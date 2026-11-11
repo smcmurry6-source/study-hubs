@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (redesign phase 2: the new Perio, beside the live one, Claude Code)** — Nothing students see changes.
+  `hubs/perio/next/` is Perio on the shared engine, with no engine of its own: settings in `window.SH_HUB`, content in
+  `next/content/` written from the live hub by `tools/hub-next/build.mjs --hub perio` (its `adaptPerio()` maps Perio's own
+  names: hints, cram, trophies, the exam format, the suture pictures, each session's Review tables), and outside a preview it
+  sends visitors to the live hub. Same hub id, state key, answered event, all 749 question ids and **Perio's own saved shape**
+  (`stateShape: "answered"`; the live page reads a save the new one wrote), and the same export, so question health keeps
+  every version. The engine (`widget/hub.js`, gated) learned recall cards, case links, HTML review sections under the notes,
+  the exam-format mock (46 in 80, partial credit, an ordering question) and Perio's arcade API; for every new hub, the games
+  keep their own button style (BUG-058) and tag questions with the lecture's color. Perio's text takes a deeper pink for
+  contrast (`widget/hub.css`). Its six arcade lobby drawings are drawn (`tools/figures/site/arcade.mjs`, `PERIO_DRAFT`) and wait
+  for Sam's yes. Budgets and the accessibility baseline gain the page. Hub note: `vault/hubs/perio.md`, "The new version".
 - **2026-11-11 (redesign phase 2: the new Heme & Endo Exam 2, beside the live one, Claude Code)** — Nothing students see
   changes. `hubs/heme-endo-exam2/next/` is the hub on the shared engine, built the way phase 1 built Occlusion's: settings in
   `window.SH_HUB`, content in `next/content/` written from the live hub by `tools/hub-next/build.mjs` (now with

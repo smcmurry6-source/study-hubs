@@ -77,5 +77,24 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   look change. **Left for Heme & Endo:** Sam's look at the colors and the player in the preview. **Next step for this task:**
   Perio's port in a fresh session (its own engine: `QBANK_FILTER`, sessions, template-literal notes, the case kit,
   `PERIO_SKIN` and its six lobby drawings), reading this note, the [perio hub note](../hubs/perio.md) and phase 1's Outcome.
+- 2026-11-11 (Claude Code, hand-off): **Perio's new version is built**, its own session as Sam asked, waiting for Sam's look
+  and the arcade drawings' yes. What's built: `hubs/perio/next/` (settings in `SH_HUB`; content from
+  `node tools/hub-next/build.mjs --hub perio` through `adaptPerio()`, all 749 ids, state key, answered event and Perio's own
+  saved shape unchanged; every piece: the [hub note](../hubs/perio.md), "The new version"). In `widget/hub.js`, gated so
+  Occlusion's and Heme & Endo's new versions are unchanged: Perio's saved shape (`stateShape: "answered"`), recall cards,
+  case links, HTML review sections under each session's notes (Side by side hidden), the exam-format mock (46 in 80, 5 Patient
+  Box, 5 multiple-answer with partial credit, 1 ordering), Perio's export for question health, and its arcade's `start`/`stop`.
+  For every hub on the engine: the games keep their own buttons' style (BUG-058) and tag a question with its lecture's color.
+  Checked on the local preview as the returning test account, phone and laptop: the four views, every More page, an answer
+  of each kind, a drawn case and its links, the mock, all six games (an arcade answer counts), lecture colors (9) and Notes
+  done; a carried-over save (old bank filters, a retired id, trophies, arcade bests) keeps Perio's shape, and the live page
+  reads a save the new one wrote. The exports match the live hubs' for all three new versions. Checks: syntax, vault, build
+  `--check`, cases, smoke (every hub), secrets, archive, preview safety, accessibility (Perio's new page clean, its baseline
+  added; its text a deeper pink for contrast) and performance (564 KB against the live page's 1,106; its budget added).
+  The database suites need PostgreSQL, which this session lacks: CI runs them. **Left for Perio:** Sam's look on the PR,
+  Sam's yes on the six lobby drawings (contact sheet sent; until then the lobby shows icons; how to switch them in: the hub
+  note), BUG-059 (Occlusion's and Heme & Endo's game header buttons, open). The release drafts are in
+  [the release note](2026-11-06-redesign-release.md). **Next step for this task:** Sam's answers on Perio, then the
+  [release](2026-11-06-redesign-release.md); this note's Outcome once both new versions are approved.
 
 ## Outcome

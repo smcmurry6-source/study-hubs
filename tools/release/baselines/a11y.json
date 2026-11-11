@@ -194,30 +194,17 @@
    "motion": 0
   },
   "perio · home": {
-   "axe": {
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
-    }
-   },
+   "axe": {},
    "focus": {
     "invisible": 0,
     "stuck": 0,
-    "where": []
+    "where": [],
+    "why": []
    },
    "motion": 0
   },
   "perio · compendium": {
-   "axe": {
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
-    }
-   },
+   "axe": {},
    "focus": null,
    "motion": 0
   },
@@ -228,18 +215,6 @@
      "impact": "critical",
      "help": "Elements must only use supported ARIA attributes",
      "sample": "button[data-rv-lec=\"all\"]"
-    },
-    "color-contrast": {
-     "n": 18,
-     "impact": "serious",
-     "help": "Elements must meet minimum color contrast ratio thresholds",
-     "sample": "#ref-staging > .eyebrow > .tag-teal.chip"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
     },
     "svg-img-alt": {
      "n": 10,
@@ -252,14 +227,7 @@
    "motion": 0
   },
   "perio · arcade": {
-   "axe": {
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
-    }
-   },
+   "axe": {},
    "focus": null,
    "motion": 0
   },
@@ -374,12 +342,6 @@
      "impact": "serious",
      "help": "Elements must meet minimum color contrast ratio thresholds",
      "sample": ".hn-num"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
     }
    },
    "focus": null,
@@ -488,6 +450,36 @@
    "motion": 0
   },
   "heme-endo-exam2/next (dark)": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "perio/next · home": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "perio/next · notes": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "perio/next · questions": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "perio/next · more": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "perio/next (dark)": {
    "axe": {},
    "focus": null,
    "motion": 0

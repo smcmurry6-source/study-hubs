@@ -190,6 +190,33 @@ Arcade work as now). Its arcade row: every game in the lobby with its own drawin
 the mock's five Exam 1 questions said "each from a different Exam 1 lecture"; Sam, 2026-11-11: "draw at random", so it now
 says they're drawn at random, fixed on the live page in [#312](https://github.com/smcmurry6-source/study-hubs/pull/312).)
 
+### From phase 2, Perio ([phase 2](2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../hubs/perio.md))
+
+Built in `hubs/perio/next/` (2026-11-11). Perio's final is Thursday, November 19, so by the rule above it is switched in if
+the release comes before then. At the release its own engine goes with the old page, and its content JSON becomes where
+it is edited, as for the others (Done when, above).
+**The six arcade lobby drawings** wait for Sam's yes on the contact sheet (2026-11-11); without it, the release ships the
+lobby with each game's icon.
+
+**About page** (Perio's entries, rewritten for the new version):
+- **Review** is gone as a tab: each session's tables sit under its notes ("Charts for this lecture") and the search finds
+  their rows. The Compendium's parts are Notes and Questions, as on every hub.
+- **The mock exam** follows the final's format from Dr. Abou-Arraj's midterm emails: 46 questions in 80 minutes, 5 Patient
+  Box cases, 5 multiple-answer questions scored with partial credit, 1 ordering question, from all 9 sessions; the results
+  give points per session.
+- **Recall cards** (Perio's short-answer questions) are in the bank: think of the answer, reveal it, then say whether you
+  got it; that counts as right or missed.
+- Perio's 16 trophies, its saved progress and the arcade's six games carry over as they are (the games' names as they are
+  now: Pocket Showdown, Perio Clinic Escape, Mind the Pocket, Million-Dollar Smile, Cross-Section, Calculus Crusher).
+
+**[question-bank-filter-panel](../rules/question-bank-filter-panel.md)**: "Perio has its own engine's copy" (and `QBANK_FILTER`,
+`qbankNorm()`, `STATE.ui.qbank`) comes out: Perio's bank is the engine's, its saved filters moved over once (`ui.qbankIn`).
+
+**[hub-home-page](../rules/hub-home-page.md)**: Perio's Home is the engine's (`SH_HUB.home`): the final's countdown and chips.
+
+**[arcade-skins](../rules/arcade-skins.md)**: Perio: Pocket Showdown first. A hub's game tags its question with the lecture's
+own color (`env.lc`, `.gm-sess`), and the games keep their own buttons' style inside the stage (BUG-058).
+
 ### From the Learn and Flashcards toggle ([Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md))
 
 Sam confirmed the calls in that note (2026-11-06); check against the engine as built.

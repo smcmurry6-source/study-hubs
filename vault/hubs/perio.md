@@ -84,6 +84,46 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   sit; how far a longer lower third moves the teeth) are illustrative, and their labels give only the notes' relations
   and numbers. Each cites its outside sources in "What this shows, and what's simplified".
 
+## The new version (the redesign, not live yet)
+
+`hubs/perio/next/` is the redesigned hub on the shared engine (`widget/hub.js`), built beside this one
+([phase 2](../tasks/2026-11-05-redesign-phase-2-live-hubs.md), the way Occlusion's and [Heme & Endo Exam 2's](heme-endo-exam2.md)
+were) and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Perio needs no engine of its own there: its
+old one goes at the release. Nothing students see changes until then: outside a preview the page sends the visitor to the
+live hub. Until then **edit content in the live file only**:
+- `node tools/hub-next/build.mjs` rewrites `next/content/` from `hubs/perio/index.html`. Run it after any change to the live
+  hub (a question, a note, a hint, a case, a figure) and commit the JSON; CI's "generated files are current" step fails when
+  it's stale. Its `adaptPerio()` turns Perio's own names into the engine's shapes: `EXAM_HINTS` (hints, `type` → kind),
+  `CRAM_CONTENT`, the achievements (`topicPercent` → `lecRight`, "every question of a session right once"), `EXAM_FORMAT`
+  (the mock), the suture pictures (`SUTURE_DIAGRAMS`, `SUTURE_DEFS` → figures), and each session's `REF_SECTIONS` into the
+  Review tables under that session's notes (the live hub's own HTML; More's Side by side has nothing left, so it's hidden,
+  `core.noSide`). The sandbox runs `widget/cases.js` first, so the Patient Box rows (`foldBox`) come out as the live hub draws them.
+- **Progress carries over:** same hub id, state key `perio-d2-compendium-state-v1`, answered event `perio:answered`, all 749
+  question ids (`tools/question-ids/perio.txt`), and **Perio's own saved shape** (`SH_HUB.stateShape: "answered"`:
+  `answered`, `totalSeen`, `activeDates`, `achievements` as `true`), which the dashboard reads as it is. The engine reads and
+  writes it only through `ansOf()`, `putAnswer()`, `studyDayList()` and `achMap()`, so the live page reads a save the new
+  one wrote (checked: a rollback keeps every answer). It adds `nx` (the daily goal) and `read` (Notes done), which the live
+  page ignores. The bank's saved filters (`ui.qbank`) move into the engine's once (`ui.qbankIn`).
+- **Question health keeps every version:** the export (`SH_EXPORT.questions`) matches the live hub's for all 749 (the
+  Patient Box rows before the stem, a multi's keys: `core.exportCase`).
+- The engine learned, gated to the hubs that have them: **recall cards** (reveal, then "I got it" / "I missed it"),
+  **case links** ("In the notes", `shCases.refHTML`), a lecture's **note** under its title, **HTML review sections**, and the
+  **exam-format mock** (`EXAM_FORMAT`: 46 in 80 minutes, 5 Patient Box, 5 multiple-answer with partial credit, 1 ordering,
+  points per session). Its arcade (`POCKET ARCADE` to `BOOT`, with `PERIO_SKIN`) is the live hub's, wrapped like the others';
+  its `start` / `stop` are mapped to the engine's `startGame` / `stopAll`, and its colors and fonts come through the build
+  (`--ar-*` ending in `--ar-lilac`; Bungee, which the new page doesn't load, so it falls back to Arial Black).
+- The page (`next/index.html`) is settings only: `window.SH_HUB` holds the words the live hub writes in its own code (Home's
+  final card and chips, the hints banner, the mock's blurb, the arcade's games with their current names, Pocket Showdown
+  first). When one changes in the live hub, change it there too. Perio has no Timmy Time episode, so More has no Timmy tile.
+- Its text color is a deeper pink than its art's ink (`#9e3a60`, 5.1:1 on its light pink; the ink is 4.05:1), in `widget/hub.css`.
+- Its art: tint `#b4466f`, emblem and masthead (phase 0). **The six arcade lobby drawings wait for Sam's yes** (contact sheet
+  sent 2026-11-11): drawn in `tools/figures/site/arcade.mjs` (`pBoard()` to `pCrusher()`, exported as `PERIO_DRAFT`, not in
+  `SETS`). Until then the lobby shows each game's icon. On a yes: add `perio: buildPerio` to `SETS`, drop `PERIO_DRAFT`, run
+  `node tools/figures/site/build.mjs` and commit `widget/hub-art/perio.js`.
+- Not carried over (on purpose): the MCQ sprint and the midterm's scope (the midterm is over), the live lobby's daily
+  rotating first game (Pocket Showdown is first), hints' slide and email source tags. Active recall is the
+  [Learn and Flashcards](../tasks/2026-11-06-redesign-learn-and-flashcards.md) task's.
+
 ## Pending
 
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's

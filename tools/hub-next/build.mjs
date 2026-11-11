@@ -32,7 +32,17 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const HUBS = {
   occlusion: { exam: "final" },
   /* phase 2 (vault/tasks/2026-11-05-redesign-phase-2-live-hubs.md): one exam, which the live hub keeps in EXAM_DATE */
-  "heme-endo-exam2": { examLabel: "Exam 2" }
+  "heme-endo-exam2": { examLabel: "Exam 2" },
+  /* phase 2: Perio, whose own engine keeps its content under other names (EXAM_HINTS, CRAM_CONTENT, REF_SECTIONS, the
+     suture pictures, EXAM_FORMAT, MIDTERM_DATE): adaptPerio() below turns them into the shapes the other hubs give */
+  perio: { adapt: "perio", lecPrefix: "S", iconsEnd: "/* ---------- exam calendar",
+    arcade: { from: "/* ====================================================================\n   POCKET ARCADE", to: "/* ====================================================================\n   BOOT / MODE SWITCHING",
+      css: [["/* ===================================================================\n   POCKET ARCADE", "/* ---------- tabs: phones get"]],
+      fonts: "--font-arcade:'Bungee','Arial Black',Impact,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,Menlo,monospace",
+      /* its games call recordAnswer(qid, lec, ok, choice) and showToast, and read its sessions' labels and the midterm's last session */
+      env: (main, D) => "var recordAnswer = function(qid, lec, ok, choice){ return env.record(qid, lec, ok, 'arcade', choice); }, showToast = function(m){ toast(String(m).replace(/<[^>]*>/g, '')); },\n" +
+        "  MIDTERM_AFTER = " + JSON.stringify(D.MIDTERM_AFTER) + ", sessChip = function(l){ return l ? '<span class=\"gm-sess' + env.lc(l.id) + '\">' + lecLabel(l) + '</span>' : ''; };\n" +
+        main.match(/function shortTitle\(l\)\{[\s\S]*?\n\}/)[0] + "\n"} }
 };
 
 const args = process.argv.slice(2);
@@ -98,23 +108,83 @@ const DATA = ["LECTURES", "EXAM_INFO", "COURSE_DATES", "EXAM_DATE", "FINAL_DATE"
   "FIGS", "FIG_PLACE",
   /* Heme & Endo Exam 2: review-only lectures (its Exam 1 Refresher), lectures the exam counts together, and lectures
      whose mock questions are High likelihood only */
-  "COUNT_SKIP", "EXAM_GROUPS", "MOCK_LIKELY_ONLY"];
+  "COUNT_SKIP", "EXAM_GROUPS", "MOCK_LIKELY_ONLY",
+  /* Perio's own names (adaptPerio) */
+  "EXAM_HINTS", "CRAM_CONTENT", "MIDTERM_DATE", "MIDTERM_AFTER", "EXAM_FORMAT", "SUTURE_DIAGRAMS", "SUTURE_DEFS"];
+
+/* Perio's Review tables are functions that write HTML (REF_SECTIONS[i].body()). The hook runs each one with its figures
+   swapped for tokens (@@FIG:key@@), so the build can cut the figures out into the engine's figure sections. */
+const REF_HOOK = `REF: (function(){
+  if (typeof REF_SECTIONS === "undefined") return undefined;
+  var ah = ANIMA.html, sd = typeof SUTURE_DIAGRAMS === "undefined" ? null : SUTURE_DIAGRAMS;
+  ANIMA.html = function(k){ return "@@FIG:" + k + "@@"; };
+  if (sd) { var tok = {}; Object.keys(sd).forEach(function(k){ tok[k] = ["@@FIG:" + k + "@@", sd[k][1]]; }); SUTURE_DIAGRAMS = tok; }
+  try { return REF_SECTIONS.map(function(s){ return { id: s.id, lec: s.lec, title: s.title, html: s.body() }; }); }
+  finally { ANIMA.html = ah; if (sd) SUTURE_DIAGRAMS = sd; }
+})()`;
+
+/* Perio's names and shapes, as the other hubs give them */
+function adaptPerio(D){
+  const label = (l) => "S" + l.num;
+  D.LECTURES = D.LECTURES.map((l) => Object.assign({}, l, { label: label(l) }));
+  D.EXAM_DATE = D.MIDTERM_DATE;
+  D.HINTS = (D.EXAM_HINTS || []).map((x) => ({ lec: x.lec, kind: x.type, quote: x.quote, take: x.takeaway }));
+  D.CRAM = {}; (D.CRAM_CONTENT || []).forEach((c) => { D.CRAM[c.lec] = c.points; });
+  D.DRILL_HY = { "exam-review": "on the class exam-review guide" };
+  /* its trophies: the same ids (progress is keyed on them), in the engine's terms */
+  const byId = {}; D.LECTURES.forEach((l) => { byId[l.id] = l; });
+  D.ACHIEVEMENTS = (D.ACHIEVEMENTS || []).map((a) => {
+    const c = a.cond, n = c.value;
+    if (c.type === "totalCorrect") return { id: a.id, name: a.name, desc: n === 1 ? "Your first question right" : n + " questions right", cond: { type: "totalCorrect", n } };
+    if (c.type === "streak") return { id: a.id, name: a.name, desc: n + " right in a row", cond: { type: "streak", n } };
+    return { id: a.id, name: a.name, desc: "Every " + label(byId[c.lec]) + " question right at least once", cond: { type: "lecRight", lec: c.lec, pct: n } };
+  });
+  /* the exam-format mock: its shape, with the time in seconds */
+  if (D.EXAM_FORMAT) D.MOCK_FORMAT = Object.assign({}, D.EXAM_FORMAT);
+  /* the suture pictures, as drawn figures (q.img names one); their gradients go in the page once */
+  if (D.SUTURE_DIAGRAMS) {
+    D.FIGS = {};
+    Object.keys(D.SUTURE_DIAGRAMS).forEach((k) => { D.FIGS[k] = { title: k === "_strands" ? "Monofilament vs braided" : k, svg: D.SUTURE_DIAGRAMS[k][0], caption: D.SUTURE_DIAGRAMS[k][1] }; });
+    D.FIG_DEFS = D.SUTURE_DEFS || "";
+  }
+  /* Review: one group per session, each table its own section; a figure inside a table's HTML becomes a figure section */
+  const groups = {};
+  (D.REF || []).forEach((r) => {
+    const g = groups[r.lec] = groups[r.lec] || { id: "rv-" + r.lec, lec: r.lec, title: byId[r.lec] ? byId[r.lec].title : r.lec, sections: [] };
+    let html = r.html
+      .replace(/<div class="sut-grid">([\s\S]*?)<\/div>(?=$|<)/, (m, inner) => "@@FIGS:" + [...inner.matchAll(/@@FIG:([^@]+)@@/g)].map((x) => x[1]).join(",") + "@@")
+      .replace(/<div class="lec-fig-card">@@FIG:([^@]+)@@<\/div>/g, "@@FIGS:$1@@")
+      .replace(/@@FIGS:([^@]+)@@@@FIGS:/g, "@@FIGS:$1,")
+      .replace(/<div class="table-wrap"><table class="chart-table">/g, '<div class="tbl-wrap" tabindex="0" role="region" aria-label="' + r.title.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]) + ' (table)"><table>')
+      .replace(/<th>/g, '<th scope="col">').replace(/<h5>/g, "<h4>").replace(/<\/h5>/g, "</h4>").replace(/ style="[^"]*"/g, "");
+    const parts = html.split(/@@FIGS:([^@]+)@@/);
+    let first = true;
+    parts.forEach((part, i) => {
+      if (i % 2) { g.sections.push({ title: first ? r.title : "", type: "figs", figs: part.split(",") }); first = false; }
+      else if (part.trim()) { g.sections.push({ title: first ? r.title : "", type: "html", html: part }); first = false; }
+    });
+  });
+  D.REVIEW = D.LECTURES.map((l) => groups[l.id]).filter(Boolean);
+}
 
 function build(hub){
   const cfg = HUBS[hub] || {};
   const file = join(ROOT, "hubs", hub, "index.html");
   const html = readFileSync(file, "utf8");
   const scripts = [...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(m => m[1]);
-  const main = scripts.find(s => s.includes("var QUESTIONS = []") && s.includes("window.SH_EXPORT = {"));
+  const main = scripts.find(s => s.includes("var QUESTIONS = [") && s.includes("window.SH_EXPORT = {"));
   if (!main) throw new Error(`${file}: no inline hub script`);
   const hook = "window.__NEXT = {" + DATA.map(n => `${n}: typeof ${n} === "undefined" ? undefined : ${n}`).join(", ") +
-    ", PODCAST: window.SH_PODCAST };\n";
+    ", PODCAST: window.SH_PODCAST, " + REF_HOOK + " };\n";
   const at = main.lastIndexOf("window.SH_EXPORT = {");
   const ctx = sandbox();
+  /* a hub that loads the dental case kit uses it while its script runs (Perio's shCases.foldBox) */
+  if (/<script[^>]*src="[^"]*widget\/cases\.js"/.test(html)) vm.runInContext(readFileSync(join(ROOT, "widget/cases.js"), "utf8"), ctx, { filename: "widget/cases.js" });
   vm.runInContext(main.slice(0, at) + hook + main.slice(at), ctx, { filename: file, timeout: 20000 });
   const D = ctx.__NEXT;
   if (!D || !Array.isArray(D.QUESTIONS) || !D.QUESTIONS.length) throw new Error(`${file}: the sandbox produced no questions`);
   const clean = v => JSON.parse(JSON.stringify(v === undefined ? null : v));
+  if (cfg.adapt === "perio") adaptPerio(D);
 
   const likely = {};
   (D.LIKELY_TOPICS || []).forEach((t, k) => (t.ids || []).forEach(id => { if (!(id in likely)) likely[id] = k; }));
@@ -126,7 +196,10 @@ function build(hub){
     ].filter(Boolean),
     examInfo: clean(D.EXAM_INFO), courseDates: clean(D.COURSE_DATES), lectures: clean(D.LECTURES),
     likelyTopics: clean(D.LIKELY_TOPICS), examCounts: clean(D.EXAM_COUNTS),
-    mock: Object.assign({ blueprint: clean(D.MOCK_BLUEPRINT), limit: D.MOCK_LIMIT },
+    mock: Object.assign({ blueprint: clean(D.MOCK_BLUEPRINT), limit: D.MOCK_FORMAT ? D.MOCK_FORMAT.minutes * 60 : D.MOCK_LIMIT },
+      /* an exam-format mock (Perio's EXAM_FORMAT): so many Patient Box, select-all and ordering items, the rest multiple
+         choice, drawn round-robin across the lectures (widget/hub.js, buildMock) */
+      D.MOCK_FORMAT ? { format: clean(D.MOCK_FORMAT) } : {},
       D.EXAM_GROUPS && Object.keys(D.EXAM_GROUPS).length ? { groups: clean(D.EXAM_GROUPS) } : {},
       D.MOCK_LIKELY_ONLY && Object.keys(D.MOCK_LIKELY_ONLY).length ? { likelyOnly: clean(D.MOCK_LIKELY_ONLY) } : {}),
     srcLabel: clean(D.SRC_LABEL), drillHy: clean(D.DRILL_HY), achievements: clean(D.ACHIEVEMENTS), podcast: clean(D.PODCAST),
@@ -136,6 +209,11 @@ function build(hub){
     index: D.QUESTIONS.map(q => [q.id, q.lec, q.likely ? 1 : 0, q.src || ""])
   };
   /* review-only lectures: in the bank only when ticked, never in the totals (widget/hub.js, isReview) */
+  /* Perio's live export put each Patient Box before its stem and listed a multi's keys: question health fingerprints
+     that export, so the new version exports the same (widget/hub.js exportQuestions) */
+  if (cfg.adapt === "perio") core.exportCase = true;
+  /* every chart belongs to one lecture (Perio's): More's Side by side has nothing to show */
+  if (Array.isArray(D.REVIEW) && D.REVIEW.length && !D.REVIEW.some((g) => g && !g.lec)) core.noSide = true;
   if (D.COUNT_SKIP && Object.keys(D.COUNT_SKIP).length) core.reviewOnly = Object.keys(D.COUNT_SKIP).filter(k => D.COUNT_SKIP[k]);
   const out = {
     "core.json": JSON.stringify(core),
@@ -157,28 +235,38 @@ function build(hub){
     /* no drawing kit (Heme & Endo Exam 2): the hub's drawn FIGS (built by its own figure build) and FIG_PLACE as data, the
        anima block as is, and the kit's case-picture and cusp-map hooks as no-ops */
     out["figures.js"] = head + "window.SH_FIGURES = function(env){\n'use strict';\nvar escHtml = env.esc, shuffled = env.shuffled, saveState = env.save, STATE = env.state;\n" +
-      "var FIGS = " + JSON.stringify(clean(D.FIGS) || {}) + ";\nvar FIG_PLACE = " + JSON.stringify(clean(D.FIG_PLACE) || {}) + ";\n" + anima +
+      "var FIGS = " + JSON.stringify(clean(D.FIGS) || {}) + ";\nvar FIG_PLACE = " + JSON.stringify(clean(D.FIG_PLACE) || {}) + ";\n" +
+      /* drawn figures that share gradients (Perio's suture pictures): their defs go in the page once */
+      (D.FIG_DEFS ? "var FIG_DEFS = " + JSON.stringify(D.FIG_DEFS) + ";\nif (typeof document !== 'undefined' && document.body && !document.body.querySelector('[data-fig-defs]')) document.body.insertAdjacentHTML('beforeend', FIG_DEFS.replace('<svg ', '<svg data-fig-defs ')); \n" : "") + anima +
       "\nreturn { OD: null, FIGS: FIGS, FIG_PLACE: FIG_PLACE, CASE_IMG: {}, caseImgHTML: function(){ return ''; }, cuspMapHTML: function(){ return ''; }, wireCuspMaps: function(){}, CUSP_GAME: { mount: function(){} }, ANIMA: ANIMA };\n};\n";
   }
   /* the figures' own CSS, with one change for the redesign: no label under 11px (the taste skill's floor; the live
      hub draws some at 10 and 10.5px). Everything else about their look is restyled in widget/hub.css, under html.shx. */
-  out["figures.css"] = head + ((hasKit ? between(style, "/* od:css begin */", "/* od:css end */", file) : "") + between(style, "/* anima:css begin */", "/* anima:css end */", file))
+  out["figures.css"] = head + ((hasKit ? between(style, "/* od:css begin */", "/* od:css end */", file) : "") + between(style, "/* anima:css begin */", "/* anima:css end */", file) +
+    /* labels in a suture picture that give its answer away hide while it sits above the question (Perio's .sd-hint) */
+    (D.FIG_DEFS ? "\nhtml.shx .qfig:not(.qfig-after) .sd-hint{display:none}\nhtml.shx .fig-card svg{display:block;width:100%;height:auto}\n" : ""))
     .replace(/font-size:\s*(?:9|9\.5|10|10\.5)px/g, "font-size:11px");
 
   /* the arcade: its games, skin and leaderboards, with the hub's icon set */
-  const icons = main.slice(main.indexOf("var ICON_PATHS"), main.indexOf("var EXAM_DATE"));
-  const arcadeStart = main.indexOf("var ARCADE = (function(){"), arcadeEnd = main.indexOf("/* ---------- theme toggle");
+  const AR = cfg.arcade || {};
+  const icons = main.slice(main.indexOf("var ICON_PATHS"), main.indexOf(cfg.iconsEnd || "var EXAM_DATE"));
+  const arcadeStart = main.indexOf(AR.from || "var ARCADE = (function(){"), arcadeEnd = main.indexOf(AR.to || "/* ---------- theme toggle");
   if (arcadeStart < 0 || arcadeEnd < arcadeStart) throw new Error(`${file}: can't find the arcade`);
   out["arcade.js"] = head + "window.SH_ARCADE = function(env){\n'use strict';\n" +
     "var escHtml = env.esc, STATE = env.state, saveState = env.save, toast = env.toast, QUESTIONS = env.questions, LECTURES = env.lectures, LECTURE_BY_ID = env.lectureById,\n" +
-    "  shuffled = env.shuffled, recordAnswer = env.record, lecLabel = env.lecLabel, SORT_SETS = env.sortSets, READINGS = env.readings, REVIEW = env.review;\n" +
+    "  shuffled = env.shuffled, recordAnswer = env.record, lecLabel = env.lecLabel, SORT_SETS = env.sortSets, READINGS = env.readings, REVIEW = env.review;\n" + (AR.env ? AR.env(main, D) : "") +
     /* the page sits one folder down (hubs/<id>/next/), so the hub's pictures are one folder up */
     (icons + main.slice(arcadeStart, arcadeEnd)).replace(/href="img\//g, 'href="../img/').replace(/href=\\"img\//g, 'href=\\"../img/').replace(/bg:'img\//g, "bg:'../img/") +
     "\nreturn { arcade: ARCADE, icon: icon };\n};\n";
-  const arcCss = style.slice(style.indexOf("/* ===================================================================\n   ARCADE"), style.indexOf("/* ---------- responsive ---------- */")) +
-    style.slice(style.indexOf("/* ---------- arcade leaderboards ---------- */"), style.indexOf("/* ---------- Listen (shared widget TTS) ---------- */"));
+  const arcCss = (AR.css || [["/* ===================================================================\n   ARCADE", "/* ---------- responsive ---------- */"],
+    ["/* ---------- arcade leaderboards ---------- */", "/* ---------- Listen (shared widget TTS) ---------- */"]]).map(([a, b]) => {
+    const i = style.indexOf(a), j = style.indexOf(b, i); if (i < 0 || j < 0) throw new Error(`${file}: can't find the arcade's CSS between "${a.split("\n").pop()}" and "${b}"`); return style.slice(i, j); }).join("");
   /* and the stylesheet sits in content/, two folders below the hub's img/ */
-  out["arcade.css"] = head + ":root{" + (style.match(/--ar-bg:[^}]*?--ar-violet:[^;]*;/) || [""])[0] + "--font-arcade:'Press Start 2P','Courier New',monospace}\n" + arcCss.replace(/url\((["']?)img\//g, "url($1../../img/");
+  /* the arcade's own colors (--ar-*; Perio's end in --ar-lilac, not --ar-violet: every --ar- declaration of that block) and
+     its fonts (AR.fonts: Perio's chunky Bungee and mono; the page loads no web font for them, so they fall back as listed) */
+  const arVars = (style.match(/--ar-bg:[^}]*?--ar-violet:[^;]*;/) || [])[0] ||
+    (style.indexOf("--ar-bg:") < 0 ? "" : (style.slice(style.indexOf("--ar-bg:"), style.indexOf("}", style.indexOf("--ar-bg:"))).match(/--ar-[\w-]+:[^;]*;/g) || []).join(""));
+  out["arcade.css"] = head + ":root{" + arVars + (AR.fonts || "--font-arcade:'Press Start 2P','Courier New',monospace") + "}\n" + arcCss.replace(/url\((["']?)img\//g, "url($1../../img/");
 
   /* every file parses before it's written */
   for (const k of Object.keys(out)) if (k.endsWith(".js")) new vm.Script(out[k], { filename: k });
