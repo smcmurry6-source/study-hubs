@@ -1,6 +1,6 @@
 {
  "about": "Known accessibility issues per screen, so tools/release/a11y.js can fail only on new ones. Lower these numbers; never raise them to make a check pass (fix the page instead), except for a deliberate change Sam approved.",
- "updated": "2026-11-06",
+ "updated": "2026-11-11",
  "pages": {
   "dashboard": {
    "axe": {
@@ -414,7 +414,8 @@
    "focus": {
     "invisible": 0,
     "stuck": 0,
-    "where": []
+    "where": [],
+    "why": []
    },
    "motion": 0
   },
@@ -463,6 +464,36 @@
    "motion": 0
   },
   "occlusion/next (dark)": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "heme-endo-exam2/next · home": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "heme-endo-exam2/next · notes": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "heme-endo-exam2/next · questions": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "heme-endo-exam2/next · more": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "heme-endo-exam2/next (dark)": {
    "axe": {},
    "focus": null,
    "motion": 0

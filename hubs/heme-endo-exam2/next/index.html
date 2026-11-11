@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Heme &amp; Endo Exam 2</title>
+<script>
+/* The redesigned Heme & Endo Exam 2 (phase 2 of the redesign, vault/tasks/2026-11-05-redesign-phase-2-live-hubs.md). Nothing
+   links here and it is only for the preview: anywhere but a preview (or a file/localhost copy) it sends the visitor to the
+   live hub, so the class keeps seeing the live Heme & Endo Exam 2 until the redesign is released. */
+(function(){
+  var local = location.protocol === "file:" || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  if (!window.SH_PREVIEW_CONFIG && !local) location.replace("../" + location.hash);
+})();
+</script>
+<link rel="icon" type="image/png" sizes="32x32" href="../../../assets/favicon-32.png?v=2">
+<link rel="icon" type="image/png" sizes="64x64" href="../../../assets/favicon-64.png?v=2">
+<meta name="theme-color" content="#a83232">
+<link rel="preload" href="../../../assets/fonts/nunito-sans-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="content/core.json" as="fetch" type="application/json" crossorigin>
+<link rel="stylesheet" href="../../../widget/hub.css">
+<script>
+/* This hub's settings for the engine (widget/hub.js). The content is in content/, written from the live hub by
+   tools/hub-next/build.mjs; the words below are the live hub's own (its Home, hints, mock, bank and arcade). The Exam 1
+   Refresher (R) is review only: the build lists it in core.json's reviewOnly (the live hub's COUNT_SKIP), so it is out of
+   every total and out of the bank until it is ticked, and "Exam 1 High likelihood" below is the live hub's likely1 toggle. */
+window.SH_HUB = {
+  hub: "heme-endo-exam2",
+  name: "Heme & Endo Exam 2",
+  stateKey: "hee2-state-v1",
+  answeredEvent: "hee2:answered",
+  firstLec: "dmpharm",
+  content: "content/",
+  widget: "../../../widget/",
+  assets: "../",
+  back: "../../../index.html",
+  about: "../../../about/",
+  home: {
+    title: "Exam 2",
+    when: "Friday, November 13 · 10:00-11:30 am · in person, LockDown Browser",
+    chips: ["50 questions in 90 minutes", "45 new", "5 from Exam 1", "L11-L16"],
+    prof: "the professors",
+    onExam: "On Exam 2",
+    offExam: "Exam 1 review: not in your totals"
+  },
+  notes: { onExam: "On Exam 2", offExam: "Exam 1 Refresher", offNote: "Review only: 5 questions on Exam 2 come from Exam 1" },
+  hints: {
+    prof: "the professors",
+    words: "In the professors' words",
+    wordsNote: "Direct quotes from the lecture recordings where a professor flagged something to know or waved it off, plus the slides a professor told the class to focus on (focus list).",
+    banner: "The exam: Friday, November 13, 10:00-11:30 am; 50 questions: 8 on L11, 9 on L12, 7 each on L13-L16, 5 on Exam 1. Below: the most likely questions for each lecture, then what the professors said in the recordings, in their words."
+  },
+  /* the bank: the Refresher stays out until it's ticked (Sam, 2026-11-10), and its own High likelihood toggle (Sam, 2026-11-06) */
+  review: {
+    all: "All {n} Exam 2 lectures",
+    allPlus: "All {n} Exam 2 lectures + R",
+    allBtn: "All Exam 2 lectures",
+    help: "The Exam 1 Refresher (R) stays out until you tick it.",
+    tag: "Exam 2 lectures + R",
+    count: "Exam 1 review"
+  },
+  bank: { only: [["likely1", "Exam 1 High likelihood", { prop: "likely", lec: "refresh" }]] },
+  mock: {
+    blurb: "The real exam's own count per lecture: 8 from L11, 9 from L12 (both hours together), 7 each from L13, L14, L15 and L16, and 5 on Exam 1, drawn at random from the Exam 1 Refresher's High Likelihood questions (Exam 1's predicted topics). It uses single-answer questions, including two-statement, true/false and numbered-statement items; practice the select-all, matching and ordering ones in the bank. Questions you haven't seen or missed last time are picked first.",
+    how: "It runs like the real thing: 90 minutes, an answer for each question with no feedback, then submit. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats."
+  },
+  arcade: {
+    first: "sort",
+    how: "Surge Showdown, the Path Lab Escape and The Yellow Body run the real question bank (those answers count toward class-wide stats). Blank Rx blanks the key terms out of the notes for you to type back. Lab Sort drills the splits that get mixed up (primary vs secondary, Sertoli vs Leydig, follicular vs luteal, which drug does what). Crossing Over turns the one-word answers into a crossword.",
+    games: [
+      { id: "sort", icon: "shuffle", name: "Lab Sort", desc: "Cards rain down. Fling each into the right bin before it hits the floor: insulin secretagogue or not, primary or secondary, Sertoli or Leydig, follicular or luteal, and more." },
+      { id: "board", icon: "questions", name: "Surge Showdown", desc: "A rack of sample tubes, one column per lecture. Two LH Surge wagers, then the Final Surge. Answers count toward class stats." },
+      { id: "escape", icon: "tour", name: "Path Lab Escape", desc: "Locked in the endocrine pathology lab after hours. Answer what locks the microscope, the analyzer and the specimen fridge, then find what the glucose meter reads. Six minutes." },
+      { id: "cloze", icon: "highlight", name: "Blank Rx", desc: "A sentence from the notes with its key term left blank, like a prescription missing the drug. Type it back before the clock runs out." },
+      { id: "smile", icon: "trophy", name: "The Yellow Body", desc: "Climb twelve rungs to $125,000 with three lifelines while a follicle ripens into a golden corpus luteum (Latin for \"yellow body\"). Miss once and you fall to your safe haven. Answers count toward class stats." },
+      { id: "cross", icon: "cram", name: "Crossing Over", desc: "A fresh mini crossword every game, from the bank's one-word answers and the key terms in the notes, the words crossing like chromatids in meiosis I." }
+    ]
+  }
+};
+</script>
+<script src="../../../widget/hub-art.js"></script>
+<script src="../../../widget/hub-art/heme-endo-exam2.js"></script>
+<script src="../../../widget/hub.js" defer></script>
+</head>
+<body>
+<noscript><p style="font:16px/1.5 system-ui;padding:24px">This hub needs JavaScript. <a href="../">Open the Heme &amp; Endo Exam 2 hub</a>.</p></noscript>
+</body>
+</html>
