@@ -347,6 +347,18 @@ html.shx .dx .shpet-ghost:hover { background: var(--active); }
   .dx-board .lvl, .dx-board .dx-vs { display: none; }
   .dx-board .val { min-width: 0; }
 }
+/* the largest text on a small phone: one name to a line, its number under it */
+@container dxarena (max-width: 300px) {
+  .dx-podium { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px 12px 4px; }
+  .dx-podium li { flex-direction: row; justify-content: flex-start; gap: 8px; text-align: left; }
+  .dx-podium .p1 { order: 1; }
+  .dx-podium .p2 { order: 2; }
+  .dx-win-txt { justify-items: start; }
+  .dx-podium .nm { justify-content: flex-start; }
+  .dx-board li { grid-template-columns: 22px minmax(0, 1fr); gap: 2px 8px; }
+  .dx-board .nm-t { overflow: visible; white-space: normal; overflow-wrap: anywhere; }
+  .dx-board .val { grid-column: 2; text-align: left; }
+}
 /* the stage in motion: confetti drifts down, the stars twinkle, the lights breathe, the crown bobs, the winners hop once */
 @keyframes st-fall { 0% { transform: translateY(-36px); opacity: 0; } 12%, 85% { opacity: 1; } 100% { transform: translateY(70px); opacity: 0; } }
 @keyframes st-twinkle { 50% { opacity: .25; } }

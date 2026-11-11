@@ -115,7 +115,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   one). The preview has a made-up class that comes and goes (`shDash.setLive(by, list)`) and a `get_place` stub. The
   smoke test seats eight made-up people and checks the count, the stage and that markup sent as an outfit is never
   drawn. **Not in yet:** the recap's redraw (`recap.mjs`, a bar graph in a smaller card) waits for Sam's yes on its
-  contact sheet. BUG-065 and BUG-066 found and fixed.
+  contact sheet. BUG-065 to BUG-068 found and fixed (the last two in the preview's UAT).
 - **2026-11-11 (redesign phase 3: the new dashboard, beside the live one, Claude Code)** — Nothing students see changes.
   `next/index.html` is the dashboard on the design system (`widget/dash.js`, `widget/dash.css`); outside a preview it sends
   visitors to the live dashboard, and it takes `index.html`'s place at the redesign's release. The hubs are tabs with their
