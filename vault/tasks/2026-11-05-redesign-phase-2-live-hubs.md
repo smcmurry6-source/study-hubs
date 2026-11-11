@@ -48,6 +48,7 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
 ## Log
 
 - 2026-11-05: written from the agreed plan.
+- 2026-11-11: Sam: **Heme & Endo Exam 2 first**, then Perio, each in its own fresh session ([run-a-redesign-session](../how-to/run-a-redesign-session.md)).
 - 2026-11-06: Sam narrowed it to Heme & Endo Exam 2 and Perio (no PCD Implants, no Special Patient Care), all released at once.
 
 ## Outcome

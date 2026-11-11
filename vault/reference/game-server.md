@@ -143,7 +143,9 @@ name ([learner-data-privacy](../rules/learner-data-privacy.md): a visitor id nev
   paint, outfit), `rank` (journey, tier, level) and `flair` (the mastery flair the boards already show). Never the visitor
   id, XP as a number, HP, snacks, the streak, answers, the wallet, the inventory, or any date or time. An unknown key gives
   null.
-- **Turning it off**: `set_visiting(visitor, false)` writes a row in `pet_visit_off`; that person's `visit` is then null on
+- **Sam, 2026-11-11: no opt-out.** Visiting can't be turned off; the opt-out below comes out of `migration_v54.sql` before
+  the release ([the open calls](../tasks/2026-11-11-redesign-open-calls.md)).
+- **Turning it off** (to be removed): `set_visiting(visitor, false)` writes a row in `pet_visit_off`; that person's `visit` is then null on
   every board and `get_place` returns null, with an old key too. `set_visiting(visitor, true)` brings the same key back.
   `get_my_shop` says `visiting: true` or `false`. Link my devices moves the choice: off on either device stays off.
 - The idea board and today's boards (the ones without `_v2`) carry no key.
@@ -164,6 +166,9 @@ neighbors, no visitor).
 the Inbox with idea notes and the visitor's shop. With no visitor it carries today's shop and nothing of anyone's.
 
 ## Calls made while building it, for Sam to confirm before the release
+
+**Sam answered these on 2026-11-11** ([decisions](../decisions.md)): yes to all but two. Visiting has no opt-out, and an
+author's idea delete doesn't keep an empty row (what it does instead is still to ask).
 
 Each is one line in `migration_v54.sql` to change.
 
