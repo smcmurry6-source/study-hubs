@@ -168,7 +168,7 @@ the Inbox with idea notes and the visitor's shop. With no visitor it carries tod
 ## Calls made while building it, for Sam to confirm before the release
 
 **Sam answered these on 2026-11-11** ([decisions](../decisions.md)): yes to all but two. Visiting has no opt-out, and an
-author's idea delete doesn't keep an empty row (what it does instead is still to ask).
+author's idea delete removes the idea completely (row and votes). Both change `migration_v54.sql` before the release.
 
 Each is one line in `migration_v54.sql` to change.
 

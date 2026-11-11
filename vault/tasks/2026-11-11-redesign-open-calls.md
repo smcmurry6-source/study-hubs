@@ -5,7 +5,7 @@ hub: site
 created: 2026-11-11
 requested-by: Sam
 due:
-waiting-on: Sam's answer on the idea delete (call 14); the visiting change in migration_v54.sql
+waiting-on: the two changes in migration_v54.sql (visiting opt-out out, idea delete removes the row)
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/308
 ---
@@ -47,8 +47,8 @@ agent records each answer in [decisions](../decisions.md) and changes the code o
 
 **The idea board**
 - [x] An idea must name a hub with its answer keys loaded (the release loads every live hub's), or "All hubs".
-- [ ] An author's delete removes the words, name and votes but keeps an empty row for the day's limit. **Sam: no.** What
-  instead is still open: ask Sam (remove the row entirely, or no author delete at all?).
+- [x] **Sam: an author's delete removes the idea completely** (its row and votes; it then no longer counts toward the day's
+  limit). Was: keep an empty row for the day's limit.
 - [x] How long hidden ideas are kept ([analytics-retention](../reference/analytics-retention.md)): suggest 90 days.
 
 **Order of the rest**
@@ -56,17 +56,18 @@ agent records each answer in [decisions](../decisions.md) and changes the code o
 
 ## Done when
 
-- [ ] Every box above answered by Sam, each answer a line in [decisions](../decisions.md) (all but the idea delete, 2026-11-11)
+- [x] Every box above answered by Sam, each answer a line in [decisions](../decisions.md) (2026-11-11)
 - [ ] Each changed call made in `migration_v54.sql` (with `node tools/release/xp.js` and `rls.js` passing) or its note
 - [ ] This note moved to `done/` with its Outcome
 
 ## Log
 
+- 2026-11-11: Sam on call 14: the idea "disappears completely". Sam OK'd a short separate session for both v54 changes.
 - 2026-11-11: Sam answered: yes to 1-11, 13 and 15; **12: don't allow people to turn visiting off**; **14: no** (what instead
   still to ask); **16: Heme & Endo Exam 2 first**. Recorded in decisions. Still to do: take the opt-out out of
   `migration_v54.sql` (`set_visiting`, `pet_visit_off`, `visiting` in `get_my_shop`, Link my devices' move of it) with
   `xp.js`, `rls.js` and `rls-expectations.json` updated and passing, and [game-server](../reference/game-server.md)'s Visiting
-  section; then the idea delete once Sam says what instead. It can ride with any later phase 5 or phase 4 session.
+  section; and make an author's idea delete remove the row and its votes (and update `xp.js`'s idea-board checks). It can ride with any later phase 5 or phase 4 session.
 - 2026-11-11 (Claude Code): written from the game-server note, the shop, idea board and release notes.
 
 ## Outcome
