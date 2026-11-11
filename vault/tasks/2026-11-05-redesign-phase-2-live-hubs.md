@@ -7,7 +7,7 @@ requested-by: Sam
 due: 2026-11-19
 waiting-on:
 agent: Claude Code
-pr:
+pr: https://github.com/smcmurry6-source/study-hubs/pull/312
 ---
 
 # Redesign phase 2: every live hub on the engine, perio ported
@@ -59,7 +59,7 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   build without `od:kit`; the six arcade lobby drawings (`arcade.mjs`). Checked on the local preview as the returning test
   account, phone and laptop: the four views, every More page, the six games, the drill, the mock (50: L12a + L12b = 9, R's 5
   High Likelihood), Exam 1 High likelihood ticking and unticking R; the release drafts are in [the release note](2026-11-06-redesign-release.md).
-  **Left for Heme & Endo:** Sam's look (one round, screenshots in the PR) and anything it asks for; the timing question (its
+  **Left for Heme & Endo:** Sam's look on [PR #312](https://github.com/smcmurry6-source/study-hubs/pull/312) (one round, screenshots shown in the session) and anything it asks for; the timing question (its
   exam is 11/13, so by the release's rule it is switched in only if the release comes first). **Next step for this task:**
   Perio's port in a fresh session (its own engine: `QBANK_FILTER`, sessions, template-literal notes, the case kit,
   `PERIO_SKIN` and its six lobby drawings), reading this note, the [perio hub note](../hubs/perio.md) and phase 1's Outcome.
