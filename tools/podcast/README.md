@@ -12,7 +12,7 @@ tools/podcast/
   lexicon.json        exact Kokoro phonemes for drug/anatomy/hormone words espeak gets wrong
   extract_hub.js      a hub's notes, exam facts, hints, cram sheet and likely topics as plain text, to write from
   LORE.md             Timmy Tooth's canon: read it before writing, add to it after
-  <hub>/script.md     one episode's script (msk-exam4, occlusion, heme-endo-exam1, pcd-implants-exam1)
+  <hub>/script.md     one episode's script (msk-exam4, occlusion, heme-endo-exam1, pcd-implants-exam1, heme-endo-exam2)
 ```
 
 The whole procedure, from asking Sam to merging, is the `/podcast` skill (`.claude/skills/podcast/SKILL.md`).

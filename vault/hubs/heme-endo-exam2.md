@@ -108,7 +108,15 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   sequence and `fh-tf-fshpeak` say it. In L16's recording (2026-11-11) Dr. Madison said the same: FSH rises, far less than LH, because
   inhibin holds it back (his slide's "FSH is suppressed by production of inhibin"). No question's key depends on FSH falling at midcycle (`fp-inhibin` and `fp-lhr-granulosa` stay retired).
 - **Narration:** `hubs/heme-endo-exam2/audio/<lecture>-full.mp3` and `-plain.mp3`, made with `tools/narrate.py`
-  (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). No Timmy Time episode yet.
+  (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`).
+- **Timmy Time** (2026-11-11): `hubs/heme-endo-exam2/audio/timmy-time.mp3`, 52 min, script `tools/podcast/heme-endo-exam2/script.md`
+  (L11-L16 by system, male then female, plus a short Exam 1 refresher on L2, L3, L6 and L10 only, opening with the class's
+  split of the five; the histology segments name the two picture questions, the Sertoli cell and the follicle stages;
+  written from the As taught notes, hints, cram sheet, High Likelihood topics, the 11/11 in-class review's questions and
+  LESSONS.md's live signals). `SH_PODCAST` (two lore comments: thirty-one, the toothbrush) sits
+  before `SH_EXPORT`; the card is on Home under the quick-start row, `#timmy` opens Home, and Home's "Also here" links it.
+  **A notes change means fixing the script and rebuilding the episode in the same PR**
+  ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)): `--only N --force` for the segment, then `produce.py`.
 - **Arcade:** the Cycle Arcade, skin `HEE2_SKIN` (sample tubes, the pathology lab escape room with a glucose meter, a
   follicle that ripens into a corpus luteum).
 - **The bank is high yield** (Sam, 2026-11-08: "803 is way too many questions. They need to be higher yield"): it was cut
@@ -252,10 +260,9 @@ until then: outside a preview the page sends the visitor to the live hub. Until 
   `widget/hub.css`, by the lecture's place in `LECTURES`): L11 blue, L12a orange, L12b teal, L13 magenta, L14 olive, L15
   violet, L16 mustard, and the Refresher grey (review only). Adding a lecture at the end keeps the others' colors; one
   inserted earlier shifts the rest. **Notes done** (`STATE.read`, this device only) fills a lecture's badge.
-- No Timmy Time yet, so the new Home and More have no episode card (the engine's redesigned player page, 2026-11-11, shows
-  up by itself once `SH_PODCAST` exists; see Occlusion's note). When one is made, `/podcast` wires the live hub and
-  then runs `node tools/hub-next/build.mjs --hub heme-endo-exam2`, so `SH_PODCAST` (its lore comments included) reaches
-  `core.json`; the engine draws the Home card, the More tile and the player with likes, dislikes and comments.
+- Timmy Time (2026-11-11): `node tools/hub-next/build.mjs --hub heme-endo-exam2` carries the live hub's `SH_PODCAST`
+  (its lore comments included) into `core.json`; the engine draws the Home card, the More tile and the player with likes,
+  dislikes and comments. Rebuild it whenever the live `SH_PODCAST` changes.
 - Test it only through the preview (`node tools/preview/serve.js`, then `/hubs/heme-endo-exam2/next/`).
 
 ## Pending

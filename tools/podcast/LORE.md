@@ -25,6 +25,9 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   failing implant: tapped himself with a spoon for percussion pain, asked whether he looked radiolucent ("You were never
   osseointegrated. You have a ligament."), then took a periapical of himself: "Very nice crest." He thinks the turkey
   costume is a cry for help.
+  On Exam Two, the diseases he said he has (Heme & Endo Exam 2), he bought a **glucose meter** after the diabetes lecture
+  and checks himself after every meal, "not his meal, yours" ("You don't have a pancreas."). His glucose is normal; he
+  credits metformin, which he isn't on (and which wouldn't lower a normal glucose anyway: Dr. Fasinu).
 - **The rabbit down the hill** (new in the implants episode's comments): offended that Timmy called rabbits "showy" for
   teeth that never stop growing (true: rabbit teeth grow all their lives and are worn down by chewing). Proud that
   osseointegration was found in rabbit bone (Brånemark, 1952).
@@ -40,6 +43,8 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
 - Occlusion (Oct 21): "it's October, so yes, I'm in costume. I'm not going to tell you which one."
 - Thanksgiving 2026 (Nov 1 to the day after Thanksgiving, as in the widget): three costumes, a pilgrim hat with a buckle, turkey
   feathers, and a chef's hat with a pie, the next one each page load, never revealed (PCD Implants Exam 1).
+  The pie is not a snack, "it is a postprandial event"; it stays uneaten and is "decorative" ("Postprandial events are for
+  people with a pancreas.") (Heme & Endo Exam 2).
 
 ## TIMMY, the other one
 
@@ -57,6 +62,10 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   bite, an implant three to five, and the ligament is how he feels a twenty-five micron hair. "An implant is a very
   impressive piece of titanium, and it feels nothing. So please, don't tie me to one."
 - Rabbits are "a little showy" for teeth that never stop growing: "Some of us got one set of roots and made it work."
+- **He came from a follicle too** (Heme & Endo Exam 2, beside the ovarian follicles): every tooth grows inside a dental
+  follicle, the sac of tissue around the developing tooth, and his made his cementum, his periodontal ligament and the bone
+  around his roots (true: the dental follicle forms the cementum, the ligament and the alveolar bone proper). "You know
+  how I feel about my ligament. Turns out it runs in the family."
 
 ## Who comments
 
@@ -67,7 +76,7 @@ number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a n
 
 - Opens: "Hey. It's Timmy, and this is Timmy Time." Closes: "This has been Timmy Time. I'm Timmy. Brush, floss, and ..."
   with a new ending each time (MSK: "go get it"; Occlusion: "bite down with confidence"; Heme & Endo: "keep your feedback
-  negative"; PCD Implants: "torque responsibly").
+  negative"; PCD Implants: "torque responsibly"; Heme & Endo Exam 2: "surge when it counts", the L-H surge).
 - Lightning round intro: answer out loud, "nobody can hear you. Except me." (Heme & Endo added "And, apparently, number
   thirty-one.")
 - Warm, dry, a little vain. Jokes are short and come after the fact, never instead of it. He quotes the professors
@@ -81,3 +90,4 @@ number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a n
 | `occlusion` | `occlusion/script.md` | 45 min | The cottage; lower first molar, two roots; October costume (unrevealed); TIMMY kept him up a week |
 | `heme-endo-exam1` | `heme-endo-exam1/script.md` | 53 min | Four Halloween costumes, one per page load; neighbor number thirty-one; TIMMY as adrenaline; enamel is not a calcium bank |
 | `pcd-implants-exam1` | `pcd-implants-exam1/script.md` | 48 min | Thanksgiving costumes, one per page load; proud of his ligament; thirty-one thinks he's a failing implant; Brånemark's rabbit. First episode with comments: thirty-one, the rabbit down the hill, the toothbrush by the door |
+| `heme-endo-exam2` | `heme-endo-exam2/script.md` | 52 min | Thirty-one's glucose meter ("You don't have a pancreas"); Timmy came from a dental follicle; the pie is a postprandial event. Comments: thirty-one, the toothbrush by the door |
