@@ -48,7 +48,8 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   L14 and L15 went to taught on 2026-11-08 from their 11/6 recordings (Drive, the four `GMT20261106-*` transcripts: 8 am A, 9 am L13,
   10 am L15, and 1:42 pm L14, which Dr. Herr re-recorded and posted after class, so its in-class emphasis isn't on it).
   Every Zoom caption is labeled "Michael Herr" because the room's account is his: A is Dr. Taylor and L15 Dr. Madison.
-  Their questions' `src` is `rec` where the point was said aloud. L16 is still slides-only (taught Tue 11/10). L17 and L18
+  Their questions' `src` is `rec` where the point was said aloud. **L16 went taught on 2026-11-11** from its 11/10 recording (Drive,
+  `GMT20261110-190013`, 1 pm; Dr. Madison, captioned "Michael Herr" like the rest): see L16 in the content flags. L17 and L18
   aren't on Exam 2 (Sam, 2026-11-10: "L16 is the last lecture on the test"), so this hub doesn't get them:
   [the task](../tasks/2026-11-05-heme-endo-exam2-l17-l18-and-recordings.md).
 - **Sources:** Drive, "Hematology and Endocrinology" → "Exam 2" (slides, schedule, syllabus, the recordings'
@@ -67,8 +68,8 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   puberty on). **Midcycle FSH follows Dr. Herr** (Sam, 2026-11-08: "Go with dr herrs version"): in L14 he walks his
   graph with FSH dipping, then peaking alongside LH just before ovulation, the smaller peak (10:52, 20:39), so `cycle`
   (`cycle.mjs`) draws that peak, and the L14 and L16 notes, both levels, the cram sheet, the note tables, the ovulation
-  sequence and `fh-tf-fshpeak` say it. L16's slide says inhibin holds FSH down at midcycle; the notes say the slide differs.
-  No question's key depends on FSH falling at midcycle (`fp-inhibin` and `fp-lhr-granulosa` stay retired).
+  sequence and `fh-tf-fshpeak` say it. In L16's recording (2026-11-11) Dr. Madison said the same: FSH rises, far less than LH, because
+  inhibin holds it back (his slide's "FSH is suppressed by production of inhibin"). No question's key depends on FSH falling at midcycle (`fp-inhibin` and `fp-lhr-granulosa` stay retired).
 - **Narration:** `hubs/heme-endo-exam2/audio/<lecture>-full.mp3` and `-plain.mp3`, made with `tools/narrate.py`
   (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). No Timmy Time episode yet.
 - **Arcade:** the Cycle Arcade, skin `HEE2_SKIN` (sample tubes, the pathology lab escape room with a glucose meter, a
@@ -88,18 +89,19 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   each section) has a question, the untagged questions filling those gaps (about 5-10 more per lecture; stained-section
   identification, near-duplicates and slide trivia stay out). On the Exam 2 lectures, 133 cut questions came back as they were (ids
   un-retired; the Refresher's 206 are counted on their own) and 4 were written for points nothing tested (`dm-met-lactic`, `mh-spermio-phases`, `mh-sertoli-fridge`,
-  `fh-tf-atresia`). With the "which statement" items and without Lecture A (2026-11-10), the Exam 2 lectures hold 393
-  (451 before; A had 58): L11 67, L12a 56, L12b 58, L13 55, L14 62, L15 52, L16 43.
+  `fh-tf-atresia`). With the "which statement" items and without Lecture A (2026-11-10), the Exam 2 lectures held 393
+  (451 before; A had 58): L11 67, L12a 56, L12b 58, L13 55, L14 62, L15 52, L16 43. L16 going taught (2026-11-11) brought it to
+  402: L16 52 (7 new for what Dr. Madison stressed, and `fp-2s-default` and `fp-lh-block` back as they were).
 - **The exam's count per lecture** (Sam, 2026-11-10, from Dr. Herr: "5 review, 8 for l11, 9 for l12, and 7 for the rest"):
   `EXAM_COUNTS = { dmpharm 8, L12 9, mhisto 7, fhisto 7, mphys 7, fphys 7, refresh 5 }`, and `MOCK_BLUEPRINT` is the same
   object, so the mock is the exam's 50. L12's two hours share their 9 (`EXAM_GROUPS`): the mock draws the 9 from L12a and
   L12b together, at random, and the "Most likely questions" box says "9 on the exam for L12a and L12b together".
   **The counts never trim High Likelihood** (Sam, 2026-11-10: "Dont remove any high likelihood questions. If they were
   hinted to be exam questions, they need to be high likelihood"; now in [high-likelihood-topics](../rules/high-likelihood-topics.md)):
-  every lecture keeps all its topics (74 on the Exam 2 lectures, 258 questions; the Refresher's 55), and the box only
-  shows the count beside each lecture. When the 11/11 review or L16's recording flags a topic, add it or rank it higher.
-  **Adding to it:** a lecture going taught (L16) gets the same audit: its hints and
-  topics covered, its notes' key terms covered once, nothing on skipped points.
+  every lecture keeps all its topics (74 on the Exam 2 lectures, 269 questions since L16 went taught; the Refresher's 55), and the box only
+  shows the count beside each lecture. When the 11/11 review flags a topic, add it or rank it higher. L16's ten topics
+  were re-ranked from its recording on 2026-11-11 (basis "recording"; every question that was High Likelihood stayed so):
+  follicular versus luteal first ("high yield for exam"), then the two-cell slide ("very important slide").
 - **Dr. Herr's in-class focus list** (Sam, 2026-11-09: "He wanted us to focus on slides 8-10, 12, 19-21 for male repro
   histology. And slides 18-21, 30-31, 33-34, 38-39, and 31 for female repro histology"): a `focus` Exam Hint at the top of
   L13 and L14 (drawn as "focus list", no quotation marks, since it came from the class) that says what is on those slides,
@@ -115,7 +117,8 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)): no question tests it. On 2026-11-08 every
   recording (L11, L12a, L12b, A, L13-L15) and Exam 1's de-emphasis hints (for the Refresher) were checked; only `mh-2s-6`
   tested such a point, and it was retired. Questions that only mention a skipped point in a wrong choice or an
-  explanation stay. When L16-L18 and the review come in, check their "you don't need" remarks the same way.
+  explanation stay. L16 was checked on 2026-11-11 (the other steroid enzymes, the in-between follicle names, the whole-body actions slide 33,
+  which has no text): no question's key depended on them. When the review comes in, check its "you don't need" remarks the same way.
 - **Vetted:** every question was checked against its slides and recording by a second reviewer on 2026-11-05 (about
   1 in 4 rewritten). Where the lecture disagrees with a textbook or with itself, the hub keeps what was taught; those
   places are listed below so whoever takes a lecture to taught can check them against its recording.
@@ -149,12 +152,21 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
 - **L14 (taught, posted recording):** he read the LH-driven edema as "theca externa" (22:48) and the secondary oocyte
   as "entering prophase" (23:06); the hub keeps the slides' theca interna and metaphase II. Cycle length: slide 28-30
   days, said 28-33 (no key depends on it). FSH peaks with LH before ovulation in his lecture, which the whole hub
-  follows (above); L16's slide says inhibin holds it down. Lactation "activated by estrogen and progesterone surges
+  follows (above); in class L16's Dr. Madison agreed (inhibin keeps FSH's peak small). Lactation "activated by estrogen and progesterone surges
   during pregnancy and after childbirth" (35:48; check against L17). He calls the corpus luteum "more translucent" (not
   used). ZP1-3: "you don't need to know those".
-- **L14 / L16:** follicle names (L16 calls any follicle with an antrum Graafian) and day counts (L16 ovarian 0-14 /
-  14-28, L14 uterine 1-5 / 5-14 / 15-28) differ; each lecture's questions use its own. L16 (slides only): rising GnRH
-  causes hot flashes (fp-meno-2 says "according to the lecture").
+- **L14 / L16:** follicle names (L16's slides call any follicle with an antrum Graafian; in class Dr. Madison called the
+  in-between one tertiary or antral and said not to worry about those names) and day counts (L16 ovarian 0-14 / 14-28, L14
+  uterine 1-5 / 5-14 / 15-28) differ; each lecture's questions use its own.
+- **L16 (taught, 11/10 recording):** **midcycle FSH is settled**: he said FSH rises too, far less than LH, because inhibin
+  "is going to preferentially inhibit FSH ... that's why we don't call it an LH-FSH surge" (28:38-29:29), which agrees
+  with Dr. Herr's graph; the notes, cram, `fp-inhibin-peak` and the `cycle` figure's text say so (`fp-inhibin` and
+  `fp-lhr-granulosa` stay retired). He put the switch to positive feedback "in the hypothalamus" (28:06; the slides: the
+  pituitary is sensitized); no key depends on where. Turner syndrome is his example of primary amenorrhea (43:16; the
+  slide files it under disorders of sexual differentiation); both are in the notes, and `fp-x-amen` still holds. Hot
+  flashes: linked to the GnRH peak, "still a lot of research to be done" (42:05); `fp-meno-2` stays. Caption slips the
+  hub doesn't follow: "20-day cycle" (20:18, his 14 + 14 is 28), "abruptly start producing" (35:43, stop),
+  "hypoprolactinemia" (44:23, hyper). The slide 30 effects on the myometrium weren't said aloud (`src` stays `slides`).
 
 - **Static drawn figures** (`FIGS`): `tools/figures/heme-endo-exam2/sertoli.mjs` (Dr. Herr's two-Sertoli-cell drawing,
   report #38, drawn for the hub and laid out like his slide, which Sam sent as a screenshot (not kept in the repo): his ten
@@ -164,8 +176,8 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   the module, never the line. It sits above `mh-fig-seq` and `mh-fig-label` and under L13's "Sertoli cells" heading.
 - **"Which statement" items** (2026-11-10, [rule](../rules/which-statement-questions.md)): `which()` and `whichf()` sit right
   after `mq()`, followed by one block of two of each per lecture (ids `<prefix>-ws-*` and `<prefix>-wf-*`; A's four,
-  `dc-*`, left with it). L16 (`fphys`)
-  has its four from the slides; when its recording lands, check them against what Dr. Madison said. Six older items are
+  `dc-*`, left with it). L16's (`fphys`)
+  four were checked against its recording on 2026-11-11. Six older items are
   tagged `which` too (`p1-graves-2`, `p2-pth-fragments`, `p2-cortex-adenoma`, `mh-cilia-stereo`, `r-h1-ccell`,
   `r-ca-calcitonin`).
 

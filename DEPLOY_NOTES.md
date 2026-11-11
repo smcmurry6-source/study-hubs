@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (Heme & Endo Exam 2: L16 taught from its recording, Claude Code)** — Sam uploaded the L16 transcript
+  (Dr. Madison, Tue 11/10). Female Reproductive Physiology goes from slides-only to taught: notes at both levels checked
+  against what he said (a "What he stressed" box; DHT and the external genitalia, leptin and what inhibits GnRH, theca cells
+  with no aromatase, oocyte maturation inhibitor, the luteal phase's glycogen and slight rise in temperature, Turner
+  syndrome as his primary amenorrhea example, prolactin turning GnRH down), 17 Exam Hints quoted from the recording (he
+  called comparing the follicular and luteal phases "high yield for exam" and the two-cell slide "very important"; he
+  won't test the other steroid enzymes, the in-between follicle names or the whole-body actions slide, and no question
+  depended on them), 7 new questions and 2 back (`fp-2s-default`, `fp-lh-block`; L16 43 to 52, the Exam 2 lectures 402),
+  `src` relabeled `rec` on 28, High Likelihood re-ranked from the recording (40 questions under 10 topics, none dropped),
+  cram, a follicular versus luteal table in Review, the sequences and sort set, and both mp3s. **Midcycle FSH is settled:**
+  he said FSH rises too, far less than LH, because inhibin holds it back, as in Dr. Herr's L14 graph; the `cycle` figure's
+  hover text and sources say so (`tools/figures/heme-endo-exam2/cycle.mjs`). The pronunciation lexicon reads KNDy as
+  "candy" and OMI as letters.
+
 - **2026-11-10 (Occlusion L9 diagrams: abfraction, cupped cusp tips, pH vs buffering capacity, Fig 19 again, Claude Code)**
   — Sam: "Approve the budget, make all diagrams, merge when ready". All four L9 candidates are built in
   `tools/figures/occlusion/anima/`, in the L9 notes at both levels next to the paragraph each explains (`FIG_PLACE.nccl`

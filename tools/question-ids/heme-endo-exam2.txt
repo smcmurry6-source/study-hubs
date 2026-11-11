@@ -554,7 +554,7 @@ mh-2s-6 retired
 mh-venous retired
 mh-tf-cavernosum retired
 fp-default-path
-fp-2s-default retired
+fp-2s-default
 fp-tf-amh
 fp-tf-fimbriae
 fp-tf-cortex
@@ -565,7 +565,7 @@ fp-tf-prog-fb
 fp-x-feedback retired
 fp-scc
 fp-fsh-block
-fp-lh-block retired
+fp-lh-block
 fp-lhr-granulosa retired
 fp-match-steroids retired
 fp-tf-estrone
@@ -840,3 +840,10 @@ fp-ws-estrogens
 fp-ws-ovulation
 fp-wf-feedback
 fp-wf-effects
+fp-tf-leptin
+fp-omi
+fp-inhibin-peak
+fp-purpose
+fp-tf-temp
+fp-tf-prl
+fp-tf-turner

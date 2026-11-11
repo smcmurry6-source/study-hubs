@@ -5,7 +5,7 @@ hub: heme-endo-exam2
 created: 2026-11-05
 requested-by: Sam
 due: 2026-11-13
-waiting-on: the L16 recording (Tue 11/10); the Exam 2 review (Wed 11/11)
+waiting-on: the Exam 2 review (Wed 11/11)
 agent: 
 pr: 
 ---
@@ -45,8 +45,8 @@ Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam
 
 - [x] ~~L17 and L18 are lectures with notes at both levels, narration, questions in every required format and their
       `LIKELY_TOPICS`; `MOCK_BLUEPRINT` gives them questions~~ Dropped 2026-11-10: not on Exam 2 (L16 is its last lecture)
-- [ ] Lecture A and L13-L16 are `status:'taught'` with notes checked against the recordings (both mp3s regenerated)
-      and Exam Hints quoted from what was said (A, L13, L14 and L15 done 2026-11-08; L16 waits for its 11/10 recording)
+- [x] Lecture A and L13-L16 are `status:'taught'` with notes checked against the recordings (both mp3s regenerated)
+      and Exam Hints quoted from what was said (A, L13, L14 and L15 done 2026-11-08; L16 2026-11-11)
 - [ ] High Likelihood re-ranked from the 11/11 review
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
 - [ ] Vault written back (hub note, decisions, this note's Outcome)
@@ -90,4 +90,13 @@ Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam
   high likelihood questions"), and L17 and L18 are dropped from this task (the first "Done when" box no longer applies; they go to the Exam 3 hub). Still to do:
   L16's recording and the 11/11 review.
 
+- 2026-11-11: Sam uploaded L16's 11/10 recording transcript to Drive ("i just uploaded the l16 transcript"). L16 is taught:
+  notes at both levels checked against what Dr. Madison said (what he stressed added, with his words), 17 Exam Hints
+  quoted from the recording (3 de-emphasize: the other steroid enzymes, the in-between follicle names, the whole-body
+  actions slide; no question's key depended on them), `src` relabeled `rec` on 28 questions, 7 new questions for what he
+  stressed and nothing tested (`fp-purpose`, `fp-tf-temp`, `fp-inhibin-peak`, `fp-omi`, `fp-tf-leptin`, `fp-tf-prl`,
+  `fp-tf-turner`), `fp-2s-default` and `fp-lh-block` back as they were (L16 43 to 52), High Likelihood re-ranked from the
+  recording (follicular versus luteal first: "high yield for exam"; 29 to 40 HL questions, none dropped), cram, Review
+  tables (a follicular versus luteal table), sequences, the `cycle` figure's FSH text, and both mp3s. His FSH at midcycle
+  agrees with Dr. Herr's, so the L14/L16 conflict is closed (hub note). Still to do: the 11/11 review.
 ## Outcome
