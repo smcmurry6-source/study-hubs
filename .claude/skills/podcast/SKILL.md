@@ -111,6 +111,11 @@ result: `ffprobe` duration under the limit Sam gave, `<mp3>.json` chapters in or
 - **The hub's note** (`vault/hubs/<hub-id>.md`): that it has an episode, where its script is
   (`tools/podcast/<hub-id>/script.md`), and that a notes change means fixing the script and rebuilding the episode.
 - If the hub has narration, nothing else changes; the podcast is separate from Listen.
+- **A hub with a new version** (`hubs/<hub-id>/next/`, the redesign on `widget/hub.js`): after wiring the live hub, run
+  `node tools/hub-next/build.mjs --hub <hub-id>` and commit its `next/content/`, so the new version carries the same
+  `SH_PODCAST` (`fans` included). The engine draws the rest itself: the animated Timmy Time card among Home's quick starts,
+  the big tile in More and the player with its likes, dislikes and comments (`widget/podcast.js`). CI's "generated files
+  are current" step fails if you skip it.
 
 ## 6. Verify
 
@@ -120,6 +125,8 @@ result: `ffprobe` duration under the limit Sam gave, `<mp3>.json` chapters in or
   the title, length and chapters, the "Timmy Time" link scrolls to it, and pressing play loads the mp3 (check
   `audio.duration`). Screenshot it at 390 px and desktop for the PR.
 - Grep that the old episode list on the About page and the dashboard `sub` text match the real length.
+- A hub with a new version: in the preview (`node tools/preview/serve.js`), `hubs/<hub-id>/next/#more/timmy` shows the
+  card with its chapters, likes, dislikes and the lore comments, and Home shows the Timmy Time quick start.
 
 ## 7. Ship
 

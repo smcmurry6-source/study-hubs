@@ -58,15 +58,36 @@ html.shx[data-theme="dark"] {
     --float-shadow: 0 4px 14px rgba(0, 0, 0, .4);
   }
 }
-.hx[data-hub="occlusion"]            { --hub: #2747a3; --hub-mid: #6f86cf; --hub-light: #dce3f6; --hub-dark: #8fa6ec; }
-.hx[data-hub="perio"]                { --hub: #b4466f; --hub-mid: #d97fa0; --hub-light: #f6dde6; --hub-dark: #ec93b5; }
-.hx[data-hub="pcd-implants-exam1"]   { --hub: #2f6f84; --hub-mid: #6fa9bb; --hub-light: #d7e9ef; --hub-dark: #7cc0d6; }
-.hx[data-hub="heme-endo-exam2"]      { --hub: #a83232; --hub-mid: #d86f6f; --hub-light: #f5dada; --hub-dark: #ee8a8a; }
-.hx[data-hub="special-patient-care"] { --hub: #2e7d4f; --hub-mid: #6db58a; --hub-light: #d7eedf; --hub-dark: #76cb98; }
+html.shx[data-hx-hub="occlusion"], .hx[data-hub="occlusion"]            { --hub: #2747a3; --hub-mid: #6f86cf; --hub-light: #dce3f6; --hub-dark: #8fa6ec; }
+html.shx[data-hx-hub="perio"], .hx[data-hub="perio"]                { --hub: #b4466f; --hub-mid: #d97fa0; --hub-light: #f6dde6; --hub-dark: #ec93b5; }
+html.shx[data-hx-hub="pcd-implants-exam1"], .hx[data-hub="pcd-implants-exam1"]   { --hub: #2f6f84; --hub-mid: #6fa9bb; --hub-light: #d7e9ef; --hub-dark: #7cc0d6; }
+html.shx[data-hx-hub="heme-endo-exam2"], .hx[data-hub="heme-endo-exam2"]      { --hub: #a83232; --hub-mid: #d86f6f; --hub-light: #f5dada; --hub-dark: #ee8a8a; }
+html.shx[data-hx-hub="special-patient-care"], .hx[data-hub="special-patient-care"] { --hub: #2e7d4f; --hub-mid: #6db58a; --hub-light: #d7eedf; --hub-dark: #76cb98; }
+/* the tint is on the page root too (hub.js sets data-hx-hub), so the shared widget's tokens below (--accent and the rest,
+   declared on html.shx) resolve to this hub's color, not the default, in its panels and in the player (BUG-056) */
 html.shx { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
 .hx { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
-html.shx[data-theme="dark"] .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }
-@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); } }
+html.shx[data-theme="dark"], html.shx[data-theme="dark"] .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }
+@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]), html.shx:not([data-theme="light"]) .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); } }
+
+/* ---------- each lecture's own color (Sam, 2026-11-11: "more color ... to distinguish each lecture from one another"):
+   hub.js puts lc-0 to lc-9 on a lecture's pieces by its place in the hub, and lc-x (grey) on a review-only one. --lc fills
+   (with --lc-on text on it) and draws dots and bars, --lc-soft is a chip's ground and --lc-ink its text (4.5:1 or more on
+   both themes); dark mode swaps in the lighter --lc-d and --lc-dk. ---------- */
+.hx .lc-0 { --lc: #2f62c8; --lc-soft: #e2eafb; --lc-ink: #1e4a9e; --lc-d: #7fa6f2; --lc-dk: #a9c4f7; }  /* blue */
+.hx .lc-1 { --lc: #b8511a; --lc-soft: #fde6d8; --lc-ink: #953c0b; --lc-d: #f2955f; --lc-dk: #f7b48c; }  /* orange */
+.hx .lc-2 { --lc: #0f7f7a; --lc-soft: #d5f0ed; --lc-ink: #0a5c58; --lc-d: #4fc4bc; --lc-dk: #86dad3; }  /* teal */
+.hx .lc-3 { --lc: #b8326f; --lc-soft: #fbe0ec; --lc-ink: #8a1f50; --lc-d: #ee7fb1; --lc-dk: #f4a8ca; }  /* magenta */
+.hx .lc-4 { --lc: #587812; --lc-soft: #e6efd0; --lc-ink: #405909; --lc-d: #a3c45a; --lc-dk: #c0d98a; }  /* olive */
+.hx .lc-5 { --lc: #7046c8; --lc-soft: #ece4fb; --lc-ink: #5530a3; --lc-d: #ae90f0; --lc-dk: #c8b3f6; }  /* violet */
+.hx .lc-6 { --lc: #9a6a00; --lc-soft: #f9edcc; --lc-ink: #704c00; --lc-d: #e2b443; --lc-dk: #ecca78; }  /* mustard */
+.hx .lc-7 { --lc: #16729f; --lc-soft: #d9eef9; --lc-ink: #0f567a; --lc-d: #62b6e2; --lc-dk: #94cdec; }  /* sky */
+.hx .lc-8 { --lc: #8a5532; --lc-soft: #f1e5da; --lc-ink: #683e22; --lc-d: #d39a72; --lc-dk: #e2b99b; }  /* brown */
+.hx .lc-9 { --lc: #4a55a6; --lc-soft: #e4e7f7; --lc-ink: #343d85; --lc-d: #9aa3e8; --lc-dk: #bcc2f0; }  /* indigo */
+.hx .lc-x { --lc: #6b6570; --lc-soft: #ecebee; --lc-ink: #4e4952; --lc-d: #a8a1ad; --lc-dk: #c6c0ca; }  /* review only */
+.hx .lc { --lc-on: #ffffff; }
+html.shx[data-theme="dark"] .hx .lc { --lc: var(--lc-d); --lc-ink: var(--lc-dk); --lc-soft: color-mix(in srgb, var(--lc-d) 22%, #1c1b1c); --lc-on: #111111; }
+@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .hx .lc { --lc: var(--lc-d); --lc-ink: var(--lc-dk); --lc-soft: color-mix(in srgb, var(--lc-d) 22%, #1c1b1c); --lc-on: #111111; } }
 
 /* ---------- base ---------- */
 html.shx, html.shx *, html.shx *::before, html.shx *::after { box-sizing: border-box; }
@@ -250,7 +271,7 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 @keyframes pm-bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-3px) rotate(3deg); } }
 @keyframes pm-float { 0%, 100% { transform: translate(0, 2px) rotate(-5deg); } 50% { transform: translate(-3px, -5px) rotate(5deg); } }
 /* still when motion is off: reduced motion, Answer animations off or Focus mode (hub.js sets hx-still) */
-html.hx-still .ql-pod *, html.hx-still .teeth .tooth { animation-name: none !important; }
+html.hx-still .ql-pod *, html.hx-still .pod-x *, html.hx-still .teeth .tooth { animation-name: none !important; }
 .home-grid { margin-top: var(--gap); display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: start; }
 .home .next { grid-column: span 8; }
 .home .today { grid-column: span 4; }
@@ -267,6 +288,10 @@ html.hx-still .ql-pod *, html.hx-still .teeth .tooth { animation-name: none !imp
 .lr-main { flex: 1; min-width: 0; }
 .lr-main p:first-child { line-height: 1.3; }
 .lr-main b { font-weight: var(--w-head); color: var(--hub-text); }
+.lec-rows .lc .lr-main b { color: var(--text); }
+.read-tag { display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; padding: 1px 8px 1px 6px; border-radius: var(--r-pill); background: var(--lc-soft, var(--hub-soft));
+  color: var(--lc-ink, var(--hub-text)); font-size: var(--fs-meta); font-weight: var(--w-strong); vertical-align: 1px; }
+.read-tag svg { width: 12px; height: 12px; }
 .lr-acts { display: flex; gap: 2px; }
 .bar { position: relative; display: block; height: 8px; margin: 8px 0 6px; border-radius: var(--r-pill); background: var(--track); overflow: hidden; }
 .bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: var(--r-pill); transition: width 700ms var(--ease-out); }
@@ -341,11 +366,28 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
   text-decoration: none; transition: background var(--t-hover) var(--ease-out); }
 .lec-item:hover { background: var(--active); }
 .lec-item[aria-current="page"] { background: var(--row); }
-.lec-item[aria-current="page"]::before { content: ""; position: absolute; left: -10px; top: 12px; bottom: 12px; width: 4px; border-radius: 0 4px 4px 0; background: var(--hub-text); }
+.lec-item[aria-current="page"]::before { content: ""; position: absolute; left: -10px; top: 12px; bottom: 12px; width: 4px; border-radius: 0 4px 4px 0; background: var(--lc, var(--hub-text)); }
 .lb { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 12px; flex: none;
   font-size: var(--fs-label); font-weight: var(--w-title); background: var(--row); color: var(--muted); border: 1px solid var(--border); }
 .lb.is-on { background: var(--hub-soft); color: var(--hub-text); border-color: transparent; }
-.lec-item[aria-current="page"] .lb { background: var(--hub); color: #ffffff; border-color: transparent; }
+.lec-item[aria-current="page"] .lb:not(.lc) { background: var(--hub); color: #ffffff; border-color: transparent; }
+.lb.lc { position: relative; background: var(--lc-soft); color: var(--lc-ink); border-color: transparent; }
+.lb.lc.is-read { background: var(--lc); color: var(--lc-on); }
+.lec-item[aria-current="page"] .lb.lc { box-shadow: 0 0 0 2px var(--row), 0 0 0 4px var(--lc); }
+.lb-ck { position: absolute; right: -6px; bottom: -6px; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--right); color: var(--on-mark); box-shadow: 0 0 0 2px var(--panel); }
+.lb-ck svg { width: 12px; height: 12px; }
+.lb-s { width: 30px; height: 30px; border-radius: 9px; font-size: var(--fs-meta); }
+.lb-s .lb-ck { width: 15px; height: 15px; right: -5px; bottom: -5px; }
+.lb-s .lb-ck svg { width: 10px; height: 10px; }
+.lc .bar .right, .bar.lc .right { background: var(--lc); }
+.lc .bar .tried, .bar.lc .tried { background: var(--lc); opacity: .3; }
+.ld { display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: var(--lc); vertical-align: 0; flex: none; }
+/* a lecture's chip on a question card, and the card's top edge in the same color, so you can tell where a question is from */
+.lchip { display: inline-flex; align-items: center; gap: 7px; min-height: 26px; padding: 2px 11px 2px 9px; border-radius: var(--r-pill);
+  background: var(--lc-soft); color: var(--lc-ink); font-weight: var(--w-strong); line-height: 1.25; }
+.lchip .ld { width: 8px; height: 8px; margin: 0; }
+.qc.lc { box-shadow: inset 0 4px 0 var(--lc); }
 .lt { min-width: 0; }
 .lt b { display: block; font-size: var(--fs-label); font-weight: var(--w-strong); line-height: 1.3; }
 .lec-item[aria-current="page"] .lt b { font-weight: var(--w-head); }
@@ -357,6 +399,9 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .lp-t small { display: block; font-size: var(--fs-meta); color: var(--muted); font-weight: var(--w-body); }
 .reading { max-width: 760px; min-width: 0; }
 .reading > .sub { margin-top: 6px; font-size: 18px; color: var(--text); }
+.rd-title { display: flex; align-items: center; gap: 12px; }
+.reading.lc .reading-prose h3 { color: var(--lc-ink); }
+.hx .btn-done[aria-pressed="true"] { background: var(--right-bg); color: var(--right-ink); border-color: transparent; }
 .reading > .note { margin-top: 6px; }
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 20px 0 8px; padding-bottom: 16px; border-bottom: 1px solid var(--rule); }
 .toolbar .tool-tip { display: inline-flex; align-items: center; gap: 6px; margin-left: 4px; }
@@ -426,6 +471,9 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .foot-nav span { min-width: 0; }
 .foot-nav small { display: block; font-size: var(--fs-meta); font-weight: var(--w-body); color: var(--muted); }
 .foot-nav b { display: block; font-weight: var(--w-head); line-height: 1.3; color: var(--hub-text); overflow-wrap: anywhere; }
+/* each in the color of the lecture it leads to */
+.hx .foot-nav .btn.lc, .hx .foot-nav .btn.lc:hover { background: var(--lc-soft); }
+.foot-nav .lc .ic, .foot-nav .lc b { color: var(--lc-ink); }
 .foot-report { margin-top: 14px; }
 .foot-report .btn, .toolbar [data-report-notes] { color: var(--muted); }
 
@@ -444,11 +492,13 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .lp-pop { position: absolute; z-index: 15; left: 76px; top: calc(100% + 6px); width: min(380px, calc(100vw - 32px)); padding: 10px; border-radius: var(--r-panel);
   background: var(--row); border: 1px solid var(--control); box-shadow: var(--float-shadow); }
 .lp-acts { display: flex; gap: 4px; padding-bottom: 6px; border-bottom: 1px solid var(--rule); }
+.lp-help { margin: 8px 8px 0; font-size: var(--fs-label); }
 .lp-pop ul { margin-top: 6px; display: grid; gap: 2px; max-height: 360px; overflow-y: auto; }
 .lp-pop li { display: flex; align-items: center; gap: 4px; }
 .lp-pop label { flex: 1; display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 8px; border-radius: 10px; font-size: var(--fs-label); cursor: pointer; }
 .lp-pop label:hover { background: var(--panel); }
 .lp-pop input { width: 18px; height: 18px; accent-color: var(--hub); }
+.lp-pop label .ld { margin: 0; }
 .search { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; height: var(--control-h); padding: 0 14px; border-radius: var(--r-pill); background: var(--row);
   border: 1px solid var(--control); color: var(--muted); }
 .search input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; color: var(--text); font-size: var(--fs-label); }
@@ -679,7 +729,12 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .hint .kind.deemphasize { background: var(--active); color: var(--muted); }
 .likely-grid { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
 .likely-lec { padding: 16px; border-radius: var(--r-row); background: var(--row); display: flex; flex-direction: column; gap: 10px; }
-.likely-lec h3 { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.likely-lec h3 { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.likely-lec.lc { box-shadow: inset 4px 0 0 var(--lc); }
+.likely-lec h3 .note { flex-basis: 100%; }
+.cram h2 { display: flex; align-items: center; gap: 10px; }
+.cram.lc { box-shadow: inset 0 4px 0 var(--lc); }
+.cram.lc li::marker { color: var(--lc); }
 .likely-lec ol { padding-left: 22px !important; list-style: decimal !important; display: grid; gap: 6px; font-size: var(--fs-label); flex: 1; }
 .likely-lec ol .note { display: block; }
 .likely-lec .btn { align-self: flex-start; }
@@ -780,10 +835,126 @@ html.shx .sh-qrate-b { width: 36px; height: 34px; border-radius: var(--r-pill); 
 html.shx .sh-qrate-b:hover { background: var(--row); }
 html.shx .sh-qrate-r { font-size: var(--fs-meta); min-height: 32px; }
 html.shx .sh-pod-card { background: var(--panel); box-shadow: none; border: 0; border-radius: var(--r-panel); padding: 20px; }
+/* the engine's ".hx button { color: inherit }" outranks the player's white label on the hub's color (BUG-056) */
+html.shx .hx .sh-pod-play, html.shx .hx .sh-pod-post { color: #ffffff; }
 html.shx .sh-pod-kicker { font: var(--w-head) var(--fs-label)/1.3 var(--font); letter-spacing: 0; text-transform: none; color: var(--hub-text); }
 html.shx .sh-pod-kicker span { letter-spacing: 0; font-size: var(--fs-meta); }
 html.shx .sh-pod-tag { font: var(--w-strong) 12px/1.3 var(--font); letter-spacing: 0; text-transform: none; }
 html.shx .sh-pod-meta, html.shx .sh-pod-ccount, html.shx .sh-pod-chead, html.shx .sh-pod-when, html.shx .sh-pod-form-row { font-size: var(--fs-meta); }
+
+/* ---------- Timmy Time's player, redesigned (hub.js podDress, Sam 2026-11-11) ----------
+   The episode on a field of the hub's color with Timmy in headphones; the chapters as a track list beside what the class
+   thinks. Scoped to the dressed card (.pod-x), so the live hubs' player is untouched. */
+html.shx .sh-pod-card.pod-x { display: grid; gap: var(--gap); margin: 0; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; overflow: visible; color: var(--text); }
+.pod-x .pod-hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 188px; align-items: end; gap: 32px;
+  padding: 32px 36px 30px; border-radius: var(--r-panel); background: var(--hub); color: #ffffff; overflow: hidden; }
+.pod-x .sh-pod-main { min-width: 0; }
+html.shx .pod-x .sh-pod-kicker, html.shx .pod-x .sh-pod-chbtn { display: none; }
+html.shx .pod-x .sh-pod-title { margin: 0; font: var(--w-title) 28px/1.2 var(--font); color: #ffffff; text-wrap: balance; }
+html.shx .pod-x .sh-pod-meta { margin-top: 10px; max-width: 64ch; font: var(--w-body) var(--fs-body)/1.5 var(--font); color: #ffffff; }
+html.shx .pod-x .sh-pod-controls { margin-top: 24px; gap: 10px; }
+html.shx .hx .pod-x .sh-pod-play { height: 52px; padding: 0 26px 0 20px; gap: 10px; border-radius: var(--r-pill); background: #ffffff; color: var(--hub);
+  font: var(--w-head) var(--fs-body)/1 var(--font); transition: background-color var(--t-hover) var(--ease-out), transform var(--t-press) var(--ease-out); }
+html.shx .hx .pod-x .sh-pod-play:hover { background: var(--hub-light); }
+html.shx .hx .pod-x .sh-pod-play:active, html.shx .hx .pod-x .sh-pod-btn:active { transform: scale(.97); }
+html.shx .pod-x .sh-pod-play svg { width: 20px; height: 20px; }
+html.shx .hx .pod-x .sh-pod-btn { width: 52px; min-width: 52px; height: 52px; padding: 0; border: 0; border-radius: var(--r-pill); background: rgba(0, 0, 0, .2); color: #ffffff;
+  transition: background-color var(--t-hover) var(--ease-out), transform var(--t-press) var(--ease-out); }
+html.shx .hx .pod-x .sh-pod-btn:hover { background: rgba(0, 0, 0, .32); }
+html.shx .pod-x .sh-pod-btn svg { width: 26px; height: 26px; }
+html.shx .hx .pod-x .sh-pod-rate { width: auto; padding: 0 18px; font: var(--w-head) var(--fs-body)/1 var(--font); font-variant-numeric: tabular-nums; }
+html.shx .pod-x .pod-hero :focus-visible { outline-color: #ffffff; }
+html.shx .pod-x .sh-pod-progress { margin-top: 22px; gap: 16px; }
+.pod-bar { position: relative; flex: 1; min-width: 0; display: flex; align-items: center; height: 28px; }
+.pod-bar::before, .pod-fill { content: ""; position: absolute; left: 0; top: 50%; height: 6px; margin-top: -3px; border-radius: 3px; }
+.pod-bar::before { right: 0; background: rgba(0, 0, 0, .24); }
+.pod-fill { width: calc(9px + (100% - 18px) * var(--p, 0)); background: #ffffff; }
+html.shx .pod-bar .sh-pod-seek { position: relative; z-index: 1; width: 100%; height: 28px; margin: 0; background: transparent; -webkit-appearance: none; appearance: none; cursor: pointer; }
+.pod-bar .sh-pod-seek::-webkit-slider-runnable-track { height: 28px; background: transparent; }
+.pod-bar .sh-pod-seek::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: 5px; border: 0; border-radius: 50%; background: #ffffff; }
+.pod-bar .sh-pod-seek::-moz-range-track { height: 28px; background: transparent; }
+.pod-bar .sh-pod-seek::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 50%; background: #ffffff; }
+html.shx .pod-x .sh-pod-time { font: var(--w-strong) var(--fs-label)/1 var(--font); color: #ffffff; font-variant-numeric: tabular-nums; }
+html.shx .pod-x .sh-pod-note { margin-top: 12px; font: var(--w-strong) var(--fs-label)/1.4 var(--font); color: #ffffff; }
+/* Timmy in headphones (spots.mjs), standing on the field's bottom edge; he bobs and the notes drift while it plays */
+html.shx .pod-x .sh-pod-art { position: relative; display: block; width: 188px; height: auto; margin: 0 0 -30px; border-radius: 0; background: none; }
+.pod-x .pa-timmy { display: block; width: 100%; height: auto; transform-origin: 50% 100%; }
+.pod-x .pa-notes { position: absolute; left: -30px; top: 6px; width: 64px; height: auto; }
+.pod-x.is-playing .pa-timmy { animation: pm-bob 1600ms ease-in-out infinite; }
+.pod-x.is-playing .pa-notes { animation: pm-float 3200ms ease-in-out infinite; }
+/* the chapters (always open: a track list, the one playing marked) and what the class thinks */
+.pod-x .pod-cols { display: grid; gap: var(--gap); }
+html.shx .pod-x .sh-pod-chapters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(var(--rows, 5), auto); grid-auto-flow: column;
+  gap: 2px 24px; margin: 12px 0 0; }
+html.shx .hx .pod-x .sh-pod-ch { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 48px; padding: 10px 14px;
+  border: 0; border-radius: var(--r-row); background: none; color: var(--text); font: var(--w-body) var(--fs-body)/1.35 var(--font);
+  transition: background-color var(--t-hover) var(--ease-out); }
+html.shx .hx .pod-x .sh-pod-ch:hover { background: var(--active); }
+html.shx .pod-x .sh-pod-ch-t { min-width: 0; font: var(--w-strong) var(--fs-label)/1 var(--font); color: var(--muted); font-variant-numeric: tabular-nums; }
+html.shx .hx .pod-x .sh-pod-ch.is-now { background: var(--hub-soft); color: var(--hub-text); font-weight: var(--w-head); }
+html.shx .pod-x .sh-pod-ch.is-now .sh-pod-ch-t { color: var(--hub-text); }
+.pod-eq { display: none; align-items: flex-end; gap: 3px; height: 16px; }
+.pod-eq i { width: 4px; height: 100%; border-radius: 1px; background: currentColor; transform-origin: 50% 100%; transform: scaleY(.45); }
+.pod-eq i:nth-child(2) { transform: scaleY(.9); animation-delay: -300ms; }
+.pod-eq i:nth-child(3) { transform: scaleY(.65); animation-delay: -600ms; }
+.pod-x .sh-pod-ch.is-now .pod-eq { display: inline-flex; }
+.pod-x.is-playing .sh-pod-ch.is-now .pod-eq i { animation: pm-eq 900ms ease-in-out infinite; }
+html.shx .pod-x .sh-pod-social { margin: 0; padding: var(--panel-pad); border: 0; }
+html.shx .pod-x .sh-pod-social > :not(h2) { max-width: 760px; }
+html.shx .pod-x .sh-pod-react { margin-top: 14px; gap: 8px; }
+html.shx .hx .pod-x .sh-pod-vote { height: 40px; padding: 0 16px; gap: 8px; border: 0; background: var(--row); color: var(--text); font: var(--w-strong) var(--fs-label)/1 var(--font);
+  transition: background-color var(--t-hover) var(--ease-out); }
+html.shx .hx .pod-x .sh-pod-vote:hover:not(:disabled) { background: var(--active); }
+html.shx .hx .pod-x .sh-pod-vote[aria-pressed="true"] { background: var(--hub-soft); color: var(--hub-text); }
+html.shx .pod-x .sh-pod-vote svg { width: 18px; height: 18px; }
+html.shx .pod-x .sh-pod-ccount { font-size: var(--fs-meta); color: var(--muted); }
+html.shx .pod-x .sh-pod-comments { margin-top: 12px; gap: 8px; }
+html.shx .pod-x .sh-pod-c { gap: 12px; padding: 12px 14px; border: 0; border-radius: var(--r-row); background: var(--row); }
+html.shx .pod-x .sh-pod-c.is-lore { background: var(--hub-soft); }
+html.shx .pod-x .sh-pod-av { width: 32px; height: 32px; background: var(--active); color: var(--text); font: var(--w-head) var(--fs-label)/1 var(--font); }
+html.shx .pod-x .sh-pod-c.is-lore .sh-pod-av { background: var(--hub); color: #ffffff; }
+html.shx .pod-x .sh-pod-chead { gap: 2px 8px; font-size: var(--fs-meta); }
+html.shx .pod-x .sh-pod-chead b { font: var(--w-head) var(--fs-label)/1.3 var(--font); color: var(--text); }
+html.shx .pod-x .sh-pod-tag { padding: 0; border-radius: 0; background: none; color: var(--hub-text); font: var(--w-strong) var(--fs-meta)/1.3 var(--font); }
+html.shx .pod-x .sh-pod-when { font-size: var(--fs-meta); color: var(--muted); }
+html.shx .pod-x .sh-pod-cbody p { margin-top: 4px; font: var(--w-body) 15px/1.5 var(--font); color: var(--text); }
+html.shx .hx .pod-x .sh-pod-cact { min-height: 24px; color: var(--muted); font: var(--w-strong) var(--fs-meta)/1.2 var(--font); text-decoration: none; }
+html.shx .hx .pod-x .sh-pod-cact:hover:not(:disabled) { color: var(--text); text-decoration: underline; }
+html.shx .hx .pod-x .sh-pod-more { margin-top: 10px; min-height: 32px; color: var(--hub-text); font: var(--w-strong) var(--fs-label)/1.2 var(--font); }
+html.shx .pod-x .sh-pod-form { margin-top: 14px; }
+html.shx .pod-x .sh-pod-input { min-height: 76px; padding: 12px 14px; border: 1px solid var(--control); border-radius: var(--r-row); background: var(--row); color: var(--text);
+  font: var(--w-body) var(--fs-body)/1.45 var(--font); }
+html.shx .pod-x .sh-pod-input:focus { outline: 3px solid var(--hub-text); outline-offset: 1px; border-color: transparent; }
+html.shx .pod-x .sh-pod-form-row { margin-top: 8px; gap: 12px; font-size: var(--fs-meta); color: var(--muted); }
+html.shx .hx .pod-x .sh-pod-post { height: 40px; padding: 0 22px; border-radius: var(--r-pill); background: var(--hub); color: #ffffff; font: var(--w-head) var(--fs-label)/1 var(--font); }
+html.shx .pod-x .sh-pod-formnote { font-size: var(--fs-meta); color: var(--wrong); }
+/* the pinned player, shown while an episode plays and the player is off screen: the hub's color too */
+html.shx .sh-pod-dock { border: 0; border-radius: var(--r-panel); background: var(--hub); color: #ffffff; box-shadow: var(--float-shadow); font-family: var(--font); }
+html.shx .sh-pod-dock-play { background: #ffffff; color: var(--hub); }
+html.shx .sh-pod-dock-title { font-family: var(--font); }
+html.shx .sh-pod-dock-sub, html.shx .sh-pod-dock-time { color: #ffffff; font-family: var(--font); }
+html.shx .sh-pod-dock-art, html.shx .sh-pod-dock-close { background: rgba(0, 0, 0, .2); }
+html.shx .sh-pod-dock-close { border: 0; color: #ffffff; }
+html.shx .sh-pod-dock .sh-pod-seek { height: 16px; background: transparent; -webkit-appearance: none; appearance: none; }
+html.shx .sh-pod-dock .sh-pod-seek::-webkit-slider-runnable-track { height: 4px; border-radius: 2px; background: rgba(0, 0, 0, .24); }
+html.shx .sh-pod-dock .sh-pod-seek::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; margin-top: -4px; border: 0; border-radius: 50%; background: #ffffff; }
+html.shx .sh-pod-dock .sh-pod-seek::-moz-range-track { height: 4px; border-radius: 2px; background: rgba(0, 0, 0, .24); }
+html.shx .sh-pod-dock .sh-pod-seek::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 50%; background: #ffffff; }
+html.shx .sh-pod-dock :focus-visible { outline: 3px solid #ffffff; outline-offset: 2px; }
+@media (max-width: 860px) {
+  html.shx .pod-x .sh-pod-chapters { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-auto-flow: row; }
+}
+@media (max-width: 640px) {
+  .pod-x .pod-hero { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 14px 20px 22px; }
+  html.shx .pod-x .sh-pod-art { order: -1; justify-self: start; width: 108px; margin: 0 0 10px -4px; }
+  .pod-x .pa-notes { left: auto; right: -44px; top: 14px; width: 44px; }
+  html.shx .pod-x .sh-pod-title { font-size: 24px; }
+  html.shx .pod-x .sh-pod-meta { font-size: var(--fs-label); }
+  html.shx .pod-x .sh-pod-controls { gap: 8px; }
+  html.shx .hx .pod-x .sh-pod-play { flex: 1 1 100%; justify-content: center; }
+  html.shx .hx .pod-x .sh-pod-btn { flex: 1 1 0; width: auto; padding: 0; }
+  html.shx .hx .pod-x .sh-pod-ch { grid-template-columns: 48px minmax(0, 1fr) auto; padding: 10px 12px; }
+}
 html.shx .sh-tts-dock { font-family: var(--font); }
 html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpanel, html.shx #shstat-searchpanel, html.shx #shstat-settingspanel { font-family: var(--font); border-radius: var(--r-panel); }
 

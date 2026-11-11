@@ -181,6 +181,46 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   tagged `which` too (`p1-graves-2`, `p2-pth-fragments`, `p2-cortex-adenoma`, `mh-cilia-stereo`, `r-h1-ccell`,
   `r-ca-calcitonin`).
 
+## The new version (the redesign, not live yet)
+
+`hubs/heme-endo-exam2/next/` is the redesigned hub on the shared engine (`widget/hub.js`), built beside this one
+([phase 2](../tasks/2026-11-05-redesign-phase-2-live-hubs.md), the way [phase 1](../tasks/done/2026-11-05-redesign-phase-1-hub-engine.md)
+built Occlusion's) and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Nothing students see changes
+until then: outside a preview the page sends the visitor to the live hub. Until then **edit content in the live file only**:
+- `node tools/hub-next/build.mjs` rewrites `next/content/` from `hubs/heme-endo-exam2/index.html`. Run it after any change
+  to the live hub (a question, a note, a hint, a figure build) and commit the JSON; CI's "generated files are current" step
+  fails when it's stale. This hub has no drawing kit (`od:kit`), so the build writes its `FIGS` (the Sertoli drawing) and
+  `FIG_PLACE` into `figures.js` as data, with its `anima:js` block as is.
+- **Progress carries over:** same hub id, state key `hee2-state-v1`, answered event `hee2:answered`, and all 609 question
+  ids (402 on the Exam 2 lectures, the Refresher's 207).
+- **The Exam 1 Refresher stays review only** (Sam, 2026-11-06 and 2026-11-10, above): the build copies the live hub's
+  `COUNT_SKIP` into `core.json` as `reviewOnly`, and the engine (`isReview()`) keeps R out of Home's totals and "you
+  haven't tried", Where to next, the bank's "of N" ("+ n Exam 1 review") and the mastery medal (`SH_EXPORT.uncounted`),
+  and out of the bank until it is ticked (`bankAll()`); the drill, the mock and a search jump still use it. The picker's and
+  the tag's words are `SH_HUB.review` in `next/index.html`.
+- **Exam 1 High likelihood** is `SH_HUB.bank.only`'s third field, `{ prop: "likely", lec: "refresh" }`: on, it shows R's
+  High Likelihood questions and ticks R; off, it unticks R again if it ticked it (`STATE.ui.qE1auto`, the live hub's flag).
+- **The mock** is the live hub's: `EXAM_GROUPS` (L12a and L12b share their 9) and `MOCK_LIKELY_ONLY` (R's five from its
+  High Likelihood questions, at random) reach `core.json` as `mock.groups` and `mock.likelyOnly`. "Most likely questions"
+  says "9 on the exam for L12a and L12b together".
+- The page (`next/index.html`) is settings only: `window.SH_HUB` holds the words the live hub writes in its own code (Home's
+  exam card and chips, the hints banner, the mock's blurb, the arcade's games, Lab Sort up front). When one changes in the
+  live hub, change it there too. "What the professors said to know" and "In the professors' words" (`hints.words`), since
+  four professors teach the lectures.
+- Its art: tint `#a83232`, emblem and masthead (phase 0) and the six arcade lobby drawings (phase 2: `tools/figures/site/arcade.mjs`,
+  `heSort()` to `heCross()`, from `HEE2_SKIN`), built into `widget/hub-art/heme-endo-exam2.js` by `node tools/figures/site/build.mjs`.
+- **Switched in only if the release beats 11/13** (Sam, 2026-11-11): its exam is Friday, November 13, 10 am; if the release
+  comes later, the live page stays to the end.
+- **Each lecture has its own color** (Sam, 2026-11-11: "more color"), from the engine (`LCOL`, `lc()`, `.lc-0` to `.lc-9` in
+  `widget/hub.css`, by the lecture's place in `LECTURES`): L11 blue, L12a orange, L12b teal, L13 magenta, L14 olive, L15
+  violet, L16 mustard, and the Refresher grey (review only). Adding a lecture at the end keeps the others' colors; one
+  inserted earlier shifts the rest. **Notes done** (`STATE.read`, this device only) fills a lecture's badge.
+- No Timmy Time yet, so the new Home and More have no episode card (the engine's redesigned player page, 2026-11-11, shows
+  up by itself once `SH_PODCAST` exists; see Occlusion's note). When one is made, `/podcast` wires the live hub and
+  then runs `node tools/hub-next/build.mjs --hub heme-endo-exam2`, so `SH_PODCAST` (its lore comments included) reaches
+  `core.json`; the engine draws the Home card, the More tile and the player with likes, dislikes and comments.
+- Test it only through the preview (`node tools/preview/serve.js`, then `/hubs/heme-endo-exam2/next/`).
+
 ## Pending
 
 Open tasks for this hub: `vault/tasks/` notes with `hub: heme-endo-exam2`.

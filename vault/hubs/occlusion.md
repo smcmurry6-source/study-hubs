@@ -118,13 +118,22 @@ and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until
 - The build raises the figures' 9-10.5 px text to 11 px (the redesign's floor); the live hub keeps its sizes.
 - Narration and the podcast are the live hub's files (`audio/`), loaded from `../audio/`.
 - The "which statement" formats (2026-11-10) reach `next/content/` through the build, and their choices shuffle
-  there too, but the new engine's type filter (`FMTS` in `widget/hub.js`) doesn't list `which` / `whichf` yet: add
-  `["which", "Which statement is true"], ["whichf", "Which statement is false"]` before the release.
+  there too; the new engine's type filter lists them (since phase 2's Heme & Endo Exam 2, 2026-11-11).
 - Test it only through the preview (`node tools/preview/serve.js`, then `/hubs/occlusion/next/`): opened any other way,
   the page sends you to the live hub, and a plain static server would reach the class's data.
 - `SH_HUB.home.prof` and `SH_HUB.hints.prof` say "Dr. Givan", so the new Exam hints read "What Dr. Givan said to know"
   and "In Dr. Givan's words" though L9's hints are Dr. Lawson's. `widget/hub.js` builds "In " + prof + "'s words", so
-  "the professors" would read wrong: word it per lecture (or plural) before the release.
+  "the professors" would read wrong: word it per lecture (or plural) before the release. Since phase 2 the engine takes
+  `SH_HUB.hints.words` for that heading (Heme & Endo Exam 2: "In the professors' words").
+- Since 2026-11-11 (Sam's look at Heme & Endo Exam 2's new version: "more color"), **each lecture has its own color** here too,
+  from the engine, by its place in `LECTURES` (L1 blue, L2 orange, L3 teal, L4 magenta, L5 olive, L6 violet, L7 mustard, L8
+  sky, L9 brown), and the notes have **Notes done**. A lecture added at the end takes the next color; one inserted earlier
+  shifts the rest.
+- Since 2026-11-11 (Sam: "Redesign the timmy time ui/card"), **More > Timmy Time** is the engine's own page: the shared
+  player (`widget/podcast.js`) fills the slot and `podDress` in `widget/hub.js` lays it out (the episode on the hub's color
+  with Timmy in headphones, the chapters always open, then what the class thinks; `.pod-x` in `widget/hub.css`). This is
+  the only hub on the engine with an episode so far, so check it here after any change to the player. Home's animated card
+  is unchanged.
 
 ## Diagram decisions
 

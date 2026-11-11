@@ -128,7 +128,7 @@
           '<button type="button" class="sh-pod-play" data-pod="play">' + I_PLAY + '<span class="sh-pod-play-label">Play episode</span></button>' +
           '<button type="button" class="sh-pod-btn" data-pod="back" aria-label="Back 15 seconds">' + I_BACK + '</button>' +
           '<button type="button" class="sh-pod-btn" data-pod="fwd" aria-label="Forward 30 seconds">' + I_FWD + '</button>' +
-          '<button type="button" class="sh-pod-btn sh-pod-rate" data-pod="rate" aria-label="Playback speed">1×</button>' +
+          '<button type="button" class="sh-pod-btn sh-pod-rate" data-pod="rate" aria-label="Playback speed 1×">1×</button>' +
           (chapters ? '<button type="button" class="sh-pod-btn sh-pod-chbtn" data-pod="chapters" aria-expanded="false">Chapters</button>' : '') +
         '</div>' +
         '<div class="sh-pod-progress"><input type="range" class="sh-pod-seek" min="0" max="1000" value="0" step="1" aria-label="Position in the episode"><span class="sh-pod-time"></span></div>' +
@@ -192,6 +192,9 @@
       });
       el.querySelector('[data-pod-n="likes"]').textContent = SOC.loaded ? String(SOC.likes) : "";
       el.querySelector('[data-pod-n="dislikes"]').textContent = SOC.loaded ? String(SOC.dislikes) : "";
+      /* the spoken name carries the count it shows (BUG-057) */
+      el.querySelector('[data-pod-vote="1"]').setAttribute("aria-label", "Like this episode" + (SOC.loaded ? ", " + SOC.likes + (SOC.likes === 1 ? " like" : " likes") : ""));
+      el.querySelector('[data-pod-vote="-1"]').setAttribute("aria-label", "Dislike this episode" + (SOC.loaded ? ", " + SOC.dislikes + (SOC.dislikes === 1 ? " dislike" : " dislikes") : ""));
       el.querySelector(".sh-pod-ccount").textContent = total === 1 ? "1 comment" : total + " comments";
       el.querySelector(".sh-pod-comments").innerHTML = shown.map(commentHTML).join("");
       var more = el.querySelector(".sh-pod-more");
@@ -360,7 +363,7 @@
       b.setAttribute("aria-label", playing ? "Pause Timmy Time" : label + ", Timmy Time");
     });
     document.querySelectorAll(".sh-pod-card").forEach(function(c){ c.classList.toggle("is-playing", playing); });
-    document.querySelectorAll(".sh-pod-rate").forEach(function(b){ b.textContent = rate() + "×"; });
+    document.querySelectorAll(".sh-pod-rate").forEach(function(b){ b.textContent = rate() + "×"; b.setAttribute("aria-label", "Playback speed " + rate() + "×"); });
     if (dock) {
       dock.setAttribute("data-state", playing ? "playing" : "paused");
       dock.querySelector(".sh-pod-dock-play").innerHTML = playing ? I_PAUSE : I_PLAY;

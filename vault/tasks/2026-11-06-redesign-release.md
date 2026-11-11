@@ -146,6 +146,50 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 - **Tour** (changed): no pop-up on arrival; a one-line tip the first time you open each part, and "Take the tour" in More.
 - Timmy Tooth: he stays in the bottom-left corner, as now.
 
+### From phase 2, Heme & Endo Exam 2 ([phase 2](2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../hubs/heme-endo-exam2.md))
+
+Built in `hubs/heme-endo-exam2/next/` (2026-11-11). Its exam is Friday, November 13, 10:00 am: by the rule above ("a hub
+whose exam passed before the release keeps its old page"), **this new version is switched in only if the release comes
+before then** (Sam, 2026-11-11: "Switch it in only if the release beats 11/13"); after that, the live page stays like an
+archived hub's.
+
+**Lecture colors and Notes done** (Sam's look at it, 2026-11-11: "more color ... to distinguish each lecture"): built in the
+engine, so every hub on it has them from the release (Occlusion and Heme & Endo now, Perio once it's ported). For the About
+page (Notes, Question Bank): every lecture has its own color, on each question's lecture tag and the card's top edge, the notes'
+list, Home's progress by lecture, the bank's lecture picker, Exam Hints and the cram sheet (a review-only lecture is grey);
+**Notes done**: the button at the end of a lecture's notes, or reading to the end after a minute, fills its badge with its
+color and a check, in the notes' list and on Home; tap it again to take it back; kept on this device, like highlights.
+
+**Timmy Time's page** (Sam, 2026-11-11: "Redesign the timmy time ui/card"): built in the engine (`podDress`), so every hub on
+it with an episode has it from the release. Home's animated card stays among the quick starts, as now. For the About page
+(the Timmy Time entry, rewritten): the episode has its own page under More, on the hub's color with Timmy in headphones
+(he bobs while it plays): a big Play button, back 15 s, forward 30 s, the speed, and a bar to drag; the chapters are listed
+under it, always open (tap one to jump there, the one playing is marked); then what the class thinks, as now. The small
+player pinned to the bottom while you're elsewhere is in the hub's color too.
+
+**[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (add, with phase 1's draft):
+- A hub's **review-only lectures** (`core.json`'s `reviewOnly`, Heme & Endo Exam 2's Exam 1 Refresher) are out of the bank
+  until ticked: "All lectures" means the others, the picker's words are the hub's own (`SH_HUB.review`), the tag says when
+  they're in, and the summary counts them apart ("Showing n of N questions + m Exam 1 review").
+- A hub's own toggle may name a lecture (`SH_HUB.bank.only`: `[key, label, { prop, lec }]`): on, it ticks that lecture;
+  off, it unticks it again if it was what ticked it.
+
+**[hub-home-page](../rules/hub-home-page.md)** (add): review-only lectures are out of Home's totals, "you haven't tried"
+and Where to next, and listed under their own heading in the progress list (Heme & Endo: "Exam 1 review: not in your
+totals").
+
+**[arcade-skins](../rules/arcade-skins.md)** (with phase 1's line): the hub's pick first, full width (Occlusion: Cusp Sort;
+Heme & Endo Exam 2: Lab Sort).
+
+**[build-a-hub](../how-to/build-a-hub.md)** (with phase 1's rewrite): a hub without the drawing kit (`od:kit`) still builds:
+its `FIGS` and `FIG_PLACE` go into `figures.js` as data. The mock's blueprint may group lectures (`EXAM_GROUPS`) and draw a
+lecture's questions from its High Likelihood ones only (`MOCK_LIKELY_ONLY`).
+
+**About page**: nothing new for Heme & Endo beyond phase 1's drafts (its Refresher, Exam 1 High likelihood and the Cycle
+Arcade work as now). Its arcade row: every game in the lobby with its own drawing, Lab Sort first. (High Likelihood's line on
+the mock's five Exam 1 questions said "each from a different Exam 1 lecture"; Sam, 2026-11-11: "draw at random", so it now
+says they're drawn at random, fixed on the live page in [#312](https://github.com/smcmurry6-source/study-hubs/pull/312).)
+
 ### From the Learn and Flashcards toggle ([Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md))
 
 Sam confirmed the calls in that note (2026-11-06); check against the engine as built.

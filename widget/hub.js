@@ -26,6 +26,7 @@
   var docEl = document.documentElement;
   var reduced = false; try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
   docEl.classList.add("shx");
+  docEl.setAttribute("data-hx-hub", HUB);   /* the hub's tint on the page root too, for the shared widget's tokens (hub.css) */
 
   /* ---------- small helpers ---------- */
   function $(s, el){ return (el || document).querySelector(s); }
@@ -94,7 +95,7 @@
   /* ---------- state: the live hub's own (same key, shape and merge), so a returning student's progress is here ---------- */
   var STATE_KEY = C.stateKey;
   function defaultState(){
-    return { v: 1, seen: {}, streak: 0, bestStreak: 0, totalCorrect: 0, totalAnswered: 0, lecStats: {}, days: [], ach: {},
+    return { v: 1, seen: {}, streak: 0, bestStreak: 0, totalCorrect: 0, totalAnswered: 0, lecStats: {}, days: [], ach: {}, read: {},
       ui: { mode: "home", sub: "notes", lec: C.firstLec || "", level: "full", group: "", recall: false, qlec: "all", qsrc: "all", qstatus: "all", qlikely: "" },
       arcade: { best: { sort: 0, board: 0, escape: 0, cloze: 0, smile: 0, cross: 0 }, plays: { sort: 0, board: 0, escape: 0, cloze: 0, smile: 0, cross: 0 }, muted: false, scope: "all", sortSet: "mix", snakeLec: "all", stackSet: "mix", matchSet: "mix", hangLec: "all", blastLec: "all", searchLec: "all", whackSet: "mix" } };
   }
@@ -129,7 +130,7 @@
 
   /* ---------- the content ---------- */
   var CORE = null, QS = null, QBY = {}, QBL = {}, LECS = [], LBY = {}, IDX = [], NOTES = null, STUDY = null, FIG = null, ARC = null;
-  var EXAM = null, EXAM_LECS = {};
+  var EXAM = null, EXAM_LECS = {}, REVIEW = {};
   var memo = {};
   function getJSON(name){
     return memo[name] || (memo[name] = fetch(BASE + name).then(function(r){ if (!r.ok) throw new Error(name + " " + r.status); return r.json(); })
@@ -142,13 +143,33 @@
   function lecLabel(l){ return l ? (l.label || ("L" + l.num)) : ""; }
   function shortTitle(l){ return l ? String(l.title).split(":")[0] : ""; }
   function lecName(id){ var l = LBY[id]; return l ? lecLabel(l) + " · " + shortTitle(l) : id; }
+  /* each lecture's own color (Sam, 2026-11-11: "more color ... to distinguish each lecture from one another so its easier
+     to tell where questions come from and also which lectures youve done in the lecture notes"): set in setCore from the
+     lecture's place in the hub, so it is the same everywhere (question cards, the notes, Home, the bank's picker, hints,
+     the cram sheet, the mock, stats); a review-only lecture is grey. hub.css draws .lc-0 to .lc-9 and .lc-x. */
+  var LCOL = {};
+  function lc(id){ return " lc lc-" + (LCOL[id] || "x"); }
+  function lecDot(id){ return '<i class="ld' + lc(id) + '" aria-hidden="true"></i>'; }
+  function lecChip(id, text){ return '<span class="lchip' + lc(id) + '"><i class="ld" aria-hidden="true"></i>' + esc(text === undefined ? lecName(id) : text) + "</span>"; }
+  /* a lecture's notes marked done: by its button at the end of the notes, or by reading to the end (on this device) */
+  /* a heading for one lecture: its colored badge, then its short title (the badge's label read out once, by the sr text) */
+  function lecHead(l){ return lecBadge(l, "lb-s") + '<span class="sr">' + esc(lecLabel(l)) + " · </span><span>" + esc(shortTitle(l)) + "</span>"; }
+  function isRead(id){ return !!(STATE.read || {})[id]; }
   function isExamLec(id){ return !!EXAM_LECS[id]; }
+  /* review-only lectures (core.reviewOnly, the live hub's COUNT_SKIP; Heme & Endo Exam 2's Exam 1 Refresher, Sam, 2026-11-06):
+     on the exam, but kept for review, so they're out of every total (Home's readiness and "you haven't tried", Where to
+     next, the bank's "of N" and, through SH_EXPORT.uncounted, the mastery medal) and out of the bank until ticked
+     (Sam, 2026-11-10). Their answers still count for XP and streaks, and the drill, mock and search still use them. */
+  function isReview(id){ return !!REVIEW[id]; }
+  function hasReview(){ return Object.keys(REVIEW).length > 0; }
   function setCore(c){
     CORE = c; LECS = c.lectures || []; LECS.forEach(function(l){ LBY[l.id] = l; QBL[l.id] = []; });
     IDX = (c.index || []).map(function(r){ return { id: r[0], lec: r[1], likely: !!r[2], src: r[3] || "" }; });
     IDX.forEach(function(r){ (QBL[r.lec] = QBL[r.lec] || []).push(r); });
     EXAM = (c.exams || []).filter(function(x){ return x.id === C.exam; })[0] || (c.exams || [])[c.exams.length - 1] || null;
-    LECS.forEach(function(l){ if (!C.exam || l.exam === C.exam) EXAM_LECS[l.id] = 1; });
+    (c.reviewOnly || []).forEach(function(id){ REVIEW[id] = 1; });
+    LECS.forEach(function(l){ if ((!C.exam || l.exam === C.exam) && !REVIEW[l.id]) EXAM_LECS[l.id] = 1; });
+    var nc = 0; LECS.forEach(function(l){ LCOL[l.id] = REVIEW[l.id] ? "x" : String(nc++ % 10); });
     if (!LBY[STATE.ui.lec]) STATE.ui.lec = (LECS.filter(function(l){ return isExamLec(l.id); })[0] || LECS[0] || {}).id;
   }
   function needQuestions(){
@@ -386,8 +407,8 @@
     var seen = STATE.seen[q.id];
     var status = o.retry ? '<span class="qc-flag">' + icon("retry", 14) + "Again: you missed this a few questions ago</span>" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
       seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + "</span>" : "";
-    var el = h('<article class="qcard qc' + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + id + 'h"></article>');
-    var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + id + 'h">' + (o.num ? "Question " + o.num + " · " : "") + esc(lecName(q.lec)) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
+    var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + id + 'h"></article>');
+    var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + id + 'h">' + (o.num ? "Question " + o.num + " · " : "") + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
     var body = "";
     if (q.type === "mcq" || multi) {
       var order = multi ? shuffled(q.choices.map(function(c, i){ return i; })) : choiceOrder(q);
@@ -621,7 +642,7 @@
       '<div><b class="num" data-count="' + d.r + '">' + d.r + "</b><span>right of " + d.n + '</span></div><div><b class="num" data-count="' + d.xp + '" data-plus>+' + d.xp + "</b><span>XP this session</span></div>" +
       (hpd !== null ? '<div><b class="num">' + (hpd >= 0 ? "+" : "") + hpd + "</b><span>Timmy's HP, now " + hp + "</span></div>" : "") +
       '<div><b class="num">' + (n ? pl(n, "day") : "Day one") + "</b><span>streak</span></div></div>" +
-      (next.length ? '<div class="next"><h3>Look at these next</h3><ul>' + next.map(function(id){ return '<li><a href="#notes/' + esc(id) + '">' + esc(lecName(id)) + '</a> <span class="num">' + pl(d.miss[id], "miss", "misses") + "</span></li>"; }).join("") + "</ul></div>" : "") +
+      (next.length ? '<div class="next"><h3>Look at these next</h3><ul>' + next.map(function(id){ return '<li><a href="#notes/' + esc(id) + '">' + lecDot(id) + esc(lecName(id)) + '</a> <span class="num">' + pl(d.miss[id], "miss", "misses") + "</span></li>"; }).join("") + "</ul></div>" : "") +
       '<div class="qc-go"><button class="btn btn-primary" type="button" data-recap="go">Keep going</button>' + (next.length ? '<button class="btn" type="button" data-recap="miss" data-lecs="' + esc(next.join(",")) + '">Practice the misses</button>' : "") + "</div></section>";
   }
   function wireRecap(node){
@@ -703,7 +724,7 @@
       "</div></div>";
     el.innerHTML = html;
     /* Home's way into the bank starts fresh: the exam's lectures, not answered yet, High likelihood off (the rule) */
-    $$("[data-home-practice]", el).forEach(function(a){ a.addEventListener("click", function(){ var ex = LECS.filter(function(l){ return isExamLec(l.id); }).map(function(l){ return l.id; }); bankReset(); STATE.ui.qlec = ex.length && ex.length < LECS.length ? ex : "all"; STATE.ui.qstatus = "unseen"; bankSearch = ""; saveState(); }); });
+    $$("[data-home-practice]", el).forEach(function(a){ a.addEventListener("click", function(){ var ex = LECS.filter(function(l){ return isExamLec(l.id); }).map(function(l){ return l.id; }); bankReset(); STATE.ui.qlec = ex.length ? lecValue(ex) : "all"; STATE.ui.qstatus = "unseen"; bankSearch = ""; saveState(); }); });
     paintLive();
     homeTimer = setInterval(function(){ var c = $("#hxCount"); if (!c || !c.isConnected || view !== "home") { clearInterval(homeTimer); return; } c.innerHTML = countHTML(); }, 30000);
     tip(el, "home", "Your daily goal is the ring in the bar: " + goal() + " questions a day. The flame counts the days in a row you study. Change the goal in More, Settings.");
@@ -726,9 +747,9 @@
     return '<ul class="lec-rows">' + rows.map(function(r){
       var tw = r.total ? Math.round(r.tried / r.total * 100) : 0, rw = r.total ? Math.round(r.right / r.total * 100) : 0, grp = isExamLec(r.l.id) ? "on" : "off", head = "";
       if (grp !== last) { head = '<li class="grp">' + esc(grp === "on" ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures")) + "</li>"; last = grp; }
-      return head + '<li><div class="lr-main"><p><b>' + esc(lecLabel(r.l)) + "</b> " + esc(shortTitle(r.l)) + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
+      return head + '<li class="' + lc(r.l.id).trim() + '">' + lecBadge(r.l, "lb-s") + '<div class="lr-main"><p><b><span class="sr">' + esc(lecLabel(r.l)) + " · </span>" + esc(shortTitle(r.l)) + "</b>" + (isRead(r.l.id) ? ' <span class="read-tag">' + icon("check", 14) + "Notes done</span>" : "") + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
         '<p class="note num">' + r.tried + " of " + r.total + " tried" + (r.pct !== null ? " · " + r.pct + "% of answers right" : "") + "</p></div>" +
-        '<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>';
+        '<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + (isRead(r.l.id) ? ", done" : "") + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>';
     }).join("") + "</ul>";
   }
   function timelineHTML(){
@@ -758,24 +779,29 @@
     Promise.all([needNotes(), needStudy(), needQuestions()]).then(function(){ drawNotes(el, lec); }).catch(function(){ el.innerHTML = offlineHTML("the notes"); });
   }
   function offlineHTML(what){ return '<div class="hx-page"><h1>Not loaded yet</h1><p>Couldn\'t load ' + esc(what) + '. Check your connection, then <a href="">reload</a>.</p></div>'; }
-  function drawNotes(el, lec){
-    if (view !== "notes") return;
-    var X = C.notes || {}, hasPlain = !!(NOTES.plain || {})[lec.id], level = hasPlain && STATE.ui.level === "plain" ? "plain" : "full";
-    var text = (level === "plain" ? NOTES.plain : NOTES.full)[lec.id], nq = (QBL[lec.id] || []).length, last = null;
-    /* the lecture list: the exam's lectures first, under the exam's date; each with its number, how much of its bank
-       you've tried (the bar: tried, and right on your latest try) and your accuracy */
+  /* the notes' lecture list: the exam's lectures first, under the exam's date; each with its number in its own color (filled,
+     with a check, once its notes are done), how much of its bank you've tried (the bar: tried, and right on your latest
+     try) and your accuracy */
+  function lecListHTML(lec){
+    var X = C.notes || {};
     var groups = [["on", LECS.filter(function(l){ return isExamLec(l.id); })], ["off", LECS.filter(function(l){ return !isExamLec(l.id); })]].filter(function(g){ return g[1].length; });
-    var list = '<nav class="lec-list" aria-label="Lectures"><button class="lec-pick btn" type="button" aria-expanded="false" data-lecpick>' + lecBadge(lec) +
+    return '<nav class="lec-list" aria-label="Lectures"><button class="lec-pick btn" type="button" aria-expanded="false" data-lecpick>' + lecBadge(lec) +
       '<span class="lp-t"><b>' + esc(shortTitle(lec)) + "</b><small>" + esc(lecLabel(lec)) + " · change lecture</small></span>" + icon("chevron", 18, "rot") + "</button><ul>" +
       groups.map(function(g){
         var on = g[0] === "on";
         return '<li class="grp grp-' + g[0] + '"><b>' + esc(on ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures")) + "</b><span>" +
           esc(on ? (EXAM ? (EXAM.label || "The exam") + ", " + dateLabel(EXAM.date, { weekday: "long", month: "long", day: "numeric" }) : "") : (X.offNote || "For review")) + "</span></li>" + g[1].map(function(l){ return lecItemHTML(l, l.id === lec.id); }).join("");
       }).join("") + "</ul></nav>";
+  }
+  function drawNotes(el, lec){
+    if (view !== "notes") return;
+    var X = C.notes || {}, hasPlain = !!(NOTES.plain || {})[lec.id], level = hasPlain && STATE.ui.level === "plain" ? "plain" : "full";
+    var text = (level === "plain" ? NOTES.plain : NOTES.full)[lec.id], nq = (QBL[lec.id] || []).length;
+    var list = lecListHTML(lec);
     var sub = String(lec.title).split(":").slice(1).join(":").trim();
     var group = (STUDY.review || []).filter(function(g){ return g.lec === lec.id; })[0];
-    var art = '<article class="reading" id="lec-' + esc(lec.id) + '">' +
-      "<h1>" + esc(lecLabel(lec) + " · " + shortTitle(lec)) + "</h1>" + (sub ? '<p class="sub">' + esc(sub) + "</p>" : "") +
+    var art = '<article class="reading' + lc(lec.id) + '" id="lec-' + esc(lec.id) + '">' +
+      '<h1 class="rd-title">' + lecBadge(lec, "lb-h") + '<span class="sr">' + esc(lecLabel(lec)) + " · </span><span>" + esc(shortTitle(lec)) + "</span></h1>" + (sub ? '<p class="sub">' + esc(sub) + "</p>" : "") +
       '<p class="note">' + esc(lec.who) + " · " + (lec.status === "taught" ? "recording and slides" : "slides only") + " · " + pl(nq, "question") + "</p>" +
       '<div class="toolbar" role="toolbar" aria-label="Notes tools">' +
         (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn" data-sh-tts-audio="1" aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' : "") +
@@ -789,7 +815,7 @@
       '<section class="lec-figs" hidden aria-labelledby="lfH"><h2 id="lfH">Diagrams</h2><div class="fig-grid"></div></section>' +
       (group ? '<section class="charts" aria-labelledby="lcH"><h2 id="lcH">Charts for this lecture</h2><p class="note">' + esc(group.blurb || "") + "</p>" + group.sections.map(function(sec, i){ return (sec.part ? '<h3 class="part">' + esc(sec.part) + "</h3>" : "") + sectionHTML(sec); }).join("") + "</section>" : "") +
       '<section class="check" aria-labelledby="ckH"><h2 id="ckH">Check yourself</h2><p class="note">Three questions from this lecture. Answers count like anywhere else.</p><div class="qlist" data-check></div></section>' +
-      '<nav class="foot-acts" aria-label="Next"><a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '">' + icon("questions", 18) + "Practice " + esc(lecLabel(lec)) + " questions</a>" +
+      '<nav class="foot-acts" aria-label="Next">' + readBtnHTML(lec) + '<a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '">' + icon("questions", 18) + "Practice " + esc(lecLabel(lec)) + " questions</a>" +
         '<a class="btn" href="#more/cram" data-cram="' + esc(lec.id) + '">' + icon("cram", 18) + "Cram bullets</a></nav>" +
       footNavHTML(lec) +
       '<p class="foot-report"><button class="btn btn-text" type="button" data-report-notes>' + icon("report", 18) + "Report a mistake in these notes</button></p>" +
@@ -800,7 +826,7 @@
     if (needF || group) needFigures().then(function(){ if (!prose.isConnected) return; placeFigs(prose, lec.id, level, $(".lec-figs", el)); $$(".charts [data-figs]", el).forEach(function(b){ b.innerHTML = b.getAttribute("data-figs").split(",").map(figCardHTML).join(""); }); try { FIG.wireCuspMaps(el); FIG.ANIMA.mount(el); } catch (e) {} }).catch(function(){});
     checkYourself($("[data-check]", el), lec);
     $$("[data-level]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.level = b.getAttribute("data-level"); saveState(); track("notes:level=" + STATE.ui.level); drawNotes(el, lec); }); });
-    var pick = $("[data-lecpick]", el); pick.addEventListener("click", function(){ var on = pick.getAttribute("aria-expanded") !== "true"; pick.setAttribute("aria-expanded", String(on)); });
+    wireLecPick(el);
     var mm = $("[data-mmap]", el); mm.addEventListener("click", function(){
       var c = $(".mmap", el), open = mm.getAttribute("aria-expanded") === "true";
       if (!open && !c.dataset.done && window.shMindMap) { window.shMindMap.render(c, mindMapFor(lec), { accent: "var(--hub)" }); c.dataset.done = "1"; }
@@ -814,25 +840,58 @@
     }); });
     $$("[data-lecnav]", el).forEach(function(a){ a.addEventListener("click", function(){ track("notes:" + a.getAttribute("data-lecnav")); }); });
     wireLecLinks(el);
+    wireRead(el, lec);
     /* the first visit's tip sits under the toolbar; while it shows, the toolbar's short "Select text to highlight it" hides (hub.css) */
     tip(el, "notes", "Select any words in the notes to highlight them; they stay on this device.", $(".reading > .toolbar", el));
+  }
+  function wireLecPick(el){ var pick = $("[data-lecpick]", el); if (pick) pick.addEventListener("click", function(){ var on = pick.getAttribute("aria-expanded") !== "true"; pick.setAttribute("aria-expanded", String(on)); }); }
+  /* "Notes done" (Sam, 2026-11-11: see "which lectures youve done in the lecture notes"): the button at the end of a lecture's
+     notes marks it, and reading to the end marks it too once the lecture has been open a minute (so jumping to the bottom
+     doesn't). Tapping the button again takes it back. Saved on this device, like highlights; the lecture's badge fills in
+     its color, with a check, in the notes' list, on Home and in the headings. */
+  var READ_AFTER = 60000;
+  function readBtnHTML(lec){ var on = isRead(lec.id); return '<button class="btn btn-done' + (on ? " is-on" : "") + '" type="button" data-read aria-pressed="' + on + '">' + icon("check", 18) + "<span>" + (on ? "Notes done" : "Mark notes as done") + "</span></button>"; }
+  function setRead(el, lec, on, how){
+    STATE.read = STATE.read || {};
+    if (on) STATE.read[lec.id] = day(0); else delete STATE.read[lec.id];
+    saveState(); track("notes:" + (on ? "done" : "undone") + (how ? "-" + how : ""));
+    var b = $("[data-read]", el); if (b) b.outerHTML = readBtnHTML(lec);
+    var nav = $(".lec-list", el); if (nav) { nav.outerHTML = lecListHTML(lec); wireLecPick(el); }
+    var t = $(".rd-title .lb", el); if (t) t.outerHTML = lecBadge(lec, "lb-h");
+    wireReadBtn(el, lec);
+  }
+  function wireReadBtn(el, lec){ var b = $("[data-read]", el); if (b) b.addEventListener("click", function(){ setRead(el, lec, !isRead(lec.id), ""); }); }
+  function wireRead(el, lec){
+    wireReadBtn(el, lec);
+    var end = $(".foot-acts", el), opened = Date.now(), seen = false, timer = null;
+    if (!end || isRead(lec.id) || !("IntersectionObserver" in window)) return;
+    var auto = function(){ if (end.isConnected && seen && !isRead(lec.id) && view === "notes") setRead(el, lec, true, "auto"); };
+    var io = new IntersectionObserver(function(es){
+      if (!end.isConnected) { io.disconnect(); clearTimeout(timer); return; }
+      seen = es.some(function(e){ return e.isIntersecting; });
+      clearTimeout(timer);
+      if (!seen) return;
+      var left = READ_AFTER - (Date.now() - opened);
+      if (left <= 0) { io.disconnect(); auto(); } else timer = setTimeout(function(){ if (seen) { io.disconnect(); auto(); } }, left);
+    });
+    io.observe(end);
   }
   /* the previous and next lecture, at the end of every lecture's notes (Sam, 2026-11-06), in the order they were taught */
   function footNavHTML(lec){
     var i = LECS.indexOf(lec), prev = LECS[i - 1], next = LECS[i + 1];
-    var link = function(l, k){ return '<a class="btn fn-' + k + '" href="#notes/' + esc(l.id) + '" data-lecnav="' + k + '">' + (k === "prev" ? icon("chevron", 20, "flip") : "") +
+    var link = function(l, k){ return '<a class="btn fn-' + k + lc(l.id) + '" href="#notes/' + esc(l.id) + '" data-lecnav="' + k + '">' + (k === "prev" ? icon("chevron", 20, "flip") : "") +
       "<span><small>" + (k === "prev" ? "Previous lecture" : "Next lecture") + "</small><b>" + esc(lecLabel(l) + " · " + shortTitle(l)) + "</b></span>" + (k === "next" ? icon("chevron", 20) : "") + "</a>"; };
     if (!prev && !next) return "";
     return '<nav class="foot-nav" aria-label="Other lectures">' + (prev ? link(prev, "prev") : "") + (next ? link(next, "next") : "") + "</nav>";
   }
-  function lecBadge(l){ return '<span class="lb num' + (isExamLec(l.id) ? " is-on" : "") + '" aria-hidden="true">' + esc(lecLabel(l)) + "</span>"; }
+  function lecBadge(l, cls){ var rd = isRead(l.id); return '<span class="lb num' + lc(l.id) + (cls ? " " + cls : "") + (isExamLec(l.id) ? " is-on" : "") + (rd ? " is-read" : "") + '" aria-hidden="true">' + esc(lecLabel(l)) + (rd ? '<span class="lb-ck">' + icon("check", 12) + "</span>" : "") + "</span>"; }
   function lecItemHTML(l, cur){
     var r = lecProgress(l), tw = r.total ? Math.round(r.tried / r.total * 100) : 0, rw = r.total ? Math.round(r.right / r.total * 100) : 0;
-    var sub = !r.tried ? "Not started · " + pl(r.total, "question") : r.tried + " of " + r.total + " tried" + (r.pct !== null && r.a >= 3 ? " · " + r.pct + "% right" : "");
-    return '<li><a class="lec-item" href="#notes/' + esc(l.id) + '"' + (cur ? ' aria-current="page"' : "") + ">" + lecBadge(l) +
+    var rd = isRead(l.id), sub = !r.tried ? (rd ? "Notes done · " + pl(r.total, "question") + " to try" : "Not started · " + pl(r.total, "question")) : (rd ? "Notes done · " : "") + r.tried + " of " + r.total + " tried" + (r.pct !== null && r.a >= 3 ? " · " + r.pct + "% right" : "");
+    return '<li><a class="lec-item' + lc(l.id) + (rd ? " is-read" : "") + '" href="#notes/' + esc(l.id) + '"' + (cur ? ' aria-current="page"' : "") + ">" + lecBadge(l) +
       '<span class="lt"><b>' + esc(shortTitle(l)) + '</b><small class="num">' + esc(sub) + "</small>" +
       '<span class="bar" aria-hidden="true"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span></span>' +
-      '<span class="sr">' + esc(lecLabel(l)) + (cur ? ", open now" : "") + "</span></a></li>";
+      '<span class="sr">' + esc(lecLabel(l)) + (rd ? ", notes done" : "") + (cur ? ", open now" : "") + "</span></a></li>";
   }
   function mindMapFor(lec){
     var d = document.createElement("div"); d.innerHTML = NOTES.full[lec.id] || "";
@@ -897,26 +956,50 @@
   var SHOW = [["all", "All"], ["unseen", "Not answered yet"], ["missed", "Missed last time"], ["pinned", "Pinned"]];
   /* Only: the High likelihood toggle, on top of any Show chip (Sam, 2026-11-06). A hub may add its own (SH_HUB.bank.only,
      [[key, label]], the key a question property), one on at a time. A Show "likely" saved before then becomes the toggle. */
+  /* A toggle may name its own test: [key, label, { prop, lec }] shows the questions whose `prop` is set in that lecture
+     only (Heme & Endo Exam 2's Exam 1 High likelihood: likely, in the Refresher), and turning it on ticks that lecture if it
+     isn't ticked, then unticks it again when the toggle goes off (STATE.ui.qE1auto, as on the live hub). */
   var LIKELY = [["likely", "High likelihood"]].concat((C.bank && C.bank.only) || []);
   function isLk(k){ return LIKELY.some(function(x){ return x[0] === k; }); }
+  function lkSpec(k){ for (var i = 0; i < LIKELY.length; i++) if (LIKELY[i][0] === k) return LIKELY[i][2] || null; return null; }
+  function lkHas(q, k){ var sp = lkSpec(k); return sp ? !!q[sp.prop || "likely"] && (!sp.lec || q.lec === sp.lec) : !!q[k]; }
+  /* turn a toggle on (k) or off (""): its lecture ticked for it, or unticked again when the toggle had ticked it */
+  function setLk(k){
+    var was = lkSpec(STATE.ui.qlikely), sp = lkSpec(k);
+    if (STATE.ui.qE1auto && was && was.lec && (!sp || sp.lec !== was.lec)) { STATE.ui.qlec = lecValue(lecIds().filter(function(id){ return id !== was.lec; })); STATE.ui.qE1auto = false; }
+    STATE.ui.qlikely = k;
+    if (sp && sp.lec && LBY[sp.lec] && lecIds().indexOf(sp.lec) === -1) { STATE.ui.qlec = lecValue(lecIds().concat([sp.lec])); STATE.ui.qE1auto = true; }
+  }
   function normShow(){
     if (isLk(STATE.ui.qstatus)) { STATE.ui.qlikely = STATE.ui.qstatus; STATE.ui.qstatus = "all"; }
     if (STATE.ui.qlikely && !isLk(STATE.ui.qlikely)) STATE.ui.qlikely = "";
   }
-  function bankReset(){ STATE.ui.qset = ""; STATE.ui.qlec = "all"; STATE.ui.qstatus = "all"; STATE.ui.qlikely = ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; }
+  function bankReset(){ STATE.ui.qset = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; STATE.ui.qstatus = "all"; STATE.ui.qlikely = ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; }
   var SETS = [["drill", "Daily drill"], ["misses", "Yesterday's misses"], ["weak", "Weak spots"], ["mock", "Mock exam"]];
-  var FMTS = [["2stmt", "Two statements"], ["tf", "True or false"], ["numbered", "Numbered statements"], ["except", "EXCEPT / NOT"], ["pbox", "Patient Box cases"], ["img", "Diagram questions"], ["multi", "Select all that apply"], ["match", "Matching"], ["sequence", "Put in order"]];
+  var FMTS = [["2stmt", "Two statements"], ["tf", "True or false"], ["numbered", "Numbered statements"], ["which", "Which statement is true"], ["whichf", "Which statement is false"], ["except", "EXCEPT / NOT"], ["pbox", "Patient Box cases"], ["img", "Diagram questions"], ["multi", "Select all that apply"], ["match", "Matching"], ["sequence", "Put in order"]];
   var PAGE = 20, bankSearch = "";
   function isFmt(q, fm){ return fm === "pbox" ? !!q.pbox : fm === "img" ? !!q.img : (fm === "multi" || fm === "match" || fm === "sequence") ? q.type === fm : q.fmt === fm; }
   function labelOf(list, k){ for (var i = 0; i < list.length; i++) if (list[i][0] === k) return list[i][1]; return k; }
   function presetOf(){ var s = parse()[1]; return SETS.some(function(x){ return x[0] === s; }) ? s : s === "missed" ? "" : ""; }
   function pins(){ try { return window.shPins ? window.shPins.list() : JSON.parse(ls("sh_pins_" + HUB) || "[]"); } catch (e) { return []; } }
+  /* the bank's default lectures ("all"): every lecture but the review-only ones */
+  function bankAll(){ return LECS.filter(function(l){ return !isReview(l.id); }).map(function(l){ return l.id; }); }
+  function isDefaultLecs(ids){ var d = bankAll(); return ids.length === d.length && d.every(function(id){ return ids.indexOf(id) > -1; }); }
+  function lecValue(ids){ return isDefaultLecs(ids) ? "all" : ids; }
   function lecIds(){
     var v = STATE.ui.qlec;
     if (v === "final" || v === "midterm") return LECS.filter(function(l){ return l.exam === v; }).map(function(l){ return l.id; });
     if (Array.isArray(v)) return v.filter(function(id){ return LBY[id]; });
     if (v && v !== "all" && LBY[v]) return [v];
-    return LECS.map(function(l){ return l.id; });
+    return bankAll();
+  }
+  /* the lecture picker's words: "All lectures", or the hub's own when it has review-only ones (SH_HUB.review) */
+  function lecSummary(picked){
+    var R = C.review || {}, n = function(t){ return String(t).replace("{n}", bankAll().length); };
+    if (isDefaultLecs(picked)) return n(R.all || "All lectures");
+    if (picked.length === LECS.length) return n(R.allPlus || "All lectures");
+    if (!picked.length) return "No lectures";
+    return picked.length === 1 ? lecName(picked[0]) : picked.map(function(id){ return lecLabel(LBY[id]); }).join(", ");
   }
   function filtered(o){
     o = o || {};
@@ -924,11 +1007,12 @@
     normShow();
     var st = o.st || STATE.ui.qstatus || "all", lk = "lk" in o ? o.lk : STATE.ui.qlikely || "", fm = o.fm || STATE.ui.qfmt || "all", src = o.src || STATE.ui.qsrc || "all";
     lecIds().forEach(function(id){ on[id] = 1; });
+    var sp = "lk" in o && o.lk ? lkSpec(o.lk) : null; if (sp && sp.lec) on[sp.lec] = 1; /* a toggle's count: tapping it ticks its lecture */
     if (st === "pinned") pins().forEach(function(id){ pin[id] = 1; });
     return QS.filter(function(q){
       if (!on[q.lec]) return false;
       if (st === "pinned" && !pin[q.id]) return false;
-      if (lk && !q[lk]) return false;
+      if (lk && !lkHas(q, lk)) return false;
       if (src !== "all" && q.src !== src) return false;
       if (fm !== "all" && !isFmt(q, fm)) return false;
       var seen = STATE.seen[q.id];
@@ -961,7 +1045,7 @@
     tip(el, "bank", "Your filters and the set you pick are remembered next time; the tags under the panel show what's on.");
   }
   function panelHTML(preset){
-    var picked = lecIds(), all = LECS.length, sum = picked.length === all ? "All lectures" : picked.length === 1 ? lecName(picked[0]) : picked.map(function(id){ return lecLabel(LBY[id]); }).join(", ");
+    var picked = lecIds(), sum = lecSummary(picked);
     normShow();
     var lkChip = function(k, lab){ var on = !preset && STATE.ui.qlikely === k; return '<button class="chip chip-tog" type="button" data-lk="' + k + '" aria-pressed="' + on + '"><span class="box" aria-hidden="true">' + icon("check", 14) + "</span>" + esc(lab) + ' <span class="n num">' + filtered({ lk: k }).length + "</span></button>"; };
     var showChip = function(k, lab){ var n = filtered({ st: k }).length; return '<button class="chip" type="button" data-show="' + k + '" aria-pressed="' + (!preset && (STATE.ui.qstatus || "all") === k) + '">' + esc(lab) + ' <span class="n num">' + n + "</span></button>"; };
@@ -973,8 +1057,8 @@
     return '<div class="qbar panel' + (preset ? " is-set" : "") + '" role="search" aria-label="Filter the questions">' +
       '<div class="qbar-row">' +
         '<div class="lp"><span class="lab" id="lpL">Lectures</span><button class="btn lp-btn" type="button" aria-expanded="false" aria-labelledby="lpL lpS" data-lp><span id="lpS">' + esc(sum) + "</span>" + icon("chevron", 16, "rot") + "</button>" +
-          '<div class="lp-pop" hidden><div class="lp-acts"><button class="btn btn-text" type="button" data-lpall>All lectures</button><button class="btn btn-text" type="button" data-lpnone>Untick all</button></div><ul>' +
-          LECS.map(function(l){ var on = picked.indexOf(l.id) > -1; return '<li><label><input type="checkbox" value="' + esc(l.id) + '"' + (on ? " checked" : "") + "><span>" + esc(lecName(l.id)) + '</span></label><button class="btn btn-text" type="button" data-only="' + esc(l.id) + '" aria-label="Only ' + esc(lecLabel(l)) + '">Only</button></li>'; }).join("") +
+          '<div class="lp-pop" hidden><div class="lp-acts"><button class="btn btn-text" type="button" data-lpall>' + esc((C.review || {}).allBtn || "All lectures") + '</button><button class="btn btn-text" type="button" data-lpnone>Untick all</button></div>' + ((C.review || {}).help ? '<p class="note lp-help">' + esc(C.review.help) + "</p>" : "") + "<ul>" +
+          LECS.map(function(l){ var on = picked.indexOf(l.id) > -1; return '<li><label><input type="checkbox" value="' + esc(l.id) + '"' + (on ? " checked" : "") + ">" + lecDot(l.id) + "<span>" + esc(lecName(l.id)) + '</span></label><button class="btn btn-text" type="button" data-only="' + esc(l.id) + '" aria-label="Only ' + esc(lecLabel(l)) + '">Only</button></li>'; }).join("") +
           "</ul></div></div>" +
         '<label class="search"><span class="sr">Search the questions</span>' + icon("search", 18) + '<input type="search" placeholder="Search the questions" value="' + esc(bankSearch) + '" data-search></label>' +
       "</div>" +
@@ -992,12 +1076,12 @@
     function redraw(k){ if (k) track("bank:" + k); STATE.ui.qset = ""; saveState(); if (preset) go("questions"); else drawQuestions(el, ""); }
     btn.addEventListener("click", function(){ var on = pop.hidden; pop.hidden = !on; btn.setAttribute("aria-expanded", String(on)); });
     document.addEventListener("click", function away(e){ if (!el.isConnected) { document.removeEventListener("click", away); return; } if (!pop.hidden && !e.target.closest(".lp")) { pop.hidden = true; btn.setAttribute("aria-expanded", "false"); } });
-    pop.addEventListener("change", function(){ var ids = $$("input:checked", pop).map(function(c){ return c.value; }); STATE.ui.qlec = ids.length === LECS.length ? "all" : ids; saveState(); $("#lpS", el).textContent = ids.length === LECS.length ? "All lectures" : ids.length ? ids.map(function(id){ return lecLabel(LBY[id]); }).join(", ") : "No lectures"; clearTimeout(pop.__t); pop.__t = setTimeout(function(){ if (!pop.hidden) { pop.hidden = true; } redraw("lec-pick"); }, 900); });
-    $$("[data-only]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qlec = b.getAttribute("data-only"); redraw("lec-only"); }); });
-    $("[data-lpall]", el).addEventListener("click", function(){ STATE.ui.qlec = "all"; redraw("lec-all"); });
-    $("[data-lpnone]", el).addEventListener("click", function(){ $$("input", pop).forEach(function(c){ c.checked = false; }); STATE.ui.qlec = []; saveState(); $("#lpS", el).textContent = "No lectures"; });
+    pop.addEventListener("change", function(){ var ids = $$("input:checked", pop).map(function(c){ return c.value; }); STATE.ui.qlec = lecValue(ids); STATE.ui.qE1auto = false; saveState(); $("#lpS", el).textContent = lecSummary(ids); clearTimeout(pop.__t); pop.__t = setTimeout(function(){ if (!pop.hidden) { pop.hidden = true; } redraw("lec-pick"); }, 900); });
+    $$("[data-only]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qlec = b.getAttribute("data-only"); STATE.ui.qE1auto = false; redraw("lec-only"); }); });
+    $("[data-lpall]", el).addEventListener("click", function(){ STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; redraw("lec-all"); });
+    $("[data-lpnone]", el).addEventListener("click", function(){ $$("input", pop).forEach(function(c){ c.checked = false; }); STATE.ui.qlec = []; STATE.ui.qE1auto = false; saveState(); $("#lpS", el).textContent = "No lectures"; });
     $$("[data-show]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qstatus = b.getAttribute("data-show"); redraw("show=" + STATE.ui.qstatus); }); });
-    $$("[data-lk]", el).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-lk"); STATE.ui.qlikely = !preset && STATE.ui.qlikely === k ? "" : k; redraw("show=" + (STATE.ui.qlikely || k + "-off")); }); });
+    $$("[data-lk]", el).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-lk"); setLk(!preset && STATE.ui.qlikely === k ? "" : k); redraw("show=" + (STATE.ui.qlikely || k + "-off")); }); });
     $$("[data-order]", el).forEach(function(b){ b.addEventListener("click", function(){ var o = b.getAttribute("data-order"); if (o === "random") STATE.ui.qseed = Math.floor(Math.random() * 2e9) + 1; STATE.ui.qorder = o; redraw("order=" + o); }); });
     $$("[data-fmt]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qfmt = b.getAttribute("data-fmt"); STATE.ui.qmore = 1; redraw("type=" + STATE.ui.qfmt); }); });
     $$("[data-src]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qsrc = b.getAttribute("data-src"); STATE.ui.qmore = 1; redraw("src=" + STATE.ui.qsrc); }); });
@@ -1045,27 +1129,31 @@
     if (preset === "weak") {
       var rows = LECS.map(lecProgress).filter(function(r){ return r.a >= 3; }).sort(function(a, b){ return a.pct - b.pct; });
       LIST.items = weakList();
-      sumEl.innerHTML = rows.length ? '<div class="weak-rows"><p class="lab">Your lectures by how much you get right</p><ul>' + rows.slice(0, 6).map(function(r){ return '<li><span>' + esc(lecName(r.l.id)) + '</span><span class="bar"><i class="right" style="width:' + r.pct + '%"></i></span><span class="num">' + r.pct + "%</span></li>"; }).join("") + '</ul></div><p class="sumline">The questions you missed last time, weakest lecture first, then ' + (rows[0] ? "new ones from " + esc(lecLabel(rows[0].l)) : "new ones") + ".</p>" : "";
+      sumEl.innerHTML = rows.length ? '<div class="weak-rows"><p class="lab">Your lectures by how much you get right</p><ul>' + rows.slice(0, 6).map(function(r){ return '<li class="' + lc(r.l.id).trim() + '"><span>' + lecDot(r.l.id) + esc(lecName(r.l.id)) + '</span><span class="bar"><i class="right" style="width:' + r.pct + '%"></i></span><span class="num">' + r.pct + "%</span></li>"; }).join("") + '</ul></div><p class="sumline">The questions you missed last time, weakest lecture first, then ' + (rows[0] ? "new ones from " + esc(lecLabel(rows[0].l)) : "new ones") + ".</p>" : "";
       if (!LIST.items.length) { host.innerHTML = emptyHTML("No weak spots yet", "Answer at least 3 questions from a lecture and it shows up here, ranked by how much you get right.", '<a class="btn btn-primary" href="#questions">Practice questions</a>'); return; }
       page(); return;
     }
-    var all = QS.length, list = ordered(filtered());
+    var all = QS.filter(function(q){ return !isReview(q.lec); }).length, list = ordered(filtered());
     LIST.items = list;
-    sumEl.innerHTML = summaryHTML(list.length, all);
-    $$("[data-tagoff]", sumEl).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-tagoff"); if (k === "lec") STATE.ui.qlec = "all"; if (k === "show") STATE.ui.qstatus = "all"; if (k === "lk") STATE.ui.qlikely = ""; if (k === "fmt") STATE.ui.qfmt = "all"; if (k === "src") STATE.ui.qsrc = "all"; if (k === "search") bankSearch = ""; saveState(); track("bank:tag-off=" + k); drawQuestions(el, ""); }); });
+    sumEl.innerHTML = summaryHTML(list, all);
+    $$("[data-tagoff]", sumEl).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-tagoff"); if (k === "lec") { STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; } if (k === "show") STATE.ui.qstatus = "all"; if (k === "lk") setLk(""); if (k === "fmt") STATE.ui.qfmt = "all"; if (k === "src") STATE.ui.qsrc = "all"; if (k === "search") bankSearch = ""; saveState(); track("bank:tag-off=" + k); drawQuestions(el, ""); }); });
     var ca = $("[data-clearall]", sumEl); if (ca) ca.addEventListener("click", function(){ bankReset(); bankSearch = ""; saveState(); track("bank:clear"); drawQuestions(el, ""); });
     if (!list.length) { host.innerHTML = emptyHTML("Nothing matches", emptyWhy(), '<button class="btn btn-primary" type="button" data-clearall>Show all ' + all + " questions</button>"); $("[data-clearall]", host).addEventListener("click", function(){ bankReset(); bankSearch = ""; saveState(); track("bank:clear"); drawQuestions(el, ""); }); return; }
     page();
   }
-  function summaryHTML(n, all){
-    var tags = [], picked = lecIds();
-    if (picked.length !== LECS.length) tags.push(["lec", picked.length === 1 ? lecName(picked[0]) : picked.length + " lectures"]);
+  function summaryHTML(list, all){
+    var tags = [], picked = lecIds(), R = C.review || {};
+    /* review-only questions are counted apart from the bank's total, as on the live hub: "of N" + "n Exam 1 review" */
+    var nRev = list.filter(function(q){ return isReview(q.lec); }).length, n = list.length - nRev;
+    if (!isDefaultLecs(picked)) tags.push(["lec", picked.length === 1 ? lecName(picked[0]) : picked.length === LECS.length && R.tag ? R.tag : picked.length + " lectures"]);
     if (STATE.ui.qstatus && STATE.ui.qstatus !== "all") tags.push(["show", labelOf(SHOW, STATE.ui.qstatus)]);
     if (STATE.ui.qlikely) tags.push(["lk", labelOf(LIKELY, STATE.ui.qlikely)]);
     if (STATE.ui.qfmt && STATE.ui.qfmt !== "all") tags.push(["fmt", labelOf(FMTS, STATE.ui.qfmt)]);
     if (STATE.ui.qsrc && STATE.ui.qsrc !== "all") tags.push(["src", (CORE.srcLabel || {})[STATE.ui.qsrc] || STATE.ui.qsrc]);
     if (bankSearch.trim()) tags.push(["search", "“" + bankSearch.trim() + "”"]);
-    return '<p class="sumline">Showing <b class="num">' + n + "</b> of " + all + " questions" + (STATE.ui.qorder === "random" ? ", in random order" : "") + "</p>" +
+    var line = !n && nRev ? 'Showing <b class="num">' + nRev + "</b> " + esc(R.count || "review") + " question" + (nRev === 1 ? "" : "s") :
+      'Showing <b class="num">' + n + "</b> of " + all + " questions" + (nRev ? ' + <b class="num">' + nRev + "</b> " + esc(R.count || "review") : "");
+    return '<p class="sumline">' + line + (STATE.ui.qorder === "random" ? ", in random order" : "") + "</p>" +
       (tags.length ? '<span class="tags">' + tags.map(function(t){ return '<button class="tagx" type="button" data-tagoff="' + t[0] + '" aria-label="Remove the filter ' + esc(t[1]) + '">' + esc(t[1]) + icon("close", 14) + "</button>"; }).join("") + '<button class="btn btn-text" type="button" data-clearall>Clear all</button></span>' : "");
   }
   /* what's in the way when the bank shows nothing, in the live hubs' words */
@@ -1073,13 +1161,14 @@
     var st = STATE.ui.qstatus || "all", lk = STATE.ui.qlikely ? labelOf(LIKELY, STATE.ui.qlikely) + " " : "";
     var only = !(STATE.ui.qfmt && STATE.ui.qfmt !== "all") && !(STATE.ui.qsrc && STATE.ui.qsrc !== "all") && !bankSearch.trim();
     if (!lecIds().length) return "No lectures are ticked, so there is nothing to show.";
+    var sp = lkSpec(STATE.ui.qlikely); if (sp && sp.lec && LBY[sp.lec] && lecIds().indexOf(sp.lec) === -1) return labelOf(LIKELY, STATE.ui.qlikely) + " questions are in " + lecName(sp.lec) + ", which isn't ticked under Lectures.";
     if (st === "pinned" && !pins().length) return "No pinned questions yet. Tap Pin on any question to save it here.";
     if (st === "missed" && only) return lk ? "You haven't missed any " + lk + "questions in these lectures. Questions you get wrong come back here." : "Nothing missed in these lectures. Questions you get wrong come back here.";
     if (st === "unseen" && only) return "You have answered every " + lk + "question here. Try Missed last time, or another lecture.";
     return "Those filters together leave no questions.";
   }
   function emptyHTML(t, p, act){ return '<div class="empty panel"><h2>' + esc(t) + "</h2><p>" + esc(p) + "</p>" + (act || "") + "</div>"; }
-  function wireEmpty(el){ $$("[data-showset]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qstatus = a.getAttribute("data-showset"); STATE.ui.qlikely = ""; STATE.ui.qlec = "all"; saveState(); }); }); }
+  function wireEmpty(el){ $$("[data-showset]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qstatus = a.getAttribute("data-showset"); STATE.ui.qlikely = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; saveState(); }); }); }
   /* twenty cards, then the next twenty load by themselves as you reach the end */
   var io = null;
   function page(){
@@ -1126,10 +1215,18 @@
 
   /* ---------- the mock: a preset of the bank that runs as a timed set with no feedback, then its results ---------- */
   function mockTotal(){ var b = (CORE.mock || {}).blueprint || {}; return Object.keys(b).reduce(function(n, k){ return n + b[k]; }, 0); }
+  /* a blueprint key is a lecture id or a group the exam counts together (core.mock.groups, the live hub's EXAM_GROUPS:
+     Heme & Endo Exam 2's L12a and L12b share their 9) */
+  function mockLecs(k){ return ((CORE.mock || {}).groups || {})[k] || [k]; }
+  function mockLecIds(){ var bp = (CORE.mock || {}).blueprint || {}; return Object.keys(bp).reduce(function(a, k){ return a.concat(mockLecs(k)); }, []); }
   function buildMock(){
-    var ids = [], bp = CORE.mock.blueprint;
+    var ids = [], bp = CORE.mock.blueprint, lo = CORE.mock.likelyOnly || {};
     Object.keys(bp).forEach(function(lec){
-      var pool = (QBL[lec] || []).map(function(r){ return QBY[r.id]; }).filter(function(q){ return q && q.type === "mcq"; });
+      var pool = mockLecs(lec).reduce(function(a, l){ return a.concat(QBL[l] || []); }, []).map(function(r){ return QBY[r.id]; }).filter(function(q){ return q && q.type === "mcq"; });
+      /* a lecture in core.mock.likelyOnly gives only its High likelihood questions, drawn at random (Heme & Endo Exam 2's
+         five Exam 1 questions, Sam, 2026-11-10); none, and it falls back to the whole lecture */
+      var hl = lo[lec] ? pool.filter(function(q){ return q.likely; }) : [];
+      if (hl.length) { shuffled(hl).slice(0, bp[lec]).forEach(function(q){ ids.push(q.id); }); return; }
       var fresh = shuffled(pool.filter(function(q){ return !STATE.seen[q.id] || STATE.seen[q.id].last === false; }));
       var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
       fresh.concat(rest).slice(0, bp[lec]).forEach(function(q){ ids.push(q.id); });
@@ -1162,16 +1259,16 @@
         '<button class="btn" type="button" data-onlymissed aria-pressed="' + !!m.onlyMissed + '">' + (m.onlyMissed ? "Show every question" : "Show only the misses") + "</button>"
         : '<span class="num" data-prog>' + picked + " of " + m.ids.length + ' answered</span><button class="btn btn-primary" type="button" data-submit>Submit the exam</button>') +
       '<button class="btn btn-text" type="button" data-newmock>New mock</button></div>';
-    var byLec = m.submitted ? '<div class="panel"><h2>By lecture</h2><div class="tbl-wrap"><table><thead><tr><th scope="col">Lecture</th><th scope="col" class="r">Right</th><th scope="col" class="r">Score</th></tr></thead><tbody>' + Object.keys(bp).map(function(lec){
+    var byLec = m.submitted ? '<div class="panel"><h2>By lecture</h2><div class="tbl-wrap"><table><thead><tr><th scope="col">Lecture</th><th scope="col" class="r">Right</th><th scope="col" class="r">Score</th></tr></thead><tbody>' + mockLecIds().map(function(lec){
       var qs = m.ids.filter(function(id){ return QBY[id] && QBY[id].lec === lec; }), c = qs.filter(function(id){ return m.res[id]; }).length;
-      return '<tr><th scope="row">' + esc(lecName(lec)) + '</th><td class="r num">' + c + " of " + qs.length + '</td><td class="r num">' + (qs.length ? Math.round(c / qs.length * 100) : 0) + "%</td></tr>"; }).join("") + "</tbody></table></div></div>" : "";
+      return '<tr><th scope="row">' + lecDot(lec) + esc(lecName(lec)) + '</th><td class="r num">' + c + " of " + qs.length + '</td><td class="r num">' + (qs.length ? Math.round(c / qs.length * 100) : 0) + "%</td></tr>"; }).join("") + "</tbody></table></div></div>" : "";
     host.innerHTML = top + byLec;
     m.ids.forEach(function(id, i){
       var q = QBY[id]; if (!q) return;
       if (m.submitted && m.onlyMissed && m.res[id]) return;
       var pick = id in m.picks ? m.picks[id] : null, order = (m.order && m.order[id]) || q.choices.map(function(c, k){ return k; });
-      var el2 = h('<article class="qcard qc' + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="mcq" data-ctx="mock" aria-labelledby="mk' + i + '"></article>');
-      el2.innerHTML = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="mk' + i + '">Question ' + (i + 1) + " · " + esc(lecName(q.lec)) + '</span></span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(q) +
+      var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="mcq" data-ctx="mock" aria-labelledby="mk' + i + '"></article>');
+      el2.innerHTML = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="mk' + i + '">Question ' + (i + 1) + " · " + lecChip(q.lec) + '</span></span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(q) +
         '<ul class="qc-choices' + (q.fmt === "tf" ? " qc-tf" : "") + '">' + order.map(function(k){
           var st = m.submitted ? (k === q.answer ? "right" : k === pick ? "wrong" : "") : "";
           return '<li><button class="ch' + (st === "right" ? " is-right" : st === "wrong" ? " is-wrong" : "") + '" type="button" data-mock-pick="' + k + '" aria-pressed="' + (k === pick) + '"' + (m.submitted ? ' aria-disabled="true"' : "") + ">" + '<span class="txt">' + esc(q.choices[k]) + '</span><span class="st-ic" aria-hidden="true">' + (st ? icon(st === "wrong" ? "cross" : "check", 20) : "") + "</span></button></li>"; }).join("") + "</ul>" +
@@ -1193,7 +1290,7 @@
         m.submitted = true; m.tEnd = Date.now(); m.res = {};
         m.ids.forEach(function(id){ var q = QBY[id]; if (!q) return; var ok = (id in m.picks) && m.picks[id] === q.answer; m.res[id] = ok; if (id in m.picks) recordAnswer(q.id, q.lec, ok, "mock", m.picks[id]); });
         var nRight = m.ids.filter(function(id){ return m.res[id]; }).length;
-        var byL = Object.keys(bp).map(function(lec){ var qs = m.ids.filter(function(id){ return QBY[id] && QBY[id].lec === lec; }); return { label: lecName(lec), correct: qs.filter(function(id){ return m.res[id]; }).length, total: qs.length }; });
+        var byL = mockLecIds().map(function(lec){ var qs = m.ids.filter(function(id){ return QBY[id] && QBY[id].lec === lec; }); return { label: lecName(lec), correct: qs.filter(function(id){ return m.res[id]; }).length, total: qs.length }; });
         document.dispatchEvent(new CustomEvent("sh:mock-done", { detail: { correct: nRight, total: m.ids.length, byLec: byL } }));
         saveNow(); paintMeters(); track("mock:submit"); drawMock(host, el); window.scrollTo(0, 0);
       } else if (b.hasAttribute("data-onlymissed")) { m.onlyMissed = !m.onlyMissed; saveState(); drawMock(host, el); }
@@ -1260,17 +1357,62 @@
     var t = $("[data-tour]", el); t.addEventListener("click", function(){ track("more:tour"); startTour(); });
   }
   function moreTimmy(body){
-    var pod = CORE.podcast;
-    body.innerHTML = pod ? '<div class="pod-slot" data-sh-podcast></div><p class="note">' + esc(pod.blurb || "") + "</p>" : "<p>No episode for this hub yet.</p>";
+    if (!CORE.podcast) { body.innerHTML = "<p>No episode for this hub yet.</p>"; return; }
+    body.innerHTML = '<div class="pod-slot" data-sh-podcast></div>';
+    var slot = $(".pod-slot", body);
+    if (slot.hasAttribute("data-sh-podcast-ready")) { podDress(slot); return; }
+    var mo = new MutationObserver(function(){ if (slot.hasAttribute("data-sh-podcast-ready")) { mo.disconnect(); podDress(slot); } });
+    mo.observe(slot, { attributes: true, attributeFilter: ["data-sh-podcast-ready"] });
   }
+  /* Timmy Time's player, redesigned (Sam, 2026-11-11): the shared player (widget/podcast.js, the same on every hub) fills
+     the slot; the engine then lays it out as one page: the episode on a field of the hub's color with Timmy in headphones
+     (he bobs while it plays), the play controls and a progress bar on it; then the chapters as a track list (always open,
+     two columns on a wide screen, the one playing marked), then what the class thinks. Only the layout and the drawing change: every control, vote
+     and comment is the shared player's own, so it works and counts the same as on the live hubs. */
+  function podDress(slot){
+    var card = $(".sh-pod-card", slot); if (!card || card.classList.contains("pod-x")) return;
+    var main = $(".sh-pod-main", card), art = $(".sh-pod-art", card), social = $(".sh-pod-social", card), chs = $(".sh-pod-chapters", card);
+    if (!main || !art) return;
+    card.classList.add("pod-x");
+    art.innerHTML = spot("notes", POD_COL, "pa-notes") + spot("timmyTime", POD_COL, "pa-timmy");
+    art.setAttribute("aria-hidden", "true");
+    var title = $(".sh-pod-title", main); if (title) { title.setAttribute("role", "heading"); title.setAttribute("aria-level", "2"); }
+    var seek = $(".sh-pod-progress .sh-pod-seek", main);
+    if (seek) { var bar = document.createElement("span"); bar.className = "pod-bar"; bar.innerHTML = '<i class="pod-fill" aria-hidden="true"></i>'; seek.parentNode.insertBefore(bar, seek); bar.appendChild(seek); }
+    var hero = document.createElement("div"); hero.className = "pod-hero";
+    card.insertBefore(hero, card.firstChild); hero.appendChild(main); hero.appendChild(art);
+    var cols = document.createElement("div"); cols.className = "pod-cols";
+    if (chs) {
+      chs.hidden = false; chs.style.setProperty("--rows", Math.ceil($$(".sh-pod-ch", chs).length / 2));
+      $$(".sh-pod-ch", chs).forEach(function(b){ b.insertAdjacentHTML("beforeend", '<span class="pod-eq" aria-hidden="true"><i></i><i></i><i></i></span>'); });
+      var sec = document.createElement("section"); sec.className = "panel pod-chs"; sec.setAttribute("aria-labelledby", "podChH");
+      sec.innerHTML = '<h2 id="podChH">Chapters</h2><p class="note">Tap one to jump there.</p>'; sec.appendChild(chs); cols.appendChild(sec);
+    }
+    if (social) {
+      social.classList.add("panel"); social.setAttribute("aria-labelledby", "podSoH"); social.setAttribute("role", "region");
+      social.insertAdjacentHTML("afterbegin", '<h2 id="podSoH">What the class thinks</h2>'); cols.appendChild(social);
+    }
+    card.appendChild(cols);
+    podSync();
+  }
+  /* the progress bar's filled part follows the player's own slider (the shared player moves the slider; the media events
+     don't bubble, so they're caught on the way down) */
+  function podSync(){
+    requestAnimationFrame(function(){ $$(".pod-bar").forEach(function(b){ var s = b.querySelector(".sh-pod-seek"); if (s) b.style.setProperty("--p", String(+s.value / 1000)); }); });
+  }
+  ["timeupdate", "seeked", "loadedmetadata", "ended", "input", "change"].forEach(function(t){
+    document.addEventListener(t, function(e){ var x = e.target; if (x && x.classList && (x.classList.contains("sh-pod-seek") || x.tagName === "AUDIO")) podSync(); }, true);
+  });
   function moreHints(body){
     needStudy().then(function(){ needQuestions().then(function(){
       var X = C.hints || {}, hints = STUDY.hints || [];
       var html = (X.banner ? '<p class="notice">' + icon("clock", 20) + "<span>" + esc(X.banner) + "</span></p>" : "") + likelyHTML(X) +
-        '<section class="panel" aria-labelledby="hqH"><h2 id="hqH">In ' + esc(X.prof || "the professor") + "'s words</h2><p class=\"note\">Direct quotes from the recordings where something was flagged to know, or waved off.</p>" +
+        '<section class="panel" aria-labelledby="hqH"><h2 id="hqH">' + esc(X.words || "In " + (X.prof || "the professor") + "'s words") + "</h2><p class=\"note\">" + esc(X.wordsNote || "Direct quotes from the recordings where something was flagged to know, or waved off.") + "</p>" +
         LECS.map(function(l){ var items = hints.filter(function(x){ return x.lec === l.id; }); if (!items.length) return "";
-          return '<div class="hint-group"><h3>' + esc(lecName(l.id)) + ' <a class="btn btn-text" href="#notes/' + esc(l.id) + '">Notes</a></h3>' + items.map(function(x){
-            return '<figure class="hint"><blockquote>“' + esc(x.quote) + '”</blockquote><figcaption><span class="kind ' + esc(x.kind) + '">' + (x.kind === "deemphasize" ? "Less likely" : "Know this") + "</span>" + esc(x.take) + "</figcaption></figure>"; }).join("") + "</div>"; }).join("") + "</section>";
+          return '<div class="hint-group' + lc(l.id) + '"><h3>' + lecHead(l) + ' <a class="btn btn-text" href="#notes/' + esc(l.id) + '">Notes</a></h3>' + items.map(function(x){
+            /* a focus list came from the class, not a recording, so it has no quotation marks (as on the live hub) */
+            var said = x.kind !== "focus";
+            return '<figure class="hint' + (said ? "" : " is-focus") + '"><blockquote>' + (said ? "“" : "") + esc(x.quote) + (said ? "”" : "") + '</blockquote><figcaption><span class="kind ' + esc(x.kind) + '">' + (x.kind === "deemphasize" ? "Less likely" : x.kind === "focus" ? "Focus list" : "Know this") + "</span>" + esc(x.take) + "</figcaption></figure>"; }).join("") + "</div>"; }).join("") + "</section>";
       body.innerHTML = html;
       $$("[data-likely]", body).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qset = ""; STATE.ui.qlec = b.getAttribute("data-likely"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = "likely"; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("hints:likely-practice"); go("questions"); }); });
     }); }).catch(function(){ body.innerHTML = "<p>Couldn't load the hints. Check your connection.</p>"; });
@@ -1279,7 +1421,9 @@
     var T = CORE.likelyTopics || [], counts = CORE.examCounts || {};
     return '<section class="panel likely-box" aria-labelledby="lkH"><h2 id="lkH">Most likely questions</h2><p class="note">' + esc(X.likely || "Each lecture's predicted topics, strongest evidence first.") + '</p><div class="likely-grid">' + LECS.map(function(l){
       var ts = T.filter(function(t){ return t.lec === l.id; }); if (!ts.length) return "";
-      return '<div class="likely-lec"><h3>' + esc(lecName(l.id)) + ' <span class="note">' + (counts[l.id] ? counts[l.id] + " on the exam" : pl(ts.length, "predicted topic")) + "</span></h3><ol>" +
+      var grp = CORE.mock && CORE.mock.groups ? Object.keys(CORE.mock.groups).filter(function(k){ return CORE.mock.groups[k].indexOf(l.id) > -1; })[0] : null;
+      var cnt = grp && counts[grp] ? counts[grp] + " on the exam for " + CORE.mock.groups[grp].map(function(id){ return lecLabel(LBY[id]); }).join(" and ") + " together" : counts[l.id] ? counts[l.id] + " on the exam" : pl(ts.length, "predicted topic");
+      return '<div class="likely-lec' + lc(l.id) + '"><h3>' + lecHead(l) + ' <span class="note">' + esc(cnt) + "</span></h3><ol>" +
         ts.map(function(t){ return "<li>" + esc(t.t) + ' <span class="note">' + esc(t.basis) + "</span></li>"; }).join("") +
         '</ol><button class="btn" type="button" data-likely="' + esc(l.id) + '">Practice these (' + ts.reduce(function(k, t){ return k + t.ids.length; }, 0) + ")</button></div>";
     }).join("") + "</div></section>";
@@ -1287,7 +1431,7 @@
   function moreCram(body){
     needStudy().then(function(){
       body.innerHTML = '<div class="cram-grid">' + LECS.map(function(l){ var c = (STUDY.cram || {})[l.id] || []; if (!c.length) return "";
-        return '<section class="panel cram" id="cram-' + esc(l.id) + '" aria-labelledby="cr' + esc(l.id) + '"><h2 id="cr' + esc(l.id) + '">' + esc(lecName(l.id)) + "</h2><ul>" + c.map(function(b){ return "<li>" + esc(b) + "</li>"; }).join("") + "</ul></section>"; }).join("") + "</div>";
+        return '<section class="panel cram' + lc(l.id) + '" id="cram-' + esc(l.id) + '" aria-labelledby="cr' + esc(l.id) + '"><h2 id="cr' + esc(l.id) + '">' + lecHead(l) + "</h2><ul>" + c.map(function(b){ return "<li>" + esc(b) + "</li>"; }).join("") + "</ul></section>"; }).join("") + "</div>";
     }).catch(function(){ body.innerHTML = "<p>Couldn't load the cram sheet.</p>"; });
   }
   function moreSide(body){
@@ -1342,7 +1486,7 @@
         "<div><dt>Best run</dt><dd class=\"num\">" + pl(STATE.bestStreak, "right in a row", "right in a row") + "</dd></div><div><dt>Days goal met</dt><dd class=\"num\">" + fmt(days) + "</dd></div>" +
         "<div><dt>Achievements</dt><dd class=\"num\">" + Object.keys(STATE.ach || {}).length + " of " + (CORE.achievements || []).length + "</dd></div></dl></section>" +
       '<section class="panel wide" aria-labelledby="slH"><h2 id="slH">By lecture</h2><div class="tbl-wrap"><table><thead><tr><th scope="col">Lecture</th><th scope="col" class="r">Tried</th><th scope="col" class="r">Right now</th><th scope="col" class="r">Accuracy</th></tr></thead><tbody>' +
-        rows.map(function(r){ return '<tr><th scope="row">' + esc(lecName(r.l.id)) + '</th><td class="r num">' + r.tried + " of " + r.total + '</td><td class="r num">' + r.right + '</td><td class="r num">' + (r.pct === null ? "–" : r.pct + "%") + "</td></tr>"; }).join("") + "</tbody></table></div></section>" +
+        rows.map(function(r){ return '<tr><th scope="row">' + lecDot(r.l.id) + esc(lecName(r.l.id)) + '</th><td class="r num">' + r.tried + " of " + r.total + '</td><td class="r num">' + r.right + '</td><td class="r num">' + (r.pct === null ? "–" : r.pct + "%") + "</td></tr>"; }).join("") + "</tbody></table></div></section>" +
       '<section class="panel wide" aria-labelledby="saH"><h2 id="saH">Achievements</h2><ul class="ach">' + (CORE.achievements || []).map(function(a){ var got = STATE.ach[a.id]; return '<li class="' + (got ? "got" : "") + '">' + icon(got ? "check" : "goal", 20) + "<span><b>" + esc(a.name) + "</b><small>" + esc(a.desc) + (got ? " · " + esc(dateLabel(got)) : "") + "</small></span></li>"; }).join("") + "</ul></section>" +
       "</div>";
     $("[data-open-stats]", body).addEventListener("click", function(){ var b = document.getElementById("shstat-stats-pill"); if (b) b.click(); track("more:trophies"); });
@@ -1466,7 +1610,12 @@
     else if (g.v === "cram") { go("more/cram"); setTimeout(function(){ var c = document.getElementById("cram-" + g.lec); if (c && window.shFlash) window.shFlash(c); }, 600); }
     else if (g.v === "hints") go("more/hints");
     else if (g.v === "review") go("more/side");
-    else if (g.v === "bank") { bankReset(); bankSearch = g.q || ""; saveState(); go("questions"); }
+    else if (g.v === "bank") {
+      bankReset(); bankSearch = g.q || "";
+      /* a search that finds a review-only question ticks every lecture, so the jump lands on it (as on the live hub) */
+      if (hasReview() && QS && bankSearch) { STATE.ui.qlec = LECS.map(function(l){ return l.id; }); if (!filtered().some(function(q){ return isReview(q.lec); })) STATE.ui.qlec = "all"; }
+      saveState(); go("questions");
+    }
   };
   var LOADED = Date.now();
   window.SH_SYNC = {
@@ -1493,7 +1642,7 @@
     }
   };
   window.SH_DRILL = {
-    pool: function(){ return IDX.filter(function(q){ return isExamLec(q.lec); }).map(function(q){ var s = STATE.seen[q.id]; return { id: q.id, lec: q.lec, last: s ? !!s.last : null, hy: (CORE.drillHy || {})[q.src] || "" }; }); },
+    pool: function(){ return IDX.filter(function(q){ return isExamLec(q.lec) || isReview(q.lec); }).map(function(q){ var s = STATE.seen[q.id]; return { id: q.id, lec: q.lec, last: s ? !!s.last : null, hy: (CORE.drillHy || {})[q.src] || "" }; }); },
     render: function(el, qid){ var q = QBY[qid]; if (!q) return false; el.innerHTML = ""; el.appendChild(card(q, { ctx: "drill" })); return true; }
   };
   window.SH_PINS = true;
@@ -1554,6 +1703,8 @@
     getJSON("core.json").then(function(c){
       setCore(c);
       window.SH_EXPORT = { lectures: LECS.map(function(l){ return { id: l.id, title: lecLabel(l) + " " + l.title, who: l.who, status: l.status }; }), exams: (c.exams || []).map(function(x){ return { label: x.label, date: x.date }; }), sections: [], hints: [] };
+      /* review-only questions left out of the mastery medal (widget/ranks.js), as on the live hub */
+      if (hasReview()) window.SH_EXPORT.uncounted = function(){ var n = 0, right = 0; IDX.forEach(function(q){ if (!isReview(q.lec)) return; n++; var s = STATE.seen[q.id]; if (s && s.last) right++; }); return { n: n, right: right }; };
       if (c.podcast) window.SH_PODCAST = Object.assign({}, c.podcast, { src: ASSETS + c.podcast.src });
       route();
       /* the rest of the content in the background, then the shared widget (it needs the notes for its search and eggs) */

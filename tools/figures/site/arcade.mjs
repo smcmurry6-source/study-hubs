@@ -11,7 +11,19 @@
              and its keypad.
    - cloze:  Mind the Gap. A page of the notes with one term missing, the caret waiting, a pencil.
    - smile:  Million-Dollar Smile. Twelve rungs up to a gold-crowned smile, three lifelines.
-   - cross:  Cross-Section. A mini crossword beside a molar cut in section: enamel, dentin, pulp, the gum and the bone. */
+   - cross:  Cross-Section. A mini crossword beside a molar cut in section: enamel, dentin, pulp, the gum and the bone.
+
+   Heme & Endo Exam 2 (redesign phase 2; from its games and HEE2_SKIN, the pathology lab at night):
+   - sort:   Lab Sort. Cards (a capsule, a drop of blood, a follicle) rain into two bins, one marked up, one marked down
+             (primary or secondary); one is being flung.
+   - board:  Surge Showdown. The rack of sample tubes, a column per lecture with its own cap color, one tube already
+             uncapped and empty, an LH Surge star.
+   - escape: Path Lab Escape. The endocrine pathology lab: the microscope, the locked analyzer, the padlocked specimen
+             fridge, the glucose meter in its wall dock, the clock, the door and its keypad.
+   - cloze:  Blank Rx. A prescription pad with its Rx and one line's drug left blank, the caret waiting, a capsule, a pen.
+   - smile:  The Yellow Body. Twelve rungs up to a golden corpus luteum with Timmy's face, three lifelines.
+   - cross:  Crossing Over. A mini crossword beside two chromosomes in meiosis I, their inner chromatids crossed and
+             their tips swapped. */
 import { INK, C, HI } from "./style.mjs";
 
 const ink = (w = 2.5) => `stroke="${INK}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
@@ -187,6 +199,217 @@ const build = (T) => ({
   cross: { label: "Cross-Section: a mini crossword beside a molar cut in section", body: cross(T) }
 });
 
+/* ---------- Heme & Endo Exam 2 ---------- */
+const NIGHT = "#3A2A3C";   // the lab's floor at night (HEE2_SKIN's escape room)
+
+/* a card for Lab Sort with one of the hub's things on it: a capsule, a drop of blood or a follicle */
+function heCard(x, y, rot, band, what){
+  const art = what === "pill"
+    ? `<g transform="translate(0 6) rotate(-35)"><rect x="-13" y="-6" width="26" height="12" rx="6" fill="${C.paper}" ${ink(2)}/><path d="M0 -6 L-7 -6 A6 6 0 0 0 -7 6 L0 6 Z" fill="${band}"/><rect x="-13" y="-6" width="26" height="12" rx="6" fill="none" ${ink(2)}/>${line("M0 -6 L0 6", 2)}</g>`
+    : what === "drop"
+    ? `<path d="M0 -8 C5 -1.5 8 2 8 7 C8 12 4.4 15 0 15 C-4.4 15 -8 12 -8 7 C-8 2 -5 -1.5 0 -8 Z" fill="${C.red}" ${ink(2)}/>` + hi("M-3.5 6 C-3.5 4 -2.6 2.6 -1.4 1.6")
+    : `<circle cx="0" cy="6" r="11" fill="${C.goldLight}" ${ink(2)}/><path d="M-6 1 C-2 -2 4 -1 6 3 C3 1 -2 1 -6 1 Z" fill="${C.sky}"/><circle cx="3" cy="9" r="4.2" fill="${C.pink}" ${ink(1.8)}/>`;
+  return `<g transform="translate(${x} ${y}) rotate(${rot})">` +
+    `<rect x="-22" y="-29" width="44" height="58" rx="8" fill="${C.paper}" ${ink(2.5)}/>` +
+    `<path d="M-22 -18 L-22 -21 C-22 -26 -19 -29 -14 -29 L14 -29 C19 -29 22 -26 22 -21 L22 -18 Z" fill="${band}" ${ink(2)}/>` + art + `</g>`;
+}
+function heSort(T){
+  const bin = (x, fill, shade, mark) =>
+    `<path d="M${x} 102 L${x + 100} 102 L${x + 92} 152 L${x + 8} 152 Z" fill="${fill}" ${ink(3)}/>` +
+    `<path d="M${x + 78} 104 L${x + 98} 104 L${x + 91} 150 L${x + 74} 150 Z" fill="${shade}" opacity=".55"/>` +
+    `<rect x="${x - 5}" y="94" width="110" height="12" rx="6" fill="${fill}" ${ink(3)}/>` +
+    hi(`M${x + 6} 99 L${x + 40} 99`) + mark;
+  const arrow = (x, up) => up
+    ? `<path d="M${x} 140 L${x} 116 M${x - 9} 125 L${x} 116 L${x + 9} 125" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`
+    : `<path d="M${x} 114 L${x} 138 M${x - 9} 129 L${x} 138 L${x + 9} 129" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  return ground(C.goldLight) +
+    `<path d="M0 152 L320 152 L320 170 L0 170 Z" fill="${C.woodShade}"/>` + line("M0 152 L320 152", 3) +
+    bin(28, T.ink, INK, arrow(78, true)) +
+    bin(192, C.plum, INK, arrow(242, false)) +
+    heCard(160, 34, 8, C.gold, "follicle") +
+    heCard(252, 46, -10, C.plum, "drop") +
+    line("M150 84 C138 80 128 78 118 78", 3) + line("M154 96 C142 94 134 93 124 94", 3) + line("M146 70 C138 66 132 65 126 65", 2.5) +
+    heCard(96, 72, -24, T.ink, "pill") +
+    `<path d="M300 22 l2.4 5.2 5.2 2.4 -5.2 2.4 -2.4 5.2 -2.4 -5.2 -5.2 -2.4 5.2 -2.4 Z" fill="${C.yellow}" ${ink(1.6)}/>` +
+    `<circle cx="22" cy="30" r="4" fill="${C.red}" ${ink(1.6)}/>`;
+}
+
+/* a sample tube standing in the rack: cap, glass, what's in it; "open" is the one already played (cap off, empty) */
+function tube(x, y, cap, liquid, open){
+  return (open
+      ? `<rect x="${x - 10}" y="${y - 30}" width="20" height="9" rx="3" fill="${cap}" ${ink(2.2)} transform="rotate(-24 ${x} ${y - 26})"/>`
+      : `<rect x="${x - 10}" y="${y - 22}" width="20" height="9" rx="3" fill="${cap}" ${ink(2.2)}/>`) +
+    `<path d="M${x - 8} ${y - 14} L${x + 8} ${y - 14} L${x + 8} ${y + 10} C${x + 8} ${y + 15} ${x + 4} ${y + 18} ${x} ${y + 18} C${x - 4} ${y + 18} ${x - 8} ${y + 15} ${x - 8} ${y + 10} Z" fill="${C.paper}" ${ink(2.2)}/>` +
+    (open ? "" : `<path d="M${x - 6} ${y + 1} L${x + 6} ${y + 1} L${x + 6} ${y + 10} C${x + 6} ${y + 13.5} ${x + 3} ${y + 16} ${x} ${y + 16} C${x - 3} ${y + 16} ${x - 6} ${y + 13.5} ${x - 6} ${y + 10} Z" fill="${liquid}"/>`) +
+    hi(`M${x - 3.5} ${y - 9} L${x - 3.5} ${y + 4}`);
+}
+function heBoard(T){
+  const caps = [T.mid, C.gold, C.blue, C.green, C.plum], cols = [50, 105, 160, 215, 270], rows = [70, 116];
+  const liquids = [C.red, C.goldLight, C.gumLight, C.yellow, C.pink];
+  const parts = [];
+  rows.forEach((y, r) => {
+    parts.push(`<rect x="22" y="${y + 2}" width="276" height="9" rx="4" fill="${T.mid}" ${ink(2.2)}/>`);
+    cols.forEach((x, c) => {
+      parts.push(tube(x, y, caps[c], liquids[(c + r * 2) % liquids.length], c === 1 && r === 0));
+      if (c === 3 && r === 1) parts.push(`<path d="M${x + 15} ${y - 24} l3 6.2 6.8 1 -4.9 4.8 1.2 6.8 -6.1 -3.2 -6.1 3.2 1.2 -6.8 -4.9 -4.8 6.8 -1 Z" fill="${C.gold}" ${ink(1.8)}/>`);
+    });
+  });
+  /* the column heads: one lecture each, its tag the cap's color */
+  const heads = cols.map((x, c) => `<rect x="${x - 16}" y="18" width="32" height="14" rx="7" fill="${caps[c]}" ${ink(2)}/>`).join("");
+  /* the LH surge, in the header: a flat line with one tall spike */
+  const surge = line("M24 40 L118 40 C126 40 128 39 131 30 L135 20 L139 30 C142 39 144 40 152 40 L296 40", 2, C.goldLight);
+  return ground(T.light) +
+    `<rect x="10" y="8" width="300" height="154" rx="16" fill="${T.ink}" ${ink(3)}/>` +
+    surge + heads + parts.join("") +
+    `<rect x="22" y="146" width="276" height="8" rx="4" fill="${INK}" opacity=".35"/>`;
+}
+
+function heEscape(T){
+  return ground(T.light) +
+    `<path d="M0 98 L320 98" stroke="${T.mid}" stroke-width="3" opacity=".6"/>` +
+    `<path d="M0 150 L320 150 L320 170 L0 170 Z" fill="${NIGHT}"/>` + line("M0 150 L320 150", 3) +
+    /* the clock */
+    `<circle cx="132" cy="28" r="14" fill="${C.paper}" ${ink(2.5)}/>` + line("M132 28 L132 19", 2.5) + line("M132 28 L139 31", 2.5, C.red) + `<circle cx="132" cy="28" r="2" fill="${INK}"/>` +
+    /* the side table and the microscope, its lamp dark */
+    `<rect x="10" y="104" width="76" height="8" rx="3" fill="${INK}"/><rect x="16" y="112" width="7" height="38" fill="${C.plum}"/><rect x="73" y="112" width="7" height="38" fill="${C.plum}"/>` +
+    `<rect x="22" y="94" width="50" height="10" rx="4" fill="${T.ink}" ${ink(2.5)}/>` +
+    `<path d="M60 96 L60 56 C60 48 56 44 48 42" fill="none" stroke="${INK}" stroke-width="12" stroke-linecap="round"/><path d="M60 96 L60 56 C60 48 56 44 48 42" fill="none" stroke="${T.ink}" stroke-width="7" stroke-linecap="round"/>` +
+    `<rect x="30" y="26" width="12" height="28" rx="4" fill="${T.ink}" ${ink(2.5)} transform="rotate(-26 36 40)"/>` +
+    `<rect x="40" y="56" width="9" height="14" rx="2" fill="${C.metalShade}" ${ink(2)}/>` +
+    `<rect x="28" y="72" width="34" height="6" rx="2" fill="${C.metal}" ${ink(2)}/><rect x="36" y="69" width="16" height="4" rx="1" fill="${C.pink}" ${ink(1.4)}/>` +
+    `<circle cx="44" cy="86" r="4.5" fill="${C.plum}" ${ink(2)}/>` +
+    /* the counter: a tube rack, the analyzer (locked), the specimen fridge under it with its padlock */
+    `<rect x="94" y="102" width="132" height="10" rx="3" fill="${INK}"/>` +
+    `<rect x="100" y="112" width="120" height="38" fill="${C.paperShade}" ${ink(2.5)}/>` +
+    `<rect x="106" y="117" width="54" height="29" rx="3" fill="${C.metalLight}" ${ink(2.2)}/>` + line("M154 124 L154 139", 3, C.metalShade) +
+    `<path d="M127 129 C127 123 139 123 139 129" fill="none" ${ink(2.5)}/><rect x="123" y="129" width="20" height="14" rx="3" fill="${C.gold}" ${ink(2.2)}/><circle cx="133" cy="136" r="2" fill="${INK}"/>` +
+    `<rect x="166" y="117" width="48" height="12" rx="3" fill="${C.paper}" ${ink(2)}/><rect x="182" y="121" width="16" height="4" rx="2" fill="${C.metalShade}"/>` +
+    `<rect x="166" y="133" width="48" height="13" rx="3" fill="${C.paper}" ${ink(2)}/><rect x="182" y="137" width="16" height="4" rx="2" fill="${C.metalShade}"/>` +
+    `<rect x="100" y="94" width="40" height="8" rx="2" fill="${C.plum}" ${ink(2)}/>` +
+    [0, 1, 2, 3].map((i) => `<rect x="${104 + i * 9}" y="76" width="6" height="20" rx="3" fill="${C.paper}" ${ink(1.6)}/><rect x="${103 + i * 9}" y="73" width="8" height="5" rx="1.5" fill="${[T.mid, C.gold, C.blue, C.green][i]}" ${ink(1.4)}/>`).join("") +
+    `<rect x="152" y="54" width="68" height="48" rx="6" fill="${INK}"/>` +
+    `<rect x="159" y="61" width="54" height="28" rx="3" fill="${NIGHT}"/>` +
+    `<path d="M181 74 C181 69 191 69 191 74" fill="none" stroke="${C.pink}" stroke-width="2.4" stroke-linecap="round"/><rect x="178" y="74" width="16" height="11" rx="2" fill="${C.pink}"/>` +
+    `<circle cx="164" cy="95" r="2.4" fill="${C.green}"/><circle cx="172" cy="95" r="2.4" fill="${C.red}"/>` +
+    /* the glucose meter in its wall dock, a strip in the slot, its screen blank */
+    `<rect x="230" y="36" width="30" height="44" rx="5" fill="${C.paper}" ${ink(2.5)}/>` +
+    `<rect x="235" y="40" width="20" height="34" rx="6" fill="${C.plum}" ${ink(2)}/><rect x="238" y="44" width="14" height="10" rx="2" fill="${NIGHT}"/>` +
+    [240, 245, 250].map((x) => `<path d="M${x - 1.5} 49 L${x + 1.5} 49" stroke="${C.metal}" stroke-width="1.8" stroke-linecap="round"/>`).join("") +
+    `<circle cx="240.5" cy="62" r="2.6" fill="${C.pink}"/><circle cx="249.5" cy="62" r="2.6" fill="${C.pink}"/>` +
+    `<rect x="242" y="74" width="6" height="10" fill="${C.paper}" ${ink(1.6)}/>` +
+    /* the door and its keypad */
+    `<rect x="262" y="88" width="12" height="20" rx="2" fill="${INK}"/>` +
+    [0, 1, 2].map((r) => [0, 1].map((c) => `<circle cx="${266 + c * 4.5}" cy="${93 + r * 5}" r="1.4" fill="${r === 2 && c === 1 ? C.green : "#fff"}"/>`).join("")).join("") +
+    `<path d="M278 150 L278 42 C278 36 282 32 288 32 L304 32 C310 32 314 36 314 42 L314 150 Z" fill="${C.wood}" ${ink(3)}/>` +
+    `<rect x="285" y="42" width="22" height="34" rx="4" fill="${C.woodShade}" opacity=".5"/>` +
+    `<circle cx="306" cy="104" r="4" fill="${C.gold}" ${ink(2)}/>`;
+}
+
+function heCloze(T){
+  const bars = [
+    [104, 70, 138], [74, 86, 56], [190, 86, 52], [74, 102, 150], [74, 118, 110], [74, 134, 132]
+  ].map(([x, y, w]) => `<path d="M${x} ${y} L${x + w} ${y}" stroke="${C.metalShade}" stroke-width="6" stroke-linecap="round" opacity=".55"/>`).join("");
+  return ground(C.sky) +
+    `<g transform="rotate(-3 160 85)">` +
+    `<rect x="52" y="14" width="208" height="146" rx="8" fill="${C.paper}" ${ink(3)}/>` +
+    `<path d="M52 40 L52 22 C52 17 56 14 61 14 L251 14 C256 14 260 17 260 22 L260 40 Z" fill="${T.ink}" ${ink(2.5)}/>` +
+    `<circle cx="74" cy="27" r="6" fill="${C.paper}"/><path d="M71 27 L77 27 M74 24 L74 30" stroke="${T.ink}" stroke-width="2.2" stroke-linecap="round"/>` +
+    [100, 132, 164].map((x) => `<path d="M${x} 27 L${x + 22} 27" stroke="${T.light}" stroke-width="4" stroke-linecap="round" opacity=".8"/>`).join("") +
+    /* the Rx */
+    line("M76 58 L76 78 M76 58 L83 58 C90 58 90 68 83 68 L76 68 M80 68 L92 82 M85 82 L93 74", 3, T.ink) +
+    bars +
+    /* the blank where the drug goes */
+    `<rect x="136" y="78" width="48" height="17" rx="5" fill="${T.light}" stroke="${T.ink}" stroke-width="2.5" stroke-dasharray="5 4"/>` +
+    line("M144 81 L144 92", 2.5, T.ink) +
+    `</g>` +
+    /* a capsule on the desk */
+    `<g transform="rotate(-28 34 138)"><rect x="16" y="130" width="36" height="16" rx="8" fill="${C.paper}" ${ink(2.5)}/><path d="M34 130 L24 130 A8 8 0 0 0 24 146 L34 146 Z" fill="${T.mid}"/><rect x="16" y="130" width="36" height="16" rx="8" fill="none" ${ink(2.5)}/>${line("M34 130 L34 146", 2.5)}${hi("M40 134 L47 134")}</g>` +
+    /* the pen */
+    `<g transform="rotate(40 272 116)">` +
+    `<rect x="226" y="109" width="70" height="14" rx="5" fill="${T.ink}" ${ink(2.5)}/>` +
+    `<path d="M226 109 L210 116 L226 123 Z" fill="${C.metal}" ${ink(2.2)}/><path d="M215 114 L210 116 L215 118 Z" fill="${INK}"/>` +
+    `<rect x="262" y="104" width="22" height="5" rx="2" fill="${C.metal}" ${ink(1.8)}/>` +
+    hi("M232 113 L280 113") + `</g>`;
+}
+
+/* the corpus luteum: a scalloped gold body, folded inside, with Timmy's face */
+function luteum(cx, cy, r, n){
+  let d = "";
+  for (let i = 0; i <= n; i++) {
+    const a = (i / n) * Math.PI * 2 - Math.PI / 2, b = ((i - 0.5) / n) * Math.PI * 2 - Math.PI / 2;
+    const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a), qx = cx + r * 1.16 * Math.cos(b), qy = cy + r * 1.16 * Math.sin(b);
+    d += i === 0 ? `M${x.toFixed(1)} ${y.toFixed(1)}` : ` Q${qx.toFixed(1)} ${qy.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`;
+  }
+  return d + " Z";
+}
+function heSmile(T){
+  const rungs = [];
+  for (let i = 0; i < 12; i++) {
+    const y = 150 - i * 11, x = 30 + i * 6, top = i === 11;
+    rungs.push(`<rect x="${x}" y="${y - 4}" width="${64}" height="8" rx="4" fill="${top ? C.gold : i === 4 || i === 9 ? C.goldLight : T.mid}" ${ink(2)}/>`);
+  }
+  const life = (x, inner) => `<circle cx="${x}" cy="26" r="13" fill="${C.paper}" ${ink(2.5)}/>` + inner;
+  const cx = 240, cy = 104;
+  return ground(T.ink) +
+    line("M25 160 L101 20", 3, T.mid) + line("M89 160 L165 20", 3, T.mid) +
+    rungs.join("") +
+    life(196, `<path d="M196 16 A10 10 0 0 0 196 36 Z" fill="${T.ink}"/>`) +
+    life(230, `<path d="M224 20 C222 26 226 33 233 34 L235 31 L232 28 L230 29 C228 27 227 26 227 24 L228 22 L225 19 Z" fill="${T.ink}"/>`) +
+    life(264, `<circle cx="259" cy="23" r="3" fill="${T.ink}"/><circle cx="269" cy="23" r="3" fill="${T.ink}"/><path d="M253 33 C254 28 264 28 265 33 M263 33 C264 28 274 28 275 33" fill="${T.ink}"/>`) +
+    `<circle cx="${cx}" cy="${cy}" r="58" fill="${C.gold}" opacity=".18"/>` +
+    `<path d="${luteum(cx, cy, 42, 11)}" fill="${C.gold}" ${ink(3)}/>` +
+    `<path d="M${cx - 30} ${cy + 18} C${cx - 20} ${cy + 8} ${cx - 22} ${cy - 6} ${cx - 30} ${cy - 14} M${cx + 31} ${cy + 16} C${cx + 22} ${cy + 6} ${cx + 24} ${cy - 8} ${cx + 30} ${cy - 16} M${cx - 8} ${cy - 34} C${cx - 4} ${cy - 26} ${cx + 6} ${cy - 26} ${cx + 10} ${cy - 34}" fill="none" stroke="${C.goldShade}" stroke-width="2.6" stroke-linecap="round"/>` +
+    hi(`M${cx - 26} ${cy - 22} C${cx - 22} ${cy - 30} ${cx - 14} ${cy - 34} ${cx - 6} ${cy - 35}`) +
+    `<circle cx="${cx - 14}" cy="${cy - 4}" r="4.2" fill="${INK}"/><circle cx="${cx + 14}" cy="${cy - 4}" r="4.2" fill="${INK}"/>` +
+    `<circle cx="${cx - 12.6}" cy="${cy - 5.4}" r="1.4" fill="#fff"/><circle cx="${cx + 15.4}" cy="${cy - 5.4}" r="1.4" fill="#fff"/>` +
+    `<circle cx="${cx - 24}" cy="${cy + 6}" r="4" fill="${C.gumLight}" opacity=".9"/><circle cx="${cx + 24}" cy="${cy + 6}" r="4" fill="${C.gumLight}" opacity=".9"/>` +
+    `<path d="M${cx - 12} ${cy + 6} C${cx - 6} ${cy + 14} ${cx + 6} ${cy + 14} ${cx + 12} ${cy + 6}" fill="${INK}" ${ink(2)}/>` +
+    /* a small follicle at the foot, the one it ripened from */
+    `<circle cx="178" cy="146" r="11" fill="${C.goldLight}" ${ink(2.2)}/><path d="M172 141 C176 138 182 139 184 143 C181 141 176 141 172 141 Z" fill="${C.sky}"/><circle cx="181" cy="149" r="4" fill="${C.pink}" ${ink(1.6)}/>` +
+    `<path d="M292 34 l2.4 5.2 5.2 2.4 -5.2 2.4 -2.4 5.2 -2.4 -5.2 -5.2 -2.4 5.2 -2.4 Z" fill="${C.yellow}" ${ink(1.6)}/>` +
+    `<path d="M296 150 l1.8 4 4 1.8 -4 1.8 -1.8 4 -1.8 -4 -4 -1.8 4 -1.8 Z" fill="${C.yellow}" ${ink(1.4)}/>`;
+}
+
+/* one chromatid arm, as a rounded bar outlined in ink; tip: the last part in another color (a crossed-over piece) */
+function arm(x1, y1, x2, y2, col, tip){
+  const t = 0.62, mx = x1 + (x2 - x1) * t, my = y1 + (y2 - y1) * t;
+  return `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${INK}" stroke-width="15" stroke-linecap="round"/>` +
+    `<path d="M${x1} ${y1} L${x2} ${y2}" stroke="${col}" stroke-width="9.6" stroke-linecap="round"/>` +
+    (tip ? `<path d="M${mx.toFixed(1)} ${my.toFixed(1)} L${x2} ${y2}" stroke="${tip}" stroke-width="9.6" stroke-linecap="round"/>` : "");
+}
+function heCross(T){
+  const G = ["000100", "222220", "010010", "000100", "100001"];
+  const cells = [];
+  G.forEach((row, r) => row.split("").forEach((v, c) => {
+    const x = 22 + c * 24, y = 22 + r * 24;
+    cells.push(`<rect x="${x}" y="${y}" width="24" height="24" fill="${v === "1" ? INK : v === "2" ? T.light : C.paper}" stroke="${INK}" stroke-width="2"/>`);
+  }));
+  const marks = [0, 1, 2, 3, 4].map((c) => `<path d="M${28 + c * 24} 60 L${34 + c * 24} 52 L${40 + c * 24} 60" fill="none" stroke="${T.ink}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`).join("");
+  const R = T.ink, B = C.blue, cy = 86;
+  return ground(C.plumLight) +
+    `<rect x="16" y="16" width="156" height="132" rx="8" fill="${C.paper}" ${ink(3)}/>` +
+    cells.join("") + marks +
+    `<rect x="22" y="22" width="144" height="120" fill="none" ${ink(3)}/>` +
+    /* the two homologs: outer chromatids straight, the inner two crossed below the centromeres, their tips swapped */
+    arm(206, cy, 196, 30, R) + arm(206, cy, 196, 148, R) +
+    arm(292, cy, 302, 30, B) + arm(292, cy, 302, 148, B) +
+    arm(222, cy, 216, 30, R) + arm(276, cy, 282, 30, B) +
+    arm(222, cy, 276, 148, R, B) + arm(276, cy, 222, 148, B, R) +
+    `<circle cx="214" cy="${cy}" r="7" fill="${R}" ${ink(2.4)}/><circle cx="284" cy="${cy}" r="7" fill="${B}" ${ink(2.4)}/>` +
+    `<circle cx="249" cy="129" r="4" fill="${C.yellow}" ${ink(1.6)}/>` +
+    hi("M198 40 L201 70") + hi("M300 40 L297 70");
+}
+
+const buildHE = (T) => ({
+  sort: { label: "Lab Sort: cards with a capsule, a drop of blood and a follicle falling into two bins, one marked up and one down", body: heSort(T) },
+  board: { label: "Surge Showdown: a rack of sample tubes, a column per lecture, one tube uncapped and an LH Surge star", body: heBoard(T) },
+  escape: { label: "Path Lab Escape: the pathology lab at night, with the microscope, the locked analyzer, the specimen fridge, the glucose meter and the door's keypad", body: heEscape(T) },
+  cloze: { label: "Blank Rx: a prescription pad with the drug left blank, a capsule and a pen", body: heCloze(T) },
+  smile: { label: "The Yellow Body: twelve rungs up to a smiling golden corpus luteum", body: heSmile(T) },
+  cross: { label: "Crossing Over: a mini crossword beside two chromosomes crossing over", body: heCross(T) }
+});
+
 export const ARCADE_VIEWBOX = [0, 0, 320, 170];
-/* only Occlusion's arcade is drawn so far; Heme & Endo 2 and Perio get their own in redesign phase 2 */
-export function arcadeArt(hub, tint){ return hub === "occlusion" ? build(tint) : null; }
+/* Occlusion's (phase 1) and Heme & Endo Exam 2's (phase 2); Perio gets its own in its phase 2 session */
+const SETS = { occlusion: build, "heme-endo-exam2": buildHE };
+export function arcadeArt(hub, tint){ return SETS[hub] ? SETS[hub](tint) : null; }

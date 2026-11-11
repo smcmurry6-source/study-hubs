@@ -1,13 +1,13 @@
 ---
 type: task
-status: open
+status: in-progress
 hub: site
 created: 2026-11-05
 requested-by: Sam
 due: 2026-11-19
 waiting-on:
-agent:
-pr:
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/312
 ---
 
 # Redesign phase 2: every live hub on the engine, perio ported
@@ -50,5 +50,32 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
 - 2026-11-05: written from the agreed plan.
 - 2026-11-11: Sam: **Heme & Endo Exam 2 first**, then Perio, each in its own fresh session ([run-a-redesign-session](../how-to/run-a-redesign-session.md)).
 - 2026-11-06: Sam narrowed it to Heme & Endo Exam 2 and Perio (no PCD Implants, no Special Patient Care), all released at once.
+- 2026-11-11 (Claude Code, hand-off): **Heme & Endo Exam 2's new version is built**, its own session as Sam asked
+  ([run-a-redesign-session](../how-to/run-a-redesign-session.md)), waiting for Sam's
+  look. What's built: `hubs/heme-endo-exam2/next/` (settings in `SH_HUB`; content from `node tools/hub-next/build.mjs`, all
+  609 ids, state key and answered event unchanged; how it's kept in step and every piece: the [hub note](../hubs/heme-endo-exam2.md),
+  "The new version"); in `widget/hub.js` (gated, Occlusion's new version unchanged) review-only lectures, a toggle tied to a
+  lecture, the grouped and High-Likelihood-only mock, the "which statement" filters, focus-list hints and `hints.words`; the
+  build without `od:kit`; the six arcade lobby drawings (`arcade.mjs`). Checked on the local preview as the returning test
+  account, phone and laptop: the four views, every More page, the six games, the drill, the mock (50: L12a + L12b = 9, R's 5
+  High Likelihood), Exam 1 High likelihood ticking and unticking R; the release drafts are in [the release note](2026-11-06-redesign-release.md).
+  **Left for Heme & Endo:** Sam's look on [PR #312](https://github.com/smcmurry6-source/study-hubs/pull/312) (one round, screenshots shown in the session) and anything it asks for; the timing question (its
+  exam is 11/13, so by the release's rule it is switched in only if the release comes first).
+- 2026-11-11 (Claude Code, same session): Sam's look: "it needs a little bit more color ... to distinguish each lecture", and
+  "everything else looks good". Built in the engine for every hub on it: each lecture's own color (question cards, the
+  notes' list, Home, the picker, hints, cram, mock, stats; review-only grey) and **Notes done** (a button at the end of the
+  notes, or reading to the end after a minute). Checking Timmy Time on the engine found BUG-056 (the player's buttons in the
+  default color with dark labels on every new hub), fixed. Sam's answers: switch it in only if the release beats 11/13; the
+  About page now says the mock's five Exam 1 questions are drawn at random; a preview (the `preview` label on #312). Learn
+  and Flashcards wasn't lost: it's [its own task](2026-11-06-redesign-learn-and-flashcards.md), not started. **Left for
+  Heme & Endo:** Sam's look at the colors in the preview.
+- 2026-11-11 (Claude Code, same session): Sam: "Looks much better. Redesign the timmy time ui/card", and asked whether the
+  animated card still shows on Home (yes, among the quick starts, unchanged). Built in the engine for every hub on it:
+  More > Timmy Time as one page (the episode on the hub's color with Timmy in headphones, the chapters always open, then
+  what the class thinks; the pinned player in the hub's color), checked on Occlusion's new version (the only one with an
+  episode). axe on it found BUG-057 in the shared player (the speed and vote buttons' spoken names), fixed live with no
+  look change. **Left for Heme & Endo:** Sam's look at the colors and the player in the preview. **Next step for this task:**
+  Perio's port in a fresh session (its own engine: `QBANK_FILTER`, sessions, template-literal notes, the case kit,
+  `PERIO_SKIN` and its six lobby drawings), reading this note, the [perio hub note](../hubs/perio.md) and phase 1's Outcome.
 
 ## Outcome

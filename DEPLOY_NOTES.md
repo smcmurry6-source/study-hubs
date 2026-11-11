@@ -32,6 +32,32 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (redesign phase 2: the new Heme & Endo Exam 2, beside the live one, Claude Code)** — Nothing students see
+  changes. `hubs/heme-endo-exam2/next/` is the hub on the shared engine, built the way phase 1 built Occlusion's: settings in
+  `window.SH_HUB`, content in `next/content/` written from the live hub by `tools/hub-next/build.mjs` (now with
+  `heme-endo-exam2`; CI's `--check` covers it), and outside a preview it sends visitors to the live hub. Same hub id, state
+  key, answered event and all 609 question ids. The engine (`widget/hub.js`, gated so Occlusion's new version is unchanged)
+  learned what this hub needs: **review-only lectures** (the Exam 1 Refresher out of every total and out of the bank until
+  ticked, `SH_EXPORT.uncounted` for the medal), **a toggle tied to a lecture** (Exam 1 High likelihood ticks R and unticks it
+  again), **the mock's grouped L12 and the Refresher's five High Likelihood picks**, "which statement" type filters, focus-list
+  hints and a plural "In the professors' words". The build handles a hub without the Occlusion drawing kit (its `FIGS` and
+  `FIG_PLACE` as data). Its six arcade lobby drawings are new (`tools/figures/site/arcade.mjs`, from `HEE2_SKIN`). After Sam's
+  look ("more color ... to distinguish each lecture"): **each lecture has its own color** on every hub on the engine (question
+  cards' lecture chip and top edge, the notes' list, Home's rows, the picker, hints, cram, mock and stats; a review-only
+  lecture grey; `LCOL`/`lc()`, `.lc-0` to `.lc-9`), and **Notes done** (a button at the end of the notes, or reading to the
+  end after a minute; `STATE.read`, this device) fills a lecture's badge. **BUG-056**, fixed: on the new hubs the Timmy Time
+  player's Play and Post buttons were in the default color with dark labels (each hub's tint now on the page root too,
+  `data-hx-hub`). `/podcast` now rebuilds a hub's new version. **Live:** the About page's High Likelihood entry now says the
+  mock's five Exam 1 questions are drawn at random (Sam: "draw at random"). Round 3 (Sam: "Redesign the timmy time
+  ui/card"): on every hub on the engine, More > Timmy Time is one page: the episode on a field of the hub's color with Timmy
+  in headphones (he bobs while it plays), a big Play, round skip and speed buttons and a progress bar on it, the chapters as
+  a track list (always open, two columns on a laptop, the one playing marked with a small equalizer), then "What the class
+  thinks"; the pinned player is in the hub's color too. The engine only lays out and restyles the shared player
+  (`podDress` in `widget/hub.js`, `.pod-x` in `widget/hub.css`), so the live hubs' player looks the same. Home's animated
+  Timmy Time card stays where it was. **Live, no look change: BUG-057**, fixed in `widget/podcast.js`: the speed and
+  like/dislike buttons' spoken names now include what they show ("Playback speed 1×", "Like this episode, 7 likes").
+  Notes: [hub note](vault/hubs/heme-endo-exam2.md), [phase 2](vault/tasks/2026-11-05-redesign-phase-2-live-hubs.md).
+
 - **2026-11-11 (CI: the test browsers install when Ubuntu's mirror is down, Claude Code)** — Three "Check hubs" runs on
   #312 in a row failed before any browser test ran: the GitHub runner couldn't resolve `azure.archive.ubuntu.com`, so
   `npx playwright install --with-deps` failed on optional font packages and never downloaded Chromium. Both workflows
