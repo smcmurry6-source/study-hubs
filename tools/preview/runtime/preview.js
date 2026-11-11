@@ -792,7 +792,9 @@
      sends) gets a made-up number that drifts a little, as a real class would; nothing on the live hubs listens for it */
   /* a made-up class for the studying-now count. The redesigned dashboard (widget/dash.js) draws each one as a Timmy in
      a classroom, so each has an outfit (the shop's ids, a holiday look, or none) and, every few seconds, one walks in or
-     out. Nothing here is anyone's real presence. */
+     out. The first one stands in for a hub tab of your own: he stays, wears what your Timmy wears and is remembered the
+     way a hub tab remembers itself ("sh_presence_mine", widget/v3.js), so the room tags him "You". Nothing here is
+     anyone's real presence. */
   var FAKE_FITS = ["captain-hat", "", "tuxedo", "thanksgiving:turkey", "football-helmet", "", "sun-hat", "dr-timmy", "", "elf-suit", "fox-hood", "", "tooth-fairy",
     "beanie", "ranger-hat", "", "skeleton-suit", "aviator-cap", "surgical-scrubs", "", "jester", "nightcap", "flannel", "", "lifeguard", "bunny-suit"];
   function fakeOnline(){
@@ -806,8 +808,13 @@
       try {
         var D = window.shDash;
         if (D && D.setLive && D.hubs) {
-          var hubs = D.hubs(), by = {}, list = [];
-          crowd.forEach(function(p){ var h = hubs[[0, 0, 1, 0, 2, 1][p.slot % 6] % hubs.length]; if (!h) return; by[h.id] = (by[h.id] || 0) + 1; list.push({ key: p.key, hub: h.id, fit: p.fit }); });
+          var hubs = D.hubs(), by = {}, list = [], me = {};
+          crowd.forEach(function(p){
+            var h = hubs[[0, 0, 1, 0, 2, 1][p.slot % 6] % hubs.length], fit = p.fit; if (!h) return;
+            if (p.slot === 1) { me[h.id + "/" + p.key] = Date.now(); try { fit = (window.shPet && window.shPet.fit && window.shPet.fit()) || ""; } catch (e) { fit = ""; } }
+            by[h.id] = (by[h.id] || 0) + 1; list.push({ key: p.key, hub: h.id, fit: fit });
+          });
+          try { localStorage.setItem("sh_presence_mine", JSON.stringify(me)); } catch (e) {}
           D.setLive(by, list);
         }
       } catch (e) {}
@@ -815,7 +822,7 @@
     setTimeout(send, 1200);
     setInterval(function(){
       var r = Math.random();
-      if (crowd.length <= 4 || (r < .55 && crowd.length < 16)) add(); else crowd.splice(Math.floor(Math.random() * crowd.length), 1);
+      if (crowd.length <= 4 || (r < .55 && crowd.length < 16)) add(); else crowd.splice(1 + Math.floor(Math.random() * (crowd.length - 1)), 1);
       send();
     }, /\/next\/(index\.html)?$/.test(location.pathname) && !/\/hubs\//.test(location.pathname) ? 7000 : 20000);
   }

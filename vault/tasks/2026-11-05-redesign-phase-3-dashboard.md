@@ -5,7 +5,7 @@ hub: dashboard
 created: 2026-11-05
 requested-by: Sam
 due: 
-waiting-on: Sam's look at the preview and approval; the idea board (a second session)
+waiting-on: Sam's approval of the PR and the merge; the idea board (a second session)
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/318
 ---
@@ -182,6 +182,34 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   `widget/hub-art/class.js` now carries the recap kit, six trophy drawings (`recapIcons`) and the hat (`recapHat`):
   55 KB. Save image is unchanged (`widget/recap.js`). The preview's second recap has a made-up "one that got us".
   BUG-069 and BUG-070 found and fixed.
+- 2026-11-11 (Claude Code, **your own Timmy marked; hand-off**). Sam on the preview with the recap in: "Mark your
+  timmy, yes to the redrawn recap. All that looks good" ([decisions](../decisions.md)).
+  - **The mark.** The classroom is anonymous on purpose and stays so: the dashboard only listens, and every hub tab is
+    in its channel under a random key made for that page load. So the hub tab now keeps that key in its own browser
+    while it is open (`rememberMine()` in the live `widget/v3.js`, `localStorage` `sh_presence_mine`: taken out when the
+    tab closes, at most 8, none older than two days), and the dashboard puts a **"You" plate on the front of the desk
+    with that key** (`mineKeys()`, `mineFirst()`, `paintMe()` in `widget/dash.js`; `.dx-me` in `widget/dash.css`).
+    Nothing new is sent and nothing is stored on the server; another browser has no way to tell whose Timmy is whose.
+    Yours is seated first, so a full room never leaves you in the hall. No hub open in another tab: no plate, since you
+    aren't in the room. The plate comes when he sits and goes when the tab closes (a `storage` event). It is text over
+    the drawing, not new art. It was first a bubble over his head; on a phone that hid the Timmy at the desk behind, so
+    it moved to the desk's front, where the hub's tooth is (BUG-071).
+  - **The preview** has no realtime, so its first made-up Timmy stands in for a hub tab of your own: he stays, wears
+    what your Timmy wears and has the plate.
+  - **Checked:** `tools/ci/smoke.js` now makes one of its eight made-up people this browser's own and fails unless
+    exactly that desk says "You" and the plate goes when everyone leaves; the hub's remember-and-forget function by
+    itself against a fake store (two tabs, closing one, the cap, old keys, a broken value); by script on the preview:
+    laptop and phone, the key taken away and back, Focus mode (no room, no plate). **Not checked:** the whole path
+    between a real hub tab and a real dashboard, because the preview has no realtime and automated browsers send no
+    presence. Outside a preview `next/` sends visitors to the live dashboard, so the first real look is at the
+    redesign's release, or on a staging database.
+  - **Where this leaves the task.** Everything in this note except the idea board is built, checked and shown to Sam,
+    who said it looks good. Left: **the idea board** (a second session; its slot on the page is `#ideas`, its server is
+    in migration_v54, its About entry is drafted in [the release note](2026-11-06-redesign-release.md)); **Sam's tick**
+    on "Sam approved this release" in the PR and the merge; after the merge `node tools/release/postcheck.js` and the
+    changelog line. The next session can start from `main` once the PR is merged, or from this branch before that.
+    Still open from earlier entries: the three `dashboard/next` screens aren't in the accessibility baseline, and first
+    paint on the slow-phone profile is worth another look before the release.
 
 
 ## Outcome
@@ -190,4 +218,6 @@ Not finished. The new dashboard is built beside the live one (`next/`), on the d
 plan except the idea board, and with Sam's second-pass changes; nothing students see has changed
 ([#318](https://github.com/smcmurry6-source/study-hubs/pull/318), a draft). The third pass is built too: the classroom, the
 stage and the recap as a bar graph in a smaller card. One change in the PR is live at merge: each hub sends
-its Timmy's outfit with the studying-now presence, with no name or id.
+its Timmy's outfit with the studying-now presence, with no name or id, and keeps its own random presence key in the
+browser so the new dashboard can mark your own Timmy. Sam has looked at all of it ("All that looks good"); what's left
+is the idea board, Sam's approval and the merge.

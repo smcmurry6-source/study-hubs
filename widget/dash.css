@@ -107,6 +107,10 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-now.is-tight .dx-now-hubs { grid-column: 1 / -1; }
 .dx-hall { position: absolute; right: 6px; z-index: 1; margin: 0; padding: 0 8px; border: 2px solid #3b2e3a; border-radius: var(--r-pill); background: #fff; color: #3b2e3a; font-size: 12px; line-height: 18px; font-weight: var(--w-head); white-space: nowrap; }
 .dx-hall[hidden] { display: none; }
+/* "You", a plate on the front of your own Timmy's desk (paintMe): only your own screen has it */
+.dx-me { position: absolute; z-index: 1; transform: translate(-50%, -50%); padding: 0 6px; border: 1.5px solid #3b2e3a; border-radius: 4px; background: #ffe08a; color: #3b2e3a;
+  font-size: 11px; line-height: 13px; font-weight: var(--w-head); white-space: nowrap; pointer-events: none; }
+.dx-now:not(.has-room) .dx-mes { display: none; }
 .rm-dooropen { opacity: 0; transition: opacity 140ms; }
 .rm-tim { transform-box: fill-box; transform-origin: 50% 100%; }
 .rm-bob { animation: rm-bob 3.2s ease-in-out infinite; }

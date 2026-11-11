@@ -258,7 +258,7 @@
           '<div class="dx-now" id="now" role="group" aria-labelledby="nowH">' +
             '<h3 class="sr" id="nowH">Studying right now</h3>' +
             /* the drawn classroom goes in here once its art and Timmy have loaded (syncRoom); the count and the hubs then sit on its board */
-            '<div class="dx-room" id="room" aria-hidden="true"></div><p class="dx-hall" id="nowHall" hidden></p>' +
+            '<div class="dx-room" id="room" aria-hidden="true"></div><p class="dx-hall" id="nowHall" hidden></p><div class="dx-mes" id="nowMe" aria-hidden="true"></div>' +
             '<div class="dx-now-board" id="nowBoard">' +
               '<p class="dx-now-num"><i class="dx-pulse" aria-hidden="true"></i><b class="num" id="nowCount">–</b><span>studying right now</span></p>' +
               '<ul class="dx-now-hubs" id="nowHubs"></ul>' +
@@ -472,6 +472,24 @@
     return '<g class="rm-bob" style="animation-delay:-' + (h % 32) / 10 + 's">' + timmyBox(CA.room.SEAT, p.fit, mood) + "</g>";
   }
   function seatEl(i){ return q('.rm-seat[data-seat="' + i + '"]', $("room")); }
+  /* Which Timmy is yours: a hub tab keeps its own presence key in this browser while it is open (widget/v3.js,
+     "sh_presence_mine"), so the desk with that key gets a "You" plate on its front (where its hub's tooth is, so it
+     covers nobody), on this screen only. Nobody else's is told apart. */
+  function mineKeys(){ try { var m = JSON.parse(localStorage.getItem("sh_presence_mine") || "{}"); return m && typeof m === "object" ? m : {}; } catch (e) { return {}; } }
+  function has(o, k){ return Object.prototype.hasOwnProperty.call(o, k); }
+  /* yours first, so a full room never leaves you in the hall */
+  function mineFirst(list){ var m = mineKeys(); return list.filter(function(p){ return has(m, p.key); }).concat(list.filter(function(p){ return !has(m, p.key); })); }
+  function paintMe(){
+    var host = $("nowMe"); if (!host) return;
+    var mine = mineKeys(), s = "";
+    if (rm) Object.keys(rm.at).forEach(function(k){
+      if (!has(mine, k)) return;
+      var st = rm.seats[rm.at[k]], el = seatEl(rm.at[k]);
+      if (!st || !el || !q(".rm-tim", el).firstChild) return;      /* still on his way in */
+      s += '<span class="dx-me" style="left:' + Math.round(st.x) + "px;top:" + Math.round(st.y - 5.4 * st.s) + 'px">You</span>';
+    });
+    if (host.innerHTML !== s) host.innerHTML = s;
+  }
   /* the count and the hubs sit on the room's board (b: its place in the drawing), or back in the plain tile (null) */
   function placeBoard(b){
     var el = $("nowBoard"); if (!el) return;
@@ -490,7 +508,7 @@
     /* desks fill from the front row's middle outward */
     var order = seats.map(function(st, i){ return i; }).sort(function(x, y){ return (seats[y].row - seats[x].row) || (Math.abs(seats[x].x - o.w * .45) - Math.abs(seats[y].x - o.w * .45)); });
     var at = {}, fits = {}, bySeat = {}, s;
-    people.slice(0, seats.length).forEach(function(p, i){ at[p.key] = order[i]; fits[p.key] = p.fit; bySeat[order[i]] = p; });
+    mineFirst(people).slice(0, seats.length).forEach(function(p, i){ at[p.key] = order[i]; fits[p.key] = p.fit; bySeat[order[i]] = p; });
     s = '<g class="rm-bg">' + R.room(o) + '</g><g class="rm-dooropen">' + R.door({ w: o.w, h: o.h, night: o.night, open: true }) + R.plant(o) + "</g>";
     for (var r = 0; r < rows; r++) {
       s += '<g class="rm-row">';
@@ -505,7 +523,7 @@
     $("room").innerHTML = '<svg viewBox="0 0 ' + o.w + " " + o.h + '" width="' + o.w + '" height="' + o.h + '" focusable="false">' + s + "</svg>";
     rm = { w: o.w, h: o.h, night: o.night, rows: rows, seats: seats, order: order, at: at, fits: fits, geo: g, door: 0 };
     $("now").classList.add("has-room"); $("now").classList.toggle("is-still", still());
-    placeBoard(g.board); paintHall();
+    placeBoard(g.board); paintHall(); paintMe();
   }
   /* the door stands open while anyone is in the doorway */
   function doorOpen(d){ if (!rm) return; rm.door = Math.max(0, rm.door + d); var el = q(".rm-dooropen", $("room")); if (el) el.style.opacity = rm.door ? "1" : "0"; }
@@ -538,6 +556,7 @@
       el.setAttribute("data-fit", p.fit);
       q(".rm-tim", el).innerHTML = seated(p); q(".rm-desk", el).innerHTML = CA.room.desk(tintKey(p.hub), hashOf(p.key) % 4);
       if (!quiet && q(".rm-tim", el).animate) q(".rm-tim", el).animate([{ transform: "translateY(-4px) scale(.96, 1.06)" }, { transform: "translateY(1px) scale(1.05, .94)" }, { transform: "none" }], { duration: 340, easing: "ease-out" });
+      paintMe();
     }
     if (quiet) sit(); else walk(p.fit, i, false, n, sit);
   }
@@ -551,7 +570,7 @@
      walk the comings and goings in and out */
   function syncRoom(){
     var now = $("now"), host = $("room"); if (!now || !host) return;
-    if (!roomReady()) { if (rm) { rm = null; host.innerHTML = ""; now.classList.remove("has-room"); placeBoard(null); paintHall(); } return; }
+    if (!roomReady()) { if (rm) { rm = null; host.innerHTML = ""; now.classList.remove("has-room"); placeBoard(null); paintHall(); paintMe(); } return; }
     var w = Math.round(now.clientWidth), hr = new Date().getHours(); if (w < 220) return;
     var o = { w: w, h: w < 480 ? 170 : 150, n: people.length, night: hr >= 19 || hr < 6 }, R = CA.room, seats = R.seats(o), rows = seats[seats.length - 1].row + 1;
     /* rows are added as soon as they're needed, and taken away only once there are two desks to spare without them */
@@ -559,7 +578,7 @@
     if (!rm || rm.w !== o.w || rm.night !== o.night || rm.rows !== rows || rm.seats.length !== seats.length) { buildRoom(o, seats, rows); return; }
     var here = {}, taken = {}, n = 0;
     people.forEach(function(p){ here[p.key] = p; });
-    var gone = Object.keys(rm.at).filter(function(k){ return !here[k]; }), came = people.filter(function(p){ return rm.at[p.key] == null; });
+    var gone = Object.keys(rm.at).filter(function(k){ return !here[k]; }), came = mineFirst(people.filter(function(p){ return rm.at[p.key] == null; }));
     var quiet = still() || document.hidden || gone.length + came.length > 6;
     now.classList.toggle("is-still", still());
     gone.forEach(function(k){ var i = rm.at[k]; delete rm.at[k]; delete rm.fits[k]; depart(i, quiet, n++); });
@@ -570,7 +589,7 @@
     });
     /* someone changed what their Timmy wears */
     people.forEach(function(p){ var i = rm.at[p.key]; if (i != null && rm.fits[p.key] !== p.fit) { rm.fits[p.key] = p.fit; arrive(p, i, true, 0); } });
-    paintHall();
+    paintHall(); paintMe();
   }
   function liveLine(hub){
     var n = liveBy[hub.id];
@@ -1612,6 +1631,8 @@
         }).observe($("class"));
       }
       document.addEventListener("sh:pref", function(){ syncRoom(); paintBoard(); recapArt(true); });
+      /* a hub tab of yours opened or closed */
+      window.addEventListener("storage", function(e){ if (e.key === "sh_presence_mine") paintMe(); });
       if (window.ResizeObserver && $("rcBody")) {
         var rcW = 0, rcT = 0;
         new ResizeObserver(function(){

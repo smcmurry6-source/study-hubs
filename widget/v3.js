@@ -1414,11 +1414,26 @@
      (Sam, 2026-11-11: the new dashboard's classroom draws a Timmy for each person studying, dressed as theirs). Sent
      again when Timmy arrives (widget/pet.js loads late) or a setting changes what he wears. */
   var presenceOn = false, trackedFit = null;
+  /* The dashboard's classroom tags your own Timmy "You", on your own screen only (Sam, 2026-11-11: "Mark your timmy").
+     For that, this tab's presence key (random, new on every page load) is kept in this browser while the tab is open
+     and taken out when it closes. It is never sent anywhere it didn't already go, and it is no use on another device. */
+  function rememberMine(on){
+    try {
+      var m = null, now = Date.now(), out = {};
+      try { m = JSON.parse(localStorage.getItem("sh_presence_mine") || "{}"); } catch (e) {}
+      if (!m || typeof m !== "object") m = {};
+      Object.keys(m).filter(function(k){ return now - m[k] < 1728e5; }).sort(function(a, b){ return m[b] - m[a]; }).slice(0, 7).forEach(function(k){ out[k] = m[k]; });
+      if (on) out[HUB + "/" + presenceId] = now; else delete out[HUB + "/" + presenceId];
+      localStorage.setItem("sh_presence_mine", JSON.stringify(out));
+    } catch (e) {}
+  }
+  window.addEventListener("pagehide", function(){ if (trackedFit != null) rememberMine(false); });
+  window.addEventListener("pageshow", function(e){ if (e.persisted && trackedFit != null) rememberMine(true); });
   function fitNow(){ try { return (window.shPet && window.shPet.fit && window.shPet.fit()) || ""; } catch (e) { return ""; } }
   function trackPresence(){
     if (!channel || !presenceOn || AUTOMATED) return;
     var f = fitNow(); if (f === trackedFit) return;
-    trackedFit = f;
+    trackedFit = f; rememberMine(true);
     try { channel.track({ online_at: new Date().toISOString(), fit: f }); } catch (e) {}
   }
   document.addEventListener("sh:pref", function(){ setTimeout(trackPresence, 50); });

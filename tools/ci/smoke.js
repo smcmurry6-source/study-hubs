@@ -251,17 +251,23 @@ function lint(hub, A){
         const D = window.shDash, hubs = D && D.hubs ? D.hubs().map(h => h.id) : [], list = [];
         if (!D || !D.setLive || !hubs.length) return { skip: !hubs.length };
         for (let i = 0; i < 8; i++) list.push({ key: 'smoke' + i, hub: hubs[i % hubs.length], fit: ['', 'thanksgiving:turkey', '<img src=x onerror="window.__fit=1">', 'captain-hat'][i % 4] });
+        // one of the eight is a hub tab of this browser's own (the key a hub tab remembers): only that desk gets "You"
+        try { localStorage.setItem('sh_presence_mine', JSON.stringify({ [list[5].hub + '/smoke5']: Date.now() })); } catch (e) {}
         const by = {}; list.forEach(x => { by[x.hub] = (by[x.hub] || 0) + 1; }); D.setLive(by, list);
         await new Promise(r => setTimeout(r, 400));
         const out = { art: !!(window.SH_CLASS_ART && window.SH_CLASS_ART.room && window.SH_CLASS_ART.stage), room: !!document.querySelector('#now.has-room #room svg'), desks: document.querySelectorAll('#room .rm-seat').length,
           tims: document.querySelectorAll('#room .rm-tim svg').length, count: document.getElementById('nowCount').textContent, bad: document.querySelectorAll('#room img').length + (window.__fit ? 1 : 0),
-          podium: !!document.querySelector('#board .dx-podium'), set: !!document.querySelector('#board .dx-set .st-win') };
-        D.setLive({}, []); return out;
+          podium: !!document.querySelector('#board .dx-podium'), set: !!document.querySelector('#board .dx-set .st-win'),
+          me: [...document.querySelectorAll('#nowMe .dx-me')].map(e => e.textContent).join('|') };
+        D.setLive({}, []); out.after = document.querySelectorAll('#nowMe .dx-me').length;
+        try { localStorage.removeItem('sh_presence_mine'); } catch (e) {}
+        return out;
       });
       if (!room.skip) {
         if (!room.art || !room.room || room.desks < 8) problems.push(`${name}: the studying-now tile drew no classroom (${JSON.stringify(room)})`);
         else if (room.tims !== 8 || room.count !== '8') problems.push(`${name}: eight people studying, but the classroom seats ${room.tims} and the board says ${room.count}`);
         if (room.bad) problems.push(`${name}: an outfit from another browser was drawn as markup`);
+        if (room.room && (room.me !== 'You' || room.after)) problems.push(`${name}: your own Timmy should be the only one tagged "You", and only while he's there (tags: "${room.me}", after everyone left: ${room.after})`);
         if (room.podium && !room.set) problems.push(`${name}: the leaderboard's top three have no stage`);
       }
       await sideways('the classroom');
