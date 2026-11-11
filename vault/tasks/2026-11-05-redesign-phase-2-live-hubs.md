@@ -96,5 +96,13 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   note), BUG-059 (Occlusion's and Heme & Endo's game header buttons, open). The release drafts are in
   [the release note](2026-11-06-redesign-release.md). **Next step for this task:** Sam's answers on Perio, then the
   [release](2026-11-06-redesign-release.md); this note's Outcome once both new versions are approved.
+- 2026-11-11 (Claude Code, same session): Sam's look at Perio: "the other drawings look good" (five lobby drawings in),
+  Pocket Showdown's "teeth ... look terrible" (redrawn as the game's own board, molars in their gums, a column per session,
+  like Heme & Endo's approved Showdown; waits for Sam's yes, its tile an icon until then), "use changes i made to the heme
+  and endo hub" (the engine's lecture colors, Notes done and Timmy Time page already apply), then "Everything looks good.
+  do whatever you need to do for that bug ... merge when ready". BUG-059 fixed in the engine (the games' icons sized as on
+  the live hubs). **Both new versions are approved** (Heme & Endo #312, Perio #314). **Left:** Sam's yes on the redrawn
+  Pocket Showdown board (`PERIO_WAITING`, the [hub note](../hubs/perio.md) says how). **Next step for this task:** the
+  [release](2026-11-06-redesign-release.md); this note goes to `done/` with its Outcome when the release ships.
 
 ## Outcome

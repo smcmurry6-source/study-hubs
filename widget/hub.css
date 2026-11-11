@@ -779,6 +779,11 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .game.is-first .game-pic img { height: 100%; object-fit: cover; }
 .arcade-lobby > .note { margin-top: 14px; }
 .arcade-stage { min-height: 60vh; }
+/* the games' icons (their hub's own icon(): svg.ic) at the size each live hub's base CSS gives them, which the engine page
+   doesn't load: unsized, they grew to fill the Back and Full screen buttons (BUG-059). :where() keeps it at .ic's weight,
+   so a game's own sizes (Perio's .gm-back .ic) still win */
+:where(.arcade-stage) .ic { width: 1.15em; height: 1.15em; flex: none; vertical-align: -.2em; }
+.hx .arcade-stage svg.ic { display: inline-block; }   /* inline beside their label, as on the live hubs (.hx svg is a block) */
 /* a game's lecture tag (Perio's Calculus Crusher), in the lecture's own color */
 .arcade-stage .gm-sess { display: inline-flex; align-items: center; flex: none; padding: 2px 9px; border-radius: var(--r-pill); font-size: 12px; font-weight: var(--w-head); line-height: 1.5; background: var(--lc-soft); color: var(--lc-ink); }
 .stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); align-items: start; }

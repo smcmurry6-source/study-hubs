@@ -195,8 +195,8 @@ says they're drawn at random, fixed on the live page in [#312](https://github.co
 Built in `hubs/perio/next/` (2026-11-11). Perio's final is Thursday, November 19, so by the rule above it is switched in if
 the release comes before then. At the release its own engine goes with the old page, and its content JSON becomes where
 it is edited, as for the others (Done when, above).
-**The six arcade lobby drawings** wait for Sam's yes on the contact sheet (2026-11-11); without it, the release ships the
-lobby with each game's icon.
+**The arcade lobby drawings**: five are in (Sam, 2026-11-11); Pocket Showdown's redrawn board waits for Sam's yes, and
+without it the release ships that one tile with the game's icon.
 
 **About page** (Perio's entries, rewritten for the new version):
 - **Review** is gone as a tab: each session's tables sit under its notes ("Charts for this lecture") and the search finds

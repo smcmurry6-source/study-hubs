@@ -116,10 +116,12 @@ live hub. Until then **edit content in the live file only**:
   final card and chips, the hints banner, the mock's blurb, the arcade's games with their current names, Pocket Showdown
   first). When one changes in the live hub, change it there too. Perio has no Timmy Time episode, so More has no Timmy tile.
 - Its text color is a deeper pink than its art's ink (`#9e3a60`, 5.1:1 on its light pink; the ink is 4.05:1), in `widget/hub.css`.
-- Its art: tint `#b4466f`, emblem and masthead (phase 0). **The six arcade lobby drawings wait for Sam's yes** (contact sheet
-  sent 2026-11-11): drawn in `tools/figures/site/arcade.mjs` (`pBoard()` to `pCrusher()`, exported as `PERIO_DRAFT`, not in
-  `SETS`). Until then the lobby shows each game's icon. On a yes: add `perio: buildPerio` to `SETS`, drop `PERIO_DRAFT`, run
-  `node tools/figures/site/build.mjs` and commit `widget/hub-art/perio.js`.
+- Its art: tint `#b4466f`, emblem and masthead (phase 0), and the arcade lobby drawings (`tools/figures/site/arcade.mjs`,
+  `pBoard()` to `pCrusher()`, built into `widget/hub-art/perio.js`). Sam approved five on 2026-11-11 ("the other drawings
+  look good"); **Pocket Showdown's** first teeth "look terrible", so `pBoard()` was redrawn as the game's own board (molars
+  in their gums, a column per session, like Heme & Endo's approved Showdown) and **waits for Sam's yes**: it's in
+  `PERIO_WAITING`, so its tile shows the game's icon. On a yes: empty `PERIO_WAITING`, run `node tools/figures/site/build.mjs`
+  and commit `widget/hub-art/perio.js` and `tools/preview/design/art.js`. `PERIO_DRAFT` (the whole set) is for contact sheets.
 - Not carried over (on purpose): the MCQ sprint and the midterm's scope (the midterm is over), the live lobby's daily
   rotating first game (Pocket Showdown is first), hints' slide and email source tags. Active recall is the
   [Learn and Flashcards](../tasks/2026-11-06-redesign-learn-and-flashcards.md) task's.

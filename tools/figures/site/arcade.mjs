@@ -23,7 +23,18 @@
    - cloze:  Blank Rx. A prescription pad with its Rx and one line's drug left blank, the caret waiting, a capsule, a pen.
    - smile:  The Yellow Body. Twelve rungs up to a golden corpus luteum with Timmy's face, three lifelines.
    - cross:  Crossing Over. A mini crossword beside two chromosomes in meiosis I, their inner chromatids crossed and
-             their tips swapped. */
+             their tips swapped.
+
+   Perio (redesign phase 2; from its games and PERIO_SKIN, the perio clinic):
+   - board:  Pocket Showdown. The game's board as a perio chart: a column per session under its colored head, molars in
+             their gums for tiles, a probe in a pocket that bleeds, one tile answered right, a Deep Pocket star. Redrawn
+             2026-11-11 (Sam: the first one's teeth "look terrible"); waits for Sam's yes (PERIO_WAITING).
+   - escape: Perio Clinic Escape. The clinic after hours: the panoramic viewer off, the locked charting computer, the
+             chart, the typodont, the taped cassette, the door's keypad.
+   - cloze:  Mind the Pocket. A page of notes with one term missing, beside a probe in a tooth's pocket.
+   - smile:  Million-Dollar Smile. Twelve rungs up to a smile with healthy gums and one gold tooth.
+   - cross:  Cross-Section. A mini crossword beside an incisor cut in section in its bone and gum, a probe in the sulcus.
+   - crusher: Calculus Crusher. A wall of calculus bricks, one breaking, a ball and a curette for a paddle. */
 import { INK, C, HI } from "./style.mjs";
 
 const ink = (w = 2.5) => `stroke="${INK}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
@@ -416,39 +427,44 @@ const BONE = C.enamelShade, PORE = C.woodShade;
 const OPT = ["#FFD84D", "#FF6FA3", "#43E0AC", "#B69CFF"];   // the games' four answer colors (the escape room's keypad slots)
 const star = (x, y, s = 1, fill = C.yellow) => `<path d="M${x} ${y - 7 * s} l${2.4 * s} ${5.2 * s} ${5.2 * s} ${2.4 * s} ${-5.2 * s} ${2.4 * s} ${-2.4 * s} ${5.2 * s} ${-2.4 * s} ${-5.2 * s} ${-5.2 * s} ${-2.4 * s} ${5.2 * s} ${-2.4 * s} Z" fill="${fill}" ${ink(1.6)}/>`;
 
-/* a single-rooted tooth on a perio chart, crown up, its CEJ at 0,0 (flip it for the upper arch) */
-const CHART_TOOTH = "M-9 0 C-11 -6 -12 -11 -10 -15 C-7 -20 -3 -21 0 -21 C3 -21 7 -20 10 -15 C12 -11 11 -6 9 0 C8 10 6 19 3 25 C1.5 28 -1.5 28 -3 25 C-6 19 -8 10 -9 0 Z";
+/* Pocket Showdown's tile: a molar crown standing in its gum (Perio's emblem tooth), its CEJ at 0,0, about 28 wide */
+const BOARD_TOOTH = "M-11 3 C-13.6 -3 -14.6 -10 -12.8 -15.4 C-11.2 -20.4 -6.8 -22.2 -3.8 -19.8 C-2.3 -18.6 -1.1 -18.2 0 -18.2 C1.1 -18.2 2.3 -18.6 3.8 -19.8 C6.8 -22.2 11.2 -20.4 12.8 -15.4 C14.6 -10 13.6 -3 11 3 L11 9 L-11 9 Z";
+const BOARD_SHADE = "M6.6 -20.2 C10.4 -20.6 13.4 -17.6 13.6 -12 C13.8 -6.6 12.6 -1.6 10.4 2.6 L7.6 2.6 C9.8 -2.8 10.6 -9.6 9.4 -14.6 C8.8 -17.2 7.8 -19 6.6 -20.2 Z";
+/* its gum: a rounded cuff hugging the neck, the margin lowest at the tooth's middle (the zenith) and rising to a papilla at
+   each side, its lower edge shaded */
+const boardGum = (x, y, fill = C.gum) =>
+  `<path d="M${x - 14.5} ${y - 6} C${x - 10} ${y - 4} ${x - 7} ${y + 1.5} ${x} ${y + 1.5} C${x + 7} ${y + 1.5} ${x + 10} ${y - 4} ${x + 14.5} ${y - 6} ` +
+  `C${x + 16} ${y - 3} ${x + 17} ${y + 3} ${x + 16.5} ${y + 8} Q${x + 16} ${y + 12} ${x + 12} ${y + 12} L${x - 12} ${y + 12} Q${x - 16} ${y + 12} ${x - 16.5} ${y + 8} ` +
+  `C${x - 17} ${y + 3} ${x - 16} ${y - 3} ${x - 14.5} ${y - 6} Z" fill="${fill}"/>` +
+  `<path d="M${x - 15.8} ${y + 7.4} C${x - 6} ${y + 9.6} ${x + 6} ${y + 9.6} ${x + 15.8} ${y + 7.4} Q${x + 15} ${y + 11.2} ${x + 12} ${y + 11.2} L${x - 12} ${y + 11.2} Q${x - 15} ${y + 11.2} ${x - 15.8} ${y + 7.4} Z" fill="${C.gumShade}"/>` +
+  `<path d="M${x - 14.5} ${y - 6} C${x - 10} ${y - 4} ${x - 7} ${y + 1.5} ${x} ${y + 1.5} C${x + 7} ${y + 1.5} ${x + 10} ${y - 4} ${x + 14.5} ${y - 6} ` +
+  `C${x + 16} ${y - 3} ${x + 17} ${y + 3} ${x + 16.5} ${y + 8} Q${x + 16} ${y + 12} ${x + 12} ${y + 12} L${x - 12} ${y + 12} Q${x - 16} ${y + 12} ${x - 16.5} ${y + 8} ` +
+  `C${x - 17} ${y + 3} ${x - 16} ${y - 3} ${x - 14.5} ${y - 6} Z" fill="none" ${ink(2)}/>` +
+  hi(`M${x - 13.6} ${y - 2} C${x - 14.4} ${y} ${x - 14.6} ${y + 2.4} ${x - 14.2} ${y + 4.6}`);
 function pBoard(T){
-  const cols = [58, 109, 160, 211, 262], up = 60, lo = 116, parts = [];
-  /* the gingival margin as charted: at each tooth's middle it sits at the CEJ (the zenith, its most apical point), and
-     between teeth the papilla rises toward the crowns; dir is the way to the roots (+1 the lower row, -1 the upper) */
-  const margin = (cej, dir) => {
-    let d = `M26 ${cej - dir * 8}`;
-    cols.forEach((x) => { d += ` C${x - 17} ${cej - dir * 8} ${x - 10} ${cej + dir} ${x} ${cej + dir} C${x + 10} ${cej + dir} ${x + 17} ${cej - dir * 8} ${x + 25.5} ${cej - dir * 8}`; });
-    return d + ` L294 ${cej - dir * 8}`;
-  };
-  [[up, -1], [lo, 1]].forEach(([cej, dir], r) => {
-    cols.forEach((x, c) => {
-      parts.push(`<path d="${CHART_TOOTH}" transform="translate(${x} ${cej}) scale(1 ${-dir})" fill="${C.enamel}" ${ink(2.2)}/>`);
-      parts.push(`<path d="M-6 -6 C-6.5 -10 -5.5 -14 -3 -16" transform="translate(${x} ${cej}) scale(1 ${-dir})" ${HI}/>`);
-    });
-    parts.push(`<path d="${margin(cej, dir)} L294 ${cej + dir * 15} L26 ${cej + dir * 15} Z" fill="${C.gumLight}" opacity=".6"/>`);
-    parts.push(`<path d="${margin(cej, dir)}" fill="none" stroke="${C.gumShade}" stroke-width="2.6" stroke-linecap="round"/>`);
-    /* the probing depths: 2-3 mm everywhere, 7 at the deep pocket (the upper row's fourth tooth) */
-    let pd = `M28 ${cej + dir * 6}`;
-    cols.forEach((x, c) => { const deep = r === 0 && c === 3; pd += ` L${x - 12} ${cej + dir * 6} Q${x} ${cej + dir * (deep ? 30 : 6)} ${x + 12} ${cej + dir * 6}`; });
-    parts.push(line(pd + ` L292 ${cej + dir * 6}`, 2.2, C.blue));
+  /* the game's own board (PERIO_SKIN): a perio chart, one column per session under its colored head, teeth for tiles */
+  const cols = [48, 104, 160, 216, 272], rows = [64, 102, 140];
+  const heads = [T.mid, OPT[0], OPT[2], "#5CC8FF", OPT[3]];
+  const parts = [];
+  cols.forEach((x, c) => {
+    parts.push(`<rect x="${x - 18}" y="21" width="36" height="12" rx="6" fill="${heads[c]}" ${ink(2)}/>`);
   });
-  /* a tooth that bled on probing (the lower row's second) and the Deep Pocket's star */
-  const bx = cols[1], by = lo;
-  const drop = (x, y, s) => `<path d="M${x} ${y - 7 * s} C${x + 3 * s} ${y - 2 * s} ${x + 4.5 * s} ${y} ${x + 4.5 * s} ${y + 2.5 * s} C${x + 4.5 * s} ${y + 5.5 * s} ${x + 2.4 * s} ${y + 7 * s} ${x} ${y + 7 * s} C${x - 2.4 * s} ${y + 7 * s} ${x - 4.5 * s} ${y + 5.5 * s} ${x - 4.5 * s} ${y + 2.5 * s} C${x - 4.5 * s} ${y} ${x - 3 * s} ${y - 2 * s} ${x} ${y - 7 * s} Z" fill="${C.red}" ${ink(1.6)}/>`;
+  rows.forEach((y, r) => cols.forEach((x, c) => {
+    const right = r === 0 && c === 1, bled = r === 1 && c === 3;
+    parts.push(`<g transform="translate(${x} ${y})"><path d="${BOARD_TOOTH}" fill="${right ? "#E6FFF4" : C.enamel}" ${ink(2.2)}/>` +
+      `<path d="${BOARD_SHADE}" fill="${right ? "#BFEBD6" : C.enamelShade}"/>` + hi("M-9.6 -14 C-10.4 -10.6 -10 -7 -8.8 -4.4") + "</g>");
+    parts.push(boardGum(x, y, bled ? "#F27596" : C.gum));
+  }));
+  /* the tile just answered right (a check over its crown), the one that bled on probing, and a Deep Pocket */
+  const [rx, ry] = [cols[1], rows[0]], [bx, by] = [cols[3], rows[1]], [dx, dy] = [cols[0], rows[2]];
+  const drop = (x, y, k) => `<path d="M${x} ${y - 6 * k} C${x + 2.6 * k} ${y - 2 * k} ${x + 4 * k} ${y} ${x + 4 * k} ${y + 2.2 * k} C${x + 4 * k} ${y + 4.6 * k} ${x + 2.2 * k} ${y + 6 * k} ${x} ${y + 6 * k} C${x - 2.2 * k} ${y + 6 * k} ${x - 4 * k} ${y + 4.6 * k} ${x - 4 * k} ${y + 2.2 * k} C${x - 4 * k} ${y} ${x - 2.6 * k} ${y - 2 * k} ${x} ${y - 6 * k} Z" fill="${C.red}" ${ink(1.5)}/>`;
   return ground(T.light) +
     `<rect x="10" y="8" width="300" height="154" rx="16" fill="${T.ink}" ${ink(3)}/>` +
-    `<rect x="20" y="16" width="280" height="138" rx="8" fill="${C.paper}" ${ink(2.5)}/>` +
-    line("M26 88 L294 88", 2, C.paperShade) +
+    `<rect x="18" y="15" width="284" height="140" rx="10" fill="#F7F1E6" ${ink(2.5)}/>` +
     parts.join("") +
-    drop(bx - 5, by - 8, 1.1) + drop(bx + 6, by - 12, .8) + drop(bx + 9, by + 2, .7) +
-    star(cols[3] + 18, up - 26, 1.4, C.gold);
+    line(`M${rx - 6} ${ry - 10} L${rx - 1.5} ${ry - 5.5} L${rx + 7} ${ry - 14}`, 3, "#2A8F6A") +
+    probe(bx + 25, by - 40, bx + 11.5, by + 3, 15, 0, T.mid) + drop(bx + 3, by + 6, .9) + drop(bx + 19, by + 10, .7) +
+    star(dx + 16, dy - 20, 1.25, C.gold);
 }
 
 function pEscape(T){
@@ -649,17 +665,21 @@ function pCrusher(T){
 }
 
 const buildPerio = (T) => ({
-  board: { label: "Pocket Showdown: a perio chart on the board, two rows of teeth with their gum and probing lines, one tooth bleeding and a Deep Pocket star", body: pBoard(T) },
+  board: { label: "Pocket Showdown: the game's board as a perio chart, a column per session under its colored head, molars in their gums for tiles, a probe in a pocket that bleeds, one tile answered right and a Deep Pocket star", body: pBoard(T) },
   escape: { label: "Perio Clinic Escape: the perio clinic after hours, with the panoramic viewer off, the locked charting computer, the perio chart, the typodont, the taped cassette and the door's keypad", body: pEscape(T) },
   cloze: { label: "Mind the Pocket: a page of notes with one term missing, beside a probe in a tooth's pocket", body: pCloze(T) },
   smile: { label: "Million-Dollar Smile: twelve rungs up to a smile with healthy gums and one gold tooth", body: pSmile(T) },
   cross: { label: "Cross-Section: a mini crossword beside a tooth cut in section in its bone and gum, a probe in the sulcus", body: pCross(T) },
   crusher: { label: "Calculus Crusher: a wall of calculus bricks, one breaking, a ball and a curette for a paddle", body: pCrusher(T) }
 });
-/* Perio's set waits for Sam's yes on the contact sheet (2026-11-11) before it joins SETS */
+/* Sam, 2026-11-11, on the contact sheet: Pocket Showdown's teeth "look terrible", "the other drawings look good". The five
+   are in; the board, redrawn as the game's own board (molars in their gums), waits for Sam's yes (PERIO_WAITING), and its
+   lobby tile shows the game's icon until then. PERIO_DRAFT is the whole set, for contact sheets. */
+const PERIO_WAITING = ["board"];
+const buildPerioLive = (T) => Object.fromEntries(Object.entries(buildPerio(T)).filter(([k]) => !PERIO_WAITING.includes(k)));
 export const PERIO_DRAFT = buildPerio;
 
 export const ARCADE_VIEWBOX = [0, 0, 320, 170];
 /* Occlusion's (phase 1) and Heme & Endo Exam 2's (phase 2); Perio gets its own in its phase 2 session */
-const SETS = { occlusion: build, "heme-endo-exam2": buildHE };
+const SETS = { occlusion: build, "heme-endo-exam2": buildHE, perio: buildPerioLive };
 export function arcadeArt(hub, tint){ return SETS[hub] ? SETS[hub](tint) : null; }
