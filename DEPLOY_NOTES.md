@@ -32,6 +32,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (CI: the test browsers install when Ubuntu's mirror is down, Claude Code)** — Three "Check hubs" runs on
+  #312 in a row failed before any browser test ran: the GitHub runner couldn't resolve `azure.archive.ubuntu.com`, so
+  `npx playwright install --with-deps` failed on optional font packages and never downloaded Chromium. Both workflows
+  (`check.yml`, `release.yml`) now fall back to installing the browsers alone (the runner image already has the
+  libraries they need) and put a warning on the run's page. Nothing students see changes. Sam asked for it in its own PR.
+
 - **2026-11-11 (cheaper sessions for the rest of the redesign, Claude Code)** — Sam: "implement these changes". The eight
   question-writing rules (every choice's why, two-statement and true/false, numbered, which-statement, high likelihood, what
   professors skip, the bank's panel, question-health flags) are `load: on-demand`: the new `hubs/CLAUDE.md` loads them whenever
