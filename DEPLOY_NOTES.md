@@ -32,6 +32,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (Lessons refresh, Claude Code)** — Data read 5:30 pm Central, two days before Heme & Endo Exam 2. The 11-10
+  evening's six explanation fixes worked (first tries 29% before, 81% since, against the bank's 70% -> 74%), and the Cushing labs
+  no longer read backwards (`p1-corticotroph` 1 of 12 -> 6 of 10). Five more Heme & Endo Exam 2 explanations now name the class's
+  favorite wrong answer, from the notes: `dm-pb-cpep-2` (the three drugs that still work without beta cells), `mh-wall` (Leydig
+  cells sit between the tubules, not in the wall), `mp-e2-role` (inhibin is the brake on FSH), `dm-pb-hf-1` (glipizide has no
+  heart failure warning) and `p1-hashi-3` (diffuse hyperplasia is Graves). Perio `q3-S02` (report #41): its explanation now says
+  what each statement claims and which of the slide's three numbers belongs to which group. Explanations only: ids, keys,
+  choices and their order are unchanged, so no picks move; `next/content` rebuilt for both hubs. `LESSONS.md` Live signals
+  rewritten; the PCD Implants retrospective now counts 6 check-ins.
 - **2026-11-11 (Timmy Time: Heme & Endo Exam 2 episode, Claude Code)** — A 52-minute (51.7) last-minute review for Heme &
   Endo Exam 2 (Fri Nov 13): `hubs/heme-endo-exam2/audio/timmy-time.mp3` (37 MB, -16 LUFS), script
   `tools/podcast/heme-endo-exam2/script.md`, from the hub's notes (As taught), Exam Hints (every professor quote word for
