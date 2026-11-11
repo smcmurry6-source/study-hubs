@@ -40,6 +40,13 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   unrealistic or its `expect` disagrees with them. A question names its case in `pcase`, picks its pictures with
   `pfig` (and hides a row that would give its answer away: `hide.cal`, `hide.furc`, `hide.mob`) and lists its `ref`
   links ("In the notes"). Write every new Patient Box item this way: [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md).
+- **Dr. Kaur's focus for her part of the final** (Sam passed it on 2026-11-11): "really know" peri-implant health,
+  peri-implant mucositis and peri-implantitis; her clinical questions are based on them. In the hub: an S7 Exam Hint
+  (`src:'relay'`, labeled "Paraphrased": not her exact words), the S7 `note` at the top of its notes, S7's
+  `LIKELY_TOPICS` led by "final focus" topics, Review's "Reading an implant case, step by step" (`PI_CASE_STEPS`), a cram
+  line, and one drawn case per state: `implant-19` (health that probes 5 mm, with first-year remodeling), `implant-5`
+  (mucositis) and `implant-14` (peri-implantitis; risk factors, suppuration, cause), questions `pc-g1`-`g4`, `pc-h1`-`h5`,
+  `pc-i1`-`i5`. If she sends anything more about the final, add it beside these.
 - **Narration:** both levels for every session, made with `python3 tools/narrate.py hubs/perio/index.html --lec <id>
   --force` (it reads perio's template-literal `READINGS['<id>']` blocks since 2026-11-05; `--text` shows what it will say); **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
   (`img/clinic-escape.webp`).
@@ -98,13 +105,13 @@ live hub. Until then **edit content in the live file only**:
   (the mock), the suture pictures (`SUTURE_DIAGRAMS`, `SUTURE_DEFS` → figures), and each session's `REF_SECTIONS` into the
   Review tables under that session's notes (the live hub's own HTML; More's Side by side has nothing left, so it's hidden,
   `core.noSide`). The sandbox runs `widget/cases.js` first, so the Patient Box rows (`foldBox`) come out as the live hub draws them.
-- **Progress carries over:** same hub id, state key `perio-d2-compendium-state-v1`, answered event `perio:answered`, all 749
-  question ids (`tools/question-ids/perio.txt`), and **Perio's own saved shape** (`SH_HUB.stateShape: "answered"`:
+- **Progress carries over:** same hub id, state key `perio-d2-compendium-state-v1`, answered event `perio:answered`, every
+  question id (`tools/question-ids/perio.txt`), and **Perio's own saved shape** (`SH_HUB.stateShape: "answered"`:
   `answered`, `totalSeen`, `activeDates`, `achievements` as `true`), which the dashboard reads as it is. The engine reads and
   writes it only through `ansOf()`, `putAnswer()`, `studyDayList()` and `achMap()`, so the live page reads a save the new
   one wrote (checked: a rollback keeps every answer). It adds `nx` (the daily goal) and `read` (Notes done), which the live
   page ignores. The bank's saved filters (`ui.qbank`) move into the engine's once (`ui.qbankIn`).
-- **Question health keeps every version:** the export (`SH_EXPORT.questions`) matches the live hub's for all 749 (the
+- **Question health keeps every version:** the export (`SH_EXPORT.questions`) matches the live hub's for every question (the
   Patient Box rows before the stem, a multi's keys: `core.exportCase`).
 - The engine learned, gated to the hubs that have them: **recall cards** (reveal, then "I got it" / "I missed it"),
   **case links** ("In the notes", `shCases.refHTML`), a lecture's **note** under its title, **HTML review sections**, and the
