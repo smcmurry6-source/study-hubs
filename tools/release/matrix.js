@@ -70,7 +70,7 @@ const QUICK = process.argv.includes('--quick');
       };
       await sideways('dashboard');
       let screens = 1, tiny = 0;
-      /* the redesign's dashboard (next/, widget/dash.js; beside the live one until the release): each hub's tab and the class board's three lists */
+      /* the redesign's dashboard (next/, widget/dash.js; beside the live one until the release): each hub's tab and the class board's two lists */
       if (fs.existsSync(path.join(L.ROOT, 'next', 'index.html'))) {
         await page.goto(srv.url + 'next/?persona=returning'); await L.settle(page);
         await sideways('dashboard/next'); screens++;

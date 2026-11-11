@@ -288,44 +288,59 @@ is in [its own note](2026-11-06-idea-board.md).
    `widget/hub-art/dash.js` to `PRECACHE`, drop what only the old dashboard used, and bump the version.
 6. `tools/release/a11y.js`, `perf.js`, `matrix.js` and `tools/ci/smoke.js` test `next/` beside the old dashboard today:
    fold the two into one, rename the baseline and budget keys (`dashboard/next` to `dashboard`, `next/` to `index.html`).
-7. The old dashboard's `sh_dash_*` keys still read: `sh_dash_last` (the hub tab you left open), `sh_dash_flap`. The old
-   page's hub-card state (`sh_dash_open:*`) is no longer used; nothing needs migrating.
+7. The old dashboard's keys still read: `sh_dash_last` (the hub you opened last) and `sh_dash_flap` (the countdown's
+   last value). `sh_dash_arcade_hub` and `sh_dash_arcade_game` are no longer used; nothing needs migrating.
 8. `get_widget_bootstrap_v2` and the `_v2` boards are called first and fall back to today's functions when the database
    doesn't have them (`rpc2` in `widget/dash.js`); once migration_v54 is applied the fallback can come out.
 
-**About page: Part 1, the dashboard** (rewrite these entries; nothing here is a secret, so no `spoil`)
+**About page: Part 1, the dashboard** (rewrite these entries; nothing here is a secret except the last one)
 
 - **Guided tour**: it no longer asks on your first visit. It's "Take the tour" in the top bar's menu (the three lines),
-  ten stops on the real page. Each hub still has its own.
+  ten stops at most, on the real page. Each hub still has its own.
 - **Your hubs** (replaces "Hub cards" and "Next-exam hero"): every live hub is a tab along the top with its emblem and its
-  exam's countdown, soonest first; the page opens on the hub whose exam is next, or the one you had open last. The open
-  hub shows its drawn scene, the exam's date, the flip countdown, **Start studying**, **Daily drill** with today's status,
-  your progress in it (questions tried and how many right) and what it covers, with its other exams and "Updated" labels.
+  exam's countdown, soonest first, the open one in the hub's color; the page opens on the hub whose exam is next, or the
+  one you had open last. The open hub shows its drawn scene across the page, the exam's date, the days left on a tile
+  that flips like a departure board, **a bead for each day left** (up to two weeks out, ending on the hub's emblem), **a
+  ring for your progress** in it (questions tried, how many right), **Start studying** and **Daily drill** with today's
+  status. Under it: what the hub covers, its other exams, its "Updated" label and its Timmy Time episode when it has one.
   A hub archives itself at 10 pm on its last exam day and moves to **Past hubs** at the bottom for 10 days.
 - **Send luck**: unchanged, under the countdown.
-- **Timmy Time on the dashboard**: a hub with an episode shows its Timmy Time card beside what the hub covers.
 - **You** (replaces "Greeting and name", "Your rank card" and "Timmy Tooth's house", now one card): the name classmates
   see with "Pick your name" / "Change name", Timmy's house (or Timmy waiting to meet you), your handpiece medallion, rank,
-  XP, place in the class and the bar to the next level, your mastery medals, your day streak and this week's answers.
-  The top bar shows the streak and rank too. The two-weeks strip of study days is gone (the hub's Home has the days).
-- **The class**: one board with three lists, one at a time: **Ranks** (top 10, with every rank from Stone to Dark Matter
-  folded under it), **Study streaks**, **Arcade** (pick a hub and a game). **Correct in a row is gone.** "When people
-  study" is one line under the board (the busiest hour and how now compares) in place of the chart. The Golden Probe line
-  is under it when someone has won today.
-- **Studying now**: the count in the top bar, and each hub's tab panel shows how many are in that hub.
-- **Past hubs** (replaces "Hub recaps" and the greyed-out cards): the recap slideshow with Save image, and a short card for
-  each hub that just closed with its Check in button.
+  XP, place in the class and the bar to the next level, your mastery medals, your day streak with **the last seven days
+  as dots** and this week's answers. The top bar shows the streak and rank too. The two-weeks strip is gone.
+- **The class**: **Studying right now** is a tile at the top: the live count with a pulsing dot and a chip for each hub
+  someone is in (the count is in the top bar too). Under it the leaderboard, one list at a time: **Ranks** (top 10, with
+  every rank from Stone to Dark Matter folded under it) or **Study streaks**, **the top three on a podium**.
+  **Gone from the dashboard** (Sam, 2026-11-11): correct-in-a-row, the arcade high scores (each hub's Arcade keeps its
+  own boards) and the "When people study" chart. The Golden Probe line is under the board when someone has won today.
+- **Past hubs** (replaces "Hub recaps" and the greyed-out cards): each finished exam's recap is **a live infographic**
+  in that hub's color, one exam at a time (chips switch between them): hours studied together, classmates, questions
+  answered and how many right, counting up as you reach them; hours per day as bars that grow, the exam day marked; the
+  day before the exam, the busiest hour, night owls, regulars, and "the one that got us" when there is one. **Save
+  image** still gives the shareable picture. Totals only, no names. Under it, a short card for each hub that just closed
+  with its Check in button.
+- **What's new is gone** (Sam, 2026-11-11: people don't read it). Each hub still says when it was last updated, and a
+  tab left open still offers "a new version is ready". Take the "What's new" entry off the About page.
 - **Exam check-ins**: the button is under the open hub from 8 am on exam day, and on the hub's card in Past hubs after it
   archives; the 10 pm pop-up is unchanged. It waits while a reply to your report is on screen.
 - **Settings and theme**: the gear opens Settings: Theme, Text size, **Focus mode** (the same switch as in a hub: no
-  streak, XP, ranks, boards or Timmy), and the extras (sounds, haptics, celebration cards, Timmy, the TIMMY show, luck
-  bursts, easter eggs). Light or dark is also in the top bar's menu. **Font, Background sound and Accent are gone from the
-  dashboard** (the redesign has one typeface; the hub's own Settings draft is in phase 1's list above).
-- **The class's easter egg** (inside a `spoil`): tapping a hub's drawn scene shows its class's line, where tapping the
-  class icon did.
+  streak, XP, ranks, boards or Timmy), and the extras (Timmy, hidden secrets, plaque bosses, the Tooth Fairy, the Golden
+  Probe, the Full Arch chart, tactical nukes, rank-up and trophy cards, streak cheers, answer animations). Light or dark is
+  also in the top bar's menu. **Font, Background sound and Accent are gone from the dashboard** (the redesign has one
+  typeface; the hub's own Settings draft is in phase 1's list above).
 - **A top bar that fits your screen**: on a narrow phone or at the largest text the dashboard's bar drops, in order, the
   studying-now count, the words "Study Hubs" and the rank badge; nothing runs off the screen.
-- Counts to recheck in that part: "arcade high scores for both hubs" becomes "for every hub with an arcade".
+- **The class's easter egg** (inside a `spoil`): tapping a hub's drawn scene shows its class's line, where tapping the
+  class icon did.
+
+**Other notes that change with it**
+
+- [ship-a-change](../how-to/ship-a-change.md) step 7 and [github-is-the-source-of-truth](../rules/github-is-the-source-of-truth.md)
+  step 4 say the site changelog is "shown on the dashboard": after the release it only drives each hub's "Updated" label
+  (and the admin page). Keep logging to it; reword both.
+- [repo-map](../reference/repo-map.md): the `ARCADES` list is no longer read by the dashboard (the arcade boards are in the
+  hubs); drop it from `hubs.js` at the switch unless something else reads it.
 
 ## Log
 

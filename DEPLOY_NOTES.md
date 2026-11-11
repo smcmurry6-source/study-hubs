@@ -93,6 +93,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   four L10 lines from the full notes), so `refresh-full.mp3` and `refresh-plain.mp3` were regenerated. An R `focus` Exam Hint, Home's
   chips and exam card, `EXAM_INFO`, the hints banner, the mock's intro and the About page say which four. `next/` rebuilt (its
   `SH_HUB` words too). No schema change.
+- **2026-11-11 (redesign phase 3: the new dashboard, beside the live one, Claude Code)** — Nothing students see changes.
+  `next/index.html` is the dashboard on the design system (`widget/dash.js`, `widget/dash.css`); outside a preview it sends
+  visitors to the live dashboard, and it takes `index.html`'s place at the redesign's release. The hubs are tabs with their
+  emblems and colors; the open hub is a stage (its drawn scene, the days left on a flip tile with a bead for each day, a
+  progress ring, Start studying, Daily drill, luck); one "you" card (Timmy's house, rank, mastery medals, streak with the
+  week as dots); the class panel has the live "studying right now" count with a chip for each hub and the leaderboard
+  (ranks or streaks, the top three on a podium); Past hubs shows each finished exam's recap as a live infographic (Save
+  image still draws the picture with `widget/recap.js`) and the hubs that just closed. **Out, on Sam's calls:** correct in
+  a row, the What's new log, the arcade scores and the When people study chart. Check-ins, surveys, the Inbox, luck, the
+  name picker, Settings with Focus mode and the tour (from the menu, its own steps through `window.SH_TOUR.steps`) are the
+  live dashboard's logic, moved over. Its hub list is `next/hubs.js`, copied from `index.html` by
+  `tools/dash-next/build.mjs` (`--check` in CI) until the release; `widget/hub-art/dash.js` holds every hub's emblem and
+  tint (from `tools/figures/site/build.mjs`). `migration_v54.sql` is still pending: the page calls the `_v2` functions with
+  a fallback to today's, and the preview stubs them. The smoke test, `a11y.js`, `perf.js`, `matrix.js` and the syntax check
+  cover the page; the new hubs' Back button goes to it. The idea board is a second session's (its slot is `#ideas`); Timmy's
+  place and visiting (`data-visit` on the board's rows) are phase 4's. Drafts for the About page and the switch are in the
+  [release note](vault/tasks/2026-11-06-redesign-release.md); bugs BUG-060 to BUG-064 found and fixed while building.
 - **2026-11-11 (Occlusion: `mo-10` retired, Claude Code)** — Sam: "Retire mo-10 if it is redundant ... it is okay to test the
   same concept multiple ways. just not for every single question and not more than twice." It was (report #40): the final's
   lectures asked the same fact, about 10% of people have MIP coincident with CR closure, three times. `mo-10` came out with its

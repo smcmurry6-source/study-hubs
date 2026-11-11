@@ -3,13 +3,17 @@
    that page sends the visitor to the live dashboard, so nothing here reaches the class before then.
 
    What it draws, on the hub engine's design system (widget/hub.css, with widget/dash.css for the layout):
-   - the hubs as tabs (emblem, tint, days to the exam), the next exam's first, and under them that hub's panel: its
-     masthead scene, the countdown, Start studying, the Daily drill, Timmy Time, exam-day luck, your progress, check-ins;
+   - the hubs as tabs (emblem, tint, days to the exam), the next exam's first, and under them that hub's stage: its
+     masthead scene, the countdown on a tile with a bead for each day left, your progress ring, Start studying, the
+     Daily drill, exam-day luck; then Timmy Time, what the hub covers and its check-ins;
    - one "you" card: your name, Timmy's house (widget/pet.js draws it; Timmy's place takes that spot in phase 4), your
-     handpiece rank, mastery medals and day streak;
-   - the class board (ranks, study streaks, arcade high scores) with When people study as a line under it;
-   - the idea board's slot (widget/ideas.js fills #ideas), hub recaps and archived hubs, What's new.
-   The check-in, survey, name, luck, archive and changelog logic is the live dashboard's own, moved here unchanged.
+     handpiece rank, mastery medals, day streak and the week as dots;
+   - the class: who is studying right now (the live count and a chip for each hub someone is in), then the board
+     (ranks or study streaks) with the top three on a podium;
+   - the idea board's slot (widget/ideas.js fills #ideas), then past hubs: each finished exam's recap as a live
+     infographic, and the hubs that just closed.
+   No What's new list, no arcade scores and no "When people study" chart (Sam, 2026-11-11); a hub's "Updated" label still reads the changelog.
+   The check-in, survey, name, luck and archive logic is the live dashboard's own, moved here unchanged.
 
    Its data is next/hubs.js (window.SH_DASH_DATA), written from index.html by tools/dash-next/build.mjs until the release.
    The game layer's functions (migration_v54, not applied until the release) are called as <name>_v2 with today's function
@@ -26,7 +30,7 @@
   docEl.classList.add("shx", "sh-dash");
 
   /* ---------- the data (next/hubs.js) ---------- */
-  var CLASSES = D.classes, HUBS = D.hubs.slice(), ARCHIVED_HUBS = D.archived.slice(), HUB_LABEL = D.labels || {}, ARCADES = D.arcades || [];
+  var CLASSES = D.classes, HUBS = D.hubs.slice(), ARCHIVED_HUBS = D.archived.slice(), HUB_LABEL = D.labels || {};
   var CHECKIN_HOUR = D.checkinHour, ARCHIVE_HOUR = D.archiveHour, CARD_DAYS = D.cardDays, DEBRIEF_DAYS = D.debriefDays;
   var NEXT = {}; (D.next || []).forEach(function(id){ NEXT[id] = 1; });
 
@@ -249,15 +253,20 @@
           '<ul class="dx-stats" id="youStats"></ul>' +
         "</section>" +
         '<section class="panel dx-class" id="class" aria-labelledby="classH">' +
-          '<div class="dx-classhead"><h2 id="classH">The class</h2>' +
-            '<span class="seg" role="group" aria-label="Class board" id="boardSeg">' +
-              [["ranks", "Ranks"], ["streaks", "Study streaks"], ["arcade", "Arcade"]].map(function(b, i){ return '<button type="button" data-board="' + b[0] + '" aria-pressed="' + (i === 0) + '">' + b[1] + "</button>"; }).join("") +
+          '<h2 id="classH">The class</h2>' +
+          /* who has a hub open this minute */
+          '<div class="dx-now" id="now" role="group" aria-labelledby="nowH">' +
+            '<h3 class="sr" id="nowH">Studying right now</h3>' +
+            '<p class="dx-now-num"><i class="dx-pulse" aria-hidden="true"></i><b class="num" id="nowCount">–</b><span>studying right now</span></p>' +
+            '<ul class="dx-now-hubs" id="nowHubs"></ul>' +
+          "</div>" +
+          '<div class="dx-classhead"><h3 id="boardH">Leaderboard</h3>' +
+            '<span class="seg" role="group" aria-label="Leaderboard" id="boardSeg">' +
+              [["ranks", "Ranks"], ["streaks", "Study streaks"]].map(function(b, i){ return '<button type="button" data-board="' + b[0] + '" aria-pressed="' + (i === 0) + '">' + b[1] + "</button>"; }).join("") +
             "</span></div>" +
           '<p class="note" id="boardNote"></p>' +
-          '<div class="dx-arcpick" id="arcadePick" hidden></div>' +
           '<div id="board" aria-live="polite"><p class="note">Loading…</p></div>' +
           '<details class="dx-ladder" id="ladderFold" hidden><summary>' + icon("chevron", 18, "rot") + "Every rank, Stone to Dark Matter</summary><div class=\"dx-rungs\" id=\"rankLadder\"></div></details>" +
-          '<p class="dx-line" id="hoursLine" hidden></p>' +
           '<p class="dx-line" id="goldenLine" hidden></p>' +
         "</section>" +
       "</div>" +
@@ -266,19 +275,9 @@
       '<section class="dx-section" id="past" aria-labelledby="pastH" hidden>' +
         '<h2 id="pastH">Past hubs</h2><p class="note" id="pastNote"></p>' +
         '<div class="dx-past">' +
-          '<div class="rcs" id="rcs" hidden>' +
-            '<div class="rcs-stage" id="rcsStage" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Hub recaps. Use the arrow keys to switch."></div>' +
-            '<div class="rcs-side"><h3 class="rcs-title" id="rcsTitle"></h3><p class="rcs-sub" id="rcsSub" aria-live="polite"></p>' +
-              '<div class="rcs-ctl"><button class="dx-ib" id="rcsPrev" type="button" aria-label="Previous recap">' + icon("chevron", 20, "flip") + '</button><span class="note num" id="rcsCount"></span>' +
-              '<button class="dx-ib" id="rcsNext" type="button" aria-label="Next recap">' + icon("chevron", 20) + '</button><a class="btn" id="rcsSave" download>Save image</a></div>' +
-              '<ul class="rcs-list" id="rcsList"></ul></div>' +
-          "</div>" +
+          '<div class="rc" id="rc" hidden><div class="rc-chips" id="rcChips" role="tablist" aria-label="Finished exams"></div><div class="rc-body tinted" id="rcBody" role="tabpanel"></div></div>' +
           '<ul class="dx-archived" id="archived"></ul>' +
         "</div>" +
-      "</section>" +
-      '<section class="dx-section" id="changelog" aria-labelledby="newH" hidden>' +
-        '<h2 id="newH">What\'s new</h2><p class="note">Every update goes live at this same link.</p>' +
-        '<ol class="dx-tl is-collapsed" id="timeline"></ol><button class="btn" id="tlMore" type="button" hidden>Show earlier updates</button>' +
       "</section>" +
       '<footer class="dx-foot"><p>Bookmark this page, not a hub: new hubs show up here as each exam gets close.</p>' +
         '<p>Built by Sam for the D2 class at UAB · <a href="' + esc(C.about || ROOT + "about/") + '">About the hubs</a> · <a href="' + esc(C.review || ROOT + "review/") + '">Review</a></p></footer>' +
@@ -406,15 +405,37 @@
   }
 
   var liveBy = {};
+  /* the count in the bar and the tile in the class panel: the total, and a chip for each hub someone is in */
+  function paintNow(){
+    var t = 0; Object.keys(liveBy).forEach(function(k){ t += liveBy[k] || 0; });
+    $("liveCount").textContent = t; $("nowCount").textContent = t;
+    var live = HUBS.filter(function(h){ return liveBy[h.id]; });
+    $("nowHubs").innerHTML = live.length ? live.map(function(h){
+      return "<li>" + emblem(h.id, "dx-emb") + '<span><b class="num">' + liveBy[h.id] + "</b> in " + esc(hubName(h)) + "</span></li>";
+    }).join("") : '<li class="is-none">Nobody has a hub open this minute. Be the first.</li>';
+    $("now").classList.toggle("is-live", t > 0);
+  }
   function liveLine(hub){
     var n = liveBy[hub.id];
     return n ? '<i class="dx-dot" aria-hidden="true"></i><b class="num">' + n + "</b> studying " + esc(hubName(hub)) + " right now" : "";
   }
-  /* your progress in the open hub: a line and a bar under the buttons; nothing when this device has no answers in it yet */
-  function progressHTML(hub){
-    var p = readProgress(hub); if (!p) return "";
-    return '<div class="dx-prog"><p class="note"><b class="num">' + num(p.seen) + "</b> " + (p.seen === 1 ? "question" : "questions") + ' tried · <b class="num">' + p.pct + "%</b> " + esc(p.pctLabel) + (p.best ? " · best run " + p.best : "") + "</p>" +
-      '<div class="dx-bar2" role="img" aria-label="' + p.pct + '% ' + esc(p.pctLabel) + '"><i data-w="' + p.pct + '"></i></div></div>';
+  /* the days left as beads: today first, the exam last (the hub's emblem). Up to two weeks out. */
+  function trackHTML(hub, x, d){
+    if (!x || d == null || d < 1 || d > 14) return "";
+    var s = "";
+    for (var i = 0; i <= d; i++) s += '<li class="' + (i === 0 ? "is-today" : i === d ? "is-exam" : "") + '">' + (i === d ? emblem(hub.id, "dx-emb") : "") + "</li>";
+    return '<div class="dx-track" aria-hidden="true"><ol>' + s + "</ol><p><span>Today</span><span>" + esc(shortDate(x.date)) + "</span></p></div>";
+  }
+  /* your progress in the open hub, as a ring */
+  var RING = 2 * Math.PI * 34;
+  function ringHTML(hub){
+    var p = readProgress(hub), pct = p ? p.pct : 0;
+    return '<div class="dx-ring" role="img" aria-label="' + (p ? pct + "% " + esc(p.pctLabel) + ", " + num(p.seen) + " questions tried" : "No questions tried in this hub yet") + '">' +
+      '<span class="dx-ring-dial"><svg viewBox="0 0 80 80" aria-hidden="true" focusable="false"><circle class="trk" cx="40" cy="40" r="34"/>' +
+        '<circle class="arc" cx="40" cy="40" r="34" stroke-dasharray="' + RING.toFixed(1) + '" stroke-dashoffset="' + RING.toFixed(1) + '" data-to="' + (RING * (1 - pct / 100)).toFixed(1) + '"/></svg>' +
+        '<span class="dx-ring-in"><b class="num">' + (p ? pct + "%" : "0") + "</b><small>" + (p ? "right" : "tried") + "</small></span></span>" +
+      '<span class="dx-ring-cap">' + (p ? '<b class="num">' + num(p.seen) + "</b> " + (p.seen === 1 ? "question" : "questions") + " tried" + (p.best ? "<br>Best run " + p.best : "")
+        : "Your progress in this hub shows here") + "</span></div>";
   }
   /* Timmy Time: a hub's audio review episode (hub.podcast = { name, sub }), on the hub's color with the host in headphones */
   function podHTML(hub){
@@ -437,18 +458,24 @@
     el.className = "dx-hub tinted"; el.setAttribute("style", tintVars(hub.id));
     el.setAttribute("role", "tabpanel"); el.setAttribute("aria-labelledby", "tab-" + hub.id); el.setAttribute("data-hub", hub.id);
     el.innerHTML =
-      '<div class="dx-hero">' +
+      '<div class="dx-stage">' +
         '<button type="button" class="dx-scene" data-egg="' + esc(hub.cls) + '" aria-label="' + esc(cls.name || hub.title) + ' (tap for a surprise)"><span class="dx-scene-in" id="hubScene"></span></button>' +
-        '<div class="dx-exam">' +
-          '<p class="dx-when">' + esc(x ? longDate(x.date) + " · " + (x.code || hub.code) : hub.code) + "</p>" +
-          '<h3 class="dx-title">' + esc(x ? x.name : hub.title) + "</h3>" +
-          (x ? '<p class="dx-count"><b class="num flap" data-flap="' + (d === 0 ? "Today" : d) + '">' + (d === 0 ? "Today" : d) + "</b>" + (d === 0 ? "" : " <span>" + (d === 1 ? "day to go" : "days to go") + "</span>") + "</p>"
-             : '<p class="dx-count dx-count-none"><span>' + esc(opened ? "You last opened this " + opened : "No exam ahead in this hub") + "</span></p>") +
-          '<p class="dx-livehub" id="hubLive">' + liveLine(hub) + "</p>" +
-          '<div class="dx-actions"><a class="btn btn-primary dx-start" href="' + esc(hubHref(hub)) + '" data-hub="' + esc(hub.id) + '">' + (p ? "Continue studying" : "Start studying") + icon("chevron", 18) + "</a>" + drillHTML(hub) + "</div>" +
-          progressHTML(hub) +
-          (x && luckTime(d) ? '<div class="dx-luck" id="heroLuck"></div>' : "") +
+        '<div class="dx-stagebody">' +
+          '<div class="dx-exam">' +
+            '<p class="dx-when">' + esc(x ? longDate(x.date) + " · " + (x.code || hub.code) : hub.code) + "</p>" +
+            '<h3 class="dx-title">' + esc(x ? x.name : hub.title) + "</h3>" +
+            '<div class="dx-countrow">' +
+              (x ? '<p class="dx-count"><b class="num flap" data-flap="' + (d === 0 ? "Today" : d) + '">' + (d === 0 ? "Today" : d) + "</b>" + (d === 0 ? "" : " <span>" + (d === 1 ? "day to go" : "days to go") + "</span>") + "</p>"
+                 : '<p class="dx-count dx-count-none"><span>' + esc(opened ? "You last opened this " + opened : "No exam ahead in this hub") + "</span></p>") +
+              trackHTML(hub, x, d) +
+            "</div>" +
+            '<p class="dx-livehub" id="hubLive">' + liveLine(hub) + "</p>" +
+          "</div>" +
+          '<div class="dx-go">' + ringHTML(hub) +
+            '<div class="dx-actions"><a class="btn btn-primary dx-start" href="' + esc(hubHref(hub)) + '" data-hub="' + esc(hub.id) + '">' + (p ? "Continue studying" : "Start studying") + icon("chevron", 18) + "</a>" + drillHTML(hub) + "</div>" +
+          "</div>" +
         "</div>" +
+        (x && luckTime(d) ? '<div class="dx-luck" id="heroLuck"></div>' : "") +
       "</div>" +
       '<div class="dx-hubrow">' + podHTML(hub) +
         '<div class="dx-card dx-about"><h3>' + esc(hub.title) + "</h3>" +
@@ -470,7 +497,7 @@
     luckFor = x && luckTime(d) ? { hub: hub.id, date: x.date, name: x.name, d: d } : null;
     drawLuck(); loadLuck();
     applyUpdated();
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){ qa(".dx-bar2 i[data-w]", el).forEach(function(i){ i.style.width = i.getAttribute("data-w") + "%"; }); }); });
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){ var arc = q(".dx-ring .arc", el); if (arc) arc.style.strokeDashoffset = arc.getAttribute("data-to"); }); });
   }
   /* the class's easter egg, on the hub's scene (the live dashboard has it on the class icon) */
   document.addEventListener("click", function(e){
@@ -499,7 +526,7 @@
     showPast();
   }
   function showPast(){
-    var arch = !!$("archived").children.length, rec = !$("rcs").hidden;
+    var arch = !!$("archived").children.length, rec = !$("rc").hidden;
     $("past").hidden = !arch && !rec;
     $("pastNote").textContent = rec ? "How the class studied for each exam that's done" + (arch ? ", and the hubs that just closed." : ".") : "Hubs that closed after their exam.";
   }
@@ -912,9 +939,13 @@
     var streak = 0, j = by[keys[0]] ? 0 : 1;
     while (j < keys.length && by[keys[j]]) { streak++; j++; }
     keys.slice(0, 7).forEach(function(k){ if (by[k]) { a7 += by[k].a || 0; c7 += by[k].c || 0; } });
+    var week = keys.slice(0, 7).reverse(), on7 = week.filter(function(k){ return by[k]; }).length;
+    var dots = '<span class="dx-week" aria-hidden="true">' + week.map(function(k, i){
+      return '<i class="' + (by[k] ? "on" : "") + (i === 6 ? " today" : "") + '">' + "SMTWTFS".charAt(parseYmd(k).getDay()) + "</i>"; }).join("") + "</span>";
     $("youStats").innerHTML =
-      '<li class="dx-stat s-flame">' + flame(streak) + '<span><b class="num">' + streak + "</b> " + (streak === 1 ? "day" : "days") + "<small>" + (streak ? "Study streak" : "Answer one question to start a streak") + "</small></span></li>" +
-      (weekSource === "server" ? '<li class="dx-stat"><span><b class="num">' + num(a7) + "</b> " + (a7 === 1 ? "answer" : "answers") + "<small>This week" + (a7 ? ", " + Math.round(c7 / a7 * 100) + "% right" : "") + "</small></span></li>" : "");
+      '<li class="dx-stat s-flame">' + flame(streak) + '<span><b class="num">' + streak + "</b> " + (streak === 1 ? "day" : "days") + "<small>" + (streak ? "Study streak" : "Answer one question to start a streak") + "</small></span>" +
+        dots + '<span class="sr">You studied on ' + on7 + " of the last 7 days.</span></li>" +
+      (weekSource === "server" ? '<li class="dx-stat s-week"><span><b class="num">' + num(a7) + "</b> " + (a7 === 1 ? "answer" : "answers") + "<small>This week" + (a7 ? ", " + Math.round(c7 / a7 * 100) + "% right" : "") + "</small></span></li>" : "");
     var m = $("dxStreak");
     /* read out in full whatever the bar has room to show (the words fold away on a phone) */
     m.innerHTML = '<span class="sr">Your study streak: ' + streak + (streak === 1 ? " day" : " days") + '</span><span class="dx-seen" aria-hidden="true">' + flame(streak) + '<b class="num">' + streak + '</b><span class="dx-fold">' + (streak === 1 ? "day" : "days") + "</span></span>";
@@ -964,12 +995,11 @@
     panel.addEventListener("focusin", open); panel.addEventListener("pointerdown", open);
   }
 
-  /* ---------- the class board: ranks, study streaks, arcade high scores (one at a time) ---------- */
+  /* ---------- the class board: ranks or study streaks (one at a time), the top three on a podium ---------- */
   var boardSb = null, boardNow = "ranks", boardOpen = false;
   var BOARD_NOTE = {
     ranks: "XP from every hub: 10 for a new question right, 2 for a repeat, 1 for trying, 20 per day studied. Every rank has levels I, II and III.",
-    streaks: "Days in a row with at least one answer.",
-    arcade: ""
+    streaks: "Days in a row with at least one answer."
   };
   function rankMini(t, lv){ return window.shRanks && t != null ? window.shRanks.mini(t, lv) : ""; }
   /* a row's name with its mastery medals (`flair`) */
@@ -982,11 +1012,18 @@
     return "<li" + (r.is_me ? ' class="me"' : "") + (r.visit ? ' data-visit="' + esc(r.visit) + '"' : "") + '><span class="rk num">' + place + '</span><span class="nm">' + rankMini(r.tier, r.level) + nameFlair(r, r.is_me ? " (you)" : "") + "</span>" +
       (mid ? '<span class="lvl">' + esc(mid) + "</span>" : "") + '<span class="val num">' + val + "<small>" + unit + "</small></span></li>";
   }
+  /* the top three stand on a podium (first in the middle, by CSS order), everyone after them in the list */
+  function podiumHTML(rows, art, val){
+    return '<ol class="dx-podium">' + rows.slice(0, 3).map(function(r, i){
+      return '<li class="p' + (i + 1) + (r.is_me ? " me" : "") + '"' + (r.visit ? ' data-visit="' + esc(r.visit) + '"' : "") + '><span class="dx-pod-who">' + art(r) + "</span>" +
+        '<span class="nm">' + nameFlair(r, r.is_me ? " (you)" : "") + '</span><span class="val num">' + val(r) + '</span><span class="dx-step"><span class="sr">Place </span><b class="num">' + (i + 1) + "</b></span></li>";
+    }).join("") + "</ol>";
+  }
   function boardMsg(msg){ $("board").innerHTML = '<p class="note">' + esc(msg || "Couldn't reach the class data just now. Reload to try again.") + "</p>"; }
   function drawBoard(){
     var sb = boardSb, which = boardNow;
     $("boardNote").textContent = BOARD_NOTE[which]; $("boardNote").hidden = !BOARD_NOTE[which];
-    $("arcadePick").hidden = which !== "arcade"; $("ladderFold").hidden = which !== "ranks" || !window.shRanks;
+    $("ladderFold").hidden = which !== "ranks" || !window.shRanks;
     if (!sb) { boardMsg(); return; }
     $("board").innerHTML = '<p class="note">Loading…</p>';
     if (which === "ranks") {
@@ -994,7 +1031,10 @@
         if (boardNow !== which) return;
         var rows = (res && res.data) || [], R = window.shRanks;
         if (!rows.length || !R){ boardMsg("No ranks yet. Answer a question in any hub to get your first handpiece."); return; }
-        $("board").innerHTML = '<ol class="dx-board">' + rows.map(function(r){ return rowHTML(r, r.rnk, R.rankName(r.tier, r.level || R.levelFor(r.xp)), num(r.xp), "XP"); }).join("") + "</ol>";
+        var pod = rows.length >= 3, rest = pod ? rows.slice(3) : rows;
+        $("board").innerHTML = (pod ? podiumHTML(rows, function(r){ return R.art(r.tier, 72, { animate: false, level: r.level || R.levelFor(r.xp) }); },
+            function(r){ return num(r.xp) + "<small>XP</small>"; }) : "") +
+          (rest.length ? '<ol class="dx-board"' + (pod ? ' start="4"' : "") + ">" + rest.map(function(r){ return rowHTML(r, r.rnk, R.rankName(r.tier, r.level || R.levelFor(r.xp)), num(r.xp), "XP"); }).join("") + "</ol>" : "");
         var me = rows.filter(function(r){ return r.is_me; })[0];
         $("rankLadder").innerHTML = R.TIERS.map(function(t, i){
           var mine = me && me.tier === i;
@@ -1006,28 +1046,11 @@
         if (boardNow !== which) return;
         var rows = (res && res.data) || [];
         if (!rows.length){ boardMsg("No streaks yet. Answer questions two days in a row to start one."); return; }
-        $("board").innerHTML = '<ol class="dx-board">' + rows.map(function(r, i){ return rowHTML(r, i + 1, "", r.streak, r.streak === 1 ? "day" : "days"); }).join("") + "</ol>";
+        var pod = rows.length >= 3, rest = pod ? rows.slice(3) : rows;
+        $("board").innerHTML = (pod ? podiumHTML(rows, function(r){ return flame(r.streak); }, function(r){ return r.streak + "<small>" + (r.streak === 1 ? "day" : "days") + "</small>"; }) : "") +
+          (rest.length ? '<ol class="dx-board"' + (pod ? ' start="4"' : "") + ">" + rest.map(function(r, i){ return rowHTML(r, i + (pod ? 4 : 1), "", r.streak, r.streak === 1 ? "day" : "days"); }).join("") + "</ol>" : "");
       }, function(){ if (boardNow === which) boardMsg(); });
-    } else drawArcade();
-  }
-  function drawArcade(){
-    var sb = boardSb, hk = "sh_dash_arcade_hub", key = "sh_dash_arcade_game", pick = $("arcadePick");
-    if (!ARCADES.length) { boardMsg("No arcade scores yet."); return; }
-    var hubSel = ls(hk) || (selected && ARCADES.some(function(a){ return a.hub === selected; }) ? selected : ARCADES[0].hub);
-    if (!ARCADES.some(function(a){ return a.hub === hubSel; })) hubSel = ARCADES[0].hub;
-    var a = ARCADES.filter(function(x){ return x.hub === hubSel; })[0], game = ls(key + ":" + a.hub) || a.games[0][0];
-    if (!a.games.some(function(g){ return g[0] === game; })) game = a.games[0][0];
-    var name = a.games.filter(function(g){ return g[0] === game; })[0][1], money = (a.money || []).indexOf(game) > -1;
-    pick.innerHTML = '<label class="dx-pick"><span>Arcade</span><span class="dx-select"><select id="arcHub" aria-label="Arcade">' + ARCADES.map(function(x){ return '<option value="' + esc(x.hub) + '"' + (x.hub === hubSel ? " selected" : "") + ">" + esc(x.title) + "</option>"; }).join("") + "</select>" + icon("chevron", 18, "rot") + "</span></label>" +
-      '<label class="dx-pick"><span>Game</span><span class="dx-select"><select id="arcGame" aria-label="Arcade game">' + a.games.map(function(g){ return '<option value="' + esc(g[0]) + '"' + (g[0] === game ? " selected" : "") + ">" + esc(g[1]) + "</option>"; }).join("") + "</select>" + icon("chevron", 18, "rot") + "</span></label>";
-    $("arcHub").addEventListener("change", function(e){ lsSet(hk, e.target.value); drawBoard(); });
-    $("arcGame").addEventListener("change", function(e){ lsSet(key + ":" + a.hub, e.target.value); drawBoard(); });
-    rpc2(sb, "get_arcade_leaderboard", { p_hub: a.hub, p_game: game, p_visitor: VISITOR || null, p_limit: 5 }).then(function(res){
-      if (boardNow !== "arcade") return;
-      var rows = (res && res.data) || [];
-      if (!rows.length){ boardMsg("No " + name + " scores yet. Finish a game in the hub's Arcade to claim first place."); return; }
-      $("board").innerHTML = '<ol class="dx-board">' + rows.map(function(r){ return rowHTML(r, r.rnk, "", (money ? "$" : "") + num(r.best), r.plays + (r.plays == 1 ? " play" : " plays")); }).join("") + "</ol>";
-    }, function(){ if (boardNow === "arcade") boardMsg(); });
+    }
   }
   $("boardSeg").addEventListener("click", function(e){
     var b = e.target.closest("[data-board]"); if (!b || b.getAttribute("data-board") === boardNow) return;
@@ -1036,98 +1059,106 @@
     boardOpen = true; drawBoard();
   });
 
-  /* ---------- hub recaps: archived hubs' recap images (published from the admin page), drawn with widget/recap.js and
-     played as a slideshow ---------- */
+  /* ---------- hub recaps: how the class studied for each finished exam (published from the admin page), as a live
+     infographic: one hub at a time, its numbers counting up and its hours-per-day chart drawing itself when it comes
+     into view. "Save image" draws the shareable picture with widget/recap.js, loaded only then. Totals only: no names. ---------- */
   function loadRecaps(sb, bootstrap){
-    function show(rows){
-      rows = Array.isArray(rows) ? rows : [];
-      if (!rows.length) return;
-      if (!document.getElementById("recapFonts")) {
-        var l = document.createElement("link"); l.id = "recapFonts"; l.rel = "stylesheet";
-        l.href = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@500;600;700&display=swap";
-        document.head.appendChild(l);
-      }
-      var fonts = function(){ return document.fonts ? Promise.race([
-        Promise.all(["600 40px Fraunces", "500 20px 'Work Sans'", "600 20px 'Work Sans'", "700 20px 'Work Sans'"].map(function(f){ return document.fonts.load(f); })),
-        new Promise(function(r){ setTimeout(r, 2500); })]).catch(function(){}) : Promise.resolve(); };
-      loadScriptOnce(WIDGET + "recap.js").then(fonts).then(function(){ startRecapShow(rows); }, function(){});
-    }
+    function show(rows){ rows = Array.isArray(rows) ? rows.filter(function(r){ return r && r.data; }) : []; if (rows.length) startRecaps(rows); }
     function remote(){ sb.rpc("get_published_recaps").then(function(res){ show(res && !res.error ? res.data : null); }, function(){}); }
     bootstrap.then(function(data){ if (data && Array.isArray(data.recaps)) show(data.recaps); else remote(); }, remote);
   }
-  function startRecapShow(rows){
-    var R = window.shRecap; if (!R || !rows.length) return;
-    var stage = $("rcsStage"), list = $("rcsList"), wrap = $("rcs"), ms = 8000, cur = -1, paused = 0, hidden = false, still = reduced();
-    var slides = rows.map(function(row){
-      var c = document.createElement("canvas");
-      R.draw(c, row.data, { title: row.title, color: row.color, names: row.names, question: row.question, footnote: row.footnote });
-      var im = new Image(), d = row.data || {};
-      im.className = "rcs-slide"; im.decoding = "async"; im.draggable = false;
-      im.alt = row.title + " recap: " + num(Math.round((d.minutes || 0) / 60)) + " hours studied by " + (d.people || 0) + " classmates, " +
-        num(d.answers) + " questions answered, " + (d.answers ? Math.round(d.correct / d.answers * 100) : 0) + "% correct.";
-      im.src = c.toDataURL("image/png");
-      im.dataset.ratio = c.height / c.width;
-      im.setAttribute("aria-hidden", "true");
-      stage.appendChild(im);
-      return { row: row, img: im };
-    });
-    list.innerHTML = slides.map(function(s, i){
-      var d = s.row.data || {};
-      return '<li><button type="button" data-rc="' + i + '"><span class="dot" style="background:' + esc(s.row.color || "#999") + '"></span>' + esc(s.row.title) +
-        '<span class="when">' + (d.exam_day ? esc(parseYmd(String(d.exam_day).slice(0, 10)).toLocaleDateString(undefined, { month: "short", day: "numeric" })) : "") + '</span><span class="bar"></span></button></li>';
-    }).join("");
-    wrap.style.setProperty("--rcs-ms", ms + "ms");
-    var single = slides.length < 2;
-    $("rcsPrev").hidden = $("rcsNext").hidden = $("rcsCount").hidden = single; list.hidden = single;
-    function fit(){ var s = slides[cur]; if (s && stage.clientWidth) stage.style.height = Math.round(stage.clientWidth * +s.img.dataset.ratio) + "px"; }
-    function go(i, dir){
-      i = (i + slides.length) % slides.length; if (i === cur) return;
-      var prev = slides[cur], next = slides[i];
-      if (dir === undefined) dir = i > cur ? 1 : -1;
-      /* park the incoming slide on the side it enters from, then let both transition */
-      next.img.classList.remove("is-before", "is-active");
-      if (dir < 0) next.img.classList.add("is-before");
-      void next.img.offsetWidth;
-      if (prev) { prev.img.classList.remove("is-active"); prev.img.classList.toggle("is-before", dir > 0); prev.img.setAttribute("aria-hidden", "true"); }
-      next.img.classList.remove("is-before"); next.img.classList.add("is-active"); next.img.removeAttribute("aria-hidden");
-      cur = i; fit();
-      var d = next.row.data || {}, acc = d.answers ? Math.round(d.correct / d.answers * 100) : 0;
-      $("rcsCount").textContent = (i + 1) + " of " + slides.length;
-      $("rcsTitle").textContent = next.row.title;
-      $("rcsSub").innerHTML = "<b>" + num(Math.round((d.minutes || 0) / 60)) + " hours</b> studied by <b>" + (d.people || 0) + " classmates</b>, " +
-        "<b>" + num(d.answers) + "</b> questions answered at <b>" + acc + "%</b>." +
-        (d.exam_day ? " Exam " + esc(parseYmd(String(d.exam_day).slice(0, 10)).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" })) + "." : "");
-      var save = $("rcsSave"); save.href = next.img.src; save.setAttribute("download", next.row.title.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() + "-recap.png");
-      qa("[data-rc]", list).forEach(function(b){
-        var on = +b.getAttribute("data-rc") === i; b.setAttribute("aria-current", on ? "true" : "false");
-        var bar = q(".bar", b); bar.style.animation = "none"; void bar.offsetWidth; bar.style.animation = "";
-      });
-      if (still && !single) restartTimer();
+  function recapDay(s, long){ return parseYmd(String(s).slice(0, 10)).toLocaleDateString(undefined, long ? { weekday: "long", month: "long", day: "numeric" } : { month: "short", day: "numeric" }); }
+  /* every day from the first to the exam (or the last day studied), with its minutes */
+  function recapDays(d){
+    var by = {}, out = [], end = String(d.exam_day || d.last_day || "").slice(0, 10), cur = parseYmd(String(d.first_day || end).slice(0, 10)), guard = 0;
+    (d.by_day || []).forEach(function(r){ by[String(r.d).slice(0, 10)] = +r.minutes || 0; });
+    if (!end) return out;
+    while (ymd(cur) <= end && guard++ < 60) { out.push({ d: ymd(cur), m: by[ymd(cur)] || 0 }); cur.setDate(cur.getDate() + 1); }
+    return out;
+  }
+  function saveRecap(row, btn){
+    btn.disabled = true;
+    if (!document.getElementById("recapFonts")) {
+      var l = document.createElement("link"); l.id = "recapFonts"; l.rel = "stylesheet";
+      l.href = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@500;600;700&display=swap";
+      document.head.appendChild(l);
     }
-    /* autoplay: the active list item's bar animates for 8 s; when it finishes, advance. Hover, focus or a hidden tab pause it. */
-    var rmTimer = null;
-    function restartTimer(){ clearTimeout(rmTimer); if (!paused && !hidden) rmTimer = setTimeout(function(){ go(cur + 1, 1); }, ms); }
-    list.addEventListener("animationend", function(e){ if (e.animationName === "rcsTimer" && !still) go(cur + 1, 1); });
-    function setPaused(){ wrap.classList.toggle("is-paused", paused > 0 || hidden); if (still) { if (paused || hidden) clearTimeout(rmTimer); else restartTimer(); } }
-    wrap.addEventListener("mouseenter", function(){ paused++; setPaused(); });
-    wrap.addEventListener("mouseleave", function(){ paused = Math.max(0, paused - 1); setPaused(); });
-    wrap.addEventListener("focusin", function(){ paused++; setPaused(); });
-    wrap.addEventListener("focusout", function(){ paused = Math.max(0, paused - 1); setPaused(); });
-    document.addEventListener("visibilitychange", function(){ hidden = document.hidden; setPaused(); });
-    $("rcsPrev").addEventListener("click", function(){ go(cur - 1, -1); });
-    $("rcsNext").addEventListener("click", function(){ go(cur + 1, 1); });
-    list.addEventListener("click", function(e){ var b = e.target.closest("[data-rc]"); if (b) go(+b.getAttribute("data-rc")); });
-    stage.addEventListener("keydown", function(e){
-      if (e.key === "ArrowRight") { e.preventDefault(); go(cur + 1, 1); } else if (e.key === "ArrowLeft") { e.preventDefault(); go(cur - 1, -1); }
+    var fonts = function(){ return document.fonts ? Promise.race([
+      Promise.all(["600 40px Fraunces", "500 20px 'Work Sans'", "600 20px 'Work Sans'", "700 20px 'Work Sans'"].map(function(f){ return document.fonts.load(f); })),
+      new Promise(function(r){ setTimeout(r, 2500); })]).catch(function(){}) : Promise.resolve(); };
+    loadScriptOnce(WIDGET + "recap.js").then(fonts).then(function(){
+      var c = document.createElement("canvas");
+      window.shRecap.draw(c, row.data, { title: row.title, color: row.color, names: row.names, question: row.question, footnote: row.footnote });
+      var a = document.createElement("a"); a.href = c.toDataURL("image/png");
+      a.download = row.title.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() + "-recap.png";
+      document.body.appendChild(a); a.click(); a.remove(); track("recap:save");
+    }).then(function(){ btn.disabled = false; }, function(){ btn.disabled = false; toast("The image didn't load. Try again in a moment."); });
+  }
+  function startRecaps(rows){
+    var chips = $("rcChips"), body = $("rcBody"), wrap = $("rc"), cur = -1, seen = false;
+    chips.innerHTML = rows.map(function(r, i){
+      return '<button type="button" role="tab" class="rc-chip tinted" style="' + tintVars(r.hub) + '" id="rc-tab-' + i + '" data-rc="' + i + '" aria-selected="false" aria-controls="rcBody" tabindex="-1">' +
+        emblem(r.hub, "dx-emb") + "<span><b>" + esc(r.title) + "</b>" + (r.data.exam_day ? "<small>" + esc(recapDay(r.data.exam_day)) + "</small>" : "") + "</span></button>";
+    }).join("");
+    chips.hidden = rows.length < 2;
+    /* numbers count up and bars grow; with reduced motion they are simply there */
+    function play(){
+      var still = reduced();
+      qa("[data-count]", body).forEach(function(el){
+        var to = +el.getAttribute("data-count"), suf = el.getAttribute("data-suffix") || "";
+        if (still || !to) { el.textContent = num(to) + suf; return; }
+        var t0 = null, ms = 900;
+        (function step(t){ if (t0 === null) t0 = t; var k = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - k, 3); el.textContent = num(Math.round(to * e)) + suf; if (k < 1) requestAnimationFrame(step); })(performance.now());
+      });
+      body.classList.add("is-in");
+    }
+    function show(i){
+      i = (i + rows.length) % rows.length; if (i === cur) return; cur = i;
+      var row = rows[i], d = row.data, acc = d.answers ? Math.round(d.correct / d.answers * 100) : 0, days = recapDays(d);
+      var max = days.reduce(function(a, b){ return Math.max(a, b.m); }, 1), peak = days.reduce(function(a, b){ return b.m > a.m ? b : a; }, days[0] || { m: 0 });
+      var byHour = d.by_hour || [], ph = 0; byHour.forEach(function(v, k){ if (v > byHour[ph]) ph = k; });
+      var facts = [];
+      if (d.night_before) facts.push(["The day before the exam", num(Math.round(d.night_before / 60)) + " hours", "from " + num(d.night_before_people) + " people"]);
+      if (byHour.length) facts.push(["Prime time", hourLabel(ph), "the busiest hour of the day"]);
+      if (d.after_midnight) facts.push(["Night owls", num(d.after_midnight), d.after_midnight === 1 ? "person studied after midnight" : "people studied after midnight"]);
+      if (d.regulars) facts.push(["Regulars", num(d.regulars), "studied here on 3 or more days"]);
+      var tq = (d.toughest || [])[0], qq = row.question;
+      body.classList.remove("is-in"); body.setAttribute("style", tintVars(row.hub)); body.setAttribute("aria-labelledby", "rc-tab-" + i);
+      body.innerHTML =
+        '<div class="rc-head">' + emblem(row.hub, "dx-emb") + "<div><h3>" + esc(row.title) + '</h3><p class="note">' +
+          (d.exam_day ? "Exam " + esc(recapDay(d.exam_day, true)) : "") + (d.first_day && (d.exam_day || d.last_day) ? " · studied " + esc(recapDay(d.first_day)) + " to " + esc(recapDay(d.exam_day || d.last_day)) : "") + "</p></div>" +
+          '<button type="button" class="btn rc-save" id="rcSave">Save image</button></div>' +
+        '<ul class="rc-nums">' +
+          '<li><b class="num" data-count="' + Math.round((d.minutes || 0) / 60) + '">' + num(Math.round((d.minutes || 0) / 60)) + '</b><span>hours studied together</span></li>' +
+          '<li><b class="num" data-count="' + (+d.people || 0) + '">' + num(d.people) + '</b><span>classmates</span></li>' +
+          '<li><b class="num" data-count="' + (+d.answers || 0) + '">' + num(d.answers) + '</b><span>questions answered</span></li>' +
+          '<li><b class="num" data-count="' + acc + '" data-suffix="%">' + acc + '%</b><span>answered correctly</span></li></ul>' +
+        (days.length ? '<div class="rc-chart"><h4>Hours per day</h4>' +
+          '<div class="rc-bars" role="img" aria-label="Hours studied each day. The most: ' + num(Math.round(peak.m / 60)) + " hours on " + esc(recapDay(peak.d)) + '.">' +
+            days.map(function(x){
+              var exam = d.exam_day && x.d === String(d.exam_day).slice(0, 10);
+              return '<i class="' + (exam ? "exam" : "") + (x === peak && x.m ? " peak" : "") + '" style="--h:' + (x.m ? Math.max(3, Math.round(x.m / max * 100)) : 0) + '%">' +
+                (x === peak && x.m ? "<em>" + num(Math.round(x.m / 60)) + " h</em>" : "") + "</i>";
+            }).join("") + "</div>" +
+          '<p class="rc-x" aria-hidden="true"><span>' + esc(recapDay(days[0].d)) + "</span><span>" + (d.exam_day ? "Exam day" : esc(recapDay(days[days.length - 1].d))) + "</span></p></div>" : "") +
+        (facts.length ? '<ul class="rc-facts">' + facts.map(function(f){ return "<li><span>" + esc(f[0]) + "</span><b>" + esc(f[1]) + "</b><small>" + esc(f[2]) + "</small></li>"; }).join("") + "</ul>" : "") +
+        (tq && tq.attempts && qq && qq.text ? '<div class="rc-tough"><h4>The one that got us</h4><p class="rc-tough-n"><b class="num">' + Math.round(tq.correct / tq.attempts * 100) + "%</b> got it right</p>" +
+          '<p class="rc-tough-q">' + esc(qq.text) + "</p>" + (qq.answer ? '<p class="note">Answer: ' + esc(qq.answer) + "</p>" : "") + "</div>" : "") +
+        (row.footnote ? '<p class="note rc-foot">' + esc(row.footnote) + "</p>" : "");
+      qa("[data-rc]", chips).forEach(function(b){ var on = +b.getAttribute("data-rc") === i; b.setAttribute("aria-selected", String(on)); b.tabIndex = on ? 0 : -1; });
+      $("rcSave").addEventListener("click", function(e){ saveRecap(row, e.currentTarget); });
+      if (seen) requestAnimationFrame(function(){ requestAnimationFrame(play); });
+    }
+    chips.addEventListener("click", function(e){ var b = e.target.closest("[data-rc]"); if (b) { track("recap:hub"); show(+b.getAttribute("data-rc")); } });
+    chips.addEventListener("keydown", function(e){
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      e.preventDefault(); show(cur + (e.key === "ArrowRight" ? 1 : -1)); var b = q('[data-rc="' + cur + '"]', chips); if (b) b.focus();
     });
-    /* swipe on phones */
-    var sx = null;
-    stage.addEventListener("pointerdown", function(e){ sx = e.clientX; });
-    stage.addEventListener("pointerup", function(e){ if (sx === null || single) return; var dx = e.clientX - sx; sx = null; if (Math.abs(dx) > 40) go(cur + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1); });
-    window.addEventListener("resize", fit);
-    wrap.hidden = false; showPast();
-    go(0, 1);
-    if (single) wrap.classList.add("is-paused");
+    wrap.hidden = false; showPast(); show(0);
+    if (window.IntersectionObserver) {
+      var io = new IntersectionObserver(function(es){ if (es.some(function(x){ return x.isIntersecting; })) { io.disconnect(); seen = true; play(); } }, { threshold: .2 });
+      io.observe(body);
+    } else { seen = true; play(); }
   }
 
   /* ---------- the hubs' states: archive overrides from the admin page (widget/archive.js, migration_v50) ---------- */
@@ -1154,7 +1185,8 @@
   /* back on the tab after a while: check again (one small request, at most every 5 minutes) */
   document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible" && ovSb && Date.now() - ovAt > 5 * 60 * 1000) loadOverrides(ovSb); });
 
-  /* ---------- What's new, and each hub's "Updated", from the changelog every deploy logs to ---------- */
+  /* ---------- each hub's "Updated", from the changelog every deploy logs to (the What's new list itself is gone:
+     Sam, 2026-11-11) ---------- */
   var latestBy = null;
   function applyUpdated(){
     if (!latestBy) return;
@@ -1165,33 +1197,12 @@
     });
   }
   function loadChangelog(){
-    rest("changelog?select=hub,message,created_at&order=created_at.desc&limit=40").then(function(rows){
+    rest("changelog?select=hub,created_at&order=created_at.desc&limit=40").then(function(rows){
       if (!rows || !rows.length) return;
       /* the freshest entry per hub drives its "Updated" (a row's hub can be "all" or a comma list) */
       latestBy = {};
       rows.forEach(function(r){ String(r.hub || "").toLowerCase().split(/[,\s]+/).filter(Boolean).forEach(function(t){ if (!latestBy[t] || r.created_at > latestBy[t]) latestBy[t] = r.created_at; }); });
       applyUpdated();
-      /* the timeline, grouped by calendar day */
-      var order = [], groups = {};
-      rows.slice(0, 20).forEach(function(r){
-        var d = new Date(r.created_at), k = ymd(d);
-        if (!groups[k]){ groups[k] = { date: d, items: [] }; order.push(k); }
-        var tok = String(r.hub || "").toLowerCase();
-        var badge = HUB_LABEL[tok] ? '<span class="dx-tag tinted" style="' + tintVars(tok) + '">' + esc(HUB_LABEL[tok]) + "</span>" : "";
-        groups[k].items.push("<li>" + badge + esc(r.message) + "</li>");
-      });
-      var tl = $("timeline");
-      tl.innerHTML = order.map(function(k){
-        var g = groups[k], rel = relDay(g.date);
-        var label = (rel === "today" || rel === "yesterday") ? rel.charAt(0).toUpperCase() + rel.slice(1) : g.date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
-        return '<li class="dx-day"><h3 class="dx-date">' + esc(label) + '</h3><ul class="dx-items">' + g.items.join("") + "</ul></li>";
-      }).join("");
-      $("changelog").hidden = false;
-      var more = $("tlMore");
-      if (order.length > 2){
-        more.hidden = false;
-        more.addEventListener("click", function(){ var c = tl.classList.toggle("is-collapsed"); more.textContent = c ? "Show earlier updates" : "Show fewer"; });
-      }
     }).catch(function(){});
   }
   /* "this page was updated", for tabs left open */
@@ -1221,13 +1232,13 @@
     var S = [{ title: "Welcome to Study Hubs", body: "<p>A quick look at this page, on the real buttons. It takes under a minute, and each hub has its own tour inside it.</p><p>Use <b>Next</b> and <b>Back</b> (or the arrow keys). Start it again any time from the menu at the top.</p>" }];
     if (HUBS.length) {
       S.push({ el: ".dx-tabs", title: "Your hubs", body: "<p>One tab per hub, the next exam's first. Each shows how many days are left.</p>" });
-      S.push({ el: ".dx-hero", title: "The next exam", body: "<p>The countdown, <b>Start studying</b>, the <b>Daily drill</b> and how far you've got in this hub. The day before an exam you can send the class some luck from here.</p>" });
+      S.push({ el: ".dx-stage", title: "The next exam", body: "<p>The countdown with a bead for each day left, <b>Start studying</b>, the <b>Daily drill</b> and a ring for how far you've got in this hub. The day before an exam you can send the class some luck from here.</p>" });
       S.push({ el: ".dx-hubrow", title: "What's in this hub", body: "<p>What the hub covers, its other exams and its Timmy Time episode when it has one. After an exam, <b>Check in</b> shows up under it.</p>" });
     }
     S.push({ el: "#you", title: "You", body: "<p>The name classmates see, your handpiece rank and XP from every hub, your mastery medals and your study streak." + (petOn() ? " Timmy Tooth lives here once you've met him: study and he stays healthy." : "") + "</p>" });
-    S.push({ el: "#class", title: "The class", body: "<p>The top ten by XP, the longest study streaks and the arcade high scores, with when the class studies most underneath.</p>" });
+    S.push({ el: "#class", title: "The class", body: "<p>How many classmates have a hub open this minute and which hubs they're in. Under it, the top ten by XP or the longest study streaks, the first three on the podium, with every rank from Stone to Dark Matter folded underneath.</p>" });
     if (o.visible($("ideas"))) S.push({ el: "#ideas", title: "The idea board", body: "<p>Post an idea for the hubs and vote on your classmates'.</p>" });
-    if (o.visible($("past"))) S.push({ el: "#past", title: "Past hubs", body: "<p>A recap of how the class studied for each exam that's done, and the check-in for a hub that just closed.</p>" });
+    if (o.visible($("past"))) S.push({ el: "#past", title: "Past hubs", body: "<p>How the class studied for each exam that's done: the hours, the people, the busiest day. <b>Save image</b> keeps a picture of it. A hub that just closed keeps its check-in here.</p>" });
     S.push({ el: "#inboxBtn", title: "Inbox", body: "<p>Replies to your reports and suggestions, notices to the whole class and the occasional short survey. A number on it means something new.</p>" });
     S.push({ el: "#setBtn", title: "Settings", body: "<p>Focus mode, the theme, text size, your name, Timmy and the extras. Set them once here and every hub follows.</p>" });
     S.push({ el: "#menuBtn", title: "About and this tour", body: "<p>The full guide to every feature, trophy and easter egg, the light or dark switch, and this tour.</p>", last: true });
@@ -1298,13 +1309,13 @@
         var ch = sb.channel("presence:" + hub, { config: { presence: { key: "dash-" + watcher + "-" + hub } } });
         ch.on("presence", { event: "sync" }, function(){
           try{ liveBy[hub] = Object.keys(ch.presenceState()).length || 0; }catch(e){ liveBy[hub] = 0; }
-          var t = 0; Object.keys(liveBy).forEach(function(k){ t += liveBy[k] || 0; }); $("liveCount").textContent = t;
+          paintNow();
           var line = $("hubLive"); if (line && selected === hub) line.innerHTML = liveLine(h);
         });
         ch.subscribe();
       }catch(e){}
     });
-    setTimeout(function(){ if ($("liveCount").textContent === "–") $("liveCount").textContent = "0"; }, 6000);
+    setTimeout(function(){ if ($("liveCount").textContent === "–") paintNow(); }, 6000);
 
     /* what gets clicked (widget/clicks.js), report replies and notices (widget/replies.js), "is this your other device?" (widget/linkask.js) */
     if (window.shClicks) window.shClicks.start({ sb: sb, hub: "dashboard", visitor: VISITOR, section: function(){ return "dashboard"; } });
@@ -1335,21 +1346,8 @@
     function remoteGolden(){ sb.rpc("get_golden_today").then(function(res){ showGolden(res && !res.error ? res.data : null); }, function(){}); }
     bootstrap.ready.then(function(data){ if (data && Array.isArray(data.golden)) showGolden(data.golden); else remoteGolden(); }, remoteGolden);
 
-    /* the class board, and when people study as a line under it */
-    whenPanelOpens($("class"), function(){
-      if (!boardOpen) { boardOpen = true; drawBoard(); }
-      sb.from("presence_hourly").select("hour_of_day,ping_count").then(function(res){
-        var rows = (res && res.data) || []; if (!rows.length) return;
-        var by = {}, max = 0, peak = 0, nowH = new Date().getHours();
-        rows.forEach(function(r){ by[r.hour_of_day] = (by[r.hour_of_day] || 0) + r.ping_count; });
-        for (var h = 0; h < 24; h++){ if ((by[h] || 0) > max){ max = by[h]; peak = h; } }
-        if (!max) return;
-        var share = Math.round((by[nowH] || 0) / max * 100), el = $("hoursLine");
-        el.innerHTML = icon("clock", 18) + "<span><b>When people study.</b> Busiest around <b>" + hourLabel(peak) + "</b>" +
-          (nowH === peak ? ", which is right now." : "; right now runs at " + share + "% of that.") + "</span>";
-        el.hidden = false;
-      }, function(){});
-    });
+    /* the class board */
+    whenPanelOpens($("class"), function(){ if (!boardOpen) { boardOpen = true; drawBoard(); } });
   }
   /* The page is drawn from this device's own data first. The class's data and the shared widgets (ranks, Timmy, the
      Inbox, click counts) come after, in this order, so the first screen doesn't wait for them on a slow phone. A page
@@ -1378,5 +1376,10 @@
     else applyHubStates();
   }, 60 * 1000);
 
-  window.shDash = { redraw: redraw, hubs: function(){ return HUBS.slice(); }, tint: tintVars, icon: icon };
+  /* setLive({ hubId: n }) paints the live counts from outside: the preview uses it, since realtime has no fixture there */
+  function setLive(by){
+    liveBy = by && typeof by === "object" ? by : {}; paintNow();
+    var hub = HUBS.filter(function(h){ return h.id === selected; })[0], line = $("hubLive"); if (hub && line) line.innerHTML = liveLine(hub);
+  }
+  window.shDash = { redraw: redraw, hubs: function(){ return HUBS.slice(); }, tint: tintVars, icon: icon, setLive: setLive };
 })();

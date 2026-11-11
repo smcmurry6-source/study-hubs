@@ -228,7 +228,7 @@ function lint(hub, A){
       const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`dashboard (${label}): page scrolls sideways by ${w}px`);
       await page.close(); }
     // the redesigned dashboard (next/, widget/dash.js; beside the live one until the release): every hub tab, the class
-    // board's three lists, Settings, the name dialog and the menu
+    // board's two lists, Settings, the name dialog and the menu
     if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
       const page = await context.newPage(); const errs = [], name = `next dashboard (${label})`; page.on('pageerror', e => errs.push(e.message));
       await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(1200);
@@ -242,7 +242,11 @@ function lint(hub, A){
         if (st.hub !== t || !st.start || !st.title.trim()) problems.push(`${name}: the ${t} tab didn't open its hub (title, Start studying)`);
         await sideways(`the ${t} tab`);
       }
-      for (const b of ['streaks', 'arcade', 'ranks']) { await page.click(`#boardSeg [data-board="${b}"]`); await page.waitForTimeout(200); if (!(await page.$('#board > *'))) problems.push(`${name}: the class board's ${b} list is empty`); await sideways(`the ${b} board`); }
+      if (tabs.length && !(await page.$('#hubPanel .dx-stage .dx-ring'))) problems.push(`${name}: the open hub has no progress ring`);
+      for (const b of ['streaks', 'ranks']) { await page.click(`#boardSeg [data-board="${b}"]`); await page.waitForTimeout(200); if (!(await page.$('#board > *'))) problems.push(`${name}: the class board's ${b} list is empty`); await sideways(`the ${b} board`); }
+      if (!(await page.$('#class #now #nowCount'))) problems.push(`${name}: the class panel has no "studying right now" count`);
+      // taken out on Sam's call (2026-11-11): the What's new list, the arcade scores and the When people study chart
+      for (const gone of ['#changelog', '#boardSeg [data-board="arcade"]', '#hoursLine']) if (await page.$(gone)) problems.push(`${name}: ${gone} is back on the page`);
       await page.click('#setBtn'); await page.waitForTimeout(200);
       if (!(await page.$('.dx-dlg [data-focus]')) || (await page.$$('.dx-dlg .set-row')).length < 8) problems.push(`${name}: Settings didn't open with Focus mode and the extras`);
       await page.keyboard.press('Escape'); await page.waitForTimeout(100);
