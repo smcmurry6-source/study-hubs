@@ -40,6 +40,13 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   unrealistic or its `expect` disagrees with them. A question names its case in `pcase`, picks its pictures with
   `pfig` (and hides a row that would give its answer away: `hide.cal`, `hide.furc`, `hide.mob`) and lists its `ref`
   links ("In the notes"). Write every new Patient Box item this way: [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md).
+- **Dr. Kaur's focus for her part of the final** (Sam passed it on 2026-11-11): "really know" peri-implant health,
+  peri-implant mucositis and peri-implantitis; her clinical questions are based on them. In the hub: an S7 Exam Hint
+  (`src:'relay'`, labeled "Paraphrased": not her exact words), the S7 `note` at the top of its notes, S7's
+  `LIKELY_TOPICS` led by "final focus" topics, Review's "Reading an implant case, step by step" (`PI_CASE_STEPS`), a cram
+  line, and one drawn case per state: `implant-19` (health that probes 5 mm, with first-year remodeling), `implant-5`
+  (mucositis) and `implant-14` (peri-implantitis; risk factors, suppuration, cause), questions `pc-g1`-`g4`, `pc-h1`-`h5`,
+  `pc-i1`-`i5`. If she sends anything more about the final, add it beside these.
 - **Narration:** both levels for every session, made with `python3 tools/narrate.py hubs/perio/index.html --lec <id>
   --force` (it reads perio's template-literal `READINGS['<id>']` blocks since 2026-11-05; `--text` shows what it will say); **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
   (`img/clinic-escape.webp`).

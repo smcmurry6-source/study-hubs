@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (Perio S7: Dr. Kaur's final focus, peri-implant health, mucositis and peri-implantitis, Claude Code)** — Sam: "Dr. Kaur
+  said for her part of the perio final to really know peri-implant health, mucositis, and implantitis. The clinical questions will be
+  based on that." `hubs/perio`: **three new drawn Patient Box cases**, one per 2017 state, each read against its own baseline
+  (`implant-19`, health that probes 5 mm with 1 mm of first-year remodeling; `implant-5`, mucositis in a smoker; `implant-14`,
+  peri-implantitis in a former smoker treated for periodontitis, with poorly controlled diabetes and suppuration), validated by
+  `tools/ci/cases.js`, and **14 case questions** (`pc-g1`-`g4`, `pc-h1`-`h5`, `pc-i1`-`i5`: the diagnosis, why a 5 mm implant can be
+  healthy, remodeling vs pathologic loss, why the pockets deepened, treat mucositis now, the one finding that makes it
+  peri-implantitis, when a film is indicated, suppuration, the cause, the risk-factor list, the susceptible host), each choice with
+  its why and "In the notes" links; bank 749 -> 763. An S7 **Exam Hint** (new `src:'relay'`, shown as "Paraphrased", since it
+  isn't her exact words), an S7 **notice** at the top of its notes (`note`, not narrated, so no audio change), S7's **High
+  Likelihood** list re-ranked with five "final focus" topics first (the new basis is explained in the list's intro), Review's
+  **Reading an implant case, step by step** under the 2017 table, and a cram line. The notes' text is unchanged (no narration to
+  regenerate; perio has no Timmy Time episode). No schema change.
+
 - **2026-11-11 (redesign phase 2: the new Perio, beside the live one, Claude Code)** — Nothing students see changes.
   `hubs/perio/next/` is Perio on the shared engine, with no engine of its own: settings in `window.SH_HUB`, content in
   `next/content/` written from the live hub by `tools/hub-next/build.mjs --hub perio` (its `adaptPerio()` maps Perio's own
