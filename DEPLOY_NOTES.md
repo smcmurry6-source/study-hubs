@@ -32,6 +32,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (Occlusion: `mo-10` retired, Claude Code)** — Sam: "Retire mo-10 if it is redundant ... it is okay to test the
+  same concept multiple ways. just not for every single question and not more than twice." It was (report #40): the final's
+  lectures asked the same fact, about 10% of people have MIP coincident with CR closure, three times. `mo-10` came out with its
+  why row and its place in the orthopedic-instability High Likelihood topic, and is `retired` in `tools/question-ids/occlusion.txt`;
+  `in-90` (L6) and `mo-tf-3` (L7) keep the fact. The final's lectures hold 412. `next/content/` rebuilt. No questions added.
 - **2026-11-11 (Perio S7: Dr. Kaur's final focus, peri-implant health, mucositis and peri-implantitis, Claude Code)** — Sam: "Dr. Kaur
   said for her part of the perio final to really know peri-implant health, mucositis, and implantitis. The clinical questions will be
   based on that." `hubs/perio`: **three new drawn Patient Box cases**, one per 2017 state, each read against its own baseline

@@ -22,6 +22,8 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
   new one in the tag CSS (light and both dark blocks). The mock stays at 45 questions, 80 s each (the midterm's pace),
   split over the final's lectures until the format is announced: 12 each from L6-L8 and 9 from L9 (2026-11-10; it was
   15 each before L9); with a fifth final lecture, 9 each.
+- **No fact more than twice** (Sam, 2026-11-10, [decisions](../decisions.md)): a concept may be asked two ways, not for every
+  concept. `mo-10` was retired for it (the 10% fact stays in `in-90` and `mo-tf-3`). Don't add questions for it.
 - **The final's format** isn't announced (question count, Canvas or not): `FINAL_TIME` / `FINAL_CLOSES` are `'18:30'` /
   `'19:45'`, and the dashboard's check-in button and pop-up go out at 8 pm (`checkinHour:20, promptHour:20`), after the
   window closes ([task](../tasks/2026-11-03-occlusion-final-time-and-format.md)).
