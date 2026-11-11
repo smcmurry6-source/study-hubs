@@ -35,8 +35,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 - **2026-11-11 (Heme & Endo Exam 2: the five Exam 1 questions come from L2, L3, L6 and L10, Claude Code)** — Sam: "the exam 1
   questions for heme and endo exam 2 will come from l2,6,3, and 10". The Exam 1 Refresher's `LIKELY_TOPICS` keep only those four
   Exam 1 lectures' 23 topics (93 questions; 32 topics dropped), so the mock's five Exam 1 questions, **Exam 1 High likelihood** in the
-  Question Bank and the drill draw on them alone. All 207 Refresher questions stay (ids unchanged; the other six lectures' 114 are
-  untagged). R's notes, both levels, and its cram sheet now cover only L2, L3, L6 and L10 (the plain level gains PNMT, Addison's and
+  Question Bank and the drill draw on them alone. Then Sam: "cut the refresher questions that arent from tested lectures": the
+  other six lectures' 114 questions (`r-pa-2s-2` among them) are retired in `tools/question-ids/heme-endo-exam2.txt`, so R holds
+  93 and the hub 495. R's notes, both levels, and its cram sheet now cover only L2, L3, L6 and L10 (the plain level gains PNMT, Addison's and
   four L10 lines from the full notes), so `refresh-full.mp3` and `refresh-plain.mp3` were regenerated. An R `focus` Exam Hint, Home's
   chips and exam card, `EXAM_INFO`, the hints banner, the mock's intro and the About page say which four. `next/` rebuilt (its
   `SH_HUB` words too). No schema change.

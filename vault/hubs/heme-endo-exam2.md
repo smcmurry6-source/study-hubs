@@ -22,15 +22,16 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   ink, blush paper, a berry accent and corpus-luteum gold); Literata / Hanken Grotesk / Overpass Mono. State key
   `hee2-state-v1`, answered event `hee2:answered`.
 - **Lectures:** L11 Diabetes pharmacology (`dmpharm`), L12a and L12b Endocrine pathology (`path1`, `path2`), L13 and L14 Male and female reproductive histology (`mhisto`, `fhisto`), L15 and L16 Male and
-  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 207 questions copied
+  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 93 questions copied
   from `heme-endo-exam1` with ids `r-<exam1 id>`, for the exam's five Exam 1 questions: **every Exam 1 High Likelihood
-  question** (206, under Exam 1's 55 predicted topics, in Exam 1's topic order) plus `r-pa-2s-2`, untagged. **Never cut
-  them** (Sam, 2026-11-10: "include all of the exam 1 high likelihood questions. do not cut them"). (It held 219 from
-  2026-11-06, every Exam 1 High Likelihood question plus 13 of its hardest; 55, then 80, after the high-yield cut below,
-  until Sam's call.) **Only Exam 1's L2, L3, L6 and L10 are on Exam 2** (Sam, 2026-11-11: "the exam 1 questions for heme and
+  question on L2, L3, L6 and L10** (under those lectures' 23 predicted topics, in Exam 1's topic order). (It held 219 from
+  2026-11-06, every Exam 1 High Likelihood question plus 13 of its hardest; 55, then 80, after the high-yield cut below;
+  207 from 2026-11-10, Sam: "include all of the exam 1 high likelihood questions. do not cut them", all 206 plus
+  `r-pa-2s-2`.) **Only Exam 1's L2, L3, L6 and L10 are on Exam 2** (Sam, 2026-11-11: "the exam 1 questions for heme and
   endo exam 2 will come from l2,6,3, and 10"): R's `LIKELY_TOPICS` keep those four lectures' 23 topics (93 questions: L2 20,
   L3 38, L6 18, L10 17), so the mock's five, Exam 1 High likelihood and the drill use them alone. The other six lectures' 114
-  questions stay in R, untagged (the agent's call, open to change: retire them if Sam wants R to hold only the four). R's
+  questions were cut the same day (Sam: "cut the refresher questions that arent from tested lectures"; `retired` in
+  `tools/question-ids/heme-endo-exam2.txt`, `r-pa-2s-2` among them). R's
   notes (both levels, narration regenerated) and cram sheet cover only the four, and an R `focus` hint, Home's chips and exam
   card, `EXAM_INFO`, the mock's intro and the About page say so. A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
   Title)" after the explanation and `pcase` prefixed `r-`; the Refresher's `LIKELY_TOPICS` are Exam 1's, "L# Title: "
@@ -196,8 +197,8 @@ until then: outside a preview the page sends the visitor to the live hub. Until 
   to the live hub (a question, a note, a hint, a figure build) and commit the JSON; CI's "generated files are current" step
   fails when it's stale. This hub has no drawing kit (`od:kit`), so the build writes its `FIGS` (the Sertoli drawing) and
   `FIG_PLACE` into `figures.js` as data, with its `anima:js` block as is.
-- **Progress carries over:** same hub id, state key `hee2-state-v1`, answered event `hee2:answered`, and all 609 question
-  ids (402 on the Exam 2 lectures, the Refresher's 207).
+- **Progress carries over:** same hub id, state key `hee2-state-v1`, answered event `hee2:answered`, and all 495 question
+  ids (402 on the Exam 2 lectures, the Refresher's 93 since 2026-11-11; 609 before its other six lectures were cut).
 - **The Exam 1 Refresher stays review only** (Sam, 2026-11-06 and 2026-11-10, above): the build copies the live hub's
   `COUNT_SKIP` into `core.json` as `reviewOnly`, and the engine (`isReview()`) keeps R out of Home's totals and "you
   haven't tried", Where to next, the bank's "of N" ("+ n Exam 1 review") and the mastery medal (`SH_EXPORT.uncounted`),
