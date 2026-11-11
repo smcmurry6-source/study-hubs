@@ -77,8 +77,8 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   look change. **Left for Heme & Endo:** Sam's look at the colors and the player in the preview. **Next step for this task:**
   Perio's port in a fresh session (its own engine: `QBANK_FILTER`, sessions, template-literal notes, the case kit,
   `PERIO_SKIN` and its six lobby drawings), reading this note, the [perio hub note](../hubs/perio.md) and phase 1's Outcome.
-- 2026-11-11 (Claude Code, hand-off): **Perio's new version is built**, its own session as Sam asked, waiting for Sam's look
-  and the arcade drawings' yes. What's built: `hubs/perio/next/` (settings in `SH_HUB`; content from
+- 2026-11-11 (Claude Code, hand-off): **Perio's new version is built** ([PR #314](https://github.com/smcmurry6-source/study-hubs/pull/314)),
+  its own session as Sam asked, waiting for Sam's look and the arcade drawings' yes. What's built: `hubs/perio/next/` (settings in `SH_HUB`; content from
   `node tools/hub-next/build.mjs --hub perio` through `adaptPerio()`, all 749 ids, state key, answered event and Perio's own
   saved shape unchanged; every piece: the [hub note](../hubs/perio.md), "The new version"). In `widget/hub.js`, gated so
   Occlusion's and Heme & Endo's new versions are unchanged: Perio's saved shape (`stateShape: "answered"`), recall cards,
