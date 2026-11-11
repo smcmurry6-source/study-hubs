@@ -26,6 +26,7 @@
   var docEl = document.documentElement;
   var reduced = false; try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
   docEl.classList.add("shx");
+  docEl.setAttribute("data-hx-hub", HUB);   /* the hub's tint on the page root too, for the shared widget's tokens (hub.css) */
 
   /* ---------- small helpers ---------- */
   function $(s, el){ return (el || document).querySelector(s); }
@@ -94,7 +95,7 @@
   /* ---------- state: the live hub's own (same key, shape and merge), so a returning student's progress is here ---------- */
   var STATE_KEY = C.stateKey;
   function defaultState(){
-    return { v: 1, seen: {}, streak: 0, bestStreak: 0, totalCorrect: 0, totalAnswered: 0, lecStats: {}, days: [], ach: {},
+    return { v: 1, seen: {}, streak: 0, bestStreak: 0, totalCorrect: 0, totalAnswered: 0, lecStats: {}, days: [], ach: {}, read: {},
       ui: { mode: "home", sub: "notes", lec: C.firstLec || "", level: "full", group: "", recall: false, qlec: "all", qsrc: "all", qstatus: "all", qlikely: "" },
       arcade: { best: { sort: 0, board: 0, escape: 0, cloze: 0, smile: 0, cross: 0 }, plays: { sort: 0, board: 0, escape: 0, cloze: 0, smile: 0, cross: 0 }, muted: false, scope: "all", sortSet: "mix", snakeLec: "all", stackSet: "mix", matchSet: "mix", hangLec: "all", blastLec: "all", searchLec: "all", whackSet: "mix" } };
   }
@@ -142,6 +143,18 @@
   function lecLabel(l){ return l ? (l.label || ("L" + l.num)) : ""; }
   function shortTitle(l){ return l ? String(l.title).split(":")[0] : ""; }
   function lecName(id){ var l = LBY[id]; return l ? lecLabel(l) + " · " + shortTitle(l) : id; }
+  /* each lecture's own color (Sam, 2026-11-11: "more color ... to distinguish each lecture from one another so its easier
+     to tell where questions come from and also which lectures youve done in the lecture notes"): set in setCore from the
+     lecture's place in the hub, so it is the same everywhere (question cards, the notes, Home, the bank's picker, hints,
+     the cram sheet, the mock, stats); a review-only lecture is grey. hub.css draws .lc-0 to .lc-9 and .lc-x. */
+  var LCOL = {};
+  function lc(id){ return " lc lc-" + (LCOL[id] || "x"); }
+  function lecDot(id){ return '<i class="ld' + lc(id) + '" aria-hidden="true"></i>'; }
+  function lecChip(id, text){ return '<span class="lchip' + lc(id) + '"><i class="ld" aria-hidden="true"></i>' + esc(text === undefined ? lecName(id) : text) + "</span>"; }
+  /* a lecture's notes marked done: by its button at the end of the notes, or by reading to the end (on this device) */
+  /* a heading for one lecture: its colored badge, then its short title (the badge's label read out once, by the sr text) */
+  function lecHead(l){ return lecBadge(l, "lb-s") + '<span class="sr">' + esc(lecLabel(l)) + " · </span><span>" + esc(shortTitle(l)) + "</span>"; }
+  function isRead(id){ return !!(STATE.read || {})[id]; }
   function isExamLec(id){ return !!EXAM_LECS[id]; }
   /* review-only lectures (core.reviewOnly, the live hub's COUNT_SKIP; Heme & Endo Exam 2's Exam 1 Refresher, Sam, 2026-11-06):
      on the exam, but kept for review, so they're out of every total (Home's readiness and "you haven't tried", Where to
@@ -156,6 +169,7 @@
     EXAM = (c.exams || []).filter(function(x){ return x.id === C.exam; })[0] || (c.exams || [])[c.exams.length - 1] || null;
     (c.reviewOnly || []).forEach(function(id){ REVIEW[id] = 1; });
     LECS.forEach(function(l){ if ((!C.exam || l.exam === C.exam) && !REVIEW[l.id]) EXAM_LECS[l.id] = 1; });
+    var nc = 0; LECS.forEach(function(l){ LCOL[l.id] = REVIEW[l.id] ? "x" : String(nc++ % 10); });
     if (!LBY[STATE.ui.lec]) STATE.ui.lec = (LECS.filter(function(l){ return isExamLec(l.id); })[0] || LECS[0] || {}).id;
   }
   function needQuestions(){
@@ -393,8 +407,8 @@
     var seen = STATE.seen[q.id];
     var status = o.retry ? '<span class="qc-flag">' + icon("retry", 14) + "Again: you missed this a few questions ago</span>" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
       seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + "</span>" : "";
-    var el = h('<article class="qcard qc' + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + id + 'h"></article>');
-    var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + id + 'h">' + (o.num ? "Question " + o.num + " · " : "") + esc(lecName(q.lec)) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
+    var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + id + 'h"></article>');
+    var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + id + 'h">' + (o.num ? "Question " + o.num + " · " : "") + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
     var body = "";
     if (q.type === "mcq" || multi) {
       var order = multi ? shuffled(q.choices.map(function(c, i){ return i; })) : choiceOrder(q);
@@ -628,7 +642,7 @@
       '<div><b class="num" data-count="' + d.r + '">' + d.r + "</b><span>right of " + d.n + '</span></div><div><b class="num" data-count="' + d.xp + '" data-plus>+' + d.xp + "</b><span>XP this session</span></div>" +
       (hpd !== null ? '<div><b class="num">' + (hpd >= 0 ? "+" : "") + hpd + "</b><span>Timmy's HP, now " + hp + "</span></div>" : "") +
       '<div><b class="num">' + (n ? pl(n, "day") : "Day one") + "</b><span>streak</span></div></div>" +
-      (next.length ? '<div class="next"><h3>Look at these next</h3><ul>' + next.map(function(id){ return '<li><a href="#notes/' + esc(id) + '">' + esc(lecName(id)) + '</a> <span class="num">' + pl(d.miss[id], "miss", "misses") + "</span></li>"; }).join("") + "</ul></div>" : "") +
+      (next.length ? '<div class="next"><h3>Look at these next</h3><ul>' + next.map(function(id){ return '<li><a href="#notes/' + esc(id) + '">' + lecDot(id) + esc(lecName(id)) + '</a> <span class="num">' + pl(d.miss[id], "miss", "misses") + "</span></li>"; }).join("") + "</ul></div>" : "") +
       '<div class="qc-go"><button class="btn btn-primary" type="button" data-recap="go">Keep going</button>' + (next.length ? '<button class="btn" type="button" data-recap="miss" data-lecs="' + esc(next.join(",")) + '">Practice the misses</button>' : "") + "</div></section>";
   }
   function wireRecap(node){
@@ -733,9 +747,9 @@
     return '<ul class="lec-rows">' + rows.map(function(r){
       var tw = r.total ? Math.round(r.tried / r.total * 100) : 0, rw = r.total ? Math.round(r.right / r.total * 100) : 0, grp = isExamLec(r.l.id) ? "on" : "off", head = "";
       if (grp !== last) { head = '<li class="grp">' + esc(grp === "on" ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures")) + "</li>"; last = grp; }
-      return head + '<li><div class="lr-main"><p><b>' + esc(lecLabel(r.l)) + "</b> " + esc(shortTitle(r.l)) + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
+      return head + '<li class="' + lc(r.l.id).trim() + '">' + lecBadge(r.l, "lb-s") + '<div class="lr-main"><p><b><span class="sr">' + esc(lecLabel(r.l)) + " · </span>" + esc(shortTitle(r.l)) + "</b>" + (isRead(r.l.id) ? ' <span class="read-tag">' + icon("check", 14) + "Notes done</span>" : "") + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
         '<p class="note num">' + r.tried + " of " + r.total + " tried" + (r.pct !== null ? " · " + r.pct + "% of answers right" : "") + "</p></div>" +
-        '<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>';
+        '<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + (isRead(r.l.id) ? ", done" : "") + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>';
     }).join("") + "</ul>";
   }
   function timelineHTML(){
@@ -765,24 +779,29 @@
     Promise.all([needNotes(), needStudy(), needQuestions()]).then(function(){ drawNotes(el, lec); }).catch(function(){ el.innerHTML = offlineHTML("the notes"); });
   }
   function offlineHTML(what){ return '<div class="hx-page"><h1>Not loaded yet</h1><p>Couldn\'t load ' + esc(what) + '. Check your connection, then <a href="">reload</a>.</p></div>'; }
-  function drawNotes(el, lec){
-    if (view !== "notes") return;
-    var X = C.notes || {}, hasPlain = !!(NOTES.plain || {})[lec.id], level = hasPlain && STATE.ui.level === "plain" ? "plain" : "full";
-    var text = (level === "plain" ? NOTES.plain : NOTES.full)[lec.id], nq = (QBL[lec.id] || []).length, last = null;
-    /* the lecture list: the exam's lectures first, under the exam's date; each with its number, how much of its bank
-       you've tried (the bar: tried, and right on your latest try) and your accuracy */
+  /* the notes' lecture list: the exam's lectures first, under the exam's date; each with its number in its own color (filled,
+     with a check, once its notes are done), how much of its bank you've tried (the bar: tried, and right on your latest
+     try) and your accuracy */
+  function lecListHTML(lec){
+    var X = C.notes || {};
     var groups = [["on", LECS.filter(function(l){ return isExamLec(l.id); })], ["off", LECS.filter(function(l){ return !isExamLec(l.id); })]].filter(function(g){ return g[1].length; });
-    var list = '<nav class="lec-list" aria-label="Lectures"><button class="lec-pick btn" type="button" aria-expanded="false" data-lecpick>' + lecBadge(lec) +
+    return '<nav class="lec-list" aria-label="Lectures"><button class="lec-pick btn" type="button" aria-expanded="false" data-lecpick>' + lecBadge(lec) +
       '<span class="lp-t"><b>' + esc(shortTitle(lec)) + "</b><small>" + esc(lecLabel(lec)) + " · change lecture</small></span>" + icon("chevron", 18, "rot") + "</button><ul>" +
       groups.map(function(g){
         var on = g[0] === "on";
         return '<li class="grp grp-' + g[0] + '"><b>' + esc(on ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures")) + "</b><span>" +
           esc(on ? (EXAM ? (EXAM.label || "The exam") + ", " + dateLabel(EXAM.date, { weekday: "long", month: "long", day: "numeric" }) : "") : (X.offNote || "For review")) + "</span></li>" + g[1].map(function(l){ return lecItemHTML(l, l.id === lec.id); }).join("");
       }).join("") + "</ul></nav>";
+  }
+  function drawNotes(el, lec){
+    if (view !== "notes") return;
+    var X = C.notes || {}, hasPlain = !!(NOTES.plain || {})[lec.id], level = hasPlain && STATE.ui.level === "plain" ? "plain" : "full";
+    var text = (level === "plain" ? NOTES.plain : NOTES.full)[lec.id], nq = (QBL[lec.id] || []).length;
+    var list = lecListHTML(lec);
     var sub = String(lec.title).split(":").slice(1).join(":").trim();
     var group = (STUDY.review || []).filter(function(g){ return g.lec === lec.id; })[0];
-    var art = '<article class="reading" id="lec-' + esc(lec.id) + '">' +
-      "<h1>" + esc(lecLabel(lec) + " · " + shortTitle(lec)) + "</h1>" + (sub ? '<p class="sub">' + esc(sub) + "</p>" : "") +
+    var art = '<article class="reading' + lc(lec.id) + '" id="lec-' + esc(lec.id) + '">' +
+      '<h1 class="rd-title">' + lecBadge(lec, "lb-h") + '<span class="sr">' + esc(lecLabel(lec)) + " · </span><span>" + esc(shortTitle(lec)) + "</span></h1>" + (sub ? '<p class="sub">' + esc(sub) + "</p>" : "") +
       '<p class="note">' + esc(lec.who) + " · " + (lec.status === "taught" ? "recording and slides" : "slides only") + " · " + pl(nq, "question") + "</p>" +
       '<div class="toolbar" role="toolbar" aria-label="Notes tools">' +
         (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn" data-sh-tts-audio="1" aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' : "") +
@@ -796,7 +815,7 @@
       '<section class="lec-figs" hidden aria-labelledby="lfH"><h2 id="lfH">Diagrams</h2><div class="fig-grid"></div></section>' +
       (group ? '<section class="charts" aria-labelledby="lcH"><h2 id="lcH">Charts for this lecture</h2><p class="note">' + esc(group.blurb || "") + "</p>" + group.sections.map(function(sec, i){ return (sec.part ? '<h3 class="part">' + esc(sec.part) + "</h3>" : "") + sectionHTML(sec); }).join("") + "</section>" : "") +
       '<section class="check" aria-labelledby="ckH"><h2 id="ckH">Check yourself</h2><p class="note">Three questions from this lecture. Answers count like anywhere else.</p><div class="qlist" data-check></div></section>' +
-      '<nav class="foot-acts" aria-label="Next"><a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '">' + icon("questions", 18) + "Practice " + esc(lecLabel(lec)) + " questions</a>" +
+      '<nav class="foot-acts" aria-label="Next">' + readBtnHTML(lec) + '<a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '">' + icon("questions", 18) + "Practice " + esc(lecLabel(lec)) + " questions</a>" +
         '<a class="btn" href="#more/cram" data-cram="' + esc(lec.id) + '">' + icon("cram", 18) + "Cram bullets</a></nav>" +
       footNavHTML(lec) +
       '<p class="foot-report"><button class="btn btn-text" type="button" data-report-notes>' + icon("report", 18) + "Report a mistake in these notes</button></p>" +
@@ -807,7 +826,7 @@
     if (needF || group) needFigures().then(function(){ if (!prose.isConnected) return; placeFigs(prose, lec.id, level, $(".lec-figs", el)); $$(".charts [data-figs]", el).forEach(function(b){ b.innerHTML = b.getAttribute("data-figs").split(",").map(figCardHTML).join(""); }); try { FIG.wireCuspMaps(el); FIG.ANIMA.mount(el); } catch (e) {} }).catch(function(){});
     checkYourself($("[data-check]", el), lec);
     $$("[data-level]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.level = b.getAttribute("data-level"); saveState(); track("notes:level=" + STATE.ui.level); drawNotes(el, lec); }); });
-    var pick = $("[data-lecpick]", el); pick.addEventListener("click", function(){ var on = pick.getAttribute("aria-expanded") !== "true"; pick.setAttribute("aria-expanded", String(on)); });
+    wireLecPick(el);
     var mm = $("[data-mmap]", el); mm.addEventListener("click", function(){
       var c = $(".mmap", el), open = mm.getAttribute("aria-expanded") === "true";
       if (!open && !c.dataset.done && window.shMindMap) { window.shMindMap.render(c, mindMapFor(lec), { accent: "var(--hub)" }); c.dataset.done = "1"; }
@@ -821,25 +840,58 @@
     }); });
     $$("[data-lecnav]", el).forEach(function(a){ a.addEventListener("click", function(){ track("notes:" + a.getAttribute("data-lecnav")); }); });
     wireLecLinks(el);
+    wireRead(el, lec);
     /* the first visit's tip sits under the toolbar; while it shows, the toolbar's short "Select text to highlight it" hides (hub.css) */
     tip(el, "notes", "Select any words in the notes to highlight them; they stay on this device.", $(".reading > .toolbar", el));
+  }
+  function wireLecPick(el){ var pick = $("[data-lecpick]", el); if (pick) pick.addEventListener("click", function(){ var on = pick.getAttribute("aria-expanded") !== "true"; pick.setAttribute("aria-expanded", String(on)); }); }
+  /* "Notes done" (Sam, 2026-11-11: see "which lectures youve done in the lecture notes"): the button at the end of a lecture's
+     notes marks it, and reading to the end marks it too once the lecture has been open a minute (so jumping to the bottom
+     doesn't). Tapping the button again takes it back. Saved on this device, like highlights; the lecture's badge fills in
+     its color, with a check, in the notes' list, on Home and in the headings. */
+  var READ_AFTER = 60000;
+  function readBtnHTML(lec){ var on = isRead(lec.id); return '<button class="btn btn-done' + (on ? " is-on" : "") + '" type="button" data-read aria-pressed="' + on + '">' + icon("check", 18) + "<span>" + (on ? "Notes done" : "Mark notes as done") + "</span></button>"; }
+  function setRead(el, lec, on, how){
+    STATE.read = STATE.read || {};
+    if (on) STATE.read[lec.id] = day(0); else delete STATE.read[lec.id];
+    saveState(); track("notes:" + (on ? "done" : "undone") + (how ? "-" + how : ""));
+    var b = $("[data-read]", el); if (b) b.outerHTML = readBtnHTML(lec);
+    var nav = $(".lec-list", el); if (nav) { nav.outerHTML = lecListHTML(lec); wireLecPick(el); }
+    var t = $(".rd-title .lb", el); if (t) t.outerHTML = lecBadge(lec, "lb-h");
+    wireReadBtn(el, lec);
+  }
+  function wireReadBtn(el, lec){ var b = $("[data-read]", el); if (b) b.addEventListener("click", function(){ setRead(el, lec, !isRead(lec.id), ""); }); }
+  function wireRead(el, lec){
+    wireReadBtn(el, lec);
+    var end = $(".foot-acts", el), opened = Date.now(), seen = false, timer = null;
+    if (!end || isRead(lec.id) || !("IntersectionObserver" in window)) return;
+    var auto = function(){ if (end.isConnected && seen && !isRead(lec.id) && view === "notes") setRead(el, lec, true, "auto"); };
+    var io = new IntersectionObserver(function(es){
+      if (!end.isConnected) { io.disconnect(); clearTimeout(timer); return; }
+      seen = es.some(function(e){ return e.isIntersecting; });
+      clearTimeout(timer);
+      if (!seen) return;
+      var left = READ_AFTER - (Date.now() - opened);
+      if (left <= 0) { io.disconnect(); auto(); } else timer = setTimeout(function(){ if (seen) { io.disconnect(); auto(); } }, left);
+    });
+    io.observe(end);
   }
   /* the previous and next lecture, at the end of every lecture's notes (Sam, 2026-11-06), in the order they were taught */
   function footNavHTML(lec){
     var i = LECS.indexOf(lec), prev = LECS[i - 1], next = LECS[i + 1];
-    var link = function(l, k){ return '<a class="btn fn-' + k + '" href="#notes/' + esc(l.id) + '" data-lecnav="' + k + '">' + (k === "prev" ? icon("chevron", 20, "flip") : "") +
+    var link = function(l, k){ return '<a class="btn fn-' + k + lc(l.id) + '" href="#notes/' + esc(l.id) + '" data-lecnav="' + k + '">' + (k === "prev" ? icon("chevron", 20, "flip") : "") +
       "<span><small>" + (k === "prev" ? "Previous lecture" : "Next lecture") + "</small><b>" + esc(lecLabel(l) + " · " + shortTitle(l)) + "</b></span>" + (k === "next" ? icon("chevron", 20) : "") + "</a>"; };
     if (!prev && !next) return "";
     return '<nav class="foot-nav" aria-label="Other lectures">' + (prev ? link(prev, "prev") : "") + (next ? link(next, "next") : "") + "</nav>";
   }
-  function lecBadge(l){ return '<span class="lb num' + (isExamLec(l.id) ? " is-on" : "") + '" aria-hidden="true">' + esc(lecLabel(l)) + "</span>"; }
+  function lecBadge(l, cls){ var rd = isRead(l.id); return '<span class="lb num' + lc(l.id) + (cls ? " " + cls : "") + (isExamLec(l.id) ? " is-on" : "") + (rd ? " is-read" : "") + '" aria-hidden="true">' + esc(lecLabel(l)) + (rd ? '<span class="lb-ck">' + icon("check", 12) + "</span>" : "") + "</span>"; }
   function lecItemHTML(l, cur){
     var r = lecProgress(l), tw = r.total ? Math.round(r.tried / r.total * 100) : 0, rw = r.total ? Math.round(r.right / r.total * 100) : 0;
-    var sub = !r.tried ? "Not started · " + pl(r.total, "question") : r.tried + " of " + r.total + " tried" + (r.pct !== null && r.a >= 3 ? " · " + r.pct + "% right" : "");
-    return '<li><a class="lec-item" href="#notes/' + esc(l.id) + '"' + (cur ? ' aria-current="page"' : "") + ">" + lecBadge(l) +
+    var rd = isRead(l.id), sub = !r.tried ? (rd ? "Notes done · " + pl(r.total, "question") + " to try" : "Not started · " + pl(r.total, "question")) : (rd ? "Notes done · " : "") + r.tried + " of " + r.total + " tried" + (r.pct !== null && r.a >= 3 ? " · " + r.pct + "% right" : "");
+    return '<li><a class="lec-item' + lc(l.id) + (rd ? " is-read" : "") + '" href="#notes/' + esc(l.id) + '"' + (cur ? ' aria-current="page"' : "") + ">" + lecBadge(l) +
       '<span class="lt"><b>' + esc(shortTitle(l)) + '</b><small class="num">' + esc(sub) + "</small>" +
       '<span class="bar" aria-hidden="true"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span></span>' +
-      '<span class="sr">' + esc(lecLabel(l)) + (cur ? ", open now" : "") + "</span></a></li>";
+      '<span class="sr">' + esc(lecLabel(l)) + (rd ? ", notes done" : "") + (cur ? ", open now" : "") + "</span></a></li>";
   }
   function mindMapFor(lec){
     var d = document.createElement("div"); d.innerHTML = NOTES.full[lec.id] || "";
@@ -1006,7 +1058,7 @@
       '<div class="qbar-row">' +
         '<div class="lp"><span class="lab" id="lpL">Lectures</span><button class="btn lp-btn" type="button" aria-expanded="false" aria-labelledby="lpL lpS" data-lp><span id="lpS">' + esc(sum) + "</span>" + icon("chevron", 16, "rot") + "</button>" +
           '<div class="lp-pop" hidden><div class="lp-acts"><button class="btn btn-text" type="button" data-lpall>' + esc((C.review || {}).allBtn || "All lectures") + '</button><button class="btn btn-text" type="button" data-lpnone>Untick all</button></div>' + ((C.review || {}).help ? '<p class="note lp-help">' + esc(C.review.help) + "</p>" : "") + "<ul>" +
-          LECS.map(function(l){ var on = picked.indexOf(l.id) > -1; return '<li><label><input type="checkbox" value="' + esc(l.id) + '"' + (on ? " checked" : "") + "><span>" + esc(lecName(l.id)) + '</span></label><button class="btn btn-text" type="button" data-only="' + esc(l.id) + '" aria-label="Only ' + esc(lecLabel(l)) + '">Only</button></li>'; }).join("") +
+          LECS.map(function(l){ var on = picked.indexOf(l.id) > -1; return '<li><label><input type="checkbox" value="' + esc(l.id) + '"' + (on ? " checked" : "") + ">" + lecDot(l.id) + "<span>" + esc(lecName(l.id)) + '</span></label><button class="btn btn-text" type="button" data-only="' + esc(l.id) + '" aria-label="Only ' + esc(lecLabel(l)) + '">Only</button></li>'; }).join("") +
           "</ul></div></div>" +
         '<label class="search"><span class="sr">Search the questions</span>' + icon("search", 18) + '<input type="search" placeholder="Search the questions" value="' + esc(bankSearch) + '" data-search></label>' +
       "</div>" +
@@ -1077,7 +1129,7 @@
     if (preset === "weak") {
       var rows = LECS.map(lecProgress).filter(function(r){ return r.a >= 3; }).sort(function(a, b){ return a.pct - b.pct; });
       LIST.items = weakList();
-      sumEl.innerHTML = rows.length ? '<div class="weak-rows"><p class="lab">Your lectures by how much you get right</p><ul>' + rows.slice(0, 6).map(function(r){ return '<li><span>' + esc(lecName(r.l.id)) + '</span><span class="bar"><i class="right" style="width:' + r.pct + '%"></i></span><span class="num">' + r.pct + "%</span></li>"; }).join("") + '</ul></div><p class="sumline">The questions you missed last time, weakest lecture first, then ' + (rows[0] ? "new ones from " + esc(lecLabel(rows[0].l)) : "new ones") + ".</p>" : "";
+      sumEl.innerHTML = rows.length ? '<div class="weak-rows"><p class="lab">Your lectures by how much you get right</p><ul>' + rows.slice(0, 6).map(function(r){ return '<li class="' + lc(r.l.id).trim() + '"><span>' + lecDot(r.l.id) + esc(lecName(r.l.id)) + '</span><span class="bar"><i class="right" style="width:' + r.pct + '%"></i></span><span class="num">' + r.pct + "%</span></li>"; }).join("") + '</ul></div><p class="sumline">The questions you missed last time, weakest lecture first, then ' + (rows[0] ? "new ones from " + esc(lecLabel(rows[0].l)) : "new ones") + ".</p>" : "";
       if (!LIST.items.length) { host.innerHTML = emptyHTML("No weak spots yet", "Answer at least 3 questions from a lecture and it shows up here, ranked by how much you get right.", '<a class="btn btn-primary" href="#questions">Practice questions</a>'); return; }
       page(); return;
     }
@@ -1209,14 +1261,14 @@
       '<button class="btn btn-text" type="button" data-newmock>New mock</button></div>';
     var byLec = m.submitted ? '<div class="panel"><h2>By lecture</h2><div class="tbl-wrap"><table><thead><tr><th scope="col">Lecture</th><th scope="col" class="r">Right</th><th scope="col" class="r">Score</th></tr></thead><tbody>' + mockLecIds().map(function(lec){
       var qs = m.ids.filter(function(id){ return QBY[id] && QBY[id].lec === lec; }), c = qs.filter(function(id){ return m.res[id]; }).length;
-      return '<tr><th scope="row">' + esc(lecName(lec)) + '</th><td class="r num">' + c + " of " + qs.length + '</td><td class="r num">' + (qs.length ? Math.round(c / qs.length * 100) : 0) + "%</td></tr>"; }).join("") + "</tbody></table></div></div>" : "";
+      return '<tr><th scope="row">' + lecDot(lec) + esc(lecName(lec)) + '</th><td class="r num">' + c + " of " + qs.length + '</td><td class="r num">' + (qs.length ? Math.round(c / qs.length * 100) : 0) + "%</td></tr>"; }).join("") + "</tbody></table></div></div>" : "";
     host.innerHTML = top + byLec;
     m.ids.forEach(function(id, i){
       var q = QBY[id]; if (!q) return;
       if (m.submitted && m.onlyMissed && m.res[id]) return;
       var pick = id in m.picks ? m.picks[id] : null, order = (m.order && m.order[id]) || q.choices.map(function(c, k){ return k; });
-      var el2 = h('<article class="qcard qc' + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="mcq" data-ctx="mock" aria-labelledby="mk' + i + '"></article>');
-      el2.innerHTML = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="mk' + i + '">Question ' + (i + 1) + " · " + esc(lecName(q.lec)) + '</span></span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(q) +
+      var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="mcq" data-ctx="mock" aria-labelledby="mk' + i + '"></article>');
+      el2.innerHTML = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="mk' + i + '">Question ' + (i + 1) + " · " + lecChip(q.lec) + '</span></span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(q) +
         '<ul class="qc-choices' + (q.fmt === "tf" ? " qc-tf" : "") + '">' + order.map(function(k){
           var st = m.submitted ? (k === q.answer ? "right" : k === pick ? "wrong" : "") : "";
           return '<li><button class="ch' + (st === "right" ? " is-right" : st === "wrong" ? " is-wrong" : "") + '" type="button" data-mock-pick="' + k + '" aria-pressed="' + (k === pick) + '"' + (m.submitted ? ' aria-disabled="true"' : "") + ">" + '<span class="txt">' + esc(q.choices[k]) + '</span><span class="st-ic" aria-hidden="true">' + (st ? icon(st === "wrong" ? "cross" : "check", 20) : "") + "</span></button></li>"; }).join("") + "</ul>" +
@@ -1314,7 +1366,7 @@
       var html = (X.banner ? '<p class="notice">' + icon("clock", 20) + "<span>" + esc(X.banner) + "</span></p>" : "") + likelyHTML(X) +
         '<section class="panel" aria-labelledby="hqH"><h2 id="hqH">' + esc(X.words || "In " + (X.prof || "the professor") + "'s words") + "</h2><p class=\"note\">" + esc(X.wordsNote || "Direct quotes from the recordings where something was flagged to know, or waved off.") + "</p>" +
         LECS.map(function(l){ var items = hints.filter(function(x){ return x.lec === l.id; }); if (!items.length) return "";
-          return '<div class="hint-group"><h3>' + esc(lecName(l.id)) + ' <a class="btn btn-text" href="#notes/' + esc(l.id) + '">Notes</a></h3>' + items.map(function(x){
+          return '<div class="hint-group' + lc(l.id) + '"><h3>' + lecHead(l) + ' <a class="btn btn-text" href="#notes/' + esc(l.id) + '">Notes</a></h3>' + items.map(function(x){
             /* a focus list came from the class, not a recording, so it has no quotation marks (as on the live hub) */
             var said = x.kind !== "focus";
             return '<figure class="hint' + (said ? "" : " is-focus") + '"><blockquote>' + (said ? "“" : "") + esc(x.quote) + (said ? "”" : "") + '</blockquote><figcaption><span class="kind ' + esc(x.kind) + '">' + (x.kind === "deemphasize" ? "Less likely" : x.kind === "focus" ? "Focus list" : "Know this") + "</span>" + esc(x.take) + "</figcaption></figure>"; }).join("") + "</div>"; }).join("") + "</section>";
@@ -1328,7 +1380,7 @@
       var ts = T.filter(function(t){ return t.lec === l.id; }); if (!ts.length) return "";
       var grp = CORE.mock && CORE.mock.groups ? Object.keys(CORE.mock.groups).filter(function(k){ return CORE.mock.groups[k].indexOf(l.id) > -1; })[0] : null;
       var cnt = grp && counts[grp] ? counts[grp] + " on the exam for " + CORE.mock.groups[grp].map(function(id){ return lecLabel(LBY[id]); }).join(" and ") + " together" : counts[l.id] ? counts[l.id] + " on the exam" : pl(ts.length, "predicted topic");
-      return '<div class="likely-lec"><h3>' + esc(lecName(l.id)) + ' <span class="note">' + esc(cnt) + "</span></h3><ol>" +
+      return '<div class="likely-lec' + lc(l.id) + '"><h3>' + lecHead(l) + ' <span class="note">' + esc(cnt) + "</span></h3><ol>" +
         ts.map(function(t){ return "<li>" + esc(t.t) + ' <span class="note">' + esc(t.basis) + "</span></li>"; }).join("") +
         '</ol><button class="btn" type="button" data-likely="' + esc(l.id) + '">Practice these (' + ts.reduce(function(k, t){ return k + t.ids.length; }, 0) + ")</button></div>";
     }).join("") + "</div></section>";
@@ -1336,7 +1388,7 @@
   function moreCram(body){
     needStudy().then(function(){
       body.innerHTML = '<div class="cram-grid">' + LECS.map(function(l){ var c = (STUDY.cram || {})[l.id] || []; if (!c.length) return "";
-        return '<section class="panel cram" id="cram-' + esc(l.id) + '" aria-labelledby="cr' + esc(l.id) + '"><h2 id="cr' + esc(l.id) + '">' + esc(lecName(l.id)) + "</h2><ul>" + c.map(function(b){ return "<li>" + esc(b) + "</li>"; }).join("") + "</ul></section>"; }).join("") + "</div>";
+        return '<section class="panel cram' + lc(l.id) + '" id="cram-' + esc(l.id) + '" aria-labelledby="cr' + esc(l.id) + '"><h2 id="cr' + esc(l.id) + '">' + lecHead(l) + "</h2><ul>" + c.map(function(b){ return "<li>" + esc(b) + "</li>"; }).join("") + "</ul></section>"; }).join("") + "</div>";
     }).catch(function(){ body.innerHTML = "<p>Couldn't load the cram sheet.</p>"; });
   }
   function moreSide(body){
@@ -1391,7 +1443,7 @@
         "<div><dt>Best run</dt><dd class=\"num\">" + pl(STATE.bestStreak, "right in a row", "right in a row") + "</dd></div><div><dt>Days goal met</dt><dd class=\"num\">" + fmt(days) + "</dd></div>" +
         "<div><dt>Achievements</dt><dd class=\"num\">" + Object.keys(STATE.ach || {}).length + " of " + (CORE.achievements || []).length + "</dd></div></dl></section>" +
       '<section class="panel wide" aria-labelledby="slH"><h2 id="slH">By lecture</h2><div class="tbl-wrap"><table><thead><tr><th scope="col">Lecture</th><th scope="col" class="r">Tried</th><th scope="col" class="r">Right now</th><th scope="col" class="r">Accuracy</th></tr></thead><tbody>' +
-        rows.map(function(r){ return '<tr><th scope="row">' + esc(lecName(r.l.id)) + '</th><td class="r num">' + r.tried + " of " + r.total + '</td><td class="r num">' + r.right + '</td><td class="r num">' + (r.pct === null ? "–" : r.pct + "%") + "</td></tr>"; }).join("") + "</tbody></table></div></section>" +
+        rows.map(function(r){ return '<tr><th scope="row">' + lecDot(r.l.id) + esc(lecName(r.l.id)) + '</th><td class="r num">' + r.tried + " of " + r.total + '</td><td class="r num">' + r.right + '</td><td class="r num">' + (r.pct === null ? "–" : r.pct + "%") + "</td></tr>"; }).join("") + "</tbody></table></div></section>" +
       '<section class="panel wide" aria-labelledby="saH"><h2 id="saH">Achievements</h2><ul class="ach">' + (CORE.achievements || []).map(function(a){ var got = STATE.ach[a.id]; return '<li class="' + (got ? "got" : "") + '">' + icon(got ? "check" : "goal", 20) + "<span><b>" + esc(a.name) + "</b><small>" + esc(a.desc) + (got ? " · " + esc(dateLabel(got)) : "") + "</small></span></li>"; }).join("") + "</ul></section>" +
       "</div>";
     $("[data-open-stats]", body).addEventListener("click", function(){ var b = document.getElementById("shstat-stats-pill"); if (b) b.click(); track("more:trophies"); });

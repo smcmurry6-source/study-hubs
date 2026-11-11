@@ -58,15 +58,36 @@ html.shx[data-theme="dark"] {
     --float-shadow: 0 4px 14px rgba(0, 0, 0, .4);
   }
 }
-.hx[data-hub="occlusion"]            { --hub: #2747a3; --hub-mid: #6f86cf; --hub-light: #dce3f6; --hub-dark: #8fa6ec; }
-.hx[data-hub="perio"]                { --hub: #b4466f; --hub-mid: #d97fa0; --hub-light: #f6dde6; --hub-dark: #ec93b5; }
-.hx[data-hub="pcd-implants-exam1"]   { --hub: #2f6f84; --hub-mid: #6fa9bb; --hub-light: #d7e9ef; --hub-dark: #7cc0d6; }
-.hx[data-hub="heme-endo-exam2"]      { --hub: #a83232; --hub-mid: #d86f6f; --hub-light: #f5dada; --hub-dark: #ee8a8a; }
-.hx[data-hub="special-patient-care"] { --hub: #2e7d4f; --hub-mid: #6db58a; --hub-light: #d7eedf; --hub-dark: #76cb98; }
+html.shx[data-hx-hub="occlusion"], .hx[data-hub="occlusion"]            { --hub: #2747a3; --hub-mid: #6f86cf; --hub-light: #dce3f6; --hub-dark: #8fa6ec; }
+html.shx[data-hx-hub="perio"], .hx[data-hub="perio"]                { --hub: #b4466f; --hub-mid: #d97fa0; --hub-light: #f6dde6; --hub-dark: #ec93b5; }
+html.shx[data-hx-hub="pcd-implants-exam1"], .hx[data-hub="pcd-implants-exam1"]   { --hub: #2f6f84; --hub-mid: #6fa9bb; --hub-light: #d7e9ef; --hub-dark: #7cc0d6; }
+html.shx[data-hx-hub="heme-endo-exam2"], .hx[data-hub="heme-endo-exam2"]      { --hub: #a83232; --hub-mid: #d86f6f; --hub-light: #f5dada; --hub-dark: #ee8a8a; }
+html.shx[data-hx-hub="special-patient-care"], .hx[data-hub="special-patient-care"] { --hub: #2e7d4f; --hub-mid: #6db58a; --hub-light: #d7eedf; --hub-dark: #76cb98; }
+/* the tint is on the page root too (hub.js sets data-hx-hub), so the shared widget's tokens below (--accent and the rest,
+   declared on html.shx) resolve to this hub's color, not the default, in its panels and in the player (BUG-056) */
 html.shx { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
 .hx { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
-html.shx[data-theme="dark"] .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }
-@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); } }
+html.shx[data-theme="dark"], html.shx[data-theme="dark"] .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }
+@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]), html.shx:not([data-theme="light"]) .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); } }
+
+/* ---------- each lecture's own color (Sam, 2026-11-11: "more color ... to distinguish each lecture from one another"):
+   hub.js puts lc-0 to lc-9 on a lecture's pieces by its place in the hub, and lc-x (grey) on a review-only one. --lc fills
+   (with --lc-on text on it) and draws dots and bars, --lc-soft is a chip's ground and --lc-ink its text (4.5:1 or more on
+   both themes); dark mode swaps in the lighter --lc-d and --lc-dk. ---------- */
+.hx .lc-0 { --lc: #2f62c8; --lc-soft: #e2eafb; --lc-ink: #1e4a9e; --lc-d: #7fa6f2; --lc-dk: #a9c4f7; }  /* blue */
+.hx .lc-1 { --lc: #b8511a; --lc-soft: #fde6d8; --lc-ink: #953c0b; --lc-d: #f2955f; --lc-dk: #f7b48c; }  /* orange */
+.hx .lc-2 { --lc: #0f7f7a; --lc-soft: #d5f0ed; --lc-ink: #0a5c58; --lc-d: #4fc4bc; --lc-dk: #86dad3; }  /* teal */
+.hx .lc-3 { --lc: #b8326f; --lc-soft: #fbe0ec; --lc-ink: #8a1f50; --lc-d: #ee7fb1; --lc-dk: #f4a8ca; }  /* magenta */
+.hx .lc-4 { --lc: #587812; --lc-soft: #e6efd0; --lc-ink: #405909; --lc-d: #a3c45a; --lc-dk: #c0d98a; }  /* olive */
+.hx .lc-5 { --lc: #7046c8; --lc-soft: #ece4fb; --lc-ink: #5530a3; --lc-d: #ae90f0; --lc-dk: #c8b3f6; }  /* violet */
+.hx .lc-6 { --lc: #9a6a00; --lc-soft: #f9edcc; --lc-ink: #704c00; --lc-d: #e2b443; --lc-dk: #ecca78; }  /* mustard */
+.hx .lc-7 { --lc: #16729f; --lc-soft: #d9eef9; --lc-ink: #0f567a; --lc-d: #62b6e2; --lc-dk: #94cdec; }  /* sky */
+.hx .lc-8 { --lc: #8a5532; --lc-soft: #f1e5da; --lc-ink: #683e22; --lc-d: #d39a72; --lc-dk: #e2b99b; }  /* brown */
+.hx .lc-9 { --lc: #4a55a6; --lc-soft: #e4e7f7; --lc-ink: #343d85; --lc-d: #9aa3e8; --lc-dk: #bcc2f0; }  /* indigo */
+.hx .lc-x { --lc: #6b6570; --lc-soft: #ecebee; --lc-ink: #4e4952; --lc-d: #a8a1ad; --lc-dk: #c6c0ca; }  /* review only */
+.hx .lc { --lc-on: #ffffff; }
+html.shx[data-theme="dark"] .hx .lc { --lc: var(--lc-d); --lc-ink: var(--lc-dk); --lc-soft: color-mix(in srgb, var(--lc-d) 22%, #1c1b1c); --lc-on: #111111; }
+@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .hx .lc { --lc: var(--lc-d); --lc-ink: var(--lc-dk); --lc-soft: color-mix(in srgb, var(--lc-d) 22%, #1c1b1c); --lc-on: #111111; } }
 
 /* ---------- base ---------- */
 html.shx, html.shx *, html.shx *::before, html.shx *::after { box-sizing: border-box; }
@@ -267,6 +288,10 @@ html.hx-still .ql-pod *, html.hx-still .teeth .tooth { animation-name: none !imp
 .lr-main { flex: 1; min-width: 0; }
 .lr-main p:first-child { line-height: 1.3; }
 .lr-main b { font-weight: var(--w-head); color: var(--hub-text); }
+.lec-rows .lc .lr-main b { color: var(--text); }
+.read-tag { display: inline-flex; align-items: center; gap: 3px; margin-left: 6px; padding: 1px 8px 1px 6px; border-radius: var(--r-pill); background: var(--lc-soft, var(--hub-soft));
+  color: var(--lc-ink, var(--hub-text)); font-size: var(--fs-meta); font-weight: var(--w-strong); vertical-align: 1px; }
+.read-tag svg { width: 12px; height: 12px; }
 .lr-acts { display: flex; gap: 2px; }
 .bar { position: relative; display: block; height: 8px; margin: 8px 0 6px; border-radius: var(--r-pill); background: var(--track); overflow: hidden; }
 .bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: var(--r-pill); transition: width 700ms var(--ease-out); }
@@ -341,11 +366,28 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
   text-decoration: none; transition: background var(--t-hover) var(--ease-out); }
 .lec-item:hover { background: var(--active); }
 .lec-item[aria-current="page"] { background: var(--row); }
-.lec-item[aria-current="page"]::before { content: ""; position: absolute; left: -10px; top: 12px; bottom: 12px; width: 4px; border-radius: 0 4px 4px 0; background: var(--hub-text); }
+.lec-item[aria-current="page"]::before { content: ""; position: absolute; left: -10px; top: 12px; bottom: 12px; width: 4px; border-radius: 0 4px 4px 0; background: var(--lc, var(--hub-text)); }
 .lb { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 12px; flex: none;
   font-size: var(--fs-label); font-weight: var(--w-title); background: var(--row); color: var(--muted); border: 1px solid var(--border); }
 .lb.is-on { background: var(--hub-soft); color: var(--hub-text); border-color: transparent; }
-.lec-item[aria-current="page"] .lb { background: var(--hub); color: #ffffff; border-color: transparent; }
+.lec-item[aria-current="page"] .lb:not(.lc) { background: var(--hub); color: #ffffff; border-color: transparent; }
+.lb.lc { position: relative; background: var(--lc-soft); color: var(--lc-ink); border-color: transparent; }
+.lb.lc.is-read { background: var(--lc); color: var(--lc-on); }
+.lec-item[aria-current="page"] .lb.lc { box-shadow: 0 0 0 2px var(--row), 0 0 0 4px var(--lc); }
+.lb-ck { position: absolute; right: -6px; bottom: -6px; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--right); color: var(--on-mark); box-shadow: 0 0 0 2px var(--panel); }
+.lb-ck svg { width: 12px; height: 12px; }
+.lb-s { width: 30px; height: 30px; border-radius: 9px; font-size: var(--fs-meta); }
+.lb-s .lb-ck { width: 15px; height: 15px; right: -5px; bottom: -5px; }
+.lb-s .lb-ck svg { width: 10px; height: 10px; }
+.lc .bar .right, .bar.lc .right { background: var(--lc); }
+.lc .bar .tried, .bar.lc .tried { background: var(--lc); opacity: .3; }
+.ld { display: inline-block; width: 10px; height: 10px; margin-right: 8px; border-radius: 50%; background: var(--lc); vertical-align: 0; flex: none; }
+/* a lecture's chip on a question card, and the card's top edge in the same color, so you can tell where a question is from */
+.lchip { display: inline-flex; align-items: center; gap: 7px; min-height: 26px; padding: 2px 11px 2px 9px; border-radius: var(--r-pill);
+  background: var(--lc-soft); color: var(--lc-ink); font-weight: var(--w-strong); line-height: 1.25; }
+.lchip .ld { width: 8px; height: 8px; margin: 0; }
+.qc.lc { box-shadow: inset 0 4px 0 var(--lc); }
 .lt { min-width: 0; }
 .lt b { display: block; font-size: var(--fs-label); font-weight: var(--w-strong); line-height: 1.3; }
 .lec-item[aria-current="page"] .lt b { font-weight: var(--w-head); }
@@ -357,6 +399,9 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .lp-t small { display: block; font-size: var(--fs-meta); color: var(--muted); font-weight: var(--w-body); }
 .reading { max-width: 760px; min-width: 0; }
 .reading > .sub { margin-top: 6px; font-size: 18px; color: var(--text); }
+.rd-title { display: flex; align-items: center; gap: 12px; }
+.reading.lc .reading-prose h3 { color: var(--lc-ink); }
+.hx .btn-done[aria-pressed="true"] { background: var(--right-bg); color: var(--right-ink); border-color: transparent; }
 .reading > .note { margin-top: 6px; }
 .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 20px 0 8px; padding-bottom: 16px; border-bottom: 1px solid var(--rule); }
 .toolbar .tool-tip { display: inline-flex; align-items: center; gap: 6px; margin-left: 4px; }
@@ -426,6 +471,9 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .foot-nav span { min-width: 0; }
 .foot-nav small { display: block; font-size: var(--fs-meta); font-weight: var(--w-body); color: var(--muted); }
 .foot-nav b { display: block; font-weight: var(--w-head); line-height: 1.3; color: var(--hub-text); overflow-wrap: anywhere; }
+/* each in the color of the lecture it leads to */
+.hx .foot-nav .btn.lc, .hx .foot-nav .btn.lc:hover { background: var(--lc-soft); }
+.foot-nav .lc .ic, .foot-nav .lc b { color: var(--lc-ink); }
 .foot-report { margin-top: 14px; }
 .foot-report .btn, .toolbar [data-report-notes] { color: var(--muted); }
 
@@ -450,6 +498,7 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .lp-pop label { flex: 1; display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 8px; border-radius: 10px; font-size: var(--fs-label); cursor: pointer; }
 .lp-pop label:hover { background: var(--panel); }
 .lp-pop input { width: 18px; height: 18px; accent-color: var(--hub); }
+.lp-pop label .ld { margin: 0; }
 .search { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; height: var(--control-h); padding: 0 14px; border-radius: var(--r-pill); background: var(--row);
   border: 1px solid var(--control); color: var(--muted); }
 .search input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; color: var(--text); font-size: var(--fs-label); }
@@ -680,7 +729,12 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .hint .kind.deemphasize { background: var(--active); color: var(--muted); }
 .likely-grid { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
 .likely-lec { padding: 16px; border-radius: var(--r-row); background: var(--row); display: flex; flex-direction: column; gap: 10px; }
-.likely-lec h3 { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
+.likely-lec h3 { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.likely-lec.lc { box-shadow: inset 4px 0 0 var(--lc); }
+.likely-lec h3 .note { flex-basis: 100%; }
+.cram h2 { display: flex; align-items: center; gap: 10px; }
+.cram.lc { box-shadow: inset 0 4px 0 var(--lc); }
+.cram.lc li::marker { color: var(--lc); }
 .likely-lec ol { padding-left: 22px !important; list-style: decimal !important; display: grid; gap: 6px; font-size: var(--fs-label); flex: 1; }
 .likely-lec ol .note { display: block; }
 .likely-lec .btn { align-self: flex-start; }
@@ -781,6 +835,8 @@ html.shx .sh-qrate-b { width: 36px; height: 34px; border-radius: var(--r-pill); 
 html.shx .sh-qrate-b:hover { background: var(--row); }
 html.shx .sh-qrate-r { font-size: var(--fs-meta); min-height: 32px; }
 html.shx .sh-pod-card { background: var(--panel); box-shadow: none; border: 0; border-radius: var(--r-panel); padding: 20px; }
+/* the engine's ".hx button { color: inherit }" outranks the player's white label on the hub's color (BUG-056) */
+html.shx .hx .sh-pod-play, html.shx .hx .sh-pod-post { color: #ffffff; }
 html.shx .sh-pod-kicker { font: var(--w-head) var(--fs-label)/1.3 var(--font); letter-spacing: 0; text-transform: none; color: var(--hub-text); }
 html.shx .sh-pod-kicker span { letter-spacing: 0; font-size: var(--fs-meta); }
 html.shx .sh-pod-tag { font: var(--w-strong) 12px/1.3 var(--font); letter-spacing: 0; text-transform: none; }
