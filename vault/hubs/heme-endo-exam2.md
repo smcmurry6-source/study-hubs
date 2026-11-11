@@ -27,7 +27,12 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   question** (206, under Exam 1's 55 predicted topics, in Exam 1's topic order) plus `r-pa-2s-2`, untagged. **Never cut
   them** (Sam, 2026-11-10: "include all of the exam 1 high likelihood questions. do not cut them"). (It held 219 from
   2026-11-06, every Exam 1 High Likelihood question plus 13 of its hardest; 55, then 80, after the high-yield cut below,
-  until Sam's call.) A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
+  until Sam's call.) **Only Exam 1's L2, L3, L6 and L10 are on Exam 2** (Sam, 2026-11-11: "the exam 1 questions for heme and
+  endo exam 2 will come from l2,6,3, and 10"): R's `LIKELY_TOPICS` keep those four lectures' 23 topics (93 questions: L2 20,
+  L3 38, L6 18, L10 17), so the mock's five, Exam 1 High likelihood and the drill use them alone. The other six lectures' 114
+  questions stay in R, untagged (the agent's call, open to change: retire them if Sam wants R to hold only the four). R's
+  notes (both levels, narration regenerated) and cram sheet cover only the four, and an R `focus` hint, Home's chips and exam
+  card, `EXAM_INFO`, the mock's intro and the About page say so. A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
   Title)" after the explanation and `pcase` prefixed `r-`; the Refresher's `LIKELY_TOPICS` are Exam 1's, "L# Title: "
   before each topic and "Exam 1 " before its basis. Its notes are Exam 1's cram sheet. **The mock's five Exam 1
   questions come only from R's High Likelihood questions** (Sam, 2026-11-06), **drawn at random** (Sam, 2026-11-10: "pull
@@ -98,7 +103,7 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   L12b together, at random, and the "Most likely questions" box says "9 on the exam for L12a and L12b together".
   **The counts never trim High Likelihood** (Sam, 2026-11-10: "Dont remove any high likelihood questions. If they were
   hinted to be exam questions, they need to be high likelihood"; now in [high-likelihood-topics](../rules/high-likelihood-topics.md)):
-  every lecture keeps all its topics (74 on the Exam 2 lectures, 269 questions since L16 went taught; the Refresher's 55), and the box only
+  every lecture keeps all its topics (74 on the Exam 2 lectures, 269 questions since L16 went taught; the Refresher's 23, L2, L3, L6 and L10 only, since 2026-11-11), and the box only
   shows the count beside each lecture. When the 11/11 review flags a topic, add it or rank it higher. L16's ten topics
   were re-ranked from its recording on 2026-11-11 (basis "recording"; every question that was High Likelihood stayed so):
   follicular versus luteal first ("high yield for exam"), then the two-cell slide ("very important slide").
