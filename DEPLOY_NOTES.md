@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-10 (migration_v54 applied by mistake, then undone, Claude Code)** — After Sam's "also apply the sql", a
+  session applied `migration_v54.sql` (the game layer's server) to the live project, though it was meant to wait for the
+  redesign's release. No page called it and no student data reached its tables. Sam: "dont run the migration if it wasnt
+  supposed to yet". `supabase/rollback-v54.sql` (tested on a throwaway copy: schema + v54 + rollback = schema) drops what v54
+  added and restores today's three replaced functions; v54 stays in `supabase/pending-migrations.txt` for the release.
+  Lesson: a migration listed as pending waits for its release, even when someone asks to "apply the sql"; ask which one.
+
 - **2026-11-11 (Heme & Endo Exam 2: L16 taught from its recording, Claude Code)** — Sam uploaded the L16 transcript
   (Dr. Madison, Tue 11/10). Female Reproductive Physiology goes from slides-only to taught: notes at both levels checked
   against what he said (a "What he stressed" box; DHT and the external genitalia, leptin and what inhibits GnRH, theca cells
