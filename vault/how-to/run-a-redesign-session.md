@@ -15,7 +15,8 @@ and the phase notes it links.
    C with the bowling egg (they share Timmy's place's renderer); part A alone; Learn and Flashcards alone; phase 5 part 2 alone.
 2. **Hand off in the task note, not the chat.** Before a session ends, its task note's Log says what's built, what's left
    and the next step, so the next session reads that note and the notes it links and starts. No re-exploring.
-3. **Decisions before code.** Answer [the open calls](../tasks/2026-11-11-redesign-open-calls.md) first. Show new art as
+3. **Decisions before code.** Put the open calls to Sam in one list and get them answered first (the first list:
+   [the open calls](../tasks/done/2026-11-11-redesign-open-calls.md), all answered and made, 2026-11-11). Show new art as
    contact sheets (`tools/figures/site/pack-preview.mjs`, the design page) and get Sam's yes before it goes into the engine:
    a round that changes something already built costs a rebuild, the tests and new screenshots.
 4. **Never read a big file whole.** `widget/hub.js`, `widget/v3.js`, a hub's `index.html` and `DEPLOY_NOTES.md` are tens of
@@ -32,5 +33,5 @@ and the phase notes it links.
 8. **Migrations wait for their release.** A file in `supabase/pending-migrations.txt` is never applied before the release
    its note names, even when asked to "apply the sql": ask which one (2026-11-10, `migration_v54`, undone).
 
-Related: [the release](../tasks/2026-11-06-redesign-release.md) · [the open calls](../tasks/2026-11-11-redesign-open-calls.md) ·
+Related: [the release](../tasks/2026-11-06-redesign-release.md) · [the open calls](../tasks/done/2026-11-11-redesign-open-calls.md) ·
 [ship-a-change](ship-a-change.md) · [verify-before-pushing](verify-before-pushing.md) · [tasks](../tasks/README.md)

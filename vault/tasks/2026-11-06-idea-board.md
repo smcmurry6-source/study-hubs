@@ -141,6 +141,10 @@ Each gets a hub and a category when it's posted (most are for all hubs; the arca
   (`get_my_inbox_v2`). Still to build: `widget/ideas.js`, the admin page's "Idea board", the check-in's tick. Calls made
   while building, for Sam: an idea's hub must be one whose keys are loaded (the release loads them for the live hubs), and
   an author's delete keeps an empty row so it still counts toward the day's three.
+- 2026-11-11 (Claude Code): Sam's answers ([decisions](../decisions.md)): an idea names a hub with keys or "All hubs" (yes);
+  an author's delete **removes the idea completely**, so `delete_my_idea` now deletes the row and, with it, its votes,
+  reports and Inbox notes (it no longer counts toward the day's three or the 20 seconds); hidden ideas are kept 90 days
+  ([analytics-retention](../reference/analytics-retention.md), not built yet). `xp.js` checks it.
 
 ## Outcome
 

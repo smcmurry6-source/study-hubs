@@ -14,13 +14,14 @@
 //   - Shiny Gold Crowns (from base XP, the grants since the switch, minus spending), the shop's rotation and seasons,
 //     buy_item (a double tap, a replayed call, a balance too low, not on sale today, owned, one snack a day, boosts that
 //     extend), equip_item, snack HP in Timmy's days, rare-costume sightings;
-//   - the idea board: names, limits, votes, reports, statuses with Inbox notes, starter ideas, no visitor ids;
+//   - the idea board: names, limits, votes, reports, statuses with Inbox notes, an author's delete that removes the idea
+//     completely, starter ideas, no visitor ids;
 //   - the bootstrap with all of it, the Dark Matter unlock once per journey;
 //   - the seasonal sets and the rank sets: the catalog is exactly tools/figures/site/sets.mjs; when each season's set is
 //     on sale (sh_shop_seasons, 2026-2028); Halloween's set is everyone's; a rank set is owned at its rank and never
 //     sold; two throwback days a month; the daily and weekly picks never hold a seasonal, gift or rank item;
-//   - visiting: a board row's key opens that person's place and nothing else of theirs; turning it off takes the key off
-//     every board; Link my devices keeps it off;
+//   - visiting: a board row's key opens that person's place and nothing else of theirs; everyone can be visited, with no
+//     way to turn it off; Link my devices moves the place to the id that remains;
 //   - anon can't reach the private parts.
 //   node tools/release/xp.js     (PostgreSQL 14+ server binaries: initdb, pg_ctl, psql)
 'use strict';
@@ -490,19 +491,29 @@ try {
   ok(anonJson(`get_ideas(null, 'shipped', null, null)`).ideas.some(x => x.id === i1.id) && !anonJson(`get_ideas(null, 'top', null, null)`).ideas.some(x => x.id === i1.id), 'Shipped moves it to the Shipped tab');
   ok(anonJson(`delete_my_idea('idea-vis-2', ${i1.id})`) === false, 'only the author deletes');
   const i3 = num(`select id from ideas where title = 'A third idea'`);
-  vote('idea-vis-2', i3, 1);
-  ok(anonJson(`delete_my_idea('idea-vis-1', ${i3})`) === true && !anonJson(`get_ideas(null, 'new', null, null)`).ideas.some(x => x.id === i3)
-    && one(`select title || name || body from ideas where id = ${i3}`) === undefined && num(`select count(*) from idea_votes where idea_id = ${i3}`) === 0,
-    'the author deletes their own: its words, name and votes go');
+  vote('idea-vis-2', i3, 1); anon(`select report_idea('idea-vis-3', ${i3})`);
+  eq(anonJson(`admin_set_idea(${S}, ${i3}, 'status', 'considering', 'Looking at it')`).notified, 2, 'a status on the idea about to go: the author and the up-voter are noted');
+  const i3rows = () => ['ideas where id', 'idea_votes where idea_id', 'idea_reports where idea_id', 'idea_notes where idea_id'].map(t => num(`select count(*) from ${t} = ${i3}`));
+  eq(i3rows(), [1, 1, 1, 2], 'before the delete: the idea, its vote, its report and its two notes');
+  ok(anonJson(`delete_my_idea('idea-vis-1', ${i3})`) === true && !anonJson(`get_ideas(null, 'new', null, null)`).ideas.some(x => x.id === i3),
+    'the author deletes their own: it leaves the board');
+  eq(i3rows(), [0, 0, 0, 0], 'removed completely (Sam, 2026-11-11): its row, votes, reports and Inbox notes, nothing left behind');
+  ok(!anonJson(`(select coalesce(json_agg(x), '[]') from get_my_inbox_v2('idea-vis-2') x)`).some(x => x.kind === 'idea' && x.title === 'A third idea'), 'its note leaves the up-voter\'s Inbox');
+  ok(anonJson(`delete_my_idea('idea-vis-1', ${i3})`) === false, 'deleting it again does nothing');
   ok(!anonJson(`(select coalesce(json_agg(x), '[]') from admin_ideas(${S}) x)`).some(x => x.id === i3) && anonJson(`admin_set_idea(${S}, ${i3}, 'restore')`).error === 'unknown',
     'Sam can\'t see or bring back an idea its author deleted');
+  ok(anonJson(`coalesce(vote_idea('idea-vis-4', ${i3}, 1), 'null'::jsonb)`) === null && anonJson(`report_idea('idea-vis-4', ${i3})`) === false && num(`select count(*) from idea_votes where idea_id = ${i3}`) === 0,
+    'a vote or report on a deleted idea writes nothing');
+  ok(post('idea-vis-1', 'A fifth idea', '', null, 'other').ok, 'a deleted idea no longer counts toward the day\'s three');
+  const i5 = num(`select id from ideas where title = 'A fifth idea'`);
+  ok(anonJson(`delete_my_idea('idea-vis-1', ${i5})`) === true && post('idea-vis-1', 'A sixth idea', '', null, 'other').ok, 'or toward the 20 seconds: deleted at once, the next one posts at once');
   sql(`update ideas set created_at = created_at - interval '30 seconds' where visitor_id = 'idea-vis-1'`);
-  eq(post('idea-vis-1', 'A fifth idea', '', null, 'other').error, 'limit', 'a deleted idea still counts toward the day\'s three');
+  eq(post('idea-vis-1', 'A seventh idea', '', null, 'other').error, 'limit', 'three standing ideas still make the limit');
   raises(() => anon(`select admin_post_starter_idea('wrong', 'Timmy Tooth', 'Study rooms', '', null, 'feature')`), '28000', 'a starter idea with a wrong secret');
   const si = num(`select admin_post_starter_idea(${S}, 'Number thirty-one', 'Build my own mock', 'Pick the lectures, how many and the time.', null, 'feature')`);
   const sn = anonJson(`get_ideas(null, 'new', null, null)`).ideas.find(x => x.id === si);
   ok(sn && sn.name === 'Number thirty-one' && sn.source === 'starter' && num(`select count(*) from ideas where id = ${si} and visitor_id is null`) === 1, 'a starter idea by Timmy\'s neighbor, with no visitor');
-  notes.push('the idea board: names, limits, filters and counts, votes, reports, statuses with Inbox notes, starter ideas');
+  notes.push('the idea board: names, limits, filters and counts, votes, reports, statuses with Inbox notes, an author\'s delete that removes it completely, starter ideas');
 
   /* ---------- 12. the bootstrap, the Dark Matter unlock and the boards ---------- */
   const b2v = json(`get_widget_bootstrap_v2('xp-B', 'xh')`);
@@ -730,7 +741,8 @@ try {
   const K = b1v.rank.find(x => x.is_me).visit;
   ok(HEX.test(K) && vsRows(b1v).every(([, r]) => r.every(x => x.visit === K)), `visiting is on by default: the same 24-character key on that person's row of every board (the caller's own row too)`);
   ok(Object.values(b1v).every(r => r.every(x => HEX.test(x.visit || ''))) && new Set(b1v.rank.map(x => x.visit)).size === b1v.rank.length, 'every row of every board has a key, a different one for each person');
-  eq(shopOf('xp-VS').visiting, true, 'get_my_shop says visiting is on');
+  ok(!('visiting' in shopOf('xp-VS')) && num(`select count(*) from pg_proc where proname = 'set_visiting'`) === 0 && one(`select to_regclass('public.pet_visit_off') is null`) === 't',
+    'no one can turn visiting off (Sam, 2026-11-11): no set_visiting, no list of who turned it off, no switch in get_my_shop');
   const pl = place(K), meRow = b1v.rank.find(x => x.is_me);
   eq(Object.keys(pl).sort(), ['equipped', 'flair', 'name', 'rank'], 'a place is a name, what stands in each slot, the rank and the mastery flair, and nothing else');
   eq(pl.name, 'Visit Subject', 'under the leaderboard name, as the boards show it');
@@ -752,38 +764,28 @@ try {
   const nameVA = one(`select anon_name('xp-VA')`), rowVA = b1v.arcade.find(x => x.display_name === nameVA), plVA = rowVA && place(rowVA.visit);
   ok(plVA && plVA.name === nameVA && sorted(plVA.equipped) === '[]' && plVA.rank.journey === 0 && plVA.rank.tier === 0 && plVA.rank.level === 1 && leaks(plVA).length === 0,
     'someone with only an arcade score and no chosen name: their generated name, an empty place, the first rank');
-  // off
-  eq(anonJson(`set_visiting('xp-VS', false)`), { ok: true, visiting: false }, 'turning visiting off');
-  eq(anonJson(`set_visiting('xp-VS', false)`), { ok: true, visiting: false }, 'off twice is still off');
-  const b2off = boardRows();
-  ok(vsRows(b2off).every(([, r]) => r.length >= 1 && r.every(x => x.visit === null)) && !JSON.stringify(b2off).includes(K), 'off: that person\'s row has no key on any of the four boards, and the old key is nowhere');
-  ok(b2off.rank.filter(x => x.display_name !== 'Visit Subject').every(x => HEX.test(x.visit || '')), 'everyone else keeps theirs');
-  eq(place(K), null, 'the old key opens nothing');
-  eq(shopOf('xp-VS').visiting, false, 'get_my_shop says visiting is off');
-  // on again
-  eq(anonJson(`set_visiting('xp-VS', true)`), { ok: true, visiting: true }, 'turning it back on');
-  ok(vsRows(boardRows()).every(([, r]) => r.every(x => x.visit === K)) && place(K).name === 'Visit Subject' && shopOf('xp-VS').visiting === true, 'on again: the same key is back on every board and opens the place');
+  ok(vsRows(boardRows()).every(([, r]) => r.every(x => x.visit === K)) && place(K).name === 'Visit Subject', 'asked again: the same key on every board, and it opens the same place');
   eq([place('0'.repeat(24)), place('xp-VS'), place('nope'), place(null), place(K.toUpperCase())], [null, null, null, null, null], 'an unknown key, a visitor id, a malformed key and no key all give nothing');
-  eq([anonJson(`set_visiting('', false)`).ok, anonJson(`set_visiting(null, false)`).ok, anonJson(`set_visiting('xp-VS', null)`).ok, anonJson(`set_visiting(repeat('x', 81), false)`).ok], [false, false, false, false], 'set_visiting refuses a bad id or no choice');
-  eq(num(`select count(*) from pet_visit_off`), 0, 'and writes nothing for them');
-  // Link my devices keeps an opt-out, whichever device made it
-  anon(`select set_visiting('xp-VL2', false); select set_visiting('xp-VM', false)`);
-  const vc1 = anon(`select create_link_code('xp-VL')`)[0][0], vc2 = anon(`select create_link_code('xp-VM')`)[0][0];
-  eq([anon(`select redeem_link_code(${q(vc1)}, 'xp-VL2')`)[0][0], anon(`select redeem_link_code(${q(vc2)}, 'xp-VM2')`)[0][0]], ['xp-VL', 'xp-VM'], 'two pairs of devices link');
-  eq(rows(`select visitor_id from pet_visit_off order by 1`).map(r => r.visitor_id), ['xp-VL', 'xp-VM'], 'linked: off on either device stays off, on the id that remains');
-  ok(shopOf('xp-VL').visiting === false && shopOf('xp-VM').visiting === false, 'and the shop says so');
+  // Link my devices: the place goes with everything else to the id that remains, and the other device's key opens nothing
+  sql(`insert into arcade_scores (hub, game, visitor_id, score) values ('xh', 'board', 'xp-VL2', 7)`);
+  const kVL = one(`select sh_visit_key('xp-VL')`), kVL2 = one(`select sh_visit_key('xp-VL2')`), nVL = one(`select anon_name('xp-VL')`);
+  ok(place(kVL2) && place(kVL2).name === one(`select anon_name('xp-VL2')`) && place(kVL) === null, 'before linking: the second device has a place (its arcade score), the first none yet');
+  const vc1 = anon(`select create_link_code('xp-VL')`)[0][0];
+  eq(anon(`select redeem_link_code(${q(vc1)}, 'xp-VL2')`)[0][0], 'xp-VL', 'two devices link');
+  const arcVL = boardRows().arcade.map(x => x.visit);
+  ok(place(kVL2) === null && place(kVL) && place(kVL).name === nVL && arcVL.includes(kVL) && !arcVL.includes(kVL2),
+    'linked: the arcade row and the place are under the id that remains; the other device\'s key opens nothing');
   ok(num(`select length(secret) from visit_secret`) >= 32 && num(`select count(*) from visit_secret`) === 1, 'one server-side secret behind the keys');
-  notes.push('visiting: on by default, a key per board row, a place with only what it shows, off and on again, unknown keys, Link my devices');
+  notes.push('visiting: everyone, a key per board row, a place with only what it shows, no way to turn it off, unknown keys, Link my devices');
 
   /* ---------- 15. the private parts stay private ---------- */
-  for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'pet_visit_off'])
+  for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);
-  raises(() => anon(`insert into public.pet_visit_off (visitor_id) values ('x')`), '42501', 'anon writes pet_visit_off directly');
   raises(() => anon(`update public.visit_secret set secret = 'x'`), '42501', 'anon writes visit_secret directly');
   for (const f of [`sh_answer(null, 'x', 'xh', 'x1', 1, null, null, null, null, null, null, null)`, `sh_award('x', 'k', 'report', 'xh', 100, 1, now())`,
     `sh_xp_replay(array['x'])`, `sh_wallet('xp-B')`, `sh_session_start(null, 'x', 'xh', 'mock', null)`, `sh_pod_minute(null, 'x', 'xh', 'ep1', 0)`,
     `sh_medal_check('x', 'xh', now())`, `sh_xp_mult('x', now())`, `sh_key('xh', 'x1', null)`,
-    `sh_visit_key('xp-VS')`, `sh_visit_link('xp-VS')`, `sh_owns('xp-B', 'castle')`, `sh_owned('xp-B')`, `sh_buy(null, 'xp-B', 'apple', 'buy-anon-0001')`, `sh_my_shop(null, 'xp-B')`, `sh_throwback_items(current_date)`])
+    `sh_visit_key('xp-VS')`, `sh_owns('xp-B', 'castle')`, `sh_owned('xp-B')`, `sh_buy(null, 'xp-B', 'apple', 'buy-anon-0001')`, `sh_my_shop(null, 'xp-B')`, `sh_throwback_items(current_date)`])
     raises(() => anon(`select ${f}`), '42501', `anon runs ${f.split('(')[0]}`);
   eq([anon(`select sh_shop_seasons('2026-10-15')`)[0][0], anon(`select sh_is_throwback('2026-10-15') is not null`)[0][0], anon(`select cardinality(sh_throwback_days('2026-10-15'))`)[0][0]], ['{halloween,fall}', 't', '2'],
     'anon can ask which seasons are on sale and which days are throwback days (pure arithmetic on the calendar)');
