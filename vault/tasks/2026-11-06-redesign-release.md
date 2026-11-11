@@ -320,7 +320,9 @@ is in [its own note](2026-11-06-idea-board.md).
   (a plain tooth if they haven't adopted him, or have him or the extras off). When someone opens a hub their Timmy hops
   in through the door and jumps into a desk; when they close it he gets up and leaves. The desk's front is the hub's
   color, the windows show day or night, rows are added as the room fills, and past a full room a sign by the door says
-  how many are in the hall. No names: nobody can tell which Timmy is whose. Reduce motion (or answer animations off)
+  how many are in the hall. **Your own Timmy's desk has a "You" plate** while you have a hub open in another tab, on
+  your screen only (your browser remembers which one is its own; nobody else can tell). No names: nobody can tell which
+  Timmy is anyone else's. Reduce motion (or answer animations off)
   seats them without the walk; Focus mode shows the plain count. The count is in the top bar too. Under it the
   leaderboard, one list at a time: **Ranks** (top 10, with every rank from Stone to Dark Matter folded under it) or
   **Study streaks**, with **the top three on a stage**: curtains, spotlights, torches, confetti, gold, silver and

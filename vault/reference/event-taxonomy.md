@@ -57,6 +57,10 @@ as `thanksgiving:turkey`; after the shop's release, the equipped outfit's id; em
 mode). No visitor id, no name, nothing typed. It is never stored: it is gone when the tab closes. The dashboard only
 listens (the count in the top bar; on the new dashboard, a Timmy at a desk for each person, in that outfit) and treats
 `fit` as a lookup key from a fixed list, never as markup. `presence_hourly` above is the stored, id-free count.
+So the new dashboard can put a "You" plate on your own Timmy's desk, a hub tab also keeps its own random key **in that
+browser only** (`localStorage` `sh_presence_mine`, `rememberMine()` in `widget/v3.js`: taken out when the tab closes, at
+most 8 kept, none older than two days). It isn't sent anywhere it didn't already go, and it means nothing on another
+device: nobody can tell which Timmy is anyone else's.
 
 ### Questions
 
