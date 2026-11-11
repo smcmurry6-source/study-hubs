@@ -32,6 +32,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (cheaper sessions for the rest of the redesign, Claude Code)** — Sam: "implement these changes". The eight
+  question-writing rules (every choice's why, two-statement and true/false, numbered, which-statement, high likelihood, what
+  professors skip, the bank's panel, question-health flags) are `load: on-demand`: the new `hubs/CLAUDE.md` loads them whenever
+  a session opens a hub file, and `CLAUDE.md` lists them under "Feature rules". The narration, usage-data and reports how-tos
+  are links. Every session now starts with about 58 KB of notes instead of 81 KB (about 5.6k tokens less on every turn). New:
+  [run-a-redesign-session](vault/how-to/run-a-redesign-session.md) and [the open calls](vault/tasks/2026-11-11-redesign-open-calls.md)
+  for Sam in one list; phase 4 starts by splitting `widget/hub.js`.
+
+- **2026-11-10 (migration_v54 applied by mistake, then undone, Claude Code)** — After Sam's "also apply the sql", a
+  session applied `migration_v54.sql` (the game layer's server) to the live project, though it was meant to wait for the
+  redesign's release. No page called it and no student data reached its tables. Sam: "dont run the migration if it wasnt
+  supposed to yet". `supabase/rollback-v54.sql` (tested on a throwaway copy: schema + v54 + rollback = schema) drops what v54
+  added and restores today's three replaced functions; Sam OK'd it and it ran on the live project the same night (none of v54's
+  tables or functions left, the three functions back with today's grants, no migration-history row, today's bootstrap
+  answers). v54 stays in `supabase/pending-migrations.txt` for the release.
+  Lesson: a migration listed as pending waits for its release, even when someone asks to "apply the sql"; ask which one.
+
 - **2026-11-11 (Heme & Endo Exam 2: L16 taught from its recording, Claude Code)** — Sam uploaded the L16 transcript
   (Dr. Madison, Tue 11/10). Female Reproductive Physiology goes from slides-only to taught: notes at both levels checked
   against what he said (a "What he stressed" box; DHT and the external genitalia, leptin and what inhibits GnRH, theca cells

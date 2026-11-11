@@ -36,15 +36,15 @@ Shipping and the vault
   groups of 5+, no new identifiers.
 
 Questions
-- [Every choice gets a why](rules/every-choice-gets-a-why.md)
-- [Two-statement and true/false questions](rules/two-statement-and-true-false.md) (CI minimums per taught lecture)
-- [Numbered-statement questions](rules/numbered-statements.md) (CI minimum per taught lecture)
-- ["Which statement is true / false?" questions](rules/which-statement-questions.md) (CI minimum per taught lecture)
-- [High Likelihood Exam Questions](rules/high-likelihood-topics.md): `LIKELY_TOPICS` for every lecture.
-- [Question Bank: the filter panel](rules/question-bank-filter-panel.md), lecture picker, order and pins.
+- [Every choice gets a why](rules/every-choice-gets-a-why.md) *(on demand)*
+- [Two-statement and true/false questions](rules/two-statement-and-true-false.md) (CI minimums per taught lecture) *(on demand)*
+- [Numbered-statement questions](rules/numbered-statements.md) (CI minimum per taught lecture) *(on demand)*
+- ["Which statement is true / false?" questions](rules/which-statement-questions.md) (CI minimum per taught lecture) *(on demand)*
+- [High Likelihood Exam Questions](rules/high-likelihood-topics.md): `LIKELY_TOPICS` for every lecture *(on demand)*.
+- [Question Bank: the filter panel](rules/question-bank-filter-panel.md), lecture picker, order and pins *(on demand)*.
 - [Question ids are permanent](rules/question-ids-are-permanent.md): never renamed or reused (`tools/question-ids/`, checked by CI).
-- [No questions on what a professor says you don't need](rules/dont-ask-what-professors-skip.md): check every recording; retire what tests it.
-- [Question-health flags are leads](rules/question-health-flags-are-leads.md): nothing changes a question automatically; Sam decides.
+- [No questions on what a professor says you don't need](rules/dont-ask-what-professors-skip.md): check every recording; retire what tests it *(on demand)*.
+- [Question-health flags are leads](rules/question-health-flags-are-leads.md): nothing changes a question automatically; Sam decides *(on demand)*.
 
 Hub building
 - [Every hub opens on its own Home page](rules/hub-home-page.md)
@@ -61,7 +61,8 @@ Hub building
 
 ## How-tos
 
-- [Ship a change](how-to/ship-a-change.md) · [Verify before pushing](how-to/verify-before-pushing.md)
+- [Ship a change](how-to/ship-a-change.md) · [Verify before pushing](how-to/verify-before-pushing.md) ·
+  [Run a redesign session](how-to/run-a-redesign-session.md): one phase per fresh session, decisions before code, cheap tests
 - [Preview a change](how-to/preview-a-change.md): the site from a branch, on made-up data, with test accounts and time
   travel · [Roll back a release](how-to/roll-back-a-release.md)
 - [Build a hub, or add a lecture to one](how-to/build-a-hub.md): the checklist, and every file a new hub touches.
