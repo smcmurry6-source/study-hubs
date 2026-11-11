@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (redesign phase 2: the new Heme & Endo Exam 2, beside the live one, Claude Code)** — Nothing students see
+  changes. `hubs/heme-endo-exam2/next/` is the hub on the shared engine, built the way phase 1 built Occlusion's: settings in
+  `window.SH_HUB`, content in `next/content/` written from the live hub by `tools/hub-next/build.mjs` (now with
+  `heme-endo-exam2`; CI's `--check` covers it), and outside a preview it sends visitors to the live hub. Same hub id, state
+  key, answered event and all 609 question ids. The engine (`widget/hub.js`, gated so Occlusion's new version is unchanged)
+  learned what this hub needs: **review-only lectures** (the Exam 1 Refresher out of every total and out of the bank until
+  ticked, `SH_EXPORT.uncounted` for the medal), **a toggle tied to a lecture** (Exam 1 High likelihood ticks R and unticks it
+  again), **the mock's grouped L12 and the Refresher's five High Likelihood picks**, "which statement" type filters, focus-list
+  hints and a plural "In the professors' words". The build handles a hub without the Occlusion drawing kit (its `FIGS` and
+  `FIG_PLACE` as data). Its six arcade lobby drawings are new (`tools/figures/site/arcade.mjs`, from `HEE2_SKIN`). Notes:
+  [hub note](vault/hubs/heme-endo-exam2.md), [phase 2](vault/tasks/2026-11-05-redesign-phase-2-live-hubs.md).
 - **2026-11-11 (cheaper sessions for the rest of the redesign, Claude Code)** — Sam: "implement these changes". The eight
   question-writing rules (every choice's why, two-statement and true/false, numbered, which-statement, high likelihood, what
   professors skip, the bank's panel, question-health flags) are `load: on-demand`: the new `hubs/CLAUDE.md` loads them whenever
