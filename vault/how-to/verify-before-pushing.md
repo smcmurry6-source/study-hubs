@@ -41,3 +41,6 @@ data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line a
 - If both `widget/v3.js` and `widget/v3.css` changed, make sure both are committed.
 - Smoke test with Playwright against the file (`file://.../hubs/<id>/index.html`),
   clicking through each mode tab. The Supabase-backed widget parts only work live.
+- If CI's runner can't reach Ubuntu's package mirror, both workflows install the test browsers without their system
+  packages and say so in a warning on the run's page (2026-11-11). A "Check hubs" that still fails at "Install headless
+  Chromium" is the browser download itself: re-run it once, then say so in the PR.

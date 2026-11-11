@@ -70,7 +70,12 @@ jobs:
       - name: Install Playwright browsers, axe-core and PostgreSQL
         run: |
           npm i --no-save playwright@1.56.1 axe-core@4.14.0
-          npx playwright install --with-deps chromium webkit firefox
+          # when Ubuntu's mirror is unreachable, the browsers alone (see check.yml); an engine that then can't start is
+          # reported as skipped by the device matrix, with this warning on the run's page
+          npx playwright install --with-deps chromium webkit firefox || {
+            echo "::warning::Ubuntu's package mirror was unreachable: browsers installed without their system packages; WebKit or Firefox may be skipped"
+            npx playwright install chromium webkit firefox
+          }
           ls /usr/lib/postgresql/*/bin/initdb >/dev/null 2>&1 || (sudo apt-get update -q && sudo apt-get install -y -q postgresql)
       # on a pull request, Check hubs already ran these on the same commit; a run by hand runs everything
       - name: Run the release suites

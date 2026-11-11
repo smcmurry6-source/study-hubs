@@ -37,7 +37,15 @@ jobs:
         if: ${{ !cancelled() }}
         run: node tools/ci/archive.js
       - name: Install headless Chromium
-        run: npm i --no-save playwright@1.56.1 && npx playwright install --with-deps chromium
+        # The system packages come from Ubuntu's mirror. When the runner can't reach it (2026-11-11: three runs in a row
+        # couldn't resolve azure.archive.ubuntu.com, and every package that failed was an optional font), install the
+        # browser alone: the runner image already has the libraries Chromium needs.
+        run: |
+          npm i --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium || {
+            echo "::warning::Ubuntu's package mirror was unreachable: Chromium installed without its system packages (the runner image has the ones it needs)"
+            npx playwright install chromium
+          }
       - name: Click through the hubs this PR changes (every hub on main or when a shared file changes) and lint their question banks
         env:
           SMOKE_CHANGED_FROM: ${{ github.event_name == 'pull_request' && 'HEAD^1' || '' }}
