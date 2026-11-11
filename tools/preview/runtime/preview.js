@@ -334,16 +334,17 @@
   /* two published recaps for the dashboard's slideshow: made-up totals in the shape get_hub_recap returns (the live
      site's are drawn from the class's real totals, which a preview never loads) */
   function recapFixtures(){
-    function one(hub, title, color, exam, people, minutes, answers, correct){
+    function one(hub, title, color, exam, people, minutes, answers, correct, tough){
       var byDay = [], byHour = [];
       for (var i = 9; i >= 0; i--) { var d = new Date(exam + "T12:00:00"); d.setDate(d.getDate() - i); byDay.push({ d: d.toISOString().slice(0, 10), minutes: Math.round(minutes * (10 - i) / 55) }); }
       for (var h = 0; h < 24; h++) byHour.push(h < 6 ? 2 : h < 12 ? 9 + h : h < 18 ? 14 + (h % 5) * 3 : 60 - Math.abs(20 - h) * 9);
-      return { hub: hub, title: title, color: color, names: false, question: null, footnote: "Preview: made-up totals",
+      return { hub: hub, title: title, color: color, names: false, footnote: "Preview: made-up totals",
+        question: tough ? { text: "A made-up question stands in here for the one the class missed most.", answer: "A made-up answer" } : null,
         data: { hub: hub, people: people, minutes: minutes, answers: answers, correct: correct, first_day: byDay[0].d, last_day: exam, exam_day: exam,
-          by_day: byDay, by_hour: byHour, night_before: Math.round(minutes * .18), night_before_people: Math.round(people * .8), after_midnight: 6, regulars: Math.round(people * .6) } };
+          by_day: byDay, by_hour: byHour, toughest: tough ? [{ qid: "pv-tough", attempts: 52, correct: 16 }] : [], night_before: Math.round(minutes * .18), night_before_people: Math.round(people * .8), after_midnight: 6, regulars: Math.round(people * .6) } };
     }
     return [one("pcd-implants-exam1", "PCD Implants Exam 1", "#2f6f84", "2026-11-06", 58, 9120, 21480, 14820),
-            one("heme-endo-exam1", "Heme & Endo Exam 1", "#a83232", "2026-10-30", 61, 11340, 26950, 17790)];
+            one("heme-endo-exam1", "Heme & Endo Exam 1", "#a83232", "2026-10-30", 61, 11340, 26950, 17790, true)];
   }
   /* the account's starting XP, plus a little for each answer given in this preview (the server's real rule is per day) */
   function myXp(){ var extra = 0; allAnswers().forEach(function(a){ if (!a[4]) extra += a[3] ? 3 : 1; }); return (db.xp || 0) + extra; }

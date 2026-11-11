@@ -5,7 +5,7 @@ hub: dashboard
 created: 2026-11-05
 requested-by: Sam
 due: 
-waiting-on: Sam's yes on the recap's redrawn contact sheet, and Sam's look at the classroom and the stage; the idea board (a second session)
+waiting-on: Sam's look at the preview and approval; the idea board (a second session)
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/318
 ---
@@ -155,11 +155,8 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
     `widget/hub-art/outfits.js` (the shop's 55 outfits and `dress()` from `place.mjs`; loaded when first needed).
   - **The preview** has a made-up class of 4 to 16 that comes and goes every 7 seconds on the dashboard, some in shop
     outfits, and a `get_place` stub; `shDash.setLive(by, list)` is how it (and the smoke test) feed the room.
-  - **The recap** is as the second pass left it. Sam on the poster: the mountain range "doesnt read as a bar graph" and
-    it "needs to fit in a smaller card". Redrawn as chunky day columns in a compact card (`recap.mjs`: `bars()`,
-    `crowd()`) and sent as a new sheet; **waiting for Sam's yes before it goes into the page**. To build it: draw
-    `CA.recap.bars()` in place of `.rc-bars` in `drawRecap`'s body, shrink `.rc-body`, add `recap:` back to
-    `class.js` in `build.mjs`.
+  - **The recap** was left as the second pass had it in this entry, waiting for Sam's yes on the redrawn sheet; it was
+    built in the next entry.
   - **"You" and the class no longer share a bottom edge.** With the stage the class card is about 360 px taller, and
     the streak and answers tiles stretched to match it were mostly empty, so each card ends where its content ends. The
     taste inspector says so as a second warning (`ragged-row`, beside `below-fold`); 0 FAIL, light and dark.
@@ -172,11 +169,25 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   every live hub's old and new page and one archived hub (the outfit that goes out is a holiday look or nothing, and
   nothing with Timmy off); "No request has reached production" at the end.
 
+- 2026-11-11 (Claude Code, **the recap's redraw built**). Sam, looking at the preview: "It looks like the infographic
+  art changes were dropped?" They had been held back for a yes on the redrawn sheet; Sam expected them in, so they are
+  in ([decisions](../decisions.md)). The recap is now a compact card (`show()` in `startRecaps`, `recapArt()`,
+  `recapClimber()`, `rcIcon()` in `widget/dash.js`): the hours on a block of the hub's color, the classmates as a crowd
+  of teeth, hours per day as drawn columns (`SH_CLASS_ART.recap.bars()`: one a day, the exam day's with its flag, the
+  most hours on a label, Timmy in the ranger hat on the tallest column clear of the label), fact chips with trophy
+  drawings as icons, "the one that got us" as a dark strip. It is drawn at the card's own width (a container query,
+  and `recapArt(true)` on a resize, which doesn't replay the entrance). On a laptop it sits beside the hubs that just
+  closed, about 680 by 420 px where it was 1170 px wide; alone, it stops at 820 px. In the dark theme the graph and the
+  crowd stay on a light surface, since they are drawn in ink. Without the art file the card is its numbers and words.
+  `widget/hub-art/class.js` now carries the recap kit, six trophy drawings (`recapIcons`) and the hat (`recapHat`):
+  55 KB. Save image is unchanged (`widget/recap.js`). The preview's second recap has a made-up "one that got us".
+  BUG-069 and BUG-070 found and fixed.
+
 
 ## Outcome
 
 Not finished. The new dashboard is built beside the live one (`next/`), on the design system, with everything from the
 plan except the idea board, and with Sam's second-pass changes; nothing students see has changed
-([#318](https://github.com/smcmurry6-source/study-hubs/pull/318), a draft). The third pass's classroom and stage are built
-too; the recap's redraw waits for Sam's yes on its contact sheet. One change in the PR is live at merge: each hub sends
+([#318](https://github.com/smcmurry6-source/study-hubs/pull/318), a draft). The third pass is built too: the classroom, the
+stage and the recap as a bar graph in a smaller card. One change in the PR is live at merge: each hub sends
 its Timmy's outfit with the studying-now presence, with no name or id.

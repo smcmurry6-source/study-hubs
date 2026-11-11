@@ -391,7 +391,10 @@ html.shx .dx .shpet-ghost:hover { background: var(--active); }
 .dx-line b { color: var(--text); }
 
 /* ---------- past hubs: each finished exam's recap as a live infographic, and the hubs that just closed ---------- */
-.dx-past { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); align-items: start; }
+/* the recap is a card of its own, beside the hubs that just closed where there's room */
+.dx-past { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap); align-items: start; }
+.dx-past > .rc[hidden] + .dx-archived, .dx-past > .dx-archived:first-child { grid-column: 1 / -1; }
+.dx-past:has(> .dx-archived:empty) > .rc { grid-column: 1 / -1; max-width: 820px; }
 .rc { display: grid; gap: 12px; min-width: 0; }
 .rc[hidden] { display: none; }
 .rc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -405,37 +408,73 @@ html.shx .dx .shpet-ghost:hover { background: var(--active); }
 .rc-chip b { display: block; font-size: var(--fs-label); line-height: 1.2; font-weight: var(--w-head); }
 .rc-chip small { display: block; font-size: 12px; color: var(--muted); }
 .rc-chip[aria-selected="true"] small { color: #fff; }
-.rc-body { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); padding: 24px; border-radius: var(--r-panel); background: var(--hub-soft); }
-.rc-head { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
-.rc-head > div { flex: 1 1 200px; min-width: 0; }
-.rc-head .dx-emb { width: 56px; height: 56px; }
-.dx .rc-head h3 { font-size: 24px; line-height: 1.15; font-weight: var(--w-title); letter-spacing: -0.01em; }
-.rc-nums { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--gap); }
-.rc-nums li { display: grid; align-content: start; gap: 2px; min-width: 0; padding: 16px 18px; border-radius: var(--r-row); background: var(--row); }
-.rc-nums b { font-size: 40px; line-height: 1.05; font-weight: var(--w-title); letter-spacing: -0.02em; color: var(--hub-text); }
-.rc-nums span { font-size: var(--fs-label); color: var(--muted); }
-.rc-nums li:first-child { background: var(--hub); }
-.rc-nums li:first-child b, .rc-nums li:first-child span { color: #fff; }
-.rc-chart { grid-column: span 7; display: grid; align-content: start; gap: 8px; min-width: 0; padding: 18px; border-radius: var(--r-row); background: var(--row); }
-.dx .rc-chart h4, .dx .rc-tough h4 { font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); }
-.rc-bars { display: flex; align-items: flex-end; justify-content: space-between; gap: 6px; height: 168px; padding-top: 28px; }
-.rc-bars i { position: relative; flex: 1 1 0; min-width: 0; max-width: 48px; height: var(--h); border-radius: 6px 6px 2px 2px; background: var(--hub-mid); transform-origin: bottom; }
-.rc-bars i.exam { background: var(--hub); }
-.rc-body.is-in .rc-bars i { animation: dx-grow 800ms var(--ease-expo) both; }
-.rc-bars em { position: absolute; left: 50%; bottom: calc(100% + 4px); transform: translateX(-50%); font-style: normal; font-size: var(--fs-meta); font-weight: var(--w-head); white-space: nowrap; color: var(--text); }
-.rc-x { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
-.rc-facts { grid-column: span 5; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); }
-.rc-facts li { display: grid; align-content: start; gap: 2px; min-width: 0; padding: 14px 16px; border-radius: var(--r-row); background: var(--row); }
-.rc-facts span { font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--muted); }
-.rc-facts b { font-size: 24px; line-height: 1.2; font-weight: var(--w-title); color: var(--hub-text); }
-.rc-facts small { font-size: var(--fs-meta); color: var(--muted); }
-.rc-tough { grid-column: 1 / -1; display: grid; gap: 4px; padding: 18px; border-radius: var(--r-row); background: var(--row); }
-.rc-tough-n { font-size: var(--fs-label); color: var(--muted); }
-.rc-tough-n b { margin-right: 6px; font-size: 28px; font-weight: var(--w-title); color: var(--hub-text); }
-.rc-tough-q { max-width: 80ch; font-size: var(--fs-body); }
-.rc-foot { grid-column: 1 / -1; }
-@media (prefers-reduced-motion: reduce) { .rc-body.is-in .rc-bars i { animation: none; } }
-.dx-archived { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); }
+/* the recap (Sam, 2026-11-11: a real bar graph, in a smaller card): the hours, the class as a crowd of teeth, hours per
+   day as drawn columns (widget/hub-art/class.js, tools/figures/site/recap.mjs), the facts as chips. Laid out by the
+   card's own width, so the text-size setting counts. */
+.rc-body { container: rc / inline-size; display: grid; gap: 10px; min-width: 0; padding: 16px; border-radius: var(--r-panel); background: var(--hub-soft); }
+.rc-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.rc-head > div { flex: 1 1 180px; min-width: 0; }
+.rc-head .dx-emb { width: 44px; height: 44px; }
+.dx .rc-head h3 { font-size: 20px; line-height: 1.15; font-weight: var(--w-title); letter-spacing: -0.01em; }
+.rc-ic { flex: none; width: 34px; height: 34px; }
+.rc-main { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); grid-template-rows: auto minmax(0, 1fr); gap: 10px; }
+.rc-big { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 10px 16px; border-radius: var(--r-row); background: var(--hub); color: #fff; }
+.rc-big .rc-ic { width: 48px; height: 48px; }
+.rc-big b { display: block; font-size: 40px; line-height: 1; font-weight: var(--w-title); letter-spacing: -0.02em; }
+.rc-big span span { font-size: var(--fs-label); font-weight: var(--w-head); }
+.rc-crowd { display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: center; gap: 2px; min-width: 0; padding: 8px 12px; border-radius: var(--r-row); background: var(--row); font-size: var(--fs-label); font-weight: var(--w-head); }
+.rc-crowd-art { width: 100%; }
+.rc-crowd-art svg { display: block; margin: 0 auto; }
+.rc-crowd b { font-size: 18px; font-weight: var(--w-title); color: var(--hub-text); }
+.rc-chart { grid-column: 2; grid-row: 1 / span 2; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 2px; min-width: 0; padding: 10px 12px 8px; border-radius: var(--r-row); background: var(--row); }
+.dx .rc-chart h4 { font-size: var(--fs-label); font-weight: var(--w-head); }
+.rc-plot { position: relative; min-height: 132px; }
+.rc-plot svg { display: block; }
+.rc-peak { position: absolute; padding: 0 7px; border: 2px solid #3b2e3a; border-radius: var(--r-pill); background: #fff; color: #3b2e3a; font-size: 12px; line-height: 18px; font-weight: var(--w-title); white-space: nowrap; }
+.rc-x { display: flex; justify-content: space-between; font-size: 12px; font-weight: var(--w-strong); color: var(--muted); }
+.rc-facts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.rc-facts li { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 8px; border-radius: var(--r-row); background: var(--row); }
+.rc-facts .rc-ic { width: 28px; height: 28px; }
+.rc-facts p { min-width: 0; font-size: 12px; line-height: 1.25; font-weight: var(--w-head); }
+.rc-facts b { font-size: 15px; font-weight: var(--w-title); color: var(--hub-text); white-space: nowrap; }
+.rc-facts small { display: block; font-size: 12px; font-weight: var(--w-body); color: var(--muted); }
+.rc-tough { display: flex; align-items: center; gap: 12px; padding: 8px 14px; border-radius: var(--r-row); background: #3b2e3a; color: #fff; }
+.rc-tough > div { flex: 1 1 auto; min-width: 0; }
+.dx .rc-tough h4 { font-size: 12px; font-weight: var(--w-title); letter-spacing: .06em; text-transform: uppercase; color: #ffe08a; }
+.rc-tough-q { font-size: var(--fs-label); font-weight: var(--w-head); }
+.rc-tough-a { font-size: var(--fs-meta); color: #dcd2d9; }
+.rc-tough-n { flex: none; font-weight: var(--w-title); white-space: nowrap; color: #ffe08a; }
+/* drawn in ink, so in the dark theme the graph and the crowd stay on paper, the way the hubs' scenes do */
+html.shx[data-theme="dark"] .rc-chart, html.shx[data-theme="dark"] .rc-crowd { background: var(--hub-light); color: #3b2e3a; }
+html.shx[data-theme="dark"] .rc-chart .rc-x { color: #5d4d5a; }
+html.shx[data-theme="dark"] .rc-crowd b { color: var(--hub); }
+html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
+@media (prefers-color-scheme: dark) {
+  html.shx:not([data-theme="light"]) .rc-chart, html.shx:not([data-theme="light"]) .rc-crowd { background: var(--hub-light); color: #3b2e3a; }
+  html.shx:not([data-theme="light"]) .rc-chart .rc-x { color: #5d4d5a; }
+  html.shx:not([data-theme="light"]) .rc-crowd b { color: var(--hub); }
+  html.shx:not([data-theme="light"]) .dx .rc-chart h4 { color: #3b2e3a; }
+}
+.rk-bar { transform-box: fill-box; transform-origin: 50% 100%; }
+.rc-body.is-in:not(.is-redraw) .rk-bar { animation: rk-grow 700ms var(--ease-expo) both; }
+.rc-body.is-in:not(.is-redraw) .rk-face, .rc-body.is-in:not(.is-redraw) .rk-tim, .rc-body.is-in:not(.is-redraw) .rc-peak { animation: rk-in 500ms ease both; }
+.rc-body.is-in:not(.is-redraw) .rk-tim, .rc-body.is-in:not(.is-redraw) .rc-peak { animation-delay: 900ms; }
+@keyframes rk-grow { from { transform: scaleY(0); } }
+@keyframes rk-in { from { opacity: 0; } }
+@container rc (max-width: 620px) {
+  .rc-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .rc-chart { grid-column: auto; grid-row: auto; }
+  .rc-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rc-facts li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .rc-facts p { font-size: var(--fs-meta); }
+}
+@container rc (max-width: 300px) {
+  .rc-facts { grid-template-columns: minmax(0, 1fr); }
+  .rc-tough { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) { .rc-body .rk-bar, .rc-body .rk-face, .rc-body .rk-tim, .rc-body .rc-peak { animation: none !important; } }
+.dx-archived { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); }
+.dx-past > .rc[hidden] + .dx-archived, .dx-past > .dx-archived:first-child { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .dx-archived:empty { display: none; }
 .dx-arch { display: flex; align-items: flex-start; gap: 14px; padding: var(--panel-pad); border-radius: var(--r-panel); background: var(--panel); }
 .dx-arch:only-child { grid-column: 1 / -1; }
@@ -493,9 +532,10 @@ html.shx .dx .shpet-ghost:hover { background: var(--active); }
 
 /* ---------- a tablet ---------- */
 @media (max-width: 1000px) {
+  .dx-past { grid-template-columns: minmax(0, 1fr); }
+  .dx-past > .rc, .dx-past:has(> .dx-archived:empty) > .rc { max-width: none; }
   .dx-stagebody { grid-template-columns: minmax(0, 1fr); }
   .dx-go { grid-template-columns: minmax(0, 1fr) auto; align-items: center; min-width: 0; }
-  .rc-chart, .rc-facts { grid-column: 1 / -1; }
   .dx-pod { grid-column: span 5; }
   .dx-about { grid-column: span 7; }
   .dx-you, .dx-class { grid-column: 1 / -1; }
@@ -517,18 +557,13 @@ html.shx .dx .shpet-ghost:hover { background: var(--active); }
   .dx-tab b { font-size: var(--fs-label); }
   .dx-tab small { font-size: 12px; }
   .dx-hub { gap: 12px; }
-  .dx-hubrow, .dx-cols, .rc-body { grid-template-columns: minmax(0, 1fr); }   /* one column: twelve columns' gaps alone are wider than a phone at the largest text */
-  .dx-hubrow > *, .dx-cols > *, .rc-body > * { grid-column: auto; }
+  .dx-hubrow, .dx-cols { grid-template-columns: minmax(0, 1fr); }   /* one column: twelve columns' gaps alone are wider than a phone at the largest text */
+  .dx-hubrow > *, .dx-cols > * { grid-column: auto; }
   .dx-stagebody { gap: 14px; padding: 16px; }
   .dx-go { grid-template-columns: minmax(0, 1fr); }
   .dx-stage .dx-luck { margin: 0 16px 16px; }
   .dx-now-num b { font-size: 48px; }
-  .rc-body { padding: 16px; gap: 12px; }
-  .rc-nums { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .rc-nums b { font-size: 32px; }
-  .rc-nums li { padding: 12px 14px; }
-  .rc-facts { gap: 12px; }
-  .rc-bars { height: 132px; gap: 3px; }
+  .rc-body { padding: 12px; }
   .rc-chip { min-height: 48px; padding-right: 14px; }
   .dx .dx-title { font-size: 26px; }
   .dx-count b { min-width: 64px; font-size: 44px; }

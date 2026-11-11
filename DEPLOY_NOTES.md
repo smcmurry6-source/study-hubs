@@ -114,8 +114,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   shop's 55 outfits and `dress()` to `widget/hub-art/outfits.js` (168 KB, loaded only when someone on the page wears
   one). The preview has a made-up class that comes and goes (`shDash.setLive(by, list)`) and a `get_place` stub. The
   smoke test seats eight made-up people and checks the count, the stage and that markup sent as an outfit is never
-  drawn. **Not in yet:** the recap's redraw (`recap.mjs`, a bar graph in a smaller card) waits for Sam's yes on its
-  contact sheet. BUG-065 to BUG-068 found and fixed (the last two in the preview's UAT).
+  drawn. **The recap** (Sam: the first redraw "doesnt read as a bar graph and it also also needs to fit in a smaller
+  card") is a compact drawn card: the hours, the classmates as a crowd of teeth, hours per day as drawn columns with
+  the exam day's flag and Timmy on one (`recap.mjs`, drawn by `recapArt()` at the card's width), fact chips with trophy
+  drawings, beside the hubs that just closed on a laptop. `class.js` carries the recap kit, its six icons and the hat
+  (55 KB). BUG-065 to BUG-070 found and fixed (two in the preview's UAT, two on the recap).
 - **2026-11-11 (redesign phase 3: the new dashboard, beside the live one, Claude Code)** — Nothing students see changes.
   `next/index.html` is the dashboard on the design system (`widget/dash.js`, `widget/dash.css`); outside a preview it sends
   visitors to the live dashboard, and it takes `index.html`'s place at the redesign's release. The hubs are tabs with their

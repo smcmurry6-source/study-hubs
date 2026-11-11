@@ -29,7 +29,8 @@ tags: [map]
   when it is stale, so run the build after changing `HUBS`). The page is drawn by `widget/dash.js` + `widget/dash.css` on
   the hub engine's design system (`widget/hub.css`), with `widget/hub-art/dash.js` (every hub's emblem and tint, from
   `tools/figures/site/build.mjs`). Its drawn parts are kits the page draws at its own size: `widget/hub-art/class.js`
-  (the studying-now classroom and the leaderboard's stage, from `classroom.mjs` and `stage.mjs` in `tools/figures/site/`)
+  (the studying-now classroom, the leaderboard's stage and the recap's bar graph and crowd, from `classroom.mjs`,
+  `stage.mjs` and `recap.mjs` in `tools/figures/site/`)
   and `widget/hub-art/outfits.js` (the shop's outfits and `dress()`, loaded only when someone on the page wears one). [Phase 3](../tasks/2026-11-05-redesign-phase-3-dashboard.md) says what is on it.
 - `hubs/<hub-id>/index.html` — one single-file hub each, and it is the source (perio included: its old split-source
   Claude Project is retired; edit the file directly). `hubs/<hub-id>/audio/` holds
