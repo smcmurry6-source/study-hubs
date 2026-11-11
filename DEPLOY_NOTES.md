@@ -45,7 +45,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   he said FSH rises too, far less than LH, because inhibin holds it back, as in Dr. Herr's L14 graph; the `cycle` figure's
   hover text and sources say so (`tools/figures/heme-endo-exam2/cycle.mjs`). The pronunciation lexicon reads KNDy as
   "candy" and OMI as letters.
-
+- **2026-11-10 (Lessons refresh, evening, Claude Code)** — `/lessons-audit`, data read 9:45 pm Central. Heme & Endo Exam 2: six
+  explanations now name the class's favorite wrong answer and why it's wrong: `p2-case4-a` (an adrenal tumor, not a pituitary one,
+  with ACTH under 5), `p2-case6-a` (Addison's high ACTH is lost feedback, not a tumor), `p2-shpt-dialysis` (primary hyperplasia raises
+  calcium), `dm-meg` (meglitinides still cause hypoglycemia), `dm-met-lactic` (the disulfiram-like reaction is the sulfonylureas') and
+  `p1-fc-mets` (follicular carcinoma reaches the lung by the blood). Occlusion: report #39, `mo-repos-irrev`'s choices no longer give the
+  answer away (two said "Reversible", one "Irreversible"): now two of each, each with a reason, and its why lines and explanation
+  match; positions 0 and 2 keep their meaning, and no class picks sat on 1 or 3, so nothing is stale. `next/content/` rebuilt. Same ids
+  and answer positions everywhere. `LESSONS.md` Live signals rewritten; two report lessons added (a category word repeated in two
+  choices; one fact asked three times, report #40; Sam kept `mo-10`). Reports #39 and #40 answered at merge.
 - **2026-11-10 (Occlusion L9 diagrams: abfraction, cupped cusp tips, pH vs buffering capacity, Fig 19 again, Claude Code)**
   — Sam: "Approve the budget, make all diagrams, merge when ready". All four L9 candidates are built in
   `tools/figures/occlusion/anima/`, in the L9 notes at both levels next to the paragraph each explains (`FIG_PLACE.nccl`

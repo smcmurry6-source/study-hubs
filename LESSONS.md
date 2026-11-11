@@ -4,8 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-11-10** (the full audit, data read 5:50 am Central, with PCD Implants Exam 1's retrospective and recap;
-Heme & Endo Exam 2's exam is Friday). Sam runs the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
+**Last refreshed: 2026-11-10** (the evening audit, data read 9:45 pm Central; the morning's full audit wrote PCD Implants Exam
+1's retrospective and recap; Heme & Endo Exam 2's exam is Friday). Sam runs the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
 
@@ -90,55 +90,50 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-11-10 morning (data read 5:50 am Central).** "Since" = the 11-04 evening audit (data read 10 pm Central). Live hubs: **Heme &
-Endo Exam 2** (Fri 11-13, 10:00 am, four days out), **Occlusion** (final Mon 11-16) and **perio** (final Thu 11-19). **PCD Implants
-Exam 1 is newly archived** (exam 11-06): its retrospective is below and its recap went on the dashboard this morning. Special Patient
-Care archived itself when its Canvas window opened (11-06, Sam's call); its window closes 11-13 (Canvas keeps it to 11-14), so its
-retrospective goes in the next audit. Data quality (`sh_data_quality()`): no test rows, 34 overcounted minutes; PCD Implants' class
-counters run 480 answers behind its personal rows, all on the statement items rewritten 11-04 and `tm-mm-2`, whose counters were
-cleared at those changes with Sam's OK (expected, not a tracking fault). Searches: none since 10-21.
+**2026-11-10 evening (data read 9:45 pm Central).** "Since" = this morning's audit (data read 5:50 am). Live hubs: **Heme & Endo
+Exam 2** (Fri 11-13, 10:00 am), **Occlusion** (final Mon 11-16, L6-L9 since L9 went live today) and **perio** (final Thu 11-19). No hub
+is newly archived; Special Patient Care (archived 11-06) keeps its Canvas window open to 11-13, and its retrospective comes after that.
+Data quality (`sh_data_quality()`): no test rows, 34 overcounted minutes, and the same PCD Implants counter drift as this morning
+(expected). Searches: none since 10-21. Check-ins: none since 11-09. The live survey: one more skip.
 
-**Student voice since 11-04 evening:** one report, #38 (Heme & Endo Exam 2, 11-09: put the Sertoli cell drawing itself, unlabeled, in
-`mh-fig-seq`; open, for Sam). Check-ins: PCD Implants 5 (below), one more for Heme & Endo Exam 1 (final n = 14 people: About right
-11, Hub was harder a couple, none "Exam asked different things"; its check-in closed 11-06), and one Occlusion midterm person checked in a second time (n stays 17
-people). The live survey ("help shape the hubs 2"): one answer since, asking for a first pass that teaches only what the exam will ask,
-and Anki-style flashcards (14 answers and 94 skips in all).
+**Student voice since this morning:** two Occlusion reports, both on the final's L7. #39, `mo-repos-irrev`: two of its four choices said
+"Reversible" and one "Irreversible", so the odd one out was the key (fixed in this run, below). #40, `mo-10`: "asked a bunch already":
+the final's lectures ask the same fact, that about 10% of people have MIP coincident with CR closure, three times (`in-90` in L6,
+`mo-10` and `mo-tf-3` in L7); Sam merged without retiring `mo-10`, and both reports were answered. Report #38 (the Sertoli drawing) was answered today.
 
-**Did the last refresh work?** (PCD Implants; "before" = answers to 10 pm on 11-04, "since" = the eve and exam day)
-- **Statement keys rebalanced** (#245): two-statement 83% of 703 before, 82% of 1,141 since; numbered 87% of 497, then 85% of 952. No
-  dip worth the name, so the class wasn't leaning on the old pattern, and the balanced keys cost nothing.
-- **Explanations that now name the favorite wrong answer**: `im-template-vdo` 10 of 17 before, **44 of 53 since (83%)**; `ev-misch` 24
-  of 43, then 17 of 25; `tm-mm-1` 15 of 30, then 28 of 46; `bm-moment` 20 of 34, then 27 of 43. `ev-blade` stayed flat (61%, then 64%)
-  and so did `tm-mm-3` (56%, then 54%; reworded on exam day).
-- `bm-goodacre` (#37, percentages out of its choices): 57% since (17 of 30), a real question now. `tm-mm-2` (3 right of 5): 13 of 27
-  before, 16 of 26 since.
-- **Quick-start "Practice questions" to the least-practiced lectures** (11-05): 7 people tapped it (either version), all on the
-  eve; Home's "Practiced least" row got no taps, ever. The lag closed anyway: the last four lectures had 12-17 answerers each
-  before the eve and **43-47 on the eve and exam day, like every other lecture**, and took the most answers (Surgery 2,476, Imaging
-  1,950, CBCT 1,883, against 1,199-1,525 on the first two lectures).
+**Did the last refresh work?** (this morning's four explanation fixes went live about 5 pm Central, so a few hours of data)
+- `p2-cah-17` (now names 21-hydroxylase): right on every try since, from a few people (8 of 19 before).
+- `p1-corticotroph` (now says ACTH low with cortisol high is the adrenal's own pattern): 5 of 13 tries since, from 7 people (38%; 37%
+  before). No change yet, and it is part of a wider pattern (below).
+- Perio `q4-44` and `q4-M02`: no tries since.
 
 **Per hub:**
-- **Heme & Endo Exam 2** (Fri): 26 people and 36 h since it opened (11-05), nearly all on 11-09 (24 people, 1,786 min); all 26 had
-  used Exam 1's hub. 1,931 answers from 21 people, 80%. Bank 1,179 min, notes 751. **Practice is piling up in bank order** (L11 15
-  tries per question, L12a 9, L12b 7, A 4, L13 2, L15 1, L14 and L16 about 0); with four days left, PCD Implants says it closes by
-  itself, and the quick-start "Practice questions" opens unanswered questions in bank order. By format: numbered 76%, two-statement
-  78%, MCQ 79%, true/false 86%. Hardest (12-27 tries, small numbers): `p1-corticotroph` 43% ("ACTH low and cortisol high" x5) and
-  `p2-cah-17` 46% (21-hydroxylase x5), whose explanations now name those choices; `p1-num-ptc` 50%; `dm-glucose-dep` 59%
-  (repaglinide x7; its why line and the summary slide's secretagogue split cover it). Question health: `p1-fc-mets` and
-  `p2-shpt-dialysis` are "possible miskey" on 8 first tries each; both keys agree with the notes (follicular carcinoma spreads by
-  blood to bone and lung; renal failure drives secondary hyperparathyroidism) and the picked choices (papillary's lymphatic route,
-  primary disease) are named in the explanations: leads for Sam's list, no change. The bank was reworked on 11-08 and 11-10
-  (339, then 431), so most of these numbers are a day old.
-- **Occlusion** (final 11-16: L6-L8): 23 people since, 14 on 11-09; notes 823 min, bank 299 (663 answers from 6 people, 83%). The
-  final's lectures have few tries yet (L6 7 per question, L7 1, L8 none). Nothing flagged. The midterm lows are unchanged and not on
-  the final (`an-compound` 45% of 103, `fp-post` 45%, `cs-pro-incline` 41%).
-- **Perio** (final 11-19): quiet: 11 people on 11-05 (312 min), 267 answers from a few people since. `q4-M02` (SRP goals, select-all) is
-  flagged very hard (38% first try, 34 people): its explanation named only the two wrong options, and now lists the three goals;
-  `q4-44`'s explanation never gave its number (4 µm; "0.4 mm" is the favorite wrong answer), and now does. Unchanged leads for the
-  final: `q3-M01` 28% of 72 (UniFe; "Plaque index" is the favorite wrong tick), `q4-06` 33% of 18, `q4-02` 36% of 28, `q4-M05` 40%.
-  Expect the final's eve (11-18) to carry most of its use.
-- **Special Patient Care** (archived 11-06): 16 people, 6.5 h and 69 answers from a few people, all before the window opened. Little to
-  learn from yet beyond that; the retrospective comes after the window closes.
+- **Heme & Endo Exam 2** (Fri): 44 people and 89 h since it opened; **11-10 was its biggest day, 44 people and 3,150 min** (10 under 5
+  min). Since this morning the notes (1,685 min, 36 people) led the bank (1,283 min, 26), as PCD Implants' notes did while there were
+  days to spare. 5,257 answers from 30 people, 77% (2,835 since this morning at 74%, after the bank grew back to 393 Exam 2 questions with
+  the new "which statement" items; 402 since L16 went taught tonight). No mocks yet. **Practice still falls off in bank order**: on 11-10, L11 had 22 answerers, L12a 13,
+  L12b 11, L13 11, L15 and L16 6 each, **L14 a couple**; tries per question L11 23, L12a 17, L12b 11, L13 7.5, L16 6, L15 3.8, **L14
+  1.2**. PCD Implants' lag closed by itself on the eve, which here is Thursday: read L14 then. By format: "which statement is true" 66%
+  (18 items) and "which is false" 66% (14), the lowest after matching (two-statement 73%, numbered 74%, MCQ 77%, true/false 82%); about
+  6 tries per item so far. **The class reads the Cushing labs backwards**: for a corticotroph adenoma, "ACTH low and cortisol high" took
+  7 of 12 first tries (`p1-corticotroph`); for an adrenal tumor with ACTH under 5, "an ACTH-secreting pituitary tumor" took 8 of 12
+  (`p2-case4-a`); for Addison disease with ACTH 480, the same pituitary-tumor choice took 7 of 10 (`p2-case6-a`). The notes, the cram
+  sheet and the explanations all state the rule, so this run makes the two case explanations name that choice and say why the labs rule
+  it out; if Thursday's numbers stay low, the L12a and L12b notes could add one line ("Cushing disease, the pituitary tumor, is the
+  secondary pattern: both high"), with their narration redone. Four more explanations now name the favorite wrong answer:
+  `p2-shpt-dialysis` (primary chief cell hyperplasia, 6 of 12 first tries), `dm-meg` ("no hypoglycemia", 7 of 18), `dm-met-lactic`
+  (the disulfiram-like reaction, 5 of 10) and `p1-fc-mets` (the lung by the lymphatics, 6 of 14). Question health lists 22 flags, all on
+  8-18 first tries, and every key agrees with the notes; the true/false, two-statement and numbered ones (`p1-tf-hypopit75`, `p1-tf-di`,
+  `p1-tf-psammoma`, `dm-tf-6`, `dm-2s-3`, `dm-2s-4`, `p2-2s-4`, `p1-num-ptc`) are the "True" lean on one changed taught detail, which
+  explanation fixes don't move (standing lesson): leads for Sam's list, no change.
+- **Occlusion** (final Mon 11-16): 31 people and 34 h since 11-05; 11-10 12 people and 740 min. Since this morning notes 386 min and bank
+  325 (9 and 8 people), 932 answers at 91%. The final's lectures are practiced in bank order too: since 11-09, L6 754 answers from 11
+  people, L7 580 from 6, L8 and L9 a few answers each (L9 went live today); tries per question L6 10.8, L7 3.9, L8 0.1, L9 0. Five days
+  out, there is time for it to close by itself. The midterm lows are unchanged and not on the final.
+- **Perio** (final 11-19): quiet: 19 people and 13 h since 11-05; 11-10 7 people and 140 min, nearly all bank time from a few people.
+  S9 went taught today. Leads for the final unchanged (`q3-M01`, `q4-06`, `q4-02`, `q4-M05`). Expect the eve (11-18) to carry most of it.
+- **Special Patient Care** (archived 11-06, window open to 11-13): 16 people and 6.5 h before the window opened (this morning's
+  reading), a couple of people today.
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order
@@ -344,7 +339,10 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   (report #18, 2026-10-13). Before shipping, grep the choices for parentheses. Numbers do it too: PCD Implants `bm-goodacre` asked which
   complication was most common and printed each one's percentage in its choice (report #37, 2026-11-04: 9 of 9 right before the fix, 9 of 14 after); put the numbers in the why lines. The reverse also happens: **a choice that names the key's own category is a second right answer.**
   Perio `q4-06` keyed the S204SD9 over "Sickle scaler", but the hub's notes call the S204SD9 the posterior sickle (7 of 17 picked
-  "Sickle scaler"; fixed 10-27 to "H6/7 sickle scaler"). Check each wrong choice against the notes: is the key a kind of it?
+  "Sickle scaler"; fixed 10-27 to "H6/7 sickle scaler"). Check each wrong choice against the notes: is the key a kind of it? **So does a category word repeated in two choices**:
+  Occlusion `mo-repos-irrev` (report #39, 2026-11-10) asked how a repositioning splint is classed, with "Reversible" in two choices and
+  "Irreversible" in one, so the odd one out was the key. When the answer is one side of a pair (reversible or irreversible, primary or
+  secondary), put each side in two choices and make the reason the test.
 - **The key's position can give the answer away too, and students notice.** PCD Implants suggestion #14 (2026-11-04, two days out):
   "the statement questions all seem to have the same answer", and the numbered ones keep coming out "1, 2 and 4". True: 36 of 46
   two-statement keys were "1 true, 2 false" and statement 1 was true in all 30 numbered items (17 keyed "1, 2 and 4", the second choice
@@ -358,6 +356,11 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   false half is where the practice is; keep it honest (one taught detail changed). **Balancing costs nothing:** after PCD Implants'
   keys were spread on its eve, two-statement accuracy went 83% -> 82% and numbered 87% -> 85% (1,141 and 952 answers), so nobody had
   been leaning on the pattern; balance from the start rather than wait for a student to notice.
+- **Students notice one fact asked again and again.** Occlusion report #40 (2026-11-10): "this question has been asked a bunch already",
+  about the 10% of people whose MIP coincides with CR closure, which the final's lectures ask three times (`in-90`, `mo-10`, `mo-tf-3`).
+  Heme & Endo Exam 2's bank went to one question per fact for the same reason (Sam, 2026-11-08: "they need to be higher yield"), keeping
+  one question for each point a High Likelihood topic names. Before shipping a lecture, list the fact each question tests and merge the
+  repeats across lectures too.
 - **Every explanation should name the class's favourite wrong answer and say why it's wrong.** The most-picked
   wrong choices (`question_choices`) on the hardest items were ones the explanation didn't mention: perio `q2-03`
   (silk), `q4-15` (Class 1), MSK `sl-calcitriol` (cholecalciferol). Fixed 2026-09-29; write explanations this way
