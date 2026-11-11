@@ -125,13 +125,14 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
 - **`get_my_shop(visitor)`** gives today's shop (`items`, each with its shelf, `owned` and `gift`), the seasons on sale
   (`seasons`), whether today is a throwback day (`throwback`), the wallet, the `inventory` (everything owned, each with
   `how`: `bought`, `gift` or `rank`), `locked` (the rank items not reached yet, with the `rank_tier` that unlocks each),
-  what's equipped, the costume log, today's snacks, the boost and `visiting`. Snack HP shows in `get_pet_days_v2`.
+  what's equipped, the costume log, today's snacks and the boost. Snack HP shows in `get_pet_days_v2`.
   `sh_buy(day, ...)` and `sh_my_shop(day, ...)` are the same two with the date given, private, for the tests.
 
 ## Visiting
 
 Sam, 2026-11-10: "Its on by default and you visit from the boards"; a visitor sees only the place, under the leaderboard
-name ([learner-data-privacy](../rules/learner-data-privacy.md): a visitor id never leaves the database).
+name ([learner-data-privacy](../rules/learner-data-privacy.md): a visitor id never leaves the database). **Sam, 2026-11-11:
+no opt-out**: no one can turn visiting off, so every place on a board can be visited ([decisions](../decisions.md)).
 
 - **The visit key.** Every row of the four `_v2` boards (`get_rank_board_v2`, `get_leaderboard_v2`,
   `get_correct_streak_stats_v2`, `get_arcade_leaderboard_v2`) has a `visit` column: 24 hex characters, a SHA-256 digest of
@@ -143,18 +144,18 @@ name ([learner-data-privacy](../rules/learner-data-privacy.md): a visitor id nev
   paint, outfit), `rank` (journey, tier, level) and `flair` (the mastery flair the boards already show). Never the visitor
   id, XP as a number, HP, snacks, the streak, answers, the wallet, the inventory, or any date or time. An unknown key gives
   null.
-- **Sam, 2026-11-11: no opt-out.** Visiting can't be turned off; the opt-out below comes out of `migration_v54.sql` before
-  the release ([the open calls](../tasks/2026-11-11-redesign-open-calls.md)).
-- **Turning it off** (to be removed): `set_visiting(visitor, false)` writes a row in `pet_visit_off`; that person's `visit` is then null on
-  every board and `get_place` returns null, with an old key too. `set_visiting(visitor, true)` brings the same key back.
-  `get_my_shop` says `visiting: true` or `false`. Link my devices moves the choice: off on either device stays off.
+- **No switch.** There is no `set_visiting`, no table of opt-outs and no `visiting` in `get_my_shop` (all three were in
+  the draft until 2026-11-11), so every row of every `_v2` board has a key. After Link my devices, the board rows and the
+  place follow the id that remains, under its key; the other id's key opens nothing.
 - The idea board and today's boards (the ones without `_v2`) carry no key.
 
 ## The idea board
 
 `post_idea` (a leaderboard name, a title of 3-80 characters, up to 280 more, a hub the server knows or all hubs, one of the
 six categories, three a day, one every 20 seconds; `source` says whether it came from the board, Suggest or a check-in),
-`vote_idea` (up, down or taken back), `report_idea` (three reports since the last restore hide it), `delete_my_idea` (its words, name, votes and notes go; an empty row keeps the day's limit),
+`vote_idea` (up, down or taken back), `report_idea` (three reports since the last restore hide it), `delete_my_idea` (the
+author's delete removes the idea completely, Sam 2026-11-11: the row and, with it, its votes, reports and Inbox notes, so it
+no longer counts toward the day's three or the 20 seconds, and Sam can't see or restore it),
 `get_ideas` (Top, New, Shipped, filtered by hub and category, with the counts each filter would show; never a visitor id).
 Sam's side, behind the secret: `admin_ideas`, `admin_set_idea` (hide, restore, a status with one line on why: the author and
 every up-voter get an Inbox note, `get_my_inbox_v2`, `mark_idea_note_seen`) and `admin_post_starter_idea` (Timmy and his
@@ -168,7 +169,8 @@ the Inbox with idea notes and the visitor's shop. With no visitor it carries tod
 ## Calls made while building it, for Sam to confirm before the release
 
 **Sam answered these on 2026-11-11** ([decisions](../decisions.md)): yes to all but two. Visiting has no opt-out, and an
-author's idea delete removes the idea completely (row and votes). Both change `migration_v54.sql` before the release.
+author's idea delete removes the idea completely (row and votes). Both changes are made in `migration_v54.sql` (2026-11-11,
+[the open calls](../tasks/done/2026-11-11-redesign-open-calls.md)); the rest stand as below.
 
 Each is one line in `migration_v54.sql` to change.
 
@@ -181,8 +183,8 @@ Each is one line in `migration_v54.sql` to change.
 - Timmy Time: a minute pays when 25 seconds have passed since the last paid one (so 2x speed still pays); "finished" is 90%
   of its minutes.
 - A rare costume Timmy was seen in stays on that visitor's shop until bought (one new sighting a day).
-- An idea's hub must have keys loaded; an author's delete removes the words, name and votes but keeps an empty row for the
-  day's limit.
+- An idea's hub must have keys loaded. (An author's delete was to keep an empty row for the day's limit; Sam said no, and
+  it removes the idea completely.)
 - The catalog's undrawn outfits, snacks and boosts, and their prices, are drafts. (The seasonal and rank rows are no longer
   drafts: they follow `tools/figures/site/sets.mjs`.)
 - From the third round (2026-11-10), each also one place in `migration_v54.sql`:
@@ -193,8 +195,9 @@ Each is one line in `migration_v54.sql` to change.
     answers `rank` (with its `rank_tier`) instead of `not-today`.
   - Gifts and rank items show in `get_my_shop`'s `inventory` with no date (`at` is null); with no visitor, `locked` lists
     all twelve rank items.
-  - The visit key is 24 hex characters of SHA-256 (not md5), and it never changes: turning visiting off and on again
-    brings the same key back. The secret has its own table (`visit_secret`), apart from `game_config`.
+  - The visit key is 24 hex characters of SHA-256 (not md5), and it never changes. The secret has its own table
+    (`visit_secret`), apart from `game_config`. (Turning visiting off and on was to bring the same key back; Sam took the
+    switch out.)
   - `get_place` finds its person among everyone a board can list (XP, answer streaks, arcade scores), so someone on the
     arcade board with no answers can be visited too. It gives the rank as journey, tier and level only (no step, no XP).
   - `get_my_shop` also says which seasons are on sale and whether today is a throwback day; the season shelf lists the
@@ -207,12 +210,13 @@ Each is one line in `migration_v54.sql` to change.
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (348 checks: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (344 checks: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, and a place opened from a board row). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;
-`rls-expectations.json` also lists what must be closed to anon altogether (`anonNone`: `visit_secret`, `pet_visit_off`;
-`anonNoRun`: `sh_visit_key`, `sh_visit_link`), and it checks that a place and the boards give a key, never an id.
+`rls-expectations.json` also lists what must be closed to anon altogether (`anonNone`: `visit_secret`; `anonNoRun`:
+`sh_visit_key`, `sh_visit_link`), and it checks that a place and the boards give a key, never an id, and that every board
+row has one.
 `admin-ops.js` and `retention.js` run with them in place. CI runs all four. `tools/release/rls-audit.sql` checks the same
 two lists on the live database once the migration is applied.
 

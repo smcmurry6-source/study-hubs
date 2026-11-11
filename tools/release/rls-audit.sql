@@ -41,7 +41,7 @@ union all
 -- 5b. tables that must be closed to anon altogether (rls-expectations.json's anonNone: what's behind the visit keys)
 select 'private table open to anon', c.relname
 from pg_class c join pg_namespace n on n.oid = c.relnamespace
-where n.nspname = 'public' and c.relkind = 'r' and c.relname in ('visit_secret', 'pet_visit_off')
+where n.nspname = 'public' and c.relkind = 'r' and c.relname in ('visit_secret')
   and (has_table_privilege('anon', c.oid, 'select') or has_table_privilege('anon', c.oid, 'insert')
        or has_table_privilege('anon', c.oid, 'update') or has_table_privilege('anon', c.oid, 'delete')
        or exists (select 1 from pg_policies pol where pol.schemaname = 'public' and pol.tablename = c.relname))

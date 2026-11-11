@@ -32,12 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (the game server: no visiting opt-out, a complete idea delete; Claude Code)** — Sam's two "no" answers in
+  [the open calls](vault/tasks/done/2026-11-11-redesign-open-calls.md), made in `migration_v54.sql` (still **unapplied**:
+  it waits for the release). Visiting can't be turned off: `set_visiting`, `pet_visit_off` and the shop's `visiting` are
+  gone, and every board row has a visit key. An author's idea delete removes the idea, its votes, reports and Inbox notes,
+  so it no longer counts toward the day's three. The design page's visiting switch is gone too. `tools/release/xp.js`
+  (344 checks), `rls.js`, `rls-expectations.json`, `rls-audit.sql` and the [game-server](vault/reference/game-server.md)
+  note updated; nothing students see changes yet.
 - **2026-11-11 (cheaper sessions for the rest of the redesign, Claude Code)** — Sam: "implement these changes". The eight
   question-writing rules (every choice's why, two-statement and true/false, numbered, which-statement, high likelihood, what
   professors skip, the bank's panel, question-health flags) are `load: on-demand`: the new `hubs/CLAUDE.md` loads them whenever
   a session opens a hub file, and `CLAUDE.md` lists them under "Feature rules". The narration, usage-data and reports how-tos
   are links. Every session now starts with about 58 KB of notes instead of 81 KB (about 5.6k tokens less on every turn). New:
-  [run-a-redesign-session](vault/how-to/run-a-redesign-session.md) and [the open calls](vault/tasks/2026-11-11-redesign-open-calls.md)
+  [run-a-redesign-session](vault/how-to/run-a-redesign-session.md) and [the open calls](vault/tasks/done/2026-11-11-redesign-open-calls.md)
   for Sam in one list; phase 4 starts by splitting `widget/hub.js`.
 
 - **2026-11-10 (migration_v54 applied by mistake, then undone, Claude Code)** — After Sam's "also apply the sql", a

@@ -141,6 +141,9 @@ Each gets a hub and a category when it's posted (most are for all hubs; the arca
   (`get_my_inbox_v2`). Still to build: `widget/ideas.js`, the admin page's "Idea board", the check-in's tick. Calls made
   while building, for Sam: an idea's hub must be one whose keys are loaded (the release loads them for the live hubs), and
   an author's delete keeps an empty row so it still counts toward the day's three.
+- 2026-11-11: Sam: yes to the hub rule; **no** to the empty row: an author's delete removes the idea completely (its row,
+  votes, reports and Inbox notes), so it no longer counts toward the day's three. Made in `migration_v54.sql`
+  ([the open calls](done/2026-11-11-redesign-open-calls.md)).
 
 ## Outcome
 

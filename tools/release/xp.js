@@ -488,16 +488,28 @@ try {
   eq(anonJson(`admin_set_idea(${S}, ${i1.id}, 'status', 'planned', 'On the list for December')`).notified, 0, 'the same status again notes no one');
   anon(`select admin_set_idea(${S}, ${i1.id}, 'status', 'shipped', 'Live now')`);
   ok(anonJson(`get_ideas(null, 'shipped', null, null)`).ideas.some(x => x.id === i1.id) && !anonJson(`get_ideas(null, 'top', null, null)`).ideas.some(x => x.id === i1.id), 'Shipped moves it to the Shipped tab');
-  ok(anonJson(`delete_my_idea('idea-vis-2', ${i1.id})`) === false, 'only the author deletes');
+  ok(anonJson(`delete_my_idea('idea-vis-2', ${i1.id})`) === false && num(`select count(*) from ideas where id = ${i1.id}`) === 1, 'only the author deletes');
+  // an author's delete removes the idea completely (Sam, 2026-11-11): the row, its votes, reports and Inbox notes
   const i3 = num(`select id from ideas where title = 'A third idea'`);
-  vote('idea-vis-2', i3, 1);
+  vote('idea-vis-2', i3, 1); anon(`select report_idea('idea-vis-3', ${i3})`);
   ok(anonJson(`delete_my_idea('idea-vis-1', ${i3})`) === true && !anonJson(`get_ideas(null, 'new', null, null)`).ideas.some(x => x.id === i3)
-    && one(`select title || name || body from ideas where id = ${i3}`) === undefined && num(`select count(*) from idea_votes where idea_id = ${i3}`) === 0,
-    'the author deletes their own: its words, name and votes go');
+    && num(`select count(*) from ideas where id = ${i3}`) === 0 && num(`select count(*) from idea_votes where idea_id = ${i3}`) === 0
+    && num(`select count(*) from idea_reports where idea_id = ${i3}`) === 0,
+    'the author deletes their own: the idea is gone completely, its row with its votes and reports');
+  ok(anonJson(`delete_my_idea('idea-vis-1', ${i3})`) === false, 'deleting it again finds nothing');
   ok(!anonJson(`(select coalesce(json_agg(x), '[]') from admin_ideas(${S}) x)`).some(x => x.id === i3) && anonJson(`admin_set_idea(${S}, ${i3}, 'restore')`).error === 'unknown',
     'Sam can\'t see or bring back an idea its author deleted');
-  sql(`update ideas set created_at = created_at - interval '30 seconds' where visitor_id = 'idea-vis-1'`);
-  eq(post('idea-vis-1', 'A fifth idea', '', null, 'other').error, 'limit', 'a deleted idea still counts toward the day\'s three');
+  back(); const i5 = post('idea-vis-1', 'A fifth idea', '', null, 'other');
+  ok(i5.ok, 'a deleted idea no longer counts toward the day\'s three');
+  ok(anonJson(`delete_my_idea('idea-vis-1', ${i5.id})`) === true && post('idea-vis-1', 'A sixth idea', '', null, 'other').ok,
+    'nor toward the 20 seconds: deleted at once, the next one posts at once');
+  eq(post('idea-vis-1', 'A seventh idea', '', null, 'other').error, 'slow', 'an idea still up still keeps the 20 seconds');
+  back(); eq(post('idea-vis-1', 'A seventh idea', '', null, 'other').error, 'limit', 'and three still up are still the day\'s limit');
+  ok(num(`select count(*) from idea_notes where idea_id = ${i1.id}`) === 4 && anonJson(`delete_my_idea('idea-vis-1', ${i1.id})`) === true
+    && num(`select count(*) from idea_notes where idea_id = ${i1.id}`) + num(`select count(*) from idea_votes where idea_id = ${i1.id}`) + num(`select count(*) from idea_reports where idea_id = ${i1.id}`) === 0
+    && !anonJson(`(select coalesce(json_agg(x), '[]') from get_my_inbox_v2('idea-vis-2') x)`).some(x => x.kind === 'idea')
+    && !anonJson(`get_ideas(null, 'shipped', null, null)`).ideas.some(x => x.id === i1.id),
+    'a shipped idea deleted by its author takes its Inbox notes with it, from the up-voter\'s Inbox too, and leaves Shipped');
   raises(() => anon(`select admin_post_starter_idea('wrong', 'Timmy Tooth', 'Study rooms', '', null, 'feature')`), '28000', 'a starter idea with a wrong secret');
   const si = num(`select admin_post_starter_idea(${S}, 'Number thirty-one', 'Build my own mock', 'Pick the lectures, how many and the time.', null, 'feature')`);
   const sn = anonJson(`get_ideas(null, 'new', null, null)`).ideas.find(x => x.id === si);
@@ -728,9 +740,9 @@ try {
   const b1v = boardRows(), vsRows = b => Object.entries(b).map(([n, r]) => [n, r.filter(x => x.display_name === 'Visit Subject')]);
   ok(vsRows(b1v).every(([, r]) => r.length >= 1), `the made-up visitor is on all four boards (${vsRows(b1v).map(([n, r]) => n + ' ' + r.length).join(', ')})`);
   const K = b1v.rank.find(x => x.is_me).visit;
-  ok(HEX.test(K) && vsRows(b1v).every(([, r]) => r.every(x => x.visit === K)), `visiting is on by default: the same 24-character key on that person's row of every board (the caller's own row too)`);
+  ok(HEX.test(K) && vsRows(b1v).every(([, r]) => r.every(x => x.visit === K)), `visiting is on for everyone: the same 24-character key on that person's row of every board (the caller's own row too)`);
   ok(Object.values(b1v).every(r => r.every(x => HEX.test(x.visit || ''))) && new Set(b1v.rank.map(x => x.visit)).size === b1v.rank.length, 'every row of every board has a key, a different one for each person');
-  eq(shopOf('xp-VS').visiting, true, 'get_my_shop says visiting is on');
+  ok(!('visiting' in shopOf('xp-VS')), 'get_my_shop has no visiting switch (Sam, 2026-11-11: no opt-out)');
   const pl = place(K), meRow = b1v.rank.find(x => x.is_me);
   eq(Object.keys(pl).sort(), ['equipped', 'flair', 'name', 'rank'], 'a place is a name, what stands in each slot, the rank and the mastery flair, and nothing else');
   eq(pl.name, 'Visit Subject', 'under the leaderboard name, as the boards show it');
@@ -752,33 +764,28 @@ try {
   const nameVA = one(`select anon_name('xp-VA')`), rowVA = b1v.arcade.find(x => x.display_name === nameVA), plVA = rowVA && place(rowVA.visit);
   ok(plVA && plVA.name === nameVA && sorted(plVA.equipped) === '[]' && plVA.rank.journey === 0 && plVA.rank.tier === 0 && plVA.rank.level === 1 && leaks(plVA).length === 0,
     'someone with only an arcade score and no chosen name: their generated name, an empty place, the first rank');
-  // off
-  eq(anonJson(`set_visiting('xp-VS', false)`), { ok: true, visiting: false }, 'turning visiting off');
-  eq(anonJson(`set_visiting('xp-VS', false)`), { ok: true, visiting: false }, 'off twice is still off');
-  const b2off = boardRows();
-  ok(vsRows(b2off).every(([, r]) => r.length >= 1 && r.every(x => x.visit === null)) && !JSON.stringify(b2off).includes(K), 'off: that person\'s row has no key on any of the four boards, and the old key is nowhere');
-  ok(b2off.rank.filter(x => x.display_name !== 'Visit Subject').every(x => HEX.test(x.visit || '')), 'everyone else keeps theirs');
-  eq(place(K), null, 'the old key opens nothing');
-  eq(shopOf('xp-VS').visiting, false, 'get_my_shop says visiting is off');
-  // on again
-  eq(anonJson(`set_visiting('xp-VS', true)`), { ok: true, visiting: true }, 'turning it back on');
-  ok(vsRows(boardRows()).every(([, r]) => r.every(x => x.visit === K)) && place(K).name === 'Visit Subject' && shopOf('xp-VS').visiting === true, 'on again: the same key is back on every board and opens the place');
+  // no opt-out (Sam, 2026-11-11): there is no switch, so the key stays on every board and keeps opening the place
+  raises(() => anon(`select set_visiting('xp-VS', false)`), '42883', 'there is no way to turn visiting off (no set_visiting)');
+  eq(one(`select (to_regclass('public.pet_visit_off') is null)::text`), 'true', 'and no table to keep an opt-out in');
+  ok(vsRows(boardRows()).every(([, r]) => r.every(x => x.visit === K)) && place(K).name === 'Visit Subject', 'the same key, asked again, is on every board and opens the place');
   eq([place('0'.repeat(24)), place('xp-VS'), place('nope'), place(null), place(K.toUpperCase())], [null, null, null, null, null], 'an unknown key, a visitor id, a malformed key and no key all give nothing');
-  eq([anonJson(`set_visiting('', false)`).ok, anonJson(`set_visiting(null, false)`).ok, anonJson(`set_visiting('xp-VS', null)`).ok, anonJson(`set_visiting(repeat('x', 81), false)`).ok], [false, false, false, false], 'set_visiting refuses a bad id or no choice');
-  eq(num(`select count(*) from pet_visit_off`), 0, 'and writes nothing for them');
-  // Link my devices keeps an opt-out, whichever device made it
-  anon(`select set_visiting('xp-VL2', false); select set_visiting('xp-VM', false)`);
-  const vc1 = anon(`select create_link_code('xp-VL')`)[0][0], vc2 = anon(`select create_link_code('xp-VM')`)[0][0];
-  eq([anon(`select redeem_link_code(${q(vc1)}, 'xp-VL2')`)[0][0], anon(`select redeem_link_code(${q(vc2)}, 'xp-VM2')`)[0][0]], ['xp-VL', 'xp-VM'], 'two pairs of devices link');
-  eq(rows(`select visitor_id from pet_visit_off order by 1`).map(r => r.visitor_id), ['xp-VL', 'xp-VM'], 'linked: off on either device stays off, on the id that remains');
-  ok(shopOf('xp-VL').visiting === false && shopOf('xp-VM').visiting === false, 'and the shop says so');
+  // Link my devices: the place follows the id that remains, and the other id's key opens nothing
+  sql(`insert into arcade_scores (hub, game, visitor_id, score) values ('xh', 'board', 'xp-VL2', 7);
+       insert into pet_inventory (visitor_id, item_id) values ('xp-VL2', 'bow-tie');`);
+  anon(`select equip_item('xp-VL2', 'outfit', 'bow-tie')`);
+  const kVL = one(`select sh_visit_key('xp-VL')`), kVL2 = one(`select sh_visit_key('xp-VL2')`);
+  ok(place(kVL2) && place(kVL2).equipped.outfit === 'bow-tie' && place(kVL) === null, 'before linking: the second device\'s place opens with its own key');
+  const vc1 = anon(`select create_link_code('xp-VL')`)[0][0];
+  eq(anon(`select redeem_link_code(${q(vc1)}, 'xp-VL2')`)[0][0], 'xp-VL', 'the two devices link');
+  const arcVL = boardRows().arcade.filter(x => x.visit === kVL || x.visit === kVL2).map(x => x.visit);
+  ok(arcVL.length === 1 && arcVL[0] === kVL && place(kVL) && place(kVL).equipped.outfit === 'bow-tie' && place(kVL2) === null,
+    'linked: the board row carries the remaining id\'s key, which opens the place; the old key opens nothing');
   ok(num(`select length(secret) from visit_secret`) >= 32 && num(`select count(*) from visit_secret`) === 1, 'one server-side secret behind the keys');
-  notes.push('visiting: on by default, a key per board row, a place with only what it shows, off and on again, unknown keys, Link my devices');
+  notes.push('visiting: on for everyone (no opt-out), a key per board row, a place with only what it shows, unknown keys, Link my devices');
 
   /* ---------- 15. the private parts stay private ---------- */
-  for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'pet_visit_off'])
+  for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);
-  raises(() => anon(`insert into public.pet_visit_off (visitor_id) values ('x')`), '42501', 'anon writes pet_visit_off directly');
   raises(() => anon(`update public.visit_secret set secret = 'x'`), '42501', 'anon writes visit_secret directly');
   for (const f of [`sh_answer(null, 'x', 'xh', 'x1', 1, null, null, null, null, null, null, null)`, `sh_award('x', 'k', 'report', 'xh', 100, 1, now())`,
     `sh_xp_replay(array['x'])`, `sh_wallet('xp-B')`, `sh_session_start(null, 'x', 'xh', 'mock', null)`, `sh_pod_minute(null, 'x', 'xh', 'ep1', 0)`,

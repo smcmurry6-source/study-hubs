@@ -108,7 +108,6 @@ try {
          insert into idea_reports (idea_id, visitor_id) select id, 'rls-C' from ideas where visitor_id = 'rls-B';
          insert into idea_notes (visitor_id, idea_id, status, note) select 'rls-B', id, 'planned', 'made-up note' from ideas where visitor_id = 'rls-B';
          insert into xp_sessions (visitor_id, hub, kind, started_at) values ('rls-B','rls-hub','mock',now());`);
-    if (has('pet_visit_off')) sql(`insert into pet_visit_off (visitor_id) values ('rls-C')`);   /* C turned visiting off */
   }
 
   /* 1. row-level security on, and anon's direct access is exactly the expected list */
@@ -243,22 +242,26 @@ try {
     if (!pB || pB.name !== 'Made Up Incisor' || !pB.equipped || pB.equipped.outfit !== 'bow-tie') fail(`get_place with B's key doesn't show B's place: ${placeB.slice(0, 120)}`);
     else if (Object.keys(pB).sort().join(',') !== 'equipped,flair,name,rank') fail(`get_place returns more than a place shows: ${Object.keys(pB).sort().join(',')}`);
     if (/rls-[ABC]/.test(placeB) || placeB.includes(keyB)) fail(`get_place hands back a visitor id or the key: ${placeB.slice(0, 120)}`);
-    if (anonText(`public.get_place(${q(keyC)})`) !== 'null') fail('get_place opened the place of someone who turned visiting off');
+    if (anonText(`public.get_place(${q(keyC)})`) !== 'null') fail('get_place opened a place for someone on no board (C has only reported an idea)');
     for (const bad of [`'rls-B'`, `'rls-A'`, `repeat('0', 24)`, `null::text`]) if (anonText(`public.get_place(${bad})`) !== 'null') fail(`get_place(${bad}) answered; only a visit key opens a place`);
     const boards = { get_rank_board_v2: `'rls-A', 50`, get_leaderboard_v2: '50', get_correct_streak_stats_v2: '', get_arcade_leaderboard_v2: `'rls-hub', 'board', 'rls-A', 50` };
     sql(`insert into arcade_scores (hub, game, visitor_id, score) values ('rls-hub','board','rls-B',10), ('rls-hub','board','rls-C',20);
          insert into correct_streaks (visitor_id, current_streak, best_streak) values ('rls-B', 7, 7) on conflict (visitor_id) do update set current_streak = 7, best_streak = 7;`);
-    let withKey = 0;
+    let withKey = 0, withKeyC = 0;
     for (const [f, args] of Object.entries(boards)) {
       const text = anonText(`select coalesce(json_agg(x), '[]') from public.${f}(${args}) x`);
       if (/rls-[ABC]/.test(text)) fail(`${f} hands back a visitor id: ${text.slice(0, 120)}`);
-      if (text.includes(keyC)) fail(`${f} carries the visit key of someone who turned visiting off`);
       let r = []; try { r = JSON.parse(text); } catch (e) {}
-      if (r.length && !r.every(x => 'visit' in x && (x.visit === null || /^[0-9a-f]{24}$/.test(x.visit)))) fail(`${f}: a row without a visit key column, or one that isn't a key or null`);
+      if (r.length && !r.every(x => 'visit' in x && /^[0-9a-f]{24}$/.test(x.visit || ''))) fail(`${f}: a row without a visit key (no one can turn visiting off, so every row has one)`);
       if (text.includes(keyB)) withKey++;
+      if (text.includes(keyC)) withKeyC++;
     }
     if (withKey < 3) fail(`B's visit key should be on the rank board, the arcade board and the answer-streak stats; found on ${withKey} board(s)`);
-    notes.push(`visiting: ${(EXPECT.anonNone || []).length} tables and ${(EXPECT.anonNoRun || []).length} helpers closed to anon; get_place and the four boards give a key, never an id`);
+    if (withKeyC < 1) fail('C, now on the arcade board, should have a visit key there (no one can turn visiting off)');
+    const placeC = anonText(`public.get_place(${q(keyC)})`);
+    if (placeC === 'null' || /rls-[ABC]/.test(placeC) || placeC.includes(keyC)) fail(`get_place with C's key, once C is on a board: ${placeC.slice(0, 120)} (expected C's place, with no id or key in it)`);
+    const nT = (EXPECT.anonNone || []).length, nF = (EXPECT.anonNoRun || []).length;
+    notes.push(`visiting: ${nT} table${nT === 1 ? '' : 's'} and ${nF} helper${nF === 1 ? '' : 's'} closed to anon; get_place and the four boards give a key, never an id`);
   }
 
   /* 7. no function a visitor can run hands back another visitor's id: every one (but triggers) is called as anon with A's

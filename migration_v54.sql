@@ -18,7 +18,7 @@
 --      HP from snacks and floss, the rare-costume log; and since 2026-11-10 (Sam's third round,
 --      vault/tasks/2026-11-10-redesign-timmys-place-round-3.md): a full set for every season, on sale in its window
 --      (sh_shop_seasons), Halloween's set as everyone's gift, a set earned at every full rank-up, two throwback days a
---      month, and visiting someone's place from the boards (get_place, set_visiting);
+--      month, and visiting someone's place from the boards (get_place; no opt-out, Sam 2026-11-11);
 --   6. the idea board (ideas, votes, reports, statuses with Inbox notes);
 --   7. the bootstrap with all of it.
 --
@@ -857,11 +857,11 @@ begin
 end;
 $$;
 
--- Visiting (Sam, 2026-11-10: "Its on by default and you visit from the boards"). The boards never give out a visitor id,
--- so every row of the four boards below carries a visit key instead (`visit`): an opaque digest of the person's id with a
--- secret only the server holds. get_place(key) opens that person's place; someone who turned visiting off has no key
--- (null), on every board. The secret is one random value made when this migration runs; nobody but the functions here
--- can read it, so a key can't be worked out from an id, or an id from a key.
+-- Visiting (Sam, 2026-11-10: "Its on by default and you visit from the boards"; 2026-11-11: no one can turn it off). The
+-- boards never give out a visitor id, so every row of the four boards below carries a visit key instead (`visit`): an
+-- opaque digest of the person's id with a secret only the server holds. get_place(key) opens that person's place. The
+-- secret is one random value made when this migration runs; nobody but the functions here can read it, so a key can't be
+-- worked out from an id, or an id from a key.
 create table if not exists public.visit_secret (
   id boolean primary key default true check (id),
   secret text not null
@@ -869,23 +869,16 @@ create table if not exists public.visit_secret (
 insert into public.visit_secret (id, secret)
   values (true, replace(gen_random_uuid()::text || gen_random_uuid()::text, '-', '')) on conflict (id) do nothing;
 
--- who turned visiting off (a row = off; no row = on, the default)
-create table if not exists public.pet_visit_off (
-  visitor_id text primary key,
-  set_at timestamptz not null default now()
-);
-
 -- a person's visit key: 24 hex characters, the same every time. Private: only the functions in this file call it.
 create or replace function public.sh_visit_key(p_visitor text)
 returns text language sql stable security definer set search_path = public as $$
   select left(encode(sha256(convert_to(s.secret || ':' || p_visitor, 'UTF8')), 'hex'), 24) from visit_secret s where s.id;
 $$;
 
--- what a board row carries: the key, or null for someone who turned visiting off
+-- what a board row carries: the person's key (everyone on a board has one: visiting can't be turned off)
 create or replace function public.sh_visit_link(p_visitor text)
 returns text language sql stable security definer set search_path = public as $$
-  select case when p_visitor is null or exists (select 1 from pet_visit_off o where o.visitor_id = p_visitor) then null
-              else sh_visit_key(p_visitor) end;
+  select case when p_visitor is null then null else sh_visit_key(p_visitor) end;
 $$;
 
 create or replace function public.get_rank_board_v2(p_visitor text default null, p_limit integer default 10)
@@ -967,23 +960,11 @@ begin
 end;
 $$;
 
--- visiting on (the default) or off, the visitor's own choice. Off: no key on any board, and get_place gives nothing
-create or replace function public.set_visiting(p_visitor text, p_on boolean)
-returns jsonb language plpgsql security definer set search_path = public as $$
-begin
-  if p_visitor is null or length(p_visitor) not between 1 and 80 or p_on is null then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
-  if p_on then delete from pet_visit_off where visitor_id = p_visitor;
-  else insert into pet_visit_off (visitor_id) values (p_visitor) on conflict (visitor_id) do nothing;
-  end if;
-  return jsonb_build_object('ok', true, 'visiting', p_on);
-end;
-$$;
-
 -- someone's place, opened with the visit key from a board row. Only what a place shows: the leaderboard name exactly as
 -- the boards show it, what stands in each slot (the home, the scene, the five yard spots, the upgrades and paint, the
 -- outfit), the rank (journey, tier, level) and the mastery flair the boards already show. Never the visitor id, XP as a
--- number, HP, snacks, the streak, answers, the wallet, the inventory, or any date or time. An unknown key, or someone
--- who turned visiting off (an old key included), gives null. The search covers everyone a board can list.
+-- number, HP, snacks, the streak, answers, the wallet, the inventory, or any date or time. An unknown key gives null.
+-- The search covers everyone a board can list.
 create or replace function public.get_place(p_key text)
 returns jsonb language plpgsql stable security definer set search_path = public as $$
 declare v text; k record;
@@ -994,7 +975,7 @@ begin
     union select c.visitor_id from correct_streaks c
     union select a.visitor_id from arcade_scores a
   ) z where sh_visit_key(z.visitor_id) = p_key limit 1;
-  if v is null or exists (select 1 from pet_visit_off o where o.visitor_id = v) then return null; end if;
+  if v is null then return null; end if;
   select * into k from sh_rank(coalesce((select x.xp from xp_visitors x where x.visitor_id = v), 0));
   return jsonb_build_object(
     'name', coalesce((select vn.display_name from visitor_names vn where vn.visitor_id = v), anon_name(v)),
@@ -1299,7 +1280,7 @@ $$;
 -- one visitor's shop, wallet, things and what's on today; with no visitor, just today's shop. `seasons` are the sets on
 -- sale today and `throwback` says whether today is a throwback day. `inventory` is everything owned, each with how it is
 -- owned ('bought', 'gift' or 'rank'); `locked` lists the rank items not reached yet, with the tier that unlocks each
--- ("Unlocks at Silver"); `visiting` says whether others can visit this place from the boards.
+-- ("Unlocks at Silver").
 -- sh_my_shop takes the Central date (the tests set it; null = today); get_my_shop is what a page calls.
 create or replace function public.sh_my_shop(p_day date, p_visitor text)
 returns jsonb language plpgsql stable security definer set search_path = public as $$
@@ -1327,8 +1308,7 @@ begin
       from costume_log c where c.visitor_id = p_visitor), '[]'::jsonb) else '[]'::jsonb end,
     'snacks_today', case when ok then coalesce((select jsonb_agg(distinct p.item_id) from pet_purchases p
       where p.visitor_id = p_visitor and p.day = dd and p.kind = 'snack'), '[]'::jsonb) else '[]'::jsonb end,
-    'boost', case when ok then sh_boost_json(p_visitor, clock_timestamp()) end,
-    'visiting', case when ok then not exists (select 1 from pet_visit_off o where o.visitor_id = p_visitor) end);
+    'boost', case when ok then sh_boost_json(p_visitor, clock_timestamp()) end);
 end;
 $$;
 create or replace function public.get_my_shop(p_visitor text)
@@ -1698,7 +1678,7 @@ create table if not exists public.ideas (
   status_note text,
   status_at timestamptz,
   hidden boolean not null default false,
-  hidden_by text check (hidden_by in ('self', 'reports', 'admin')),
+  hidden_by text check (hidden_by in ('reports', 'admin')),
   restored_at timestamptz,
   created_at timestamptz not null default now()
 );
@@ -1793,19 +1773,14 @@ begin
 end;
 $$;
 
--- the author's own delete: the words, the name, the votes, reports and Inbox notes go; an empty row stays, so a deleted
--- idea still counts toward the day's three and the 20 seconds
+-- the author's own delete removes the idea completely (Sam, 2026-11-11): the row goes, and with it (on delete cascade) its
+-- votes, reports and Inbox notes. A deleted idea no longer counts toward the day's three or the 20 seconds.
 create or replace function public.delete_my_idea(p_visitor text, p_id bigint)
 returns boolean language plpgsql security definer set search_path = public as $$
 begin
   if p_visitor is null then return false; end if;
-  update ideas set title = '', body = '', name = '', hidden = true, hidden_by = 'self', status_note = null
-    where id = p_id and visitor_id = p_visitor and hidden_by is distinct from 'self';
-  if not found then return false; end if;
-  delete from idea_votes where idea_id = p_id;
-  delete from idea_reports where idea_id = p_id;
-  delete from idea_notes where idea_id = p_id;
-  return true;
+  delete from ideas where id = p_id and visitor_id = p_visitor;
+  return found;
 end;
 $$;
 
@@ -1856,7 +1831,6 @@ begin
       (select count(*) from idea_votes x where x.idea_id = i.id and x.val = -1),
       (select count(*) from idea_reports r where r.idea_id = i.id), i.hidden, i.hidden_by, i.created_at
     from ideas i where i.created_at > now() - make_interval(days => greatest(1, least(coalesce(p_days, 90), 400)))
-      and i.hidden_by is distinct from 'self'
     order by i.created_at desc limit 500;
 end;
 $$;
@@ -1868,7 +1842,7 @@ returns jsonb language plpgsql security definer set search_path = public as $$
 declare i record; nn text := nullif(left(btrim(coalesce(p_note, '')), 200), ''); k int := 0;
 begin
   if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
-  select * into i from ideas where id = p_id and hidden_by is distinct from 'self';   -- an idea its author deleted is gone
+  select * into i from ideas where id = p_id;
   if not found then return jsonb_build_object('ok', false, 'error', 'unknown'); end if;
   if p_action = 'hide' then update ideas set hidden = true, hidden_by = 'admin' where id = p_id;
   elsif p_action = 'restore' then update ideas set hidden = false, hidden_by = null, restored_at = now() where id = p_id;
@@ -1931,7 +1905,7 @@ $$;
 -- Today's redeem_link_code (migration_v52), plus the new tables, moved before the answers so the answer trigger's rebuild
 -- sees them: awards and boosts (a key both devices earned pays once), sessions, the baseline (added together), purchases
 -- (spending adds up), the inventory (both devices' things), what's equipped (per slot, the newer choice wins), the costume
--- log, ideas, votes (the newer vote wins), reports and notes, and the visiting switch (off on either device stays off).
+-- log, ideas, votes (the newer vote wins), reports and notes.
 -- Then one rebuild for both ids.
 create or replace function public.redeem_link_code(p_code text, p_visitor text)
 returns text language plpgsql security definer set search_path = public as $$
@@ -1978,9 +1952,6 @@ begin
     select p, costume, first_day from costume_log where visitor_id = p_visitor
     on conflict (visitor_id, costume) do update set first_day = least(costume_log.first_day, excluded.first_day);
   delete from costume_log where visitor_id = p_visitor;
-  insert into pet_visit_off (visitor_id, set_at)
-    select p, set_at from pet_visit_off where visitor_id = p_visitor on conflict (visitor_id) do nothing;
-  delete from pet_visit_off where visitor_id = p_visitor;
   update ideas set visitor_id = p where visitor_id = p_visitor;
   insert into idea_votes (idea_id, visitor_id, val, at)
     select idea_id, p, val, at from idea_votes where visitor_id = p_visitor
@@ -2095,11 +2066,10 @@ alter table public.idea_votes enable row level security;
 alter table public.idea_reports enable row level security;
 alter table public.idea_notes enable row level security;
 alter table public.visit_secret enable row level security;
-alter table public.pet_visit_off enable row level security;
 revoke all on table public.game_config, public.game_baseline, public.question_keys, public.xp_awards, public.xp_boosts,
   public.xp_sessions, public.answer_xp, public.podcast_episodes, public.report_outcomes, public.shop_items, public.pet_purchases,
   public.pet_inventory, public.pet_equipped, public.costume_log, public.ideas, public.idea_votes, public.idea_reports,
-  public.idea_notes, public.visit_secret, public.pet_visit_off from public, anon, authenticated;
+  public.idea_notes, public.visit_secret from public, anon, authenticated;
 
 -- private helpers: only the functions above call them
 revoke all on function public.sh_v2_at() from public, anon, authenticated;
@@ -2166,8 +2136,6 @@ revoke all on function public.get_arcade_leaderboard_v2(text, text, text, intege
 grant execute on function public.get_arcade_leaderboard_v2(text, text, text, integer) to anon, authenticated;
 revoke all on function public.get_trophy_stats_v2() from public;
 grant execute on function public.get_trophy_stats_v2() to anon, authenticated;
-revoke all on function public.set_visiting(text, boolean) from public;
-grant execute on function public.set_visiting(text, boolean) to anon, authenticated;
 revoke all on function public.get_place(text) from public;
 grant execute on function public.get_place(text) to anon, authenticated;
 revoke all on function public.get_my_shop(text) from public;

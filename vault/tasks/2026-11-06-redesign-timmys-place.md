@@ -116,6 +116,9 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
 - 2026-11-10 (Claude Code): Sam's second look: hub mastery is one **medal board** (each hub's own medal, a big view on
   tap), the statue stands upright, and the design page has the shop's window, the customizer, the rank board and
   visiting ([round 3's note](done/2026-11-10-redesign-timmys-place-round-3.md)). Still nothing in `widget/pet.js`.
+- 2026-11-11 (Claude Code): Sam: **no opt-out from visiting**. The design page's "Let classmates visit my place" switch
+  and its "Visits off" row are gone, and so is the server's switch ([game-server](../reference/game-server.md)): build
+  visiting with no setting for it ([the open calls](done/2026-11-11-redesign-open-calls.md)).
 
 ## Outcome
 
