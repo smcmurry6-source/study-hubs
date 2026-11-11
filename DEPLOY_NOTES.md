@@ -41,8 +41,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   every version. The engine (`widget/hub.js`, gated) learned recall cards, case links, HTML review sections under the notes,
   the exam-format mock (46 in 80, partial credit, an ordering question) and Perio's arcade API; for every new hub, the games
   keep their own button style (BUG-058) and tag questions with the lecture's color. Perio's text takes a deeper pink for
-  contrast (`widget/hub.css`). Its arcade lobby drawings (`tools/figures/site/arcade.mjs`): five in, Pocket Showdown's board
-  redrawn and waiting for Sam's yes (`PERIO_WAITING`). The games' icons on the engine are sized as on the live hubs
+  contrast (`widget/hub.css`). Its six arcade lobby drawings are in (`tools/figures/site/arcade.mjs`, Sam's look on
+  2026-11-11; Pocket Showdown's board redrawn after the first one's teeth). The games' icons on the engine are sized as on the live hubs
   (BUG-059: Occlusion's and Heme & Endo's Back and Full screen buttons had grown). Budgets and the accessibility baseline
   gain the page. Hub note: `vault/hubs/perio.md`, "The new version".
 - **2026-11-11 (redesign phase 2: the new Heme & Endo Exam 2, beside the live one, Claude Code)** — Nothing students see

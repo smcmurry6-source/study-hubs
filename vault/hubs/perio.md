@@ -119,9 +119,9 @@ live hub. Until then **edit content in the live file only**:
 - Its art: tint `#b4466f`, emblem and masthead (phase 0), and the arcade lobby drawings (`tools/figures/site/arcade.mjs`,
   `pBoard()` to `pCrusher()`, built into `widget/hub-art/perio.js`). Sam approved five on 2026-11-11 ("the other drawings
   look good"); **Pocket Showdown's** first teeth "look terrible", so `pBoard()` was redrawn as the game's own board (molars
-  in their gums, a column per session, like Heme & Endo's approved Showdown) and **waits for Sam's yes**: it's in
-  `PERIO_WAITING`, so its tile shows the game's icon. On a yes: empty `PERIO_WAITING`, run `node tools/figures/site/build.mjs`
-  and commit `widget/hub-art/perio.js` and `tools/preview/design/art.js`. `PERIO_DRAFT` (the whole set) is for contact sheets.
+  in their gums, a column per session, like Heme & Endo's approved Showdown), and Sam approved the redraw the same day. All
+  six are in. A change to one: edit it in `arcade.mjs`, run `node tools/figures/site/build.mjs`, commit
+  `widget/hub-art/perio.js` and `tools/preview/design/art.js`, and show Sam before it goes in.
 - Not carried over (on purpose): the MCQ sprint and the midterm's scope (the midterm is over), the live lobby's daily
   rotating first game (Pocket Showdown is first), hints' slide and email source tags. Active recall is the
   [Learn and Flashcards](../tasks/2026-11-06-redesign-learn-and-flashcards.md) task's.

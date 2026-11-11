@@ -28,7 +28,7 @@
    Perio (redesign phase 2; from its games and PERIO_SKIN, the perio clinic):
    - board:  Pocket Showdown. The game's board as a perio chart: a column per session under its colored head, molars in
              their gums for tiles, a probe in a pocket that bleeds, one tile answered right, a Deep Pocket star. Redrawn
-             2026-11-11 (Sam: the first one's teeth "look terrible"); waits for Sam's yes (PERIO_WAITING).
+             2026-11-11 (Sam: the first one's teeth "look terrible"; the redraw approved the same day).
    - escape: Perio Clinic Escape. The clinic after hours: the panoramic viewer off, the locked charting computer, the
              chart, the typodont, the taped cassette, the door's keypad.
    - cloze:  Mind the Pocket. A page of notes with one term missing, beside a probe in a tooth's pocket.
@@ -672,14 +672,10 @@ const buildPerio = (T) => ({
   cross: { label: "Cross-Section: a mini crossword beside a tooth cut in section in its bone and gum, a probe in the sulcus", body: pCross(T) },
   crusher: { label: "Calculus Crusher: a wall of calculus bricks, one breaking, a ball and a curette for a paddle", body: pCrusher(T) }
 });
-/* Sam, 2026-11-11, on the contact sheet: Pocket Showdown's teeth "look terrible", "the other drawings look good". The five
-   are in; the board, redrawn as the game's own board (molars in their gums), waits for Sam's yes (PERIO_WAITING), and its
-   lobby tile shows the game's icon until then. PERIO_DRAFT is the whole set, for contact sheets. */
-const PERIO_WAITING = ["board"];
-const buildPerioLive = (T) => Object.fromEntries(Object.entries(buildPerio(T)).filter(([k]) => !PERIO_WAITING.includes(k)));
-export const PERIO_DRAFT = buildPerio;
+/* Sam, 2026-11-11, on the contact sheet: "the other drawings look good", Pocket Showdown's teeth "look terrible"; the board,
+   redrawn as the game's own board (molars in their gums), approved the same day ("the redraw is good"). All six are in. */
 
 export const ARCADE_VIEWBOX = [0, 0, 320, 170];
-/* Occlusion's (phase 1) and Heme & Endo Exam 2's (phase 2); Perio gets its own in its phase 2 session */
-const SETS = { occlusion: build, "heme-endo-exam2": buildHE, perio: buildPerioLive };
+/* Occlusion's (phase 1), Heme & Endo Exam 2's and Perio's (phase 2) */
+const SETS = { occlusion: build, "heme-endo-exam2": buildHE, perio: buildPerio };
 export function arcadeArt(hub, tint){ return SETS[hub] ? SETS[hub](tint) : null; }
