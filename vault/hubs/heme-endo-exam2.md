@@ -109,7 +109,7 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   inhibin holds it back (his slide's "FSH is suppressed by production of inhibin"). No question's key depends on FSH falling at midcycle (`fp-inhibin` and `fp-lhr-granulosa` stay retired).
 - **Narration:** `hubs/heme-endo-exam2/audio/<lecture>-full.mp3` and `-plain.mp3`, made with `tools/narrate.py`
   (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`).
-- **Timmy Time** (2026-11-11): `hubs/heme-endo-exam2/audio/timmy-time.mp3`, 50 min, script `tools/podcast/heme-endo-exam2/script.md`
+- **Timmy Time** (2026-11-11): `hubs/heme-endo-exam2/audio/timmy-time.mp3`, 52 min, script `tools/podcast/heme-endo-exam2/script.md`
   (L11-L16 by system, male then female, plus a short Exam 1 refresher on L2, L3, L6 and L10 only, opening with the class's
   split of the five; the histology segments name the two picture questions, the Sertoli cell and the follicle stages;
   written from the As taught notes, hints, cram sheet, High Likelihood topics, the 11/11 in-class review's questions and

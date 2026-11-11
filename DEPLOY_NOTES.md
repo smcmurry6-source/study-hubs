@@ -32,8 +32,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-11 (Timmy Time: Heme & Endo Exam 2 episode, Claude Code)** — A 50-minute (49.9) last-minute review for Heme &
-  Endo Exam 2 (Fri Nov 13): `hubs/heme-endo-exam2/audio/timmy-time.mp3` (36 MB, -16 LUFS), script
+- **2026-11-11 (Timmy Time: Heme & Endo Exam 2 episode, Claude Code)** — A 52-minute (51.7) last-minute review for Heme &
+  Endo Exam 2 (Fri Nov 13): `hubs/heme-endo-exam2/audio/timmy-time.mp3` (37 MB, -16 LUFS), script
   `tools/podcast/heme-endo-exam2/script.md`, from the hub's notes (As taught), Exam Hints (every professor quote word for
   word), cram sheet, `LIKELY_TOPICS` and LESSONS.md's live signals for the hub (the Cushing labs read backwards,
   meglitinides and hypoglycemia, metformin vs the disulfiram reaction, secondary hyperparathyroidism on dialysis,
