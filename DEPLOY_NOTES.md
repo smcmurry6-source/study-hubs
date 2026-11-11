@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (Heme & Endo Exam 2: Exam 2's review questions with twins, the Exam 1 breakdown, the two pictures, Claude Code)** —
+  Sam sent the in-class review's 20 PollEv questions: "add these exact questions and then use each question to make a similar
+  question with a different option as the answer". All 20 are in the bank as given (`rv-*`, src `review2`, "Exam 2 in-class
+  review", one typo fixed), each with a twin (`rv-*-twin`, src `twin`, "Like an Exam 2 review question") keyed on a different
+  choice, every choice with its why, all from the hub's notes; each lecture gets an "Exam 2 in-class review (11/11)" High
+  Likelihood topic. Sam on the five Exam 1 questions: "2 questions from l2, question on which hormones synergize, and pth
+  maintenance": three new R topics (PTH and calcitriol synergize; how PTH maintains blood calcium; T3 synergizes with GH on bone)
+  with three new questions and three Exam 1 copies, R's notes (both levels, narration regenerated), cram and a focus hint, and the
+  mock's five now follow the split (`MOCK_PLAN`: 2 from L2, 1 synergy, 1 PTH, 1 any). "The two images on the exam are sertoli and
+  female reproductive stages": focus hints and an `EXAM_INFO` "Pictures" row; the follicle-stages drawing comes in its own PR.
+  541 questions (46 new ids in the registry); `next/` rebuilt. About page's High Likelihood entry updated.
+
 - **2026-11-11 (Heme & Endo Exam 2: the five Exam 1 questions come from L2, L3, L6 and L10, Claude Code)** — Sam: "the exam 1
   questions for heme and endo exam 2 will come from l2,6,3, and 10". The Exam 1 Refresher's `LIKELY_TOPICS` keep only those four
   Exam 1 lectures' 23 topics (93 questions; 32 topics dropped), so the mock's five Exam 1 questions, **Exam 1 High likelihood** in the

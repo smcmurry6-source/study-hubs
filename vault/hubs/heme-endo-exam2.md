@@ -37,7 +37,14 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   Title)" after the explanation and `pcase` prefixed `r-`; the Refresher's `LIKELY_TOPICS` are Exam 1's, "L# Title: "
   before each topic and "Exam 1 " before its basis. Its notes are Exam 1's cram sheet. **The mock's five Exam 1
   questions come only from R's High Likelihood questions** (Sam, 2026-11-06), **drawn at random** (Sam, 2026-11-10: "pull
-  randomly from them for the mock"): `MOCK_LIKELY_ONLY` and `mockLikelyPick`.
+  randomly from them for the mock"): `MOCK_LIKELY_ONLY` and `mockLikelyPick`. **How the five break down** (Sam, 2026-11-11: "theres 2 questions from l2,
+  question on which hormones synergize, and pth maintenance"; the fifth wasn't named): `MOCK_PLAN.refresh` fills 2 slots
+  from topics starting "L2 ", 1 from a topic matching /synergi/ and 1 from "How PTH maintains", then 1 from any R High
+  Likelihood question. Three R topics hold them (basis "Exam 2 breakdown"): PTH and calcitriol synergize (`r-ca-synergy`,
+  new, and `r-ca-pth-synergy`, an Exam 1 copy), How PTH maintains blood calcium (`r-ca-pth-maintain`, new, and the copy
+  `r-ca-pth-net`) and T3 synergizes with GH on bone (`r-gr-synergy`, new, and the copy `r-gr-tf-8`; a hedge in case
+  "synergize" meant T3). R's notes (both levels, narration regenerated), cram and a second R `focus` hint say it. A topic
+  name that the plan matches must keep its wording, or the mock loses that slot (it falls back to any R question).
   **The Question Bank leaves R out by default** (Sam, 2026-11-10: "do not include them in the default question bank filter
   unless you click to include them"): `qlec: 'all'` means the Exam 2 lectures (`bankDefaultIds`); R joins when it is ticked
   in the Lectures list, when Exam 1 High likelihood is turned on (which ticks R, and unticks it again when turned off:
@@ -50,6 +57,21 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   readiness ring and "you haven't tried" (whose button opens the other lectures), Where to next, the bank's "of N" (which
   adds "+ n Exam 1 review") and, through `SH_EXPORT.uncounted()`, the mastery medal in `widget/ranks.js`. Its answers
   still count for XP, streaks and leaderboards, and the bank, mock, drill and search still use its questions.
+- **Exam 2's in-class review (Wed 11/11, Dr. Madison)** (Sam, 2026-11-11, with its PollEv questions: "add these exact
+  questions and then use each question to make a similar question with a different option as the answer. My professor
+  basically gives his questions to chatgpt and tells it to make a new question from it"): its 20 questions are in the bank
+  as given (`src: 'review2'`, "Exam 2 in-class review"; ids `rv-<topic>`, one typo fixed, "Nephorpathy"), each followed by a
+  twin (`src: 'twin'`, "Like an Exam 2 review question"; id `rv-<topic>-twin`) whose key is a different choice. They sit at
+  the top of the question code, so they come first in each lecture's bank order: L2's steroid item and its twin in R; L11 5;
+  L12a 1 and L12b 2; L13 3; L14 2; L15 3; L16 3. `rv-btb-twin` (granulosa cells' gap junctions, no blood-follicle barrier)
+  is filed under L14, its review question (`rv-btb`, Sertoli tight junctions) under L13. Each lecture has an "Exam 2 in-class
+  review (11/11)" High Likelihood topic (basis "Exam 2 review") with its items: first in the lecture, except L13 and L14,
+  where the picture topic stays first. The PollEv file isn't in the repo.
+- **The two picture questions** (Sam, 2026-11-11: "The two images on the exam are sertoli and female reproductive stages
+  picture question"; the picture is the follicle stages): a `focus` hint first in L13 (the Sertoli cell) and L14 (the
+  follicle stages), the first topic of each (basis "image on the exam + focus list + recording") and an `EXAM_INFO`
+  "Pictures" row. The Sertoli cell already has its drawing (`FIGS.sertoli`, `mh-fig-label`, `mh-fig-seq`); an unlabeled,
+  numbered follicle-stages drawing with its own picture questions (Sam: "Yes, draw it") comes in its own PR.
 - **Taught or slides-only:** L11 and L12 were written from their class recordings (11/3, 11/4). A (since removed), L13,
   L14 and L15 went to taught on 2026-11-08 from their 11/6 recordings (Drive, the four `GMT20261106-*` transcripts: 8 am A, 9 am L13,
   10 am L15, and 1:42 pm L14, which Dr. Herr re-recorded and posted after class, so its in-class emphasis isn't on it).
