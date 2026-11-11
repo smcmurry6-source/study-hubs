@@ -32,6 +32,29 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-11 (Heme & Endo Exam 2: Exam 2's review questions with twins, the Exam 1 breakdown, the two pictures, Claude Code)** —
+  Sam sent the in-class review's 20 PollEv questions: "add these exact questions and then use each question to make a similar
+  question with a different option as the answer". All 20 are in the bank as given (`rv-*`, src `review2`, "Exam 2 in-class
+  review", one typo fixed), each with a twin (`rv-*-twin`, src `twin`, "Like an Exam 2 review question") keyed on a different
+  choice, every choice with its why, all from the hub's notes; each lecture gets an "Exam 2 in-class review (11/11)" High
+  Likelihood topic. Sam on the five Exam 1 questions: "2 questions from l2, question on which hormones synergize, and pth
+  maintenance": three new R topics (PTH and calcitriol synergize; how PTH maintains blood calcium; T3 synergizes with GH on bone)
+  with three new questions and three Exam 1 copies, R's notes (both levels, narration regenerated), cram and a focus hint, and the
+  mock's five now follow the split (`MOCK_PLAN`: 2 from L2, 1 synergy, 1 PTH, 1 any). "The two images on the exam are sertoli and
+  female reproductive stages": focus hints and an `EXAM_INFO` "Pictures" row, and (Sam: "Yes, draw it", then a screenshot of the slide: "This is
+  actually the female question he was talking about") an unlabeled drawing laid out like Dr. Herr's five-stage slide
+  (`FIGS.follicles`, `tools/figures/heme-endo-exam2/follicles.mjs`: his numbers 1-5, his labels as letters A-K) under L14's
+  notes with six picture questions. 547 questions (52 new ids in the registry); `next/` rebuilt. About page's High Likelihood and Diagrams entries updated.
+
+- **2026-11-11 (Heme & Endo Exam 2: the five Exam 1 questions come from L2, L3, L6 and L10, Claude Code)** — Sam: "the exam 1
+  questions for heme and endo exam 2 will come from l2,6,3, and 10". The Exam 1 Refresher's `LIKELY_TOPICS` keep only those four
+  Exam 1 lectures' 23 topics (93 questions; 32 topics dropped), so the mock's five Exam 1 questions, **Exam 1 High likelihood** in the
+  Question Bank and the drill draw on them alone. Then Sam: "cut the refresher questions that arent from tested lectures": the
+  other six lectures' 114 questions (`r-pa-2s-2` among them) are retired in `tools/question-ids/heme-endo-exam2.txt`, so R holds
+  93 and the hub 495. R's notes, both levels, and its cram sheet now cover only L2, L3, L6 and L10 (the plain level gains PNMT, Addison's and
+  four L10 lines from the full notes), so `refresh-full.mp3` and `refresh-plain.mp3` were regenerated. An R `focus` Exam Hint, Home's
+  chips and exam card, `EXAM_INFO`, the hints banner, the mock's intro and the About page say which four. `next/` rebuilt (its
+  `SH_HUB` words too). No schema change.
 - **2026-11-11 (Occlusion: `mo-10` retired, Claude Code)** — Sam: "Retire mo-10 if it is redundant ... it is okay to test the
   same concept multiple ways. just not for every single question and not more than twice." It was (report #40): the final's
   lectures asked the same fact, about 10% of people have MIP coincident with CR closure, three times. `mo-10` came out with its

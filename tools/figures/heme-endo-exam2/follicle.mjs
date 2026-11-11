@@ -382,3 +382,6 @@ export default function follicle() {
 `,
   });
 }
+
+/* the drawing helpers, for the static follicle-stages picture (follicles.mjs) */
+export { foR, foPt, foSmooth, foPolar, foCirc, foRing, foStroma, foOocyte, foTheca, foGran, foSurface };

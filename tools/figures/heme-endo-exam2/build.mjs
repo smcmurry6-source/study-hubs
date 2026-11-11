@@ -1,5 +1,5 @@
 // Pastes the Heme & Endo Exam 2 hub's anima figures into hubs/heme-endo-exam2/index.html between its markers, and its
-// static drawn figures (sertoli.mjs) into its `var FIGS = {...};` line.
+// static drawn figures (sertoli.mjs, follicles.mjs) into its `var FIGS = {...};` line.
 //   node tools/figures/heme-endo-exam2/build.mjs            rebuild the hub's anima blocks from the files here
 //   node tools/figures/heme-endo-exam2/build.mjs --check    exit 1 if the hub's blocks are out of date
 //   node tools/figures/heme-endo-exam2/build.mjs --preview  also write standalone pages to dist/ for anima's checks
@@ -9,6 +9,7 @@ import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { baseCss } from "./shared.mjs";
 import { FIGURES } from "./index.mjs";
 import { SERTOLI } from "./sertoli.mjs";
+import { FOLLICLES } from "./follicles.mjs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -55,7 +56,7 @@ let out = between(hub, AJB, AJE, animaJs());
 out = between(out, ACB, ACE, animaCss());
 /* the static drawn figures (FIGS: figHTML above a stem, figAfterHTML after answering, figCardHTML in the notes and
    Review), written as the hub's one `var FIGS = {...};` line */
-const STATIC = [SERTOLI];
+const STATIC = [SERTOLI, FOLLICLES];
 const FL = out.match(/^var FIGS = \{.*\};$/m);
 if (!FL) throw new Error("the hub's `var FIGS = {...};` line was not found");
 out = out.replace(FL[0], () => "var FIGS = " + JSON.stringify(Object.fromEntries(STATIC.map((f) =>

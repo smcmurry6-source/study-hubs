@@ -22,16 +22,29 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   ink, blush paper, a berry accent and corpus-luteum gold); Literata / Hanken Grotesk / Overpass Mono. State key
   `hee2-state-v1`, answered event `hee2:answered`.
 - **Lectures:** L11 Diabetes pharmacology (`dmpharm`), L12a and L12b Endocrine pathology (`path1`, `path2`), L13 and L14 Male and female reproductive histology (`mhisto`, `fhisto`), L15 and L16 Male and
-  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 207 questions copied
+  female reproductive physiology (`mphys`, `fphys`) and R, the **Exam 1 Refresher** (`refresh`): 93 questions copied
   from `heme-endo-exam1` with ids `r-<exam1 id>`, for the exam's five Exam 1 questions: **every Exam 1 High Likelihood
-  question** (206, under Exam 1's 55 predicted topics, in Exam 1's topic order) plus `r-pa-2s-2`, untagged. **Never cut
-  them** (Sam, 2026-11-10: "include all of the exam 1 high likelihood questions. do not cut them"). (It held 219 from
-  2026-11-06, every Exam 1 High Likelihood question plus 13 of its hardest; 55, then 80, after the high-yield cut below,
-  until Sam's call.) A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
+  question on L2, L3, L6 and L10** (under those lectures' 23 predicted topics, in Exam 1's topic order). (It held 219 from
+  2026-11-06, every Exam 1 High Likelihood question plus 13 of its hardest; 55, then 80, after the high-yield cut below;
+  207 from 2026-11-10, Sam: "include all of the exam 1 high likelihood questions. do not cut them", all 206 plus
+  `r-pa-2s-2`.) **Only Exam 1's L2, L3, L6 and L10 are on Exam 2** (Sam, 2026-11-11: "the exam 1 questions for heme and
+  endo exam 2 will come from l2,6,3, and 10"): R's `LIKELY_TOPICS` keep those four lectures' 23 topics (93 questions: L2 20,
+  L3 38, L6 18, L10 17), so the mock's five, Exam 1 High likelihood and the drill use them alone. The other six lectures' 114
+  questions were cut the same day (Sam: "cut the refresher questions that arent from tested lectures"; `retired` in
+  `tools/question-ids/heme-endo-exam2.txt`, `r-pa-2s-2` among them). R's
+  notes (both levels, narration regenerated) and cram sheet cover only the four, and an R `focus` hint, Home's chips and exam
+  card, `EXAM_INFO`, the mock's intro and the About page say so. A copy is the Exam 1 question unchanged except its id, `lec: 'refresh'`, "(Exam 1 · L#
   Title)" after the explanation and `pcase` prefixed `r-`; the Refresher's `LIKELY_TOPICS` are Exam 1's, "L# Title: "
   before each topic and "Exam 1 " before its basis. Its notes are Exam 1's cram sheet. **The mock's five Exam 1
   questions come only from R's High Likelihood questions** (Sam, 2026-11-06), **drawn at random** (Sam, 2026-11-10: "pull
-  randomly from them for the mock"): `MOCK_LIKELY_ONLY` and `mockLikelyPick`.
+  randomly from them for the mock"): `MOCK_LIKELY_ONLY` and `mockLikelyPick`. **How the five break down** (Sam, 2026-11-11: "theres 2 questions from l2,
+  question on which hormones synergize, and pth maintenance"; the fifth wasn't named): `MOCK_PLAN.refresh` fills 2 slots
+  from topics starting "L2 ", 1 from a topic matching /synergi/ and 1 from "How PTH maintains", then 1 from any R High
+  Likelihood question. Three R topics hold them (basis "Exam 2 breakdown"): PTH and calcitriol synergize (`r-ca-synergy`,
+  new, and `r-ca-pth-synergy`, an Exam 1 copy), How PTH maintains blood calcium (`r-ca-pth-maintain`, new, and the copy
+  `r-ca-pth-net`) and T3 synergizes with GH on bone (`r-gr-synergy`, new, and the copy `r-gr-tf-8`; a hedge in case
+  "synergize" meant T3). R's notes (both levels, narration regenerated), cram and a second R `focus` hint say it. A topic
+  name that the plan matches must keep its wording, or the mock loses that slot (it falls back to any R question).
   **The Question Bank leaves R out by default** (Sam, 2026-11-10: "do not include them in the default question bank filter
   unless you click to include them"): `qlec: 'all'` means the Exam 2 lectures (`bankDefaultIds`); R joins when it is ticked
   in the Lectures list, when Exam 1 High likelihood is turned on (which ticks R, and unticks it again when turned off:
@@ -44,6 +57,30 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   readiness ring and "you haven't tried" (whose button opens the other lectures), Where to next, the bank's "of N" (which
   adds "+ n Exam 1 review") and, through `SH_EXPORT.uncounted()`, the mastery medal in `widget/ranks.js`. Its answers
   still count for XP, streaks and leaderboards, and the bank, mock, drill and search still use its questions.
+- **Exam 2's in-class review (Wed 11/11, Dr. Madison)** (Sam, 2026-11-11, with its PollEv questions: "add these exact
+  questions and then use each question to make a similar question with a different option as the answer. My professor
+  basically gives his questions to chatgpt and tells it to make a new question from it"): its 20 questions are in the bank
+  as given (`src: 'review2'`, "Exam 2 in-class review"; ids `rv-<topic>`, one typo fixed, "Nephorpathy"), each followed by a
+  twin (`src: 'twin'`, "Like an Exam 2 review question"; id `rv-<topic>-twin`) whose key is a different choice. They sit at
+  the top of the question code, so they come first in each lecture's bank order: L2's steroid item and its twin in R; L11 5;
+  L12a 1 and L12b 2; L13 3; L14 2; L15 3; L16 3. `rv-btb-twin` (granulosa cells' gap junctions, no blood-follicle barrier)
+  is filed under L14, its review question (`rv-btb`, Sertoli tight junctions) under L13. Each lecture has an "Exam 2 in-class
+  review (11/11)" High Likelihood topic (basis "Exam 2 review") with its items: first in the lecture, except L13 and L14,
+  where the picture topic stays first. The PollEv file isn't in the repo.
+- **The two picture questions** (Sam, 2026-11-11: "The two images on the exam are sertoli and female reproductive stages
+  picture question"; the picture is the follicle stages): a `focus` hint first in L13 (the Sertoli cell) and L14 (the
+  follicle stages), the first topic of each (basis "image on the exam + focus list + recording") and an `EXAM_INFO`
+  "Pictures" row. The Sertoli cell already has its drawing (`FIGS.sertoli`, `mh-fig-label`, `mh-fig-seq`). The follicle stages
+  got theirs the same day (Sam: "Yes, draw it"; then, with a screenshot of the slide: "This is actually the female question he
+  was talking about"): `FIGS.follicles`, built by `tools/figures/heme-endo-exam2/follicles.mjs` with follicle.mjs's own
+  drawing helpers (exported for it), **laid out like Dr. Herr's slide** (the screenshot isn't in the repo): the five stages in
+  a column, numbered 1-5 as he numbers them (primordial, unilaminar primary, multilaminar primary, antral, mature graafian),
+  and each of his 18 labels a letter, the same letter wherever he repeats one, out of order (A zona pellucida, B antrum,
+  C follicular cell, D corona radiata, E granulosa cells, F theca externa, G oocyte, H basal lamina, I cumulus oophorus,
+  J theca interna, K stromal cells). It sits under L14's "Telling the stages apart" (`FIG_PLACE`) above the stepped anima
+  figure, and six picture questions use it (`fh-fig-graafian`, `fh-fig-multi`, `fh-fig-order`, `fh-fig-theca`,
+  `fh-fig-cumulus`, `fh-fig-zona`), first in L14's picture topic. Changing the drawing's numbers or letters means changing
+  those questions' keys.
 - **Taught or slides-only:** L11 and L12 were written from their class recordings (11/3, 11/4). A (since removed), L13,
   L14 and L15 went to taught on 2026-11-08 from their 11/6 recordings (Drive, the four `GMT20261106-*` transcripts: 8 am A, 9 am L13,
   10 am L15, and 1:42 pm L14, which Dr. Herr re-recorded and posted after class, so its in-class emphasis isn't on it).
@@ -98,7 +135,7 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   L12b together, at random, and the "Most likely questions" box says "9 on the exam for L12a and L12b together".
   **The counts never trim High Likelihood** (Sam, 2026-11-10: "Dont remove any high likelihood questions. If they were
   hinted to be exam questions, they need to be high likelihood"; now in [high-likelihood-topics](../rules/high-likelihood-topics.md)):
-  every lecture keeps all its topics (74 on the Exam 2 lectures, 269 questions since L16 went taught; the Refresher's 55), and the box only
+  every lecture keeps all its topics (74 on the Exam 2 lectures, 269 questions since L16 went taught; the Refresher's 23, L2, L3, L6 and L10 only, since 2026-11-11), and the box only
   shows the count beside each lecture. When the 11/11 review flags a topic, add it or rank it higher. L16's ten topics
   were re-ranked from its recording on 2026-11-11 (basis "recording"; every question that was High Likelihood stayed so):
   follicular versus luteal first ("high yield for exam"), then the two-cell slide ("very important slide").
@@ -191,8 +228,8 @@ until then: outside a preview the page sends the visitor to the live hub. Until 
   to the live hub (a question, a note, a hint, a figure build) and commit the JSON; CI's "generated files are current" step
   fails when it's stale. This hub has no drawing kit (`od:kit`), so the build writes its `FIGS` (the Sertoli drawing) and
   `FIG_PLACE` into `figures.js` as data, with its `anima:js` block as is.
-- **Progress carries over:** same hub id, state key `hee2-state-v1`, answered event `hee2:answered`, and all 609 question
-  ids (402 on the Exam 2 lectures, the Refresher's 207).
+- **Progress carries over:** same hub id, state key `hee2-state-v1`, answered event `hee2:answered`, and all 495 question
+  ids (402 on the Exam 2 lectures, the Refresher's 93 since 2026-11-11; 609 before its other six lectures were cut).
 - **The Exam 1 Refresher stays review only** (Sam, 2026-11-06 and 2026-11-10, above): the build copies the live hub's
   `COUNT_SKIP` into `core.json` as `reviewOnly`, and the engine (`isReview()`) keeps R out of Home's totals and "you
   haven't tried", Where to next, the bank's "of N" ("+ n Exam 1 review") and the mastery medal (`SH_EXPORT.uncounted`),
