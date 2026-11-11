@@ -893,3 +893,7 @@ r-ca-pth-maintain
 r-ca-pth-net
 r-gr-synergy
 r-gr-tf-8
+fh-fig-graafian
+fh-fig-multi
+fh-fig-order
+fh-fig-theca

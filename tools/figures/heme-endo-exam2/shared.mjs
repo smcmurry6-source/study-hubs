@@ -145,3 +145,6 @@ export function makeFig({ id, lec, title, caption, fig, short, hint, W, H, label
   return { id, lec, title, caption, css, live: amLive.toString(), helpers: all.concat([render, say]), data: D,
     html: `<div class="anima" data-anima="${id}">${plate}${controls}<p class="am-summary" aria-live="polite"></p><p class="am-info">Hover or tap a part of the drawing to read about it.</p>${src}</div>` };
 }
+
+/* the material colors, for the static drawn figures (FIGS) that sit outside .anima */
+export { LIGHT, DARK };
