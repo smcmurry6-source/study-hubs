@@ -227,6 +227,37 @@ function lint(hub, A){
       errs.forEach(e => problems.push(`dashboard (${label}): ${e}`));
       const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`dashboard (${label}): page scrolls sideways by ${w}px`);
       await page.close(); }
+    // the redesigned dashboard (next/, widget/dash.js; beside the live one until the release): every hub tab, the class
+    // board's three lists, Settings, the name dialog and the menu
+    if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
+      const page = await context.newPage(); const errs = [], name = `next dashboard (${label})`; page.on('pageerror', e => errs.push(e.message));
+      await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(1200);
+      const sideways = async what => { const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`${name}: ${what} scrolls sideways by ${w}px`); };
+      if (!(await page.$('#dx h1'))) problems.push(`${name}: the page has no title`);
+      const tabs = await page.$$eval('#hubTabs [data-tab]', bs => bs.map(b => b.getAttribute('data-tab')));
+      if (!tabs.length && !(await page.$('.dx-empty'))) problems.push(`${name}: no hub tabs and no "no hubs are live" message`);
+      for (const t of tabs) {
+        await page.click(`#hubTabs [data-tab="${t}"]`); await page.waitForTimeout(250);
+        const st = await page.evaluate(() => { const p = document.getElementById('hubPanel'); return { hub: p.getAttribute('data-hub'), start: !!p.querySelector('a.dx-start[href*="hubs/"]'), title: (p.querySelector('.dx-title') || {}).textContent || '' }; });
+        if (st.hub !== t || !st.start || !st.title.trim()) problems.push(`${name}: the ${t} tab didn't open its hub (title, Start studying)`);
+        await sideways(`the ${t} tab`);
+      }
+      for (const b of ['streaks', 'arcade', 'ranks']) { await page.click(`#boardSeg [data-board="${b}"]`); await page.waitForTimeout(200); if (!(await page.$('#board > *'))) problems.push(`${name}: the class board's ${b} list is empty`); await sideways(`the ${b} board`); }
+      await page.click('#setBtn'); await page.waitForTimeout(200);
+      if (!(await page.$('.dx-dlg [data-focus]')) || (await page.$$('.dx-dlg .set-row')).length < 8) problems.push(`${name}: Settings didn't open with Focus mode and the extras`);
+      await page.keyboard.press('Escape'); await page.waitForTimeout(100);
+      if (await page.$('.dx-dlg')) problems.push(`${name}: Escape didn't close Settings`);
+      await page.click('#greetEdit'); await page.waitForTimeout(200);
+      if (!(await page.$('.dx-dlg input'))) problems.push(`${name}: the name dialog didn't open`);
+      await page.keyboard.press('Escape');
+      await page.click('#menuBtn'); await page.waitForTimeout(100);
+      if (!(await page.$('#dxMenu:not([hidden]) #tourBtn')) || !(await page.$('#dxMenu #aboutBtn'))) problems.push(`${name}: the menu didn't open with About and the tour`);
+      await page.keyboard.press('Escape');
+      if (!(await page.$('#ideas[data-sh-ideas]'))) problems.push(`${name}: the idea board's section (#ideas) is missing`);
+      errs.forEach(e => problems.push(`${name}: JavaScript error: ${e}`));
+      notes.push(`${name}: ${tabs.length} hub tabs, the class board, Settings, the name dialog and the menu`);
+      await page.close();
+    }
     for (const hub of hubs) {
       const page = await context.newPage(); const errs = [];
       page.on('pageerror', e => errs.push(e.message));
@@ -292,7 +323,7 @@ function lint(hub, A){
     await stub(context);
     await context.addInitScript(size => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); if (size) localStorage.setItem('sh_pref_size', size); } catch (e) {} }, tb.size || '');
     const label = `${tb.width}px${tb.size ? ', largest text' : ''}`;
-    for (const url of ['index.html', ...hubs.map(h => `hubs/${h}/index.html`), ...nextHubs.map(h => `hubs/${h}/next/index.html`)]) {
+    for (const url of ['index.html', ...(fs.existsSync(path.join(root, 'next', 'index.html')) ? ['next/index.html'] : []), ...hubs.map(h => `hubs/${h}/index.html`), ...nextHubs.map(h => `hubs/${h}/next/index.html`)]) {
       const page = await context.newPage();
       await page.goto(BASE() + url); await page.waitForTimeout(700);
       await page.click('.sh-archived-stay', { timeout: 500 }).catch(() => {});
@@ -300,7 +331,7 @@ function lint(hub, A){
       const bad = await page.evaluate(() => {
         const out = [], vw = document.documentElement.clientWidth;
         if (document.documentElement.scrollWidth > vw + 1) out.push(`page scrolls sideways by ${document.documentElement.scrollWidth - vw}px`);
-        const els = document.querySelectorAll('header.hub-header button, header.hub-header a, .topbar button, .topbar a, .hx-bar a, .hx-bar button, .hx-strip button, #modeSwitch [data-mode], #arcadeHubs button, #gameTabs button');
+        const els = document.querySelectorAll('header.hub-header button, header.hub-header a, .topbar button, .topbar a, .hx-bar a, .hx-bar button, .hx-strip button, #modeSwitch [data-mode], #arcadeHubs button, #gameTabs button, .dx-bar a, .dx-bar button, .dx-tab, #boardSeg button, .dx-actions a');
         for (const el of els) {
           const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[hidden]')) continue;
           const r = el.getBoundingClientRect(); if (!r.width && !r.height) continue;
@@ -320,9 +351,9 @@ function lint(hub, A){
           const btn = document.getElementById('setBtn'); if (btn) btn.click();
           const sp = document.getElementById('shstat-settingspanel'); if (sp) sp.classList.add('is-open');
           const out = [], vw = document.documentElement.getBoundingClientRect();
-          document.querySelectorAll('.set-seg button, .shset-seg button').forEach(b => {
+          document.querySelectorAll('.set-seg button, .shset-seg button, .dx-dlg .seg button').forEach(b => {
             const r = b.getBoundingClientRect(); if (!r.width) return;
-            const box = (b.closest('#shstat-settingspanel') || document.documentElement).getBoundingClientRect();
+            const box = (b.closest('#shstat-settingspanel') || b.closest('.dx-dlgcard') || document.documentElement).getBoundingClientRect();
             if (r.right > Math.min(vw.right, box.right) + 1 || r.left < Math.max(vw.left, box.left) - 1) {
               const seg = b.parentElement; out.push(`Settings: "${b.textContent.trim()}" (${seg.dataset.set || seg.dataset.key || seg.dataset.pref || 'a row'}) runs past the sheet's edge`);
             }

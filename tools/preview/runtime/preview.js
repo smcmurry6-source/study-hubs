@@ -323,13 +323,27 @@
       dashboard_week: dashboard ? bootstrapWeek() : [],
       survey_popup: dashboard ? bootstrapSurvey(t) : [],
       exam_luck: dashboard && a.p_luck_hub && a.p_luck_date ? { count: 0, mine: false, recent: [] } : null,
-      recaps: [],
+      recaps: dashboard ? recapFixtures() : [],
       golden: [],
       name_shared: false,
       /* your own rank and mastery ride in the bootstrap too (Sam, 2026-11-06); same fixtures as the single calls */
       rank: rpc("get_rank_profile", { p_visitor: v }).data,
       mastery: hub ? rpc("get_hub_mastery", { p_visitor: v }).data : []
     };
+  }
+  /* two published recaps for the dashboard's slideshow: made-up totals in the shape get_hub_recap returns (the live
+     site's are drawn from the class's real totals, which a preview never loads) */
+  function recapFixtures(){
+    function one(hub, title, color, exam, people, minutes, answers, correct){
+      var byDay = [], byHour = [];
+      for (var i = 9; i >= 0; i--) { var d = new Date(exam + "T12:00:00"); d.setDate(d.getDate() - i); byDay.push({ d: d.toISOString().slice(0, 10), minutes: Math.round(minutes * (10 - i) / 55) }); }
+      for (var h = 0; h < 24; h++) byHour.push(h < 6 ? 2 : h < 12 ? 9 + h : h < 18 ? 14 + (h % 5) * 3 : 60 - Math.abs(20 - h) * 9);
+      return { hub: hub, title: title, color: color, names: false, question: null, footnote: "Preview: made-up totals",
+        data: { hub: hub, people: people, minutes: minutes, answers: answers, correct: correct, first_day: byDay[0].d, last_day: exam, exam_day: exam,
+          by_day: byDay, by_hour: byHour, night_before: Math.round(minutes * .18), night_before_people: Math.round(people * .8), after_midnight: 6, regulars: Math.round(people * .6) } };
+    }
+    return [one("pcd-implants-exam1", "PCD Implants Exam 1", "#2f6f84", "2026-11-06", 58, 9120, 21480, 14820),
+            one("heme-endo-exam1", "Heme & Endo Exam 1", "#a83232", "2026-10-30", 61, 11340, 26950, 17790)];
   }
   /* the account's starting XP, plus a little for each answer given in this preview (the server's real rule is per day) */
   function myXp(){ var extra = 0; allAnswers().forEach(function(a){ if (!a[4]) extra += a[3] ? 3 : 1; }); return (db.xp || 0) + extra; }
@@ -577,6 +591,18 @@
       return { data: fn === "get_question_health" ? qhFixture(a.p_hub, a.p_current) : synthAdmin(fn) };
     }
     var v = a.p_visitor, hub = a.p_hub, t = now();
+    /* the game layer's functions (migration_v54: written, tested, and not applied until the redesign's release). The new
+       dashboard (widget/dash.js) calls them as <name>_v2, so the preview answers them from today's fixtures plus what
+       v54 adds to a row: the journey (0, the Handpiece) and a visit key (made up here; the real one is a digest only
+       the server can make). The shop and Timmy's place get their fixtures with phase 4. */
+    if (/^get_(widget_bootstrap|rank_profile|rank_board|leaderboard|arcade_leaderboard)_v2$/.test(fn)) {
+      var d2 = rpc(fn.slice(0, -3), a).data;
+      var vkey = function(n){ var k = ""; for (var i = 0; i < 3; i++) k += ("00000000" + (hash(n + "|visit" + i) >>> 0).toString(16)).slice(-8); return k; };
+      if (Array.isArray(d2)) d2 = d2.map(function(r){ var o2 = {}; Object.keys(r).forEach(function(k){ o2[k] = r[k]; }); o2.journey = 0; o2.visit = vkey(r.display_name); return o2; });
+      else if (d2 && d2.rank) d2.rank.journey = 0;
+      else if (d2 && fn === "get_rank_profile_v2") d2.journey = 0;
+      return { data: d2 };
+    }
     switch (fn) {
       case "get_hub_overrides": return { data: ovrStore().rows.filter(function(r){ return ovrActive(r, t); }).map(function(r){ return { hub: r.hub, state: r.state, until: r.until }; }) };
       case "get_widget_bootstrap": return { data: widgetBootstrap(a, t) };
@@ -651,7 +677,8 @@
       case "create_link_code": return { write: true, data: "PREV-" + String(hash(db.visitor) % 9000 + 1000) };
       case "redeem_link_code": return { write: true, data: null };
       case "record_achievement": if (a.p_kind && db.achievements.indexOf(a.p_kind) < 0) { db.achievements.push(a.p_kind + (hub ? ":" + hub : "")); save(); } return { write: true, data: null };
-      case "get_published_recaps": case "get_golden_today": case "get_correct_streak_stats": case "get_trophy_stats": case "get_fairy_board": case "get_cavity_week": return { data: [] };
+      case "get_published_recaps": return { data: recapFixtures() };
+      case "get_golden_today": case "get_correct_streak_stats": case "get_trophy_stats": case "get_fairy_board": case "get_cavity_week": return { data: [] };
     }
     if (/^get_/.test(fn)) return { data: [] };
     return { write: true, data: null };

@@ -5,7 +5,8 @@
      streak flame, the XP spark and Home's spot art (spots.mjs: Timmy Time's host in headphones, the notes, the Today
      calendar) (redesign phase 1);
    - widget/hub-art/<hub>.js: one hub's tint, emblem, masthead scene and arcade lobby art (arcade.mjs), loaded by that
-     hub's page only.
+     hub's page only;
+   - widget/hub-art/dash.js (window.SH_DASH_ART): every hub's tint and emblem, for the new dashboard (widget/dash.js).
 
      node tools/figures/site/build.mjs           write them all
      node tools/figures/site/build.mjs --check   fail if any is stale (CI-friendly)
@@ -228,6 +229,10 @@ for (const h of HUBS) {
   outs.push([path.join(root, "widget/hub-art/" + h + ".js"), engineHead + "window.SH_HUB_ART_HUB = " +
     JSON.stringify(Object.assign({ hub: h, tint: TINTS[h], emblem: EMBLEMS[h], masthead: MASTHEADS[h] }, arcades[h] ? { games: arcades[h], gamesViewBox: ARCADE_VIEWBOX.join(" ") } : {})) + ";\n"]);
 }
+/* the new dashboard (widget/dash.js, redesign phase 3) shows every hub at once, so it gets every tint and emblem in one
+   file; a hub's masthead still comes from that hub's own file, loaded when its tab is opened */
+outs.push([path.join(root, "widget/hub-art/dash.js"), engineHead + "window.SH_DASH_ART = " +
+  JSON.stringify({ tints: Object.fromEntries(HUBS.filter((h) => EMBLEMS[h]).map((h) => [h, TINTS[h]])), emblems: Object.fromEntries(HUBS.filter((h) => EMBLEMS[h]).map((h) => [h, EMBLEMS[h]])) }) + ";\n"]);
 if (process.argv.includes("--dry")) {
   console.log("checked, nothing written: Timmy's place (" + placeCount + " drawings and " + routeCount + " walks)" + (onlyPack ? ", with only the " + onlyPack + " set" : ""));
 } else if (onlyPack) {

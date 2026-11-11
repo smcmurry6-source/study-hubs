@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: in-progress
 hub: dashboard
 created: 2026-11-05
 requested-by: Sam
 due: 
 waiting-on:
-agent:
+agent: Claude Code
 pr:
 ---
 
@@ -47,5 +47,12 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 
 - 2026-11-05: written from the agreed plan.
 - 2026-11-06: the idea board and Timmy's place added (Sam).
+- 2026-11-11 (Claude Code, everything except the idea board): first pass built beside the live dashboard: `next/index.html`
+  (sends visitors to the live dashboard outside a preview), `widget/dash.js` + `widget/dash.css` on the design system,
+  `next/hubs.js` (the hub list, copied from `index.html` by `tools/dash-next/build.mjs`, checked in CI) and
+  `widget/hub-art/dash.js` (every hub's emblem and tint). migration_v54's functions are called through a fallback and
+  stubbed in the preview; nothing was applied. No new art yet. Then Sam asked (same day) for a second pass: familiar,
+  but much more visually interesting; a better way to show the recaps and who is studying; the What's new log out. In
+  progress; the hand-off goes here when it's done.
 
 ## Outcome

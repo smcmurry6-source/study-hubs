@@ -14,7 +14,7 @@
 //                the shared widget run) in under 45 s
 //   node tools/release/matrix.js [--quick]   (--quick: two devices, no slow 3G)
 'use strict';
-const fs = require('fs');
+const fs = require('fs'), path = require('path');
 const L = require('./lib');
 const { start } = require('../preview/serve');
 const QUICK = process.argv.includes('--quick');
@@ -70,6 +70,16 @@ const QUICK = process.argv.includes('--quick');
       };
       await sideways('dashboard');
       let screens = 1, tiny = 0;
+      /* the redesign's dashboard (next/, widget/dash.js; beside the live one until the release): each hub's tab and the class board's three lists */
+      if (fs.existsSync(path.join(L.ROOT, 'next', 'index.html'))) {
+        await page.goto(srv.url + 'next/?persona=returning'); await L.settle(page);
+        await sideways('dashboard/next'); screens++;
+        const tabs = await page.$$eval('#hubTabs [data-tab]', ts => ts.map(t => t.getAttribute('data-tab')));
+        if (!tabs.length) problems.push(`${tag}: dashboard/next shows no hub tabs`);
+        for (const t of tabs) { await page.click(`#hubTabs [data-tab="${t}"]`).catch(() => {}); await page.waitForTimeout(250); await sideways(`dashboard/next · ${t}`); screens++; }
+        for (const bn of await page.$$('#boardSeg button')) { await bn.click().catch(() => {}); await page.waitForTimeout(350); }
+        await sideways('dashboard/next · class board');
+      }
       for (const hub of live) {
         await page.goto(srv.url + `hubs/${hub}/`); await L.settle(page);
         const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
