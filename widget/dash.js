@@ -1292,6 +1292,46 @@
       document.body.appendChild(a); a.click(); a.remove(); track("recap:save");
     }).then(function(){ btn.disabled = false; }, function(){ btn.disabled = false; toast("The image didn't load. Try again in a moment."); });
   }
+  /* the recap's drawings (widget/hub-art/class.js: tools/figures/site/recap.mjs and six trophy drawings): hours per day
+     as drawn columns with the exam day's flag and Timmy climbing them, and the classmates as a crowd of teeth. Drawn at
+     the card's own width, and again when it changes. Without the art the card is its numbers and words. */
+  var rcRow = null;
+  function rcIcon(k){
+    /* inline, not an image: the drawings have no ids, and six more images were six more requests */
+    var b = k === "flame" ? (A.flame || {})[3] : CA && CA.recapIcons && CA.recapIcons[k];
+    return b ? '<svg class="rc-ic" viewBox="' + (k === "flame" ? "0 0 40 48" : "0 0 64 64") + '" aria-hidden="true" focusable="false">' + b + "</svg>" : "";
+  }
+  function recapClimber(){
+    var P = window.shPet; if (!P || !P.art || focusOn() || ls("sh_pref_pet") === "off") return "";
+    var svg = String(P.art({ hp: 100, mood: "happy", hat: "" }, 200)), o = CA.recapHat;
+    if (o && o.back) svg = svg.replace(/(<ellipse cx="100" cy="226"[^>]*\/>)/, "$1" + '<g class="shpet-back">' + o.back + "</g>");
+    if (o) svg = svg.replace(/<\/g><\/svg>\s*$/, (o.face ? '<g class="shpet-garb">' + o.face + "</g>" : "") + (o.top ? '<g class="shpet-hat">' + o.top + "</g>" : "") + "</g></svg>");
+    return svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
+  }
+  function recapArt(again){
+    var row = rcRow, body = $("rcBody"); if (!row || !body || !CA || !CA.recap) return;
+    var d = row.data, days = recapDays(d), plot = $("rcPlot"), crowd = $("rcCrowd"), t = tintOf(row.hub);
+    body.classList.toggle("is-redraw", !!again);
+    if (plot && days.length) {
+      var w = Math.round(plot.clientWidth), h = w < 360 ? 132 : 150;
+      if (w >= 120) {
+        var ex = d.exam_day ? days.map(function(x){ return x.d; }).indexOf(String(d.exam_day).slice(0, 10)) : -1, pk = 0, ci = -1;
+        days.forEach(function(x, k){ if (x.m > days[pk].m) pk = k; });
+        var b = CA.recap.bars({ w: w, h: h, days: days.map(function(x){ return x.m / 60; }), tint: t, exam: ex }), far = (w - 20) / days.length < 34 ? 3 : 2;
+        /* Timmy stands on the tallest column that is clear of the peak's label and the flag */
+        days.forEach(function(x, k){ if (!x.m || k === ex || Math.abs(k - pk) < far) return; if (ci < 0 || x.m > days[ci].m) ci = k; });
+        var tw = Math.min(30, b.bw + 6), tim = ci >= 0 && b.bw >= 12 ? recapClimber() : "", top = b.tops[pk];
+        var left = Math.max(0, Math.min(w - 46, pk === ex ? top[0] - 46 : top[0] - 21));
+        plot.innerHTML = '<svg viewBox="0 0 ' + w + " " + h + '" width="' + w + '" height="' + h + '" overflow="visible" aria-hidden="true" focusable="false">' + b.svg +
+          (tim ? '<svg class="rk-tim" x="' + (b.tops[ci][0] - tw / 2).toFixed(1) + '" y="' + (b.tops[ci][1] - tw * 1.31 * (256 / 262) + 1).toFixed(1) + '" width="' + tw.toFixed(1) + '" height="' + (tw * 1.31).toFixed(1) + '" viewBox="0 -30 200 262" overflow="visible">' + tim + "</svg>" : "") + "</svg>" +
+          (days[pk].m ? '<span class="rc-peak num" style="left:' + Math.round(left) + "px;top:" + Math.round(Math.max(0, top[1] - 25)) + 'px">' + num(Math.round(days[pk].m / 60)) + " h</span>" : "");
+      }
+    }
+    if (crowd && +d.people > 0) {
+      var cw = Math.round(crowd.clientWidth);
+      if (cw >= 100) { var c = CA.recap.crowd({ n: Math.min(+d.people, 160), w: cw, tint: t, size: 1.15 }); crowd.innerHTML = '<svg viewBox="0 0 ' + cw + " " + c.h + '" width="' + cw + '" height="' + c.h + '" focusable="false">' + c.svg + "</svg>"; }
+    }
+  }
   function startRecaps(rows){
     var chips = $("rcChips"), body = $("rcBody"), wrap = $("rc"), cur = -1, seen = false;
     chips.innerHTML = rows.map(function(r, i){
@@ -1316,33 +1356,29 @@
       var max = days.reduce(function(a, b){ return Math.max(a, b.m); }, 1), peak = days.reduce(function(a, b){ return b.m > a.m ? b : a; }, days[0] || { m: 0 });
       var byHour = d.by_hour || [], ph = 0; byHour.forEach(function(v, k){ if (v > byHour[ph]) ph = k; });
       var facts = [];
-      if (d.night_before) facts.push(["The day before the exam", num(Math.round(d.night_before / 60)) + " hours", "from " + num(d.night_before_people) + " people"]);
-      if (byHour.length) facts.push(["Prime time", hourLabel(ph), "the busiest hour of the day"]);
-      if (d.after_midnight) facts.push(["Night owls", num(d.after_midnight), d.after_midnight === 1 ? "person studied after midnight" : "people studied after midnight"]);
-      if (d.regulars) facts.push(["Regulars", num(d.regulars), "studied here on 3 or more days"]);
-      var tq = (d.toughest || [])[0], qq = row.question;
+      if (d.answers) facts.push(["right", '<b class="num" data-count="' + acc + '" data-suffix="%">' + acc + "%</b> right", "of " + num(d.answers) + " answers"]);
+      if (d.night_before) facts.push(["flame", '<b class="num">' + num(Math.round(d.night_before / 60)) + " h</b> the day before", "from " + num(d.night_before_people) + " people"]);
+      if (byHour.length) facts.push(["prime", '<b class="num">' + esc(hourLabel(ph)) + "</b> prime time", "the busiest hour"]);
+      if (d.after_midnight) facts.push(["owls", '<b class="num">' + num(d.after_midnight) + "</b> night owl" + (d.after_midnight === 1 ? "" : "s"), "after midnight"]);
+      if (d.regulars) facts.push(["regulars", '<b class="num">' + num(d.regulars) + "</b> regular" + (d.regulars === 1 ? "" : "s"), "3 or more days"]);
+      var tq = (d.toughest || [])[0], qq = row.question, hrs = Math.round((d.minutes || 0) / 60);
       body.classList.remove("is-in"); body.setAttribute("style", tintVars(row.hub)); body.setAttribute("aria-labelledby", "rc-tab-" + i);
       body.innerHTML =
         '<div class="rc-head">' + emblem(row.hub, "dx-emb") + "<div><h3>" + esc(row.title) + '</h3><p class="note">' +
           (d.exam_day ? "Exam " + esc(recapDay(d.exam_day, true)) : "") + (d.first_day && (d.exam_day || d.last_day) ? " · studied " + esc(recapDay(d.first_day)) + " to " + esc(recapDay(d.exam_day || d.last_day)) : "") + "</p></div>" +
           '<button type="button" class="btn rc-save" id="rcSave">Save image</button></div>' +
-        '<ul class="rc-nums">' +
-          '<li><b class="num" data-count="' + Math.round((d.minutes || 0) / 60) + '">' + num(Math.round((d.minutes || 0) / 60)) + '</b><span>hours studied together</span></li>' +
-          '<li><b class="num" data-count="' + (+d.people || 0) + '">' + num(d.people) + '</b><span>classmates</span></li>' +
-          '<li><b class="num" data-count="' + (+d.answers || 0) + '">' + num(d.answers) + '</b><span>questions answered</span></li>' +
-          '<li><b class="num" data-count="' + acc + '" data-suffix="%">' + acc + '%</b><span>answered correctly</span></li></ul>' +
-        (days.length ? '<div class="rc-chart"><h4>Hours per day</h4>' +
-          '<div class="rc-bars" role="img" aria-label="Hours studied each day. The most: ' + num(Math.round(peak.m / 60)) + " hours on " + esc(recapDay(peak.d)) + '.">' +
-            days.map(function(x){
-              var exam = d.exam_day && x.d === String(d.exam_day).slice(0, 10);
-              return '<i class="' + (exam ? "exam" : "") + (x === peak && x.m ? " peak" : "") + '" style="--h:' + (x.m ? Math.max(3, Math.round(x.m / max * 100)) : 0) + '%">' +
-                (x === peak && x.m ? "<em>" + num(Math.round(x.m / 60)) + " h</em>" : "") + "</i>";
-            }).join("") + "</div>" +
-          '<p class="rc-x" aria-hidden="true"><span>' + esc(recapDay(days[0].d)) + "</span><span>" + (d.exam_day ? "Exam day" : esc(recapDay(days[days.length - 1].d))) + "</span></p></div>" : "") +
-        (facts.length ? '<ul class="rc-facts">' + facts.map(function(f){ return "<li><span>" + esc(f[0]) + "</span><b>" + esc(f[1]) + "</b><small>" + esc(f[2]) + "</small></li>"; }).join("") + "</ul>" : "") +
-        (tq && tq.attempts && qq && qq.text ? '<div class="rc-tough"><h4>The one that got us</h4><p class="rc-tough-n"><b class="num">' + Math.round(tq.correct / tq.attempts * 100) + "%</b> got it right</p>" +
-          '<p class="rc-tough-q">' + esc(qq.text) + "</p>" + (qq.answer ? '<p class="note">Answer: ' + esc(qq.answer) + "</p>" : "") + "</div>" : "") +
+        '<div class="rc-main">' +
+          '<p class="rc-big">' + rcIcon("hours") + '<span><b class="num" data-count="' + hrs + '">' + num(hrs) + "</b><span>hours studied together</span></span></p>" +
+          '<div class="rc-crowd"><div class="rc-crowd-art" id="rcCrowd" aria-hidden="true"></div><p><b class="num" data-count="' + (+d.people || 0) + '">' + num(d.people) + "</b> classmates</p></div>" +
+          (days.length ? '<div class="rc-chart"><h4>Hours per day</h4>' +
+            '<div class="rc-plot" id="rcPlot" role="img" aria-label="Hours studied each day, as a bar graph. The most: ' + num(Math.round(peak.m / 60)) + " hours on " + esc(recapDay(peak.d)) + '."></div>' +
+            '<p class="rc-x" aria-hidden="true"><span>' + esc(recapDay(days[0].d)) + "</span><span>" + (d.exam_day ? "Exam day" : esc(recapDay(days[days.length - 1].d))) + "</span></p></div>" : "") +
+        "</div>" +
+        (facts.length ? '<ul class="rc-facts">' + facts.map(function(f){ return "<li>" + rcIcon(f[0]) + "<p>" + f[1] + "<small>" + esc(f[2]) + "</small></p></li>"; }).join("") + "</ul>" : "") +
+        (tq && tq.attempts && qq && qq.text ? '<div class="rc-tough">' + rcIcon("tough") + '<div><h4>The one that got us</h4><p class="rc-tough-q">' + esc(qq.text) + "</p>" +
+          (qq.answer ? '<p class="rc-tough-a">Answer: ' + esc(qq.answer) + "</p>" : "") + '</div><p class="rc-tough-n"><b class="num">' + Math.round(tq.correct / tq.attempts * 100) + "%</b> right</p></div>" : "") +
         (row.footnote ? '<p class="note rc-foot">' + esc(row.footnote) + "</p>" : "");
+      rcRow = row; recapArt(false);
       qa("[data-rc]", chips).forEach(function(b){ var on = +b.getAttribute("data-rc") === i; b.setAttribute("aria-selected", String(on)); b.tabIndex = on ? 0 : -1; });
       $("rcSave").addEventListener("click", function(e){ saveRecap(row, e.currentTarget); });
       if (seen) requestAnimationFrame(function(){ requestAnimationFrame(play); });
@@ -1575,7 +1611,15 @@
           rt = setTimeout(function(){ syncRoom(); var ar = q(".dx-arena", $("board")); if (ar && Math.abs(+ar.getAttribute("data-w") - $("board").clientWidth) > 4) paintBoard(); }, 120);
         }).observe($("class"));
       }
-      document.addEventListener("sh:pref", function(){ syncRoom(); paintBoard(); });
+      document.addEventListener("sh:pref", function(){ syncRoom(); paintBoard(); recapArt(true); });
+      if (window.ResizeObserver && $("rcBody")) {
+        var rcW = 0, rcT = 0;
+        new ResizeObserver(function(){
+          var w = $("rcBody").clientWidth; if (!w || Math.abs(w - rcW) < 4) return;
+          var first = !rcW; rcW = w; if (first) return;
+          clearTimeout(rcT); rcT = setTimeout(function(){ recapArt(true); }, 120);
+        }).observe($("rcBody"));
+      }
     });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", afterDraw); else afterDraw();

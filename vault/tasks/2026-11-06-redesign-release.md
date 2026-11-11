@@ -328,12 +328,13 @@ is in [its own note](2026-11-06-idea-board.md).
   own boards) and the "When people study" chart. The Golden Probe line is under the board when someone has won today.
 - **What the hubs record** (already on the live About page since the PR that added it): the outfit goes with the
   studying-now count, with no name or id, and isn't saved.
-- **Past hubs** (replaces "Hub recaps" and the greyed-out cards): each finished exam's recap is **a live infographic**
-  in that hub's color, one exam at a time (chips switch between them): hours studied together, classmates, questions
-  answered and how many right, counting up as you reach them; hours per day as bars that grow, the exam day marked; the
-  day before the exam, the busiest hour, night owls, regulars, and "the one that got us" when there is one. **Save
-  image** still gives the shareable picture. Totals only, no names. Under it, a short card for each hub that just closed
-  with its Check in button.
+- **Past hubs** (replaces "Hub recaps" and the greyed-out cards): each finished exam's recap is **a drawn card** in that
+  hub's color, one exam at a time (chips switch between them): the hours studied together, the classmates as a crowd of
+  teeth, **hours per day as a bar graph** (a drawn column for each day, the exam day's with a flag, the most hours
+  labeled, Timmy standing on one), then chips for how many answers were right, the day before the exam, the busiest
+  hour, night owls and regulars, and "the one that got us" when there is one. The numbers count up and the columns
+  grow as you reach it. **Save image** still gives the shareable picture. Totals only, no names. Beside it (under it on
+  a phone), a short card for each hub that just closed with its Check in button.
 - **What's new is gone** (Sam, 2026-11-11: people don't read it). Each hub still says when it was last updated, and a
   tab left open still offers "a new version is ready". Take the "What's new" entry off the About page.
 - **Exam check-ins**: the button is under the open hub from 8 am on exam day, and on the hub's card in Past hubs after it
