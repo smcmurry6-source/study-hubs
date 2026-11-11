@@ -36,7 +36,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   session applied `migration_v54.sql` (the game layer's server) to the live project, though it was meant to wait for the
   redesign's release. No page called it and no student data reached its tables. Sam: "dont run the migration if it wasnt
   supposed to yet". `supabase/rollback-v54.sql` (tested on a throwaway copy: schema + v54 + rollback = schema) drops what v54
-  added and restores today's three replaced functions; v54 stays in `supabase/pending-migrations.txt` for the release.
+  added and restores today's three replaced functions; Sam OK'd it and it ran on the live project the same night (none of v54's
+  tables or functions left, the three functions back with today's grants, no migration-history row, today's bootstrap
+  answers). v54 stays in `supabase/pending-migrations.txt` for the release.
   Lesson: a migration listed as pending waits for its release, even when someone asks to "apply the sql"; ask which one.
 
 - **2026-11-11 (Heme & Endo Exam 2: L16 taught from its recording, Claude Code)** — Sam uploaded the L16 transcript
