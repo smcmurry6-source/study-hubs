@@ -769,6 +769,7 @@ window.SH_DASH_DATA = {
  ],
  "next": [
   "heme-endo-exam2",
-  "occlusion"
+  "occlusion",
+  "perio"
  ]
 };
