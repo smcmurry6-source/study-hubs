@@ -37,14 +37,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `tools/podcast/heme-endo-exam2/script.md`, from the hub's notes (As taught), Exam Hints (every professor quote word for
   word), cram sheet, `LIKELY_TOPICS` and LESSONS.md's live signals for the hub (the Cushing labs read backwards,
   meglitinides and hypoglycemia, metformin vs the disulfiram reaction, secondary hyperparathyroidism on dialysis,
-  follicular carcinoma's spread). 14 chapters: insulin and diagnosis, the non-insulin drugs, primary or secondary and the pituitary, thyroid, parathyroid, adrenal, male and
-  female reproductive histology and physiology, a short Exam 1 refresher, a 30-question lightning round and the sign-off.
-  Lecture A, L17 and L18 (not on this exam) are left out; no graded quiz content (Quiz 3 is still open). Where the notes
+  follicular carcinoma's spread). 14 chapters: insulin and diagnosis, the non-insulin drugs, primary or secondary and the
+  pituitary, thyroid, parathyroid, adrenal, male and female reproductive histology and physiology, a short Exam 1
+  refresher, a 31-question lightning round and the sign-off. It follows #320 (merged while it rendered): the refresher
+  covers only L2, L3, L6 and L10 and starts with the class's split of the five (two from L2, the synergy pairs, how PTH
+  keeps calcium up), the histology segments say the exam's two picture questions are the Sertoli cell and the follicle
+  stages, and each of the 11/11 in-class review's 20 questions has its point in the episode. Lecture A, L17 and L18 (not on this exam) are left out; no graded quiz content (Quiz 3 is still open). Where the notes
   give two numbers it says whose is whose. Lore (Sam picked three): thirty-one bought a glucose meter and checks it after
   every meal, yours ("You don't have a pancreas"); Timmy came from a dental follicle too (it made his cementum, ligament
   and the bone around his roots); the Thanksgiving pie is "a postprandial event". Two lore comments (rolled): number
-  thirty-one and the toothbrush by the door. `lexicon.json` gains 65 entries (the gliptins, gliflozins and glitazones,
-  semaglutide, Leydig, Sertoli, Mullerian, Wolffian, Zellballen, sestamibi, Dababneh, Fasinu, and `C-E-A`, `P-S-A`,
+  thirty-one and the toothbrush by the door. `lexicon.json` gains 69 entries (the gliptins, gliflozins and glitazones,
+  semaglutide, oxytocin, oophorus, Leydig, Sertoli, Mullerian, Wolffian, Zellballen, sestamibi, Dababneh, Fasinu, and `C-E-A`, `P-S-A`,
   `I-G-A`, `D-A-G`, `S-I-A-D-H`, `type-A`, whose final A read "uh"). Hub: `SH_PODCAST` (id `exam2-review`), card on Home
   under the quick-start row, "Also here" link, `#timmy` opens Home; `next/content/` rebuilt so the new version carries
   it; dashboard card gets `podcast` and "Timmy Time" in modes; About page's episode list and `LORE.md` updated.

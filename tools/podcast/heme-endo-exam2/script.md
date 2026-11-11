@@ -11,7 +11,8 @@ NOT SPOKEN. Notes for whoever renders this with Kokoro (see tools/podcast/README
   The thyroid tumor genes are written as words (B-raf, Ras, Ret), the way pathologists say them.
 - Content source: hubs/heme-endo-exam2 lecture notes (As taught), Exam Hints (the professors' quotes from the
   recordings, Dr. Herr's in-class focus lists), cram sheet and High Likelihood topics, L11 to L16 and the Exam 1
-  Refresher, plus LESSONS.md's live signals (the Cushing labs read backwards, meglitinides and hypoglycemia, metformin
+  Refresher (only L2, L3, L6 and L10, with the class's split of the five: two from L2, one synergy, one P-T-H; and the two
+  picture questions, the Sertoli cell and the follicle stages, all from the hub's 11/11 hints), plus LESSONS.md's live signals (the Cushing labs read backwards, meglitinides and hypoglycemia, metformin
   versus the disulfiram reaction, secondary hyperparathyroidism on dialysis, follicular carcinoma's spread, L14 least practiced).
   No graded quiz, take-home or previous years' content (Quiz 3 is open until 11/12; the D3s' resources are not used).
 - Not on Exam 2, so not here: Dr. Taylor's Lecture A, L17 and L18.
@@ -195,7 +196,7 @@ Now the reproductive lectures, the male side first. Doctor Herr's histology, the
 
 In class, Doctor Herr's focus list was the Sertoli cell, the Leydig cells, and the spermatogonia. And he said one drawing is on your exam. In his words: This image is actually on your exam, so I do want you to know the labels on this image, so make sure you pay attention to it, and you'll be able to answer at least one question, if not a few questions.
 
-It's his drawing of two Sertoli cells. Walk it from the outside of the tubule in. The basal lamina. A type-A spermatogonium and a type B spermatogonium, both in the basal compartment. Then the junctional complex between the two Sertoli cells: the tight junctions. Past it, in the adluminal compartment: a primary spermatocyte, an early spermatid, and a late spermatid up at the lumen. Adluminal means near the lumen. Those tight junctions are the blood-testis barrier, keeping the immune system away from the dividing germ cells. The hub has that drawing under the Sertoli cell heading. Look at it once more before Friday.
+It's his drawing of two Sertoli cells. Walk it from the outside of the tubule in. The basal lamina. A type-A spermatogonium and a type B spermatogonium, both in the basal compartment. Then the junctional complex between the two Sertoli cells: the tight junctions. Past it, in the adluminal compartment: a primary spermatocyte, an early spermatid, and a late spermatid up at the lumen. Adluminal means near the lumen. Those tight junctions are the blood-testis barrier, keeping the immune system away from the dividing germ cells. And word from the class this week: that drawing is one of the exam's two picture questions. The hub has it under the Sertoli cell heading, with two picture questions on it. Look at it once more before Friday.
 
 Sertoli cells reach from the basement membrane to the lumen. In his words: just know that they are the refrigerator, right? They're nourishment and transport. They eat the cytoplasm the spermatids shed, they don't divide in the adult, and they survive heat and radiation.
 
@@ -249,7 +250,9 @@ The oocyte's two arrests, from a slide he marked with three asterisks. In his wo
 
 The numbers fall the whole way. Five to seven million oocytes by the fifth fetal month, one to two million at birth, about four hundred thousand at menarche, and about four hundred fifty ovulated in a lifetime.
 
-The five follicle stages. Primordial: one layer of flat, squamous cells. Early primary: one layer of cuboidal granulosa cells, and the zona pellucida starts. Late primary: several layers, and the theca forms outside. Secondary: fluid, the liquor folliculi, and an antrum. And the Graafian follicle: about twenty millimeters, bulging from the ovary.
+The five follicle stages. Primordial: one layer of flat, squamous cells. Early primary, or unilaminar: one layer of cuboidal granulosa cells, and the zona pellucida starts. Late primary, or multilaminar: several layers, and the theca forms outside. Secondary, or antral: fluid, the liquor folliculi, and an antrum. The oocyte sits on a mound of granulosa cells, the cumulus oophorus, and the single layer of granulosa cells wrapped around it is the corona radiata. And the Graafian follicle: about twenty millimeters, bulging from the ovary.
+
+That's the exam's other picture question: his drawing of the five stages in a column, numbered one to five. The hub has an unlabeled copy of it under the notes, with six picture questions on it. To name a stage, ask three things. Flat cells, or cube-shaped? One layer, or many? Fluid in several spaces, or one big antrum?
 
 The Graafian follicle's wall, from the antrum out. In his words: There's a granulosa layer, a very small basement membrane, a theca interna, and a theca externa. The theca interna has L-H receptors and makes androgens. And granulosa cells have gap junctions but no tight junctions, so there's no blood-follicle barrier, unlike the testis.
 
@@ -305,21 +308,17 @@ What you don't need: the slide on the whole-body actions of estrogen and progest
 
 ## 12. Exam One, the refresher
 
-A handful of questions come from Exam One. Here's what it leaned on hardest, fast.
+Five questions reach back to Exam One, and word from the class this week is that they come from just four lectures. Lecture two, the hypothalamus and pituitary. Lecture three, growth. Lecture six, the adrenal. And lecture ten, calcium and phosphate. The class also heard how the five split: two from lecture two, one on which hormones work synergistically, and one on how P-T-H keeps blood calcium up. The fifth wasn't named.
 
-Receptors. G-S raises cyclic A-M-P. G-I lowers it. G-Q makes I-P-three and D-A-G, and calcium rises. The insulin receptor is a tyrosine kinase. Growth hormone's receptor uses JAK two.
+Synergy first. P-T-H and calcitriol, active vitamin D, raise blood calcium together. P-T-H turns on one alpha hydroxylase, which makes the calcitriol, and calcitriol raises absorption in the gut. And from growth: T-three works synergistically with growth hormone on bone growth in children. T-three is on the growth plate slide, with growth hormone and I-G-F one.
 
-The pituitary. The anterior cells by stain, with the mnemonic flat pig. F-S-H, L-H, A-C-T-H and T-S-H are basophils. Prolactin and growth hormone are acidophils.
+How P-T-H keeps calcium up. Three places. Bone, through the osteoblasts, which carry the P-T-H receptor and signal the osteoclasts. The osteoclasts don't have one. The kidney: keep calcium, dump phosphate, and turn on one alpha hydroxylase. And the gut, through calcitriol. Net: calcium up, phosphate down. Calcium and phosphate move together everywhere except the kidney under P-T-H. The brake: calcium on the chief cell's calcium-sensing receptor stops P-T-H. And calcitonin, from the C cells, acts on the osteoclast, and you can live without it.
 
-Growth. G-H-R-H raises growth hormone, and somatostatin lowers it. Linear growth runs through I-G-F one. Growth hormone is diabetogenic and lipolytic.
+Lecture two, since it gets two. Know G-S, G-I and G-Q, plus the insulin receptor, a tyrosine kinase, and growth hormone's, which uses JAK two. G-S raises cyclic A-M-P, G-I lowers it, and G-Q makes I-P-three and D-A-G. Peptide hormones are stored and bind surface receptors. Steroids are made on demand from cholesterol, and their receptors are inside the cell. Negative feedback is the hallmark. The posterior pituitary makes nothing: oxytocin and A-D-H come down axons from the supraoptic and paraventricular nuclei. Dopamine holds prolactin down. And the lab rule again: primary, the target hormone and the pituitary hormone move in opposite directions. Secondary, the same direction.
 
-The thyroid. Its hormone is made outside the cell, in the colloid. Five prime deiodinase makes active T-three, and T-three is the main feedback. Methimazole first, unless she's pregnant: P-T-U in the first trimester. Levothyroxine first thing in the morning, on an empty stomach. And read the T-S-H: high means the patient needs more drug, low means less.
+Growth, quickly. G-H-R-H raises growth hormone, and somatostatin lowers it. Growth hormone is diabetogenic and lipolytic. Estrogen closes the growth plates: gigantism before, acromegaly after.
 
-The pancreas. Beta cells about seventy percent, alpha about twenty, delta under ten. Somatostatin brakes both insulin and glucagon.
-
-The adrenal. Aldosterone keeps sodium and loses potassium. Cortisol reaches the medulla and turns on P-N-M-T, for epinephrine. A-C-T-H drives all three zones, and the glomerulosa also answers to angiotensin two. A steroid taper exists because steroids suppress the adrenal. And the steroid side effect that matters most to you: it masks infection.
-
-Calcium. Calcium on the chief cell's calcium-sensing receptor stops P-T-H. P-T-H turns on one alpha hydroxylase, and calcitriol works in the gut. In the kidney, P-T-H keeps calcium and dumps phosphate. It acts on osteoblasts, and calcitonin acts on the osteoclast.
+The adrenal. Aldosterone, from the glomerulosa, keeps sodium and loses potassium. Angiotensin two and high potassium drive it, A-C-T-H only a little. Cortisol reaches the medulla and turns on P-N-M-T, so about eighty percent of its output is epinephrine. And Addison's: high A-C-T-H and M-S-H, so pigmented gums.
 
 And from Exam One, still true: enamel has no cells, so P-T-H can't take calcium from me. The bank is bone. Nobody's home to make a withdrawal.
 
@@ -389,13 +388,15 @@ The estrogen of menopause? [pause 2.5] Estrone, from adrenal D-H-E-A.
 
 Which G protein makes I-P-three? [pause 2.5] G-Q.
 
+Which hormone works synergistically with P-T-H to raise blood calcium? [pause 2.5] Calcitriol, active vitamin D.
+
 [pause 1.5]
 
 ## 14. Sign-off
 
 That's the review. Six lectures, both hours of pathology, and a little Exam One.
 
-If it's the night before: skim the cram sheet once. Say the two-column lists out loud: Sertoli and Leydig, theca and granulosa, follicular and luteal. Run the lab rule one more time. Opposite directions, primary. Same direction, secondary. Look at Doctor Herr's Sertoli drawing once. Do one Daily Drill, and go to sleep. If it's Friday morning: eat something, and read every lab value in a question before you pick an answer.
+If it's the night before: skim the cram sheet once. Say the two-column lists out loud: Sertoli and Leydig, theca and granulosa, follicular and luteal. Run the lab rule one more time. Opposite directions, primary. Same direction, secondary. Look at Doctor Herr's two pictures once, the Sertoli cell and the follicle stages. Do one Daily Drill, and go to sleep. If it's Friday morning: eat something, and read every lab value in a question before you pick an answer.
 
 Number thirty-one wants you to know his glucose is normal. He says it's the metformin. Thirty-one, you're not on metformin. And if you were, it wouldn't bring a normal glucose lower. Doctor Fasinu said so.
 
