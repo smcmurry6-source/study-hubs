@@ -1230,7 +1230,8 @@
     if (which === "ranks") {
       rpc2(sb, "get_rank_board", { p_visitor: VISITOR || null, p_limit: 10 }).then(function(res){
         if (boardNow !== which) return;
-        var rows = (res && res.data) || [], R = window.shRanks;
+        if (!res || res.error) { boardMsg(); return; }   /* not reached is not the same as nobody ranked */
+        var rows = res.data || [], R = window.shRanks;
         if (!rows.length || !R){ boardMsg("No ranks yet. Answer a question in any hub to get your first handpiece."); return; }
         boardData = { which: which, rows: rows, fits: [] }; paintBoard(); loadFits(sb, boardData);
         var me = rows.filter(function(r){ return r.is_me; })[0];
@@ -1242,7 +1243,8 @@
     } else if (which === "streaks") {
       rpc2(sb, "get_leaderboard", { p_limit: 8 }).then(function(res){
         if (boardNow !== which) return;
-        var rows = (res && res.data) || [];
+        if (!res || res.error) { boardMsg(); return; }
+        var rows = res.data || [];
         if (!rows.length){ boardMsg("No streaks yet. Answer questions two days in a row to start one."); return; }
         boardData = { which: which, rows: rows, fits: [] }; paintBoard(); loadFits(sb, boardData);
       }, function(){ if (boardNow === which) boardMsg(); });

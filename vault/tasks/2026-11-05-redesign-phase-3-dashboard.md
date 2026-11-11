@@ -164,6 +164,13 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
     the streak and answers tiles stretched to match it were mostly empty, so each card ends where its content ends. The
     taste inspector says so as a second warning (`ragged-row`, beside `below-fold`); 0 FAIL, light and dark.
   - **Checked**: see the PR's test report. BUG-065 and BUG-066 found and fixed.
+- 2026-11-11 (Claude Code, **preview and UAT**). Sam: "preview". The PR has the `preview` label (the hosted link is in
+  the PR's preview comment). UAT in the preview as the returning, new and high-XP accounts, on an emulated iPhone 13
+  and a laptop, 25 checks, all passed after two fixes: the classroom fills and empties while you watch; the largest
+  text size (too narrow for the drawings: the plain count, and now every name in full, BUG-067); a reload; class data
+  Slow and Unreachable (the board now says it couldn't reach the data, BUG-068); keyboard; dark with reduce motion;
+  every live hub's old and new page and one archived hub (the outfit that goes out is a holiday look or nothing, and
+  nothing with Timmy off); "No request has reached production" at the end.
 
 
 ## Outcome
