@@ -50,6 +50,14 @@ privacy rule). Written by = the RPC and the client file that calls it.
 | `feature_daily` | day × hub × kind: `people`, `n` | no | `sh_retention_run` (v52) | rows older than 180 days | `feature_events` after 180 days; `people` is the distinct ids that day |
 | `search_terms` | day × hub × term, searches, last hit count | no | `record_search`, `widget/v3.js` | 2026-09-29 | The widget's Search only; terms trimmed to 3-60 characters, no visitor |
 
+**Not a table: who has a hub open** (Supabase Realtime presence, channel `presence:<hub>`, `widget/v3.js`). While a hub
+tab is open it is in its hub's channel under a random key made for that page load, with the time it joined and, since
+2026-11-11, **`fit`: what that browser's Timmy is wearing** (`shPet.fit()` in `widget/pet.js`: `<holiday>:<outfit>`, such
+as `thanksgiving:turkey`; after the shop's release, the equipped outfit's id; empty with no outfit, Timmy off or Focus
+mode). No visitor id, no name, nothing typed. It is never stored: it is gone when the tab closes. The dashboard only
+listens (the count in the top bar; on the new dashboard, a Timmy at a desk for each person, in that outfit) and treats
+`fit` as a lookup key from a fixed list, never as markup. `presence_hourly` above is the stored, id-free count.
+
 ### Questions
 
 | Table | Grain | Visitor | Written by | Since | Notes |

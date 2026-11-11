@@ -5,7 +5,7 @@ hub: dashboard
 created: 2026-11-05
 requested-by: Sam
 due: 
-waiting-on: Sam's yes on the third pass's contact sheets; the idea board (a second session)
+waiting-on: Sam's yes on the recap's redrawn contact sheet, and Sam's look at the classroom and the stage; the idea board (a second session)
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/318
 ---
@@ -124,10 +124,52 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
     - Motion: the walk is a hop (Timmy has no legs: he sits in his gum cushion); reduced motion and "Answer animations"
       off show people at their desks with no walk.
 
+- 2026-11-11 (Claude Code, **third pass built: the classroom and the stage**). Sam on the sheets: "b, yes, yes, the
+  mountain range doesnt read as a bar graph and it also also needs to fit in a smaller card, yes"
+  ([decisions](../decisions.md)). So the classroom (50 px taller) and the stage are in the page; the recap is not.
+  - **The classroom** (`#now`, `syncRoom()` and its helpers in `widget/dash.js`; art `tools/figures/site/classroom.mjs`):
+    150 px tall, 170 on a phone. The count and the three busiest hubs are HTML laid over the drawn chalkboard
+    (`placeBoard()`; a narrow board stacks them), so screen readers get the same words as before, every hub included. One
+    Timmy per presence key, at the next free desk from the front row's middle outward, the desk's front in the hub's
+    tint. Coming and going is `walk()`: a wrapper group moved with the Web Animations API from the door along the
+    aisle in hops, then an arc into the seat (the reverse to leave), the door open while someone is in it, 450 ms
+    apart. The count changes at once, the Timmy catches up. More than six changes at once, a hidden tab, reduced
+    motion or "Answer animations" off: no walk. Focus mode on the viewer's side: the plain count tile. Rows are added
+    when needed and taken away only with two desks to spare; past six rows (or desks too small) a sign by the door says
+    "+N in the hall". Night is 7 pm to 6 am by the viewer's clock.
+  - **Whose outfit.** Each hub tab sends `fit` with its presence (`trackPresence()` in `widget/v3.js`, `shPet.fit()` in
+    `widget/pet.js`): `<holiday>:<outfit>` today, empty before Timmy is adopted, with him off or in Focus mode. No name,
+    no id, not stored. **This is the one live change in the PR**; it is on the live About page ("What the hubs
+    record"), in [event-taxonomy](../reference/event-taxonomy.md) and [analytics-retention](../reference/analytics-retention.md).
+    The dashboard treats `fit` as untrusted: `cleanFit()` keeps only `[a-z0-9:-]`, and it is used only to look an outfit
+    up (`fitOutfit()` in pet.js for a holiday one, `SH_OUTFITS.parts` for a shop one), never written as markup. The
+    smoke test sends markup as an outfit and fails if it is drawn. After the shop's release `fit()` should send the
+    equipped shop outfit's id ([release note](2026-11-06-redesign-release.md), step 9); the dashboard already draws those.
+  - **The stage** (`stageSvg()`, `paintBoard()`; art `stage.mjs`): the top three stand on drawn blocks as Timmys; their
+    outfits come from `get_place` through each row's visit key (`loadFits()`), only when the game layer exists, so no
+    change to migration_v54 was needed. Someone with visiting off, and everyone until v54 is applied, is a plain Timmy.
+    Names, ranks and XP are HTML under the stage; places 4 to 10 are rows on the dark floor with a bar against first.
+    The streaks board uses the same stage with flames. The board is drawn again when the card's width changes.
+  - **The art files**: `tools/figures/site/classroom.mjs`, `stage.mjs`, `recap.mjs` (kits: one function each, checked in
+    `build.mjs`), written into `widget/hub-art/class.js` (the room and the stage; **not** the recap until Sam's yes) and
+    `widget/hub-art/outfits.js` (the shop's 55 outfits and `dress()` from `place.mjs`; loaded when first needed).
+  - **The preview** has a made-up class of 4 to 16 that comes and goes every 7 seconds on the dashboard, some in shop
+    outfits, and a `get_place` stub; `shDash.setLive(by, list)` is how it (and the smoke test) feed the room.
+  - **The recap** is as the second pass left it. Sam on the poster: the mountain range "doesnt read as a bar graph" and
+    it "needs to fit in a smaller card". Redrawn as chunky day columns in a compact card (`recap.mjs`: `bars()`,
+    `crowd()`) and sent as a new sheet; **waiting for Sam's yes before it goes into the page**. To build it: draw
+    `CA.recap.bars()` in place of `.rc-bars` in `drawRecap`'s body, shrink `.rc-body`, add `recap:` back to
+    `class.js` in `build.mjs`.
+  - **"You" and the class no longer share a bottom edge.** With the stage the class card is about 360 px taller, and
+    the streak and answers tiles stretched to match it were mostly empty, so each card ends where its content ends. The
+    taste inspector says so as a second warning (`ragged-row`, beside `below-fold`); 0 FAIL, light and dark.
+  - **Checked**: see the PR's test report. BUG-065 and BUG-066 found and fixed.
+
 
 ## Outcome
 
 Not finished. The new dashboard is built beside the live one (`next/`), on the design system, with everything from the
 plan except the idea board, and with Sam's second-pass changes; nothing students see has changed
-([#318](https://github.com/smcmurry6-source/study-hubs/pull/318), a draft). A third pass (the classroom, the stage, the
-recap poster) is at the contact-sheet stage, waiting for Sam's yes.
+([#318](https://github.com/smcmurry6-source/study-hubs/pull/318), a draft). The third pass's classroom and stage are built
+too; the recap's redraw waits for Sam's yes on its contact sheet. One change in the PR is live at merge: each hub sends
+its Timmy's outfit with the studying-now presence, with no name or id.

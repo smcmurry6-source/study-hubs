@@ -93,6 +93,29 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   four L10 lines from the full notes), so `refresh-full.mp3` and `refresh-plain.mp3` were regenerated. An R `focus` Exam Hint, Home's
   chips and exam card, `EXAM_INFO`, the hints banner, the mock's intro and the About page say which four. `next/` rebuilt (its
   `SH_HUB` words too). No schema change.
+- **2026-11-11 (redesign phase 3, third pass: a classroom and a stage; the hubs share each Timmy's outfit, Claude Code)** —
+  Sam: "make a fully drawn classroom with the timmys of the people studying and make them wear what the user has their
+  timmy dressed as. it should be animated. timmys should walk in and sit at a desk or get up and leave as people join or
+  leave. Also i want the leaderboards and pedestals to be more epic". **One live change:** each hub tab now sends what its
+  Timmy is wearing with its studying-now presence (`widget/v3.js` `trackPresence()`, `shPet.fit()` in `widget/pet.js`:
+  `<holiday>:<outfit>`, empty before he's adopted, with Timmy off or in Focus mode), with no name or id; it isn't stored.
+  The About page's "What the hubs record", [event-taxonomy](vault/reference/event-taxonomy.md) and
+  [analytics-retention](vault/reference/analytics-retention.md) say so. **On the new dashboard** (still beside the live
+  one): the studying-now tile is a drawn classroom (`tools/figures/site/classroom.mjs`), 150 px tall (170 on a phone),
+  the count and the three busiest hubs on its chalkboard, a Timmy at a desk for each presence key in that outfit
+  (`shPet.art({ fit })`; an outfit is only ever a lookup key), desks in the hub's tint, day or night by the viewer's
+  clock, rows added as it fills, "+N in the hall" on a sign past a full room; people hop in through the door and jump
+  into a desk, or get up and leave (the Web Animations API on wrapper groups; more than six changes at once, a hidden
+  tab, reduced motion or answer animations off seat them without the walk; Focus mode keeps the plain count). The
+  leaderboard is a stage (`stage.mjs`): curtains, lights, torches, confetti, gold, silver and bronze blocks, a crown, the
+  top three as Timmys (their outfit from `get_place` through the row's visit key once migration_v54 is applied; plain
+  until then), places 4 to 10 as dark rows with a bar against first. Both kits are written into
+  `widget/hub-art/class.js` (`window.SH_CLASS_ART`, 26 KB) by `tools/figures/site/build.mjs`, which also writes the
+  shop's 55 outfits and `dress()` to `widget/hub-art/outfits.js` (168 KB, loaded only when someone on the page wears
+  one). The preview has a made-up class that comes and goes (`shDash.setLive(by, list)`) and a `get_place` stub. The
+  smoke test seats eight made-up people and checks the count, the stage and that markup sent as an outfit is never
+  drawn. **Not in yet:** the recap's redraw (`recap.mjs`, a bar graph in a smaller card) waits for Sam's yes on its
+  contact sheet. BUG-065 and BUG-066 found and fixed.
 - **2026-11-11 (redesign phase 3: the new dashboard, beside the live one, Claude Code)** — Nothing students see changes.
   `next/index.html` is the dashboard on the design system (`widget/dash.js`, `widget/dash.css`); outside a preview it sends
   visitors to the live dashboard, and it takes `index.html`'s place at the redesign's release. The hubs are tabs with their

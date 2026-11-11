@@ -603,6 +603,14 @@
       else if (d2 && fn === "get_rank_profile_v2") d2.journey = 0;
       return { data: d2 };
     }
+    /* someone's place, for the dashboard's stage (the top three stand on it as their own Timmys): only the outfit here,
+       the rest of a place gets its fixtures with phase 4. One made-up classmate has visiting off. */
+    if (fn === "get_place") {
+      var pk = String(a.p_key || ""), who = -1;
+      FAKE_NAMES.forEach(function(nm, i){ var k = ""; for (var j = 0; j < 3; j++) k += ("00000000" + (hash(nm + "|visit" + j) >>> 0).toString(16)).slice(-8); if (k === pk) who = i; });
+      if (who < 0 || who === 4) return { data: null };
+      return { data: { name: FAKE_NAMES[who], equipped: { outfit: ["rank-dark-outfit", "captain-hat", "tooth-fairy", "tuxedo"][who % 4] }, rank: { journey: 0, tier: 5, level: 1 }, flair: null } };
+    }
     switch (fn) {
       case "get_hub_overrides": return { data: ovrStore().rows.filter(function(r){ return ovrActive(r, t); }).map(function(r){ return { hub: r.hub, state: r.state, until: r.until }; }) };
       case "get_widget_bootstrap": return { data: widgetBootstrap(a, t) };
@@ -781,18 +789,34 @@
   ].join("\n");
   /* who's studying now: realtime has no fixture, so the redesigned hubs' live count (the sh:online event widget/v3.js
      sends) gets a made-up number that drifts a little, as a real class would; nothing on the live hubs listens for it */
+  /* a made-up class for the studying-now count. The redesigned dashboard (widget/dash.js) draws each one as a Timmy in
+     a classroom, so each has an outfit (the shop's ids, a holiday look, or none) and, every few seconds, one walks in or
+     out. Nothing here is anyone's real presence. */
+  var FAKE_FITS = ["captain-hat", "", "tuxedo", "thanksgiving:turkey", "football-helmet", "", "sun-hat", "dr-timmy", "", "elf-suit", "fox-hood", "", "tooth-fairy",
+    "beanie", "ranger-hat", "", "skeleton-suit", "aviator-cap", "surgical-scrubs", "", "jester", "nightcap", "flannel", "", "lifeguard", "bunny-suit"];
   function fakeOnline(){
-    var n = 9;
+    var seq = 0, crowd = [];
+    function add(){ seq++; crowd.push({ key: "pv" + seq, fit: FAKE_FITS[seq % FAKE_FITS.length], slot: seq }); }
+    for (var i = 0; i < 9; i++) add();
     function send(){
+      var n = crowd.length;
       try { document.dispatchEvent(new CustomEvent("sh:online", { detail: { n: n, preview: true } })); } catch (e) {}
-      /* the redesigned dashboard (widget/dash.js) shows the count hub by hub: split the made-up number over its live hubs, most in the first */
+      /* the dashboard shows the count hub by hub: spread the made-up class over its live hubs, most in the first */
       try {
         var D = window.shDash;
-        if (D && D.setLive && D.hubs) { var hubs = D.hubs(), by = {}, left = n; hubs.forEach(function(h, i){ var k = i === hubs.length - 1 ? left : Math.ceil(left * .55); by[h.id] = k; left -= k; }); D.setLive(by); }
+        if (D && D.setLive && D.hubs) {
+          var hubs = D.hubs(), by = {}, list = [];
+          crowd.forEach(function(p){ var h = hubs[[0, 0, 1, 0, 2, 1][p.slot % 6] % hubs.length]; if (!h) return; by[h.id] = (by[h.id] || 0) + 1; list.push({ key: p.key, hub: h.id, fit: p.fit }); });
+          D.setLive(by, list);
+        }
       } catch (e) {}
     }
     setTimeout(send, 1200);
-    setInterval(function(){ n = Math.max(3, Math.min(16, n + [-1, 0, 1][Math.floor(Math.random() * 3)])); send(); }, 20000);
+    setInterval(function(){
+      var r = Math.random();
+      if (crowd.length <= 4 || (r < .55 && crowd.length < 16)) add(); else crowd.splice(Math.floor(Math.random() * crowd.length), 1);
+      send();
+    }, /\/next\/(index\.html)?$/.test(location.pathname) && !/\/hubs\//.test(location.pathname) ? 7000 : 20000);
   }
   function mount(){
     if (document.getElementById("shpv-pill")) return;

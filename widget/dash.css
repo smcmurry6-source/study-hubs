@@ -83,6 +83,36 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-now-hubs li.is-none { min-height: 0; padding: 0; background: none; color: var(--now-soft); }
 .dx-now-hubs .dx-emb { width: 32px; height: 32px; }
 @media (prefers-reduced-motion: reduce) { .dx-now.is-live .dx-pulse::after { animation: none; opacity: 0; } }
+/* the tile as the class's room (widget/dash.js syncRoom, drawn once its art and Timmy have loaded): the drawing fills the
+   tile and the count and the hubs sit on its chalkboard, where the script puts them */
+.dx-now-board { display: contents; }
+.dx-room { display: none; }
+.dx-now.has-room { position: relative; display: block; padding: 0; overflow: hidden; background: none; }
+.dx-now.has-room .dx-room { display: block; }
+.dx-room svg { display: block; width: 100%; height: auto; }
+.dx-now.has-room .dx-now-board { position: absolute; display: grid; grid-template-columns: auto minmax(0, 1fr); align-content: center; align-items: center; gap: 3px 8px;
+  padding: 2px 6px 2px 10px; overflow: hidden; color: #fff; }
+.dx-now.has-room .dx-pulse { display: none; }
+.dx-now.has-room .dx-now-num { display: contents; }
+.dx-now.has-room .dx-now-num b { grid-row: span 2; font-size: 32px; }
+.dx-now.has-room .dx-now-num span { align-self: end; max-width: none; font-size: 12px; line-height: 1.1; font-weight: var(--w-head); color: #fff; white-space: nowrap; }
+.dx-now.has-room .dx-now-hubs { flex-wrap: nowrap; align-self: start; gap: 4px; min-width: 0; }
+.dx-now.has-room .dx-now-hubs li { flex: none; gap: 3px; min-height: 0; padding: 0 6px 0 2px; background: #fff; color: #3b2e3a; font-size: 12px; line-height: 16px; font-weight: var(--w-head); }
+.dx-now.has-room .dx-now-hubs .dx-emb { width: 14px; height: 14px; }
+.dx-now.has-room .dx-in, .dx-now.has-room .dx-now-hubs li.is-none { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.dx-now.has-room .dx-now-hubs li:nth-child(n+4) { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.dx-now.is-tight .dx-now-board { gap: 2px 6px; padding: 1px 6px 1px 8px; }
+.dx-now.is-tight .dx-now-num b { grid-row: auto; font-size: 26px; }
+.dx-now.is-tight .dx-now-num span { align-self: center; max-width: 9ch; font-size: 11px; white-space: normal; }
+.dx-now.is-tight .dx-now-hubs { grid-column: 1 / -1; }
+.dx-hall { position: absolute; right: 6px; z-index: 1; margin: 0; padding: 0 8px; border: 2px solid #3b2e3a; border-radius: var(--r-pill); background: #fff; color: #3b2e3a; font-size: 12px; line-height: 18px; font-weight: var(--w-head); white-space: nowrap; }
+.dx-hall[hidden] { display: none; }
+.rm-dooropen { opacity: 0; transition: opacity 140ms; }
+.rm-tim { transform-box: fill-box; transform-origin: 50% 100%; }
+.rm-bob { animation: rm-bob 3.2s ease-in-out infinite; }
+@keyframes rm-bob { 50% { transform: translateY(-1.2px); } }
+.dx-now.is-still .rm-bob { animation: none; }
+@media (prefers-reduced-motion: reduce) { .rm-bob { animation: none; } .rm-dooropen { transition: none; } }
 @keyframes dx-grow { from { transform: scaleY(0); } }
 
 /* ---------- the hubs: tabs, then the open hub ---------- */
@@ -203,8 +233,9 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-empty p { color: var(--muted); }
 
 /* ---------- "you" and the class, side by side ---------- */
-/* the two cards share a bottom edge: the shorter one grows, and in "you" the streak and the week's answers take the room */
-.dx-cols { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: stretch; }
+/* the two cards end where their content ends: the leaderboard's stage makes the class card the taller one, and tiles
+   stretched to match it were mostly empty */
+.dx-cols { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: start; }
 .dx-you { grid-column: span 5; display: flex; flex-direction: column; gap: 14px; }
 .dx-class { grid-column: span 7; display: grid; gap: 12px; align-content: start; }
 /* before Timmy is adopted he stands on this line (widget/pet.js places him over #petPerch); the room above it is his */
@@ -223,7 +254,7 @@ body:has(> .shpet-perch) .dx-porch { display: block; }
 .dx-rankname span { font-size: var(--fs-meta); color: var(--muted); }
 .dx-rankbar i { background: var(--gold); }
 .dx-medals { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding-top: 8px; }
-.dx-stats { flex: 1 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); grid-auto-rows: 1fr; gap: 8px; }
+.dx-stats { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
 .dx-stats:empty { display: none; }
 .dx-stat { display: flex; align-items: center; align-content: center; gap: 10px; padding: 12px 14px; border-radius: var(--r-row); background: var(--row); }
 .dx-stat.s-flame { flex-wrap: wrap; background: var(--sun); }
@@ -263,36 +294,75 @@ html.shx .dx .shpet-ghost:hover { background: var(--active); }
 .dx .dx-classhead h3 { font-size: var(--fs-card); }
 .dx-classhead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
 .dx-class > .note[hidden] { display: none; }
-/* the top three on a podium: first in the middle and tallest */
-.dx-podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: end; padding: 4px 0 8px; }
-.dx-podium li { display: grid; justify-items: center; gap: 2px; min-width: 0; text-align: center; }
+/* the leaderboard's arena (Sam, 2026-11-11: "more epic"): a drawn stage for the top three, their names under it, then the
+   rest on dark rows with a bar against first place. Dark in both themes, like a theater. */
+.dx-arena { --ar-bg: #2a2233; --ar-row: #372c44; --ar-soft: #cfc3d6; --ar-gold: #ffe08a; container: dxarena / inline-size;
+  display: grid; overflow: hidden; border-radius: var(--r-panel); background: var(--ar-bg); color: #fff; }
+.dx-set { display: block; width: 100%; height: auto; }
+.dx-podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: start; padding: 12px 12px 4px; }
+.dx-podium li { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; }
 .dx-podium .p1 { order: 2; }
 .dx-podium .p2 { order: 1; }
 .dx-podium .p3 { order: 3; }
-.dx-pod-who { display: grid; place-items: center; height: 96px; }
-.dx-pod-who svg { width: 68px; height: 68px; }
-.dx-podium .p1 .dx-pod-who svg { width: 92px; height: 92px; }
-.dx .dx-pod-who .flame { width: 46px; height: 56px; }
-.dx .dx-podium .p1 .dx-pod-who .flame { width: 62px; height: 76px; }
-.dx-podium .nm { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2px 6px; max-width: 100%; min-width: 0; font-weight: var(--w-strong); line-height: 1.2; }
+.dx-win-who { flex: none; display: grid; place-items: center; }
+.dx-win-who svg { width: 40px; height: 40px; }
+.dx .dx-win-who .flame { width: 30px; height: 36px; }
+.dx-win-txt { display: grid; gap: 1px; min-width: 0; }
+.dx-podium .nm { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; min-width: 0; font-weight: var(--w-head); line-height: 1.2; }
+.dx-podium .p1 .nm { font-size: 18px; color: var(--ar-gold); }
 .dx-podium .nm-t { min-width: 0; overflow-wrap: anywhere; }
-.dx-podium .val { font-weight: var(--w-head); }
-.dx-podium .val small { margin-left: 4px; font-size: var(--fs-meta); font-weight: var(--w-body); color: var(--muted); }
-.dx-step { display: grid; place-items: center; width: 100%; margin-top: 8px; border-radius: var(--r-row) var(--r-row) 6px 6px; font-size: 24px; font-weight: var(--w-title); }
-.dx-podium .p1 .dx-step { height: 76px; background: var(--sun); color: var(--sun-ink); }
-.dx-podium .p2 .dx-step { height: 54px; background: var(--lilac); color: var(--lilac-ink); }
-.dx-podium .p3 .dx-step { height: 38px; background: var(--peach); color: var(--peach-ink); }
-.dx-podium li.me .nm-t { text-decoration: underline; text-decoration-color: var(--gold); text-decoration-thickness: 3px; text-underline-offset: 3px; }
-.dx-board { display: grid; gap: 4px; }
-.dx-board li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto auto; align-items: center; gap: 10px; min-height: 48px; padding: 6px 14px 6px 10px; border-radius: var(--r-row); background: var(--row); }
-.dx-board li.me { background: var(--sun); }
-.dx-board .rk { text-align: center; font-weight: var(--w-head); color: var(--muted); }
+.dx-win-sub { font-size: var(--fs-meta); color: var(--ar-soft); }
+.dx-win-sub .mid::after { content: " \00b7  "; white-space: pre; }
+.dx-win-sub .val { font-weight: var(--w-head); color: var(--ar-gold); white-space: nowrap; }
+.dx-win-sub .val small { margin-left: 3px; font-size: inherit; }
+.dx-podium li.me .nm-t { text-decoration: underline; text-decoration-color: var(--ar-gold); text-decoration-thickness: 3px; text-underline-offset: 3px; }
+/* the drawn blocks carry the places; without the drawing (its art didn't load) each name gets its number */
+.dx-step { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ar-gold); color: #3b2e3a; font-weight: var(--w-title); }
+.dx-arena.has-set .dx-step { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.dx-board { display: grid; gap: 5px; padding: 8px 12px 12px; }
+.dx-board li { display: grid; grid-template-columns: 26px minmax(0, 1.3fr) auto minmax(48px, 1fr) auto; align-items: center; gap: 10px; min-height: 48px; padding: 6px 14px 6px 10px; border-radius: var(--r-row); background: var(--ar-row); }
+.dx-board li.me { box-shadow: inset 0 0 0 2px var(--ar-gold); }
+.dx-board .rk { text-align: center; font-weight: var(--w-title); color: var(--ar-gold); }
 .dx-board .nm { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: var(--w-strong); }
 .dx-board .nm-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dx-board .lvl { font-size: var(--fs-meta); color: var(--muted); white-space: nowrap; }
-.dx-board .me .lvl, .dx-board .me .rk, .dx-board .me .val small { color: var(--sun-ink); }
+.dx-board .lvl { font-size: var(--fs-meta); color: var(--ar-soft); white-space: nowrap; }
+.dx-board .dx-vs { height: 6px; overflow: hidden; border-radius: 3px; background: #4a3d58; }
+.dx-board .dx-vs i { display: block; height: 100%; border-radius: 3px; background: #f2c94c; transform-origin: 0 50%; animation: dx-fill 900ms var(--ease-expo) both; }
 .dx-board .val { min-width: 76px; text-align: right; font-weight: var(--w-head); white-space: nowrap; }
-.dx-board .val small { margin-left: 4px; font-size: var(--fs-meta); font-weight: var(--w-body); color: var(--muted); }
+.dx-board .val small { margin-left: 4px; font-size: var(--fs-meta); font-weight: var(--w-body); color: var(--ar-soft); }
+/* by the arena's own width, so the text-size setting counts (it zooms the page, which a media query doesn't see) */
+/* the names stack under their blocks unless there's room for a medallion beside each */
+@container dxarena (max-width: 700px) {
+  .dx-podium li { flex-direction: column; gap: 2px; text-align: center; }
+  .dx-win-txt { justify-items: center; }
+  .dx-win-sub .mid { display: block; }
+  .dx-win-sub .mid::after { content: none; }
+  .dx-podium .nm { justify-content: center; }
+}
+@container dxarena (max-width: 520px) {
+  .dx-podium { gap: 4px; padding: 10px 6px 2px; }
+  .dx-podium .nm { font-size: var(--fs-label); }
+  .dx-podium .p1 .nm { font-size: var(--fs-body); }
+  .dx-board li { grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; padding: 6px 12px 6px 8px; }
+  .dx-board .lvl, .dx-board .dx-vs { display: none; }
+  .dx-board .val { min-width: 0; }
+}
+/* the stage in motion: confetti drifts down, the stars twinkle, the lights breathe, the crown bobs, the winners hop once */
+@keyframes st-fall { 0% { transform: translateY(-36px); opacity: 0; } 12%, 85% { opacity: 1; } 100% { transform: translateY(70px); opacity: 0; } }
+@keyframes st-twinkle { 50% { opacity: .25; } }
+@keyframes st-lights { 50% { opacity: .55; } }
+@keyframes st-bob { 50% { transform: translateY(-4px); } }
+@keyframes st-hop { 0%, 100% { transform: none; } 40% { transform: translateY(-10px); } }
+@keyframes dx-fill { from { transform: scaleX(0); } }
+.dx-arena .st-conf { animation: st-fall 7s linear infinite; }
+.dx-arena .st-twinkle { animation: st-twinkle 2.6s ease-in-out infinite; }
+.dx-arena .st-lights { animation: st-lights 4s ease-in-out infinite; }
+.dx-arena .st-crown { animation: st-bob 2.4s ease-in-out infinite; }
+.dx-arena .st-win { animation: st-hop 700ms var(--ease-out) 600ms 1 both; }
+.dx-arena .st-win2 { animation-delay: 350ms; }
+.dx-arena .st-win3 { animation-delay: 100ms; }
+.dx-arena.is-still .st-conf, .dx-arena.is-still .st-twinkle, .dx-arena.is-still .st-lights, .dx-arena.is-still .st-crown, .dx-arena.is-still .st-win, .dx-arena.is-still .dx-vs i { animation: none; }
+@media (prefers-reduced-motion: reduce) { .dx-arena .st-conf, .dx-arena .st-twinkle, .dx-arena .st-lights, .dx-arena .st-crown, .dx-arena .st-win, .dx-board .dx-vs i { animation: none; } }
 .dx-ladder summary { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); cursor: pointer; list-style: none; }
 .dx-ladder summary::-webkit-details-marker { display: none; }
 .dx-ladder[open] summary .ic { transform: rotate(-90deg); }
@@ -448,8 +518,6 @@ html.shx .dx .shpet-ghost:hover { background: var(--active); }
   .rc-facts { gap: 12px; }
   .rc-bars { height: 132px; gap: 3px; }
   .rc-chip { min-height: 48px; padding-right: 14px; }
-  .dx-pod-who svg { width: 56px; height: 56px; }
-  .dx-podium .p1 .dx-pod-who svg { width: 76px; height: 76px; }
   .dx .dx-title { font-size: 26px; }
   .dx-count b { min-width: 64px; font-size: 44px; }
   .dx-actions .btn { flex: 1 1 auto; }
@@ -460,9 +528,6 @@ html.shx .dx .shpet-ghost:hover { background: var(--active); }
   html.shx .dx .shpet-house { grid-template-columns: minmax(0, 1fr); }
   .dx-classhead .seg { width: 100%; }
   .dx-classhead .seg button { flex: 1; justify-content: center; padding: 0 8px; }
-  .dx-board li { grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; padding: 6px 12px 6px 8px; }
-  .dx-board .lvl { display: none; }
-  .dx-board .val { min-width: 0; }
   .dx-archived { grid-template-columns: minmax(0, 1fr); }
   .dx-arch > div { justify-items: stretch; }
   .dx-arch .btn { white-space: normal; text-align: left; }

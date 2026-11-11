@@ -1405,11 +1405,23 @@
   });
   channel.subscribe(function(status){
     if (status === "SUBSCRIBED") {
-      if (!AUTOMATED) channel.track({ online_at: new Date().toISOString() });
+      presenceOn = true; trackPresence();
       safeRpc("record_presence_ping", { p_hub: HUB });
     }
   });
   }
+  /* What this visitor's Timmy is wearing goes out with the presence, and nothing else about them: no name, no id
+     (Sam, 2026-11-11: the new dashboard's classroom draws a Timmy for each person studying, dressed as theirs). Sent
+     again when Timmy arrives (widget/pet.js loads late) or a setting changes what he wears. */
+  var presenceOn = false, trackedFit = null;
+  function fitNow(){ try { return (window.shPet && window.shPet.fit && window.shPet.fit()) || ""; } catch (e) { return ""; } }
+  function trackPresence(){
+    if (!channel || !presenceOn || AUTOMATED) return;
+    var f = fitNow(); if (f === trackedFit) return;
+    trackedFit = f;
+    try { channel.track({ online_at: new Date().toISOString(), fit: f }); } catch (e) {}
+  }
+  document.addEventListener("sh:pref", function(){ setTimeout(trackPresence, 50); });
 
   /* ---------- answer + mode tracking (fire-and-forget, never throws into the hub) ---------- */
   /* Automated browsers (Playwright, Puppeteer, Selenium: navigator.webdriver) don't count in the analytics: sessions that
@@ -2869,7 +2881,7 @@
     petLoading = true;
     var petScript = document.createElement("script");
     petScript.src = new URL("pet.js", thisScript.src).href; petScript.async = true;
-    petScript.onload = function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); if (then) then(); };
+    petScript.onload = function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); trackPresence(); if (then) then(); };
     document.head.appendChild(petScript);
   }
   window.shLoadPet = loadPet;
