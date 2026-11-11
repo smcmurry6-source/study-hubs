@@ -93,6 +93,13 @@
    "fcp": 3000,
    "lcp": 3000,
    "tbt": 500
+  },
+  "hubs/perio/next/": {
+   "kb": 680,
+   "requests": 21,
+   "fcp": 3000,
+   "lcp": 3000,
+   "tbt": 500
   }
  }
 }

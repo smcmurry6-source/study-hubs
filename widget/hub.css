@@ -67,6 +67,9 @@ html.shx[data-hx-hub="special-patient-care"], .hx[data-hub="special-patient-care
    declared on html.shx) resolve to this hub's color, not the default, in its panels and in the player (BUG-056) */
 html.shx { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
 .hx { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
+/* Perio's ink is 4.05:1 on its light pink, under AA for text: its words take a deeper pink (5.1:1, as Heme & Endo's);
+   the art keeps the ink. Before the dark rules, so dark mode still takes --hub-dark. */
+html.shx[data-hx-hub="perio"], .hx[data-hub="perio"] { --hub-text: #9e3a60; }
 html.shx[data-theme="dark"], html.shx[data-theme="dark"] .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }
 @media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]), html.shx:not([data-theme="light"]) .hx { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); } }
 
@@ -97,7 +100,9 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 /* the reset weighs no more than one class (:where), so a component's own margin wins over it (BUG-047) */
 .hx :where(h1, h2, h3, h4, p, ul, ol, figure, dl, dd, blockquote) { margin: 0; }
 .hx :where(ul, ol) { padding: 0; list-style: none; }
-.hx button, .hx select, .hx input { font: inherit; color: inherit; }
+/* not inside the arcade's stage: the games style their own buttons (.gm-btn: dark label, arcade font), which this reset
+   outranked; :where() keeps its weight the same everywhere else */
+.hx button:where(:not(.arcade-stage *)), .hx select:where(:not(.arcade-stage *)), .hx input:where(:not(.arcade-stage *)) { font: inherit; color: inherit; }
 .hx button { cursor: pointer; }
 .hx a { color: inherit; }
 .hx :focus-visible { outline: 3px solid var(--hub-text); outline-offset: 2px; border-radius: 6px; }
@@ -440,6 +445,15 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .fig-key dt { font-weight: var(--w-strong); }
 .rv-section { margin-top: 20px; }
 .rv-section > h3 { margin-bottom: 10px; }
+/* a chart written as the live hub's own HTML (Perio's Review tables): its notes, lists and subheads under the table */
+.rv-html > * + * { margin-top: 12px; }
+.rv-html > p, .rv-html > div:not(.tbl-wrap) { font-size: var(--fs-label); line-height: 1.5; color: var(--muted); max-width: 72ch; }
+.rv-html > p b, .rv-html > p strong { color: var(--text); }
+.rv-html h4 { font-size: var(--fs-card); font-weight: var(--w-head); color: var(--hub-text); margin-top: 20px; }
+.rv-html ul, .rv-html ol { padding-left: 20px; display: grid; gap: 6px; font-size: var(--fs-label); }
+.rv-html ul { list-style: disc; }
+.rv-html ol { list-style: decimal; }
+.lec-note { margin-top: 6px; max-width: 72ch; }
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
 .rv-card { padding: 14px 16px; border-radius: var(--r-row); background: var(--panel); }
 .panel .rv-card { background: var(--row); }
@@ -765,6 +779,13 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .game.is-first .game-pic img { height: 100%; object-fit: cover; }
 .arcade-lobby > .note { margin-top: 14px; }
 .arcade-stage { min-height: 60vh; }
+/* the games' icons (their hub's own icon(): svg.ic) at the size each live hub's base CSS gives them, which the engine page
+   doesn't load: unsized, they grew to fill the Back and Full screen buttons (BUG-059). :where() keeps it at .ic's weight,
+   so a game's own sizes (Perio's .gm-back .ic) still win */
+:where(.arcade-stage) .ic { width: 1.15em; height: 1.15em; flex: none; vertical-align: -.2em; }
+.hx .arcade-stage svg.ic { display: inline-block; }   /* inline beside their label, as on the live hubs (.hx svg is a block) */
+/* a game's lecture tag (Perio's Calculus Crusher), in the lecture's own color */
+.arcade-stage .gm-sess { display: inline-flex; align-items: center; flex: none; padding: 2px 9px; border-radius: var(--r-pill); font-size: 12px; font-weight: var(--w-head); line-height: 1.5; background: var(--lc-soft); color: var(--lc-ink); }
 .stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); align-items: start; }
 .stats-grid .wide { grid-column: 1 / -1; }
 .rank-big { margin-top: 12px; display: flex; align-items: center; gap: 16px; }
