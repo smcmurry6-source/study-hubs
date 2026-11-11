@@ -99,7 +99,7 @@ Data quality (`sh_data_quality()`): no test rows, 34 overcounted minutes, and th
 **Student voice since this morning:** two Occlusion reports, both on the final's L7. #39, `mo-repos-irrev`: two of its four choices said
 "Reversible" and one "Irreversible", so the odd one out was the key (fixed in this run, below). #40, `mo-10`: "asked a bunch already":
 the final's lectures ask the same fact, that about 10% of people have MIP coincident with CR closure, three times (`in-90` in L6,
-`mo-10` and `mo-tf-3` in L7); Sam merged without retiring `mo-10`, and both reports were answered. Report #38 (the Sertoli drawing) was answered today.
+`mo-10` and `mo-tf-3` in L7); both reports were answered, and then Sam had `mo-10` retired ("not more than twice"). Report #38 (the Sertoli drawing) was answered today.
 
 **Did the last refresh work?** (this morning's four explanation fixes went live about 5 pm Central, so a few hours of data)
 - `p2-cah-17` (now names 21-hydroxylase): right on every try since, from a few people (8 of 19 before).
@@ -359,8 +359,9 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
 - **Students notice one fact asked again and again.** Occlusion report #40 (2026-11-10): "this question has been asked a bunch already",
   about the 10% of people whose MIP coincides with CR closure, which the final's lectures ask three times (`in-90`, `mo-10`, `mo-tf-3`).
   Heme & Endo Exam 2's bank went to one question per fact for the same reason (Sam, 2026-11-08: "they need to be higher yield"), keeping
-  one question for each point a High Likelihood topic names. Before shipping a lecture, list the fact each question tests and merge the
-  repeats across lectures too.
+  one question for each point a High Likelihood topic names. Sam's bar (2026-11-10, `mo-10` retired): "it is okay to test the same concept multiple ways. just
+  not for every single question and not more than twice." Before shipping a lecture, list the fact each question tests, and keep at
+  most two questions per fact, across lectures too.
 - **Every explanation should name the class's favourite wrong answer and say why it's wrong.** The most-picked
   wrong choices (`question_choices`) on the hardest items were ones the explanation didn't mention: perio `q2-03`
   (silk), `q4-15` (Class 1), MSK `sl-calcitriol` (cholecalciferol). Fixed 2026-09-29; write explanations this way

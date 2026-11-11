@@ -550,7 +550,7 @@ mo-lit-weak
 mo-orth-occ
 mo-goal1
 mo-alert
-mo-10
+mo-10 retired
 mo-ortho-instab
 mo-intracap
 mo-risk-mm
