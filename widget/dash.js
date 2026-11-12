@@ -1229,7 +1229,7 @@
       }).join("") + "</ol>" : "") + "</div>";
   }
   /* what the top three's Timmys wear: each one's place says (get_place, migration_v54), through the visit key on their
-     row. Someone who turned visiting off, or a database without the game layer yet, gives a plain Timmy. */
+     row. A place that can't be read, or a database without the game layer yet, gives a plain Timmy. */
   function loadFits(sb, d){
     if (V2 !== true || !sb) return;
     d.rows.slice(0, 3).forEach(function(r, i){

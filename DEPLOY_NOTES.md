@@ -121,7 +121,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   (55 KB). BUG-065 to BUG-070 found and fixed (two in the preview's UAT, two on the recap). **Your own Timmy is
   marked** (Sam: "Mark your timmy"): a "You" plate on his desk, on your own screen only. A hub tab keeps its random
   presence key in the browser (`sh_presence_mine`, `rememberMine()` in the live `widget/v3.js`) and the dashboard's
-  `paintMe()` finds that desk; nothing new is sent or stored on the server (BUG-071).
+  `paintMe()` finds that desk; nothing new is sent or stored on the server (BUG-071). Merged 2026-11-12 on Sam's word ("merge"), after a rebase
+  and one more fix the smoke test found the day before an exam (BUG-072: "Send luck" at the largest text on a phone).
 - **2026-11-11 (redesign phase 3: the new dashboard, beside the live one, Claude Code)** — Nothing students see changes.
   `next/index.html` is the dashboard on the design system (`widget/dash.js`, `widget/dash.css`); outside a preview it sends
   visitors to the live dashboard, and it takes `index.html`'s place at the redesign's release. The hubs are tabs with their

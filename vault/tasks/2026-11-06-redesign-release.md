@@ -326,8 +326,7 @@ is in [its own note](2026-11-06-idea-board.md).
   seats them without the walk; Focus mode shows the plain count. The count is in the top bar too. Under it the
   leaderboard, one list at a time: **Ranks** (top 10, with every rank from Stone to Dark Matter folded under it) or
   **Study streaks**, with **the top three on a stage**: curtains, spotlights, torches, confetti, gold, silver and
-  bronze blocks, a crown for first, and each winner's own Timmy on top in their outfit (with the shop; a plain Timmy if
-  they turned visiting off). The rest of the board is on the dark stage floor with a bar for how close each is to first.
+  bronze blocks, a crown for first, and each winner's own Timmy on top in their outfit (with the shop). The rest of the board is on the dark stage floor with a bar for how close each is to first.
   **Gone from the dashboard** (Sam, 2026-11-11): correct-in-a-row, the arcade high scores (each hub's Arcade keeps its
   own boards) and the "When people study" chart. The Golden Probe line is under the board when someone has won today.
 - **What the hubs record** (already on the live About page since the PR that added it): the outfit goes with the

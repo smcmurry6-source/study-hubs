@@ -5,7 +5,7 @@ hub: dashboard
 created: 2026-11-05
 requested-by: Sam
 due: 
-waiting-on: Sam's approval of the PR and the merge; the idea board (a second session)
+waiting-on: the idea board (a second session)
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/318
 ---
@@ -211,13 +211,25 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
     Still open from earlier entries: the three `dashboard/next` screens aren't in the accessibility baseline, and first
     paint on the slow-phone profile is worth another look before the release.
 
+- 2026-11-12 (Claude Code, **merged on Sam's word**). Sam, in the session: "merge" ([decisions](../decisions.md)): the
+  approval of this release and a one-time OK for the agent to merge PR #318. Before the merge the branch was rebased
+  onto `main` (the `migration_v54` changes and a lessons refresh had landed since its last CI run) and CI ran on the
+  result. `migration_v54` no longer has a visiting opt-out, so the two places here that spoke of "visiting off" (a
+  comment above `loadFits()` in `widget/dash.js`, the preview's `get_place` stub) and the About draft's stage entry now
+  say a place that can't be read gives a plain Timmy; the code was already right. The earlier entries above keep their
+  wording. The smoke test on the rebased branch failed, and not from the rebase: it was the day before Heme & Endo
+  Exam 2, the first day "Send luck" showed, and at 390 px with the largest text its row pulled the hub card wider than
+  the screen (BUG-072, fixed: the card's column can't be pushed wider, the button drops under the words). A lesson for
+  the dashboard's tests: its states depend on the date, so check the day before an exam and exam day by setting the
+  clock, not only today. **Left:** the idea board (a second session, started from `main`), and BUG-073 (open, S4: at
+  320 px with the largest text "Start studying" and the seven day dots run a little past the edge).
 
 ## Outcome
 
 Not finished. The new dashboard is built beside the live one (`next/`), on the design system, with everything from the
 plan except the idea board, and with Sam's second-pass changes; nothing students see has changed
-([#318](https://github.com/smcmurry6-source/study-hubs/pull/318), a draft). The third pass is built too: the classroom, the
+([#318](https://github.com/smcmurry6-source/study-hubs/pull/318)). The third pass is built too: the classroom, the
 stage and the recap as a bar graph in a smaller card. One change in the PR is live at merge: each hub sends
 its Timmy's outfit with the studying-now presence, with no name or id, and keeps its own random presence key in the
-browser so the new dashboard can mark your own Timmy. Sam has looked at all of it ("All that looks good"); what's left
-is the idea board, Sam's approval and the merge.
+browser so the new dashboard can mark your own Timmy. Sam has looked at all of it ("All that looks good") and said "merge" on 2026-11-12; what's left
+is the idea board.

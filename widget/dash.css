@@ -134,7 +134,7 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 
 .dx-hub { display: grid; gap: var(--gap); min-width: 0; }
 /* the open hub's stage: its drawn scene across the top, the exam under it, all on the hub's own color */
-.dx-stage { display: grid; border-radius: var(--r-panel); overflow: hidden; background: var(--hub-soft); }
+.dx-stage { display: grid; grid-template-columns: minmax(0, 1fr); border-radius: var(--r-panel); overflow: hidden; background: var(--hub-soft); }
 .dx-scene { display: block; width: 100%; padding: 0; border: 0; background: var(--hub-light); cursor: pointer; }
 .dx-scene-in { display: block; width: 100%; aspect-ratio: 3 / 1; }
 /* a short laptop screen: trim the sky so Start studying stays on the first screen */
@@ -196,10 +196,11 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 /* the number sits on a tile: the folding layers wear the same tile, so each flip turns the whole card */
 .dx-count .flap-bot, .dx-count .flap-fold, .dx-count .flap-unfold { padding: inherit; border-radius: inherit; background: var(--hub); text-align: center; }
 /* exam-day luck */
-.dx-luck { position: relative; display: flex; align-items: center; gap: 12px; margin-top: 6px; padding: 12px 14px; border-radius: var(--r-row); background: var(--mint); color: var(--mint-ink); }
+/* the button drops under the words when the two don't fit side by side (a phone at the largest text, BUG-072) */
+.dx-luck { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 6px; padding: 12px 14px; border-radius: var(--r-row); background: var(--mint); color: var(--mint-ink); }
 .dx-luck:empty { display: none; }
 .dx-luck > .ic { flex: none; }
-.dx-luck-txt { flex: 1; min-width: 0; font-size: var(--fs-label); color: var(--text); }
+.dx-luck-txt { flex: 1 1 9em; min-width: 0; font-size: var(--fs-label); color: var(--text); }
 .dx-luck-txt small { display: block; font-size: var(--fs-meta); color: var(--muted); }
 .dx-luck-burst { position: absolute; right: 48px; top: 14px; pointer-events: none; animation: dx-luck 1.1s var(--ease-out) forwards; }
 @keyframes dx-luck { to { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; } }
