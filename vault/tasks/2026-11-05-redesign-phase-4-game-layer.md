@@ -40,14 +40,96 @@ Put the ranks, trophies and celebrations on the design system without changing t
   [phase 1](done/2026-11-05-redesign-phase-1-hub-engine.md)), and the live hubs keep today's cards until
   [the release](2026-11-06-redesign-release.md).
 
+## From here to the release (planned with Sam, 2026-11-12)
+
+Sam answered every open call for what is left of this phase on 2026-11-12 ([decisions](../decisions.md)). Each session
+below has a **build spec** in its own note, written so a fresh session can start without asking Sam anything, and each
+spec ends with the prompt that starts it. One session each, in this order ([run-a-redesign-session](../how-to/run-a-redesign-session.md)):
+
+| # | Session | Its spec | Needs first |
+|---|---|---|---|
+| 1 | **The shop's art**: the coin, snacks, boosts, rarity frames, the five undrawn outfits, the five rare costumes, and Timmy's door spot moved off the rank statue (BUG-089) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1" | [#335](https://github.com/smcmurry6-source/study-hubs/pull/335) merged |
+| 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
+| 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
+| 4 | **Visiting**: a row on the new dashboard's boards opens that person's place | [visiting](2026-11-12-redesign-visiting.md) | 3 |
+| 5 | **The bowling egg** (part D) | [the bowling egg](2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
+| 6 | **The trophy case and the cards**: this note's original goal | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
+| 7 | **Ask Timmy, part 2** (the chat) | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), its code map; its prompt is at the end of that note | 3 |
+| 8 | **The game layer's wiring** left by part A: the arcade's sessions, Timmy Time's minutes, the service worker's lists | [the wiring](2026-11-12-redesign-game-layer-wiring.md) | 6 |
+| 9 | **Phase 5, part 2**: bundles, one stylesheet, the font, budgets lowered | [phase 5](2026-11-05-redesign-phase-5-backend.md) | every session that adds a file (1 to 8) |
+| 10 | **The release** | [the release](2026-11-06-redesign-release.md) | all of the above, and Sam's look at the whole thing on its preview |
+
+Beside any of them, because they touch other files: **Ask Timmy, part 3** (the admin page's Timmy tab, `review/`) and
+**[Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md)** (`widget/hub-bank.js`; its note wants a server
+part in the pending migration, which is Sam's call at the start of that session). After the release:
+[the later journeys' rank sets](2026-11-12-redesign-later-journeys-rank-sets.md).
+
+**No date** (Sam, 2026-11-06, kept on 2026-11-12): one release with everything. Heme & Endo Exam 2's exam is Nov 13,
+Occlusion's final Nov 16 and Perio's Nov 19 (`HUBS` in `index.html`); ten sessions will not land by then, so the
+release switches the dashboard and whichever hub is live at that point, and a hub whose exam has passed keeps its old
+page ([the release](2026-11-06-redesign-release.md), Context).
+
+### For every session above
+
+These hold for each spec; a spec only adds to them.
+
+- **Start** from a fresh `origin/main`. Read `AGENTS.md`, this section, the spec and the notes it links. Grep the big
+  files (`widget/hub.js`, `widget/v3.js`, `widget/pet.js`, `widget/dash.js`, `migration_v54.sql`), never read them whole.
+  No subagents.
+- **Nothing students see changes before the release.** New code goes in files only the redesign's pages load
+  (`hubs/<id>/next/`, `next/`), or runs only there (the engine, `data-game="v2"` on the widget's tag, a `mount` option
+  the new pages pass). `widget/pet.js`, `eggs.js`, `ranks.js`, `rankup.js`, `games.js`, `podcast.js` and `v3.js` are
+  shared with the live hubs and the live dashboard: a change there must leave a live page behaving exactly as it does
+  today, and the smoke test on every hub is the proof. What the old pages do after the release doesn't matter (Sam,
+  2026-11-12: "Old pages arent accessible so they dont matter").
+- **`migration_v54.sql` and `migration_v55.sql` are not applied and not changed.** Where the client and the server as
+  written disagree, the client follows the server; the known cases and how each is worked around are in
+  [game-server](../reference/game-server.md) ("Where the client works around the server as written"). A new one: stop
+  and tell Sam, don't change the migration.
+- **Request budgets** (`tools/release/budgets.json`, measured by `node tools/release/perf.js`): the new Occlusion is at
+  20 of 21 requests, the new Heme & Endo Exam 2 at 20 of 22, the new Perio at 18 of 21, the new dashboard at its 30.
+  **Nothing new loads with a page**: fetch a new file the first time it is used (`loadScript` in the engine, the way
+  `HX.morePlace` fetches `widget/place.js`; on the dashboard the way `placeStart` waits for the first scroll, tap or
+  key), and make the smoke test fail if it loads with a page. No budget is raised.
+- **The preview's made-up data**: `tools/preview/runtime/preview.js` answers every database call in `rpc()`'s switch
+  from the six test accounts (`new`, `returning`, `high-xp`, `missed`, `archived`, `admin`; `?persona=`, `?xp=`,
+  `?now=`). A call a session adds gets its case there, shaped exactly as the migration returns it. Never a production
+  row, never the real admin secret.
+- **No hosted preview** (Sam, 2026-11-12, until the release's own). Use the change in a scripted browser on the
+  preview's made-up data (`node tools/preview/serve.js`), on a phone (390 px) and a laptop (1280 px), light and dark,
+  reduced motion too. Sam looks, doesn't test: send screenshots (`deviceScaleFactor: 2`), and a short recording for
+  anything that moves. **New art goes to Sam as a contact sheet, light and dark, and gets a yes before it goes into
+  the engine.**
+- **Clicks never record words**: every button in new UI carries a fixed `data-*` name (as `data-tp` in the place and
+  `data-shi` on the idea board), and the smoke test checks that none is missing. Names, item names and typed text are
+  drawn as text, never as markup.
+- **Tracking**: a new feature event gets its row in [event-taxonomy](../reference/event-taxonomy.md) and its line in
+  [analytics-retention](../reference/analytics-retention.md) in the same PR; never an item's name, a person's name or
+  typed text in a kind ([learner-data-privacy](../rules/learner-data-privacy.md)).
+- **Tests**: while building, what you touched (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, the smoke test,
+  `node tools/release/xp.js` when the client meets the server); once on the finished code, `node tools/release/run.js`
+  ([long-tests-once](../rules/long-tests-once.md)). The spec lists the checks to add.
+- **The About page and `tools/podcast/LORE.md`'s student-facing lines land at the release**: write them into
+  [the release note](2026-11-06-redesign-release.md)'s drafts ("From phase 4, ..."), as parts A and C did, and fix any
+  draft there that your session makes untrue.
+- **Write back** in the same PR: the spec's Done when ticked, a hand-off entry in this note's Log (what was built, what
+  the next session can call), [decisions](../decisions.md) for anything Sam said, the bug log, `DEPLOY_NOTES.md`. Then
+  a draft PR with a test report; Sam's "merge" merges it.
+
 ## Done when
 
 - [x] First, before parts A-D grow it: `widget/hub.js` split into its core and the parts each session changes (the
   bank and study toggle, rewards and cards, Timmy and his place), loaded as now, with no behavior change and the
   smoke, a11y and perf suites passing ([run-a-redesign-session](../how-to/run-a-redesign-session.md), step 4) ([#330](https://github.com/smcmurry6-source/study-hubs/pull/330), 2026-11-12)
-- [ ] Every card and the cutscene reviewed in a recording on the preview, reduced motion too
+- [ ] The trophy case and the cards on the design system ([its note](2026-11-12-redesign-trophy-case-and-cards.md)),
+      reviewed by Sam in a recording from a scripted browser on made-up data, reduced motion too, and once more on the
+      release's own preview (Sam, 2026-11-12: no hosted preview before that one)
 - [ ] Part A, B, C and D done as their notes say (each note's "Done when"), and part E's "everyone has Timmy"
-- [ ] The arcade lobby of each live hub redrawn; game mechanics unchanged
+- [ ] Visiting from the new dashboard's boards ([its note](2026-11-12-redesign-visiting.md); Sam, 2026-11-12: in the release)
+- [x] The arcade lobby of each live hub redrawn; game mechanics unchanged (done outside this phase: Occlusion's in
+      [phase 1](done/2026-11-05-redesign-phase-1-hub-engine.md), Heme & Endo Exam 2's and Perio's in
+      [phase 2](2026-11-05-redesign-phase-2-live-hubs.md), Perio's drawings approved 2026-11-11; the arcade's part of
+      the game layer is in [the wiring](2026-11-12-redesign-game-layer-wiring.md))
 - [ ] The About page's trophy and rank entries updated
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
 - [ ] Preview link, phone and laptop screenshots, and Sam's look, then Sam's "merge"
@@ -173,5 +255,34 @@ Put the ranks, trophies and celebrations on the design system without changing t
     wear his place's outfit: that is pet.js's, for "everyone has Timmy" ([the release](2026-11-06-redesign-release.md),
     "From phase 4, part C").
   - **Still open in this note**: parts B and D, part E, the arcade lobby, the recording on a preview, the About page.
+- 2026-11-12 (Claude Code, **planning only, no code**): what is left of this phase turned into build specs. Sam
+  answered one list of 23 calls ([decisions](../decisions.md)); the order, what holds for every session and the link to
+  each spec are in "From here to the release" above. Found while reading: this note's original goal (the trophy case
+  and the cards) was never built, so it has [its own note](2026-11-12-redesign-trophy-case-and-cards.md) now; visiting
+  had no session ([its note](2026-11-12-redesign-visiting.md)); the bowling egg's eight clips were already drawn on
+  [#291](https://github.com/smcmurry6-source/study-hubs/pull/291) and are carried over, not redrawn; and the server
+  refuses a new trophy kind as written, so the bowling trophy is kept on the device until the first migration after
+  the release ([game-server](../reference/game-server.md)). The arcade lobby box is ticked: phases 1 and 2 did it.
+  **Next: session 1, the shop's art.**
 
 ## Outcome
+
+## Opening prompts
+
+Each session's prompt is at the end of its own note; in order:
+1 and 2, [the shop](2026-11-06-redesign-timmy-shop.md) (the art, then the client) ·
+3, [Ask Timmy](2026-11-12-redesign-ask-timmy.md) (part 4, Timmy everywhere) ·
+4, [visiting](2026-11-12-redesign-visiting.md) ·
+5, [the bowling egg](2026-11-06-redesign-bowling-egg.md) ·
+6, [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) ·
+7, [Ask Timmy](2026-11-12-redesign-ask-timmy.md) (part 2, the chat) ·
+8, [the wiring](2026-11-12-redesign-game-layer-wiring.md) ·
+9, [phase 5](2026-11-05-redesign-phase-5-backend.md) (part 2) ·
+10, the release:
+
+> Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then `RELEASE_TEST_PLAN.md` and
+> `vault/tasks/2026-11-06-redesign-release.md` (its Done when, and every "From ..." draft). Before anything else,
+> check that each session in "From here to the release" in `vault/tasks/2026-11-05-redesign-phase-4-game-layer.md`
+> is merged, and tell me what isn't. Then ask me which hubs are live and get switched, and whether I want the
+> preview now. Nothing is applied, deployed or merged before I say so. Grep the big files, never read them whole.
+> No subagents.

@@ -208,7 +208,8 @@ and `hub-timmy.js` and touches the core only for Settings ([run-a-redesign-sessi
 - **The idea board** (`widget/ideas.js`, `migration_v54`, still pending): `post_idea({ p_visitor, p_title, p_body, p_hub,
   p_category, p_source, p_request })`; a name is required (`visitor_names`, else `error: 'name'`; the client checks
   `sh_display_name` and calls `set_display_name` first). Categories `feature`, `better`, `content`, `fun`, `look`, `other`;
-  title 3-80 characters, body up to 280, one idea per 20 seconds, three a day. `p_source` would gain `timmy`.
+  title 3-80 characters, body up to 280, one idea per 20 seconds, three a day. `p_source` is `board` for an idea Timmy drafted (Sam, 2026-11-12): `post_idea`
+  as written takes only `board`, `suggest` and `checkin`, and the migration isn't changed.
   `window.shIdeas`; a hub opens the board at `#more/ideas`.
 - **Supabase in the browser**: `window.shSupabase` (made in `v3.js`; `dash.js` makes its own), the visitor id from
   `sh_visitor_id`. The function's address is `https://thytmzsgymydbzcqdnix.supabase.co/functions/v1/timmy`.
@@ -243,6 +244,90 @@ and `hub-timmy.js` and touches the core only for Settings ([run-a-redesign-sessi
 limit; the function is deployed (the Supabase connector's `deploy_edge_function`); `migration_v55` is applied with
 `migration_v54`; the function's content address is the released one; the About page and the changelogs.
 
+## Build spec, part 4: Timmy everywhere (written 2026-11-12, with Sam's calls of that day)
+
+Session 3 of [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release"; it comes after the
+shop's client, because both edit `widget/pet.js`. Read first: "For every session above" there, this note's "Where it
+plugs in", [the shop](2026-11-06-redesign-timmy-shop.md) ("Sam's calls (2026-11-12)"), `widget/place.js`'s top comment.
+
+**Sam's calls** ([decisions](../decisions.md)):
+- 2026-11-12 (above): "adopting timmy is no longer an option. once the redesign launches, everyone has timmy", with
+  the defaults Sam left as proposed (full HP to start, existing Timmys keep theirs, the intro goes, he answers at
+  any HP).
+- 2026-11-12, planning: **"Since we are moving to the shop, if someone doesnt have a costume applied, they are
+  naked. What you put wins."** On the redesign's pages Timmy wears only the outfit put on at his place, everywhere
+  he is drawn, and nothing when nothing is on. He no longer dresses himself for a holiday or the fall weeks there.
+- 2026-11-12, planning: **"Old pages arent accessible so they dont matter."** No work goes into how the old pages
+  (the archived hubs, PCD Implants, Special Patient Care, the old dashboard) treat adoption after the release. Before
+  the release they must not change, like every live page.
+- One session does both halves, "everyone has Timmy" and the outfit on the bar.
+
+**Files to touch**:
+- `widget/pet.js`:
+  - `mount(opt)` takes `everyone: true`. With it: no adoption. `adopted()` is true; if `sh_pet_born` is missing it
+    is set to today (Central) and the `pet-adopt:<day>` badge is sent as it is today, so every linked device counts
+    his health from the same day (`syncBadges` already takes the earliest day). `visible()` on a hub no longer
+    waits for adoption. The four-step `intro()`, the "Tap me!" bubble and the "No thanks" steps are never shown. A
+    first-time visitor gets one hello in his bubble instead. Without the option, every line of today's behavior
+    stays (the live pages pass nothing).
+  - **A Timmy born this way starts at 100 HP**, not 70 (`simulate()` starts at 70). So that every linked device
+    agrees from the badge's day alone: a Timmy whose `sh_pet_born` is on or after the day the redesign goes live
+    starts at 100. That day is one constant in `pet.js` (the release sets it; until then it is far in the future, and
+    the preview sets it to its own start so the `new` account shows it). A Timmy adopted before keeps his history
+    and HP.
+  - **What he wears**: with `everyone`, `outfit()` and the holiday hats are not used. He wears `opt.outfit` (the id
+    equipped in the `outfit` slot), drawn by the kit's `dress()`. `fit()` returns that id (or `""`), not
+    `"<holiday>:<outfit>"`; `fitOutfit()` is untouched (the dashboard's `timmyArt` already draws a plain kit id
+    through `SH_OUTFITS`). `shPet.setOutfit(id)` changes it at once and redraws him.
+- `widget/v3.js`: on a page whose tag has `data-game="v2"`, `loadPet()` runs for everyone (today a new page loads
+  him only once `sh_pet_born` is set: grep `petBorn`) and mounts with `everyone: true` and the bootstrap's
+  `shop.equipped.outfit`. A live page's tag has no `data-game`, so nothing changes there.
+- `widget/dash.js`: the new dashboard mounts with `everyone: true` and the same outfit; the "Timmy Tooth wants to
+  meet you. Tap him." perch line (`#petPerch`) goes.
+- `widget/hub-timmy.js`: `hasTimmy()` and `petFromBadges()`'s wait for adoption go; `morePlace` loses its "Timmy
+  hasn't moved in yet" note.
+- `widget/place.js`: `timmySvg()` always draws him without `pet.js`'s own hat (`hat: ""`), so with nothing on he is
+  himself; after the `outfit` slot changes (`equip()`), it calls `shPet.setOutfit(id)` so the bar follows at once.
+- `tools/preview/runtime/preview.js`: the `new` test account has a Timmy; nothing else.
+- The tests, `tools/podcast/LORE.md`, the vault.
+
+**Not to touch**: `migration_v54.sql` (`sh_wallet` already leaves `pet-adopt` out of the trophies); `holidayId()`,
+`isFall()` and the holiday dates (the hubs' themes, the eggs, the place's props and `tools/release/xp.js` read them);
+`widget/eggs.js`; the engine's core; the shop.
+
+**Drawing the outfit without a new request**: the kit's outfits are in `widget/hub-art/outfits.js`
+(`window.SH_OUTFITS`, `dress(svg, key)`), which no hub page loads today, and the new Occlusion is at 20 of 21
+requests. So `pet.js` keeps the dressed drawing's outfit layer on the device (`sh_pet_outfit`, with the id it
+belongs to), draws from that at page load, and fetches `outfits.js` only when the id on the server differs from the
+one kept (a change made on another device) or nothing is kept. `shPet.setOutfit` and the place write it whenever the
+outfit changes. The smoke test fails if `outfits.js` loads with a page for someone whose kept outfit is current.
+
+**The preview's made-up data**: the `new` account opens a new hub and the new dashboard with a Timmy at 100 HP and
+no intro; `returning` and `high-xp` wear an outfit (`PLACE_START`), `missed` wears none.
+
+**Tests to add**:
+- `node tools/ci/smoke.js`: a first-time visitor on a new hub and on the new dashboard has Timmy on the page with no
+  intro and no "Tap me!"; the bar's Timmy wears the bootstrap's outfit and wears nothing when none is on, on a
+  holiday date too (`?now=` on Halloween); `shPet.fit()` is the outfit's id; changing the outfit in the customizer
+  changes the bar without a reload; More always has Timmy's place. On a live hub and the live dashboard: the intro,
+  the holiday outfit and `fit()` are exactly as today.
+- `tools/release/a11y.js`: no new screen; the baseline still passes.
+- `node tools/release/perf.js`: the three new hubs and the new dashboard at their request counts.
+
+**Out of scope**: the chat and the Ask icon that takes his place when he is off (part 2); the shop; visiting; any
+change to HP's rules beyond the 100 start; the old pages.
+
+**Done when** (part 4):
+- [ ] On the redesign's pages everyone has Timmy; no adoption anywhere there
+- [ ] He wears what is on at his place, and nothing otherwise, on the bar, on the dashboard, at his place, in the
+      classroom and on the leaderboard's stage
+- [ ] The live pages are unchanged (the smoke test on every hub)
+- [ ] `tools/podcast/LORE.md`: from the redesign on, the student dresses him (the holiday costumes he used to pick
+      himself are canon for the episodes already out); the About drafts in
+      [the release note](2026-11-06-redesign-release.md) say everyone has Timmy and drop "once you adopt Timmy"
+- [ ] A box in the release note: at the release `everyone` becomes the only behavior and the adoption code comes out
+- [ ] `node tools/release/run.js` once; screenshots to Sam; the hand-off in phase 4's Log
+
 ## Done when
 
 - [x] Sam's calls written down (this note, [decisions](../decisions.md), the privacy rule)
@@ -259,6 +344,7 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
             his place (`shop.equipped.outfit` in the v2 bootstrap; `SH_PLACE.dress()` or `SH_OUTFITS.dress()` draws
             it). Part C of phase 4 left pet.js untouched, so today only the place itself shows it
             ([the place](2026-11-06-redesign-timmys-place.md), 2026-11-12)
+      - [ ] as "Build spec, part 4" above says (its own Done when)
 - [ ] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
       answered by Claude, Anthropic's AI) in the release note's drafts
 - [ ] CI and `node tools/release/run.js` pass; Sam's look on the screenshots (a preview only if Sam wants one)
@@ -300,9 +386,41 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
   $1.23). Reports: branch `claude/timmy-eval-run-1`, `tools/timmy/runs/` (not merged). Part 1 is done. Sam: "dont
   bother with the rerun before release" ([decisions](../decisions.md)): the eval runs again only after a change to
   `RULES`, the schema, the effort level or the model.
+- 2026-11-12 (Claude Code, planning only): part 4's build spec is above ("Timmy everywhere": everyone has Timmy, and
+  he wears only what the student put on, Sam's call that day), with the prompts for parts 2, 3 and 4 at the end of
+  this note. Where it sits among the sessions left: [phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here
+  to the release" (part 4 before part 2, so the chat is built on a Timmy who is always there). For part 2: an idea
+  Timmy drafts is posted with source `board`, because the pending `post_idea` refuses `timmy`.
 
 ## Outcome
 
 Related: [the release](2026-11-06-redesign-release.md) · [phase 4](2026-11-05-redesign-phase-4-game-layer.md) ·
 [Ask the Hub](done/2026-11-06-ask-the-hub-assistant.md) · [learner-data-privacy](../rules/learner-data-privacy.md) ·
 [decisions](../decisions.md)
+
+## Opening prompts
+
+Part 4, Timmy everywhere (after the shop's client is merged):
+
+> Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then "From here to the release" in
+> `vault/tasks/2026-11-05-redesign-phase-4-game-layer.md` and its Log's last entries, then do **"Build spec, part 4:
+> Timmy everywhere"** in `vault/tasks/2026-11-12-redesign-ask-timmy.md`. Grep the big files (`widget/pet.js` is 180 KB),
+> never read them whole. No subagents. The live pages must behave exactly as today. `migration_v54.sql` is not applied
+> and is not to be changed: if the client disagrees with it, tell me. No hosted preview: screenshots from a scripted
+> browser on the preview's made-up data. Open a draft PR with the test report; I'll say "merge".
+
+Part 2, the chat (after part 4 is merged):
+
+> Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then "From here to the release" in
+> `vault/tasks/2026-11-05-redesign-phase-4-game-layer.md`, then do **part 2** of
+> `vault/tasks/2026-11-12-redesign-ask-timmy.md` (the chat in the new pages), from its "Where it plugs in" and
+> `vault/reference/ask-timmy.md`. Everyone has Timmy now, so the Ask icon takes his place only when he is turned off
+> or in Focus mode. An idea he drafts posts with source `board`. Grep the big files, never read them whole. No
+> subagents. Neither pending migration is applied or changed. No hosted preview. Open a draft PR with the test report.
+
+Part 3, the admin page's Timmy tab (any time; it touches only `review/`):
+
+> Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then do **part 3** of
+> `vault/tasks/2026-11-12-redesign-ask-timmy.md` (the admin page's Timmy tab), from its "Where it plugs in" and
+> `vault/reference/ask-timmy.md`. Grep `review/index.html`, never read it whole. No subagents. Neither pending
+> migration is applied or changed. Per-person rows stay behind the admin secret. Open a draft PR with the test report.

@@ -35,6 +35,10 @@ task is the one PR that then switches the site over. If something goes wrong, re
 
 ## Done when
 
+- [ ] Every session before this one is merged: 1 to 9 in [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s
+      "From here to the release" (the shop's art and client, Timmy everywhere, visiting, the bowling egg, the trophy
+      case and the cards, Ask Timmy's chat, the wiring, phase 5 part 2), and beside them Ask Timmy's admin tab and
+      Learn and Flashcards (planned with Sam, 2026-11-12)
 - [ ] Sam has used the whole redesign on the preview and says it's ready
 - [ ] One PR: the dashboard and each live hub's address serve the new versions (the new pages take the old ones' place,
       same addresses, so bookmarks and the home-screen app keep working)
@@ -64,7 +68,14 @@ task is the one PR that then switches the site over. If something goes wrong, re
       ([to-do](2026-11-12-audio-off-at-archiving.md)). High yield's recordings (`<lecture>-hy.mp3`) come off with the rest;
       the build's `hyAudio` then lists none by itself (`tools/hub-next/build.mjs` checks the files)
 - [ ] The game layer's wiring left by phase 4, part A (2026-11-12, "From phase 4, part A" below): the arcade's
-      sessions and pick indexes, Timmy Time's minutes, the journey trophies in the trophy case, the scenes' sound
+      sessions and pick indexes and Timmy Time's minutes are [their own session](2026-11-12-redesign-game-layer-wiring.md)
+      before this one (Sam, 2026-11-12); the journey trophies join the case in
+      [the trophy case's session](2026-11-12-redesign-trophy-case-and-cards.md); the scenes stay silent. Left for
+      this PR: each episode's length loaded (`admin_set_podcast_episode`) and the service worker's lists
+- [ ] From the planning of 2026-11-12 ("What Sam's calls of 2026-11-12 change" below): `widget/pet.js`'s
+      `everyone` becomes the only behavior and the adoption code comes out, with the day the redesign went live set
+      in its constant; the prices Sam wants changed are changed with `admin_upsert_shop_item` once the migration is
+      applied ([the shop](2026-11-06-redesign-timmy-shop.md), "Prices to change after the release")
 - [ ] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"; the steps: [ask-timmy](../reference/ask-timmy.md)): Sam has saved the API key in Supabase and
       set the Console's spending limit; the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
       function reads the content from its released place; everyone has Timmy
@@ -450,6 +461,27 @@ his house card; the tap surprises go inside a `spoil` element):
 - **His health shows in how he moves** at his place (bouncing when sparkling, on the doorstep when he needs
   treatment), the same HP as everywhere else. A visitor never sees it: a visited Timmy is always drawn well.
 
+### What Sam's calls of 2026-11-12 change in the drafts above
+
+The sessions that build each part fix the drafts they make untrue; this is the list, so none is missed.
+
+- **Everyone has Timmy** ([Timmy everywhere](2026-11-12-redesign-ask-timmy.md)): "once you adopt Timmy" goes from
+  the place's About draft and from anywhere else it appears; the About page's adoption entry goes.
+- **Timmy wears only what the student put on** (Sam: "if someone doesnt have a costume applied, they are naked. What
+  you put wins"): the place's "Seasons" draft keeps the yard and the holiday props but no longer says the place
+  "dresses up with him"; the About page's lines on Timmy's holiday outfits are rewritten (they are in his wardrobe
+  now: the seasonal sets); `LORE.md`'s "he can't pick one" is canon for the episodes already out, and from the
+  redesign on the student dresses him. Rare costumes turn up at the shop; he doesn't wear one by himself.
+- **The trophy count** is 28, 15 of them secret (24, the three journey trophies and Bowling): "From phase 4, part
+  A" says 27 and 14. The Bowling trophy is kept on the device until the first migration after the release, so it
+  shows no share of the class at first ([the bowling egg](2026-11-06-redesign-bowling-egg.md)).
+- **New drafts to come**, each written by its session under its own heading here: part B (Shiny Gold Crowns, the
+  shop, rarity, snacks, boosts; rare costumes in a spoiler), part D (the bowling egg, in a spoiler), visiting, the
+  trophy case.
+- **Which hub is switched**: with no date and ten sessions to go, the release comes after Perio's final (Nov 19), so
+  it switches the dashboard and whichever hub is live then. Sam hasn't named the hub that follows Perio: ask at the
+  start of the release session, and build that hub on the engine from the start.
+
 ### From phase 5, part 3 (the game layer's server, [game-server](../reference/game-server.md))
 
 `migration_v54.sql` is written and tested, not applied. At the release, in this order:
@@ -602,5 +634,9 @@ is in [its own note](2026-11-06-idea-board.md).
   first step); the service worker's list for them is above ("The engine's files").
 - 2026-11-12: High yield narrated with Kokoro for all three hubs (21 lectures), played with Follow along where it
   matches today's High yield ([task](done/2026-11-12-high-yield-narration.md)); the drift rule covers it.
+- 2026-11-12 (Claude Code, planning only): the sessions from here to this one are in order in
+  [phase 4](2026-11-05-redesign-phase-4-game-layer.md) ("From here to the release"), each with a build spec; this
+  note's Done when names them, and "What Sam's calls of 2026-11-12 change in the drafts above" lists the drafts they
+  make untrue. Part C ([#335](https://github.com/smcmurry6-source/study-hubs/pull/335)) merged the same day.
 
 ## Outcome

@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: open
 hub: widget
 created: 2026-11-12
 requested-by: Claude Code (found building Timmy's place, part C of phase 4)
 due: before the redesign's release
-waiting-on: Sam (draw them, or take them out of the catalog)
+waiting-on: 
 agent: 
 pr: 
 ---
@@ -37,7 +37,14 @@ Every outfit the shop can sell is one Timmy can be drawn in. Today five can't be
 - The five **rare costumes** (`pirate`, `astronaut`, `detective`, `chef`, `captain-enamel`) are also in the catalog
   and not drawn yet. That one is known: it is the shop note's first Done-when box ("the rare costumes"), part B's art.
 
-## The two ways, Sam's call
+## Sam's call (2026-11-12): draw them
+
+Sam chose the first way ([decisions](../decisions.md)): **the five are drawn**, in the shop's art session, with the
+five rare costumes, on one contact sheet for his yes. The migration is not changed. The build spec is
+[the shop](2026-11-06-redesign-timmy-shop.md)'s "Build spec, session 1: the shop's art" (item 5 there), and that
+session ticks this note's boxes and moves it to `done/`. In the bug log this is BUG-090.
+
+## The two ways, as they were asked
 
 1. **Draw them**: five outfits in the kit's style (hat or eyewear, body, how they sit with the loupes), a contact sheet
    on the design page for Sam's yes, then into `place.mjs` and the generated files. No change to the migration.
@@ -47,16 +54,22 @@ Every outfit the shop can sell is one Timmy can be drawn in. Today five can't be
 
 ## Done when
 
-- [ ] Sam picks one
-- [ ] Either the five are drawn, approved and built (`node tools/figures/site/build.mjs`), or their rows are gone
+- [x] Sam picks one (2026-11-12: draw them)
+- [ ] The five are drawn, approved and built (`node tools/figures/site/build.mjs`)
 - [ ] `tools/release/xp.js`'s kit-against-catalog check expects no undrawn outfit, and passes
 - [ ] The shop note and [game-server](../reference/game-server.md) say which
 
 ## Log
 
 - 2026-11-12 (Claude Code): written from part C; told Sam in the hand-off.
+- 2026-11-12 (Claude Code, planning only): Sam: draw them. The spec is the shop's art session.
 
 ## Outcome
 
 Related: [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [Timmy's place](2026-11-06-redesign-timmys-place.md) ·
 [game-server](../reference/game-server.md) · [the release](2026-11-06-redesign-release.md)
+
+## Opening prompt
+
+This note has no session of its own: it is done by the shop's art session. Its prompt is the first one at the end of
+[the shop's note](2026-11-06-redesign-timmy-shop.md).
