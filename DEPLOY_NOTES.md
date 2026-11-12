@@ -47,8 +47,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   bicarbonate, mouth rinses, the summary slide; `nc-rda-seal` and `nc-erosion-sites` are new; the "Recording" badge is gone. Narration:
   L10 and L9 at all three levels from `next/content/notes.json`; the lexicon gained Abou-Arraj, Waerhaug and others. The new
   Occlusion's hint headings say "the professors". About page: an L10 sentence in Diagrams. Occlusion's page is 1470 KB over the
-  wire, so its budget went from 1395 to 1480 KB (BUG-084; Sam's "merge when ready"). The site is 760 MB, past `size.js`'s 750 MB warning; no
+  wire, so its budget went from 1395 to 1480 KB (BUG-087; Sam's "merge when ready"). The site is 760 MB, past `size.js`'s 750 MB warning; no
   archived hub still has audio. Task: [done](vault/tasks/done/2026-11-10-occlusion-l9-follow-ups.md).
+- **2026-11-12 (Ask Timmy's server, part 1, Claude Code)** — Nothing students see changes yet: this is the server half of
+  [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md), which goes live with the redesign. The Supabase Edge Function
+  `timmy` (`supabase/functions/timmy/`: the logic in `core.js`, the Deno wrapper in `index.ts`, the site help in
+  `site.json`, built from the About page by `tools/timmy/build.mjs` with the spoilers left out) answers from a hub's own
+  notes, review tables, cram sheet, Exam Hints and High likelihood topics with Claude Opus 5.5, every point linked to the
+  paragraph it came from and every quote checked against it; it declines graded quiz questions and unanswered practice
+  questions, offers a report or an idea-board post, and naps at 40 questions a person a day or the site's $10 a day.
+  `migration_v55.sql` (pending until the release, with v54) stores the chats and adds the students' calls (history,
+  thumbs, what they did with an offer, and the Report button Sam asked for, which sends a usual report the Inbox answers)
+  and the admin tab's reads. Tests: `tools/timmy/test.mjs` (paragraph links against the engine's own numbering in
+  Chromium), `tools/release/timmy.js` (the database), and `tools/timmy/eval.mjs` with a 134-case test set (`--dry` in CI;
+  the real-API run, all 134 cases for $11.71, passed once its fixes were in: choices named by their words, not letters,
+  since the card shuffles them; a short exam fact quotable whole). How it all works: [ask-timmy](vault/reference/ask-timmy.md).
+
 - **2026-11-12 (the redesign's three journeys, client side: phase 4, part A, Claude Code)** — Nothing students see
   changes: it runs only on the new pages (`hubs/<id>/next/`, `next/`, shown in a preview) and only once the database
   has migration_v54, which is still **not applied**. The rank ladder becomes three journeys (Handpiece, then the

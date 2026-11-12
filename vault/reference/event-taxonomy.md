@@ -117,6 +117,20 @@ more people, never for anything about a person.
 | `ideas` | one idea: visitor (none for starters), leaderboard name, title, body, hub, category, source, status, hidden | yes | `post_idea`, `admin_post_starter_idea` | **Public to the class under the poster's name** (no id is ever sent back). `source`: `board`, `suggest`, `checkin`, `starter`. An author's delete (`delete_my_idea`) removes the row with its votes, reports and notes |
 | `idea_votes` / `idea_reports` / `idea_notes` | visitor × idea: up or down; a report; a status note for the Inbox | yes | `vote_idea`, `report_idea`, `admin_set_idea` | Three reports hide an idea |
 
+### Ask Timmy (migration_v55, from the redesign's release; [ask-timmy](ask-timmy.md))
+
+Timmy's chats are stored whole, with the visitor id (Sam, 2026-11-12: "store all chat logs with timmy";
+[learner-data-privacy](../rules/learner-data-privacy.md)): the one place besides search terms where what a student typed is
+kept. Only the admin page reads them (behind the admin secret, with no visitor id in what it returns); a browser reads only
+its own (`get_timmy_history`). Quote them only as short paraphrases, totals over 5 or more people.
+
+| Table | Grain | Visitor | Written by | Notes |
+|---|---|---|---|---|
+| `timmy_chats` | one chat: visitor, hub (or `dashboard`), started, last message, count | yes | `timmy_begin` (the `timmy` Edge Function, service role) | Moved to the remaining id when devices link |
+| `timmy_messages` | one message, the student's or Timmy's: the text, its kind; for a question the page context (view, lecture, paragraph, voice, the answered question's id and pick, how many lectures of progress), the exact turn sent and the request id; for an answer the JSON reply, the raw model output, quotes that checked and didn't, the offer and what the student did with it, a thumb, a report, the model, tokens, estimated cost, time to answer, Central `day` | via the chat | `timmy_begin`, `timmy_finish`; `timmy_thumb`, `timmy_offer`, `timmy_report` | Kinds: `answer`, `not_covered`, `quiz_declined`, `hint_declined`, `off_topic`, `support`, `refusal`, `error`. The context never holds free text beyond the question itself |
+| `timmy_config` | one row: on or off, the day's cap in dollars, questions a person a day | no | the migration, `admin_timmy_config` | |
+| `question_flags` (a Timmy report) | the usual report row, its note ending `— Timmy's answer <id> · <section>` | yes | `timmy_report` | The chat's Report button; the answer keeps `report_id` |
+
 ## Naming conventions
 
 ### Sections (`activity_pings.section`, `ui_clicks.section`)
