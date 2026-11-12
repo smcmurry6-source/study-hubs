@@ -7,7 +7,8 @@
      masthead scene, the countdown on a tile with a bead for each day left, your progress ring, Start studying, the
      Daily drill, exam-day luck; then Timmy Time, what the hub covers and its check-ins;
    - one "you" card: your name, Timmy's house (widget/pet.js draws it; Timmy's place takes that spot in phase 4), your
-     handpiece rank, mastery medals, day streak and the week as dots;
+     handpiece rank, mastery medals, day streak and the week as dots. Ask Timmy (widget/ask.js) is "Ask me" in his house,
+     or an "Ask the hub" button in #askSpot when he isn't there; on the dashboard he answers from every live hub;
    - the class: who is studying right now (the live count and a chip for each hub someone is in), then the board
      (ranks or study streaks) with the top three on a podium;
    - the idea board (widget/ideas.js draws it in #ideas once the board's server is there), then past hubs: each
@@ -249,6 +250,7 @@
           '<div class="dx-youhead"><h2 id="youH">You</h2><p class="dx-name" id="youName"></p></div>' +
           '<div class="dx-porch"><p class="note" id="petPerch">Timmy Tooth wants to meet you. Tap him.</p></div>' +
           '<div id="petHome" hidden></div>' +
+          '<div class="dx-ask" id="askSpot" hidden></div>' +
           '<div class="dx-rankcard" id="meRank"></div>' +
           '<ul class="dx-stats" id="youStats"></ul>' +
         "</section>" +
@@ -1022,7 +1024,7 @@
   /* Settings: the same keys the hubs' Settings keep (widget/hub.js and widget/v3.js: keep the three lists in step), so a
      change here shows in every hub. The font choice, background music and the accent metal are cut (plan, 4.6). */
   var EXTRAS = [
-    ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy. Right answers and study streaks keep him healthy.", [["on", "Everywhere"], ["dash", "Dashboard only"], ["off", "Off"]]],
+    ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy: ask him about the notes. Right answers and study streaks keep him healthy. Off, an Ask button takes his place.", [["on", "Everywhere"], ["dash", "Dashboard only"], ["off", "Off"]]],
     ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in each hub's trophy case."],
     ["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online."],
     ["sh_pref_fairy", "Tooth Fairy", "Flies across the page now and then. Catch her for the fairy board."],
@@ -1628,6 +1630,13 @@
     /* the anonymous visitor exists before the one load-time request, so a first visit gets the same bootstrap as a returning one */
     VISITOR = surveyVisitor();
     var bootstrap = dashboardBootstrap(sb);
+    /* Ask Timmy (widget/ask.js), before Timmy so his house has its "Ask me": on the dashboard he answers from every live
+       hub (Sam, 2026-11-12: "timmy doesnt ask what hub when on the dashboard"); a link opens that hub's page at it */
+    if (window.shAsk) window.shAsk.mount({ where: "dashboard", sb: sb, name: "Study Hubs", about: C.about || ROOT + "about/",
+      section: function(){ return "dashboard"; },
+      hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: NEXT[h.id] ? ROOT + "hubs/" + h.id + "/next/content/" : null }; }); },
+      href: function(id){ var h = HUBS.concat(ARCHIVED_HUBS).filter(function(x){ return x.id === id; })[0]; return h ? hubHref(h) : ""; },
+      spot: function(){ return $("askSpot"); } });
     /* Timmy (widget/pet.js): until he's adopted he waits on the "you" card's porch (dash.css shows it only while he's
        there), then he lives in the card. He places himself once and on a resize, so tell him when the page above him
        changes height (another hub's tab, a card that loads). */
@@ -1729,7 +1738,7 @@
   /* The page is drawn from this device's own data first. The class's data and the shared widgets (ranks, Timmy, the
      Inbox, click counts) come after, in this order, so the first screen doesn't wait for them on a slow phone. A page
      that lists one of them itself is left alone. */
-  var LATE = ["vendor/supabase-2.117.2.js", "clicks.js", "replies.js", "linkask.js", "ranks.js", "pet.js", "timmy.js", "hub-art/class.js", "ideas.js"];
+  var LATE = ["vendor/supabase-2.117.2.js", "clicks.js", "replies.js", "linkask.js", "ranks.js", "ask.js", "pet.js", "timmy.js", "hub-art/class.js", "ideas.js"];
   function loadLate(done){
     var need = LATE.filter(function(f){ return !q('script[src$="' + f + '"]'); }), left = need.length;
     if (!left) { done(); return; }

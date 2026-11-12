@@ -6,8 +6,8 @@ created: 2026-11-12
 requested-by: Sam
 due: 
 waiting-on: 
-agent: Claude Code (part 1, 2026-11-12)
-pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1)
+agent: Claude Code (parts 1 and 2, 2026-11-12)
+pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1), https://github.com/smcmurry6-source/study-hubs/pull/338 (part 2)
 ---
 
 # Ask Timmy: Timmy becomes every hub's study assistant (redesign)
@@ -336,7 +336,7 @@ change to HP's rules beyond the 100 start; the old pages.
 - [x] Part 1: the test set passes on the real API (every quote checks out, "not covered" when it should be, quiz and
       practice questions declined, offers drafted, no rule broken): the full run on 2026-11-12, its fixes, and a rerun of
       the fixed prompt (Log)
-- [ ] Part 2: the chat on every new hub page and the new dashboard, on a phone and a laptop, with the Report button on
+- [x] Part 2: the chat on every new hub page and the new dashboard, on a phone and a laptop, with the Report button on
       his answers; the smoke test covers it
 - [ ] Part 3: the admin tab
 - [ ] Part 4: everyone has Timmy
@@ -345,7 +345,7 @@ change to HP's rules beyond the 100 start; the old pages.
             it). Part C of phase 4 left pet.js untouched, so today only the place itself shows it
             ([the place](2026-11-06-redesign-timmys-place.md), 2026-11-12)
       - [ ] as "Build spec, part 4" above says (its own Done when)
-- [ ] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
+- [x] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
       answered by Claude, Anthropic's AI) in the release note's drafts
 - [ ] CI and `node tools/release/run.js` pass; Sam's look on the screenshots (a preview only if Sam wants one)
 - [ ] At the release, as above
@@ -391,6 +391,23 @@ change to HP's rules beyond the 100 start; the old pages.
   this note. Where it sits among the sessions left: [phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here
   to the release" (part 4 before part 2, so the chat is built on a Timmy who is always there). For part 2: an idea
   Timmy drafts is posted with source `board`, because the pending `post_idea` refuses `timmy`.
+- 2026-11-12 (part 2, Claude Code, [#338](https://github.com/smcmurry6-source/study-hubs/pull/338)): the chat. `widget/ask.js` + `widget/ask.css`, mounted by `widget/hub-timmy.js` on a
+  new hub and by `widget/dash.js` on the new dashboard; "Ask me" in Timmy's bubble and house (`widget/pet.js`, only where
+  `window.shAsk` exists, so the live hubs are unchanged); the Ask icon in his spot when he isn't shown; "Ask Timmy" in an
+  answered card's row (`widget/hub-bank.js`); Report on every answer, nap and error; report and idea drafts (an idea
+  posts with source `board`, as the planning entry above says: neither pending migration is changed); the preview's canned replies; `tools/ci/smoke.js`'s `askCheck`. How it fits together:
+  [ask-timmy](../reference/ask-timmy.md), "The chat in the new pages". The About page's entries and the release steps
+  (`sw.js`'s `PRECACHE`, one live question on a phone and a laptop, `site.json` rebuilt after the About edits) are in
+  [the release note](2026-11-06-redesign-release.md), "From Ask Timmy, part 2". Choices made: on the dashboard the Ask
+  button sits in the "you" card where Timmy's house is; a link from the dashboard's chat opens the hub's new page and
+  then the paragraph (`sessionStorage`); "What should I study tonight?" sends progress only for that question (the
+  starter or a question like it); the chat continues the newest chat under 6 hours old. Built before part 4 because
+  Sam asked for part 2 then: the Ask icon shows whenever Timmy isn't on the page (`html.sh-pet-on` on a hub, the house on
+  the dashboard), so today that includes someone who hasn't met him, and after part 4 only Timmy turned off or Focus
+  mode; nothing in the chat needs changing for part 4. What part 4's session should know: `widget/pet.js` now adds "Ask
+  me" to his tap bubble and his house only where `window.shAsk` exists; the chat waits 6 seconds after load for Timmy
+  before it shows the icon (`timmyDue()` in `widget/ask.js` reads `sh_pet_born` and the setting), which part 4 can
+  simplify. Next: part 4, then part 3.
 
 ## Outcome
 

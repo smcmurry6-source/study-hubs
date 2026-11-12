@@ -10,6 +10,11 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] Ask Timmy's "What should I study tonight?" on the new dashboard reads each hub's progress from this device's saved state
+  (`progressFrom` in `widget/ask.js`), so on a new or linked device it sees nothing until a hub page has synced the answers. Read the
+  student's own answers from the server there instead (their own rows, like the v2 bootstrap), or say "open a hub first" when every
+  hub's state is empty (2026-11-12, [Ask Timmy](2026-11-12-redesign-ask-timmy.md) part 2).
+
 - [ ] Class picks on each choice ignore question versions: `question_choices` (and `question_stats`) are keyed by position, so when
   an edit moves or rewrites choices, last week's percentages show beside a different choice until someone moves or clears the rows by
   hand (2026-11-04 evening lessons audit). Record the version with each pick (`record_choice`, `question_versions.v`) and read only the

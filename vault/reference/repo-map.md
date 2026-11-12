@@ -77,7 +77,8 @@ tags: [map]
   `core.js` (the logic, run under Node by the tests), `index.ts` (the Deno wrapper), `site.json` (the site help, built from
   the About page by `tools/timmy/build.mjs`; rebuild it when `about/index.html` changes). Its tests and eval are in
   `tools/timmy/` (`test.mjs`, `test-set.json`, `eval.mjs`), its database suite is `tools/release/timmy.js`, its tables are
-  `migration_v55.sql`: [ask-timmy](ask-timmy.md).
+  `migration_v55.sql`. Its chat is `widget/ask.js` + `widget/ask.css` (`window.shAsk`), loaded only by the
+  redesign's pages (a new hub through `widget/hub-timmy.js`, the new dashboard through `widget/dash.js`): [ask-timmy](ask-timmy.md).
 - `tools/reddit-scout/` — `scout.py` reads the Claude subreddits' feeds into one digest for `/reddit-scout`
   (`.claude/skills/reddit-scout/`); `log.md` keeps every run's suggestions, Sam's answers and the posts judged.
 - `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new

@@ -270,7 +270,7 @@ clips; the About page.
   nine statues moved a little to the left; the yard's left spot moved forward (`SLOTS.left`) and the path's lamp
   moved down the path (`FIX.lamp`). The lamp was a third thing in front of the statue's steps, not named in the bug.
   The build still walks every route (4,500).
-- **Left open** (BUG-091, Sam's call): a tall piece in "By the path, right" (the mailbox, the fountain, the
+- **Left open** (BUG-095, Sam's call): a tall piece in "By the path, right" (the mailbox, the fountain, the
   telescope) now stands in front of Timmy's gum when he is at the door, where before it stood beside him. His face
   stays clear. That spot was not this session's to move (only the left one was), and it borders the path and the lane.
 - **Sizes**, compressed: the kit `widget/hub-art/place.js` 77.1 to 80.6 KB; `widget/hub-art/outfits.js` 29.7 to
@@ -454,7 +454,7 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
   five rare costumes, and Timmy's door spot in all 22 homes; what it built and what session 2 needs from it is "What
   session 1 built", above. The frames and the regular coin are round 3's drawings, moved from the place's kit into
   `shop.mjs`. Nothing disagreed with `migration_v54.sql`, and it is unchanged. `tools/release/xp.js`: 358 checks (no
-  undrawn outfit, the five costumes, the shelf's thumbnails against the catalog). One thing left open: BUG-091.
+  undrawn outfit, the five costumes, the shelf's thumbnails against the catalog). One thing left open: BUG-095.
 - 2026-11-12 (Claude Code), same session, after the sheets: Sam: "I want the shop ui to be more epic". The design
   page's shop is redrawn as a storefront, a showcase and fuller shelves (new art: `store()` and `stand()` in
   `shop.mjs`; "The shop's look", above), still no client code. Sent to Sam as screenshots at 1280 and 390 px, light

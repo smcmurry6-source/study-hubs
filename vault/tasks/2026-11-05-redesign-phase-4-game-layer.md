@@ -54,7 +54,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 | 4 | **Visiting**: a row on the new dashboard's boards opens that person's place | [visiting](2026-11-12-redesign-visiting.md) | 3 |
 | 5 | **The bowling egg** (part D) | [the bowling egg](2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
 | 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12) | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
-| 7 | **Ask Timmy, part 2** (the chat) | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), its code map; its prompt is at the end of that note | 3 |
+| 7 | **Ask Timmy, part 2** (the chat). **Built 2026-11-12, ahead of its turn** (Sam asked for it then): the Ask icon shows whenever Timmy isn't on the page, so it works before and after session 3 | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), its Log | (3) |
 | 8 | **The game layer's wiring** left by part A: the arcade's sessions, Timmy Time's minutes, the service worker's lists | [the wiring](2026-11-12-redesign-game-layer-wiring.md) | 6 |
 | 9 | **Phase 5, part 2**: bundles, one stylesheet, the font, budgets lowered | [phase 5](2026-11-05-redesign-phase-5-backend.md) | every session that adds a file (1 to 8) |
 | 10 | **The release** | [the release](2026-11-06-redesign-release.md) | all of the above, and Sam's look at the whole thing on its preview |
@@ -265,6 +265,12 @@ These hold for each spec; a spec only adds to them.
   refuses a new trophy kind as written, so the bowling trophy is kept on the device until the first migration after
   the release ([game-server](../reference/game-server.md)). The arcade lobby box is ticked: phases 1 and 2 did it.
   **Next: session 1, the shop's art.**
+- 2026-11-12 (Claude Code): **session 7, Ask Timmy's chat, was built ahead of its turn**, because Sam asked for part 2
+  then ([its Log](2026-11-12-redesign-ask-timmy.md)). It doesn't need session 3: the Ask icon takes Timmy's spot
+  whenever he isn't on the page. Sessions 2 and 3 edit `widget/pet.js` after it: it adds "Ask me" to Timmy's tap
+  bubble and his house, only where `window.shAsk` exists. Session 9 counts its two files (`widget/ask.js`,
+  `widget/ask.css`; the stylesheet loads only when the chat is drawn). It also fixed BUG-086 (`widget/hub.css` makes an
+  empty `<i>` upright, so the new dashboard no longer downloads the italic font).
 - 2026-11-12 (Claude Code), **session 1, the shop's art**
   ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)). Art only: no client code, nothing students
   see, `migration_v54.sql` unchanged (nothing disagreed with it). **Hand-off for session 2**: "What session 1 built"
@@ -276,7 +282,7 @@ These hold for each spec; a spec only adds to them.
   - the ten outfits are `SH_PLACE.OUTFITS` entries keyed by the shop's id, a costume marked `costume: true`; four
     are on `NO_LOUPES` (safety glasses, pirate, astronaut, Captain Enamel);
   - Timmy's door spot moved in all 22 homes (BUG-089 closed), with the left yard spot, the path's lamp and nine
-    statues; BUG-090 closed; BUG-091 opened (a tall piece right of the path now stands in front of Timmy's gum at
+    statues; BUG-090 closed; BUG-095 opened (a tall piece right of the path now stands in front of Timmy's gum at
     the door: Sam's call);
   - sizes, compressed: the kit 77.1 to 80.6 KB, `outfits.js` 29.7 to 33.6 KB, `shop.js` 11.4 KB, none loaded with a
     page; `tools/release/xp.js` 358 checks; `widget/hub-art/shop.js` is in `tools/ci/syntax.js`'s list. Session 2's
