@@ -1012,14 +1012,17 @@
       stage.addEventListener("click", function(e){ if (e.target.closest("[data-back]")) { e.stopPropagation(); e.preventDefault(); back(); } }, true);
     }).catch(function(e){ body.innerHTML = "<p>Couldn't load the arcade. Check your connection.</p>"; if (window.console) console.error(e); });
   }
+  /* the rank comes from the server after the page is up, and again as you answer: Stats shows it as it changes */
+  document.addEventListener("sh:rank-profile", function(){ setTimeout(function(){ var g = $(".more-body .stats-grid"); if (g && g.parentNode) moreStats(g.parentNode); }, 0); });
   function moreStats(body){
     var rows = LECS.map(lecProgress), answered = ANSWERED ? STATE.totalSeen : STATE.totalAnswered, rightN = STATE.totalCorrect, acc = answered ? Math.round(STATE.totalCorrect / answered * 100) : null;
     /* Perio's shape counts each question once, the first time it's right: show right on the latest try instead */
     if (ANSWERED) { var tr = 0, rt = 0; Object.keys(STATE.answered).forEach(function(id){ var r = ansOf(id); if (r) { tr++; if (r.last) rt++; } }); rightN = rt; acc = tr ? Math.round(rt / tr * 100) : null; }
-    var x = HX.rankXp(), p = HX.RANK.p, days = Object.keys(HX.goalDays()).length;
+    var x = HX.rankXp(), p = HX.RANK.p, days = Object.keys(HX.goalDays()).length, game = HX.gameOn() && p && p.journey != null;
     body.innerHTML = '<div class="stats-grid">' +
-      '<section class="panel" aria-labelledby="srH"><h2 id="srH">Your rank</h2><div class="rank-big"><span class="hp" aria-hidden="true">' + (window.shRanks ? window.shRanks.art(p ? p.tier || 0 : +(ls("sh_rank_tier") || 0), 64) : "") + "</span><div><p class=\"rank-name\">" + esc(HX.rankName()) + '</p><p class="num">' + (x === null ? "+" + fmt(HX.todayRec().xp) + " XP today" : fmt(x) + " XP" + (p && p.next_at ? " · " + fmt(p.next_at - x) + " to the next level" : "")) + "</p></div></div>" +
-        '<p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study (answer XP tops out at 600 a day).</p>' +
+      '<section class="panel" aria-labelledby="srH"><h2 id="srH">Your rank</h2><div class="rank-big"><span class="hp" data-rankart="64" aria-hidden="true">' + HX.rankArt(64) + "</span><div><p class=\"rank-name\">" + esc(HX.rankName()) + '</p><p class="num">' + (x === null ? "+" + fmt(HX.todayRec().xp) + " XP today" : fmt(x) + " XP" + (p && p.next_at && p.next_at > x ? " · " + fmt(p.next_at - x) + " to the next level" : "")) + "</p></div></div>" +
+        (game ? '<div data-road></div><p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study. A question pays its first three right and its first three wrong answers a day. More comes from the day\'s 20th answer, fixing a miss, a finished mock exam and every mastery medal, which also starts 24 hours of double XP.</p>'
+          : '<p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study (answer XP tops out at 600 a day).</p>') +
         '<button class="btn" type="button" data-open-stats>' + icon("trophy", 18) + "Trophies and leaderboards</button></section>" +
       '<section class="panel" aria-labelledby="ssH"><h2 id="ssH">Your answers</h2><dl class="kv">' +
         "<div><dt>Answered</dt><dd class=\"num\">" + fmt(answered) + "</dd></div><div><dt>" + (ANSWERED ? "Right on the latest try" : "Right") + "</dt><dd class=\"num\">" + fmt(rightN) + (acc !== null ? " · " + acc + "%" : "") + "</dd></div>" +
@@ -1030,6 +1033,13 @@
       '<section class="panel wide" aria-labelledby="saH"><h2 id="saH">Achievements</h2><ul class="ach">' + (CORE.achievements || []).map(function(a){ var got = achMap()[a.id]; return '<li class="' + (got ? "got" : "") + '">' + icon(got ? "check" : "goal", 20) + "<span><b>" + esc(a.name) + "</b><small>" + esc(a.desc) + (typeof got === "string" ? " · " + esc(dateLabel(got)) : "") + "</small></span></li>"; }).join("") + "</ul></section>" +
       "</div>";
     $("[data-open-stats]", body).addEventListener("click", function(){ var b = document.getElementById("shstat-stats-pill"); if (b) b.click(); track("more:trophies"); });
+    /* the road ahead: the three journeys, where you are on yours and what the next one is (widget/journeys.js, loaded here) */
+    var road = $("[data-road]", body);
+    if (road && window.shRanks && window.shRanks.journeys) window.shRanks.journeys(function(J){
+      if (!J || !road.isConnected) return;
+      var q = {}, k; for (k in p) q[k] = p[k]; q.xp = x === null ? p.xp || 0 : x;
+      road.innerHTML = '<h3 class="road-h">The road ahead</h3>' + J.road(q);
+    });
   }
   /* Settings: the cuts (font, background music, accent metal) are gone; text size and theme stay, plus the goal.
      The extras use the same keys as widget/v3.js (EXTRAS) and the dashboard: keep the three in step. */
@@ -1247,6 +1257,8 @@
     sb.onload = sb.onerror = function(){
       var s = document.createElement("script");
       s.src = WIDGET + "v3.js"; s.setAttribute("data-hub", HUB); s.setAttribute("data-answered-event", EVT); s.setAttribute("data-default-mode", "home");
+      /* the game layer: v3.js asks the database for it and works as on the live hubs until it is there */
+      s.setAttribute("data-game", "v2");
       s.onload = function(){
         /* Report and Pin on every card, as on the live hubs (the class picks are the engine's own: classPicks) */
         if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]");

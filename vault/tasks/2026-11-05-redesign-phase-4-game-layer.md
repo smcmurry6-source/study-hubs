@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on:
 agent: Claude Code
-pr: https://github.com/smcmurry6-source/study-hubs/pull/330
+pr: https://github.com/smcmurry6-source/study-hubs/pull/332
 ---
 
 # Redesign phase 4: the game layer's presentation
@@ -106,5 +106,43 @@ Put the ranks, trophies and celebrations on the design system without changing t
     what the engine shows of Timmy, `widget/pet.js` for the renderer; a new page in More also needs its row in the
     core's `MORE` list and its entry in `renderMore`'s map (call the part's function as `HX.<name>`).
     [Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md): `widget/hub-bank.js`.
+- 2026-11-12: [#330](https://github.com/smcmurry6-source/study-hubs/pull/330) merged as `56a1fd9`, and `node tools/release/postcheck.js` passed (7 of 7 changed files live and identical to `main`; the dashboard and the three live hubs open with no errors).
+- 2026-11-12 (Claude Code, **part A, the journeys' client; hand-off**, [#332](https://github.com/smcmurry6-source/study-hubs/pull/332);
+  the split was [#330](https://github.com/smcmurry6-source/study-hubs/pull/330)). What was built, the calls Sam
+  answered and the five points where the client meets the server are in [the journeys note](2026-11-06-redesign-progression-journeys.md)
+  (its Log and "Open calls"). Nothing students see changes, and migration_v54 is still pending.
+  - **What every later part can use**:
+    - `window.shGame` (`widget/v3.js`, only where the page's widget tag has `data-game="v2"`, which the engine writes):
+      `v2()` (true once the database answered with a v2 profile), `boost()` (the running double XP or null),
+      `startSession(kind, game)` and `finishSession(id, score, total)` (a promise of the session's id, then of what
+      the finish paid; the finish waits for that session's answers to arrive). In the engine: `HX.gameOn()`, `HX.boost()`.
+    - **An answer under the game layer is `HX.recordAnswer(qid, lec, right, ctx, choice, picks, { order, session })`**:
+      give a one-choice question its pick index, select-all its picks, a sequence its order. The server's reply comes
+      as the `sh:answer-paid` event (`{ qid, ctx, session, res }`; `res` is `record_answer_v2`'s answer); a finished
+      session's as `sh:session-paid`. `widget/hub-rewards.js` already turns both into the pill's total, today's XP and
+      a toast, so a part that pays something new (a purchase, a game) only needs its own line there.
+    - **Ranks past the Handpiece**: `shRanks.nameOf(profile)`, `artOf(journey, tier, px, opt)`, `miniOf(journey, tier,
+      level)`, `legacy(profile)` (the Handpiece's own rank, for anything that reads tiers 0 to 6), `needJourneyArt(cb)`
+      and `journeys(cb)` (load the drawings, or the scenes too, on first use). `HX.rankArt(px)` draws your medallion;
+      any element with `data-rankart="<px>"` is repainted with it.
+    - **Scenes**: `shJourneys.handoff(d, done)`, `dark(d, done)`, `road(profile)`, `still(kind, d)`; ranks.js queues a
+      scene behind the rank-up cards with `rankup.js`'s new `scene(run)`. A full-screen moment for the shop or the
+      place can be queued the same way so two never overlap.
+    - The preview answers the game layer's calls from made-up data (`tools/preview/runtime/preview.js`: `answer2`,
+      `rank2`, sessions, the unlock mark) and takes `?xp=<n>`.
+  - **Request budgets are where the split left them** (Occlusion 20 of 21, Heme & Endo Exam 2 20 of 22, Perio 18 of
+    21): the journeys' two files load on first use. The same goes for anything parts B to D add.
+  - **Parts B and C with the bowling egg start from**: this entry; `widget/hub-timmy.js` (what the engine shows of
+    Timmy) and `widget/pet.js` (the renderer). For **the shop** ([note](2026-11-06-redesign-timmy-shop.md)): the
+    bootstrap already carries `shop` when the game layer is on (`window.shBootstrap.data.shop`); a shop boost comes back
+    in the profile's `boost` and the pill's chip shows it with no more work (`src` says which kind); a rank-up's +20
+    crowns is the server's. For **Timmy's place** ([note](2026-11-06-redesign-timmys-place.md)): the old house card
+    reads `sh_rank_tier`, which stays at 6 past 125,000 (`legacy()`), so the journey's pieces (the ModuPro on the porch,
+    Timmy in loupes, the rank sets for the later journeys) are drawn from the v2 profile's `journey` and `gtier`
+    (0 to 20), which `sh:rank-profile` hands every listener. For **the bowling egg** ([note](2026-11-06-redesign-bowling-egg.md)):
+    nothing here is in its way; if it pays XP it needs a session or an award on the server, which would be a change to
+    the migration, so ask Sam first.
+  - **Still open in this note**: parts B, C and D, the arcade lobby, the cards' and the cutscene's recording on a
+    preview, the About page (drafted in [the release note](2026-11-06-redesign-release.md), "From phase 4, part A").
 
 ## Outcome

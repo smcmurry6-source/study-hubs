@@ -538,3 +538,57 @@ export const TROPHIES = {};
 const PARTS = {};
 KEYS.forEach((k) => { PARTS[k] = S[k](); TROPHIES[k] = { body: body(PARTS[k]) }; });
 export function silhouette(key){ return PARTS[key] ? sil(PARTS[key]) : ""; }
+
+/* ---------------- the journey trophies (redesign phase 4, part A): one for each equipment journey finished, its
+   object with a gold star. The server gives them as journey-0, journey-1 and journey-2 (migration_v54). They are not
+   in widget/ranks.js's live list, so they have their own export; their names are in journeys.mjs. ---------------- */
+const DONE = (cx, cy) => F(star(cx, cy, 8.6, 3.9), C.gold, { w: 1.9, shade: "M" + P(cx, cy - 8.6) + "L" + P(cx + 2.4, cy - 2.9) + "L" + P(cx + 8.2, cy - 2.6) + "L" + P(cx + 3.7, cy + 1.4) + "L" + P(cx + 5.1, cy + 7) + "L" + P(cx, cy + 3.9) + "Z", sh: C.goldShade, op: .4 });
+const J = {};
+/* the Handpiece: a contra-angle high-speed handpiece, head down and to the left, bur in its head */
+J["journey-0"] = () => [
+  L("M16.4 46.6 L19.2 54.6", 2.6),
+  F("M49.2 10.6 L55.4 5.4 C57 4 59.2 4.4 60.2 6 C61.2 7.6 60.8 9.4 59.4 10.6 L53.2 15.8Z", C.metalShade, { w: 2.2 }),
+  F("M24.4 31.4 L47.4 12 C49.4 10.4 52.2 10.8 53.8 12.8 C55.4 14.8 55 17.6 53 19.2 L30.4 38.8Z", C.metal,
+    { shade: "M27.8 35.6L51 16.4C52.6 15 53.6 13.6 53.8 12.8C55.4 14.8 55 17.6 53 19.2L30.4 38.8Z", sh: C.metalShade, op: .5, hi: "M29 30.4L44.6 17.2",
+      inner: line("M33.8 26.6L37.6 31.4M36.6 24.2L40.4 29M39.4 21.8L43.2 26.6", 1.5) }),
+  F("M24.4 31.4 L30.4 38.8 C27 41 23.6 42.6 20 43.6 L17 39.6 C19 36.6 21.4 33.8 24.4 31.4Z", C.metal, { w: 2.2, shade: "M27.6 35.4L30.4 38.8C27 41 23.6 42.6 20 43.6L18.6 41.8C22 40.2 25 38 27.6 35.4Z", sh: C.metalShade, op: .5 }),
+  F("M9.6 39.4 C8.4 37.4 9 35 11 33.8 L14.6 31.6 C16.6 30.4 19 31 20.2 33 L23.6 38.6 C24.8 40.6 24.2 43 22.2 44.2 L18.6 46.4 C16.6 47.6 14.2 47 13 45Z", C.metalLight,
+    { shade: "M17.4 31.6C18.6 31.6 19.6 32.2 20.2 33L23.6 38.6C24.8 40.6 24.2 43 22.2 44.2L18.6 46.4C17.6 47 16.6 47.2 15.6 47C19.4 43.6 20.6 37.6 17.4 31.6Z", sh: C.metalShade, op: .45 }),
+  DONE(46, 44)
+];
+/* the ModuPro: a typodont from the side, jaws a little open on the hinge at the back */
+J["journey-1"] = () => {
+  const up = "M10 25.4 H46 V29.4 C46 31.8 44.4 32.6 43 31.4 L41.5 30 L40 31.4 C38.6 32.6 37 31.8 37 29.4 C37 31.8 35.4 32.6 34 31.4 L32.5 30 L31 31.4 C29.6 32.6 28 31.8 28 29.4 V30.2 C28 32.8 23.6 32.8 23.6 30.2 V31 C23.6 33.6 19.4 33.6 19.4 31 V31.6 L17 35.6 L14.6 31.6 V32.2 C14.6 35 10.6 35 10.4 32.2Z";
+  const lo = "M11.4 49.4 H46 V45.4 C46 43 44.4 42.2 43 43.4 L41.5 44.8 L40 43.4 C38.6 42.2 37 43 37 45.4 C37 43 35.4 42.2 34 43.4 L32.5 44.8 L31 43.4 C29.6 42.2 28 43 28 45.4 V44.6 C28 42 23.6 42 23.6 44.6 V43.8 C23.6 41.2 19.6 41.2 19.6 43.8 L17.6 39.6 L15.6 43.8 V43 C15.6 40.6 11.8 40.6 11.6 43Z";
+  return [
+    F("M46.6 13 H52.4 C53.6 13 54.4 13.8 54.4 15 V55 C54.4 56.2 53.6 57 52.4 57 H46.6Z", C.metalShade, { w: 2.2 }),
+    F("M22 7.4 H32 V13 H22Z", C.metalShade, { w: 2 }),
+    F("M8.6 12.4 H48 C49.4 12.4 50 13.2 50 14.4 V16.4 C50 17.6 49.4 18.4 48 18.4 H8.6 C7.2 18.4 6.6 17.6 6.6 16.4 V14.4 C6.6 13.2 7.2 12.4 8.6 12.4Z", C.metal, { w: 2.2, hi: "M10.6 14.4H30" }),
+    F("M9 18.4 H47 V26 H10.4 C8.6 23.6 8.4 21 9 18.4Z", C.gum, { w: 2.2, shade: "M9.4 23.4H47V26H10.4C9.8 25.2 9.6 24.4 9.4 23.4Z", sh: C.gumShade, op: .6 }),
+    F(up, C.enamel, { w: 1.9 }),
+    F(lo, C.enamel, { w: 1.9 }),
+    F("M10.4 49 H47 V56 H10.2 C9 53.6 9.2 51.2 10.4 49Z", C.gum, { w: 2.2, shade: "M9.8 53.4H47V56H10.2C9.8 55.2 9.8 54.4 9.8 53.4Z", sh: C.gumShade, op: .6 }),
+    F("M8.6 56 H48 C49.4 56 50 56.8 50 58 V59.4 C50 60.6 49.4 61.4 48 61.4 H8.6 C7.2 61.4 6.6 60.6 6.6 59.4 V58 C6.6 56.8 7.2 56 8.6 56Z", C.metal, { w: 2.2 }),
+    F(blob(50.6, 37.4, 5.4, 5.4, .2, 31, 10), C.metalLight, { w: 2.2, inner: '<circle cx="50.6" cy="37.4" r="1.6" fill="' + INK + '"/>' }),
+    DONE(54, 14)
+  ];
+};
+/* the Loupes: through-the-lens loupes from the front, two telescopes low in the lenses */
+J["journey-2"] = () => {
+  const lens = (m) => m ? "M60 22.6 H34.6 C33.4 33.6 36.4 44.4 44.6 46 C53.4 47.4 59.8 40.4 60 22.6Z" : "M4 22.6 H29.4 C30.6 33.6 27.6 44.4 19.4 46 C10.6 47.4 4.2 40.4 4 22.6Z";
+  const scope = (cx) => [
+    F(blob(cx, 37.6, 8.8, 8.8, .2, cx, 12), C.plum, { w: 2.2, shade: crescent(cx, 37.6, 8.5, -30, 150, 1.36), sh: INK, op: .35 }),
+    F(blob(cx, 37.6, 5.6, 5.6, .15, cx + 3, 10), "#22303F", { w: 1.6, hi: arc(cx, 37.6, 3.6, 200, 262) })
+  ];
+  return [
+    F(lens(0), C.sky, { w: 2.4, shade: "M4 22.6H29.4C29.8 26 29.8 29.4 29.2 32.6C22 31.6 12 30.6 4.6 29.6C4.2 27.4 4 25 4 22.6Z", sh: "#fff", op: .5 }),
+    F(lens(1), C.sky, { w: 2.4, shade: "M60 22.6H34.6C34.2 26 34.2 29.4 34.8 32.6C42 31.6 52 30.6 59.4 29.6C59.8 27.4 60 25 60 22.6Z", sh: "#fff", op: .5 }),
+    F("M2.6 18.6 C12 16.2 24 16.6 32 19.6 C40 16.6 52 16.2 61.4 18.6 V24 C52 21.8 40 22.2 32 25.2 C24 22.2 12 21.8 2.6 24Z", C.plum, { w: 2.3, hi: "M6.6 19.8C12 18.8 18 18.6 23 19.2" }),
+    F("M27.4 9 H36.6 C37.8 9 38.4 9.6 38.4 10.8 V15.4 C38.4 16.6 37.8 17.2 36.6 17.2 H27.4 C26.2 17.2 25.6 16.6 25.6 15.4 V10.8 C25.6 9.6 26.2 9 27.4 9Z", C.plum, { w: 2, inner: '<circle cx="32" cy="13.1" r="2.5" fill="' + C.yellow + '" stroke="' + INK + '" stroke-width="1.3"/>' }),
+    ...scope(20.4), ...scope(43.6),
+    DONE(52, 52)
+  ];
+};
+export const JOURNEY_TROPHIES = {};
+Object.keys(J).forEach((k) => { const parts = J[k](); JOURNEY_TROPHIES[k] = { body: body(parts), sil: sil(parts) }; });
+

@@ -608,7 +608,61 @@
       '<div class="panel s12"><h3>Mastery medals</h3><p>Bronze at 50% right on your latest try, Silver at 75%, Gold at 90%, the Crown at every question.</p><div class="panel-body">' + table + "</div></div>" +
       '<div class="panel s12"><h3>Trophies</h3><p>Every trophy, as it looks once you’ve won it.</p><div class="panel-body trophies">' + trophy + "</div></div>" +
       '<div class="panel s12"><h3>Before a secret trophy is won</h3><p>A shape and its riddle, in place of a grid of question marks.</p><div class="panel-body trophies">' + locked + "</div></div>" +
-      '<div class="panel s12"><h3>Ranks: the handpieces</h3><p>Stone to Dark Matter, levels I to III, as drawn today; the rank name becomes plain type in place of the gradient.</p><div class="panel-body ranks">' + ranks + "</div></div>";
+      '<div class="panel s12"><h3>Ranks: the handpieces</h3><p>Stone to Dark Matter, levels I to III, as drawn today; the rank name becomes plain type in place of the gradient.</p><div class="panel-body ranks">' + ranks + "</div></div>" +
+      journeysHTML();
+    journeysWire();
+  }
+
+  /* ---------- the three equipment journeys (phase 4, part A): a contact sheet drawn by the live code. The medallions
+     are shRanks.artOf (the handpiece by widget/ranks.js, the ModuPro and the loupes by widget/hub-art/journeys.js, from
+     tools/figures/site/journeys.mjs); the hand-off and the Dark Matter unlock are widget/journeys.js: their last frame
+     sits in the page (what reduced motion gets) and Play runs the scene itself. ---------- */
+  function journeysHTML(){
+    var R = window.shRanks, K = window.SH_JOURNEY_ART, SJ = window.shJourneys; if (!R || !K || !SJ) return "";
+    var ROMAN = ["I", "II", "III"], JN = R.JOURNEYS, T = R.TIERS;
+    function small(j, t){ return '<span class="hp">' + R.artOf(j, t, 30) + "</span>"; }
+    function rname(j, t, lv){ return R.nameOf({ journey: j, tier: t, level: lv }); }
+    var rows = JN.map(function(n, ji){
+      return '<div class="jr-row"><div class="jr-rowhead"><b>' + (ji + 1) + " · " + esc(n) + '</b><span class="num">' + fmt(125000 * ji) + " to " + fmt(125000 * (ji + 1)) + " XP" + (ji ? "" : " · as drawn today") + '</span></div><div class="ranks">' +
+        T.map(function(t, ti){ return "<figure>" + R.artOf(ji, ti, 96) + "<b>" + esc(t.name) + '</b><span class="num">' + fmt(K.floor(ji, ti)) + " XP</span></figure>"; }).join("") + "</div></div>";
+    }).join("");
+    function pill(j, t, lv, xp, boost){
+      return '<span class="rankpill jr-pill">' + small(j, t) + "<b>" + esc(rname(j, t, lv)) + '</b><span class="xpn num">' + fmt(xp) + " XP</span>" +
+        (boost ? '<span class="xboost"><i>2x</i><span class="num">' + esc(boost) + "</span></span>" : "") + "</span>";
+    }
+    var pills = '<div class="jr-pills">' + pill(0, 3, 2, 7420) + pill(1, 4, 2, 201400) + pill(2, 6, 3, 371250) + "</div>" +
+      '<p class="jr-cap">On a board, beside a name:</p><div class="jr-minis">' + [0, 1, 2].map(function(j){ return '<span class="jr-minirow">' + T.map(function(t, ti){ return small(j, ti); }).join("") + "</span>"; }).join("") + "</div>";
+    var boost = '<div class="jr-pills">' + pill(0, 3, 2, 7420, "23 h") + pill(0, 3, 2, 7480, "41 min") + "</div>" +
+      '<p class="jr-cap">The XP that flies to the pill says it too, and the pill’s label reads “Double XP, 23 hours left”:</p>' +
+      '<div class="jr-pills"><span class="xpfly jr-fly" aria-hidden="true">' + xpSpark() + '+20<i class="x2">2x</i></span><span class="xpfly jr-fly" aria-hidden="true">' + xpSpark() + "+10</span></div>" +
+      '<p class="jr-cap">Left: a first right answer during a boost. Right: the same answer without one.</p>';
+    function play(kind, arg, label){ return '<button class="btn" type="button" data-jplay="' + kind + '" data-jarg="' + arg + '">' + icon("play", 18) + esc(label) + "</button>"; }
+    var troph = Object.keys(K.trophies).map(function(k){ var t = K.trophies[k];
+      return '<div class="trophy">' + img(t.body, "", "", "0 0 64 64") + "<div><b>" + esc(t.name) + "</b><span>" + esc(t.desc) + "</span></div></div>"; }).join("") +
+      Object.keys(K.trophies).slice(1).map(function(k){ var t = K.trophies[k];
+        return '<div class="trophy locked">' + img(t.sil.replace(/currentColor/g, "#B9ADB6"), "", "", "0 0 64 64") + "<div><b>" + esc(t.name) + "</b><span>Not won yet: " + esc(t.desc) + "</span></div></div>"; }).join("");
+    return '<div class="panel s12" id="journeys"><h3>The three journeys</h3><p>The same seven materials in each, so Gold reads as Gold; the object changes. The Handpiece is today’s drawing, untouched. The ModuPro (the sim-lab typodont) and the loupes are new, drawn by the same medallion code: one drawing each, plus its antique.</p><div class="panel-body">' + rows + "</div></div>" +
+      '<div class="panel s6"><h3>The rank pill and the boards</h3><p>From the second journey the rank’s name carries the object: “ModuPro Gold II”.</p><div class="panel-body">' + pills + "</div></div>" +
+      '<div class="panel s6"><h3>Double XP on the rank pill</h3><p>A hub mastery medal starts 24 hours of double XP. The pill shows it with the time left.</p><div class="panel-body">' + boost + "</div></div>" +
+      '<div class="panel s12"><h3>The hand-off</h3><p>Plays once when a journey’s Dark Matter III is done, over the whole screen. The finished medallion charges and flies up to its place on the road, a beam comes down, and the next object lands with a flash, rings and sparks; then its name, its seven ranks lighting one by one, and the trophy. About 7 seconds, and Skip or Esc ends it. Below is its last frame, which is the whole card with reduced motion.</p>' +
+        '<div class="panel-body"><div class="jr-still" data-jstill="handoff" data-jarg="1"></div><div class="qc-go jr-plays">' + play("handoff", 1, "Play: the ModuPro") + play("handoff", 2, "Play: the Loupes") + "</div></div></div>" +
+      '<div class="panel s12"><h3>The Dark Matter unlock</h3><p>Once per journey, ever. The rank before it glows, its casing goes dark, the Dark Matter medallion comes out of the dark and the sky opens behind it; each journey has its own sky. About 6 seconds, and Skip or Esc ends it. Below: each one’s last frame (reduced motion gets this, faded in).</p>' +
+        '<div class="panel-body"><div class="jr-darks"><div class="jr-still" data-jstill="dark" data-jarg="0"></div><div class="jr-still" data-jstill="dark" data-jarg="1"></div><div class="jr-still" data-jstill="dark" data-jarg="2"></div></div>' +
+        '<div class="qc-go jr-plays">' + play("dark", 0, "Play: Handpiece") + play("dark", 1, "Play: ModuPro") + play("dark", 2, "Play: Loupes") + "</div></div></div>" +
+      '<div class="panel s12"><h3>The road ahead, on the “you” panel</h3><p>Where you are, and the next object shown locked. Top: on the Handpiece. Bottom: after the hand-off, with the trophy on the finished journey.</p><div class="panel-body">' +
+        SJ.road({ journey: 0, tier: 4, level: 2, xp: 17300 }) + SJ.road({ journey: 1, tier: 2, level: 1, xp: 161000 }) + "</div></div>" +
+      '<div class="panel s12"><h3>Journey trophies</h3><p>One for each journey finished. Top: won. Bottom: before they are won.</p><div class="panel-body trophies jr-troph">' + troph + "</div></div>";
+  }
+  function journeysWire(){
+    var SJ = window.shJourneys; if (!SJ) return;
+    $$("[data-jstill]").forEach(function(n){
+      var k = n.getAttribute("data-jstill"), a = +n.getAttribute("data-jarg");
+      n.appendChild(SJ.still(k, k === "dark" ? { journey: a } : { from: a - 1, to: a }));
+    });
+    $$("[data-jplay]").forEach(function(b){ b.addEventListener("click", function(){
+      var k = b.getAttribute("data-jplay"), a = +b.getAttribute("data-jarg");
+      if (k === "dark") SJ.dark({ journey: a }); else SJ.handoff({ from: a - 1, to: a });
+    }); });
   }
 
   function timmys(){

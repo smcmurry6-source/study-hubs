@@ -22,6 +22,23 @@
   var ROMAN = ["I", "II", "III"];
   function rankName(t, level){ return TIERS[t].name + (level ? " " + ROMAN[Math.max(1, Math.min(3, level)) - 1] : ""); }
 
+  /* ---------- the three journeys (the redesign; migration_v54's get_rank_profile_v2) ----------
+     The ladder is three journeys of the same seven ranks: the Handpiece (today's), then the ModuPro, then the Loupes.
+     A v2 profile carries journey (0, 1, 2), tier and level inside that journey, step of 63 and gtier of 21, the double-XP
+     boost and which Dark Matter unlocks were seen. Only the redesign's pages ask for one, so on a live page none of
+     this runs. The Handpiece keeps today's names ("Gold II"); a later journey's name leads ("ModuPro Gold II"). */
+  var JOURNEYS = ["Handpiece", "ModuPro", "Loupes"];
+  function isV2(p){ return !!p && p.journey != null; }
+  /* what the handpiece-only parts of this file read from a v2 profile: from the ModuPro on, the rank the Handpiece
+     ended at (Dark Matter III), so accents, Timmy's house and the old cards never go back to Stone */
+  function legacy(p){
+    if (!isV2(p) || !(p.journey > 0)) return p;
+    var q = {}, k; for (k in p) q[k] = p[k];
+    q.tier = 6; q.level = 3; q.step = 20; q.tier_at = 50000; q.step_at = 100000; q.next_at = null;
+    return q;
+  }
+  function nameOf(p){ return !p ? TIERS[0].name : (p.journey > 0 && JOURNEYS[p.journey] ? JOURNEYS[p.journey] + " " : "") + rankName(Math.max(0, Math.min(6, p.tier | 0)), p.level || 0); }
+
   var uid = 0;
 
   /* cylinder shading stops, top edge -> bottom edge, per material */
@@ -191,6 +208,10 @@
     opt = opt || {};
     tier = Math.max(0, Math.min(6, tier | 0));
     var t = TIERS[tier].key, p = "shr" + (++uid) + "-";
+    /* opt.shape: another journey's object in place of the handpiece (the redesign's ModuPro and loupes,
+       tools/figures/site/journeys.mjs says what a shape is). Only the new pages pass one; without it nothing changes. */
+    var S = opt.shape || null, old = t === "antique", B = S ? S.box : null;
+    var MASK = S ? (old ? S.antiqueMask() : S.mask()) : (old ? antiqueMask() : modernMask());
     var rich = px >= 40 ? (opt.animate ? "anim" : true) : false;
     var anim = rich === "anim";
     var mat = t === "antique" ? METAL.brass : METAL[t];
@@ -201,39 +222,46 @@
         cyl(p + "wood", ["#2A1406", "#5C2F12", "#8A4B22", "#B4713C", "#7A4019", "#4E260C", "#231003", "#6A3816"]);
     }
     if (t === "diamond") defs += facets(p);
+    if (S && S.defs) defs += S.defs(p, t, cyl);
     defs += filters(p, t, rich);
-    defs += '<clipPath id="' + p + 'clip">' + (t === "antique" ? antiqueMask() : modernMask()) + '</clipPath>';
+    defs += '<clipPath id="' + p + 'clip">' + MASK + '</clipPath>';
     defs += '<linearGradient id="' + p + 'sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/>' +
       '<stop offset=".5" stop-color="#fff" stop-opacity="' + (t === "diamond" ? ".95" : ".75") + '"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>';
 
-    var parts = t === "antique" ? antiqueParts(p, rich) : modernParts(p, rich);
+    var parts = S ? (old ? S.antique(p, rich) : S.modern(p, rich)) : old ? antiqueParts(p, rich) : modernParts(p, rich);
+    var all = B ? ' x="' + B[0] + '" y="' + B[1] + '" width="' + B[2] + '" height="' + B[3] + '"' : ' x="-10" y="-20" width="170" height="50"';
     var body = '<g' + (rich ? ' filter="url(#' + p + 'tex)"' : '') + '>' + parts + '</g>';
     var over = '';
     if (t === "diamond") {
-      over += '<g clip-path="url(#' + p + 'clip)"><rect x="-10" y="-20" width="170" height="50" fill="url(#' + p + 'fac)"/>' +
-        '<rect x="-10" y="-20" width="170" height="50" fill="url(#' + p + 'rb)" opacity=".22" style="mix-blend-mode:color"/></g>';
+      over += '<g clip-path="url(#' + p + 'clip)"><rect' + all + ' fill="url(#' + p + 'fac)"/>' +
+        '<rect' + all + ' fill="url(#' + p + 'rb)" opacity=".22" style="mix-blend-mode:color"/></g>';
     }
     if (t === "dark" && rich) {
       var stars = "", seed = 7;
-      for (var i = 0; i < 26; i++){ seed = (seed * 9301 + 49297) % 233280; var sx = (seed / 233280) * 150 - 4; seed = (seed * 9301 + 49297) % 233280; var sy = (seed / 233280) * 34 - 15;
+      for (var i = 0; i < (B ? 44 : 26); i++){ seed = (seed * 9301 + 49297) % 233280; var sx = B ? B[0] + (seed / 233280) * B[2] : (seed / 233280) * 150 - 4; seed = (seed * 9301 + 49297) % 233280; var sy = B ? B[1] + (seed / 233280) * B[3] : (seed / 233280) * 34 - 15;
         stars += '<circle cx="' + sx.toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="' + (i % 5 === 0 ? .9 : .45) + '" fill="#fff" opacity="' + (i % 3 ? .75 : 1) + '">' +
           (anim && i % 4 === 0 ? '<animate attributeName="opacity" values="1;.2;1" dur="' + (2 + i % 3) + 's" repeatCount="indefinite"/>' : '') + '</circle>'; }
       over += '<g clip-path="url(#' + p + 'clip)">' + stars + '</g>';
     }
     // rim light: a thin bright line along the top of the body
-    if (rich && t !== "antique" && t !== "stone") over += '<path d="M50 -1.6 H122" stroke="#fff" stroke-opacity="' + (t === "dark" ? ".35" : ".55") + '" stroke-width=".8" stroke-linecap="round"/>';
+    if (rich && t !== "antique" && t !== "stone" && (!S || S.rim)) over += '<path d="' + (S ? S.rim + '" fill="none' : "M50 -1.6 H122") + '" stroke="#fff" stroke-opacity="' + (t === "dark" ? ".35" : ".55") + '" stroke-width=".8" stroke-linecap="round"/>';
     // moving glint (metals, diamond, dark matter)
     if (anim && tier >= 2) {
-      over += '<g clip-path="url(#' + p + 'clip)"><rect x="-40" y="-30" width="26" height="70" fill="url(#' + p + 'sheen)" transform="skewX(-22)" opacity="' + (t === "dark" ? ".5" : ".9") + '">' +
-        '<animate attributeName="x" values="-60;190;190" keyTimes="0;.35;1" dur="' + (t === "diamond" || t === "dark" ? "3.6" : "4.6") + 's" repeatCount="indefinite"/></rect></g>';
+      over += '<g clip-path="url(#' + p + 'clip)"><rect x="-40" y="' + (B ? B[1] - 10 : -30) + '" width="26" height="' + (B ? B[3] + 20 : 70) + '" fill="url(#' + p + 'sheen)" transform="skewX(-22)" opacity="' + (t === "dark" ? ".5" : ".9") + '">' +
+        '<animate attributeName="x" values="' + (B ? (B[0] - 50) + ";" + (B[0] + B[2] + 60) + ";" + (B[0] + B[2] + 60) : "-60;190;190") + '" keyTimes="0;.35;1" dur="' + (t === "diamond" || t === "dark" ? "3.6" : "4.6") + 's" repeatCount="indefinite"/></rect></g>';
     }
-    if (t === "diamond" && rich) over += sparkle(18, -12, 5, 0, anim) + sparkle(98, -2, 4, 1.1, anim) + sparkle(64, 13, 3.2, 2.2, anim);
-    if (t === "dark" && rich) over += sparkle(20, -12, 4, .4, anim) + sparkle(110, 10, 3, 1.7, anim);
+    if (S && S.top) over += S.top(p, rich, old);
+    var K = S && S.sparks ? S.sparks : null;
+    if (t === "diamond" && rich) over += K ? sparkle(K[0][0], K[0][1], K[0][2], 0, anim) + sparkle(K[1][0], K[1][1], K[1][2], 1.1, anim) + sparkle(K[2][0], K[2][1], K[2][2], 2.2, anim)
+      : sparkle(18, -12, 5, 0, anim) + sparkle(98, -2, 4, 1.1, anim) + sparkle(64, 13, 3.2, 2.2, anim);
+    if (t === "dark" && rich) over += K ? sparkle(K[0][0], K[0][1], K[0][2] * .85, .4, anim) + sparkle(K[1][0], K[1][1], K[1][2] * .85, 1.7, anim)
+      : sparkle(20, -12, 4, .4, anim) + sparkle(110, 10, 3, 1.7, anim);
 
-    var under = t === "dark" && rich ? '<g filter="url(#' + p + 'glow)" opacity=".85">' + (t === "antique" ? antiqueMask() : modernMask()) +
+    var under = t === "dark" && rich ? '<g filter="url(#' + p + 'glow)" opacity=".85">' + MASK +
       (anim ? '<animate attributeName="opacity" values=".55;.95;.55" dur="3s" repeatCount="indefinite"/>' : '') + '</g>' : '';
     // shadow under the tool
-    var shadow = rich ? '<ellipse cx="72" cy="27" rx="64" ry="5" fill="#000" opacity=".35"/>' : '';
+    var shadow = !rich ? '' : S ? (S.shadow ? '<ellipse cx="' + S.shadow[0] + '" cy="' + S.shadow[1] + '" rx="' + S.shadow[2] + '" ry="' + S.shadow[3] + '" fill="#000" opacity=".35"/>' : '')
+      : '<ellipse cx="72" cy="27" rx="64" ry="5" fill="#000" opacity=".35"/>';
 
     var D = DISC[t], ring = t === "antique" ? METAL.brass : mat;
     defs += cyl(p + "ring", ring.map(function(c){ return shade(c, t === "dark" ? .08 : 0); }));
@@ -262,10 +290,10 @@
           '<text x="0" y="5.2" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="15" letter-spacing="1" fill="' + D[3] + '" stroke="rgba(0,0,0,.35)" stroke-width=".4">' + num + '</text></g>';
       }
     }
-    var g = '<g clip-path="url(#' + p + 'dclip2)"><g transform="translate(' + (t === "antique" ? 22 : 19) + ' 84) rotate(-30) scale(' + (t === "antique" ? .66 : .7) + ')">' + shadow + under + body + over + '</g></g>';
+    var g = '<g clip-path="url(#' + p + 'dclip2)"><g transform="' + (S ? S.place[old ? 1 : 0] : 'translate(' + (t === "antique" ? 22 : 19) + ' 84) rotate(-30) scale(' + (t === "antique" ? .66 : .7) + ')') + '">' + shadow + under + body + over + '</g></g>';
     defs += '<clipPath id="' + p + 'dclip2"><circle cx="64" cy="64" r="' + (rich ? 60 : 58) + '"/></clipPath>';
     return '<svg class="sh-rank-art sh-rank-' + t + '" width="' + px + '" height="' + px + '" viewBox="0 0 128 128" role="img" aria-label="' +
-      TIERS[tier].name + ' handpiece' + (opt.level ? ' ' + ROMAN[Math.max(1, Math.min(3, opt.level)) - 1] : '') + '"><defs>' + defs + '</defs>' + disc + g + over2 + '</svg>';
+      TIERS[tier].name + ' ' + (S ? S.name : 'handpiece') + (opt.level ? ' ' + ROMAN[Math.max(1, Math.min(3, opt.level)) - 1] : '') + '"><defs>' + defs + '</defs>' + disc + g + over2 + '</svg>';
   }
 
   /* medallion interior: center, mid, edge, spotlight color */
@@ -592,6 +620,31 @@
     }
     rankUpLoading.push(cb);
   }
+  /* the redesign's journeys: their scenes (widget/journeys.js) and the two later objects' drawings
+     (widget/hub-art/journeys.js, window.SH_JOURNEY_ART), each fetched the first time it is needed, never with the page */
+  function sibling(name){ try { return RANKUP_SRC ? new URL(name, RANKUP_SRC).href : ""; } catch (e) { return ""; } }
+  function loadOnce(src, ready, cbs){
+    return function(cb, fail){
+      if (ready()) { cb(ready()); return; }
+      if (!src) { if (fail) fail(); return; }
+      cbs.push([cb, fail]);
+      if (cbs.length > 1) return;
+      var s = document.createElement("script"); s.src = src; s.async = true;
+      s.onload = s.onerror = function(){ var q = cbs.splice(0), ok = ready(); q.forEach(function(x){ if (ok) x[0](ok); else if (x[1]) x[1](); }); };
+      document.head.appendChild(s);
+    };
+  }
+  var withJourneys = loadOnce(sibling("journeys.js"), function(){ return window.shJourneys; }, []);
+  var loadJourneyArt = loadOnce(sibling("hub-art/journeys.js"), function(){ return window.SH_JOURNEY_ART; }, []);
+  function needJourneyArt(cb){ loadJourneyArt(cb, function(){ cb(null); }); }
+  /* a journey's medallion: the ModuPro's or the loupes' once their drawings are here, the handpiece's until then
+     (call needJourneyArt and draw again) */
+  function artOf(j, tier, px, opt){
+    var K = window.SH_JOURNEY_ART, sh = j > 0 && K ? K.shape(j) : null;
+    if (!sh) return art(tier, px, opt);
+    var o = {}, k; for (k in (opt || {})) o[k] = opt[k]; o.shape = sh;
+    return art(tier, px, o);
+  }
   function playRankUp(kind, d, busy){
     if (document.hidden || (busy && busy())) { setTimeout(function(){ playRankUp(kind, d, busy); }, 3000); return; }
     withRankUp(function(U){ if (U[kind]) U[kind](d); });
@@ -616,15 +669,49 @@
   function track(p, opt){
     if (!p) return;
     opt = opt || {};
+    var raw = p, v2 = isV2(raw); p = legacy(p);
     trackTrophies(p, opt.busy);
     var t = p.tier || 0, step = p.step != null ? p.step : t * 3, pt = ls("sh_rank_tier"), ps = ls("sh_rank_step");
     ls("sh_rank_tier", String(t)); ls("sh_rank_step", String(step));
-    if (pt === null || (ls("sh_pref_celebrate") || "on") === "off") return;
+    var on = (ls("sh_pref_celebrate") || "on") !== "off";
+    /* a journey's own moments (v2 only): the hand-off and the Dark Matter unlock play alone, in place of the cards below */
+    var took = v2 ? trackJourney(raw, opt, on) : false;
+    if (pt === null || !on || took) return;
     pt = +pt; ps = ps === null ? NaN : +ps;
     var from = Math.floor(ps / 3) === pt ? ps : pt * 3;   // the dashboard used to save only the tier
     var d = { from: pt, fromLevel: from % 3 + 1, to: t, level: p.level || step % 3 + 1, xp: p.xp, next_at: p.next_at, position: p.position, of: p.of };
     if (t > pt) playRankUp("tier", d, opt.busy);
     else if (t === pt && step > from) playRankUp("level", d, opt.busy);
+  }
+  /* The redesign's journeys (a v2 profile). The device remembers the step of 63 it last saw (sh_rank_g; the first look
+     only records it). A new journey plays the hand-off; reaching a journey's Dark Matter plays its unlock, once ever (the
+     server's dark_seen says whether it has played anywhere; opt.seen(journey) tells the server when it has); a rank or
+     level inside a later journey plays today's cards with that journey's object. Returns true when it played a scene
+     that stands in for the Handpiece's cards. Both scenes are widget/journeys.js, fetched when one is due. */
+  var darkPlayed = {};
+  function trackJourney(raw, opt, on){
+    var j = raw.journey | 0, g = raw.step != null ? raw.step : j * 21 + (raw.tier | 0) * 3 + (raw.level || 1) - 1, pg = ls("sh_rank_g");
+    ls("sh_rank_g", String(g));
+    if (!on) return false;
+    var took = false, base = { xp: raw.xp, next_at: raw.next_at, position: raw.position, of: raw.of };
+    function scene(kind, d, after){
+      playRankUp("scene", function(done){
+        withJourneys(function(J){ J[kind](d, function(){ if (after) after(); done(); }); }, done);
+      }, opt.busy);
+    }
+    if (pg !== null) {
+      pg = +pg; var pj = Math.floor(pg / 21), ptier = Math.floor((pg % 21) / 3);
+      if (j > pj) { took = true; scene("handoff", { from: pj, to: j, xp: raw.xp, tier: raw.tier | 0, level: raw.level || 1 }); }
+      else if (j === pj && j > 0 && g > pg && !((raw.tier | 0) === 6 && ptier < 6)) {
+        var d = { from: ptier, fromLevel: pg % 3 + 1, to: raw.tier | 0, level: raw.level || 1, xp: raw.xp, next_at: raw.next_at, position: raw.position, of: raw.of, jn: JOURNEYS[j] };
+        needJourneyArt(function(K){ d.shape = K ? K.shape(j) : null; d.tier_next = K && d.to < 6 ? K.floor(j, d.to + 1) : 0; playRankUp(d.to > ptier ? "tier" : "level", d, opt.busy); });
+      }
+    }
+    if ((raw.tier | 0) >= 6 && (raw.dark_seen || []).indexOf(j) < 0 && !darkPlayed[j]) {
+      darkPlayed[j] = 1; if (j === 0) took = true;
+      scene("dark", { journey: j, xp: base.xp, level: raw.level || 1 }, function(){ if (opt.seen) opt.seen(j); });
+    }
+    return took;
   }
   /* try them from the console: shRanks.preview("tier", 3) (Silver -> Gold), shRanks.preview("level", 4, 2) (Gold I -> II),
      shRanks.preview("trophy", 6) (a TROPHIES index), shRanks.preview("mastery", 2) (Gold), shRanks.preview("mock", 37, 40) */
@@ -746,15 +833,20 @@
       if (!profile) return;
       var t = profile.tier || 0, xp = profile.xp || 0, next = profile.next_at, at = profile.step_at != null ? profile.step_at : (profile.tier_at || 0);
       var lvl = profile.level || 1, step = profile.step != null ? profile.step : t * 3;
+      /* a v2 profile (the redesign's pages on the game layer): the card shows the journey's own rank, 63 steps long,
+         while the rest of this panel keeps reading the Handpiece's view above */
+      var V = isV2(ownRaw) ? ownRaw : null, vj = V ? Math.max(0, Math.min(2, V.journey | 0)) : 0, vn = V ? (V.step | 0) + 1 : 0;
+      if (V) { next = V.next_at; at = V.step_at != null ? V.step_at : at; }
       var pct = next ? Math.max(0, Math.min(1, (xp - at) / (next - at))) : 1;
+      var nextName = !next ? "" : V ? nameOf({ journey: Math.floor(vn / 21), tier: Math.floor(vn % 21 / 3), level: vn % 3 + 1 }) : rankName(Math.floor((step + 1) / 3), (step + 1) % 3 + 1);
       var m = masteryFor(), badges = profile.badges || [];
       var h = '<div class="sh-rank-card sh-tier-' + TIERS[t].key + '">' +
-        '<div class="sh-rank-art-wrap">' + art(t, 108, { animate: true, level: lvl }) + '</div>' +
-        '<div class="sh-rank-info"><div class="sh-rank-eyebrow">Your handpiece</div>' +
-        '<div class="sh-rank-name">' + rankName(t, lvl) + '</div>' +
+        '<div class="sh-rank-art-wrap">' + (vj ? artOf(vj, V.tier | 0, 108, { animate: true, level: V.level || 1 }) : art(t, 108, { animate: true, level: lvl })) + '</div>' +
+        '<div class="sh-rank-info"><div class="sh-rank-eyebrow">' + (vj === 1 ? "Your ModuPro" : vj === 2 ? "Your loupes" : "Your handpiece") + '</div>' +
+        '<div class="sh-rank-name">' + (vj ? esc(nameOf(V)) : rankName(t, lvl)) + '</div>' +
         '<div class="sh-rank-xp"><b>' + fmt(xp) + '</b> XP' + (profile.position ? ' · #' + profile.position + ' of ' + profile.of : '') + '</div>' +
         '<div class="sh-rank-bar"><i style="width:' + (pct * 100).toFixed(1) + '%"></i></div>' +
-        '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + rankName(Math.floor((step + 1) / 3), (step + 1) % 3 + 1) : 'The highest rank there is.') + '</div>' +
+        '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + nextName : 'The highest rank there is.') + '</div>' +
         (window.shEditName ? '<button type="button" class="sh-rank-rename">' + (window.shNameNow && window.shNameNow() ? 'Shown as ' + esc(window.shNameNow()) + ' · change' : 'Change your name') + '</button>' : '') +
         '</div></div>';
       if (m.bank) {
@@ -859,23 +951,26 @@
         : tr.secret ? '<b>Secret.</b> ' + esc(tr.clue) : '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '.') + share;
     });
 
-    var loading = false;
+    var loading = false, ownRaw = null;
     /* your own rank and mastery: the badge by your name, the rank-up, level-up, trophy and mastery cards, and the
        medals recorded in render(). Cheap per-visitor reads since migration_v53's XP cache, so they still come on load
        (in the page bootstrap) and every 10 answers (Sam, 2026-11-06). The class-wide trophy rarity waits for Stats. */
     function applyOwn(p, m){
-      profile = p; mastery = m || [];
-      /* the redesigned hubs' rank pill (widget/hub.js) listens; nothing on the live pages does */
-      try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: p, mastery: masteryFor() } })); } catch (e) {}
+      var raw = p; p = legacy(p);   // a v2 profile (the redesign): this panel, the accents and Timmy's house read the Handpiece's rank
+      profile = p; mastery = m || []; ownRaw = raw;
+      if (raw.journey > 0 && !window.SH_JOURNEY_ART) needJourneyArt(function(K){ if (K) render(); });
+      /* the redesigned hubs' rank pill (widget/hub-rewards.js) listens; nothing on the live pages does */
+      try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: raw, mastery: masteryFor() } })); } catch (e) {}
       if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
-      track(profile, { busy: mockBusy });
+      track(raw, { busy: mockBusy, seen: function(j){ if (!window.shAutomated) rpc("mark_dark_unlock_seen", { p_visitor: H.visitor, p_journey: j }); } });
       badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
       /* Full Arch is once per hub: if it's done on any device, eggs.js stops showing it here */
       if ((profile.badges || []).indexOf("fullarch:" + H.hub) >= 0) document.dispatchEvent(new CustomEvent("sh:arch-done", { detail: H.hub }));
     }
     function loadOwn(){
       if (loading) return; loading = true;
-      Promise.all([rpc("get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
+      /* the redesign's pages read the game layer's profile once the database has it (H.v2, set by widget/v3.js) */
+      Promise.all([rpc(H.v2 && H.v2() ? "get_rank_profile_v2" : "get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
         loading = false;
         if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
         applyOwn(r[0], r[1]);
@@ -900,12 +995,19 @@
         setTimeout(panelOpen() ? load : loadOwn, 1500);
       }
     });
+    /* the game layer (the redesign): the server's answer carries your new total, so a rank-up, a hand-off or a Dark
+       Matter unlock plays on the answer that earned it instead of up to ten answers later */
+    document.addEventListener("sh:answer-paid", function(e){
+      var r = e.detail && e.detail.res;
+      if (r && typeof r.total === "number" && ownRaw && ownRaw.next_at != null && r.total >= ownRaw.next_at) { sinceLoad = 0; setTimeout(loadOwn, 900); }
+    });
     document.addEventListener("click", function(e){
       if (e.target.closest && e.target.closest("#shstat-stats-pill")) setTimeout(function(){ if (panelOpen()) load(); }, 50);
     });
     document.addEventListener("sh:mock-done", function(e){
       var d = e.detail || {};
-      if (d.total > 0 && !window.shAutomated) rpc("record_mock_score", { p_visitor: H.visitor, p_hub: H.hub, p_correct: d.correct | 0, p_total: d.total | 0 });
+      /* d.session: the game layer's server saved the score itself when the mock's session finished (xp_session_finish) */
+      if (d.total > 0 && !window.shAutomated && !d.session) rpc("record_mock_score", { p_visitor: H.visitor, p_hub: H.hub, p_correct: d.correct | 0, p_total: d.total | 0 });
       if (d.total >= 20 && d.correct / d.total >= 0.9) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock90", p_hub: H.hub }).then(function(){ setTimeout(panelOpen() ? load : loadOwn, 800); });
       if (d.total >= 20 && d.correct === d.total) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock-perfect", p_hub: H.hub });
     });
@@ -955,6 +1057,16 @@
   window.shRanks = {
     TIERS: TIERS, TROPHIES: TROPHIES, HUB_TROPHIES: HUB_TROPHIES, MASTERY: MASTERY,
     art: art,
+    /* the journeys (the redesign): a v2 profile's name and medallion, its Handpiece view, and the later objects' drawings */
+    JOURNEYS: JOURNEYS, isV2: isV2, legacy: legacy, nameOf: nameOf, artOf: artOf, needJourneyArt: needJourneyArt,
+    /* the scenes and the road ahead (widget/journeys.js), with the drawings they use: cb(shJourneys), or cb(null) */
+    journeys: function(cb){ needJourneyArt(function(){ withJourneys(cb, function(){ cb(null); }); }); },
+    miniOf: function(j, tier, level){
+      if (!(j > 0) || !JOURNEYS[j]) return this.mini(tier, level);
+      tier = Math.max(0, Math.min(6, tier | 0)); level = level ? Math.max(1, Math.min(3, level | 0)) : 0;
+      return '<span class="sh-rank-mini" title="' + JOURNEYS[j] + " " + rankName(tier, level) + '">' + artOf(j, tier, 20) +
+        (level ? '<b class="sh-rank-lv sh-lv-' + TIERS[tier].key + '">' + ROMAN[level - 1] + '</b>' : '') + '</span>';
+    },
     mini: function(tier, level){
       tier = Math.max(0, Math.min(6, tier | 0)); level = level ? Math.max(1, Math.min(3, level | 0)) : 0;
       var k = tier + ":" + level;

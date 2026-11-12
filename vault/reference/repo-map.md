@@ -31,7 +31,11 @@ tags: [map]
   `tools/figures/site/build.mjs`). Its drawn parts are kits the page draws at its own size: `widget/hub-art/class.js`
   (the studying-now classroom, the leaderboard's stage and the recap's bar graph and crowd, from `classroom.mjs`,
   `stage.mjs` and `recap.mjs` in `tools/figures/site/`)
-  and `widget/hub-art/outfits.js` (the shop's outfits and `dress()`, loaded only when someone on the page wears one). [Phase 3](../tasks/2026-11-05-redesign-phase-3-dashboard.md) says what is on it.
+  and `widget/hub-art/outfits.js` (the shop's outfits and `dress()`, loaded only when someone on the page wears one).
+  The three journeys (Handpiece, ModuPro, Loupes: [task](../tasks/2026-11-06-redesign-progression-journeys.md)):
+  `widget/journeys.js` (the hand-off and the Dark Matter unlock, full-screen scenes, and the road ahead) and
+  `widget/hub-art/journeys.js` (the ModuPro's and the loupes' shapes for `shRanks.art` and the three journey trophies,
+  from `tools/figures/site/journeys.mjs` and `medals.mjs`), both fetched by `widget/ranks.js` on first use. [Phase 3](../tasks/2026-11-05-redesign-phase-3-dashboard.md) says what is on it.
 - `hubs/<hub-id>/next/` — the redesign's new version of a hub, beside the live one until the release: a small page of
   settings (`window.SH_HUB`), its content as JSON in `content/` (written by `tools/hub-next/build.mjs`) and the shared
   engine. The engine is four scripts the page loads in order, with `widget/hub.css`: `widget/hub-rewards.js` (the answer

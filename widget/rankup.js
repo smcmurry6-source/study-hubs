@@ -53,8 +53,17 @@
     el.style.setProperty("--ru-n1", P.n[0]); el.style.setProperty("--ru-n2", P.n[1]); el.style.setProperty("--ru-n3", P.n[2]);
   }
   /* what comes after this rank and level */
+  /* a rank-up on a later journey (the redesign's ModuPro and loupes: widget/ranks.js hands it d.shape, the object to draw,
+     and d.jn, its name): the same cards with that object. Without them, the handpiece as always. */
+  function A(d, t, px, o){ if (d && d.shape) { o = o || {}; o.shape = d.shape; } return R.art(t, px, o); }
+  function N(d, t, lv){ return (d && d.jn ? d.jn + " " : "") + R.rankName(t, lv); }
   function nextLine(d){
     var step = d.to * 3 + (d.level || 1) - 1;
+    if (d.jn) {
+      if (step >= 20) return d.next_at != null && d.xp != null && d.next_at > d.xp ? "<b>" + fmt(d.next_at - d.xp) + " XP</b> to finish the " + esc(d.jn) : "The last rank of the " + esc(d.jn) + ".";
+      var jn = N(d, Math.floor((step + 1) / 3), (step + 1) % 3 + 1);
+      return d.next_at != null && d.xp != null && d.next_at > d.xp ? "<b>" + fmt(d.next_at - d.xp) + " XP</b> to " + esc(jn) : "Next up: " + esc(jn);
+    }
     if (step >= 20) return "The highest rank there is.";
     var nm = R.rankName(Math.floor((step + 1) / 3), (step + 1) % 3 + 1);
     if (d.next_at != null && d.xp != null && d.next_at > d.xp) return "<b>" + fmt(d.next_at - d.xp) + " XP</b> to " + esc(nm);
@@ -406,6 +415,10 @@
   var IC_CROWN = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg>';
   function unlocks(d){
     var to = T[d.to], out = [];
+    if (d.jn) {   // a later journey: its accents and house pieces were earned on the Handpiece; only what's next
+      if (d.to < 6) out.push('<span class="sh-ru-ic">' + A(d, d.to + 1, 30) + '</span><span><b>Next rank</b>' + esc(d.jn + " " + T[d.to + 1].name) + (d.tier_next ? ' at ' + fmt(d.tier_next) + ' XP' : '') + '.</span>');
+      return out.map(function(h, i){ return '<li style="--i:' + i + '">' + h + '</li>'; }).join("");
+    }
     if (R.ACCENTS && R.ACCENTS[to.key] && R.accentTex) {
       out.push('<span class="sh-ru-ic" style="background-image:url(\'' + R.accentTex(to.key) + '\')"></span><span><b>New accent</b>' + esc(to.name) +
         ' metal for your buttons, switches and progress bars. Pick it in Settings.</span>');
@@ -441,20 +454,20 @@
     css();
     if (open) open(true);
     var to = T[d.to], key = to.key, P = PAL[key], lvl = d.level || 1, fromLvl = d.fromLevel || 3, still = reduced();
-    var name = R.rankName(d.to, lvl), title = d.to >= 6 ? "MAX RANK" : "RANK UP";
+    var name = N(d, d.to, lvl), title = d.to >= 6 && !d.jn ? "MAX RANK" : "RANK UP";
     var el = document.createElement("div");
     el.className = "sh-ru"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "New rank: " + name); el.tabIndex = -1;
     vars(el, key);
     el.innerHTML = '<div class="sh-ru-bg"></div><canvas class="sh-ru-cv" aria-hidden="true"></canvas>' +
       '<div class="sh-ru-fx" aria-hidden="true"><div class="sh-ru-fxc"><div class="sh-ru-rays"><i></i><i></i></div><div class="sh-ru-halo"></div></div></div>' +
       '<div class="sh-ru-stage"><div class="sh-ru-in">' +
-        '<div class="sh-ru-medal"><div class="sh-ru-face sh-ru-old">' + R.art(d.from, 200, { level: fromLvl }) + '</div>' +
-        '<div class="sh-ru-face sh-ru-new">' + R.art(d.to, 200, { animate: true, level: lvl }) + '</div><div class="sh-ru-glare"></div></div>' +
+        '<div class="sh-ru-medal"><div class="sh-ru-face sh-ru-old">' + A(d, d.from, 200, { level: fromLvl }) + '</div>' +
+        '<div class="sh-ru-face sh-ru-new">' + A(d, d.to, 200, { animate: true, level: lvl }) + '</div><div class="sh-ru-glare"></div></div>' +
         '<div class="sh-ru-hint">Something\'s happening to your handpiece<span>...</span></div>' +
         '<div class="sh-ru-text">' +
           '<h2 class="sh-ru-title" aria-label="' + title + '">' + title.split("").map(function(c, i){ return '<span aria-hidden="true" style="--i:' + i + '">' + (c === " " ? "&nbsp;" : c) + '</span>'; }).join("") + '</h2>' +
           '<div class="sh-ru-namewrap"><span class="sh-ru-name sh-ru-mt">' + esc(name) + '</span></div>' +
-          '<div class="sh-ru-from"><span>' + R.art(d.from, 26) + esc(R.rankName(d.from, fromLvl)) + '</span><span class="sh-ru-arw" aria-label="to">&rarr;</span><span>' + R.art(d.to, 26) + esc(name) + '</span></div>' +
+          '<div class="sh-ru-from"><span>' + A(d, d.from, 26) + esc(N(d, d.from, fromLvl)) + '</span><span class="sh-ru-arw" aria-label="to">&rarr;</span><span>' + A(d, d.to, 26) + esc(name) + '</span></div>' +
           (d.xp != null ? '<div class="sh-ru-stat"><b>' + fmt(d.xp) + '</b> XP' + (d.position ? ' · #' + fmt(d.position) + ' of ' + fmt(d.of) + ' in the class' : '') + '</div>' : '') +
           '<ul class="sh-ru-unl">' + unlocks(d) + '</ul>' +
           '<button type="button" class="sh-ru-go">Let\'s go</button>' +
@@ -573,10 +586,10 @@
     var t = T[d.to], key = t.key, P = PAL[key], lv = d.level || 2, old = d.fromLevel && d.fromLevel < lv ? d.fromLevel : Math.max(1, lv - 1), still = reduced();
     var o = ROMAN[old - 1], n = ROMAN[lv - 1];
     var el = document.createElement("div");
-    el.className = "sh-ru-lv"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite"); el.setAttribute("aria-label", "Level up: " + R.rankName(d.to, lv));
+    el.className = "sh-ru-lv"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite"); el.setAttribute("aria-label", "Level up: " + N(d, d.to, lv));
     vars(el, key);
-    el.innerHTML = '<div class="sh-ru-lv-medal" aria-hidden="true"><i class="sh-ru-lv-ring"></i><i class="sh-ru-lv-ring"></i><div class="sh-ru-lv-coin">' + R.art(d.to, 80, { level: old }) + '</div></div>' +
-      '<div class="sh-ru-lv-body" aria-hidden="true"><div class="sh-ru-lv-eye">Level up</div>' +
+    el.innerHTML = '<div class="sh-ru-lv-medal" aria-hidden="true"><i class="sh-ru-lv-ring"></i><i class="sh-ru-lv-ring"></i><div class="sh-ru-lv-coin">' + A(d, d.to, 80, { level: old }) + '</div></div>' +
+      '<div class="sh-ru-lv-body" aria-hidden="true"><div class="sh-ru-lv-eye">' + (d.jn ? esc(d.jn) + " · level up" : "Level up") + '</div>' +
       '<div class="sh-ru-lv-name"><span class="sh-ru-mt">' + esc(t.name) + '</span><span class="sh-ru-roll"><i>' + (o.length > n.length ? o : n) + '</i>' +
       '<b class="o sh-ru-mt">' + o + '</b><b class="n sh-ru-mt">' + n + '</b></span></div>' +
       '<div class="sh-ru-pips">' + [1, 2, 3].map(function(i){ return '<i class="' + (i <= old ? "on" : i <= lv ? "new" : "") + '"><b></b></i>'; }).join("") + '</div>' +
@@ -599,7 +612,7 @@
     var coin = el.querySelector(".sh-ru-lv-coin");
     function land(){
       if (closed) return;
-      coin.innerHTML = R.art(d.to, 80, { animate: true, level: lv });
+      coin.innerHTML = A(d, d.to, 80, { animate: true, level: lv });
       el.classList.add("is-landed");
       sfxLevel();
       if (!still) {
@@ -798,5 +811,8 @@
     });
   }
 
-  window.shRankUp = { tier: tier, level: level, trophy: trophy, mock: mock, trophyArt: trophyArt };
+  window.shRankUp = { tier: tier, level: level, trophy: trophy, mock: mock, trophyArt: trophyArt,
+    /* another file's full-screen scene takes its turn with the cards: run(done) plays it and calls done when it closes
+       (the redesign's hand-off and Dark Matter unlock, widget/journeys.js) */
+    scene: function(run){ if (typeof run === "function") enqueue(run); } };
 })();

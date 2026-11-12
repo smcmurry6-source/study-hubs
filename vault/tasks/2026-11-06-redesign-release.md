@@ -63,6 +63,8 @@ task is the one PR that then switches the site over. If something goes wrong, re
       missing mp3s or word files. Needed before Heme & Endo Exam 2, Occlusion or Perio is archived on the engine
       ([to-do](2026-11-12-audio-off-at-archiving.md)). High yield's recordings (`<lecture>-hy.mp3`) come off with the rest;
       the build's `hyAudio` then lists none by itself (`tools/hub-next/build.mjs` checks the files)
+- [ ] The game layer's wiring left by phase 4, part A (2026-11-12, "From phase 4, part A" below): the arcade's
+      sessions and pick indexes, Timmy Time's minutes, the journey trophies in the trophy case, the scenes' sound
 - [ ] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"): Sam has saved the API key in Supabase and
       set the Console's spending limit; the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
       function reads the content from its released place; everyone has Timmy
@@ -168,6 +170,9 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 - Timmy Tooth: he stays in the bottom-left corner, as now.
 
 ### The engine's files (the split, 2026-11-12, [phase 4](2026-11-05-redesign-phase-4-game-layer.md))
+
+(Since part A, 2026-11-12: `widget/journeys.js` and `widget/hub-art/journeys.js` too. They load on first use, not with
+the page, and are in `tools/ci/syntax.js`.)
 
 `sw.js`: add the engine's four scripts to `PRECACHE` when the new hubs go live: `widget/hub.js`, `widget/hub-rewards.js`,
 `widget/hub-timmy.js` and `widget/hub-bank.js` (`widget/hub.css` and `widget/hub-art.js` are in phase 3's list below).
@@ -315,6 +320,63 @@ show the question, you flip it and say how well you knew it (Again, Hard, Good, 
 forget it, never later than the day before the exam. Learn's answers count like any answer; a flashcard counts toward your
 daily goal and streak and earns 2 XP when it's due. "What the hubs record": how you rated each flashcard, so your schedule
 follows you to your other devices.
+
+### From phase 4, part A (the journeys' client, [the journeys](2026-11-06-redesign-progression-journeys.md), built 2026-11-12)
+
+**Already wired, switches on by itself when migration_v54 is applied** (step 6 below, in part): the new hubs call
+`get_widget_bootstrap_v2`, `record_answer_v2` in place of today's answer calls, `xp_session_start` / `xp_session_finish`
+for a mock, `get_rank_profile_v2` and `mark_dark_unlock_seen`; the new dashboard already read the `_v2` profile and
+boards. Until the functions exist each of them falls back to today's call. The keys must be loaded (step 3) before
+the first answer, or answers are recorded and pay nothing (`why: unknown`).
+
+**Still to wire, at the release or before it** (the box in Done when):
+
+- [ ] **The arcade** (`widget/games.js`, shared with the live hubs until the switch): a game starts a session
+      (`shGame.startSession("arcade", game)`) and finishes it (`finishSession(id, score)`: the +50, and the server posts
+      the score itself, so the page stops calling `submit_arcade_score` for it); its answers send the pick's authored
+      index and `session`. An answer without an index is refused by the server and recorded by today's calls instead.
+- [ ] **Timmy Time** (`widget/podcast.js`): each minute heard reports to `pod_minute_v2`; the +100 at 90% is the
+      server's. Its XP should reach the pill the way an answer's does (an event like `sh:answer-paid`, or a profile
+      refresh).
+- [ ] **The journey trophies in the trophy case**: `journey-0` to `journey-2` are drawn (`SH_JOURNEY_ART.trophies`) and
+      show on the road ahead and in the hand-off; the case in Stats (`widget/ranks.js`, `TROPHIES`) doesn't list them
+      yet, so it still says 24. They join it when phase 4 redraws the case, with `get_trophy_stats_v2` for their
+      shares: 27 trophies then.
+- [ ] **Sound** for the hand-off and the unlock, only if the redesign gets a sound setting (it has none; the scenes
+      are silent).
+- [ ] `sw.js`: `widget/journeys.js` and `widget/hub-art/journeys.js` join `PRECACHE` with the engine's files, so a
+      scene still plays offline.
+- [ ] The hand-off and the unlock looked at on the release's own preview, reduced motion too (`?xp=124999` and one
+      answer plays the hand-off; `?xp=49999` the Handpiece's unlock).
+
+**About page** (`about/index.html`, Part 5, replacing today's "XP", "Handpiece ranks" and "Rank-up celebrations"
+entries; tagged new; nothing here is a secret):
+
+- **XP**: 10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss, and a flat 2 for a
+  card you grade yourself, plus 20 for every day you study. There is no daily cap any more. A question pays for its
+  first three right and its first three wrong answers each day, and answers less than 2 seconds apart (or more than 30
+  in a minute) still count but earn nothing. Counted across every hub.
+- **More ways to earn XP**: +30 at your 20th answer of the day; +5 the first time you get right a question you missed
+  on an earlier day; +50 for a mock exam with 10 or more answers (once a hub a day); +50 for finishing an arcade game
+  (each game once a day); 10 a minute for a Timmy Time episode you hear for the first time and +100 for finishing it;
+  +100 when a report or suggestion you sent is fixed; and +100, +200, +300 and +500 for a hub's Bronze, Silver, Gold
+  and Crown medals.
+- **Double XP**: every new mastery medal starts 24 hours of double XP on answers, the day's bonuses, mocks and games
+  (never more than 2x, and a new medal starts the 24 hours again). A gold "2x" chip on your rank shows the time left,
+  and the XP that flies up from an answer says "2x".
+- **Three journeys**: the handpiece ladder is the first of three. Handpiece: Stone (start), Antique (300 XP), Bronze
+  (1,500), Silver (5,000), Gold (12,000), Diamond (25,000), Dark Matter (50,000). At 125,000 XP the ModuPro begins (the
+  sim-lab typodont), and at 250,000 the Loupes, each with the same seven ranks, evenly spaced, each rank with levels I,
+  II and III. Nothing is lost on the way: your XP, trophies, accent metals and Timmy's house come with you. From the
+  ModuPro on your rank reads "ModuPro Gold II". More, Stats shows the road ahead.
+- **Rank-up celebrations**: as today (the cutscene for a new rank, the coin-flip card for a new level), now with the
+  journey's own object. Two new full-screen scenes: **reaching Dark Matter** opens a starfield inside the medallion
+  (once per journey, ever, on whichever device gets there first; each journey has its own sky), and **finishing a
+  journey** hands you the next object: "The ModuPro is yours." Both can be skipped, wait until a mock exam is over, are
+  one still card with reduced motion, and are off with Settings, Extras, Rank-up and trophy cards.
+- **Trophy case**: 27 trophies (was 24), 14 of them secret: the three new ones are **Handpiece finished**, **ModuPro
+  finished** and **Loupes finished**, one for each journey completed. "All 24 trophies" in the contents and Part 9's
+  list become 27 (when the case lists them: the box above).
 
 ### From phase 5, part 3 (the game layer's server, [game-server](../reference/game-server.md))
 

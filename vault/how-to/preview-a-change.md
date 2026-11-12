@@ -39,7 +39,8 @@ The **Preview** button, bottom left, opens the controls:
 
 - **Test account:** new, returning (the default), high-XP, missed-question, archived-hub, admin
   ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), section 5). Switching starts that account fresh. Same with a link:
-  `?persona=missed` on any page.
+  `?persona=missed` on any page. `?xp=180000` stands the account anywhere on the rank ladder (the redesign's
+  journeys: `?xp=124999` and one answer plays the hand-off to the ModuPro).
 - **Pretend it's:** time travel (exam morning, the night a hub archives, a holiday). Or `?now=2026-11-19T21:00`;
   `?now=real` resets it.
 - **Class data:** Normal, Slow (2 seconds a request: loading states) or Unreachable (what students see when Supabase

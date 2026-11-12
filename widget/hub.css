@@ -191,6 +191,26 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 .hx-rank b { font-weight: var(--w-strong); }
 .hx-rank .xpn { color: var(--gold-ink); font-weight: var(--w-strong); }
 .hx-rank.bump { animation: hx-bump 420ms var(--ease-out); }
+/* double XP (the game layer: a mastery medal starts 24 hours of it): a gold chip on the rank pill with the time left,
+   a small 2x on the phone's XP meter and on the XP that flies up from an answer */
+.xboost { display: inline-flex; align-items: center; gap: 5px; height: 24px; margin-left: 2px; padding: 0 9px 0 4px; border-radius: var(--r-pill);
+  background: color-mix(in srgb, var(--gold) 26%, var(--row)); color: var(--gold-ink); font-size: var(--fs-meta); font-weight: var(--w-strong); font-variant-numeric: tabular-nums; }
+.xboost i, .hx .x2 { display: grid; place-items: center; height: 18px; padding: 0 6px; border-radius: var(--r-pill); background: var(--gold-ink); color: #fff; font-style: normal; font-weight: var(--w-head); font-size: var(--fs-meta); }
+:root[data-theme="dark"] .xboost { color: var(--gold); }
+:root[data-theme="dark"] .xboost i, :root[data-theme="dark"] .hx .x2 { background: var(--gold); color: #1c1b1c; }
+.hx .x2 { display: inline-grid; margin-left: 4px; vertical-align: middle; }
+/* the pill never makes the bar wider than it was: on a bar with less room it keeps its old size. The journey's name
+   goes (the medallion shows which object it is; it is still read out), and double XP becomes a small 2x on the
+   medallion's corner, with the time left still read out */
+.hx-rank { position: relative; }
+/* and where the bar still has no room (widget/hub-rewards.js, fitPill): the name goes, then the number */
+.hx-rank.is-tight b, .hx-rank.is-tighter .xpn { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.hx-rank.is-tighter { padding-right: 6px; }
+@media (max-width: 1600px) {
+  .hx-rank .jn, .hx-rank .xb-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .hx-rank .xboost { position: absolute; left: 22px; top: -3px; height: 16px; margin: 0; padding: 0; gap: 0; background: none; }
+  .hx-rank .xboost i { height: 16px; padding: 0 5px; font-size: 10px; box-shadow: 0 0 0 2px var(--panel); }
+}
 @keyframes hx-bump { 0% { transform: scale(1); } 35% { transform: scale(1.08); } 100% { transform: scale(1); } }
 .hx .xpi { width: 22px; height: 22px; }
 .hx-set { display: inline-flex; align-items: center; justify-content: center; gap: 2px; width: 40px; height: 40px; border-radius: var(--r-pill); color: var(--muted);
@@ -706,6 +726,7 @@ html.shx .qc-after .sh-qrate:has(.sh-qrate-why:not([hidden])) { flex: 1 1 100%; 
 .xpfly { position: fixed; left: 0; top: 0; z-index: 50; display: flex; align-items: center; gap: 4px; padding: 4px 10px 4px 6px; border-radius: var(--r-pill);
   background: var(--primary); color: var(--on-primary); font-family: var(--font); font-size: var(--fs-label); font-weight: var(--w-head); pointer-events: none; box-shadow: var(--float-shadow); }
 .xpfly svg { width: 20px; height: 20px; }
+.xpfly .x2 { font-style: normal; margin-left: 3px; padding: 0 6px; border-radius: var(--r-pill); background: var(--gold); color: #2b1d00; }
 html.shx .shpet-btn.hx-cheer svg { animation: hx-hop 700ms var(--ease-out) 2; transform-origin: 50% 90%; }
 html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1; transform-origin: 50% 90%; }
 @keyframes hx-hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-14%) scale(1.03, .97); } }
@@ -816,6 +837,9 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap); align-items: start; }
 .stats-grid .wide { grid-column: 1 / -1; }
 .rank-big { margin-top: 12px; display: flex; align-items: center; gap: 16px; }
+.road-h { margin: 18px 0 0; font-size: var(--fs-label); font-weight: var(--w-head); }
+[data-road] .shj-road { margin-top: 8px; }
+[data-road] .shj-road li { background: var(--panel); font-size: var(--fs-meta); }
 .rank-big .hp { width: 64px; height: 64px; display: block; }
 .rank-big .hp svg, .rank-big .hp img { width: 100%; height: 100%; }
 .rank-name { font-size: 22px; font-weight: var(--w-head); }
