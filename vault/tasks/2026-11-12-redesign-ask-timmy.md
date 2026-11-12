@@ -442,5 +442,10 @@ Part 3, the admin page's Timmy tab (any time; it touches only `review/`):
 
 > Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then do **part 3** of
 > `vault/tasks/2026-11-12-redesign-ask-timmy.md` (the admin page's Timmy tab), from its "Where it plugs in" and
-> `vault/reference/ask-timmy.md`. Grep `review/index.html`, never read it whole. No subagents. Neither pending
-> migration is applied or changed. Per-person rows stay behind the admin secret. Open a draft PR with the test report.
+> `vault/reference/ask-timmy.md` (its admin calls and "Notes for the admin tab"). Grep `review/index.html`, never read it
+> whole. No subagents. Neither pending migration is applied or changed: the live admin page has no `admin_timmy_*`
+> functions until the release, so the tab says so then and works once they answer. Give the preview's `rpc()` the
+> `admin_timmy_*` cases, shaped exactly as `migration_v55.sql` returns them, with made-up chats; cover the tab in
+> `tools/release/admin-ui.js`. Per-person rows stay behind the admin secret, no visitor id is drawn, and every student's
+> or Timmy's words are drawn as text, never markup. No hosted preview: screenshots on a phone and a laptop from the
+> preview. Open a draft PR with the test report; I'll say "merge".
