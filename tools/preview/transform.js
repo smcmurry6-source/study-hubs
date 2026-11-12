@@ -27,7 +27,7 @@ const ROBOTS = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
 
 /* What the live site serves (and so what a preview serves). Everything else in the repo (vault, tools, SQL, notes)
    isn't part of the site. */
-const SITE_ENTRIES = ['index.html', 'about', 'review', 'hubs', 'widget', 'assets', 'manifest.webmanifest', 'sw.js'];
+const SITE_ENTRIES = ['index.html', 'next', 'about', 'review', 'hubs', 'widget', 'assets', 'manifest.webmanifest', 'sw.js'];   // next: the redesigned dashboard, beside the live one until the release
 /* Pages that aren't part of the site but are shown in a preview for Sam to look at: the redesign's design system
    (tools/preview/design, Phase 0). A preview serves and builds them like a site page; a release doesn't check them. */
 const PREVIEW_PAGES = ['tools/preview/design'];

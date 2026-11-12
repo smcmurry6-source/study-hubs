@@ -110,7 +110,7 @@
     var hp = state.hp == null ? 80 : state.hp, c = conditions(hp), has = {};
     c.forEach(function(k){ has[k] = 1; });
     var mood = state.mood || moodFor(hp), p = "shpt" + (++uid) + "-";
-    var o = outfit(state.hat === undefined ? seasonId() : state.hat);   // holiday outfit, if any (state.hat "" = none)
+    var o = state.fit ? fitOutfit(state.fit) : outfit(state.hat === undefined ? seasonId() : state.hat);   // holiday outfit, if any (state.hat "" = none; state.fit names one: someone else's Timmy)
     var T = has.perio ? 176 : 146;                       // gum line: lower when it has receded
     var gumC = has.perio ? ["#F07A8E", "#D2405A", "#A82540"] : has.gingivitis ? ["#FF95A6", "#EE5A75", "#C93A56"] : ["#FFC0CD", "#F78FA8", "#E07090"];
     var d = '<defs>' +
@@ -501,6 +501,21 @@
       ls(key, String(i)); outfitNow[id] = i;
     }
     return list[outfitNow[id]];
+  }
+
+  /* What this visitor's Timmy is wearing, as "<holiday>:<outfit>" ("" for none, before he's adopted, or with Timmy or the extras off): the
+     hubs send it with their studying-now presence (widget/v3.js), and the new dashboard's classroom draws a Timmy for each
+     person studying, dressed as theirs (Sam, 2026-11-11). No name and no id goes with it. fitOutfit() reads one back. */
+  function fit(){
+    try { if (!adopted() || ls("sh_pref_pet") === "off" || ls("sh_pref_focus") === "on") return ""; } catch (e) { return ""; }
+    var id = seasonId(), o = outfit(id);
+    return o && o.k ? id + ":" + o.k : "";
+  }
+  function fitOutfit(f){
+    var m = /^([a-z0-9]{1,20}):([a-z0-9-]{1,30})$/.exec(String(f || "")), list = m && OUTFITS.hasOwnProperty(m[1]) ? OUTFITS[m[1]] : null;
+    if (!list) return null;
+    for (var i = 0; i < list.length; i++) if (list[i].k === m[2]) return list[i];
+    return null;
   }
 
   /* ================= Timmy's house =================
@@ -2002,5 +2017,5 @@
     else if (!b && adopted() && M && M.sb && M.visitor && !ls("sh_pet_adopt_sent")) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
   }
 
-  window.shPet = { say: function(text, move, ms){ talk(text, move, ms); }, hp: function(){ return M.st && typeof M.st.hp === "number" ? M.st.hp : null; }, mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, house: houseSvg, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
+  window.shPet = { say: function(text, move, ms){ talk(text, move, ms); }, hp: function(){ return M.st && typeof M.st.hp === "number" ? M.st.hp : null; }, mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, fit: fit, house: houseSvg, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
 })();

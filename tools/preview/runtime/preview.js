@@ -323,13 +323,28 @@
       dashboard_week: dashboard ? bootstrapWeek() : [],
       survey_popup: dashboard ? bootstrapSurvey(t) : [],
       exam_luck: dashboard && a.p_luck_hub && a.p_luck_date ? { count: 0, mine: false, recent: [] } : null,
-      recaps: [],
+      recaps: dashboard ? recapFixtures() : [],
       golden: [],
       name_shared: false,
       /* your own rank and mastery ride in the bootstrap too (Sam, 2026-11-06); same fixtures as the single calls */
       rank: rpc("get_rank_profile", { p_visitor: v }).data,
       mastery: hub ? rpc("get_hub_mastery", { p_visitor: v }).data : []
     };
+  }
+  /* two published recaps for the dashboard's slideshow: made-up totals in the shape get_hub_recap returns (the live
+     site's are drawn from the class's real totals, which a preview never loads) */
+  function recapFixtures(){
+    function one(hub, title, color, exam, people, minutes, answers, correct, tough){
+      var byDay = [], byHour = [];
+      for (var i = 9; i >= 0; i--) { var d = new Date(exam + "T12:00:00"); d.setDate(d.getDate() - i); byDay.push({ d: d.toISOString().slice(0, 10), minutes: Math.round(minutes * (10 - i) / 55) }); }
+      for (var h = 0; h < 24; h++) byHour.push(h < 6 ? 2 : h < 12 ? 9 + h : h < 18 ? 14 + (h % 5) * 3 : 60 - Math.abs(20 - h) * 9);
+      return { hub: hub, title: title, color: color, names: false, footnote: "Preview: made-up totals",
+        question: tough ? { text: "A made-up question stands in here for the one the class missed most.", answer: "A made-up answer" } : null,
+        data: { hub: hub, people: people, minutes: minutes, answers: answers, correct: correct, first_day: byDay[0].d, last_day: exam, exam_day: exam,
+          by_day: byDay, by_hour: byHour, toughest: tough ? [{ qid: "pv-tough", attempts: 52, correct: 16 }] : [], night_before: Math.round(minutes * .18), night_before_people: Math.round(people * .8), after_midnight: 6, regulars: Math.round(people * .6) } };
+    }
+    return [one("pcd-implants-exam1", "PCD Implants Exam 1", "#2f6f84", "2026-11-06", 58, 9120, 21480, 14820),
+            one("heme-endo-exam1", "Heme & Endo Exam 1", "#a83232", "2026-10-30", 61, 11340, 26950, 17790, true)];
   }
   /* the account's starting XP, plus a little for each answer given in this preview (the server's real rule is per day) */
   function myXp(){ var extra = 0; allAnswers().forEach(function(a){ if (!a[4]) extra += a[3] ? 3 : 1; }); return (db.xp || 0) + extra; }
@@ -577,6 +592,26 @@
       return { data: fn === "get_question_health" ? qhFixture(a.p_hub, a.p_current) : synthAdmin(fn) };
     }
     var v = a.p_visitor, hub = a.p_hub, t = now();
+    /* the game layer's functions (migration_v54: written, tested, and not applied until the redesign's release). The new
+       dashboard (widget/dash.js) calls them as <name>_v2, so the preview answers them from today's fixtures plus what
+       v54 adds to a row: the journey (0, the Handpiece) and a visit key (made up here; the real one is a digest only
+       the server can make). The shop and Timmy's place get their fixtures with phase 4. */
+    if (/^get_(widget_bootstrap|rank_profile|rank_board|leaderboard|arcade_leaderboard)_v2$/.test(fn)) {
+      var d2 = rpc(fn.slice(0, -3), a).data;
+      var vkey = function(n){ var k = ""; for (var i = 0; i < 3; i++) k += ("00000000" + (hash(n + "|visit" + i) >>> 0).toString(16)).slice(-8); return k; };
+      if (Array.isArray(d2)) d2 = d2.map(function(r){ var o2 = {}; Object.keys(r).forEach(function(k){ o2[k] = r[k]; }); o2.journey = 0; o2.visit = vkey(r.display_name); return o2; });
+      else if (d2 && d2.rank) d2.rank.journey = 0;
+      else if (d2 && fn === "get_rank_profile_v2") d2.journey = 0;
+      return { data: d2 };
+    }
+    /* someone's place, for the dashboard's stage (the top three stand on it as their own Timmys): only the outfit here,
+       the rest of a place gets its fixtures with phase 4. One made-up classmate's place can't be read, for the plain Timmy. */
+    if (fn === "get_place") {
+      var pk = String(a.p_key || ""), who = -1;
+      FAKE_NAMES.forEach(function(nm, i){ var k = ""; for (var j = 0; j < 3; j++) k += ("00000000" + (hash(nm + "|visit" + j) >>> 0).toString(16)).slice(-8); if (k === pk) who = i; });
+      if (who < 0 || who === 4) return { data: null };
+      return { data: { name: FAKE_NAMES[who], equipped: { outfit: ["rank-dark-outfit", "captain-hat", "tooth-fairy", "tuxedo"][who % 4] }, rank: { journey: 0, tier: 5, level: 1 }, flair: null } };
+    }
     switch (fn) {
       case "get_hub_overrides": return { data: ovrStore().rows.filter(function(r){ return ovrActive(r, t); }).map(function(r){ return { hub: r.hub, state: r.state, until: r.until }; }) };
       case "get_widget_bootstrap": return { data: widgetBootstrap(a, t) };
@@ -651,7 +686,8 @@
       case "create_link_code": return { write: true, data: "PREV-" + String(hash(db.visitor) % 9000 + 1000) };
       case "redeem_link_code": return { write: true, data: null };
       case "record_achievement": if (a.p_kind && db.achievements.indexOf(a.p_kind) < 0) { db.achievements.push(a.p_kind + (hub ? ":" + hub : "")); save(); } return { write: true, data: null };
-      case "get_published_recaps": case "get_golden_today": case "get_correct_streak_stats": case "get_trophy_stats": case "get_fairy_board": case "get_cavity_week": return { data: [] };
+      case "get_published_recaps": return { data: recapFixtures() };
+      case "get_golden_today": case "get_correct_streak_stats": case "get_trophy_stats": case "get_fairy_board": case "get_cavity_week": return { data: [] };
     }
     if (/^get_/.test(fn)) return { data: [] };
     return { write: true, data: null };
@@ -754,11 +790,41 @@
   ].join("\n");
   /* who's studying now: realtime has no fixture, so the redesigned hubs' live count (the sh:online event widget/v3.js
      sends) gets a made-up number that drifts a little, as a real class would; nothing on the live hubs listens for it */
+  /* a made-up class for the studying-now count. The redesigned dashboard (widget/dash.js) draws each one as a Timmy in
+     a classroom, so each has an outfit (the shop's ids, a holiday look, or none) and, every few seconds, one walks in or
+     out. The first one stands in for a hub tab of your own: he stays, wears what your Timmy wears and is remembered the
+     way a hub tab remembers itself ("sh_presence_mine", widget/v3.js), so the room tags him "You". Nothing here is
+     anyone's real presence. */
+  var FAKE_FITS = ["captain-hat", "", "tuxedo", "thanksgiving:turkey", "football-helmet", "", "sun-hat", "dr-timmy", "", "elf-suit", "fox-hood", "", "tooth-fairy",
+    "beanie", "ranger-hat", "", "skeleton-suit", "aviator-cap", "surgical-scrubs", "", "jester", "nightcap", "flannel", "", "lifeguard", "bunny-suit"];
   function fakeOnline(){
-    var n = 9;
-    function send(){ try { document.dispatchEvent(new CustomEvent("sh:online", { detail: { n: n, preview: true } })); } catch (e) {} }
+    var seq = 0, crowd = [];
+    function add(){ seq++; crowd.push({ key: "pv" + seq, fit: FAKE_FITS[seq % FAKE_FITS.length], slot: seq }); }
+    for (var i = 0; i < 9; i++) add();
+    function send(){
+      var n = crowd.length;
+      try { document.dispatchEvent(new CustomEvent("sh:online", { detail: { n: n, preview: true } })); } catch (e) {}
+      /* the dashboard shows the count hub by hub: spread the made-up class over its live hubs, most in the first */
+      try {
+        var D = window.shDash;
+        if (D && D.setLive && D.hubs) {
+          var hubs = D.hubs(), by = {}, list = [], me = {};
+          crowd.forEach(function(p){
+            var h = hubs[[0, 0, 1, 0, 2, 1][p.slot % 6] % hubs.length], fit = p.fit; if (!h) return;
+            if (p.slot === 1) { me[h.id + "/" + p.key] = Date.now(); try { fit = (window.shPet && window.shPet.fit && window.shPet.fit()) || ""; } catch (e) { fit = ""; } }
+            by[h.id] = (by[h.id] || 0) + 1; list.push({ key: p.key, hub: h.id, fit: fit });
+          });
+          try { localStorage.setItem("sh_presence_mine", JSON.stringify(me)); } catch (e) {}
+          D.setLive(by, list);
+        }
+      } catch (e) {}
+    }
     setTimeout(send, 1200);
-    setInterval(function(){ n = Math.max(3, Math.min(16, n + [-1, 0, 1][Math.floor(Math.random() * 3)])); send(); }, 20000);
+    setInterval(function(){
+      var r = Math.random();
+      if (crowd.length <= 4 || (r < .55 && crowd.length < 16)) add(); else crowd.splice(1 + Math.floor(Math.random() * (crowd.length - 1)), 1);
+      send();
+    }, /\/next\/(index\.html)?$/.test(location.pathname) && !/\/hubs\//.test(location.pathname) ? 7000 : 20000);
   }
   function mount(){
     if (document.getElementById("shpv-pill")) return;

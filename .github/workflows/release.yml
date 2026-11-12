@@ -33,7 +33,7 @@ jobs:
         id: decide
         env:
           LABELED: ${{ contains(github.event.pull_request.labels.*.name, 'full-tests') }}
-          SHARED: '^(index\.html|about/|review/|widget/|assets/|sw\.js|manifest\.webmanifest|supabase/|migration_v[^/]*\.sql|tools/preview/|tools/release/|\.github/workflows/release\.yml)'
+          SHARED: '^(index\.html|next/|about/|review/|widget/|assets/|sw\.js|manifest\.webmanifest|supabase/|migration_v[^/]*\.sql|tools/preview/|tools/release/|\.github/workflows/release\.yml)'
         run: |
           shared=$(git diff --name-only HEAD^1 HEAD | grep -E "$SHARED" || true)
           if [ "$LABELED" = true ]; then
