@@ -314,9 +314,11 @@ function lint(hub, A){
       const board = await page.evaluate(async () => {
         const el = document.getElementById('ideas'), wait = ms => new Promise(r => setTimeout(r, ms));
         if (!el || el.hidden) return { hidden: true };
+        for (let i = 0; i < 20 && !el.querySelector('.shi-card .shi-pin svg'); i++) await wait(150);   // its drawings load after it (widget/hub-art/board.js)
         const out = { cards: el.querySelectorAll('.shi-card').length, markup: el.querySelectorAll('.shi-card img, .shi-card b:not(.shi-meta b):not(.shi-why b), .shi-card i').length + (window.__idea ? 1 : 0),
           tags: [...el.querySelectorAll('.shi-card:nth-child(2) .shi-tag')].map(t => t.textContent).join('|'), status: !!el.querySelector('.shi-card .shi-why'),
           own: !!el.querySelector('.shi-card.is-own [data-shi="delete"]'), filters: el.querySelectorAll('[data-shi-filter] option').length };
+        out.art = [el.querySelectorAll('.shi-card .shi-pin svg').length, el.querySelectorAll('.shi-card .shi-kindart svg').length, el.querySelectorAll('.shi-card .shi-stamp').length, el.querySelectorAll('.shi-card.is-top .shi-rosette svg').length].join(' ');
         const up = el.querySelector('.shi-card [data-shi="up"]'); up.click(); await wait(250);
         out.vote = up.getAttribute('aria-pressed') + ' ' + up.querySelector('.num').textContent;
         el.querySelector('[data-shi="new"]').click(); await wait(100);
@@ -329,6 +331,7 @@ function lint(hub, A){
       else {
         if (board.cards !== 4 || !board.status || !board.own || board.filters < 9) problems.push(`${name}: the idea board is missing cards, a status line, Delete on my own idea or its filters (${JSON.stringify(board)})`);
         if (board.markup) problems.push(`${name}: an idea's words were drawn as markup`);
+        if (board.art !== '4 4 1 1') problems.push(`${name}: the idea board's drawings are missing: every note has a pin and its kind's picture, Sam's answer is a stamp and the top idea wears the rosette (pins, kinds, stamps, rosette: ${board.art})`);
         if (board.tags !== 'Perio|Questions and notes|From a check-in') problems.push(`${name}: an idea's tags should be its hub, its kind and where it came from, not "${board.tags}"`);
         if (board.vote !== 'true 6') problems.push(`${name}: an up vote on the idea board didn't count (${board.vote})`);
         if (board.kinds !== 6 || board.hubs !== 'All hubs') problems.push(`${name}: the idea form should offer All hubs first and six kinds (${board.kinds}, ${board.hubs})`);

@@ -16,6 +16,25 @@
   "use strict";
   if (window.shIdeas) return;
   var SELF = document.currentScript && document.currentScript.src || "";
+  /* the board's drawings (widget/hub-art/board.js, built from tools/figures/site/board.mjs): the cork, the pins, the
+     six kinds, the rosette, the bulb. Without them the board is plain notes. A hub's pin and emblem take its tint. */
+  function A(){ return window.SH_BOARD_ART || null; }
+  var artWait = null;
+  function loadArt(){
+    if (!artWait) artWait = new Promise(function(done){
+      if (A() || !SELF) { done(); return; }
+      var s = document.createElement("script"); s.src = SELF.replace(/ideas\.js(\?.*)?$/, "hub-art/board.js"); s.async = true;
+      s.onload = s.onerror = function(){ done(); }; document.head.appendChild(s);
+    });
+    return artWait;
+  }
+  /* the dashboard has every hub's tint and emblem (widget/hub-art/dash.js); a hub's page has its own */
+  function hubArt(id){ var H = window.SH_HUB_ART_HUB; return H && H.hub === id ? H : null; }
+  function tintOf(id){ var T = window.SH_DASH_ART && window.SH_DASH_ART.tints, H = hubArt(id); return (id && T && T[id]) || (H && H.tint) || null; }
+  function emblemOf(id){
+    var D = window.SH_DASH_ART, H = hubArt(id), e = (D && D.emblems && D.emblems[id]) || (H && H.emblem), t = tintOf(id);
+    return e && t ? '<svg class="shi-emb" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><circle cx="32" cy="32" r="31" fill="' + t.light + '"/><g transform="translate(6.4 6.4) scale(.8)">' + e.body + "</g></svg>" : "";
+  }
   var CATS = [
     ["feature", "New feature", "Something the hubs don't do yet"],
     ["better", "Make something work better", "How something that's already there works"],
@@ -88,6 +107,8 @@
     var l = document.createElement("link"); l.rel = "stylesheet"; l.href = SELF ? SELF.replace(/ideas\.js(\?.*)?$/, "ideas.css") : "ideas.css";
     document.head.appendChild(l);
   }
+
+  loadArt();
 
   /* ---------- the server ---------- */
   function call(sb, fn, args){
@@ -167,37 +188,58 @@
         '<label class="shi-pick"><span class="sr">Show ideas for</span><select data-shi-filter="hub"></select></label>' +
         '<label class="shi-pick"><span class="sr">Kind of idea</span><select data-shi-filter="cat"></select></label>' +
       "</div>" +
-      '<ul class="shi-list"></ul>' +
-      '<p class="note shi-empty" hidden></p>' +
-      '<button type="button" class="btn shi-more" data-shi="more" hidden>Show more ideas</button>';
+      '<div class="shi-wall"><div class="shi-peek" aria-hidden="true"></div><div class="shi-frame"><div class="shi-cork">' +
+        '<ul class="shi-list"></ul>' +
+        '<p class="shi-empty" hidden></p>' +
+        '<button type="button" class="btn shi-more" data-shi="more" hidden>Show more ideas</button>' +
+      "</div></div></div>";
     if (o.heading !== false) el.setAttribute("aria-labelledby", uid + "H"); else el.setAttribute("aria-label", "Idea board");
     var $ = function(s){ return el.querySelector(s); };
     var form = $(".shi-form"), list = $(".shi-list"), say = $(".shi-say");
+    /* the drawn parts: the cork and the pad's binding as backgrounds, Timmy looking over the frame with an idea */
+    function decorate(){
+      var a = A(); if (!a || el.classList.contains("has-art")) return;
+      el.classList.add("has-art");
+      el.style.setProperty("--shi-cork", 'url("data:image/svg+xml,' + encodeURIComponent(a.cork()) + '")');
+      el.style.setProperty("--shi-ring", 'url("data:image/svg+xml,' + encodeURIComponent(a.ring()) + '")');
+      var t = ""; try { if (window.shPet && window.shPet.art) t = String(window.shPet.art({ hp: 100, mood: "happy", hat: "" }, 200)); } catch (e) {}
+      if (t) $(".shi-peek").innerHTML = '<span class="shi-bulb">' + a.bulb(38) + '</span><span class="shi-timmy">' + t + "</span>";
+    }
+    decorate();
+    if (!A()) loadArt().then(function(){ if (A() && el.isConnected) { decorate(); if (S.data) paint(); } });
     function tell(msg){ say.textContent = msg || ""; }
     function find(id){ return S.data ? S.data.ideas.filter(function(i){ return String(i.id) === String(id); })[0] : null; }
 
     /* ----- the list ----- */
     function tagsHTML(it){
-      var t = "";
-      if (it.hub) t += '<span class="shi-tag is-hub' + (o.tint ? ' has-dot" style="' + esc(o.tint(it.hub)) : "") + '">' + esc(label(it.hub)) + "</span>";
-      else t += '<span class="shi-tag">All hubs</span>';
+      var t = "", a = A(), em = it.hub ? emblemOf(it.hub) : "";
+      if (it.hub) t += '<span class="shi-tag is-hub' + (em ? " has-emb" : o.tint ? ' has-dot" style="' + esc(o.tint(it.hub)) : "") + '">' + em + esc(label(it.hub)) + "</span>";
+      else t += '<span class="shi-tag is-hub">All hubs</span>';
       t += '<span class="shi-tag">' + esc(CAT_NAME[it.category] || "Something else") + "</span>";
       if (it.source === "starter") t += '<span class="shi-tag is-src">Starter idea</span>';
       else if (it.source === "checkin") t += '<span class="shi-tag is-src">From a check-in</span>';
-      if (STATUS[it.status]) t += '<span class="shi-tag is-st is-' + esc(it.status) + '">' + esc(STATUS[it.status]) + "</span>";
+      if (STATUS[it.status]) t += '<span class="shi-stamp is-' + esc(it.status) + '">' + (a && it.status === "shipped" ? a.check(14) : "") + esc(STATUS[it.status]) + "</span>";
       return t;
     }
     function voteLabel(it, up){ var n = up ? it.up : it.down; return (up ? "Vote up" : "Vote down") + ", " + n + (up ? " up" : " down") + (n === 1 ? " vote" : " votes") + (it.mine === (up ? 1 : -1) ? ", yours" : ""); }
-    function cardHTML(it){
-      return '<li class="shi-card' + (it.own ? " is-own" : "") + '" data-idea="' + esc(it.id) + '">' +
-        '<div class="shi-votes" role="group" aria-label="Vote on this idea">' +
-          '<button type="button" class="shi-vote is-up" data-shi="up" aria-pressed="' + (it.mine === 1) + '" aria-label="' + esc(voteLabel(it, true)) + '">' + icon("thumbup", 18) + '<span class="num">' + (+it.up || 0) + "</span></button>" +
-          '<button type="button" class="shi-vote is-down" data-shi="down" aria-pressed="' + (it.mine === -1) + '" aria-label="' + esc(voteLabel(it, false)) + '">' + icon("thumbdown", 18) + '<span class="num">' + (+it.down || 0) + "</span></button>" +
-        "</div>" +
-        '<div class="shi-text"><' + HN + ' class="shi-title">' + esc(it.title) + "</" + HN + ">" +
-          (it.body ? '<p class="shi-body">' + esc(it.body) + "</p>" : "") +
-          '<p class="shi-tags">' + tagsHTML(it) + "</p>" +
-          (STATUS[it.status] && it.note ? '<p class="shi-why"><b>Sam:</b> ' + esc(it.note) + "</p>" : "") +
+    /* a note on the board: its pin in its hub's color (red for all hubs), the picture of its kind, and on the Top tab
+       with nothing filtered the first idea wears the rosette */
+    function cardHTML(it, i){
+      var a = A(), cat = CAT_NAME[it.category] ? it.category : "other";
+      var top = i === 0 && S.tab === "top" && S.hub === (here || "*") && !S.cat && (+it.up || 0) - (+it.down || 0) > 0;
+      return '<li class="shi-card is-k-' + cat + (it.own ? " is-own" : "") + (top ? " is-top" : "") + '" data-idea="' + esc(it.id) + '" style="--i:' + Math.min(i || 0, 9) + '">' +
+        (a ? '<span class="shi-pin" aria-hidden="true">' + a.pin(tintOf(it.hub), 26) + "</span>" : "") +
+        (a && top ? '<span class="shi-rosette" aria-hidden="true">' + a.rosette(42) + "</span>" : "") +
+        '<div class="shi-top">' + (a ? '<span class="shi-kindart" aria-hidden="true">' + a.kind(cat, 40) + "</span>" : "") +
+          '<div class="shi-text"><' + HN + ' class="shi-title">' + (top ? '<span class="sr">Top idea: </span>' : "") + esc(it.title) + "</" + HN + ">" +
+          (it.body ? '<p class="shi-body">' + esc(it.body) + "</p>" : "") + "</div></div>" +
+        '<p class="shi-tags">' + tagsHTML(it) + "</p>" +
+        (STATUS[it.status] && it.note ? '<p class="shi-why"><b>Sam:</b> ' + esc(it.note) + "</p>" : "") +
+        '<div class="shi-foot">' +
+          '<div class="shi-votes" role="group" aria-label="Vote on this idea">' +
+            '<button type="button" class="shi-vote is-up" data-shi="up" aria-pressed="' + (it.mine === 1) + '" aria-label="' + esc(voteLabel(it, true)) + '">' + icon("thumbup", 18) + '<span class="num">' + (+it.up || 0) + "</span></button>" +
+            '<button type="button" class="shi-vote is-down" data-shi="down" aria-pressed="' + (it.mine === -1) + '" aria-label="' + esc(voteLabel(it, false)) + '">' + icon("thumbdown", 18) + '<span class="num">' + (+it.down || 0) + "</span></button>" +
+          "</div>" +
           '<p class="shi-meta"><span><b>' + esc(it.name) + "</b> · " + esc(ago(it.at)) + (it.own ? " · you" : "") + "</span>" +
             (it.own ? '<button type="button" class="shi-act" data-shi="delete">Delete</button>'
               : it.source === "starter" ? ""
@@ -233,6 +275,10 @@
       paintFilters();
       var rows = d.ideas.slice(0, S.shown), empty = $(".shi-empty"), more = $(".shi-more");
       list.innerHTML = rows.map(cardHTML).join("");
+      /* the notes are pinned up one after another when the board first shows or a tab or filter changes it, not on a vote */
+      var key = S.tab + "|" + S.hub + "|" + S.cat;
+      if (key !== S.painted) { S.painted = key; list.classList.remove("is-fresh"); void list.offsetWidth; list.classList.add("is-fresh"); }
+      else list.classList.remove("is-fresh");
       empty.hidden = !!rows.length;
       empty.textContent = S.tab === "shipped" ? "Nothing here yet. When an idea gets built, it moves to this tab."
         : (S.hub !== "*" || S.cat) ? "No ideas match these filters yet." : "No ideas yet. Post the first one.";
@@ -266,7 +312,7 @@
           '<option value=""' + (here ? "" : " selected") + ">All hubs</option>" +
           hubs.map(function(h){ return '<option value="' + esc(h.id) + '"' + (h.id === here ? " selected" : "") + ">" + esc(h.name || label(h.id)) + "</option>"; }).join("") + "</select></label>" +
         '<fieldset class="shi-kinds"><legend>What kind of idea</legend>' + CATS.map(function(c){
-          return '<label class="shi-kind" data-shi-kind="' + c[0] + '"><input type="radio" name="' + uid + 'cat" value="' + c[0] + '"><span><b>' + esc(c[1]) + "</b><small>" + esc(c[2]) + "</small></span></label>";
+          return '<label class="shi-kind" data-shi-kind="' + c[0] + '"><input type="radio" name="' + uid + 'cat" value="' + c[0] + '">' + (A() ? '<span class="shi-kindart" aria-hidden="true">' + A().kind(c[0], 34) + "</span>" : "") + '<span class="shi-kindtxt"><b>' + esc(c[1]) + "</b><small>" + esc(c[2]) + "</small></span></label>";
         }).join("") + "</fieldset>" +
         '<p class="shi-msg" role="alert"></p>' +
         '<div class="shi-actions"><button type="button" class="btn btn-text" data-shi="cancel">Cancel</button><button type="submit" class="btn btn-primary" data-shi="post">Post idea</button></div>';
