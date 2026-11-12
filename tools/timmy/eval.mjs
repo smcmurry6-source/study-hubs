@@ -7,8 +7,9 @@
 //   --effort low|medium|high   try another effort level      --concurrency 4   requests at a time within a hub
 //   --max-usd 15               stops starting new cases past this estimated spend
 // The real run needs @anthropic-ai/sdk@1.3.0 (the function's version): npm i --prefix <dir> @anthropic-ai/sdk@1.3.0, then
-// TIMMY_SDK_DIR=<dir>. The key: ANTHROPIC_API_KEY, or, in a Claude Code cloud session, the key saved for api.anthropic.com
-// through the credential form (the session's proxy adds it; set TIMMY_KEY_FROM_PROXY=1). Never in the repo or a chat.
+// TIMMY_SDK_DIR=<dir>. The key: TIMMY_EVAL_KEY (in a Claude Code cloud session, an environment variable Sam adds in the
+// environment's settings; not ANTHROPIC_API_KEY, which Claude Code itself reads), or ANTHROPIC_API_KEY on a computer
+// where nothing else uses it. Never in the repo or a chat.
 // Writes the full report (every question, answer and grade) as markdown and JSON to $SH_RELEASE_OUT or the temp folder.
 //
 // What a case passes: the reply came back (no error), every quote it cites is really in that paragraph, plain text, nothing
@@ -167,8 +168,8 @@ async function realModel(){
   try { mod = dir ? createRequire(path.join(path.resolve(dir), "noop.js"))("@anthropic-ai/sdk") : createRequire(import.meta.url)("@anthropic-ai/sdk"); }
   catch (e) { console.error("✗ needs @anthropic-ai/sdk@1.3.0: npm i --prefix /tmp/timmy-sdk @anthropic-ai/sdk@1.3.0, then TIMMY_SDK_DIR=/tmp/timmy-sdk"); process.exit(2); }
   const Anthropic = mod.default || mod.Anthropic || mod;
-  const key = process.env.ANTHROPIC_API_KEY || (process.env.TIMMY_KEY_FROM_PROXY === "1" ? "placeholder-the-session-proxy-adds-the-key" : "");
-  if (!key) { console.error("✗ no key: set ANTHROPIC_API_KEY, or TIMMY_KEY_FROM_PROXY=1 in a session whose proxy holds one for api.anthropic.com"); process.exit(2); }
+  const key = process.env.TIMMY_EVAL_KEY || process.env.ANTHROPIC_API_KEY || "";
+  if (!key) { console.error("✗ no key: set TIMMY_EVAL_KEY (or ANTHROPIC_API_KEY where nothing else reads it)"); process.exit(2); }
   const client = new Anthropic({ apiKey: key, maxRetries: 2, timeout: 180_000 });
   return params => client.beta.messages.create(EFFORT ? Object.assign({}, params, { output_config: Object.assign({}, params.output_config, { effort: EFFORT }) }) : params);
 }

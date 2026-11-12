@@ -105,8 +105,10 @@ person to read. The full report (every question and answer) is written as markdo
   "not covered" case's terms are in no hub content) and the grading. CI and `tools/release/run.js` run it.
 - The real run costs about $10-12 for all 134 cases (`--only <hub or case ids>` for fewer, `--max-usd` to stop early).
   **Ask Sam before running it.** It needs the SDK (`npm i --prefix <dir> @anthropic-ai/sdk@1.3.0`, then
-  `TIMMY_SDK_DIR=<dir>`) and a key: in a Claude Code cloud session, saved for `api.anthropic.com` through the credential
-  form (then `TIMMY_KEY_FROM_PROXY=1`), never pasted in a chat or written in a file.
+  `TIMMY_SDK_DIR=<dir>`) and a key in `TIMMY_EVAL_KEY`. In a Claude Code cloud session Sam adds it as an environment
+  variable in the environment's settings (the session's credential form can't hold a key for `api.anthropic.com`: the
+  session reaches Anthropic's API without the proxy). Not `ANTHROPIC_API_KEY`, which Claude Code itself reads. Never
+  pasted in a chat or written in a file; a key made for the eval, deleted after, is safest.
 - Rerun it after changing `RULES`, the schema, the effort level or the model, and before the release.
 
 ## At the release (the release note's Ask Timmy box)

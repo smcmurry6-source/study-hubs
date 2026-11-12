@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: 
 agent: Claude Code (part 1, 2026-11-12)
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1)
 ---
 
 # Ask Timmy: Timmy becomes every hub's study assistant (redesign)
@@ -231,7 +231,8 @@ and `hub-timmy.js` and touches the core only for Settings ([run-a-redesign-sessi
    questions a hub (covered, not covered, half covered, a graded quiz question, a practice question before and after
    answering, a problem to report, an idea, site help, a dashboard question with no hub named, attempts to make him break
    his rules, stress), and `tools/timmy/eval.mjs`, which runs it against the real API. That needs a key in the session
-   (the credential form for `api.anthropic.com`) and costs a few dollars: ask Sam once before running it.
+   (`TIMMY_EVAL_KEY`, an environment variable Sam adds; the credential form can't hold a key for Anthropic's host) and
+   costs about $10-12: ask Sam once before running it.
 2. **The chat in the new pages.** `widget/ask.js` and `ask.css`, Timmy's "Ask me", the icon when he's off, Ask Timmy on
    answered questions, the report and idea drafts, the Report button on his answers, the preview's canned replies, the smoke test, and the About page's
    entries written into the release note's drafts.
@@ -248,8 +249,9 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
 - [x] Part 1: the migration, the function and its tests ([ask-timmy](../reference/ask-timmy.md)); the test set and the
       eval, which passes with a fake model (`node tools/timmy/eval.mjs --dry`, in CI)
 - [ ] Part 1: the test set passes on the real API (every quote checks out, "not covered" when it should be, quiz and
-      practice questions declined, offers drafted, no rule broken): waits for Sam's OK to spend about $10 and a key in the
-      session (the credential form for `api.anthropic.com`); then fix what it finds and rerun the failures
+      practice questions declined, offers drafted, no rule broken). Sam said yes to the full run (about $10-12) on
+      2026-11-12; it waits for a key in `TIMMY_EVAL_KEY` (an environment variable in the cloud environment's settings: the
+      credential form refuses Anthropic's host); then fix what it finds and rerun the failures
 - [ ] Part 2: the chat on every new hub page and the new dashboard, on a phone and a laptop, with the Report button on
       his answers; the smoke test covers it
 - [ ] Part 3: the admin tab
@@ -271,7 +273,7 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
   its server half is in. Choices made: the SDK is `@anthropic-ai/sdk@1.3.0` (it sends the key as `Authorization: Bearer`);
   content paragraphs are numbered with the engine's own rule, tested in Chromium against `exportSections`; the dashboard
   holds at most 4 hubs; a question holds $0.08 against the day's cap while it's answered. Left: the real-API eval run
-  (Sam's OK and a key), then parts 2-4.
+  (Sam said yes; it waits for the key in `TIMMY_EVAL_KEY`), then parts 2-4.
 
 ## Outcome
 
