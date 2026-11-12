@@ -145,28 +145,16 @@ def render(items, out_mp3, voice, speed):
     Kokoro's own timings: when each word of the notes is spoken, for the redesign's Follow along highlight."""
     from kokoro_ready import ensure
     kdir = ensure()   # installs Kokoro the first time it's missing (tools/kokoro-setup.sh)
-    import numpy as np, soundfile as sf
+    import soundfile as sf
     import narration_words as nw
     from kokoro_onnx import Kokoro
     k = Kokoro(os.path.join(kdir, "kokoro-v1.0.onnx"), os.path.join(kdir, "voices-v1.0.bin"))
-    ph = nw.Phonemes(k)
-    audio, n, timed = [], 0, []
-    for it in items:
-        if it[0] == "pause": audio.append(np.zeros(int(SR * it[1]), dtype=np.float32)); n += len(audio[-1]); continue
-        _, v, shown = it
-        chars = []
-        # Kokoro takes at most ~510 phoneme tokens per call: split long text at sentence or clause ends
-        for chunk in split_ph(ph.phonemes(v)):
-            a, _, spoken_at = k.create_timed(chunk, voice=voice, speed=speed, is_phonemes=True, sentence_pause=0.3, clause_pause=0.1)
-            t0 = n / SR
-            chars += [(x.phoneme, t0 + x.start, t0 + x.end) for x in spoken_at]
-            audio.append(a.astype(np.float32)); n += len(a)
-        timed += [(w, s, e) for w, (s, e) in nw.item_words(ph, v, shown, chars, 0.0) if w.strip()]
+    audio, timed = nw.render_items(nw.Phonemes(k), items, voice, speed)
     wav = tempfile.mktemp(suffix=".wav")
-    sf.write(wav, np.concatenate(audio), SR)
+    sf.write(wav, audio, SR)
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-ac", "1", "-ar", str(SR), "-b:a", "64k", out_mp3], check=True)
     os.remove(wav)
-    nw.write_file(out_mp3, timed, n / SR)
+    nw.write_file(out_mp3, timed, len(audio) / SR)
 
 
 def split_ph(ph, n=400):

@@ -50,7 +50,13 @@ python3 tools/narration_words.py heme-endo-exam2 --check                       #
 
 It reads the notes from `hubs/<hub>/next/content/notes.json`, predicts where each sound falls with Kokoro's duration model
 (cut down to that output, about 20 times faster than speaking; it needs the `onnx` package, also installed by the setup
-script), and aligns that to the mp3's loudness; nothing is re-spoken. About a minute for a 35-minute lecture. Checked against
-exact timings: median error 20-40 ms, 96-100% of words within 0.2 s (its docstring has the numbers). The smoke test's lint
+script), and aligns that to the mp3's loudness; nothing is re-spoken. A minute or two for a 35-minute lecture. Checked against
+exact timings: median error 20-40 ms, 96-100% of words within 0.2 s (its docstring has the numbers). Each file it makes
+prints how many words start on speech (about 99.5% when they line up); under 97% it says so. Then run it again with
+`--render`: it speaks the notes afresh (about a fifth of the lecture's length) and lines the two recordings' spectra up,
+which is exact wherever they say the same words, and it names any minutes of the recording that **don't** say today's notes.
+Those minutes mean the notes changed after the narration was made: regenerate it with `narrate.py`
+([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)). That is how Perio Session 5's drift was found
+(2026-11-12). The smoke test's lint
 fails when a redesigned hub's narration has no words file or one made from another recording of it, so a regenerated mp3
 needs its words file in the same PR; `narrate.py` already did it.

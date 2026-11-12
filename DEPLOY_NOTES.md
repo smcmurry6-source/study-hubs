@@ -43,7 +43,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   (Kokoro's duration model cut to that output, aligned to each mp3's loudness; median error 20-40 ms, 96-100% of words within
   0.2 s against exact timings). `tools/narrate.py` now writes the file from Kokoro's own timings whenever it renders, and the
   smoke lint fails a redesigned hub whose narration has no words file or one made from another recording.
-  `tools/kokoro-setup.sh` installs kokoro-onnx 0.6.1+ and `onnx`. `widget/v3.js`: `shTTS.audio()` and the `sh:tts-audio` /
+  `tools/kokoro-setup.sh` installs kokoro-onnx 0.6.1+ and `onnx`. **Live on Perio:** Session 5's narration (both levels)
+  is regenerated: its middle (minutes 5-9 Plain English, 6-15 As taught) no longer said what the notes say, found by the
+  timings' fit check and confirmed by comparing a fresh rendering minute by minute (`narration_words.py --render`). `widget/v3.js`: `shTTS.audio()` and the `sh:tts-audio` /
   `sh:tts-stop` events for it, and the Listen dock's title no longer repeats a hidden lecture badge ("L11L11 · ...", every
   hub). The About page text waits in the [redesign release](vault/tasks/2026-11-06-redesign-release.md) note, like the
   redesign's other features. [Task](vault/tasks/done/2026-11-12-redesign-follow-along.md).

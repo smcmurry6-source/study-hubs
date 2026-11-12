@@ -41,6 +41,7 @@ A survey answer asked to "highlight the words being read when listening to the l
 
 - 2026-11-11: Sam approved it ("Add the highlight feature to the hub redesign").
 - 2026-11-12: built, measured against Kokoro's exact timings, checked in a browser on a laptop and a phone.
+- 2026-11-12: the timings' fit check found Perio Session 5's narration had drifted from its notes; regenerated.
 
 ## Outcome
 
@@ -56,6 +57,16 @@ within 0.2 s; on the committed mp3s, against a spectral alignment of the fresh r
 0.1 s, 96-100% within 0.2 s. All 52 files were made (Heme & Endo Exam 2, Occlusion, Perio, both levels). `tools/narrate.py`
 now writes the file from Kokoro's own timings (`create_timed`) whenever it renders an mp3, and the smoke lint fails a
 redesigned hub whose narration lacks one or has one from another recording.
+
+**A drift it found.** Scoring every file (the share of words that start where the recording is speaking: 98-100% for all
+but three) flagged Perio Session 5 at both levels and Session 3 As taught. Speaking each afresh and comparing the two
+recordings' spectra minute by minute: Session 5's middle (minutes 5-9 of Plain English, 6-15 of As taught) didn't say what
+the notes say any more, so the notes had changed after its 10-21 narration, against
+[text-and-audio-never-drift](../../rules/text-and-audio-never-drift.md). Both were regenerated with `narrate.py` (with exact
+timings): the live Perio hub's Session 5 narration now reads the current notes (2 minutes longer in Plain English, 2.7 As taught). Session 3
+matched its notes (only its pauses differ), so its mp3 stays and its timings come from the exact way (`--render`: the fresh
+rendering's word times moved onto the recording by the spectra; 98.9% of words start on speech, up from 95.4%). The tool
+now prints that score for every file and points to `--render` under 97%, which also names any drifted minutes.
 
 **The page** (`widget/hub.js`, "Follow along"): when Listen starts a narration file (`sh:tts-audio` from `widget/v3.js`),
 the engine loads the words file, matches its words to the notes' text in order (inline tags don't split a word, block

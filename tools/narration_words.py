@@ -4,6 +4,7 @@
   python3 tools/narration_words.py <hub> --lec dmpharm --level full
   python3 tools/narration_words.py <hub> --check          say which files are missing or older than their mp3 (no Kokoro needed)
   python3 tools/narration_words.py <hub> --stale          make only those
+  python3 tools/narration_words.py <hub> --lec X --level full --render    the exact way, for a file that fits badly
 
 Writes hubs/<hub>/audio/<lecture>-<level>.words.json beside each <lecture>-<level>.mp3, for the redesign's Follow along
 (widget/hub.js). The words come from the notes as the redesign shows them (hubs/<hub>/next/content/notes.json, the live
@@ -35,7 +36,9 @@ JUMP = 60.0           # the stretch search's cost per second that a pause grew o
 LONGEST = 0.06        # the most of one sound's predicted duration that counts as speech
 FINE_BAND = 0.8       # how far (seconds) the last alignment lets a word move from where its stretch put it
 FINE_STEP = 0.6       # the last alignment's cost of a stretching step
-SR = 16000            # the mp3 is decoded at this rate, for its loudness only
+SR = 16000            # the mp3 is decoded at this rate, for its loudness (and, with --render, its spectrum)
+FIT_OK = 0.97         # below this share of word starts on speech, the tool says to try --render
+DRIFT = 0.4           # --render: a minute of the recording whose spectrum differs from today's notes by more than this
 UNIT = 600 / 24000    # one step of Kokoro's duration output, seconds
 SENT, CLAUSE = ".!?", ",;:"
 
@@ -199,10 +202,12 @@ def loudness(mp3):
     return np.clip((db + 45) / 25, 0, 1).astype(np.float32), len(a) / SR
 
 
-def align(actual, pred, lo, hi, step):
-    """DTW of the real loudness (rows) against the predicted speech mask (columns) inside a band (row i may meet columns
+def align(actual, pred, lo, hi, step, path=False):
+    """DTW of the real recording's frames (rows) against the predicted ones (columns) inside a band (row i may meet columns
     lo[i] to hi[i] - 1), a step that stretches one side costing `step`: for each predicted frame, the real frame it meets
-    first. Each row is one vector pass (the horizontal moves as a prefix minimum)."""
+    first (with path=True, also the path's cost at each real frame). Frames are numbers (loudness against the speech mask)
+    or rows of numbers (spectra, compared by their RMS difference). Each row is one vector pass (the horizontal moves as a
+    prefix minimum)."""
     N, M = len(actual), len(pred)
     INF = np.float32(1e9)
     prev = np.full(M + 1, INF, dtype=np.float32)   # prev[j + 1] = D[i - 1, j]; prev[0] = D[i - 1, -1]
@@ -210,7 +215,7 @@ def align(actual, pred, lo, hi, step):
     ptr = []
     for i in range(N):
         a, b = lo[i], hi[i]
-        c = np.abs(actual[i] - pred[a:b])
+        c = np.abs(actual[i] - pred[a:b]) if actual.ndim == 1 else np.sqrt(((actual[i][None, :] - pred[a:b]) ** 2).mean(1))
         diag = prev[a:b]                   # D[i-1, j-1]
         vert = prev[a + 1:b + 1] + step    # D[i-1, j]
         B = c + np.minimum(diag, vert)
@@ -223,16 +228,17 @@ def align(actual, pred, lo, hi, step):
         if i == 0: prev[0] = INF
     if not prev[M] < INF: return None      # the band left no way through
     i, j = N - 1, M - 1                    # walk back from the corner
-    first = np.full(M, -1, dtype=np.int64)
+    first = np.full(M, -1, dtype=np.int64); here = np.zeros(N, dtype=np.float32)
     while i >= 0 and j >= 0:
         first[j] = i
+        if path: here[i] = abs(actual[i] - pred[j]) if actual.ndim == 1 else np.sqrt(((actual[i] - pred[j]) ** 2).mean())
         p = ptr[i][j - lo[i]] if lo[i] <= j < hi[i] else 0
         if p == 0: i -= 1; j -= 1
         elif p == 1: i -= 1
         else: j -= 1
     for j in range(M):
         if first[j] < 0: first[j] = first[j - 1] if j else 0
-    return first
+    return (first, here) if path else first
 
 
 def band(center, M, W):
@@ -315,6 +321,59 @@ def place(words, spans, breaks, loud, alen):
     return out
 
 
+def render_items(ph, items, voice="af_heart", speed=1.0):
+    """Speak narrate.spoken(html, shown=True) items as tools/narrate.py does: the audio (24 kHz) and the page's words with
+    Kokoro's own timings. ph: a Phonemes (or Predictor)."""
+    audio, n, timed = [], 0, []
+    for it in items:
+        if it[0] == "pause": audio.append(np.zeros(int(24000 * it[1]), dtype=np.float32)); n += len(audio[-1]); continue
+        _, v, shown = it
+        chars = []
+        # Kokoro takes at most ~510 phoneme tokens per call: split long text at sentence or clause ends
+        for chunk in narrate.split_ph(ph.phonemes(v)):
+            a, _, spoken_at = ph.k.create_timed(chunk, voice=voice, speed=speed, is_phonemes=True, sentence_pause=0.3, clause_pause=0.1)
+            t0 = n / 24000
+            chars += [(x.phoneme, t0 + x.start, t0 + x.end) for x in spoken_at]
+            audio.append(a.astype(np.float32)); n += len(a)
+        timed += [(w, s, e) for w, (s, e) in item_words(ph, v, shown, chars, 0.0) if w.strip()]
+    return (np.concatenate(audio) if audio else np.zeros(0, np.float32)), timed
+
+
+def spectrum(pcm, sr, hop=0.02):
+    """32 log-spaced bands, 60 Hz to 7 kHz, every hop seconds, each band normalized over the recording."""
+    h, w = int(sr * hop), int(sr * 0.032); n = max(0, (len(pcm) - w) // h)
+    fr = np.lib.stride_tricks.as_strided(pcm, (n, w), (pcm.strides[0] * h, pcm.strides[0])) * np.hanning(w)
+    P = np.abs(np.fft.rfft(fr, axis=1)) ** 2; bins = np.fft.rfftfreq(w, 1 / sr); edges = np.geomspace(60, 7000, 33)
+    L = np.log(np.stack([P[:, (bins >= edges[i]) & (bins < edges[i + 1])].sum(1) for i in range(32)], 1) + 1e-8)
+    return ((L - L.mean(0)) / (L.std(0) + 1e-6)).astype(np.float32)
+
+
+def rerender(hub, lec, level, pred, html=None):
+    """The slow, exact way, for a recording the loudness alignment fits badly: speak the notes again (Kokoro's own word
+    times, about a fifth of the lecture's length) and align the two recordings' spectra (same voice, so they line up
+    closely wherever they say the same words). Returns the words placed on the recording, its length, and the minutes
+    of the recording that don't sound like today's notes (the text changed after it was made: regenerate it with
+    tools/narrate.py, text-and-audio-never-drift)."""
+    if html is None: html = json.load(open(os.path.join(ROOT, "hubs", hub, "next", "content", "notes.json")))[level][lec]
+    audio, timed = render_items(pred, narrate.spoken(html, shown=True))
+    fresh = np.interp(np.arange(int(len(audio) * SR / 24000)) * 24000 / SR, np.arange(len(audio)), audio).astype(np.float32)
+    pcm = np.frombuffer(subprocess.run(["ffmpeg", "-v", "error", "-i", mp3_path(hub, lec, level), "-f", "f32le", "-ac", "1", "-ar", str(SR), "-"], check=True, capture_output=True).stdout, dtype=np.float32)
+    A, B, HOP = spectrum(pcm, SR), spectrum(fresh, SR), 0.02
+    first, cost = align(A, B, *band(np.arange(len(A)) * len(B) / max(1, len(A)), len(B), int(60 / HOP)), 0.15, path=True)
+    at = lambda t: first[min(len(first) - 1, int(t / HOP))] * HOP
+    out, last = [], 0.0
+    for w, s, e in timed:
+        a = max(last, at(s)); out.append((w, a, max(a, at(e)))); last = a
+    mins = [m for m in range(int(len(A) * HOP / 60) + 1) if cost[int(m * 60 / HOP):int((m + 1) * 60 / HOP)].mean() > DRIFT]
+    return out, len(pcm) / SR, mins
+
+
+def fit(timed, loud):
+    """Share of words whose start the recording is speaking at (within 60 ms): about 99.5% or more when they line up."""
+    sp = loud > 0.5
+    return float(np.mean([sp[int(a / FINE):int(a / FINE) + 6].any() for _, a, _ in timed])) if timed else 1.0
+
+
 def build(hub, lec, level, pred=None, html=None):
     mp3 = mp3_path(hub, lec, level)
     if html is None:
@@ -323,7 +382,8 @@ def build(hub, lec, level, pred=None, html=None):
     pred = pred or Predictor()
     words, spans, breaks, plen = predict(pred, html)
     loud, alen = loudness(mp3)
-    return write(hub, lec, level, place(words, spans, breaks, loud, alen), alen), plen, alen
+    timed = place(words, spans, breaks, loud, alen)
+    return write(hub, lec, level, timed, alen), plen, alen, fit(timed, loud)
 
 
 def write(hub, lec, level, timed, alen):
@@ -370,6 +430,7 @@ def main():
     ap.add_argument("--level", choices=["full", "plain"], action="append")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--stale", action="store_true", help="only the files --check lists")
+    ap.add_argument("--render", action="store_true", help="the exact way: speak the notes again and align the recordings (slow)")
     a = ap.parse_args()
     if a.check:
         bad = stale(a.hub)
@@ -380,8 +441,13 @@ def main():
     if not todo: print("%s: nothing to do" % a.hub); return
     pred = Predictor()
     for lec, level in todo:
-        n, plen, alen = build(a.hub, lec, level, pred)
-        print("%s %s-%s: %d words, predicted %.1f s, recording %.1f s" % (a.hub, lec, level, n, plen, alen), flush=True)
+        if a.render:
+            timed, alen, drift = rerender(a.hub, lec, level, pred)
+            n = write(a.hub, lec, level, timed, alen)
+            print("%s %s-%s: %d words from a fresh rendering, recording %.1f s%s" % (a.hub, lec, level, n, alen, "; minutes %s of the recording don't match today's notes: regenerate it with tools/narrate.py" % drift if drift else ""), flush=True)
+            continue
+        n, plen, alen, f = build(a.hub, lec, level, pred)
+        print("%s %s-%s: %d words, predicted %.1f s, recording %.1f s, %.1f%% of words start on speech%s" % (a.hub, lec, level, n, plen, alen, 100 * f, "" if f >= FIT_OK else ": a poor fit, try --render (it also says whether the notes changed after the recording)"), flush=True)
 
 
 if __name__ == "__main__":
