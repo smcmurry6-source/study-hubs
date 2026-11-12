@@ -195,9 +195,22 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
 - 2026-11-06: written from Sam's request in chat, with the survey's answers, the retry data and the engine and server as
   they are; the calls above are proposals until Sam confirms them.
 - 2026-11-06: Sam confirmed all six calls; ready to build.
+- 2026-11-12 (Claude Code, planning the rest of phase 4): not built yet. It touches `widget/hub-bank.js` and can run
+  beside the phase 4 sessions ([phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here to the release"). Its
+  "server part in the pending migration" is a change to `migration_v54.sql`, which Sam has said not to change without
+  his word: ask him at the start of the session (or build it with no server part).
 
 ## Outcome
 
 Related: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) · [the release](2026-11-06-redesign-release.md) ·
 [phase 2](2026-11-05-redesign-phase-2-live-hubs.md) · [question-bank-filter-panel](../rules/question-bank-filter-panel.md) ·
 [game-server](../reference/game-server.md)
+
+## Opening prompt
+
+> Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then "For every session above" in
+> `vault/tasks/2026-11-05-redesign-phase-4-game-layer.md`, then do the task in
+> `vault/tasks/2026-11-06-redesign-learn-and-flashcards.md`. Its note asks for a server part in the pending
+> migration: before any code, tell me in one message what that part is and whether the toggle can ship without it,
+> and wait for my answer. `migration_v54.sql` is not applied and is not changed without my word. Grep the big files,
+> never read them whole. No subagents. No hosted preview. Open a draft PR with the test report.

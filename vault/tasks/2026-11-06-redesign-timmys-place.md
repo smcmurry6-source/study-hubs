@@ -66,6 +66,9 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
       it (the journeys' pedestal too), and a piece in the spot left of the path hides its base; the card always shows him
       at the door (found in part C, 2026-11-12; either his door spot or the statue's moves, home by home, in
       `tools/figures/site/place.mjs`)
+      **Sam, 2026-11-12: fix it.** Timmy's door spot moves to the open side of the door, home by home, and the spot
+      left of the path is nudged; the statue stays by the door. In the shop's art session, on one sheet of every home
+      ([the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1", item 7; BUG-089 in the bug log)
 - [ ] `LORE.md` and the About page (Timmy's place) updated
 - [ ] CI and the release suites pass, perf budgets met (`node tools/release/run.js`)
 - [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
@@ -257,6 +260,18 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
   - **Something to look at, Sam:** with the garden in the spot left of the path, the garden and Timmy at the door
     stand in front of the rank statue and hide most of it (the kit's layout since round 3; the statue shows as soon as
     Timmy walks off or the spot is empty). Not changed here.
+- 2026-11-12 (Claude Code, planning only), Sam's calls for what is left around the place
+  ([decisions](../decisions.md); the order is in [phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here to
+  the release"):
+  - **The statue behind Timmy** (BUG-089): fixed in the shop's art session (the box above).
+  - **What Timmy wears**: "if someone doesnt have a costume applied, they are naked. What you put wins." At his
+    place too: with nothing on he is himself, where part C drew him in that day's holiday outfit. One line in
+    `timmySvg()`, made in [Timmy everywhere](2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"). The place's
+    own seasons and holiday props don't change.
+  - **Visiting** has its own note and session: [visiting](2026-11-12-redesign-visiting.md).
+  - **The shop's link** in the customizer and snack HP: [the shop](2026-11-06-redesign-timmy-shop.md), session 2.
+  - **The later journeys' rank sets**: after the release, in a new migration
+    ([their note](2026-11-12-redesign-later-journeys-rank-sets.md)).
 
 ## Outcome
 

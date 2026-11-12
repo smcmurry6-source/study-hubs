@@ -179,9 +179,10 @@ lane goes to `yard-side` and clears `yard-corner`, a piece in `yard-corner` take
 `tools/release/xp.js` runs fourteen changes through both and fails if they ever differ; it also checks the place's
 spring, summer and fall against `sh_shop_seasons` for every day of three years, and the kit's ids against the catalog.
 `get_place` is ready to be drawn (`shPlace.open({ place })`) but nothing calls it until visiting is built. Not wired
-yet: the shop (`buy_item`, the wallet, snacks and their HP in `get_pet_days_v2`: part B). **One gap, Sam's call:** five
-everyday outfits in the catalog have no drawing ([task](../tasks/2026-11-12-five-outfits-without-a-drawing.md)), and the
-five rare costumes aren't drawn yet either (part B's art); the place draws Timmy as himself in any of them.
+yet: the shop (`buy_item`, the wallet, snacks and their HP in `get_pet_days_v2`: part B). **One gap, decided:** five
+everyday outfits in the catalog have no drawing ([task](../tasks/2026-11-12-five-outfits-without-a-drawing.md); Sam,
+2026-11-12: draw them), and the five rare costumes aren't drawn yet either; both are the shop's art session, and
+until then the place draws Timmy as himself in any of them.
 
 The pages that call them (built 2026-11-12, [the idea board](../tasks/2026-11-06-idea-board.md)): `widget/ideas.js` (the
 board and the tick), `widget/replies.js` (a status note shows as a pop-up once and stays in the Inbox; it reads
@@ -233,6 +234,30 @@ Each is one line in `migration_v54.sql` to change.
     the Fourth of July's is June 28 to July 4 (7 days; Sam confirmed it, 2026-11-10).
 - Today's `record_personal_answer` stays open after the release, with today's capped rules, for any page that still calls it;
   a later migration can close it once no page does.
+
+## Where the client works around the server as written
+
+Sam's instruction since 2026-11-12: when the client and `migration_v54.sql` disagree, tell him and don't change the
+migration. These are the known cases and what he chose for each (2026-11-12, [decisions](../decisions.md)). The
+client follows the server in all of them. A new case: stop and tell Sam.
+
+| The server as written | What the client does |
+|---|---|
+| Five everyday outfits have rows and no drawing | They are drawn (the shop's art session) |
+| Five rare costumes, where the shop's first note said "about a dozen" | Five. More can join later with `admin_upsert_shop_item` |
+| The prices are the draft ones | Released as written; any Sam wants changed are changed afterwards with `admin_upsert_shop_item` ([the shop](../tasks/2026-11-06-redesign-timmy-shop.md) keeps the list) |
+| `record_answer_v2`'s reply has the XP and the total, not the balance | The balance is read at page load (the bootstrap's `shop.wallet`), when the shop or the "you" card opens (`get_my_shop`) and from `buy_item`'s reply; no counter ticks after an answer |
+| `buy_item` sells a snack at 100 HP | The shop greys it out ("He's full") |
+| `get_my_shop` says which seasons are on sale, not until when | A season's shelf says "Limited time", with no countdown |
+| `sh_wallet` counts every badge kind that isn't `mastery-`, `dark-seen-` or `pet-adopt` as a trophy (+25) | The client records no new badge kinds except real trophies |
+| `record_achievement` takes only the kinds it lists; `bowling` isn't one | The Bowling trophy and the clips seen are kept on the device; the kind is added in the first migration after the release ([the rank sets](../tasks/2026-11-12-redesign-later-journeys-rank-sets.md)) |
+| Nothing pays XP for a bowling clip | No XP for it |
+| Rank items exist for tiers 1 to 6 only | The ModuPro's and the Loupes' sets come after the release, in a new migration |
+| `post_idea` takes the sources `board`, `suggest` and `checkin` | An idea Timmy drafts (Ask Timmy, part 2) posts as `board` |
+| `sh_season` and `sh_is_fall` are described as the days Timmy dresses up by himself | They stay as the holiday dates (the hubs' themes, the eggs, the place's props). On the redesign's pages Timmy wears only what the student put on (Sam, 2026-11-12), and a rare costume turns up at the shop on its day instead of being worn |
+
+[Learn and Flashcards](../tasks/2026-11-06-redesign-learn-and-flashcards.md) wants a server part in the pending
+migration: that one is Sam's call when its session starts.
 
 ## Tests
 

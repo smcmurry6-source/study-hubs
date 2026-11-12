@@ -91,3 +91,16 @@ server for the journeys, Shiny Gold Crowns and Timmy's shop, Timmy's place and t
 the live hubs keep today's rules (and the 600-a-day cap) until the release switches the pages to the new calls. No XP back pay.
 What the release does with it is in [the release note](2026-11-06-redesign-release.md) ("From phase 5, part 3"). The judgment
 calls made while building it, for Sam to confirm before the release, are listed in the reference note and the PR.
+
+## Opening prompt (part 2)
+
+Session 9 of [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release": after every session
+that adds a file, so the bundles are cut once (planned with Sam, 2026-11-12).
+
+> Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then "From here to the release" in
+> `vault/tasks/2026-11-05-redesign-phase-4-game-layer.md` and its Log's last entries (the files phase 4 added and
+> when each loads), then do **part 2** of `vault/tasks/2026-11-05-redesign-phase-5-backend.md`: the two widget
+> bundles, one shared stylesheet, one self-hosted font, the thinner Supabase client, and the budgets lowered to the
+> new sizes. The live pages must keep working exactly as today until the release. Neither pending migration is
+> applied or changed. Grep the big files, never read them whole. No subagents. No hosted preview. Open a draft PR
+> with the test report; I'll say "merge".
