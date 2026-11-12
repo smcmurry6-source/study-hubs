@@ -119,7 +119,8 @@ person to read. The full report (every question and answer) is written as markdo
   started after it, so a session that started before runs the eval in a fresh session on its branch.
 - `--regrade <report.json>`: free; grades a saved run again with this checkout's grader and quote check, for a change to
   the grading or to `quoteIn`.
-- Rerun it after changing `RULES`, the schema, the effort level or the model, and before the release.
+- Rerun it after changing `RULES`, the schema, the effort level or the model. Not before the release unless one of those
+  changed (Sam, 2026-11-12: "dont bother with the rerun before release").
 
 ## At the release (the release note's Ask Timmy box)
 

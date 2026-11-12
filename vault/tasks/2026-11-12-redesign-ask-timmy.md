@@ -293,8 +293,9 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
   and $3.26 on the dashboard, which the estimate had missed. Sam then OK'd about $2 for occlusion only: oc-01, oc-09,
   oc-24, oc-25 and oc-38 all passed ($1.23), choices named by their words, every quote checked out, every fact in the
   content. Spent on the eval in all: about $17.50 (a one-case try $1.32, the full run $11.71, the reruns $3.26 and
-  $1.23). Reports: branch `claude/timmy-eval-run-1`, `tools/timmy/runs/` (not merged). Part 1 is done; the whole set
-  runs again before the release (the release steps say so).
+  $1.23). Reports: branch `claude/timmy-eval-run-1`, `tools/timmy/runs/` (not merged). Part 1 is done. Sam: "dont
+  bother with the rerun before release" ([decisions](../decisions.md)): the eval runs again only after a change to
+  `RULES`, the schema, the effort level or the model.
 
 ## Outcome
 
