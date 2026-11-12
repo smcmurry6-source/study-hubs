@@ -404,9 +404,9 @@ redesign's pages, on the game layer (`get_my_shop`, `equip_item`), so it goes li
 
 - [ ] **The shop first** (part B): until it is built the customizer has no "Get more in the shop" and what Timmy owns
       comes from the server's gifts and rank pieces only (Halloween 2026's set and the Handpiece's rank sets).
-- [ ] **Five everyday outfits have no drawing** ([task](2026-11-12-five-outfits-without-a-drawing.md), Sam's call:
+- [x] **Five everyday outfits have no drawing** ([task](done/2026-11-12-five-outfits-without-a-drawing.md), Sam's call:
       draw them or take them out of the catalog) and the five rare costumes are part B's art. Until then the place
-      draws Timmy as himself in any of them.
+      draws Timmy as himself in any of them. (Drawn, all ten, and approved by Sam: [#339](https://github.com/smcmurry6-source/study-hubs/pull/339), 2026-11-12.)
 - [ ] **The later journeys' rank sets** ([task](2026-11-12-redesign-later-journeys-rank-sets.md)): 28 drawings and 28
       catalog rows, cut from part C with Sam's yes. Not needed for the release (nobody is near 125,000 XP).
 - [ ] **Timmy on a hub's bar doesn't wear his place's outfit yet**: `widget/pet.js` wasn't touched in part C. It

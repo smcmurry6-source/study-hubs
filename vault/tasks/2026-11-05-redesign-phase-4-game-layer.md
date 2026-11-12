@@ -48,7 +48,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 
 | # | Session | Its spec | Needs first |
 |---|---|---|---|
-| 1 | **The shop's art**: the coin, snacks, boosts, rarity frames, the five undrawn outfits, the five rare costumes, and Timmy's door spot moved off the rank statue (BUG-089) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1" | [#335](https://github.com/smcmurry6-source/study-hubs/pull/335) merged |
+| 1 | **The shop's art**: the coin, snacks, boosts, rarity frames, the five undrawn outfits, the five rare costumes, and Timmy's door spot moved off the rank statue (BUG-089). **Done 2026-11-12** ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)), with the shop's look redrawn ("more epic") | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1" | [#335](https://github.com/smcmurry6-source/study-hubs/pull/335) merged |
 | 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
 | 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
 | 4 | **Visiting**: a row on the new dashboard's boards opens that person's place | [visiting](2026-11-12-redesign-visiting.md) | 3 |
@@ -243,7 +243,7 @@ These hold for each spec; a spec only adds to them.
     `shPlace.ready()`. The preview's `shop2()` already carries a wallet and empty shelves to fill
     (`tools/preview/runtime/preview.js`). Still the shop's: `buy_item`, the balance on the "you" panel, snacks and
     their HP (`get_pet_days_v2`'s `hp`, which `widget/pet.js` doesn't read yet), the rare costumes' art, and **the
-    five everyday outfits with no drawing** ([task](2026-11-12-five-outfits-without-a-drawing.md), Sam's call).
+    five everyday outfits with no drawing** ([task](done/2026-11-12-five-outfits-without-a-drawing.md), Sam's call).
   - **Part D (the bowling egg) starts from**: the bowling lane is a yard piece (`bowling-lane`, wide: the side yard
     and the front corner), drawn by the kit with its own tap surprise (`EGGS.lane`: it rolls a mint, "Strike! Well,
     close."). In the full view every tappable thing is a `.tp-egg[data-egg]` inside the stage's shadow root and
@@ -283,13 +283,14 @@ These hold for each spec; a spec only adds to them.
     are on `NO_LOUPES` (safety glasses, pirate, astronaut, Captain Enamel);
   - Timmy's door spot moved in all 22 homes (BUG-089 closed), with the left yard spot, the path's lamp and nine
     statues; BUG-090 closed; BUG-095 opened (a tall piece right of the path now stands in front of Timmy's gum at
-    the door: Sam's call);
+    the door), accepted as it is with Sam's "Everything looks good";
   - sizes, compressed: the kit 77.1 to 80.6 KB, `outfits.js` 29.7 to 33.6 KB, `shop.js` 11.4 KB, none loaded with a
     page; `tools/release/xp.js` 358 checks; `widget/hub-art/shop.js` is in `tools/ci/syntax.js`'s list. Session 2's
     smoke test checks that it never loads with a page (its spec); the service worker's lists are session 8's.
   - **the shop's look changed** after the sheets (Sam: "I want the shop ui to be more epic"): the design page's
     shop is now a storefront, "Today's showcase" and shelves whose cards fill them, and session 2's spec says to
-    build the page to it ("The shop's look" in the shop's note). Sam's yes on it is still to come.
+    build the page to it ("The shop's look" in the shop's note). Sam: "Everything looks good. Merge when ready",
+    "i like the redesign".
   **Next: session 2, the shop's client.**
 
 ## Outcome
