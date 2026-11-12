@@ -1,11 +1,11 @@
 ---
 type: task
-status: in-progress
+status: review
 hub: dashboard
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: 
+waiting-on: "Sam's answer to the contact sheet of the board's new look"
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/324
 ---
@@ -247,16 +247,38 @@ The live About page describes the live site, so these go in with the redesign's 
     branches touched conflicted; each was merged three ways against `b4ad576`, the #318 commit this branch started from.
     Kept from `main`: its luck-row fix, its wording for a place that can't be read (the preview's `get_place` keeps one
     made-up classmate whose place can't be read, for the plain Timmy; no "visiting off" anywhere), its bug numbers.
-  - **Next step, for whoever takes it up** (this session, or a new one from this note): open the
-    new dashboard in a local preview (`node tools/preview/serve.js`, `next/?persona=returning`) and look at the stage,
-    the classroom, the leaderboard's stage and the recap, which are what the board has to sit beside; then restyle
-    `widget/ideas.css` (and the markup in `widget/ideas.js` where it needs hooks) with the dashboard's own parts: its
-    tints, panels and drawn kits (`widget/hub-art/`). Anything newly drawn goes to Sam as a contact sheet before it goes
-    in. Keep every `data-shi` name, the smoke test's checks and the 110-check walk passing, and send Sam new screenshots.
+  - **The new look, proposed to Sam as a contact sheet** (2026-11-12; waiting for Sam's yes or changes, nothing of it is
+    in `widget/` yet): the board becomes **a cork board in a wood frame, every idea a paper note pinned to it**, drawn in
+    Timmy's ink so it sits beside the stage, the classroom and the leaderboard.
+    - **Drawn, in `tools/figures/site/board.mjs`** (`boardKit(INK, C)`, the same shape as `classroomKit`; not yet in
+      `build.mjs`): `cork()` (a 96 px tile), `pin(tint, px)` (a pushpin in a hub's tint, red for "All hubs"),
+      `kind(k, px)` for the six kinds (a present, a wrench, a page with a question mark and a pencil, an arcade stick, a
+      palette, a light bulb), `rosette()` (the top idea), `bulb()`, `spiral()`/`ring()` (a pad's wire binding), `check()`
+      (the tick in a Shipped stamp).
+    - **Mocked on the real board**, in the local preview with `widget/ideas.js` and `ideas.css` swapped for drafts by the
+      browser (no file in `widget/` changed). The markup the draft adds: `.shi-wall` > `.shi-peek` (Timmy from
+      `shPet.art`, looking over the frame's top edge with the bulb) + `.shi-frame` (wood `#C4915F`, 2 px ink border) >
+      `.shi-cork` (the tile as a CSS background from a `--shi-cork` data URI) holding the list, the empty note and Show
+      more. A card gets `is-k-<kind>` (paper color by kind: feature `#FFF3B8`, better `#DDF3E3`, content white, fun
+      `#FFE0E8`, look `#DFEBFA`, other `#FFE9D2`, each with a 7 px darker bottom strip), `span.shi-pin` at its top, the
+      kind's picture (40 px) beside the title, the hub's emblem in its hub chip (`SH_DASH_ART.emblems`), Sam's status as
+      a tilted outlined stamp (`.shi-stamp.is-<status>`: planned `#2747A3`, considering `#85540A`, shipped `#23703F`
+      with the tick, not doing `#6B5A68`), Sam's note as a white slip, and a foot row with the votes (white pills with an
+      ink border; pressed: green up, red down) and the name, time and Report. On the Top tab with nothing filtered, the
+      first idea with a score above 0 wears the rosette (`is-top`, with "Top idea:" for screen readers). The form is a
+      page of the pad: the binding along its top edge and each kind's picture in its choice. Notes go up one after
+      another when the list changes (not on a vote), off under reduced motion. The board keeps its light colors in the
+      dark theme, like the classroom. Every `data-shi` name is unchanged. No gradients, no shadows.
+    - **Still to settle when wiring it in**: in a hub's More the dashboard's art isn't loaded, so pins are all red and
+      the hub chip has no emblem (use the hub's own tint there); the smoke test's board checks and the 110-check walk;
+      axe and the taste inspector on the new look; `build.mjs` writing `widget/hub-art/board.js` (`window.SH_BOARD_ART`),
+      loaded by `ideas.js`, with the plain board as the fallback.
+  - **Next step**: Sam's answer to the contact sheet. On a yes: add the kit to `build.mjs`, put the look into
+    `widget/ideas.js` and `widget/ideas.css`, run the checks above and the release suites, send Sam 2x screenshots.
 
 ## Outcome
 
-Built, not released ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324)). Sam asked for a more decorative look, to be done after #318 merges (the Log's last entry). The board is on the new dashboard and in the new hubs' More from one file, with the
+Built, not released ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324)). Sam asked for a more decorative look; a cork board with pinned notes is drawn and waits for Sam's yes (the Log's last entry). The board is on the new dashboard and in the new hubs' More from one file, with the
 check-in's and Suggest's ticks, the Inbox notes and the admin page's Idea board. It ships with the redesign: migration_v54,
 the starting ideas and the About entries go in at the release.
 
