@@ -20,8 +20,11 @@ and the phase notes it links.
    contact sheets (`tools/figures/site/pack-preview.mjs`, the design page) and get Sam's yes before it goes into the engine:
    a round that changes something already built costs a rebuild, the tests and new screenshots.
 4. **Never read a big file whole.** `widget/hub.js`, `widget/v3.js`, a hub's `index.html` and `DEPLOY_NOTES.md` are tens of
-   thousands of tokens each: grep for the function, read its lines. (Splitting `hub.js` before phase 4 grows it is the first
-   step of [phase 4](../tasks/2026-11-05-redesign-phase-4-game-layer.md).)
+   thousands of tokens each: grep for the function, read its lines. The engine is four files since 2026-11-12 (the first
+   step of [phase 4](../tasks/2026-11-05-redesign-phase-4-game-layer.md)): work in the part your session changes
+   (`widget/hub-bank.js`, the question card and the bank; `widget/hub-rewards.js`, the answer path, XP, rank and recap;
+   `widget/hub-timmy.js`, Timmy) and leave the core, `widget/hub.js`, alone unless the change is its own. How the four
+   share names is at the top and the end of `hub.js`.
 5. **Test what you touched while building; everything once at the end.** `node tools/release/xp.js` (and `rls.js`) only when
    SQL changed; `node tools/ci/smoke.js` already checks only the touched hubs; `node tools/release/run.js` once before the PR,
    and let CI's "Release tests" do the rest ([long-tests-once](../rules/long-tests-once.md)). Screenshots only the agent looks at: `deviceScaleFactor: 1`, as few as answer

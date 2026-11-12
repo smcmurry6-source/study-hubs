@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (the redesign's hub engine split into four files, Claude Code)** — Nothing students see changes: only the
+  new hubs (`hubs/<id>/next/`, shown in a preview only) load the engine, and no live file changed. `widget/hub.js` was
+  one 188 KB closure; it is now the core (`widget/hub.js`, 116 KB) and three parts, each holding what one kind of
+  session changes: `widget/hub-rewards.js` (the answer path, XP, the rank, the bar's meters, Today, the recap),
+  `widget/hub-timmy.js` (what the engine asks of Timmy) and `widget/hub-bank.js` (the question card, the bank, the
+  mock). **A new hub's page loads all four, deferred, the core last**; the smoke test fails a page that doesn't. The
+  parts share the core's names through one object, `HX` (how: the top and the end of `hub.js`). Before editing the
+  engine, find the function's file first (`grep -n "function name" widget/hub*.js`). Three more requests a page (20,
+  20 and 18 against budgets of 21, 22 and 21, not raised). No behavior change: the same scripted visit on `main`'s copy
+  and on the split gave identical pages and saved state at all 368 steps. Hand-off for parts A to D:
+  [phase 4's note](vault/tasks/2026-11-05-redesign-phase-4-game-layer.md). ([#330](https://github.com/smcmurry6-source/study-hubs/pull/330))
+
 - **2026-11-12 (archived hubs' audio off the site, Claude Code)** — The site was 958 MB of GitHub Pages' 1 GB limit, 909 MB
   of it mp3s. Sam kept the bitrates (narration 64 kbps, Timmy Time 96 kbps) and made it a standing rule that an archived
   hub's narration and Timmy Time come off the site ([rule](vault/rules/archived-hubs-drop-their-audio.md)). Done now for

@@ -42,8 +42,11 @@ function pickHubs(){
 const { hubs, why: hubsWhy } = pickHubs();
 console.log(`Smoke test: ${hubsWhy}`);
 /* the redesign's new versions (hubs/<id>/next/, widget/hub.js), built beside the live hubs until the release: those of
-   the hubs picked above (a change to hubs/<id>/next/ touches <id>; widget/hub.js is shared, so it picks every hub) */
+   the hubs picked above (a change to hubs/<id>/next/ touches <id>; the engine is shared, so it picks every hub) */
 const nextHubs = hubs.filter(h => fs.existsSync(path.join(root, 'hubs', h, 'next', 'index.html')));
+/* the engine is four files: its three parts, then the core (widget/hub.js), which runs them and boots. A new hub's page
+   loads every one, deferred, in this order */
+const ENGINE = ['hub-rewards.js', 'hub-timmy.js', 'hub-bank.js', 'hub.js'];
 const problems = [], notes = [];
 
 /* the idea board (widget/ideas.js; its server is migration_v54, not applied until the redesign's release): a made-up
@@ -389,6 +392,8 @@ function lint(hub, A){
       if (modes.join() !== 'home,notes,questions,more') problems.push(`${name} (${label}): the views are ${modes.join(', ') || 'missing'}, not Home, Notes, Questions and More`);
       const n = await page.evaluate(() => window.SH_EXPORT && window.SH_EXPORT.questions ? window.SH_EXPORT.questions.length : 0);
       if (!n) problems.push(`${name} (${label}): window.SH_EXPORT has no questions (the widget's search, stats and question health read it)`);
+      const eng = await page.$$eval('script[src]', ss => ss.map(x => [x.getAttribute('src').replace(/^.*widget\//, ''), x.defer]).filter(x => /^hub(-(rewards|timmy|bank))?\.js$/.test(x[0])).map(x => x[0] + (x[1] ? '' : ' (not deferred)')));
+      if (eng.join() !== ENGINE.join()) problems.push(`${name} (${label}): the page loads the engine as ${eng.join(', ') || 'nothing'}, not ${ENGINE.join(', ')} (all deferred, the core last)`);
       let screens = 0;
       const routes = [...modes, 'questions/drill', 'questions/misses', 'questions/weak', 'questions/mock',
         'more/timmy', 'more/hints', 'more/cram', 'more/side', 'more/arcade', 'more/stats', 'more/settings', 'more/ideas'];
