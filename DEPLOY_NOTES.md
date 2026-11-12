@@ -32,6 +32,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (Occlusion: `in-locator`'s explanation names the pantograph, Claude Code)** — About half of the people who
+  tried it picked "Trace protrusive and lateral paths on six recording tables" as how the hinge axis is found. Its why
+  row named the pantograph; now the explanation does too (L6's notes: the kinematic facebow finds the axis, the
+  pantograph then records how the jaw moves). Approved on the 2026-11-11 lessons refresh's list; it waited for #319.
+  Explanation only; `next/content` rebuilt.
 - **2026-11-12 (the idea board, built for the redesign, Claude Code)** — Nothing students see changes: the board is on
   the new dashboard (`next/`) and in the new hubs' More, which only a preview shows, and its server (migration_v54) is
   still not applied. New: `widget/ideas.js` + `widget/ideas.css` (`window.shIdeas`: the board, its post form with the hub
