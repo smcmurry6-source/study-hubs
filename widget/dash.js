@@ -82,7 +82,7 @@
     return img('<circle cx="32" cy="32" r="31" fill="' + t.light + '"/><g transform="translate(6.4 6.4) scale(.8)">' + e.body + "</g>", "", cls, "0 0 64 64");
   }
   function flame(n, cls){
-    var lvl = n >= 7 ? 3 : n >= 3 ? 2 : 1;
+    var lvl = n >= 30 ? 5 : n >= 10 ? 4 : n >= 7 ? 3 : n >= 3 ? 2 : 1;
     return '<svg class="flame' + (n ? "" : " is-cold") + (cls ? " " + cls : "") + '" viewBox="0 0 40 48" aria-hidden="true" focusable="false">' + ((A.flame || {})[lvl] || "") + "</svg>";
   }
   function spot(k, col, cls){
@@ -1128,6 +1128,70 @@
     pill.innerHTML = '<span class="sr">Your rank: ' + esc(jName(p, lv)) + ", " + num(xp) + ' XP</span><span class="dx-seen" aria-hidden="true">' + jMini(p, lv) + "<b>" + esc(jName(p, lv)) + '</b><span class="num dx-fold">' + num(xp) + " XP</span></span>";
     pill.hidden = false;
   }
+  /* ------------------------------------------------------------
+     TIMMY'S PLACE in the "you" card (widget/place.js, phase 4 part C). Once Timmy is adopted, his place takes the
+     house picture's spot: widget/pet.js still draws the card (his name, HP bar, status and the three buttons) and
+     isn't changed, and this puts the place over its picture. The page is at its request budget, so the renderer and
+     its kit never load with it: the card shows the still place.js kept on this device (sh_place_still) and the live
+     place loads on the first scroll, tap or key, or when the picture is opened. With no still yet, the house
+     picture stays until the place has drawn.
+  ------------------------------------------------------------ */
+  var PLACE = { sb: null, boot: null, load: null, wake: false, open: false };
+  function placeHost(){
+    var scene = q("#petHome .shpet-scene"); if (!scene) return null;
+    var host = q(".tpc-host", scene);
+    if (host) return host;
+    host = document.createElement("div"); host.className = "tpc-host";
+    scene.insertBefore(host, scene.firstChild);
+    var still = ls("sh_place_still");
+    if (still && still.slice(0, 4) === "<svg") {
+      host.innerHTML = '<button type="button" class="tpc" data-tp="open" aria-label="Timmy’s place. Open it"><img alt="" decoding="async" src="data:image/svg+xml;charset=utf-8,' + encodeURIComponent(still) + '"></button>';
+      scene.classList.add("has-place");
+      placeAt(scene, String(ls("sh_place_still_at") || "").split(","));
+    }
+    /* a tap before the renderer is here: fetch it, then open (place.js takes the button's taps once it has drawn) */
+    host.addEventListener("click", function(e){ var b = e.target.closest(".tpc"); if (!b || b.__tp) return; PLACE.open = true; placeLoad(); });
+    if (window.shPlace) placeDraw(); else if (PLACE.wake) placeLoad();
+    return host;
+  }
+  /* where the top of Timmy's head is in the picture (percent across, percent down): pet.js's bubble hangs from there */
+  function placeAt(scene, at){
+    var x = +(at && at[0]), y = +(at && at[1]);
+    if (!(x >= 0 && x <= 100 && y >= 0 && y <= 100)) return;
+    scene.style.setProperty("--tp-x", x + "%"); scene.style.setProperty("--tp-y", y + "%");
+  }
+  function placeDraw(){
+    var host = placeHost(), P = window.shPlace; if (!host || !P) return;
+    P.card(host, { label: false, onDraw: function(btn, at){
+      var scene = host.parentNode; if (scene) { scene.classList.add("has-place"); placeAt(scene, at); }
+      if (PLACE.open) { PLACE.open = false; P.open(); }
+    } });
+  }
+  function placeLoad(){
+    if (PLACE.load) return PLACE.load;
+    PLACE.load = loadScriptOnce(WIDGET + "place.js").then(function(){
+      var set = function(d){
+        if (!window.shPlace) return;
+        window.shPlace.setup({ sb: PLACE.sb, visitor: VISITOR || null, shop: d && d.shop, profile: myRank, tints: (window.SH_DASH_ART || {}).tints });
+        placeDraw();
+      };
+      if (PLACE.boot) PLACE.boot.then(set, function(){ set(null); }); else set(null);
+    }, function(){ PLACE.load = null; });
+    return PLACE.load;
+  }
+  function placeStart(sb, boot){
+    PLACE.sb = sb; PLACE.boot = boot;
+    var home = $("petHome"); if (!home) return;
+    /* pet.js writes the card again when Timmy is adopted, renamed or refreshed: put the place back each time */
+    if (window.MutationObserver) new MutationObserver(function(){ placeHost(); }).observe(home, { childList: true });
+    placeHost();
+    var woke = function(){
+      ["scroll", "pointerdown", "keydown", "touchstart"].forEach(function(n){ window.removeEventListener(n, woke, true); });
+      PLACE.wake = true; if (q("#petHome .shpet-scene")) placeLoad();
+    };
+    ["scroll", "pointerdown", "keydown", "touchstart"].forEach(function(n){ window.addEventListener(n, woke, { capture: true, passive: true }); });
+  }
+
   /* your own rank: the card, Timmy's flair and the rank-up celebration. It rides in the page bootstrap. */
   function applyMyRank(p){
     myRank = p; renderMyRank(p);
@@ -1138,6 +1202,7 @@
     if (window.shRanks && window.shRanks.flairFromBadges){ lsSet("sh_rank_flair", window.shRanks.flairFromBadges(p.badges)); }
     if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(p.badges);
     try{ document.dispatchEvent(new CustomEvent("sh:rank")); }catch(e){}
+    if (window.shPlace) { window.shPlace.setup({ profile: p }); window.shPlace.repaint(); }
   }
   function loadMyRank(sb){
     if (!VISITOR){ renderMyRank(null); return; }
@@ -1579,6 +1644,7 @@
         }).observe($("hubs"));
       }
     }
+    placeStart(sb, bootstrap.ready);
     if (!sb){ renderMyRank(null); whenPanelOpens($("class"), function(){ boardOpen = true; drawBoard(); }); return; }
     nameSb = sb; luckSb = sb; debriefSb = sb; boardSb = sb;
     /* the idea board (widget/ideas.js): its section stays hidden until its first load says the board is up (its

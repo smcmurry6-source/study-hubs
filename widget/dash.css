@@ -289,6 +289,21 @@ html.shx .dx .shpet-ghost { min-height: 36px; padding: 0 14px; border: 1px solid
   font: inherit; font-size: var(--fs-meta); font-weight: var(--w-strong); }
 html.shx .dx .shpet-ghost:hover { background: var(--active); }
 
+/* Timmy's place over the house picture (widget/dash.js placeHost, widget/place.js): the still kept on this device shows
+   at once and the live place takes over on first use, so these few rules are here and the rest are in place.css, which
+   comes with the renderer. pet.js's own Timmy steps aside (he's in the picture) and his bubble hangs over the door. */
+html.shx .dx .tpc-host:empty { display: none; }
+html.shx .dx .tpc { position: relative; display: block; width: 100%; margin: 0; padding: 0; border: 0; border-radius: var(--r-row); background: var(--panel);
+  line-height: 0; overflow: hidden; cursor: pointer; }
+html.shx .dx .tpc img { display: block; width: 100%; height: auto; aspect-ratio: 296 / 262; }
+html.shx .dx .tpc:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+html.shx .dx .shpet-scene.has-place { max-width: 380px; margin: 0 auto; width: 100%; }
+html.shx .dx .shpet-scene.has-place .shpet-housesvg, html.shx .dx .shpet-scene.has-place .shpet-btn { display: none; }
+html.shx .dx .shpet-scene.has-place .shpet-spot { left: 0; top: var(--tp-y, 52%); bottom: auto; width: 100%; height: 0; pointer-events: none; }
+html.shx .dx .shpet-scene.has-place .shpet-say { left: auto; right: max(4px, calc(100% - var(--tp-x, 40%) - 30px)); bottom: 6px;
+  max-width: min(200px, calc(var(--tp-x, 40%) + 26px)); }
+html.shx .dx .shpet-scene.has-place .shpet-say.is-on { pointer-events: auto; }
+
 /* the small handpiece beside a name (widget/ranks.js mini): the medallion with its level, I to III, on its corner */
 .dx .sh-rank-mini { position: relative; display: inline-flex; width: 26px; height: 26px; flex: none; margin-right: 4px; }
 .dx .sh-rank-mini svg { width: 100%; height: 100%; }

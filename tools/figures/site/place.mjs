@@ -2275,27 +2275,32 @@ export function placeKit(INK, C, PACKS, SETS){
     tinyTooth: tinyTooth, glowAt: glowAt, smoke: smoke, tuft: tuft, flower: flower, stemLeaf: stemLeaf, daisyOn: daisyOn, tulip: tulip, sunflower: sunflower, mintBall: mintBall,
     snowSlope: snowSlope, snowDome: snowDome, backSlope: backSlope, firefly: firefly, crystal: crystal, fern: fern, PAINTS: PAINTS, BOLD: BOLD, HILL_TOP: HILL_TOP, hillScene: hillScene,
     busy: busy, inYard: inYard, p: p, O2: O2, O3: O3, O4: O4, star5: star5, FIX: FIX, S: S };
-  var SET_OF = {};
+  var SET_OF = {}, SET_INFO = {};
   (function(){
-    var info = {}, cap = function(r){ return r.charAt(0).toUpperCase() + r.slice(1); };
+    var cap = function(r){ return r.charAt(0).toUpperCase() + r.slice(1); };
     if (SETS){
-      SETS.seasons.forEach(function(se){ se.items.forEach(function(it){ info[it.id] = { n: it.n, rarity: cap(it.rarity), price: it.price, set: se.k }; }); });
-      SETS.ranks.forEach(function(r){ [r.outfit, r.yard].forEach(function(q){ info[q[0]] = { n: q[1], rarity: cap(q[2]), price: 0, set: "rank", rank: r.gtier, rankName: r.rank }; }); });
+      SETS.seasons.forEach(function(se){ se.items.forEach(function(it){ SET_INFO[it.id] = { n: it.n, rarity: cap(it.rarity), price: it.price, set: se.k, kind: it.kind }; }); });
+      SETS.ranks.forEach(function(r){ [r.outfit, r.yard].forEach(function(q, i){ SET_INFO[q[0]] = { n: q[1], rarity: cap(q[2]), price: 0, set: "rank", rank: r.gtier, rankName: r.rank, kind: i ? "yard" : "outfit" }; }); });
     }
-    (PACKS || []).forEach(function(pack){
-      var got = pack(TOOLS);
-      [["homes", HOMES], ["scenes", SCENES], ["yard", YARD], ["outfits", OUTFITS]].forEach(function(pair){
-        var list = got[pair[0]] || {};
-        Object.keys(list).forEach(function(id){
-          var x = list[id], m = info[id] || {};
-          x.k = id; x.id = id; x.set = m.set || got.k; x.theme = ""; x.n = m.n || x.n || id; x.rarity = m.rarity || x.rarity || "Legendary"; x.price = m.price != null ? m.price : x.price || 0;
-          if (m.rank){ x.rank = m.rank; x.rankName = m.rankName; }
-          pair[1][id] = x; SET_OF[id] = x.set;
-          if (pair[0] === "yard"){ EGGS[id] = x.egg || { n: x.n, does: "a little wobble", say: "" }; if (x.bits) EGG_ANIM[id] = x.anim || "tp-pop 2.2s"; }
-        });
+  })();
+  /* one set's drawings join the kit. The design page's kit is built with every pack; the engine's (widget/hub-art/place.js)
+     starts with none and each set's file (widget/hub-art/place/<set>.js) calls addPack when it is fetched, so a place
+     only loads the sets it shows. SET_INFO names every set piece before its drawing is here (setOf, below). */
+  var PACKED = {};
+  function addPack(pack){
+    var got = pack(TOOLS); PACKED[got.k] = true;
+    [["homes", HOMES], ["scenes", SCENES], ["yard", YARD], ["outfits", OUTFITS]].forEach(function(pair){
+      var list = got[pair[0]] || {};
+      Object.keys(list).forEach(function(id){
+        var x = list[id], m = SET_INFO[id] || {};
+        x.k = id; x.id = id; x.set = m.set || got.k; x.theme = ""; x.n = m.n || x.n || id; x.rarity = m.rarity || x.rarity || "Legendary"; x.price = m.price != null ? m.price : x.price || 0;
+        if (m.rank){ x.rank = m.rank; x.rankName = m.rankName; }
+        pair[1][id] = x; SET_OF[id] = x.set;
+        if (pair[0] === "yard"){ EGGS[id] = x.egg || { n: x.n, does: "a little wobble", say: "" }; if (x.bits) EGG_ANIM[id] = x.anim || "tp-pop 2.2s"; }
       });
     });
-  })();
+  }
+  (PACKS || []).forEach(addPack);
   var BOING = ["home", "statue", "garden", "pool", "hammock", "fountain", "doghouse", "mailbox", "sandcastle", "umbrella", "campfire", "hotspring", "telescope", "studio", "sun"];
 
   /* the motion: smoke rises, water shimmers, leaves fall, flags wave, stars twinkle, eggs play. Reduced motion: still,
@@ -2416,7 +2421,7 @@ export function placeKit(INK, C, PACKS, SETS){
     return HEALTH[HEALTH.length - 1];
   }
 
-  return {
+  var API = {
     HEALTH: HEALTH, healthFor: healthFor,
     VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout,
     onLand: function(scene, x, y){ var q = P(x, y, 0); return sceneOn(SCENES[scene] || SCENES.hill, q[0], q[1]); }, unproject: unP, N: N, S: S, FIX: FIX, SLOT_AT: SLOTS,
@@ -2428,6 +2433,18 @@ export function placeKit(INK, C, PACKS, SETS){
     UPGRADES: UPGRADES, MATS: MATS.map(function(m){ return { k: m.k, n: m.n, c: m.c }; }),
     OUTFITS: meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName"]), dress: dress, loupes: loupes, NO_LOUPES: NO_LOUPES, SETS: SETS || null,
     THEMES: THEMES, RARITIES: RARITIES, EGGS: EGGS, frame: frame, burst: burst, coin: coin, thumb: thumb,
-    outfitParts: function(k){ var o = OUTFITS[k]; return o ? { back: o.back || "", face: o.face || "", top: o.top || "" } : null; }
+    outfitParts: function(k){ var o = OUTFITS[k]; return o ? { back: o.back || "", face: o.face || "", top: o.top || "" } : null; },
+    /* a set piece's set ("halloween", "rank"...) and kind, known from the list before its pack is loaded; whether a
+       set's pack is here; and a pack joining late (the lists above are made again) */
+    setOf: function(id){ return SET_INFO[id] ? SET_INFO[id].set : ""; }, setInfo: function(id){ return SET_INFO[id] || null; },
+    hasPack: function(k){ return !!PACKED[k]; },
+    addPack: function(pack){ addPack(pack); lists(); }
   };
+  function lists(){
+    API.HOMES = meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set"]);
+    API.SCENES = meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set"]);
+    API.YARD = meta(YARD, ["n", "note", "rarity", "theme", "price", "id", "wide", "set", "rank", "rankName"]);
+    API.OUTFITS = meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName"]);
+  }
+  return API;
 }

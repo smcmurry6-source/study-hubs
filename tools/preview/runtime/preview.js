@@ -376,6 +376,71 @@
     p.dark_seen = v === db.visitor ? (db.dark || []).slice() : [];
     return p;
   }
+  /* ---------- Timmy's place (redesign phase 4, part C): the inventory and equip_item, as migration_v54 writes them ----------
+     The shop isn't built yet (part B), so what each test account owns is made up here: Halloween's set (everyone's, a
+     gift), the rank sets up to the account's rank (earned), and what this account "bought". Only the pieces an account
+     can own are listed: id, kind, and for an upgrade its slot; "wide" for the bowling lane. */
+  var PLACE_CAT = {};
+  ("haunted-manor:home pumpkin-patch:scene floss-mummy:outfit bedsheet-ghost:outfit skeleton-suit:outfit pumpkin-lantern:yard bubbling-cauldron:yard haunted-tree:yard").split(" ")
+    .forEach(function(x){ var q = x.split(":"); PLACE_CAT[q[0]] = { kind: q[1], gift: true }; });
+  ["antique", "bronze", "silver", "gold", "diamond", "dark"].forEach(function(r, i){ PLACE_CAT["rank-" + r + "-outfit"] = { kind: "outfit", rank: i + 1 }; PLACE_CAT["rank-" + r + "-yard"] = { kind: "yard", rank: i + 1 }; });
+  ("castle:home giant-mushroom:home treehouse:home lighthouse:home beach:scene forest:scene clouds:scene night-sky:scene garden:yard swimming-pool:yard hammock:yard mouthwash-fountain:yard doghouse:yard " +
+   "bowling-lane:yard:wide mailbox:yard campfire:yard telescope:yard podcast-studio:yard scrub-cap:outfit ranger-hat:outfit sunglasses-lei:outfit captain-hat:outfit aviator-cap:outfit " +
+   "fancy-windows:upgrade:windows porch:upgrade:porch chimney:upgrade:chimney flag:upgrade:flag paint-mint:upgrade:paint paint-sky:upgrade:paint paint-lilac:upgrade:paint " +
+   "harvest-barn:home harvest-fields:scene hay-bales:yard scarecrow-hat:outfit ice-rink:yard elf-suit:outfit").split(" ")
+    .forEach(function(x){ var q = x.split(":"); PLACE_CAT[q[0]] = { kind: q[1], wide: q[2] === "wide", slot: q[1] === "upgrade" ? q[2] : null }; });
+  var PLACE_BOUGHT = {
+    "new": [], "missed": [],
+    "returning": ["garden", "mailbox", "scrub-cap", "chimney", "paint-mint"],
+    "archived": ["giant-mushroom", "forest", "campfire", "ranger-hat", "hammock"],
+    "admin": ["treehouse", "beach", "swimming-pool", "sunglasses-lei", "flag"],
+    "high-xp": Object.keys(PLACE_CAT).filter(function(k){ return !PLACE_CAT[k].gift && !PLACE_CAT[k].rank; })
+  };
+  var PLACE_START = {
+    "returning": { "yard-left": "garden", "yard-front": "mailbox", chimney: "chimney" },
+    "archived": { home: "giant-mushroom", scene: "forest", "yard-right": "campfire", outfit: "ranger-hat" },
+    "admin": { home: "treehouse", "yard-left": "swimming-pool" },
+    "high-xp": { home: "castle", scene: "clouds", "yard-left": "mouthwash-fountain", "yard-right": "telescope", "yard-side": "bowling-lane", "yard-front": "podcast-studio", outfit: "rank-gold-outfit", flag: "flag", porch: "porch" }
+  };
+  function placeOwned(v){
+    var own = {}, g = rank2(rpc("get_rank_profile", { p_visitor: v }).data.xp || 0).gtier;
+    Object.keys(PLACE_CAT).forEach(function(k){ var c = PLACE_CAT[k]; if (c.gift) own[k] = "gift"; else if (c.rank && c.rank <= g) own[k] = "rank"; });
+    if (v === db.visitor) (PLACE_BOUGHT[db.persona] || []).forEach(function(k){ own[k] = "bought"; });
+    return own;
+  }
+  function placeEquipped(){
+    if (!db.equip) { db.equip = {}; var st = PLACE_START[db.persona] || {}, own = placeOwned(db.visitor); Object.keys(st).forEach(function(k){ if (own[st[k]]) db.equip[k] = st[k]; }); }
+    return db.equip;
+  }
+  function shop2(v){
+    var mine = v && v === db.visitor, own = v ? placeOwned(v) : {}, eq = {};
+    if (mine) { var e = placeEquipped(); Object.keys(e).forEach(function(k){ eq[k] = e[k]; }); }
+    return { day: day(now()), seasons: [], throwback: false, wallet: mine ? Math.floor((rpc("get_rank_profile", { p_visitor: v }).data.xp || 0) / 10) : null, items: [],
+      inventory: Object.keys(own).sort().map(function(k){ return { id: k, at: own[k] === "bought" ? iso(now() - 864e5 * 3) : null, how: own[k] }; }),
+      locked: Object.keys(PLACE_CAT).filter(function(k){ return PLACE_CAT[k].rank && !own[k]; }).map(function(k){ return { id: k, name: k, kind: PLACE_CAT[k].kind, rarity: PLACE_CAT[k].rank < 3 ? "rare" : PLACE_CAT[k].rank < 5 ? "epic" : "legendary", rank_tier: PLACE_CAT[k].rank }; }),
+      equipped: eq, costumes: [], snacks_today: [], boost: mine ? boost2(now()) : null };
+  }
+  /* equip_item, line for line as the migration has it: the slot must be one of the thirteen, the piece owned and of the
+     slot's kind; the lane always stands in the side yard and clears the front corner; a piece in the front corner
+     takes the lane away; a yard piece stands in one spot at a time */
+  var PLACE_SLOTS = ["outfit", "home", "scene", "yard-left", "yard-front", "yard-corner", "yard-side", "yard-right", "windows", "porch", "chimney", "flag", "paint"];
+  function equip2(v, slot, item){
+    if (!v || v !== db.visitor || PLACE_SLOTS.indexOf(slot) < 0) return { ok: false, error: "bad" };
+    var eq = placeEquipped(), it = item == null ? null : PLACE_CAT[item], sl = slot;
+    if (item == null) delete eq[slot];
+    else {
+      if (!it || !placeOwned(v)[item]) return { ok: false, error: "not-owned" };
+      var yardSlot = slot.indexOf("yard-") === 0;
+      if (!((slot === "outfit" && (it.kind === "outfit" || it.kind === "costume")) || (slot === it.kind && (it.kind === "home" || it.kind === "scene")) || (yardSlot && it.kind === "yard") || (it.kind === "upgrade" && slot === it.slot))) return { ok: false, error: "slot" };
+      if (it.kind === "yard" && it.wide) { if (slot !== "yard-side" && slot !== "yard-corner") return { ok: false, error: "slot" }; sl = "yard-side"; delete eq["yard-corner"]; }
+      else if (slot === "yard-corner" && eq["yard-side"] && PLACE_CAT[eq["yard-side"]] && PLACE_CAT[eq["yard-side"]].wide) delete eq["yard-side"];
+      if (it.kind === "yard") Object.keys(eq).forEach(function(k){ if (eq[k] === item && k !== sl) delete eq[k]; });
+      eq[sl] = item;
+    }
+    save();
+    var out = {}; Object.keys(eq).forEach(function(k){ out[k] = eq[k]; });
+    return { ok: true, equipped: out };
+  }
   function medalLevel(hub){
     var E = hubExport(hub), bank = E ? E.questions.length : 0, last = {}; if (!bank) return 0;
     (db.answers[hub] || []).forEach(function(r){ last[r[0]] = r[2]; });
@@ -824,9 +889,14 @@
         /* a board row with XP stands where the 63-step ladder puts it (your own row, past the Handpiece) */
         if (typeof r.xp === "number" && r.tier != null) { var rr = rank2(r.xp); o2.journey = rr.journey; o2.tier = rr.tier; o2.level = rr.level; }
         return o2; });
-      else if (d2 && d2.rank) { d2.rank = profile2(v); if (Array.isArray(d2.inbox)) d2.inbox = d2.inbox.concat(ideaNotes(v)); }
+      else if (d2 && d2.rank) { d2.rank = profile2(v); if (Array.isArray(d2.inbox)) d2.inbox = d2.inbox.concat(ideaNotes(v)); d2.shop = shop2(v);
+        if (Array.isArray(d2.pet_days)) d2.pet_days = d2.pet_days.map(function(r){ return { d: r.d, attempts: r.attempts, correct: r.correct, hp: 0 }; }); }
       return { data: d2 };
     }
+    /* Timmy's place (phase 4, part C): what this account owns and where it stands, as migration_v54 answers it */
+    if (fn === "get_my_shop") return { data: shop2(v) };
+    if (fn === "equip_item") return { write: v === db.visitor, data: equip2(v, a.p_slot, a.p_item) };
+    if (fn === "get_pet_days_v2") return { data: v === db.visitor ? bootstrapPetDays(t).map(function(r){ return { d: r.d, attempts: r.attempts, correct: r.correct, hp: 0 }; }) : [] };
     if (fn === "record_answer_v2") return { write: true, data: answer2(a, t) };
     if (fn === "mark_dark_unlock_seen") { if (v === db.visitor) { db.dark = db.dark || []; if (db.dark.indexOf(a.p_journey) < 0) db.dark.push(a.p_journey); save(); } return { write: true, data: true }; }
     if (fn === "xp_session_start") {
