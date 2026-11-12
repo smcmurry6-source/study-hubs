@@ -1099,9 +1099,10 @@
   /* the journeys (migration_v54's _v2 profile and boards carry `journey`: 0 the Handpiece, 1 the ModuPro, 2 the
      Loupes): a rank's name, medallion and mini for whichever object it is on. The later objects' drawings
      (widget/hub-art/journeys.js) load only when someone on the page is past the Handpiece, and the page paints again. */
-  function jName(r, lv){ var R = window.shRanks; return R.nameOf && r.journey > 0 ? R.nameOf({ journey: r.journey, tier: r.tier, level: lv }) : R.rankName(r.tier, lv); }
-  function jArt(r, px, opt){ var R = window.shRanks; return R.artOf && r.journey > 0 ? R.artOf(r.journey, r.tier, px, opt) : R.art(r.tier, px, opt); }
-  function jMini(r, lv){ var R = window.shRanks; return R.miniOf && r.journey > 0 ? R.miniOf(r.journey, r.tier, lv) : R.mini(r.tier, lv); }
+  function jTier(r){ return Math.max(0, Math.min(6, r.tier | 0)); }   // a row or a profile with no tier yet is Stone
+  function jName(r, lv){ var R = window.shRanks; return R.nameOf && r.journey > 0 ? R.nameOf({ journey: r.journey, tier: jTier(r), level: lv }) : R.rankName(jTier(r), lv); }
+  function jArt(r, px, opt){ var R = window.shRanks; return R.artOf && r.journey > 0 ? R.artOf(r.journey, jTier(r), px, opt) : R.art(jTier(r), px, opt); }
+  function jMini(r, lv){ var R = window.shRanks; return R.miniOf && r.journey > 0 ? R.miniOf(r.journey, jTier(r), lv) : R.mini(jTier(r), lv); }
   var jAsked = false;
   function jNeed(rows, again){
     var R = window.shRanks;

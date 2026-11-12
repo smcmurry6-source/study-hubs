@@ -199,6 +199,18 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 :root[data-theme="dark"] .xboost { color: var(--gold); }
 :root[data-theme="dark"] .xboost i, :root[data-theme="dark"] .hx .x2 { background: var(--gold); color: #1c1b1c; }
 .hx .x2 { display: inline-grid; margin-left: 4px; vertical-align: middle; }
+/* the pill never makes the bar wider than it was: on a bar with less room it keeps its old size. The journey's name
+   goes (the medallion shows which object it is; it is still read out), and double XP becomes a small 2x on the
+   medallion's corner, with the time left still read out */
+.hx-rank { position: relative; }
+/* and where the bar still has no room (widget/hub-rewards.js, fitPill): the name goes, then the number */
+.hx-rank.is-tight b, .hx-rank.is-tighter .xpn { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.hx-rank.is-tighter { padding-right: 6px; }
+@media (max-width: 1600px) {
+  .hx-rank .jn, .hx-rank .xb-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .hx-rank .xboost { position: absolute; left: 22px; top: -3px; height: 16px; margin: 0; padding: 0; gap: 0; background: none; }
+  .hx-rank .xboost i { height: 16px; padding: 0 5px; font-size: 10px; box-shadow: 0 0 0 2px var(--panel); }
+}
 @keyframes hx-bump { 0% { transform: scale(1); } 35% { transform: scale(1.08); } 100% { transform: scale(1); } }
 .hx .xpi { width: 22px; height: 22px; }
 .hx-set { display: inline-flex; align-items: center; justify-content: center; gap: 2px; width: 40px; height: 40px; border-radius: var(--r-pill); color: var(--muted);

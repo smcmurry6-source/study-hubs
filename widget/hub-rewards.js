@@ -155,7 +155,7 @@
     var ms = new Date(b.until).getTime() - Date.now();
     /* repaint when the label would change, and once more when it ends */
     boostTimer = setTimeout(paintMeters, Math.min(ms + 500, ms > 5400000 ? 600000 : 60000));
-    return '<span class="xboost"><i aria-hidden="true">2x</i><span class="sr">Double XP, </span><span class="xb-t">' + left(ms) + '</span><span class="sr"> left. </span></span>';
+    return '<span class="xboost"><i aria-hidden="true">2x</i><span class="sr">Double XP. </span><span class="xb-t">' + left(ms) + '<span class="sr"> left. </span></span></span>';
   }
   document.addEventListener("sh:rank-profile", function(e){
     var d = e.detail || {}; if (!d.profile) return;
@@ -164,6 +164,18 @@
     paintMeters();
     HX.petFromBadges(d.profile.badges || []);
   });
+  /* The rank pill gives way when the bar has no room for it (a long hub name, a six-digit XP, a narrow laptop): it
+     drops its name first, then its number, down to the medallion alone. Both stay in its spoken name. Checked on
+     every paint and when the window changes size. */
+  function fitPill(){
+    var rk = $("#hxRank"), bar = $("#hxBar"); if (!rk || !bar) return;
+    rk.classList.remove("is-tight", "is-tighter");
+    if (!visible(rk) || bar.scrollWidth <= bar.clientWidth + 1) return;
+    rk.classList.add("is-tight");
+    if (bar.scrollWidth > bar.clientWidth + 1) rk.classList.add("is-tighter");
+  }
+  var fitAsked = false;
+  window.addEventListener("resize", function(){ if (fitAsked) return; fitAsked = true; requestAnimationFrame(function(){ fitAsked = false; fitPill(); }); });
   /* a journey's scene has closed (widget/journeys.js): Timmy has the last word, and the pill shows the new rank */
   document.addEventListener("sh:journey-scene-end", function(e){
     var d = e.detail || {}, R = window.shRanks, name = R && R.JOURNEYS ? R.JOURNEYS[d.journey | 0] : "";
@@ -179,10 +191,15 @@
     $$("[data-streakm]").forEach(function(m){ m.innerHTML = flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row studied" : "No streak yet") + "</span>"; });
     $$("[data-goalm]").forEach(function(m){ m.innerHTML = ring(t.n, g) + '<span class="num" aria-hidden="true">' + Math.min(t.n, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(t.n, 999) + " of " + g + ' questions today</span>'; });
     var x = rankXp(), rk = $("#hxRank"), chip = boostChip();
+    /* past the Handpiece the name starts with the journey ("ModuPro Gold II"); a tight bar shows the medallion and
+       "Gold II" and keeps the journey for screen readers (hub.css) */
+    var nm = rankName(), R = window.shRanks, jn = RANK.p && RANK.p.journey > 0 && R && R.JOURNEYS ? (R.JOURNEYS[RANK.p.journey | 0] || "") + " " : "";
+    var nameHTML = jn.length > 1 && nm.indexOf(jn) === 0 ? '<span class="jn">' + esc(jn) + "</span>" + esc(nm.slice(jn.length)) : esc(nm);
     /* its spoken name is its visible text with a few hidden words around it (axe: the label must contain what's shown) */
-    if (rk) rk.innerHTML = '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + esc(rankName()) + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. </span>' + chip + '<span class="sr">Open your stats</span>';
+    if (rk) rk.innerHTML = '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + nameHTML + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. </span>' + chip + '<span class="sr">Open your stats</span>';
     $$("[data-xpm]").forEach(function(m){ m.innerHTML = artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>' + (boostShown ? '<i class="x2" aria-hidden="true">2x</i><span class="sr">Double XP is on</span>' : ""); });
     $$("[data-today]").forEach(function(p){ p.outerHTML = todayPanel(); });
+    fitPill();
     /* any other medallion of your rank on the page (More, Stats), at its own size */
     $$("[data-rankart]").forEach(function(n){ n.innerHTML = rankArt(+n.getAttribute("data-rankart") || 30); });
     paintLive();
