@@ -428,6 +428,13 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .reading-prose th, .reading-prose td { padding: 8px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--rule); }
 .reading-prose th { font-weight: var(--w-head); }
 .reading-prose .tested, .reading-prose .callout, .reading-prose .box { padding: 14px 16px; border-radius: var(--r-row); background: var(--panel); }
+/* Follow along (widget/hub.js): while Listen plays, the sentence being read, softly, and the word, with an underline so it
+   stands apart from the student's own highlights */
+::highlight(sh-read-line) { background-color: color-mix(in srgb, var(--hub-text) 13%, transparent); }
+::highlight(sh-read) { background-color: color-mix(in srgb, var(--hub-text) 30%, transparent); text-decoration: underline 2px var(--hub-text); text-underline-offset: 3px; }
+.toolbar .follow-btn[aria-pressed="true"] { color: var(--hub-text); }
+.toolbar .follow-btn[aria-pressed="false"] { color: var(--muted); }
+.toolbar .follow-btn[aria-pressed="false"] .ic { opacity: .5; }
 .reading-prose mark, .hx mark.sh-hl { background: color-mix(in srgb, var(--gold) 40%, transparent); color: inherit; border-radius: 3px; }
 .lec-fig-inline { margin: 20px 0; }
 .lec-figs, .charts, .check { margin-top: 48px; }

@@ -12,7 +12,9 @@ soundfile and the model files in /tmp/kokoro, or $KOKORO_DIR; vault/how-to/narra
 It reads the hub's `var READINGS = {...};` and `var READINGS_PLAIN = {...};` lines (one JSON object each), or perio's
 READINGS['<id>'] = `...`; template-literal blocks, turns the HTML
 into spoken text (the "What's tested" box, headings with a pause, paragraphs, list items, and each table row read as
-"first cell: header, cell; ..."), and writes a 24 kHz mono 64 kbps mp3 like the hubs' existing narration.
+"first cell: header, cell; ..."), and writes a 24 kHz mono 64 kbps mp3 like the hubs' existing narration, and beside it
+<lecture>-<level>.words.json, when each word of the notes is spoken (Kokoro's own timings), for the redesign's Follow along
+(tools/narration_words.py makes the same file for an mp3 made any other way).
 """
 import argparse, html, json, os, re, subprocess, sys, tempfile
 from html.parser import HTMLParser
@@ -52,11 +54,13 @@ class Spoken(HTMLParser):
         self.items, self.buf, self.stack = [], [], []
         self.table, self.row, self.cell, self.head = None, None, None, []
         self.in_tested = False
+        self.shown = []   # for each "text" item, the words as the page shows them (tools/narration_words.py)
 
     def flush(self, pause=0.45):
         t = " ".join("".join(self.buf).split())
         self.buf = []
         if t:
+            self.shown.append(t)
             if t[-1] not in ".?!:;": t += "."
             self.items.append(("text", t))
             self.items.append(("pause", pause))
@@ -89,6 +93,7 @@ class Spoken(HTMLParser):
                         h = self.head[i] if i < len(self.head) else ""
                         parts.append((h + ", " + c) if h else c)
                     t = parts[0] + ": " + "; ".join(parts[1:]) if len(parts) > 1 else parts[0]
+                    self.shown.append(" ".join(c for c in r if c))
                     self.items.append(("text", t.rstrip(".") + "."))
                     self.items.append(("pause", 0.35))
                 self.table = None
@@ -108,13 +113,15 @@ class Spoken(HTMLParser):
         self.buf.append(d)
 
 
-def spoken(html_text):
+def spoken(html_text, shown=False):
+    """The notes as ('text', s) and ('pause', seconds) items; with shown=True each text item is ('text', s, words on the page)."""
     p = Spoken(); p.feed(html_text); p.flush()
-    out = []
+    out, k = [], 0
     for kind, v in p.items:
         if kind == "text":
             for pat, rep in SAY: v = re.sub(pat, rep, v)
             v = re.sub(r"\(\s*\)", "", " ".join(v.split()))
+            if shown: out.append((kind, v, p.shown[k])); k += 1; continue
         out.append((kind, v))
     return out
 
@@ -134,26 +141,20 @@ def readings(hub_html):
 
 
 def render(items, out_mp3, voice, speed):
+    """items: spoken(html, shown=True). Writes out_mp3 and, beside it, its words file (tools/narration_words.py) from
+    Kokoro's own timings: when each word of the notes is spoken, for the redesign's Follow along highlight."""
     from kokoro_ready import ensure
     kdir = ensure()   # installs Kokoro the first time it's missing (tools/kokoro-setup.sh)
-    import numpy as np, soundfile as sf
+    import soundfile as sf
+    import narration_words as nw
     from kokoro_onnx import Kokoro
-    from kokoro_onnx.tokenizer import Tokenizer
-    from render_podcast import load_lexicon, to_phonemes
     k = Kokoro(os.path.join(kdir, "kokoro-v1.0.onnx"), os.path.join(kdir, "voices-v1.0.bin"))
-    tok = Tokenizer(); lex, pat = load_lexicon(os.path.join(HERE, "podcast", "lexicon.json"))
-    audio = []
-    for kind, v in items:
-        if kind == "pause": audio.append(np.zeros(int(SR * v), dtype=np.float32)); continue
-        ph = to_phonemes(v, tok, lex, pat)
-        # Kokoro takes at most ~510 phoneme tokens per call: split long text at sentence or clause ends
-        for chunk in split_ph(ph):
-            a, _ = k.create(chunk, voice=voice, speed=speed, is_phonemes=True, sentence_pause=0.3, clause_pause=0.1)
-            audio.append(a.astype(np.float32))
+    audio, timed = nw.render_items(nw.Phonemes(k), items, voice, speed)
     wav = tempfile.mktemp(suffix=".wav")
-    sf.write(wav, np.concatenate(audio), SR)
+    sf.write(wav, audio, SR)
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-ac", "1", "-ar", str(SR), "-b:a", "64k", out_mp3], check=True)
     os.remove(wav)
+    nw.write_file(out_mp3, timed, len(audio) / SR)
 
 
 def split_ph(ph, n=400):
@@ -208,7 +209,7 @@ def main():
             procs.append(subprocess.Popen(args, env=dict(os.environ, OMP_NUM_THREADS="1")))
         sys.exit(max(p.wait() for p in procs))
     for lec, level, out in jobs:
-        render(spoken(R[level][lec]), out, a.voice, a.speed); print("wrote", out, flush=True)
+        render(spoken(R[level][lec], shown=True), out, a.voice, a.speed); print("wrote", out, flush=True)
 
 
 if __name__ == "__main__":
@@ -224,6 +225,6 @@ if __name__ == "__main__":
         for p in pairs:
             lec, level = p.split(":")
             out = os.path.join(audio_dir, "%s-%s.mp3" % (lec, level))
-            render(spoken(R[level][lec]), out, voice, speed); print("wrote", out, flush=True)
+            render(spoken(R[level][lec], shown=True), out, voice, speed); print("wrote", out, flush=True)
     else:
         main()
