@@ -80,8 +80,8 @@ Done in [#331](https://github.com/smcmurry6-source/study-hubs/pull/331), 2026-11
 redesign's release.
 
 - **The recordings:** `hubs/<hub>/audio/<lecture>-hy.mp3` and its words file for all 21 lectures with High yield: Heme &
-  Endo Exam 2's 8 (HEME_MB), Occlusion's 4 final lectures (33 MB) and Perio's 9 (57 MB), TOTAL_MB at 64 kbps, the same voice
-  as the other levels. The site went from 589 to SITE_MB (`node tools/ci/size.js`). Rendering took about RENDER_MIN minutes
+  Endo Exam 2's 8 (59 MB), Occlusion's 4 final lectures (33 MB) and Perio's 9 (57 MB), 148 MB at 64 kbps, the same voice
+  as the other levels. The site went from 589 to 738 MB (`node tools/ci/size.js`). Rendering took about 106 minutes
   with all 4 cores (`--jobs 4`).
 - **How:** `tools/narrate.py` reads `hubs/<hub>/next/content/notes.json` (`--level hy`), reads a topic's number as
   "Topic 2." and High yield's "·" as a pause, and writes `"h"` (which text it was spoken from) into each words file;

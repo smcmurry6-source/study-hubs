@@ -296,6 +296,9 @@ The live About page describes the live site, so these go in with the redesign's 
     board"): apply migration_v54, post the starting ideas, the About entries (the draft above now describes the cork
     board), the three files in the service worker's list, the admin Overview's line, the old hubs' Inbox, and the
     90-day delete of removed ideas.
+- 2026-11-12: [#324](https://github.com/smcmurry6-source/study-hubs/pull/324) merged on Sam's word (`728279c`), and
+  `node tools/release/postcheck.js` passed (the changed files live and identical to `main`, no errors on the live
+  dashboard or a hub, nothing written to the class's data). Not released: the rest is the release's, as listed above.
 
 ## Outcome
 

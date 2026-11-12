@@ -63,6 +63,9 @@ task is the one PR that then switches the site over. If something goes wrong, re
       missing mp3s or word files. Needed before Heme & Endo Exam 2, Occlusion or Perio is archived on the engine
       ([to-do](2026-11-12-audio-off-at-archiving.md)). High yield's recordings (`<lecture>-hy.mp3`) come off with the rest;
       the build's `hyAudio` then lists none by itself (`tools/hub-next/build.mjs` checks the files)
+- [ ] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"): Sam has saved the API key in Supabase and
+      set the Console's spending limit; the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
+      function reads the content from its released place; everyone has Timmy
 - [ ] After merge: `node tools/release/postcheck.js`, `DEPLOY_NOTES.md` and the site changelog; a notice to the class only
       if Sam wants one
 
@@ -117,14 +120,16 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 **[build-a-hub](../how-to/build-a-hub.md)** (rewrite "Build it" and "Wire it into the site"):
 - A new hub is a page like `hubs/occlusion/next/index.html`: the guard script, `window.SH_HUB` (hub id, name, state key,
   answered event, exam, the Home/Notes/hints/mock/arcade wording), `widget/hub-art.js` + `widget/hub-art/<hub>.js`, `hub.css`
-  and `hub.js`. Nothing else goes in the page.
+  and the engine's four scripts, deferred, in this order: `hub-rewards.js`, `hub-timmy.js`, `hub-bank.js`, then `hub.js`
+  (the smoke test checks the order). Nothing else goes in the page.
 - Its content is JSON beside the page (`content/core.json`, `questions.json`, `notes.json`, `study.json`) plus
   `figures.js/css` and `arcade.js/css`. After the release the JSON is the source (edited by hand or by a build step), and
   `narrate.py`, the lint, the figure builds and the question-id registry read it.
 - Its art (emblem, masthead, medals, tint) is drawn in `tools/figures/site/` and built into `widget/hub-art/<hub>.js`
   ([every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md)).
 - The engine owns the frame, the card, the bank, the rewards, the mock and the settings: a hub never copies or patches
-  them; a change for every hub goes in `widget/hub.js` / `hub.css`.
+  them; a change for every hub goes in the engine (`widget/hub.js` and its three parts, which file holds what is at the
+  top of `hub.js`) / `hub.css`.
 - Figure text is 11 px at the smallest (the build raises 9-10.5 px to 11).
 - Drop from the old steps: copying a hub file, its palette and type trio (the tint is the hub's color now), `whyHTML`,
   the `.qbar` copy, `renderHome()` and the tour steps.
@@ -161,6 +166,12 @@ bar under the explanation; opened, it lists every choice with your pick's reason
   true).
 - **Tour** (changed): no pop-up on arrival; a one-line tip the first time you open each part, and "Take the tour" in More.
 - Timmy Tooth: he stays in the bottom-left corner, as now.
+
+### The engine's files (the split, 2026-11-12, [phase 4](2026-11-05-redesign-phase-4-game-layer.md))
+
+`sw.js`: add the engine's four scripts to `PRECACHE` when the new hubs go live: `widget/hub.js`, `widget/hub-rewards.js`,
+`widget/hub-timmy.js` and `widget/hub-bank.js` (`widget/hub.css` and `widget/hub-art.js` are in phase 3's list below).
+A file a later session adds to the engine joins this list, the pages, `tools/ci/syntax.js` and the smoke test's `ENGINE`.
 
 ### From phase 2, Heme & Endo Exam 2 ([phase 2](2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../hubs/heme-endo-exam2.md))
 
@@ -453,6 +464,8 @@ is in [its own note](2026-11-06-idea-board.md).
   drafts above.
 - 2026-11-06: Sam's third look: Timmy Time among Home's quick starts, animated; Today's ring of 20 teeth.
 - 2026-11-12: High yield, the notes' third reading level, built in the engine; its drafts are above.
+- 2026-11-12: the engine split into its core and three parts ([phase 4](2026-11-05-redesign-phase-4-game-layer.md), its
+  first step); the service worker's list for them is above ("The engine's files").
 - 2026-11-12: High yield narrated with Kokoro for all three hubs (21 lectures), played with Follow along where it
   matches today's High yield ([task](done/2026-11-12-high-yield-narration.md)); the drift rule covers it.
 

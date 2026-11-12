@@ -5,7 +5,7 @@ hub: dashboard
 created: 2026-11-05
 requested-by: Sam
 due: 
-waiting-on: the idea board (a second session)
+waiting-on: "the redesign's release (BUG-076 and the About entries)"
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/318
 ---
@@ -238,6 +238,8 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 - 2026-11-12 (Claude Code, **the idea board**). Built in its own session, in [#324](https://github.com/smcmurry6-source/study-hubs/pull/324), stacked on #318: `widget/ideas.js`
   fills `#ideas`, the check-in has its tick, the admin page its Idea board. The hand-off is in
   [the idea board's note](2026-11-06-idea-board.md).
+- 2026-11-12: the idea board merged ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324), `728279c`), so this
+  note no longer waits on it. Left here: BUG-076 (open, S4) and the About entries at the release.
 
 ## Outcome
 
@@ -246,5 +248,6 @@ plan except the idea board, and with Sam's second-pass changes; nothing students
 ([#318](https://github.com/smcmurry6-source/study-hubs/pull/318)). The third pass is built too: the classroom, the
 stage and the recap as a bar graph in a smaller card. One change in the PR is live at merge: each hub sends
 its Timmy's outfit with the studying-now presence, with no name or id, and keeps its own random presence key in the
-browser so the new dashboard can mark your own Timmy. Sam has looked at all of it ("All that looks good") and said "merge" on 2026-11-12; what's left
-is the idea board.
+browser so the new dashboard can mark your own Timmy. Sam has looked at all of it ("All that looks good") and said "merge" on 2026-11-12. The idea board is built and
+merged too ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324)); what's left is BUG-076 and the About
+entries, which land at the release.

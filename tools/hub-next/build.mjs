@@ -214,7 +214,7 @@ function build(hub){
     likelyTopics: clean(D.LIKELY_TOPICS), examCounts: clean(D.EXAM_COUNTS),
     mock: Object.assign({ blueprint: clean(D.MOCK_BLUEPRINT), limit: D.MOCK_FORMAT ? D.MOCK_FORMAT.minutes * 60 : D.MOCK_LIMIT },
       /* an exam-format mock (Perio's EXAM_FORMAT): so many Patient Box, select-all and ordering items, the rest multiple
-         choice, drawn round-robin across the lectures (widget/hub.js, buildMock) */
+         choice, drawn round-robin across the lectures (widget/hub-bank.js, buildMock) */
       D.MOCK_FORMAT ? { format: clean(D.MOCK_FORMAT) } : {},
       D.EXAM_GROUPS && Object.keys(D.EXAM_GROUPS).length ? { groups: clean(D.EXAM_GROUPS) } : {},
       D.MOCK_LIKELY_ONLY && Object.keys(D.MOCK_LIKELY_ONLY).length ? { likelyOnly: clean(D.MOCK_LIKELY_ONLY) } : {}),

@@ -53,8 +53,9 @@ High yield in `notes.json`'s `hyAudio`, and only those get the recording (and Fo
 the device's voice. A topic number is read "Topic 2." and the "·" in "A professor's hint · 4 questions in the bank" as a
 pause. High yield changes whenever the lecture's notes, predicted topics, hints or questions do, so record it again then
 ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)); the smoke lint names a lecture whose recording no
-longer matches. About 55 characters a second with all 4 cores (a 10,000-character lecture in 3 minutes); the 21 lectures
-of 2026-11-12 took about N minutes.
+longer matches. One lecture on a 4-core machine speaks about 50 characters a second (10,000 characters in about 3
+minutes); `--jobs 4` manages about 40 a second in all, and the 21 lectures of 2026-11-12 (270,000 characters, 148 MB) took
+106 minutes.
 
 **Word timings for Follow along** (since 2026-11-12). The redesign highlights each word as Listen reads it
 (`widget/hub.js`), from a `<lecture>-<level>.words.json` beside each mp3: the words as the page shows them and when each is

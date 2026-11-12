@@ -35,7 +35,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 - **2026-11-12 (High yield narration for the redesign, Claude Code)** — Nothing students see changes until the redesign's
   release. The notes' third reading level, High yield, now has Kokoro narration like the other two: `<lecture>-hy.mp3` and
   its word timings for all 21 lectures that have it (Heme & Endo Exam 2's 8, Occlusion's 4 final lectures, Perio's 9; Sam
-  asked for Heme & Endo too though it archives Nov 13), SIZE_MB at 64 kbps; site SITE_MB. `tools/narrate.py` reads the
+  asked for Heme & Endo too though it archives Nov 13), 148 MB at 64 kbps (about 5 hours 20 minutes); the site is 738 MB of the 1 GB limit, under `size.js`'s 750 MB warning. `tools/narrate.py` reads the
   redesign's `notes.json` (`--level hy`), says a topic's number as "Topic 2." and the "·" as a pause, stamps each words file
   with the text it was spoken from (`"h"`), and spreads lectures over `--jobs` longest first. `tools/hub-next/build.mjs`
   lists in `notes.json`'s `hyAudio` the lectures whose recording matches today's High yield, and only those get the
@@ -44,6 +44,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   exactly the listed ones. The drift rule now covers High yield: it changes whenever a lecture's notes, predicted topics,
   hints or questions do, so a question edit on these three hubs can mean recording that lecture's High yield again in the
   same PR ([rule](vault/rules/text-and-audio-never-drift.md), [task](vault/tasks/done/2026-11-12-high-yield-narration.md)).
+
+- **2026-11-12 (the redesign's hub engine split into four files, Claude Code)** — Nothing students see changes: only the
+  new hubs (`hubs/<id>/next/`, shown in a preview only) load the engine, and no live file changed. `widget/hub.js` was
+  one 188 KB closure; it is now the core (`widget/hub.js`, 116 KB) and three parts, each holding what one kind of
+  session changes: `widget/hub-rewards.js` (the answer path, XP, the rank, the bar's meters, Today, the recap),
+  `widget/hub-timmy.js` (what the engine asks of Timmy) and `widget/hub-bank.js` (the question card, the bank, the
+  mock). **A new hub's page loads all four, deferred, the core last**; the smoke test fails a page that doesn't. The
+  parts share the core's names through one object, `HX` (how: the top and the end of `hub.js`). Before editing the
+  engine, find the function's file first (`grep -n "function name" widget/hub*.js`). Three more requests a page (20,
+  20 and 18 against budgets of 21, 22 and 21, not raised). No behavior change: the same scripted visit on `main`'s copy
+  and on the split gave identical pages and saved state at all 368 steps. Hand-off for parts A to D:
+  [phase 4's note](vault/tasks/2026-11-05-redesign-phase-4-game-layer.md). ([#330](https://github.com/smcmurry6-source/study-hubs/pull/330))
+
 - **2026-11-12 (archived hubs' audio off the site, Claude Code)** — The site was 958 MB of GitHub Pages' 1 GB limit, 909 MB
   of it mp3s. Sam kept the bitrates (narration 64 kbps, Timmy Time 96 kbps) and made it a standing rule that an archived
   hub's narration and Timmy Time come off the site ([rule](vault/rules/archived-hubs-drop-their-audio.md)). Done now for

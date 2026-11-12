@@ -49,7 +49,7 @@
   }
   function timmy(k){ return uniq(A.timmy.bar[k] || A.timmy.bar.happy); }
 
-  /* Today's goal as a ring of 20 teeth, the way the hub engine draws it (widget/hub.js teethRing; Sam, 2026-11-06: "a more
+  /* Today's goal as a ring of 20 teeth, the way the hub engine draws it (widget/hub-rewards.js teethRing; Sam, 2026-11-06: "a more
      visually interesting progress circle"): each tooth is a twentieth of the goal and fills in the hub's color, a thin
      arc shows the exact share, the tooth that just filled pops in */
   var TOOTH = "M-5 -3C-5.5 -7-3.5-7.8-1.8-7C-.8-6.6.8-6.6 1.8-7C3.5-7.8 5.5-7 5-3C4.7-.5 4 1.5 3.2 5C2.8 7 1.4 7.4 1 5.4L.4 2.6C.2 2-.2 2-.4 2.6L-1 5.4C-1.4 7.4-2.8 7-3.2 5C-4 1.5-4.7-.5-5-3Z";
