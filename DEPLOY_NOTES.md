@@ -48,6 +48,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `tools/ci/smoke.js` draws a made-up board and checks votes, the pickers, that words never become markup and that every
   button has a fixed `data-shi` name. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324))
 
+- **2026-11-11 (Lessons refresh, Claude Code)** — Data read 5:30 pm Central, two days before Heme & Endo Exam 2. The 11-10
+  evening's six explanation fixes worked (first tries 29% before, 81% since, against the bank's 70% -> 74%), and the Cushing labs
+  no longer read backwards (`p1-corticotroph` 1 of 12 -> 6 of 10). Five more Heme & Endo Exam 2 explanations now name the class's
+  favorite wrong answer, from the notes: `dm-pb-cpep-2` (the three drugs that still work without beta cells), `mh-wall` (Leydig
+  cells sit between the tubules, not in the wall), `mp-e2-role` (inhibin is the brake on FSH), `dm-pb-hf-1` (glipizide has no
+  heart failure warning) and `p1-hashi-3` (diffuse hyperplasia is Graves). Perio `q3-S02` (report #41): its explanation now says
+  what each statement claims and which of the slide's three numbers belongs to which group. Explanations only: ids, keys,
+  choices and their order are unchanged, so no picks move; `next/content` rebuilt for both hubs. `LESSONS.md` Live signals
+  rewritten; the PCD Implants retrospective now counts 6 check-ins.
 - **2026-11-11 (migration_v54: no visiting opt-out, an idea delete removes the idea, Claude Code)** — Nothing students see
   changes, and the migration is still not applied (it waits for the redesign's release). Sam's two "no" answers on the open
   calls, made in `migration_v54.sql`: **visiting can't be turned off** (`set_visiting`, `pet_visit_off`, `visiting` in

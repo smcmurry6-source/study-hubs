@@ -4,8 +4,8 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-11-10** (the evening audit, data read 9:45 pm Central; the morning's full audit wrote PCD Implants Exam
-1's retrospective and recap; Heme & Endo Exam 2's exam is Friday). Sam runs the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
+**Last refreshed: 2026-11-11** (data read 5:30 pm Central, two days before Heme & Endo Exam 2; the 11-10 morning audit wrote
+PCD Implants Exam 1's retrospective and recap). Sam runs the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and
 suggestions and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
 
@@ -90,50 +90,57 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-11-10 evening (data read 9:45 pm Central).** "Since" = this morning's audit (data read 5:50 am). Live hubs: **Heme & Endo
-Exam 2** (Fri 11-13, 10:00 am), **Occlusion** (final Mon 11-16, L6-L9 since L9 went live today) and **perio** (final Thu 11-19). No hub
-is newly archived; Special Patient Care (archived 11-06) keeps its Canvas window open to 11-13, and its retrospective comes after that.
-Data quality (`sh_data_quality()`): no test rows, 34 overcounted minutes, and the same PCD Implants counter drift as this morning
-(expected). Searches: none since 10-21. Check-ins: none since 11-09. The live survey: one more skip.
+**2026-11-11 (data read 5:30 pm Central).** "Since" = the 11-10 evening audit (data read 9:45 pm; its fixes went live about 10:25 pm).
+Live hubs: **Heme & Endo Exam 2** (Fri 11-13, 10:00 am; tomorrow is the eve), **Occlusion** (final Mon 11-16, L6-L9) and **perio** (final
+Thu 11-19, cumulative). No hub is newly archived; Special Patient Care (archived 11-06) keeps its Canvas window open to 11-13 and its
+check-in waits for 11-19, so its retrospective comes after that. Data quality (`sh_data_quality()`): no test rows, 34 overcounted minutes,
+the same PCD Implants counter drift (expected). Searches: none since 10-21.
 
-**Student voice since this morning:** two Occlusion reports, both on the final's L7. #39, `mo-repos-irrev`: two of its four choices said
-"Reversible" and one "Irreversible", so the odd one out was the key (fixed in this run, below). #40, `mo-10`: "asked a bunch already":
-the final's lectures ask the same fact, that about 10% of people have MIP coincident with CR closure, three times (`in-90` in L6,
-`mo-10` and `mo-tf-3` in L7); both reports were answered, and then Sam had `mo-10` retired ("not more than twice"). Report #38 (the Sertoli drawing) was answered today.
+**Student voice since the last audit:** one report, perio #41 on `q3-S02` (S3, the slide's closing numbers): "the first statement does
+not say what the explanation says it does". The statements and the key agree with the notes (about 10% resistant whatever their hygiene,
+10-15% at risk for severe disease, 20-25% don't respond to standard therapy), but the explanation said "Statement 1 is true" with no
+reason and called statement 2 a swap of "the slide's two other numbers" when it misplaces one; this run rewrites it to say what each
+statement claims and which number belongs to which group. Its sibling `q3-47` (51% over 72 tries, "About 25%" the favorite wrong answer)
+shows the class mixes the three numbers up. One more PCD Implants check-in (n = 6 now, in its retrospective), one more Occlusion midterm
+check-in (18 in all), and one survey answer, a feature idea: highlight the words being read while Listen plays the notes (for Sam).
 
-**Did the last refresh work?** (this morning's four explanation fixes went live about 5 pm Central, so a few hours of data)
-- `p2-cah-17` (now names 21-hydroxylase): right on every try since, from a few people (8 of 19 before).
-- `p1-corticotroph` (now says ACTH low with cortisol high is the adrenal's own pattern): 5 of 13 tries since, from 7 people (38%; 37%
-  before). No change yet, and it is part of a wider pattern (below).
-- Perio `q4-44` and `q4-M02`: no tries since.
+**Did the last refresh work?** Yes, for the explanation fixes (first tries, before each fix vs since):
+- The six 11-10 evening explanations that now name the favorite wrong answer (`p2-case4-a`, `p2-case6-a`, `p2-shpt-dialysis`, `dm-meg`,
+  `dm-met-lactic`, `p1-fc-mets`): **22 of 76 (29%) before, 17 of 21 (81%) since**, while the whole bank's first tries went 70% -> 74%.
+  Each item has only a few first tries since, so read them together; only `dm-met-lactic` is still low.
+- The 11-10 morning's two: `p1-corticotroph` (ACTH low with cortisol high is the adrenal's own pattern) 1 of 12 -> 6 of 10 (10 people);
+  `p2-cah-17` 1 of 8 -> 6 of 6. With the two case items right on every first try since, **the Cushing labs no longer read backwards**,
+  so the L12a/L12b notes line suggested last time isn't needed.
+- Occlusion `mo-repos-irrev` (report #39's choices) and perio `q4-44`, `q4-M02`: too few tries since to read.
 
 **Per hub:**
-- **Heme & Endo Exam 2** (Fri): 44 people and 89 h since it opened; **11-10 was its biggest day, 44 people and 3,150 min** (10 under 5
-  min). Since this morning the notes (1,685 min, 36 people) led the bank (1,283 min, 26), as PCD Implants' notes did while there were
-  days to spare. 5,257 answers from 30 people, 77% (2,835 since this morning at 74%, after the bank grew back to 393 Exam 2 questions with
-  the new "which statement" items; 402 since L16 went taught tonight). No mocks yet. **Practice still falls off in bank order**: on 11-10, L11 had 22 answerers, L12a 13,
-  L12b 11, L13 11, L15 and L16 6 each, **L14 a couple**; tries per question L11 23, L12a 17, L12b 11, L13 7.5, L16 6, L15 3.8, **L14
-  1.2**. PCD Implants' lag closed by itself on the eve, which here is Thursday: read L14 then. By format: "which statement is true" 66%
-  (18 items) and "which is false" 66% (14), the lowest after matching (two-statement 73%, numbered 74%, MCQ 77%, true/false 82%); about
-  6 tries per item so far. **The class reads the Cushing labs backwards**: for a corticotroph adenoma, "ACTH low and cortisol high" took
-  7 of 12 first tries (`p1-corticotroph`); for an adrenal tumor with ACTH under 5, "an ACTH-secreting pituitary tumor" took 8 of 12
-  (`p2-case4-a`); for Addison disease with ACTH 480, the same pituitary-tumor choice took 7 of 10 (`p2-case6-a`). The notes, the cram
-  sheet and the explanations all state the rule, so this run makes the two case explanations name that choice and say why the labs rule
-  it out; if Thursday's numbers stay low, the L12a and L12b notes could add one line ("Cushing disease, the pituitary tumor, is the
-  secondary pattern: both high"), with their narration redone. Four more explanations now name the favorite wrong answer:
-  `p2-shpt-dialysis` (primary chief cell hyperplasia, 6 of 12 first tries), `dm-meg` ("no hypoglycemia", 7 of 18), `dm-met-lactic`
-  (the disulfiram-like reaction, 5 of 10) and `p1-fc-mets` (the lung by the lymphatics, 6 of 14). Question health lists 22 flags, all on
-  8-18 first tries, and every key agrees with the notes; the true/false, two-statement and numbered ones (`p1-tf-hypopit75`, `p1-tf-di`,
-  `p1-tf-psammoma`, `dm-tf-6`, `dm-2s-3`, `dm-2s-4`, `p2-2s-4`, `p1-num-ptc`) are the "True" lean on one changed taught detail, which
-  explanation fixes don't move (standing lesson): leads for Sam's list, no change.
-- **Occlusion** (final Mon 11-16): 31 people and 34 h since 11-05; 11-10 12 people and 740 min. Since this morning notes 386 min and bank
-  325 (9 and 8 people), 932 answers at 91%. The final's lectures are practiced in bank order too: since 11-09, L6 754 answers from 11
-  people, L7 580 from 6, L8 and L9 a few answers each (L9 went live today); tries per question L6 10.8, L7 3.9, L8 0.1, L9 0. Five days
-  out, there is time for it to close by itself. The midterm lows are unchanged and not on the final.
-- **Perio** (final 11-19): quiet: 19 people and 13 h since 11-05; 11-10 7 people and 140 min, nearly all bank time from a few people.
-  S9 went taught today. Leads for the final unchanged (`q3-M01`, `q4-06`, `q4-02`, `q4-M05`). Expect the eve (11-18) to carry most of it.
-- **Special Patient Care** (archived 11-06, window open to 11-13): 16 people and 6.5 h before the window opened (this morning's
-  reading), a couple of people today.
+- **Heme & Endo Exam 2** (Fri, eve tomorrow): 61 people and 139 h since it opened; 11-10 ended at 46 people and 3,635 min (8 under 5
+  min), and 11-11 had 49 people and 2,566 min by 5:30 pm (9 under 5). Since the last audit the notes (1,613 min, 38 people) still led
+  the bank (1,275, 34), as PCD Implants' did until its eve; a couple of mocks (79%), the Daily Drill a few people, Timmy Time (live
+  since 4:45 pm) a first play. 2,239 answers from 34 people since, 79% (6,544 from 38 ever, 78%). **Practice by lecture today**: L11 11
+  answerers, L12a 12, L12b 9, L13 9, L14 7, L15 9, **L16 a couple** (taught last night, 9 new questions), R a few, and the 11/11
+  in-class review's 40 items 8 (originals 72%, twins 79%). Tries per question ever: L11 27, L12a 23, L12b 14, L13 12, L15 9, L16 5.7,
+  **L14 4.9**. Expect the eve to close it, as PCD Implants' did; L14 holds a picture question (the follicle stages) and L16 is the
+  last lecture taught. By format, "which statement is true" 69% (17 items) and "which is false" 68% (14) stay the lowest after
+  matching and select-all (two-statement 73%, numbered 74%, MCQ 78%, true/false 84%). **Hardest now** (keys checked against the
+  notes; every wrong choice has its why): `mh-num-glands` 40% (the bulbourethral glands' urethra), `p2-mm-hypo` 47% (renal failure
+  ticked as a cause of hypoparathyroidism), `dm-mm-glp1` 50%, `mp-2s-2` 50% (FSH, not LH, turns up aromatase), and question
+  health's new flags: `mh-wall` (the Leydig cells picked as the cells in the tubule's own wall, most first tries), `p1-wf-hypopit`
+  (the hypothalamic tumor picked as the false statement; Sheehan's is the anterior pituitary), `mp-e2-role` (estradiol picked as the
+  brake on FSH), `dm-ws-insulin`, `dm-pb-cpep-2` (37% of 27 people's first tries, the wrong picks spread over the three drugs that
+  still work). This run makes five explanations name the favorite wrong answer: `dm-pb-cpep-2`, `mh-wall`, `mp-e2-role`, `dm-pb-hf-1`
+  (glipizide) and `p1-hashi-3` (Graves). The statement items flagged last time (`dm-tf-6`, `p1-tf-psammoma`, `dm-2s-3`, `p2-2s-4`,
+  `p1-num-ptc`) are unchanged: keys agree with the notes, leads for Sam's list.
+- **Occlusion** (final Mon 11-16): 11-11 15 people and 346 min (6 under 5 min); since the last audit notes 195 min and bank 123, 267
+  answers at 88%. The final's lectures are still practiced in bank order: since 11-09 L6 675 answers from 12 people, L7 665 from 7,
+  **L8 and L9 about 40 each from a few**; tries per question L6 11.0, L7 5.1, L9 0.8, L8 0.4. Five days out there is time. Hardest on
+  the final's lectures (small numbers): `in-locator` 7 of 15 (the pantograph's six recording tables picked as how the hinge axis is
+  found: the why names it, the explanation doesn't; a one-sentence fix waits for PR #319, which rewrites the same generated file),
+  `in-full-adj` 7 of 13 (the Bennett angle), `mo-2s-2`. The midterm lows are unchanged and not on the final.
+- **Perio** (final 11-19, cumulative): quiet, a few people a day (6 on 11-11, 55 min). The final's lows: `q3-M01` 28% (UniFe's inputs),
+  `q4-06`, `q4-02`, `q5-01` (the narrowest maxillary furcation entrance, "Mesial" picked), `q4-M05`, `q3-47` (the three numbers, above).
+  Each explanation already names its favorite wrong answer. Expect the eve (11-18) to carry most of it.
+- **Special Patient Care** (archived 11-06, window open to 11-13): a couple of people on 11-10, none today.
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order
@@ -238,7 +245,7 @@ the final's lectures ask the same fact, that about 10% of people have MIP coinci
   checked in, 8 said "About right", 1 "Hub was harder", **none "Exam asked different things"** (13 by 11-04: 10 About right, 2 harder). The
   same people moved: of the 7 who said the Occlusion midterm "asked different things", 5 checked in after Heme & Endo too, and most of
   them said About right (two courses and professors, so a pointer, not proof). Final Heme & Endo count, n = 13 people: About right 10,
-  Hub was harder a couple, none "different"; the Occlusion midterm ended at n = 17 (About right 8, different 7). Statement formats are the hardest in its
+  Hub was harder a couple, none "different"; the Occlusion midterm stood at 18 check-ins by 11-11 (About right 9, different 7, easier 2). Statement formats are the hardest in its
   bank (two-statement 73%, numbered 75%, true/false 84%, plain MCQ 83%): keep them, they are where the practice is.
 - **The exam is harder than the hub, and case questions matter.** GI Exam 2 check-ins: 2 of 4 said the hub was
   easier than the exam, and one said it missed "patient box style questions". Every new hub gets case-based
@@ -475,12 +482,12 @@ highlighter 13 (1,590 marks). "Find this in the notes" appeared after a miss for
 couldn't place. Little used: the quick start's least-practiced "Practice questions" (7 people, the eve only), Home's "Practiced least"
 row (none), the hub tour (all 12 shown it on arrival declined; a few started it from the menu), the search panel (none). Plaque bosses: 71 met one, 16 hid it.
 
-Check-ins, **n = 5 people** (later ones go into the next audit), all heavy users: their median was 361 min and 737 answers (the hub's
+Check-ins, **n = 6 people** by 11-11 (5 at the retrospective; later ones go into the next audit), all heavy users: at the retrospective their median was 361 min and 737 answers (the hub's
 199 and 334), 77-95% right. Hub vs exam: most said About right, none "Exam asked different things"; most went better than expected,
-none worse; readiness 3.6 of 5. The new questions: the drawn Patient Box cases rated 4 of 5 against the old text boxes by everyone who
-rated them (one hadn't reached them); the diagrams and implant-type drawings 4.5 of 5 (the Occlusion midterm's diagrams: 4.6, n = 17);
-**all five ticked High likelihood questions** as a help, most "Why each choice", a few each the class's picks per choice, pins, the
-least-practiced button and Timmy Time; all but one said "keep improving it right up to the exam". Written: more "which statement is
+none worse; readiness 3.7 of 5. The new questions: the drawn Patient Box cases rated 4 of 5 against the old text boxes by everyone who
+rated them (one hadn't reached them); the diagrams and implant-type drawings about 4.5 of 5 (the Occlusion midterm's diagrams: 4.6, n = 17);
+**every one of them ticked High likelihood questions** as a help, most "Why each choice", a few each the class's picks per choice, pins, the
+least-practiced button and Timmy Time; most said "keep improving it right up to the exam" (one said it was too much). Written: more "which statement is
 correct" items where each choice is a different statement (a format, not a topic). Reports: four and suggestion #14, all fixed and
 answered within a day (brand detail #35/#36, a choice set #34, the percentages in `bm-goodacre` #37, the statement-key pattern #14).
 
