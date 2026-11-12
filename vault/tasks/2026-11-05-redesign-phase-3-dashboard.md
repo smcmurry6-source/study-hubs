@@ -34,7 +34,8 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 
 ## Done when
 
-- [ ] The idea board on the new dashboard and in More, with its starting ideas ready to post at the release
+- [x] The idea board on the new dashboard and in More, with its starting ideas ready to post at the release (built
+      2026-11-12, PRLINK; [its note](2026-11-06-idea-board.md) has the hand-off)
 
 - [x] The dashboard on the design system, inspector 0 FAIL at three widths, light and dark
 - [x] Check-ins, surveys, notices, luck, the leaderboard, streaks, archive rules and the tour all work on the preview
@@ -211,6 +212,10 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
     Still open from earlier entries: the three `dashboard/next` screens aren't in the accessibility baseline, and first
     paint on the slow-phone profile is worth another look before the release.
 
+- 2026-11-12 (Claude Code, **the idea board**). Built in its own session, in PRLINK, stacked on #318: `widget/ideas.js`
+  fills `#ideas`, the check-in has its tick, the admin page its Idea board. The hand-off is in
+  [the idea board's note](2026-11-06-idea-board.md). Also fixed here: BUG-072, the stage's luck row at the largest text on
+  a phone the day before an exam (`.dx-stage` in `widget/dash.css`), which failed the smoke test on 2026-11-12.
 
 ## Outcome
 

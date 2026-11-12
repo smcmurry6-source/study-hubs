@@ -1,0 +1,109 @@
+/* The idea board's look (widget/ideas.js loads this file by itself). On the redesign's design system: the tokens come
+   from widget/hub.css (html.shx), the buttons, segments and notes are its own (.hx .btn, .seg, .note). The tick
+   (.shi-tick) also sits in the shared widget's Suggest panel, outside .hx, so it styles everything it uses. */
+
+/* ---------- the board ---------- */
+.shi { display: grid; gap: 12px; min-width: 0; }
+.shi.is-off > * { display: none; }
+.shi-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; }
+.shi-head h2 { grid-column: 1; }
+.shi-head .shi-lede { grid-column: 1; max-width: 62ch; }
+.shi-head p.shi-lede:not(.note) { color: var(--muted); }
+.shi-head .shi-new { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+.shi-say { margin: 0; min-height: 0; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--text); }
+.shi-say:empty { display: none; }
+.shi-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.shi-pick { display: inline-flex; min-width: 0; }
+.shi-pick select, .shi-f select { appearance: none; -webkit-appearance: none; min-height: 40px; max-width: 100%; padding: 0 36px 0 14px; border: 1px solid var(--control); border-radius: var(--r-pill);
+  background: var(--row) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23857a83' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center / 16px;
+  color: var(--text); font: inherit; font-size: var(--fs-label); font-weight: var(--w-strong); text-overflow: ellipsis; cursor: pointer; }
+.shi-pick select:hover, .shi-f select:hover { background-color: var(--active); }
+
+.shi-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.shi-card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; padding: 16px; border-radius: var(--r-panel); background: var(--panel); min-width: 0; }
+.shi-card.is-new { animation: shi-in 1.6s var(--ease-out, ease-out); }
+@keyframes shi-in { from { background: var(--sun); } to { background: var(--panel); } }
+@media (prefers-reduced-motion: reduce) { .shi-card.is-new { animation: none; } }
+.shi-votes { display: grid; gap: 6px; align-content: start; }
+.shi-vote { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 64px; min-height: 40px; padding: 0 10px; border: 1px solid var(--control); border-radius: var(--r-pill);
+  background: var(--row); color: var(--text); font: inherit; font-size: var(--fs-label); font-weight: var(--w-strong); cursor: pointer; transition: background var(--t-hover, 180ms) var(--ease-out, ease-out); }
+.shi-vote:hover { background: var(--active); }
+.shi-vote:active { transform: scale(.96); }
+.shi-vote.is-up[aria-pressed="true"] { background: var(--right-bg); border-color: var(--right); color: var(--right-ink); }
+.shi-vote.is-down[aria-pressed="true"] { background: var(--wrong-bg); border-color: var(--wrong); color: var(--wrong-ink); }
+.shi-text { display: grid; gap: 8px; align-content: start; min-width: 0; }
+.shi-title { margin: 0; font-size: var(--fs-card); font-weight: var(--w-head); line-height: 1.3; overflow-wrap: anywhere; }
+.shi-body { margin: 0; font-size: var(--fs-label); line-height: 1.5; overflow-wrap: anywhere; }
+.shi-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.shi-tag { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 10px; border-radius: var(--r-pill); background: var(--row); color: var(--muted); font-size: var(--fs-meta); font-weight: var(--w-strong); }
+.shi-tag.is-hub { color: var(--text); }
+.shi-tag.has-dot::before { content: ""; flex: none; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--hub-mid, var(--hub)); }
+.shi-tag.is-src { background: var(--lilac); color: var(--lilac-ink); }
+.shi-tag.is-st { background: var(--sun); color: var(--sun-ink); }
+.shi-tag.is-st.is-shipped { background: var(--right-bg); color: var(--right-ink); }
+.shi-tag.is-st.is-not-doing { background: var(--active); color: var(--muted); }
+.shi-why { margin: 0; padding: 8px 12px; border-radius: var(--r-row); background: var(--row); font-size: var(--fs-label); line-height: 1.45; overflow-wrap: anywhere; }
+.shi-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; justify-content: space-between; margin: 0; font-size: var(--fs-meta); color: var(--muted); }
+.shi-meta b { color: var(--text); font-weight: var(--w-strong); overflow-wrap: anywhere; }
+.shi-act { min-height: 32px; padding: 0 10px; margin: -4px -10px -4px 0; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--muted); font: inherit; font-size: var(--fs-meta); font-weight: var(--w-strong); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.shi-act:hover { background: var(--active); color: var(--text); }
+.shi-act:disabled { text-decoration: none; cursor: default; background: transparent; }
+.shi-as .shi-act { margin: 0; }
+.shi-more { justify-self: center; }
+.shi-empty { padding: 24px 16px; border-radius: var(--r-panel); background: var(--panel); text-align: center; }
+
+/* ---------- the post form ---------- */
+.shi-form { display: grid; gap: 14px; padding: var(--panel-pad, 20px); border-radius: var(--r-panel); background: var(--panel); max-width: 760px; }
+.shi-formh { margin: 0; font-size: 18px; font-weight: var(--w-head); }
+.shi-as { margin: 0; font-size: var(--fs-label); }
+.shi-f { display: grid; gap: 6px; min-width: 0; }
+.shi-f > span { font-size: var(--fs-label); font-weight: var(--w-strong); }
+.shi-f > span i { font-style: normal; font-weight: var(--w-body); color: var(--muted); }
+.shi-f > small { font-size: var(--fs-meta); color: var(--muted); }
+.shi-f input[type="text"], .shi-f textarea { width: 100%; min-width: 0; box-sizing: border-box; padding: 10px 14px; border: 1px solid var(--control); border-radius: var(--r-row); background: var(--row); color: var(--text);
+  font: inherit; font-size: var(--fs-body); line-height: 1.45; }
+.shi-f input[type="text"] { height: 44px; padding-top: 0; padding-bottom: 0; }
+.shi-f textarea { resize: vertical; min-height: 84px; }
+.shi-f select { justify-self: start; min-height: 44px; border-radius: var(--r-row); }
+.shi-f input::placeholder, .shi-f textarea::placeholder { color: var(--muted); opacity: 1; }
+.shi-kinds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.shi-kinds legend { padding: 0 0 6px; font-size: var(--fs-label); font-weight: var(--w-strong); }
+.shi-kind { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--control); border-radius: var(--r-row); background: var(--row); cursor: pointer; min-width: 0; }
+.shi-kind:hover { background: var(--active); }
+.shi-kind input { flex: none; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--primary); }
+.shi-kind span { display: grid; gap: 2px; min-width: 0; }
+.shi-kind b { font-size: var(--fs-label); font-weight: var(--w-strong); }
+.shi-kind small { font-size: var(--fs-meta); color: var(--muted); }
+.shi-kind:has(input:checked) { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.shi-msg { margin: 0; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--wrong-ink); }
+.shi-msg:empty { display: none; }
+.shi-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+
+/* ---------- the tick, under the check-in's last question and the Suggest box ---------- */
+.shi-tick { display: grid; gap: 10px; min-width: 0; text-align: left; }
+.shi-tick:empty { display: none; }
+.shi-tickrow { display: flex; gap: 10px; align-items: flex-start; font-size: var(--fs-label, 14px); line-height: 1.4; cursor: pointer; }
+.shi-tickrow input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--primary, #3b2e3a); }
+.shi-tickrow b { font-weight: var(--w-strong, 700); overflow-wrap: anywhere; }
+.shi-prev { display: grid; gap: 10px; padding: 12px; border-radius: var(--r-row, 14px); background: var(--panel, #f7f3f6); }
+.shi-prev[hidden] { display: none; }
+.shi-prevnote { margin: 0; font-size: var(--fs-meta, 13px); line-height: 1.4; color: var(--muted, #685c66); }
+.shi-prevnote:empty { display: none; }
+.shi-tick .shi-f textarea { min-height: 72px; }
+.shi-prevrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.shi-prevrow .shi-pick { flex: 1 1 220px; }
+.shi-prevrow .shi-pick select { width: 100%; }
+.shi-tick .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .shi-list { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .shi-head { grid-template-columns: minmax(0, 1fr); }
+  .shi-head .shi-new { grid-column: 1; grid-row: auto; justify-self: start; }
+  .shi-kinds { grid-template-columns: minmax(0, 1fr); }
+  .shi-card { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 14px; }
+  .shi-votes { grid-auto-flow: column; justify-content: start; order: 2; }
+  .shi-bar .shi-pick { flex: 1 1 100%; }
+  .shi-pick select { width: 100%; }
+}

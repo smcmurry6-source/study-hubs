@@ -1,13 +1,13 @@
 ---
 type: task
-status: open
+status: review
 hub: dashboard
 created: 2026-11-06
 requested-by: Sam
 due: 
 waiting-on: 
-agent: 
-pr: 
+agent: Claude Code
+pr: PRLINK
 ---
 
 # An idea board: classmates post ideas and vote on them
@@ -115,15 +115,39 @@ Each gets a hub and a category when it's posted (most are for all hubs; the arca
 
 ## Done when
 
-- [ ] The tables, functions and admin controls built and tested on a throwaway copy; `widget/ideas.js` on the new dashboard and
+- [x] The tables, functions and admin controls built and tested on a throwaway copy; `widget/ideas.js` on the new dashboard and
       in More; the Inbox's "Idea board" with hide, restore, status and reply
-- [ ] The hub and category pickers, their tags on each card and the board's filters, in both places
-- [ ] The check-in's tick, preview and name prompt on the new dashboard's check-in
+- [x] The hub and category pickers, their tags on each card and the board's filters, in both places
+- [x] The check-in's tick, preview and name prompt on the new dashboard's check-in
 - [ ] The starting ideas posted at the release, with the ones from the past check-ins, checked against the About page first
-- [ ] Previewed on fixture data as the test accounts, on a phone and a laptop; Sam's look
-- [ ] The About page, the event taxonomy and the retention rows
-- [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
-- [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, the site changelog, this note's Outcome)
+- [ ] Previewed on fixture data as the test accounts, on a phone and a laptop (done by the agent, 2026-11-12, on the local
+      preview); Sam's look (screenshots sent; a hosted preview only if Sam asks)
+- [ ] The About page (drafted below, lands at the release), the event taxonomy (done) and the retention rows (the row is
+      there; the 90-day delete of hidden ideas is approved and not built)
+- [x] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
+- [ ] Vault written back (`DEPLOY_NOTES.md` and this note: done; the site changelog and the Outcome's last word at the release)
+
+## The About page's entries (a draft; they land at the release)
+
+The live About page describes the live site, so these go in with the redesign's switch ([the release](2026-11-06-redesign-release.md)).
+
+- **On the dashboard and in every hub: "Idea board"** (new). Post an idea for the hubs and vote on your classmates'. An
+  idea has a title and up to 280 characters, the hub it's for (or all hubs) and what kind it is: a new feature, making
+  something work better, questions and notes, games and fun, look and feel, or something else. It shows to the class right
+  away under your leaderboard name, with its up and down votes. One vote per idea, tap again to take it back. Top, New and
+  Shipped tabs, and filters by hub and by kind. Three ideas a day. Report hides an idea after three reports until Sam
+  looks; you can delete your own, and its votes go with it. Sam marks ideas Under consideration, Planned, Shipped or Not
+  doing with a line on why, and you get that in your Inbox if it's yours or you voted it up. Votes show what the class
+  wants; they don't decide what gets built. No quiz or exam questions or answers, and nothing about a classmate. On the
+  dashboard it's its own section; in a hub it's under More.
+- **Exam check-in**, added to its entry: under "Anything the hub could do better?" a box, ticked to start, also posts
+  your answer on the idea board under your name. You see the post first (its title, text and kind, all yours to change);
+  untick it and the answer goes only to Sam, as before. The other answers are never posted.
+- **Suggest something**, added to its entry: still private, to Sam. Tick "Also post this on the idea board" to put it on
+  the board too.
+- **What the hubs record**, added: an idea you post shows to the class under your leaderboard name, and so does a
+  check-in's "Anything the hub could do better?" unless you untick the box. Your votes and reports on ideas are kept so
+  each person counts once; nobody else sees who voted or reported.
 
 ## Log
 
@@ -146,7 +170,68 @@ Each gets a hub and a category when it's posted (most are for all hubs; the arca
   reports and Inbox notes (it no longer counts toward the day's three or the 20 seconds); hidden ideas are kept 90 days
   ([analytics-retention](../reference/analytics-retention.md), not built yet). `xp.js` checks it.
 
+- 2026-11-12 (Claude Code, **the board, the admin card and the tick built; hand-off**). On the branch of PRLINK (a draft),
+  stacked on [#318](https://github.com/smcmurry6-source/study-hubs/pull/318) (the new dashboard), which wasn't merged yet:
+  the branch starts from `claude/phase-3-dashboard-redesign-n7r4m9` with `origin/main` merged in. Nothing students see
+  changes; migration_v54 is **not applied** and the starting ideas are **not posted** (both at the release).
+  - **`widget/ideas.js` + `widget/ideas.css`** (`window.shIdeas`), one file for both places. On the new dashboard
+    (`widget/dash.js` loads it late and mounts it in `#ideas`, which stays hidden until `get_ideas` answers) and in a new
+    hub's More (`widget/hub.js`: a row under "Talk to us", first, opening `#more/ideas`). Cards with both vote counts,
+    the hub and kind as tags, "Starter idea" / "From a check-in", the status and Sam's line; Top / New / Shipped; a hub
+    filter and a kind filter that say how many each shows; Post an idea (name if none, title, details, For, the six kinds
+    with a hint each, the rules line); Report; Delete on your own. Six cards then "Show more" on the dashboard, eight in More.
+  - **The check-in's tick** (`openDebrief` in `widget/dash.js`; the live `index.html`'s check-in is untouched): under
+    "Anything the hub could do better?", ticked to start, "Also post this on the idea board as <name>". With something
+    written it shows the post: a title from the first sentence, the rest as details (cut to 280), both editable, "For
+    <the check-in's hub>" and the kind, starting on Questions and notes. The honor-code reminder moved above the box. On
+    Send the check-in goes first; the post follows, tagged From a check-in, and the thanks says whether it went up.
+    Unticked: private, counted as `ideas:checkin-private`.
+  - **The Suggest box's tick** (`widget/v3.js`, live file, a small change): "Also post this on the idea board", unticked
+    to start, with the same preview. It only appears where `ideas.js` is loaded, which the new hubs do when Suggest opens,
+    and only once the board answers; on a live hub the Suggest box is unchanged.
+  - **Inbox notes** (`widget/replies.js`, live file, a small change): a row of kind `idea` reads "An idea you posted or
+    voted for is planned", with the idea's title and Sam's line, once as a pop-up and then in the Inbox. No such row
+    exists until migration_v54. The new dashboard gets them (its bootstrap is the `_v2` one); **the hubs get them when
+    `v3.js` moves to `get_widget_bootstrap_v2`** ([phase 5](2026-11-05-redesign-phase-5-backend.md), part 2).
+  - **The admin page**: Inbox → "Idea board", under the podcast comments: every idea of the last 90 days with its votes
+    and reports, Hide / Restore, a status with one line on why ("Saved. N people told in their Inbox."), and an "All /
+    Reported or hidden" switch. Before migration_v54 the card says the board opens with the redesign.
+  - **The preview** (`tools/preview/runtime/preview.js`): a made-up board (ten ideas, none of the starting ones) that
+    follows the real functions' rules; what a test account posts, votes, reports or deletes is kept in its own preview
+    data. Also taken out, as Sam asked: the "classmate with visiting off" in the `get_place` stub and in `dash.js`'s
+    comment above `loadFits` (migration_v54 has no visiting opt-out).
+  - **No new art**: thumbs up, thumbs down and the rest are the icon set's. A tile for the board in More, or a drawing
+    for the section, would be new art: contact sheet first.
+  - **Calls I made** (say if any is wrong):
+    1. In a hub, "For" offers that hub or All hubs (a hub page doesn't know which other hubs are live); the dashboard
+       offers every live hub. In More the hub filter is "This hub and all hubs" or "Every hub's ideas".
+    2. The filters are two drop-downs, not chips: with six kinds and every hub they didn't fit a phone.
+    3. Someone who hasn't picked a name **in this browser** gets a "Your name" box that starts on the name the boards
+       show for them now (their random one, or one picked on another device), to keep or change; posting saves it.
+    4. The Suggest tick asks for the kind (it has no starting kind); the check-in's starts on Questions and notes.
+    5. Starter ideas have no Report button. After you post, the board switches to New so you see it.
+    6. The board isn't on the admin Overview's "Waiting on you" yet: it would ask the database for a function that isn't
+       there on every load until the release. Add "Ideas reported" there at the switch.
+  - **Found on the way**: BUG-072 (phase 3's stage: the day before an exam, at the largest text on a phone, the luck row
+    pushed Start studying past the screen's edge; `tools/ci/smoke.js` failed on it today, the day before Heme & Endo 2)
+    and BUG-073 (the form's name box), both fixed ([bug log](../release/bug-log.md)).
+  - **Checked**: `node tools/release/run.js` (results in the PR); `tools/ci/smoke.js` now draws a made-up board on the new
+    dashboard and in each new hub's More and fails if a card, a status, a vote, the hub and kind pickers or the tags are
+    missing, if an idea's words are drawn as markup, or if any button in the board has no fixed `data-shi` name; a
+    scripted walk on the local preview, 110 checks, laptop and iPhone 13, as the returning, new and admin accounts (post,
+    the limits, votes, report to three, delete, filters, the check-in ticked and unticked, the name box, Suggest's tick,
+    the admin card, the Inbox note), all passing. **Not checked**: against a database with migration_v54 applied (the
+    preview answers for it, and `xp.js` tests the SQL by itself): the first real run is a staging database or the release.
+  - **Left**, in order: Sam's look; at the release, apply migration_v54, load the hubs' keys, **post the starting ideas**
+    (the table above plus the ones from the past check-ins, checked against the About page), put the About entries in
+    (drafted above), add `widget/ideas.js` and `widget/ideas.css` to `sw.js`, and the Overview line. Not built: the 90-day
+    delete of hidden ideas ([analytics-retention](../reference/analytics-retention.md)), a job for the retention migration.
+
 ## Outcome
+
+Built, not released (PRLINK). The board is on the new dashboard and in the new hubs' More from one file, with the
+check-in's and Suggest's ticks, the Inbox notes and the admin page's Idea board. It ships with the redesign: migration_v54,
+the starting ideas and the About entries go in at the release.
 
 Related: [phase 3](2026-11-05-redesign-phase-3-dashboard.md) · [reply-to-reports](../how-to/reply-to-reports.md) ·
 [podcast-reactions](../rules/podcast-reactions.md) · [learner-data-privacy](../rules/learner-data-privacy.md)

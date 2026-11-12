@@ -32,6 +32,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (the idea board, built for the redesign, Claude Code)** — Nothing students see changes: the board is on
+  the new dashboard (`next/`) and in the new hubs' More, which only a preview shows, and its server (migration_v54) is
+  still not applied. New: `widget/ideas.js` + `widget/ideas.css` (`window.shIdeas`: the board, its post form with the hub
+  and the six kinds, votes, Report, Delete, Top / New / Shipped and two filters; and `shIdeas.tick()`, the "Also post this
+  on the idea board" box). `widget/dash.js` mounts the board in `#ideas` and puts the tick under the check-in's last
+  question (ticked to start; the live `index.html` check-in is untouched); `widget/hub.js` adds the page `#more/ideas`
+  and a row under "Talk to us". **Two live files change, both inert until the release**: `widget/v3.js` (the Suggest
+  box gets the tick only where `ideas.js` is loaded, which no live hub does) and `widget/replies.js` (it can show an
+  idea's status note, kind `idea`, which no server sends yet; `get_my_inbox_v2` only where the page says so). The admin
+  page's Inbox has an "Idea board" card (hide, restore, a status with one line on why); until migration_v54 it says the
+  board opens with the redesign. The preview answers the board from made-up ideas; the release's starting ideas are not
+  posted. Also: BUG-072 (new dashboard, the day before an exam at the largest text on a phone: Start studying ran off
+  the screen) fixed in `widget/dash.css`, and the "visiting off" classmate is out of the preview's `get_place` stub.
+  `tools/ci/smoke.js` draws a made-up board and checks votes, the pickers, that words never become markup and that every
+  button has a fixed `data-shi` name. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). (PRLINK)
+
 - **2026-11-11 (migration_v54: no visiting opt-out, an idea delete removes the idea, Claude Code)** — Nothing students see
   changes, and the migration is still not applied (it waits for the redesign's release). Sam's two "no" answers on the open
   calls, made in `migration_v54.sql`: **visiting can't be turned off** (`set_visiting`, `pet_visit_off`, `visiting` in

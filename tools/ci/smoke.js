@@ -46,9 +46,18 @@ console.log(`Smoke test: ${hubsWhy}`);
 const nextHubs = hubs.filter(h => fs.existsSync(path.join(root, 'hubs', h, 'next', 'index.html')));
 const problems = [], notes = [];
 
+/* the idea board (widget/ideas.js; its server is migration_v54, not applied until the redesign's release): a made-up
+   board, so the new dashboard and a new hub's More have something to draw. One title is markup, which must show as text. */
+const IDEAS = { total: 4, hubs: { '': 3, perio: 1 }, categories: { feature: 2, fun: 1, content: 1 }, ideas: [
+  { id: 1, title: 'Smoke idea one', body: 'A made-up idea.', name: 'Test Molar', hub: null, category: 'feature', source: 'board', status: 'planned', note: 'A made-up reason.', up: 5, down: 1, at: new Date(Date.now() - 864e5).toISOString(), own: false, mine: 0, reported: false },
+  { id: 2, title: '<img src=x onerror="window.__idea=1">', body: '<b>bold</b>', name: '<i>Name</i>', hub: 'perio', category: 'content', source: 'checkin', status: 'open', note: null, up: 2, down: 0, at: new Date(Date.now() - 2 * 864e5).toISOString(), own: false, mine: 0, reported: false },
+  { id: 3, title: 'Smoke idea three', body: '', name: 'Timmy Tooth', hub: null, category: 'fun', source: 'starter', status: 'open', note: null, up: 1, down: 0, at: new Date(Date.now() - 3 * 864e5).toISOString(), own: false, mine: 0, reported: false },
+  { id: 4, title: 'Smoke idea four, mine', body: '', name: 'Test Molar', hub: null, category: 'feature', source: 'board', status: 'open', note: null, up: 0, down: 0, at: new Date(Date.now() - 4 * 864e5).toISOString(), own: true, mine: 0, reported: false }] };
 async function stub(context){
   await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, route => {
     const u = route.request().url();
+    if (/supabase\.co\/rest\/v1\/rpc\/get_ideas/.test(u)) return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(IDEAS) });
+    if (/supabase\.co\/rest\/v1\/rpc\/vote_idea/.test(u)) return route.fulfill({ status: 200, contentType: 'application/json', body: '{"up":6,"down":1,"mine":1}' });
     if (/supabase\.co\/rest\/v1\/rpc\/get_display_name/.test(u)) return route.fulfill({ status: 200, contentType: 'application/json', body: '"Test Molar"' });
     if (/supabase\.co\/rest\/v1\//.test(u)) return route.fulfill({ status: 200, contentType: 'application/json', body: '[]' });
     return route.abort();
@@ -284,6 +293,33 @@ function lint(hub, A){
       if (!(await page.$('#dxMenu:not([hidden]) #tourBtn')) || !(await page.$('#dxMenu #aboutBtn'))) problems.push(`${name}: the menu didn't open with About and the tour`);
       await page.keyboard.press('Escape');
       if (!(await page.$('#ideas[data-sh-ideas]'))) problems.push(`${name}: the idea board's section (#ideas) is missing`);
+      // the idea board (widget/ideas.js): the made-up board above is drawn, a vote counts, the form has the hub and the six
+      // kinds, what a student wrote shows as text, and every button names itself with a fixed data- value (click counts
+      // must never pick up anyone's words: learner-data-privacy)
+      const board = await page.evaluate(async () => {
+        const el = document.getElementById('ideas'), wait = ms => new Promise(r => setTimeout(r, ms));
+        if (!el || el.hidden) return { hidden: true };
+        const out = { cards: el.querySelectorAll('.shi-card').length, markup: el.querySelectorAll('.shi-card img, .shi-card b:not(.shi-meta b):not(.shi-why b), .shi-card i').length + (window.__idea ? 1 : 0),
+          tags: [...el.querySelectorAll('.shi-card:nth-child(2) .shi-tag')].map(t => t.textContent).join('|'), status: !!el.querySelector('.shi-card .shi-why'),
+          own: !!el.querySelector('.shi-card.is-own [data-shi="delete"]'), filters: el.querySelectorAll('[data-shi-filter] option').length };
+        const up = el.querySelector('.shi-card [data-shi="up"]'); up.click(); await wait(250);
+        out.vote = up.getAttribute('aria-pressed') + ' ' + up.querySelector('.num').textContent;
+        el.querySelector('[data-shi="new"]').click(); await wait(100);
+        out.kinds = el.querySelectorAll('.shi-form .shi-kind input[type=radio]').length; out.hubs = (el.querySelector('.shi-form [data-shi-f="hub"] option') || {}).textContent;
+        out.unnamed = [...el.querySelectorAll('button, label.shi-kind')].filter(b => ![...b.attributes].some(a => /^data-shi/.test(a.name) && a.value)).length;
+        el.querySelector('[data-shi="cancel"]').click();
+        return out;
+      });
+      if (board.hidden) problems.push(`${name}: the idea board didn't show`);
+      else {
+        if (board.cards !== 4 || !board.status || !board.own || board.filters < 9) problems.push(`${name}: the idea board is missing cards, a status line, Delete on my own idea or its filters (${JSON.stringify(board)})`);
+        if (board.markup) problems.push(`${name}: an idea's words were drawn as markup`);
+        if (board.tags !== 'Perio|Questions and notes|From a check-in') problems.push(`${name}: an idea's tags should be its hub, its kind and where it came from, not "${board.tags}"`);
+        if (board.vote !== 'true 6') problems.push(`${name}: an up vote on the idea board didn't count (${board.vote})`);
+        if (board.kinds !== 6 || board.hubs !== 'All hubs') problems.push(`${name}: the idea form should offer All hubs first and six kinds (${board.kinds}, ${board.hubs})`);
+        if (board.unnamed) problems.push(`${name}: ${board.unnamed} idea board button(s) have no fixed data-shi name, so click counts would record their text`);
+      }
+      await sideways('the idea board');
       errs.forEach(e => problems.push(`${name}: JavaScript error: ${e}`));
       notes.push(`${name}: ${tabs.length} hub tabs, the class board, Settings, the name dialog and the menu`);
       await page.close();
@@ -329,10 +365,19 @@ function lint(hub, A){
       if (!n) problems.push(`${name} (${label}): window.SH_EXPORT has no questions (the widget's search, stats and question health read it)`);
       let screens = 0;
       const routes = [...modes, 'questions/drill', 'questions/misses', 'questions/weak', 'questions/mock',
-        'more/timmy', 'more/hints', 'more/cram', 'more/side', 'more/arcade', 'more/stats', 'more/settings'];
+        'more/timmy', 'more/hints', 'more/cram', 'more/side', 'more/arcade', 'more/stats', 'more/settings', 'more/ideas'];
       for (const r of routes) {
         if (modes.includes(r)) await page.click(`#modeSwitch [data-mode="${r}"]`); else await page.evaluate(h => { location.hash = h; }, r);
         await page.waitForTimeout(r === 'more/arcade' ? 1500 : 500); screens++;
+        // the idea board's page in More: this hub's ideas and the all-hub ones, and a new idea starts on this hub
+        if (r === 'more/ideas') {
+          await page.waitForSelector('.more-body .shi-card', { timeout: 15000 }).catch(() => {});
+          const ib = await page.evaluate(() => { const b = document.querySelector('.more-body'); if (!b || !b.querySelector('.shi-card')) return null;
+            b.querySelector('[data-shi="new"]').click(); const v = (b.querySelector('.shi-form [data-shi-f="hub"]') || {}).value; b.querySelector('[data-shi="cancel"]').click();
+            return { hub: v, first: (b.querySelector('[data-shi-filter="hub"]') || {}).value, markup: b.querySelectorAll('.shi-card img').length + (window.__idea ? 1 : 0) }; });
+          if (!ib) problems.push(`${name} (${label}): the idea board in More drew no ideas`);
+          else if (ib.hub !== hub || ib.first !== hub || ib.markup) problems.push(`${name} (${label}): the idea board in More should open on this hub, start a new idea on it and show words as text (${JSON.stringify(ib)})`);
+        }
         const st = await page.evaluate(() => { const v = document.querySelector('.hx-view:not([hidden])'); return { h1: !!(v && v.querySelector('h1')), w: document.documentElement.scrollWidth - innerWidth }; });
         if (!st.h1) problems.push(`${name} (${label}): ${r} has no page title`);
         if (st.w > 1) problems.push(`${name} (${label}): ${r} scrolls sideways by ${st.w}px`);

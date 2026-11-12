@@ -575,10 +575,134 @@
                  { hub: "perio", exam: ex(-34), people: 22, hub_people: 88, their_median_mins: 120, hub_median_mins: 70, avg_ready: 3.9, match: { "About right": 15, "Harder": 7 } }],
       surveys: { responses: 60, declined: 25 } };
   }
+  /* ---------- the idea board (widget/ideas.js; its server is migration_v54, not applied until the redesign's release):
+     made-up ideas, with what this test account posts, votes, reports and deletes kept in its own preview data. The
+     answers follow the real functions (post_idea's checks and limits, get_ideas' tabs, filters and counts, three
+     reports hide an idea, a new status leaves a note in the Inbox). None of the release's starter ideas is here. */
+  var IDEA_CATS = ["feature", "better", "content", "fun", "look", "other"];
+  var IDEA_FIX = [
+    [6001, FAKE_NAMES[0], "Fixture idea: show how long each question took", "Next to the class average, so I can see where I'm slow.", null, "feature", "board", 14, 2, 0, 6],
+    [6002, "Timmy Tooth", "Fixture starter: name the lecture on every missed question", "So it's clear at a glance which lecture to go back to.", null, "better", "starter", 9, 1, 0, 9],
+    [6003, FAKE_NAMES[1], "Fixture idea: more radiograph questions", "The ones with a picture are the closest to the real thing.", "perio", "content", "checkin", 11, 0, 0, 4],
+    [6004, FAKE_NAMES[2], "Fixture idea: a darker dark mode", "", null, "look", "board", 5, 6, 2, 3],
+    [6005, FAKE_NAMES[3], "Fixture idea: a two-player arcade round", "Race a classmate through ten questions.", "occlusion", "fun", "board", 17, 1, 0, 12],
+    [6006, FAKE_NAMES[4], "Fixture idea: bigger buttons in the mock", "They're easy to miss on a phone.", null, "better", "suggest", 21, 0, 0, 20],
+    [6007, FAKE_NAMES[5], "Fixture idea: a search box on the cram sheet", "", "heme-endo-exam2", "feature", "board", 8, 0, 0, 2],
+    [6008, FAKE_NAMES[6], "Fixture idea: hidden by three reports", "A fixture post to restore or keep hidden.", null, "other", "board", 1, 4, 3, 5],
+    [6009, "Number thirty-one", "Fixture starter: a trophy for a week of drills", "Seven Daily Drills in a row.", null, "fun", "starter", 6, 3, 0, 9],
+    [6010, FAKE_NAMES[7], "Fixture idea: the drawings in the question explanations too", "", "pcd-implants-exam1", "content", "board", 4, 0, 0, 1]
+  ];
+  var IDEA_SET = { 6005: ["planned", "Fixture note: after the redesign ships."], 6006: ["shipped", "Fixture note: built last week."], 6007: ["considering", null], 6008: ["open", null, true, "reports"] };
+  function ideaDb(){
+    if (!db.ideaPosts) { db.ideaPosts = []; db.ideaVotes = {}; db.ideaReports = {}; db.ideaAdmin = {}; db.ideaNotes = []; db.ideaGone = {}; }
+    return db;
+  }
+  function ideaAll(t){
+    ideaDb();
+    var d = 864e5, rows = IDEA_FIX.map(function(f){
+      var st = IDEA_SET[f[0]] || ["open", null];
+      return { id: f[0], visitor: null, name: f[1], title: f[2], body: f[3], hub: f[4], category: f[5], source: f[6], up0: f[7], down0: f[8], reports0: f[9], at: iso(t - f[10] * d),
+        status: st[0], note: st[1], status_at: st[0] === "open" ? null : iso(t - d), hidden: !!st[2], hidden_by: st[3] || null };
+    }).concat(db.ideaPosts.map(function(p){ return { id: p.id, visitor: db.visitor, name: p.name, title: p.title, body: p.body, hub: p.hub, category: p.category, source: p.source, up0: 0, down0: 0, reports0: 0, at: p.at, status: "open", note: null, status_at: null, hidden: false, hidden_by: null }; }));
+    return rows.filter(function(r){ return !db.ideaGone[r.id]; }).map(function(r){
+      var ad = db.ideaAdmin[r.id]; if (ad) Object.keys(ad).forEach(function(k){ r[k] = ad[k]; });
+      var mine = +db.ideaVotes[r.id] || 0; r.mine = mine; r.up = r.up0 + (mine === 1 ? 1 : 0); r.down = r.down0 + (mine === -1 ? 1 : 0);
+      r.reported = !!db.ideaReports[r.id]; r.reports = r.reports0 + (r.reported ? 1 : 0);
+      if (!ad && r.reports >= 3) { r.hidden = true; r.hidden_by = "reports"; }
+      return r;
+    });
+  }
+  function ideaBoard(a, t){
+    var tab = a.p_tab || "top", hub = a.p_hub, cat = a.p_category || null, me = a.p_visitor;
+    var v = ideaAll(t).filter(function(r){ return !r.hidden && (tab === "shipped" ? r.status === "shipped" : r.status !== "shipped"); });
+    var hubf = v.filter(function(r){ return hub == null || (hub === "" ? !r.hub : (r.hub === hub || !r.hub)); });
+    var catf = v.filter(function(r){ return !cat || r.category === cat; });
+    var shown = hubf.filter(function(r){ return !cat || r.category === cat; });
+    shown.sort(function(x, y){
+      if (tab === "top" && (y.up - y.down) !== (x.up - x.down)) return (y.up - y.down) - (x.up - x.down);
+      if (tab === "shipped" && x.status_at !== y.status_at) return x.status_at < y.status_at ? 1 : -1;
+      return x.at < y.at ? 1 : x.at > y.at ? -1 : y.id - x.id;
+    });
+    var hubs = {}, cats = {};
+    catf.forEach(function(r){ var k = r.hub || ""; hubs[k] = (hubs[k] || 0) + 1; });
+    hubf.forEach(function(r){ cats[r.category] = (cats[r.category] || 0) + 1; });
+    return { ideas: shown.slice(0, Math.max(1, Math.min(+a.p_limit || 50, 200))).map(function(r){
+        return { id: r.id, title: r.title, body: r.body, name: r.name, hub: r.hub, category: r.category, source: r.source, status: r.status, note: r.note, status_at: r.status_at,
+          up: r.up, down: r.down, at: r.at, own: !!me && r.visitor === me, mine: me === db.visitor ? r.mine : 0, reported: me === db.visitor && r.reported }; }),
+      total: shown.length, hubs: hubs, categories: cats };
+  }
+  function ideaPost(a, t){
+    ideaDb();
+    var no = function(e){ return { data: { ok: false, error: e } }; };
+    var title = String(a.p_title || "").replace(/\s+/g, " ").trim(), body = String(a.p_body || "").replace(/\s+/g, " ").trim(), hub = String(a.p_hub || "").trim() || null;
+    if (!a.p_visitor || ["board", "suggest", "checkin"].indexOf(a.p_source || "board") < 0 || (a.p_request != null && !/^[A-Za-z0-9_-]{8,64}$/.test(a.p_request))) return no("bad");
+    var prev = db.ideaPosts.filter(function(p){ return a.p_request && p.request === a.p_request; })[0];
+    if (prev) return { data: { ok: true, id: prev.id, name: prev.name, repeat: true } };
+    if (a.p_visitor !== db.visitor || !String(db.name || "").trim()) return no("name");
+    if (title.length < 3 || title.length > 80) return no("title");
+    if (body.length > 280) return no("long");
+    if (hub && !/^[a-z0-9][a-z0-9-]{0,39}$/.test(hub)) return no("hub");
+    if (IDEA_CATS.indexOf(a.p_category) < 0) return no("category");
+    if (db.ideaPosts.some(function(p){ var age = t - Date.parse(p.at); return age >= 0 && age < 20000; })) return no("slow");
+    if (db.ideaPosts.filter(function(p){ return day(Date.parse(p.at)) === day(t); }).length >= 3) return no("limit");
+    var row = { id: 6500 + (db.ideaSeq = (db.ideaSeq || 0) + 1), name: String(db.name).trim().slice(0, 24), title: title, body: body, hub: hub, category: a.p_category, source: a.p_source || "board", request: a.p_request || null, at: iso(t) };
+    db.ideaPosts.push(row); save();
+    return { write: true, data: { ok: true, id: row.id, name: row.name } };
+  }
+  function ideaRpc(fn, a, t){
+    var id = +a.p_id, row;
+    switch (fn) {
+      case "get_ideas": return { data: ideaBoard(a, t) };
+      case "post_idea": return ideaPost(a, t);
+      case "vote_idea":
+        row = ideaAll(t).filter(function(r){ return r.id === id && !r.hidden; })[0];
+        if (!row || a.p_visitor !== db.visitor || [-1, 0, 1].indexOf(a.p_val) < 0) return { data: null };
+        if (a.p_val) db.ideaVotes[id] = a.p_val; else delete db.ideaVotes[id];
+        save(); return { write: true, data: { up: row.up0 + (a.p_val === 1 ? 1 : 0), down: row.down0 + (a.p_val === -1 ? 1 : 0), mine: a.p_val } };
+      case "report_idea":
+        row = ideaAll(t).filter(function(r){ return r.id === id && !r.hidden && r.visitor !== a.p_visitor; })[0];
+        if (!row || a.p_visitor !== db.visitor) return { data: false };
+        db.ideaReports[id] = 1; save(); return { write: true, data: true };
+      case "delete_my_idea":
+        ideaDb(); row = db.ideaPosts.filter(function(p){ return p.id === id; })[0];
+        if (!row || a.p_visitor !== db.visitor) return { data: false };
+        db.ideaPosts = db.ideaPosts.filter(function(p){ return p.id !== id; }); delete db.ideaVotes[id]; delete db.ideaAdmin[id];
+        db.ideaNotes = db.ideaNotes.filter(function(n){ return n.idea !== id; }); save(); return { write: true, data: true };
+      case "get_my_inbox_v2": return { data: bootstrapInbox(a.p_visitor).concat(ideaNotes(a.p_visitor)) };
+      case "mark_idea_note_seen": ideaDb(); db.ideaNotes.forEach(function(n){ if (n.id === id) n.seen = true; }); save(); return { write: true, data: true };
+    }
+    return null;
+  }
+  function ideaNotes(v){ ideaDb(); return v === db.visitor ? db.ideaNotes.map(function(n){ return { kind: "idea", id: n.id, hub: n.hub, title: n.title, note: n.status, message: n.note, at: n.at, seen: !!n.seen, expires_at: null, outcome: null }; }) : []; }
+  /* the admin page's Idea board: every idea with its votes and reports, hide and restore, a status with one line on why */
+  function ideaAdmin(fn, a, t){
+    if (fn === "admin_ideas") return { data: ideaAll(t).sort(function(x, y){ return x.at < y.at ? 1 : -1; }).map(function(r){
+      return { id: r.id, hub: r.hub, category: r.category, source: r.source, name: r.name, title: r.title, body: r.body, status: r.status, status_note: r.note, up: r.up, down: r.down, reports: r.reports, hidden: r.hidden, hidden_by: r.hidden_by, created_at: r.at }; }) };
+    if (fn === "admin_post_starter_idea") return { write: true, data: 6900 };
+    if (fn !== "admin_set_idea") return null;
+    var row = ideaAll(t).filter(function(r){ return r.id === +a.p_id; })[0], k = 0;
+    if (!row) return { data: { ok: false, error: "unknown" } };
+    var ad = db.ideaAdmin[row.id] || (db.ideaAdmin[row.id] = { hidden: row.hidden, hidden_by: row.hidden_by, status: row.status, note: row.note, status_at: row.status_at });
+    if (a.p_action === "hide") { ad.hidden = true; ad.hidden_by = "admin"; }
+    else if (a.p_action === "restore") { ad.hidden = false; ad.hidden_by = null; delete db.ideaReports[row.id]; }
+    else if (a.p_action === "status" && ["open", "considering", "planned", "shipped", "not-doing"].indexOf(a.p_status) >= 0) {
+      var nn = String(a.p_note || "").trim().slice(0, 200) || null, changed = a.p_status !== row.status;
+      ad.status = a.p_status; ad.note = nn; ad.status_at = iso(t);
+      if (changed && a.p_status !== "open") {
+        /* the author and everyone who voted it up: this test account, when it is one of them, plus the made-up voters */
+        k = row.up0 + (row.visitor ? 1 : 0) + (row.mine === 1 && row.visitor !== db.visitor ? 1 : 0);
+        if (row.visitor === db.visitor || row.mine === 1) db.ideaNotes.unshift({ id: 9700 + db.ideaNotes.length, idea: row.id, hub: row.hub, title: row.title, status: a.p_status, note: nn, at: iso(t), seen: false });
+      }
+    } else return { error: { status: 400, code: "P0001", message: "bad action" } };
+    save(); return { write: true, data: { ok: true, notified: k } };
+  }
+
   function rpc(fn, a){
     a = a || {};
     if (ADMIN_FNS.test(fn)) {
       if (a.p_secret !== C.adminSecret) return unauthorized();
+      var ideaOp = ideaAdmin(fn, a, now());
+      if (ideaOp) return ideaOp;
       var ops = adminOps(fn, a);
       if (ops) return ops;
       if (/^(admin_|set_report_resolved)/.test(fn) && fn !== "admin_pod_comments") {
@@ -600,18 +724,20 @@
       var d2 = rpc(fn.slice(0, -3), a).data;
       var vkey = function(n){ var k = ""; for (var i = 0; i < 3; i++) k += ("00000000" + (hash(n + "|visit" + i) >>> 0).toString(16)).slice(-8); return k; };
       if (Array.isArray(d2)) d2 = d2.map(function(r){ var o2 = {}; Object.keys(r).forEach(function(k){ o2[k] = r[k]; }); o2.journey = 0; o2.visit = vkey(r.display_name); return o2; });
-      else if (d2 && d2.rank) d2.rank.journey = 0;
+      else if (d2 && d2.rank) { d2.rank.journey = 0; if (Array.isArray(d2.inbox)) d2.inbox = d2.inbox.concat(ideaNotes(v)); }
       else if (d2 && fn === "get_rank_profile_v2") d2.journey = 0;
       return { data: d2 };
     }
     /* someone's place, for the dashboard's stage (the top three stand on it as their own Timmys): only the outfit here,
-       the rest of a place gets its fixtures with phase 4. One made-up classmate has visiting off. */
+       the rest of a place gets its fixtures with phase 4. */
     if (fn === "get_place") {
       var pk = String(a.p_key || ""), who = -1;
       FAKE_NAMES.forEach(function(nm, i){ var k = ""; for (var j = 0; j < 3; j++) k += ("00000000" + (hash(nm + "|visit" + j) >>> 0).toString(16)).slice(-8); if (k === pk) who = i; });
-      if (who < 0 || who === 4) return { data: null };
+      if (who < 0) return { data: null };
       return { data: { name: FAKE_NAMES[who], equipped: { outfit: ["rank-dark-outfit", "captain-hat", "tooth-fairy", "tuxedo"][who % 4] }, rank: { journey: 0, tier: 5, level: 1 }, flair: null } };
     }
+    var ideaAns = ideaRpc(fn, a, t);
+    if (ideaAns) return ideaAns;
     switch (fn) {
       case "get_hub_overrides": return { data: ovrStore().rows.filter(function(r){ return ovrActive(r, t); }).map(function(r){ return { hub: r.hub, state: r.state, until: r.until }; }) };
       case "get_widget_bootstrap": return { data: widgetBootstrap(a, t) };

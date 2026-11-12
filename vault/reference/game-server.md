@@ -162,6 +162,12 @@ Sam's side, behind the secret: `admin_ideas`, `admin_set_idea` (hide, restore, a
 every up-voter get an Inbox note, `get_my_inbox_v2`, `mark_idea_note_seen`) and `admin_post_starter_idea` (Timmy and his
 neighbors, no visitor).
 
+The pages that call them (built 2026-11-12, [the idea board](../tasks/2026-11-06-idea-board.md)): `widget/ideas.js` (the
+board and the tick), `widget/replies.js` (a status note shows as a pop-up once and stays in the Inbox; it reads
+`get_my_inbox_v2` where the page says the game layer is there, which only the new dashboard does so far) and the admin
+page's Inbox, "Idea board" (`admin_ideas`, `admin_set_idea`). The preview answers all of them from made-up ideas
+(`tools/preview/runtime/preview.js`).
+
 ## The bootstrap
 
 `get_widget_bootstrap_v2` takes today's arguments and returns today's bootstrap plus the v2 rank, Timmy's days with snack HP,
