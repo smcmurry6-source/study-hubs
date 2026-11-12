@@ -257,6 +257,8 @@ follows you to your other devices.
    board's functions; the admin page's `admin_resolve_report_v2` ("Fixed" / "No change needed") and `get_reports_v2`.
 7. Before it: Sam confirms the calls made while building it (listed in [game-server](../reference/game-server.md) and the
    PR that added it), the draft catalog's prices, and how long hidden ideas are kept ([analytics-retention](../reference/analytics-retention.md)).
+   **Done 2026-11-11** ([the open calls](done/2026-11-11-redesign-open-calls.md)): the two changes are in `migration_v54.sql`;
+   the prices are judged again with the art, and the 90 days for hidden ideas is approved but not built yet.
 8. About page: the XP sources and the guardrails, Shiny Gold Crowns, the shop, the idea board, and "What the hubs record"
    (ideas show to the class under your name).
 

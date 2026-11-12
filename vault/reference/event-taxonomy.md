@@ -114,7 +114,7 @@ more people, never for anything about a person.
 | `pet_purchases` | one purchase: visitor, item, price, request id, Central day, HP | yes | `buy_item` | Spending, snacks' HP, boosts bought |
 | `pet_inventory` / `pet_equipped` | visitor × item; visitor × slot | yes | `buy_item`, `equip_item` | What Timmy has, wears and where his things stand |
 | `costume_log` | visitor × rare costume: first day seen | yes | `record_costume_sighting` | The "you" panel's costume log |
-| `ideas` | one idea: visitor (none for starters), leaderboard name, title, body, hub, category, source, status, hidden | yes | `post_idea`, `admin_post_starter_idea` | **Public to the class under the poster's name** (no id is ever sent back). `source`: `board`, `suggest`, `checkin`, `starter` |
+| `ideas` | one idea: visitor (none for starters), leaderboard name, title, body, hub, category, source, status, hidden | yes | `post_idea`, `admin_post_starter_idea` | **Public to the class under the poster's name** (no id is ever sent back). `source`: `board`, `suggest`, `checkin`, `starter`. An author's delete (`delete_my_idea`) removes the row with its votes, reports and notes |
 | `idea_votes` / `idea_reports` / `idea_notes` | visitor × idea: up or down; a report; a status note for the Inbox | yes | `vote_idea`, `report_idea`, `admin_set_idea` | Three reports hide an idea |
 
 ## Naming conventions
