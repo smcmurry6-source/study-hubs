@@ -782,6 +782,8 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .more-page .back { margin: -6px 0 8px -10px; }
 .more-body { margin-top: 20px; }
 .more-body > * + * { margin-top: var(--gap); }
+/* More > Timmy's place: the card (widget/place.js draws it; its own styles come with it) */
+.place-card { max-width: 520px; min-height: 120px; }
 .hint-group { margin-top: 20px; }
 .hint-group h3 { display: flex; align-items: center; gap: 8px; }
 .hint { margin-top: 10px; padding: 14px 16px; border-radius: var(--r-row); background: var(--row); }

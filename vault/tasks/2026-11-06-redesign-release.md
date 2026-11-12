@@ -378,6 +378,78 @@ entries; tagged new; nothing here is a secret):
   finished** and **Loupes finished**, one for each journey completed. "All 24 trophies" in the contents and Part 9's
   list become 27 (when the case lists them: the box above).
 
+### From phase 4, part C (Timmy's place as a real client, [the place](2026-11-06-redesign-timmys-place.md), built 2026-11-12)
+
+What part C built is in the place's note (its Log) and [game-server](../reference/game-server.md). It runs only on the
+redesign's pages, on the game layer (`get_my_shop`, `equip_item`), so it goes live with the release and with the shop.
+
+- [ ] **The shop first** (part B): until it is built the customizer has no "Get more in the shop" and what Timmy owns
+      comes from the server's gifts and rank pieces only (Halloween 2026's set and the Handpiece's rank sets).
+- [ ] **Five everyday outfits have no drawing** ([task](2026-11-12-five-outfits-without-a-drawing.md), Sam's call:
+      draw them or take them out of the catalog) and the five rare costumes are part B's art. Until then the place
+      draws Timmy as himself in any of them.
+- [ ] **The later journeys' rank sets** ([task](2026-11-12-redesign-later-journeys-rank-sets.md)): 28 drawings and 28
+      catalog rows, cut from part C with Sam's yes. Not needed for the release (nobody is near 125,000 XP).
+- [ ] **Timmy on a hub's bar doesn't wear his place's outfit yet**: `widget/pet.js` wasn't touched in part C. It
+      belongs to "everyone has Timmy" ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), part 4), which changes pet.js
+      anyway: the outfit equipped at his place (`shop.equipped.outfit`) should show on the bar and in the classroom.
+- [ ] **Snack HP**: `get_pet_days_v2` carries each day's `hp` from snacks and `widget/pet.js` doesn't read it yet
+      (part B, with the snacks).
+- [ ] `sw.js`: `widget/place.js`, `widget/place.css` and `widget/hub-art/place.js` join `PRECACHE` with the engine's
+      files; the set files in `widget/hub-art/place/` don't (fifteen files, fetched only when a piece of that set is
+      drawn).
+- [ ] **The live dashboard's house card comes down with the old dashboard**: nothing to do in `widget/pet.js` for the
+      release itself. `houseSvg`, the old flair pennants and `sh_rank_tier`'s use there can go once no page shows them.
+- [ ] The place looked at on the release's own preview, phone and laptop, reduced motion too (`?persona=high-xp` has
+      everything; `?xp=180000` the ModuPro on the pedestal, `?xp=300000` Timmy in loupes).
+
+**About page** (`about/index.html`, a new entry "Timmy's place" in Timmy Tooth's part, tagged new, replacing the lines on
+his house card; the tap surprises go inside a `spoil` element):
+
+- **Timmy's place**: once you adopt Timmy he has a place of his own: a home, the scene around it and a yard with five
+  spots. It is on the dashboard's "You" card and in every hub under More, Timmy's place. Tap the picture to step in.
+- **Timmy at home**: tap anything and he hops over to it; tap him and he waves, and again while he's waving for a
+  flip. How he moves is his health: at 90 HP and up he bounces and wanders the most, lower down he slows, and when he
+  needs treatment he stays on the doorstep and tells you what he needs. Studying is still what heals him.
+- **Your rank and your medals live there**: a statue of your rank stands by the door, in your rank's metal, on one
+  step for each level. Past the Handpiece the ModuPro joins it on the pedestal, and in the Loupes journey Timmy wears
+  his loupes. Every hub you've earned a mastery medal in hangs its medal on the board by the house (up to twenty; tap
+  the board to see them all, in each hub's colors).
+- **Customize**: change the home, the scene, what stands in each yard spot, the home's upgrades and paint, and what
+  Timmy wears, from what you own. Every change is saved as you make it and follows you to your other linked devices.
+  The bowling lane is long: it takes the side yard and the front corner together. "Surprise me" picks a whole new look.
+- **What you own**: the cottage on the hill is every Timmy's first home. Halloween 2026's set is a gift to everyone,
+  each full rank-up gives an outfit and a yard piece (earned, never sold), and the rest comes from the shop. (This line
+  is finished with the shop's entry, part B.)
+- **Seasons**: the yard follows the year (spring blossom, fall leaves, winter snow), and on Timmy's holidays the place
+  dresses up with him.
+- **Study streak flame**: two more colors, blue from 10 days in a row and Dark Matter from 30.
+- In a spoiler: **things to tap at his place**: the sun puts on its shades, the moon has a cow, a cloud rains on the
+  garden, Number thirty-one takes his temperature next door, the rabbit down the hill pops out of its burrow, and
+  every yard piece does something of its own (the mailbox has a letter from thirty-one; the telescope finds Molar
+  Major).
+- "What the hubs record" gets: opening Timmy's place and changing something there are counted (which spot, never
+  which piece).
+
+**`tools/podcast/LORE.md`** ("Where he lives", replacing the house-card line; nothing here contradicts an episode):
+
+- His **place**: the cottage on a hill is every Timmy's first home, with the toothbrush planted by the front door and
+  the tree out front. A student can move him (a castle, a giant mushroom, a treehouse, a lighthouse, and a home in
+  each seasonal set) and set the scene around it (the beach, the forest, above the clouds, a snowy mountain, the night
+  sky), so an episode never says where he lives today: "my place", "the yard", "the front door" are always true.
+- **By the door**: the toothbrush (it talks now), and a statue of the student's rank in the rank's metal; past the
+  Handpiece a ModuPro shares the pedestal, and in the Loupes journey Timmy wears loupes. The medal board by the house
+  hangs one medal for every hub the student has mastered.
+- **Neighbors, seen from the yard**: Number thirty-one's house is the small one up the hill (tap it and he takes his
+  temperature; his letters come to Timmy's mailbox, usually about a bump). The rabbit down the hill has a burrow at
+  the bottom of the yard. New, and only at certain scenes: a crab on the beach (it has moved into a sandcastle), an
+  owl in the forest, a yeti behind a rock on the mountain, a friend in a crater under the night sky, a whale off the
+  beach, and the dog in the doghouse, who brushes twice a day.
+- **The podcast studio** is a yard piece: where it stands, that's where Timmy Time is recorded. Nothing in an episode
+  says otherwise so far; don't place the studio anywhere else.
+- **His health shows in how he moves** at his place (bouncing when sparkling, on the doorstep when he needs
+  treatment), the same HP as everywhere else. A visitor never sees it: a visited Timmy is always drawn well.
+
 ### From phase 5, part 3 (the game layer's server, [game-server](../reference/game-server.md))
 
 `migration_v54.sql` is written and tested, not applied. At the release, in this order:

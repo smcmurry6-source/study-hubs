@@ -171,6 +171,18 @@ without a pick), starts and finishes a mock's session, and hands the server's re
 (`widget/journeys.js`) and calls `mark_dark_unlock_seen` when an unlock ends or is skipped. Not wired yet: an arcade
 game's session, `pod_minute_v2` ([the release](../tasks/2026-11-06-redesign-release.md), "From phase 4, part A").
 
+**Timmy's place has its client since 2026-11-12** (phase 4, part C, [the place](../tasks/2026-11-06-redesign-timmys-place.md)):
+`widget/place.js` reads the bootstrap's `shop` (or `get_my_shop`) for `inventory`, `locked` and `equipped`, draws the
+place from them and the v2 profile's `journey`, `tier` and `level`, and saves every change in its customizer with one
+`equip_item`. It shows a change before the server answers by the same rules (a yard piece stands in one spot, the wide
+lane goes to `yard-side` and clears `yard-corner`, a piece in `yard-corner` takes the lane away), and
+`tools/release/xp.js` runs fourteen changes through both and fails if they ever differ; it also checks the place's
+spring, summer and fall against `sh_shop_seasons` for every day of three years, and the kit's ids against the catalog.
+`get_place` is ready to be drawn (`shPlace.open({ place })`) but nothing calls it until visiting is built. Not wired
+yet: the shop (`buy_item`, the wallet, snacks and their HP in `get_pet_days_v2`: part B). **One gap, Sam's call:** five
+everyday outfits in the catalog have no drawing ([task](../tasks/2026-11-12-five-outfits-without-a-drawing.md)), and the
+five rare costumes aren't drawn yet either (part B's art); the place draws Timmy as himself in any of them.
+
 The pages that call them (built 2026-11-12, [the idea board](../tasks/2026-11-06-idea-board.md)): `widget/ideas.js` (the
 board and the tick), `widget/replies.js` (a status note shows as a pop-up once and stays in the Inbox; it reads
 `get_my_inbox_v2` where the page says the game layer is there, which only the new dashboard does so far) and the admin

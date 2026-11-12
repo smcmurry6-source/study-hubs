@@ -1,0 +1,150 @@
+/* Timmy's place (widget/place.js): the card and the full view. Loaded by place.js on first use, on the redesign's pages
+   only, and drawn on the design system's tokens (widget/hub.css: html.shx). The scene itself is the kit's drawing
+   (widget/hub-art/place.js) and keeps its own colors in light and dark. */
+
+/* ---------- the card ---------- */
+.tpc { position: relative; display: block; width: 100%; margin: 0; padding: 0; border: 0; border-radius: var(--r-row); background: var(--panel); color: var(--text);
+  font: inherit; text-align: left; line-height: 0; overflow: hidden; cursor: pointer; }
+.tpc img { display: block; width: 100%; height: auto; }
+.tpc:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+.tpc-foot { position: absolute; left: 8px; bottom: 8px; display: grid; gap: 1px; max-width: calc(100% - 16px); padding: 6px 12px; border-radius: var(--r-row);
+  background: var(--ground); color: var(--text); font-size: var(--fs-meta); line-height: 1.3; box-shadow: var(--float-shadow); }
+.tpc-foot b { font-weight: var(--w-head); }
+.tpc-foot span { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (hover: hover) { .tpc img { transition: transform var(--t-ui) var(--ease-out); } .tpc:hover img { transform: scale(1.02); } }
+
+/* ---------- the full view: one dialog, the stage and the panel beside it ---------- */
+html.tpv-open { overflow: hidden; }
+dialog.tpv { width: min(1120px, calc(100vw - 32px)); height: min(760px, calc(100dvh - 32px)); max-width: none; max-height: none; margin: auto; padding: 0; border: 0;
+  border-radius: 20px; background: var(--ground); color: var(--text); font-family: var(--font); font-size: var(--fs-body); line-height: 1.45; overflow: hidden;
+  box-shadow: 0 24px 60px rgba(20, 14, 20, .35); }
+dialog.tpv::backdrop { background: rgba(20, 14, 20, .6); }
+.tpv *, .tpv *::before, .tpv *::after { box-sizing: border-box; }
+.tpv button { font: inherit; color: inherit; }
+.tpv .num { font-variant-numeric: tabular-nums; }
+.tpv-in { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; }
+.tpv-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px 10px 20px; border-bottom: 1px solid var(--rule); }
+.tpv-title { min-width: 0; }
+.tpv-title h2 { margin: 0; font-size: var(--fs-section); font-weight: var(--w-head); line-height: 1.2; }
+.tpv-sub { margin: 0; font-size: var(--fs-meta); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tpv-acts { display: flex; align-items: center; gap: 8px; flex: none; }
+.tpv-seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: var(--r-pill); background: var(--panel); }
+.tpv-seg[hidden] { display: none; }
+.tpv-seg button { min-height: 36px; padding: 0 14px; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--muted); font-size: var(--fs-label);
+  font-weight: var(--w-strong); cursor: pointer; }
+.tpv-seg button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
+.tpv-x { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: var(--panel); color: var(--text); cursor: pointer; }
+.tpv button:focus-visible, .tpv [tabindex]:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+
+.tpv-body { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr); min-height: 0; }
+.tpv-stagewrap { position: relative; display: grid; place-items: center; min-width: 0; min-height: 0; padding: 16px; background: var(--panel); }
+.tpv-stage { width: min(100%, calc((min(760px, 100dvh - 32px) - 96px) * 1.13)); border-radius: var(--r-panel); overflow: hidden; background: #cfe9f7; }
+.tpv-stage.is-night { background: #1c1f3f; }
+.tpv-wait { position: absolute; inset: auto 16px 16px; margin: 0; padding: 10px 14px; border-radius: var(--r-row); background: var(--ground); color: var(--text);
+  font-size: var(--fs-label); text-align: center; }
+.tpv-wait[hidden] { display: none; }
+.tpv-chip { min-height: 34px; padding: 0 14px; border: 1px solid var(--control); border-radius: var(--r-pill); background: var(--ground); color: var(--text);
+  font-size: var(--fs-meta); font-weight: var(--w-strong); cursor: pointer; }
+.tpv-chip[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+.tpv-zoom { position: absolute; right: 24px; top: 24px; }
+.tpv-zoom[hidden] { display: none; }
+.tpv-side { min-width: 0; min-height: 0; padding: 16px 20px 20px; overflow-y: auto; overscroll-behavior: contain; }
+
+.tpv-btn { display: inline-flex; align-items: center; justify-content: center; min-height: var(--control-h); padding: 0 18px; border: 1px solid var(--control);
+  border-radius: var(--r-pill); background: var(--ground); color: var(--text); font-size: var(--fs-label); font-weight: var(--w-strong); cursor: pointer; }
+.tpv-btn.tpv-primary { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+.tpv-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.tpv-note { margin: 10px 0 0; font-size: var(--fs-meta); color: var(--muted); }
+.tpv-lede { margin: 0; }
+
+/* Visit: his health, his rank, the medals */
+.tpv-hp { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0; font-size: var(--fs-card); }
+.tpv-hp b { font-weight: var(--w-head); }
+.tpv-hp span { color: var(--muted); font-size: var(--fs-label); }
+.tpv-facts { display: grid; gap: 0; margin: 14px 0 0; border-top: 1px solid var(--rule); }
+.tpv-facts div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+.tpv-facts dt { color: var(--muted); font-size: var(--fs-label); }
+.tpv-facts dd { margin: 0; font-weight: var(--w-strong); text-align: right; }
+
+/* Customize: the dock (what's in every spot) and the drawer (what you own of one kind) */
+.tpv-dock { display: grid; gap: 10px; }
+.tpv-dmain { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tpv-dyard { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.tpv-dlab { grid-column: 1 / -1; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--muted); }
+.tpv-tile { display: grid; gap: 4px; justify-items: center; min-width: 0; padding: 6px 4px 8px; border: 2px solid transparent; border-radius: var(--r-row); background: var(--panel);
+  font-size: var(--fs-meta); font-weight: var(--w-strong); line-height: 1.2; text-align: center; cursor: pointer; }
+.tpv-tile.is-slot { padding: 4px 2px 6px; font-size: 12px; font-weight: var(--w-body); }
+.tpv-tile.on { border-color: var(--text); background: var(--ground); }
+.tpv-tpic { position: relative; display: block; width: 100%; aspect-ratio: 3 / 2; overflow: hidden; color: var(--muted); }
+.tpv-tile.is-slot .tpv-tpic { aspect-ratio: 1; }
+.tpv-tpic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.tpv-tpic svg { position: absolute; inset: 0; margin: auto; }
+.tpv-drawer { margin: 16px 0 0; padding: 16px 0 0; border-top: 1px solid var(--rule); }
+.tpv-dhead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.tpv-dhead h3 { margin: 0; font-size: var(--fs-card); font-weight: var(--w-head); }
+.tpv-dhead p { margin: 2px 0 0; font-size: var(--fs-meta); color: var(--muted); }
+.tpv-dhead .tpv-btn { flex: none; min-height: 34px; padding: 0 12px; font-size: var(--fs-meta); }
+.tpv-tabs { margin: 12px 0 0; }
+.tpv-tabs button { min-height: 32px; padding: 0 12px; font-size: var(--fs-meta); }
+.tpv-seth { margin: 14px 0 0; font-size: var(--fs-label); font-weight: var(--w-head); }
+.tpv-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin: 12px 0 0; }
+.tpv-card { display: grid; gap: 4px; justify-items: center; align-content: start; min-width: 0; padding: 8px 6px 10px; border: 2px solid var(--border); border-radius: var(--r-row);
+  background: var(--row); font-size: var(--fs-meta); line-height: 1.25; text-align: center; cursor: pointer; }
+.tpv-card.on { border-color: var(--text); }
+.tpv-card.is-locked { cursor: default; border-style: dashed; }
+.tpv-card.is-locked .tpv-cpic { opacity: .45; filter: grayscale(1); }
+.tpv-cpic { position: relative; display: block; width: 100%; aspect-ratio: 1; overflow: hidden; }
+.tpv-cpic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.tpv-cname { font-size: 13px; line-height: 1.25; font-weight: var(--w-strong); overflow-wrap: break-word; hyphens: auto; }
+.tpv-how { font-size: 12px; color: var(--muted); }
+.tpv-rar { padding: 1px 8px; border-radius: var(--r-pill); font-size: 12px; font-style: normal; font-weight: var(--w-strong); background: var(--active); color: var(--text); }
+.tpv-rar.r-uncommon { background: var(--mint); color: var(--mint-ink); }
+.tpv-rar.r-rare { background: #e2effb; color: #1c5486; }
+.tpv-rar.r-epic { background: var(--lilac); color: var(--lilac-ink); }
+.tpv-rar.r-legendary { background: var(--sun); color: var(--sun-ink); }
+.tpv-extra { margin: 16px 0 0; }
+.tpv-extra h4 { margin: 0 0 8px; font-size: var(--fs-label); font-weight: var(--w-head); }
+.tpv-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.tpv-upg { display: grid; gap: 0; min-height: var(--control-h); padding: 4px 14px; border: 2px solid var(--border); border-radius: var(--r-row); background: var(--row);
+  font-size: var(--fs-meta); line-height: 1.25; text-align: left; cursor: pointer; }
+.tpv-upg b { font-weight: var(--w-strong); }
+.tpv-upg small { color: var(--muted); font-size: 12px; }
+.tpv-upg.on { border-color: var(--text); background: var(--active); }
+.tpv-swatch { width: 40px; height: 40px; padding: 0; border: 2px solid var(--border); border-radius: 50%; background: var(--sw); cursor: pointer; }
+.tpv-swatch.on { border-color: var(--text); box-shadow: 0 0 0 3px var(--ground) inset; }
+.tpv-foot { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--rule); }
+
+/* the medal board's big view, over the place */
+.tpv-over { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; padding: 16px; background: rgba(20, 14, 20, .55); }
+.tpv-over[hidden] { display: none; }
+.tpv-overin { position: relative; width: min(640px, 100%); max-height: 100%; padding: 22px 22px 20px; border-radius: var(--r-panel); background: var(--ground); color: var(--text); overflow-y: auto; }
+.tpv-ox { position: absolute; right: 12px; top: 12px; }
+.tpv-mhead { padding-right: 48px; }
+.tpv-mhead h3 { margin: 0; font-size: var(--fs-section); font-weight: var(--w-head); }
+.tpv-mhead p { margin: 2px 0 0; color: var(--muted); font-size: var(--fs-label); }
+.tpv-mchips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+.tpv-mchip { padding: 4px 12px; border-radius: var(--r-pill); background: var(--panel); font-size: var(--fs-meta); }
+.tpv-mchip b { font-weight: var(--w-head); }
+.tpv-mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+.tpv-mcard { display: grid; gap: 2px; justify-items: center; padding: 12px 8px; border-radius: var(--r-row); background: var(--panel); font-size: var(--fs-meta); text-align: center; }
+.tpv-mcard b { font-weight: var(--w-strong); }
+.tpv-mcard span { color: var(--muted); }
+.tpv-mcard svg { display: block; }
+
+html.shx[data-theme="dark"] .tpv-rar.r-rare { background: #16283a; color: #9ccbf2; }
+@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .tpv-rar.r-rare { background: #16283a; color: #9ccbf2; } }
+
+/* a phone: the whole screen, the stage on top and the panel scrolling under it */
+@media (max-width: 760px) {
+  dialog.tpv { width: 100vw; height: 100dvh; border-radius: 0; }
+  .tpv-top { padding: 8px 8px 8px 16px; }
+  .tpv-title h2 { font-size: var(--fs-card); }
+  .tpv-seg button { padding: 0 12px; }
+  .tpv-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .tpv-stagewrap { padding: 10px; }
+  .tpv-stage { width: min(100%, calc(46dvh * 1.13)); }
+  .tpv.is-custom .tpv-stage { width: min(100%, calc(38dvh * 1.13)); }
+  .tpv-zoom { right: 16px; top: 16px; }
+  .tpv-side { padding: 14px 16px 24px; }
+}
+@media (prefers-reduced-motion: reduce) { .tpc img { transition: none; } .tpc:hover img { transform: none; } }

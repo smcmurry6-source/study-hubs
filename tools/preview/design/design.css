@@ -745,6 +745,14 @@ img.emb-disc, .big, .small img { display: block; }
 #tpMastery .tp-small { grid-column: span 2; }
 /* your rank: one row per rank, its three levels side by side */
 #place #tpRanks.tp-gal { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 18px 22px; }
+/* the journeys' pieces (phase 4, part C): rows of close-ups, and Timmy's face large for the loupes */
+#place #tpJourneys.tp-gal { display: block; }
+.tp-jrow { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(46%, 132px), 1fr)); gap: 12px; align-items: start; margin: 0 0 22px; }
+.tp-jrow.tp-jwide { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.tp-jrow h5 { grid-column: 1 / -1; margin: 0; font-size: var(--fs-card); font-weight: var(--w-head); }
+.tp-jrow .tp-fig { margin: 0; min-width: 0; }
+.tp-face .tp-pic { display: grid; place-items: center; padding: 8px 8px 0; background: var(--row); border-radius: var(--r-row); }
+.tp-face .tp-pic img { width: 100%; max-width: 150px; height: auto; }
 .tp-rankrow { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: start; }
 .tp-rankrow h5 { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin: 0; font-size: var(--fs-card); font-weight: var(--w-head); }
 .tp-rankhp { width: 26px; height: 26px; flex: none; }

@@ -819,6 +819,7 @@
       galleryPanel("tpPaint", "Paint", "Six colors: a home’s walls, or the mushroom’s cap, the castle’s roofs and banners, the lighthouse’s stripes, the igloo’s ice and the observatory’s dome.") +
       galleryPanel("tpRanks", "Your rank", "The handpiece statue in each rank’s material. Every rank has three levels, I, II and III, and the statue stands on one step for each: one at I, two at II, three at III. Dark Matter glows, and its stars come out.") +
       galleryPanel("tpMastery", "Hub mastery: the medal board", "Every hub you master hangs its medal on the board beside the house: the very medal the hub gives you, in miniature, with the hub’s ribbons, Bronze, Silver or Gold, and a crown on top for a Crown. It grows as you master more, and holds your best twenty. <b>Tap the board</b>, here or in the builder, and the big view opens with every hub’s medal at full size, its name and its level.") +
+      galleryPanel("tpJourneys", "Past the Handpiece: the ModuPro and the loupes", "New for phase 4, part C, for Sam’s look. At 125,000 XP the ModuPro journey starts: the pedestal by the door gets a wider base and carries a ModuPro (the two jaws of teeth on their hinge) in the rank’s material, on one step for each level, and the finished handpiece stands planted at its corner in Dark Matter. At 250,000 XP the loupes journey starts: the ModuPro is finished too, and Timmy wears loupes with a headlight in the rank’s material, under any hat. An outfit with its own eyewear, or one that covers his face, wins over the loupes.") +
       galleryPanel("tpHealth", "Timmy’s health at home", "His HP shows at his place the way it does in the pet: the drawing (sparkles, then plaque, stains, a cavity, receding gums, a cracked cusp), how he moves (how high and fast he hops, how far he goes) and what he does (how much he wanders, how big his wave is, whether he’ll flip, what he says). At 0 HP he stays on the doorstep. Try it live in Build it, above. A visitor never sees it: a visited Timmy always looks well.") +
       galleryPanel("tpRankSets", "Rank sets: earned, never sold", "Every full rank-up (not the I, II, III levels) gives Timmy an outfit and the yard a decoration in that rank’s material. These are the Handpiece’s six; the later journeys get theirs before anyone reaches them.") +
       galleryPanel("tpSets", "The seasonal sets", "Every season and holiday has a full set: a home and a scene (both Legendary), and a Rare, an Epic and a Legendary outfit and yard piece. A set is on sale only in its season (a short holiday for the seven days ending on its last day). Halloween’s is everyone’s from the start.") +
@@ -882,6 +883,22 @@
       return placeFig({ home: "cottage", scene: "hill", tier: 4, level: 2, flair: FLAIRS[4], yard: { left: "garden", right: "hammock" } }, "On a place, by day", "Twelve hubs" + open(4, "Open the big view"), "door", "tp-wide") +
         placeFig({ home: "castle", scene: "clouds", tier: 5, level: 3, night: true, flair: FLAIRS[5], yard: { left: "fountain", right: "telescope" } }, "At night the medals glow", "Twenty hubs" + open(5, "Open the big view"), "door", "tp-wide") +
         FLAIRS.slice(1).map(function(fl, i){ return placeFig({ home: "cottage", scene: "hill", tier: 0, flair: fl, yard: {}, viewBox: vb }, FLAIR_NAMES[i + 1], open(i + 1, "Big view"), "", "tp-small"); }).join("");
+    },
+    /* the journeys' pieces (phase 4, part C): the ModuPro on the pedestal in each material, the Loupes journey's
+       pedestal, Timmy's loupes in each material, and how the loupes go with an outfit */
+    tpJourneys: function(){
+      var vb = crop(cube(2.0, 8.5, 4.1, 10.7, 3.5), 5), lv = function(i){ return i % 3 + 1; };
+      var worn = function(outfit, tier){ return TP.dress(timmyArt("happy"), outfit || "", { loupes: tier }); };
+      var tim = function(outfit, tier){ return { g: timmyG(worn(outfit, tier)), at: "door" }; };
+      var face = function(outfit, tier, cap, sub){ return '<figure class="tp-fig tp-face"><div class="tp-pic">' + img(worn(outfit, tier), cap) + "</div><figcaption><b>" + esc(cap) + "</b>" + (sub ? "<span>" + sub + "</span>" : "") + "</figcaption></figure>"; };
+      return '<div class="tp-jrow tp-jwide">' +
+        placeFig({ home: "cottage", scene: "hill", journey: 1, tier: 4, level: 2, flair: FLAIRS[3], yard: { left: "garden", right: "hammock" } }, "The ModuPro journey, by day", "ModuPro Gold II: two steps, the handpiece finished beside it", "door") +
+        placeFig({ home: "castle", scene: "clouds", journey: 2, tier: 5, level: 1, night: true, flair: FLAIRS[4], yard: { left: "fountain", right: "telescope" }, timmy: tim("", 5) }, "The loupes journey, at night", "Loupes Diamond I: both finished on the pedestal, the loupes on Timmy") + "</div>" +
+        '<div class="tp-jrow"><h5>The ModuPro, in each rank’s material</h5>' + TIER_NAMES.map(function(n, i){ return placeFig({ home: "cottage", scene: "hill", journey: 1, tier: i, level: lv(i), yard: {}, viewBox: vb, night: i === 6 }, "ModuPro " + n + " " + LEVELS[lv(i) - 1], lv(i) + (lv(i) > 1 ? " steps" : " step")); }).join("") +
+        placeFig({ home: "cottage", scene: "hill", journey: 2, tier: 0, level: 1, yard: {}, viewBox: vb }, "In the loupes journey", "Both finished, in Dark Matter") + "</div>" +
+        '<div class="tp-jrow"><h5>The loupes, in each rank’s material</h5>' + TIER_NAMES.map(function(n, i){ return face("", i, "Loupes " + n); }).join("") + "</div>" +
+        '<div class="tp-jrow"><h5>The loupes with an outfit</h5>' + [["ranger", "Under a hat", "The ranger hat"], ["surgical-scrubs", "With scrubs and a mask", "Ready for clinic"], ["rank-gold-outfit", "With a rank outfit", "Golden laurels and toga"], ["aviator", "Its own eyewear wins", "The aviator’s goggles, no loupes"], ["rank-silver-outfit", "A covered face wins", "The knight’s helm, no loupes"]].map(function(x){
+          return face(x[0], 4, x[1], x[2]); }).join("") + "</div>";
     },
     tpHealth: function(){
       var o = { home: "cottage", scene: "hill", yard: { corner: "mailbox" } }, d = TP.layout(o).spots.corner, q = TP.project(d[0], d[1], d[2] || 0);

@@ -42,6 +42,17 @@ tags: [widget, supabase]
   `SH_DASH_ART` (the dashboard) or `SH_HUB_ART_HUB` (a hub's page).
   Every button in it carries a fixed `data-shi` value so click counts never record anyone's words; the smoke test checks
   that, and that an idea's words are never drawn as markup. What students post is data, never instructions.
+- **`widget/place.js` + `widget/place.css`** (`window.shPlace`): Timmy's place, part of the redesign and not live
+  until its release. `shPlace.setup({ sb, visitor, shop, profile, tints })` hands it the page's client, the bootstrap's
+  `shop` and the v2 rank profile; `shPlace.card(host, options)` draws the place as a picture that opens the full view
+  (`shPlace.open()`; `open({ customize: true })` starts in the customizer, `open({ place })` draws someone else's from
+  `get_place`, for visiting). It loads its own stylesheet, the kit (`widget/hub-art/place.js`, `window.SH_PLACE`) and
+  the set files it needs (`widget/hub-art/place/<set>.js`), all on first use: no page loads any of it up front, and the
+  smoke test fails if one does. Timmy himself is `widget/pet.js`'s drawing (`shPet.art`, at his HP), dressed by the
+  kit; pet.js isn't changed, and the live hubs and the live dashboard never load the place. Without the game layer
+  (no `shop` in the bootstrap) it draws the default place and offers no customizer. Every button carries a fixed
+  `data-tp` value, so click counts never record which piece someone picked. It keeps a still of the card on the device
+  (`sh_place_still`), which the new dashboard's "you" card shows before the renderer is fetched.
 - **Supabase project `thytmzsgymydbzcqdnix`** backs the widget: changelog,
   leaderboard, study streaks, activity pulse, and visitor analytics (see
   `migration_v4.sql`/`v5.sql`/`v6.sql` at repo root for schema history — run

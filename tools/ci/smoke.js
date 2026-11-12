@@ -484,6 +484,124 @@ function lint(hub, A){
       notes.push(`${name} (${label}): the journeys' pill, boost, road and hand-off`);
       await page.close();
     }
+    /* Timmy's place (phase 4, part C: widget/place.js, its kit widget/hub-art/place.js and one file per set). On the
+       game layer, with a made-up shop in the bootstrap: More has the tile once Timmy is adopted, nothing of the place
+       loads with the page, the card draws, the full view is a dialog, Timmy answers a tap, Customize puts a piece in
+       the yard through equip_item (stubbed here; nothing is recorded), the bowling lane takes the side yard and the
+       front corner, and Escape closes it. */
+    for (const hub of nextHubs.slice(0, 1)) {
+      const page = await context.newPage(); const errs = [], name = `${hub}/next, Timmy's place`, asked = [], calls = [];
+      page.on('pageerror', e => errs.push(e.message));
+      page.on('request', r => { if (/\/widget\/(place\.(js|css)|hub-art\/place)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
+      await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
+      const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
+      const equipped = { 'yard-left': 'garden' };
+      const shop = () => ({ day: '2026-11-12', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], costumes: [], snacks_today: 0, boost: null,
+        inventory: ['garden', 'mailbox', 'bowling-lane', 'castle'].map(id => ({ id, at: '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
+        locked: [{ id: 'rank-bronze-outfit', name: 'Bronze outfit', kind: 'outfit', rarity: 'rare', rank_tier: 2 }], equipped: Object.assign({}, equipped) });
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rank, mastery: [], shop: shop() }) }));
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(shop()) }));
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/equip_item/, route => {
+        let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
+        calls.push(a.p_slot + '=' + a.p_item);
+        if (a.p_item === 'bowling-lane') { delete equipped['yard-corner']; equipped['yard-side'] = a.p_item; }
+        else if (a.p_item) { Object.keys(equipped).forEach(k => { if (equipped[k] === a.p_item && /^yard-/.test(k)) delete equipped[k]; }); equipped[a.p_slot] = a.p_item; }
+        else delete equipped[a.p_slot];
+        return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, equipped }) });
+      });
+      await page.goto(BASE() + `hubs/${hub}/next/index.html#more`); await page.waitForTimeout(2500);
+      if (!(await page.$('a[href="#more/place"], [data-more="place"]')) && !(await page.evaluate(() => [...document.querySelectorAll('.menu .rows a, .menu .rows button')].some(x => /Timmy’s place/.test(x.textContent))))) problems.push(`${name} (${label}): More has no "Timmy's place" tile for an adopted Timmy`);
+      if (asked.length) problems.push(`${name} (${label}): the place's files loaded with the page, before it was opened (${asked.join(', ')}): they load on first use`);
+      await page.evaluate(() => { location.hash = 'more/place'; });
+      const card = await page.waitForSelector('.place-card .tpc.is-live', { timeout: 20000 }).catch(() => null);
+      if (!card) problems.push(`${name} (${label}): More > Timmy's place didn't draw the place`);
+      else {
+        if (!asked.includes('place.js') || !asked.includes('hub-art/place.js')) problems.push(`${name} (${label}): the place drew without its renderer and kit (${asked.join(', ')})`);
+        const c = await page.evaluate(() => { const b = document.querySelector('.place-card .tpc'), i = b.querySelector('img'); return { label: b.getAttribute('aria-label') || ((i && i.alt) || '') + ' ' + b.textContent, img: !!i && i.naturalWidth > 0, w: document.documentElement.scrollWidth - innerWidth, still: (localStorage.getItem('sh_place_still') || '').slice(0, 4) }; });
+        if (!/Timmy’s place/.test(c.label) || !/garden/i.test(c.label) || !c.img) problems.push(`${name} (${label}): the place's card should be a labeled button with its picture (${JSON.stringify(c)})`);
+        if (c.w > 1) problems.push(`${name} (${label}): Timmy's place scrolls sideways by ${c.w}px`);
+        if (c.still !== '<svg') problems.push(`${name} (${label}): the place didn't keep a still on the device for the dashboard's card`);
+        await card.click();
+        const dlg = await page.waitForSelector('dialog.tpv[open]', { timeout: 8000 }).catch(() => null);
+        if (!dlg) problems.push(`${name} (${label}): tapping the place's card didn't open the full view`);
+        else {
+          await page.waitForTimeout(900);
+          const v = await page.evaluate(() => { const d = document.querySelector('dialog.tpv'), st = d.querySelector('.tpv-stage'), sr = st && st.shadowRoot, t = sr && sr.querySelector('.tp-timmy');
+            return { label: d.getAttribute('aria-label') || (document.getElementById(d.getAttribute('aria-labelledby')) || {}).textContent || '', timmy: !!t, tlabel: t ? t.getAttribute('aria-label') : '', statue: !!(sr && sr.querySelector('[data-egg="statue"]')),
+              w: d.scrollWidth - d.clientWidth, seg: !d.querySelector('.tpv-seg').hidden, state: window.shPlace.state() }; });
+          if (!/Timmy’s place/.test(v.label)) problems.push(`${name} (${label}): the place's full view has no name (${v.label})`);
+          if (!v.timmy || !/HP/.test(v.tlabel || '')) problems.push(`${name} (${label}): Timmy isn't at his place as a labeled button with his HP (${v.tlabel})`);
+          if (!v.statue) problems.push(`${name} (${label}): the rank statue isn't in the place`);
+          if (v.w > 1) problems.push(`${name} (${label}): the place's full view scrolls sideways by ${v.w}px`);
+          if (!v.state.game || !v.seg) problems.push(`${name} (${label}): with a shop in the bootstrap the place should offer Customize (${JSON.stringify(v.state)})`);
+          await page.click('dialog.tpv .tp-timmy', { force: true }); await page.waitForTimeout(500);
+          const said = await page.evaluate(() => { const b = document.querySelector('dialog.tpv .tpv-stage').shadowRoot.querySelector('.tp-bubble'); return b ? b.textContent : ''; });
+          if (!said) problems.push(`${name} (${label}): Timmy said nothing when tapped at his place`);
+          await page.click('dialog.tpv [data-tp="customize"]'); await page.waitForSelector('dialog.tpv .tpv-tile[data-pick="front"]', { timeout: 8000 }).catch(() => null);
+          const front = await page.$('dialog.tpv .tpv-tile[data-pick="front"]');
+          if (!front) problems.push(`${name} (${label}): Customize didn't show the yard's spots`);
+          else {
+            await front.click(); await page.waitForTimeout(400);
+            const cards = await page.$$eval('dialog.tpv .tpv-card[data-item]', els => els.map(e => e.dataset.item));
+            if (!cards.includes('mailbox') || cards.includes('campfire')) problems.push(`${name} (${label}): the customizer should offer what's owned and nothing else (${cards.join(', ')})`);
+            const mb = await page.$('dialog.tpv .tpv-card[data-item="mailbox"]'); if (mb) await mb.click();
+            await page.waitForTimeout(900);
+            await page.click('dialog.tpv .tpv-tile[data-pick="side"]'); await page.waitForTimeout(400);
+            const lane = await page.$('dialog.tpv .tpv-card[data-item="bowling-lane"]'); if (lane) await lane.click();
+            await page.waitForTimeout(1200);
+            const after = await page.evaluate(() => ({ eq: window.shPlace.state().equipped, corner: !!document.querySelector('dialog.tpv .tpv-tile[data-pick="corner"]'),
+              locked: (() => { return document.querySelectorAll('dialog.tpv .tpv-card.is-locked').length; })(), w: (() => { const d = document.querySelector('dialog.tpv'); return d.scrollWidth - d.clientWidth; })() }));
+            if (calls.join() !== 'yard-front=mailbox,yard-side=bowling-lane') problems.push(`${name} (${label}): the customizer should save each change through equip_item (${calls.join(', ') || 'no calls'})`);
+            if (after.eq['yard-front'] !== 'mailbox' || after.eq['yard-side'] !== 'bowling-lane' || after.eq['yard-left'] !== 'garden') problems.push(`${name} (${label}): after two changes the place has ${JSON.stringify(after.eq)}`);
+            if (after.corner) problems.push(`${name} (${label}): with the bowling lane in the side yard, the front corner should not be offered`);
+            if (after.w > 1) problems.push(`${name} (${label}): Customize scrolls sideways by ${after.w}px`);
+            await page.click('dialog.tpv .tpv-tile[data-pick="timmy"]'); await page.waitForTimeout(400);
+            const rk = await page.$('dialog.tpv [data-src="rank"]'); if (rk) { await rk.click(); await page.waitForTimeout(300); }
+            const lk = await page.evaluate(() => { const l = document.querySelector('dialog.tpv .tpv-card.is-locked'); return l ? l.textContent : ''; });
+            if (!/Reach Bronze/.test(lk)) problems.push(`${name} (${label}): a rank outfit not reached yet should show locked, with the rank that gives it (${lk})`);
+            const names = await page.$$eval('dialog.tpv button, dialog.tpv [role="button"]', bs => bs.filter(b => !(b.getAttribute('aria-label') || b.textContent || '').trim()).length);
+            if (names) problems.push(`${name} (${label}): ${names} button(s) in the place's full view have no name`);
+          }
+          await page.keyboard.press('Escape'); await page.waitForTimeout(500);
+          if (await page.$('dialog.tpv[open]')) problems.push(`${name} (${label}): Escape didn't close the place's full view`);
+        }
+      }
+      errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+      notes.push(`${name} (${label}): Timmy's place, its full view and the customizer`);
+      await page.close();
+    }
+    /* the new dashboard's "you" card: the place takes the house picture's spot once Timmy is adopted. The page is at its
+       request budget, so nothing of the place loads with it; the place draws on first use and keeps a still, and the
+       next visit shows that still at once, still without a request. */
+    if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
+      const page = await context.newPage(); const errs = [], name = `next (dashboard), Timmy's place`; let asked = [];
+      page.on('pageerror', e => errs.push(e.message));
+      page.on('request', r => { if (/\/widget\/(place\.(js|css)|hub-art\/place)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
+      await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_tour_done', '1'); } catch (e) {} });
+      await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(2500);
+      const before = await page.evaluate(() => { const s = document.querySelector('#petHome .shpet-scene'); return { scene: !!s, place: !!(s && s.classList.contains('has-place')), house: !!(s && s.querySelector('.shpet-housesvg')) }; });
+      if (!before.scene || !before.house) problems.push(`${name} (${label}): the "you" card should show Timmy's house for an adopted Timmy (${JSON.stringify(before)})`);
+      if (asked.length) problems.push(`${name} (${label}): the place's files loaded with the dashboard (${asked.join(', ')}): the page is at its request budget, they load on first use`);
+      await page.evaluate(() => window.dispatchEvent(new Event('scroll')));
+      const live = await page.waitForSelector('#petHome .shpet-scene.has-place .tpc.is-live', { timeout: 20000 }).catch(() => null);
+      if (!live) problems.push(`${name} (${label}): the place didn't take the house picture's spot after the first scroll`);
+      else {
+        const d = await page.evaluate(() => { const s = document.querySelector('#petHome .shpet-scene'), h = s.querySelector('.shpet-housesvg'), b = s.querySelector('.shpet-btn');
+          return { house: h ? getComputedStyle(h).display : '', timmy: b ? getComputedStyle(b).display : '', info: !!document.querySelector('#petHome .shpet-info [data-joke]'), w: document.documentElement.scrollWidth - innerWidth }; });
+        if (d.house !== 'none' || d.timmy !== 'none' || !d.info) problems.push(`${name} (${label}): with the place drawn, the old house picture and its Timmy step aside and his name, HP and buttons stay (${JSON.stringify(d)})`);
+        if (d.w > 1) problems.push(`${name} (${label}): the dashboard with the place scrolls sideways by ${d.w}px`);
+        asked = [];
+        await page.reload(); await page.waitForTimeout(2500);
+        const again = await page.evaluate(() => { const s = document.querySelector('#petHome .shpet-scene'), i = s && s.querySelector('.tpc img'); return { place: !!(s && s.classList.contains('has-place')), img: !!i && i.naturalWidth > 0 }; });
+        if (!again.place || !again.img) problems.push(`${name} (${label}): the second visit should show the place's saved still at once (${JSON.stringify(again)})`);
+        if (asked.length) problems.push(`${name} (${label}): the saved still should need no request (${asked.join(', ')})`);
+        const still = await page.$('#petHome .tpc');
+        if (still) { await still.click(); if (!(await page.waitForSelector('dialog.tpv[open]', { timeout: 20000 }).catch(() => null))) problems.push(`${name} (${label}): tapping the saved still didn't load the place and open it`); else { await page.keyboard.press('Escape'); await page.waitForTimeout(300); } }
+      }
+      errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+      notes.push(`${name} (${label}): the place in the "you" card, on first use and from its still`);
+      await page.close();
+    }
     await context.close();
   }
   // top bars and tab rows (2026-11-04): at the widths and text sizes where they used to break, every control in the
