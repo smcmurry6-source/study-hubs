@@ -64,6 +64,10 @@ Beside any of them, because they touch other files: **Ask Timmy, part 3** (the a
 part in the pending migration, which is Sam's call at the start of that session). After the release:
 [the later journeys' rank sets](2026-11-12-redesign-later-journeys-rank-sets.md).
 
+**Which model** (Sam, 2026-11-12, [decisions](../decisions.md)): every session above, and the two beside them, on Opus 5.5
+at Extra effort; sessions 9 (phase 5, part 2) and 10 (the release) on Fable 5.2 at High effort. Sam picks it when
+starting the session.
+
 **No date** (Sam, 2026-11-06, kept on 2026-11-12): one release with everything. Heme & Endo Exam 2's exam is Nov 13,
 Occlusion's final Nov 16 and Perio's Nov 19 (`HUBS` in `index.html`); ten sessions will not land by then, so the
 release switches the dashboard and whichever hub is live at that point, and a hub whose exam has passed keeps its old

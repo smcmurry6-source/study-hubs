@@ -31,6 +31,8 @@ and the phase notes it links.
    the question (images cost far more than text). Screenshots for Sam stay at 2.
 6. **Match the model to the work.** The engine, Perio's port, the SQL and the art need the strongest model. Copying
    content into a new hub's `content/`, vault write-backs and rerunning checks don't: a lighter model or effort does them.
+   Sam's choice for the sessions left before the release is under "Which model" in
+   [phase 4](../tasks/2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release".
 7. **No fan-out.** Parallel subagents and workflows multiply the tokens. Two independent ports are two sessions, not one
    session with agents.
 8. **Migrations wait for their release.** A file in `supabase/pending-migrations.txt` is never applied before the release
