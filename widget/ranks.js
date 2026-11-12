@@ -191,6 +191,10 @@
     opt = opt || {};
     tier = Math.max(0, Math.min(6, tier | 0));
     var t = TIERS[tier].key, p = "shr" + (++uid) + "-";
+    /* opt.shape: another journey's object in place of the handpiece (the redesign's ModuPro and loupes,
+       tools/figures/site/journeys.mjs says what a shape is). Only the new pages pass one; without it nothing changes. */
+    var S = opt.shape || null, old = t === "antique", B = S ? S.box : null;
+    var MASK = S ? (old ? S.antiqueMask() : S.mask()) : (old ? antiqueMask() : modernMask());
     var rich = px >= 40 ? (opt.animate ? "anim" : true) : false;
     var anim = rich === "anim";
     var mat = t === "antique" ? METAL.brass : METAL[t];
@@ -201,39 +205,46 @@
         cyl(p + "wood", ["#2A1406", "#5C2F12", "#8A4B22", "#B4713C", "#7A4019", "#4E260C", "#231003", "#6A3816"]);
     }
     if (t === "diamond") defs += facets(p);
+    if (S && S.defs) defs += S.defs(p, t, cyl);
     defs += filters(p, t, rich);
-    defs += '<clipPath id="' + p + 'clip">' + (t === "antique" ? antiqueMask() : modernMask()) + '</clipPath>';
+    defs += '<clipPath id="' + p + 'clip">' + MASK + '</clipPath>';
     defs += '<linearGradient id="' + p + 'sheen" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/>' +
       '<stop offset=".5" stop-color="#fff" stop-opacity="' + (t === "diamond" ? ".95" : ".75") + '"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>';
 
-    var parts = t === "antique" ? antiqueParts(p, rich) : modernParts(p, rich);
+    var parts = S ? (old ? S.antique(p, rich) : S.modern(p, rich)) : old ? antiqueParts(p, rich) : modernParts(p, rich);
+    var all = B ? ' x="' + B[0] + '" y="' + B[1] + '" width="' + B[2] + '" height="' + B[3] + '"' : ' x="-10" y="-20" width="170" height="50"';
     var body = '<g' + (rich ? ' filter="url(#' + p + 'tex)"' : '') + '>' + parts + '</g>';
     var over = '';
     if (t === "diamond") {
-      over += '<g clip-path="url(#' + p + 'clip)"><rect x="-10" y="-20" width="170" height="50" fill="url(#' + p + 'fac)"/>' +
-        '<rect x="-10" y="-20" width="170" height="50" fill="url(#' + p + 'rb)" opacity=".22" style="mix-blend-mode:color"/></g>';
+      over += '<g clip-path="url(#' + p + 'clip)"><rect' + all + ' fill="url(#' + p + 'fac)"/>' +
+        '<rect' + all + ' fill="url(#' + p + 'rb)" opacity=".22" style="mix-blend-mode:color"/></g>';
     }
     if (t === "dark" && rich) {
       var stars = "", seed = 7;
-      for (var i = 0; i < 26; i++){ seed = (seed * 9301 + 49297) % 233280; var sx = (seed / 233280) * 150 - 4; seed = (seed * 9301 + 49297) % 233280; var sy = (seed / 233280) * 34 - 15;
+      for (var i = 0; i < (B ? 44 : 26); i++){ seed = (seed * 9301 + 49297) % 233280; var sx = B ? B[0] + (seed / 233280) * B[2] : (seed / 233280) * 150 - 4; seed = (seed * 9301 + 49297) % 233280; var sy = B ? B[1] + (seed / 233280) * B[3] : (seed / 233280) * 34 - 15;
         stars += '<circle cx="' + sx.toFixed(1) + '" cy="' + sy.toFixed(1) + '" r="' + (i % 5 === 0 ? .9 : .45) + '" fill="#fff" opacity="' + (i % 3 ? .75 : 1) + '">' +
           (anim && i % 4 === 0 ? '<animate attributeName="opacity" values="1;.2;1" dur="' + (2 + i % 3) + 's" repeatCount="indefinite"/>' : '') + '</circle>'; }
       over += '<g clip-path="url(#' + p + 'clip)">' + stars + '</g>';
     }
     // rim light: a thin bright line along the top of the body
-    if (rich && t !== "antique" && t !== "stone") over += '<path d="M50 -1.6 H122" stroke="#fff" stroke-opacity="' + (t === "dark" ? ".35" : ".55") + '" stroke-width=".8" stroke-linecap="round"/>';
+    if (rich && t !== "antique" && t !== "stone" && (!S || S.rim)) over += '<path d="' + (S ? S.rim + '" fill="none' : "M50 -1.6 H122") + '" stroke="#fff" stroke-opacity="' + (t === "dark" ? ".35" : ".55") + '" stroke-width=".8" stroke-linecap="round"/>';
     // moving glint (metals, diamond, dark matter)
     if (anim && tier >= 2) {
-      over += '<g clip-path="url(#' + p + 'clip)"><rect x="-40" y="-30" width="26" height="70" fill="url(#' + p + 'sheen)" transform="skewX(-22)" opacity="' + (t === "dark" ? ".5" : ".9") + '">' +
-        '<animate attributeName="x" values="-60;190;190" keyTimes="0;.35;1" dur="' + (t === "diamond" || t === "dark" ? "3.6" : "4.6") + 's" repeatCount="indefinite"/></rect></g>';
+      over += '<g clip-path="url(#' + p + 'clip)"><rect x="-40" y="' + (B ? B[1] - 10 : -30) + '" width="26" height="' + (B ? B[3] + 20 : 70) + '" fill="url(#' + p + 'sheen)" transform="skewX(-22)" opacity="' + (t === "dark" ? ".5" : ".9") + '">' +
+        '<animate attributeName="x" values="' + (B ? (B[0] - 50) + ";" + (B[0] + B[2] + 60) + ";" + (B[0] + B[2] + 60) : "-60;190;190") + '" keyTimes="0;.35;1" dur="' + (t === "diamond" || t === "dark" ? "3.6" : "4.6") + 's" repeatCount="indefinite"/></rect></g>';
     }
-    if (t === "diamond" && rich) over += sparkle(18, -12, 5, 0, anim) + sparkle(98, -2, 4, 1.1, anim) + sparkle(64, 13, 3.2, 2.2, anim);
-    if (t === "dark" && rich) over += sparkle(20, -12, 4, .4, anim) + sparkle(110, 10, 3, 1.7, anim);
+    if (S && S.top) over += S.top(p, rich, old);
+    var K = S && S.sparks ? S.sparks : null;
+    if (t === "diamond" && rich) over += K ? sparkle(K[0][0], K[0][1], K[0][2], 0, anim) + sparkle(K[1][0], K[1][1], K[1][2], 1.1, anim) + sparkle(K[2][0], K[2][1], K[2][2], 2.2, anim)
+      : sparkle(18, -12, 5, 0, anim) + sparkle(98, -2, 4, 1.1, anim) + sparkle(64, 13, 3.2, 2.2, anim);
+    if (t === "dark" && rich) over += K ? sparkle(K[0][0], K[0][1], K[0][2] * .85, .4, anim) + sparkle(K[1][0], K[1][1], K[1][2] * .85, 1.7, anim)
+      : sparkle(20, -12, 4, .4, anim) + sparkle(110, 10, 3, 1.7, anim);
 
-    var under = t === "dark" && rich ? '<g filter="url(#' + p + 'glow)" opacity=".85">' + (t === "antique" ? antiqueMask() : modernMask()) +
+    var under = t === "dark" && rich ? '<g filter="url(#' + p + 'glow)" opacity=".85">' + MASK +
       (anim ? '<animate attributeName="opacity" values=".55;.95;.55" dur="3s" repeatCount="indefinite"/>' : '') + '</g>' : '';
     // shadow under the tool
-    var shadow = rich ? '<ellipse cx="72" cy="27" rx="64" ry="5" fill="#000" opacity=".35"/>' : '';
+    var shadow = !rich ? '' : S ? (S.shadow ? '<ellipse cx="' + S.shadow[0] + '" cy="' + S.shadow[1] + '" rx="' + S.shadow[2] + '" ry="' + S.shadow[3] + '" fill="#000" opacity=".35"/>' : '')
+      : '<ellipse cx="72" cy="27" rx="64" ry="5" fill="#000" opacity=".35"/>';
 
     var D = DISC[t], ring = t === "antique" ? METAL.brass : mat;
     defs += cyl(p + "ring", ring.map(function(c){ return shade(c, t === "dark" ? .08 : 0); }));
@@ -262,10 +273,10 @@
           '<text x="0" y="5.2" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="15" letter-spacing="1" fill="' + D[3] + '" stroke="rgba(0,0,0,.35)" stroke-width=".4">' + num + '</text></g>';
       }
     }
-    var g = '<g clip-path="url(#' + p + 'dclip2)"><g transform="translate(' + (t === "antique" ? 22 : 19) + ' 84) rotate(-30) scale(' + (t === "antique" ? .66 : .7) + ')">' + shadow + under + body + over + '</g></g>';
+    var g = '<g clip-path="url(#' + p + 'dclip2)"><g transform="' + (S ? S.place[old ? 1 : 0] : 'translate(' + (t === "antique" ? 22 : 19) + ' 84) rotate(-30) scale(' + (t === "antique" ? .66 : .7) + ')') + '">' + shadow + under + body + over + '</g></g>';
     defs += '<clipPath id="' + p + 'dclip2"><circle cx="64" cy="64" r="' + (rich ? 60 : 58) + '"/></clipPath>';
     return '<svg class="sh-rank-art sh-rank-' + t + '" width="' + px + '" height="' + px + '" viewBox="0 0 128 128" role="img" aria-label="' +
-      TIERS[tier].name + ' handpiece' + (opt.level ? ' ' + ROMAN[Math.max(1, Math.min(3, opt.level)) - 1] : '') + '"><defs>' + defs + '</defs>' + disc + g + over2 + '</svg>';
+      TIERS[tier].name + ' ' + (S ? S.name : 'handpiece') + (opt.level ? ' ' + ROMAN[Math.max(1, Math.min(3, opt.level)) - 1] : '') + '"><defs>' + defs + '</defs>' + disc + g + over2 + '</svg>';
   }
 
   /* medallion interior: center, mid, edge, spotlight color */

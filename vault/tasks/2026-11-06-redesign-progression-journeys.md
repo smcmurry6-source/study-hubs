@@ -170,6 +170,60 @@ old rate, about half the leaders' new pace); past days as they were. Groups by X
   report awards aren't doubled by a boost; a rank-up is a tier; match questions are self-graded (a flat 2); a mock needs 10
   answers for its +50; a podcast minute needs 25 seconds since the last; "finished" is 90% of its minutes.
 
+- 2026-11-12 (Claude Code, part A, **the art and the open calls; nothing is in the engine yet**). Branch
+  `claude/game-layer-phase-4-client-rtv06n`.
+  - **Drawn**: the ModuPro and the loupes, each one drawing plus its antique, as shapes in a new kit,
+    `tools/figures/site/journeys.mjs` (its header cites the sources and says what a shape is). `shRanks.art(tier, px,
+    { shape })` in `widget/ranks.js` draws a shape in the same medallion as the handpiece (same disc, metals, textures,
+    stars, glints); without a shape its output is byte for byte what it was (checked over every tier, size and option), so
+    the live hubs' handpieces don't change. Three journey trophies (`journey-0` to `journey-2`) in `medals.mjs`
+    (`JOURNEY_TROPHIES`, apart from the live list).
+  - **The contact sheet** is on the design page (`tools/preview/design/`, "The three journeys" under Ranks, built by
+    `journeysHTML()` in `design.js` from `A.journeys` and `A.journeyTrophies` in `art.js`): the 21 medallions, the rank pill
+    and board sizes, double XP on the pill and on the flying XP, the hand-off's last frame, the Dark Matter unlock's still
+    card for each journey, the road ahead for the "you" panel, the trophies won and not won. Light and dark, laptop and
+    phone width looked at. **Waiting for Sam's yes before any of it goes into the engine.**
+  - **Next, after Sam's answers** (the open calls below): the kit built into a file the new pages load on first use (never
+    with the page: Occlusion has one request to spare), the journey-aware rank in `widget/hub-rewards.js`, the hand-off and
+    the unlock, the boost on the pill.
+
+## Open calls (2026-11-12, asked before part A is built)
+
+Asked in chat on 2026-11-12; each has the recommendation that gets built if Sam says "yes to all".
+
+- [ ] **The art** (the contact sheet): the new objects drawn in today's medallion look, not flat ink, so the three journeys
+      are one family (the plan keeps the handpiece medallions as drawn); the trophies are in ink. The ModuPro's antique is
+      plaster casts on a brass hinge articulator; the loupes' antique is brass telescopic pince-nez; the loupes are
+      through-the-lens with a headlight.
+- [ ] **The answer call.** The boost, the new XP rules and "2x" only exist behind `record_answer_v2`, and no part's note
+      builds the switch (the release note lists it as a step). Recommended: part A wires it. The engine calls
+      `record_answer_v2` and shows what the server paid (falling back to today's five calls while the function isn't there,
+      as the dashboard does); `widget/v3.js` gets one switch only the engine sets, so it doesn't record the same answer
+      twice; a mock starts and finishes its session (without one the server pays a mock's answers nothing, they arrive
+      together). Or: part A only shows what the profile says and the release session wires the calls.
+- [ ] **The arcade's +50 and Timmy Time's minutes** (`xp_session_start` for a game, `pod_minute_v2`) are in
+      `widget/games.js` and `widget/podcast.js`, shared with the live hubs. Recommended: not in part A; a to-do in the
+      release note, done with the release's wiring.
+- [ ] **The Handpiece keeps today's names** ("Gold II", not "Handpiece Gold II"); the object's name shows from the
+      ModuPro on.
+- [ ] **One scene at a time.** Reaching Dark Matter plays the unlock in place of the ordinary rank-up cutscene. Reaching
+      125,000 plays the hand-off alone: it names the journey trophy, and no trophy card or Stone cutscene follows.
+- [ ] **Skipping the unlock counts as seen** (the server's mark is written when it ends or is skipped). The hand-off is
+      remembered per device, like every rank-up today: the server has a mark for the unlock only, and adding one would
+      change the migration.
+- [ ] **Each journey's Dark Matter has its own sky**: stars (Handpiece), a nebula (ModuPro), a constellation (Loupes).
+- [ ] **Trophy names**: "Handpiece finished", "ModuPro finished", "Loupes finished" (27 trophies in all at the release).
+- [ ] **The new dashboard** (its "you" card, boards, stage and ladder) learns the journeys' names and medallions in part A
+      too; the kit loads there only when someone on the page is past the Handpiece.
+- [ ] **Timmy's place** (the statue by the door, "the ModuPro on the porch, Timmy in loupes", the rank sets for tiers
+      7-20) is part C's, drawn before anyone reaches 125,000. In part A the old house card just keeps its Dark Matter
+      house past 125,000.
+- [ ] **A preview?** The note wants the hand-off and the unlock recorded on one, reduced motion too. Asked once, here.
+
+Not a call, how it will work: nothing earned is lost on entering a journey (accent colors, the house and rank sets
+follow the overall rank, since the v2 profile's `tier` restarts at Stone); the flying XP shows the client's count at once
+and the pill takes the server's total when the reply comes; no request is added to a page's load.
+
 ## Outcome
 
 Related: [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [phase 5](2026-11-05-redesign-phase-5-backend.md) ·

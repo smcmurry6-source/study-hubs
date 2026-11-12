@@ -103,5 +103,6 @@ Put the ranks, trophies and celebrations on the design system without changing t
     what the engine shows of Timmy, `widget/pet.js` for the renderer; a new page in More also needs its row in the
     core's `MORE` list and its entry in `renderMore`'s map (call the part's function as `HX.<name>`).
     [Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md): `widget/hub-bank.js`.
+- 2026-11-12: [#330](https://github.com/smcmurry6-source/study-hubs/pull/330) merged as `56a1fd9`, and `node tools/release/postcheck.js` passed (7 of 7 changed files live and identical to `main`; the dashboard and the three live hubs open with no errors).
 
 ## Outcome
