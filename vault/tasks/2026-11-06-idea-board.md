@@ -131,7 +131,9 @@ Each gets a hub and a category when it's posted (most are for all hubs; the arca
 
 The live About page describes the live site, so these go in with the redesign's switch ([the release](2026-11-06-redesign-release.md)).
 
-- **On the dashboard and in every hub: "Idea board"** (new). Post an idea for the hubs and vote on your classmates'. An
+- **On the dashboard and in every hub: "Idea board"** (new). A cork board where every idea is a pinned note: the paper's
+  color and the little picture say what kind it is, the pushpin is in its hub's color (red for all hubs), Sam's answer
+  is stamped on it and the top idea wears a rosette. Post an idea for the hubs and vote on your classmates'. An
   idea has a title and up to 280 characters, the hub it's for (or all hubs) and what kind it is: a new feature, making
   something work better, questions and notes, games and fun, look and feel, or something else. It shows to the class right
   away under your leaderboard name, with its up and down votes. One vote per idea, tap again to take it back. Top, New and

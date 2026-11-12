@@ -46,8 +46,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   posted.
   `tools/ci/smoke.js` draws a made-up board and checks votes, the pickers, that words never become markup and that every
   button has a fixed `data-shi` name. BUG-078 (WebKit only: a "ResizeObserver loop" error on the new dashboard while
-  the board's stylesheet loads) fixed in `widget/dash.js`. Sam then asked for a more decorative board, to be done once
-  #318 has merged. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324))
+  the board's stylesheet loads) fixed in `widget/dash.js`. Sam then asked for a more decorative board, done after
+  #318 merged and approved from a contact sheet: **a cork board in a wood frame, every idea a pinned paper note** (the
+  paper's color and a picture for its kind, a pushpin in the hub's tint, Sam's answer as a stamp, a rosette on the top
+  idea, Timmy looking over the frame, the form as a page of a pad). The drawings are a kit, `tools/figures/site/board.mjs`,
+  built into `widget/hub-art/board.js`, which `ideas.js` loads itself. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324))
 
 - **2026-11-12 (Follow along: the redesign highlights the word being read, Claude Code)** — The survey's "highlight the words
   being read when listening to the lecture notes voiceover", approved by Sam for the redesign. While Listen plays a lecture's

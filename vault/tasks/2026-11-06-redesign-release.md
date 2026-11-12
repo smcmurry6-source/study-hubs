@@ -279,7 +279,7 @@ follows you to your other devices.
 1. After migration_v54 is applied and the keys are loaded (above), **post the starting ideas**: the table in the idea
    board's note and the ones written from the past check-ins, each checked against the About page and the redesign plan first.
 2. The About page: the entries drafted in the idea board's note ("The About page's entries").
-3. `sw.js`: add `widget/ideas.js` and `widget/ideas.css` to `PRECACHE`.
+3. `sw.js`: add `widget/ideas.js`, `widget/ideas.css` and `widget/hub-art/board.js` (the board's drawings) to `PRECACHE`.
 4. The admin page's Overview: add "Ideas reported" to "Waiting on you" (`ideas` in the Overview's `needs`), left out
    until the function exists so the live page doesn't ask for it on every load.
 5. The check-in with the tick is `widget/dash.js`'s; the old `index.html`'s goes with the old dashboard.
