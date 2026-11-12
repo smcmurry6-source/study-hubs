@@ -25,8 +25,14 @@ surveys, comments, a leaderboard name). No accounts, emails, IP addresses, devic
 - **Data improves the hubs, never judges a student.** It is never used to grade, rank (outside the opt-in leaderboards),
   contact or single out anyone, and is never shared with faculty or the school about an individual.
 - **No new identifiers.** Don't record IP addresses, user agents, fingerprints, emails, session replays, keystrokes or
-  anything typed (except search terms, already trimmed and without an id), and add no third-party analytics or ad scripts.
-  Kinds and click targets never carry free text, names or per-student ids.
+  anything typed (except search terms, already trimmed and without an id, and Timmy's chats, below), and add no
+  third-party analytics or ad scripts. Kinds and click targets never carry free text, names or per-student ids.
+- **Timmy's chats are stored** (Sam, 2026-11-12: "store all chat logs with timmy", from the redesign's release,
+  [the task](../tasks/2026-11-12-redesign-ask-timmy.md)): every message to and from Timmy, with the visitor id, so a whole
+  conversation can be read. They are sent to Anthropic's API to be answered (that's how Timmy works) and nowhere else. Only
+  the admin page reads them, behind the admin secret; a student's browser reads only its own. Students are told above the
+  chat box that chats are saved to help improve the hub, and the About page says so. Everything above still holds for
+  them: quoted only as a short paraphrase, totals over at least 5 people, never used to judge a student.
 - **New tracking is documented in the same PR**: its row in [event-taxonomy](../reference/event-taxonomy.md), its line
   in [analytics-retention](../reference/analytics-retention.md), and the About page's "What the hubs record" entry when
   students wouldn't expect it ([about-page](about-page.md)).

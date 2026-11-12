@@ -30,6 +30,9 @@ Put the ranks, trophies and celebrations on the design system without changing t
     rare costumes);
   - **C**: [Timmy's place](2026-11-06-redesign-timmys-place.md) (the house card redrawn as a scene you build);
   - **D**: [the bowling egg](2026-11-06-redesign-bowling-egg.md).
+  - **E** (Sam, 2026-11-12): [Ask Timmy](2026-11-12-redesign-ask-timmy.md), Timmy as every hub's study assistant. Its
+    part 4, **everyone has Timmy** ("adopting timmy is no longer an option"), changes `widget/pet.js`: do it with parts B
+    and C, or right after them, so it doesn't collide with their work on Timmy.
   Their server side is [phase 5](2026-11-05-redesign-phase-5-backend.md), part 3. This changes "without changing their
   model" in the goal: XP rules, the ladder, the house and HP change as those notes say.
 - **Released with the rest** (Sam, 2026-11-06, [decisions](../decisions.md)): these widget files are shared with the
@@ -43,7 +46,7 @@ Put the ranks, trophies and celebrations on the design system without changing t
   bank and study toggle, rewards and cards, Timmy and his place), loaded as now, with no behavior change and the
   smoke, a11y and perf suites passing ([run-a-redesign-session](../how-to/run-a-redesign-session.md), step 4) ([#330](https://github.com/smcmurry6-source/study-hubs/pull/330), 2026-11-12)
 - [ ] Every card and the cutscene reviewed in a recording on the preview, reduced motion too
-- [ ] Part A, B, C and D done as their notes say (each note's "Done when")
+- [ ] Part A, B, C and D done as their notes say (each note's "Done when"), and part E's "everyone has Timmy"
 - [ ] The arcade lobby of each live hub redrawn; game mechanics unchanged
 - [ ] The About page's trophy and rank entries updated
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
