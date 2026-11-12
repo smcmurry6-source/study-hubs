@@ -32,6 +32,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (Occlusion L10: Occlusion and the Periodontium, Dr. Abou-Arraj; L9 checked against Dr. Lawson's slides, Claude Code)**
+  — Sam: "i just added the last occlusion materials to the folder" and "yes to all figures and anima". **L10 `occtrauma`** (the first
+  hour of the 11/12 session; `nov 12 occ.txt` and `Dr. Abou-Arraj Occlusion and Periodontal Correlations.pdf` in Drive, not in the repo),
+  the last lecture on the final: notes at both levels, 59 questions (`ot-*`, `cs-ot-*`) in every format with every choice's why,
+  three Patient Box cases (`otcrown`, `otperio`, `otfrem`), 19 hints, 11 likely topics, Review, cram, sort sets `primsec` and
+  `otsigns`, two side-by-side rows, tag `plum` (a tenth tag color), the mock at 9 each from L6-L10, and the exam card, timeline,
+  banner, Home notice and dashboard card. His mobility degrees differ from Dr. Givan's L7 handout: L10's questions say "on
+  Dr. Abou-Arraj's scale", and the notes, Review and `mo-miller2` point out the difference. Five figures (`tools/figures/occlusion/anima/`,
+  in the notes at both levels and in Review): Fig 27 `otsupport` (primary vs secondary, the fence post), Fig 28 `otjiggle` (unilateral
+  vs jiggling, the hourglass), Fig 29 `otxray` (the radiographic signs on a film), Fig 30 `otmobility` (degrees 0-3 to scale, fremitus)
+  and Fig 31 `otanimal` (the 1970s animal experiments); Figs 27, 28 and 30 share `anima/l10tooth.mjs`. **L9** checked against
+  `Dr. Lawson Non-carious cervical lesions.pdf`: RDA below 250 for the seal, the sensor, acid vs plaque sites, the drinks' pH and
+  bicarbonate, mouth rinses, the summary slide; `nc-rda-seal` and `nc-erosion-sites` are new; the "Recording" badge is gone. Narration:
+  L10 and L9 at all three levels from `next/content/notes.json`; the lexicon gained Abou-Arraj, Waerhaug and others. The new
+  Occlusion's hint headings say "the professors". About page: an L10 sentence in Diagrams. Occlusion's page is 1470 KB over the
+  wire, so its budget went from 1395 to 1480 KB (BUG-087; Sam's "merge when ready"). The site is 760 MB, past `size.js`'s 750 MB warning; no
+  archived hub still has audio. Task: [done](vault/tasks/done/2026-11-10-occlusion-l9-follow-ups.md).
 - **2026-11-12 (Ask Timmy's server, part 1, Claude Code)** — Nothing students see changes yet: this is the server half of
   [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md), which goes live with the redesign. The Supabase Edge Function
   `timmy` (`supabase/functions/timmy/`: the logic in `core.js`, the Deno wrapper in `index.ts`, the site help in
@@ -467,7 +484,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   description, footer and dashboard card list L9 and no longer say the final is only Dr. Givan's lectures; the
   redesign (`next/`) copy matches and its content was rebuilt. Lexicon: NCCLs, Dzakovich, chelator, exostoses, tori,
   subgingivally, CEJ. The notes give both views where L9 meets L7 (Lawson: abfraction is a cause, treat it with a night
-  guard; Givan: not yet proven clinically). Pending in [the follow-up task](vault/tasks/2026-11-10-occlusion-l9-follow-ups.md):
+  guard; Givan: not yet proven clinically). Pending in [the follow-up task](vault/tasks/done/2026-11-10-occlusion-l9-follow-ups.md):
   Sam's answers on four diagram candidates, the check against Dr. Lawson's slides (names spelled by ear) and the other
   11/12 lecture as L10. Occlusion's performance budget 1350 -> 1370 KB (L9 adds about 25 KB over the wire; BUG-053),
   for Sam to approve with the PR. No schema change.

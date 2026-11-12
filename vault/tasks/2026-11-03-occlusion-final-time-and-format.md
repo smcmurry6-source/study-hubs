@@ -42,6 +42,8 @@ clock. When the announcement arrives (Sam passes it on), make the hub match it.
   waiting on the format.
 - 2026-11-10: L9 (Dr. Lawson's noncarious cervical lesions) added: the mock is still 45 questions in an hour, now 12 each
   from L6-L8 and 9 from L9 (`MOCK_BLUEPRINT`); still waiting on the format.
+- 2026-11-12: L10 (Dr. Abou-Arraj's occlusal trauma) added, the last lecture on the final: the mock is 45 questions in an
+  hour, 9 each from L6-L10; still waiting on the format.
 
 ## Outcome
 
