@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: 
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/323
 ---
 
 # Follow along: highlight the word being read while Listen plays (the redesign)
