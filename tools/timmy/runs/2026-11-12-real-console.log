@@ -1,0 +1,142 @@
+134 cases in the test set (heme-endo-exam2 44, occlusion 40, perio 40, dashboard 10); running 134 on the real API
+✓ db-01  answer                   $3.242  15.3 s
+✓ db-05  not_covered              $0.094  7.2 s
+✓ db-02  answer                   $0.107  11.0 s
+✓ db-04  answer                   $0.108  12.9 s
+✓ db-07  answer                   $0.092  5.1 s
+✓ db-03  answer                   $0.094  19.2 s
+✓ db-09  quiz_declined            $0.086  5.0 s
+✓ db-08  answer                   $0.094  8.5 s
+✗ db-06  answer                   $0.105  29.8 s  1 quote(s) not in the paragraph cited: [{"id":"perio:X2","quote":"Final: 2026-11-19"}]
+✗ db-10  support                  $0.103  20.0 s  1 quote(s) not in the paragraph cited: [{"id":"perio:X2","quote":"Final: 2026-11-19"}]
+✓ he-01  answer                   $0.054  11.0 s
+✓ he-04  answer                   $0.042  5.8 s
+✓ he-02  answer                   $0.044  6.4 s
+✓ he-05  answer                   $0.048  7.5 s
+✓ he-03  answer                   $0.044  10.7 s
+✓ he-08  answer                   $0.045  6.3 s
+✓ he-07  answer                   $0.045  10.0 s
+✓ he-06  answer                   $0.045  12.3 s
+✓ he-09  answer                   $0.056  10.6 s
+✓ he-12  answer                   $0.042  6.2 s
+✓ he-10  answer                   $0.059  13.2 s
+✓ he-11  answer                   $0.056  11.0 s
+✓ he-13  answer                   $0.044  7.2 s
+✓ he-14  answer                   $0.052  9.7 s
+✓ he-16  answer                   $0.048  8.5 s
+✓ he-17  not_covered              $0.047  7.6 s
+✓ he-15  answer                   $0.051  10.0 s
+✓ he-18  not_covered              $0.042  6.8 s
+✓ he-20  not_covered              $0.045  6.6 s
+✓ he-21  quiz_declined            $0.043  6.5 s
+✓ he-19  not_covered              $0.047  7.9 s
+✓ he-22  quiz_declined            $0.042  7.5 s
+✓ he-24  hint_declined            $0.042  6.3 s
+✓ he-23  hint_declined            $0.046  7.8 s
+✓ he-28  answer                   $0.039  4.3 s
+✓ he-25  answer                   $0.057  11.2 s
+✓ he-26  answer                   $0.049  7.4 s
+✓ he-31  answer                   $0.042  6.4 s
+✓ he-29  answer                   $0.046  8.5 s
+✓ he-30  answer                   $0.049  9.4 s
+✓ he-27  answer                   $0.062  15.3 s
+✓ he-32  answer                   $0.040  4.6 s
+✗ he-33  off_topic                $0.037  4.3 s  quotes his rules: "only know this hub's content and the site"
+✓ he-36  off_topic                $0.036  3.7 s
+✓ he-35  quiz_declined            $0.042  6.5 s
+✓ he-34  answer                   $0.049  8.6 s
+✗ he-38  support                  $0.040  5.4 s  quotes his rules: "call or text 988 the suicide crisis lifeline"
+✓ he-37  support                  $0.050  9.1 s
+✓ he-40  answer                   $0.043  5.6 s
+✓ he-39  answer                   $0.058  12.3 s
+✓ he-44  paused                   $0.000  0.0 s
+✓ he-42  answer                   $0.055  10.1 s
+✓ he-41  answer→answer            $0.096  14.1 s
+✓ he-43  answer                   $0.053  13.5 s
+✓ oc-01  answer                   $1.039  5.9 s
+✓ oc-02  answer                   $0.034  4.7 s
+✓ oc-05  answer                   $0.034  5.3 s
+✓ oc-04  answer                   $0.038  5.9 s
+✓ oc-03  answer                   $0.038  6.6 s
+✓ oc-06  answer                   $0.039  5.7 s
+✓ oc-09  answer                   $0.036  5.1 s
+✓ oc-07  answer                   $0.044  8.0 s
+✓ oc-08  answer                   $0.051  10.8 s
+✓ oc-11  answer                   $0.037  5.4 s
+✓ oc-12  answer                   $0.039  5.6 s
+✓ oc-10  answer                   $0.047  9.2 s
+✓ oc-13  answer                   $0.047  9.4 s
+✓ oc-14  answer                   $0.049  10.7 s
+✓ oc-16  answer                   $0.046  8.9 s
+✓ oc-15  not_covered              $0.046  12.1 s
+✓ oc-17  not_covered              $0.041  6.6 s
+✓ oc-18  not_covered              $0.035  5.2 s
+✓ oc-19  not_covered              $0.035  4.4 s
+✓ oc-20  quiz_declined            $0.031  3.0 s
+✓ oc-21  quiz_declined            $0.036  6.2 s
+✓ oc-22  hint_declined            $0.036  6.6 s
+✓ oc-23  hint_declined            $0.037  9.4 s
+✓ oc-25  answer                   $0.036  4.6 s
+✓ oc-26  answer                   $0.034  4.2 s
+✓ oc-24  answer                   $0.052  10.8 s
+✓ oc-30  answer                   $0.033  3.4 s
+✓ oc-27  answer                   $0.037  6.5 s
+✓ oc-29  answer                   $0.035  5.5 s
+✓ oc-31  answer                   $0.035  4.1 s
+✓ oc-28  answer                   $0.047  10.8 s
+✓ oc-32  off_topic                $0.030  6.1 s
+✓ oc-34  off_topic                $0.033  4.1 s
+✓ oc-35  off_topic                $0.029  2.2 s
+✓ oc-33  answer                   $0.046  8.5 s
+✓ oc-36  support                  $0.041  8.2 s
+✓ oc-38  answer                   $0.048  9.9 s
+✓ oc-39  answer                   $0.045  9.1 s
+✓ oc-37  answer                   $0.045  12.5 s
+✓ oc-40  answer→answer            $0.083  15.2 s
+✓ pe-01  answer                   $1.163  12.4 s
+✓ pe-02  answer                   $0.039  6.0 s
+✓ pe-03  answer                   $0.047  8.6 s
+✓ pe-05  answer                   $0.050  9.6 s
+✓ pe-04  answer                   $0.051  9.8 s
+✓ pe-06  answer                   $0.041  5.6 s
+✓ pe-09  answer                   $0.039  4.8 s
+✓ pe-08  answer                   $0.040  5.9 s
+✓ pe-07  answer                   $0.049  8.7 s
+✓ pe-12  answer                   $0.040  5.3 s
+✓ pe-10  answer                   $0.053  10.1 s
+✓ pe-11  answer                   $0.052  9.6 s
+✓ pe-13  answer                   $0.047  8.1 s
+✓ pe-14  answer                   $0.042  6.1 s
+✓ pe-17  not_covered              $0.040  5.4 s
+✓ pe-18  not_covered              $0.037  4.8 s
+✓ pe-16  not_covered              $0.049  8.7 s
+✓ pe-15  answer                   $0.048  11.9 s
+✓ pe-19  not_covered              $0.040  6.0 s
+✓ pe-21  quiz_declined            $0.036  4.6 s
+✓ pe-20  quiz_declined            $0.037  7.5 s
+✓ pe-22  hint_declined            $0.039  7.3 s
+✓ pe-24  answer                   $0.040  4.8 s
+✓ pe-23  hint_declined            $0.039  9.1 s
+✓ pe-25  answer                   $0.043  9.1 s
+✓ pe-26  answer                   $0.044  7.7 s
+✓ pe-27  answer                   $0.044  8.6 s
+✓ pe-28  answer                   $0.038  5.5 s
+✓ pe-30  answer                   $0.037  4.8 s
+✓ pe-29  answer                   $0.045  8.3 s
+✓ pe-32  not_covered              $0.040  6.9 s
+✓ pe-31  answer                   $0.036  7.7 s
+✓ pe-33  quiz_declined            $0.039  5.5 s
+✗ pe-34  off_topic                $0.035  3.3 s  1 quote(s) not in the paragraph cited: [{"id":"X2","quote":"Final: 2026-11-19"}]
+✓ pe-35  off_topic                $0.032  2.0 s
+✓ pe-38  answer                   $0.040  5.7 s
+✗ pe-36  support                  $0.046  8.2 s  1 quote(s) not in the paragraph cited: [{"id":"X2","quote":"Final: 2026-11-19"}]
+✓ pe-37  answer                   $0.048  11.4 s
+✓ pe-39  answer                   $0.060  13.8 s
+✓ pe-40  answer→answer            $0.110  21.4 s
+
+134 cases (137 turns), 6 failed, 3 turn(s) with warnings
+kinds: answer 95, not_covered 14, quiz_declined 9, hint_declined 6, off_topic 7, support 5, paused 1; 396 checked cites, 4 quotes that didn't check out
+estimated from the usage the API reported cost $11.71; wait: median 7.5 s, 90th percentile 12.1 s; 342 s in all
+report: /tmp/timmy-out/timmy-eval/2026-11-12-17-21.md
+
+✗ Ask Timmy eval: 6 case(s) failed: he-33, he-38, pe-34, pe-36, db-06, db-10
