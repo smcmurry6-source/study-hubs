@@ -183,6 +183,9 @@ const base = { visitor: "visitor-1", hub: HUB, text: "What does this paragraph m
   eq(out.body.paragraphs[2].cites.length, 1, "a quote with an ellipsis checks out piece by piece");
   eq([db.calls.finish[0].p_cites_ok, db.calls.finish[0].p_cites_bad, db.calls.finish[0].p_unchecked.length], [2, 2, 2], "the unchecked quotes go to the admin tab");
 }
+// a quote under three words counts only when it is the whole unit (an exam fact like "Final: 2026-11-19")
+ok(T.quoteIn("Final: 2026-11-19", "Final: 2026-11-19") && T.quoteIn("final: 2026-11-19.", "Final: 2026-11-19"), "a short unit quoted whole checks out");
+ok(!T.quoteIn("Final: 2026", "Final: 2026-11-19") && !T.quoteIn("Final", "Final: 2026-11-19") && !T.quoteIn("2026-11-19 ... Final", "Final: 2026-11-19"), "part of a short unit doesn't");
 // offers, go and not covered
 {
   const lecIds = C.lectures.map(l => l.id);
@@ -210,7 +213,9 @@ const base = { visitor: "visitor-1", hub: HUB, text: "What does this paragraph m
   m = fakeModel(answer([{ text: "Here's why.", cites: [{ id: "Q", quote: whyQuote }] }]));
   const out = await T.handle(Object.assign({}, base, { ask: { qid: Q1.id, picks: [1], right: false } }), deps(m, fakeDb({ answered: true })));
   const turn = m.calls[0].messages[0].content;
-  ok(turn.includes("<answered_question>") && turn.includes("[correct]") && turn.includes("The student's answer: B, wrong."), "answered: the question, its key, whys and the student's pick are in the turn");
+  const pick = `"${T.clean(Q1.choices[1])}"`;
+  ok(turn.includes("<answered_question>") && turn.includes("[correct]") && turn.includes(`The student's answer: ${pick}, wrong.`) && turn.includes(`- ${pick}`) && turn.includes("[the student's pick]"), "answered: the question, its key, whys and the student's pick (by its words) are in the turn");
+  ok(!/^[A-J]\. /m.test(turn.split("<answered_question>")[1]), "answered: no choice letters (the card shuffles them and shows none)");
   eq(out.body.paragraphs[0].cites.map(c => c.go), [{ v: "bank", q: Q1.id }], "a quote from the question's explanation links to the question");
   m = fakeModel(answer([{ text: "x", cites: [] }]));
   await T.handle(Object.assign({}, base, { hub: "dashboard", hubs: [HUB], ask: { qid: Q1.id, picks: [0], right: true } }), deps(m, fakeDb({ answered: true })));

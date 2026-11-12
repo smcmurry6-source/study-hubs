@@ -40,10 +40,11 @@ not before**. Until then `migration_v55.sql` is in `supabase/pending-migrations.
    exact JSON answered, so the API's prompt cache hits on follow-ups).
 3. The request: the rules, then the site help and the hub's content (on the dashboard, every live hub's, in a fixed
    order) with a 1-hour cache mark; then the earlier turns; then this turn: `<page>` (hub, voice, today in Central time,
-   view, lecture, paragraph), `<answered_question>`, `<progress>`, `<student>` (escaped: what a student types is data).
+   view, lecture, paragraph), `<answered_question>` (its choices without letters, the student's pick by its words: the card
+   shuffles the choices and shows no letters), `<progress>`, `<student>` (escaped: what a student types is data).
    Model `claude-opus-5-5`, effort `medium`, structured output (the schema in `core.js`), the refusal fallback on.
-4. The answer is checked: every cite's quote must really be in the unit it names (a real quote under the wrong id is
-   moved to the right unit). Only checked cites become links; the rest are stored as `unchecked` for the admin tab.
+4. The answer is checked: every cite's quote must really be in the unit it names, at least three words or the whole of a
+   shorter unit such as an exam date (a real quote under the wrong id is moved to the right unit). Only checked cites become links; the rest are stored as `unchecked` for the admin tab.
 5. `timmy_finish` stores the answer with its tokens and estimated cost, and the browser gets:
    `{ ok, chat, message, kind, paragraphs: [{ text, cites: [{ id, hub, kind, label, quote, go }] }], offer, go, closest }`,
    plus `limited` (`limit`, `cap`, `off`, `busy`) on a "napping" line and `repeat` on a retried send. `message` is Timmy's
@@ -98,7 +99,9 @@ with `<hub>:`.
 
 Each case says what a good answer is: the kind, the lecture its links land in, the offer, words it must or mustn't say.
 Every answer is also checked for what no answer may do: an error, a quote that isn't in the paragraph it cites, markdown,
-a line of his rules, an About page spoiler. Warnings (over 170 words, a British spelling, a missing "closest") are for a
+a line of his rules (12 words in a row), an About page spoiler, words in quotation marks that aren't in the content (unless
+he says they're his own mnemonic or analogy), an answer choice named by a letter (the card shuffles the choices and shows
+no letters, so he names a choice by its words). Warnings (over 170 words, a British spelling, a missing "closest") are for a
 person to read. The full report (every question and answer) is written as markdown beside the run's summary.
 
 - `node tools/timmy/eval.mjs --dry`: free; checks the test set (every "covered" case's terms are in its lecture, every
@@ -111,6 +114,8 @@ person to read. The full report (every question and answer) is written as markdo
   pasted in a chat or written in a file; a key made for the eval, deleted after, is safest. Make it inside a workspace,
   or also set `TIMMY_EVAL_WORKSPACE` to the workspace's id. A variable added to the environment reaches only sessions
   started after it, so a session that started before runs the eval in a fresh session on its branch.
+- `--regrade <report.json>`: free; grades a saved run again with this checkout's grader and quote check, for a change to
+  the grading or to `quoteIn`.
 - Rerun it after changing `RULES`, the schema, the effort level or the model, and before the release.
 
 ## At the release (the release note's Ask Timmy box)

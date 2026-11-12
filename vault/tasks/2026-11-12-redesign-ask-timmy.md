@@ -278,6 +278,17 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
   cost: "This API key is not scoped to a workspace". The eval and the function now send a workspace's id when one is
   set (`TIMMY_EVAL_WORKSPACE`; `ANTHROPIC_WORKSPACE_ID` in Supabase); a key made inside a workspace needs neither. The
   release steps in [ask-timmy](../reference/ask-timmy.md) say so.
+- 2026-11-12: the full real-API run (Sam's workspace key, effort medium): 134 cases (137 turns), $11.71, a median wait
+  of 7.5 s (90th percentile 12.1 s); 396 quotes checked out and 4 didn't. Every answer was read by hand, and the numbers and
+  names in them checked against the content by script: nothing from outside the content, the quiz and practice questions
+  declined, the crisis answer gave 988. 6 cases failed, none for a wrong answer: 4 quoted the two-word exam fact
+  "Final: 2026-11-19" whole (a quote now passes when it is the whole of a short unit), and 2 tripped the grader on
+  sanctioned lines like "call or text 988" (its rules check is now 12 words in a row). Reading found one real bug the
+  grader missed: after a practice question he said "Your pick, B", but the card shuffles the choices and shows no letters.
+  The answered question now goes to him without letters, the student's pick by its words, and his rules say to name a
+  choice by its words; the eval fails a letter. Also new: quotation marks only around words in the content (the eval
+  checks it), 911 beside 988 for immediate danger, and `--regrade` to grade a saved run again for free. The failed and
+  practice-question cases were run again on the fixed prompt.
 
 ## Outcome
 

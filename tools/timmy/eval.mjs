@@ -6,6 +6,7 @@
 //   node tools/timmy/eval.mjs --only perio,db-03   some hubs (heme-endo-exam2, occlusion, perio, dashboard) or case ids
 //   --effort low|medium|high   try another effort level      --concurrency 4   requests at a time within a hub
 //   --max-usd 15               stops starting new cases past this estimated spend
+//   --regrade <report.json>    grades a saved run again with this checkout's grader and quote check; free, no key
 // The real run needs @anthropic-ai/sdk@1.3.0 (the function's version): npm i --prefix <dir> @anthropic-ai/sdk@1.3.0, then
 // TIMMY_SDK_DIR=<dir>. The key: TIMMY_EVAL_KEY (in a Claude Code cloud session, an environment variable Sam adds in the
 // environment's settings; not ANTHROPIC_API_KEY, which Claude Code itself reads), or ANTHROPIC_API_KEY on a computer
@@ -14,7 +15,8 @@
 // Writes the full report (every question, answer and grade) as markdown and JSON to $SH_RELEASE_OUT or the temp folder.
 //
 // What a case passes: the reply came back (no error), every quote it cites is really in that paragraph, plain text, nothing
-// from Timmy's rules or the About page's spoilers, the kind the case expects, links into the expected lecture, the offer
+// from Timmy's rules or the About page's spoilers, no words in quotation marks that aren't in the content (unless he says
+// they're his own mnemonic or analogy), no answer choice named by a letter (the card shuffles them), the kind the case expects, links into the expected lecture, the offer
 // it expects (a report or an idea, drafted), the words it must say (988 in a crisis) and none it must not (a quiz's key,
 // a practice question's key before it's answered). Warnings (a long answer, a British spelling, no "closest" lecture on
 // "not covered", an offer nobody asked for) are listed for a person to read; they don't fail the run.
@@ -29,7 +31,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..")
 const argv = process.argv.slice(2);
 const flag = n => argv.includes("--" + n);
 const opt = (n, d) => { const i = argv.indexOf("--" + n); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
-const DRY = flag("dry"), ONLY = opt("only", "") ? opt("only").split(",") : null;
+const REGRADE = opt("regrade", ""), DRY = flag("dry") || !!REGRADE, ONLY = opt("only", "") ? opt("only").split(",") : null;
 const CONC = Math.max(1, Number(opt("concurrency", 4))), MAX_USD = Number(opt("max-usd", 15)), EFFORT = opt("effort", "");
 const OUT = path.join(process.env.SH_RELEASE_OUT || path.join(os.tmpdir(), "sh-release"), "timmy-eval");
 
@@ -55,7 +57,8 @@ const UNITS = new Map(["dashboard", ...HUBS].map(h => [h, unitsFor(h)]));
 /* ---------------------------------------------------------------- the checks every answer gets */
 const norm = s => String(s || "").toLowerCase().normalize("NFKC").replace(/[‘’]/g, "'").replace(/[^a-z0-9' ]+/g, " ").replace(/\s+/g, " ").trim();
 function shingles(text, n){ const w = norm(text).split(" ").filter(Boolean), out = new Set(); for (let i = 0; i + n <= w.length; i++) out.add(w.slice(i, i + n).join(" ")); return out; }
-const RULE_SHINGLES = shingles(T.RULES.replace(/^##.*$/gm, ""), 8);
+const RULE_N = 12;   // 12 words in a row: his sanctioned lines ("only know this hub's content and the site", "call or text 988") are shorter
+const RULE_SHINGLES = shingles(T.RULES.replace(/^##.*$/gm, ""), RULE_N);
 const SPOILERS = (() => {   // the About page's hidden text (.spoil), which Timmy must never give away
   const root = T.parseHTML(fs.readFileSync(path.join(ROOT, "about/index.html"), "utf8")), out = new Set();
   T.walk(root, el => { if ((" " + (el.attrs.class || "") + " ").includes(" spoil ")) for (const s of shingles(T.textOf(el), 6)) out.add(s); });
@@ -63,6 +66,20 @@ const SPOILERS = (() => {   // the About page's hidden text (.spoil), which Timm
 })();
 const BRITISH = /\b(colour|favourite|centre|behaviour|organis|labelled|haemo|anaesth|paediatr|oedema|oestrogen|programme|practise[sd]?|analys(e|ed|ing)\b)/i;
 const textOfReply = b => (b.paragraphs || []).map(p => p.text).join("\n\n");
+/* words in quotation marks must be in the content (or what the student typed), unless he says they're his own */
+const CONTENT = new Map([...UNITS].map(([h, u]) => [h, norm([...u.units.values()].map(x => x.text).join(" \n ") + " " +
+  JSON.stringify(h === "dashboard" ? HUBS.map(x => QUESTIONS.get(x)) : QUESTIONS.get(h) || []))]));
+const OWN = /\b(my own|mine|my (hook|shortcut|trick|version|take|analogy|mnemonic)|mnemonic|analogy|memory (trick|hook))\b/i;
+function madeUpQuotes(text, hub, said){
+  const hay = CONTENT.get(hub) + " " + norm(said), out = [];
+  for (const p of text.split("\n\n")) for (const m of p.matchAll(/["“](\S[^"”]*?\S)["”]/g)) {
+    const pieces = m[1].split(/\s*(?:\.\.\.|…)\s*/).map(norm).filter(Boolean);
+    if (pieces.join(" ").split(" ").length < 3 || pieces.every(x => hay.includes(x))) continue;
+    if (!OWN.test(p.slice(Math.max(0, m.index - 80), m.index))) out.push(m[1]);   // "My own mnemonic: "..."" comes first
+  }
+  return out;
+}
+const LETTER_PICK = /\b(?:[Yy]our pick|[Yy]ou picked|[Yy]ou chose|[Tt]he key|[Tt]he answer|[Cc]hoice|[Oo]ption)\b[,:]?\s+(?:is\s+|was\s+)?\(?[A-E]\)?(?=[\s,.;:)]|$)/;
 
 function grade(c, turn, r){
   const e = turn.expect || {}, fails = [], warns = [], b = r.body || {}, text = textOfReply(b), units = UNITS.get(c.hub).units;
@@ -77,7 +94,9 @@ function grade(c, turn, r){
   if (r.db && r.db.p_cites_bad) fails.push(`${r.db.p_cites_bad} quote(s) not in the paragraph cited: ${JSON.stringify(r.db.p_unchecked).slice(0, 300)}`);
   if (/\*\*|`|(^|\n)\s*(#{1,6}\s|[-*•]\s)/.test(text)) fails.push("markdown in the answer");
   else if (/(^|\n)\s*\d+[.)]\s/.test(text)) warns.push("a numbered list");
-  const sh = shingles(text, 8); for (const s of sh) if (RULE_SHINGLES.has(s)) { fails.push(`quotes his rules: "${s}"`); break; }
+  for (const s of shingles(text, RULE_N)) if (RULE_SHINGLES.has(s)) { fails.push(`quotes his rules: "${s}"`); break; }
+  for (const q of madeUpQuotes(text, c.hub, turn.sent)) fails.push(`quotes words that aren't in the content: "${q}"`);
+  if (LETTER_PICK.test(text)) fails.push(`names a choice by a letter ("${text.match(LETTER_PICK)[0]}"): the card shuffles them and shows none`);
   if (/<\/?(page|student|answered_question|progress)>|\bkind\s*"|json_schema/i.test(text)) fails.push("talks about the prompt's tags or fields");
   for (const s of shingles(text, 6)) if (SPOILERS.has(s)) { fails.push(`gives away an About page spoiler: "${s}"`); break; }
   if (BRITISH.test(text)) warns.push(`British spelling: ${text.match(BRITISH)[0]}`);
@@ -216,7 +235,7 @@ async function runCase(c, model, db, cached){
     const row = r.body.message ? db.row(r.body.message) : null;
     const cost = row ? Number(row.p_cost) : 0; spent += cost;
     const res = { status: r.status, body: r.body, called, db: row, ms, usage, model: row && row.p_model };
-    const g = grade(c, Object.assign({}, turn, { keyText }), res);
+    const g = grade(c, Object.assign({}, turn, { keyText, sent: text }), res);
     out.push({ text, reply: r.body, kind: r.body.kind, cost, ms, usage, model: res.model, unchecked: row && row.p_unchecked, ...g });
   }
   return out;
@@ -230,7 +249,20 @@ const cases = SET.cases.filter(c => !ONLY || ONLY.includes(c.hub) || ONLY.includ
 console.log(`${SET.cases.length} cases in the test set (${HUBS.map(h => `${h} ${SET.cases.filter(c => c.hub === h).length}`).join(", ")}, dashboard ${SET.cases.filter(c => c.hub === "dashboard").length}); running ${cases.length}${DRY ? " with a fake model" : " on the real API"}`);
 const model = DRY ? null : await realModel();
 const db = memoryDb(), cached = new Set(), results = new Map(), t0 = Date.now();
-for (const hub of ["dashboard", ...HUBS]) {
+if (REGRADE) {   // a saved run: its answers, graded again (a quote that didn't check out is checked again with today's quoteIn)
+  const saved = new Map(JSON.parse(fs.readFileSync(REGRADE, "utf8")).map(c => [c.id, c.turns]));
+  for (const c of cases) {
+    const st = saved.get(c.id); if (!st) continue;
+    const units = UNITS.get(c.hub).units, specs = [c, ...(c.then || []).map(t => Object.assign({ hub: c.hub }, t))];
+    results.set(c.id, st.map((t, i) => {
+      const bad = (t.unchecked || []).filter(u => ![...units.values()].some(v => T.quoteIn(u.quote, v.text)));
+      const res = { status: t.reply ? 200 : 0, body: t.reply || {}, called: !!t.usage, db: { p_cites_bad: bad.length, p_unchecked: bad } };
+      const g = grade(c, Object.assign({}, specs[i] || {}, { keyText: specs[i] && specs[i].paste ? pasted(c).keyText : null, sent: t.text }), res);
+      return Object.assign({}, t, { unchecked: bad, cost: 0 }, g);
+    }));
+  }
+}
+for (const hub of REGRADE ? [] : ["dashboard", ...HUBS]) {
   const group = cases.filter(c => c.hub === hub); if (!group.length) continue;
   const run = async c => {
     if (stopped || spent > MAX_USD) { stopped = true; return; }
