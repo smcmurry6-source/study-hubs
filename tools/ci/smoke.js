@@ -242,6 +242,67 @@ function lint(hub, A){
       errs.forEach(e => problems.push(`dashboard (${label}): ${e}`));
       const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`dashboard (${label}): page scrolls sideways by ${w}px`);
       await page.close(); }
+    // the redesigned dashboard (next/, widget/dash.js; beside the live one until the release): every hub tab, the class
+    // board's two lists, Settings, the name dialog and the menu
+    if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
+      const page = await context.newPage(); const errs = [], name = `next dashboard (${label})`; page.on('pageerror', e => errs.push(e.message));
+      await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(1200);
+      const sideways = async what => { const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`${name}: ${what} scrolls sideways by ${w}px`); };
+      if (!(await page.$('#dx h1'))) problems.push(`${name}: the page has no title`);
+      const tabs = await page.$$eval('#hubTabs [data-tab]', bs => bs.map(b => b.getAttribute('data-tab')));
+      if (!tabs.length && !(await page.$('.dx-empty'))) problems.push(`${name}: no hub tabs and no "no hubs are live" message`);
+      for (const t of tabs) {
+        await page.click(`#hubTabs [data-tab="${t}"]`); await page.waitForTimeout(250);
+        const st = await page.evaluate(() => { const p = document.getElementById('hubPanel'); return { hub: p.getAttribute('data-hub'), start: !!p.querySelector('a.dx-start[href*="hubs/"]'), title: (p.querySelector('.dx-title') || {}).textContent || '' }; });
+        if (st.hub !== t || !st.start || !st.title.trim()) problems.push(`${name}: the ${t} tab didn't open its hub (title, Start studying)`);
+        await sideways(`the ${t} tab`);
+      }
+      if (tabs.length && !(await page.$('#hubPanel .dx-stage .dx-ring'))) problems.push(`${name}: the open hub has no progress ring`);
+      for (const b of ['streaks', 'ranks']) { await page.click(`#boardSeg [data-board="${b}"]`); await page.waitForTimeout(200); if (!(await page.$('#board > *'))) problems.push(`${name}: the class board's ${b} list is empty`); await sideways(`the ${b} board`); }
+      if (!(await page.$('#class #now #nowCount'))) problems.push(`${name}: the class panel has no "studying right now" count`);
+      // the classroom in the studying-now tile, and the stage behind the top three (Sam, 2026-11-11). Eight made-up people at
+      // once take their desks without the walk; an outfit that isn't one (here, markup) must come out as a plain Timmy.
+      const room = await page.evaluate(async () => {
+        const D = window.shDash, hubs = D && D.hubs ? D.hubs().map(h => h.id) : [], list = [];
+        if (!D || !D.setLive || !hubs.length) return { skip: !hubs.length };
+        for (let i = 0; i < 8; i++) list.push({ key: 'smoke' + i, hub: hubs[i % hubs.length], fit: ['', 'thanksgiving:turkey', '<img src=x onerror="window.__fit=1">', 'captain-hat'][i % 4] });
+        // one of the eight is a hub tab of this browser's own (the key a hub tab remembers): only that desk gets "You"
+        try { localStorage.setItem('sh_presence_mine', JSON.stringify({ [list[5].hub + '/smoke5']: Date.now() })); } catch (e) {}
+        const by = {}; list.forEach(x => { by[x.hub] = (by[x.hub] || 0) + 1; }); D.setLive(by, list);
+        await new Promise(r => setTimeout(r, 400));
+        const out = { art: !!(window.SH_CLASS_ART && window.SH_CLASS_ART.room && window.SH_CLASS_ART.stage), room: !!document.querySelector('#now.has-room #room svg'), desks: document.querySelectorAll('#room .rm-seat').length,
+          tims: document.querySelectorAll('#room .rm-tim svg').length, count: document.getElementById('nowCount').textContent, bad: document.querySelectorAll('#room img').length + (window.__fit ? 1 : 0),
+          podium: !!document.querySelector('#board .dx-podium'), set: !!document.querySelector('#board .dx-set .st-win'),
+          me: [...document.querySelectorAll('#nowMe .dx-me')].map(e => e.textContent).join('|') };
+        D.setLive({}, []); out.after = document.querySelectorAll('#nowMe .dx-me').length;
+        try { localStorage.removeItem('sh_presence_mine'); } catch (e) {}
+        return out;
+      });
+      if (!room.skip) {
+        if (!room.art || !room.room || room.desks < 8) problems.push(`${name}: the studying-now tile drew no classroom (${JSON.stringify(room)})`);
+        else if (room.tims !== 8 || room.count !== '8') problems.push(`${name}: eight people studying, but the classroom seats ${room.tims} and the board says ${room.count}`);
+        if (room.bad) problems.push(`${name}: an outfit from another browser was drawn as markup`);
+        if (room.room && (room.me !== 'You' || room.after)) problems.push(`${name}: your own Timmy should be the only one tagged "You", and only while he's there (tags: "${room.me}", after everyone left: ${room.after})`);
+        if (room.podium && !room.set) problems.push(`${name}: the leaderboard's top three have no stage`);
+      }
+      await sideways('the classroom');
+      // taken out on Sam's call (2026-11-11): the What's new list, the arcade scores and the When people study chart
+      for (const gone of ['#changelog', '#boardSeg [data-board="arcade"]', '#hoursLine']) if (await page.$(gone)) problems.push(`${name}: ${gone} is back on the page`);
+      await page.click('#setBtn'); await page.waitForTimeout(200);
+      if (!(await page.$('.dx-dlg [data-focus]')) || (await page.$$('.dx-dlg .set-row')).length < 8) problems.push(`${name}: Settings didn't open with Focus mode and the extras`);
+      await page.keyboard.press('Escape'); await page.waitForTimeout(100);
+      if (await page.$('.dx-dlg')) problems.push(`${name}: Escape didn't close Settings`);
+      await page.click('#greetEdit'); await page.waitForTimeout(200);
+      if (!(await page.$('.dx-dlg input'))) problems.push(`${name}: the name dialog didn't open`);
+      await page.keyboard.press('Escape');
+      await page.click('#menuBtn'); await page.waitForTimeout(100);
+      if (!(await page.$('#dxMenu:not([hidden]) #tourBtn')) || !(await page.$('#dxMenu #aboutBtn'))) problems.push(`${name}: the menu didn't open with About and the tour`);
+      await page.keyboard.press('Escape');
+      if (!(await page.$('#ideas[data-sh-ideas]'))) problems.push(`${name}: the idea board's section (#ideas) is missing`);
+      errs.forEach(e => problems.push(`${name}: JavaScript error: ${e}`));
+      notes.push(`${name}: ${tabs.length} hub tabs, the class board, Settings, the name dialog and the menu`);
+      await page.close();
+    }
     for (const hub of hubs) {
       const page = await context.newPage(); const errs = [];
       page.on('pageerror', e => errs.push(e.message));
@@ -322,7 +383,7 @@ function lint(hub, A){
     await stub(context);
     await context.addInitScript(size => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); if (size) localStorage.setItem('sh_pref_size', size); } catch (e) {} }, tb.size || '');
     const label = `${tb.width}px${tb.size ? ', largest text' : ''}`;
-    for (const url of ['index.html', ...hubs.map(h => `hubs/${h}/index.html`), ...nextHubs.map(h => `hubs/${h}/next/index.html`)]) {
+    for (const url of ['index.html', ...(fs.existsSync(path.join(root, 'next', 'index.html')) ? ['next/index.html'] : []), ...hubs.map(h => `hubs/${h}/index.html`), ...nextHubs.map(h => `hubs/${h}/next/index.html`)]) {
       const page = await context.newPage();
       await page.goto(BASE() + url); await page.waitForTimeout(700);
       await page.click('.sh-archived-stay', { timeout: 500 }).catch(() => {});
@@ -330,7 +391,7 @@ function lint(hub, A){
       const bad = await page.evaluate(() => {
         const out = [], vw = document.documentElement.clientWidth;
         if (document.documentElement.scrollWidth > vw + 1) out.push(`page scrolls sideways by ${document.documentElement.scrollWidth - vw}px`);
-        const els = document.querySelectorAll('header.hub-header button, header.hub-header a, .topbar button, .topbar a, .hx-bar a, .hx-bar button, .hx-strip button, #modeSwitch [data-mode], #arcadeHubs button, #gameTabs button');
+        const els = document.querySelectorAll('header.hub-header button, header.hub-header a, .topbar button, .topbar a, .hx-bar a, .hx-bar button, .hx-strip button, #modeSwitch [data-mode], #arcadeHubs button, #gameTabs button, .dx-bar a, .dx-bar button, .dx-tab, #boardSeg button, .dx-actions a');
         for (const el of els) {
           const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[hidden]')) continue;
           const r = el.getBoundingClientRect(); if (!r.width && !r.height) continue;
@@ -350,9 +411,9 @@ function lint(hub, A){
           const btn = document.getElementById('setBtn'); if (btn) btn.click();
           const sp = document.getElementById('shstat-settingspanel'); if (sp) sp.classList.add('is-open');
           const out = [], vw = document.documentElement.getBoundingClientRect();
-          document.querySelectorAll('.set-seg button, .shset-seg button').forEach(b => {
+          document.querySelectorAll('.set-seg button, .shset-seg button, .dx-dlg .seg button').forEach(b => {
             const r = b.getBoundingClientRect(); if (!r.width) return;
-            const box = (b.closest('#shstat-settingspanel') || document.documentElement).getBoundingClientRect();
+            const box = (b.closest('#shstat-settingspanel') || b.closest('.dx-dlgcard') || document.documentElement).getBoundingClientRect();
             if (r.right > Math.min(vw.right, box.right) + 1 || r.left < Math.max(vw.left, box.left) - 1) {
               const seg = b.parentElement; out.push(`Settings: "${b.textContent.trim()}" (${seg.dataset.set || seg.dataset.key || seg.dataset.pref || 'a row'}) runs past the sheet's edge`);
             }

@@ -5,7 +5,13 @@
      streak flame, the XP spark and Home's spot art (spots.mjs: Timmy Time's host in headphones, the notes, the Today
      calendar) (redesign phase 1);
    - widget/hub-art/<hub>.js: one hub's tint, emblem, masthead scene and arcade lobby art (arcade.mjs), loaded by that
-     hub's page only.
+     hub's page only;
+   - widget/hub-art/dash.js (window.SH_DASH_ART): every hub's tint and emblem, for the new dashboard (widget/dash.js);
+   - widget/hub-art/class.js (window.SH_CLASS_ART): the new dashboard's drawn parts, as kits the page draws at its own
+     size: the classroom of the studying-now tile (classroom.mjs), the leaderboard's stage (stage.mjs) and the recap's
+     bar graph and crowd (recap.mjs), with the recap's icons (six trophy drawings) and its climber's hat;
+   - widget/hub-art/outfits.js (window.SH_OUTFITS): the shop's 55 outfits and dress(), from place.mjs, so the dashboard
+     can put one on a Timmy from widget/pet.js. Loaded only when someone on the page wears one.
 
      node tools/figures/site/build.mjs           write them all
      node tools/figures/site/build.mjs --check   fail if any is stale (CI-friendly)
@@ -40,6 +46,10 @@ const { FLAME, XP } = await import("./rewards.mjs");
 const { arcadeArt, ARCADE_VIEWBOX } = await load("./arcade.mjs", { arcadeArt: () => null, ARCADE_VIEWBOX: [0, 0, 320, 170] });
 const { HEADPHONES, NOTES, NOTES_VIEWBOX, TODAY, TODAY_VIEWBOX } = await load("./spots.mjs", { HEADPHONES: "", NOTES: "", NOTES_VIEWBOX: [0, 0, 1, 1], TODAY: "", TODAY_VIEWBOX: [0, 0, 1, 1] });
 const { placeKit } = await load("./place.mjs", { placeKit: null });
+/* the new dashboard's drawn parts (kits, like the place: the page draws them at its own size) */
+const { classroomKit } = await import("./classroom.mjs");
+const { stageKit } = await import("./stage.mjs");
+const { recapKit } = await import("./recap.mjs");
 /* the sets of Timmy's place: sets.mjs lists every piece (the shop's catalog has the same rows), and each set's drawings
    are one pack in packs/<set>.mjs (a function handed the kit's tools). A set with no pack yet isn't drawn; --strict fails on one. */
 const { SEASONS, RANKS } = await import("./sets.mjs");
@@ -227,6 +237,49 @@ for (const h of HUBS) {
   if (!EMBLEMS[h] || !MASTHEADS[h]) continue;
   outs.push([path.join(root, "widget/hub-art/" + h + ".js"), engineHead + "window.SH_HUB_ART_HUB = " +
     JSON.stringify(Object.assign({ hub: h, tint: TINTS[h], emblem: EMBLEMS[h], masthead: MASTHEADS[h] }, arcades[h] ? { games: arcades[h], gamesViewBox: ARCADE_VIEWBOX.join(" ") } : {})) + ";\n"]);
+}
+/* the new dashboard (widget/dash.js, redesign phase 3) shows every hub at once, so it gets every tint and emblem in one
+   file; a hub's masthead still comes from that hub's own file, loaded when its tab is opened */
+outs.push([path.join(root, "widget/hub-art/dash.js"), engineHead + "window.SH_DASH_ART = " +
+  JSON.stringify({ tints: Object.fromEntries(HUBS.filter((h) => EMBLEMS[h]).map((h) => [h, TINTS[h]])), emblems: Object.fromEntries(HUBS.filter((h) => EMBLEMS[h]).map((h) => [h, EMBLEMS[h]])) }) + ";\n"]);
+/* the dashboard's kits: the class's room (studying right now), the leaderboard's stage, the recap's columns and crowd.
+   Loaded after the page is drawn (widget/dash.js). Each is checked here by drawing it at a laptop's and a phone's size. */
+{
+  const room = classroomKit(INK, C, TINTS), stage = stageKit(INK, C), recap = recapKit(INK, C), bad = (s) => typeof s !== "string" || !s || /NaN|undefined|<text|<style| id="/.test(s);
+  for (const o of [{ w: 720, h: 150 }, { w: 330, h: 170 }, { w: 720, h: 150, night: true, open: true }]) {
+    if (bad(room.room(o))) throw new Error("classroom.mjs: the room doesn't draw at " + o.w + " x " + o.h);
+    for (const n of [0, 1, 9, 27, 60]) { const st = room.seats(Object.assign({ n }, o)); if (!st.length || st.some((q) => !(q.x > 0 && q.x < o.w && q.y > 0 && q.y <= o.h && q.s > 0))) throw new Error("classroom.mjs: a desk is off the floor at " + o.w + " x " + o.h + " with " + n); }
+  }
+  if (bad(room.desk("perio", 2)) || bad(room.desk(null, null)) || bad(room.chair())) throw new Error("classroom.mjs: a desk doesn't draw");
+  for (const o of [{ w: 720, h: 300 }, { w: 330, h: 262 }]) if (bad(stage.stage(o)) || bad(stage.confetti(o))) throw new Error("stage.mjs: the stage doesn't draw at " + o.w);
+  for (const p of [1, 2, 3]) if (bad(stage.pedestal(p, 150, [108, 74, 54][p - 1])) ) throw new Error("stage.mjs: block " + p + " doesn't draw");
+  if (bad(stage.crown()) || bad(stage.torch(74))) throw new Error("stage.mjs: the crown or the torch doesn't draw");
+  if (bad(recap.bars({ w: 400, h: 150, days: [3, 5, 0, 9, 28], tint: TINTS.perio }).svg) || bad(recap.crowd({ n: 58, w: 236, tint: TINTS.perio }).svg)) throw new Error("recap.mjs: the columns or the crowd don't draw");
+  /* the recap's icons are trophy drawings that say the same thing (hours: Mock Ace's stopwatch; right: the target; ...) */
+  const recapIcons = {};
+  for (const [k, t] of Object.entries({ hours: "mock90", right: "run-100", prime: "mock-perfect", owls: "owl", regulars: "days-7", tough: "boss" })) {
+    if (!trophies[t] || bad(trophies[t].body)) throw new Error("the recap's " + k + " icon: no trophy drawing " + t);
+    recapIcons[k] = trophies[t].body;
+  }
+  let recapHat = null;
+  if (placeKit) { const q = placeKit(INK, C, PACKS.map((x) => x.pack), SETS).outfitParts("ranger"); if (!q) throw new Error("place.mjs: no ranger outfit for the recap"); recapHat = Object.fromEntries(Object.entries(q).filter(([, v]) => v)); }
+  outs.push([path.join(root, "widget/hub-art/class.js"), "/* Generated by tools/figures/site/build.mjs from classroom.mjs, stage.mjs and recap.mjs in tools/figures/site/ (the new dashboard's drawn\n" +
+    "   parts: the kits themselves, checked in the build). Do not edit: change the drawing and run the build. */\nwindow.SH_CLASS_ART = {\n  room: (" + classroomKit.toString() + ")(" + JSON.stringify(INK) + ", " + JSON.stringify(C) + ", " + JSON.stringify(TINTS) + "),\n" +
+    "  stage: (" + stageKit.toString() + ")(" + JSON.stringify(INK) + ", " + JSON.stringify(C) + "),\n" +
+    "  /* the recap: the kit for the bar graph and the crowd, its facts' icons (trophy drawings, 64 x 64) and the hat on the\n     Timmy who climbs the columns (the shop's ranger hat, put on with dress() as in outfits.js) */\n" +
+    "  recap: (" + recapKit.toString() + ")(" + JSON.stringify(INK) + ", " + JSON.stringify(C) + "),\n" +
+    "  recapIcons: " + JSON.stringify(recapIcons) + ",\n  recapHat: " + JSON.stringify(recapHat) + "\n};\n"]);
+}
+/* Timmy's outfits from the place kit, keyed by the shop's item id, with the function that puts one on a Timmy drawn by
+   widget/pet.js art(). The dashboard loads it only when someone in the classroom or on the stage wears one. */
+if (placeKit) {
+  const K = placeKit(INK, C, PACKS.map((x) => x.pack), SETS), parts = {};
+  for (const o of K.OUTFITS) { const q = K.outfitParts(o.k); if (!o.id || !q) throw new Error("place.mjs: outfit " + o.k + " has no shop id or no drawing"); parts[o.id] = Object.fromEntries(Object.entries(q).filter(([, v]) => v)); }
+  outs.push([path.join(root, "widget/hub-art/outfits.js"), engineHead + "window.SH_OUTFITS = { parts: " + JSON.stringify(parts) + ",\n  /* put outfit `id` on a Timmy drawing from widget/pet.js art() (place.mjs dress()) */\n" +
+    "  dress: function(svg, id){ var o = this.parts[id]; if (!o || !svg) return svg;\n" +
+    "    if (o.back) svg = svg.replace(/(<ellipse cx=\"100\" cy=\"226\"[^>]*\\/>)/, \"$1\" + '<g class=\"shpet-back\">' + o.back + \"</g>\");\n" +
+    "    var add = (o.face ? '<g class=\"shpet-garb\">' + o.face + \"</g>\" : \"\") + (o.top ? '<g class=\"shpet-wobble\"><g class=\"shpet-hat\">' + o.top + \"</g></g>\" : \"\");\n" +
+    "    return svg.replace(/<\\/g><\\/svg>\\s*$/, add + \"</g></svg>\"); } };\n"]);
 }
 if (process.argv.includes("--dry")) {
   console.log("checked, nothing written: Timmy's place (" + placeCount + " drawings and " + routeCount + " walks)" + (onlyPack ? ", with only the " + onlyPack + " set" : ""));

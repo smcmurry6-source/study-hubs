@@ -1,0 +1,593 @@
+/* ============ THE NEW DASHBOARD'S LAYOUT (widget/dash.css, with widget/dash.js) ============
+   Redesign phase 3. Loaded only by next/index.html, after widget/hub.css, which brings the design system: the tokens, the
+   typeface, buttons, segments, panels and the Settings rows. Everything here is the dashboard's own layout, under .dx
+   (the page's root, which is also .hx), so it can never change a hub. Flat surfaces a tone step apart, one radius pair,
+   each hub's tint on its own tab and panel, shadows only on what floats (the menu, dialogs, pop-ups). */
+
+/* a tinted piece carries its hub's four colors inline (dash.js tintVars) and works them out for the theme here */
+.dx .tinted { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
+html.shx[data-theme="dark"] .dx .tinted { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }
+@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .dx .tinted { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); } }
+
+html.sh-dash { scroll-behavior: smooth; scroll-padding-top: 80px; }
+@media (prefers-reduced-motion: reduce) { html.sh-dash { scroll-behavior: auto; } }
+.dx :where(h2) { font-size: var(--fs-section); line-height: 1.25; font-weight: var(--w-head); }
+.dx :where(h3) { font-size: var(--fs-card); line-height: 1.3; font-weight: var(--w-head); }
+.dx .panel > h2 { font-size: var(--fs-section); }
+.dx b { font-weight: var(--w-strong); }
+
+/* ---------- the bar ---------- */
+.dx-bar { container: dxbar / inline-size; position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 10px; height: var(--bar-h); padding: 0 max(16px, calc((100% - 1180px) / 2));
+  background: var(--ground); border-bottom: 1px solid var(--border); }
+.dx-brand { display: flex; align-items: center; gap: 10px; font-size: 18px; line-height: 1; font-weight: var(--w-title); letter-spacing: -0.01em; white-space: nowrap; }
+.dx-mark { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; background: var(--primary); color: var(--on-primary); }
+.dx-live { display: inline-flex; align-items: center; gap: 6px; margin-left: 8px; font-size: var(--fs-label); color: var(--muted); white-space: nowrap; }
+.dx-live b { color: var(--text); }
+.dx-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--right); flex: none; }
+.dx-meter, .dx-rank { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 12px; border-radius: var(--r-pill); font-size: var(--fs-label);
+  font-weight: var(--w-strong); text-decoration: none; white-space: nowrap; transition: background var(--t-hover) var(--ease-out); }
+.dx-seen { display: contents; }   /* what the eye gets; a screen reader gets the .sr line beside it */
+.dx-meter:hover, .dx-rank:hover { background: var(--panel); }
+.dx-rank { background: var(--panel); padding-left: 6px; }
+.dx-rank:hover { background: var(--active); }
+.dx-rank .num { color: var(--gold-ink); }
+.dx-ib { position: relative; display: inline-grid; place-items: center; width: 40px; height: 40px; flex: none; border: 0; border-radius: var(--r-pill); background: transparent;
+  color: var(--text); transition: background var(--t-hover) var(--ease-out), transform var(--t-press) var(--ease-out); }
+.dx-ib:hover { background: var(--panel); }
+.dx-ib:active { transform: scale(.94); }
+.dx-menuwrap { position: relative; }
+.dx-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: min(300px, calc(100vw - 24px)); padding: 6px; border-radius: var(--r-panel);
+  background: var(--row); box-shadow: var(--float-shadow); }
+.dx-menu a, .dx-menu button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px 12px; border: 0; border-radius: var(--r-row);
+  background: transparent; text-align: left; text-decoration: none; }
+.dx-menu a:hover, .dx-menu button:hover { background: var(--panel); }
+.dx-menu .ic { color: var(--muted); }
+.dx-menu b { display: block; font-size: var(--fs-label); }
+.dx-menu small { display: block; font-size: var(--fs-meta); color: var(--muted); }
+
+/* a narrow phone, or the largest text size (Settings zooms the page, so this goes by the bar's own width, not the screen's):
+   the bar drops the count of people studying (each hub shows its own), then the site's name, then the rank */
+@container dxbar (max-width: 640px) {
+  .dx-bar .dx-fold { display: none; }
+  .dx-brand { font-size: 16px; gap: 8px; }
+  .dx-mark { width: 32px; height: 32px; border-radius: 10px; }
+  .dx-live { margin-left: 4px; }
+  .dx-meter { padding: 0 6px; }
+  .dx-rank { padding: 0 6px; background: transparent; }
+  .dx-rank b { display: none; }
+}
+@container dxbar (max-width: 420px) { .dx-live { display: none; } }
+@container dxbar (max-width: 345px) { .dx-word { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } }
+@container dxbar (max-width: 300px) { .dx-rank { display: none; } .dx-ib { width: 36px; } }
+
+/* ---------- the page ---------- */
+.dx-page { width: min(1180px, 100% - 2 * var(--pad)); margin: 0 auto; padding: 24px 0 72px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+.dx-section { display: grid; gap: 12px; min-width: 0; }
+.dx-section > .note { margin-top: -8px; }
+
+/* ---------- studying right now: the live count and a chip for each hub someone is in ---------- */
+.dx-now { --now-bg: #3b2e3a; --now-ink: #ffffff; --now-soft: #dcd2d9; --now-chip: rgba(255, 255, 255, .12); --now-live: #6fe0a8;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; padding: 16px 20px; border-radius: var(--r-row);
+  background: var(--now-bg); color: var(--now-ink); }
+html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
+@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .dx-now { --now-bg: #2d2a2d; } }
+.dx-now-num { display: flex; align-items: center; gap: 16px; }
+.dx-now-num b { font-size: 56px; line-height: 1; font-weight: var(--w-title); letter-spacing: -0.02em; }
+.dx-now-num span { max-width: 9ch; font-size: 18px; line-height: 1.2; font-weight: var(--w-strong); color: var(--now-soft); }
+.dx-pulse { position: relative; flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--now-soft); }
+.dx-now.is-live .dx-pulse { background: var(--now-live); }
+.dx-now.is-live .dx-pulse::after { content: ""; position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--now-live); animation: dx-ping 1.8s var(--ease-out) infinite; }
+@keyframes dx-ping { from { transform: scale(1); opacity: .9; } to { transform: scale(2.8); opacity: 0; } }
+.dx-now-hubs { display: flex; flex-wrap: wrap; gap: 8px; }
+.dx-now-hubs li { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 14px 4px 4px; border-radius: var(--r-pill); background: var(--now-chip); font-size: var(--fs-label); }
+.dx-now-hubs li.is-none { min-height: 0; padding: 0; background: none; color: var(--now-soft); }
+.dx-now-hubs .dx-emb { width: 32px; height: 32px; }
+@media (prefers-reduced-motion: reduce) { .dx-now.is-live .dx-pulse::after { animation: none; opacity: 0; } }
+/* the tile as the class's room (widget/dash.js syncRoom, drawn once its art and Timmy have loaded): the drawing fills the
+   tile and the count and the hubs sit on its chalkboard, where the script puts them */
+.dx-now-board { display: contents; }
+.dx-room { display: none; }
+.dx-now.has-room { position: relative; display: block; padding: 0; overflow: hidden; background: none; }
+.dx-now.has-room .dx-room { display: block; }
+.dx-room svg { display: block; width: 100%; height: auto; }
+.dx-now.has-room .dx-now-board { position: absolute; display: grid; grid-template-columns: auto minmax(0, 1fr); align-content: center; align-items: center; gap: 3px 8px;
+  padding: 2px 6px 2px 10px; overflow: hidden; color: #fff; }
+.dx-now.has-room .dx-pulse { display: none; }
+.dx-now.has-room .dx-now-num { display: contents; }
+.dx-now.has-room .dx-now-num b { grid-row: span 2; font-size: 32px; }
+.dx-now.has-room .dx-now-num span { align-self: end; max-width: none; font-size: 12px; line-height: 1.1; font-weight: var(--w-head); color: #fff; white-space: nowrap; }
+.dx-now.has-room .dx-now-hubs { flex-wrap: nowrap; align-self: start; gap: 4px; min-width: 0; }
+.dx-now.has-room .dx-now-hubs li { flex: none; gap: 3px; min-height: 0; padding: 0 6px 0 2px; background: #fff; color: #3b2e3a; font-size: 12px; line-height: 16px; font-weight: var(--w-head); }
+.dx-now.has-room .dx-now-hubs .dx-emb { width: 14px; height: 14px; }
+.dx-now.has-room .dx-in, .dx-now.has-room .dx-now-hubs li.is-none { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.dx-now.has-room .dx-now-hubs li:nth-child(n+4) { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.dx-now.is-tight .dx-now-board { gap: 2px 6px; padding: 1px 6px 1px 8px; }
+.dx-now.is-tight .dx-now-num b { grid-row: auto; font-size: 26px; }
+.dx-now.is-tight .dx-now-num span { align-self: center; max-width: 9ch; font-size: 11px; white-space: normal; }
+.dx-now.is-tight .dx-now-hubs { grid-column: 1 / -1; }
+.dx-hall { position: absolute; right: 6px; z-index: 1; margin: 0; padding: 0 8px; border: 2px solid #3b2e3a; border-radius: var(--r-pill); background: #fff; color: #3b2e3a; font-size: 12px; line-height: 18px; font-weight: var(--w-head); white-space: nowrap; }
+.dx-hall[hidden] { display: none; }
+/* "You", a plate on the front of your own Timmy's desk (paintMe): only your own screen has it */
+.dx-me { position: absolute; z-index: 1; transform: translate(-50%, -50%); padding: 0 6px; border: 1.5px solid #3b2e3a; border-radius: 4px; background: #ffe08a; color: #3b2e3a;
+  font-size: 11px; line-height: 13px; font-weight: var(--w-head); white-space: nowrap; pointer-events: none; }
+.dx-now:not(.has-room) .dx-mes { display: none; }
+.rm-dooropen { opacity: 0; transition: opacity 140ms; }
+.rm-tim { transform-box: fill-box; transform-origin: 50% 100%; }
+.rm-bob { animation: rm-bob 3.2s ease-in-out infinite; }
+@keyframes rm-bob { 50% { transform: translateY(-1.2px); } }
+.dx-now.is-still .rm-bob { animation: none; }
+@media (prefers-reduced-motion: reduce) { .rm-bob { animation: none; } .rm-dooropen { transition: none; } }
+@keyframes dx-grow { from { transform: scaleY(0); } }
+
+/* ---------- the hubs: tabs, then the open hub ---------- */
+.dx-hubs { container: dxhubs / inline-size; display: grid; gap: 12px; min-width: 0; }
+.dx-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.dx-tab { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 6px 18px 6px 8px; border: 0; border-radius: var(--r-pill); background: var(--panel);
+  text-align: left; transition: background var(--t-hover) var(--ease-out), transform var(--t-press) var(--ease-out); }
+.dx-tab:hover { background: var(--active); }
+.dx-tab:active { transform: scale(.98); }
+.dx-tab[aria-selected="true"] { background: var(--hub); color: #fff; }
+.dx-emb { width: 44px; height: 44px; flex: none; }
+.dx-tab b { display: block; font-size: var(--fs-body); line-height: 1.2; font-weight: var(--w-head); white-space: nowrap; }
+.dx-tab small { display: block; font-size: var(--fs-meta); line-height: 1.3; color: var(--muted); white-space: nowrap; }
+.dx-tab[aria-selected="true"] small { color: #fff; }
+
+.dx-hub { display: grid; gap: var(--gap); min-width: 0; }
+/* the open hub's stage: its drawn scene across the top, the exam under it, all on the hub's own color */
+.dx-stage { display: grid; grid-template-columns: minmax(0, 1fr); border-radius: var(--r-panel); overflow: hidden; background: var(--hub-soft); }
+.dx-scene { display: block; width: 100%; padding: 0; border: 0; background: var(--hub-light); cursor: pointer; }
+.dx-scene-in { display: block; width: 100%; aspect-ratio: 3 / 1; }
+/* a short laptop screen: trim the sky so Start studying stays on the first screen */
+@media (max-height: 800px) and (min-width: 1001px) { .dx-scene-in { max-height: 300px; } }
+.dx-mast { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 100%; animation: dx-scene-in 500ms var(--ease-out) both; }
+@keyframes dx-scene-in { from { opacity: 0; transform: scale(1.03); } }
+.dx-scene.is-active .dx-mast { animation: dx-nudge 500ms var(--ease-out); }
+@keyframes dx-nudge { 40% { transform: scale(1.025); } }
+.dx-stagebody { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 40px; align-items: center; padding: 20px 24px 24px; }
+.dx-exam { display: grid; gap: 8px; min-width: 0; }
+.dx-when { font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--hub-text); }
+.dx .dx-title { font-size: 32px; line-height: 1.12; font-weight: var(--w-title); letter-spacing: -0.015em; text-wrap: balance; }
+.dx-countrow { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 32px; margin-top: 4px; }
+.dx-count { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; }
+.dx-count b { min-width: 76px; padding: 4px 16px; border-radius: var(--r-row); background: var(--hub); color: #fff; font-size: 52px; line-height: 1.15; font-weight: var(--w-title); text-align: center; }
+.dx-count span { font-size: var(--fs-body); font-weight: var(--w-strong); }
+.dx-count-none span { font-size: var(--fs-label); font-weight: var(--w-body); color: var(--muted); }
+/* the days left as beads on a line: today, each day between, then the exam (the hub's emblem) */
+.dx-track { flex: 1 1 200px; max-width: 440px; min-width: 0; display: grid; gap: 2px; }
+.dx-track ol { position: relative; display: flex; align-items: center; justify-content: space-between; height: 36px; }
+.dx-track ol::before { content: ""; position: absolute; left: 8px; right: 18px; top: 50%; height: 3px; margin-top: -1.5px; border-radius: 2px; background: var(--hub-mid); opacity: .45; }
+.dx-track li { position: relative; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--hub-mid); }
+.dx-track li.is-today { width: 16px; height: 16px; background: var(--hub); outline: 4px solid color-mix(in srgb, var(--hub) 24%, transparent); }
+.dx-track li.is-exam { width: 36px; height: 36px; background: none; }
+.dx-track .dx-emb { width: 36px; height: 36px; }
+.dx-track p { display: flex; justify-content: space-between; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--hub-text); }
+.dx-livehub { display: flex; align-items: center; gap: 6px; font-size: var(--fs-label); color: var(--muted); }
+.dx-livehub:empty { display: none; }
+.dx-livehub b { color: var(--text); }
+/* what to do next: your progress ring, Start studying in the hub's color, the Daily drill */
+.dx-go { display: grid; gap: 14px; min-width: 280px; }
+.dx-ring { display: flex; align-items: center; gap: 14px; }
+.dx-ring-dial { position: relative; flex: none; width: 84px; height: 84px; }
+.dx-ring svg { display: block; width: 100%; height: 100%; transform: rotate(-90deg); }
+.dx-ring circle { fill: none; stroke-width: 9; }
+.dx-ring .trk { stroke: var(--hub-mid); opacity: .3; }
+.dx-ring .arc { stroke: var(--hub); stroke-linecap: round; transition: stroke-dashoffset 900ms var(--ease-expo); }
+.dx-ring-in { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; line-height: 1.1; }
+.dx-ring-in b { font-size: 20px; font-weight: var(--w-title); }
+.dx-ring-in small { font-size: 11px; font-weight: var(--w-strong); color: var(--muted); }
+.dx-ring-cap { font-size: var(--fs-label); color: var(--muted); }
+.dx-ring-cap b { color: var(--text); }
+.dx-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.dx .dx-start { min-height: 52px; padding: 0 22px 0 28px; font-size: 17px; }
+.dx .dx-stage .dx-start { background: var(--hub); color: #fff; }
+.dx .dx-stage .dx-start:hover { filter: brightness(1.1); }
+.dx .dx-drill { min-height: 52px; }
+.dx-drill .ic { color: var(--hub-text); }
+.dx-stage .dx-luck { margin: 0 24px 24px; }
+@media (prefers-reduced-motion: reduce) { .dx-mast { animation: none; } .dx-ring .arc { transition: none; } }
+/* the countdown's flip (dash.js heroFlap) */
+.dx .flap { position: relative; display: inline-block; perspective: 300px; }
+.dx .flap-l { display: block; backface-visibility: hidden; }
+.dx .flap-top { visibility: hidden; }
+.dx .flap-bot, .dx .flap-fold, .dx .flap-unfold { position: absolute; inset: 0; }
+.dx .flap-bot { opacity: 0; }
+.dx .flap-fold { transform-origin: 50% 100%; }
+.dx .flap-unfold { transform-origin: 50% 0; opacity: 0; }
+/* the number sits on a tile: the folding layers wear the same tile, so each flip turns the whole card */
+.dx-count .flap-bot, .dx-count .flap-fold, .dx-count .flap-unfold { padding: inherit; border-radius: inherit; background: var(--hub); text-align: center; }
+/* exam-day luck */
+/* the button drops under the words when the two don't fit side by side (a phone at the largest text, BUG-075) */
+.dx-luck { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 6px; padding: 12px 14px; border-radius: var(--r-row); background: var(--mint); color: var(--mint-ink); }
+.dx-luck:empty { display: none; }
+.dx-luck > .ic { flex: none; }
+.dx-luck-txt { flex: 1 1 9em; min-width: 0; font-size: var(--fs-label); color: var(--text); }
+.dx-luck-txt small { display: block; font-size: var(--fs-meta); color: var(--muted); }
+.dx-luck-burst { position: absolute; right: 48px; top: 14px; pointer-events: none; animation: dx-luck 1.1s var(--ease-out) forwards; }
+@keyframes dx-luck { to { transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); opacity: 0; } }
+
+.dx-hubrow { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); }
+.dx-card { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: var(--panel-pad); border-radius: var(--r-panel); background: var(--panel); }
+.dx-pod { grid-column: span 4; order: 2; }
+.dx-about { grid-column: span 8; }
+.dx-hubrow:not(:has(.dx-pod)) .dx-about { grid-column: 1 / -1; }
+.dx-hubrow:not(:has(.dx-pod)) .dx-desc { max-width: none; }
+.dx-hubrow:not(:has(.dx-pod)) .dx-desc.clamp { -webkit-line-clamp: 2; }
+.dx-bar2 { height: 10px; border-radius: var(--r-pill); background: var(--track); overflow: hidden; }
+.dx-bar2 i { display: block; width: 0; height: 100%; border-radius: var(--r-pill); background: var(--hub-text); transition: width 700ms var(--ease-expo); }
+@media (prefers-reduced-motion: reduce) { .dx-bar2 i { transition: none; } }
+.dx .dx-pod { position: relative; overflow: hidden; flex-direction: row; background: var(--hub); color: #fff; text-decoration: none; transition: filter var(--t-hover); }
+.dx .dx-pod:hover { filter: brightness(1.08); }
+.dx-pod:focus-visible { outline-color: var(--text); }
+.dx-pod-txt { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-right: 64px; }
+.dx-pod-txt b { font-size: var(--fs-card); font-weight: var(--w-head); color: #fff; }
+.dx-pod-txt small { font-size: var(--fs-meta); color: rgba(255, 255, 255, .88); }
+.dx-pod-go { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; height: 32px; margin-top: auto; padding: 0 14px 0 10px; border-radius: var(--r-pill);
+  background: #fff; color: var(--hub); font-size: var(--fs-meta); font-weight: var(--w-strong); }
+.dx-pod-art { position: absolute; right: -6px; bottom: -8px; width: 92px; height: auto; }
+.dx-exams { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: var(--fs-label); color: var(--muted); }
+.dx-exams b { color: var(--text); }
+.dx-desc { max-width: 78ch; font-size: var(--fs-label); color: var(--muted); }
+.dx-desc.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.dx .dx-more { align-self: flex-start; min-height: 32px; margin: -2px 0 0 -10px; }
+.dx-about .updated { margin-top: auto; }
+.dx-about .updated:empty { display: none; }
+.dx-checks { display: flex; flex-wrap: wrap; gap: 8px; }
+.dx .dx-checkin { background: var(--peach); color: var(--peach-ink); border-color: transparent; white-space: normal; text-align: left; padding: 8px 18px; }
+.dx .dx-checkin:hover { background: var(--peach); filter: brightness(.97); }
+.dx-empty { display: grid; gap: 6px; padding: 32px; }
+.dx-empty p { color: var(--muted); }
+
+/* ---------- "you" and the class, side by side ---------- */
+/* the two cards end where their content ends: the leaderboard's stage makes the class card the taller one, and tiles
+   stretched to match it were mostly empty */
+.dx-cols { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: start; }
+.dx-you { grid-column: span 5; display: flex; flex-direction: column; gap: 14px; }
+.dx-class { grid-column: span 7; display: grid; gap: 12px; align-content: start; }
+/* before Timmy is adopted he stands on this line (widget/pet.js places him over #petPerch); the room above it is his */
+.dx-porch { display: none; padding: 116px 12px 12px; border-radius: var(--r-row); background: var(--row); text-align: center; }
+body:has(> .shpet-perch) .dx-porch { display: block; }
+.dx-youhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.dx-name { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: var(--fs-body); }
+.dx-name b { overflow-wrap: anywhere; }
+.dx .dx-rename { min-height: 32px; color: var(--muted); }
+.dx-rankcard { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; align-items: center; padding: 14px; border-radius: var(--r-row); background: var(--row); }
+.dx-rankcard:empty { display: none; }
+.dx-rankart svg { width: 84px; height: 84px; }
+.dx-rankbody { display: grid; gap: 6px; min-width: 0; }
+.dx-rankname { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 2px 12px; }
+.dx-rankname b { font-size: 18px; font-weight: var(--w-head); }
+.dx-rankname span { font-size: var(--fs-meta); color: var(--muted); }
+.dx-rankbar i { background: var(--gold); }
+.dx-medals { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding-top: 8px; }
+.dx-stats { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.dx-stats:empty { display: none; }
+.dx-stat { display: flex; align-items: center; align-content: center; gap: 10px; padding: 12px 14px; border-radius: var(--r-row); background: var(--row); }
+.dx-stat.s-flame { flex-wrap: wrap; background: var(--sun); }
+.dx-stat.s-week { background: var(--mint); }
+.dx-stat.s-week small { color: var(--mint-ink); }
+/* the last seven days, today last: a filled dot for each day studied */
+.dx-week { display: flex; gap: 4px; margin-left: auto; }
+.dx-week i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: color-mix(in srgb, var(--sun-ink) 14%, transparent); color: var(--sun-ink);
+  font-style: normal; font-size: 11px; font-weight: var(--w-head); }
+.dx-week i.on { background: var(--flame); color: #3d2200; }
+.dx-week i.today { outline: 2px solid var(--sun-ink); outline-offset: 1px; }
+.dx-stat:only-child { grid-column: 1 / -1; }
+.dx-stat b { font-size: 20px; font-weight: var(--w-title); }
+.dx-stat small { display: block; font-size: var(--fs-meta); color: var(--muted); }
+.dx-stat.s-flame small { color: var(--sun-ink); }
+.dx .dx-stat .flame { width: 34px; height: 42px; flex: none; }
+.dx .dx-meter .flame { width: 20px; height: 24px; }
+
+/* Timmy's house in the "you" card (widget/pet.js draws it into #petHome; Timmy's place takes this spot in phase 4) */
+html.shx .dx .shpet-house { grid-template-columns: minmax(0, 1fr); gap: 10px; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+html.shx .dx .shpet-housesvg { border-radius: var(--r-row); max-height: none; }
+html.shx .dx .shpet-info { padding: 0 2px; }
+html.shx .dx .shpet-title b { font-family: var(--font); font-size: 18px; font-weight: var(--w-head); }
+html.shx .dx .shpet-hpnum, html.shx .dx .shpet-status { color: var(--muted); font-size: var(--fs-meta); }
+html.shx .dx .shpet-house .shpet-hp { height: 10px; border-radius: var(--r-pill); background: var(--track); border: 0; overflow: hidden; }
+html.shx .dx .shpet-ghost { min-height: 36px; padding: 0 14px; border: 1px solid var(--control); border-radius: var(--r-pill); background: var(--row); color: var(--text);
+  font: inherit; font-size: var(--fs-meta); font-weight: var(--w-strong); }
+html.shx .dx .shpet-ghost:hover { background: var(--active); }
+
+/* the small handpiece beside a name (widget/ranks.js mini): the medallion with its level, I to III, on its corner */
+.dx .sh-rank-mini { position: relative; display: inline-flex; width: 26px; height: 26px; flex: none; margin-right: 4px; }
+.dx .sh-rank-mini svg { width: 100%; height: 100%; }
+.dx .sh-rank-lv { position: absolute; right: -6px; bottom: -3px; display: grid; place-items: center; min-width: 15px; height: 15px; padding: 0 3px; border-radius: 6px;
+  background: var(--primary); color: var(--on-primary); font-size: 11px; line-height: 1; font-weight: var(--w-head); }
+
+/* ---------- the class board ---------- */
+.dx .dx-classhead h3 { font-size: var(--fs-card); }
+.dx-classhead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.dx-class > .note[hidden] { display: none; }
+/* the leaderboard's arena (Sam, 2026-11-11: "more epic"): a drawn stage for the top three, their names under it, then the
+   rest on dark rows with a bar against first place. Dark in both themes, like a theater. */
+.dx-arena { --ar-bg: #2a2233; --ar-row: #372c44; --ar-soft: #cfc3d6; --ar-gold: #ffe08a; container: dxarena / inline-size;
+  display: grid; overflow: hidden; border-radius: var(--r-panel); background: var(--ar-bg); color: #fff; }
+.dx-set { display: block; width: 100%; height: auto; }
+.dx-podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: start; padding: 12px 12px 4px; }
+.dx-podium li { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; }
+.dx-podium .p1 { order: 2; }
+.dx-podium .p2 { order: 1; }
+.dx-podium .p3 { order: 3; }
+.dx-win-who { flex: none; display: grid; place-items: center; }
+.dx-win-who svg { width: 40px; height: 40px; }
+.dx .dx-win-who .flame { width: 30px; height: 36px; }
+.dx-win-txt { display: grid; gap: 1px; min-width: 0; }
+.dx-podium .nm { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; min-width: 0; font-weight: var(--w-head); line-height: 1.2; }
+.dx-podium .p1 .nm { font-size: 18px; color: var(--ar-gold); }
+.dx-podium .nm-t { min-width: 0; overflow-wrap: anywhere; }
+.dx-win-sub { font-size: var(--fs-meta); color: var(--ar-soft); }
+.dx-win-sub .mid::after { content: " \00b7  "; white-space: pre; }
+.dx-win-sub .val { font-weight: var(--w-head); color: var(--ar-gold); white-space: nowrap; }
+.dx-win-sub .val small { margin-left: 3px; font-size: inherit; }
+.dx-podium li.me .nm-t { text-decoration: underline; text-decoration-color: var(--ar-gold); text-decoration-thickness: 3px; text-underline-offset: 3px; }
+/* the drawn blocks carry the places; without the drawing (its art didn't load) each name gets its number */
+.dx-step { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ar-gold); color: #3b2e3a; font-weight: var(--w-title); }
+.dx-arena.has-set .dx-step { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.dx-board { display: grid; gap: 5px; padding: 8px 12px 12px; }
+.dx-board li { display: grid; grid-template-columns: 26px minmax(0, 1.3fr) auto minmax(48px, 1fr) auto; align-items: center; gap: 10px; min-height: 48px; padding: 6px 14px 6px 10px; border-radius: var(--r-row); background: var(--ar-row); }
+.dx-board li.me { box-shadow: inset 0 0 0 2px var(--ar-gold); }
+.dx-board .rk { text-align: center; font-weight: var(--w-title); color: var(--ar-gold); }
+.dx-board .nm { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: var(--w-strong); }
+.dx-board .nm-t { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dx-board .lvl { font-size: var(--fs-meta); color: var(--ar-soft); white-space: nowrap; }
+.dx-board .dx-vs { height: 6px; overflow: hidden; border-radius: 3px; background: #4a3d58; }
+.dx-board .dx-vs i { display: block; height: 100%; border-radius: 3px; background: #f2c94c; transform-origin: 0 50%; animation: dx-fill 900ms var(--ease-expo) both; }
+.dx-board .val { min-width: 76px; text-align: right; font-weight: var(--w-head); white-space: nowrap; }
+.dx-board .val small { margin-left: 4px; font-size: var(--fs-meta); font-weight: var(--w-body); color: var(--ar-soft); }
+/* by the arena's own width, so the text-size setting counts (it zooms the page, which a media query doesn't see) */
+/* the names stack under their blocks unless there's room for a medallion beside each */
+@container dxarena (max-width: 700px) {
+  .dx-podium li { flex-direction: column; gap: 2px; text-align: center; }
+  .dx-win-txt { justify-items: center; }
+  .dx-win-sub .mid { display: block; }
+  .dx-win-sub .mid::after { content: none; }
+  .dx-podium .nm { justify-content: center; }
+}
+@container dxarena (max-width: 520px) {
+  .dx-podium { gap: 4px; padding: 10px 6px 2px; }
+  .dx-podium .nm { font-size: var(--fs-label); }
+  .dx-podium .p1 .nm { font-size: var(--fs-body); }
+  .dx-board li { grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; padding: 6px 12px 6px 8px; }
+  .dx-board .lvl, .dx-board .dx-vs { display: none; }
+  .dx-board .val { min-width: 0; }
+}
+/* the largest text on a small phone: one name to a line, its number under it */
+@container dxarena (max-width: 300px) {
+  .dx-podium { grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 10px 12px 4px; }
+  .dx-podium li { flex-direction: row; justify-content: flex-start; gap: 8px; text-align: left; }
+  .dx-podium .p1 { order: 1; }
+  .dx-podium .p2 { order: 2; }
+  .dx-win-txt { justify-items: start; }
+  .dx-podium .nm { justify-content: flex-start; }
+  .dx-board li { grid-template-columns: 22px minmax(0, 1fr); gap: 2px 8px; }
+  .dx-board .nm-t { overflow: visible; white-space: normal; overflow-wrap: anywhere; }
+  .dx-board .val { grid-column: 2; text-align: left; }
+}
+/* the stage in motion: confetti drifts down, the stars twinkle, the lights breathe, the crown bobs, the winners hop once */
+@keyframes st-fall { 0% { transform: translateY(-36px); opacity: 0; } 12%, 85% { opacity: 1; } 100% { transform: translateY(70px); opacity: 0; } }
+@keyframes st-twinkle { 50% { opacity: .25; } }
+@keyframes st-lights { 50% { opacity: .55; } }
+@keyframes st-bob { 50% { transform: translateY(-4px); } }
+@keyframes st-hop { 0%, 100% { transform: none; } 40% { transform: translateY(-10px); } }
+@keyframes dx-fill { from { transform: scaleX(0); } }
+.dx-arena .st-conf { animation: st-fall 7s linear infinite; }
+.dx-arena .st-twinkle { animation: st-twinkle 2.6s ease-in-out infinite; }
+.dx-arena .st-lights { animation: st-lights 4s ease-in-out infinite; }
+.dx-arena .st-crown { animation: st-bob 2.4s ease-in-out infinite; }
+.dx-arena .st-win { animation: st-hop 700ms var(--ease-out) 600ms 1 both; }
+.dx-arena .st-win2 { animation-delay: 350ms; }
+.dx-arena .st-win3 { animation-delay: 100ms; }
+.dx-arena.is-still .st-conf, .dx-arena.is-still .st-twinkle, .dx-arena.is-still .st-lights, .dx-arena.is-still .st-crown, .dx-arena.is-still .st-win, .dx-arena.is-still .dx-vs i { animation: none; }
+@media (prefers-reduced-motion: reduce) { .dx-arena .st-conf, .dx-arena .st-twinkle, .dx-arena .st-lights, .dx-arena .st-crown, .dx-arena .st-win, .dx-board .dx-vs i { animation: none; } }
+.dx-ladder summary { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); cursor: pointer; list-style: none; }
+.dx-ladder summary::-webkit-details-marker { display: none; }
+.dx-ladder[open] summary .ic { transform: rotate(-90deg); }
+.dx-rungs { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; padding-top: 6px; }
+.dx-rung { display: grid; justify-items: center; gap: 2px; padding: 10px 4px; border-radius: var(--r-row); background: var(--row); text-align: center; }
+.dx-rung.me { background: var(--sun); }
+.dx-rung svg { width: 48px; height: 48px; }
+.dx-rung b { font-size: var(--fs-meta); }
+.dx-rung .note { font-size: 12px; }
+.dx-rung.me .note { color: var(--sun-ink); }
+.dx-line { display: flex; align-items: flex-start; gap: 8px; font-size: var(--fs-label); color: var(--muted); }
+.dx-line[hidden] { display: none; }
+.dx-line .ic { flex: none; margin-top: 1px; }
+.dx-line b { color: var(--text); }
+
+/* ---------- past hubs: each finished exam's recap as a live infographic, and the hubs that just closed ---------- */
+/* the recap is a card of its own, beside the hubs that just closed where there's room */
+.dx-past { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap); align-items: start; }
+.dx-past > .rc[hidden] + .dx-archived, .dx-past > .dx-archived:first-child { grid-column: 1 / -1; }
+.dx-past:has(> .dx-archived:empty) > .rc { grid-column: 1 / -1; max-width: 820px; }
+.rc { display: grid; gap: 12px; min-width: 0; }
+.rc[hidden] { display: none; }
+.rc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.rc-chips[hidden] { display: none; }
+.rc-chip { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 4px 18px 4px 6px; border: 0; border-radius: var(--r-pill); background: var(--panel); text-align: left;
+  transition: background var(--t-hover) var(--ease-out), transform var(--t-press) var(--ease-out); }
+.rc-chip:hover { background: var(--active); }
+.rc-chip:active { transform: scale(.98); }
+.rc-chip[aria-selected="true"] { background: var(--hub); color: #fff; }
+.rc-chip .dx-emb { width: 40px; height: 40px; }
+.rc-chip b { display: block; font-size: var(--fs-label); line-height: 1.2; font-weight: var(--w-head); }
+.rc-chip small { display: block; font-size: 12px; color: var(--muted); }
+.rc-chip[aria-selected="true"] small { color: #fff; }
+/* the recap (Sam, 2026-11-11: a real bar graph, in a smaller card): the hours, the class as a crowd of teeth, hours per
+   day as drawn columns (widget/hub-art/class.js, tools/figures/site/recap.mjs), the facts as chips. Laid out by the
+   card's own width, so the text-size setting counts. */
+.rc-body { container: rc / inline-size; display: grid; gap: 10px; min-width: 0; padding: 16px; border-radius: var(--r-panel); background: var(--hub-soft); }
+.rc-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.rc-head > div { flex: 1 1 180px; min-width: 0; }
+.rc-head .dx-emb { width: 44px; height: 44px; }
+.dx .rc-head h3 { font-size: 20px; line-height: 1.15; font-weight: var(--w-title); letter-spacing: -0.01em; }
+.rc-ic { flex: none; width: 34px; height: 34px; }
+.rc-main { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); grid-template-rows: auto minmax(0, 1fr); gap: 10px; }
+.rc-big { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 10px 16px; border-radius: var(--r-row); background: var(--hub); color: #fff; }
+.rc-big .rc-ic { width: 48px; height: 48px; }
+.rc-big b { display: block; font-size: 40px; line-height: 1; font-weight: var(--w-title); letter-spacing: -0.02em; }
+.rc-big span span { font-size: var(--fs-label); font-weight: var(--w-head); }
+.rc-crowd { display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: center; gap: 2px; min-width: 0; padding: 8px 12px; border-radius: var(--r-row); background: var(--row); font-size: var(--fs-label); font-weight: var(--w-head); }
+.rc-crowd-art { width: 100%; }
+.rc-crowd-art svg { display: block; margin: 0 auto; }
+.rc-crowd b { font-size: 18px; font-weight: var(--w-title); color: var(--hub-text); }
+.rc-chart { grid-column: 2; grid-row: 1 / span 2; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: 2px; min-width: 0; padding: 10px 12px 8px; border-radius: var(--r-row); background: var(--row); }
+.dx .rc-chart h4 { font-size: var(--fs-label); font-weight: var(--w-head); }
+.rc-plot { position: relative; min-height: 132px; }
+.rc-plot svg { display: block; }
+.rc-peak { position: absolute; padding: 0 7px; border: 2px solid #3b2e3a; border-radius: var(--r-pill); background: #fff; color: #3b2e3a; font-size: 12px; line-height: 18px; font-weight: var(--w-title); white-space: nowrap; }
+.rc-x { display: flex; justify-content: space-between; font-size: 12px; font-weight: var(--w-strong); color: var(--muted); }
+.rc-facts { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.rc-facts li { display: flex; align-items: center; gap: 7px; min-width: 0; padding: 8px; border-radius: var(--r-row); background: var(--row); }
+.rc-facts .rc-ic { width: 28px; height: 28px; }
+.rc-facts p { min-width: 0; font-size: 12px; line-height: 1.25; font-weight: var(--w-head); }
+.rc-facts b { font-size: 15px; font-weight: var(--w-title); color: var(--hub-text); white-space: nowrap; }
+.rc-facts small { display: block; font-size: 12px; font-weight: var(--w-body); color: var(--muted); }
+.rc-tough { display: flex; align-items: center; gap: 12px; padding: 8px 14px; border-radius: var(--r-row); background: #3b2e3a; color: #fff; }
+.rc-tough > div { flex: 1 1 auto; min-width: 0; }
+.dx .rc-tough h4 { font-size: 12px; font-weight: var(--w-title); letter-spacing: .06em; text-transform: uppercase; color: #ffe08a; }
+.rc-tough-q { font-size: var(--fs-label); font-weight: var(--w-head); }
+.rc-tough-a { font-size: var(--fs-meta); color: #dcd2d9; }
+.rc-tough-n { flex: none; font-weight: var(--w-title); white-space: nowrap; color: #ffe08a; }
+/* drawn in ink, so in the dark theme the graph and the crowd stay on paper, the way the hubs' scenes do */
+html.shx[data-theme="dark"] .rc-chart, html.shx[data-theme="dark"] .rc-crowd { background: var(--hub-light); color: #3b2e3a; }
+html.shx[data-theme="dark"] .rc-chart .rc-x { color: #5d4d5a; }
+html.shx[data-theme="dark"] .rc-crowd b { color: var(--hub); }
+html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
+@media (prefers-color-scheme: dark) {
+  html.shx:not([data-theme="light"]) .rc-chart, html.shx:not([data-theme="light"]) .rc-crowd { background: var(--hub-light); color: #3b2e3a; }
+  html.shx:not([data-theme="light"]) .rc-chart .rc-x { color: #5d4d5a; }
+  html.shx:not([data-theme="light"]) .rc-crowd b { color: var(--hub); }
+  html.shx:not([data-theme="light"]) .dx .rc-chart h4 { color: #3b2e3a; }
+}
+.rk-bar { transform-box: fill-box; transform-origin: 50% 100%; }
+.rc-body.is-in:not(.is-redraw) .rk-bar { animation: rk-grow 700ms var(--ease-expo) both; }
+.rc-body.is-in:not(.is-redraw) .rk-face, .rc-body.is-in:not(.is-redraw) .rk-tim, .rc-body.is-in:not(.is-redraw) .rc-peak { animation: rk-in 500ms ease both; }
+.rc-body.is-in:not(.is-redraw) .rk-tim, .rc-body.is-in:not(.is-redraw) .rc-peak { animation-delay: 900ms; }
+@keyframes rk-grow { from { transform: scaleY(0); } }
+@keyframes rk-in { from { opacity: 0; } }
+@container rc (max-width: 620px) {
+  .rc-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+  .rc-chart { grid-column: auto; grid-row: auto; }
+  .rc-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rc-facts li:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  .rc-facts p { font-size: var(--fs-meta); }
+}
+@container rc (max-width: 300px) {
+  .rc-facts { grid-template-columns: minmax(0, 1fr); }
+  .rc-tough { flex-wrap: wrap; }
+}
+@media (prefers-reduced-motion: reduce) { .rc-body .rk-bar, .rc-body .rk-face, .rc-body .rk-tim, .rc-body .rc-peak { animation: none !important; } }
+.dx-archived { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); }
+.dx-past > .rc[hidden] + .dx-archived, .dx-past > .dx-archived:first-child { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.dx-archived:empty { display: none; }
+.dx-arch { display: flex; align-items: flex-start; gap: 14px; padding: var(--panel-pad); border-radius: var(--r-panel); background: var(--panel); }
+.dx-arch:only-child { grid-column: 1 / -1; }
+.dx-arch > div { display: grid; gap: 6px; justify-items: start; min-width: 0; }
+
+.dx-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px; padding-top: 8px; font-size: var(--fs-meta); color: var(--muted); }
+
+/* ---------- what floats: dialogs, the check-in and survey pop-ups, the update prompt ---------- */
+.dx-dlg { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(30, 20, 30, .45); overflow-y: auto; }
+.dx-dlgcard { position: relative; display: grid; gap: 10px; width: min(460px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; padding: 24px; border-radius: var(--r-panel);
+  background: var(--ground); box-shadow: var(--float-shadow); }
+.dx-dlg-wide .dx-dlgcard { width: min(720px, 100%); }
+.dx-dlgcard > h2 { padding-right: 44px; }
+.dx-x { position: absolute; right: 12px; top: 12px; }
+.dx-dlg .settings { margin-top: 6px; }
+.dx-dlg .settings h3 { font-size: 18px; }
+.dx-nameform { display: flex; gap: 8px; }
+.dx-nameform input { flex: 1; min-width: 0; height: 44px; padding: 0 14px; border: 1px solid var(--control); border-radius: var(--r-row); background: var(--row); font-size: var(--fs-body); }
+.dx-nameform .btn { min-height: 44px; }
+.dx-namemsg:empty { display: none; }
+.dx .dx-namereset { justify-self: start; margin-left: -10px; color: var(--muted); }
+
+.dx .survey { position: fixed; z-index: 50; right: 20px; bottom: 20px; display: grid; gap: 10px; width: min(400px, calc(100vw - 24px)); max-height: calc(100vh - 40px); overflow-y: auto;
+  padding: 20px; border-radius: var(--r-panel); background: var(--ground); box-shadow: var(--float-shadow); opacity: 0; transform: translateY(16px);
+  transition: opacity 300ms var(--ease-out), transform 300ms var(--ease-out); }
+.dx .survey.is-shown { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .dx .survey { transition: none; transform: none; } }
+.dx .survey h3 { font-size: 18px; padding-right: 36px; }
+.dx .survey-x { position: absolute; right: 10px; top: 10px; width: 36px; height: 36px; border: 0; border-radius: var(--r-pill); background: transparent; font-size: 22px; line-height: 1; color: var(--muted); }
+.dx .survey-x:hover { background: var(--panel); color: var(--text); }
+.dx .survey-eyebrow { font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--muted); padding-right: 36px; }
+.dx .survey-why { font-size: var(--fs-meta); color: var(--muted); }
+.dx .survey-q { display: grid; gap: 8px; }
+.dx .survey-q > p:first-child { font-weight: var(--w-strong); }
+.dx .survey-q > p.debrief-prompt { font-size: 18px; font-weight: var(--w-head); }
+.dx .survey-opts { display: flex; flex-wrap: wrap; gap: 6px; }
+.dx .survey-opt { min-height: 40px; padding: 6px 14px; border: 1px solid var(--control); border-radius: var(--r-pill); background: var(--row); font-size: var(--fs-label); font-weight: var(--w-strong); text-align: left; }
+.dx .survey-opt:hover { background: var(--active); }
+.dx .survey-opt[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+.dx .survey-scale .survey-opt { flex: 1; min-width: 44px; text-align: center; font-variant-numeric: tabular-nums; }
+.dx .survey-scale-ends { display: flex; justify-content: space-between; gap: 8px; font-size: var(--fs-meta); color: var(--muted); }
+.dx .survey-scale-ends3 span:nth-child(2) { text-align: center; }
+.dx .debrief-list { flex-direction: column; }
+.dx .debrief-list .survey-opt { border-radius: var(--r-row); }
+.dx .survey textarea { width: 100%; min-height: 84px; padding: 10px 12px; border: 1px solid var(--control); border-radius: var(--r-row); background: var(--row); color: var(--text); font: inherit; font-size: var(--fs-label); resize: vertical; }
+.dx .survey-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
+.dx .survey-skip { min-height: 40px; padding: 0 10px; border: 0; border-radius: var(--r-pill); background: transparent; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); }
+.dx .survey-skip:hover { background: var(--panel); }
+.dx .survey-thanks { font-size: var(--fs-label); }
+.dx .debrief-steps { display: flex; gap: 4px; }
+.dx .debrief-steps i { flex: 1; height: 4px; border-radius: var(--r-pill); background: var(--track); }
+.dx .debrief-steps i.on { background: var(--text); }
+.dx-update { position: fixed; z-index: 55; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; width: max-content; max-width: calc(100vw - 24px);
+  padding: 8px 8px 8px 18px; border-radius: var(--r-pill); background: var(--ground); box-shadow: var(--float-shadow); font-size: var(--fs-label); font-weight: var(--w-strong); }
+
+/* ---------- a tablet ---------- */
+@media (max-width: 1000px) {
+  .dx-past { grid-template-columns: minmax(0, 1fr); }
+  .dx-past > .rc, .dx-past:has(> .dx-archived:empty) > .rc { max-width: none; }
+  .dx-stagebody { grid-template-columns: minmax(0, 1fr); }
+  .dx-go { grid-template-columns: minmax(0, 1fr) auto; align-items: center; min-width: 0; }
+  .dx-pod { grid-column: span 5; }
+  .dx-about { grid-column: span 7; }
+  .dx-you, .dx-class { grid-column: 1 / -1; }
+  html.shx .dx .shpet-house { grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 16px; align-items: center; }
+  .dx-rungs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+/* ---------- a phone ---------- */
+@media (max-width: 640px) {
+  /* the hubs drop their top bar for a tab bar on a phone (hub.css zeroes --bar-h and sets --sh-tabbar-h); the dashboard keeps its bar and has no tab bar */
+  html.shx.sh-dash { --bar-h: 56px; --sh-tabbar-h: 0px; }
+  .dx-bar { gap: 4px; padding: 0 8px 0 12px; }
+  .dx-page { width: calc(100% - 32px); padding: 16px 0 56px; gap: 24px; }
+  .dx-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .dx-tabs:has(.dx-tab:only-child) { grid-template-columns: minmax(0, 1fr); }
+  .dx-tab { min-height: 52px; padding: 4px 10px 4px 6px; gap: 8px; border-radius: var(--r-row); }
+  .dx-tab .dx-emb { width: 36px; height: 36px; }
+  .dx-tab b, .dx-tab small { overflow: hidden; text-overflow: ellipsis; }
+  .dx-tab > span { min-width: 0; }
+  .dx-tab b { font-size: var(--fs-label); }
+  .dx-tab small { font-size: 12px; }
+  .dx-hub { gap: 12px; }
+  .dx-hubrow, .dx-cols { grid-template-columns: minmax(0, 1fr); }   /* one column: twelve columns' gaps alone are wider than a phone at the largest text */
+  .dx-hubrow > *, .dx-cols > * { grid-column: auto; }
+  .dx-stagebody { gap: 14px; padding: 16px; }
+  .dx-go { grid-template-columns: minmax(0, 1fr); }
+  .dx-stage .dx-luck { margin: 0 16px 16px; }
+  .dx-now-num b { font-size: 48px; }
+  .rc-body { padding: 12px; }
+  .rc-chip { min-height: 48px; padding-right: 14px; }
+  .dx .dx-title { font-size: 26px; }
+  .dx-count b { min-width: 64px; font-size: 44px; }
+  .dx-actions .btn { flex: 1 1 auto; }
+  .dx-hubrow { gap: 12px; }
+  .dx-pod { order: 0; }
+  .dx-pod { min-height: 124px; }
+  .dx-cols { gap: 24px; }
+  html.shx .dx .shpet-house { grid-template-columns: minmax(0, 1fr); }
+  .dx-classhead .seg { width: 100%; }
+  .dx-classhead .seg button { flex: 1; justify-content: center; padding: 0 8px; }
+  .dx-archived { grid-template-columns: minmax(0, 1fr); }
+  .dx-arch > div { justify-items: stretch; }
+  .dx-arch .btn { white-space: normal; text-align: left; }
+  .dx-day { grid-template-columns: minmax(0, 1fr); }
+  .dx .survey { right: 12px; bottom: 12px; }
+  /* a reply to your report: the hubs move it to the top on a phone, clear of their tab bar; here there is none, and at the top it covers the bar's menu */
+  html.shx.sh-dash .sh-reply { top: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-height: calc(100vh - 120px); }
+  .dx-dlgcard { padding: 20px 16px; }
+}
+/* the largest text on a phone: the hub tabs go one to a row so their names fit */
+@container dxhubs (max-width: 300px) { .dx-tabs { grid-template-columns: minmax(0, 1fr); } }

@@ -134,6 +134,53 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   four L10 lines from the full notes), so `refresh-full.mp3` and `refresh-plain.mp3` were regenerated. An R `focus` Exam Hint, Home's
   chips and exam card, `EXAM_INFO`, the hints banner, the mock's intro and the About page say which four. `next/` rebuilt (its
   `SH_HUB` words too). No schema change.
+- **2026-11-11 (redesign phase 3, third pass: a classroom and a stage; the hubs share each Timmy's outfit, Claude Code)** —
+  Sam: "make a fully drawn classroom with the timmys of the people studying and make them wear what the user has their
+  timmy dressed as. it should be animated. timmys should walk in and sit at a desk or get up and leave as people join or
+  leave. Also i want the leaderboards and pedestals to be more epic". **One live change:** each hub tab now sends what its
+  Timmy is wearing with its studying-now presence (`widget/v3.js` `trackPresence()`, `shPet.fit()` in `widget/pet.js`:
+  `<holiday>:<outfit>`, empty before he's adopted, with Timmy off or in Focus mode), with no name or id; it isn't stored.
+  The About page's "What the hubs record", [event-taxonomy](vault/reference/event-taxonomy.md) and
+  [analytics-retention](vault/reference/analytics-retention.md) say so. **On the new dashboard** (still beside the live
+  one): the studying-now tile is a drawn classroom (`tools/figures/site/classroom.mjs`), 150 px tall (170 on a phone),
+  the count and the three busiest hubs on its chalkboard, a Timmy at a desk for each presence key in that outfit
+  (`shPet.art({ fit })`; an outfit is only ever a lookup key), desks in the hub's tint, day or night by the viewer's
+  clock, rows added as it fills, "+N in the hall" on a sign past a full room; people hop in through the door and jump
+  into a desk, or get up and leave (the Web Animations API on wrapper groups; more than six changes at once, a hidden
+  tab, reduced motion or answer animations off seat them without the walk; Focus mode keeps the plain count). The
+  leaderboard is a stage (`stage.mjs`): curtains, lights, torches, confetti, gold, silver and bronze blocks, a crown, the
+  top three as Timmys (their outfit from `get_place` through the row's visit key once migration_v54 is applied; plain
+  until then), places 4 to 10 as dark rows with a bar against first. Both kits are written into
+  `widget/hub-art/class.js` (`window.SH_CLASS_ART`, 26 KB) by `tools/figures/site/build.mjs`, which also writes the
+  shop's 55 outfits and `dress()` to `widget/hub-art/outfits.js` (168 KB, loaded only when someone on the page wears
+  one). The preview has a made-up class that comes and goes (`shDash.setLive(by, list)`) and a `get_place` stub. The
+  smoke test seats eight made-up people and checks the count, the stage and that markup sent as an outfit is never
+  drawn. **The recap** (Sam: the first redraw "doesnt read as a bar graph and it also also needs to fit in a smaller
+  card") is a compact drawn card: the hours, the classmates as a crowd of teeth, hours per day as drawn columns with
+  the exam day's flag and Timmy on one (`recap.mjs`, drawn by `recapArt()` at the card's width), fact chips with trophy
+  drawings, beside the hubs that just closed on a laptop. `class.js` carries the recap kit, its six icons and the hat
+  (55 KB). BUG-068 to BUG-073 found and fixed (two in the preview's UAT, two on the recap). **Your own Timmy is
+  marked** (Sam: "Mark your timmy"): a "You" plate on his desk, on your own screen only. A hub tab keeps its random
+  presence key in the browser (`sh_presence_mine`, `rememberMine()` in the live `widget/v3.js`) and the dashboard's
+  `paintMe()` finds that desk; nothing new is sent or stored on the server (BUG-074). Merged 2026-11-12 on Sam's word ("merge"), after a rebase
+  and one more fix the smoke test found the day before an exam (BUG-075: "Send luck" at the largest text on a phone).
+- **2026-11-11 (redesign phase 3: the new dashboard, beside the live one, Claude Code)** — Nothing students see changes.
+  `next/index.html` is the dashboard on the design system (`widget/dash.js`, `widget/dash.css`); outside a preview it sends
+  visitors to the live dashboard, and it takes `index.html`'s place at the redesign's release. The hubs are tabs with their
+  emblems and colors; the open hub is a stage (its drawn scene, the days left on a flip tile with a bead for each day, a
+  progress ring, Start studying, Daily drill, luck); one "you" card (Timmy's house, rank, mastery medals, streak with the
+  week as dots); the class panel has the live "studying right now" count with a chip for each hub and the leaderboard
+  (ranks or streaks, the top three on a podium); Past hubs shows each finished exam's recap as a live infographic (Save
+  image still draws the picture with `widget/recap.js`) and the hubs that just closed. **Out, on Sam's calls:** correct in
+  a row, the What's new log, the arcade scores and the When people study chart. Check-ins, surveys, the Inbox, luck, the
+  name picker, Settings with Focus mode and the tour (from the menu, its own steps through `window.SH_TOUR.steps`) are the
+  live dashboard's logic, moved over. Its hub list is `next/hubs.js`, copied from `index.html` by
+  `tools/dash-next/build.mjs` (`--check` in CI) until the release; `widget/hub-art/dash.js` holds every hub's emblem and
+  tint (from `tools/figures/site/build.mjs`). `migration_v54.sql` is still pending: the page calls the `_v2` functions with
+  a fallback to today's, and the preview stubs them. The smoke test, `a11y.js`, `perf.js`, `matrix.js` and the syntax check
+  cover the page; the new hubs' Back button goes to it. The idea board is a second session's (its slot is `#ideas`); Timmy's
+  place and visiting (`data-visit` on the board's rows) are phase 4's. Drafts for the About page and the switch are in the
+  [release note](vault/tasks/2026-11-06-redesign-release.md); bugs BUG-063 to BUG-067 found and fixed while building.
 - **2026-11-11 (Occlusion: `mo-10` retired, Claude Code)** — Sam: "Retire mo-10 if it is redundant ... it is okay to test the
   same concept multiple ways. just not for every single question and not more than twice." It was (report #40): the final's
   lectures asked the same fact, about 10% of people have MIP coincident with CR closure, three times. `mo-10` came out with its

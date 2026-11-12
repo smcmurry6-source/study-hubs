@@ -59,6 +59,8 @@ async function motion(page){
     && !(a.effect.target && a.effect.target.closest && a.effect.target.closest('#shpv-pill, #shpv-panel'))).length);
 }
 
+const HAS_NEXT_DASH = fs.existsSync(path.join(L.ROOT, 'next', 'index.html'));
+
 (async () => {
   const baseline = fs.existsSync(BASE_FILE) ? JSON.parse(fs.readFileSync(BASE_FILE, 'utf8')) : { pages: {} };
   const results = {}, problems = [], notes = [];
@@ -84,6 +86,12 @@ async function motion(page){
     await check('dashboard', 'index.html');
     await check('about', 'about/');
     await check('review (sign-in)', 'review/');
+    /* the redesign's dashboard (next/, widget/dash.js; not live until the release), with its Settings sheet open too */
+    if (HAS_NEXT_DASH) {
+      await check('dashboard/next', 'next/');
+      await check('dashboard/next · settings', null, async () => { await page.click('#setBtn').catch(() => {}); await page.waitForTimeout(300); });
+      await page.keyboard.press('Escape').catch(() => {});
+    }
   }
   for (const hub of live) {
     await page.goto(srv.url + `hubs/${hub}/`); await L.settle(page);
@@ -112,7 +120,7 @@ async function motion(page){
   const dp = await dark.newPage();
   await dp.goto(srv.url + 'index.html?persona=returning'); await L.settle(dp);
   await dp.evaluate(() => { try { localStorage.setItem('sh_theme', 'dark'); } catch (e) {} });
-  for (const [key, url] of [['dashboard (dark)', 'index.html'], ...live.map(h => [`${h} (dark)`, `hubs/${h}/`]), ...next.map(h => [`${h}/next (dark)`, `hubs/${h}/next/`])].filter(([k]) => !ONLY || k !== 'dashboard (dark)')) {
+  for (const [key, url] of [['dashboard (dark)', 'index.html'], ...(HAS_NEXT_DASH ? [['dashboard/next (dark)', 'next/']] : []), ...live.map(h => [`${h} (dark)`, `hubs/${h}/`]), ...next.map(h => [`${h}/next (dark)`, `hubs/${h}/next/`])].filter(([k]) => !ONLY || !/^dashboard/.test(k))) {
     await dp.goto(srv.url + url); await L.settle(dp);
     await dp.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     await dp.addScriptTag({ content: AXE });

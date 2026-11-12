@@ -1410,11 +1410,38 @@
   });
   channel.subscribe(function(status){
     if (status === "SUBSCRIBED") {
-      if (!AUTOMATED) channel.track({ online_at: new Date().toISOString() });
+      presenceOn = true; trackPresence();
       safeRpc("record_presence_ping", { p_hub: HUB });
     }
   });
   }
+  /* What this visitor's Timmy is wearing goes out with the presence, and nothing else about them: no name, no id
+     (Sam, 2026-11-11: the new dashboard's classroom draws a Timmy for each person studying, dressed as theirs). Sent
+     again when Timmy arrives (widget/pet.js loads late) or a setting changes what he wears. */
+  var presenceOn = false, trackedFit = null;
+  /* The dashboard's classroom tags your own Timmy "You", on your own screen only (Sam, 2026-11-11: "Mark your timmy").
+     For that, this tab's presence key (random, new on every page load) is kept in this browser while the tab is open
+     and taken out when it closes. It is never sent anywhere it didn't already go, and it is no use on another device. */
+  function rememberMine(on){
+    try {
+      var m = null, now = Date.now(), out = {};
+      try { m = JSON.parse(localStorage.getItem("sh_presence_mine") || "{}"); } catch (e) {}
+      if (!m || typeof m !== "object") m = {};
+      Object.keys(m).filter(function(k){ return now - m[k] < 1728e5; }).sort(function(a, b){ return m[b] - m[a]; }).slice(0, 7).forEach(function(k){ out[k] = m[k]; });
+      if (on) out[HUB + "/" + presenceId] = now; else delete out[HUB + "/" + presenceId];
+      localStorage.setItem("sh_presence_mine", JSON.stringify(out));
+    } catch (e) {}
+  }
+  window.addEventListener("pagehide", function(){ if (trackedFit != null) rememberMine(false); });
+  window.addEventListener("pageshow", function(e){ if (e.persisted && trackedFit != null) rememberMine(true); });
+  function fitNow(){ try { return (window.shPet && window.shPet.fit && window.shPet.fit()) || ""; } catch (e) { return ""; } }
+  function trackPresence(){
+    if (!channel || !presenceOn || AUTOMATED) return;
+    var f = fitNow(); if (f === trackedFit) return;
+    trackedFit = f; rememberMine(true);
+    try { channel.track({ online_at: new Date().toISOString(), fit: f }); } catch (e) {}
+  }
+  document.addEventListener("sh:pref", function(){ setTimeout(trackPresence, 50); });
 
   /* ---------- answer + mode tracking (fire-and-forget, never throws into the hub) ---------- */
   /* Automated browsers (Playwright, Puppeteer, Selenium: navigator.webdriver) don't count in the analytics: sessions that
@@ -2874,7 +2901,7 @@
     petLoading = true;
     var petScript = document.createElement("script");
     petScript.src = new URL("pet.js", thisScript.src).href; petScript.async = true;
-    petScript.onload = function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); if (then) then(); };
+    petScript.onload = function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); trackPresence(); if (then) then(); };
     document.head.appendChild(petScript);
   }
   window.shLoadPet = loadPet;

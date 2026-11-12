@@ -104,6 +104,8 @@
 
   /* ---------- the dashboard's steps (top bar, then top to bottom; what's inside a hub is the hub's own tour) ---------- */
   function dashSteps(){
+    /* the redesigned dashboard (widget/dash.js, not live yet) gives its own steps through window.SH_TOUR.steps(), like the redesigned hubs */
+    if (window.SH_TOUR && typeof window.SH_TOUR.steps === "function") { try { return window.SH_TOUR.steps({ phone: phone(), visible: visible }); } catch (e) {} }
     var S = [];
     S.push({ title: "Welcome to Study Hubs",
       body: "<p>This tour shows you everything on this page. It takes about a minute, and each hub has its own tour inside it.</p>" +
