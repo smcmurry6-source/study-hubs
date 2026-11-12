@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: "Sam's merge; then the redesign's release (migration_v56 applied after v54 and v55, the About page entries)"
 agent: Claude Code (2026-11-12)
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/344
 ---
 
 # Learn and Flashcards: a toggle that changes how the Question Bank is studied
@@ -207,7 +207,7 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
 
 - 2026-11-12 (Claude Code): asked Sam first, as the session's prompt said, what the server part is and whether the toggle
   could ship without it, with three options (A: no server part, B: a new pending `migration_v56.sql`, C: a section in
-  v54). Sam: "B, go ahead". Built and tested; draft PR below. Sam also asked mid-session (2026-11-12): "make sure learn has
+  v54). Sam: "B, go ahead". Built and tested in [#344](https://github.com/smcmurry6-source/study-hubs/pull/344) (draft). Sam also asked mid-session (2026-11-12): "make sure learn has
   similar progress bar filling animations and such so it is very satisfying to use like quizlet": the overall bar now
   fills instead of jumping (a shine along it when a question is mastered, its numbers counting to their new value, the
   percent counting a question right once as halfway), the round's track fills a step per answer (red for a miss, a
