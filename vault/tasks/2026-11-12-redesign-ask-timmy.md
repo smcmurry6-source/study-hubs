@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: 
 agent: Claude Code (parts 1, 2 and 3, 2026-11-12)
-pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1), https://github.com/smcmurry6-source/study-hubs/pull/338 (part 2)
+pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1), https://github.com/smcmurry6-source/study-hubs/pull/338 (part 2), https://github.com/smcmurry6-source/study-hubs/pull/341 (part 3)
 ---
 
 # Ask Timmy: Timmy becomes every hub's study assistant (redesign)
@@ -411,7 +411,7 @@ change to HP's rules beyond the 100 start; the old pages.
 - 2026-11-12: [#338](https://github.com/smcmurry6-source/study-hubs/pull/338) merged as `d6bd18b` (Sam: "Merge"), once
   "Check hubs" and "Release tests" passed on its last commit; `node tools/release/postcheck.js` passed (9 of 9 changed
   files live and identical to `main`; the live hubs open with no errors). Part 2 is done.
-- 2026-11-12 (part 3, Claude Code): the admin page's **Ask Timmy** tab (`review/index.html`): figures for the range, By
+- 2026-11-12 (part 3, Claude Code, [#341](https://github.com/smcmurry6-source/study-hubs/pull/341)): the admin page's **Ask Timmy** tab (`review/index.html`): figures for the range, By
   hub, his settings (switch, daily cap, questions a person a day; Save asks first), By day, and four lists (reported
   answers, not covered, quotes that didn't check out, chats), each row opening its whole chat in place; hub chips; the
   Inbox's "Read the chat with Timmy" on a report from the Report button. How it works: [ask-timmy](../reference/ask-timmy.md),
