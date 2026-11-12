@@ -151,9 +151,15 @@ that note's design is the starting point, and where the two differ this one wins
 
 ## Where it plugs in (code map, 2026-11-12; line numbers drift, grep the names)
 
-- **Timmy on a new hub page**: `widget/hub.js` `startWidget()` loads `v3.js`, whose `loadPet()` loads `widget/pet.js` and
+The engine is four files since #330 (2026-11-12): `widget/hub.js` (the core: routes, Settings, Focus mode, notes,
+`SH_GOTO`, `exportSections`, More), `widget/hub-bank.js` (the question card and the bank), `widget/hub-rewards.js` (the
+answer path, XP, rank, recap) and `widget/hub-timmy.js` (what the engine asks of Timmy). Part 2 works in `hub-bank.js`
+and `hub-timmy.js` and touches the core only for Settings ([run-a-redesign-session](../how-to/run-a-redesign-session.md), step 4).
+
+- **Timmy on a new hub page**: the core's `startWidget()` loads `v3.js`, whose `loadPet()` loads `widget/pet.js` and
   calls `shPet.mount({ where:"hub", H: window.shEggHooks, bootstrap })`. On the new pages he loads **only once adopted**
-  (`localStorage sh_pet_born`; the badge `pet-adopt:<day>` from another device makes `hub.js` call `window.shLoadPet`).
+  (`localStorage sh_pet_born`; the badge `pet-adopt:<day>` from another device makes `hub-timmy.js` `petFromBadges()` call
+  `window.shLoadPet`).
   His element is `div.shpet.shpet-home` on `<body>` (`button.shpet-btn`, `span.shpet-hp`, the bubble
   `div.shpet-say[role=status]`), fixed at the bottom left (left 14px, bottom 12px; above the tab bar on a phone);
   `html.sh-pet-on` while he's shown, `.is-away` hides him, hidden during a mock (`html.sh-mock-on`).
@@ -162,22 +168,23 @@ that note's design is the starting point, and where the two differ this one wins
   `[data-joke]`, `[data-check]`, `[data-tip]` buttons in `.shpet-actions`.
 - **Tapping him** (`pet.js` `onTap`): not adopted → the four-step `intro()`; adopted → a line and a "Checkup" button
   (`.shpet-more`) in the bubble. There's no menu: "Ask me" is new. Other code talks to him through
-  `window.shPet` (`say(text, move, ms)` escapes its text; `hp()`, `mount`, `refresh`, `syncBadges`, `fit`, `house`...).
+  `window.shPet` (the engine through `hub-timmy.js`'s `say()`, `petHp()`, `timmyReact()`; `pet.js` `wireHub()` hears the
+  answered event) (`say(text, move, ms)` escapes its text; `hp()`, `mount`, `refresh`, `syncBadges`, `fit`, `house`...).
 - **Settings**: on a hub `#more/settings`, `moreSettings()` and its `EXTRAS` list in `hub.js`; on the dashboard
   `openSettings()` and `EXTRAS` in `dash.js`. Timmy's pref is `sh_pref_pet`: `on`, `dash` (dashboard only) or `off`.
   **Focus mode** is `sh_pref_focus = "on"`: `setFocus()` (same code in `hub.js` and `dash.js`) saves the old values in
   `sh_pref_focus_prev` and sets every extra to `off`; prefs change through `prefSet`, which fires `sh:pref`
   (`detail.key`). Whether Timmy shows: `pet.js` `visible()`. **The Ask icon** takes his spot whenever he isn't shown on
   that page: pref `off`, `dash` on a hub, Focus mode, or (until part 4) not adopted.
-- **A question card**: `card(q, o)` builds `article.qcard[data-qid][data-ctx]`; `result(el, q, right, partial, xp, picks)`
-  draws the verdict, `whyHTML(q, picks)` and `div.qc-after` ("Try it again"); `gather()` moves "Find this in the notes"
+- **A question card** (`widget/hub-bank.js`): `card(q, o)` builds `article.qcard[data-qid][data-ctx]`; `result(el, q, right, partial, xp, picks)`
+  draws the verdict, `whyHTML(q, picks)` and `div.qc-after` ("Try it again"); its `gather` (a MutationObserver) moves "Find this in the notes"
   (`v3.js` `njAttach`) and "Good question?" (`qhealth.js` `addRating`) into `.qc-after`. "Ask Timmy" goes there too, with
-  `q.id`, `q.lec`, `right` and `picks` (authored choice indices). The answered event (`SH_HUB.answeredEvent`, e.g.
+  `q.id`, `q.lec`, `right` and `picks` (authored choice indices). The answered event (`hub-rewards.js` `recordAnswer`; `SH_HUB.answeredEvent`, e.g.
   `perio:answered`) carries `{ qid, lec, correct, ctx, choice, picks }`. A mock's cards have `data-ctx="mock"`.
 - **Where the student is**: `window.SH_SECTION()` (`home/dashboard`, `compendium/notes`, `compendium/bank`, `.../drill`,
   `compendium/mock`, `arcade/...`, `more/<page>`); the route `#questions/mock` and `html.sh-mock-on` mark a mock.
 - **Content JSON** (`hubs/<id>/next/content/`): `notes.json` is `{ full, plain, hy }`, each `{ <lecture id>: "<html>" }`.
-  A paragraph's address `k` is its index among `p, li, h3, h4` in the parsed `full` HTML (`exportSections` in `hub.js`, which
+  A paragraph's address `k` is its index among `p, li, h3, h4` in the parsed `full` HTML (`exportSections` in the core, which
   fills `SH_EXPORT.sections` with `go: { v:"notes", lec, k }`); `window.SH_GOTO(go)` opens it (also `cram`, `hints`,
   `review` `{ lec, t }`, `bank` `{ q }`). **The function must number paragraphs exactly as `exportSections` does**, or the
   links land on the wrong paragraph: share or copy that code and test it against `SH_EXPORT.sections`.
