@@ -144,5 +144,6 @@ Put the ranks, trophies and celebrations on the design system without changing t
     the migration, so ask Sam first.
   - **Still open in this note**: parts B, C and D, the arcade lobby, the cards' and the cutscene's recording on a
     preview, the About page (drafted in [the release note](2026-11-06-redesign-release.md), "From phase 4, part A").
+- 2026-11-12: [#332](https://github.com/smcmurry6-source/study-hubs/pull/332) merged as `048bcdb`, and `node tools/release/postcheck.js` passed (10 of 10 changed files live and identical to `main`; the dashboard and the three live hubs open with no errors).
 
 ## Outcome
