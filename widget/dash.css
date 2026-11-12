@@ -196,7 +196,7 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 /* the number sits on a tile: the folding layers wear the same tile, so each flip turns the whole card */
 .dx-count .flap-bot, .dx-count .flap-fold, .dx-count .flap-unfold { padding: inherit; border-radius: inherit; background: var(--hub); text-align: center; }
 /* exam-day luck */
-/* the button drops under the words when the two don't fit side by side (a phone at the largest text, BUG-072) */
+/* the button drops under the words when the two don't fit side by side (a phone at the largest text, BUG-075) */
 .dx-luck { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 6px; padding: 12px 14px; border-radius: var(--r-row); background: var(--mint); color: var(--mint-ink); }
 .dx-luck:empty { display: none; }
 .dx-luck > .ic { flex: none; }
