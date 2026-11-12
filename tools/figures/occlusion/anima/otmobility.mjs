@@ -1,4 +1,4 @@
-// Fig 29: measuring mobility (Occlusion L10, "Tooth mobility and occlusal trauma"; Dr. Abou-Arraj).
+// Fig 30: measuring mobility (Occlusion L10, "Tooth mobility and occlusal trauma"; Dr. Abou-Arraj).
 // The same premolar as Figs 27 and 28 (l10tooth.mjs), drawn to scale (18 px a millimeter, the ruler's millimeters are the
 // tooth's), cut cheek to tongue down to about 6 mm below the CEJ. Two rigid instrument handles rock it buccolingually; a
 // fixed millimeter scale above the crown shows how far the buccal cusp tip travels, shaded. His degrees: 0 physiologic
@@ -149,7 +149,7 @@ function otmRead(deg) { return { 0: "degree 0: 0.1-0.2 mm", 1: "degree 1: up to 
 const ST0 = { deg: "1", a: 0, v: 0, push: 0, gap: 1.5 };
 const ctx = Object.assign({ otSmooth, otPose, otRootBelow, otSocket, otText, otLab, otGumPose, otmAmp, otmFA }, DATA);
 const svg = figureSvg({ width: MW, height: MH, className: "ot-svg otm-svg", label: "A premolar in buccolingual section, drawn to scale, between two rigid instrument handles that rock it buccolingually; a millimeter scale above the crown shows how far the cusp tip travels.", body: otmScene(ST0, ctx) });
-const plate = plateHtml({ fig: "Fig 29", title: "Measuring tooth mobility", hint: "pick a degree", readout: otmRead("1"), body: `<div class="am-svg otm-box">${svg}</div>` });
+const plate = plateHtml({ fig: "Fig 30", title: "Measuring tooth mobility", hint: "pick a degree", readout: otmRead("1"), body: `<div class="am-svg otm-box">${svg}</div>` });
 const controls = `<div class="am-controls" role="group" aria-label="Mobility"><span class="ot-lbl">Degree</span><button type="button" class="am-btn" data-otdeg="0" aria-pressed="false">0</button><button type="button" class="am-btn" data-otdeg="1" aria-pressed="true">1</button><button type="button" class="am-btn" data-otdeg="2" aria-pressed="false">2</button><button type="button" class="am-btn" data-otdeg="3" aria-pressed="false">3</button><button type="button" class="am-btn" data-otdeg="f" aria-pressed="false">Fremitus</button><button type="button" class="am-btn" data-otmgo="1">Pause</button></div>
 <p class="am-summary" aria-live="polite">${otmText("1")}</p>
 <p class="ot-note">${NOTE}</p>
