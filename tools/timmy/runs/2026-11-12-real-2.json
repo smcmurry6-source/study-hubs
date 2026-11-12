@@ -1,0 +1,132 @@
+[
+ {
+  "id": "db-06",
+  "hub": "dashboard",
+  "type": "tonight",
+  "turns": [
+   {
+    "text": "What should I study tonight?",
+    "reply": {
+     "ok": true,
+     "chat": "137f37f7-011f-431e-872a-e4da92a29692",
+     "message": 2,
+     "kind": "answer",
+     "paragraphs": [
+      {
+       "text": "Tonight is easy to call: Heme & Endo Exam 2 is tomorrow morning at 10, and L16 Female Reproductive Physiology carries 7 questions. You haven't opened its notes or any of its 70 questions yet, so that gap is the one to close.",
+       "cites": [
+        {
+         "id": "heme-endo-exam2:X17",
+         "hub": "heme-endo-exam2",
+         "kind": "exam",
+         "label": "Course dates",
+         "quote": "Exam 2, 10:00-11:30 am (dental)",
+         "go": {
+          "v": "home"
+         }
+        },
+        {
+         "id": "heme-endo-exam2:X2",
+         "hub": "heme-endo-exam2",
+         "kind": "exam",
+         "label": "Exam",
+         "quote": "7 each on L13, L14, L15 and L16",
+         "go": {
+          "v": "home"
+         }
+        }
+       ]
+      },
+      {
+       "text": "Read the notes first, aiming at what Dr. Madison flagged: follicular versus luteal phase, which he called \"high yield for exam,\" and his two-cells, two-gonadotropins slide (LH on theca, FSH on granulosa). Then do a round of L16 practice questions.",
+       "cites": [
+        {
+         "id": "heme-endo-exam2:H106",
+         "hub": "heme-endo-exam2",
+         "kind": "hint",
+         "label": "L16 Exam Hints",
+         "quote": "High yield for exam, right? Compare and contrast luteal versus follicular.",
+         "go": {
+          "v": "hints",
+          "lec": "fphys"
+         }
+        },
+        {
+         "id": "heme-endo-exam2:H107",
+         "hub": "heme-endo-exam2",
+         "kind": "hint",
+         "label": "L16 Exam Hints",
+         "quote": "Very important slide. I'd know this slide pretty well",
+         "go": {
+          "v": "hints",
+          "lec": "fphys"
+         }
+        }
+       ]
+      },
+      {
+       "text": "Your Perio L8 sits at 30 of 60 right, so it needs work too, but the Perio final isn't until next Thursday. Save it for the weekend. I'd sleep on that, and so should you.",
+       "cites": [
+        {
+         "id": "perio:X2",
+         "hub": "perio",
+         "kind": "exam",
+         "label": "Exam",
+         "quote": "Final: 2026-11-19",
+         "go": {
+          "v": "home"
+         }
+        }
+       ]
+      }
+     ],
+     "offer": null,
+     "go": {
+      "hub": "heme-endo-exam2",
+      "v": "notes",
+      "lec": "fphys",
+      "k": 61
+     },
+     "closest": null
+    },
+    "kind": "answer",
+    "cost": 3.257761,
+    "ms": 16066,
+    "usage": {
+     "input_tokens": 4,
+     "cache_creation_input_tokens": 404165,
+     "cache_read_input_tokens": 0,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 265,
+      "ephemeral_1h_input_tokens": 403900
+     },
+     "iterations": [
+      {
+       "input_tokens": 4,
+       "output_tokens": 1261,
+       "cache_read_input_tokens": 0,
+       "cache_creation_input_tokens": 404165,
+       "cache_creation": {
+        "ephemeral_5m_input_tokens": 265,
+        "ephemeral_1h_input_tokens": 403900
+       },
+       "type": "message",
+       "model": null
+      }
+     ],
+     "output_tokens": 1261,
+     "output_tokens_details": {
+      "thinking_tokens": 688
+     },
+     "service_tier": "standard",
+     "inference_geo": "global",
+     "speed": "standard"
+    },
+    "model": "claude-opus-5-5",
+    "unchecked": null,
+    "fails": [],
+    "warns": []
+   }
+  ]
+ }
+]
