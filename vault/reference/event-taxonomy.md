@@ -153,7 +153,7 @@ new one can't go undocumented.
 | `hl` | `hl:y`, `hl:g` | highlights made, by color | `widget/highlight.js` | 10-20 |
 | `mmap` | `mmap:open` | mind map opened | `widget/v3.js` | 10-20 |
 | `notes-jump` | `:shown`, `:show`, `:none` | "Find this in the notes" offered / tapped / no match | `widget/v3.js` | 11-04 |
-| `notes` | `notes:next`, `notes:report`; the redesign's engine adds `notes:prev`, `notes:level=`, `notes:mindmap`, `notes:done`, `notes:undone`, `notes:done-auto` (Notes done: the button, taking it back, reading to the end) | notes navigation, Report under notes, Notes done | `widget/v3.js`; `widget/hub.js` from the redesign's release | 11-03 (Notes done 11-11) |
+| `notes` | `notes:next`, `notes:report`; the redesign's engine adds `notes:prev`, `notes:level=`, `notes:mindmap`, `notes:done`, `notes:undone`, `notes:done-auto` (Notes done: the button, taking it back, reading to the end), `notes:follow=on`/`=off` (Follow along turned back on or off) | notes navigation, Report under notes, Notes done | `widget/v3.js`; `widget/hub.js` from the redesign's release | 11-03 (Notes done 11-11, Follow along 11-12) |
 | `pet` | `pet:intro`, `pet:adopt-*`, `pet:no-thanks-step*`, `pet:tap-*`, `pet:checkup`, `pet:joke` | Timmy Tooth's intro and use | `widget/pet.js` | 10-20 |
 | `arcade` | `arcade:board:start`, `arcade:escape:win` | arcade game starts and wins | `widget/games.js` | 10-21 |
 | `link` / `link-ask` | `link:code`, `link:linked`, `link:fail`; `link-ask:shown`/`yes`/`no`/`later`/`code`/`fail`/`share`/`url-open` | Link my devices; the "is this your other device?" prompt | `widget/ranks.js`, `widget/linkask.js` | 10-21 |
