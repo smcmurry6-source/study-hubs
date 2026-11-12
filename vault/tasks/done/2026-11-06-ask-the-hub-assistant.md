@@ -98,6 +98,8 @@ the release up. A pilot on one hub for one exam; then Sam decides from the numbe
 
 - 2026-11-06: workshop of Sam's idea; waiting on Sam's calls.
 - 2026-11-06: Sam, in chat: "i think we ditch the ask the hub idea". Dropped.
+- 2026-11-12: Sam brought it back as part of the redesign, in Timmy's voice: [Ask Timmy](../2026-11-12-redesign-ask-timmy.md).
+  The design below is its starting point; where the two differ, that note wins.
 
 ## Outcome
 
