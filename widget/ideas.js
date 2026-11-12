@@ -506,5 +506,17 @@
     return api;
   }
 
-  window.shIdeas = { mount: mount, tick: tick, up: up, cats: CATS.map(function(c){ return { id: c[0], name: c[1], hint: c[2] }; }), statuses: STATUS };
+  /* one idea posted from somewhere else (Ask Timmy's drafted idea, widget/ask.js, which posts it as "board": the pending
+     post_idea takes only board, suggest and checkin, and isn't changed; Sam, 2026-11-12): p { sb, title, body, hub, category,
+     source, newName (a name to save first, for someone who hasn't picked one), request }; resolves { ok, id, name } or
+     { ok: false, msg }. Every board on the page shows it. */
+  function post(p){
+    p = p || {};
+    return send(p.sb || window.shSupabase || null, { title: tidy(p.title), body: tidy(p.body || ""), hub: p.hub || null, category: p.category, source: p.source || "board", newName: nameNow() ? "" : tidy(p.newName || ""), request: p.request || requestId() }).then(function(r){
+      if (r.ok) boards.forEach(function(b){ b.reload(); });
+      return r;
+    });
+  }
+
+  window.shIdeas = { mount: mount, tick: tick, up: up, post: post, cats: CATS.map(function(c){ return { id: c[0], name: c[1], hint: c[2] }; }), statuses: STATUS };
 })();

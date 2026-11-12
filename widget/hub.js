@@ -1046,7 +1046,7 @@
   /* Settings: the cuts (font, background music, accent metal) are gone; text size and theme stay, plus the goal.
      The extras use the same keys as widget/v3.js (EXTRAS) and the dashboard: keep the three in step. */
   var EXTRAS = [
-    ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy, on the bar. He hides during mock exams.", [["on", "On"], ["dash", "Dashboard only"], ["off", "Off"]]],
+    ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy, on the bar: tap him to ask about the notes. He hides during mock exams. Off, an Ask button takes his place.", [["on", "On"], ["dash", "Dashboard only"], ["off", "Off"]]],
     ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in the trophy case."],
     ["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online."],
     ["sh_pref_fairy", "Tooth Fairy", "Flies across the page now and then. Catch her for the fairy board."],
@@ -1240,7 +1240,7 @@
       { el: function(){ return [].slice.call(document.querySelectorAll("[data-goalm]")).filter(o.visible)[0]; }, title: "Your daily goal", body: "<p>The ring fills toward " + HX.goal() + " questions a day, and the flame counts the days in a row you study. Change the goal in More, Settings.</p>" },
       { el: function(){ return [document.getElementById("hxRank"), document.getElementById("hxXp")].filter(o.visible)[0]; }, title: "XP and your rank", body: "<p>Every answer earns XP, and it flies up here. Tap it for your stats and trophies.</p>" },
       { el: ".hx-set", title: "Settings", body: "<p>Theme, text size, your daily goal, Timmy and the extras.</p>" },
-      { el: ".shpet-home", title: "Timmy", body: "<p>Timmy Tooth, in the corner, cheers when you get one right and when you meet your goal. Tap him for a joke.</p>" },
+      { el: function(){ return [document.querySelector(".shpet-home"), document.querySelector(".ska-fab")].filter(o.visible)[0]; }, title: "Ask Timmy", body: "<p>Timmy Tooth, in the corner, cheers when you get one right and when you meet your goal. Tap him to ask about the notes: he answers from this hub's notes and links each point to where it came from. With Timmy off, the Ask button in his corner does the same. After you answer a question, <b>Ask Timmy</b> under it asks why.</p>" },
       { before: press("questions"), wait: 600, el: ".qbar", title: "The question bank", body: "<p>Pick lectures, what to show and the order here. The sets underneath are the daily drill, yesterday's misses, your weak spots and the timed mock.</p>" },
       { before: press("home"), wait: 400, el: ".quick", title: "Start here", body: "<p>One tap to practice, the drill, your notes, the mock and the rest.</p>", last: true }
     ];
@@ -1262,6 +1262,8 @@
       /* the game layer: v3.js asks the database for it and works as on the live hubs until it is there */
       s.setAttribute("data-game", "v2");
       s.onload = function(){
+        /* Ask Timmy's chat (widget/ask.js, hub-timmy.js mounts it) comes with the shared widget */
+        HX.askStart();
         /* Report and Pin on every card, as on the live hubs (the class picks are the engine's own: classPicks) */
         if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]");
         var boot = window.shBootstrap && window.shBootstrap.ready;

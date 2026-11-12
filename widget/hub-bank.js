@@ -179,15 +179,18 @@
       (q.ref && window.shCases && window.shCases.refHTML ? window.shCases.refHTML(q) : "") +
       whyHTML(q, q.type === "mcq" || q.type === "multi" ? picks : null) +
       '<p class="qc-class note" data-classnote hidden></p>' +
-      '<div class="qc-after"><button class="btn" type="button" data-again>' + icon("retry", 18) + '<span class="l-long">Try it again</span><span class="l-short">Retry</span></button></div>';
+      '<div class="qc-after"><button class="btn" type="button" data-again>' + icon("retry", 18) + '<span class="l-long">Try it again</span><span class="l-short">Retry</span></button>' +
+      /* Ask Timmy about it, now that it's answered (widget/ask.js; hub-timmy.js opens the chat with the question attached) */
+      (HX.askOn && HX.askOn() ? '<button class="btn" type="button" data-ask-q="card">' + icon("comment", 18) + "<span>" + esc(HX.askLabel()) + "</span></button>" : "") + "</div>";
     res.hidden = false;
-    /* one row under the answer (Sam, 2026-11-06): Try it again, then the shared widget's "Find this in the notes" (on a
-       miss; it replaced the "Notes for <lecture>" link) and "Good question?", moved in beside it as they arrive */
+    /* one row under the answer (Sam, 2026-11-06): Try it again, Ask Timmy, then the shared widget's "Find this in the notes"
+       (on a miss; it replaced the "Notes for <lecture>" link) and "Good question?", moved in beside it as they arrive */
     var after = $(".qc-after", res);
     var gather = function(){ $$(":scope > .sh-nj, :scope > .sh-qrate", res).forEach(function(n){ after.appendChild(n); }); };
     gather();
     if (window.MutationObserver) { var mo = new MutationObserver(gather); mo.observe(res, { childList: true }); setTimeout(function(){ mo.disconnect(); }, 4000); }
     $("[data-again]", res).addEventListener("click", function(){ var n = card(q, { ctx: el.getAttribute("data-ctx") }); el.replaceWith(n); var f = $(".ch", n); if (f) f.focus(); track("bank:again"); });
+    var ak = $("[data-ask-q]", res); if (ak) ak.addEventListener("click", function(){ HX.askAbout(q, right, picks); });
     if (HX.FIG && HX.FIG.ANIMA) { try { HX.FIG.ANIMA.mount(res); } catch (e) {} }
   }
   /* the class's picks beside each choice (question_choices through the widget's shGetClassStats; from 2 answers) */

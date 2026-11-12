@@ -8,6 +8,10 @@
 @font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-normal.woff2") format("woff2"); font-weight: 200 1000; font-style: normal; font-display: swap; }
 @font-face { font-family: "Nunito Sans"; src: url("../assets/fonts/nunito-sans-italic.woff2") format("woff2"); font-weight: 200 1000; font-style: italic; font-display: swap; }
 
+/* An empty <i> (the dots, bars and pulses drawn with one) is italic by default, and Chrome then downloads the italic face
+   just to measure its line: 46 KB nobody sees, on the new dashboard nearly every load (BUG-086, found 2026-11-12). */
+html.shx i:empty { font-style: normal; }
+
 /* ---------- tokens ---------- */
 html.shx {
   color-scheme: light;

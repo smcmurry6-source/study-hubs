@@ -3,10 +3,10 @@ type: reference
 tags: [timmy, ask-timmy, supabase, edge-function, claude-api, redesign, privacy]
 ---
 
-# Ask Timmy: the server (the `timmy` Edge Function and migration_v55)
+# Ask Timmy: the server (the `timmy` Edge Function and migration_v55) and the chat
 
 How Ask Timmy answers a student: the Supabase Edge Function `timmy`, its database half (`migration_v55.sql`), the tests
-and the eval. Built 2026-11-12 as part 1 of [the task](../tasks/2026-11-12-redesign-ask-timmy.md) (Sam's calls are
+and the eval, and the chat in the new pages (`widget/ask.js`, "The chat" below). Built 2026-11-12 as parts 1 and 2 of [the task](../tasks/2026-11-12-redesign-ask-timmy.md) (Sam's calls are
 there and in [decisions](../decisions.md)); **deployed and applied at [the redesign's release](../tasks/2026-11-06-redesign-release.md),
 not before**. Until then `migration_v55.sql` is in `supabase/pending-migrations.txt` and nothing calls the function.
 
@@ -135,15 +135,64 @@ person to read. The full report (every question and answer) is written as markdo
    (`https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/content/` or wherever the switch PR puts it).
 4. One question from the live site on a phone; `admin_timmy_days` shows it with its cost.
 
-## Notes for the chat (part 2) and the admin tab (part 3)
+## The chat in the new pages (`widget/ask.js` + `ask.css`, part 2)
 
-- Enable "Ask Timmy" on a card only after the answer is recorded (`personal_answers` has the row), or the function
-  won't see it as answered and he'll decline it like an unanswered practice question.
-- `limited: "busy"` means the last question is still being answered: keep the box disabled until it comes back.
-- A nap or an error can still be reported (`timmy_report` with `message` null).
-- Unit ids, kinds and `go` shapes are fixed by `core.js`; `site` links (`{ v: "about", id }`) open the About page at that
-  section; `{ v: "home" }` opens the hub's Home.
-- Text the student typed and Timmy's answers are untrusted text: draw them with `textContent`, never as markup.
+Loaded only by the redesign's pages, so nothing reaches the class before the release: a new hub (`widget/hub-timmy.js`
+loads it once the shared widget is up and mounts it with the hub's options) and the new dashboard (`widget/dash.js`, a
+late script, mounted in `startClassData` before Timmy). Its header comment lists `shAsk.mount()`'s options. `ask.css` loads only when something
+of the chat is drawn (the Ask icon or button, or the chat itself): a page where Timmy is shown and nobody asks doesn't
+download it, which keeps the new dashboard inside its request budget (`tools/release/budgets.json`).
+
+- **Where it opens.** Timmy's "Ask me": a button in his speech bubble when he's tapped and in the dashboard house's menu
+  (`widget/pet.js` adds them only when `window.shAsk` exists, so the live hubs' Timmy is unchanged). When he isn't on the
+  page (turned off, Dashboard only, Focus mode, not adopted yet), an Ask icon takes his spot: `.ska-fab` in a hub's
+  bottom-left corner (above the tab bar on a phone), `#askSpot` in the dashboard's "you" card. A 6-second grace after load
+  keeps the icon from flashing before Timmy arrives. "Ask Timmy" (or "Ask the hub") on an answered question card
+  (`widget/hub-bank.js`, `[data-ask-q]`) opens it with that question attached and "Why is it “…”?" in the box.
+- **The voice** follows what's on the page: Timmy's (`voice: "timmy"`) when he's shown (`html.sh-pet-on` on a hub, the
+  house on the dashboard), the plain "Ask the hub" voice otherwise. Same rules either way.
+- **What it sends**: the body in "One question, start to finish" above. `context` is the view, and on the notes the
+  lecture and the first paragraph on screen (`k`, the engine's own count of `p, li, h3, h4` in `.reading-prose`) when
+  the level is As taught. `ask` waits for the answer to be recorded (`sh:answer-paid`, up to 2.5 s) so the server sees it
+  answered. `progress` goes only with "What should I study tonight?" (the starter or a question like it), worked out in the
+  browser from the hub's `core.json` and the student's own saved state (`shAsk.progressFrom`); on the dashboard, for each
+  live hub with a new version. The "chat" id continues the newest chat under 6 hours old; "New chat" starts another.
+- **What it draws**: every word with `textContent`. Each checked quote is a "From the notes" button (the hub's name in
+  front on the dashboard), a `go` is a button ("Practice L8", "Open the notes"), `not_covered` gets "Closest:", a nap
+  gets "Open the notes". Thumbs (`timmy_thumb`), Report (`timmy_report`, its note box; on a nap or an error too, with
+  `message` null), and offers as draft cards: a report goes into `question_flags` like any report (the question's id and
+  "drafted by Timmy" at the end of its note), an idea through `shIdeas.post` with source `board` (the pending `post_idea` takes only `board`, `suggest` and
+  `checkin` and isn't changed: Sam, 2026-11-12, [decisions](../decisions.md)), asking for a leaderboard
+  name first when there's none; "No thanks" and each send call `timmy_offer`. A failed request (45 seconds, offline, an
+  error) says so in his voice with "Try again", which resends the same request id.
+- **Links**: on a hub, through the engine (`SH_GOTO`; practice on a lecture filters the bank to it; the drill opens
+  `#questions/drill`), closing the sheet on a phone. On the dashboard, a link to a hub is saved in `sessionStorage`
+  (`sh_ask_goto`) and the hub's page opens it once its sections have loaded. `about` opens the About page at that section.
+- **Paused** during a mock (`html.sh-mock-on` or a `/mock` view): the box is replaced by a line saying why, and the Ask
+  icon hides. **Not on an archived hub** (the same check as the engine's).
+- **Every button** has a fixed `data-ska` value (click counts never pick up anyone's words); events are `ask:*`
+  ([event-taxonomy](event-taxonomy.md)).
+- **Previews** never call the function: `tools/preview/runtime/preview.js` answers it with canned replies built from the
+  hub's own notes (each ends "(This is the preview's canned answer...)"), and keeps the chats, thumbs, offers and reports
+  in its fixture database. Words that steer it: "quiz" or "Canvas" (declined), "broken" or "report" (a report draft),
+  "idea" or "would be cool" (an idea draft), "tonight" (a plan from the progress sent), "dragon" or "weather" (not
+  covered), "nap" (today's limit reached). The preview panel's "class data" switch reaches it too: slow answers in
+  4 seconds instead of 1.2, unreachable shows the chat's "can't reach" line with Try again.
+- **The smoke test** (`tools/ci/smoke.js`, `askCheck`) stubs the function and checks, on every new hub (phone and laptop)
+  and the new dashboard: the Ask icon or button shows while Timmy isn't adopted, the chat says chats are saved, the
+  request carries what the function reads, an answer's markup is drawn as text, Report and a drafted report work, every
+  button has its `data-ska`, a "From the notes" link opens `#notes/<lecture>`, Ask Timmy on an answered card sends its id,
+  and the icon hides during the mock.
+- At the release: `sw.js` precaches the new pages' files (add `widget/ask.js` and `widget/ask.css` with the rest), and
+  the function's `TIMMY_CONTENT_BASE` points at the released content (above).
+
+## Notes for the admin tab (part 3)
+
+- A report from the chat is a usual `question_flags` row: from the Report button, `timmy_report` marks the answer
+  (`report_id`), so the Timmy tab can open the whole chat; a drafted report the student sent is a plain report whose note
+  ends "drafted by Timmy", and `timmy_offer` marks its answer `sent`.
+- Unit ids, kinds and `go` shapes are fixed by `core.js`; text the student typed and Timmy's answers are untrusted text:
+  draw them with `textContent`, never as markup.
 
 Related: [the task](../tasks/2026-11-12-redesign-ask-timmy.md) · [the release](../tasks/2026-11-06-redesign-release.md) ·
 [game-server](game-server.md) · [event-taxonomy](event-taxonomy.md) · [analytics-retention](analytics-retention.md) ·

@@ -19,7 +19,9 @@
    shPet.mount({ where: "dashboard", sb, visitor, name: fn, perch: fn })   // dashboard
    shPet.mount({ where: "hub", H: window.shEggHooks })                      // hubs (v3.js does this)
    shPet.refresh()                                                          // after a setting changes
-   shPet.art(state, px)                                                     // just the drawing */
+   shPet.art(state, px)                                                     // just the drawing
+   On the redesign's pages, which load Ask Timmy's chat (widget/ask.js, window.shAsk), tapping him offers "Ask me" in his
+   bubble and his house has an "Ask me" button; anywhere else (the live hubs and dashboard) nothing here changes. */
 (function(){
   "use strict";
   if (window.shPet) return;
@@ -990,11 +992,14 @@
     ls("sh_pet_tip", String(i + 1));
     return list[i];
   }
-  function tellTip(ms){
+  function tellTip(ms, extra){
     var t = nextTip();
-    if (typeof t === "string") talk(t, "do-wave", 7000);
-    else talk("<small>Psst. Secret tip:</small><br>" + tipHTML(t), "do-look", ms || 10000, true);
+    if (typeof t === "string") { if (extra) talk(esc(t) + "<br>" + extra, "do-wave", 9000, true); else talk(t, "do-wave", 7000); }
+    else talk("<small>Psst. Secret tip:</small><br>" + tipHTML(t) + (extra ? "<br>" + extra : ""), "do-look", ms || 10000, true);
   }
+  /* Ask Timmy (widget/ask.js): only on the pages that load it, and only while it can answer here (not on an archived hub) */
+  function askOn(){ try { return !!(window.shAsk && window.shAsk.available && window.shAsk.available()); } catch (e) { return false; } }
+  function askBtn(){ return askOn() ? '<button type="button" class="shpet-ask">Ask me</button>' : ""; }
   var EGG_LINES = {
     golden: ["GOLDEN PROBE! I'm so proud I could crack. (I won't.)", "A golden question! You've got the Midas touch. The Midas tooth.",
       "Golden! That's going on my fridge."],
@@ -1490,6 +1495,7 @@
       ".shpet-say b{font-weight:700;}",
       ".shpet-say small{font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; opacity:.65;}",
       ".shpet-say .shpet-more{display:inline-block; margin-top:6px; padding:0; border:0; background:none; color:var(--pet-accent); font:inherit; font-size:12.5px; font-weight:700; cursor:pointer; text-decoration:underline; text-underline-offset:2px;}",
+      ".shpet-say .shpet-ask{display:inline-block; margin:6px 10px 0 0; padding:5px 14px; border:0; border-radius:999px; background:var(--pet-accent); color:#fff; font:inherit; font-size:12.5px; font-weight:800; cursor:pointer;}",
       /* where it lives */
       ".shpet-home{position:fixed; z-index:9989; left:14px; bottom:12px; width:64px; transition:opacity .3s, transform .3s;}",
       ".shpet-home.is-away{opacity:0; transform:translateY(30px); pointer-events:none;}",
@@ -1645,7 +1651,7 @@
       el.innerHTML = '<div class="shpet-scene">' + houseSvg() + '<div class="shpet-spot"><button type="button" class="shpet-btn"></button><div class="shpet-say" role="status" aria-live="polite"></div></div></div>' +
         '<div class="shpet-info"><div class="shpet-title"><b>' + petName() + '</b><span class="shpet-hpnum"></span></div>' +
         '<span class="shpet-hp" aria-hidden="true"><i></i></span><p class="shpet-status"></p>' +
-        '<div class="shpet-actions"><button type="button" class="shpet-ghost" data-joke>Tell me a joke</button><button type="button" class="shpet-ghost" data-check>Checkup</button><button type="button" class="shpet-ghost" data-tip>Secret tip</button></div></div>';
+        '<div class="shpet-actions">' + (window.shAsk ? '<button type="button" class="shpet-ghost" data-ask>Ask me</button>' : "") + '<button type="button" class="shpet-ghost" data-joke>Tell me a joke</button><button type="button" class="shpet-ghost" data-check>Checkup</button><button type="button" class="shpet-ghost" data-tip>Secret tip</button></div></div>';
       if (!el.__shpet) { el.__shpet = true; el.addEventListener("click", homeClick); }
     } else {
       el = document.createElement("div");
@@ -1656,12 +1662,16 @@
     }
     M.el = el; M.btn = el.querySelector(".shpet-btn"); M.say = el.querySelector(".shpet-say");
     M.btn.addEventListener("click", onTap);
-    M.say.addEventListener("click", function(e){ if (e.target.closest(".shpet-more")) { hush(); checkup(); } });
+    M.say.addEventListener("click", function(e){
+      if (e.target.closest(".shpet-ask")) { hush(); if (askOn()) window.shAsk.open({ from: "timmy" }); return; }
+      if (e.target.closest(".shpet-more")) { hush(); checkup(); }
+    });
     draw(); place();
     if (!adopted()) setTimeout(function(){ talk("Psst. Up here. Tap me!", "do-wave", 9000); }, 1400);
     else setTimeout(hello, 900);
   }
   function homeClick(e){
+    if (e.target.closest("[data-ask]")) { if (window.shAsk) window.shAsk.open({ from: "house" }); return; }
     var b = e.target.closest("[data-joke], [data-check], [data-tip]");
     if (b) track("pet:" + (b.hasAttribute("data-joke") ? "joke" : b.hasAttribute("data-check") ? "checkup" : "tip"));
     if (e.target.closest("[data-joke]")) { M.jokes = 0; talk(joke(), pick(["do-hop", "do-wiggle", "do-wave"]), 8500); }
@@ -1830,10 +1840,10 @@
     if (M.sleeping) { M.sleeping = false; M.lastInput = now; draw(); talk(deal("wake", WAKE), "do-hop"); return; }
     if (M.taps >= 5) { M.taps = 0; talk(deal("tickle", TICKLE), "do-spin"); return; }
     M.jokes = (M.jokes || 0) + 1;
-    if (M.jokes % 4 === 0) talk(esc(statusLine(M.st)) + '<br><button type="button" class="shpet-more">Open my checkup</button>', "do-wave", 9000, true);
-    else if (M.jokes % 4 === 2) tellTip();
-    else if (scaredLeft() > 0 && Math.random() < 0.6) talk(deal("scared", SCARED), "do-flinch", 6000);
-    else { var c = chat(); talk(esc(c) + '<br><button type="button" class="shpet-more">Checkup</button>', pick(["do-hop", "do-wiggle", "do-wave"]), readTime(c, 8500, 11000), true); }
+    if (M.jokes % 4 === 0) talk(esc(statusLine(M.st)) + "<br>" + askBtn() + '<button type="button" class="shpet-more">Open my checkup</button>', "do-wave", 9000, true);
+    else if (M.jokes % 4 === 2) tellTip(null, askBtn());
+    else if (scaredLeft() > 0 && Math.random() < 0.6) { if (askOn()) talk(esc(deal("scared", SCARED)) + "<br>" + askBtn(), "do-flinch", 8000, true); else talk(deal("scared", SCARED), "do-flinch", 6000); }
+    else { var c = chat(); talk(esc(c) + "<br>" + askBtn() + '<button type="button" class="shpet-more">Checkup</button>', pick(["do-hop", "do-wiggle", "do-wave"]), readTime(c, askOn() ? 10000 : 8500, askOn() ? 12000 : 11000), true); }
   }
 
   /* ---------- hub reactions ---------- */
