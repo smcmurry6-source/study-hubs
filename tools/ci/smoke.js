@@ -56,6 +56,55 @@ const IDEAS = { total: 4, hubs: { '': 3, perio: 1 }, categories: { feature: 2, f
   { id: 2, title: '<img src=x onerror="window.__idea=1">', body: '<b>bold</b>', name: '<i>Name</i>', hub: 'perio', category: 'content', source: 'checkin', status: 'open', note: null, up: 2, down: 0, at: new Date(Date.now() - 2 * 864e5).toISOString(), own: false, mine: 0, reported: false },
   { id: 3, title: 'Smoke idea three', body: '', name: 'Timmy Tooth', hub: null, category: 'fun', source: 'starter', status: 'open', note: null, up: 1, down: 0, at: new Date(Date.now() - 3 * 864e5).toISOString(), own: false, mine: 0, reported: false },
   { id: 4, title: 'Smoke idea four, mine', body: '', name: 'Test Molar', hub: null, category: 'feature', source: 'board', status: 'open', note: null, up: 0, down: 0, at: new Date(Date.now() - 4 * 864e5).toISOString(), own: true, mine: 0, reported: false }] };
+/* Ask Timmy's chat (widget/ask.js; its server, the `timmy` Edge Function, is deployed at the redesign's release): with
+   Timmy not adopted (as in these runs) the Ask button opens it, with the line that chats are saved; a question goes out
+   with what the function reads; the answer's words are drawn as text, never markup; Report on an answer sends; a drafted
+   report can be edited and turned down; every button names itself with a fixed data-ska value (click counts must never
+   pick up anyone's words); on a hub, an answer's "From the notes" link opens the notes at the lecture. Returns what was sent. */
+const CORS = { 'access-control-allow-origin': '*', 'access-control-allow-headers': 'content-type, apikey, authorization, x-client-info', 'access-control-allow-methods': 'POST, OPTIONS' };
+async function askCheck(page, name, o){
+  const sent = [];
+  await page.route(/supabase\.co\/functions\/v1\/timmy/, route => {
+    const r = route.request();
+    if (r.method() === 'OPTIONS') return route.fulfill({ status: 204, headers: CORS });
+    let body = {}; try { body = JSON.parse(r.postData() || '{}'); } catch (e) {}
+    sent.push(body);
+    const n = sent.length, cites = o.lec ? [{ id: 'N1.0', hub: o.hub, kind: 'notes', label: 'L1 notes', quote: 'a quote', go: { v: 'notes', lec: o.lec, k: 0 } }] : [];
+    return route.fulfill({ status: 200, headers: Object.assign({ 'content-type': 'application/json' }, CORS), body: JSON.stringify({ ok: true, chat: '00000000-0000-4000-a000-00000000000' + (n % 10), message: 900 + n, kind: 'answer',
+      paragraphs: [{ text: 'Smoke answer <img src=x onerror="window.__ask=1"> in plain words.', cites }], offer: n === 2 ? { kind: 'report', text: 'A drafted report', qid: null } : null, go: null, closest: null }) });
+  });
+  await page.route(/supabase\.co\/rest\/v1\/rpc\/timmy_report/, route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"id":1}' }));
+  await o.open();
+  await page.waitForSelector('.ska.is-on .ska-panel', { timeout: 5000 }).catch(() => {});
+  const p0 = await page.evaluate(() => { const r = document.querySelector('.ska'); if (!r || r.hidden) return null;
+    return { title: document.getElementById('skaT').textContent, note: document.querySelector('.ska-note').textContent, starters: document.querySelectorAll('.ska-starters [data-ska^="starter-"]').length }; });
+  if (!p0) { problems.push(`${name}: the Ask button didn't open Ask Timmy's chat`); return sent; }
+  if (p0.title !== 'Ask the hub' || !/saved to help improve the hub/.test(p0.note) || p0.starters < 3) problems.push(`${name}: the chat should say who answers, that chats are saved to help improve the hub, and offer starters (${JSON.stringify(p0)})`);
+  await page.fill('#skaIn', 'What is a smoke test?'); await page.click('.ska-send');
+  await page.waitForSelector('.ska-m.is-tim:not(.is-wait)', { timeout: 8000 }).catch(() => {});
+  const b = sent[0];
+  if (!b || b.hub !== o.hubId || b.voice !== 'plain' || !/^[A-Za-z0-9_-]{8,64}$/.test(b.request || '') || !b.visitor || b.text !== 'What is a smoke test?' || !b.context || !b.context.view) problems.push(`${name}: the chat's question went out as ${JSON.stringify(b)}`);
+  else if (o.hubId === 'dashboard' && !(Array.isArray(b.hubs) && b.hubs.length)) problems.push(`${name}: the dashboard's chat sent no live hubs`);
+  const a1 = await page.evaluate(() => ({ text: (document.querySelector('.ska-m.is-tim .ska-b p') || {}).textContent || '', markup: document.querySelectorAll('.ska-log img').length + (window.__ask ? 1 : 0), w: document.documentElement.scrollWidth - innerWidth }));
+  if (!/<img/.test(a1.text) || a1.markup) problems.push(`${name}: Timmy's answer was drawn as markup, or not at all (${JSON.stringify(a1)})`);
+  if (a1.w > 1) problems.push(`${name}: the open chat scrolls the page sideways by ${a1.w}px`);
+  await page.click('.ska-m.is-tim [data-ska="report"]'); await page.fill('.ska-rep textarea', 'Smoke report'); await page.click('[data-ska="report-send"]');
+  if (!(await page.waitForFunction(() => /Thanks/.test((document.querySelector('.ska-rep') || {}).textContent || ''), null, { timeout: 4000 }).catch(() => null))) problems.push(`${name}: Report on Timmy's answer didn't send`);
+  await page.fill('#skaIn', 'Something is broken'); await page.click('.ska-send');
+  await page.waitForSelector('.ska-offer[data-offer="report"] textarea', { timeout: 8000 }).catch(() => {});
+  const draft = await page.$eval('.ska-offer[data-offer="report"] textarea', t => t.value).catch(() => null);
+  if (draft !== 'A drafted report') problems.push(`${name}: Timmy's drafted report isn't in an editable box (${draft})`);
+  else { await page.click('.ska-offer [data-ska="offer-no"]'); if (!(await page.$('.ska-offer.is-done'))) problems.push(`${name}: No thanks didn't close Timmy's drafted report`); }
+  const unnamed = await page.evaluate(() => [...document.querySelectorAll('.ska button, .ska a[href], .ska label, .ska summary, .ska-fab, .ska-spot button')].filter(e => !e.getAttribute('data-ska')).map(e => e.className || e.tagName));
+  if (unnamed.length) problems.push(`${name}: ${unnamed.length} button(s) in the chat have no fixed data-ska name, so click counts would record their text (${unnamed.join(', ')})`);
+  if (o.lec) {
+    await page.click('.ska-m.is-tim .ska-cite'); await page.waitForTimeout(700);
+    const h = await page.evaluate(() => location.hash);
+    if (h !== '#notes/' + o.lec) problems.push(`${name}: the answer's "From the notes" link opened ${h}, not #notes/${o.lec}`);
+  }
+  if (await page.$('.ska.is-on')) { await page.click('[data-ska="close"]'); await page.waitForTimeout(300); }
+  return sent;
+}
 async function stub(context){
   await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, route => {
     const u = route.request().url();
@@ -359,6 +408,10 @@ function lint(hub, A){
         if (board.unnamed) problems.push(`${name}: ${board.unnamed} idea board button(s) have no fixed data-shi name, so click counts would record their text`);
       }
       await sideways('the idea board');
+      // Ask Timmy on the dashboard: the "Ask the hub" button in the "you" card (Timmy not adopted), every live hub at once
+      await page.waitForSelector('#askSpot:not([hidden]) [data-ska="spot"]', { timeout: 10000 }).catch(() => {});
+      if (!(await page.$('#askSpot:not([hidden]) [data-ska="spot"]'))) problems.push(`${name}: no Ask button in the "you" card while Timmy isn't there`);
+      else await askCheck(page, name, { hubId: 'dashboard', open: () => page.click('#askSpot [data-ska="spot"]') });
       errs.forEach(e => problems.push(`${name}: JavaScript error: ${e}`));
       notes.push(`${name}: ${tabs.length} hub tabs, the class board, Settings, the name dialog and the menu`);
       await page.close();
@@ -443,6 +496,31 @@ function lint(hub, A){
           if (st.w > 1) problems.push(`${name} (${label}): High yield for ${hyLec} scrolls sideways by ${st.w}px`);
           const back = await page.$('[data-level="full"]'); if (back) { await back.click(); await page.waitForTimeout(300); }
         }
+      }
+      /* Ask Timmy (widget/ask.js): the Ask icon in Timmy's corner (he isn't adopted here), the chat, then "Ask Timmy" on an
+         answered question, which sends that question with the next message; no Ask icon during a mock */
+      await page.evaluate(() => { location.hash = 'home'; }); await page.waitForTimeout(400);
+      await page.waitForSelector('.ska-fab:not([hidden])', { timeout: 15000 }).catch(() => {});
+      if (!(await page.$('.ska-fab:not([hidden])'))) problems.push(`${name} (${label}): no Ask icon in Timmy's corner while he isn't there`);
+      else {
+        const lec0 = (() => { try { return JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'core.json'), 'utf8')).lectures[0].id; } catch (e) { return null; } })();
+        const sent = await askCheck(page, `${name} (${label})`, { hubId: hub, hub, lec: lec0, open: () => page.click('.ska-fab') });
+        await page.evaluate(() => { location.hash = 'questions'; }); await page.waitForTimeout(800);
+        const ch = await page.$('#qlist .qcard:not(.is-answered) .ch'); if (ch) { await ch.click(); await page.waitForTimeout(500); }
+        const ab = await page.$('#qlist .qcard.is-answered [data-ask-q]');
+        if (!ab) problems.push(`${name} (${label}): an answered question has no Ask Timmy button`);
+        else {
+          const qid = await ab.evaluate(x => x.closest('.qcard').getAttribute('data-qid'));
+          await ab.click(); await page.waitForSelector('.ska.is-on', { timeout: 5000 }).catch(() => {});
+          const at = await page.evaluate(() => ({ on: !!document.querySelector('.ska-attach:not([hidden])'), text: (document.getElementById('skaIn') || {}).value || '' }));
+          if (!at.on || !at.text) problems.push(`${name} (${label}): Ask Timmy on a question didn't attach it and start a question (${JSON.stringify(at)})`);
+          const before = sent.length; await page.click('.ska-send'); await page.waitForTimeout(3500);
+          const last = sent[sent.length - 1];
+          if (sent.length === before || !last.ask || last.ask.qid !== qid) problems.push(`${name} (${label}): Ask Timmy didn't send question ${qid} with the message (${JSON.stringify(last && last.ask)})`);
+          if (await page.$('.ska.is-on')) await page.click('[data-ska="close"]');
+        }
+        await page.evaluate(() => { location.hash = 'questions/mock'; }); await page.waitForTimeout(800);
+        if (await page.evaluate(() => { const f = document.querySelector('.ska-fab'); return !!f && !f.hidden && getComputedStyle(f).display !== 'none'; })) problems.push(`${name} (${label}): the Ask icon shows during the mock exam`);
       }
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
       notes.push(`${name} (${label}): clicked through ${screens} screens, ${n} questions`);

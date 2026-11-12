@@ -473,9 +473,11 @@ try {
   eq(post('idea-vis-1', 'Another idea', '', null, 'fun').error, 'slow', 'one every 20 seconds');
   const back = () => sql(`update ideas set created_at = created_at - interval '30 seconds' where visitor_id = 'idea-vis-1'`);
   back(); ok(post('idea-vis-1', 'Another idea', '', null, 'fun', 'checkin').ok, 'a second idea, from a check-in');
-  back(); ok(post('idea-vis-1', 'A third idea', '', null, 'look').ok, 'a third');
+  back(); ok(post('idea-vis-1', 'A third idea', '', null, 'look', 'timmy').ok, 'a third, drafted by Ask Timmy (migration_v55\'s chat)');
   back(); eq(post('idea-vis-1', 'A fourth idea', '', null, 'other').error, 'limit', 'three a day');
   ok(one(`select source from ideas where title = 'Another idea'`) === 'checkin', 'a check-in\'s idea is tagged as one');
+  ok(one(`select source from ideas where title = 'A third idea'`) === 'timmy', 'an idea Timmy drafted is tagged as one');
+  eq(post('idea-vis-3', 'From nowhere', '', null, 'fun', 'robot').error, 'bad', 'a source outside the list');
   ok(post('idea-vis-2', 'Exam dates in my calendar', '', null, 'feature').ok, 'an idea for all hubs');
   const vote = (v, id, val) => anonJson(`vote_idea(${q(v)}, ${id}, ${val})`);
   vote('idea-vis-2', i1.id, 1); vote('idea-vis-3', i1.id, -1); vote('idea-vis-4', i1.id, 1);

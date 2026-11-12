@@ -224,6 +224,7 @@
       t += '<span class="shi-tag">' + esc(CAT_NAME[it.category] || "Something else") + "</span>";
       if (it.source === "starter") t += '<span class="shi-tag is-src">Starter idea</span>';
       else if (it.source === "checkin") t += '<span class="shi-tag is-src">From a check-in</span>';
+      else if (it.source === "timmy") t += '<span class="shi-tag is-src">Drafted with Timmy</span>';
       if (STATUS[it.status]) t += '<span class="shi-stamp is-' + esc(it.status) + '">' + (a && it.status === "shipped" ? a.check(14) : "") + esc(STATUS[it.status]) + "</span>";
       return t;
     }
@@ -506,5 +507,16 @@
     return api;
   }
 
-  window.shIdeas = { mount: mount, tick: tick, up: up, cats: CATS.map(function(c){ return { id: c[0], name: c[1], hint: c[2] }; }), statuses: STATUS };
+  /* one idea posted from somewhere else (Ask Timmy's drafted idea, widget/ask.js): p { sb, title, body, hub, category,
+     source, newName (a name to save first, for someone who hasn't picked one), request }; resolves { ok, id, name } or
+     { ok: false, msg }. Every board on the page shows it. */
+  function post(p){
+    p = p || {};
+    return send(p.sb || window.shSupabase || null, { title: tidy(p.title), body: tidy(p.body || ""), hub: p.hub || null, category: p.category, source: p.source || "board", newName: nameNow() ? "" : tidy(p.newName || ""), request: p.request || requestId() }).then(function(r){
+      if (r.ok) boards.forEach(function(b){ b.reload(); });
+      return r;
+    });
+  }
+
+  window.shIdeas = { mount: mount, tick: tick, up: up, post: post, cats: CATS.map(function(c){ return { id: c[0], name: c[1], hint: c[2] }; }), statuses: STATUS };
 })();

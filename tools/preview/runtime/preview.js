@@ -795,7 +795,7 @@
     ideaDb();
     var no = function(e){ return { data: { ok: false, error: e } }; };
     var title = String(a.p_title || "").replace(/\s+/g, " ").trim(), body = String(a.p_body || "").replace(/\s+/g, " ").trim(), hub = String(a.p_hub || "").trim() || null;
-    if (!a.p_visitor || ["board", "suggest", "checkin"].indexOf(a.p_source || "board") < 0 || (a.p_request != null && !/^[A-Za-z0-9_-]{8,64}$/.test(a.p_request))) return no("bad");
+    if (!a.p_visitor || ["board", "suggest", "checkin", "timmy"].indexOf(a.p_source || "board") < 0 || (a.p_request != null && !/^[A-Za-z0-9_-]{8,64}$/.test(a.p_request))) return no("bad");
     var prev = db.ideaPosts.filter(function(p){ return a.p_request && p.request === a.p_request; })[0];
     if (prev) return { data: { ok: true, id: prev.id, name: prev.name, repeat: true } };
     if (a.p_visitor !== db.visitor || !String(db.name || "").trim()) return no("name");
@@ -857,6 +857,82 @@
     save(); return { write: true, data: { ok: true, notified: k } };
   }
 
+  /* ---------- Ask Timmy (the `timmy` Edge Function and migration_v55's calls, from the redesign's release). A preview
+     never calls the function or the model: these canned answers show each kind of reply (an answer with "From the notes"
+     links into the hub's own notes, a plan from the student's progress, "not covered", a declined quiz question, a
+     drafted report or idea, a nap), and every one says it's the preview's. Type "nap" to see him napping. ---------- */
+  function timmyDb(){ if (!db.timmy) db.timmy = { chats: [], mseq: 7000 }; return db.timmy; }
+  var timmyContent = {};
+  function timmyHub(hub){
+    if (!timmyContent[hub]) {
+      var base = ROOT + "hubs/" + hub + "/next/content/";
+      timmyContent[hub] = Promise.all([realFetch(base + "core.json").then(function(r){ return r.json(); }), realFetch(base + "notes.json").then(function(r){ return r.json(); })])
+        .then(function(x){ return { core: x[0], notes: x[1] }; }, function(){ delete timmyContent[hub]; return null; });
+    }
+    return timmyContent[hub];
+  }
+  function timmyParas(html){
+    var t = document.createElement("template"); t.innerHTML = html || "";
+    return Array.prototype.map.call(t.content.querySelectorAll("p, li, h3, h4"), function(e, k){ return { k: k, text: String(e.textContent || "").replace(/\s+/g, " ").trim() }; });
+  }
+  function timmyUuid(){ var h = "0123456789abcdef", s = ""; for (var i = 0; i < 32; i++) s += h[Math.floor(Math.random() * 16)]; return s.slice(0, 8) + "-" + s.slice(8, 12) + "-4" + s.slice(13, 16) + "-a" + s.slice(17, 20) + "-" + s.slice(20); }
+  function timmyReply(a){
+    var text = String(a.text || "").trim(), low = text.toLowerCase(), dash = a.hub === "dashboard", plain = a.voice === "plain";
+    var ctx = a.context || {}, hub = dash ? (Array.isArray(a.hubs) && a.hubs[0]) || "" : a.hub;
+    var tail = { text: "(This is the preview's canned answer. On the live site " + (plain ? "the answer is written" : "Timmy writes his own") + " from the notes.)", cites: [] };
+    if (/(^|\/)mock(\/|$)/.test(String(ctx.view || ""))) return Promise.resolve({ ok: true, kind: "paused", paragraphs: [{ text: plain ? "Ask the hub is paused during a mock exam." : "No help from me during a mock exam: it's your test. I'll be here when you finish.", cites: [] }], offer: null, go: null, closest: null });
+    if (/^nap$/i.test(text)) return Promise.resolve({ ok: true, limited: "limit", kind: "limit", paragraphs: [{ text: plain ? "You've reached today's 40 questions. Ask again tomorrow; the notes are a tap away." : "That's my 40 questions for today, and I'm napping. The notes are right where you left them. Ask me again tomorrow.", cites: [] }], offer: null, go: null, closest: null });
+    return (hub ? timmyHub(hub) : Promise.resolve(null)).then(function(H){
+      var lecs = H && H.core && H.core.lectures || [], L = lecs.filter(function(l){ return l.id === ctx.lec; })[0] || lecs.filter(function(l){ return H.notes.full[l.id]; })[0] || null;
+      var label = function(l){ return l ? (l.label || "L" + l.num) : ""; };
+      var paras = L ? timmyParas(H.notes.full[L.id]) : [], P0 = null;
+      if (ctx.lec === (L && L.id) && Number.isInteger(ctx.k)) P0 = paras.filter(function(x){ return x.k >= ctx.k && x.text.length > 40; })[0];
+      P0 = P0 || paras.filter(function(x){ return x.text.length > 60; })[0] || null;
+      var quote = P0 ? P0.text.split(" ").slice(0, 10).join(" ") : "";
+      var cite = P0 ? [{ id: "N1." + P0.k, hub: hub, kind: "notes", label: label(L) + " notes", quote: quote, go: { v: "notes", lec: L.id, k: P0.k } }] : [];
+      var r = { kind: "answer", paragraphs: [], offer: null, go: null, closest: null };
+      var me = plain ? "" : "Great question. ";
+      if (/\b(quiz|canvas|take-?home)\b/.test(low)) { r.kind = "quiz_declined"; r.paragraphs = [{ text: plain ? "That reads like a graded quiz question, so it won't be answered here. The notes on it are a tap away." : "That sounds like a graded quiz question, and I can't help with those. I'm happy to go over the notes on the topic once it's closed.", cites: [] }]; }
+      else if (a.ask && a.ask.qid) { r.paragraphs = [{ text: me + "Here's the idea behind that one, in a few lines, with where it is in the notes.", cites: [] }, { text: P0 ? P0.text.slice(0, 220) : "The notes for that lecture explain it.", cites: cite }];
+        r.paragraphs[0].cites = [{ id: "Q", hub: a.hub, kind: "question", label: "This question", quote: "", go: { v: "bank", q: a.ask.qid } }]; r.go = L ? { v: "practice", hub: hub, lec: L.id } : null; }
+      else if (/broken|bug|typo|wrong key|doesn.?t work|won.?t load|report/.test(low)) { r.paragraphs = [{ text: plain ? "Sorry about that. Want to send it to Sam as a report?" : "Oof, sorry about that. Want me to write it up for Sam as a report?", cites: [] }];
+        r.offer = { kind: "report", text: text.slice(0, 400), qid: null }; }
+      else if (/\bidea\b|would be (cool|nice|great|helpful)|\bwish\b|you should add|could you add/.test(low)) { r.paragraphs = [{ text: plain ? "That could help others too. Post it on the idea board?" : "Ooh, I like it. Want to put it on the idea board so the class can vote?", cites: [] }];
+        r.offer = { kind: "idea", title: text.replace(/[.!?]+$/, "").slice(0, 70), body: "", hub: dash ? "" : a.hub, category: "feature" }; }
+      else if (/tonight|today|next|where should i start/.test(low)) {
+        var pr = (a.progress && a.progress.lectures) || [], pick = pr.slice().sort(function(x, y){ return (y.missed - x.missed) || ((x.answered / (x.questions || 1)) - (y.answered / (y.questions || 1))); })[0];
+        var PL = pick ? lecs.filter(function(l){ return l.id === pick.lec; })[0] : L;
+        r.paragraphs = [{ text: pick ? "Start with " + label(PL) + (PL ? " " + String(PL.title).split(":")[0] : "") + (pick.missed ? ": you've missed " + pick.missed + " there on your latest tries." : pick.answered ? ": you've tried " + pick.answered + " of its " + pick.questions + " questions so far." : ": you haven't tried its " + pick.questions + " questions yet.") : "Start with the first lecture's notes, then its questions.", cites: [] },
+          { text: "Read its notes first, then practice its questions until the misses are gone. Finish with the Daily drill.", cites: cite }];
+        r.go = PL ? { v: "practice", hub: pick ? pick.hub || hub : hub, lec: PL.id } : { v: "drill", hub: dash ? hub : a.hub }; }
+      else if (/dragon|weather|football|recipe|movie/.test(low)) { r.kind = "not_covered"; r.paragraphs = [{ text: plain ? "The notes don't cover that." : "My notes don't cover that one. Ask me about the lectures?", cites: [] }];
+        r.closest = L ? { hub: hub, lec: L.id, label: label(L), title: L.title } : null; }
+      else { r.paragraphs = [{ text: me + (P0 ? "The notes put it this way: " + P0.text.slice(0, 260) : "The notes cover it in the lectures."), cites: cite }]; if (L && P0) r.go = { v: "notes", hub: hub, lec: L.id, k: P0.k }; }
+      r.paragraphs.push(tail);
+      /* the chat, kept in this browser like every other preview save, so Past chats and the thumbs work */
+      var T = timmyDb(), c = a.chat ? T.chats.filter(function(x){ return x.id === a.chat; })[0] : null, at = iso(now());
+      if (!c) { c = { id: timmyUuid(), hub: a.hub, started: at, last: at, messages: [] }; T.chats.unshift(c); }
+      c.last = at; c.messages.push({ id: ++T.mseq, who: "student", text: text, at: at });
+      var mid = ++T.mseq; c.messages.push({ id: mid, who: "timmy", text: r.paragraphs.map(function(x){ return x.text; }).join("\n\n"), reply: r, kind: r.kind, thumb: null, offer: r.offer ? r.offer.kind : null, offer_action: null, at: at });
+      save();
+      return Object.assign({ ok: true, chat: c.id, message: mid }, r);
+    });
+  }
+  function timmyRpc(fn, a){
+    if (!/^(get_timmy_history|timmy_thumb|timmy_offer|timmy_report)$/.test(fn)) return null;
+    var T = timmyDb(), find = function(id){ var out = null; T.chats.forEach(function(c){ c.messages.forEach(function(m){ if (m.id === id) out = { c: c, m: m }; }); }); return out; };
+    if (fn === "get_timmy_history") return { data: T.chats.filter(function(c){ return c.hub === a.p_hub; }).sort(function(x, y){ return x.last < y.last ? 1 : -1; }).slice(0, Math.max(1, Math.min(a.p_limit || 10, 20))) };
+    var f = a.p_message != null ? find(a.p_message) : null;
+    if (fn === "timmy_thumb") { if (f) f.m.thumb = a.p_val ? a.p_val : null; save(); return { write: true, data: !!f }; }
+    if (fn === "timmy_offer") { if (f) f.m.offer_action = a.p_action; save(); return { write: true, data: !!f }; }
+    var note = String(a.p_note || "").trim();
+    if (!note) return { data: { ok: false, error: "bad" } };
+    var id = 8000 + db.flags.length;
+    db.flags.push({ id: id, hub: f ? f.c.hub : a.p_hub, note: note.slice(0, 600) + " — Timmy" + (f ? "'s answer " + a.p_message : "") + (a.p_section ? " · " + a.p_section : ""), at: iso(now()) });
+    if (f) f.m.report_id = id;
+    save(); return { write: true, data: { ok: true, id: id } };
+  }
+
   function rpc(fn, a){
     a = a || {};
     if (ADMIN_FNS.test(fn)) {
@@ -876,6 +952,7 @@
       return { data: fn === "get_question_health" ? qhFixture(a.p_hub, a.p_current) : synthAdmin(fn) };
     }
     var v = a.p_visitor, hub = a.p_hub, t = now();
+    var tm = timmyRpc(fn, a); if (tm) return tm;
     /* the game layer's functions (migration_v54: written, tested, and not applied until the redesign's release). The new
        dashboard (widget/dash.js) calls them as <name>_v2, so the preview answers them from today's fixtures plus what
        v54 adds to a row: the journey (0, the Handpiece) and a visit key (made up here; the real one is a digest only
@@ -1049,6 +1126,11 @@
     if (speed === "down") { logEntry("read", "class data unreachable (simulated) " + p, {}); return Promise.reject(new TypeError("Failed to fetch (simulated by the preview)")); }
     var args = {}; try { args = body ? JSON.parse(body) : {}; } catch (e) {}
     var m = /^\/rest\/v1\/rpc\/([a-z0-9_]+)$/.exec(p), tm = /^\/rest\/v1\/([a-z0-9_]+)$/.exec(p);
+    /* Ask Timmy's function: a canned answer after a moment's "thinking" (above) */
+    if (p === "/functions/v1/timmy" && method === "POST") {
+      logEntry("write", "timmy (canned answer)", { hub: args.hub, voice: args.voice, view: args.context && args.context.view });
+      return timmyReply(args).then(function(d){ return new Promise(function(ok){ setTimeout(function(){ ok(respond(200, d)); }, speed === "slow" ? 4000 : 1200); }); });
+    }
     if (m) {
       var r = rpc(m[1], args);
       logEntry(r.error ? "denied" : r.write ? "write" : "read", m[1], r.write || r.error ? args : {});

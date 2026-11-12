@@ -534,6 +534,48 @@ The sessions that build each part fix the drafts they make untrue; this is the l
 7. The 90-day delete of hidden and deleted ideas (approved, not built): add it to the weekly retention job and its
    suite (`tools/release/retention.js`), with its line in [analytics-retention](../reference/analytics-retention.md).
 
+### From Ask Timmy, part 2 (the chat, [its note](2026-11-12-redesign-ask-timmy.md), built 2026-11-12)
+
+The chat is `widget/ask.js` + `widget/ask.css`, loaded only by the new pages ([ask-timmy](../reference/ask-timmy.md),
+"The chat in the new pages"). At the release, besides its box above:
+
+1. `sw.js`: add `widget/ask.js` and `widget/ask.css` to `PRECACHE` with the engine's files.
+2. The function's `TIMMY_CONTENT_BASE` is the content's released address (the switch PR says where).
+3. **One question from the live site on a phone and a laptop**, plain voice and Timmy's: a "From the notes" link opens
+   the paragraph, Report sends, `admin_timmy_days` shows it with its cost.
+4. `supabase/functions/timmy/site.json` is rebuilt after the About page's edits below (`node tools/timmy/build.mjs`; CI's
+   "generated files are current" step fails otherwise), so Timmy's site help knows about himself.
+
+**About page** (in `section#timmy` unless said; nothing here is a secret):
+
+- **Ask Timmy** <span class="tag new">new</span>: tap Timmy and pick **Ask me** (on the dashboard, Ask me in his house)
+  to ask about the notes. He answers from the hub's own notes, review tables, Exam Hints and cram sheet only (on the
+  dashboard, from every live hub's), in a few short lines, with a **From the notes** link under each point that opens the
+  notes at that very paragraph. When the notes don't cover something he says so and points to the closest lecture. Starter
+  questions: "What should I study tonight?" (he reads your own progress in the hub: weakest lectures, questions missed,
+  lectures not started; it's worked out on your device and sent only with that question), "Explain this lecture simply"
+  (while you're in its notes), "What's most likely on the exam?" and "How do I use this hub?" (on the dashboard, "When are
+  my exams?" and "What can this site do?"). **He won't answer a graded quiz,
+  take-home or exam question**, and gives no hints on a practice question before you've answered it. 40 questions a day;
+  after that he naps until tomorrow. Paused during a mock exam. Thumbs up or down on each answer, **Report** on any answer
+  that's wrong or odd (Sam sees the whole chat and replies in your Inbox), and past chats on this hub (the clock).
+- **If he spots a problem or an idea**, he writes it up for you: a report for Sam or an idea for the idea board, in a box
+  you can edit. Nothing is sent until you tap Send (or Post); **No thanks** drops it. An idea goes up under your
+  leaderboard name, tagged "Drafted with Timmy".
+- **Ask Timmy on a question**: after you answer a practice question, **Ask Timmy** under it opens the chat with that
+  question attached ("Why is it ...?"). Not before you answer.
+- **Timmy off?** When Timmy is turned off (Settings, Dashboard only on a hub, or Focus mode), or before you've met him, an
+  **Ask button** sits in his spot (a hub's bottom-left corner; the "You" card on the dashboard) and the same chat answers
+  in a plain "Ask the hub" voice, with the same rules.
+- **What the hubs record** (`section#widget`; replace "Nothing else you type is recorded"): **Your chats with Ask Timmy
+  are saved, every message with your browser's id, to help improve the hub** (Sam reads them on the admin page to fix
+  gaps in the notes and wrong answers). They're answered by **Claude, Anthropic's AI**: your question, the hub's notes and
+  what's on your screen go to Anthropic's API to write the answer, and nowhere else. Only Sam and your own browser can
+  read your chats; classmates never see them. Nothing else you type is recorded. (Add the chats to "How long it's kept"
+  once Sam decides how long: [analytics-retention](../reference/analytics-retention.md) has it as proposed.)
+- **Settings**: Timmy's line reads "Your cartoon tooth buddy, on the bar: tap him to ask about the notes. He hides during
+  mock exams. Off, an Ask button takes his place." (the engine's and the dashboard's Settings already say so).
+
 ### From phase 3 (the new dashboard, [phase 3](2026-11-05-redesign-phase-3-dashboard.md))
 
 Written for the dashboard as built in `next/index.html`, `widget/dash.js` and `widget/dash.css`. The idea board's part

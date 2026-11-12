@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (Ask Timmy's chat, part 2, Claude Code)** — Nothing students see changes yet: the chat half of
+  [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md), in the redesign's pages only. `widget/ask.js` + `ask.css`
+  (a bottom sheet on a phone, a side panel on a laptop) open from Timmy's "Ask me" (his bubble, the dashboard house), from
+  an Ask icon in his spot when he isn't shown (a hub's bottom-left corner, the dashboard's "you" card; a plain "Ask the
+  hub" voice), and from "Ask Timmy" on an answered question card (`widget/hub-bank.js`). Answers draw as text with "From
+  the notes" links to the paragraph, thumbs, Report (`timmy_report`), and drafted reports and ideas the student edits and
+  sends (ideas with source `timmy`: `migration_v54.sql`, still pending, and `tools/release/xp.js`). Paused during a mock,
+  off on an archived hub. `widget/pet.js` adds "Ask me" only where `window.shAsk` exists, so the live hubs' Timmy is
+  unchanged. The preview answers the function with canned replies; `tools/ci/smoke.js` checks the chat on every new hub
+  (phone and laptop) and the new dashboard. How it works: [ask-timmy](vault/reference/ask-timmy.md); release steps and
+  the About page's entries: [the release](vault/tasks/2026-11-06-redesign-release.md). Parts 3 (the admin tab) and 4
+  (everyone has Timmy) are next.
 - **2026-11-12 (the rest of the redesign's phase 4, planned: vault only, Claude Code)** — No code and nothing students
   see. Sam answered one list of calls, and what is left of phase 4 is now ten sessions in order, each with a build
   spec a fresh session can follow (files to touch and not to, the calls and their shapes, the preview's made-up data,
