@@ -10,8 +10,8 @@
      handpiece rank, mastery medals, day streak and the week as dots;
    - the class: who is studying right now (the live count and a chip for each hub someone is in), then the board
      (ranks or study streaks) with the top three on a podium;
-   - the idea board's slot (widget/ideas.js fills #ideas), then past hubs: each finished exam's recap as a live
-     infographic, and the hubs that just closed.
+   - the idea board (widget/ideas.js draws it in #ideas once the board's server is there), then past hubs: each
+     finished exam's recap as a live infographic, and the hubs that just closed.
    No What's new list, no arcade scores and no "When people study" chart (Sam, 2026-11-11); a hub's "Updated" label still reads the changelog.
    The check-in, survey, name, luck and archive logic is the live dashboard's own, moved here unchanged.
 
@@ -719,7 +719,7 @@
 
   /* ====================================================================
      EXAM CHECK-INS AND SURVEYS: the live dashboard's own code (index.html), moved here unchanged except for its
-     buttons' classes. Keep the two in step until the release.
+     buttons' classes and, in the check-in, the idea board's tick (below). Keep the rest in step until the release.
      ==================================================================== */
   /* Exam check-in (exam_debriefs, migration_v23/v24). After an exam, anyone with progress in that hub gets the
      check-in as a pop-up once, on their first visit after it, however late. Every hub (live or archived) with a
@@ -771,6 +771,11 @@
     lsSet("sh_debrief_" + hub.id + "_" + x.date, "1");   /* shown = seen; the card button stays for later */
     var old = document.querySelector(".survey"); if (old) old.remove();
     var QS = debriefQs(x), answers = {}, examId = x.date + " " + (x.label || "Exam"), step = 0, last = QS.length - 1, timer = null;
+    /* the idea board's tick under "Anything the hub could do better?" (widget/ideas.js, Sam 2026-11-06): ticked to
+       start, it shows the answer as the post it would make (a title, the text cut to 280, its kind) and posts it under
+       the writer's leaderboard name when the check-in is sent. Unticked, the answer stays private, as before. The tick
+       draws nothing until the board is up, and what it holds (ideaPost) outlives a Back and Next. */
+    var ideaTick = null, ideaPost = {};
     var box = document.createElement("section");
     box.className = "survey debrief"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Exam check-in");
     root.appendChild(box);
@@ -781,8 +786,9 @@
       if (step === 0) h += '<h3>How did ' + esc(x.name || hub.title) + ' go?</h3>' +
         '<p class="survey-why">What you say here, along with how everyone used the hub, goes to the AI that builds these hubs, so the ones for your next exams come out better.</p>';
       h += '<div class="survey-q" data-sq="' + q.id + '" data-kind="' + q.kind + '"><p' + (step ? ' class="debrief-prompt"' : '') + '>' + esc(q.prompt) + '</p>';
-      if (q.kind === "text") h += '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '" placeholder="e.g. more on suture types, more EXCEPT questions">' + esc(v || "") + '</textarea>' +
-        (q.note ? '<p class="survey-why">' + esc(q.note) + '</p>' : '');
+      if (q.kind === "text") h += (q.note ? '<p class="survey-why">' + esc(q.note) + '</p>' : '') +
+        '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '" placeholder="e.g. more on suture types, more EXCEPT questions">' + esc(v || "") + '</textarea>' +
+        (q.id === "missed" ? '<div data-idea-tick></div><p class="survey-why debrief-warn" role="alert"></p>' : '');
       else if (q.kind === "scale") {
         h += '<div class="survey-opts survey-scale">';
         for (var n = 1; n <= 5; n++) h += '<button type="button" class="survey-opt" aria-pressed="' + (v === n) + '" data-sv="' + n + '">' + n + '</button>';
@@ -795,12 +801,14 @@
       if (step < last) h += '<button type="button" class="btn ' + (v != null ? 'btn-primary' : 'btn-quiet') + '" data-act="next">' + (v != null ? 'Next' : 'Skip') + '</button>';
       else h += '<button type="button" class="btn btn-primary survey-send" data-act="send">Send</button>';
       box.innerHTML = h + '</div>';
+      var th = box.querySelector("[data-idea-tick]");
+      ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
       refresh();
       var t = box.querySelector("textarea"); if (t && step && window.matchMedia && matchMedia("(hover:hover)").matches) setTimeout(function(){ try{ t.focus({ preventScroll:true }); }catch(e){} }, 60);
     }
     function refresh(){
       var t = box.querySelector("textarea"), send = box.querySelector(".survey-send");
-      if (t){ var v = t.value.trim(); if (v) answers.missed = v.slice(0, 600); else delete answers.missed; }
+      if (t){ var v = t.value.trim(); if (v) answers.missed = v.slice(0, 600); else delete answers.missed; if (ideaTick) ideaTick.sync(v); }
       if (send) send.disabled = !Object.keys(answers).length;
     }
     function go(n){ clearTimeout(timer); step = Math.max(0, Math.min(last, n)); render(); }
@@ -840,10 +848,20 @@
         refresh();
         var thanks = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>Thank you!</b> Thought of something else? Check in again any time from the hub on this page.</p>';
         var failed = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>That didn\'t save.</b> Please try again in a minute from the hub on this page.</p>';
+        /* the tick: a ticked answer needs a name and a title before anything is sent; an unticked one is counted */
+        var tk = ideaTick, toBoard = !!(tk && tk.on()), warn = box.querySelector(".debrief-warn");
+        if (toBoard) { var bad = tk.check(); if (bad) { if (warn) warn.textContent = bad; return; } }
+        else if (tk && tk.shown() && answers.missed) track("ideas:checkin-private");
         act.disabled = true;
         if (!debriefSb) { box.innerHTML = failed; setTimeout(close, 4000); return; }
         debriefSb.rpc("submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
-          box.innerHTML = (!r.error && r.data === true) ? thanks : failed; setTimeout(close, 3600);
+          if (r.error || r.data !== true) { box.innerHTML = failed; setTimeout(close, 4000); return; }
+          if (!toBoard) { box.innerHTML = thanks; setTimeout(close, 3600); return; }
+          /* the check-in is in; now the post. If it doesn't go up (three ideas today, say), the check-in still counts */
+          tk.post().then(function(p){
+            box.innerHTML = thanks + '<p class="survey-why">' + (p.ok ? "Your idea is on the idea board." : "Your check-in was sent, but the idea didn\'t post. " + esc(p.msg || "")) + "</p>";
+            setTimeout(close, p.ok ? 3600 : 7000);
+          }, function(){ box.innerHTML = thanks; setTimeout(close, 3600); });
         }, function(){ box.innerHTML = failed; setTimeout(close, 4000); });
       }
     });
@@ -976,7 +994,7 @@
     setTimeout(function(){ try{ input.select(); }catch(e){} }, 40);
     d.addEventListener("click", function(e){
       if (!e.target.closest(".dx-namereset")) return;
-      localName = ""; lsSet("sh_display_name", null); track("name:reset");
+      localName = ""; lsSet("sh_display_name", null); track("name:reset"); nameChanged();
       if (nameSb) nameSb.rpc("clear_display_name", { p_visitor: VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; paintName(); } }, function(){});
       paintName(); dlg.close();
     });
@@ -986,7 +1004,7 @@
       if (!v){ msg.textContent = "Type a name first."; input.focus(); return; }
       if (nameSb) nameSb.rpc("set_display_name", { p_visitor: VISITOR, p_name: v }).then(function(){}, function(){});
       track("name:set");
-      localName = v; lsSet("sh_display_name", v); paintName();
+      localName = v; lsSet("sh_display_name", v); paintName(); nameChanged();
       /* another, unlinked device already uses this name: ask whether it's theirs (widget/linkask.js) */
       if (window.shLinkAsk) window.shLinkAsk.check(v);
       msg.textContent = "Saved. Hi, " + v + "!";
@@ -995,6 +1013,11 @@
   }
   paintName();
   $("youName").addEventListener("click", function(e){ if (e.target.closest("#greetEdit")) openNameEditor(); });
+  /* the name changed here: say so (the idea board shows who you post as). A name picked in the idea board's form says
+     so the same way, and this page takes it. */
+  var nameTold = false;
+  function nameChanged(){ nameTold = true; try { document.dispatchEvent(new CustomEvent("sh:name", { detail: { name: localName } })); } catch (e) {} nameTold = false; }
+  document.addEventListener("sh:name", function(e){ if (nameTold) return; localName = String(e && e.detail && e.detail.name || "").slice(0, 24); paintName(); });
 
   /* Settings: the same keys the hubs' Settings keep (widget/hub.js and widget/v3.js: keep the three lists in step), so a
      change here shows in every hub. The font choice, background music and the accent metal are cut (plan, 4.6). */
@@ -1490,7 +1513,7 @@
     }
     S.push({ el: "#you", title: "You", body: "<p>The name classmates see, your handpiece rank and XP from every hub, your mastery medals and your study streak." + (petOn() ? " Timmy Tooth lives here once you've met him: study and he stays healthy." : "") + "</p>" });
     S.push({ el: "#class", title: "The class", body: "<p>How many classmates have a hub open this minute and which hubs they're in. Under it, the top ten by XP or the longest study streaks, the first three on the podium, with every rank from Stone to Dark Matter folded underneath.</p>" });
-    if (o.visible($("ideas"))) S.push({ el: "#ideas", title: "The idea board", body: "<p>Post an idea for the hubs and vote on your classmates'.</p>" });
+    if (o.visible($("ideas"))) S.push({ el: "#ideas", title: "The idea board", body: "<p>Ideas for the hubs, from the class. Vote the ones you'd use up or down, or post your own: it shows right away under your name, with the hub it's for and what kind of idea it is.</p>" });
     if (o.visible($("past"))) S.push({ el: "#past", title: "Past hubs", body: "<p>How the class studied for each exam that's done: the hours, the people, the busiest day. <b>Save image</b> keeps a picture of it. A hub that just closed keeps its check-in here.</p>" });
     S.push({ el: "#inboxBtn", title: "Inbox", body: "<p>Replies to your reports and suggestions, notices to the whole class and the occasional short survey. A number on it means something new.</p>" });
     S.push({ el: "#setBtn", title: "Settings", body: "<p>Focus mode, the theme, text size, your name, Timmy and the extras. Set them once here and every hub follows.</p>" });
@@ -1533,6 +1556,13 @@
     }
     if (!sb){ renderMyRank(null); whenPanelOpens($("class"), function(){ boardOpen = true; drawBoard(); }); return; }
     nameSb = sb; luckSb = sb; debriefSb = sb; boardSb = sb;
+    /* the idea board (widget/ideas.js): its section stays hidden until its first load says the board is up (its
+       server is migration_v54). An idea can be for a live hub or all hubs; an archived hub's ideas keep its name. */
+    if (window.shIdeas) window.shIdeas.mount($("ideas"), { sb: sb,
+      hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h) }; }); },
+      name: function(id){ var h = debriefHub(id); return h ? hubName(h) : HUB_LABEL[id] || ""; },
+      tint: tintVars, editName: openNameEditor, nameHint: function(){ return randomName; },
+      onReady: function(ok){ $("ideas").hidden = !ok; } });
     loadOverrides(sb, bootstrap.ready);
     loadRecaps(sb, bootstrap.ready);
     loadChangelog(); watchUpdates();
@@ -1575,7 +1605,7 @@
 
     /* what gets clicked (widget/clicks.js), report replies and notices (widget/replies.js), "is this your other device?" (widget/linkask.js) */
     if (window.shClicks) window.shClicks.start({ sb: sb, hub: "dashboard", visitor: VISITOR, section: function(){ return "dashboard"; } });
-    if (window.shReplies) window.shReplies.start({ sb: sb, visitor: VISITOR || null, hub: "dashboard", bootstrap: bootstrap.ready });
+    if (window.shReplies) window.shReplies.start({ sb: sb, visitor: VISITOR || null, hub: "dashboard", bootstrap: bootstrap.ready, v2: function(){ return V2 === true; } });
     if (window.shLinkAsk) window.shLinkAsk.start({ sb: sb, hub: "dashboard", bootstrap: bootstrap.ready, bootstrapName: bootstrap.linkName });
 
     /* after an exam, its check-in takes the survey's place for that visit; both wait while the tour is on screen */
@@ -1608,7 +1638,7 @@
   /* The page is drawn from this device's own data first. The class's data and the shared widgets (ranks, Timmy, the
      Inbox, click counts) come after, in this order, so the first screen doesn't wait for them on a slow phone. A page
      that lists one of them itself is left alone. */
-  var LATE = ["vendor/supabase-2.117.2.js", "clicks.js", "replies.js", "linkask.js", "ranks.js", "pet.js", "timmy.js", "hub-art/class.js"];
+  var LATE = ["vendor/supabase-2.117.2.js", "clicks.js", "replies.js", "linkask.js", "ranks.js", "pet.js", "timmy.js", "hub-art/class.js", "ideas.js"];
   function loadLate(done){
     var need = LATE.filter(function(f){ return !q('script[src$="' + f + '"]'); }), left = need.length;
     if (!left) { done(); return; }
@@ -1635,8 +1665,10 @@
       window.addEventListener("storage", function(e){ if (e.key === "sh_presence_mine") paintMe(); });
       if (window.ResizeObserver && $("rcBody")) {
         var rcW = 0, rcT = 0;
-        new ResizeObserver(function(){
-          var w = $("rcBody").clientWidth; if (!w || Math.abs(w - rcW) < 4) return;
+        /* the width comes from the entry: measuring here would lay the page out in the middle of the browser's own
+           pass, and when that changes a size (a stylesheet still loading) WebKit reports a ResizeObserver loop (BUG-078) */
+        new ResizeObserver(function(es){
+          var w = es && es[0] ? Math.round(es[0].contentRect.width) : 0; if (!w || Math.abs(w - rcW) < 4) return;
           var first = !rcW; rcW = w; if (first) return;
           clearTimeout(rcT); rcT = setTimeout(function(){ recapArt(true); }, 120);
         }).observe($("rcBody"));

@@ -32,6 +32,26 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (the idea board, built for the redesign, Claude Code)** — Nothing students see changes: the board is on
+  the new dashboard (`next/`) and in the new hubs' More, which only a preview shows, and its server (migration_v54) is
+  still not applied. New: `widget/ideas.js` + `widget/ideas.css` (`window.shIdeas`: the board, its post form with the hub
+  and the six kinds, votes, Report, Delete, Top / New / Shipped and two filters; and `shIdeas.tick()`, the "Also post this
+  on the idea board" box). `widget/dash.js` mounts the board in `#ideas` and puts the tick under the check-in's last
+  question (ticked to start; the live `index.html` check-in is untouched); `widget/hub.js` adds the page `#more/ideas`
+  and a row under "Talk to us". **Two live files change, both inert until the release**: `widget/v3.js` (the Suggest
+  box gets the tick only where `ideas.js` is loaded, which no live hub does) and `widget/replies.js` (it can show an
+  idea's status note, kind `idea`, which no server sends yet; `get_my_inbox_v2` only where the page says so). The admin
+  page's Inbox has an "Idea board" card (hide, restore, a status with one line on why); until migration_v54 it says the
+  board opens with the redesign. The preview answers the board from made-up ideas; the release's starting ideas are not
+  posted.
+  `tools/ci/smoke.js` draws a made-up board and checks votes, the pickers, that words never become markup and that every
+  button has a fixed `data-shi` name. BUG-078 (WebKit only: a "ResizeObserver loop" error on the new dashboard while
+  the board's stylesheet loads) fixed in `widget/dash.js`. Sam then asked for a more decorative board, done after
+  #318 merged and approved from a contact sheet: **a cork board in a wood frame, every idea a pinned paper note** (the
+  paper's color and a picture for its kind, a pushpin in the hub's tint, Sam's answer as a stamp, a rosette on the top
+  idea, Timmy looking over the frame, the form as a page of a pad). The drawings are a kit, `tools/figures/site/board.mjs`,
+  built into `widget/hub-art/board.js`, which `ideas.js` loads itself. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324))
+
 - **2026-11-12 (a standing rule: run the long tests once, Claude Code)** — Notes only. Sam asked why the dashboard's
   merge took two hours; part of it was the agent running the every-hub smoke test again on its own machine each time
   `main` moved. New rule, `vault/rules/long-tests-once.md`: the long suites run once on the finished code, then the

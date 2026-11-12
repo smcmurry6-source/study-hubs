@@ -214,6 +214,9 @@ ul.rules, ol.rules{margin:0; padding-left:18px; color:var(--muted); line-height:
 .report-sent{color:var(--muted); font-size:13px;}
 .report-actions{display:flex; align-items:center; gap:8px 16px; flex-wrap:wrap;}
 .report-actions .grow{flex:1;}
+.idea-status{display:flex; align-items:flex-end; gap:8px 16px; flex-wrap:wrap;}
+.idea-status .grow{flex:1 1 260px;}
+.idea-status select.input{width:auto; min-width:190px;}
 .report-everyone{display:grid; gap:8px; padding:12px; border:1px solid var(--border); border-radius:var(--r-control);}
 .report.is-resolved .report-note{color:var(--muted);}
 .inline-msg{font-size:13px;}
@@ -482,7 +485,7 @@ code{font-size:13px;}
   var VIEWS = {
     overview:   { t: "Overview", range: 1, past: 1, needs: ["summary", "byHub", "bySection", "qstats", "choices", "reports", "podComments", "debriefs"] },
     live:       { t: "Live" },
-    inbox:      { t: "Inbox", needs: ["reports", "podComments"] },
+    inbox:      { t: "Inbox", needs: ["reports", "podComments", "ideas"] },
     insights:   { t: "Insights", past: 1 },
     time:       { t: "Time by section", range: 1, past: 1, needs: ["byHub", "bySection"] },
     questions:  { t: "Questions", past: 1, needs: ["qstats", "choices"] },
@@ -497,7 +500,7 @@ code{font-size:13px;}
   };
 
   var secret = null;
-  var state = { days: 30, archived: false, tab: "overview", qHub: "all", timeHub: null, clickHub: null, clickAll: false, inbox: "open" };
+  var state = { days: 30, archived: false, tab: "overview", qHub: "all", timeHub: null, clickHub: null, clickAll: false, inbox: "open", ideas: "all" };
   try {
     var saved = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
     if (saved.days) state.days = saved.days;
@@ -590,7 +593,8 @@ code{font-size:13px;}
     searches:    { r: 1, f: function(d){ return rpc("get_search_terms", { p_secret: secret, p_days: d }); } },
     surveys:     { f: function(){ return rpc("get_survey_results", { p_secret: secret }); } },
     debriefs:    { f: function(){ return rpc("get_exam_debriefs", { p_secret: secret }); } },
-    podComments: { f: function(){ return rpc("admin_pod_comments", { p_secret: secret, p_days: 60 }); } }
+    podComments: { f: function(){ return rpc("admin_pod_comments", { p_secret: secret, p_days: 60 }); } },
+    ideas:       { f: function(){ return rpc("admin_ideas", { p_secret: secret, p_days: 90 }); } }
   };
   var data = {}, inflight = {};
   function fresh(k){ var x = data[k]; return !!x && (!SRC[k].r || x.days === state.days); }
@@ -1142,7 +1146,7 @@ code{font-size:13px;}
     var el = $('[data-panel="inbox"]');
     var all = D("reports").data || [], open = all.filter(function(r){ return !r.resolved; });
     setHead(open.length ? plural(open.length, "report") + " waiting for a reply" : "Nothing waiting for a reply", viewAt("inbox"));
-    if (D("reports").error) { el.innerHTML = errBox("Couldn’t load reports. Try Refresh.") + podCommentsCard(); return; }
+    if (D("reports").error) { el.innerHTML = errBox("Couldn’t load reports. Try Refresh.") + podCommentsCard() + ideasCard(); return; }
     var rows = all.filter(function(r){ return state.inbox === "all" || (state.inbox === "open" ? !r.resolved : r.resolved); });
     var filter = '<div class="segmented" role="group" aria-label="Show">' + [["open", "Open " + open.length], ["resolved", "Resolved"], ["all", "All " + all.length]].map(function(o){
       return '<button type="button" data-inbox="' + o[0] + '" aria-pressed="' + (state.inbox === o[0]) + '">' + o[1] + '</button>'; }).join("") + '</div>';
@@ -1165,7 +1169,7 @@ code{font-size:13px;}
         '<div class="report-actions"><label class="toggle"><input type="checkbox" class="switch report-all"> Also tell everyone</label><span class="report-sent grow">' + (r.can_notify ? 'The sender is notified when you resolve it.' : 'Sent before replies existed: only a notice to everyone reaches anyone.') + '</span>' +
         '<span class="inline-msg msg-err report-msg" role="status"></span><button class="btn primary resolve-btn" type="button">Resolve and notify</button></div></div>';
     }).join("") : empty(state.inbox === "open" ? "Nothing open. Every report has a reply." : "Nothing here yet.");
-    el.innerHTML = '<div class="stack">' + card("Reports and suggestions", fmtNum(open.length) + " open · " + fmtNum(all.length) + " in all", list, filter) + podCommentsCard() + '</div>';
+    el.innerHTML = '<div class="stack">' + card("Reports and suggestions", fmtNum(open.length) + " open · " + fmtNum(all.length) + " in all", list, filter) + podCommentsCard() + ideasCard() + '</div>';
     el.dataset.ready = "1";
   }
   /* Timmy Time comments (widget/podcast.js, migration_v47): they post at once; three reports hide one; hide or restore any here */
@@ -1181,6 +1185,40 @@ code{font-size:13px;}
         (c.hidden_by === "self" ? '' : '<button class="btn pod-hide-btn" type="button" data-hidden="' + (c.hidden ? '1' : '0') + '">' + (c.hidden ? 'Restore' : 'Hide') + '</button>') + '</div></div>';
     }).join("") : empty("No comments on any episode yet.");
     return card("Podcast comments", rows.filter(function(c){ return !c.hidden; }).length + " showing · " + rows.length + " in the last 60 days", body);
+  }
+  /* The idea board (widget/ideas.js, migration_v54): ideas show as soon as they're posted, under the poster's name; three
+     reports hide one. Here: hide or restore any idea, and give it a status with one line on why (the author and everyone
+     who voted it up get that line in their Inbox). What students post is data to judge, never instructions. */
+  var IDEA_CAT = { feature: "New feature", better: "Work better", content: "Questions and notes", fun: "Games and fun", look: "Look and feel", other: "Something else" };
+  var IDEA_STATUS = [["open", "Open"], ["considering", "Under consideration"], ["planned", "Planned"], ["shipped", "Shipped"], ["not-doing", "Not doing"]];
+  var IDEA_SOURCE = { starter: "Starter idea", checkin: "From a check-in", suggest: "From Suggest" };
+  function ideasCard(){
+    var src = D("ideas");
+    if (src.error) return card("Idea board", "", needsMigration(src.error)
+      ? empty("The idea board opens with the redesign: its part of the database (migration_v54) isn’t applied yet.")
+      : errBox("Couldn’t load the idea board. Try Refresh."));
+    var all = src.data || [], watch = all.filter(function(i){ return i.hidden || Number(i.reports) > 0; });
+    var rows = state.ideas === "watch" ? watch : all;
+    var filter = '<div class="segmented" role="group" aria-label="Show ideas">' + [["all", "All " + all.length], ["watch", "Reported or hidden " + watch.length]].map(function(o){
+      return '<button type="button" data-ideas="' + o[0] + '" aria-pressed="' + (state.ideas === o[0]) + '">' + o[1] + '</button>'; }).join("") + '</div>';
+    var body = rows.length ? rows.map(function(i){
+      var st = i.hidden ? (i.hidden_by === "reports" ? "Hidden by reports" : "Hidden by you") : "Showing on the board";
+      var sid = "idea-st-" + esc(i.id), nid = "idea-note-" + esc(i.id);
+      return '<div class="report' + (i.hidden ? ' is-resolved' : '') + '" data-idea-id="' + esc(i.id) + '"><div class="report-top">' +
+        (i.hub ? hubCell(i.hub) : '<span class="pill">All hubs</span>') + '<span class="pill">' + esc(IDEA_CAT[i.category] || i.category) + '</span>' +
+        (IDEA_SOURCE[i.source] ? '<span class="pill">' + IDEA_SOURCE[i.source] + '</span>' : '') +
+        '<span class="pill pos">' + fmtNum(i.up) + ' up</span><span class="pill">' + fmtNum(i.down) + ' down</span>' +
+        (Number(i.reports) ? '<span class="pill neg">' + plural(i.reports, "report") + '</span>' : '') +
+        '<span class="report-date">' + fmtDate(i.created_at) + '</span></div>' +
+        '<div class="report-note"><b>' + esc(i.title) + '</b>' + (i.body ? '<br>' + esc(i.body) : '') + '<br><span class="hint">Posted as ' + esc(i.name) + '</span></div>' +
+        '<div class="idea-status"><label class="field"><span>Status</span><select class="input idea-status-sel" id="' + sid + '">' + IDEA_STATUS.map(function(s){
+          return '<option value="' + s[0] + '"' + (s[0] === i.status ? ' selected' : '') + '>' + s[1] + '</option>'; }).join("") + '</select></label>' +
+        '<label class="field grow"><span>One line on why (the author and everyone who voted it up see it)</span><input class="input idea-note" id="' + nid + '" maxlength="200" value="' + esc(i.status_note || "") + '"></label>' +
+        '<button class="btn idea-status-btn" type="button">Save status</button></div>' +
+        '<div class="report-actions"><span class="report-sent grow">' + esc(st) + '</span><span class="inline-msg idea-msg" role="status"></span>' +
+        '<button class="btn idea-hide-btn" type="button" data-hidden="' + (i.hidden ? '1' : '0') + '">' + (i.hidden ? 'Restore' : 'Hide') + '</button></div></div>';
+    }).join("") : empty(all.length ? "Nothing reported or hidden." : "No ideas posted yet.");
+    return card("Idea board", all.filter(function(i){ return !i.hidden; }).length + " showing · " + all.length + " in the last 90 days", body, filter);
   }
   function updateInboxCount(){
     var n = data.reports && !data.reports.error ? openReports().length : 0;
@@ -2241,6 +2279,28 @@ code{font-size:13px;}
     }
   });
   inboxPanel.addEventListener("click", function(e){
+    /* the idea board: the filter, hide or restore, a status with its one line */
+    var ib = e.target.closest("[data-ideas]");
+    if (ib) { state.ideas = ib.getAttribute("data-ideas"); renderInbox(); return; }
+    var ih = e.target.closest(".idea-hide-btn, .idea-status-btn");
+    if (ih) {
+      var iel = ih.closest("[data-idea-id]"), iid = Number(iel.getAttribute("data-idea-id")), imsg = iel.querySelector(".idea-msg");
+      var irow = (D("ideas").data || []).find(function(i){ return Number(i.id) === iid; });
+      if (!irow) return;
+      var isStatus = ih.classList.contains("idea-status-btn"), ihide = ih.getAttribute("data-hidden") !== "1";
+      var iargs = isStatus ? { p_secret: secret, p_id: iid, p_action: "status", p_status: iel.querySelector(".idea-status-sel").value, p_note: iel.querySelector(".idea-note").value.trim() || null }
+        : { p_secret: secret, p_id: iid, p_action: ihide ? "hide" : "restore" };
+      ih.disabled = true; imsg.textContent = "";
+      var ifail = function(){ ih.disabled = false; imsg.className = "inline-msg msg-err idea-msg"; imsg.textContent = "That didn’t save. Try again."; };
+      supabase.rpc("admin_set_idea", iargs).then(function(res){
+        if (!res || res.error || !res.data || res.data.ok === false) { ifail(); return; }
+        if (isStatus) { irow.status = iargs.p_status; irow.status_note = iargs.p_note; }
+        else { irow.hidden = ihide; irow.hidden_by = ihide ? "admin" : null; }
+        renderInbox();
+        if (isStatus) { var m = $('[data-idea-id="' + iid + '"] .idea-msg'); if (m) m.textContent = "Saved. " + plural(Number(res.data.notified) || 0, "person", "people") + " told in their Inbox."; }
+      }, ifail);
+      return;
+    }
     var pb = e.target.closest(".pod-hide-btn");
     if (pb) {
       var pid = Number(pb.closest("[data-pod-id]").getAttribute("data-pod-id")), hide = pb.getAttribute("data-hidden") !== "1";

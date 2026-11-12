@@ -1,0 +1,175 @@
+/* The idea board's look (widget/ideas.js loads this file by itself). On the redesign's design system: the tokens come
+   from widget/hub.css (html.shx), the buttons, segments and notes are its own (.hx .btn, .seg, .note). The tick
+   (.shi-tick) also sits in the shared widget's Suggest panel, outside .hx, so it styles everything it uses. */
+
+/* ---------- the board ---------- */
+.shi { display: grid; gap: 12px; min-width: 0; }
+.shi.is-off > * { display: none; }
+.shi-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; }
+.shi-head h2 { grid-column: 1; }
+.shi-head .shi-lede { grid-column: 1; max-width: 62ch; }
+.shi-head p.shi-lede:not(.note) { color: var(--muted); }
+.shi-head .shi-new { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+.shi-say { margin: 0; min-height: 0; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--text); }
+.shi-say:empty { display: none; }
+.shi-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.shi-pick { display: inline-flex; min-width: 0; }
+.shi-pick select, .shi-f select { appearance: none; -webkit-appearance: none; min-height: 40px; max-width: 100%; padding: 0 36px 0 14px; border: 1px solid var(--control); border-radius: var(--r-pill);
+  background: var(--row) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23857a83' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center / 16px;
+  color: var(--text); font: inherit; font-size: var(--fs-label); font-weight: var(--w-strong); text-overflow: ellipsis; cursor: pointer; }
+.shi-pick select:hover, .shi-f select:hover { background-color: var(--active); }
+
+/* ---------- the board: cork in a wood frame, every idea a paper note pinned to it. Like the classroom, it keeps its
+   own colors in the dark theme: cork, paper and Timmy's ink (#3B2E3A) ---------- */
+.shi-wall { position: relative; min-width: 0; }
+.shi-frame { position: relative; padding: 10px; border: 2px solid #3B2E3A; border-radius: 22px; background: #C4915F; }
+.shi-frame::before { content: ""; position: absolute; left: 16px; right: 16px; top: 3px; height: 2px; border-radius: 2px; background: #fff; opacity: .45; }
+.shi-frame::after { content: ""; position: absolute; left: 16px; right: 16px; bottom: 3px; height: 2px; border-radius: 2px; background: #8A5A3A; opacity: .6; }
+.shi-cork { display: grid; gap: 18px; min-width: 0; padding: 30px 20px 20px; border: 2px solid #3B2E3A; border-radius: 12px; background: #E4BC8A var(--shi-cork, none) 0 0 / 96px 96px; color: #3B2E3A; }
+
+/* Timmy looks over the top of the frame, with an idea */
+.shi-peek { position: absolute; right: 168px; bottom: 100%; width: 150px; height: 94px; margin-bottom: -3px; overflow: hidden; pointer-events: none; }
+.shi-peek:empty { display: none; }
+.shi-timmy { position: absolute; right: 0; top: 6px; width: 112px; }
+.shi-timmy svg { display: block; width: 100%; height: auto; }
+.shi-bulb { position: absolute; left: 4px; top: 4px; width: 36px; }
+.shi-bulb svg { display: block; width: 100%; height: auto; }
+.shi-bulb .shb-rays { animation: shi-rays 2.4s ease-in-out infinite; }
+@keyframes shi-rays { 50% { opacity: .35; } }
+
+.shi-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 20px; align-items: start; margin: 0; padding: 0; list-style: none; }
+.shi-card { --note: #fff; --note-edge: #E6DDE3; position: relative; display: grid; gap: 12px; min-width: 0; padding: 24px 18px 20px; border: 2px solid #3B2E3A; border-radius: 8px; background: var(--note); color: #3B2E3A; }
+.shi-card::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 7px; border-radius: 0 0 6px 6px; background: var(--note-edge); }
+.shi-card.is-k-feature { --note: #FFF3B8; --note-edge: #F1DC83; }
+.shi-card.is-k-better { --note: #DDF3E3; --note-edge: #B4DEC2; }
+.shi-card.is-k-content { --note: #FFFFFF; --note-edge: #E6DDE3; }
+.shi-card.is-k-fun { --note: #FFE0E8; --note-edge: #F4B9C8; }
+.shi-card.is-k-look { --note: #DFEBFA; --note-edge: #B5CCEC; }
+.shi-card.is-k-other { --note: #FFE9D2; --note-edge: #F2C99E; }
+.shi-pin { position: absolute; left: 50%; top: -14px; width: 26px; margin-left: -13px; }
+.shi-pin svg, .shi-rosette svg, .shi-kindart svg { display: block; width: 100%; height: auto; }
+.shi-card:nth-child(3n+1) .shi-pin { left: 47%; transform: rotate(-8deg); }
+.shi-card:nth-child(3n+2) .shi-pin { left: 54%; transform: rotate(6deg); }
+.shi-rosette { position: absolute; left: -14px; top: -18px; width: 42px; }
+.shi-top { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: start; }
+.shi-kindart { flex: none; width: 40px; }
+.shi-text { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.shi-title { margin: 0; font-size: var(--fs-card, 17px); font-weight: var(--w-head, 800); line-height: 1.3; overflow-wrap: anywhere; color: #3B2E3A; }
+.shi-body { margin: 0; font-size: var(--fs-label, 14px); line-height: 1.5; overflow-wrap: anywhere; }
+.shi-tags { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; margin: 0; }
+/* a tag takes the page's colors (the check-in's preview row uses it too); on a note it takes the paper's */
+.shi-tag { display: inline-flex; align-items: center; gap: 6px; min-height: 26px; padding: 2px 10px; border-radius: var(--r-pill, 999px); background: var(--row); color: var(--muted); font-size: var(--fs-meta, 13px); font-weight: var(--w-strong, 700); }
+.shi-tag.is-hub { color: var(--text); }
+.shi-card .shi-tag { background: rgba(255, 255, 255, .72); color: #5E4F5B; }
+.shi-card .shi-tag.is-hub { color: #3B2E3A; }
+.shi-card.is-k-content .shi-tag:not(.is-src) { background: #F4EEF2; }
+.shi-tag.has-emb { padding-left: 3px; }
+.shi-emb { flex: none; width: 22px; height: 22px; }
+.shi-tag.has-dot::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--hub-mid, var(--hub)); }
+.shi-tag.is-src { background: var(--lilac); color: var(--lilac-ink); }
+.shi-card .shi-tag.is-src { background: #EADFF6; color: #4E3A6B; }
+/* Sam's answer, stamped on the note */
+.shi-stamp { display: inline-flex; align-items: center; gap: 4px; min-height: 26px; padding: 0 9px; border: 2px solid currentColor; border-radius: 7px; font-size: var(--fs-meta, 13px); font-weight: 800; transform: rotate(-3deg); color: #2747A3; }
+.shi-stamp svg { flex: none; width: 14px; height: 14px; }
+.shi-stamp.is-considering { color: #85540A; }
+.shi-stamp.is-shipped { color: #23703F; }
+.shi-stamp.is-not-doing { color: #6B5A68; }
+.shi-why { margin: 0; padding: 8px 12px; border-radius: 6px; background: rgba(255, 255, 255, .8); font-size: var(--fs-label, 14px); line-height: 1.45; overflow-wrap: anywhere; }
+.shi-foot { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: space-between; }
+.shi-votes { display: flex; gap: 6px; }
+.shi-vote { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 60px; min-height: 40px; padding: 0 12px; border: 2px solid #3B2E3A; border-radius: var(--r-pill, 999px);
+  background: #fff; color: #3B2E3A; font: inherit; font-size: var(--fs-label, 14px); font-weight: var(--w-strong, 700); cursor: pointer; transition: background var(--t-hover, 180ms) var(--ease-out, ease-out), transform 120ms var(--ease-out, ease-out); }
+.shi-vote:hover { background: #F4EEF2; }
+.shi-vote:active { transform: scale(.94); }
+.shi-vote.is-up[aria-pressed="true"] { background: #BFEBCD; }
+.shi-vote.is-down[aria-pressed="true"] { background: #F9CACA; }
+.shi-meta { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; margin: 0; font-size: var(--fs-meta, 13px); color: #5E4F5B; }
+.shi-meta b { color: #3B2E3A; font-weight: var(--w-strong, 700); overflow-wrap: anywhere; }
+.shi-act { min-height: 32px; padding: 0 10px; margin: -4px -10px -4px 0; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--muted); font: inherit; font-size: var(--fs-meta); font-weight: var(--w-strong); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.shi-act:hover { background: var(--active); color: var(--text); }
+.shi-act:disabled { text-decoration: none; cursor: default; background: transparent; }
+.shi-card .shi-act { color: #5E4F5B; }
+.shi-card .shi-act:hover { background: rgba(59, 46, 58, .1); color: #3B2E3A; }
+.shi-as .shi-act { margin: 0; }
+.shi-more { justify-self: center; }
+.shi-cork .shi-more, .shi-cork .shi-more:hover { border: 2px solid #3B2E3A; background: #fff; color: #3B2E3A; }
+.shi-cork .shi-more:hover { background: #F4EEF2; }
+/* nothing here yet: one blank note */
+.shi-empty { justify-self: center; max-width: 420px; margin: 0; padding: 22px 20px; border: 2px solid #3B2E3A; border-radius: 8px; background: #fff; text-align: center; font-size: var(--fs-label, 14px); font-weight: var(--w-strong, 700); }
+.shi-empty[hidden] { display: none; }
+
+/* the notes go up one after another; a note just posted lands with its pin */
+.shi-list.is-fresh .shi-card { animation: shi-up .42s var(--ease-out, ease-out) both; animation-delay: calc(var(--i, 0) * 60ms); }
+.shi-list.is-fresh .shi-pin { animation: shi-pin .34s var(--ease-out, ease-out) both; animation-delay: calc(var(--i, 0) * 60ms + .22s); }
+@keyframes shi-up { from { opacity: 0; transform: translateY(18px); } }
+@keyframes shi-pin { from { opacity: 0; margin-top: -16px; } }
+.shi-card.is-new { animation: shi-in 1.6s var(--ease-out, ease-out); }
+@keyframes shi-in { from { background: #FFD96B; } }
+@media (prefers-reduced-motion: reduce) { .shi-list.is-fresh .shi-card, .shi-list.is-fresh .shi-pin, .shi-card.is-new, .shi-bulb .shb-rays { animation: none; } }
+
+/* ---------- the post form ---------- */
+/* a fresh page of the pad the notes come from: the wire binding along its top edge */
+.shi-form { position: relative; display: grid; gap: 14px; padding: var(--panel-pad, 20px); border-radius: var(--r-panel); background: var(--panel); max-width: 760px; }
+.shi.has-art .shi-form { margin-top: 10px; padding-top: 30px; border: 2px solid var(--text); border-radius: 12px; }
+.shi.has-art .shi-form::before { content: ""; position: absolute; left: 18px; right: 18px; top: -11px; height: 20px; background: var(--shi-ring) 0 0 / 24px 20px space no-repeat; }
+.shi-formh { margin: 0; font-size: 18px; font-weight: var(--w-head); }
+.shi-as { margin: 0; font-size: var(--fs-label); }
+.shi-f { display: grid; gap: 6px; min-width: 0; }
+.shi-f > span { font-size: var(--fs-label); font-weight: var(--w-strong); }
+.shi-f > span i { font-style: normal; font-weight: var(--w-body); color: var(--muted); }
+.shi-f > small { font-size: var(--fs-meta); color: var(--muted); }
+.shi-f input[type="text"], .shi-f textarea { width: 100%; min-width: 0; box-sizing: border-box; padding: 10px 14px; border: 1px solid var(--control); border-radius: var(--r-row); background: var(--row); color: var(--text);
+  font: inherit; font-size: var(--fs-body); line-height: 1.45; }
+.shi-f input[type="text"] { height: 44px; padding-top: 0; padding-bottom: 0; }
+.shi-f textarea { resize: vertical; min-height: 84px; }
+.shi-f select { justify-self: start; min-height: 44px; border-radius: var(--r-row); }
+.shi-f input::placeholder, .shi-f textarea::placeholder { color: var(--muted); opacity: 1; }
+.shi-kinds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.shi-kinds legend { padding: 0 0 6px; font-size: var(--fs-label); font-weight: var(--w-strong); }
+.shi-kind { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border: 1px solid var(--control); border-radius: var(--r-row); background: var(--row); cursor: pointer; min-width: 0; }
+.shi-kind:hover { background: var(--active); }
+.shi-kind input { flex: none; width: 18px; height: 18px; margin: 2px 0 0; accent-color: var(--primary); }
+.shi-kind .shi-kindtxt { display: grid; gap: 2px; min-width: 0; }
+.shi-kind .shi-kindart { width: 34px; margin: -2px 0; }
+.shi-kind b { font-size: var(--fs-label); font-weight: var(--w-strong); }
+.shi-kind small { font-size: var(--fs-meta); color: var(--muted); }
+.shi-kind:has(input:checked) { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.shi-msg { margin: 0; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--wrong-ink); }
+.shi-msg:empty { display: none; }
+.shi-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; }
+
+/* ---------- the tick, under the check-in's last question and the Suggest box ---------- */
+.shi-tick { display: grid; gap: 10px; min-width: 0; text-align: left; }
+.shi-tick:empty { display: none; }
+.shi-tickrow { display: flex; gap: 10px; align-items: flex-start; font-size: var(--fs-label, 14px); line-height: 1.4; cursor: pointer; }
+.shi-tickrow input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--primary, #3b2e3a); }
+.shi-tickrow b { font-weight: var(--w-strong, 700); overflow-wrap: anywhere; }
+.shi-prev { display: grid; gap: 10px; padding: 12px; border-radius: var(--r-row, 14px); background: var(--panel, #f7f3f6); }
+.shi-prev[hidden] { display: none; }
+.shi-prevnote { margin: 0; font-size: var(--fs-meta, 13px); line-height: 1.4; color: var(--muted, #685c66); }
+.shi-prevnote:empty { display: none; }
+.shi-tick .shi-f textarea { min-height: 72px; }
+.shi-prevrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.shi-prevrow .shi-pick { flex: 1 1 220px; }
+.shi-prevrow .shi-pick select { width: 100%; }
+.shi-tick .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 760px) {
+  .shi-list { grid-template-columns: minmax(0, 1fr); }
+  .shi-peek { right: 16px; width: 124px; height: 78px; }
+  .shi-timmy { width: 92px; }
+  .shi-bulb { left: 0; top: 0; width: 32px; }
+}
+@media (max-width: 560px) {
+  .shi-head { grid-template-columns: minmax(0, 1fr); }
+  .shi-head .shi-new { grid-column: 1; grid-row: auto; justify-self: start; }
+  .shi-kinds { grid-template-columns: minmax(0, 1fr); }
+  .shi-frame { padding: 7px; border-radius: 18px; }
+  .shi-cork { padding: 28px 12px 14px; }
+  .shi-card { padding: 22px 14px 18px; }
+  .shi-kindart { width: 34px; }
+  .shi-bar .shi-pick { flex: 1 1 100%; }
+  .shi-pick select { width: 100%; }
+  /* room for Timmy, who looks over the frame's right end */
+  .shi.has-art .shi-bar .shi-pick { max-width: calc(100% - 136px); }
+}

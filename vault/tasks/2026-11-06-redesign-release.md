@@ -324,6 +324,20 @@ follows you to your other devices.
 8. About page: the XP sources and the guardrails, Shiny Gold Crowns, the shop, the idea board, and "What the hubs record"
    (ideas show to the class under your name).
 
+### From the idea board ([the idea board](2026-11-06-idea-board.md), built 2026-11-12)
+
+1. After migration_v54 is applied and the keys are loaded (above), **post the starting ideas**: the table in the idea
+   board's note and the ones written from the past check-ins, each checked against the About page and the redesign plan first.
+2. The About page: the entries drafted in the idea board's note ("The About page's entries").
+3. `sw.js`: add `widget/ideas.js`, `widget/ideas.css` and `widget/hub-art/board.js` (the board's drawings) to `PRECACHE`.
+4. The admin page's Overview: add "Ideas reported" to "Waiting on you" (`ideas` in the Overview's `needs`), left out
+   until the function exists so the live page doesn't ask for it on every load.
+5. The check-in with the tick is `widget/dash.js`'s; the old `index.html`'s goes with the old dashboard.
+6. The hubs' Inbox shows an idea's status note once `widget/v3.js` reads `get_widget_bootstrap_v2` (phase 5, part 2);
+   the new dashboard's already does.
+7. The 90-day delete of hidden and deleted ideas (approved, not built): add it to the weekly retention job and its
+   suite (`tools/release/retention.js`), with its line in [analytics-retention](../reference/analytics-retention.md).
+
 ### From phase 3 (the new dashboard, [phase 3](2026-11-05-redesign-phase-3-dashboard.md))
 
 Written for the dashboard as built in `next/index.html`, `widget/dash.js` and `widget/dash.css`. The idea board's part

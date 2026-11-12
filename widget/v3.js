@@ -2130,6 +2130,7 @@
     '<div id="shstat-suggestpanel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
     '<h5>Suggest something</h5>' +
     '<textarea id="shstat-suggest-text" maxlength="500" placeholder="e.g. add a flashcard mode, more questions on lecture 3..."></textarea>' +
+    '<div id="shstat-suggest-ideas"></div>' +
     '<div><button class="shstat-send" id="shstat-suggest-submit" type="button">Send</button></div>' +
     '<div class="shstat-flagmsg" id="shstat-suggest-msg"></div>' +
     '</div>' +
@@ -2659,10 +2660,22 @@
     }, function(){ btn.disabled = false; msg.textContent = "Couldn't send — try again later."; });
   });
 
+  /* "Also post it on the idea board" (widget/ideas.js, part of the redesign): only where that file is loaded, which
+     the redesigned hubs do when Suggest opens, and it draws nothing until the board's server is there. On a live hub
+     window.shIdeas doesn't exist, so the Suggest box is what it always was: private, to Sam. Unticked to start. */
+  var suggestTick = null;
+  function suggestTickNow(){
+    if (!suggestTick && window.shIdeas && window.shIdeas.tick && supabase) {
+      try { suggestTick = window.shIdeas.tick(document.getElementById("shstat-suggest-ideas"), { sb: supabase, hub: HUB, source: "suggest", checked: false }); } catch (e) {}
+    }
+    return suggestTick;
+  }
+  document.getElementById("shstat-suggest-text").addEventListener("input", function(e){ var tk = suggestTickNow(); if (tk) tk.sync(e.target.value); });
   document.getElementById("shstat-suggest-pill").addEventListener("click", function(){
     closeOtherPanels(suggestPanel);
     suggestPanel.classList.toggle("is-open");
     updateSheetState();
+    var tk = suggestTickNow(); if (tk) tk.sync(document.getElementById("shstat-suggest-text").value);
   });
   document.querySelector("#shstat-suggestpanel .shstat-close").addEventListener("click", function(){
     suggestPanel.classList.remove("is-open");
@@ -2675,6 +2688,9 @@
     var text = (ta.value || "").trim();
     if (!text) { msg.textContent = "Type something first."; return; }
     if (!supabase) { msg.textContent = "Couldn't send — try again later."; return; }
+    /* ticked for the idea board: it needs a name, a title and a kind before anything is sent */
+    var tk = suggestTickNow(), toBoard = !!(tk && tk.on());
+    if (toBoard) { var bad = tk.check(); if (bad) { msg.textContent = bad; return; } }
     btn.disabled = true;
     msg.textContent = "Sending…";
     supabase.from("hub_suggestions").insert({ hub: HUB, note: text, visitor_id: VISITOR_ID }).then(function(res){
@@ -2682,6 +2698,11 @@
       if (res && res.error) { msg.textContent = "Couldn't send — try again later."; return; }
       ta.value = "";
       msg.textContent = "Thanks — sent!";
+      if (toBoard) tk.post().then(function(p){
+        msg.textContent = p.ok ? "Thanks — sent, and it's on the idea board." : "Thanks — sent to Sam. It didn't go on the idea board: " + (p.msg || "try again later.");
+        tk.sync("");
+      }, function(){});
+      else if (tk) tk.sync("");
     }, function(){ btn.disabled = false; msg.textContent = "Couldn't send — try again later."; });
   });
 

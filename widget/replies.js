@@ -3,7 +3,7 @@
    question report, what was fixed). Notices to everyone (site_notices, posted from the admin Inbox's "Tell everyone")
    pop up once per device (sh_notice_seen) while they're live, on whichever page is opened first. Everything also stays
    in one Inbox (replies 90 days, notices 60), the same on every hub and the dashboard; a notice's hub only labels it.
-   Any [data-sh-inbox] element opens it; .sh-inbox-badge elements show the unread count. Data: get_my_inbox; reading a reply calls mark_reply_seen.
+   Any [data-sh-inbox] element opens it; .sh-inbox-badge elements show the unread count. Data: get_my_inbox (get_my_inbox_v2 once the game layer is there, which adds the idea board's status notes, kind "idea"); reading a reply calls mark_reply_seen.
    The live survey (get_my_survey) also waits at the top of the Inbox until it's answered, so "Later" on the dashboard's
    survey pop-up (or never seeing it) still leaves it one tap away; it counts as unread until the Inbox is opened
    (sh_survey_seen) and is answered right there (submit_survey). shReplies.refresh() reloads after the pop-up is used.
@@ -121,7 +121,8 @@
         try { var d = seenList(key); if (d.indexOf(r.id) < 0) d.push(r.id); localStorage.setItem(key, JSON.stringify(d.slice(-80))); } catch (e) {}
       } else if (!r.seen) {
         r.seen = true;
-        try { sb.rpc("mark_reply_seen", { p_visitor: visitor, p_kind: r.kind, p_id: r.id }).then(function(){}, function(){}); } catch (e) {}
+        /* an idea's status note (the idea board, migration_v54) has its own table */
+        try { (r.kind === "idea" ? sb.rpc("mark_idea_note_seen", { p_visitor: visitor, p_id: r.id }) : sb.rpc("mark_reply_seen", { p_visitor: visitor, p_kind: r.kind, p_id: r.id })).then(function(){}, function(){}); } catch (e) {}
       }
       updateBadges();
     }
@@ -145,7 +146,8 @@
       function rowsOf(res){ return res && !res.error && Array.isArray(res.data) ? res.data : []; }
       var none = Promise.resolve(null);
       return Promise.all([
-        sb.rpc("get_my_inbox", { p_visitor: visitor }).then(rowsOf, function(){ return null; }),
+        /* o.v2() says the game layer's Inbox is there (migration_v54: the idea board's status notes ride in it) */
+        sb.rpc(typeof o.v2 === "function" && o.v2() ? "get_my_inbox_v2" : "get_my_inbox", { p_visitor: visitor }).then(rowsOf, function(){ return null; }),
         visitor ? sb.rpc("get_my_survey", { p_visitor: visitor }).then(rowsOf, function(){ return []; }) : none
       ]).then(function(r){
         if (!r[0]) return items;
@@ -232,7 +234,21 @@
 
     /* one card's contents, shared by the pop-up and the inbox list */
     var CARD = '<div class="sh-reply-top"></div><div class="sh-reply-meta"></div><div class="sh-reply-you"></div><div class="sh-reply-msg"></div>';
+    /* an idea's new status (the idea board): it goes to the idea's author and everyone who voted it up. The row's
+       title is the idea's, its note the status, its message Sam's one line on why. */
+    var IDEA_STATUS = { considering: ["under consideration", "Sam is thinking this one over."], planned: ["planned", "It's on the list to build."],
+      shipped: ["shipped", "It's built. Thanks for the idea and the votes."], "not-doing": ["not being built", "This one won't be built."] };
+    function fillIdea(el, r){
+      var st = IDEA_STATUS[r.note] || ["updated", "Its status changed."];
+      el.querySelector(".sh-reply-top").innerHTML = CHECK + "<span></span>";
+      el.querySelector(".sh-reply-top span").textContent = "An idea you posted or voted for is " + st[0];
+      el.querySelector(".sh-reply-meta").textContent = ["Idea board", HUB_NAME[r.hub] || r.hub || "All hubs", r.at ? fmtDate(r.at) : ""].filter(Boolean).join(" · ");
+      var t = String(r.title || "");
+      el.querySelector(".sh-reply-you").textContent = "The idea: " + (t.length > 240 ? t.slice(0, 237) + "..." : t);
+      el.querySelector(".sh-reply-msg").textContent = (r.message || "").trim() || st[1];
+    }
     function fill(el, r){
+      if (r.kind === "idea") { fillIdea(el, r); return; }
       var flag = r.kind === "flag", notice = r.kind === "notice";
       var yours = notice ? "" : ownWords(r.note), qid = flag ? qidOf(r.note) : "";
       var msg = (r.message || "").trim() || (flag

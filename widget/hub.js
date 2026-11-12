@@ -1600,13 +1600,15 @@
     ["stats", "stats", "Stats and trophies", "Your answers, your rank, the trophy case and the leaderboards"],
     ["settings", "settings", "Settings", "Theme, text size, your daily goal, Timmy and the extras"]
   ];
+  /* pages in More that aren't tiles: the idea board is a row under "Talk to us" */
+  var MORE_ROWS = [["ideas", "thumbup", "Idea board", "Ideas for the hubs from the class: vote on them, or post your own"]];
   function renderMore(el, s){
-    var page = MORE.filter(function(m){ return m[0] === s; })[0];
+    var page = MORE.concat(MORE_ROWS).filter(function(m){ return m[0] === s; })[0];
     if (!page) { drawMoreMenu(el); return; }
     var back = '<a class="btn btn-text back" href="#more">' + icon("chevron", 18, "flip") + "More</a>";
     el.innerHTML = '<div class="hx-page more-page">' + back + "<h1>" + esc(page[2]) + '</h1><div class="more-body"><p class="note loading">Loading…</p></div></div>';
     var body = $(".more-body", el);
-    ({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, stats: moreStats, settings: moreSettings })[s](body);
+    ({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body);
   }
   /* More (Sam, 2026-11-06: "can use a spice up"): one tile per part, each on its own field of color with its drawing and
      a line of what's in it; Timmy Time is the big one, its host in headphones. Talk to us stays a list. */
@@ -1634,6 +1636,7 @@
     el.innerHTML = '<div class="hx-page more"><h1>More</h1><p class="more-lede">Everything past the notes and the questions: the review, the games, your stats and your settings.</p>' +
       '<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide); }).map(tile).join("") + "</ul></nav>" +
       '<section class="panel menu talk" aria-labelledby="mwH"><h2 id="mwH">Talk to us</h2><ul class="rows">' +
+        MORE_ROWS.map(function(m){ return '<li><a href="#more/' + m[0] + '">' + icon(m[1], 22) + "<span><b>" + esc(m[2]) + "</b><small>" + esc(m[3]) + "</small></span>" + icon("chevron", 18) + "</a></li>"; }).join("") +
         '<li><button type="button" data-sh-inbox>' + icon("inbox", 22) + "<span><b>Inbox</b><small>Replies to what you report or suggest, and notices to the class</small></span>" + icon("chevron", 18) + "</button></li>" +
         '<li><button type="button" data-open="suggest">' + icon("comment", 22) + "<span><b>Suggest something</b><small>An idea for this hub or the site</small></span>" + icon("chevron", 18) + "</button></li>" +
         '<li><button type="button" data-open="flag">' + icon("report", 22) + "<span><b>Report an issue</b><small>A typo, a wrong key, something broken</small></span>" + icon("chevron", 18) + "</button></li>" +
@@ -1641,8 +1644,30 @@
         '<li><a href="' + esc(C.about || "../../../about/") + '">' + icon("about", 22) + "<span><b>About</b><small>Every feature, trophy and easter egg</small></span>" + icon("chevron", 18) + "</a></li>" +
         '<li><a href="' + esc(C.back || "../../../index.html") + '">' + icon("home", 22) + "<span><b>All hubs</b><small>Back to the dashboard</small></span>" + icon("chevron", 18) + "</a></li>" +
       "</ul></section></div>";
-    $$("[data-open]", el).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-open"); if (k === "flag" && window.shOpenFlag) { window.shOpenFlag(); return; } var p = document.getElementById("shstat-" + k + "-pill"); if (p) p.click(); }); });
+    $$("[data-open]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var k = b.getAttribute("data-open"); if (k === "flag" && window.shOpenFlag) { window.shOpenFlag(); return; }
+      var open = function(){ var p = document.getElementById("shstat-" + k + "-pill"); if (p) p.click(); };
+      /* the Suggest box's "Also post it on the idea board" tick is the idea board's (widget/ideas.js): load it first */
+      if (k === "suggest") loadScript(WIDGET + "ideas.js").then(open, open); else open();
+    }); });
     var t = $("[data-tour]", el); t.addEventListener("click", function(){ track("more:tour"); startTour(); });
+  }
+  /* the idea board (widget/ideas.js, the same board as the dashboard's): it opens on this hub's ideas and the ones for
+     all hubs, and a new idea starts on this hub. Its server comes with the redesign's release (migration_v54). */
+  function moreIdeas(body){
+    var shut = function(){ body.innerHTML = '<p class="note">The idea board isn\'t open yet. For now, <b>Suggest something</b> (under More) reaches Sam.</p>'; };
+    loadScript(WIDGET + "ideas.js").then(function(){
+      whenWidget("shSupabase", function(sb){
+        if (!body.isConnected || view !== "more" || sub !== "ideas") return;
+        if (!sb || !window.shIdeas) { shut(); return; }
+        body.innerHTML = "<div></div>";
+        window.shIdeas.mount(body.firstChild, { sb: sb, hub: HUB, heading: false, level: "h2", page: 8,
+          hubs: function(){ return [{ id: HUB, name: C.name || HUB }]; },
+          name: function(id){ return id === HUB ? (C.name || "") : ""; },
+          editName: function(){ if (window.shEditName) window.shEditName(); },
+          onReady: function(ok){ if (!ok && body.isConnected) shut(); } });
+      });
+    }, shut);
   }
   function moreTimmy(body){
     if (!CORE.podcast) { body.innerHTML = "<p>No episode for this hub yet.</p>"; return; }
