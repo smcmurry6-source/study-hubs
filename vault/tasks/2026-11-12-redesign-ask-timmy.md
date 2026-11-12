@@ -149,9 +149,67 @@ that note's design is the starting point, and where the two differ this one wins
 - By day: people, messages, estimated cost, the share "not covered", thumbs. The not-covered questions, which point at
   gaps in the content (the lessons audit reads them as counts and paraphrases only). Recent chats by hub; open one to read it.
 
-## Where it plugs in (code map, 2026-11-12)
+## Where it plugs in (code map, 2026-11-12; line numbers drift, grep the names)
 
-_Filled in from the survey below._
+- **Timmy on a new hub page**: `widget/hub.js` `startWidget()` loads `v3.js`, whose `loadPet()` loads `widget/pet.js` and
+  calls `shPet.mount({ where:"hub", H: window.shEggHooks, bootstrap })`. On the new pages he loads **only once adopted**
+  (`localStorage sh_pet_born`; the badge `pet-adopt:<day>` from another device makes `hub.js` call `window.shLoadPet`).
+  His element is `div.shpet.shpet-home` on `<body>` (`button.shpet-btn`, `span.shpet-hp`, the bubble
+  `div.shpet-say[role=status]`), fixed at the bottom left (left 14px, bottom 12px; above the tab bar on a phone);
+  `html.sh-pet-on` while he's shown, `.is-away` hides him, hidden during a mock (`html.sh-mock-on`).
+- **Timmy on the new dashboard** (`next/index.html`, `widget/dash.js`): `startClassData()` mounts him with
+  `{ where:"dashboard", sb, visitor, name, perch:#petPerch, home:#petHome, bootstrap }`; his house is `.shpet-house` with
+  `[data-joke]`, `[data-check]`, `[data-tip]` buttons in `.shpet-actions`.
+- **Tapping him** (`pet.js` `onTap`): not adopted → the four-step `intro()`; adopted → a line and a "Checkup" button
+  (`.shpet-more`) in the bubble. There's no menu: "Ask me" is new. Other code talks to him through
+  `window.shPet` (`say(text, move, ms)` escapes its text; `hp()`, `mount`, `refresh`, `syncBadges`, `fit`, `house`...).
+- **Settings**: on a hub `#more/settings`, `moreSettings()` and its `EXTRAS` list in `hub.js`; on the dashboard
+  `openSettings()` and `EXTRAS` in `dash.js`. Timmy's pref is `sh_pref_pet`: `on`, `dash` (dashboard only) or `off`.
+  **Focus mode** is `sh_pref_focus = "on"`: `setFocus()` (same code in `hub.js` and `dash.js`) saves the old values in
+  `sh_pref_focus_prev` and sets every extra to `off`; prefs change through `prefSet`, which fires `sh:pref`
+  (`detail.key`). Whether Timmy shows: `pet.js` `visible()`. **The Ask icon** takes his spot whenever he isn't shown on
+  that page: pref `off`, `dash` on a hub, Focus mode, or (until part 4) not adopted.
+- **A question card**: `card(q, o)` builds `article.qcard[data-qid][data-ctx]`; `result(el, q, right, partial, xp, picks)`
+  draws the verdict, `whyHTML(q, picks)` and `div.qc-after` ("Try it again"); `gather()` moves "Find this in the notes"
+  (`v3.js` `njAttach`) and "Good question?" (`qhealth.js` `addRating`) into `.qc-after`. "Ask Timmy" goes there too, with
+  `q.id`, `q.lec`, `right` and `picks` (authored choice indices). The answered event (`SH_HUB.answeredEvent`, e.g.
+  `perio:answered`) carries `{ qid, lec, correct, ctx, choice, picks }`. A mock's cards have `data-ctx="mock"`.
+- **Where the student is**: `window.SH_SECTION()` (`home/dashboard`, `compendium/notes`, `compendium/bank`, `.../drill`,
+  `compendium/mock`, `arcade/...`, `more/<page>`); the route `#questions/mock` and `html.sh-mock-on` mark a mock.
+- **Content JSON** (`hubs/<id>/next/content/`): `notes.json` is `{ full, plain, hy }`, each `{ <lecture id>: "<html>" }`.
+  A paragraph's address `k` is its index among `p, li, h3, h4` in the parsed `full` HTML (`exportSections` in `hub.js`, which
+  fills `SH_EXPORT.sections` with `go: { v:"notes", lec, k }`); `window.SH_GOTO(go)` opens it (also `cram`, `hints`,
+  `review` `{ lec, t }`, `bank` `{ q }`). **The function must number paragraphs exactly as `exportSections` does**, or the
+  links land on the wrong paragraph: share or copy that code and test it against `SH_EXPORT.sections`.
+  `study.json`: `hints[]` `{ lec, kind, quote, take }`, `cram` `{ <lec>: [...] }`, `review[]` `{ id, lec, title, sections }`,
+  `sequences`, `sortSets`. `core.json`: `exams[]`, `examInfo`, `courseDates[]`, `lectures[]` `{ id, num, title, ... }`,
+  `likelyTopics[]` `{ lec, t, basis, ids }`, `mock`, and more. `questions.json` (read only for Ask Timmy's one question):
+  `{ id, lec, type, stem, choices[], answer, why[], ex, ... }`.
+- **The student's own progress**: `window.SH_DRILL.pool()` gives `[{ id, lec, last: true|false|null, hy }]`; with
+  `SH_EXPORT.lectures` that's enough for "What should I study tonight?" (and `core.json`'s exam dates). `window.shHub.state()`
+  is the whole saved state (`SH_HUB.stateShape` says which shape).
+- **Reports aren't an RPC**: `v3.js` inserts into `question_flags` (`{ hub, note, visitor_id }`, the note ending
+  `" — question <qid> · ... · <section>"`, at most 700 characters); `window.shOpenFlag(qid | { lec, label })` opens the
+  form. A Timmy report should open that same form with his draft filled in (a new option on `shOpenFlag`), so it's the
+  student's own send.
+- **The idea board** (`widget/ideas.js`, `migration_v54`, still pending): `post_idea({ p_visitor, p_title, p_body, p_hub,
+  p_category, p_source, p_request })`; a name is required (`visitor_names`, else `error: 'name'`; the client checks
+  `sh_display_name` and calls `set_display_name` first). Categories `feature`, `better`, `content`, `fun`, `look`, `other`;
+  title 3-80 characters, body up to 280, one idea per 20 seconds, three a day. `p_source` would gain `timmy`.
+  `window.shIdeas`; a hub opens the board at `#more/ideas`.
+- **Supabase in the browser**: `window.shSupabase` (made in `v3.js`; `dash.js` makes its own), the visitor id from
+  `sh_visitor_id`. The function's address is `https://thytmzsgymydbzcqdnix.supabase.co/functions/v1/timmy`.
+- **Previews**: `tools/preview/transform.js` swaps the production address and key for `https://fixtures.preview.invalid`;
+  `tools/preview/runtime/preview.js` replaces `fetch` and answers `/rest/v1/rpc/<fn>` from a `switch` in `rpc()` (admin
+  ones checked against the fixture secret). `/functions/v1/...` isn't answered yet (a 404): part 2 adds canned Timmy
+  replies there.
+- **The admin page** (`review/index.html`): a tab is a nav link `a.nav-item[data-tab]`, a `section.view[data-panel]`, an
+  entry in `VIEWS`, loaders in `SRC` (`rpc(name, { p_secret: secret, ... })`, the secret in sessionStorage
+  `sh_admin_secret`) and a renderer in `RENDER`. Admin SQL starts `if not sh_admin_ok(p_secret) then raise exception
+  'unauthorized' using errcode = '28000'; end if;` and is granted to `anon` (see `admin_set_idea` in `migration_v54`).
+- **Edge Functions**: none yet (no `supabase/functions/`); this is the first.
+- **About page**: only `about/index.html`. "What the hubs record" is an `.item` in `section#widget`; Timmy has
+  `section#timmy`; a new entry looks like `<h3>Name <span class="tag new">new</span></h3>`.
 
 ## Parts: one fresh session each
 
@@ -187,8 +245,8 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
 ## Log
 
 - 2026-11-12: written from Sam's calls in chat. This session wrote the plan and the vault changes only; the build is in
-  the four parts above, each in a fresh session ([run-a-redesign-session](../how-to/run-a-redesign-session.md)). Next
-  step: part 1.
+  the four parts above, each in a fresh session ([run-a-redesign-session](../how-to/run-a-redesign-session.md)), and the
+  code map above is from a survey of the redesign's code that day, so they can start without exploring. Next step: part 1.
 
 ## Outcome
 
