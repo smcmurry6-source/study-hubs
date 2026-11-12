@@ -32,6 +32,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (a standing rule: run the long tests once, Claude Code)** — Notes only. Sam asked why the dashboard's
+  merge took two hours; part of it was the agent running the every-hub smoke test again on its own machine each time
+  `main` moved. New rule, `vault/rules/long-tests-once.md`: the long suites run once on the finished code, then the
+  fast checks and a push, and CI is the check. The dashboard PR (#318) was merged on Sam's word the same day;
+  `node tools/release/postcheck.js` after it: passed.
+
 - **2026-11-12 (No approval checkbox: Sam's "merge" is the approval, Claude Code)** — Sam: "Remove the sam approval
   tick stuff entirely. If i say merge, merge. We are adding too many steps." The "Sam approved this release" box is gone
   from the PR template and the test report template, and [preview-and-release-test](vault/rules/preview-and-release-test.md),

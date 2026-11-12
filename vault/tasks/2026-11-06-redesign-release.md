@@ -51,6 +51,11 @@ task is the one PR that then switches the site over. If something goes wrong, re
 - [ ] `sw.js` version bumped, so phones drop the old cached pages; perf budgets lowered to the new sizes
 - [ ] CI and the release suites pass on the switch PR, and the UAT is done on its own preview; reverting it there brings
       the old site back
+- [ ] The new dashboard, left from [phase 3](2026-11-05-redesign-phase-3-dashboard.md) (2026-11-12): its three screens
+      (`dashboard/next`) added to the accessibility baseline; first paint on the slow-phone profile looked at again (it
+      passes its budget but is slower than the live dashboard's); and, once it is the live dashboard, one look with a
+      real hub tab open beside it: your Timmy walks in wearing his outfit and his desk says "You" (a preview has no
+      realtime, so this was only checked in pieces)
 - [ ] After merge: `node tools/release/postcheck.js`, `DEPLOY_NOTES.md` and the site changelog; a notice to the class only
       if Sam wants one
 

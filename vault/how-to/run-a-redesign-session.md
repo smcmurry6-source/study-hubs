@@ -24,7 +24,7 @@ and the phase notes it links.
    step of [phase 4](../tasks/2026-11-05-redesign-phase-4-game-layer.md).)
 5. **Test what you touched while building; everything once at the end.** `node tools/release/xp.js` (and `rls.js`) only when
    SQL changed; `node tools/ci/smoke.js` already checks only the touched hubs; `node tools/release/run.js` once before the PR,
-   and let CI's "Release tests" do the rest. Screenshots only the agent looks at: `deviceScaleFactor: 1`, as few as answer
+   and let CI's "Release tests" do the rest ([long-tests-once](../rules/long-tests-once.md)). Screenshots only the agent looks at: `deviceScaleFactor: 1`, as few as answer
    the question (images cost far more than text). Screenshots for Sam stay at 2.
 6. **Match the model to the work.** The engine, Perio's port, the SQL and the art need the strongest model. Copying
    content into a new hub's `content/`, vault write-backs and rerunning checks don't: a lighter model or effort does them.
