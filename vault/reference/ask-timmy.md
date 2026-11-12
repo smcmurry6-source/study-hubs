@@ -106,7 +106,10 @@ person to read. The full report (every question and answer) is written as markdo
 
 - `node tools/timmy/eval.mjs --dry`: free; checks the test set (every "covered" case's terms are in its lecture, every
   "not covered" case's terms are in no hub content) and the grading. CI and `tools/release/run.js` run it.
-- The real run costs about $10-12 for all 134 cases (`--only <hub or case ids>` for fewer, `--max-usd` to stop early).
+- The real run cost $11.71 for all 134 cases on 2026-11-12 (`--only <hub or case ids>` for fewer, `--max-usd` to stop
+  early). The first case on each hub writes that hub's content to the API's cache, about $1 a hub and about $3.30 on the
+  dashboard (every hub's content); the rest read it for about 5 cents a case. So a few cases on one hub cost about $1.25,
+  and a change to `RULES` or the content makes the next run write the cache again.
   **Ask Sam before running it.** It needs the SDK (`npm i --prefix <dir> @anthropic-ai/sdk@1.3.0`, then
   `TIMMY_SDK_DIR=<dir>`) and a key in `TIMMY_EVAL_KEY`. In a Claude Code cloud session Sam adds it as an environment
   variable in the environment's settings (the session's credential form can't hold a key for `api.anthropic.com`: the

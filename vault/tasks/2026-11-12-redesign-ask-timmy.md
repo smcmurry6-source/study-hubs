@@ -248,10 +248,9 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
 - [x] Sam's calls written down (this note, [decisions](../decisions.md), the privacy rule)
 - [x] Part 1: the migration, the function and its tests ([ask-timmy](../reference/ask-timmy.md)); the test set and the
       eval, which passes with a fake model (`node tools/timmy/eval.mjs --dry`, in CI)
-- [ ] Part 1: the test set passes on the real API (every quote checks out, "not covered" when it should be, quiz and
-      practice questions declined, offers drafted, no rule broken). Sam said yes to the full run (about $10-12) on
-      2026-11-12; it waits for a key in `TIMMY_EVAL_KEY` (an environment variable in the cloud environment's settings: the
-      credential form refuses Anthropic's host); then fix what it finds and rerun the failures
+- [x] Part 1: the test set passes on the real API (every quote checks out, "not covered" when it should be, quiz and
+      practice questions declined, offers drafted, no rule broken): the full run on 2026-11-12, its fixes, and a rerun of
+      the fixed prompt (Log)
 - [ ] Part 2: the chat on every new hub page and the new dashboard, on a phone and a laptop, with the Report button on
       his answers; the smoke test covers it
 - [ ] Part 3: the admin tab
@@ -287,8 +286,15 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
   grader missed: after a practice question he said "Your pick, B", but the card shuffles the choices and shows no letters.
   The answered question now goes to him without letters, the student's pick by its words, and his rules say to name a
   choice by its words; the eval fails a letter. Also new: quotation marks only around words in the content (the eval
-  checks it), 911 beside 988 for immediate danger, and `--regrade` to grade a saved run again for free. The failed and
-  practice-question cases were run again on the fixed prompt.
+  checks it), 911 beside 988 for immediate danger, and `--regrade` to grade a saved run again for free. Re-grading the
+  full run with the new grader flags only the three letter answers.
+- 2026-11-12: the fixed prompt on the real API. A rerun of 16 cases stopped at its $3 limit after one (db-06, passed,
+  its exam-date quote now checked): the first case on a hub writes that hub's content to the API's cache, about $1 a hub
+  and $3.26 on the dashboard, which the estimate had missed. Sam then OK'd about $2 for occlusion only: oc-01, oc-09,
+  oc-24, oc-25 and oc-38 all passed ($1.23), choices named by their words, every quote checked out, every fact in the
+  content. Spent on the eval in all: about $17.50 (a one-case try $1.32, the full run $11.71, the reruns $3.26 and
+  $1.23). Reports: branch `claude/timmy-eval-run-1`, `tools/timmy/runs/` (not merged). Part 1 is done; the whole set
+  runs again before the release (the release steps say so).
 
 ## Outcome
 

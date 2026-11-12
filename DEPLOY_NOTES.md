@@ -43,7 +43,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   thumbs, what they did with an offer, and the Report button Sam asked for, which sends a usual report the Inbox answers)
   and the admin tab's reads. Tests: `tools/timmy/test.mjs` (paragraph links against the engine's own numbering in
   Chromium), `tools/release/timmy.js` (the database), and `tools/timmy/eval.mjs` with a 134-case test set (`--dry` in CI;
-  the real-API run costs about $10 and waits for Sam's OK). How it all works: [ask-timmy](vault/reference/ask-timmy.md).
+  the real-API run, all 134 cases for $11.71, passed once its fixes were in: choices named by their words, not letters,
+  since the card shuffles them; a short exam fact quotable whole). How it all works: [ask-timmy](vault/reference/ask-timmy.md).
 
 - **2026-11-12 (the redesign's three journeys, client side: phase 4, part A, Claude Code)** — Nothing students see
   changes: it runs only on the new pages (`hubs/<id>/next/`, `next/`, shown in a preview) and only once the database
