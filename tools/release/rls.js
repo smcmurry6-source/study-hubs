@@ -10,6 +10,8 @@
 //     the right one (so the test means something);
 //   - per-visitor reads (get_my_answers, get_personal_stats, the bootstrap, the shop, the rank) return only that
 //     visitor's rows, and no function a visitor can run hands back another visitor's id;
+//   - Learn and Flashcards (migration_v56): card_reviews is closed to anon, get_my_cards returns only the asking
+//     visitor's rows, and record_card_v2 refuses another visitor's request id;
 //   - visiting (migration_v54): the tables and helpers behind the visit keys are closed to anon (rls-expectations.json's
 //     anonNone and anonNoRun), and a place opened with someone's key, like the boards, carries no visitor id.
 // The migrations waiting for their release (supabase/pending-migrations.txt) are applied on top of the schema first, so
@@ -108,6 +110,9 @@ try {
          insert into idea_reports (idea_id, visitor_id) select id, 'rls-C' from ideas where visitor_id = 'rls-B';
          insert into idea_notes (visitor_id, idea_id, status, note) select 'rls-B', id, 'planned', 'made-up note' from ideas where visitor_id = 'rls-B';
          insert into xp_sessions (visitor_id, hub, kind, started_at) values ('rls-B','rls-hub','mock',now());`);
+    /* Learn and Flashcards (migration_v56): B has ratings and a Learn step, A one rating */
+    if (has('card_reviews')) sql(`insert into card_reviews (visitor_id, hub, qid, what, request_id) values ('rls-B','rls-hub','q1','good','rls-b-card-0001'),
+         ('rls-B','rls-hub','q9','learn-1','rls-b-card-0002'), ('rls-A','rls-hub','q2','again','rls-a-card-0001');`);
   }
 
   /* 1. row-level security on, and anon's direct access is exactly the expected list */
@@ -218,6 +223,16 @@ try {
     const board = asAnon(`public.get_ideas('rls-A')`);
     if (!board.ideas.length || board.ideas.some(i => i.own) || board.ideas[0].mine !== 1) fail(`get_ideas for visitor A: ${JSON.stringify(board.ideas)} (expected B's idea, not A's own, with A's up vote)`);
     notes.push('get_my_shop, get_rank_profile_v2, get_widget_bootstrap_v2, get_my_inbox_v2 and get_ideas return only the asking visitor\'s rows');
+    /* Learn and Flashcards (migration_v56): your own ratings, never another visitor's, and another's request id is refused */
+    if (has('card_reviews')) {
+      const cardsA = asAnon(`public.get_my_cards('rls-A', 'rls-hub')`), cardsN = asAnon(`public.get_my_cards(null, 'rls-hub')`);
+      if (cardsA.length !== 1 || cardsA[0][0] !== 'q2' || cardsA[0][1] !== 'again') fail(`get_my_cards for visitor A returned ${JSON.stringify(cardsA)}, expected A's one rating`);
+      if (cardsN.length) fail('get_my_cards with no visitor returned rows');
+      const dupB = asAnon(`public.record_card_v2('rls-A', 'rls-hub', 'q1', 'good', false, 'rls-b-card-0001', null)`);
+      if (dupB.error !== 'dup' || Number(sql(`select count(*) from public.card_reviews where request_id = 'rls-b-card-0001' and visitor_id = 'rls-A'`)[0][0]))
+        fail(`record_card_v2 with B's request id answered ${JSON.stringify(dupB)} for A (expected it refused, nothing written)`);
+      notes.push('get_my_cards returns only the asking visitor\'s ratings; record_card_v2 refuses another visitor\'s request id');
+    }
 
     /* 6b. visiting (migration_v54): what's behind the visit keys is closed to anon, and a place gives no id away */
     for (const t of EXPECT.anonNone || []) {

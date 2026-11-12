@@ -411,23 +411,35 @@
       "</div></div>";
     el.innerHTML = html;
     /* Home's way into the bank starts fresh: the exam's lectures, not answered yet, High likelihood off (the rule) */
+    /* "n flashcards due": the bank as flashcards, every lecture, so every due card is in the deck */
+    $$("[data-cardsdue]", el).forEach(function(a){ a.addEventListener("click", function(){ HX.bankReset(); HX.bankSearch = ""; STATE.ui.qview = "cards"; saveState(); track("home:cards-due"); }); });
     $$("[data-home-practice]", el).forEach(function(a){ a.addEventListener("click", function(){ var ex = LECS.filter(function(l){ return isExamLec(l.id); }).map(function(l){ return l.id; }); HX.bankReset(); STATE.ui.qlec = ex.length ? HX.lecValue(ex) : "all"; STATE.ui.qstatus = "unseen"; HX.bankSearch = ""; saveState(); }); });
     paintLive();
     homeTimer = setInterval(function(){ var c = $("#hxCount"); if (!c || !c.isConnected || view !== "home") { clearInterval(homeTimer); return; } c.innerHTML = countHTML(); }, 30000);
     tip(el, "home", "Your daily goal is the ring in the bar: " + HX.goal() + " questions a day. The flame counts the days in a row you study. Change the goal in More, Settings.");
   }
+  /* flashcards due now (widget/study-modes.js keeps each card's schedule in STATE.cards: d, when it's due), for Home */
+  function cardsDue(){
+    var c = STATE.cards, now = Date.now(), n = 0;
+    if (!c || typeof c !== "object") return 0;
+    IDX.forEach(function(q){ var x = c[q.id]; if (x && x.d && x.d <= now && !isReview(q.lec)) n++; });
+    return n;
+  }
   function nextHTML(rows, mis, examWeek){
     var fin = rows.filter(function(r){ return isExamLec(r.l.id); }), out = [];
+    var due = cardsDue();
     var started = fin.filter(function(r){ return r.a >= 5; }).sort(function(a, b){ return a.pct - b.pct; });
     var fresh = fin.filter(function(r){ return !r.tried; });
     var missedFin = fin.reduce(function(n, r){ return n + r.missed; }, 0);
     var row = function(title, sub, href, label, primary){ return "<li><span><b>" + esc(title) + "</b><small>" + esc(sub) + '</small></span><a class="btn' + (primary ? " btn-primary" : "") + '" href="' + href + '">' + esc(label) + "</a></li>"; };
     if (mis && examWeek) out.push(row("Yesterday's misses: " + pl(mis, "question"), "Missed yesterday and not tried again yet", "#questions/misses", "Retry them", true));
+    /* flashcards you rated, back now that you're about to forget them (the Question Bank's Study as: Flashcards) */
+    if (due) out.push(row(pl(due, "flashcard") + " due", "Back now, before you forget them", "#questions", "Flashcards", !out.length).replace('href="#questions"', 'href="#questions" data-cardsdue'));
     if (started.length && started[0].pct < 80) { var w = started[0]; out.push(row("Your weakest lecture: " + lecName(w.l.id), w.pct + "% right over " + pl(w.a, "answer"), "#questions/weak", "Weak spots", !out.length)); }
     if (missedFin) out.push(row(pl(missedFin, "question") + " you missed last time", "Try them again while they're fresh", "#questions/missed", "Retry"));
     if (fresh.length) { var f = fresh[0]; out.push(row("Not started: " + lecName(f.l.id), fresh.length > 1 ? (fresh.length - 1) + " more not started yet" : "On the exam", "#notes/" + esc(f.l.id), "Read the notes")); }
     if (!out.length) out.push(row("Every lecture started and no misses waiting", "Take the mock to check yourself", "#questions/mock", "Mock exam", true));
-    return '<ul class="rows">' + out.join("") + "</ul>";
+    return '<ul class="rows">' + out.slice(0, 3).join("") + "</ul>";
   }
   function lecsHTML(rows){
     var last = null, X = C.home || {};

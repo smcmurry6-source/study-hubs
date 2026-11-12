@@ -22,6 +22,9 @@
 //     sold; two throwback days a month; the daily and weekly picks never hold a seasonal, gift or rank item;
 //   - visiting: a board row's key opens that person's place and nothing else of theirs; everyone can be visited, with no
 //     way to turn it off; Link my devices moves the place to the id that remains;
+//   - Learn and Flashcards (migration_v56): a rating pays a flat 2 for a card's first three a day, under the answers'
+//     speed limit; Study ahead and Learn's steps pay nothing; a replayed call, a double tap, a boost, the rebuild and Link
+//     my devices; a rating never reaches the class's numbers, your answers or a day studied; get_my_cards;
 //   - anon can't reach the private parts.
 //   node tools/release/xp.js     (PostgreSQL 14+ server binaries: initdb, pg_ctl, psql)
 'use strict';
@@ -831,14 +834,90 @@ try {
   ok(num(`select length(secret) from visit_secret`) >= 32 && num(`select count(*) from visit_secret`) === 1, 'one server-side secret behind the keys');
   notes.push('visiting: everyone, a key per board row, a place with only what it shows, no way to turn it off, unknown keys, Link my devices');
 
+  /* ---------- 14b. Learn and Flashcards (migration_v56): ratings and Learn's steps ---------- */
+  const card = (v, qid, what, o) => { o = o || {};
+    return json(`sh_card(${T(o.at || 0)}, ${q(v)}, ${q(o.hub || 'xh')}, ${q(qid)}, ${q(what)}, ${o.ahead ? 'true' : 'false'}, ${o.req ? q(o.req) : 'null'}, ${o.seen == null ? 'null' : o.seen})`); };
+  const CD = 9 * DAY;   // a day of its own, after the others
+  const cls0 = rows(`select hub, qid, attempts, correct from question_stats where hub = 'xh' order by 2`), picks0 = num(`select coalesce(sum(picks), 0) from question_choices where hub = 'xh'`);
+  const pa0 = num(`select count(*) from personal_answers`), ax0 = num(`select count(*) from answer_xp`);
+  const c1 = card('xp-C', 'x1', 'good', { at: CD, req: 'card-c-0001' });
+  ok(c1.ok && c1.xp === 2 && c1.base === 2 && c1.mult === 1 && c1.why === null && c1.total === 2, `a due or new card's rating pays a flat 2 (${JSON.stringify(c1)})`);
+  const c234 = [card('xp-C', 'x1', 'again', { at: CD + 10 }), card('xp-C', 'x1', 'hard', { at: CD + 20 }), card('xp-C', 'x1', 'easy', { at: CD + 30 })];
+  eq(c234.map(r => [r.xp, r.why]), [[2, null], [2, null], [0, 'repeat']], 'a card pays its first three ratings a Central day, then nothing');
+  eq(card('xp-C', 'x2', 'good', { at: CD + 31 }).why, 'fast', 'a rating under 2 seconds after the last one pays nothing (the speed limit)');
+  ans('xp-C', 'x3', { choice: 1, at: CD + 40 });
+  eq(card('xp-C', 'x2', 'good', { at: CD + 41 }).why, 'fast', 'the speed limit counts answers too: a rating 1 second after an answer pays nothing');
+  const ca = card('xp-C', 'x2', 'easy', { at: CD + 50, ahead: true });
+  ok(ca.xp === 0 && ca.why === 'ahead', `Study ahead moves the schedule and pays nothing (${JSON.stringify(ca)})`);
+  eq(card('xp-C', 'x2', 'good', { at: CD + 60 }).xp, 2, 'Study ahead\'s ratings don\'t count toward the card\'s three a day');
+  const cl = card('xp-C', 'x4', 'learn-1', { at: CD + 70 });
+  ok(cl.ok && cl.xp === 0 && cl.why === 'learn', `a Learn step is recorded and pays nothing (Learn's answers pay as answers) (${JSON.stringify(cl)})`);
+  eq([card('xp-C', 'nope', 'good', { at: CD + 80 }).why, card('xp-C', 'v2', 'good', { hub: 'xv', at: CD + 90 }).why], ['unknown', 'retired'], 'an unknown or retired id is recorded and earns nothing');
+  eq([card('xp-C', 'x5', 'maybe', { at: CD + 100 }).error, card('xp-C', 'x5', 'good', { hub: 'Bad Hub', at: CD + 110 }).error, card('xp-C', 'x5', 'good', { at: CD + 120, req: 'short' }).error], ['bad', 'bad', 'bad'],
+    'a bad rating, hub or request id is refused');
+  // a replayed call and a double tap
+  const xC = xpOf('xp-C'), rows0 = num(`select count(*) from card_reviews where visitor_id = 'xp-C'`);
+  const cr = card('xp-C', 'x1', 'good', { at: CD + 500, req: 'card-c-0001' });
+  ok(cr.repeat === true && cr.xp === 2 && xpOf('xp-C') === xC && num(`select count(*) from card_reviews where visitor_id = 'xp-C'`) === rows0,
+    `a replayed call returns the first answer, records nothing and pays nothing (${JSON.stringify(cr)})`);
+  eq(card('xp-C2', 'x1', 'good', { at: CD + 510, req: 'card-c-0001' }).error, 'dup', 'another visitor reusing a request id is refused');
+  eq(num(`select count(*) from card_reviews where visitor_id = 'xp-C2'`), 0, '... and nothing is written for them');
+  const ctap1 = card('xp-C3', 'x6', 'good', { at: CD + 600, req: 'card-tap-0001' }), ctap2 = card('xp-C3', 'x6', 'good', { at: CD + 600, req: 'card-tap-0002' });
+  eq([ctap1.xp, ctap2.xp, ctap2.why], [2, 0, 'fast'], 'a double tap (two ratings in the same second) pays once');
+  // a boost doubles a card, as it does an answer
+  sql(`insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at) values ('xp-C4', 'medal:test', 'medal', 2, ${T(CD - 100)}, ${T(CD + 3600)})`);
+  const cb = card('xp-C4', 'x1', 'good', { at: CD });
+  ok(cb.xp === 4 && cb.base === 2 && cb.mult === 2, `double XP doubles a card (${JSON.stringify(cb)})`);
+  // the next Central day pays again
+  eq(card('xp-C', 'x1', 'good', { at: CD + DAY }).xp, 2, 'the next day, a card pays again');
+  // a rating is not an answer: nothing reaches the class's numbers, your answers or a day studied
+  eq(rows(`select hub, qid, attempts, correct from question_stats where hub = 'xh' order by 2`).filter(r => r.qid !== 'x3'), cls0.filter(r => r.qid !== 'x3'), 'ratings never reach question_stats (x3 had a real answer)');
+  eq(num(`select coalesce(sum(picks), 0) from question_choices where hub = 'xh'`) - picks0, 1, 'ratings never reach the class\'s picks (only the one real answer did)');
+  eq([num(`select count(*) from personal_answers`) - pa0, num(`select count(*) from answer_xp`) - ax0], [1, 1], 'ratings never reach personal_answers or answer_xp');
+  eq([num(`select count(*) from xp_days where visitor_id = 'xp-C3'`), num(`select coalesce((select days from xp_visitors where visitor_id = 'xp-C3'), 0)`)], [0, 0],
+    'a day with only flashcards doesn\'t make a day studied on the server (no +20, not on the streak board)');
+  // the rebuild keeps the card awards
+  const xC1 = xpOf('xp-C'); sql(`select sh_xp_rebuild(array['xp-C'])`);
+  eq(xpOf('xp-C'), xC1, 'the rebuild (a correction, Link my devices) keeps the card awards');
+  eq(num(`select coalesce(sum(xp), 0) from xp_awards where visitor_id = 'xp-C' and src = 'card'`), num(`select coalesce(sum(xp), 0) from card_reviews where visitor_id = 'xp-C'`), 'every paid rating is one card award');
+  // get_my_cards: your rows, this hub, oldest first, in the page's time
+  card('xp-C5', 'x8', 'good', { at: CD + 1000, seen: Date.parse('2030-03-13T17:59:00Z') });
+  card('xp-C5', 'x8', 'again', { at: CD + 1010, seen: Date.parse('2030-03-01T00:00:00Z') });
+  card('xp-C5', 'x9', 'learn-2', { at: CD + 1020, req: 'card-c5-learn' });
+  card('xp-C5', 'm1', 'hard', { hub: 'xm', at: CD + 1030 });
+  const myCards = anonJson(`get_my_cards('xp-C5', 'xh')`);
+  eq(myCards.map(r => [r[0], r[1], r[3], r[4]]), [['x8', 'again', 0, null], ['x8', 'good', 0, null], ['x9', 'learn-2', 0, 'card-c5-learn']],
+    'get_my_cards: this hub\'s rows, oldest first by the page\'s time');
+  ok(myCards[0][2] === Date.parse('2030-03-13T18:00:00Z') + 1010 * 1000 - 2 * DAY * 1000 && myCards[1][2] === Date.parse('2030-03-13T17:59:00Z'),
+    `the page's time is kept within the last two days, never in the future (${myCards.map(r => new Date(r[2]).toISOString()).join(', ')})`);
+  eq([anonJson(`get_my_cards('xp-C6', 'xh')`), anonJson(`get_my_cards(null, 'xh')`), anonJson(`get_my_cards('xp-C5', '')`)], [[], [], []], 'nobody else\'s rows, and nothing without a visitor or hub');
+  // through the grants, as a page calls it
+  const cAnon = anonJson(`record_card_v2('xp-C7', 'xh', 'x1', 'good', false, 'card-anon-0001', null)`);
+  ok(cAnon.ok && cAnon.xp === 2, `anon can record a rating through record_card_v2 (${JSON.stringify(cAnon)})`);
+  // Start over in Learn: one call resets a whole set, pays nothing, and comes back in the replay
+  const xC7 = xpOf('xp-C7');
+  eq(anon(`select reset_my_learn('xp-C7', 'xh', array['x1', 'x2', 'x2', 'x3'], null)`)[0][0], '3', 'reset_my_learn writes one learn-reset row per question (duplicates once)');
+  eq([xpOf('xp-C7'), anonJson(`get_my_cards('xp-C7', 'xh')`).filter(r => r[1] === 'learn-reset').length], [xC7, 3], 'a reset pays nothing and is in get_my_cards');
+  eq([anon(`select reset_my_learn('xp-C7', 'xh', '{}'::text[], null)`)[0][0], anon(`select reset_my_learn(null, 'xh', array['x1'], null)`)[0][0], anon(`select reset_my_learn('xp-C7', 'Bad Hub', array['x1'], null)`)[0][0]], ['0', '0', '0'],
+    'an empty list, no visitor or a bad hub resets nothing');
+  // Link my devices: the ratings and their XP go to the id that remains
+  card('xp-CL', 'x1', 'good', { at: CD });
+  card('xp-CL2', 'x1', 'good', { at: CD + 100 }); card('xp-CL2', 'x2', 'learn-1', { at: CD + 110 });
+  eq([xpOf('xp-CL'), xpOf('xp-CL2')], [2, 2], 'two devices before linking');
+  const ccode = anon(`select create_link_code('xp-CL')`)[0][0];
+  eq(anon(`select redeem_link_code(${q(ccode)}, 'xp-CL2')`)[0][0], 'xp-CL', 'the two devices link');
+  eq([num(`select count(*) from card_reviews where visitor_id = 'xp-CL2'`), anonJson(`get_my_cards('xp-CL', 'xh')`).length], [0, 3], 'linked: every rating and Learn step is under the id that remains');
+  eq(xpOf('xp-CL'), 4, 'linked: both devices\' card XP (the same card twice in a day: still within its three)');
+  notes.push('Learn and Flashcards: a flat 2 for a card\'s first three ratings a day, the shared speed limit, Study ahead and Learn steps pay nothing, a replay, a double tap, a boost, the rebuild, no class numbers or day studied, get_my_cards, Link my devices');
+
   /* ---------- 15. the private parts stay private ---------- */
-  for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret'])
+  for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);
   raises(() => anon(`update public.visit_secret set secret = 'x'`), '42501', 'anon writes visit_secret directly');
   for (const f of [`sh_answer(null, 'x', 'xh', 'x1', 1, null, null, null, null, null, null, null)`, `sh_award('x', 'k', 'report', 'xh', 100, 1, now())`,
     `sh_xp_replay(array['x'])`, `sh_wallet('xp-B')`, `sh_session_start(null, 'x', 'xh', 'mock', null)`, `sh_pod_minute(null, 'x', 'xh', 'ep1', 0)`,
     `sh_medal_check('x', 'xh', now())`, `sh_xp_mult('x', now())`, `sh_key('xh', 'x1', null)`,
-    `sh_visit_key('xp-VS')`, `sh_owns('xp-B', 'castle')`, `sh_owned('xp-B')`, `sh_buy(null, 'xp-B', 'apple', 'buy-anon-0001')`, `sh_my_shop(null, 'xp-B')`, `sh_throwback_items(current_date)`])
+    `sh_visit_key('xp-VS')`, `sh_card(null, 'x', 'xh', 'x1', 'good', false, null, null)`, `sh_owns('xp-B', 'castle')`, `sh_owned('xp-B')`, `sh_buy(null, 'xp-B', 'apple', 'buy-anon-0001')`, `sh_my_shop(null, 'xp-B')`, `sh_throwback_items(current_date)`])
     raises(() => anon(`select ${f}`), '42501', `anon runs ${f.split('(')[0]}`);
   eq([anon(`select sh_shop_seasons('2026-10-15')`)[0][0], anon(`select sh_is_throwback('2026-10-15') is not null`)[0][0], anon(`select cardinality(sh_throwback_days('2026-10-15'))`)[0][0]], ['{halloween,fall}', 't', '2'],
     'anon can ask which seasons are on sale and which days are throwback days (pure arithmetic on the calendar)');
