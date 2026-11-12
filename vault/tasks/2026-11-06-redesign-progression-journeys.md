@@ -1,13 +1,13 @@
 ---
 type: task
-status: open
+status: in-progress
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: 
-agent: 
-pr: 
+waiting-on: Sam (the art and the open calls, 2026-11-12)
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/332
 ---
 
 # Three equipment journeys, more ways to earn XP, and the Dark Matter unlock
