@@ -108,8 +108,6 @@
     document.head.appendChild(l);
   }
 
-  loadArt();
-
   /* ---------- the server ---------- */
   function call(sb, fn, args){
     if (!sb) return Promise.resolve({ fail: true });
@@ -205,8 +203,16 @@
       var t = ""; try { if (window.shPet && window.shPet.art) t = String(window.shPet.art({ hp: 100, mood: "happy", hat: "" }, 200)); } catch (e) {}
       if (t) $(".shi-peek").innerHTML = '<span class="shi-bulb">' + a.bulb(38) + '</span><span class="shi-timmy">' + t + "</span>";
     }
-    decorate();
-    if (!A()) loadArt().then(function(){ if (A() && el.isConnected) { decorate(); if (S.data) paint(); } });
+    /* the drawings are fetched when the board is about to come into view, not with the page: on the dashboard it is
+       several screens down, and a page's first load has a request budget (tools/release/budgets.json) */
+    function wantArt(){ loadArt().then(function(){ if (A() && el.isConnected) { decorate(); if (S.data) paint(); } }); }
+    if (A()) decorate();
+    else if (window.IntersectionObserver) {
+      var artIO = new IntersectionObserver(function(es){
+        if (es.some(function(e){ return e.isIntersecting; })) { artIO.disconnect(); wantArt(); }
+      }, { rootMargin: "900px 0px" });
+      artIO.observe(el);
+    } else wantArt();
     function tell(msg){ say.textContent = msg || ""; }
     function find(id){ return S.data ? S.data.ideas.filter(function(i){ return String(i.id) === String(id); })[0] : null; }
 

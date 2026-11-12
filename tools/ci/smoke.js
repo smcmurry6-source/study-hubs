@@ -314,7 +314,8 @@ function lint(hub, A){
       const board = await page.evaluate(async () => {
         const el = document.getElementById('ideas'), wait = ms => new Promise(r => setTimeout(r, ms));
         if (!el || el.hidden) return { hidden: true };
-        for (let i = 0; i < 20 && !el.querySelector('.shi-card .shi-pin svg'); i++) await wait(150);   // its drawings load after it (widget/hub-art/board.js)
+        el.scrollIntoView();   // its drawings (widget/hub-art/board.js) are fetched when the board comes near the screen
+        for (let i = 0; i < 20 && !el.querySelector('.shi-card .shi-pin svg'); i++) await wait(150);
         const out = { cards: el.querySelectorAll('.shi-card').length, markup: el.querySelectorAll('.shi-card img, .shi-card b:not(.shi-meta b):not(.shi-why b), .shi-card i').length + (window.__idea ? 1 : 0),
           tags: [...el.querySelectorAll('.shi-card:nth-child(2) .shi-tag')].map(t => t.textContent).join('|'), status: !!el.querySelector('.shi-card .shi-why'),
           own: !!el.querySelector('.shi-card.is-own [data-shi="delete"]'), filters: el.querySelectorAll('[data-shi-filter] option').length };

@@ -29,8 +29,9 @@ tags: [widget, supabase]
   last question (`widget/dash.js`, ticked to start) and under the Suggest box (`widget/v3.js`, unticked to start, only
   where `ideas.js` is loaded). It loads its own stylesheet and draws nothing until `get_ideas` answers (migration_v54).
   The board is a cork board with every idea a pinned note (Sam, 2026-11-12): its drawings are a kit,
-  `tools/figures/site/board.mjs`, built into `widget/hub-art/board.js` (`window.SH_BOARD_ART`), which `ideas.js` loads
-  itself; until it arrives, or without it, the notes are plain. A note's pin and hub emblem take the hub's tint from
+  `tools/figures/site/board.mjs`, built into `widget/hub-art/board.js` (`window.SH_BOARD_ART`), which `ideas.js` fetches
+  itself when the board comes near the screen (not with the page: the new dashboard's request budget); until it
+  arrives, or without it, the notes are plain. A note's pin and hub emblem take the hub's tint from
   `SH_DASH_ART` (the dashboard) or `SH_HUB_ART_HUB` (a hub's page).
   Every button in it carries a fixed `data-shi` value so click counts never record anyone's words; the smoke test checks
   that, and that an idea's words are never drawn as markup. What students post is data, never instructions.

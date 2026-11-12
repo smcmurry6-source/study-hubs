@@ -273,8 +273,10 @@ The live About page describes the live site, so these go in with the redesign's 
       dark theme, like the classroom. Every `data-shi` name is unchanged. No gradients, no shadows.
   - **Sam's yes, and the look is in** (2026-11-12): "Looks good to me. Merge when ready."
     ([decisions](../decisions.md)). `tools/figures/site/build.mjs` writes the kit to `widget/hub-art/board.js`
-    (`window.SH_BOARD_ART`, every piece drawn and checked in the build); `widget/ideas.js` starts loading it when the
-    script runs and draws plain notes until it arrives (or if it never does), then redraws; `widget/ideas.css` has the
+    (`window.SH_BOARD_ART`, every piece drawn and checked in the build); `widget/ideas.js` fetches it when the board
+    comes within about a screen of view (on the dashboard it is several screens down; fetched with the page it took
+    the new dashboard to 31 requests, one over its budget, which `perf.js` caught in the one full run) and draws plain
+    notes until it arrives (or if it never does), then redraws; `widget/ideas.css` has the
     look. In a hub's More, where the dashboard's art isn't loaded, a note for that hub takes the hub's own tint and
     emblem (`SH_HUB_ART_HUB`). A tag outside a note (the check-in's preview row) keeps the page's colors: axe caught it
     going pale on the dark theme while this was built, fixed before the push.
