@@ -7,7 +7,7 @@ requested-by: Sam
 due: 2026-11-16
 waiting-on: 
 agent: Claude Code
-pr: https://github.com/smcmurry6-source/study-hubs/pull/328
+pr: https://github.com/smcmurry6-source/study-hubs/pull/329
 ---
 
 # Occlusion `in-locator`: the explanation names the pantograph trap
