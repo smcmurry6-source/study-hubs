@@ -62,6 +62,10 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
 - [x] What's placed is kept on the server (`equip_item`, [the shop note](2026-11-06-redesign-timmy-shop.md)) and the same on
       every linked device (the server side, phase 5 part 3; the full view that calls it is phase 4); its five yard spots and
       names follow the art (Sam, 2026-11-06)
+- [ ] Sam's look, then a fix in the kit if wanted: at the door Timmy stands in front of the rank statue and hides most of
+      it (the journeys' pedestal too), and a piece in the spot left of the path hides its base; the card always shows him
+      at the door (found in part C, 2026-11-12; either his door spot or the statue's moves, home by home, in
+      `tools/figures/site/place.mjs`)
 - [ ] `LORE.md` and the About page (Timmy's place) updated
 - [ ] CI and the release suites pass, perf budgets met (`node tools/release/run.js`)
 - [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
