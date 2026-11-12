@@ -1312,6 +1312,7 @@
         var rows = res.data || [];
         if (!rows.length){ boardMsg("No streaks yet. Answer questions two days in a row to start one."); return; }
         boardData = { which: which, rows: rows, fits: [] }; paintBoard(); loadFits(sb, boardData);
+        jNeed(rows, function(){ if (boardData && boardData.rows === rows) paintBoard(); });
       }, function(){ if (boardNow === which) boardMsg(); });
     }
   }

@@ -19,14 +19,14 @@
   /* data-audio="off": an archived hub whose narration and Timmy Time came off the site to keep it under GitHub Pages'
      1 GB limit (vault/rules/archived-hubs-drop-their-audio.md). Listen reads with the device's own voice, Timmy Time
      isn't mounted, and v3.css hides the hub's Timmy Time links (html.sh-audio-off). */
-/* data-game="v2": the redesign's hubs (widget/hub.js writes it) use the game layer's server once the database has it
+  var AUDIO_OFF = ds.audio === "off";
+  if (AUDIO_OFF) try { document.documentElement.classList.add("sh-audio-off"); } catch (e) {}
+  /* data-game="v2": the redesign's hubs (widget/hub.js writes it) use the game layer's server once the database has it
      (migration_v54, applied at the redesign's release; vault/reference/game-server.md): one call per answer that the
      server grades and pays, the journeys' rank profile, mock sessions. Until the functions exist, and on every live hub,
      everything below works as it does today. on: null until the page knows, then true or false. */
   var GAME = { want: ds.game === "v2", on: null, boost: null };
   function rpcMissing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
-  var AUDIO_OFF = ds.audio === "off";
-  if (AUDIO_OFF) try { document.documentElement.classList.add("sh-audio-off"); } catch (e) {}
   var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
   var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
 

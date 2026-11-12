@@ -81,7 +81,7 @@
     var xp = xpFor(qid, correct, kind === "self"), t = todayRec(), first = !t.n, mult = game && boost() ? 2 : 1;
     putAnswer(qid, lecId, correct);
     t.n++; if (correct) t.r++; t.xp += xp;
-    if (game) { var tq = t.q || (t.q = {}), c = tq[qid] || (tq[qid] = [0, 0]); c[correct ? 0 : 1]++; PEND.push({ xp: xp, at: Date.now() }); }
+    if (game) { var tq = t.q || (t.q = {}), c = tq[qid] || (tq[qid] = [0, 0]); c[correct ? 0 : 1]++; PEND.push({ qid: qid, xp: xp, at: Date.now() }); }
     var met = false; if (!t.met && t.n >= goal()) { t.met = 1; met = true; }
     if (ctx !== "mock" && ctx !== "arcade") { SESSION.n++; if (correct) SESSION.r++; else SESSION.miss[lecId] = (SESSION.miss[lecId] || 0) + 1; SESSION.xp += xp; }
     achievements();
@@ -100,7 +100,9 @@
   function pendSum(){ var cut = Date.now() - 20000; PEND = PEND.filter(function(x){ return x.at > cut; }); return PEND.reduce(function(n, x){ return n + x.xp; }, 0); }
   document.addEventListener("sh:answer-paid", function(e){
     var d = e.detail || {}, r = d.res; if (!r || r.repeat) return;
-    var guess = PEND.shift(), t = todayRec(), extra = 0, said = [];
+    /* the page's guess for this very answer (a reply can be missing: an answer recorded the old way, or lost offline) */
+    var at = -1; PEND.some(function(x, i){ if (x.qid === d.qid) { at = i; return true; } return false; });
+    var guess = at > -1 ? PEND.splice(at, 1)[0] : null, t = todayRec(), extra = 0, said = [];
     (Array.isArray(r.bonus) ? r.bonus : []).forEach(function(b){ if (b && b.xp > 0) { extra += b.xp; if (BONUS[b.src]) said.push(BONUS[b.src] + ": +" + b.xp + " XP"); } });
     var off = (r.xp | 0) - (guess ? guess.xp : r.xp | 0) + extra;
     if (off) { t.xp = Math.max(0, t.xp + off); if (d.ctx !== "mock" && d.ctx !== "arcade") SESSION.xp = Math.max(0, SESSION.xp + off); saveState(); }
