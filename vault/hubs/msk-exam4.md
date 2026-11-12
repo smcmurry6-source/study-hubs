@@ -17,4 +17,6 @@ still up. Retrospective: `LESSONS.md` → Hub retrospectives.
 - Timmy Time's first episode: `tools/podcast/msk-exam4/`.
 - Exempt from the "why for every choice" lint (`WHY_EXEMPT`, archived before the rule).
 
+**Audio off (2026-11-12):** its narration and Timmy Time came off the site when it was archived, to keep the site under GitHub Pages' 1 GB limit ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)). The widget tag says `data-audio="off"`, so Listen reads in the device's voice and its Timmy Time card and links are hidden (the script stays in `tools/podcast/msk-exam4/`). To bring it back: `git checkout <the commit before> -- hubs/msk-exam4/audio` and take the attribute out.
+
 Related: [home](../home.md) · [diagrams-anima](../rules/diagrams-anima.md)

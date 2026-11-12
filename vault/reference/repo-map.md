@@ -69,7 +69,8 @@ tags: [map]
   [admin-operations](admin-operations.md)): its card turns into an archived card with no Open button, which disappears 10 days
   later (`CARD_DAYS`; `hideCardOn` overrides). "Check in" buttons show from 8 am on exam day; the pop-up only goes out
   from 10 pm and still reaches first visits up to 60 days after (`DEBRIEF_DAYS`). The hub's page itself stays up until
-  someone removes it, so the retrospective and cleanup are still manual; moving the entry into `ARCHIVED_HUBS` then is optional. Read the check-ins as late as you can.
+  someone removes it, so the retrospective and cleanup are still manual; its narration and Timmy Time come off the site then
+  ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)); moving the entry into `ARCHIVED_HUBS` then is optional. Read the check-ins as late as you can.
 - `migration_v*.sql` — Supabase schema history (project `thytmzsgymydbzcqdnix`).
   New migrations are run once, by hand, in the Supabase SQL editor, or by a Claude Code session through the
   Supabase connector (`apply_migration` is pre-approved in `.claude/settings.json`). Commit the `.sql` file and

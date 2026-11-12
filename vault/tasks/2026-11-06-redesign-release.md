@@ -56,6 +56,11 @@ task is the one PR that then switches the site over. If something goes wrong, re
       passes its budget but is slower than the live dashboard's); and, once it is the live dashboard, one look with a
       real hub tab open beside it: your Timmy walks in wearing his outfit and his desk says "You" (a preview has no
       realtime, so this was only checked in pieces)
+- [ ] An archived hub on the engine can take its audio off ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md),
+      2026-11-12): a `core.json` switch that `widget/hub.js` passes to v3.js as `data-audio="off"` (`startWidget`), and that
+      hides the engine's own Timmy Time page and Home card and sends Listen to the device's voice without requesting the
+      missing mp3s or word files. Needed before Heme & Endo Exam 2, Occlusion or Perio is archived on the engine
+      ([to-do](2026-11-12-audio-off-at-archiving.md))
 - [ ] After merge: `node tools/release/postcheck.js`, `DEPLOY_NOTES.md` and the site changelog; a notice to the class only
       if Sam wants one
 

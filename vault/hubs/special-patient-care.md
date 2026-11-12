@@ -47,4 +47,6 @@ Sam kept the dates above. The exam card (`EXAM_INFO`) carries all of this, and t
 
 History: grep `Special Patient Care` in "Recent major changes" (`DEPLOY_NOTES.md`).
 
+**Audio comes off after Nov 13** (2026-11-12): the card came down on Nov 6, but the exam is open until Fri Nov 13, 11:59 pm; after that its narration comes off the site ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md), [to-do](../tasks/2026-11-12-audio-off-at-archiving.md)).
+
 Related: [home](../home.md) · [pcd-implants-exam1](pcd-implants-exam1.md) (built on this engine)

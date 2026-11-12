@@ -24,4 +24,6 @@ DENT 2160 Hematology & Endocrinology Exam 1 (lectures 1-10), Fri Oct 30. Sam reo
 - L3's recording is Dr. Madison giving the lecture in another year (this year's slides are Dr. Galin's), so the notes quote
   "the recording".
 
+**Audio off (2026-11-12):** its narration and Timmy Time came off the site when it was archived, to keep the site under GitHub Pages' 1 GB limit ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)). The widget tag says `data-audio="off"`, so Listen reads in the device's voice and its Timmy Time card and links are hidden (the script stays in `tools/podcast/heme-endo-exam1/`). To bring it back: `git checkout <the commit before> -- hubs/heme-endo-exam1/audio` and take the attribute out.
+
 Related: [home](../home.md) · [archiving-is-a-retrospective](../rules/archiving-is-a-retrospective.md)

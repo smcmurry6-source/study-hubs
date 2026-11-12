@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: open
 hub: widget
 created: 2026-11-12
 requested-by: Sam
 due: 
-waiting-on: room on the site (Sam's call on what to make room with) before about 135 MB of new narration
+waiting-on:
 agent: 
 pr: 
 ---
@@ -20,7 +20,11 @@ each redesigned hub's `notes.json` as `hy`). Until it has its own narration, Lis
 kokoro", then, told the size, **"Hold the narration"**. This task records the narration so Listen plays Kokoro (with
 Follow along) on High yield like the other two levels.
 
-## Why it's held: the site is near GitHub Pages' 1 GB cap
+## Why it was held: the site was near GitHub Pages' 1 GB cap
+
+**Room was made on 2026-11-12:** Sam had the five archived hubs' audio taken off and every hub's at its archiving
+([rule](../rules/archived-hubs-drop-their-audio.md)): the site went from 958 to 589 MB, so High yield's ~135 MB at the
+usual 64 kbps fits (Sam kept 64 kbps). `node tools/ci/size.js` shows the size. What follows is how it stood before.
 
 - On 2026-11-12 the published site (the repo without `.git`) was **960 MB**; GitHub Pages caps a published site at 1 GB.
   The narration is most of it: Heme & Endo Exam 2 173 MB, Perio 161, Occlusion 154, and the archived hubs' 430 MB
@@ -53,7 +57,7 @@ Follow along) on High yield like the other two levels.
 
 ## Done when
 
-- [ ] Sam has said how to make room (or that the site may go over 1 GB)
+- [x] Sam has said how to make room (or that the site may go over 1 GB): the archived hubs' audio came off (2026-11-12)
 - [ ] `<lecture>-hy.mp3` and its words file for every lecture with High yield, in the hubs still live
 - [ ] The engine plays them, Follow along works on them, and the smoke lint checks them
 - [ ] The drift rule and the narration how-to cover High yield
@@ -64,6 +68,7 @@ Follow along) on High yield like the other two levels.
 
 - 2026-11-12: written when High yield was built (redesign only); Sam asked for the narration later, then said to generate
   it, then, shown the size against the 1 GB cap, chose to hold it.
+- 2026-11-12: unblocked: the archived hubs' audio came off (958 → 589 MB). Render at 64 kbps.
 
 ## Outcome
 

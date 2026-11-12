@@ -217,14 +217,21 @@ function lint(hub, A){
   notes.push(`${hub}: ${Q.length} questions, ${L.length} lectures; correct answer is the longest choice in ${pct}% of MCQs`);
   if (pct > 40) problems.push(`${hub}: the correct answer is the longest choice in ${pct}% of MCQs (keep it under 40%; chance is ~25%)`);
   const audioDir = path.join(root, 'hubs', hub, 'audio');
-  if (fs.existsSync(audioDir)) L.forEach(l => {
+  /* an archived hub whose audio came off the site says data-audio="off" on its widget tag
+     (vault/rules/archived-hubs-drop-their-audio.md): no narration is expected, and none may be left behind */
+  const audioOff = (() => { try { return /<script[^>]*widget\/v3\.js"[^>]*\bdata-audio="off"/.test(fs.readFileSync(path.join(root, 'hubs', hub, 'index.html'), 'utf8')); } catch (e) { return false; } })();
+  if (audioOff) {
+    const left = fs.existsSync(audioDir) ? fs.readdirSync(audioDir).filter(f => /\.(mp3|words\.json)$/.test(f)) : [];
+    if (left.length) problems.push(`${hub}: its widget tag says data-audio="off" but audio/ still holds ${left.length} file(s) (${left.slice(0, 3).join(', ')}): take them out, or drop data-audio="off"`);
+    notes.push(`${hub}: audio off (archived; Listen uses the device's voice, no Timmy Time)`);
+  } else if (fs.existsSync(audioDir)) L.forEach(l => {
     if (A.READINGS[l.id] && !fs.existsSync(path.join(audioDir, `${l.id}-full.mp3`))) problems.push(`${hub}: missing narration audio/${l.id}-full.mp3`);
     if (A.READINGS_PLAIN[l.id] && !fs.existsSync(path.join(audioDir, `${l.id}-plain.mp3`))) problems.push(`${hub}: missing narration audio/${l.id}-plain.mp3`);
   });
   /* Follow along (widget/hub.js): a redesigned hub's narration has its word timings beside it, made from that very mp3
      (tools/narration_words.py; tools/narrate.py writes them whenever it renders one) */
   const nextNotes = path.join(root, 'hubs', hub, 'next', 'content', 'notes.json');
-  if (fs.existsSync(audioDir) && fs.existsSync(nextNotes)) {
+  if (!audioOff && fs.existsSync(audioDir) && fs.existsSync(nextNotes)) {
     const NN = JSON.parse(fs.readFileSync(nextNotes, 'utf8'));
     ['full', 'plain'].forEach(level => Object.keys(NN[level] || {}).forEach(id => {
       const mp3 = path.join(audioDir, `${id}-${level}.mp3`), wf = mp3.replace(/\.mp3$/, '.words.json'), fix = `python3 tools/narration_words.py ${hub} --lec ${id} --level ${level}`;

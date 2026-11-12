@@ -61,6 +61,10 @@ tags: [widget, supabase]
   `syncing_files` for 10 minutes and the deploy step canceled it ("Timeout reached"), so the Perio S9 diagrams waited
   for the next merge. When a release can't wait for someone else's PR, a small vault-only PR (one that records what
   happened) publishes it.
+  **Size:** Pages publishes every file in `main` and stops at 1 GB per site (and times a deploy out after 10 minutes).
+  The mp3s are nearly all of it, 100-180 MB a hub, so an archived hub's narration and Timmy Time come off the site
+  ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md); 958 → 589 MB on 2026-11-12).
+  `node tools/ci/size.js` (in "Check hubs") prints the size, warns from 750 MB and fails from 900 MB.
 - **Kokoro model files** — re-hosted as release `kokoro-model-v1.0` on this repo
   (`kokoro-v1.0.onnx`, `voices-v1.0.bin`), because Claude Code cloud sessions can
   only download release files from repos attached to the session.

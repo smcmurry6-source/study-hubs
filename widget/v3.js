@@ -16,6 +16,11 @@
   var HUB = ds.hub || "";
   var ANSWERED_EVENT = ds.answeredEvent || (HUB + ":answered");
   var DEFAULT_MODE = ds.defaultMode || "compendium";
+  /* data-audio="off": an archived hub whose narration and Timmy Time came off the site to keep it under GitHub Pages'
+     1 GB limit (vault/rules/archived-hubs-drop-their-audio.md). Listen reads with the device's own voice, Timmy Time
+     isn't mounted, and v3.css hides the hub's Timmy Time links (html.sh-audio-off). */
+  var AUDIO_OFF = ds.audio === "off";
+  if (AUDIO_OFF) try { document.documentElement.classList.add("sh-audio-off"); } catch (e) {}
   var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
   var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
 
@@ -562,7 +567,9 @@
     // voice, unchanged from before.
     function speak(container, btn, audioUrl){
       if (!container) return;
-      cur = { container: container, btn: btn, url: audioUrl || "" };
+      /* an archived hub's narration files are gone: read with the device's voice (voice picker included) */
+      if (AUDIO_OFF) { audioUrl = ""; if (btn && btn.removeAttribute) btn.removeAttribute("data-sh-tts-audio"); }
+      cur ={ container: container, btn: btn, url: audioUrl || "" };
       if (activeBtn === btn) {
         if (activeAudioEl) {
           if (activeAudioEl.paused) { activeAudioEl.play(); setState(btn, "playing"); }
@@ -1328,7 +1335,7 @@
         p_visitor: VISITOR_ID,
         p_hub: HUB,
         p_cavity_week: cavityWeekForBootstrap(),
-        p_episode: window.SH_PODCAST && window.SH_PODCAST.id ? window.SH_PODCAST.id : null,
+        p_episode: !AUDIO_OFF && window.SH_PODCAST && window.SH_PODCAST.id ? window.SH_PODCAST.id : null,
         p_include_pins: !!window.SH_PINS,
         p_link_name: bootstrap.linkName || null
       }).then(function(res){
@@ -2948,8 +2955,9 @@
     hlScript.onload = function(){ if (window.shHighlight) window.shHighlight.mount(HUB); };
     document.head.appendChild(hlScript);
   }
-  /* Timmy Time (widget/podcast.js): a hub's audio review episode, if the hub defines window.SH_PODCAST */
-  if (!EXPORT_ONLY && window.SH_PODCAST) {
+  /* Timmy Time (widget/podcast.js): a hub's audio review episode, if the hub defines window.SH_PODCAST
+     (not on an archived hub whose audio came off: data-audio="off") */
+  if (!EXPORT_ONLY && window.SH_PODCAST && !AUDIO_OFF) {
     var podScript = document.createElement("script");
     podScript.src = new URL("podcast.js", thisScript.src).href; podScript.async = true;
     podScript.onload = function(){ if (window.shPodcast) window.shPodcast.mount(HUB); };
