@@ -6,8 +6,8 @@ created: 2026-11-12
 requested-by: Sam
 due: 
 waiting-on: 
-agent: Claude Code (part 1, 2026-11-12)
-pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1)
+agent: Claude Code (parts 1 and 2, 2026-11-12)
+pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1), https://github.com/smcmurry6-source/study-hubs/pull/338 (part 2)
 ---
 
 # Ask Timmy: Timmy becomes every hub's study assistant (redesign)
@@ -391,7 +391,7 @@ change to HP's rules beyond the 100 start; the old pages.
   this note. Where it sits among the sessions left: [phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here
   to the release" (part 4 before part 2, so the chat is built on a Timmy who is always there). For part 2: an idea
   Timmy drafts is posted with source `board`, because the pending `post_idea` refuses `timmy`.
-- 2026-11-12 (part 2, Claude Code): the chat. `widget/ask.js` + `widget/ask.css`, mounted by `widget/hub-timmy.js` on a
+- 2026-11-12 (part 2, Claude Code, [#338](https://github.com/smcmurry6-source/study-hubs/pull/338)): the chat. `widget/ask.js` + `widget/ask.css`, mounted by `widget/hub-timmy.js` on a
   new hub and by `widget/dash.js` on the new dashboard; "Ask me" in Timmy's bubble and house (`widget/pet.js`, only where
   `window.shAsk` exists, so the live hubs are unchanged); the Ask icon in his spot when he isn't shown; "Ask Timmy" in an
   answered card's row (`widget/hub-bank.js`); Report on every answer, nap and error; report and idea drafts (an idea
