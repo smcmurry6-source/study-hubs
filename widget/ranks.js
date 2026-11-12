@@ -22,6 +22,23 @@
   var ROMAN = ["I", "II", "III"];
   function rankName(t, level){ return TIERS[t].name + (level ? " " + ROMAN[Math.max(1, Math.min(3, level)) - 1] : ""); }
 
+  /* ---------- the three journeys (the redesign; migration_v54's get_rank_profile_v2) ----------
+     The ladder is three journeys of the same seven ranks: the Handpiece (today's), then the ModuPro, then the Loupes.
+     A v2 profile carries journey (0, 1, 2), tier and level inside that journey, step of 63 and gtier of 21, the double-XP
+     boost and which Dark Matter unlocks were seen. Only the redesign's pages ask for one, so on a live page none of
+     this runs. The Handpiece keeps today's names ("Gold II"); a later journey's name leads ("ModuPro Gold II"). */
+  var JOURNEYS = ["Handpiece", "ModuPro", "Loupes"];
+  function isV2(p){ return !!p && p.journey != null; }
+  /* what the handpiece-only parts of this file read from a v2 profile: from the ModuPro on, the rank the Handpiece
+     ended at (Dark Matter III), so accents, Timmy's house and the old cards never go back to Stone */
+  function legacy(p){
+    if (!isV2(p) || !(p.journey > 0)) return p;
+    var q = {}, k; for (k in p) q[k] = p[k];
+    q.tier = 6; q.level = 3; q.step = 20; q.tier_at = 50000; q.step_at = 100000; q.next_at = null;
+    return q;
+  }
+  function nameOf(p){ return !p ? TIERS[0].name : (p.journey > 0 && JOURNEYS[p.journey] ? JOURNEYS[p.journey] + " " : "") + rankName(Math.max(0, Math.min(6, p.tier | 0)), p.level || 0); }
+
   var uid = 0;
 
   /* cylinder shading stops, top edge -> bottom edge, per material */
@@ -603,6 +620,31 @@
     }
     rankUpLoading.push(cb);
   }
+  /* the redesign's journeys: their scenes (widget/journeys.js) and the two later objects' drawings
+     (widget/hub-art/journeys.js, window.SH_JOURNEY_ART), each fetched the first time it is needed, never with the page */
+  function sibling(name){ try { return RANKUP_SRC ? new URL(name, RANKUP_SRC).href : ""; } catch (e) { return ""; } }
+  function loadOnce(src, ready, cbs){
+    return function(cb, fail){
+      if (ready()) { cb(ready()); return; }
+      if (!src) { if (fail) fail(); return; }
+      cbs.push([cb, fail]);
+      if (cbs.length > 1) return;
+      var s = document.createElement("script"); s.src = src; s.async = true;
+      s.onload = s.onerror = function(){ var q = cbs.splice(0), ok = ready(); q.forEach(function(x){ if (ok) x[0](ok); else if (x[1]) x[1](); }); };
+      document.head.appendChild(s);
+    };
+  }
+  var withJourneys = loadOnce(sibling("journeys.js"), function(){ return window.shJourneys; }, []);
+  var loadJourneyArt = loadOnce(sibling("hub-art/journeys.js"), function(){ return window.SH_JOURNEY_ART; }, []);
+  function needJourneyArt(cb){ loadJourneyArt(cb, function(){ cb(null); }); }
+  /* a journey's medallion: the ModuPro's or the loupes' once their drawings are here, the handpiece's until then
+     (call needJourneyArt and draw again) */
+  function artOf(j, tier, px, opt){
+    var K = window.SH_JOURNEY_ART, sh = j > 0 && K ? K.shape(j) : null;
+    if (!sh) return art(tier, px, opt);
+    var o = {}, k; for (k in (opt || {})) o[k] = opt[k]; o.shape = sh;
+    return art(tier, px, o);
+  }
   function playRankUp(kind, d, busy){
     if (document.hidden || (busy && busy())) { setTimeout(function(){ playRankUp(kind, d, busy); }, 3000); return; }
     withRankUp(function(U){ if (U[kind]) U[kind](d); });
@@ -627,15 +669,49 @@
   function track(p, opt){
     if (!p) return;
     opt = opt || {};
+    var raw = p, v2 = isV2(raw); p = legacy(p);
     trackTrophies(p, opt.busy);
     var t = p.tier || 0, step = p.step != null ? p.step : t * 3, pt = ls("sh_rank_tier"), ps = ls("sh_rank_step");
     ls("sh_rank_tier", String(t)); ls("sh_rank_step", String(step));
-    if (pt === null || (ls("sh_pref_celebrate") || "on") === "off") return;
+    var on = (ls("sh_pref_celebrate") || "on") !== "off";
+    /* a journey's own moments (v2 only): the hand-off and the Dark Matter unlock play alone, in place of the cards below */
+    var took = v2 ? trackJourney(raw, opt, on) : false;
+    if (pt === null || !on || took) return;
     pt = +pt; ps = ps === null ? NaN : +ps;
     var from = Math.floor(ps / 3) === pt ? ps : pt * 3;   // the dashboard used to save only the tier
     var d = { from: pt, fromLevel: from % 3 + 1, to: t, level: p.level || step % 3 + 1, xp: p.xp, next_at: p.next_at, position: p.position, of: p.of };
     if (t > pt) playRankUp("tier", d, opt.busy);
     else if (t === pt && step > from) playRankUp("level", d, opt.busy);
+  }
+  /* The redesign's journeys (a v2 profile). The device remembers the step of 63 it last saw (sh_rank_g; the first look
+     only records it). A new journey plays the hand-off; reaching a journey's Dark Matter plays its unlock, once ever (the
+     server's dark_seen says whether it has played anywhere; opt.seen(journey) tells the server when it has); a rank or
+     level inside a later journey plays today's cards with that journey's object. Returns true when it played a scene
+     that stands in for the Handpiece's cards. Both scenes are widget/journeys.js, fetched when one is due. */
+  var darkPlayed = {};
+  function trackJourney(raw, opt, on){
+    var j = raw.journey | 0, g = raw.step != null ? raw.step : j * 21 + (raw.tier | 0) * 3 + (raw.level || 1) - 1, pg = ls("sh_rank_g");
+    ls("sh_rank_g", String(g));
+    if (!on) return false;
+    var took = false, base = { xp: raw.xp, next_at: raw.next_at, position: raw.position, of: raw.of };
+    function scene(kind, d, after){
+      playRankUp("scene", function(done){
+        withJourneys(function(J){ J[kind](d, function(){ if (after) after(); done(); }); }, done);
+      }, opt.busy);
+    }
+    if (pg !== null) {
+      pg = +pg; var pj = Math.floor(pg / 21), ptier = Math.floor((pg % 21) / 3);
+      if (j > pj) { took = true; scene("handoff", { from: pj, to: j, xp: raw.xp, tier: raw.tier | 0, level: raw.level || 1 }); }
+      else if (j === pj && j > 0 && g > pg && !((raw.tier | 0) === 6 && ptier < 6)) {
+        var d = { from: ptier, fromLevel: pg % 3 + 1, to: raw.tier | 0, level: raw.level || 1, xp: raw.xp, next_at: raw.next_at, position: raw.position, of: raw.of, jn: JOURNEYS[j] };
+        needJourneyArt(function(K){ d.shape = K ? K.shape(j) : null; d.tier_next = K && d.to < 6 ? K.floor(j, d.to + 1) : 0; playRankUp(d.to > ptier ? "tier" : "level", d, opt.busy); });
+      }
+    }
+    if ((raw.tier | 0) >= 6 && (raw.dark_seen || []).indexOf(j) < 0 && !darkPlayed[j]) {
+      darkPlayed[j] = 1; if (j === 0) took = true;
+      scene("dark", { journey: j, xp: base.xp, level: raw.level || 1 }, function(){ if (opt.seen) opt.seen(j); });
+    }
+    return took;
   }
   /* try them from the console: shRanks.preview("tier", 3) (Silver -> Gold), shRanks.preview("level", 4, 2) (Gold I -> II),
      shRanks.preview("trophy", 6) (a TROPHIES index), shRanks.preview("mastery", 2) (Gold), shRanks.preview("mock", 37, 40) */
@@ -875,18 +951,20 @@
        medals recorded in render(). Cheap per-visitor reads since migration_v53's XP cache, so they still come on load
        (in the page bootstrap) and every 10 answers (Sam, 2026-11-06). The class-wide trophy rarity waits for Stats. */
     function applyOwn(p, m){
+      var raw = p; p = legacy(p);   // a v2 profile (the redesign): this panel, the accents and Timmy's house read the Handpiece's rank
       profile = p; mastery = m || [];
-      /* the redesigned hubs' rank pill (widget/hub.js) listens; nothing on the live pages does */
-      try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: p, mastery: masteryFor() } })); } catch (e) {}
+      /* the redesigned hubs' rank pill (widget/hub-rewards.js) listens; nothing on the live pages does */
+      try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: raw, mastery: masteryFor() } })); } catch (e) {}
       if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
-      track(profile, { busy: mockBusy });
+      track(raw, { busy: mockBusy, seen: function(j){ if (!window.shAutomated) rpc("mark_dark_unlock_seen", { p_visitor: H.visitor, p_journey: j }); } });
       badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
       /* Full Arch is once per hub: if it's done on any device, eggs.js stops showing it here */
       if ((profile.badges || []).indexOf("fullarch:" + H.hub) >= 0) document.dispatchEvent(new CustomEvent("sh:arch-done", { detail: H.hub }));
     }
     function loadOwn(){
       if (loading) return; loading = true;
-      Promise.all([rpc("get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
+      /* the redesign's pages read the game layer's profile once the database has it (H.v2, set by widget/v3.js) */
+      Promise.all([rpc(H.v2 && H.v2() ? "get_rank_profile_v2" : "get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
         loading = false;
         if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
         applyOwn(r[0], r[1]);
@@ -916,7 +994,8 @@
     });
     document.addEventListener("sh:mock-done", function(e){
       var d = e.detail || {};
-      if (d.total > 0 && !window.shAutomated) rpc("record_mock_score", { p_visitor: H.visitor, p_hub: H.hub, p_correct: d.correct | 0, p_total: d.total | 0 });
+      /* d.session: the game layer's server saved the score itself when the mock's session finished (xp_session_finish) */
+      if (d.total > 0 && !window.shAutomated && !d.session) rpc("record_mock_score", { p_visitor: H.visitor, p_hub: H.hub, p_correct: d.correct | 0, p_total: d.total | 0 });
       if (d.total >= 20 && d.correct / d.total >= 0.9) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock90", p_hub: H.hub }).then(function(){ setTimeout(panelOpen() ? load : loadOwn, 800); });
       if (d.total >= 20 && d.correct === d.total) rpc("record_achievement", { p_visitor: H.visitor, p_kind: "mock-perfect", p_hub: H.hub });
     });
@@ -966,6 +1045,14 @@
   window.shRanks = {
     TIERS: TIERS, TROPHIES: TROPHIES, HUB_TROPHIES: HUB_TROPHIES, MASTERY: MASTERY,
     art: art,
+    /* the journeys (the redesign): a v2 profile's name and medallion, its Handpiece view, and the later objects' drawings */
+    JOURNEYS: JOURNEYS, isV2: isV2, legacy: legacy, nameOf: nameOf, artOf: artOf, needJourneyArt: needJourneyArt,
+    miniOf: function(j, tier, level){
+      if (!(j > 0) || !JOURNEYS[j]) return this.mini(tier, level);
+      tier = Math.max(0, Math.min(6, tier | 0)); level = level ? Math.max(1, Math.min(3, level | 0)) : 0;
+      return '<span class="sh-rank-mini" title="' + JOURNEYS[j] + " " + rankName(tier, level) + '">' + artOf(j, tier, 20) +
+        (level ? '<b class="sh-rank-lv sh-lv-' + TIERS[tier].key + '">' + ROMAN[level - 1] + '</b>' : '') + '</span>';
+    },
     mini: function(tier, level){
       tier = Math.max(0, Math.min(6, tier | 0)); level = level ? Math.max(1, Math.min(3, level | 0)) : 0;
       var k = tier + ":" + level;
