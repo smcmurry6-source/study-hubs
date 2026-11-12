@@ -35,7 +35,7 @@ export function pack(T){
     "harvest-barn": {
       note: "A red barn with a gambrel roof, a hayloft and a tooth for a weathervane",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the cupola", paint: "Barn paint" },
-      door: [5.5, 8.6], brush: [7.55, 9.15], statue: [3.2, 9.5], spots: { door: [5.5, 10.6] }, h: 8.2,
+      door: [5.5, 8.6], brush: [7.55, 9.15], statue: [3.15, 9.55], spots: { door: [6.45, 10.25] }, h: 8.2,
       eaves: [[2.5, 8.95, 3.1], [8.5, 8.95, 3.1]], foot: [2.6, 3.0, 8.4, 8.6], base: [[2.6, 8.6], [8.4, 8.6], [8.4, 3.0]], block: [2.4, 2.7, 8.8, 9.0],
       draw: function(o){
         var u = o.up, bp = o.paint && o.paint !== "cream" ? T.BOLD[o.paint] : { c: "#D9483B", s: "#B5382E" }, s = "", lights = "";

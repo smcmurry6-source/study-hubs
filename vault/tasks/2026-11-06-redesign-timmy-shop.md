@@ -111,7 +111,7 @@ his own (what Timmy wears).
 
 - **Two sessions**: the art first (contact sheets, Sam's yes), then the client.
 - **The five undrawn everyday outfits are drawn** (`scrub-cap`, `bow-tie`, `safety-glasses`, `white-coat`,
-  `graduation-cap`), in the art session ([their note](2026-11-12-five-outfits-without-a-drawing.md)).
+  `graduation-cap`), in the art session ([their note](done/2026-11-12-five-outfits-without-a-drawing.md)).
 - **Five rare costumes**, the ones in the migration (`pirate`, `astronaut`, `detective`, `chef`, `captain-enamel`), not
   "about a dozen". More can join after the release with `admin_upsert_shop_item`, no migration.
 - **Prices stay as the migration has them** for the release. Any Sam wants changed when he sees the art go on a list
@@ -209,15 +209,76 @@ on the list above, never into the migration.
 clips; the About page.
 
 **Done when** (session 1):
-- [ ] The three sheets sent, light and dark, and Sam's yes (his words in [decisions](../decisions.md))
-- [ ] The ten outfits in the kit with the catalog's ids; `node tools/figures/site/build.mjs` passes and the generated
+- [x] The three sheets sent, light and dark, and Sam's yes (his words in [decisions](../decisions.md):
+      "Everything looks good. Merge when ready")
+- [x] The ten outfits in the kit with the catalog's ids; `node tools/figures/site/build.mjs` passes and the generated
       files are committed
-- [ ] `widget/hub-art/shop.js` built, with the coin, four snacks, two boosts and five frames
-- [ ] Timmy at the door hides the statue in no home; BUG-089 retested and closed in [the bug log](../release/bug-log.md)
-- [ ] `tools/release/xp.js` expects no undrawn outfit or costume and passes; BUG-090 closed; the
-      [five outfits' note](2026-11-12-five-outfits-without-a-drawing.md) done and moved to `done/`
-- [ ] `node tools/release/run.js` once; the hand-off in [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s Log
-      (the kit's new names, sizes, anything session 2 must know)
+- [x] `widget/hub-art/shop.js` built, with the coin, four snacks, two boosts and five frames
+- [x] Timmy at the door hides the statue in no home; BUG-089 retested and closed in [the bug log](../release/bug-log.md)
+- [x] `tools/release/xp.js` expects no undrawn outfit or costume and passes; BUG-090 closed; the
+      [five outfits' note](done/2026-11-12-five-outfits-without-a-drawing.md) done and moved to `done/`
+- [x] `node tools/release/run.js` once; the hand-off in [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s Log
+      (the kit's new names, sizes, anything session 2 must know). 16 of 17 suites passed; accessibility needs
+      `axe-core`, which the cloud container doesn't have, so CI's "Release tests" ran it
+
+### What session 1 built (read before session 2)
+
+- **`window.SH_SHOP_ART`** (`widget/hub-art/shop.js`, built from `tools/figures/site/shop.mjs`; 11.4 KB compressed; no
+  page loads it, only the design page):
+  - `coin(px)`: the Shiny Gold Crown as an `<svg class="ts-coin">` of that size. Under 20 px it draws the small cut
+    (heavier ink, no sparkle), so it reads at 16 px beside a number. `coinBody(small)` is the drawing alone, in a 24
+    box, for a caller that writes its own `<svg>` (the dashboard's inline coin: copy `coinBody(true)`'s output).
+  - `thumb(id)`: a 64-box `<svg class="ts-thumb">` for `apple`, `cheese-cube`, `floss`, `fluoride-rinse`, `boost-1h`
+    and `boost-3h`; `""` for any other id (an outfit, a costume or a place piece is `SH_PLACE.thumb(kind, key)`).
+  - `ITEMS`: those six with the catalog's `id`, `n`, `kind`, `rarity`, `price`, `hp` or `minutes` and `mult`, and a
+    one-line `note` for the card. `tools/release/xp.js` fails if one differs from `shop_items`.
+  - `frame(rarity, w, h)`: the card's frame (160 x 200 unless told), drawn behind what the card shows; `rarity` in
+    any letter case, so the server's lowercase value works. `RARITIES`: each one's `k`, price `band` and colors
+    (`fill`, `edge`, `deep`, `ink`; the name's pill is `ink`). `CSS`: the frames' motion (classes `ts-r-*`), still
+    under reduced motion and inside `.ts-still`; the shop adds it once.
+  - `store("back")` and `store("front")`: the storefront, the shop's masthead, 600 x 200, in two layers so the live
+    Timmy stands between them (he is centered, about 80% of its height, his gum just behind the counter's top). No
+    wall is drawn, so the page's wooden wall shows through in both themes; a narrow page crops the sides and keeps
+    the arch, Timmy, the till and the bell. `stand(rarity)`: the showcase's stand, 200 x 64. Their motion (turning
+    rays, swaying lanterns, glints) is in `CSS` under `ts-s-*`, still under reduced motion.
+  - No drawing takes a color from the page (the build fails on `currentColor` or a `var(`): a shop card is paper on
+    the light page and on the dark one, as on the design page, so one drawing serves both.
+- **The shop's look** (Sam, 2026-11-12: "I want the shop ui to be more epic"; then, on the result: "Actually its
+  good", "i like the redesign") is the design page's "The shop" (`shopMock()` in `tools/preview/design/design.js`, the `.tp-store` rules in
+  `design.css`). Session 2 builds the real page to it, top to bottom:
+  1. **The storefront**: the awning, bunting and lanterns, Timmy at the counter in the bow tie under the arch of
+     light, the sign ("Timmy's Shop" with the coin), and on the counter's front the balance on a gold plaque (the
+     coin, the number, "Shiny Gold Crowns"). On a phone the plaque is centered on the counter.
+  2. **Today's showcase**: the rarest piece on sale that the student doesn't own (the dearest among equals), large,
+     on `stand()` in its rarity's colors with rays turning behind it; beside it its name in large type, its rarity
+     and kind, one sentence, the price and one button that opens it. Left out when everything on sale is owned.
+  3. **The shelves**, each a cabinet whose cards fill its width: Today's picks alone (four large cards); This week
+     beside Back for today (on a day with no throwback, This week takes the row); the season with a picture of the
+     whole set at Timmy's place beside its cards; Spotted, all five costumes, the unseen ones as grey shapes that
+     say "Not spotted yet"; Always here, each snack and boost with what it does on the card ("+10 HP", "2x XP · 1 h").
+     On a phone every shelf is one row that scrolls sideways, as on the design page.
+- **The frames and the coin moved out of the place's kit.** They are the round 3 drawings Sam approved on 2026-11-10,
+  unchanged; only the coin's 16 px cut is new. `SH_PLACE.frame`, `SH_PLACE.coin` and `SH_PLACE.RARITIES` are gone
+  (`widget/place.js` never used them); `SH_PLACE.burst(rarity)` stays.
+- **The ten outfits** are `SH_PLACE.OUTFITS` entries whose key is the shop's id (`scrub-cap`, `bow-tie`,
+  `safety-glasses`, `white-coat`, `graduation-cap`; `pirate`, `astronaut`, `detective`, `chef`, `captain-enamel`),
+  with the catalog's rarity and price. A costume has `costume: true` and three `say` lines; the everyday five are in
+  the classics theme. `dress(svg, key, { loupes: tier })` draws all ten, and `widget/hub-art/outfits.js` carries
+  them. Four cover the eyes themselves, so they are on `NO_LOUPES` and the loupes aren't drawn with them: the safety
+  glasses, the pirate (an eye patch), the astronaut (a helmet) and Captain Enamel (a mask). The kit's names carry an
+  article ("A scrub cap", "The pirate"), as its other outfits do; the catalog's don't ("Scrub cap", "Pirate"): a
+  shop card prints the catalog's `name`.
+- **The door** (BUG-089): Timmy's door spot moved in all 22 homes, to the side of the door away from the statue;
+  nine statues moved a little to the left; the yard's left spot moved forward (`SLOTS.left`) and the path's lamp
+  moved down the path (`FIX.lamp`). The lamp was a third thing in front of the statue's steps, not named in the bug.
+  The build still walks every route (4,500).
+- **Accepted as it is** (BUG-095; Sam was shown it and said "Everything looks good"): a tall piece in "By the path, right" (the mailbox, the fountain, the
+  telescope) now stands in front of Timmy's gum when he is at the door, where before it stood beside him. His face
+  stays clear. That spot was not this session's to move (only the left one was), and it borders the path and the lane.
+- **Sizes**, compressed: the kit `widget/hub-art/place.js` 77.1 to 80.6 KB; `widget/hub-art/outfits.js` 29.7 to
+  33.6 KB; `widget/hub-art/shop.js` 11.4 KB (the spec's limit is about 15). None loads with a page.
+- **The sheets** can be made again: `node tools/figures/site/shop-sheets.mjs <out-dir> [shelf|outfits|homes|ui]`
+  (needs Playwright; each in light and dark; `ui` is the design page's shop at 1280 and 390 px, after a build).
 
 ## Build spec, session 2: the shop's client
 
@@ -238,7 +299,7 @@ costumes that turn up. Only on the redesign's pages.
 - `widget/dash.js` + `widget/dash.css`: the balance (the coin and a number) and a "Shop" button on the "you" card;
   the button fetches `shop.js` on its first tap and opens the shop as a dialog. The balance is drawn from the
   bootstrap's `shop.wallet.balance` (grep `shPlace.setup` in `dash.js`: the same `d.shop`); the coin there is one
-  small inline drawing in `dash.js`, so no request is added.
+  small inline drawing in `dash.js` (`SH_SHOP_ART.coinBody(true)`'s output, copied), so no request is added.
 - `widget/place.js`: the "Get more in the shop" link in the customizer's drawer (`side()`, beside "Surprise me";
   `data-tp="shop"`), which opens the shop; nothing else there.
 - `widget/pet.js`: **only** `simulate()`: a server row that carries `hp` (the v2 bootstrap's `pet_days` and
@@ -270,16 +331,17 @@ bootstrap already carries `shop`: `window.shBootstrap.data.shop`); the rest of `
   `repaint()`; `open({ customize: true })`; `ready()` (a promise: the kit is loaded); `state()`. From the kit
   (`window.SH_PLACE`): `thumb(kind, key)` for a home, scene, yard piece, upgrade or outfit, `setInfo(id)` for a set
   piece's name, rarity and price, the lists `HOMES`, `SCENES`, `YARD`, `OUTFITS`, `UPGRADES`, `PAINTS` (each entry has
-  `id`, the shop's id), `dress(svg, key)`. From session 1: `window.SH_SHOP_ART` (the coin, snack and boost
-  thumbnails, the frames).
+  `id`, the shop's id), `dress(svg, key)`. From session 1: `window.SH_SHOP_ART` (`coin(px)`, `thumb(id)` for a snack or a boost,
+  `frame(rarity)`, `ITEMS`, `CSS`; "What session 1 built", above).
 
 **How it behaves**:
-- **The page**: the balance at the top (the coin, the number, and a line that opens "How you earn gold crowns": 1 for
-  every 10 XP, 25 a trophy, 50 a mastery medal, 20 a rank-up; "Shiny Gold Crowns" in full once, "gold crowns" after,
-  never just "crowns"). Then the shelves, in this order, an empty one left out: **Spotted** (rare costumes that
-  turned up), **Today** ("New at midnight"), **This week** ("New Monday"), **In season** ("Limited time"; a gift
-  shows as "Yours"), **Back for today**, **Always here** (snacks, boosts). Midnight and Monday are Central time,
-  worked out on the device.
+- **The page** looks like the design page's shop ("The shop's look" in "What session 1 built", above; Sam,
+  2026-11-12: "more epic"): the storefront with the balance on the counter (the coin, the number, and a line that
+  opens "How you earn gold crowns": 1 for every 10 XP, 25 a trophy, 50 a mastery medal, 20 a rank-up; "Shiny Gold
+  Crowns" in full once, "gold crowns" after, never just "crowns"), then Today's showcase, then the shelves, an empty
+  one left out: **Today** ("New at midnight"), **This week** ("New Monday") beside **Back for today**, **In
+  season** ("Limited time"; a gift shows as "Yours"), **Spotted** (rare costumes that turned up; the others as
+  shapes), **Always here** (snacks, boosts). Midnight and Monday are Central time, worked out on the device.
 - **A card**: the thumbnail in its rarity's frame, the name, the rarity's name, the price with the coin, and one
   state: Buy, Owned, "N more to go" (the balance is short), "Bought today" (a snack in `snacks_today`), "He's full"
   (a snack while `shPet.hp()` is 100).
@@ -346,8 +408,9 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
 
 ## Done when
 
-- [ ] The catalog drawn and approved by Sam (light and dark): the coin, the outfits, the snacks, the boosts, the
-      rare costumes, the rarity frames (session 1's Done when, above; the seasonal sets were approved in round 3)
+- [x] The catalog drawn and approved by Sam (light and dark): the coin, the outfits, the snacks, the boosts, the
+      rare costumes, the rarity frames (session 1's Done when, above; the seasonal sets were approved in round 3).
+      Sam, 2026-11-12: "Everything looks good" ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339))
 - [x] Server: gold crowns, the catalog and rotation, `buy_item`, `equip_item`, the inventory and purchases, HP from snacks, the boosts,
       tested on a throwaway copy (a double tap, a replayed call, a balance too low, an item not on sale today, a linked device)
 - [ ] Client: the shop in More, the balance on the "you" card, rare costumes (session 2's Done when, above), shown to
@@ -355,8 +418,8 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
       - [ ] from part C of phase 4 (2026-11-12, [its hand-off](2026-11-05-redesign-phase-4-game-layer.md)): the place's
             customizer gets its "Get more in the shop" link; `widget/pet.js` reads snack HP (`get_pet_days_v2`'s `hp`);
             after a purchase the place is told (`shPlace.setup({ shop })`, `shPlace.repaint()`)
-      - [ ] the five everyday outfits with no drawing are drawn (Sam, 2026-11-12: draw them; session 1;
-            [task](2026-11-12-five-outfits-without-a-drawing.md))
+      - [x] the five everyday outfits with no drawing are drawn (Sam, 2026-11-12: draw them; session 1;
+            [task](done/2026-11-12-five-outfits-without-a-drawing.md))
 - [ ] `LORE.md`, the About page (Shiny Gold Crowns, the shop, rarity, boosts, health items; rare costumes in a spoiler), the event taxonomy
       and retention rows
 - [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
@@ -389,6 +452,19 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
 - 2026-11-12 (Claude Code, planning only): Sam's calls for the shop and two build specs, the art and the client
   (above); the order of every session left is in [phase 4](2026-11-05-redesign-phase-4-game-layer.md) ("From here to
   the release"). What Timmy wears changed: only what the student put on.
+- 2026-11-12 (Claude Code), session 1, the art ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)):
+  the coin (with its own cut for 16 px), four snacks, two boosts, the five frames, the five everyday outfits and the
+  five rare costumes, and Timmy's door spot in all 22 homes; what it built and what session 2 needs from it is "What
+  session 1 built", above. The frames and the regular coin are round 3's drawings, moved from the place's kit into
+  `shop.mjs`. Nothing disagreed with `migration_v54.sql`, and it is unchanged. `tools/release/xp.js`: 358 checks (no
+  undrawn outfit, the five costumes, the shelf's thumbnails against the catalog). One thing left open: BUG-095.
+- 2026-11-12 (Claude Code), same session, after the sheets: Sam: "I want the shop ui to be more epic". The design
+  page's shop is redrawn as a storefront, a showcase and fuller shelves (new art: `store()` and `stand()` in
+  `shop.mjs`; "The shop's look", above), still no client code. Sent to Sam as screenshots at 1280 and 390 px, light
+  and dark (`node tools/figures/site/shop-sheets.mjs <out-dir> ui`).
+- 2026-11-12: Sam's yes for all of it: "Actually its good. Everything looks good. Merge when ready", "i like the
+  redesign" ([decisions](../decisions.md)). No price to change. Session 1 is done; `main` (Ask Timmy's chat, #338)
+  was brought in before the merge, and this branch's new bug became BUG-095. **Next: session 2, the client.**
 
 ## Outcome
 

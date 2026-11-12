@@ -159,14 +159,14 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   /* ------------------------------------------------------------------ the yard and its fixed spots ----------------- */
   var N = 14, S = 3.6;
   var SLOTS = {
-    left:   { n: "By the path, left",  x: .3,   y: 10.1 },
+    left:   { n: "By the path, left",  x: 0,    y: 11.0 },
     front:  { n: "By the path, right", x: 6.7,  y: 10.2 },
     corner: { n: "The front corner",   x: 10.3, y: 10.3 },
     side:   { n: "The side yard",      x: 10.3, y: 6.4 },
     right:  { n: "The back corner",    x: 10.2, y: .8 }
   };
   var SLOT_ORDER = ["right", "side", "left", "front", "corner"];
-  var FIX = { tree: [.7, 9.1], lamp: [6.6, 13.5], holiday: [9.8, 8.8], lawn: [8.4, 9.9], statue: [3.1, 9.6], brush: [7.3, 9.3], mast: [10.05, 8.3] };
+  var FIX = { tree: [.7, 9.1], lamp: [6.6, 14.7], holiday: [9.8, 8.8], lawn: [8.4, 9.9], statue: [3.1, 9.6], brush: [7.3, 9.3], mast: [10.05, 8.3] };
   /* where nothing else grows: the home, the path, the slots and the fixed pieces */
   function busy(x, y){
     if (x > 1.2 && x < 9.8 && y > 1.2 && y < 10.4) return true;
@@ -844,7 +844,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       n: "The cottage", note: "Default: the cottage on the hill, every Timmy's first home", rarity: "", theme: "hilltop", price: 0, id: "",
       ups: ["windows", "porch", "chimney", "flag", "paint"],
       upn: { windows: "Shutters and window boxes", porch: "A porch with a lamp", chimney: "A stone chimney", flag: "A Timmy flag on the gable", paint: "Wall paint" },
-      door: [5.5, 8.4], brush: [7.25, 9.05], statue: [3.0, 9.3], porchZ: { brush: .38 }, spots: { door: [5.5, 10.9] }, h: 7.4,
+      door: [5.5, 8.4], brush: [7.25, 9.05], statue: [2.85, 9.45], porchZ: { brush: .38 }, spots: { door: [6.65, 10.7] }, h: 7.4,
       eaves: [[2.1, 8.9, 3.55], [8.9, 8.9, 3.55]], foot: [2.4, 3.0, 8.6, 8.6], base: [[2.4, 8.6], [8.6, 8.6], [8.6, 3.0]], block: [2.2, 2.6, 9.0, 9.0], porchBlock: [3.6, 8.4, 8.2, 10.6],
       draw: function(o){
         var p = PAINTS[o.paint] || PAINTS.cream, u = o.up, s = "", lights = "";
@@ -911,7 +911,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       n: "The castle", note: "Legendary: three towers, a gate with banners and a keep", rarity: "Legendary", theme: "clouds", price: 8000, id: "castle",
       ups: ["windows", "porch", "flag", "paint"],
       upn: { windows: "Stained glass", porch: "A stone landing", flag: "A Timmy flag on the keep", paint: "Roofs and banners" },
-      door: [5.5, 8.15], brush: [8.95, 6.75], statue: [3.75, 9.4], spots: { door: [5.5, 10.4], tower: [1.9, 10.0] }, h: 10.8,
+      door: [5.5, 8.15], brush: [8.95, 6.75], statue: [3.75, 9.4], spots: { door: [7.2, 9.95], tower: [1.9, 10.0] }, h: 10.8,
       eaves: [[3.6, 8.15, 3.5], [7.5, 8.15, 3.5]], foot: [1.5, 2.0, 9.5, 9.1],
       base: arcPts(2.45, 8.15, .95, 175, 25, 5).concat(arcPts(8.55, 8.15, .95, 155, -65, 7)).concat(arcPts(8.55, 2.95, .95, 65, -30, 4)), block: [1.4, 1.8, 9.7, 9.3], porchBlock: [4.5, 8.15, 6.5, 9.9],
       draw: function(o){
@@ -974,7 +974,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       n: "The giant mushroom", note: "Legendary: round windows, a spotted cap", rarity: "Legendary", theme: "woodland", price: 6000, id: "giant-mushroom",
       ups: ["windows", "porch", "chimney", "flag", "paint"],
       upn: { windows: "Window boxes", porch: "A doorstep and flower pots", chimney: "A crooked stovepipe", flag: "A flag on the cap", paint: "Cap color" },
-      door: [5.5, 7.6], brush: [8.3, 7.4], statue: [2.7, 9.4], spots: { door: [5.5, 9.4] }, h: 8.8,
+      door: [5.5, 7.6], brush: [8.3, 7.4], statue: [2.7, 9.4], spots: { door: [6.15, 9.95] }, h: 8.8,
       eaves: [[2.74, 8.26, 3.95], [8.26, 2.74, 3.95], 27], round: [5.5, 5.5, 2.3], base: arcPts(5.5, 5.5, 2.35, -40, 135, 14), block: [2.4, 2.6, 8.6, 8.9],
       draw: function(o){
         var u = o.up, cap = BOLD[o.paint] || BOLD.cream, s = "", lights = "";
@@ -1006,7 +1006,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       n: "The treehouse", note: "Legendary: up in the branches, a rope ladder down", rarity: "Legendary", theme: "woodland", price: 5000, id: "treehouse",
       ups: ["windows", "porch", "flag", "paint"],
       upn: { windows: "Shutters and a window box", porch: "A railing and lanterns", flag: "A Timmy flag on the roof", paint: "Cabin paint" },
-      door: [5.5, 8.3], brush: [7.4, 8.9], statue: [3.3, 9.4], spots: { door: [5.5, 10.2], deck: [6.7, 7.6, 4.75] }, h: 10.6,
+      door: [5.5, 8.3], brush: [7.4, 8.9], statue: [3.2, 9.5], spots: { door: [6.5, 10.2], deck: [6.7, 7.6, 4.75] }, h: 10.6,
       climbs: { deck: [[5.5, 8.95, 0], [5.5, 8.3, 4.4], [6.7, 7.6, 4.75]] },
       eaves: [[3.2, 7.6, 7.2], [7.6, 7.6, 7.2]], round: [5.4, 5.2, 1.3], base: arcPts(5.4, 5.2, 1.4, -40, 135, 8), block: [2.6, 2.8, 8.4, 8.7],
       draw: function(o){
@@ -1059,7 +1059,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       n: "The beach hut", note: "Epic: up on stilts, with steps down to the sand", rarity: "Epic", theme: "seaside", price: 2600, id: "beach-hut",
       ups: ["windows", "porch", "flag", "paint"],
       upn: { windows: "Porthole windows", porch: "A railing and a life ring", flag: "A pennant on the roof", paint: "Plank paint" },
-      door: [5.5, 7.6], brush: [8.35, 9.85], statue: [3.5, 8.6, 1.2], spots: { door: [5.5, 11.2], deck: [7.4, 8.7, 1.2] }, h: 6.4,
+      door: [5.5, 7.6], brush: [8.35, 9.85], statue: [3.5, 8.6, 1.2], spots: { door: [6.5, 11.3], deck: [7.4, 8.7, 1.2] }, h: 6.4,
       climbs: { deck: [[5.5, 11.0, 0], [5.5, 9.4, 1.2], [7.4, 8.7, 1.2]] },
       eaves: [[2.9, 7.95, 3.6], [8.1, 7.95, 3.6]], foot: [2.8, 3.0, 8.4, 9.2], base: [[2.8, 9.2], [4.6, 9.2], [6.4, 9.2], [8.4, 9.2], [8.4, 3.0]], block: [2.6, 2.8, 8.7, 10.8],
       draw: function(o){
@@ -1109,7 +1109,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       n: "The lighthouse", note: "Legendary: red and white, its lamp sweeps the night", rarity: "Legendary", theme: "seaside", price: 7000, id: "lighthouse",
       ups: ["windows", "porch", "flag", "paint"],
       upn: { windows: "Round windows", porch: "The keeper's cottage", flag: "A flag on the lantern", paint: "Stripe color" },
-      door: [5.5, 7.0], brush: [8.35, 6.7], statue: [4.45, 9.95], spots: { door: [5.5, 9.0] }, h: 12,
+      door: [5.5, 7.0], brush: [8.35, 6.7], statue: [4.45, 9.95], spots: { door: [7.9, 10.5] }, h: 12,
       eaves: [[3.8, 6.4, 8.35], [6.6, 3.6, 8.35], 5], round: [5.5, 5.0, 2.3], base: arcPts(5.5, 5.0, 2.35, -40, 135, 14), block: [3.0, 2.6, 8.6, 7.6], porchBlock: [1.0, 5.0, 3.9, 8.8],
       draw: function(o){
         var u = o.up, bp = BOLD[o.paint] || BOLD.cream, s = "", lights = "", cx = 5.5, cy = 5.0;
@@ -1155,7 +1155,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       n: "The igloo", note: "Epic: snow blocks, a tunnel door and a warm glow", rarity: "Epic", theme: "snowy", price: 2200, id: "igloo",
       ups: ["windows", "porch", "chimney", "flag", "paint"],
       upn: { windows: "Ice windows", porch: "Snow lanterns", chimney: "A stovepipe", flag: "A flag on top", paint: "Ice tint" },
-      door: [5.5, 9.55], brush: [9.0, 8.25], statue: [1.9, 8.6], spots: { door: [5.5, 10.9] }, h: 5.2, skirt: "snow", gap: [[3.1, 7.2, 6.3, 10.4], [3.1, 8.75, 7.0, 10.4]],
+      door: [5.5, 9.55], brush: [9.0, 8.25], statue: [1.9, 8.6], spots: { door: [6.55, 10.4] }, h: 5.2, skirt: "snow", gap: [[3.1, 7.2, 6.3, 10.4], [3.1, 8.75, 7.0, 10.4]],
       eaves: [[2.7, 7.4, 1.7], [7.8, 2.4, 1.7], 8], round: [5.5, 5.3, 3.0],
       base: arcPts(5.5, 5.3, 3.05, -24, 62, 7).concat([[6.65, 8.1], [6.65, 9.55], [4.35, 9.55], [4.35, 8.1]]).concat(arcPts(5.5, 5.3, 3.05, 118, 135, 2)), block: [2.3, 2.1, 8.7, 10.0],
       draw: function(o){
@@ -1191,7 +1191,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       n: "The observatory", note: "Legendary: a dome that opens on the stars", rarity: "Legendary", theme: "starlight", price: 7500, id: "observatory",
       ups: ["windows", "porch", "flag", "paint"],
       upn: { windows: "Star windows", porch: "Steps and star lamps", flag: "A flag on the dome", paint: "Dome color" },
-      door: [5.5, 8.0], brush: [7.7, 8.9], statue: [3.3, 9.5], spots: { door: [5.5, 9.9] }, h: 9.0,
+      door: [5.5, 8.0], brush: [7.7, 8.9], statue: [3.3, 9.5], spots: { door: [6.6, 10.2] }, h: 9.0,
       eaves: [[3.4, 7.6, 3.4], [7.6, 3.4, 3.4], 6], round: [5.5, 5.5, 2.5], base: arcPts(5.5, 5.5, 2.55, -40, 135, 14), block: [2.7, 2.7, 8.4, 8.8],
       draw: function(o){
         var u = o.up, p = PAINTS[o.paint] || PAINTS.cream, dc = o.paint && o.paint !== "cream" ? p : { c: "#F4F6FA", s: "#C9D1DE" }, s = "", lights = "", cx = 5.5, cy = 5.5;
@@ -2020,60 +2020,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     }
     return '<svg class="tp-thumb" viewBox="' + vb.join(" ") + '" xmlns="http://www.w3.org/2000/svg" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + s + "</svg>";
   }
-  /* the rarity tiers: each its own card art, an animated frame drawn in the ink style */
-  var RARITIES = [
-    { k: "Common",    band: [100, 200],   fill: "#FFFDF6", edge: "#D9D2C6", deep: "#8E98A3", ink: "#5F5A55" },
-    { k: "Uncommon",  band: [250, 500],   fill: "#E9F8EF", edge: "#3ECF9E", deep: "#239A72", ink: "#1C6E52" },
-    { k: "Rare",      band: [600, 1200],  fill: "#E4F3FC", edge: "#3FA7E0", deep: "#2378B0", ink: "#1C5C88" },
-    { k: "Epic",      band: [1500, 3000], fill: "#F0E8FD", edge: "#9B7BE0", deep: "#6E50B8", ink: "#4E3492" },
-    { k: "Legendary", band: [4000, 8000], fill: "#FFF6D6", edge: "#F2C94C", deep: "#C9971C", ink: "#7A5600" }
-  ];
-  function rar(k){ for (var i = 0; i < RARITIES.length; i++) if (RARITIES[i].k === k) return RARITIES[i]; return RARITIES[0]; }
-  function frame(k, w, h){
-    w = w || 160; h = h || 200;
-    var R = rar(k), cx = w / 2, cy = h * .4, s = "";
-    var rr = function(i, rad){ return "M" + f(i + rad) + " " + f(i) + " H" + f(w - i - rad) + " Q" + f(w - i) + " " + f(i) + " " + f(w - i) + " " + f(i + rad) + " V" + f(h - i - rad) + " Q" + f(w - i) + " " + f(h - i) + " " + f(w - i - rad) + " " + f(h - i) +
-      " H" + f(i + rad) + " Q" + f(i) + " " + f(h - i) + " " + f(i) + " " + f(h - i - rad) + " V" + f(i + rad) + " Q" + f(i) + " " + f(i) + " " + f(i + rad) + " " + f(i) + " Z"; };
-    var rays = function(n, r, fill, cls){ var d = ""; for (var i = 0; i < n; i++){ var a0 = i / n * Math.PI * 2, a1 = a0 + Math.PI / n; d += "M" + f(cx) + " " + f(cy) + " L" + f(cx + Math.cos(a0) * r) + " " + f(cy + Math.sin(a0) * r) + " L" + f(cx + Math.cos(a1) * r) + " " + f(cy + Math.sin(a1) * r) + " Z "; }
-      return '<g class="' + cls + '" style="transform-origin:' + f(cx) + "px " + f(cy) + 'px">' + F(d, fill) + "</g>"; };
-    s += F(rr(2, 14), R.fill);
-    if (k === "Legendary") s += rays(22, 74, "#FFE89A", "tp-r-spin2") + circ(cx, cy, 46, "#FFF3C4", 0) + circ(cx, cy, 40, "#FFFBE8", 0);
-    else if (k === "Epic") s += rays(16, 72, "#E3D5FB", "tp-r-spin") + circ(cx, cy, 40, "#F6F0FE", 0);
-    else if (k === "Rare") s += circ(cx, cy, 44, "#D3EBFA", 0) + circ(cx, cy, 34, "#EAF6FD", 0);
-    else if (k === "Uncommon") s += circ(cx, cy, 42, "#D5F2E2", 0);
-    else s += circ(cx, cy, 40, "#F2EDE4", 0);
-    /* the name plate */
-    s += F("M14 " + f(h * .62) + " H" + f(w - 14) + " V" + f(h - 18) + " Q" + f(w - 14) + " " + f(h - 12) + " " + f(w - 20) + " " + f(h - 12) + " H20 Q14 " + f(h - 12) + " 14 " + f(h - 18) + " Z", "#FFFFFF", .72);
-    if (k === "Common"){
-      s += L(rr(2, 14), 2.4) + L(rr(7, 10), 1.2, R.edge) + circ(14, 14, 1.6, R.deep) + circ(w - 14, 14, 1.6, R.deep) + circ(14, h - 14, 1.6, R.deep) + circ(w - 14, h - 14, 1.6, R.deep);
-    } else if (k === "Uncommon"){
-      var vine = function(sx, sy, dx, dy){ var d = "M" + f(sx) + " " + f(sy + dy * 40) + " Q" + f(sx) + " " + f(sy) + " " + f(sx + dx * 40) + " " + f(sy);
-        var lf = [[.3, .55], [.62, .2], [.12, .85]].map(function(t){ var x = sx + dx * 40 * t[0] * (t[1] < .5 ? 1 : .4), y = sy + dy * 40 * (t[1] < .5 ? .15 : t[1]); return FO("M" + f(x) + " " + f(y) + " q" + f(dx * 6) + " " + f(-dy * 6) + " " + f(dx * 10) + " 0 q" + f(-dx * 5) + " " + f(dy * 5) + " " + f(-dx * 10) + " 0 z", "#7CC46A", 1); }).join("");
-        return '<g class="tp-r-sway" style="transform-origin:' + f(sx) + "px " + f(sy) + 'px">' + L(d, 2, R.deep) + lf + "</g>"; };
-      s += L(rr(4, 13), 4.4, R.edge) + L(rr(2, 14), 2.2) + L(rr(8, 9), 1.1, INK, .35) + vine(11, 11, 1, 1) + vine(w - 11, h - 11, -1, -1);
-      s += FO("M" + f(cx) + " 0 q8 6 0 14 q-8 -8 0 -14 z", "#7CC46A", 1.4) + L("M" + f(cx) + " 2 v10", 1, R.deep);
-    } else if (k === "Rare"){
-      s += '<g class="tp-r-shine">' + F("M-60 16 L-34 16 L-70 " + (h - 16) + " L-96 " + (h - 16) + " Z", "#FFFFFF", .55) + F("M-26 16 L-18 16 L-54 " + (h - 16) + " L-62 " + (h - 16) + " Z", "#FFFFFF", .4) + "</g>";
-      s += L(rr(5, 12), 6, R.edge) + L(rr(2, 14), 2.2) + L(rr(8.6, 9), 1.3);
-      [[12, 12], [w - 12, 12], [12, h - 12], [w - 12, h - 12]].forEach(function(q){ s += circ(q[0], q[1], 3, R.deep, 1.1) + circ(q[0] - .8, q[1] - .8, .8, "#FFFFFF"); });
-      s += FO("M" + f(cx - 10) + " 4 L" + f(cx - 6) + " -1 L" + f(cx + 6) + " -1 L" + f(cx + 10) + " 4 L" + f(cx) + " 16 Z", "#8FD3F5", 1.6) + L("M" + f(cx - 10) + " 4 H" + f(cx + 10) + " M" + f(cx - 4) + " 4 L" + f(cx) + " 16 M" + f(cx + 4) + " 4 L" + f(cx) + " 16 M" + f(cx - 6) + " -1 L" + f(cx - 4) + " 4 M" + f(cx + 6) + " -1 L" + f(cx + 4) + " 4", 1, "#FFFFFF");
-    } else if (k === "Epic"){
-      s += L(rr(5, 12), 6, R.edge) + L(rr(5, 12), 1.2, R.deep) + L(rr(2, 14), 2.2) + L(rr(10, 7), 1.3, R.deep);
-      [[22, 26, 5, 0], [w - 24, 30, 4, .6], [26, h * .62, 3.6, 1.2], [w - 22, h * .6, 4.6, .3], [cx - 36, cy - 30, 3, 1.6], [cx + 38, cy - 22, 3.4, .9]].forEach(function(q){ s += dmStar(q[0], q[1], q[2], q[3] > 1 ? "#FFFFFF" : K.dmLight, "tp-r-tw", q[3]); });
-      s += '<g class="tp-r-orbit" style="transform-origin:' + f(cx) + "px " + f(cy) + 'px">' + dmStar(cx + 52, cy, 4, "#FFE27A", "") + "</g>";
-      s += FO("M" + f(cx) + " -2 l3.4 7.2 7.8 .9 -5.8 5.2 1.6 7.7 -7 -4 -7 4 1.6 -7.7 -5.8 -5.2 7.8 -.9 z", "#B57BFF", 1.4);
-    } else {
-      s += L(rr(6, 11), 9, R.edge) + L(rr(6, 11), 2, R.deep, .7) + L(rr(2, 14), 2.4) + L(rr(10.6, 7), 1.4);
-      var curl = function(x, y, dx, dy){ return L("M" + f(x) + " " + f(y + dy * 30) + " C" + f(x) + " " + f(y + dy * 12) + " " + f(x + dx * 12) + " " + f(y) + " " + f(x + dx * 30) + " " + f(y) +
-        " M" + f(x + dx * 8) + " " + f(y + dy * 18) + " c" + f(dx * 0) + " " + f(-dy * 6) + " " + f(dx * 4) + " " + f(-dy * 10) + " " + f(dx * 10) + " " + f(-dy * 10) + " c" + f(dx * 3) + " 0 " + f(dx * 5) + " " + f(dy * 2) + " " + f(dx * 5) + " " + f(dy * 5) + " c0 " + f(dy * 2) + " " + f(-dx * 2) + " " + f(dy * 3) + " " + f(-dx * 3) + " " + f(dy * 3), 2, R.deep); };
-      s += curl(15, 15, 1, 1) + curl(w - 15, 15, -1, 1) + curl(15, h - 15, 1, -1) + curl(w - 15, h - 15, -1, -1);
-      [[cx, 9], [9, h / 2], [w - 9, h / 2]].forEach(function(q, i){ s += FO("M" + f(q[0]) + " " + f(q[1] - 5) + " l4 5 -4 5 -4 -5 z", i ? "#E0457B" : "#7FCDEB", 1.2); });
-      s += circ(cx, 4, 9, R.edge, 1.6) + rays(12, 0, "none", "").replace(/.*/, "") + dmStar(cx, 4, 6, "#FFFFFF", "tp-r-tw");
-      s += '<g class="tp-r-glint">' + dmStar(24, 6, 4.4, "#FFFFFF", "") + "</g>" + '<g class="tp-r-glint" style="animation-delay:1.4s">' + dmStar(24, h - 6, 4.4, "#FFFFFF", "") + "</g>";
-      [[30, 0], [60, .8], [100, 1.6], [128, 2.4]].forEach(function(q){ s += '<g class="tp-r-rise" style="animation-delay:' + q[1] + 's">' + dmStar(q[0] * w / 160, h * .58, 2.6, "#FFF3C4", "") + "</g>"; });
-    }
-    return '<svg class="tp-frame" viewBox="0 0 ' + w + " " + h + '" xmlns="http://www.w3.org/2000/svg" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + s + "</svg>";
-  }
+  /* the rarity tiers' card art (the frames) and the Shiny Gold Crown are the shop's: tools/figures/site/shop.mjs */
   /* the burst when something is placed, in its rarity's style (80 x 80, centered on 0 0) */
   function burst(k){
     var s = "", R = rng(k.length * 7 + 3), part = function(dx, dy, inner, delay){ return '<g class="tp-b-p" style="--dx:' + f(dx) + "px;--dy:" + f(dy) + "px;animation-delay:" + f(delay || 0) + 's">' + inner + "</g>"; };
@@ -2088,23 +2035,15 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     }
     return '<svg class="tp-burst" viewBox="-40 -40 80 80" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' + s + "</svg>";
   }
-  /* a Shiny Gold Crown: a full gold crown, the restoration (never a king's crown, and not a chef's hat: Sam, 2026-11-10).
-     A molar's crown seen a little from below, so it reads as a cap: two cusps and the groove between them, the bulge of
-     the contact, the taper to the margin, and the hollow it seats on. 24 box. */
-  function coin(){
-    return FO("M6.2 17.4 C4.5 14.3 3.5 10.9 4.3 8.1 C4.9 5.9 6.5 4.4 8.4 4.5 C10 4.6 10.8 6.1 12 6.1 C13.2 6.1 14 4.6 15.6 4.5 C17.5 4.4 19.1 5.9 19.7 8.1 C20.5 10.9 19.5 14.3 17.8 17.4 Z", "#F2C94C", 1.6) +
-      F("M15.7 5.3 C17.4 5.5 18.6 6.7 19 8.4 C19.6 11 18.8 14.2 17.4 16.8 L14.9 16.4 C16.6 12.6 17.1 8.8 15.7 5.3 Z", "#C9971C") +
-      L("M12 6.4 V9.6 M9.4 9 Q12 10.5 14.6 9", 1.1, "#9C7414") +
-      ell(12, 17.5, 5.75, 2.3, "#8A6410", 1.6) + F("M7.4 18.3 Q12 20.3 16.6 18.3 Q12 21 7.4 18.3 Z", "#C9971C") +
-      HI("M6.3 9.4 C6.5 7.8 7.2 6.8 8.1 6.3", 1.3) + dmStar(8.6, 11.6, 2, "#FFFFFF", "");
-  }
-
   /* ------------------------------------------------------------------ Timmy's theme outfits ------------------------ */
   /* drawn in Timmy's own box (widget/pet.js art(): 200 wide, the crown's top near y 40, the eyes at y 84), in the same
      layers as his holiday outfits: back (behind him), face (on his face or body), top (hats) */
   var O4 = 'stroke="' + INK + '" stroke-width="4"', O3 = 'stroke="' + INK + '" stroke-width="3"', O2 = 'stroke="' + INK + '" stroke-width="2.2"';
   function p(d, fill, st){ return '<path d="' + d + '" fill="' + fill + '" ' + (st || O4) + "/>"; }
   function daisy(x, y){ var s = ""; for (var i = 0; i < 6; i++){ var a = i / 6 * Math.PI * 2; s += '<ellipse cx="' + f(x + Math.cos(a) * 4.4) + '" cy="' + f(y + Math.sin(a) * 4.4) + '" rx="3" ry="3" fill="#FFFFFF" ' + O2.replace("2.2", "1.4") + "/>"; } return s + '<circle cx="' + x + '" cy="' + y + '" r="3" fill="#FFE27A" ' + O2.replace("2.2", "1.4") + "/>"; }
+  function ln(d, color, w, op){ return '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="' + w + '"' + (op ? ' opacity="' + op + '"' : "") + "/>"; }
+  /* the hem of anything worn on his body: down his sides and along the gum line, from 149.4 110 round to 50.6 110 */
+  var HEM = "Q149.6 121 146.6 131 Q140 132 135 143 Q120 156 100 157 Q80 156 65 143 Q60 132 53.4 131 Q50.4 121 50.6 110";
   function star5(x, y, r, fill){ var d = ""; for (var i = 0; i < 10; i++){ var a = Math.PI / 5 * i - Math.PI / 2, q = i % 2 ? r * .45 : r; d += (i ? " L" : "M") + f(x + q * Math.cos(a)) + " " + f(y + q * Math.sin(a)); } return '<path d="' + d + ' Z" fill="' + fill + '" ' + O2.replace("2.2", "1.2") + "/>"; }
   var OUTFITS = {
     sunhat: { n: "A straw sun hat", note: "With a daisy in the band", rarity: "Common", theme: "hilltop", price: 150, id: "sun-hat",
@@ -2144,7 +2083,130 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       top: p("M56 52 C54 18 76 4 100 4 C124 4 146 18 144 52 L138 64 C134 58 132 52 130 46 L70 46 C68 52 66 58 62 64 Z", "#8A5A3A") + '<path d="M100 4 V44" stroke="#6B4128" stroke-width="2.2"/>' +
         '<path d="M58 38 Q100 26 142 38" fill="none" stroke="#3B2E3A" stroke-width="5"/>' + '<circle cx="84" cy="32" r="10.6" fill="#C9971C" ' + O3 + '/><circle cx="116" cy="32" r="10.6" fill="#C9971C" ' + O3 + "/>" +
         '<circle cx="84" cy="32" r="7.6" fill="#9FD8F2" ' + O2.replace("2.2", "1.6") + '/><circle cx="116" cy="32" r="7.6" fill="#9FD8F2" ' + O2.replace("2.2", "1.6") + '/><path d="M79 29 l4 -3 M111 29 l4 -3" stroke="#FFFFFF" stroke-width="2"/><path d="M94.6 31 Q100 28 105.4 31" fill="none" ' + O3 + "/>",
-      say: ["Goggles down, scarf out. Next stop: above the clouds.", "Pilot Timmy. Cleared for takeoff, flossed for landing."] }
+      say: ["Goggles down, scarf out. Next stop: above the clouds.", "Pilot Timmy. Cleared for takeoff, flossed for landing."] },
+
+    /* ---- the shop's everyday outfits (the catalog's first five; Sam, 2026-11-12: draw them). Plain, single pieces,
+       so they sit beside the dentist set's surgical scrubs and Dr. Timmy without being mistaken for them. Keyed by
+       the shop's id, as a set's outfits are. */
+    "scrub-cap": { n: "A scrub cap", note: "Tied at the back, lilac with dots", rarity: "Common", theme: "classics", price: 150, id: "scrub-cap",
+      top: p("M152 50 q14 -8 20 1 q-10 1 -14 7 z", "#8C76D6", O2) + p("M153 57 q14 1 15 13 q-8 -5 -15 -5 z", "#8C76D6", O2) + '<circle cx="153" cy="54" r="4.4" fill="#8C76D6" ' + O2 + "/>" +
+        p("M46 62 C37 30 60 8 100 8 C140 8 163 30 154 62 Q100 46 46 62 Z", "#B7A6EC") +
+        [[66, 36], [82, 22], [100, 32], [118, 20], [135, 34], [98, 15], [121, 38], [78, 41]].map(function(q, i){ return '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="' + (i % 2 ? 2.4 : 3) + '" fill="#FFFFFF"/>'; }).join("") +
+        p("M46 62 Q100 46 154 62 L153 51 Q100 35 47 51 Z", "#8C76D6", O3) + ln("M58 40 C60 27 70 18 84 14", "#FFFFFF", 3, .6),
+      say: ["Scrub cap on. Hair? I'm a tooth. It's for the look.", "Cap tied, hands washed. Let's do some questions."] },
+    "bow-tie": { n: "A bow tie", note: "Red with white dots, tied just under his smile", rarity: "Common", theme: "classics", price: 120, id: "bow-tie",
+      face: p("M97 135 C89 126 78 121 69 122.6 C65.6 129 65.6 141 69 147.4 C78 149 89 144 97 135 Z", "#E5484D", O3) + p("M103 135 C111 126 122 121 131 122.6 C134.4 129 134.4 141 131 147.4 C122 149 111 144 103 135 Z", "#E5484D", O3) +
+        ln("M90 131 Q84 135 90 139 M110 131 Q116 135 110 139", "#B8323A", 2) +
+        '<circle cx="75" cy="129.6" r="2" fill="#FFFFFF"/><circle cx="78.6" cy="140.6" r="2" fill="#FFFFFF"/><circle cx="125" cy="129.6" r="2" fill="#FFFFFF"/><circle cx="121.4" cy="140.6" r="2" fill="#FFFFFF"/>' +
+        p("M95 127 H105 Q107.6 127 107.6 129.6 V140.4 Q107.6 143 105 143 H95 Q92.4 143 92.4 140.4 V129.6 Q92.4 127 95 127 Z", "#B8323A", O3) + ln("M96.6 130.6 V139.4", "#E5484D", 1.8),
+      say: ["A bow tie. I clean up nicely. Twice a day, in fact.", "Dressed for the exam. You should see my other molar."] },
+    "safety-glasses": { n: "Safety glasses", note: "A clear wraparound shield with an orange brow bar", rarity: "Uncommon", theme: "classics", price: 300, id: "safety-glasses",
+      face: p("M56 71 L43 76.6 L44 85 L57 81 Z", "#F59A1E", O2) + p("M144 71 L157 76.6 L156 85 L143 81 Z", "#F59A1E", O2) +
+        '<path d="M57 74 Q100 65 143 74 L143 87 Q141 100 125 100 Q111 100 105 91 Q100 86 95 91 Q89 100 75 100 Q59 100 57 87 Z" fill="#DDF2FB" opacity=".42"/>' +
+        '<path d="M57 74 Q100 65 143 74 L143 87 Q141 100 125 100 Q111 100 105 91 Q100 86 95 91 Q89 100 75 100 Q59 100 57 87 Z" fill="none" ' + O3 + "/>" +
+        p("M55 70 Q100 60 145 70 L145 77.6 Q100 67.6 55 77.6 Z", "#F59A1E", O3) + ln("M62 71.6 Q100 63.4 138 71.6", "#FFD08A", 1.8) +
+        ln("M66 84 l8 -5 M109 84 l8 -5", "#FFFFFF", 2.8, .9) + ln("M70 90 l4 -2.6", "#FFFFFF", 2, .7),
+      say: ["Safety glasses on. Splatter happens.", "Eye protection first. Then we open the question bank."] },
+    "white-coat": { n: "A white coat", note: "Over a scrub top, two pens in the pocket and a name badge", rarity: "Uncommon", theme: "classics", price: 450, id: "white-coat",
+      face: p("M57 101 C50 99 43 100 38.6 105 L43.6 123 C48 120 52 118 57 118 Z", "#FFFFFF", O3) + p("M143 101 C150 99 157 100 161.4 105 L156.4 123 C152 120 148 118 143 118 Z", "#FFFFFF", O3) +
+        ln("M41.6 108.6 L45.6 121.4 M158.4 108.6 L154.4 121.4", "#C9D3DC", 1.8) +
+        p("M80 112 Q100 122 120 112 L101 145 L99 145 Z", "#7FCDEB", O2) + ln("M89 117.6 L100 136 L111 117.6", "#5FB6E0", 2) +
+        p("M50.6 110 Q64 107 80 112 L99 143 L99 157 Q80 156 65 143 Q60 132 53.4 131 Q50.4 121 50.6 110 Z", "#FFFFFF", O3) +
+        p("M149.4 110 Q136 107 120 112 L101 143 L101 157 Q120 156 135 143 Q140 132 146.6 131 Q149.6 121 149.4 110 Z", "#FFFFFF", O3) +
+        p("M80 112 L68.6 118 L85 131 L99 143 Z", "#EEF2F6", O2) + p("M120 112 L131.4 118 L115 131 L101 143 Z", "#EEF2F6", O2) +
+        '<circle cx="105.6" cy="150.6" r="2.2" fill="#C9D3DC" stroke="' + INK + '" stroke-width="1.2"/>' +
+        ln("M122.6 130 V119", INK, 3.8) + ln("M122.6 130 V119", "#3FA7E0", 1.8) + ln("M129 130 V120.6", INK, 3.8) + ln("M129 130 V120.6", "#E5484D", 1.8) +
+        p("M117.6 127.6 h17 v9.4 q-8.5 4.2 -17 0 z", "#FFFFFF", O2) + ln("M117.6 131 h17", "#C9D3DC", 1.4) +
+        p("M62.6 126 h12 v7.6 h-12 z", "#CFEAF8", O2.replace("2.2", "1.6")) + ln("M65 129 h7.2 M65 131.4 h4.6", "#5FB6E0", 1.2),
+      say: ["White coat on. Short sleeves of knowledge, long sleeves of coat.", "It has pockets. For pens. And floss. Mostly floss."] },
+    "graduation-cap": { n: "A graduation cap", note: "A mortarboard with a gold tassel", rarity: "Rare", theme: "classics", price: 900, id: "graduation-cap",
+      top: p("M58 52 C56 36 74 26 100 26 C126 26 144 36 142 52 Q100 39 58 52 Z", "#2E3350") +
+        p("M28 21 L100 43 L172 21 L172 27 L100 49.6 L28 27 Z", "#20243B", O3) + p("M100 1 L172 21 L100 43 L28 21 Z", "#3A4066") +
+        ln("M52 20.6 L100 7.4 L122 13.4", "#5A6190", 2.4) +
+        ln("M100 21.6 Q130 20 153 29 L155 58", INK, 5.6) + ln("M100 21.6 Q130 20 153 29 L155 58", "#F2C94C", 2.6) +
+        '<ellipse cx="100" cy="21.6" rx="6" ry="3.4" fill="#F2C94C" ' + O2 + "/>" +
+        p("M150.6 62 L159.6 62 L162 82 L148 82 Z", "#F2C94C", O2) + ln("M152.6 66 L151.6 80 M155.2 66 V80 M157.8 66 L158.8 80", "#C9971C", 1.4) +
+        '<circle cx="155" cy="60.4" r="4" fill="#C9971C" ' + O2 + "/>",
+      say: ["Cap on, tassel to the left. Wait. The right? I'll ask after the exam.", "One day this is you. I'll be the tooth in the front row."] },
+
+    /* ---- the five rare costumes (kind "costume" in the catalog; they go in the outfit slot). Marked costume: true so
+       a page can tell them from outfits. Never worn by itself: on its day one turns up at the shop (Sam, 2026-11-12). */
+    pirate: { n: "The pirate", note: "A hat with a tooth and crossed brushes, an eye patch, a striped shirt, a hook and one gold earring", rarity: "Epic", theme: "", price: 2000, id: "pirate", costume: true,
+      face: /* the shirt, its stripes, the belt */
+        p("M50.6 110 Q100 124 149.4 110 " + HEM + " Z", "#FFFFFF", O3) +
+        ln("M53 120.4 Q100 135 147 120.4", "#E5484D", 5) + ln("M57.6 132 Q100 147.6 142.4 132", "#E5484D", 5) + ln("M73 147.4 Q100 156.4 127 147.4", "#E5484D", 4.4) +
+        '<path d="M50.6 110 Q100 124 149.4 110 ' + HEM + ' Z" fill="none" ' + O3 + "/>" +
+        /* the eye patch and its strap */
+        ln("M110 78 L50 63.6 M131 77 L150.6 68", INK, 3.2) +
+        p("M107 77 Q120 70.4 133 77 Q135 91 120 99 Q105 91 107 77 Z", "#2B2230", O3) + ln("M112.6 79.6 Q120 76 127.4 79.6", "#5A4B66", 1.8) +
+        /* the earring and the hook */
+        '<circle cx="155" cy="104" r="5.4" fill="none" stroke="' + INK + '" stroke-width="5"/><circle cx="155" cy="104" r="5.4" fill="none" stroke="#F2C94C" stroke-width="2.4"/>' +
+        p("M40.6 110.6 L29.4 111.6 L28 123 L40 124.6 Z", "#8A5A3A", O2) +
+        ln("M30 117.6 C20 114 12.6 121 16 129.6 C18.6 135.6 26.6 134.6 27 128.6", INK, 6.4) + ln("M30 117.6 C20 114 12.6 121 16 129.6 C18.6 135.6 26.6 134.6 27 128.6", "#D5DBE1", 3),
+      top: p("M32 50 C36 31 53 22 65 25 C73 6 127 6 135 25 C147 22 164 31 168 50 C148 59 125 52 100 52 C75 52 52 59 32 50 Z", "#2B2230") +
+        ln("M38 45.6 C56 52 78 46.6 100 46.6 C122 46.6 144 52 162 45.6", "#F2C94C", 3) +
+        ln("M84 37 L116 17 M84 17 L116 37", "#FFFFFF", 3.4) +
+        '<circle cx="84" cy="37" r="2.6" fill="#FFFFFF"/><circle cx="116" cy="37" r="2.6" fill="#FFFFFF"/>' + ln("M111.4 15 l6 1 l1 6", "#7FE3C4", 2.6) + ln("M88.6 15 l-6 1 l-1 6", "#7FE3C4", 2.6) +
+        tinyTooth(100, 27.6, 1.75, "#FFFFFF"),
+      say: ["Arr. X marks the spot. The spot is your back molars. Brush there.", "No scurvy on this ship: we eat our vitamin C, and our gums thank us.", "Yo ho ho and a bottle of mouthwash. Swish, don't swallow."] },
+    astronaut: { n: "The astronaut", note: "A white helmet with a gold-rimmed visor and an antenna, a suit with a control panel", rarity: "Epic", theme: "", price: 2500, id: "astronaut", costume: true,
+      face: p("M57 101 C50 99 43 100 38.6 105 L43.6 123 C48 120 52 118 57 118 Z", "#FFFFFF", O3) + p("M143 101 C150 99 157 100 161.4 105 L156.4 123 C152 120 148 118 143 118 Z", "#FFFFFF", O3) +
+        ln("M40.6 111.6 L44.4 120.6 M159.4 111.6 L155.6 120.6", "#3FA7E0", 3.4) +
+        p("M50.6 110 Q100 124 149.4 110 " + HEM + " Z", "#FFFFFF", O3) +
+        p("M84 136 H116 Q118.6 136 118.6 138.6 V149 Q109 153.6 100 153.6 Q91 153.6 81.4 149 V138.6 Q81.4 136 84 136 Z", "#D5DBE1", O2) +
+        '<circle cx="89" cy="143" r="2.8" fill="#E5484D" stroke="' + INK + '" stroke-width="1.2"/><circle cx="97.6" cy="143" r="2.8" fill="#F2C94C" stroke="' + INK + '" stroke-width="1.2"/><circle cx="106.2" cy="143" r="2.8" fill="#3ECF7E" stroke="' + INK + '" stroke-width="1.2"/>' +
+        ln("M111.6 140.6 h3.6 M111.6 145 h3.6", INK, 1.4),
+      top: /* the antenna, the ear caps, then the shell with the visor cut out of it so his own face shows */
+        ln("M138 24 L150 2", INK, 5) + ln("M138 24 L150 2", "#D5DBE1", 2.2) + '<circle cx="150.6" cy="0" r="5" fill="#E5484D" ' + O2 + "/>" +
+        '<path d="M28 70 h10 v26 h-10 q-5 0 -5 -5 v-16 q0 -5 5 -5 z" fill="#D5DBE1" ' + O3 + '/><path d="M172 70 h-10 v26 h10 q5 0 5 -5 v-16 q0 -5 -5 -5 z" fill="#D5DBE1" ' + O3 + "/>" +
+        '<path fill-rule="evenodd" d="M34 80 C34 34 62 8 100 8 C138 8 166 34 166 80 C166 106 154 124 138 131 Q100 141 62 131 C46 124 34 106 34 80 Z M52 82 C52 104 70 120 100 120 C130 120 148 104 148 82 C148 58 130 46 100 46 C70 46 52 58 52 82 Z" fill="#FFFFFF" ' + O4 + "/>" +
+        '<path d="M52 82 C52 104 70 120 100 120 C130 120 148 104 148 82 C148 58 130 46 100 46 C70 46 52 58 52 82 Z" fill="#BFE7FA" opacity=".2"/>' +
+        '<path d="M52 82 C52 104 70 120 100 120 C130 120 148 104 148 82 C148 58 130 46 100 46 C70 46 52 58 52 82 Z" fill="none" stroke="#F2C94C" stroke-width="2.6"/>' +
+        ln("M62 70 C66 60 76 54 88 52", "#FFFFFF", 4, .85) + ln("M60 80 L61 74", "#FFFFFF", 3.4, .85) +
+        ln("M46 50 C54 30 72 18 94 15", "#D5DBE1", 3) + ln("M62 131.6 Q100 141.6 138 131.6", "#3FA7E0", 3.4),
+      say: ["One small step for a tooth. One giant leap for your streak.", "Houston, we have no cavities.", "In space nobody can hear you floss. Do it anyway."] },
+    detective: { n: "The detective", note: "A checked deerstalker tied on top, a caped coat and a magnifying glass", rarity: "Epic", theme: "", price: 1800, id: "detective", costume: true,
+      face: /* the cape over his shoulders, the coat under it, the glass in his hand */
+        p("M50.6 112 Q100 126 149.4 112 " + HEM.replace("149.6 121", "149.6 122") + " Z", "#A8854E", O3) + ln("M100 124 V156", "#7A5E33", 2) +
+        '<circle cx="94.4" cy="140" r="2" fill="#5A4426"/><circle cx="94.4" cy="149" r="2" fill="#5A4426"/>' +
+        p("M57 100 C48 99 40 102 36 108 L41 127 Q56 138 76 133.6 Q100 127 124 133.6 Q144 138 159 127 L164 108 C160 102 152 99 143 100 Q100 122 57 100 Z", "#C4A26A", O3) +
+        ln("M47 105 L52 130 M62 108 L64 135 M138 108 L136 135 M153 105 L148 130", "#A8854E", 1.8) + ln("M41 116 Q58 127 76 124 M124 124 Q142 127 159 116", "#A8854E", 1.8) +
+        ln("M165 122 L176 94", INK, 9) + ln("M165 122 L176 94", "#8A5A3A", 5) +
+        '<circle cx="180" cy="78" r="17" fill="#C9971C" ' + O3 + '/><circle cx="180" cy="78" r="12.4" fill="#DFF4FF" stroke="' + INK + '" stroke-width="2"/>' + ln("M171.6 75 Q173 68.6 179 67.4", "#FFFFFF", 2.8) +
+        p("M157.4 113 C160 106.6 171 107.6 173.6 113.4 C175.6 119.6 170.6 125 163.6 124.2 C158.4 123.4 155.6 118 157.4 113 Z", "#FBF7EE", O3) + ln("M163 110.6 Q167 109.6 170.4 111.6", "#D9CDB6", 1.6),
+      top: p("M48 56 C40 26 62 6 100 6 C138 6 160 26 152 56 Q100 42 48 56 Z", "#C4A26A") +
+        ln("M70 16 Q64 34 66 50 M86 9 Q82 28 84 45 M100 6 V43 M114 9 Q118 28 116 45 M130 16 Q136 34 134 50", "#A8854E", 2) + ln("M50 40 Q100 22 150 40 M56 26 Q100 8 144 26", "#A8854E", 2) +
+        /* the ear flaps, tied up over the crown */
+        p("M50 52 C44 36 52 18 70 9 C66 24 66 38 68 50 Z", "#B08D57", O3) + p("M150 52 C156 36 148 18 130 9 C134 24 134 38 132 50 Z", "#B08D57", O3) +
+        p("M100 4 C92 -6 80 -6 79 1 C78 8 90 9 100 4 Z", "#8A5A3A", O2) + p("M100 4 C108 -6 120 -6 121 1 C122 8 110 9 100 4 Z", "#8A5A3A", O2) + '<circle cx="100" cy="4" r="3.6" fill="#6B4128" ' + O2 + "/>" +
+        /* the peak */
+        p("M52 54 Q100 40 148 54 Q130 66 100 66 Q70 66 52 54 Z", "#A8854E", O3) + ln("M64 55.6 Q100 46 136 55.6", "#C4A26A", 2),
+      say: ["The case of the missing floss. I suspect everyone.", "Elementary. The plaque did it. It always does.", "I've found a clue. It's between your teeth. It's always between your teeth."] },
+    chef: { n: "The chef", note: "A tall pleated toque, a red neckerchief, a double-breasted jacket and a wooden spoon", rarity: "Epic", theme: "", price: 1500, id: "chef", costume: true,
+      face: p("M57 101 C50 99 43 100 38.6 105 L43.6 123 C48 120 52 118 57 118 Z", "#FFFFFF", O3) + p("M143 101 C150 99 157 100 161.4 105 L156.4 123 C152 120 148 118 143 118 Z", "#FFFFFF", O3) +
+        p("M50.6 110 Q100 124 149.4 110 " + HEM + " Z", "#FFFFFF", O3) + ln("M113 128 L109.6 155", "#C9D3DC", 2.2) +
+        [[90, 138.6], [91, 149], [104, 139.6], [103.4, 150.6]].map(function(q){ return '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="2.4" fill="#59647A" stroke="' + INK + '" stroke-width="1.2"/>'; }).join("") +
+        p("M66 114.6 Q100 128 134 114.6 L132 124.6 Q100 137.6 68 124.6 Z", "#E5484D", O3) + p("M96 126 L100 123 L104 126 L108.6 139 L100 134.6 L91.4 139 Z", "#E5484D", O2) + ln("M97.6 128 L100 126.4 L102.4 128", "#B8323A", 1.6) +
+        /* the wooden spoon */
+        ln("M36 121 L24 88", INK, 8.6) + ln("M36 121 L24 88", "#C4915F", 4.6) +
+        '<ellipse cx="21" cy="76" rx="9.6" ry="13" transform="rotate(-18 21 76)" fill="#C4915F" ' + O3 + '/><ellipse cx="20.6" cy="76.6" rx="5.4" ry="8.4" transform="rotate(-18 20.6 76.6)" fill="#A9774A"/>' +
+        p("M42.6 113 C40 106.6 29 107.6 26.4 113.4 C24.4 119.6 29.4 125 36.4 124.2 C41.6 123.4 44.4 118 42.6 113 Z", "#FBF7EE", O3) + ln("M37 110.6 Q33 109.6 29.6 111.6", "#D9CDB6", 1.6),
+      top: p("M56 44 C36 40 34 14 56 10 C58 -8 86 -14 97 -3 C108 -14 134 -10 138 6 C160 4 168 30 146 42 Q100 28 56 44 Z", "#FFFFFF") +
+        ln("M78 36 Q74 18 80 4 M100 31 V1 M122 36 Q126 18 120 4", "#D5DBE1", 2.4) + ln("M52 30 C48 22 52 16 58 14", "#E9EEF2", 3) +
+        p("M55 56 Q100 42 145 56 L146 42 Q100 28 54 42 Z", "#FFFFFF", O3) + ln("M57 49.6 Q100 35.6 143 49.6", "#D5DBE1", 2),
+      say: ["Tonight's special: carrots from my garden. Crunchy, and no sugar added.", "The secret ingredient is never sugar.", "Order up! One study session, well done."] },
+    "captain-enamel": { n: "Captain Enamel", note: "A red cape, a blue mask, a suit with a gold shield and a tooth on it", rarity: "Legendary", theme: "", price: 4000, id: "captain-enamel", costume: true,
+      back: p("M100 96 C72 94 46 99 31 111 C16 124 8 146 7 168 C7 176 12 182 20 184 L182 184 C190 180 195 172 197 160 C200 138 208 112 205 82 C194 97 172 102 151 99 C133 95 116 95 100 96 Z", "#E5484D", O3) +
+        ln("M33 118 Q24 146 21 176 M172 106 Q182 138 184 172", "#B8323A", 2.6) + ln("M199 98 Q201 116 197 136", "#FF8F93", 2.4),
+      face: /* the suit, its collar where the cape is clasped, the shield */
+        p("M50.6 110 Q100 124 149.4 110 " + HEM + " Z", "#3F6FD8", O3) + ln("M57 126 Q62 134 70 140", "#7FA2EC", 2.4) +
+        p("M50.6 110 Q100 124 149.4 110 L149.6 118.6 Q100 132.6 50.4 118.6 Z", "#E5484D", O2) +
+        '<circle cx="60" cy="115.6" r="4.4" fill="#F2C94C" ' + O2 + '/><circle cx="140" cy="115.6" r="4.4" fill="#F2C94C" ' + O2 + "/>" +
+        p("M86.6 130.6 H113.4 V141 Q113.4 151 100 155.6 Q86.6 151 86.6 141 Z", "#F2C94C", O3) + ln("M90 134 H104", "#FFF0B3", 2) + tinyTooth(100, 141.6, 1.5, "#FFFFFF") +
+        /* the mask, with his own eyes looking through it */
+        '<path fill-rule="evenodd" d="M52 80 C50 70 60 65.6 76 66.6 C88 67.4 94 72 100 72 C106 72 112 67.4 124 66.6 C140 65.6 150 70 148 80 C146 94 136 101.6 123 101.6 C112 101.6 105 96 100 90.6 C95 96 88 101.6 77 101.6 C64 101.6 54 94 52 80 Z M80 71.6 C73.6 71.6 69.4 77 69.4 84 C69.4 91 73.6 96.4 80 96.4 C86.4 96.4 90.6 91 90.6 84 C90.6 77 86.4 71.6 80 71.6 Z M120 71.6 C113.6 71.6 109.4 77 109.4 84 C109.4 91 113.6 96.4 120 96.4 C126.4 96.4 130.6 91 130.6 84 C130.6 77 126.4 71.6 120 71.6 Z" fill="#2747A3" ' + O3 + "/>" +
+        ln("M58 74 Q64 69.6 73 69.6 M142 74 Q136 69.6 127 69.6", "#6F86CF", 2.2),
+      say: ["Captain Enamel! The hardest substance in the human body, at your service.", "My one weakness? Acid. Don't tell the plaque.", "Fear not, citizen. I'll guard your smile. You do the flossing."] }
   };
   /* put a theme outfit on a Timmy drawing from widget/pet.js art() (a string): back after his shadow, the rest on top */
   /* the Loupes journey's object is worn (redesign phase 4, part C): through-the-lens loupes with a headlight, the frame
@@ -2152,7 +2214,8 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
      at 80, 84 and 120, 84), over his face and under any hat. An outfit with its own eyewear, or one that covers his
      face, wins over them (NO_LOUPES). */
   var NO_LOUPES = ["sunnies", "aviator", "tweed-professor", "floss-mummy", "bedsheet-ghost", "rank-antique-outfit", "rank-bronze-outfit", "rank-silver-outfit", "rank-diamond-outfit",
-    "beekeeper", "snorkel", "deep-sea-diver", "football-helmet", "knight-of-hearts", "masquerade"];
+    "beekeeper", "snorkel", "deep-sea-diver", "football-helmet", "knight-of-hearts", "masquerade",
+    "safety-glasses", "pirate", "astronaut", "captain-enamel"];
   function loupes(tier){
     var m = MATS[Math.max(0, Math.min(6, tier | 0))], s = "", ink = 'stroke="' + INK + '" stroke-linecap="round" stroke-linejoin="round"';
     function tube(d, w){ return '<path d="' + d + '" fill="none" ' + ink + ' stroke-width="' + (w + 3.2) + '"/><path d="' + d + '" fill="none" stroke="' + m.c + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"/>'; }
@@ -2193,7 +2256,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     { k: "snowy", n: "Snowy peak", note: "An igloo on a ledge above the clouds, a hot spring to warm up in", scene: "mountain", homes: ["igloo"], yard: ["hotspring"], outfits: ["beanie"], color: "#5FA3D9" },
     { k: "starlight", n: "Starlight", note: "A little planet under the Dark Matter stars", scene: "space", homes: ["observatory"], yard: ["telescope"], outfits: ["nightcap"], color: "#7A3CFF" },
     { k: "clouds", n: "Above the clouds", note: "A castle in the sky, a mouthwash fountain in its yard", scene: "clouds", homes: ["castle"], yard: ["fountain"], outfits: ["aviator"], color: "#E07090" },
-    { k: "classics", n: "The classics", note: "They go anywhere", scene: "", homes: [], yard: ["doghouse", "lane", "studio"], outfits: [], color: "#8E98A3" }
+    { k: "classics", n: "The classics", note: "They go anywhere", scene: "", homes: [], yard: ["doghouse", "lane", "studio"], outfits: ["scrub-cap", "bow-tie", "safety-glasses", "white-coat", "graduation-cap"], color: "#8E98A3" }
   ];
   /* the upgrades and paints in the shop: one item each; every home draws it its own way (HOMES[k].upn) */
   var UPGRADES = [
@@ -2281,7 +2344,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   /* the motion: smoke rises, water shimmers, leaves fall, flags wave, stars twinkle, eggs play. Reduced motion: still,
      and an egg shows its bits without moving. */
   var CSS = [
-    ".tp-scene{display:block;width:100%;height:auto}.tp-thumb,.tp-frame,.tp-burst{display:block;width:100%;height:100%}",
+    ".tp-scene{display:block;width:100%;height:auto}.tp-thumb,.tp-burst{display:block;width:100%;height:100%}",
     ".tp-grade,.tp-night,.tp-lights,.tp-eb,.tp-mark{pointer-events:none}.tp-egg{cursor:pointer;transform-box:fill-box;transform-origin:50% 100%}.tp-eb{opacity:0}",
     "@keyframes tp-rise{0%{transform:translateY(4px);opacity:0}30%{opacity:.9}100%{transform:translateY(-10px);opacity:0}}",
     ".tp-smoke circle{animation:tp-rise 3.2s ease-out infinite;transform-box:fill-box}.tp-smoke circle:nth-child(2){animation-delay:1s}.tp-smoke circle:nth-child(3){animation-delay:2s}",
@@ -2329,17 +2392,11 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     "[data-egg='brush'].tp-on{animation:tp-wiggle .9s ease}[data-egg='tree'].tp-on{transform-origin:50% 100%;animation:tp-shake .8s ease}[data-egg='lane'].tp-on .tp-ball{animation:tp-roll 1.4s ease-in both}[data-egg='lane'].tp-on .tp-pins{transform-box:fill-box;transform-origin:50% 100%;animation:tp-tip 1.4s ease both}",
     "[data-egg='mailbox'].tp-on .tp-mflag{transform-box:fill-box;transform-origin:0 100%;animation:tp-flip 2.2s ease}[data-egg='hammock'].tp-on .tp-cloth{animation:tp-swing 1.6s ease-in-out}",
     "[data-egg='fountain'].tp-on .tp-eb,[data-egg='geyser'] .tp-eb{transform-box:fill-box;transform-origin:50% 100%}[data-egg='pool'].tp-on .tp-eb{transform-box:fill-box;transform-origin:center}",
-    /* the rarity frames and the placing burst */
-    "@keyframes tp-r-shine{0%,58%{transform:translateX(0)}100%{transform:translateX(340px)}}.tp-r-shine{animation:tp-r-shine 3.8s ease-in-out infinite}",
-    ".tp-r-spin{animation:tp-spin 26s linear infinite}.tp-r-spin2{animation:tp-spin 44s linear infinite}.tp-r-orbit{animation:tp-spin 6s linear infinite}",
-    "@keyframes tp-r-tw{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1)}}.tp-r-tw{transform-box:fill-box;transform-origin:center;animation:tp-r-tw 2.2s ease-in-out infinite}",
-    "@keyframes tp-r-rise{0%{opacity:0;transform:translateY(0)}20%{opacity:1}100%{opacity:0;transform:translateY(-70px)}}.tp-r-rise{animation:tp-r-rise 3.2s ease-in infinite}",
-    "@keyframes tp-r-sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}.tp-r-sway{animation:tp-r-sway 4s ease-in-out infinite}",
-    "@keyframes tp-r-glint{0%{transform:translateX(0);opacity:0}10%,90%{opacity:1}100%{transform:translateX(110px);opacity:0}}.tp-r-glint{animation:tp-r-glint 2.8s ease-in-out infinite}",
+    /* the placing burst */
     "@keyframes tp-b-out{0%{opacity:0;transform:translate(0,0) scale(.4)}15%{opacity:1}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1)}}.tp-b-p{animation:tp-b-out 1.1s ease-out both}",
     "@keyframes tp-b-ring{0%{opacity:.9;transform:scale(.2)}100%{opacity:0;transform:scale(1.5)}}.tp-b-ring,.tp-b-rays{transform-box:fill-box;transform-origin:center;animation:tp-b-ring 1s ease-out both}.tp-b-rays{animation-duration:1.4s}",
-    "@media (prefers-reduced-motion: reduce){.tp-scene *,.tp-frame *,.tp-burst *{animation:none!important}.tp-egg.tp-on .tp-eb{opacity:1}.tp-burst{display:none}}",
-    ".tp-still .tp-scene *,.tp-still .tp-frame *{animation:none!important}.tp-still .tp-egg.tp-on .tp-eb{opacity:1}"
+    "@media (prefers-reduced-motion: reduce){.tp-scene *,.tp-burst *{animation:none!important}.tp-egg.tp-on .tp-eb{opacity:1}.tp-burst{display:none}}",
+    ".tp-still .tp-scene *{animation:none!important}.tp-still .tp-egg.tp-on .tp-eb{opacity:1}"
   ].join("\n");
 
   function meta(list, keys){ return Object.keys(list).map(function(k){ var x = list[k], o = { k: k }; keys.forEach(function(q){ if (x[q] !== undefined) o[q] = x[q]; }); return o; }); }
@@ -2406,8 +2463,8 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     SLOTS: SLOT_ORDER.map(function(k){ return { k: k, n: SLOTS[k].n }; }),
     PAINTS: Object.keys(PAINTS).map(function(k){ return { k: k, n: PAINTS[k].n, c: PAINTS[k].c, bold: BOLD[k].c, boldName: BOLD[k].n, rarity: k === "cream" ? "" : "Common", price: k === "cream" ? 0 : 150, id: k === "cream" ? "" : "paint-" + k }; }),
     UPGRADES: UPGRADES, MATS: MATS.map(function(m){ return { k: m.k, n: m.n, c: m.c }; }),
-    OUTFITS: meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName"]), dress: dress, loupes: loupes, NO_LOUPES: NO_LOUPES, SETS: SETS || null,
-    THEMES: THEMES, RARITIES: RARITIES, EGGS: EGGS, frame: frame, burst: burst, coin: coin, thumb: thumb,
+    OUTFITS: meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName", "costume"]), dress: dress, loupes: loupes, NO_LOUPES: NO_LOUPES, SETS: SETS || null,
+    THEMES: THEMES, EGGS: EGGS, burst: burst, thumb: thumb,
     outfitParts: function(k){ var o = OUTFITS[k]; return o ? { back: o.back || "", face: o.face || "", top: o.top || "" } : null; },
     /* a set piece's set ("halloween", "rank"...) and kind, known from the list before its pack is loaded; whether a
        set's pack is here; and a pack joining late (the lists above are made again) */
@@ -2419,7 +2476,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     API.HOMES = meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set"]);
     API.SCENES = meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set"]);
     API.YARD = meta(YARD, ["n", "note", "rarity", "theme", "price", "id", "wide", "set", "rank", "rankName"]);
-    API.OUTFITS = meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName"]);
+    API.OUTFITS = meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName", "costume"]);
   }
   return API;
 })("#3B2E3A", {"enamel":"#FFFDF6","enamelShade":"#E9DFCC","gum":"#F78FA8","gumShade":"#E07090","gumLight":"#FFC0CD","pink":"#F7A3BA","metal":"#D5DBE1","metalShade":"#8E98A3","metalLight":"#EEF2F5","gold":"#F2C94C","goldShade":"#C9971C","goldLight":"#FFF0B3","bronze":"#D08A52","bronzeShade":"#9A5A2A","bronzeLight":"#F2C49A","silver":"#D9DFE5","silverShade":"#8E98A3","silverLight":"#F6F8FA","paper":"#FFFFFF","paperShade":"#ECE6EA","wood":"#C4915F","woodShade":"#8A5A3A","sky":"#CFEAF8","grass":"#A7DE93","grassShade":"#6CBB68","red":"#E5484D","blue":"#3FA7E0","yellow":"#FFE27A","green":"#3ECF7E","orange":"#F59A1E","plum":"#6B5A68","plumLight":"#ECE6EA"}, [], {"seasons":[{"k":"halloween","n":"Halloween","when":"October","gift":true,"items":[{"id":"haunted-manor","n":"Haunted manor","kind":"home","rarity":"legendary","price":6500},{"id":"pumpkin-patch","n":"Pumpkin patch at dusk","kind":"scene","rarity":"legendary","price":5000},{"id":"floss-mummy","n":"Floss mummy","kind":"outfit","rarity":"rare","price":800},{"id":"bedsheet-ghost","n":"Bedsheet ghost","kind":"outfit","rarity":"epic","price":1800},{"id":"skeleton-suit","n":"Skeleton suit","kind":"outfit","rarity":"legendary","price":4500},{"id":"pumpkin-lantern","n":"Pumpkin lanterns","kind":"yard","rarity":"rare","price":700},{"id":"bubbling-cauldron","n":"Bubbling cauldron","kind":"yard","rarity":"epic","price":1800},{"id":"haunted-tree","n":"Haunted tree","kind":"yard","rarity":"legendary","price":4200}]},{"k":"thanksgiving","n":"Thanksgiving","when":"November 1 to the day after Thanksgiving","gift":false,"items":[{"id":"harvest-barn","n":"Harvest barn","kind":"home","rarity":"legendary","price":6000},{"id":"harvest-fields","n":"Harvest fields","kind":"scene","rarity":"legendary","price":5000},{"id":"scarecrow-hat","n":"Scarecrow hat","kind":"outfit","rarity":"rare","price":700},{"id":"football-helmet","n":"Football helmet","kind":"outfit","rarity":"epic","price":1800},{"id":"parade-marshal","n":"Parade grand marshal","kind":"outfit","rarity":"legendary","price":4500},{"id":"hay-bales","n":"Hay bales","kind":"yard","rarity":"rare","price":700},{"id":"harvest-table","n":"Harvest table","kind":"yard","rarity":"epic","price":2000},{"id":"turkey-balloon","n":"Turkey parade balloon","kind":"yard","rarity":"legendary","price":4500}]},{"k":"winter","n":"Winter holidays","when":"After Thanksgiving to December 26","gift":false,"items":[{"id":"log-cabin","n":"Snowy log cabin","kind":"home","rarity":"legendary","price":6500},{"id":"aurora-lake","n":"Frozen lake under the northern lights","kind":"scene","rarity":"legendary","price":5500},{"id":"ugly-sweater","n":"Holiday sweater","kind":"outfit","rarity":"rare","price":700},{"id":"elf-suit","n":"Elf suit","kind":"outfit","rarity":"epic","price":1800},{"id":"nutcracker","n":"Nutcracker uniform","kind":"outfit","rarity":"legendary","price":4800},{"id":"snow-globe","n":"Snow globe","kind":"yard","rarity":"rare","price":800},{"id":"ice-rink","n":"Ice rink","kind":"yard","rarity":"epic","price":2200},{"id":"holiday-tree","n":"Decorated tree","kind":"yard","rarity":"legendary","price":4500}]},{"k":"newyear","n":"New Year","when":"December 27 to January 2","gift":false,"items":[{"id":"clock-tower","n":"Clock tower","kind":"home","rarity":"legendary","price":7000},{"id":"midnight-rooftops","n":"Midnight rooftops","kind":"scene","rarity":"legendary","price":5500},{"id":"sparkle-bow-tie","n":"Sparkly bow tie","kind":"outfit","rarity":"rare","price":700},{"id":"tuxedo","n":"Tuxedo","kind":"outfit","rarity":"epic","price":2000},{"id":"father-time","n":"Father Time","kind":"outfit","rarity":"legendary","price":4500},{"id":"confetti-cannon","n":"Confetti cannon","kind":"yard","rarity":"rare","price":800},{"id":"countdown-clock","n":"Countdown clock","kind":"yard","rarity":"epic","price":2000},{"id":"ball-drop","n":"Midnight ball drop","kind":"yard","rarity":"legendary","price":4500}]},{"k":"mardigras","n":"Mardi Gras","when":"The week through Fat Tuesday","gift":false,"items":[{"id":"french-quarter","n":"French Quarter townhouse","kind":"home","rarity":"legendary","price":7000},{"id":"parade-street","n":"Parade street","kind":"scene","rarity":"legendary","price":5000},{"id":"bead-necklaces","n":"Parade beads","kind":"outfit","rarity":"rare","price":700},{"id":"jester","n":"Jester","kind":"outfit","rarity":"epic","price":1800},{"id":"carnival-king","n":"Carnival king","kind":"outfit","rarity":"legendary","price":4500},{"id":"bead-tree","n":"Bead tree","kind":"yard","rarity":"rare","price":700},{"id":"jazz-stand","n":"Jazz stand","kind":"yard","rarity":"epic","price":1800},{"id":"parade-float","n":"Parade float","kind":"yard","rarity":"legendary","price":4500}]},{"k":"valentine","n":"Valentine's Day","when":"February 8 to 14","gift":false,"items":[{"id":"heart-cottage","n":"Heart cottage","kind":"home","rarity":"legendary","price":6000},{"id":"rose-garden","n":"Rose garden","kind":"scene","rarity":"legendary","price":5000},{"id":"mail-cap","n":"Love-letter mail cap","kind":"outfit","rarity":"rare","price":700},{"id":"knight-of-hearts","n":"Knight of hearts","kind":"outfit","rarity":"epic","price":1800},{"id":"masquerade","n":"Masquerade mask and cape","kind":"outfit","rarity":"legendary","price":4500},{"id":"heart-balloon","n":"Heart balloons","kind":"yard","rarity":"rare","price":700},{"id":"swing-for-two","n":"Swing for two","kind":"yard","rarity":"epic","price":1800},{"id":"swan-pond","n":"Swan pond","kind":"yard","rarity":"legendary","price":4500}]},{"k":"toothfairy","n":"Tooth Fairy week","when":"February 22 to 28","gift":false,"items":[{"id":"pillow-palace","n":"Pillow palace","kind":"home","rarity":"legendary","price":7000},{"id":"fairy-glen","n":"Moonlit fairy glen","kind":"scene","rarity":"legendary","price":5500},{"id":"fairy-wand","n":"Wand and tiara","kind":"outfit","rarity":"rare","price":800},{"id":"fairy-wings","n":"Fairy wings","kind":"outfit","rarity":"epic","price":2000},{"id":"tooth-fairy","n":"The Tooth Fairy","kind":"outfit","rarity":"legendary","price":5000},{"id":"coin-pile","n":"Pile of shiny coins","kind":"yard","rarity":"rare","price":800},{"id":"tooth-pillow","n":"Tooth pillow","kind":"yard","rarity":"epic","price":1800},{"id":"fairy-ring","n":"Fairy ring","kind":"yard","rarity":"legendary","price":4500}]},{"k":"dentist","n":"Dentist's Day","when":"February 28 to March 6","gift":false,"items":[{"id":"dental-office","n":"Dental office","kind":"home","rarity":"legendary","price":7000},{"id":"main-street","n":"Main Street","kind":"scene","rarity":"legendary","price":5000},{"id":"gold-mirror","n":"Golden mouth mirror","kind":"outfit","rarity":"rare","price":900},{"id":"surgical-scrubs","n":"Surgical scrubs and mask","kind":"outfit","rarity":"epic","price":1800},{"id":"dr-timmy","n":"Dr. Timmy's long white coat","kind":"outfit","rarity":"legendary","price":4500},{"id":"dental-chair","n":"Dental chair","kind":"yard","rarity":"rare","price":900},{"id":"operatory-light","n":"Operatory light and tray","kind":"yard","rarity":"epic","price":1800},{"id":"molar-monument","n":"Molar monument","kind":"yard","rarity":"legendary","price":4500}]},{"k":"stpatrick","n":"St. Patrick's Day","when":"March 11 to 17","gift":false,"items":[{"id":"thatched-cottage","n":"Thatched cottage","kind":"home","rarity":"legendary","price":6000},{"id":"emerald-hills","n":"Emerald hills","kind":"scene","rarity":"legendary","price":5000},{"id":"flat-cap","n":"Tweed flat cap","kind":"outfit","rarity":"rare","price":700},{"id":"bagpiper","n":"Bagpiper","kind":"outfit","rarity":"epic","price":1800},{"id":"gold-buckle-suit","n":"Gold-buckle suit","kind":"outfit","rarity":"legendary","price":4500},{"id":"clover-patch","n":"Clover patch","kind":"yard","rarity":"rare","price":700},{"id":"wishing-well","n":"Wishing well","kind":"yard","rarity":"epic","price":1800},{"id":"pot-of-gold","n":"Pot of gold","kind":"yard","rarity":"legendary","price":4500}]},{"k":"easter","n":"Easter","when":"The week of Easter","gift":false,"items":[{"id":"egg-house","n":"Painted egg house","kind":"home","rarity":"legendary","price":6000},{"id":"tulip-meadow","n":"Tulip meadow","kind":"scene","rarity":"legendary","price":5000},{"id":"easter-bonnet","n":"Easter bonnet","kind":"outfit","rarity":"rare","price":700},{"id":"egg-painter","n":"Egg painter's smock","kind":"outfit","rarity":"epic","price":1800},{"id":"bunny-suit","n":"Bunny suit","kind":"outfit","rarity":"legendary","price":4500},{"id":"egg-basket","n":"Giant egg basket","kind":"yard","rarity":"rare","price":700},{"id":"carrot-patch","n":"Carrot patch","kind":"yard","rarity":"epic","price":1800},{"id":"chick-coop","n":"Chick coop","kind":"yard","rarity":"legendary","price":4200}]},{"k":"spring","n":"Spring","when":"March 20 to May 31","gift":false,"items":[{"id":"flowerpot-house","n":"Flowerpot house","kind":"home","rarity":"legendary","price":6000},{"id":"cherry-blossoms","n":"Cherry blossom grove","kind":"scene","rarity":"legendary","price":5000},{"id":"rain-slicker","n":"Raincoat and boots","kind":"outfit","rarity":"rare","price":700},{"id":"beekeeper","n":"Beekeeper","kind":"outfit","rarity":"epic","price":1800},{"id":"butterfly-wings","n":"Butterfly wings","kind":"outfit","rarity":"legendary","price":4500},{"id":"birdbath","n":"Birdbath","kind":"yard","rarity":"rare","price":700},{"id":"beehives","n":"Beehives","kind":"yard","rarity":"epic","price":1800},{"id":"greenhouse","n":"Glass greenhouse","kind":"yard","rarity":"legendary","price":4500}]},{"k":"july4","n":"Fourth of July","when":"June 28 to July 4","gift":false,"items":[{"id":"a-frame-cabin","n":"A-frame cabin","kind":"home","rarity":"legendary","price":6000},{"id":"fairgrounds","n":"Fairgrounds","kind":"scene","rarity":"legendary","price":5000},{"id":"stars-top-hat","n":"Stars-and-stripes top hat","kind":"outfit","rarity":"rare","price":700},{"id":"drum-major","n":"Drum major","kind":"outfit","rarity":"epic","price":1800},{"id":"lady-liberty","n":"Lady Liberty","kind":"outfit","rarity":"legendary","price":4500},{"id":"picnic-blanket","n":"Picnic blanket","kind":"yard","rarity":"rare","price":700},{"id":"fireworks-launcher","n":"Fireworks launcher","kind":"yard","rarity":"epic","price":1800},{"id":"ferris-wheel","n":"Little Ferris wheel","kind":"yard","rarity":"legendary","price":4500}]},{"k":"summer","n":"Summer","when":"June 1 to September 21","gift":false,"items":[{"id":"camper-van","n":"Camper van","kind":"home","rarity":"legendary","price":6500},{"id":"summer-lake","n":"Summer lake","kind":"scene","rarity":"legendary","price":5000},{"id":"snorkel","n":"Snorkel and flippers","kind":"outfit","rarity":"rare","price":700},{"id":"lifeguard","n":"Lifeguard","kind":"outfit","rarity":"epic","price":1800},{"id":"deep-sea-diver","n":"Deep-sea diver","kind":"outfit","rarity":"legendary","price":4500},{"id":"lawn-sprinkler","n":"Lawn sprinkler","kind":"yard","rarity":"rare","price":700},{"id":"barbecue-grill","n":"Barbecue grill","kind":"yard","rarity":"epic","price":1800},{"id":"water-slide","n":"Water slide","kind":"yard","rarity":"legendary","price":4500}]},{"k":"fall","n":"Fall","when":"September 22 to November 30","gift":false,"items":[{"id":"acorn-house","n":"Acorn house","kind":"home","rarity":"legendary","price":6000},{"id":"autumn-woods","n":"Autumn woods","kind":"scene","rarity":"legendary","price":5000},{"id":"flannel","n":"Flannel and scarf","kind":"outfit","rarity":"rare","price":700},{"id":"fox-hood","n":"Fox hood","kind":"outfit","rarity":"epic","price":1800},{"id":"tweed-professor","n":"Tweed professor","kind":"outfit","rarity":"legendary","price":4500},{"id":"leaf-pile","n":"Leaf pile","kind":"yard","rarity":"rare","price":700},{"id":"cider-stand","n":"Apple cider stand","kind":"yard","rarity":"epic","price":1800},{"id":"apple-tree","n":"Apple tree with a swing","kind":"yard","rarity":"legendary","price":4200}]}],"ranks":[{"gtier":1,"rank":"Antique","outfit":["rank-antique-outfit","Brass monocle and bowler","rare"],"yard":["rank-antique-yard","Treadle dental engine","rare"]},{"gtier":2,"rank":"Bronze","outfit":["rank-bronze-outfit","Bronze gladiator helmet","rare"],"yard":["rank-bronze-yard","Bronze bell","rare"]},{"gtier":3,"rank":"Silver","outfit":["rank-silver-outfit","Silver knight's helm","epic"],"yard":["rank-silver-yard","Silver trophy cup","epic"]},{"gtier":4,"rank":"Gold","outfit":["rank-gold-outfit","Golden laurels and toga","epic"],"yard":["rank-gold-yard","Golden tooth statue","epic"]},{"gtier":5,"rank":"Diamond","outfit":["rank-diamond-outfit","Diamond shades and ice cape","legendary"],"yard":["rank-diamond-yard","Diamond geode","legendary"]},{"gtier":6,"rank":"Dark Matter","outfit":["rank-dark-outfit","Dark Matter cloak","legendary"],"yard":["rank-dark-yard","Dark Matter orb","legendary"]}]});

@@ -45,6 +45,7 @@ so no candy, cake or soda as something good. Holidays are drawn by their secular
 ```bash
 node tools/figures/site/build.mjs --pack <set> --dry      # one set: house style, every piece drawn, Timmy's walks; writes nothing
 node tools/figures/site/pack-preview.mjs <set> out.png     # a contact sheet of the set (needs Playwright); add "dark", or home|scene|yard|outfits
+node tools/figures/site/shop-sheets.mjs <out-dir> homes     # every home with Timmy at the door, with a close-up (light and dark)
 node tools/figures/site/build.mjs                          # everything, and writes tools/preview/design/place.js
 node tools/figures/site/build.mjs --check                  # CI: fails if place.js is stale
 ```
@@ -52,6 +53,10 @@ node tools/figures/site/build.mjs --check                  # CI: fails if place.
 Look at the sheet every round: the build can't tell that a piece doesn't read as what it's named, that the door, the
 statue or the toothbrush is covered, or that an outfit hides Timmy's face. When several agents draw sets at once, each
 edits only its own pack and runs only `--pack <set> --dry`, because the plain build writes files they share.
+
+A new home's `spots.door` goes on the side of the door away from its `statue`, so Timmy at the door (where the card
+always draws him) leaves the statue, its steps and the pedestal in full view (BUG-089, 2026-11-12): check it on the
+homes sheet's close-up.
 
 The design page (`tools/preview/design/`, "The seasonal sets" and "Rank sets") shows every set; Sam looks before any of it
 is wired into `widget/pet.js` ([preview-and-release-test](../rules/preview-and-release-test.md)).

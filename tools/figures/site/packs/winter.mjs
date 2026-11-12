@@ -21,7 +21,7 @@ export function pack(T){
     "log-cabin": {
       note: "Round logs notched at the corners, a fieldstone chimney, snow on the roof and windows that are always warm",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the ridge", paint: "Door and shutter paint" },
-      door: [5.5, 8.4], brush: [7.4, 9.1], statue: [3.0, 9.4], spots: { door: [5.5, 10.4] }, h: 8.4, skirt: "snow",
+      door: [5.5, 8.4], brush: [7.4, 9.1], statue: [2.95, 9.45], spots: { door: [6.25, 10.15] }, h: 8.4, skirt: "snow",
       eaves: [[2.05, 8.95, 3.4], [8.6, 8.95, 3.4]], foot: [2.5, 3.2, 8.9, 8.4],
       base: [[2.5, 8.4], [8.3, 8.4], [8.8, 8.0], [8.8, 6.6], [9.05, 6.4], [9.05, 5.2], [8.3, 5.0], [8.3, 3.2]], block: [2.3, 2.9, 9.2, 8.8],
       draw: function(o){

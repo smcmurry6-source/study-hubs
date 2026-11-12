@@ -62,13 +62,14 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
 - [x] What's placed is kept on the server (`equip_item`, [the shop note](2026-11-06-redesign-timmy-shop.md)) and the same on
       every linked device (the server side, phase 5 part 3; the full view that calls it is phase 4); its five yard spots and
       names follow the art (Sam, 2026-11-06)
-- [ ] Sam's look, then a fix in the kit if wanted: at the door Timmy stands in front of the rank statue and hides most of
+- [x] Sam's look, then a fix in the kit if wanted: at the door Timmy stands in front of the rank statue and hides most of
       it (the journeys' pedestal too), and a piece in the spot left of the path hides its base; the card always shows him
       at the door (found in part C, 2026-11-12; either his door spot or the statue's moves, home by home, in
       `tools/figures/site/place.mjs`)
       **Sam, 2026-11-12: fix it.** Timmy's door spot moves to the open side of the door, home by home, and the spot
       left of the path is nudged; the statue stays by the door. In the shop's art session, on one sheet of every home
-      ([the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1", item 7; BUG-089 in the bug log)
+      ([the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1", item 7; BUG-089 in the bug log).
+      Fixed in [#339](https://github.com/smcmurry6-source/study-hubs/pull/339); Sam, on the sheet of every home: "Everything looks good"
 - [ ] `LORE.md` and the About page (Timmy's place) updated
 - [ ] CI and the release suites pass, perf budgets met (`node tools/release/run.js`)
 - [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
@@ -249,7 +250,7 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
   - **Checked against the server as written** (`tools/release/xp.js`, 350 checks): the customizer's rules against
     `equip_item` through fourteen changes, the place's seasons against `sh_shop_seasons` for three years, the kit's ids
     against the catalog. **One disagreement, told to Sam, migration unchanged**: five everyday outfits in the catalog
-    have no drawing ([task](2026-11-12-five-outfits-without-a-drawing.md)).
+    have no drawing ([task](done/2026-11-12-five-outfits-without-a-drawing.md)).
   - **The preview** answers `get_my_shop`, `equip_item` and `get_pet_days_v2` from made-up data per test account
     (`shop2`, `equip2`, `PLACE_BOUGHT`, `PLACE_START` in `tools/preview/runtime/preview.js`): `high-xp` owns
     everything, `new` has no Timmy, `?xp=180000` and `?xp=300000` show the later journeys.
@@ -264,6 +265,12 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
   ([decisions](../decisions.md); the order is in [phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here to
   the release"):
   - **The statue behind Timmy** (BUG-089): fixed in the shop's art session (the box above).
+- 2026-11-12 (Claude Code), the shop's art session ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)):
+  BUG-089 fixed in the kit. Timmy's door spot moved in all 22 homes to the side of the door away from the statue,
+  with the yard's left spot (`SLOTS.left`), the path's lamp (`FIX.lamp`) and nine statues; `widget/place.js` is
+  unchanged. The frames and the coin left the kit for `widget/hub-art/shop.js`. Accepted as it is with Sam's "Everything looks good": BUG-095 (a tall
+  piece right of the path in front of Timmy's gum at the door). Details: [the shop](2026-11-06-redesign-timmy-shop.md),
+  "What session 1 built".
   - **What Timmy wears**: "if someone doesnt have a costume applied, they are naked. What you put wins." At his
     place too: with nothing on he is himself, where part C drew him in that day's holiday outfit. One line in
     `timmySvg()`, made in [Timmy everywhere](2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"). The place's

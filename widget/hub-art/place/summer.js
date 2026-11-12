@@ -29,7 +29,7 @@ window.SH_PLACE && window.SH_PLACE.addPack(function pack(T){
     "camper-van": {
       note: "A two-tone camper van with a pop-up roof, a surfboard on the rack and a striped awning",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the pop-up roof", paint: "Body paint" },
-      door: [5.5, 8.2], brush: [7.8, 8.85], statue: [3.65, 9.8], spots: { door: [5.5, 10.3] }, h: 6.6,
+      door: [5.5, 8.2], brush: [7.8, 8.85], statue: [3.65, 9.8], spots: { door: [6.95, 10.5] }, h: 6.6,
       eaves: [[2.7, 8.25, 3.7], [8.5, 8.25, 3.7]], foot: [2.5, 5.2, 8.7, 8.2], base: [[2.7, 8.2], [8.6, 8.2], [8.7, 5.4]], block: [2.3, 4.9, 9.0, 9.6],
       draw: function(o){
         var u = o.up, bp = o.paint && o.paint !== "cream" ? T.BOLD[o.paint] : { c: "#F2684A", s: "#CC4E36" }, s = "", lights = "";

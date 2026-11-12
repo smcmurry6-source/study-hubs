@@ -32,6 +32,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (the redesign's shop, session 1: its art; Claude Code, #339)** — Art only: no client code, nothing
+  students see (the redesign isn't live), `migration_v54.sql` unchanged. New `tools/figures/site/shop.mjs`, built by
+  `build.mjs` into **`widget/hub-art/shop.js`** (`window.SH_SHOP_ART`, 11.4 KB compressed, loaded by no page yet): the
+  Shiny Gold Crown coin (`coin(px)`, with its own cut for 16 px), thumbnails for the four snacks and two boosts
+  (`thumb(id)`), and the five rarity frames (`frame(rarity)`), which moved here with the coin from the place's kit
+  (`SH_PLACE.frame`, `.coin`, `.RARITIES` are gone; nothing used them). **Ten new outfits** in the kit's `OUTFITS`
+  (`tools/figures/site/place.mjs`), keyed by the shop's ids: the five everyday ones that had no drawing (BUG-090:
+  scrub cap, bow tie, safety glasses, white coat, graduation cap) and the five rare costumes (pirate, astronaut,
+  detective, chef, Captain Enamel; `costume: true`, three lines each). **Timmy's door spot moved in all 22 homes**
+  (BUG-089) so he no longer hides the rank statue, with the yard's left spot, the path's lamp and nine statues.
+  `tools/release/xp.js` now fails on any catalog piece without a drawing and checks the shelf's thumbnails against
+  the catalog (358 checks). The design page shows them ("The shop's own art: the coin and the shelf", "The shop's ten outfits");
+  `node tools/figures/site/shop-sheets.mjs <dir>` makes the contact sheets. **The shop's look, "more epic"** (Sam,
+  after the sheets): the design page's shop is redrawn as a storefront (Timmy at the counter under an arch of light;
+  `SH_SHOP_ART.store()`), "Today's showcase" (`stand()`) and shelves whose cards fill them, with Spotted and Always
+  here; the client session builds the page to it. Left open: BUG-095. Hand-off for
+  the shop's client session: `vault/tasks/2026-11-06-redesign-timmy-shop.md`, "What session 1 built".
 - **2026-11-12 (Ask Timmy's chat, part 2, Claude Code)** — Nothing students see changes yet: the chat half of
   [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md), in the redesign's pages only. `widget/ask.js` + `ask.css`
   (a bottom sheet on a phone, a side panel on a laptop) open from Timmy's "Ask me" (his bubble, the dashboard house), from

@@ -34,7 +34,7 @@ window.SH_PLACE && window.SH_PLACE.addPack(function pack(T){
     "haunted-manor": {
       note: "A crooked old manor: a leaning tower in a witch's hat, a sagging roof, and every window glowing after dark",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the tower", paint: "Wall paint" },
-      door: [5.5, 8.6], brush: [7.6, 9.1], statue: [3.2, 9.4], spots: { door: [5.5, 10.6] }, h: 11,
+      door: [5.5, 8.6], brush: [7.6, 9.1], statue: [3.15, 9.45], spots: { door: [6.45, 10.15] }, h: 11,
       eaves: [[2.35, 8.6, 3.1], [8.65, 8.6, 3.1]], foot: [2.7, 3.6, 8.3, 8.6],
       base: [[2.7, 8.2], [4.5, 8.2], [4.5, 8.6], [6.5, 8.6], [6.5, 8.2], [8.3, 8.2], [8.3, 3.6]], block: [2.5, 3.2, 8.7, 9.0],
       draw: function(o){

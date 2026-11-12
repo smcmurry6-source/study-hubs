@@ -36,7 +36,7 @@ window.SH_PLACE && window.SH_PLACE.addPack(function pack(T){
     "heart-cottage": {
       note: "A blush cottage with a heart for a door, a heart window in the gable and a roof of heart shingles",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the ridge", paint: "Wall paint" },
-      door: [5.5, 8.6], brush: [7.9, 9.15], statue: [3.05, 9.5], spots: { door: [5.5, 10.6] }, h: 8.6,
+      door: [5.5, 8.6], brush: [7.9, 9.15], statue: [3.05, 9.5], spots: { door: [6.35, 10.2] }, h: 8.6,
       eaves: [[2.5, 8.95, 2.9], [8.5, 8.95, 2.9]], foot: [2.6, 3.0, 8.4, 8.6], base: [[2.6, 8.6], [8.4, 8.6], [8.4, 3.0]], block: [2.4, 2.7, 8.8, 9.0],
       draw: function(o){
         var u = o.up, wp = o.paint && o.paint !== "cream" ? T.PAINTS[o.paint] : { c: "#FFE9EE", s: "#F3BECB" }, s = "", lights = "", b;

@@ -730,6 +730,13 @@ img.emb-disc, .big, .small img { display: block; }
 #tpRanks .tp-fig:nth-child(n + 8) { grid-column: span 1; }
 #tpFrames { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .tp-framefig { display: grid; gap: 8px; justify-items: center; }
+/* the shop's own art: the coin beside a number, the shelf cards, the ten outfits (each as it is and with loupes) */
+#place #tpShelf.tp-gal { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.tp-coinrow { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 36px; padding: 4px 2px 10px; }
+.tp-coinfig { display: grid; gap: 4px; justify-items: start; } .tp-coinfig small { font-size: var(--fs-meta); color: var(--muted); }
+.tp-coinnum { display: inline-flex; align-items: center; gap: .28em; font-weight: var(--w-head); color: var(--text); } .tp-coinnum svg { display: block; flex: none; }
+#place #tpTen.tp-gal { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.tp-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 8px 4px 0; }
 .tp-framefig .tp-rcard { width: 100%; max-width: 180px; }
 .tp-framefig p { font-size: var(--fs-meta); color: var(--muted); text-align: center; }
 .tp-framefig p b { color: var(--text); }
@@ -828,10 +835,13 @@ img.emb-disc, .big, .small img { display: block; }
 .tp-awning { display: flex; justify-content: center; margin: 0 -24px; height: 50px; overflow: hidden; background: var(--w-trim2); border-bottom: 3px solid #3B2E3A; }
 .tp-awning i { flex: none; width: 46px; height: 44px; margin-left: -2px; border: 2px solid #3B2E3A; border-top: 0; border-radius: 0 0 23px 23px; background: #FF8B7B; box-shadow: inset 0 -7px 0 rgba(59, 46, 58, .14); }
 .tp-awning i:nth-child(even) { background: #FFF6E5; }
-/* the counter: Timmy stands behind it, the sign hangs over it */
-.tp-storehead { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 12px; margin-top: -6px; padding: 0 4px 22px; }
-.tp-storehead::after { content: ""; position: absolute; left: -10px; right: -10px; bottom: 0; height: 16px; border: 2px solid #3B2E3A; border-radius: 6px; background: linear-gradient(180deg, #E0A868 0 5px, var(--w-board) 5px 11px, var(--w-board2) 11px); box-shadow: 0 4px 0 rgba(59, 46, 58, .22); }
-.tp-keeper { width: 62px; height: 78px; margin-bottom: -10px; } .tp-keeper img { display: block; width: 100%; height: 100%; object-fit: contain; }
+/* the storefront: the shop's art in two layers with the live Timmy between them, the sign hanging over the arch, the
+   till's plaque and the sound switch on the counter's front */
+.tp-front { position: relative; margin: -24px -14px 0; aspect-ratio: 600 / 200; max-height: 360px; }
+.tp-frontlayer, .tp-frontlayer img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.tp-keeper { position: absolute; left: 50%; top: 9%; height: 80%; transform: translateX(-50%); animation: tp-keeper 3.6s ease-in-out infinite; }
+.tp-keeper img { display: block; height: 100%; width: auto; }
+@keyframes tp-keeper { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-1.6%); } }
 .tp-sign { position: relative; justify-self: start; display: grid; padding: 9px 22px 10px; margin-bottom: 8px; border-radius: 10px; border: 2px solid #3B2E3A; color: #3B2E3A; box-shadow: 0 4px 0 #3B2E3A; transform: rotate(-1.2deg);
   background: repeating-linear-gradient(180deg, transparent 0 13px, rgba(59, 46, 58, .13) 13px 14px), linear-gradient(180deg, #F2CC92, #DDA667); }
 .tp-sign::before, .tp-sign::after { content: ""; position: absolute; bottom: 100%; width: 3px; height: 30px; background: repeating-linear-gradient(180deg, #3B2E3A 0 5px, #8E7B6A 5px 8px); border-radius: 2px; }
@@ -840,10 +850,58 @@ img.emb-disc, .big, .small img { display: block; }
 .tp-nail.a { left: 7px; } .tp-nail.b { right: 7px; }
 .tp-sign b { font-size: 22px; font-weight: var(--w-head); line-height: 1.15; letter-spacing: -.01em; text-shadow: 0 1px 0 rgba(255, 255, 255, .45); }
 .tp-sign span { font-size: var(--fs-meta); font-weight: 600; color: #5A4130; }
+.tp-front .tp-sign { position: absolute; z-index: 2; left: 50%; top: 8px; margin: 0; padding: 7px 26px 8px; justify-items: center; text-align: center; transform: translateX(-50%) rotate(-1.2deg); }
+.tp-front .tp-sign::before, .tp-front .tp-sign::after { height: 20px; }
+.tp-front .tp-sign b { display: inline-flex; align-items: center; gap: 8px; font-size: 28px; white-space: nowrap; }
+.tp-front .tp-sign b .tp-coin { width: 28px; height: 28px; }
 /* the till: your crowns on a wooden plaque */
 .tp-wallet { display: inline-flex; align-items: center; gap: 7px; height: 44px; padding: 0 16px 0 8px; border-radius: 12px; border: 2px solid #3B2E3A; color: #3B2E3A; box-shadow: 0 3px 0 #3B2E3A, inset 0 0 0 3px rgba(255, 255, 255, .28);
   background: repeating-linear-gradient(180deg, transparent 0 10px, rgba(59, 46, 58, .1) 10px 11px), linear-gradient(180deg, #FFE39A, #F1C567); }
 .tp-wallet .tp-coin { width: 26px; height: 26px; } .tp-wallet b { font-size: 18px; font-weight: var(--w-head); } .tp-wallet small { font-size: var(--fs-meta); font-weight: 600; }
+.tp-front .tp-wallet { position: absolute; z-index: 2; right: 9.5%; bottom: 3.5%; height: auto; gap: 9px; padding: 4px 18px 5px 9px; }
+.tp-front .tp-wallet .tp-coin { width: 38px; height: 38px; }
+.tp-front .tp-wallet > span { display: grid; line-height: 1.08; text-align: left; } .tp-front .tp-wallet b { font-size: 25px; } .tp-front .tp-wallet small { font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.tp-front .tp-snd { position: absolute; z-index: 2; left: 9.5%; bottom: 5%; }
+/* the showcase: the day's rarest piece on a stand in its rarity's colors, rays turning behind it, and what it is in large type */
+.tp-show { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin: 7px; border-radius: 16px; border: 2px solid #3B2E3A; overflow: hidden; color: #3B2E3A; background: #FFFDF6;
+  box-shadow: 0 0 0 5px var(--sr-edge), 0 0 0 7px #3B2E3A; }
+.tp-showcase { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-height: 340px; padding: 14px 18px 14px; background: var(--sr-fill); border-right: 2px solid #3B2E3A; overflow: hidden; isolation: isolate; }
+.tp-showcase .tp-irays { top: 52%; width: 190%; margin: -95% 0 0 -95%; opacity: .34; } .tp-showcase .tp-irays g { fill: var(--sr-edge); }
+.tp-showpiece { position: relative; z-index: 1; width: min(80%, 330px); aspect-ratio: 1; margin-bottom: -24%; animation: tp-showfloat 4.4s ease-in-out infinite; }
+.tp-showpiece img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.tp-showpiece.k-outfit { width: min(46%, 190px); aspect-ratio: 200 / 262; margin-bottom: -5%; }
+.tp-showstand { width: min(88%, 380px); } .tp-showstand img { display: block; width: 100%; height: auto; }
+@keyframes tp-showfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+.tp-showtw { position: absolute; z-index: 1; width: 22px; height: 22px; background: #fff; clip-path: polygon(50% 0, 59% 41%, 100% 50%, 59% 59%, 50% 100%, 41% 59%, 0 50%, 41% 41%); animation: tp-showtw 2.4s ease-in-out infinite; }
+.tp-showtw.a { left: 14%; top: 18%; } .tp-showtw.b { right: 13%; top: 30%; width: 16px; height: 16px; animation-delay: .8s; } .tp-showtw.c { right: 24%; top: 10%; width: 13px; height: 13px; animation-delay: 1.5s; }
+@keyframes tp-showtw { 0%, 100% { opacity: .25; transform: scale(.6); } 50% { opacity: 1; transform: scale(1); } }
+.tp-showinfo { display: grid; align-content: center; justify-items: start; gap: 10px; padding: 24px 28px; }
+.tp-showkick { margin: 0; padding: 4px 14px 5px; border-radius: 8px; border: 2px solid #3B2E3A; background: var(--sr-edge); color: #3B2E3A; font-size: var(--fs-card); font-weight: var(--w-head); box-shadow: 0 3px 0 #3B2E3A; transform: rotate(-1deg); }
+.tp-showname { margin: 2px 0 0; font-size: clamp(30px, 4.4vw, 46px); font-weight: var(--w-head); line-height: 1.02; letter-spacing: -.02em; }
+.tp-show .tp-itags span { font-size: 13.5px; font-weight: 700; color: #5A4130; }
+.tp-showdesc { margin: 0; max-width: 44ch; font-size: 16px; line-height: 1.45; }
+.tp-showbuy { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 4px; }
+.tp-showbuy .tp-ibig .tp-coin { width: 40px; height: 40px; } .tp-showbuy .tp-ibig b { font-size: 40px; }
+.tp-showwhen { display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: var(--fs-meta); font-weight: 700; color: #5A4130; }
+/* two shelves side by side where there is room, and a season's shelf with the whole set at Timmy's place beside it */
+.tp-aisle { display: grid; }
+.tp-seasonbody { display: grid; gap: 16px; }
+.tp-poster { align-self: start; border: 2px solid #3B2E3A; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 4px 0 #3B2E3A; transform: rotate(-1.2deg); }
+.tp-poster > * { display: block; width: 100%; height: auto; }
+/* a rare costume nobody has spotted yet: its shape only */
+.tp-unseen { cursor: default; } .tp-unseen .tp-rthumb img { filter: brightness(0); opacity: .42; } .tp-unseen .tp-rframe { filter: grayscale(1); opacity: .75; }
+.tp-unseen .tp-rname { color: #6B5A68; }
+/* what a snack or a boost does, on the card's corner */
+.tp-does { position: absolute; left: 50%; top: 45%; transform: translateX(-50%); z-index: 1; padding: 2px 7px; border-radius: 999px; border: 1.5px solid #3B2E3A; background: #BFEBCF; color: #3B2E3A; font-size: clamp(10.5px, 8cqw, 12.5px); font-weight: 800; white-space: nowrap; }
+.tp-shelf-always .r-Rare .tp-does, .tp-shelf-always .r-Epic .tp-does { background: #FFE27A; }
+.tp-shelf-spotted .tp-tagsign { box-shadow: 0 3px 0 #3B2E3A, inset 8px 0 0 #F28BA8; } .tp-shelf-always .tp-tagsign { box-shadow: 0 3px 0 #3B2E3A, inset 8px 0 0 #FFD86B; }
+@media (min-width: 721px) {
+  .tp-aisle.a11 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .tp-seasonbody { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); align-items: center; }
+  /* the cards fill their shelf, and their type grows with them */
+  .tp-store .tp-shelf .tp-rcards { grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); }
+  .tp-store .tp-shelf .tp-rname { font-size: clamp(11px, 9.6cqw, 17px); } .tp-store .tp-shelf .tp-rmeta .tp-rar { font-size: clamp(11px, 8.4cqw, 13.5px); } .tp-store .tp-shelf .tp-rprice .tp-price { font-size: clamp(11px, 9cqw, 15px); }
+}
 /* each shelf is a cabinet let into the wall */
 .tp-shelf { position: relative; display: grid; gap: 12px; padding: 16px 18px 20px; border-radius: 14px; border: 2px solid #3B2E3A;
   background: repeating-linear-gradient(90deg, transparent 0 58px, var(--w-seam) 58px 60px), linear-gradient(180deg, var(--w-cab), var(--w-cab2));
@@ -917,7 +975,6 @@ img.emb-disc, .big, .small img { display: block; }
 .tp-itry { height: 52px; background: #fff; color: #3B2E3A; border: 2px solid #3B2E3A; }
 .tp-itry:hover { background: #F3ECFA; }
 .tp-buy:focus-visible, .tp-itry:focus-visible, .tp-imini:focus-visible, .tp-iview button:focus-visible { outline: 3px solid #4E3492; outline-offset: 2px; }
-.tp-storeend { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
 .tp-snd { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px 0 10px; border-radius: 10px; border: 2px solid #3B2E3A; background: #F6DFB4; color: #3B2E3A; box-shadow: 0 3px 0 #3B2E3A; font-size: var(--fs-meta); font-weight: 800; cursor: pointer; }
 .tp-snd[aria-pressed="false"] { background: #D9BE94; color: #6B5240; }
 .tp-snd:focus-visible { outline: 3px solid var(--focus, var(--primary)); outline-offset: 2px; }
@@ -962,12 +1019,16 @@ img.emb-disc, .big, .small img { display: block; }
   /* the price and Buy stay in reach however long the piece's story is */
   .tp-ibuy { position: sticky; bottom: 0; z-index: 2; margin: 6px -16px -16px; padding: 12px 16px 14px; background: #FFF9EE; gap: 8px; }
   .tp-store { padding: 0 15px 22px; gap: 14px; } .tp-awning { margin: 0 -15px; }
-  .tp-shelf { padding: 14px 11px 16px; margin: 7px 4px; } .tp-storehead::after { left: -4px; right: -4px; }
-  .tp-storehead { grid-template-columns: auto minmax(0, 1fr); } .tp-storeend { grid-column: 1 / -1; justify-content: flex-start; }
-  .tp-keeper { width: 48px; height: 62px; } .tp-sign b { font-size: 19px; }
+  .tp-shelf { padding: 14px 11px 16px; margin: 7px 4px; }
+  .tp-front { aspect-ratio: auto; height: 236px; margin: -20px -9px 0; }
+  .tp-front .tp-sign { top: 8px; padding: 4px 16px 5px; } .tp-front .tp-sign b { font-size: 19px; gap: 6px; } .tp-front .tp-sign b .tp-coin { width: 20px; height: 20px; } .tp-front .tp-sign span { display: none; }
+  .tp-front .tp-sign::before, .tp-front .tp-sign::after { height: 14px; }
+  .tp-front .tp-wallet { right: auto; left: 50%; bottom: 5px; transform: translateX(-50%); padding: 2px 14px 3px 7px; gap: 7px; } .tp-front .tp-wallet .tp-coin { width: 28px; height: 28px; } .tp-front .tp-wallet b { font-size: 19px; } .tp-front .tp-wallet small { font-size: 11px; }
+  .tp-front .tp-snd { left: auto; right: 4px; bottom: 9px; width: 36px; padding: 0; justify-content: center; } .tp-front .tp-snd span { display: none; }
+  .tp-show { grid-template-columns: 1fr; margin: 7px 4px; } .tp-showcase { min-height: 236px; border-right: 0; border-bottom: 2px solid #3B2E3A; } .tp-showinfo { padding: 16px 16px 18px; }
   .tp-shelf header { grid-template-columns: 1fr; } .tp-when { justify-self: start; }
 }
-@media (prefers-reduced-motion: reduce) { .tp-irays, .tp-ipiece { animation: none; } .tp-plank .tp-rcard:hover, .tp-plank .tp-rcard:hover::before { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .tp-irays, .tp-ipiece, .tp-keeper, .tp-showpiece, .tp-showtw { animation: none; } .tp-plank .tp-rcard:hover, .tp-plank .tp-rcard:hover::before { transform: none; } }
 
 .tp-visiting { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: 22px; align-items: start; }
 .tp-vboard { display: grid; gap: 12px; }
@@ -1055,6 +1116,7 @@ img.emb-disc, .big, .small img { display: block; }
   .tp-build { grid-template-columns: 1fr; }
   .tp-stage-wrap { position: relative; top: 0; }
   .tp-gal, #tpYard, #tpFrames { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #place #tpShelf.tp-gal { grid-template-columns: repeat(3, minmax(0, 1fr)); } #place #tpTen.tp-gal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #tpThemes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #tpPaint { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   #tpRanks, #tpOutfits { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -1064,6 +1126,7 @@ img.emb-disc, .big, .small img { display: block; }
 }
 @media (max-width: 640px) {
   .tp-gal, #tpYard, #tpFrames { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  #place #tpShelf.tp-gal, #place #tpTen.tp-gal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #tpHomes, #tpNights, #tpScenes, #tpThemes { grid-template-columns: 1fr; }
   #tpRanks, #tpOutfits, #tpPaint { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   #tpMastery { grid-template-columns: repeat(2, minmax(0, 1fr)); }

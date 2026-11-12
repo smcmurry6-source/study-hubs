@@ -44,7 +44,7 @@ export function pack(T){
     "clock-tower": {
       note: "A tall stone tower with a spire; its big clock stands at five to midnight",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the spire", paint: "Wall paint" },
-      door: [5.5, 8.6], brush: [7.8, 9.1], statue: [3.3, 9.6], spots: { door: [5.5, 10.6] }, h: 12,
+      door: [5.5, 8.6], brush: [7.8, 9.1], statue: [3.3, 9.6], spots: { door: [6.6, 10.3] }, h: 12,
       eaves: [[3.15, 8.8, 3.0], [7.85, 8.8, 3.0]], foot: [3.3, 4.2, 7.7, 8.6], base: [[3.3, 8.6], [7.7, 8.6], [7.7, 4.2]], block: [3.1, 3.9, 8.1, 9.0],
       draw: function(o){
         var u = o.up, wp = o.paint && o.paint !== "cream" ? T.PAINTS[o.paint] : { c: "#F1E3C6", s: "#D2BE98" }, s = "", lights = "", w, i;

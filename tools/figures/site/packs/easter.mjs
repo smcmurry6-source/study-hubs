@@ -56,7 +56,7 @@ export function pack(T){
     "egg-house": {
       note: "A giant painted egg: bands of zigzags and dots, a round door and round windows",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the tip", paint: "Shell color" },
-      door: [5.5, 7.72], brush: [8.5, 8.0], statue: [3.1, 8.9], spots: { door: [5.5, 9.7] }, h: 8.3,
+      door: [5.5, 7.72], brush: [8.5, 8.0], statue: [3.1, 8.9], spots: { door: [6.55, 9.45] }, h: 8.3,
       eaves: [[3.75, 7.25, 3.0], [7.25, 3.75, 3.0], 17], round: [5.5, 5.5, 2.3], base: T.arcPts(5.5, 5.5, 2.25, -40, 135, 14), block: [2.6, 2.7, 8.4, 8.5],
       draw: function(o){
         var u = o.up, shell = o.paint && o.paint !== "cream" && T.PAINTS[o.paint] ? T.PAINTS[o.paint].c : "#FFF6E2", s = "", lights = "", i;

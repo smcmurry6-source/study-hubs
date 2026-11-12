@@ -30,7 +30,7 @@ window.SH_PLACE && window.SH_PLACE.addPack(function pack(T){
     "thatched-cottage": {
       note: "Whitewashed walls under a thick, rounded thatch roof, with a green half-door and a turf fire going",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the ridge", paint: "Wall paint" },
-      door: [5.5, 8.4], brush: [7.3, 9.05], statue: [3.0, 9.3], spots: { door: [5.5, 10.6] }, h: 8.2,
+      door: [5.5, 8.4], brush: [7.3, 9.05], statue: [2.9, 9.4], spots: { door: [6.2, 10.1] }, h: 8.2,
       eaves: [[2.15, 8.85, 2.95], [8.85, 8.85, 2.95]], foot: [2.6, 3.2, 8.4, 8.4], base: [[2.6, 8.4], [8.4, 8.4], [8.4, 3.2]], block: [2.4, 2.8, 9.3, 8.9],
       draw: function(o){
         var u = o.up, wall = o.paint && o.paint !== "cream" ? T.PAINTS[o.paint] : { c: "#FFFDF6", s: "#E4DDCF" }, s = "", lights = "";
