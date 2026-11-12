@@ -52,6 +52,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   [game-server](vault/reference/game-server.md).** Left for the release, written in
   [its note](vault/tasks/2026-11-06-redesign-release.md): the arcade's and Timmy Time's XP, the journey trophies in
   the trophy case, the About entries (drafted there).
+
+- **2026-11-12 (High yield narration for the redesign, Claude Code)** — Nothing students see changes until the redesign's
+  release. The notes' third reading level, High yield, now has Kokoro narration like the other two: `<lecture>-hy.mp3` and
+  its word timings for all 21 lectures that have it (Heme & Endo Exam 2's 8, Occlusion's 4 final lectures, Perio's 9; Sam
+  asked for Heme & Endo too though it archives Nov 13), 148 MB at 64 kbps (about 5 hours 20 minutes); the site is 738 MB of the 1 GB limit, under `size.js`'s 750 MB warning. `tools/narrate.py` reads the
+  redesign's `notes.json` (`--level hy`), says a topic's number as "Topic 2." and the "·" as a pause, stamps each words file
+  with the text it was spoken from (`"h"`), and spreads lectures over `--jobs` longest first. `tools/hub-next/build.mjs`
+  lists in `notes.json`'s `hyAudio` the lectures whose recording matches today's High yield, and only those get the
+  recording (with Follow along) in `widget/hub.js`; the rest read in the device's voice, so a stale one never plays.
+  `tools/ci/smoke.js` fails on a recording made from another version of a lecture's High yield and checks the page offers
+  exactly the listed ones. The drift rule now covers High yield: it changes whenever a lecture's notes, predicted topics,
+  hints or questions do, so a question edit on these three hubs can mean recording that lecture's High yield again in the
+  same PR ([rule](vault/rules/text-and-audio-never-drift.md), [task](vault/tasks/done/2026-11-12-high-yield-narration.md)).
+
 - **2026-11-12 (the redesign's hub engine split into four files, Claude Code)** — Nothing students see changes: only the
   new hubs (`hubs/<id>/next/`, shown in a preview only) load the engine, and no live file changed. `widget/hub.js` was
   one 188 KB closure; it is now the core (`widget/hub.js`, 116 KB) and three parts, each holding what one kind of
@@ -133,7 +147,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   [<lecture>]` lists every pick. In High yield, Listen uses the device's voice, the end-of-notes button opens the lecture's
   High likelihood questions (`notes:practice-likely`), and reading to the end doesn't mark the notes done. The smoke test
   opens High yield on each redesigned hub. **Narration held**: about 135 MB of Kokoro would take the site (960 MB) past
-  GitHub Pages' 1 GB cap; Sam chose to hold it ([task](vault/tasks/2026-11-12-high-yield-narration.md)). The About page text
+  GitHub Pages' 1 GB cap; Sam chose to hold it ([task](vault/tasks/done/2026-11-12-high-yield-narration.md)). The About page text
   and the rule edits wait in the [redesign release](vault/tasks/2026-11-06-redesign-release.md) note;
   [high-likelihood-topics](vault/rules/high-likelihood-topics.md) now says the topics build it.
 - **2026-11-12 (Follow along: the redesign highlights the word being read, Claude Code)** — The survey's "highlight the words

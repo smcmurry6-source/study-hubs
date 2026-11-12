@@ -8,7 +8,8 @@
  *   core.json       the hub's facts for Home: lectures, exam info, course dates, likely topics, mock blueprint, the
  *                   podcast, and a compact question index ([id, lec, likely]) so Home draws before the bank loads
  *   questions.json  every question in its final shape (the helpers two(), tf(), nums(), pc() already run), whys on it
- *   notes.json      the notes at both reading levels, and the High yield level built from them (high-yield.mjs)
+ *   notes.json      the notes at both reading levels, and the High yield level built from them (high-yield.mjs), with
+ *                   hyAudio: the lectures whose High yield narration matches it (hyRecorded below)
  *   study.json      hints, the cram sheet, the Review tables and processes (Side by side), the arcade's sort sets
  *   figures.js/.css the hub's drawing kit and anima figures, copied from its od:kit / anima:js / od:css / anima:css
  *                   marker blocks and wrapped so the engine hands them what they used from the hub (a hub without
@@ -22,7 +23,8 @@
  *   node tools/hub-next/build.mjs --check      fail if any written file is stale (CI runs this)
  *   node tools/hub-next/build.mjs --hub occlusion
  */
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, existsSync, statSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { dirname, resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
@@ -45,6 +47,19 @@ const HUBS = {
         "  MIDTERM_AFTER = " + JSON.stringify(D.MIDTERM_AFTER) + ", sessChip = function(l){ return l ? '<span class=\"gm-sess' + env.lc(l.id) + '\">' + lecLabel(l) + '</span>' : ''; };\n" +
         main.match(/function shortTitle\(l\)\{[\s\S]*?\n\}/)[0] + "\n"} }
 };
+
+/* High yield's narration (vault/tasks/2026-11-12-high-yield-narration.md): hubs/<hub>/audio/<lecture>-hy.mp3, made by
+   tools/narrate.py from notes.json's hy, with its words file beside it saying which text it was spoken from ("h", the
+   first 12 hex digits of the SHA-1 of the HTML: narrate.py's text_hash). High yield changes whenever the notes, predicted
+   topics, hints or questions do, so the page is offered the recording only while it was spoken from today's High yield;
+   otherwise Listen reads it in the device's voice, and tools/ci/smoke.js fails until it's recorded again
+   (vault/rules/text-and-audio-never-drift.md). Record or re-record it, then run this build again. */
+const textHash = (html) => createHash("sha1").update(html, "utf8").digest("hex").slice(0, 12);
+function hyRecorded(hub, lec, html){
+  const mp3 = join(ROOT, "hubs", hub, "audio", lec + "-hy.mp3"), wf = mp3.replace(/\.mp3$/, ".words.json");
+  if (!existsSync(mp3) || !existsSync(wf)) return false;
+  try { const d = JSON.parse(readFileSync(wf, "utf8")); return d.v === 1 && d.h === textHash(html) && d.bytes === statSync(mp3).size; } catch (e) { return false; }
+}
 
 const args = process.argv.slice(2);
 const CHECK = args.includes("--check");
@@ -216,13 +231,14 @@ function build(hub){
   /* every chart belongs to one lecture (Perio's): More's Side by side has nothing to show */
   if (Array.isArray(D.REVIEW) && D.REVIEW.length && !D.REVIEW.some((g) => g && !g.lec)) core.noSide = true;
   if (D.COUNT_SKIP && Object.keys(D.COUNT_SKIP).length) core.reviewOnly = Object.keys(D.COUNT_SKIP).filter(k => D.COUNT_SKIP[k]);
+  const hy = highYield({ notes: clean(D.READINGS), topics: clean(D.LIKELY_TOPICS), hints: clean(D.HINTS), questions: clean(D.QUESTIONS) });
   const out = {
     "core.json": JSON.stringify(core),
     "questions.json": JSON.stringify(clean(D.QUESTIONS)),
     /* hy: the third reading level, each lecture's predicted topics with the paragraphs of its notes that teach them
        (tools/hub-next/high-yield.mjs; Sam, 2026-11-12) */
-    "notes.json": JSON.stringify({ full: clean(D.READINGS), plain: clean(D.READINGS_PLAIN),
-      hy: highYield({ notes: clean(D.READINGS), topics: clean(D.LIKELY_TOPICS), hints: clean(D.HINTS), questions: clean(D.QUESTIONS) }) }),
+    "notes.json": JSON.stringify({ full: clean(D.READINGS), plain: clean(D.READINGS_PLAIN), hy,
+      hyAudio: Object.keys(hy).filter((lec) => hyRecorded(hub, lec, hy[lec])) }),
     "study.json": JSON.stringify({ hints: clean(D.HINTS), cram: clean(D.CRAM), review: clean(D.REVIEW), sequences: clean(D.SEQUENCES), sortSets: clean(D.SORT_SETS) })
   };
 
@@ -290,4 +306,4 @@ for (const hub of Object.keys(HUBS)) {
   }
   console.log(`${hub}: ${n} questions${CHECK ? "" : ", content up to date"}`);
 }
-if (stale) { console.error(`${stale} file(s) stale: the live hub changed since its new version's content was built.`); process.exit(1); }
+if (stale) { console.error(`${stale} file(s) stale: the live hub changed since its new version's content was built (or a lecture's High yield narration was recorded since).`); process.exit(1); }

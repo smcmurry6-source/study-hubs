@@ -14,8 +14,11 @@ a fresh rendering, and an alignment of that timeline's speech and pauses to the 
 onto the real recording, so narration made with other pauses or an older lexicon still lines up. Nothing is re-spoken and
 the mp3 is never touched. tools/narrate.py writes the file itself, from Kokoro's exact timings, whenever it renders an mp3.
 
-The file: {"v": 1, "bytes": <mp3 size>, "dur": <seconds>, "w": "word word ...", "t": [start, end, start, end, ...]}, times in
-hundredths of a second, one pair per word of "w" (split on spaces), the words as the page shows them, in reading order.
+The file: {"v": 1, "bytes": <mp3 size>, "dur": <seconds>, "w": "word word ...", "t": [start, end, start, end, ...], "h": ...},
+times in hundredths of a second, one pair per word of "w" (split on spaces), the words as the page shows them, in reading
+order; "h" (narrate.text_hash) says which text the mp3 was spoken from, written by tools/narrate.py and kept here while the
+mp3 is the same one. High yield's narration (level hy) must have it: tools/hub-next/build.mjs offers the recording to the
+page only while it matches today's High yield, and the smoke lint fails when it doesn't.
 vault/how-to/narrate-with-kokoro.md.
 """
 import argparse, bisect, difflib, json, os, re, subprocess, sys
@@ -390,20 +393,28 @@ def write(hub, lec, level, timed, alen):
     return write_file(mp3_path(hub, lec, level), timed, alen)
 
 
-def write_file(mp3, timed, alen):
-    """timed: [(word, start, end)] in seconds, in reading order; written beside the mp3 as <name>.words.json."""
+def write_file(mp3, timed, alen, h=None):
+    """timed: [(word, start, end)] in seconds, in reading order; written beside the mp3 as <name>.words.json. h: which text
+    the mp3 was spoken from (narrate.text_hash); without it, the old file's h is kept if it was made from this same mp3."""
     ws, ts = [], []
     for w, a, b in timed:
         ws.append(w); ts += [int(round(a * 100)), int(round(max(a, b) * 100))]
-    out = {"v": 1, "bytes": os.path.getsize(mp3), "dur": round(alen, 2), "w": " ".join(ws), "t": ts}
-    with open(re.sub(r"\.mp3$", ".words.json", mp3), "w") as f: json.dump(out, f, separators=(",", ":"))
+    wf, size = re.sub(r"\.mp3$", ".words.json", mp3), os.path.getsize(mp3)
+    if h is None and os.path.exists(wf):
+        try:
+            old = json.load(open(wf))
+            if old.get("bytes") == size: h = old.get("h")
+        except ValueError: pass
+    out = {"v": 1, "bytes": size, "dur": round(alen, 2), "w": " ".join(ws), "t": ts}
+    if h: out["h"] = h
+    with open(wf, "w") as f: json.dump(out, f, separators=(",", ":"))
     return len(ws)
 
 
 def files(hub, lecs=None, levels=None):
     notes = json.load(open(os.path.join(ROOT, "hubs", hub, "next", "content", "notes.json")))
     out = []
-    for level in levels or ["full", "plain"]:
+    for level in levels or ["full", "plain", "hy"]:
         for lec in (notes.get(level) or {}):
             if lecs and lec not in lecs: continue
             if os.path.exists(mp3_path(hub, lec, level)): out.append((lec, level))
@@ -427,7 +438,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("hub")
     ap.add_argument("--lec", action="append")
-    ap.add_argument("--level", choices=["full", "plain"], action="append")
+    ap.add_argument("--level", choices=["full", "plain", "hy"], action="append")
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--stale", action="store_true", help="only the files --check lists")
     ap.add_argument("--render", action="store_true", help="the exact way: speak the notes again and align the recordings (slow)")

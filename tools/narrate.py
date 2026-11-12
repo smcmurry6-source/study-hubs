@@ -1,22 +1,29 @@
-"""Narrate a hub's lecture notes with Kokoro: audio/<lecture>-full.mp3 (As taught) and audio/<lecture>-plain.mp3 (Plain English).
+"""Narrate a hub's lecture notes with Kokoro: audio/<lecture>-full.mp3 (As taught), audio/<lecture>-plain.mp3 (Plain English)
+and, for the redesign, audio/<lecture>-hy.mp3 (High yield, read from hubs/<hub>/next/content/notes.json).
 
-The rule (vault/rules/text-and-audio-never-drift.md): change a lecture's notes at either level and regenerate that
-level's mp3 in the same PR. Kokoro installs itself the first time it's missing (tools/kokoro-setup.sh: kokoro-onnx,
+The rule (vault/rules/text-and-audio-never-drift.md): change a lecture's notes at any level and regenerate that
+level's mp3 in the same PR. High yield is rebuilt from the notes, predicted topics, hints and questions
+(tools/hub-next/high-yield.mjs), so it changes when they do: the smoke lint names a lecture whose High yield changed since
+its mp3, and tools/hub-next/build.mjs offers the recording to the page only while it matches. Kokoro installs itself the first time it's missing (tools/kokoro-setup.sh: kokoro-onnx,
 soundfile and the model files in /tmp/kokoro, or $KOKORO_DIR; vault/how-to/narrate-with-kokoro.md). Hard words use tools/podcast/lexicon.json, the same lexicon as Timmy Time.
 
   python3 tools/narrate.py hubs/<hub>/index.html                      every lecture, both levels (skips existing files)
   python3 tools/narrate.py hubs/<hub>/index.html --lec dmpharm --level full --force
   python3 tools/narrate.py hubs/<hub>/index.html --text --lec dmpharm  print the spoken text, no audio
   python3 tools/narrate.py hubs/<hub>/index.html --jobs 4              lectures in parallel processes
+  python3 tools/narrate.py hubs/<hub>/next/content/notes.json --level hy --jobs 4
+                                                                      High yield (the redesign), every lecture that has it;
+                                                                      then node tools/hub-next/build.mjs --hub <hub>
 
 It reads the hub's `var READINGS = {...};` and `var READINGS_PLAIN = {...};` lines (one JSON object each), or perio's
-READINGS['<id>'] = `...`; template-literal blocks, turns the HTML
+READINGS['<id>'] = `...`; template-literal blocks, or the redesign's notes.json (full, plain and hy), turns the HTML
 into spoken text (the "What's tested" box, headings with a pause, paragraphs, list items, and each table row read as
 "first cell: header, cell; ..."), and writes a 24 kHz mono 64 kbps mp3 like the hubs' existing narration, and beside it
 <lecture>-<level>.words.json, when each word of the notes is spoken (Kokoro's own timings), for the redesign's Follow along
-(tools/narration_words.py makes the same file for an mp3 made any other way).
+(tools/narration_words.py makes the same file for an mp3 made any other way), with "h", which text it was made from
+(text_hash()).
 """
-import argparse, html, json, os, re, subprocess, sys, tempfile
+import argparse, hashlib, html, json, os, re, subprocess, sys, tempfile
 from html.parser import HTMLParser
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -36,7 +43,7 @@ SAY = [
     (r"\bT3\b", "T three"), (r"\bT4\b", "T four"), (r"\bGLP-1\b", "G L P one"), (r"\bDPP-4\b", "D P P four"), (r"\bSGLT2\b", "S G L T two"),
     (r"\bGLUT2\b", "glute two"), (r"\bGLUT4\b", "glute four"), (r"\bIGF-1\b", "I G F one"), (r"\bMEN ?1\b", "men one"), (r"\bMEN ?2A?\b", "men two"),
     (r"\b5-alpha\b", "five alpha"), (r"\b5α\b", "five alpha"), (r"α", "alpha "), (r"β", "beta "), (r"γ", "gamma "), (r"δ", "delta "),
-    (r"&", " and "), (r"\s/\s", " or "), (r"\+/-", " plus or minus "),
+    (r"&", " and "), (r"\s/\s", " or "), (r"\+/-", " plus or minus "), (r"\s·\s", ", "),
     # rating marks in tables (+++ / ++ / + / −) when they stand alone, not "Ca2+" or a negative number
     (r"(?<![\w+])\+\+\+(?![\w+])", " three plus "), (r"(?<![\w+])\+\+(?![\w+])", " two plus "),
     (r"(?<![\w+])\+(?![\w+])", " plus "), (r"(?<![\w−])−(?![\w−])", " minus "),
@@ -52,15 +59,17 @@ class Spoken(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
         self.items, self.buf, self.stack = [], [], []
+        self.sbuf = []    # the same text as the page shows it, where it's read differently (High yield's topic numbers)
         self.table, self.row, self.cell, self.head = None, None, None, []
         self.in_tested = False
         self.shown = []   # for each "text" item, the words as the page shows them (tools/narration_words.py)
 
     def flush(self, pause=0.45):
         t = " ".join("".join(self.buf).split())
-        self.buf = []
+        s = " ".join("".join(self.sbuf).split())
+        self.buf, self.sbuf = [], []
         if t:
-            self.shown.append(t)
+            self.shown.append(s)
             if t[-1] not in ".?!:;": t += "."
             self.items.append(("text", t))
             self.items.append(("pause", pause))
@@ -72,11 +81,11 @@ class Spoken(HTMLParser):
         if tag == "table": self.flush(); self.table, self.head = [], []
         elif tag == "tr" and self.table is not None: self.row = []
         elif tag in ("td", "th") and self.table is not None: self.cell = []
-        elif tag == "br": self.buf.append(" ")
-        self.stack.append(tag)
+        elif tag == "br": self.buf.append(" "); self.sbuf.append(" ")
+        self.stack.append(tag if not (tag == "span" and "hy-n" in (a.get("class") or "")) else "hy-n")
 
     def handle_endtag(self, tag):
-        if self.stack and self.stack[-1] == tag: self.stack.pop()
+        if self.stack and (self.stack[-1] == tag or (tag == "span" and self.stack[-1] == "hy-n")): self.stack.pop()
         if self.table is not None:
             if tag in ("td", "th") and self.cell is not None:
                 self.row.append(" ".join("".join(self.cell).split())); self.cell = None
@@ -110,7 +119,9 @@ class Spoken(HTMLParser):
             if self.cell is not None: self.cell.append(d)
             if self.stack and self.stack[-1] == "th": self._row_is_head = True
             return
-        self.buf.append(d)
+        # High yield's topic number (<span class="hy-n">2</span>): "Topic 2." aloud, the number alone on the page
+        self.buf.append("Topic " + d.strip() + ". " if self.stack and self.stack[-1] == "hy-n" and d.strip() else d)
+        self.sbuf.append(d)
 
 
 def spoken(html_text, shown=False):
@@ -124,6 +135,22 @@ def spoken(html_text, shown=False):
             if shown: out.append((kind, v, p.shown[k])); k += 1; continue
         out.append((kind, v))
     return out
+
+
+def text_hash(html_text):
+    """Which text a recording was made from: the first 12 hex digits of the SHA-1 of the notes' HTML (UTF-8), as
+    tools/hub-next/build.mjs and tools/ci/smoke.js compute it for High yield."""
+    return hashlib.sha1(html_text.encode("utf-8")).hexdigest()[:12]
+
+
+def load(path):
+    """({level: {lecture: html}}, the audio folder) from a hub's index.html (full, plain) or the redesign's notes.json
+    (hubs/<hub>/next/content/notes.json: full, plain and hy)."""
+    if path.endswith(".json"):
+        notes = json.load(open(path, encoding="utf-8"))
+        hub_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(path))))
+        return {lv: notes[lv] for lv in ("full", "plain", "hy") if isinstance(notes.get(lv), dict)}, os.path.join(hub_dir, "audio")
+    return readings(open(path, encoding="utf-8").read()), os.path.join(os.path.dirname(os.path.abspath(path)), "audio")
 
 
 def readings(hub_html):
@@ -140,9 +167,10 @@ def readings(hub_html):
     return {"full": grab("READINGS"), "plain": grab("READINGS_PLAIN")}
 
 
-def render(items, out_mp3, voice, speed):
+def render(items, out_mp3, voice, speed, h=None):
     """items: spoken(html, shown=True). Writes out_mp3 and, beside it, its words file (tools/narration_words.py) from
-    Kokoro's own timings: when each word of the notes is spoken, for the redesign's Follow along highlight."""
+    Kokoro's own timings: when each word of the notes is spoken, for the redesign's Follow along highlight; h: text_hash()
+    of the notes it was made from."""
     from kokoro_ready import ensure
     kdir = ensure()   # installs Kokoro the first time it's missing (tools/kokoro-setup.sh)
     import soundfile as sf
@@ -154,7 +182,7 @@ def render(items, out_mp3, voice, speed):
     sf.write(wav, audio, SR)
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", wav, "-ac", "1", "-ar", str(SR), "-b:a", "64k", out_mp3], check=True)
     os.remove(wav)
-    nw.write_file(out_mp3, timed, len(audio) / SR)
+    nw.write_file(out_mp3, timed, len(audio) / SR, h)
 
 
 def split_ph(ph, n=400):
@@ -177,18 +205,18 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("hub")
     ap.add_argument("--lec", action="append")
-    ap.add_argument("--level", choices=["full", "plain"], action="append")
+    ap.add_argument("--level", choices=["full", "plain", "hy"], action="append")
     ap.add_argument("--voice", default="af_heart")
     ap.add_argument("--speed", type=float, default=1.0)
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--text", action="store_true")
     ap.add_argument("--jobs", type=int, default=1)
     a = ap.parse_args()
-    R = readings(open(a.hub, encoding="utf-8").read())
-    audio_dir = os.path.join(os.path.dirname(os.path.abspath(a.hub)), "audio")
+    R, audio_dir = load(a.hub)
     os.makedirs(audio_dir, exist_ok=True)
     jobs = []
-    for level in (a.level or ["full", "plain"]):
+    for level in (a.level or list(R)):
+        if level not in R: sys.exit("no %s level in %s" % (level, a.hub))
         for lec in R[level]:
             if a.lec and lec not in a.lec: continue
             out = os.path.join(audio_dir, "%s-%s.mp3" % (lec, level))
@@ -200,16 +228,19 @@ def main():
     from kokoro_ready import ensure
     ensure()   # once, before any parallel workers start, so they don't all install it at the same time
     if a.jobs > 1 and len(jobs) > 1:
+        # longest lecture first, each to the worker with the least text so far, so they all finish about together
+        loads = [[0, []] for _ in range(a.jobs)]
+        for job in sorted(jobs, key=lambda j: -len(R[j[1]][j[0]])):
+            w = min(loads, key=lambda x: x[0]); w[0] += len(R[job[1]][job[0]]); w[1].append(job)
         procs = []
-        for i in range(a.jobs):
-            mine = jobs[i::a.jobs]
+        for _, mine in loads:
             if not mine: continue
             args = [sys.executable, os.path.abspath(__file__), a.hub, "--voice", a.voice, "--speed", str(a.speed), "--force"]
             for lec, level, _ in mine: args += ["--only", lec + ":" + level]
             procs.append(subprocess.Popen(args, env=dict(os.environ, OMP_NUM_THREADS="1")))
         sys.exit(max(p.wait() for p in procs))
     for lec, level, out in jobs:
-        render(spoken(R[level][lec], shown=True), out, a.voice, a.speed); print("wrote", out, flush=True)
+        render(spoken(R[level][lec], shown=True), out, a.voice, a.speed, text_hash(R[level][lec])); print("wrote", out, flush=True)
 
 
 if __name__ == "__main__":
@@ -220,11 +251,10 @@ if __name__ == "__main__":
         while "--only" in argv:
             j = argv.index("--only"); pairs.append(argv[j + 1]); del argv[j:j + 2]
         hub = argv[0]; voice = argv[argv.index("--voice") + 1]; speed = float(argv[argv.index("--speed") + 1])
-        R = readings(open(hub, encoding="utf-8").read())
-        audio_dir = os.path.join(os.path.dirname(os.path.abspath(hub)), "audio")
+        R, audio_dir = load(hub)
         for p in pairs:
             lec, level = p.split(":")
             out = os.path.join(audio_dir, "%s-%s.mp3" % (lec, level))
-            render(spoken(R[level][lec], shown=True), out, voice, speed); print("wrote", out, flush=True)
+            render(spoken(R[level][lec], shown=True), out, voice, speed, text_hash(R[level][lec])); print("wrote", out, flush=True)
     else:
         main()

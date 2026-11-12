@@ -38,6 +38,25 @@ python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec dmpharm --force
 `--text` prints what it would say (check a new hub's hard words with it first), `--level full|plain` picks one level,
 `--jobs 4` runs lectures in parallel, and without `--force` it skips files that exist.
 
+**High yield** (the redesign's third reading level, since 2026-11-12) exists only in the redesign's
+`hubs/<hub>/next/content/notes.json` (`hy`), so give `narrate.py` that file instead of the hub's page:
+
+```bash
+python3 tools/narrate.py hubs/occlusion/next/content/notes.json --level hy --jobs 4             # every lecture with High yield
+python3 tools/narrate.py hubs/occlusion/next/content/notes.json --level hy --lec nccl --force   # one, again
+node tools/hub-next/build.mjs --hub occlusion                                                   # then always this
+```
+
+It writes `audio/<lecture>-hy.mp3` and its words file, which records which text it was spoken from (`"h"`, the first 12
+hex digits of the SHA-1 of the lecture's High yield HTML). The build lists the lectures whose recording matches today's
+High yield in `notes.json`'s `hyAudio`, and only those get the recording (and Follow along) on the page; the rest read in
+the device's voice. A topic number is read "Topic 2." and the "·" in "A professor's hint · 4 questions in the bank" as a
+pause. High yield changes whenever the lecture's notes, predicted topics, hints or questions do, so record it again then
+([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)); the smoke lint names a lecture whose recording no
+longer matches. One lecture on a 4-core machine speaks about 50 characters a second (10,000 characters in about 3
+minutes); `--jobs 4` manages about 40 a second in all, and the 21 lectures of 2026-11-12 (270,000 characters, 148 MB) took
+106 minutes.
+
 **Word timings for Follow along** (since 2026-11-12). The redesign highlights each word as Listen reads it
 (`widget/hub.js`), from a `<lecture>-<level>.words.json` beside each mp3: the words as the page shows them and when each is
 spoken. `narrate.py` writes it with every mp3 it renders, from Kokoro's own timings (`create_timed`, kokoro-onnx 0.6.1 or
