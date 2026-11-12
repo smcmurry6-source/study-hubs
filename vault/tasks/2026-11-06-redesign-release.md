@@ -403,8 +403,9 @@ entries; tagged new; nothing here is a secret):
 What part C built is in the place's note (its Log) and [game-server](../reference/game-server.md). It runs only on the
 redesign's pages, on the game layer (`get_my_shop`, `equip_item`), so it goes live with the release and with the shop.
 
-- [ ] **The shop first** (part B): until it is built the customizer has no "Get more in the shop" and what Timmy owns
-      comes from the server's gifts and rank pieces only (Halloween 2026's set and the Handpiece's rank sets).
+- [x] **The shop first** (part B): until it is built the customizer has no "Get more in the shop" and what Timmy owns
+      comes from the server's gifts and rank pieces only (Halloween 2026's set and the Handpiece's rank sets). (Built:
+      part B, below; the customizer's "Get more in the shop" opens it.)
 - [x] **Five everyday outfits have no drawing** ([task](done/2026-11-12-five-outfits-without-a-drawing.md), Sam's call:
       draw them or take them out of the catalog) and the five rare costumes are part B's art. Until then the place
       draws Timmy as himself in any of them. (Drawn, all ten, and approved by Sam: [#339](https://github.com/smcmurry6-source/study-hubs/pull/339), 2026-11-12.)
@@ -413,8 +414,8 @@ redesign's pages, on the game layer (`get_my_shop`, `equip_item`), so it goes li
 - [ ] **Timmy on a hub's bar doesn't wear his place's outfit yet**: `widget/pet.js` wasn't touched in part C. It
       belongs to "everyone has Timmy" ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), part 4), which changes pet.js
       anyway: the outfit equipped at his place (`shop.equipped.outfit`) should show on the bar and in the classroom.
-- [ ] **Snack HP**: `get_pet_days_v2` carries each day's `hp` from snacks and `widget/pet.js` doesn't read it yet
-      (part B, with the snacks).
+- [x] **Snack HP**: `get_pet_days_v2` carries each day's `hp` from snacks and `widget/pet.js` doesn't read it yet
+      (part B, with the snacks). (Done in part B: `simulate()` adds it, the redesign's pages ask `get_pet_days_v2`.)
 - [ ] `sw.js`: `widget/place.js`, `widget/place.css` and `widget/hub-art/place.js` join `PRECACHE` with the engine's
       files; the set files in `widget/hub-art/place/` don't (fifteen files, fetched only when a piece of that set is
       drawn).
@@ -439,8 +440,9 @@ his house card; the tap surprises go inside a `spoil` element):
   Timmy wears, from what you own. Every change is saved as you make it and follows you to your other linked devices.
   The bowling lane is long: it takes the side yard and the front corner together. "Surprise me" picks a whole new look.
 - **What you own**: the cottage on the hill is every Timmy's first home. Halloween 2026's set is a gift to everyone,
-  each full rank-up gives an outfit and a yard piece (earned, never sold), and the rest comes from the shop. (This line
-  is finished with the shop's entry, part B.)
+  each full rank-up gives an outfit and a yard piece (earned, never sold), and everything else is bought in Timmy's
+  shop with Shiny Gold Crowns. What you own is yours for good, on every device you link; spending never lowers your
+  XP or your rank.
 - **Seasons**: the yard follows the year (spring blossom, fall leaves, winter snow), and on Timmy's holidays the place
   dresses up with him.
 - **Study streak flame**: two more colors, blue from 10 days in a row and Dark Matter from 30.
@@ -470,6 +472,44 @@ his house card; the tap surprises go inside a `spoil` element):
 - **His health shows in how he moves** at his place (bouncing when sparkling, on the doorstep when he needs
   treatment), the same HP as everywhere else. A visitor never sees it: a visited Timmy is always drawn well.
 
+### From phase 4, part B (Timmy's shop, [the shop](2026-11-06-redesign-timmy-shop.md), built 2026-11-12)
+
+What part B built is in the shop's note (session 2 in its Log) and [game-server](../reference/game-server.md) ("How
+the client uses it"). It runs only on the redesign's pages, on the game layer, so it goes live with the release.
+
+- [ ] `sw.js`: `widget/shop.js`, `widget/shop.css` and `widget/hub-art/shop.js` join `PRECACHE` with the place's files
+      (they load on first use, never with a page).
+- [ ] The shop looked at on the release's own preview, phone and laptop, light and dark, reduced motion too
+      (`?persona=returning` about 300 gold crowns, `?persona=high-xp` about 20,000, `?persona=missed` about 80; a
+      rare costume: `?persona=returning&now=2027-01-07T10:00`, the detective).
+- [ ] **A hub's Shop row waits for Timmy to be adopted** (the shop draws him in the outfits, and pet.js loads on a new
+      hub only once he's adopted). "Everyone has Timmy" ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), part 4) takes
+      the condition out (`hasShop()` in `widget/hub-timmy.js`). The new dashboard always shows the balance and the button.
+
+**About page** (`about/index.html`, a new entry "Timmy's shop" after "Timmy's place" in Timmy Tooth's part, tagged
+new; the rare costumes go inside a `spoil` element):
+
+- **Shiny Gold Crowns**: the hubs' money, for Timmy's shop. You earn 1 for every 10 XP (a boost's extra XP doesn't
+  count), 25 for each trophy, 50 for each mastery medal and 20 for each rank-up. Spending them never lowers your XP or
+  your rank. Your balance is on the dashboard's "You" card and on the shop's counter.
+- **Timmy's shop**: on the dashboard's "You" card (the Shop button), in every hub under More, and from Timmy's place
+  ("Get more in the shop"). Today's picks (four pieces, new at midnight Central time), This week (three, new every
+  Monday), the seasons' sets while they're on, a "Back for today" shelf on two throwback days a month, and the snacks
+  and boosts, always. Tap anything for a closer look; Buy asks once more, with your balance after. Outfits, homes,
+  scenes, yard pieces and the home's upgrades are yours for good: "Put it on" or "Place it" takes you to the customizer.
+- **Rarity**: Common, Uncommon, Rare, Epic and Legendary, each with its own frame. The rarer a piece, the less often
+  it's on a shelf. Today's showcase is the rarest piece on sale that you don't own yet.
+- **Snacks for Timmy**: an apple (+10 HP), a cheese cube (+15), floss (+25) and a fluoride rinse (+40), one of each a
+  day, and not while he's at 100 HP. He eats it at once. Studying still heals him too.
+- **Double XP boosts**: one hour or three, starting when you buy one; a second one adds its time to the first. The
+  2x shows on your rank.
+- In a spoiler: **rare costumes**: now and then a rare costume turns up at the shop (the pirate, the astronaut, the
+  detective, the chef and the legendary Captain Enamel), on a different day for everyone. Timmy tells you when one
+  does, the Shop button gets a dot, and the costume waits on the Spotted shelf until you buy it. "Spotted: 2 of 5"
+  counts the ones you've seen; the others are shapes.
+- "What the hubs record" gets: opening the shop, a purchase (its kind: an outfit, a snack, a boost..., never which
+  piece) and a rare costume turning up are counted. What you bought is kept, so it stays yours on every device.
+
 ### What Sam's calls of 2026-11-12 change in the drafts above
 
 The sessions that build each part fix the drafts they make untrue; this is the list, so none is missed.
@@ -486,9 +526,8 @@ The sessions that build each part fix the drafts they make untrue; this is the l
   shows no share of the class at first ([the bowling egg](2026-11-06-redesign-bowling-egg.md)).
 - **Full Arch is gone**: the 32-tooth chart, its switch and its trophy (the box in Done when). Where a draft above
   lists the extras a setting turns off ("the Full Arch chart" in phase 3's Settings draft), it comes out.
-- **New drafts to come**, each written by its session under its own heading here: part B (Shiny Gold Crowns, the
-  shop, rarity, snacks, boosts; rare costumes in a spoiler), part D (the bowling egg, in a spoiler), visiting, the
-  trophy case.
+- **New drafts to come**, each written by its session under its own heading here: part D (the bowling egg, in a
+  spoiler), visiting, the trophy case. (Part B's is written: "From phase 4, part B", above.)
 - **Which hub is switched**: with no date and ten sessions to go, the release comes after Perio's final (Nov 19), so
   it switches the dashboard and whichever hub is live then. Sam hasn't named the hub that follows Perio: ask at the
   start of the release session, and build that hub on the engine from the start.

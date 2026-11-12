@@ -1,6 +1,6 @@
 {
  "about": "Known accessibility issues per screen, so tools/release/a11y.js can fail only on new ones. Lower these numbers; never raise them to make a check pass (fix the page instead), except for a deliberate change Sam approved.",
- "updated": "2026-11-11",
+ "updated": "2026-11-12",
  "pages": {
   "dashboard": {
    "axe": {
@@ -65,7 +65,8 @@
    "focus": {
     "invisible": 0,
     "stuck": 0,
-    "where": []
+    "where": [],
+    "why": []
    },
    "motion": 0
   },
@@ -400,7 +401,8 @@
    "focus": {
     "invisible": 0,
     "stuck": 0,
-    "where": []
+    "where": [],
+    "why": []
    },
    "motion": 0
   },
@@ -480,6 +482,41 @@
    "motion": 0
   },
   "perio/next (dark)": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion/next · place": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion/next · place, full view": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion/next · place, customize": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion/next · shop": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "occlusion/next · shop, an item's sheet": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion/next · shop (dark)": {
    "axe": {},
    "focus": null,
    "motion": 0

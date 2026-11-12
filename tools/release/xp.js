@@ -13,7 +13,8 @@
 //   - a replayed call, a double tap and a linked device pay once, and the rebuild gives exactly what the live calls paid;
 //   - Shiny Gold Crowns (from base XP, the grants since the switch, minus spending), the shop's rotation and seasons,
 //     buy_item (a double tap, a replayed call, a balance too low, not on sale today, owned, one snack a day, boosts that
-//     extend), equip_item, snack HP in Timmy's days, rare-costume sightings;
+//     extend), equip_item, snack HP in Timmy's days, rare-costume sightings; the preview's purchases (buyCore) answer as
+//     sh_buy does, and the rare costume of the day (widget/hub-timmy.js, widget/dash.js) never lands on a holiday or fall day;
 //   - the idea board: names, limits, votes, reports, statuses with Inbox notes, an author's delete that removes the idea
 //     completely, starter ideas, no visitor ids;
 //   - the bootstrap with all of it, the Dark Matter unlock once per journey;
@@ -767,6 +768,75 @@ try {
     'if XP ever drops below the rank, what is on stays on; it can\'t be put on again');
   ok(shopOf('xp-T').locked.length === 0 && shopOf('xp-T').inventory.filter(i => i.how === 'rank').length === 12 && shopOf('xp-T').inventory.some(i => i.how === 'bought' && i.id === 'clover-patch' && i.at), 'past Dark Matter: all twelve, beside what was bought');
   notes.push(`seasonal sets: the catalog matches sets.mjs (${SETS.items.length} rows), ${SALE.length} sample days of sh_shop_seasons, three years of shelves, throwback days, the gift set, the rank sets`);
+
+  /* ---------- 13b. the shop's client (phase 4, part B): the preview's purchases, and the rare costume of the day ---------- */
+  {
+  // the preview answers buy_item with buyCore (tools/preview/runtime/preview.js): one list of purchases through it and
+  // through sh_buy gives the same answers, in the server's order of checks (the preview's world is read from the server
+  // before each call: what's on sale that day, what's owned, the balance, a running shop boost)
+  const grabIn = (src, name) => { const i = src.indexOf('function ' + name + '('); if (i < 0) return ''; let k = src.indexOf('{', i), depth = 0; for (; k < src.length; k++) { if (src[k] === '{') depth++; else if (src[k] === '}' && --depth === 0) break; } return src.slice(i, k + 1); };
+  const prevSrc = fs.readFileSync(path.join(ROOT, 'tools/preview/runtime/preview.js'), 'utf8');
+  ok(!!grabIn(prevSrc, 'buyCore'), 'tools/preview/runtime/preview.js has buyCore');
+  const buyCore = new Function('RealDate', grabIn(prevSrc, 'buyCore') + '\nreturn buyCore;')(Date);
+  const CAT = Object.fromEntries(rows(`select id, kind, price, hp, boost_minutes, rank_tier from shop_items where active`).map(r => [r.id, r]));
+  const PD = '2027-07-10', plog = [];
+  const arr = l => q('{' + l.join(',') + '}') + '::text[]';
+  const shopBoostMs = v => { const t = one(`select (extract(epoch from max(ends_at)) * 1000)::bigint from xp_boosts where visitor_id = ${q(v)} and src = 'shop' and starts_at <= now() and ends_at > now()`); return t ? Number(t) : null; };
+  const world = v => ({ cat: CAT, log: plog, sale: rows(`select item_id from sh_shop_for(${q(v)}, ${q(PD)}::date)`).map(r => r.item_id),
+    owns: id => one(`select sh_owns(${q(v)}, ${q(id)})`) === 't', balance: () => num(`select (sh_wallet(${q(v)})->>'balance')::int`),
+    boost: () => shopBoostMs(v), setBoost: () => {}, day: PD, now: Date.now() });
+  award('xp-PV', 'rep:flag:9030', 20000); award('xp-PW', 'rep:flag:9031', 300);
+  const pvSale = world('xp-PV').sale;
+  const cheap = one(`select id from shop_items where id = any(${arr(pvSale)}) and kind not in ('snack', 'boost', 'costume') order by price, id limit 1`);
+  const notOn = one(`select id from shop_items where active and rotates and season is null and rank_tier is null and not gift and kind not in ('snack', 'boost', 'costume') and not (id = any(${arr(pvSale)})) order by id limit 1`);
+  const LIST = [
+    ['xp-PV', cheap, 'pv-buy-000001', `a piece on sale (${cheap})`], ['xp-PV', cheap, 'pv-buy-000001', 'the same call again (a replay)'],
+    ['xp-PV', cheap, 'pv-buy-000002', 'a double tap that made a new id: already owned'], ['xp-PV', 'apple', 'pv-buy-000003', 'a snack'],
+    ['xp-PV', 'apple', 'pv-buy-000004', 'the same snack again that day'], ['xp-PV', 'cheese-cube', 'pv-buy-000005', 'another snack'],
+    ['xp-PV', 'boost-1h', 'pv-buy-000006', 'a boost'], ['xp-PV', 'boost-1h', 'pv-buy-000007', 'a second boost, which extends the first'],
+    ['xp-PV', 'boost-1h', 'pv-buy-000007', 'the second boost replayed'], ['xp-PV', notOn, 'pv-buy-000008', `a piece not on sale that day (${notOn})`],
+    ['xp-PV', 'rank-dark-outfit', 'pv-buy-000009', 'a rank piece above the rank'], ['xp-PV', 'rank-antique-outfit', 'pv-buy-000010', 'a rank piece already reached'],
+    ['xp-PV', 'no-such-item', 'pv-buy-000011', 'an unknown piece'], ['xp-PV', 'apple', 'short', 'a request id too short'], ['xp-PV', 'Apple!', 'pv-buy-000013', 'an item id that isn\'t one'],
+    ['xp-PW', 'apple', 'pv-buy-000001', 'another visitor\'s request id'], ['xp-PW', 'apple', 'pv-buy-000012', 'a balance too low']];
+  const strip = r => { const o = Object.assign({}, r); delete o.boost_until; return JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]])); };
+  const msOf = t => t == null ? null : new Date(t).getTime();
+  const pOff = [];
+  for (const [v, item, req, what] of LIST) {
+    const js = buyCore(world(v), v, item, req), srv = json(`sh_buy(${q(PD)}::date, ${q(v)}, ${q(item)}, ${q(req)})`);
+    const bu = [msOf(js.boost_until), msOf(srv.boost_until)];
+    if (strip(js) !== strip(srv) || (bu[0] == null) !== (bu[1] == null) || (bu[0] != null && Math.abs(bu[0] - bu[1]) > 5000)) pOff.push(`${what}: preview ${JSON.stringify(js)}, server ${JSON.stringify(srv)}`);
+  }
+  ok(pOff.length === 0, `the preview's purchases answer as sh_buy does, ${LIST.length} calls (${pOff.length} differ${pOff.length ? ': ' + pOff.join(' | ') : ''})`);
+  const answers = LIST.map(([v, item, req]) => json(`sh_buy(${q(PD)}::date, ${q(v)}, ${q(item)}, ${q(req)})`));
+  ok(answers.filter(a => a.ok && !a.repeat).length === 0, 'the whole list sent again buys nothing more: every purchase that went through is a replay now');
+  eq(num(`select count(*) from pet_purchases where visitor_id in ('xp-PV', 'xp-PW')`), plog.length, 'the server kept as many purchases as the preview\'s log');
+  const bst = rows(`select ends_at - starts_at as len from xp_boosts where visitor_id = 'xp-PV' and src = 'shop'`);
+  ok(bst.length === 1 && /02:00:00/.test(JSON.stringify(bst[0].len)), `two one-hour boosts make one boost of two hours (${JSON.stringify(bst)})`);
+
+  // the rare costume of the day: widget/hub-timmy.js and widget/dash.js pick it the same way, only the catalog's five
+  // costumes, never on a holiday (sh_season, which section 10 checks against pet.js's holidayId) or in the fall weeks
+  // (sh_is_fall), on about one day in twelve of the rest; every day of three years, for 60 made-up visitors
+  const costumeFn = f => { const src = fs.readFileSync(path.join(ROOT, f), 'utf8'), m = /var COSTUMES = \[[^\]]*\];/.exec(src); return m && grabIn(src, 'costumeOfDay') ? new Function(m[0] + '\n' + grabIn(src, 'costumeOfDay') + '\nreturn costumeOfDay;')() : null; };
+  const cHub = costumeFn('widget/hub-timmy.js'), cDash = costumeFn('widget/dash.js');
+  ok(!!cHub && !!cDash, 'widget/hub-timmy.js and widget/dash.js each have costumeOfDay and COSTUMES');
+  if (cHub && cDash) {
+    const five = rows(`select id from shop_items where kind = 'costume' and active order by id`).map(r => r.id);
+    const days3 = rows(`select to_char(d, 'YYYY-MM-DD') as d, sh_season(d::date) as s, sh_is_fall(d::date) as f from generate_series('2026-11-12'::date, '2029-11-11'::date, interval '1 day') d`);
+    const vis = Array.from({ length: 60 }, (_, i) => 'xp-costume-' + i.toString(36) + '-' + (i * 7919).toString(36));
+    let open = 0, hits = 0; const seenC = new Set(), cOff = [];
+    for (const r of days3) for (const v of vis) {
+      const a = cHub(v, r.d, r.s || ''), b = cDash(v, r.d, r.s || '');
+      if (a !== b) cOff.push(`${v} ${r.d}: hub ${a}, dashboard ${b}`);
+      if (a && (r.s || r.f)) cOff.push(`${v} ${r.d}: ${a} on ${r.s || 'a fall day'}`);
+      if (a && !five.includes(a)) cOff.push(`${v} ${r.d}: ${a} isn't a costume in the catalog`);
+      if (!r.s && !r.f) { open++; if (a) { hits++; seenC.add(a); } }
+    }
+    ok(five.length === 5 && cOff.length === 0, `the costume of the day: the hub's and the dashboard's agree, only the catalog's costumes, never on a holiday or a fall day (${days3.length} days x ${vis.length} visitors; ${cOff.length} wrong${cOff.length ? ': ' + cOff.slice(0, 3).join(' | ') : ''})`);
+    ok(hits / open > 1 / 15 && hits / open < 1 / 10 && seenC.size === 5, `about one open day in twelve (${hits} of ${open}, 1 in ${(open / hits).toFixed(1)}), all five turn up (${[...seenC].sort().join(', ')})`);
+    ok(cHub('', '2027-07-10', '') === '' && cHub('xp-A', 'not-a-day', '') === '', 'no costume without a visitor or a day');
+  }
+  notes.push(`the shop's client: ${LIST.length} purchases through the preview's buyCore and sh_buy, the costume of the day over three years`);
+  }
 
   /* ---------- 14. visiting someone's place from the boards ---------- */
   sql(`insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values

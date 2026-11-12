@@ -719,9 +719,12 @@
     ls("sh_pet_log", JSON.stringify(log));
   }
   /* server rows + this device's tally -> HP. Deterministic for the same history, so phone and laptop agree. */
+  /* On the game layer (the redesign) a server row also carries `hp`: what the shop's snacks gave Timmy that day
+     (get_pet_days_v2, migration_v54). It is added on that day, after the day's own change, and he never goes past 100.
+     Today's rows (get_pet_days) have no `hp`, so the live pages work out exactly what they always have. */
   function simulate(serverRows){
-    var today = centralDay(), born = ls("sh_pet_born") || today, log = readLog(), by = {};
-    (serverRows || []).forEach(function(r){ var k = String(r.d).slice(0, 10); by[k] = [r.attempts | 0, r.correct | 0]; });
+    var today = centralDay(), born = ls("sh_pet_born") || today, log = readLog(), by = {}, fed = {};
+    (serverRows || []).forEach(function(r){ var k = String(r.d).slice(0, 10); by[k] = [r.attempts | 0, r.correct | 0]; if (r.hp > 0) fed[k] = r.hp | 0; });
     Object.keys(log).forEach(function(k){ var a = log[k], b = by[k] || [0, 0]; by[k] = [Math.max(a[0], b[0]), Math.max(a[1], b[1])]; });
     var start = born, earliest = addDays(today, -60);
     if (start < earliest) start = earliest;
@@ -737,6 +740,7 @@
         streak = 0; miss++;
         hp -= Math.min(20, 8 + 4 * (miss - 1));
       }
+      if (fed[day]) hp += fed[day];
       if (hp <= 0) { hp = 0; treat = true; everZero = true; }
       if (treat && hp >= 50) treat = false;
       if (hp > 100) hp = 100;
@@ -1613,7 +1617,10 @@
   }
   function loadRemote(){
     if (!M || !M.sb || !M.visitor) return;
-    M.sb.rpc("get_pet_days", { p_visitor: M.visitor }).then(function(r){
+    /* a page on the game layer asks for the days with the snacks' HP (migration_v54): a new hub says so through
+       shGame.v2(), the new dashboard by its v2 bootstrap (only that one carries `shop`); every other page as before */
+    var v2 = false; try { var bd = window.shBootstrap && window.shBootstrap.data; v2 = !!((window.shGame && window.shGame.v2 && window.shGame.v2()) || (bd && bd.shop && bd.rank && bd.rank.journey != null)); } catch (e) {}
+    M.sb.rpc(v2 ? "get_pet_days_v2" : "get_pet_days", { p_visitor: M.visitor }).then(function(r){
       if (r && !r.error && Array.isArray(r.data)) { M.rows = r.data; update(true); }
     }, function(){});
   }
@@ -2015,7 +2022,8 @@
     document.body.appendChild(t);
     setTimeout(function(){ t.remove(); }, 4200);
   }
-  function refresh(){ if (!M) return; hush(); render(); }
+  /* refresh(true): read his days again first (the shop calls it after a snack, so his HP goes up at once) */
+  function refresh(reload){ if (!M) return; hush(); if (reload === true) loadRemote(); render(); }
   /* adoption follows you to your other devices: ranks.js and the dashboard pass the badges from get_rank_profile,
      where 'pet-adopt' shows up once you've adopted him anywhere (migration_v32) */
   function syncBadges(badges){

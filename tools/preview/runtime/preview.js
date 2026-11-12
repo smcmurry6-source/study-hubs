@@ -366,7 +366,12 @@
     var st = 0; for (var i = 0; i < 63; i++) if (F2[i] <= xp) st = i;
     return { journey: Math.floor(st / 21), tier: Math.floor(st % 21 / 3), level: st % 3 + 1, step: st, gtier: Math.floor(st / 3), step_at: F2[st], next_at: st < 62 ? F2[st + 1] : null, tier_at: F2[Math.floor(st / 3) * 3], steps: 63 };
   }
-  function boost2(t){ var b = db.boost; return b && new RealDate(b.until).getTime() > t ? { mult: 2, until: b.until, src: b.src } : null; }
+  /* the running boost (sh_boost_json): a medal's 24 hours (db.boost) or the shop's (db.sboost), whichever ends later */
+  function boost2(t){
+    var b = db.boost && new RealDate(db.boost.until).getTime() > t ? { mult: 2, until: db.boost.until, src: db.boost.src } : null;
+    var s = db.sboost && new RealDate(db.sboost).getTime() > t ? { mult: 2, until: db.sboost, src: "shop" } : null;
+    return b && s ? (new RealDate(s.until).getTime() > new RealDate(b.until).getTime() ? s : b) : b || s;
+  }
   function profile2(v){
     var p = rpc("get_rank_profile", { p_visitor: v }).data, r = rank2(p.xp || 0), k;
     for (k in r) p[k] = r[k];
@@ -376,25 +381,31 @@
     p.dark_seen = v === db.visitor ? (db.dark || []).slice() : [];
     return p;
   }
-  /* ---------- Timmy's place (redesign phase 4, part C): the inventory and equip_item, as migration_v54 writes them ----------
-     The shop isn't built yet (part B), so what each test account owns is made up here: Halloween's set (everyone's, a
-     gift), the rank sets up to the account's rank (earned), and what this account "bought". Only the pieces an account
-     can own are listed: id, kind, and for an upgrade its slot; "wide" for the bowling lane. */
+  /* ---------- Timmy's place and shop (redesign phase 4, parts B and C): the catalog, the inventory, the rotation, the
+     wallet, buy_item and equip_item, as migration_v54 writes them ----------
+     The catalog is the migration's own (tools/preview/transform.js reads its two inserts into SH_PREVIEW_CONFIG.shop), so
+     the shelves sell exactly what the server will. What each test account owns is made up here: Halloween's set
+     (everyone's, a gift), the rank sets up to the account's rank (earned), what it "bought" before (PLACE_BOUGHT) and what
+     it buys in this preview (db.buys). The rotation is the server's rules with a made-up draw: a different four and three
+     than the real shop would pick, never anything the real shop couldn't sell that day. */
   var PLACE_CAT = {};
-  ("haunted-manor:home pumpkin-patch:scene floss-mummy:outfit bedsheet-ghost:outfit skeleton-suit:outfit pumpkin-lantern:yard bubbling-cauldron:yard haunted-tree:yard").split(" ")
-    .forEach(function(x){ var q = x.split(":"); PLACE_CAT[q[0]] = { kind: q[1], gift: true }; });
-  ["antique", "bronze", "silver", "gold", "diamond", "dark"].forEach(function(r, i){ PLACE_CAT["rank-" + r + "-outfit"] = { kind: "outfit", rank: i + 1 }; PLACE_CAT["rank-" + r + "-yard"] = { kind: "yard", rank: i + 1 }; });
-  ("castle:home giant-mushroom:home treehouse:home lighthouse:home beach:scene forest:scene clouds:scene night-sky:scene garden:yard swimming-pool:yard hammock:yard mouthwash-fountain:yard doghouse:yard " +
-   "bowling-lane:yard:wide mailbox:yard campfire:yard telescope:yard podcast-studio:yard sun-hat:outfit ranger-hat:outfit sunglasses-lei:outfit captain-hat:outfit aviator-cap:outfit " +
-   "fancy-windows:upgrade:windows porch:upgrade:porch chimney:upgrade:chimney flag:upgrade:flag paint-mint:upgrade:paint paint-sky:upgrade:paint paint-lilac:upgrade:paint " +
-   "harvest-barn:home harvest-fields:scene hay-bales:yard scarecrow-hat:outfit ice-rink:yard elf-suit:outfit").split(" ")
-    .forEach(function(x){ var q = x.split(":"); PLACE_CAT[q[0]] = { kind: q[1], wide: q[2] === "wide", slot: q[1] === "upgrade" ? q[2] : null }; });
+  (function(){
+    var sc = C.shop || {}, cols = sc.cols || [], rows = sc.rows || [];
+    rows.forEach(function(r){ var o = {}; cols.forEach(function(k, i){ o[k] = r[i]; }); o.rank = o.rank_tier; PLACE_CAT[o.id] = o; });
+    if (rows.length) return;
+    /* no catalog in the config (an older build): the place's own pieces, as before */
+    ("haunted-manor:home pumpkin-patch:scene floss-mummy:outfit bedsheet-ghost:outfit skeleton-suit:outfit pumpkin-lantern:yard bubbling-cauldron:yard haunted-tree:yard").split(" ")
+      .forEach(function(x){ var q = x.split(":"); PLACE_CAT[q[0]] = { id: q[0], kind: q[1], gift: true }; });
+    ["antique", "bronze", "silver", "gold", "diamond", "dark"].forEach(function(r, i){ PLACE_CAT["rank-" + r + "-outfit"] = { id: "rank-" + r + "-outfit", kind: "outfit", rank: i + 1, rank_tier: i + 1 }; PLACE_CAT["rank-" + r + "-yard"] = { id: "rank-" + r + "-yard", kind: "yard", rank: i + 1, rank_tier: i + 1 }; });
+  })();
+  var PLACE_OLD = ("castle giant-mushroom treehouse lighthouse beach forest clouds night-sky garden swimming-pool hammock mouthwash-fountain doghouse bowling-lane mailbox campfire telescope podcast-studio " +
+    "sun-hat ranger-hat sunglasses-lei captain-hat aviator-cap fancy-windows porch chimney flag paint-mint paint-sky paint-lilac harvest-barn harvest-fields hay-bales scarecrow-hat ice-rink elf-suit").split(" ");
   var PLACE_BOUGHT = {
     "new": [], "missed": [],
     "returning": ["garden", "mailbox", "sun-hat", "chimney", "paint-mint"],
     "archived": ["giant-mushroom", "forest", "campfire", "ranger-hat", "hammock"],
     "admin": ["treehouse", "beach", "swimming-pool", "sunglasses-lei", "flag"],
-    "high-xp": Object.keys(PLACE_CAT).filter(function(k){ return !PLACE_CAT[k].gift && !PLACE_CAT[k].rank; })
+    "high-xp": PLACE_OLD.filter(function(k){ return PLACE_CAT[k] && !PLACE_CAT[k].gift && !PLACE_CAT[k].rank; })
   };
   var PLACE_START = {
     "returning": { "yard-left": "garden", "yard-front": "mailbox", chimney: "chimney" },
@@ -402,23 +413,141 @@
     "admin": { home: "treehouse", "yard-left": "swimming-pool" },
     "high-xp": { home: "castle", scene: "clouds", "yard-left": "mouthwash-fountain", "yard-right": "telescope", "yard-side": "bowling-lane", "yard-front": "podcast-studio", outfit: "rank-gold-outfit", flag: "flag", porch: "porch" }
   };
+  /* what each test account has earned in Shiny Gold Crowns before this preview (Sam's spec: new 0, returning about 300,
+     missed about 80 so a purchase is refused for its balance, high-XP about 20,000); answers here add 1 for every 10 XP */
+  var WALLET_START = { "new": 0, returning: 300, missed: 80, "high-xp": 20000, archived: 1500, admin: 5000 };
   function placeOwned(v){
     var own = {}, g = rank2(rpc("get_rank_profile", { p_visitor: v }).data.xp || 0).gtier;
     Object.keys(PLACE_CAT).forEach(function(k){ var c = PLACE_CAT[k]; if (c.gift) own[k] = "gift"; else if (c.rank && c.rank <= g) own[k] = "rank"; });
-    if (v === db.visitor) (PLACE_BOUGHT[db.persona] || []).forEach(function(k){ own[k] = "bought"; });
+    if (v === db.visitor) {
+      (PLACE_BOUGHT[db.persona] || []).forEach(function(k){ own[k] = "bought"; });
+      (db.buys || []).forEach(function(b){ var c = PLACE_CAT[b.item]; if (c && c.kind !== "snack" && c.kind !== "boost") own[b.item] = "bought"; });
+    }
     return own;
   }
   function placeEquipped(){
     if (!db.equip) { db.equip = {}; var st = PLACE_START[db.persona] || {}, own = placeOwned(db.visitor); Object.keys(st).forEach(function(k){ if (own[st[k]]) db.equip[k] = st[k]; }); }
     return db.equip;
   }
+  function wallet2(v){
+    if (!v || v !== db.visitor) return null;
+    var earned = (WALLET_START[db.persona] || 0) + Math.floor((db.xp2 || 0) / 10), spent = 0;
+    (db.buys || []).forEach(function(b){ spent += b.price || 0; });
+    return { earned: earned, spent: spent, balance: earned - spent, from_xp: earned, trophies: 0, medals: 0, rankups: 0 };
+  }
+  /* the server's calendar (sh_shop_seasons): every season whose set is on sale that Central day */
+  function easterOf(y){ var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25), g = Math.floor((b - f + 1) / 3),
+    h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4, l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+    return RealDate.UTC(y, Math.floor((h + l - 7 * m + 114) / 31) - 1, ((h + l - 7 * m + 114) % 31) + 1); }
+  function shopSeasons(dd){
+    var p = dd.split("-"), y = +p[0], x = +p[1] * 100 + +p[2], t = RealDate.UTC(y, +p[1] - 1, +p[2]), D1 = 864e5, r = [];
+    var f = new RealDate(RealDate.UTC(y, 10, 1)).getUTCDay(), tgEnd = RealDate.UTC(y, 10, 1 + ((4 - f + 7) % 7) + 21 + 1), ea = easterOf(y), den = RealDate.UTC(y, 2, 6);
+    if (x >= 1001 && x <= 1031) r.push("halloween");
+    if (x >= 1101 && t <= tgEnd) r.push("thanksgiving");
+    if (t > tgEnd && x <= 1226 && x >= 1101) r.push("winter");
+    if (x >= 1227 || x <= 102) r.push("newyear");
+    if (t >= ea - 53 * D1 && t <= ea - 47 * D1) r.push("mardigras");
+    if (x >= 208 && x <= 214) r.push("valentine");
+    if (x >= 222 && x <= 228) r.push("toothfairy");
+    if (t >= den - 6 * D1 && t <= den) r.push("dentist");
+    if (x >= 311 && x <= 317) r.push("stpatrick");
+    if (t >= ea - 6 * D1 && t <= ea + D1) r.push("easter");
+    if (x >= 628 && x <= 704) r.push("july4");
+    if (x >= 320 && x <= 531) r.push("spring");
+    if (x >= 601 && x <= 921) r.push("summer");
+    if (x >= 922 && x <= 1130) r.push("fall");
+    return r;
+  }
+  var RAR_W = { common: 10, uncommon: 6, rare: 3, epic: 1.5, legendary: .6 };
+  function shopPick(seed, n, ok, w){
+    return Object.keys(PLACE_CAT).filter(function(id){ return ok(PLACE_CAT[id]); })
+      .map(function(id){ var c = PLACE_CAT[id]; return { id: id, k: -Math.log(((hash(seed + ":" + id) >>> 0) + .5) / 4294967296) / (RAR_W[c.rarity] || .6) / (w ? w(c) : 1) }; })
+      .sort(function(a, b){ return a.k - b.k || (a.id < b.id ? -1 : 1); }).slice(0, n).map(function(x){ return x.id; });
+  }
+  function everyday(c){ return c.rotates !== false && !c.season && !c.gift && !c.rank && c.kind !== "snack" && c.kind !== "boost" && c.kind !== "costume"; }
+  function isThrowback(dd){ var p = dd.split("-"), hm = hash("throwback:" + p[0] + "-" + p[1]) >>> 0; return +p[2] === 1 + hm % 14 || +p[2] === 15 + (hm >>> 8) % 14; }
+  /* one day's shop for this visitor (sh_shop_for): [{ id, shelf, pos }] */
+  function shopDay(v, dd){
+    var p = dd.split("-"), wd = new RealDate(RealDate.UTC(+p[0], +p[1] - 1, +p[2])).getUTCDay(), mon = new RealDate(RealDate.UTC(+p[0], +p[1] - 1, +p[2] - ((wd + 6) % 7))).toISOString().slice(0, 10);
+    var seasons = shopSeasons(dd), out = [], push = function(list, shelf){ list.forEach(function(id, i){ out.push({ id: id, shelf: shelf, pos: i + 1 }); }); };
+    var week = shopPick("week:" + mon, 3, everyday);
+    push(week, "weekly");
+    push(shopPick("day:" + dd, 4, function(c){ return everyday(c) && week.indexOf(c.id) < 0; }), "daily");
+    push(Object.keys(PLACE_CAT).filter(function(id){ return seasons.indexOf(PLACE_CAT[id].season) >= 0; })
+      .sort(function(a, b){ var A = PLACE_CAT[a], B = PLACE_CAT[b]; return seasons.indexOf(A.season) - seasons.indexOf(B.season) || (A.sort || 0) - (B.sort || 0) || (a < b ? -1 : 1); }), "season");
+    if (isThrowback(dd)) push(shopPick("throwback:" + dd, 3, function(c){ return c.season && seasons.indexOf(c.season) < 0 && !c.gift && !c.rank && c.kind !== "snack" && c.kind !== "boost" && c.kind !== "costume"; },
+      function(c){ return c.kind === "home" || c.kind === "scene" ? .4 : 1; }), "throwback");
+    push(Object.keys(PLACE_CAT).filter(function(id){ return PLACE_CAT[id].shelf; }).sort(function(a, b){ return (PLACE_CAT[a].sort || 0) - (PLACE_CAT[b].sort || 0); }), "always");
+    if (v && v === db.visitor) { var own = placeOwned(v); (db.costumes || []).forEach(function(c){ if (PLACE_CAT[c.id] && !own[c.id]) out.push({ id: c.id, shelf: "spotted", pos: 1 }); }); }
+    return { seasons: seasons, throwback: isThrowback(dd), items: out };
+  }
+  function shopBoost(t){ var b = db.sboost; return b && new RealDate(b).getTime() > t ? new RealDate(b).getTime() : null; }
   function shop2(v){
-    var mine = v && v === db.visitor, own = v ? placeOwned(v) : {}, eq = {};
+    var mine = v && v === db.visitor, own = v ? placeOwned(v) : {}, eq = {}, dd = day(now()), sd = shopDay(v, dd);
     if (mine) { var e = placeEquipped(); Object.keys(e).forEach(function(k){ eq[k] = e[k]; }); }
-    return { day: day(now()), seasons: [], throwback: false, wallet: mine ? Math.floor((rpc("get_rank_profile", { p_visitor: v }).data.xp || 0) / 10) : null, items: [],
-      inventory: Object.keys(own).sort().map(function(k){ return { id: k, at: own[k] === "bought" ? iso(now() - 864e5 * 3) : null, how: own[k] }; }),
-      locked: Object.keys(PLACE_CAT).filter(function(k){ return PLACE_CAT[k].rank && !own[k]; }).map(function(k){ return { id: k, name: k, kind: PLACE_CAT[k].kind, rarity: PLACE_CAT[k].rank < 3 ? "rare" : PLACE_CAT[k].rank < 5 ? "epic" : "legendary", rank_tier: PLACE_CAT[k].rank }; }),
-      equipped: eq, costumes: [], snacks_today: [], boost: mine ? boost2(now()) : null };
+    var ORDER = ["always", "daily", "season", "spotted", "throwback", "weekly"];
+    var items = sd.items.slice().sort(function(a, b){ return ORDER.indexOf(a.shelf) - ORDER.indexOf(b.shelf) || a.pos - b.pos; }).map(function(s){
+      var c = PLACE_CAT[s.id] || {};
+      return { id: s.id, name: c.name || s.id, kind: c.kind, rarity: c.rarity, price: c.price, season: c.season || null, slot: c.slot || null, hp: c.hp == null ? null : c.hp,
+        boost_minutes: c.boost_minutes == null ? null : c.boost_minutes, boost_mult: c.boost_mult == null ? null : c.boost_mult, shelf: s.shelf, gift: !!c.gift, owned: !!own[s.id] };
+    });
+    var at = function(k){ var b = (db.buys || []).filter(function(x){ return x.item === k; })[0]; return b ? b.at : own[k] === "bought" ? iso(now() - 864e5 * 3) : null; };
+    return { day: dd, seasons: sd.seasons, throwback: sd.throwback, wallet: wallet2(v), items: items,
+      inventory: Object.keys(own).map(function(k){ return { id: k, at: at(k), how: own[k] }; }).sort(function(a, b){ return (a.at ? 0 : 1) - (b.at ? 0 : 1) || (a.at < b.at ? -1 : a.at > b.at ? 1 : 0) || (a.id < b.id ? -1 : 1); }),
+      locked: Object.keys(PLACE_CAT).filter(function(k){ return PLACE_CAT[k].rank && !own[k]; }).sort(function(a, b){ return PLACE_CAT[a].rank - PLACE_CAT[b].rank || (PLACE_CAT[a].sort || 0) - (PLACE_CAT[b].sort || 0); })
+        .map(function(k){ var c = PLACE_CAT[k]; return { id: k, name: c.name || k, kind: c.kind, rarity: c.rarity || (c.rank < 3 ? "rare" : c.rank < 5 ? "epic" : "legendary"), rank_tier: c.rank }; }),
+      equipped: eq, costumes: mine ? (db.costumes || []).map(function(c){ return { id: c.id, day: c.day }; }) : [],
+      snacks_today: mine ? (db.buys || []).filter(function(b){ return b.kind === "snack" && b.day === dd; }).map(function(b){ return b.item; }).filter(function(x, i, a){ return a.indexOf(x) === i; }) : [],
+      boost: mine ? boost2(now()) : null };
+  }
+  /* buy_item, check for check in the server's order (sh_buy): a bad call, a replay (the same answer again, marked) or
+     someone else's request id, an unknown item, owned already, a rank item, not on sale today, a second snack of a kind
+     today, the balance. A world `w` says what the server knows; tools/release/xp.js runs this same function against
+     sh_buy through one list of purchases. */
+  function buyCore(w, v, item, req){
+    if (!v || String(v).length > 80 || !item || !/^[a-z0-9][a-z0-9-]{0,39}$/.test(item) || !req || !/^[A-Za-z0-9_-]{8,64}$/.test(req)) return { ok: false, error: "bad" };
+    var prev = null; w.log.forEach(function(p){ if (p.req === req) prev = p; });
+    if (prev) { if (prev.v !== v) return { ok: false, error: "dup" }; var rep = {}; Object.keys(prev.resp || {}).forEach(function(k){ rep[k] = prev.resp[k]; }); rep.repeat = true; return rep; }
+    var it = w.cat[item];
+    if (!it) return { ok: false, error: "unknown" };
+    if (it.kind !== "snack" && it.kind !== "boost" && w.owns(item)) return { ok: false, error: "owned" };
+    if (it.rank_tier != null) return { ok: false, error: "rank", rank_tier: it.rank_tier };
+    if (w.sale.indexOf(item) < 0) return { ok: false, error: "not-today" };
+    if (it.kind === "snack" && w.log.some(function(p){ return p.v === v && p.item === item && p.day === w.day; })) return { ok: false, error: "today" };
+    var bal = w.balance();
+    if (bal < it.price) return { ok: false, error: "balance", balance: bal, price: it.price };
+    var until = null;
+    if (it.kind === "boost") { var b = w.boost(); until = (b || w.now) + it.boost_minutes * 60000; w.setBoost(until); }
+    var resp = { ok: true, item: item, kind: it.kind, price: it.price, balance: bal - it.price, hp: it.hp == null ? null : it.hp, boost_until: until == null ? null : new RealDate(until).toISOString() };
+    w.log.push({ req: req, v: v, item: item, kind: it.kind, price: it.price, hp: it.hp == null ? null : it.hp, day: w.day, at: new RealDate(w.now).toISOString(), resp: resp });
+    return resp;
+  }
+  function buy2(v, item, req){
+    if (!v || v !== db.visitor) return buyCore({ cat: PLACE_CAT, log: [], sale: [], owns: function(){ return false; }, balance: function(){ return 0; }, boost: function(){ return null; }, setBoost: function(){}, day: day(now()), now: now() }, v, item, req);
+    db.buys = db.buys || [];
+    var t = now(), res = buyCore({ cat: PLACE_CAT, log: db.buys, sale: shopDay(v, day(t)).items.map(function(x){ return x.id; }), owns: function(id){ return !!placeOwned(v)[id]; },
+      balance: function(){ return wallet2(v).balance; }, boost: function(){ return shopBoost(t); }, setBoost: function(ms){ db.sboost = iso(ms); }, day: day(t), now: t }, v, item, req);
+    save();
+    return res;
+  }
+  /* record_costume_sighting: one new costume a day, logged once, and it joins that visitor's shop until bought */
+  function sight2(v, c){
+    var it = PLACE_CAT[c];
+    if (!v || String(v).length > 80 || !it || it.kind !== "costume") return { ok: false, error: "bad" };
+    if (v !== db.visitor) return { ok: true, first: true };
+    db.costumes = db.costumes || [];
+    if (db.costumes.some(function(x){ return x.id === c; })) return { ok: true, first: false };
+    var dd = day(now());
+    if (db.costumes.some(function(x){ return x.day === dd; })) return { ok: false, error: "today" };
+    db.costumes.push({ id: c, day: dd }); save();
+    return { ok: true, first: true };
+  }
+  /* Timmy's days with the HP his snacks gave each day (get_pet_days_v2; the bootstrap's pet_days the same) */
+  function petDays2(t){
+    var by = {};
+    bootstrapPetDays(t).forEach(function(r){ by[r.d] = { d: r.d, attempts: r.attempts, correct: r.correct, hp: 0 }; });
+    (db.buys || []).forEach(function(b){ if (b.hp == null || t - new RealDate(b.day + "T12:00:00").getTime() > 70 * 864e5) return; var r = by[b.day] || (by[b.day] = { d: b.day, attempts: 0, correct: 0, hp: 0 }); r.hp += b.hp; });
+    return Object.keys(by).sort().map(function(k){ return by[k]; });
   }
   /* equip_item, line for line as the migration has it: the slot must be one of the thirteen, the piece owned and of the
      slot's kind; the lane always stands in the side yard and clears the front corner; a piece in the front corner
@@ -1144,13 +1273,16 @@
         if (typeof r.xp === "number" && r.tier != null) { var rr = rank2(r.xp); o2.journey = rr.journey; o2.tier = rr.tier; o2.level = rr.level; }
         return o2; });
       else if (d2 && d2.rank) { d2.rank = profile2(v); if (Array.isArray(d2.inbox)) d2.inbox = d2.inbox.concat(ideaNotes(v)); d2.shop = shop2(v);
-        if (Array.isArray(d2.pet_days)) d2.pet_days = d2.pet_days.map(function(r){ return { d: r.d, attempts: r.attempts, correct: r.correct, hp: 0 }; }); }
+        if (Array.isArray(d2.pet_days)) d2.pet_days = petDays2(t); }
       return { data: d2 };
     }
     /* Timmy's place (phase 4, part C): what this account owns and where it stands, as migration_v54 answers it */
     if (fn === "get_my_shop") return { data: shop2(v) };
     if (fn === "equip_item") return { write: v === db.visitor, data: equip2(v, a.p_slot, a.p_item) };
-    if (fn === "get_pet_days_v2") return { data: v === db.visitor ? bootstrapPetDays(t).map(function(r){ return { d: r.d, attempts: r.attempts, correct: r.correct, hp: 0 }; }) : [] };
+    if (fn === "get_pet_days_v2") return { data: v === db.visitor ? petDays2(t) : [] };
+    /* the shop (phase 4, part B): buying and the rare costumes' log */
+    if (fn === "buy_item") return { write: v === db.visitor, data: buy2(v, a.p_item, a.p_request) };
+    if (fn === "record_costume_sighting") return { write: v === db.visitor, data: sight2(v, a.p_costume) };
     if (fn === "record_answer_v2") return { write: true, data: answer2(a, t) };
     if (fn === "mark_dark_unlock_seen") { if (v === db.visitor) { db.dark = db.dark || []; if (db.dark.indexOf(a.p_journey) < 0) db.dark.push(a.p_journey); save(); } return { write: true, data: true }; }
     if (fn === "xp_session_start") {

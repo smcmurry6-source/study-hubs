@@ -127,6 +127,17 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   `how`: `bought`, `gift` or `rank`), `locked` (the rank items not reached yet, with the `rank_tier` that unlocks each),
   what's equipped, the costume log, today's snacks and the boost. Snack HP shows in `get_pet_days_v2`.
   `sh_buy(day, ...)` and `sh_my_shop(day, ...)` are the same two with the date given, private, for the tests.
+- **How the client uses it** (`widget/shop.js`, session 2 of [the shop](../tasks/2026-11-06-redesign-timmy-shop.md)):
+  the balance and the shelves come from the bootstrap's `shop`, then one `get_my_shop` when the shop opens and one after
+  each purchase (handed to the place: `shPlace.setup({ shop })`); `buy_item`'s `balance` is shown at once. A purchase's
+  request id is made when an item's sheet opens and reused for every try from it (a double tap, a retry after a dropped
+  connection), and a new one only after `dup`. A snack's reply has no HP: `widget/pet.js` reads his days again
+  (`shPet.refresh(true)`, `get_pet_days_v2`), and `simulate()` adds each day's `hp` after the day's own change. A
+  boost's `boost_until` goes to `shGame.setBoost` unless a longer boost is already running. `get_my_shop`'s items don't
+  carry `wide`: the client reads it from the place's kit. The rare costume of the day is worked out on the page
+  (`costumeOfDay` in `widget/hub-timmy.js` and `widget/dash.js`: about one day in twelve from the visitor id and the
+  Central day, never on a holiday or in the fall weeks), and `record_costume_sighting` is called only on that day if
+  the costume isn't in `shop.costumes` yet (once a day per device). `tools/release/xp.js` checks both against the server.
 
 ## Visiting
 
@@ -263,7 +274,7 @@ migration: that one is Sam's call when its session starts.
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (344 checks: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (367 checks: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, and a place opened from a board row). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;

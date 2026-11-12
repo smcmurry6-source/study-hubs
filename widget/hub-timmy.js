@@ -9,6 +9,11 @@
    links, the saved state for "What should I study tonight?", whether the hub is archived) and opens it from a question
    card's "Ask Timmy" (widget/hub-bank.js puts the button there once the question is answered).
 
+   And Timmy's shop (vault/tasks/2026-11-06-redesign-timmy-shop.md, session 2): its page in More (widget/shop.js draws
+   it, fetched the first time that page is opened), the balance on the Shop tile, and the rare costume of the day: on
+   about one day in twelve with no holiday or fall weeks a costume turns up at the shop, Timmy says so once, and it waits
+   on the shop's Spotted shelf (record_costume_sighting). All of it only once the database has the game layer.
+
    The names it takes from the core are listed first; what the other files call from here is put on HX at the end.
    ============ */
 (window.SH_HUB_PARTS = window.SH_HUB_PARTS || {}).timmy = function(HX){
@@ -59,6 +64,94 @@
       });
     }, shut);
   }
+
+  /* ---------- Timmy's shop (phase 4, part B): its page in More, the balance on its tile, the costume of the day.
+     widget/shop.js (window.shShop) draws the shop and fetches its art and the place's kit itself; none of it loads with
+     the page. The shop is there once the page's bootstrap carries one (the game layer, migration_v54). ---------- */
+  var COIN = '<path d="M6.2 17.4 C4.5 14.3 3.5 10.9 4.3 8.1 C4.9 5.9 6.5 4.4 8.4 4.5 C10 4.6 10.8 6.1 12 6.1 C13.2 6.1 14 4.6 15.6 4.5 C17.5 4.4 19.1 5.9 19.7 8.1 C20.5 10.9 19.5 14.3 17.8 17.4 Z" fill="#F2C94C" stroke="#3B2E3A" stroke-width="1.6"/><path d="M15.7 5.3 C17.4 5.5 18.6 6.7 19 8.4 C19.6 11 18.8 14.2 17.4 16.8 L14.9 16.4 C16.6 12.6 17.1 8.8 15.7 5.3 Z" fill="#C9971C"/><path d="M12 6.4 V9.6 M9.4 9 Q12 10.5 14.6 9" fill="none" stroke="#9C7414" stroke-width="1.1"/><ellipse cx="12" cy="17.5" rx="5.8" ry="2.3" fill="#8A6410" stroke="#3B2E3A" stroke-width="1.6"/><path d="M7.4 18.3 Q12 20.3 16.6 18.3 Q12 21 7.4 18.3 Z" fill="#C9971C"/><path d="M6.3 9.4 C6.5 7.8 7.2 6.8 8.1 6.3" stroke="#fff" stroke-width="1.3" fill="none" opacity=".6"/><path d="M8.6 9.6 Q9 11.2 10.6 11.6 Q9 12 8.6 13.6 Q8.2 12 6.6 11.6 Q8.2 11.2 8.6 9.6 Z" fill="#FFFFFF"/>';
+  /* the Shiny Gold Crown (widget/hub-art/shop.js's coinBody(), copied here so the tile needs no request) */
+  function shopCoin(px){ return '<svg class="ic" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + COIN + "</svg>"; }
+  var SHOP = null;
+  function shopOf(){ var b = window.shBootstrap, d = b && b.data; return SHOP || (d && d.shop && d.shop.wallet ? d.shop : null); }
+  /* he's there once adopted, as his place is (everyone has Timmy comes with the next session) */
+  function hasShop(){ return !!shopOf() && hasTimmy(); }
+  function shopMeta(){
+    var sh = shopOf(), bal = sh && sh.wallet ? sh.wallet.balance : null;
+    return (ls("sh_shop_dot") === dayCT() ? "● A rare costume came in · " : "") + (bal == null ? "" : String(bal).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " gold crowns");
+  }
+  function dayCT(){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()); } catch (e) { return ""; } }
+  /* the rare costume of the day, the same on every reload and every linked device: from the visitor id and the Central
+     day, on about one day in twelve among the days with no holiday (holiday: widget/pet.js's holidayId() that day) and
+     outside the fall weeks (September 22 to November 30), one of the five. widget/dash.js has the same function, and
+     tools/release/xp.js checks both against the server's sh_season and sh_is_fall for every day of three years. */
+  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+  function costumeOfDay(visitor, day, holiday){
+    if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
+    var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";
+    var s = visitor + "|costume|" + day, h = 2166136261;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    h = h >>> 0;
+    return h % 12 === 0 ? COSTUMES[Math.floor(h / 12) % COSTUMES.length] : "";
+  }
+  function shopStart(){
+    var boot = window.shBootstrap && window.shBootstrap.ready;
+    if (!boot || !boot.then) return;
+    boot.then(function(d){
+      if (!d || !d.shop || !d.shop.wallet) return;
+      SHOP = d.shop;
+      if (HX.view === "more" && !HX.sub) HX.go("more", true);
+      whenWidget("shPet", function(P){
+        var sb = window.shSupabase, v = ls("sh_visitor_id"), day = dayCT(), hol = "";
+        if (!P || !sb || !v || !day) return;
+        try { hol = P.holidayId ? P.holidayId() : ""; } catch (e) { return; }
+        var c = costumeOfDay(v, day, hol);
+        if (!c || (d.shop.costumes || []).some(function(x){ return x && x.id === c; }) || ls("sh_costume_asked") === day) return;
+        ls("sh_costume_asked", day);
+        sb.rpc("record_costume_sighting", { p_visitor: v, p_costume: c }).then(function(r){
+          var a = r && !r.error && r.data;
+          if (!a || !a.ok || !a.first) return;
+          try { localStorage.setItem("sh_shop_dot", day); } catch (e) {}
+          window.shTrack && window.shTrack("shop:spotted");
+          setTimeout(function(){ say("Something rare came in at the shop today: the " + (c === "captain-enamel" ? "Captain Enamel" : c) + " costume. It’s on the Spotted shelf."); }, 2500);
+          if (HX.view === "more" && !HX.sub) HX.go("more", true);
+        }, function(){});
+      });
+    }, function(){});
+  }
+  function moreShop(body){
+    var shut = function(){ if (body.isConnected) body.innerHTML = '<p class="note">The shop couldn’t be opened just now. Try again in a moment.</p>'; };
+    if (!hasTimmy()) { body.innerHTML = '<p class="note">Timmy hasn’t moved in yet. Adopt him on the dashboard and his shop opens here.</p>'; return; }
+    var closed = function(){ if (body.isConnected) body.innerHTML = '<p class="note">The shop isn’t open yet. It opens with the new hubs.</p>'; };
+    loadScript(WIDGET + "shop.js").then(function(){
+      whenWidget("shSupabase", function(sb){
+        var go = function(){
+          var S = window.shShop, boot = window.shBootstrap;
+          if (!body.isConnected || HX.view !== "more") return;
+          if (!S || !sb) { shut(); return; }
+          /* the balance and the shelves ride in the page's bootstrap: a link straight to the shop waits for it */
+          var draw = function(d){
+            if (!body.isConnected || HX.view !== "more") return;
+            if (!SHOP && d && d.shop && d.shop.wallet) SHOP = d.shop;
+            if (!shopOf()) { closed(); return; }
+            S.setup({ sb: sb, visitor: ls("sh_visitor_id"), shop: shopOf(), profile: HX.RANK.p, onBought: shopBought });
+            body.innerHTML = '<div class="shop-host"></div>';
+            S.mount(body.firstChild, { level: 2 });
+          };
+          if (shopOf()) draw(null); else if (boot && boot.ready && boot.ready.then) boot.ready.then(draw, closed); else closed();
+        };
+        if (window.shPet) go(); else { if (window.shLoadPet) window.shLoadPet(); whenWidget("shPet", function(){ go(); }); }
+      });
+    }, shut);
+  }
+  /* a purchase: a boost starts the 2x chip on the rank pill at once, with the server's end time */
+  function shopBought(res){
+    var G = window.shGame, cur = G && G.boost ? G.boost() : null;
+    if (!res || !res.boost_until || !G || !G.setBoost) return;
+    /* a medal's boost that runs longer keeps the chip; the server counts whichever ends later, too */
+    if (!cur || new Date(cur.until).getTime() < new Date(res.boost_until).getTime()) G.setBoost({ mult: 2, until: res.boost_until, src: "shop" });
+    HX.paintMeters();
+  }
+  document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) SHOP = sh; });
 
   /* ---------- Ask Timmy (widget/ask.js, window.shAsk) ---------- */
   var askLoad = null, askMounted = false;
@@ -132,5 +225,6 @@
 
   /* what the other files call from here */
   HX.say = say; HX.petHp = petHp; HX.timmyReact = timmyReact; HX.petFromBadges = petFromBadges; HX.hasTimmy = hasTimmy; HX.morePlace = morePlace;
+  HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.costumeOfDay = costumeOfDay;
   HX.askStart = askStart; HX.askOn = askOn; HX.askLabel = askLabel; HX.askAbout = askAbout;
 };

@@ -648,6 +648,126 @@ function lint(hub, A){
       notes.push(`${name} (${label}): Timmy's place, its full view and the customizer`);
       await page.close();
     }
+    /* Timmy's shop (phase 4, part B: widget/shop.js, its art widget/hub-art/shop.js and the place's kit). On the game
+       layer, with a made-up shop in the bootstrap and buy_item stubbed here (nothing is recorded): More has the Shop
+       tile, nothing of the shop loads with the page, the shelves draw, a purchase lowers the balance and the piece shows
+       as Yours and in the customizer, a double tap sends one request id, a dropped connection charges nothing and the
+       retry sends the same id, a refusal says why and changes nothing, a snack can't be bought while Timmy is at 100 HP
+       (the bootstrap's pet_days carry the snack's hp, read by widget/pet.js), every button names its click by data-shop
+       alone, and an item's name is never drawn as markup. */
+    for (const hub of nextHubs.slice(0, 1)) {
+      const page = await context.newPage(); const errs = [], name = `${hub}/next, Timmy's shop`, asked = [], buys = [];
+      page.on('pageerror', e => errs.push(e.message));
+      page.on('request', r => { if (/\/widget\/(shop\.(js|css)|hub-art\/shop\.js)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
+      const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date());
+      await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
+      const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
+      const wallet = { earned: 300, spent: 0, balance: 300, from_xp: 230, trophies: 50, medals: 0, rankups: 20 }, inv = [], seen = new Map();
+      let refuse = '', drop = false;
+      const item = (id, nm, kind, rarity, price, shelf, x) => Object.assign({ id, name: nm, kind, rarity, price, season: null, slot: null, hp: null, boost_minutes: null, boost_mult: null, shelf, gift: false, owned: false }, x || {});
+      const CAT = [item('sandcastle', 'Sand<img src=x onerror="window.__shopx=1">castle', 'yard', 'common', 150, 'daily'), item('igloo', 'Igloo', 'yard', 'epic', 2200, 'daily'),
+        item('bow-tie', 'Bow tie', 'outfit', 'common', 120, 'weekly'), item('apple', 'Apple', 'snack', 'common', 100, 'always', { hp: 10 }),
+        item('boost-1h', 'Double XP for 1 hour', 'boost', 'rare', 600, 'always', { boost_minutes: 60, boost_mult: 2 })];
+      const shop = () => ({ day: today, seasons: [], throwback: false, wallet: Object.assign({}, wallet), items: CAT.map(x => Object.assign({}, x, { owned: inv.some(i => i.id === x.id) })),
+        inventory: inv.slice(), locked: [], equipped: {}, costumes: [], snacks_today: [], boost: null });
+      const fed = [{ d: today, attempts: 0, correct: 0, hp: 100 }];
+      const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => json(route, { rank, mastery: [], shop: shop(), pet_days: fed }));
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => json(route, shop()));
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_pet_days_v2/, route => json(route, fed));
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/buy_item/, route => {
+        let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
+        buys.push(a.p_request + ' ' + a.p_item);
+        if (drop) { drop = false; return route.abort(); }
+        if (seen.has(a.p_request)) return json(route, Object.assign({}, seen.get(a.p_request), { repeat: true }));
+        const it = CAT.find(x => x.id === a.p_item);
+        if (refuse) return json(route, { ok: false, error: refuse });
+        if (!it) return json(route, { ok: false, error: 'unknown' });
+        if (inv.some(i => i.id === it.id)) return json(route, { ok: false, error: 'owned' });
+        if (wallet.balance < it.price) return json(route, { ok: false, error: 'balance', balance: wallet.balance, price: it.price });
+        wallet.balance -= it.price; wallet.spent += it.price; inv.push({ id: it.id, at: new Date().toISOString(), how: 'bought' });
+        const res = { ok: true, item: it.id, kind: it.kind, price: it.price, balance: wallet.balance, hp: null, boost_until: null };
+        seen.set(a.p_request, res); return json(route, res);
+      });
+      await page.goto(BASE() + `hubs/${hub}/next/index.html#more`); await page.waitForTimeout(2500);
+      const tile = await page.evaluate(() => [...document.querySelectorAll('a[href="#more/shop"]')].map(x => x.textContent.replace(/\s+/g, ' ')).join(' | '));
+      if (!tile) problems.push(`${name} (${label}): More has no "Timmy's shop" tile on the game layer`);
+      else if (!/300 gold crowns/.test(tile)) problems.push(`${name} (${label}): the Shop tile should show the balance from the bootstrap (${tile})`);
+      if (asked.length) problems.push(`${name} (${label}): the shop's files loaded with the page (${asked.join(', ')}): they load on first use`);
+      await page.evaluate(() => { location.hash = 'more/shop'; });
+      const store = await page.waitForSelector('.shop-host .tsh-store', { timeout: 20000 }).catch(() => null);
+      if (!store) problems.push(`${name} (${label}): More > Timmy's shop didn't draw the shop`);
+      else {
+        await page.waitForTimeout(800);
+        if (!['shop.js', 'shop.css', 'hub-art/shop.js'].every(f => asked.includes(f))) problems.push(`${name} (${label}): the shop drew without its files (${asked.join(', ')})`);
+        const s = await page.evaluate(() => {
+          const r = document.querySelector('.tsh-store'), cards = [...r.querySelectorAll('.tsh-card[data-item]')], btns = [...document.querySelectorAll('.tsh-store button')];
+          return { bal: (r.querySelector('[data-shop-bal]') || {}).textContent, shelves: [...r.querySelectorAll('.tsh-shelf')].map(x => x.className.replace(/.*tsh-shelf-/, '')),
+            state: Object.fromEntries(cards.map(c => [c.dataset.item, c.className.replace(/.*\bs-/, '')])), x: !!window.__shopx || !!r.querySelector('img[src="x"]'),
+            nameTxt: (r.querySelector('.tsh-card[data-item="sandcastle"] .tsh-rname') || {}).textContent || '',
+            first: btns.filter(b => { const d = [...b.attributes].map(a => a.name).filter(n => n.indexOf('data-') === 0); return d[0] !== 'data-shop'; }).map(b => b.outerHTML.slice(0, 80)),
+            w: document.documentElement.scrollWidth - innerWidth };
+        });
+        if (s.bal !== '300') problems.push(`${name} (${label}): the shop's balance reads "${s.bal}", not 300`);
+        if (s.shelves.join() !== 'today,week,spotted,always') problems.push(`${name} (${label}): the shop's shelves are ${s.shelves.join(', ')}, not Today's picks, This week, Spotted (the five costumes as shapes) and Always here (an empty shelf is left out)`);
+        const spot = await page.evaluate(() => ({ shapes: document.querySelectorAll('.tsh-shelf-spotted .tsh-unseen').length, cards: document.querySelectorAll('.tsh-shelf-spotted .tsh-card[data-item]').length }));
+        if (spot.shapes !== 5 || spot.cards) problems.push(`${name} (${label}): with no costume spotted yet, the Spotted shelf shows the five as shapes and nothing to buy (${JSON.stringify(spot)})`);
+        if (s.state.sandcastle !== 'buy' || s.state.igloo !== 'short' || s.state.apple !== 'full' || s.state['boost-1h'] !== 'short') problems.push(`${name} (${label}): the cards' states are ${JSON.stringify(s.state)}`);
+        if (s.x) problems.push(`${name} (${label}): an item's name was drawn as markup`);
+        else if (!/<img/.test(s.nameTxt)) problems.push(`${name} (${label}): an item's name should show as text (${s.nameTxt})`);
+        if (s.first.length) problems.push(`${name} (${label}): every button in the shop names its click by data-shop first (${s.first.join(' / ')})`);
+        if (s.w > 1) problems.push(`${name} (${label}): the shop scrolls sideways by ${s.w}px`);
+        const open = async id => { await page.click(`.tsh-store .tsh-card[data-item="${id}"]`); return page.waitForSelector('dialog.tsh-sheet[open]', { timeout: 5000 }).catch(() => null); };
+        const sheetSays = () => page.evaluate(() => { const d = document.querySelector('dialog.tsh-sheet[open]'); return d ? d.innerText.replace(/\s+/g, ' ') : ''; });
+        /* a snack while he's at 100 HP: no Buy */
+        if (await open('apple')) {
+          const a = await page.evaluate(() => { const b = document.querySelector('dialog.tsh-sheet [data-shop="confirm"]'); return { dis: !b || b.disabled, txt: document.querySelector('dialog.tsh-sheet').innerText }; });
+          if (!a.dis || !/full/i.test(a.txt)) problems.push(`${name} (${label}): a snack at 100 HP should say he's full and offer no Buy`);
+          await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+        } else problems.push(`${name} (${label}): tapping a card didn't open its sheet`);
+        if (vp.isMobile) { /* the phone: shelves scroll sideways inside, the page doesn't */
+          const ph = await page.evaluate(() => { const c = document.querySelector('.tsh-shelf-today .tsh-rcards'); return c ? { x: getComputedStyle(c).overflowX, w: c.scrollWidth > c.clientWidth } : null; });
+          if (!ph || !/auto|scroll/.test(ph.x)) problems.push(`${name} (${label}): on a phone a shelf should scroll sideways (${JSON.stringify(ph)})`);
+        } else {
+          /* a dropped connection charges nothing; the retry sends the same request id; a double tap sends one */
+          if (await open('sandcastle')) {
+            drop = true;
+            await page.click('dialog.tsh-sheet [data-shop="confirm"]'); await page.waitForTimeout(700);
+            const d1 = await sheetSays(), bal1 = await page.textContent('.tsh-store [data-shop-bal]');
+            if (!/nothing was charged/.test(d1) || bal1 !== '300') problems.push(`${name} (${label}): a dropped connection should say nothing was charged and leave 300 (${bal1}; ${d1.slice(0, 120)})`);
+            await page.dblclick('dialog.tsh-sheet [data-shop="confirm"]'); await page.waitForTimeout(1600);
+            const ids = buys.map(b => b.split(' ')[0]);
+            if (buys.length !== 2 || ids[0] !== ids[1] || !/^[A-Za-z0-9_-]{8,64}$/.test(ids[0])) problems.push(`${name} (${label}): the retry and its double tap should send one request with the first try's id (${buys.join(', ')})`);
+            const d2 = await sheetSays(), bal2 = await page.textContent('.tsh-store [data-shop-bal]');
+            if (!/It’s yours/.test(d2) || bal2 !== '150') problems.push(`${name} (${label}): after buying, the sheet should say it's yours and the balance read 150 (${bal2}; ${d2.slice(0, 120)})`);
+            await page.waitForTimeout(800);
+            const st = await page.evaluate(() => (document.querySelector('.tsh-store .tsh-card[data-item="sandcastle"]') || {}).className || '');
+            if (!/\bs-owned\b/.test(st)) problems.push(`${name} (${label}): a bought piece's card should show Yours (${st})`);
+            /* a refusal says why and changes nothing */
+            await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+            if (await open('bow-tie')) {
+              refuse = 'not-today'; const n = buys.length;
+              await page.click('dialog.tsh-sheet [data-shop="confirm"]'); await page.waitForTimeout(700);
+              const d3 = await sheetSays(), bal3 = await page.textContent('.tsh-store [data-shop-bal]');
+              if (buys.length !== n + 1 || !/left the shelf/.test(d3) || bal3 !== '150' || /It’s yours/.test(d3)) problems.push(`${name} (${label}): a refusal should say why and change nothing (${bal3}; ${d3.slice(0, 120)})`);
+              refuse = '';
+              await page.click('dialog.tsh-sheet [data-shop="confirm"]'); await page.waitForTimeout(1600);
+              const wear = await page.$('dialog.tsh-sheet [data-shop="wear"]');
+              if (!wear) problems.push(`${name} (${label}): a bought outfit should offer "Put it on"`);
+              else {
+                await wear.click();
+                const pl = await page.waitForSelector('dialog.tpv[open] .tpv-card[data-item="bow-tie"]', { timeout: 15000 }).catch(() => null);
+                if (!pl) problems.push(`${name} (${label}): "Put it on" should open the customizer on Timmy's outfits, with the bow tie in it`);
+                await page.keyboard.press('Escape'); await page.waitForTimeout(400);
+              }
+            }
+          }
+        }
+      }
+      errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+      notes.push(`${name} (${label}): Timmy's shop, a purchase, a refusal and a dropped connection`);
+      await page.close();
+    }
     /* the new dashboard's "you" card: the place takes the house picture's spot once Timmy is adopted. The page is at its
        request budget, so nothing of the place loads with it; the place draws on first use and keeps a still, and the
        next visit shows that still at once, still without a request. */
@@ -678,6 +798,54 @@ function lint(hub, A){
       }
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
       notes.push(`${name} (${label}): the place in the "you" card, on first use and from its still`);
+      await page.close();
+    }
+    /* the new dashboard's balance and Shop button (widget/dash.js): the balance comes from the bootstrap, the shop's
+       files load only when the button is tapped, the shop opens as a dialog and Escape gives focus back to the button.
+       And a live hub never asks for any of it: no shop files, no get_pet_days_v2, no buy_item. */
+    if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
+      const page = await context.newPage(); const errs = [], name = `next (dashboard), Timmy's shop`, asked = [];
+      page.on('pageerror', e => errs.push(e.message));
+      page.on('request', r => { if (/\/widget\/(shop\.(js|css)|hub-art\/shop\.js)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
+      /* this device last saw the same rank, so no rank-up card covers the page */
+      await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_tour_done', '1'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
+      const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
+      const shop = { day: '2026-11-12', seasons: [], throwback: false, wallet: { earned: 1234, spent: 0, balance: 1234 }, items: [{ id: 'bow-tie', name: 'Bow tie', kind: 'outfit', rarity: 'common', price: 120, shelf: 'weekly', owned: false }],
+        inventory: [], locked: [], equipped: {}, costumes: [], snacks_today: [], boost: null };
+      const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => json(route, { rank, shop }));
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => json(route, shop));
+      await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(2500);
+      const w = await page.evaluate(() => { const e = document.getElementById('youShop'); return e ? { hidden: e.hidden, text: e.innerText.replace(/\s+/g, ' '), btn: !!e.querySelector('button[data-dash="shop"]') } : null; });
+      if (!w || w.hidden || !/1,234 Shiny Gold Crowns/.test(w.text) || !w.btn) problems.push(`${name} (${label}): the "you" card should show the balance from the bootstrap and a Shop button (${JSON.stringify(w)})`);
+      if (asked.length) problems.push(`${name} (${label}): the shop's files loaded with the dashboard (${asked.join(', ')}): they load when the button is tapped`);
+      if (await page.$('.sh-ru.is-on')) { await page.keyboard.press('Escape'); await page.waitForTimeout(600); }
+      if (w && w.btn) {
+        await page.click('#youShop [data-dash="shop"]', { timeout: 8000 }).catch(e => problems.push(`${name} (${label}): the Shop button couldn't be tapped (${e.message.split('\n')[0]})`));
+        const dlg = await page.waitForSelector('dialog.tsh-dlg[open] .tsh-store', { timeout: 20000 }).catch(() => null);
+        if (!dlg) problems.push(`${name} (${label}): the Shop button didn't open the shop`);
+        else {
+          if (!asked.includes('shop.js')) problems.push(`${name} (${label}): the shop opened without fetching shop.js`);
+          const d = await page.evaluate(() => { const g = document.querySelector('dialog.tsh-dlg'), h = document.getElementById(g.getAttribute('aria-labelledby'));
+            return { name: h ? h.textContent : '', ids: [...document.querySelectorAll('[id]')].map(e => e.id).filter((x, i, a) => a.indexOf(x) !== i), w: g.scrollWidth - g.clientWidth }; });
+          if (!/Timmy’s Shop/.test(d.name)) problems.push(`${name} (${label}): the shop's dialog has no name (${d.name})`);
+          if (d.ids.length) problems.push(`${name} (${label}): ids used twice with the shop open: ${d.ids.join(', ')}`);
+          if (d.w > 1) problems.push(`${name} (${label}): the shop's dialog scrolls sideways by ${d.w}px`);
+          await page.keyboard.press('Escape'); await page.waitForTimeout(500);
+          const back = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tsh-dlg'), focus: document.activeElement && document.activeElement.getAttribute('data-dash') }));
+          if (back.open || back.focus !== 'shop') problems.push(`${name} (${label}): Escape should close the shop and give focus back to the Shop button (${JSON.stringify(back)})`);
+        }
+      }
+      errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+      notes.push(`${name} (${label}): the balance and the Shop button on the "you" card`);
+      await page.close();
+    }
+    for (const hub of hubs.slice(0, 1)) {
+      const page = await context.newPage(); const asked = [];
+      page.on('request', r => { const u = r.url(); if (/\/widget\/(shop\.(js|css)|hub-art\/shop\.js)|rpc\/(get_pet_days_v2|buy_item|get_my_shop|record_costume_sighting)/.test(u)) asked.push(u.replace(/^.*\/(widget|rpc)\//, '')); });
+      await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); } catch (e) {} });
+      await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(2500);
+      if (asked.length) problems.push(`${hub} (${label}): a live hub asked for the shop (${asked.join(', ')}): it stays on the redesign's pages until the release`);
       await page.close();
     }
     await context.close();

@@ -21,6 +21,8 @@
    it always stands in the side yard and takes the front corner too. On a database without the game layer the place
    shows the defaults with your rank and medals, and the customizer isn't offered.
 
+   The customizer's "Get more in the shop" fetches Timmy's shop (widget/shop.js, part B) and opens it over the place.
+
    Every button carries a fixed data-tp value, so click counts (widget/clicks.js) never pick up anyone's words.
    ============ */
 (function(){
@@ -248,7 +250,7 @@
       '<div class="tpv-body"><div class="tpv-stagewrap"><div class="tpv-stage"></div><p class="tpv-wait" role="status">Opening the door…</p>' +
       '<button type="button" class="tpv-chip tpv-zoom" data-tp="zoom" aria-pressed="true" hidden>Close-up</button></div><div class="tpv-side"></div></div><div class="tpv-over" hidden></div></div>';
     D.body.appendChild(dlg);
-    V = { dlg: dlg, m: o.place ? theirs(o.place) : mine(), mode: "play", pick: "home", wide: false, src: {}, at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, camRaf: 0, cam: null, bub: null,
+    V = { dlg: dlg, m: o.place ? theirs(o.place) : mine(), mode: "play", pick: /^(home|scene|timmy|left|front|corner|side|right)$/.test(o.pick || "") ? o.pick : "home", wide: false, src: {}, at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, camRaf: 0, cam: null, bub: null,
       lastTap: 0, wander: 0, visible: true, back: D.activeElement, onClose: o.onClose || null };
     dlg.addEventListener("close", shut);
     dlg.addEventListener("cancel", function(e){ if (!$(".tpv-over", dlg).hidden) { e.preventDefault(); overClose(); } });
@@ -685,7 +687,7 @@
         return '<button type="button" class="tpv-swatch' + (o.paint === p.k ? " on" : "") + '" data-tp="paint" data-paint="' + p.k + '" aria-pressed="' + (o.paint === p.k) + '" aria-label="' + esc(nm) + '" title="' + esc(nm) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div></div>";
     }
     if (kind === "yard" && (pick === "side" || pick === "corner") && mineOf.some(function(y){ return y.wide; })) body += '<p class="tpv-note">The bowling lane is long: it takes the side yard and the front corner together.</p>';
-    body += '<div class="tpv-row tpv-foot"><button type="button" class="tpv-btn" data-tp="surprise">Surprise me</button></div>';
+    body += '<div class="tpv-row tpv-foot"><button type="button" class="tpv-btn" data-tp="surprise">Surprise me</button><button type="button" class="tpv-btn" data-tp="shop">Get more in the shop</button></div>';
     var keep = $(".tpv-dcards", el), top = keep && V.kept === kind + src ? keep.scrollTop : 0; V.kept = kind + src;
     el.innerHTML = dock + '<div class="tpv-drawer d-' + kind + '">' + body + "</div>";
     if (top) $(".tpv-dcards", el).scrollTop = top;
@@ -705,6 +707,20 @@
     $$("[data-up]", el).forEach(function(b){ b.addEventListener("click", function(){ var u = byK(TP.UPGRADES, b.dataset.up), on = !e[u.k]; equip(u.k, on ? u.id : null, on ? { burst: "home" } : {}); }); });
     $$("[data-paint]", el).forEach(function(b){ b.addEventListener("click", function(){ var p = byK(TP.PAINTS, b.dataset.paint); equip("paint", p.id || null, {}); }); });
     var su = $('[data-tp="surprise"]', el); if (su) su.addEventListener("click", surprise);
+    var sh = $('[data-tp="shop"]', el); if (sh) sh.addEventListener("click", toShop);
+  }
+  /* Timmy's shop (widget/shop.js, phase 4 part B), fetched the first time it's wanted; it opens over the place, and what
+     you buy there is handed back here (setup({ shop }) and repaint()) */
+  /* the shop takes the screen; closing it comes back here, on the same tab (unless a purchase's "Put it on" or "Place it"
+     already opened the place on that piece's tab) */
+  function toShop(){
+    script(BASE + "shop.js").then(function(){
+      if (!W.shShop) return;
+      var pick = V ? V.pick : "home";
+      W.shShop.setup({ sb: S.sb, visitor: S.visitor, profile: S.profile || undefined });
+      close();
+      W.shShop.open({ onClose: function(){ if (!V) open({ customize: true, pick: pick }); } });
+    }, function(){ say("The shop didn’t open just now. Try again in a moment."); });
   }
   /* Surprise me: a whole new place, from what you own */
   function surprise(){
