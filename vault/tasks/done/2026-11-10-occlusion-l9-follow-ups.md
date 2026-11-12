@@ -1,11 +1,10 @@
 ---
 type: task
-status: blocked
+status: done
 hub: occlusion
 created: 2026-11-10
 requested-by: Sam
 due: 2026-11-16
-waiting-on: Dr. Lawson's slides; the other 11/12 lecture
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/305
 ---
@@ -17,9 +16,9 @@ pr: https://github.com/smcmurry6-source/study-hubs/pull/305
 L9 `nccl` went live from Dr. Lawson's prerecorded lecture alone (the transcript `en-Dr. Lawson NCCLs.txt` in Drive
 Occlusion/Hubs/Final; no slides yet). Sam: "this is technically part of the session for this thursday, but it was
 prerecorded instead. i dont have his slides yet or the other lecture from thursday." Three things are left before the
-final (Mon Nov 16), the sooner the better ([ship-it-now](../rules/ship-it-now.md)):
+final (Mon Nov 16), the sooner the better ([ship-it-now](../../rules/ship-it-now.md)):
 
-1. **Diagram review** ([diagram-review](../rules/diagram-review.md)): Sam approves or skips each candidate below, one by
+1. **Diagram review** ([diagram-review](../../rules/diagram-review.md)): Sam approves or skips each candidate below, one by
    one; build only the approved ones.
 2. **The slides check:** when Dr. Lawson's slides reach the Drive folder, check the notes, questions, hints and likely
    topics against them (as L8's were in [PR #270](https://github.com/smcmurry6-source/study-hubs/pull/270)).
@@ -27,9 +26,9 @@ final (Mon Nov 16), the sooner the better ([ship-it-now](../rules/ship-it-now.md
 
 ## Context
 
-- Hub note: [occlusion](../hubs/occlusion.md). Change log: "2026-11-10 (Occlusion L9" in `DEPLOY_NOTES.md`.
-- Rules: [diagrams-anima](../rules/diagrams-anima.md), [figures-teach-the-lecture](../rules/figures-teach-the-lecture.md),
-  [outside-sources-for-figures](../rules/outside-sources-for-figures.md), [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)
+- Hub note: [occlusion](../../hubs/occlusion.md). Change log: "2026-11-10 (Occlusion L9" in `DEPLOY_NOTES.md`.
+- Rules: [diagrams-anima](../../rules/diagrams-anima.md), [figures-teach-the-lecture](../../rules/figures-teach-the-lecture.md),
+  [outside-sources-for-figures](../../rules/outside-sources-for-figures.md), [text-and-audio-never-drift](../../rules/text-and-audio-never-drift.md)
   (a notes change means both mp3s again, `audio/nccl-full.mp3` and `-plain.mp3`).
 - Names spelled by ear in the recording, to check on the slides: **Dzakovich** (the brushing study; the transcript has
   "Dzajakovich", and he said he can't pronounce it), Dr. Burgess (his mentor, the camel), "Basic Bites", "Milo's sweet
@@ -66,12 +65,12 @@ final (Mon Nov 16), the sooner the better ([ship-it-now](../rules/ship-it-now.md
 
 ## Done when
 
-- [x] Sam has approved or skipped each candidate; the answers are in [decisions](../decisions.md) and the hub note
+- [x] Sam has approved or skipped each candidate; the answers are in [decisions](../../decisions.md) and the hub note
 - [x] The approved figures are built and checked at 390 px in both themes, with screenshots for Sam
-- [ ] Dr. Lawson's slides are checked against L9's notes, questions, hints and likely topics (the names above), with
-      both mp3s rebuilt if the notes change
-- [ ] The other 11/12 lecture is added as L10 (or Sam says there's nothing to add)
-- [ ] CI passes; vault written back (hub note, decisions, this note's Outcome)
+- [x] Dr. Lawson's slides are checked against L9's notes, questions, hints and likely topics (the names above), with
+      both mp3s rebuilt if the notes change (2026-11-12, all three levels)
+- [x] The other 11/12 lecture is added as L10 (2026-11-12: Dr. Abou-Arraj's occlusal trauma, with five figures)
+- [x] CI passes; vault written back (hub note, decisions, this note's Outcome)
 
 ## Log
 
@@ -82,7 +81,21 @@ final (Mon Nov 16), the sooner the better ([ship-it-now](../rules/ship-it-now.md
   matching paragraphs; in Review as three `figs` sections. The About page's Diagrams entry has an L9 sentence. The page went
   to 1379 KB, so the budget is 1395 KB now (BUG-055).
 
+- 2026-11-12: Sam: "i just added the last occlusion materials to the folder" (Dr. Lawson's slides, Dr. Abou-Arraj's
+  slides and the 11/12 recording). **The slides check:** the slides are mostly pictures and name none of Dzakovich,
+  Dr. Burgess, Basic Bites, Crest Pro-Health or the 124 toothpaste, so those keep the recording's spellings (no question
+  is keyed on a name). The notes gained what the slides add: RDA below 250 for the ADA seal, the sensor changing color,
+  where acid demineralizes vs where plaque does, the buffering experiment's pH 6.5, OJ (about 3.6) and wine (about 4.0)
+  needing the most bicarbonate though they aren't the lowest pH, mouth rinses as low as about 3.2, "Milo's unsweet tea"
+  beside the recording's sweet tea with Splenda, and the summary slide; Review and the cram sheet follow, and two
+  questions are new (`nc-rda-seal`, `nc-erosion-sites`). The cupped cusp tips, the mouth-rinse pH and the battery-acid
+  line aren't on the slides, so the earlier calls stand. **L10** (`occtrauma`, Dr. Abou-Arraj, "Occlusion and Periodontal
+  Correlations"): notes at both levels, 59 questions in every format, three Patient Box cases, 19 hints, 11 likely topics,
+  Review, cram, two sort sets, two side-by-side rows, the mock at 9 each from L6-L10, tag `plum`. Sam: "yes to all figures
+  and anima" (Figs 27-31). L9 and L10 narrated at all three levels.
+
 ## Outcome
 
-The diagrams are done (2026-11-10, all four approved and built; see the Log). Still open: Dr. Lawson's slides check and
-the other 11/12 lecture (L10), so this note stays `blocked` until those arrive.
+Done 2026-11-12. The diagrams shipped 2026-11-10; Dr. Lawson's slides were checked against L9 and L10 was added with its
+figures and narration on 2026-11-12 (see the Log; [hub note](../../hubs/occlusion.md)). L10 is the last lecture on the
+final. Still open for the hub: [the final's format](../2026-11-03-occlusion-final-time-and-format.md).

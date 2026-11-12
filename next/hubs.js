@@ -328,8 +328,8 @@ window.SH_DASH_DATA = {
      "promptHour": 20
     }
    ],
-   "updated": "2026-11-10",
-   "desc": "Now for the final (Mon Nov 16, 6:30-7:45 pm, not comprehensive): L6 Occlusal Instrumentation (articulators, the facebow and the CR, MIP and eccentric records), L7 Malocclusion and Dysfunction (TMD, splints, mobility, wear and bruxism), L8 Denture Occlusion (balanced, non-balanced and lingualized dentures; support, stability and retention) and L9 Noncarious Cervical Lesions (Dr. Lawson: abrasion, abfraction and erosion; pH vs buffering capacity). New lectures are added as they are taught. The midterm lectures stay for review: basic occlusion and the fence post, TMJ anatomy and the muscles, chewing, swallowing and speech, occlusal concepts, and applying occlusion. Notes in two reading levels, drawn diagrams, Patient Box questions, exam hints from the recordings, a timed mock and the Freeway Space Arcade.",
+   "updated": "2026-11-12",
+   "desc": "Now for the final (Mon Nov 16, 6:30-7:45 pm, not comprehensive): L6 Occlusal Instrumentation (articulators, the facebow and the CR, MIP and eccentric records), L7 Malocclusion and Dysfunction (TMD, splints, mobility, wear and bruxism), L8 Denture Occlusion (balanced, non-balanced and lingualized dentures; support, stability and retention), L9 Noncarious Cervical Lesions (Dr. Lawson: abrasion, abfraction and erosion; pH vs buffering capacity) and L10 Occlusion and the Periodontium (Dr. Abou-Arraj: occlusal trauma, mobility and when to adjust the occlusion). The midterm lectures stay for review: basic occlusion and the fence post, TMJ anatomy and the muscles, chewing, swallowing and speech, occlusal concepts, and applying occlusion. Notes in two reading levels, drawn diagrams, Patient Box questions, exam hints from the recordings, a timed mock and the Freeway Space Arcade.",
    "modes": [
     "Compendium",
     "Plain-English notes",
