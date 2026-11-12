@@ -23,4 +23,11 @@ whose exam is already over).
 
 Perio: add topics for each session as it is taught.
 
-Related: [question-bank-filter-panel](question-bank-filter-panel.md) (the High likelihood toggle)
+**They also write the redesign's High yield notes** (Sam, 2026-11-12): in the new versions (`hubs/<id>/next/`), each lecture's
+notes have a third reading level, **High yield**, built from its topics in this order, each with the notes' paragraphs its
+questions point to and the Exam Hints' takeaways (`tools/hub-next/high-yield.mjs`, run by `tools/hub-next/build.mjs`). So a
+topic's words and its question list decide what that level shows: after changing topics, rebuild and check the picks with
+`node tools/hub-next/high-yield.mjs <hub> <lecture>`. Never write High yield text by hand.
+
+Related: [question-bank-filter-panel](question-bank-filter-panel.md) (the High likelihood toggle) ·
+[the redesign release](../tasks/2026-11-06-redesign-release.md) (High yield's drafts)

@@ -39,11 +39,14 @@ task is the one PR that then switches the site over. If something goes wrong, re
 - [ ] One PR: the dashboard and each live hub's address serve the new versions (the new pages take the old ones' place,
       same addresses, so bookmarks and the home-screen app keep working)
 - [ ] The content JSON becomes where content is edited: the step that copied it from the old hub files is retired, and
-      `narrate.py`, the figure builds, the CI lint, `tools/question-ids/` and the preview transform read the JSON
+      `narrate.py`, the figure builds, the CI lint, `tools/question-ids/` and the preview transform read the JSON; High
+      yield (`notes.json`'s `hy`) is still rebuilt by `tools/hub-next/high-yield.mjs` from the JSON's notes, topics, hints
+      and questions, with a CI check that it's current (today `build.mjs --check` does it)
 - [ ] Same hub and question ids, so everyone's answers, XP, ranks, pins and question health carry over (checked on the
       preview with the test accounts)
 - [ ] The rules edited from the drafts below: [hub-home-page](../rules/hub-home-page.md), [arcade-skins](../rules/arcade-skins.md),
-      [question-bank-filter-panel](../rules/question-bank-filter-panel.md); [build-a-hub](../how-to/build-a-hub.md) rewritten
+      [question-bank-filter-panel](../rules/question-bank-filter-panel.md), [every-choice-gets-a-why](../rules/every-choice-gets-a-why.md),
+      [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md) (High yield); [build-a-hub](../how-to/build-a-hub.md) rewritten
 - [ ] The About page rewritten for everything students will see change, counts true
 - [ ] `sw.js` version bumped, so phones drop the old cached pages; perf budgets lowered to the new sizes
 - [ ] CI and the release suites pass on the switch PR, and the UAT is done on its own preview; reverting it there brings
@@ -120,7 +123,8 @@ bar under the explanation; opened, it lists every choice with your pick's reason
   Review and Arcade" and the "top bar that fits your screen" entry.)
 - **Home**: what it shows (above), the daily goal and streak, Where to next.
 - **Notes**: the lecture list (lectures on the exam first, the others for review, each with a progress bar and how many
-  you've tried), both reading levels, Listen, the drawn diagrams beside their paragraph, and **Check yourself**: three
+  you've tried), the three reading levels (As taught, Plain English, High yield: see its own draft below), Listen, the
+  drawn diagrams beside their paragraph, and **Check yourself**: three
   questions at the end of each lecture's notes.
 - **Questions**: the bank, its panel (the High likelihood toggle as now) and the four sets (Daily drill, Yesterday's misses, Weak spots, Mock exam); answer
   choices look as they do now (plain rows, a check or cross after you answer); Pin and Report on every card.
@@ -202,6 +206,47 @@ keep it in view. Scroll away and it stops following until you come back (or move
 The **Follow along** button beside Listen turns it off or back on, on this device. A classmate's idea, from the survey.
 In a browser too old for it, Listen plays as before, without the highlight.
 
+### High yield, the notes' third reading level (2026-11-12)
+
+Sam, 2026-11-12: "a toggle in the lecture notes that only explains the high likelihood/high yield points that are hinted to
+be tested. the toggles can be As taught, plain english, and high yield ... implemented now and also added to the redesign
+rules", then "only do it for the redesign right now" ([decisions](../decisions.md)). Built in the engine
+(`widget/hub.js` `drawNotes`, `hub.css` `.hy-*`) and the content step (`tools/hub-next/high-yield.mjs`, which
+`tools/hub-next/build.mjs` runs into each hub's `notes.json` as `hy`), so every redesigned hub has it from the release. The
+live hubs keep As taught and Plain English.
+
+What it is: for each lecture with predicted topics (`LIKELY_TOPICS`, [high-likelihood-topics](../rules/high-likelihood-topics.md)),
+the lecture's "What's tested" box, then each topic in the list's order (strongest evidence first) as a numbered heading in the
+lecture's color, why it's on the list ("A professor's hint", "Exam 2 review", ...) and how many questions it has, the
+professor's own takeaways that go with it ("Know this", from the Exam Hints), and the paragraphs of the As taught notes that
+teach it, with their figures. After the topics: the lecture's other flagged hints ("Also flagged in class") and its "less
+likely" ones ("You can skip"). No word of it is written by hand: the paragraphs are picked by the match "Find this in the
+notes" uses, each topic's questions voting for the paragraph that answers them (`node tools/hub-next/high-yield.mjs <hub>
+[<lecture>]` lists every pick). A lecture without topics (Occlusion's midterm lectures) has no High yield button. It runs
+about 40-65% of the As taught notes' length (more for Perio's shortest sessions and Heme & Endo's Refresher, a cram list
+already). Listen reads it in the device's voice: its Kokoro narration is held ([task](2026-11-12-high-yield-narration.md):
+the site is near GitHub Pages' 1 GB cap). Reading it to the end doesn't mark the lecture's notes done; its button at the end
+opens the lecture's High likelihood questions. Tracked as `notes:level=hy` and `notes:practice-likely`.
+
+**[hub-home-page](../rules/hub-home-page.md)**, in phase 1's draft for Notes (or a line in [build-a-hub](../how-to/build-a-hub.md)):
+every hub's notes have three reading levels, **As taught · Plain English · High yield**, High yield on every lecture with
+predicted topics.
+
+**[text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)** (edit): "editing a lecture's text at either level"
+becomes "at any level"; High yield changes whenever its notes, topics, hints or questions do, so once it has narration
+([task](2026-11-12-high-yield-narration.md)) a changed `hy` means a new `<lecture>-hy.mp3` in the same PR. Until then it has
+none, and the device's voice reads the page as it is, so it can't drift.
+
+**[build-a-hub](../how-to/build-a-hub.md)** (with phase 1's rewrite): a new hub's High yield comes from its `LIKELY_TOPICS`
+and hints with no extra work; check its picks with `node tools/hub-next/high-yield.mjs <hub>` and fix a weak one by fixing
+the topic (its words, its questions), never by writing High yield text by hand.
+
+**About page**, Notes (add, tagged new): **Three ways to read**: As taught (the professor's version), Plain English (the same
+facts in everyday words) and **High yield**: only what's most likely on the exam. Each predicted topic (the same list as Exam
+hints' "Most likely questions"), strongest evidence first, with the part of the notes that teaches it and the professor's own
+"know this", then what else was flagged in class and what you can skip. Its button at the end opens that lecture's High
+likelihood questions. Listen reads High yield in your device's voice.
+
 ### From phase 2, Perio ([phase 2](2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../hubs/perio.md))
 
 Built in `hubs/perio/next/` (2026-11-11). Perio's final is Thursday, November 19, so by the rule above it is switched in if
@@ -281,5 +326,6 @@ follows you to your other devices.
   decorated Today and Timmy Time, more color, notes prev/next and report, the More tiles, the live count) added to the
   drafts above.
 - 2026-11-06: Sam's third look: Timmy Time among Home's quick starts, animated; Today's ring of 20 teeth.
+- 2026-11-12: High yield, the notes' third reading level, built in the engine; its drafts are above.
 
 ## Outcome

@@ -437,6 +437,26 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .toolbar .follow-btn[aria-pressed="false"] .ic { opacity: .5; }
 .reading-prose mark, .hx mark.sh-hl { background: color-mix(in srgb, var(--gold) 40%, transparent); color: inherit; border-radius: 3px; }
 .lec-fig-inline { margin: 20px 0; }
+/* High yield, the third reading level (tools/hub-next/high-yield.mjs writes its HTML): each predicted topic a numbered
+   heading in the lecture's color, why it's on the list, the professor's takeaways, then the notes' own paragraphs */
+.hy-intro { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; max-width: 72ch; }
+.hy-intro .ic { flex: none; margin-top: 2px; color: var(--hub-text); }
+.reading-prose.hy > .tested { margin-bottom: 8px; }
+.reading-prose .hy-t { display: flex; align-items: flex-start; gap: 10px; margin-top: 40px; font-size: 19px; }
+.reading-prose > .hy-t:first-child, .reading-prose > .tested + .hy-t { margin-top: 24px; }
+.hy-n { flex: none; display: inline-grid; place-items: center; min-width: 28px; height: 28px; padding: 0 6px; margin-top: -1px; border-radius: 9px;
+  background: var(--hub-soft); color: var(--hub-text); font-size: 15px; font-variant-numeric: tabular-nums; }
+.reading.lc .hy-n { background: var(--lc); color: var(--lc-on, #fff); }   /* the lecture colors swap for dark mode by themselves */
+.reading-prose > .hy-why { margin-top: 4px; font-size: var(--fs-meta); color: var(--muted); font-weight: var(--w-strong); }
+.reading-prose .hy-know { padding: 12px 16px; border-radius: var(--r-row); background: var(--hub-soft); font-size: 16px; line-height: 1.55; }
+.reading.lc .reading-prose .hy-know { background: var(--lc-soft); box-shadow: inset 4px 0 0 var(--lc); }
+.reading-prose .hy-know > b { display: block; font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: .06em; color: var(--hub-text); }
+.reading.lc .reading-prose .hy-know > b { color: var(--lc-ink); }
+.reading-prose .hy-know ul { margin-top: 4px; }
+.reading.lc .reading-prose .hy-know li::marker { color: var(--lc); }
+.reading-prose .hy-see, .reading-prose .hy-none { color: var(--muted); font-size: 16px; }
+.reading.lc .reading-prose .hy-more, .reading.lc .reading-prose .hy-skip { color: var(--text); }
+.reading-prose .hy-skip + .hy-list { color: var(--muted); }
 .lec-figs, .charts, .check { margin-top: 48px; }
 .lec-figs > h2, .charts > h2, .check > h2 { font-size: var(--fs-section); }
 .charts > .note, .check > .note { margin-top: 4px; }

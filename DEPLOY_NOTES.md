@@ -32,6 +32,30 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (A standing rule: anything left to do goes on the to-do list, Claude Code)** — Sam: "make it a standing rule
+  to add things like that to a to do so things dont get lost in chats that need to be done. check them off as they are
+  done." New rule [to-dos-go-in-the-vault](vault/rules/to-dos-go-in-the-vault.md), loaded in every Claude Code session and
+  linked from `AGENTS.md`: deferred, held or blocked work and found follow-ups go in a task note, the inbox or a task's Done
+  when (never only in a chat), and are ticked off in the PR that does them. The inbox's done lines are now ticked with their
+  PR and cleared on the next pass. Its first entries: the High yield narration task and an inbox line on the site nearing
+  GitHub Pages' 1 GB cap; the redesign release's checklist now names every rule it has a draft for.
+- **2026-11-12 (High yield: the redesign's notes get a third reading level, Claude Code)** — Sam: "a toggle in the lecture
+  notes that only explains the high likelihood/high yield points that are hinted to be tested ... As taught, plain english,
+  and high yield", for the redesign only for now. The notes' level switch in the engine is **As taught · Plain English · High
+  yield** (`widget/hub.js` `drawNotes`, `widget/hub.css` `.hy-*`) on every lecture with predicted topics: the "What's tested"
+  box, then each `LIKELY_TOPICS` topic in order as a numbered heading in the lecture's color, why it's on the list and its
+  question count, the Exam Hints' takeaways that go with it ("Know this"), and the paragraphs (or list items) of the As taught
+  notes that teach it, with their figures; then the other flagged hints and the "You can skip" ones. Nothing is written by
+  hand: `tools/hub-next/high-yield.mjs` picks each topic's paragraphs with the BM25 match "Find this in the notes" uses, each
+  of the topic's questions voting for the paragraph that answers it (two at most, a second only where two signals agree; no
+  repeats), and `tools/hub-next/build.mjs` writes the result into `notes.json` as `hy` (21 lectures: Heme & Endo Exam 2's 8,
+  Occlusion's 4 final lectures, Perio's 9), so CI's `--check` keeps it current. `node tools/hub-next/high-yield.mjs <hub>
+  [<lecture>]` lists every pick. In High yield, Listen uses the device's voice, the end-of-notes button opens the lecture's
+  High likelihood questions (`notes:practice-likely`), and reading to the end doesn't mark the notes done. The smoke test
+  opens High yield on each redesigned hub. **Narration held**: about 135 MB of Kokoro would take the site (960 MB) past
+  GitHub Pages' 1 GB cap; Sam chose to hold it ([task](vault/tasks/2026-11-12-high-yield-narration.md)). The About page text
+  and the rule edits wait in the [redesign release](vault/tasks/2026-11-06-redesign-release.md) note;
+  [high-likelihood-topics](vault/rules/high-likelihood-topics.md) now says the topics build it.
 - **2026-11-12 (Follow along: the redesign highlights the word being read, Claude Code)** — The survey's "highlight the words
   being read when listening to the lecture notes voiceover", approved by Sam for the redesign. While Listen plays a lecture's
   narration in a redesigned hub (`hubs/<id>/next/`), the word being read is highlighted in the notes and its sentence shaded

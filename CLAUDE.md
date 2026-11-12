@@ -46,6 +46,8 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/repo-is-the-vault.md
 
+@vault/rules/to-dos-go-in-the-vault.md
+
 @vault/rules/github-is-the-source-of-truth.md
 
 @vault/rules/ship-it-now.md

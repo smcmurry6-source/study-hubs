@@ -56,6 +56,8 @@ Don't read the big files whole. Each `hubs/<id>/index.html` is one large single-
 
 In the same PR as the work: the task note's outcome and status, any decision Sam made (one line in
 `vault/decisions.md`), anything the next agent on that hub needs (its hub note), a new standing rule as its own note.
+**Anything still to do goes on the to-do list** (a task note, a line in the inbox, a box in a task's Done when), and what
+your PR finishes is **checked off** there ([to-dos-go-in-the-vault](vault/rules/to-dos-go-in-the-vault.md)).
 Knowledge left only in your chat or memory is lost to the next agent.
 
 ## Hard limits

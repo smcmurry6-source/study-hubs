@@ -8,7 +8,7 @@
  *   core.json       the hub's facts for Home: lectures, exam info, course dates, likely topics, mock blueprint, the
  *                   podcast, and a compact question index ([id, lec, likely]) so Home draws before the bank loads
  *   questions.json  every question in its final shape (the helpers two(), tf(), nums(), pc() already run), whys on it
- *   notes.json      the notes at both reading levels
+ *   notes.json      the notes at both reading levels, and the High yield level built from them (high-yield.mjs)
  *   study.json      hints, the cram sheet, the Review tables and processes (Side by side), the arcade's sort sets
  *   figures.js/.css the hub's drawing kit and anima figures, copied from its od:kit / anima:js / od:css / anima:css
  *                   marker blocks and wrapped so the engine hands them what they used from the hub (a hub without
@@ -26,6 +26,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { dirname, resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
+import { highYield } from "./high-yield.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 /* hubs with a new version beside the live one */
@@ -218,7 +219,10 @@ function build(hub){
   const out = {
     "core.json": JSON.stringify(core),
     "questions.json": JSON.stringify(clean(D.QUESTIONS)),
-    "notes.json": JSON.stringify({ full: clean(D.READINGS), plain: clean(D.READINGS_PLAIN) }),
+    /* hy: the third reading level, each lecture's predicted topics with the paragraphs of its notes that teach them
+       (tools/hub-next/high-yield.mjs; Sam, 2026-11-12) */
+    "notes.json": JSON.stringify({ full: clean(D.READINGS), plain: clean(D.READINGS_PLAIN),
+      hy: highYield({ notes: clean(D.READINGS), topics: clean(D.LIKELY_TOPICS), hints: clean(D.HINTS), questions: clean(D.QUESTIONS) }) }),
     "study.json": JSON.stringify({ hints: clean(D.HINTS), cram: clean(D.CRAM), review: clean(D.REVIEW), sequences: clean(D.SEQUENCES), sortSets: clean(D.SORT_SETS) })
   };
 

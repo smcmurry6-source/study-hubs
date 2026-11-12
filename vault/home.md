@@ -22,6 +22,8 @@ Those marked *(on demand)* apply to one feature: read them when your task touche
 
 Shipping and the vault
 - [The repo is the vault](rules/repo-is-the-vault.md): read from it, write back to it, link don't copy, nothing private.
+- [Anything left to do goes on the to-do list](rules/to-dos-go-in-the-vault.md) (a task note, the inbox, a Done when box),
+  never only in a chat, and is checked off when done.
 - [GitHub is the source of truth](rules/github-is-the-source-of-truth.md): fetch fresh, merge, never overwrite blind.
 - [Ship it now, never "after the exam"](rules/ship-it-now.md)
 - [American English everywhere](rules/american-english.md)
