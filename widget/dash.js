@@ -1665,8 +1665,10 @@
       window.addEventListener("storage", function(e){ if (e.key === "sh_presence_mine") paintMe(); });
       if (window.ResizeObserver && $("rcBody")) {
         var rcW = 0, rcT = 0;
-        new ResizeObserver(function(){
-          var w = $("rcBody").clientWidth; if (!w || Math.abs(w - rcW) < 4) return;
+        /* the width comes from the entry: measuring here would lay the page out in the middle of the browser's own
+           pass, and when that changes a size (a stylesheet still loading) WebKit reports a ResizeObserver loop (BUG-074) */
+        new ResizeObserver(function(es){
+          var w = es && es[0] ? Math.round(es[0].contentRect.width) : 0; if (!w || Math.abs(w - rcW) < 4) return;
           var first = !rcW; rcW = w; if (first) return;
           clearTimeout(rcT); rcT = setTimeout(function(){ recapArt(true); }, 120);
         }).observe($("rcBody"));

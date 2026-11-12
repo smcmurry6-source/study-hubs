@@ -46,7 +46,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   posted. Also: BUG-072 (new dashboard, the day before an exam at the largest text on a phone: Start studying ran off
   the screen) fixed in `widget/dash.css`, and the "visiting off" classmate is out of the preview's `get_place` stub.
   `tools/ci/smoke.js` draws a made-up board and checks votes, the pickers, that words never become markup and that every
-  button has a fixed `data-shi` name. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324))
+  button has a fixed `data-shi` name. BUG-074 (WebKit only: a "ResizeObserver loop" error on the new dashboard while
+  the board's stylesheet loads) fixed in `widget/dash.js`. Sam then asked for a more decorative board, to be done once
+  #318 has merged. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324))
 
 - **2026-11-11 (Lessons refresh, Claude Code)** — Data read 5:30 pm Central, two days before Heme & Endo Exam 2. The 11-10
   evening's six explanation fixes worked (first tries 29% before, 81% since, against the bank's 70% -> 74%), and the Cushing labs

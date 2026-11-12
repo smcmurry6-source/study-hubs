@@ -1,11 +1,11 @@
 ---
 type: task
-status: review
+status: blocked
 hub: dashboard
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: 
+waiting-on: "#318 merging (then the board's look is redone)"
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/324
 ---
@@ -229,10 +229,29 @@ The live About page describes the live site, so these go in with the redesign's 
     (the table above plus the ones from the past check-ins, checked against the About page), put the About entries in
     (drafted above), add `widget/ideas.js` and `widget/ideas.css` to `sw.js`, and the Overview line. Not built: the 90-day
     delete of hidden ideas ([analytics-retention](../reference/analytics-retention.md)), a job for the retention migration.
+- **2026-11-12, later (Claude Code, same session)**:
+  - **`main` merged in again** (the 2026-11-11 lessons refresh, #322): the change log conflicted; both entries kept.
+  - **BUG-074**, found by the PR's Release tests in WebKit and fixed ([bug log](../release/bug-log.md)): the recap's
+    `ResizeObserver` in `widget/dash.js` measured the card inside its callback, and with the board's stylesheet still
+    loading that raised WebKit's "ResizeObserver loop" error. It takes the width from its entry now. **A cloud session
+    can run WebKit**: `PLAYWRIGHT_BROWSERS_PATH=<a scratch folder> node <the global playwright>/cli.js install webkit`,
+    the system libraries it lists with `apt-get`, then `SH_ENGINES=webkit PLAYWRIGHT_BROWSERS_PATH=<that folder> node
+    tools/release/matrix.js`. The error only shows on a busy machine, so run several loads at once to see it.
+  - **Sam, after the screenshots: redo the board's look** ([decisions](../decisions.md)): "make the board UI way more
+    interesting and decorative to match the vibe of the rest of the dashboard", then "these decorative changes are on PR
+    318. wait for it to merge before redesigning so you can see the rest of the dashboard as it stands now". **Not started,
+    on Sam's word**: this session is subscribed to #318 and takes it up when it merges.
+  - **Next step, for whoever takes it up** (this session, or a new one from this note): once #318 is merged, start
+    `claude/wonderful-fermi-2ypk03` again from `main` if #324 has merged too, or merge `main` into it if not; open the
+    new dashboard in a local preview (`node tools/preview/serve.js`, `next/?persona=returning`) and look at the stage,
+    the classroom, the leaderboard's stage and the recap, which are what the board has to sit beside; then restyle
+    `widget/ideas.css` (and the markup in `widget/ideas.js` where it needs hooks) with the dashboard's own parts: its
+    tints, panels and drawn kits (`widget/hub-art/`). Anything newly drawn goes to Sam as a contact sheet before it goes
+    in. Keep every `data-shi` name, the smoke test's checks and the 110-check walk passing, and send Sam new screenshots.
 
 ## Outcome
 
-Built, not released ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324)). The board is on the new dashboard and in the new hubs' More from one file, with the
+Built, not released ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324)). Sam asked for a more decorative look, to be done after #318 merges (the Log's last entry). The board is on the new dashboard and in the new hubs' More from one file, with the
 check-in's and Suggest's ticks, the Inbox notes and the admin page's Idea board. It ships with the redesign: migration_v54,
 the starting ideas and the About entries go in at the release.
 
