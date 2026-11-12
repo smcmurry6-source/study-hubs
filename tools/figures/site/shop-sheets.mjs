@@ -1,6 +1,6 @@
 /* Contact sheets of the shop's art, for Sam's look (needs Playwright; not part of the build or CI).
 
-     node tools/figures/site/shop-sheets.mjs <out-dir> [shelf|outfits|homes]
+     node tools/figures/site/shop-sheets.mjs <out-dir> [shelf|outfits|homes|ui]
 
    Writes each sheet twice, on the light page and on the dark one (deviceScaleFactor 2):
      shop-shelf-{light,dark}.png     the Shiny Gold Crown at 16, 24 and 48 px, the four snacks and two boosts, and one
@@ -10,8 +10,11 @@
      shop-homes-{light,dark}.png     every home (the everyday ones and each set's) as the card draws it: Timmy at the
                                      door, the statue at Dark Matter on three steps and again as the ModuPro on its
                                      pedestal, the garden in the yard's left spot, each beside a close-up of the door.
-   It draws from the sources (place.mjs, shop.mjs, the packs), not from the built files, so a sheet shows a drawing
-   before the build is run. Timmy is the live one from tools/preview/design/art.js (widget/pet.js's drawing). */
+     shop-ui-{desktop,phone}-{light,dark}.png   the shop as the design page draws it (tools/preview/design/, "The
+                                     shop"): the storefront, the showcase and the shelves, at 1280 and 390 px wide.
+   The first three draw from the sources (place.mjs, shop.mjs, the packs), not from the built files, so a sheet shows
+   a drawing before the build is run; "ui" opens the design page, so run the build first. Timmy is the live one from
+   tools/preview/design/art.js (widget/pet.js's drawing). */
 import { createRequire } from "node:module";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import path from "node:path";
@@ -95,6 +98,19 @@ for (const [name, make] of Object.entries(sheets)) {
     await p.setContent(page(body, dark));
     const out = path.join(outDir, "shop-" + name + "-" + (dark ? "dark" : "light") + ".png");
     await p.screenshot({ path: out, fullPage: true }); await p.close();
+    console.log("wrote " + out);
+  }
+}
+/* (d) the shop itself, as the design page draws it */
+if (!only || only === "ui") {
+  for (const [name, w, dark] of [["desktop", 1280, false], ["desktop", 1280, true], ["phone", 390, false], ["phone", 390, true]]) {
+    const p = await b.newPage({ viewport: { width: w, height: 900 }, deviceScaleFactor: 2 });
+    await p.emulateMedia({ reducedMotion: "reduce" });
+    await p.goto(pathToFileURL(path.join(root, "tools/preview/design/index.html")).href + "?theme=" + (dark ? "dark" : "light"));
+    await p.waitForSelector("#tpShop .tp-store", { timeout: 30000 });
+    const el = await p.$("#tpShop"); await el.scrollIntoViewIfNeeded(); await p.waitForTimeout(900);
+    const out = path.join(outDir, "shop-ui-" + name + "-" + (dark ? "dark" : "light") + ".png");
+    await el.screenshot({ path: out }); await p.close();
     console.log("wrote " + out);
   }
 }

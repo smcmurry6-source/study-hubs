@@ -214,6 +214,106 @@ window.SH_SHOP_ART = (function shopKit(INK, C){
     }
     return wrap("ts-frame", "0 0 " + w + " " + h, s);
   }
+  /* ------------------------------------------------------------------ the storefront -------------------------------
+     The shop's masthead (Sam, 2026-11-12: "I want the shop ui to be more epic"), in two layers so the live Timmy can
+     stand between them. Back: the arch of light he stands in, two bays of shelves with what the shop sells, lanterns
+     and bunting. Front: the counter with the till, the bell, a jar of brushes, a basket of apples and a chest of gold
+     crowns. 600 x 200. No wall is drawn, so the page's own wall shows through on the light page and the dark one. A
+     phone shows the middle of it (the page crops the sides): the arch, Timmy, the till and the bell.
+     Timmy stands at 300 across, about 170 tall, the foot of his gum at 158, just behind the counter's top (150). */
+  var WOOD = "#C4864A", BOARD = "#B9773F", BOARDS = "#96592B", BOARDL = "#E0A868", SLATE = "#6B5A68";
+  function at(x, y, k, inner){ return '<g transform="translate(' + f(x) + " " + f(y) + ")" + (k !== 1 ? " scale(" + k + ")" : "") + '">' + inner + "</g>"; }
+  function star5(x, y, r, fill, sw){
+    var d = ""; for (var i = 0; i < 10; i++){ var a = -Math.PI / 2 + i * Math.PI / 5, q = i % 2 ? r * .46 : r; d += (i ? "L" : "M") + f(x + Math.cos(a) * q) + " " + f(y + Math.sin(a) * q); }
+    return O(d + "Z", sw || 1.5, fill);
+  }
+  function board(x0, x1, y){
+    return FO("M" + (x0 + 8) + " " + (y + 7) + " h11 l-11 9 Z", BOARDS, 1.8) + FO("M" + (x1 - 8) + " " + (y + 7) + " h-11 l11 9 Z", BOARDS, 1.8) +
+      FO("M" + x0 + " " + y + " H" + x1 + " V" + (y + 7) + " H" + x0 + " Z", BOARD, 2.2) + F("M" + (x0 + 1.6) + " " + (y + 1.4) + " H" + (x1 - 1.6) + " V" + (y + 3.2) + " H" + (x0 + 1.6) + " Z", BOARDL);
+  }
+  /* small goods for the shelves, each in a 36 box standing on its bottom edge */
+  var GOODS = {
+    cloche: function(){
+      return ell(18, 33, 13.4, 2.8, BOARD, 2) + star5(18, 21.4, 8, C.gold, 1.6) +
+        '<path d="M6.4 32 V17 C6.4 8.4 11.6 3.6 18 3.6 C24.4 3.6 29.6 8.4 29.6 17 V32 Z" fill="#FFFFFF" opacity=".38"/>' + O("M6.4 32 V17 C6.4 8.4 11.6 3.6 18 3.6 C24.4 3.6 29.6 8.4 29.6 17 V32 Z", 2) +
+        circ(18, 3, 2.2, C.gold, 1.5) + HI("M9.8 16 C10 11.4 12.4 8.2 15.4 6.8", 1.6) + star(26.4, 10.4, 3.2, "#FFFFFF", "ts-s-tw", .6);
+    },
+    hat: function(){
+      return FO("M7 22.6 H29 V34.8 H7 Z", "#FFF6E5", 2) + F("M10.6 22.6 H14 V34.8 H10.6 Z", "#FF8B7B") + F("M16.4 22.6 H19.8 V34.8 H16.4 Z", "#FF8B7B") + F("M22.2 22.6 H25.6 V34.8 H22.2 Z", "#FF8B7B") +
+        O("M7 22.6 H29 V34.8 H7 Z", 2) + FO("M5 18.4 H31 V23.4 H5 Z", "#FF8B7B", 2) +
+        ell(18, 16.6, 13.2, 3.2, "#F2D58A", 2) + FO("M11.4 16.4 C11.4 7.6 24.6 7.6 24.6 16.4 Z", "#F2D58A", 2) + L("M11.6 14.2 Q18 16.4 24.4 14.2", 2.6, RED);
+    }
+  };
+  function goods(x, y, id){ return THUMBS[id] ? at(x - 1, y - 33.4, .58, THUMBS[id]()) : at(x, y - 36, 1, GOODS[id]()); }
+  function lantern(x, delay){
+    return '<g class="ts-s-sway"' + (delay ? ' style="animation-delay:' + delay + 's"' : "") + ">" + L("M" + x + " 0 V34", 2) + circ(x, 48, 23, "#FFE27A").replace("/>", ' opacity=".26"/>') +
+      FO("M" + (x - 5) + " 33 H" + (x + 5) + " L" + (x + 8) + " 39 H" + (x - 8) + " Z", SLATE, 2) + FO("M" + (x - 7.4) + " 39 H" + (x + 7.4) + " V57 H" + (x - 7.4) + " Z", "#FFE9A3", 2) +
+      F("M" + x + " 43.4 C" + (x + 3.4) + " 47.6 " + (x + 3) + " 52.6 " + x + " 53.6 C" + (x - 3) + " 52.6 " + (x - 3.4) + " 47.6 " + x + " 43.4 Z", "#FF9F43") +
+      FO("M" + (x - 9) + " 57 H" + (x + 9) + " V61 H" + (x - 9) + " Z", SLATE, 2) + "</g>";
+  }
+  function bunting(x0, x1, y, sag, n, turn){
+    var cols = ["#FF8B7B", "#FFF6E5", "#6FBDEB", "#FFD86B", "#8FD0A8"], mx = (x0 + x1) / 2, s = L("M" + x0 + " " + y + " Q" + mx + " " + (y + sag * 2) + " " + x1 + " " + y, 1.8);
+    for (var i = 0; i < n; i++){ var t = (i + .5) / n, px = x0 + (x1 - x0) * t, py = y + sag * 4 * t * (1 - t);
+      s += FO("M" + f(px - 8) + " " + f(py - .6) + " H" + f(px + 8) + " L" + f(px) + " " + f(py + 15) + " Z", cols[(i + (turn || 0)) % cols.length], 1.8); }
+    return s;
+  }
+  function storeBack(){
+    var arch = "M212 162 V104 A88 88 0 0 1 388 104 V162 Z", s = "", i;
+    /* the two bays: a recess in the wall, two boards each, and the goods */
+    [[14, 174], [426, 586]].forEach(function(b){ s += '<rect x="' + b[0] + '" y="26" width="' + (b[1] - b[0]) + '" height="124" rx="8" fill="' + INK + '" opacity=".13"/>'; });
+    s += goods(24, 72, "apple") + goods(76, 72, "cheese-cube") + goods(128, 72, "floss") + board(18, 170, 72) + goods(22, 124, "fluoride-rinse") + board(16, 62, 124) +
+      goods(436, 72, "boost-1h") + goods(488, 72, "boost-3h") + goods(540, 72, "cloche") + board(430, 582, 72) + goods(540, 124, "hat") + board(534, 584, 124);
+    /* the arch: a wooden frame, warm light and turning rays behind Timmy */
+    s += '<path d="' + arch + '" fill="none" stroke="' + INK + '" stroke-width="15"/><path d="' + arch + '" fill="none" stroke="' + WOOD + '" stroke-width="10"/>' + F(arch, "#FFF3D6");
+    var rays = ""; for (i = 0; i < 14; i++){ var a0 = i / 14 * Math.PI * 2, a1 = a0 + Math.PI / 14; rays += "M300 104 L" + f(300 + Math.cos(a0) * 85) + " " + f(104 + Math.sin(a0) * 85) + " L" + f(300 + Math.cos(a1) * 85) + " " + f(104 + Math.sin(a1) * 85) + " Z"; }
+    s += '<g class="ts-s-rays">' + '<circle cx="300" cy="104" r="85" fill="none"/>' + F(rays, "#FFDD85", .8) + "</g>" + circ(300, 108, 52, "#FFFFFF").replace("/>", ' opacity=".6"/>') + O(arch, 2.5);
+    [[236, 60, 4.4, 0], [368, 76, 3.6, .9], [246, 124, 3, 1.7], [356, 34, 3.2, .4]].forEach(function(q){ s += star(q[0], q[1], q[2], "#FFFFFF", "ts-s-tw", q[3]); });
+    /* bunting to either side of the sign, and a lantern beside each bay */
+    s += bunting(-6, 193, 5, 7, 7, 0) + bunting(407, 606, 5, 7, 7, 2) + lantern(193, 0) + lantern(407, 1.3);
+    return s;
+  }
+  function storeFront(){
+    var s = "", i;
+    /* on the counter, left: a jar of brushes and a basket of apples */
+    [[102, 96, "#6FBDEB"], [107, 104, "#F28BA8"], [112, 99, "#7FE3C4"]].forEach(function(q){
+      s += L("M" + q[0] + " 146 L" + q[1] + " 112", 5) + L("M" + q[0] + " 146 L" + q[1] + " 112", 2.6, q[2]) + FO("M" + (q[1] - 3) + " 104 h6 v9 h-6 Z", "#FFFFFF", 1.4); });
+    s += '<path d="M96.6 150 V127 H117.4 V150 Z" fill="#CFEAF8" opacity=".8"/>' + O("M96.6 150 V127 H117.4 V150 Z", 2) + HI("M100.4 131 V144", 1.6);
+    [[143, 131], [167, 131], [155, 126]].forEach(function(q){ s += circ(q[0], q[1], 8.4, RED, 2) + F("M" + (q[0] + 2) + " " + (q[1] - 7.6) + " a8.4 8.4 0 0 1 0 15.2 a11 11 0 0 0 0 -15.2 Z", REDS) + L("M" + q[0] + " " + (q[1] - 8) + " q1 -3.4 3.4 -4.4", 1.6) ; });
+    s += FO("M133.6 150 L130.6 134.6 H179.4 L176.4 150 Z", "#E3B87A", 2.2) + L("M142 135 L143.4 150 M155 135 V150 M168 135 L166.6 150 M132 142 H178", 1.2, BOARDS);
+    /* the till */
+    s += FO("M219 122 V106.4 H241 V122 Z", "#FFF6E5", 2) + at(224, 107.6, .5, coinBody(true)) +
+      FO("M209.6 150 V132 L215.6 121.6 H244.4 L250.4 132 V150 Z", RED, 2.5) + F("M209.6 142.6 H250.4 V150 H209.6 Z", REDS) + O("M209.6 150 V132 L215.6 121.6 H244.4 L250.4 132 V150 Z", 2.5);
+    for (i = 0; i < 8; i++) s += circ(219.6 + (i % 4) * 7, 129 + Math.floor(i / 4) * 6.4, 2.2, "#FFF6E5", 1.2);
+    s += FO("M215 143.4 H245 V148 H215 Z", C.gold, 1.5) + L("M250.4 130 H257 V120", 2.2) + circ(257, 118, 3, C.gold, 1.5);
+    /* the bell */
+    s += FO("M350.6 147.6 C350.6 136.6 367.4 136.6 367.4 147.6 Z", C.gold, 2) + circ(359, 137.4, 2.4, C.goldLight, 1.5) + FO("M347.6 147 H370.4 V150 H347.6 Z", SLATE, 1.8) + HI("M354 143 C354.4 140.6 355.8 139.4 357.4 139", 1.4);
+    /* the chest of gold crowns: its lid thrown back, the heap, then the box */
+    s += FO("M446 124 L449.6 97 C451 87 501 87 502.4 97 L506 124 Z", BOARDS, 2.5) + L("M452 99 C454 92 498 92 500 99", 2, C.gold) +
+      FO("M446.6 129 C449 114 462 105.6 476 106.6 C490 105.6 503 114 505.4 129 Z", C.gold, 2) + F("M488 108.6 C497 111.6 503.6 119 505.4 129 H494 C495 121 493 114 488 108.6 Z", C.goldShade, .8) +
+      at(450.6, 104.6, .82, coinBody(false)) + at(484, 103.6, .82, coinBody(false)) + at(465, 93.4, .95, coinBody(false)) +
+      FO("M441.6 150 V127.6 H510.4 V150 Z", "#A66C36", 2.5) + F("M441.6 127.6 H510.4 V133 H441.6 Z", C.gold) + F("M452 127.6 H458 V150 H452 Z", C.gold) + F("M494 127.6 H500 V150 H494 Z", C.gold) +
+      L("M441.6 133 H510.4 M452 133 V150 M458 133 V150 M494 133 V150 M500 133 V150", 1.3) + O("M441.6 150 V127.6 H510.4 V150 Z", 2.5) + FO("M471.4 129.6 H480.6 V141 H471.4 Z", C.gold, 1.6) + circ(476, 135, 1.5, INK) +
+      star(461, 90, 5.4, "#FFFFFF", "ts-s-tw", 0) + star(499, 99, 4.2, "#FFF7D6", "ts-s-tw", .9) + star(483, 86, 3.6, "#FFFFFF", "ts-s-tw", 1.6);
+    /* the counter: its top, and the front with three panels */
+    s += FO("M48 158 H552 V204 H48 Z", BOARD, 2.5) + L("M104 162 V204 M160 162 V204 M216 162 V204 M272 162 V204 M328 162 V204 M384 162 V204 M440 162 V204 M496 162 V204", 1.4, INK, .18);
+    [[66, 232], [246, 354], [368, 534]].forEach(function(q){ s += FO("M" + (q[0] + 5) + " 167 H" + (q[1] - 5) + " q5 0 5 5 V184 q0 5 -5 5 H" + (q[0] + 5) + " q-5 0 -5 -5 V172 q0 -5 5 -5 Z", "#A66C36", 2); });
+    s += tooth(300, 181.6, 2.3, "#FFF6E5", 1.7) + FO("M44 195 H556 V204 H44 Z", BOARDS, 2.2) +
+      FO("M40 150 H560 q4 0 4 4 V156.6 q0 4 -4 4 H40 q-4 0 -4 -4 V154 q0 -4 4 -4 Z", BOARDL, 2.5) + F("M38.6 156.4 H561.4 V159.4 H38.6 Z", BOARDS, .45);
+    return s;
+  }
+  /* layer: "back" or "front"; each is the whole 600 x 200 picture, to be stacked with Timmy between */
+  function store(layer){
+    return '<svg class="ts-store ts-store-' + (layer === "front" ? "front" : "back") + '" viewBox="0 0 600 200" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' +
+      (layer === "front" ? storeFront() : storeBack()) + "</svg>";
+  }
+  /* the showcase's stand: a round plinth in the rarity's colors, 200 x 64, for the day's best piece to stand on */
+  function stand(k){
+    var R = rar(k);
+    return wrap("ts-stand", "0 0 200 64", ell(100, 53, 92, 9, "#000").replace("/>", ' opacity=".12"/>') +
+      FO("M22 38 V46 C22 56 178 56 178 46 V38 Z", R.deep, 2.5) + ell(100, 38, 78, 10, R.edge, 2.5) +
+      FO("M40 20 V30 C40 40 160 40 160 30 V20 Z", R.edge, 2.5) + F("M128 37.4 C146 35.6 160 34 160 30 V20 H150 V29 C150 33 140 35.6 128 37.4 Z", R.deep, .5) + ell(100, 20, 60, 8.4, R.fill, 2.5) +
+      HI("M52 21 C60 16.6 76 14.6 92 14.2", 2));
+  }
   var CSS = [
     ".ts-coin{display:inline-block;vertical-align:-.18em;flex:none}.ts-thumb,.ts-frame{display:block;width:100%;height:100%}",
     "@keyframes ts-spin{to{transform:rotate(360deg)}}",
@@ -224,8 +324,14 @@ window.SH_SHOP_ART = (function shopKit(INK, C){
     "@keyframes ts-r-sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}.ts-r-sway{animation:ts-r-sway 4s ease-in-out infinite}",
     "@keyframes ts-r-glint{0%{transform:translateX(0);opacity:0}10%,90%{opacity:1}100%{transform:translateX(110px);opacity:0}}.ts-r-glint{animation:ts-r-glint 2.8s ease-in-out infinite}",
     "@media (prefers-reduced-motion: reduce){.ts-frame *{animation:none!important}}",
-    ".ts-still .ts-frame *{animation:none!important}"
+    ".ts-still .ts-frame *{animation:none!important}",
+    ".ts-store{display:block;width:100%;height:100%}.ts-stand{display:block;width:100%;height:auto}",
+    ".ts-s-rays{transform-box:fill-box;transform-origin:center;animation:ts-spin 90s linear infinite}",
+    "@keyframes ts-s-sway{0%,100%{transform:rotate(-2.4deg)}50%{transform:rotate(2.4deg)}}.ts-s-sway{transform-box:fill-box;transform-origin:50% 0;animation:ts-s-sway 5.2s ease-in-out infinite}",
+    ".ts-s-tw{transform-box:fill-box;transform-origin:center;animation:ts-r-tw 2.6s ease-in-out infinite}",
+    "@media (prefers-reduced-motion: reduce){.ts-store *{animation:none!important}}",
+    ".ts-still .ts-store *{animation:none!important}"
   ].join("\n");
 
-  return { coin: coin, coinBody: coinBody, thumb: thumb, ITEMS: ITEMS, RARITIES: RARITIES, frame: frame, CSS: CSS };
+  return { coin: coin, coinBody: coinBody, thumb: thumb, ITEMS: ITEMS, RARITIES: RARITIES, frame: frame, store: store, stand: stand, CSS: CSS };
 })("#3B2E3A", {"enamel":"#FFFDF6","enamelShade":"#E9DFCC","gum":"#F78FA8","gumShade":"#E07090","gumLight":"#FFC0CD","pink":"#F7A3BA","metal":"#D5DBE1","metalShade":"#8E98A3","metalLight":"#EEF2F5","gold":"#F2C94C","goldShade":"#C9971C","goldLight":"#FFF0B3","bronze":"#D08A52","bronzeShade":"#9A5A2A","bronzeLight":"#F2C49A","silver":"#D9DFE5","silverShade":"#8E98A3","silverLight":"#F6F8FA","paper":"#FFFFFF","paperShade":"#ECE6EA","wood":"#C4915F","woodShade":"#8A5A3A","sky":"#CFEAF8","grass":"#A7DE93","grassShade":"#6CBB68","red":"#E5484D","blue":"#3FA7E0","yellow":"#FFE27A","green":"#3ECF7E","orange":"#F59A1E","plum":"#6B5A68","plumLight":"#ECE6EA"});

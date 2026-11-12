@@ -1459,23 +1459,66 @@
     return rcard(x, pieceThumb(x), false, 'data-shop="' + pieceId(x) + '" data-shelf="' + shelf + '" aria-label="' + esc(cardName(x.n) + ", " + (x.rarity || "") + ", " + (own ? "yours" : fmtPrice(x.price || 0) + " crowns") + (shelf === "back" ? ", back for today only" : "") + ". Open") + '"')
       .replace(' aria-pressed="false"', "").replace(/<\/button>$/, extra + "</button>");
   }
+  /* a layer of the shop's storefront as a picture, with its own motion inside (still when the page is) */
+  var STORE_IMG = {};
+  function storeImg(layer){
+    var key = layer + (isStill() ? "-still" : "");
+    if (!STORE_IMG[key]) {
+      var css = SA.CSS.split("\n").filter(function(l){ return /ts-s-|@keyframes ts-spin|@keyframes ts-r-tw|prefers-reduced/.test(l); }).join("\n");
+      var svg = SA.store(layer); if (!isStill()) svg = svg.replace(/(<svg[^>]*>)/, "$1<style>" + css + "</style>");
+      STORE_IMG[key] = img(svg, "", "tp-frontart");
+    }
+    return STORE_IMG[key];
+  }
+  /* the shop: a storefront with Timmy at the counter, the day's showcase on a stand, then the shelves */
   function shopMock(){
     var el = $("#tpShop"); if (!el) return;
     var pick = function(list, ks){ return ks.map(function(k){ return byK(list, k); }).filter(Boolean); };
-    var shelf = function(k, title, when, ic, note, items){ return '<section class="tp-shelf tp-shelf-' + k + '"><header><h4 class="tp-tagsign">' + esc(title) + '</h4><span class="tp-when">' + ic + esc(when) + "</span>" + (note ? '<p class="tp-note">' + esc(note) + "</p>" : "") +
-      '</header><div class="tp-rcards tp-plank">' + items.map(function(x){ return shopCard(x, k); }).join("") + "</div></section>"; };
+    var head = function(title, when, ic, note){ return '<header><h4 class="tp-tagsign">' + esc(title) + '</h4><span class="tp-when">' + ic + esc(when) + "</span>" + (note ? '<p class="tp-note">' + esc(note) + "</p>" : "") + "</header>"; };
+    var shelf = function(k, title, when, ic, note, items){ return '<section class="tp-shelf tp-shelf-' + k + '">' + head(title, when, ic, note) +
+      '<div class="tp-rcards tp-plank" style="--n:' + items.length + '">' + items.map(function(x){ return typeof x === "string" ? x : shopCard(x, k); }).join("") + "</div></section>"; };
     var season = TP.SETS && TP.SETS.seasons.filter(function(q){ return q.k === "thanksgiving"; })[0], of = function(list, k){ return list.filter(function(x){ return x.set === k; }); };
     var seasonal = season ? of(TP.HOMES, season.k).concat(of(TP.SCENES, season.k), of(TP.OUTFITS, season.k), of(TP.YARD, season.k)) : [];
     var back = [].concat(of(TP.YARD, "spring").slice(1, 2), of(TP.OUTFITS, "valentine").slice(0, 1), of(TP.HOMES, "summer").slice(0, 1));
+    var today = pick(TP.YARD, ["mailbox", "campfire"]).concat(pick(TP.OUTFITS, ["sunhat"]), pick(TP.YARD, ["telescope"])), week = pick(TP.HOMES, ["igloo"]).concat(pick(TP.SCENES, ["beach"]), pick(TP.YARD, ["pool"]));
     var stripes = ""; for (var n = 0; n < 40; n++) stripes += "<i></i>";
+    /* the showcase: the rarest piece on sale today (the dearest among those), large, on a stand in its rarity's colors */
+    var rank = function(x){ return ["Common", "Uncommon", "Rare", "Epic", "Legendary"].indexOf(x.rarity) * 100000 + (x.price || 0); };
+    var star = today.concat(week, seasonal, back).filter(function(x){ return !SHOP.owned[pieceId(x)]; }).sort(function(p, q){ return rank(q) - rank(p); })[0];
+    var show = "";
+    if (star) {
+      var R = SA.RARITIES.filter(function(r){ return r.k === star.rarity; })[0] || SA.RARITIES[0], se = seasonOf(star), sk = kindOf(star), shelfOf = seasonal.indexOf(star) >= 0 ? "season" : back.indexOf(star) >= 0 ? "back" : week.indexOf(star) >= 0 ? "week" : "today";
+      show = '<section class="tp-show r-' + R.k + '" style="--sr-fill:' + R.fill + ";--sr-edge:" + R.edge + ";--sr-deep:" + R.deep + ";--sr-ink:" + R.ink + '">' +
+        '<div class="tp-showcase" aria-hidden="true">' + rays() + '<span class="tp-showpiece k-' + sk + '">' + (sk === "outfit" ? img(timmySvg("happy", star.k), "") : pieceThumb(star)) + '</span><span class="tp-showstand">' + img(SA.stand(R.k), "") + "</span>" +
+          '<i class="tp-showtw a"></i><i class="tp-showtw b"></i><i class="tp-showtw c"></i></div>' +
+        '<div class="tp-showinfo"><h4 class="tp-showkick">Today’s showcase</h4><p class="tp-showname">' + esc(cardName(star.n)) + "</p>" +
+          '<p class="tp-itags">' + rarTag(R.k) + "<span>" + esc(KIND_N[sk]) + (se ? " · " + esc(se.n) + " set" : "") + "</span></p>" +
+          '<p class="tp-showdesc">' + esc(sentence(star.note)) + ".</p>" +
+          '<div class="tp-showbuy"><span class="tp-ibig">' + img(SA.coinBody(false), "", "tp-coin", "0 0 24 24") + '<b class="num">' + fmtPrice(star.price || 0) + '</b></span><button type="button" class="tp-buy" data-shop="' + pieceId(star) + '" data-shelf="' + shelfOf + '">Take a closer look</button></div>' +
+          '<p class="tp-showwhen">' + SIC.clock + (shelfOf === "season" ? "In the shop until November 27" : shelfOf === "back" ? "Back for today only" : shelfOf === "week" ? "In the shop for 5 more days" : "In the shop until midnight") + "</p></div></section>";
+    }
+    /* rare costumes: the ones that have turned up wait here; the others are shapes until they do */
+    var seen = { pirate: 1, chef: 1 }, costumes = TP.OUTFITS.filter(function(o){ return o.costume; });
+    var spotted = costumes.map(function(o){ return seen[o.k] ? shopCard(o, "spotted") :
+      '<span class="tp-rcard tp-static tp-unseen r-Common" role="img" aria-label="A rare costume you haven’t spotted yet">' + frameImg("Common") + '<span class="tp-rthumb">' + thumbImg("outfit", o.k) + '</span><span class="tp-rtext"><span class="tp-rname">Not spotted yet</span></span></span>'; });
+    /* always here: the snacks and the boosts, from the shop's own art */
+    var always = SA.ITEMS.map(function(it){ return scard({ n: it.n, rarity: it.rarity, price: it.price }, img(SA.thumb(it.id), ""), '<span class="tp-does">' + esc(it.hp ? "+" + it.hp + " HP" : "2x XP · " + (it.minutes / 60) + " h") + "</span>"); });
+    var seasonPic = "";
+    if (season && seasonal.length) { var yd = {}; of(TP.YARD, season.k).forEach(function(y, i){ yd[["left", "front", "right"][i]] = y.k; });
+      seasonPic = '<div class="tp-poster">' + sceneImg(TP.render(tpOpts({ home: of(TP.HOMES, season.k)[0].k, scene: of(TP.SCENES, season.k)[0].k, yard: yd, night: false, viewBox: TP.CARD, timmy: { g: timmyG(timmySvg("happy", (of(TP.OUTFITS, season.k).slice(-1)[0] || {}).k)), at: "door" } })).svg, "The whole " + season.n + " set at Timmy’s place", isStill()) + "</div>"; }
     el.innerHTML = '<div class="tp-store"><div class="tp-awning" aria-hidden="true">' + stripes + "</div>" +
-      '<div class="tp-storehead"><span class="tp-keeper" aria-hidden="true">' + img(timmySvg("happy", "sunhat"), "") + '</span><div class="tp-sign"><i class="tp-nail a"></i><i class="tp-nail b"></i><b>Timmy’s Shop</b><span>Tap anything for a closer look.</span></div>' +
-        '<div class="tp-storeend"><button type="button" class="tp-snd" id="tpSnd" aria-pressed="' + SND.on + '" aria-label="Sound"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 7.500h3l4-3.500v12l-4-3.500H3Z" fill="currentColor"/>' + (SND.on ? '<path d="M13 7a4.200 4.200 0 0 1 0 6M15.200 4.800a7.300 7.300 0 0 1 0 10.400" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"/>' : '<path d="M13.200 7.800l4 4.400M17.200 7.800l-4 4.400" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"/>') + "</svg><span>" + (SND.on ? "Sound on" : "Sound off") + '</span></button>' +
-        '<span class="tp-wallet" title="Shiny Gold Crowns">' + img(SA.coinBody(false), "", "tp-coin", "0 0 24 24") + '<b class="num">' + fmtPrice(SHOP.wallet) + "</b><small>crowns</small></span></div></div>" +
-      shelf("today", "Today’s picks", "New picks in 6 h 12 min", SIC.clock, "Four pieces, the same for everyone, new every day.", pick(TP.YARD, ["mailbox", "campfire"]).concat(pick(TP.OUTFITS, ["sunhat"]), pick(TP.YARD, ["telescope"]))) +
-      shelf("week", "This week", "5 days left", SIC.clock, "Three bigger pieces that stay all week.", pick(TP.HOMES, ["igloo"]).concat(pick(TP.SCENES, ["beach"]), pick(TP.YARD, ["pool"]))) +
-      (seasonal.length ? shelf("season", season.n, "Until November 27", SIC.clock, "The season’s set, only while the season lasts. Nothing from a season or a holiday is ever sold before its dates. Two seasons at once (fall is on too) get a shelf each.", seasonal) : "") +
-      (back.length ? shelf("back", "Back for today", "Gone at midnight", SIC.glass, "A throwback day, two a month: three pieces from seasons that have passed, at their usual price. On other days this shelf isn’t here.", back) : "") +
+      '<div class="tp-front"><span class="tp-frontlayer" aria-hidden="true">' + storeImg("back") + '</span><span class="tp-keeper" aria-hidden="true">' + img(timmySvg("happy", "bow-tie"), "") + '</span><span class="tp-frontlayer" aria-hidden="true">' + storeImg("front") + "</span>" +
+        '<div class="tp-sign"><i class="tp-nail a"></i><i class="tp-nail b"></i><b>' + img(SA.coinBody(false), "", "tp-coin", "0 0 24 24") + "Timmy’s Shop</b><span>Tap anything for a closer look.</span></div>" +
+        '<button type="button" class="tp-snd" id="tpSnd" aria-pressed="' + SND.on + '" aria-label="Sound"><svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M3 7.500h3l4-3.500v12l-4-3.500H3Z" fill="currentColor"/>' + (SND.on ? '<path d="M13 7a4.200 4.200 0 0 1 0 6M15.200 4.800a7.300 7.300 0 0 1 0 10.400" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"/>' : '<path d="M13.200 7.800l4 4.400M17.200 7.800l-4 4.400" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round"/>') + "</svg><span>" + (SND.on ? "Sound on" : "Sound off") + '</span></button>' +
+        '<span class="tp-wallet" title="Shiny Gold Crowns">' + img(SA.coinBody(false), "", "tp-coin", "0 0 24 24") + '<span><b class="num">' + fmtPrice(SHOP.wallet) + "</b><small>Shiny Gold Crowns</small></span></span></div>" +
+      show +
+      shelf("today", "Today’s picks", "New picks in 6 h 12 min", SIC.clock, "Four pieces, the same for everyone, new every day.", today) +
+      '<div class="tp-aisle a11">' + shelf("week", "This week", "5 days left", SIC.clock, "Three bigger pieces that stay all week.", week) +
+        (back.length ? shelf("back", "Back for today", "Gone at midnight", SIC.glass, "A throwback day, two a month: three pieces from seasons that have passed, at their usual price.", back) : "") + "</div>" +
+      (seasonal.length ? '<section class="tp-shelf tp-shelf-season">' + head(season.n, "Until November 27", SIC.clock, "The season’s set, only while the season lasts. Nothing from a season or a holiday is ever sold before its dates. Two seasons at once (fall is on too) get a shelf each.") +
+        '<div class="tp-seasonbody">' + seasonPic + '<div class="tp-rcards tp-plank" style="--n:4">' + seasonal.map(function(x){ return shopCard(x, "season"); }).join("") + "</div></div></section>" : "") +
+      shelf("spotted", "Spotted", "2 of 5 so far", SIC.glass, "Rare costumes turn up without warning. One you’ve spotted waits here until you buy it.", spotted) +
+      shelf("always", "Always here", "Never sells out", SIC.check, "Snacks put health back on Timmy’s bar, one of each a day. A boost doubles your XP from the moment you buy it. Shown here; buying them comes with the shop itself.", always) +
       '<p class="tp-note tp-storefoot">Halloween’s set is already in everyone’s inventory, and rank sets are never on a shelf: you earn them. The crowns and what you buy here are made up for this page.</p></div>';
     $$("[data-shop]", el).forEach(function(b){ b.addEventListener("click", function(){ sfx("open"); openItem(pieceBy(b.dataset.shop), b.dataset.shelf); }); });
     $("#tpSnd", el).addEventListener("click", function(){ SND.on = !SND.on; try { localStorage.setItem("sh_design_sound", SND.on ? "on" : "off"); } catch (e) {} shopMock(); if (SND.on) sfx("open"); var n = $("#tpSnd"); if (n) n.focus(); });

@@ -34,7 +34,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 - **2026-11-12 (the redesign's shop, session 1: its art; Claude Code, #339)** — Art only: no client code, nothing
   students see (the redesign isn't live), `migration_v54.sql` unchanged. New `tools/figures/site/shop.mjs`, built by
-  `build.mjs` into **`widget/hub-art/shop.js`** (`window.SH_SHOP_ART`, 7.9 KB compressed, loaded by no page yet): the
+  `build.mjs` into **`widget/hub-art/shop.js`** (`window.SH_SHOP_ART`, 11.4 KB compressed, loaded by no page yet): the
   Shiny Gold Crown coin (`coin(px)`, with its own cut for 16 px), thumbnails for the four snacks and two boosts
   (`thumb(id)`), and the five rarity frames (`frame(rarity)`), which moved here with the coin from the place's kit
   (`SH_PLACE.frame`, `.coin`, `.RARITIES` are gone; nothing used them). **Ten new outfits** in the kit's `OUTFITS`
@@ -44,7 +44,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   (BUG-089) so he no longer hides the rank statue, with the yard's left spot, the path's lamp and nine statues.
   `tools/release/xp.js` now fails on any catalog piece without a drawing and checks the shelf's thumbnails against
   the catalog (358 checks). The design page shows them ("The shop's own art: the coin and the shelf", "The shop's ten outfits");
-  `node tools/figures/site/shop-sheets.mjs <dir>` makes the three contact sheets. Left open: BUG-091. Hand-off for
+  `node tools/figures/site/shop-sheets.mjs <dir>` makes the contact sheets. **The shop's look, "more epic"** (Sam,
+  after the sheets): the design page's shop is redrawn as a storefront (Timmy at the counter under an arch of light;
+  `SH_SHOP_ART.store()`), "Today's showcase" (`stand()`) and shelves whose cards fill them, with Spotted and Always
+  here; the client session builds the page to it. Left open: BUG-091. Hand-off for
   the shop's client session: `vault/tasks/2026-11-06-redesign-timmy-shop.md`, "What session 1 built".
 - **2026-11-12 (the rest of the redesign's phase 4, planned: vault only, Claude Code)** — No code and nothing students
   see. Sam answered one list of calls, and what is left of phase 4 is now ten sessions in order, each with a build

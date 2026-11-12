@@ -251,7 +251,9 @@ const SHOP = shopKit(INK, C);
 {
   const pieces = [["coin", SHOP.coin(24)], ["coin, small", SHOP.coin(16)], ["coin body", SHOP.coinBody(false)], ["coin body, small", SHOP.coinBody(true)]]
     .concat(["apple", "cheese-cube", "floss", "fluoride-rinse", "boost-1h", "boost-3h"].map((id) => ["shelf " + id, SHOP.thumb(id)]),
-      ["Common", "Uncommon", "Rare", "Epic", "Legendary"].map((r) => ["frame " + r, SHOP.frame(r)]));
+      ["Common", "Uncommon", "Rare", "Epic", "Legendary"].map((r) => ["frame " + r, SHOP.frame(r)]),
+      [["storefront, back", SHOP.store("back")], ["storefront, front", SHOP.store("front")]],
+      ["Common", "Uncommon", "Rare", "Epic", "Legendary"].map((r) => ["stand " + r, SHOP.stand(r)]));
   for (const [w, svg] of pieces) {
     if (typeof svg !== "string" || svg.length < 120) { bad.push("shop " + w + ": missing"); continue; }
     if (/NaN|undefined|Infinity/.test(svg)) bad.push("shop " + w + ": NaN or undefined in the drawing");
@@ -260,6 +262,8 @@ const SHOP = shopKit(INK, C);
   }
   if (SHOP.coin(16) === SHOP.coin(24).replace('width="24" height="24"', 'width="16" height="16"')) bad.push("shop coin: no small cut for 16 px");
   if (SHOP.thumb("no-such-item") !== "") bad.push("shop thumb: draws something for an id it doesn't have");
+  if (SHOP.store("back") === SHOP.store("front") || !/viewBox="0 0 600 200"/.test(SHOP.store("back")) || !/viewBox="0 0 600 200"/.test(SHOP.store("front"))) bad.push("shop storefront: two layers, both 600 x 200");
+  if (new Set(SHOP.RARITIES.map((r) => SHOP.stand(r.k))).size !== 5) bad.push("shop stands: five, each in its rarity's colors");
   if (SHOP.ITEMS.length !== 6 || SHOP.ITEMS.some((it) => !SHOP.thumb(it.id) || !SHOP.RARITIES.some((r) => r.k === it.rarity))) bad.push("shop ITEMS: six items, each with a thumbnail and a rarity");
   if (SHOP.RARITIES.map((r) => r.k).join() !== "Common,Uncommon,Rare,Epic,Legendary" || new Set(SHOP.RARITIES.map((r) => SHOP.frame(r.k))).size !== 5) bad.push("shop frames: five, each its own");
 }

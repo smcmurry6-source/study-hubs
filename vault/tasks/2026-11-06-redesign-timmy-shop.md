@@ -221,7 +221,7 @@ clips; the About page.
 
 ### What session 1 built (read before session 2)
 
-- **`window.SH_SHOP_ART`** (`widget/hub-art/shop.js`, built from `tools/figures/site/shop.mjs`; 7.9 KB compressed; no
+- **`window.SH_SHOP_ART`** (`widget/hub-art/shop.js`, built from `tools/figures/site/shop.mjs`; 11.4 KB compressed; no
   page loads it, only the design page):
   - `coin(px)`: the Shiny Gold Crown as an `<svg class="ts-coin">` of that size. Under 20 px it draws the small cut
     (heavier ink, no sparkle), so it reads at 16 px beside a number. `coinBody(small)` is the drawing alone, in a 24
@@ -234,8 +234,27 @@ clips; the About page.
     any letter case, so the server's lowercase value works. `RARITIES`: each one's `k`, price `band` and colors
     (`fill`, `edge`, `deep`, `ink`; the name's pill is `ink`). `CSS`: the frames' motion (classes `ts-r-*`), still
     under reduced motion and inside `.ts-still`; the shop adds it once.
+  - `store("back")` and `store("front")`: the storefront, the shop's masthead, 600 x 200, in two layers so the live
+    Timmy stands between them (he is centered, about 80% of its height, his gum just behind the counter's top). No
+    wall is drawn, so the page's wooden wall shows through in both themes; a narrow page crops the sides and keeps
+    the arch, Timmy, the till and the bell. `stand(rarity)`: the showcase's stand, 200 x 64. Their motion (turning
+    rays, swaying lanterns, glints) is in `CSS` under `ts-s-*`, still under reduced motion.
   - No drawing takes a color from the page (the build fails on `currentColor` or a `var(`): a shop card is paper on
     the light page and on the dark one, as on the design page, so one drawing serves both.
+- **The shop's look** (Sam, 2026-11-12: "I want the shop ui to be more epic"; his yes on the result is still to
+  come) is the design page's "The shop" (`shopMock()` in `tools/preview/design/design.js`, the `.tp-store` rules in
+  `design.css`). Session 2 builds the real page to it, top to bottom:
+  1. **The storefront**: the awning, bunting and lanterns, Timmy at the counter in the bow tie under the arch of
+     light, the sign ("Timmy's Shop" with the coin), and on the counter's front the balance on a gold plaque (the
+     coin, the number, "Shiny Gold Crowns"). On a phone the plaque is centered on the counter.
+  2. **Today's showcase**: the rarest piece on sale that the student doesn't own (the dearest among equals), large,
+     on `stand()` in its rarity's colors with rays turning behind it; beside it its name in large type, its rarity
+     and kind, one sentence, the price and one button that opens it. Left out when everything on sale is owned.
+  3. **The shelves**, each a cabinet whose cards fill its width: Today's picks alone (four large cards); This week
+     beside Back for today (on a day with no throwback, This week takes the row); the season with a picture of the
+     whole set at Timmy's place beside its cards; Spotted, all five costumes, the unseen ones as grey shapes that
+     say "Not spotted yet"; Always here, each snack and boost with what it does on the card ("+10 HP", "2x XP · 1 h").
+     On a phone every shelf is one row that scrolls sideways, as on the design page.
 - **The frames and the coin moved out of the place's kit.** They are the round 3 drawings Sam approved on 2026-11-10,
   unchanged; only the coin's 16 px cut is new. `SH_PLACE.frame`, `SH_PLACE.coin` and `SH_PLACE.RARITIES` are gone
   (`widget/place.js` never used them); `SH_PLACE.burst(rarity)` stays.
@@ -255,9 +274,9 @@ clips; the About page.
   telescope) now stands in front of Timmy's gum when he is at the door, where before it stood beside him. His face
   stays clear. That spot was not this session's to move (only the left one was), and it borders the path and the lane.
 - **Sizes**, compressed: the kit `widget/hub-art/place.js` 77.1 to 80.6 KB; `widget/hub-art/outfits.js` 29.7 to
-  33.6 KB; `widget/hub-art/shop.js` 7.9 KB. None loads with a page.
-- **The three sheets** can be made again: `node tools/figures/site/shop-sheets.mjs <out-dir> [shelf|outfits|homes]`
-  (needs Playwright; each in light and dark).
+  33.6 KB; `widget/hub-art/shop.js` 11.4 KB (the spec's limit is about 15). None loads with a page.
+- **The sheets** can be made again: `node tools/figures/site/shop-sheets.mjs <out-dir> [shelf|outfits|homes|ui]`
+  (needs Playwright; each in light and dark; `ui` is the design page's shop at 1280 and 390 px, after a build).
 
 ## Build spec, session 2: the shop's client
 
@@ -314,12 +333,13 @@ bootstrap already carries `shop`: `window.shBootstrap.data.shop`); the rest of `
   `frame(rarity)`, `ITEMS`, `CSS`; "What session 1 built", above).
 
 **How it behaves**:
-- **The page**: the balance at the top (the coin, the number, and a line that opens "How you earn gold crowns": 1 for
-  every 10 XP, 25 a trophy, 50 a mastery medal, 20 a rank-up; "Shiny Gold Crowns" in full once, "gold crowns" after,
-  never just "crowns"). Then the shelves, in this order, an empty one left out: **Spotted** (rare costumes that
-  turned up), **Today** ("New at midnight"), **This week** ("New Monday"), **In season** ("Limited time"; a gift
-  shows as "Yours"), **Back for today**, **Always here** (snacks, boosts). Midnight and Monday are Central time,
-  worked out on the device.
+- **The page** looks like the design page's shop ("The shop's look" in "What session 1 built", above; Sam,
+  2026-11-12: "more epic"): the storefront with the balance on the counter (the coin, the number, and a line that
+  opens "How you earn gold crowns": 1 for every 10 XP, 25 a trophy, 50 a mastery medal, 20 a rank-up; "Shiny Gold
+  Crowns" in full once, "gold crowns" after, never just "crowns"), then Today's showcase, then the shelves, an empty
+  one left out: **Today** ("New at midnight"), **This week** ("New Monday") beside **Back for today**, **In
+  season** ("Limited time"; a gift shows as "Yours"), **Spotted** (rare costumes that turned up; the others as
+  shapes), **Always here** (snacks, boosts). Midnight and Monday are Central time, worked out on the device.
 - **A card**: the thumbnail in its rarity's frame, the name, the rarity's name, the price with the coin, and one
   state: Buy, Owned, "N more to go" (the balance is short), "Bought today" (a snack in `snacks_today`), "He's full"
   (a snack while `shPet.hp()` is 100).
@@ -435,6 +455,10 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
   session 1 built", above. The frames and the regular coin are round 3's drawings, moved from the place's kit into
   `shop.mjs`. Nothing disagreed with `migration_v54.sql`, and it is unchanged. `tools/release/xp.js`: 358 checks (no
   undrawn outfit, the five costumes, the shelf's thumbnails against the catalog). One thing left open: BUG-091.
+- 2026-11-12 (Claude Code), same session, after the sheets: Sam: "I want the shop ui to be more epic". The design
+  page's shop is redrawn as a storefront, a showcase and fuller shelves (new art: `store()` and `stand()` in
+  `shop.mjs`; "The shop's look", above), still no client code. Sent to Sam as screenshots at 1280 and 390 px, light
+  and dark (`node tools/figures/site/shop-sheets.mjs <out-dir> ui`).
 
 ## Outcome
 
