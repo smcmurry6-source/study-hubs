@@ -6,7 +6,7 @@ created: 2026-11-12
 requested-by: Sam
 due: 
 waiting-on: 
-agent: 
+agent: Claude Code (part 1, 2026-11-12)
 pr: 
 ---
 
@@ -42,6 +42,9 @@ that note's design is the starting point, and where the two differ this one wins
 - Yes to "What should I study tonight?" (from the student's own progress) and to a Timmy tab on the admin page; no
   read-aloud.
 - "if you need to wait till other parts of the redesign are done, this work can wait till then."
+- A **Report button** in the chat (2026-11-12, during part 1): "also have a report button in the chat box so if timmy gives
+  an error or bad answer or something, you can report it and we can fix what went wrong". The server half is in
+  `migration_v55` (`timmy_report`); the button is part 2.
 
 **The agent's defaults, which Sam didn't change** (proposed 2026-11-12; Sam can change any of them):
 - Timmy pauses during a mock exam, so it stays a real test.
@@ -134,6 +137,9 @@ that note's design is the starting point, and where the two differ this one wins
 - Above the box: Timmy answers from this hub's notes, and chats are saved to help improve the hub.
 - Starter chips: "What should I study tonight?", "Explain this lecture simply", and so on.
 - "Ask Timmy" in a question card's after-answer row, starting "Why is it ...?".
+- A **Report** button on each of Timmy's answers (and on a nap or an error): a short note box, sent with `timmy_report`
+  (a usual report: the admin Inbox, Sam's reply back to the sender; the answer is marked so the Timmy tab opens the
+  whole chat). Sam's call, 2026-11-12.
 - Offers show as a draft card (edit, Send, No thanks). A report goes through the hub's existing report path (with the
   question id when there is one), so it reaches the admin Inbox and Sam's reply comes back as now. An idea goes through
   the idea board's own posting (asking for a leaderboard name first when there's none), hub and category filled in.
@@ -227,7 +233,7 @@ and `hub-timmy.js` and touches the core only for Settings ([run-a-redesign-sessi
    his rules, stress), and `tools/timmy/eval.mjs`, which runs it against the real API. That needs a key in the session
    (the credential form for `api.anthropic.com`) and costs a few dollars: ask Sam once before running it.
 2. **The chat in the new pages.** `widget/ask.js` and `ask.css`, Timmy's "Ask me", the icon when he's off, Ask Timmy on
-   answered questions, the report and idea drafts, the preview's canned replies, the smoke test, and the About page's
+   answered questions, the report and idea drafts, the Report button on his answers, the preview's canned replies, the smoke test, and the About page's
    entries written into the release note's drafts.
 3. **The admin page's Timmy tab.**
 4. **Everyone has Timmy** (`widget/pet.js`), with phase 4's parts B and C or right after them.
@@ -239,9 +245,13 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
 ## Done when
 
 - [x] Sam's calls written down (this note, [decisions](../decisions.md), the privacy rule)
-- [ ] Part 1: the migration, the function and its tests; the test set passes on the real API (every quote checks out,
-      "not covered" when it should be, quiz and practice questions declined, offers drafted, no rule broken)
-- [ ] Part 2: the chat on every new hub page and the new dashboard, on a phone and a laptop; the smoke test covers it
+- [x] Part 1: the migration, the function and its tests ([ask-timmy](../reference/ask-timmy.md)); the test set and the
+      eval, which passes with a fake model (`node tools/timmy/eval.mjs --dry`, in CI)
+- [ ] Part 1: the test set passes on the real API (every quote checks out, "not covered" when it should be, quiz and
+      practice questions declined, offers drafted, no rule broken): waits for Sam's OK to spend about $10 and a key in the
+      session (the credential form for `api.anthropic.com`); then fix what it finds and rerun the failures
+- [ ] Part 2: the chat on every new hub page and the new dashboard, on a phone and a laptop, with the Report button on
+      his answers; the smoke test covers it
 - [ ] Part 3: the admin tab
 - [ ] Part 4: everyone has Timmy
 - [ ] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
@@ -254,6 +264,14 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
 - 2026-11-12: written from Sam's calls in chat. This session wrote the plan and the vault changes only; the build is in
   the four parts above, each in a fresh session ([run-a-redesign-session](../how-to/run-a-redesign-session.md)), and the
   code map above is from a survey of the redesign's code that day, so they can start without exploring. Next step: part 1.
+- 2026-11-12 (part 1, Claude Code): the server, the database and the test set. `supabase/functions/timmy/` (`core.js`,
+  `index.ts`, `site.json`), `migration_v55.sql` (pending), `tools/timmy/` (`test.mjs`, `build.mjs`, `test-set.json`,
+  `eval.mjs`), `tools/release/timmy.js`; CI runs the tests, the database suite and the eval's `--dry`. How it works and
+  what parts 2 and 3 need: [ask-timmy](../reference/ask-timmy.md) (its last section). Sam added the Report button mid-way;
+  its server half is in. Choices made: the SDK is `@anthropic-ai/sdk@1.3.0` (it sends the key as `Authorization: Bearer`);
+  content paragraphs are numbered with the engine's own rule, tested in Chromium against `exportSections`; the dashboard
+  holds at most 4 hubs; a question holds $0.08 against the day's cap while it's answered. Left: the real-API eval run
+  (Sam's OK and a key), then parts 2-4.
 
 ## Outcome
 

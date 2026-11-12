@@ -7,3 +7,6 @@
 # migration_v54.sql: the game layer's server (XP without a daily cap, server-checked answers, the 63-step ladder, Shiny
 # Gold Crowns and Timmy's shop, the idea board). Applied at the redesign's release: vault/tasks/2026-11-06-redesign-release.md
 migration_v54.sql
+# migration_v55.sql: Ask Timmy's chats, limits and admin reads (vault/tasks/2026-11-12-redesign-ask-timmy.md). Applied at the
+# redesign's release with migration_v54, when the timmy Edge Function is deployed.
+migration_v55.sql

@@ -52,6 +52,8 @@ does exactly the deletes marked "the weekly job" below and nothing else. A new k
 | `xp_sessions` | keep for now | **proposed, not approved**: delete sessions older than 30 days in the weekly job (only the last 6 hours are read); ask Sam | | A mock's or game's start and finish |
 | `ideas`, `idea_votes`, `idea_reports`, `idea_notes` | keep while the board is up; an idea hidden by reports or by Sam, 90 days (Sam, 2026-11-11) | delete the hidden idea with its votes, reports and notes | **approved, not built yet** | Public to the class under the poster's name; votes and notes are per person. An author's own delete removes the idea, its votes, reports and notes at once (`delete_my_idea`; Sam, 2026-11-11: nothing of it is kept) |
 | `question_keys`, `shop_items`, `podcast_episodes`, `report_outcomes`, `game_config` | keep | | | No visitor ids |
+| Ask Timmy (migration_v55, from the release): `timmy_chats`, `timmy_messages` | the school year, with the visitor id | **proposed, not approved**: delete with the end-of-year job (or keep counts by day, hub and kind with no ids); ask Sam then. Until then kept whole, as Sam asked ("store all chat logs with timmy") | not built | The whole chat is read on the admin page's Timmy tab and its not-covered list points at gaps in the content. A Timmy report is a `question_flags` row and follows its line above |
+| `timmy_config` | keep | | | No visitor ids |
 
 A student who asks for their data to be deleted: there is no self-serve way yet, and a student can't see their own id.
 Until there is, Sam deletes by the id from the student's own browser, never by guessing from a name.
