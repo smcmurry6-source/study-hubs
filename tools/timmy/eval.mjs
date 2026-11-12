@@ -9,7 +9,8 @@
 // The real run needs @anthropic-ai/sdk@1.3.0 (the function's version): npm i --prefix <dir> @anthropic-ai/sdk@1.3.0, then
 // TIMMY_SDK_DIR=<dir>. The key: TIMMY_EVAL_KEY (in a Claude Code cloud session, an environment variable Sam adds in the
 // environment's settings; not ANTHROPIC_API_KEY, which Claude Code itself reads), or ANTHROPIC_API_KEY on a computer
-// where nothing else uses it. Never in the repo or a chat.
+// where nothing else uses it. Never in the repo or a chat. A key made outside a workspace also needs the workspace's id in
+// TIMMY_EVAL_WORKSPACE (the API refuses it otherwise: "This API key is not scoped to a workspace").
 // Writes the full report (every question, answer and grade) as markdown and JSON to $SH_RELEASE_OUT or the temp folder.
 //
 // What a case passes: the reply came back (no error), every quote it cites is really in that paragraph, plain text, nothing
@@ -170,7 +171,8 @@ async function realModel(){
   const Anthropic = mod.default || mod.Anthropic || mod;
   const key = process.env.TIMMY_EVAL_KEY || process.env.ANTHROPIC_API_KEY || "";
   if (!key) { console.error("✗ no key: set TIMMY_EVAL_KEY (or ANTHROPIC_API_KEY where nothing else reads it)"); process.exit(2); }
-  const client = new Anthropic({ apiKey: key, maxRetries: 2, timeout: 180_000 });
+  const ws = process.env.TIMMY_EVAL_WORKSPACE;   // a key not made inside a workspace needs the workspace's id with every call
+  const client = new Anthropic({ apiKey: key, maxRetries: 2, timeout: 180_000, defaultHeaders: ws ? { "anthropic-workspace-id": ws } : undefined });
   return params => client.beta.messages.create(EFFORT ? Object.assign({}, params, { output_config: Object.assign({}, params.output_config, { effort: EFFORT }) }) : params);
 }
 const approxTokens = s => Math.ceil(String(s).length / 3.6);

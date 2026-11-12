@@ -108,12 +108,17 @@ person to read. The full report (every question and answer) is written as markdo
   `TIMMY_SDK_DIR=<dir>`) and a key in `TIMMY_EVAL_KEY`. In a Claude Code cloud session Sam adds it as an environment
   variable in the environment's settings (the session's credential form can't hold a key for `api.anthropic.com`: the
   session reaches Anthropic's API without the proxy). Not `ANTHROPIC_API_KEY`, which Claude Code itself reads. Never
-  pasted in a chat or written in a file; a key made for the eval, deleted after, is safest.
+  pasted in a chat or written in a file; a key made for the eval, deleted after, is safest. Make it inside a workspace,
+  or also set `TIMMY_EVAL_WORKSPACE` to the workspace's id. A variable added to the environment reaches only sessions
+  started after it, so a session that started before runs the eval in a fresh session on its branch.
 - Rerun it after changing `RULES`, the schema, the effort level or the model, and before the release.
 
 ## At the release (the release note's Ask Timmy box)
 
 1. Sam saves `ANTHROPIC_API_KEY` in the Supabase dashboard (Edge Functions, Secrets) and sets the Console's spending limit.
+   **Make the key inside a workspace** (the Console's workspace, then API keys). A key made outside one is refused
+   ("This API key is not scoped to a workspace", found on 2026-11-12's first eval run) unless the workspace's id is also
+   saved, as `ANTHROPIC_WORKSPACE_ID`.
 2. Apply `migration_v55.sql` with `migration_v54.sql`, append both to `supabase/schema.sql`, take their lines out of
    `supabase/pending-migrations.txt` (same PR).
 3. Deploy the function with JWT verification off (the Supabase connector's `deploy_edge_function`: `index.ts`, `core.js`,

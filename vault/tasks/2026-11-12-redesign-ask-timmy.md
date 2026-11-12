@@ -274,6 +274,10 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
   content paragraphs are numbered with the engine's own rule, tested in Chromium against `exportSections`; the dashboard
   holds at most 4 hubs; a question holds $0.08 against the day's cap while it's answered. Left: the real-API eval run
   (Sam said yes; it waits for the key in `TIMMY_EVAL_KEY`), then parts 2-4.
+- 2026-11-12: the first real-API run (in a fresh session, which has the variable) was refused before any answer, at no
+  cost: "This API key is not scoped to a workspace". The eval and the function now send a workspace's id when one is
+  set (`TIMMY_EVAL_WORKSPACE`; `ANTHROPIC_WORKSPACE_ID` in Supabase); a key made inside a workspace needs neither. The
+  release steps in [ask-timmy](../reference/ask-timmy.md) say so.
 
 ## Outcome
 

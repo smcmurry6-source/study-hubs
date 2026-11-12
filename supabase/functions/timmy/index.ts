@@ -8,7 +8,8 @@
 // Deploy with JWT verification off (the site's publishable key isn't a JWT); the function checks its own input, answers
 // only the site's own origin, and the database keeps the limits.
 // Settings (all optional): TIMMY_CONTENT_BASE (where the content is: "{hub}" is replaced by the hub's id; until the
-// redesign's release the new hubs' content is under hubs/<id>/next/content/), TIMMY_ORIGINS (comma separated).
+// redesign's release the new hubs' content is under hubs/<id>/next/content/), TIMMY_ORIGINS (comma separated),
+// ANTHROPIC_WORKSPACE_ID (only for a key made outside a workspace: the API refuses such a key without it).
 import Anthropic from "npm:@anthropic-ai/sdk@1.3.0";
 import site from "./site.json" with { type: "json" };
 import { serve } from "./core.js";
@@ -20,7 +21,10 @@ const ORIGINS = (Deno.env.get("TIMMY_ORIGINS") ?? "https://smcmurry6-source.gith
 const HUB_RE = /^[a-z0-9][a-z0-9-]{0,39}$/;
 const TTL = 10 * 60 * 1000;
 
-const client = new Anthropic({ apiKey: Deno.env.get("ANTHROPIC_API_KEY"), maxRetries: 1, timeout: 120_000 });
+// a key made outside a workspace needs the workspace's id with every call (ANTHROPIC_WORKSPACE_ID, optional)
+const WORKSPACE = Deno.env.get("ANTHROPIC_WORKSPACE_ID") ?? "";
+const client = new Anthropic({ apiKey: Deno.env.get("ANTHROPIC_API_KEY"), maxRetries: 1, timeout: 120_000,
+  defaultHeaders: WORKSPACE ? { "anthropic-workspace-id": WORKSPACE } : undefined });
 
 async function rpc(name: string, args: Record<string, unknown>) {
   const headers: Record<string, string> = { "content-type": "application/json", apikey: SB_KEY };
