@@ -74,10 +74,20 @@
     px = px || 20;
     return '<svg class="ska-ic" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + b + "</svg>";
   }
+  /* the stylesheet loads only when something of the chat is drawn (the Ask icon or button, or the chat itself), so a page
+     where Timmy is shown and nobody asks doesn't download it (the new dashboard's request budget, tools/release/budgets.json) */
+  var cssP = null, cssDone = false;
   function css(){
-    if (document.querySelector('link[href*="widget/ask.css"], link[href$="ask.css"]')) return;
-    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = SELF ? SELF.replace(/ask\.js(\?.*)?$/, "ask.css") : "ask.css";
-    document.head.appendChild(l);
+    if (cssP) return cssP;
+    cssP = new Promise(function(ok){
+      var l = document.querySelector('link[href*="widget/ask.css"], link[href$="ask.css"]');
+      function done(){ cssDone = true; ok(); }
+      if (l) { if (l.sheet) done(); else { l.addEventListener("load", done); l.addEventListener("error", done); setTimeout(done, 8000); } return; }
+      l = document.createElement("link"); l.rel = "stylesheet"; l.href = SELF ? SELF.replace(/ask\.js(\?.*)?$/, "ask.css") : "ask.css";
+      l.onload = l.onerror = done; setTimeout(done, 8000);
+      document.head.appendChild(l);
+    });
+    return cssP;
   }
   function loadScript(src){
     return new Promise(function(ok, no){ var s = document.createElement("script"); s.src = src; s.async = true; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
@@ -230,6 +240,7 @@
   function open(o){
     o = o || {};
     if (!O) return;
+    if (!cssDone) { css().then(function(){ open(o); }); return; }
     build();
     if (archived()) return;
     var was = !P.root.hidden;
@@ -704,8 +715,8 @@
     var on = available(), here = timmyHere(), due = timmyDue() && Date.now() - bootAt < 6000;
     if (!isDash()) {
       var show = on && !here && !due && !mockOn();
+      if (show && !cssDone) { css().then(sync); show = false; }
       if (show && !fab) {
-        css();
         fab = el("button", "ska-fab", { type: "button", "data-ska": "fab", "aria-label": "Ask the hub about the notes", title: "Ask the hub" });
         fab.innerHTML = icon("ask", 26);
         fab.addEventListener("click", function(){ open({ from: "icon" }); });
@@ -713,9 +724,9 @@
       }
       if (fab) fab.hidden = !show;
     } else {
-      var host = opt("spot");
-      if (host && !spotEl) {
-        css();
+      var host = opt("spot"), want = on && !here && !due;
+      if (want && !cssDone) { css().then(sync); want = false; }
+      if (host && !spotEl && want) {
         spotEl = el("div", "ska-spot");
         spotEl.innerHTML = '<span class="ska-spot-ic" aria-hidden="true">' + icon("ask", 26) + "</span>";
         var tx = el("div", "ska-spot-t"); tx.appendChild(txt("b", "", "Ask the hub")); tx.appendChild(txt("small", "", "Questions about the notes, answered from the live hubs"));
@@ -723,7 +734,7 @@
         var b = btn("spot", "Ask", "is-pri"); b.addEventListener("click", function(){ open({ from: "spot" }); }); spotEl.appendChild(b);
         host.appendChild(spotEl);
       }
-      if (host) host.hidden = !(on && !here && !due);
+      if (host) host.hidden = !want;
     }
     if (isOpen()) { var v = P.root.getAttribute("data-voice"); if (v !== voice()) dress(); paintPaused(); }
   }
@@ -731,7 +742,6 @@
   function mount(o){
     if (O || !o) return;
     O = o;
-    css();
     /* answers on this page: "Ask Timmy" on a card waits until the server has the answer */
     if (O.answeredEvent) document.addEventListener(O.answeredEvent, function(e){ var d = e && e.detail; if (d && d.qid) answered[String(d.qid)] = Date.now(); });
     document.addEventListener("sh:answer-paid", function(e){ var d = e && e.detail; if (d && d.qid) paid[String(d.qid)] = 1; });

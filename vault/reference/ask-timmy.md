@@ -139,7 +139,9 @@ person to read. The full report (every question and answer) is written as markdo
 
 Loaded only by the redesign's pages, so nothing reaches the class before the release: a new hub (`widget/hub-timmy.js`
 loads it once the shared widget is up and mounts it with the hub's options) and the new dashboard (`widget/dash.js`, a
-late script, mounted in `startClassData` before Timmy). Its header comment lists `shAsk.mount()`'s options.
+late script, mounted in `startClassData` before Timmy). Its header comment lists `shAsk.mount()`'s options. `ask.css` loads only when something
+of the chat is drawn (the Ask icon or button, or the chat itself): a page where Timmy is shown and nobody asks doesn't
+download it, which keeps the new dashboard inside its request budget (`tools/release/budgets.json`).
 
 - **Where it opens.** Timmy's "Ask me": a button in his speech bubble when he's tapped and in the dashboard house's menu
   (`widget/pet.js` adds them only when `window.shAsk` exists, so the live hubs' Timmy is unchanged). When he isn't on the
