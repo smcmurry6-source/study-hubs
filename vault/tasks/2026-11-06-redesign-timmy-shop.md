@@ -120,7 +120,7 @@ his own (what Timmy wears).
   they are naked. What you put wins." So on the redesign's pages **Timmy wears only what the student put on him, and
   nothing when nothing is on.** This replaces "What wins" under Rare costumes below, and the line under "The shop"
   that the seasonal outfits "don't replace the free holiday outfits he already wears". What follows from it (the
-  agent's reading, told to Sam the same day; his to change):
+  agent's reading, told to Sam the same day; Sam, asked again with #337: "Sounds good"):
   - Timmy no longer dresses himself for a holiday or the fall weeks on the redesign's pages. The hubs' holiday themes,
     the eggs and the place's own seasons and holiday props are untouched (`holidayId()`, `isFall()` and the server's
     `sh_season` stay as they are).

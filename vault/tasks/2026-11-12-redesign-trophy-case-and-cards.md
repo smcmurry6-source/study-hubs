@@ -91,7 +91,7 @@ one change there); `widget/v3.js`'s Stats panel (the live hubs use it); the jour
   `widget/dash.js` (Focus mode's list of extras with it).
 - **Its trophy leaves the case's list**, the main one and each hub's: nobody sees a locked Full Arch any more, and
   it isn't one of the 27. **Someone who already earned it keeps it**, shown after the others as "Full Arch
-  (retired)" with its drawing (the agent's default, told to Sam; his to change: the other way is that it vanishes
+  (retired)" with its drawing (the agent's default, told to Sam; Sam, asked again with #337: "Sounds good". The other way was that it vanishes
   for everyone). Nothing on the server changes: the kind stays in `record_achievement`'s list and nothing calls it.
 - What is left for the release itself is a box in [the release note](2026-11-06-redesign-release.md): the code out
   of the shared files, the About page's entries, Timmy's tip and line about it.
