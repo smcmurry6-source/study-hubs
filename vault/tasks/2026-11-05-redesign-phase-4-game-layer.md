@@ -294,6 +294,9 @@ These hold for each spec; a spec only adds to them.
     build the page to it ("The shop's look" in the shop's note). Sam: "Everything looks good. Merge when ready",
     "i like the redesign".
   **Next: session 2, the shop's client.**
+- 2026-11-12: beside the sessions, Ask Timmy part 3 (the admin page's Ask Timmy tab, `review/`) merged as `e0737a1`
+  ([#341](https://github.com/smcmurry6-source/study-hubs/pull/341), Sam: "merge"); `postcheck.js` passed. **Next: still
+  session 2, the shop's client**, then session 3 (Ask Timmy part 4).
 
 ## Outcome
 
