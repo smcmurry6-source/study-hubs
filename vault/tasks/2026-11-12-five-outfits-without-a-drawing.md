@@ -6,8 +6,8 @@ created: 2026-11-12
 requested-by: Claude Code (found building Timmy's place, part C of phase 4)
 due: before the redesign's release
 waiting-on: 
-agent: 
-pr: 
+agent: Claude Code
+pr: 339
 ---
 
 # Five everyday outfits in the shop's catalog have no drawing

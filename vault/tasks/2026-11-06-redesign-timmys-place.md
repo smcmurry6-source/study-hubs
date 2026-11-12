@@ -264,6 +264,12 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
   ([decisions](../decisions.md); the order is in [phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here to
   the release"):
   - **The statue behind Timmy** (BUG-089): fixed in the shop's art session (the box above).
+- 2026-11-12 (Claude Code), the shop's art session ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)):
+  BUG-089 fixed in the kit. Timmy's door spot moved in all 22 homes to the side of the door away from the statue,
+  with the yard's left spot (`SLOTS.left`), the path's lamp (`FIX.lamp`) and nine statues; `widget/place.js` is
+  unchanged. The frames and the coin left the kit for `widget/hub-art/shop.js`. Left open, Sam's call: BUG-091 (a tall
+  piece right of the path in front of Timmy's gum at the door). Details: [the shop](2026-11-06-redesign-timmy-shop.md),
+  "What session 1 built".
   - **What Timmy wears**: "if someone doesnt have a costume applied, they are naked. What you put wins." At his
     place too: with nothing on he is himself, where part C drew him in that day's holiday outfit. One line in
     `timmySvg()`, made in [Timmy everywhere](2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"). The place's

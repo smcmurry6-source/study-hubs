@@ -265,6 +265,22 @@ These hold for each spec; a spec only adds to them.
   refuses a new trophy kind as written, so the bowling trophy is kept on the device until the first migration after
   the release ([game-server](../reference/game-server.md)). The arcade lobby box is ticked: phases 1 and 2 did it.
   **Next: session 1, the shop's art.**
+- 2026-11-12 (Claude Code), **session 1, the shop's art**
+  ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)). Art only: no client code, nothing students
+  see, `migration_v54.sql` unchanged (nothing disagreed with it). **Hand-off for session 2**: "What session 1 built"
+  in [the shop's note](2026-11-06-redesign-timmy-shop.md) (read it before the spec). In short:
+  - new `widget/hub-art/shop.js`, `window.SH_SHOP_ART` (from `tools/figures/site/shop.mjs`): `coin(px)`,
+    `coinBody(small)`, `thumb(id)` for the four snacks and two boosts, `frame(rarity)`, `RARITIES`, `ITEMS`, `CSS`.
+    The frames and the coin left the place's kit (`SH_PLACE.frame`, `.coin` and `.RARITIES` are gone; `.burst` stays);
+  - the ten outfits are `SH_PLACE.OUTFITS` entries keyed by the shop's id, a costume marked `costume: true`; four
+    are on `NO_LOUPES` (safety glasses, pirate, astronaut, Captain Enamel);
+  - Timmy's door spot moved in all 22 homes (BUG-089 closed), with the left yard spot, the path's lamp and nine
+    statues; BUG-090 closed; BUG-091 opened (a tall piece right of the path now stands in front of Timmy's gum at
+    the door: Sam's call);
+  - sizes, compressed: the kit 77.1 to 80.6 KB, `outfits.js` 29.7 to 33.6 KB, `shop.js` 7.9 KB, none loaded with a
+    page; `tools/release/xp.js` 358 checks; `widget/hub-art/shop.js` is in `tools/ci/syntax.js`'s list. Session 2's
+    smoke test checks that it never loads with a page (its spec); the service worker's lists are session 8's.
+  **Next: session 2, the shop's client.**
 
 ## Outcome
 

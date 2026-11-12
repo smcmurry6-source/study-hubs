@@ -179,10 +179,11 @@ lane goes to `yard-side` and clears `yard-corner`, a piece in `yard-corner` take
 `tools/release/xp.js` runs fourteen changes through both and fails if they ever differ; it also checks the place's
 spring, summer and fall against `sh_shop_seasons` for every day of three years, and the kit's ids against the catalog.
 `get_place` is ready to be drawn (`shPlace.open({ place })`) but nothing calls it until visiting is built. Not wired
-yet: the shop (`buy_item`, the wallet, snacks and their HP in `get_pet_days_v2`: part B). **One gap, decided:** five
-everyday outfits in the catalog have no drawing ([task](../tasks/2026-11-12-five-outfits-without-a-drawing.md); Sam,
-2026-11-12: draw them), and the five rare costumes aren't drawn yet either; both are the shop's art session, and
-until then the place draws Timmy as himself in any of them.
+yet: the shop (`buy_item`, the wallet, snacks and their HP in `get_pet_days_v2`: part B). **The one gap is closed** (2026-11-12, the
+shop's art session, [#339](https://github.com/smcmurry6-source/study-hubs/pull/339)): the five everyday outfits
+that had no drawing and the five rare costumes are drawn as kit outfits under the catalog's ids (a costume is marked
+`costume`), and `tools/release/xp.js` fails if a catalog piece has no drawing, a kit costume has no row, or a snack's
+or boost's thumbnail (`widget/hub-art/shop.js`) differs from its row.
 
 The pages that call them (built 2026-11-12, [the idea board](../tasks/2026-11-06-idea-board.md)): `widget/ideas.js` (the
 board and the tick), `widget/replies.js` (a status note shows as a pop-up once and stays in the Inbox; it reads
