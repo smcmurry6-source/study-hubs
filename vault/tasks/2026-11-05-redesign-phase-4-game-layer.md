@@ -47,7 +47,7 @@ Put the ranks, trophies and celebrations on the design system without changing t
 - [ ] The arcade lobby of each live hub redrawn; game mechanics unchanged
 - [ ] The About page's trophy and rank entries updated
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
-- [ ] Preview link, phone and laptop screenshots, and Sam's look ("Sam approved this release" ticked by Sam)
+- [ ] Preview link, phone and laptop screenshots, and Sam's look, then Sam's "merge"
 - [ ] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
 ## Log

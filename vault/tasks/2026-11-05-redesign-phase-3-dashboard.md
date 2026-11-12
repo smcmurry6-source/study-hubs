@@ -39,8 +39,10 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 - [x] The dashboard on the design system, inspector 0 FAIL at three widths, light and dark
 - [x] Check-ins, surveys, notices, luck, the leaderboard, streaks, archive rules and the tour all work on the preview
 - [ ] About page lists every changed feature, counts true (drafted in [the release note](2026-11-06-redesign-release.md), "From phase 3"; it lands at the release)
-- [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
-- [ ] Preview link, phone and laptop screenshots, and Sam's look ("Sam approved this release" ticked by Sam): the second pass's screenshots sent 2026-11-11, then a third pass asked for; no preview link (on request only)
+- [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`) (#318)
+- [x] Preview link, phone and laptop screenshots, and Sam's look, then Sam's "merge": the preview on 2026-11-11 ("All that looks good"), "merge" on 2026-11-12 (#318)
+- [ ] BUG-076 ([bug log](../release/bug-log.md)): at 320 px wide with the largest text, "Start studying" is 2 px past
+  the screen's edge and the "You" card's seven day dots run off its side
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
 ## Log
@@ -228,7 +230,10 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 - 2026-11-12 (Claude Code, **merged**). [#318](https://github.com/smcmurry6-source/study-hubs/pull/318) was merged
   once CI was green on the head with `main` in it; `node tools/release/postcheck.js` passed after the publish. No site
   changelog line: nothing students can see changed. Sam asked why it took so long, and the answer became a standing
-  rule, [long-tests-once](../rules/long-tests-once.md). The idea board's session starts from `main`.
+  rule, [long-tests-once](../rules/long-tests-once.md). The idea board's session starts from `main`. What's left is
+  on the to-do list ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)): the idea board and BUG-076 in this
+  note's Done when, and the accessibility baseline, the slow-phone first paint and the real-presence look in
+  [the release note](2026-11-06-redesign-release.md)'s.
 
 ## Outcome
 

@@ -39,6 +39,5 @@ What wasn't tested, and why (no staging, no real iPhone, realtime not simulatedâ
 
 ## Release
 
-- [ ] Sam approved this release (Sam ticks it).
 - [ ] Merged; `node tools/release/postcheck.js` passed:
 - [ ] `DEPLOY_NOTES.md` and the site changelog updated.
