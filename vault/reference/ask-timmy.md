@@ -90,7 +90,7 @@ with `<hub>:`.
   Sam's reply reaches the sender as any reply does. The note ends `— Timmy's answer <id> · <section>`, the answer is
   marked (`report_id`), and the Timmy tab opens the whole chat from it. With `message` null (he was napping or wouldn't
   answer), `hub` says where. One report an answer (again returns the first), ten Timmy reports a person a day.
-- **The admin page's calls** (behind the admin secret, part 3 draws them): `admin_timmy_days` (by day and hub: people,
+- **The admin page's calls** (behind the admin secret; the Ask Timmy tab draws them, below): `admin_timmy_days` (by day and hub: people,
   questions, answers, cost, not covered, declined, errors, thumbs, quotes, offers, reported), `admin_timmy_chats`,
   `admin_timmy_chat`, `admin_timmy_not_covered` (gaps in the content), `admin_timmy_unchecked`, `admin_timmy_reported`,
   `admin_timmy_config`. None returns a visitor id.
@@ -133,7 +133,7 @@ person to read. The full report (every question and answer) is written as markdo
 3. Deploy the function with JWT verification off (the Supabase connector's `deploy_edge_function`: `index.ts`, `core.js`,
    `site.json`), and set `TIMMY_CONTENT_BASE` to the released content address
    (`https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/content/` or wherever the switch PR puts it).
-4. One question from the live site on a phone; `admin_timmy_days` shows it with its cost.
+4. One question from the live site on a phone; the admin page's Ask Timmy tab shows it, with its cost, and opens its chat.
 
 ## The chat in the new pages (`widget/ask.js` + `ask.css`, part 2)
 
@@ -186,13 +186,42 @@ download it, which keeps the new dashboard inside its request budget (`tools/rel
 - At the release: `sw.js` precaches the new pages' files (add `widget/ask.js` and `widget/ask.css` with the rest), and
   the function's `TIMMY_CONTENT_BASE` points at the released content (above).
 
-## Notes for the admin tab (part 3)
+## The admin page's Ask Timmy tab (`review/index.html`, part 3)
 
-- A report from the chat is a usual `question_flags` row: from the Report button, `timmy_report` marks the answer
-  (`report_id`), so the Timmy tab can open the whole chat; a drafted report the student sent is a plain report whose note
-  ends "drafted by Timmy", and `timmy_offer` marks its answer `sent`.
-- Unit ids, kinds and `go` shapes are fixed by `core.js`; text the student typed and Timmy's answers are untrusted text:
-  draw them with `textContent`, never as markup.
+Built 2026-11-12. A tab like the others (`#timmy`, under Feedback; `VIEWS.timmy`, its six loaders in `SRC`, `renderTimmy`),
+with the 7, 30 or 90 days range. Its code and notes are under "Ask Timmy" in the page's script.
+
+- **What it shows**, all from migration_v55's admin calls behind the admin secret (none returns a visitor id): figures for
+  the range (questions, estimated cost, the share not covered, declined, thumbs, quotes that checked, reports and how many
+  of his drafts were sent), **By hub** (the busiest day's people, since people can't be added up across days), the
+  **Settings** card, **By day** (one row a Central day, 14 shown), then four lists, each row opening its whole chat in place
+  (`admin_timmy_chat`, with the answer in question outlined): **Reported answers** (`admin_timmy_reported`, open or
+  resolved, "Reply in the Inbox"), **Not covered** (`admin_timmy_not_covered`, with a count of the closest lectures he
+  named: leads for content), **Quotes that didn't check out** (`admin_timmy_unchecked`) and **Chats**
+  (`admin_timmy_chats`, the newest 200). A row of hub chips narrows every card to one hub.
+- **A chat** shows both sides: what the student typed and where they were (only the context's view, lecture, paragraph,
+  the question for Ask Timmy, whether progress was sent, the dashboard's hubs, the plain voice: never the whole context),
+  then each answer with its kind, checked quotes, quotes that didn't check out, a drafted report or idea and what the
+  student did with it, the "go" button, the closest lecture, the thumb, the report, and the model, time, tokens and cost.
+- **Words are text.** Everything a student typed and everything Timmy answered (paragraphs, quotes, labels, drafts,
+  report notes) goes through the page's `esc()`, so it is drawn as text and never as markup.
+- **Settings**: Timmy's switch, the daily cap (0 to 100 dollars) and the questions a person a day (0 to 500), with
+  today's spend against the cap. Save checks the values, then shows what will change and asks (it reaches every student
+  at once); Escape or Cancel backs out; Confirm calls `admin_timmy_config` with only what changed.
+- **From the Inbox**: a report from the chat's Report button (its note ends "— Timmy's answer <id>") gets "Read the chat
+  with Timmy", which opens the tab with that answer's chat open. The reply is written in the Inbox, as for any report.
+- **Before the release** the live database has none of these functions: the calls answer "Could not find the
+  function", and the tab says Ask Timmy starts at the release (no error, no settings). It fills in once migration_v55 is
+  applied; nothing in the page changes then.
+- **The preview** answers the six calls with made-up chats shaped as migration_v55 returns them
+  (`timmyFixtures`/`timmyAdmin` in `tools/preview/runtime/preview.js`; the quotes are real lines of the new hubs' notes,
+  one chat carries markup on purpose), keeps the settings in the account's fixture database, and lists the made-up
+  Timmy report in the Inbox, so resolving it there shows on the tab. `{"missing": ["admin_timmy_"]}` in the preview's
+  settings shows the tab as it is before the release ([preview-a-change](../how-to/preview-a-change.md)).
+- **The test**: `tools/release/admin-ui.js` (the Release tests): the figures against the calls' rows, a chat opened, markup
+  drawn as text, no visitor or chat id on the page, the hub chips, no answer without the secret, the settings (a bad value
+  refused, asked first, Escape, saved once, off and on again), the Inbox's link, the tab before the release, axe on the
+  tab with chats open, and a 390 px phone with a chat open.
 
 Related: [the task](../tasks/2026-11-12-redesign-ask-timmy.md) · [the release](../tasks/2026-11-06-redesign-release.md) ·
 [game-server](game-server.md) · [event-taxonomy](event-taxonomy.md) · [analytics-retention](analytics-retention.md) ·

@@ -48,6 +48,10 @@ The **Preview** button, bottom left, opens the controls:
 - **What this site tried to save:** every write the page made, newest first. Copy it into a bug report.
 - The admin page is `review/`. As the admin account it opens by itself; otherwise its secret is `preview-admin`.
   Never type the real admin secret into a preview.
+- **The database before a migration** (no button: for a scripted test): `missing` in the preview's settings
+  (`localStorage.sh_preview_ui`, e.g. `{"missing": ["admin_timmy_"]}`) makes every function whose name starts with one of
+  those answer "Could not find the function", as the live database does before its migration. `tools/release/admin-ui.js`
+  uses it to see the admin page's Ask Timmy tab as it is until the redesign's release.
 
 If the button turns red, something tried to reach production: that's an S1 bug, report it (the write log says what).
 

@@ -1,21 +1,29 @@
 #!/usr/bin/env node
-// The admin page's Live and Hubs tabs and the Surveys tab's order, used in a preview (fixture data, production
+// The admin page's Live, Hubs and Ask Timmy tabs and the Surveys tab's order, used in a preview (fixture data, production
 // blocked) the way Sam would use them, plus what students then see on the dashboard and a hub page. Fails if
 //   - check-in groups or surveys aren't newest first (the fixtures put the newest group last by name);
 //   - Live shows an id, doesn't poll every 30 s while open, or polls while another tab is open or the page is hidden;
 //   - archiving a hub skips the confirmation, doesn't reach the dashboard and the hub's notice, or can't be reversed;
 //   - an end time doesn't hand the hub back to its dates; a change from a stale page isn't refused; a bad end time saves;
 //   - Escape doesn't close the form and return focus; a removed page can be set to Live;
+//   - Ask Timmy (migration_v55's admin_timmy_* calls, the preview's made-up chats): its numbers don't add up to what the
+//     functions return; a visitor id or chat id is drawn; anything a student typed or Timmy answered is drawn as markup;
+//     a chat doesn't open; the hub filter leaks other hubs; the settings save without asking, save a bad value, or don't
+//     reach everyone's chat (on, off); the Inbox's "Read the chat with Timmy" doesn't open that chat; the calls answer
+//     without the admin secret; before the release (the functions missing) the tab doesn't say so; serious or critical
+//     axe violations on the tab with a chat open (when axe-core is installed, as in CI);
 //   - any admin screen scrolls sideways at 390 px, a page throws, or any request heads for Supabase;
 //   - the page turns dark on a dark-mode device (it is light only, Sam 2026-11-06).
 // Screenshots (desktop light, phone on a dark-mode device) go to $SH_RELEASE_OUT/admin-ui/.   node tools/release/admin-ui.js
 'use strict';
-const path = require('path');
+const path = require('path'), fs = require('fs');
 const { start } = require('../preview/serve');
 const L = require('./lib');
 const problems = [], notes = [];
 function ok(c, what){ if (!c) problems.push(what); }
 const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & Endo's card is gone by its dates */
+let AXE = null; try { AXE = fs.readFileSync(process.env.AXE_CORE_PATH || require.resolve('axe-core/axe.min.js'), 'utf8'); } catch (e) {}
+const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
 
 (async () => {
   const srv = await start({ label: 'admin-ui test' });
@@ -61,7 +69,7 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
     ok(!first.some(n => /get_click_summary|get_search_terms|get_survey_results|get_feature_events|get_nuke_/.test(n)), `the Overview loads only its own data (it asked for ${[...new Set(first)].join(', ')})`);
     ok(first.filter(n => n === 'get_reports').length === 1, 'the sign-in check\'s reports are reused, not fetched twice');
     /* every view opens with its own title and no error */
-    for (const v of ['insights', 'time', 'questions', 'health', 'clicks', 'searches', 'engagement', 'checkins', 'surveys', 'inbox', 'recap', 'overview']) {
+    for (const v of ['insights', 'time', 'questions', 'health', 'clicks', 'searches', 'engagement', 'checkins', 'surveys', 'timmy', 'inbox', 'recap', 'overview']) {
       await go(page, v);
       await page.waitForFunction(v => { const el = document.querySelector(`[data-panel=${v}]`); return el && !el.querySelector('[aria-busy=true]') && el.children.length; }, v, { timeout: 15000 });
       const nav = (await page.textContent(`.nav [data-tab=${v}]`)).replace(/\d+$/, '').trim(), h1 = (await page.textContent('#viewTitle')).trim();
@@ -86,6 +94,100 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
     const iNew = titles.findIndex(t => /round 2/.test(t)), iOld = titles.findIndex(t => /round 1/.test(t));
     ok(iNew >= 0 && iOld > iNew, `surveys newest first (got ${titles.filter(t => /round/.test(t))})`);
     notes.push('Exam check-ins: groups and rows newest first; Surveys: newest first');
+
+    /* ---------- Ask Timmy (migration_v55, from the release): the preview answers admin_timmy_* with made-up chats ---------- */
+    const T = '[data-panel=timmy]';
+    const fixture = (fn, args) => page.evaluate(async ([u, a]) => { const r = await fetch(u, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(a) }); return { status: r.status, body: await r.json() }; }, [FIX + fn, args]);
+    const secret = await page.evaluate(() => sessionStorage.getItem('sh_admin_secret'));
+    const kpi = label => page.$$eval(`${T} .kpi`, (els, l) => { const k = els.find(e => e.querySelector('.kpi-label').textContent === l); return k ? k.querySelector('.kpi-value').textContent : null; }, label);
+    const tmWrites = () => page.evaluate(() => window.__shPreview.log().filter(x => x.name === 'admin_timmy_config' && x.kind === 'write').length);
+    await go(page, 'timmy');
+    await page.waitForSelector(`${T} [data-tm-item]`, { timeout: 15000 });
+    const days30 = (await fixture('admin_timmy_days', { p_secret: secret, p_days: 30 })).body;
+    const sum = (rows, k) => rows.reduce((a, r) => a + Number(r[k]), 0);
+    ok(await kpi('Questions') === sum(days30, 'questions').toLocaleString(), `the Questions figure is the days' total (${await kpi('Questions')} vs ${sum(days30, 'questions')})`);
+    ok(await kpi('Estimated cost') === '$' + sum(days30, 'cost_usd').toFixed(2), `the cost is the days' total (${await kpi('Estimated cost')})`);
+    ok(/^Timmy is on\. [\d,]+ questions in the last 30 days/.test(await page.textContent('#viewSub')), `the title row says he's on and how many questions ("${await page.textContent('#viewSub')}")`);
+    const denied = await fixture('admin_timmy_chat', { p_secret: 'wrong', p_chat: '7e1e0000-0000-4000-a000-000000000001' });
+    ok(denied.status === 401 && !JSON.stringify(denied.body).includes('working side'), `a chat without the admin secret is refused (${denied.status})`);
+    /* a chat with markup in it: drawn as text, nothing runs, no element is made from it */
+    const markup = page.locator(`${T} [data-tm-item]`, { hasText: 'Does <b>bold</b> work here?' }).first();
+    await markup.locator('[data-tm-open]').click();
+    await markup.locator('.tm-msg.is-timmy').waitFor({ timeout: 10000 });
+    const mx = await page.evaluate(sel => { const el = document.querySelector(sel); return { els: el.querySelectorAll('img, script, iframe, u, svg, object, i:not(.bar > i)').length,
+      bold: [...el.querySelectorAll('b')].some(b => /^bold$/.test(b.textContent)), xss: window.__tmXss, text: el.textContent }; }, T);
+    ok(mx.els === 0 && !mx.bold && mx.xss === undefined, `a student's or Timmy's markup made elements (${mx.els} elements, bold ${mx.bold}, ran ${mx.xss})`);
+    ok(['Does <b>bold</b> work here? <img src=x onerror="window.__tmXss=1">', 'so <i>this</i> shows', '<script>window.__tmXss=3</script>a quote with markup', 'L1 notes <u>underlined?</u>'].every(t => mx.text.includes(t)),
+      'what the student typed, Timmy\'s answer, a quote and a label show as the text they are');
+    ok(await markup.locator('[data-tm-open]').getAttribute('aria-expanded') === 'true' && (await markup.locator('[data-tm-open]').textContent()) === 'Hide the chat', 'an open chat says so on its button');
+    /* a usual chat: both sides, where the student was, the checked quotes, the button he offered, what it cost */
+    const usual = page.locator(`${T} [data-tm-item]`, { hasText: 'working side and the nonworking side' }).first();
+    await usual.locator('[data-tm-open]').click();
+    await usual.locator('.tm-msg.is-timmy').first().waitFor();
+    const ut = await usual.locator('.tm-chat').textContent();
+    ok(/Student[\s\S]*Lecture Notes · lecture review, paragraph 35[\s\S]*Timmy[\s\S]*Answered[\s\S]*Thumbs up[\s\S]*Checked\s*L1 notes: “the working \(laterotrusive\) side/.test(ut) && /Button: Open the notes: Occlusion review, paragraph 37/.test(ut) && /claude-opus-5-5 · [\d.]+ s · 1,180 in, 420 out/.test(ut),
+      `a chat shows both sides, where the student was, checked quotes, the button and the cost ("${ut.slice(0, 160)}…")`);
+    const ptext = await page.textContent(T);
+    ok(!/preview0000|00000000-0000-4000|7e1e0000|visitor/i.test(ptext), 'the Timmy tab draws no visitor id or chat id');
+    ok(/Closest lectures: Perio S4 Phase I Therapy & Instrumentation ×1/.test(ptext), 'Not covered sums up the closest lectures');
+    await page.screenshot({ path: path.join(shots, 'timmy-desktop-light.png'), fullPage: true });
+    if (AXE) {
+      await page.addScriptTag({ content: AXE });
+      const v = await page.evaluate(async sel => (await window.axe.run(sel, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] }, resultTypes: ['violations'] }))
+        .violations.filter(x => x.impact === 'serious' || x.impact === 'critical').map(x => `${x.id} (${x.nodes.length}: ${x.nodes[0].target.join(' ')})`), T);
+      ok(!v.length, `axe on the Timmy tab with chats open: ${v.join('; ')}`);
+      notes.push('Ask Timmy: axe (WCAG 2.2 AA) finds nothing serious with two chats open');
+    } else notes.push('Ask Timmy: axe-core isn\'t installed here, so its accessibility check was skipped (the Release tests run it)');
+    /* one hub: every card shows only that hub, and the figures follow */
+    await page.click(`${T} [data-tm-hub="perio"]`);
+    const hubsShown = await page.$$eval(`${T} [data-tm-item] .report-top .hub`, els => [...new Set(els.map(e => e.textContent.trim()))]);
+    ok(hubsShown.length && hubsShown.every(h => h === 'Perio'), `the hub filter shows Perio only (${hubsShown})`);
+    ok(await kpi('Questions') === sum(days30.filter(r => r.hub === 'perio'), 'questions').toLocaleString(), 'the figures follow the hub filter');
+    await page.click(`${T} [data-tm-hub="all"]`);
+    notes.push('Ask Timmy: figures match the functions\' rows, a chat opens with both sides, markup shows as text, no ids, one hub at a time, no answer without the secret');
+    /* the settings: a bad value is refused, a change asks first, Escape backs out, Confirm reaches everyone */
+    const form = `${T} [data-tm-form]`;
+    await page.fill(`${form} [name=cap]`, '500'); await page.click(`${form} [data-tm-save]`);
+    ok(/0 to 100/.test(await page.textContent(`${form} [data-tm-msg]`)) && !(await page.$(`${form} .arch-confirm`)), 'a cap over $100 is refused before anything is asked');
+    await page.fill(`${form} [name=cap]`, '15'); await page.uncheck(`${form} [name=enabled]`); await page.click(`${form} [data-tm-save]`);
+    await page.waitForSelector(`${form} .arch-confirm`);
+    const conf = await page.textContent(`${form} .arch-confirm`);
+    ok(/Turn Timmy off for everyone/.test(conf) && /\$10\.00 → \$15\.00/.test(conf), `the confirmation says what changes ("${conf.slice(0, 120)}")`);
+    ok(await page.evaluate(() => document.activeElement && document.activeElement.classList.contains('arch-confirm')), 'focus moves to the confirmation');
+    ok(await tmWrites() === 0, 'nothing is saved before Confirm');
+    await page.keyboard.press('Escape');
+    ok(await page.evaluate(() => !document.querySelector('[data-tm-form] .arch-confirm') && document.activeElement && document.activeElement.hasAttribute('data-tm-save')), 'Escape backs out and returns focus to Save');
+    await page.click(`${form} [data-tm-save]`); await page.click(`${form} [data-tm-confirm]`);
+    await page.waitForFunction(() => /^Saved\./.test((document.querySelector('[data-tm-msg]') || {}).textContent || ''));
+    ok(await tmWrites() === 1, 'Confirm saves once');
+    ok(/^Timmy is off/.test(await page.textContent('#viewSub')) && (await page.textContent(`${T} .tm-status .state`)) === 'Off' && await page.inputValue(`${form} [name=cap]`) === '15', 'the tab shows him off with the new cap');
+    const after = (await fixture('admin_timmy_config', { p_secret: secret })).body;
+    ok(after.enabled === false && after.day_cap_usd === 15 && after.per_visitor_day === 40, `the settings saved as asked (${JSON.stringify(after)})`);
+    await page.check(`${form} [name=enabled]`); await page.fill(`${form} [name=cap]`, '10'); await page.click(`${form} [data-tm-save]`);
+    ok(/Turn Timmy back on/.test(await page.textContent(`${form} .arch-confirm`)), 'turning him back on asks too');
+    await page.click(`${form} [data-tm-confirm]`);
+    await page.waitForFunction(() => /^Saved\./.test((document.querySelector('[data-tm-msg]') || {}).textContent || ''));
+    ok((await page.textContent(`${T} .tm-status .state`)) === 'On' && await tmWrites() === 2, 'he is on again');
+    await page.click(`${form} [data-tm-save]`);
+    ok(/Nothing changed/.test(await page.textContent(`${form} [data-tm-msg]`)) && await tmWrites() === 2, 'Save with nothing changed saves nothing');
+    await page.screenshot({ path: path.join(shots, 'timmy-settings-desktop-light.png') });
+    notes.push('Ask Timmy settings: $500 refused, off and $15 asked first and saved once, Escape backs out, back on, nothing changed saves nothing');
+    /* the Inbox: a report from the chat's Report button opens its whole chat, and its reply shows on the Timmy tab */
+    await go(page, 'inbox');
+    await page.waitForSelector('[data-tm-report="8811"]');
+    await page.click('[data-tm-report="8811"]');
+    await page.waitForSelector(`${T} [data-tm-report-id="8811"] .tm-msg.is-focus`, { timeout: 10000 });
+    ok(await page.evaluate(() => location.hash) === '#timmy' && /a day or two/.test(await page.textContent(`${T} [data-tm-report-id="8811"] .tm-msg.is-focus`)), 'the Inbox\'s "Read the chat with Timmy" opens that chat at the reported answer');
+    ok(/Open/.test(await page.textContent(`${T} [data-tm-report-id="8811"] .report-top`)), 'the reported answer shows as open');
+    await page.screenshot({ path: path.join(shots, 'timmy-reported-desktop-light.png'), fullPage: true });
+    await page.click(`${T} [data-tm-report-id="8811"] a[href="#inbox"]`);
+    await page.waitForSelector('.report[data-id="8811"] .resolve-btn');
+    await page.fill('.report[data-id="8811"] .report-replybox', 'Thanks: Timmy\'s rules now say to quote the notes word for word.');
+    await page.click('.report[data-id="8811"] .resolve-btn');
+    await page.waitForSelector('[data-panel=inbox] .report[data-id="8811"]', { state: 'detached' });   /* the Inbox shows open reports */
+    await go(page, 'timmy'); await page.click('#refreshBtn');
+    await page.waitForFunction(() => /Resolved/.test((document.querySelector('[data-panel=timmy] [data-tm-report-id="8811"] .report-top') || {}).textContent || ''), null, { timeout: 10000 });
+    notes.push('Ask Timmy: the Inbox opens a reported answer\'s chat; resolving it there shows Resolved here');
 
     /* Live: count, names, no ids, polling only while open and visible */
     const liveCalls = () => page.evaluate(() => window.__shPreview.log().filter(x => x.name === 'admin_live_presence').length);
@@ -204,28 +306,51 @@ const NOW = '2026-11-10T12:00';   /* before every live hub's last exam; Heme & E
     ok(await m.evaluate(() => !document.querySelector('#sidebar').classList.contains('open') && document.activeElement && document.activeElement.id === 'menuBtn'), 'Escape closes the menu and returns focus to Menu');
     const barTaps = await m.$$eval('.mbar .btn', els => els.map(e => Math.round(e.getBoundingClientRect().height)));
     ok(barTaps.every(h => h >= 44), `the top bar's buttons are at least 44 px tall (${barTaps})`);
-    for (const tab of ['overview', 'live', 'checkins', 'inbox', 'hubs', 'health']) {
+    for (const tab of ['overview', 'live', 'checkins', 'inbox', 'hubs', 'health', 'timmy']) {
       await go(m, tab);
       if (tab === 'live') await m.waitForFunction(() => (document.querySelector('#liveTotal') || {}).textContent === '5');
       if (tab === 'hubs') { await m.waitForSelector('[data-arch-hub="occlusion"] .state'); await m.waitForTimeout(400); await m.tap('[data-arch-edit="occlusion"]'); await m.tap('[data-arch-form="occlusion"] input[value=hidden]'); await m.tap('[data-arch-form="occlusion"] [type=submit]'); await m.waitForSelector('.arch-confirm'); }
       if (tab === 'checkins') await m.waitForSelector('[data-checkin-group]');
       if (tab === 'overview') await m.waitForSelector('[data-panel=overview] .card');
       if (tab === 'health') await m.waitForSelector('[data-panel=health] .qh-item', { timeout: 30000 });   /* Question health: the fixture flags on a live hub */
+      if (tab === 'timmy') { await m.waitForSelector('[data-panel=timmy] [data-tm-item]'); const r = m.locator('[data-panel=timmy] [data-tm-report-id="8811"]'); await r.locator('[data-tm-open]').tap(); await r.locator('.tm-msg.is-timmy').waitFor(); }
       await m.waitForTimeout(300);
+      /* touch targets, measured while that tab is the one showing (hidden ones have no size) */
+      if (tab === 'hubs') {
+        const tap = await m.$$eval('[data-arch-form="occlusion"] .arch-opt, [data-arch-form="occlusion"] .btn', els => els.filter(e => e.offsetParent).map(e => Math.round(e.getBoundingClientRect().height)));
+        ok(tap.length && tap.every(h => h >= 40), `touch targets in the form are at least 40 px tall (${tap})`);
+      }
+      if (tab === 'timmy') {
+        const tmTap = await m.$$eval('[data-panel=timmy] .btn, [data-panel=timmy] .chips button', els => els.filter(e => e.offsetParent).map(e => Math.round(e.getBoundingClientRect().height)));
+        ok(tmTap.length && tmTap.every(h => h >= 44), `the Timmy tab's buttons are at least 44 px tall on a phone (${[...new Set(tmTap)]})`);
+      }
       const over = await wide();
       ok(over <= 0, `${tab} scrolls sideways on a 390 px phone by ${over} px`);
       await m.screenshot({ path: path.join(shots, `${tab}-phone-dark.png`), fullPage: tab !== 'checkins' });
     }
-    const tap = await m.$$eval('[data-arch-form="occlusion"] .arch-opt, [data-arch-form="occlusion"] .btn', els => els.filter(e => e.offsetParent).map(e => Math.round(e.getBoundingClientRect().height)));
-    ok(tap.every(h => h >= 40), `touch targets in the form are at least 40 px tall (${tap})`);
     ok(G2.leaks.length === 0, `phone: requests to Supabase: ${G2.leaks.join(', ')}`);
     await phone.close();
-    notes.push('phone (390 px, dark-mode device): the page stays light; the menu (focus in, Escape out, 44 px bar); Overview, Live, Hubs with the form open, Check-ins and Inbox fit with no sideways scroll');
+    notes.push('phone (390 px, dark-mode device): the page stays light; the menu (focus in, Escape out, 44 px bar); Overview, Live, Hubs with the form open, Check-ins, Inbox, Question health and Ask Timmy with a chat open fit with no sideways scroll');
+
+    /* ---------- 3. before the release: the live database has no admin_timmy_* functions, and the tab says so ---------- */
+    const pre = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: 'light' });
+    const G3 = await L.guard(pre);
+    await pre.addInitScript(() => { try { const u = JSON.parse(localStorage.getItem('sh_preview_ui') || '{}'); u.missing = ['admin_timmy_']; localStorage.setItem('sh_preview_ui', JSON.stringify(u)); } catch (e) {} });
+    const b4 = await admin(pre, `review/?persona=admin&now=${NOW}#timmy`);
+    await b4.waitForFunction(() => /migration_v55/.test((document.querySelector('[data-panel=timmy]') || {}).textContent || ''), null, { timeout: 15000 });
+    ok(/starts at the redesign’s release/.test(await b4.textContent('#viewSub')) && !(await b4.$('[data-panel=timmy] .err')) && !(await b4.$('[data-panel=timmy] [data-tm-form]')),
+      'before the release the tab says Ask Timmy starts then, with no error and no settings');
+    await b4.screenshot({ path: path.join(shots, 'timmy-before-release-desktop-light.png') });
+    await go(b4, 'overview'); await b4.waitForSelector('[data-panel=overview] .card');
+    ok(!(await b4.$('[data-panel=overview] .err')), 'the rest of the page works without them');
+    ok(G3.leaks.length === 0, `before the release: requests to Supabase: ${G3.leaks.join(', ')}`);
+    await pre.close();
+    notes.push('before the release (admin_timmy_* missing, as on the live database): the tab says Ask Timmy starts at the release; the rest of the page works');
     ok(!errs.length, `page errors: ${errs.slice(0, 3).join(' | ')}`);
     notes.push(`screenshots in ${shots}`);
   } catch (e) {
     problems.push(`test run failed: ${e.message.split('\n')[0]}`);
   }
   await browser.close(); srv.server.close();
-  process.exit(L.report('admin page (Live, Hubs, order) in a preview', problems, notes));
+  process.exit(L.report('admin page (Live, Hubs, Ask Timmy, order) in a preview', problems, notes));
 })();

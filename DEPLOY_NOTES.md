@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (Ask Timmy's admin tab, part 3, Claude Code)** — Nothing students see changes: the admin page
+  (`review/index.html`) gets an **Ask Timmy** tab for [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md): figures for
+  the range, by hub and by day (questions, estimated cost, not covered, declined, errors, thumbs, quotes, reports), his
+  switch and daily limits (Save asks first, then `admin_timmy_config`), the answers students reported, the questions the
+  notes don't cover, the quotes that didn't check out and every chat, each opening in place; the Inbox links a Timmy report
+  to its chat. Every student's or Timmy's word is drawn as text, and no visitor id is drawn. migration_v55 isn't applied
+  until the release, so until then the tab says Ask Timmy starts then. The preview answers the `admin_timmy_*` calls with
+  made-up chats and can show a page as it is before a migration (`missing` in its settings); `tools/release/admin-ui.js`
+  covers the tab (and its Hubs form touch-target check now measures the form, which it hadn't been). How it works:
+  [ask-timmy](vault/reference/ask-timmy.md).
 - **2026-11-12 (the redesign's shop, session 1: its art; Claude Code, #339)** — Art only: no client code, nothing
   students see (the redesign isn't live), `migration_v54.sql` unchanged. New `tools/figures/site/shop.mjs`, built by
   `build.mjs` into **`widget/hub-art/shop.js`** (`window.SH_SHOP_ART`, 11.4 KB compressed, loaded by no page yet): the
