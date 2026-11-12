@@ -100,7 +100,8 @@ Dates and check-in hours: `HUBS` in `index.html`.
     change re-poses it: look at every scheme and move again after one. Reuse it for any new denture section.
     Fig 20's proportions come from outside sources (2026-11-06, [outside-sources-for-figures](../rules/outside-sources-for-figures.md)):
     the mandible loses about twice the maxilla's ridge height (Tallgren), and the basal bone stays put (Cawood & Howell).
-  - The anima figures are numbered Fig 1-26 (plus Fig 2b) in lecture order; a new one takes the next free number.
+  - The anima figures are numbered Fig 1-31 (plus Fig 2b) in lecture order; a new one takes the next free number. The
+    number is written in each figure's file (`plateHtml({ fig: "Fig 29" ...})` and its first comment), not computed.
   - **An alias shows a figure under a second lecture** without a second copy of its drawing: an entry
     `{ id, alias, lec, title, caption, data }` in `anima/index.mjs` (after the figure it copies); `build.mjs` gives it the
     original's markup and live code, and `data` overrides the original's. `erosion9` is Fig 19 under L9: `start` opens it
@@ -111,6 +112,15 @@ Dates and check-in hours: `HUBS` in `index.html`.
     mandibular first molar's mesial cusps in section; its pH scale places the critical pHs at about 6.3 (dentin) and 5.5
     (enamel) but labels only their order, since the lecture gave no numbers. `buffer` (Fig 25) computes both drinks'
     pH: A an unbuffered strong acid, B citric acid from its three pKa values, sized so A takes 5 drops and B 40.
+  - L10's figures (2026-11-12) draw what the L10 notes teach. `otsupport` (Fig 27), `otjiggle` (Fig 28) and `otmobility`
+    (Fig 30) share `anima/l10tooth.mjs`, a mandibular premolar in buccolingual section in its bone with normal or reduced
+    support; reuse it for any new L10 tooth. How far a tooth tips is illustrative, and Figs 27-28 draw the ligament
+    0.45 mm wide (real: about 0.25) so the hourglass shows; Fig 30 is to scale (18 px per mm), uses Dr. Abou-Arraj's
+    degrees and shows L7's grading in a note. `otxray` (Fig 29) is a periapical film of #28-#30 drawn in the Patient Box
+    films' style, one control per radiographic sign. `otanimal` (Fig 31) is the animal experiments: trauma (none,
+    jiggling, stopped 10 weeks later) by inflammation (none, gingivitis, periodontitis), with the dogs and the monkeys
+    side by side where they disagreed; its millimeters are illustrative and its labels use words. No figure names a
+    researcher on screen ("Conclusions are enough"); the citations are in each one's "What this shows".
   - **What settles a figure's content** (audit of every figure, 2026-11-04, [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
     the notes, then the help sheet's contact pictures for `CONTACTS` (Class III: #4's lingual cusp goes to the
     **mesial** fossa of #30, as the sheet draws it, though real crown widths would put it nearer the central fossa) and
@@ -181,6 +191,8 @@ and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until
 - 2026-11-10: Sam approved all four L9 candidates ("make all diagrams"); built the same day as Figs 24-26 (`abfract`,
   `cupping`, `buffer`) plus `erosion9`, Fig 19 again under L9 opened on bulimia
   ([task](../tasks/done/2026-11-10-occlusion-l9-follow-ups.md)). L9's diagram review is done; don't propose these again.
+- 2026-11-12: Sam approved every L10 candidate ("yes to all figures and anima"); built the same day as Figs 27-31
+  (`otsupport`, `otjiggle`, `otxray`, `otmobility`, `otanimal`). L10's diagram review is done; don't propose these again.
 
 ## Drawn Patient Box cases
 
