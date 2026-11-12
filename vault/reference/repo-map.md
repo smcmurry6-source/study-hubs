@@ -70,6 +70,11 @@ tags: [map]
   Kokoro voice with a pronunciation lexicon, synthesized music and mastering (its `README.md`). The mp3 goes in
   `hubs/<hub-id>/audio/timmy-time.mp3`; the hub defines `window.SH_PODCAST` and a `<div data-sh-podcast>` slot.
   Like narration, the episode must not drift from the notes: fix both in the same PR.
+- `supabase/functions/timmy/` — Ask Timmy's server, the Supabase Edge Function `timmy` (deployed at the redesign's release):
+  `core.js` (the logic, run under Node by the tests), `index.ts` (the Deno wrapper), `site.json` (the site help, built from
+  the About page by `tools/timmy/build.mjs`; rebuild it when `about/index.html` changes). Its tests and eval are in
+  `tools/timmy/` (`test.mjs`, `test-set.json`, `eval.mjs`), its database suite is `tools/release/timmy.js`, its tables are
+  `migration_v55.sql`: [ask-timmy](ask-timmy.md).
 - `tools/reddit-scout/` — `scout.py` reads the Claude subreddits' feeds into one digest for `/reddit-scout`
   (`.claude/skills/reddit-scout/`); `log.md` keeps every run's suggestions, Sam's answers and the posts judged.
 - `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new

@@ -103,6 +103,8 @@ Hub building
 - [Question health](reference/question-health.md): stable ids, versions, what's tracked per question, the flags and how to act on them.
 - [The game layer's server](reference/game-server.md): XP without a cap and its guardrails, server-checked answers, the three
   journeys, Shiny Gold Crowns and Timmy's shop, the idea board (migration_v54, applied at the redesign's release).
+- [Ask Timmy's server](reference/ask-timmy.md): the `timmy` Edge Function, how a question is answered from a hub's content
+  with every quote checked, the limits and cost, the Report button, the eval (migration_v55, applied at the redesign's release).
 - `LESSONS.md`: what the data and archived hubs taught. Read it before building or restructuring a hub.
 - `DEPLOY_NOTES.md`: the change log, newest first. Grep it for a hub or feature.
 - `supabase/schema.sql` and `migration_v*.sql`: the database; `supabase/pending-migrations.txt` lists the ones written and

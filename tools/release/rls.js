@@ -224,7 +224,9 @@ try {
       if (!has(t)) { fail(`rls-expectations.json's anonNone lists ${t}, which isn't a table`); continue; }
       for (const p of ['select', 'insert', 'update', 'delete']) if (sql(`select has_table_privilege('anon', ${q('public.' + t)}, ${q(p)})`)[0][0] === 't') fail(`anon has ${p} on ${t}, which must be closed to anon altogether`);
       if (Number(sql(`select count(*) from pg_policies where schemaname = 'public' and tablename = ${q(t)}`)[0][0])) fail(`${t} has a row-level security policy; it must have none`);
-      for (const [what, stmt] of [['read', `select count(*) from public.${t}`], ['insert into', `insert into public.${t} default values`], ['update', `update public.${t} set ${t === 'visit_secret' ? "secret = 'x'" : "visitor_id = 'x'"}`], ['delete from', `delete from public.${t}`]]) {
+      /* an update of the table's first ordinary column to itself (not every closed table has a visitor_id) */
+      const col = (sql(`select attname from pg_attribute where attrelid = ${q('public.' + t)}::regclass and attnum > 0 and not attisdropped and attidentity = '' and attgenerated = '' order by attnum limit 1`)[0] || [])[0];
+      for (const [what, stmt] of [['read', `select count(*) from public.${t}`], ['insert into', `insert into public.${t} default values`], ['update', `update public.${t} set ${col} = ${col}`], ['delete from', `delete from public.${t}`]]) {
         let done = false; try { sql(`begin; set local role anon; ${stmt}; rollback;`); done = true; } catch (e) { if (!/permission denied/i.test(e.message)) done = true; }
         if (done) fail(`anon could ${what} ${t} directly (or it failed for another reason than permission)`);
       }

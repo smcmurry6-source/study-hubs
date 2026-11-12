@@ -22,6 +22,9 @@ const SUITES = [
   ['admin', 'Admin operations on fixtures (live presence privacy, archive overrides, order)', 'tools/release/admin-ops.js'],
   ['retention', 'Analytics retention on fixtures (deletes, kept hours, device linking, recap)', 'tools/release/retention.js'],
   ['xp', 'XP and the game layer on fixtures (replayed calls, double taps, linked devices, the shop, the idea board)', 'tools/release/xp.js'],
+  ['timmy', 'Ask Timmy\'s database on fixtures (limits, the daily spend, own chats only, admin reads, linked devices)', 'tools/release/timmy.js'],
+  ['timmyfn', 'Ask Timmy\'s function with a fake model (paragraph links against the engine, quotes, offers, limits, HTTP)', 'tools/timmy/test.mjs'],
+  ['timmyset', 'Ask Timmy\'s test set checks itself (every case answerable, "not covered" really not covered; fake model, free)', 'tools/timmy/eval.mjs', ['--dry']],
   ['a11y', 'Accessibility (axe, keyboard, reduced motion)', 'tools/release/a11y.js'],
   ['perf', 'Performance budgets (slow 4G phone)', 'tools/release/perf.js'],
   ['matrix', 'Devices and resilience (refresh, history, offline, slow)', 'tools/release/matrix.js']
@@ -29,10 +32,10 @@ const SUITES = [
 
 const rows = [];
 let failed = 0;
-for (const [key, name, file] of SUITES) {
+for (const [key, name, file, args] of SUITES) {
   process.stdout.write(`\n=== ${name} (${file})\n`);
   const t0 = Date.now();
-  const r = spawnSync(process.execPath, [path.join(L.ROOT, file)], { cwd: L.ROOT, encoding: 'utf8', env: process.env, maxBuffer: 64 * 1048576 });
+  const r = spawnSync(process.execPath, [path.join(L.ROOT, file), ...(args || [])], { cwd: L.ROOT, encoding: 'utf8', env: process.env, maxBuffer: 64 * 1048576 });
   const out = (r.stdout || '') + (r.stderr || '');
   process.stdout.write(out);
   const secs = Math.round((Date.now() - t0) / 1000);
