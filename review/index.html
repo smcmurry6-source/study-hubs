@@ -334,6 +334,35 @@ code{font-size:13px;}
 .qh-filter .qh-copy{margin-left:auto;}
 .qh-more{text-align:center; margin-top:12px;}
 
+/* ---------- Ask Timmy (migration_v55): what students asked him, every chat to read, his switch and limits ---------- */
+.tm-status{display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+.tm-spend{display:grid; gap:8px; margin-top:12px;}
+.tm-form{display:grid; gap:16px; margin-top:16px; padding-top:16px; border-top:1px solid var(--rule);}
+.tm-form .arch-fields{margin-top:0; grid-template-columns:1fr;}
+.tm-form .arch-confirm ul{margin:8px 0 12px; color:var(--text);}
+table.data.tm-table td.lbl{white-space:nowrap;}
+.tm-sum{color:var(--muted); font-size:13px; line-height:19px; margin:-4px 0 12px; overflow-wrap:anywhere;}
+.tm-sum b{color:var(--text); font-weight:600;}
+.tm-label{display:block; color:var(--faint); font-size:var(--fs-small); line-height:16px; margin-bottom:2px;}
+.tm-words{font-size:15px; line-height:22px; white-space:pre-wrap; overflow-wrap:anywhere; max-width:80ch;}
+.tm-words.is-quote{color:var(--muted); font-size:14px; line-height:20px;}
+.tm-chat{display:grid; gap:10px; padding:12px; border-radius:var(--r-card); background:var(--raised); min-width:0;}
+.tm-chat-head{display:flex; align-items:center; gap:4px 10px; flex-wrap:wrap; color:var(--muted); font-size:13px;}
+.tm-msg{display:grid; gap:6px; padding:10px 12px; border:1px solid var(--border); border-left:3px solid var(--control); border-radius:var(--r-control); background:var(--sheet); min-width:0; max-width:86ch;}
+.tm-msg.is-timmy{border-left-color:var(--accent);}
+.tm-msg.is-focus{outline:2px solid var(--warn); outline-offset:1px;}
+.tm-who{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+.tm-who b{font-weight:600;}
+.tm-text{white-space:pre-wrap; overflow-wrap:anywhere; line-height:21px;}
+.tm-cites{list-style:none; margin:0; padding:0; display:grid; gap:4px; font-size:13px; line-height:19px; color:var(--muted);}
+.tm-cites li{overflow-wrap:anywhere;}
+.tm-cites .pill{height:20px; margin-right:4px;}
+.tm-box{display:grid; gap:4px; padding:8px 10px; border-radius:var(--r-control); background:var(--raised);}
+.tm-box.is-report{background:var(--pill-neg-bg);}
+.tm-box.is-report .tm-label{color:var(--pill-neg-ink);}
+.tm-item .report-actions .report-sent{flex:1 1 240px;}
+.tm-meta{color:var(--faint); font-size:var(--fs-small); line-height:16px; overflow-wrap:anywhere;}
+
 /* ---------- tablet and phone: the frame folds into a 48px bar; the menu opens as a full-screen sheet ---------- */
 @media (max-width:1100px){ .s8, .s7, .s5, .s4{grid-column:span 12;} }
 @media (max-width:860px){
@@ -401,6 +430,7 @@ code{font-size:13px;}
       <p class="group-label">Feedback</p>
       <a class="nav-item" href="#checkins" data-tab="checkins">Exam check-ins</a>
       <a class="nav-item" href="#surveys" data-tab="surveys">Surveys</a>
+      <a class="nav-item" href="#timmy" data-tab="timmy">Ask Timmy</a>
       <p class="group-label">Manage</p>
       <a class="nav-item" href="#hubs" data-tab="hubs">Hubs on the dashboard</a>
       <a class="nav-item" href="#recap" data-tab="recap">Recap</a>
@@ -440,6 +470,7 @@ code{font-size:13px;}
     <section class="view" data-panel="engagement" hidden></section>
     <section class="view" data-panel="checkins" hidden></section>
     <section class="view" data-panel="surveys" hidden></section>
+    <section class="view" data-panel="timmy" hidden></section>
     <section class="view" data-panel="hubs" hidden></section>
     <section class="view" data-panel="recap" hidden></section>
   </main>
@@ -495,12 +526,14 @@ code{font-size:13px;}
     engagement: { t: "Engagement", range: 1, past: 1, needs: ["streaks", "nukeSum", "nukeHub", "nukeRecent", "nukeUnlocks", "modes"] },
     checkins:   { t: "Exam check-ins", needs: ["debriefs"] },
     surveys:    { t: "Surveys", needs: ["surveys"] },
+    timmy:      { t: "Ask Timmy", range: 1, needs: ["timmyConfig", "timmyDays", "timmyChats", "timmyReported", "timmyGaps", "timmyUnchecked"] },
     hubs:       { t: "Hubs on the dashboard" },
     recap:      { t: "Recap" }
   };
 
   var secret = null;
-  var state = { days: 30, archived: false, tab: "overview", qHub: "all", timeHub: null, clickHub: null, clickAll: false, inbox: "open", ideas: "all" };
+  var state = { days: 30, archived: false, tab: "overview", qHub: "all", timeHub: null, clickHub: null, clickAll: false, inbox: "open", ideas: "all",
+    tmHub: "all", tmMore: null, tmFocus: null };
   try {
     var saved = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
     if (saved.days) state.days = saved.days;
@@ -594,7 +627,14 @@ code{font-size:13px;}
     surveys:     { f: function(){ return rpc("get_survey_results", { p_secret: secret }); } },
     debriefs:    { f: function(){ return rpc("get_exam_debriefs", { p_secret: secret }); } },
     podComments: { f: function(){ return rpc("admin_pod_comments", { p_secret: secret, p_days: 60 }); } },
-    ideas:       { f: function(){ return rpc("admin_ideas", { p_secret: secret, p_days: 90 }); } }
+    ideas:       { f: function(){ return rpc("admin_ideas", { p_secret: secret, p_days: 90 }); } },
+    /* Ask Timmy (migration_v55, applied at the redesign's release): none of these returns a visitor id */
+    timmyConfig:    { f: function(){ return rpc("admin_timmy_config", { p_secret: secret }); } },
+    timmyDays:      { r: 1, f: function(d){ return rpc("admin_timmy_days", { p_secret: secret, p_days: d }); } },
+    timmyChats:     { r: 1, f: function(d){ return rpc("admin_timmy_chats", { p_secret: secret, p_hub: null, p_days: d, p_limit: 200 }); } },
+    timmyReported:  { r: 1, f: function(d){ return rpc("admin_timmy_reported", { p_secret: secret, p_days: d }); } },
+    timmyGaps:      { r: 1, f: function(d){ return rpc("admin_timmy_not_covered", { p_secret: secret, p_days: d }); } },
+    timmyUnchecked: { r: 1, f: function(d){ return rpc("admin_timmy_unchecked", { p_secret: secret, p_days: d }); } }
   };
   var data = {}, inflight = {};
   function fresh(k){ var x = data[k]; return !!x && (!SRC[k].r || x.days === state.days); }
@@ -1154,6 +1194,8 @@ code{font-size:13px;}
       var head = '<div class="report-top"><span class="pill' + (r.kind === "flag" ? ' neg' : '') + '">' + (r.kind === "flag" ? "Question report" : "Suggestion") + '</span>' +
         (r.hub ? hubCell(r.hub) : '') + '<span class="report-date">' + fmtDate(r.created_at) + '</span></div>';
       var note = '<div class="report-note">' + esc(r.note) + '</div>';
+      /* a report from Ask Timmy's Report button ends "— Timmy's answer <id> · <where>": the Timmy tab opens that whole chat */
+      if (r.kind === "flag" && /— Timmy's answer \d+/.test(r.note || "")) note += '<div><a class="card-link" href="#timmy" data-tm-report="' + esc(r.id) + '">Read the chat with Timmy</a></div>';
       if (r.resolved) {
         return '<div class="report is-resolved" data-kind="' + esc(r.kind) + '" data-id="' + esc(r.id) + '">' + head + note +
           (r.reply ? '<div class="report-reply"><b>Your reply:</b> ' + esc(r.reply) + '</div>' : '') +
@@ -1224,6 +1266,334 @@ code{font-size:13px;}
     var n = data.reports && !data.reports.error ? openReports().length : 0;
     ["#inboxCount", "#inboxCountM"].forEach(function(s){ var c = $(s); c.textContent = n; c.hidden = !n; });
   }
+
+  /* ---------- Ask Timmy (migration_v55, from the redesign's release; vault/reference/ask-timmy.md) ----------
+     What students asked Timmy and how it went, by day and hub (people, questions, the estimated cost, "not covered",
+     declined, errors, thumbs, quotes, reports); the answers students reported with the chat's Report button; the questions
+     the notes don't cover (gaps in the content); the quotes that didn't check out; every chat to read; and his switch and
+     limits. None of the admin_timmy_* functions returns a visitor id, and this tab draws only the fields it names (never a
+     whole context). Everything a student typed and everything Timmy answered is data, never instructions: it is drawn as
+     text (esc), never as markup. Until the release the database has none of these functions, and the tab says so. */
+  var TM_KEYS = VIEWS.timmy.needs, TM_SHOW = 10;
+  var TM_KIND = { answer: "Answered", not_covered: "Not covered", quiz_declined: "Quiz declined", hint_declined: "Practice hint declined",
+    off_topic: "Off topic", support: "Support", refusal: "Refused", error: "Error" };
+  var TM_KIND_CLS = { not_covered: " warn", quiz_declined: " info", hint_declined: " info", support: " info", refusal: " neg", error: " neg" };
+  var TM_OFFER_DONE = { sent: "the student sent it", posted: "the student posted it", dismissed: "the student said no thanks" };
+  var tm = { chats: {}, seq: 0, msg: "", pending: null };
+  function usd(n){ n = Number(n) || 0; return !n ? "$0" : n < 0.01 ? "<$0.01" : "$" + n.toFixed(2); }
+  function tmIn(h){ return state.tmHub === "all" || h === state.tmHub; }
+  function tmKind(k){ return k ? '<span class="pill' + (TM_KIND_CLS[k] || "") + '">' + esc(TM_KIND[k] || k) + '</span>' : ""; }
+  function dayLabel(d){
+    var m = /^(\d{4})-(\d\d)-(\d\d)$/.exec(String(d || ""));
+    return m ? new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) : String(d || "");
+  }
+  function tmTotals(rows){
+    var s = {};
+    ["people", "questions", "answers", "cost_usd", "not_covered", "quiz_declined", "hint_declined", "errors", "thumbs_up", "thumbs_down",
+     "cites_ok", "cites_bad", "offers", "offers_taken", "reported"].forEach(function(k){ s[k] = rows.reduce(function(a, r){ return a + (Number(r[k]) || 0); }, 0); });
+    return s;
+  }
+  function tmRows(k){ var d = D(k).data; return (Array.isArray(d) ? d : []).filter(function(r){ return tmIn(r.hub); }); }
+  function tmHubs(){
+    var seen = {};
+    TM_KEYS.forEach(function(k){ var d = D(k).data; if (Array.isArray(d)) d.forEach(function(r){ if (r && r.hub) seen[r.hub] = 1; }); });
+    return Object.keys(seen).sort(function(a, b){ return (a === "dashboard") - (b === "dashboard") || hubLabel(a).localeCompare(hubLabel(b)); });
+  }
+  /* the reply's "closest lecture" arrives as text (reply->>'closest'); a chat's own reply carries it as an object */
+  function tmClosest(c){ if (typeof c === "string") { try { c = JSON.parse(c); } catch (e) { c = null; } } return c && typeof c === "object" ? c : null; }
+  function tmLecName(c, hub){ return (c.hub && c.hub !== hub ? hubLabel(c.hub) + " " : "") + [c.label || c.lec || "", c.title || ""].join(" ").trim(); }
+  /* where a student was and what the page sent with the question: only these fields, as words */
+  function tmContext(x){
+    if (!x || typeof x !== "object") return "";
+    var out = [];
+    if (x.view) out.push("on " + String(x.view).split("/").map(prettyPart).join(" › "));
+    if (x.lec) out.push("lecture " + x.lec + (typeof x.k === "number" ? ", paragraph " + (x.k + 1) : ""));
+    if (x.ask && x.ask.qid) out.push("Ask Timmy on question " + x.ask.qid + (x.ask.right === true ? ", answered right" : x.ask.right === false ? ", answered wrong" : ""));
+    if (x.progress) out.push("sent their progress (" + plural(x.progress.lectures, "lecture") + ")");
+    if (Array.isArray(x.hubs) && x.hubs.length) out.push("live hubs: " + x.hubs.map(hubLabel).join(", "));
+    if (x.voice === "plain") out.push("the plain “Ask the hub” voice");
+    return out.join(" · ");
+  }
+  function tmGo(g){
+    if (!g || typeof g !== "object") return "";
+    var where = g.hub ? hubLabel(g.hub) + " " : "";
+    if (g.v === "practice") return "Practice " + where + (g.lec || "");
+    if (g.v === "drill") return "Daily drill" + (g.hub ? " on " + hubLabel(g.hub) : "");
+    if (g.v === "notes") return "Open the notes: " + where + (g.lec || "") + (typeof g.k === "number" ? ", paragraph " + (g.k + 1) : "");
+    return String(g.v || "");
+  }
+  function tmMsg(m, focus, hub){
+    var timmy = m.who === "timmy", r = timmy && m.reply && typeof m.reply === "object" ? m.reply : null;
+    var head = '<div class="tm-who"><b>' + (timmy ? "Timmy" : "Student") + '</b>' + (timmy ? tmKind(m.kind) : "") +
+      (m.thumb === 1 ? '<span class="pill pos">Thumbs up</span>' : m.thumb === -1 ? '<span class="pill neg">Thumbs down</span>' : "") +
+      (m.report_id ? '<span class="pill neg">Reported</span>' : "") + '<span class="report-date">' + esc(fmtDate(m.at)) + '</span></div>';
+    if (!timmy) {
+      var where = tmContext(m.context);
+      return '<div class="tm-msg is-student">' + head + '<div class="tm-text">' + esc(m.text) + '</div>' + (where ? '<div class="tm-meta">' + esc(where) + '</div>' : "") + '</div>';
+    }
+    var paras = r && Array.isArray(r.paragraphs) && r.paragraphs.length ? r.paragraphs : [{ text: m.text, cites: [] }];
+    var out = paras.map(function(p){
+      var cites = p && Array.isArray(p.cites) ? p.cites : [];
+      return '<div class="tm-text">' + esc(p && p.text) + '</div>' + (cites.length ? '<ul class="tm-cites">' + cites.map(function(c){
+        return '<li><span class="pill ok">Checked</span>' + esc((c.hub && c.hub !== hub ? hubLabel(c.hub) + " " : "") + (c.label || c.id || "")) + ': “' + esc(c.quote) + '”</li>';
+      }).join("") + '</ul>' : "");
+    }).join("");
+    var bad = Array.isArray(m.unchecked) ? m.unchecked : [];
+    if (bad.length) out += '<ul class="tm-cites">' + bad.map(function(u){ return '<li><span class="pill warn">Didn’t check out</span>' + esc(u && u.id) + ': “' + esc(u && u.quote) + '”</li>'; }).join("") + '</ul>';
+    var o = r && r.offer, done = m.offer_action ? ": " + TM_OFFER_DONE[m.offer_action] : ", not answered yet";
+    if (o && o.kind === "report") out += '<div class="tm-box"><span class="tm-label">Offered to send a report' + esc(done) + '</span><div class="tm-text">' + esc(o.text) + '</div></div>';
+    if (o && o.kind === "idea") out += '<div class="tm-box"><span class="tm-label">Offered to post an idea' + esc(done) + '</span><div class="tm-text"><b>' + esc(o.title) + '</b>' +
+      (o.body ? "\n" + esc(o.body) : "") + '</div><span class="tm-meta">' + esc((IDEA_CAT[o.category] || o.category || "") + " · " + (o.hub ? hubLabel(o.hub) : "all hubs")) + '</span></div>';
+    var extra = [], cl = r && tmClosest(r.closest);
+    if (r && r.go) extra.push("Button: " + tmGo(r.go));
+    if (cl) extra.push("Closest: " + tmLecName(cl, hub));
+    if (extra.length) out += '<div class="tm-meta">' + esc(extra.join(" · ")) + '</div>';
+    if (m.report_id) out += '<div class="tm-box is-report"><span class="tm-label">The student’s report</span><div class="tm-text">' + esc(m.report || "") + '</div></div>';
+    var cost = [m.model || "", m.ms != null ? (Number(m.ms) / 1000).toFixed(1) + " s" : "",
+      m.input_tokens != null ? fmtNum(m.input_tokens) + " in, " + fmtNum(m.output_tokens) + " out, " + fmtNum(m.cache_read_tokens) + " from the cache, " + fmtNum(m.cache_write_tokens) + " written to it" : "",
+      usd(m.cost_usd)].filter(Boolean);
+    out += '<div class="tm-meta">' + esc(cost.join(" · ")) + '</div>';
+    return '<div class="tm-msg is-timmy' + (focus ? ' is-focus' : '') + '">' + head + out + '</div>';
+  }
+  function tmChatHTML(c, focus){
+    if (!c || typeof c !== "object" || !Array.isArray(c.messages)) return empty("This chat isn’t there any more.");
+    var cost = c.messages.reduce(function(s, m){ return s + (Number(m.cost_usd) || 0); }, 0);
+    var asked = c.messages.filter(function(m){ return m.who === "student"; }).length;
+    return '<p class="tm-chat-head">' + hubCell(c.hub) + '<span>' + esc("Started " + fmtDate(c.started) + " · " + plural(asked, "question") + " · " + usd(cost)) + '</span></p>' +
+      c.messages.map(function(m){ return tmMsg(m, !!focus && Number(m.id) === focus, c.hub); }).join("");
+  }
+  /* "Read the chat": the whole chat opens under the row it was asked from, with the answer in question outlined */
+  function tmOpen(btn, scroll){
+    var item = btn.closest("[data-tm-item]"), box = item && item.querySelector(".tm-chat");
+    if (!box) return;
+    var open = btn.getAttribute("aria-expanded") === "true";
+    btn.setAttribute("aria-expanded", String(!open)); btn.textContent = open ? "Read the chat" : "Hide the chat";
+    box.hidden = open;
+    if (open) return;
+    var id = item.getAttribute("data-tm-chat"), focus = Number(item.getAttribute("data-tm-msg-id")) || null;
+    function fill(){
+      var c = tm.chats[id];
+      box.innerHTML = !c || c.loading ? '<p class="muted" aria-busy="true">Loading the chat…</p>' : c.error ? errBox("Couldn’t load this chat. Close it and try again.") : tmChatHTML(c.data, focus);
+      var f = scroll && $(".tm-msg.is-focus", box);
+      if (f) f.scrollIntoView({ block: "center" });
+    }
+    if (!tm.chats[id] || tm.chats[id].error) {
+      tm.chats[id] = { loading: true }; fill();
+      rpc("admin_timmy_chat", { p_secret: secret, p_chat: id }).then(function(res){
+        tm.chats[id] = res.error ? { error: res.error } : { data: res.data };
+        if (box.isConnected && !box.hidden) fill();
+      });
+    } else fill();
+  }
+  function tmList(key, rows, item, none){
+    if (!rows.length) return empty(none);
+    var all = state.tmMore === key;
+    return '<div class="tm-list">' + (all ? rows : rows.slice(0, TM_SHOW)).map(item).join("") + '</div>' +
+      (rows.length > TM_SHOW ? '<p class="qh-more"><button class="btn" type="button" data-tm-more="' + key + '">' + (all ? "Show fewer" : "Show all " + fmtNum(rows.length)) + '</button></p>' : "");
+  }
+  function tmItem(o){
+    var id = "tm-chat-" + (++tm.seq);
+    return '<div class="report tm-item" data-tm-item data-tm-chat="' + esc(o.chat) + '"' + (o.msg ? ' data-tm-msg-id="' + esc(o.msg) + '"' : "") +
+      (o.report ? ' data-tm-report-id="' + esc(o.report) + '"' : "") + '><div class="report-top">' + o.top + '</div>' + o.body +
+      '<div class="report-actions"><span class="report-sent grow">' + esc(o.meta || "") + '</span>' + (o.actions || "") +
+      '<button class="btn" type="button" data-tm-open aria-expanded="false" aria-controls="' + id + '">Read the chat</button></div>' +
+      '<div class="tm-chat" id="' + id + '" hidden></div></div>';
+  }
+  /* the columns: every one by day; by hub (a narrower card) the main ones, no bar */
+  function tmCells(s, max, short){
+    return '<td class="n">' + fmtNum(s.questions) + '</td>' + (short ? '' : '<td class="barcell">' + bar(s.questions, max) + '</td>') + '<td class="n">' + usd(s.cost_usd) + '</td>' +
+      '<td class="n">' + fmtNum(s.not_covered) + '</td>' + (short ? '' : '<td class="n">' + fmtNum(s.quiz_declined + s.hint_declined) + '</td><td class="n">' + fmtNum(s.errors) + '</td>') +
+      '<td class="n">' + fmtNum(s.thumbs_up) + ' / ' + fmtNum(s.thumbs_down) + '</td>' + (short ? '' : '<td class="n">' + fmtNum(s.cites_bad) + '</td><td class="n">' + fmtNum(s.reported) + '</td>');
+  }
+  function tmHead(short){
+    return '<th class="n">Questions</th>' + (short ? '' : '<th class="barcell"><span class="visually-hidden">Questions as a bar</span></th>') + '<th class="n">Cost</th><th class="n">Not covered</th>' +
+      (short ? '' : '<th class="n">Declined</th><th class="n">Errors</th>') + '<th class="n">Thumbs up / down</th>' + (short ? '' : '<th class="n">Quotes off</th><th class="n">Reported</th>');
+  }
+  function tmTable(label, head, body){
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="' + label + '"><table class="data tm-table"><thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+  }
+  /* one row a Central day; a person who asked on two hubs that day counts once on each */
+  function tmDaysCard(rows){
+    if (D("timmyDays").error) return card("By day", "", errBox("Couldn’t load Timmy’s numbers by day. Try Refresh."));
+    if (!rows.length) return card("By day", rangeText(), empty("Nobody asked Timmy anything in this range."));
+    var byDay = {}, max = 0;
+    rows.forEach(function(r){ (byDay[r.day] = byDay[r.day] || []).push(r); });
+    var list = Object.keys(byDay).sort().reverse().map(function(d){ var s = tmTotals(byDay[d]); max = Math.max(max, s.questions); return [d, s, byDay[d].length]; });
+    var all = state.tmMore === "days", shown = all ? list : list.slice(0, 14);
+    var body = shown.map(function(x){
+      return '<tr><td class="lbl">' + esc(dayLabel(x[0])) + (state.tmHub === "all" ? '<span class="tag">' + plural(x[2], "hub") + '</span>' : '') + '</td><td class="n">' + fmtNum(x[1].people) + '</td>' + tmCells(x[1], max) + '</tr>';
+    }).join("");
+    return card("By day", "Central days, newest first; people counted on each hub they asked on",
+      tmTable("Timmy by day", '<th>Day</th><th class="n">People</th>' + tmHead(), body) +
+      (list.length > 14 ? '<p class="qh-more"><button class="btn" type="button" data-tm-more="days">' + (all ? "Show fewer" : "Show all " + fmtNum(list.length) + " days") + '</button></p>' : ""));
+  }
+  /* the range by hub: no distinct count of people across days here, so the busiest day's */
+  function tmHubCard(rows){
+    if (D("timmyDays").error) return card("By hub", "", errBox("Couldn’t load Timmy’s numbers by hub. Try Refresh."));
+    if (!rows.length) return card("By hub", rangeText(), empty("Nobody asked Timmy anything in this range."));
+    var by = {}, max = 0;
+    rows.forEach(function(r){ (by[r.hub] = by[r.hub] || []).push(r); });
+    var list = Object.keys(by).map(function(h){ var s = tmTotals(by[h]); max = Math.max(max, s.questions); return [h, s, Math.max.apply(null, by[h].map(function(r){ return Number(r.people) || 0; }))]; })
+      .sort(function(a, b){ return b[1].questions - a[1].questions; });
+    return card("By hub", rangeText() + "; the dashboard is its own row",
+      tmTable("Timmy by hub", '<th>Hub</th><th class="n">Busiest day</th>' + tmHead(true),
+        list.map(function(x){ return '<tr><td class="lbl">' + hubCell(x[0]) + '</td><td class="n">' + plural(x[2], "person", "people") + '</td>' + tmCells(x[1], max, true) + '</tr>'; }).join("")));
+  }
+  function tmSettingsCard(){
+    var src = D("timmyConfig");
+    if (src.error) return card("Settings", "", errBox("Couldn’t load Timmy’s settings. Try Refresh."));
+    var c = src.data && !Array.isArray(src.data) ? src.data : {}, on = c.enabled !== false, cap = Number(c.day_cap_usd) || 0, spent = Number(c.spent_today) || 0;
+    var body = '<div class="tm-status"><span class="state ' + (on ? 's-live">On' : 's-hidden">Off') + '</span><span>' +
+        (on ? "Timmy answers questions on every live hub and the dashboard." : "Timmy is off: every chat says he’s napping.") + '</span></div>' +
+      '<div class="tm-spend"><div class="hub-meta">Today, all hubs: <b>' + usd(spent) + '</b> of the <b>' + usd(cap) + '</b> cap · ' + plural(c.questions_today, "question") + '</div>' +
+        bar(spent, cap, spent >= cap * 0.8 ? "low" : "", usd(spent) + " of " + usd(cap)) + '</div>' +
+      '<form class="tm-form" data-tm-form novalidate>' +
+        '<label class="toggle"><input type="checkbox" class="switch" name="enabled"' + (on ? " checked" : "") + '> Timmy answers questions</label>' +
+        '<div class="arch-fields">' +
+          '<label class="field"><span>Daily spending cap, USD</span><input class="input" name="cap" type="number" inputmode="decimal" min="0" max="100" step="0.5" value="' + esc(cap) + '"><small>The whole site, for a Central day: 0 to 100.</small></label>' +
+          '<label class="field"><span>Questions a person a day</span><input class="input" name="per" type="number" inputmode="numeric" min="0" max="500" step="1" value="' + esc(Number(c.per_visitor_day) || 0) + '"><small>0 to 500.</small></label>' +
+        '</div>' +
+        '<div class="form-actions"><button class="btn primary" type="submit" data-tm-save>Save</button><span class="inline-msg" role="status" data-tm-msg></span></div>' +
+        '<div data-tm-confirm-box></div>' +
+      '</form>' +
+      '<p class="note">Each question holds ' + usd(c.reserve_usd) + ' against the cap while he answers it. The cap is an estimate: the spending limit in Anthropic’s Console is the real backstop.' +
+        (c.updated_at ? " Last changed " + esc(fmtDate(c.updated_at)) + "." : "") + '</p>';
+    return card("Settings", "his switch and limits", body);
+  }
+  function tmReportedCard(){
+    var src = D("timmyReported");
+    if (src.error) return card("Reported answers", "", errBox("Couldn’t load the reported answers. Try Refresh."));
+    var rows = tmRows("timmyReported"), open = rows.filter(function(r){ return !r.resolved; }).length;
+    return card("Reported answers", fmtNum(open) + " open · " + plural(rows.length, "report") + " from the chat’s Report button, " + rangeText() + ". Reply in the Inbox, as for any report.",
+      tmList("reported", rows, function(r){
+        return tmItem({ chat: r.chat_id, msg: r.message_id, report: r.report_id,
+          top: hubCell(r.hub) + tmKind(r.kind) + '<span class="pill' + (r.resolved ? ' pos">Resolved' : ' neg">Open') + '</span><span class="report-date">' + esc(fmtDate(r.reported_at)) + '</span>',
+          body: '<div><span class="tm-label">The report</span><div class="tm-words">' + esc(r.report || "") + '</div></div>' +
+                '<div><span class="tm-label">Timmy’s answer</span><div class="tm-words is-quote">' + esc(r.answer || "") + '</div></div>',
+          actions: r.resolved ? "" : '<a class="btn" href="#inbox">Reply in the Inbox</a>' });
+      }, "No answers were reported from the chat in this range."));
+  }
+  function tmGapsCard(){
+    var src = D("timmyGaps");
+    if (src.error) return card("Not covered", "", errBox("Couldn’t load the questions the notes don’t cover. Try Refresh."));
+    var rows = tmRows("timmyGaps"), by = {};
+    rows.forEach(function(r){ var c = tmClosest(r.closest); if (!c) return; var k = (c.hub || r.hub) + "|" + (c.lec || c.label); (by[k] = by[k] || { n: 0, c: c, hub: r.hub }).n++; });
+    var top = Object.keys(by).sort(function(a, b){ return by[b].n - by[a].n; }).slice(0, 6);
+    var sum = top.length ? '<p class="tm-sum">Closest lectures: ' + top.map(function(k){ var x = by[k]; return esc(tmLecName(x.c, "")) + ' <b>×' + x.n + '</b>'; }).join(" · ") + '</p>' : "";
+    return card("Not covered", "what students asked that the notes don’t cover: leads for content to add, " + rangeText(), sum + tmList("gaps", rows, function(r){
+      var c = tmClosest(r.closest);
+      return tmItem({ chat: r.chat_id, msg: r.message_id, meta: c ? "Closest: " + tmLecName(c, r.hub) : "He named no closest lecture",
+        top: hubCell(r.hub) + '<span class="report-date">' + esc(dayLabel(r.day)) + '</span>', body: '<div class="tm-words">' + esc(r.question || "") + '</div>' });
+    }, "Every question in this range was covered by the notes."));
+  }
+  function tmUncheckedCard(){
+    var src = D("timmyUnchecked");
+    if (src.error) return card("Quotes that didn’t check out", "", errBox("Couldn’t load the quotes. Try Refresh."));
+    var rows = tmRows("timmyUnchecked");
+    return card("Quotes that didn’t check out", "words Timmy put in quotes that aren’t in the paragraph he named; students saw them as plain text, not links", tmList("unchecked", rows, function(r){
+      var u = Array.isArray(r.unchecked) ? r.unchecked : [];
+      return tmItem({ chat: r.chat_id, msg: r.message_id,
+        top: hubCell(r.hub) + '<span class="pill warn">' + plural(u.length, "quote") + '</span><span class="report-date">' + esc(dayLabel(r.day)) + '</span>',
+        body: '<ul class="tm-cites">' + u.map(function(x){ return '<li>' + esc(x && x.id) + ': “' + esc(x && x.quote) + '”</li>'; }).join("") + '</ul>' });
+    }, "Every quote in this range checked out."));
+  }
+  function tmChatsCard(){
+    var src = D("timmyChats");
+    if (src.error) return card("Chats", "", errBox("Couldn’t load the chats. Try Refresh."));
+    var rows = tmRows("timmyChats");
+    return card("Chats", "newest first, " + rangeText() + "; open one to read it", tmList("chats", rows, function(r){
+      var kinds = (Array.isArray(r.kinds) ? r.kinds : []).filter(function(k){ return k !== "answer"; });
+      return tmItem({ chat: r.id, meta: plural(r.messages, "message") + " · " + usd(r.cost_usd) + " · started " + fmtDate(r.started_at),
+        top: hubCell(r.hub) + kinds.map(tmKind).join("") + (Number(r.thumbs_down) ? '<span class="pill neg">' + plural(r.thumbs_down, "thumb") + ' down</span>' : "") +
+          '<span class="report-date">' + esc(fmtDate(r.last_at)) + '</span>',
+        body: '<div class="tm-words">' + esc(r.first_question || "") + '</div>' });
+    }, "No chats in this range."));
+  }
+  function renderTimmy(){
+    var el = $('[data-panel="timmy"]'), msg = tm.msg; tm.msg = "";
+    var errs = TM_KEYS.map(function(k){ return D(k).error; }).filter(Boolean);
+    /* before the release: the database doesn't have these functions yet */
+    if (D("timmyDays").error && errs.every(needsMigration)) {
+      setHead("Ask Timmy starts at the redesign’s release", viewAt("timmy"));
+      el.innerHTML = card("Not on yet", "", '<p>Ask Timmy starts with the redesign’s release. His part of the database (<code>migration_v55</code>) isn’t applied yet, so there are no chats, costs or settings to show.</p>' +
+        '<p class="note">Once it is, this tab shows what students asked him by day and hub, what it cost, the answers students reported, the questions the notes don’t cover, quotes that didn’t check out and every chat, with his switch and daily limits. Nothing to do here until then.</p>');
+      el.dataset.ready = "1"; return;
+    }
+    /* from the Inbox's "Read the chat with Timmy": every hub, every reported answer listed, that one opened */
+    var focus = state.tmFocus; state.tmFocus = null;
+    if (focus != null) { state.tmHub = "all"; state.tmMore = "reported"; }
+    var hubs = tmHubs(); if (state.tmHub !== "all" && hubs.indexOf(state.tmHub) < 0) state.tmHub = "all";
+    var s = tmTotals(tmRows("timmyDays")), cfg = D("timmyConfig"), on = cfg.error || !cfg.data ? null : cfg.data.enabled !== false;
+    setHead((on === false ? "Timmy is off: every chat says he’s napping. " : on ? "Timmy is on. " : "") + plural(s.questions, "question") + " in the " + rangeText() +
+      (state.tmHub !== "all" ? " on " + hubLabel(state.tmHub) : "") + ", about " + usd(s.cost_usd) + ".", viewAt("timmy"));
+    var chips = hubs.length > 1 ? '<div class="chips" role="group" aria-label="Show one hub">' + ["all"].concat(hubs).map(function(h){
+      return '<button type="button" data-tm-hub="' + esc(h) + '" aria-pressed="' + (state.tmHub === h) + '">' + (h === "all" ? "All hubs" : dot(h) + esc(hubLabel(h))) + '</button>'; }).join("") + '</div>' : "";
+    var top = D("timmyDays").error ? "" : kpis([
+      { label: "Questions", value: fmtNum(s.questions), hint: plural(s.answers, "answer") + (s.errors ? " · " + plural(s.errors, "error") : ""), lead: 1 },
+      { label: "Estimated cost", value: usd(s.cost_usd), hint: s.questions ? "about " + usd(s.cost_usd / s.questions) + " a question" : rangeText() },
+      { label: "Not covered", value: pctOf(s.not_covered, s.answers), hint: plural(s.not_covered, "answer") },
+      { label: "Declined", value: fmtNum(s.quiz_declined + s.hint_declined), hint: fmtNum(s.quiz_declined) + " quiz · " + fmtNum(s.hint_declined) + " practice" },
+      { label: "Thumbs", value: fmtNum(s.thumbs_up) + " / " + fmtNum(s.thumbs_down), hint: "up / down, on his answers" },
+      { label: "Quotes that checked", value: s.cites_ok + s.cites_bad ? Math.floor(s.cites_ok / (s.cites_ok + s.cites_bad) * 1000) / 10 + "%" : "–", hint: fmtNum(s.cites_bad) + " didn’t" },
+      { label: "Reported", value: fmtNum(s.reported), hint: "his drafts sent: " + fmtNum(s.offers_taken) + " of " + fmtNum(s.offers) }
+    ]);
+    el.innerHTML = '<div class="stack">' + chips + top + '<div class="grid"><div class="s8">' + tmHubCard(tmRows("timmyDays")) + '</div><div class="s4">' + tmSettingsCard() + '</div></div>' +
+      tmDaysCard(tmRows("timmyDays")) + tmReportedCard() + tmGapsCard() + tmUncheckedCard() + tmChatsCard() + '</div>';
+    if (msg) { var me = $("[data-tm-msg]", el); if (me) { me.className = "inline-msg msg-ok"; me.textContent = msg; } }
+    el.dataset.ready = "1";
+    if (focus != null) {
+      var b = $('[data-tm-report-id="' + focus + '"] [data-tm-open]', el);
+      if (b) tmOpen(b, true);
+      else $(".stack", el).insertAdjacentHTML("afterbegin", '<p class="note" role="status">That report’s chat isn’t in the ' + esc(rangeText()) + '. Pick 90 days above.</p>');
+    }
+  }
+  /* the settings: Save shows what will change and asks first, since it reaches every student at once */
+  function tmSave(form){
+    var c = D("timmyConfig").data || {}, msgEl = $("[data-tm-msg]", form), box = $("[data-tm-confirm-box]", form);
+    var on = form.elements.enabled.checked, capS = form.elements.cap.value.trim(), perS = form.elements.per.value.trim(), cap = Number(capS), per = Number(perS);
+    function bad(text, field){ msgEl.className = "inline-msg msg-err"; msgEl.textContent = text; box.innerHTML = ""; tm.pending = null; field.focus(); }
+    msgEl.className = "inline-msg"; msgEl.textContent = "";
+    if (capS === "" || !isFinite(cap) || cap < 0 || cap > 100) return bad("The daily cap is a number of dollars from 0 to 100.", form.elements.cap);
+    if (!/^\d+$/.test(perS) || per > 500) return bad("Questions a person a day is a whole number from 0 to 500.", form.elements.per);
+    cap = Math.round(cap * 100) / 100;
+    var was = { on: c.enabled !== false, cap: Number(c.day_cap_usd) || 0, per: Number(c.per_visitor_day) || 0 }, lines = [];
+    if (on !== was.on) lines.push(on ? "Turn Timmy back on: students can ask him again at once." : "Turn Timmy off for everyone: every chat says he’s napping until you turn him back on.");
+    if (cap !== was.cap) lines.push("Daily cap: " + usd(was.cap) + " → " + usd(cap) + (cap <= (Number(c.spent_today) || 0) ? " (no more than today’s spend, so he naps for the rest of today)" : ""));
+    if (per !== was.per) lines.push("Questions a person a day: " + was.per + " → " + per + (per === 0 ? " (nobody can ask)" : ""));
+    if (!lines.length) { box.innerHTML = ""; tm.pending = null; msgEl.textContent = "Nothing changed."; return; }
+    tm.pending = { p_enabled: on !== was.on ? on : null, p_day_cap_usd: cap !== was.cap ? cap : null, p_per_visitor_day: per !== was.per ? per : null };
+    box.innerHTML = '<div class="arch-confirm" tabindex="-1" role="group" aria-label="Confirm the change"><p><b>Save this?</b> It reaches every student at once.</p><ul class="rules">' +
+      lines.map(function(l){ return '<li>' + esc(l) + '</li>'; }).join("") + '</ul><div class="form-actions"><button class="btn primary" type="button" data-tm-confirm>Confirm</button>' +
+      '<button class="btn" type="button" data-tm-cancel>Cancel</button></div></div>';
+    $(".arch-confirm", box).focus();
+  }
+  function tmCancel(from){
+    var form = from.closest("[data-tm-form]"); if (!form) return;
+    tm.pending = null; $("[data-tm-confirm-box]", form).innerHTML = "";
+    $("[data-tm-save]", form).focus();
+  }
+  function tmConfirm(btn){
+    var form = btn.closest("[data-tm-form]"), msgEl = $("[data-tm-msg]", form), args = tm.pending;
+    if (!args) return;
+    btn.disabled = true;
+    rpc("admin_timmy_config", { p_secret: secret, p_enabled: args.p_enabled, p_day_cap_usd: args.p_day_cap_usd, p_per_visitor_day: args.p_per_visitor_day }).then(function(res){
+      if (res.error || !res.data || Array.isArray(res.data)) { btn.disabled = false; msgEl.className = "inline-msg msg-err"; msgEl.textContent = "That didn’t save. Try again."; return; }
+      tm.pending = null; data.timmyConfig = { data: res.data, days: state.days, at: Date.now() };
+      tm.msg = "Saved."; renderTimmy();
+      var sv = $('[data-panel="timmy"] [data-tm-save]'); if (sv) sv.focus();
+    });
+  }
+  var tmPanel = $('[data-panel="timmy"]');
+  tmPanel.addEventListener("click", function(e){
+    var b;
+    if ((b = e.target.closest("[data-tm-hub]"))) { state.tmHub = b.getAttribute("data-tm-hub"); state.tmMore = null; renderTimmy(); var nb = $('[data-tm-hub="' + state.tmHub + '"]', tmPanel); if (nb) nb.focus(); return; }
+    if ((b = e.target.closest("[data-tm-more]"))) { var k = b.getAttribute("data-tm-more"); state.tmMore = state.tmMore === k ? null : k; renderTimmy(); var mb = $('[data-tm-more="' + k + '"]', tmPanel); if (mb) mb.focus(); return; }
+    if ((b = e.target.closest("[data-tm-open]"))) { tmOpen(b); return; }
+    if ((b = e.target.closest("[data-tm-confirm]"))) { tmConfirm(b); return; }
+    if ((b = e.target.closest("[data-tm-cancel]"))) tmCancel(b);
+  });
+  tmPanel.addEventListener("submit", function(e){ var f = e.target.closest("[data-tm-form]"); if (!f) return; e.preventDefault(); tmSave(f); });
+  tmPanel.addEventListener("keydown", function(e){ if (e.key === "Escape" && e.target.closest("[data-tm-confirm-box] .arch-confirm")) { e.preventDefault(); tmCancel(e.target); } });
 
   /* ---------- Recap: a shareable image of how the class used one hub (made when a hub is archived) ---------- */
   var HUB_COLOR = { hepatobiliary: "#DDAE52", "gi-exam1": "#DDAE52", "msk-exam3": "#DDAE52", "msk-exam4": "#DDAE52", occlusion: "#E08566", "pcd-exam3": "#E08566", perio: "#E88EA9", genetics: "#6FC2B8", "fixed-pros": "#E08566", "heme-endo-exam1": "#C99BE0", "heme-endo-exam2": "#EC9AC0", "special-patient-care": "#6FC2B8", "pcd-implants-exam1": "#8FB8E8" };
@@ -2191,7 +2561,7 @@ code{font-size:13px;}
 
   /* ---------- views and routing (#overview, #inbox, ...: the back button and links work) ---------- */
   var RENDER = { overview: renderOverview, inbox: renderInbox, time: renderTime, questions: renderQuestions, clicks: renderClicks, searches: renderSearches,
-    engagement: renderEngagement, checkins: renderCheckins, surveys: renderSurveys, live: renderLive, hubs: renderHubAdmin, recap: renderRecapPanel, insights: renderInsights, health: renderHealth };
+    engagement: renderEngagement, checkins: renderCheckins, surveys: renderSurveys, live: renderLive, hubs: renderHubAdmin, recap: renderRecapPanel, insights: renderInsights, health: renderHealth, timmy: renderTimmy };
   function renderView(t){
     var v = VIEWS[t], el = $('[data-panel="' + t + '"]');
     $("#viewTitle").textContent = v.t;
@@ -2222,6 +2592,9 @@ code{font-size:13px;}
   }
   window.addEventListener("hashchange", function(){ if (secret) showTab(location.hash.slice(1), true); });
   document.addEventListener("click", function(e){
+    /* the Inbox's "Read the chat with Timmy": the Timmy tab opens with that report's chat */
+    var tr = e.target.closest("[data-tm-report]");
+    if (tr) state.tmFocus = Number(tr.getAttribute("data-tm-report"));
     var a = e.target.closest('a[href^="#"]');
     if (a && secret) { var t = a.getAttribute("href").slice(1); if (VIEWS[t]) { e.preventDefault(); if (location.hash !== "#" + t) location.hash = t; else showTab(t, true); return; } }
     var c;
@@ -2243,6 +2616,7 @@ code{font-size:13px;}
     if (t === "recap") { loadPublished(); return; }
     if (t === "insights") { insights = null; setHead("Updating…", 0); loadInsights(); return; }
     if (t === "health") { QH.ex = {}; if (QH.hub) { setHead("Updating…", 0); qhLoad(QH.hub); } else renderHealth(); return; }
+    if (t === "timmy") tm.chats = {};
     var keys = VIEWS[t].needs || [];
     $("#viewStamp").textContent = "Updating…";
     need(keys, true).then(function(){ if (state.tab === t) RENDER[t](); });

@@ -586,7 +586,8 @@
         return db.flags.map(function(f){ return { kind: "flag", id: f.id, hub: f.hub, note: f.note, resolved: !!f.resolved, created_at: f.at, reply: f.reply || null, resolved_at: f.resolved_at || null, can_notify: true, reply_seen_at: null }; })
           .concat(db.suggestions.map(function(s){ return { kind: "suggestion", id: s.id, hub: s.hub, note: s.note, resolved: !!s.resolved, created_at: s.at, reply: s.reply || null, resolved_at: null, can_notify: true, reply_seen_at: null }; }))
           .concat([{ kind: "flag", id: 8801, hub: "occlusion", note: "Fixture report: choice B and C read the same.", resolved: false, created_at: iso(t - d), reply: null, resolved_at: null, can_notify: true, reply_seen_at: null },
-                   { kind: "suggestion", id: 8802, hub: "dashboard", note: "Fixture suggestion: a dark mode for the arcade.", resolved: false, created_at: iso(t - 2 * d), reply: null, resolved_at: null, can_notify: true, reply_seen_at: null }]);
+                   { kind: "suggestion", id: 8802, hub: "dashboard", note: "Fixture suggestion: a dark mode for the arcade.", resolved: false, created_at: iso(t - 2 * d), reply: null, resolved_at: null, can_notify: true, reply_seen_at: null }])
+          .concat(timmyReportRows(t));
       case "admin_pod_comments": return [{ id: 7701, hub: "pcd-implants-exam1", ep: "timmy-time", name: "Sample Sealant", body: "Fixture comment to hide or restore.", created_at: iso(t - d), hidden: !!(db.podHidden || {})[7701], hidden_by: (db.podHidden || {})[7701] ? "admin" : null, reports: 1 },
         { id: 7702, hub: "occlusion", ep: "timmy-time", name: "Test Tubercle", body: "Fixture comment: the Bennett part finally clicked.", created_at: iso(t - 3 * d), hidden: false, hidden_by: null, reports: 0 }];
       /* the admin page's other views, so each one has something to show in a preview (made-up numbers) */
@@ -933,16 +934,192 @@
     save(); return { write: true, data: { ok: true, id: id } };
   }
 
+  /* ---------- the admin page's Timmy tab (migration_v55's admin_timmy_* calls, from the redesign's release) ----------
+     Made-up chats, shaped exactly as the functions return them: no visitor id anywhere, timestamps written the way
+     PostgREST writes them, Timmy's checked answer in `reply` as the function stored it, the closest lecture as the text
+     `reply->>'closest'` gives. The quotes are real lines of the three new hubs' notes; the questions and answers around
+     them are made up. One chat carries markup in what the student typed, in Timmy's answer and in a quote, so the page is
+     seen drawing it as text. The settings live in this account's fixture database; a Timmy report resolved in the Inbox
+     shows as resolved here. The numbers by day are made up on their own (a few hundred questions a month). */
+  var TM_CHAT_ID = "7e1e0000-0000-4000-a000-0000000000";
+  function pgts(ms){ return iso(ms).replace("Z", "+00:00"); }
+  /* jsonb's text form: keys by length, then bytes; ", " and ": " between them */
+  function jsonbText(v){
+    if (v === null || typeof v !== "object") return JSON.stringify(v);
+    if (Array.isArray(v)) return "[" + v.map(jsonbText).join(", ") + "]";
+    return "{" + Object.keys(v).sort(function(a, b){ return a.length - b.length || (a < b ? -1 : a > b ? 1 : 0); }).map(function(k){ return JSON.stringify(k) + ": " + jsonbText(v[k]); }).join(", ") + "}";
+  }
+  function timmyFixtures(t){
+    var D = 864e5, H = 36e5, M = 6e4, chats = [], mid = 7100;
+    function note(hub, n, lec, k, label, quote, dash){ return { id: (dash ? hub + ":" : "") + "N" + n + "." + k, hub: hub, kind: "notes", label: label, quote: quote, go: { v: "notes", lec: lec, k: k } }; }
+    function ctx(view, lec, k, more){ var c = { view: view, lec: lec || null, k: k == null ? null : k, voice: "timmy" }; Object.keys(more || {}).forEach(function(x){ c[x] = more[x]; }); return c; }
+    function say(kind, paras, more){ var r = { kind: kind, paragraphs: paras.map(function(p){ return { text: p[0], cites: p[1] || [] }; }), offer: null, go: null, closest: null }; Object.keys(more || {}).forEach(function(x){ r[x] = more[x]; }); return r; }
+    function chat(hub, ago, turns){
+      var at = t - ago, c = { id: TM_CHAT_ID + ("0" + (chats.length + 1)).slice(-2), hub: hub, started: pgts(at), last: null, messages: [] };
+      turns.forEach(function(u, i){
+        var s = at + i * 4 * M, r = u.reply, failed = r.kind === "error", tok = failed ? [null, null, null, null] : u.tok || [1100, 340, 76800, 0];
+        var cost = failed ? 0 : Math.round((tok[0] * 4 + tok[1] * 20 + tok[2] * 0.2 + tok[3] * 8)) / 1e6, ok = 0;
+        r.paragraphs.forEach(function(p){ ok += p.cites.length; });
+        c.messages.push({ id: ++mid, who: "student", text: u.ask, kind: null, context: u.ctx, reply: null, cites_ok: null, cites_bad: null, unchecked: null,
+          offer: null, offer_action: null, thumb: null, report_id: null, reported_at: null, report: null, model: null, input_tokens: null, output_tokens: null,
+          cache_read_tokens: null, cache_write_tokens: null, cost_usd: null, ms: null, at: pgts(s) });
+        var tid = ++mid, rep = u.report ? db.tmResolved && db.tmResolved[u.report.id] : null;
+        c.messages.push({ id: tid, who: "timmy", text: r.paragraphs.map(function(p){ return p.text; }).join("\n\n"), kind: r.kind, context: null, reply: r,
+          cites_ok: ok, cites_bad: (u.unchecked || []).length, unchecked: u.unchecked || null, offer: r.offer ? r.offer.kind : null, offer_action: u.action || null,
+          thumb: u.thumb || null, report_id: u.report ? u.report.id : null, reported_at: u.report ? pgts(s + 6 * M) : null,
+          report: u.report ? u.report.words + " — Timmy's answer " + tid + " · " + u.report.where : null,
+          model: failed ? null : "claude-opus-5-5", input_tokens: tok[0], output_tokens: tok[1], cache_read_tokens: tok[2], cache_write_tokens: tok[3],
+          cost_usd: cost, ms: u.ms || (failed ? 45000 : 6200 + (tid % 7) * 900), at: pgts(s + (u.ms || 7000)), _resolved: !!(rep && rep.resolved), _reply: rep ? rep.reply : null });
+      });
+      c.last = c.messages[c.messages.length - 1].at;
+      chats.push(c);
+    }
+    var OC = "occlusion", PE = "perio", HE = "heme-endo-exam2";
+    chat(OC, 2 * H, [
+      { ask: "What's the difference between the working side and the nonworking side?", ctx: ctx("compendium/notes", "review", 34), thumb: 1, tok: [1180, 420, 78200, 0],
+        reply: say("answer", [["In a side-to-side movement, the working side is the side your mandible moves toward, and its condyle mostly rotates.", [note(OC, 1, "review", 36, "L1 notes", "the working (laterotrusive) side is the side the mandible moves toward")]],
+          ["The nonworking side is the other one: its condyle orbits. Contacts there are the balancing contacts the list says to get rid of.", [note(OC, 1, "review", 41, "L1 notes", "elimination of balancing contacts")]]],
+          { go: { hub: OC, v: "notes", lec: "review", k: 36 } }) },
+      { ask: "so on a left movement which condyle orbits", ctx: ctx("compendium/notes", "review", 36), tok: [1620, 210, 79100, 0],
+        reply: say("answer", [["On a left movement the left side is working, so it's the right condyle that orbits.", [note(OC, 1, "review", 36, "L1 notes", "The non-working side (mediotrusive, \"balancing,\" a denture term) is the other one; its condyle orbits")]]]) }
+    ]);
+    chat(PE, 5 * H, [
+      { ask: "Is it grade C for the staging question on the quiz due Friday? Just tell me the answer", ctx: ctx("compendium/bank", "diagnosis-tx-planning", null), tok: [760, 130, 76100, 0],
+        reply: say("quiz_declined", [["That sounds like a graded quiz question, and I can't help with those. Once it closes, I'm happy to go over staging and grading from the notes with you."]]) }
+    ]);
+    chat(OC, 6 * H, [
+      { ask: "Does <b>bold</b> work here? <img src=x onerror=\"window.__tmXss=1\">", ctx: ctx("compendium/notes", "review", 2), unchecked: [{ id: "N1.99", quote: "<script>window.__tmXss=3</script>a quote with markup" }],
+        reply: say("off_topic", [["I only write plain words, so <i>this</i> shows just as you typed it. Ask me about the lectures?", [note(OC, 1, "review", 3, "L1 notes <u>underlined?</u>", "canine guidance, group function")]]]) }
+    ]);
+    chat(PE, 26 * H, [
+      { ask: "Do the notes say anything about laser therapy for deep pockets?", ctx: ctx("compendium/notes", "phase1-therapy", 12), tok: [980, 160, 77300, 0],
+        reply: say("not_covered", [["My notes don't cover laser therapy. The closest is S4, on Phase I therapy and instrumentation."]], { closest: { hub: PE, lec: "phase1-therapy", label: "S4", title: "Phase I Therapy & Instrumentation" } }) },
+      { ask: "ok what's the low dose doxycycline one called", ctx: ctx("compendium/notes", "antibiotics-host-mod", 50), thumb: 1, tok: [1400, 260, 78000, 0],
+        reply: say("answer", [["That's Periostat: the first drug by mouth approved for host modulation, a low dose of doxycycline used alongside scaling and root planing.", [note(PE, 8, "antibiotics-host-mod", 55, "S8 notes", "a low, sub-antimicrobial dose of doxycycline")]]],
+          { go: { hub: PE, v: "notes", lec: "antibiotics-host-mod", k: 55 } }) }
+    ]);
+    chat(HE, 27 * H, [
+      { ask: "Why is it “Metformin”?", ctx: ctx("compendium/bank", "dmpharm", null, { ask: { qid: "dm-first-line", right: false, picks: [2] } }), tok: [2300, 380, 77600, 0],
+        unchecked: [{ id: "N1.58", quote: "metformin is never given with kidney disease" }],
+        reply: say("answer", [["You picked a sulfonylurea, but for a newly diagnosed, otherwise healthy patient the first-line drug is metformin.", [{ id: "Q", hub: HE, kind: "question", label: "This question", quote: "first-line", go: { v: "bank", q: "dm-first-line" } }]],
+          ["It won't push a normal glucose any lower, so its risk of hypoglycemia is very low.", [note(HE, 1, "dmpharm", 57, "L11 notes", "metformin has no effect in normoglycemic states")]]],
+          { go: { v: "practice", hub: HE, lec: "dmpharm" } }) },
+      { ask: "I think the explanation on this one names the wrong drug", ctx: ctx("compendium/bank", "dmpharm", null), action: "sent", tok: [2600, 190, 79900, 0],
+        reply: say("answer", [["If the explanation names a different drug than the key, that's worth fixing. Want me to write it up for Sam as a report?"]],
+          { offer: { kind: "report", text: "The explanation for this question names a different drug than the key (metformin).", qid: "dm-first-line" } }) }
+    ]);
+    chat(HE, 30 * H, [
+      { ask: "How long does metformin's stomach upset last?", ctx: ctx("compendium/notes", "dmpharm", 56), thumb: -1, tok: [1250, 150, 77900, 0],
+        unchecked: [{ id: "N1.58", quote: "fades in a day or two" }], report: { id: 8811, words: "He said a day or two, but the notes say one or two weeks.", where: "compendium/notes" },
+        reply: say("answer", [["The stomach upset usually fades in a day or two."]]) }
+    ]);
+    chat("dashboard", 2 * D, [
+      { ask: "What should I study tonight?", ctx: { view: "dashboard", lec: null, k: null, voice: "timmy", hubs: [HE, OC, PE], progress: { lectures: 27 } }, thumb: 1, tok: [1900, 380, 0, 231000],
+        reply: say("answer", [["Start with L11, Pharmacology of Diabetes Mellitus: you've missed 6 there on your latest tries.", []],
+          ["Read its notes on metformin first, then practice L11 until the misses are gone.", [note(HE, 1, "dmpharm", 55, "L11 notes", "it is still the first-line drug for newly diagnosed type 2 diabetes", true)]]],
+          { go: { v: "practice", hub: HE, lec: "dmpharm" } }) }
+    ]);
+    chat(OC, 3 * D, [
+      { ask: "It would be cool if the arcade had a timed round for cusp pathways", ctx: ctx("arcade/lobby", null, null), action: "posted", tok: [900, 240, 76400, 0],
+        reply: say("answer", [["Ooh, I like it. Want to put it on the idea board so the class can vote?"]],
+          { offer: { kind: "idea", title: "A timed round for cusp pathways", body: "A round against the clock: working, nonworking and protrusive pathways.", hub: OC, category: "fun" } }) }
+    ]);
+    chat(OC, 3 * D + 5 * H, [
+      { ask: "Explain canine guidance simply", ctx: ctx("compendium/notes", "review", 3, { voice: "plain" }), reply: say("error", [["Something went wrong. Try again in a minute."]]) },
+      { ask: "Explain canine guidance simply", ctx: ctx("compendium/notes", "review", 3, { voice: "plain" }), tok: [1500, 230, 78300, 0],
+        reply: say("answer", [["With canine guidance, the canines take a side-to-side movement on their own and lift the back teeth apart.", [note(OC, 1, "review", 3, "L1 notes", "canine guidance, group function")]]]) }
+    ]);
+    chat(PE, 4 * D, [
+      { ask: "I'm so stressed about the final I can't focus on anything", ctx: ctx("home/dashboard", null, null), thumb: 1, tok: [820, 150, 76000, 0],
+        reply: say("support", [["That's a lot to carry before a final, and it makes sense. Take a short break, then pick one small piece, like one lecture's High yield."],
+          ["If it ever feels like more than stress, UAB's student counseling is there for you, and you can call or text 988 any time."]]) }
+    ]);
+    return chats;
+  }
+  function timmyAdmin(fn, a, t){
+    if (!/^admin_timmy_/.test(fn)) return null;
+    var D = 864e5, today = day(t), days = Math.max(1, Math.min(Number(a.p_days) || 30, 400)), chats = timmyFixtures(t);
+    var inDays = function(d){ return Math.round((new RealDate(today + "T12:00").getTime() - new RealDate(d + "T12:00").getTime()) / D) < days; };
+    var tim = []; chats.forEach(function(c){ c.messages.forEach(function(m, i){ if (m.who === "timmy") tim.push({ c: c, m: m, s: c.messages[i - 1] }); }); });
+    tim.sort(function(x, y){ return y.m.id - x.m.id; });
+    var mday = function(m){ return day(new RealDate(m.at).getTime()); }, clean = function(m){ var o = {}; Object.keys(m).forEach(function(k){ if (k[0] !== "_") o[k] = m[k]; }); return o; };
+    if (fn === "admin_timmy_days") {
+      var out = [], HUBS = ["occlusion", "perio", "heme-endo-exam2", "dashboard"];
+      for (var i = 0; i < Math.min(days, 45); i++) HUBS.forEach(function(h, hi){
+        var x = hash(h + "|" + i), d = day(t - i * D);
+        if (h === "dashboard" && x % 3 === 0) return;
+        if (h === "heme-endo-exam2" && i > 20) return;
+        var people = 2 + x % 7 + (hi === 0 ? 2 : 0) + (i < 3 ? 3 : 0), q = people + (x >>> 4) % (people + 1), ans = q - (x % 11 === 0 ? 1 : 0);
+        var cost = Math.round((q * 0.043 + ((x >>> 8) % 3 === 0 ? 0 : 0.62) + (h === "dashboard" && (x >>> 8) % 2 ? 1.2 : 0)) * 1e4) / 1e4;
+        out.push({ day: d, hub: h, people: people, questions: q, answers: ans, cost_usd: cost, not_covered: Math.round(ans * 0.06 + (x >>> 3) % 2),
+          quiz_declined: (x >>> 5) % 3 === 0 ? 1 : 0, hint_declined: (x >>> 6) % 4 === 0 ? 1 : 0, errors: q - ans, thumbs_up: Math.round(ans * 0.22), thumbs_down: (x >>> 7) % 4 === 0 ? 1 : 0,
+          cites_ok: Math.round(ans * 2.4), cites_bad: (x >>> 9) % 5 === 0 ? 1 : 0, offers: (x >>> 10) % 3, offers_taken: (x >>> 10) % 3 ? 1 : 0, reported: (x >>> 11) % 7 === 0 ? 1 : 0 });
+      });
+      return { data: out.filter(function(r){ return inDays(r.day); }) };
+    }
+    if (fn === "admin_timmy_chats") {
+      var lim = Math.max(1, Math.min(Number(a.p_limit) || 100, 500));
+      return { data: chats.filter(function(c){ return (!a.p_hub || c.hub === a.p_hub) && new RealDate(c.last).getTime() > t - days * D; })
+        .sort(function(x, y){ return x.last < y.last ? 1 : -1; }).slice(0, lim).map(function(c){
+          var kinds = {}, cost = 0, down = 0;
+          c.messages.forEach(function(m){ if (m.kind) kinds[m.kind] = 1; cost += Number(m.cost_usd) || 0; if (m.thumb === -1) down++; });
+          return { id: c.id, hub: c.hub, started_at: c.started, last_at: c.last, messages: c.messages.length,
+            first_question: c.messages[0].text.slice(0, 200), kinds: Object.keys(kinds).sort(), thumbs_down: down, cost_usd: Math.round(cost * 1e4) / 1e4 };
+        }) };
+    }
+    if (fn === "admin_timmy_chat") {
+      var c = chats.filter(function(x){ return x.id === a.p_chat; })[0];
+      return { data: c ? { id: c.id, hub: c.hub, started: c.started, last: c.last, messages: c.messages.map(clean) } : null };
+    }
+    if (fn === "admin_timmy_not_covered") return { data: tim.filter(function(x){ return x.m.kind === "not_covered" && inDays(mday(x.m)); }).map(function(x){
+      return { message_id: x.m.id, chat_id: x.c.id, hub: x.c.hub, day: mday(x.m), question: x.s.text, closest: x.m.reply.closest ? jsonbText(x.m.reply.closest) : null }; }) };
+    if (fn === "admin_timmy_unchecked") return { data: tim.filter(function(x){ return x.m.cites_bad > 0 && inDays(mday(x.m)); }).map(function(x){
+      return { message_id: x.m.id, chat_id: x.c.id, hub: x.c.hub, day: mday(x.m), unchecked: x.m.unchecked }; }) };
+    if (fn === "admin_timmy_reported") return { data: tim.filter(function(x){ return x.m.report_id && new RealDate(x.m.reported_at).getTime() > t - days * D; })
+      .sort(function(x, y){ return x.m.reported_at < y.m.reported_at ? 1 : -1; }).map(function(x){
+        return { message_id: x.m.id, chat_id: x.c.id, hub: x.c.hub, day: mday(x.m), kind: x.m.kind, answer: x.m.text.slice(0, 400), report_id: x.m.report_id,
+          report: x.m.report, resolved: x.m._resolved, reported_at: x.m.reported_at }; }) };
+    if (fn === "admin_timmy_config") {
+      var cfg = db.timmyCfg || { enabled: true, day_cap_usd: 10, per_visitor_day: 40, reserve_usd: 0.08, updated_at: pgts(t - 3 * D) }, write = false;
+      if (a.p_enabled != null || a.p_day_cap_usd != null || a.p_per_visitor_day != null) {
+        if (a.p_enabled != null) cfg.enabled = !!a.p_enabled;
+        if (a.p_day_cap_usd != null) cfg.day_cap_usd = Math.round(Math.max(0, Math.min(Number(a.p_day_cap_usd), 100)) * 100) / 100;
+        if (a.p_per_visitor_day != null) cfg.per_visitor_day = Math.max(0, Math.min(Math.round(Number(a.p_per_visitor_day)), 500));
+        cfg.updated_at = pgts(t); db.timmyCfg = cfg; save(); write = true;
+      }
+      var todays = timmyAdmin("admin_timmy_days", { p_days: 1 }, t).data;
+      return { write: write, data: { enabled: cfg.enabled, day_cap_usd: cfg.day_cap_usd, per_visitor_day: cfg.per_visitor_day, reserve_usd: cfg.reserve_usd, updated_at: cfg.updated_at,
+        spent_today: Math.round(todays.reduce(function(s, r){ return s + r.cost_usd; }, 0) * 1e4) / 1e4, questions_today: todays.reduce(function(s, r){ return s + r.questions; }, 0) } };
+    }
+    return { error: { status: 404, code: "PGRST202", message: "Could not find the function public." + fn + " in the schema cache" } };
+  }
+  /* the Inbox lists a Timmy report like any report (question_flags); resolving it there shows on the Timmy tab */
+  function timmyReportRows(t){
+    var out = [];
+    timmyFixtures(t).forEach(function(c){ c.messages.forEach(function(m){ if (m.report_id) out.push({ kind: "flag", id: m.report_id, hub: c.hub, note: m.report, resolved: m._resolved,
+      created_at: iso(new RealDate(m.reported_at).getTime()), reply: m._reply || null, resolved_at: null, can_notify: true, reply_seen_at: null }); }); });
+    return out;
+  }
+
   function rpc(fn, a){
     a = a || {};
+    /* the database before a migration: the preview's settings (sh_preview_ui) can list function-name prefixes that answer
+       as the live database does before their migration is applied, e.g. { "missing": ["admin_timmy_"] } until the release */
+    var missing = jget(K.ui, {}).missing;
+    if (Array.isArray(missing) && missing.some(function(p){ return p && fn.indexOf(p) === 0; }))
+      return { error: { status: 404, code: "PGRST202", message: "Could not find the function public." + fn + " in the schema cache" } };
     if (ADMIN_FNS.test(fn)) {
       if (a.p_secret !== C.adminSecret) return unauthorized();
       var ideaOp = ideaAdmin(fn, a, now());
       if (ideaOp) return ideaOp;
       var ops = adminOps(fn, a);
       if (ops) return ops;
+      var tmA = timmyAdmin(fn, a, now());
+      if (tmA) { if (tmA.write) save(); return tmA; }
       if (/^(admin_|set_report_resolved)/.test(fn) && fn !== "admin_pod_comments") {
         if (fn === "set_report_resolved") db.flags.concat(db.suggestions).forEach(function(r){ if (r.id === a.p_id) { r.resolved = a.p_resolved; r.reply = a.p_reply; } });
+        if (fn === "set_report_resolved" && a.p_kind === "flag" && timmyReportRows(now()).some(function(r){ return r.id === a.p_id; })) {
+          db.tmResolved = db.tmResolved || {}; db.tmResolved[a.p_id] = { resolved: !!a.p_resolved, reply: a.p_reply || null }; }
         if (fn === "admin_hide_pod_comment") { db.podHidden = db.podHidden || {}; db.podHidden[a.p_id] = !!a.p_hidden; }
         if (fn === "admin_post_notice") db.notices.push({ title: a.p_title, message: a.p_message, at: iso(now()) });
         if (fn === "admin_review_question") { db.qhReviews = db.qhReviews || {}; var rk0 = a.p_hub + "|" + a.p_qid;

@@ -18,7 +18,7 @@ const SUITES = [
   ['smoke', 'Smoke test and question-bank lint', 'tools/ci/smoke.js'],
   ['preview', 'Preview safety (no production requests, noindex, fixtures)', 'tools/ci/preview.js'],
   ['rls', 'Database permissions (RLS, grants, secrets)', 'tools/release/rls.js'],
-  ['adminui', 'Admin page in a preview (Live, Hubs, newest first, phone layout)', 'tools/release/admin-ui.js'],
+  ['adminui', 'Admin page in a preview (Live, Hubs, Ask Timmy, newest first, phone layout)', 'tools/release/admin-ui.js'],
   ['admin', 'Admin operations on fixtures (live presence privacy, archive overrides, order)', 'tools/release/admin-ops.js'],
   ['retention', 'Analytics retention on fixtures (deletes, kept hours, device linking, recap)', 'tools/release/retention.js'],
   ['xp', 'XP and the game layer on fixtures (replayed calls, double taps, linked devices, the shop, the idea board)', 'tools/release/xp.js'],

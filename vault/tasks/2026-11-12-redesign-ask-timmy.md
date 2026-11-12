@@ -6,8 +6,8 @@ created: 2026-11-12
 requested-by: Sam
 due: 
 waiting-on: 
-agent: Claude Code (parts 1 and 2, 2026-11-12)
-pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1), https://github.com/smcmurry6-source/study-hubs/pull/338 (part 2)
+agent: Claude Code (parts 1, 2 and 3, 2026-11-12)
+pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1), https://github.com/smcmurry6-source/study-hubs/pull/338 (part 2), https://github.com/smcmurry6-source/study-hubs/pull/341 (part 3)
 ---
 
 # Ask Timmy: Timmy becomes every hub's study assistant (redesign)
@@ -338,7 +338,7 @@ change to HP's rules beyond the 100 start; the old pages.
       the fixed prompt (Log)
 - [x] Part 2: the chat on every new hub page and the new dashboard, on a phone and a laptop, with the Report button on
       his answers; the smoke test covers it
-- [ ] Part 3: the admin tab
+- [x] Part 3: the admin tab (the admin page's Ask Timmy tab, [ask-timmy](../reference/ask-timmy.md); covered by `tools/release/admin-ui.js`)
 - [ ] Part 4: everyone has Timmy
       - [ ] with it: Timmy on a hub's bar (and wherever else `widget/pet.js` draws him) wears the outfit equipped at
             his place (`shop.equipped.outfit` in the v2 bootstrap; `SH_PLACE.dress()` or `SH_OUTFITS.dress()` draws
@@ -411,6 +411,18 @@ change to HP's rules beyond the 100 start; the old pages.
 - 2026-11-12: [#338](https://github.com/smcmurry6-source/study-hubs/pull/338) merged as `d6bd18b` (Sam: "Merge"), once
   "Check hubs" and "Release tests" passed on its last commit; `node tools/release/postcheck.js` passed (9 of 9 changed
   files live and identical to `main`; the live hubs open with no errors). Part 2 is done.
+- 2026-11-12 (part 3, Claude Code, [#341](https://github.com/smcmurry6-source/study-hubs/pull/341)): the admin page's **Ask Timmy** tab (`review/index.html`): figures for the range, By
+  hub, his settings (switch, daily cap, questions a person a day; Save asks first), By day, and four lists (reported
+  answers, not covered, quotes that didn't check out, chats), each row opening its whole chat in place; hub chips; the
+  Inbox's "Read the chat with Timmy" on a report from the Report button. How it works: [ask-timmy](../reference/ask-timmy.md),
+  "The admin page's Ask Timmy tab". Neither pending migration is applied or changed: until the release the tab says Ask
+  Timmy starts then (the calls answer "Could not find the function") and it works once they answer. The preview answers
+  the six calls with made-up chats shaped as migration_v55 returns them, and a new preview setting (`missing`) shows a
+  page as it is before a migration ([preview-a-change](../how-to/preview-a-change.md)); `tools/release/admin-ui.js` covers
+  the tab (figures, chats as text, no ids, settings, the Inbox link, before the release, axe, a phone). Choices made: no
+  people total for a range (the daily rows count distinct people per day and hub, which don't add up), so By hub shows the
+  busiest day; the chat list loads the newest 200 in the range; a chat's context is drawn field by field, never whole.
+  Part 3 is done; part 4 is left.
 
 ## Outcome
 
