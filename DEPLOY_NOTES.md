@@ -47,7 +47,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   bicarbonate, mouth rinses, the summary slide; `nc-rda-seal` and `nc-erosion-sites` are new; the "Recording" badge is gone. Narration:
   L10 and L9 at all three levels from `next/content/notes.json`; the lexicon gained Abou-Arraj, Waerhaug and others. The new
   Occlusion's hint headings say "the professors". About page: an L10 sentence in Diagrams. Occlusion's page is 1470 KB over the
-  wire, so its budget went from 1395 to 1480 KB (BUG-084, for Sam's OK). The site is 760 MB, past `size.js`'s 750 MB warning; no
+  wire, so its budget went from 1395 to 1480 KB (BUG-084; Sam's "merge when ready"). The site is 760 MB, past `size.js`'s 750 MB warning; no
   archived hub still has audio. Task: [done](vault/tasks/done/2026-11-10-occlusion-l9-follow-ups.md).
 - **2026-11-12 (the redesign's three journeys, client side: phase 4, part A, Claude Code)** — Nothing students see
   changes: it runs only on the new pages (`hubs/<id>/next/`, `next/`, shown in a preview) and only once the database
