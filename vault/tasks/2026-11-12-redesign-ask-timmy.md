@@ -423,6 +423,12 @@ change to HP's rules beyond the 100 start; the old pages.
   people total for a range (the daily rows count distinct people per day and hub, which don't add up), so By hub shows the
   busiest day; the chat list loads the newest 200 in the range; a chat's context is drawn field by field, never whole.
   Part 3 is done; part 4 is left.
+- 2026-11-12: [#341](https://github.com/smcmurry6-source/study-hubs/pull/341) merged as `e0737a1` (Sam: "merge"), once
+  `main` with the shop's art (#339) was brought in (its admin-ui bug became BUG-097, since #339 took BUG-095) and "Check
+  hubs" and "Release tests" passed on its last commit; `postcheck.js` passed (`review/index.html` live and identical to
+  `main`). Part 3 is done. **Next for Ask Timmy: part 4, after the shop's client** (phase 4's session 2): it needs
+  nothing from the shop's art, only the order, because both sessions edit `widget/pet.js`'s `simulate()`,
+  `widget/hub-timmy.js`, `widget/dash.js` and the preview.
 
 ## Outcome
 
