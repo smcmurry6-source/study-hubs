@@ -12,8 +12,10 @@
      bar graph and crowd (recap.mjs), with the recap's icons (six trophy drawings) and its climber's hat;
    - widget/hub-art/board.js (window.SH_BOARD_ART): the idea board's drawings as a kit (board.mjs): the cork, the pins,
      the six kinds, the rosette, the bulb, the pad's binding. Loaded by widget/ideas.js;
-   - widget/hub-art/outfits.js (window.SH_OUTFITS): the shop's 55 outfits and dress(), from place.mjs, so the dashboard
-     can put one on a Timmy from widget/pet.js. Loaded only when someone on the page wears one.
+   - widget/hub-art/outfits.js (window.SH_OUTFITS): the shop's 65 outfits and costumes and dress(), from place.mjs, so
+     the dashboard can put one on a Timmy from widget/pet.js. Loaded only when someone on the page wears one;
+   - widget/hub-art/shop.js (window.SH_SHOP_ART): the shop's own art as a kit (shop.mjs): the Shiny Gold Crown, the
+     thumbnails of the four snacks and two boosts, and the five rarity frames. Fetched by the shop on first use.
 
      node tools/figures/site/build.mjs           write them all
      node tools/figures/site/build.mjs --check   fail if any is stale (CI-friendly)
@@ -51,6 +53,7 @@ const { placeKit } = await load("./place.mjs", { placeKit: null });
 /* the new dashboard's drawn parts (kits, like the place: the page draws them at its own size) */
 const { classroomKit } = await import("./classroom.mjs");
 const { boardKit } = await import("./board.mjs");
+const { shopKit } = await import("./shop.mjs");
 const { stageKit } = await import("./stage.mjs");
 const { recapKit } = await import("./recap.mjs");
 /* the sets of Timmy's place: sets.mjs lists every piece (the shop's catalog has the same rows), and each set's drawings
@@ -201,8 +204,7 @@ if (placeKit) {
   K.YARD.forEach((y) => K.SCENES.forEach((sc) => { if (builtIn(sc) || sc.set === y.set) art.push(["thumb " + y.k + " " + sc.k, K.thumb("yard", y.k, { scene: sc.k })]); }));
   pairs.forEach(([h, sc]) => art.push(["thumb " + h.k + " " + sc.k, K.thumb("home", h.k, { scene: sc.k, up: ups(h) })]));
   K.SCENES.forEach((sc) => art.push(["thumb " + sc.k, K.thumb("scene", sc.k)]));
-  K.RARITIES.forEach((r) => { art.push(["frame " + r.k, K.frame(r.k)]); art.push(["burst " + r.k, K.burst(r.k)]); });
-  art.push(["coin", K.coin()]);
+  ["Common", "Uncommon", "Rare", "Epic", "Legendary"].forEach((r) => art.push(["burst " + r, K.burst(r)]));
   K.OUTFITS.forEach((o) => { const p = K.outfitParts(o.k); art.push(["outfit " + o.k, p.back + p.face + p.top]); });
   for (let t = 0; t < 7; t++) art.push(["loupes " + t, K.loupes(t)]);
   for (const [w, svg] of art) {
@@ -216,6 +218,11 @@ if (placeKit) {
   { const t = pet({ hp: 85 }); if (!/shpet-loupes/.test(K.dress(t, "", { loupes: 3 }))) bad.push("loupes: dress() didn't put them on a bare Timmy");
     for (const o of K.OUTFITS) { const d = K.dress(t, o.k, { loupes: 5 }); if (/shpet-loupes/.test(d) !== (K.NO_LOUPES.indexOf(o.k) < 0)) bad.push("loupes with outfit " + o.k + ": wrong"); }
     for (const k of K.NO_LOUPES) if (!K.OUTFITS.some((o) => o.k === k)) bad.push("NO_LOUPES names an outfit that isn't drawn: " + k); }
+  /* the shop's ten: the five everyday outfits and the five rare costumes are drawn, under the catalog's ids, and a
+     costume is marked as one and has three lines */
+  for (const id of ["scrub-cap", "bow-tie", "safety-glasses", "white-coat", "graduation-cap"]) { const o = K.OUTFITS.find((x) => x.id === id); if (!o || o.costume || o.set) bad.push("everyday outfit " + id + ": not drawn as an outfit of the kit"); }
+  for (const id of ["pirate", "astronaut", "detective", "chef", "captain-enamel"]) { const o = K.OUTFITS.find((x) => x.id === id); if (!o || !o.costume || !(o.say && o.say.length === 3)) bad.push("rare costume " + id + ": not drawn, not marked costume, or without its three lines"); }
+  if (K.OUTFITS.filter((o) => o.costume).length !== 5) bad.push("the kit marks " + K.OUTFITS.filter((o) => o.costume).length + " costumes; the catalog has five");
   /* Timmy's walks */
   for (const [h, sc] of pairs) for (const [yard, journey] of [[{}, 0], [fill(0), 0], [fill(3), 0], [Object.assign(fill(2), { side: "lane" }), 0], [fill(1), 1]]) {
     const o = { home: h.k, scene: sc.k, yard, up: ups(h), holiday: "halloween", journey }, L = K.layout(o);
@@ -237,6 +244,24 @@ if (placeKit) {
       }
     }
   }
+}
+/* the shop's own art (shop.mjs): the coin in both cuts, the six shelf thumbnails and the five frames are all there
+   and hold the house style. One drawing serves the light and the dark page, so none may take a color from the page. */
+const SHOP = shopKit(INK, C);
+{
+  const pieces = [["coin", SHOP.coin(24)], ["coin, small", SHOP.coin(16)], ["coin body", SHOP.coinBody(false)], ["coin body, small", SHOP.coinBody(true)]]
+    .concat(["apple", "cheese-cube", "floss", "fluoride-rinse", "boost-1h", "boost-3h"].map((id) => ["shelf " + id, SHOP.thumb(id)]),
+      ["Common", "Uncommon", "Rare", "Epic", "Legendary"].map((r) => ["frame " + r, SHOP.frame(r)]));
+  for (const [w, svg] of pieces) {
+    if (typeof svg !== "string" || svg.length < 120) { bad.push("shop " + w + ": missing"); continue; }
+    if (/NaN|undefined|Infinity/.test(svg)) bad.push("shop " + w + ": NaN or undefined in the drawing");
+    if (/currentColor|var\(--/.test(svg)) bad.push("shop " + w + ": takes a color from the page, so it would differ between the light and the dark theme");
+    add("shop " + w, svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, ""));
+  }
+  if (SHOP.coin(16) === SHOP.coin(24).replace('width="24" height="24"', 'width="16" height="16"')) bad.push("shop coin: no small cut for 16 px");
+  if (SHOP.thumb("no-such-item") !== "") bad.push("shop thumb: draws something for an id it doesn't have");
+  if (SHOP.ITEMS.length !== 6 || SHOP.ITEMS.some((it) => !SHOP.thumb(it.id) || !SHOP.RARITIES.some((r) => r.k === it.rarity))) bad.push("shop ITEMS: six items, each with a thumbnail and a rarity");
+  if (SHOP.RARITIES.map((r) => r.k).join() !== "Common,Uncommon,Rare,Epic,Legendary" || new Set(SHOP.RARITIES.map((r) => SHOP.frame(r.k))).size !== 5) bad.push("shop frames: five, each its own");
 }
 for (const [w, s] of all) {
   if (/\sid=|url\(#|Gradient|<filter|<text|<style|<image|<script|on[a-z]+=/i.test(s)) bad.push(w + ": ids, gradients, filters, text, images or script");
@@ -325,6 +350,9 @@ if (placeKit) {
       if (whole.render(c).svg !== late.render(c).svg) { console.error("place.mjs: a kit that gets its packs late draws " + JSON.stringify(c) + " differently"); process.exit(1); }
     if (late.OUTFITS.length !== whole.OUTFITS.length || late.setOf("haunted-manor") !== "halloween" || late.setOf("rank-gold-yard") !== "rank") { console.error("place.mjs: addPack or setOf is off"); process.exit(1); } }
 }
+/* the shop's own art (widget/shop.js will fetch the file itself, the first time the shop is opened) */
+outs.push([path.join(root, "widget/hub-art/shop.js"), "/* Generated by tools/figures/site/build.mjs from tools/figures/site/shop.mjs (the shop's own art: the kit itself,\n" +
+  "   checked in the build). Do not edit: change the drawing and run the build. */\nwindow.SH_SHOP_ART = (" + shopKit.toString() + ")(" + JSON.stringify(INK) + ", " + JSON.stringify(C) + ");\n"]);
 /* Timmy's outfits from the place kit, keyed by the shop's item id, with the function that puts one on a Timmy drawn by
    widget/pet.js art(). The dashboard loads it only when someone in the classroom or on the stage wears one. */
 if (placeKit) {

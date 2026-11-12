@@ -29,7 +29,7 @@ window.SH_PLACE && window.SH_PLACE.addPack(function pack(T){
     "acorn-house": {
       note: "A giant acorn: a round door and round windows in the nut, its scaly cap for a roof and the stem for a chimney",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the cap", paint: "Shell paint" },
-      door: [5.5, 7.6], brush: [8.7, 6.9], statue: [2.7, 9.4], spots: { door: [5.5, 9.4] }, h: 9.6,
+      door: [5.5, 7.6], brush: [8.7, 6.9], statue: [2.7, 9.4], spots: { door: [6.15, 9.95] }, h: 9.6,
       eaves: [[3.24, 7.76, 5.3], [7.76, 3.24, 5.3], 23], round: [5.5, 5.5, 2.4], base: T.arcPts(5.5, 5.5, 2.15, -40, 135, 14), block: [2.4, 2.6, 8.6, 8.9],
       draw: function(o){
         var u = o.up, nut = o.paint && o.paint !== "cream" && T.PAINTS[o.paint] ? T.PAINTS[o.paint] : { c: "#E9B972", s: "#C48C48" }, s = "", lights = "", i;

@@ -587,17 +587,36 @@ try {
   eq(num(`select count(*) from shop_items where id in ('vampire-cape', 'pilgrim-hat', 'party-hat', 'clover-hat', 'bunny-ears', 'scarf', 'mint-fountain')`), 0, 'the old draft seasonal rows and the mint fountain are gone');
   eq(rows(`select name, kind, rarity, price, season from shop_items where id = 'mouthwash-fountain'`), [{ name: 'Mouthwash fountain', kind: 'yard', rarity: 'rare', price: 900, season: null }], 'the mouthwash fountain, under its new id');
   // the place's kit (widget/hub-art/place.js and its set files, what widget/place.js draws from) against the catalog:
-  // every drawing is a catalog row of its kind, and every place piece in the catalog has a drawing, except the five
-  // everyday outfits nobody has drawn yet (vault/tasks/2026-11-12-five-outfits-without-a-drawing.md); a sixth fails here
+  // every drawing is a catalog row of its kind, and every place piece in the catalog has a drawing (the five everyday
+  // outfits and the five rare costumes were drawn in the shop's art session; a piece without one fails here)
   const kitCtx = { window: {} }; require('vm').createContext(kitCtx);
   require('vm').runInContext(fs.readFileSync(path.join(ROOT, 'widget/hub-art/place.js'), 'utf8'), kitCtx);
   for (const f of fs.readdirSync(path.join(ROOT, 'widget/hub-art/place')).sort()) require('vm').runInContext(fs.readFileSync(path.join(ROOT, 'widget/hub-art/place', f), 'utf8'), kitCtx);
   const KIT = kitCtx.window.SH_PLACE, kitIds = {};
-  for (const [kind, list] of [['home', KIT.HOMES], ['scene', KIT.SCENES], ['yard', KIT.YARD], ['outfit', KIT.OUTFITS], ['upgrade', KIT.UPGRADES], ['upgrade', KIT.PAINTS]]) for (const x of list) if (x.id) kitIds[x.id] = kind;
-  const placeRows = rows(`select id, kind from shop_items where kind in ('outfit', 'home', 'scene', 'yard', 'upgrade') and id <> 'lab-goggles' order by id`), placeCat = Object.fromEntries(placeRows.map(r => [r.id, r.kind]));
+  for (const [kind, list] of [['home', KIT.HOMES], ['scene', KIT.SCENES], ['yard', KIT.YARD], ['outfit', KIT.OUTFITS], ['upgrade', KIT.UPGRADES], ['upgrade', KIT.PAINTS]]) for (const x of list) if (x.id) kitIds[x.id] = kind === 'outfit' && x.costume ? 'costume' : kind;
+  const placeRows = rows(`select id, kind from shop_items where kind in ('outfit', 'costume', 'home', 'scene', 'yard', 'upgrade') and id <> 'lab-goggles' order by id`), placeCat = Object.fromEntries(placeRows.map(r => [r.id, r.kind]));
   const noRow = Object.keys(kitIds).filter(id => placeCat[id] !== kitIds[id]), noArt = placeRows.filter(r => !kitIds[r.id]).map(r => r.id);
-  ok(Object.keys(kitIds).length > 150 && noRow.length === 0, `every piece the place's kit draws is a catalog row of its kind (${Object.keys(kitIds).length} pieces${noRow.length ? ', not: ' + noRow : ''})`);
-  eq(noArt, ['bow-tie', 'graduation-cap', 'safety-glasses', 'scrub-cap', 'white-coat'], 'every place piece in the catalog has a drawing, but five everyday outfits (still to draw or to drop: Sam\'s call)');
+  ok(Object.keys(kitIds).length > 160 && noRow.length === 0, `every piece the place's kit draws is a catalog row of its kind (${Object.keys(kitIds).length} pieces${noRow.length ? ', not: ' + noRow : ''})`);
+  eq(noArt, [], 'every place piece in the catalog has a drawing, the five everyday outfits included');
+  // the rare costumes: each catalog row of kind costume is a kit outfit marked as a costume, with its three lines, and
+  // the kit marks no other outfit as one
+  const costumeRows = rows(`select id, rarity, price from shop_items where kind = 'costume' order by id`), kitOutfit = Object.fromEntries(KIT.OUTFITS.filter(o => o.id).map(o => [o.id, o]));
+  eq(costumeRows.map(r => r.id), ['astronaut', 'captain-enamel', 'chef', 'detective', 'pirate'], 'the catalog has the five rare costumes');
+  eq(costumeRows.filter(r => { const o = kitOutfit[r.id]; return !(o && o.costume && Array.isArray(o.say) && o.say.length === 3 && o.say.every(t => t && typeof t === 'string')); }).map(r => r.id), [], 'every rare costume is drawn, marked as a costume, and has its three lines');
+  eq(KIT.OUTFITS.filter(o => o.costume).map(o => o.id).sort(), costumeRows.map(r => r.id), 'the kit marks only the catalog\'s costumes as costumes');
+  // what the kit says an outfit or costume costs is what the catalog charges (the ten of the shop's art session)
+  const tenRows = rows(`select id, rarity, price from shop_items where id in ('scrub-cap', 'bow-tie', 'safety-glasses', 'white-coat', 'graduation-cap') or kind = 'costume' order by id`);
+  eq(tenRows.filter(r => { const o = kitOutfit[r.id]; return !o || String(o.rarity).toLowerCase() !== r.rarity || o.price !== r.price; }).map(r => r.id), [], 'the ten new outfits carry the catalog\'s rarity and price');
+  // the shop's own art (widget/hub-art/shop.js): the coin, a frame for every rarity, and a thumbnail for every snack
+  // and boost on the shelf, each with the catalog's name, rarity, price, HP and minutes
+  const shopCtx = { window: {} }; require('vm').createContext(shopCtx);
+  require('vm').runInContext(fs.readFileSync(path.join(ROOT, 'widget/hub-art/shop.js'), 'utf8'), shopCtx);
+  const SHOPART = shopCtx.window.SH_SHOP_ART, shelfRows = rows(`select id, name, rarity, price, hp, boost_minutes from shop_items where kind in ('snack', 'boost') order by id`);
+  const shelfArt = Object.fromEntries(SHOPART.ITEMS.map(x => [x.id, x]));
+  eq(shelfRows.filter(r => { const x = shelfArt[r.id]; return !(x && SHOPART.thumb(r.id) && x.n === r.name && String(x.rarity).toLowerCase() === r.rarity && x.price === r.price && (x.hp || null) === r.hp && (x.minutes || null) === r.boost_minutes); }).map(r => r.id), [], `every snack and boost in the catalog has a thumbnail with its name, rarity, price, HP and minutes (${shelfRows.length} rows)`);
+  eq(SHOPART.ITEMS.map(x => x.id).sort(), shelfRows.map(r => r.id), 'the shop\'s art draws no snack or boost the catalog doesn\'t sell');
+  eq(rows(`select distinct rarity from shop_items order by rarity`).map(r => r.rarity).filter(k => !SHOPART.frame(k)), [], 'every rarity in the catalog has a card frame');
+  ok(/<svg/.test(SHOPART.coin(16)) && /<svg/.test(SHOPART.coin(48)) && SHOPART.coinBody(true) !== SHOPART.coinBody(false), 'the Shiny Gold Crown is drawn, with its own cut for small sizes');
   const rankRows = rows(`select id, kind, price, rank_tier, rotates, shelf from shop_items where rank_tier is not null order by rank_tier, kind`);
   ok(rankRows.length === 12 && rankRows.every(r => r.price === 0 && !r.rotates && !r.shelf && ['outfit', 'yard'].includes(r.kind)) && JSON.stringify([...new Set(rankRows.map(r => r.rank_tier))]) === JSON.stringify(SETS.ranks),
     'twelve rank items: an outfit and a yard thing for each of the Handpiece\'s six full rank-ups, price 0, on no shelf');

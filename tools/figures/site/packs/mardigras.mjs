@@ -43,7 +43,7 @@ export function pack(T){
     "french-quarter": {
       note: "A tall, narrow townhouse: two iron-lace galleries, shutters, hanging ferns and gas lanterns by a green door",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the roof", paint: "Stucco paint" },
-      door: [5.5, 8.4], brush: [7.7, 9.35], statue: [3.4, 9.5], spots: { door: [5.5, 10.4] }, h: 11.3,
+      door: [5.5, 8.4], brush: [7.7, 9.35], statue: [3.25, 9.65], spots: { door: [6.55, 10.35] }, h: 11.3,
       eaves: [[2.7, 8.8, 8.6], [8.3, 8.8, 8.6]], foot: [3.0, 3.8, 8.6, 9.0], base: [[3.0, 8.4], [8.0, 8.4], [8.0, 3.8]], block: [2.8, 3.5, 8.6, 9.0],
       draw: function(o){
         var u = o.up, wp = o.paint && o.paint !== "cream" ? T.PAINTS[o.paint] : { c: "#F9DB7C", s: "#DFB854" }, s = "", lights = "";

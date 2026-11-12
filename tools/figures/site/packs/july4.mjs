@@ -82,7 +82,7 @@ export function pack(T){
     "a-frame-cabin": {
       note: "A tall A-frame, its whole front glass, bunting along the deck and a star on the roof",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the peak", paint: "Roof paint" },
-      door: [5.5, 8.6], brush: [7.7, 9.2], statue: [3.2, 9.5], spots: { door: [5.5, 10.6] }, h: 9.0,
+      door: [5.5, 8.6], brush: [7.7, 9.2], statue: [3.2, 9.5], spots: { door: [6.5, 10.2] }, h: 9.0,
       eaves: [[3.85, 9.6, 3.6], [7.15, 9.6, 3.6]], foot: [2.2, 4.4, 8.8, 8.6], base: [[2.2, 8.6], [8.8, 8.6], [8.8, 4.4]], block: [2.0, 4.1, 9.2, 9.0],
       draw: function(o){
         var u = o.up, rp = o.paint && o.paint !== "cream" ? T.BOLD[o.paint] : { c: "#3F6FB8", s: "#2C5490" }, s = "", lights = "", i;

@@ -78,7 +78,7 @@ export function pack(T){
     "pillow-palace": {
       note: "Two cushions under two plump tasseled pillows, with bolster towers in nightcap roofs",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the top tower", paint: "The big cushion's color" },
-      door: [5.5, 8.6], brush: [7.45, 9.2], statue: [3.75, 9.5], spots: { door: [5.5, 10.6] }, h: 9.2,
+      door: [5.5, 8.6], brush: [7.45, 9.2], statue: [3.35, 9.9], spots: { door: [6.65, 10.6] }, h: 9.2,
       eaves: [[2.6, 8.8, 2.75], [8.4, 8.8, 2.75]], foot: [2.6, 3.0, 8.4, 8.6], base: [[2.6, 8.6], [8.4, 8.6], [8.4, 3.0]], block: [2.3, 2.6, 8.9, 9.1],
       draw: function(o){
         var u = o.up || {}, bp = o.paint && o.paint !== "cream" && T.PAINTS[o.paint] ? T.PAINTS[o.paint] : { c: "#FBD3E0", s: "#EDA9C2" }, s = "", lights = "";

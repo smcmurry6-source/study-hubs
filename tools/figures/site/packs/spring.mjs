@@ -54,7 +54,7 @@ export function pack(T){
     "flowerpot-house": {
       note: "A giant terracotta flowerpot on its saucer, a sunflower, a tulip and a heap of leaves for a roof",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag among the flowers", paint: "Pot glaze" },
-      door: [5.5, 7.82], brush: [8.9, 6.9], statue: [2.7, 9.4], spots: { door: [5.5, 9.6] }, h: 10.2,
+      door: [5.5, 7.82], brush: [8.9, 6.9], statue: [2.7, 9.4], spots: { door: [6.15, 9.95] }, h: 10.2,
       eaves: [[3.3, 7.7, 4.6], [7.7, 3.3, 4.6], 22], round: [5.5, 5.5, 2.8], base: T.arcPts(5.5, 5.5, 2.9, -40, 135, 14), block: [2.4, 2.5, 8.7, 8.7],
       draw: function(o){
         var u = o.up, glazed = o.paint && o.paint !== "cream", pc = glazed ? T.BOLD[o.paint] : TERRA, rc = glazed ? pc : { c: "#E88F66", s: "#C4683F" };

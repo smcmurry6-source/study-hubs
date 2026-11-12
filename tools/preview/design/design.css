@@ -730,6 +730,13 @@ img.emb-disc, .big, .small img { display: block; }
 #tpRanks .tp-fig:nth-child(n + 8) { grid-column: span 1; }
 #tpFrames { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .tp-framefig { display: grid; gap: 8px; justify-items: center; }
+/* the shop's own art: the coin beside a number, the shelf cards, the ten outfits (each as it is and with loupes) */
+#place #tpShelf.tp-gal { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.tp-coinrow { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 14px 36px; padding: 4px 2px 10px; }
+.tp-coinfig { display: grid; gap: 4px; justify-items: start; } .tp-coinfig small { font-size: var(--fs-meta); color: var(--muted); }
+.tp-coinnum { display: inline-flex; align-items: center; gap: .28em; font-weight: var(--w-head); color: var(--text); } .tp-coinnum svg { display: block; flex: none; }
+#place #tpTen.tp-gal { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.tp-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 8px 4px 0; }
 .tp-framefig .tp-rcard { width: 100%; max-width: 180px; }
 .tp-framefig p { font-size: var(--fs-meta); color: var(--muted); text-align: center; }
 .tp-framefig p b { color: var(--text); }
@@ -1055,6 +1062,7 @@ img.emb-disc, .big, .small img { display: block; }
   .tp-build { grid-template-columns: 1fr; }
   .tp-stage-wrap { position: relative; top: 0; }
   .tp-gal, #tpYard, #tpFrames { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #place #tpShelf.tp-gal { grid-template-columns: repeat(3, minmax(0, 1fr)); } #place #tpTen.tp-gal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #tpThemes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #tpPaint { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   #tpRanks, #tpOutfits { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -1064,6 +1072,7 @@ img.emb-disc, .big, .small img { display: block; }
 }
 @media (max-width: 640px) {
   .tp-gal, #tpYard, #tpFrames { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  #place #tpShelf.tp-gal, #place #tpTen.tp-gal { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #tpHomes, #tpNights, #tpScenes, #tpThemes { grid-template-columns: 1fr; }
   #tpRanks, #tpOutfits, #tpPaint { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   #tpMastery { grid-template-columns: repeat(2, minmax(0, 1fr)); }

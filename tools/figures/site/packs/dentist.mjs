@@ -63,7 +63,7 @@ export function pack(T){
     "dental-office": {
       note: "A neat white clinic: plate-glass windows, a striped awning and a tooth for a sign over the door",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the roof", paint: "Wall paint" },
-      door: [5.5, 8.6], brush: [7.55, 9.15], statue: [3.2, 9.5], spots: { door: [5.5, 10.6] }, h: 8.4,
+      door: [5.5, 8.6], brush: [7.55, 9.15], statue: [3.15, 9.55], spots: { door: [6.45, 10.25] }, h: 8.4,
       eaves: [[2.42, 8.78, 3.7], [8.58, 8.78, 3.7]], foot: [2.6, 3.0, 8.4, 8.6], base: [[2.6, 8.6], [8.4, 8.6], [8.4, 3.0]], block: [2.4, 2.7, 8.8, 9.0],
       draw: function(o){
         var u = o.up, wp = o.paint && o.paint !== "cream" ? T.PAINTS[o.paint] : { c: "#FDFEFF", s: "#DCE4EC" }, s = "", lights = "", w, i;
