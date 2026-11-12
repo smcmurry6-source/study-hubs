@@ -364,7 +364,9 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   keys were spread on its eve, two-statement accuracy went 83% -> 82% and numbered 87% -> 85% (1,141 and 952 answers), so nobody had
   been leaning on the pattern; balance from the start rather than wait for a student to notice.
 - **Students notice one fact asked again and again.** Occlusion report #40 (2026-11-10): "this question has been asked a bunch already",
-  about the 10% of people whose MIP coincides with CR closure, which the final's lectures ask three times (`in-90`, `mo-10`, `mo-tf-3`).
+  about the 10% of people whose MIP coincides with CR closure, which the final's lectures asked four times (`in-90`, `mo-10`, `mo-tf-3`, and
+  a statement in `in-2s-4`, plus one in `in-num-3`). Checking the whole final the same way (2026-11-11) found 58 facts asked three to five
+  times, mostly a plain question, then its two-statement, true/false and numbered versions; 58 questions came out (Occlusion's hub note).
   Heme & Endo Exam 2's bank went to one question per fact for the same reason (Sam, 2026-11-08: "they need to be higher yield"), keeping
   one question for each point a High Likelihood topic names. Sam's bar (2026-11-10, `mo-10` retired): "it is okay to test the same concept multiple ways. just
   not for every single question and not more than twice." Before shipping a lecture, list the fact each question tests, and keep at

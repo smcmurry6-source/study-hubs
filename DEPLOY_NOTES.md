@@ -213,6 +213,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   cover the page; the new hubs' Back button goes to it. The idea board is a second session's (its slot is `#ideas`); Timmy's
   place and visiting (`data-visit` on the board's rows) are phase 4's. Drafts for the About page and the switch are in the
   [release note](vault/tasks/2026-11-06-redesign-release.md); bugs BUG-063 to BUG-067 found and fixed while building.
+- **2026-11-11 (Occlusion: the final's repeat questions retired, Claude Code)** — Sam: "merge it and check the rest of the
+  final questions", with the bar from `mo-10` (a concept may be asked two ways, never more than twice; no new questions).
+  Every L6-L9 question's facts were listed, counting each statement of a two-statement or numbered item and facts shared
+  across lectures (the bulimia pattern and cupping are in both L7 and L9): 58 facts were asked three to five times. 58
+  questions came out (L6 17, L7 15, L8 13, L9 13: mostly the plain repeat, plus the two-statement and numbered items whose
+  every statement was asked elsewhere), so each fact is now asked at most twice, in two formats where possible, with Patient
+  Box questions kept over plain ones. No fact is left unasked, each lecture keeps its format minimums, and the bank is
+  783 questions. Ids marked `retired` in `tools/question-ids/occlusion.txt`; their why rows and High Likelihood ids went
+  with them; `next/content` rebuilt. The kept/retired list per fact is in the PR.
 - **2026-11-11 (Occlusion: `mo-10` retired, Claude Code)** — Sam: "Retire mo-10 if it is redundant ... it is okay to test the
   same concept multiple ways. just not for every single question and not more than twice." It was (report #40): the final's
   lectures asked the same fact, about 10% of people have MIP coincident with CR closure, three times. `mo-10` came out with its
