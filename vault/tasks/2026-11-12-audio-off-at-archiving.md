@@ -32,8 +32,11 @@ after its date. Do each one on its own (a small PR), with the steps in the rule.
 ## Log
 
 - 2026-11-12: written with the first five's removal ([#328](https://github.com/smcmurry6-source/study-hubs/pull/328)); sizes are their audio at 64 kbps (narration) and 96 kbps (Timmy Time).
+- 2026-11-12: the three redesigned hubs gained High yield narration (`<lecture>-hy.mp3`,
+  [task](done/2026-11-12-high-yield-narration.md)): Heme & Endo Exam 2, Occlusion and Perio each carry more than the sizes
+  above (`node tools/ci/size.js` lists them). Step 1's `git rm hubs/<hub>/audio/*.mp3` takes those too.
 
 ## Outcome
 
 Related: [archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md) ·
-[the High yield narration](2026-11-12-high-yield-narration.md), which was waiting for room on the site
+[the High yield narration](done/2026-11-12-high-yield-narration.md), which was waiting for room on the site

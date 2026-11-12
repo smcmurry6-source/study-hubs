@@ -108,6 +108,10 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
   and calls `narrate.spoken()` / `narrate.render()` (spoken "1/16" as "one sixteenth", "11/5" as "November fifth").
   L9 the same way ("11/12" as "November twelfth", "lower-RDA" as "lower RDA"); the lexicon gained NCCLs, Dzakovich,
   chelator, exostoses, tori, subgingivally and CEJ for it.
+  **High yield** (the redesign's third level) is narrated too, since 2026-11-12: `audio/<lecture>-hy.mp3` for the four final
+  lectures, made from `next/content/notes.json`. It changes whenever a final lecture's notes, predicted topics, hints or
+  questions do, so a question edit there can mean recording that lecture's High yield again in the same PR: the smoke lint
+  says which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)).
 - **Timmy Time:** the midterm episode (`tools/podcast/occlusion/script.md`); there is no final episode yet.
 - **Arcade:** the Freeway Space Arcade, skin `OCCL_SKIN`. Lab Escape is a painted backdrop (`img/lab-escape.webp`) with
   hotspots measured onto it: a new backdrop means re-measuring every `api.spot()`.

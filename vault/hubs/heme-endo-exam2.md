@@ -108,7 +108,11 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   sequence and `fh-tf-fshpeak` say it. In L16's recording (2026-11-11) Dr. Madison said the same: FSH rises, far less than LH, because
   inhibin holds it back (his slide's "FSH is suppressed by production of inhibin"). No question's key depends on FSH falling at midcycle (`fp-inhibin` and `fp-lhr-granulosa` stay retired).
 - **Narration:** `hubs/heme-endo-exam2/audio/<lecture>-full.mp3` and `-plain.mp3`, made with `tools/narrate.py`
-  (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`).
+  (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). **High yield** (the redesign's third
+  level) is narrated too, since 2026-11-12 (Sam asked for it though the hub archives Nov 13): `audio/<lecture>-hy.mp3` for
+  all eight lectures, made from `next/content/notes.json`. It changes whenever a lecture's notes, predicted topics, hints or
+  questions do, so a question edit can mean recording that lecture's High yield again in the same PR: the smoke lint says
+  which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)). It comes off with the rest at archiving.
 - **Timmy Time** (2026-11-11): `hubs/heme-endo-exam2/audio/timmy-time.mp3`, 52 min, script `tools/podcast/heme-endo-exam2/script.md`
   (L11-L16 by system, male then female, plus a short Exam 1 refresher on L2, L3, L6 and L10 only, opening with the class's
   split of the five; the histology segments name the two picture questions, the Sertoli cell and the follicle stages;
