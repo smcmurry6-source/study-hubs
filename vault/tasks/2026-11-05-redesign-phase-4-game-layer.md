@@ -270,7 +270,9 @@ These hold for each spec; a spec only adds to them.
   whenever he isn't on the page. Sessions 2 and 3 edit `widget/pet.js` after it: it adds "Ask me" to Timmy's tap
   bubble and his house, only where `window.shAsk` exists. Session 9 counts its two files (`widget/ask.js`,
   `widget/ask.css`; the stylesheet loads only when the chat is drawn). It also fixed BUG-086 (`widget/hub.css` makes an
-  empty `<i>` upright, so the new dashboard no longer downloads the italic font).
+  empty `<i>` upright, so the new dashboard no longer downloads the italic font). Merged as `d6bd18b`
+  ([#338](https://github.com/smcmurry6-source/study-hubs/pull/338), Sam: "Merge"); `postcheck.js` passed. **Next: still
+  session 1, the shop's art.**
 
 ## Outcome
 

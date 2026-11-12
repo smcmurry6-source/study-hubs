@@ -408,6 +408,9 @@ change to HP's rules beyond the 100 start; the old pages.
   me" to his tap bubble and his house only where `window.shAsk` exists; the chat waits 6 seconds after load for Timmy
   before it shows the icon (`timmyDue()` in `widget/ask.js` reads `sh_pet_born` and the setting), which part 4 can
   simplify. Next: part 4, then part 3.
+- 2026-11-12: [#338](https://github.com/smcmurry6-source/study-hubs/pull/338) merged as `d6bd18b` (Sam: "Merge"), once
+  "Check hubs" and "Release tests" passed on its last commit; `node tools/release/postcheck.js` passed (9 of 9 changed
+  files live and identical to `main`; the live hubs open with no errors). Part 2 is done.
 
 ## Outcome
 
