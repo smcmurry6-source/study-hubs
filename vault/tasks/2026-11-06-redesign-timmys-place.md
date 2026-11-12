@@ -5,9 +5,9 @@ hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: Sam (the open calls, 2026-11-12)
+waiting-on: 
 agent: Claude Code
-pr: https://github.com/smcmurry6-source/study-hubs/pull/289
+pr: https://github.com/smcmurry6-source/study-hubs/pull/335
 ---
 
 # Timmy's place: the house card, redrawn as a scene you build
@@ -55,8 +55,10 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
 
 - [ ] The homes, scenes, yard items and upgrades drawn and approved by Sam in a preview (phone and laptop, light and dark),
       starting with the cottage redrawn, the castle, the giant mushroom, the treehouse, the pool and the garden
-- [ ] The scene renderer (slots, depth order, the rank and season layers) and the full view built in phase 4, recorded on the
-      preview with reduced motion too
+- [x] The scene renderer (slots, depth order, the rank and season layers) and the full view built in phase 4, recorded on the
+      preview with reduced motion too (built 2026-11-12, [#335](https://github.com/smcmurry6-source/study-hubs/pull/335);
+      no recording: Sam said "no preview", so it was used in a scripted browser on made-up data, phone and laptop, light
+      and dark, reduced motion too)
 - [x] What's placed is kept on the server (`equip_item`, [the shop note](2026-11-06-redesign-timmy-shop.md)) and the same on
       every linked device (the server side, phase 5 part 3; the full view that calls it is phase 4); its five yard spots and
       names follow the art (Sam, 2026-11-06)
@@ -71,25 +73,31 @@ Part C is the renderer and the full view (the box above) and the place's share o
 [round 3's wiring list](done/2026-11-10-redesign-timmys-place-round-3.md). The shop (part B), the bowling egg (part D),
 visiting and "everyone has Timmy" are their own sessions, and none of them blocks part C.
 
+**Answered the same day.** Sam: "okay thats fine. no preview": yes to every recommendation below, no preview, and the
+first cut taken (the second wasn't needed: the camera, the close-up and "Surprise me" are built). The new art, the
+ModuPro on the pedestal and Timmy in loupes, went to Sam as a contact sheet, light and dark, before it went into the
+engine: "contact sheet looks good" ([decisions](../decisions.md)). Every box is ticked as answered; what was built is
+in the Log.
+
 **Where it lives**
 
-- [ ] **The dashboard's "you" card**: the place takes the house picture's spot. Timmy's name, HP bar, status line and
+- [x] **The dashboard's "you" card**: the place takes the house picture's spot. Timmy's name, HP bar, status line and
       the three buttons (joke, checkup, secret tip) stay beside it as today; tapping the picture opens the full view.
-- [ ] **In a new hub**: a "Timmy's place" tile in More (the card, and the full view from it). Timmy on the bar stays
+- [x] **In a new hub**: a "Timmy's place" tile in More (the card, and the full view from it). Timmy on the bar stays
       as he is.
-- [ ] **Only once Timmy is adopted**, as the house card is today, until "everyone has Timmy"
+- [x] **Only once Timmy is adopted**, as the house card is today, until "everyone has Timmy"
       ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), part 4).
 
 **`widget/pet.js`**
 
-- [ ] **Not touched at all.** The renderer is a new file (`widget/place.js`) that reads what `pet.js` already hands
+- [x] **Not touched at all.** The renderer is a new file (`widget/place.js`) that reads what `pet.js` already hands
       out (`shPet.hp()`, `art()`, `fit()`, `holidayId()`), and the new dashboard swaps the picture inside the card.
       What that leaves: Timmy on a hub's bar doesn't wear the outfit he has on at his place until `pet.js` changes,
       which is "everyone has Timmy"'s session (a to-do there).
 
 **Where the notes and the server disagree** (the migration is not changed without Sam's word)
 
-- [ ] **The new seasons and holidays.** Round 3's wiring list says to put them into `holidayId()` / `isFall()`. The
+- [x] **The new seasons and holidays.** Round 3's wiring list says to put them into `holidayId()` / `isFall()`. The
       server's `sh_season` and `sh_is_fall` were left as they are, and `tools/release/xp.js` checks them against
       `pet.js` for every day of three years, so changing `holidayId()` fails that test unless the migration changes
       too. And the kit only draws props by itself for today's eight holidays: Tooth Fairy week, Mardi Gras and the
@@ -98,61 +106,61 @@ visiting and "everyone has Timmy" are their own sessions, and none of them block
       summer, fall, the winter look), checked against `sh_shop_seasons` in `xp.js`; the three new holidays show
       nothing by themselves (their sets are the shop's, part B). Or: draw props for them and have Timmy dress up
       (new art, and `sh_season` changes in the migration).
-- [ ] **The later journeys' rank sets** (tiers 7 to 20): the catalog's rank rows must be exactly `sets.mjs`
+- [x] **The later journeys' rank sets** (tiers 7 to 20): the catalog's rank rows must be exactly `sets.mjs`
       (`xp.js` fails otherwise), so drawing them means 28 new rows in `migration_v54.sql`. See "Where to cut".
-- [ ] **Snack HP** (`get_pet_days_v2`'s `hp`): `pet.js` works HP out from the days and doesn't read that column
+- [x] **Snack HP** (`get_pet_days_v2`'s `hp`): `pet.js` works HP out from the days and doesn't read that column
       yet; reading it is a change to `pet.js`, and snacks are the shop's. Recommended: part B. At his place Timmy's
       health is the pet's HP as it is today.
 
 **What Timmy owns, with no shop yet**
 
-- [ ] **The customizer shows what you own** (bought, a gift, a rank piece reached) and the free defaults, and the
+- [x] **The customizer shows what you own** (bought, a gift, a rank piece reached) and the free defaults, and the
       rank pieces not reached yet as locked, with the rank that opens each (`locked`). "Get more in the shop" stays
       hidden until part B.
-- [ ] **The preview's made-up inventory** (`tools/preview/runtime/preview.js`, answering `get_my_shop`,
+- [x] **The preview's made-up inventory** (`tools/preview/runtime/preview.js`, answering `get_my_shop`,
       `equip_item` and the bootstrap's `shop` as the migration writes them): Halloween's gift set, the rank sets up
       to the account's rank, and a different handful of bought pieces per test account (one with nothing bought,
       one with a lot, the bowling lane included, for the wide spot).
-- [ ] **His outfit**: what's put on at his place wins there; with nothing on he wears what he wears that day by
+- [x] **His outfit**: what's put on at his place wins there; with nothing on he wears what he wears that day by
       himself (a holiday's outfit, a rare costume).
-- [ ] **Saving**: each change saves at once through `equip_item` and shows at once; if the server refuses, it goes
+- [x] **Saving**: each change saves at once through `equip_item` and shows at once; if the server refuses, it goes
       back and Timmy says so. On a database without the game layer (today's) the place shows the defaults with your
       rank and medals, and the customizer isn't offered.
 
 **The journeys' pieces (new art: a contact sheet on the design page first, light and dark, then Sam's yes)**
 
-- [ ] **How a journey shows.** Handpiece: the statue by the door, as approved. ModuPro: the handpiece statue stays,
+- [x] **How a journey shows.** Handpiece: the statue by the door, as approved. ModuPro: the handpiece statue stays,
       in Dark Matter (it's finished), and a ModuPro stands on the porch side of the door in the rank's material, one
       to three steps for the level. Loupes: both stand in Dark Matter and Timmy wears loupes in the rank's material
       (an outfit with its own eyewear wins over them).
 
 **Loading and the budgets**
 
-- [ ] **The kit in pieces.** With every set it is 744 KB (224 KB compressed). Split: the kit itself (about a third)
+- [x] **The kit in pieces.** With every set it is 744 KB (224 KB compressed). Split: the kit itself (about a third)
       and one file per set, fetched only when a piece of that set stands at your place or you open its drawer. All
       of it on first use, never with a page: the hubs' budgets stay at 20, 20 and 18.
-- [ ] **The new dashboard is at 30 of 30 requests**, so the place can't draw itself with the page. Recommended: the
+- [x] **The new dashboard is at 30 of 30 requests**, so the place can't draw itself with the page. Recommended: the
       card shows a still of your place kept on the device from last time (today's house picture the very first
       time), and the live place loads at the first scroll, tap or key, or when it's opened. Or: raise the
       dashboard's budget by three requests and about 90 KB (not recommended).
 
 **Tracking**
 
-- [ ] Two feature events, no words and no item names: the place opened, a piece changed (the slot only), with
+- [x] Two feature events, no words and no item names: the place opened, a piece changed (the slot only), with
       their rows in [event-taxonomy](../reference/event-taxonomy.md) and [analytics-retention](../reference/analytics-retention.md).
       Every button carries a fixed label, as the idea board's do.
 
 **A preview?**
 
-- [ ] The box above wants the full view recorded on a preview, reduced motion too. Asked once, here.
+- [x] The box above wants the full view recorded on a preview, reduced motion too. Asked once, here.
 
 **Where to cut**, if part C is too much for one session
 
-- [ ] **First: the ModuPro's and the Loupes' rank sets** (an outfit and a yard piece for each of 14 ranks, 28
+- [x] **First: the ModuPro's and the Loupes' rank sets** (an outfit and a yard piece for each of 14 ranks, 28
       drawings, as much art as three and a half seasonal sets) go to their own art session, with their catalog rows
       then. Nobody is within reach of 125,000 XP, the renderer draws any rank piece the catalog names, so nothing in
       the client waits for them. The ModuPro on the porch and Timmy in loupes stay in part C.
-- [ ] **Second, only if it still runs long**: the customizer's camera moves, close-up and "Surprise me" (the dock,
+- [x] **Second, only if it still runs long**: the customizer's camera moves, close-up and "Surprise me" (the dock,
       the drawer and saving stay).
 
 Not calls, how it will work: flame levels 4 and 5 (blue at 10 days, Dark Matter at 30) go into the new hubs' and
@@ -213,6 +221,38 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
 - 2026-11-10 (Claude Code): Sam's second look: hub mastery is one **medal board** (each hub's own medal, a big view on
   tap), the statue stands upright, and the design page has the shop's window, the customizer, the rank board and
   visiting ([round 3's note](done/2026-11-10-redesign-timmys-place-round-3.md)). Still nothing in `widget/pet.js`.
+- 2026-11-12 (Claude Code): **part C of phase 4: the place is a real client** ([#335](https://github.com/smcmurry6-source/study-hubs/pull/335)),
+  on the redesign's pages only. `widget/pet.js` is untouched and the live hubs and the live dashboard load none of it.
+  - **Files.** `widget/place.js` + `widget/place.css` (`window.shPlace`), the kit `widget/hub-art/place.js`
+    (`window.SH_PLACE`, 77 KB compressed) and one file per set in `widget/hub-art/place/` (14 seasons and `ranks.js`),
+    all generated by `node tools/figures/site/build.mjs` (the kit has `addPack`, `setOf`, `setInfo`, `hasPack`; the
+    build checks that a kit packed late draws the same as the whole one). Nothing loads with a page.
+  - **Where it is.** A new hub: More, "Timmy's place" (only once he's adopted; `widget/hub.js`, `HX.morePlace` in
+    `widget/hub-timmy.js`). The new dashboard: the place takes the house picture's spot in the "you" card
+    (`placeStart` in `widget/dash.js`); the page is at 30 of 30 requests, so it shows the still kept on the device
+    (`sh_place_still`) and fetches the renderer on the first scroll, tap or key, or when the picture is tapped. pet.js
+    still draws the card's name, HP bar, status and buttons, and its bubble hangs over Timmy's head in the picture.
+  - **What it does.** The card; the full view (a dialog: Visit and Customize); Timmy's hops to what you tap, his wave,
+    flip and bubble, his health in how he moves (the design page's stage, moved over); the tap surprises; the medal
+    board's big view; the statue by rank, the ModuPro on the pedestal and Timmy in loupes from the v2 profile's
+    `journey`, `tier` and `level`; spring, summer and fall by `shPlace.seasonOn` (checked against `sh_shop_seasons`),
+    Timmy's holidays by `shPet.holidayId()`; night by the device's clock. The customizer shows what's owned, the free
+    defaults and the locked rank pieces ("Reach Gold"), saves each change with one `equip_item`, shows it at once and
+    puts it back with a line from Timmy if the server refuses. Without the game layer: the default place, no customizer.
+  - **Checked against the server as written** (`tools/release/xp.js`, 350 checks): the customizer's rules against
+    `equip_item` through fourteen changes, the place's seasons against `sh_shop_seasons` for three years, the kit's ids
+    against the catalog. **One disagreement, told to Sam, migration unchanged**: five everyday outfits in the catalog
+    have no drawing ([task](2026-11-12-five-outfits-without-a-drawing.md)).
+  - **The preview** answers `get_my_shop`, `equip_item` and `get_pet_days_v2` from made-up data per test account
+    (`shop2`, `equip2`, `PLACE_BOUGHT`, `PLACE_START` in `tools/preview/runtime/preview.js`): `high-xp` owns
+    everything, `new` has no Timmy, `?xp=180000` and `?xp=300000` show the later journeys.
+  - **Left, each written down:** the later journeys' rank sets ([task](2026-11-12-redesign-later-journeys-rank-sets.md));
+    the five outfits (above); Timmy on the bar wearing his place's outfit, snack HP, `sw.js`, the About page's and
+    `LORE.md`'s lines, drafted ([the release](2026-11-06-redesign-release.md), "From phase 4, part C"); visiting
+    (`shPlace.open({ place })` is ready for `get_place`).
+  - **Something to look at, Sam:** with the garden in the spot left of the path, the garden and Timmy at the door
+    stand in front of the rank statue and hide most of it (the kit's layout since round 3; the statue shows as soon as
+    Timmy walks off or the spot is empty). Not changed here.
 
 ## Outcome
 

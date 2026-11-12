@@ -355,6 +355,14 @@ try {
   const sqlSeasons = rows(`select to_char(d, 'YYYY-MM-DD') as d, sh_season(d::date) as s, sh_is_fall(d::date) as f from generate_series('2026-01-01'::date, '2028-12-31'::date, interval '1 day') d`);
   const off = sqlSeasons.filter(r => { const [s, f] = jsSeason(r.d); return s !== r.s || f !== r.f; });
   ok(off.length === 0, `sh_season and sh_is_fall match widget/pet.js on every day of 2026-2028 (${off.length} differ${off.length ? ', first ' + JSON.stringify(off[0]) + ' vs ' + JSON.stringify(jsSeason(off[0].d)) : ''})`);
+  // Timmy's place draws spring, summer and fall by its own dates (seasonOn in widget/place.js): the shop's windows, every day of three years
+  const placeSrc = fs.readFileSync(path.join(ROOT, 'widget/place.js'), 'utf8');
+  const pi = placeSrc.indexOf('function seasonOn('), pj = placeSrc.indexOf('\n', pi);
+  ok(pi > 0, 'widget/place.js has seasonOn');
+  const placeSeason = new Function('day', placeSrc.slice(pi, pj) + '\nreturn seasonOn(day);');
+  const shopSeasons = rows(`select to_char(d, 'YYYY-MM-DD') as d, array_to_string(array(select unnest(sh_shop_seasons(d::date)) intersect select unnest(array['spring', 'summer', 'fall'])), ',') as s from generate_series('2026-01-01'::date, '2028-12-31'::date, interval '1 day') d`);
+  const offP = shopSeasons.filter(r => placeSeason(r.d) !== (r.s || ''));
+  ok(shopSeasons.length > 1000 && offP.length === 0, `the place's spring, summer and fall match sh_shop_seasons on every day of 2026-2028 (${offP.length} differ${offP.length ? ', first ' + JSON.stringify(offP[0]) + ' vs ' + JSON.stringify(placeSeason(offP[0].d)) : ''})`);
   // the rotation
   const day0 = rows(`select * from sh_shop_day('${D0}') order by shelf, pos`), again = rows(`select * from sh_shop_day('${D0}') order by shelf, pos`);
   eq(again, day0, 'the same day gives the same shop');
@@ -421,6 +429,20 @@ try {
   ok(unlane['yard-corner'] === 'mailbox' && !unlane['yard-side'], 'something in the front corner takes the lane away');
   ok(anonJson(`equip_item('xp-B', 'porch', 'porch')`).equipped.porch === 'porch' && anonJson(`equip_item('xp-B', 'chimney', 'porch')`).error === 'slot', 'an upgrade only in its own slot');
   ok(!('home' in anonJson(`equip_item('xp-B', 'home', null)`).equipped), 'back to the cottage');
+  // the customizer (widget/place.js) shows a change before the server answers: its rules are equip_item's, step by step
+  const apI = placeSrc.indexOf('function applied('), apJ = placeSrc.indexOf('\n  }\n', apI);
+  ok(apI > 0 && apJ > apI, 'widget/place.js has applied()');
+  const clientEquip = new Function('eq', 'slot', 'id', 'function copy(o){ var c = {}; Object.keys(o || {}).forEach(function(k){ c[k] = o[k]; }); return c; }\nfunction isWide(id){ return id === "bowling-lane"; }\n' + placeSrc.slice(apI, apJ + 4) + '\nreturn applied(eq, slot, id);');
+  sql(`insert into pet_inventory (visitor_id, item_id) values ('xp-PL', 'garden'), ('xp-PL', 'castle'), ('xp-PL', 'porch'), ('xp-PL', 'bowling-lane'), ('xp-PL', 'mailbox') on conflict do nothing`);
+  const sortKeys = o => JSON.stringify(Object.keys(o || {}).sort().map(k => [k, o[k]]));
+  let mineEq = {}; const offE = [];
+  for (const [slot, item] of [['yard-left', 'garden'], ['yard-front', 'mailbox'], ['yard-right', 'garden'], ['yard-side', 'bowling-lane'], ['yard-corner', 'mailbox'], ['yard-side', 'bowling-lane'],
+    ['yard-side', 'garden'], ['home', 'castle'], ['porch', 'porch'], ['yard-corner', 'mailbox'], ['yard-side', null], ['home', null], ['porch', null], ['yard-corner', null]]) {
+    mineEq = clientEquip(mineEq, slot, item);
+    const r = anonJson(`equip_item('xp-PL', ${q(slot)}, ${item ? q(item) : 'null'})`);
+    if (!r.ok || sortKeys(r.equipped) !== sortKeys(mineEq)) offE.push(`${slot} ${item}: server ${JSON.stringify(r.equipped || r)} / client ${JSON.stringify(mineEq)}`);
+  }
+  ok(offE.length === 0 && Object.keys(mineEq).length === 0, `the customizer's rules match equip_item through 14 changes (${offE.length ? offE[0] : 'the yard, the wide lane, the home, an upgrade, clearing'})`);
   // rare costumes
   ok(anonJson(`record_costume_sighting('xp-B', 'pirate')`).first === true, 'a first sighting');
   ok(anonJson(`record_costume_sighting('xp-B', 'pirate')`).first === false, 'the same costume again');
@@ -564,6 +586,18 @@ try {
   eq(perSeason.filter(r => r.g).map(r => r.season), SETS.gifts, 'only Halloween\'s set is a gift');
   eq(num(`select count(*) from shop_items where id in ('vampire-cape', 'pilgrim-hat', 'party-hat', 'clover-hat', 'bunny-ears', 'scarf', 'mint-fountain')`), 0, 'the old draft seasonal rows and the mint fountain are gone');
   eq(rows(`select name, kind, rarity, price, season from shop_items where id = 'mouthwash-fountain'`), [{ name: 'Mouthwash fountain', kind: 'yard', rarity: 'rare', price: 900, season: null }], 'the mouthwash fountain, under its new id');
+  // the place's kit (widget/hub-art/place.js and its set files, what widget/place.js draws from) against the catalog:
+  // every drawing is a catalog row of its kind, and every place piece in the catalog has a drawing, except the five
+  // everyday outfits nobody has drawn yet (vault/tasks/2026-11-12-five-outfits-without-a-drawing.md); a sixth fails here
+  const kitCtx = { window: {} }; require('vm').createContext(kitCtx);
+  require('vm').runInContext(fs.readFileSync(path.join(ROOT, 'widget/hub-art/place.js'), 'utf8'), kitCtx);
+  for (const f of fs.readdirSync(path.join(ROOT, 'widget/hub-art/place')).sort()) require('vm').runInContext(fs.readFileSync(path.join(ROOT, 'widget/hub-art/place', f), 'utf8'), kitCtx);
+  const KIT = kitCtx.window.SH_PLACE, kitIds = {};
+  for (const [kind, list] of [['home', KIT.HOMES], ['scene', KIT.SCENES], ['yard', KIT.YARD], ['outfit', KIT.OUTFITS], ['upgrade', KIT.UPGRADES], ['upgrade', KIT.PAINTS]]) for (const x of list) if (x.id) kitIds[x.id] = kind;
+  const placeRows = rows(`select id, kind from shop_items where kind in ('outfit', 'home', 'scene', 'yard', 'upgrade') and id <> 'lab-goggles' order by id`), placeCat = Object.fromEntries(placeRows.map(r => [r.id, r.kind]));
+  const noRow = Object.keys(kitIds).filter(id => placeCat[id] !== kitIds[id]), noArt = placeRows.filter(r => !kitIds[r.id]).map(r => r.id);
+  ok(Object.keys(kitIds).length > 150 && noRow.length === 0, `every piece the place's kit draws is a catalog row of its kind (${Object.keys(kitIds).length} pieces${noRow.length ? ', not: ' + noRow : ''})`);
+  eq(noArt, ['bow-tie', 'graduation-cap', 'safety-glasses', 'scrub-cap', 'white-coat'], 'every place piece in the catalog has a drawing, but five everyday outfits (still to draw or to drop: Sam\'s call)');
   const rankRows = rows(`select id, kind, price, rank_tier, rotates, shelf from shop_items where rank_tier is not null order by rank_tier, kind`);
   ok(rankRows.length === 12 && rankRows.every(r => r.price === 0 && !r.rotates && !r.shelf && ['outfit', 'yard'].includes(r.kind)) && JSON.stringify([...new Set(rankRows.map(r => r.rank_tier))]) === JSON.stringify(SETS.ranks),
     'twelve rank items: an outfit and a yard thing for each of the Handpiece\'s six full rank-ups, price 0, on no shelf');

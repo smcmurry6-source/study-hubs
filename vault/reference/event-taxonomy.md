@@ -171,6 +171,7 @@ new one can't go undocumented.
 | `link` / `link-ask` | `link:code`, `link:linked`, `link:fail`; `link-ask:shown`/`yes`/`no`/`later`/`code`/`fail`/`share`/`url-open` | Link my devices; the "is this your other device?" prompt | `widget/ranks.js`, `widget/linkask.js` | 10-21 |
 | `name` | `name:set`, `name:reset` | leaderboard name changed | `index.html` (dashboard) | 10-20 |
 | `ideas` | `ideas:post=board` / `=suggest` / `=checkin` (an idea posted, and from where), `ideas:vote`, `ideas:report`, `ideas:delete`, `ideas:tab=top` / `new` / `shipped`, `ideas:filter=hub:<hub id, all or every>`, `ideas:filter=cat:<category id or any>`, `ideas:checkin-private` (a check-in sent with the tick turned off) | the idea board's use; never an idea's words or a name | `widget/ideas.js`, the check-in in `widget/dash.js` | with the redesign's release (written 11-12) |
+| `place` | `place:open`, `place:equip:<slot>` (one of `equip_item`'s 13 slots: `outfit`, `home`, `scene`, `yard-left`, `yard-front`, `yard-corner`, `yard-side`, `yard-right`, `windows`, `porch`, `chimney`, `flag`, `paint`) | Timmy's place opened; a change made in its customizer: the slot only, never which piece | `widget/place.js` | with the redesign's release (written 11-12) |
 | `flair` | `flair:open` | mastery flair panel | `widget/ranks.js` | 10-21 |
 | `about` | `about:spoilers=on` | About page spoilers | `about/index.html` | 10-20 |
 

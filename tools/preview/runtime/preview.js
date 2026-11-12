@@ -385,13 +385,13 @@
     .forEach(function(x){ var q = x.split(":"); PLACE_CAT[q[0]] = { kind: q[1], gift: true }; });
   ["antique", "bronze", "silver", "gold", "diamond", "dark"].forEach(function(r, i){ PLACE_CAT["rank-" + r + "-outfit"] = { kind: "outfit", rank: i + 1 }; PLACE_CAT["rank-" + r + "-yard"] = { kind: "yard", rank: i + 1 }; });
   ("castle:home giant-mushroom:home treehouse:home lighthouse:home beach:scene forest:scene clouds:scene night-sky:scene garden:yard swimming-pool:yard hammock:yard mouthwash-fountain:yard doghouse:yard " +
-   "bowling-lane:yard:wide mailbox:yard campfire:yard telescope:yard podcast-studio:yard scrub-cap:outfit ranger-hat:outfit sunglasses-lei:outfit captain-hat:outfit aviator-cap:outfit " +
+   "bowling-lane:yard:wide mailbox:yard campfire:yard telescope:yard podcast-studio:yard sun-hat:outfit ranger-hat:outfit sunglasses-lei:outfit captain-hat:outfit aviator-cap:outfit " +
    "fancy-windows:upgrade:windows porch:upgrade:porch chimney:upgrade:chimney flag:upgrade:flag paint-mint:upgrade:paint paint-sky:upgrade:paint paint-lilac:upgrade:paint " +
    "harvest-barn:home harvest-fields:scene hay-bales:yard scarecrow-hat:outfit ice-rink:yard elf-suit:outfit").split(" ")
     .forEach(function(x){ var q = x.split(":"); PLACE_CAT[q[0]] = { kind: q[1], wide: q[2] === "wide", slot: q[1] === "upgrade" ? q[2] : null }; });
   var PLACE_BOUGHT = {
     "new": [], "missed": [],
-    "returning": ["garden", "mailbox", "scrub-cap", "chimney", "paint-mint"],
+    "returning": ["garden", "mailbox", "sun-hat", "chimney", "paint-mint"],
     "archived": ["giant-mushroom", "forest", "campfire", "ranger-hat", "hammock"],
     "admin": ["treehouse", "beach", "swimming-pool", "sunglasses-lei", "flag"],
     "high-xp": Object.keys(PLACE_CAT).filter(function(k){ return !PLACE_CAT[k].gift && !PLACE_CAT[k].rank; })

@@ -36,7 +36,7 @@
   function $$(s, r){ return [].slice.call((r || D).querySelectorAll(s)); }
   function copy(o){ var c = {}; Object.keys(o || {}).forEach(function(k){ c[k] = o[k]; }); return c; }
   function track(k){ try { if (W.shTrack) W.shTrack(k); } catch (e) {} }
-  function lowerFirst(t){ t = String(t || ""); return /^[A-Z][a-z]/.test(t) && !/^Timmy/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
+  function lowerFirst(t){ t = String(t || ""); return /^[A-Z]([a-z]| )/.test(t) && !/^Timmy/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
   function cardName(n){ n = String(n || "").replace(/^(The|A|An) /, ""); return n.charAt(0).toUpperCase() + n.slice(1); }
   function keyed(el, fn){ el.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); e.stopPropagation(); fn(); } }); }
 
@@ -155,7 +155,7 @@
   }
   function sceneAlt(m){
     var o = optsOf(m), h = byK(TP.HOMES, o.home), sc = byK(TP.SCENES, o.scene), items = YARD_SLOTS.map(function(k){ return o.yard[k] ? lowerFirst(byK(TP.YARD, o.yard[k]).n) : ""; }).filter(Boolean);
-    return (m.visiting && m.name ? m.name + "'s place: " : "Timmy's place: ") + h.n.replace(/^The /, "the ") + " on " + sc.n.replace(/^The /, "the ") + (items.length ? ", with " + items.join(", ") : "");
+    return (m.visiting && m.name ? m.name + "’s place: " : "Timmy’s place: ") + lowerFirst(h.n) + ", " + lowerFirst(sc.n) + (items.length ? ", with " + items.join(", ") : "");
   }
   function equippedIds(m){ var e = m.eq || {}; return Object.keys(e).map(function(k){ return e[k]; }); }
   function ready(m){ return kit().then(function(){ return needPacks(equippedIds(m || mine())); }); }
@@ -184,9 +184,11 @@
       return ready().then(function(){
         if (!host.isConnected) return;
         var m = mine(), art = cardArt(m), svg = art.svg, moving = !reduced && !opt.still;
-        btn.innerHTML = img(moving ? svg.replace(/(<svg[^>]*>)/, function(t){ return t + "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") + "</style>"; }) : svg, "") +
+        /* with its caption showing, the button is named by what's in it (the picture's description, then the caption);
+           as a bare picture it carries the description itself */
+        btn.innerHTML = img(moving ? svg.replace(/(<svg[^>]*>)/, function(t){ return t + "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") + "</style>"; }) : svg, opt.label === false ? "" : sceneAlt(m) + ". Open it.") +
           (opt.label === false ? "" : '<span class="tpc-foot"><b>Timmy’s place</b><span>' + esc(cardName(byK(TP.HOMES, optsOf(m).home).n)) + " · " + esc(lowerFirst(byK(TP.SCENES, optsOf(m).scene).n)) + "</span></span>");
-        btn.setAttribute("aria-label", sceneAlt(m) + ". Open it");
+        if (opt.label === false) btn.setAttribute("aria-label", sceneAlt(m) + ". Open it"); else btn.removeAttribute("aria-label");
         btn.classList.add("is-live");
         if (svg.length < 240000) { lsSet(STILL, /xmlns=/.test(svg) ? svg : svg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"')); lsSet(STILL + "_at", art.at ? art.at.join(",") : null); }
         if (opt.onDraw) opt.onDraw(btn, art.at);

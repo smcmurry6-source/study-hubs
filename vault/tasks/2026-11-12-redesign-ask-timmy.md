@@ -244,6 +244,10 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
 - [ ] Part 2: the chat on every new hub page and the new dashboard, on a phone and a laptop; the smoke test covers it
 - [ ] Part 3: the admin tab
 - [ ] Part 4: everyone has Timmy
+      - [ ] with it: Timmy on a hub's bar (and wherever else `widget/pet.js` draws him) wears the outfit equipped at
+            his place (`shop.equipped.outfit` in the v2 bootstrap; `SH_PLACE.dress()` or `SH_OUTFITS.dress()` draws
+            it). Part C of phase 4 left pet.js untouched, so today only the place itself shows it
+            ([the place](2026-11-06-redesign-timmys-place.md), 2026-11-12)
 - [ ] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
       answered by Claude, Anthropic's AI) in the release note's drafts
 - [ ] CI and `node tools/release/run.js` pass; Sam's look on the screenshots (a preview only if Sam wants one)

@@ -113,6 +113,22 @@ const HAS_NEXT_DASH = fs.existsSync(path.join(L.ROOT, 'next', 'index.html'));
       await check(`${hub}/next · ${v}`, null);
       if (first) { results[`${hub}/next · ${v}`].focus = await keyboard(page); results[`${hub}/next · ${v}`].motion = await motion(page); first = false; }
     }
+    /* Timmy's place (widget/place.js; loaded on first use): its card under More, then the full view and the customizer */
+    if (hub === next[0]) {
+      await page.evaluate(() => { location.hash = 'more/place'; });
+      if (await page.waitForSelector('.place-card .tpc.is-live', { timeout: 20000 }).catch(() => null)) {
+        await check(`${hub}/next · place`, null);
+        await page.click('.place-card .tpc').catch(() => {});
+        if (await page.waitForSelector('dialog.tpv[open]', { timeout: 8000 }).catch(() => null)) {
+          await page.waitForTimeout(600);
+          await check(`${hub}/next · place, full view`, null);
+          results[`${hub}/next · place, full view`].motion = await motion(page);
+          await page.click('dialog.tpv [data-tp="customize"]').catch(() => {}); await page.waitForTimeout(900);
+          await check(`${hub}/next · place, customize`, null);
+          await page.keyboard.press('Escape').catch(() => {});
+        } else problems.push(`${hub}/next · place: the full view didn't open`);
+      } else problems.push(`${hub}/next · place: Timmy's place didn't draw for the returning test account`);
+    }
   }
   await ctx.close();
   /* dark mode: the first screen of each live hub and the dashboard */

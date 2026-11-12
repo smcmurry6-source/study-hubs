@@ -61,6 +61,8 @@ Each has a still version for reduced motion: the last frame and the word ("Strik
 
 - [ ] The eight clips drawn and animated, approved by Sam from a recording (and their still versions)
 - [ ] The triggers in `widget/eggs.js` and the bowling lane at Timmy's place, built in phase 4
+      (the lane is at his place since part C, 2026-11-12: a wide yard piece with a small tap surprise of its own;
+      where a clip hooks in is in [phase 4's Log](2026-11-05-redesign-phase-4-game-layer.md))
 - [ ] `LORE.md` (the bowling alley, number thirty-one's fainting), the About page (in a spoiler), the event taxonomy
 - [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
 - [ ] Vault written back (`DEPLOY_NOTES.md`, this note's Outcome)

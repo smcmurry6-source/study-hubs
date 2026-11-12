@@ -35,7 +35,13 @@ tags: [map]
   The three journeys (Handpiece, ModuPro, Loupes: [task](../tasks/2026-11-06-redesign-progression-journeys.md)):
   `widget/journeys.js` (the hand-off and the Dark Matter unlock, full-screen scenes, and the road ahead) and
   `widget/hub-art/journeys.js` (the ModuPro's and the loupes' shapes for `shRanks.art` and the three journey trophies,
-  from `tools/figures/site/journeys.mjs` and `medals.mjs`), both fetched by `widget/ranks.js` on first use. [Phase 3](../tasks/2026-11-05-redesign-phase-3-dashboard.md) says what is on it.
+  from `tools/figures/site/journeys.mjs` and `medals.mjs`), both fetched by `widget/ranks.js` on first use.
+  Timmy's place ([task](../tasks/2026-11-06-redesign-timmys-place.md)): `widget/place.js` + `widget/place.css`
+  (`window.shPlace`: the card, the full view, Timmy's hops, the medal view and the customizer, which saves through
+  `equip_item`), with its kit `widget/hub-art/place.js` (`window.SH_PLACE`, from `tools/figures/site/place.mjs`) and
+  one file per set in `widget/hub-art/place/` (`<season>.js` and `ranks.js`, each fetched only when a piece of that set
+  is drawn). None of it loads with a page: a new hub fetches it from More, Timmy's place, and the new dashboard on the
+  first scroll, tap or key (until then its "you" card shows a still kept on the device). [Phase 3](../tasks/2026-11-05-redesign-phase-3-dashboard.md) says what is on it.
 - `hubs/<hub-id>/next/` — the redesign's new version of a hub, beside the live one until the release: a small page of
   settings (`window.SH_HUB`), its content as JSON in `content/` (written by `tools/hub-next/build.mjs`) and the shared
   engine. The engine is four scripts the page loads in order, with `widget/hub.css`: `widget/hub-rewards.js` (the answer

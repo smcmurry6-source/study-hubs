@@ -104,6 +104,11 @@ sells house cosmetics, snacks and floss that boost health, and XP boosts. The ho
 - [x] Server: gold crowns, the catalog and rotation, `buy_item`, `equip_item`, the inventory and purchases, HP from snacks, the boosts,
       tested on a throwaway copy (a double tap, a replayed call, a balance too low, an item not on sale today, a linked device)
 - [ ] Client: the shop in More, the balance on the "you" panel, rare costumes, recorded on the preview (reduced motion too)
+      - [ ] from part C of phase 4 (2026-11-12, [its hand-off](2026-11-05-redesign-phase-4-game-layer.md)): the place's
+            customizer gets its "Get more in the shop" link; `widget/pet.js` reads snack HP (`get_pet_days_v2`'s `hp`);
+            after a purchase the place is told (`shPlace.setup({ shop })`, `shPlace.repaint()`)
+      - [ ] the five everyday outfits with no drawing are drawn or out of the catalog
+            ([task](2026-11-12-five-outfits-without-a-drawing.md), Sam's call)
 - [ ] `LORE.md`, the About page (Shiny Gold Crowns, the shop, rarity, boosts, health items; rare costumes in a spoiler), the event taxonomy
       and retention rows
 - [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)

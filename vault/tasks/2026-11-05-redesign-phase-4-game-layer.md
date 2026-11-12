@@ -145,5 +145,33 @@ Put the ranks, trophies and celebrations on the design system without changing t
   - **Still open in this note**: parts B, C and D, the arcade lobby, the cards' and the cutscene's recording on a
     preview, the About page (drafted in [the release note](2026-11-06-redesign-release.md), "From phase 4, part A").
 - 2026-11-12: [#332](https://github.com/smcmurry6-source/study-hubs/pull/332) merged as `048bcdb`, and `node tools/release/postcheck.js` passed (10 of 10 changed files live and identical to `main`; the dashboard and the three live hubs open with no errors).
+- 2026-11-12 (Claude Code): **part C is built: Timmy's place as a real client**
+  ([#335](https://github.com/smcmurry6-source/study-hubs/pull/335)); what it is and what it does is in
+  [the place's note](2026-11-06-redesign-timmys-place.md) (its Log). Nothing students see changes: only the new pages
+  load it, `widget/pet.js` is untouched, migration_v54 is still not applied and wasn't changed. Flame levels 4 and 5
+  (blue from 10 days, Dark Matter from 30) are in the new hubs' and the new dashboard's flame.
+  - **Request budgets are unchanged**: the new hubs' pages 20, 20 and 18 of 21, 22 and 21, the new dashboard 30 of
+    30. The place's renderer, kit and set files all load on first use; the smoke test fails if one loads with a page.
+  - **Part B (the shop) starts from**: `window.shPlace` (`widget/place.js`): `setup({ shop })` takes the bootstrap's
+    `shop` or a fresh `get_my_shop` answer (call it again after a purchase and `repaint()`), `open({ customize: true })`
+    opens the customizer, and `state()` says what's owned and equipped. The customizer lists what `shop.inventory`
+    owns and nothing else; its "Get more in the shop" link is left out until there is a shop to open (the drawer's
+    foot in `side()`, beside "Surprise me"). The kit's thumbnails (`SH_PLACE.thumb(kind, key)`, `setInfo(id)` for a
+    set piece's name, rarity and price) and `dress()` are what the shop's cards need; load the kit with
+    `shPlace.ready()`. The preview's `shop2()` already carries a wallet and empty shelves to fill
+    (`tools/preview/runtime/preview.js`). Still the shop's: `buy_item`, the balance on the "you" panel, snacks and
+    their HP (`get_pet_days_v2`'s `hp`, which `widget/pet.js` doesn't read yet), the rare costumes' art, and **the
+    five everyday outfits with no drawing** ([task](2026-11-12-five-outfits-without-a-drawing.md), Sam's call).
+  - **Part D (the bowling egg) starts from**: the bowling lane is a yard piece (`bowling-lane`, wide: the side yard
+    and the front corner), drawn by the kit with its own tap surprise (`EGGS.lane`: it rolls a mint, "Strike! Well,
+    close."). In the full view every tappable thing is a `.tp-egg[data-egg]` inside the stage's shadow root and
+    `playEgg(n)` in `widget/place.js` plays it; a clip for the lane hooks in there. Whether someone has the lane out
+    is `shPlace.state().equipped["yard-side"] === "bowling-lane"`. If the egg pays XP it needs something on the
+    server, which is a change to the migration: ask Sam first.
+  - **Visiting and "everyone has Timmy" start from**: `shPlace.open({ place })` draws what `get_place` returns (the
+    name in the title, no HP, Timmy always well, no customizer); nothing calls it yet. Timmy on a hub's bar doesn't
+    wear his place's outfit: that is pet.js's, for "everyone has Timmy" ([the release](2026-11-06-redesign-release.md),
+    "From phase 4, part C").
+  - **Still open in this note**: parts B and D, part E, the arcade lobby, the recording on a preview, the About page.
 
 ## Outcome
