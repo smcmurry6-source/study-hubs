@@ -63,6 +63,9 @@ task is the one PR that then switches the site over. If something goes wrong, re
       ([to-do](2026-11-12-audio-off-at-archiving.md))
 - [ ] The game layer's wiring left by phase 4, part A (2026-11-12, "From phase 4, part A" below): the arcade's
       sessions and pick indexes, Timmy Time's minutes, the journey trophies in the trophy case, the scenes' sound
+- [ ] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"): Sam has saved the API key in Supabase and
+      set the Console's spending limit; the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
+      function reads the content from its released place; everyone has Timmy
 - [ ] After merge: `node tools/release/postcheck.js`, `DEPLOY_NOTES.md` and the site changelog; a notice to the class only
       if Sam wants one
 
