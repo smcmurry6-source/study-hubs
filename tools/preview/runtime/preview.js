@@ -795,7 +795,7 @@
     ideaDb();
     var no = function(e){ return { data: { ok: false, error: e } }; };
     var title = String(a.p_title || "").replace(/\s+/g, " ").trim(), body = String(a.p_body || "").replace(/\s+/g, " ").trim(), hub = String(a.p_hub || "").trim() || null;
-    if (!a.p_visitor || ["board", "suggest", "checkin", "timmy"].indexOf(a.p_source || "board") < 0 || (a.p_request != null && !/^[A-Za-z0-9_-]{8,64}$/.test(a.p_request))) return no("bad");
+    if (!a.p_visitor || ["board", "suggest", "checkin"].indexOf(a.p_source || "board") < 0 || (a.p_request != null && !/^[A-Za-z0-9_-]{8,64}$/.test(a.p_request))) return no("bad");
     var prev = db.ideaPosts.filter(function(p){ return a.p_request && p.request === a.p_request; })[0];
     if (prev) return { data: { ok: true, id: prev.id, name: prev.name, repeat: true } };
     if (a.p_visitor !== db.visitor || !String(db.name || "").trim()) return no("name");

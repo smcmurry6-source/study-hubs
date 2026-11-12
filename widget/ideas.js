@@ -224,7 +224,6 @@
       t += '<span class="shi-tag">' + esc(CAT_NAME[it.category] || "Something else") + "</span>";
       if (it.source === "starter") t += '<span class="shi-tag is-src">Starter idea</span>';
       else if (it.source === "checkin") t += '<span class="shi-tag is-src">From a check-in</span>';
-      else if (it.source === "timmy") t += '<span class="shi-tag is-src">Drafted with Timmy</span>';
       if (STATUS[it.status]) t += '<span class="shi-stamp is-' + esc(it.status) + '">' + (a && it.status === "shipped" ? a.check(14) : "") + esc(STATUS[it.status]) + "</span>";
       return t;
     }
@@ -507,7 +506,8 @@
     return api;
   }
 
-  /* one idea posted from somewhere else (Ask Timmy's drafted idea, widget/ask.js): p { sb, title, body, hub, category,
+  /* one idea posted from somewhere else (Ask Timmy's drafted idea, widget/ask.js, which posts it as "board": the pending
+     post_idea takes only board, suggest and checkin, and isn't changed; Sam, 2026-11-12): p { sb, title, body, hub, category,
      source, newName (a name to save first, for someone who hasn't picked one), request }; resolves { ok, id, name } or
      { ok: false, msg }. Every board on the page shows it. */
   function post(p){

@@ -161,8 +161,9 @@ download it, which keeps the new dashboard inside its request budget (`tools/rel
   front on the dashboard), a `go` is a button ("Practice L8", "Open the notes"), `not_covered` gets "Closest:", a nap
   gets "Open the notes". Thumbs (`timmy_thumb`), Report (`timmy_report`, its note box; on a nap or an error too, with
   `message` null), and offers as draft cards: a report goes into `question_flags` like any report (the question's id and
-  "drafted by Timmy" at the end of its note), an idea through `shIdeas.post` with source `timmy` (asking for a leaderboard
-  name first when there's none); "No thanks" and each send call `timmy_offer`. A failed request (45 seconds, offline, an
+  "drafted by Timmy" at the end of its note), an idea through `shIdeas.post` with source `board` (the pending `post_idea` takes only `board`, `suggest` and
+  `checkin` and isn't changed: Sam, 2026-11-12, [decisions](../decisions.md)), asking for a leaderboard
+  name first when there's none; "No thanks" and each send call `timmy_offer`. A failed request (45 seconds, offline, an
   error) says so in his voice with "Try again", which resends the same request id.
 - **Links**: on a hub, through the engine (`SH_GOTO`; practice on a lecture filters the bank to it; the drill opens
   `#questions/drill`), closing the sheet on a phone. On the dashboard, a link to a hub is saved in `sessionStorage`

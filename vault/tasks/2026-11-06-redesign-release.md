@@ -561,7 +561,7 @@ The chat is `widget/ask.js` + `widget/ask.css`, loaded only by the new pages ([a
   that's wrong or odd (Sam sees the whole chat and replies in your Inbox), and past chats on this hub (the clock).
 - **If he spots a problem or an idea**, he writes it up for you: a report for Sam or an idea for the idea board, in a box
   you can edit. Nothing is sent until you tap Send (or Post); **No thanks** drops it. An idea goes up under your
-  leaderboard name, tagged "Drafted with Timmy".
+  leaderboard name.
 - **Ask Timmy on a question**: after you answer a practice question, **Ask Timmy** under it opens the chat with that
   question attached ("Why is it ...?"). Not before you answer.
 - **Timmy off?** When Timmy is turned off (Settings, Dashboard only on a hub, or Focus mode), or before you've met him, an

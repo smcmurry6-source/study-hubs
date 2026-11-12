@@ -208,12 +208,8 @@ and `hub-timmy.js` and touches the core only for Settings ([run-a-redesign-sessi
 - **The idea board** (`widget/ideas.js`, `migration_v54`, still pending): `post_idea({ p_visitor, p_title, p_body, p_hub,
   p_category, p_source, p_request })`; a name is required (`visitor_names`, else `error: 'name'`; the client checks
   `sh_display_name` and calls `set_display_name` first). Categories `feature`, `better`, `content`, `fun`, `look`, `other`;
-<<<<<<< HEAD
   title 3-80 characters, body up to 280, one idea per 20 seconds, three a day. `p_source` is `board` for an idea Timmy drafted (Sam, 2026-11-12): `post_idea`
   as written takes only `board`, `suggest` and `checkin`, and the migration isn't changed.
-=======
-  title 3-80 characters, body up to 280, one idea per 20 seconds, three a day. `p_source` gained `timmy` in part 2.
->>>>>>> 4c7dcda (Ask Timmy, part 2: the chat in the redesign's pages)
   `window.shIdeas`; a hub opens the board at `#more/ideas`.
 - **Supabase in the browser**: `window.shSupabase` (made in `v3.js`; `dash.js` makes its own), the visitor id from
   `sh_visitor_id`. The function's address is `https://thytmzsgymydbzcqdnix.supabase.co/functions/v1/timmy`.
@@ -348,12 +344,8 @@ change to HP's rules beyond the 100 start; the old pages.
             his place (`shop.equipped.outfit` in the v2 bootstrap; `SH_PLACE.dress()` or `SH_OUTFITS.dress()` draws
             it). Part C of phase 4 left pet.js untouched, so today only the place itself shows it
             ([the place](2026-11-06-redesign-timmys-place.md), 2026-11-12)
-<<<<<<< HEAD
       - [ ] as "Build spec, part 4" above says (its own Done when)
-- [ ] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
-=======
 - [x] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
->>>>>>> 4c7dcda (Ask Timmy, part 2: the chat in the redesign's pages)
       answered by Claude, Anthropic's AI) in the release note's drafts
 - [ ] CI and `node tools/release/run.js` pass; Sam's look on the screenshots (a preview only if Sam wants one)
 - [ ] At the release, as above
@@ -394,26 +386,28 @@ change to HP's rules beyond the 100 start; the old pages.
   $1.23). Reports: branch `claude/timmy-eval-run-1`, `tools/timmy/runs/` (not merged). Part 1 is done. Sam: "dont
   bother with the rerun before release" ([decisions](../decisions.md)): the eval runs again only after a change to
   `RULES`, the schema, the effort level or the model.
-<<<<<<< HEAD
 - 2026-11-12 (Claude Code, planning only): part 4's build spec is above ("Timmy everywhere": everyone has Timmy, and
   he wears only what the student put on, Sam's call that day), with the prompts for parts 2, 3 and 4 at the end of
   this note. Where it sits among the sessions left: [phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here
   to the release" (part 4 before part 2, so the chat is built on a Timmy who is always there). For part 2: an idea
   Timmy drafts is posted with source `board`, because the pending `post_idea` refuses `timmy`.
-=======
 - 2026-11-12 (part 2, Claude Code): the chat. `widget/ask.js` + `widget/ask.css`, mounted by `widget/hub-timmy.js` on a
   new hub and by `widget/dash.js` on the new dashboard; "Ask me" in Timmy's bubble and house (`widget/pet.js`, only where
   `window.shAsk` exists, so the live hubs are unchanged); the Ask icon in his spot when he isn't shown; "Ask Timmy" in an
-  answered card's row (`widget/hub-bank.js`); Report on every answer, nap and error; report and idea drafts (ideas gain
-  the source `timmy` in the pending `migration_v54.sql`, checked by `tools/release/xp.js`, tagged "Drafted with Timmy" on
-  the board); the preview's canned replies; `tools/ci/smoke.js`'s `askCheck`. How it fits together:
+  answered card's row (`widget/hub-bank.js`); Report on every answer, nap and error; report and idea drafts (an idea
+  posts with source `board`, as the planning entry above says: neither pending migration is changed); the preview's canned replies; `tools/ci/smoke.js`'s `askCheck`. How it fits together:
   [ask-timmy](../reference/ask-timmy.md), "The chat in the new pages". The About page's entries and the release steps
   (`sw.js`'s `PRECACHE`, one live question on a phone and a laptop, `site.json` rebuilt after the About edits) are in
   [the release note](2026-11-06-redesign-release.md), "From Ask Timmy, part 2". Choices made: on the dashboard the Ask
   button sits in the "you" card where Timmy's house is; a link from the dashboard's chat opens the hub's new page and
   then the paragraph (`sessionStorage`); "What should I study tonight?" sends progress only for that question (the
-  starter or a question like it); the chat continues the newest chat under 6 hours old. Next: part 3, the admin tab.
->>>>>>> 4c7dcda (Ask Timmy, part 2: the chat in the redesign's pages)
+  starter or a question like it); the chat continues the newest chat under 6 hours old. Built before part 4 because
+  Sam asked for part 2 then: the Ask icon shows whenever Timmy isn't on the page (`html.sh-pet-on` on a hub, the house on
+  the dashboard), so today that includes someone who hasn't met him, and after part 4 only Timmy turned off or Focus
+  mode; nothing in the chat needs changing for part 4. What part 4's session should know: `widget/pet.js` now adds "Ask
+  me" to his tap bubble and his house only where `window.shAsk` exists; the chat waits 6 seconds after load for Timmy
+  before it shows the icon (`timmyDue()` in `widget/ask.js` reads `sh_pet_born` and the setting), which part 4 can
+  simplify. Next: part 4, then part 3.
 
 ## Outcome
 

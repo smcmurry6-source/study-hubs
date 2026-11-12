@@ -585,7 +585,7 @@
         if (!I || !I.post) return { ok: false, msg: "The idea board isn't open yet. For now, Suggest something reaches Sam." };
         return I.up(sb()).then(function(isUp){
           if (!isUp) return { ok: false, msg: "The idea board isn't open yet. For now, Suggest something reaches Sam." };
-          return I.post({ sb: sb(), title: t, body: body, hub: forHub || null, category: ks.value, source: "timmy", newName: nm, request: reqId });
+          return I.post({ sb: sb(), title: t, body: body, hub: forHub || null, category: ks.value, source: "board", newName: nm, request: reqId });
         });
       }).then(function(r){
         if (!r || !r.ok) { postB.disabled = false; say2.textContent = (r && r.msg) || "Couldn't post it. Try again in a minute."; return; }

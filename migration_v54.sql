@@ -1667,7 +1667,7 @@ create table if not exists public.ideas (
   body text not null default '',
   hub text,                                          -- null: all hubs
   category text not null check (category in ('feature', 'better', 'content', 'fun', 'look', 'other')),
-  source text not null check (source in ('board', 'suggest', 'checkin', 'timmy', 'starter')),   -- timmy: drafted by Ask Timmy (migration_v55)
+  source text not null check (source in ('board', 'suggest', 'checkin', 'starter')),
   request_id text unique,
   status text not null default 'open' check (status in ('open', 'considering', 'planned', 'shipped', 'not-doing')),
   status_note text,
@@ -1709,7 +1709,7 @@ returns jsonb language plpgsql security definer set search_path = public as $$
 declare t text := btrim(regexp_replace(coalesce(p_title, ''), '\s+', ' ', 'g')); b text := btrim(regexp_replace(coalesce(p_body, ''), '\s+', ' ', 'g'));
   h text := nullif(btrim(coalesce(p_hub, '')), ''); n text; prev record; iid bigint;
 begin
-  if p_visitor is null or length(p_visitor) not between 1 and 80 or coalesce(p_source, 'board') not in ('board', 'suggest', 'checkin', 'timmy')
+  if p_visitor is null or length(p_visitor) not between 1 and 80 or coalesce(p_source, 'board') not in ('board', 'suggest', 'checkin')
      or (p_request is not null and p_request !~ '^[A-Za-z0-9_-]{8,64}$') then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
   if p_request is not null then
     select id, visitor_id, name into prev from ideas where request_id = p_request;

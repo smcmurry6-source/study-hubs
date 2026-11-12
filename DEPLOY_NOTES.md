@@ -38,7 +38,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   an Ask icon in his spot when he isn't shown (a hub's bottom-left corner, the dashboard's "you" card; a plain "Ask the
   hub" voice), and from "Ask Timmy" on an answered question card (`widget/hub-bank.js`). Answers draw as text with "From
   the notes" links to the paragraph, thumbs, Report (`timmy_report`), and drafted reports and ideas the student edits and
-  sends (ideas with source `timmy`: `migration_v54.sql`, still pending, and `tools/release/xp.js`). Paused during a mock,
+  sends (an idea posts as `board`: neither pending migration is changed). Paused during a mock,
   off on an archived hub. `widget/pet.js` adds "Ask me" only where `window.shAsk` exists, so the live hubs' Timmy is
   unchanged. The preview answers the function with canned replies; `tools/ci/smoke.js` checks the chat on every new hub
   (phone and laptop) and the new dashboard. How it works: [ask-timmy](vault/reference/ask-timmy.md); release steps and
