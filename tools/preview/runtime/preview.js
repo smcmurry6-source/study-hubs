@@ -38,7 +38,7 @@
   }
   function clearNow(){ lsSet(K.now, null); }
 
-  /* ---------- 2. query parameters: ?persona=<id>, ?now=<local datetime>, ?now=real ---------- */
+  /* ---------- 2. query parameters: ?persona=<id>, ?now=<local datetime>, ?now=real, ?xp=<number> ---------- */
   var params = new URLSearchParams(location.search), cleaned = false;
   function persona(id){ for (var i = 0; i < PERSONAS.length; i++) if (PERSONAS[i].id === id) return PERSONAS[i]; return null; }
   if (params.has("now")) {
@@ -48,6 +48,10 @@
   }
   var wantPersona = params.get("persona");
   if (wantPersona != null) { params.delete("persona"); cleaned = true; }
+  /* ?xp=<n>: put the test account at that much XP, to stand just under a rank-up, the hand-off at 125,000 or a Dark
+     Matter unlock (the game layer's journeys); it also forgets which unlocks were seen */
+  var wantXp = params.get("xp");
+  if (wantXp != null) { params.delete("xp"); cleaned = true; }
   if (cleaned) { try { history.replaceState(history.state, "", location.pathname + (params.toString() ? "?" + params : "") + location.hash); } catch (e) {} }
 
   var OFFSET = nowOffset();
@@ -107,6 +111,7 @@
   var db = jget(K.db, null);
   if (!db || db.v !== 1 || db.visitor !== P.visitor) { db = freshDb(P); jset(K.db, db); }
   function save(){ jset(K.db, db); }
+  if (wantXp != null && isFinite(+wantXp)) { db.xp = Math.max(0, Math.min(400000, Math.floor(+wantXp))); db.xp2 = 0; db.dark = []; save(); }
 
   /* ---------- 5. the guard ---------- */
   var blocked = Number(lsGet(K.blocked) || 0);
@@ -347,7 +352,97 @@
             one("heme-endo-exam1", "Heme & Endo Exam 1", "#a83232", "2026-10-30", 61, 11340, 26950, 17790, true)];
   }
   /* the account's starting XP, plus a little for each answer given in this preview (the server's real rule is per day) */
-  function myXp(){ var extra = 0; allAnswers().forEach(function(a){ if (!a[4]) extra += a[3] ? 3 : 1; }); return (db.xp || 0) + extra; }
+  function myXp(){ var extra = 0; allAnswers().forEach(function(a){ if (!a[4]) extra += a[3] ? 3 : 1; }); return (db.xp || 0) + extra + (db.xp2 || 0); }
+
+  /* ---------- the game layer's answers, ladder and sessions (migration_v54), as the server does them, on the fixtures.
+     The 63 steps' floors are sh_rank's own list; an answer is graded where the page's export has its key (one choice),
+     paid by the same rules (10, 2, 1; a self-graded card 2; three right and three wrong a question a day; the day's 20th
+     answer; a miss fixed; a medal and its 24 hours of double XP) and its award kept in db.xp2. ---------- */
+  var F2 = [0, 100, 200, 300, 700, 1100, 1500, 2666, 3833, 5000, 7333, 9666, 12000, 16333, 20666, 25000, 33333, 41666, 50000, 75000, 100000,
+    125000, 130952, 136904, 142857, 148809, 154761, 160714, 166666, 172618, 178571, 184523, 190475, 196428, 202380, 208332, 214285, 220237, 226189,
+    232142, 238094, 244047, 250000, 255952, 261904, 267857, 273809, 279761, 285714, 291666, 297618, 303571, 309523, 315475, 321428, 327380, 333332,
+    339285, 345237, 351189, 357142, 363094, 369047, 375000];
+  function rank2(xp){
+    var st = 0; for (var i = 0; i < 63; i++) if (F2[i] <= xp) st = i;
+    return { journey: Math.floor(st / 21), tier: Math.floor(st % 21 / 3), level: st % 3 + 1, step: st, gtier: Math.floor(st / 3), step_at: F2[st], next_at: st < 62 ? F2[st + 1] : null, tier_at: F2[Math.floor(st / 3) * 3], steps: 63 };
+  }
+  function boost2(t){ var b = db.boost; return b && new RealDate(b.until).getTime() > t ? { mult: 2, until: b.until, src: b.src } : null; }
+  function profile2(v){
+    var p = rpc("get_rank_profile", { p_visitor: v }).data, r = rank2(p.xp || 0), k;
+    for (k in r) p[k] = r[k];
+    p.badges = (p.badges || []).slice();
+    for (var j = 0; j < 3; j++) if ((p.xp || 0) >= 125000 * (j + 1)) p.badges.push("journey-" + j);
+    p.boost = v === db.visitor ? boost2(now()) : null;
+    p.dark_seen = v === db.visitor ? (db.dark || []).slice() : [];
+    return p;
+  }
+  function medalLevel(hub){
+    var E = hubExport(hub), bank = E ? E.questions.length : 0, last = {}; if (!bank) return 0;
+    (db.answers[hub] || []).forEach(function(r){ last[r[0]] = r[2]; });
+    var got = Object.keys(last).filter(function(q){ return last[q]; }).length;
+    return got >= bank ? 4 : got * 10 >= bank * 9 ? 3 : got * 4 >= bank * 3 ? 2 : got * 2 >= bank ? 1 : 0;
+  }
+  function answer2(a, t){
+    var hub = a.p_hub, qid = String(a.p_qid || ""), E = hubExport(hub), q = null;
+    if (a.p_visitor !== db.visitor || !qid) return { ok: false, error: "bad" };
+    db.reqs = db.reqs || {};
+    if (a.p_request && db.reqs[a.p_request]) { var again = {}, k0; for (k0 in db.reqs[a.p_request]) again[k0] = db.reqs[a.p_request][k0]; again.repeat = true; return again; }
+    if (E) for (var i = 0; i < E.questions.length; i++) if (E.questions[i].id === qid) { q = E.questions[i]; break; }
+    var picks = Array.isArray(a.p_picks) ? a.p_picks : null, kind, correct;
+    if (!q) { kind = "unknown"; correct = !!a.p_claim; }
+    else if (q.choices && typeof q.answer === "number") {
+      if (a.p_choice == null && !(picks && picks.length === 1)) return { ok: false, error: "bad" };
+      kind = "one"; correct = (a.p_choice != null ? a.p_choice : picks[0]) === q.answer;
+    } else if (q.choices) { if (!picks) return { ok: false, error: "bad" }; kind = "all"; correct = !!a.p_claim; }
+    else if (a.p_self != null) { kind = "self"; correct = !!a.p_self; }
+    else if (picks) { kind = "order"; correct = picks.every(function(x, n){ return x === n; }); }
+    else { kind = "self"; correct = !!a.p_claim; }
+    answersFor(hub);
+    var rows = db.answers[hub] = db.answers[hub] || [], dd = day(t), sess = a.p_session && db.sess && db.sess[a.p_session], sOk = !!(sess && sess.hub === hub && !sess.done && t - sess.t0 < 6 * 3600e3);
+    if (db.medals == null) db.medals = {};
+    if (db.medals[hub] == null) db.medals[hub] = medalLevel(hub);   // reached before the switch: no XP, no boost
+    var today = allAnswers().filter(function(r){ return day(r[2] * 1000) === dd; }).length, lastT = db.lastAns || 0, before = null;
+    rows.forEach(function(r){ if (r[0] === qid && day(r[1] * 1000) < dd) before = r[2]; });
+    /* recorded as the four calls of today */
+    rows.push([qid, Math.floor(t / 1000), correct ? 1 : 0, 2]);   /* 4th = paid by its award, not by myXp's 3 or 1 */
+    var ck = hub + "|" + qid, c = db.cls[ck] || (db.cls[ck] = [0, 0]); c[0]++; if (correct) c[1]++;
+    if (a.p_choice != null) { var kc = ck + "|" + a.p_choice; db.picks[kc] = (db.picks[kc] || 0) + 1; }
+    else if (picks && kind !== "order") picks.forEach(function(ch){ var kk = ck + "|" + ch; db.picks[kk] = (db.picks[kk] || 0) + 1; });
+    db.lastAns = t; db.xp2 = db.xp2 || 0;
+    if (!today) db.xp2 += 20;   // the day studied, as today's trigger pays it
+    var why = null, base = 0, mult = 1, paid = 0, bonus = [], medal = null, speed = false;
+    if (kind === "unknown") why = kind;
+    else {
+      if (sOk && sess.kind === "mock") { speed = !sess.q[qid] && t - sess.t0 >= (sess.n + 1) * 2000; }
+      else speed = !lastT || t - lastT >= 2000;
+      if (!speed) why = "fast";
+    }
+    if (sOk) { sess.q[qid] = 1; sess.n++; if (correct) sess.c++; }
+    if (speed) {
+      var same = 0, all = 0, ever = 0;
+      rows.forEach(function(r){ if (r[0] !== qid) return; if (r[2]) ever++; if (day(r[1] * 1000) === dd) { all++; if (!!r[2] === correct) same++; } });
+      base = kind === "self" ? (all <= 3 ? 2 : 0) : correct ? (same <= 3 ? (ever === 1 ? 10 : 2) : 0) : (same <= 3 ? 1 : 0);
+      if (!base) why = "repeat";
+      mult = boost2(t) ? 2 : 1; paid = base * mult; db.xp2 += paid;
+      db.g20 = db.g20 || {};
+      if (today + 1 >= 20 && !db.g20[dd]) { db.g20[dd] = 1; db.xp2 += 30 * mult; bonus.push({ src: "goal20", xp: 30 * mult }); }
+      db.fix = db.fix || {};
+      if (correct && kind !== "self" && before === 0 && !db.fix[ck]) { db.fix[ck] = 1; db.xp2 += 5 * mult; bonus.push({ src: "fix", xp: 5 * mult }); }
+    }
+    if (kind !== "unknown") {
+      var lvl = medalLevel(hub), pays = [0, 100, 200, 300, 500], got = 0;
+      for (var m = db.medals[hub] + 1; m <= lvl; m++) got += pays[m];
+      if (got) {
+        db.medals[hub] = lvl; db.xp2 += got; db.boost = { until: iso(t + 864e5), src: "medal" };
+        medal = { kind: ["", "mastery-bronze", "mastery-silver", "mastery-gold", "mastery-crown"][lvl], level: lvl, xp: got, boost_until: iso(t + 864e5) };
+      }
+    }
+    var resp = { ok: true, correct: correct, kind: kind, xp: paid, base: base, mult: mult, first: correct && paid > 0 && base === 10, why: why, bonus: bonus, medal: medal, boost: boost2(t), total: 0 };
+    resp.total = myXp();
+    if (a.p_request) { var ids = Object.keys(db.reqs); if (ids.length > 300) db.reqs = {}; db.reqs[a.p_request] = resp; }
+    save();
+    return resp;
+  }
   function classStat(hub, qid){
     var h = hash(hub + "|" + qid), attempts = 12 + h % 49, correct = Math.round(attempts * (0.35 + (h >>> 8) % 61 / 100));
     var d = db.cls[hub + "|" + qid]; if (d) { attempts += d[0]; correct += d[1]; }
@@ -721,12 +816,34 @@
        v54 adds to a row: the journey (0, the Handpiece) and a visit key (made up here; the real one is a digest only
        the server can make). The shop and Timmy's place get their fixtures with phase 4. */
     if (/^get_(widget_bootstrap|rank_profile|rank_board|leaderboard|arcade_leaderboard)_v2$/.test(fn)) {
+      if (fn === "get_rank_profile_v2") return { data: profile2(v) };
       var d2 = rpc(fn.slice(0, -3), a).data;
       var vkey = function(n){ var k = ""; for (var i = 0; i < 3; i++) k += ("00000000" + (hash(n + "|visit" + i) >>> 0).toString(16)).slice(-8); return k; };
-      if (Array.isArray(d2)) d2 = d2.map(function(r){ var o2 = {}; Object.keys(r).forEach(function(k){ o2[k] = r[k]; }); o2.journey = 0; o2.visit = vkey(r.display_name); return o2; });
-      else if (d2 && d2.rank) { d2.rank.journey = 0; if (Array.isArray(d2.inbox)) d2.inbox = d2.inbox.concat(ideaNotes(v)); }
-      else if (d2 && fn === "get_rank_profile_v2") d2.journey = 0;
+      if (Array.isArray(d2)) d2 = d2.map(function(r){
+        var o2 = {}; Object.keys(r).forEach(function(k){ o2[k] = r[k]; }); o2.journey = 0; o2.visit = vkey(r.display_name);
+        /* a board row with XP stands where the 63-step ladder puts it (your own row, past the Handpiece) */
+        if (typeof r.xp === "number" && r.tier != null) { var rr = rank2(r.xp); o2.journey = rr.journey; o2.tier = rr.tier; o2.level = rr.level; }
+        return o2; });
+      else if (d2 && d2.rank) { d2.rank = profile2(v); if (Array.isArray(d2.inbox)) d2.inbox = d2.inbox.concat(ideaNotes(v)); }
       return { data: d2 };
+    }
+    if (fn === "record_answer_v2") return { write: true, data: answer2(a, t) };
+    if (fn === "mark_dark_unlock_seen") { if (v === db.visitor) { db.dark = db.dark || []; if (db.dark.indexOf(a.p_journey) < 0) db.dark.push(a.p_journey); save(); } return { write: true, data: true }; }
+    if (fn === "xp_session_start") {
+      if (v !== db.visitor) return { data: null };
+      var sid = "00000000-0000-4000-8000-" + ("000000000000" + (hash(String(t) + "|" + hub) >>> 0).toString(16)).slice(-12);
+      db.sess = db.sess || {}; db.sess[sid] = { hub: hub, kind: a.p_kind, t0: t, n: 0, c: 0, q: {}, done: false }; save();
+      return { write: true, data: sid };
+    }
+    if (fn === "xp_session_finish") {
+      var ss = db.sess && db.sess[a.p_session];
+      if (v !== db.visitor || !ss) return { data: { ok: false, error: "bad" } };
+      if (ss.done) return { data: { ok: true, repeat: true, xp: 0 } };
+      ss.done = true; db.mockDay = db.mockDay || {};
+      var mk = ss.hub + "|" + day(t), mm = boost2(t) ? 2 : 1, got2 = 0;
+      if (ss.kind === "mock" && ss.n >= 10 && !db.mockDay[mk]) { db.mockDay[mk] = 1; got2 = 50 * mm; db.xp2 = (db.xp2 || 0) + got2; }
+      save();
+      return { write: true, data: { ok: true, xp: got2, mult: mm, answers: ss.n, correct: ss.c } };
     }
     /* someone's place, for the dashboard's stage (the top three stand on it as their own Timmys): only the outfit here,
        the rest of a place gets its fixtures with phase 4. One made-up classmate's place can't be read, for the plain Timmy. */

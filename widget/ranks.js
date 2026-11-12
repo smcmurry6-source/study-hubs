@@ -833,15 +833,20 @@
       if (!profile) return;
       var t = profile.tier || 0, xp = profile.xp || 0, next = profile.next_at, at = profile.step_at != null ? profile.step_at : (profile.tier_at || 0);
       var lvl = profile.level || 1, step = profile.step != null ? profile.step : t * 3;
+      /* a v2 profile (the redesign's pages on the game layer): the card shows the journey's own rank, 63 steps long,
+         while the rest of this panel keeps reading the Handpiece's view above */
+      var V = isV2(ownRaw) ? ownRaw : null, vj = V ? Math.max(0, Math.min(2, V.journey | 0)) : 0, vn = V ? (V.step | 0) + 1 : 0;
+      if (V) { next = V.next_at; at = V.step_at != null ? V.step_at : at; }
       var pct = next ? Math.max(0, Math.min(1, (xp - at) / (next - at))) : 1;
+      var nextName = !next ? "" : V ? nameOf({ journey: Math.floor(vn / 21), tier: Math.floor(vn % 21 / 3), level: vn % 3 + 1 }) : rankName(Math.floor((step + 1) / 3), (step + 1) % 3 + 1);
       var m = masteryFor(), badges = profile.badges || [];
       var h = '<div class="sh-rank-card sh-tier-' + TIERS[t].key + '">' +
-        '<div class="sh-rank-art-wrap">' + art(t, 108, { animate: true, level: lvl }) + '</div>' +
-        '<div class="sh-rank-info"><div class="sh-rank-eyebrow">Your handpiece</div>' +
-        '<div class="sh-rank-name">' + rankName(t, lvl) + '</div>' +
+        '<div class="sh-rank-art-wrap">' + (vj ? artOf(vj, V.tier | 0, 108, { animate: true, level: V.level || 1 }) : art(t, 108, { animate: true, level: lvl })) + '</div>' +
+        '<div class="sh-rank-info"><div class="sh-rank-eyebrow">' + (vj === 1 ? "Your ModuPro" : vj === 2 ? "Your loupes" : "Your handpiece") + '</div>' +
+        '<div class="sh-rank-name">' + (vj ? esc(nameOf(V)) : rankName(t, lvl)) + '</div>' +
         '<div class="sh-rank-xp"><b>' + fmt(xp) + '</b> XP' + (profile.position ? ' · #' + profile.position + ' of ' + profile.of : '') + '</div>' +
         '<div class="sh-rank-bar"><i style="width:' + (pct * 100).toFixed(1) + '%"></i></div>' +
-        '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + rankName(Math.floor((step + 1) / 3), (step + 1) % 3 + 1) : 'The highest rank there is.') + '</div>' +
+        '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + nextName : 'The highest rank there is.') + '</div>' +
         (window.shEditName ? '<button type="button" class="sh-rank-rename">' + (window.shNameNow && window.shNameNow() ? 'Shown as ' + esc(window.shNameNow()) + ' · change' : 'Change your name') + '</button>' : '') +
         '</div></div>';
       if (m.bank) {
@@ -946,13 +951,14 @@
         : tr.secret ? '<b>Secret.</b> ' + esc(tr.clue) : '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '.') + share;
     });
 
-    var loading = false;
+    var loading = false, ownRaw = null;
     /* your own rank and mastery: the badge by your name, the rank-up, level-up, trophy and mastery cards, and the
        medals recorded in render(). Cheap per-visitor reads since migration_v53's XP cache, so they still come on load
        (in the page bootstrap) and every 10 answers (Sam, 2026-11-06). The class-wide trophy rarity waits for Stats. */
     function applyOwn(p, m){
       var raw = p; p = legacy(p);   // a v2 profile (the redesign): this panel, the accents and Timmy's house read the Handpiece's rank
-      profile = p; mastery = m || [];
+      profile = p; mastery = m || []; ownRaw = raw;
+      if (raw.journey > 0 && !window.SH_JOURNEY_ART) needJourneyArt(function(K){ if (K) render(); });
       /* the redesigned hubs' rank pill (widget/hub-rewards.js) listens; nothing on the live pages does */
       try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: raw, mastery: masteryFor() } })); } catch (e) {}
       if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
@@ -988,6 +994,12 @@
         sinceLoad = 0;
         setTimeout(panelOpen() ? load : loadOwn, 1500);
       }
+    });
+    /* the game layer (the redesign): the server's answer carries your new total, so a rank-up, a hand-off or a Dark
+       Matter unlock plays on the answer that earned it instead of up to ten answers later */
+    document.addEventListener("sh:answer-paid", function(e){
+      var r = e.detail && e.detail.res;
+      if (r && typeof r.total === "number" && ownRaw && ownRaw.next_at != null && r.total >= ownRaw.next_at) { sinceLoad = 0; setTimeout(loadOwn, 900); }
     });
     document.addEventListener("click", function(e){
       if (e.target.closest && e.target.closest("#shstat-stats-pill")) setTimeout(function(){ if (panelOpen()) load(); }, 50);
@@ -1047,6 +1059,8 @@
     art: art,
     /* the journeys (the redesign): a v2 profile's name and medallion, its Handpiece view, and the later objects' drawings */
     JOURNEYS: JOURNEYS, isV2: isV2, legacy: legacy, nameOf: nameOf, artOf: artOf, needJourneyArt: needJourneyArt,
+    /* the scenes and the road ahead (widget/journeys.js), with the drawings they use: cb(shJourneys), or cb(null) */
+    journeys: function(cb){ needJourneyArt(function(){ withJourneys(cb, function(){ cb(null); }); }); },
     miniOf: function(j, tier, level){
       if (!(j > 0) || !JOURNEYS[j]) return this.mini(tier, level);
       tier = Math.max(0, Math.min(6, tier | 0)); level = level ? Math.max(1, Math.min(3, level | 0)) : 0;

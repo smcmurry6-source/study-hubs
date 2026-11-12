@@ -628,7 +628,7 @@
     }).join("");
     function pill(j, t, lv, xp, boost){
       return '<span class="rankpill jr-pill">' + small(j, t) + "<b>" + esc(rname(j, t, lv)) + '</b><span class="xpn num">' + fmt(xp) + " XP</span>" +
-        (boost ? '<span class="xboost"><b>2x</b><span class="num">' + esc(boost) + "</span></span>" : "") + "</span>";
+        (boost ? '<span class="xboost"><i>2x</i><span class="num">' + esc(boost) + "</span></span>" : "") + "</span>";
     }
     var pills = '<div class="jr-pills">' + pill(0, 3, 2, 7420) + pill(1, 4, 2, 201400) + pill(2, 6, 3, 371250) + "</div>" +
       '<p class="jr-cap">On a board, beside a name:</p><div class="jr-minis">' + [0, 1, 2].map(function(j){ return '<span class="jr-minirow">' + T.map(function(t, ti){ return small(j, ti); }).join("") + "</span>"; }).join("") + "</div>";

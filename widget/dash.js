@@ -1096,27 +1096,44 @@
      THE "YOU" CARD: your rank, mastery and streak (Timmy's house is drawn into #petHome by widget/pet.js)
      ==================================================================== */
   var myRank = null, weekBy = null, weekSource = "local";
+  /* the journeys (migration_v54's _v2 profile and boards carry `journey`: 0 the Handpiece, 1 the ModuPro, 2 the
+     Loupes): a rank's name, medallion and mini for whichever object it is on. The later objects' drawings
+     (widget/hub-art/journeys.js) load only when someone on the page is past the Handpiece, and the page paints again. */
+  function jName(r, lv){ var R = window.shRanks; return R.nameOf && r.journey > 0 ? R.nameOf({ journey: r.journey, tier: r.tier, level: lv }) : R.rankName(r.tier, lv); }
+  function jArt(r, px, opt){ var R = window.shRanks; return R.artOf && r.journey > 0 ? R.artOf(r.journey, r.tier, px, opt) : R.art(r.tier, px, opt); }
+  function jMini(r, lv){ var R = window.shRanks; return R.miniOf && r.journey > 0 ? R.miniOf(r.journey, r.tier, lv) : R.mini(r.tier, lv); }
+  var jAsked = false;
+  function jNeed(rows, again){
+    var R = window.shRanks;
+    if (jAsked || window.SH_JOURNEY_ART || !R || !R.needJourneyArt || !rows.some(function(r){ return r && r.journey > 0; })) return;
+    jAsked = true; R.needJourneyArt(function(K){ if (K) again(); });
+  }
   function renderMyRank(p){
     var R = window.shRanks, el = $("meRank"); if (!R || !el) return;
     p = p || { xp: 0, tier: 0, level: 1, step: 0, step_at: 0, next_at: 100 };
     var t = p.tier || 0, lv = p.level || 1, step = p.step != null ? p.step : t * 3, xp = p.xp || 0;
     var at = p.step_at != null ? p.step_at : 0, next = p.next_at, pct = next ? Math.max(0, Math.min(1, (xp - at) / (next - at))) : 1;
-    var nextName = next ? R.rankName(Math.floor((step + 1) / 3), (step + 1) % 3 + 1) : "";
+    /* the next step's name: on a v2 profile the steps run 0 to 62, 21 a journey */
+    var ns = step + 1, nextName = next ? jName({ journey: Math.floor(ns / 21), tier: Math.floor(ns % 21 / 3) }, ns % 3 + 1) : "";
+    jNeed([p], function(){ renderMyRank(myRank || p); });
     var medals = R.flair && R.flairFromBadges && R.flairFromBadges(p.badges) ? R.flair(R.flairFromBadges(p.badges), { list: true }) : "";
-    el.innerHTML = '<div class="dx-rankart">' + R.art(t, 64, { level: lv }) + "</div>" +
-      '<div class="dx-rankbody"><p class="dx-rankname"><b>' + esc(R.rankName(t, lv)) + '</b><span class="num">' + num(xp) + " XP" + (p.position ? " · #" + p.position + " of " + p.of : "") + "</span></p>" +
+    el.innerHTML = '<div class="dx-rankart">' + jArt(p, 64, { level: lv }) + "</div>" +
+      '<div class="dx-rankbody"><p class="dx-rankname"><b>' + esc(jName(p, lv)) + '</b><span class="num">' + num(xp) + " XP" + (p.position ? " · #" + p.position + " of " + p.of : "") + "</span></p>" +
       '<div class="dx-bar2 dx-rankbar" role="progressbar" aria-label="Progress to ' + esc(nextName || "the top") + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pct * 100) + '"><i style="width:0%"></i></div>' +
       '<p class="note">' + (!xp ? "Answer a question in any hub to start earning XP." : next ? '<b class="num">' + num(next - xp) + " XP</b> to " + esc(nextName) : "The highest rank there is.") + "</p></div>" +
       (medals ? '<div class="dx-medals"><span class="note">Mastery</span>' + medals + "</div>" : "");
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ var i = q(".dx-rankbar i", el); if (i) i.style.width = (pct * 100).toFixed(1) + "%"; }); });
     var pill = $("dxRank");
-    pill.innerHTML = '<span class="sr">Your rank: ' + esc(R.rankName(t, lv)) + ", " + num(xp) + ' XP</span><span class="dx-seen" aria-hidden="true">' + R.mini(t, lv) + "<b>" + esc(R.rankName(t, lv)) + '</b><span class="num dx-fold">' + num(xp) + " XP</span></span>";
+    pill.innerHTML = '<span class="sr">Your rank: ' + esc(jName(p, lv)) + ", " + num(xp) + ' XP</span><span class="dx-seen" aria-hidden="true">' + jMini(p, lv) + "<b>" + esc(jName(p, lv)) + '</b><span class="num dx-fold">' + num(xp) + " XP</span></span>";
     pill.hidden = false;
   }
   /* your own rank: the card, Timmy's flair and the rank-up celebration. It rides in the page bootstrap. */
   function applyMyRank(p){
     myRank = p; renderMyRank(p);
-    if (window.shRanks && window.shRanks.track) window.shRanks.track(p); else lsSet("sh_rank_tier", String(p.tier || 0));
+    /* the rank-up cards, and on the game layer the hand-off and the Dark Matter unlock (seen: the unlock is marked
+       played on the server, once ever) */
+    if (window.shRanks && window.shRanks.track) window.shRanks.track(p, { seen: function(j){ var bot = false; try { bot = !!navigator.webdriver; } catch (e) {} if (boardSb && VISITOR && !bot) boardSb.rpc("mark_dark_unlock_seen", { p_visitor: VISITOR, p_journey: j }).then(function(){}, function(){}); } });
+    else lsSet("sh_rank_tier", String(p.tier || 0));
     if (window.shRanks && window.shRanks.flairFromBadges){ lsSet("sh_rank_flair", window.shRanks.flairFromBadges(p.badges)); }
     if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(p.badges);
     try{ document.dispatchEvent(new CustomEvent("sh:rank")); }catch(e){}
@@ -1200,7 +1217,7 @@
     ranks: "XP from every hub: 10 for a new question right, 2 for a repeat, 1 for trying, 20 per day studied. Every rank has levels I, II and III.",
     streaks: "Days in a row with at least one answer."
   };
-  function rankMini(t, lv){ return window.shRanks && t != null ? window.shRanks.mini(t, lv) : ""; }
+  function rankMini(r){ return window.shRanks && r.tier != null ? jMini(r, r.level) : ""; }
   /* a row's name with its mastery medals (`flair`) */
   function nameFlair(r, extra){
     var f = window.shRanks && window.shRanks.flair ? window.shRanks.flair(r.flair, { who: r.display_name }) : "";
@@ -1209,7 +1226,7 @@
   /* a row carries its visit key (the _v2 boards, migration_v54) as data-visit: Timmy's place (phase 4) opens from it.
      pct: its bar against first place (0 to 1) */
   function rowHTML(r, place, mid, val, unit, pct){
-    return "<li" + (r.is_me ? ' class="me"' : "") + (r.visit ? ' data-visit="' + esc(r.visit) + '"' : "") + '><span class="rk num">' + place + '</span><span class="nm">' + rankMini(r.tier, r.level) + nameFlair(r, r.is_me ? " (you)" : "") + "</span>" +
+    return "<li" + (r.is_me ? ' class="me"' : "") + (r.visit ? ' data-visit="' + esc(r.visit) + '"' : "") + '><span class="rk num">' + place + '</span><span class="nm">' + rankMini(r) + nameFlair(r, r.is_me ? " (you)" : "") + "</span>" +
       '<span class="lvl">' + esc(mid || "") + '</span><span class="dx-vs" aria-hidden="true"><i style="width:' + Math.max(2, Math.min(100, Math.round((pct || 0) * 100))) + '%"></i></span>' +
       '<span class="val num">' + val + "<small>" + unit + "</small></span></li>";
   }
@@ -1244,10 +1261,10 @@
     var first = Math.max(1, ranks ? +rows[0].xp || 0 : +rows[0].streak || 0);
     var set = pod && CA && CA.stage && w >= 240 ? stageSvg(w, rows, d.fits || []) : "";
     $("board").innerHTML = '<div class="dx-arena' + (set ? " has-set" : "") + (still() ? " is-still" : "") + '" data-w="' + w + '">' + set +
-      (pod ? (ranks ? podiumHTML(rows, function(r){ return R.art(r.tier, 72, { animate: false, level: r.level || R.levelFor(r.xp) }); }, function(r){ return num(r.xp) + "<small>XP</small>"; }, function(r){ return R.rankName(r.tier, r.level || R.levelFor(r.xp)); })
+      (pod ? (ranks ? podiumHTML(rows, function(r){ return jArt(r, 72, { animate: false, level: r.level || R.levelFor(r.xp) }); }, function(r){ return num(r.xp) + "<small>XP</small>"; }, function(r){ return jName(r, r.level || R.levelFor(r.xp)); })
         : podiumHTML(rows, function(r){ return flame(r.streak); }, function(r){ return r.streak + "<small>" + (r.streak === 1 ? "day" : "days") + "</small>"; })) : "") +
       (rest.length ? '<ol class="dx-board"' + (pod ? ' start="4"' : "") + ">" + rest.map(function(r, i){
-        return ranks ? rowHTML(r, r.rnk, R.rankName(r.tier, r.level || R.levelFor(r.xp)), num(r.xp), "XP", (+r.xp || 0) / first)
+        return ranks ? rowHTML(r, r.rnk, jName(r, r.level || R.levelFor(r.xp)), num(r.xp), "XP", (+r.xp || 0) / first)
           : rowHTML(r, i + (pod ? 4 : 1), "", r.streak, r.streak === 1 ? "day" : "days", (+r.streak || 0) / first);
       }).join("") + "</ol>" : "") + "</div>";
   }
@@ -1277,10 +1294,16 @@
         if (!rows.length || !R){ boardMsg("No ranks yet. Answer a question in any hub to get your first handpiece."); return; }
         boardData = { which: which, rows: rows, fits: [] }; paintBoard(); loadFits(sb, boardData);
         var me = rows.filter(function(r){ return r.is_me; })[0];
-        $("rankLadder").innerHTML = R.TIERS.map(function(t, i){
-          var mine = me && me.tier === i;
-          return '<div class="dx-rung' + (mine ? " me" : "") + '">' + R.art(i, 56, { animate: false, level: mine ? (me.level || R.levelFor(me.xp)) : 0 }) + "<b>" + esc(t.name) + '</b><span class="note num">' + (i ? num(t.at) + " XP" : "Start") + (mine ? " · you" : "") + "</span></div>";
-        }).join("");
+        /* the ladder under the board is the journey you are on: the Handpiece's seven ranks, or the next object's */
+        var paintLadder = function(){
+          var K = window.SH_JOURNEY_ART, mj = me && me.journey > 0 && K ? Math.min(2, me.journey | 0) : 0;
+          $("rankLadder").innerHTML = R.TIERS.map(function(t, i){
+            var mine = me && me.tier === i, at = mj ? K.floor(mj, i) : t.at;
+            return '<div class="dx-rung' + (mine ? " me" : "") + '">' + jArt({ journey: mj, tier: i }, 56, { animate: false, level: mine ? (me.level || R.levelFor(me.xp)) : 0 }) + "<b>" + esc(t.name) + '</b><span class="note num">' + (at ? num(at) + " XP" : "Start") + (mine ? " · you" : "") + "</span></div>";
+          }).join("");
+        };
+        paintLadder();
+        jNeed(rows, function(){ if (boardData && boardData.rows === rows) { paintBoard(); paintLadder(); } });
       }, function(){ if (boardNow === which) boardMsg(); });
     } else if (which === "streaks") {
       rpc2(sb, "get_leaderboard", { p_limit: 8 }).then(function(res){

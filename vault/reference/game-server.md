@@ -162,6 +162,15 @@ Sam's side, behind the secret: `admin_ideas`, `admin_set_idea` (hide, restore, a
 every up-voter get an Inbox note, `get_my_inbox_v2`, `mark_idea_note_seen`) and `admin_post_starter_idea` (Timmy and his
 neighbors, no visitor).
 
+**The answer call, the ladder and mock sessions have their pages since 2026-11-12** (phase 4, part A,
+[the journeys](../tasks/2026-11-06-redesign-progression-journeys.md)): a new hub's widget tag carries `data-game="v2"`,
+and `widget/v3.js` then asks for `get_widget_bootstrap_v2`, sends each answer as one `record_answer_v2` (falling back
+to today's calls when the function isn't there, or when the server answers `bad` because a one-choice question came
+without a pick), starts and finishes a mock's session, and hands the server's reply to the engine as `sh:answer-paid`
+(`window.shGame`). `widget/ranks.js` reads `get_rank_profile_v2` there, plays the hand-off and the Dark Matter unlock
+(`widget/journeys.js`) and calls `mark_dark_unlock_seen` when an unlock ends or is skipped. Not wired yet: an arcade
+game's session, `pod_minute_v2` ([the release](../tasks/2026-11-06-redesign-release.md), "From phase 4, part A").
+
 The pages that call them (built 2026-11-12, [the idea board](../tasks/2026-11-06-idea-board.md)): `widget/ideas.js` (the
 board and the tick), `widget/replies.js` (a status note shows as a pop-up once and stays in the Inbox; it reads
 `get_my_inbox_v2` where the page says the game layer is there, which only the new dashboard does so far) and the admin

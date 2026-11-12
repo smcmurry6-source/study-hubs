@@ -18,6 +18,13 @@ tags: [widget, supabase]
   review but leaves out of its totals) adds `uncounted()`, returning `{ n, right }` (how many, how many right on the
   latest try), and `widget/ranks.js` takes them off both sides of the mastery medal (Heme & Endo Exam 2's Exam 1
   Refresher, 2026-11-06).
+- **The game layer's switch** (the redesign, not live until its release): a page whose `v3.js` tag has
+  `data-game="v2"` (the engine writes it; no live hub has it) uses migration_v54's functions once the database has them:
+  the v2 bootstrap, one `record_answer_v2` per answer in place of today's four or five calls, mock sessions, and
+  `window.shGame` for the engine. Without the attribute, or until the functions exist, v3.js works exactly as on the
+  live hubs. `widget/ranks.js` and `widget/rankup.js` draw a rank past the Handpiece only for a v2 profile (`journey`
+  set); `shRanks.art()` without a shape is byte for byte what it was. How it fits together:
+  [game-server](game-server.md) and [the journeys](../tasks/2026-11-06-redesign-progression-journeys.md).
 - **`widget/cases.js` + `widget/cases.css`** (`window.shCases`): the dental case kit. A Patient Box question in any
   hub names a case (`pcase`) in that hub's `PCASES`, and the kit draws its periodontal chart, periapical radiograph
   and buccal view from the case's numbers, works out the diagnosis from them and validates that every number is

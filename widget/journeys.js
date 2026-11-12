@@ -12,7 +12,8 @@
    it was. Reduced motion gets the last frame, faded in, with nothing moving. They move transform and opacity only.
    No sound yet: the site has no sound setting, and these stay silent until it has one (a to-do in the journeys note).
    The medallions are shRanks.artOf (the handpiece by ranks.js, the ModuPro and the loupes by widget/hub-art/journeys.js,
-   which is fetched first). When a scene reaches its peak it sends "sh:journey-scene" so Timmy can react on a hub's bar. */
+   which is fetched first). When a scene reaches its peak it sends "sh:journey-scene", and "sh:journey-scene-end" when it
+   closes, so Timmy can say something on a hub's bar once the page is back. */
 (function(){
   "use strict";
   if (window.shJourneys || !window.shRanks) return;
@@ -188,7 +189,11 @@
       if (closed) return; closed = true;
       timers.forEach(clearTimeout); document.removeEventListener("keydown", key, true);
       el.classList.add("is-out");
-      setTimeout(function(){ el.remove(); try { if (prev && prev.focus) prev.focus({ preventScroll: true }); } catch (e) {} if (done) done(); }, 300);
+      setTimeout(function(){
+        el.remove(); try { if (prev && prev.focus) prev.focus({ preventScroll: true }); } catch (e) {}
+        try { document.dispatchEvent(new CustomEvent("sh:journey-scene-end", { detail: opt.detail })); } catch (e) {}
+        if (done) done();
+      }, 300);
     }
     function key(e){
       if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); close(); }

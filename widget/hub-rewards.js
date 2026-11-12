@@ -15,11 +15,26 @@
     visible = HX.visible, toast = HX.toast, icon = HX.icon, artSvg = HX.artSvg, spot = HX.spot, flame = HX.flame,
     ring = HX.ring, ANSWERED = HX.ANSWERED, STATE = HX.STATE, ansOf = HX.ansOf, studyDayList = HX.studyDayList,
     achMap = HX.achMap, putAnswer = HX.putAnswer, saveNow = HX.saveNow, saveState = HX.saveState, QBL = HX.QBL,
-    lecName = HX.lecName, lecDot = HX.lecDot, paintLive = HX.paintLive, go = HX.go, lecStat = HX.lecStat;
+    lecName = HX.lecName, lecDot = HX.lecDot, paintLive = HX.paintLive, go = HX.go, lecStat = HX.lecStat, QBY = HX.QBY;
+
+  /* ---------- the game layer (migration_v54, at the redesign's release; vault/reference/game-server.md) ----------
+     widget/v3.js knows whether the database has it (window.shGame). When it does, an answer is one call the server
+     grades and pays, and this file shows XP by the new rules; until then, and whenever the call isn't there,
+     everything here counts XP the way the live hubs do. */
+  function v2(){ var G = window.shGame; return !!(G && G.v2 && G.v2()); }
+  function boost(){ var G = window.shGame; return v2() && G.boost ? G.boost() : null; }
+  /* how the server grades each kind of question (tools/xp/keys.js): one choice and select-all from the picks, a
+     sequence from the order as placed, recall cards and matching by the student's own grade */
+  var KIND = { sequence: "order", recall: "self", match: "self" };
 
   /* ---------- the one answer path: the live hub's recordAnswer, plus the daily goal and the rewards ---------- */
   var SESSION = { n: 0, r: 0, xp: 0, miss: {}, since: 0, recapAt: 0, hp0: null };
-  function todayRec(){ var d = day(0), x = STATE.nx.days[d]; if (!x) x = STATE.nx.days[d] = { n: 0, r: 0, xp: 0 }; return x; }
+  function todayRec(){
+    var d = day(0), x = STATE.nx.days[d];
+    /* q (each question's right and wrong answers today, for the three-a-day rule) is kept for today only */
+    if (!x) { Object.keys(STATE.nx.days).forEach(function(k){ delete STATE.nx.days[k].q; }); x = STATE.nx.days[d] = { n: 0, r: 0, xp: 0 }; }
+    return x;
+  }
   function goal(){ return STATE.nx.goal || 20; }
   function goalDays(){
     var on = {}; Object.keys(STATE.nx.days).forEach(function(k){ if (STATE.nx.days[k].met) on[k] = 1; });
@@ -48,44 +63,111 @@
       if (ok) { got[a.id] = ANSWERED ? true : day(0); if (!quiet) toast("Achievement: " + a.name); }
     });
   }
-  /* XP as the server counts it (widget/ranks.js, "How XP works"): 10 the first time you get a question right, 2 for any
-     other right answer, 1 for a miss, 20 for every day you study; answer XP is capped at 600 a day */
-  function xpFor(qid, correct){
-    var s = ansOf(qid), t = todayRec(), x = correct ? (s && s.c > 0 ? 2 : 10) : 1;
-    return Math.max(0, Math.min(x, 600 - t.xp));
+  /* XP as the server counts it. On the live rules (widget/ranks.js, "How XP works"): 10 the first time you get a
+     question right, 2 for any other right answer, 1 for a miss, 20 for every day you study; answer XP is capped at 600
+     a day. On the game layer: the same 10, 2 and 1 with no cap, a self-graded card a flat 2, each question paying
+     its first three right and its first three wrong answers a day, all of it doubled while a boost runs. This is the
+     page's guess, shown at once; the server's own figure follows and corrects it (sh:answer-paid, below). */
+  function xpFor(qid, correct, self){
+    var s = ansOf(qid), t = todayRec();
+    if (!v2()) { var x = correct ? (s && s.c > 0 ? 2 : 10) : 1; return Math.max(0, Math.min(x, 600 - t.xp)); }
+    var q = (t.q || {})[qid] || [0, 0], b = boost();
+    var base = self ? (q[0] + q[1] < 3 ? 2 : 0) : correct ? (q[0] < 3 ? (s && s.c > 0 ? 2 : 10) : 0) : (q[1] < 3 ? 1 : 0);
+    return base * (b ? b.mult || 2 : 1);
   }
-  function recordAnswer(qid, lecId, correct, ctx, choice, picks){
-    var xp = xpFor(qid, correct), t = todayRec(), first = !t.n;
+  /* more: { order: a sequence's steps as placed (authored indexes), session: the mock's session } */
+  function recordAnswer(qid, lecId, correct, ctx, choice, picks, more){
+    var qq = QBY[qid], kind = qq ? KIND[qq.type] || "" : "", game = v2();
+    var xp = xpFor(qid, correct, kind === "self"), t = todayRec(), first = !t.n, mult = game && boost() ? 2 : 1;
     putAnswer(qid, lecId, correct);
     t.n++; if (correct) t.r++; t.xp += xp;
+    if (game) { var tq = t.q || (t.q = {}), c = tq[qid] || (tq[qid] = [0, 0]); c[correct ? 0 : 1]++; PEND.push({ xp: xp, at: Date.now() }); }
     var met = false; if (!t.met && t.n >= goal()) { t.met = 1; met = true; }
     if (ctx !== "mock" && ctx !== "arcade") { SESSION.n++; if (correct) SESSION.r++; else SESSION.miss[lecId] = (SESSION.miss[lecId] || 0) + 1; SESSION.xp += xp; }
     achievements();
     saveNow();
     if (ctx === "drill" && window.shDrill && window.shDrill.mark) { try { window.shDrill.mark(qid, correct); } catch (e) {} }
-    document.dispatchEvent(new CustomEvent(EVT, { detail: { qid: qid, lec: lecId, correct: !!correct, ctx: ctx || "bank", choice: (typeof choice === "number" ? choice : null), picks: (Array.isArray(picks) && picks.length ? picks.slice() : null) } }));
+    more = more || {};
+    document.dispatchEvent(new CustomEvent(EVT, { detail: { qid: qid, lec: lecId, correct: !!correct, ctx: ctx || "bank", choice: (typeof choice === "number" ? choice : null), picks: (Array.isArray(picks) && picks.length ? picks.slice() : null),
+      self: kind === "self", order: (kind === "order" && Array.isArray(more.order) ? more.order.slice() : null), session: more.session || null } }));
     RANK.local += xp + (first ? 20 : 0);
-    return { xp: xp, met: met, dayBonus: first };
+    return { xp: xp, met: met, dayBonus: first, mult: mult };
   }
+  /* what the server paid for an answer (widget/v3.js sends it on): the total it holds replaces the page's sum, an
+     answer that paid something other than the guess corrects today's figure, and what the page can't know by itself is
+     said out loud: the day's 20th answer, a miss fixed, a medal with its double XP */
+  var PEND = [], BONUS = { goal20: "20 answers today", fix: "A miss fixed" }, MEDAL = ["", "Bronze", "Silver", "Gold", "Crown"];
+  function pendSum(){ var cut = Date.now() - 20000; PEND = PEND.filter(function(x){ return x.at > cut; }); return PEND.reduce(function(n, x){ return n + x.xp; }, 0); }
+  document.addEventListener("sh:answer-paid", function(e){
+    var d = e.detail || {}, r = d.res; if (!r || r.repeat) return;
+    var guess = PEND.shift(), t = todayRec(), extra = 0, said = [];
+    (Array.isArray(r.bonus) ? r.bonus : []).forEach(function(b){ if (b && b.xp > 0) { extra += b.xp; if (BONUS[b.src]) said.push(BONUS[b.src] + ": +" + b.xp + " XP"); } });
+    var off = (r.xp | 0) - (guess ? guess.xp : r.xp | 0) + extra;
+    if (off) { t.xp = Math.max(0, t.xp + off); if (d.ctx !== "mock" && d.ctx !== "arcade") SESSION.xp = Math.max(0, SESSION.xp + off); saveState(); }
+    if (RANK.p && typeof r.total === "number") { RANK.p.xp = Math.max(RANK.p.xp || 0, r.total); RANK.local = pendSum(); }
+    if (r.medal && r.medal.level) {
+      said.push((MEDAL[r.medal.level] || "A medal") + " medal: +" + fmt(r.medal.xp | 0) + " XP, and double XP for 24 hours");
+      HX.say("Double XP for a day. Go!", "do-hop");
+    }
+    if (said.length && d.ctx !== "mock") toast(said.join(". ") + ".");
+    if (off || extra || r.medal || boostShown !== !!boost()) paintMeters();
+  });
+  /* a finished mock's +50 (the server pays it once per hub per day, with 10 or more answers) */
+  document.addEventListener("sh:session-paid", function(e){
+    var r = (e.detail || {}).res; if (!r || !(r.xp > 0)) return;
+    todayRec().xp += r.xp; RANK.local += r.xp; saveState();
+    toast("Mock exam finished: +" + r.xp + " XP."); paintMeters();
+  });
 
   /* ---------- rank: the server's profile (the page bootstrap, then widget/ranks.js every 10 answers) plus what you
      earned since it came ---------- */
   var RANK = { p: null, local: 0, mastery: null };
   function rankName(){
     var R = window.shRanks, p = RANK.p, t = p ? p.tier || 0 : +(ls("sh_rank_tier") || 0);
+    if (R && R.nameOf && p) return R.nameOf(p);   // "Gold II" on the Handpiece, "ModuPro Gold II" after it
     if (R && R.rankName) return R.rankName(t, p ? p.level || 1 : 0);
     var names = ["Stone", "Bronze", "Silver", "Gold", "Platinum", "Diamond", "Dark Matter"];
     return names[t] || "Stone";
   }
   function rankXp(){ return RANK.p ? (RANK.p.xp || 0) + RANK.local : null; }
-  function rankArt(){
-    var R = window.shRanks, t = RANK.p ? RANK.p.tier || 0 : +(ls("sh_rank_tier") || 0);
-    return R && R.art ? R.art(t, 30) : "";
+  /* the rank's medallion at a size: the handpiece, or the journey's object once its drawings have come (they load the
+     first time someone past the Handpiece opens a page, and the pill is painted again when they arrive) */
+  var artAsked = false;
+  function rankArt(px){
+    var R = window.shRanks, p = RANK.p, t = p ? p.tier || 0 : +(ls("sh_rank_tier") || 0), j = p ? p.journey | 0 : 0;
+    if (!R || !R.art) return "";
+    if (j > 0 && R.artOf) {
+      if (window.SH_JOURNEY_ART) return R.artOf(j, t, px || 30);
+      if (!artAsked && R.needJourneyArt) { artAsked = true; R.needJourneyArt(function(K){ if (K) paintMeters(); }); }
+      return R.art(6, px || 30);   // until then, the Handpiece as it was left: Dark Matter
+    }
+    return R.art(t, px || 30);
+  }
+  /* double XP: its chip on the rank pill, with the time left; the pill's spoken name says it too */
+  var boostShown = false, boostTimer = 0;
+  function left(ms){ var m = Math.max(1, Math.round(ms / 60000)); return m >= 90 ? Math.round(m / 60) + " h" : m >= 60 ? "1 h" : m + " min"; }
+  function boostChip(){
+    var b = boost(); boostShown = !!b;
+    clearTimeout(boostTimer);
+    if (!b) return "";
+    var ms = new Date(b.until).getTime() - Date.now();
+    /* repaint when the label would change, and once more when it ends */
+    boostTimer = setTimeout(paintMeters, Math.min(ms + 500, ms > 5400000 ? 600000 : 60000));
+    return '<span class="xboost"><i aria-hidden="true">2x</i><span class="sr">Double XP, </span><span class="xb-t">' + left(ms) + '</span><span class="sr"> left. </span></span>';
   }
   document.addEventListener("sh:rank-profile", function(e){
     var d = e.detail || {}; if (!d.profile) return;
-    RANK.p = d.profile; RANK.local = 0; RANK.mastery = d.mastery || null; paintMeters();
+    RANK.p = d.profile; RANK.local = 0; PEND = []; RANK.mastery = d.mastery || null;
+    if (d.profile.boost !== undefined && window.shGame && window.shGame.setBoost) window.shGame.setBoost(d.profile.boost);
+    paintMeters();
     HX.petFromBadges(d.profile.badges || []);
+  });
+  /* a journey's scene has closed (widget/journeys.js): Timmy has the last word, and the pill shows the new rank */
+  document.addEventListener("sh:journey-scene-end", function(e){
+    var d = e.detail || {}, R = window.shRanks, name = R && R.JOURNEYS ? R.JOURNEYS[d.journey | 0] : "";
+    paintMeters();
+    if (d.kind === "handoff") HX.say(name ? "The " + name + "! A whole new climb." : "A whole new climb!", "do-hop");
+    else if (d.kind === "dark") HX.say("Dark Matter. You earned that one.", "do-hop");
   });
   /* the meters on the bar and the strip: the streak, today's goal, the rank and its XP (the bar itself is the core's
      buildShell), and every Today panel on the page */
@@ -94,18 +176,20 @@
     var n = streakDays(), t = todayRec(), g = goal();
     $$("[data-streakm]").forEach(function(m){ m.innerHTML = flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row studied" : "No streak yet") + "</span>"; });
     $$("[data-goalm]").forEach(function(m){ m.innerHTML = ring(t.n, g) + '<span class="num" aria-hidden="true">' + Math.min(t.n, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(t.n, 999) + " of " + g + ' questions today</span>'; });
-    var x = rankXp(), rk = $("#hxRank");
+    var x = rankXp(), rk = $("#hxRank"), chip = boostChip();
     /* its spoken name is its visible text with a few hidden words around it (axe: the label must contain what's shown) */
-    if (rk) rk.innerHTML = '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + esc(rankName()) + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. Open your stats</span>';
-    $$("[data-xpm]").forEach(function(m){ m.innerHTML = artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>'; });
+    if (rk) rk.innerHTML = '<span class="hp" aria-hidden="true">' + rankArt() + '</span><span class="sr">Your rank: </span><b>' + esc(rankName()) + '</b><span class="sr">, </span><span class="xpn num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + "</span> XP" + (x === null ? " today" : "") + '</span><span class="sr">. </span>' + chip + '<span class="sr">Open your stats</span>';
+    $$("[data-xpm]").forEach(function(m){ m.innerHTML = artSvg(A.xp || "", "0 0 24 24", "xpi") + '<span class="num"><span data-xp>' + (x === null ? "+" + fmt(t.xp) : fmt(x)) + '</span><span class="fold-xp"> XP</span></span>' + (boostShown ? '<i class="x2" aria-hidden="true">2x</i><span class="sr">Double XP is on</span>' : ""); });
     $$("[data-today]").forEach(function(p){ p.outerHTML = todayPanel(); });
+    /* any other medallion of your rank on the page (More, Stats), at its own size */
+    $$("[data-rankart]").forEach(function(n){ n.innerHTML = rankArt(+n.getAttribute("data-rankart") || 30); });
     paintLive();
   }
 
   /* ---------- the rewards on every answer: XP to the rank, Timmy on the bar, the goal ring, the flame, the recap ---------- */
   function reward(from, right, rec){
     var target = [$("#hxRank"), $("#hxXp")].filter(visible)[0] || null;
-    flyXp(from, target, rec.xp, function(){
+    flyXp(from, target, rec.xp, rec.mult > 1, function(){
       $$("[data-xp]").forEach(function(n){ var to = rankXp(); countUp(n, to === null ? todayRec().xp : to, to === null); });
       if (target) { target.classList.remove("bump"); void target.offsetWidth; target.classList.add("bump"); }
     });
@@ -120,10 +204,10 @@
       }
     }, reduced ? 0 : 650);
   }
-  function flyXp(from, to, xp, done){
+  function flyXp(from, to, xp, doubled, done){
     if (!from || !to || reduced || !xp) { done(); return; }
     var a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
-    var n = h('<span class="xpfly" aria-hidden="true">' + artSvg(A.xp || "", "0 0 24 24", "") + "+" + xp + "</span>");
+    var n = h('<span class="xpfly" aria-hidden="true">' + artSvg(A.xp || "", "0 0 24 24", "") + "+" + xp + (doubled ? '<i class="x2">2x</i>' : "") + "</span>");
     document.body.appendChild(n);
     var w = n.offsetWidth, hh = n.offsetHeight;
     var x0 = a.left + Math.max(8, Math.min(a.width - w - 12, 64)), y0 = a.top + a.height / 2 - hh / 2, x1 = b.left + b.width / 2 - w / 2, y1 = b.top + b.height / 2 - hh / 2;
@@ -205,6 +289,6 @@
   /* what the other files call from here */
   HX.SESSION = SESSION; HX.todayRec = todayRec; HX.goal = goal; HX.goalDays = goalDays;
   HX.achievements = achievements; HX.recordAnswer = recordAnswer; HX.RANK = RANK; HX.rankName = rankName;
-  HX.rankXp = rankXp; HX.paintMeters = paintMeters; HX.reward = reward; HX.todayPanel = todayPanel;
+  HX.rankXp = rankXp; HX.rankArt = rankArt; HX.gameOn = v2; HX.boost = boost; HX.paintMeters = paintMeters; HX.reward = reward; HX.todayPanel = todayPanel;
   HX.recapDue = recapDue; HX.showLeftRecap = showLeftRecap;
 };

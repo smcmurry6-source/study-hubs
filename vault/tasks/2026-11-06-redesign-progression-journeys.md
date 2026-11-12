@@ -5,7 +5,7 @@ hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: Sam (the art and the open calls, 2026-11-12)
+waiting-on: Sam (a look at the new hand-off, then "merge")
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/332
 ---
@@ -148,8 +148,11 @@ old rate, about half the leaders' new pace); past days as they were. Groups by X
       `record_personal_answer`, the guardrails, the 63-step ladder, every source in the table, the boosts, the award rows,
       `sh_xp_rebuild` updated; tests for each source, a replayed call, a double tap, a linked device (`node tools/release/rls.js`
       and a new XP suite)
-- [ ] Client (phase 4, part A): journeys, their art, the hand-off, the Dark Matter unlock, the boost on the rank pill,
-      recorded on the preview with reduced motion too; Sam has seen the art in light and dark
+- [x] Client (phase 4, part A): journeys, their art, the hand-off, the Dark Matter unlock, the boost on the rank pill
+      ([#332](https://github.com/smcmurry6-source/study-hubs/pull/332), 2026-11-12). Sam saw the art in light and dark
+      and asked for a bigger hand-off, which was redrawn and recorded for Sam (full and reduced motion) from the design
+      page; no preview was made (asked once, Sam didn't ask for one), so the recording on the preview is left to the
+      release's own preview ([phase 4](2026-11-05-redesign-phase-4-game-layer.md), its "Every card and the cutscene" box)
 - [ ] The admin page's resolve control has "Fixed" and "No change needed"
 - [ ] The About page's rank, XP and trophy entries rewritten, counts true; event taxonomy and retention rows for any new table
 - [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
@@ -187,42 +190,101 @@ old rate, about half the leaders' new pace); past days as they were. Groups by X
     with the page: Occlusion has one request to spare), the journey-aware rank in `widget/hub-rewards.js`, the hand-off and
     the unlock, the boost on the pill.
 
-## Open calls (2026-11-12, asked before part A is built)
+## Open calls (2026-11-12, asked before part A was built)
 
-Asked in chat on 2026-11-12; each has the recommendation that gets built if Sam says "yes to all".
+Asked in chat on 2026-11-12; each has the recommendation that gets built if Sam says "yes to all". **Sam's answer, the
+same day: "Make the hand off more epic. Everything else looks great"** ([decisions](../decisions.md)). The agent read
+that as a yes to the art and to every recommendation below (its reading, said back to Sam before building), so each is
+ticked as built that way; the hand-off was redrawn as a full-screen scene. Any of them is one small change if Sam
+meant otherwise.
 
-- [ ] **The art** (the contact sheet): the new objects drawn in today's medallion look, not flat ink, so the three journeys
+- [x] **The art** (the contact sheet): the new objects drawn in today's medallion look, not flat ink, so the three journeys
       are one family (the plan keeps the handpiece medallions as drawn); the trophies are in ink. The ModuPro's antique is
       plaster casts on a brass hinge articulator; the loupes' antique is brass telescopic pince-nez; the loupes are
       through-the-lens with a headlight.
-- [ ] **The answer call.** The boost, the new XP rules and "2x" only exist behind `record_answer_v2`, and no part's note
+- [x] **The answer call.** The boost, the new XP rules and "2x" only exist behind `record_answer_v2`, and no part's note
       builds the switch (the release note lists it as a step). Recommended: part A wires it. The engine calls
       `record_answer_v2` and shows what the server paid (falling back to today's five calls while the function isn't there,
       as the dashboard does); `widget/v3.js` gets one switch only the engine sets, so it doesn't record the same answer
       twice; a mock starts and finishes its session (without one the server pays a mock's answers nothing, they arrive
       together). Or: part A only shows what the profile says and the release session wires the calls.
-- [ ] **The arcade's +50 and Timmy Time's minutes** (`xp_session_start` for a game, `pod_minute_v2`) are in
+- [x] **The arcade's +50 and Timmy Time's minutes** (`xp_session_start` for a game, `pod_minute_v2`) are in
       `widget/games.js` and `widget/podcast.js`, shared with the live hubs. Recommended: not in part A; a to-do in the
       release note, done with the release's wiring.
-- [ ] **The Handpiece keeps today's names** ("Gold II", not "Handpiece Gold II"); the object's name shows from the
+- [x] **The Handpiece keeps today's names** ("Gold II", not "Handpiece Gold II"); the object's name shows from the
       ModuPro on.
-- [ ] **One scene at a time.** Reaching Dark Matter plays the unlock in place of the ordinary rank-up cutscene. Reaching
+- [x] **One scene at a time.** Reaching Dark Matter plays the unlock in place of the ordinary rank-up cutscene. Reaching
       125,000 plays the hand-off alone: it names the journey trophy, and no trophy card or Stone cutscene follows.
-- [ ] **Skipping the unlock counts as seen** (the server's mark is written when it ends or is skipped). The hand-off is
+- [x] **Skipping the unlock counts as seen** (the server's mark is written when it ends or is skipped). The hand-off is
       remembered per device, like every rank-up today: the server has a mark for the unlock only, and adding one would
       change the migration.
-- [ ] **Each journey's Dark Matter has its own sky**: stars (Handpiece), a nebula (ModuPro), a constellation (Loupes).
-- [ ] **Trophy names**: "Handpiece finished", "ModuPro finished", "Loupes finished" (27 trophies in all at the release).
-- [ ] **The new dashboard** (its "you" card, boards, stage and ladder) learns the journeys' names and medallions in part A
+- [x] **Each journey's Dark Matter has its own sky**: stars (Handpiece), a nebula (ModuPro), a constellation (Loupes).
+- [x] **Trophy names**: "Handpiece finished", "ModuPro finished", "Loupes finished" (27 trophies in all at the release).
+- [x] **The new dashboard** (its "you" card, boards, stage and ladder) learns the journeys' names and medallions in part A
       too; the kit loads there only when someone on the page is past the Handpiece.
-- [ ] **Timmy's place** (the statue by the door, "the ModuPro on the porch, Timmy in loupes", the rank sets for tiers
+- [x] **Timmy's place** (the statue by the door, "the ModuPro on the porch, Timmy in loupes", the rank sets for tiers
       7-20) is part C's, drawn before anyone reaches 125,000. In part A the old house card just keeps its Dark Matter
       house past 125,000.
-- [ ] **A preview?** The note wants the hand-off and the unlock recorded on one, reduced motion too. Asked once, here.
+- [x] **A preview?** The note wants the hand-off and the unlock recorded on one, reduced motion too. Asked once, here.
+      Sam didn't ask for one, so none was made.
 
 Not a call, how it will work: nothing earned is lost on entering a journey (accent colors, the house and rank sets
 follow the overall rank, since the v2 profile's `tier` restarts at Stone); the flying XP shows the client's count at once
 and the pill takes the server's total when the reply comes; no request is added to a page's load.
+
+- 2026-11-12 (Claude Code, **part A built; hand-off**, [#332](https://github.com/smcmurry6-source/study-hubs/pull/332)).
+  Nothing students see changes: the live hubs load none of it, and on the new pages it switches on only when the
+  database has migration_v54, which is still pending.
+  - **The hand-off, redrawn** (Sam: "Make the hand off more epic"): a full-screen scene of about seven seconds. The
+    finished journey's Dark Matter medallion charges and flies to its place on a track of the three journeys, a beam
+    comes down, the next object lands with a flash and a shake, then "The ModuPro is yours.", its seven ranks lighting
+    in turn, the trophy won and one button. Skip and Escape close it at any moment; reduced motion gets the last frame
+    as a still card. The Dark Matter unlock is the same kind of scene with each journey's own sky.
+  - **Files.** `widget/journeys.js` (the two scenes, the road ahead, their styles) and `widget/hub-art/journeys.js`
+    (the ModuPro's and the loupes' shapes and the three journey trophies, built by `tools/figures/site/build.mjs` from
+    `journeys.mjs` and `medals.mjs`). **Neither loads with a page**: `widget/ranks.js` fetches them the first time a
+    scene plays, the road is opened, or someone past the Handpiece is drawn (`shRanks.journeys(cb)`,
+    `shRanks.needJourneyArt(cb)`). So no page's request count moved.
+  - **The switch.** `widget/hub.js` writes `data-game="v2"` on the shared widget's tag; `widget/v3.js` then asks for
+    `get_widget_bootstrap_v2` and falls back to today's when the function isn't there. `window.shGame.v2()` is true only
+    after a v2 profile came back. With it on, an answer is **one call**, `record_answer_v2` (the pick, the ticked
+    choices, a sequence's order as placed or the student's own grade; the question's version; the context; a random
+    request id; the mock's session), and what the server paid goes out as `sh:answer-paid`. Without it, on every live
+    hub and under an automated browser, v3.js makes today's calls exactly as before.
+  - **In the engine** (`widget/hub-rewards.js`): `xpFor` counts by the new rules when the game layer is on (no cap, a
+    self-graded card 2, three right and three wrong a question a day, doubled under a boost) and by today's otherwise;
+    the pill takes the server's total when the reply comes and corrects today's figure; the day's 20th answer, a miss
+    fixed, a medal with its double XP and a finished mock's +50 are said in a toast; the rank's name and medallion are
+    the journey's (`shRanks.nameOf`, `artOf`); the boost is a gold chip on the pill with the time left, spoken too, a
+    small "2x" on the phone's XP meter and on the flying XP. More's Stats shows the road ahead and the new XP note.
+    `widget/hub-bank.js`: a mock starts a session when it starts and finishes it on submit (the server then saves the
+    score itself); a sequence sends its order. `widget/rankup.js`: a rank-up or level-up past the Handpiece draws the
+    journey's object and names it. `widget/dash.js`: the new dashboard's rank card, pill, boards and ladder know the
+    journeys. `widget/pet.js` needed nothing: `shRanks.legacy()` gives the Handpiece's own rank (Dark Matter III from the
+    ModuPro on) to everything that reads tiers 0 to 6, so accents and Timmy's house never go back to Stone.
+  - **Where the client and the server meet, for Sam** (no change made to the migration):
+    1. A one-choice question answered without a pick index is refused by `record_answer_v2` (`bad`, nothing recorded).
+       The engine always sends one; a page that doesn't (an older arcade game) is recorded by today's calls for that
+       answer, which pay by today's rules. The arcade's wiring at the release should send the index.
+    2. The mock recasts a sequence as one pick among orderings, and the server grades a sequence by its order: the page
+       sends the steps in order for the right pick and two of them swapped for any other.
+    3. The server marks only the Dark Matter unlock as seen. The hand-off is remembered per device (`sh_rank_g`, the
+       step of 63), like every rank-up today, so a second device plays it once more the first time it crosses.
+    4. **Anyone already at Dark Matter when the release lands sees the Handpiece's unlock once**, on their first new
+       page (the server has no mark for them yet). It reads as a late celebration; say so if it shouldn't play.
+    5. The site has no sound setting, so the scenes are silent (the note says "sound only when the student turned
+       sounds on").
+  - **Checked** on the local preview's made-up data with a scripted browser (no preview for Sam was made): the answer
+    that crosses 125,000 plays the hand-off and the pill reads "ModuPro Stone I"; a level-up inside the ModuPro; the
+    ModuPro's Dark Matter unlock under reduced motion, marked seen once and not replayed on reload; the boost chip and
+    "2x"; the road ahead on laptop and phone; the Stats panel; the new dashboard past the Handpiece; a mock (one session,
+    its answers, one finish, none of today's calls); a live hub makes no v2 call and loads no journey file. The
+    handpiece medallions are byte for byte what they were (every tier, size and option). The smoke test has a new
+    block for it on one new hub. The preview takes `?xp=<n>` to stand a test account anywhere on the ladder.
+  - **Left, written down**: the arcade's +50 and Timmy Time's minutes, the journey trophies in the trophy case, sound,
+    and the About entries are boxes and drafts in [the release note](2026-11-06-redesign-release.md) ("From phase 4,
+    part A"); the admin page's resolve control and the About page are this note's own open boxes; Timmy's place past
+    125,000 is [part C](2026-11-06-redesign-timmys-place.md)'s.
 
 ## Outcome
 

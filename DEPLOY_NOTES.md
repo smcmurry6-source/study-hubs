@@ -32,6 +32,26 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (the redesign's three journeys, client side: phase 4, part A, Claude Code)** — Nothing students see
+  changes: it runs only on the new pages (`hubs/<id>/next/`, `next/`, shown in a preview) and only once the database
+  has migration_v54, which is still **not applied**. The rank ladder becomes three journeys (Handpiece, then the
+  ModuPro at 125,000 XP, then the Loupes at 250,000). New: `widget/journeys.js` (the hand-off to the next journey and
+  the Dark Matter unlock, two full-screen scenes with a still card for reduced motion, and the road ahead) and
+  `widget/hub-art/journeys.js` (the ModuPro and the loupes drawn in the handpiece's medallion, from
+  `tools/figures/site/journeys.mjs`), **both loaded on first use, never with a page**. **Shared files changed, inert
+  for the live hubs**: `widget/v3.js` has a switch, `data-game="v2"` on its script tag (only the engine writes it):
+  with it, the page asks for the v2 bootstrap and sends each answer as one `record_answer_v2` call, falling back to
+  today's calls while the function isn't there; without it nothing differs. `widget/ranks.js` draws and names a rank
+  past the Handpiece only for a v2 profile, and its `art()` without a shape is byte for byte what it was;
+  `widget/rankup.js` takes the journey's object for its cards. The engine (`widget/hub-rewards.js`, `hub-bank.js`,
+  `hub.js`) shows XP by the new rules when the game layer is on (no daily cap, double XP after a mastery medal as a
+  chip on the rank pill), runs a mock inside a server session and shows the road ahead in More, Stats; the new
+  dashboard (`widget/dash.js`) knows the journeys. The preview answers the new calls from made-up data and takes
+  `?xp=<n>`. **Before changing how an answer is recorded, or the rank art, read
+  [the journeys note](vault/tasks/2026-11-06-redesign-progression-journeys.md) and
+  [game-server](vault/reference/game-server.md).** Left for the release, written in
+  [its note](vault/tasks/2026-11-06-redesign-release.md): the arcade's and Timmy Time's XP, the journey trophies in
+  the trophy case, the About entries (drafted there).
 - **2026-11-12 (the redesign's hub engine split into four files, Claude Code)** — Nothing students see changes: only the
   new hubs (`hubs/<id>/next/`, shown in a preview only) load the engine, and no live file changed. `widget/hub.js` was
   one 188 KB closure; it is now the core (`widget/hub.js`, 116 KB) and three parts, each holding what one kind of

@@ -434,6 +434,42 @@ function lint(hub, A){
       notes.push(`${name} (${label}): clicked through ${screens} screens, ${n} questions`);
       await page.close();
     }
+    /* the game layer on a redesigned hub (migration_v54, at the release; widget/v3.js data-game="v2"): the page asks for
+       the v2 bootstrap, and with a rank past the Handpiece in it the pill names the journey and draws its object (the
+       drawings load on first use), double XP shows as a chip, More's Stats has the road ahead, and the hand-off plays
+       for a device that last saw the Handpiece: a dialog that Escape closes. The stub above answers every other call
+       with [], so nothing is recorded; a page without the switch (every live hub) never makes the v2 call. */
+    for (const hub of nextHubs.slice(0, 1)) {
+      const page = await context.newPage(); const errs = [], name = `${hub}/next, game layer`; let asked = 0;
+      page.on('pageerror', e => errs.push(e.message));
+      await page.addInitScript(() => { try { localStorage.setItem('sh_rank_g', '20'); localStorage.setItem('sh_rank_tier', '6'); localStorage.setItem('sh_rank_step', '20'); } catch (e) {} });
+      const rank = { xp: 190000, journey: 1, tier: 3, level: 2, step: 31, gtier: 10, step_at: 184523, next_at: 190475, tier_at: 178571, steps: 63, answers: 900, correct: 700, days: 40,
+        badges: ['journey-0'], dark_seen: [0], boost: { mult: 2, until: new Date(Date.now() + 5 * 3600e3).toISOString(), src: 'medal' } };
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => { asked++; return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rank, mastery: [] }) }); });
+      await page.goto(BASE() + `hubs/${hub}/next/index.html#more/stats`);
+      const scene = await page.waitForSelector('.shj.shj-hand[role="dialog"]', { timeout: 15000 }).catch(() => null);
+      if (!asked) problems.push(`${name} (${label}): the page never asked for get_widget_bootstrap_v2`);
+      if (!scene) problems.push(`${name} (${label}): the hand-off to the ModuPro didn't play for a device that last saw the Handpiece`);
+      else {
+        const said = await page.evaluate(() => { const d = document.querySelector('.shj'); return { label: d.getAttribute('aria-label') || '', modal: d.getAttribute('aria-modal'), buttons: d.querySelectorAll('button').length }; });
+        if (!/ModuPro/.test(said.label) || said.modal !== 'true' || said.buttons < 2) problems.push(`${name} (${label}): the hand-off should be a labeled modal dialog with Skip and its button (${JSON.stringify(said)})`);
+        await page.keyboard.press('Escape'); await page.waitForTimeout(700);
+        if (await page.$('.shj')) problems.push(`${name} (${label}): Escape didn't close the hand-off`);
+      }
+      await page.waitForTimeout(800);
+      const g = await page.evaluate(() => { const p = document.querySelector('#hxRank'), x = document.querySelector('#hxXp');
+        return { name: p ? (p.querySelector('b') || {}).textContent : '', art: p ? !!p.querySelector('svg[aria-label*="ModuPro"]') : false, chip: p ? !!p.querySelector('.xboost') : false, x2: x ? !!x.querySelector('.x2') : false,
+          road: document.querySelectorAll('[data-road] .shj-road li').length, w: document.documentElement.scrollWidth - innerWidth, g: localStorage.getItem('sh_rank_g'), tier: localStorage.getItem('sh_rank_tier') }; });
+      if (g.name !== 'ModuPro Silver II') problems.push(`${name} (${label}): the rank pill reads "${g.name}", not the journey's rank`);
+      if (!g.art) problems.push(`${name} (${label}): the rank pill didn't draw the ModuPro (widget/hub-art/journeys.js loads on first use)`);
+      if (!g.chip || !g.x2) problems.push(`${name} (${label}): double XP isn't shown (the chip on the rank pill, the 2x on the phone's XP meter)`);
+      if (g.road !== 3) problems.push(`${name} (${label}): More's Stats shows ${g.road} journeys on the road ahead, not 3`);
+      if (g.w > 1) problems.push(`${name} (${label}): Stats with the road ahead scrolls sideways by ${g.w}px`);
+      if (g.g !== '31' || g.tier !== '6') problems.push(`${name} (${label}): the device should remember step 31 of 63 and keep the Handpiece's own rank at Dark Matter (${g.g}, ${g.tier})`);
+      errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+      notes.push(`${name} (${label}): the journeys' pill, boost, road and hand-off`);
+      await page.close();
+    }
     await context.close();
   }
   // top bars and tab rows (2026-11-04): at the widths and text sizes where they used to break, every control in the

@@ -589,7 +589,7 @@
     el.className = "sh-ru-lv"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite"); el.setAttribute("aria-label", "Level up: " + N(d, d.to, lv));
     vars(el, key);
     el.innerHTML = '<div class="sh-ru-lv-medal" aria-hidden="true"><i class="sh-ru-lv-ring"></i><i class="sh-ru-lv-ring"></i><div class="sh-ru-lv-coin">' + A(d, d.to, 80, { level: old }) + '</div></div>' +
-      '<div class="sh-ru-lv-body" aria-hidden="true"><div class="sh-ru-lv-eye">Level up</div>' +
+      '<div class="sh-ru-lv-body" aria-hidden="true"><div class="sh-ru-lv-eye">' + (d.jn ? esc(d.jn) + " · level up" : "Level up") + '</div>' +
       '<div class="sh-ru-lv-name"><span class="sh-ru-mt">' + esc(t.name) + '</span><span class="sh-ru-roll"><i>' + (o.length > n.length ? o : n) + '</i>' +
       '<b class="o sh-ru-mt">' + o + '</b><b class="n sh-ru-mt">' + n + '</b></span></div>' +
       '<div class="sh-ru-pips">' + [1, 2, 3].map(function(i){ return '<i class="' + (i <= old ? "on" : i <= lv ? "new" : "") + '"><b></b></i>'; }).join("") + '</div>' +

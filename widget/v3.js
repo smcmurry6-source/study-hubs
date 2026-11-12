@@ -19,6 +19,12 @@
   /* data-audio="off": an archived hub whose narration and Timmy Time came off the site to keep it under GitHub Pages'
      1 GB limit (vault/rules/archived-hubs-drop-their-audio.md). Listen reads with the device's own voice, Timmy Time
      isn't mounted, and v3.css hides the hub's Timmy Time links (html.sh-audio-off). */
+/* data-game="v2": the redesign's hubs (widget/hub.js writes it) use the game layer's server once the database has it
+     (migration_v54, applied at the redesign's release; vault/reference/game-server.md): one call per answer that the
+     server grades and pays, the journeys' rank profile, mock sessions. Until the functions exist, and on every live hub,
+     everything below works as it does today. on: null until the page knows, then true or false. */
+  var GAME = { want: ds.game === "v2", on: null, boost: null };
+  function rpcMissing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
   var AUDIO_OFF = ds.audio === "off";
   if (AUDIO_OFF) try { document.documentElement.classList.add("sh-audio-off"); } catch (e) {}
   var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
@@ -1331,16 +1337,29 @@
   var bootstrap = { data: null, ready: Promise.resolve(null), linkName: currentName() };
   if (supabase && !EXPORT_ONLY) {
     try {
-      bootstrap.ready = supabase.rpc("get_widget_bootstrap", {
+      var bootArgs = {
         p_visitor: VISITOR_ID,
         p_hub: HUB,
         p_cavity_week: cavityWeekForBootstrap(),
         p_episode: !AUDIO_OFF && window.SH_PODCAST && window.SH_PODCAST.id ? window.SH_PODCAST.id : null,
         p_include_pins: !!window.SH_PINS,
         p_link_name: bootstrap.linkName || null
-      }).then(function(res){
+      };
+      /* a page on the game layer asks for the v2 bootstrap (today's, with the journeys' rank) and falls back to
+         today's when the database doesn't have it yet */
+      var bootCall = !GAME.want ? supabase.rpc("get_widget_bootstrap", bootArgs)
+        : supabase.rpc("get_widget_bootstrap_v2", bootArgs).then(function(res){
+            if (rpcMissing(res)) { GAME.on = false; return supabase.rpc("get_widget_bootstrap", bootArgs); }
+            return res;
+          });
+      bootstrap.ready = bootCall.then(function(res){
         if (!res || res.error || !res.data || typeof res.data !== "object") return null;
         bootstrap.data = res.data;
+        if (GAME.want && GAME.on === null) {
+          var rk = res.data.rank;
+          GAME.on = !!(rk && rk.journey != null);
+          if (GAME.on) GAME.boost = rk.boost || null;
+        }
         return bootstrap.data;
       }, function(){ return null; });
     } catch (e) { bootstrap.ready = Promise.resolve(null); }
@@ -1622,12 +1641,8 @@
   });
   window.addEventListener("pagehide", stopActivityPing);
 
-  var sessionCorrectStreak = 0;
-  var nukeReady = false;
-  document.addEventListener(ANSWERED_EVENT, function(e){
-    var d = (e && e.detail) || {};
-    var isCorrect = !!d.correct;
-    srsRecord(String(d.qid || ""), isCorrect);
+  /* an answer, recorded the way every live hub does it: the class's stats, the class's picks, your answers, your run */
+  function answerToday(d, isCorrect){
     safeRpc("record_answer", { p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
     /* which option was picked (its authored index, 0 = the key), for the admin page's
        "most popular wrong answer"; hubs send it for bank and mock-exam MCQs */
@@ -1636,6 +1651,94 @@
     else if (Array.isArray(d.picks) && d.picks.length) safeRpc("record_choices", { p_hub: HUB, p_qid: String(d.qid || ""), p_choices: d.picks });
     safeRpc("record_personal_answer", { p_visitor: VISITOR_ID, p_hub: HUB, p_qid: String(d.qid || ""), p_correct: isCorrect });
     safeRpc("record_correct_streak", { p_visitor: VISITOR_ID, p_correct: isCorrect });
+  }
+  /* the game layer's answer (record_answer_v2): one call that records all of the above, grades the answer from the
+     server's key and pays it. The page sends what was picked (a choice, the ticked choices, the order as placed, or
+     the student's own grade), the question's version, where it was answered and a random id, so a retried call
+     records and pays once. What comes back goes out as sh:answer-paid for the engine (widget/hub-rewards.js): the XP
+     paid, the day's bonuses, a new medal and its double XP, the total. The answer falls back to today's calls when
+     the database doesn't have the function yet, or when the server can't grade what was sent (a one-choice question
+     with no pick index: an older arcade game). Automated browsers record nothing, as today. */
+  var gamePending = {};
+  function gameId(){
+    var a = new Uint8Array(16), out = "", abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    try { crypto.getRandomValues(a); } catch (e) { for (var i = 0; i < 16; i++) a[i] = Math.floor(Math.random() * 256); }
+    for (var j = 0; j < 16; j++) out += abc[a[j] & 63];
+    return out;
+  }
+  function answerV2(d, isCorrect){
+    if (!supabase || AUTOMATED) return;
+    var qid = String(d.qid || ""), order = Array.isArray(d.order) ? d.order : null;
+    var args = {
+      p_visitor: VISITOR_ID, p_hub: HUB, p_qid: qid,
+      p_choice: typeof d.choice === "number" ? d.choice : null,
+      p_picks: order || (Array.isArray(d.picks) && d.picks.length ? d.picks : null),
+      p_self: d.self ? isCorrect : null,
+      p_v: (window.shQH && window.shQH.version && window.shQH.version(qid)) || null,
+      p_ctx: d.ctx || null, p_request: gameId(), p_session: d.session || null, p_claim: isCorrect
+    };
+    var tries = 0;
+    function paid(r){
+      if (r.boost !== undefined) GAME.boost = r.boost || null;
+      try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: qid, ctx: d.ctx || "", session: d.session || null, res: r } })); } catch (e) {}
+    }
+    function send(){
+      var call;
+      try { call = supabase.rpc("record_answer_v2", args); } catch (e) { return Promise.resolve(); }
+      return call.then(function(res){
+        if (rpcMissing(res)) { GAME.on = false; answerToday(d, isCorrect); return; }
+        if (res && res.error) {
+          /* the network or the server hiccuped: once more with the same id, which can't record or pay twice */
+          if (!tries++ && (!res.status || res.status >= 500)) return new Promise(function(ok){ setTimeout(ok, 4000); }).then(send);
+          return;
+        }
+        var r = res && res.data;
+        if (!r || typeof r !== "object") return;
+        if (r.ok === false) { if (r.error === "bad") answerToday(d, isCorrect); return; }
+        GAME.on = true;
+        paid(r);
+      }, function(){});
+    }
+    var p = send();
+    /* a mock's answers go out together; its session is finished only once they have all arrived (finishSession) */
+    if (d.session) (gamePending[d.session] = gamePending[d.session] || []).push(p);
+  }
+  /* for the engine: is the game layer there, the running boost, and a mock's session (the server pays a mock's
+     answers and its +50 only inside one, and saves the mock's score itself when it is finished) */
+  window.shGame = {
+    want: GAME.want,
+    v2: function(){ return GAME.on === true; },
+    boost: function(){ var b = GAME.boost; return b && b.until && new Date(b.until).getTime() > Date.now() ? b : null; },
+    setBoost: function(b){ GAME.boost = b || null; },
+    startSession: function(kind, game){
+      if (!supabase || AUTOMATED || !GAME.want || GAME.on === false) return Promise.resolve(null);
+      try {
+        return supabase.rpc("xp_session_start", { p_visitor: VISITOR_ID, p_hub: HUB, p_kind: kind, p_game: game || null }).then(function(res){
+          if (rpcMissing(res)) { GAME.on = false; return null; }
+          return res && !res.error && typeof res.data === "string" ? res.data : null;
+        }, function(){ return null; });
+      } catch (e) { return Promise.resolve(null); }
+    },
+    finishSession: function(id, score, total){
+      if (!supabase || AUTOMATED || !id) return Promise.resolve(null);
+      var wait = gamePending[id] || []; delete gamePending[id];
+      return Promise.all(wait).then(function(){
+        return supabase.rpc("xp_session_finish", { p_visitor: VISITOR_ID, p_session: id, p_score: score == null ? null : score, p_total: total == null ? null : total });
+      }).then(function(res){
+        var r = res && !res.error && res.data && typeof res.data === "object" ? res.data : null;
+        if (r && r.ok) try { document.dispatchEvent(new CustomEvent("sh:session-paid", { detail: { session: id, res: r } })); } catch (e) {}
+        return r;
+      }, function(){ return null; });
+    }
+  };
+
+  var sessionCorrectStreak = 0;
+  var nukeReady = false;
+  document.addEventListener(ANSWERED_EVENT, function(e){
+    var d = (e && e.detail) || {};
+    var isCorrect = !!d.correct;
+    srsRecord(String(d.qid || ""), isCorrect);
+    if (GAME.want && GAME.on !== false) answerV2(d, isCorrect); else answerToday(d, isCorrect);
     var prevStreak = sessionCorrectStreak;
     if (isCorrect) {
       sessionCorrectStreak++;
@@ -2901,6 +3004,7 @@
   /* ---------- easter eggs live in widget/eggs.js; these are the hooks they use ---------- */
   window.shEggHooks = {
     hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase, bootstrap: bootstrap.ready,
+    v2: function(){ return GAME.on === true; },
     send: function(payload){ try { if (channel) channel.send({ type: "broadcast", event: "egg", payload: payload }); } catch (e) {} },
     name: displayName, section: currentSection, online: function(){ return onlineCount; },
     toast: showStreakToast, confetti: fireConfetti, prefGet: prefGet, prefSet: prefSet, esc: esc,

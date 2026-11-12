@@ -131,7 +131,7 @@
         $$("[data-step]", el).forEach(function(b){ var i = +b.getAttribute("data-step"); b.classList.remove("is-on"); b.classList.add(seqP.indexOf(i) === i ? "is-right" : "is-wrong"); });
         if (!right) partial = "Not quite: " + inPlace + " of " + q.steps.length + " in the right spot";
         $("[data-seqtools]", el).hidden = true;
-        rec = HX.recordAnswer(q.id, q.lec, right, o.ctx);
+        rec = HX.recordAnswer(q.id, q.lec, right, o.ctx, null, null, { order: seqP });   // the server grades the order as placed
       } else if (q.type === "recall") {
         right = self; if (!right) partial = "You marked it missed";
         rec = HX.recordAnswer(q.id, q.lec, right, o.ctx);
@@ -505,7 +505,7 @@
       order[q.id] = shuffled(oc[q.id].choices.map(function(c, k){ return k; }));
     });
     STATE.mock = { ids: shuffled(pb.concat(mu, od, mc).map(function(q){ return q.id; })), t0: Date.now(), picks: {}, order: order, oc: oc, res: {}, pts: {}, submitted: false };
-    saveNow();
+    saveNow(); mockSession();
   }
   function buildMock(){
     if (mockFormat()) return formatMock();
@@ -522,8 +522,17 @@
     });
     var order = {}; ids.forEach(function(id){ order[id] = choiceOrder(QBY[id]); });
     STATE.mock = { ids: shuffled(ids), t0: Date.now(), picks: {}, order: order, res: {}, submitted: false };
-    saveNow();
+    saveNow(); mockSession();
   }
+  /* the game layer (widget/v3.js, shGame): the server pays a mock's answers, which arrive together at the end, and its
+     +50 only inside a session it started when the mock did, and saves the score itself when the session is finished.
+     A session lasts six hours; a mock handed in later is recorded the way the live hubs do it. */
+  function mockSession(){
+    var m = STATE.mock, G = window.shGame;
+    if (!m || !G || !G.startSession) return;
+    G.startSession("mock").then(function(id){ if (id && STATE.mock === m && !m.submitted) { m.sid = id; saveState(); } });
+  }
+  function mockSid(m){ return m.sid && window.shGame && window.shGame.finishSession && Date.now() - m.t0 < 5.9 * 3600e3 ? m.sid : null; }
   var mockTimer = 0;
   function drawMock(host, el){
     clearInterval(mockTimer);
@@ -589,20 +598,25 @@
         var left = m.ids.length - m.ids.filter(has).length;
         if (left > 0 && !b.getAttribute("data-confirm")) { b.setAttribute("data-confirm", "1"); b.textContent = left + " unanswered: submit anyway?"; return; }
         m.submitted = true; m.tEnd = Date.now(); m.res = {}; m.pts = pts = {};
+        var sid = mockSid(m);
         m.ids.forEach(function(id){
           var q = QBY[id]; if (!q) return;
           if (q.type === "multi") {
             var pk = Array.isArray(m.picks[id]) ? m.picks[id] : [], hit = pk.filter(function(i){ return q.correct.indexOf(i) > -1; }).length;
             pts[id] = pk.length ? Math.max(0, (hit - (pk.length - hit)) / q.correct.length) : 0; m.res[id] = pts[id] === 1;
-            if (pk.length) HX.recordAnswer(q.id, q.lec, m.res[id], "mock", null, pk);
+            if (pk.length) HX.recordAnswer(q.id, q.lec, m.res[id], "mock", null, pk, { session: sid });
             return;
           }
           var ok = has(id) && m.picks[id] === (oc[id] ? oc[id].answer : q.answer); m.res[id] = ok; pts[id] = ok ? 1 : 0;
-          if (has(id)) HX.recordAnswer(q.id, q.lec, ok, "mock", oc[id] ? null : m.picks[id]);
+          /* an ordering item is one pick among orderings here; the server grades a sequence by its order, so the right
+             pick sends the steps in order and any other pick sends two of them swapped */
+          var seq = oc[id] && q.steps ? q.steps.map(function(x, k){ return ok ? k : k === 0 ? 1 : k === 1 ? 0 : k; }) : null;
+          if (has(id)) HX.recordAnswer(q.id, q.lec, ok, "mock", oc[id] ? null : m.picks[id], null, { session: sid, order: seq });
         });
         var nRight = m.ids.filter(function(id){ return m.res[id]; }).length;
         var byL = mockLecIds().map(function(lec){ var qs = m.ids.filter(function(id){ return QBY[id] && QBY[id].lec === lec; }); return { label: lecName(lec), correct: qs.filter(function(id){ return m.res[id]; }).length, total: qs.length }; });
-        document.dispatchEvent(new CustomEvent("sh:mock-done", { detail: { correct: nRight, total: m.ids.length, byLec: byL } }));
+        document.dispatchEvent(new CustomEvent("sh:mock-done", { detail: { correct: nRight, total: m.ids.length, byLec: byL, session: sid } }));
+        if (sid) window.shGame.finishSession(sid, nRight, m.ids.length);
         saveNow(); HX.paintMeters(); track("mock:submit"); drawMock(host, el); window.scrollTo(0, 0);
       } else if (b.hasAttribute("data-onlymissed")) { m.onlyMissed = !m.onlyMissed; saveState(); drawMock(host, el); }
       else if (b.hasAttribute("data-newmock")) { STATE.mock = null; saveState(); drawMock(host, el); }

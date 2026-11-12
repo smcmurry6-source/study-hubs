@@ -1102,9 +1102,9 @@ img.emb-disc, .big, .small img { display: block; }
 .jr-minis .hp { width: 22px; height: 22px; }
 .xboost { display: inline-flex; align-items: center; gap: 5px; height: 24px; margin-left: 2px; padding: 0 9px 0 4px; border-radius: var(--r-pill);
   background: color-mix(in srgb, var(--gold) 26%, var(--row)); color: var(--gold-ink); font-size: var(--fs-meta); font-weight: var(--w-strong); }
-.xboost b { display: grid; place-items: center; height: 18px; padding: 0 6px; border-radius: var(--r-pill); background: var(--gold-ink); color: #fff; font-weight: var(--w-head); }
+.xboost i { font-style: normal; display: grid; place-items: center; height: 18px; padding: 0 6px; border-radius: var(--r-pill); background: var(--gold-ink); color: #fff; font-weight: var(--w-head); }
 :root[data-theme="dark"] .xboost { color: var(--gold); }
-:root[data-theme="dark"] .xboost b { background: var(--gold); color: #1c1b1c; }
+:root[data-theme="dark"] .xboost i { background: var(--gold); color: #1c1b1c; }
 .xpfly .x2 { font-style: normal; margin-left: 3px; padding: 0 6px; border-radius: var(--r-pill); background: var(--gold); color: #2b1d00; }
 .jr-fly { position: static; display: inline-flex; }
 .jr-darks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
