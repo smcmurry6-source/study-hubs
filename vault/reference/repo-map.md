@@ -32,6 +32,11 @@ tags: [map]
   (the studying-now classroom, the leaderboard's stage and the recap's bar graph and crowd, from `classroom.mjs`,
   `stage.mjs` and `recap.mjs` in `tools/figures/site/`)
   and `widget/hub-art/outfits.js` (the shop's outfits and `dress()`, loaded only when someone on the page wears one). [Phase 3](../tasks/2026-11-05-redesign-phase-3-dashboard.md) says what is on it.
+- `hubs/<hub-id>/next/` — the redesign's new version of a hub, beside the live one until the release: a small page of
+  settings (`window.SH_HUB`), its content as JSON in `content/` (written by `tools/hub-next/build.mjs`) and the shared
+  engine. The engine is four scripts the page loads in order, with `widget/hub.css`: `widget/hub-rewards.js` (the answer
+  path, XP, rank, the recap), `widget/hub-timmy.js` (Timmy), `widget/hub-bank.js` (the question card, the bank, the mock),
+  then the core, `widget/hub.js` (its top says how they fit together).
 - `hubs/<hub-id>/index.html` — one single-file hub each, and it is the source (perio included: its old split-source
   Claude Project is retired; edit the file directly). `hubs/<hub-id>/audio/` holds
   its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).

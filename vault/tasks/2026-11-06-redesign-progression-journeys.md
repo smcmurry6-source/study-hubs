@@ -32,7 +32,7 @@ version for reduced motion. Ships with the redesign.
 - Code: `widget/ranks.js` (`TIERS`, `art()`, `levelFor`), `widget/rankup.js` (the tier cutscene and cards), `widget/pet.js`
   (the house grows with the tier), `sh_tier`, `sh_tier_floor`, `sh_step`, `sh_xp_on_insert`, `sh_xp_rebuild`, `xp_seen`,
   `xp_days`, `xp_visitors`, `record_personal_answer`, `record_choice` in `supabase/schema.sql` (migration_v53). The new
-  engine's `recordAnswer` (phase 1, `widget/hub.js`) already sends the picked choice's index and the context (`bank`,
+  engine's `recordAnswer` (phase 1; in `widget/hub-rewards.js` since the split, 2026-11-12) already sends the picked choice's index and the context (`bank`,
   `mock`, `arcade`...) with every answer.
 
 ## Sam's calls (2026-11-06, [decisions](../decisions.md))

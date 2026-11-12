@@ -29,8 +29,9 @@ by side in the engine and **ships with the redesign's release**.
 - The redesign plan: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) (section 4.4, the question card and the
   core loop; section 4.10, the additions), [the release](2026-11-06-redesign-release.md) (the drafts for the rule and About
   page edits), [phase 2](2026-11-05-redesign-phase-2-live-hubs.md) (every hub that switches gets it from the engine).
-- The engine: `widget/hub.js` (`card()` and `wireCard()`, the bank's `drawQuestions()` and `filtered()`, the sets in
-  `SETS`, `recordAnswer()`, `SH_SYNC`); the server: [game-server](../reference/game-server.md) (`record_answer_v2`, its `ctx`
+- The engine, four files since 2026-11-12 (the top of `widget/hub.js` says how they fit): `widget/hub-bank.js` (`card()`
+  and `wireCard()`, the bank's `drawQuestions()` and `filtered()`, the sets in `SETS`), `widget/hub-rewards.js`
+  (`recordAnswer()`) and `widget/hub.js` (`SH_SYNC`); the server: [game-server](../reference/game-server.md) (`record_answer_v2`, its `ctx`
   list, the guardrails, self-graded pay) in `migration_v54.sql`, which is still pending, so it can still change.
 - Rules that matter most here: [question-bank-filter-panel](../rules/question-bank-filter-panel.md) (the panel stays as
   written; the toggle is added to it at the release), [every-choice-gets-a-why](../rules/every-choice-gets-a-why.md),
@@ -177,8 +178,9 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
 ## Done when
 
 - [x] Sam has confirmed or changed the calls above (all six confirmed, 2026-11-06)
-- [ ] The toggle, Learn and Flashcards built in `widget/hub.js` / `hub.css` (or a `widget/study-modes.js` loaded when first
-      used, phase 5's bundles), in the new Occlusion first, then every hub on the engine
+- [ ] The toggle, Learn and Flashcards built in `widget/hub-bank.js` / `hub.css` (or a `widget/study-modes.js` loaded when first
+      used, phase 5's bundles: a file loaded on demand adds no request to the page's first load, where Occlusion's budget
+      has 1 to spare since the split), in the new Occlusion first, then every hub on the engine
 - [ ] The two icons drawn in `tools/figures/site/icons.mjs` and built into `widget/hub-art.js`
 - [ ] The server part in the pending migration, with its `xp.js` and `rls.js` checks, and [game-server](../reference/game-server.md) updated
 - [ ] Every format checked in both views on a phone and a laptop: one-answer, select-all, true/false, two-statement,
