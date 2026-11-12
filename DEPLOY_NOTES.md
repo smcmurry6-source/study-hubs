@@ -453,7 +453,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   description, footer and dashboard card list L9 and no longer say the final is only Dr. Givan's lectures; the
   redesign (`next/`) copy matches and its content was rebuilt. Lexicon: NCCLs, Dzakovich, chelator, exostoses, tori,
   subgingivally, CEJ. The notes give both views where L9 meets L7 (Lawson: abfraction is a cause, treat it with a night
-  guard; Givan: not yet proven clinically). Pending in [the follow-up task](vault/tasks/2026-11-10-occlusion-l9-follow-ups.md):
+  guard; Givan: not yet proven clinically). Pending in [the follow-up task](vault/tasks/done/2026-11-10-occlusion-l9-follow-ups.md):
   Sam's answers on four diagram candidates, the check against Dr. Lawson's slides (names spelled by ear) and the other
   11/12 lecture as L10. Occlusion's performance budget 1350 -> 1370 KB (L9 adds about 25 KB over the wire; BUG-053),
   for Sam to approve with the PR. No schema change.

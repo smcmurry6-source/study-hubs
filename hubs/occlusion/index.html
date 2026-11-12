@@ -18,7 +18,7 @@
 <meta property="og:image" content="https://smcmurry6-source.github.io/study-hubs/assets/og-occlusion.png">
 <meta name="twitter:card" content="summary_large_image">
 <title>Occlusion Final Hub</title>
-<meta name="description" content="D2 Occlusion final study hub (Dr. Givan's course): occlusal instrumentation, malocclusion and dysfunction, denture occlusion and noncarious cervical lesions, plus the midterm lectures for review: basic occlusion and the fence post, TMJ anatomy and the muscles of mastication, mastication, swallowing and speech, occlusal concepts, and applying occlusion in operative, fixed and implant dentistry. Lecture notes at two reading levels, a question bank with diagrams, exam hints, an exam-style mock, review tables and nine arcade games.">
+<meta name="description" content="D2 Occlusion final study hub (Dr. Givan's course): occlusal instrumentation, malocclusion and dysfunction, denture occlusion, noncarious cervical lesions and occlusal trauma, plus the midterm lectures for review: basic occlusion and the fence post, TMJ anatomy and the muscles of mastication, mastication, swallowing and speech, occlusal concepts, and applying occlusion in operative, fixed and implant dentistry. Lecture notes at two reading levels, a question bank with diagrams, exam hints, an exam-style mock, review tables and nine arcade games.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=JetBrains+Mono:wght@400;700&family=Press+Start+2P&family=Public+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -1929,7 +1929,7 @@ body .sh-tts-voice-picker{background:var(--surface);color:var(--ink);border:1px 
   </main>
 
   <footer class="hub-footer">
-    Occlusion Hub &middot; built from Dr. Givan's lectures (slides, handouts and the recordings from 9/17 on) and his "What cusp hits where?" help sheet, and Dr. Lawson's prerecorded lecture on noncarious cervical lesions, checked against last year's class study deck. Diagrams are drawn for this hub; board-exam items are not reproduced.
+    Occlusion Hub &middot; built from Dr. Givan's lectures (slides, handouts and the recordings from 9/17 on) and his "What cusp hits where?" help sheet, Dr. Lawson's prerecorded lecture on noncarious cervical lesions and Dr. Abou-Arraj's lecture on occlusal trauma, checked against last year's class study deck. Diagrams are drawn for this hub; board-exam items are not reproduced.
   </footer>
 </div>
 <div id="toastHost"></div>
@@ -2007,9 +2007,9 @@ var EXAM_TIME = '18:30', EXAM_CLOSES = '19:45';
    7:45. Not comprehensive, the lectures from 10/22 on, building on the midterm material. Format not announced
    yet; update EXAM_INFO and the mock when it is. */
 var EXAM_INFO = [
-  ['What', 'The lectures from 10/22 on: L6, L7, L8 and L9 so far, with more added here as they are taught. The final is not comprehensive, but it builds on the midterm material.'],
+  ['What', 'The lectures from 10/22 on: L6 through L10, the last two taught 11/12. The final is not comprehensive, but it builds on the midterm material.'],
   ['When', 'Monday, November 16, 6:30 pm, the same time window as the midterm: it closes at 7:45 pm. Moved up from Thursday, November 19. The format hasn\'t been announced yet; this card will change when it is.'],
-  ['So far', 'L6, Occlusal Instrumentation (10/22): the three kinds of articulator, the facebow, CR, MIP and eccentric records, and how to choose an articulator. L7, Malocclusion and Dysfunction (10/29): functional disturbances and TMD, the five etiologies, splints and occlusal therapy, mobility, wear and bruxism. L8, Denture Occlusion (11/5): why a denture\'s occlusion is about keeping it from tipping, support, stability and retention, resorption, balanced, non-balanced and lingualized occlusion, and denture teeth. L9, Noncarious Cervical Lesions (Dr. Lawson, prerecorded for 11/12): carious vs noncarious, abrasion, abfraction and erosion, pH vs buffering capacity, and when to restore.'],
+  ['So far', 'L6, Occlusal Instrumentation (10/22): the three kinds of articulator, the facebow, CR, MIP and eccentric records, and how to choose an articulator. L7, Malocclusion and Dysfunction (10/29): functional disturbances and TMD, the five etiologies, splints and occlusal therapy, mobility, wear and bruxism. L8, Denture Occlusion (11/5): why a denture\'s occlusion is about keeping it from tipping, support, stability and retention, resorption, balanced, non-balanced and lingualized occlusion, and denture teeth. L9, Noncarious Cervical Lesions (Dr. Lawson, prerecorded for 11/12): carious vs noncarious, abrasion, abfraction and erosion, pH vs buffering capacity, and when to restore. L10, Occlusion and the Periodontium (Dr. Abou-Arraj, 11/12): occlusal trauma, primary vs secondary, its signs, mobility, what the animal studies showed, and when to adjust the occlusion.'],
   ['Midterm lectures', 'L1-L5 stay in the hub for review. The final builds on them, so the terms (CR, CO, MIP), guidance and the determinants still matter.']
 ];
 /* the final's start and end ('HH:MM'), for Home's countdown and the header pill: the midterm's window */
@@ -2023,7 +2023,7 @@ var COURSE_DATES = [
   { date:'2026-10-22', label:'L6 Occlusal Instrumentation' },
   { date:'2026-10-29', label:'L7 Malocclusion and Dysfunction' },
   { date:'2026-11-05', label:'L8 Denture Occlusion' },
-  { date:'2026-11-12', label:'L9 Noncarious Cervical Lesions (Dr. Lawson, prerecorded)' },
+  { date:'2026-11-12', label:'L9 Noncarious Cervical Lesions (Dr. Lawson, prerecorded) and L10 Occlusion and the Periodontium (Dr. Abou-Arraj)' },
   { date:'2026-11-16', label:'Final: the lectures from 10/22 on, 6:30 pm', kind:'exam' }
 ];
 var LECTURES = [
@@ -6831,7 +6831,10 @@ var CASES = {
   dnret: { pbox:[['Patient','70-year-old woman, new complete dentures 3 weeks ago'],['Complaint 1','"When I eat a peanut butter sandwich, my lower denture lifts off"'],['Complaint 2','"Biting into an apple with my front teeth flips my upper denture down"'],['Exam','Good fit; borders extended to the peripheral border; no sore spots; chewing on both sides is comfortable']] },
   ncbrush: { pbox:[["Patient","29-year-old right-handed man"],["Chief complaint","\"There are little notches in my teeth at the gumline\""],["Findings","Hard, smooth cervical notches on the facial of the premolars, much deeper on his right side than on his left; no caries"],["Habits","Scrubs hard twice a day with a medium brush and a whitening toothpaste (RDA about 124)"],["Other","No wear facets, no tori; drinks mostly water"]] },
   ncgrind: { pbox:[["Patient","55-year-old woman"],["Chief complaint","\"My teeth are getting notches near the gums, and they look bad in photos\""],["Findings","Cervical notches on #5, #12, #21 and #28; mandibular tori and buccal exostoses; matching wear facets on the canines and premolars"],["Habits","Her partner hears her grinding at night; brushes gently with a soft electric brush (pressure sensor) and a low-RDA toothpaste"],["Diet","Water, and coffee with milk"]] },
-  ncacid: { pbox:[["Patient","24-year-old graduate student"],["Chief complaint","\"One of my front teeth hurts with cold\""],["Findings","Noncarious cervical lesions on several teeth; cupped-out cusp tips on the first molars; the lesion on #6 is sensitive to air and cold"],["Diet","A large glass of orange juice every morning; sips very bubbly sparkling water all day"],["Brushing","Soft brush, low-RDA toothpaste, gentle"]] }
+  ncacid: { pbox:[["Patient","24-year-old graduate student"],["Chief complaint","\"One of my front teeth hurts with cold\""],["Findings","Noncarious cervical lesions on several teeth; cupped-out cusp tips on the first molars; the lesion on #6 is sensitive to air and cold"],["Diet","A large glass of orange juice every morning; sips very bubbly sparkling water all day"],["Brushing","Soft brush, low-RDA toothpaste, gentle"]] },
+  otcrown: { pbox:[["Patient","47-year-old man"],["Chief complaint","\"My new crown hurts when I bite\""],["History","Crown on #30 cemented 2 weeks ago; no history of periodontal disease"],["Findings","#30 is the first tooth to touch when he closes and is tender to biting; it moves about 0.5 mm buccolingually; probing depths 2-3 mm, no bleeding, no attachment loss"],["Radiograph","Widened PDL space around #30; crestal bone at a normal level"]] },
+  otperio: { pbox:[["Patient","62-year-old woman, referred for periodontal treatment"],["Chief complaint","\"My gums bleed when I brush\""],["Findings","Heavy plaque; generalized 5-7 mm pockets that bleed on probing; #3 moves about 1.5 mm buccolingually but not into its socket; #3 has a non-working contact in left lateral movement; no fremitus; no pain"],["Radiograph","Generalized horizontal bone loss of about 40%; a vertical defect on the mesial of #3"]] },
+  otfrem: { pbox:[["Patient","55-year-old woman, a new patient at her first exam"],["Chief complaint","\"My front teeth have spread apart over the last two years\""],["History","Periodontitis treated years ago, on maintenance since; she doesn't grind"],["Findings","New spaces between #7, #8 and #9, with #8 and #9 flared facially; probing depths 3-4 mm with no bleeding; when she taps her teeth together, you feel #8 move under a finger on its facial gingiva"],["Radiograph","About 40% horizontal bone loss around #8 and #9; widened PDL spaces"]] }
 };
 function pc(key){ var c = CASES[key]; return { pcase:key, pbox:c.pbox, pimg:c.pimg }; }
 
@@ -8962,7 +8965,7 @@ mcq('mo-splinting','malocclusion','handout','Which is an indication for splintin
   'Traumatic mobility (progressive, when the tissues\' tolerance is exceeded) is the indication for splinting: more surface area to resist the force. Adapted mobility doesn\'t need it.');
 mcq('mo-miller2','malocclusion','handout','On Miller\'s Mobility Index (1938), a score of 2 means:',
   ['Any horizontal movement up to 1 mm','Barely distinguishable tooth movement','More than 1 mm, or depressed or rotated','No detectable movement'],
-  '0 = no detectable movement; 1 = barely distinguishable; 2 = any horizontal movement up to 1 mm; 3 = more than 1 mm or depressed or rotated. The tooth is held between two instruments and moved back and forth.');
+  '0 = no detectable movement; 1 = barely distinguishable; 2 = any horizontal movement up to 1 mm; 3 = more than 1 mm or depressed or rotated. The tooth is held between two instruments and moved back and forth. (Dr. Abou-Arraj\'s L10 slide grades it differently: 1 = up to 1 mm, 2 = more than 1 mm, 3 = horizontal and vertical.)');
 mcq('mo-wear-pain','malocclusion','handout','Why do patients with tooth wear usually seek treatment?',
   ['For esthetic concerns; pain is usually not a symptom','Because of severe pain from exposed dentin','Because the teeth become mobile','Because their TMJ starts clicking'],
   'Pain is usually not a symptom of wear (it is too slow); patients usually seek treatment for esthetics, often too late for an easy fix.');
@@ -9693,6 +9696,233 @@ multi("nc-sel-acid","nccl","hub","Select every step Dr. Lawson lists for a patie
 match("nc-match-fix","nccl","hub","Match each patient to what Dr. Lawson suggests to keep the lesions from growing.",
   [["Abrasion, using a high-RDA toothpaste", "A lower-RDA toothpaste"], ["Abrasion, already on a low-RDA toothpaste", "An electric brush with a pressure sensor"], ["Erosion from acidic drinks", "A less acidic drink"], ["Abfraction", "A night guard"]],
   "His last slide: find the cause, then treat it. Toothpaste first for brushing, then pressure; drinks (and bicarbonate) for acid; a night guard for abfraction.");
+mcq("nc-rda-seal","nccl","handout","On Dr. Lawson's slide, a toothpaste's RDA must be below what number to get the ADA seal?",
+  ["250", "124", "100", "500"],
+  "His slide: RDA must be below 250 to get the seal. A Colgate whitening toothpaste is about 124 on his chart: under the limit, though lower is still better for a patient with abrasion.");
+mcq("nc-erosion-sites","nccl","handout","Dr. Lawson's slide lists where acid, not bacteria, demineralizes teeth. Which of these is on that list?",
+  ["Incisal edges, with tooth wear", "Interproximal surfaces, just below the contact", "White spot lesions after orthodontic brackets", "The occlusal grooves"],
+  "Chemical-induced (erosion): cusp tips, the lingual of the maxillary anteriors (internal acids), incisal edges with wear, and buccal surfaces with toothbrush wear. Bacteria-induced (caries): cervical and post-orthodontic white spots, occlusal and interproximal caries.");
+/* =================================================================== L10 OCCLUSAL TRAUMA AND THE PERIODONTIUM (Dr. Abou-Arraj, 11/12) */
+mcq("ot-initiate","occtrauma","handout","In the definition of occlusal trauma, what is the occlusal trauma itself?",
+  ["The injury and tissue changes in the periodontium that the force causes", "The excessive occlusal force that lands on the tooth", "Any occlusal discrepancy, such as a non-working contact", "The wear facets that grinding leaves on the teeth"],
+  "\"Injury resulting in tissue changes within the periodontal attachment apparatus as a result of occlusal force(s).\" The occlusal force is the initiating factor; the injury it causes in the periodontium is the occlusal trauma.");
+mcq("ot-primary","occtrauma","handout","Primary occlusal trauma is injury from:",
+  ["Traumatic occlusal forces on a tooth with normal bone and attachment levels", "Normal occlusal forces on a tooth that has already lost bone and attachment", "Traumatic occlusal forces on a tooth that has already lost bone and attachment", "Plaque-induced inflammation on a tooth with normal bone and attachment levels"],
+  "Primary: traumatic (excessive) forces, normal support, no attachment or bone lost. Secondary: normal or traumatic forces on a tooth with reduced support.");
+mcq("ot-histo-same","occtrauma","handout","How do primary and secondary occlusal trauma differ histologically?",
+  ["They don't: the changes are the same, and the difference is clinical", "Only secondary occlusal trauma shows resorption of the alveolar bone", "Primary shows attachment loss under the microscope; secondary doesn't", "Secondary injures the gingiva, while primary injures only the PDL"],
+  "The distinction is a clinical description (normal vs reduced support). Histologically, the alterations trauma from occlusion causes in the periodontium are the same in both.");
+mcq("ot-fence","occtrauma","hub","Why can a normal occlusal force injure a tooth with reduced periodontal support?",
+  ["Its center of rotation moves apically, like a fence post with less of it in the ground", "Its PDL becomes narrower and stiffer, so it can no longer absorb the force", "Its center of rotation moves coronally, toward the crown, so the root tips", "Bone loss makes its crown shorter, so the same bite delivers a bigger force"],
+  "With normal support the center of rotation is about mid-root; with reduced support it moves toward the apical third. A post two thirds in the ground doesn't move when you lean on it; with only a third in the ground, the same lean tips it.");
+mcq("ot-jiggle","occtrauma","handout","A force that pushes a tooth from the mesial, then from the distal, again and again, produces:",
+  ["An hourglass-shaped widening of the PDL, with bone loss on both sides and mobility", "Pressure on one side and tension on the other, the controlled force orthodontics uses", "Bodily movement of the whole tooth, crown and root, in one direction", "A narrowed PDL on both sides as the bone thickens to resist the force"],
+  "That is a jiggling force: pressure and tension on both sides, so the PDL widens on both sides into an hourglass, with bone loss and mobility. The slides call it often the clinical situation in humans. Orthodontics uses unilateral force.");
+mcq("ot-histology","occtrauma","handout","How is occlusal trauma confirmed?",
+  ["Only histologically; clinical and radiographic findings are surrogate indicators", "By a widened PDL space on a periapical radiograph of the tooth", "By fremitus when the patient taps their teeth together", "By a vertical bony defect next to the tooth on a radiograph"],
+  "Occlusal trauma can only be confirmed histologically, and we don't do histology on patients. The clinical and radiographic signs are surrogates, so occlusal trauma is a diagnosis, not a finding.");
+mcq("ot-fremitus","occtrauma","hub","How do you check a tooth for fremitus?",
+  ["Have the patient tap their teeth together while a finger rests on the facial gingiva", "Rock the tooth buccolingually between the handles of two rigid instruments", "Press down on the occlusal surface to see if the tooth moves into its socket", "Tap the tooth with a mirror handle and compare the sound with its neighbors"],
+  "Fremitus is a palpable or visible movement of a tooth when subjected to occlusal forces. Have the patient tap, tap, tap with a finger on the facial gingiva: if you feel the tooth pushed, it's fremitus. Advanced, you can see it.");
+mcq("ot-pdl","occtrauma","hub","In a healthy periodontium, the PDL space is roughly:",
+  ["0.25 mm", "0.025 mm", "1 mm", "2.5 mm"],
+  "About 0.25 mm in health. A wider radiolucent band around the root suggests the tooth is likely mobile; confirm it clinically.");
+mcq("ot-vertical","occtrauma","hub","A radiograph shows a vertical defect on the mesial of #19. What does that tell you about occlusal trauma on #19?",
+  ["Nothing by itself: a vertical defect doesn't mean occlusal trauma", "That #19 has secondary occlusal trauma, since it has lost bone", "That #19 has primary occlusal trauma from a heavy contact", "That #19's occlusion must be adjusted before its scaling and root planing"],
+  "He wanted it very clear: don't assume occlusal trauma from a vertical defect; it isn't cause and effect. If there is trauma with bone loss, the loss tends to be vertical, not the other way around.");
+mcq("ot-mob-dep","occtrauma","handout","A tooth's horizontal mobility depends on each of these EXCEPT:",
+  ["The size of its pulp chamber", "The height of the alveolar bone", "The width of the periodontal ligament", "The shape and number of its roots"],
+  "Horizontal mobility depends on the height of the alveolar bone, the width of the PDL, and the shape and number of the roots. The pulp has nothing to do with it.",
+  {"fmt": "except"});
+mcq("ot-surgery","occtrauma","hub","After a flap on a quadrant of teeth, how long can the teeth be slightly mobile before they settle down?",
+  ["Up to a year", "Up to 48 hours", "Up to two weeks", "For good: the mobility is permanent"],
+  "Periodontal surgery is one of the causes of mobility: after a flap (resective surgery), expect the teeth to be slightly mobile for up to a year after surgery. They settle down eventually.");
+mcq("ot-class2","occtrauma","handout","On the mobility scale in Dr. Abou-Arraj's lecture, Class 2 is:",
+  ["Visibly increased horizontal movement of more than 1 mm", "Increased horizontal movement of the crown of up to 1 mm", "Horizontal movement plus vertical movement into the socket", "Physiologic movement of about 0.1-0.2 mm horizontally"],
+  "His scale: 0 physiologic (0.1-0.2 mm), 1 up to 1 mm horizontally, 2 more than 1 mm horizontally, 3 horizontal and vertical. (Dr. Givan's L7 handout grades it differently: there, 2 is any horizontal movement up to 1 mm.)");
+mcq("ot-class3","occtrauma","handout","What sets Class 3 mobility apart from Class 2?",
+  ["The tooth also moves vertically, into the socket, when you press on it", "The tooth moves more than 2 mm buccolingually between the instruments", "The tooth shows fremitus when the patient taps their teeth together", "The tooth moves mesiodistally as well as buccolingually"],
+  "Class 3 is Class 2 plus vertical movement: press on the occlusal surface and the tooth moves up into the socket. It is severe and impinges on function. Fremitus isn't part of the scale.");
+mcq("ot-adapt","occtrauma","hub","A tooth has Class 2 mobility. What does Dr. Abou-Arraj say to do with that finding?",
+  ["Find out why it's mobile: mobility can be adaptation, not a hopeless prognosis", "Plan to extract it: Class 2 mobility makes the prognosis hopeless", "Splint it to its neighbors before any periodontal treatment begins", "Leave it: mobility doesn't affect how a tooth responds to treatment"],
+  "Mobility may be a sign of adaptation of the periodontal tissues to the forces on them. Class 2 isn't hopeless (Class 3 is tougher); look for why the tooth is mobile and what you can do about it.");
+mcq("ot-heal","occtrauma","handout","How does mobility affect the response to periodontal treatment?",
+  ["Mobile teeth respond less well, for example to regeneration or soft tissue grafting", "Mobile teeth heal better, since movement increases blood flow to the PDL", "Mobility makes no difference to how a tooth responds to treatment", "Only Class 3 teeth respond less well; Class 2 heals like a firm tooth"],
+  "Mobile teeth respond less well to treatment, whether regeneration or soft tissue grafting; Class 1 matters less than Class 2, so bring a Class 2 tooth to Class 1 or less by adjusting the occlusion if you can.");
+mcq("ot-blood","occtrauma","handout","What is the main blood supply to the marginal gingiva?",
+  ["The supraperiosteal arteries", "The arteries of the periodontal ligament", "The intra-alveolar arteries in the bone", "The arteries of the dental pulp"],
+  "The gingiva's blood supply is external to the alveolus: PDL, intra-alveolar and supraperiosteal arteries, with the supraperiosteal the main supply to the marginal gingiva. That refuted the idea that occlusal forces cut off the gingiva's blood.");
+mcq("ot-codestruct","occtrauma","handout","What does it mean to call occlusal trauma a co-destructive factor?",
+  ["Added to plaque-induced inflammation, it changes the pathway of destruction into the PDL and bone", "It causes periodontitis on its own, without any plaque or inflammation present", "It destroys the gingiva while the plaque destroys the bone and the PDL", "It adds destruction only on teeth that have no plaque or inflammation"],
+  "In the co-destruction idea, plaque inflammation alone stays in the gingiva (and spreads into horizontal bone loss); occlusal trauma changes its pathway into the PDL and bone, giving vertical defects. It works with the bacterial insult, never alone.");
+mcq("ot-anim-alone","occtrauma","handout","In the animal experiments, what did occlusal trauma alone, with no inflammation, cause?",
+  ["Mobility and loss of bone density, but no attachment loss; reversible once it stopped", "Attachment loss and loss of crestal bone height that stayed after it stopped", "Gingivitis that went on to become periodontitis within the study", "No change at all in either the bone or the mobility of the teeth"],
+  "Trauma alone: increased mobility, loss of bone density (not height), no loss of attachment, and a return to pretreatment stability once the trauma was removed. It isn't a primary factor.");
+mcq("ot-anim-ging","occtrauma","handout","In the animal experiments, occlusal trauma plus gingivitis, on teeth with normal support, caused:",
+  ["Greater loss of bone density than trauma alone, but still no attachment loss", "Attachment loss in both the beagle dogs and the squirrel monkeys", "Less mobility than occlusal trauma alone, since the gingiva swelled", "Periodontitis within weeks, with loss of crestal bone height"],
+  "Trauma plus inflammation on a normal periodontium: increased mobility and greater loss of bone density, but still no attachment loss. Still no irreversible damage.");
+mcq("ot-anim-perio","occtrauma","handout","When occlusal trauma was added to periodontitis on a reduced periodontium, what did the two animal groups find?",
+  ["They disagreed: one found extra attachment and bone loss, the other none beyond the disease", "Both found extra attachment and bone loss, so co-destruction is proven", "Both found no extra loss, so trauma has no effect on periodontitis", "Both found that adding the trauma slowed the periodontitis"],
+  "The beagle dogs lost attachment and bone beyond what the disease caused alone (co-destruction is a reality); the squirrel monkeys didn't (co-destruction is a question). And there's no such evidence in humans.");
+mcq("ot-stop","occtrauma","handout","In the monkeys, the trauma was stopped while their periodontitis was left untreated. Ten weeks later:",
+  ["There was no return to stability: stopping the trauma didn't reverse the periodontitis", "The bone density and the attachment had both returned to normal", "The attachment had returned to normal, but the bone density hadn't", "The periodontitis had healed, but the teeth were still mobile"],
+  "With the trauma stopped and no periodontitis, the bone regained its density. With the periodontitis left, there was no return to stability: you still have to treat the periodontitis.");
+mcq("ot-discrep","occtrauma","handout","In the occlusal trauma and periodontal literature, which counts as an occlusal discrepancy?",
+  ["A slide from CR to CO of more than 1 mm", "A slide from CR to CO of about 0.5 mm", "Canine guidance in a lateral movement", "Working-side contacts in group function"],
+  "Occlusal discrepancies in these studies: a CR-to-CO slide over 1 mm, and non-working contacts in lateral movements (one or both).");
+mcq("ot-trial","occtrauma","handout","In the randomized trial of occlusal adjustment with periodontal therapy, how did the adjusted patients do after two years?",
+  ["About 0.5 mm more clinical attachment gain, with no difference in probing depth", "More probing depth reduction, with no difference in clinical attachment", "Both more attachment gain and shallower pockets than the others", "No difference at all from the patients who weren't adjusted"],
+  "50 patients with periodontitis, all fully treated, half adjusted: a more favorable clinical attachment level (about 0.5 mm) after two years, no influence on probing depth, and initial mobility didn't matter. It's often cited to justify adjustment.");
+mcq("ot-select","occtrauma","handout","The camp that calls for careful patient selection argues that:",
+  ["Not every occlusal discrepancy causes occlusal trauma, so not every one needs adjusting", "Occlusal adjustment should never be part of periodontal treatment", "Every discrepancy in a periodontitis patient must be adjusted first", "Only teeth with Class 3 mobility should ever have their occlusion adjusted"],
+  "Not every occlusal discrepancy causes occlusal trauma, so not every discrepancy in a patient with periodontitis needs adjustment. They don't say never adjust: they say choose carefully.");
+mcq("ot-timing","occtrauma","handout","Except in acute conditions, when is occlusal adjustment done in periodontal treatment?",
+  ["After efforts to reduce the inflammation, if the teeth haven't improved by re-evaluation", "At the first visit, before any scaling and root planing is done", "Only after periodontal surgery has corrected the bone levels", "Never, since adjusting the occlusion has no effect on the periodontium"],
+  "Except in acute conditions, occlusion is addressed during initial therapy after efforts to reduce the inflammatory lesion: treat the inflammation, keep monitoring, and adjust at the phase 1 re-evaluation if needed.");
+mcq("ot-cause","occtrauma","handout","His first conclusion: occlusal trauma:",
+  ["Does not cause gingivitis or periodontitis, but affects the supporting tissues", "Causes periodontitis directly, though it doesn't cause gingivitis", "Causes gingivitis, which then progresses to periodontitis", "Has no effect at all on the tissues that support the teeth"],
+  "\"Occlusal trauma alone does not cause gingivitis or periodontitis. Does it have an effect on the periodontal tissues? The answer is absolutely yes.\"");
+mcq("ot-oa-does","occtrauma","handout","What can occlusal adjustment do for traumatized teeth?",
+  ["Reduce their mobility and promote bone regrowth, without arresting plaque-driven breakdown", "Arrest the breakdown of attachment caused by microbial plaque", "Regenerate the attachment the teeth have already lost, on its own", "Replace scaling and root planing for teeth that are mobile"],
+  "Occlusal adjustment may reduce the mobility of traumatized teeth and promote the regrowth of bone, but it will not arrest further breakdown caused by plaque. You still have to control the plaque.");
+mcq("cs-ot-cr-dx","occtrauma","hub","What is the best diagnosis for #30?",
+  ["Primary occlusal trauma", "Secondary occlusal trauma", "Periodontitis", "A healthy reduced periodontium"],
+  "A new crown that hits first (a traumatic force) on a tooth with normal bone and attachment: primary occlusal trauma. Secondary needs reduced support, and there is no inflammation or attachment loss for periodontitis.",
+  pc("otcrown"));
+mcq("cs-ot-cr-tx","occtrauma","hub","What should you do first?",
+  ["Adjust the crown so it is no longer the first contact", "Scale and root plane, then re-evaluate in six weeks", "Extract #30, since a mobile tooth has a poor prognosis", "Splint #30 to #29 and #31"],
+  "A restoration left high makes the tooth the first contact every time he closes: pain on biting and mobility. Take the overload off; the changes from trauma alone are reversible once the force is removed.",
+  pc("otcrown"));
+mcq("cs-ot-cr-mob","occtrauma","hub","#30 moves about 0.5 mm buccolingually and doesn't move into its socket. On Dr. Abou-Arraj's scale, that is:",
+  ["Class 1", "Class 0", "Class 2", "Class 3"],
+  "Up to 1 mm of horizontal movement is Class 1 on his scale. Class 0 is physiologic (0.1-0.2 mm), Class 2 more than 1 mm, Class 3 adds vertical movement.",
+  pc("otcrown"));
+mcq("cs-ot-pe-when","occtrauma","hub","When should the non-working contact on #3 be adjusted?",
+  ["After her initial therapy, if #3 hasn't improved by re-evaluation", "Today, before her scaling and root planing", "Never: occlusal adjustment doesn't help periodontitis patients", "Only if #3 later needs periodontal surgery"],
+  "No acute signs (no fremitus, no pain), so treat the inflammation first (oral hygiene, scaling and root planing), keep monitoring #3, and adjust at the phase 1 re-evaluation if it hasn't improved.",
+  pc("otperio"));
+mcq("cs-ot-pe-mob","occtrauma","hub","#3 moves about 1.5 mm buccolingually but doesn't move into its socket when pressed. On Dr. Abou-Arraj's scale, that is:",
+  ["Class 2", "Class 1", "Class 3", "Class 0"],
+  "More than 1 mm horizontally, with no vertical movement: Class 2 on his scale. It isn't hopeless; mobile teeth heal less well, so bringing it toward Class 1 is worth trying.",
+  pc("otperio"));
+mcq("cs-ot-pe-defect","occtrauma","hub","What does the vertical defect on the mesial of #3 tell you?",
+  ["It doesn't prove occlusal trauma; treat the periodontitis and keep watching #3", "It proves the non-working contact caused her bone loss on #3", "It shows #3 has primary occlusal trauma", "It means #3 needs extraction before her periodontal therapy"],
+  "A vertical defect doesn't mean occlusal trauma. Her plaque and inflammation explain bone loss on their own; the contact may be playing a role, which is why #3 is monitored through therapy.",
+  pc("otperio"));
+mcq("cs-ot-fr-dx","occtrauma","hub","Her bite is normal and she doesn't grind. What best describes #8 and #9?",
+  ["Secondary occlusal trauma", "Primary occlusal trauma", "Gingivitis", "Physiologic mobility"],
+  "Normal forces on teeth with reduced support (about 40% bone loss from her old periodontitis): secondary occlusal trauma. Primary needs normal support.",
+  pc("otfrem"));
+mcq("cs-ot-fr-sign","occtrauma","hub","What is the name for the movement you feel under your finger when she taps?",
+  ["Fremitus", "Pathologic tooth migration", "Class 1 mobility", "Physiologic mobility"],
+  "Fremitus: a palpable or visible movement of a tooth when subjected to occlusal forces, sometimes called functional mobility. A tooth with it usually has Class 3 mobility.",
+  pc("otfrem"));
+mcq("cs-ot-fr-tx","occtrauma","hub","This is her first visit. When should her occlusion be adjusted?",
+  ["Now: fremitus at the first exam is an acute condition", "Only after she has had a year of periodontal maintenance", "After scaling and root planing, at re-evaluation", "Never: her support is reduced, so adjustment can't help"],
+  "Except in acute conditions, adjustment waits until the inflammation is treated. Fremitus or a heavily loaded tooth at the first exam is the acute condition he would adjust early.",
+  pc("otfrem"));
+two("ot-2s-1","occtrauma","handout","Secondary occlusal trauma can come from normal occlusal forces.","A healthy reduced periodontium has deepened probing depths.", true, false,
+  "Secondary: normal or traumatic forces on reduced support. A healthy reduced periodontium has lost bone and attachment but has no inflammation or deepened probing depths.",
+  "normal or traumatic forces on a tooth with reduced support.", "a healthy reduced periodontium has no inflammation or deepened probing depths, just the bone and attachment already lost.");
+two("ot-2s-2","occtrauma","handout","Jiggling forces widen the PDL on only one side of the tooth.","A unilateral force puts pressure on one side of the tooth and tension on the other.", false, true,
+  "Jiggling: pressure and tension on both sides, so the PDL widens into an hourglass. Unilateral (tipping or bodily movement): pressure on one side, tension on the other.",
+  "the force comes from both sides, so the PDL widens on both sides into an hourglass.", "that is the unilateral force of tipping or bodily movement, as orthodontics uses.");
+two("ot-2s-3","occtrauma","hub","A widened PDL space suggests a tooth is likely mobile, but it has to be confirmed clinically.","The lamina dura can be thickened or discontinued in occlusal trauma.", true, true,
+  "Both are radiographic indicators: a widened PDL (a wider radiolucent band than about 0.25 mm) suggests mobility, confirmed clinically; the lamina dura can be thicker and more radiopaque, or discontinued.",
+  "the radiograph suggests mobility; you confirm it with the instruments.", "it can go either way: thicker, or a line that disappears and reappears.");
+two("ot-2s-4","occtrauma","handout","Occlusal adjustment arrests the breakdown caused by microbial plaque.","Permanent increased mobility causes periodontal disease to develop.", false, false,
+  "Adjustment may reduce mobility and help bone regrow, but it won't arrest plaque-driven breakdown. Permanent increased mobility has no influence on the development of periodontal disease, though non-mobile teeth may heal better.",
+  "it may reduce mobility and promote bone regrowth, but it won't stop breakdown from plaque.", "permanent increased mobility has no influence on the development of periodontal disease.");
+two("ot-2s-5","occtrauma","handout","In the randomized trial, the teeth's initial mobility didn't affect their attachment response to occlusal adjustment.","A slide from CR to CO of 0.5 mm counts as an occlusal discrepancy.", true, false,
+  "Class 1 or Class 2 at the start, the attachment response to adjustment was the same. An occlusal discrepancy is a CR-to-CO slide of more than 1 mm, or a non-working contact.",
+  "initial mobility had no influence on the result.", "the slide has to exceed 1 mm (or there's a non-working contact) to count.");
+tf("ot-tf-1","occtrauma","handout","Primary and secondary occlusal trauma cause the same histologic changes.", true,
+  "The distinction is clinical (the support); histologically, the alterations are similar.",
+  "The difference between them is clinical: normal vs reduced support.", "Histologically they are the same; only the clinical picture differs.");
+tf("ot-tf-2","occtrauma","hub","Fremitus is one of the grades of the mobility scale.", false,
+  "Fremitus isn't explicitly part of the mobility classification, though a tooth with fremitus usually has Class 3 mobility.",
+  "It isn't a grade, though a tooth with fremitus usually has Class 3 mobility.", "The scale is 0-3 by how far the tooth moves; fremitus is a separate sign, movement under occlusal force.");
+tf("ot-tf-3","occtrauma","handout","Occlusal trauma is a diagnosis, not a finding.", true,
+  "It can only be confirmed histologically, so the clinical and radiographic findings are surrogate indicators of it.",
+  "The findings point to it; it is confirmed only histologically.", "No single finding proves it: it is confirmed only histologically.");
+tf("ot-tf-4","occtrauma","handout","About a century ago, flattening the cusps was suggested as a treatment for periodontal disease.", true,
+  "When occlusion was thought to cause periodontitis, the suggested treatment was to flatten the cusps, and occlusal therapy was considered mandatory.",
+  "Heavy occlusion was thought to cause it, so the cusps were flattened.", "That was the treatment suggested when occlusion was blamed for periodontitis.");
+tf("ot-tf-5","occtrauma","handout","The PDL arteries are the main blood supply to the marginal gingiva.", false,
+  "The supraperiosteal arteries are the main supply to the marginal gingiva; the PDL and intra-alveolar arteries are the other two sources.",
+  "The supraperiosteal arteries are the main supply.", "The PDL arteries are one of three sources, not the main one.");
+tf("ot-tf-6","occtrauma","hub","After a flap on a quadrant, the teeth can be slightly mobile for up to a year.", true,
+  "Periodontal surgery is a cause of mobility; the teeth settle down within about a year.",
+  "Expect slight mobility for up to a year after the surgery.", "They can stay slightly mobile for up to a year, then settle.");
+tf("ot-tf-7","occtrauma","handout","Human studies give strong evidence that occlusal trauma speeds attachment loss in periodontitis.", false,
+  "There is a lack of evidence from human studies implicating occlusal trauma in the progression of attachment loss; the evidence came from one group's animal studies.",
+  "The evidence in humans is lacking.", "There is a lack of evidence from human studies; only one animal group found it.");
+tf("ot-tf-8","occtrauma","handout","Occlusal trauma alone causes gingivitis.", false,
+  "Occlusal trauma does not cause gingivitis or periodontitis; it affects the supporting tissues.",
+  "It doesn't cause gingivitis or periodontitis.", "Trauma alone affects the supporting tissues, not the gingiva's inflammation.");
+nums("ot-num-1","occtrauma","handout","Which statements about the signs of occlusal trauma are true?",
+  ["A healthy PDL space is roughly 0.25 mm wide.", "Wear facets from grinding are a clinical indicator.", "Root resorption can be a radiographic sign.", "These signs appear only when occlusal trauma is present."],
+  [true,true,true,false], [[1, 2], [1, 2, 3, 4], [2, 3, 4]],
+  "Clinical signs include wear facets; radiographic ones include a widened PDL (normal about 0.25 mm) and root resorption. Every one of them can exist without occlusal trauma.",
+  ["about 0.25 mm in health; wider suggests mobility.",
+  "grinding leaves wear facets, a clinical indicator.",
+  "the slides list root resorption among the radiographic signs.",
+  "any of these signs can exist without occlusal trauma."]);
+nums("ot-num-2","occtrauma","hub","Which statements about tooth mobility are true?",
+  ["A periapical lesion can make a tooth mobile.", "On Dr. Abou-Arraj's scale, Class 1 is horizontal movement of up to 1 mm.", "Mobile teeth respond better than firm teeth to regenerative treatment.", "Class 2 mobility means the tooth has a hopeless prognosis."],
+  [true,true,false,false], [[1, 2, 3], [2, 4], [1, 4]],
+  "Mobility comes from periodontal disease, overload, a periapical lesion or surgery; Class 1 is up to 1 mm. Mobile teeth respond less well to treatment, but Class 2 isn't hopeless: find out why.",
+  ["an infection or abscess at the apex can loosen a tooth.",
+  "up to 1 mm horizontally is Class 1 on his scale.",
+  "mobile teeth respond less well to regeneration and grafting.",
+  "mobility can be adaptation; Class 2 isn't hopeless."]);
+nums("ot-num-3","occtrauma","handout","Which statements about forces on teeth are true?",
+  ["Bodily movement moves the whole tooth, crown and root, in one direction.", "Orthodontic tooth movement relies on jiggling forces.", "Tipping leans the crown in one direction.", "With reduced support, a tooth's center of rotation moves apically."],
+  [true,false,true,true], [[1, 3], [1, 2, 3, 4], [2, 3, 4]],
+  "Unilateral forces tip the crown or move the whole tooth bodily, the controlled movement orthodontics uses (not jiggling). With reduced support the center of rotation moves apically, like a shallow fence post.",
+  ["the whole tooth, root and crown, moves one way.",
+  "orthodontics uses controlled, unilateral forces, not jiggling.",
+  "a tipping movement leans the crown, mesially or distally.",
+  "it moves from mid-root toward the apical third."]);
+which("ot-ws-1","occtrauma","handout",
+  "Which statement about occlusal discrepancies and adjustment is true?",
+  [["Not every occlusal discrepancy in a periodontitis patient needs to be adjusted", "Not every discrepancy causes occlusal trauma, so careful patient selection."],
+   ["A CR-to-CO slide of less than 1 mm counts as an occlusal discrepancy", "The slide has to exceed 1 mm."],
+   ["In the randomized trial, adjustment improved probing depth more than attachment", "It was the attachment level that improved (about 0.5 mm); probing depth didn't change."],
+   ["In the randomized trial, Class 2 mobility kept adjustment from helping", "Initial mobility didn't affect the attachment response."]],
+  "Discrepancies (a CR-to-CO slide over 1 mm, non-working contacts) don't all cause trauma, so choose who gets adjusted. The trial's gain was in attachment, not probing depth, whatever the starting mobility.");
+which("ot-ws-2","occtrauma","hub",
+  "Which statement about fremitus and mobility is true?",
+  [["A tooth with fremitus usually has Class 3 mobility", "Fremitus isn't part of the scale, but a tooth that moves under the bite is usually Class 3."],
+   ["Fremitus is tested by pressing down on the occlusal surface", "That tests vertical mobility (Class 3); fremitus is felt on the facial gingiva while the patient taps."],
+   ["Class 2 mobility means the prognosis is hopeless", "Class 2 isn't hopeless: find out why the tooth is mobile."],
+   ["Mobile teeth respond better to soft tissue grafting than firm teeth", "Mobile teeth respond less well to treatment."]],
+  "Fremitus: movement under occlusal force, felt with a finger on the facial gingiva; usually a Class 3 tooth. Class 2 isn't hopeless, but mobile teeth respond less well to treatment.");
+whichf("ot-wf-1","occtrauma","hub",
+  "Which statement about the radiographic signs of occlusal trauma is false?",
+  [["A widened PDL space proves the tooth is mobile, with no clinical check needed", "This is the false one: a widened PDL suggests mobility, and you confirm it clinically."],
+   ["The lamina dura can be thickened or discontinued", "This is true: it can go either way."],
+   ["The bone loss can be in a furcation, vertical or circumferential", "This is true: all three are on his slide."],
+   ["Root resorption can be one of the signs", "This is true: in some cases."]],
+  "Radiographic indicators: a widened PDL (confirm the mobility clinically), a thickened or discontinued lamina dura, bone loss (furcation, vertical, circumferential) and root resorption, none of them proof by itself.");
+whichf("ot-wf-2","occtrauma","handout",
+  "Which statement about the 1970s animal experiments is false?",
+  [["They settle how occlusal trauma affects periodontitis in humans", "This is the false one: animal models and the studies' short duration leave questions about humans."],
+   ["Occlusal trauma alone increased the teeth's mobility", "This is true, in both groups."],
+   ["Occlusal trauma alone caused no loss of attachment", "This is true: bone density was lost, not attachment."],
+   ["One group used squirrel monkeys and the other beagle dogs", "This is true: Rochester's monkeys, Gothenburg's dogs."]],
+  "The animal studies showed trauma alone causes mobility and density loss, not attachment loss, and the groups disagreed about trauma with periodontitis; but animals and short studies leave the human question open.");
+multi("ot-sel-clin","occtrauma","handout","Select every clinical indicator of occlusal trauma on Dr. Abou-Arraj's slide.",
+  ["Tooth migration", "Wear facets from grinding", "Thermal sensitivity or pain on biting", "A widened PDL space", "Bleeding on probing"],
+  [0, 1, 2],
+  "Clinical: progressive mobility, migration, fremitus, prematurities, wear facets, fractured teeth, thermal sensitivity or pain on biting. A widened PDL is a radiographic sign, and bleeding on probing is inflammation.");
+multi("ot-sel-mob","occtrauma","handout","Select every cause of tooth mobility in Dr. Abou-Arraj's lecture.",
+  ["Progression of periodontal disease", "A periapical lesion", "A restoration left high in occlusion", "A carious lesion on the occlusal surface", "Gingival recession with no bone loss"],
+  [0, 1, 2],
+  "Causes of mobility: progression of periodontal disease, overloading (a high restoration), periapical lesions and periodontal surgery. Occlusal caries and recession without bone loss aren't on his list.");
+match("ot-match-anim","occtrauma","handout","Match each condition in the animal experiments to what happened.",
+  [["Occlusal trauma alone", "Less dense bone, no attachment loss; reversible"], ["Trauma plus gingivitis, normal support", "Even less dense bone; still no attachment loss"], ["Trauma plus periodontitis, reduced support", "The two animal groups disagreed"], ["Trauma stopped, periodontitis untreated", "No return to stability"]],
+  "Trauma alone and with gingivitis: density loss and mobility, no attachment loss. With periodontitis, the dogs lost more and the monkeys didn't. Stopping the trauma doesn't reverse untreated periodontitis.");
 /* ---------- READINGS (lecture notes synthesized from the recordings, slides and Dr. Givan's handouts) ----------
    Each lecture opens with a short "what's tested" list (LESSONS.md: lead with it) and puts look-alikes in a table.
    Narration (audio/<id>-full.mp3, -plain.mp3) is generated from this text: edit a level, regenerate its mp3. */
@@ -10209,7 +10439,7 @@ nccl: `
 <div class="tested"><b>What's tested</b><ul><li>Carious vs noncarious cervical lesions: the same place on the tooth, a different cause</li><li>The three causes of NCCLs, alone or together: abrasion (toothbrushing), abfraction (occlusion) and erosion (acid)</li><li>Abrasion: the toothpaste matters more than the toothbrush; relative dentin abrasivity (RDA); soft brushes, less pressure and the dominant-side clue</li><li>The evidence that not every NCCL comes from toothbrushing</li><li>Abfraction: why a load on an inclined plane makes a lesion at the cervical area (compression, tension and the fulcrum), its clues and the night guard</li><li>Erosion vs caries, where vomiting erodes and why, pH vs buffering capacity, and which drinks are worst</li><li>Matching the treatment to the cause, and when an NCCL needs a restoration</li></ul></div>
 <p>This lecture is Dr. Lawson's, prerecorded for the 11/12 session. He starts with a confession: as a dental student he wouldn't have known the difference between a <b>noncarious cervical lesion</b> (NCCL) and a <b>carious cervical lesion</b>. "I would have just said they're all class fives," without thinking hard about why a patient would need a filling down by the gum.</p>
 <h4>Carious or noncarious?</h4>
-<p>A lot of plaque can sit at the cervical area of a tooth, so <b>caries-mediated lesions</b> form there. They look like caries: <b>soft and brown</b>. They are difficult to restore, sitting under the gums in a patient at risk for caries, and a great option for them is <b>resin-modified glass ionomer</b>. <b>Noncarious cervical lesions</b> are in the same location but have a completely different etiology: they are caused by factors that are <b>not caries</b>.</p>
+<p>A lot of plaque can sit at the cervical area of a tooth, so <b>caries-mediated lesions</b> form there. They look like caries: <b>soft and brown</b>. They are difficult to restore, sitting under the gums in a patient at risk for caries, and a great option for them is <b>resin-modified glass ionomer</b>. <b>Noncarious cervical lesions</b> are in the same location but have a completely different etiology: they are caused by factors that are <b>not caries</b>. His first slide puts the two side by side: the carious lesion is <b>soft-looking</b> brown tooth structure, while a noncarious one can be brown too but looks <b>hard</b>.</p>
 <p>NCCLs are <b>multifactorial</b>. There are three causes, and a lesion can come from one of them, two of them or all three:</p>
 <div class="rv-table-wrap"><table class="rv-table"><thead><tr><th>Cause</th><th>Comes from</th><th>What to do about it</th></tr></thead><tbody>
 <tr><td>Abrasion</td><td>Toothbrushing, above all the toothpaste</td><td>A lower-RDA toothpaste; if it's already low, less pressure, with an electric toothbrush that has a pressure sensor</td></tr>
@@ -10218,33 +10448,34 @@ nccl: `
 </tbody></table></div>
 <h4>Abrasion: the toothbrush and the toothpaste</h4>
 <p><b>The evidence that brushing can do it.</b> At a lecture he once heard a researcher, <b>Dzakovich</b> ("I can't pronounce his name"), take the position that all NCCLs are produced by toothbrushing. His study brushed <b>extracted teeth set in artificial gums</b> and recreated the look of an NCCL by brushing near the gum line. It also showed that <b>commercial toothbrushes used without toothpaste did not create NCCLs</b>: the <b>toothpaste matters more than the toothbrush</b>. So when you suspect a patient's lesions come from abrasion, talk with them about the toothpaste they use.</p>
-<p><b>Relative dentin abrasivity (RDA)</b> rates how abrasive a toothpaste is: <b>the higher the number, the more abrasive</b>, and the lower the number, the less. Recommend toothpastes with <b>lower numbers</b>. On his chart, a Colgate whitening toothpaste is about 124, and Crest Pro-Health is always very high. You used to have to look a toothpaste up on a list; now you can ask an AI chatbot, which (live in the recording) gave the same 124 as the chart.</p>
-<p><b>The brush and how it's used.</b> Most dentists recommend a <b>soft-bristle toothbrush</b>. The study made the toothpaste look more important than the brush, but soft brushes aren't only about abrasion lesions: they are also for <b>gingival health</b>. "Sometimes I forget that there's the pink parts of the mouth." Oral hygiene has to consider both caries and periodontal health. Technique matters too: tell the patient to brush with <b>less pressure</b>. Pressure is hard to judge, so an <b>electric toothbrush with a pressure sensor</b> helps the patient make sure they aren't pressing too hard (he uses one himself).</p>
+<p><b>Relative dentin abrasivity (RDA)</b> rates how abrasive a toothpaste is: <b>the higher the number, the more abrasive</b>, and the lower the number, the less. Recommend toothpastes with <b>lower numbers</b>. His slide adds that a toothpaste's RDA <b>must be below 250 to get the ADA seal</b>. On his chart, a Colgate whitening toothpaste is about 124, and Crest Pro-Health is always very high. You used to have to look a toothpaste up on a list; now you can ask an AI chatbot, which (live in the recording) gave the same 124 as the chart.</p>
+<p><b>The brush and how it's used.</b> Most dentists recommend a <b>soft-bristle toothbrush</b>. The study made the toothpaste look more important than the brush, but soft brushes aren't only about abrasion lesions: they are also for <b>gingival health</b>. "Sometimes I forget that there's the pink parts of the mouth." Oral hygiene has to consider both caries and periodontal health. Technique matters too: tell the patient to brush with <b>less pressure</b>. Pressure is hard to judge, so an <b>electric toothbrush with a pressure sensor</b>, which changes color if you press too hard, helps the patient make sure they aren't pressing too hard (he uses one himself).</p>
 <p><b>The dominant-side clue.</b> People push harder on the side of their dominant hand, while on the other side they have to pull. So abrasion that looks <b>worse on the patient's dominant side</b> than on the other side points to the toothbrush. A patient with abrasion lesions on the left side but not the right? Ask, "Are you left-handed?" Those are the patients to coach on brushing more gently, perhaps with an electric toothbrush with a sensor.</p>
 <h4>Not every NCCL comes from toothbrushing</h4>
 <p>Some people say all NCCLs come from toothbrushing. That isn't true, and there is evidence against it:</p>
 <ul><li>Studies of populations with <b>leprosy</b>, people <b>unable to brush their own teeth</b>, found NCCLs.</li><li><b>Archaeological populations</b> had NCCLs in times and places where toothbrushes hadn't been invented yet.</li><li><b>Animals</b> get them: his mentor, Dr. Burgess, showed a camel with an NCCL, and a study shows NCCLs in a cat (they don't look quite like the ones in people).</li><li>NCCLs form where a toothbrush doesn't easily go: on the <b>palate</b>, where people don't usually brush, and even <b>subgingivally</b>, where the bristles can't reach.</li></ul>
 <p>So some NCCLs are caused by toothbrushing, and the rest need another cause.</p>
 <h4>Abfraction: the occlusion</h4>
-<p>How can a load on the occlusal surface make a lesion on the side of the tooth, at the cervical area? Studies show that <b>loads on the inclined planes of the occlusal surface cause stress at the cervical part of the tooth</b>. In materials science, things are almost always <b>stronger in compression than in tension</b> (being pulled apart). A load the tooth isn't supposed to have, on an inclined plane, pushes the crown to one side. The <b>fulcrum</b> is where the tooth is anchored in the bone. One side of the tooth is compressed; on the other side, <b>tensile forces</b> pull apart the bonds within the tooth structure, and where those tensile stresses are, <b>abfraction lesions</b> can form, <b>just above the fulcrum</b>.</p>
+<p>How can a load on the occlusal surface make a lesion on the side of the tooth, at the cervical area? Studies using <b>finite element analysis</b> (FEA), the stress images on his slide, show that <b>loads on the inclined planes of the occlusal surface cause stress at the cervical part of the tooth</b>. In materials science, things are almost always <b>stronger in compression than in tension</b> (being pulled apart). A load the tooth isn't supposed to have, on an inclined plane, pushes the crown to one side. The <b>fulcrum</b> is where the tooth is anchored in the bone. One side of the tooth is compressed; on the other side, <b>tensile forces</b> pull apart the bonds within the tooth structure, and where those tensile stresses are, <b>abfraction lesions</b> can form, <b>just above the fulcrum</b>.</p>
 <p>His analogy: push on a <b>stop sign</b>. It is anchored in the ground (the fulcrum), the side being stretched is under tension, and that's where the damage can occur. In the tooth, the fulcrum is where it is anchored in the bone, and the NCCL forms just above it.</p>
 <p><b>How would you know</b> a lesion is abfraction and not abrasion? "It's hard to know," but look for clues that the patient loads their teeth heavily: <b>exostoses and tori</b> sometimes accompany NCCLs, along with <b>opposing wear facets</b> or other <b>generalized wear</b> that shows the patient is wearing their teeth.</p>
 <p><b>What to do:</b> an <b>occlusal splint</b>, a night guard (he apologizes in advance to Dr. Givan if that isn't the right term). This one <b>isn't treating TMD</b>: it is a piece of plastic between the patient's teeth, so they grind a <b>sacrificial piece of plastic</b> instead of their teeth. Any of these lesions can also be <b>restored for esthetic reasons</b> if needed.</p>
 <p class="reading-note">Dr. Givan's L7 slides add a caution: abfraction is supported by in vitro studies, but clinical documentation has neither validated nor rejected it, so he doesn't count it as a primary mechanism of wear. Both lectures agree that NCCLs are multifactorial.</p>
 <h4>Erosion: acid that isn't caries</h4>
 <p>In a sense all destruction of teeth comes down to acid: a cavity is <b>lactic acid</b> dissolving enamel. But caries is <b>bacteria-mediated</b> demineralization, so it occurs only where <b>plaque stagnates</b>: the cervical areas of the teeth, around orthodontic brackets, the occlusal grooves, and proximally just below the contact point. <b>Erosion</b> happens wherever acidic <b>fluids sit</b>, and it isn't the same as caries.</p>
+<p>His slide sets the two side by side. <b>Bacteria-induced</b> demineralization (caries): a <b>white spot lesion</b> at the cervical area, white spots after orthodontics, <b>occlusal</b> caries and <b>interproximal</b> caries. <b>Chemical-induced</b> demineralization (erosion): the <b>cusp tips</b>, the <b>lingual of the maxillary anteriors</b> (internal acids, such as vomiting), the <b>incisal edges</b> (with tooth wear) and the <b>buccal</b> surfaces (with toothbrush wear).</p>
 <p><b>Cupped-out cusp tips.</b> Why do eroded molars show cupped-out areas where the cusp tips used to be? (A side point, he said, "not totally related to this lecture," but one he always thought was cool.) It's a <b>combination of wear and erosion</b>. The patient wears through the enamel of a cusp tip until a pinpoint of dentin shows: the <b>dentin horn</b> under each cusp. As soon as that dentin is exposed, acid <b>selectively dissolves it</b>, because <b>dentin has a higher critical pH than enamel</b>.</p>
 <p><b>Vomiting</b> (bulimia, or anyone who throws up a lot) erodes the <b>lingual of the maxillary teeth</b>, mostly the anterior teeth: the facial surfaces are protected by the <b>lip</b>, and the lingual of the mandibular teeth by the <b>tongue</b>. And when acidic fluids sit at the cervical area of the teeth, they make <b>noncarious cervical lesions</b>.</p>
 <h4>Talking to patients about what they drink</h4>
 <p>The first thing to do about erosion is to talk with patients about the acidic things they eat and drink. A dental school classmate of his measured the <b>pH</b> of a whole range of beverages and ranked them from the lowest pH (the worst) to higher. <b>Don't assume patients know what pH numbers mean</b>: plenty of very smart people don't. Give them reference points (he likens the most acidic end of the chart to battery acid; <b>water is 7</b>) and tell them how acidic some of their drinks are.</p>
-<p>His chart covers more than soft drinks. <b>Coffee</b>: adding <b>milk makes it less acidic</b> (good news for his cappuccinos), and <b>tea is better than coffee</b>. <b>Sparkling waters</b>: what sets their acidity is the <b>amount of carbonic acid</b>, not the flavor, so the <b>bubblier, more carbonated</b> ones are <b>more acidic</b>.</p>
+<p>His chart covers more than soft drinks. <b>Coffee</b>: adding <b>milk makes it less acidic</b> (good news for his cappuccinos), and <b>tea is better than coffee</b>. <b>Sparkling waters</b>: what sets their acidity is the <b>amount of carbonic acid</b>, not the flavor, so the <b>bubblier, more carbonated</b> ones are <b>more acidic</b>. His slide puts it as <b>the brand more than the flavor</b>: brands differ in how much carbonic acid they hold, how bubbly they are.</p>
 <h4>pH vs buffering capacity</h4>
 <p>A newer idea is <b>buffering capacity</b>: how much bicarbonate, and so how much of your saliva, it takes to neutralize a drink. If a drink with a pH of 4 takes a lot of bicarbonate to neutralize, it has a <b>high buffering capacity, and that's bad</b>. If it takes only a little saliva, it has a <b>low buffering capacity, and that's good</b>: it is easier to neutralize after you eat or drink it.</p>
-<p>pH and buffering capacity sound as if they should be the same thing, but they aren't, and they are measured differently. You measure <b>pH</b> by putting a <b>pH probe</b> in the solution. You measure <b>buffering capacity</b> by <b>adding bicarbonate a little at a time</b> and measuring how much it takes to bring the pH back to neutral.</p>
-<p>A dental student in their lab (later a resident, now an endodontist) measured both for a whole range of beverages. Ranked by buffering capacity, the drinks stayed in about the same order as by pH, with two exceptions: <b>orange juice and wine</b> became "way, way bad." People drink orange juice all the time, so for a patient with a lot of erosion, ask about <b>citrus drinks</b>. <b>Citric acid is a chelator</b>: it wraps around <b>calcium</b>, so citrus drinks and citrus fruit can be extremely erosive to enamel.</p>
-<p>Telling a patient with erosion to drink only water and milk may make them "lose the will to live," so give them something good that isn't bad for their teeth: <b>Milo's sweet tea</b>, and made with Splenda it has no fermentable sugar either.</p>
+<p>pH and buffering capacity sound as if they should be the same thing, but they aren't, and they are measured differently. You measure <b>pH</b> by putting a <b>pH probe</b> in the solution. You measure <b>buffering capacity</b> by <b>adding bicarbonate a little at a time</b> and measuring how much it takes to bring the pH back toward neutral (in their experiment, to a pH of 6.5).</p>
+<p>A dental student in their lab (later a resident, now an endodontist) measured both for a whole range of beverages. Ranked by buffering capacity, the drinks stayed in about the same order as by pH, with two exceptions: <b>orange juice and wine</b> became "way, way bad." On his slide their pH is about 3.6 and 4.0, not the lowest on the chart (the most acidic drink is 2.5), yet they took the most bicarbonate to neutralize. People drink orange juice all the time, so for a patient with a lot of erosion, ask about <b>citrus drinks</b>. <b>Citric acid is a chelator</b>: it wraps around <b>calcium</b>, so citrus drinks and citrus fruit can be extremely erosive to enamel.</p>
+<p>Telling a patient with erosion to drink only water and milk may make them "lose the will to live," so give them something good that isn't bad for their teeth: <b>Milo's tea</b>. His slide says the unsweet tea; in the recording it's the sweet tea, which, made with Splenda, has no fermentable sugar either.</p>
 <h4>Raising the pH</h4>
-<p>He measured the pH of many <b>mouth rinses</b> too ("kind of a waste of time"): some are low, but you rinse for about 30 seconds, maybe twice a day, so it's probably not a big deal.</p>
+<p>He measured the pH of many <b>mouth rinses</b> too ("kind of a waste of time"): some are low (as low as about 3.2 on his slide), but you rinse for about 30 seconds, maybe twice a day, so it's probably not a big deal.</p>
 <p>For a patient with a lot of erosion, you can raise the mouth's pH with a base: <b>bicarbonate</b>. <b>Basic Bites</b> are candies that contain <b>bicarbonate</b> and <b>arginine</b>, a prebiotic, and they can help raise the pH of the mouth (he brought them up as an aside, and they are back in his summary). A patient can also rinse with <b>baking soda</b>, which is bicarbonate.</p>
 <p>Some advice makes sense but, as far as he knows, has no evidence behind it ("kind of wives' tales"):</p>
 <ul><li>Keep acidic drinks to <b>mealtimes</b> (maybe the cheese on your hamburger helps neutralize your Coca-Cola).</li><li>Drink through a <b>straw</b> (he teases a colleague who sends his Diet Coke straight past his teeth).</li><li><b>Rinse with water</b> after drinking soda or juice.</li></ul>
@@ -10252,6 +10483,7 @@ nccl: `
 <h4>Match the treatment to the cause</h4>
 <p>There is value in figuring out the etiology of an NCCL, because then you can treat the cause. If all of a patient's lesions come from sucking on lemons all day, there's little point in talking about the RDA of their toothpaste. To keep the lesions from getting bigger:</p>
 <ul><li><b>Toothbrushing:</b> switch to a lower-RDA toothpaste. If it's already low, the patient may be pressing too hard: an electric toothbrush with a pressure sensor.</li><li><b>Acid:</b> switch to a less acidic drink; rinse with water after meals (he doesn't know of evidence for it); bicarbonate, such as Basic Bites.</li><li><b>Abfraction:</b> a night guard.</li></ul>
+<p>His slide calls this "what I tell patients," since "who really knows what causes NCCLs": if they don't hurt, look ugly or come near the pulp, he doesn't need to fill them; try to stop them from getting bigger; switch toothpaste; an electric toothbrush with a sensor; more Milo's unsweet tea; rinse with water after meals and acidic foods; and a night guard, with a question mark. The slide's ways to cut acidity (non-water drinks only at mealtimes, a straw, a water rinse after soda or juice) have only anecdotal evidence.</p>
 <h4>When to restore an NCCL</h4>
 <p>What he learned in dental school (not official, he says): you don't necessarily need to restore an NCCL if it is <b>cleansable</b>, <b>doesn't hurt</b>, <b>doesn't look bad</b> and <b>isn't so deep that it is getting close to the pulp</b>. A lesion that can't be cleaned, hurts, looks bad or is deep is the one to restore.</p>
 <p class="reading-note">The same idea as Dr. Givan's L7 slides, which restore NCCLs only when it becomes necessary (progression, sensitivity, poor esthetics, food collection). Find the cause, treat it, and restore when a lesion is a problem.</p>
@@ -10577,11 +10809,11 @@ nccl: `
 <div class="tested"><b>What's tested</b><ul><li>Cavities vs notches at the gumline: the same spot, a different cause</li><li>The three causes of the notches, alone or together: brushing, biting forces and acid</li><li>Brushing: the toothpaste matters more than the brush; the RDA number; soft brushes, less pressure; worse on the side of the hand you brush with</li><li>Why not every notch comes from brushing</li><li>Biting forces (abfraction): how a push on the biting surface makes a notch at the neck of the tooth, its clues and the night guard</li><li>Acid: erosion vs cavities, where throwing up does damage, pH vs buffering capacity, and the worst drinks</li><li>Fix the cause, and when to fill a notch</li></ul></div>
 <p>This lecture is Dr. Lawson's, recorded ahead of time for the 11/12 class. It's about <b>noncarious cervical lesions</b> (NCCLs): notches worn into a tooth at the gumline that <b>aren't cavities</b>.</p>
 <h4>Cavity or not?</h4>
-<p>Plaque collects at the gumline, so cavities form there too. Those look like cavities: <b>soft and brown</b>, and a good filling for them is <b>resin-modified glass ionomer</b>. NCCLs sit in the same spot but have a different cause: <b>not decay</b>. There are <b>three causes</b>, and a notch can have one, two or all three:</p>
+<p>Plaque collects at the gumline, so cavities form there too. Those look like cavities: <b>soft and brown</b>, and a good filling for them is <b>resin-modified glass ionomer</b>. NCCLs sit in the same spot but have a different cause: <b>not decay</b>. They can be brown too, but they look hard. There are <b>three causes</b>, and a notch can have one, two or all three:</p>
 <ul><li><b>Abrasion</b>: from brushing.</li><li><b>Abfraction</b>: from biting forces.</li><li><b>Erosion</b>: from acid.</li></ul>
 <h4>Brushing (abrasion)</h4>
 <p>A researcher (Dzakovich) brushed pulled teeth set in fake gums and made notches like the real ones near the gum line. <b>Brushing without toothpaste made no notches</b>, so <b>the toothpaste matters more than the brush</b>. Ask what toothpaste the patient uses.</p>
-<p>A toothpaste's <b>RDA</b> (relative dentin abrasivity) says how scratchy it is: <b>a higher number means more abrasive</b>. Pick a low one. (A Colgate whitening paste is about 124; Crest Pro-Health is always high.)</p>
+<p>A toothpaste's <b>RDA</b> (relative dentin abrasivity) says how scratchy it is: <b>a higher number means more abrasive</b>. Pick a low one; to get the ADA seal, it must be <b>below 250</b>. (A Colgate whitening paste is about 124; Crest Pro-Health is always high.)</p>
 <p>Still use a <b>soft brush</b>: it protects the <b>gums</b> too. Brush with <b>less pressure</b>; an <b>electric toothbrush with a pressure sensor</b> helps. A clue: people press harder on the side of the hand they brush with, so brushing notches are <b>worse on that side</b>. Notches only on the left? Ask if the patient is left-handed.</p>
 <h4>Not every notch is from brushing</h4>
 <p>People with leprosy who couldn't brush their own teeth, ancient people from before toothbrushes, and animals (a camel, a cat) have had these notches. They also show up on the <b>roof of the mouth</b>, where people don't brush, and <b>under the gums</b>, where bristles can't reach. So something else causes some of them.</p>
@@ -10590,9 +10822,10 @@ nccl: `
 <p>It's hard to tell for sure, but clues are <b>bony bumps</b> (tori and exostoses) and <b>worn, matching spots</b> on the teeth from grinding. The fix: a <b>night guard</b>, a piece of plastic to grind on instead of the teeth (here it isn't a treatment for jaw joint problems). Dr. Givan's L7 adds that abfraction is shown in the lab but not yet proven in patients.</p>
 <h4>Acid (erosion)</h4>
 <p>Cavities are acid too, but made by bacteria where plaque sits. <b>Erosion</b> is acid from what we eat, drink or bring up, wherever the liquid sits. Cupped-out molar tips come from <b>wear plus acid</b>: once the enamel wears through and the dentin underneath shows, the acid eats the dentin faster, because <b>dentin starts to dissolve at a higher pH than enamel</b>. <b>Throwing up</b> erodes the <b>tongue side of the upper teeth</b>: the lip protects the outside surfaces, and the tongue covers the lower teeth.</p>
+<p>Acid shows up where bacteria don't: the <b>cusp tips</b>, the tongue side of the upper front teeth, worn <b>biting edges</b>, and the cheek side where brushing has worn it. Cavities show up where plaque sits: white spots at the gumline or after braces, the grooves, and between the teeth.</p>
 <h4>Drinks</h4>
-<p>Talk to patients about acidic drinks, and explain pH simply (water is 7; lower is more acidic). <b>Milk in coffee</b> makes it less acidic, and <b>tea beats coffee</b>. In sparkling water, <b>more bubbles means more acid</b>; the flavor doesn't matter.</p>
-<p><b>Buffering capacity</b> is how much saliva (bicarbonate) it takes to neutralize a drink. <b>Needing more is worse.</b> pH is read with a probe; buffering capacity is measured by adding bicarbonate bit by bit until the pH is back to neutral. Measured that way, <b>orange juice and wine</b> are much worse than their pH alone suggests. <b>Citric acid grabs calcium</b> (it's a chelator), so citrus is very erosive. Safer choices: water, milk, or Milo's sweet tea (no fermentable sugar if it's made with Splenda).</p>
+<p>Talk to patients about acidic drinks, and explain pH simply (water is 7; lower is more acidic). <b>Milk in coffee</b> makes it less acidic, and <b>tea beats coffee</b>. In sparkling water, <b>more bubbles means more acid</b>; the brand matters more than the flavor.</p>
+<p><b>Buffering capacity</b> is how much saliva (bicarbonate) it takes to neutralize a drink. <b>Needing more is worse.</b> pH is read with a probe; buffering capacity is measured by adding bicarbonate bit by bit until the pH is back to neutral. Measured that way, <b>orange juice and wine</b> are much worse than their pH alone suggests. <b>Citric acid grabs calcium</b> (it's a chelator), so citrus is very erosive. Safer choices: water, milk, or Milo's tea (unsweet on his slide; the sweet tea has no fermentable sugar if it's made with Splenda).</p>
 <h4>Raising the pH</h4>
 <p>Mouth rinses can be acidic, but you don't rinse for long, so he isn't worried about them. To raise the mouth's pH, use a <b>base</b>: <b>bicarbonate</b>, as in a baking soda rinse or Basic Bites candies (bicarbonate plus arginine). Rinsing with water, keeping acidic drinks to mealtimes and using a straw make sense but aren't proven. Water doesn't neutralize much: pH is a <b>log scale</b>, so you'd need a swimming pool of it. A base works.</p>
 <h4>Fix the cause, then decide on a filling</h4>
@@ -11179,7 +11412,7 @@ var REVIEW = [
   { title:'Carious or noncarious?', type:'table', head:['','Carious cervical lesion','Noncarious cervical lesion'], rows:[
     ["Where", "The cervical area, where plaque sits", "The same place"],
     ["Cause", "Caries: bacteria and stagnant plaque", "Abrasion, abfraction or erosion, alone or together"],
-    ["Looks", "Soft and brown", "Not decay"],
+    ["Looks", "Soft-looking and brown", "Hard-looking (it can be brown too)"],
     ["Restore?", "Yes; resin-modified glass ionomer is a great option (under the gums, a caries-risk patient)", "Only if it can't be cleaned, hurts, looks bad or is deep; treat the cause first"]
   ]},
   { title:'Not every NCCL is from brushing', type:'list', items:[
@@ -11197,19 +11430,25 @@ var REVIEW = [
   ] },
   { title:'Abfraction, drawn', type:'figs', figs:['abfract'] },
   { title:'Erosion, drawn: cupped cusp tips and where vomiting erodes', type:'figs', figs:['cupping','erosion9'] },
+  { title:'Where acid demineralizes (his slide)', type:'table', head:['Bacteria-induced (caries)','Chemical-induced (erosion)'], rows:[
+    ["A white spot lesion at the cervical area", "The cusp tips"],
+    ["White spots after orthodontics", "The lingual of the maxillary anteriors (internal acids)"],
+    ["Occlusal caries", "The incisal edges (with tooth wear)"],
+    ["Interproximal caries", "The buccal surfaces (with toothbrush wear)"]
+  ]},
   { title:'pH vs buffering capacity', type:'table', head:['','pH','Buffering capacity'], rows:[
     ["What it tells you", "How acidic the drink is (water is 7; lower is more acidic)", "How much bicarbonate (saliva) it takes to neutralize the drink"],
-    ["How it's measured", "A pH probe in the solution", "Add bicarbonate a little at a time until the pH is back to neutral"],
+    ["How it's measured", "A pH probe in the solution", "Add bicarbonate a little at a time until the pH is back toward neutral (6.5 in his lab's experiment)"],
     ["Which way is bad", "Lower", "Higher"],
     ["What it changes", "The order of the drinks on his chart", "About the same order, but orange juice and wine get much worse"]
   ]},
   { title:'pH vs buffering capacity, drawn', type:'figs', figs:['buffer'] },
   { title:'Drinks and the mouth\'s pH', type:'list', items:[
     "Coffee: milk makes it less acidic; tea is better than coffee",
-    "Sparkling water: the carbonic acid sets the acidity, not the flavor, so bubblier is more acidic",
+    "Sparkling water: the carbonic acid sets the acidity, so bubblier is more acidic (the brand more than the flavor)",
     "Citric acid is a chelator: it binds calcium, so citrus is extremely erosive",
-    "Safer: water, milk, Milo's sweet tea (with Splenda, no fermentable sugar)",
-    "Mouth rinses: some are low pH, but 30 seconds twice a day is probably not a big deal",
+    "Safer: water, milk, Milo's tea (unsweet on his slide; the sweet tea with Splenda in the recording)",
+    "Mouth rinses: some are low pH (about 3.2), but 30 seconds twice a day is probably not a big deal",
     "Water only dilutes (pH is logarithmic: \"a swimming pool of water\"); a base such as bicarbonate neutralizes",
     "Sensible but unproven: acidic drinks at mealtimes, a straw, a water rinse afterward"
   ] },
@@ -11218,6 +11457,62 @@ var REVIEW = [
     "Restore one that fails any of those; any NCCL can be restored for esthetics",
     "Dr. Givan (L7): restore when it becomes necessary: progression, sensitivity, poor esthetics, food collection",
     "Treat the cause too, or the lesion keeps growing"
+  ] }
+]},
+{ id:'occtrauma', lec:'occtrauma', title:'Occlusion and the Periodontium: Occlusal Trauma', icon:'tooth', blurb:"Dr. Abou-Arraj (11/12): occlusal trauma, primary vs secondary, jiggling forces, the signs, mobility, what the animal studies showed, and when to adjust the occlusion. His word on the studies: \"Conclusions are enough.\"",
+  sections:[
+  { title:'Primary vs secondary occlusal trauma', type:'table', head:['','Primary','Secondary'], rows:[
+    ["The forces", "Traumatic (excessive)", "Normal or traumatic"],
+    ["The support", "Normal bone and attachment levels", "Reduced: bone and attachment already lost"],
+    ["Center of rotation", "About mid-root", "Moved apically, toward the apical third (the shallow fence post)"],
+    ["Histology", "The same as secondary", "The same as primary: the difference is clinical"]
+  ]},
+  { title:'The signs', type:'table', head:['Clinical','Radiographic'], rows:[
+    ["Progressive mobility", "A widened PDL space (normal about 0.25 mm)"],
+    ["Tooth migration", "A thickened or discontinued lamina dura"],
+    ["Fremitus: movement under occlusal force, felt on the facial gingiva", "Bone loss: furcation, vertical, circumferential"],
+    ["Prematurities or discrepancies; wear facets; fractured teeth; thermal sensitivity or pain on biting", "Root resorption"]
+  ]},
+  { title:'Read the signs right', type:'list', items:[
+    "Occlusal trauma is confirmed only histologically: the signs are surrogates, so it's a diagnosis, not a finding",
+    "Any of the signs can exist without occlusal trauma",
+    "A vertical defect does not mean occlusal trauma (trauma with bone loss tends to be vertical, not the reverse)",
+    "Fremitus isn't a mobility grade, but a tooth with it usually has Class 3 mobility"
+  ] },
+  { title:'Mobility (Dr. Abou-Arraj\'s scale)', type:'table', head:['Degree','Movement'], rows:[
+    ["0", "Physiologic, 0.1-0.2 mm horizontally"],
+    ["1", "Up to 1 mm horizontally"],
+    ["2", "More than 1 mm horizontally, visibly"],
+    ["3", "Horizontal and vertical (into the socket when pressed); impinges on function"],
+    ["L7 (Dr. Givan)", "Miller graded differently: 1 barely distinguishable, 2 up to 1 mm, 3 more than 1 mm or depressed"]
+  ]},
+  { title:'Mobility: what to know', type:'list', items:[
+    "Depends on the height of the alveolar bone, the width of the PDL, and the shape and number of roots",
+    "Causes: progression of periodontal disease, overload (a restoration left high), a periapical lesion, periodontal surgery (up to a year)",
+    "Measured buccolingually between two rigid instruments",
+    "A sign of adaptation: Class 2 isn't hopeless; find out why the tooth is mobile",
+    "Mobile teeth respond less well to treatment (regeneration, grafting): bring Class 2 to Class 1 if you can"
+  ] },
+  { title:'What the animal experiments showed', type:'table', head:['Condition','Result'], rows:[
+    ["Trauma alone", "More mobility, less dense bone; no attachment loss; back to stability once the trauma stopped"],
+    ["Trauma + gingivitis (normal support)", "More mobility, even less dense bone; still no attachment loss"],
+    ["Trauma + periodontitis (reduced support)", "Beagle dogs: more attachment and bone loss (co-destruction a reality). Squirrel monkeys: none beyond the disease (a question)"],
+    ["Trauma stopped, periodontitis untreated", "No return to stability: stopping the trauma doesn't reverse periodontitis"]
+  ]},
+  { title:'Occlusal adjustment', type:'list', items:[
+    "An occlusal discrepancy: a CR-to-CO slide over 1 mm, or non-working contacts in lateral movements",
+    "The randomized trial: about 0.5 mm more attachment gain at two years, no change in probing depth, whatever the starting mobility",
+    "Not every discrepancy causes occlusal trauma: careful patient selection",
+    "When: after the inflammation is treated (at re-evaluation); early only if acute, like fremitus at the first exam",
+    "It may reduce mobility and help bone regrow, but it won't stop breakdown from plaque"
+  ] },
+  { title:'His conclusions', type:'list', items:[
+    "Occlusal trauma doesn't cause gingivitis or periodontitis; it affects the supporting tissues",
+    "No evidence from human studies that it speeds attachment loss in periodontitis",
+    "Alone, it resorbs bone in density (and the PDL), not height; reversible once the force is gone",
+    "Adjustment: less mobility and some bone regrowth, but plaque breakdown goes on",
+    "Healing after periodontal therapy may be better in non-mobile teeth",
+    "Adjust after successful anti-infective periodontal therapy"
   ] }
 ]},
 /* =================================================================== PROCESSES */
@@ -11262,7 +11557,9 @@ var REVIEW = [
     ['Balancing contacts','Natural teeth: non-working interferences, removed','Dentures: wanted, so the one-piece denture doesn\'t tip'],
     ['Retention vs stability','Retention: resists dislodgement away from the tissues; bothers patients','Stability: resists horizontal force; its failure hurts, and it matters most'],
     ["Carious vs noncarious cervical lesion", "Carious: plaque and bacteria; soft and brown; resin-modified glass ionomer", "Noncarious: the same place, but abrasion, abfraction or erosion"],
-    ["pH vs buffering capacity", "pH: how acidic, read with a probe; lower is worse", "Buffering capacity: the bicarbonate it takes to neutralize; higher is worse"]
+    ["pH vs buffering capacity", "pH: how acidic, read with a probe; lower is worse", "Buffering capacity: the bicarbonate it takes to neutralize; higher is worse"],
+    ["Primary vs secondary occlusal trauma", "Primary: traumatic force, normal support (nothing lost)", "Secondary: normal or traumatic force, reduced support; the histology is the same"],
+    ["Unilateral vs jiggling force", "Unilateral: pressure one side, tension the other (tipping, bodily, orthodontics)", "Jiggling: from both sides; an hourglass-shaped widened PDL, bone loss, mobility"]
   ]}
 ]},
 ];
@@ -11300,10 +11597,11 @@ dentures:['Goal: keep the floating prosthesis in the mouth; balance = resisting 
 'Slides\' table: balanced best for esthetics and stability in function; non-balanced simplest, easiest to adjust, least lateral force, Class II and III',
 'Thielemann: CG and PO fixed; AG, CC, CA variable. Hanau: Realeff, heavy M1 contacts, refine by remount','Chewing: food on both sides, vertical, premolars, small bites; no balance with a bolus between the teeth','Porcelain: no bond (pins, diatorics), hard to adjust. Composite: bonds, the go-to, but a reverse curve in 5-7 years. Acrylic: cheap, wears, temporary',
 'Tooth forms: anatomic 30-33°, semi-anatomic 12-22° (functional), flat 0° (cuspless, zero-degree, rational, monoline)','Maxillary anterior mold sets the rest; chosen on esthetics (soft or bold, square, tapering, ovoid)','Berry 1/16 bizygomatic and ala-to-ala: not valid, but look good. Wax rim = lip support, incisal edge, plane','Flat teeth clinically as successful as anatomic; chewing is one factor of many. Abduo 2013: cusps preferred for acceptance','Partials: more teeth left = dentate occlusion; more lost = denture thinking'],
-nccl:["Carious vs noncarious cervical lesion: the same place, a different cause; carious = soft, brown, RMGI","Three causes, alone or together: abrasion (brushing), abfraction (occlusion), erosion (acid)","Brushing study: toothpaste > toothbrush (no toothpaste, no lesions). RDA: higher = more abrasive; pick low","Soft brush for the gums too; less pressure (electric brush with a pressure sensor); worse on the dominant side","Not all from brushing: leprosy (couldn't brush), archaeological, animals, the palate, subgingival","Abfraction: inclined-plane load flexes the tooth; weaker in tension; lesion just above the fulcrum (bone); stop sign","Abfraction clues: exostoses, tori, opposing wear facets, generalized wear. Fix: night guard (sacrificial, not TMD)","Caries: lactic acid where plaque stagnates. Erosion: wherever acid sits. Dentin's critical pH > enamel's (cupped cusps)","Vomiting: maxillary linguals (the lip guards the facials, the tongue the mandibular linguals)","Buffering capacity = bicarbonate (saliva) needed to neutralize; high = bad. OJ and wine much worse; citric acid chelates Ca","Milk makes coffee less acidic; tea > coffee; bubblier sparkling water = more acidic; mouth rinses: not a big deal","Water dilutes (log scale), bicarbonate neutralizes (baking soda, Basic Bites); mealtimes, straw, water rinse: unproven","Fix the cause first. Restore if it can't be cleaned, hurts, looks bad, or is deep near the pulp"]
+nccl:["Carious vs noncarious cervical lesion: the same place, a different cause; carious = soft, brown, RMGI","Three causes, alone or together: abrasion (brushing), abfraction (occlusion), erosion (acid)","Brushing study: toothpaste > toothbrush (no toothpaste, no lesions). RDA: higher = more abrasive; pick low; under 250 for the ADA seal","Soft brush for the gums too; less pressure (electric brush with a pressure sensor); worse on the dominant side","Not all from brushing: leprosy (couldn't brush), archaeological, animals, the palate, subgingival","Abfraction: inclined-plane load flexes the tooth; weaker in tension; lesion just above the fulcrum (bone); stop sign","Abfraction clues: exostoses, tori, opposing wear facets, generalized wear. Fix: night guard (sacrificial, not TMD)","Caries: lactic acid where plaque stagnates. Erosion: wherever acid sits. Dentin's critical pH > enamel's (cupped cusps)","Vomiting: maxillary linguals (the lip guards the facials, the tongue the mandibular linguals)","Acid sites: cusp tips, maxillary anterior linguals, incisal edges (wear), buccal (brushing). Bacteria: cervical and post-ortho white spots, occlusal, interproximal","Buffering capacity = bicarbonate (saliva) needed to neutralize; high = bad. OJ and wine much worse; citric acid chelates Ca","Milk makes coffee less acidic; tea > coffee; bubblier sparkling water = more acidic; mouth rinses: not a big deal","Water dilutes (log scale), bicarbonate neutralizes (baking soda, Basic Bites); mealtimes, straw, water rinse: unproven","Fix the cause first. Restore if it can't be cleaned, hurts, looks bad, or is deep near the pulp"],
+occtrauma:["Occlusal trauma: injury (tissue changes) in the attachment apparatus from occlusal force; the force initiates, the injury is the trauma","Primary: traumatic force, normal support. Secondary: normal or traumatic force, reduced support. Same histology; clinical difference","Reduced support: center of rotation moves apically (the fence post); jiggling (both sides) = hourglass PDL widening","Confirmed only histologically: signs are surrogates (a diagnosis, not a finding)","Clinical: progressive mobility, migration, fremitus (tap, finger on the facial gingiva), discrepancies, wear facets, fractures, pain on biting","X-ray: widened PDL (normal about 0.25 mm), lamina dura thick or broken, bone loss, root resorption. A vertical defect isn't proof","Mobility depends on bone height, PDL width, roots. Causes: perio, overload (high crown), periapical lesion, surgery (up to a year)","His scale: 0 physiologic 0.1-0.2 mm; 1 up to 1 mm; 2 over 1 mm; 3 plus vertical (L7's Miller differs). Class 2 isn't hopeless; mobile teeth heal less well","Animals: trauma alone = mobility, density loss, no attachment loss, reversible; + gingivitis = more density loss, still none","+ periodontitis: dogs more loss (co-destruction real), monkeys none; stopping trauma doesn't reverse periodontitis","Discrepancy: CR-to-CO slide over 1 mm, non-working contacts. Trial: about 0.5 mm attachment gain, no PD change","Adjust after anti-infective therapy (re-evaluation), unless acute (fremitus at the first exam); not every discrepancy","Bottom line: no gingivitis or periodontitis from trauma; density not height, reversible; adjustment won't stop plaque"]
 };
 
-/* ---------- EXAM HINTS (quotes from the recordings, 9/17 through 11/5 and Dr. Lawson's prerecorded L9; obvious transcription errors in terms corrected, e.g. "central occlusion" → "centric occlusion") ---------- */
+/* ---------- EXAM HINTS (quotes from the recordings, 9/17 through 11/12, with Dr. Lawson's prerecorded L9; obvious transcription errors in terms corrected, e.g. "central occlusion" → "centric occlusion") ---------- */
 var HINTS = [
   { lec:'review', kind:'emphasize', quote:'You will have questions on the exams that will be the ones that you\'ll see repeatedly through the years of what cusp are we talking about, you know, if we\'re doing a crown or if we\'re moving a tooth or whatever is there.', take:'"What cusp hits where" (the help sheet) is a recurring exam topic.' },
   { lec:'review', kind:'emphasize', quote:'The bottom line is this, is that in an exam, if I use the term centric occlusion, this is what I mean, okay? I never mean, you know, the same thing as MIP.', take:'CO = tooth contact with the joints seated. Never MIP.' },
@@ -11419,7 +11717,26 @@ var HINTS = [
   { lec:"nccl", kind:"emphasize", quote:"There is value in figuring out the etiology of the noncarious cervical lesion, because if you know what the etiology is, then you can do treatments to address it.", take:"Match the fix to the cause: a lower-RDA toothpaste, then a pressure-sensor brush; a less acidic drink and bicarbonate; a night guard." },
   { lec:"nccl", kind:"emphasize", quote:"If they're cleansable and they don't hurt and they don't look ugly and they're not near the pulp, or they're not very deep... then I wouldn't necessarily need to [restore them].", take:"Restore an NCCL when it can't be cleaned, hurts, looks bad or is deep, near the pulp (what he learned in school, \"not official\")." },
   { lec:"nccl", kind:"deemphasize", quote:"I measured the pH of all these different mouth rinses... you rinse your mouth for like 30 seconds, maybe twice a day. So that's probably not that big of a deal.", take:"Low-pH mouth rinses: probably not a big deal." },
-  { lec:"nccl", kind:"deemphasize", quote:"These are all kind of wives' tales that I don't know that there's evidence for, but they make sense.", take:"Acidic drinks only at mealtimes, a straw, a water rinse afterward: sensible, but unproven." }
+  { lec:"nccl", kind:"deemphasize", quote:"These are all kind of wives' tales that I don't know that there's evidence for, but they make sense.", take:"Acidic drinks only at mealtimes, a straw, a water rinse afterward: sensible, but unproven." },
+  { lec:"occtrauma", kind:"emphasize", quote:"It's injury resulting in tissue changes within the periodontal attachment apparatus as a result of occlusal forces. So the initiating factor here is the occlusal force, and the injury that results in the periodontium is what we call occlusal trauma.", take:"Occlusal trauma is the injury, not the force: the force starts it, the tissue changes in the periodontium are the trauma." },
+  { lec:"occtrauma", kind:"emphasize", quote:"We call that primary occlusal trauma because the tooth has not lost a single ounce or millimeter of... attachment or bone.", take:"Primary: traumatic forces on normal support (no bone or attachment lost)." },
+  { lec:"occtrauma", kind:"emphasize", quote:"So normal or traumatic occlusal forces, when they're applied to a tooth or a number of teeth that have a reduced periodontal support.", take:"Secondary: normal or traumatic forces on reduced support. The fence post: less of it in the ground, the same lean tips it." },
+  { lec:"occtrauma", kind:"emphasize", quote:"The distinction between the two is simply clinical... But when you look at what the injury caused histologically, it's going to be exactly the same, whether it's primary or secondary.", take:"Primary vs secondary is clinical; histologically the same." },
+  { lec:"occtrauma", kind:"emphasize", quote:"Because the tooth is being moved in both directions, it creates this hourglass shape that you see here around the tooth. That means you have a widened PDL, you have some bone loss on either side or on both sides.", take:"Jiggling forces: from both sides, an hourglass-shaped widening of the PDL. Orthodontics uses a controlled unilateral force." },
+  { lec:"occtrauma", kind:"emphasize", quote:"The trauma itself can be only confirmed histologically. So when we look at signs clinical and radiographic, these are surrogate to those histological findings.", take:"Confirmed only histologically; the signs are surrogates. A diagnosis, not a finding." },
+  { lec:"occtrauma", kind:"emphasize", quote:"Fremitus means it's a palpable or visible movement of a tooth when subjected to occlusal forces.", take:"Fremitus: the patient taps, a finger on the facial gingiva feels the tooth move. Not a mobility grade, but usually a Class 3 tooth." },
+  { lec:"occtrauma", kind:"emphasize", quote:"The space generally in health is roughly 0.25 millimeter... widened PDL space is telling us that this tooth is probably under some forces that are making it shift in multiple directions.", take:"Radiographic signs: a widened PDL (normal about 0.25 mm), a thickened or discontinued lamina dura, bone loss, root resorption." },
+  { lec:"occtrauma", kind:"emphasize", quote:"Just because you see a vertical defect around the tooth, do not assume there's occlusal trauma. This is not a cause and effect type thing.", take:"A vertical defect doesn't mean occlusal trauma (trauma with bone loss tends to be vertical, not the reverse)." },
+  { lec:"occtrauma", kind:"emphasize", quote:"Mobility is not a bad thing. So if you saw a tooth with class 2 mobility, do not assume that this tooth now has a hopeless prognosis.", take:"Mobility can be adaptation: find out why. Class 2 isn't hopeless; Class 3 is much worse." },
+  { lec:"occtrauma", kind:"emphasize", quote:"It's been shown that mobile teeth respond less well to treatment, whether it's regenerative treatment... or whether it's soft tissue grafting.", take:"Mobile teeth heal less well: bring a Class 2 tooth to Class 1 or less by adjusting the occlusion if you can." },
+  { lec:"occtrauma", kind:"emphasize", quote:"All we know is that you do this occlusal damage, things will get bad, but if you stop it in time, things will get stable back again.", take:"Animals, trauma alone: mobility and less dense bone, no attachment loss, reversible once stopped. Not a primary factor." },
+  { lec:"occtrauma", kind:"emphasize", quote:"That tells us that just stopping the occlusal trauma is not going to reverse periodontitis if you already have it in place.", take:"Stopping the trauma doesn't reverse periodontitis: treat the periodontitis." },
+  { lec:"occtrauma", kind:"emphasize", quote:"Except in those acute conditions, treatment is usually first addressed... following efforts to reduce or minimize the inflammatory lesion.", take:"Adjust the occlusion after treating the inflammation (at re-evaluation), unless it's acute, like fremitus at the first exam." },
+  { lec:"occtrauma", kind:"emphasize", quote:"So occlusal trauma alone does not cause gingivitis or periodontitis. Does it have an effect on the periodontal tissues? The answer is absolutely yes.", take:"His bottom line: trauma doesn't cause gingivitis or periodontitis, but it affects the supporting tissues." },
+  { lec:"occtrauma", kind:"emphasize", quote:"You will not see loss of bone height if you only have occlusal trauma. And these changes are reversible once you control the occlusal trauma of the tooth.", take:"Trauma alone: bone resorbs in density, not height, and it reverses once the force is gone." },
+  { lec:"occtrauma", kind:"emphasize", quote:"Occlusal adjustment may reduce the mobility of traumatized teeth and promote regrowth of bone, but it will not arrest the rate of further breakdown caused by microbial plaque.", take:"Adjustment helps mobility and bone, but only plaque control stops the disease." },
+  { lec:"occtrauma", kind:"emphasize", quote:"When performed, adjustment of occlusal discrepancies should follow successful anti-infective periodontal therapy.", take:"Treat the infection first, then adjust (an adjunct, like antibiotics)." },
+  { lec:"occtrauma", kind:"deemphasize", quote:"Don't go in the weeds about it... But you don't need to learn all the names and such. Conclusions are enough.", take:"The researchers' names and the studies' details (Glickman, Waerhaug, the Rochester and Gothenburg groups): not needed. Learn the conclusions." }
 ];
 
 /* ---------- SORT SETS (sort and whack games) ---------- */
@@ -11442,7 +11759,9 @@ var SORT_SETS = [
   { id:'balance', lec:'dentures', title:'Balanced or non-balanced?', bins:['Balanced','Non-balanced'], items:[['Contact in eccentric positions',0],['Compensating curve',0],['Anatomic 30° teeth',0],['Facebow and protrusive record',0],['Anterior contact in protrusion possible',0],['Flat 0° teeth',1],['Condylar guidance set to 0°',1],['No anterior contact',1],['Plane parallel to the ridges',1],['Poor ridges, poor control',1]] },
   { id:'ssr', lec:'dentures', title:'Retention or stability?', bins:['Retention','Stability'], items:[['Resists dislodgement away from the tissue',0],['Peanut butter lifts the denture',0],['Tongue lifts the lower denture',0],['Bothers patients, doesn\'t hurt',0],['Resists horizontal force',1],['Denture slides when biting',1],['Painful; can\'t eat',1],['What implants do best',1],['The most important of the three',1]] },
   { id:'brushing', lec:'nccl', title:'Points to the toothbrush, or not?', bins:['Toothbrush','Not the toothbrush'], items:[["Recreated by brushing with toothpaste",0],["Worse on the dominant side",0],["A high-RDA toothpaste",0],["Scrubbing hard",0],["People who couldn't brush",1],["Archaeological populations",1],["A camel with an NCCL",1],["Lesions on the palate",1],["Lesions below the gum line",1]] },
-  { id:'acidity', lec:'nccl', title:'Worse or better for erosion?', bins:['Worse','Better'], items:[["Orange juice",0],["Wine",0],["Very bubbly sparkling water",0],["High buffering capacity",0],["Citric acid",0],["Milk in the coffee",1],["Tea instead of coffee",1],["Water",1],["Low buffering capacity",1],["A baking soda rinse",1]] }
+  { id:'acidity', lec:'nccl', title:'Worse or better for erosion?', bins:['Worse','Better'], items:[["Orange juice",0],["Wine",0],["Very bubbly sparkling water",0],["High buffering capacity",0],["Citric acid",0],["Milk in the coffee",1],["Tea instead of coffee",1],["Water",1],["Low buffering capacity",1],["A baking soda rinse",1]] },
+  { id:'primsec', lec:'occtrauma', title:'Primary or secondary occlusal trauma?', bins:['Primary','Secondary'], items:[["Traumatic force, normal support",0],["No bone or attachment lost",0],["A new crown left high on a healthy tooth",0],["Center of rotation about mid-root",0],["Normal force, reduced support",1],["Bone and attachment already lost",1],["Center of rotation moved apically",1],["A shallow fence post",1]] },
+  { id:'otsigns', lec:'occtrauma', title:'Clinical or radiographic sign?', bins:['Clinical','Radiographic'], items:[["Fremitus",0],["Progressive mobility",0],["Tooth migration",0],["Wear facets",0],["Pain on biting",0],["Widened PDL space",1],["Discontinued lamina dura",1],["Thickened lamina dura",1],["Root resorption",1],["Furcation bone loss",1]] }
 ];
 
 var LECTURE_BY_ID = {}, QUESTIONS_BY_ID = {}, QUESTIONS_BY_LECTURE = {};
@@ -12056,7 +12375,47 @@ var QUESTION_WHY = {
   "cs-nc-ac-help":["A base neutralizes the acid.", "Dilution barely changes pH, so water helps less than you would hope.", "Toothpaste is an abrasion question.", "A night guard is for abfraction."],
   "cs-nc-ac-6":["Hurting is one of the reasons to restore.", "Changing the diet stops the cause; it doesn't make a sensitive lesion fine.", "A night guard is for abfraction, and it doesn't treat sensitivity.", "Sensitivity is exactly a reason to restore."],
   "nc-sel-evid":["They couldn't brush, yet had NCCLs.", "From before the toothbrush existed.", "Where people don't usually brush.", "That is evidence that brushing with toothpaste can cause them.", "That is a clue that points to the toothbrush."],
-  "nc-sel-acid":["Less acid at the source.", "He lists it, though he doesn't know of evidence for it.", "Bicarbonate candies raise the mouth's pH.", "A night guard is for abfraction.", "Toothpaste RDA is for abrasion."]
+  "nc-sel-acid":["Less acid at the source.", "He lists it, though he doesn't know of evidence for it.", "Bicarbonate candies raise the mouth's pH.", "A night guard is for abfraction.", "Toothpaste RDA is for abrasion."],
+  "nc-rda-seal":["Below 250 for the seal, on his slide.", "124 is his chart's number for a Colgate whitening toothpaste, not the limit.", "Not the number on his slide.", "Twice the limit on his slide."],
+  "nc-erosion-sites":["Acid plus wear shows on the incisal edges.", "Interproximal caries is bacteria-induced.", "White spots after orthodontics are bacteria-induced.", "Occlusal caries is bacteria-induced."],
+  "ot-initiate":["The injury the force causes in the attachment apparatus is the trauma.", "The force is the initiating factor, not the trauma itself.", "A discrepancy may or may not cause trauma; it isn't the injury.", "Wear facets are a clinical sign that points to it, not the injury itself."],
+  "ot-primary":["Traumatic forces, normal support: nothing lost yet.", "Reduced support makes it secondary, whatever the force.", "Reduced support makes it secondary, even with traumatic forces.", "Inflammation from plaque isn't occlusal trauma; the force has to be occlusal."],
+  "ot-histo-same":["The tissue changes are the same; only the support differs.", "Both can show resorption of the bone; the histology is the same.", "Primary has no attachment loss by definition; the histology of the injury is the same.", "Both injure the attachment apparatus, the same way."],
+  "ot-fence":["Less support moves the center of rotation toward the apex, so the same force tips the tooth.", "He describes a shallower post, not a stiffer ligament.", "It moves apically, not coronally.", "The force doesn't grow; less of the root is anchored to resist it."],
+  "ot-jiggle":["Pushed both ways, the PDL widens on both sides: the hourglass.", "That is a unilateral force, pushing one way.", "Bodily movement is a one-way, unilateral movement.", "Jiggling widens the PDL; it doesn't narrow it."],
+  "ot-histology":["Only histology confirms it; everything else is a surrogate.", "A widened PDL suggests it, but it can exist without occlusal trauma.", "Fremitus is a clinical indicator, not proof.", "A vertical defect doesn't mean occlusal trauma."],
+  "ot-fremitus":["Feel for movement on the facial gingiva while the patient taps.", "That is how mobility is measured, not fremitus.", "That tests for vertical (Class 3) mobility.", "That isn't a test from his lecture."],
+  "ot-pdl":["Roughly 0.25 mm in health.", "Ten times too small.", "Four times too wide; that would look widened.", "Ten times too wide."],
+  "ot-vertical":["Don't assume trauma from a vertical defect: it isn't cause and effect.", "Bone loss alone doesn't make a diagnosis of occlusal trauma.", "Primary trauma means no bone loss at all, and a defect isn't proof of trauma.", "Inflammation is treated first; the defect doesn't call for adjustment by itself."],
+  "ot-mob-dep":["The pulp has nothing to do with how far a tooth moves.", "Less bone height, more mobility.", "A wider PDL, more mobility.", "Root shape and number matter: one root moves more easily than several."],
+  "ot-surgery":["Up to a year, then they settle.", "Much longer than two days.", "Much longer than two weeks.", "They settle down eventually."],
+  "ot-class2":["More than 1 mm horizontally is Class 2 on his scale.", "Up to 1 mm is his Class 1 (L7's handout calls it 2).", "Adding vertical movement makes it Class 3.", "That is Class 0, physiologic."],
+  "ot-class3":["Vertical movement into the socket is what makes it Class 3.", "His scale has no 2 mm cutoff; Class 2 is already anything over 1 mm.", "Fremitus isn't part of the scale.", "The scale is buccolingual and vertical, not mesiodistal."],
+  "ot-adapt":["Mobility can be the tissues adapting; look for the reason.", "He says don't assume Class 2 is hopeless.", "Splinting isn't his first step; find the cause.", "Mobile teeth respond less well to treatment, so it does matter."],
+  "ot-heal":["Mobile teeth respond less well to regeneration and grafting.", "Mobility makes healing worse, not better.", "It does make a difference: healing is better in non-mobile teeth.", "Class 2 affects the response more than Class 1, so bring it down if you can."],
+  "ot-blood":["The supraperiosteal arteries are the main supply to the marginal gingiva.", "One of three sources, not the main one for the marginal gingiva.", "One of three sources, not the main one.", "The pulp isn't one of the gingiva's three sources."],
+  "ot-codestruct":["It works with the inflammation, steering it into the PDL and bone.", "It never causes periodontitis on its own.", "In this idea plaque inflammation is in the gingiva; trauma acts on the PDL and bone.", "Without plaque there is no inflammation for it to steer."],
+  "ot-anim-alone":["Mobility and density loss, no attachment loss, and a return to stability once stopped.", "Trauma alone caused no attachment loss and no loss of crestal height.", "Trauma alone didn't cause gingivitis or periodontitis.", "It did increase mobility and reduce bone density."],
+  "ot-anim-ging":["More density loss, but still no attachment loss.", "Neither group found attachment loss with gingivitis.", "Mobility increased.", "There was no attachment or crestal bone loss with gingivitis."],
+  "ot-anim-perio":["The dogs lost more attachment and bone; the monkeys didn't.", "Only one group found it, so co-destruction is a reality in one and a question in the other.", "One group did find extra loss.", "Neither found that trauma slowed the disease."],
+  "ot-stop":["Stopping the trauma doesn't reverse periodontitis; treat it.", "Density returned only where there was no periodontitis left.", "Attachment lost to periodontitis doesn't come back by stopping the trauma.", "The periodontitis stayed; it needs its own treatment."],
+  "ot-discrep":["More than 1 mm from CR to CO is a discrepancy.", "The slide has to exceed 1 mm.", "Canine guidance is not a discrepancy.", "Working-side contacts in group function are normal; non-working contacts are the discrepancy."],
+  "ot-trial":["A better attachment level (about 0.5 mm) and no change in probing depth.", "It was the other way around: attachment improved, probing depth didn't.", "Probing depth didn't change.", "The adjusted group gained more attachment."],
+  "ot-select":["Not every discrepancy causes trauma, so choose who gets adjusted.", "They don't say never; they say select carefully.", "That is the opposite of their argument.", "They don't set a mobility class as the rule."],
+  "ot-timing":["Treat the inflammation first; adjust at re-evaluation if needed.", "Only acute conditions are adjusted that early.", "Surgery isn't the trigger; the response to initial therapy is.", "Adjustment can reduce mobility and help bone regrow."],
+  "ot-cause":["It doesn't cause either disease, but it does affect the supporting tissues.", "It doesn't cause periodontitis.", "It doesn't cause gingivitis.", "It does affect the supporting tissues: \"absolutely yes.\""],
+  "ot-oa-does":["Less mobility and some bone regrowth, but plaque breakdown goes on.", "It won't arrest the breakdown caused by plaque.", "It doesn't regenerate attachment by itself.", "The plaque still has to be treated."],
+  "cs-ot-cr-dx":["A traumatic force (the high crown) on normal support.", "His support is normal: no bone or attachment lost.", "No inflammation and no attachment loss.", "He has lost no bone or attachment, and the new crown is overloading #30."],
+  "cs-ot-cr-tx":["Remove the overload: a high restoration is a cause of pain and mobility.", "There's no inflammation to treat; the crown is the problem.", "Mobility from overload is reversible, not a reason to extract.", "Take away the cause first; splinting doesn't fix a high crown."],
+  "cs-ot-cr-mob":["Up to 1 mm horizontally is Class 1.", "Class 0 is 0.1-0.2 mm, nothing you can see.", "Class 2 is more than 1 mm.", "Class 3 needs vertical movement too."],
+  "cs-ot-pe-when":["No acute signs: inflammation first, then re-evaluate.", "Adjusting first is only for acute conditions.", "Adjustment can help, chosen carefully.", "Surgery isn't what decides it; the response to initial therapy is."],
+  "cs-ot-pe-mob":["More than 1 mm horizontally, no vertical movement.", "Class 1 is up to 1 mm.", "Class 3 needs vertical movement.", "Class 0 is physiologic, 0.1-0.2 mm."],
+  "cs-ot-pe-defect":["A vertical defect doesn't mean occlusal trauma; treat the periodontitis.", "A defect isn't proof that the contact caused it.", "Primary trauma means normal support, and she has bone loss.", "A vertical defect isn't a reason to extract."],
+  "cs-ot-fr-dx":["Normal forces on reduced support.", "Primary needs normal support; she has lost bone.", "Her gingiva isn't inflamed (no bleeding).", "Movement under the bite isn't physiologic."],
+  "cs-ot-fr-sign":["Movement under occlusal force, felt on the facial gingiva.", "Migration is a change in position over time, not movement as she taps.", "Mobility is graded with two instruments, not by tapping.", "Physiologic mobility is too small to see or feel."],
+  "cs-ot-fr-tx":["An acute condition at the first exam is the exception: adjust early.", "No such waiting period; the acute sign is a reason to act now.", "That is the usual timing, but fremitus at the first exam is the acute exception.", "Adjustment can reduce mobility on reduced support too."],
+  "ot-sel-clin":["Migration is a clinical indicator.", "Wear facets from grinding are a clinical indicator.", "Thermal sensitivity or pain on biting is on the list.", "A widened PDL is a radiographic sign.", "Bleeding on probing is inflammation, not a sign of occlusal trauma."],
+  "ot-sel-mob":["Lost attachment and bone make a tooth mobile.", "An infection at the apex can.", "A high restoration overloads the tooth: occlusal trauma.", "Caries isn't on his list of causes.", "Recession without bone loss isn't on his list."]
 };
 QUESTIONS.forEach(function(q){ if(QUESTION_WHY[q.id]) q.why = QUESTION_WHY[q.id]; });
 QUESTIONS.forEach(function(q){ QUESTIONS_BY_ID[q.id] = q; (QUESTIONS_BY_LECTURE[q.lec] = QUESTIONS_BY_LECTURE[q.lec] || []).push(q); });
@@ -12222,22 +12581,33 @@ var LIKELY_TOPICS = [
   { lec:"dentures", t:"Hanau and Thielemann: the five determinants, which are fixed and which vary", basis:"slides", ids:["dn-quint", "dn-reverse", "dn-fixed-po", "dn-2s-10"] },
   { lec:"dentures", t:"Denture tooth materials: porcelain, composite and cross-linked resin, acrylic", basis:"slides", ids:["dn-porc", "dn-comp", "dn-acrylic", "dn-num-4", "dn-wear", "dn-reverse-curve"] },
   { lec:"nccl", t:"Three causes, alone or together: abrasion, abfraction and erosion; carious vs noncarious", basis:"hint", ids:["nc-three", "nc-def", "nc-2s-1", "nc-rmgi"] },
-  { lec:"nccl", t:"Abrasion: the toothpaste matters more than the brush; RDA (higher is more abrasive)", basis:"hint", ids:["nc-rda", "nc-2s-2", "cs-nc-br-first"] },
+  { lec:"nccl", t:"Abrasion: the toothpaste matters more than the brush; RDA (higher is more abrasive)", basis:"hint", ids:["nc-rda", "nc-rda-seal", "nc-2s-2", "cs-nc-br-first"] },
   { lec:"nccl", t:"Not every NCCL is from brushing: leprosy, archaeological, animals, the palate, subgingival", basis:"hint", ids:["nc-num-1", "nc-sel-evid", "nc-tf-1"] },
   { lec:"nccl", t:"Abfraction: an inclined-plane load, weaker in tension, the lesion just above the fulcrum", basis:"hint", ids:["nc-tension", "nc-num-2", "nc-wf-1"] },
   { lec:"nccl", t:"pH vs buffering capacity: high is bad; orange juice and wine; citric acid chelates calcium", basis:"hint", ids:["nc-buffer-def", "nc-citric", "nc-2s-4", "nc-num-3", "cs-nc-ac-drink"] },
   { lec:"nccl", t:"Match the treatment to the cause (his last slide)", basis:"hint", ids:["nc-why-etio", "nc-sensor", "nc-sel-acid", "nc-match-fix", "nc-tf-4", "cs-nc-gr-tx"] },
   { lec:"nccl", t:"When to restore: cleansable, doesn't hurt, doesn't look bad, not deep", basis:"hint", ids:["nc-restore", "nc-tf-8", "cs-nc-br-restore", "cs-nc-gr-restore", "cs-nc-ac-6"] },
   { lec:"nccl", t:"The clues: dominant side for brushing; tori and wear facets for abfraction", basis:"lecture", ids:["nc-hand", "nc-tf-3", "nc-tf-5", "cs-nc-br-cause", "cs-nc-gr-cause"] },
-  { lec:"nccl", t:"Erosion vs caries, and where vomiting erodes", basis:"lecture", ids:["nc-caries-sites", "nc-ws-2", "nc-tf-9", "nc-2s-5", "cs-nc-ac-cause"] },
-  { lec:"nccl", t:"Water dilutes, bicarbonate neutralizes (pH is a log scale)", basis:"hint", ids:["nc-tf-6", "cs-nc-ac-help"] }
+  { lec:"nccl", t:"Erosion vs caries, and where vomiting erodes", basis:"lecture", ids:["nc-caries-sites", "nc-erosion-sites", "nc-ws-2", "nc-tf-9", "nc-2s-5", "cs-nc-ac-cause"] },
+  { lec:"nccl", t:"Water dilutes, bicarbonate neutralizes (pH is a log scale)", basis:"hint", ids:["nc-tf-6", "cs-nc-ac-help"] },
+  { lec:"occtrauma", t:"His conclusions: occlusal trauma doesn't cause gingivitis or periodontitis; no human evidence it speeds attachment loss", basis:"hint", ids:["ot-cause", "ot-tf-8", "ot-tf-7"] },
+  { lec:"occtrauma", t:"Occlusal trauma is the injury, not the force; primary vs secondary: normal vs reduced support; the same histologically; the fence post", basis:"hint", ids:["ot-initiate", "ot-primary", "ot-histo-same", "ot-fence", "ot-2s-1", "ot-tf-1", "cs-ot-cr-dx", "cs-ot-fr-dx"] },
+  { lec:"occtrauma", t:"Trauma alone, and with gingivitis: mobility and bone density loss, no attachment loss, reversible", basis:"hint", ids:["ot-anim-alone", "ot-anim-ging", "ot-match-anim"] },
+  { lec:"occtrauma", t:"Occlusal adjustment: what it does and doesn't do, and when (after the inflammation is treated, unless acute)", basis:"hint", ids:["ot-oa-does", "ot-timing", "ot-2s-4", "cs-ot-pe-when", "cs-ot-fr-tx"] },
+  { lec:"occtrauma", t:"The signs: confirmed only histologically; fremitus; a widened PDL (about 0.25 mm); a vertical defect isn't proof", basis:"hint", ids:["ot-histology", "ot-tf-3", "ot-fremitus", "ot-pdl", "ot-vertical", "ot-num-1", "ot-wf-1", "ot-2s-3", "ot-sel-clin", "cs-ot-fr-sign", "cs-ot-pe-defect"] },
+  { lec:"occtrauma", t:"Mobility: what it depends on and what causes it; the grades; adaptation; mobile teeth heal less well", basis:"hint", ids:["ot-class2", "ot-class3", "ot-adapt", "ot-heal", "ot-num-2", "ot-ws-2", "ot-tf-2", "ot-sel-mob", "cs-ot-pe-mob", "cs-ot-cr-mob"] },
+  { lec:"occtrauma", t:"Trauma with periodontitis: the animal groups disagreed; stopping the trauma doesn't reverse periodontitis", basis:"hint", ids:["ot-anim-perio", "ot-stop", "ot-codestruct", "ot-wf-2"] },
+  { lec:"occtrauma", t:"Jiggling vs unilateral forces: the hourglass", basis:"hint", ids:["ot-jiggle", "ot-2s-2", "ot-num-3"] },
+  { lec:"occtrauma", t:"Occlusal discrepancies: a CR-to-CO slide over 1 mm, non-working contacts; not every one needs adjusting", basis:"slides", ids:["ot-discrep", "ot-select", "ot-trial", "ot-ws-1", "ot-2s-5"] },
+  { lec:"occtrauma", t:"Overload and surgery as causes of mobility: a high crown; up to a year after a flap", basis:"lecture", ids:["cs-ot-cr-tx", "ot-surgery", "ot-tf-6", "ot-mob-dep"] },
+  { lec:"occtrauma", t:"The gingiva's blood supply (supraperiosteal), and the old idea that occlusion caused periodontitis", basis:"slides", ids:["ot-blood", "ot-tf-5", "ot-tf-4"] }
 ];
 (function(){ var byId = {}; QUESTIONS.forEach(function(q){ byId[q.id] = q; }); LIKELY_TOPICS.forEach(function(t){ t.ids.forEach(function(id){ if(byId[id]) byId[id].likely = t; }); }); })();
 /* the tag on a predicted exam topic; not drawn in the mock, which stays exam-like */
 function likelyChip(q){ return q.likely ? '<span class="likely-chip" title="Predicted topic: '+escHtml(q.likely.t)+' ('+escHtml(q.likely.basis)+')">'+icon('target')+'High Likelihood Exam Question</span>' : ''; }
 /* Most likely questions: each lecture's predicted topics (LIKELY_TOPICS), folded by default, at the top of Exam Hints */
 function likelyHTML(){
-  return '<details class="likely-box"><summary>'+icon('target')+'<span><b>Most likely questions.</b> The final\'s count per lecture hasn\'t been announced, so these are the topics flagged in the L6-L9 recordings (plus the slides\' core idea), ranked by how hard each professor leaned on them.</span></summary>' +
+  return '<details class="likely-box"><summary>'+icon('target')+'<span><b>Most likely questions.</b> The final\'s count per lecture hasn\'t been announced, so these are the topics flagged in the L6-L10 recordings (plus the slides\' core idea), ranked by how hard each professor leaned on them.</span></summary>' +
     '<div class="likely-grid">' + LECTURES.map(function(l){
       var ts = LIKELY_TOPICS.filter(function(t){ return t.lec === l.id; }); if(!ts.length) return '';
       var n = EXAM_COUNTS[l.id];
@@ -12526,7 +12896,7 @@ function renderHome(){
     '<div class="hh-ready">' + ringSVG(total ? Math.round(right / total * 100) : 0) + '<div class="hh-ready-txt"><b>' + right + ' of ' + total + '</b><span>questions for the final right on your latest try</span>' +
       (acc !== null ? '<span>' + acc + '% of all your answers right</span>' : '<span>Answer a few to see your accuracy</span>') + '</div></div>' +
   '</section>';
-  h += '<div class="home-alert">' + icon('notes') + '<span><b>New: L9 Noncarious Cervical Lesions</b>, Dr. Lawson\'s prerecorded lecture for 11/12, with its notes, questions and a place in the mock. More lectures are coming: each one taught before the final is added here.</span></div>';
+  h += '<div class="home-alert">' + icon('notes') + '<span><b>New: L10 Occlusion and the Periodontium</b>, Dr. Abou-Arraj\'s 11/12 lecture on occlusal trauma, with its notes, questions, diagrams and a place in the mock; and L9 is now checked against Dr. Lawson\'s slides. That\'s every lecture on the final.</span></div>';
   h += '<div class="quick-start home-qs" aria-label="Start studying">' +
     '<button type="button" class="qs-btn primary" data-home="new"><span class="qs-ic">' + icon('bank') + '</span><span><b>Practice questions</b><small>' + left + ' for the final you haven\'t tried</small></span></button>' +
     '<button type="button" class="qs-btn" data-sh-drill="home"><span class="qs-ic">' + icon('bolt') + '</span><span><b>Daily drill</b><small>Misses + high-yield, a few minutes</small></span></button>' +
@@ -12964,7 +13334,7 @@ function renderBank(body){
 }
 
 function renderHints(body){
-  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Occlusion final: Monday, November 16, 6:30-7:45 pm</b> (the midterm\'s time window, moved up from Thursday, November 19). Not comprehensive: the lectures from 10/22 on (L6, L7, L8 and L9 so far), building on the midterm material. Its format hasn\'t been announced yet. The midterm lectures\' hints stay below for review.</span></div>' +
+  var h = '<div class="exam-banner">'+icon('clock')+'<span><b>Occlusion final: Monday, November 16, 6:30-7:45 pm</b> (the midterm\'s time window, moved up from Thursday, November 19). Not comprehensive: the lectures from 10/22 on (L6-L10), building on the midterm material. Its format hasn\'t been announced yet. The midterm lectures\' hints stay below for review.</span></div>' +
     likelyHTML() +
     '<p style="color:var(--ink-soft);max-width:80ch;margin-top:0">Every hint below is a direct quote from the lecture recordings where a professor flagged something as <span class="kind emphasize">emphasize</span> or waved it off <span class="kind deemphasize">de-emphasize</span>.</p>';
   lecOrder().forEach(function(l){
@@ -13093,8 +13463,8 @@ function renderReview(){
    =================================================================== */
 /* the final's lectures only (not comprehensive); add each new lecture here as it is taught. The clock keeps the midterm's
    pace (45 questions in an hour, 80 s each) until Dr. Givan sends the final's format. 45 split over the lectures so far:
-   12 each from L6-L8 and 9 from L9, Dr. Lawson's shorter lecture (2026-11-10; 15 each before L9). */
-var MOCK_BLUEPRINT = { instruments:12, malocclusion:12, dentures:12, nccl:9 };
+   9 from each of L6-L10 (2026-11-12, with L10; 12/12/12/9 with L9, 15 each before it). */
+var MOCK_BLUEPRINT = { instruments:9, malocclusion:9, dentures:9, nccl:9, occtrauma:9 };
 var MOCK_LIMIT = 45 * 80;
 function buildMock(){
   var ids = [];
@@ -13122,7 +13492,7 @@ function renderMock(body){
   }
   var total = mockTotal();
   if(!m || !m.ids || !m.ids.length){
-    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions from the final\'s lectures so far (L6 Occlusal Instrumentation, L7 Malocclusion and Dysfunction, L8 Denture Occlusion and L9 Noncarious Cervical Lesions); it grows as the next lectures are added. The final is not comprehensive, so the midterm lectures aren\'t in it. Patient Box items are included, and questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. The final\'s format hasn\'t been announced, so the clock keeps the midterm\'s pace (about 80 seconds a question) and turns red past '+Math.round(MOCK_LIMIT/60)+' minutes. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
+    body.innerHTML = '<div class="reading" style="max-width:760px"><h2>Mock Exam</h2><p>'+total+' multiple-choice questions from the final\'s lectures so far (L6 Occlusal Instrumentation, L7 Malocclusion and Dysfunction, L8 Denture Occlusion, L9 Noncarious Cervical Lesions and L10 Occlusion and the Periodontium). The final is not comprehensive, so the midterm lectures aren\'t in it. Patient Box items are included, and questions you haven\'t seen or missed last time are picked first.</p><p>It runs like the real thing: choose an answer for each question with no feedback, then submit. The final\'s format hasn\'t been announced, so the clock keeps the midterm\'s pace (about 80 seconds a question) and turns red past '+Math.round(MOCK_LIMIT/60)+' minutes. You get your score, a per-lecture breakdown and every explanation afterwards, and your answers count toward your progress and class stats.</p><div class="reading-actions"><button type="button" class="btn primary" id="mockStart">Start a '+total+'-question mock</button></div></div>';
     document.getElementById('mockStart').onclick = function(){ buildMock(); renderMock(body); };
     return;
   }
