@@ -135,7 +135,7 @@ check-in (18 in all), and one survey answer, a feature idea: highlight the words
   answers at 88%. The final's lectures are still practiced in bank order: since 11-09 L6 675 answers from 12 people, L7 665 from 7,
   **L8 and L9 about 40 each from a few**; tries per question L6 11.0, L7 5.1, L9 0.8, L8 0.4. Five days out there is time. Hardest on
   the final's lectures (small numbers): `in-locator` 7 of 15 (the pantograph's six recording tables picked as how the hinge axis is
-  found: the why names it, the explanation doesn't; a one-sentence fix waits for PR #319, which rewrites the same generated file),
+  found: the why named it, the explanation didn't; since 11-12 the explanation says it too, after #319 merged),
   `in-full-adj` 7 of 13 (the Bennett angle), `mo-2s-2`. The midterm lows are unchanged and not on the final.
 - **Perio** (final 11-19, cumulative): quiet, a few people a day (6 on 11-11, 55 min). The final's lows: `q3-M01` 28% (UniFe's inputs),
   `q4-06`, `q4-02`, `q5-01` (the narrowest maxillary furcation entrance, "Mesial" picked), `q4-M05`, `q3-47` (the three numbers, above).
