@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (archived hubs' audio off the site, Claude Code)** — The site was 958 MB of GitHub Pages' 1 GB limit, 909 MB
+  of it mp3s. Sam kept the bitrates (narration 64 kbps, Timmy Time 96 kbps) and made it a standing rule that an archived
+  hub's narration and Timmy Time come off the site ([rule](vault/rules/archived-hubs-drop-their-audio.md)). Done now for
+  MSK Exam 3 and 4, PCD Fixed Pros Exam 3, Heme & Endo Exam 1 and PCD Implants Exam 1: 83 mp3s, 368 MB, site 958 → 589 MB.
+  Their pages stay up. `widget/v3.js` reads `data-audio="off"` on a hub's widget tag: Listen reads in the device's voice
+  without requesting the missing file (voice picker included), Timmy Time isn't loaded, and `widget/v3.css` hides the hub's
+  Timmy Time links (`html.sh-audio-off`). `tools/ci/smoke.js` skips the narration checks for such a hub and fails if any
+  audio is left behind; new `tools/ci/size.js` in "Check hubs" prints the site's size, warns from 750 MB and fails from
+  900 MB. The next four (Special Patient Care after Nov 13, Heme & Endo Exam 2, Occlusion, Perio) are a
+  [to-do](vault/tasks/2026-11-12-audio-off-at-archiving.md); the engine's version is a box in the redesign release. The
+  High yield narration is no longer waiting for room. About page: Listen and Timmy Time say so.
 - **2026-11-12 (Occlusion: `in-locator`'s explanation names the pantograph, Claude Code)** — About half of the people who
   tried it picked "Trace protrusive and lateral paths on six recording tables" as how the hinge axis is found. Its why
   row named the pantograph; now the explanation does too (L6's notes: the kinematic facebow finds the axis, the

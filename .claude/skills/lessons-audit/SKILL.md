@@ -91,7 +91,10 @@ so say in the retro how many there were and that later ones go into the next aud
    `node tools/publish-recap.js <hub> --bank <banks>/<hub>.json --dry-run` to check the numbers and the featured
    question, then the same without `--dry-run`. It uses the hub's last exam from `index.html`. Re-running replaces it.
    Say in the summary that it went live; `review/` → Recap → "Remove from dashboard" takes it down.
-4. Leave the hub page and the `ARCHIVED_HUBS` move to the archiving
+4. **Take its audio off the site** (Sam's standing rule, 2026-11-12, no need to ask): `git rm hubs/<hub>/audio/*.mp3`
+   and `data-audio="off"` on its widget tag, in this audit's PR (`vault/rules/archived-hubs-drop-their-audio.md`).
+   Not before its last exam is over (a take-home: its due date).
+5. Leave the hub page and the `ARCHIVED_HUBS` move to the archiving
    work itself (see `vault/reference/repo-map.md` and `vault/rules/archiving-is-a-retrospective.md`); list them for Sam if they aren't done.
 
 ## 3. Read every hard question yourself

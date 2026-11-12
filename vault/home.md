@@ -62,6 +62,8 @@ Hub building
 - [Figures teach the lecture](rules/figures-teach-the-lecture.md): outside sources for accuracy, the lecture for what's shown and named *(on demand)*.
 - [Outside sources are encouraged for every figure](rules/outside-sources-for-figures.md): for accuracy and for how it works, cited *(on demand)*.
 - [Archiving a hub = retrospective](rules/archiving-is-a-retrospective.md)
+- [An archived hub's audio comes off the site](rules/archived-hubs-drop-their-audio.md): narration and Timmy Time, to stay under
+  GitHub Pages' 1 GB limit; the page stays and Listen uses the device's voice.
 
 ## How-tos
 

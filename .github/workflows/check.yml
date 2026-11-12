@@ -36,6 +36,9 @@ jobs:
       - name: Hub archive state (the dashboard's dates and admin overrides)
         if: ${{ !cancelled() }}
         run: node tools/ci/archive.js
+      - name: Site size (GitHub Pages stops at 1 GB; warns at 750 MB, fails at 900 MB)
+        if: ${{ !cancelled() }}
+        run: node tools/ci/size.js
       - name: Install headless Chromium
         # The system packages come from Ubuntu's mirror. When the runner can't reach it (2026-11-11: three runs in a row
         # couldn't resolve azure.archive.ubuntu.com, and every package that failed was an optional font), install the

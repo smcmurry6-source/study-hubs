@@ -997,6 +997,8 @@ html.sh-drill-open #sh-flame{bottom:16px; z-index:9997;}
 }
 
 /* ================= Timmy Time podcast (widget/podcast.js): the episode card a hub places with [data-sh-podcast], and its pinned player ================= */
+/* an archived hub whose audio came off the site (v3.js, data-audio="off"): its Timmy Time links go with it */
+.sh-audio-off [data-sh-podcast-open], .sh-audio-off li:has(> [data-sh-podcast-open]){display:none !important;}
 .sh-pod-card{position:relative; display:flex; gap:16px; align-items:flex-start; margin:0 0 14px; padding:16px 18px; border-radius:16px; overflow:hidden;
   border:1px solid color-mix(in srgb, var(--accent, #2F6FD6) 45%, var(--line, rgba(0,0,0,.12)));
   background:linear-gradient(135deg, color-mix(in srgb, var(--accent, #2F6FD6) 14%, var(--surface, #fff)), var(--surface, #fff) 70%);
