@@ -8,7 +8,9 @@
 set -euo pipefail
 DIR="${KOKORO_DIR:-/tmp/kokoro}"
 U=https://github.com/smcmurry6-source/study-hubs/releases/download/kokoro-model-v1.0
-python3 -c "import kokoro_onnx, soundfile" 2>/dev/null || python3 -m pip install -q kokoro-onnx soundfile
+# kokoro-onnx 0.6.1 or later: create_timed() gives each sound's time, which tools/narrate.py writes beside the mp3 for the
+# redesign's Follow along; onnx cuts the model down to its duration output for tools/narration_words.py
+python3 -c "import soundfile, onnx; from kokoro_onnx import Kokoro; Kokoro.create_timed" 2>/dev/null || python3 -m pip install -q -U "kokoro-onnx>=0.6.1" soundfile onnx
 mkdir -p "$DIR"
 for f in kokoro-v1.0.onnx voices-v1.0.bin; do
   [ -s "$DIR/$f" ] && continue

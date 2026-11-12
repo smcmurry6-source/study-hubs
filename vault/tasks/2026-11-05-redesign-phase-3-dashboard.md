@@ -221,7 +221,9 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   Exam 2, the first day "Send luck" showed, and at 390 px with the largest text its row pulled the hub card wider than
   the screen (BUG-075, fixed: the card's column can't be pushed wider, the button drops under the words). A lesson for
   the dashboard's tests: its states depend on the date, so check the day before an exam and exam day by setting the
-  clock, not only today. **Left:** the idea board (a second session, started from `main`), and BUG-076 (open, S4: at
+  clock, not only today. While that was being fixed `main` got the Follow along release, which logged BUG-060 to
+  BUG-062; this note's bugs were renumbered to match the log (**BUG-063 to BUG-076**; an older message or screenshot
+  caption that says BUG-060 to BUG-073 means these, three higher), and `main` was merged in. **Left:** the idea board (a second session, started from `main`), and BUG-076 (open, S4: at
   320 px with the largest text "Start studying" and the seven day dots run a little past the edge).
 
 ## Outcome

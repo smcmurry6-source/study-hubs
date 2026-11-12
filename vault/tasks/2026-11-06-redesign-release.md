@@ -190,6 +190,18 @@ Arcade work as now). Its arcade row: every game in the lobby with its own drawin
 the mock's five Exam 1 questions said "each from a different Exam 1 lecture"; Sam, 2026-11-11: "draw at random", so it now
 says they're drawn at random, fixed on the live page in [#312](https://github.com/smcmurry6-source/study-hubs/pull/312).)
 
+### Follow along ([task](done/2026-11-12-redesign-follow-along.md))
+
+Built in the engine (2026-11-12), so every redesigned hub has it from the release; it needs a words file beside each
+narration mp3 (`tools/narration_words.py`, written by `tools/narrate.py` since; the smoke lint checks them). When the content
+JSON becomes the source, `narrate.py` reads `notes.json` the way `narration_words.py` already does.
+
+**About page**, the Listen entry (Hub modes), add with a "new" tag: **Follow along**: while Listen plays a lecture's
+narration, the word being read is highlighted in the notes, with its sentence shaded more softly, and the page scrolls to
+keep it in view. Scroll away and it stops following until you come back (or move the narration: then it jumps there).
+The **Follow along** button beside Listen turns it off or back on, on this device. A classmate's idea, from the survey.
+In a browser too old for it, Listen plays as before, without the highlight.
+
 ### From phase 2, Perio ([phase 2](2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../hubs/perio.md))
 
 Built in `hubs/perio/next/` (2026-11-11). Perio's final is Thursday, November 19, so by the rule above it is switched in if
