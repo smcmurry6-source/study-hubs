@@ -41,6 +41,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   what each statement claims and which of the slide's three numbers belongs to which group. Explanations only: ids, keys,
   choices and their order are unchanged, so no picks move; `next/content` rebuilt for both hubs. `LESSONS.md` Live signals
   rewritten; the PCD Implants retrospective now counts 6 check-ins.
+- **2026-11-11 (migration_v54: no visiting opt-out, an idea delete removes the idea, Claude Code)** — Nothing students see
+  changes, and the migration is still not applied (it waits for the redesign's release). Sam's two "no" answers on the open
+  calls, made in `migration_v54.sql`: **visiting can't be turned off** (`set_visiting`, `pet_visit_off`, `visiting` in
+  `get_my_shop`, Link my devices' move of it and `sh_visit_link` are gone; every board row has a visit key), and **an
+  author's delete removes their idea completely** (`delete_my_idea` deletes the row; its votes, reports and Inbox notes go by
+  cascade, so it no longer counts toward the day's three or the 20 seconds; `hidden_by` has no `self`). `xp.js` (344 checks),
+  `rls.js`, `rls-expectations.json`, `rls-audit.sql`, the design page's rank board (no switch, no "Visits off" row) and the
+  notes follow. [The open calls](vault/tasks/done/2026-11-11-redesign-open-calls.md) are done.
+
 - **2026-11-11 (Timmy Time: Heme & Endo Exam 2 episode, Claude Code)** — A 52-minute (51.7) last-minute review for Heme &
   Endo Exam 2 (Fri Nov 13): `hubs/heme-endo-exam2/audio/timmy-time.mp3` (37 MB, -16 LUFS), script
   `tools/podcast/heme-endo-exam2/script.md`, from the hub's notes (As taught), Exam Hints (every professor quote word for
@@ -153,7 +162,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   professors skip, the bank's panel, question-health flags) are `load: on-demand`: the new `hubs/CLAUDE.md` loads them whenever
   a session opens a hub file, and `CLAUDE.md` lists them under "Feature rules". The narration, usage-data and reports how-tos
   are links. Every session now starts with about 58 KB of notes instead of 81 KB (about 5.6k tokens less on every turn). New:
-  [run-a-redesign-session](vault/how-to/run-a-redesign-session.md) and [the open calls](vault/tasks/2026-11-11-redesign-open-calls.md)
+  [run-a-redesign-session](vault/how-to/run-a-redesign-session.md) and [the open calls](vault/tasks/done/2026-11-11-redesign-open-calls.md)
   for Sam in one list; phase 4 starts by splitting `widget/hub.js`.
 
 - **2026-11-10 (migration_v54 applied by mistake, then undone, Claude Code)** — After Sam's "also apply the sql", a

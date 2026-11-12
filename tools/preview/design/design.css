@@ -1002,14 +1002,6 @@ img.emb-disc, .big, .small img { display: block; }
 .tp-vrand:hover { transform: translateY(-1px); box-shadow: 0 4px 0 #3B2E3A; } .tp-vrand:hover svg { transform: rotate(180deg); }
 .tp-vrand svg { transition: transform 420ms var(--ease-out); }
 .tp-vrand:active { transform: translateY(3px); box-shadow: 0 0 0 #3B2E3A; }
-.tp-vnote { display: inline-flex; align-items: center; justify-content: center; gap: 5px; font-size: var(--fs-meta); color: var(--muted); text-align: center; }
-.tp-vswitch { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 12px; padding: 12px; border-radius: var(--r-row); border: 1px solid var(--rule); cursor: pointer; font-size: var(--fs-label); }
-.tp-vswitch small { display: block; font-size: var(--fs-meta); color: var(--muted); }
-.tp-vswitch input { appearance: none; -webkit-appearance: none; width: 46px; height: 28px; border-radius: 999px; background: var(--track); position: relative; cursor: pointer; transition: background var(--t-press) var(--ease-out); }
-.tp-vswitch input::after { content: ""; position: absolute; left: 3px; top: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0, 0, 0, .3); transition: transform var(--t-press) var(--ease-out); }
-.tp-vswitch input:checked { background: var(--primary); }
-.tp-vswitch input:checked::after { transform: translateX(18px); }
-.tp-vswitch input:focus-visible { outline: 3px solid var(--focus, var(--primary)); outline-offset: 2px; }
 .tp-vplace { display: grid; gap: 10px; scroll-margin-top: 76px; }
 .tp-vhead { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0 12px; }
 .tp-vhead div { min-width: 0; } .tp-vhead b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1093,4 +1085,4 @@ img.emb-disc, .big, .small img { display: block; }
   .tp-found { flex-basis: 100%; }
   .tp-card { max-width: none; }
 }
-@media (prefers-reduced-motion: reduce) { .tp-rcard, .tp-vswitch input, .tp-vswitch input::after, .tp-vgo, .tp-vrand, .tp-vnav, .tp-vthumb img, .tp-vrand svg { transition: none; } .tp-vsheen::before, .tp-vpeek img { animation: none; } .tp-vpeek img { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .tp-rcard, .tp-vgo, .tp-vrand, .tp-vnav, .tp-vthumb img, .tp-vrand svg { transition: none; } .tp-vsheen::before, .tp-vpeek img { animation: none; } .tp-vpeek img { transform: none; } }
