@@ -221,6 +221,21 @@ function lint(hub, A){
     if (A.READINGS[l.id] && !fs.existsSync(path.join(audioDir, `${l.id}-full.mp3`))) problems.push(`${hub}: missing narration audio/${l.id}-full.mp3`);
     if (A.READINGS_PLAIN[l.id] && !fs.existsSync(path.join(audioDir, `${l.id}-plain.mp3`))) problems.push(`${hub}: missing narration audio/${l.id}-plain.mp3`);
   });
+  /* Follow along (widget/hub.js): a redesigned hub's narration has its word timings beside it, made from that very mp3
+     (tools/narration_words.py; tools/narrate.py writes them whenever it renders one) */
+  const nextNotes = path.join(root, 'hubs', hub, 'next', 'content', 'notes.json');
+  if (fs.existsSync(audioDir) && fs.existsSync(nextNotes)) {
+    const NN = JSON.parse(fs.readFileSync(nextNotes, 'utf8'));
+    ['full', 'plain'].forEach(level => Object.keys(NN[level] || {}).forEach(id => {
+      const mp3 = path.join(audioDir, `${id}-${level}.mp3`), wf = mp3.replace(/\.mp3$/, '.words.json'), fix = `python3 tools/narration_words.py ${hub} --lec ${id} --level ${level}`;
+      if (!fs.existsSync(mp3)) return;
+      if (!fs.existsSync(wf)) { problems.push(`${hub}: no word timings for audio/${id}-${level}.mp3 (${fix})`); return; }
+      let d = null; try { d = JSON.parse(fs.readFileSync(wf, 'utf8')); } catch (e) {}
+      if (!d || d.v !== 1) problems.push(`${hub}: audio/${id}-${level}.words.json can't be read (${fix})`);
+      else if (d.bytes !== fs.statSync(mp3).size) problems.push(`${hub}: audio/${id}-${level}.words.json was made from another recording of it (${fix})`);
+      else if (!d.w || !Array.isArray(d.t) || 2 * d.w.split(' ').length !== d.t.length) problems.push(`${hub}: audio/${id}-${level}.words.json has ${d.w ? d.w.split(' ').length : 0} words but ${(d.t || []).length / 2} times (${fix})`);
+    }));
+  }
 }
 
 (async () => {

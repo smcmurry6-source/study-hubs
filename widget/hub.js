@@ -866,7 +866,8 @@
       '<p class="note">' + esc(lec.who) + " · " + (lec.status === "taught" ? "recording and slides" : "slides only") + " · " + pl(nq, "question") + "</p>" +
       (lec.note ? '<p class="note lec-note">' + lec.note + "</p>" : "") +
       '<div class="toolbar" role="toolbar" aria-label="Notes tools">' +
-        (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn" data-sh-tts-audio="1" aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' : "") +
+        (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn" data-sh-tts-audio="1" aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
+          '<button type="button" class="btn btn-text follow-btn" data-follow hidden aria-pressed="' + followOn() + '" title="Highlight each word as it is read">' + icon("highlight", 18) + "Follow along</button>" : "") +
         (hasPlain ? '<span class="seg" role="group" aria-label="Reading level"><button type="button" data-level="full" aria-pressed="' + (level === "full") + '">As taught</button><button type="button" data-level="plain" aria-pressed="' + (level === "plain") + '">Plain English</button></span>' : "") +
         '<button type="button" class="btn" data-mmap aria-expanded="false">' + icon("mindmap", 18) + "Mind map</button>" +
         '<button type="button" class="btn btn-text" data-report-notes>' + icon("report", 18) + "Report a mistake</button>" +
@@ -896,6 +897,8 @@
     });
     var tts = $("#sh-tts-btn", el);
     if (tts) tts.addEventListener("click", function(){ if (window.shTTS) window.shTTS.speak(prose, tts, ASSETS + "audio/" + lec.id + "-" + level + ".mp3"); });
+    var fb = $("[data-follow]", el);
+    if (fb) { fb.addEventListener("click", function(){ var on = !followOn(); ls("sh_pref_follow", on ? null : "off"); fb.setAttribute("aria-pressed", String(on)); track("notes:follow=" + (on ? "on" : "off")); follow.pref(); }); follow.reattach(prose, ASSETS + "audio/" + lec.id + "-" + level + ".mp3"); }
     /* a mistake in the notes goes to Sam's Inbox with the lecture attached (the shared widget's report form) */
     $$("[data-report-notes]", el).forEach(function(b){ b.addEventListener("click", function(){
       track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: lec.id, label: lecLabel(lec) + " " + shortTitle(lec) }); else toast("The report form is still loading. Try again in a moment.");
@@ -906,6 +909,157 @@
     /* the first visit's tip sits under the toolbar; while it shows, the toolbar's short "Select text to highlight it" hides (hub.css) */
     tip(el, "notes", "Select any words in the notes to highlight them; they stay on this device.", $(".reading > .toolbar", el));
   }
+  /* ======================= Follow along: the word being read ======================= */
+  /* While Listen plays a lecture's narration, the word being read is highlighted in the notes, and the sentence around it
+     more softly (a survey idea, approved by Sam 2026-11-11: "highlight the words being read when listening to the lecture
+     notes voiceover"). The times come from hubs/<hub>/audio/<lecture>-<level>.words.json beside the mp3, made by
+     tools/narration_words.py (and by tools/narrate.py whenever it renders). The highlight is a CSS Custom Highlight
+     (::highlight(sh-read) in hub.css), so the notes' text and the student's own highlights are never touched; a browser
+     without it simply doesn't highlight. The page scrolls to keep the word in view while the reader is following (the word
+     was on screen), but not for 6 seconds after they scroll, and never to pull them back from elsewhere in the notes; a
+     seek moves the page to the new place. "Follow along" in the toolbar turns it off (sh_pref_follow, this device). */
+  function followOn(){ return ls("sh_pref_follow") !== "off"; }
+  var follow = (function(){
+    var OK = !!(window.CSS && CSS.highlights && typeof window.Highlight === "function");
+    var BLOCK = /^(P|LI|H1|H2|H3|H4|H5|H6|DIV|TD|TH|TR|TABLE|THEAD|TBODY|UL|OL|DL|DT|DD|BLOCKQUOTE|SECTION|ARTICLE|ASIDE|FIGURE|FIGCAPTION|DETAILS|SUMMARY|BR|HR)$/;
+    var SKIP = /^(SCRIPT|STYLE|SVG|BUTTON|TEMPLATE|NOSCRIPT)$/;
+    var F = null, wordHL = null, lineHL = null, userAt = 0, cache = {};
+    function key(w){ var k = String(w).toLowerCase().replace(/[^0-9a-z]/g, ""); return k || String(w); }
+    /* the notes' words in reading order, as narrate.py reads the HTML: whitespace and block edges split words, inline
+       tags don't (so "Ca<sup>2+</sup>" is one word); figures placed in the notes (data-sh-noread) aren't read */
+    function domWords(root){
+      var out = [], cur = null, blk = 0;
+      function end(){ if (cur) { out.push(cur); cur = null; } }
+      (function walk(n){
+        for (var c = n.firstChild; c; c = c.nextSibling) {
+          if (c.nodeType === 3) {
+            var re = /\S+|\s+/g, m;
+            while ((m = re.exec(c.data))) {
+              if (/^\s/.test(m[0])) { end(); continue; }
+              if (!cur) cur = { a: c, ai: m.index, blk: blk, text: "" };
+              cur.b = c; cur.bi = m.index + m[0].length; cur.text += m[0];
+            }
+          } else if (c.nodeType === 1) {
+            var tag = c.tagName.toUpperCase();
+            if (SKIP.test(tag) || c.hasAttribute("data-sh-noread")) { end(); continue; }
+            var b = BLOCK.test(tag);
+            if (b) { end(); blk++; }
+            walk(c);
+            if (b) { end(); blk++; }
+          }
+        }
+      })(root);
+      end();
+      return out;
+    }
+    /* each narrated word -> the same word on the page: in order, looking a little ahead, a match two words long when it
+       skips anything (the narration leaves out table headers and adds nothing the page doesn't show) */
+    function build(){
+      var dw = domWords(F.root), dk = dw.map(function(d){ return key(d.text); }), fw = F.w, map = new Array(fw.length), j = 0;
+      for (var i = 0; i < fw.length; i++) {
+        var k = key(fw[i]), next = i + 1 < fw.length ? key(fw[i + 1]) : null, hit = -1;
+        for (var d = 0; d < 60 && j + d < dk.length; d++) {
+          if (dk[j + d] === k && (d === 0 || next === null || dk[j + d + 1] === next)) { hit = j + d; break; }
+        }
+        map[i] = hit; if (hit >= 0) j = hit + 1;
+      }
+      /* sentences: runs of words in one block, ending at . ! or ? ("Oxytocin: labor contractions" stays one) */
+      var sent = new Array(fw.length), sid = 0, prevBlk = -1;
+      for (i = 0; i < fw.length; i++) {
+        var blk = map[i] >= 0 ? dw[map[i]].blk : prevBlk;
+        if (blk !== prevBlk && i) sid++;
+        sent[i] = sid; prevBlk = blk;
+        if (/[.!?]["”')\]]*$/.test(fw[i])) sid++;
+      }
+      F.dw = dw; F.map = map; F.sent = sent; F.dirty = false; F.cur = -2;
+    }
+    function rangeOf(a, b){
+      var r = document.createRange();
+      try { r.setStart(a.a, a.ai); r.setEnd(b.b, b.bi); } catch (e) { return null; }
+      return r;
+    }
+    function clear(){ if (!OK) return; try { CSS.highlights.delete("sh-read"); CSS.highlights.delete("sh-read-line"); } catch (e) {} wordHL = lineHL = null; }
+    /* the last word that has started by time t (hundredths), or -1 */
+    function at(t){ var T = F.t, lo = 0, hi = F.w.length - 1, ans = -1; while (lo <= hi) { var m = (lo + hi) >> 1; if (T[2 * m] <= t) { ans = m; lo = m + 1; } else hi = m - 1; } return ans; }
+    function paint(i, jump){
+      F.cur = i;
+      var dwi = i >= 0 ? F.map[i] : -1;
+      while (i >= 0 && dwi < 0 && i > 0) { i--; dwi = F.map[i]; }   // a word the page doesn't show: stay on the one before
+      if (dwi < 0) { clear(); return; }
+      var w = F.dw[dwi], r = rangeOf(w, w); if (!r) { F.dirty = true; return; }
+      var s0 = i, s1 = i, sid = F.sent[i];
+      while (s0 > 0 && F.sent[s0 - 1] === sid) s0--;
+      while (s1 < F.w.length - 1 && F.sent[s1 + 1] === sid) s1++;
+      while (s0 < i && F.map[s0] < 0) s0++;
+      while (s1 > i && F.map[s1] < 0) s1--;
+      var lr = rangeOf(F.dw[F.map[s0]], F.dw[F.map[s1]]);
+      try {
+        wordHL = new Highlight(r); CSS.highlights.set("sh-read", wordHL);
+        if (lr) { lineHL = new Highlight(lr); CSS.highlights.set("sh-read-line", lineHL); }
+      } catch (e) {}
+      keepInView(r, jump);
+    }
+    function keepInView(r, jump){
+      var b = r.getBoundingClientRect(); if (!b.height && !b.width) return;
+      var vh = innerHeight, top = 96, bottom = vh - 150, was = F.seen;
+      F.seen = b.bottom > 0 && b.top < vh;
+      if (!jump && (Date.now() - userAt < 6000 || !was)) return;   // the reader scrolled, or is reading elsewhere
+      if (b.top >= top && b.bottom <= bottom) return;
+      try { scrollTo({ top: Math.max(0, scrollY + b.top - vh * 0.33), behavior: reduced ? "auto" : "smooth" }); } catch (e) { scrollTo(0, scrollY + b.top - vh * 0.33); }
+      F.seen = true;
+    }
+    function tick(){
+      F && (F.raf = 0);
+      if (!F || !F.on || !F.w) return;   // off, or its timings still loading
+      if (!F.root.isConnected) { detach(); return; }
+      if (F.dirty) build();
+      var i = at(F.audio.currentTime * 100 + 4);
+      if (i !== F.cur) paint(i, F.jump); F.jump = false;
+      if (!F.audio.paused && !F.audio.ended) F.raf = requestAnimationFrame(tick);
+    }
+    function kick(){ if (F && F.on && !F.raf) F.raf = requestAnimationFrame(tick); }
+    function detach(){
+      if (!F) return;
+      if (F.raf) cancelAnimationFrame(F.raf);
+      if (F.mo) F.mo.disconnect();
+      F.off.forEach(function(x){ F.audio.removeEventListener(x[0], x[1]); });
+      F = null; clear();
+    }
+    function load(url){
+      if (!cache[url]) cache[url] = fetch(url, { cache: "no-cache" }).then(function(r){ if (!r.ok) throw new Error(r.status); return r.json(); });
+      return cache[url];
+    }
+    function attach(audio, root, url){
+      detach();
+      if (!OK || !audio || !root || !/\.mp3(\?|$)/.test(url || "") || !root.closest(".reading")) return;
+      var wurl = url.replace(/\.mp3(\?.*)?$/, ".words.json");
+      var me = F = { audio: audio, root: root, url: wurl, on: followOn(), raf: 0, cur: -2, dirty: true, jump: true, seen: true, off: [] };
+      load(wurl).then(function(d){
+        if (F !== me || !d || d.v !== 1 || !d.w || !d.t) return;
+        var w = String(d.w).split(" ");
+        if (w.length * 2 !== d.t.length) return;
+        function ready(){ if (F !== me) return; if (audio.duration && isFinite(audio.duration) && Math.abs(audio.duration - d.dur) > 2) { detach(); return; } me.w = w; me.t = d.t; show(true); kick(); }   // a words file made from another mp3 is never shown
+        if (audio.readyState >= 1) ready(); else audio.addEventListener("loadedmetadata", ready, { once: true });
+        function on(x, f){ audio.addEventListener(x, f); me.off.push([x, f]); }
+        on("play", kick); on("seeked", function(){ if (F === me) { me.jump = true; me.cur = -2; kick(); } });
+        on("ended", function(){ if (F === me) clear(); });
+        on("error", function(){ if (F === me) detach(); });   // the browser voice takes over, with its own highlight
+        me.mo = new MutationObserver(function(){ if (F === me) { me.dirty = true; kick(); } });   // figures placed, a highlight added
+        me.mo.observe(root, { childList: true, subtree: true, characterData: true });
+      }).catch(function(){ show(false); });
+    }
+    function show(on){ var b = F && F.root.closest(".reading") ? $("[data-follow]", F.root.closest(".reading")) : null; if (b) b.hidden = !on; }
+    ["wheel", "touchmove", "keydown"].forEach(function(x){ addEventListener(x, function(e){ if (x !== "keydown" || /^(Arrow|Page|Home|End| )/.test(e.key)) userAt = Date.now(); }, { passive: true }); });
+    document.addEventListener("sh:tts-audio", function(e){ var d = e.detail || {}; attach(d.audio, d.container, d.url); });
+    document.addEventListener("sh:tts-stop", function(){ if (F && !(window.shTTS && window.shTTS.audio && window.shTTS.audio() === F.audio)) detach(); });
+    return {
+      /* the toolbar's toggle changed */
+      pref: function(){ if (!F) return; F.on = followOn(); if (F.on) { F.cur = -2; F.jump = true; kick(); } else clear(); },
+      /* the notes were drawn again while the narration plays (a lecture's own page): follow the new text if it's the same file */
+      reattach: function(root, mp3){ var a = window.shTTS && window.shTTS.audio && window.shTTS.audio(); if (a && F && F.audio === a && !F.root.isConnected && F.url === mp3.replace(/\.mp3$/, ".words.json")) attach(a, root, mp3); }
+    };
+  })();
+
   function wireLecPick(el){ var pick = $("[data-lecpick]", el); if (pick) pick.addEventListener("click", function(){ var on = pick.getAttribute("aria-expanded") !== "true"; pick.setAttribute("aria-expanded", String(on)); }); }
   /* "Notes done" (Sam, 2026-11-11: see "which lectures youve done in the lecture notes"): the button at the end of a lecture's
      notes marks it, and reading to the end marks it too once the lecture has been open a minute (so jumping to the bottom

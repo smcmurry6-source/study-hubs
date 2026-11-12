@@ -285,6 +285,7 @@
       clearHighlight();
       activeBtn = null; activeWords = null; wordCursor = -1;
       dockSync();
+      try { document.dispatchEvent(new CustomEvent("sh:tts-stop")); } catch (e) {}   // the read-along (widget/hub.js) lets go
     }
 
     // Wrap each word of a container's text in its own span so it can be
@@ -469,6 +470,8 @@
       activeBtn = btn;
       activeAudioEl = audio;
       setState(btn, "playing");
+      /* the redesign's read-along (widget/hub.js) follows this audio to highlight each word as it's read */
+      try { document.dispatchEvent(new CustomEvent("sh:tts-audio", { detail: { audio: audio, container: container, url: audioUrl } })); } catch (e) {}
       var p = audio.play();
       if (p && p.catch) {
         p.catch(function(){
@@ -544,7 +547,7 @@
       var head = cur.container && cur.container.closest ? cur.container.closest("article, section, .reading, .notes") : null;
       var h = head && head.querySelector("h1, h2, h3");
       var title = "";
-      if (h) { var hc = h.cloneNode(true); Array.prototype.forEach.call(hc.querySelectorAll("[class*=badge],[class*=chip],[class*=pill],[class*=status],[class*=tag]"), function(x){ x.remove(); }); title = hc.textContent.replace(/\s+/g, " ").trim(); }
+      if (h) { var hc = h.cloneNode(true); Array.prototype.forEach.call(hc.querySelectorAll("[class*=badge],[class*=chip],[class*=pill],[class*=status],[class*=tag],[aria-hidden=true]"), function(x){ x.remove(); }); title = hc.textContent.replace(/\s+/g, " ").trim(); }
       d.querySelector(".sh-tts-dock-title").textContent = title || "Lecture notes";
       var seek = d.querySelector(".sh-tts-dock-seek");
       seek.disabled = !activeAudioEl;
@@ -582,7 +585,9 @@
 
     /* true while a lecture is being read aloud (pre-recorded narration or the browser voice) */
     function listening(){ return !!(activeAudioEl && !activeAudioEl.paused && !activeAudioEl.ended) || !!(synth && synth.speaking && !synth.paused); }
-    return { supported: !!synth, speak: speak, stop: stop, listening: listening };
+    /* the narration file playing now, if any (read-only: the read-along highlight in widget/hub.js reads its time) */
+    function audioEl(){ return activeAudioEl; }
+    return { supported: !!synth, speak: speak, stop: stop, listening: listening, audio: audioEl };
   })();
 
   /* ---------- universal settings: font, text size, screen name — applied

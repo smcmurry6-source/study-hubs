@@ -50,6 +50,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   the board's stylesheet loads) fixed in `widget/dash.js`. Sam then asked for a more decorative board, to be done once
   #318 has merged. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324))
 
+- **2026-11-12 (Follow along: the redesign highlights the word being read, Claude Code)** — The survey's "highlight the words
+  being read when listening to the lecture notes voiceover", approved by Sam for the redesign. While Listen plays a lecture's
+  narration in a redesigned hub (`hubs/<id>/next/`), the word being read is highlighted in the notes and its sentence shaded
+  more softly (CSS Custom Highlights, `::highlight(sh-read)` / `(sh-read-line)` in `widget/hub.css`: the notes' text and the
+  student's own highlights are never touched); the page scrolls to keep it in view while the reader follows along, stops
+  following when they scroll away, and jumps to the new place on a seek. A **Follow along** toggle beside Listen
+  (`sh_pref_follow`, `notes:follow=on|off`). The times: `hubs/<hub>/audio/<lecture>-<level>.words.json` beside each mp3, for all
+  52 narrations of Heme & Endo Exam 2, Occlusion and Perio, made from the recordings by the new `tools/narration_words.py`
+  (Kokoro's duration model cut to that output, aligned to each mp3's loudness; median error 20-40 ms, 96-100% of words within
+  0.2 s against exact timings). `tools/narrate.py` now writes the file from Kokoro's own timings whenever it renders, and the
+  smoke lint fails a redesigned hub whose narration has no words file or one made from another recording.
+  `tools/kokoro-setup.sh` installs kokoro-onnx 0.6.1+ and `onnx`. **Live on Perio:** Session 5's narration (both levels)
+  is regenerated: its middle (minutes 5-9 Plain English, 6-15 As taught) no longer said what the notes say, found by the
+  timings' fit check and confirmed by comparing a fresh rendering minute by minute (`narration_words.py --render`). `widget/v3.js`: `shTTS.audio()` and the `sh:tts-audio` /
+  `sh:tts-stop` events for it, and the Listen dock's title no longer repeats a hidden lecture badge ("L11L11 · ...", every
+  hub). The About page text waits in the [redesign release](vault/tasks/2026-11-06-redesign-release.md) note, like the
+  redesign's other features. [Task](vault/tasks/done/2026-11-12-redesign-follow-along.md).
 - **2026-11-11 (Lessons refresh, Claude Code)** — Data read 5:30 pm Central, two days before Heme & Endo Exam 2. The 11-10
   evening's six explanation fixes worked (first tries 29% before, 81% since, against the bank's 70% -> 74%), and the Cushing labs
   no longer read backwards (`p1-corticotroph` 1 of 12 -> 6 of 10). Five more Heme & Endo Exam 2 explanations now name the class's
