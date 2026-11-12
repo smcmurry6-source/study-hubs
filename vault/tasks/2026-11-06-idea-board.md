@@ -215,7 +215,10 @@ The live About page describes the live site, so these go in with the redesign's 
   - **Found on the way**: BUG-072 (phase 3's stage: the day before an exam, at the largest text on a phone, the luck row
     pushed Start studying past the screen's edge; `tools/ci/smoke.js` failed on it today, the day before Heme & Endo 2)
     and BUG-073 (the form's name box), both fixed ([bug log](../release/bug-log.md)).
-  - **Checked**: `node tools/release/run.js` (results in the PR); `tools/ci/smoke.js` now draws a made-up board on the new
+  - **Checked**: `node tools/release/run.js`, all 14 suites passing (results in the PR; `a11y.js` needs `axe-core`,
+    which a cloud session installs outside the repo and names in `AXE_CORE_PATH`), and axe on the board's own screens,
+    which `a11y.js` doesn't open (the post form with an error showing, the check-in's tick, a hub's More page, the admin
+    card; laptop, phone and dark), clean; `tools/ci/smoke.js` now draws a made-up board on the new
     dashboard and in each new hub's More and fails if a card, a status, a vote, the hub and kind pickers or the tags are
     missing, if an idea's words are drawn as markup, or if any button in the board has no fixed `data-shi` name; a
     scripted walk on the local preview, 110 checks, laptop and iPhone 13, as the returning, new and admin accounts (post,
