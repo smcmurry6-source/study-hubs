@@ -35,7 +35,7 @@ Don't read the big files whole. Each `hubs/<id>/index.html` is one large single-
 ## 3. Shipping
 
 - **Never push `main` and never force-push a shared branch.** Start a branch from a fresh `origin/main` (other agents
-  push here too: fetch and rebase before you push), open a pull request into `main` (a draft is fine), and Sam merges.
+  push here too: fetch and rebase before you push), open a pull request into `main` (a draft is fine). When Sam says "merge", merge it; or Sam merges it.
   Claude Code cloud sessions push their own `claude/...` branch.
 - **Boards hub work** (INBDE + ADEX) is the exception: it lives on the `claude/boards-hub` branch with its own briefs
   under `docs/boards/` there. Branch from it and open the PR into it. Its rules: [vault/hubs/boards.md](vault/hubs/boards.md).
@@ -44,7 +44,7 @@ Don't read the big files whole. Each `hubs/<id>/index.html` is one large single-
   [vault/how-to/verify-before-pushing.md](vault/how-to/verify-before-pushing.md).
 - **A substantial change** (a feature, anything in `widget/`, a new hub or lecture, a migration...) follows
   [RELEASE_TEST_PLAN.md](RELEASE_TEST_PLAN.md): the release suites (`node tools/release/run.js`), the bug log, a test
-  report in the PR, and **Sam's explicit approval** before it ships. A preview on made-up data, and UAT in it, only when
+  report in the PR, and **Sam's "merge"** before it ships (no approval checkbox). A preview on made-up data, and UAT in it, only when
   Sam asks for one or says yes when you ask (Sam, 2026-11-06). Previews and tests never write to the class's data.
 - **The PR description** says what changed in plain, student-facing words, what you ran and what passed, and anything
   you're unsure of. American English everywhere.

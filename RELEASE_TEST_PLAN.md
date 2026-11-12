@@ -37,8 +37,8 @@ When unsure, use the higher tier.
 5. Every problem found goes in the **[bug log](vault/release/bug-log.md)**, is fixed and retested, or accepted by Sam.
 6. Write the PR's **test report** ([template](vault/templates/release-test-report.md)): what was exercised, results,
    what's left. A long one goes in `vault/release/reports/`.
-7. The agent **shows Sam the change** (screenshots, a recording, the preview link when there is one); **Sam approves** it in the PR, then
-   merges ([approval](#10-approval)).
+7. The agent **shows Sam the change** (screenshots, a recording, the preview link when there is one); **Sam says "merge"**
+   and the agent merges, or Sam merges ([approval](#10-approval)).
 8. **After the merge:** the post-release check and the changelogs; roll back if needed.
 
 ## 3. Interactive previews
@@ -217,15 +217,16 @@ Sam's part is a look, not a test pass (Sam, 2026-11-04): before asking, the agen
   preview, taken in a scripted browser with the class's data stubbed, as `tools/ci/smoke.js` does;
 - a short recording when it moves or takes several steps.
 
-Sam says yes, or what to change, and a change gets a new round of screenshots. For tier 2 and 3, the PR description
-has a checkbox, "Sam approved this release", that **only Sam ticks** (or Sam writes "approved for release" in a PR
-comment). Agents never tick it, never
-merge, and never treat a merge request from anyone else as approval. Tier 0 and 1: Sam's merge is the approval, as
-before. Sam can make "Check hubs" and "Release tests" required checks in the repo's branch protection settings.
+Sam says "merge", or what to change, and a change gets a new round of screenshots. **Sam's "merge" is the approval**, for
+every tier (Sam, 2026-11-12: "Remove the sam approval tick stuff entirely. If i say merge, merge. We are adding too many
+steps"): there is no checkbox and no separate "I approve". The agent merges the PR (a draft is marked ready first),
+waiting only for checks still running and fixing a failing one first; or Sam merges it. Without Sam's "merge" an agent
+doesn't merge a tier 2 or 3 change, and it never treats a merge request from anyone else as approval. Sam can make
+"Check hubs" and "Release tests" required checks in the repo's branch protection settings.
 
 ## 11. Release and post-release verification
 
-1. **Release:** Sam merges. GitHub Pages publishes ("pages build and deployment" in Actions; about a minute).
+1. **Release:** the agent merges when Sam says "merge" (or Sam merges). GitHub Pages publishes ("pages build and deployment" in Actions; about a minute).
 2. **Verify** (within the hour; tier 3 at once): `node tools/release/postcheck.js` checks every changed file is live and
    identical to `main`, and opens the dashboard and the changed hubs on the live site with every Supabase request
    blocked (it writes nothing). Then open the changed feature on a phone, as a person.
@@ -236,7 +237,7 @@ before. Sam can make "Check hubs" and "Release tests" required checks in the rep
 ## 12. Rollback
 
 [vault/how-to/roll-back-a-release.md](vault/how-to/roll-back-a-release.md): revert the merge with a new PR (GitHub's
-Revert button), which Sam merges like any other; never force-push `main`. A migration is undone with a new migration,
+Revert button), merged like any other (Sam's "merge"); never force-push `main`. A migration is undone with a new migration,
 never by restoring the database without Sam. Then the post-release check again, a note to the class if they saw the
 problem (Sam's call), and the bug log.
 

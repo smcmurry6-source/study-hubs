@@ -40,7 +40,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 - [x] Check-ins, surveys, notices, luck, the leaderboard, streaks, archive rules and the tour all work on the preview
 - [ ] About page lists every changed feature, counts true (drafted in [the release note](2026-11-06-redesign-release.md), "From phase 3"; it lands at the release)
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
-- [ ] Preview link, phone and laptop screenshots, and Sam's look ("Sam approved this release" ticked by Sam): the second pass's screenshots sent 2026-11-11, then a third pass asked for; no preview link (on request only)
+- [ ] Preview link, phone and laptop screenshots, and Sam's look, then Sam's "merge": the second pass's screenshots sent 2026-11-11, then a third pass asked for; no preview link (on request only)
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
 ## Log

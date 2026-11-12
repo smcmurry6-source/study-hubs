@@ -32,6 +32,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (No approval checkbox: Sam's "merge" is the approval, Claude Code)** — Sam: "Remove the sam approval
+  tick stuff entirely. If i say merge, merge. We are adding too many steps." The "Sam approved this release" box is gone
+  from the PR template and the test report template, and [preview-and-release-test](vault/rules/preview-and-release-test.md),
+  `RELEASE_TEST_PLAN.md` (sections 10-12), `AGENTS.md`, `CLAUDE.md`, ship-a-change, roll-back-a-release, home and the
+  redesign task notes now say it: when Sam says "merge", the agent merges (a draft is marked ready first), waiting only
+  for checks still running and fixing a failing one first; Sam can still merge it. Nothing in CI read the box.
 - **2026-11-12 (A standing rule: anything left to do goes on the to-do list, Claude Code)** — Sam: "make it a standing rule
   to add things like that to a to do so things dont get lost in chats that need to be done. check them off as they are
   done." New rule [to-dos-go-in-the-vault](vault/rules/to-dos-go-in-the-vault.md), loaded in every Claude Code session and

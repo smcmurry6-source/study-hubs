@@ -25,7 +25,7 @@ task is the one PR that then switches the site over. If something goes wrong, re
   [4](2026-11-05-redesign-phase-4-game-layer.md); [5](2026-11-05-redesign-phase-5-backend.md) ships as it's ready.
 - The plan: [the redesign audit and plan](done/2026-11-05-redesign-audit-and-plan.md), section 4.
 - Rules that matter most here: [preview-and-release-test](../rules/preview-and-release-test.md) (tier 3: the release
-  suites, UAT, Sam ticks "Sam approved this release"), [about-page](../rules/about-page.md),
+  suites, UAT, Sam's "merge"), [about-page](../rules/about-page.md),
   [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md), [question-ids-are-permanent](../rules/question-ids-are-permanent.md),
   [roll-back-a-release](../how-to/roll-back-a-release.md).
 - The hubs that get new versions: **Occlusion, Heme & Endo Exam 2 and Perio** (Sam, 2026-11-06). PCD Implants and Special

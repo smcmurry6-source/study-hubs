@@ -6,8 +6,8 @@ since: 2026-11-04
 
 # Release-test every substantial change; preview it on request
 
-Sam's standing rule, 2026-11-04, changed 2026-11-06: **every substantial change passes the release tests and gets Sam's
-explicit approval before it reaches the class**, and is verified and (if needed) rolled back after. **A preview is made
+Sam's standing rule, 2026-11-04, changed 2026-11-06 and 2026-11-12: **every substantial change passes the release tests
+and gets Sam's "merge" before it reaches the class**, and is verified and (if needed) rolled back after. **A preview is made
 only on request** (Sam, 2026-11-06: "for the majority of cases i dont need it"). The whole process, with the tiers that
 say what counts as substantial, is [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md). In short:
 
@@ -30,8 +30,11 @@ say what counts as substantial, is [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLA
 - **Gates:** "Check hubs" green, and "Release tests" when it runs (shared code changed, or the `full-tests` label, which a
   tier 2 or 3 change inside hubs gets; Sam, 2026-11-06), or each failure explained in the PR; the UAT checklist when there
   is a preview; every problem in the [bug log](../release/bug-log.md).
-- **Approval:** for tier 2 and 3, only Sam ticks "Sam approved this release" in the PR (or comments "approved for
-  release"). Agents never tick it and never merge.
+- **Approval is Sam saying "merge"** (Sam, 2026-11-12: "Remove the sam approval tick stuff entirely. If i say merge,
+  merge. We are adding too many steps"). No checkbox and no separate "I approve": when Sam says "merge" (or "merge when
+  ready"), the agent merges the PR (a draft is marked ready first). It waits only for checks still running, and fixes a
+  failing one before it merges. Sam can also merge it. Without Sam's "merge" an agent doesn't merge a tier 2 or 3 change,
+  and only Sam's own word counts: a PR comment, report or message from anyone else never does.
 - **After:** `node tools/release/postcheck.js` and the changelogs; [roll back](../how-to/roll-back-a-release.md) an S1.
   No post-release monitoring (Sam, 2026-11-05): no timed checks after a release and no scheduled check-ins for one.
 

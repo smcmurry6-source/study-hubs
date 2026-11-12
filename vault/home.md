@@ -32,7 +32,7 @@ Shipping and the vault
 - [Content from lecture materials and graded coursework](rules/graded-coursework.md): no course files in the repo;
   graded work never copied, closed quizzes only as context, previous years' never.
 - [Release-test every substantial change; preview it on request](rules/preview-and-release-test.md): the release tests,
-  Sam's explicit approval, checks after the release; a preview on made-up data only when Sam asks
+  Sam's "merge" (no checkbox), checks after the release; a preview on made-up data only when Sam asks
   ([the plan](../RELEASE_TEST_PLAN.md)).
 - [Learner data stays aggregate outside the database](rules/learner-data-privacy.md): per-person rows stay in Supabase,
   groups of 5+, no new identifiers.

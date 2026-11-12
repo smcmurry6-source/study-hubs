@@ -33,6 +33,5 @@ Preview: <!-- only when Sam asked for one (the `preview` label): the link from t
 
 ## Release
 
-- [ ] Sam approved this release <!-- tiers 2 and 3: only Sam ticks this -->
 - [ ] After merge: `node tools/release/postcheck.js` passed
 - [ ] Vault written back (task note, decisions, hub note), `DEPLOY_NOTES.md`, About page if students can see it
