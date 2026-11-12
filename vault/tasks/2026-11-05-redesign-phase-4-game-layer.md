@@ -53,7 +53,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 | 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
 | 4 | **Visiting**: a row on the new dashboard's boards opens that person's place | [visiting](2026-11-12-redesign-visiting.md) | 3 |
 | 5 | **The bowling egg** (part D) | [the bowling egg](2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
-| 6 | **The trophy case and the cards**: this note's original goal | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
+| 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12) | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
 | 7 | **Ask Timmy, part 2** (the chat) | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), its code map; its prompt is at the end of that note | 3 |
 | 8 | **The game layer's wiring** left by part A: the arcade's sessions, Timmy Time's minutes, the service worker's lists | [the wiring](2026-11-12-redesign-game-layer-wiring.md) | 6 |
 | 9 | **Phase 5, part 2**: bundles, one stylesheet, the font, budgets lowered | [phase 5](2026-11-05-redesign-phase-5-backend.md) | every session that adds a file (1 to 8) |
@@ -255,6 +255,7 @@ These hold for each spec; a spec only adds to them.
     wear his place's outfit: that is pet.js's, for "everyone has Timmy" ([the release](2026-11-06-redesign-release.md),
     "From phase 4, part C").
   - **Still open in this note**: parts B and D, part E, the arcade lobby, the recording on a preview, the About page.
+- 2026-11-12: [#335](https://github.com/smcmurry6-source/study-hubs/pull/335) merged as `a529c0f` (Sam: "Merge"; `main` with Occlusion L10, #336, was brought into the branch first, which moved the place's three bug rows up one: BUG-088 the card's name, BUG-089 the statue, BUG-090 the five outfits), and `node tools/release/postcheck.js` passed (23 of 23 changed files live and identical to `main`; the dashboard and the live hubs open with no errors).
 - 2026-11-12 (Claude Code, **planning only, no code**): what is left of this phase turned into build specs. Sam
   answered one list of 23 calls ([decisions](../decisions.md)); the order, what holds for every session and the link to
   each spec are in "From here to the release" above. Found while reading: this note's original goal (the trophy case

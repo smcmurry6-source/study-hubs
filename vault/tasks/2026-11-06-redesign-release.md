@@ -72,6 +72,14 @@ task is the one PR that then switches the site over. If something goes wrong, re
       before this one (Sam, 2026-11-12); the journey trophies join the case in
       [the trophy case's session](2026-11-12-redesign-trophy-case-and-cards.md); the scenes stay silent. Left for
       this PR: each episode's length loaded (`admin_set_podcast_episode`) and the service worker's lists
+- [ ] **Full Arch comes out** (Sam, 2026-11-12: "I also want to remove the full arch challenge thing"; the redesign's
+      pages stop showing it in [the trophy case's session](2026-11-12-redesign-trophy-case-and-cards.md)). In this
+      PR, from the shared files: its code in `widget/eggs.js` (and the top comment's lines about it), its styles in
+      `widget/v3.css`, the `sh_pref_arch` switch in `widget/v3.js` (the old dashboard's goes with `index.html`),
+      `sh:arch-done` in `widget/ranks.js`, Timmy's secret tip and his line about it in `widget/pet.js`; and on the
+      About page: its entry in Easter eggs, its rows in both trophy tables, its name in Settings, in "Secret tips"
+      and in Part 7's list of switches, with every trophy count made true. Then `tools/timmy/build.mjs`, so Ask
+      Timmy's site help stops describing it. An earned Full Arch stays in its owner's case as retired
 - [ ] From the planning of 2026-11-12 ("What Sam's calls of 2026-11-12 change" below): `widget/pet.js`'s
       `everyone` becomes the only behavior and the adoption code comes out, with the day the redesign went live set
       in its constant; the prices Sam wants changed are changed with `admin_upsert_shop_item` once the migration is
@@ -472,9 +480,11 @@ The sessions that build each part fix the drafts they make untrue; this is the l
   "dresses up with him"; the About page's lines on Timmy's holiday outfits are rewritten (they are in his wardrobe
   now: the seasonal sets); `LORE.md`'s "he can't pick one" is canon for the episodes already out, and from the
   redesign on the student dresses him. Rare costumes turn up at the shop; he doesn't wear one by himself.
-- **The trophy count** is 28, 15 of them secret (24, the three journey trophies and Bowling): "From phase 4, part
-  A" says 27 and 14. The Bowling trophy is kept on the device until the first migration after the release, so it
+- **The trophy count** is 27, 14 of them secret (today's 24 without Full Arch, the three journey trophies and
+  Bowling): "From phase 4, part A" says 27 and 14 for another reason (the journeys alone), so its wording changes. The Bowling trophy is kept on the device until the first migration after the release, so it
   shows no share of the class at first ([the bowling egg](2026-11-06-redesign-bowling-egg.md)).
+- **Full Arch is gone**: the 32-tooth chart, its switch and its trophy (the box in Done when). Where a draft above
+  lists the extras a setting turns off ("the Full Arch chart" in phase 3's Settings draft), it comes out.
 - **New drafts to come**, each written by its session under its own heading here: part B (Shiny Gold Crowns, the
   shop, rarity, snacks, boosts; rare costumes in a spoiler), part D (the bowling egg, in a spoiler), visiting, the
   trophy case.

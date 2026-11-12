@@ -40,8 +40,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   trophy case and the cards (phase 4's first goal, found unbuilt), the game layer's wiring. Sam's calls are in
   `vault/decisions.md`; the biggest: Timmy wears only what the student put on ("if someone doesnt have a costume
   applied, they are naked"), the five undrawn outfits are drawn, the bowling egg uses the clips already drawn on
-  #291, and `migration_v54.sql` is not changed (`vault/reference/game-server.md` lists where the client works around
-  it). #335 (Timmy's place) was merged in the same session.
+  #291, `migration_v54.sql` is not changed (`vault/reference/game-server.md` lists where the client works around it), and
+  the Full Arch chart and its trophy are retired with the redesign. #335 (Timmy's place) was merged in the same session.
 - **2026-11-12 (the redesign's Timmy's place, client side: phase 4, part C, Claude Code)** — Nothing students see
   changes: it runs only on the new pages (`hubs/<id>/next/`, `next/`, shown in a preview), `widget/pet.js` is
   untouched, and migration_v54 is still **not applied** and wasn't changed. New: `widget/place.js` + `widget/place.css`
