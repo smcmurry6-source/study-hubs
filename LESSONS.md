@@ -135,7 +135,7 @@ check-in (18 in all), and one survey answer, a feature idea: highlight the words
   answers at 88%. The final's lectures are still practiced in bank order: since 11-09 L6 675 answers from 12 people, L7 665 from 7,
   **L8 and L9 about 40 each from a few**; tries per question L6 11.0, L7 5.1, L9 0.8, L8 0.4. Five days out there is time. Hardest on
   the final's lectures (small numbers): `in-locator` 7 of 15 (the pantograph's six recording tables picked as how the hinge axis is
-  found: the why names it, the explanation doesn't; a one-sentence fix waits for PR #319, which rewrites the same generated file),
+  found: the why named it, the explanation didn't; since 11-12 the explanation says it too, after #319 merged),
   `in-full-adj` 7 of 13 (the Bennett angle), `mo-2s-2`. The midterm lows are unchanged and not on the final.
 - **Perio** (final 11-19, cumulative): quiet, a few people a day (6 on 11-11, 55 min). The final's lows: `q3-M01` 28% (UniFe's inputs),
   `q4-06`, `q4-02`, `q5-01` (the narrowest maxillary furcation entrance, "Mesial" picked), `q4-M05`, `q3-47` (the three numbers, above).
@@ -364,7 +364,9 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   keys were spread on its eve, two-statement accuracy went 83% -> 82% and numbered 87% -> 85% (1,141 and 952 answers), so nobody had
   been leaning on the pattern; balance from the start rather than wait for a student to notice.
 - **Students notice one fact asked again and again.** Occlusion report #40 (2026-11-10): "this question has been asked a bunch already",
-  about the 10% of people whose MIP coincides with CR closure, which the final's lectures ask three times (`in-90`, `mo-10`, `mo-tf-3`).
+  about the 10% of people whose MIP coincides with CR closure, which the final's lectures asked four times (`in-90`, `mo-10`, `mo-tf-3`, and
+  a statement in `in-2s-4`, plus one in `in-num-3`). Checking the whole final the same way (2026-11-11) found 58 facts asked three to five
+  times, mostly a plain question, then its two-statement, true/false and numbered versions; 58 questions came out (Occlusion's hub note).
   Heme & Endo Exam 2's bank went to one question per fact for the same reason (Sam, 2026-11-08: "they need to be higher yield"), keeping
   one question for each point a High Likelihood topic names. Sam's bar (2026-11-10, `mo-10` retired): "it is okay to test the same concept multiple ways. just
   not for every single question and not more than twice." Before shipping a lecture, list the fact each question tests, and keep at
