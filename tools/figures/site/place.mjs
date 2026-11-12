@@ -1708,7 +1708,7 @@ export function placeKit(INK, C, PACKS, SETS){
     function quad(a, b, wa, wb){ var d = unit(a, b), n = [-d[1], d[0]]; return [[a[0] + n[0] * wa, a[1] + n[1] * wa], [b[0] + n[0] * wb, b[1] + n[1] * wb], [b[0] - n[0] * wb, b[1] - n[1] * wb], [a[0] - n[0] * wa, a[1] - n[1] * wa]]; }
     function along(a, b, t){ return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]; }
     var d = unit(A, B), n = [-d[1], d[0]];                      // n points down and to the left: the lit side is -n
-    if (m.k === "dark") s += circ(-1, -16, 17, m.h, 0).replace("/>", ' opacity=".22" class="tp-twinkle"/>');
+    if (m.k === "dark" && !o.small) s += circ(-1, -16, 17, m.h, 0).replace("/>", ' opacity=".22" class="tp-twinkle"/>');
     /* the socket it stands in: a stone ring on the step and a collar in the statue's own material */
     s += ell(.9, -.4, 4.3, 1.8, K.stoneShade, 1.2) + ell(.9, -.9, 3.3, 1.35, m.s, 1.1);
     /* the neck first (behind the grip), then the handle, lit along its upper edge and shaded along its lower */
@@ -1733,16 +1733,62 @@ export function placeKit(INK, C, PACKS, SETS){
     if (m.k === "gold" || m.k === "diamond" || m.k === "dark") s += dmStar(5, -26, 2.6, "#FFFFFF", "tp-twinkle", .6);
     return s;
   }
+  /* the ModuPro journey's object (redesign phase 4, part C): a typodont, the two jaws of teeth on their hinge, seen from
+     the front quarter with the mouth open toward the path. Cast in the rank's material like the handpiece, the teeth in
+     its highlight; the Antique one is a pair of plaster casts on a brass articulator, as the journey's medallion is.
+     About 27 px tall and 24 wide. */
+  function modupro(m, o){
+    var s = "", plaster = m.k === "antique", gum = plaster ? "#EDE3CF" : m.c, gumS = plaster ? "#C9BCA2" : m.s, gumH = plaster ? "#FAF5EA" : m.h,
+      tooth = plaster ? "#FBF7EC" : m.k === "dark" ? "#E2D0FF" : m.k === "stone" ? "#F4F1EB" : m.k === "bronze" ? "#FBE3CC" : m.k === "gold" ? "#FFF6D0" : "#FFFFFF", metal = plaster ? m.c : m.s;
+    function tooth1(x, y, w, h, up){ return '<rect x="' + f(x) + '" y="' + f(up ? y - h : y) + '" width="' + f(w) + '" height="' + f(h) + '" rx="1.1" fill="' + tooth + '" stroke="' + INK + '" stroke-width=".85"/>'; }
+    /* one jaw, drawn as the lower one (teeth up from y = 0, the slab below it, 5 thick); the upper is the same, flipped */
+    function jaw(flip){
+      var k = flip ? -1 : 1, q = "", y = function(v){ return f(v * k); };
+      /* the far row of teeth first, behind the arch */
+      [-4.6, -1.4, 1.8, 5].forEach(function(x){ q += tooth1(x + 2.6, flip ? 2 : -2, 2.5, 2.9, !flip); });
+      /* the flat of the arch between the two rows, then the near wall of the gum */
+      q += FO("M-9.4 0 L10 0 L12.6 " + y(-2) + " L-6 " + y(-2) + " Q-9.6 " + y(-2) + " -9.4 0 Z", gumS, 1);
+      q += FO("M10 0 L10 " + y(5) + " L-6.4 " + y(5) + " Q-11.4 " + y(5) + " -11.4 " + y(2.2) + " Q-11.4 0 -9 0 Z", gum, 1.4) +
+        L("M-9.6 " + y(1.5) + " L8.6 " + y(1.5), 1, gumH, .9) + F("M10 " + y(3.2) + " L10 " + y(5) + " L-6.4 " + y(5) + " Q-9.6 " + y(5) + " -10.8 " + y(3.6) + " Z", gumS, .7);
+      /* the near row, round the front of the arch */
+      [-10.3, -7.2, -4.1, -1, 2.1, 5.2].forEach(function(x, i){ q += tooth1(x, flip ? 0 : 0, i ? 2.7 : 2.4, i > 3 ? 3.7 : 3.3, !flip); });
+      return q;
+    }
+    if (m.k === "dark" && !o.small) s += circ(0, -14, 16, m.h, 0).replace("/>", ' opacity=".22" class="tp-twinkle"/>');
+    /* the collar and the short post it stands on */
+    s += ell(.6, -.6, 5.2, 2.1, K.stoneShade, 1.2) + ell(.6, -1.2, 4, 1.6, metal, 1.1) + FO("M-1.4 -1.4 L-1.4 -4.6 L2.6 -4.6 L2.6 -1.4 Z", metal, 1.1);
+    /* the back of the hinge, behind both jaws */
+    s += FO("M8.2 -7 L13.4 -9 L13.4 -14.4 L8.2 -12.6 Z", metal, 1.1);
+    s += T(0, -9.6, jaw(false));
+    s += '<g transform="translate(0 -11.2) rotate(27 10.6 0)">' + jaw(true) + "</g>";
+    /* the hinge pin */
+    s += circ(11, -10.6, 2.5, plaster ? m.h : m.c, 1.2) + circ(11, -10.6, .8, INK, 0);
+    if (m.k === "antique") s += circ(-7.6, -6.2, .7, m.pat) + circ(4.2, -6.6, .6, m.pat);
+    if (m.k === "diamond") s += L("M-8 -7.6 l2.4 1.6 M-3 -21.4 l2.6 1.2", .7, "#FFFFFF");
+    if (m.k === "dark") s += circ(-6.6, -7, .5, "#FFFFFF") + circ(2.4, -6.4, .55, K.dmTeal) + circ(-2, -20.6, .45, "#FFFFFF");
+    if (m.k === "gold" || m.k === "diamond" || m.k === "dark") s += dmStar(-11.5, -24, 2.6, "#FFFFFF", "tp-twinkle", .6);
+    return s;
+  }
   function statue(x, y, z, tier, level, o){
-    var m = MATS[tier] || MATS[0], s = "", lv = Math.max(1, Math.min(3, level || 1)), st = { top: K.stone, left: "#E3E8EC", right: K.stoneShade };
-    s += ell.apply(null, P(x + .3, y + .2, z).concat([12, 4.2, "#000", 0, .12]));
-    for (var i = 0; i < lv; i++){ var w = 1.1 - i * .24; s += box(x - w / 2, y - w / 2, z + i * .28, w, w, .28, st, { sw: 1.3, si: .8 }); }
-    var zt = z + lv * .28;
+    var j = Math.max(0, Math.min(2, o.journey | 0));
+    /* past the Handpiece (o.journey 1, the ModuPro; 2, the Loupes) the pedestal gets a wider base and carries the
+       journey's object, and the handpiece, finished, stands planted at its front corner in Dark Matter. In the Loupes
+       journey the ModuPro is finished too (Dark Matter, all three steps): that rank is the loupes Timmy wears. */
+    var m = MATS[j > 1 ? 6 : tier] || MATS[0], s = "", lv = j > 1 ? 3 : Math.max(1, Math.min(3, level || 1)), st = { top: K.stone, left: "#E3E8EC", right: K.stoneShade };
+    s += ell.apply(null, P(x + .3, y + .2, z).concat([j ? 15 : 12, j ? 5 : 4.2, "#000", 0, .12]));
+    var z0 = z, w0 = 1.1, dw = .24;
+    if (j){ s += box(x - .76, y - .76, z, 1.52, 1.52, .22, st, { sw: 1.3, si: .8 }); z0 = z + .22; w0 = 1.2; dw = .2; }
+    for (var i = 0; i < lv; i++){ var w = w0 - i * dw; s += box(x - w / 2, y - w / 2, z0 + i * .28, w, w, .28, st, { sw: 1.3, si: .8 }); }
+    var zt = z0 + lv * .28;
     if (o.snow) s += F(D([[x - .3, y - .3, zt], [x + .3, y - .3, zt], [x + .3, y + .3, zt], [x - .3, y + .3, zt]]), "#FFFFFF");
     var t = P(x, y, zt);
-    s += T(t[0], t[1] - 1, handpiece(m, o));
+    if (j){
+      var c = P(x - .56, y + .56, z0);
+      s += '<g transform="translate(' + f(c[0]) + " " + f(c[1] - .4) + ') rotate(-10) scale(.8)">' + handpiece(MATS[6], { small: true }) + "</g>";
+      s += T(t[0], t[1] - 1, modupro(m, o));
+    } else s += T(t[0], t[1] - 1, handpiece(m, o));
     var glint = L("M" + f(t[0] + .6) + " " + f(t[1] - 7) + " l-1.8 -12", 2.2, "#FFFFFF") + dmStar(t[0] + 7, t[1] - 30, 4, "#FFFFFF", "");
-    return { s: egg("statue", s, glint), lights: o.night && tier >= 4 ? glowAt(t[0], t[1] - 14, 12) : "" };
+    return { s: egg("statue", s, glint), lights: o.night && (j || tier >= 4) ? glowAt(t[0], t[1] - 14, 12) : "" };
   }
   /* mastery: every hub medal shows by the house on a board (Sam, 2026-11-10: picked the plaque over the trophy case, then
      "the mastery medals that pop up on the screen and the ones that are visible in Timmy's board need to be the same"). So
@@ -1865,7 +1911,8 @@ export function placeKit(INK, C, PACKS, SETS){
     obs.push(home.block);
     if (home.porchBlock && o.up && o.up.porch) obs.push(home.porchBlock);
     var st = home.statue || FIX.statue, br = home.brush || FIX.brush;
-    if (!st[2]) obs.push([st[0] - .55, st[1] - .55, st[0] + .55, st[1] + .55]);
+    var sw = o.journey > 0 ? .76 : .55;                    // past the Handpiece the pedestal has a wider base
+    if (!st[2]) obs.push([st[0] - sw, st[1] - sw, st[0] + sw, st[1] + sw]);
     obs.push([br[0] - .25, br[1] - .25, br[0] + .25, br[1] + .25], [FIX.lamp[0] - .3, FIX.lamp[1] - .3, FIX.lamp[0] + .3, FIX.lamp[1] + .3], [FIX.tree[0] - .5, FIX.tree[1] - .5, FIX.tree[0] + .5, FIX.tree[1] + .5]);
     if (o.holiday) obs.push([FIX.holiday[0] - .5, FIX.holiday[1] - .5, FIX.holiday[0] + .5, FIX.holiday[1] + .5]);
     return { home: home, sc: sc, yard: yard, spots: spots, obs: obs };
@@ -1917,13 +1964,13 @@ export function placeKit(INK, C, PACKS, SETS){
     o = o || {};
     EGGS_SEEN = [];
     var Lo = layout(o), home = Lo.home, sc = Lo.sc, yard = Lo.yard;
-    var night = !!(o.night || sc.alwaysNight), H = o.holiday || "", tier = Math.max(0, Math.min(6, o.tier | 0)), flair = o.flair || [];
+    var night = !!(o.night || sc.alwaysNight), H = o.holiday || "", tier = Math.max(0, Math.min(6, o.tier | 0)), journey = Math.max(0, Math.min(2, o.journey | 0)), flair = o.flair || [];
     var season = o.season || (H === "winter" ? "winter" : "");
     var snow = !!(sc.snowy || H === "winter");
     var up = {}; (home.ups || []).forEach(function(k){ if (o.up && o.up[k]) up[k] = true; });
-    var so = { night: night, snow: snow, season: season, fall: season === "fall", spring: season === "spring" };
+    var so = { night: night, snow: snow, season: season, fall: season === "fall", spring: season === "spring", journey: journey };
     var s = sc.sky(so);
-    if (tier >= 6) s += G("", [[150, 30, 5], [196, 16, 7], [246, 30, 4.4], [118, 54, 3.4], [276, 54, 3.6]].map(function(p, i){ return dmStar(p[0], p[1], p[2], i % 2 ? K.dmTeal : K.dmLight, "tp-twinkle", i * .5); }).join("") +
+    if (tier >= 6 || journey) s += G("", [[150, 30, 5], [196, 16, 7], [246, 30, 4.4], [118, 54, 3.4], [276, 54, 3.6]].map(function(p, i){ return dmStar(p[0], p[1], p[2], i % 2 ? K.dmTeal : K.dmLight, "tp-twinkle", i * .5); }).join("") +
       (night ? F("M70 84 Q140 40 200 58 Q262 76 330 40 L330 50 Q262 88 200 70 Q140 52 70 96 Z", K.dmLight, .22) + F("M70 98 Q140 58 200 74 Q262 90 330 58 L330 64 Q262 98 200 82 Q140 66 70 104 Z", K.dmTeal, .2) : ""));
     s += holidaySky(H === "winter" ? "" : H);
     /* the backdrops were drawn for a steeper hill: farLift raises one so the gentler land doesn't bury it */
@@ -2125,10 +2172,43 @@ export function placeKit(INK, C, PACKS, SETS){
       say: ["Goggles down, scarf out. Next stop: above the clouds.", "Pilot Timmy. Cleared for takeoff, flossed for landing."] }
   };
   /* put a theme outfit on a Timmy drawing from widget/pet.js art() (a string): back after his shadow, the rest on top */
-  function dress(svg, k){
-    var o = OUTFITS[k]; if (!o || !svg) return svg;
+  /* the Loupes journey's object is worn (redesign phase 4, part C): through-the-lens loupes with a headlight, the frame
+     and the little telescopes in the rank's material. Drawn on Timmy's own drawing (viewBox 0 -30 200 262; his eyes are
+     at 80, 84 and 120, 84), over his face and under any hat. An outfit with its own eyewear, or one that covers his
+     face, wins over them (NO_LOUPES). */
+  var NO_LOUPES = ["sunnies", "aviator", "tweed-professor", "floss-mummy", "bedsheet-ghost", "rank-antique-outfit", "rank-bronze-outfit", "rank-silver-outfit", "rank-diamond-outfit",
+    "beekeeper", "snorkel", "deep-sea-diver", "football-helmet", "knight-of-hearts", "masquerade"];
+  function loupes(tier){
+    var m = MATS[Math.max(0, Math.min(6, tier | 0))], s = "", ink = 'stroke="' + INK + '" stroke-linecap="round" stroke-linejoin="round"';
+    function tube(d, w){ return '<path d="' + d + '" fill="none" ' + ink + ' stroke-width="' + (w + 3.2) + '"/><path d="' + d + '" fill="none" stroke="' + m.c + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"/>'; }
+    var lensL = "M73 68 L90 68 Q98 68 98 77 L98 90 Q98 99 89 99 L72 99 Q62 99 62 89 L62 79 Q62 68 73 68 Z", lensR = "M127 68 L110 68 Q102 68 102 77 L102 90 Q102 99 111 99 L128 99 Q138 99 138 89 L138 79 Q138 68 127 68 Z";
+    /* the arms back to his sides, the lenses (clear: his eyes show), the frame and the bridge */
+    s += tube("M62 80 L47 75", 3.4) + tube("M138 80 L153 75", 3.4);
+    s += '<path d="' + lensL + '" fill="#DDF2FB" opacity=".3"/><path d="' + lensR + '" fill="#DDF2FB" opacity=".3"/>';
+    s += tube(lensL, 3.4) + tube(lensR, 3.4) + tube("M98 80 Q100 77 102 80", 3.4);
+    s += '<path d="M68 76 l6 -4 M108 76 l6 -4" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" opacity=".85"/>';
+    /* the telescopes, set low and toward the nose, each with its glass */
+    [[88.5, 95.5], [111.5, 95.5]].forEach(function(q){
+      s += '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="7.4" fill="' + m.s + '" ' + ink + ' stroke-width="2.6"/><circle cx="' + q[0] + '" cy="' + q[1] + '" r="5.6" fill="none" stroke="' + m.c + '" stroke-width="1.8"/>' +
+        '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="3.9" fill="' + (m.k === "dark" ? "#7FE7D8" : "#9FD8F0") + '" ' + ink + ' stroke-width="1.6"/><circle cx="' + (q[0] - 1.2) + '" cy="' + (q[1] - 1.3) + '" r="1.1" fill="#FFFFFF"/>';
+    });
+    /* the headlight on the bridge */
+    s += '<path d="M94 59 L106 59 Q109 59 109 62 L109 68 Q109 71 106 71 L94 71 Q91 71 91 68 L91 62 Q91 59 94 59 Z" fill="' + m.c + '" ' + ink + ' stroke-width="2.6"/>' +
+      '<circle cx="100" cy="65" r="3.6" fill="' + (m.k === "dark" ? "#B57BFF" : "#FFF3B0") + '" ' + ink + ' stroke-width="1.6"/><circle cx="98.9" cy="63.9" r="1" fill="#FFFFFF"/>' +
+      '<path d="M100 55 v-5 M91 57 l-4 -4 M109 57 l4 -4" stroke="' + (m.k === "dark" ? "#B57BFF" : "#F6CD55") + '" stroke-width="2.4" stroke-linecap="round" opacity=".9"/>';
+    if (m.k === "antique") s += '<circle cx="66" cy="94" r="1.6" fill="' + m.pat + '"/><circle cx="134" cy="72" r="1.4" fill="' + m.pat + '"/>';
+    if (m.k === "diamond") s += '<path d="M64 84 l3 -5 M136 90 l-3 5" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round"/>';
+    if (m.k === "gold" || m.k === "diamond" || m.k === "dark") s += '<path class="shpet-twinkle" d="M146 58 l1.8 4.6 4.6 1.8 -4.6 1.8 -1.8 4.6 -1.8 -4.6 -4.6 -1.8 4.6 -1.8 z" fill="#FFFFFF" stroke="' + INK + '" stroke-width="1"/>';
+    return s;
+  }
+  /* put outfit k on a Timmy drawing from widget/pet.js art(); x.loupes (a tier, 0 to 6) adds the Loupes journey's loupes */
+  function dress(svg, k, x){
+    var o = OUTFITS[k]; if (!svg) return svg;
+    var lp = x && x.loupes != null && NO_LOUPES.indexOf(k) < 0 ? '<g class="shpet-garb shpet-loupes">' + loupes(x.loupes) + "</g>" : "";
+    if (!o && !lp) return svg;
+    o = o || {};
     if (o.back) svg = svg.replace(/(<ellipse cx="100" cy="226"[^>]*\/>)/, "$1" + '<g class="shpet-back">' + o.back + "</g>");
-    var add = (o.face ? '<g class="shpet-garb">' + o.face + "</g>" : "") + (o.top ? '<g class="shpet-wobble"><g class="shpet-hat">' + o.top + "</g></g>" : "");
+    var add = (o.face ? '<g class="shpet-garb">' + o.face + "</g>" : "") + lp + (o.top ? '<g class="shpet-wobble"><g class="shpet-hat">' + o.top + "</g></g>" : "");
     return svg.replace(/<\/g><\/svg>\s*$/, add + "</g></svg>");
   }
   var THEMES = [
@@ -2346,7 +2426,7 @@ export function placeKit(INK, C, PACKS, SETS){
     SLOTS: SLOT_ORDER.map(function(k){ return { k: k, n: SLOTS[k].n }; }),
     PAINTS: Object.keys(PAINTS).map(function(k){ return { k: k, n: PAINTS[k].n, c: PAINTS[k].c, bold: BOLD[k].c, boldName: BOLD[k].n, rarity: k === "cream" ? "" : "Common", price: k === "cream" ? 0 : 150, id: k === "cream" ? "" : "paint-" + k }; }),
     UPGRADES: UPGRADES, MATS: MATS.map(function(m){ return { k: m.k, n: m.n, c: m.c }; }),
-    OUTFITS: meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName"]), dress: dress, SETS: SETS || null,
+    OUTFITS: meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName"]), dress: dress, loupes: loupes, NO_LOUPES: NO_LOUPES, SETS: SETS || null,
     THEMES: THEMES, RARITIES: RARITIES, EGGS: EGGS, frame: frame, burst: burst, coin: coin, thumb: thumb,
     outfitParts: function(k){ var o = OUTFITS[k]; return o ? { back: o.back || "", face: o.face || "", top: o.top || "" } : null; }
   };

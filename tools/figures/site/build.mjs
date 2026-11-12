@@ -181,6 +181,11 @@ if (placeKit) {
     combos.push({ home: h.k, scene: sc.k, night, tier: 6, level: 3, up: ups(h), paint: K.PAINTS[(hi + si) % K.PAINTS.length].k, yard: fill(hi + si), flair, marks: true });
     combos.push({ home: h.k, scene: sc.k, night, tier: (hi + si) % 6, level: 1 + (hi % 3), yard: Object.assign(fill(hi), { side: "lane" }), flair: flair.slice(0, 2) });
   }));
+  /* past the Handpiece (phase 4, part C): the ModuPro on the pedestal in every material, then the Loupes journey's pedestal */
+  pairs.forEach(([h, sc, hi, si]) => {
+    combos.push({ home: h.k, scene: sc.k, night: !!(hi % 2), journey: 1, tier: (hi + si) % 7, level: 1 + (si % 3), up: ups(h), yard: fill(si), flair: flair.slice(0, 3) });
+    combos.push({ home: h.k, scene: sc.k, night: !(hi % 2), journey: 2, tier: (hi + 2 * si) % 7, level: 1 + (hi % 3), yard: fill(hi + 1) });
+  });
   /* a set's yard pieces, in the yard of their own scene (or the hill), day and night */
   K.YARD.filter((y) => y.set).forEach((y, i) => { const sc = K.SCENES.find((x) => x.set === y.set) || { k: "hill" }, hm = K.HOMES.find((x) => x.set === y.set) || { k: "cottage" };
     [false, true].forEach((night) => combos.push({ home: hm.k, scene: sc.k, night, tier: 2, yard: { [slots[i % slots.length]]: y.k, [slots[(i + 2) % slots.length]]: y.k } })); });
@@ -189,7 +194,7 @@ if (placeKit) {
   for (const c of combos) {
     const r = K.render(c), body = r.svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
     if (/NaN|undefined|Infinity/.test(r.svg)) bad.push("place " + JSON.stringify(c) + ": NaN or undefined in the drawing");
-    add("place " + [c.home, c.scene, c.night ? "night" : "day", c.holiday || "", c.season || ""].join(" "), body);
+    add("place " + [c.home, c.scene, c.night ? "night" : "day", c.holiday || "", c.season || "", c.journey ? "journey " + c.journey : ""].join(" "), body);
     placeCount++;
   }
   const art = [];
@@ -199,6 +204,7 @@ if (placeKit) {
   K.RARITIES.forEach((r) => { art.push(["frame " + r.k, K.frame(r.k)]); art.push(["burst " + r.k, K.burst(r.k)]); });
   art.push(["coin", K.coin()]);
   K.OUTFITS.forEach((o) => { const p = K.outfitParts(o.k); art.push(["outfit " + o.k, p.back + p.face + p.top]); });
+  for (let t = 0; t < 7; t++) art.push(["loupes " + t, K.loupes(t)]);
   for (const [w, svg] of art) {
     if (/NaN|undefined|Infinity/.test(svg)) bad.push(w + ": NaN or undefined in the drawing");
     add(w, svg.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, ""));
@@ -206,13 +212,17 @@ if (placeKit) {
   }
   /* every outfit goes on the live Timmy: its layers land inside his drawing */
   for (const o of K.OUTFITS) { const t = pet({ hp: 85 }), d = K.dress(t, o.k); if (d === t || !/<\/g><\/svg>$/.test(d)) bad.push("outfit " + o.k + ": dress() didn't fit Timmy's drawing"); }
+  /* the loupes go on him bare and with every outfit that has no eyewear of its own */
+  { const t = pet({ hp: 85 }); if (!/shpet-loupes/.test(K.dress(t, "", { loupes: 3 }))) bad.push("loupes: dress() didn't put them on a bare Timmy");
+    for (const o of K.OUTFITS) { const d = K.dress(t, o.k, { loupes: 5 }); if (/shpet-loupes/.test(d) !== (K.NO_LOUPES.indexOf(o.k) < 0)) bad.push("loupes with outfit " + o.k + ": wrong"); }
+    for (const k of K.NO_LOUPES) if (!K.OUTFITS.some((o) => o.k === k)) bad.push("NO_LOUPES names an outfit that isn't drawn: " + k); }
   /* Timmy's walks */
-  for (const [h, sc] of pairs) for (const yard of [{}, fill(0), fill(3), Object.assign(fill(2), { side: "lane" })]) {
-    const o = { home: h.k, scene: sc.k, yard, up: ups(h), holiday: "halloween" }, L = K.layout(o);
+  for (const [h, sc] of pairs) for (const [yard, journey] of [[{}, 0], [fill(0), 0], [fill(3), 0], [Object.assign(fill(2), { side: "lane" }), 0], [fill(1), 1]]) {
+    const o = { home: h.k, scene: sc.k, yard, up: ups(h), holiday: "halloween", journey }, L = K.layout(o);
     const inR = (p, r, e) => p[0] > r[0] + (e || 0) && p[0] < r[2] - (e || 0) && p[1] > r[1] + (e || 0) && p[1] < r[3] - (e || 0);
     for (const k of Object.keys(L.spots)) for (const [a, b] of [["door", k], [k, "door"]]) {
       if (a === b) continue;
-      const path = K.route(o, a, b), where = h.k + " " + sc.k + " " + a + "->" + b + " " + JSON.stringify(yard);
+      const path = K.route(o, a, b), where = h.k + " " + sc.k + " " + a + "->" + b + " " + JSON.stringify(yard) + (journey ? " journey " + journey : "");
       routeCount++;
       if (path.blocked) { bad.push("place route " + where + ": no way round"); continue; }
       path.forEach((q) => { if (!(q[2] > 0) && !K.onLand(sc.k, q[0], q[1])) bad.push("place route " + where + ": off the ground at " + q.map((v) => v.toFixed(1)).join(",")); });
