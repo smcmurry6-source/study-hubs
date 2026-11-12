@@ -32,6 +32,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (a standing rule: run the long tests once, Claude Code)** — Notes only. Sam asked why the dashboard's
+  merge took two hours; part of it was the agent running the every-hub smoke test again on its own machine each time
+  `main` moved. New rule, `vault/rules/long-tests-once.md`: the long suites run once on the finished code, then the
+  fast checks and a push, and CI is the check. The dashboard PR (#318) was merged on Sam's word the same day;
+  `node tools/release/postcheck.js` after it: passed.
+
 - **2026-11-12 (Follow along: the redesign highlights the word being read, Claude Code)** — The survey's "highlight the words
   being read when listening to the lecture notes voiceover", approved by Sam for the redesign. While Listen plays a lecture's
   narration in a redesigned hub (`hubs/<id>/next/`), the word being read is highlighted in the notes and its sentence shaded

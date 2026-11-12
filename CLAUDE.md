@@ -70,6 +70,8 @@ applies here too, except where a note says how a Claude Code session does it dif
 
 @vault/rules/learner-data-privacy.md
 
+@vault/rules/long-tests-once.md
+
 ## Feature rules: read them when your task touches the feature
 
 These standing rules apply to one feature each, so they aren't loaded into every session (Sam, 2026-11-06: tasks were

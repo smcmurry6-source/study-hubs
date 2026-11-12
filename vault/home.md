@@ -34,6 +34,8 @@ Shipping and the vault
   ([the plan](../RELEASE_TEST_PLAN.md)).
 - [Learner data stays aggregate outside the database](rules/learner-data-privacy.md): per-person rows stay in Supabase,
   groups of 5+, no new identifiers.
+- [Run the long tests once, then let CI be the check](rules/long-tests-once.md): after `main` is brought in, the fast
+  checks and a push; no second local run of a long suite.
 
 Questions
 - [Every choice gets a why](rules/every-choice-gets-a-why.md) *(on demand)*

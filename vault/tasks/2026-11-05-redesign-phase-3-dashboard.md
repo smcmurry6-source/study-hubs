@@ -225,6 +225,10 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   BUG-062; this note's bugs were renumbered to match the log (**BUG-063 to BUG-076**; an older message or screenshot
   caption that says BUG-060 to BUG-073 means these, three higher), and `main` was merged in. **Left:** the idea board (a second session, started from `main`), and BUG-076 (open, S4: at
   320 px with the largest text "Start studying" and the seven day dots run a little past the edge).
+- 2026-11-12 (Claude Code, **merged**). [#318](https://github.com/smcmurry6-source/study-hubs/pull/318) was merged
+  once CI was green on the head with `main` in it; `node tools/release/postcheck.js` passed after the publish. No site
+  changelog line: nothing students can see changed. Sam asked why it took so long, and the answer became a standing
+  rule, [long-tests-once](../rules/long-tests-once.md). The idea board's session starts from `main`.
 
 ## Outcome
 
