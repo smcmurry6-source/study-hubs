@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: in-progress
 hub: dashboard
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: "#318 merging (then the board's look is redone)"
+waiting-on: 
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/324
 ---
@@ -212,9 +212,11 @@ The live About page describes the live site, so these go in with the redesign's 
     5. Starter ideas have no Report button. After you post, the board switches to New so you see it.
     6. The board isn't on the admin Overview's "Waiting on you" yet: it would ask the database for a function that isn't
        there on every load until the release. Add "Ideas reported" there at the switch.
-  - **Found on the way**: BUG-072 (phase 3's stage: the day before an exam, at the largest text on a phone, the luck row
-    pushed Start studying past the screen's edge; `tools/ci/smoke.js` failed on it today, the day before Heme & Endo 2)
-    and BUG-073 (the form's name box), both fixed ([bug log](../release/bug-log.md)).
+  - **Found on the way**: phase 3's stage, the day before an exam at the largest text on a phone (the luck row pushed
+    Start studying past the screen's edge; `tools/ci/smoke.js` failed on it that day): #318 fixed the same bug before it
+    merged, as BUG-075, and its fix is the one kept. And BUG-077 (the form's name box), fixed
+    ([bug log](../release/bug-log.md)). (First logged here as BUG-072 and BUG-073: #318 renumbered its bugs three higher
+    when it merged, so this session's two that are left are BUG-077 and BUG-078.)
   - **Checked**: `node tools/release/run.js`, all 14 suites passing (results in the PR; `a11y.js` needs `axe-core`,
     which a cloud session installs outside the repo and names in `AXE_CORE_PATH`), and axe on the board's own screens,
     which `a11y.js` doesn't open (the post form with an error showing, the check-in's tick, a hub's More page, the admin
@@ -231,7 +233,7 @@ The live About page describes the live site, so these go in with the redesign's 
     delete of hidden ideas ([analytics-retention](../reference/analytics-retention.md)), a job for the retention migration.
 - **2026-11-12, later (Claude Code, same session)**:
   - **`main` merged in again** (the 2026-11-11 lessons refresh, #322): the change log conflicted; both entries kept.
-  - **BUG-074**, found by the PR's Release tests in WebKit and fixed ([bug log](../release/bug-log.md)): the recap's
+  - **BUG-078** (first logged as BUG-074), found by the PR's Release tests in WebKit and fixed ([bug log](../release/bug-log.md)): the recap's
     `ResizeObserver` in `widget/dash.js` measured the card inside its callback, and with the board's stylesheet still
     loading that raised WebKit's "ResizeObserver loop" error. It takes the width from its entry now. **A cloud session
     can run WebKit**: `PLAYWRIGHT_BROWSERS_PATH=<a scratch folder> node <the global playwright>/cli.js install webkit`,
@@ -241,8 +243,11 @@ The live About page describes the live site, so these go in with the redesign's 
     interesting and decorative to match the vibe of the rest of the dashboard", then "these decorative changes are on PR
     318. wait for it to merge before redesigning so you can see the rest of the dashboard as it stands now". **Not started,
     on Sam's word**: this session is subscribed to #318 and takes it up when it merges.
-  - **Next step, for whoever takes it up** (this session, or a new one from this note): once #318 is merged, start
-    `claude/wonderful-fermi-2ypk03` again from `main` if #324 has merged too, or merge `main` into it if not; open the
+  - **#318 merged** (2026-11-12, squashed) and `main` was merged in here. Because of the squash every file both
+    branches touched conflicted; each was merged three ways against `b4ad576`, the #318 commit this branch started from.
+    Kept from `main`: its luck-row fix, its wording for a place that can't be read (the preview's `get_place` keeps one
+    made-up classmate whose place can't be read, for the plain Timmy; no "visiting off" anywhere), its bug numbers.
+  - **Next step, for whoever takes it up** (this session, or a new one from this note): open the
     new dashboard in a local preview (`node tools/preview/serve.js`, `next/?persona=returning`) and look at the stage,
     the classroom, the leaderboard's stage and the recap, which are what the board has to sit beside; then restyle
     `widget/ideas.css` (and the markup in `widget/ideas.js` where it needs hooks) with the dashboard's own parts: its

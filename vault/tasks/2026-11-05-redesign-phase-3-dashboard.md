@@ -5,7 +5,7 @@ hub: dashboard
 created: 2026-11-05
 requested-by: Sam
 due: 
-waiting-on: Sam's approval of the PR and the merge; the idea board (a second session)
+waiting-on: the idea board (a second session)
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/318
 ---
@@ -82,7 +82,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   - **Not as good as the live page:** first paint on the slow-phone profile is about 2.3 s (the live dashboard's budget
     is 1.5 s; `next/` has its own budget of 3.5 s in `tools/release/budgets.json`). It was 3.1 s before the shared
     widgets moved to late loading. Worth another look before the release.
-  - **Bugs** found and fixed while building: BUG-060 to BUG-064 in the [bug log](../release/bug-log.md).
+  - **Bugs** found and fixed while building: BUG-063 to BUG-067 in the [bug log](../release/bug-log.md).
   - **The switch and the About page draft** are in [the release note](2026-11-06-redesign-release.md), "From phase 3".
   - **Checks** on the second pass (commit f1264f6): `node tools/release/run.js`, all 14 suites passed (syntax, vault,
     archive, secrets, the smoke test on every hub, preview safety, the four database suites on a throwaway copy, the
@@ -161,12 +161,12 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   - **"You" and the class no longer share a bottom edge.** With the stage the class card is about 360 px taller, and
     the streak and answers tiles stretched to match it were mostly empty, so each card ends where its content ends. The
     taste inspector says so as a second warning (`ragged-row`, beside `below-fold`); 0 FAIL, light and dark.
-  - **Checked**: see the PR's test report. BUG-065 and BUG-066 found and fixed.
+  - **Checked**: see the PR's test report. BUG-068 and BUG-069 found and fixed.
 - 2026-11-11 (Claude Code, **preview and UAT**). Sam: "preview". The PR has the `preview` label (the hosted link is in
   the PR's preview comment). UAT in the preview as the returning, new and high-XP accounts, on an emulated iPhone 13
   and a laptop, 25 checks, all passed after two fixes: the classroom fills and empties while you watch; the largest
-  text size (too narrow for the drawings: the plain count, and now every name in full, BUG-067); a reload; class data
-  Slow and Unreachable (the board now says it couldn't reach the data, BUG-068); keyboard; dark with reduce motion;
+  text size (too narrow for the drawings: the plain count, and now every name in full, BUG-070); a reload; class data
+  Slow and Unreachable (the board now says it couldn't reach the data, BUG-071); keyboard; dark with reduce motion;
   every live hub's old and new page and one archived hub (the outfit that goes out is a holiday look or nothing, and
   nothing with Timmy off); "No request has reached production" at the end.
 
@@ -182,7 +182,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   crowd stay on a light surface, since they are drawn in ink. Without the art file the card is its numbers and words.
   `widget/hub-art/class.js` now carries the recap kit, six trophy drawings (`recapIcons`) and the hat (`recapHat`):
   55 KB. Save image is unchanged (`widget/recap.js`). The preview's second recap has a made-up "one that got us".
-  BUG-069 and BUG-070 found and fixed.
+  BUG-072 and BUG-073 found and fixed.
 - 2026-11-11 (Claude Code, **your own Timmy marked; hand-off**). Sam on the preview with the recap in: "Mark your
   timmy, yes to the redrawn recap. All that looks good" ([decisions](../decisions.md)).
   - **The mark.** The classroom is anonymous on purpose and stays so: the dashboard only listens, and every hub tab is
@@ -194,7 +194,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
     Yours is seated first, so a full room never leaves you in the hall. No hub open in another tab: no plate, since you
     aren't in the room. The plate comes when he sits and goes when the tab closes (a `storage` event). It is text over
     the drawing, not new art. It was first a bubble over his head; on a phone that hid the Timmy at the desk behind, so
-    it moved to the desk's front, where the hub's tooth is (BUG-071).
+    it moved to the desk's front, where the hub's tooth is (BUG-074).
   - **The preview** has no realtime, so its first made-up Timmy stands in for a hub tab of your own: he stays, wears
     what your Timmy wears and has the plate.
   - **Checked:** `tools/ci/smoke.js` now makes one of its eight made-up people this browser's own and fails unless
@@ -212,17 +212,30 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
     Still open from earlier entries: the three `dashboard/next` screens aren't in the accessibility baseline, and first
     paint on the slow-phone profile is worth another look before the release.
 
+- 2026-11-12 (Claude Code, **merged on Sam's word**). Sam, in the session: "merge" ([decisions](../decisions.md)): the
+  approval of this release and a one-time OK for the agent to merge PR #318. Before the merge the branch was rebased
+  onto `main` (the `migration_v54` changes and a lessons refresh had landed since its last CI run) and CI ran on the
+  result. `migration_v54` no longer has a visiting opt-out, so the two places here that spoke of "visiting off" (a
+  comment above `loadFits()` in `widget/dash.js`, the preview's `get_place` stub) and the About draft's stage entry now
+  say a place that can't be read gives a plain Timmy; the code was already right. The earlier entries above keep their
+  wording. The smoke test on the rebased branch failed, and not from the rebase: it was the day before Heme & Endo
+  Exam 2, the first day "Send luck" showed, and at 390 px with the largest text its row pulled the hub card wider than
+  the screen (BUG-075, fixed: the card's column can't be pushed wider, the button drops under the words). A lesson for
+  the dashboard's tests: its states depend on the date, so check the day before an exam and exam day by setting the
+  clock, not only today. While that was being fixed `main` got the Follow along release, which logged BUG-060 to
+  BUG-062; this note's bugs were renumbered to match the log (**BUG-063 to BUG-076**; an older message or screenshot
+  caption that says BUG-060 to BUG-073 means these, three higher), and `main` was merged in. **Left:** the idea board (a second session, started from `main`), and BUG-076 (open, S4: at
+  320 px with the largest text "Start studying" and the seven day dots run a little past the edge).
 - 2026-11-12 (Claude Code, **the idea board**). Built in its own session, in [#324](https://github.com/smcmurry6-source/study-hubs/pull/324), stacked on #318: `widget/ideas.js`
   fills `#ideas`, the check-in has its tick, the admin page its Idea board. The hand-off is in
-  [the idea board's note](2026-11-06-idea-board.md). Also fixed here: BUG-072, the stage's luck row at the largest text on
-  a phone the day before an exam (`.dx-stage` in `widget/dash.css`), which failed the smoke test on 2026-11-12.
+  [the idea board's note](2026-11-06-idea-board.md).
 
 ## Outcome
 
 Not finished. The new dashboard is built beside the live one (`next/`), on the design system, with everything from the
 plan except the idea board, and with Sam's second-pass changes; nothing students see has changed
-([#318](https://github.com/smcmurry6-source/study-hubs/pull/318), a draft). The third pass is built too: the classroom, the
+([#318](https://github.com/smcmurry6-source/study-hubs/pull/318)). The third pass is built too: the classroom, the
 stage and the recap as a bar graph in a smaller card. One change in the PR is live at merge: each hub sends
 its Timmy's outfit with the studying-now presence, with no name or id, and keeps its own random presence key in the
-browser so the new dashboard can mark your own Timmy. Sam has looked at all of it ("All that looks good"); what's left
-is the idea board, Sam's approval and the merge.
+browser so the new dashboard can mark your own Timmy. Sam has looked at all of it ("All that looks good") and said "merge" on 2026-11-12; what's left
+is the idea board.

@@ -1252,7 +1252,7 @@
       }).join("") + "</ol>" : "") + "</div>";
   }
   /* what the top three's Timmys wear: each one's place says (get_place, migration_v54), through the visit key on their
-     row. A database without the game layer yet gives a plain Timmy. */
+     row. A place that can't be read, or a database without the game layer yet, gives a plain Timmy. */
   function loadFits(sb, d){
     if (V2 !== true || !sb) return;
     d.rows.slice(0, 3).forEach(function(r, i){
@@ -1666,7 +1666,7 @@
       if (window.ResizeObserver && $("rcBody")) {
         var rcW = 0, rcT = 0;
         /* the width comes from the entry: measuring here would lay the page out in the middle of the browser's own
-           pass, and when that changes a size (a stylesheet still loading) WebKit reports a ResizeObserver loop (BUG-074) */
+           pass, and when that changes a size (a stylesheet still loading) WebKit reports a ResizeObserver loop (BUG-078) */
         new ResizeObserver(function(es){
           var w = es && es[0] ? Math.round(es[0].contentRect.width) : 0; if (!w || Math.abs(w - rcW) < 4) return;
           var first = !rcW; rcW = w; if (first) return;

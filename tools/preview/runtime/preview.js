@@ -729,11 +729,11 @@
       return { data: d2 };
     }
     /* someone's place, for the dashboard's stage (the top three stand on it as their own Timmys): only the outfit here,
-       the rest of a place gets its fixtures with phase 4. */
+       the rest of a place gets its fixtures with phase 4. One made-up classmate's place can't be read, for the plain Timmy. */
     if (fn === "get_place") {
       var pk = String(a.p_key || ""), who = -1;
       FAKE_NAMES.forEach(function(nm, i){ var k = ""; for (var j = 0; j < 3; j++) k += ("00000000" + (hash(nm + "|visit" + j) >>> 0).toString(16)).slice(-8); if (k === pk) who = i; });
-      if (who < 0) return { data: null };
+      if (who < 0 || who === 4) return { data: null };
       return { data: { name: FAKE_NAMES[who], equipped: { outfit: ["rank-dark-outfit", "captain-hat", "tooth-fairy", "tuxedo"][who % 4] }, rank: { journey: 0, tier: 5, level: 1 }, flair: null } };
     }
     var ideaAns = ideaRpc(fn, a, t);

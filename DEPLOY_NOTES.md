@@ -43,10 +43,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   idea's status note, kind `idea`, which no server sends yet; `get_my_inbox_v2` only where the page says so). The admin
   page's Inbox has an "Idea board" card (hide, restore, a status with one line on why); until migration_v54 it says the
   board opens with the redesign. The preview answers the board from made-up ideas; the release's starting ideas are not
-  posted. Also: BUG-072 (new dashboard, the day before an exam at the largest text on a phone: Start studying ran off
-  the screen) fixed in `widget/dash.css`, and the "visiting off" classmate is out of the preview's `get_place` stub.
+  posted.
   `tools/ci/smoke.js` draws a made-up board and checks votes, the pickers, that words never become markup and that every
-  button has a fixed `data-shi` name. BUG-074 (WebKit only: a "ResizeObserver loop" error on the new dashboard while
+  button has a fixed `data-shi` name. BUG-078 (WebKit only: a "ResizeObserver loop" error on the new dashboard while
   the board's stylesheet loads) fixed in `widget/dash.js`. Sam then asked for a more decorative board, to be done once
   #318 has merged. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324))
 
@@ -153,10 +152,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   card") is a compact drawn card: the hours, the classmates as a crowd of teeth, hours per day as drawn columns with
   the exam day's flag and Timmy on one (`recap.mjs`, drawn by `recapArt()` at the card's width), fact chips with trophy
   drawings, beside the hubs that just closed on a laptop. `class.js` carries the recap kit, its six icons and the hat
-  (55 KB). BUG-065 to BUG-070 found and fixed (two in the preview's UAT, two on the recap). **Your own Timmy is
+  (55 KB). BUG-068 to BUG-073 found and fixed (two in the preview's UAT, two on the recap). **Your own Timmy is
   marked** (Sam: "Mark your timmy"): a "You" plate on his desk, on your own screen only. A hub tab keeps its random
   presence key in the browser (`sh_presence_mine`, `rememberMine()` in the live `widget/v3.js`) and the dashboard's
-  `paintMe()` finds that desk; nothing new is sent or stored on the server (BUG-071).
+  `paintMe()` finds that desk; nothing new is sent or stored on the server (BUG-074). Merged 2026-11-12 on Sam's word ("merge"), after a rebase
+  and one more fix the smoke test found the day before an exam (BUG-075: "Send luck" at the largest text on a phone).
 - **2026-11-11 (redesign phase 3: the new dashboard, beside the live one, Claude Code)** — Nothing students see changes.
   `next/index.html` is the dashboard on the design system (`widget/dash.js`, `widget/dash.css`); outside a preview it sends
   visitors to the live dashboard, and it takes `index.html`'s place at the redesign's release. The hubs are tabs with their
@@ -173,7 +173,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   a fallback to today's, and the preview stubs them. The smoke test, `a11y.js`, `perf.js`, `matrix.js` and the syntax check
   cover the page; the new hubs' Back button goes to it. The idea board is a second session's (its slot is `#ideas`); Timmy's
   place and visiting (`data-visit` on the board's rows) are phase 4's. Drafts for the About page and the switch are in the
-  [release note](vault/tasks/2026-11-06-redesign-release.md); bugs BUG-060 to BUG-064 found and fixed while building.
+  [release note](vault/tasks/2026-11-06-redesign-release.md); bugs BUG-063 to BUG-067 found and fixed while building.
 - **2026-11-11 (Occlusion: `mo-10` retired, Claude Code)** — Sam: "Retire mo-10 if it is redundant ... it is okay to test the
   same concept multiple ways. just not for every single question and not more than twice." It was (report #40): the final's
   lectures asked the same fact, about 10% of people have MIP coincident with CR closure, three times. `mo-10` came out with its
