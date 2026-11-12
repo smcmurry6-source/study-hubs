@@ -42,7 +42,7 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
 - [ ] Perio's new version needs no engine of its own; its questions, cases and figures unchanged (ids permanent); the old engine goes at the release
 - [ ] The archived hubs untouched; the dashboard's archived cards restyled only
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
-- [ ] Preview link, phone and laptop screenshots, and Sam's look ("Sam approved this release" ticked by Sam)
+- [ ] Preview link, phone and laptop screenshots, and Sam's look, then Sam's "merge"
 - [ ] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
 ## Log
