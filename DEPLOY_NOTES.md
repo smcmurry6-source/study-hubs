@@ -46,7 +46,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   posted. Also: BUG-072 (new dashboard, the day before an exam at the largest text on a phone: Start studying ran off
   the screen) fixed in `widget/dash.css`, and the "visiting off" classmate is out of the preview's `get_place` stub.
   `tools/ci/smoke.js` draws a made-up board and checks votes, the pickers, that words never become markup and that every
-  button has a fixed `data-shi` name. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). (PRLINK)
+  button has a fixed `data-shi` name. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324))
 
 - **2026-11-11 (migration_v54: no visiting opt-out, an idea delete removes the idea, Claude Code)** — Nothing students see
   changes, and the migration is still not applied (it waits for the redesign's release). Sam's two "no" answers on the open

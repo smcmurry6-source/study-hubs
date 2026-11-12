@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: 
 agent: Claude Code
-pr: PRLINK
+pr: https://github.com/smcmurry6-source/study-hubs/pull/324
 ---
 
 # An idea board: classmates post ideas and vote on them
@@ -170,7 +170,7 @@ The live About page describes the live site, so these go in with the redesign's 
   reports and Inbox notes (it no longer counts toward the day's three or the 20 seconds); hidden ideas are kept 90 days
   ([analytics-retention](../reference/analytics-retention.md), not built yet). `xp.js` checks it.
 
-- 2026-11-12 (Claude Code, **the board, the admin card and the tick built; hand-off**). On the branch of PRLINK (a draft),
+- 2026-11-12 (Claude Code, **the board, the admin card and the tick built; hand-off**). On the branch of [#324](https://github.com/smcmurry6-source/study-hubs/pull/324) (a draft),
   stacked on [#318](https://github.com/smcmurry6-source/study-hubs/pull/318) (the new dashboard), which wasn't merged yet:
   the branch starts from `claude/phase-3-dashboard-redesign-n7r4m9` with `origin/main` merged in. Nothing students see
   changes; migration_v54 is **not applied** and the starting ideas are **not posted** (both at the release).
@@ -229,7 +229,7 @@ The live About page describes the live site, so these go in with the redesign's 
 
 ## Outcome
 
-Built, not released (PRLINK). The board is on the new dashboard and in the new hubs' More from one file, with the
+Built, not released ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324)). The board is on the new dashboard and in the new hubs' More from one file, with the
 check-in's and Suggest's ticks, the Inbox notes and the admin page's Idea board. It ships with the redesign: migration_v54,
 the starting ideas and the About entries go in at the release.
 

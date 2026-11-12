@@ -513,6 +513,9 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
 .dx .survey-x:hover { background: var(--panel); color: var(--text); }
 .dx .survey-eyebrow { font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--muted); padding-right: 36px; }
 .dx .survey-why { font-size: var(--fs-meta); color: var(--muted); }
+/* what the idea board's tick still needs before the check-in is sent (a name, a title) */
+.dx .survey .debrief-warn { font-weight: var(--w-strong); color: var(--wrong-ink); }
+.dx .survey .debrief-warn:empty { display: none; }
 .dx .survey-q { display: grid; gap: 8px; }
 .dx .survey-q > p:first-child { font-weight: var(--w-strong); }
 .dx .survey-q > p.debrief-prompt { font-size: 18px; font-weight: var(--w-head); }
