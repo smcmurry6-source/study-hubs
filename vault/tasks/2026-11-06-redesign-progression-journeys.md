@@ -5,7 +5,7 @@ hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: Sam (a look at the new hand-off, then "merge")
+waiting-on:
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/332
 ---
