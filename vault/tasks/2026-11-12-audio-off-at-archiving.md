@@ -31,7 +31,7 @@ after its date. Do each one on its own (a small PR), with the steps in the rule.
 
 ## Log
 
-- 2026-11-12: written with the first five's removal; sizes are their audio at 64 kbps (narration) and 96 kbps (Timmy Time).
+- 2026-11-12: written with the first five's removal ([#328](https://github.com/smcmurry6-source/study-hubs/pull/328)); sizes are their audio at 64 kbps (narration) and 96 kbps (Timmy Time).
 
 ## Outcome
 
