@@ -6,7 +6,7 @@ tags: [shipping, release]
 # Roll back a release
 
 When a release breaks something for the class (an S1 in [the bug log](../release/bug-log.md), or Sam says so), undo it
-first and debug after. A rollback is a release too: it goes through a PR, and Sam merges it.
+first and debug after. A rollback is a release too: it goes through a PR, merged when Sam says "merge" (or by Sam).
 
 1. **Find the merge.** On GitHub, the PR's page; or `git log --merges --oneline origin/main | head`.
 2. **Revert it with a new PR.** On the merged PR's page, **Revert** makes the PR. Or by hand:
@@ -15,7 +15,7 @@ first and debug after. A rollback is a release too: it goes through a PR, and Sa
 3. **Check the revert** like any change: CI (a preview only if Sam asks for one), and that the
    reverted files don't also carry someone else's later fix (if a later PR built on the change, revert both or fix
    forward; say which in the PR).
-4. **Sam merges.** Pages republishes in a minute or two. Pages and scripts are network-first in the service worker, so
+4. **Merge it** when Sam says "merge" (or Sam merges). Pages republishes in a minute or two. Pages and scripts are network-first in the service worker, so
    students get the old version on their next load; when only cached files changed (a precached widget script), bump
    `VERSION` in `sw.js` in the revert too.
 5. **Verify:** `node tools/release/postcheck.js` (the reverted files are live and identical to `main`, the pages load).

@@ -402,6 +402,21 @@ function lint(hub, A){
         if (r === 'questions') { const c = await page.$('#qlist .qcard .ch'); if (c) { await c.click(); await page.waitForTimeout(300); if (!(await page.$('#qlist .qcard.is-answered'))) problems.push(`${name} (${label}): answering a question didn't mark the card answered`); } }
         if (r === 'more/arcade') { const g = await page.$('.ar-grid [data-game]'); if (g) { await g.click(); await page.waitForTimeout(400); const back = await page.$('#panel-arcade [data-back]'); if (back) await back.click().catch(() => {}); } }
       }
+      /* High yield, the notes' third reading level (tools/hub-next/high-yield.mjs): on a lecture that has it, the switch shows
+         it, each predicted topic a heading, nothing scrolls sideways; then back to As taught */
+      const hyLec = (() => { try { return Object.keys(JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'notes.json'), 'utf8')).hy || {})[0]; } catch (e) { return null; } })();
+      if (hyLec) {
+        await page.evaluate(h => { location.hash = h; }, 'notes/' + hyLec); await page.waitForTimeout(800);
+        const hb = await page.$('[data-level="hy"]');
+        if (!hb) problems.push(`${name} (${label}): notes/${hyLec} has High yield in notes.json but no High yield button`);
+        else {
+          await hb.click(); await page.waitForTimeout(600); screens++;
+          const st = await page.evaluate(() => ({ t: document.querySelectorAll('.reading-prose.hy .hy-t').length, on: !!document.querySelector('[data-level="hy"][aria-pressed="true"]'), w: document.documentElement.scrollWidth - innerWidth }));
+          if (!st.on || !st.t) problems.push(`${name} (${label}): High yield for ${hyLec} shows ${st.t} topics`);
+          if (st.w > 1) problems.push(`${name} (${label}): High yield for ${hyLec} scrolls sideways by ${st.w}px`);
+          const back = await page.$('[data-level="full"]'); if (back) { await back.click(); await page.waitForTimeout(300); }
+        }
+      }
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
       notes.push(`${name} (${label}): clicked through ${screens} screens, ${n} questions`);
       await page.close();

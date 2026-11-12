@@ -7,7 +7,7 @@
    tools/figures/site/build.mjs) and its content, in files next to it (content/), written from the live hub by
    tools/hub-next/build.mjs (CI's --check fails when they're stale):
      core.json       lectures, exams, dates, likely topics, the mock's blueprint, the podcast, the question index
-     questions.json  the bank;  notes.json  the notes at both levels;  study.json  hints, cram, review charts
+     questions.json  the bank;  notes.json  the notes at both levels and High yield;  study.json  hints, cram, review charts
      figures.js/css  the drawn figures and case pictures;  arcade.js/css  the arcade's games and its skin
    Only core.json comes before the first screen; the rest loads in the background or when a view needs it.
 
@@ -856,8 +856,18 @@
   }
   function drawNotes(el, lec){
     if (view !== "notes") return;
-    var X = C.notes || {}, hasPlain = !!(NOTES.plain || {})[lec.id], level = hasPlain && STATE.ui.level === "plain" ? "plain" : "full";
-    var text = (level === "plain" ? NOTES.plain : NOTES.full)[lec.id], nq = (QBL[lec.id] || []).length;
+    /* three reading levels: As taught, Plain English and High yield (Sam, 2026-11-12: "only explains the high likelihood/high
+       yield points that are hinted to be tested"): the lecture's predicted topics, each with the paragraphs of its notes that
+       teach it and the professor's takeaways, built by tools/hub-next/high-yield.mjs into notes.json's hy. A lecture without
+       predicted topics has no High yield, and shows As taught when that level is picked. */
+    var X = C.notes || {}, hasPlain = !!(NOTES.plain || {})[lec.id], hasHy = !!(NOTES.hy || {})[lec.id];
+    var level = hasPlain && STATE.ui.level === "plain" ? "plain" : hasHy && STATE.ui.level === "hy" ? "hy" : "full", hy = level === "hy";
+    var text = (level === "plain" ? NOTES.plain : hy ? NOTES.hy : NOTES.full)[lec.id], nq = (QBL[lec.id] || []).length;
+    var nTopics = hy ? (CORE.likelyTopics || []).filter(function(t){ return t.lec === lec.id; }).length : 0;
+    var nLikely = (QBL[lec.id] || []).filter(function(r){ return r.likely; }).length;
+    /* High yield has no recorded narration yet (vault/tasks/2026-11-12-high-yield-narration.md): Listen reads it in the
+       device's voice, which can't drift from the text */
+    var mp3 = hy ? "" : ASSETS + "audio/" + lec.id + "-" + level + ".mp3";
     var list = lecListHTML(lec);
     var sub = String(lec.title).split(":").slice(1).join(":").trim();
     var group = (STUDY.review || []).filter(function(g){ return g.lec === lec.id; })[0];
@@ -866,19 +876,23 @@
       '<p class="note">' + esc(lec.who) + " · " + (lec.status === "taught" ? "recording and slides" : "slides only") + " · " + pl(nq, "question") + "</p>" +
       (lec.note ? '<p class="note lec-note">' + lec.note + "</p>" : "") +
       '<div class="toolbar" role="toolbar" aria-label="Notes tools">' +
-        (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn" data-sh-tts-audio="1" aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
+        (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn"' + (mp3 ? ' data-sh-tts-audio="1"' : ' title="Read aloud in your device\'s voice"') + ' aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
           '<button type="button" class="btn btn-text follow-btn" data-follow hidden aria-pressed="' + followOn() + '" title="Highlight each word as it is read">' + icon("highlight", 18) + "Follow along</button>" : "") +
-        (hasPlain ? '<span class="seg" role="group" aria-label="Reading level"><button type="button" data-level="full" aria-pressed="' + (level === "full") + '">As taught</button><button type="button" data-level="plain" aria-pressed="' + (level === "plain") + '">Plain English</button></span>' : "") +
+        (hasPlain || hasHy ? '<span class="seg" role="group" aria-label="Reading level"><button type="button" data-level="full" aria-pressed="' + (level === "full") + '">As taught</button>' +
+          (hasPlain ? '<button type="button" data-level="plain" aria-pressed="' + (level === "plain") + '">Plain English</button>' : "") +
+          (hasHy ? '<button type="button" data-level="hy" aria-pressed="' + hy + '">High yield</button>' : "") + "</span>" : "") +
         '<button type="button" class="btn" data-mmap aria-expanded="false">' + icon("mindmap", 18) + "Mind map</button>" +
         '<button type="button" class="btn btn-text" data-report-notes>' + icon("report", 18) + "Report a mistake</button>" +
         '<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
       "</div>" +
       '<div class="mmap" hidden></div>' +
-      '<div class="reading-prose">' + (text || "<p>Notes coming soon.</p>") + "</div>" +
+      (hy ? '<p class="note hy-intro">' + icon("hints", 18) + "<span>Only what's most likely on the exam: " + pl(nTopics, "predicted topic") + ", strongest evidence first, each with the part of the notes that teaches it. <b>As taught</b> has everything.</span></p>" : "") +
+      '<div class="reading-prose' + (hy ? " hy" : "") + '">' + (text || "<p>Notes coming soon.</p>") + "</div>" +
       '<section class="lec-figs" hidden aria-labelledby="lfH"><h2 id="lfH">Diagrams</h2><div class="fig-grid"></div></section>' +
-      (group ? '<section class="charts" aria-labelledby="lcH"><h2 id="lcH">Charts for this lecture</h2><p class="note">' + esc(group.blurb || "") + "</p>" + group.sections.map(function(sec, i){ return (sec.part ? '<h3 class="part">' + esc(sec.part) + "</h3>" : "") + sectionHTML(sec); }).join("") + "</section>" : "") +
+      (group && !hy ? '<section class="charts" aria-labelledby="lcH"><h2 id="lcH">Charts for this lecture</h2><p class="note">' + esc(group.blurb || "") + "</p>" + group.sections.map(function(sec, i){ return (sec.part ? '<h3 class="part">' + esc(sec.part) + "</h3>" : "") + sectionHTML(sec); }).join("") + "</section>" : "") +
       '<section class="check" aria-labelledby="ckH"><h2 id="ckH">Check yourself</h2><p class="note">Three questions from this lecture. Answers count like anywhere else.</p><div class="qlist" data-check></div></section>' +
-      '<nav class="foot-acts" aria-label="Next">' + readBtnHTML(lec) + '<a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '">' + icon("questions", 18) + "Practice " + esc(lecLabel(lec)) + " questions</a>" +
+      '<nav class="foot-acts" aria-label="Next">' + readBtnHTML(lec) + (hy && nLikely ? '<a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '" data-lqlk>' + icon("questions", 18) + "Practice the " + fmt(nLikely) + " High likelihood questions</a>" :
+        '<a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '">' + icon("questions", 18) + "Practice " + esc(lecLabel(lec)) + " questions</a>") +
         '<a class="btn" href="#more/cram" data-cram="' + esc(lec.id) + '">' + icon("cram", 18) + "Cram bullets</a></nav>" +
       footNavHTML(lec) +
       '<p class="foot-report"><button class="btn btn-text" type="button" data-report-notes>' + icon("report", 18) + "Report a mistake in these notes</button></p>" +
@@ -886,7 +900,8 @@
     el.innerHTML = '<div class="hx-page notes"><div class="notes-grid">' + list + art + "</div></div>";
     /* figures: in the notes next to the paragraph they explain, the rest under them (the live hub's FIG_PLACE) */
     var prose = $(".reading-prose", el), needF = (CORE.figByLec || {})[lec.id] && CORE.figByLec[lec.id].length;
-    if (needF || group) needFigures().then(function(){ if (!prose.isConnected) return; placeFigs(prose, lec.id, level, $(".lec-figs", el)); $$(".charts [data-figs]", el).forEach(function(b){ b.innerHTML = b.getAttribute("data-figs").split(",").map(figCardHTML).join(""); }); try { FIG.wireCuspMaps(el); FIG.ANIMA.mount(el); } catch (e) {} }).catch(function(){});
+    /* in High yield, only the figures that go with a paragraph it shows (placed by As taught's anchors), none left over */
+    if (needF || (group && !hy)) needFigures().then(function(){ if (!prose.isConnected) return; placeFigs(prose, lec.id, hy ? "full" : level, hy ? null : $(".lec-figs", el)); $$(".charts [data-figs]", el).forEach(function(b){ b.innerHTML = b.getAttribute("data-figs").split(",").map(figCardHTML).join(""); }); try { FIG.wireCuspMaps(el); FIG.ANIMA.mount(el); } catch (e) {} }).catch(function(){});
     checkYourself($("[data-check]", el), lec);
     $$("[data-level]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.level = b.getAttribute("data-level"); saveState(); track("notes:level=" + STATE.ui.level); drawNotes(el, lec); }); });
     wireLecPick(el);
@@ -896,16 +911,16 @@
       c.hidden = open; mm.setAttribute("aria-expanded", String(!open)); track("notes:mindmap");
     });
     var tts = $("#sh-tts-btn", el);
-    if (tts) tts.addEventListener("click", function(){ if (window.shTTS) window.shTTS.speak(prose, tts, ASSETS + "audio/" + lec.id + "-" + level + ".mp3"); });
+    if (tts) tts.addEventListener("click", function(){ if (window.shTTS) window.shTTS.speak(prose, tts, mp3); });
     var fb = $("[data-follow]", el);
-    if (fb) { fb.addEventListener("click", function(){ var on = !followOn(); ls("sh_pref_follow", on ? null : "off"); fb.setAttribute("aria-pressed", String(on)); track("notes:follow=" + (on ? "on" : "off")); follow.pref(); }); follow.reattach(prose, ASSETS + "audio/" + lec.id + "-" + level + ".mp3"); }
+    if (fb) { fb.addEventListener("click", function(){ var on = !followOn(); ls("sh_pref_follow", on ? null : "off"); fb.setAttribute("aria-pressed", String(on)); track("notes:follow=" + (on ? "on" : "off")); follow.pref(); }); if (mp3) follow.reattach(prose, mp3); }
     /* a mistake in the notes goes to Sam's Inbox with the lecture attached (the shared widget's report form) */
     $$("[data-report-notes]", el).forEach(function(b){ b.addEventListener("click", function(){
       track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: lec.id, label: lecLabel(lec) + " " + shortTitle(lec) }); else toast("The report form is still loading. Try again in a moment.");
     }); });
     $$("[data-lecnav]", el).forEach(function(a){ a.addEventListener("click", function(){ track("notes:" + a.getAttribute("data-lecnav")); }); });
     wireLecLinks(el);
-    wireRead(el, lec);
+    wireRead(el, lec, hy);   // reading High yield to its end doesn't mark the whole lecture's notes done
     /* the first visit's tip sits under the toolbar; while it shows, the toolbar's short "Select text to highlight it" hides (hub.css) */
     tip(el, "notes", "Select any words in the notes to highlight them; they stay on this device.", $(".reading > .toolbar", el));
   }
@@ -1077,10 +1092,10 @@
     wireReadBtn(el, lec);
   }
   function wireReadBtn(el, lec){ var b = $("[data-read]", el); if (b) b.addEventListener("click", function(){ setRead(el, lec, !isRead(lec.id), ""); }); }
-  function wireRead(el, lec){
+  function wireRead(el, lec, manual){
     wireReadBtn(el, lec);
     var end = $(".foot-acts", el), opened = Date.now(), seen = false, timer = null;
-    if (!end || isRead(lec.id) || !("IntersectionObserver" in window)) return;
+    if (manual || !end || isRead(lec.id) || !("IntersectionObserver" in window)) return;
     var auto = function(){ if (end.isConnected && seen && !isRead(lec.id) && view === "notes") setRead(el, lec, true, "auto"); };
     var io = new IntersectionObserver(function(es){
       if (!end.isConnected) { io.disconnect(); clearTimeout(timer); return; }
@@ -1165,7 +1180,8 @@
     (need ? needFigures() : Promise.resolve()).then(function(){ if (!host.isConnected) return; pick.forEach(function(q){ host.appendChild(card(q, { ctx: "check" })); }); });
   }
   function wireLecLinks(el){
-    $$("[data-lecq]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qset = ""; STATE.ui.qlec = a.getAttribute("data-lecq"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("notes:practice"); }); });
+    /* High yield's button opens the lecture's High likelihood questions (the bank's toggle on), the others the whole lecture */
+    $$("[data-lecq]", el).forEach(function(a){ a.addEventListener("click", function(){ var lk = a.hasAttribute("data-lqlk"); STATE.ui.qset = ""; STATE.ui.qlec = a.getAttribute("data-lecq"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = lk ? "likely" : ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("notes:practice" + (lk ? "-likely" : "")); }); });
     $$("[data-cram]", el).forEach(function(a){ a.addEventListener("click", function(){ setTimeout(function(){ var c = document.getElementById("cram-" + a.getAttribute("data-cram")); if (c) c.scrollIntoView({ block: "start" }); }, 80); }); });
   }
 

@@ -22,6 +22,8 @@ Those marked *(on demand)* apply to one feature: read them when your task touche
 
 Shipping and the vault
 - [The repo is the vault](rules/repo-is-the-vault.md): read from it, write back to it, link don't copy, nothing private.
+- [Anything left to do goes on the to-do list](rules/to-dos-go-in-the-vault.md) (a task note, the inbox, a Done when box),
+  never only in a chat, and is checked off when done.
 - [GitHub is the source of truth](rules/github-is-the-source-of-truth.md): fetch fresh, merge, never overwrite blind.
 - [Ship it now, never "after the exam"](rules/ship-it-now.md)
 - [American English everywhere](rules/american-english.md)
@@ -30,10 +32,12 @@ Shipping and the vault
 - [Content from lecture materials and graded coursework](rules/graded-coursework.md): no course files in the repo;
   graded work never copied, closed quizzes only as context, previous years' never.
 - [Release-test every substantial change; preview it on request](rules/preview-and-release-test.md): the release tests,
-  Sam's explicit approval, checks after the release; a preview on made-up data only when Sam asks
+  Sam's "merge" (no checkbox), checks after the release; a preview on made-up data only when Sam asks
   ([the plan](../RELEASE_TEST_PLAN.md)).
 - [Learner data stays aggregate outside the database](rules/learner-data-privacy.md): per-person rows stay in Supabase,
   groups of 5+, no new identifiers.
+- [Run the long tests once, then let CI be the check](rules/long-tests-once.md): after `main` is brought in, the fast
+  checks and a push; no second local run of a long suite.
 
 Questions
 - [Every choice gets a why](rules/every-choice-gets-a-why.md) *(on demand)*

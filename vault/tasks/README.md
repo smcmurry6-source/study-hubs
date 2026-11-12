@@ -59,8 +59,10 @@ Merging the PR is what makes a task done. If Sam closes the PR instead, the task
 ## The inbox
 
 [inbox.md](inbox.md) is a checklist anyone can add a line to, from the Obsidian app on a phone. An agent asked to
-"go through the inbox" turns each line into a task note (or, if it's small and clear, just does it in its PR), then
-deletes the line in the same PR.
+"go through the inbox" turns each line into a task note (deleting the line) or, if it's small and clear, just does it in its
+PR and ticks the line with the PR (`- [x] ... (#123)`); ticked lines are cleared on the next pass. Anything left to do at the
+end of a session goes here or in a task note, and is checked off when it's done
+([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md), Sam, 2026-11-12).
 
 ## Statuses
 

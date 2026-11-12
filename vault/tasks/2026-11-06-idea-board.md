@@ -1,11 +1,11 @@
 ---
 type: task
-status: review
+status: blocked
 hub: dashboard
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: "Sam's answer to the contact sheet of the board's new look"
+waiting-on: "the redesign's release (migration_v54 applied, the starting ideas posted, the About entries)"
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/324
 ---
@@ -120,8 +120,8 @@ Each gets a hub and a category when it's posted (most are for all hubs; the arca
 - [x] The hub and category pickers, their tags on each card and the board's filters, in both places
 - [x] The check-in's tick, preview and name prompt on the new dashboard's check-in
 - [ ] The starting ideas posted at the release, with the ones from the past check-ins, checked against the About page first
-- [ ] Previewed on fixture data as the test accounts, on a phone and a laptop (done by the agent, 2026-11-12, on the local
-      preview); Sam's look (screenshots sent; a hosted preview only if Sam asks)
+- [x] Previewed on fixture data as the test accounts, on a phone and a laptop (done by the agent, 2026-11-12, on the local
+      preview); Sam's look (screenshots, then the new look's contact sheet: "Looks good to me. Merge when ready.")
 - [ ] The About page (drafted below, lands at the release), the event taxonomy (done) and the retention rows (the row is
       there; the 90-day delete of hidden ideas is approved and not built)
 - [x] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
@@ -271,18 +271,37 @@ The live About page describes the live site, so these go in with the redesign's 
       page of the pad: the binding along its top edge and each kind's picture in its choice. Notes go up one after
       another when the list changes (not on a vote), off under reduced motion. The board keeps its light colors in the
       dark theme, like the classroom. Every `data-shi` name is unchanged. No gradients, no shadows.
-    - **Still to settle when wiring it in**: in a hub's More the dashboard's art isn't loaded, so pins are all red and
-      the hub chip has no emblem (use the hub's own tint there); the smoke test's board checks and the 110-check walk;
-      axe and the taste inspector on the new look; `build.mjs` writing `widget/hub-art/board.js` (`window.SH_BOARD_ART`),
-      loaded by `ideas.js`, with the plain board as the fallback.
-  - **Next step**: Sam's answer to the contact sheet. On a yes: add the kit to `build.mjs`, put the look into
-    `widget/ideas.js` and `widget/ideas.css`, run the checks above and the release suites, send Sam 2x screenshots.
+  - **Sam's yes, and the look is in** (2026-11-12): "Looks good to me. Merge when ready."
+    ([decisions](../decisions.md)). `tools/figures/site/build.mjs` writes the kit to `widget/hub-art/board.js`
+    (`window.SH_BOARD_ART`, every piece drawn and checked in the build); `widget/ideas.js` starts loading it when the
+    script runs and draws plain notes until it arrives (or if it never does), then redraws; `widget/ideas.css` has the
+    look. In a hub's More, where the dashboard's art isn't loaded, a note for that hub takes the hub's own tint and
+    emblem (`SH_HUB_ART_HUB`). A tag outside a note (the check-in's preview row) keeps the page's colors: axe caught it
+    going pale on the dark theme while this was built, fixed before the push.
+    - **Checked on the new look**: the smoke test on every hub, which now also fails if a note has no pin or kind
+      picture, Sam's answer isn't a stamp or the top idea has no rosette; the 110-check walk on the local preview
+      (laptop and phone, the returning, new and admin test accounts), 110 passing, no request to production; axe on
+      the board's screens (the form with an error, the check-in's tick, a hub's More, the admin card; laptop, phone,
+      dark), clean; `node tools/release/run.js` once on the finished code ([long-tests-once](../rules/long-tests-once.md)),
+      its summary in the PR.
+    - **The taste inspector** (`inspect.mjs --app --allow rainbow-chart,palette-terracotta`, three widths): 0 FAIL, 4
+      WARN. `palette-terracotta` is allowed because it reads the drawn frame's wood (`C.wood` from the art's own
+      palette, the color Sam saw on the sheet) as an accent color; without the allowance that is its one FAIL. Three
+      of the WARNs were there before the new look and are the dashboard's (`colour-sprawl`, `ragged-row`,
+      `below-fold`); the new one, `heavy-borders`, is the notes' and the frame's ink outline, which is the drawing
+      style, as on the classroom. The old look's `panel-void` WARN is gone.
+  - **What's left is the release's**, on its list ([the release note](2026-11-06-redesign-release.md), "From the idea
+    board"): apply migration_v54, post the starting ideas, the About entries (the draft above now describes the cork
+    board), the three files in the service worker's list, the admin Overview's line, the old hubs' Inbox, and the
+    90-day delete of removed ideas.
 
 ## Outcome
 
-Built, not released ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324)). Sam asked for a more decorative look; a cork board with pinned notes is drawn and waits for Sam's yes (the Log's last entry). The board is on the new dashboard and in the new hubs' More from one file, with the
-check-in's and Suggest's ticks, the Inbox notes and the admin page's Idea board. It ships with the redesign: migration_v54,
-the starting ideas and the About entries go in at the release.
+Built and merged on Sam's word, not released ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324)). The
+board is on the new dashboard and in the new hubs' More from one file, as a cork board in a wood frame with every idea
+a pinned paper note (Sam's ask for a more decorative look, approved from a contact sheet), with the check-in's and
+Suggest's ticks, the Inbox notes and the admin page's Idea board. It ships with the redesign: migration_v54, the
+starting ideas and the About entries go in at the release, and this note closes then.
 
 Related: [phase 3](2026-11-05-redesign-phase-3-dashboard.md) · [reply-to-reports](../how-to/reply-to-reports.md) ·
 [podcast-reactions](../rules/podcast-reactions.md) · [learner-data-privacy](../rules/learner-data-privacy.md)
