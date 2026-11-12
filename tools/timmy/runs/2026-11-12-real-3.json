@@ -1,0 +1,612 @@
+[
+ {
+  "id": "oc-01",
+  "hub": "occlusion",
+  "type": "covered",
+  "turns": [
+   {
+    "text": "What's the difference between centric relation and centric occlusion?",
+    "reply": {
+     "ok": true,
+     "chat": "794cac64-1a72-4fdc-a074-fc9544e64297",
+     "message": 2,
+     "kind": "answer",
+     "paragraphs": [
+      {
+       "text": "Centric relation (CR) is a joint position, not a tooth position: the condyles sit on the thinnest avascular part of their discs, anterior-superior against the eminences, independent of tooth contact. Dr. Givan's short version, quoted: \"it's where the condyle is seated in the joint. That's it.\"",
+       "cites": [
+        {
+         "id": "N1.20",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L1 notes",
+         "quote": "It is independent of tooth contact, clinically discernable when the mandible",
+         "go": {
+          "v": "notes",
+          "lec": "review",
+          "k": 20
+         }
+        }
+       ]
+      },
+      {
+       "text": "Centric occlusion (CO) is the tooth contact you get when the mandible is in CR: teeth touching with the joints seated. On his exams CO never means MIP. The joint is stable, but that CO tooth contact is often unstable, and about 90% of people slide from CO into MIP, averaging 1.25 ± 1 mm.",
+       "cites": [
+        {
+         "id": "N1.18",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L1 notes",
+         "quote": "Centric occlusion (CO) is the tooth contact when the mandible is in centric relation",
+         "go": {
+          "v": "notes",
+          "lec": "review",
+          "k": 18
+         }
+        },
+        {
+         "id": "H2",
+         "hub": "occlusion",
+         "kind": "hint",
+         "label": "L1 Exam Hints",
+         "quote": "I never mean, you know, the same thing as MIP.",
+         "go": {
+          "v": "hints",
+          "lec": "review"
+         }
+        },
+        {
+         "id": "N1.19",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L1 notes",
+         "quote": "About 90% of people have a slide between the CO contact and MIP",
+         "go": {
+          "v": "notes",
+          "lec": "review",
+          "k": 19
+         }
+        }
+       ]
+      },
+      {
+       "text": "So: CR is where the condyles are; CO is where the teeth meet once they're there. My own shortcut: Relation is the joint, Occlusion is the teeth. As a molar, I'm partial to the second one.",
+       "cites": []
+      }
+     ],
+     "offer": null,
+     "go": {
+      "hub": "occlusion",
+      "v": "notes",
+      "lec": "review",
+      "k": 18
+     },
+     "closest": null
+    },
+    "kind": "answer",
+    "cost": 1.038956,
+    "ms": 8526,
+    "usage": {
+     "input_tokens": 4,
+     "cache_creation_input_tokens": 128460,
+     "cache_read_input_tokens": 0,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 80,
+      "ephemeral_1h_input_tokens": 128380
+     },
+     "iterations": [
+      {
+       "input_tokens": 4,
+       "output_tokens": 575,
+       "cache_read_input_tokens": 0,
+       "cache_creation_input_tokens": 128460,
+       "cache_creation": {
+        "ephemeral_5m_input_tokens": 80,
+        "ephemeral_1h_input_tokens": 128380
+       },
+       "type": "message",
+       "model": null
+      }
+     ],
+     "output_tokens": 575,
+     "output_tokens_details": {
+      "thinking_tokens": 0
+     },
+     "service_tier": "standard",
+     "inference_geo": "global",
+     "speed": "standard"
+    },
+    "model": "claude-opus-5-5",
+    "unchecked": null,
+    "fails": [],
+    "warns": []
+   }
+  ]
+ },
+ {
+  "id": "oc-09",
+  "hub": "occlusion",
+  "type": "covered",
+  "turns": [
+   {
+    "text": "What are the five etiologies of functional disturbances?",
+    "reply": {
+     "ok": true,
+     "chat": "fc2cc510-771b-4b75-b38f-298d10f983d2",
+     "message": 8,
+     "kind": "answer",
+     "paragraphs": [
+      {
+       "text": "Dr. Givan lists five common ones (he says the list isn't complete): mandibular stability, trauma, emotional stress, deep pain input, and parafunctional activities. He spent the most time on mandibular stability, because that one is often directly in a dentist's hands.",
+       "cites": [
+        {
+         "id": "N7.25",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L7 notes",
+         "quote": "1. mandibular stability, 2. trauma, 3. emotional stress, 4. deep pain input, 5. parafunctional activities",
+         "go": {
+          "v": "notes",
+          "lec": "malocclusion",
+          "k": 25
+         }
+        }
+       ]
+      },
+      {
+       "text": "Quick sketch of each: mandibular stability is how the teeth and both joints fit together against the skull; trauma is a force that actually produces damage (judged by magnitude, frequency, duration, direction, distribution); emotional stress raises muscle tone through the limbic system; deep pain input (below skin or mucosa, like a toothache limiting opening) changes how we move; and parafunction covers clenching, bruxism and habits.",
+       "cites": [
+        {
+         "id": "N7.27",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L7 notes",
+         "quote": "Mandibular stability regards the simultaneous fit of the teeth and both joints against the skull",
+         "go": {
+          "v": "notes",
+          "lec": "malocclusion",
+          "k": 27
+         }
+        },
+        {
+         "id": "N7.58",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L7 notes",
+         "quote": "A force is only traumatic when it produces trauma.",
+         "go": {
+          "v": "notes",
+          "lec": "malocclusion",
+          "k": 58
+         }
+        },
+        {
+         "id": "N7.74",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L7 notes",
+         "quote": "Deep pain input (deep is anything below the skin or mucosa",
+         "go": {
+          "v": "notes",
+          "lec": "malocclusion",
+          "k": 74
+         }
+        }
+       ]
+      },
+      {
+       "text": "My own mnemonic: \"My Teeth Endure Deep Pressure.\" Stable, like me.",
+       "cites": []
+      }
+     ],
+     "offer": null,
+     "go": {
+      "hub": "occlusion",
+      "v": "notes",
+      "lec": "malocclusion",
+      "k": 25
+     },
+     "closest": null
+    },
+    "kind": "answer",
+    "cost": 0.037022,
+    "ms": 9249,
+    "usage": {
+     "input_tokens": 4,
+     "cache_creation_input_tokens": 78,
+     "cache_read_input_tokens": 128380,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 78,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "iterations": [
+      {
+       "input_tokens": 4,
+       "output_tokens": 547,
+       "cache_read_input_tokens": 128380,
+       "cache_creation_input_tokens": 78,
+       "cache_creation": {
+        "ephemeral_5m_input_tokens": 78,
+        "ephemeral_1h_input_tokens": 0
+       },
+       "type": "message",
+       "model": null
+      }
+     ],
+     "output_tokens": 547,
+     "output_tokens_details": {
+      "thinking_tokens": 0
+     },
+     "service_tier": "standard",
+     "inference_geo": "global",
+     "speed": "standard"
+    },
+    "model": "claude-opus-5-5",
+    "unchecked": null,
+    "fails": [],
+    "warns": []
+   }
+  ]
+ },
+ {
+  "id": "oc-24",
+  "hub": "occlusion",
+  "type": "practice_after",
+  "turns": [
+   {
+    "text": "Why is it the mesial fossae of the maxillary premolars and not the distal?",
+    "reply": {
+     "ok": true,
+     "chat": "e61f4812-5b69-4dd6-b17a-13751b98e6c7",
+     "message": 10,
+     "kind": "answer",
+     "paragraphs": [
+      {
+       "text": "It comes from where the lower teeth sit. On the help sheet's fence post, in Class I each mandibular post sits a half step mesial to its maxillary partner. Because the lower premolar sits forward, its buccal cusp lands in the mesial fossa of the upper premolar. The notes' example: the buccal cusp of #29 goes into the mesial fossa of #4. Going the other way, the maxillary lingual cusps land in the distal fossae of the lower premolars.",
+       "cites": [
+        {
+         "id": "N1.25",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L1 notes",
+         "quote": "In Class I each mandibular post sits a half step mesial to its maxillary partner",
+         "go": {
+          "v": "notes",
+          "lec": "review",
+          "k": 25
+         }
+        },
+        {
+         "id": "N1.27",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L1 notes",
+         "quote": "the buccal cusp of #29 is in the mesial fossa of #4",
+         "go": {
+          "v": "notes",
+          "lec": "review",
+          "k": 27
+         }
+        }
+       ]
+      },
+      {
+       "text": "Class III brings the mandible forward one whole tooth, so the pattern stays the same, just one tooth over (#29 into the mesial fossa of #5). Your pick, maxillary distal and mandibular mesial, is the Class II rule, because Class II steps the mandible back one post and flips it (#29 into the distal fossa of #4).",
+       "cites": [
+        {
+         "id": "N1.25",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L1 notes",
+         "quote": "Class II steps the mandible back one post",
+         "go": {
+          "v": "notes",
+          "lec": "review",
+          "k": 25
+         }
+        },
+        {
+         "id": "R1.7",
+         "hub": "occlusion",
+         "kind": "review",
+         "label": "L1 review table",
+         "quote": "#29 buccal cusp → distal fossa #4",
+         "go": {
+          "v": "review",
+          "lec": "review",
+          "t": "Premolar contacts (cusp-fossa)"
+         }
+        }
+       ]
+      },
+      {
+       "text": "Easy mix-up. I'm a lower molar myself, so I take the forward position personally.",
+       "cites": []
+      }
+     ],
+     "offer": null,
+     "go": {
+      "hub": "occlusion",
+      "v": "notes",
+      "lec": "review",
+      "k": 27
+     },
+     "closest": null
+    },
+    "kind": "answer",
+    "cost": 0.054492,
+    "ms": 14973,
+    "usage": {
+     "input_tokens": 4,
+     "cache_creation_input_tokens": 544,
+     "cache_read_input_tokens": 128380,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 544,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "iterations": [
+      {
+       "input_tokens": 4,
+       "output_tokens": 1304,
+       "cache_read_input_tokens": 128380,
+       "cache_creation_input_tokens": 544,
+       "cache_creation": {
+        "ephemeral_5m_input_tokens": 544,
+        "ephemeral_1h_input_tokens": 0
+       },
+       "type": "message",
+       "model": null
+      }
+     ],
+     "output_tokens": 1304,
+     "output_tokens_details": {
+      "thinking_tokens": 756
+     },
+     "service_tier": "standard",
+     "inference_geo": "global",
+     "speed": "standard"
+    },
+    "model": "claude-opus-5-5",
+    "unchecked": null,
+    "fails": [],
+    "warns": []
+   }
+  ]
+ },
+ {
+  "id": "oc-25",
+  "hub": "occlusion",
+  "type": "practice_after",
+  "turns": [
+   {
+    "text": "why is my answer wrong",
+    "reply": {
+     "ok": true,
+     "chat": "26eefcfc-2cb4-40d1-89f8-ef2611c64eeb",
+     "message": 7,
+     "kind": "answer",
+     "paragraphs": [
+      {
+       "text": "Close, but the notes are specific: a maxillary splint can be used in Class I, II and even III, so Class III works. It just isn't the ideal match. The ideal match is Class II division 1, the patient with excessive horizontal overlap. Workable is not the same as ideally suited.",
+       "cites": [
+        {
+         "id": "N7.50",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L7 notes",
+         "quote": "usable in Class I, II and even III",
+         "go": {
+          "v": "notes",
+          "lec": "malocclusion",
+          "k": 50
+         }
+        }
+       ]
+      },
+      {
+       "text": "The true statement was about the mandibular splint. Its ramp sits behind the lower front teeth, so it interferes less with speech and is less visible, which makes it the daytime choice. The maxillary splint is sturdier and is usually worn at night.",
+       "cites": [
+        {
+         "id": "N7.50",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L7 notes",
+         "quote": "so it is preferable for daytime wear",
+         "go": {
+          "v": "notes",
+          "lec": "malocclusion",
+          "k": 50
+         }
+        },
+        {
+         "id": "R7.7",
+         "hub": "occlusion",
+         "kind": "review",
+         "label": "L7 review table",
+         "quote": "Night wear; Class I, II, III; ideally Class II division 1",
+         "go": {
+          "v": "review",
+          "lec": "malocclusion",
+          "t": "Splints"
+         }
+        }
+       ]
+      },
+      {
+       "text": "My own memory trick: maxillary splint, Class II division 1, at night. Mandibular splint, for talking during the day. Even a molar like me knows when to keep quiet.",
+       "cites": []
+      }
+     ],
+     "offer": null,
+     "go": {
+      "hub": "occlusion",
+      "v": "notes",
+      "lec": "malocclusion",
+      "k": 50
+     },
+     "closest": null
+    },
+    "kind": "answer",
+    "cost": 0.046242,
+    "ms": 8975,
+    "usage": {
+     "input_tokens": 4,
+     "cache_creation_input_tokens": 518,
+     "cache_read_input_tokens": 128380,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 518,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "iterations": [
+      {
+       "input_tokens": 4,
+       "output_tokens": 898,
+       "cache_read_input_tokens": 128380,
+       "cache_creation_input_tokens": 518,
+       "cache_creation": {
+        "ephemeral_5m_input_tokens": 518,
+        "ephemeral_1h_input_tokens": 0
+       },
+       "type": "message",
+       "model": null
+      }
+     ],
+     "output_tokens": 898,
+     "output_tokens_details": {
+      "thinking_tokens": 427
+     },
+     "service_tier": "standard",
+     "inference_geo": "global",
+     "speed": "standard"
+    },
+    "model": "claude-opus-5-5",
+    "unchecked": null,
+    "fails": [],
+    "warns": []
+   }
+  ]
+ },
+ {
+  "id": "oc-38",
+  "hub": "occlusion",
+  "type": "mnemonic",
+  "turns": [
+   {
+    "text": "give me a mnemonic for which muscles open and which close the jaw",
+    "reply": {
+     "ok": true,
+     "chat": "2bdc4958-e301-4716-bfa8-30bb75ad0612",
+     "message": 9,
+     "kind": "answer",
+     "paragraphs": [
+      {
+       "text": "Here's my own mnemonic: \"Medial Munches, Lateral Lowers.\" The closers (elevators) on Dr. Givan's exam slide are the temporalis, medial pterygoid and masseter. Picture an M&M sitting on the temple: Masseter, Medial pterygoid and the Temporalis all chew down. The openers (depressors) are the inferior head of the lateral pterygoid plus the suprahyoid and infrahyoid muscles, so Lateral Lowers, with the hyoid crew helping.",
+       "cites": [
+        {
+         "id": "C2.14",
+         "hub": "occlusion",
+         "kind": "cram",
+         "label": "L2 cram sheet",
+         "quote": "elevate T, MPt, M. Depress inf LPt + supra/infrahyoids",
+         "go": {
+          "v": "cram",
+          "lec": "anatomy"
+         }
+        },
+        {
+         "id": "N2t3",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L2 notes",
+         "quote": "Lateral pterygoid (inferior head) + suprahyoid and infrahyoid muscles",
+         "go": {
+          "v": "notes",
+          "lec": "anatomy",
+          "k": 22
+         }
+        }
+       ]
+      },
+      {
+       "text": "One trap: the lateral pterygoid's superior head doesn't open. It is relaxed during opening and active during closure, steadying the disc. He said he expects you to know which belly does what. So only the inferior head gets to Lower.",
+       "cites": [
+        {
+         "id": "N2.20",
+         "hub": "occlusion",
+         "kind": "notes",
+         "label": "L2 notes",
+         "quote": "The superior head is relaxed during opening and active during closure",
+         "go": {
+          "v": "notes",
+          "lec": "anatomy",
+          "k": 20
+         }
+        },
+        {
+         "id": "H14",
+         "hub": "occlusion",
+         "kind": "hint",
+         "label": "L2 Exam Hints",
+         "quote": "I expect you to know which belly is doing what",
+         "go": {
+          "v": "hints",
+          "lec": "anatomy"
+         }
+        }
+       ]
+      },
+      {
+       "text": "Two heads, one muscle, and still less complicated than my two roots.",
+       "cites": []
+      }
+     ],
+     "offer": null,
+     "go": {
+      "hub": "occlusion",
+      "v": "notes",
+      "lec": "anatomy",
+      "k": 22
+     },
+     "closest": null
+    },
+    "kind": "answer",
+    "cost": 0.050927,
+    "ms": 12064,
+    "usage": {
+     "input_tokens": 4,
+     "cache_creation_input_tokens": 83,
+     "cache_read_input_tokens": 128380,
+     "cache_creation": {
+      "ephemeral_5m_input_tokens": 83,
+      "ephemeral_1h_input_tokens": 0
+     },
+     "iterations": [
+      {
+       "input_tokens": 4,
+       "output_tokens": 1241,
+       "cache_read_input_tokens": 128380,
+       "cache_creation_input_tokens": 83,
+       "cache_creation": {
+        "ephemeral_5m_input_tokens": 83,
+        "ephemeral_1h_input_tokens": 0
+       },
+       "type": "message",
+       "model": null
+      }
+     ],
+     "output_tokens": 1241,
+     "output_tokens_details": {
+      "thinking_tokens": 704
+     },
+     "service_tier": "standard",
+     "inference_geo": "global",
+     "speed": "standard"
+    },
+    "model": "claude-opus-5-5",
+    "unchecked": null,
+    "fails": [],
+    "warns": []
+   }
+  ]
+ }
+]

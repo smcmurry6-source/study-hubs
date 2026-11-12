@@ -1,0 +1,13 @@
+134 cases in the test set (heme-endo-exam2 44, occlusion 40, perio 40, dashboard 10); running 5 on the real API
+✓ oc-01  answer                   $1.039  8.5 s
+✓ oc-25  answer                   $0.046  9.0 s
+✓ oc-09  answer                   $0.037  9.2 s
+✓ oc-38  answer                   $0.051  12.1 s
+✓ oc-24  answer                   $0.054  15.0 s
+
+5 cases (5 turns), 0 failed, 0 turn(s) with warnings
+kinds: answer 5; 19 checked cites, 0 quotes that didn't check out
+estimated from the usage the API reported cost $1.23; wait: median 9.2 s, 90th percentile 15.0 s; 24 s in all
+report: /tmp/timmy-out3/timmy-eval/2026-11-12-17-40.md
+
+✓ Ask Timmy eval passed
