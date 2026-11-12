@@ -51,7 +51,10 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   --force` (it reads perio's template-literal `READINGS['<id>']` blocks since 2026-11-05; `--text` shows what it will say;
   it writes the redesign's word timings beside each mp3 too). Session 5's two mp3s were regenerated on 2026-11-12: their
   middle (minutes 5-9 of Plain English, 6-15 of As taught) no longer said what the notes say, found while making the
-  word timings ([narrate-with-kokoro](../how-to/narrate-with-kokoro.md)); **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
+  word timings ([narrate-with-kokoro](../how-to/narrate-with-kokoro.md)). **High yield** (the redesign's third level) is
+  narrated too, since 2026-11-12: `audio/<id>-hy.mp3` for all nine sessions, made from `next/content/notes.json`. It changes
+  whenever a session's notes, predicted topics, hints or questions do, so a question edit can mean recording that session's
+  High yield again in the same PR: the smoke lint says which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)); **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
   (`img/clinic-escape.webp`).
 - **Kept as taught** after an outside fact check (2026-10-21), so don't "fix" them: molar-area CTG harvest, Kwok & Caton
   whole-dentition prognosis, stage regression only by regenerating the defect, clinic piezo can't root plane, lingual

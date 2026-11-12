@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: done
 hub: widget
 created: 2026-11-12
 requested-by: Sam
 due: 
 waiting-on:
-agent: 
+agent: Claude Code
 pr: 
 ---
 
@@ -23,7 +23,7 @@ Follow along) on High yield like the other two levels.
 ## Why it was held: the site was near GitHub Pages' 1 GB cap
 
 **Room was made on 2026-11-12:** Sam had the five archived hubs' audio taken off and every hub's at its archiving
-([rule](../rules/archived-hubs-drop-their-audio.md)): the site went from 958 to 589 MB, so High yield's ~135 MB at the
+([rule](../../rules/archived-hubs-drop-their-audio.md)): the site went from 958 to 589 MB, so High yield's ~135 MB at the
 usual 64 kbps fits (Sam kept 64 kbps). `node tools/ci/size.js` shows the size. What follows is how it stood before.
 
 - On 2026-11-12 the published site (the repo without `.git`) was **960 MB**; GitHub Pages caps a published site at 1 GB.
@@ -35,7 +35,7 @@ usual 64 kbps fits (Sam kept 64 kbps). `node tools/ci/size.js` shows the size. W
 - The options Sam was shown (2026-11-12): make room first (for example, take down the narration of the hubs whose cards
   are gone: MSK Exam 3 and 4 and PCD Fixed Pros Exam 3, about 145 MB, so their pages fall back to the device voice), render
   at 32 kbps, render at 64 kbps anyway, or hold. Sam picked hold. Removing anything is Sam's call.
-- The slow and failed publishes on 11-06 and 11-10 ([shared-infrastructure](../reference/shared-infrastructure.md)) may be
+- The slow and failed publishes on 11-06 and 11-10 ([shared-infrastructure](../../reference/shared-infrastructure.md)) may be
   related to the size; nobody has checked.
 
 ## How to do it, once there's room
@@ -48,10 +48,10 @@ usual 64 kbps fits (Sam kept 64 kbps). `node tools/ci/size.js` shows the size. W
 - In `widget/hub.js` (`drawNotes`), `mp3` is empty for High yield: set it to `audio/<lecture>-hy.mp3` when the file exists
   (a flag in `notes.json` from the build, so a page never requests a missing file), and Follow along then works as is.
 - The smoke lint's words-file check (`tools/ci/smoke.js`) loops over `full` and `plain`: add `hy`.
-- **Text and audio never drift** ([rule](../rules/text-and-audio-never-drift.md)): High yield is rebuilt by
+- **Text and audio never drift** ([rule](../../rules/text-and-audio-never-drift.md)): High yield is rebuilt by
   `tools/hub-next/build.mjs` whenever a hub's notes, predicted topics, hints or questions change, so its narration must be
   regenerated in the same PR whenever `notes.json`'s `hy` for that lecture changes. Add that to the rule and to
-  [narrate-with-kokoro](../how-to/narrate-with-kokoro.md) when this lands, and a lint that names a lecture whose `hy`
+  [narrate-with-kokoro](../../how-to/narrate-with-kokoro.md) when this lands, and a lint that names a lecture whose `hy`
   changed since its mp3 (for example its text's hash in the words file).
 - Narrate only the hubs still on the redesign's list when this runs (a hub whose exam has passed doesn't need it).
 
@@ -72,5 +72,5 @@ usual 64 kbps fits (Sam kept 64 kbps). `node tools/ci/size.js` shows the size. W
 
 ## Outcome
 
-Related: [the redesign release](2026-11-06-redesign-release.md) · [narrate-with-kokoro](../how-to/narrate-with-kokoro.md) ·
-[text-and-audio-never-drift](../rules/text-and-audio-never-drift.md) · [shared-infrastructure](../reference/shared-infrastructure.md)
+Related: [the redesign release](../2026-11-06-redesign-release.md) · [narrate-with-kokoro](../../how-to/narrate-with-kokoro.md) ·
+[text-and-audio-never-drift](../../rules/text-and-audio-never-drift.md) · [shared-infrastructure](../../reference/shared-infrastructure.md)

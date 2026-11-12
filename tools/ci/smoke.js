@@ -1,7 +1,7 @@
 // Browser smoke test + question-bank lint for every live hub and the dashboard.
 // Class data (Supabase) is stubbed with empty results; nothing is written anywhere.
 //   npm i --no-save playwright && npx playwright install chromium && node tools/ci/smoke.js
-const http = require('http'), fs = require('fs'), path = require('path');
+const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 const root = path.resolve(__dirname, '../..');
 const TYPES = { '.html':'text/html', '.js':'application/javascript', '.css':'text/css', '.mp3':'audio/mpeg', '.svg':'image/svg+xml', '.png':'image/png', '.webp':'image/webp', '.mp4':'video/mp4', '.webm':'video/webm', '.json':'application/json' };
@@ -233,15 +233,25 @@ function lint(hub, A){
   const nextNotes = path.join(root, 'hubs', hub, 'next', 'content', 'notes.json');
   if (!audioOff && fs.existsSync(audioDir) && fs.existsSync(nextNotes)) {
     const NN = JSON.parse(fs.readFileSync(nextNotes, 'utf8'));
-    ['full', 'plain'].forEach(level => Object.keys(NN[level] || {}).forEach(id => {
+    const unrecorded = [];
+    ['full', 'plain', 'hy'].forEach(level => Object.keys(NN[level] || {}).forEach(id => {
       const mp3 = path.join(audioDir, `${id}-${level}.mp3`), wf = mp3.replace(/\.mp3$/, '.words.json'), fix = `python3 tools/narration_words.py ${hub} --lec ${id} --level ${level}`;
-      if (!fs.existsSync(mp3)) return;
+      if (!fs.existsSync(mp3)) { if (level === 'hy') unrecorded.push(id); return; }
       if (!fs.existsSync(wf)) { problems.push(`${hub}: no word timings for audio/${id}-${level}.mp3 (${fix})`); return; }
       let d = null; try { d = JSON.parse(fs.readFileSync(wf, 'utf8')); } catch (e) {}
       if (!d || d.v !== 1) problems.push(`${hub}: audio/${id}-${level}.words.json can't be read (${fix})`);
       else if (d.bytes !== fs.statSync(mp3).size) problems.push(`${hub}: audio/${id}-${level}.words.json was made from another recording of it (${fix})`);
       else if (!d.w || !Array.isArray(d.t) || 2 * d.w.split(' ').length !== d.t.length) problems.push(`${hub}: audio/${id}-${level}.words.json has ${d.w ? d.w.split(' ').length : 0} words but ${(d.t || []).length / 2} times (${fix})`);
+      /* High yield is rebuilt whenever the notes, predicted topics, hints or questions change (tools/hub-next/high-yield.mjs),
+         so its recording says which text it was spoken from ("h", tools/narrate.py's text_hash) and must still match it
+         (vault/rules/text-and-audio-never-drift.md); the build then offers it to the page (notes.json's hyAudio) */
+      else if (level === 'hy' && d.h !== crypto.createHash('sha1').update(NN.hy[id], 'utf8').digest('hex').slice(0, 12))
+        problems.push(`${hub}: audio/${id}-hy.mp3 was spoken from another version of ${id}'s High yield: record it again (python3 tools/narrate.py hubs/${hub}/next/content/notes.json --level hy --lec ${id} --force, then node tools/hub-next/build.mjs --hub ${hub})`);
     }));
+    /* a lecture with High yield and no recording of it is allowed (Listen reads it in the device's voice), and named */
+    if (unrecorded.length) notes.push(`${hub}: High yield not narrated for ${unrecorded.join(', ')} (Listen uses the device's voice there)`);
+    const offered = (NN.hyAudio || []).filter(id => !fs.existsSync(path.join(audioDir, `${id}-hy.mp3`)));
+    if (offered.length) problems.push(`${hub}: notes.json's hyAudio lists ${offered.join(', ')} with no audio/<lecture>-hy.mp3 (node tools/hub-next/build.mjs --hub ${hub})`);
   }
 }
 
@@ -421,6 +431,10 @@ function lint(hub, A){
           await hb.click(); await page.waitForTimeout(600); screens++;
           const st = await page.evaluate(() => ({ t: document.querySelectorAll('.reading-prose.hy .hy-t').length, on: !!document.querySelector('[data-level="hy"][aria-pressed="true"]'), w: document.documentElement.scrollWidth - innerWidth }));
           if (!st.on || !st.t) problems.push(`${name} (${label}): High yield for ${hyLec} shows ${st.t} topics`);
+          /* its Listen offers the recording exactly when the build listed it (notes.json's hyAudio), else the device's voice */
+          const rec = (() => { try { return (JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'notes.json'), 'utf8')).hyAudio || []).includes(hyLec); } catch (e) { return false; } })();
+          const offers = await page.evaluate(() => { const b = document.querySelector('.reading #sh-tts-btn'); return b ? b.getAttribute('data-sh-tts-audio') === '1' : null; });
+          if (offers !== rec) problems.push(`${name} (${label}): High yield for ${hyLec}: Listen ${offers ? 'offers' : 'does not offer'} its recording, but notes.json's hyAudio ${rec ? 'lists' : "doesn't list"} it`);
           if (st.w > 1) problems.push(`${name} (${label}): High yield for ${hyLec} scrolls sideways by ${st.w}px`);
           const back = await page.$('[data-level="full"]'); if (back) { await back.click(); await page.waitForTimeout(300); }
         }

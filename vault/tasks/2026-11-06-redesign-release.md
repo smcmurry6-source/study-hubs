@@ -45,8 +45,9 @@ task is the one PR that then switches the site over. If something goes wrong, re
 - [ ] Same hub and question ids, so everyone's answers, XP, ranks, pins and question health carry over (checked on the
       preview with the test accounts)
 - [ ] The rules edited from the drafts below: [hub-home-page](../rules/hub-home-page.md), [arcade-skins](../rules/arcade-skins.md),
-      [question-bank-filter-panel](../rules/question-bank-filter-panel.md), [every-choice-gets-a-why](../rules/every-choice-gets-a-why.md),
-      [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md) (High yield); [build-a-hub](../how-to/build-a-hub.md) rewritten
+      [question-bank-filter-panel](../rules/question-bank-filter-panel.md), [every-choice-gets-a-why](../rules/every-choice-gets-a-why.md);
+      [build-a-hub](../how-to/build-a-hub.md) rewritten ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)
+      already covers High yield, since its narration on 2026-11-12)
 - [ ] The About page rewritten for everything students will see change, counts true
 - [ ] `sw.js` version bumped, so phones drop the old cached pages; perf budgets lowered to the new sizes
 - [ ] CI and the release suites pass on the switch PR, and the UAT is done on its own preview; reverting it there brings
@@ -60,7 +61,8 @@ task is the one PR that then switches the site over. If something goes wrong, re
       2026-11-12): a `core.json` switch that `widget/hub.js` passes to v3.js as `data-audio="off"` (`startWidget`), and that
       hides the engine's own Timmy Time page and Home card and sends Listen to the device's voice without requesting the
       missing mp3s or word files. Needed before Heme & Endo Exam 2, Occlusion or Perio is archived on the engine
-      ([to-do](2026-11-12-audio-off-at-archiving.md))
+      ([to-do](2026-11-12-audio-off-at-archiving.md)). High yield's recordings (`<lecture>-hy.mp3`) come off with the rest;
+      the build's `hyAudio` then lists none by itself (`tools/hub-next/build.mjs` checks the files)
 - [ ] After merge: `node tools/release/postcheck.js`, `DEPLOY_NOTES.md` and the site changelog; a notice to the class only
       if Sam wants one
 
@@ -234,28 +236,30 @@ likely" ones ("You can skip"). No word of it is written by hand: the paragraphs 
 notes" uses, each topic's questions voting for the paragraph that answers them (`node tools/hub-next/high-yield.mjs <hub>
 [<lecture>]` lists every pick). A lecture without topics (Occlusion's midterm lectures) has no High yield button. It runs
 about 40-65% of the As taught notes' length (more for Perio's shortest sessions and Heme & Endo's Refresher, a cram list
-already). Listen reads it in the device's voice: its Kokoro narration is held ([task](2026-11-12-high-yield-narration.md):
-the site is near GitHub Pages' 1 GB cap). Reading it to the end doesn't mark the lecture's notes done; its button at the end
-opens the lecture's High likelihood questions. Tracked as `notes:level=hy` and `notes:practice-likely`.
+already). Listen plays its Kokoro narration (`<lecture>-hy.mp3`, recorded 2026-11-12, with Follow along) where it matches
+today's High yield, and reads it in the device's voice where it doesn't ([task](done/2026-11-12-high-yield-narration.md)).
+Reading it to the end doesn't mark the lecture's notes done; its button at the end opens the lecture's High likelihood
+questions. Tracked as `notes:level=hy` and `notes:practice-likely`.
 
 **[hub-home-page](../rules/hub-home-page.md)**, in phase 1's draft for Notes (or a line in [build-a-hub](../how-to/build-a-hub.md)):
 every hub's notes have three reading levels, **As taught · Plain English · High yield**, High yield on every lecture with
 predicted topics.
 
-**[text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)** (edit): "editing a lecture's text at either level"
-becomes "at any level"; High yield changes whenever its notes, topics, hints or questions do, so once it has narration
-([task](2026-11-12-high-yield-narration.md)) a changed `hy` means a new `<lecture>-hy.mp3` in the same PR. Until then it has
-none, and the device's voice reads the page as it is, so it can't drift.
+**[text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)**: done 2026-11-12 with the High yield narration
+([task](done/2026-11-12-high-yield-narration.md)): "at any level", and a changed `hy` means recording `<lecture>-hy.mp3` again
+in the same PR (the smoke lint names it; until then the page doesn't offer the old recording).
 
 **[build-a-hub](../how-to/build-a-hub.md)** (with phase 1's rewrite): a new hub's High yield comes from its `LIKELY_TOPICS`
 and hints with no extra work; check its picks with `node tools/hub-next/high-yield.mjs <hub>` and fix a weak one by fixing
-the topic (its words, its questions), never by writing High yield text by hand.
+the topic (its words, its questions), never by writing High yield text by hand. Narrate it with the other two levels:
+`python3 tools/narrate.py hubs/<hub>/next/content/notes.json --level hy`, then the build
+([narrate-with-kokoro](../how-to/narrate-with-kokoro.md)).
 
 **About page**, Notes (add, tagged new): **Three ways to read**: As taught (the professor's version), Plain English (the same
 facts in everyday words) and **High yield**: only what's most likely on the exam. Each predicted topic (the same list as Exam
 hints' "Most likely questions"), strongest evidence first, with the part of the notes that teaches it and the professor's own
 "know this", then what else was flagged in class and what you can skip. Its button at the end opens that lecture's High
-likelihood questions. Listen reads High yield in your device's voice.
+likelihood questions. Listen reads High yield too, in the same voice as the other levels, with Follow along.
 
 ### From phase 2, Perio ([phase 2](2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../hubs/perio.md))
 
@@ -449,5 +453,7 @@ is in [its own note](2026-11-06-idea-board.md).
   drafts above.
 - 2026-11-06: Sam's third look: Timmy Time among Home's quick starts, animated; Today's ring of 20 teeth.
 - 2026-11-12: High yield, the notes' third reading level, built in the engine; its drafts are above.
+- 2026-11-12: High yield narrated with Kokoro for all three hubs (21 lectures), played with Follow along where it
+  matches today's High yield ([task](done/2026-11-12-high-yield-narration.md)); the drift rule covers it.
 
 ## Outcome

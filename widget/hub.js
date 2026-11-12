@@ -865,9 +865,10 @@
     var text = (level === "plain" ? NOTES.plain : hy ? NOTES.hy : NOTES.full)[lec.id], nq = (QBL[lec.id] || []).length;
     var nTopics = hy ? (CORE.likelyTopics || []).filter(function(t){ return t.lec === lec.id; }).length : 0;
     var nLikely = (QBL[lec.id] || []).filter(function(r){ return r.likely; }).length;
-    /* High yield has no recorded narration yet (vault/tasks/2026-11-12-high-yield-narration.md): Listen reads it in the
-       device's voice, which can't drift from the text */
-    var mp3 = hy ? "" : ASSETS + "audio/" + lec.id + "-" + level + ".mp3";
+    /* High yield's narration (<lecture>-hy.mp3) is offered only where notes.json's hyAudio lists the lecture: the build lists
+       it while the recording was spoken from today's High yield (tools/hub-next/build.mjs, hyRecorded). Anywhere else
+       Listen reads it in the device's voice, which can't drift from the text. */
+    var mp3 = !hy ? ASSETS + "audio/" + lec.id + "-" + level + ".mp3" : (NOTES.hyAudio || []).indexOf(lec.id) >= 0 ? ASSETS + "audio/" + lec.id + "-hy.mp3" : "";
     var list = lecListHTML(lec);
     var sub = String(lec.title).split(":").slice(1).join(":").trim();
     var group = (STUDY.review || []).filter(function(g){ return g.lec === lec.id; })[0];
