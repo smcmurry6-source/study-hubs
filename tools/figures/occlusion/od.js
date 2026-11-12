@@ -425,9 +425,13 @@ var FIG_PLACE = {
     { full:'Cupped-out cusp tips.', plain:'Cavities are acid too', figs:['cupping'] },
     { full:'Vomiting (bulimia', plain:'Cavities are acid too', figs:['erosion9'] },
     { full:'pH and buffering capacity sound', plain:'Buffering capacity is how much saliva', figs:['buffer'] }
+  ],
+  occtrauma: [
+    { full:'He wanted one thing very clear', plain:'His big warning', figs:['otxray'] },
+    { full:'So trauma alone is', plain:'So in animals, biting trauma', figs:['otanimal'] }
   ]
 };
-var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'], instruments:['mounterr','scirec','bennett','hingearc'], malocclusion:['tolerance','stability','splints','thirds','erosion'], dentures:['resorb','ssr','schemes','toothforms'], nccl:['abfract','cupping','erosion9','buffer'] };
+var FIG_BY_LEC = { review:['fence','envSag','envHoriz','envFront','pathMax','pathMand','cuspmotion','inclines','interferences','cuspheight','envelope','crslide','guidance'], applying:['guidance','implant'], function:['swallow'], anatomy:['tmj','muscles'], instruments:['mounterr','scirec','bennett','hingearc'], malocclusion:['tolerance','stability','splints','thirds','erosion'], dentures:['resorb','ssr','schemes','toothforms'], nccl:['abfract','cupping','erosion9','buffer'], occtrauma:['otxray','otanimal'] };
 /* fence post + contact map with Class I / II / III tabs (notes and Review) */
 function cuspMapHTML(cls){
   cls = cls || 1;

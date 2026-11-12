@@ -29,6 +29,9 @@ import { toothforms } from "./toothforms.mjs";
 import { abfract } from "./abfract.mjs";
 import { buffer } from "./buffer.mjs";
 import { cupping } from "./cupping.mjs";
+// L10 (final), approved by Sam 2026-11-12
+import { otxray } from "./otxray.mjs";
+import { otanimal } from "./otanimal.mjs";
 /* L7's Fig 19 again under L9, opened on vomiting, with L9's reasons; an alias (build.mjs), so no second copy of the drawing */
 const erosion9 = {
   id: "erosion9", alias: "erosion", lec: "nccl",
@@ -42,4 +45,4 @@ const erosion9 = {
     },
   },
 };
-export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope(), crslide(), guidance(), swallow(), implant(), mounterr(), hingearc(), scirec(), bennett(), tolerance(), stability(), splints(), thirds(), erosion(), resorb(), ssr(), schemes(), toothforms(), abfract(), buffer(), cupping(), erosion9];
+export const FIGURES = [tmj(), cuspmotion(), interferences(), muscles(), cuspheight(), envelope(), crslide(), guidance(), swallow(), implant(), mounterr(), hingearc(), scirec(), bennett(), tolerance(), stability(), splints(), thirds(), erosion(), resorb(), ssr(), schemes(), toothforms(), abfract(), buffer(), cupping(), erosion9, otxray(), otanimal()];
