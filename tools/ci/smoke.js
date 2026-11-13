@@ -143,6 +143,8 @@ async function askCheck(page, name, o){
   await page.route(/supabase\.co\/rest\/v1\/rpc\/timmy_report/, route => route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true,"id":1}' }));
   await o.open();
   await page.waitForSelector('.ska.is-on .ska-panel', { timeout: 5000 }).catch(() => {});
+  /* the panel slides in: wait until it has stopped, so a tap lands on what was aimed at */
+  await page.waitForFunction(() => { const p = document.querySelector('.ska.is-on .ska-panel'), t = p && getComputedStyle(p).transform; return !!p && (t === 'none' || t === 'matrix(1, 0, 0, 1, 0, 0)'); }, null, { timeout: 3000 }).catch(() => {});
   const p0 = await page.evaluate(() => { const r = document.querySelector('.ska'); if (!r || r.hidden) return null;
     return { title: document.getElementById('skaT').textContent, note: document.querySelector('.ska-note').textContent, starters: document.querySelectorAll('.ska-starters [data-ska^="starter-"]').length }; });
   if (!p0) { problems.push(`${name}: the Ask button didn't open Ask Timmy's chat`); return sent; }

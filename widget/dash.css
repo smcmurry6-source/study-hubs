@@ -634,7 +634,8 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
   html.shx .dx .shpet-house { grid-template-columns: minmax(0, 1fr); }
   .dx-classhead .seg { width: 100%; }
   .dx-classhead .seg button { flex: 1; justify-content: center; padding: 0 8px; }
-  .dx-archived { grid-template-columns: minmax(0, 1fr); }
+  /* one column on a phone, also when no recap is beside it (that rule above is more specific and gave two) */
+  .dx-archived, .dx-past > .rc[hidden] + .dx-archived, .dx-past > .dx-archived:first-child { grid-template-columns: minmax(0, 1fr); }
   .dx-arch > div { justify-items: stretch; }
   .dx-arch .btn { white-space: normal; text-align: left; }
   .dx-day { grid-template-columns: minmax(0, 1fr); }

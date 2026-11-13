@@ -1066,5 +1066,7 @@ is a new migration and Sam's call, never a restore.
   ring drawn around a leaderboard row. Fixed, and each rerun on its own.
   Then the device suite run with the clock a day ahead (Heme & Endo Exam 2 archived, so its refresh and history
   steps run on Occlusion): four more places written for an old page (BUG-139), fixed, and green for today and tomorrow.
+  The smoke test in the same state (two hubs under Past hubs) found one bug in the new dashboard itself: on a phone,
+  Past hubs went two columns wide when no recap was beside it and the page scrolled sideways (BUG-140, fixed).
 
 ## Outcome
