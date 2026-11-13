@@ -2491,6 +2491,9 @@
     if (!qid || !card || card.getAttribute("data-qid") !== qid) return;
     setTimeout(function(){ if (card.isConnected) njAttach(card, qid); }, 0);
   });
+  /* the redesign's flashcards (widget/study-modes.js): a card's back isn't a question card and has no answer to miss, so the
+     page asks for "Find this in the notes" itself, in the element's .qcard-explain. Nothing on a live hub calls it. */
+  window.shNoteJump = function(el, qid){ if (el && qid && typeof window.SH_GOTO === "function") njAttach(el, String(qid)); };
 
   function loadStats(){
     var toughEl = document.getElementById("shstat-tough");

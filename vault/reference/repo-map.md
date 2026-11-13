@@ -49,7 +49,9 @@ tags: [map]
   settings (`window.SH_HUB`), its content as JSON in `content/` (written by `tools/hub-next/build.mjs`) and the shared
   engine. The engine is four scripts the page loads in order, with `widget/hub.css`: `widget/hub-rewards.js` (the answer
   path, XP, rank, the recap), `widget/hub-timmy.js` (Timmy), `widget/hub-bank.js` (the question card, the bank, the mock),
-  then the core, `widget/hub.js` (its top says how they fit together).
+  then the core, `widget/hub.js` (its top says how they fit together). The Question Bank's Learn and Flashcards are
+  `widget/study-modes.js` + `widget/study-modes.css`, fetched by `hub-bank.js` the first time either is opened
+  ([the task](../tasks/2026-11-06-redesign-learn-and-flashcards.md); their server part is the pending `migration_v56.sql`).
 - `hubs/<hub-id>/index.html` — one single-file hub each, and it is the source (perio included: its old split-source
   Claude Project is retired; edit the file directly). `hubs/<hub-id>/audio/` holds
   its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).

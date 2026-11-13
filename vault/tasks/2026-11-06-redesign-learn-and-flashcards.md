@@ -1,13 +1,13 @@
 ---
 type: task
-status: open
+status: review
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: 
-agent: 
-pr: 
+waiting-on: "Sam's merge; then the redesign's release (migration_v56 applied after v54 and v55, the About page entries)"
+agent: Claude Code (2026-11-12)
+pr: https://github.com/smcmurry6-source/study-hubs/pull/344
 ---
 
 # Learn and Flashcards: a toggle that changes how the Question Bank is studied
@@ -178,17 +178,22 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
 ## Done when
 
 - [x] Sam has confirmed or changed the calls above (all six confirmed, 2026-11-06)
-- [ ] The toggle, Learn and Flashcards built in `widget/hub-bank.js` / `hub.css` (or a `widget/study-modes.js` loaded when first
-      used, phase 5's bundles: a file loaded on demand adds no request to the page's first load, where Occlusion's budget
-      has 1 to spare since the split), in the new Occlusion first, then every hub on the engine
-- [ ] The two icons drawn in `tools/figures/site/icons.mjs` and built into `widget/hub-art.js`
-- [ ] The server part in the pending migration, with its `xp.js` and `rls.js` checks, and [game-server](../reference/game-server.md) updated
-- [ ] Every format checked in both views on a phone and a laptop: one-answer, select-all, true/false, two-statement,
-      numbered, EXCEPT, put-in-order, match, Patient box, figure questions
-- [ ] The drafts in [the release note](2026-11-06-redesign-release.md) (the panel rule, the About page) match what was built
-- [ ] Event taxonomy, analytics retention, the About page's "What the hubs record"
-- [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
-- [ ] Vault written back (`DEPLOY_NOTES.md`, this note's Outcome)
+- [x] The toggle, Learn and Flashcards built: the toggle in `widget/hub-bank.js` / `hub.css`, Learn and Flashcards in
+      `widget/study-modes.js` + `widget/study-modes.css`, loaded the first time either is opened (no request added to
+      any page's first load), in every hub on the engine (Occlusion, Heme & Endo Exam 2, Perio)
+- [x] The two icons drawn in `tools/figures/site/icons.mjs` and built into `widget/hub-art.js` (Sam: "Yes, both")
+- [x] The server part: `migration_v56.sql`, pending after v54 and v55 (Sam: "B"), with its `xp.js` and `rls.js` checks, and
+      [game-server](../reference/game-server.md) updated
+- [x] Every format checked in both views on a phone and a laptop: one-answer, select-all, true/false, two-statement,
+      numbered, EXCEPT, which-is-true and which-is-false, put-in-order, match, Patient box, figure questions, self-graded
+      recall (light and dark, motion on and off)
+- [x] The drafts in [the release note](2026-11-06-redesign-release.md) (the panel rule, the About page) match what was built
+- [x] Event taxonomy, analytics retention; the About page's "What the hubs record" is in the release note's drafts
+- [x] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
+- [x] Vault written back (`DEPLOY_NOTES.md`, this note's Outcome)
+- [ ] At the release: `migration_v56.sql` applied after v54 and v55, `widget/study-modes.js` and `.css` in `sw.js`'s
+      `PRECACHE`, the About page entries (the steps are in [the release note](2026-11-06-redesign-release.md), "From the
+      Learn and Flashcards toggle")
 
 ## Log
 
@@ -200,7 +205,34 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
   "server part in the pending migration" is a change to `migration_v54.sql`, which Sam has said not to change without
   his word: ask him at the start of the session (or build it with no server part).
 
+- 2026-11-12 (Claude Code): asked Sam first, as the session's prompt said, what the server part is and whether the toggle
+  could ship without it, with three options (A: no server part, B: a new pending `migration_v56.sql`, C: a section in
+  v54). Sam: "B, go ahead". Built and tested in [#344](https://github.com/smcmurry6-source/study-hubs/pull/344) (draft). Sam also asked mid-session (2026-11-12): "make sure learn has
+  similar progress bar filling animations and such so it is very satisfying to use like quizlet": the overall bar now
+  fills instead of jumping (a shine along it when a question is mastered, its numbers counting to their new value, the
+  percent counting a question right once as halfway), the round's track fills a step per answer (red for a miss, a
+  dashed step for its second try) and stays under the top bar while you answer, a right answer gets a word of praise
+  and a streak chip from 3 in a row, Mastered pops with a small burst, the round's end fills the bar from where the
+  round began (+n%) and lists the round's questions, and "You mastered all" ends in a burst. Motion off: the end states
+  only.
+  - How it's built: [game-server](../reference/game-server.md), "Learn and Flashcards"; `widget/study-modes.js`'s header.
+    Learn's step and the flashcard schedule are kept per question on the device (`STATE.learn`, `STATE.cards`); each
+    rating or step goes to `card_reviews` (queued in `STATE.cardq` while offline or before the migration) and
+    `get_my_cards` replays them on another device. A flashcard is drawn as `.qc.fcard` with `data-fqid`, never a
+    `.qcard`, so question health and the class's picks leave it alone; "Good question?" and "Find this in the notes"
+    come through two small hooks (`shQH.rate`, `window.shNoteJump`) that nothing on a live hub calls.
+  - Decided while building (no call needed from Sam, all inside the six calls above): Learn's answers go through
+    `record_answer_v2` as context `other` (v54's list has no `learn`, and v54 isn't changed); the four ratings sit at the
+    bottom of the screen while a turned-over card is longer than it, on a laptop only (on a phone the corner buttons
+    would cover Again and Easy, so they stay at the card's end); the hidden-choices step uses a conservative test (a
+    stem with "which", "the following", "not", "true", "statements" and the like keeps its choices); Study new cards gives
+    20 at a time.
+
 ## Outcome
+
+Built, not released: the Question Bank's **Study as: Questions · Learn · Flashcards** in the three new hubs, with the
+server part as `migration_v56.sql` (pending, after v54 and v55, which are unchanged). Nothing students see changes until
+the release; the release note says what goes in then.
 
 Related: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) · [the release](2026-11-06-redesign-release.md) ·
 [phase 2](2026-11-05-redesign-phase-2-live-hubs.md) · [question-bank-filter-panel](../rules/question-bank-filter-panel.md) ·

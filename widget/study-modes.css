@@ -1,0 +1,173 @@
+/* ============ Learn and Flashcards' look (widget/study-modes.css, with widget/study-modes.js) ============
+   Fetched with the module the first time Learn or Flashcards is opened, never with the page. The hub engine's tokens
+   (widget/hub.css): one ground, Timmy's ink, the hub's tint, the right and wrong greens and reds, radius 16 / 14 / pill.
+   A Learn question is the bank's own card (.qc); a flashcard is a .qc too, never a .qcard, so the shared widget's
+   question tracking and class picks leave it alone. Scoped to html.shx, which only the new hubs set. ============ */
+
+/* ---------- Learn: the progress bar, the round, the cards one at a time ---------- */
+html.shx .sm { display: grid; gap: 14px; --sm-top: var(--bar-h); }
+html.shx .sm-prog { padding: 16px 20px; }
+html.shx .sm-bar { position: relative; display: flex; height: 12px; border-radius: var(--r-pill); background: var(--track); overflow: hidden; }
+html.shx .sm-bar i { position: relative; display: block; height: 100%; overflow: hidden; transition: width 750ms var(--ease-expo); }
+html.shx .sm-bar .b-done { background: var(--hub-text); }
+html.shx .sm-bar .b-learn { background: var(--hub-mid); }
+html.shx .sm-legend { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: var(--fs-label); color: var(--muted); }
+html.shx .sm-legend li { display: inline-flex; align-items: center; gap: 6px; }
+html.shx .sm-legend b { color: var(--text); font-weight: var(--w-head); }
+html.shx .sm-legend i { width: 10px; height: 10px; border-radius: 50%; background: var(--track); border: 1px solid var(--control); }
+html.shx .sm-legend .k-learn { background: var(--hub-mid); border-color: var(--hub-mid); }
+html.shx .sm-legend .k-done { background: var(--hub-text); border-color: var(--hub-text); }
+/* the percent above the bar, which counts to its new value; the Mastered count and it bump when a question is mastered */
+html.shx .sm-prog-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+html.shx .sm-pct { font-size: var(--fs-label); color: var(--muted); }
+html.shx .sm-pct b { display: inline-block; margin-right: 2px; font-size: 24px; line-height: 1; font-weight: var(--w-head); color: var(--hub-text); }
+html.shx .sm-of { font-size: var(--fs-meta); }
+html.shx .is-bump { display: inline-block; animation: sm-bump 520ms var(--ease-out); }
+@keyframes sm-bump { 0% { transform: scale(1); } 35% { transform: scale(1.32); } 100% { transform: scale(1); } }
+/* a shine runs along the mastered part of the bar */
+html.shx .sm-bar .b-done::after { content: ""; position: absolute; inset: 0; transform: translateX(-110%);
+  background: linear-gradient(100deg, transparent 0 30%, rgba(255,255,255,.65) 50%, transparent 70% 100%); }
+html.shx .sm-bar.is-shine .b-done::after { animation: sm-shine 900ms 260ms var(--ease-out); }
+@keyframes sm-shine { from { transform: translateX(-110%); } to { transform: translateX(110%); } }
+
+/* the round's track: a step per question, filling as you answer (a miss adds a dashed step for its second try) */
+/* it stays under the top bar while you answer, so you see it fill */
+html.shx .sm-round { position: sticky; top: var(--sm-top); z-index: 6; margin: -6px -6px 0; padding: 8px 6px 10px; background: var(--ground); }
+html.shx .sm-where { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; font-size: var(--fs-label); color: var(--muted); }
+html.shx .sm-where b { color: var(--text); font-weight: var(--w-head); }
+html.shx .sm-streak { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px 2px 6px; border-radius: var(--r-pill);
+  background: var(--hub-soft); color: var(--text); font-weight: var(--w-strong); }
+html.shx .sm-streak .ic { color: var(--flame); }
+html.shx .sm-steps { margin-top: 8px; display: flex; gap: 6px; }
+html.shx .sm-steps li { position: relative; flex: 1 1 0; min-width: 0; height: 10px; border-radius: var(--r-pill); background: var(--track); overflow: hidden;
+  transition: box-shadow var(--t-ui); }
+html.shx .sm-steps li::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--right); transform: scaleX(0); transform-origin: left center;
+  transition: transform 520ms var(--ease-expo), background var(--t-ui); }
+html.shx .sm-steps li.is-again { background: repeating-linear-gradient(90deg, var(--track) 0 6px, transparent 6px 10px); }
+html.shx .sm-steps li.is-now { box-shadow: inset 0 0 0 2px var(--hub-text); animation: sm-now 1.6s ease-in-out infinite; }
+html.shx .sm-steps li.is-right::after { transform: scaleX(1); }
+html.shx .sm-steps li.is-miss::after { transform: scaleX(1); background: var(--wrong); opacity: .55; }
+@keyframes sm-now { 50% { box-shadow: inset 0 0 0 2px var(--hub-mid); } }
+html.shx .sm-stage { display: grid; gap: 14px; min-height: 120px; }
+html.shx .sm-stage > .qc { animation: sm-in 260ms var(--ease-out) both; }
+html.shx .qc-think { margin-top: 16px; }
+html.shx .sm-next { margin: 12px 0 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; scroll-margin-bottom: calc(var(--sh-tabbar-h, 0px) + 88px); }   /* clear of the corner buttons (Ask Timmy, the streak chip) */
+html.shx .sm-tag { display: inline-flex; align-items: center; gap: 5px; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); }
+html.shx .sm-tag.is-done { position: relative; color: var(--right); }
+html.shx .sm-tag.is-right { padding: 4px 12px; border-radius: var(--r-pill); background: var(--right-bg); color: var(--right-ink); font-weight: var(--w-head); }
+html.shx .sm-tag.is-done.is-pop { padding: 4px 12px; border-radius: var(--r-pill); background: var(--right-bg); color: var(--right-ink); }
+html.shx .sm-sub { flex-basis: 100%; margin-top: -4px; }
+html.shx .is-pop { animation: sm-pop 460ms var(--ease-out) both; }
+@keyframes sm-pop { 0% { opacity: 0; transform: scale(.6); } 60% { opacity: 1; transform: scale(1.12); } 100% { transform: scale(1); } }
+/* a small burst of dots from the Mastered tag, a big one over "You mastered all" */
+html.shx .sm-burst { position: absolute; left: 50%; top: 50%; width: 0; height: 0; pointer-events: none; }
+html.shx .sm-burst i { position: absolute; left: -3px; top: -3px; width: 6px; height: 6px; border-radius: 50%; opacity: 0;
+  background: var(--right); animation: sm-fly 700ms var(--ease-out) forwards; }
+html.shx .sm-burst i[style*="--c:1"] { background: var(--hub-mid); }
+html.shx .sm-burst i[style*="--c:2"] { background: var(--gold); }
+html.shx .sm-burst i[style*="--c:3"] { background: var(--hub-text); }
+html.shx .sm-burst.is-big { top: 28px; }
+html.shx .sm-burst.is-big i { width: 9px; height: 9px; left: -4px; top: -4px; border-radius: 2px; animation-duration: 1100ms; }
+@keyframes sm-fly { 0% { opacity: 1; transform: rotate(var(--a)) translateX(0) scale(1); } 70% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--d)) scale(.4); } }
+html.shx .sm-done { position: relative; overflow: hidden; }
+html.shx .sm-end .figs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+html.shx .sm-endbar { margin-top: 12px; }
+html.shx .sm-endbar p { font-size: var(--fs-label); color: var(--muted); }
+html.shx .sm-endbar p b { font-size: 22px; font-weight: var(--w-head); color: var(--hub-text); }
+html.shx .sm-endbar .sm-bar { margin-top: 8px; height: 14px; }
+html.shx .sm-endbar .sm-bar i { transition-duration: 1100ms; }
+html.shx .sm-gain { display: inline-block; margin-left: 4px; padding: 1px 8px; border-radius: var(--r-pill); background: var(--right-bg); color: var(--right-ink); font-weight: var(--w-head);
+  animation: sm-pop 460ms 900ms var(--ease-out) both; }
+html.shx .sm-list { margin-top: 16px; display: grid; gap: 6px; }
+html.shx .sm-list li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: var(--r-row); background: var(--panel); font-size: var(--fs-label); min-width: 0;
+  animation: sm-in 320ms calc(var(--i, 0) * 70ms + 300ms) var(--ease-out) both; }
+html.shx .sm-list li .ic { flex: none; }
+html.shx .sm-list li .t { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html.shx .sm-list li.is-right .ic, html.shx .sm-list li.is-fixed .ic { color: var(--right); }
+html.shx .sm-list li.is-miss .ic { color: var(--wrong); }
+html.shx .sm-list .sm-tag { flex: none; font-size: var(--fs-meta); }
+html.shx .sm-done p, html.shx .sm-caught p { margin-top: 8px; color: var(--muted); }
+html.shx .sm-saved { margin-top: 12px; }
+html.shx .sm-done .qc-go .ic, html.shx .sm-caught .qc-go .ic { flex: none; }
+@keyframes sm-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Flashcards: the counts, the card, its two sides, the four ratings ---------- */
+html.shx .sm-counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+html.shx .sm-counts li { display: flex; align-items: baseline; gap: 8px; padding: 12px 16px; border-radius: var(--r-row); background: var(--panel); min-width: 0; }
+html.shx .sm-counts b { font-size: 22px; font-weight: var(--w-head); line-height: 1; }
+html.shx .sm-counts span { font-size: var(--fs-label); color: var(--muted); }
+html.shx .sm-counts .c-due b { color: var(--hub-text); }
+html.shx .fcard { position: relative; }
+html.shx .fc-state { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: var(--r-pill); background: var(--row); color: var(--muted); font-weight: var(--w-strong); }
+html.shx .fc-turn { transform-origin: 50% 40%; }
+html.shx .fc-front { cursor: pointer; }
+html.shx .fcard.is-flipped .fc-front { cursor: auto; }
+html.shx .fc-hint { margin-top: 12px; }
+html.shx .fc-choices { margin-top: 14px; display: grid; gap: 6px; }
+html.shx .fc-choices li { display: flex; align-items: flex-start; gap: 8px; padding: 10px 14px; border-radius: var(--r-row); background: var(--row); border: 1px solid var(--border);
+  font-size: var(--fs-body); line-height: 1.4; transition: opacity var(--t-ui), background var(--t-ui), border-color var(--t-ui); }
+html.shx .fc-choices.is-tf { grid-template-columns: 1fr 1fr; }
+html.shx .fc-choices.is-answered li { opacity: .55; }
+html.shx .fc-choices.is-answered li.is-key { opacity: 1; border-color: var(--right); background: var(--right-bg); color: var(--right-ink); font-weight: var(--w-strong); }
+html.shx .fc-choices li.is-key .ic { flex: none; width: 18px; height: 18px; margin-top: 2px; color: var(--right); }
+html.shx .fc-showch { margin-top: 10px; padding-left: 8px; }
+html.shx .fc-match { margin-top: 14px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+html.shx .fc-match ul { display: grid; gap: 6px; align-content: start; }
+html.shx .fc-match li { padding: 10px 12px; border-radius: var(--r-row); background: var(--row); border: 1px solid var(--border); font-size: var(--fs-label); line-height: 1.35; }
+html.shx .fcard.is-flipped .fc-match { opacity: .55; }
+html.shx .fc-flip { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+html.shx .fc-back { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--control); }
+html.shx .fc-ans { padding: 14px 16px; border-radius: var(--r-row); background: var(--right-bg); color: var(--right-ink); }
+html.shx .fc-ans-h { display: flex; align-items: center; gap: 6px; font-size: var(--fs-label); font-weight: var(--w-head); color: var(--right); }
+html.shx .fc-ans-t { margin-top: 4px; font-size: var(--fs-stem); line-height: 1.4; font-weight: var(--w-head); color: var(--text); }
+html.shx .fc-ans-l { margin-top: 6px; display: grid; gap: 4px; padding-left: 20px; list-style: disc; font-weight: var(--w-strong); color: var(--text); }
+html.shx .fc-ans .qc-order, html.shx .fc-ans .qc-pairs { color: var(--text); }
+html.shx .fc-ex { margin-top: 14px; }
+html.shx .fc-ex .why { margin-top: 12px; }
+html.shx .fc-ex .sh-nj, html.shx .fc-ex .sh-qrate { margin-top: 12px; }
+html.shx .fc-rate { margin-top: 18px; }
+/* turned over, on a laptop: the four ratings stick to the bottom of the screen while the card runs past it. Not on a phone,
+   where Ask Timmy's icon and the streak chip sit in the bottom corners: there the row stays at the end of the card. */
+@media (min-width: 641px) {
+  html.shx .fcard.is-flipped .fc-rate { position: sticky; bottom: 0; z-index: 2; margin: 14px -10px -10px; padding: 10px 10px 12px;
+    border-radius: var(--r-row) var(--r-row) 0 0; background: var(--panel); box-shadow: 0 -1px 0 var(--border); }
+}
+html.shx .sm-stage > .qc { scroll-margin-top: calc(var(--sm-top) + 76px); scroll-margin-bottom: calc(var(--sh-tabbar-h, 0px) + 12px); }
+html.shx .fc-ans { scroll-margin-top: calc(var(--bar-h) + 12px); scroll-margin-bottom: calc(var(--sh-tabbar-h, 0px) + 130px); }
+html.shx .fc-rate-q { font-size: var(--fs-label); font-weight: var(--w-head); color: var(--muted); }
+html.shx .fc-rate-btns { margin-top: 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+html.shx .hx .fc-r, html.shx .fc-r { position: relative; display: grid; justify-items: center; gap: 2px; min-height: 64px; padding: 8px 6px; border-radius: var(--r-row); text-align: center; }
+html.shx .fc-r b { font-size: var(--fs-body); font-weight: var(--w-head); }
+html.shx .fc-r small { font-size: var(--fs-meta); color: var(--muted); }
+html.shx .fc-r kbd { position: absolute; top: 6px; right: 8px; font: inherit; font-size: 11px; color: var(--muted); }
+html.shx .fc-r.r-again b { color: var(--wrong); }
+html.shx .fc-r.r-good { border-color: var(--hub-text); }
+html.shx .fc-r.r-good b { color: var(--hub-text); }
+html.shx .fc-r.r-easy b { color: var(--right); }
+html.shx .fc-r.is-picked { background: var(--hub-soft); border-color: var(--hub-text); }
+html.shx .fc-r:disabled { opacity: 1; }
+html.shx .fc-r:disabled:not(.is-picked) { opacity: .5; }
+
+/* a phone: no keys to show; the four ratings along the bottom of the card, big */
+@media (hover: none), (max-width: 640px) {
+  html.shx .fc-key { display: none; }
+}
+@media (max-width: 640px) {
+  html.shx .sm { --sm-top: 56px; }   /* under the phone's sticky strip (widget/hub.css, .hx-strip) */
+  html.shx .sm-counts li { flex-direction: column; gap: 4px; padding: 10px 12px; }
+  html.shx .sm-end .figs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  html.shx .sm-end .figs b { font-size: 22px; }
+  html.shx .sm-steps { gap: 4px; }
+  html.shx .fc-flip .btn { width: 100%; }
+  html.shx .fc-rate-btns { gap: 6px; }
+  html.shx .fc-r { min-height: 68px; padding: 8px 2px; }
+  html.shx .fc-choices.is-tf { grid-template-columns: 1fr; }
+  html.shx .sm-next .btn { flex: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.shx .sm-stage > .qc { animation: none; }
+  html.shx .sm-bar i, html.shx .fc-choices li, html.shx .sm-steps li, html.shx .sm-steps li::after { transition: none; }
+  html.shx .is-bump, html.shx .is-pop, html.shx .sm-gain, html.shx .sm-list li, html.shx .sm-steps li.is-now, html.shx .sm-bar.is-shine .b-done::after { animation: none; }
+  html.shx .sm-burst { display: none; }
+}

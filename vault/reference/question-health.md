@@ -30,7 +30,9 @@ deletes a question**: a flag is a lead for a person to check against the hub's n
 - **"Good question?"**: under each explanation, once answered, a thumbs up / down; a thumbs down asks why (answer looks
   wrong, confusing wording, not in the notes, explanation didn't help, gives the answer away) and offers the Report form
   for anything else (`qh_vote`, `question_feedback`, one vote per person per question). Tracked as `qrate:up`,
-  `qrate:down`, `qrate:undo`, `qrate:why=<reason>`. On the About page under the question bank.
+  `qrate:down`, `qrate:undo`, `qrate:why=<reason>`. On the About page under the question bank. A redesign flashcard
+  (`widget/study-modes.js`) isn't a `.qcard`, so it's never timed or counted as a view; its back asks for the vote alone
+  with `shQH.rate(el, qid)`, and for "Find this in the notes" with `window.shNoteJump(el, qid)` (`widget/v3.js`).
 - **Reports** (`question_flags`) are joined to their question through the "— question <id>" tag the widget writes.
 - **The report**, `qh_report(hub, days, current)`: per question, its numbers and flags. The admin page calls it through
   `get_question_health` (admin secret), passing every live question's version, key, choice count and type worked out

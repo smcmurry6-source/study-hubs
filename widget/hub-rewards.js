@@ -28,13 +28,17 @@
   var KIND = { sequence: "order", recall: "self", match: "self" };
 
   /* ---------- the one answer path: the live hub's recordAnswer, plus the daily goal and the rewards ---------- */
-  var SESSION = { n: 0, r: 0, xp: 0, miss: {}, since: 0, recapAt: 0, hp0: null };
+  var SESSION = { n: 0, r: 0, xp: 0, miss: {}, since: 0, recapAt: 0, hp0: null, k: 0, again: 0, kSince: 0, againAt: 0 };
   function todayRec(){
     var d = day(0), x = STATE.nx.days[d];
-    /* q (each question's right and wrong answers today, for the three-a-day rule) is kept for today only */
-    if (!x) { Object.keys(STATE.nx.days).forEach(function(k){ delete STATE.nx.days[k].q; }); x = STATE.nx.days[d] = { n: 0, r: 0, xp: 0 }; }
+    /* q (each question's right and wrong answers today, for the three-a-day rule) and cq (each flashcard's paying ratings
+       today) are kept for today only; k counts today's flashcard ratings */
+    if (!x) { Object.keys(STATE.nx.days).forEach(function(k){ delete STATE.nx.days[k].q; delete STATE.nx.days[k].cq; }); x = STATE.nx.days[d] = { n: 0, r: 0, xp: 0 }; }
     return x;
   }
+  /* today's goal counts answers and flashcards (Sam, 2026-11-06: flashcards count toward the ring and the streak, not as
+     answers) */
+  function doneToday(t){ t = t || todayRec(); return t.n + (t.k || 0); }
   function goal(){ return STATE.nx.goal || 20; }
   function goalDays(){
     var on = {}; Object.keys(STATE.nx.days).forEach(function(k){ if (STATE.nx.days[k].met) on[k] = 1; });
@@ -82,7 +86,7 @@
     putAnswer(qid, lecId, correct);
     t.n++; if (correct) t.r++; t.xp += xp;
     if (game) { var tq = t.q || (t.q = {}), c = tq[qid] || (tq[qid] = [0, 0]); c[correct ? 0 : 1]++; PEND.push({ qid: qid, xp: xp, at: Date.now() }); }
-    var met = false; if (!t.met && t.n >= goal()) { t.met = 1; met = true; }
+    var met = false; if (!t.met && doneToday(t) >= goal()) { t.met = 1; met = true; }
     if (ctx !== "mock" && ctx !== "arcade") { SESSION.n++; if (correct) SESSION.r++; else SESSION.miss[lecId] = (SESSION.miss[lecId] || 0) + 1; SESSION.xp += xp; }
     achievements();
     saveNow();
@@ -93,6 +97,34 @@
     RANK.local += xp + (first ? 20 : 0);
     return { xp: xp, met: met, dayBonus: first, mult: mult };
   }
+  /* a flashcard's rating (widget/study-modes.js): not an answer, so nothing here touches your answers, the class's numbers
+     or question health. It counts toward today's goal and the streak, and pays a flat 2 for a card that was due or new,
+     for a card's first three ratings a day (record_card_v2, migration_v56, which the module sends; its reply comes back
+     as sh:card-paid). pays: the card was due or new (not Study ahead). */
+  var CPEND = {};
+  function recordCard(qid, what, pays, req){
+    var t = todayRec(), cq = t.cq || (t.cq = {}), n = cq[qid] || 0, b = boost(), d = day(0);
+    var xp = v2() && pays && n < 3 ? 2 * (b ? b.mult || 2 : 1) : 0;   // no game layer on the server: nothing pays a rating
+    if (pays) cq[qid] = n + 1;
+    t.k = (t.k || 0) + 1; t.xp += xp;
+    /* a day you studied, for the streak, as an answer marks it */
+    if (HX.ANSWERED) { STATE.activeDates[d] = true; STATE.lastActiveDate = d; } else if (STATE.days.indexOf(d) === -1) STATE.days.push(d);
+    var met = false; if (!t.met && doneToday(t) >= goal()) { t.met = 1; met = true; }
+    SESSION.k++; if (what === "again") SESSION.again++; SESSION.xp += xp;
+    if (req && xp) CPEND[req] = { xp: xp, at: Date.now() };
+    RANK.local += xp;
+    saveNow();
+    return { xp: xp, met: met, dayBonus: false, mult: b ? 2 : 1 };
+  }
+  /* what the server paid for a rating: the total it holds wins, and a guess it didn't pay comes off today's figure */
+  document.addEventListener("sh:card-paid", function(e){
+    var d = e.detail || {}, r = d.res; if (!r || r.repeat || !r.ok) return;
+    var g = d.req && CPEND[d.req]; if (g) delete CPEND[d.req];
+    var off = (r.xp | 0) - (g ? g.xp : r.xp | 0), t = todayRec();
+    if (off) { t.xp = Math.max(0, t.xp + off); SESSION.xp = Math.max(0, SESSION.xp + off); saveState(); }
+    if (RANK.p && typeof r.total === "number") { RANK.p.xp = Math.max(RANK.p.xp || 0, r.total); RANK.local = pendSum() + Object.keys(CPEND).reduce(function(n, k){ return Date.now() - CPEND[k].at < 20000 ? n + CPEND[k].xp : n; }, 0); }
+    if (off || boostShown !== !!boost()) paintMeters();
+  });
   /* what the server paid for an answer (widget/v3.js sends it on): the total it holds replaces the page's sum, an
      answer that paid something other than the guess corrects today's figure, and what the page can't know by itself is
      said out loud: the day's 20th answer, a miss fixed, a medal with its double XP */
@@ -189,7 +221,8 @@
     if (!HX.shell) return;
     var n = streakDays(), t = todayRec(), g = goal();
     $$("[data-streakm]").forEach(function(m){ m.innerHTML = flame(n) + '<span class="num" aria-hidden="true">' + (n ? n + '<span class="fold"> ' + (n === 1 ? "day" : "days") + "</span>" : '<span class="fold">No streak</span><span class="unfold">0</span>') + '</span><span class="sr">' + (n ? pl(n, "day") + " in a row studied" : "No streak yet") + "</span>"; });
-    $$("[data-goalm]").forEach(function(m){ m.innerHTML = ring(t.n, g) + '<span class="num" aria-hidden="true">' + Math.min(t.n, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(t.n, 999) + " of " + g + ' questions today</span>'; });
+    var dn = doneToday(t), what = t.k ? " questions and flashcards today" : " questions today";
+    $$("[data-goalm]").forEach(function(m){ m.innerHTML = ring(dn, g) + '<span class="num" aria-hidden="true">' + Math.min(dn, 999) + '<span class="fold"> of </span><span class="unfold">/</span>' + g + '</span><span class="sr">' + Math.min(dn, 999) + " of " + g + what + "</span>"; });
     var x = rankXp(), rk = $("#hxRank"), chip = boostChip();
     /* past the Handpiece the name starts with the journey ("ModuPro Gold II"); a tight bar shows the medallion and
        "Gold II" and keeps the journey for screen readers (hub.css) */
@@ -212,14 +245,14 @@
       $$("[data-xp]").forEach(function(n){ var to = rankXp(); countUp(n, to === null ? todayRec().xp : to, to === null); });
       if (target) { target.classList.remove("bump"); void target.offsetWidth; target.classList.add("bump"); }
     });
-    HX.timmyReact(right);
+    if (right !== null) HX.timmyReact(right);
     setTimeout(function(){
       paintMeters();
       if (rec.met) {
-        var n = streakDays();
+        var n = streakDays(), what = todayRec().k ? "" : " questions";
         $$("[data-streakm] .flame").forEach(function(f){ f.classList.add("grow-in"); });
-        HX.say("Goal met! " + goal() + " questions today.", "do-hop");
-        toast("Today's goal is met: " + goal() + " questions." + (n > 1 ? " Your streak is " + pl(n, "day") + "." : ""));
+        HX.say("Goal met! " + goal() + (what || " today") + (what ? " today." : "."), "do-hop");
+        toast("Today's goal is met: " + goal() + (what || " questions and flashcards") + "." + (n > 1 ? " Your streak is " + pl(n, "day") + "." : ""));
       }
     }, reduced ? 0 : 650);
   }
@@ -263,27 +296,31 @@
       out + "</svg>";
   }
   function todayPanel(){
-    var t = todayRec(), g = goal(), n = streakDays(), left = Math.max(0, g - t.n), hp = HX.petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" };
-    var cap = t.n >= g ? "Goal met for today." : left === g ? "Your goal today: " + g + " questions. One answer keeps your streak going." : pl(left, "more question") + " meets today's goal.";
+    var t = todayRec(), g = goal(), n = streakDays(), dn = doneToday(t), left = Math.max(0, g - dn), hp = HX.petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" };
+    var cap = dn >= g ? "Goal met for today." : left === g ? "Your goal today: " + g + " questions or flashcards. One keeps your streak going." : left + " more meets today's goal.";
     return '<div class="panel today" data-today><div class="today-head"><div><h2>Today</h2><p class="today-date">' + esc(dateLabel(day(0), { weekday: "long", month: "long", day: "numeric" })) + "</p></div>" +
         spot("today", { tint: T.ink, light: T.light, line: T.ink }, "today-art") + "</div>" +
-      '<div class="big-ring"><div class="teeth-wrap">' + teethRing(t.n, g) + '<p class="ring-num"><b class="num">' + fmt(t.n) + '</b><span>of ' + g + '</span><span class="sr"> questions today</span></p></div><p class="ring-cap">' + esc(cap) + "</p></div>" +
+      '<div class="big-ring"><div class="teeth-wrap">' + teethRing(dn, g) + '<p class="ring-num"><b class="num">' + fmt(dn) + '</b><span>of ' + g + '</span><span class="sr">' + (t.k ? " questions and flashcards today" : " questions today") + '</span></p></div><p class="ring-cap">' + esc(cap) + "</p></div>" +
       '<ul class="today-stats">' +
         '<li class="ts-flame">' + flame(n, "ts-art") + '<span><b class="num">' + (n ? pl(n, "day") : "Not yet") + "</b><small>Streak</small></span></li>" +
         '<li class="ts-xp">' + artSvg(A.xp, "0 0 24 24", "ts-art", "") + '<span><b class="num">+' + fmt(t.xp) + "</b><small>XP today</small></span></li>" +
         '<li class="ts-right">' + icon("check", 26) + '<span><b class="num">' + fmt(t.r || 0) + " of " + fmt(t.n) + "</b><small>Right today</small></span></li>" +
+        (t.k ? '<li class="ts-cards">' + icon("cards", 26) + '<span><b class="num">' + fmt(t.k) + "</b><small>" + (t.k === 1 ? "Flashcard" : "Flashcards") + " today</small></span></li>" : "") +
       "</ul>" +
       (hp !== null ? '<p class="today-pet">' + icon("tooth", 18) + "<span>Timmy has <b class=\"num\">" + hp + " HP</b></span></p>" : "") + "</div>";
   }
   /* the session recap: when you leave the questions with 5 or more answered since the last one (Sam, 2026-11-06: never
      mid-practice) */
-  function recapDue(){ var n = SESSION.n - SESSION.since; return n >= 5 ? { n: n, r: SESSION.r - (SESSION.rAt || 0), xp: SESSION.xp - (SESSION.xpAt || 0), miss: Object.assign({}, SESSION.miss) } : null; }
-  function markRecap(){ SESSION.since = SESSION.n; SESSION.rAt = SESSION.r; SESSION.xpAt = SESSION.xp; SESSION.miss = {}; }
+  function recapDue(){ var n = SESSION.n - SESSION.since, k = SESSION.k - SESSION.kSince; return n + k >= 5 ? { n: n, r: SESSION.r - (SESSION.rAt || 0), xp: SESSION.xp - (SESSION.xpAt || 0), miss: Object.assign({}, SESSION.miss), k: k, again: SESSION.again - SESSION.againAt } : null; }
+  function markRecap(){ SESSION.since = SESSION.n; SESSION.rAt = SESSION.r; SESSION.xpAt = SESSION.xp; SESSION.miss = {}; SESSION.kSince = SESSION.k; SESSION.againAt = SESSION.again; }
   function recapHTML(d){
     var hp = HX.petHp(), hpd = hp !== null && SESSION.hp0 !== null ? hp - SESSION.hp0 : null, n = streakDays();
     var next = Object.keys(d.miss).sort(function(a, b){ return d.miss[b] - d.miss[a]; }).slice(0, 2);
-    return '<section class="recap enter" aria-label="Session recap"><h2>That was ' + pl(d.n, "question") + "</h2><div class=\"figs\">" +
-      '<div><b class="num" data-count="' + d.r + '">' + d.r + "</b><span>right of " + d.n + '</span></div><div><b class="num" data-count="' + d.xp + '" data-plus>+' + d.xp + "</b><span>XP this session</span></div>" +
+    var k = d.k || 0, head = d.n && k ? pl(d.n, "question") + " and " + pl(k, "flashcard") : k ? pl(k, "flashcard") : pl(d.n, "question");
+    return '<section class="recap enter" aria-label="Session recap"><h2>That was ' + head + "</h2><div class=\"figs\">" +
+      (d.n ? '<div><b class="num" data-count="' + d.r + '">' + d.r + "</b><span>right of " + d.n + "</span></div>" : "") +
+      (k ? '<div><b class="num" data-count="' + k + '">' + k + "</b><span>" + (k === 1 ? "card" : "cards") + " rated, " + (d.again || 0) + " Again</span></div>" : "") +
+      '<div><b class="num" data-count="' + d.xp + '" data-plus>+' + d.xp + "</b><span>XP this session</span></div>" +
       (hpd !== null ? '<div><b class="num">' + (hpd >= 0 ? "+" : "") + hpd + "</b><span>Timmy's HP, now " + hp + "</span></div>" : "") +
       '<div><b class="num">' + (n ? pl(n, "day") : "Day one") + "</b><span>streak</span></div></div>" +
       (next.length ? '<div class="next"><h3>Look at these next</h3><ul>' + next.map(function(id){ return '<li><a href="#notes/' + esc(id) + '">' + lecDot(id) + esc(lecName(id)) + '</a> <span class="num">' + pl(d.miss[id], "miss", "misses") + "</span></li>"; }).join("") + "</ul></div>" : "") +
@@ -307,7 +344,7 @@
 
   /* what the other files call from here */
   HX.SESSION = SESSION; HX.todayRec = todayRec; HX.goal = goal; HX.goalDays = goalDays;
-  HX.achievements = achievements; HX.recordAnswer = recordAnswer; HX.RANK = RANK; HX.rankName = rankName;
+  HX.achievements = achievements; HX.recordAnswer = recordAnswer; HX.recordCard = recordCard; HX.doneToday = doneToday; HX.RANK = RANK; HX.rankName = rankName;
   HX.rankXp = rankXp; HX.rankArt = rankArt; HX.gameOn = v2; HX.boost = boost; HX.paintMeters = paintMeters; HX.reward = reward; HX.todayPanel = todayPanel;
   HX.recapDue = recapDue; HX.showLeftRecap = showLeftRecap;
 };
