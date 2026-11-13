@@ -45,7 +45,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   with `admin_resolve_report_v2` (`review/index.html`), today's Inbox without them. The preview answers all of it
   (BUG-122: its made-up reports now stay resolved). Neither pending migration was applied or changed. Left for the
   release: the episode lengths (`admin_set_podcast_episode`: 2688 s and 3101 s) and `sw.js` (no new file).
-  [The task](vault/tasks/done/2026-11-12-redesign-game-layer-wiring.md).
+  [The task](vault/tasks/done/2026-11-12-redesign-game-layer-wiring.md), [#357](https://github.com/smcmurry6-source/study-hubs/pull/357).
 - **2026-11-13 (the trophy case and the cards, phase 4 session 6, Claude Code)** — One live fix (Sam: "ship the BUG-116 live fix
   too"): after a level-up card, later cards (a rank-up, a trophy, a medal, a mock result) play again; until now none
   did until the page reloaded. Otherwise nothing students see changes: the live hubs and dashboard keep 24 trophies, Full Arch, the old Stats panel and today's cards. On the redesign's pages

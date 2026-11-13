@@ -7,7 +7,7 @@ requested-by: Sam
 due: before the redesign's release
 waiting-on: 
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/357
 ---
 
 # The game layer's wiring left by part A: the arcade, Timmy Time and the admin page's "Fixed"
@@ -104,7 +104,7 @@ trophies in the case ([the trophy case](2026-11-12-redesign-trophy-case-and-card
 
 ## Outcome
 
-Built 2026-11-13 (the PR is in `pr` above). What is where ([game-server](../../reference/game-server.md) has the client's rules):
+Built 2026-11-13 ([#357](https://github.com/smcmurry6-source/study-hubs/pull/357)). What is where ([game-server](../../reference/game-server.md) has the client's rules):
 
 - **The arcade** (`widget/games.js`): `shGames.played(game, name)` starts a session at a game's start,
   `shGames.over(game, score, today)` finishes it at its end in place of `submit_arcade_score` (today's call when there
