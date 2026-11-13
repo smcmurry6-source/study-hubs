@@ -6,8 +6,8 @@ created: 2026-11-12
 requested-by: Sam
 due: 
 waiting-on: 
-agent: Claude Code (parts 1, 2 and 3, 2026-11-12)
-pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1), https://github.com/smcmurry6-source/study-hubs/pull/338 (part 2), https://github.com/smcmurry6-source/study-hubs/pull/341 (part 3)
+agent: Claude Code (parts 1, 2 and 3, 2026-11-12; part 4, 2026-11-13)
+pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1), https://github.com/smcmurry6-source/study-hubs/pull/338 (part 2), https://github.com/smcmurry6-source/study-hubs/pull/341 (part 3), https://github.com/smcmurry6-source/study-hubs/pull/348 (part 4)
 ---
 
 # Ask Timmy: Timmy becomes every hub's study assistant (redesign)
@@ -431,7 +431,7 @@ change to HP's rules beyond the 100 start; the old pages.
   `main`). Part 3 is done. **Next for Ask Timmy: part 4, after the shop's client** (phase 4's session 2): it needs
   nothing from the shop's art, only the order, because both sessions edit `widget/pet.js`'s `simulate()`,
   `widget/hub-timmy.js`, `widget/dash.js` and the preview.
-- 2026-11-13 (part 4, Claude Code, phase 4's session 3, this PR): **everyone has Timmy, and he wears what you put on.**
+- 2026-11-13 (part 4, Claude Code, phase 4's session 3, [#348](https://github.com/smcmurry6-source/study-hubs/pull/348)): **everyone has Timmy, and he wears what you put on.**
   Nothing students see changes: only the redesign's pages pass the new option. `widget/pet.js`'s `mount({ everyone: true })`
   (from `widget/v3.js` on a `data-game="v2"` page, and from `widget/dash.js`): no adoption, no introduction, "Tap me!" or
   "No thanks"; a first visit sets `sh_pet_born` to today, sends the `pet-adopt:<day>` badge and gets one hello ("Hi, I'm
