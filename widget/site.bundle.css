@@ -1099,6 +1099,7 @@ animation: sh-pop-in 260ms var(--ease-out, ease-out) backwards; }
 :where(html.shx) :where(dialog[open]) { animation: sh-pop-in 260ms var(--ease-out, ease-out) backwards; }
 :where(html.shx) :where(dialog[open])::backdrop { animation: sh-fade-in 200ms ease-out backwards; }
 :where(html.shx) :where(.is-entering) { animation: sh-page-in 300ms var(--ease-out, ease-out) backwards; }
+:where(html.shx) :where(:has(> .is-entering)) { overflow-x: clip; }
 :where(html.shx) :where(.hx-tab.is-active .ic, .dx-tab[aria-selected="true"] .dx-emb) { animation: sh-tab-pop 320ms var(--ease-out, ease-out); }
 html.hx-still :where(.dx-dlg, .sh-la, .shpet-dlg, .sh-flair-pop, .sh-inbox, .sh-name-dlg, .dx-dlgcard, .sh-la-card, .shpet-card, .sh-flair-card, .sh-inbox-card, .sh-name-card, .tpv-overin, .survey, .sh-reply,
 .sh-archived, .lp-pop, dialog[open], .is-entering, .hx-tab.is-active .ic, .dx-tab[aria-selected="true"] .dx-emb) { animation: none; }

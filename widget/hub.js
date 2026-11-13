@@ -338,12 +338,14 @@
     try { ({ home: renderHome, notes: renderNotes, questions: HX.renderQuestions, more: renderMore })[v](el, s); } catch (e) { el.innerHTML = '<div class="hx-page"><h1>Something went wrong</h1><p class="note">' + esc(e.message) + "</p></div>"; if (window.console) console.error(e); }
     if (leaving) { HX.showLeftRecap(el, leaving); leaving = null; }
     /* the page slides in from the side its tab is on (a new page of the same view just rises); hub.css, .is-entering */
-    var pg = el && el.firstElementChild;
+    /* on the view itself, not the page inside it: Notes and Questions draw their page again once their content is in */
+    var pg = el;
     if (pg && was && (was !== v || wasSub !== s)) {
       var order = VIEWS.map(function(x){ return x[0]; }), d = order.indexOf(v) - order.indexOf(was);
+      pg.classList.remove("is-entering"); void pg.offsetWidth;
       pg.style.setProperty("--from", was === v ? "0px" : (d > 0 ? "22px" : "-22px"));
       pg.classList.add("is-entering");
-      pg.addEventListener("animationend", function(e){ if (e.target === pg) pg.classList.remove("is-entering"); }, { once: true });
+      if (!pg._hxEnter) { pg._hxEnter = 1; pg.addEventListener("animationend", function(e){ if (e.target === pg) pg.classList.remove("is-entering"); }); }
     }
   }
   function go(hash, keep){

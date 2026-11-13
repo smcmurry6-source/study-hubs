@@ -1212,6 +1212,8 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
 :where(html.shx) :where(dialog[open])::backdrop { animation: sh-fade-in 200ms ease-out backwards; }
 /* a page of the hub, or a hub's panel on the dashboard, slides in from the side it's on (--from, set by the router) */
 :where(html.shx) :where(.is-entering) { animation: sh-page-in 300ms var(--ease-out, ease-out) backwards; }
+/* a page that slides in from the right would, for those 300 ms, make the page wider than the screen: its parent clips it */
+:where(html.shx) :where(:has(> .is-entering)) { overflow-x: clip; }
 /* the tab you tapped: its icon pops */
 :where(html.shx) :where(.hx-tab.is-active .ic, .dx-tab[aria-selected="true"] .dx-emb) { animation: sh-tab-pop 320ms var(--ease-out, ease-out); }
 html.hx-still :where(.dx-dlg, .sh-la, .shpet-dlg, .sh-flair-pop, .sh-inbox, .sh-name-dlg, .dx-dlgcard, .sh-la-card, .shpet-card, .sh-flair-card, .sh-inbox-card, .sh-name-card, .tpv-overin, .survey, .sh-reply,
