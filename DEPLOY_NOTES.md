@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **THE REDESIGN'S RELEASE (the switch PR, opened 2026-11-13, Claude Code; live from the merge)** — **Read this before
+- **THE REDESIGN'S RELEASE (the switch PR, #359, opened 2026-11-13, Claude Code; live from the merge)** — **Read this before
   touching the dashboard, Occlusion or Perio: the files moved.** One PR switches the site to the redesign
   ([the release](vault/tasks/2026-11-06-redesign-release.md)); reverting it brings the old site back
   ([roll-back-a-release](vault/how-to/roll-back-a-release.md); the database stays as it is, the old pages run on it).

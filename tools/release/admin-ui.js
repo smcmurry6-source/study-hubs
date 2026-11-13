@@ -51,13 +51,29 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
   }
   async function confirm(p, hub){ await p.waitForSelector(`[data-arch-form="${hub}"] .arch-confirm`); await p.click(`[data-arch-confirm="${hub}"]`); await p.waitForSelector(`[data-arch-hub="${hub}"] .arch-msg`, { timeout: 10000 }); }
   const writes = p => p.evaluate(() => window.__shPreview.log().filter(x => x.name === 'admin_set_hub_archive' && x.kind === 'write').length);
+  /* the dashboard's hubs as the admin's change left them: a live hub is a tab whose panel has its Start button, an
+     archived one is a row under Past hubs with no way in, a hidden one is neither */
   async function dashboard(ctx, extra){
     const p = await open(ctx, '?persona=returning' + (extra || ''));
-    await p.waitForSelector('.hub-card', { timeout: 15000 }); await p.waitForTimeout(1200);   /* get_hub_overrides answers, the cards redraw */
-    const cards = await p.$$eval('.hub-card', els => els.map(e => ({ title: (e.querySelector('h4') || {}).textContent, archived: e.classList.contains('is-archived'), open: !!e.querySelector('a.btn-primary') })));
+    await p.waitForSelector('.dx-tab[data-tab], #archived li', { timeout: 15000 }); await p.waitForTimeout(1200);   /* get_hub_overrides answers, the page redraws */
+    const cards = await p.evaluate(async () => {
+      const out = [], byTitle = {};
+      (window.SH_DASH_DATA.hubs || []).forEach(h => { byTitle[h.title] = h.id; });
+      /* a tap redraws the tab row, so each tab is looked up again before it's tapped */
+      for (const id of [...document.querySelectorAll('.dx-tab[data-tab]')].map(t => t.getAttribute('data-tab'))) {
+        document.querySelector('.dx-tab[data-tab="' + id + '"]').click(); await new Promise(r => setTimeout(r, 80));
+        const panel = document.getElementById('hubPanel');
+        out.push({ id, archived: false, open: !!(panel && panel.getAttribute('data-hub') === id && panel.querySelector('a.dx-start[href*="hubs/' + id + '/"]')) });
+      }
+      for (const li of document.querySelectorAll('#archived li')) {
+        const title = (li.querySelector('h3') || {}).textContent || '';
+        out.push({ id: byTitle[title] || title, archived: true, open: !!li.querySelector('a[href*="hubs/"]') });
+      }
+      return out;
+    });
     await p.close(); return cards;
   }
-  const card = (cards, t) => cards.find(c => new RegExp(t).test(c.title || ''));
+  const card = (cards, id) => cards.find(c => c.id === id);
 
   try {
     /* ---------- 1. desktop, light: order, live, archive and reverse ---------- */
@@ -274,7 +290,7 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     await page.screenshot({ path: path.join(shots, 'hubs-saved-desktop-light.png'), fullPage: true });
 
     let cards = await dashboard(ctx);
-    const occ = card(cards, 'Occlusion');
+    const occ = card(cards, 'occlusion');
     ok(occ && occ.archived && !occ.open, `the dashboard shows Occlusion archived with no Open button (${JSON.stringify(occ)})`);
     const hp = await open(ctx, 'hubs/occlusion/');
     const notice = await hp.waitForSelector('.sh-archived', { timeout: 8000 }).then(() => hp.textContent('.sh-archived'), () => '');
@@ -288,7 +304,7 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     await confirm(page, 'occlusion');
     ok(await page.$eval('[data-arch-hub="occlusion"] .state', e => e.textContent) === 'Live', 'Occlusion is Live again');
     cards = await dashboard(ctx);
-    ok((card(cards, 'Occlusion') || {}).open, 'the dashboard shows Occlusion open again');
+    ok((card(cards, 'occlusion') || {}).open, `the dashboard shows Occlusion open again (${JSON.stringify(cards)})`);
     const hp2 = await open(ctx, 'hubs/occlusion/');
     await hp2.waitForTimeout(4000);
     ok(!(await hp2.$('.sh-archived')), 'the hub page no longer says it is archived');
@@ -304,9 +320,9 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     ok(/until .*Nov.* 10/.test(await page.textContent('[data-arch-form="heme-endo-exam1"] .arch-confirm')), 'the confirmation names the end time');
     await confirm(page, 'heme-endo-exam1');
     cards = await dashboard(ctx);
-    ok((card(cards, 'Heme & Endo Exam 1') || {}).open, 'reopened: the dashboard shows Heme & Endo open before its end time');
+    ok((card(cards, 'heme-endo-exam1') || {}).open, `reopened: the dashboard shows Heme & Endo open before its end time (${JSON.stringify(cards)})`);
     cards = await dashboard(ctx, '&now=2026-11-10T19:00');
-    ok(!card(cards, 'Heme & Endo Exam 1'), 'after its end time Heme & Endo goes back to its dates (no card)');
+    ok(!card(cards, 'heme-endo-exam1'), 'after its end time Heme & Endo goes back to its dates (no card)');
     notes.push('end time: reopened until 6 pm, its dates again at 7 pm');
 
     /* a change from a stale page is refused, not overwritten */

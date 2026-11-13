@@ -62,13 +62,18 @@ const problems = [], notes = [];
         if (!n) problems.push(`${hub}: the returning learner has no answers here (get_my_answers fixture)`);
         /* a real answer through the widget's own event: every write lands in the fixtures */
         const before = await page.evaluate(() => window.__shPreview.log().length);
-        await page.evaluate(() => {
-          const ev = document.querySelector('script[src*="widget/v3.js"]').dataset.answeredEvent, q = window.SH_EXPORT.questions[0];
-          document.dispatchEvent(new CustomEvent(ev, { detail: { qid: q.id, correct: true, choice: 0 } }));
+        /* a hub on the engine fills SH_EXPORT.questions once its bank has loaded, and its widget tag comes with the
+           bundle (widget/hub.js); an old single-file hub has both from the start */
+        await page.waitForFunction(() => window.SH_EXPORT && Array.isArray(window.SH_EXPORT.questions) && window.SH_EXPORT.questions.length && document.querySelector('script[data-answered-event]'), null, { timeout: 30000 }).catch(() => {});
+        const v2 = await page.evaluate(() => {
+          const t = document.querySelector('script[data-answered-event]'), q = window.SH_EXPORT.questions[0];
+          document.dispatchEvent(new CustomEvent(t.dataset.answeredEvent, { detail: { qid: q.id, correct: true, choice: 0 } }));
+          return t.dataset.game === 'v2';
         });
-        await page.waitForTimeout(400);
+        await page.waitForTimeout(600);
         const got = await page.evaluate(b => window.__shPreview.log().slice(b).map(x => x.kind + ' ' + x.name), before);
-        for (const w of ['write record_answer', 'write record_personal_answer', 'write record_choice']) if (!got.includes(w)) problems.push(`${hub}: answering didn't reach the fixtures as "${w}" (got: ${got.join(', ') || 'nothing'})`);
+        /* the game layer's pages record an answer in one call; the old pages in today's three */
+        for (const w of v2 ? ['write record_answer_v2'] : ['write record_answer', 'write record_personal_answer', 'write record_choice']) if (!got.includes(w)) problems.push(`${hub}: answering didn't reach the fixtures as "${w}" (got: ${got.join(', ') || 'nothing'})`);
       });
     }
     /* the admin page unlocks with the preview's secret only (its sign-in reads get_reports_v2 where the game layer's

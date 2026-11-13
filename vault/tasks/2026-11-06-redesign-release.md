@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: Sam's "merge" on the switch PR (its preview is up)
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/359
 ---
 
 # Redesign release: one PR switches the site to the new design
@@ -1059,5 +1059,10 @@ is a new migration and Sam's call, never a restore.
   **New with the release:** after a merge that changes a hub's questions its answer keys are loaded again, and Ask
   Timmy's function is deployed again when it changes (both by hand for now: [the inbox](inbox.md)). Left to do is in
   "The merge, step by step" above and the inbox.
+- 2026-11-13 (Claude Code, the switch PR is [#359](https://github.com/smcmurry6-source/study-hubs/pull/359), with the
+  `preview` label). Its first CI run and the one run of `node tools/release/run.js` found three suites still reading
+  the old pages, each a test and not the site (BUG-136 to BUG-138): the preview-safety check looked for an old hub's
+  widget tag, the admin page suite read the old dashboard's cards, and the accessibility suite didn't count a focus
+  ring drawn around a leaderboard row. Fixed, and each rerun on its own.
 
 ## Outcome

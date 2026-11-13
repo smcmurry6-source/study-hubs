@@ -38,7 +38,11 @@ async function keyboard(page){
       const e = document.activeElement;
       if (!e || e === document.body) return null;
       if (e.closest('#shpv-pill, #shpv-panel')) return { skip: true };
-      const s = getComputedStyle(e), ring = (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || (s.boxShadow && s.boxShadow !== 'none');
+      /* the ring is the stop's own outline or shadow, or one drawn on its ::before or ::after: a leaderboard name's
+         button rings the whole row that way (widget/dash.css, .dx-visit) */
+      const has = t => (t.outlineStyle !== 'none' && parseFloat(t.outlineWidth) > 0) || (t.boxShadow && t.boxShadow !== 'none');
+      const drawn = which => { const t = getComputedStyle(e, which); return t.content !== 'none' && t.content !== 'normal' && has(t); };
+      const s = getComputedStyle(e), ring = has(s) || drawn('::after') || drawn('::before');
       const id = e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/)[0] : '');
       /* why a stop has no ring, for the report: is it :focus / :focus-visible, does the page have focus, what outline applies */
       let why = '';
