@@ -14,3 +14,7 @@ migration_v55.sql
 # 2026-11-12: a new file, v54 and v55 unchanged; vault/tasks/2026-11-06-redesign-learn-and-flashcards.md). Applied at the
 # redesign's release, after migration_v54 and migration_v55.
 migration_v56.sql
+# migration_v57.sql: Visit someone random from the whole class (get_random_place; Sam, 2026-11-13: "i want random to be
+# for the whole class", a new file, v54 unchanged; vault/tasks/done/2026-11-12-redesign-visiting.md). Applied at the
+# redesign's release, after migration_v56.
+migration_v57.sql

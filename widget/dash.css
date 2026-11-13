@@ -372,6 +372,8 @@ html.shx .dx .shpet-scene.has-place .shpet-say.is-on { pointer-events: auto; }
 .dx-vmsg { grid-column: 1 / -1; flex-basis: 100%; font-size: var(--fs-meta); color: var(--ar-soft); text-align: inherit; }
 /* Visit someone random (the tour, widget/dash.js): the design page's die button (round 3), under the board */
 .dx-rand { margin: 12px 0 0; }
+.dx-rmsg { display: block; margin-top: 6px; font-size: var(--fs-meta); color: var(--muted); }
+.dx-rmsg:empty { display: none; }
 .dx-rand button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px 0 12px; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFE9A3; color: #3B2E3A;
   box-shadow: 0 3px 0 #3B2E3A; font: inherit; font-size: var(--fs-label); font-weight: 800; cursor: pointer; transition: transform var(--t-press) var(--ease-out), box-shadow var(--t-press) var(--ease-out); }
 .dx-rand button svg { transition: transform 420ms var(--ease-out); }
