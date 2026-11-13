@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-13 (Visit someone random, from the whole class, Claude Code)** — Nothing students see changes (the new
+  dashboard, on the game layer). Sam: "i want random to be for the whole class". A new pending migration,
+  **`migration_v57.sql`** (`get_random_place`; `migration_v54.sql` unchanged), picks on the server from everyone a place
+  can be opened for, never you or your linked device, and gives the place and its key, never an id; the class comes
+  round once before anyone twice (`p_skip`). Applied at the release after v56 (listed in
+  `supabase/pending-migrations.txt`). `widget/dash.js` (`visitRandom`, `getRandom`, `placeOf`), `widget/place.js` (a
+  `nav` with `more()`: Next rolls the die in the clouds, then the name; Previous goes back through the trip),
+  `widget/place.css`, the preview's stub. Without the function the button picks among the board's rows as before.
+  Tests: `xp.js` 14a, `rls.js`, the smoke test's random trip and fallback.
+  [Visiting](vault/tasks/done/2026-11-12-redesign-visiting.md), [game-server](vault/reference/game-server.md).
 - **2026-11-13 (visiting's tour, Claude Code)** — Nothing students see changes (the new dashboard, on the game layer).
   Sam: "build the random visit and next/back", the rest of round 3's visiting. **Visit someone random** under the board
   picks one of its rows (never your own); in a visit, round arrows go to the previous and next person on that board and

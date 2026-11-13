@@ -576,6 +576,12 @@ game layer no row is a button.
 - [ ] Visiting looked at on the release's own preview, phone and laptop, light and dark, reduced motion too: a tap on a
       row or one of the stage's top three opens that classmate's place (`?persona=returning`: Fixture Fluoride is a
       ModuPro, Dummy Dentin's place can't be opened, on purpose; your own row is #11).
+- [ ] **Apply `migration_v57.sql`** (Visit someone random from the whole class, `get_random_place`; Sam, 2026-11-13: "i
+      want random to be for the whole class") through the connector right after `migration_v56` (it needs v54's
+      `get_place` and `sh_visit_key`). In the switch PR: append it to `supabase/schema.sql` and take its line out of
+      `supabase/pending-migrations.txt`; then `node tools/release/rls.js` and `rls-audit.sql` on the live project. Until
+      it's applied, the button picks among the board's rows. On the live site, from a laptop: a few presses of Next on a
+      random trip reach someone who isn't on the boards, and never your own place.
 - [ ] The hubs' boards (the shared widget's panel, `widget/v3.js`) don't visit yet (Sam, 2026-11-12: the new dashboard's
       boards only). When the hubs' boards are rebuilt for the redesign, a row there can open a place the same way
       (`shPlace.open({ place })` with what `get_place` gives).
@@ -589,9 +595,10 @@ game layer no row is a button.
   to fly over through the clouds to their Timmy's place: their home, scene and yard, what their Timmy is wearing, their rank's statue and their
   hub medals, under their leaderboard name. Tap their Timmy and he waves; the things around the place do what they do
   at yours. Your own row opens your own place.
-- **Visit someone random** (under the leaderboard) takes you to one of the places on it. While you're visiting, the
-  arrows on either side take you to the next or the last place on the board, and **Back to mine** brings you home,
-  each through the clouds.
+- **Visit someone random** (under the leaderboard) rolls the die and takes you to anyone in the class, on the
+  leaderboard or not (never your own place). Next rolls again, the back arrow returns to the places you've been, and
+  you meet everyone once before anyone comes round twice. Visiting from the leaderboard, the arrows on either side take
+  you to the next or the last place on the board. **Back to mine** brings you home. Each trip is through the clouds.
 - **What a visitor sees, and doesn't**: only the place. Never your HP, XP as a number, your streak, your answers, your
   Shiny Gold Crowns, what you own beyond what's out, or when you did anything. Nobody can change your place but you,
   and there's no list of who visited. Everyone on a board can be visited (there's no switch to turn it off).

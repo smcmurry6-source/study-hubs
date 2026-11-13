@@ -1173,24 +1173,53 @@ function lint(hub, A){
         if (t.n || t.focus !== 'Test Molar (you): open your place') problems.push(`${name} (${label}): closing your place after a tour should give focus to your own row (${JSON.stringify(t)})`);
         const tt = (await page.evaluate(() => window.__tracked || [])).filter(k => /^place:/.test(k));
         if (tt.filter(k => k === 'place:visit').length < 3 || tt.some(k => /aaaa|cccc|Cee|Bee|Alpha|img/.test(k))) problems.push(`${name} (${label}): each place on a tour is counted as place:visit, never whose (${tt.join(', ')})`);
-        /* Visit someone random: under the board, one of its rows with a key (never your own), and focus back to the button */
+        /* Visit someone random, from the whole class (migration_v57's get_random_place): the server picks, here Gee, who is
+           on no board, then Cee, then Hache; the page sends its own id and the keys the trip has shown (p_skip), never
+           anyone else's. A random trip has no Previous at its first place, Next is "Visit someone else at random" and rolls
+           the die in the clouds ("Off to someone random…") before the name; Previous goes back through the trip without
+           asking the server; get_place isn't asked for a place the pick brought; focus goes back to the button. */
         const rb = await page.evaluate(() => { const p = document.getElementById('visitRand'), b = p && p.querySelector('button'); return p ? { shown: !p.hidden, data: b ? [...b.attributes].filter(a => a.name.startsWith('data-')).map(a => a.name + '=' + a.value).join(' ') : '' } : null; });
         if (!rb || !rb.shown || rb.data !== 'data-dash=visit-random') problems.push(`${name} (${label}): "Visit someone random" should be under the board with one fixed click name (${JSON.stringify(rb)})`);
         else {
-          /* the pick made certain for the test: the third of the four (Cee) */
-          await page.evaluate(() => { window.__rnd = Math.random; Math.random = () => .6; });
-          await page.click('#visitRand button'); await page.evaluate(() => { Math.random = window.__rnd; }); await page.waitForTimeout(3000); t = await tour();
-          if (t.n !== 1 || t.title !== 'Cee’s place' || !t.visit || !t.next) problems.push(`${name} (${label}): a random visit should open that place as a visit, with the tour (${JSON.stringify(t)})`);
+          const picks = [{ visit: K('f'), name: 'Gee', equipped: { home: 'castle' }, rank: { journey: 0, tier: 1, level: 1 }, flair: null }, Object.assign({ visit: K('c') }, places[K('c')]),
+            { visit: K('9'), name: 'Hache', equipped: {}, rank: { journey: 0, tier: 0, level: 1 }, flair: null }], rasks = [];
+          await page.route(/supabase\.co\/rest\/v1\/rpc\/get_random_place/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {} rasks.push(a); return json(route, picks[rasks.length - 1] || null); });
+          const g0 = (placeCalls[K('f')] || 0) + (placeCalls[K('9')] || 0);
+          await page.click('#visitRand button'); await page.waitForTimeout(3000); t = await tour();
+          const myId = await page.evaluate(() => localStorage.getItem('sh_visitor_id'));
+          if (t.n !== 1 || t.title !== 'Gee’s place' || !t.visit || t.prev || !t.next || t.next.label !== 'Visit someone else at random' || t.next.data !== 'data-tp' || !t.home)
+            problems.push(`${name} (${label}): a random visit should open the place the server picked, someone on no board, with Next to someone else at random and no Previous yet (${JSON.stringify(t)})`);
+          if (!/^Picked at random from the class/.test(t.gnav) || !/Next: someone else at random$/.test(t.gnav)) problems.push(`${name} (${label}): the guest card should say the visit was picked at random (${JSON.stringify(t.gnav)})`);
+          if (rasks.length !== 1 || !myId || rasks[0].p_visitor !== myId || JSON.stringify(rasks[0].p_skip) !== '[]' || Object.keys(rasks[0]).sort().join() !== 'p_skip,p_visitor')
+            problems.push(`${name} (${label}): the random pick should send only the page's own id and the keys already shown (${JSON.stringify(rasks)})`);
+          await page.click('dialog.tpv [data-tp="visit-next"]'); await page.waitForTimeout(350);
+          const roll = await page.evaluate(() => { const d = document.querySelector('dialog.tpv'), m = d && d.querySelector('.tpv-clmsg'); return m ? m.textContent : ''; });
+          if (!/^Off to someone random/.test(roll)) problems.push(`${name} (${label}): Next on a random trip should roll the die in the clouds first (${JSON.stringify(roll)})`);
+          await page.waitForTimeout(3400); t = await tour();
+          if (t.n !== 1 || t.title !== 'Cee’s place' || t.clouds || t.focus !== 'visit-next' || !t.prev || t.prev.label !== 'Previous place: Gee' || t.next.label !== 'Visit someone else at random')
+            problems.push(`${name} (${label}): Next on a random trip should open the next pick, with Previous back to the last (${JSON.stringify(t)})`);
+          if (rasks.length !== 2 || JSON.stringify(rasks[1].p_skip) !== JSON.stringify([K('f')])) problems.push(`${name} (${label}): Next should ask again, skipping the places the trip has shown (${JSON.stringify(rasks.map(a => a.p_skip))})`);
+          await page.click('dialog.tpv [data-tp="visit-prev"]'); await page.waitForTimeout(3200); t = await tour();
+          if (t.n !== 1 || t.title !== 'Gee’s place' || t.prev || t.focus !== 'visit-next' || t.next.label !== 'Next place: Cee' || rasks.length !== 2 || !/Next: Cee$/.test(t.gnav))
+            problems.push(`${name} (${label}): Previous should go back through the trip without a new pick, focus on Next (${JSON.stringify(t)}, ${rasks.length} picks)`);
+          if ((placeCalls[K('f')] || 0) + (placeCalls[K('9')] || 0) - g0) problems.push(`${name} (${label}): get_place shouldn't be asked for a place the random pick brought`);
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
           const rf = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tpv'), rand: !!(document.activeElement && document.activeElement.closest('#visitRand')) }));
           if (rf.open || !rf.rand) problems.push(`${name} (${label}): closing a random visit should give focus back to the button (${JSON.stringify(rf)})`);
+          /* before the release (no get_random_place yet): one of the board's rows, the pick made certain for the test (Cee) */
+          await page.unroute(/supabase\.co\/rest\/v1\/rpc\/get_random_place/);
+          await page.route(/supabase\.co\/rest\/v1\/rpc\/get_random_place/, route => json(route, { code: 'PGRST202', message: 'Could not find the function' }, 404));
+          await page.evaluate(() => { window.__rnd = Math.random; Math.random = () => .6; });
+          await page.click('#visitRand button'); await page.waitForTimeout(1200); await page.evaluate(() => { Math.random = window.__rnd; }); await page.waitForTimeout(1800); t = await tour();
+          if (t.n !== 1 || t.title !== 'Cee’s place' || !t.visit || !/^Place 3 of 4 on the board/.test(t.gnav)) problems.push(`${name} (${label}): without the server's pick, a random visit should be one of the board's rows, with the board's tour (${JSON.stringify(t)})`);
+          await page.keyboard.press('Escape'); await page.waitForTimeout(500);
         }
         await page.click('#boardSeg [data-board="streaks"]'); await page.waitForTimeout(800);
         const sb = await page.$$eval('#board .dx-visit', bs => bs.map(b => b.getAttribute('aria-label')));
         if (sb.length !== 4) problems.push(`${name} (${label}): the study streaks board's rows should be buttons too (${sb.join(' | ')})`);
       }
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
-      notes.push(`${name} (${label}): rows as buttons, a visit, the plain line, focus back, the tour, a random visit, both boards`);
+      notes.push(`${name} (${label}): rows as buttons, a visit, the plain line, focus back, the tour, a random visit from the whole class (and the board's rows before the release), both boards`);
       await page.close();
       /* without the game layer: today's boards, no keys, no buttons */
       const p2 = await context.newPage(); const e2 = [];

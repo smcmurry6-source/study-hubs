@@ -144,6 +144,21 @@ do at a place besides look and tap; a list of who visited; an opt-out (Sam: none
   opened just now." Pressing Next again keeps going (focus lands on it). Closing gives focus to the row of the place
   you ended at, your own row after "Back to mine", or the random button after a random visit. Each place counts
   `place:visit`. With reduced motion there are no clouds. Nothing on the server.
+- **Random from the whole class** (after #354; Sam: "i want random to be for the whole class"). The page only holds the
+  keys the boards hand out, so the pick moved to the server: **a new pending migration, `migration_v57.sql`**
+  (`get_random_place`, [game-server](../../reference/game-server.md), "Visiting"), applied at the release after v56;
+  `migration_v54.sql` is unchanged. It picks from everyone a place can be opened for, never you or your linked device,
+  and gives their place and key, never an id. The button (`visitRandom()` in `widget/dash.js`) sends the page's own id
+  and the keys the trip has shown, so the class comes round once before anyone twice; the place's `nav` gets `more()`:
+  Next past the last place rolls the die again ("Off to someone random…" over the clouds for about half a second, then
+  the next window opens under them with the name popping in, and they part a little later than a board tour's), Previous
+  goes back through the trip (not past its first place), and the guest card says "Picked at random from the class, Next:
+  someone else at random". Without the function (today) or when it fails, the button picks among the board's rows as in
+  #354. Tests: `xp.js` 14a (the whole class once before anyone twice, people on no board among them, never the caller or
+  a linked device, no id, the shape, junk in the skip list), `rls.js` (a random place gives a key, never A's, never an
+  id; its sweep calls it too), the smoke test (the server's pick, someone on no board; the request carries only the
+  page's own id and the keys; the die line; Previous without a new pick; no second `get_place`; the fallback to the
+  board), the preview's stub (every made-up classmate, the ones off the board too).
 - **The preview's made-up data** (`tools/preview/runtime/preview.js`): each classmate has a place of their own
   (`FAKE_PLACES`: different homes, scenes, yards, outfits, seasonal sets, rank pieces their rank has reached); Fixture
   Fluoride is a ModuPro (`fakeXp`), the same rank on every board and at the place; three have one hub medal each

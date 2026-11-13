@@ -47,7 +47,7 @@ tags: [widget, supabase]
   `shop` and the v2 rank profile; `shPlace.card(host, options)` draws the place as a picture that opens the full view
   (`shPlace.open()`; `open({ customize: true })` starts in the customizer, `open({ place })` draws someone else's from
   `get_place`, for visiting: the new dashboard's boards open it from a row, in the leaderboard's theater look, with an
-  `onClose` that gives focus back to the row, and `nav` for its arrows and "Back to mine": the tour). It loads its own stylesheet, the kit (`widget/hub-art/place.js`, `window.SH_PLACE`) and
+  `onClose` that gives focus back to the row, and `nav` for its arrows and "Back to mine": the tour; a `nav` with `more()` is a random trip, whose Next past the last place asks for someone else). It loads its own stylesheet, the kit (`widget/hub-art/place.js`, `window.SH_PLACE`) and
   the set files it needs (`widget/hub-art/place/<set>.js`), all on first use: no page loads any of it up front, and the
   smoke test fails if one does. Timmy himself is `widget/pet.js`'s drawing (`shPet.art`, at his HP), dressed by the
   kit; pet.js isn't changed, and the live hubs and the live dashboard never load the place. Without the game layer

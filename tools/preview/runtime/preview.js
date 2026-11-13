@@ -227,6 +227,8 @@
   function now(){ return Date.now(); }
   function iso(ms){ return new RealDate(ms).toISOString(); }
   function day(ms){ var d = new RealDate(ms); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  /* a made-up person's visit key on the boards and at get_place (the server's is a digest of the id; this one of the name) */
+  function visitKeyOf(n){ var k = ""; for (var j = 0; j < 3; j++) k += ("00000000" + (hash(n + "|visit" + j) >>> 0).toString(16)).slice(-8); return k; }
   var FAKE_NAMES = ["Fixture Fluoride", "Sample Sealant", "Test Tubercle", "Mock Mandible", "Dummy Dentin", "Stub Sulcus", "Placeholder Pulp", "Example Enamel", "Synthetic Cingulum", "Trial Torus", "Pretend Papilla", "Model Mesial"];
   /* the made-up classmates' XP, the same on every board and at their place (visiting): the first is past the Handpiece,
      in the ModuPro journey; the rest climb the Handpiece */
@@ -1355,7 +1357,7 @@
     if (/^get_(widget_bootstrap|rank_profile|rank_board|leaderboard|arcade_leaderboard)_v2$/.test(fn)) {
       if (fn === "get_rank_profile_v2") return { data: profile2(v) };
       var d2 = rpc(fn.slice(0, -3), a).data;
-      var vkey = function(n){ var k = ""; for (var i = 0; i < 3; i++) k += ("00000000" + (hash(n + "|visit" + i) >>> 0).toString(16)).slice(-8); return k; };
+      var vkey = visitKeyOf;
       if (Array.isArray(d2)) d2 = d2.map(function(r){
         var o2 = {}; Object.keys(r).forEach(function(k){ o2[k] = r[k]; }); o2.journey = 0; o2.visit = vkey(r.display_name);
         /* a board row with XP stands where the 63-step ladder puts it (your own row, past the Handpiece); a made-up
@@ -1403,7 +1405,7 @@
        kit's pieces (FAKE_PLACES), the first in the ModuPro journey; one place can't be read (null), on purpose, for the
        plain Timmy on the stage and the "couldn't be opened" line. Your own key opens your own place. */
     if (fn === "get_place") {
-      var pk = String(a.p_key || ""), who = -1, vk = function(n){ var k = ""; for (var j = 0; j < 3; j++) k += ("00000000" + (hash(n + "|visit" + j) >>> 0).toString(16)).slice(-8); return k; };
+      var pk = String(a.p_key || ""), who = -1, vk = visitKeyOf;
       if (!/^[0-9a-f]{24}$/.test(pk)) return { data: null };
       var myName = db.name || "You (preview)";
       if (pk === vk(myName)) { var mp = profile2(db.visitor), meq = {}, pe = placeEquipped(); Object.keys(pe).forEach(function(k){ meq[k] = pe[k]; });
@@ -1413,6 +1415,15 @@
       var fr = rank2(fakeXp(FAKE_NAMES[who])), feq = {}, fp = FAKE_PLACES[who] || {};
       Object.keys(fp).forEach(function(k){ feq[k] = fp[k]; });
       return { data: { name: FAKE_NAMES[who], equipped: feq, rank: { journey: fr.journey, tier: fr.tier, level: fr.level }, flair: FAKE_FLAIR[FAKE_NAMES[who]] || null } };
+    }
+    /* migration_v57's get_random_place (Visit someone random, from the whole class): anyone in the made-up class but you
+       (and the one place that can't be read), the ones whose keys aren't in p_skip first, as get_place answers them, with
+       the key. Every made-up classmate is in it, the ones the board on the screen leaves out too */
+    if (fn === "get_random_place") {
+      var sk = Array.isArray(a.p_skip) ? a.p_skip : [], pool = FAKE_NAMES.filter(function(nm, i){ return i !== 4; }),
+        fresh = pool.filter(function(nm){ return sk.indexOf(visitKeyOf(nm)) < 0; }), from = fresh.length ? fresh : pool,
+        pick = from[Math.floor(Math.random() * from.length)], rp = rpc("get_place", { p_key: visitKeyOf(pick) }).data;
+      return { data: rp ? Object.assign({}, rp, { visit: visitKeyOf(pick) }) : null };
     }
     var ideaAns = ideaRpc(fn, a, t);
     if (ideaAns) return ideaAns;

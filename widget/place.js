@@ -269,10 +269,14 @@
     }
     return '<i class="tpv-clfill"></i>' + html + '<div class="tpv-clmsg">' + msg + "</div>";
   }
-  /* the line: "Off to <name>'s place" (or "Heading home") under that rank, as the boards draw it */
+  /* the line: "Off to <name>'s place" (or "Heading home") under that rank, as the boards draw it; a random trip rolls a die
+     first ("Off to someone random…"), and the next window opens with the name the server picked */
+  var DIE_SVG = '<svg viewBox="0 0 72 72" width="72" height="72" aria-hidden="true" focusable="false"><g transform="rotate(-12 36 36)"><rect x="13" y="17" width="46" height="46" rx="12" fill="#3B2E3A"/>' +
+    '<rect x="13" y="12" width="46" height="46" rx="12" fill="#FFE9A3" stroke="#3B2E3A" stroke-width="3.5"/><g fill="#3B2E3A"><circle cx="25" cy="24" r="4"/><circle cx="47" cy="24" r="4"/><circle cx="36" cy="35" r="4"/><circle cx="25" cy="46" r="4"/><circle cx="47" cy="46" r="4"/></g></g></svg>';
   function tripMsg(line, rk){
     var R = W.shRanks, em = "";
-    try { if (R && rk) em = rk.journey > 0 && R.artOf ? R.artOf(rk.journey, rk.tier, 72, { level: rk.level }) : R.art(rk.tier, 72, { level: rk.level }); } catch (e) { em = ""; }
+    if (rk === "die") em = DIE_SVG;
+    else try { if (R && rk) em = rk.journey > 0 && R.artOf ? R.artOf(rk.journey, rk.tier, 72, { level: rk.level }) : R.art(rk.tier, 72, { level: rk.level }); } catch (e) { em = ""; }
     return (em ? '<span class="tpv-clhp">' + em + "</span>" : "") + "<b>" + esc(line) + "</b>";
   }
   /* the clouds roll in over the page or the place you're leaving (a first visit keeps its window hidden until they cover
@@ -288,6 +292,7 @@
   function tripCovered(dlg, cov){
     var c = D.createElement("div"); c.className = "tpv-clouds is-covered"; c.setAttribute("aria-hidden", "true");
     c.innerHTML = cloudsHTML(cov.msg);
+    if (cov.fresh) $(".tpv-clmsg", c).classList.add("is-new");
     dlg.appendChild(c); dlg._tripAt = cov.at;
   }
   /* once the place is drawn, and not before 1.4 s (the design page's timing), the clouds scatter */
@@ -306,25 +311,34 @@
      only). The arrows go to the next or the last person on it and "Back to mine" goes home: the clouds roll in over this
      place, and once they cover the screen and the next place is here, this window gives way to the next one under the
      same clouds, which then scatter over it. A place that can't be read leaves you where you are with one plain line.
-     With reduced motion there are no clouds. ---------- */
+     With reduced motion there are no clouds.
+     A random trip (Sam, 2026-11-13: "i want random to be for the whole class") also has more(), which asks the server for
+     someone else and resolves to their place in the list: the list is the trip so far, Previous goes back through it (not
+     past the first), and Next past the last rolls the die again. ---------- */
   var HOME_SVG = '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M3 9.5L10 3.5l7 6M5 8.5V16.5h10V8.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var NAV_SVG = { prev: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true" focusable="false"><path d="M12.5 4.5L7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     next: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true" focusable="false"><path d="M7.5 4.5L13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' };
   function navStep(nav, d){ var n = nav.list.length; return (nav.at + d + n) % n; }
+  function navPrev(nav){ return nav.more ? nav.at - 1 : navStep(nav, -1); }   /* -1: the first place of a random trip */
+  function navNext(nav){ return nav.more ? (nav.at + 1 < nav.list.length ? nav.at + 1 : "more") : navStep(nav, 1); }
+  function navAt(nav, i){ var n = {}; Object.keys(nav).forEach(function(k){ n[k] = nav[k]; }); n.at = i; return n; }
   function hop(to, focus){
     if (!V || !V.nav || V.hopping || $(".tpv-clouds", V.dlg)) return;
-    var v = V, dlg = v.dlg, nav = v.nav, home = to === "home", e = home ? null : nav.list[to], t0 = Date.now();
-    if (!home && (!e || to === nav.at)) return;
+    var v = V, dlg = v.dlg, nav = v.nav, home = to === "home", more = to === "more" && typeof nav.more === "function", e = home || more ? null : nav.list[to], t0 = Date.now();
+    if (!home && !more && (!e || to === nav.at)) return;
     v.hopping = true;
-    if (!reduced) tripIn(dlg, home ? "Heading home" : "Off to " + e.name + "’s place", home ? rankOf(mine()) : e.rank);
-    var load = home ? Promise.resolve(true) : nav.load(to);
-    Promise.all([load, new Promise(function(res){ setTimeout(res, reduced ? 0 : 850); })]).then(function(a){
+    if (!reduced) tripIn(dlg, home ? "Heading home" : more ? "Off to someone random…" : "Off to " + e.name + "’s place", home ? rankOf(mine()) : more ? "die" : e.rank);
+    /* a random trip: the server picks while the die shows; the next window then opens under the clouds with that
+       person's name popping in (fresh), and they part a moment later than a board tour's, so the name is read first */
+    var load = home ? Promise.resolve(true) : !more ? nav.load(to) : nav.more().then(function(i){ to = i; e = nav.list[i]; if (!e) throw new Error("place"); return nav.load(i); });
+    Promise.all([load, new Promise(function(res){ setTimeout(res, reduced ? 0 : more ? 1150 : 850); })]).then(function(a){
       if (V !== v) return;
       if (!a[0]) throw new Error("place");
-      var m = $(".tpv-clmsg", dlg), cov = m ? { at: t0, msg: m.innerHTML } : null, onClose = v.onClose;
+      var m = $(".tpv-clmsg", dlg), onClose = v.onClose,
+        cov = !m ? null : more ? { at: t0 + 750, msg: tripMsg("Off to " + e.name + "’s place", e.rank), fresh: true } : { at: t0, msg: m.innerHTML };
       v.onClose = null; v.back = null; shut();
       open(home ? { covered: cov, back: null, onClose: onClose ? function(){ onClose("home"); } : null }
-        : { place: a[0], nav: { at: to, list: nav.list, load: nav.load }, covered: cov, back: null, onClose: onClose, focus: focus });
+        : { place: a[0], nav: navAt(nav, to), covered: cov, back: null, onClose: onClose, focus: focus });
     }).then(null, function(){
       if (V !== v) return;
       v.hopping = false; tripOut(dlg, true);
@@ -333,10 +347,10 @@
     });
   }
   function navHTML(nav){
-    if (!nav || nav.list.length < 2) return "";
-    var p = nav.list[navStep(nav, -1)], n = nav.list[navStep(nav, 1)];
-    return '<button type="button" class="tpv-vnav prev" data-tp="visit-prev" aria-label="' + esc("Previous place: " + p.name) + '">' + NAV_SVG.prev + "</button>" +
-      '<button type="button" class="tpv-vnav next" data-tp="visit-next" aria-label="' + esc("Next place: " + n.name) + '">' + NAV_SVG.next + "</button>";
+    if (!nav || (!nav.more && nav.list.length < 2)) return "";
+    var p = navPrev(nav), n = navNext(nav);
+    return (p >= 0 ? '<button type="button" class="tpv-vnav prev" data-tp="visit-prev" aria-label="' + esc("Previous place: " + nav.list[p].name) + '">' + NAV_SVG.prev + "</button>" : "") +
+      '<button type="button" class="tpv-vnav next" data-tp="visit-next" aria-label="' + esc(n === "more" ? "Visit someone else at random" : "Next place: " + nav.list[n].name) + '">' + NAV_SVG.next + "</button>";
   }
   function open(o){
     o = o || {};
@@ -363,11 +377,11 @@
     $('[data-tp="zoom"]', dlg).addEventListener("click", function(){ V.wide = !V.wide; build(); });
     if (nav) {
       $('[data-tp="visit-home"]', dlg).addEventListener("click", function(){ hop("home"); });
-      ["prev", "next"].forEach(function(k){ var b = $('[data-tp="visit-' + k + '"]', dlg); if (b) b.addEventListener("click", function(){ hop(navStep(nav, k === "prev" ? -1 : 1), k); }); });
+      ["prev", "next"].forEach(function(k){ var b = $('[data-tp="visit-' + k + '"]', dlg); if (b) b.addEventListener("click", function(){ hop(k === "prev" ? navPrev(nav) : navNext(nav), k); }); });
     }
     try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); }
     D.documentElement.classList.add("tpv-open");
-    if (o.focus) { var fb = $('[data-tp="visit-' + o.focus + '"]', dlg); if (fb) try { fb.focus(); } catch (e) {} }   /* pressing Next again goes on */
+    if (o.focus) { var fb = $('[data-tp="visit-' + o.focus + '"]', dlg) || $('[data-tp="visit-next"]', dlg); if (fb) try { fb.focus(); } catch (e) {} }   /* pressing Next again goes on (back at a random trip's first place, Previous is gone: Next) */
     if (o.covered && !reduced) tripCovered(dlg, o.covered);
     else if (o.place && !reduced) tripIn(dlg, "Off to " + V.m.name + "’s place", rankOf(V.m));
     track(V.m.visiting ? "place:visit" : "place:open");   /* a visit is counted, never whose (visiting: widget/dash.js) */
@@ -770,7 +784,8 @@
           '<div class="tpv-row"><button type="button" class="tpv-btn tpv-gold" data-tp="mastery">See the medals</button></div>'
         : '<p class="tpv-gnone">No hub medals yet</p>') + "</div>" +
       '<p class="tpv-gtip">Tap Timmy and he waves. The sun, the house and the things in the yard each do something too.</p>' +
-      (V.nav && V.nav.list.length > 1 ? '<p class="tpv-gnav">Place ' + (V.nav.at + 1) + " of " + V.nav.list.length + " on the board<span>Next: " + esc(V.nav.list[navStep(V.nav, 1)].name) + "</span></p>" : "") + "</div>";
+      (V.nav && V.nav.more ? '<p class="tpv-gnav">Picked at random from the class<span>Next: ' + (navNext(V.nav) === "more" ? "someone else at random" : esc(V.nav.list[navNext(V.nav)].name)) + "</span></p>"
+        : V.nav && V.nav.list.length > 1 ? '<p class="tpv-gnav">Place ' + (V.nav.at + 1) + " of " + V.nav.list.length + " on the board<span>Next: " + esc(V.nav.list[navStep(V.nav, 1)].name) + "</span></p>" : "") + "</div>";
     var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
   }
   function rarTag(r){ return '<i class="tpv-rar r-' + String(r || "free").toLowerCase() + '">' + esc(r || "Default") + "</i>"; }

@@ -1438,15 +1438,18 @@
   function visitKey(r){ return r && typeof r.visit === "string" && VISIT_RE.test(r.visit) ? r.visit : ""; }
   /* someone's place, asked once a page (the stage's outfits and a visit share the answer); a call that fails isn't kept.
      Only what a place shows goes on: the slots as strings, the rank as numbers, the name and medals as text */
+  function placeOf(d){
+    if (!d || typeof d !== "object" || Array.isArray(d)) return null;
+    var eq = {}, e = d.equipped && typeof d.equipped === "object" ? d.equipped : {}, rk = d.rank && typeof d.rank === "object" ? d.rank : null;
+    Object.keys(e).forEach(function(k){ if (typeof e[k] === "string" && /^[a-z0-9-]{1,40}$/.test(k)) eq[k] = e[k]; });
+    return { name: String(d.name == null ? "" : d.name), equipped: eq, flair: typeof d.flair === "string" ? d.flair : "",
+      rank: rk ? { journey: +rk.journey || 0, tier: +rk.tier || 0, level: +rk.level || 1 } : null };
+  }
   function getPlace(sb, key){
     if (PLACES[key]) return PLACES[key];
     var p = PLACES[key] = sb.rpc("get_place", { p_key: key }).then(function(res){
       if (!res || res.error) throw new Error("get_place");
-      var d = res.data; if (!d || typeof d !== "object" || Array.isArray(d)) return null;
-      var eq = {}, e = d.equipped && typeof d.equipped === "object" ? d.equipped : {}, rk = d.rank && typeof d.rank === "object" ? d.rank : null;
-      Object.keys(e).forEach(function(k){ if (typeof e[k] === "string" && /^[a-z0-9-]{1,40}$/.test(k)) eq[k] = e[k]; });
-      return { name: String(d.name == null ? "" : d.name), equipped: eq, flair: typeof d.flair === "string" ? d.flair : "",
-        rank: rk ? { journey: +rk.journey || 0, tier: +rk.tier || 0, level: +rk.level || 1 } : null };
+      return placeOf(res.data);
     });
     p.then(null, function(){ if (PLACES[key] === p) delete PLACES[key]; });
     return p;
@@ -1472,8 +1475,7 @@
   }
   /* the tour (Sam, 2026-11-13: "build the random visit and next/back", round 3's design page): a visit carries the board it
      came from, so the place's arrows go to the next or the last person on it and "Back to mine" goes home. Only names and
-     ranks go to the place; the keys stay here, and load(i) asks get_place for the i-th. "Visit someone random" picks one
-     of the board's rows: nothing new on the server (migration_v54 gives a key only on a board row) */
+     ranks go to the place; the keys stay here, and load(i) asks get_place for the i-th. */
   function visitList(){ return (boardData && boardData.rows || []).filter(function(r){ return visitKey(r) && !r.is_me; }); }
   function visitNav(key){
     var rows = visitList(), keys = rows.map(visitKey), at = keys.indexOf(key), R = window.shRanks;
@@ -1504,11 +1506,38 @@
       done(); window.shPlace.open({ place: a[0], onClose: back, nav: nav ? { at: nav.at, list: nav.list, load: nav.load } : null });
     }, fail);
   }
-  $("visitRand").addEventListener("click", function(e){
-    if (!e.target.closest("button")) return;
-    var rows = visitList(); if (!rows.length) return;
-    visit(visitKey(rows[Math.floor(Math.random() * rows.length)]), false, "random");
-  });
+  /* "Visit someone random" (Sam, 2026-11-13: "i want random to be for the whole class"): migration_v57's get_random_place
+     picks on the server from everyone a place can be opened for, never you or your linked device, and gives their place
+     with its key (never an id). The trip keeps the keys it has shown and sends them back (p_skip), so the class comes
+     round once before anyone twice; the place's Previous goes back through the trip and Next past the last asks again
+     (nav.more). Without the function (before the release) or when it fails, one of the board's rows, as a board tour. */
+  function getRandom(skip){
+    return boardSb.rpc("get_random_place", { p_visitor: VISITOR || null, p_skip: skip.slice(-100) }).then(function(res){
+      if (!res || res.error) throw new Error("get_random_place");
+      var d = res.data, k = d && typeof d.visit === "string" && VISIT_RE.test(d.visit) ? d.visit : "", p = k && placeOf(d);
+      if (!p) return null;
+      PLACES[k] = Promise.resolve(p);
+      return { key: k, place: p };
+    });
+  }
+  function visitRandom(){
+    var rb = q("button", $("visitRand"));
+    if (visiting || !boardSb || !rb) return;
+    var fromBoard = function(){ var rows = visitList(); if (rows.length) visit(visitKey(rows[Math.floor(Math.random() * rows.length)]), false, "random"); };
+    visiting = "random"; rb.setAttribute("aria-busy", "true");
+    var done = function(){ visiting = ""; rb.removeAttribute("aria-busy"); };
+    var keys = [], list = [], add = function(r){ keys.push(r.key); list.push({ name: r.place.name, rank: r.place.rank }); return keys.length - 1; };
+    var back = function(){ if (!rb.closest("[hidden]")) try { rb.focus(); } catch (e) {} };
+    Promise.all([getRandom([]), placeLoad()]).then(function(a){
+      done();
+      if (!a[0] || !window.shPlace) { fromBoard(); return; }
+      add(a[0]);
+      window.shPlace.open({ place: a[0].place, onClose: back, nav: { at: 0, list: list,
+        load: function(i){ return keys[i] ? getPlace(boardSb, keys[i]) : Promise.reject(new Error("key")); },
+        more: function(){ return getRandom(keys).then(function(r){ if (!r) throw new Error("none"); return add(r); }); } } });
+    }, function(){ done(); fromBoard(); });
+  }
+  $("visitRand").addEventListener("click", function(e){ if (e.target.closest("button")) visitRandom(); });
   $("board").addEventListener("click", function(e){
     var b = e.target.closest(".dx-visit"), w = !b && e.target.closest(".st-win.can-visit");
     /* a winner's Timmy on the stage is their name's button under it */

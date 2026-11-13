@@ -22,7 +22,8 @@
 //     on sale (sh_shop_seasons, 2026-2028); Halloween's set is everyone's; a rank set is owned at its rank and never
 //     sold; two throwback days a month; the daily and weekly picks never hold a seasonal, gift or rank item;
 //   - visiting: a board row's key opens that person's place and nothing else of theirs; everyone can be visited, with no
-//     way to turn it off; Link my devices moves the place to the id that remains;
+//     way to turn it off; Link my devices moves the place to the id that remains; Visit someone random (migration_v57)
+//     goes through the whole class, each once before anyone twice, never you or your linked device, never an id;
 //   - Learn and Flashcards (migration_v56): a rating pays a flat 2 for a card's first three a day, under the answers'
 //     speed limit; Study ahead and Learn's steps pay nothing; a replayed call, a double tap, a boost, the rebuild and Link
 //     my devices; a rating never reaches the class's numbers, your answers or a day studied; get_my_cards;
@@ -903,6 +904,40 @@ try {
     'linked: the arcade row and the place are under the id that remains; the other device\'s key opens nothing');
   ok(num(`select length(secret) from visit_secret`) >= 32 && num(`select count(*) from visit_secret`) === 1, 'one server-side secret behind the keys');
   notes.push('visiting: everyone, a key per board row, a place with only what it shows, no way to turn it off, unknown keys, Link my devices');
+
+  /* ---------- 14a. Visit someone random, from the whole class (migration_v57) ---------- */
+  {
+  const rnd = (v, skip) => anonJson(`coalesce(get_random_place(${v == null ? 'null' : q(v)}, ${skip ? `array[${skip.map(q).join(',') || "''"}]::text[]` : 'null'}), 'null'::jsonb)`);
+  const everyone = rows(`select z.visitor_id, sh_visit_key(z.visitor_id) as k from (select visitor_id from xp_visitors union select visitor_id from correct_streaks
+                         union select visitor_id from arcade_scores) z where not exists (select 1 from visitor_links l where l.alias_id = z.visitor_id)`);
+  const keyOf = Object.fromEntries(everyone.map(r => [r.k, r.visitor_id])), others = everyone.filter(r => r.visitor_id !== 'xp-VS');
+  const r1 = rnd('xp-VS'), { visit: r1k, ...r1p } = r1 || {};
+  ok(r1 && HEX.test(r1k || '') && keyOf[r1k] && keyOf[r1k] !== 'xp-VS', `a random visit gives someone else's place and their key (${JSON.stringify(r1).slice(0, 120)})`);
+  eq(Object.keys(r1 || {}).sort(), ['equipped', 'flair', 'name', 'rank', 'visit'], 'a random place is what get_place gives, and the visit key, nothing else');
+  eq(sorted(r1p), sorted(place(r1k) || {}), 'the same place the key opens');
+  ok(leaks(r1p).length === 0 && !/xp-|idea-vis-/.test(JSON.stringify(r1)), `no visitor id, XP, HP, date or time in it (${leaks(r1p).join(', ')})`);
+  // the whole class: skipping the keys already shown, a trip goes through everyone else once before anyone comes back
+  const seen = [];
+  for (let i = 0; i < Math.min(others.length, 100); i++) { const r = rnd('xp-VS', seen); if (!r || seen.includes(r.visit)) break; seen.push(r.visit); }
+  ok(others.length >= 20 && others.length <= 100 && seen.length === others.length && seen.every(k => keyOf[k] && keyOf[k] !== 'xp-VS'),
+    `skipping the ones already seen, everyone else comes up once (${seen.length} of ${others.length}), people on no board among them, never the caller`);
+  ok(others.some(r => !Object.values(b1v).some(b => b.some(x => x.visit === r.k))), 'some of the class is on no board (the page couldn\'t have found them)');
+  const again = rnd('xp-VS', seen);
+  ok(again && keyOf[again.visit] && keyOf[again.visit] !== 'xp-VS', 'once everyone has been seen, it starts again rather than giving nothing');
+  // linked devices: the one that remains comes up, the other never does, and neither device is sent to itself
+  const fromVL = new Set(), fromVL2 = new Set();
+  for (let i = 0; i < 40; i++) { fromVL.add(rnd('xp-VL').visit); fromVL2.add(rnd('xp-VL2').visit); }
+  ok(!fromVL.has(kVL) && !fromVL2.has(kVL) && !fromVL.has(kVL2) && !fromVL2.has(kVL2), 'linked devices: neither device is sent to its own place, nor to the device it linked');
+  ok(rnd('xp-VS', seen.filter(k => k !== kVL)).visit === kVL, 'the id that remains after linking can be picked (it is the only one not yet seen)');
+  const r0 = rnd(null), bad = [rnd('x'.repeat(81)), rnd('')];
+  ok(r0 && keyOf[r0.visit] && leaks((({ visit, ...p }) => p)(r0)).length === 0, 'without a visitor id: someone, still without an id');
+  eq(bad, [null, null], 'a malformed visitor id gives nothing');
+  const junk = rnd('xp-VS', ['xp-VA', 'NOPE', '0'.repeat(24), K.toUpperCase()]);
+  ok(junk && keyOf[junk.visit] && keyOf[junk.visit] !== 'xp-VS', 'visitor ids, malformed and unknown keys in the skip list are ignored');
+  ok(one(`select has_function_privilege('anon', 'public.get_random_place(text, text[])', 'execute')`) === 't' && one(`select provolatile from pg_proc where proname = 'get_random_place'`) === 'v',
+    'anyone can ask (anon), and it is volatile (a new pick each time)');
+  notes.push(`visit someone random: ${others.length} classmates, each once before anyone twice, never the caller or a linked device, no id`);
+  }
 
   /* ---------- 14b. Learn and Flashcards (migration_v56): ratings and Learn's steps ---------- */
   const card = (v, qid, what, o) => { o = o || {};

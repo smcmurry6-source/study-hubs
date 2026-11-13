@@ -202,6 +202,7 @@ dialog.tpv.is-trip::backdrop { background: transparent; }
 .tpv-clmsg b { font-size: 22px; font-weight: var(--w-head); line-height: 1.2; overflow-wrap: anywhere; }
 .tpv-clouds.is-covered .tpv-clfill, .tpv-clouds.is-covered .tpv-cloud, .tpv-clouds.is-covered .tpv-clmsg { opacity: 1; }   /* a tour's next window starts under them */
 .tpv-clouds.in .tpv-clmsg { animation: tpv-clmsg 420ms var(--ease-out) 560ms forwards; }
+.tpv-clouds.is-covered .tpv-clmsg.is-new { animation: tpv-clmsg 420ms var(--ease-out) forwards; }   /* a random trip's name, after the die */
 .tpv-clouds.out .tpv-clmsg { opacity: 0; }
 @keyframes tpv-clmsg { from { opacity: 0; transform: translate(-50%, -40%) scale(.9); } to { opacity: 1; transform: translate(-50%, -50%); } }
 /* the guest card */
