@@ -1419,7 +1419,7 @@
         dots + '<span class="sr">You studied on ' + on7 + " of the last 7 days.</span></li>" +
       (weekSource === "server" ? '<li class="dx-stat s-week"><span><b class="num">' + num(a7) + "</b> " + (a7 === 1 ? "answer" : "answers") + "<small>This week" + (a7 ? ", " + pct7 + "% right" : "") + "</small></span>" +
         /* how many of the week's answers were right, as a ring */
-        (a7 ? '<span class="dx-ring" aria-hidden="true"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="t"/><circle cx="22" cy="22" r="18" class="v" pathLength="100" stroke-dasharray="' + pct7 + ' 100" transform="rotate(-90 22 22)"/></svg><b class="num">' + pct7 + "</b></span>" : "") + "</li>" : "");
+        (a7 ? '<span class="dx-wring" aria-hidden="true"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="t"/><circle cx="22" cy="22" r="18" class="v" pathLength="100" stroke-dasharray="' + pct7 + ' 100" transform="rotate(-90 22 22)"/></svg><b class="num">' + pct7 + "</b></span>" : "") + "</li>" : "");
     var m = $("dxStreak");
     /* read out in full whatever the bar has room to show (the words fold away on a phone) */
     m.innerHTML = '<span class="sr">Your study streak: ' + streak + (streak === 1 ? " day" : " days") + '</span><span class="dx-seen" aria-hidden="true">' + flame(streak) + '<b class="num">' + streak + '</b><span class="dx-fold">' + (streak === 1 ? "day" : "days") + "</span></span>";
