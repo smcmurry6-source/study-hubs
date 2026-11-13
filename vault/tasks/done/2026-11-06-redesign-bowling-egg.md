@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: 
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/349
 ---
 
 # The bowling egg: odd bowling-alley animations, Timmy style
@@ -186,7 +186,7 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
     sits above the widget's floating pieces (Timmy, the Full Arch chart) and below the rank-up cards.
   - Learn mode's questions count like the bank's (a question card outside the mock and the arcade); a Learn question
     asked again the same day is a second try.
-- 2026-11-13: Sam, after the recording: "Looks good. Merge when ready" ([decisions](../../decisions.md)). Merged; #291
+- 2026-11-13: Sam, after the recording: "Looks good. Merge when ready" ([decisions](../../decisions.md)). Merged as [#349](https://github.com/smcmurry6-source/study-hubs/pull/349); #291
   closed unmerged with a note pointing here.
 
 ## Outcome
