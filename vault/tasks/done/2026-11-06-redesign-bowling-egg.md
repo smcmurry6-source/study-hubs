@@ -147,7 +147,7 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
       the stills); #291 closed
 - [x] The run, the three triggers and the lane work as above on the redesign's pages; the live hubs are unchanged
 - [x] Sightings and the trophy are kept on the device; the Bowling trophy's drawing and silhouette are in `medals.mjs`
-- [ ] The tests above added and passing; `node tools/release/run.js` once; budgets unchanged
+- [x] The tests above added and passing; `node tools/release/run.js` once; budgets unchanged
 - [x] `tools/podcast/LORE.md`; the About draft in [the release note](../2026-11-06-redesign-release.md) ("From phase 4,
       part D", in a spoiler, with the trophy count); the event taxonomy row; the hand-off in phase 4's Log
 
