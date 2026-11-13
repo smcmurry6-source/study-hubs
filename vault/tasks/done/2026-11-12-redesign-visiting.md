@@ -159,6 +159,18 @@ do at a place besides look and tap; a list of who visited; an opt-out (Sam: none
   id; its sweep calls it too), the smoke test (the server's pick, someone on no board; the request carries only the
   page's own id and the keys; the die line; Previous without a new pick; no second `get_place`; the fallback to the
   board), the preview's stub (every made-up classmate, the ones off the board too).
+  Then Sam: **"skip people with zero customization"**: the pick lands only on someone with at least one row in
+  `pet_equipped` (a slot set back to its default deletes its row), in `migration_v57.sql`; with no one else customized
+  the button says "No one else has decorated their place yet. Check back soon." (`.dx-rmsg`, a status line), and the
+  fallback walks the board's rows from a random one until a place has something chosen. A tap on a row and the board
+  tour still open anyone's. The preview leaves out Synthetic Cingulum's plain place.
+- **The top ten's number badge** (Sam: "the people in the top ten should also get a special number badge next to their
+  name when you visit them"): `widget/dash.js` keeps the Ranks board's `rnk` by visit key (`TOP`, from that board's
+  rows whenever it's drawn, or one `get_rank_board_v2` call when a visit starts from the other board) and gives each
+  visited place its `top`; `widget/place.js` draws `.tpv-num` after the name in the title (gold, silver, bronze, then
+  purple with gold to #10), with ", number 5 on the leaderboard" for screen readers. For a row, the stage, a tour and a
+  random pick. Nothing on the server. (First drawn as `.tpv-top`, which is the window's header class: it tilted the
+  whole header; renamed before it shipped.)
 - **The preview's made-up data** (`tools/preview/runtime/preview.js`): each classmate has a place of their own
   (`FAKE_PLACES`: different homes, scenes, yards, outfits, seasonal sets, rank pieces their rank has reached); Fixture
   Fluoride is a ModuPro (`fakeXp`), the same rank on every board and at the place; three have one hub medal each

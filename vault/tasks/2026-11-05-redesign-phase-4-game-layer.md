@@ -443,6 +443,8 @@ These hold for each spec; a spec only adds to them.
   `widget/dash.js`'s `visitRandom()` falls back to the board's rows without the function. Details:
   [visiting](done/2026-11-12-redesign-visiting.md)'s Outcome, [game-server](../reference/game-server.md), "Visiting".
   **Next: session 6** still.
+  In the same PR, Sam: "skip people with zero customization" (the random pick needs a place with something chosen) and
+  a number badge for the top ten on a visit (`top` on a place, `.tpv-num`).
 
 ## Outcome
 

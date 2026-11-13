@@ -580,8 +580,10 @@ game layer no row is a button.
       want random to be for the whole class") through the connector right after `migration_v56` (it needs v54's
       `get_place` and `sh_visit_key`). In the switch PR: append it to `supabase/schema.sql` and take its line out of
       `supabase/pending-migrations.txt`; then `node tools/release/rls.js` and `rls-audit.sql` on the live project. Until
-      it's applied, the button picks among the board's rows. On the live site, from a laptop: a few presses of Next on a
-      random trip reach someone who isn't on the boards, and never your own place.
+      it's applied, the button picks among the board's rows. It picks only people who have decorated their place (Sam:
+      "skip people with zero customization"), so on the first day it may say "No one else has decorated their place
+      yet" until someone does. On the live site, from a laptop, once a few people have: a few presses of Next on a
+      random trip reach someone who isn't on the boards, never your own place and never a plain one.
 - [ ] The hubs' boards (the shared widget's panel, `widget/v3.js`) don't visit yet (Sam, 2026-11-12: the new dashboard's
       boards only). When the hubs' boards are rebuilt for the redesign, a row there can open a place the same way
       (`shPlace.open({ place })` with what `get_place` gives).
@@ -595,9 +597,11 @@ game layer no row is a button.
   to fly over through the clouds to their Timmy's place: their home, scene and yard, what their Timmy is wearing, their rank's statue and their
   hub medals, under their leaderboard name. Tap their Timmy and he waves; the things around the place do what they do
   at yours. Your own row opens your own place.
-- **Visit someone random** (under the leaderboard) rolls the die and takes you to anyone in the class, on the
-  leaderboard or not (never your own place). Next rolls again, the back arrow returns to the places you've been, and
-  you meet everyone once before anyone comes round twice. Visiting from the leaderboard, the arrows on either side take
+- **Visit someone random** (under the leaderboard) rolls the die and takes you to anyone in the class who has
+  decorated their place, on the leaderboard or not (never your own). Next rolls again, the back arrow returns to the
+  places you've been, and you meet everyone once before anyone comes round twice.
+- **Top ten**: visiting someone in the leaderboard's top ten shows their number next to their name: gold for #1,
+  silver for #2, bronze for #3. Visiting from the leaderboard, the arrows on either side take
   you to the next or the last place on the board. **Back to mine** brings you home. Each trip is through the clouds.
 - **What a visitor sees, and doesn't**: only the place. Never your HP, XP as a number, your streak, your answers, your
   Shiny Gold Crowns, what you own beyond what's out, or when you did anything. Nobody can change your place but you,

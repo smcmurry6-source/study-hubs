@@ -1417,13 +1417,14 @@
       return { data: { name: FAKE_NAMES[who], equipped: feq, rank: { journey: fr.journey, tier: fr.tier, level: fr.level }, flair: FAKE_FLAIR[FAKE_NAMES[who]] || null } };
     }
     /* migration_v57's get_random_place (Visit someone random, from the whole class): anyone in the made-up class but you
-       (and the one place that can't be read), the ones whose keys aren't in p_skip first, as get_place answers them, with
-       the key. Every made-up classmate is in it, the ones the board on the screen leaves out too */
+       whose place has something chosen (not the one that can't be read, nor Synthetic Cingulum's plain one), the ones whose
+       keys aren't in p_skip first, as get_place answers them, with the key. The ones the board on the screen leaves out
+       are in it too */
     if (fn === "get_random_place") {
-      var sk = Array.isArray(a.p_skip) ? a.p_skip : [], pool = FAKE_NAMES.filter(function(nm, i){ return i !== 4; }),
+      var sk = Array.isArray(a.p_skip) ? a.p_skip : [], pool = FAKE_NAMES.filter(function(nm, i){ return FAKE_PLACES[i] && Object.keys(FAKE_PLACES[i]).length; }),
         fresh = pool.filter(function(nm){ return sk.indexOf(visitKeyOf(nm)) < 0; }), from = fresh.length ? fresh : pool,
         pick = from[Math.floor(Math.random() * from.length)], rp = rpc("get_place", { p_key: visitKeyOf(pick) }).data;
-      return { data: rp ? Object.assign({}, rp, { visit: visitKeyOf(pick) }) : null };
+      return { data: rp && pick ? Object.assign({}, rp, { visit: visitKeyOf(pick) }) : null };
     }
     var ideaAns = ideaRpc(fn, a, t);
     if (ideaAns) return ideaAns;

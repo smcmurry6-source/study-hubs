@@ -40,7 +40,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `supabase/pending-migrations.txt`). `widget/dash.js` (`visitRandom`, `getRandom`, `placeOf`), `widget/place.js` (a
   `nav` with `more()`: Next rolls the die in the clouds, then the name; Previous goes back through the trip),
   `widget/place.css`, the preview's stub. Without the function the button picks among the board's rows as before.
-  Tests: `xp.js` 14a, `rls.js`, the smoke test's random trip and fallback.
+  Then Sam: "skip people with zero customization" (only places with something chosen; "No one else has decorated their
+  place yet" when none) and a **number badge for the top ten** on a visit (gold, silver, bronze, then purple to #10).
+  Tests: `xp.js` 14a, `rls.js`, the smoke test's random trip, the badge, nobody customized and the fallback.
   [Visiting](vault/tasks/done/2026-11-12-redesign-visiting.md), [game-server](vault/reference/game-server.md).
 - **2026-11-13 (visiting's tour, Claude Code)** — Nothing students see changes (the new dashboard, on the game layer).
   Sam: "build the random visit and next/back", the rest of round 3's visiting. **Visit someone random** under the board

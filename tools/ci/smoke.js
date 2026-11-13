@@ -1124,11 +1124,15 @@ function lint(hub, A){
           const after = await page.evaluate(() => { const d = document.querySelector('dialog.tpv'); return { clouds: !!d.querySelector('.tpv-clouds'), hidden: d.classList.contains('is-trip') }; });
           if (after.clouds || after.hidden) problems.push(`${name} (${label}): the clouds should be gone and the window showing 2.6 s after a visit opens (${JSON.stringify(after)})`);
           const v = await page.evaluate(() => { const d = document.querySelector('dialog.tpv'), sr = d.querySelector('.tpv-stage').shadowRoot, t = sr && sr.querySelector('.tp-timmy');
-            return { title: d.querySelector('#tpvT').textContent, titleEls: d.querySelector('#tpvT').children.length, seg: d.querySelector('.tpv-seg').hidden, cust: !!d.querySelector('[data-tp="customize2"], [data-tp="customize"]:not([hidden]) ') && !d.querySelector('.tpv-seg').hidden,
+            const h = d.querySelector('#tpvT').cloneNode(true), tb = h.querySelector('.tpv-num'); if (tb) tb.remove();
+            return { title: h.textContent.trim(), titleEls: h.children.length, top: tb ? { shown: (tb.querySelector('[aria-hidden="true"]') || {}).textContent, said: (tb.querySelector('.tpv-sr') || {}).textContent, cls: tb.className } : null, seg: d.querySelector('.tpv-seg').hidden, cust: !!d.querySelector('[data-tp="customize2"], [data-tp="customize"]:not([hidden]) ') && !d.querySelector('.tpv-seg').hidden,
               hp: !!d.querySelector('.tpv-hp'), timmy: t ? t.getAttribute('aria-label') : '', home: (d.querySelector('.tpv-sub') || {}).textContent || '', injected: !!window.__visit || !!d.querySelector('img[src="x"]'), w: d.scrollWidth - d.clientWidth,
               look: { visit: d.classList.contains('is-visit'), kick: (d.querySelector('.tpv-kick') || {}).textContent || '', rank: (d.querySelector('.tpv-guest .tpv-gr') || {}).textContent || '', art: !!d.querySelector('.tpv-grank svg') } }; });
           if (!v.look.visit || v.look.kick !== 'Welcome to' || !/Gold/.test(v.look.rank) || !v.look.art) problems.push(`${name} (${label}): a visit should open in its theater look, "Welcome to" over the name and their rank drawn on the guest card (${JSON.stringify(v.look)})`);
           if (v.title !== BAD + '’s place' || v.titleEls) problems.push(`${name} (${label}): the visited place's title should be "<name>'s place" as text (${JSON.stringify(v.title)}, ${v.titleEls} elements)`);
+          /* the top ten's number badge (Sam: "a special number badge next to their name"): Bee is #2 on the Ranks board,
+             drawn as "#2" in silver and read out as words */
+          if (!v.top || v.top.shown !== '#2' || v.top.said !== ', number 2 on the leaderboard' || !/\bt2\b/.test(v.top.cls)) problems.push(`${name} (${label}): a top-ten visit should have its number badge after the name (${JSON.stringify(v.top)})`);
           if (!v.seg || v.cust || v.hp || /HP/.test(v.timmy)) problems.push(`${name} (${label}): a visited place can't be changed and shows no HP (${JSON.stringify(v)})`);
           if (!/Igloo/i.test(v.home)) problems.push(`${name} (${label}): the visited place isn't theirs (their home is the igloo; the view says "${v.home}")`);
           if (v.injected) problems.push(`${name} (${label}): a visited place drew its name as markup`);
@@ -1150,7 +1154,8 @@ function lint(hub, A){
            your own row. */
         const tour = () => page.evaluate(() => { const ds = document.querySelectorAll('dialog.tpv'), d = ds[0]; if (!d) return { n: 0, focus: document.activeElement ? document.activeElement.getAttribute('aria-label') || '' : '' };
           const btn = k => { const b = d.querySelector('[data-tp="visit-' + k + '"]'); return b ? { label: b.getAttribute('aria-label'), data: [...b.attributes].filter(a => a.name.startsWith('data-')).map(a => a.name).join(' ') } : null; };
-          return { n: ds.length, title: d.querySelector('#tpvT').textContent, visit: d.classList.contains('is-visit'), clouds: !!d.querySelector('.tpv-clouds'), prev: btn('prev'), next: btn('next'), home: btn('home'),
+          const h = d.querySelector('#tpvT').cloneNode(true), tb = h.querySelector('.tpv-num'); if (tb) tb.remove();
+          return { n: ds.length, title: h.textContent.trim(), top: tb ? (tb.querySelector('[aria-hidden="true"]') || {}).textContent : '', visit: d.classList.contains('is-visit'), clouds: !!d.querySelector('.tpv-clouds'), prev: btn('prev'), next: btn('next'), home: btn('home'),
             gnav: (d.querySelector('.tpv-gnav') || {}).textContent || '', wait: (() => { const w = d.querySelector('.tpv-wait'); return w && !w.hidden ? w.textContent : ''; })(), focus: document.activeElement ? document.activeElement.getAttribute('data-tp') || '' : '', injected: !!window.__visit }; });
         const vb = () => (placeCalls[K('a')] || 0) + (placeCalls[K('b')] || 0) + (placeCalls[K('c')] || 0) + (placeCalls[K('d')] || 0);
         await page.click(bee); await page.waitForTimeout(2800);
@@ -1163,7 +1168,7 @@ function lint(hub, A){
         const mid = await tour();
         if (!mid.clouds || mid.n !== 1) problems.push(`${name} (${label}): Next should go through the clouds, one window at a time (${JSON.stringify(mid)})`);
         await page.waitForTimeout(2800); t = await tour();
-        if (t.n !== 1 || t.title !== 'Cee’s place' || t.clouds || t.focus !== 'visit-next' || !/^Place 3 of 4/.test(t.gnav)) problems.push(`${name} (${label}): Next should open Cee's place, the clouds gone and focus on Next again (${JSON.stringify(t)})`);
+        if (t.n !== 1 || t.title !== 'Cee’s place' || t.top !== '#3' || t.clouds || t.focus !== 'visit-next' || !/^Place 3 of 4/.test(t.gnav)) problems.push(`${name} (${label}): Next should open Cee's place (#3), the clouds gone and focus on Next again (${JSON.stringify(t)})`);
         await page.keyboard.press('Enter'); await page.waitForTimeout(3000); t = await tour();
         if (t.n !== 1 || t.title !== 'Cee’s place' || t.clouds || !/^That place couldn’t be opened just now/.test(t.wait)) problems.push(`${name} (${label}): a place that can't be read should leave you where you are with one plain line (${JSON.stringify(t)})`);
         if (vb() - before) problems.push(`${name} (${label}): the tour should ask get_place for nothing the page already has (the top three's outfits and the tap on Dee asked; ${vb() - before} more asked)`);
@@ -1181,13 +1186,13 @@ function lint(hub, A){
         const rb = await page.evaluate(() => { const p = document.getElementById('visitRand'), b = p && p.querySelector('button'); return p ? { shown: !p.hidden, data: b ? [...b.attributes].filter(a => a.name.startsWith('data-')).map(a => a.name + '=' + a.value).join(' ') : '' } : null; });
         if (!rb || !rb.shown || rb.data !== 'data-dash=visit-random') problems.push(`${name} (${label}): "Visit someone random" should be under the board with one fixed click name (${JSON.stringify(rb)})`);
         else {
-          const picks = [{ visit: K('f'), name: 'Gee', equipped: { home: 'castle' }, rank: { journey: 0, tier: 1, level: 1 }, flair: null }, Object.assign({ visit: K('c') }, places[K('c')]),
-            { visit: K('9'), name: 'Hache', equipped: {}, rank: { journey: 0, tier: 0, level: 1 }, flair: null }], rasks = [];
+          const picks = [{ visit: K('f'), name: 'Gee', equipped: { home: 'castle' }, rank: { journey: 0, tier: 1, level: 1 }, flair: null }, Object.assign({ visit: K('a') }, places[K('a')]),
+            { visit: K('9'), name: 'Hache', equipped: { outfit: 'beanie' }, rank: { journey: 0, tier: 0, level: 1 }, flair: null }], rasks = [];
           await page.route(/supabase\.co\/rest\/v1\/rpc\/get_random_place/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {} rasks.push(a); return json(route, picks[rasks.length - 1] || null); });
           const g0 = (placeCalls[K('f')] || 0) + (placeCalls[K('9')] || 0);
           await page.click('#visitRand button'); await page.waitForTimeout(3000); t = await tour();
           const myId = await page.evaluate(() => localStorage.getItem('sh_visitor_id'));
-          if (t.n !== 1 || t.title !== 'Gee’s place' || !t.visit || t.prev || !t.next || t.next.label !== 'Visit someone else at random' || t.next.data !== 'data-tp' || !t.home)
+          if (t.n !== 1 || t.title !== 'Gee’s place' || t.top || !t.visit || t.prev || !t.next || t.next.label !== 'Visit someone else at random' || t.next.data !== 'data-tp' || !t.home)
             problems.push(`${name} (${label}): a random visit should open the place the server picked, someone on no board, with Next to someone else at random and no Previous yet (${JSON.stringify(t)})`);
           if (!/^Picked at random from the class/.test(t.gnav) || !/Next: someone else at random$/.test(t.gnav)) problems.push(`${name} (${label}): the guest card should say the visit was picked at random (${JSON.stringify(t.gnav)})`);
           if (rasks.length !== 1 || !myId || rasks[0].p_visitor !== myId || JSON.stringify(rasks[0].p_skip) !== '[]' || Object.keys(rasks[0]).sort().join() !== 'p_skip,p_visitor')
@@ -1196,22 +1201,30 @@ function lint(hub, A){
           const roll = await page.evaluate(() => { const d = document.querySelector('dialog.tpv'), m = d && d.querySelector('.tpv-clmsg'); return m ? m.textContent : ''; });
           if (!/^Off to someone random/.test(roll)) problems.push(`${name} (${label}): Next on a random trip should roll the die in the clouds first (${JSON.stringify(roll)})`);
           await page.waitForTimeout(3400); t = await tour();
-          if (t.n !== 1 || t.title !== 'Cee’s place' || t.clouds || t.focus !== 'visit-next' || !t.prev || t.prev.label !== 'Previous place: Gee' || t.next.label !== 'Visit someone else at random')
+          if (t.n !== 1 || t.title !== 'Visit Alpha’s place' || t.top !== '#1' || t.clouds || t.focus !== 'visit-next' || !t.prev || t.prev.label !== 'Previous place: Gee' || t.next.label !== 'Visit someone else at random')
             problems.push(`${name} (${label}): Next on a random trip should open the next pick, with Previous back to the last (${JSON.stringify(t)})`);
           if (rasks.length !== 2 || JSON.stringify(rasks[1].p_skip) !== JSON.stringify([K('f')])) problems.push(`${name} (${label}): Next should ask again, skipping the places the trip has shown (${JSON.stringify(rasks.map(a => a.p_skip))})`);
           await page.click('dialog.tpv [data-tp="visit-prev"]'); await page.waitForTimeout(3200); t = await tour();
-          if (t.n !== 1 || t.title !== 'Gee’s place' || t.prev || t.focus !== 'visit-next' || t.next.label !== 'Next place: Cee' || rasks.length !== 2 || !/Next: Cee$/.test(t.gnav))
+          if (t.n !== 1 || t.title !== 'Gee’s place' || t.prev || t.focus !== 'visit-next' || t.next.label !== 'Next place: Visit Alpha' || rasks.length !== 2 || !/Next: Visit Alpha$/.test(t.gnav))
             problems.push(`${name} (${label}): Previous should go back through the trip without a new pick, focus on Next (${JSON.stringify(t)}, ${rasks.length} picks)`);
           if ((placeCalls[K('f')] || 0) + (placeCalls[K('9')] || 0) - g0) problems.push(`${name} (${label}): get_place shouldn't be asked for a place the random pick brought`);
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
           const rf = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tpv'), rand: !!(document.activeElement && document.activeElement.closest('#visitRand')) }));
           if (rf.open || !rf.rand) problems.push(`${name} (${label}): closing a random visit should give focus back to the button (${JSON.stringify(rf)})`);
-          /* before the release (no get_random_place yet): one of the board's rows, the pick made certain for the test (Cee) */
+          /* no one else has customized their place (the server gives nothing): one plain line under the button, no visit */
+          await page.unroute(/supabase\.co\/rest\/v1\/rpc\/get_random_place/);
+          await page.route(/supabase\.co\/rest\/v1\/rpc\/get_random_place/, route => json(route, null));
+          await page.click('#visitRand button'); await page.waitForTimeout(1500);
+          const nobody = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tpv'), line: (document.querySelector('#visitRand .dx-rmsg') || {}).textContent || '' }));
+          if (nobody.open || !/^No one else has decorated their place yet/.test(nobody.line)) problems.push(`${name} (${label}): with no one else customized, the button should say so and open nothing (${JSON.stringify(nobody)})`);
+          /* before the release (no get_random_place yet): one of the board's rows whose place has something chosen, from a
+             random one on (made certain for the test: Cee, then Dee, then Alpha, the first with a place of their own) */
           await page.unroute(/supabase\.co\/rest\/v1\/rpc\/get_random_place/);
           await page.route(/supabase\.co\/rest\/v1\/rpc\/get_random_place/, route => json(route, { code: 'PGRST202', message: 'Could not find the function' }, 404));
           await page.evaluate(() => { window.__rnd = Math.random; Math.random = () => .6; });
           await page.click('#visitRand button'); await page.waitForTimeout(1200); await page.evaluate(() => { Math.random = window.__rnd; }); await page.waitForTimeout(1800); t = await tour();
-          if (t.n !== 1 || t.title !== 'Cee’s place' || !t.visit || !/^Place 3 of 4 on the board/.test(t.gnav)) problems.push(`${name} (${label}): without the server's pick, a random visit should be one of the board's rows, with the board's tour (${JSON.stringify(t)})`);
+          const gone = await page.evaluate(() => (document.querySelector('#visitRand .dx-rmsg') || {}).textContent || '');
+          if (t.n !== 1 || t.title !== 'Visit Alpha’s place' || !t.visit || !/^Place 1 of 4 on the board/.test(t.gnav) || gone) problems.push(`${name} (${label}): without the server's pick, a random visit should be the next of the board's rows with a place of their own, with the board's tour (${JSON.stringify(t)}, line ${JSON.stringify(gone)})`);
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
         }
         await page.click('#boardSeg [data-board="streaks"]'); await page.waitForTimeout(800);

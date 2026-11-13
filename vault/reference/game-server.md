@@ -169,15 +169,18 @@ off.
   hubs' boards (`widget/v3.js`) don't visit yet (Sam, 2026-11-12).
 - **Visit someone random, from the whole class** (`migration_v57.sql`, pending, applied at the release after v56; Sam,
   2026-11-13: "i want random to be for the whole class"). `get_random_place(p_visitor, p_skip)` picks on the server from
-  everyone `get_place` can open (XP, answer streaks, arcade scores: on a board or not), never the caller, the id the
+  everyone `get_place` can open (XP, answer streaks, arcade scores: on a board or not) **who has customized their place**
+  (at least one row in `pet_equipped`; Sam: "skip people with zero customization"; null when no one else has, and the page
+  says so), never the caller, the id the
   caller's linked devices share, or any device linked to another (its place is under the id that remains). It returns
   `get_place`'s answer and `visit`, that person's key; nothing when there is no one else or the visitor id is malformed.
   `p_skip` takes up to 100 keys the trip has shown: anyone else comes first, so a trip goes through the class once before
   anyone twice, then starts again. Volatile, runnable by anon; v54 is unchanged. The page (`widget/dash.js`'s
   `visitRandom`) sends its own id and the trip's keys, keeps the places it gets (no second `get_place` for them), and
   hands `widget/place.js` a `nav` with `more()`: Next past the last place rolls the die again, Previous goes back through
-  the trip. Without the function (before the release) or when it fails, the button picks among the board's rows as
-  before.
+  the trip. Without the function (before the release) or when it fails, the button picks among the board's rows whose
+  place has something chosen. A visit to someone in the Ranks board's top ten shows their number as a badge (the page
+  matches the key to that board's `rnk`: nothing on the server).
 
 ## The idea board
 
@@ -332,7 +335,7 @@ Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sq
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (414 checks, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (416 checks, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, a place opened from a board row, and a random visit going through the whole class, in 14a). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;

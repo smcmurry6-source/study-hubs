@@ -151,6 +151,14 @@ dialog.tpv.is-visit { --ar-bg: #2a2233; --ar-deep: #1d1724; --ar-row: #372c44; -
 .is-visit .tpv-title h2 { font-size: clamp(22px, 2.6vw, 30px); font-weight: var(--w-title, 800); line-height: 1.1; color: var(--ar-gold); overflow-wrap: anywhere;
   text-shadow: 0 2px 0 rgba(0, 0, 0, .35), 0 0 18px rgba(255, 214, 102, .35); }
 .is-visit .tpv-sub { color: var(--ar-soft); }
+.tpv-num { display: inline-flex; align-items: center; justify-content: center; vertical-align: .12em; min-width: 1.9em; height: 1.9em; margin-left: .3em; padding: 0 .42em; border-radius: 999px;
+  font-size: .62em; font-weight: 800; line-height: 1; letter-spacing: -.01em; color: #3B2E3A; text-shadow: none; background: linear-gradient(180deg, #FFE68F, #EDB021);
+  box-shadow: 0 0 0 2px #3B2E3A, 0 0 0 4px #FFE9A3, 0 5px 14px rgba(0, 0, 0, .4); transform: rotate(-5deg); white-space: nowrap; }   /* a top-ten visit's number */
+.tpv-num i { font-style: normal; font-size: .72em; margin-right: .06em; opacity: .75; }
+.tpv-num.t2 { background: linear-gradient(180deg, #F6F8FC, #B9C1CF); }
+.tpv-num.t3 { background: linear-gradient(180deg, #F6CDA4, #C4834B); }
+.tpv-num.tx { color: #FFE9A3; background: linear-gradient(180deg, #8A79D2, #4A3B8F); box-shadow: 0 0 0 2px #FFE9A3, 0 0 0 4px #3B2E3A, 0 5px 14px rgba(0, 0, 0, .4); }
+.tpv-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .is-visit .tpv-x { background: rgba(255, 255, 255, .12); color: #fff; }
 .is-visit .tpv-x:hover { background: rgba(255, 255, 255, .2); }
 /* the tour (widget/place.js, hop): "Back to mine" by the close button, and the design page's round arrows on either

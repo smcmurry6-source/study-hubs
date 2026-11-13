@@ -277,7 +277,7 @@
           '<p class="note" id="boardNote"></p>' +
           '<div id="board" aria-live="polite"><p class="note">Loading…</p></div>' +
           /* Visit someone random: one of the board's rows (the tour, below); shown when the board has someone to visit */
-          '<p class="dx-rand" id="visitRand" hidden><button type="button" data-dash="visit-random">' + DICE + "<span>Visit someone random</span></button></p>" +
+          '<p class="dx-rand" id="visitRand" hidden><button type="button" data-dash="visit-random">' + DICE + '<span>Visit someone random</span></button><span class="dx-rmsg" role="status"></span></p>' +
           '<details class="dx-ladder" id="ladderFold" hidden><summary>' + icon("chevron", 18, "rot") + "Every rank, Stone to Dark Matter</summary><div class=\"dx-rungs\" id=\"rankLadder\"></div></details>" +
           '<p class="dx-line" id="goldenLine" hidden></p>' +
         "</section>" +
@@ -1434,8 +1434,21 @@
      the leaderboard's theater look. Your own row ("<name> (you): open your place", its visible text first) opens your
      own place, as the card does. Without the game layer a row has no key and isn't a button. A key that opens nothing
      (null) or a call that fails puts one plain line on the row and changes nothing else. ---------- */
-  var VISIT_RE = /^[0-9a-f]{24}$/, PLACES = {}, visiting = "";
+  var VISIT_RE = /^[0-9a-f]{24}$/, PLACES = {}, visiting = "", TOP = null;
   function visitKey(r){ return r && typeof r.visit === "string" && VISIT_RE.test(r.visit) ? r.visit : ""; }
+  /* the top ten's number badge (Sam, 2026-11-13: "the people in the top ten should also get a special number badge next to
+     their name when you visit them"): a visit key's place on the Ranks board, 1 to 10, from that board's rows (TOP, kept
+     whenever it's drawn, or asked for once when a visit starts from the other board). widget/place.js draws it */
+  function topFrom(rows){ var t = {}; (rows || []).forEach(function(r){ var k = visitKey(r), n = Math.floor(+r.rnk || 0); if (k && n >= 1 && n <= 10) t[k] = n; }); return t; }
+  function topTen(){
+    if (TOP) return Promise.resolve(TOP);
+    return rpc2(boardSb, "get_rank_board", { p_visitor: VISITOR || null, p_limit: 10 }).then(function(res){
+      if (res && !res.error && Array.isArray(res.data)) TOP = topFrom(res.data);
+      return TOP || {};
+    }, function(){ return {}; });
+  }
+  function withTop(p, key, top){ if (!p) return p; var c = {}; Object.keys(p).forEach(function(k){ c[k] = p[k]; }); c.top = top[key] || 0; return c; }
+  function placeTop(key){ return Promise.all([getPlace(boardSb, key), topTen()]).then(function(a){ return withTop(a[0], key, a[1]); }); }
   /* someone's place, asked once a page (the stage's outfits and a visit share the answer); a call that fails isn't kept.
      Only what a place shows goes on: the slots as strings, the rank as numbers, the name and medals as text */
   function placeOf(d){
@@ -1482,7 +1495,7 @@
     if (at < 0) return null;
     return { at: at, keys: keys,
       list: rows.map(function(r){ return { name: String(r.display_name == null ? "" : r.display_name), rank: { journey: +r.journey || 0, tier: +r.tier || 0, level: +r.level || (R && R.levelFor ? R.levelFor(r.xp) : 1) } }; }),
-      load: function(i){ return keys[i] ? getPlace(boardSb, keys[i]) : Promise.reject(new Error("key")); } };
+      load: function(i){ return keys[i] ? placeTop(keys[i]) : Promise.reject(new Error("key")); } };
   }
   function visit(key, me, from){
     if (!VISIT_RE.test(key) || visiting || !boardSb) return;
@@ -1501,16 +1514,18 @@
       placeLoad().then(function(){ done(); if (window.shPlace) window.shPlace.open({ onClose: back }); else fail(); }, fail);
       return;
     }
-    Promise.all([getPlace(boardSb, key), placeLoad()]).then(function(a){
+    Promise.all([placeTop(key), placeLoad()]).then(function(a){
       if (!a[0] || !window.shPlace) { fail(); return; }
       done(); window.shPlace.open({ place: a[0], onClose: back, nav: nav ? { at: nav.at, list: nav.list, load: nav.load } : null });
     }, fail);
   }
-  /* "Visit someone random" (Sam, 2026-11-13: "i want random to be for the whole class"): migration_v57's get_random_place
-     picks on the server from everyone a place can be opened for, never you or your linked device, and gives their place
-     with its key (never an id). The trip keeps the keys it has shown and sends them back (p_skip), so the class comes
-     round once before anyone twice; the place's Previous goes back through the trip and Next past the last asks again
-     (nav.more). Without the function (before the release) or when it fails, one of the board's rows, as a board tour. */
+  /* "Visit someone random" (Sam, 2026-11-13: "i want random to be for the whole class", then "skip people with zero
+     customization"): migration_v57's get_random_place picks on the server from everyone whose place has at least one
+     thing chosen, never you or your linked device, and gives their place with its key (never an id). The trip keeps the
+     keys it has shown and sends them back (p_skip), so the class comes round once before anyone twice; the place's
+     Previous goes back through the trip and Next past the last asks again (nav.more). Nobody customized yet (null): one
+     plain line under the button. Without the function (before the release) or when it fails, one of the board's rows
+     whose place has something chosen, as a board tour. */
   function getRandom(skip){
     return boardSb.rpc("get_random_place", { p_visitor: VISITOR || null, p_skip: skip.slice(-100) }).then(function(res){
       if (!res || res.error) throw new Error("get_random_place");
@@ -1520,20 +1535,33 @@
       return { key: k, place: p };
     });
   }
+  function customized(p){ return !!(p && p.equipped && Object.keys(p.equipped).length); }
+  function randSay(msg){ var m = q(".dx-rmsg", $("visitRand")); if (m) { m.textContent = ""; if (msg) setTimeout(function(){ m.textContent = msg; }, 60); } }
   function visitRandom(){
     var rb = q("button", $("visitRand"));
     if (visiting || !boardSb || !rb) return;
-    var fromBoard = function(){ var rows = visitList(); if (rows.length) visit(visitKey(rows[Math.floor(Math.random() * rows.length)]), false, "random"); };
-    visiting = "random"; rb.setAttribute("aria-busy", "true");
+    var none = function(){ randSay("No one else has decorated their place yet. Check back soon."); };
+    /* the board's rows from a random one on, asking get_place in turn until a place has something chosen */
+    var fromBoard = function(){
+      var rows = visitList(), n = rows.length, at = Math.floor(Math.random() * n), i = 0;
+      var next = function(){
+        if (i >= n) { none(); return; }
+        var k = visitKey(rows[(at + i++) % n]);
+        getPlace(boardSb, k).then(function(p){ if (customized(p)) visit(k, false, "random"); else next(); }, next);
+      };
+      next();
+    };
+    randSay(""); visiting = "random"; rb.setAttribute("aria-busy", "true");
     var done = function(){ visiting = ""; rb.removeAttribute("aria-busy"); };
     var keys = [], list = [], add = function(r){ keys.push(r.key); list.push({ name: r.place.name, rank: r.place.rank }); return keys.length - 1; };
     var back = function(){ if (!rb.closest("[hidden]")) try { rb.focus(); } catch (e) {} };
-    Promise.all([getRandom([]), placeLoad()]).then(function(a){
+    Promise.all([getRandom([]), placeLoad(), topTen()]).then(function(a){
       done();
-      if (!a[0] || !window.shPlace) { fromBoard(); return; }
+      if (!a[0]) { none(); return; }
+      if (!window.shPlace) { fromBoard(); return; }
       add(a[0]);
-      window.shPlace.open({ place: a[0].place, onClose: back, nav: { at: 0, list: list,
-        load: function(i){ return keys[i] ? getPlace(boardSb, keys[i]) : Promise.reject(new Error("key")); },
+      window.shPlace.open({ place: withTop(a[0].place, a[0].key, a[2]), onClose: back, nav: { at: 0, list: list,
+        load: function(i){ return keys[i] ? placeTop(keys[i]) : Promise.reject(new Error("key")); },
         more: function(){ return getRandom(keys).then(function(r){ if (!r) throw new Error("none"); return add(r); }); } } });
     }, function(){ done(); fromBoard(); });
   }
@@ -1557,7 +1585,7 @@
         if (!res || res.error) { boardMsg(); return; }   /* not reached is not the same as nobody ranked */
         var rows = res.data || [], R = window.shRanks;
         if (!rows.length || !R){ boardMsg("No ranks yet. Answer a question in any hub to get your first handpiece."); return; }
-        boardData = { which: which, rows: rows, fits: [] }; paintBoard(); loadFits(sb, boardData);
+        boardData = { which: which, rows: rows, fits: [] }; TOP = topFrom(rows); paintBoard(); loadFits(sb, boardData);
         var me = rows.filter(function(r){ return r.is_me; })[0];
         /* the ladder under the board is the journey you are on: the Handpiece's seven ranks, or the next object's */
         var paintLadder = function(){

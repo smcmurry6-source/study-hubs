@@ -101,7 +101,10 @@
   /* the model a view draws: yours, or someone's you are visiting (get_place: the place, the rank and the medals, and
      never their HP, so a visited Timmy is always drawn well) */
   function mine(){ return { eq: S.eq, profile: S.profile, flair: S.flair != null ? S.flair : ls("sh_rank_flair"), visiting: false, name: "" }; }
-  function theirs(p){ return { eq: copy(p.equipped), profile: p.rank || null, flair: p.flair || "", visiting: true, name: String(p.name || "") }; }
+  /* top: their place on the Ranks board, 1 to 10, or 0 (Sam, 2026-11-13: "the people in the top ten should also get a
+     special number badge next to their name when you visit them"; widget/dash.js gives it from the board's rows) */
+  function theirs(p){ var t = Math.floor(+p.top || 0);
+    return { eq: copy(p.equipped), profile: p.rank || null, flair: p.flair || "", visiting: true, name: String(p.name || ""), top: t >= 1 && t <= 10 ? t : 0 }; }
   /* the rank the place shows: the journey (0 the Handpiece, 1 the ModuPro, 2 the Loupes), its tier and level. Past the
      Handpiece the pedestal carries the ModuPro and, in the loupes journey, Timmy wears loupes (Sam's yes to the contact
      sheet, 2026-11-12) */
@@ -486,7 +489,9 @@
     });
     /* the top bar and the panel */
     $(".tpv-sub", dlg).textContent = cardName(home.n) + " · " + lowerFirst(sc.n);
-    $("#tpvT", dlg).textContent = m.visiting && m.name ? m.name + "’s place" : "Timmy’s place";
+    /* a top-ten visit: the number badge after the name (gold, silver and bronze for the first three), read out as words */
+    $("#tpvT", dlg).innerHTML = m.visiting && m.name ? esc(m.name + "’s place") + (m.top ? ' <span class="tpv-num t' + (m.top <= 3 ? m.top : "x") + '" title="Number ' + m.top + ' on the leaderboard">' +
+      '<span aria-hidden="true"><i>#</i>' + m.top + '</span><span class="tpv-sr">, number ' + m.top + " on the leaderboard</span></span>" : "") : "Timmy’s place";
     var seg = $(".tpv-seg", dlg); seg.hidden = !canChange();
     $('[data-tp="play"]', dlg).setAttribute("aria-pressed", String(!custom)); $('[data-tp="customize"]', dlg).setAttribute("aria-pressed", String(custom));
     var zb = $(".tpv-zoom", dlg); zb.hidden = !custom || V.pick === "scene"; zb.setAttribute("aria-pressed", String(!V.wide));
