@@ -1,4 +1,5 @@
-// Dump every live hub's QUESTIONS and LECTURES to JSON, the same way the CI lint reads them.
+// Dump every hub's questions and lectures to JSON, the same way the CI lint reads them: a hub on the engine from its
+// content (hubs/<hub>/content/questions.json and core.json), an old single-file hub from its page.
 //   node tools/dump-banks.js <out-dir>     -> <out-dir>/<hub>.json  ({ Q: [...], L: [...] })
 // Needs Playwright (PLAYWRIGHT_PATH, as for tools/ci/smoke.js). Nothing is sent anywhere: all non-local requests are blocked.
 const http = require('http'), fs = require('fs'), path = require('path');
@@ -18,6 +19,12 @@ const hubs = fs.readdirSync(path.join(root, 'hubs')).filter(h => fs.existsSync(p
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   await ctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort());
   for (const hub of hubs) {
+    const content = path.join(root, 'hubs', hub, 'content');
+    if (fs.existsSync(path.join(content, 'core.json'))) {
+      const A = { Q: JSON.parse(fs.readFileSync(path.join(content, 'questions.json'), 'utf8')), L: JSON.parse(fs.readFileSync(path.join(content, 'core.json'), 'utf8')).lectures };
+      fs.writeFileSync(path.join(out, hub + '.json'), JSON.stringify(A)); console.log(`${hub}: ${A.Q.length} questions, ${A.L.length} lectures`);
+      continue;
+    }
     const page = await ctx.newPage();
     await page.route(`**/hubs/${hub}/index.html`, async route => {
       const r = await route.fetch(); let h = await r.text(); const i = h.lastIndexOf('window.SH_EXPORT = {');

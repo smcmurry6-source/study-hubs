@@ -497,7 +497,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   var PREF_KEY = "sh_admin_prefs";
 
   var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo Exam 1", "heme-endo-exam2": "Heme & Endo Exam 2", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants Exam 1", dashboard: "Dashboard", about: "About page" };
-  /* each hub's class colour on the dashboard (index.html CLASSES / HUB_RING), drawn as a dot wherever the hub is named */
+  /* each hub's class colour on the dashboard (the old dashboard's CLASSES / HUB_RING), drawn as a dot wherever the hub is named */
   var HUB_DOT = { occlusion: "#A94E34", "pcd-exam3": "#A94E34", "fixed-pros": "#A94E34", "pcd-implants-exam1": "#A94E34", perio: "#A23F5E", genetics: "#246B64", "special-patient-care": "#246B64", "heme-endo-exam1": "#7E3F8F", "heme-endo-exam2": "#8C2F5A", hepatobiliary: "#A8752A", "gi-exam1": "#A8752A", "msk-exam3": "#A8752A", "msk-exam4": "#A8752A" };
   /* used only until the dashboard's own hub list has loaded (then a hub is "past" when the dashboard doesn't show it live) */
   var ARCHIVED = { genetics: 1, "fixed-pros": 1, "gi-exam1": 1, hepatobiliary: 1 };
@@ -514,7 +514,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
 
   /* every view: its title, whether the time range and the past-hubs switch apply, and the data it needs */
   var VIEWS = {
-    overview:   { t: "Overview", range: 1, past: 1, needs: ["summary", "byHub", "bySection", "qstats", "choices", "reports", "podComments", "debriefs"] },
+    overview:   { t: "Overview", range: 1, past: 1, needs: ["summary", "byHub", "bySection", "qstats", "choices", "reports", "podComments", "ideas", "debriefs"] },
     live:       { t: "Live" },
     inbox:      { t: "Inbox", needs: ["reports", "podComments", "ideas"] },
     insights:   { t: "Insights", past: 1 },
@@ -668,13 +668,13 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   function D(k){ return data[k] || { data: [] }; }
   function viewAt(t){ return (VIEWS[t].needs || []).reduce(function(m, k){ return data[k] && data[k].at ? Math.min(m, data[k].at) : m; }, Infinity); }
 
-  /* the dashboard's own hub list (index.html), read once: which hubs are live now, and their titles. The Hubs view uses it too. */
+  /* the dashboard's own hub list (hubs.js), read once: which hubs are live now, and their titles. The Hubs view uses it too. */
   var dash = { live: null, titles: {}, src: null, p: null };
   function loadDash(force){
     if (dash.p && !force) return dash.p;
-    dash.p = fetch("../index.html", { cache: "no-store" })
+    dash.p = fetch("../hubs.js", { cache: "no-store" })
       .then(function(r){ if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
-      .then(function(html){ dash.src = window.shArchive.fromDashboardHtml(html); dash.err = null; computeDashLive(); return dash.src; },
+      .then(function(js){ dash.src = window.shArchive.fromHubsJs(js); dash.err = null; computeDashLive(); return dash.src; },
             function(e){ dash.err = e; dash.p = null; return null; });
     return dash.p;
   }
@@ -766,6 +766,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var waiting = card("Waiting on you", "", '<ul class="todo">' +
       todo("#inbox", "Reports to answer", D("reports").error ? null : open.length, reportsMore) +
       todo("#inbox", "Podcast comments reported", D("podComments").error ? null : comments.length, "") +
+      todo("#inbox", "Ideas reported", D("ideas").error ? null : (D("ideas").data || []).filter(function(i){ return Number(i.reports) > 0; }).length, "") +
       todo("#checkins", "Exam check-ins this week", D("debriefs").error ? null : recentCheckins.length, lastCheck ? '<span>Newest: ' + esc(hubLabel(lastCheck.hub)) + ', ' + esc(fmtDate(lastCheck.created_at)) + '</span>' : "") +
       todo("#live", "Studying now", liveN, "") + '</ul>');
 
@@ -964,7 +965,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       var body = '<div class="tally"><div><div class="kpi-label">Ready, 1 to 5</div><p><b>' + avg + '</b> average · ' + tally("ready") + '</p></div>' +
         '<div><div class="kpi-label">How it went</div><p>' + tally("went") + '</p></div>' +
         '<div><div class="kpi-label">Hub against the exam</div><p>' + tally("match") + '</p></div></div>';
-      /* any other question an exam added (extraQs in index.html): a 1-5 rating (e.g. Occlusion's diagrams / pbox_img; "none" is
+      /* any other question an exam added (extraQs in hubs.js): a 1-5 rating (e.g. Occlusion's diagrams / pbox_img; "none" is
          its "didn't use it" button, counted apart and never averaged), a choice (one answer) or a tick-any list (an array) */
       var extra = {}, CORE = { ready:1, went:1, match:1, missed:1 };
       ans.forEach(function(r){ Object.keys(r.answers).forEach(function(id){
@@ -1079,25 +1080,38 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       .map(function(r){ return { hub: r.hub, qid: r.qid, attempts: r.attempts, pct: Math.round(r.correct / r.attempts * 100) }; })
       .sort(function(a, b){ return a.pct - b.pct || b.attempts - a.attempts; });
   }
-  /* question text comes from each live hub's own SH_EXPORT, read from a hidden same-site
-     frame (?sh_export=1 keeps that copy from logging any activity) */
-  var QTEXT = {}, qtextLoaded = {};
-  function loadQuestionText(hub){
-    if (qtextLoaded[hub] || isArchived(hub)) return;
-    qtextLoaded[hub] = true;
-    var f = document.createElement("iframe");
+  /* A hub's own SH_EXPORT, read from a hidden same-site frame (?sh_export=1 keeps that copy from logging any activity).
+     An old single-file hub has it as soon as the frame loads. A hub on the engine (widget/hub.js: its page sets
+     window.SH_HUB) fills it once its content JSON has arrived, so wait for the questions. use(export or null) runs
+     while the frame is still there (question health fingerprints the frame's own objects); then the frame goes. */
+  function hubFrame(hub, use, wait){
+    var f = document.createElement("iframe"), done = false, t0 = Date.now();
+    function fin(ex){ if (done) return; done = true; try { use(ex || null); } catch (e) {} try { f.remove(); } catch (e) {} }
     f.src = "../hubs/" + encodeURIComponent(hub) + "/index.html?sh_export=1";
     f.style.cssText = "position:absolute;width:1px;height:1px;border:0;left:-9999px";
     f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
     f.onload = function(){
-      try {
-        var ex = f.contentWindow.SH_EXPORT;
-        (ex && ex.questions || []).forEach(function(q){ QTEXT[hub + "|" + q.id] = q; });
-      } catch (e) {}
-      f.remove();
-      if (state.tab === "overview" || state.tab === "questions") renderView(state.tab);
+      (function poll(){
+        if (done) return;
+        var w = null, ex = null;
+        try { w = f.contentWindow; ex = w.SH_EXPORT; } catch (e) { return fin(null); }
+        if (ex && Array.isArray(ex.questions)) return fin(ex);
+        if (!w || !w.SH_HUB || Date.now() - t0 > (wait || 15000)) return fin(ex);   /* not on the engine: what's there is all there is */
+        setTimeout(poll, 150);
+      })();
     };
+    setTimeout(function(){ fin(null); }, (wait || 15000) + 5000);
     document.body.appendChild(f);
+  }
+  /* question text comes from each live hub's own SH_EXPORT */
+  var QTEXT = {}, qtextLoaded = {};
+  function loadQuestionText(hub){
+    if (qtextLoaded[hub] || isArchived(hub)) return;
+    qtextLoaded[hub] = true;
+    hubFrame(hub, function(ex){
+      (ex && ex.questions || []).forEach(function(q){ QTEXT[hub + "|" + q.id] = q; });
+      if (state.tab === "overview" || state.tab === "questions") renderView(state.tab);
+    });
   }
   function topWrong(hub, qid){
     var q = QTEXT[hub + "|" + qid]; if (!q || !q.choices) return null;
@@ -1633,13 +1647,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
         choices: choices, answer: choices && typeof ai === "number" ? choices[ai] : (q.ans || ""), answerIndex: typeof ai === "number" ? ai : null };
     }
     recapBanks[hub] = new Promise(function(resolve){
-      var f = document.createElement("iframe");
-      f.src = "../hubs/" + encodeURIComponent(hub) + "/index.html?sh_export=1";
-      f.style.cssText = "position:absolute;width:1px;height:1px;border:0;left:-9999px"; f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
-      var done = function(list){ f.remove(); resolve(list); };
-      f.onload = function(){ try { done(((f.contentWindow.SH_EXPORT || {}).questions || []).map(norm)); } catch (e) { done([]); } };
-      setTimeout(function(){ if (f.isConnected) done([]); }, 15000);
-      document.body.appendChild(f);
+      hubFrame(hub, function(ex){ var list = []; try { list = ((ex || {}).questions || []).map(norm); } catch (e) {} resolve(list); });
     });
     return recapBanks[hub];
   }
@@ -1752,7 +1760,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   var SURFACE_LABEL = { notes: "Notes", bank: "Question bank", review: "Review", mock: "Mock exam", drill: "Daily drill", hints: "Exam hints", cram: "Cram sheet",
     "weak-spots": "Weak spots", home: "Home", podcast: "Timmy Time", arcade: "Arcade", recall: "Active recall", other: "Other", unknown: "No section sent", retired: "Retired (Atlas)" };
   var insights = null;
-  /* each hub's most recent exam (its first if none has passed yet), from the dashboard's own HUBS / ARCHIVED_HUBS */
+  /* each hub's most recent exam (its first if none has passed yet), from the dashboard's own hubs.js (hubs and archived) */
   function hubExam(h){
     var x = dash.src && dash.src.hubs.concat(dash.src.archived).filter(function(y){ return y.id === h; })[0];
     var ex = ((x && x.exams) || []).map(function(e){ return e && e.date; }).filter(function(d){ return /^\d{4}-\d{2}-\d{2}$/.test(d || ""); }).sort();
@@ -2108,7 +2116,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
 
   /* ---------- Hubs: the dashboard state of every hub, and a manual override (migration_v50) ----------
      State (widget/archive.js): an override set here wins until it is set back to Automatic or its end time passes;
-     otherwise the dates in index.html (HUBS) decide. The schedule is read from the dashboard's own source, so it is
+     otherwise the dates in hubs.js decide. The schedule is read from the dashboard's own source, so it is
      always the one students get. Every change goes through a confirmation step, carries the version the page showed
      (a change from another tab is refused, not overwritten) and lands in the audit log. */
   var STATE_WORD = { live: "Live", archived: "Archived", hidden: "Hidden", auto: "Automatic" };
@@ -2163,7 +2171,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     return r;
   }
   function scheduleText(x, r){
-    if (x.listed) return r.cardGoneAt ? "Automatic: archived in the code (ARCHIVED_HUBS); card " + (new Date() < r.cardGoneAt ? "until " + when(r.cardGoneAt) : "gone since " + when(r.cardGoneAt)) + "." : "Automatic: archived in the code, no card.";
+    if (x.listed) return r.cardGoneAt ? "Automatic: archived in the code (hubs.js, archived); card " + (new Date() < r.cardGoneAt ? "until " + when(r.cardGoneAt) : "gone since " + when(r.cardGoneAt)) + "." : "Automatic: archived in the code, no card.";
     if (!r.archiveAt) return "Automatic: live (no exam date yet).";
     var now = new Date();
     if (now < r.archiveAt) return "Automatic: live until " + when(r.archiveAt) + ", then archived" + (r.cardGoneAt ? " until " + when(r.cardGoneAt) + ", then hidden." : ".");
@@ -2367,7 +2375,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   var QH_SRC = { version: "this version", all: "all answers ever", feedback: "students", ids: "ids" };
   var QH_KIND = { mcq: "Multiple choice", "mcq:tf": "True/false", "mcq:2stmt": "Two statements", "mcq:num": "Numbered statements", multi: "Select all", match: "Matching", sequence: "Ordering", recall: "Recall" };
   var QH_REASON = { "wrong-key": "answer looks wrong", confusing: "confusing wording", "not-in-notes": "not in the notes", explanation: "explanation didn’t help", giveaway: "gives the answer away" };
-  /* the hubs live on the dashboard now (dash.live, from index.html): an archived hub's page may be gone, and its questions no
+  /* the hubs live on the dashboard now (dash.live, from hubs.js): an archived hub's page may be gone, and its questions no
      longer change */
   function qhHubs(){
     var seen = {}, out = [];
@@ -2386,15 +2394,9 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   function qhExport(hub){
     if (QH.ex[hub] !== undefined) return Promise.resolve(QH.ex[hub]);
     return new Promise(function(res){
-      var f = document.createElement("iframe"), done = false;
-      function fin(ex){ if (done) return; done = true; try { f.remove(); } catch (e) {} QH.ex[hub] = ex; res(ex); }
-      f.src = "../hubs/" + encodeURIComponent(hub) + "/index.html?sh_export=1";
-      f.style.cssText = "position:absolute;width:1px;height:1px;border:0;left:-9999px";
-      f.setAttribute("aria-hidden", "true"); f.tabIndex = -1;
-      f.onload = function(){
+      hubFrame(hub, function(x){
         var ex = null;
         try {
-          var x = f.contentWindow.SH_EXPORT;
           if (x && Array.isArray(x.questions) && window.shQH) {
             var fps = {}; x.questions.forEach(function(q){ if (q && q.id) fps[q.id] = window.shQH.fp(q); });
             var qs = JSON.parse(JSON.stringify(x.questions)), byId = {};
@@ -2403,10 +2405,8 @@ table.data.tm-table td.lbl{white-space:nowrap;}
             ex = { questions: qs, byId: byId, lec: lec };
           }
         } catch (e) {}
-        fin(ex);
-      };
-      setTimeout(function(){ fin(null); }, 25000);
-      document.body.appendChild(f);
+        QH.ex[hub] = ex; res(ex);
+      }, 20000);
     });
   }
   function qhLoad(hub){

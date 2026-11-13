@@ -42,9 +42,7 @@
   /* ---------- Timmy's place (redesign phase 4, part C): its page in More. The card, and the full view from it, are
      widget/place.js (window.shPlace), with the kit of drawings it fetches; none of it loads with the page. What Timmy
      owns and where it stands come in the page's bootstrap once the database has the game layer (migration_v54);
-     without it the place shows the defaults with your rank and medals. Everyone has Timmy, so everyone has a place
-     (the core's More asks hasTimmy() for its row). ---------- */
-  function hasTimmy(){ return true; }
+     without it the place shows the defaults with your rank and medals. Everyone has Timmy, so everyone has a place. ---------- */
   function morePlace(body){
     var shut = function(){ if (body.isConnected) body.innerHTML = '<p class="note">Timmy’s place couldn’t be opened just now. Try again in a moment.</p>'; };
     loadScript(WIDGET + "place.js").then(function(){
@@ -162,7 +160,7 @@
   }
   function askMount(){
     if (askMounted || !window.shAsk) return; askMounted = true;
-    window.shAsk.mount({ where: "hub", hub: HUB, name: C.name || HUB, exam: C.exam || null, about: C.about || "../../../about/",
+    window.shAsk.mount({ where: "hub", hub: HUB, name: C.name || HUB, exam: C.exam || null, about: C.about || "../../about/",
       answeredEvent: HX.EVT, section: function(){ return HX.section(); }, place: askPlace,
       lecName: function(lec){ var l = HX.LBY[lec]; return l ? HX.lecLabel(l) + " " + HX.shortTitle(l) : ""; },
       core: function(){ return HX.CORE; }, state: function(){ return STATE; },
@@ -225,7 +223,7 @@
   }
 
   /* what the other files call from here */
-  HX.say = say; HX.petHp = petHp; HX.timmyReact = timmyReact; HX.petFromBadges = petFromBadges; HX.hasTimmy = hasTimmy; HX.morePlace = morePlace;
+  HX.say = say; HX.petHp = petHp; HX.timmyReact = timmyReact; HX.petFromBadges = petFromBadges; HX.morePlace = morePlace;
   HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.costumeOfDay = costumeOfDay;
   HX.askStart = askStart; HX.askOn = askOn; HX.askLabel = askLabel; HX.askAbout = askAbout;
 };

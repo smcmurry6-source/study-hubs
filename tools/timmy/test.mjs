@@ -24,8 +24,8 @@ let checks = 0;
 function ok(cond, what){ checks++; if (!cond) problems.push(what); return !!cond; }
 function eq(got, want, what){ return ok(JSON.stringify(got) === JSON.stringify(want), `${what}: got ${JSON.stringify(got)}, expected ${JSON.stringify(want)}`); }
 
-const HUBS = fs.readdirSync(path.join(ROOT, "hubs")).filter(h => fs.existsSync(path.join(ROOT, "hubs", h, "next/content/notes.json"))).sort();
-const read = (h, f) => JSON.parse(fs.readFileSync(path.join(ROOT, "hubs", h, "next/content", f + ".json"), "utf8"));
+const HUBS = fs.readdirSync(path.join(ROOT, "hubs")).filter(h => fs.existsSync(path.join(ROOT, "hubs", h, "content/notes.json"))).sort();
+const read = (h, f) => JSON.parse(fs.readFileSync(path.join(ROOT, "hubs", h, "content", f + ".json"), "utf8"));
 const DATA = Object.fromEntries(HUBS.map(h => [h, { core: read(h, "core"), notes: read(h, "notes"), study: read(h, "study") }]));
 const SITE = JSON.parse(fs.readFileSync(path.join(ROOT, "supabase/functions/timmy/site.json"), "utf8"));
 

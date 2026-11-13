@@ -75,12 +75,12 @@
   function typingIn(e){ var t = e.target; return t && (t.tagName === "INPUT" || t.tagName === "SELECT" || t.tagName === "TEXTAREA"); }
 
   /* ---------- the game layer (migration_v54, at the redesign's release; vault/reference/game-server.md) ----------
-     On a page on the game layer (window.shGame.v2(): the redesign's hubs, once the database has it), each game played is
+     On a page on the game layer (window.shGame.v2(): a hub on the engine, once the database has it), each game played is
      a session on the server: it starts when play starts (played: every game here calls it from begin(); a hub's own games
-     get the call from tools/hub-next/build.mjs), its answers carry it (session(), read by widget/hub-rewards.js), and it
-     finishes with the score (over, which a hub's submitScore asks first, also put there by the build). The finish pays
+     call it themselves in their arcade.js, where the start overlay comes off), its answers carry it (session(), read by widget/hub-rewards.js), and it
+     finishes with the score (over, which a hub's submitScore asks first). The finish pays
      +50 for a game that ended 20 seconds or more after it started, once per game per day, and the server posts the score
-     itself, so the page doesn't call submit_arcade_score for that game. Anywhere else (every live hub) played() returns at
+     itself, so the page doesn't call submit_arcade_score for that game. Anywhere else (the old single-file hubs) played() returns at
      once and nothing calls over(), so the games make exactly today's calls. */
   var RUN = null, RAN = {};
   function gameOn(){ var G = window.shGame; return !!(G && G.v2 && G.v2() && G.startSession && G.finishSession); }

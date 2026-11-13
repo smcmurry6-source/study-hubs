@@ -1,4 +1,4 @@
-"""Word timings for a hub's lecture narration, so the redesigned hub can highlight each word as Listen reads it.
+"""Word timings for a hub's lecture narration, so a hub on the engine can highlight each word as Listen reads it.
 
   python3 tools/narration_words.py <hub>                  every lecture and level that has an mp3
   python3 tools/narration_words.py <hub> --lec dmpharm --level full
@@ -6,9 +6,8 @@
   python3 tools/narration_words.py <hub> --stale          make only those
   python3 tools/narration_words.py <hub> --lec X --level full --render    the exact way, for a file that fits badly
 
-Writes hubs/<hub>/audio/<lecture>-<level>.words.json beside each <lecture>-<level>.mp3, for the redesign's Follow along
-(widget/hub.js). The words come from the notes as the redesign shows them (hubs/<hub>/next/content/notes.json, the live
-hub's READINGS) and are read the way tools/narrate.py reads them; the times come from the mp3 itself: Kokoro's duration
+Writes hubs/<hub>/audio/<lecture>-<level>.words.json beside each <lecture>-<level>.mp3, for Follow along
+(widget/hub.js). The words come from the notes as the hub shows them (hubs/<hub>/content/notes.json) and are read the way tools/narrate.py reads them; the times come from the mp3 itself: Kokoro's duration
 predictor (the model cut down to its duration output, about 20 times faster than speaking) says where each sound falls in
 a fresh rendering, and an alignment of that timeline's speech and pauses to the mp3's loudness (place()) moves every word
 onto the real recording, so narration made with other pauses or an older lexicon still lines up. Nothing is re-spoken and
@@ -357,7 +356,7 @@ def rerender(hub, lec, level, pred, html=None):
     closely wherever they say the same words). Returns the words placed on the recording, its length, and the minutes
     of the recording that don't sound like today's notes (the text changed after it was made: regenerate it with
     tools/narrate.py, text-and-audio-never-drift)."""
-    if html is None: html = json.load(open(os.path.join(ROOT, "hubs", hub, "next", "content", "notes.json")))[level][lec]
+    if html is None: html = json.load(open(os.path.join(ROOT, "hubs", hub, "content", "notes.json")))[level][lec]
     audio, timed = render_items(pred, narrate.spoken(html, shown=True))
     fresh = np.interp(np.arange(int(len(audio) * SR / 24000)) * 24000 / SR, np.arange(len(audio)), audio).astype(np.float32)
     pcm = np.frombuffer(subprocess.run(["ffmpeg", "-v", "error", "-i", mp3_path(hub, lec, level), "-f", "f32le", "-ac", "1", "-ar", str(SR), "-"], check=True, capture_output=True).stdout, dtype=np.float32)
@@ -380,7 +379,7 @@ def fit(timed, loud):
 def build(hub, lec, level, pred=None, html=None):
     mp3 = mp3_path(hub, lec, level)
     if html is None:
-        html = (json.load(open(os.path.join(ROOT, "hubs", hub, "next", "content", "notes.json"))).get(level) or {}).get(lec)
+        html = (json.load(open(os.path.join(ROOT, "hubs", hub, "content", "notes.json"))).get(level) or {}).get(lec)
     if not html: raise SystemExit("no %s notes for %s in %s" % (level, lec, hub))
     pred = pred or Predictor()
     words, spans, breaks, plen = predict(pred, html)
@@ -412,7 +411,7 @@ def write_file(mp3, timed, alen, h=None):
 
 
 def files(hub, lecs=None, levels=None):
-    notes = json.load(open(os.path.join(ROOT, "hubs", hub, "next", "content", "notes.json")))
+    notes = json.load(open(os.path.join(ROOT, "hubs", hub, "content", "notes.json")))
     out = []
     for level in levels or ["full", "plain", "hy"]:
         for lec in (notes.get(level) or {}):

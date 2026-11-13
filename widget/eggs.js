@@ -1,5 +1,5 @@
 /* study-hubs easter eggs. Loaded by widget/v3.js, which hands over window.shEggHooks.
-   Everything here is optional fun: it switches off with Settings → Extras (bosses, fairy, Golden Probe and Full Arch have their own switches; the rest is "Hidden secrets"), never shows
+   Everything here is optional fun: it switches off with Settings → Extras (bosses, fairy and Golden Probe have their own switches; the rest is "Hidden secrets"), never shows
    during a mock exam, and every network call is best-effort.
 
    - Golden Probe: one taught question per hub per day is secretly golden; first right answer claims it
@@ -10,7 +10,6 @@
    - Konami code → 8-bit mode (keyboard, or on a phone: swipe up up down down left right left right, tap tap);
      type "floss" for a dancing tooth (three classmates flossing in the same hub within a minute make a Floss Chain)
    - type "mirror": the hub flips left-to-right, the way the mouth looks in a dental mirror
-   - Full Arch: every right answer grows a tooth in a little arch, every miss knocks one out; fill all 32
    - Cavity Search: each week a tiny cavity hides in one paragraph of each hub's Lecture Notes; the first five to tap it fill it
    - Holidays (Halloween, Thanksgiving, Christmas, New Year, Valentine's, Dentist's Day, St Patrick's, Easter): themed
      confetti and Plaque Boss, plus a magic word per holiday
@@ -27,7 +26,7 @@
   function on(){ return H.prefGet("sh_pref_eggs", "on") !== "off"; }
   function inMock(){ try { return /(^|\/)mock/.test(String(H.section() || "")); } catch (e) { return false; } }
   function ok(){ return on() && !inMock(); }
-  /* the eggs with their own switch in Settings → Extras (bosses, fairy, Golden Probe, Full Arch) don't follow "Hidden secrets" */
+  /* the eggs with their own switch in Settings → Extras (bosses, fairy, Golden Probe) don't follow "Hidden secrets" */
   function feat(k){ return H.prefGet("sh_pref_" + k, "on") !== "off" && !inMock(); }
   function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
   function rpc(name, args){
@@ -64,7 +63,6 @@
     owl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M5 4l3 3h8l3-3v9a7 7 0 0 1-14 0z"/><circle cx="9.5" cy="11" r="2"/><circle cx="14.5" cy="11" r="2"/><path d="M11 14.5l1 1.2 1-1.2"/></svg>',
     quote: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 18v-5c0-4 2-7 6-8l.7 1.6C8.3 7.6 7.5 9.3 7.5 11H10v7zm10 0v-5c0-4 2-7 6-8l.7 1.6c-2.4 1-3.2 2.7-3.2 4.4H20v7z"/></svg>',
     mirror: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="9" r="5.5"/><path d="M6.5 7.2a3 3 0 0 1 2.6-1.6"/><path d="M13 13l8 8"/></svg>',
-    arch: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 17C3.5 9 7 4 12 4s8.5 5 8.5 13"/><path d="M6 16.4v-2.6M9 15.2v-3M12 15v-3.4M15 15.2v-3M18 16.4v-2.6"/></svg>',
     cavity: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 3c-2.5 0-4 2-4 4.5 0 3 1.5 4.5 2 7 .5 3 1 6.5 2.5 6.5s1.8-3 2.2-5c.2-1 .6-1.5 2.3-1.5s2.1.5 2.3 1.5c.4 2 .7 5 2.2 5s2-3.5 2.5-6.5c.5-2.5 2-4 2-7C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/><path d="M12.6 7.4c1.4-.2 2.4.8 2 2-.5 1.2-2.2 1.4-2.8.4-.5-.8-.2-2.2.8-2.4z" fill="currentColor"/></svg>',
     root: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c-2.5 0-4 2-4 4.5 0 3 1.5 4.5 2 7 .5 3 1 6.5 2.5 6.5s1.8-3 2.2-5c.2-1 .6-1.5 2.3-1.5s2.1.5 2.3 1.5c.4 2 .7 5 2.2 5s2-3.5 2.5-6.5c.5-2.5 2-4 2-7C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/><path d="M9.5 8.5l1 8M14.5 8.5l-1 8"/></svg>'
   };
@@ -126,7 +124,8 @@
 
   /* ================= Holidays =================
      A holiday week dresses the hubs up: themed confetti (window.shConfettiTheme, read by v3.js), a costumed Plaque Boss,
-     a hat on the tooth buddy (window.shHoliday, read by pet.js) and a magic word that sets off a little parade. */
+     holiday lines for the tooth buddy (window.shHoliday, read by pet.js; he no longer dresses himself) and a magic word
+     that sets off a little parade. */
   var HSHAPE = {
     candy: '<svg viewBox="0 0 24 24"><path d="M12 2.5 L20.5 20 Q12 23 3.5 20 Z" fill="#F7F3E8"/><path d="M6.6 13.6 L17.4 13.6 L20.5 20 Q12 23 3.5 20 Z" fill="#F59A1E"/><path d="M3.5 20 Q12 23 20.5 20 L19.2 17.4 Q12 19.6 4.8 17.4 Z" fill="#F5D21E"/><path d="M12 2.5 L20.5 20 Q12 23 3.5 20 Z" fill="none" stroke="#7A4A12" stroke-width="1.1" stroke-linejoin="round"/></svg>',
     bat: '<svg viewBox="0 0 32 18"><path d="M16 5 C17 3 18 3 18.6 4.6 L19.6 3.4 L19.8 6.2 C22 5 25 3 31 3.6 C28.4 5.4 28 8 28.8 10.8 C26.4 9.6 24 10 22.8 12.4 C21.4 11 19.8 11.4 18.6 13.6 C17.6 12.6 16.8 12.8 16 15 C15.2 12.8 14.4 12.6 13.4 13.6 C12.2 11.4 10.6 11 9.2 12.4 C8 10 5.6 9.6 3.2 10.8 C4 8 3.6 5.4 1 3.6 C7 3 10 5 12.2 6.2 L12.4 3.4 L13.4 4.6 C14 3 15 3 16 5 Z" fill="#2B1B3D"/><circle cx="14.6" cy="6.6" r=".7" fill="#FFD84A"/><circle cx="17.4" cy="6.6" r=".7" fill="#FFD84A"/></svg>',
@@ -646,7 +645,6 @@
   document.addEventListener("sh:pref", function(e){
     var k = e.detail && e.detail.key;
     if (k === "sh_pref_boss") drawBoss();
-    else if (k === "sh_pref_arch" && archEl && !feat("arch")) archEl.classList.remove("is-shown");
   });
 
   /* ================= broadcasts from classmates ================= */
@@ -672,7 +670,6 @@
     rightRun = correct ? rightRun + 1 : 0;
     if (correct && feat("probe")) checkGolden(String(d.qid || ""));
     if (correct && feat("boss")) hitBoss(rightRun);
-    if (feat("arch")) archAnswer(correct);
     if (feat("fairy")) maybeFairy();
     if (!ok()) return;
     if (correct && sh8bit) blip();
@@ -901,88 +898,9 @@
     }
   });
 
-  /* ================= Full Arch: once per hub. Right answers grow teeth, misses knock them out; fill all 32 ================= */
-  /* retired on the redesign's pages (Sam, 2026-11-12: "I also want to remove the full arch challenge thing"): the hub
-     engine and the new dashboard (html.shx, or data-game="v2" on the widget's tag) never draw it. A live hub keeps it
-     until the release takes the code out. */
-  var ARCH_OFF = (function(){ try { return document.documentElement.classList.contains("shx") || !!document.querySelector('script[src*="v3.js"][data-game="v2"]'); } catch (e) { return false; } })();
-  var ARCH_KEY = "sh_egg_arch_" + HUB, ARCH_DONE = "sh_egg_arch_done_" + HUB, archEl = null, archHide = null;
-  var archN = Math.max(0, Math.min(31, +(ls(ARCH_KEY) || 0)));
-  function archDone(){ return ls(ARCH_DONE) === "1"; }
-  /* drawn as a little dental chart: maxillary teeth #1-16 on top (roots up), mandibular #32-17 below (roots down),
-     patient's right on the viewer's left, the way a chart reads */
-  var ARCH_TYPE = "MMMPPCIIIICPPMMM";
-  var ARCH_SHAPE = {
-    M: "M0.6 9 L0.3 2 Q0.5 0 1.5 .6 L2.7 7 L4.7 7 L5.9 .6 Q6.9 0 7.1 2 L6.8 9 Q7.4 15 5.9 17 Q3.7 18.3 1.5 17 Q0 15 .6 9 Z",
-    P: "M1.4 9 L2.5 1 Q3.5 -.4 4.5 1 L5.6 9 Q6.8 14 5.4 16.6 Q3.5 18 1.6 16.6 Q.2 14 1.4 9 Z",
-    C: "M1.5 8 L2.6 -.6 Q3.5 -1.6 4.4 -.6 L5.5 8 Q6.7 13 3.5 18 Q.3 13 1.5 8 Z",
-    I: "M1.7 9 L2.6 .6 Q3.5 -.4 4.4 .6 L5.3 9 Q6.1 14 5.5 17.4 L1.5 17.4 Q.9 14 1.7 9 Z"
-  };
-  function archSvg(){
-    var s = '<svg viewBox="0 0 136 44" aria-hidden="true">';
-    for (var k = 1; k <= 32; k++) {
-      var upper = k <= 16, i = upper ? k - 1 : 32 - k, t = ARCH_TYPE.charAt(i);
-      var x = 2.2 + i * 8.25 + (t === "M" ? 0 : .5);
-      /* the position (and the lower arch's flip) lives on a wrapper group: the pop animation's CSS transform on the
-         path itself would otherwise replace it, and fill-box origins would shift the flipped lower teeth */
-      s += '<g transform="translate(' + x.toFixed(2) + (upper ? ' 2)' : ' 42) scale(1 -1)') + '"><path class="egg-arch-t" data-k="' + k + '" d="' + ARCH_SHAPE[t] + '"/></g>';
-    }
-    return s + '<path d="M2 22 H134" stroke="currentColor" stroke-width=".6" stroke-dasharray="2 2" opacity=".35"/></svg>';
-  }
-  function archDraw(pop){
-    if (!archEl) return;
-    archEl.querySelectorAll(".egg-arch-t").forEach(function(t){
-      var k = +t.getAttribute("data-k");
-      t.classList.toggle("is-in", k <= archN);
-      if (k === pop) { t.classList.remove("is-pop"); void t.getBoundingClientRect(); t.classList.add("is-pop"); }
-    });
-    archEl.querySelector(".sh-egg-arch-n").textContent = archN + " / 32";
-  }
-  function archShow(){
-    if (!archEl) {
-      archEl = document.createElement("div");
-      archEl.className = "sh-egg sh-egg-arch";
-      archEl.setAttribute("role", "img");
-      archEl.title = "Full Arch: every right answer grows a tooth, every miss knocks one out. Fill all 32.";
-      archEl.innerHTML = archSvg() + '<div class="sh-egg-arch-cap"><b>Full Arch</b><span class="sh-egg-arch-n"></span></div>';
-      document.body.appendChild(archEl);
-    }
-    archEl.setAttribute("aria-label", "Full Arch, " + archN + " of 32 teeth");
-    requestAnimationFrame(function(){ archEl.classList.add("is-shown"); });
-    clearTimeout(archHide);
-    archHide = setTimeout(function(){ if (archEl) archEl.classList.remove("is-shown"); }, 5500);
-  }
-  function knockOut(k){
-    if (!archEl) return;
-    var t = archEl.querySelector('.egg-arch-t[data-k="' + k + '"]'); if (!t || !t.getBoundingClientRect) return;
-    var r = t.getBoundingClientRect(), f = document.createElement("span");
-    f.className = "sh-egg sh-egg-arch-fly"; f.setAttribute("aria-hidden", "true");
-    f.style.left = r.left + "px"; f.style.top = r.top + "px";
-    f.innerHTML = IC.tooth;
-    document.body.appendChild(f);
-    setTimeout(function(){ f.remove(); }, 900);
-  }
-  function archAnswer(correct){
-    if (ARCH_OFF || archDone() || !feat("arch")) return;
-    if (!archEl) archShow();
-    if (correct) { archN++; archShow(); archDraw(archN); }
-    else if (archN > 0) { archShow(); knockOut(archN); archN--; archDraw(0); }
-    else return;
-    ls(ARCH_KEY, String(archN));
-    if (archN >= 32) {
-      ls(ARCH_DONE, "1"); ls(ARCH_KEY, null);
-      archEl.classList.add("is-full");
-      H.confetti(); setTimeout(H.confetti, 350); setTimeout(H.confetti, 700);
-      rpc("record_achievement", { p_visitor: VISITOR, p_kind: "fullarch", p_hub: HUB });
-      toast(row(IC.arch, "Full Arch!", "All 32 teeth, fully erupted. That's the whole adult dentition for this hub. It's on your trophy shelf now."), 7000, "is-gold");
-      announce("fullarch");
-      clearTimeout(archHide);
-      setTimeout(archRetire, 4000);
-    }
-  }
-  function archRetire(){ if (!archEl) return; var el = archEl; archEl = null; el.classList.remove("is-shown"); setTimeout(function(){ el.remove(); }, 400); }
-  /* ranks.js knows from the server whether this hub's arch is already done (another device, cleared storage) */
-  document.addEventListener("sh:arch-done", function(e){ if (e.detail === HUB) { ls(ARCH_DONE, "1"); archRetire(); } });
+  /* Full Arch (a 32-tooth chart that filled as you answered) was retired at the redesign's release (Sam, 2026-11-12:
+     "I also want to remove the full arch challenge thing"). A Full Arch already won stays in its owner's trophy case as
+     retired (widget/ranks.js, RETIRED). */
 
   /* ================= Cavity Search: a weekly cavity hidden in one paragraph of the Lecture Notes ================= */
   function isoWeek(){

@@ -1,5 +1,5 @@
-/* ============ THE NEW DASHBOARD'S LAYOUT (widget/dash.css, with widget/dash.js) ============
-   Redesign phase 3. Loaded only by next/index.html, after widget/hub.css, which brings the design system: the tokens, the
+/* ============ THE DASHBOARD'S LAYOUT (widget/dash.css, with widget/dash.js) ============
+   Loaded by index.html (inside widget/site.bundle.css), after widget/hub.css, which brings the design system: the tokens, the
    typeface, buttons, segments, panels and the Settings rows. Everything here is the dashboard's own layout, under .dx
    (the page's root, which is also .hx), so it can never change a hub. Flat surfaces a tone step apart, one radius pair,
    each hub's tint on its own tab and panel, shadows only on what floats (the menu, dialogs, pop-ups). */

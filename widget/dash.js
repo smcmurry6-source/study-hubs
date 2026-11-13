@@ -1,6 +1,5 @@
-/* The new dashboard (redesign phase 3, vault/tasks/2026-11-05-redesign-phase-3-dashboard.md). Loaded only by
-   next/index.html, the page built beside the live dashboard (index.html) until the redesign is released: outside a preview
-   that page sends the visitor to the live dashboard, so nothing here reaches the class before then.
+/* The dashboard (the redesign's, live since its release; vault/tasks/2026-11-05-redesign-phase-3-dashboard.md). Loaded by
+   index.html inside widget/dash.bundle.js (tools/bundle/build.mjs: edit this file, then rebuild).
 
    What it draws, on the hub engine's design system (widget/hub.css, with widget/dash.css for the layout):
    - the hubs as tabs (emblem, tint, days to the exam), the next exam's first, and under them that hub's stage: its
@@ -17,24 +16,25 @@
    No What's new list, no arcade scores and no "When people study" chart (Sam, 2026-11-11); a hub's "Updated" label still reads the changelog.
    The check-in, survey, name, luck and archive logic is the live dashboard's own, moved here unchanged.
 
-   Its data is next/hubs.js (window.SH_DASH_DATA), written from index.html by tools/dash-next/build.mjs until the release.
-   The game layer's functions (migration_v54, not applied until the release) are called as <name>_v2 with today's function
-   as the fallback, so the page works before and after the migration; a preview answers both from fixtures. */
+   Its data is hubs.js (window.SH_DASH_DATA), where a hub is added, dated or archived.
+   The game layer's functions (migration_v54) are called as <name>_v2 with the older function as the fallback, so the
+   page still works on a database without them (a preview answers both from fixtures). */
 (function(){
   "use strict";
   if (window.shDash) return;
   var D = window.SH_DASH_DATA; if (!D) return;
   var C = window.SH_DASH || {}, A = window.SH_HUB_ART || { icons: {}, flame: {}, spots: {} }, DA = window.SH_DASH_ART || { tints: {}, emblems: {} };
-  var ROOT = C.root || "../", WIDGET = C.widget || (ROOT + "widget/");
+  var ROOT = C.root || "./", WIDGET = C.widget || (ROOT + "widget/");
   var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
   var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
   var docEl = document.documentElement;
   docEl.classList.add("shx", "sh-dash");
 
-  /* ---------- the data (next/hubs.js) ---------- */
+  /* ---------- the data (hubs.js) ---------- */
   var CLASSES = D.classes, HUBS = D.hubs.slice(), ARCHIVED_HUBS = D.archived.slice(), HUB_LABEL = D.labels || {};
   var CHECKIN_HOUR = D.checkinHour, ARCHIVE_HOUR = D.archiveHour, CARD_DAYS = D.cardDays, DEBRIEF_DAYS = D.debriefDays;
-  var NEXT = {}; (D.next || []).forEach(function(id){ NEXT[id] = 1; });
+  /* hubs still on their old single-file page; every other hub is on the engine (widget/hub.js) */
+  var LEGACY = {}; (D.legacy || []).forEach(function(id){ LEGACY[id] = 1; });
 
   /* ---------- helpers ---------- */
   function $(id){ return document.getElementById(id); }
@@ -127,7 +127,7 @@
   applyTheme(ls("sh_theme") || ""); applySize();
 
   /* ---------- live, archived or hidden (the live dashboard's rules: widget/archive.js decides from the dates in
-     next/hubs.js plus any override set on the admin page; without it the dates alone decide) ---------- */
+     hubs.js plus any override set on the admin page; without it the dates alone decide) ---------- */
   function examAt(x, hour){ var d = parseYmd(x.date); d.setHours(hour, 0, 0, 0); return d; }
   function lastExam(hub){ return (hub.exams || []).filter(function(x){ return x.date; }).sort(function(a, b){ return a.date < b.date ? 1 : -1; })[0] || null; }
   function archiveAt(hub){
@@ -158,9 +158,9 @@
   var hubSig = partitionHubs();
   function shownArchived(){ return ARCHIVED_HUBS.filter(function(h){ return HUB_STATE[h.id] && HUB_STATE[h.id].state === "archived"; }); }
 
-  /* ---------- where a hub opens: its new version when it has one (hubs/<id>/next/), with that version's own routes ---------- */
+  /* ---------- where a hub opens: the engine's routes, or an old single-file hub's own ---------- */
   function hubHref(hub, part){
-    var isNew = !!NEXT[hub.id], base = ROOT + "hubs/" + hub.id + "/" + (isNew ? "next/" : "");
+    var isNew = !LEGACY[hub.id], base = ROOT + "hubs/" + hub.id + "/";
     if (part === "drill") return base + (isNew ? "#questions/drill" : "#drill");
     if (part === "timmy") return base + (isNew ? "#more/timmy" : "#timmy");
     return base;
@@ -462,11 +462,12 @@
   function timmyArt(fit, mood){
     var P = window.shPet, O = window.SH_OUTFITS, svg;
     fit = cleanFit(fit);
-    if (fit.indexOf(":") > 0) svg = P.art({ hp: 100, mood: mood || "happy", hat: "", fit: fit }, 200);
-    else {
-      svg = P.art({ hp: 100, mood: mood || "happy", hat: "" }, 200);
-      if (fit && O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
-      else if (fit && !O) wantOutfits();
+    svg = P.art({ hp: 100, mood: mood || "happy", hat: "" }, 200);
+    /* "<holiday>:<outfit>" is what a page from before the release still sends (he dressed himself for holidays then):
+       those drawings are gone, so that Timmy sits with nothing on */
+    if (fit && fit.indexOf(":") < 0) {
+      if (O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
+      else if (!O) wantOutfits();
     }
     return String(svg).replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
   }
@@ -809,8 +810,9 @@
       if (step < last) h += '<button type="button" class="btn ' + (v != null ? 'btn-primary' : 'btn-quiet') + '" data-act="next">' + (v != null ? 'Next' : 'Skip') + '</button>';
       else h += '<button type="button" class="btn btn-primary survey-send" data-act="send">Send</button>';
       box.innerHTML = h + '</div>';
+      /* an old single-file hub has no answer keys on the server, so an idea from its check-in is for all hubs */
       var th = box.querySelector("[data-idea-tick]");
-      ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
+      ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: LEGACY[hub.id] ? null : hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
       refresh();
       var t = box.querySelector("textarea"); if (t && step && window.matchMedia && matchMedia("(hover:hover)").matches) setTimeout(function(){ try{ t.focus({ preventScroll:true }); }catch(e){} }, 60);
     }
@@ -1028,8 +1030,7 @@
   document.addEventListener("sh:name", function(e){ if (nameTold) return; localName = String(e && e.detail && e.detail.name || "").slice(0, 24); paintName(); });
 
   /* Settings: the same keys the hubs' Settings keep (widget/hub.js and widget/v3.js: keep the three lists in step), so a
-     change here shows in every hub. The font choice, background music and the accent metal are cut (plan, 4.6), and Full
-     Arch is retired on the redesign (Sam, 2026-11-12), so its switch is in v3.js's list only. */
+     change here shows in every hub. The font choice, background music and the accent metal are cut (plan, 4.6). */
   var EXTRAS = [
     ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy: ask him about the notes. Right answers and study streaks keep him healthy. Off, an Ask button takes his place.", [["on", "Everywhere"], ["dash", "Dashboard only"], ["off", "Off"]]],
     ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in each hub's trophy case."],
@@ -1039,12 +1040,13 @@
     ["sh_pref_nuke", "Tactical nukes", "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes.", [["on", "On"], ["mine", "Mine only"], ["off", "Off"]]],
     ["sh_pref_celebrate", "Rank-up and trophy cards", "The rank-up cutscene, level-up, trophy and medal cards."],
     ["sh_pref_cheers", "Streak cheers", "Confetti and a toast every 5 right in a row."],
+    ["sh_pref_flame", "Streak flame", "The flame in the corner that counts your run from 3 right in a row."],
     ["sh_pref_fx", "Answer animations", "Pops, shakes, sweeps and fades. Off keeps the check and X marks."]
   ];
   function prefSet(k, v){ lsSet(k, v); try { document.dispatchEvent(new CustomEvent("sh:pref", { detail: { key: k, val: v } })); } catch (e) {} }
   function seg(key, opts, cur){ return '<span class="seg" role="group" data-key="' + esc(key) + '">' + opts.map(function(o){ return '<button type="button" data-val="' + esc(o[0]) + '" aria-pressed="' + (cur === o[0]) + '">' + esc(o[1]) + "</button>"; }).join("") + "</span>"; }
   /* Focus mode (Sam, 2026-11-06): one switch that turns every extra off, and back to what you had. Same keys as widget/hub.js. */
-  var FOCUS_KEYS = EXTRAS.map(function(x){ return x[0]; }).concat(["sh_pref_flame"]);
+  var FOCUS_KEYS = EXTRAS.map(function(x){ return x[0]; });
   function focusOn(){ return ls("sh_pref_focus") === "on"; }
   function setFocus(on){
     if (on === focusOn()) return;
@@ -1873,13 +1875,13 @@
        hub (Sam, 2026-11-12: "timmy doesnt ask what hub when on the dashboard"); a link opens that hub's page at it */
     if (window.shAsk) window.shAsk.mount({ where: "dashboard", sb: sb, name: "Study Hubs", about: C.about || ROOT + "about/",
       section: function(){ return "dashboard"; },
-      hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: NEXT[h.id] ? ROOT + "hubs/" + h.id + "/next/content/" : null }; }); },
+      hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: LEGACY[h.id] ? null : ROOT + "hubs/" + h.id + "/content/" }; }); },
       href: function(id){ var h = HUBS.concat(ARCHIVED_HUBS).filter(function(x){ return x.id === id; })[0]; return h ? hubHref(h) : ""; },
       spot: function(){ return $("askSpot"); } });
     /* Timmy (widget/pet.js) lives in the "you" card. Everyone has Timmy (Ask Timmy, part 4): no adoption and no
        introduction, and he wears what's on at his place (the v2 bootstrap's shop), nothing when nothing is. */
     if (window.shPet) {
-      window.shPet.mount({ where: "dashboard", sb: sb, visitor: VISITOR, everyone: true,
+      window.shPet.mount({ where: "dashboard", sb: sb, visitor: VISITOR,
         name: function(){ return localName || randomName; },
         home: function(){ return $("petHome"); }, bootstrap: bootstrap.ready });
     }
@@ -1890,7 +1892,9 @@
     /* the idea board (widget/ideas.js): its section stays hidden until its first load says the board is up (its
        server is migration_v54). An idea can be for a live hub or all hubs; an archived hub's ideas keep its name. */
     if (window.shIdeas) window.shIdeas.mount($("ideas"), { sb: sb,
-      hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h) }; }); },
+      /* only a hub on the engine can be named: the server takes an idea's hub from the hubs whose answer keys it holds,
+         and an old single-file hub has none ("All hubs" is always there) */
+      hubs: function(){ return HUBS.filter(function(h){ return !LEGACY[h.id]; }).map(function(h){ return { id: h.id, name: hubName(h) }; }); },
       name: function(id){ var h = debriefHub(id); return h ? hubName(h) : HUB_LABEL[id] || ""; },
       tint: tintVars, editName: openNameEditor, nameHint: function(){ return randomName; },
       onReady: function(ok){ $("ideas").hidden = !ok; } });

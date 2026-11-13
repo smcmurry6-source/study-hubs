@@ -90,9 +90,9 @@ jobs:
       - name: Drawn Patient Box cases (realistic numbers, keys agree)
         if: ${{ !cancelled() }}
         run: node tools/ci/cases.js
-      - name: The redesign's generated files are current (site art, the new hubs' content from the live hubs, the new dashboard's hub list, Ask Timmy's site help from the About page, the bundles from the widget files)
+      - name: Generated files are current (site art, each hub's question index and High yield from its content, Occlusion's and Perio's figures, Ask Timmy's site help from the About page, the bundles from the widget files)
         if: ${{ !cancelled() }}
-        run: node tools/figures/site/build.mjs --check && node tools/hub-next/build.mjs --check && node tools/dash-next/build.mjs --check && node tools/timmy/build.mjs --check && node tools/bundle/build.mjs --check
+        run: node tools/figures/site/build.mjs --check && node tools/hub-next/build.mjs --check && node tools/figures/occlusion/build.mjs --check && node tools/figures/perio/build.mjs --check && node tools/timmy/build.mjs --check && node tools/bundle/build.mjs --check
 
   smoke:
     needs: scope

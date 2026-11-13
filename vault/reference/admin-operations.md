@@ -63,7 +63,7 @@ card). Precedence, highest first (`shArchive.resolve` in `widget/archive.js`; th
 1. **An override that is in force** (`hub_archive_overrides`): set on the Hubs view to Live, Archived or Hidden. It lasts
    until Sam sets the hub back to **Automatic**, or until its optional end time; after that the dates decide again
    (Sam, 2026-11-04). The end time must be in the future and at most 400 days away.
-2. **The dates in `HUBS`** in `index.html`: `archiveOn` and `hideCardOn` if a hub has them.
+2. **The dates in `hubs.js`** (the dashboard's hub list): `archiveOn` and `hideCardOn` if a hub has them.
 3. **The exam dates**: archived at `ARCHIVE_HOUR` (10 pm) on the last exam day, hidden `CARD_DAYS` (10) days later. A hub
    listed in `ARCHIVED_HUBS` starts archived.
 

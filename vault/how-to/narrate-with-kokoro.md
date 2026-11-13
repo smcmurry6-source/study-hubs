@@ -24,27 +24,26 @@ Encode to mp3 (ffmpeg or lameenc). ~20–30 chars/sec on one CPU — for many
 lectures, shard the job and skip files that already exist. Keep the job in the
 foreground/polled; an idle cloud VM is reclaimed and background work is lost.
 
-**`tools/narrate.py`** does the whole job for a hub whose notes sit in one-line `var READINGS = {...};` and
-`var READINGS_PLAIN = {...};` objects (heme-endo-exam2 and hubs built after it), or in perio's one template literal per
-lecture (`READINGS['<id>'] = ` then the notes in backticks, since 2026-11-05): it turns each lecture's notes into
+**`tools/narrate.py`** does the whole job for a hub on the engine (its notes are `hubs/<hub>/content/notes.json`: name the
+hub), and for an old single-file hub whose notes sit in its page (give it `hubs/<hub>/index.html`): it turns each lecture's notes into
 spoken text (the "What's tested" box, headings with a pause, tables read row by row, symbols, units and prescription
 shorthand spelled out: mg, po, qd/bid/tid/qid, q6h),
 uses Timmy Time's pronunciation lexicon (`tools/podcast/lexicon.json`) and writes both mp3s.
 
 ```bash
-python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec dmpharm --force
+python3 tools/narrate.py occlusion --lec nccl --force
 ```
 
-`--text` prints what it would say (check a new hub's hard words with it first), `--level full|plain` picks one level,
+`--text` prints what it would say (check a new hub's hard words with it first), `--level full|plain|hy` picks one level,
 `--jobs 4` runs lectures in parallel, and without `--force` it skips files that exist.
 
-**High yield** (the redesign's third reading level, since 2026-11-12) exists only in the redesign's
-`hubs/<hub>/next/content/notes.json` (`hy`), so give `narrate.py` that file instead of the hub's page:
+**High yield** (the third reading level, since 2026-11-12) is built into `hubs/<hub>/content/notes.json` (`hy`) by the
+content build, so record it after that build and run the build again after recording:
 
 ```bash
-python3 tools/narrate.py hubs/occlusion/next/content/notes.json --level hy --jobs 4             # every lecture with High yield
-python3 tools/narrate.py hubs/occlusion/next/content/notes.json --level hy --lec nccl --force   # one, again
-node tools/hub-next/build.mjs --hub occlusion                                                   # then always this
+python3 tools/narrate.py occlusion --level hy --jobs 4             # every lecture with High yield
+python3 tools/narrate.py occlusion --level hy --lec nccl --force   # one, again
+node tools/hub-next/build.mjs --hub occlusion                     # then always this
 ```
 
 It writes `audio/<lecture>-hy.mp3` and its words file, which records which text it was spoken from (`"h"`, the first 12
@@ -57,17 +56,17 @@ longer matches. One lecture on a 4-core machine speaks about 50 characters a sec
 minutes); `--jobs 4` manages about 40 a second in all, and the 21 lectures of 2026-11-12 (270,000 characters, 148 MB) took
 106 minutes.
 
-**Word timings for Follow along** (since 2026-11-12). The redesign highlights each word as Listen reads it
+**Word timings for Follow along** (since 2026-11-12). The engine highlights each word as Listen reads it
 (`widget/hub.js`), from a `<lecture>-<level>.words.json` beside each mp3: the words as the page shows them and when each is
 spoken. `narrate.py` writes it with every mp3 it renders, from Kokoro's own timings (`create_timed`, kokoro-onnx 0.6.1 or
 later, which `tools/kokoro-setup.sh` installs). For an mp3 made any other way, or before this, make it from the recording:
 
 ```bash
-python3 tools/narration_words.py heme-endo-exam2 --lec dmpharm --level full   # one file; without --lec, every narrated lecture
-python3 tools/narration_words.py heme-endo-exam2 --check                       # which are missing or stale (no Kokoro needed)
+python3 tools/narration_words.py occlusion --lec nccl --level full   # one file; without --lec, every narrated lecture
+python3 tools/narration_words.py occlusion --check                  # which are missing or stale (no Kokoro needed)
 ```
 
-It reads the notes from `hubs/<hub>/next/content/notes.json`, predicts where each sound falls with Kokoro's duration model
+It reads the notes from `hubs/<hub>/content/notes.json`, predicts where each sound falls with Kokoro's duration model
 (cut down to that output, about 20 times faster than speaking; it needs the `onnx` package, also installed by the setup
 script), and aligns that to the mp3's loudness; nothing is re-spoken. A minute or two for a 35-minute lecture. Checked against
 exact timings: median error 20-40 ms, 96-100% of words within 0.2 s (its docstring has the numbers). Each file it makes

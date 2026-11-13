@@ -22,7 +22,11 @@ tags: [shipping]
 6. **Write back to the vault in the same PR** ([repo-is-the-vault](../rules/repo-is-the-vault.md)): the task note's
    outcome, any decision Sam made, anything the next agent working on this hub needs to know.
 7. Add a line to "Recent major changes" in `DEPLOY_NOTES.md` for anything non-trivial (in the PR, or after merge),
-   and log it to the site changelog (`log_changelog`, see [secrets](../rules/secrets.md)) if students would notice it.
+   and log it to the site changelog (`log_changelog`, see [secrets](../rules/secrets.md)) if students would notice it:
+   it sets the hub's "Updated" label on the dashboard (there is no "What's new" list any more).
+8. **After a merge that changed a hub's questions** (added, edited, re-keyed or retired, in `hubs/<hub>/content/questions.json`):
+   load that hub's answer keys again, so the server grades and pays the new version
+   ([build-a-hub](build-a-hub.md), "The answer keys"). A new Timmy Time episode is registered the same way (`/podcast`).
 
 Never force-push `main`. If a PR conflicts, rebase and resolve deliberately —
 don't take one side wholesale; the other side is usually another session's work.

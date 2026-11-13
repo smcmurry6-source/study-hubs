@@ -1,5 +1,5 @@
 /* study-hubs guided tours: one for the dashboard, one for the inside of a hub.
-   Loaded by index.html (the dashboard) and by widget/v3.js in every hub.
+   Loaded by widget/dash.js (the dashboard, when "Take the tour" is tapped) and by widget/v3.js in every hub.
 
    The first time someone opens the dashboard, and separately the first time they open any hub, a card asks whether they
    want the tour ("Show me around" / "No thanks"). Either answer is remembered (sh_tour on the dashboard, sh_tour_hub for
@@ -92,7 +92,6 @@
   function $(sel){ return document.querySelector(sel); }
   function $$(sel){ return [].slice.call(document.querySelectorAll(sel)); }
   function txt(el){ return (el && el.textContent || "").replace(/\s+/g, " ").trim(); }
-  function timmyOn(){ return (ls("sh_pref_pet") || "on") !== "off"; }
   function phone(){ return window.innerWidth <= 640; }
   /* fixed or sticky parts (the hub's top bar, the launcher) don't need the page scrolled to them */
   function pinned(el){
@@ -104,59 +103,10 @@
 
   /* ---------- the dashboard's steps (top bar, then top to bottom; what's inside a hub is the hub's own tour) ---------- */
   function dashSteps(){
-    /* the redesigned dashboard (widget/dash.js, not live yet) gives its own steps through window.SH_TOUR.steps(), like the redesigned hubs */
+    /* the dashboard (widget/dash.js) gives its own steps through window.SH_TOUR.steps(), like the hubs on the engine.
+       (The old dashboard's steps came out with it at the redesign's release.) */
     if (window.SH_TOUR && typeof window.SH_TOUR.steps === "function") { try { return window.SH_TOUR.steps({ phone: phone(), visible: visible }); } catch (e) {} }
-    var S = [];
-    S.push({ title: "Welcome to Study Hubs",
-      body: "<p>This tour shows you everything on this page. It takes about a minute, and each hub has its own tour inside it.</p>" +
-        "<p>Use <b>Next</b> and <b>Back</b> (or the arrow keys). You can leave any time, and start it again from the <b>Tour</b> button at the top.</p>" });
-    S.push({ el: ".live-pill", title: "Studying now",
-      body: "<p>The green dot counts classmates who have a hub open right now, live.</p>" });
-    S.push({ el: "#inboxBtn", title: "Inbox",
-      body: "<p>Report a mistake or send a suggestion from any hub, and the reply lands here once it's dealt with. Notices to the whole class and the occasional short survey come here too.</p><p>A number on it means something new.</p>" });
-    S.push({ el: "#setBtn", title: "Settings",
-      body: "<p>Font, text size, background sounds (rain, ocean, coffee shop, lo-fi, piano), accent colors you unlock by rank, surprises on or off, Timmy Tooth, nuke alerts and your name.</p><p>Set them once here and they apply in every hub.</p>" });
-    S.push({ el: "#themeBtn", title: "Light or dark",
-      body: "<p>Switch between light, dark, or whatever your device uses.</p>" });
-    S.push({ el: "#aboutBtn", title: "About the hubs",
-      body: "<p>The full manual: every feature, all the arcade games, all 24 trophies, and, if you tick <b>Show spoilers</b>, how to find every easter egg.</p>" });
-    S.push({ el: "#greeting", title: "Your name",
-      body: "<p>Everyone starts with a random class name like “Gleaming Molar”. It's the name classmates see on the leaderboards.</p><p>Tap <b>Pick your name</b> to choose your own, or keep the random one to stay anonymous.</p>" });
-    S.push({ el: "#meRank", title: "Your handpiece rank",
-      body: "<p>You earn XP in every hub: <b>10</b> for a new question right, <b>2</b> for a repeat, <b>1</b> for trying, and <b>20</b> for each day you study.</p>" +
-        "<p>XP moves you up seven handpiece ranks, from Stone to Dark Matter, each with levels I, II and III. Each rank unlocks its metal as an accent in Settings.</p>" });
-    if (timmyOn()) {
-      if (visible($("#petHome"))) S.push({ el: "#petHome", title: "Timmy Tooth's house",
-        body: "<p>Your tooth buddy. His health comes from your answers in every hub: study and he stays healthy; skip days and he picks up plaque, then a cavity. He can't die.</p>" +
-          "<p>Tap him for a joke, <b>Checkup</b> for his chart, and <b>Secret tip</b> for hints about the easter eggs. Settings turns him off.</p>" });
-      else S.push({ el: ".shpet-perch", title: "Meet Timmy Tooth",
-        body: "<p>The little tooth sitting on your name is Timmy, an optional tooth buddy. Tap him after the tour to meet him.</p>" +
-          "<p>His health comes from how much you study, he tells jokes, and he drops hints about the easter eggs. Don't want him? Settings turns him off.</p>" });
-    }
-    S.push({ el: "#hero", title: "Your next exam",
-      body: "<p>A countdown to the next exam, with <b>Start studying</b> and <b>Daily drill</b> buttons. Other exams in the next two weeks are listed underneath.</p>" +
-        "<p>Beside it: your progress in that hub and your last two weeks of study days, with your streak and accuracy. The day before an exam, you can send classmates luck here.</p>" });
-    S.push({ el: "#hubs", title: "The hubs",
-      body: "<p>One card per exam, grouped by class: what it covers, its modes, your progress, and a Daily drill row. <b>Open</b> takes you in.</p>" +
-        "<p>After the exam, a <b>Check in</b> button asks how it went; your answers shape the next hubs. A hub archives itself the night of its last exam.</p>" });
-    S.push({ el: function(){ var h = $("#pulseHead"); return h && h.closest("section"); }, title: "The class",
-      body: "<p>Live boards for everyone using the hubs: handpiece ranks, study streaks, right answers in a row, the busiest study hours, and arcade high scores.</p>" +
-        "<p>Medals next to a name show which hubs that person has mastered.</p>" });
-    S.push({ el: "#recaps", title: "Hub recaps",
-      body: "<p>After an exam, a recap of how the class used that hub: hours studied, accuracy, the hardest question and more. <b>Save image</b> keeps one.</p>" });
-    S.push({ el: "#changelog", title: "What's new",
-      body: "<p>Every update to the hubs, newest first. Updates go live at this same link, so bookmark this page rather than a single hub.</p>" });
-
-    S.push({ title: "Trophies and surprises",
-      body: "<p>There are 24 trophies to earn, plus 9 in every hub, and many of them are secret. The hubs also hide easter eggs, a daily Golden Probe question, and bosses the whole class fights together when five or more of you are online.</p>" +
-        "<p>Timmy's <b>Secret tip</b> gives hints. Rather study in peace? <b>Settings → Extras</b> turns them off, one at a time or all at once.</p>" });
-    /* what's inside a hub is the hub's own tour, on the real buttons; this one only points there */
-    S.push({ el: function(){ var b = $("#hubs a.btn-primary[data-hub]"); return visible(b) ? b : $("#hubs"); }, title: "Inside a hub",
-      body: "<p>The first time you open a hub, it offers its own tour: a spotlight on the real buttons for the notes and narration, the question bank, mock exam, daily drill, Review, Arcade and search.</p>" +
-        "<p>Take it again any time from the hub's <b>Tour</b> button, or <b>Take the tour</b> under <b>More</b> on a phone.</p>" });
-    S.push({ el: "#tourBtn", title: "That's the tour", last: true, about: "about/",
-      body: "<p>Start it again any time from this <b>Tour</b> button. For every detail, open <b>About</b>.</p><p>Happy studying!</p>" });
-    return S;
+    return [];
   }
 
   /* ---------- a hub's steps: its top bar, then Compendium tab by tab, Review, Arcade, the launcher ---------- */
@@ -186,7 +136,8 @@
     return t.replace(/\s*\bhub\b\s*$/i, "") || "this hub";
   }
   function hubSteps(){
-    /* the redesigned hubs (widget/hub.js, not live yet) give their own steps through window.SH_TOUR.steps() */
+    /* a hub on the engine (widget/hub.js) gives its own steps through window.SH_TOUR.steps(); the steps below are an old
+       single-file hub's */
     if (window.SH_TOUR && typeof window.SH_TOUR.steps === "function") { try { return window.SH_TOUR.steps({ phone: phone(), visible: visible }); } catch (e) {} }
     var S = [], name = hubTitle();
     S.push({ title: "Welcome to " + name,

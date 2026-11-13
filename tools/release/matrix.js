@@ -70,15 +70,13 @@ const QUICK = process.argv.includes('--quick');
       };
       await sideways('dashboard');
       let screens = 1, tiny = 0;
-      /* the redesign's dashboard (next/, widget/dash.js; beside the live one until the release): each hub's tab and the class board's two lists */
-      if (fs.existsSync(path.join(L.ROOT, 'next', 'index.html'))) {
-        await page.goto(srv.url + 'next/?persona=returning'); await L.settle(page);
-        await sideways('dashboard/next'); screens++;
+      /* the dashboard (widget/dash.js): each hub's tab and the class board's two lists */
+      {
         const tabs = await page.$$eval('#hubTabs [data-tab]', ts => ts.map(t => t.getAttribute('data-tab')));
-        if (!tabs.length) problems.push(`${tag}: dashboard/next shows no hub tabs`);
-        for (const t of tabs) { await page.click(`#hubTabs [data-tab="${t}"]`).catch(() => {}); await page.waitForTimeout(250); await sideways(`dashboard/next · ${t}`); screens++; }
+        if (!tabs.length) problems.push(`${tag}: dashboard shows no hub tabs`);
+        for (const t of tabs) { await page.click(`#hubTabs [data-tab="${t}"]`).catch(() => {}); await page.waitForTimeout(250); await sideways(`dashboard · ${t}`); screens++; }
         for (const bn of await page.$$('#boardSeg button')) { await bn.click().catch(() => {}); await page.waitForTimeout(350); }
-        await sideways('dashboard/next · class board');
+        await sideways('dashboard · class board');
       }
       for (const hub of live) {
         await page.goto(srv.url + `hubs/${hub}/`); await L.settle(page);
@@ -112,12 +110,14 @@ const QUICK = process.argv.includes('--quick');
       const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
       const target = modes[1] || modes[0];
       await page.click(`#modeSwitch [data-mode="${target}"]`); await page.waitForTimeout(400);
-      const qid = await page.evaluate(() => { const ev = document.querySelector('script[src*="widget/v3.js"]').dataset.answeredEvent, q = window.SH_EXPORT.questions[1];
+      /* a hub on the engine fills SH_EXPORT.questions once its bank has loaded, and its widget tag comes with the bundle */
+      await page.waitForFunction(() => window.SH_EXPORT && Array.isArray(window.SH_EXPORT.questions) && window.SH_EXPORT.questions.length > 1 && document.querySelector('script[data-answered-event]'), null, { timeout: 30000 }).catch(() => {});
+      const qid = await page.evaluate(() => { const ev = document.querySelector('script[data-answered-event]').dataset.answeredEvent, q = window.SH_EXPORT.questions[1];
         document.dispatchEvent(new CustomEvent(ev, { detail: { qid: q.id, correct: false, choice: 1 } })); return q.id; });
       await page.waitForTimeout(600);
       const logBefore = await page.evaluate(() => window.__shPreview.log().length);
       await page.reload(); await L.settle(page);
-      const after = await page.evaluate(([h, q]) => ({ mode: (document.querySelector('#modeSwitch [aria-selected="true"]') || {}).dataset, srs: (localStorage.getItem('sh_srs_' + h) || '').includes(q),
+      const after = await page.evaluate(([h, q]) => ({ mode: (document.querySelector('#modeSwitch [aria-selected="true"], #modeSwitch [aria-current="page"]') || {}).dataset, srs: (localStorage.getItem('sh_srs_' + h) || '').includes(q),
         log: window.__shPreview.log().length, mine: (window.__shPreview.db().answers[h] || []).some(r => r[0] === q && !r[3]) }), [hub, qid]);
       if (!after.mode || after.mode.mode !== target) problems.push(`refresh (${label}): ${hub} reopened in ${after.mode ? after.mode.mode : 'no mode'}, not ${target}`);
       if (!after.srs) problems.push(`refresh (${label}): the missed question isn't in spaced review after a reload`);

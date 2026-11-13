@@ -55,28 +55,15 @@ return c.rows;
 } catch (e) { return null; }
 }
 function writeCache(rows){ try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), rows: rows || [] })); } catch (e) {} }
-function literalAt(html, name){
-var start = html.indexOf("var " + name + " = ["); if (start < 0) return null;
-var i = html.indexOf("[", start), depth = 0, q = null;
-for (; i < html.length; i++) {
-var c = html[i];
-if (q) { if (c === "\\") { i++; continue; } if (c === q) q = null; continue; }
-if (c === "/" && html[i + 1] === "*") { var e = html.indexOf("*/", i + 2); if (e < 0) return null; i = e + 1; continue; }
-if (c === "/" && html[i + 1] === "/") { var nl = html.indexOf("\n", i + 2); if (nl < 0) return null; i = nl; continue; }
-if (c === '"' || c === "'" || c === "`") { q = c; continue; }
-if (c === "[") depth++;
-else if (c === "]" && --depth === 0) return html.slice(html.indexOf("[", start), i + 1);
+function fromData(d){
+if (!d || !Array.isArray(d.hubs)) throw new Error("no hubs in hubs.js");
+return { hubs: d.hubs, archived: d.archived || [], options: opt({ archiveHour: d.archiveHour, cardDays: d.cardDays }) };
 }
-return null;
+function fromHubsJs(src){
+var w = {}; Function("window", String(src))(w);
+return fromData(w.SH_DASH_DATA);
 }
-function fromDashboardHtml(html){
-var h = literalAt(html, "HUBS"), a = literalAt(html, "ARCHIVED_HUBS");
-if (!h) throw new Error("no HUBS in the dashboard");
-var k = /var CHECKIN_HOUR = \d+, ARCHIVE_HOUR = (\d+), CARD_DAYS = (\d+);/.exec(html);
-function ev(src){ return Function('"use strict"; return (' + src + ');')(); }
-return { hubs: ev(h), archived: a ? ev(a) : [], options: k ? { archiveHour: Number(k[1]), cardDays: Number(k[2]) } : opt() };
-}
-var api = { STATES: STATES, fromDashboardHtml: fromDashboardHtml, DEFAULTS: DEFAULTS, parseYmd: parseYmd, lastExam: lastExam, archiveAt: archiveAt, cardGoneAt: cardGoneAt,
+var api = { STATES: STATES, fromData: fromData, fromHubsJs: fromHubsJs, DEFAULTS: DEFAULTS, parseYmd: parseYmd, lastExam: lastExam, archiveAt: archiveAt, cardGoneAt: cardGoneAt,
 autoState: autoState, activeOverride: activeOverride, resolve: resolve, index: index, readCache: readCache, writeCache: writeCache, CACHE_KEY: CACHE_KEY };
 root.shArchive = api;
 if (typeof module !== "undefined" && module.exports) module.exports = api;
@@ -88,14 +75,14 @@ if (typeof module !== "undefined" && module.exports) module.exports = api;
 if (window.shDash) return;
 var D = window.SH_DASH_DATA; if (!D) return;
 var C = window.SH_DASH || {}, A = window.SH_HUB_ART || { icons: {}, flame: {}, spots: {} }, DA = window.SH_DASH_ART || { tints: {}, emblems: {} };
-var ROOT = C.root || "../", WIDGET = C.widget || (ROOT + "widget/");
+var ROOT = C.root || "./", WIDGET = C.widget || (ROOT + "widget/");
 var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
 var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
 var docEl = document.documentElement;
 docEl.classList.add("shx", "sh-dash");
 var CLASSES = D.classes, HUBS = D.hubs.slice(), ARCHIVED_HUBS = D.archived.slice(), HUB_LABEL = D.labels || {};
 var CHECKIN_HOUR = D.checkinHour, ARCHIVE_HOUR = D.archiveHour, CARD_DAYS = D.cardDays, DEBRIEF_DAYS = D.debriefDays;
-var NEXT = {}; (D.next || []).forEach(function(id){ NEXT[id] = 1; });
+var LEGACY = {}; (D.legacy || []).forEach(function(id){ LEGACY[id] = 1; });
 function $(id){ return document.getElementById(id); }
 function q(sel, el){ return (el || document).querySelector(sel); }
 function qa(sel, el){ return [].slice.call((el || document).querySelectorAll(sel)); }
@@ -205,7 +192,7 @@ return sig.join(",");
 var hubSig = partitionHubs();
 function shownArchived(){ return ARCHIVED_HUBS.filter(function(h){ return HUB_STATE[h.id] && HUB_STATE[h.id].state === "archived"; }); }
 function hubHref(hub, part){
-var isNew = !!NEXT[hub.id], base = ROOT + "hubs/" + hub.id + "/" + (isNew ? "next/" : "");
+var isNew = !LEGACY[hub.id], base = ROOT + "hubs/" + hub.id + "/";
 if (part === "drill") return base + (isNew ? "#questions/drill" : "#drill");
 if (part === "timmy") return base + (isNew ? "#more/timmy" : "#timmy");
 return base;
@@ -471,11 +458,10 @@ document.head.appendChild(el);
 function timmyArt(fit, mood){
 var P = window.shPet, O = window.SH_OUTFITS, svg;
 fit = cleanFit(fit);
-if (fit.indexOf(":") > 0) svg = P.art({ hp: 100, mood: mood || "happy", hat: "", fit: fit }, 200);
-else {
 svg = P.art({ hp: 100, mood: mood || "happy", hat: "" }, 200);
-if (fit && O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
-else if (fit && !O) wantOutfits();
+if (fit && fit.indexOf(":") < 0) {
+if (O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
+else if (!O) wantOutfits();
 }
 return String(svg).replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
 }
@@ -771,7 +757,7 @@ if (step < last) h += '<button type="button" class="btn ' + (v != null ? 'btn-pr
 else h += '<button type="button" class="btn btn-primary survey-send" data-act="send">Send</button>';
 box.innerHTML = h + '</div>';
 var th = box.querySelector("[data-idea-tick]");
-ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
+ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: LEGACY[hub.id] ? null : hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
 refresh();
 var t = box.querySelector("textarea"); if (t && step && window.matchMedia && matchMedia("(hover:hover)").matches) setTimeout(function(){ try{ t.focus({ preventScroll:true }); }catch(e){} }, 60);
 }
@@ -982,11 +968,12 @@ var EXTRAS = [
 ["sh_pref_nuke", "Tactical nukes", "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes.", [["on", "On"], ["mine", "Mine only"], ["off", "Off"]]],
 ["sh_pref_celebrate", "Rank-up and trophy cards", "The rank-up cutscene, level-up, trophy and medal cards."],
 ["sh_pref_cheers", "Streak cheers", "Confetti and a toast every 5 right in a row."],
+["sh_pref_flame", "Streak flame", "The flame in the corner that counts your run from 3 right in a row."],
 ["sh_pref_fx", "Answer animations", "Pops, shakes, sweeps and fades. Off keeps the check and X marks."]
 ];
 function prefSet(k, v){ lsSet(k, v); try { document.dispatchEvent(new CustomEvent("sh:pref", { detail: { key: k, val: v } })); } catch (e) {} }
 function seg(key, opts, cur){ return '<span class="seg" role="group" data-key="' + esc(key) + '">' + opts.map(function(o){ return '<button type="button" data-val="' + esc(o[0]) + '" aria-pressed="' + (cur === o[0]) + '">' + esc(o[1]) + "</button>"; }).join("") + "</span>"; }
-var FOCUS_KEYS = EXTRAS.map(function(x){ return x[0]; }).concat(["sh_pref_flame"]);
+var FOCUS_KEYS = EXTRAS.map(function(x){ return x[0]; });
 function focusOn(){ return ls("sh_pref_focus") === "on"; }
 function setFocus(on){
 if (on === focusOn()) return;
@@ -1692,11 +1679,11 @@ VISITOR = surveyVisitor();
 var bootstrap = dashboardBootstrap(sb);
 if (window.shAsk) window.shAsk.mount({ where: "dashboard", sb: sb, name: "Study Hubs", about: C.about || ROOT + "about/",
 section: function(){ return "dashboard"; },
-hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: NEXT[h.id] ? ROOT + "hubs/" + h.id + "/next/content/" : null }; }); },
+hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: LEGACY[h.id] ? null : ROOT + "hubs/" + h.id + "/content/" }; }); },
 href: function(id){ var h = HUBS.concat(ARCHIVED_HUBS).filter(function(x){ return x.id === id; })[0]; return h ? hubHref(h) : ""; },
 spot: function(){ return $("askSpot"); } });
 if (window.shPet) {
-window.shPet.mount({ where: "dashboard", sb: sb, visitor: VISITOR, everyone: true,
+window.shPet.mount({ where: "dashboard", sb: sb, visitor: VISITOR,
 name: function(){ return localName || randomName; },
 home: function(){ return $("petHome"); }, bootstrap: bootstrap.ready });
 }
@@ -1705,7 +1692,7 @@ shopStart(sb, bootstrap.ready);
 if (!sb){ renderMyRank(null); whenPanelOpens($("class"), function(){ boardOpen = true; drawBoard(); }); return; }
 nameSb = sb; luckSb = sb; debriefSb = sb; boardSb = sb;
 if (window.shIdeas) window.shIdeas.mount($("ideas"), { sb: sb,
-hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h) }; }); },
+hubs: function(){ return HUBS.filter(function(h){ return !LEGACY[h.id]; }).map(function(h){ return { id: h.id, name: hubName(h) }; }); },
 name: function(id){ var h = debriefHub(id); return h ? hubName(h) : HUB_LABEL[id] || ""; },
 tint: tintVars, editName: openNameEditor, nameHint: function(){ return randomName; },
 onReady: function(ok){ $("ideas").hidden = !ok; } });

@@ -1,5 +1,5 @@
 // Publish (or preview) a hub's recap to the dashboard's "Hub recaps" slideshow, the same way review/ → Recap → Publish does.
-//   node tools/publish-recap.js <hub> --bank <file> [--exam YYYY-MM-DD, default: its last exam in index.html] [--title "MSK Exam 3"] [--no-names] [--dry-run]
+//   node tools/publish-recap.js <hub> --bank <file> [--exam YYYY-MM-DD, default: its last exam in hubs.js] [--title "MSK Exam 3"] [--no-names] [--dry-run]
 // --bank: a local bank file ({questions:[...]}) or a tools/dump-banks.js file ({Q:[...]}), for the toughest
 // question's text. Needs SB_KEY and ADMIN_SECRET in the environment (never printed). --dry-run prints what would go up.
 const fs = require('fs'), path = require('path'), vm = require('vm');
@@ -24,12 +24,10 @@ function norm(q) {
     answer: choices && typeof ai === 'number' ? choices[ai] : (q.ans || '') };
 }
 function lastExam(h) {
-  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8'), i = html.indexOf('id:"' + h + '"');
-  if (i < 0) return null;
-  // the next hub entry: a line indented 4 spaces then { id:"..." (extraQs entries inside exams also carry id:)
-  const m = /\n {4}\{ id:"/.exec(html.slice(i + 5)), entry = html.slice(i, m ? i + 5 + m.index : i + 4000);
-  // exam dates only: archiveOn:{ date } (a reopened hub's new archive day) is not an exam
-  const dates = (entry.replace(/archiveOn:\s*\{[^}]*\}/g, '').match(/date:"(\d{4}-\d{2}-\d{2})"/g) || []).map(d => d.slice(6, 16)).sort();
+  // the dashboard's data (hubs.js): the hub's latest exam date; archiveOn (a reopened hub's new archive day) is not an exam
+  const w = {}; Function('window', fs.readFileSync(path.join(__dirname, '..', 'hubs.js'), 'utf8'))(w);
+  const D = w.SH_DASH_DATA || {}, hub = (D.hubs || []).concat(D.archived || []).find(x => x.id === h);
+  const dates = hub ? (hub.exams || []).map(x => x.date).filter(Boolean).sort() : [];
   return dates.length ? dates[dates.length - 1] : null;
 }
 async function rpc(name, body) {
@@ -40,9 +38,9 @@ async function rpc(name, body) {
   const bankFile = opt('--bank'), names = !args.includes('--no-names'), dry = args.includes('--dry-run');
   const B = bankFile ? JSON.parse(fs.readFileSync(bankFile, 'utf8')) : {};
   const byId = {}; (B.questions || B.Q || []).map(norm).forEach(q => { byId[q.id] = q; });
-  // the hub's last exam date from the dashboard's HUBS / ARCHIVED_HUBS (without it get_hub_recap can hit the statement timeout)
+  // the hub's last exam date from the dashboard's hubs.js (without it get_hub_recap can hit the statement timeout)
   const exam = opt('--exam') || lastExam(hub);
-  if (!exam) throw new Error('no exam date for ' + hub + ' in index.html; pass --exam YYYY-MM-DD');
+  if (!exam) throw new Error('no exam date for ' + hub + ' in hubs.js; pass --exam YYYY-MM-DD');
   const a = { p_secret: ADMIN_SECRET, p_hub: hub, p_exam: exam };
   const R = await rpc('get_hub_recap', a);
   if (!R || !R.minutes) throw new Error('no recap data for ' + hub);

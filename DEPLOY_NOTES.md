@@ -32,6 +32,40 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **THE REDESIGN'S RELEASE (the switch PR, opened 2026-11-13, Claude Code; live from the merge)** — **Read this before
+  touching the dashboard, Occlusion or Perio: the files moved.** One PR switches the site to the redesign
+  ([the release](vault/tasks/2026-11-06-redesign-release.md)); reverting it brings the old site back
+  ([roll-back-a-release](vault/how-to/roll-back-a-release.md); the database stays as it is, the old pages run on it).
+  - **The pages:** `index.html` is the new dashboard (its hub list is **`hubs.js`**, edited by hand: add, date or archive
+    a hub there, not in `index.html`); `hubs/occlusion/` and `hubs/perio/` are on the engine, their old single-file pages
+    gone. `next/` and every `hubs/<hub>/next/` are gone. **Heme & Endo Exam 2 keeps its old page** (Sam: its exam was the
+    13th) and its new version was deleted, with the 59 MB of High yield recordings only that version played.
+  - **A hub's content is its JSON** (`hubs/<hub>/content/`): edit it there, then `node tools/hub-next/build.mjs`
+    (the question index, High yield, one layout; CI's `--check`). `tools/narrate.py`, `narration_words.py`, the figure
+    builds (they write `content/figures.js/css`), `tools/ci/cases.js`, the smoke lint, `tools/xp/keys.js`,
+    `tools/podcast/extract_hub.js`, `dump-banks.js`, `publish-recap.js`, the preview and Ask Timmy all read it.
+    `tools/dash-next/` is gone. New hubs: [build-a-hub](vault/how-to/build-a-hub.md), rewritten.
+  - **After a merge that changes a hub's questions, load its answer keys** (`node tools/xp/keys.js <hub> --sql`): the
+    server grades and pays from its own copy. A new Timmy Time episode is registered with `admin_set_podcast_episode`.
+  - **The database:** `migration_v54.sql` to `migration_v58.sql` (the game layer, Ask Timmy, Learn and Flashcards, the
+    random visit, and v58, new: hidden ideas are deleted after 90 days by the weekly retention job) are applied at the
+    merge and are in `supabase/schema.sql` after a marker line; `supabase/pending-migrations.txt` is empty.
+  - **Shared widget files, on every page (the archived hubs' too):** **Full Arch is retired** (the chart, its switch
+    and its code are gone; 23 trophies on an old page, 27 on the redesign; whoever won it keeps it as "retired").
+    **Everyone has Timmy**: no adoption, introduction, "Tap me!" or holiday outfits in `widget/pet.js`; he wears what
+    is on at his place (on an old hub's page, the outfit kept on the device, or nothing). `FULL_FROM` in `pet.js` is
+    the release day. BUG-112 fixed (the medal button's label for two or more medals). The run flame has its own
+    switch in the new Settings.
+  - **`sw.js`** (`sh-v59`): precaches the dashboard, the bundles, the files fetched on first use and each engine hub in
+    its `HUBS` list; a hub's content JSON is served from the cache and refreshed behind it (**a content edit shows on the
+    load after the one that fetched it**). A new engine hub adds itself to `HUBS`; `tools/ci/syntax.js` checks it.
+  - **The About page** is rewritten for all of it (27 trophies, 16 secret), and Ask Timmy's site help rebuilt from it.
+    Rules and how-tos rewritten for the engine: hub-home-page, arcade-skins, question-bank-filter-panel,
+    every-choice-gets-a-why, archived-hubs-drop-their-audio (`"audio": "off"` in `core.json`), build-a-hub,
+    narrate-with-kokoro, the repo map, shared-infrastructure, `/podcast`, `tools/podcast/LORE.md` (his place).
+  - Tests: the smoke test on every hub, `node tools/release/run.js` (the report is in the PR). Left to do:
+    [the inbox](vault/tasks/inbox.md) (what the old pages still hold up, keys and the function loaded by hand, the
+    first migration after the release, the hub trophies' shelf: Sam's call).
 - **2026-11-13 (the redesign's bundles, phase 5 part 2, Claude Code)** — Nothing students see changes: the live
   dashboard and hubs load exactly the files they loaded (the smoke test fails if one asks for a bundle). A redesigned
   page (`next/`, `hubs/<hub>/next/`) now loads the widget as **built files** instead of one request per source file:

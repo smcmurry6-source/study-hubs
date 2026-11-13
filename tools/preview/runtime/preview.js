@@ -236,7 +236,7 @@
   /* the mastery medal three of them show, on the game layer's boards and at their place (get_place). One each: a row
      with two or more draws widget/ranks.js's "+1" medal button, whose name leaves the "+1" out (BUG-112, left for the
      release), and the accessibility suite would stop on it */
-  var FAKE_FLAIR = { "Fixture Fluoride": "perio:4", "Sample Sealant": "heme-endo-exam2:1", "Test Tubercle": "occlusion:2" };
+  var FAKE_FLAIR = { "Fixture Fluoride": "perio:4,occlusion:3", "Sample Sealant": "heme-endo-exam2:1", "Test Tubercle": "occlusion:2" };   // one classmate has two, so the "+1" on a medal button is drawn (BUG-112)
   var TIER_AT = [0, 300, 1500, 5000, 12000, 25000, 50000, 125000];
   function tierOf(xp){ var t = 0; for (var i = 0; i < 7; i++) if (xp >= TIER_AT[i]) t = i; return t; }
   function stepOf(xp){ var t = tierOf(xp), lo = TIER_AT[t], hi = TIER_AT[t + 1]; return Math.min(20, t * 3 + Math.min(2, Math.floor((xp - lo) * 3 / (hi - lo)))); }
@@ -1095,7 +1095,7 @@
   var timmyContent = {};
   function timmyHub(hub){
     if (!timmyContent[hub]) {
-      var base = ROOT + "hubs/" + hub + "/next/content/";
+      var base = ROOT + "hubs/" + hub + "/content/";
       timmyContent[hub] = Promise.all([realFetch(base + "core.json").then(function(r){ return r.json(); }), realFetch(base + "notes.json").then(function(r){ return r.json(); })])
         .then(function(x){ return { core: x[0], notes: x[1] }; }, function(){ delete timmyContent[hub]; return null; });
     }
@@ -1724,7 +1724,7 @@
       var r = Math.random();
       if (crowd.length <= 4 || (r < .55 && crowd.length < 16)) add(); else crowd.splice(1 + Math.floor(Math.random() * (crowd.length - 1)), 1);
       send();
-    }, /\/next\/(index\.html)?$/.test(location.pathname) && !/\/hubs\//.test(location.pathname) ? 7000 : 20000);
+    }, /\/(index\.html)?$/.test(location.pathname) && !/\/(hubs|about|review|tools)\//.test(location.pathname) ? 7000 : 20000);   /* faster on the dashboard, where the classroom shows it */
   }
   function mount(){
     if (document.getElementById("shpv-pill")) return;

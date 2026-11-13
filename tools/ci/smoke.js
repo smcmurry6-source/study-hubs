@@ -1,4 +1,4 @@
-// Browser smoke test + question-bank lint for every live hub and the dashboard.
+// Browser smoke test + question-bank lint for every hub and the dashboard.
 // Class data (Supabase) is stubbed with empty results; nothing is written anywhere.
 //   npm i --no-save playwright && npx playwright install chromium && node tools/ci/smoke.js
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto');
@@ -46,12 +46,18 @@ const { hubs, why: hubsWhy } = pickHubs();
 const PART = process.env.SMOKE_PART || '';
 if (PART && !['desktop', 'phone'].includes(PART)) { console.error(`SMOKE_PART must be desktop or phone, not "${PART}"`); process.exit(1); }
 console.log(`Smoke test: ${hubsWhy}${PART ? `, the ${PART} half` : ''}`);
-/* the redesign's new versions (hubs/<id>/next/, widget/hub.js), built beside the live hubs until the release: those of
-   the hubs picked above (a change to hubs/<id>/next/ touches <id>; the engine is shared, so it picks every hub) */
-const nextHubs = hubs.filter(h => fs.existsSync(path.join(root, 'hubs', h, 'next', 'index.html')));
-/* The redesign's pages load bundles (tools/bundle/build.mjs, tools/bundle/bundles.json): the engine as one deferred
-   script with the page, the shared widgets and a hub's own widget layer once it is drawn, and one stylesheet. A page
-   that asks for a file one of its bundles carries has lost the bundle; a live page never asks for a bundle. */
+/* Two kinds of hub. A hub on the engine (widget/hub.js: its page is settings, its content is in hubs/<id>/content/)
+   and an old single-file hub (everything in hubs/<id>/index.html, with widget/v3.js): each has its own walk below. */
+const isEngine = h => fs.existsSync(path.join(root, 'hubs', h, 'content', 'core.json'));
+const engineHubs = hubs.filter(isEngine), oldHubs = hubs.filter(h => !isEngine(h));
+/* an old hub for the checks that an old page gets nothing of the engine's: Heme & Endo Exam 2 when it is picked (the
+   last one built), else the first */
+const OLD = oldHubs.includes('heme-endo-exam2') ? 'heme-endo-exam2' : oldHubs[0] || null;
+const content = (h, f) => path.join(root, 'hubs', h, 'content', f);
+/* The dashboard and the engine's hubs load bundles (tools/bundle/build.mjs, tools/bundle/bundles.json): the engine as
+   one deferred script with the page, the shared widgets and a hub's own widget layer once it is drawn, and one
+   stylesheet. A page that asks for a file one of its bundles carries has lost the bundle; an old single-file hub
+   never asks for a bundle. */
 const BUNDLES = JSON.parse(fs.readFileSync(path.join(root, 'tools/bundle/bundles.json'), 'utf8'));
 const inBundle = out => { const b = BUNDLES.scripts[out] || {}; return [...(b.css || []), ...(b.run || []), ...(b.hold || [])]; };
 const SHEET = Object.keys(BUNDLES.styles)[0];
@@ -168,19 +174,17 @@ async function askCheck(page, name, o){
 }
 /* The game layer's wiring (phase 4, session 8; vault/tasks/done/2026-11-12-redesign-game-layer-wiring.md), desktop only.
    navigator.webdriver is hidden so the widget records (every call is answered here; nothing is written anywhere).
-   1. A new hub on the game layer: Million-Dollar Smile played to the end twice (one right answer and Walk away, then
+   A hub on the game layer: Million-Dollar Smile played to the end twice (one right answer and Walk away, then
       Play again and one wrong answer) makes, each play, one xp_session_start ("arcade", "smile") and one xp_session_finish
       with that session and the score, and no submit_arcade_score; each answer is one record_answer_v2 with the pick's
       authored index (not its place on screen) and its play's session, and none of today's answer calls; the stubbed +50s
       reach the rank pill, and the toast names the game. Then Timmy Time plays with 44.9 seconds of minute 0 already heard
       on this device: one pod_minute_v2 (minute 0), its stubbed 10 XP on the pill, the minute kept as taken.
-   2. The live hub, the same steps, with this branch's widget/games.js and podcast.js and then with the base's (git show
-      of SMOKE_CHANGED_FROM, or where this branch left origin/main): the same calls, in the same order, with the same
-      arguments (the question and the pick aside: they're random); none is a game-layer call; the score goes to
-      submit_arcade_score; nothing writes an sh_pod_min key. */
+   (Until the redesign's release this also played an old hub with this branch's widget/games.js and podcast.js and with
+   main's, to prove the live pages' calls hadn't changed; those pages were replaced at the release.) */
 async function wiringCheck(context, hub, label){
-  const cp = require('child_process'), QS = JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'questions.json'), 'utf8'));
-  const EP = (JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'core.json'), 'utf8')).podcast || {}).id || null;
+  const QS = JSON.parse(fs.readFileSync(content(hub, 'questions.json'), 'utf8'));
+  const EP = (JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8')).podcast || {}).id || null;
   const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
   const unbot = () => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} };
   const args = r => { try { return JSON.parse(r.postData() || '{}'); } catch (e) { return {}; } };
@@ -216,9 +220,8 @@ async function wiringCheck(context, hub, label){
   }
   const watch = (page, calls) => page.on('request', r => { const u = r.url(); if (r.method() === 'POST' && /supabase\.co\/rest\/v1\/rpc\//.test(u)) calls.push({ fn: fnOf(u), a: args(r) }); });
 
-  /* 1. the new hub, on the game layer */
   {
-    const page = await context.newPage(), errs = [], calls = [], name = `${hub}/next, the game layer's wiring`;
+    const page = await context.newPage(), errs = [], calls = [], name = `${hub}, the game layer's wiring`;
     page.on('pageerror', e => errs.push(e.message));
     await page.addInitScript(unbot);
     let total = 2400, sids = 0;
@@ -233,7 +236,7 @@ async function wiringCheck(context, hub, label){
       if (fn === 'xp_session_finish') { total += 50; return json(route, { ok: true, xp: 50, mult: 1 }); }
       total += 10; return json(route, { ok: true, xp: 10, done: 0, mult: 1, heard: 1, of: 52 });
     });
-    await page.goto(BASE() + `hubs/${hub}/next/index.html#more/arcade`);
+    await page.goto(BASE() + `hubs/${hub}/index.html#more/arcade`);
     const on = await page.waitForFunction(() => window.shGame && window.shGame.v2(), null, { timeout: 15000 }).catch(() => null);
     await page.waitForSelector('.ar-grid [data-game="smile"]', { timeout: 20000 }).catch(() => {});
     if (!on || !(await page.$('.ar-grid [data-game="smile"]'))) problems.push(`${name} (${label}): the page didn't come up on the game layer with Million-Dollar Smile in the arcade`);
@@ -260,9 +263,9 @@ async function wiringCheck(context, hub, label){
       if (pill !== total) problems.push(`${name} (${label}): the rank pill reads ${pill} XP after the games, not the ${total} the server paid`);
       const gname = await page.evaluate(() => ((((window.SH_HUB || {}).arcade || {}).games || []).find(g => g.id === 'smile') || {}).name || '');
       if (!toasts.includes(`${gname} finished: +50 XP.`)) problems.push(`${name} (${label}): the +50's toast should name the game as the lobby does ("${gname} finished: +50 XP."): ${JSON.stringify(toasts)}`);
-      /* one of the hub's own games (Cusp Sort, Pocket Crusher): its session starts where its overlay comes off, through
-         the hook tools/hub-next/build.mjs puts in */
-      const AJ = fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'arcade.js'), 'utf8');
+      /* one of the hub's own games (Cusp Sort, Pocket Crusher): its session starts where its overlay comes off (the call
+         to shGames.played in its arcade.js) */
+      const AJ = fs.readFileSync(content(hub, 'arcade.js'), 'utf8');
       const ownId = [...((/var GAMES = \[([\s\S]*?)\n\s*\];/.exec(AJ) || [])[1] || '').matchAll(/\bid:\s*'([a-z]+)'/g)].map(m => m[1]).find(id => !['board', 'cloze', 'escape', 'cross', 'smile'].includes(id));
       if (ownId) {
         const f3 = calls.length;
@@ -288,7 +291,7 @@ async function wiringCheck(context, hub, label){
         const pm = calls.slice(f2).filter(c => c.fn === 'pod_minute_v2');
         const kept = await page.evaluate(k => localStorage.getItem(k), key);
         const pill2 = await page.evaluate(() => Number(((document.querySelector('#hxRank [data-xp]') || {}).textContent || '').replace(/\D/g, '')));
-        await page.evaluate(k => localStorage.removeItem(k), key);   /* the live hub below shares this origin's storage */
+        await page.evaluate(k => localStorage.removeItem(k), key);   /* the pages below share this origin's storage */
         if (pm.length !== 1 || pm[0].a.p_minute !== 0 || pm[0].a.p_ep !== EP || pm[0].a.p_hub !== hub || !pm[0].a.p_visitor) problems.push(`${name} (${label}): a minute heard should report once, as minute 0 of ${EP} (${JSON.stringify(pm.map(c => c.a))})`);
         else {
           if (pill2 !== before + 10) problems.push(`${name} (${label}): the rank pill reads ${pill2} after a Timmy Time minute, not the ${before + 10} the server paid`);
@@ -300,55 +303,6 @@ async function wiringCheck(context, hub, label){
     errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
     await page.close();
   }
-
-  /* 2. the live hub: today's calls, with this branch's files and with the base's */
-  let base = null;
-  try {
-    const ref = process.env.SMOKE_CHANGED_FROM || cp.execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
-    const show = f => cp.execFileSync('git', ['show', `${ref}:${f}`], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1 << 26 });
-    base = { ref, games: show('widget/games.js'), podcast: show('widget/podcast.js') };
-  } catch (e) {}
-  /* what a live page sends while it plays, without the batches that go out on a timer and carry a per-visit id or the
-     random questions (the activity ping, click and feature counts, question health's record_qh: none of them changed here) */
-  const KEEP = /^(record_(?!activity_ping$|clicks?$|feature_events?$|qh$)|submit_|xp_|pod_|get_arcade_leaderboard$)|_v2$/;
-  const norm = c => c.fn + ' ' + JSON.stringify(Object.keys(c.a).sort().reduce((o, k) => { o[k] = /^p_(qid|choice|choices)$/.test(k) ? '*' : c.a[k]; return o; }, {}));
-  async function live(files){
-    const page = await context.newPage(), errs = [], calls = [];
-    page.on('pageerror', e => errs.push(e.message));
-    await page.addInitScript(unbot);
-    if (files) for (const [re, body] of [[/\/widget\/games\.js(\?|$)/, files.games], [/\/widget\/podcast\.js(\?|$)/, files.podcast]])
-      await page.route(re, route => route.fulfill({ status: 200, contentType: 'application/javascript', body }));
-    watch(page, calls);
-    await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);
-    await page.evaluate(() => Object.keys(localStorage).filter(k => /^sh_pod_(min|pos):/.test(k)).forEach(k => localStorage.removeItem(k)));
-    await page.click('.sh-archived-stay', { timeout: 1000 }).catch(() => {});
-    await page.click('#modeSwitch [data-mode="arcade"]'); await page.waitForTimeout(400);
-    const from = calls.length;
-    let picks = [];
-    try { picks = await play(page, '#panel-arcade .ar-grid [data-game="smile"]'); } catch (e) { errs.push('playing Smile: ' + e.message.split('\n')[0]); }
-    await page.click('#modeSwitch [data-mode="home"]').catch(() => {}); await page.waitForTimeout(400);
-    await page.click('.sh-pod-play').catch(() => {}); await page.waitForTimeout(2500);
-    await page.evaluate(() => { const a = document.querySelector('audio.sh-pod-audio'); if (a) a.pause(); });
-    const pod = await page.evaluate(() => Object.keys(localStorage).filter(k => /^sh_pod_min:/.test(k)));
-    await page.close();
-    return { calls: calls.slice(from).filter(c => KEEP.test(c.fn)), picks, pod, errs };
-  }
-  const name = `${hub} (live), the game layer's wiring`, now = await live(null);
-  const fns = now.calls.map(c => c.fn);
-  if (fns.some(f => /_v2$|^xp_session_|^pod_minute/.test(f))) problems.push(`${name} (${label}): a live hub made a game-layer call (${fns.join(', ')})`);
-  const subs = now.calls.filter(c => c.fn === 'submit_arcade_score').map(c => [c.a.p_game, c.a.p_score]);
-  if (JSON.stringify(subs) !== '[["smile",100]]') problems.push(`${name} (${label}): the $100 game should post its score with submit_arcade_score, as today (${JSON.stringify(subs)})`);
-  const per = now.picks.filter(Boolean).map(p => p.choice), choices = now.calls.filter(c => c.fn === 'record_choice').map(c => c.a.p_choice);
-  if (now.picks.length !== 2 || JSON.stringify(choices) !== JSON.stringify(per) || fns.filter(f => f === 'record_personal_answer').length !== 2) problems.push(`${name} (${label}): each answer should go out as today's calls with the authored index (${JSON.stringify(per)} picked, ${fns.join(', ')})`);
-  if (now.pod.length) problems.push(`${name} (${label}): a live hub kept Timmy Time minutes (${now.pod.join(', ')})`);
-  if (base) {
-    const then = await live(base);
-    const a = now.calls.map(norm), b = then.calls.map(norm);
-    if (JSON.stringify(a) !== JSON.stringify(b)) problems.push(`${name} (${label}): the live hub's calls differ from the base's (${base.ref.slice(0, 8)}) widget/games.js and podcast.js:\n      now:  ${a.join('\n            ')}\n      then: ${b.join('\n            ')}`);
-    then.errs.forEach(e => problems.push(`${name}, with the base's files (${label}): JavaScript error: ${e}`));
-  }
-  now.errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
-  notes.push(`${name} (${label}): ${now.calls.length} calls while playing Smile twice and Timmy Time (${fns.join(', ')}), ${base ? `the same as with the base's (${base.ref.slice(0, 8)}) files` : 'no base to compare with'}; none on the game layer`);
 }
 async function stub(context){
   await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, route => {
@@ -516,20 +470,20 @@ function lint(hub, A){
   const audioDir = path.join(root, 'hubs', hub, 'audio');
   /* an archived hub whose audio came off the site says data-audio="off" on its widget tag
      (vault/rules/archived-hubs-drop-their-audio.md): no narration is expected, and none may be left behind */
-  const audioOff = (() => { try { return /<script[^>]*widget\/v3\.js"[^>]*\bdata-audio="off"/.test(fs.readFileSync(path.join(root, 'hubs', hub, 'index.html'), 'utf8')); } catch (e) { return false; } })();
+  const audioOff = A.CORE ? A.CORE.audio === 'off' : (() => { try { return /<script[^>]*widget\/v3\.js"[^>]*\bdata-audio="off"/.test(fs.readFileSync(path.join(root, 'hubs', hub, 'index.html'), 'utf8')); } catch (e) { return false; } })();
   if (audioOff) {
     const left = fs.existsSync(audioDir) ? fs.readdirSync(audioDir).filter(f => /\.(mp3|words\.json)$/.test(f)) : [];
-    if (left.length) problems.push(`${hub}: its widget tag says data-audio="off" but audio/ still holds ${left.length} file(s) (${left.slice(0, 3).join(', ')}): take them out, or drop data-audio="off"`);
+    if (left.length) problems.push(`${hub}: its ${A.CORE ? 'core.json says "audio": "off"' : 'widget tag says data-audio="off"'} but audio/ still holds ${left.length} file(s) (${left.slice(0, 3).join(', ')}): take them out, or drop the switch`);
+    if (A.NOTES && (A.NOTES.hyAudio || []).length) problems.push(`${hub}: audio is off but notes.json's hyAudio still lists ${A.NOTES.hyAudio.join(', ')} (node tools/hub-next/build.mjs --hub ${hub})`);
     notes.push(`${hub}: audio off (archived; Listen uses the device's voice, no Timmy Time)`);
   } else if (fs.existsSync(audioDir)) L.forEach(l => {
     if (A.READINGS[l.id] && !fs.existsSync(path.join(audioDir, `${l.id}-full.mp3`))) problems.push(`${hub}: missing narration audio/${l.id}-full.mp3`);
     if (A.READINGS_PLAIN[l.id] && !fs.existsSync(path.join(audioDir, `${l.id}-plain.mp3`))) problems.push(`${hub}: missing narration audio/${l.id}-plain.mp3`);
   });
-  /* Follow along (widget/hub.js): a redesigned hub's narration has its word timings beside it, made from that very mp3
-     (tools/narration_words.py; tools/narrate.py writes them whenever it renders one) */
-  const nextNotes = path.join(root, 'hubs', hub, 'next', 'content', 'notes.json');
-  if (!audioOff && fs.existsSync(audioDir) && fs.existsSync(nextNotes)) {
-    const NN = JSON.parse(fs.readFileSync(nextNotes, 'utf8'));
+  /* Follow along (widget/hub.js): the narration of a hub on the engine has its word timings beside it, made from that
+     very mp3 (tools/narration_words.py; tools/narrate.py writes them whenever it renders one) */
+  if (!audioOff && fs.existsSync(audioDir) && A.NOTES) {
+    const NN = A.NOTES;
     const unrecorded = [];
     ['full', 'plain', 'hy'].forEach(level => Object.keys(NN[level] || {}).forEach(id => {
       const mp3 = path.join(audioDir, `${id}-${level}.mp3`), wf = mp3.replace(/\.mp3$/, '.words.json'), fix = `python3 tools/narration_words.py ${hub} --lec ${id} --level ${level}`;
@@ -543,7 +497,7 @@ function lint(hub, A){
          so its recording says which text it was spoken from ("h", tools/narrate.py's text_hash) and must still match it
          (vault/rules/text-and-audio-never-drift.md); the build then offers it to the page (notes.json's hyAudio) */
       else if (level === 'hy' && d.h !== crypto.createHash('sha1').update(NN.hy[id], 'utf8').digest('hex').slice(0, 12))
-        problems.push(`${hub}: audio/${id}-hy.mp3 was spoken from another version of ${id}'s High yield: record it again (python3 tools/narrate.py hubs/${hub}/next/content/notes.json --level hy --lec ${id} --force, then node tools/hub-next/build.mjs --hub ${hub})`);
+        problems.push(`${hub}: audio/${id}-hy.mp3 was spoken from another version of ${id}'s High yield: record it again (python3 tools/narrate.py ${hub} --level hy --lec ${id} --force, then node tools/hub-next/build.mjs --hub ${hub})`);
     }));
     /* a lecture with High yield and no recording of it is allowed (Listen reads it in the device's voice), and named */
     if (unrecorded.length) notes.push(`${hub}: High yield not narrated for ${unrecorded.join(', ')} (Listen uses the device's voice there)`);
@@ -559,22 +513,14 @@ function lint(hub, A){
     const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, isMobile: !!vp.isMobile, hasTouch: !!vp.isMobile, serviceWorkers: 'block' }); /* sw.js would bypass the lint hook */
     await stub(context);
     const label = vp.isMobile ? 'phone' : 'desktop';
-    // dashboard
-    { const page = await context.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
-      const bundles = []; page.on('request', r => { if (/\.bundle\.(js|css)/.test(r.url())) bundles.push(widgetFile(r.url())); });
-      await page.goto(BASE() + 'index.html'); await page.waitForTimeout(800);
-      errs.forEach(e => problems.push(`dashboard (${label}): ${e}`));
-      if (bundles.length || await page.evaluate(() => !!window.SH_BUNDLE)) problems.push(`dashboard (${label}): the live dashboard loaded a bundle (${bundles.join(', ') || 'window.SH_BUNDLE'}); only the redesign's pages do`);
-      const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`dashboard (${label}): page scrolls sideways by ${w}px`);
-      await page.close(); }
-    // the redesigned dashboard (next/, widget/dash.js; beside the live one until the release): every hub tab, the class
+    // the dashboard (index.html, widget/dash.js): every hub tab, the class
     // board's two lists, Settings, the name dialog and the menu
-    if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
-      const page = await context.newPage(); const errs = [], name = `next dashboard (${label})`; page.on('pageerror', e => errs.push(e.message));
+    {
+      const page = await context.newPage(); const errs = [], name = `dashboard (${label})`; page.on('pageerror', e => errs.push(e.message));
       const askedFiles = [], outside = []; page.on('request', r => { const w = widgetFile(r.url()); if (w) askedFiles.push(w); if (GOOGLE_FONTS.test(r.url())) outside.push(r.url().slice(0, 80)); });
-      await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(1200);
+      await page.goto(BASE() + 'index.html'); await page.waitForTimeout(1200);
       await page.waitForFunction(() => window.SH_BUNDLE && window.shRanks && window.shPet && window.shIdeas, null, { timeout: 15000 }).catch(() => {});
-      { const bun = await bundleCheck(page, 'next dashboard', label, 'dash', askedFiles);
+      { const bun = await bundleCheck(page, 'dashboard', label, 'dash', askedFiles);
         notes.push(`${name}: the page asked for ${[...new Set(askedFiles)].length} widget files (${[...new Set(askedFiles)].join(', ')}) and links ${bun.links} stylesheet${bun.links === 1 ? '' : 's'}`); }
       const sideways = async what => { const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`${name}: ${what} scrolls sideways by ${w}px`); };
       if (!(await page.$('#dx h1'))) problems.push(`${name}: the page has no title`);
@@ -687,14 +633,15 @@ function lint(hub, A){
         if (!/font: FACE/.test(fs.readFileSync(path.join(root, 'widget/dash.js'), 'utf8'))) problems.push(`${name}: widget/dash.js should hand the recap image the site's own typeface (font: FACE)`);
       }
       if (outside.length) problems.push(`${name}: the page asked Google Fonts for ${[...new Set(outside)].join(', ')}; the redesign's one typeface is self-hosted`);
-      ownFiles('next dashboard', label, 'dash', askedFiles);
+      ownFiles('dashboard', label, 'dash', askedFiles);
       notes.push(`${name}: ${tabs.length} hub tabs, the class board, Settings, the name dialog and the menu`);
       await page.close();
     }
-    for (const hub of hubs) {
+    // the old single-file hubs: every mode tab and its sub-tabs, and the arcade's games
+    for (const hub of oldHubs) {
       const page = await context.newPage(); const errs = [];
       page.on('pageerror', e => errs.push(e.message));
-      /* a live hub loads its widget files by themselves, as it always has: never a bundle */
+      /* an old hub loads its widget files by themselves, as it always has: never a bundle */
       const liveBundles = []; page.on('request', r => { if (/\.bundle\.(js|css)/.test(r.url())) liveBundles.push(widgetFile(r.url())); });
       if (!vp.isMobile) await page.route(`**/hubs/${hub}/index.html`, async route => {
         const r = await route.fetch(); let h = await r.text(); const i = h.lastIndexOf('window.SH_EXPORT = {');
@@ -706,12 +653,12 @@ function lint(hub, A){
       await page.click(".sh-archived-stay", { timeout: 1000 }).catch(() => {});
       if (!vp.isMobile) { const A = await page.evaluate(() => window.__CI); if (A) lint(hub, A); else problems.push(`${hub}: could not read its question data (is window.SH_EXPORT still set at the end of the script?)`); }
       const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
-      if (liveBundles.length || await page.evaluate(() => !!window.SH_BUNDLE)) problems.push(`${hub} (${label}): the live hub loaded a bundle (${liveBundles.join(', ') || 'window.SH_BUNDLE'}); only the redesign's pages do`);
+      if (liveBundles.length || await page.evaluate(() => !!window.SH_BUNDLE)) problems.push(`${hub} (${label}): an old single-file hub loaded a bundle (${liveBundles.join(', ') || 'window.SH_BUNDLE'}); only the dashboard and the engine's hubs do`);
       /* and its 8-bit code still asks Google Fonts for the pixel face, as it always has */
-      if (!vp.isMobile && hub === hubs[0]) {
+      if (!vp.isMobile && hub === oldHubs[0]) {
         await page.waitForFunction(() => !!window.shEggHooks && !!document.querySelector('script[src*="eggs.js"]'), null, { timeout: 8000 }).catch(() => {}); await page.waitForTimeout(600);
         const e8 = await eightBit(page);
-        if (!e8.on || e8.tag !== 'LINK' || !/fonts\.googleapis\.com\/css2\?family=VT323/.test(e8.href)) problems.push(`${hub} (${label}): the live hub's 8-bit code changed (8-bit mode ${e8.on ? 'on' : 'did not start'}, <${e8.tag.toLowerCase() || 'nothing'}> ${e8.href})`);
+        if (!e8.on || e8.tag !== 'LINK' || !/fonts\.googleapis\.com\/css2\?family=VT323/.test(e8.href)) problems.push(`${hub} (${label}): an old hub's 8-bit code changed (8-bit mode ${e8.on ? 'on' : 'did not start'}, <${e8.tag.toLowerCase() || 'nothing'}> ${e8.href})`);
       }
       let screens = 0;
       for (const m of modes) {
@@ -730,12 +677,19 @@ function lint(hub, A){
       notes.push(`${hub} (${label}): clicked through ${screens} screens`);
       await page.close();
     }
-    // the redesigned hubs: the four views, then every page in More and every set of questions
-    for (const hub of nextHubs) {
-      const page = await context.newPage(); const errs = [], name = `${hub}/next`;
+    // the hubs on the engine: the four views, then every page in More and every set of questions
+    for (const hub of engineHubs) {
+      /* the question-bank lint, from the hub's content (the JSON is where it is edited) */
+      if (!vp.isMobile) {
+        try {
+          const rd = f => JSON.parse(fs.readFileSync(content(hub, f), 'utf8')), core = rd('core.json'), nts = rd('notes.json');
+          lint(hub, { QUESTIONS: rd('questions.json'), LECTURES: core.lectures || [], READINGS: nts.full || {}, READINGS_PLAIN: nts.plain || {}, LIKELY_TOPICS: core.likelyTopics, CORE: core, NOTES: nts });
+        } catch (e) { problems.push(`${hub}: could not read its content (hubs/${hub}/content/): ${e.message}`); }
+      }
+      const page = await context.newPage(); const errs = [], name = `${hub}`;
       page.on('pageerror', e => errs.push(e.message));
       const askedFiles = [], outside = [], askedFonts = []; page.on('request', r => { const w = widgetFile(r.url()); if (w) askedFiles.push(w); if (GOOGLE_FONTS.test(r.url())) outside.push(r.url().slice(0, 80)); if (/\.woff2?(\?|$)/.test(r.url())) askedFonts.push(r.url()); });
-      await page.goto(BASE() + `hubs/${hub}/next/index.html`); await page.waitForTimeout(1500);
+      await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(1500);
       const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
       if (modes.join() !== 'home,notes,questions,more') problems.push(`${name} (${label}): the views are ${modes.join(', ') || 'missing'}, not Home, Notes, Questions and More`);
       const n = await page.evaluate(() => window.SH_EXPORT && window.SH_EXPORT.questions ? window.SH_EXPORT.questions.length : 0);
@@ -744,7 +698,7 @@ function lint(hub, A){
          when the browser is idle, after the notes), one stylesheet, and nothing they carry fetched by itself */
       await page.waitForFunction(() => window.shBootstrap && window.SH_BUNDLE && window.shRanks && window.shPet, null, { timeout: 15000 }).catch(() => {});
       const bun = await bundleCheck(page, name, label, 'hub', askedFiles);
-      if (hub === nextHubs[0]) notes.push(`${name} (${label}): the page asked for ${[...new Set(askedFiles)].length} widget files (${[...new Set(askedFiles)].join(', ')}) and links ${bun.links} stylesheet${bun.links === 1 ? '' : 's'}`);
+      if (hub === engineHubs[0]) notes.push(`${name} (${label}): the page asked for ${[...new Set(askedFiles)].length} widget files (${[...new Set(askedFiles)].join(', ')}) and links ${bun.links} stylesheet${bun.links === 1 ? '' : 's'}`);
       let screens = 0;
       const routes = [...modes, 'questions/drill', 'questions/misses', 'questions/weak', 'questions/mock',
         'more/timmy', 'more/hints', 'more/cram', 'more/side', 'more/arcade', 'more/stats', 'more/settings', 'more/ideas'];
@@ -768,7 +722,7 @@ function lint(hub, A){
       }
       /* High yield, the notes' third reading level (tools/hub-next/high-yield.mjs): on a lecture that has it, the switch shows
          it, each predicted topic a heading, nothing scrolls sideways; then back to As taught */
-      const hyLec = (() => { try { return Object.keys(JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'notes.json'), 'utf8')).hy || {})[0]; } catch (e) { return null; } })();
+      const hyLec = (() => { try { return Object.keys(JSON.parse(fs.readFileSync(content(hub, 'notes.json'), 'utf8')).hy || {})[0]; } catch (e) { return null; } })();
       if (hyLec) {
         await page.evaluate(h => { location.hash = h; }, 'notes/' + hyLec); await page.waitForTimeout(800);
         const hb = await page.$('[data-level="hy"]');
@@ -778,7 +732,7 @@ function lint(hub, A){
           const st = await page.evaluate(() => ({ t: document.querySelectorAll('.reading-prose.hy .hy-t').length, on: !!document.querySelector('[data-level="hy"][aria-pressed="true"]'), w: document.documentElement.scrollWidth - innerWidth }));
           if (!st.on || !st.t) problems.push(`${name} (${label}): High yield for ${hyLec} shows ${st.t} topics`);
           /* its Listen offers the recording exactly when the build listed it (notes.json's hyAudio), else the device's voice */
-          const rec = (() => { try { return (JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'notes.json'), 'utf8')).hyAudio || []).includes(hyLec); } catch (e) { return false; } })();
+          const rec = (() => { try { return (JSON.parse(fs.readFileSync(content(hub, 'notes.json'), 'utf8')).hyAudio || []).includes(hyLec); } catch (e) { return false; } })();
           const offers = await page.evaluate(() => { const b = document.querySelector('.reading #sh-tts-btn'); return b ? b.getAttribute('data-sh-tts-audio') === '1' : null; });
           if (offers !== rec) problems.push(`${name} (${label}): High yield for ${hyLec}: Listen ${offers ? 'offers' : 'does not offer'} its recording, but notes.json's hyAudio ${rec ? 'lists' : "doesn't list"} it`);
           if (st.w > 1) problems.push(`${name} (${label}): High yield for ${hyLec} scrolls sideways by ${st.w}px`);
@@ -794,7 +748,7 @@ function lint(hub, A){
       await page.waitForSelector('.ska-fab:not([hidden])', { timeout: 15000 }).catch(() => {});
       if (!(await page.$('.ska-fab:not([hidden])'))) problems.push(`${name} (${label}): no Ask icon in Timmy's corner while he isn't there`);
       else {
-        const lec0 = (() => { try { return JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'core.json'), 'utf8')).lectures[0].id; } catch (e) { return null; } })();
+        const lec0 = (() => { try { return JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8')).lectures[0].id; } catch (e) { return null; } })();
         const sent = await askCheck(page, `${name} (${label})`, { hubId: hub, hub, lec: lec0, open: () => page.click('.ska-fab') });
         await page.evaluate(() => { location.hash = 'questions'; }); await page.waitForTimeout(800);
         const ch = await page.$('#qlist .qcard:not(.is-answered) .ch'); if (ch) { await ch.click(); await page.waitForTimeout(500); }
@@ -816,7 +770,7 @@ function lint(hub, A){
       await page.evaluate(() => localStorage.removeItem('sh_pref_pet'));
       /* the 8-bit code's pixel face is the site's own file here, fetched only now (a live hub's comes from Google Fonts) */
       if (askedFonts.some(u => /vt323/.test(u))) problems.push(`${name} (${label}): the pixel face was fetched before anyone did the 8-bit code`);
-      if (!vp.isMobile && hub === nextHubs[0]) {
+      if (!vp.isMobile && hub === engineHubs[0]) {
         await page.evaluate(() => { location.hash = 'home'; }); await page.waitForTimeout(400);
         const e8 = await eightBit(page);
         if (!e8.on || e8.tag || !e8.face || !askedFonts.some(u => /assets\/fonts\/vt323\.woff2/.test(u)))
@@ -844,14 +798,14 @@ function lint(hub, A){
        drawings load on first use), double XP shows as a chip, More's Stats has the road ahead, and the hand-off plays
        for a device that last saw the Handpiece: a dialog that Escape closes. The stub above answers every other call
        with [], so nothing is recorded; a page without the switch (every live hub) never makes the v2 call. */
-    for (const hub of nextHubs.slice(0, 1)) {
-      const page = await context.newPage(); const errs = [], name = `${hub}/next, game layer`; let asked = 0;
+    for (const hub of engineHubs.slice(0, 1)) {
+      const page = await context.newPage(); const errs = [], name = `${hub}, game layer`; let asked = 0;
       page.on('pageerror', e => errs.push(e.message));
       await page.addInitScript(() => { try { localStorage.setItem('sh_rank_g', '20'); localStorage.setItem('sh_rank_tier', '6'); localStorage.setItem('sh_rank_step', '20'); } catch (e) {} });
       const rank = { xp: 190000, journey: 1, tier: 3, level: 2, step: 31, gtier: 10, step_at: 184523, next_at: 190475, tier_at: 178571, steps: 63, answers: 900, correct: 700, days: 40,
         badges: ['journey-0'], dark_seen: [0], boost: { mult: 2, until: new Date(Date.now() + 5 * 3600e3).toISOString(), src: 'medal' } };
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => { asked++; return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rank, mastery: [] }) }); });
-      await page.goto(BASE() + `hubs/${hub}/next/index.html#more/stats`);
+      await page.goto(BASE() + `hubs/${hub}/index.html#more/stats`);
       const scene = await page.waitForSelector('.shj.shj-hand[role="dialog"]', { timeout: 15000 }).catch(() => null);
       if (!asked) problems.push(`${name} (${label}): the page never asked for get_widget_bootstrap_v2`);
       if (!scene) problems.push(`${name} (${label}): the hand-off to the ModuPro didn't play for a device that last saw the Handpiece`);
@@ -875,11 +829,11 @@ function lint(hub, A){
       notes.push(`${name} (${label}): the journeys' pill, boost, road and hand-off`);
       await page.close();
     }
-    /* the game layer's wiring (session 8): the arcade's sessions and Timmy Time's minutes on a new hub, and the live hub's
-       calls as today's (wiringCheck, above), on a hub with Million-Dollar Smile, a podcast if one has it */
-    if (!vp.isMobile && nextHubs.length) {
-      const has = (h, f, re) => { try { return re.test(fs.readFileSync(path.join(root, 'hubs', h, 'next', 'content', f), 'utf8')); } catch (e) { return false; } };
-      const smile = nextHubs.filter(h => has(h, 'arcade.js', /id:\s*'smile'/) && fs.existsSync(path.join(root, 'hubs', h, 'index.html')));
+    /* the game layer's wiring (session 8): the arcade's sessions and Timmy Time's minutes (wiringCheck, above), on a
+       hub with Million-Dollar Smile, a podcast if one has it */
+    if (!vp.isMobile && engineHubs.length) {
+      const has = (h, f, re) => { try { return re.test(fs.readFileSync(content(h, f), 'utf8')); } catch (e) { return false; } };
+      const smile = engineHubs.filter(h => has(h, 'arcade.js', /id:\s*'smile'/));
       const wh = smile.find(h => has(h, 'core.json', /"podcast":\s*\{/)) || smile[0];
       if (wh) await wiringCheck(context, wh, label).catch(e => problems.push(`${wh}, the game layer's wiring (${label}): the check stopped: ${e.message.split('\n')[0]}`));
     }
@@ -888,8 +842,8 @@ function lint(hub, A){
        loads with the page, the card draws, the full view is a dialog, Timmy answers a tap, Customize puts a piece in
        the yard through equip_item (stubbed here; nothing is recorded), the bowling lane takes the side yard and the
        front corner, and Escape closes it. */
-    for (const hub of nextHubs.slice(0, 1)) {
-      const page = await context.newPage(); const errs = [], name = `${hub}/next, Timmy's place`, asked = [], calls = [];
+    for (const hub of engineHubs.slice(0, 1)) {
+      const page = await context.newPage(); const errs = [], name = `${hub}, Timmy's place`, asked = [], calls = [];
       page.on('pageerror', e => errs.push(e.message));
       page.on('request', r => { if (/\/widget\/(place\.(js|css)|hub-art\/place)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
       await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
@@ -908,7 +862,7 @@ function lint(hub, A){
         else delete equipped[a.p_slot];
         return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, equipped }) });
       });
-      await page.goto(BASE() + `hubs/${hub}/next/index.html#more`); await page.waitForTimeout(2500);
+      await page.goto(BASE() + `hubs/${hub}/index.html#more`); await page.waitForTimeout(2500);
       if (!(await page.$('a[href="#more/place"], [data-more="place"]')) && !(await page.evaluate(() => [...document.querySelectorAll('.menu .rows a, .menu .rows button')].some(x => /Timmy’s place/.test(x.textContent))))) problems.push(`${name} (${label}): More has no "Timmy's place" tile for an adopted Timmy`);
       if (asked.length) problems.push(`${name} (${label}): the place's files loaded with the page, before it was opened (${asked.join(', ')}): they load on first use`);
       await page.evaluate(() => { location.hash = 'more/place'; });
@@ -976,7 +930,7 @@ function lint(hub, A){
        again; Escape closes a clip; nothing plays (or counts) in the mock, with the eggs off or in Focus mode; reduced
        motion shows the clip's still and its word. At Timmy's place a tap on the bowling lane plays a clip inside the full
        view, and with the eggs off the lane keeps its own surprise. A live hub has no counter and fetches neither file. */
-    for (const hub of nextHubs.slice(0, 1)) {
+    for (const hub of engineHubs.slice(0, 1)) {
       const BOWL_KEYS = ['panic', 'conga', 'floss', 'rocket', 'sweep', 'neighbor', 'turkey', 'spare'];
       const fresh = async (opts) => {
         const page = await context.newPage(), errs = [], asked = [];
@@ -1003,10 +957,10 @@ function lint(hub, A){
         return { clip: c.dataset.clip, still: c.classList.contains('is-still'), label: c.getAttribute('aria-label') || '', top: r.top, bottom: r.bottom, h: innerHeight, focus: c.contains(document.activeElement),
           word: w ? w.textContent : '', wordAnim: w ? getComputedStyle(w).animationName : '', alt: i ? i.alt : '', x: x ? x.getAttribute('data-bowl') + '|' + (x.getAttribute('aria-label') || '') : '',
           after: window.__bwShown ? Math.round(window.__bwShown - window.__bwAt) : -1, seen: localStorage.getItem('sh_bowl_seen') || '' }; });
-      const name = `${hub}/next, the bowling egg`;
+      const name = `${hub}, the bowling egg`;
       { /* the bank */
         const { page, errs, asked } = await fresh();
-        await page.goto(BASE() + `hubs/${hub}/next/index.html#questions`);
+        await page.goto(BASE() + `hubs/${hub}/index.html#questions`);
         await page.waitForSelector('.qcard', { timeout: 20000 }).catch(() => null); await page.waitForTimeout(800);
         await clean(page);
         if (asked.length) problems.push(`${name} (${label}): the bowling egg's files loaded with the page (${asked.join(', ')}): they load at the first strike`);
@@ -1059,7 +1013,7 @@ function lint(hub, A){
       }
       if (!vp.isMobile) { /* reduced motion: the still and its word */
         const { page, errs } = await fresh({ reduced: true });
-        await page.goto(BASE() + `hubs/${hub}/next/index.html#questions`);
+        await page.goto(BASE() + `hubs/${hub}/index.html#questions`);
         await page.waitForSelector('.qcard', { timeout: 20000 }).catch(() => null); await page.waitForTimeout(800);
         await clean(page); await page.evaluate(() => localStorage.setItem('sh_bowl_run', '49'));
         await answer(page, true);
@@ -1078,7 +1032,7 @@ function lint(hub, A){
           inventory: [{ id: 'bowling-lane', at: '2026-11-01', how: 'bought' }], locked: [], equipped: { 'yard-side': 'bowling-lane' } });
         await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rank, mastery: [], shop: shop() }) }));
         await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(shop()) }));
-        await page.goto(BASE() + `hubs/${hub}/next/index.html#more/place`);
+        await page.goto(BASE() + `hubs/${hub}/index.html#more/place`);
         const pc = await page.waitForSelector('.place-card .tpc.is-live', { timeout: 20000 }).catch(() => null);
         await clean(page);
         if (!pc) problems.push(`${name} (${label}): Timmy's place didn't draw, so the lane wasn't checked`);
@@ -1107,20 +1061,21 @@ function lint(hub, A){
         errs.forEach(e => problems.push(`${name} (${label}, the lane): JavaScript error: ${e}`));
         await page.close();
       }
-      if (!vp.isMobile) { /* a live hub: no counter, no file */
+      if (!vp.isMobile && OLD) { /* an old single-file hub: no counter, no file */
         const { page, errs, asked } = await fresh();
-        await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(1500);
+        await page.goto(BASE() + `hubs/${OLD}/index.html`); await page.waitForTimeout(1500);
         await page.click('.sh-archived-stay', { timeout: 1000 }).catch(() => {});
         await page.evaluate(h => { localStorage.setItem('sh_bowl_run', '49'); localStorage.removeItem('sh_bowl_today');
-          document.dispatchEvent(new CustomEvent(h + ':answered', { detail: { qid: 'smoke-bowl', correct: true } })); }, hub);
+          const t = document.querySelector('script[data-answered-event]');
+          document.dispatchEvent(new CustomEvent(t ? t.getAttribute('data-answered-event') : h + ':answered', { detail: { qid: 'smoke-bowl', correct: true } })); }, OLD);
         await page.waitForTimeout(1800);
         const live = await page.evaluate(() => ({ run: localStorage.getItem('sh_bowl_run'), api: !!window.shBowl, today: localStorage.getItem('sh_bowl_today') }));
-        if (asked.length || live.api || live.run !== '49' || live.today) problems.push(`${hub} (live, ${label}): the live hub should have no bowling counter and fetch neither file (${JSON.stringify(live)}, ${asked.join(', ')})`);
+        if (asked.length || live.api || live.run !== '49' || live.today) problems.push(`${OLD} (${label}): an old single-file hub should have no bowling counter and fetch neither file (${JSON.stringify(live)}, ${asked.join(', ')})`);
         await clean(page);
-        errs.forEach(e => problems.push(`${hub} (live, ${label}, the bowling egg): JavaScript error: ${e}`));
+        errs.forEach(e => problems.push(`${OLD} (${label}, the bowling egg): JavaScript error: ${e}`));
         await page.close();
       }
-      notes.push(`${name} (${label}): the run, a strike, a retry, a miss, the turkey, the mock, eggs off, Focus mode${vp.isMobile ? '' : ', reduced motion, the lane and the live hub'}`);
+      notes.push(`${name} (${label}): the run, a strike, a retry, a miss, the turkey, the mock, eggs off, Focus mode${vp.isMobile ? '' : ', reduced motion, the lane and an old hub'}`);
     }
     /* Timmy's shop (phase 4, part B: widget/shop.js, its art widget/hub-art/shop.js and the place's kit). On the game
        layer, with a made-up shop in the bootstrap and buy_item stubbed here (nothing is recorded): More has the Shop
@@ -1129,8 +1084,8 @@ function lint(hub, A){
        retry sends the same id, a refusal says why and changes nothing, a snack can't be bought while Timmy is at 100 HP
        (the bootstrap's pet_days carry the snack's hp, read by widget/pet.js), every button names its click by data-shop
        alone, and an item's name is never drawn as markup. */
-    for (const hub of nextHubs.slice(0, 1)) {
-      const page = await context.newPage(); const errs = [], name = `${hub}/next, Timmy's shop`, asked = [], buys = [];
+    for (const hub of engineHubs.slice(0, 1)) {
+      const page = await context.newPage(); const errs = [], name = `${hub}, Timmy's shop`, asked = [], buys = [];
       page.on('pageerror', e => errs.push(e.message));
       page.on('request', r => { if (/\/widget\/(shop\.(js|css)|hub-art\/shop\.js)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
       const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date());
@@ -1165,7 +1120,7 @@ function lint(hub, A){
         const res = { ok: true, item: it.id, kind: it.kind, price: it.price, balance: wallet.balance, hp: null, boost_until: null };
         seen.set(a.p_request, res); return json(route, res);
       });
-      await page.goto(BASE() + `hubs/${hub}/next/index.html#more`); await page.waitForTimeout(2500);
+      await page.goto(BASE() + `hubs/${hub}/index.html#more`); await page.waitForTimeout(2500);
       const tile = await page.evaluate(() => [...document.querySelectorAll('a[href="#more/shop"]')].map(x => x.textContent.replace(/\s+/g, ' ')).join(' | '));
       if (!tile) problems.push(`${name} (${label}): More has no "Timmy's shop" tile on the game layer`);
       else if (!/300 gold crowns/.test(tile)) problems.push(`${name} (${label}): the Shop tile should show the balance from the bootstrap (${tile})`);
@@ -1250,11 +1205,11 @@ function lint(hub, A){
        alone), turns over to its answer and four ratings, and a rating brings the next card; every button they draw carries
        a fixed data-* name; the mock has no toggle. The stub answers get_my_cards with [], and the page sends no rating
        under a test browser, so nothing is recorded. The bank is put back on Questions at the end. */
-    for (const hub of nextHubs.slice(0, 1)) {
-      const page = await context.newPage(); const errs = [], name = `${hub}/next, Learn and Flashcards`, asked = [];
+    for (const hub of engineHubs.slice(0, 1)) {
+      const page = await context.newPage(); const errs = [], name = `${hub}, Learn and Flashcards`, asked = [];
       page.on('pageerror', e => errs.push(e.message));
       page.on('request', r => { if (/\/widget\/study-modes\.(js|css)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
-      await page.goto(BASE() + `hubs/${hub}/next/index.html#questions`); await page.waitForTimeout(1500);
+      await page.goto(BASE() + `hubs/${hub}/index.html#questions`); await page.waitForTimeout(1500);
       const views = await page.$$eval('[data-qview]', bs => bs.map(b => b.getAttribute('data-qview')));
       if (views.join() !== 'questions,learn,cards') problems.push(`${name} (${label}): the Question Bank's "Study as" toggle is ${views.join(', ') || 'missing'}, not Questions, Learn and Flashcards`);
       if (asked.length) problems.push(`${name} (${label}): Learn and Flashcards' files loaded with the page, before the toggle was used (${asked.join(', ')}): they load on first use`);
@@ -1305,12 +1260,12 @@ function lint(hub, A){
     /* the new dashboard's "you" card: the place takes the house picture's spot once Timmy is adopted. The page is at its
        request budget, so nothing of the place loads with it; the place draws on first use and keeps a still, and the
        next visit shows that still at once, still without a request. */
-    if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
-      const page = await context.newPage(); const errs = [], name = `next (dashboard), Timmy's place`; let asked = [];
+    {
+      const page = await context.newPage(); const errs = [], name = `dashboard, Timmy's place`; let asked = [];
       page.on('pageerror', e => errs.push(e.message));
       page.on('request', r => { if (/\/widget\/(place\.(js|css)|hub-art\/place)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
       await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_tour_done', '1'); } catch (e) {} });
-      await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(2500);
+      await page.goto(BASE() + 'index.html'); await page.waitForTimeout(2500);
       const before = await page.evaluate(() => { const s = document.querySelector('#petHome .shpet-scene'); return { scene: !!s, place: !!(s && s.classList.contains('has-place')), house: !!(s && s.querySelector('.shpet-housesvg')) }; });
       if (!before.scene || !before.house) problems.push(`${name} (${label}): the "you" card should show Timmy's house for an adopted Timmy (${JSON.stringify(before)})`);
       if (asked.length) problems.push(`${name} (${label}): the place's files loaded with the dashboard (${asked.join(', ')}): the page is at its request budget, they load on first use`);
@@ -1337,8 +1292,8 @@ function lint(hub, A){
     /* the new dashboard's balance and Shop button (widget/dash.js): the balance comes from the bootstrap, the shop's
        files load only when the button is tapped, the shop opens as a dialog and Escape gives focus back to the button.
        And a live hub never asks for any of it: no shop files, no get_pet_days_v2, no buy_item. */
-    if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
-      const page = await context.newPage(); const errs = [], name = `next (dashboard), Timmy's shop`, asked = [];
+    {
+      const page = await context.newPage(); const errs = [], name = `dashboard, Timmy's shop`, asked = [];
       page.on('pageerror', e => errs.push(e.message));
       page.on('request', r => { if (/\/widget\/(shop\.(js|css)|hub-art\/shop\.js)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
       /* this device last saw the same rank, so no rank-up card covers the page */
@@ -1349,7 +1304,7 @@ function lint(hub, A){
       const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => json(route, { rank, shop }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => json(route, shop));
-      await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(2500);
+      await page.goto(BASE() + 'index.html'); await page.waitForTimeout(2500);
       const w = await page.evaluate(() => { const e = document.getElementById('youShop'); return e ? { hidden: e.hidden, text: e.innerText.replace(/\s+/g, ' '), btn: !!e.querySelector('button[data-dash="shop"]') } : null; });
       if (!w || w.hidden || !/1,234 Shiny Gold Crowns/.test(w.text) || !w.btn) problems.push(`${name} (${label}): the "you" card should show the balance from the bootstrap and a Shop button (${JSON.stringify(w)})`);
       if (asked.length) problems.push(`${name} (${label}): the shop's files loaded with the dashboard (${asked.join(', ')}): they load when the button is tapped`);
@@ -1382,8 +1337,8 @@ function lint(hub, A){
        whose; closing gives focus back to the row. A name with markup in it is drawn as text, a key that opens nothing
        gives one plain line on its row, a row whose key isn't one isn't a button, and nothing of the place loads with the
        page. Without the game layer (no _v2 boards) no row is a button. */
-    if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
-      const name = `next (dashboard), visiting`, K = c => c.repeat(24), BAD = '<img src=x onerror="window.__visit=1">Bee';
+    {
+      const name = `dashboard, visiting`, K = c => c.repeat(24), BAD = '<img src=x onerror="window.__visit=1">Bee';
       const json = (route, body, status) => route.fulfill({ status: status || 200, contentType: 'application/json', body: JSON.stringify(body) });
       const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
       const row = (rnk, display_name, xp, visit, me) => ({ rnk, display_name, xp, journey: 0, tier: 3, level: 2, step: 11, is_me: !!me, flair: null, visit });
@@ -1399,7 +1354,7 @@ function lint(hub, A){
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_rank_board_v2/, route => json(route, board));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_leaderboard_v2/, route => json(route, board.slice(0, 4).map(r => ({ display_name: r.display_name, streak: 10 - r.rnk, total_answered: 100, journey: 0, tier: 2, level: 1, step: 7, flair: null, visit: r.visit }))));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_place/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {} placeCalls[a.p_key] = (placeCalls[a.p_key] || 0) + 1; return json(route, places[a.p_key] || null); });
-      await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(2000);
+      await page.goto(BASE() + 'index.html'); await page.waitForTimeout(2000);
       if (asked.length) problems.push(`${name} (${label}): the place's files loaded with the dashboard (${asked.join(', ')}): a tap on a row is a first use`);
       if (await page.$('.sh-ru.is-on')) { await page.keyboard.press('Escape'); await page.waitForTimeout(600); }
       await page.evaluate(() => { document.getElementById('class').scrollIntoView(); const o = window.shTrack; window.__tracked = []; window.shTrack = (k, n) => { window.__tracked.push(String(k)); return o && o(k, n); }; });
@@ -1548,7 +1503,7 @@ function lint(hub, A){
       await p2.addInitScript(() => { try { localStorage.setItem('sh_tour_done', '1'); } catch (e) {} });
       await p2.route(/supabase\.co\/rest\/v1\/rpc\/[a-z_]+_v2/, route => json(route, { code: 'PGRST202', message: 'Could not find the function' }, 404));
       await p2.route(/supabase\.co\/rest\/v1\/rpc\/get_rank_board(\?|$)/, route => json(route, board.map(r => { const o = Object.assign({}, r); delete o.visit; delete o.journey; delete o.step; return o; })));
-      await p2.goto(BASE() + 'next/index.html'); await p2.waitForTimeout(2000);
+      await p2.goto(BASE() + 'index.html'); await p2.waitForTimeout(2000);
       await p2.evaluate(() => document.getElementById('class').scrollIntoView());
       await p2.waitForSelector('#board li', { timeout: 15000 }).catch(() => null); await p2.waitForTimeout(600);
       const old = await p2.evaluate(() => ({ rows: document.querySelectorAll('#board li').length, buttons: document.querySelectorAll('#board .dx-visit, #board [data-visit]').length, rand: !document.getElementById('visitRand').hidden }));
@@ -1556,29 +1511,28 @@ function lint(hub, A){
       e2.forEach(e => problems.push(`${name}, without the game layer (${label}): JavaScript error: ${e}`));
       await p2.close();
     }
-    for (const hub of hubs.slice(0, 1)) {
+    for (const hub of OLD ? [OLD] : []) {
       const page = await context.newPage(); const asked = [];
       page.on('request', r => { const u = r.url(); if (/\/widget\/(shop\.(js|css)|hub-art\/shop\.js)|rpc\/(get_pet_days_v2|buy_item|get_my_shop|record_costume_sighting)/.test(u)) asked.push(u.replace(/^.*\/(widget|rpc)\//, '')); });
       await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); } catch (e) {} });
       await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(2500);
-      if (asked.length) problems.push(`${hub} (${label}): a live hub asked for the shop (${asked.join(', ')}): it stays on the redesign's pages until the release`);
+      if (asked.length) problems.push(`${hub} (${label}): an old single-file hub asked for the shop (${asked.join(', ')}): it is on the dashboard and the engine's hubs only`);
       await page.close();
     }
-    /* Everyone has Timmy (Ask Timmy, part 4: widget/pet.js mount({ everyone: true }), on the redesign's pages only). widget/pet.js
+    /* Everyone has Timmy (Ask Timmy, part 4; the only behavior since the redesign's release). widget/pet.js
        is served with its FULL_FROM at today, as a preview serves it (tools/preview/transform.js), so a Timmy met today starts
        at 100 HP. A first-time visitor on a new hub has Timmy on the bar with no introduction and no "Tap me!", at 100 HP, his
        birthday today and the pet-adopt badge sent; he wears the bootstrap's outfit (shop.equipped.outfit): nothing until the
        first key (outfits.js never loads with a page), then the outfit, kept on the device; on the next visit he wears it at
        once with no request; with nothing on he wears nothing, on Halloween too; shPet.fit() is the outfit's id; changing
        it in the customizer changes the bar without a reload; More has Timmy's place and the shop. The same first visit on
-       the new dashboard has him in the "you" card. And the live hub and the live dashboard are as they were: the
-       introduction, "Tap me!", the holiday outfit and fit()'s "<holiday>:<outfit>". */
+       the dashboard has him in the "you" card. An old single-file hub has him the same way, with nothing on. */
     {
       const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date());
       /* widget/pet.js by itself (a live page) or inside the bundle the redesign's pages load it from */
       const petFrom = async page => page.route(/\/widget\/(pet|rest\.bundle)\.js(\?.*)?$/, async route => {
-        const r = await route.fetch(), t = await r.text(), from = 'var FULL_FROM = "9999-12-31";';
-        if (!t.includes(from)) problems.push(`widget/${widgetFile(route.request().url())} (${label}): no \`${from}\` line (the release sets it; tools/preview/transform.js points it at a preview's start)`);
+        const r = await route.fetch(), t = await r.text(), from = /var FULL_FROM = "\d{4}-\d{2}-\d{2}";/;
+        if (!from.test(t)) problems.push(`widget/${widgetFile(route.request().url())} (${label}): no \`var FULL_FROM = "yyyy-mm-dd";\` line (tools/preview/transform.js looks for it to point it at a preview's start)`);
         return route.fulfill({ response: r, body: t.replace(from, `var FULL_FROM = "${today}";`) });
       });
       const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
@@ -1615,12 +1569,12 @@ function lint(hub, A){
           kept, born: localStorage.getItem('sh_pet_born'), on: document.documentElement.classList.contains('sh-pet-on'),
           intro: !!document.querySelector('.shpet-dlg'), perch: !!document.querySelector('.shpet-perch, #petPerch, .dx-porch'), say: (document.querySelector('.shpet-say') || {}).textContent || '' };
       }, sel);
-      for (const hub of nextHubs.slice(0, 1)) {
-        const page = await context.newPage(), errs = [], adopts = [], asked = [], name = `${hub}/next, everyone has Timmy`;
+      for (const hub of engineHubs.slice(0, 1)) {
+        const page = await context.newPage(), errs = [], adopts = [], asked = [], name = `${hub}, everyone has Timmy`;
         page.on('pageerror', e => errs.push(e.message));
         await game(page, adopts, asked);
         await fresh(page);
-        await page.goto(BASE() + `hubs/${hub}/next/index.html#more`); await page.waitForTimeout(3000);
+        await page.goto(BASE() + `hubs/${hub}/index.html#more`); await page.waitForTimeout(3000);
         let t = await bar(page, '.shpet-home .shpet-btn');
         if (!t.here || !t.on) problems.push(`${name} (${label}): a first-time visitor has no Timmy on the bar (${JSON.stringify({ here: t.here, on: t.on })})`);
         if (t.intro || /Tap me!/.test(t.say)) problems.push(`${name} (${label}): a first-time visitor got the adoption introduction or "Tap me!" (${JSON.stringify({ intro: t.intro, say: t.say })})`);
@@ -1668,13 +1622,13 @@ function lint(hub, A){
         notes.push(`${name} (${label}): a first visit, his outfit kept, nothing on at Halloween, the customizer`);
         await page.close();
       }
-      if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
+      {
         equipped.outfit = 'bow-tie';
-        const page = await context.newPage(), errs = [], adopts = [], asked = [], name = 'next (dashboard), everyone has Timmy';
+        const page = await context.newPage(), errs = [], adopts = [], asked = [], name = 'dashboard, everyone has Timmy';
         page.on('pageerror', e => errs.push(e.message));
         await game(page, adopts, asked);
         await fresh(page);
-        await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(3000);
+        await page.goto(BASE() + 'index.html'); await page.waitForTimeout(3000);
         let t = await bar(page, '#petHome .shpet-btn');
         const house = await page.evaluate(() => !!document.querySelector('#petHome.shpet-house:not([hidden])'));
         if (!house || !t.here || t.perch || t.intro) problems.push(`${name} (${label}): a first-time visitor should find Timmy in the "you" card, with no porch, perch or introduction (${JSON.stringify({ house, here: t.here, perch: t.perch, intro: t.intro })})`);
@@ -1687,38 +1641,25 @@ function lint(hub, A){
         notes.push(`${name} (${label}): a first visit, in his outfit`);
         await page.close();
       }
-      /* the live pages, as they were */
-      for (const hub of hubs.slice(0, 1)) {
-        const page = await context.newPage(), errs = [], asked = [], name = `${hub}, Timmy as before`;
+      /* an old single-file hub (they keep their pages until they come down): everyone has Timmy there too. A
+         first-time visitor finds him on the bar with no introduction, born today; he never dresses himself for a
+         holiday, fit() is "" with nothing on, and outfits.js isn't fetched */
+      for (const hub of OLD ? [OLD] : []) {
+        const page = await context.newPage(), errs = [], asked = [], name = `${hub}, everyone has Timmy`;
         page.on('pageerror', e => errs.push(e.message));
         page.on('request', r => { if (/\/widget\/hub-art\/outfits\.js/.test(r.url())) asked.push('outfits.js'); });
         await fresh(page);
+        await page.addInitScript(() => { try { localStorage.setItem('sh_egg_holiday_test', 'halloween'); } catch (e) {} });
         await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(2500);
-        const before = await page.evaluate(() => ({ on: document.documentElement.classList.contains('sh-pet-on'), born: localStorage.getItem('sh_pet_born'), fit: window.shPet ? window.shPet.fit() : null }));
-        if (before.on || before.born || before.fit !== '') problems.push(`${name} (${label}): a live hub shouldn't show or adopt a Timmy nobody has met (${JSON.stringify(before)})`);
-        await page.evaluate(() => { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_egg_holiday_test', 'halloween'); });
-        await page.reload(); await page.waitForTimeout(2500);
+        await page.click('.sh-archived-stay', { timeout: 1000 }).catch(() => {});
+        await page.waitForSelector('.shpet-home .shpet-btn', { timeout: 15000 }).catch(() => {});
         const t = await bar(page, '.shpet-home .shpet-btn');
-        if (!t.on || !/^halloween:[a-z0-9-]+$/.test(t.fit || '') || !t.dressed) problems.push(`${name} (${label}): an adopted Timmy on a live hub should wear his own Halloween costume, fit() "halloween:<outfit>" (${JSON.stringify({ on: t.on, fit: t.fit, dressed: t.dressed })})`);
-        if (t.kept || asked.length) problems.push(`${name} (${label}): a live hub kept or fetched an outfit (${JSON.stringify(t.kept)}, ${asked.join(', ')})`);
+        if (!t.here || !t.on || t.intro || t.perch || t.born !== today) problems.push(`${name} (${label}): a first-time visitor on an old hub should find Timmy on the bar, met today, with no introduction (${JSON.stringify({ here: t.here, on: t.on, intro: t.intro, perch: t.perch, born: t.born })})`);
+        if (t.dressed || t.fit !== '') problems.push(`${name} (${label}): Timmy doesn't dress himself for a holiday any more: nothing on, fit() "" (${JSON.stringify({ dressed: t.dressed, fit: t.fit })})`);
+        if (asked.length) problems.push(`${name} (${label}): an old hub fetched an outfit with nothing on (${asked.join(', ')})`);
         errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
-        await page.close();
-      }
-      {
-        const page = await context.newPage(), errs = [], name = 'dashboard, Timmy as before';
-        page.on('pageerror', e => errs.push(e.message));
-        await fresh(page);
-        await page.goto(BASE() + 'index.html'); await page.waitForTimeout(2600);
-        const p = await page.evaluate(() => ({ perch: !!document.querySelector('.shpet-perch'), say: (document.querySelector('.shpet-perch .shpet-say') || {}).textContent || '', born: localStorage.getItem('sh_pet_born') }));
-        if (!p.perch || !/Tap me/.test(p.say) || p.born) problems.push(`${name} (${label}): before he's adopted, Timmy should wait on the live dashboard with "Tap me!" (${JSON.stringify(p)})`);
-        else {
-          await page.click('.shpet-perch .shpet-btn'); await page.waitForTimeout(500);
-          const i = await page.evaluate(() => { const d = document.querySelector('.shpet-dlg'); return d ? { hi: /Hi! I'm Timmy Tooth/.test(d.textContent), no: !!d.querySelector('[data-no]') } : null; });
-          if (!i || !i.hi || !i.no) problems.push(`${name} (${label}): tapping him should open the adoption introduction with "No thanks" (${JSON.stringify(i)})`);
-        }
-        errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
-        notes.push(`${hubs[0]} and the dashboard (${label}): Timmy's adoption, "Tap me!", the holiday outfit and fit() as before`);
-        await page.evaluate(() => { ['sh_pet_born', 'sh_egg_holiday_test'].forEach(k => localStorage.removeItem(k)); });
+        notes.push(`${hub} (${label}): Timmy for a first-time visitor on an old hub, no introduction, no holiday outfit`);
+        await page.evaluate(() => { ['sh_pet_born', 'sh_egg_holiday_test', 'sh_pet_adopt_sent'].forEach(k => localStorage.removeItem(k)); });
         await page.close();
       }
     }
@@ -1731,9 +1672,11 @@ function lint(hub, A){
        drawing; every button has a fixed data-sht; the scoreboard, a card per lecture and the achievements are under it.
        Without Full Arch won there is no Retired shelf. A trophy the device hasn't seen plays the new card (drawn, "New
        trophy", in the rank's metal, "... of 27 in your case") and a tap skips it. On the new dashboard the "you" card opens
-       the case. On a live hub: 24 trophies with Full Arch, the arch grows on a right answer, nothing of the case is fetched,
-       and the trophy, mastery, rank-up and mock cards have the same structure as before this session (LIVE_CARDS: tags,
-       classes but not is-* states, attribute names; captured from main's widget/rankup.js and ranks.js, 2026-11-13). */
+       the case. On an old single-file hub (they keep their pages until they come down): 23 trophies, Full Arch in neither
+       list and no chart after a right answer (it is retired on every page since the release), nothing of the case is
+       fetched, and the trophy, mastery, rank-up and mock cards have the same structure as before that session
+       (LIVE_CARDS: tags, classes but not is-* states, attribute names; captured from main's widget/rankup.js and
+       ranks.js, 2026-11-13). */
     {
       const LIVE_CARDS = {
         "t": "div.sh-ru-lv.sh-ru-tr[aria-label,aria-live,role,style](div.sh-ru-lv-medal[aria-hidden](i.sh-ru-lv-ring[]()i.sh-ru-lv-ring[]()div.sh-ru-lv-coin[](svg[aria-hidden,height,viewBox,width]))div.sh-ru-lv-body[aria-hidden](div.sh-ru-lv-eye[]()span.sh-ru-tr-name.sh-ru-mt[]()div.sh-ru-tr-desc[]())i.sh-ru-lv-shine[aria-hidden]())",
@@ -1761,10 +1704,10 @@ function lint(hub, A){
       /* n right answers, as the hub's widget hears them */
       const answer = (page, n) => page.evaluate(n => { const t = document.querySelector('script[data-answered-event]'), e = t && t.getAttribute('data-answered-event');
         for (let i = 0; e && i < n; i++) document.dispatchEvent(new CustomEvent(e, { detail: { correct: true, qid: 'smoke-' + i } })); return !!e; }, n);
-      for (const hub of nextHubs.slice(0, 1)) {
-        const name = `${hub}/next, the trophy case`;
+      for (const hub of engineHubs.slice(0, 1)) {
+        const name = `${hub}, the trophy case`;
         let { page, got, errs } = await tpage(['answers-100', 'run-25', 'fairy', 'golden', 'fullarch:' + hub], null);
-        await page.goto(BASE() + `hubs/${hub}/next/index.html`); await page.waitForTimeout(3000);
+        await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(3000);
         await page.waitForFunction(() => window.shRanks && [...document.scripts].some(s => /\/eggs\.js/.test(s.src)), null, { timeout: 15000 }).catch(() => {});
         if (got.length) problems.push(`${name} (${label}): ${got.join(', ')} loaded with the page (the case loads when it is first opened)`);
         if (!(await answer(page, 3))) problems.push(`${name} (${label}): couldn't find the widget's answered event`);
@@ -1804,13 +1747,13 @@ function lint(hub, A){
         await page.close();
         /* without Full Arch won: no Retired shelf */
         ({ page, got, errs } = await tpage(['answers-100'], null));
-        await page.goto(BASE() + `hubs/${hub}/next/index.html#more/stats`); await page.waitForTimeout(1500);
+        await page.goto(BASE() + `hubs/${hub}/index.html#more/stats`); await page.waitForTimeout(1500);
         await page.waitForSelector('.sht .sht-cab', { timeout: 20000 }).catch(() => null);
         if (await page.$('.sht-shelf.is-retired')) problems.push(`${name} (${label}): a Retired shelf showed for someone who never won Full Arch`);
         await page.close();
         /* a trophy this device hasn't seen yet: the new card, skipped with a tap */
         ({ page, got, errs } = await tpage(['answers-100', 'fairy', 'golden'], 'fairy,golden'));
-        await page.goto(BASE() + `hubs/${hub}/next/index.html`);
+        await page.goto(BASE() + `hubs/${hub}/index.html`);
         const card = await page.waitForSelector('.sh-ru-tr', { timeout: 20000 }).catch(() => null);
         if (!card) problems.push(`${name} (${label}): a trophy won since this device last looked played no card`);
         else {
@@ -1827,9 +1770,9 @@ function lint(hub, A){
         await page.close();
         notes.push(`${name} (${label}): 27 trophies (16 secret), Full Arch only as retired, the stats under the case, and the new trophy card`);
       }
-      if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
-        const name = 'dashboard/next, the trophy case', { page, got, errs } = await tpage(['answers-100', 'fairy'], null);
-        await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(2000);
+      {
+        const name = 'dashboard, the trophy case', { page, got, errs } = await tpage(['answers-100', 'fairy'], null);
+        await page.goto(BASE() + 'index.html'); await page.waitForTimeout(2000);
         await page.mouse.wheel(0, 200);
         const btn = await page.waitForSelector('[data-dx="trophies"]', { timeout: 20000 }).catch(() => null);
         if (got.length) problems.push(`${name} (${label}): ${got.join(', ')} loaded before the case was opened`);
@@ -1845,8 +1788,8 @@ function lint(hub, A){
         await page.close();
         notes.push(`${name} (${label}): the "you" card's Trophy case button opens the case`);
       }
-      /* a hub with a new version is live (it is being redesigned); the first hub on the list may be archived */
-      for (const hub of (nextHubs.length ? nextHubs : hubs).slice(0, 1)) {
+      /* an old single-file hub: the shared files it still loads behave there as they did, less Full Arch */
+      for (const hub of OLD ? [OLD] : []) {
         const page = await context.newPage(), errs = [], got = [], name = `${hub}, trophies as before`;
         page.on('pageerror', e => errs.push(e.message));
         page.on('request', r => { if (caseFiles.test(r.url())) got.push(r.url().replace(/^.*\/widget\//, '')); });
@@ -1862,17 +1805,16 @@ function lint(hub, A){
         await page.waitForFunction(() => window.shRanks && [...document.scripts].some(s => /\/eggs\.js/.test(s.src)), null, { timeout: 15000 }).catch(() => {});
         for (let i = 0; i < 3; i++) { await page.keyboard.press('Escape'); await page.waitForTimeout(150); }
         const l = await page.evaluate(() => { const R = window.shRanks; return R ? { n: R.TROPHIES.length, arch: R.TROPHIES.some(t => t.k === 'fullarch'), hub: R.HUB_TROPHIES.some(t => t.k === 'fullarch'), retired: (R.RETIRED || []).length } : null; });
-        if (!l || l.n !== 24 || !l.arch || !l.hub || l.retired) problems.push(`${name} (${label}): a live hub's case should still hold 24 trophies with Full Arch (${JSON.stringify(l)})`);
+        if (!l || l.n !== 23 || l.arch || l.hub || l.retired !== 1) problems.push(`${name} (${label}): an old hub's case should hold 23 trophies, Full Arch only in RETIRED (${JSON.stringify(l)})`);
         await answer(page, 2); await page.waitForTimeout(700);
-        const arch = await page.evaluate(() => { const a = document.querySelector('.sh-egg-arch .sh-egg-arch-n'); return a ? a.textContent : null; });
-        if (arch !== '2 / 32') problems.push(`${name} (${label}): the Full Arch chart should still grow on a live hub (${arch})`);
+        if (await page.$('.sh-egg-arch')) problems.push(`${name} (${label}): the Full Arch chart showed after a right answer (it is retired)`);
         for (const [k, a, sel] of [['t', ['trophy', 1], '.sh-ru-tr'], ['m', ['mastery', 1], '.sh-ru-tr'], ['r', ['tier', 3], '.sh-ru'], ['k', ['mock', 34, 40], '.sh-mk']]) {
           await page.evaluate(a => window.shRanks.preview(...a), a);
           const el = await page.waitForSelector(sel, { timeout: 15000 }).catch(() => null);
           if (!el) { problems.push(`${name} (${label}): shRanks.preview(${a.join(', ')}) showed no card`); continue; }
           await page.waitForTimeout(k === 'r' ? 4500 : 1200);
           const sig = await page.evaluate(sel => window.__sig(document.querySelector(sel)), sel);
-          if (sig !== LIVE_CARDS[k]) problems.push(`${name} (${label}): the ${a[0]} card's markup changed on a live hub:\n      was ${LIVE_CARDS[k]}\n      now ${sig}`);
+          if (sig !== LIVE_CARDS[k]) problems.push(`${name} (${label}): the ${a[0]} card's markup changed on an old hub:\n      was ${LIVE_CARDS[k]}\n      now ${sig}`);
           if (k === 'r' || k === 'k') await page.keyboard.press('Escape'); else await el.click().catch(() => {});
           await page.waitForTimeout(900);
         }
@@ -1886,10 +1828,10 @@ function lint(hub, A){
           if (!(await page.waitForSelector('.sh-ru', { timeout: 8000 }).catch(() => null))) problems.push(`${name} (${label}): after a level-up card no later card played (BUG-116)`);
           else { await page.waitForTimeout(800); await page.keyboard.press('Escape'); await page.waitForTimeout(900); }
         }
-        if (got.length || (await page.$('#sh-trophies-css'))) problems.push(`${name} (${label}): a live hub fetched the trophy case's files (${got.join(', ')})`);
+        if (got.length || (await page.$('#sh-trophies-css'))) problems.push(`${name} (${label}): an old hub fetched the trophy case's files (${got.join(', ')})`);
         errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
         await page.evaluate(h => { ['sh_egg_arch_' + h, 'sh_pet_born'].forEach(k => localStorage.removeItem(k)); }, hub);
-        notes.push(`${hub} (${label}): 24 trophies, Full Arch grows, the trophy, mastery, rank-up and mock cards as before, and a card after a level-up plays`);
+        notes.push(`${hub} (${label}): 23 trophies, no Full Arch, the trophy, mastery, rank-up and mock cards as before, and a card after a level-up plays`);
         await page.close();
       }
     }
@@ -1903,7 +1845,7 @@ function lint(hub, A){
     await stub(context);
     await context.addInitScript(size => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); if (size) localStorage.setItem('sh_pref_size', size); } catch (e) {} }, tb.size || '');
     const label = `${tb.width}px${tb.size ? ', largest text' : ''}`;
-    for (const url of ['index.html', ...(fs.existsSync(path.join(root, 'next', 'index.html')) ? ['next/index.html'] : []), ...hubs.map(h => `hubs/${h}/index.html`), ...nextHubs.map(h => `hubs/${h}/next/index.html`)]) {
+    for (const url of ['index.html', ...hubs.map(h => `hubs/${h}/index.html`)]) {
       const page = await context.newPage();
       await page.goto(BASE() + url); await page.waitForTimeout(700);
       await page.click('.sh-archived-stay', { timeout: 500 }).catch(() => {});
