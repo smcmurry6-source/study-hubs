@@ -436,7 +436,7 @@ These hold for each spec; a spec only adds to them.
   mine in a visit, each hop through the clouds. Nothing on the server; `widget/place.js`'s `open()` takes `nav` and
   `covered` (above). **Next: session 6** still.
 - 2026-11-13: [#354](https://github.com/smcmurry6-source/study-hubs/pull/354) merged as `0cba9fc` (Sam: "merge");
-  `postcheck.js` passed. Then Sam: "i want random to be for the whole class": the pick moved to the server, in **a new
+  `postcheck.js` passed. Then Sam: "i want random to be for the whole class" ([#355](https://github.com/smcmurry6-source/study-hubs/pull/355)): the pick moved to the server, in **a new
   pending migration, `migration_v57.sql`** (`get_random_place`; v54 unchanged; applied at the release after v56: its box
   is in [the release](2026-11-06-redesign-release.md), "From phase 4, visiting"). `widget/place.js`'s `nav` can carry
   `more()` (a random trip: Next past the last rolls the die again, Previous goes back through the trip);

@@ -43,7 +43,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Then Sam: "skip people with zero customization" (only places with something chosen; "No one else has decorated their
   place yet" when none) and a **number badge for the top ten** on a visit (gold, silver, bronze, then purple to #10).
   Tests: `xp.js` 14a, `rls.js`, the smoke test's random trip, the badge, nobody customized and the fallback.
-  [Visiting](vault/tasks/done/2026-11-12-redesign-visiting.md), [game-server](vault/reference/game-server.md).
+  [Visiting](vault/tasks/done/2026-11-12-redesign-visiting.md), [game-server](vault/reference/game-server.md), [#355](https://github.com/smcmurry6-source/study-hubs/pull/355).
 - **2026-11-13 (visiting's tour, Claude Code)** — Nothing students see changes (the new dashboard, on the game layer).
   Sam: "build the random visit and next/back", the rest of round 3's visiting. **Visit someone random** under the board
   picks one of its rows (never your own); in a visit, round arrows go to the previous and next person on that board and

@@ -144,7 +144,7 @@ do at a place besides look and tap; a list of who visited; an opt-out (Sam: none
   opened just now." Pressing Next again keeps going (focus lands on it). Closing gives focus to the row of the place
   you ended at, your own row after "Back to mine", or the random button after a random visit. Each place counts
   `place:visit`. With reduced motion there are no clouds. Nothing on the server.
-- **Random from the whole class** (after #354; Sam: "i want random to be for the whole class"). The page only holds the
+- **Random from the whole class** (after #354, in [#355](https://github.com/smcmurry6-source/study-hubs/pull/355); Sam: "i want random to be for the whole class"). The page only holds the
   keys the boards hand out, so the pick moved to the server: **a new pending migration, `migration_v57.sql`**
   (`get_random_place`, [game-server](../../reference/game-server.md), "Visiting"), applied at the release after v56;
   `migration_v54.sql` is unchanged. It picks from everyone a place can be opened for, never you or your linked device,
