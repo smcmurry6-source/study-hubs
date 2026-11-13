@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-13 (the trophy case and the cards, phase 4 session 6, Claude Code)** — One live fix (Sam: "ship the BUG-116 live fix
+  too"): after a level-up card, later cards (a rank-up, a trophy, a medal, a mock result) play again; until now none
+  did until the page reloaded. Otherwise nothing students see changes: the live hubs and dashboard keep 24 trophies, Full Arch, the old Stats panel and today's cards. On the redesign's pages
+  (`html.shx`): **the trophy case** (`widget/trophies.js` + `widget/trophies.css`, `window.shTrophies`; its drawings in
+  the new `widget/hub-art/trophies.js`, `window.SH_TROPHY_ART`, 128 KB, 23 KB compressed, built by
+  `tools/figures/site/build.mjs`), all three fetched on first use through `widget/ranks.js` (`trophyCase`, `trophyCss`,
+  `trophyStats`). 27 trophies, 16 secret: the rank on top with the road ahead, a showcase stand, a cabinet with "Won by
+  studying", "The journeys" and "Secrets" shelves, and "Full Arch (retired)" only for someone who won it. In a new hub's
+  More, Stats and trophies (with the rest of that page redrawn: a scoreboard, a card per lecture, the achievements as
+  rosettes; Sam: "make it more epic") and from the new dashboard's "you" card. **The cards** (`widget/rankup.js`) in
+  the new look: drawn trophies, the class share and a "what's next" line, Timmy's place pieces on a rank-up; they wait
+  for their styles and drawings (2.5 s at most). **Full Arch retired** on the redesign (`ARCH_OFF` in `widget/eggs.js`,
+  out of the Extras and both trophy lists). Found: BUG-116, a level-up card stopped later cards (fixed everywhere, above). Tests: the smoke test's trophy-case block, `a11y.js`'s case and
+  card. [#356](https://github.com/smcmurry6-source/study-hubs/pull/356), [the task](vault/tasks/done/2026-11-12-redesign-trophy-case-and-cards.md).
 - **2026-11-13 (Visit someone random, from the whole class, Claude Code)** — Nothing students see changes (the new
   dashboard, on the game layer). Sam: "i want random to be for the whole class". A new pending migration,
   **`migration_v57.sql`** (`get_random_place`; `migration_v54.sql` unchanged), picks on the server from everyone a place

@@ -29,6 +29,8 @@ async function audit(page){
 }
 async function keyboard(page){
   await page.evaluate(() => { document.activeElement && document.activeElement.blur && document.activeElement.blur(); window.scrollTo(0, 0); });
+  /* a stop is told apart by its text and its accessible name: buttons that read the same (the trophy case's unfound
+     secrets all say "Secret") are still different stops when their names differ */
   let invisible = 0, stuck = 0, last = null, same = 0; const where = [], whyNot = [];
   for (let i = 0; i < 30; i++) {
     await page.keyboard.press('Tab');
@@ -43,9 +45,9 @@ async function keyboard(page){
       if (!ring) {
         why = `focus=${e.matches(':focus')} focus-visible=${e.matches(':focus-visible')} page-focused=${document.hasFocus()} outline=${s.outlineStyle} ${s.outlineWidth}` +
           ` html=${document.documentElement.className || '-'} in-hx=${!!e.closest('.hx')}`;
-        return new Promise(r => setTimeout(() => { const t = getComputedStyle(e); r({ id, ring, why: why + ` later: active=${document.activeElement === e} outline=${t.outlineStyle} ${t.outlineWidth}`, path: (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30) }); }, 200));
+        return new Promise(r => setTimeout(() => { const t = getComputedStyle(e); r({ id, ring, why: why + ` later: active=${document.activeElement === e} outline=${t.outlineStyle} ${t.outlineWidth}`, path: (e.textContent || '').trim().slice(0, 30) + '|' + (e.getAttribute('aria-label') || '').slice(0, 80) }); }, 200));
       }
-      return { id, ring, why, path: (e.textContent || e.getAttribute('aria-label') || '').trim().slice(0, 30) };
+      return { id, ring, why, path: (e.textContent || '').trim().slice(0, 30) + '|' + (e.getAttribute('aria-label') || '').slice(0, 80) };
     });
     if (!f || f.skip) continue;
     if (!f.ring) { invisible++; if (where.length < 3) where.push(f.id); if (whyNot.length < 3) whyNot.push(`${f.id} (${f.why})`); }
@@ -197,6 +199,35 @@ async function openVisit(page, check){
         }
       } else problems.push(`${hub}/next · bowling clip: one first-try right answer with the run at 49 showed no clip`);
       await page.evaluate(() => ['sh_bowl_run', 'sh_bowl_today', 'sh_bowl_seen'].forEach(k => localStorage.removeItem(k)));
+      /* the trophy case (widget/trophies.js; loaded on first use) under More, Stats and trophies: axe and the keyboard; every
+         trophy has a name a screen reader gets, and a secret one is announced as a secret, never by its name. Then one
+         card on the redesign's look (a trophy card), axe on the card alone. */
+      await page.evaluate(() => { location.hash = 'more/stats'; });
+      if (await page.waitForSelector('.sht .sht-cab', { timeout: 20000 }).catch(() => null)) {
+        await page.waitForTimeout(800);
+        const k = `${hub}/next · trophy case`;
+        await check(k, null);
+        results[k].focus = await keyboard(page); results[k].motion = await motion(page);
+        const t = await page.evaluate(() => {
+          const b = [...document.querySelectorAll('.sht [data-sht="trophy"]')], R = window.shRanks, all = R.TROPHIES.concat(R.RETIRED || []);
+          const sec = b.filter(x => x.classList.contains('is-secret'));
+          const leak = sec.filter(x => { const m = all.filter(y => y.k === x.getAttribute('data-k'))[0], said = (x.getAttribute('aria-label') || '') + ' ' + x.textContent;
+            return !/^Secret trophy/.test(x.getAttribute('aria-label') || '') || !m || said.indexOf(m.n) >= 0; });
+          return { n: b.length, unnamed: b.filter(x => !/\S/.test(x.getAttribute('aria-label') || '')).length, sec: sec.length, leak: leak.map(x => x.getAttribute('data-k')) };
+        });
+        if (t.n < 27 || t.unnamed) problems.push(`${k}: every trophy needs a name a screen reader gets (${t.unnamed} of ${t.n} have none)`);
+        if (!t.sec || t.leak.length) problems.push(`${k}: a secret not found must be announced as a secret, never by its name (${t.leak.join(', ') || 'no secret drawn'})`);
+        await page.evaluate(() => window.shRanks.preview('trophy', 1));
+        if (await page.waitForSelector('.sh-ru-tr', { timeout: 15000 }).catch(() => null)) {
+          await page.waitForTimeout(1200);
+          const kc = `${hub}/next · trophy card`;
+          await page.addScriptTag({ content: AXE });
+          const v = await page.evaluate(async tags => (await window.axe.run({ include: [['.sh-ru-tr']] }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })).violations
+            .map(x => ({ id: x.id, impact: x.impact, n: x.nodes.length, help: x.help, sample: x.nodes[0] && x.nodes[0].target.join(' ') })), TAGS);
+          results[kc] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: await motion(page) };
+          await page.click('.sh-ru-tr').catch(() => {});
+        } else problems.push(`${hub}/next · trophy card: shRanks.preview("trophy") showed no card`);
+      } else problems.push(`${hub}/next · trophy case: More, Stats and trophies didn't draw the case for the returning test account`);
     }
   }
   await ctx.close();

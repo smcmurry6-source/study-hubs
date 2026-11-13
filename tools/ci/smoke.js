@@ -564,7 +564,7 @@ function lint(hub, A){
       await page.waitForTimeout(800);
       const g = await page.evaluate(() => { const p = document.querySelector('#hxRank'), x = document.querySelector('#hxXp');
         return { name: p ? (p.querySelector('b') || {}).textContent : '', art: p ? !!p.querySelector('svg[aria-label*="ModuPro"]') : false, chip: p ? !!p.querySelector('.xboost') : false, x2: x ? !!x.querySelector('.x2') : false,
-          road: document.querySelectorAll('[data-road] .shj-road li').length, w: document.documentElement.scrollWidth - innerWidth, g: localStorage.getItem('sh_rank_g'), tier: localStorage.getItem('sh_rank_tier') }; });
+          road: document.querySelectorAll('[data-road] .shj-road li, [data-sht-roadin] .shj-road li').length, w: document.documentElement.scrollWidth - innerWidth, g: localStorage.getItem('sh_rank_g'), tier: localStorage.getItem('sh_rank_tier') }; });
       if (g.name !== 'ModuPro Silver II') problems.push(`${name} (${label}): the rank pill reads "${g.name}", not the journey's rank`);
       if (!g.art) problems.push(`${name} (${label}): the rank pill didn't draw the ModuPro (widget/hub-art/journeys.js loads on first use)`);
       if (!g.chip || !g.x2) problems.push(`${name} (${label}): double XP isn't shown (the chip on the rank pill, the 2x on the phone's XP meter)`);
@@ -1410,6 +1410,177 @@ function lint(hub, A){
         errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
         notes.push(`${hubs[0]} and the dashboard (${label}): Timmy's adoption, "Tap me!", the holiday outfit and fit() as before`);
         await page.evaluate(() => { ['sh_pet_born', 'sh_egg_holiday_test'].forEach(k => localStorage.removeItem(k)); });
+        await page.close();
+      }
+    }
+    /* The trophy case and the cards on the design system (phase 4, session 6; vault/tasks/2026-11-12-redesign-trophy-case-and-cards.md).
+       A new hub on the game layer whose profile won First Hundred, a run of 25, the Tooth Fairy, the Golden Probe and Full
+       Arch in this hub: none of the case's files (widget/trophies.js and .css, widget/hub-art/trophies.js) load with the
+       page; a right answer grows no Full Arch chart and Settings has no Full Arch switch; More, Stats and trophies shows 27
+       trophies, 16 on the Secrets shelf, no Full Arch among them, and Full Arch alone on the Retired shelf as "Full Arch
+       (retired)"; a secret not found is its silhouette, its name nowhere in the page or a label; a won trophy is its
+       drawing; every button has a fixed data-sht; the scoreboard, a card per lecture and the achievements are under it.
+       Without Full Arch won there is no Retired shelf. A trophy the device hasn't seen plays the new card (drawn, "New
+       trophy", in the rank's metal, "... of 27 in your case") and a tap skips it. On the new dashboard the "you" card opens
+       the case. On a live hub: 24 trophies with Full Arch, the arch grows on a right answer, nothing of the case is fetched,
+       and the trophy, mastery, rank-up and mock cards have the same structure as before this session (LIVE_CARDS: tags,
+       classes but not is-* states, attribute names; captured from main's widget/rankup.js and ranks.js, 2026-11-13). */
+    {
+      const LIVE_CARDS = {
+        "t": "div.sh-ru-lv.sh-ru-tr[aria-label,aria-live,role,style](div.sh-ru-lv-medal[aria-hidden](i.sh-ru-lv-ring[]()i.sh-ru-lv-ring[]()div.sh-ru-lv-coin[](svg[aria-hidden,height,viewBox,width]))div.sh-ru-lv-body[aria-hidden](div.sh-ru-lv-eye[]()span.sh-ru-tr-name.sh-ru-mt[]()div.sh-ru-tr-desc[]())i.sh-ru-lv-shine[aria-hidden]())",
+        "m": "div.sh-ru-lv.sh-ru-tr[aria-label,aria-live,role,style](div.sh-ru-lv-medal[aria-hidden](i.sh-ru-lv-ring[]()i.sh-ru-lv-ring[]()div.sh-ru-lv-coin[](svg[aria-hidden,height,viewBox,width]))div.sh-ru-lv-body[aria-hidden](div.sh-ru-lv-eye[]()span.sh-ru-tr-name.sh-ru-mt[]()div.sh-ru-tr-desc[]())i.sh-ru-lv-shine[aria-hidden]())",
+        "r": "div.sh-ru[aria-label,aria-modal,role,style,tabindex](div.sh-ru-bg[]()canvas.sh-ru-cv[aria-hidden,height,width]()div.sh-ru-fx[aria-hidden](div.sh-ru-fxc[](div.sh-ru-rays[](i[]()i[]())div.sh-ru-halo[style]()))div.sh-ru-stage[](div.sh-ru-in[](div.sh-ru-medal[](div.sh-ru-face.sh-ru-new[style](svg[aria-label,height,role,viewBox,width])div.sh-ru-glare[style]())div.sh-ru-hint[](span[]())div.sh-ru-text[](h2.sh-ru-title[aria-label](span[aria-hidden,style]()span[aria-hidden,style]()span[aria-hidden,style]()span[aria-hidden,style]()span[aria-hidden,style]()span[aria-hidden,style]()span[aria-hidden,style]())div.sh-ru-namewrap[](span.sh-ru-name.sh-ru-mt[]())div.sh-ru-from[](span[](svg[aria-label,height,role,viewBox,width])span.sh-ru-arw[aria-label]()span[](svg[aria-label,height,role,viewBox,width]))ul.sh-ru-unl[](li[style](span.sh-ru-ic[style]()span[](b[]()))li[style](span.sh-ru-ic[style](svg[fill,stroke,stroke-linecap,stroke-linejoin,stroke-width,viewBox])span[](b[]()))li[style](span.sh-ru-ic[](svg[aria-label,height,role,viewBox,width])span[](b[]())))button.sh-ru-go[type]())))div.sh-ru-bars[aria-hidden](i[]()i[]())div.sh-ru-flash[aria-hidden]())",
+        "k": "div.sh-mk[aria-labelledby,aria-modal,role,style,tabindex](div.sh-mk-bg[]()canvas.sh-ru-cv[aria-hidden,height,width]()div.sh-mk-stage[](div.sh-mk-card[](div.sh-mk-eye[]()h2.sh-ru-sr[id]()div.sh-mk-ring[aria-hidden](svg[viewBox]div.sh-mk-num[](b[]()span[]()))div.sh-mk-frac[aria-hidden]()div.sh-mk-verdict[aria-hidden]()div.sh-mk-best[]()ul.sh-mk-lecs[aria-label](li[style](span.l[]()span.b[](i[style]())span.n[]())li[style](span.l[]()span.b[](i[style]())span.n[]())li[style](span.l[]()span.b[](i[style]())span.n[]()))div.sh-mk-actions[](button.sh-mk-go[type]()button.sh-mk-miss[type]()))))"
+      };
+      const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+      const caseFiles = /\/widget\/(trophies\.(js|css)|hub-art\/trophies\.js)(\?|$)/;
+      const rank = badges => ({ xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges, dark_seen: [], boost: null });
+      const SHARES = [['answers-100', 166], ['run-25', 87], ['fairy', 58], ['golden', 41], ['boss', 23], ['fullarch', 15], ['journey-0', 6]].map(([kind, n]) => ({ kind, n, total: 212 }));
+      /* a page on the game layer with these trophies won; `seen` is what this device last saw (null: a first look) */
+      const tpage = async (badges, seen, dash) => {
+        const page = await context.newPage(), got = [], errs = [];
+        page.on('pageerror', e => errs.push(e.message));
+        page.on('request', r => { if (caseFiles.test(r.url())) got.push(r.url().replace(/^.*\/widget\//, '')); });
+        await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => json(route, { rank: rank(badges), mastery: [], pet_days: [] }));
+        await page.route(/supabase\.co\/rest\/v1\/rpc\/get_trophy_stats_v2/, route => json(route, SHARES));
+        await page.addInitScript(seen => { try { if (sessionStorage.getItem('sh_smoke_tc')) return; sessionStorage.setItem('sh_smoke_tc', '1');
+          localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); localStorage.setItem('sh_tour_done', '1');
+          ['sh_bowl_trophy', 'sh_pref_celebrate', 'sh_pref_arch', 'sh_pref_eggs', 'sh_pref_focus'].forEach(k => localStorage.removeItem(k));
+          if (seen === null) localStorage.removeItem('sh_trophy_seen'); else localStorage.setItem('sh_trophy_seen', seen); } catch (e) {} }, seen);
+        return { page, got, errs };
+      };
+      /* n right answers, as the hub's widget hears them */
+      const answer = (page, n) => page.evaluate(n => { const t = document.querySelector('script[src*="v3.js"]'), e = t && t.getAttribute('data-answered-event');
+        for (let i = 0; e && i < n; i++) document.dispatchEvent(new CustomEvent(e, { detail: { correct: true, qid: 'smoke-' + i } })); return !!e; }, n);
+      for (const hub of nextHubs.slice(0, 1)) {
+        const name = `${hub}/next, the trophy case`;
+        let { page, got, errs } = await tpage(['answers-100', 'run-25', 'fairy', 'golden', 'fullarch:' + hub], null);
+        await page.goto(BASE() + `hubs/${hub}/next/index.html`); await page.waitForTimeout(3000);
+        await page.waitForFunction(() => window.shRanks && [...document.scripts].some(s => /\/eggs\.js/.test(s.src)), null, { timeout: 15000 }).catch(() => {});
+        if (got.length) problems.push(`${name} (${label}): ${got.join(', ')} loaded with the page (the case loads when it is first opened)`);
+        if (!(await answer(page, 3))) problems.push(`${name} (${label}): couldn't find the widget's answered event`);
+        await page.waitForTimeout(600);
+        if (await page.$('.sh-egg-arch')) problems.push(`${name} (${label}): the Full Arch chart showed after a right answer (it is retired on the redesign)`);
+        await page.evaluate(() => { location.hash = 'more/settings'; }); await page.waitForTimeout(700);
+        const set = await page.evaluate(() => { const v = document.querySelector('.hx-view:not([hidden])'); return v ? v.innerText : ''; });
+        if (!/Rank-up and trophy cards/.test(set) || /Full Arch/.test(set)) problems.push(`${name} (${label}): Settings should list the extras without Full Arch`);
+        await page.evaluate(() => { location.hash = 'more/stats'; });
+        const cab = await page.waitForSelector('.sht .sht-cab', { timeout: 20000 }).catch(() => null);
+        await page.waitForTimeout(1000);
+        if (!cab) problems.push(`${name} (${label}): More, Stats and trophies didn't draw the trophy case`);
+        else {
+          const c = await page.evaluate(() => {
+            const q = s => [...document.querySelectorAll(s)], k = b => b.getAttribute('data-k');
+            const main = q('.sht-shelf:not(.is-retired) [data-sht="trophy"]'), ret = q('.sht-shelf.is-retired [data-sht="trophy"]');
+            const secrets = q('.sht-shelf').filter(s => /^Secrets/.test((s.querySelector('h3') || {}).textContent || ''))[0];
+            const boss = document.querySelector('[data-sht="trophy"][data-k="boss"]'), first = document.querySelector('[data-sht="trophy"][data-k="answers-100"]');
+            const words = document.body.innerHTML + ' ' + q('[aria-label], [title]').map(e => (e.getAttribute('aria-label') || '') + ' ' + (e.getAttribute('title') || '')).join(' ');
+            return { n: main.length, secrets: secrets ? secrets.querySelectorAll('[data-sht="trophy"]').length : 0, arch: main.some(b => k(b) === 'fullarch'),
+              ret: ret.map(b => k(b) + ':' + b.textContent.trim()).join(), boss: !!boss && boss.classList.contains('is-secret') && /^Secret trophy/.test(boss.getAttribute('aria-label') || '') && !!boss.querySelector('.sht-obj svg path'),
+              named: /Final Blow/.test(words), first: !!first && first.classList.contains('is-won') && first.querySelectorAll('.sht-obj svg *').length > 3,
+              unnamed: q('.sht button').filter(b => !b.getAttribute('data-sht')).length, boards: !!document.querySelector('[data-sht="boards"]'),
+              board: !!document.querySelector('.stx-board .stx-gauge, .stx-board .stx-tiles'), lecs: q('.stx-lec').length, ach: !!document.querySelector('.stx-ach .stx-badges') };
+          });
+          const lecs = await page.evaluate(() => (window.SH_EXPORT && window.SH_EXPORT.lectures || []).length);
+          if (c.n !== 27 || c.secrets !== 16) problems.push(`${name} (${label}): the case should hold 27 trophies, 16 of them secret (${c.n}, ${c.secrets})`);
+          if (c.arch) problems.push(`${name} (${label}): Full Arch is among the case's trophies (it is retired: only on the Retired shelf, for those who won it)`);
+          if (c.ret !== 'fullarch:Full Arch (retired)') problems.push(`${name} (${label}): Full Arch, won here, should sit alone on the Retired shelf as "Full Arch (retired)" (${c.ret || 'none'})`);
+          if (!c.boss || c.named) problems.push(`${name} (${label}): a secret not found should be its silhouette, announced as a secret, its name nowhere in the page (${JSON.stringify({ boss: c.boss, named: c.named })})`);
+          if (!c.first) problems.push(`${name} (${label}): a won trophy should show its drawing, lit`);
+          if (c.unnamed) problems.push(`${name} (${label}): ${c.unnamed} button(s) in the case have no fixed data-sht, so click counts would record their words`);
+          if (!c.boards) problems.push(`${name} (${label}): the case has no Leaderboards button`);
+          if (!c.board || c.lecs !== lecs || !c.ach) problems.push(`${name} (${label}): under the case: the scoreboard, a card for each of ${lecs} lectures and the achievements (${JSON.stringify({ board: c.board, lecs: c.lecs, ach: c.ach })})`);
+        }
+        errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+        await page.close();
+        /* without Full Arch won: no Retired shelf */
+        ({ page, got, errs } = await tpage(['answers-100'], null));
+        await page.goto(BASE() + `hubs/${hub}/next/index.html#more/stats`); await page.waitForTimeout(1500);
+        await page.waitForSelector('.sht .sht-cab', { timeout: 20000 }).catch(() => null);
+        if (await page.$('.sht-shelf.is-retired')) problems.push(`${name} (${label}): a Retired shelf showed for someone who never won Full Arch`);
+        await page.close();
+        /* a trophy this device hasn't seen yet: the new card, skipped with a tap */
+        ({ page, got, errs } = await tpage(['answers-100', 'fairy', 'golden'], 'fairy,golden'));
+        await page.goto(BASE() + `hubs/${hub}/next/index.html`);
+        const card = await page.waitForSelector('.sh-ru-tr', { timeout: 20000 }).catch(() => null);
+        if (!card) problems.push(`${name} (${label}): a trophy won since this device last looked played no card`);
+        else {
+          await page.waitForTimeout(1200);
+          const t = await page.evaluate(() => { const el = document.querySelector('.sh-ru-tr');
+            return { metal: el.getAttribute('data-metal'), eye: el.querySelector('.sh-ru-lv-eye').textContent, drawn: !!el.querySelector('.sh-ru-lv-coin svg[viewBox="0 0 64 64"]'),
+              rare: (el.querySelector('.sh-ru-tr-rare') || {}).textContent || '', css: !!document.getElementById('sh-trophies-css'), frame: getComputedStyle(el).borderTopWidth }; });
+          if (t.metal !== 'gold' || t.eye !== 'New trophy' || !t.drawn || !/3 of 27 in your case/.test(t.rare) || !t.css || t.frame !== '3px')
+            problems.push(`${name} (${label}): the new trophy card should be drawn on the design system ("New trophy", the drawing, "3 of 27 in your case", widget/trophies.css): ${JSON.stringify(t)}`);
+          await card.click(); await page.waitForTimeout(800);
+          if (await page.$('.sh-ru-tr')) problems.push(`${name} (${label}): a tap didn't skip the trophy card`);
+        }
+        errs.forEach(e => problems.push(`${name}, the card (${label}): JavaScript error: ${e}`));
+        await page.close();
+        notes.push(`${name} (${label}): 27 trophies (16 secret), Full Arch only as retired, the stats under the case, and the new trophy card`);
+      }
+      if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
+        const name = 'dashboard/next, the trophy case', { page, got, errs } = await tpage(['answers-100', 'fairy'], null);
+        await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(2000);
+        await page.mouse.wheel(0, 200);
+        const btn = await page.waitForSelector('[data-dx="trophies"]', { timeout: 20000 }).catch(() => null);
+        if (got.length) problems.push(`${name} (${label}): ${got.join(', ')} loaded before the case was opened`);
+        if (!btn) problems.push(`${name} (${label}): the "you" card has no Trophy case button`);
+        else {
+          await btn.click();
+          const ok = await page.waitForSelector('.dx-dlg .sht-cab', { timeout: 20000 }).catch(() => null); await page.waitForTimeout(600);
+          const n = await page.$$eval('.dx-dlg .sht-shelf:not(.is-retired) [data-sht="trophy"]', b => b.length);
+          if (!ok || n !== 27) problems.push(`${name} (${label}): the "you" card should open the case with 27 trophies (${n})`);
+          await page.keyboard.press('Escape');
+        }
+        errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+        await page.close();
+        notes.push(`${name} (${label}): the "you" card's Trophy case button opens the case`);
+      }
+      /* a hub with a new version is live (it is being redesigned); the first hub on the list may be archived */
+      for (const hub of (nextHubs.length ? nextHubs : hubs).slice(0, 1)) {
+        const page = await context.newPage(), errs = [], got = [], name = `${hub}, trophies as before`;
+        page.on('pageerror', e => errs.push(e.message));
+        page.on('request', r => { if (caseFiles.test(r.url())) got.push(r.url().replace(/^.*\/widget\//, '')); });
+        await page.addInitScript(h => { try { ['sh_egg_arch_' + h, 'sh_egg_arch_done_' + h, 'sh_pref_arch', 'sh_pref_eggs', 'sh_pref_pet', 'sh_pref_celebrate', 'sh_pref_focus'].forEach(k => localStorage.removeItem(k));
+          localStorage.setItem('sh_pet_born', '2026-10-01');
+          window.__sig = function sig(el){
+            const cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/).filter(c => c && !/^is-/.test(c)).map(c => '.' + c).join('') : '';
+            const at = [...el.attributes].map(a => a.name).filter(n => n !== 'class').sort().join(',');
+            return el.tagName.toLowerCase() + cls + '[' + at + ']' + (el.tagName.toLowerCase() === 'svg' ? '' : '(' + [...el.children].filter(c => !c.classList.contains('sh-ru-ring')).map(sig).join('') + ')');
+          }; } catch (e) {} }, hub);
+        await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(2500);
+        await page.click('.sh-archived-stay', { timeout: 1000 }).catch(() => {});
+        await page.waitForFunction(() => window.shRanks && [...document.scripts].some(s => /\/eggs\.js/.test(s.src)), null, { timeout: 15000 }).catch(() => {});
+        for (let i = 0; i < 3; i++) { await page.keyboard.press('Escape'); await page.waitForTimeout(150); }
+        const l = await page.evaluate(() => { const R = window.shRanks; return R ? { n: R.TROPHIES.length, arch: R.TROPHIES.some(t => t.k === 'fullarch'), hub: R.HUB_TROPHIES.some(t => t.k === 'fullarch'), retired: (R.RETIRED || []).length } : null; });
+        if (!l || l.n !== 24 || !l.arch || !l.hub || l.retired) problems.push(`${name} (${label}): a live hub's case should still hold 24 trophies with Full Arch (${JSON.stringify(l)})`);
+        await answer(page, 2); await page.waitForTimeout(700);
+        const arch = await page.evaluate(() => { const a = document.querySelector('.sh-egg-arch .sh-egg-arch-n'); return a ? a.textContent : null; });
+        if (arch !== '2 / 32') problems.push(`${name} (${label}): the Full Arch chart should still grow on a live hub (${arch})`);
+        for (const [k, a, sel] of [['t', ['trophy', 1], '.sh-ru-tr'], ['m', ['mastery', 1], '.sh-ru-tr'], ['r', ['tier', 3], '.sh-ru'], ['k', ['mock', 34, 40], '.sh-mk']]) {
+          await page.evaluate(a => window.shRanks.preview(...a), a);
+          const el = await page.waitForSelector(sel, { timeout: 15000 }).catch(() => null);
+          if (!el) { problems.push(`${name} (${label}): shRanks.preview(${a.join(', ')}) showed no card`); continue; }
+          await page.waitForTimeout(k === 'r' ? 4500 : 1200);
+          const sig = await page.evaluate(sel => window.__sig(document.querySelector(sel)), sel);
+          if (sig !== LIVE_CARDS[k]) problems.push(`${name} (${label}): the ${a[0]} card's markup changed on a live hub:\n      was ${LIVE_CARDS[k]}\n      now ${sig}`);
+          if (k === 'r' || k === 'k') await page.keyboard.press('Escape'); else await el.click().catch(() => {});
+          await page.waitForTimeout(900);
+        }
+        /* BUG-116: a card after a level-up card still plays (a local `done` in levelNow's close() once stopped the queue) */
+        await page.evaluate(() => window.shRanks.preview('level', 4, 2));
+        const lv = await page.waitForSelector('.sh-ru-lv:not(.sh-ru-tr)', { timeout: 15000 }).catch(() => null);
+        if (!lv) problems.push(`${name} (${label}): shRanks.preview(level) showed no level-up card`);
+        else {
+          await page.waitForTimeout(1500); await lv.click().catch(() => {});
+          await page.evaluate(() => window.shRanks.preview('tier', 5, 6));
+          if (!(await page.waitForSelector('.sh-ru', { timeout: 8000 }).catch(() => null))) problems.push(`${name} (${label}): after a level-up card no later card played (BUG-116)`);
+          else { await page.waitForTimeout(800); await page.keyboard.press('Escape'); await page.waitForTimeout(900); }
+        }
+        if (got.length || (await page.$('#sh-trophies-css'))) problems.push(`${name} (${label}): a live hub fetched the trophy case's files (${got.join(', ')})`);
+        errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+        await page.evaluate(h => { ['sh_egg_arch_' + h, 'sh_pet_born'].forEach(k => localStorage.removeItem(k)); }, hub);
+        notes.push(`${hub} (${label}): 24 trophies, Full Arch grows, the trophy, mastery, rank-up and mock cards as before, and a card after a level-up plays`);
         await page.close();
       }
     }

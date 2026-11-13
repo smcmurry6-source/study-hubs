@@ -29,6 +29,9 @@
      this runs. The Handpiece keeps today's names ("Gold II"); a later journey's name leads ("ModuPro Gold II"). */
   var JOURNEYS = ["Handpiece", "ModuPro", "Loupes"];
   function isV2(p){ return !!p && p.journey != null; }
+  /* the redesign's pages: a new hub's engine and the new dashboard set html.shx before this file runs. The trophy case's
+     list of 27 and the cards' new look are theirs; a live page never has the class, so its lists and cards are today's. */
+  var NEW = (function(){ try { return document.documentElement.classList.contains("shx"); } catch (e) { return false; } })();
   /* what the handpiece-only parts of this file read from a v2 profile: from the ModuPro on, the rank the Handpiece
      ended at (Dark Matter III), so accents, Timmy's house and the old cards never go back to Stone */
   function legacy(p){
@@ -361,6 +364,29 @@
     { k: "mock-perfect",   n: "Perfect Mock",   d: "Every question right on a mock exam of 20+ questions here", ic: "M12 3l2.6 5.5 6 .8-4.4 4.2 1 6-5.2-2.9-5.2 2.9 1-6L3.4 9.3l6-.8z", c: "#E0A800" },
     { k: "boss",           n: "Final Blow",     d: "Land the last hit on a boss in this hub", ic: "M12 3c4 0 7 2.5 7 7 0 3-2 4-2 6H7c0-2-2-3-2-6 0-4.5 3-7 7-7zM9 11h.01M15 11h.01M9 20h6", secret: true, clue: "Wait until five or more classmates are online at once, then answer fast." }
   ];
+  /* The redesign's trophy case (phase 4, session 6), on its pages only: Full Arch is retired (Sam, 2026-11-12) and
+     leaves both lists, kept in RETIRED for those who earned it (shown as "Full Arch (retired)"); the three journey
+     trophies and the bowling egg's join, so the case holds 27, 16 of them secret. A journey has its own scene (the
+     hand-off), so trackTrophies doesn't announce it again (scene); Bowling is earned on the device (sh_bowl_trophy,
+     widget/bowling.js) and has no class share. A live page keeps today's 24. */
+  var RETIRED = [];
+  if (NEW) {
+    RETIRED = TROPHIES.filter(function(t){ return t.k === "fullarch"; });
+    TROPHIES = TROPHIES.filter(function(t){ return !t.secret; }).concat([
+      { k: "journey-0", n: "Handpiece finished", d: "Reach 125,000 XP: Dark Matter III on the Handpiece", ic: "M3 21l6-6M9 15l8.5-8.5 2.5 2.5L11.5 17.5zM15 5l1.5-1.5 4 4L19 9", scene: true },
+      { k: "journey-1", n: "ModuPro finished", d: "Reach 250,000 XP: Dark Matter III on the ModuPro", ic: "M4 5h16v15H4zM4 10h16M4 15h16M10 7.5h4M10 12.5h4M10 17.5h4", scene: true },
+      { k: "journey-2", n: "Loupes finished", d: "Reach 375,000 XP: Dark Matter III on the Loupes", ic: "M3 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM14 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM10 15h4M4.5 12L7 5h10l2.5 7", scene: true }
+    ], TROPHIES.filter(function(t){ return t.secret && t.k !== "fullarch"; }), [
+      { k: "bowling", n: "Lane Legend", d: "Saw all eight bowling clips", ic: "M12 3c-1.7 0-2.5 1.6-2 3.5.4 1.4-1.5 3-1.5 6.5 0 3.5 1.6 6 3.5 8 1.9-2 3.5-4.5 3.5-8 0-3.5-1.9-5.1-1.5-6.5C14.5 4.6 13.7 3 12 3zM10.2 8.5h3.6", secret: true, device: "sh_bowl_trophy",
+        clue: "The alley\u2019s screen plays something odd after a strike. There are eight." }
+    ]);
+    HUB_TROPHIES = HUB_TROPHIES.filter(function(t){ return t.k !== "fullarch"; });
+  }
+  /* how many of the case's trophies a profile's badges (and this device, for Bowling) have won */
+  function caseCount(badges){
+    var got = {}; (badges || []).forEach(function(b){ got[String(b).split(":")[0]] = 1; });
+    return { won: TROPHIES.filter(function(t){ return got[t.k] || (t.device && ls(t.device)); }).length, of: TROPHIES.length };
+  }
   var MASTERY = [
     { k: "mastery-bronze", n: "Bronze", pct: .5 }, { k: "mastery-silver", n: "Silver", pct: .75 },
     { k: "mastery-gold", n: "Gold", pct: .9 }, { k: "mastery-crown", n: "Crown", pct: 1 }
@@ -637,6 +663,50 @@
   var withJourneys = loadOnce(sibling("journeys.js"), function(){ return window.shJourneys; }, []);
   var loadJourneyArt = loadOnce(sibling("hub-art/journeys.js"), function(){ return window.SH_JOURNEY_ART; }, []);
   function needJourneyArt(cb){ loadJourneyArt(cb, function(){ cb(null); }); }
+  /* the redesign's trophy case: its drawings (widget/hub-art/trophies.js, window.SH_TROPHY_ART) and the case itself
+     (widget/trophies.js, window.shTrophies, which brings its own stylesheet), fetched the first time the case opens */
+  var loadTrophyArt = loadOnce(sibling("hub-art/trophies.js"), function(){ return window.SH_TROPHY_ART; }, []);
+  var withTrophyCase = loadOnce(sibling("trophies.js"), function(){ return window.shTrophies; }, []);
+  /* the case's and the redesign's cards' stylesheet (widget/trophies.css), once; cb when it has loaded (or failed) */
+  var cssWait = null;
+  function trophyCss(cb){
+    if (cssWait === true) { cb(); return; }
+    if (cssWait) { cssWait.push(cb); return; }
+    cssWait = [cb];
+    var fin = function(){ var q = cssWait; cssWait = true; q.forEach(function(f){ f(); }); }, href = sibling("trophies.css");
+    if (!href || document.getElementById("sh-trophies-css")) { fin(); return; }
+    var l = document.createElement("link"); l.rel = "stylesheet"; l.href = href; l.id = "sh-trophies-css"; l.onload = l.onerror = fin;
+    document.head.appendChild(l);
+  }
+  function trophyCase(cb){
+    var go = function(){ withTrophyCase(cb, function(){ cb(null); }); };
+    loadTrophyArt(go, go);
+  }
+  /* the class's share of each trophy, for the redesign's case and cards: get_trophy_stats_v2 (migration_v54, with the
+     journeys) or, until that is applied, get_trophy_stats (migration_v32). kind -> { n, total }, kept 10 minutes. The
+     client is the hub widget's (mount), the one passed in (the dashboard's) or window.shSupabase. */
+  var TS = { data: null, at: 0, q: null, sb: null };
+  function trophyStats(cb, sb){
+    sb = sb || TS.sb || window.shSupabase || null;
+    if (sb && !TS.sb) TS.sb = sb;
+    if ((TS.data && Date.now() - TS.at < 600000) || !sb || !sb.rpc) { if (cb) cb(TS.data); return; }
+    if (TS.q) { if (cb) TS.q.push(cb); return; }
+    TS.q = cb ? [cb] : [];
+    function call(name){
+      try { return Promise.resolve(sb.rpc(name, {})).then(function(r){ return r && !r.error && r.data && r.data.length ? r.data : null; }, function(){ return null; }); }
+      catch (e) { return Promise.resolve(null); }
+    }
+    call("get_trophy_stats_v2").then(function(rows){ return rows || call("get_trophy_stats"); }).then(function(rows){
+      if (rows) { var m = {}; rows.forEach(function(r){ if (r && r.kind) m[r.kind] = { n: r.n | 0, total: r.total | 0 }; }); TS.data = m; TS.at = Date.now(); }
+      var q = TS.q; TS.q = null; q.forEach(function(f){ try { f(TS.data); } catch (e) {} });
+    });
+  }
+  /* one kind's share, or null when the server doesn't count it (Bowling) or hasn't answered */
+  function shareOf(k){
+    var r = TS.data && TS.data[k]; if (!r || !r.total) return null;
+    var p = r.n / r.total * 100;
+    return { n: r.n, total: r.total, p: p, label: !r.n ? "nobody yet" : p < 1 ? "<1%" : Math.round(p) + "%" };
+  }
   /* a journey's medallion: the ModuPro's or the loupes' once their drawings are here, the handpiece's until then
      (call needJourneyArt and draw again) */
   function artOf(j, tier, px, opt){
@@ -654,8 +724,14 @@
      moment (an egg's toast, Timmy Tooth), and hub mastery medals are announced by the hub widget (masteryCard). The
      device remembers which it has seen in sh_trophy_seen; the first look only records them. */
   var rarityOf = null;   // set by the hub widget once trophy stats load: kind -> { n, total, label }
-  function trophyCard(tr){
-    return { name: tr.n, desc: tr.d, eyebrow: "Trophy unlocked", ic: tr.ic, pal: "gold", rarity: function(){ return rarityOf ? rarityOf(tr.k) : null; } };
+  function trophyCard(tr, badges){
+    var c = { name: tr.n, desc: tr.d, eyebrow: "Trophy unlocked", ic: tr.ic, pal: "gold", rarity: function(){ return rarityOf ? rarityOf(tr.k) : null; } };
+    /* the redesign's card: the drawn trophy (k, SH_TROPHY_ART), its share from the shared stats and what's next */
+    if (NEW) {
+      c.k = tr.k; c.eyebrow = "New trophy"; c.rarity = function(){ return shareOf(tr.k); };
+      if (badges) { var n = caseCount(badges); c.next = n.won + " of " + n.of + " in your case"; }
+    }
+    return c;
   }
   function trackTrophies(p, busy){
     var kinds = {}; (p.badges || []).forEach(function(b){ kinds[String(b).split(":")[0]] = 1; });
@@ -664,7 +740,9 @@
     ls("sh_trophy_seen", have);
     if (seen === null || (ls("sh_pref_celebrate") || "on") === "off") return;
     var old = {}; seen.split(",").forEach(function(k){ old[k] = 1; });
-    TROPHIES.forEach(function(tr){ if (!tr.secret && kinds[tr.k] && !old[tr.k]) playRankUp("trophy", trophyCard(tr), busy); });
+    var fresh = TROPHIES.filter(function(tr){ return !tr.secret && !tr.scene && kinds[tr.k] && !old[tr.k]; });
+    if (NEW && fresh.length) trophyStats();
+    fresh.forEach(function(tr){ playRankUp("trophy", trophyCard(tr, p.badges), busy); });
   }
   function track(p, opt){
     if (!p) return;
@@ -680,6 +758,7 @@
     pt = +pt; ps = ps === null ? NaN : +ps;
     var from = Math.floor(ps / 3) === pt ? ps : pt * 3;   // the dashboard used to save only the tier
     var d = { from: pt, fromLevel: from % 3 + 1, to: t, level: p.level || step % 3 + 1, xp: p.xp, next_at: p.next_at, position: p.position, of: p.of };
+    if (v2) d.v2 = true;   // the redesign's cutscene names the rank's pieces for Timmy's place (game layer only)
     if (t > pt) playRankUp("tier", d, opt.busy);
     else if (t === pt && step > from) playRankUp("level", d, opt.busy);
   }
@@ -730,9 +809,15 @@
   /* a hub mastery medal (Bronze 50% ... Crown 100%), as a trophy card */
   var MASTERY_PAL = ["bronze", "silver", "gold", "gold"];
   function masteryCard(i, hub){
-    return { name: MASTERY[i].n + " mastery", eyebrow: "Hub mastery" + (hub ? " · " + hubName(hub) : ""), art: medalSvg(i + 1, 84, hub), pal: MASTERY_PAL[i],
+    var c = { name: MASTERY[i].n + " mastery", eyebrow: "Hub mastery" + (hub ? " · " + hubName(hub) : ""), art: medalSvg(i + 1, 84, hub), pal: MASTERY_PAL[i],
       desc: i === 3 ? "Every question right. The crown now sits next to your name on every leaderboard." : "A " + MASTERY[i].n.toLowerCase() + " medal with this hub's emblem now shows next to your name on every leaderboard.",
       rarity: function(){ return rarityOf ? rarityOf(MASTERY[i].k) : null; } };
+    /* the redesign's card: the same medal, its share and the next medal */
+    if (NEW) {
+      c.rarity = function(){ return shareOf(MASTERY[i].k); };
+      if (i < 3) c.next = MASTERY[i + 1].n + " at " + Math.round(MASTERY[i + 1].pct * 100) + "% right";
+    }
+    return c;
   }
 
   /* ---------- the hub widget: rank card, hub mastery, trophy case, link devices, accent unlocks ---------- */
@@ -740,6 +825,7 @@
     if (!H || window.__shRanksMounted) return;
     window.__shRanksMounted = true;
     var SB = H.supabase, esc = H.esc;
+    if (NEW && SB) TS.sb = SB;
     applyAccent(ls("sh_pref_accent"));
     if (!SB) return;
     function rpc(name, args){ return SB.rpc(name, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); }
@@ -798,6 +884,8 @@
     function loadTrophyStats(){
       if (Date.now() - tstatsAt < 600000) return;
       tstatsAt = Date.now();
+      /* the redesign's pages share one read with the case and the cards (with the journeys, once migration_v54 is in) */
+      if (NEW) { TS.sb = SB; trophyStats(function(d){ if (!d) { tstatsAt = 0; return; } tstats = d; render(); }); return; }
       rpc("get_trophy_stats", {}).then(function(rows){
         if (!rows || !rows.length) { tstatsAt = 0; return; }
         tstats = {}; rows.forEach(function(r){ tstats[r.kind] = { n: r.n | 0, total: r.total | 0 }; });
@@ -861,6 +949,7 @@
       if ((ls("sh_rank_flair") || "") !== myFlair) { ls("sh_rank_flair", myFlair || null); try { document.dispatchEvent(new CustomEvent("sh:rank")); } catch (e) {} }
       if (myFlair) h += '<div class="sh-flair-row"><span>Your mastery medals</span>' + flair(myFlair, { list: true, big: true }) + '</div>';
       var earned = {}; badges.forEach(function(b){ earned[b.split(":")[0]] = true; });
+      if (NEW) TROPHIES.forEach(function(x){ if (x.device && ls(x.device)) earned[x.k] = true; });
       h += '<div class="sh-trophies-h"><span>Trophy case</span><b>' + TROPHIES.filter(function(x){ return earned[x.k]; }).length + ' / ' + TROPHIES.length + '</b></div>' +
         '<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") + '</div>' +
         '<p class="sh-trophy-detail" aria-live="polite">' + psst(earned) + '</p>' +
@@ -889,10 +978,12 @@
     function hubTrophyCard(k){
       if (H.prefGet("sh_pref_celebrate", "on") === "off") return;
       var t = HUB_TROPHIES.filter(function(x){ return x.k === k; })[0]; if (!t) return;
+      if (NEW) trophyStats();
       playRankUp("trophy", trophyCard({ k: t.k, n: t.n, d: t.d + " (" + hubName(H.hub) + ")", ic: t.ic }), mockBusy);
     }
     function masteryToast(i){
       if (H.prefGet("sh_pref_celebrate", "on") === "off") return;
+      if (NEW) trophyStats();
       playRankUp("trophy", masteryCard(i, H.hub), mockBusy);
     }
 
@@ -1056,6 +1147,10 @@
   var miniCache = {};
   window.shRanks = {
     TIERS: TIERS, TROPHIES: TROPHIES, HUB_TROPHIES: HUB_TROPHIES, MASTERY: MASTERY,
+    /* the redesign's trophy case: Full Arch for those who keep it, the count, the class's shares and the case itself
+       (cb(shTrophies), or cb(null) offline) */
+    RETIRED: RETIRED, caseCount: caseCount, trophyStats: trophyStats, shareOf: shareOf, trophyCase: trophyCase, trophyCss: trophyCss,
+    needTrophyArt: function(cb){ loadTrophyArt(cb, function(){ cb(null); }); },
     art: art,
     /* the journeys (the redesign): a v2 profile's name and medallion, its Handpiece view, and the later objects' drawings */
     JOURNEYS: JOURNEYS, isV2: isV2, legacy: legacy, nameOf: nameOf, artOf: artOf, needJourneyArt: needJourneyArt,

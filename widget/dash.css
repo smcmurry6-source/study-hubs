@@ -255,6 +255,8 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-rankname b { font-size: 18px; font-weight: var(--w-head); }
 .dx-rankname span { font-size: var(--fs-meta); color: var(--muted); }
 .dx-rankbar i { background: var(--gold); }
+.dx-tro { grid-column: 1 / -1; justify-self: start; margin-top: 6px; }
+.dx-tro .num { font-weight: 700; color: var(--muted); }
 .dx-medals { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding-top: 8px; }
 /* Timmy's shop on the "you" card (widget/shop.js): the balance, a gold coin and its number, and the Shop button */
 .dx-wallet { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 10px 14px; border-radius: var(--r-row); background: var(--row); }

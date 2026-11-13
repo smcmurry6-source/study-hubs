@@ -71,10 +71,10 @@ task is the one PR that then switches the site over. If something goes wrong, re
 - [ ] The game layer's wiring left by phase 4, part A (2026-11-12, "From phase 4, part A" below): the arcade's
       sessions and pick indexes and Timmy Time's minutes are [their own session](2026-11-12-redesign-game-layer-wiring.md)
       before this one (Sam, 2026-11-12); the journey trophies join the case in
-      [the trophy case's session](2026-11-12-redesign-trophy-case-and-cards.md); the scenes stay silent. Left for
+      [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md); the scenes stay silent. Left for
       this PR: each episode's length loaded (`admin_set_podcast_episode`) and the service worker's lists
 - [ ] **Full Arch comes out** (Sam, 2026-11-12: "I also want to remove the full arch challenge thing"; the redesign's
-      pages stop showing it in [the trophy case's session](2026-11-12-redesign-trophy-case-and-cards.md)). In this
+      pages stop showing it in [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md)). In this
       PR, from the shared files: its code in `widget/eggs.js` (and the top comment's lines about it), its styles in
       `widget/v3.css`, the `sh_pref_arch` switch in `widget/v3.js` (the old dashboard's goes with `index.html`),
       `sh:arch-done` in `widget/ranks.js`, Timmy's secret tip and his line about it in `widget/pet.js`; and on the
@@ -381,10 +381,12 @@ the first answer, or answers are recorded and pay nothing (`why: unknown`).
 - [ ] **Timmy Time** (`widget/podcast.js`): each minute heard reports to `pod_minute_v2`; the +100 at 90% is the
       server's. Its XP should reach the pill the way an answer's does (an event like `sh:answer-paid`, or a profile
       refresh).
-- [ ] **The journey trophies in the trophy case**: `journey-0` to `journey-2` are drawn (`SH_JOURNEY_ART.trophies`) and
+- [x] **The journey trophies in the trophy case**: `journey-0` to `journey-2` are drawn (`SH_JOURNEY_ART.trophies`) and
       show on the road ahead and in the hand-off; the case in Stats (`widget/ranks.js`, `TROPHIES`) doesn't list them
       yet, so it still says 24. They join it when phase 4 redraws the case, with `get_trophy_stats_v2` for their
-      shares: 27 trophies then.
+      shares: 27 trophies then. Done 2026-11-13 by [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md):
+      on the redesign's pages the case lists them as "The journeys" (27 trophies, their shares from
+      `get_trophy_stats_v2`); a live page still says 24.
 - [ ] **Sound** for the hand-off and the unlock, only if the redesign gets a sound setting (it has none; the scenes
       are silent).
 - [ ] `sw.js`: `widget/journeys.js` and `widget/hub-art/journeys.js` join `PRECACHE` with the engine's files, so a
@@ -417,9 +419,10 @@ entries; tagged new; nothing here is a secret):
   (once per journey, ever, on whichever device gets there first; each journey has its own sky), and **finishing a
   journey** hands you the next object: "The ModuPro is yours." Both can be skipped, wait until a mock exam is over, are
   one still card with reduced motion, and are off with Settings, Extras, Rank-up and trophy cards.
-- **Trophy case**: 27 trophies (was 24), 14 of them secret: the three new ones are **Handpiece finished**, **ModuPro
-  finished** and **Loupes finished**, one for each journey completed. "All 24 trophies" in the contents and Part 9's
-  list become 27 (when the case lists them: the box above).
+- **Trophy case**: 27 trophies (was 24), 16 of them secret: the three new ones here are **Handpiece finished**,
+  **ModuPro finished** and **Loupes finished**, one for each journey completed; Bowling joins as a secret and Full Arch
+  leaves ("From phase 4, session 6" below has the case's own entry and the whole count). "All 24 trophies" in the
+  contents and Part 9's list become 27.
 
 ### From phase 4, part C (Timmy's place as a real client, [the place](2026-11-06-redesign-timmys-place.md), built 2026-11-12)
 
@@ -608,6 +611,51 @@ game layer no row is a button.
   and there's no list of who visited. Everyone on a board can be visited (there's no switch to turn it off).
 - "What the hubs record" gets: a visit is counted (that one happened, never whose place).
 
+### From phase 4, session 6 (the trophy case and the cards, [its note](done/2026-11-12-redesign-trophy-case-and-cards.md), built 2026-11-13)
+
+What the session built is in its note (its Outcome) and phase 4's Log. It runs only on the redesign's pages (`html.shx`;
+Full Arch's gate also on `data-game="v2"`), so it goes live with them; a live page keeps 24 trophies, Full Arch, the
+old Stats panel and today's cards.
+
+- [ ] `sw.js`: `widget/trophies.js`, `widget/trophies.css` and `widget/hub-art/trophies.js` join `PRECACHE` with the
+      engine's files (session 8 or 9). All three load on first use (the case opened, or the first card), so phase 5,
+      part 2 counts them among those.
+- [ ] The case and the cards looked at on the release's own preview, phone and laptop, light and dark, reduced motion
+      too (phase 4's Done when): More, Stats and trophies as `?persona=high-xp` (most trophies, Full Arch retired) and
+      `returning`; the "you" card's Trophy case on the new dashboard; the cards with `shRanks.preview("trophy", 0)`,
+      `("mastery", 2)`, `("tier", 2, 3)`, `("level", 4, 2)`, `("mock", 37, 40)` from the console.
+- [ ] When the old pages come down: the `NEW` branches in `widget/ranks.js`, `widget/rankup.js` and `widget/eggs.js`
+      (`ARCH_OFF`) become the only path, with "Full Arch comes out" above (the `RETIRED` row stays, for those who won it).
+      (**BUG-116**, a level-up card stopping later cards, is fixed on every page: [the bug log](../release/bug-log.md).)
+- [ ] The **Bowling** trophy shows no share until the first migration after the release counts the kind (part D's box
+      above); the case reads `get_trophy_stats_v2` and shows a share for any kind it returns.
+- [ ] **The hub trophies** (8 a hub: the mastery levels, every question answered, mock exams, the boss) aren't in the
+      new case; they show in today's panel behind its Leaderboards button. Sam's call whether the case gets a shelf for
+      them (this hub's first, as today's panel has it) before the release.
+
+**About page** (`about/index.html`, Part 5, replacing today's "Trophy case" and "Trophy and medal cards" entries; tagged
+new; the secret's names stay inside `spoil`):
+
+- **Trophy case**: 27 trophies, in More, Stats and trophies in a hub, or from the "Trophy case" button on your card on
+  the dashboard. Your rank sits on top with the road ahead. Then a showcase stand with one trophy at a time (it opens
+  on your rarest; tap any trophy to put it there) and a cabinet with three shelves: **Won by studying** (8), **The
+  journeys** (3: Handpiece, ModuPro and Loupes finished) and **Secrets** (16). A trophy you've won is lit on its brass
+  plate with the share of the class that has it; one you haven't is dimmed, with what earns it; a secret you haven't
+  found is only its shape and its clue, with how many have found it. If you won **Full Arch** before it was retired,
+  it stays in your case on a "Retired" shelf. The leaderboards are behind the Leaderboards button.
+- **Your stats**: under the case, your numbers on a scoreboard (answered, right, best run, days you met your goal),
+  a card for each lecture with how you're doing (your strongest and the one that needs work marked), and your
+  achievements.
+- **Trophy and medal cards**: a new trophy or medal pops up framed in its metal, drawn, with the share of the class
+  that has it and what's next ("12 of 27 in your case", "Gold at 90% right"). A new rank names the pieces it brings
+  to Timmy's place. They take turns, wait until a mock exam is submitted, are one still card with reduced motion, and
+  are off with Settings, Extras, Rank-up and trophy cards.
+- **Hub trophies** (Part 9's per-hub list): 8 a hub, not 9 (the 32 teeth are gone with Full Arch). The new case
+  doesn't show them: they are in today's panel behind the Leaderboards button, as before. Whether the case gets a
+  shelf for this hub's trophies is Sam's call (asked with session 6's PR; the box below).
+- Part 9, "All 27 trophies": the three journey rows, Bowling's secret row ("From phase 4, part D"), and Full Arch's
+  row out (or marked retired, for the record).
+
 ### What Sam's calls of 2026-11-12 change in the drafts above
 
 The sessions that build each part fix the drafts they make untrue; this is the list, so none is missed.
@@ -621,13 +669,15 @@ The sessions that build each part fix the drafts they make untrue; this is the l
   now: the seasonal sets); `LORE.md`'s "he can't pick one" is canon for the episodes already out, and from the
   redesign on the student dresses him. Rare costumes turn up at the shop; he doesn't wear one by himself. Done in part
   4 (the place's draft, `LORE.md`, and the About lines in "From Ask Timmy, part 4").
-- **The trophy count** is 27, 14 of them secret (today's 24 without Full Arch, the three journey trophies and
-  Bowling): "From phase 4, part A" says 27 and 14 for another reason (the journeys alone), so its wording changes. The Bowling trophy is kept on the device until the first migration after the release, so it
+- **The trophy count** is 27, 16 of them secret (today's 24 without Full Arch, the three journey trophies and
+  Bowling; today's 24 already have 16 secret, so the live About page's "14" was out of date: Sam OK'd 16 on 2026-11-13).
+  "From phase 4, part A" now says so. The Bowling trophy is kept on the device until the first migration after the release, so it
   shows no share of the class at first ([the bowling egg](done/2026-11-06-redesign-bowling-egg.md)).
 - **Full Arch is gone**: the 32-tooth chart, its switch and its trophy (the box in Done when). Where a draft above
   lists the extras a setting turns off ("the Full Arch chart" in phase 3's Settings draft), it comes out.
-- **New drafts to come**, each written by its session under its own heading here: the trophy case. (Part B's, part D's
-  and visiting's are written: "From phase 4, part B", "From phase 4, part D" and "From phase 4, visiting", above.)
+- **New drafts to come**, each written by its session under its own heading here: none left from phase 4. (Part B's,
+  part D's, visiting's and the trophy case's are written: "From phase 4, part B", "From phase 4, part D", "From phase 4,
+  visiting" and "From phase 4, session 6", above.)
 - **Which hub is switched**: with no date and ten sessions to go, the release comes after Perio's final (Nov 19), so
   it switches the dashboard and whichever hub is live then. Sam hasn't named the hub that follows Perio: ask at the
   start of the release session, and build that hub on the engine from the start.

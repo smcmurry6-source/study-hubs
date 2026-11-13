@@ -25,6 +25,13 @@ tags: [widget, supabase]
   live hubs. `widget/ranks.js` and `widget/rankup.js` draw a rank past the Handpiece only for a v2 profile (`journey`
   set); `shRanks.art()` without a shape is byte for byte what it was. How it fits together:
   [game-server](game-server.md) and [the journeys](../tasks/2026-11-06-redesign-progression-journeys.md).
+- **The trophy case and the cards on the redesign** (phase 4 session 6, not live until the release): `widget/ranks.js`,
+  `widget/rankup.js` and `widget/eggs.js` are shared with the live pages, so what's new there is gated on the `shx`
+  class the redesign's pages put on `<html>` (`NEW`; Full Arch's `ARCH_OFF` also on `data-game="v2"`): 27 trophies
+  (Full Arch retired, the journeys and Bowling in), the cards' new look, and `shRanks.trophyCase()`, which fetches
+  `widget/trophies.js` + `.css` and `widget/hub-art/trophies.js` on first use. On a live page the list, the cards and
+  Full Arch are as before (the smoke test compares the cards' markup).
+  ([the task](../tasks/done/2026-11-12-redesign-trophy-case-and-cards.md))
 - **`widget/cases.js` + `widget/cases.css`** (`window.shCases`): the dental case kit. A Patient Box question in any
   hub names a case (`pcase`) in that hub's `PCASES`, and the kit draws its periodontal chart, periapical radiograph
   and buccal view from the case's numbers, works out the diagnosis from them and validates that every number is
