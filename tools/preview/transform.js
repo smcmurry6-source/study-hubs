@@ -92,6 +92,15 @@ function transformSw(js, o){
   return rewriteText(js, o).replace(/var VERSION = '([^']+)';/, (m, v) => `var VERSION = '${v}-preview-${(o.sha || 'local').slice(0, 7)}';`);
 }
 
+/* widget/pet.js: the day the redesign goes live (FULL_FROM: a Timmy born on or after it starts at 100 HP, everyone has
+   Timmy) is, in a preview, the day its test account started (the runtime's SH_PREVIEW_TIMMY_FROM), so the "new" account
+   meets him at 100 and the others keep their history. A pet.js without the line fails loudly rather than quietly. */
+const PET_FROM = 'var FULL_FROM = "9999-12-31";';
+function transformPet(js, o){
+  if (!js.includes(PET_FROM)) throw new Error('widget/pet.js has no `' + PET_FROM + '` line for the preview to point at its own start (tools/preview/transform.js)');
+  return rewriteText(js, o).replace(PET_FROM, 'var FULL_FROM = window.SH_PREVIEW_TIMMY_FROM || "9999-12-31";');
+}
+
 /* body for a site-relative file, or null to serve it untouched (binary) */
 function transformFile(rel, buf, o){
   const ext = path.extname(rel).toLowerCase();
@@ -99,6 +108,7 @@ function transformFile(rel, buf, o){
   const text = buf.toString('utf8');
   if (ext === '.html') return transformHtml(text, rel, o);
   if (rel === 'sw.js') return transformSw(text, o);
+  if (rel === 'widget/pet.js') return transformPet(text, o);
   return rewriteText(text, o);
 }
 

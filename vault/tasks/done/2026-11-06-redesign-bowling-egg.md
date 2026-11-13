@@ -213,7 +213,7 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
   device, and the first migration after the release can take it.
 - **Tests**: the smoke test plays a strike, the turkey, the retry, the wrong answer, the eggs off, Focus mode, the mock,
   reduced motion, the lane and a live hub; the accessibility suite checks the clip card. Two bugs found and fixed in
-  testing (BUG-105, BUG-106).
+  testing (BUG-110, BUG-111).
 
 Left, each written where it belongs: the About page entry and the service worker's precache at the release
 ([the release note](../2026-11-06-redesign-release.md), "From phase 4, part D"); the trophy's row and pop-up card

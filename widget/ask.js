@@ -12,9 +12,9 @@
      cover it, a drafted report or idea to edit and send (nothing is sent without the student's tap), thumbs, and Report
      (Sam, 2026-11-12: "so if timmy gives an error or bad answer or something, you can report it and we can fix what went
      wrong"), on a nap or an error too;
-   - the Ask icon in Timmy's spot whenever he isn't shown on the page (turned off, Dashboard only, Focus mode, or not adopted
-     yet; Sam: "if someone turns timmy off in the settings, he is replaced with an icon in the same place that you can click
-     on to ask the hub"). On a hub that's the bottom-left corner; on the dashboard, the "you" card. Without Timmy the chat
+   - the Ask icon in Timmy's spot whenever he isn't shown on the page (turned off, Dashboard only, or Focus mode; everyone
+     has Timmy on the redesign's pages. Sam: "if someone turns timmy off in the settings, he is replaced with an icon in
+     the same place that you can click on to ask the hub"). On a hub that's the bottom-left corner; on the dashboard, the "you" card. Without Timmy the chat
      speaks in a plain "Ask the hub" voice, with the same rules;
    - "Ask Timmy" on an answered question (widget/hub-bank.js puts the button in the card's after-answer row; this file
      opens the chat with the question attached). Before it's answered he gives neither hints nor the answer.
@@ -112,9 +112,9 @@
     if (isDash()) return !!document.querySelector("#petHome.shpet-house:not([hidden])");
     return docEl.classList.contains("sh-pet-on");
   }
-  /* he should be there once his script has loaded (so the icon doesn't flash up in his spot first) */
+  /* he should be there once his script has loaded (so the icon doesn't flash up in his spot first): everyone has Timmy */
   function timmyDue(){
-    if (pref("sh_pref_pet") === "off" || ls("sh_pref_focus") === "on" || !ls("sh_pet_born")) return false;
+    if (pref("sh_pref_pet") === "off" || ls("sh_pref_focus") === "on") return false;
     return isDash() || pref("sh_pref_pet") !== "dash";
   }
   function voice(){ return timmyHere() ? "timmy" : "plain"; }

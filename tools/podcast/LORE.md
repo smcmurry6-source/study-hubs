@@ -46,7 +46,16 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
 - He dresses for holidays and the fall weeks (`OUTFITS` in `widget/pet.js`). Halloween 2026: four costumes, a witch hat,
   a vampire cape with fangs ("just very long canines with big ambitions"), a pumpkin cap with a candy pail, and a black cat.
   **He can't pick one, so he wears the next one each time a page loads** (true in the widget). He never reveals a single
-  costume as "the one", because students see different ones.
+  costume as "the one", because students see different ones. This is canon for the episodes already out, and stays true
+  on the live hubs until the redesign's release.
+- **From the redesign on, the student dresses him** ([Ask Timmy](../../vault/tasks/2026-11-12-redesign-ask-timmy.md),
+  part 4; Sam, 2026-11-12: "What you put wins"). Everyone has Timmy (nobody adopts him any more; he says hello on a first
+  visit), and he wears only what the student put on at his place, from the shop or his rank: on the hub's bar, on the
+  dashboard, at his place, in the classroom and on the leaderboard's stage. With nothing on he wears nothing, on a holiday
+  too; he no longer picks a holiday costume himself. An episode written after the release never says what he's wearing
+  (each student dresses theirs), and never that he picked it: "whatever you put me in" is the line. His holiday looks are
+  the shop's seasonal sets now (a floss mummy and a bedsheet ghost at Halloween, a holiday sweater and an elf suit in the
+  winter), and the old "he can't pick one" can be a joke about the past ("I used to dress myself. You saw how that went.").
 - **Rare costumes** (the redesign's shop, not live until [its release](../../vault/tasks/2026-11-06-redesign-release.md)):
   five costumes that turn up at Timmy's shop now and then, about one ordinary day in twelve, never on a holiday or in the
   fall weeks, a different day for each student. When one turns up he says so once ("Something rare came in at the shop

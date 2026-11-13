@@ -43,8 +43,24 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   hubs): strikes at 50 and 100, the turkey at 150; not in the mock or the arcade, nor with the eggs off or in Focus
   mode. The bowling lane at Timmy's place plays a random clip (`widget/place.js`). Sightings and the trophy are kept
   on the device. Tracked as `egg:bowling=<clip>`. Tests: the smoke test (the run, strike, retry, miss, turkey, mock,
-  eggs off, Focus, reduced motion, the lane, a live hub untouched), `a11y.js` (the clip card). BUG-105 and BUG-106
+  eggs off, Focus, reduced motion, the lane, a live hub untouched), `a11y.js` (the clip card). BUG-110 and BUG-111
   found and fixed in testing.
+- **2026-11-13 (Ask Timmy part 4, "Timmy everywhere", phase 4 session 3, Claude Code)** — Nothing students see
+  changes: only the redesign's pages pass the new option. `widget/pet.js` takes `mount({ everyone: true })`: no
+  adoption (a first visit sets `sh_pet_born` to today and sends the `pet-adopt` badge; linked devices keep the earliest
+  day), no introduction or "Tap me!", one hello instead; a Timmy met on or after `FULL_FROM` (far future until the
+  release sets it) starts at 100 HP, and Pearly Whites then needs a day under 100 first; he wears only the shop outfit on
+  at his place (the v2 bootstrap's `shop.equipped.outfit`), never a holiday's, nothing when nothing is on: on the bar, the
+  dashboard's card, the chat's avatar, his place, the classroom (`fit()` is the outfit's id) and the stage. The drawing
+  is kept on the device (`sh_pet_outfit`); `widget/hub-art/outfits.js` loads only after the first scroll, tap or key,
+  when the outfit on isn't the kept one. `shPet.setOutfit()` (called by `widget/place.js` when the outfit slot changes).
+  `widget/v3.js` loads and mounts him for everyone on `data-game="v2"` pages and resends the presence on `sh:pet-fit`;
+  `widget/dash.js` mounts with `everyone` and drops the porch line; `widget/hub-timmy.js` drops the adoption waits
+  (Timmy's place and the shop for everyone); `widget/ask.js` no longer waits for adoption. The preview: `FULL_FROM` is the
+  test account's start (`tools/preview/transform.js`, the runtime's `SH_PREVIEW_TIMMY_FROM`), and "returning" wears the
+  sun hat. `tools/ci/smoke.js`: "everyone has Timmy" on a new hub and the new dashboard, and the live hub and dashboard
+  as before; the Ask checks turn Timmy off first. `tools/podcast/LORE.md`: from the redesign on, the student dresses him.
+  [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md), [ask-timmy](vault/reference/ask-timmy.md).
 - **2026-11-12 (Timmy's shop, the client, phase 4 part B, Claude Code)** — Nothing students see changes: the shop
   runs only on the redesign's pages, on the game layer (`migration_v54.sql`, not applied, unchanged). New
   `widget/shop.js` + `widget/shop.css` (`window.shShop`, fetched on first use): the storefront with the balance, Today's
