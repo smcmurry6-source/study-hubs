@@ -2,10 +2,14 @@
 # the device matrix in three browsers and the admin page in a preview. Trimmed on Sam's call, 2026-11-06: a pull request
 # runs them only when it changes shared code (the dashboard, About, the admin page, widget/, assets, the service worker,
 # the database, the preview runtime, the suites or this file) or has the `full-tests` label, so question and notes
-# changes skip it; and it skips the suites Check hubs already ran on the same commit (syntax, vault, archive, secrets,
-# smoke, preview safety, database permissions, admin operations, retention, XP). By hand (Actions -> Release tests -> Run
-# workflow) it runs every suite. The hosted preview is its own workflow, preview.yml, on request only.
-# It never deploys anything and never talks to the live database: every page runs on fixture data.
+# changes skip it; and it skips the suites Check hubs already runs on the same commit (syntax, vault, archive, secrets,
+# smoke, preview safety, the database suites, Ask Timmy's function). Since 2026-11-13 (Sam: "do 1 and 2 in their own
+# PR") each suite is its own job, and the device matrix one job per browser, all at the same time; `release` passes only
+# when they all did. On a pull request, `scope` (tools/ci/reuse.js) also lets them keep an earlier green result when
+# only notes changed since it (a .md file, .obsidian/), and an old run steps aside when a newer push has come in.
+# By hand (Actions -> Release tests -> Run workflow) it runs every suite. The hosted preview is its own workflow,
+# preview.yml, on request only. It never deploys anything and never talks to the live database: every page runs on
+# fixture data.
 name: Release tests
 on:
   workflow_dispatch:
@@ -17,6 +21,8 @@ on:
     types: [opened, synchronize, reopened, labeled]
 permissions:
   contents: read
+  actions: read         # tools/ci/reuse.js reads this pull request's earlier runs
+  pull-requests: read   # and whether a newer push has come in
 jobs:
   # A few seconds: does this pull request need the release suites? (Adding any other label does nothing.)
   scope:
@@ -24,16 +30,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      run: ${{ steps.decide.outputs.run }}
+      run: ${{ steps.final.outputs.run }}
+      reuse: ${{ steps.reuse.outputs.reuse }}
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2   # the PR's merge commit and its base (HEAD^1)
+          fetch-depth: 0          # every commit and tree, no file contents: enough for git diff --name-only
+          filter: blob:none
+          sparse-checkout: tools/ci
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Shared code changed, or the full-tests label?
         id: decide
         env:
           LABELED: ${{ contains(github.event.pull_request.labels.*.name, 'full-tests') }}
-          SHARED: '^(index\.html|next/|about/|review/|widget/|assets/|sw\.js|manifest\.webmanifest|supabase/|migration_v[^/]*\.sql|tools/preview/|tools/release/|\.github/workflows/release\.yml)'
+          SHARED: '^(index\.html|next/|about/|review/|widget/|assets/|sw\.js|manifest\.webmanifest|supabase/|migration_v[^/]*\.sql|tools/preview/|tools/release/|tools/ci/reuse\.js|\.github/workflows/release\.yml)'
         run: |
           shared=$(git diff --name-only HEAD^1 HEAD | grep -E "$SHARED" || true)
           if [ "$LABELED" = true ]; then
@@ -45,20 +57,88 @@ jobs:
             echo "run=no" >> "$GITHUB_OUTPUT"
             echo "No shared code changed (hub content, notes or tools only): the release suites are skipped. Add the \`full-tests\` label to run them anyway." >> "$GITHUB_STEP_SUMMARY"
           fi
+      - name: Only notes changed since an earlier green run, or a newer push?
+        id: reuse
+        if: steps.decide.outputs.run == 'yes'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_REF: ${{ github.head_ref }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          REUSE_OFF: ${{ github.event.action == 'labeled' }}   # adding the full-tests label means "run them"
+        run: node tools/ci/reuse.js release.yml suite
+      - name: Run the suites?
+        id: final
+        env:
+          SHARED: ${{ steps.decide.outputs.run }}
+          REUSE: ${{ steps.reuse.outputs.reuse }}
+          NEWER: ${{ steps.reuse.outputs.newer }}
+        run: |
+          if [ "$SHARED" = yes ] && [ "$REUSE" != yes ] && [ "$NEWER" != yes ]; then echo "run=yes" >> "$GITHUB_OUTPUT"; else echo "run=no" >> "$GITHUB_OUTPUT"; fi
 
-  release:
+  suite:
     needs: scope
     # a run by hand has no scope job (it's skipped), so it always runs
     if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.scope.outputs.run == 'yes') }}
+    name: suite (${{ matrix.name }})
     concurrency:
-      group: release-${{ github.event.pull_request.number || github.ref }}
+      group: release-${{ github.event.pull_request.number || github.ref }}-${{ matrix.key }}
       cancel-in-progress: true
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { key: a11y, name: accessibility, only: a11y, browsers: chromium }
+          - { key: perf, name: performance, only: perf, browsers: chromium }
+          - { key: adminui, name: admin page, only: adminui, browsers: chromium }
+          - { key: matrix-chromium, name: devices in Chromium, only: matrix, browsers: chromium }
+          - { key: matrix-webkit, name: devices in WebKit, only: matrix, browsers: webkit }
+          - { key: matrix-firefox, name: devices in Firefox, only: matrix, browsers: firefox }
     env:
-      SH_ENGINES: ${{ github.event.inputs.engines || 'chromium,webkit,firefox' }}
+      SH_ENGINES: ${{ matrix.browsers }}
+      # a run by hand can leave an engine out of the device matrix (its "engines" input)
+      SKIP_ENGINE: ${{ matrix.only == 'matrix' && github.event_name == 'workflow_dispatch' && !contains(github.event.inputs.engines, matrix.browsers) }}
     steps:
       # The runner context isn't available in a job's env, so the results folder is set here for every later step.
+      - name: Results folder outside the checkout
+        run: echo "SH_RELEASE_OUT=$RUNNER_TEMP/release" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright's ${{ matrix.browsers }} and axe-core
+        if: env.SKIP_ENGINE != 'true'
+        run: |
+          npm i --no-save playwright@1.56.1 axe-core@4.14.0
+          # when Ubuntu's mirror is unreachable, the browser alone (see check.yml); an engine that then can't start is
+          # reported as skipped by the device matrix, with this warning on the run's page
+          npx playwright install --with-deps ${{ matrix.browsers }} || {
+            echo "::warning::Ubuntu's package mirror was unreachable: ${{ matrix.browsers }} installed without its system packages and may be skipped"
+            npx playwright install ${{ matrix.browsers }}
+          }
+      - name: Run the ${{ matrix.name }} suite
+        if: env.SKIP_ENGINE != 'true'
+        run: node tools/release/run.js --only ${{ matrix.only }}
+      - name: Write the summary on this run's page
+        if: ${{ !cancelled() && env.SKIP_ENGINE != 'true' }}
+        run: cat "$SH_RELEASE_OUT/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Upload the test results
+        if: ${{ !cancelled() && env.SKIP_ENGINE != 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-test-results-${{ matrix.key }}
+          path: ${{ runner.temp }}/release
+          retention-days: 30
+
+  # By hand only: the suites a pull request leaves to Check hubs, so a run by hand still runs every suite.
+  others:
+    if: github.event_name == 'workflow_dispatch'
+    name: suite (the rest, by hand)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
       - name: Results folder outside the checkout
         run: echo "SH_RELEASE_OUT=$RUNNER_TEMP/release" >> "$GITHUB_ENV"
       - uses: actions/checkout@v4
@@ -67,19 +147,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install Playwright browsers, axe-core and PostgreSQL
+      - name: Install Playwright's Chromium and PostgreSQL
         run: |
-          npm i --no-save playwright@1.56.1 axe-core@4.14.0
-          # when Ubuntu's mirror is unreachable, the browsers alone (see check.yml); an engine that then can't start is
-          # reported as skipped by the device matrix, with this warning on the run's page
-          npx playwright install --with-deps chromium webkit firefox || {
-            echo "::warning::Ubuntu's package mirror was unreachable: browsers installed without their system packages; WebKit or Firefox may be skipped"
-            npx playwright install chromium webkit firefox
-          }
+          npm i --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium || npx playwright install chromium
           ls /usr/lib/postgresql/*/bin/initdb >/dev/null 2>&1 || (sudo apt-get update -q && sudo apt-get install -y -q postgresql)
-      # on a pull request, Check hubs already ran these on the same commit; a run by hand runs everything
-      - name: Run the release suites
-        run: node tools/release/run.js ${{ github.event_name == 'pull_request' && '--skip syntax,vault,archive,secrets,smoke,preview,rls,admin,retention,xp' || '' }}
+      - name: Run the other suites
+        run: node tools/release/run.js --skip a11y,perf,adminui,matrix
       - name: Write the summary on this run's page
         if: ${{ !cancelled() }}
         run: cat "$SH_RELEASE_OUT/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
@@ -87,6 +161,32 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: release-test-results
+          name: release-test-results-others
           path: ${{ runner.temp }}/release
           retention-days: 30
+
+  # The one result to read: passes when every suite passed, or when none had to run (no shared code changed, only notes
+  # changed since an earlier green run, or a newer push is being tested instead).
+  release:
+    needs: [scope, suite, others]
+    if: ${{ !cancelled() && (github.event.action != 'labeled' || github.event.label.name == 'full-tests') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Every suite passed?
+        env:
+          EVENT: ${{ github.event_name }}
+          SCOPE: ${{ needs.scope.result }}
+          RUN: ${{ needs.scope.outputs.run }}
+          REUSE: ${{ needs.scope.outputs.reuse }}
+          SUITE: ${{ needs.suite.result }}
+          OTHERS: ${{ needs.others.result }}
+        run: |
+          echo "scope: $SCOPE (run: ${RUN:-n/a}, kept an earlier result: ${REUSE:-no}); suites: $SUITE; the rest: $OTHERS"
+          if [ "$EVENT" = workflow_dispatch ]; then
+            [ "$SUITE" = success ] && [ "$OTHERS" = success ] && exit 0
+            echo "::error::A suite didn't pass (suites: $SUITE, the rest: $OTHERS)"; exit 1
+          fi
+          [ "$SCOPE" = success ] || { echo "::error::The scope job didn't finish ($SCOPE)"; exit 1; }
+          if [ "$RUN" != yes ]; then echo "No suite had to run here (see the scope job's summary)."; exit 0; fi
+          [ "$SUITE" = success ] || { echo "::error::A suite didn't pass ($SUITE)"; exit 1; }

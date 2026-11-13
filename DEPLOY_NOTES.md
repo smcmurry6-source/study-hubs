@@ -32,6 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-13 (faster CI, Claude Code)** — Nothing students see changes. Sam, after #349 waited most of an hour while
+  `main` moved three times: "merge now, then do 1 and 2 in their own PR". (1) **Parallel jobs.** "Check hubs" is now
+  `scope`, `fast` (the fast checks and the database suites), `smoke (desktop)` and `smoke (phone)`
+  (`SMOKE_PART=desktop|phone` in `tools/ci/smoke.js`; a local run still does both halves) and `check`, the one result to
+  read. "Release tests" is `scope`, one `suite (...)` job each for accessibility, performance and the admin page, one
+  per browser for the device matrix, and `release`. Release tests no longer repeats Ask Timmy's suites, which Check hubs
+  runs. (2) **A notes-only change keeps the green result.** New `tools/ci/reuse.js`: on a PR, when every file that
+  changed since a run whose long jobs passed is a `.md` file (or `.obsidian/`), the long jobs are skipped and the run's
+  summary links the run it kept. The comparison uses the merge commit being tested, so code that came in from `main`
+  still runs everything; a run that kept a result is never itself kept. (3) A stale run steps aside: Check hubs cancels
+  an older run of the same PR, and Release tests' scope starts no suite when a newer push has come in (it had cancelled
+  the head's suites once that day). `RELEASE_TEST_PLAN.md`, [verify-before-pushing](vault/how-to/verify-before-pushing.md)
+  and [long-tests-once](vault/rules/long-tests-once.md) say so.
 - **2026-11-13 (the bowling egg, phase 4 part D, Claude Code)** — Nothing students see changes: it runs only on the
   redesign's pages, with no XP and nothing on the server (neither pending migration touched). The eight clips drawn in
   #291 (never merged, closed) carried over unchanged as `tools/figures/site/bowling.mjs`, built into

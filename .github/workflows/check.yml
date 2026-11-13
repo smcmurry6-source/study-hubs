@@ -1,16 +1,55 @@
+# Check hubs: every pull request and every push to main. Split into jobs that run at the same time (Sam, 2026-11-13: "do
+# 1 and 2 in their own PR", after a merge waited most of an hour): the fast checks and the database suites in one job,
+# the smoke test's desktop and phone halves in two more, and `check`, which passes only when they all did, so the
+# result still reads as one check. On a pull request, `scope` (tools/ci/reuse.js) lets the smoke test keep an earlier
+# green result when only notes changed since it (a .md file, .obsidian/): a merge of main that brought only notes, or
+# a vault write-back. The fast checks always run.
 name: Check hubs
 on:
   pull_request:
   push:
     branches: [main]
+permissions:
+  contents: read
+  actions: read         # tools/ci/reuse.js reads this pull request's earlier runs
+  pull-requests: read   # and whether a newer push has come in
+# a newer push to the same pull request cancels this run; a push to main never cancels anything
+concurrency:
+  group: check-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
 jobs:
-  check:
+  # A few seconds: can the smoke test keep an earlier green result? (pull requests only)
+  scope:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 5
+    outputs:
+      reuse: ${{ steps.reuse.outputs.reuse }}
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2   # the PR's merge commit and its base (HEAD^1), so the smoke test sees which hubs changed
+          fetch-depth: 0          # every commit and tree, no file contents: enough for git diff --name-only
+          filter: blob:none
+          sparse-checkout: tools/ci
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Only notes changed since an earlier green run?
+        id: reuse
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_HEAD_REF: ${{ github.head_ref }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node tools/ci/reuse.js check.yml smoke
+
+  fast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # the PR's merge commit and its base (HEAD^1)
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -19,6 +58,9 @@ jobs:
       - name: Public-repo check (no secrets, course material or data files)
         if: ${{ !cancelled() }}
         run: node tools/release/secrets.js
+      - name: Vault notes, links and tasks
+        if: ${{ !cancelled() }}
+        run: node tools/ci/vault.js
       - name: Database permissions (RLS, grants, secret-gated functions) on a throwaway copy of supabase/schema.sql
         if: ${{ !cancelled() }}
         run: |
@@ -36,12 +78,40 @@ jobs:
       - name: Ask Timmy's database on fixtures (migration_v55 waiting for its release; the limits, own chats only, admin reads)
         if: ${{ !cancelled() }}
         run: node tools/release/timmy.js
+      - name: Ask Timmy's function with a fake model (paragraph links against the engine's own, quotes, offers, limits, HTTP)
+        if: ${{ !cancelled() }}
+        run: node tools/timmy/test.mjs && node tools/timmy/eval.mjs --dry
       - name: Hub archive state (the dashboard's dates and admin overrides)
         if: ${{ !cancelled() }}
         run: node tools/ci/archive.js
       - name: Site size (GitHub Pages stops at 1 GB; warns at 750 MB, fails at 900 MB)
         if: ${{ !cancelled() }}
         run: node tools/ci/size.js
+      - name: Drawn Patient Box cases (realistic numbers, keys agree)
+        if: ${{ !cancelled() }}
+        run: node tools/ci/cases.js
+      - name: The redesign's generated files are current (site art, the new hubs' content from the live hubs, the new dashboard's hub list, Ask Timmy's site help from the About page)
+        if: ${{ !cancelled() }}
+        run: node tools/figures/site/build.mjs --check && node tools/hub-next/build.mjs --check && node tools/dash-next/build.mjs --check && node tools/timmy/build.mjs --check
+
+  smoke:
+    needs: scope
+    # runs on main too, where there is no scope job (it's skipped)
+    if: ${{ !cancelled() && needs.scope.outputs.reuse != 'yes' }}
+    name: smoke (${{ matrix.part }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        part: [desktop, phone]   # the desktop half has the question-bank lint and preview safety; the phone half the top bars
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2   # the PR's merge commit and its base (HEAD^1), so the smoke test sees which hubs changed
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - name: Install headless Chromium
         # The system packages come from Ubuntu's mirror. When the runner can't reach it (2026-11-11: three runs in a row
         # couldn't resolve azure.archive.ubuntu.com, and every package that failed was an optional font), install the
@@ -55,18 +125,27 @@ jobs:
       - name: Click through the hubs this PR changes (every hub on main or when a shared file changes) and lint their question banks
         env:
           SMOKE_CHANGED_FROM: ${{ github.event_name == 'pull_request' && 'HEAD^1' || '' }}
+          SMOKE_PART: ${{ matrix.part }}
         run: node tools/ci/smoke.js
-      - name: Ask Timmy's function with a fake model (paragraph links against the engine's own, quotes, offers, limits, HTTP)
-        if: ${{ !cancelled() }}
-        run: node tools/timmy/test.mjs && node tools/timmy/eval.mjs --dry
       - name: Preview safety (no production requests, noindex, fixtures)
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && matrix.part == 'desktop' }}
         run: node tools/ci/preview.js
-      - name: Vault notes, links and tasks
-        if: ${{ !cancelled() }}
-        run: node tools/ci/vault.js
-      - name: Drawn Patient Box cases (realistic numbers, keys agree)
-        run: node tools/ci/cases.js
-      - name: The redesign's generated files are current (site art, the new hubs' content from the live hubs, the new dashboard's hub list, Ask Timmy's site help from the About page)
-        if: ${{ !cancelled() }}
-        run: node tools/figures/site/build.mjs --check && node tools/hub-next/build.mjs --check && node tools/dash-next/build.mjs --check && node tools/timmy/build.mjs --check
+
+  # The one result to read: passes when the fast checks passed and both smoke halves passed (or kept an earlier green
+  # result because only notes changed).
+  check:
+    needs: [scope, fast, smoke]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Every part passed?
+        env:
+          FAST: ${{ needs.fast.result }}
+          SMOKE: ${{ needs.smoke.result }}
+          REUSE: ${{ needs.scope.outputs.reuse }}
+        run: |
+          echo "fast checks: $FAST; smoke test: $SMOKE${REUSE:+ (kept an earlier result: $REUSE)}"
+          [ "$FAST" = success ] || { echo "::error::The fast checks didn't pass ($FAST)"; exit 1; }
+          if [ "$SMOKE" = skipped ] && [ "$REUSE" = yes ]; then echo "The smoke test kept an earlier green result: only notes changed since it."; exit 0; fi
+          [ "$SMOKE" = success ] || { echo "::error::The smoke test didn't pass ($SMOKE)"; exit 1; }

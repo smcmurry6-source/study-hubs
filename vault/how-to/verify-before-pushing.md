@@ -30,7 +30,10 @@ from 750 MB, fails from 900 MB, and lists the hubs still carrying audio; [archiv
 a second workflow, "Release tests", runs accessibility, performance and the device matrix when a PR changes shared code
 (the dashboard, `widget/`, the service worker, the admin page, the database...) or has the `full-tests` label (since
 2026-11-06: hub content and notes skip it; a tier 2 or 3 change inside hubs gets the label)
-([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md); `node tools/release/run.js` runs everything). Run them locally before pushing; the smoke test needs Playwright
+([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md); `node tools/release/run.js` runs everything). Both run in
+parallel jobs since 2026-11-13, each read as one result (`check`, `release`), and on a PR both keep an earlier green
+result when only notes changed since it (`tools/ci/reuse.js`; `node tools/ci/reuse.js --diff <sha>` says whether a
+change would). Run them locally before pushing; the smoke test needs Playwright
 (`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub's
 data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line at the end of each hub script.
 
