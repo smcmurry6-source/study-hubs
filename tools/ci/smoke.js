@@ -1061,6 +1061,104 @@ function lint(hub, A){
       notes.push(`${name} (${label}): the balance and the Shop button on the "you" card`);
       await page.close();
     }
+    /* Visiting (phase 4, session 4: widget/dash.js's boards, widget/place.js's visit). On the game layer every board row
+       has a visit key, and its name is a button named for what it does ("Visit <name>'s place", your own "Open your
+       place") with one fixed name for the click count (data-dash="visit") and the key on its row, never on the button.
+       A tap opens the place as a visit: "<name>'s place" in the title as text, no Customize, no HP; get_place is asked
+       once for a person (the stage's outfits already asked for the top three); place:visit is counted with nothing about
+       whose; closing gives focus back to the row. A name with markup in it is drawn as text, a key that opens nothing
+       gives one plain line on its row, a row whose key isn't one isn't a button, and nothing of the place loads with the
+       page. Without the game layer (no _v2 boards) no row is a button. */
+    if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
+      const name = `next (dashboard), visiting`, K = c => c.repeat(24), BAD = '<img src=x onerror="window.__visit=1">Bee';
+      const json = (route, body, status) => route.fulfill({ status: status || 200, contentType: 'application/json', body: JSON.stringify(body) });
+      const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
+      const row = (rnk, display_name, xp, visit, me) => ({ rnk, display_name, xp, journey: 0, tier: 3, level: 2, step: 11, is_me: !!me, flair: null, visit });
+      const board = [row(1, 'Visit Alpha', 9000, K('a')), row(2, BAD, 8000, K('b')), row(3, 'Cee', 7000, K('c')), row(4, 'Dee', 6000, K('d')), row(5, 'Eff', 5000, 'not-a-key'), row(6, 'Test Molar', 2400, K('e'), true)];
+      const places = { [K('a')]: { name: 'Visit Alpha', equipped: { home: 'castle', scene: 'beach', outfit: 'captain-hat' }, rank: { journey: 1, tier: 0, level: 2 }, flair: null },
+        [K('b')]: { name: BAD, equipped: { home: 'igloo', scene: 'snowy-mountain', 'yard-left': 'campfire', outfit: 'beanie' }, rank: { journey: 0, tier: 4, level: 1 }, flair: null },
+        [K('c')]: { name: 'Cee', equipped: {}, rank: { journey: 0, tier: 2, level: 3 }, flair: null } };
+      const page = await context.newPage(); const errs = [], asked = [], placeCalls = {};
+      page.on('pageerror', e => errs.push(e.message));
+      page.on('request', r => { if (/\/widget\/(place\.(js|css)|hub-art\/place)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
+      await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_tour_done', '1'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => json(route, { rank, shop: { day: '2026-11-12', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], inventory: [], locked: [], equipped: {}, costumes: [], snacks_today: [], boost: null } }));
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_rank_board_v2/, route => json(route, board));
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_leaderboard_v2/, route => json(route, board.slice(0, 4).map(r => ({ display_name: r.display_name, streak: 10 - r.rnk, total_answered: 100, journey: 0, tier: 2, level: 1, step: 7, flair: null, visit: r.visit }))));
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_place/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {} placeCalls[a.p_key] = (placeCalls[a.p_key] || 0) + 1; return json(route, places[a.p_key] || null); });
+      await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(2000);
+      if (asked.length) problems.push(`${name} (${label}): the place's files loaded with the dashboard (${asked.join(', ')}): a tap on a row is a first use`);
+      if (await page.$('.sh-ru.is-on')) { await page.keyboard.press('Escape'); await page.waitForTimeout(600); }
+      await page.evaluate(() => { document.getElementById('class').scrollIntoView(); const o = window.shTrack; window.__tracked = []; window.shTrack = (k, n) => { window.__tracked.push(String(k)); return o && o(k, n); }; });
+      if (!(await page.waitForSelector('#board .dx-visit', { timeout: 15000 }).catch(() => null))) problems.push(`${name} (${label}): the boards' rows didn't become buttons on the game layer`);
+      else {
+        await page.waitForTimeout(1200);
+        const r = await page.evaluate(() => ({
+          buttons: [...document.querySelectorAll('#board .dx-visit')].map(b => ({ label: b.getAttribute('aria-label') || '', tag: b.tagName, data: [...b.attributes].filter(a => a.name.startsWith('data-')).map(a => a.name + '=' + a.value).join(' '), key: (b.closest('[data-visit]') || {}).getAttribute ? b.closest('[data-visit]').getAttribute('data-visit') : '' })),
+          plain: [...document.querySelectorAll('#board li:not([data-visit])')].map(l => l.textContent.trim().slice(0, 20)), injected: !!window.__visit || !!document.querySelector('#board img'),
+          w: document.documentElement.scrollWidth - innerWidth }));
+        const labels = r.buttons.map(b => b.label);
+        if (r.buttons.length !== 5 || r.buttons.some(b => b.tag !== 'BUTTON' || b.data !== 'data-dash=visit' || !/^[0-9a-f]{24}$/.test(b.key))) problems.push(`${name} (${label}): every row with a key (5 here) should have one button carrying only data-dash="visit", its key on the row (${JSON.stringify(r.buttons)})`);
+        if (!labels.includes('Visit Visit Alpha’s place') || !labels.includes('Visit Dee’s place') || !labels.includes('Test Molar (you): open your place')) problems.push(`${name} (${label}): the buttons should be named "Visit <name>'s place", and "<name> (you): open your place" on your own row (${labels.join(' | ')})`);
+        if (!r.plain.some(t => /Eff/.test(t))) problems.push(`${name} (${label}): a row whose key isn't 24 hex characters shouldn't be a button (${r.plain.join(' | ')})`);
+        if (r.injected) problems.push(`${name} (${label}): a leaderboard name with markup in it was drawn as markup`);
+        if (r.w > 1) problems.push(`${name} (${label}): the board with its buttons scrolls sideways by ${r.w}px`);
+        const bee = '#board .dx-visit[aria-label^="Visit <img"]';
+        await page.click(bee);
+        const dlg = await page.waitForSelector('dialog.tpv[open]', { timeout: 20000 }).catch(() => null);
+        if (!dlg) problems.push(`${name} (${label}): tapping a row didn't open that person's place`);
+        else {
+          /* the trip Sam approved on the design page: clouds over the whole screen with "Off to <name>'s place" as text, the
+             window hidden behind them until they cover it, and all of it gone once they've scattered */
+          await page.waitForTimeout(150);
+          const trip = await page.evaluate(() => { const d = document.querySelector('dialog.tpv'), c = d.querySelector('.tpv-clouds'), b = c && c.querySelector('.tpv-clmsg b');
+            return { clouds: !!c, hidden: d.classList.contains('is-trip'), aria: c ? c.getAttribute('aria-hidden') : '', n: c ? c.querySelectorAll('.tpv-cloud').length : 0, line: b ? b.textContent : '', els: b ? b.children.length : -1, injected: !!window.__visit }; });
+          if (!trip.clouds || !trip.hidden || trip.aria !== 'true' || trip.n < 9) problems.push(`${name} (${label}): a visit should start with the trip through the clouds, the window hidden behind them (${JSON.stringify(trip)})`);
+          if (trip.clouds && (trip.line !== 'Off to ' + BAD + '’s place' || trip.els || trip.injected)) problems.push(`${name} (${label}): the trip's line should be "Off to <name>'s place" as text (${JSON.stringify(trip)})`);
+          await page.waitForTimeout(2600);
+          const after = await page.evaluate(() => { const d = document.querySelector('dialog.tpv'); return { clouds: !!d.querySelector('.tpv-clouds'), hidden: d.classList.contains('is-trip') }; });
+          if (after.clouds || after.hidden) problems.push(`${name} (${label}): the clouds should be gone and the window showing 2.6 s after a visit opens (${JSON.stringify(after)})`);
+          const v = await page.evaluate(() => { const d = document.querySelector('dialog.tpv'), sr = d.querySelector('.tpv-stage').shadowRoot, t = sr && sr.querySelector('.tp-timmy');
+            return { title: d.querySelector('#tpvT').textContent, titleEls: d.querySelector('#tpvT').children.length, seg: d.querySelector('.tpv-seg').hidden, cust: !!d.querySelector('[data-tp="customize2"], [data-tp="customize"]:not([hidden]) ') && !d.querySelector('.tpv-seg').hidden,
+              hp: !!d.querySelector('.tpv-hp'), timmy: t ? t.getAttribute('aria-label') : '', home: (d.querySelector('.tpv-sub') || {}).textContent || '', injected: !!window.__visit || !!d.querySelector('img[src="x"]'), w: d.scrollWidth - d.clientWidth,
+              look: { visit: d.classList.contains('is-visit'), kick: (d.querySelector('.tpv-kick') || {}).textContent || '', rank: (d.querySelector('.tpv-guest .tpv-gr') || {}).textContent || '', art: !!d.querySelector('.tpv-grank svg') } }; });
+          if (!v.look.visit || v.look.kick !== 'Welcome to' || !/Gold/.test(v.look.rank) || !v.look.art) problems.push(`${name} (${label}): a visit should open in its theater look, "Welcome to" over the name and their rank drawn on the guest card (${JSON.stringify(v.look)})`);
+          if (v.title !== BAD + '’s place' || v.titleEls) problems.push(`${name} (${label}): the visited place's title should be "<name>'s place" as text (${JSON.stringify(v.title)}, ${v.titleEls} elements)`);
+          if (!v.seg || v.cust || v.hp || /HP/.test(v.timmy)) problems.push(`${name} (${label}): a visited place can't be changed and shows no HP (${JSON.stringify(v)})`);
+          if (!/Igloo/i.test(v.home)) problems.push(`${name} (${label}): the visited place isn't theirs (their home is the igloo; the view says "${v.home}")`);
+          if (v.injected) problems.push(`${name} (${label}): a visited place drew its name as markup`);
+          if (v.w > 1) problems.push(`${name} (${label}): the visited place scrolls sideways by ${v.w}px`);
+          if (placeCalls[K('b')] !== 1) problems.push(`${name} (${label}): get_place was asked ${placeCalls[K('b')] || 0} times for one of the top three: the stage's outfits and the visit share one answer`);
+          await page.keyboard.press('Escape'); await page.waitForTimeout(500);
+          const back = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tpv'), focus: document.activeElement ? document.activeElement.getAttribute('aria-label') || '' : '', tracked: window.__tracked || [] }));
+          if (back.open || !/^Visit <img/.test(back.focus)) problems.push(`${name} (${label}): closing the place should give focus back to the row (${JSON.stringify(back.focus)})`);
+          const vt = back.tracked.filter(k => /^place:/.test(k));
+          if (!vt.includes('place:visit') || vt.some(k => /bbbb|Bee|img/.test(k))) problems.push(`${name} (${label}): a visit should be counted as place:visit and nothing about whose (${vt.join(', ')})`);
+        }
+        await page.click('#board .dx-visit[aria-label="Visit Dee’s place"]'); await page.waitForTimeout(1500);
+        const dee = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tpv'), lines: [...document.querySelectorAll('#board .dx-vmsg')].map(m => (m.closest('[data-visit]').querySelector('.dx-visit') || {}).textContent + ': ' + m.textContent) }));
+        if (dee.open || dee.lines.length !== 1 || !/^Dee: That place couldn’t be opened just now/.test(dee.lines[0])) problems.push(`${name} (${label}): a key that opens nothing should give one plain line on its row and nothing else (${JSON.stringify(dee)})`);
+        await page.click('#boardSeg [data-board="streaks"]'); await page.waitForTimeout(800);
+        const sb = await page.$$eval('#board .dx-visit', bs => bs.map(b => b.getAttribute('aria-label')));
+        if (sb.length !== 4) problems.push(`${name} (${label}): the study streaks board's rows should be buttons too (${sb.join(' | ')})`);
+      }
+      errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+      notes.push(`${name} (${label}): rows as buttons, a visit, the plain line, focus back, both boards`);
+      await page.close();
+      /* without the game layer: today's boards, no keys, no buttons */
+      const p2 = await context.newPage(); const e2 = [];
+      p2.on('pageerror', e => e2.push(e.message));
+      await p2.addInitScript(() => { try { localStorage.setItem('sh_tour_done', '1'); } catch (e) {} });
+      await p2.route(/supabase\.co\/rest\/v1\/rpc\/[a-z_]+_v2/, route => json(route, { code: 'PGRST202', message: 'Could not find the function' }, 404));
+      await p2.route(/supabase\.co\/rest\/v1\/rpc\/get_rank_board(\?|$)/, route => json(route, board.map(r => { const o = Object.assign({}, r); delete o.visit; delete o.journey; delete o.step; return o; })));
+      await p2.goto(BASE() + 'next/index.html'); await p2.waitForTimeout(2000);
+      await p2.evaluate(() => document.getElementById('class').scrollIntoView());
+      await p2.waitForSelector('#board li', { timeout: 15000 }).catch(() => null); await p2.waitForTimeout(600);
+      const old = await p2.evaluate(() => ({ rows: document.querySelectorAll('#board li').length, buttons: document.querySelectorAll('#board .dx-visit, #board [data-visit]').length }));
+      if (!old.rows || old.buttons) problems.push(`${name} (${label}): without the game layer no row should be a button (${JSON.stringify(old)})`);
+      e2.forEach(e => problems.push(`${name}, without the game layer (${label}): JavaScript error: ${e}`));
+      await p2.close();
+    }
     for (const hub of hubs.slice(0, 1)) {
       const page = await context.newPage(); const asked = [];
       page.on('request', r => { const u = r.url(); if (/\/widget\/(shop\.(js|css)|hub-art\/shop\.js)|rpc\/(get_pet_days_v2|buy_item|get_my_shop|record_costume_sighting)/.test(u)) asked.push(u.replace(/^.*\/(widget|rpc)\//, '')); });

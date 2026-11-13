@@ -32,6 +32,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-13 (visiting, phase 4 session 4, Claude Code)** — Nothing students see changes: it runs only on the new
+  dashboard (`next/`), on the game layer (the `_v2` boards' visit keys and `get_place`, migration_v54, not applied and
+  not changed). A row of Ranks or Study streaks, each of the stage's top three and a winner's Timmy on the stage open
+  that person's Timmy's place; your own row opens yours. `widget/dash.js`: the name is a button (`data-dash="visit"`,
+  "Visit <name>'s place"; the key stays on the row) stretched over the row in `widget/dash.css`; `getPlace()` asks
+  `get_place` once a page per person and `loadFits` shares it; a null place or a failed call is one plain line on the
+  row; closing gives focus back to the row. Sam, seeing it: "this window should be more epic": `widget/place.js` and
+  `place.css` open a visit in the leaderboard's theater look (dark in both themes, "Welcome to" over the name in gold,
+  chasing marquee bulbs, a gold-framed stage under spotlights, a guest card
+  with their rank drawn big and their medals) and count `place:visit`; your own place is unchanged. Then "there should
+  be a clouds animation" ("i already approved a cloud animation before"): a visit plays the design page's trip through
+  the clouds, ported as approved in round 3 (soft clouds over the whole screen, "Off to <name>'s place", then they
+  scatter; none with reduced motion). The preview's
+  classmates have places of their own (one a ModuPro, one that can't be read), one rank on every board, and your own
+  row stays on the rank board below the top ten. Tests: the smoke test's "visiting" block, `a11y.js`'s boards and
+  visited place (light and dark, zero issues, in the baseline). BUG-112 (`widget/ranks.js`'s "+1" medal button's name,
+  shared with the live pages) waits for the release. [Visiting](vault/tasks/done/2026-11-12-redesign-visiting.md).
 - **2026-11-13 (the bowling egg, phase 4 part D, Claude Code)** — Nothing students see changes: it runs only on the
   redesign's pages, with no XP and nothing on the server (neither pending migration touched). The eight clips drawn in
   #291 (never merged, closed) carried over unchanged as `tools/figures/site/bowling.mjs`, built into

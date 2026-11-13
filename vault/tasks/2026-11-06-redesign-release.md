@@ -567,6 +567,33 @@ the other changes listed below):
   like "Fifty right in a row, first try, and the alley's screen does something. Thirty-one hates the noise." (one line;
   `pet.js` is shared, so only at the release).
 
+### From phase 4, visiting ([visiting](done/2026-11-12-redesign-visiting.md), built 2026-11-13)
+
+What the visiting session built is in its note (its Log) and phase 4's Log. It runs only on the new dashboard, on the
+game layer (the `_v2` boards' visit keys and `get_place`, migration_v54), so it goes live with the release. Without the
+game layer no row is a button.
+
+- [ ] Visiting looked at on the release's own preview, phone and laptop, light and dark, reduced motion too: a tap on a
+      row or one of the stage's top three opens that classmate's place (`?persona=returning`: Fixture Fluoride is a
+      ModuPro, Dummy Dentin's place can't be opened, on purpose; your own row is #11).
+- [ ] The hubs' boards (the shared widget's panel, `widget/v3.js`) don't visit yet (Sam, 2026-11-12: the new dashboard's
+      boards only). When the hubs' boards are rebuilt for the redesign, a row there can open a place the same way
+      (`shPlace.open({ place })` with what `get_place` gives).
+- [ ] **BUG-112** ([the bug log](../release/bug-log.md)): `widget/ranks.js`'s medal button for two or more medals shows
+      "+1" that its name leaves out (axe: label in name, serious). It's shared with the live pages, so it's fixed when
+      the old pages come down: put the count in its `aria-label` ("Mastery medals (2): ...").
+
+**About page** (`about/index.html`, a new entry "Visiting" in Timmy Tooth's part, next to "Timmy's place", tagged new):
+
+- **Visiting**: tap anyone on the dashboard's leaderboard (Ranks or Study streaks, the top three on the stage too)
+  to fly over through the clouds to their Timmy's place: their home, scene and yard, what their Timmy is wearing, their rank's statue and their
+  hub medals, under their leaderboard name. Tap their Timmy and he waves; the things around the place do what they do
+  at yours. Your own row opens your own place.
+- **What a visitor sees, and doesn't**: only the place. Never your HP, XP as a number, your streak, your answers, your
+  Shiny Gold Crowns, what you own beyond what's out, or when you did anything. Nobody can change your place but you,
+  and there's no list of who visited. Everyone on a board can be visited (there's no switch to turn it off).
+- "What the hubs record" gets: a visit is counted (that one happened, never whose place).
+
 ### What Sam's calls of 2026-11-12 change in the drafts above
 
 The sessions that build each part fix the drafts they make untrue; this is the list, so none is missed.
@@ -585,8 +612,8 @@ The sessions that build each part fix the drafts they make untrue; this is the l
   shows no share of the class at first ([the bowling egg](done/2026-11-06-redesign-bowling-egg.md)).
 - **Full Arch is gone**: the 32-tooth chart, its switch and its trophy (the box in Done when). Where a draft above
   lists the extras a setting turns off ("the Full Arch chart" in phase 3's Settings draft), it comes out.
-- **New drafts to come**, each written by its session under its own heading here: visiting, the trophy case. (Part B's
-  and part D's are written: "From phase 4, part B" and "From phase 4, part D", above.)
+- **New drafts to come**, each written by its session under its own heading here: the trophy case. (Part B's, part D's
+  and visiting's are written: "From phase 4, part B", "From phase 4, part D" and "From phase 4, visiting", above.)
 - **Which hub is switched**: with no date and ten sessions to go, the release comes after Perio's final (Nov 19), so
   it switches the dashboard and whichever hub is live then. Sam hasn't named the hub that follows Perio: ask at the
   start of the release session, and build that hub on the engine from the start.

@@ -10,6 +10,12 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] Visiting's other two parts from round 3 ([decisions](../decisions.md), 2026-11-10): **Visit someone random**, and **next and back**
+  while visiting (the design page has both). The 2026-11-13 session built only what [its task](done/2026-11-12-redesign-visiting.md) asked: a board
+  row opens that person's place. Both would reuse `widget/place.js`'s `tripIn`/`tripOut` (the round-3 clouds) and the board's visit keys;
+  `migration_v54.sql` has no random-visit call (a key comes only on a board row), so "random" would pick among the boards' rows,
+  or need a new function after the release: Sam's call.
+
 - [ ] Learn's answers are filed as context `other` because `migration_v54.sql`'s `record_answer_v2` doesn't list `learn` (v54 isn't
   changed without Sam's word). In the first migration after the release, add `learn` to its context list (the `case` in `sh_answer`),
   so the admin page can tell Learn's answers from the bank's (2026-11-12, [Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md),

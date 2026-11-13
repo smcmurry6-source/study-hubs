@@ -60,6 +60,20 @@ async function motion(page){
 }
 
 const HAS_NEXT_DASH = fs.existsSync(path.join(L.ROOT, 'next', 'index.html'));
+/* the new dashboard's boards on the preview's game layer: every row a button; audits the boards (as "dashboard/next · boards"
+   when a check is passed in), then taps the second place's name and waits for that classmate's place */
+async function openVisit(page, check){
+  await page.evaluate(() => { document.querySelectorAll('section.survey').forEach(s => s.remove()); const c = document.getElementById('class'); if (c) c.scrollIntoView(); });
+  if (!(await page.waitForSelector('#board .dx-visit', { timeout: 20000 }).catch(() => null))) return false;
+  await page.waitForTimeout(1500);
+  if (check) await check();
+  await page.$eval('#board .dx-podium .p2 .dx-visit', b => b.click()).catch(() => {});
+  if (!(await page.waitForSelector('dialog.tpv.is-visit[open] .tpv-guest', { timeout: 20000 }).catch(() => null))) return false;
+  /* the trip through the clouds plays first (about 2.4 s); check the place once they've gone */
+  await page.waitForFunction(() => !document.querySelector('dialog.tpv .tpv-clouds'), null, { timeout: 10000 }).catch(() => {});
+  await page.waitForTimeout(1000);
+  return true;
+}
 
 (async () => {
   const baseline = fs.existsSync(BASE_FILE) ? JSON.parse(fs.readFileSync(BASE_FILE, 'utf8')) : { pages: {} };
@@ -91,6 +105,13 @@ const HAS_NEXT_DASH = fs.existsSync(path.join(L.ROOT, 'next', 'index.html'));
       await check('dashboard/next', 'next/');
       await check('dashboard/next · settings', null, async () => { await page.click('#setBtn').catch(() => {}); await page.waitForTimeout(300); });
       await page.keyboard.press('Escape').catch(() => {});
+      /* visiting (phase 4): the boards with their rows as buttons, then a classmate's place opened from one */
+      if (await openVisit(page, () => check('dashboard/next · boards', null))) {
+        await check('dashboard/next · visited place', null);
+        /* motion only, as for a hub's place: Tab inside the scene moves within its shadow root, which reads as one element */
+        results['dashboard/next · visited place'].motion = await motion(page);
+        await page.keyboard.press('Escape').catch(() => {});
+      } else problems.push('dashboard/next · visited place: a row on the boards didn\'t open a classmate\'s place');
     }
   }
   for (const hub of live) {
@@ -191,6 +212,17 @@ const HAS_NEXT_DASH = fs.existsSync(path.join(L.ROOT, 'next', 'index.html'));
     const v = await dp.evaluate(async ([tags, exclude]) => (await window.axe.run({ exclude: exclude.map(s => [s]) }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })).violations
       .map(x => ({ id: x.id, impact: x.impact, n: x.nodes.length, help: x.help, sample: x.nodes[0] && x.nodes[0].target.join(' ') })), [TAGS, PREVIEW_UI]);
     results[key] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: 0 };
+  }
+  /* a visited place in dark mode (the theater is dark in both themes; the page behind it isn't) */
+  if (HAS_NEXT_DASH && !ONLY) {
+    await dp.goto(srv.url + 'next/'); await L.settle(dp);
+    await dp.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    if (await openVisit(dp)) {
+      await dp.addScriptTag({ content: AXE });
+      const v = await dp.evaluate(async ([tags, exclude]) => (await window.axe.run({ exclude: exclude.map(s => [s]) }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })).violations
+        .map(x => ({ id: x.id, impact: x.impact, n: x.nodes.length, help: x.help, sample: x.nodes[0] && x.nodes[0].target.join(' ') })), [TAGS, PREVIEW_UI]);
+      results['dashboard/next · visited place (dark)'] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: 0 };
+    } else problems.push('dashboard/next · visited place (dark): a row on the boards didn\'t open a classmate\'s place');
   }
   /* the shop in dark mode (its own wood and paper colors) */
   if (next.length) {

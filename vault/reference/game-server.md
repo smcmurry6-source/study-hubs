@@ -160,6 +160,13 @@ off.
 - **Link my devices** moves a place with everything else: the id that remains has the board rows and the place, and the
   other device's key opens nothing.
 - The idea board and today's boards (the ones without `_v2`) carry no key.
+- **The client** (2026-11-13, [visiting](../tasks/done/2026-11-12-redesign-visiting.md)): on the new dashboard
+  (`widget/dash.js`) every row of the Ranks and Study streaks boards with a key (24 hex characters; anything else isn't
+  one) has its name as a button, `data-dash="visit"`, with the key on the row (`data-visit`), never on the button, so a
+  click count never holds it. A tap asks `get_place` once a page for a person (the stage's outfits, `loadFits`, share the
+  answer) and opens `shPlace.open({ place })`: the name as text in the title, no HP, no Customize, in the leaderboard's
+  theater look. Your own row opens your own place. A null place or a failed call puts one plain line on the row. The
+  hubs' boards (`widget/v3.js`) don't visit yet (Sam, 2026-11-12).
 
 ## The idea board
 
@@ -189,7 +196,7 @@ place from them and the v2 profile's `journey`, `tier` and `level`, and saves ev
 lane goes to `yard-side` and clears `yard-corner`, a piece in `yard-corner` takes the lane away), and
 `tools/release/xp.js` runs fourteen changes through both and fails if they ever differ; it also checks the place's
 spring, summer and fall against `sh_shop_seasons` for every day of three years, and the kit's ids against the catalog.
-`get_place` is ready to be drawn (`shPlace.open({ place })`) but nothing calls it until visiting is built. Not wired
+`get_place` is drawn by visiting since 2026-11-13 (below and "Visiting", above). Not wired
 yet: the shop (`buy_item`, the wallet, snacks and their HP in `get_pet_days_v2`: part B). **The one gap is closed** (2026-11-12, the
 shop's art session, [#339](https://github.com/smcmurry6-source/study-hubs/pull/339)): the five everyday outfits
 that had no drawing and the five rare costumes are drawn as kit outfits under the catalog's ids (a costume is marked

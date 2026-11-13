@@ -134,9 +134,89 @@ dialog.tpv::backdrop { background: rgba(20, 14, 20, .6); }
 html.shx[data-theme="dark"] .tpv-rar.r-rare { background: #16283a; color: #9ccbf2; }
 @media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .tpv-rar.r-rare { background: #16283a; color: #9ccbf2; } }
 
+/* ---------- a visit (someone's place, opened from a board row): the leaderboard's theater (widget/dash.css, the arena),
+   dark in both themes. A marquee of bulbs under the name, the stage framed in gold under two spotlights, the visit arrives
+   through the clouds (the trip, below), and a guest card with their rank drawn big and their medals. ---------- */
+dialog.tpv.is-visit { --ar-bg: #2a2233; --ar-deep: #1d1724; --ar-row: #372c44; --ar-soft: #cfc3d6; --ar-gold: #ffe08a; --ar-gold2: #f2c94c;
+  background: var(--ar-bg); color: #fff; box-shadow: 0 0 0 2px rgba(255, 224, 138, .55), 0 24px 70px rgba(10, 6, 14, .6); }
+.is-visit .tpv-top { position: relative; overflow: hidden; padding: 12px 12px 18px 22px; border-bottom: 0;
+  background: radial-gradient(120% 140% at 50% -40%, rgba(255, 224, 138, .22), transparent 60%), var(--ar-bg); }
+/* the marquee: a row of bulbs along the header's foot, every other one lit in turn */
+.is-visit .tpv-top::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 4px; height: 8px;
+  background: radial-gradient(circle, #fff6cf 0 2.2px, var(--ar-gold) 2.6px 3.4px, transparent 3.8px) 0 50% / 16px 8px repeat-x; filter: drop-shadow(0 0 3px rgba(255, 214, 102, .9)); }
+.is-visit .tpv-top::before { content: ""; position: absolute; left: 22px; right: 14px; bottom: 4px; height: 8px; z-index: 1;
+  background: radial-gradient(circle, rgba(42, 34, 51, .75) 0 3.8px, transparent 4px) 0 50% / 32px 8px repeat-x; animation: tpv-chase 1.2s linear infinite; }
+@keyframes tpv-chase { 0%, 50% { transform: none; } 50.01%, 100% { transform: translateX(16px); } }
+.tpv-kick { margin: 0 0 1px; font-size: 12px; font-weight: var(--w-head); letter-spacing: .14em; text-transform: uppercase; color: var(--ar-soft); }
+.is-visit .tpv-title h2 { font-size: clamp(22px, 2.6vw, 30px); font-weight: var(--w-title, 800); line-height: 1.1; color: var(--ar-gold); overflow-wrap: anywhere;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .35), 0 0 18px rgba(255, 214, 102, .35); }
+.is-visit .tpv-sub { color: var(--ar-soft); }
+.is-visit .tpv-x { background: rgba(255, 255, 255, .12); color: #fff; }
+.is-visit .tpv-x:hover { background: rgba(255, 255, 255, .2); }
+.is-visit button:focus-visible, .is-visit [tabindex]:focus-visible { outline-color: #fff; }
+/* the stage: two spotlights from above, the scene in a gold frame */
+.is-visit .tpv-stagewrap { overflow: hidden; background: radial-gradient(60% 50% at 50% 100%, rgba(255, 224, 138, .12), transparent 70%), var(--ar-deep); }
+.is-visit .tpv-stagewrap::before, .is-visit .tpv-stagewrap::after { content: ""; position: absolute; top: -10%; width: 46%; height: 120%; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 240, 190, .2), rgba(255, 240, 190, 0) 80%); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
+  animation: tpv-sway 6s ease-in-out infinite alternate; }
+.is-visit .tpv-stagewrap::before { left: 2%; transform-origin: 50% 0; transform: rotate(-16deg); }
+.is-visit .tpv-stagewrap::after { right: 2%; transform-origin: 50% 0; transform: rotate(16deg); animation-delay: -3s; }
+@keyframes tpv-sway { from { opacity: .7; } to { opacity: 1; } }
+.is-visit .tpv-stage { position: relative; z-index: 1; width: min(100%, calc((min(760px, 100dvh - 32px) - 120px) * 1.13));
+  box-shadow: 0 0 0 4px var(--ar-gold), 0 0 0 7px rgba(42, 34, 51, .9), 0 0 0 9px var(--ar-gold2), 0 18px 40px rgba(0, 0, 0, .5), 0 0 60px rgba(255, 214, 102, .22); }
+.is-visit .tpv-wait { z-index: 2; background: var(--ar-row); color: #fff; }
+/* the trip (widget/place.js, tripIn and tripOut): the design page's clouds, as Sam approved them (2026-11-10). Separate
+   soft clouds drift in from every side and pile up over the whole screen, the window shows behind them, and they scatter
+   outward again. Until they cover the page the window and its backdrop are hidden (is-trip). Fixed inside the dialog, so
+   it covers the screen from the top layer */
+dialog.tpv.is-trip { background: transparent; box-shadow: none; }
+dialog.tpv.is-trip::backdrop { background: transparent; }
+.tpv.is-trip .tpv-in { visibility: hidden; }
+.tpv-clouds { position: fixed; inset: 0; z-index: 10; overflow: hidden; pointer-events: auto; }
+.tpv-clfill { position: absolute; inset: 0; background: #fff; opacity: 0; }
+.tpv-clouds.in .tpv-clfill { animation: tpv-clfill 420ms ease-in 300ms forwards; }
+.tpv-clouds.out .tpv-clfill { animation: tpv-clfill 420ms ease-in reverse forwards; }
+@keyframes tpv-clfill { from { opacity: 0; } to { opacity: 1; } }
+.tpv-cloud { position: absolute; left: var(--x); top: var(--y); width: var(--s); margin: calc(var(--s) * -.36) 0 0 calc(var(--s) * -.5); opacity: 0; will-change: transform; }
+.tpv-cloud svg { display: block; width: 100%; height: auto; }
+.tpv-clouds.in .tpv-cloud { animation: tpv-cloud-in 640ms cubic-bezier(.16, .84, .3, 1) var(--d) both; }
+.tpv-clouds.out .tpv-cloud { animation: tpv-cloud-out 780ms cubic-bezier(.5, 0, .85, .55) var(--d2) both; }
+@keyframes tpv-cloud-in { from { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(.62) rotate(var(--r)); } to { opacity: 1; transform: none; } }
+@keyframes tpv-cloud-out { from { opacity: 1; transform: none; } to { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(calc(var(--r) * -1)); } }
+.tpv-clmsg { position: absolute; z-index: 2; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 8px; max-width: 80vw; text-align: center; color: #3B2E3A; opacity: 0; }
+.tpv-clhp { display: block; width: 72px; height: 72px; }
+.tpv-clhp svg { display: block; width: 100%; height: 100%; }
+.tpv-clmsg b { font-size: 22px; font-weight: var(--w-head); line-height: 1.2; overflow-wrap: anywhere; }
+.tpv-clouds.in .tpv-clmsg { animation: tpv-clmsg 420ms var(--ease-out) 560ms forwards; }
+.tpv-clouds.out .tpv-clmsg { opacity: 0; }
+@keyframes tpv-clmsg { from { opacity: 0; transform: translate(-50%, -40%) scale(.9); } to { opacity: 1; transform: translate(-50%, -50%); } }
+/* the guest card */
+.is-visit .tpv-side { background: var(--ar-bg); }
+.tpv-guest { display: grid; gap: 14px; }
+.tpv-gk { margin: 0; font-size: 12px; font-weight: var(--w-head); letter-spacing: .12em; text-transform: uppercase; color: var(--ar-soft); }
+.tpv-gplate { display: grid; justify-items: center; gap: 2px; padding: 16px 14px 14px; border-radius: var(--r-panel); text-align: center;
+  background: radial-gradient(80% 70% at 50% 30%, rgba(255, 224, 138, .2), transparent 70%), var(--ar-row); box-shadow: inset 0 0 0 2px rgba(255, 224, 138, .55); }
+.tpv-grank { display: grid; place-items: center; width: 112px; height: 112px; margin-bottom: 4px; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); }
+.tpv-grank svg { display: block; width: 112px; height: 112px; }
+.tpv-gr { margin: 0; font-size: var(--fs-card); font-weight: var(--w-head); color: var(--ar-gold); }
+.tpv-gmedals { display: grid; gap: 8px; padding: 14px; border-radius: var(--r-panel); background: var(--ar-row); }
+.tpv-gml { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tpv-gml li { display: grid; justify-items: center; gap: 2px; min-width: 0; text-align: center; }
+.tpv-gml svg { display: block; width: 44px; height: 44px; }
+.tpv-gmn { max-width: 100%; font-size: 12px; line-height: 1.25; color: var(--ar-soft); overflow-wrap: anywhere; }
+.tpv-gnone { margin: 0; color: var(--ar-soft); font-size: var(--fs-label); }
+.tpv-guest .tpv-row { margin: 4px 0 0; }
+.tpv-btn.tpv-gold { background: var(--ar-gold); color: #3b2e3a; border-color: var(--ar-gold); font-weight: var(--w-strong); }
+.tpv-gtip { margin: 0; font-size: var(--fs-meta); color: var(--ar-soft); }
+@media (prefers-reduced-motion: reduce) {
+  .is-visit .tpv-top::before, .is-visit .tpv-stagewrap::before, .is-visit .tpv-stagewrap::after { animation: none; }
+  .tpv-clouds { display: none; }
+}
+
 /* a phone: the whole screen, the stage on top and the panel scrolling under it */
 @media (max-width: 760px) {
   dialog.tpv { width: 100vw; height: 100dvh; border-radius: 0; }
+  .tpv-clmsg b { font-size: 19px; }
   .tpv-top { padding: 8px 8px 8px 16px; }
   .tpv-title h2 { font-size: var(--fs-card); }
   .tpv-seg button { padding: 0 12px; }
@@ -146,5 +226,13 @@ html.shx[data-theme="dark"] .tpv-rar.r-rare { background: #16283a; color: #9ccbf
   .tpv.is-custom .tpv-stage { width: min(100%, calc(38dvh * 1.13)); }
   .tpv-zoom { right: 16px; top: 16px; }
   .tpv-side { padding: 14px 16px 24px; }
+  .is-visit .tpv-top { padding: 8px 8px 16px 16px; }
+  .is-visit .tpv-title h2 { font-size: 22px; }
+  .is-visit .tpv-stage { width: min(100%, calc(44dvh * 1.13)); }
+  .tpv-gplate { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; justify-items: start; align-items: center; column-gap: 14px; padding: 12px 14px; text-align: left; }
+  .tpv-grank { grid-row: 1 / 3; width: 76px; height: 76px; margin: 0; }
+  .tpv-grank svg { width: 76px; height: 76px; }
+  .tpv-gplate .tpv-gk { align-self: end; }
+  .tpv-gplate .tpv-gr { align-self: start; }
 }
 @media (prefers-reduced-motion: reduce) { .tpc img { transition: none; } .tpc:hover img { transform: none; } }

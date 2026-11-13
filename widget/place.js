@@ -240,13 +240,59 @@
   function hpLine(t){ return String(t || "").replace("{hp}", hpOf(V.m)); }
   function canChange(){ return !!(V && !V.m.visiting && S.game && S.sb && S.visitor); }
 
+  /* ---------- a visit is a trip through the clouds: the one Sam approved on the design page (2026-11-10, round 3: "a cloud
+     transition of soft separate clouds (not two curtains closing)", then "the individual clouds should be less harsh so it
+     comes together more seamlessly"), ported from clouds() in tools/preview/design/design.js with its shapes and timings.
+     Separate soft clouds drift in from every side and pile up over the whole screen with "Off to <name>'s place" and their
+     rank, the place opens behind them, and they scatter outward again; then a burst goes up over their home. The design
+     page's whoosh isn't here (the place has no sounds). None with reduced motion. ---------- */
+  var CLOUD_SHAPES = [
+    [[30, 62, 22], [58, 44, 30], [92, 50, 26], [118, 66, 18], [74, 70, 26], [48, 74, 18], [100, 76, 16]],
+    [[26, 60, 18], [50, 48, 26], [82, 40, 28], [112, 54, 24], [92, 72, 22], [60, 74, 22], [34, 74, 14]],
+    [[34, 56, 24], [66, 42, 26], [98, 46, 30], [122, 68, 16], [84, 72, 24], [52, 72, 20]]
+  ];
+  /* soft clouds: no ink outline, a pale underside and a faint halo, so a pile of them melts into one sky */
+  function cloudSvg(k){
+    var c = CLOUD_SHAPES[k % CLOUD_SHAPES.length], ring = function(grow, dy){ return c.map(function(q){ return '<circle cx="' + q[0] + '" cy="' + (q[1] + dy) + '" r="' + (q[2] + grow) + '"/>'; }).join(""); };
+    return '<svg viewBox="-12 -8 168 128" aria-hidden="true" focusable="false"><g fill="#B9AEDA" opacity=".16">' + ring(9, 8) + '</g><g fill="#FFFFFF" opacity=".55">' + ring(6, 0) + '</g><g fill="#E0D8EF">' + ring(0, 5) + '</g><g fill="#FFFFFF">' + ring(0, 0) + "</g>" +
+      '<g fill="none" stroke="#E4DDF1" stroke-width="4" stroke-linecap="round">' + c.slice(1, 4).map(function(q){ return '<path d="M' + (q[0] - q[2] * .5).toFixed(1) + " " + (q[1] + q[2] * .52).toFixed(1) + " q" + (q[2] * .5).toFixed(1) + " " + (q[2] * .3).toFixed(1) + " " + (q[2] * 1.02).toFixed(1) + ' 0"/>'; }).join("") + "</g></svg>";
+  }
+  /* the clouds roll in over the page (the window stays hidden until they cover it, is-trip) and the window shows behind them at 800 ms */
+  function tripIn(dlg, m){
+    var vw = W.innerWidth, vh = W.innerHeight, cols = vw > vh ? 4 : 3, rows = vw > vh ? 3 : 4, size = Math.max(vw / cols, vh / rows) * 2.05, far = Math.max(vw, vh) * .9, html = "", n = 0;
+    for (var r = 0; r < rows; r++) for (var q = 0; q < cols; q++, n++) {
+      var jx = ((n * 37) % 11 - 5) / 60, jy = ((n * 53) % 9 - 4) / 60, x = (q + .5) / cols + jx, y = (r + .5) / rows + jy;
+      var dx = x - .5, dy = (y - .5) * .8, len = Math.sqrt(dx * dx + dy * dy);
+      if (len < .12) { var a = n * 2.4; dx = Math.cos(a); dy = Math.sin(a) + .4; len = Math.sqrt(dx * dx + dy * dy); }
+      html += '<span class="tpv-cloud" style="--x:' + (x * 100).toFixed(1) + "%;--y:" + (y * 100).toFixed(1) + "%;--s:" + Math.round(size * (.86 + ((n * 29) % 7) / 22)) + "px;--dx:" + Math.round(dx / len * far) + "px;--dy:" + Math.round(dy / len * far) +
+        "px;--r:" + (((n * 17) % 9) - 4) * 3 + "deg;--d:" + ((n * 7) % cols * 45 + (n % 3) * 35) + "ms;--d2:" + ((n * 5) % 4) * 45 + 'ms">' + cloudSvg(n) + "</span>";
+    }
+    var R = W.shRanks, rk = rankOf(m), em = "";
+    try { if (R) em = rk.journey > 0 && R.artOf ? R.artOf(rk.journey, rk.tier, 72, { level: rk.level }) : R.art(rk.tier, 72, { level: rk.level }); } catch (e) { em = ""; }
+    var c = D.createElement("div"); c.className = "tpv-clouds"; c.setAttribute("aria-hidden", "true");
+    c.innerHTML = '<i class="tpv-clfill"></i>' + html + '<div class="tpv-clmsg">' + (em ? '<span class="tpv-clhp">' + em + "</span>" : "") + "<b>" + esc("Off to " + m.name + "’s place") + "</b></div>";
+    dlg.appendChild(c); void c.offsetWidth; c.classList.add("in");
+    dlg._tripAt = Date.now();
+    setTimeout(function(){ dlg.classList.remove("is-trip"); }, 800);
+  }
+  /* once the place is drawn, and not before 1.4 s (the design page's timing), the clouds scatter */
+  function tripOut(dlg){
+    var c = $(".tpv-clouds", dlg); if (!c) return;
+    setTimeout(function(){
+      if (!c.isConnected) return;
+      dlg.classList.remove("is-trip"); c.classList.remove("in"); c.classList.add("out");
+      setTimeout(function(){ if (V && V.dlg === dlg && V.o) burstAt("home", V.o); }, 550);
+      setTimeout(function(){ tripGone(dlg); }, 950);
+    }, Math.max(0, 1400 - (Date.now() - (dlg._tripAt || 0))));
+  }
+  function tripGone(dlg){ var c = $(".tpv-clouds", dlg); if (c && c.parentNode) c.parentNode.removeChild(c); dlg.classList.remove("is-trip"); }
   function open(o){
     o = o || {};
     if (V) return;
     css();
     var dlg = D.createElement("dialog");
-    dlg.className = "tpv"; dlg.setAttribute("aria-labelledby", "tpvT");
-    dlg.innerHTML = '<div class="tpv-in"><header class="tpv-top"><div class="tpv-title"><h2 id="tpvT">Timmy’s place</h2><p class="tpv-sub"></p></div>' +
+    dlg.className = "tpv" + (o.place ? " is-visit" + (reduced ? "" : " is-trip") : ""); dlg.setAttribute("aria-labelledby", "tpvT");
+    dlg.innerHTML = '<div class="tpv-in"><header class="tpv-top"><div class="tpv-title">' + (o.place ? '<p class="tpv-kick" aria-hidden="true">Welcome to</p>' : "") + '<h2 id="tpvT">Timmy’s place</h2><p class="tpv-sub"></p></div>' +
       '<div class="tpv-acts"><span class="tpv-seg" role="group" aria-label="What to do here" hidden><button type="button" data-tp="play" aria-pressed="true">Visit</button><button type="button" data-tp="customize" aria-pressed="false">Customize</button></span>' +
       '<button type="button" class="tpv-x" data-tp="close" aria-label="Close Timmy’s place">' + X_SVG + "</button></div></header>" +
       '<div class="tpv-body"><div class="tpv-stagewrap"><div class="tpv-stage"></div><p class="tpv-wait" role="status">Opening the door…</p>' +
@@ -263,14 +309,16 @@
     $('[data-tp="zoom"]', dlg).addEventListener("click", function(){ V.wide = !V.wide; build(); });
     try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); }
     D.documentElement.classList.add("tpv-open");
-    if (!V.m.visiting) track("place:open");
+    if (o.place && !reduced) tripIn(dlg, V.m);
+    track(V.m.visiting ? "place:visit" : "place:open");   /* a visit is counted, never whose (visiting: widget/dash.js) */
     var first = V.m.visiting ? Promise.resolve() : readShop();
     first.then(function(){ if (V && !V.m.visiting) V.m = mine(); return ready(V && V.m); }).then(function(){
       if (!V) return;
       $(".tpv-wait", dlg).hidden = true;
       build({ hello: true });
       if (o.customize && canChange()) setMode("customize");
-    }, function(){ if (V) { var w = $(".tpv-wait", dlg); w.hidden = false; w.textContent = "Timmy’s place couldn’t be opened just now. Try again in a moment."; } });
+      tripOut(dlg);
+    }, function(){ if (V) { tripGone(dlg); var w = $(".tpv-wait", dlg); w.hidden = false; w.textContent = "Timmy’s place couldn’t be opened just now. Try again in a moment."; } });
     return api;
   }
   function close(){ if (V) { try { V.dlg.close(); } catch (e) { shut(); } } }
@@ -647,11 +695,28 @@
     }
     return THUMBS[id];
   }
+  /* a visit's panel: their rank as the boards draw it (the handpiece, or the journey's object), its name in gold, and
+     each hub medal they've earned, the way a marquee bills the star. Only what get_place gives: no HP, no XP, no dates */
+  function guestCard(el, m){
+    var R = W.shRanks, r = rankOf(m), fl = flairOf(m).sort(function(a, b){ return b.lvl - a.lvl; }), big = "";
+    try { if (R) big = r.journey > 0 && R.artOf ? R.artOf(r.journey, r.tier, 112, { level: r.level, animate: !reduced }) : R.art(r.tier, 112, { level: r.level, animate: !reduced }); } catch (e) { big = ""; }
+    var medal = function(x){ try { return R && R.medal ? R.medal(x.lvl, 44, x.hub) : ""; } catch (e) { return ""; } };
+    var hub = function(h){ try { return R && R.hubName ? R.hubName(h) : h; } catch (e) { return h; } };
+    el.innerHTML = '<div class="tpv-guest">' +
+      '<div class="tpv-gplate"><div class="tpv-grank" aria-hidden="true">' + big + '</div><p class="tpv-gk">Rank</p><p class="tpv-gr">' + esc(rankName(m)) + "</p></div>" +
+      '<div class="tpv-gmedals"><p class="tpv-gk">Hub mastery</p>' + (fl.length
+        ? '<ul class="tpv-gml">' + fl.slice(0, 8).map(function(x){ var n = hub(x.hub); return '<li title="' + esc(n) + '"><span aria-hidden="true">' + medal(x) + '</span><span class="tpv-gmn">' + esc(n) + "</span></li>"; }).join("") + "</ul>" +
+          '<div class="tpv-row"><button type="button" class="tpv-btn tpv-gold" data-tp="mastery">See the medals</button></div>'
+        : '<p class="tpv-gnone">No hub medals yet</p>') + "</div>" +
+      '<p class="tpv-gtip">Tap Timmy and he waves. The sun, the house and the things in the yard each do something too.</p></div>';
+    var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
+  }
   function rarTag(r){ return '<i class="tpv-rar r-' + String(r || "free").toLowerCase() + '">' + esc(r || "Default") + "</i>"; }
   function owned(x){ return !x.id || !!S.own[x.id]; }
   function howTag(x){ var how = x.id ? S.own[x.id] : ""; return how === "gift" ? "A gift" : how === "rank" ? (x.rankName || "Rank") + " rank" : ""; }
   function side(o){
     var el = $(".tpv-side", V.dlg), m = V.m, H = HL();
+    if (V.mode !== "customize" && m.visiting) { guestCard(el, m); return; }
     if (V.mode !== "customize") {
       var fl = flairOf(m), r = rankOf(m);
       el.innerHTML = '<div class="tpv-visit">' +
