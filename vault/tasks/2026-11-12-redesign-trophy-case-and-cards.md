@@ -76,6 +76,13 @@ one change there); `widget/v3.js`'s Stats panel (the live hubs use it); the jour
   class that has it. Not earned: the drawing dimmed, with what earns it. A secret one not earned: its silhouette and
   its riddle (`clue`), never its name. Bowling is earned on the device (`sh_bowl_trophy`,
   [the bowling egg](2026-11-06-redesign-bowling-egg.md)) and shows no share until the server knows the kind.
+  **What the bowling egg left for it** (2026-11-13): the drawing and its silhouette are `EGG_TROPHIES.bowling` in
+  `tools/figures/site/medals.mjs` (`{ body, sil }`, 64 box; built into the design page's `art.js` as `eggTrophies`, in
+  no widget file yet: put it with the case's own art); its words are `shBowl.TROPHY` in `widget/bowling.js`
+  (`{ k: "bowling", n: "Lane Legend", d: "Saw all eight bowling clips", secret: true, clue }`; copy them, since that
+  file loads only at a strike or the lane). The device keeps `sh_bowl_trophy` (the day it was earned) and
+  `sh_bowl_seen` (the clips' keys); the page hears `sh:bowl-trophy` when the eighth is seen, and Timmy says his line
+  then. The name "Lane Legend" is the bowling session's pick: Sam can rename it.
 - **The rank** at the top of the case: the medallion (`HX.rankArt`, `shRanks.artOf`), the rank's name set in flat
   metal, the level, the XP to the next step, and the road ahead (`shJourneys.road(profile)`, as More, Stats has it).
 - **The cards**: the site's typeface and tokens, the drawn trophy or medal, one line of what happened and one of

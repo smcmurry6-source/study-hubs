@@ -52,7 +52,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 | 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes. **Built 2026-11-12** in [#345](https://github.com/smcmurry6-source/study-hubs/pull/345), waiting for Sam's "merge" (its hand-off in the Log) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
 | 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
 | 4 | **Visiting**: a row on the new dashboard's boards opens that person's place | [visiting](2026-11-12-redesign-visiting.md) | 3 |
-| 5 | **The bowling egg** (part D) | [the bowling egg](2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
+| 5 | **The bowling egg** (part D). **Built 2026-11-13** (its PR waits for Sam's "merge"; the hand-off in the Log) | [the bowling egg](2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
 | 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12) | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
 | 7 | **Ask Timmy, part 2** (the chat). **Built 2026-11-12, ahead of its turn** (Sam asked for it then): the Ask icon shows whenever Timmy isn't on the page, so it works before and after session 3 | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), its Log | (3) |
 | 8 | **The game layer's wiring** left by part A: the arcade's sessions, Timmy Time's minutes, the service worker's lists | [the wiring](2026-11-12-redesign-game-layer-wiring.md) | 6 |
@@ -353,6 +353,28 @@ These hold for each spec; a spec only adds to them.
   - **Left for later, written down**: `sw.js`'s `PRECACHE` (session 8) and the shop on the release's preview, in [the
     release note](2026-11-06-redesign-release.md) ("From phase 4, part B", with the About page's draft).
   **Next: session 3, Timmy everywhere** ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4").
+- 2026-11-13 (Claude Code), **session 5, the bowling egg; hand-off for session 6** ([the bowling egg](2026-11-06-redesign-bowling-egg.md)).
+  Run ahead of sessions 3 and 4 (it needs only session 2). Nothing students see changes, no XP, nothing on the server:
+  neither pending migration is applied or changed, and nothing in them disagreed with the client.
+  - **The clips**: #291's kit carried over unchanged (`tools/figures/site/bowling.mjs`), built by `build.mjs` into
+    `widget/hub-art/bowling.js` (`window.SH_BOWL`, 56 KB, 18 KB compressed) and the design page's "The bowling egg"
+    section; the build checks every clip, still and playing, and that every class a clip's CSS moves is in its drawing.
+    A recording of the eight and their stills went to Sam.
+  - **New `widget/bowling.js`**, `window.shBowl`: `play(clip, { host, say, queue, still, onClose })`, `random()`, `seen()`,
+    `trophy()`, `off()`, `ready()`, `close()`, `showing()`, `KEYS`, `STRIKES`, `TROPHY`. Its styles are inside it; it
+    fetches its drawings itself; on the bar it queues through `shRankUp.scene` when rank-up cards are on the page. The
+    page hears `sh:bowl-trophy` when the eighth clip is seen.
+  - **`widget/hub-rewards.js`**: `bowlRun()` in `recordAnswer` (the run, `sh_bowl_run`; the day's first answers,
+    `sh_bowl_today`); it fetches `bowling.js` at a strike. **`widget/place.js`**: the lane plays a clip in the full view
+    (`playLane`), its own surprise with the eggs off; `shut()` closes a clip.
+  - **For session 6, the trophy case**: the Bowling trophy is `EGG_TROPHIES.bowling` in `medals.mjs` and
+    `shBowl.TROPHY`'s words; what to take from where is in [its note](2026-11-12-redesign-trophy-case-and-cards.md)
+    ("What the bowling egg left for it").
+  - **For session 8 and session 9**: `sw.js`'s `PRECACHE` gains `widget/bowling.js` and `widget/hub-art/bowling.js`
+    (the release note's "From phase 4, part D" has the box); both load on first use, so phase 5 part 2 counts them among
+    those. Budgets unchanged.
+  - Tests: the smoke test's bowling block on a new hub (desktop and phone), `a11y.js`'s clip card. BUG-105 and BUG-106.
+  **Next: session 3, Timmy everywhere** (unchanged), then 4, then 6.
 
 ## Outcome
 

@@ -648,6 +648,157 @@ function lint(hub, A){
       notes.push(`${name} (${label}): Timmy's place, its full view and the customizer`);
       await page.close();
     }
+    /* The bowling egg (phase 4, part D: widget/bowling.js and its drawings widget/hub-art/bowling.js, both fetched on first
+       use). In a new hub's bank with the run at 49 (sh_bowl_run): neither file loads with the page; one first-try right
+       answer shows a strike clip after the verdict, in a card docked at the bottom that is named, takes no focus and goes
+       at a tap; a retry changes nothing; a wrong first try puts the run at 0; 150 plays the turkey and starts the run
+       again; Escape closes a clip; nothing plays (or counts) in the mock, with the eggs off or in Focus mode; reduced
+       motion shows the clip's still and its word. At Timmy's place a tap on the bowling lane plays a clip inside the full
+       view, and with the eggs off the lane keeps its own surprise. A live hub has no counter and fetches neither file. */
+    for (const hub of nextHubs.slice(0, 1)) {
+      const BOWL_KEYS = ['panic', 'conga', 'floss', 'rocket', 'sweep', 'neighbor', 'turkey', 'spare'];
+      const fresh = async (opts) => {
+        const page = await context.newPage(), errs = [], asked = [];
+        page.on('pageerror', e => errs.push(e.message));
+        page.on('request', r => { if (/\/widget\/(bowling\.js|hub-art\/bowling\.js)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
+        if (opts && opts.reduced) await page.emulateMedia({ reducedMotion: 'reduce' });
+        return { page, errs, asked };
+      };
+      const clean = p => p.evaluate(() => ['sh_bowl_run', 'sh_bowl_today', 'sh_bowl_seen', 'sh_bowl_trophy', 'sh_pref_eggs', 'sh_pref_focus'].forEach(k => localStorage.removeItem(k)));
+      /* a question card from the bank's own code (shHub.card), answered right or wrong as a student would tap it */
+      const answer = (p, right, again) => p.evaluate(async ([right, again]) => {
+        const B = window.__bw || (window.__bw = { qs: (await (await fetch('content/questions.json')).json()).filter(q => q.type === 'mcq' && !q.fig && !q.pcase && !q.img), i: 0, last: null });
+        const q = again ? B.last : (B.last = B.qs[B.i++]);
+        const host = document.querySelector('.qcard') ? document.querySelector('.qcard').parentNode : document.querySelector('.hx-view:not([hidden])');
+        const el = window.shHub.card(q.id); host.insertBefore(el, host.firstChild); el.scrollIntoView({ block: 'start' });
+        const sc = el.querySelector('[data-showch]'); if (sc && sc.offsetParent) sc.click();
+        window.__bwAt = performance.now(); window.__bwShown = 0;
+        if (!window.__bwObs) { window.__bwObs = new MutationObserver(() => { if (!window.__bwShown && document.querySelector('.shb')) window.__bwShown = performance.now(); }); window.__bwObs.observe(document.body, { childList: true }); }
+        el.querySelector('.ch[data-i="' + (right ? q.answer : (q.answer + 1) % q.choices.length) + '"]').click();
+        return { id: q.id, verdict: !!el.querySelector('.qc-result .verdict'), run: localStorage.getItem('sh_bowl_run') };
+      }, [right, !!again]);
+      const run = p => p.evaluate(() => localStorage.getItem('sh_bowl_run'));
+      const card = p => p.evaluate(() => { const c = document.querySelector('.shb'); if (!c) return null; const r = c.getBoundingClientRect(), w = c.querySelector('.shb-word'), x = c.querySelector('.shb-x'), i = c.querySelector('img');
+        return { clip: c.dataset.clip, still: c.classList.contains('is-still'), label: c.getAttribute('aria-label') || '', top: r.top, bottom: r.bottom, h: innerHeight, focus: c.contains(document.activeElement),
+          word: w ? w.textContent : '', wordAnim: w ? getComputedStyle(w).animationName : '', alt: i ? i.alt : '', x: x ? x.getAttribute('data-bowl') + '|' + (x.getAttribute('aria-label') || '') : '',
+          after: window.__bwShown ? Math.round(window.__bwShown - window.__bwAt) : -1, seen: localStorage.getItem('sh_bowl_seen') || '' }; });
+      const name = `${hub}/next, the bowling egg`;
+      { /* the bank */
+        const { page, errs, asked } = await fresh();
+        await page.goto(BASE() + `hubs/${hub}/next/index.html#questions`);
+        await page.waitForSelector('.qcard', { timeout: 20000 }).catch(() => null); await page.waitForTimeout(800);
+        await clean(page);
+        if (asked.length) problems.push(`${name} (${label}): the bowling egg's files loaded with the page (${asked.join(', ')}): they load at the first strike`);
+        await page.evaluate(() => localStorage.setItem('sh_bowl_run', '49'));
+        const a = await answer(page, true);
+        await page.waitForSelector('.shb', { timeout: 8000 }).catch(() => null); await page.waitForTimeout(300);
+        const c = await card(page);
+        if (!c) problems.push(`${name} (${label}): the 50th first-try right answer in a row showed no clip (run ${await run(page)})`);
+        else {
+          if (!a.verdict || c.after < 800) problems.push(`${name} (${label}): the clip should come after the answer's verdict (verdict ${a.verdict}, ${c.after} ms after the tap)`);
+          if (!['panic', 'conga', 'floss', 'rocket', 'sweep', 'neighbor'].includes(c.clip)) problems.push(`${name} (${label}): a strike played "${c.clip}", not one of the six strike clips`);
+          if (!/^Bowling clip: /.test(c.label) || c.x !== 'close|Close the bowling clip') problems.push(`${name} (${label}): the clip card should be named and have a named close button with data-bowl (${c.label}, ${c.x})`);
+          if (c.focus) problems.push(`${name} (${label}): the clip card took the focus`);
+          if (!(c.bottom <= c.h && c.top > c.h / 3)) problems.push(`${name} (${label}): the clip card should be docked at the bottom of the screen (${Math.round(c.top)}-${Math.round(c.bottom)} of ${c.h})`);
+          if (!c.seen.includes(c.clip)) problems.push(`${name} (${label}): the sighting wasn't kept on the device (${c.seen})`);
+          if (!asked.includes('bowling.js') || !asked.includes('hub-art/bowling.js')) problems.push(`${name} (${label}): the clip played without its two files (${asked.join(', ')})`);
+          if (await run(page) !== '50') problems.push(`${name} (${label}): the run should be 50 after the strike (${await run(page)})`);
+          await page.click('.shb .shb-screen'); await page.waitForTimeout(600);
+          if (await page.$('.shb')) problems.push(`${name} (${label}): a tap didn't remove the clip`);
+        }
+        await answer(page, false, true); await page.waitForTimeout(300);
+        if (await run(page) !== '50') problems.push(`${name} (${label}): a second try at a question changed the run (${await run(page)}, not 50)`);
+        await answer(page, false); await page.waitForTimeout(300);
+        if (await run(page) !== '0') problems.push(`${name} (${label}): a wrong first try should put the run at 0 (${await run(page)})`);
+        await page.evaluate(() => localStorage.setItem('sh_bowl_run', '149'));
+        await answer(page, true);
+        await page.waitForSelector('.shb', { timeout: 8000 }).catch(() => null);
+        const t = await card(page);
+        if (!t || t.clip !== 'turkey' || t.word !== 'Turkey!') problems.push(`${name} (${label}): 150 in a row should play the turkey (${t ? t.clip + ', ' + t.word : 'no clip'})`);
+        if (await run(page) !== '0') problems.push(`${name} (${label}): after the turkey the run starts again at 0 (${await run(page)})`);
+        if (t) { await page.keyboard.press('Escape'); await page.waitForTimeout(600); if (await page.$('.shb')) problems.push(`${name} (${label}): Escape didn't close the clip`); }
+        for (const [k, v, what] of [['sh_pref_eggs', 'off', 'the eggs off'], ['sh_pref_focus', 'on', 'Focus mode']]) {
+          await page.evaluate(([k, v]) => { localStorage.setItem('sh_bowl_run', '49'); localStorage.setItem(k, v); }, [k, v]);
+          await answer(page, true); await page.waitForTimeout(2200);
+          if (await page.$('.shb') || await run(page) !== '49') problems.push(`${name} (${label}): with ${what} a strike played or the run moved (${await run(page)})`);
+          await page.evaluate(k => localStorage.removeItem(k), k);
+        }
+        /* the mock: its answers are recorded with ctx "mock" at submit, and neither count nor play */
+        await page.evaluate(() => { localStorage.setItem('sh_bowl_run', '49'); location.hash = 'questions/mock'; }); await page.waitForTimeout(900);
+        const start = await page.$('[data-mockstart]'); if (start) { await start.click(); await page.waitForTimeout(900); }
+        await page.evaluate(() => { [...document.querySelectorAll('.qcard[data-ctx="mock"]')].slice(0, 5).forEach(c => { const b = c.querySelector('[data-mock-pick]'); if (b) b.click(); }); });
+        for (let i = 0; i < 2; i++) { const s = await page.$('[data-submit]'); if (s) { await s.click(); await page.waitForTimeout(400); } }
+        await page.waitForTimeout(1800);
+        if (await page.$('.shb') || await run(page) !== '49') problems.push(`${name} (${label}): the mock counted toward the run or played a clip (${await run(page)})`);
+        for (let i = 0; i < 4 && await page.$('.sh-mk'); i++) { await page.keyboard.press('Escape'); await page.waitForTimeout(450); } /* the mock's results card */
+        const nm = await page.$('[data-newmock]'); if (nm) await nm.click({ timeout: 5000 }).catch(() => null);
+        await clean(page);
+        errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+        await page.close();
+      }
+      if (!vp.isMobile) { /* reduced motion: the still and its word */
+        const { page, errs } = await fresh({ reduced: true });
+        await page.goto(BASE() + `hubs/${hub}/next/index.html#questions`);
+        await page.waitForSelector('.qcard', { timeout: 20000 }).catch(() => null); await page.waitForTimeout(800);
+        await clean(page); await page.evaluate(() => localStorage.setItem('sh_bowl_run', '49'));
+        await answer(page, true);
+        await page.waitForSelector('.shb', { timeout: 8000 }).catch(() => null);
+        const c = await card(page);
+        if (!c || !c.still || c.word !== 'Strike!' || c.wordAnim !== 'none' || !/\(the last frame\)$/.test(c.alt)) problems.push(`${name} (${label}, reduced motion): the clip should be its still with "Strike!" (${JSON.stringify(c && { still: c.still, word: c.word, anim: c.wordAnim, alt: c.alt.slice(-20) })})`);
+        await clean(page);
+        errs.forEach(e => problems.push(`${name} (${label}, reduced motion): JavaScript error: ${e}`));
+        await page.close();
+      }
+      if (!vp.isMobile) { /* Timmy's place: the bowling lane */
+        const { page, errs, asked } = await fresh();
+        await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); } catch (e) {} });
+        const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
+        const shop = () => ({ day: '2026-11-12', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], costumes: [], snacks_today: 0, boost: null,
+          inventory: [{ id: 'bowling-lane', at: '2026-11-01', how: 'bought' }], locked: [], equipped: { 'yard-side': 'bowling-lane' } });
+        await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rank, mastery: [], shop: shop() }) }));
+        await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(shop()) }));
+        await page.goto(BASE() + `hubs/${hub}/next/index.html#more/place`);
+        const pc = await page.waitForSelector('.place-card .tpc.is-live', { timeout: 20000 }).catch(() => null);
+        await clean(page);
+        if (!pc) problems.push(`${name} (${label}): Timmy's place didn't draw, so the lane wasn't checked`);
+        else {
+          await pc.click(); await page.waitForSelector('dialog.tpv[open]', { timeout: 8000 }).catch(() => null); await page.waitForTimeout(1200);
+          const tap = () => page.evaluate(() => { const sr = document.querySelector('dialog.tpv .tpv-stage').shadowRoot, n = sr && sr.querySelector('[data-egg="lane"]'); if (!n) return false; n.dispatchEvent(new MouseEvent('click', { bubbles: true })); return true; });
+          if (asked.length) problems.push(`${name} (${label}): the bowling egg's files loaded with the place (${asked.join(', ')})`);
+          if (!(await tap())) problems.push(`${name} (${label}): the place has no bowling lane to tap`);
+          else {
+            const lc = await page.waitForSelector('dialog.tpv .shb.shb-in-host', { timeout: 8000 }).catch(() => null);
+            const k = lc ? await lc.getAttribute('data-clip') : '';
+            if (!BOWL_KEYS.includes(k)) problems.push(`${name} (${label}): a tap on the lane should play a clip inside the place (${k || 'none'})`);
+            if (lc) { await page.keyboard.press('Escape'); await page.waitForTimeout(500);
+              if (await page.$('dialog.tpv .shb')) problems.push(`${name} (${label}): Escape didn't close the lane's clip`);
+              if (!(await page.$('dialog.tpv[open]'))) problems.push(`${name} (${label}): Escape on the lane's clip closed the whole place too`); }
+            await page.evaluate(() => localStorage.setItem('sh_pref_eggs', 'off'));
+            await tap(); await page.waitForTimeout(900);
+            const said = await page.evaluate(() => { const b = document.querySelector('dialog.tpv .tpv-stage').shadowRoot.querySelector('.tp-bubble'); return { clip: !!document.querySelector('dialog.tpv .shb'), text: b ? b.textContent : '' }; });
+            if (said.clip || !/Strike! Well, close\./.test(said.text)) problems.push(`${name} (${label}): with the eggs off the lane should keep its own surprise (${JSON.stringify(said)})`);
+          }
+          await page.keyboard.press('Escape');
+        }
+        await clean(page);
+        errs.forEach(e => problems.push(`${name} (${label}, the lane): JavaScript error: ${e}`));
+        await page.close();
+      }
+      if (!vp.isMobile) { /* a live hub: no counter, no file */
+        const { page, errs, asked } = await fresh();
+        await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(1500);
+        await page.click('.sh-archived-stay', { timeout: 1000 }).catch(() => {});
+        await page.evaluate(h => { localStorage.setItem('sh_bowl_run', '49'); localStorage.removeItem('sh_bowl_today');
+          document.dispatchEvent(new CustomEvent(h + ':answered', { detail: { qid: 'smoke-bowl', correct: true } })); }, hub);
+        await page.waitForTimeout(1800);
+        const live = await page.evaluate(() => ({ run: localStorage.getItem('sh_bowl_run'), api: !!window.shBowl, today: localStorage.getItem('sh_bowl_today') }));
+        if (asked.length || live.api || live.run !== '49' || live.today) problems.push(`${hub} (live, ${label}): the live hub should have no bowling counter and fetch neither file (${JSON.stringify(live)}, ${asked.join(', ')})`);
+        await clean(page);
+        errs.forEach(e => problems.push(`${hub} (live, ${label}, the bowling egg): JavaScript error: ${e}`));
+        await page.close();
+      }
+      notes.push(`${name} (${label}): the run, a strike, a retry, a miss, the turkey, the mock, eggs off, Focus mode${vp.isMobile ? '' : ', reduced motion, the lane and the live hub'}`);
+    }
     /* Timmy's shop (phase 4, part B: widget/shop.js, its art widget/hub-art/shop.js and the place's kit). On the game
        layer, with a made-up shop in the bootstrap and buy_item stubbed here (nothing is recorded): More has the Shop
        tile, nothing of the shop loads with the page, the shelves draw, a purchase lowers the balance and the piece shows

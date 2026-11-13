@@ -142,6 +142,40 @@ const HAS_NEXT_DASH = fs.existsSync(path.join(L.ROOT, 'next', 'index.html'));
           await page.keyboard.press('Escape').catch(() => {});
         } else problems.push(`${hub}/next · shop: an item's sheet didn't open`);
       } else problems.push(`${hub}/next · shop: the shop didn't draw for the returning test account`);
+      /* the bowling egg's clip card (widget/bowling.js; loaded at the first strike): with the run at 49, one first-try
+         right answer in the bank shows it. It is named, takes no focus by itself, and closes from the keyboard (its
+         close button, and Escape). The pointer rests on it while axe runs, which holds it on the screen. */
+      await page.evaluate(() => { location.hash = 'questions'; }); await page.waitForTimeout(900);
+      const bowlAnswer = () => page.evaluate(async () => {
+        localStorage.setItem('sh_bowl_run', '49'); localStorage.removeItem('sh_bowl_today'); localStorage.removeItem('sh_pref_eggs'); localStorage.removeItem('sh_pref_focus');
+        const qs = (await (await fetch('content/questions.json')).json()).filter(q => q.type === 'mcq' && !q.fig && !q.pcase && !q.img);
+        const q = qs[(window.__bwA = (window.__bwA || 0) + 1)], host = document.querySelector('.qcard') ? document.querySelector('.qcard').parentNode : document.querySelector('.hx-view:not([hidden])');
+        const el = window.shHub.card(q.id); host.insertBefore(el, host.firstChild); el.scrollIntoView({ block: 'start' });
+        const sc = el.querySelector('[data-showch]'); if (sc && sc.offsetParent) sc.click();
+        el.querySelector('.ch[data-i="' + q.answer + '"]').click();
+      });
+      await bowlAnswer();
+      if (await page.waitForSelector('.shb', { timeout: 10000 }).catch(() => null)) {
+        await page.hover('.shb .shb-screen').catch(() => {});
+        const k = `${hub}/next · bowling clip`;
+        /* axe on the card alone: the bank under it is checked as its own screen */
+        await page.addScriptTag({ content: AXE });
+        const v = await page.evaluate(async tags => (await window.axe.run({ include: [['.shb']] }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })).violations
+          .map(x => ({ id: x.id, impact: x.impact, n: x.nodes.length, help: x.help, sample: x.nodes[0] && x.nodes[0].target.join(' ') })), TAGS);
+        results[k] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: await motion(page) };
+        const c = await page.evaluate(() => { const c = document.querySelector('.shb'), x = c && c.querySelector('.shb-x');
+          return { named: !!(c && /\S/.test(c.getAttribute('aria-label') || '')), x: !!(x && /\S/.test(x.getAttribute('aria-label') || '')), focus: !!(c && c.contains(document.activeElement)) }; });
+        if (!c.named || !c.x) problems.push(`${k}: the clip card and its close button need names (${JSON.stringify(c)})`);
+        if (c.focus) problems.push(`${k}: the clip card took the focus by itself`);
+        await page.focus('.shb .shb-x'); await page.keyboard.press('Enter'); await page.waitForTimeout(500);
+        if (await page.$('.shb')) problems.push(`${k}: its close button doesn't close it from the keyboard`);
+        await page.mouse.move(0, 0); await bowlAnswer();
+        if (await page.waitForSelector('.shb', { timeout: 10000 }).catch(() => null)) {
+          await page.keyboard.press('Escape'); await page.waitForTimeout(500);
+          if (await page.$('.shb')) problems.push(`${k}: Escape doesn't close it`);
+        }
+      } else problems.push(`${hub}/next · bowling clip: one first-try right answer with the run at 49 showed no clip`);
+      await page.evaluate(() => ['sh_bowl_run', 'sh_bowl_today', 'sh_bowl_seen'].forEach(k => localStorage.removeItem(k)));
     }
   }
   await ctx.close();

@@ -62,7 +62,8 @@ calls it makes today.
 
 **For the release, not this session** (keep them in the release note's list): each episode's length is loaded with
 `admin_set_podcast_episode(secret, hub, ep, seconds)` when the migration is applied, or its minutes pay nothing;
-the service worker's `PRECACHE` gains the files the phase-4 sessions added.
+the service worker's `PRECACHE` gains the files the phase-4 sessions added. The bowling egg added two (2026-11-13): `widget/bowling.js` and `widget/hub-art/bowling.js`, fetched at the first
+strike or the first tap on the lane.
 
 **The preview's made-up data**: `xp_session_start` and `xp_session_finish` are answered since part A; add
 `pod_minute_v2` (a minute pays 10 once, the last one +100), `admin_resolve_report_v2` and `get_reports_v2` behind

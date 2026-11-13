@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: in-progress
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
 waiting-on: 
-agent: 
+agent: Claude Code
 pr: 
 ---
 
@@ -145,10 +145,10 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
 **Done when** (this replaces the list below where they differ):
 - [ ] The eight clips on `main` from #291's kit, in the design page, and Sam's yes to a recording of them (and to
       the stills); #291 closed
-- [ ] The run, the three triggers and the lane work as above on the redesign's pages; the live hubs are unchanged
-- [ ] Sightings and the trophy are kept on the device; the Bowling trophy's drawing and silhouette are in `medals.mjs`
+- [x] The run, the three triggers and the lane work as above on the redesign's pages; the live hubs are unchanged
+- [x] Sightings and the trophy are kept on the device; the Bowling trophy's drawing and silhouette are in `medals.mjs`
 - [ ] The tests above added and passing; `node tools/release/run.js` once; budgets unchanged
-- [ ] `tools/podcast/LORE.md`; the About draft in [the release note](2026-11-06-redesign-release.md) ("From phase 4,
+- [x] `tools/podcast/LORE.md`; the About draft in [the release note](2026-11-06-redesign-release.md) ("From phase 4,
       part D", in a spoiler, with the trophy count); the event taxonomy row; the hand-off in phase 4's Log
 
 ## Done when
@@ -169,6 +169,21 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
   carried over. The triggers go in the engine's answer path, not `widget/eggs.js`, so no live hub changes. The trophy
   can't be recorded on the server as written (`record_achievement` lists its kinds), so it is on the device until
   the first migration after the release.
+- 2026-11-13 (Claude Code): **built**, ahead of sessions 3 and 4 (it needs only session 2). The kit carried over from
+  #291 unchanged and built into `widget/hub-art/bowling.js` and the design page; a recording of the eight clips and their
+  stills sent to Sam. New `widget/bowling.js` (`window.shBowl`); the run in `widget/hub-rewards.js`'s `recordAnswer`;
+  the lane in `widget/place.js`'s `playEgg`; the Bowling trophy ("Lane Legend", the agent's name for it) drawn in
+  `medals.mjs` as `EGG_TROPHIES.bowling`. Calls the spec left open, made here:
+  - **The eggs off or Focus mode stop the run too**, not only the clip ("not at all"): nothing counts or resets until
+    they are back on.
+  - **The spare plays only from the lane**, as the spec's default said; the lane picks any of the eight, never the one
+    just shown.
+  - **A still (reduced motion) goes by itself after 4 seconds** like a playing clip (3 to 5 seconds), rather than staying
+    until tapped; hovering or focusing the card holds it, and Esc or its close button closes it.
+  - **On the bar the card waits for an open dialog**: it doesn't show while a modal is up (the place, the shop), and it
+    sits above the widget's floating pieces (Timmy, the Full Arch chart) and below the rank-up cards.
+  - Learn mode's questions count like the bank's (a question card outside the mock and the arcade); a Learn question
+    asked again the same day is a second try.
 
 ## Outcome
 
