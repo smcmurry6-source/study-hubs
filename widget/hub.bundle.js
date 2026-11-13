@@ -767,9 +767,11 @@ return '<div class="studyas" role="group" aria-labelledby="saL"><span class="lab
 VIEWS.map(function(x){ return '<button type="button" data-qview="' + x[0] + '" aria-pressed="' + (v === x[0]) + '">' + icon(x[2], 18) + "<span>" + x[1] + "</span></button>"; }).join("") + "</span></div>";
 }
 function drawQuestions(el, preset){
-var title = preset ? labelOf(SETS, preset) : "Questions";
+var title = preset ? labelOf(SETS, preset) : "Questions", studying = preset !== "mock" && qview() !== "questions";
 el.innerHTML = '<div class="hx-page bank"><div class="bank-head"><h1>' + esc(title) + "</h1></div>" +
-'<div class="bank-grid"><div class="bank-main">' + (preset === "mock" ? "" : viewHTML()) + panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div></div>' +
+'<div class="bank-grid"><div class="bank-main' + (studying ? " is-study" : "") + '">' + (preset === "mock" ? "" : viewHTML()) +
+(studying ? '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div><h2 class="bank-which">Which questions</h2>' + panelHTML(preset)
+: panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div>') + "</div>" +
 '<aside class="bank-side" aria-label="Today">' + HX.todayPanel() + "</aside></div></div>";
 wirePanel(el, preset);
 $$("[data-qview]", el).forEach(function(b){ b.addEventListener("click", function(){
@@ -780,8 +782,8 @@ var nb = $('[data-qview="' + v + '"]', el); if (nb) nb.focus();
 if (preset === "mock") { drawMock($("#qlist", el), el); return; }
 fill(el, preset);
 var v = qview();
-if (v === "learn") tip(el, "learn", "Learn asks each question until you get it right twice. Your progress is saved.");
-else if (v === "cards") tip(el, "cards", "Flip the card, then say how well you knew it. It comes back when you're about to forget it.");
+if (v === "learn") tip(el, "learn", "Pick the questions below, then Start: Learn asks each one until you get it right twice. Your progress is saved.");
+else if (v === "cards") tip(el, "cards", "Pick the questions below, then Study: flip each card and say how well you knew it. It comes back when you're about to forget it.");
 else tip(el, "bank", "Your filters and the set you pick are remembered next time; the tags under the panel show what's on.");
 }
 var SM = null, smLoad = null;
@@ -1342,7 +1344,7 @@ return '<a class="hx-tab" href="#' + v[0] + '" data-mode="' + v[0] + '">' + icon
 '<button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button>" +
 '<a class="hx-set" href="#more/settings" aria-label="Settings">' + icon("settings", 22) + '<span class="lbl">Settings</span></a>' +
 "</header>" +
-'<div class="hx-strip" id="hxStrip" aria-label="Today"><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="hx-meter hx-live" data-livem></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
+'<div class="hx-strip" id="hxStrip" aria-label="Today"><a class="hx-home" href="' + esc(C.back || "../../") + '" aria-label="All hubs: back to the dashboard"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M13 8H3"/><path d="M7 4 3 8l4 4"/></svg><span>Hubs</span></a><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="hx-meter hx-live" data-livem></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
 '<main class="hx-main" id="main" tabindex="-1">' + VIEWS.map(function(v){ return '<section class="hx-view" data-view="' + v[0] + '" data-mode-panel="' + v[0] + '" hidden></section>'; }).join("") + "</main>" +
 '<div class="hx-toasts" id="hxToast" aria-live="polite"></div>';
 document.body.appendChild(shell);
@@ -1376,6 +1378,7 @@ var r = parse(), v = r[0], s = r[1];
 if (window.shTTS && view === "notes" && (v !== "notes" || s !== sub)) { try { window.shTTS.stop(); } catch (e) {} }
 if (view === "questions" && v !== "questions") leaving = HX.recapDue();
 if (view === "more" && sub === "arcade" && ARC && (v !== "more" || s !== "arcade")) { try { ARC.arcade.stopAll(); } catch (e) {} }
+var was = view, wasSub = sub;
 view = v; sub = s;
 var setOn = v === "more" && s === "settings", gear = $(".hx-set");
 if (gear) { if (setOn) gear.setAttribute("aria-current", "page"); else gear.removeAttribute("aria-current"); }
@@ -1386,6 +1389,13 @@ var el = $('.hx-view[data-view="' + v + '"]');
 STATE.ui.mode = v; saveState();
 try { ({ home: renderHome, notes: renderNotes, questions: HX.renderQuestions, more: renderMore })[v](el, s); } catch (e) { el.innerHTML = '<div class="hx-page"><h1>Something went wrong</h1><p class="note">' + esc(e.message) + "</p></div>"; if (window.console) console.error(e); }
 if (leaving) { HX.showLeftRecap(el, leaving); leaving = null; }
+var pg = el && el.firstElementChild;
+if (pg && was && (was !== v || wasSub !== s)) {
+var order = VIEWS.map(function(x){ return x[0]; }), d = order.indexOf(v) - order.indexOf(was);
+pg.style.setProperty("--from", was === v ? "0px" : (d > 0 ? "22px" : "-22px"));
+pg.classList.add("is-entering");
+pg.addEventListener("animationend", function(e){ if (e.target === pg) pg.classList.remove("is-entering"); }, { once: true });
+}
 }
 function go(hash, keep){
 if (("#" + hash) === location.hash) { route(); }

@@ -994,8 +994,8 @@ sitting; the admin secret is typed into the connector by hand and never into a f
    workspace) and the Console's spending limit set ([ask-timmy](../reference/ask-timmy.md), "At the release", step 1).
    Without it everything else can still go; Ask Timmy answers "can't reach" until it's there.
 2. Bring `main` in if it moved, and the fast checks. If a hub that is on the engine archived since the PR was opened,
-   nothing changes for it here (its audio comes off in [its own to-do](2026-11-12-audio-off-at-archiving.md)); if
-   **Heme & Endo Exam 2** has archived (Nov 13, 10 pm), its audio can come off in this PR (the old steps).
+   nothing changes for it here (its audio comes off in [its own to-do](2026-11-12-audio-off-at-archiving.md)); 
+   **Heme & Endo Exam 2** is already archived and its audio already off in this PR (Sam, 2026-11-13).
 3. **`FULL_FROM`** in `widget/pet.js` set to the merge day (Central), then `node tools/bundle/build.mjs`; commit, push.
 4. **The migrations**, through the connector, in order, each checked before the next: `migration_v54.sql`, `v55`, `v56`,
    `v57`, `v58`. v54 sets the switch time (`game_config.v2_at`) and takes everyone's baseline as it runs, so apply
@@ -1068,5 +1068,19 @@ is a new migration and Sam's call, never a restore.
   steps run on Occlusion): four more places written for an old page (BUG-139), fixed, and green for today and tomorrow.
   The smoke test in the same state (two hubs under Past hubs) found one bug in the new dashboard itself: on a phone,
   Past hubs went two columns wide when no recap was beside it and the page scrolled sideways (BUG-140, fixed).
+- 2026-11-13 (Claude Code, round 2, same PR). Sam used the preview and asked for more before the merge
+  ([decisions](../decisions.md), 2026-11-13). Built: a shelf per hub in the trophy case (`widget/trophies.js`; a hub's
+  mastery medals drawn by `shRanks.medal`, a higher medal counting the lower ones); Heme & Endo Exam 2 archived
+  (`archiveOn` noon Nov 13) and its audio off; the dashboard's Timmy Time card animated again; the You card's rank as a
+  hero on the arena's dark plum, the wallet and the stats to match, and **The road** (`#road`, `renderRoad()` in
+  `widget/dash.js`: three journeys, seven ranks each, in place of the folded ladder); the idea board's banner; one
+  **Exam check-ins** panel at the top of Past hubs (`renderCheckins()`; a sent check-in is remembered on the device as
+  `sh_debrief_sent_<hub>_<date>`); the pedestals' wreath redrawn around the numeral (`tools/figures/site/stage.mjs`);
+  the preview's made-up recaps now mirror the 8 on the live site; in a hub, **All hubs** in the bar and **Hubs** on a
+  phone's top strip; **Learn and Flashcards as a session over the whole screen** (`widget/study-modes.js`: a launcher in
+  the bank, `openFocus()`, number keys, "Don't know?", Auto-next; swipe, arrows and a session summary for the cards);
+  and the **motion** block at the end of `widget/hub.css` (pop-ups rise, a hub's pages and the dashboard's hub panel
+  slide in; `html.hx-still` turns it off). Left as to-dos in the [inbox](inbox.md): Heme & Endo Exam 2's retrospective
+  and recap, the two missing recaps, a typed answer in Learn and an undo for a flashcard rating (both only if Sam asks).
 
 ## Outcome

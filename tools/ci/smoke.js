@@ -1216,8 +1216,17 @@ function lint(hub, A){
       if (views.join() !== 'questions,learn,cards') problems.push(`${name} (${label}): the Question Bank's "Study as" toggle is ${views.join(', ') || 'missing'}, not Questions, Learn and Flashcards`);
       if (asked.length) problems.push(`${name} (${label}): Learn and Flashcards' files loaded with the page, before the toggle was used (${asked.join(', ')}): they load on first use`);
       if (views.length) {
+        /* Learn and Flashcards open a launcher in the bank (how far along, Start); Start opens the session over the
+           whole screen, and Escape or Close puts you back (Sam, 2026-11-13) */
         await page.click('[data-qview="learn"]');
-        const lc = await page.waitForSelector('[data-smstage] .qcard', { timeout: 15000 }).catch(() => null);
+        const ls0 = await page.waitForSelector('.sm-launch [data-sm="start"]', { timeout: 15000 }).catch(() => null);
+        if (!ls0) problems.push(`${name} (${label}): Learn drew no launcher with a Start button`);
+        else {
+          const above = await page.evaluate(() => { const a = document.querySelector('.sm-launch'), b = document.querySelector('.bank-main .fpanel, .bank-main [data-panel], .bank-which'); return !!(a && b && (a.compareDocumentPosition(b) & 4)); });
+          if (!above) problems.push(`${name} (${label}): Learn's launcher should come before the "Which questions" panel`);
+          await ls0.click();
+        }
+        const lc = await page.waitForSelector('.sm-focus [data-smstage] .qcard', { timeout: 15000 }).catch(() => null);
         if (!asked.includes('study-modes.js') || !asked.includes('study-modes.css')) problems.push(`${name} (${label}): Learn opened without study-modes.js and study-modes.css (${asked.join(', ')})`);
         if (!lc) problems.push(`${name} (${label}): Learn drew no question`);
         else {
@@ -1231,8 +1240,15 @@ function lint(hub, A){
           await page.waitForTimeout(500);
           const st = await page.evaluate(() => { const c = document.querySelector('[data-smstage] .qcard'); return { answered: !!c && c.classList.contains('is-answered'), again: !!(c && c.querySelector('[data-again]')), next: !!document.querySelector('[data-smstage] [data-sm="next"]') }; });
           if (!st.answered || st.again || !st.next) problems.push(`${name} (${label}): a Learn question should end answered, with Next and without "Try it again" (${JSON.stringify(st)})`);
+          const lw = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+          if (lw > 1) problems.push(`${name} (${label}): Learn's session scrolls sideways by ${lw}px`);
+          await page.keyboard.press('Escape'); await page.waitForTimeout(500);
+          const closed = await page.evaluate(() => ({ gone: !document.querySelector('.sm-focus'), lock: document.documentElement.classList.contains('sm-open'), launcher: !!document.querySelector('.sm-launch [data-sm="start"]') }));
+          if (!closed.gone || closed.lock || !closed.launcher) problems.push(`${name} (${label}): Escape should close Learn's session and show its launcher again (${JSON.stringify(closed)})`);
         }
         await page.click('[data-qview="cards"]');
+        const cs0 = await page.waitForSelector('.sm-launch [data-sm="start"]', { timeout: 10000 }).catch(() => null);
+        if (!cs0) problems.push(`${name} (${label}): Flashcards drew no launcher with a Study button`); else await cs0.click();
         const fc = await page.waitForSelector('.sm-cards .fcard', { timeout: 10000 }).catch(() => null);
         if (!fc) problems.push(`${name} (${label}): Flashcards drew no card`);
         else {
@@ -1246,6 +1262,10 @@ function lint(hub, A){
           const after = await page.evaluate(() => { const c = document.querySelector('.sm-cards .fcard'); return { id: c && c.getAttribute('data-fqid'), caught: !!document.querySelector('.sm-caught') }; });
           if (!after.caught && (!after.id || after.id === first)) problems.push(`${name} (${label}): rating a flashcard Good didn't bring the next card`);
         }
+        const unnamedIn = await page.$$eval('.sm button', bs => bs.filter(b => !b.closest('.qcard') && ![...b.attributes].some(a => /^data-/.test(a.name))).map(b => (b.textContent || '').trim().slice(0, 30)));
+        if (unnamedIn.length) problems.push(`${name} (${label}): button(s) in a Flashcards session without a fixed data-* name (click counts): ${unnamedIn.join(', ')}`);
+        if (await page.$('.sm-focus [data-sm="exit"]')) { await page.click('.sm-focus [data-sm="exit"]'); await page.waitForTimeout(500); }
+        if (await page.$('.sm-focus')) problems.push(`${name} (${label}): Close didn't close the Flashcards session`);
         /* the bank's own question card inside Learn keeps its buttons as they are; everything Learn and Flashcards draw is named */
         const unnamed = await page.$$eval('.sm button', bs => bs.filter(b => !b.closest('.qcard') && ![...b.attributes].some(a => /^data-/.test(a.name))).map(b => (b.textContent || '').trim().slice(0, 30)));
         if (unnamed.length) problems.push(`${name} (${label}): button(s) in Learn or Flashcards without a fixed data-* name (click counts): ${unnamed.join(', ')}`);

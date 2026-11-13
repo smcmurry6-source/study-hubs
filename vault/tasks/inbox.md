@@ -30,9 +30,22 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **The first migration after the release** (2026-11-13) also counts the **Bowling** trophy on the server (add `bowling`
   to the achievement kinds; until then it is kept on the device and shows no share of the class:
   [the bowling egg](done/2026-11-06-redesign-bowling-egg.md)), with Learn's `learn` context (the line below).
-- [ ] **Sam's call: the hub trophies in the trophy case** (2026-11-13, from [the trophy case](done/2026-11-12-redesign-trophy-case-and-cards.md)).
+- [x] **Sam's call: the hub trophies in the trophy case** (2026-11-13: "Each hub should get a shelf"; built in #359) (2026-11-13, from [the trophy case](done/2026-11-12-redesign-trophy-case-and-cards.md)).
   The 8 trophies each hub has (the mastery levels, every question answered, mock exams, the boss) aren't in the new case:
   they are behind its Leaderboards button, in the shared widget's panel. A shelf for them in the case, or leave them there?
+- [ ] **Heme & Endo Exam 2's retrospective and recap** (2026-11-13, from the release's PR #359): Sam had it archived and its
+  audio taken off in the PR; its retrospective (`/lessons-audit`: `tools/retro.sql`, `LESSONS.md`) and its recap on the
+  dashboard (`tools/publish-recap.js`, which writes to the live database, so after the merge) are still to do. Read the
+  check-ins as late as you can.
+- [ ] **Recaps missing from Past hubs** (2026-11-13, Sam: "There are a lot of past hubs missing from the recap card"): the
+  live site has 8 published recaps; **Special Patient Care** (its exam closes Nov 13, 11:59 pm) and **Heme & Endo Exam 2**
+  have none yet. Publish each with its retrospective. Hubs archived before recaps existed (GI Exam 1, Genetics, Fixed
+  Pros and older) have no bank dump to draw one from: say so to Sam if he asks for them.
+- [ ] **Learn: a typed answer** (2026-11-13, idea from making Learn "more like quizlet"): Quizlet's Learn ends on written
+  questions. Ours ends on recall before the choices show (Sam's call 5, 2026-11-06), because a typed answer can't be
+  graded against a bank question's choice. Only if Sam asks for it.
+- [ ] **Flashcards: undo the last rating** (2026-11-13, same): not built, because a rating is paid and sent to the server
+  at once; it needs the rating held back a few seconds first. Only if Sam asks for it.
 - [ ] **Visiting from a hub's boards** (2026-11-13, [visiting](done/2026-11-12-redesign-visiting.md)): the leaderboards in a
   hub's own panel (`widget/v3.js`) don't open anyone's place yet (Sam, 2026-11-12: the dashboard's boards first).
 - [ ] **Sound for the hand-off and the Dark Matter unlock**, only if the redesign ever gets a sound setting (it has none; the

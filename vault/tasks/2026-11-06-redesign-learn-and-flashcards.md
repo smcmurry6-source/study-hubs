@@ -232,6 +232,17 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
   commit; `node tools/release/postcheck.js` passed (9 files live and identical to `main`, the dashboard and the three hubs
   with 0 errors). The note is `blocked` on the release, its last box. No preview was asked for.
 
+- 2026-11-13 (Claude Code, the release's PR #359): Sam, after using the preview: "Make the learn mode function and look more
+  like it does on quizlet. Make the flashcards function better too". Both now open from a **launcher** in the bank (how
+  far along, Start; it comes before the "Which questions" panel) into a **session over the whole screen**
+  (`openFocus()`: its own top row with Close, the progress and today's XP; Escape closes; a hash change closes it).
+  Learn: the choices as numbered tiles (keys 1 to 9), "Don't know?" (the answer with no guess recorded, the question
+  back like a miss), and Auto-next after a right answer (`STATE.ui.smAuto`, on unless switched off; touching the card
+  stops it). Flashcards: a tall card, the ratings stuck to the bottom of the screen, swipe left for Again and right for
+  Good on a phone, the arrow keys, choices never opened stay folded on the back, and "All caught up" shows the session
+  by rating. The six calls above stand (rounds of 7, two rights, the schedule, what pays). Not built: a typed answer and
+  an undo for a rating ([inbox](inbox.md)).
+
 ## Outcome
 
 Built and merged ([#344](https://github.com/smcmurry6-source/study-hubs/pull/344), `7efb1ad`), not released: the Question Bank's **Study as: Questions · Learn · Flashcards** in the three new hubs, with the

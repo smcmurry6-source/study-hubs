@@ -285,7 +285,7 @@
         '<button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button>" +
         '<a class="hx-set" href="#more/settings" aria-label="Settings">' + icon("settings", 22) + '<span class="lbl">Settings</span></a>' +
       "</header>" +
-      '<div class="hx-strip" id="hxStrip" aria-label="Today"><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="hx-meter hx-live" data-livem></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
+      '<div class="hx-strip" id="hxStrip" aria-label="Today"><a class="hx-home" href="' + esc(C.back || "../../") + '" aria-label="All hubs: back to the dashboard"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M13 8H3"/><path d="M7 4 3 8l4 4"/></svg><span>Hubs</span></a><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="hx-meter hx-live" data-livem></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
       '<main class="hx-main" id="main" tabindex="-1">' + VIEWS.map(function(v){ return '<section class="hx-view" data-view="' + v[0] + '" data-mode-panel="' + v[0] + '" hidden></section>'; }).join("") + "</main>" +
       '<div class="hx-toasts" id="hxToast" aria-live="polite"></div>';
     document.body.appendChild(shell);
@@ -326,6 +326,7 @@
     if (window.shTTS && view === "notes" && (v !== "notes" || s !== sub)) { try { window.shTTS.stop(); } catch (e) {} }
     if (view === "questions" && v !== "questions") leaving = HX.recapDue();
     if (view === "more" && sub === "arcade" && ARC && (v !== "more" || s !== "arcade")) { try { ARC.arcade.stopAll(); } catch (e) {} }
+    var was = view, wasSub = sub;
     view = v; sub = s;
     var setOn = v === "more" && s === "settings", gear = $(".hx-set");
     if (gear) { if (setOn) gear.setAttribute("aria-current", "page"); else gear.removeAttribute("aria-current"); }
@@ -336,6 +337,14 @@
     STATE.ui.mode = v; saveState();
     try { ({ home: renderHome, notes: renderNotes, questions: HX.renderQuestions, more: renderMore })[v](el, s); } catch (e) { el.innerHTML = '<div class="hx-page"><h1>Something went wrong</h1><p class="note">' + esc(e.message) + "</p></div>"; if (window.console) console.error(e); }
     if (leaving) { HX.showLeftRecap(el, leaving); leaving = null; }
+    /* the page slides in from the side its tab is on (a new page of the same view just rises); hub.css, .is-entering */
+    var pg = el && el.firstElementChild;
+    if (pg && was && (was !== v || wasSub !== s)) {
+      var order = VIEWS.map(function(x){ return x[0]; }), d = order.indexOf(v) - order.indexOf(was);
+      pg.style.setProperty("--from", was === v ? "0px" : (d > 0 ? "22px" : "-22px"));
+      pg.classList.add("is-entering");
+      pg.addEventListener("animationend", function(e){ if (e.target === pg) pg.classList.remove("is-entering"); }, { once: true });
+    }
   }
   function go(hash, keep){
     if (("#" + hash) === location.hash) { route(); }

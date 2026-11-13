@@ -173,6 +173,10 @@ window.SH_DASH_DATA = {
      "promptHour": 12
     }
    ],
+   "archiveOn": {
+    "date": "2026-11-13",
+    "hour": 12
+   },
    "updated": "2026-11-10",
    "desc": "Lectures 11-16: diabetes pharmacology, endocrine pathology (both hours), male and female reproductive histology and physiology, plus an Exam 1 refresher for the 5 old questions (L16 is the last lecture on Exam 2: Dr. Taylor's Lecture A, L17 and L18 aren't on it). The exam is Fri Nov 13, 10:00-11:30 am (50 questions: 8 on L11, 9 on L12, 7 each on L13-L16, 5 on Exam 1). Its own home page with your countdown and progress, notes in two reading levels with narration, animated diagrams, Patient Box lab-value cases, two-statement, true/false and numbered-statement questions with every choice explained, High Likelihood Exam Questions, exam hints from the recordings, review tables with side-by-side look-alikes, a 50-question mock and the Cycle Arcade.",
    "modes": [

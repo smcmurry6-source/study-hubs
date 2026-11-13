@@ -246,6 +246,14 @@ there. **Its audio comes off at its archiving** ([the to-do](../tasks/2026-11-12
 
 Open tasks for this hub: `vault/tasks/` notes with `hub: heme-endo-exam2`.
 
+## Archived, audio off (2026-11-13)
+
+Sam, 2026-11-13: "You can also remove the audio for heme and endo 2 and archive it." In the release's PR (#359): `hubs.js`
+gives it `archiveOn` noon Nov 13 (it is under Past hubs from the merge), its narration and Timmy Time are off the site
+(`data-audio="off"` on the v3.js tag; Listen reads in the device's voice) and it keeps its old single-file page. **Still to
+do:** its retrospective and its recap ([inbox](../tasks/inbox.md)). To bring the audio back:
+[archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md).
+
 ## History
 
 Grep "Recent major changes" in `DEPLOY_NOTES.md` for `heme-endo-exam2`. Retrospective (once archived): `LESSONS.md`.

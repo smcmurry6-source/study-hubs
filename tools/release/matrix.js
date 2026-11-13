@@ -151,12 +151,10 @@ const QUICK = process.argv.includes('--quick');
         for (let i = 0; i < steps; i++) { await page.goForward(); await page.waitForLoadState(); await page.waitForTimeout(300); }
         await L.settle(page);
         if (!page.url().includes(`hubs/${hub}/`) || !(await page.$('#modeSwitch'))) problems.push(`history (${label}): Forward didn't bring ${hub} back`);
-        /* the way back to the dashboard: the bar's arrow, or on a phone on the engine the "All hubs" row in More */
-        if (await page.isVisible('#sh-ribbon-back, #shhome-pill')) await page.click('#sh-ribbon-back, #shhome-pill', { timeout: 3000 }).catch(() => problems.push(`history (${label}): no back-to-dashboard button in ${hub}`));
-        else {
-          await page.click('#modeSwitch [data-mode="more"]', { timeout: 3000 }).catch(() => {}); await page.waitForTimeout(400);
-          await page.click('main a[href="../../"], main a[href="../../index.html"]', { timeout: 3000 }).catch(() => problems.push(`history (${label}): no back-to-dashboard button in ${hub}`));
-        }
+        /* the way back to the dashboard, always on the screen: the bar's "All hubs", or on a phone on the engine "Hubs"
+           at the start of the top strip (Sam, 2026-11-13: "a convenient back to dashboard button when you are in a hub") */
+        const backSel = (await page.isVisible('#sh-ribbon-back')) ? '#sh-ribbon-back' : (await page.isVisible('.hx-strip .hx-home')) ? '.hx-strip .hx-home' : '#shhome-pill';
+        await page.click(backSel, { timeout: 3000 }).catch(() => problems.push(`history (${label}): no back-to-dashboard button on the screen in ${hub}`));
         await page.waitForLoadState(); await L.settle(page);
         if (page.url().includes('/hubs/')) problems.push(`history (${label}): ${hub}'s back button didn't open the dashboard`);
       }

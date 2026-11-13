@@ -32,6 +32,24 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **The release PR's second round (#359, 2026-11-13, Claude Code; live from the merge)** — what Sam asked for after
+  using the preview ([decisions](vault/decisions.md), 2026-11-13), all in the same PR:
+  - **Dashboard:** the You card's rank is a hero on dark plum (`renderMyRank()`), the wallet and stats match, and
+    **The road** (`#road`, `renderRoad()`) lays out the three journeys rank by rank in place of the folded ladder; one
+    **Exam check-ins** panel at the top of Past hubs (`renderCheckins()`; archived rows no longer carry the button); the
+    Timmy Time card is animated again; the idea board has a banner; the pedestals' wreath sits around the numeral
+    (`tools/figures/site/stage.mjs`); a hub's panel slides in on a tab change.
+  - **Trophy case:** a shelf per hub with its eight (`widget/trophies.js`; badges stay `"<trophy>:<hub>"`).
+  - **Hubs on the engine:** "All hubs" in the bar and "Hubs" on a phone's top strip (`.hx-back`, `.hx-home`); pages
+    slide in from their tab's side (`route()` in `widget/hub.js`).
+  - **Learn and Flashcards** (`widget/study-modes.js` + `.css`, `widget/hub-bank.js`): a launcher in the bank, above
+    the "Which questions" panel, and a **session over the whole screen** (`openFocus()`): numbered tiles, "Don't
+    know?" and Auto-next in Learn; swipe, arrows and a session summary in Flashcards. Tests that drive them click
+    `[data-sm="start"]` first.
+  - **Motion:** the block at the end of `widget/hub.css` (pop-ups rise, pages slide; zero-specificity `:where()` rules
+    with `translate` / `scale`, so a pop-up's own transform and entrance are left alone; `html.hx-still` turns it off,
+    set by `widget/hub.js` and now `widget/dash.js`).
+  - **Heme & Endo Exam 2:** archived (`archiveOn` noon Nov 13 in `hubs.js`) and its audio off the site (173 MB).
 - **THE REDESIGN'S RELEASE (the switch PR, #359, opened 2026-11-13, Claude Code; live from the merge)** — **Read this before
   touching the dashboard, Occlusion or Perio: the files moved.** One PR switches the site to the redesign
   ([the release](vault/tasks/2026-11-06-redesign-release.md)); reverting it brings the old site back

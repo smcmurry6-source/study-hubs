@@ -25,7 +25,8 @@ it, and adds only its own toggles (`SH_HUB.bank.only`). The single-file hubs arc
   buttons into the bank start with it off.
 - **Sets**: a row under Show: Daily drill, Yesterday's misses, Weak spots, Mock exam (`#questions/<set>`). A set replaces the list
   until it's closed; the filters stay as they were. Above the panel, **Study as** picks how the chosen questions are asked:
-  Questions, Learn or Flashcards (`widget/study-modes.js`; the mock is always questions).
+  Questions, Learn or Flashcards (`widget/study-modes.js`; the mock is always questions). In Learn and Flashcards the
+  launcher (how far along, Start) comes first and the panel follows under "Which questions" (Sam, 2026-11-13).
 - **Order**: **In order / Random** only (`STATE.ui.qorder`; In order = by lecture, then bank order; Random shuffles once and keeps that
   order until Random is tapped again). **No "Likely first"** (Sam, 2026-11-03): High likelihood is a filter, either those questions or the whole bank.
 - **More filters** (folded, with a "n on" badge): question type (`STATE.ui.qfmt`, only the formats the bank has, each with its count) and

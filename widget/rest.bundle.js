@@ -4414,12 +4414,14 @@ function liveHubs(){ var a = []; try { a = (typeof o.hubs === "function" ? o.hub
 function label(id){ var m = liveHubs().filter(function(h){ return h.id === id; })[0]; return (m && m.name) || hubLabel(id, o); }
 el.classList.add("shi");
 el.innerHTML =
-'<div class="shi-head">' + (o.heading === false ? '<p class="shi-lede">' : '<h2 id="' + uid + 'H">Idea board</h2><p class="note shi-lede">') +
-"Ideas for the hubs, from the class. Vote for the ones you'd use: the votes show Sam what the class wants most.</p>" +
-'<button type="button" class="btn btn-primary shi-new" data-shi="new" aria-expanded="false" aria-controls="' + uid + 'F">Post an idea</button></div>' +
+'<div class="shi-head"><span class="shi-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg></span>' +
+'<div class="shi-headtx">' + (o.heading === false ? '<p class="shi-title">Got an idea for the hubs?</p><p class="shi-lede">' : '<h2 id="' + uid + 'H">Idea board</h2><p class="shi-lede">') +
+"Ideas for the hubs, from the class. Vote for the ones you'd use: the votes show Sam what the class wants most.</p></div>" +
+'<button type="button" class="btn btn-primary shi-new" data-shi="new" aria-expanded="false" aria-controls="' + uid + 'F"><svg class="ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Post an idea</button></div>' +
 '<form class="shi-form" id="' + uid + 'F" novalidate hidden></form>' +
 '<p class="shi-say" role="status" aria-live="polite"></p>' +
 '<div class="shi-bar">' +
+'<span class="shi-barl" aria-hidden="true">Show</span>' +
 '<span class="seg" role="group" aria-label="Which ideas">' + TABS.map(function(t){ return '<button type="button" data-shi-tab="' + t[0] + '" aria-pressed="' + (t[0] === S.tab) + '">' + t[1] + "</button>"; }).join("") + "</span>" +
 '<label class="shi-pick"><span class="sr">Show ideas for</span><select data-shi-filter="hub"></select></label>' +
 '<label class="shi-pick"><span class="sr">Kind of idea</span><select data-shi-filter="cat"></select></label>' +

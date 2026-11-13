@@ -204,8 +204,8 @@
       body: "<p><b>Search</b>, today's <b>Drill</b>, <b>Stats</b>, and <b>More</b> for everything else. It's on every hub page.</p>" });
     S.push({ before: function(){ launcherOpen(false); }, el: ".shpet-home", title: "Timmy Tooth",
       body: "<p>Your tooth buddy keeps you company in the corner. Right answers heal him; skipped days give him plaque and worse. Tap him for a joke. He hides during mock exams.</p>" });
-    S.push({ before: function(){ launcherOpen(false); }, el: "#sh-ribbon-back", title: "Back to all hubs",
-      body: "<p>The arrow takes you to the dashboard: every hub, your rank, the class boards and what's new.</p>" });
+    S.push({ before: function(){ launcherOpen(false); }, el: function(){ var a = $("#sh-ribbon-back"), b = $(".hx-strip .hx-home"); return visible(a) ? a : b; }, title: "Back to all hubs",
+      body: "<p>This takes you to the dashboard: every hub, your rank, the class boards and the idea board.</p>" });
     S.push({ before: function(){ launcherOpen(false); }, last: true, title: "That's the tour",
       el: function(){ var b = $(".sh-ribbon-tour"); return visible(b) ? b : null; },
       body: function(){
