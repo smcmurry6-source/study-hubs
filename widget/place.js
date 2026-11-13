@@ -257,8 +257,8 @@
     return '<svg viewBox="-12 -8 168 128" aria-hidden="true" focusable="false"><g fill="#B9AEDA" opacity=".16">' + ring(9, 8) + '</g><g fill="#FFFFFF" opacity=".55">' + ring(6, 0) + '</g><g fill="#E0D8EF">' + ring(0, 5) + '</g><g fill="#FFFFFF">' + ring(0, 0) + "</g>" +
       '<g fill="none" stroke="#E4DDF1" stroke-width="4" stroke-linecap="round">' + c.slice(1, 4).map(function(q){ return '<path d="M' + (q[0] - q[2] * .5).toFixed(1) + " " + (q[1] + q[2] * .52).toFixed(1) + " q" + (q[2] * .5).toFixed(1) + " " + (q[2] * .3).toFixed(1) + " " + (q[2] * 1.02).toFixed(1) + ' 0"/>'; }).join("") + "</g></svg>";
   }
-  /* the clouds roll in over the page (the window stays hidden until they cover it, is-trip) and the window shows behind them at 800 ms */
-  function tripIn(dlg, m){
+  /* the clouds and the line over them; the same clouds for the same screen every time, so one window can give way to the next under them */
+  function cloudsHTML(msg){
     var vw = W.innerWidth, vh = W.innerHeight, cols = vw > vh ? 4 : 3, rows = vw > vh ? 3 : 4, size = Math.max(vw / cols, vh / rows) * 2.05, far = Math.max(vw, vh) * .9, html = "", n = 0;
     for (var r = 0; r < rows; r++) for (var q = 0; q < cols; q++, n++) {
       var jx = ((n * 37) % 11 - 5) / 60, jy = ((n * 53) % 9 - 4) / 60, x = (q + .5) / cols + jx, y = (r + .5) / rows + jy;
@@ -267,49 +267,109 @@
       html += '<span class="tpv-cloud" style="--x:' + (x * 100).toFixed(1) + "%;--y:" + (y * 100).toFixed(1) + "%;--s:" + Math.round(size * (.86 + ((n * 29) % 7) / 22)) + "px;--dx:" + Math.round(dx / len * far) + "px;--dy:" + Math.round(dy / len * far) +
         "px;--r:" + (((n * 17) % 9) - 4) * 3 + "deg;--d:" + ((n * 7) % cols * 45 + (n % 3) * 35) + "ms;--d2:" + ((n * 5) % 4) * 45 + 'ms">' + cloudSvg(n) + "</span>";
     }
-    var R = W.shRanks, rk = rankOf(m), em = "";
-    try { if (R) em = rk.journey > 0 && R.artOf ? R.artOf(rk.journey, rk.tier, 72, { level: rk.level }) : R.art(rk.tier, 72, { level: rk.level }); } catch (e) { em = ""; }
+    return '<i class="tpv-clfill"></i>' + html + '<div class="tpv-clmsg">' + msg + "</div>";
+  }
+  /* the line: "Off to <name>'s place" (or "Heading home") under that rank, as the boards draw it */
+  function tripMsg(line, rk){
+    var R = W.shRanks, em = "";
+    try { if (R && rk) em = rk.journey > 0 && R.artOf ? R.artOf(rk.journey, rk.tier, 72, { level: rk.level }) : R.art(rk.tier, 72, { level: rk.level }); } catch (e) { em = ""; }
+    return (em ? '<span class="tpv-clhp">' + em + "</span>" : "") + "<b>" + esc(line) + "</b>";
+  }
+  /* the clouds roll in over the page or the place you're leaving (a first visit keeps its window hidden until they cover
+     it, is-trip, and shows it behind them at 800 ms) */
+  function tripIn(dlg, line, rk){
     var c = D.createElement("div"); c.className = "tpv-clouds"; c.setAttribute("aria-hidden", "true");
-    c.innerHTML = '<i class="tpv-clfill"></i>' + html + '<div class="tpv-clmsg">' + (em ? '<span class="tpv-clhp">' + em + "</span>" : "") + "<b>" + esc("Off to " + m.name + "’s place") + "</b></div>";
+    c.innerHTML = cloudsHTML(tripMsg(line, rk));
     dlg.appendChild(c); void c.offsetWidth; c.classList.add("in");
     dlg._tripAt = Date.now();
     setTimeout(function(){ dlg.classList.remove("is-trip"); }, 800);
   }
+  /* the next window of a tour starts under the clouds the last one rolled in (the same line, the same start time) */
+  function tripCovered(dlg, cov){
+    var c = D.createElement("div"); c.className = "tpv-clouds is-covered"; c.setAttribute("aria-hidden", "true");
+    c.innerHTML = cloudsHTML(cov.msg);
+    dlg.appendChild(c); dlg._tripAt = cov.at;
+  }
   /* once the place is drawn, and not before 1.4 s (the design page's timing), the clouds scatter */
-  function tripOut(dlg){
+  function tripOut(dlg, quiet){
     var c = $(".tpv-clouds", dlg); if (!c) return;
     setTimeout(function(){
       if (!c.isConnected) return;
-      dlg.classList.remove("is-trip"); c.classList.remove("in"); c.classList.add("out");
-      setTimeout(function(){ if (V && V.dlg === dlg && V.o) burstAt("home", V.o); }, 550);
+      dlg.classList.remove("is-trip"); c.classList.remove("in", "is-covered"); c.classList.add("out");
+      if (!quiet) setTimeout(function(){ if (V && V.dlg === dlg && V.o) burstAt("home", V.o); }, 550);
       setTimeout(function(){ tripGone(dlg); }, 950);
     }, Math.max(0, 1400 - (Date.now() - (dlg._tripAt || 0))));
   }
   function tripGone(dlg){ var c = $(".tpv-clouds", dlg); if (c && c.parentNode) c.parentNode.removeChild(c); dlg.classList.remove("is-trip"); }
+  /* ---------- the tour (Sam, 2026-11-13: "build the random visit and next/back", from round 3's design page): a visit
+     opened from a board carries it (nav: { at, list: [{ name, rank }], load(i) }, from widget/dash.js, names and ranks
+     only). The arrows go to the next or the last person on it and "Back to mine" goes home: the clouds roll in over this
+     place, and once they cover the screen and the next place is here, this window gives way to the next one under the
+     same clouds, which then scatter over it. A place that can't be read leaves you where you are with one plain line.
+     With reduced motion there are no clouds. ---------- */
+  var HOME_SVG = '<svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><path d="M3 9.5L10 3.5l7 6M5 8.5V16.5h10V8.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var NAV_SVG = { prev: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true" focusable="false"><path d="M12.5 4.5L7 10l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    next: '<svg viewBox="0 0 20 20" width="22" height="22" aria-hidden="true" focusable="false"><path d="M7.5 4.5L13 10l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' };
+  function navStep(nav, d){ var n = nav.list.length; return (nav.at + d + n) % n; }
+  function hop(to, focus){
+    if (!V || !V.nav || V.hopping || $(".tpv-clouds", V.dlg)) return;
+    var v = V, dlg = v.dlg, nav = v.nav, home = to === "home", e = home ? null : nav.list[to], t0 = Date.now();
+    if (!home && (!e || to === nav.at)) return;
+    v.hopping = true;
+    if (!reduced) tripIn(dlg, home ? "Heading home" : "Off to " + e.name + "’s place", home ? rankOf(mine()) : e.rank);
+    var load = home ? Promise.resolve(true) : nav.load(to);
+    Promise.all([load, new Promise(function(res){ setTimeout(res, reduced ? 0 : 850); })]).then(function(a){
+      if (V !== v) return;
+      if (!a[0]) throw new Error("place");
+      var m = $(".tpv-clmsg", dlg), cov = m ? { at: t0, msg: m.innerHTML } : null, onClose = v.onClose;
+      v.onClose = null; v.back = null; shut();
+      open(home ? { covered: cov, back: null, onClose: onClose ? function(){ onClose("home"); } : null }
+        : { place: a[0], nav: { at: to, list: nav.list, load: nav.load }, covered: cov, back: null, onClose: onClose, focus: focus });
+    }).then(null, function(){
+      if (V !== v) return;
+      v.hopping = false; tripOut(dlg, true);
+      var w = $(".tpv-wait", dlg); w.hidden = false; w.textContent = "That place couldn’t be opened just now.";
+      clearTimeout(v.navT); v.navT = setTimeout(function(){ if (V === v) w.hidden = true; }, 4000);
+    });
+  }
+  function navHTML(nav){
+    if (!nav || nav.list.length < 2) return "";
+    var p = nav.list[navStep(nav, -1)], n = nav.list[navStep(nav, 1)];
+    return '<button type="button" class="tpv-vnav prev" data-tp="visit-prev" aria-label="' + esc("Previous place: " + p.name) + '">' + NAV_SVG.prev + "</button>" +
+      '<button type="button" class="tpv-vnav next" data-tp="visit-next" aria-label="' + esc("Next place: " + n.name) + '">' + NAV_SVG.next + "</button>";
+  }
   function open(o){
     o = o || {};
     if (V) return;
     css();
     var dlg = D.createElement("dialog");
-    dlg.className = "tpv" + (o.place ? " is-visit" + (reduced ? "" : " is-trip") : ""); dlg.setAttribute("aria-labelledby", "tpvT");
+    var nav = o.place && o.nav && o.nav.list && o.nav.list.length && typeof o.nav.load === "function" ? o.nav : null;
+    dlg.className = "tpv" + (o.place ? " is-visit" + (reduced || o.covered ? "" : " is-trip") : ""); dlg.setAttribute("aria-labelledby", "tpvT");
     dlg.innerHTML = '<div class="tpv-in"><header class="tpv-top"><div class="tpv-title">' + (o.place ? '<p class="tpv-kick" aria-hidden="true">Welcome to</p>' : "") + '<h2 id="tpvT">Timmy’s place</h2><p class="tpv-sub"></p></div>' +
       '<div class="tpv-acts"><span class="tpv-seg" role="group" aria-label="What to do here" hidden><button type="button" data-tp="play" aria-pressed="true">Visit</button><button type="button" data-tp="customize" aria-pressed="false">Customize</button></span>' +
+      (nav ? '<button type="button" class="tpv-home" data-tp="visit-home" aria-label="Back to mine">' + HOME_SVG + "<span>Back to mine</span></button>" : "") +
       '<button type="button" class="tpv-x" data-tp="close" aria-label="Close Timmy’s place">' + X_SVG + "</button></div></header>" +
-      '<div class="tpv-body"><div class="tpv-stagewrap"><div class="tpv-stage"></div><p class="tpv-wait" role="status">Opening the door…</p>' +
+      '<div class="tpv-body"><div class="tpv-stagewrap"><div class="tpv-stage"></div>' + navHTML(nav) + '<p class="tpv-wait" role="status">Opening the door…</p>' +
       '<button type="button" class="tpv-chip tpv-zoom" data-tp="zoom" aria-pressed="true" hidden>Close-up</button></div><div class="tpv-side"></div></div><div class="tpv-over" hidden></div></div>';
     D.body.appendChild(dlg);
     V = { dlg: dlg, m: o.place ? theirs(o.place) : mine(), mode: "play", pick: /^(home|scene|timmy|left|front|corner|side|right)$/.test(o.pick || "") ? o.pick : "home", wide: false, src: {}, at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, camRaf: 0, cam: null, bub: null,
-      lastTap: 0, wander: 0, visible: true, back: D.activeElement, onClose: o.onClose || null };
-    dlg.addEventListener("close", shut);
+      lastTap: 0, wander: 0, visible: true, back: o.back !== undefined ? o.back : D.activeElement, onClose: o.onClose || null, nav: nav };
+    dlg.addEventListener("close", function(){ if (V && V.dlg === dlg) shut(); });   /* only this window: on a tour the next one may be open already */
     dlg.addEventListener("cancel", function(e){ if (!$(".tpv-over", dlg).hidden) { e.preventDefault(); overClose(); } });
     dlg.addEventListener("click", function(e){ if (e.target === dlg) close(); });
     $('[data-tp="close"]', dlg).addEventListener("click", close);
     $('[data-tp="play"]', dlg).addEventListener("click", function(){ setMode("play"); });
     $('[data-tp="customize"]', dlg).addEventListener("click", function(){ setMode("customize"); });
     $('[data-tp="zoom"]', dlg).addEventListener("click", function(){ V.wide = !V.wide; build(); });
+    if (nav) {
+      $('[data-tp="visit-home"]', dlg).addEventListener("click", function(){ hop("home"); });
+      ["prev", "next"].forEach(function(k){ var b = $('[data-tp="visit-' + k + '"]', dlg); if (b) b.addEventListener("click", function(){ hop(navStep(nav, k === "prev" ? -1 : 1), k); }); });
+    }
     try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); }
     D.documentElement.classList.add("tpv-open");
-    if (o.place && !reduced) tripIn(dlg, V.m);
+    if (o.focus) { var fb = $('[data-tp="visit-' + o.focus + '"]', dlg); if (fb) try { fb.focus(); } catch (e) {} }   /* pressing Next again goes on */
+    if (o.covered && !reduced) tripCovered(dlg, o.covered);
+    else if (o.place && !reduced) tripIn(dlg, "Off to " + V.m.name + "’s place", rankOf(V.m));
     track(V.m.visiting ? "place:visit" : "place:open");   /* a visit is counted, never whose (visiting: widget/dash.js) */
     var first = V.m.visiting ? Promise.resolve() : readShop();
     first.then(function(){ if (V && !V.m.visiting) V.m = mine(); return ready(V && V.m); }).then(function(){
@@ -331,7 +391,8 @@
     if (v.dlg.parentNode) v.dlg.parentNode.removeChild(v.dlg);
     D.documentElement.classList.remove("tpv-open");
     try { if (v.back && v.back.isConnected && v.back.focus) v.back.focus(); } catch (e) {}
-    if (v.onClose) v.onClose();
+    clearTimeout(v.navT);
+    if (v.onClose) v.onClose(v.nav ? v.nav.at : undefined);   /* a tour says which place it ended at, for the focus */
   }
   function setMode(mode){
     if (!V || (mode === "customize" && !canChange())) return;
@@ -708,7 +769,8 @@
         ? '<ul class="tpv-gml">' + fl.slice(0, 8).map(function(x){ var n = hub(x.hub); return '<li title="' + esc(n) + '"><span aria-hidden="true">' + medal(x) + '</span><span class="tpv-gmn">' + esc(n) + "</span></li>"; }).join("") + "</ul>" +
           '<div class="tpv-row"><button type="button" class="tpv-btn tpv-gold" data-tp="mastery">See the medals</button></div>'
         : '<p class="tpv-gnone">No hub medals yet</p>') + "</div>" +
-      '<p class="tpv-gtip">Tap Timmy and he waves. The sun, the house and the things in the yard each do something too.</p></div>';
+      '<p class="tpv-gtip">Tap Timmy and he waves. The sun, the house and the things in the yard each do something too.</p>' +
+      (V.nav && V.nav.list.length > 1 ? '<p class="tpv-gnav">Place ' + (V.nav.at + 1) + " of " + V.nav.list.length + " on the board<span>Next: " + esc(V.nav.list[navStep(V.nav, 1)].name) + "</span></p>" : "") + "</div>";
     var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
   }
   function rarTag(r){ return '<i class="tpv-rar r-' + String(r || "free").toLowerCase() + '">' + esc(r || "Default") + "</i>"; }

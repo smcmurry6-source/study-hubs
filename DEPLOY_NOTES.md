@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-13 (visiting's tour, Claude Code)** — Nothing students see changes (the new dashboard, on the game layer).
+  Sam: "build the random visit and next/back", the rest of round 3's visiting. **Visit someone random** under the board
+  picks one of its rows (never your own); in a visit, round arrows go to the previous and next person on that board and
+  **Back to mine** goes home, each through the round-3 clouds, one window giving way to the next under them; the guest
+  card says where on the board you are. `widget/dash.js` (`visitList`, `visitNav`, the die button), `widget/dash.css`,
+  `widget/place.js` (`open({ nav, covered })`, `hop()`), `widget/place.css`. Nothing on the server (a key still comes only
+  on a board row). Tests: the smoke test's visiting block walks a tour (next, a place that can't be read, Back to mine,
+  focus) and a random visit. [Visiting](vault/tasks/done/2026-11-12-redesign-visiting.md).
 - **2026-11-13 (visiting, phase 4 session 4, Claude Code)** — Nothing students see changes: it runs only on the new
   dashboard (`next/`), on the game layer (the `_v2` boards' visit keys and `get_place`, migration_v54, not applied and
   not changed). A row of Ranks or Study streaks, each of the stage's top three and a winner's Timmy on the stage open

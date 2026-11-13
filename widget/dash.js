@@ -67,6 +67,9 @@
 
   /* ---------- the drawings (widget/hub-art.js: the icon set, the flame, Home's spot art; widget/hub-art/dash.js: every
      hub's tint and emblem; a hub's masthead comes from its own art file when its tab is opened) ---------- */
+  /* the die on "Visit someone random", as the design page draws it (round 3) */
+  var DICE = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5" fill="#fff" stroke="currentColor" stroke-width="2"/>' +
+    '<circle cx="8.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.6" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.6" fill="currentColor"/></svg>';
   function icon(k, px, cls){
     var b = A.icons && A.icons[k] ? A.icons[k].body : ""; px = px || 20;
     return '<svg class="ic' + (cls ? " " + cls : "") + '" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + b + "</svg>";
@@ -273,6 +276,8 @@
             "</span></div>" +
           '<p class="note" id="boardNote"></p>' +
           '<div id="board" aria-live="polite"><p class="note">Loading…</p></div>' +
+          /* Visit someone random: one of the board's rows (the tour, below); shown when the board has someone to visit */
+          '<p class="dx-rand" id="visitRand" hidden><button type="button" data-dash="visit-random">' + DICE + "<span>Visit someone random</span></button></p>" +
           '<details class="dx-ladder" id="ladderFold" hidden><summary>' + icon("chevron", 18, "rot") + "Every rank, Stone to Dark Matter</summary><div class=\"dx-rungs\" id=\"rankLadder\"></div></details>" +
           '<p class="dx-line" id="goldenLine" hidden></p>' +
         "</section>" +
@@ -1390,7 +1395,7 @@
     s += '<g class="st-confetti">' + S.confetti({ w: w, h: h }) + "</g>";
     return '<svg class="dx-set" viewBox="0 0 ' + w + " " + h + '" width="' + w + '" height="' + h + '" aria-hidden="true" focusable="false">' + s + "</svg>";
   }
-  function boardMsg(msg){ boardData = null; $("board").innerHTML = '<p class="note">' + esc(msg || "Couldn't reach the class data just now. Reload to try again.") + "</p>"; }
+  function boardMsg(msg){ boardData = null; $("visitRand").hidden = true; $("board").innerHTML = '<p class="note">' + esc(msg || "Couldn't reach the class data just now. Reload to try again.") + "</p>"; }
   var boardData = null;      /* the board as last loaded: { which, rows, fits } (painted again when the page's width changes) */
   function paintBoard(){
     var d = boardData, R = window.shRanks; if (!d || d.which !== boardNow) return;
@@ -1405,6 +1410,7 @@
           : rowHTML(r, i + (pod ? 4 : 1), "", r.streak, r.streak === 1 ? "day" : "days", (+r.streak || 0) / first);
       }).join("") + "</ol>" : "") + "</div>";
     if (d.say) visitSay(d.say.key, d.say.msg, true);
+    $("visitRand").hidden = !visitList().length;
   }
   /* what the top three's Timmys wear: each one's place says (get_place, migration_v54), through the visit key on their
      row. A place that can't be read, or a database without the game layer yet, gives a plain Timmy. The answer is kept
@@ -1464,21 +1470,45 @@
     var b = q('[data-visit="' + key + '"] .dx-visit', $("board"));
     if (b && document.activeElement !== b) try { b.focus(); } catch (e) {}
   }
-  function visit(key, me){
+  /* the tour (Sam, 2026-11-13: "build the random visit and next/back", round 3's design page): a visit carries the board it
+     came from, so the place's arrows go to the next or the last person on it and "Back to mine" goes home. Only names and
+     ranks go to the place; the keys stay here, and load(i) asks get_place for the i-th. "Visit someone random" picks one
+     of the board's rows: nothing new on the server (migration_v54 gives a key only on a board row) */
+  function visitList(){ return (boardData && boardData.rows || []).filter(function(r){ return visitKey(r) && !r.is_me; }); }
+  function visitNav(key){
+    var rows = visitList(), keys = rows.map(visitKey), at = keys.indexOf(key), R = window.shRanks;
+    if (at < 0) return null;
+    return { at: at, keys: keys,
+      list: rows.map(function(r){ return { name: String(r.display_name == null ? "" : r.display_name), rank: { journey: +r.journey || 0, tier: +r.tier || 0, level: +r.level || (R && R.levelFor ? R.levelFor(r.xp) : 1) } }; }),
+      load: function(i){ return keys[i] ? getPlace(boardSb, keys[i]) : Promise.reject(new Error("key")); } };
+  }
+  function visit(key, me, from){
     if (!VISIT_RE.test(key) || visiting || !boardSb) return;
     visiting = key; visitSay(key, ""); visitBusy(key, true);
     var done = function(){ visiting = ""; visitBusy(key, false); };
     var fail = function(){ done(); visitSay(key, "That place couldn’t be opened just now."); };
-    var back = function(){ visitBack(key); };
+    var nav = me ? null : visitNav(key);
+    /* closing gives focus back: to the random button for a random visit, else to the row of the last place (or your own row, home) */
+    var back = function(where){
+      var mine = where === "home" && q("li.me .dx-visit", $("board")), rb = from === "random" && q("button", $("visitRand"));
+      if (rb && !rb.closest("[hidden]")) { try { rb.focus(); } catch (e) {} return; }
+      if (mine) { try { mine.focus(); } catch (e) {} return; }
+      visitBack(nav && typeof where === "number" && nav.keys[where] ? nav.keys[where] : key);
+    };
     if (me) {
       placeLoad().then(function(){ done(); if (window.shPlace) window.shPlace.open({ onClose: back }); else fail(); }, fail);
       return;
     }
     Promise.all([getPlace(boardSb, key), placeLoad()]).then(function(a){
       if (!a[0] || !window.shPlace) { fail(); return; }
-      done(); window.shPlace.open({ place: a[0], onClose: back });
+      done(); window.shPlace.open({ place: a[0], onClose: back, nav: nav ? { at: nav.at, list: nav.list, load: nav.load } : null });
     }, fail);
   }
+  $("visitRand").addEventListener("click", function(e){
+    if (!e.target.closest("button")) return;
+    var rows = visitList(); if (!rows.length) return;
+    visit(visitKey(rows[Math.floor(Math.random() * rows.length)]), false, "random");
+  });
   $("board").addEventListener("click", function(e){
     var b = e.target.closest(".dx-visit"), w = !b && e.target.closest(".st-win.can-visit");
     /* a winner's Timmy on the stage is their name's button under it */

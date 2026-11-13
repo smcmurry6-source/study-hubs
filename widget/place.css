@@ -153,6 +153,19 @@ dialog.tpv.is-visit { --ar-bg: #2a2233; --ar-deep: #1d1724; --ar-row: #372c44; -
 .is-visit .tpv-sub { color: var(--ar-soft); }
 .is-visit .tpv-x { background: rgba(255, 255, 255, .12); color: #fff; }
 .is-visit .tpv-x:hover { background: rgba(255, 255, 255, .2); }
+/* the tour (widget/place.js, hop): "Back to mine" by the close button, and the design page's round arrows on either
+   side of the stage (round 3) */
+.tpv .tpv-home { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px 0 11px; border: 2px solid rgba(255, 224, 138, .6); border-radius: 999px;
+  background: transparent; color: var(--ar-gold); font-weight: var(--w-head); cursor: pointer; white-space: nowrap; }
+.tpv-home:hover { background: rgba(255, 224, 138, .12); }
+.tpv .tpv-vnav { position: absolute; z-index: 2; top: 50%; width: 44px; height: 44px; margin-top: -22px; display: grid; place-items: center; padding: 0; border-radius: 50%;
+  border: 2px solid #3B2E3A; background: #fff; color: #3B2E3A; box-shadow: 0 3px 0 #3B2E3A; cursor: pointer; transition: transform var(--t-press, 120ms) ease-out; }
+.tpv-vnav.prev { left: 6px; } .tpv-vnav.next { right: 6px; }
+.tpv-vnav:hover { background: #FFF3C4; } .tpv-vnav.prev:hover { transform: translateX(-2px); } .tpv-vnav.next:hover { transform: translateX(2px); }
+.tpv-vnav:active { transform: translateY(3px); box-shadow: 0 0 0 #3B2E3A; }
+.is-visit .tpv-vnav:focus-visible { outline: 3px solid var(--ar-gold); outline-offset: 2px; }
+.tpv-gnav { display: grid; gap: 2px; margin: 0; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, .12); font-size: var(--fs-meta); color: var(--ar-soft); }
+.tpv-gnav span { color: #fff; font-weight: var(--w-strong, 700); overflow-wrap: anywhere; }
 .is-visit button:focus-visible, .is-visit [tabindex]:focus-visible { outline-color: #fff; }
 /* the stage: two spotlights from above, the scene in a gold frame */
 .is-visit .tpv-stagewrap { overflow: hidden; background: radial-gradient(60% 50% at 50% 100%, rgba(255, 224, 138, .12), transparent 70%), var(--ar-deep); }
@@ -187,6 +200,7 @@ dialog.tpv.is-trip::backdrop { background: transparent; }
 .tpv-clhp { display: block; width: 72px; height: 72px; }
 .tpv-clhp svg { display: block; width: 100%; height: 100%; }
 .tpv-clmsg b { font-size: 22px; font-weight: var(--w-head); line-height: 1.2; overflow-wrap: anywhere; }
+.tpv-clouds.is-covered .tpv-clfill, .tpv-clouds.is-covered .tpv-cloud, .tpv-clouds.is-covered .tpv-clmsg { opacity: 1; }   /* a tour's next window starts under them */
 .tpv-clouds.in .tpv-clmsg { animation: tpv-clmsg 420ms var(--ease-out) 560ms forwards; }
 .tpv-clouds.out .tpv-clmsg { opacity: 0; }
 @keyframes tpv-clmsg { from { opacity: 0; transform: translate(-50%, -40%) scale(.9); } to { opacity: 1; transform: translate(-50%, -50%); } }
@@ -211,12 +225,15 @@ dialog.tpv.is-trip::backdrop { background: transparent; }
 @media (prefers-reduced-motion: reduce) {
   .is-visit .tpv-top::before, .is-visit .tpv-stagewrap::before, .is-visit .tpv-stagewrap::after { animation: none; }
   .tpv-clouds { display: none; }
+  .tpv-vnav { transition: none; }
 }
 
 /* a phone: the whole screen, the stage on top and the panel scrolling under it */
 @media (max-width: 760px) {
   dialog.tpv { width: 100vw; height: 100dvh; border-radius: 0; }
   .tpv-clmsg b { font-size: 19px; }
+  .tpv-home { width: 40px; padding: 0; justify-content: center; } .tpv-home span { display: none; }   /* its name stays "Back to mine" */
+  .tpv-vnav { width: 40px; height: 40px; margin-top: -20px; }
   .tpv-top { padding: 8px 8px 8px 16px; }
   .tpv-title h2 { font-size: var(--fs-card); }
   .tpv-seg button { padding: 0 12px; }

@@ -370,6 +370,16 @@ html.shx .dx .shpet-scene.has-place .shpet-say.is-on { pointer-events: auto; }
 .dx-arena .st-win.can-visit { cursor: pointer; }
 /* a place that couldn't be opened: one plain line on its row */
 .dx-vmsg { grid-column: 1 / -1; flex-basis: 100%; font-size: var(--fs-meta); color: var(--ar-soft); text-align: inherit; }
+/* Visit someone random (the tour, widget/dash.js): the design page's die button (round 3), under the board */
+.dx-rand { margin: 12px 0 0; }
+.dx-rand button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px 0 12px; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFE9A3; color: #3B2E3A;
+  box-shadow: 0 3px 0 #3B2E3A; font: inherit; font-size: var(--fs-label); font-weight: 800; cursor: pointer; transition: transform var(--t-press) var(--ease-out), box-shadow var(--t-press) var(--ease-out); }
+.dx-rand button svg { transition: transform 420ms var(--ease-out); }
+.dx-rand button:hover { transform: translateY(-1px); box-shadow: 0 4px 0 #3B2E3A; } .dx-rand button:hover svg { transform: rotate(180deg); }
+.dx-rand button:active { transform: translateY(3px); box-shadow: 0 0 0 #3B2E3A; }
+.dx-rand button:focus-visible { outline: 3px solid var(--text); outline-offset: 3px; }
+@media (max-width: 560px) { .dx-rand button { width: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .dx-rand button, .dx-rand button svg { transition: none; } }
 .dx-vmsg:empty { display: none; }
 .dx-podium li.has-vmsg { flex-wrap: wrap; }
 /* by the arena's own width, so the text-size setting counts (it zooms the page, which a media query doesn't see) */
