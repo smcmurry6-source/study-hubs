@@ -1064,5 +1064,7 @@ is a new migration and Sam's call, never a restore.
   the old pages, each a test and not the site (BUG-136 to BUG-138): the preview-safety check looked for an old hub's
   widget tag, the admin page suite read the old dashboard's cards, and the accessibility suite didn't count a focus
   ring drawn around a leaderboard row. Fixed, and each rerun on its own.
+  Then the device suite run with the clock a day ahead (Heme & Endo Exam 2 archived, so its refresh and history
+  steps run on Occlusion): four more places written for an old page (BUG-139), fixed, and green for today and tomorrow.
 
 ## Outcome
