@@ -730,10 +730,11 @@ changes the drafts above and below wherever they name a bundled file:**
       addresses; `node tools/release/perf.js` now measures a page's **whole load** (until the network has been quiet
       for 2 s), where it used to stop 3 s after the load event, so a number from before 2026-11-13 isn't comparable
       with one after
-- [ ] Sam's call, asked in [#358](https://github.com/smcmurry6-source/study-hubs/pull/358): the saved recap image on
+- [x] Sam's call, asked in [#358](https://github.com/smcmurry6-source/study-hubs/pull/358): the saved recap image on
       the new dashboard is set in Nunito Sans (the redesign's one typeface) instead of Fraunces and Work Sans from
-      Google Fonts. To put the old faces back: take `font: FACE` out of `saveRecap` in `widget/dash.js` and load the
-      two families there again (the live dashboard and the admin page still draw it in the old faces)
+      Google Fonts (the live dashboard and the admin page still draw it in the old faces). **Sam, 2026-11-13: "dont
+      worry about it"**: it stays, and the saved image keeps its static layout (it isn't redrawn to match the
+      dashboard's animated infographic; [decisions](../decisions.md))
 - The preview: `tools/preview/transform.js` rewrites `widget/rest.bundle.js` the way it rewrites `widget/pet.js`
   (Timmy's full-screen date), so a bundle that takes in a file the preview rewrites needs its line in `PET_FILES`.
 

@@ -128,7 +128,8 @@ from another site (the 8-bit face is `assets/fonts/vt323.woff2`, and the new das
 Nunito Sans). The new dashboard goes from 22 requests to 9 and from 416 KB to 332; a new hub from 28-29 requests to 11
 and about 100 KB lighter. The budgets are lowered to match, on a meter that now counts the whole load. Left for the
 release: `sw.js`'s lists and the content JSON's caching ([the release note](../2026-11-06-redesign-release.md), "From
-phase 5, part 2"). Sam's open call: the recap image's typeface (the same section).
+phase 5, part 2"). Sam, 2026-11-13: "dont worry about it. merge when ready" (the saved recap image stays in Nunito Sans,
+with its static layout: [decisions](../../decisions.md)).
 
 **Part 3 is written and tested, waiting for the release** (`migration_v54.sql`; [game-server](../../reference/game-server.md)). The
 server for the journeys, Shiny Gold Crowns and Timmy's shop, Timmy's place and the idea board sits beside today's functions, so
