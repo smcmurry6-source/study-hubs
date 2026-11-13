@@ -44,7 +44,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   still runs everything; a run that kept a result is never itself kept. (3) A stale run steps aside: Check hubs cancels
   an older run of the same PR, and Release tests' scope starts no suite when a newer push has come in (it had cancelled
   the head's suites once that day). `RELEASE_TEST_PLAN.md`, [verify-before-pushing](vault/how-to/verify-before-pushing.md)
-  and [long-tests-once](vault/rules/long-tests-once.md) say so.
+  and [long-tests-once](vault/rules/long-tests-once.md) say so. Measured on #351: Check hubs about 7 minutes (was about
+  13) and Release tests about 5 (was about 17), both at once; a notes-only commit about 3, its long jobs kept.
 - **2026-11-13 (the bowling egg, phase 4 part D, Claude Code)** — Nothing students see changes: it runs only on the
   redesign's pages, with no XP and nothing on the server (neither pending migration touched). The eight clips drawn in
   #291 (never merged, closed) carried over unchanged as `tools/figures/site/bowling.mjs`, built into
