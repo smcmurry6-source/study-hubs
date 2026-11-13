@@ -534,6 +534,39 @@ new; the rare costumes go inside a `spoil` element):
 - "What the hubs record" gets: opening the shop, a purchase (its kind: an outfit, a snack, a boost..., never which
   piece) and a rare costume turning up are counted. What you bought is kept, so it stays yours on every device.
 
+### From phase 4, part D (the bowling egg, [the bowling egg](done/2026-11-06-redesign-bowling-egg.md), built 2026-11-13)
+
+What part D built is in the bowling egg's note (its Log) and phase 4's Log. It runs only on the redesign's pages (the
+engine's answer path and Timmy's place), needs nothing on the server, and goes live with the release.
+
+- [ ] `sw.js`: `widget/bowling.js` and `widget/hub-art/bowling.js` join `PRECACHE` with the place's files, if the
+      wiring session hasn't already (they load at the first strike or the first tap on the lane, never with a page).
+- [ ] The clips looked at on the release's own preview, phone and laptop, reduced motion too (`sh_bowl_run` set to 49
+      in the device's storage, then one first-try right answer; `?persona=high-xp` has the lane at Timmy's place).
+- [ ] **The Bowling trophy is on the device only** until the first migration after the release adds `bowling` to
+      `record_achievement`'s kinds ([the later journeys' rank sets](2026-11-12-redesign-later-journeys-rank-sets.md));
+      until then its row on the About page shows no share of the class.
+
+**About page** (`about/index.html`, in a spoiler; a new entry in Part 7, Easter eggs, tagged new and with the trophy's
+tag, and a secret row in Part 9's trophy table, counted in the 27; "All 24 trophies" becomes "All 27 trophies" with
+the other changes listed below):
+
+- In Easter eggs, the entry's name and how-to inside `spoil`, its placeholder outside: **Bowling night** (the trophy:
+  Lane Legend). *How*: get 50 questions right in a row on the first try (any hub; a second try doesn't count, a wrong
+  first try starts the run again), or tap the bowling lane at Timmy's place. *What*: a short cartoon plays at the bottom
+  of the screen, like the ones bowling alleys show after a strike: the pins are the Plaque crew and the ball is a
+  sugar-free mint. Strikes at 50 and 100 in a row; at 150, a turkey. Eight clips in all; tap one to skip it. Not in a
+  mock exam, and off with Hidden secrets or Focus mode. Placeholder: "Something happens after a long run of right
+  answers (spoiler)."
+- In the trophy table, a secret row (`data-k="bowling"`): **Lane Legend**, "See all eight bowling clips", clue "The
+  alley's screen plays something odd after a strike. There are eight.", the share column "kept on this device" until the
+  server records it.
+- "What the hubs record" gets: a bowling clip playing is counted (which clip, never who saw it); the clips you've seen
+  and your run of right answers are kept on your device only.
+- Timmy's secret tips (his list of eggs, in `widget/pet.js`): add the bowling egg after the Plaque Boss, as a tip
+  like "Fifty right in a row, first try, and the alley's screen does something. Thirty-one hates the noise." (one line;
+  `pet.js` is shared, so only at the release).
+
 ### What Sam's calls of 2026-11-12 change in the drafts above
 
 The sessions that build each part fix the drafts they make untrue; this is the list, so none is missed.
@@ -549,11 +582,11 @@ The sessions that build each part fix the drafts they make untrue; this is the l
   4 (the place's draft, `LORE.md`, and the About lines in "From Ask Timmy, part 4").
 - **The trophy count** is 27, 14 of them secret (today's 24 without Full Arch, the three journey trophies and
   Bowling): "From phase 4, part A" says 27 and 14 for another reason (the journeys alone), so its wording changes. The Bowling trophy is kept on the device until the first migration after the release, so it
-  shows no share of the class at first ([the bowling egg](2026-11-06-redesign-bowling-egg.md)).
+  shows no share of the class at first ([the bowling egg](done/2026-11-06-redesign-bowling-egg.md)).
 - **Full Arch is gone**: the 32-tooth chart, its switch and its trophy (the box in Done when). Where a draft above
   lists the extras a setting turns off ("the Full Arch chart" in phase 3's Settings draft), it comes out.
-- **New drafts to come**, each written by its session under its own heading here: part D (the bowling egg, in a
-  spoiler), visiting, the trophy case. (Part B's is written: "From phase 4, part B", above.)
+- **New drafts to come**, each written by its session under its own heading here: visiting, the trophy case. (Part B's
+  and part D's are written: "From phase 4, part B" and "From phase 4, part D", above.)
 - **Which hub is switched**: with no date and ten sessions to go, the release comes after Perio's final (Nov 19), so
   it switches the dashboard and whichever hub is live then. Sam hasn't named the hub that follows Perio: ask at the
   start of the release session, and build that hub on the engine from the start.

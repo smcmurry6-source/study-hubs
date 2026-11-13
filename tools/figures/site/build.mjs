@@ -15,7 +15,10 @@
    - widget/hub-art/outfits.js (window.SH_OUTFITS): the shop's 65 outfits and costumes and dress(), from place.mjs, so
      the dashboard can put one on a Timmy from widget/pet.js. Loaded only when someone on the page wears one;
    - widget/hub-art/shop.js (window.SH_SHOP_ART): the shop's own art as a kit (shop.mjs): the Shiny Gold Crown, the
-     thumbnails of the four snacks and two boosts, and the five rarity frames. Fetched by the shop on first use.
+     thumbnails of the four snacks and two boosts, and the five rarity frames. Fetched by the shop on first use;
+   - widget/hub-art/bowling.js (window.SH_BOWL): the bowling egg's eight clips as a kit (bowling.mjs): the lane, the
+     Plaque crew as pins, the sugar-free mint, the cast, and each clip's CSS timeline. Fetched by widget/bowling.js the
+     first time a clip plays; tools/preview/design/bowling.js is the same kit for the design page.
 
      node tools/figures/site/build.mjs           write them all
      node tools/figures/site/build.mjs --check   fail if any is stale (CI-friendly)
@@ -50,6 +53,7 @@ const { FLAME, XP } = await import("./rewards.mjs");
 const { arcadeArt, ARCADE_VIEWBOX } = await load("./arcade.mjs", { arcadeArt: () => null, ARCADE_VIEWBOX: [0, 0, 320, 170] });
 const { HEADPHONES, NOTES, NOTES_VIEWBOX, TODAY, TODAY_VIEWBOX } = await load("./spots.mjs", { HEADPHONES: "", NOTES: "", NOTES_VIEWBOX: [0, 0, 1, 1], TODAY: "", TODAY_VIEWBOX: [0, 0, 1, 1] });
 const { placeKit } = await load("./place.mjs", { placeKit: null });
+const { bowlingKit } = await load("./bowling.mjs", { bowlingKit: null });
 /* the new dashboard's drawn parts (kits, like the place: the page draws them at its own size) */
 const { classroomKit } = await import("./classroom.mjs");
 const { boardKit } = await import("./board.mjs");
@@ -114,7 +118,7 @@ const handpieces = W.shRanks.TIERS.map((t, i) => ({ k: t.key, name: t.name, at: 
    medallion code draws (shRanks.art with a shape), and a trophy for each journey finished. Checked here, written below
    as widget/hub-art/journeys.js, which the new pages fetch the first time they need it. */
 const { journeyKit } = await import("./journeys.mjs");
-const { JOURNEY_TROPHIES } = await import("./medals.mjs");
+const { JOURNEY_TROPHIES, EGG_TROPHIES } = await import("./medals.mjs");
 const JK = journeyKit();
 JK.JOURNEYS.forEach((j, ji) => W.shRanks.TIERS.forEach((t, i) => {
   if (!ji && JK.floor(0, i) !== t.at) throw new Error("journeys.mjs: the Handpiece's floors differ from ranks.js");
@@ -149,6 +153,7 @@ for (const [k, v] of Object.entries(MASTHEADS)) add("masthead " + k, v.body);
 for (const [h, ms] of Object.entries(medals)) ms.forEach((m, i) => add("medal " + h + " " + (i + 1), m));
 for (const [k, v] of Object.entries(trophies)) { add("trophy " + k, v.body); add("silhouette " + k, v.sil); }
 for (const t of journeyTrophies) { add("trophy " + t.k, t.body); add("silhouette " + t.k, t.sil); }
+for (const [k, t] of Object.entries(EGG_TROPHIES)) { add("trophy " + k, t.body); add("silhouette " + k, t.sil); }
 for (const [k, v] of Object.entries(FLAME)) add("flame " + k, v);
 add("xp", XP);
 const arcades = {};
@@ -267,6 +272,27 @@ const SHOP = shopKit(INK, C);
   if (SHOP.ITEMS.length !== 6 || SHOP.ITEMS.some((it) => !SHOP.thumb(it.id) || !SHOP.RARITIES.some((r) => r.k === it.rarity))) bad.push("shop ITEMS: six items, each with a thumbnail and a rarity");
   if (SHOP.RARITIES.map((r) => r.k).join() !== "Common,Uncommon,Rare,Epic,Legendary" || new Set(SHOP.RARITIES.map((r) => SHOP.frame(r.k))).size !== 5) bad.push("shop frames: five, each its own");
 }
+/* the bowling egg (bowling.mjs, phase 4 part D): every clip, playing and still, and its CSS: no broken numbers, and
+   every class its timeline moves is in its drawing (a typo would leave a piece standing still) */
+let bowlCount = 0;
+if (bowlingKit) {
+  const K = bowlingKit(INK, C);
+  for (const c of K.CLIPS) {
+    for (const still of [false, true]) {
+      const r = K.render(c.k, { still }), body = r.replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, "");
+      if (/NaN|undefined|Infinity/.test(r)) bad.push("bowling " + c.k + ": NaN or undefined in the drawing");
+      add("bowling " + c.k + (still ? " still" : ""), body);
+    }
+    const css = K.css(c.k), svg = K.render(c.k), classes = new Set((svg.match(/class="[^"]+"/g) || []).flatMap((m) => m.slice(7, -1).split(" ")));
+    if (/NaN|undefined|Infinity/.test(css)) bad.push("bowling " + c.k + ": NaN or undefined in its CSS");
+    for (const m of css.matchAll(new RegExp("\\.bw-" + c.k + " ([^{]+)\\{", "g"))) for (const sel of m[1].trim().split(/\s+/))
+      if (!classes.has(sel.slice(1))) bad.push("bowling " + c.k + ": its CSS moves " + sel + ", which isn't in the drawing");
+    if (!(c.wordAt > 0 && c.wordAt < c.D && c.D >= 3 && c.D <= 5.5)) bad.push("bowling " + c.k + ": 3 to 5.5 seconds, its word inside it");
+    bowlCount++;
+  }
+  if (K.CLIPS.map((c) => c.k).join() !== "panic,conga,floss,rocket,sweep,neighbor,turkey,spare") bad.push("bowling: the eight clips, in order (widget/bowling.js names them)");
+  for (const k of K.CREW.map((x) => x.k).concat(K.PARTS)) add("bowling part " + k, K.part(k).replace(/^<svg[^>]*>/, "").replace(/<\/svg>$/, ""));
+}
 for (const [w, s] of all) {
   if (/\sid=|url\(#|Gradient|<filter|<text|<style|<image|<script|on[a-z]+=/i.test(s)) bad.push(w + ": ids, gradients, filters, text, images or script");
   if (/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(s)) bad.push(w + ": emoji");
@@ -279,7 +305,9 @@ const data = {
   icons: ICONS, emblems: EMBLEMS, mastheads: MASTHEADS,
   medalLevels: MEDAL_LEVELS, medals, trophies,
   flame: FLAME, xp: XP,
-  timmy, houses, handpieces, spots, arcades, arcadeViewBox: ARCADE_VIEWBOX
+  timmy, houses, handpieces, spots, arcades, arcadeViewBox: ARCADE_VIEWBOX,
+  /* the egg trophies kept on the device (the bowling egg's), for the design page; the trophy case lists them */
+  eggTrophies: EGG_TROPHIES
 };
 const text = "/* Generated by tools/figures/site/build.mjs from the drawings in tools/figures/site/ and the live widget code\n" +
   "   (Timmy, his house and the handpieces). Do not edit: change the drawing and run the build. */\n" +
@@ -354,6 +382,15 @@ if (placeKit) {
       if (whole.render(c).svg !== late.render(c).svg) { console.error("place.mjs: a kit that gets its packs late draws " + JSON.stringify(c) + " differently"); process.exit(1); }
     if (late.OUTFITS.length !== whole.OUTFITS.length || late.setOf("haunted-manor") !== "halloween" || late.setOf("rank-gold-yard") !== "rank") { console.error("place.mjs: addPack or setOf is off"); process.exit(1); } }
 }
+/* the bowling egg: the kit for the design page, and the same kit for widget/bowling.js, which fetches it the first time a
+   clip plays (never with a page) */
+if (bowlingKit) {
+  const kit = "window.SH_BOWL = (" + bowlingKit.toString() + ")(" + JSON.stringify(INK) + ", " + JSON.stringify(C) + ");\n";
+  outs.push([path.join(root, "tools/preview/design/bowling.js"), "/* Generated by tools/figures/site/build.mjs from tools/figures/site/bowling.mjs (the bowling egg: the kit itself, checked in the build).\n" +
+    "   Do not edit: change bowling.mjs and run the build. */\n" + kit]);
+  outs.push([path.join(root, "widget/hub-art/bowling.js"), "/* Generated by tools/figures/site/build.mjs from tools/figures/site/bowling.mjs (the bowling egg's eight clips: the kit\n" +
+    "   itself, checked in the build). Fetched by widget/bowling.js. Do not edit: change the drawing and run the build. */\n" + kit]);
+}
 /* the shop's own art (widget/shop.js will fetch the file itself, the first time the shop is opened) */
 outs.push([path.join(root, "widget/hub-art/shop.js"), "/* Generated by tools/figures/site/build.mjs from tools/figures/site/shop.mjs (the shop's own art: the kit itself,\n" +
   "   checked in the build). Do not edit: change the drawing and run the build. */\nwindow.SH_SHOP_ART = (" + shopKit.toString() + ")(" + JSON.stringify(INK) + ", " + JSON.stringify(C) + ");\n"]);
@@ -375,12 +412,12 @@ if (process.argv.includes("--dry")) {
 } else if (check) {
   const stale = outs.filter(([f, t]) => !fs.existsSync(f) || fs.readFileSync(f, "utf8") !== t).map(([f]) => path.relative(root, f));
   if (stale.length) { console.error("stale: " + stale.join(", ") + "\nrun node tools/figures/site/build.mjs"); process.exit(1); }
-  console.log("art.js, place.js, widget/hub-art.js and widget/hub-art/ are up to date");
+  console.log("art.js, place.js, bowling.js, widget/hub-art.js and widget/hub-art/ are up to date");
 } else {
   fs.mkdirSync(path.join(root, "widget/hub-art/place"), { recursive: true });
   for (const [f, t] of outs) fs.writeFileSync(f, t);
   console.log("wrote " + path.relative(root, OUT) + " (" + Math.round(text.length / 1024) + " KB): " +
     Object.keys(ICONS).length + " icons, " + Object.keys(EMBLEMS).length + " emblems, " + Object.keys(MASTHEADS).length + " mastheads, " +
     Object.keys(trophies).length + " trophies, " + HUBS.length * 4 + " medals, " + (timmy.moods.length + timmy.hp.length + timmy.outfits.length) + " Timmys, " +
-    houses.length + " houses, " + handpieces.length + " handpieces; Timmy's place (" + placeCount + " drawings and " + routeCount + " walks checked); and the hub engine's art (" + (outs.length - 1) + " files)");
+    houses.length + " houses, " + handpieces.length + " handpieces; Timmy's place (" + placeCount + " drawings and " + routeCount + " walks checked); the bowling egg (" + bowlCount + " clips checked); and the hub engine's art (" + (outs.length - 1) + " files)");
 }

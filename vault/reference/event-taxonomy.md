@@ -176,6 +176,7 @@ new one can't go undocumented.
 | `state` | `state:pet=dash`, `state:theme=dark` | once a day per page: a snapshot of each setting | `widget/clicks.js` `snapshot()` | 10-20 |
 | `pref` | `pref:fx=off` | a setting changed | `widget/clicks.js` (`sh:pref`) | 10-20 |
 | `egg` | `egg:timmy-start`, `egg:boss` | an easter egg showed itself | `widget/clicks.js` on `sh:egg-local` (`widget/eggs.js`), `widget/timmy.js` | 10-20 |
+| `egg:bowling` | `egg:bowling=<clip>`: one of `panic`, `conga`, `floss`, `rocket`, `sweep`, `neighbor`, `turkey`, `spare` | a bowling clip played (after a run of first-try right answers, or a tap on the bowling lane at Timmy's place); the clip only. The run and the clips seen stay on the device (`sh_bowl_run`, `sh_bowl_today`, `sh_bowl_seen`, `sh_bowl_trophy`) and nothing else is sent; the card's close button is `data-bowl="close"`, so a click records no words | `widget/bowling.js` | with the redesign's release (written 11-13) |
 | `fig-seen` / `fig` / `fig-part` | `fig-seen:sarcomere`, `fig:attach` | a diagram half on screen once / a control moved / a part tapped | `widget/clicks.js` | 10-20 |
 | `pod` | `pod:<episode>:play`, `:q1`-`:q4` (25/50/75/95% heard), `:secs`, `:like`, `:dislike`, `:unvote`, `:comment`, `:report`, `:comments-all` | count; seconds for `:secs` | `widget/podcast.js` | 10-20 (reactions 11-04) |
 | `tts` | `tts:start-<plain\|full\|voice>`, `tts:lec=<lecture>-<level>`, `tts:secs`, `tts:end` | starts; seconds heard; finishes | Listen, `widget/v3.js` | 10-20 |

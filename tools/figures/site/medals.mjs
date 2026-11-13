@@ -5,6 +5,8 @@
      TROPHIES[key].body           inner markup for viewBox 0 0 64 64, one per trophy key in widget/ranks.js
                                   (TROPHIES and HUB_TROPHIES, minus the four mastery-* keys, which are the medals)
      silhouette(key)              the trophy's outer shapes only, in currentColor: a locked secret trophy's mystery shape
+     JOURNEY_TROPHIES[key]        { body, sil } for journey-0, journey-1, journey-2 (not in ranks.js's live list)
+     EGG_TROPHIES[key]            { body, sil } for the egg trophies kept on the device: bowling (phase 4, part D)
    No ids, gradients, filters, <text> or <style>. Light comes from the top left: one flat shade on the far side, short
    white highlights on the near side, ink outlines 2.5 outside and 1.5 for inner detail.                              */
 import { INK, C, TINTS } from "./style.mjs";
@@ -592,3 +594,36 @@ J["journey-2"] = () => {
 export const JOURNEY_TROPHIES = {};
 Object.keys(J).forEach((k) => { const parts = J[k](); JOURNEY_TROPHIES[k] = { body: body(parts), sil: sil(parts) }; });
 
+
+/* ---------------- the egg trophies (redesign phase 4, part D): secret trophies kept on the device, not in widget/ranks.js's
+   live list (the server's record_achievement doesn't take them yet: vault/tasks/done/2026-11-06-redesign-bowling-egg.md), so
+   they have their own export for the trophy case to list. Its name and clue are widget/bowling.js's (shBowl.TROPHY). ----- */
+const E = {};
+/* Bowling: seen all eight bowling clips. A gold pin on a plinth, the sugar-free mint resting against it, a sparkle */
+E.bowling = () => {
+  const pin = "M40 5.2 C43.6 5.2 46 8 46 11.4 C46 14.6 44 17 43.4 20.6 C43.2 23 45 25.6 47 29 C49.4 33 50 37.6 49.8 41.4 C49.6 46.4 47.6 50.8 46.4 54.6 H33.6" +
+    " C32.4 50.8 30.4 46.4 30.2 41.4 C30 37.6 30.6 33 33 29 C35 25.6 36.8 23 36.6 20.6 C36 17 34 14.6 34 11.4 C34 8 36.4 5.2 40 5.2Z";
+  const pinShade = "M40 5.4 C43.6 5.4 45.8 8 45.8 11.4 C45.8 14.6 43.8 17 43.2 20.6 C43 23 44.8 25.6 46.8 29 C49.2 33 49.8 37.6 49.6 41.4 C49.4 46.4 47.4 50.8 46.2 54.4 H42.6" +
+    " C44.4 48 45.4 40 43.4 32.4 C41.8 26.8 40.4 22 41.6 17 C42.4 13 42.6 8.6 40 5.4Z";
+  const stripes = fill("M35.5 16.4 H44.5 L44 18.4 H36Z", C.red) + fill("M36.6 20.6 H43.4 L43.6 22.4 H36.4Z", C.red) +
+    line("M35.5 16.4H44.5M36 18.4H44M36.6 20.6H43.4M36.4 22.4H43.6", 1.3);
+  const bx = 20.4, by = 44.2, r = 10.4, rr = r * .9;
+  let swirl = "";
+  for (let i = 0; i < 6; i++){
+    const a1 = i * Math.PI / 3 + .3, a2 = a1 + Math.PI / 6;
+    swirl += fill("M" + P(bx, by) + " Q" + P(bx + Math.cos(a1 - .55) * r * .55, by + Math.sin(a1 - .55) * r * .55) + " " + P(bx + Math.cos(a1) * rr, by + Math.sin(a1) * rr) +
+      " A" + n(rr) + " " + n(rr) + " 0 0 1 " + P(bx + Math.cos(a2) * rr, by + Math.sin(a2) * rr) +
+      " Q" + P(bx + Math.cos(a2 - .55) * r * .55, by + Math.sin(a2 - .55) * r * .55) + " " + P(bx, by) + " Z", "#7FD6B5");
+  }
+  return [
+    F("M10 54.6 H54 C55.4 54.6 56 55.4 56 56.6 V58.6 C56 59.8 55.4 60.6 54 60.6 H10 C8.6 60.6 8 59.8 8 58.6 V56.6 C8 55.4 8.6 54.6 10 54.6Z", C.plum,
+      { w: 2.2, shade: "M44 54.8H54C55.2 54.8 55.8 55.4 55.8 56.6V58.6C55.8 59.6 55.2 60.4 54 60.4H44Z", sh: darken(C.plum, .3), op: .5, hi: "M12 56.8H26" }),
+    F(pin, C.gold, { shade: pinShade, sh: C.goldShade, op: .5, inner: stripes, hi: ["M35.6 9.6C36.2 8.4 37.2 7.6 38.4 7.2", "M34 38.4C34 34.6 34.8 32 36.4 29.8"] }),
+    F(blob(bx, by, r, r, .05, 7, 16), C.paper, { w: 2.2, inner: swirl + '<circle cx="' + bx + '" cy="' + by + '" r="2" fill="#fff"/>' + fill(crescent(bx, by, r - .3, -40, 130, 1.3), INK, .12),
+      hi: arc(bx, by, r - 2.4, 200, 250) }),
+    F(sparkle(54.4, 14.6, 5.6), C.gold, { w: 1.5 }),
+    F(sparkle(14.8, 22.6, 3.4), C.gold, { w: 1.3 })
+  ];
+};
+export const EGG_TROPHIES = {};
+Object.keys(E).forEach((k) => { const parts = E[k](); EGG_TROPHIES[k] = { body: body(parts), sil: sil(parts) }; });

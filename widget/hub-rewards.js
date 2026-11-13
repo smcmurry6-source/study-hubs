@@ -1,7 +1,7 @@
 /* ============ THE HUB ENGINE, part: the rewards (widget/hub-rewards.js) ============
    One of the engine's four files (widget/hub.js is the core and says how they fit together). This one holds what an
    answer earns and where it shows: the one answer path (recordAnswer: the daily goal, the streak, achievements, XP as
-   the server counts it), the rank from the server's profile, the meters on the bar, the XP flying to the rank, the
+   the server counts it, the bowling egg's run), the rank from the server's profile, the meters on the bar, the XP flying to the rank, the
    ring of teeth and the Today panel, and the session recap card.
 
    The names it takes from the core are listed first; anything of the core's that changes after the page loads is read
@@ -91,11 +91,35 @@
     achievements();
     saveNow();
     if (ctx === "drill" && window.shDrill && window.shDrill.mark) { try { window.shDrill.mark(qid, correct); } catch (e) {} }
+    bowlRun(qid, correct, ctx);
     more = more || {};
     document.dispatchEvent(new CustomEvent(EVT, { detail: { qid: qid, lec: lecId, correct: !!correct, ctx: ctx || "bank", choice: (typeof choice === "number" ? choice : null), picks: (Array.isArray(picks) && picks.length ? picks.slice() : null),
       self: kind === "self", order: (kind === "order" && Array.isArray(more.order) ? more.order.slice() : null), session: more.session || null } }));
     RANK.local += xp + (first ? 20 : 0);
     return { xp: xp, met: met, dayBonus: first, mult: mult };
+  }
+  /* ---------- the bowling egg (phase 4, part D; vault/tasks/done/2026-11-06-redesign-bowling-egg.md) ----------
+     A run of first-try right answers, kept on the device across hubs and reloads (sh_bowl_run). An answer counts when it
+     is the first to that question on this device today (sh_bowl_today), on a card outside the mock and the arcade: right
+     adds one, wrong puts the run at 0, a second try does neither. At 50 and at 100 a strike clip, one of the six; at 150
+     the turkey, and the run starts again. The clip plays a moment after the verdict, from widget/bowling.js, fetched
+     then (never with the page); it waits behind a rank-up or trophy card. Nothing at all with the eggs off or in Focus
+     mode. No XP and nothing on the server (Sam, 2026-11-12). */
+  function bowlRun(qid, correct, ctx){
+    if (ctx === "mock" || ctx === "arcade" || ls("sh_pref_eggs") === "off" || ls("sh_pref_focus") === "on") return;
+    var d = day(0), key = HX.HUB + ":" + qid, t = null;
+    try { t = JSON.parse(ls("sh_bowl_today") || "null"); } catch (e) {}
+    if (!t || t.d !== d || !Array.isArray(t.q)) t = { d: d, q: [] };
+    if (t.q.indexOf(key) > -1) return;
+    t.q.push(key); ls("sh_bowl_today", JSON.stringify(t));
+    var n = correct ? (parseInt(ls("sh_bowl_run"), 10) || 0) + 1 : 0, turkey = n >= 150, strike = n === 50 || n === 100;
+    ls("sh_bowl_run", String(turkey ? 0 : n));
+    if (!turkey && !strike) return;
+    setTimeout(function(){
+      HX.loadScript(HX.WIDGET + "bowling.js").then(function(){
+        var B = window.shBowl; if (B) B.play(turkey ? "turkey" : B.STRIKES[Math.floor(Math.random() * B.STRIKES.length)]);
+      }, function(){});
+    }, reduced ? 400 : 1200);
   }
   /* a flashcard's rating (widget/study-modes.js): not an answer, so nothing here touches your answers, the class's numbers
      or question health. It counts toward today's goal and the streak, and pays a flat 2 for a card that was due or new,

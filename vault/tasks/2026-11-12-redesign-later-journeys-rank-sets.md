@@ -42,7 +42,7 @@ never sold. Fourteen ranks (seven in the ModuPro, seven in the Loupes), 28 drawi
 - **After the release**, in its own session, with its rows in **a new migration** (the next free number then), not
   in `migration_v54.sql`. Nobody is near 125,000 XP, and it is the one piece of the redesign that needs catalog rows.
 - The same migration adds **`bowling` to the trophy kinds `record_achievement` takes**
-  ([the bowling egg](2026-11-06-redesign-bowling-egg.md): until then that trophy is kept on the device), and the
+  ([the bowling egg](done/2026-11-06-redesign-bowling-egg.md): until then that trophy is kept on the device), and the
   client then records it for everyone whose device has it.
 
 ## Build spec

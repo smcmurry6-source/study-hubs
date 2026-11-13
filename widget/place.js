@@ -279,6 +279,7 @@
     var v = V; V = null;
     cancelAnimationFrame(v.raf); cancelAnimationFrame(v.camRaf); clearInterval(v.wander); clearTimeout(v.sayT); clearTimeout(v.waveT); clearTimeout(v.mt);
     if (v.io) v.io.disconnect();
+    if (W.shBowl && W.shBowl.showing()) W.shBowl.close();
     if (v.dlg.parentNode) v.dlg.parentNode.removeChild(v.dlg);
     D.documentElement.classList.remove("tpv-open");
     try { if (v.back && v.back.isConnected && v.back.focus) v.back.focus(); } catch (e) {}
@@ -406,13 +407,23 @@
     var parts = [[4, "Crown"], [3, "Gold"], [2, "Silver"], [1, "Bronze"]].filter(function(q){ return n[q[0]]; }).map(function(q){ return n[q[0]] + " " + q[1]; });
     return fl.length + (fl.length === 1 ? " hub" : " hubs") + " mastered: " + (parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1] : parts[0]) + ".";
   }
+  /* the bowling lane plays one of the bowling egg's eight clips inside the view (widget/bowling.js, fetched on the first
+     tap); with the eggs off or in Focus mode it keeps its own small surprise (the mint and "Strike! Well, close.") */
+  function eggsOff(){ return ls("sh_pref_eggs") === "off" || ls("sh_pref_focus") === "on"; }
+  function playLane(fallback){
+    script(BASE + "bowling.js").then(function(){
+      var B = W.shBowl, host = V && $(".tpv-stagewrap", V.dlg);
+      if (!B || !host) { if (V) say(fallback); return; }
+      B.play(B.random(), { host: host, say: say }).then(function(shown){ if (!shown && V) say(fallback); });
+    }, function(){ if (V) say(fallback); });
+  }
   function playEgg(n){
     var k = n.dataset.egg, e = TP.EGGS[k] || {};
     n.classList.remove("tp-on"); void n.getBoundingClientRect(); n.classList.add("tp-on");
     clearTimeout(n._t); n._t = setTimeout(function(){ n.classList.remove("tp-on"); }, 2600);
     var H = HL(), line = k === "statue" ? rankLine() : k === "mastery" ? masteryLine() : e.say;
     if (H.stay && k !== "mastery" && k !== "statue") { V.rested = !V.rested; line = V.rested ? H.rest : line; }
-    say(line);
+    if (k === "lane" && !eggsOff()) playLane(line); else say(line);
     V.lastTap = Date.now();
     if (k === "mastery") { clearTimeout(V.mt); V.mt = setTimeout(function(){ if (V) openMastery(); }, isStill() ? 0 : 650); }
     if (isStill()) return;

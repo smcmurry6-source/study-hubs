@@ -20,6 +20,6 @@ for (const w of ['widget/v3.js', 'widget/archive.js', 'widget/eggs.js', 'widget/
      and its generated data */
   'widget/hub.js', 'widget/hub-rewards.js', 'widget/hub-timmy.js', 'widget/hub-bank.js', 'widget/study-modes.js', 'widget/hub-art.js', 'widget/dash.js', 'widget/ideas.js', 'widget/ask.js', 'widget/hub-art/dash.js', 'widget/hub-art/class.js', 'widget/hub-art/board.js', 'widget/hub-art/shop.js', 'widget/hub-art/outfits.js', 'widget/journeys.js', 'widget/hub-art/journeys.js', 'next/hubs.js',
   /* Timmy's place: the renderer, its kit and one file per set (all on first use) */
-  'widget/place.js', 'widget/shop.js', 'widget/hub-art/place.js', ...(fs.existsSync(path.join(root, 'widget/hub-art/place')) ? fs.readdirSync(path.join(root, 'widget/hub-art/place')).filter(f => /\.js$/.test(f)).sort().map(f => 'widget/hub-art/place/' + f) : [])].filter(w => fs.existsSync(path.join(root, w)))) check(path.join(root, w), w);
+  'widget/place.js', 'widget/shop.js', 'widget/bowling.js', 'widget/hub-art/place.js', 'widget/hub-art/bowling.js', ...(fs.existsSync(path.join(root, 'widget/hub-art/place')) ? fs.readdirSync(path.join(root, 'widget/hub-art/place')).filter(f => /\.js$/.test(f)).sort().map(f => 'widget/hub-art/place/' + f) : [])].filter(w => fs.existsSync(path.join(root, w)))) check(path.join(root, w), w);
 console.log(failed ? 'Syntax check failed' : `✓ ${pages.length} pages and the widget scripts parse`);
 process.exit(failed ? 1 : 0);

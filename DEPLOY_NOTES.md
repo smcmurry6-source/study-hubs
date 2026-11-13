@@ -32,6 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-13 (the bowling egg, phase 4 part D, Claude Code)** — Nothing students see changes: it runs only on the
+  redesign's pages, with no XP and nothing on the server (neither pending migration touched). The eight clips drawn in
+  #291 (never merged, closed) carried over unchanged as `tools/figures/site/bowling.mjs`, built into
+  `widget/hub-art/bowling.js` (`window.SH_BOWL`) and the design page's "The bowling egg" section (with the Bowling
+  trophy, "Lane Legend", drawn in `medals.mjs` as `EGG_TROPHIES.bowling`). New `widget/bowling.js` (`window.shBowl`,
+  fetched at the first strike or the first tap on the lane): a small card docked at the bottom, 3 to 5 seconds, a tap
+  or Esc closes it, the still and its word with reduced motion, queued behind rank-up and trophy cards. The run of
+  first-try right answers is counted in the engine's answer path (`widget/hub-rewards.js`, kept on the device across
+  hubs): strikes at 50 and 100, the turkey at 150; not in the mock or the arcade, nor with the eggs off or in Focus
+  mode. The bowling lane at Timmy's place plays a random clip (`widget/place.js`). Sightings and the trophy are kept
+  on the device. Tracked as `egg:bowling=<clip>`. Tests: the smoke test (the run, strike, retry, miss, turkey, mock,
+  eggs off, Focus, reduced motion, the lane, a live hub untouched), `a11y.js` (the clip card). BUG-110 and BUG-111
+  found and fixed in testing.
 - **2026-11-13 (Ask Timmy part 4, "Timmy everywhere", phase 4 session 3, Claude Code)** — Nothing students see
   changes: only the redesign's pages pass the new option. `widget/pet.js` takes `mount({ everyone: true })`: no
   adoption (a first visit sets `sh_pet_born` to today and sends the `pet-adopt` badge; linked devices keep the earliest

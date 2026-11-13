@@ -33,6 +33,13 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   osseointegration was found in rabbit bone (Brånemark, 1952).
 - **The toothbrush by the front door** (canon since Occlusion) talks now, in the comments: feels left out of every episode,
   and reminds everyone that implants need cleaning too.
+- **The bowling alley** (the redesign's bowling egg, `widget/bowling.js`, from its release): a bowling lane can stand in
+  his yard, and the alley's screen plays odd cartoons after a strike, the way real alleys do. The pins are the Plaque crew
+  from the boss fights (Plaque Boss, Tartar Titan, Biofilm Blob, the Strep Mutans Swarm, Cavity Creep, the Gingivitis
+  Goblin, Halitosis Haze and the Red Complex), never teeth, and the ball is a giant **sugar-free mint**. Number thirty-one
+  comes to watch from the gallery with a thermometer in his mouth and **faints at the noise** of a strike; the head pin
+  fans him with a scorecard. The toothbrush by the door sweeps up the pins, and three strikes bring out a turkey in
+  Timmy's pilgrim hat. Never say Timmy bowls with a tooth or that a pin is a tooth.
 
 ## Costumes
 

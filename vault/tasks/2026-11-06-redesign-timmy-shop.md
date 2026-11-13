@@ -26,7 +26,7 @@ with no holiday, Timmy now and then wears a rare costume, the same one all day. 
   [phase 4](2026-11-05-redesign-phase-4-game-layer.md) (part B); server: [phase 5](2026-11-05-redesign-phase-5-backend.md)
   (part 3); live at [the release](2026-11-06-redesign-release.md).
 - What the house items go into: [Timmy's place](2026-11-06-redesign-timmys-place.md) (the house card, redrawn). XP and its
-  boosts: [the journeys note](2026-11-06-redesign-progression-journeys.md). Bowling: [its own note](2026-11-06-redesign-bowling-egg.md).
+  boosts: [the journeys note](2026-11-06-redesign-progression-journeys.md). Bowling: [its own note](done/2026-11-06-redesign-bowling-egg.md).
 - Rules that matter most here: [podcast-reactions](../rules/podcast-reactions.md) (the lore rules: never contradict
   `tools/podcast/LORE.md` or `widget/pet.js`), [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md) (drawn in
   SVG in Timmy's ink style, nothing generated), [about-page](../rules/about-page.md) (spoilers for secrets),
@@ -429,7 +429,7 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
 ## Log
 
 - 2026-11-06: workshop of Sam's idea.
-- 2026-11-06: Sam's calls (above). Bowling moved to [its own note](2026-11-06-redesign-bowling-egg.md) as an Easter egg; the
+- 2026-11-06: Sam's calls (above). Bowling moved to [its own note](done/2026-11-06-redesign-bowling-egg.md) as an Easter egg; the
   house card's redesign to [Timmy's place](2026-11-06-redesign-timmys-place.md).
 - 2026-11-06: the currency renamed from Mints to Shiny Gold Crowns (Sam).
 - 2026-11-06 (Claude Code): the server is written and tested on a throwaway copy (`migration_v54.sql`, phase 5 part 3;

@@ -41,7 +41,7 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
     (a lighthouse, a houseboat...). Each home has its own spots for Timmy and its own night lights.
   - **The scene**: the hill (free), then a beach, a forest, a snowy mountain, a night sky with the Dark Matter stars.
   - **The yard**: four to six spots by the home for a garden, a swimming pool, a hammock, a mailbox, a bowling lane (the
-    [bowling egg](2026-11-06-redesign-bowling-egg.md) lives there), a doghouse...
+    [bowling egg](done/2026-11-06-redesign-bowling-egg.md) lives there), a doghouse...
   - **Upgrades of the home itself**: windows, a porch, a chimney, a flag, a paint color.
 - **What students already earned still shows** on any home and scene: the rank decorations (now one set per journey: the
   ModuPro on the porch, Timmy in loupes: [the journeys](2026-11-06-redesign-progression-journeys.md)), the mastery
@@ -282,5 +282,5 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
 
 ## Outcome
 
-Related: [round 3](done/2026-11-10-redesign-timmys-place-round-3.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the bowling egg](2026-11-06-redesign-bowling-egg.md) ·
+Related: [round 3](done/2026-11-10-redesign-timmys-place-round-3.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the bowling egg](done/2026-11-06-redesign-bowling-egg.md) ·
 [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [diagrams-anima](../rules/diagrams-anima.md)

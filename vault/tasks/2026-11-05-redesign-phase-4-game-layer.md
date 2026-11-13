@@ -29,7 +29,7 @@ Put the ranks, trophies and celebrations on the design system without changing t
   - **B**: [Timmy's shop](2026-11-06-redesign-timmy-shop.md) (Shiny Gold Crowns, the rotating shop, rarity, snacks and floss, XP boosts,
     rare costumes);
   - **C**: [Timmy's place](2026-11-06-redesign-timmys-place.md) (the house card redrawn as a scene you build);
-  - **D**: [the bowling egg](2026-11-06-redesign-bowling-egg.md).
+  - **D**: [the bowling egg](done/2026-11-06-redesign-bowling-egg.md).
   - **E** (Sam, 2026-11-12): [Ask Timmy](2026-11-12-redesign-ask-timmy.md), Timmy as every hub's study assistant. Its
     part 4, **everyone has Timmy** ("adopting timmy is no longer an option"), changes `widget/pet.js`: do it with parts B
     and C, or right after them, so it doesn't collide with their work on Timmy.
@@ -52,7 +52,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 | 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes. **Done 2026-11-12** ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345), merged as `510dcb6`; its hand-off in the Log) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
 | 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage. **Done 2026-11-13** ([#348](https://github.com/smcmurry6-source/study-hubs/pull/348), merged as `c5ce92e`; its hand-off in the Log) | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
 | 4 | **Visiting**: a row on the new dashboard's boards opens that person's place | [visiting](2026-11-12-redesign-visiting.md) | 3 |
-| 5 | **The bowling egg** (part D) | [the bowling egg](2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
+| 5 | **The bowling egg** (part D). **Done 2026-11-13** (merged on Sam's "merge"; the hand-off in the Log) | [the bowling egg](done/2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
 | 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12) | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
 | 7 | **Ask Timmy, part 2** (the chat). **Built 2026-11-12, ahead of its turn** (Sam asked for it then): the Ask icon shows whenever Timmy isn't on the page, so it works before and after session 3 | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), its Log | (3) |
 | 8 | **The game layer's wiring** left by part A: the arcade's sessions, Timmy Time's minutes, the service worker's lists | [the wiring](2026-11-12-redesign-game-layer-wiring.md) | 6 |
@@ -188,7 +188,7 @@ These hold for each spec; a spec only adds to them.
     ([journeys](2026-11-06-redesign-progression-journeys.md)): `widget/hub-rewards.js` (`xpFor`, `recordAnswer`, the
     rank functions, `paintMeters`, `reward`, the recap), with `widget/ranks.js`, `rankup.js` and `pet.js` as its note
     says. **Parts B and C with the bowling egg** ([shop](2026-11-06-redesign-timmy-shop.md),
-    [place](2026-11-06-redesign-timmys-place.md), [egg](2026-11-06-redesign-bowling-egg.md)): `widget/hub-timmy.js` for
+    [place](2026-11-06-redesign-timmys-place.md), [egg](done/2026-11-06-redesign-bowling-egg.md)): `widget/hub-timmy.js` for
     what the engine shows of Timmy, `widget/pet.js` for the renderer; a new page in More also needs its row in the
     core's `MORE` list and its entry in `renderMore`'s map (call the part's function as `HX.<name>`).
     [Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md): `widget/hub-bank.js`.
@@ -225,7 +225,7 @@ These hold for each spec; a spec only adds to them.
     crowns is the server's. For **Timmy's place** ([note](2026-11-06-redesign-timmys-place.md)): the old house card
     reads `sh_rank_tier`, which stays at 6 past 125,000 (`legacy()`), so the journey's pieces (the ModuPro on the porch,
     Timmy in loupes, the rank sets for the later journeys) are drawn from the v2 profile's `journey` and `gtier`
-    (0 to 20), which `sh:rank-profile` hands every listener. For **the bowling egg** ([note](2026-11-06-redesign-bowling-egg.md)):
+    (0 to 20), which `sh:rank-profile` hands every listener. For **the bowling egg** ([note](done/2026-11-06-redesign-bowling-egg.md)):
     nothing here is in its way; if it pays XP it needs a session or an award on the server, which would be a change to
     the migration, so ask Sam first.
   - **Still open in this note**: parts B, C and D, the arcade lobby, the cards' and the cutscene's recording on a
@@ -380,6 +380,28 @@ These hold for each spec; a spec only adds to them.
   **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)), or session 5, the bowling egg.
 - 2026-11-13: [#348](https://github.com/smcmurry6-source/study-hubs/pull/348) (session 3) merged as `c5ce92e` (Sam:
   "Merge when ready"). `postcheck.js` passed (7 of 7 changed files live and identical to `main`; the live dashboard and hubs open with no errors). Session 3 is done. **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)).
+- 2026-11-13 (Claude Code), **session 5, the bowling egg; hand-off for session 6** ([the bowling egg](done/2026-11-06-redesign-bowling-egg.md)).
+  Run ahead of session 4 (it needs only session 2); session 3 (#348) merged while it waited. Nothing students see changes, no XP, nothing on the server:
+  neither pending migration is applied or changed, and nothing in them disagreed with the client.
+  - **The clips**: #291's kit carried over unchanged (`tools/figures/site/bowling.mjs`), built by `build.mjs` into
+    `widget/hub-art/bowling.js` (`window.SH_BOWL`, 56 KB, 18 KB compressed) and the design page's "The bowling egg"
+    section; the build checks every clip, still and playing, and that every class a clip's CSS moves is in its drawing.
+    A recording of the eight and their stills went to Sam: "Looks good. Merge when ready." #291 closed unmerged.
+  - **New `widget/bowling.js`**, `window.shBowl`: `play(clip, { host, say, queue, still, onClose })`, `random()`, `seen()`,
+    `trophy()`, `off()`, `ready()`, `close()`, `showing()`, `KEYS`, `STRIKES`, `TROPHY`. Its styles are inside it; it
+    fetches its drawings itself; on the bar it queues through `shRankUp.scene` when rank-up cards are on the page. The
+    page hears `sh:bowl-trophy` when the eighth clip is seen.
+  - **`widget/hub-rewards.js`**: `bowlRun()` in `recordAnswer` (the run, `sh_bowl_run`; the day's first answers,
+    `sh_bowl_today`); it fetches `bowling.js` at a strike. **`widget/place.js`**: the lane plays a clip in the full view
+    (`playLane`), its own surprise with the eggs off; `shut()` closes a clip.
+  - **For session 6, the trophy case**: the Bowling trophy is `EGG_TROPHIES.bowling` in `medals.mjs` and
+    `shBowl.TROPHY`'s words; what to take from where is in [its note](2026-11-12-redesign-trophy-case-and-cards.md)
+    ("What the bowling egg left for it").
+  - **For session 8 and session 9**: `sw.js`'s `PRECACHE` gains `widget/bowling.js` and `widget/hub-art/bowling.js`
+    (the release note's "From phase 4, part D" has the box); both load on first use, so phase 5 part 2 counts them among
+    those. Budgets unchanged.
+  - Tests: the smoke test's bowling block on a new hub (desktop and phone), `a11y.js`'s clip card. BUG-110 and BUG-111.
+  **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)), then 6.
 
 ## Outcome
 
@@ -389,7 +411,7 @@ Each session's prompt is at the end of its own note; in order:
 1 and 2, [the shop](2026-11-06-redesign-timmy-shop.md) (the art, then the client) ·
 3, [Ask Timmy](2026-11-12-redesign-ask-timmy.md) (part 4, Timmy everywhere) ·
 4, [visiting](2026-11-12-redesign-visiting.md) ·
-5, [the bowling egg](2026-11-06-redesign-bowling-egg.md) ·
+5, [the bowling egg](done/2026-11-06-redesign-bowling-egg.md) ·
 6, [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) ·
 7, [Ask Timmy](2026-11-12-redesign-ask-timmy.md) (part 2, the chat) ·
 8, [the wiring](2026-11-12-redesign-game-layer-wiring.md) ·

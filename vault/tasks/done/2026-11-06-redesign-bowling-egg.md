@@ -1,13 +1,13 @@
 ---
 type: task
-status: open
+status: done
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
 waiting-on: 
-agent: 
-pr: 
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/349
 ---
 
 # The bowling egg: odd bowling-alley animations, Timmy style
@@ -19,10 +19,10 @@ after a strike or a spare, slightly Timmy themed, as an **Easter egg**. Ships wi
 
 ## Context
 
-- Easter eggs live in `widget/eggs.js`; the About page lists them inside spoilers ([about-page](../rules/about-page.md)).
-- Rules that matter most here: [podcast-reactions](../rules/podcast-reactions.md) (lore: nothing that contradicts
-  `tools/podcast/LORE.md` or `widget/pet.js`, never TIMMY in capitals), [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md)
-  (drawn in SVG, nothing generated). Dismissing things is a top-five interaction ([the audit](done/2026-11-05-redesign-audit-and-plan.md)),
+- Easter eggs live in `widget/eggs.js`; the About page lists them inside spoilers ([about-page](../../rules/about-page.md)).
+- Rules that matter most here: [podcast-reactions](../../rules/podcast-reactions.md) (lore: nothing that contradicts
+  `tools/podcast/LORE.md` or `widget/pet.js`, never TIMMY in capitals), [every-hub-gets-its-own-art](../../rules/every-hub-gets-its-own-art.md)
+  (drawn in SVG, nothing generated). Dismissing things is a top-five interaction ([the audit](2026-11-05-redesign-audit-and-plan.md)),
   so a clip is short, skips with a tap and never covers an unanswered question.
 
 ## The clips
@@ -51,15 +51,15 @@ Each has a still version for reduced motion: the last frame and the word ("Strik
   and the mock too, so more often than the real trigger): a run of 10 right came about 5,200 times, about 4.6 times a day for
   each person studying; a run of 50 about 110 times, for 43 people, about once in ten study days; a run of 150 only a couple
   of times. So the turkey is rare by design, and the bowling lane at Timmy's place still plays any clip.
-- **At Timmy's place**: the bowling lane yard item ([Timmy's place](2026-11-06-redesign-timmys-place.md)); tapping it plays a
+- **At Timmy's place**: the bowling lane yard item ([Timmy's place](../2026-11-06-redesign-timmys-place.md)); tapping it plays a
   random clip.
 - **First sighting** of each clip goes in the egg log; seeing all eight is a secret trophy (keep the About page's trophy count true).
   (2026-11-12: there is no egg log on the site; sightings and the trophy are kept on the device, see "Sam's calls
   (2026-11-12)".)
 - Off with the eggs toggle in Settings, like every egg. Tracked as `egg:bowling=<clip>` (`window.shTrack`), with its row in the
-  [event taxonomy](../reference/event-taxonomy.md).
+  [event taxonomy](../../reference/event-taxonomy.md).
 
-## Sam's calls (2026-11-12, [decisions](../decisions.md))
+## Sam's calls (2026-11-12, [decisions](../../decisions.md))
 
 - **The clips are not redrawn.** The eight were drawn and animated on 2026-11-06 in
   [#291](https://github.com/smcmurry6-source/study-hubs/pull/291) (never merged; its base branch is long gone):
@@ -72,7 +72,7 @@ Each has a still version for reduced motion: the last frame and the word ("Strik
   the database's `record_achievement` takes only the trophy kinds it lists, `bowling` isn't one, and neither pending
   migration changes that. So at the release the Bowling trophy shows in the case from this device's sightings, earns
   no gold crowns and has no "share of the class" line. The first migration after the release adds the kind (a box in
-  [the later journeys' rank sets](2026-11-12-redesign-later-journeys-rank-sets.md), which needs a migration anyway),
+  [the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md), which needs a migration anyway),
   and the client then records it for everyone who has it.
 - **Only on the redesign's pages** (the engine's answer path), so no live hub changes before the release.
 - **The lane** at Timmy's place plays a random clip; its small "Strike! Well, close." stays as what it does when the
@@ -80,9 +80,9 @@ Each has a still version for reduced motion: the last frame and the word ("Strik
 
 ## Build spec
 
-Session 5 of [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release", after the shop's
+Session 5 of [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release", after the shop's
 client. Read first: "For every session above" there, this note, the lore rules in
-[podcast-reactions](../rules/podcast-reactions.md), `widget/place.js`'s `playEgg`.
+[podcast-reactions](../../rules/podcast-reactions.md), `widget/place.js`'s `playEgg`.
 
 **Files to touch**:
 - `tools/figures/site/bowling.mjs`: taken whole from #291 (`git fetch origin claude/bowling-egg-r3inwl`, then
@@ -92,7 +92,7 @@ client. Read first: "For every session above" there, this note, the lore rules i
 - `tools/figures/site/build.mjs`: build the kit into `widget/hub-art/bowling.js` (`window.SH_BOWL`, about 56 KB) and
   into the design page's "The bowling egg" section; keep the build's check of every clip, still and playing.
 - `tools/figures/site/medals.mjs`: the Bowling trophy's drawing and its silhouette (key `bowling`), for the
-  [trophy case](2026-11-12-redesign-trophy-case-and-cards.md) session to list.
+  [trophy case](../2026-11-12-redesign-trophy-case-and-cards.md) session to list.
 - New: `widget/bowling.js` (`window.shBowl`: `play(clip, { host })`, `random()`, `seen()`), with its styles inside
   or beside it, fetched on first use. It fetches `widget/hub-art/bowling.js` itself.
 - `widget/hub-rewards.js`: the run counter, in the engine's one answer path (`recordAnswer`), so only the
@@ -121,7 +121,7 @@ is called, not changed), `widget/v3.js`, `widget/pet.js`, the migrations.
 - **Sightings**: `sh_bowl_seen`, the clips' keys seen on this device. With all eight, `sh_bowl_trophy` is set and
   Timmy says a line; the trophy's card and its place in the case are the trophy case session's. Nothing is sent to
   the server for a sighting or the trophy (see Sam's calls).
-- **Tracking**: `egg:bowling=<clip>` (`window.shTrack`), with its row in [event-taxonomy](../reference/event-taxonomy.md).
+- **Tracking**: `egg:bowling=<clip>` (`window.shTrack`), with its row in [event-taxonomy](../../reference/event-taxonomy.md).
 
 **The preview's made-up data**: nothing new on the server side, and no new query parameter. A test or a scripted
 browser sets `sh_bowl_run` to 49 in the device's storage, so one right answer shows a strike; the `high-xp` account
@@ -143,23 +143,25 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
 (the next session); sound; the live hubs.
 
 **Done when** (this replaces the list below where they differ):
-- [ ] The eight clips on `main` from #291's kit, in the design page, and Sam's yes to a recording of them (and to
+- [x] The eight clips on `main` from #291's kit, in the design page, and Sam's yes to a recording of them (and to
       the stills); #291 closed
-- [ ] The run, the three triggers and the lane work as above on the redesign's pages; the live hubs are unchanged
-- [ ] Sightings and the trophy are kept on the device; the Bowling trophy's drawing and silhouette are in `medals.mjs`
-- [ ] The tests above added and passing; `node tools/release/run.js` once; budgets unchanged
-- [ ] `tools/podcast/LORE.md`; the About draft in [the release note](2026-11-06-redesign-release.md) ("From phase 4,
+- [x] The run, the three triggers and the lane work as above on the redesign's pages; the live hubs are unchanged
+- [x] Sightings and the trophy are kept on the device; the Bowling trophy's drawing and silhouette are in `medals.mjs`
+- [x] The tests above added and passing; `node tools/release/run.js` once; budgets unchanged
+- [x] `tools/podcast/LORE.md`; the About draft in [the release note](../2026-11-06-redesign-release.md) ("From phase 4,
       part D", in a spoiler, with the trophy count); the event taxonomy row; the hand-off in phase 4's Log
 
 ## Done when
 
-- [ ] The eight clips drawn and animated, approved by Sam from a recording (and their still versions)
-- [ ] The triggers in `widget/eggs.js` and the bowling lane at Timmy's place, built in phase 4
+- [x] The eight clips drawn and animated, approved by Sam from a recording (and their still versions)
+- [x] The triggers ~~in `widget/eggs.js`~~ (in the engine's answer path instead, per the build spec) and the bowling
+      lane at Timmy's place, built in phase 4
       (the lane is at his place since part C, 2026-11-12: a wide yard piece with a small tap surprise of its own;
-      where a clip hooks in is in [phase 4's Log](2026-11-05-redesign-phase-4-game-layer.md))
-- [ ] `LORE.md` (the bowling alley, number thirty-one's fainting), the About page (in a spoiler), the event taxonomy
-- [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
-- [ ] Vault written back (`DEPLOY_NOTES.md`, this note's Outcome)
+      where a clip hooks in is in [phase 4's Log](../2026-11-05-redesign-phase-4-game-layer.md))
+- [x] `LORE.md` (the bowling alley, number thirty-one's fainting), the About page (in a spoiler: drafted in the release
+      note, written to `about/index.html` at the release), the event taxonomy
+- [x] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
+- [x] Vault written back (`DEPLOY_NOTES.md`, this note's Outcome)
 
 ## Log
 
@@ -169,11 +171,56 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
   carried over. The triggers go in the engine's answer path, not `widget/eggs.js`, so no live hub changes. The trophy
   can't be recorded on the server as written (`record_achievement` lists its kinds), so it is on the device until
   the first migration after the release.
+- 2026-11-13 (Claude Code): **built**, ahead of sessions 3 and 4 (it needs only session 2). The kit carried over from
+  #291 unchanged and built into `widget/hub-art/bowling.js` and the design page; a recording of the eight clips and their
+  stills sent to Sam. New `widget/bowling.js` (`window.shBowl`); the run in `widget/hub-rewards.js`'s `recordAnswer`;
+  the lane in `widget/place.js`'s `playEgg`; the Bowling trophy ("Lane Legend", the agent's name for it) drawn in
+  `medals.mjs` as `EGG_TROPHIES.bowling`. Calls the spec left open, made here:
+  - **The eggs off or Focus mode stop the run too**, not only the clip ("not at all"): nothing counts or resets until
+    they are back on.
+  - **The spare plays only from the lane**, as the spec's default said; the lane picks any of the eight, never the one
+    just shown.
+  - **A still (reduced motion) goes by itself after 4 seconds** like a playing clip (3 to 5 seconds), rather than staying
+    until tapped; hovering or focusing the card holds it, and Esc or its close button closes it.
+  - **On the bar the card waits for an open dialog**: it doesn't show while a modal is up (the place, the shop), and it
+    sits above the widget's floating pieces (Timmy, the Full Arch chart) and below the rank-up cards.
+  - Learn mode's questions count like the bank's (a question card outside the mock and the arcade); a Learn question
+    asked again the same day is a second try.
+- 2026-11-13: Sam, after the recording: "Looks good. Merge when ready" ([decisions](../../decisions.md)). Merged as [#349](https://github.com/smcmurry6-source/study-hubs/pull/349); #291
+  closed unmerged with a note pointing here.
 
 ## Outcome
 
-Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) ·
-[phase 4](2026-11-05-redesign-phase-4-game-layer.md)
+**Built and merged, not live until the redesign's release** (2026-11-13). What changed:
+
+- **The clips**: #291's kit (`tools/figures/site/bowling.mjs`) carried over as drawn (only its header's path to this note changed), built by `build.mjs` (which now
+  checks every clip: each class the CSS moves is in the drawing, 3 to 5.5 seconds with the word inside, the still has no
+  NaN) into `widget/hub-art/bowling.js` (`window.SH_BOWL`, 56 KB, 18 KB gzipped) and a "The bowling egg" section of the
+  design page (every clip playing and still, plus the trophy).
+- **The player**: `widget/bowling.js` (`window.shBowl`) draws a clip in a small card docked at the bottom of the screen
+  (inside the place's full view when the lane is tapped). It takes no focus, is named for screen readers, closes on a
+  tap, its close button or Esc, holds while hovered or focused, waits behind the rank-up cards and open dialogs, and
+  shows the still with "Strike!" under reduced motion. Neither file loads with a page: both are fetched at a strike or a
+  lane tap.
+- **The run**: `widget/hub-rewards.js` counts right first tries in a row on the device (`sh_bowl_run`, one try per
+  question a day in `sh_bowl_today`): a strike at 50 and 100, the turkey at 150 (the run starts again). The mock and the
+  arcade don't count, and with the eggs off or Focus mode on nothing counts or plays. The live hubs are unchanged.
+- **The lane**: `widget/place.js`'s lane egg plays any clip but the one just shown (its old line, "Strike! Well, close.",
+  stays for the eggs off).
+- **The trophy**: Lane Legend (secret) for seeing all eight, kept on the device (`sh_bowl_seen`, `sh_bowl_trophy`) with a
+  line from Timmy and an `sh:bowl-trophy` event; its drawing and silhouette are `EGG_TROPHIES.bowling` in `medals.mjs`.
+  The server can't record it yet (`record_achievement` lists its kinds): the trophy case session shows it from the
+  device, and the first migration after the release can take it.
+- **Tests**: the smoke test plays a strike, the turkey, the retry, the wrong answer, the eggs off, Focus mode, the mock,
+  reduced motion, the lane and a live hub; the accessibility suite checks the clip card. Two bugs found and fixed in
+  testing (BUG-110, BUG-111).
+
+Left, each written where it belongs: the About page entry and the service worker's precache at the release
+([the release note](../2026-11-06-redesign-release.md), "From phase 4, part D"); the trophy's row and pop-up card
+([the trophy case](../2026-11-12-redesign-trophy-case-and-cards.md)); the trophy on the server after the release.
+
+Related: [Timmy's place](../2026-11-06-redesign-timmys-place.md) · [Timmy's shop](../2026-11-06-redesign-timmy-shop.md) ·
+[phase 4](../2026-11-05-redesign-phase-4-game-layer.md)
 
 ## Opening prompt
 
