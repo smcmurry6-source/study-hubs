@@ -49,7 +49,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 | # | Session | Its spec | Needs first |
 |---|---|---|---|
 | 1 | **The shop's art**: the coin, snacks, boosts, rarity frames, the five undrawn outfits, the five rare costumes, and Timmy's door spot moved off the rank statue (BUG-089). **Done 2026-11-12** ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)), with the shop's look redrawn ("more epic") | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1" | [#335](https://github.com/smcmurry6-source/study-hubs/pull/335) merged |
-| 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes. **Built 2026-11-12**, waiting for Sam's "merge" (its hand-off in the Log) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
+| 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes. **Built 2026-11-12** in [#345](https://github.com/smcmurry6-source/study-hubs/pull/345), waiting for Sam's "merge" (its hand-off in the Log) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
 | 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
 | 4 | **Visiting**: a row on the new dashboard's boards opens that person's place | [visiting](2026-11-12-redesign-visiting.md) | 3 |
 | 5 | **The bowling egg** (part D) | [the bowling egg](2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
@@ -301,7 +301,7 @@ These hold for each spec; a spec only adds to them.
 - 2026-11-12: beside the sessions, Ask Timmy part 3 (the admin page's Ask Timmy tab, `review/`) merged as `e0737a1`
   ([#341](https://github.com/smcmurry6-source/study-hubs/pull/341), Sam: "merge"); `postcheck.js` passed. **Next: still
   session 2, the shop's client**, then session 3 (Ask Timmy part 4).
-- 2026-11-12 (Claude Code), **session 2, the shop's client; hand-off for session 3**. Nothing students see changes:
+- 2026-11-12 (Claude Code), **session 2, the shop's client; hand-off for session 3** ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345)). Nothing students see changes:
   the shop runs only on the redesign's pages, on the game layer; `migration_v54.sql` is unchanged and nothing in it
   disagreed with the client. Screenshots and a recording of one purchase were sent to Sam (no hosted preview).
   - **New `widget/shop.js` + `widget/shop.css`**, `window.shShop`: `setup({ sb, visitor, shop, profile, onBought })`,

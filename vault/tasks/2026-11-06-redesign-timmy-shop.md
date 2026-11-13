@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: 
 agent: 
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/345 (session 2)
 ---
 
 # Timmy's shop: Shiny Gold Crowns, a rotating shop, rarity, seasonal outfits and rare costumes
@@ -466,7 +466,7 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
 - 2026-11-12: Sam's yes for all of it: "Actually its good. Everything looks good. Merge when ready", "i like the
   redesign" ([decisions](../decisions.md)). No price to change. Session 1 is done; `main` (Ask Timmy's chat, #338)
   was brought in before the merge, and this branch's new bug became BUG-095. **Next: session 2, the client.**
-- 2026-11-12 (Claude Code), **session 2, the shop's client** (this PR): `widget/shop.js` + `widget/shop.css`
+- 2026-11-12 (Claude Code), **session 2, the shop's client** ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345)): `widget/shop.js` + `widget/shop.css`
   (`window.shShop`), built to the design page's shop; the hub engine's Shop row in More, the new dashboard's balance and
   Shop button, the place's "Get more in the shop"; snacks heal through `get_pet_days_v2` (`widget/pet.js`); boosts start
   the 2x chip; the rare costume of the day. `migration_v54.sql` unchanged, and nothing in it disagreed with the client.
