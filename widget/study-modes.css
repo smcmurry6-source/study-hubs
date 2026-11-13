@@ -300,7 +300,9 @@ html.shx .sm-focus .recap { border-radius: 22px; box-shadow: var(--float-shadow)
   html.shx .sm-topr { gap: 8px; }
   html.shx .sm-topr [data-goalm] { display: none; }
   html.shx .sm-ofw { display: none; }
-  html.shx .sm-body { padding: 12px 10px calc(96px + env(safe-area-inset-bottom, 0px)); }
+  /* Timmy and the Ask button are hidden during a session on a phone, so the page ends near the screen's edge and a
+     flashcard's ratings sit at the bottom of the screen, with nothing showing under them */
+  html.shx .sm-body { padding: 12px 10px calc(22px + env(safe-area-inset-bottom, 0px)); }
   html.shx .sm-focus .sm-stage > .qc { padding: 18px 16px; border-radius: 18px; }
   html.shx .sm-focus .qc-stem { font-size: 19px; }
   html.shx .sm-focus .fcard:not(.is-flipped) .qc-stem { font-size: 21px; }
