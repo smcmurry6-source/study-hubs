@@ -71,10 +71,10 @@ task is the one PR that then switches the site over. If something goes wrong, re
 - [ ] The game layer's wiring left by phase 4, part A (2026-11-12, "From phase 4, part A" below): the arcade's
       sessions and pick indexes and Timmy Time's minutes are [their own session](2026-11-12-redesign-game-layer-wiring.md)
       before this one (Sam, 2026-11-12); the journey trophies join the case in
-      [the trophy case's session](2026-11-12-redesign-trophy-case-and-cards.md); the scenes stay silent. Left for
+      [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md); the scenes stay silent. Left for
       this PR: each episode's length loaded (`admin_set_podcast_episode`) and the service worker's lists
 - [ ] **Full Arch comes out** (Sam, 2026-11-12: "I also want to remove the full arch challenge thing"; the redesign's
-      pages stop showing it in [the trophy case's session](2026-11-12-redesign-trophy-case-and-cards.md)). In this
+      pages stop showing it in [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md)). In this
       PR, from the shared files: its code in `widget/eggs.js` (and the top comment's lines about it), its styles in
       `widget/v3.css`, the `sh_pref_arch` switch in `widget/v3.js` (the old dashboard's goes with `index.html`),
       `sh:arch-done` in `widget/ranks.js`, Timmy's secret tip and his line about it in `widget/pet.js`; and on the
@@ -384,7 +384,7 @@ the first answer, or answers are recorded and pay nothing (`why: unknown`).
 - [x] **The journey trophies in the trophy case**: `journey-0` to `journey-2` are drawn (`SH_JOURNEY_ART.trophies`) and
       show on the road ahead and in the hand-off; the case in Stats (`widget/ranks.js`, `TROPHIES`) doesn't list them
       yet, so it still says 24. They join it when phase 4 redraws the case, with `get_trophy_stats_v2` for their
-      shares: 27 trophies then. Done 2026-11-13 by [the trophy case's session](2026-11-12-redesign-trophy-case-and-cards.md):
+      shares: 27 trophies then. Done 2026-11-13 by [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md):
       on the redesign's pages the case lists them as "The journeys" (27 trophies, their shares from
       `get_trophy_stats_v2`); a live page still says 24.
 - [ ] **Sound** for the hand-off and the unlock, only if the redesign gets a sound setting (it has none; the scenes
@@ -600,7 +600,7 @@ game layer no row is a button.
   and there's no list of who visited. Everyone on a board can be visited (there's no switch to turn it off).
 - "What the hubs record" gets: a visit is counted (that one happened, never whose place).
 
-### From phase 4, session 6 (the trophy case and the cards, [its note](2026-11-12-redesign-trophy-case-and-cards.md), built 2026-11-13)
+### From phase 4, session 6 (the trophy case and the cards, [its note](done/2026-11-12-redesign-trophy-case-and-cards.md), built 2026-11-13)
 
 What the session built is in its note (its Outcome) and phase 4's Log. It runs only on the redesign's pages (`html.shx`;
 Full Arch's gate also on `data-game="v2"`), so it goes live with them; a live page keeps 24 trophies, Full Arch, the

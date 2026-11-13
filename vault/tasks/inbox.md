@@ -20,7 +20,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **A live bug, Sam's call** (BUG-116 in [the bug log](../release/bug-log.md), 2026-11-13): on the live hubs and dashboard, after a
   level-up card no later card plays until the page reloads (a rank-up, a trophy, a medal, a mock result; the trophy itself is still
   recorded). In `levelNow`'s `close()` in `widget/rankup.js`, a local `var done` hides the queue's `done`. The redesign's pages have the
-  fix ([the trophy case](2026-11-12-redesign-trophy-case-and-cards.md)); the live fix is to call the queue's `done` there too (the `NEW`
+  fix ([the trophy case](done/2026-11-12-redesign-trophy-case-and-cards.md)); the live fix is to call the queue's `done` there too (the `NEW`
   branch's code for every page). Left out of that PR because Sam asked for the live pages to behave exactly as today. A tier 1 fix.
 
 - [ ] The live About page says the trophy case has "24 trophies ... 14 of them secret", but today's list has 16 secret (Timmy's two

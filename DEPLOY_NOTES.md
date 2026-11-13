@@ -45,7 +45,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   for their styles and drawings (2.5 s at most). **Full Arch retired** on the redesign (`ARCH_OFF` in `widget/eggs.js`,
   out of the Extras and both trophy lists). Found: BUG-116, a level-up card stops later cards (live too; fixed on the
   redesign only, the live fix is in the inbox for Sam). Tests: the smoke test's trophy-case block, `a11y.js`'s case and
-  card. [#356](https://github.com/smcmurry6-source/study-hubs/pull/356), [the task](vault/tasks/2026-11-12-redesign-trophy-case-and-cards.md).
+  card. [#356](https://github.com/smcmurry6-source/study-hubs/pull/356), [the task](vault/tasks/done/2026-11-12-redesign-trophy-case-and-cards.md).
 - **2026-11-13 (visiting's tour, Claude Code)** — Nothing students see changes (the new dashboard, on the game layer).
   Sam: "build the random visit and next/back", the rest of round 3's visiting. **Visit someone random** under the board
   picks one of its rows (never your own); in a visit, round arrows go to the previous and next person on that board and

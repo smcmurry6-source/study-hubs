@@ -1,11 +1,11 @@
 ---
 type: task
-status: review
+status: done
 hub: widget
 created: 2026-11-12
 requested-by: Sam
 due: before the redesign's release
-waiting-on: Sam's yes to the recording, then "merge"
+waiting-on: 
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/356
 ---
@@ -14,7 +14,7 @@ pr: https://github.com/smcmurry6-source/study-hubs/pull/356
 
 ## Goal
 
-[Phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s original goal, never built: the redesign's pages still open
+[Phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s original goal, never built: the redesign's pages still open
 today's trophy panel (an emoji grid with ??? for secrets) and show today's rank-up, level, trophy and mock cards.
 The trophies and their silhouettes were drawn in phase 0. This puts the trophy case and the cards on the design
 system, on the redesign's pages only: drawn trophies in place of emoji and ???, a secret trophy as its silhouette
@@ -23,13 +23,13 @@ the site's type with their motion kept.
 
 ## Context
 
-- Session 6 of phase 4's "From here to the release", after [the bowling egg](done/2026-11-06-redesign-bowling-egg.md), so
+- Session 6 of phase 4's "From here to the release", after [the bowling egg](2026-11-06-redesign-bowling-egg.md), so
   the case lists the three journey trophies and the Bowling trophy once. "For every session above" there holds here.
-- Sam, 2026-11-12 ([decisions](../decisions.md)): build it before the release. And the same day: "I also want to
+- Sam, 2026-11-12 ([decisions](../../decisions.md)): build it before the release. And the same day: "I also want to
   remove the full arch challenge thing" ("Full Arch is retired", below). Earlier calls that stand: the eggs'
   pop-ups stay as they are; "the mastery medals that pop up on the screen and the ones that are visible in timmys
   board need to be the same" (2026-11-10); the scenes are silent (no sound setting in the redesign).
-- The plan: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md), section 4; the taste skill in full
+- The plan: [the audit and plan](2026-11-05-redesign-audit-and-plan.md), section 4; the taste skill in full
   (`.claude/skills/taste-skill/`, Sam, 2026-11-04); the design page, `tools/preview/design/`.
 - Where things are today:
   - The case's list: `TROPHIES` in `widget/ranks.js` (24 rows: `k`, `n`, `d`, `ic` an icon path, `secret`, `clue`
@@ -76,7 +76,7 @@ one change there); `widget/v3.js`'s Stats panel (the live hubs use it); the jour
   `journey-2` (Handpiece, ModuPro and Loupes finished) and Bowling (secret). An earned trophy: its drawing, name, what it was for, and the share of the
   class that has it. Not earned: the drawing dimmed, with what earns it. A secret one not earned: its silhouette and
   its riddle (`clue`), never its name. Bowling is earned on the device (`sh_bowl_trophy`,
-  [the bowling egg](done/2026-11-06-redesign-bowling-egg.md)) and shows no share until the server knows the kind.
+  [the bowling egg](2026-11-06-redesign-bowling-egg.md)) and shows no share until the server knows the kind.
   **What the bowling egg left for it** (2026-11-13): the drawing and its silhouette are `EGG_TROPHIES.bowling` in
   `tools/figures/site/medals.mjs` (`{ body, sil }`, 64 box; built into the design page's `art.js` as `eggTrophies`, in
   no widget file yet: put it with the case's own art); its words are `shBowl.TROPHY` in `widget/bowling.js`
@@ -101,7 +101,7 @@ one change there); `widget/v3.js`'s Stats panel (the live hubs use it); the jour
   it isn't one of the 27. **Someone who already earned it keeps it**, shown after the others as "Full Arch
   (retired)" with its drawing (the agent's default, told to Sam; Sam, asked again with #337: "Sounds good". The other way was that it vanishes
   for everyone). Nothing on the server changes: the kind stays in `record_achievement`'s list and nothing calls it.
-- What is left for the release itself is a box in [the release note](2026-11-06-redesign-release.md): the code out
+- What is left for the release itself is a box in [the release note](../2026-11-06-redesign-release.md): the code out
   of the shared files, the About page's entries, Timmy's tip and line about it.
 
 **The preview's made-up data**: `high-xp` has earned Full Arch in one hub (so the retired trophy can be seen),
@@ -122,14 +122,14 @@ card first shows, never with a page. Report `hub-art/trophies.js`'s size.
   secret, never by name) and one card, added to the baseline with no issues.
 
 **Out of scope**: new trophies beyond the four; the leaderboards' look; sound; the old pages; the About page (draft
-in [the release note](2026-11-06-redesign-release.md): its "From phase 4, part A" draft said 27 trophies and 14 secret; the count is
+in [the release note](../2026-11-06-redesign-release.md): its "From phase 4, part A" draft said 27 trophies and 14 secret; the count is
 27 and 16: Bowling joins and Full Arch leaves; the draft's wording changes to say so).
 
 ## Done when
 
-- [ ] Sam's yes to the contact sheet, then to a recording of each card and the cutscene from a scripted browser on
+- [x] Sam's yes to the contact sheet, then to a recording of each card and the cutscene from a scripted browser on
       made-up data, reduced motion too (the sheet: "sounds good" to round 2, 2026-11-13; the recording sent
-      2026-11-13: laptop, laptop with reduced motion, phone; Sam's answer still to come)
+      2026-11-13: laptop, laptop with reduced motion, phone; Sam, after it: "merge when ready")
 - [x] The case on the design system in a new hub's More and on the new dashboard, with 27 trophies, 16 secret
 - [x] Full Arch retired on the redesign's pages: no chart, no switch, no locked trophy; an earned one kept as retired
 - [x] The cards on the site's type on the redesign's pages; a live page's case and cards unchanged
@@ -148,11 +148,11 @@ in [the release note](2026-11-06-redesign-release.md): its "From phase 4, part A
 - 2026-11-13 (Claude Code, session 6): the contact sheet, round 1 (light and dark, phone and laptop, from the real
   drawings and today's card code). Sam: "It needs to be more epic". Round 2: the rank in a burst of rays, a showcase
   stand, a wooden cabinet with a plaque and three velvet shelves, the cards framed in metal. Sam: "sounds good" (the yes,
-  with the calls listed in [decisions](../decisions.md): 16 secret, Timmy's place pieces in the rank-up, a "what's
+  with the calls listed in [decisions](../../decisions.md): 16 secret, Timmy's place pieces in the rank-up, a "what's
   next" line, the share on an unfound secret, the mastery card's own medal). Built. Then Sam, seeing the page: "the
   whole stats and trophies page could use a face lift. make it more epic" and "the trophy case you did earlier is good,
   but the rest of the page doesnt match the epicness": the rest of More, Stats and trophies redrawn to match (below).
-  Bugs found on the way: BUG-116 to BUG-121. The recording of the cards went to Sam (laptop, reduced motion, phone).
+  Bugs found on the way: BUG-116 to BUG-121. The recording of the cards went to Sam (laptop, reduced motion, phone); Sam: "merge when ready".
 
 ## Outcome
 
@@ -202,16 +202,16 @@ compares the live cards' markup with `main`'s). Neither pending migration was ap
   `a11y.js`'s "trophy case" and "trophy card" screens (in the baseline at zero, with the bowling clip's screen that
   wasn't); the keyboard check now tells stops apart by their spoken names too. `node tools/release/run.js` once.
 
-**For the release** ([its note](2026-11-06-redesign-release.md)): `sw.js`'s `PRECACHE` gains the three files (with the
+**For the release** ([its note](../2026-11-06-redesign-release.md)): `sw.js`'s `PRECACHE` gains the three files (with the
 engine's, in session 8 or 9); the About drafts are written there ("From phase 4, session 6"); the live About page's
-"14 of them secret" is already wrong today (there are 16), a line in [the inbox](inbox.md). BUG-116's live fix (one line in
+"14 of them secret" is already wrong today (there are 16), a line in [the inbox](../inbox.md). BUG-116's live fix (one line in
 `widget/rankup.js`) waits for Sam's call, also in the inbox. The per-hub trophies (8 a hub) aren't in the new case (the
 task didn't ask for them): they stay in today's panel behind Leaderboards, and a shelf for them is Sam's call (a box in
 the release note's "From phase 4, session 6").
 
-Related: [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·
-[the bowling egg](done/2026-11-06-redesign-bowling-egg.md) · [the release](2026-11-06-redesign-release.md) ·
-[about-page](../rules/about-page.md)
+Related: [phase 4](../2026-11-05-redesign-phase-4-game-layer.md) · [the journeys](../2026-11-06-redesign-progression-journeys.md) ·
+[the bowling egg](2026-11-06-redesign-bowling-egg.md) · [the release](../2026-11-06-redesign-release.md) ·
+[about-page](../../rules/about-page.md)
 
 ## Opening prompt
 

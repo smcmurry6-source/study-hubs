@@ -53,7 +53,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 | 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage. **Done 2026-11-13** ([#348](https://github.com/smcmurry6-source/study-hubs/pull/348), merged as `c5ce92e`; its hand-off in the Log) | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
 | 4 | **Visiting**: a row on the new dashboard's boards opens that person's place. **Done 2026-11-13** ([#352](https://github.com/smcmurry6-source/study-hubs/pull/352); its hand-off in the Log), in the leaderboard's theater look (Sam: "this window should be more epic"), getting there through the round-3 clouds | [visiting](done/2026-11-12-redesign-visiting.md) | 3 |
 | 5 | **The bowling egg** (part D). **Done 2026-11-13** (merged on Sam's "merge"; the hand-off in the Log) | [the bowling egg](done/2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
-| 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12). **Built 2026-11-13** ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356)), waiting on Sam's yes to the recording and "merge" (its hand-off in the Log), with the rest of More, Stats and trophies redrawn to match (Sam: "make it more epic") | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
+| 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12). **Done 2026-11-13** ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356), merged on Sam's "merge when ready") (its hand-off in the Log), with the rest of More, Stats and trophies redrawn to match (Sam: "make it more epic") | [the trophy case and the cards](done/2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
 | 7 | **Ask Timmy, part 2** (the chat). **Built 2026-11-12, ahead of its turn** (Sam asked for it then): the Ask icon shows whenever Timmy isn't on the page, so it works before and after session 3 | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), its Log | (3) |
 | 8 | **The game layer's wiring** left by part A: the arcade's sessions, Timmy Time's minutes, the service worker's lists | [the wiring](2026-11-12-redesign-game-layer-wiring.md) | 6 |
 | 9 | **Phase 5, part 2**: bundles, one stylesheet, the font, budgets lowered | [phase 5](2026-11-05-redesign-phase-5-backend.md) | every session that adds a file (1 to 8) |
@@ -125,10 +125,10 @@ These hold for each spec; a spec only adds to them.
 - [x] First, before parts A-D grow it: `widget/hub.js` split into its core and the parts each session changes (the
   bank and study toggle, rewards and cards, Timmy and his place), loaded as now, with no behavior change and the
   smoke, a11y and perf suites passing ([run-a-redesign-session](../how-to/run-a-redesign-session.md), step 4) ([#330](https://github.com/smcmurry6-source/study-hubs/pull/330), 2026-11-12)
-- [ ] The trophy case and the cards on the design system ([its note](2026-11-12-redesign-trophy-case-and-cards.md)),
+- [ ] The trophy case and the cards on the design system ([its note](done/2026-11-12-redesign-trophy-case-and-cards.md)),
       reviewed by Sam in a recording from a scripted browser on made-up data, reduced motion too, and once more on the
-      release's own preview (Sam, 2026-11-12: no hosted preview before that one). Built 2026-11-13 and the recording
-      sent; the look on the release's preview is a box in [the release note](2026-11-06-redesign-release.md)
+      release's own preview (Sam, 2026-11-12: no hosted preview before that one). Built 2026-11-13 ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356); Sam: "merge when ready" after the recording);
+      the look on the release's preview is a box in [the release note](2026-11-06-redesign-release.md)
 - [ ] Part A, B, C and D done as their notes say (each note's "Done when"), and part E's "everyone has Timmy"
 - [x] Visiting from the new dashboard's boards ([its note](done/2026-11-12-redesign-visiting.md); Sam, 2026-11-12: in the release). Built 2026-11-13 ([#352](https://github.com/smcmurry6-source/study-hubs/pull/352))
 - [x] The arcade lobby of each live hub redrawn; game mechanics unchanged (done outside this phase: Occlusion's in
@@ -264,7 +264,7 @@ These hold for each spec; a spec only adds to them.
 - 2026-11-12 (Claude Code, **planning only, no code**): what is left of this phase turned into build specs. Sam
   answered one list of 23 calls ([decisions](../decisions.md)); the order, what holds for every session and the link to
   each spec are in "From here to the release" above. Found while reading: this note's original goal (the trophy case
-  and the cards) was never built, so it has [its own note](2026-11-12-redesign-trophy-case-and-cards.md) now; visiting
+  and the cards) was never built, so it has [its own note](done/2026-11-12-redesign-trophy-case-and-cards.md) now; visiting
   had no session ([its note](done/2026-11-12-redesign-visiting.md)); the bowling egg's eight clips were already drawn on
   [#291](https://github.com/smcmurry6-source/study-hubs/pull/291) and are carried over, not redrawn; and the server
   refuses a new trophy kind as written, so the bowling trophy is kept on the device until the first migration after
@@ -396,7 +396,7 @@ These hold for each spec; a spec only adds to them.
     `sh_bowl_today`); it fetches `bowling.js` at a strike. **`widget/place.js`**: the lane plays a clip in the full view
     (`playLane`), its own surprise with the eggs off; `shut()` closes a clip.
   - **For session 6, the trophy case**: the Bowling trophy is `EGG_TROPHIES.bowling` in `medals.mjs` and
-    `shBowl.TROPHY`'s words; what to take from where is in [its note](2026-11-12-redesign-trophy-case-and-cards.md)
+    `shBowl.TROPHY`'s words; what to take from where is in [its note](done/2026-11-12-redesign-trophy-case-and-cards.md)
     ("What the bowling egg left for it").
   - **For session 8 and session 9**: `sw.js`'s `PRECACHE` gains `widget/bowling.js` and `widget/hub-art/bowling.js`
     (the release note's "From phase 4, part D" has the box); both load on first use, so phase 5 part 2 counts them among
@@ -430,13 +430,13 @@ These hold for each spec; a spec only adds to them.
     own place; your own row stays on the rank board below the top ten.
   - Tests: the smoke test's "visiting" block (desktop and phone), `a11y.js`'s boards and visited place (light and dark,
     in the baseline at zero). Bugs: BUG-112 (`widget/ranks.js`'s "+1" medal button, at the release) to BUG-115.
-  **Next: session 6, the trophy case and the cards** ([its note](2026-11-12-redesign-trophy-case-and-cards.md)).
+  **Next: session 6, the trophy case and the cards** ([its note](done/2026-11-12-redesign-trophy-case-and-cards.md)).
 - 2026-11-13: [#352](https://github.com/smcmurry6-source/study-hubs/pull/352) merged as `86b81a3` (Sam: "merge when ready").
   Then Sam: "build the random visit and next/back": the tour, in [#354](https://github.com/smcmurry6-source/study-hubs/pull/354)
   ([visiting](done/2026-11-12-redesign-visiting.md)'s Outcome): Visit someone random under the board, arrows and Back to
   mine in a visit, each hop through the clouds. Nothing on the server; `widget/place.js`'s `open()` takes `nav` and
   `covered` (above). **Next: session 6** still.
-- 2026-11-13 (Claude Code), **session 6, the trophy case and the cards; hand-off for session 7 on** ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356); [its note](2026-11-12-redesign-trophy-case-and-cards.md),
+- 2026-11-13 (Claude Code), **session 6, the trophy case and the cards; hand-off for session 7 on** ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356); [its note](done/2026-11-12-redesign-trophy-case-and-cards.md),
   its Outcome). Nothing students see changes: the live hubs and dashboard keep 24 trophies, Full Arch, the old Stats
   panel and today's cards (the smoke test compares the live cards' markup with `main`'s). Neither pending migration
   was applied or changed. Sam saw two contact sheets ("It needs to be more epic", then "sounds good") and asked for the
@@ -477,7 +477,7 @@ Each session's prompt is at the end of its own note; in order:
 3, [Ask Timmy](2026-11-12-redesign-ask-timmy.md) (part 4, Timmy everywhere) ·
 4, [visiting](done/2026-11-12-redesign-visiting.md) ·
 5, [the bowling egg](done/2026-11-06-redesign-bowling-egg.md) ·
-6, [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) ·
+6, [the trophy case and the cards](done/2026-11-12-redesign-trophy-case-and-cards.md) ·
 7, [Ask Timmy](2026-11-12-redesign-ask-timmy.md) (part 2, the chat) ·
 8, [the wiring](2026-11-12-redesign-game-layer-wiring.md) ·
 9, [phase 5](2026-11-05-redesign-phase-5-backend.md) (part 2) ·

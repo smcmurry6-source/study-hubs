@@ -92,7 +92,7 @@ client. Read first: "For every session above" there, this note, the lore rules i
 - `tools/figures/site/build.mjs`: build the kit into `widget/hub-art/bowling.js` (`window.SH_BOWL`, about 56 KB) and
   into the design page's "The bowling egg" section; keep the build's check of every clip, still and playing.
 - `tools/figures/site/medals.mjs`: the Bowling trophy's drawing and its silhouette (key `bowling`), for the
-  [trophy case](../2026-11-12-redesign-trophy-case-and-cards.md) session to list.
+  [trophy case](2026-11-12-redesign-trophy-case-and-cards.md) session to list.
 - New: `widget/bowling.js` (`window.shBowl`: `play(clip, { host })`, `random()`, `seen()`), with its styles inside
   or beside it, fetched on first use. It fetches `widget/hub-art/bowling.js` itself.
 - `widget/hub-rewards.js`: the run counter, in the engine's one answer path (`recordAnswer`), so only the
@@ -217,7 +217,7 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
 
 Left, each written where it belongs: the About page entry and the service worker's precache at the release
 ([the release note](../2026-11-06-redesign-release.md), "From phase 4, part D"); the trophy's row and pop-up card
-([the trophy case](../2026-11-12-redesign-trophy-case-and-cards.md)); the trophy on the server after the release.
+([the trophy case](2026-11-12-redesign-trophy-case-and-cards.md)); the trophy on the server after the release.
 
 Related: [Timmy's place](../2026-11-06-redesign-timmys-place.md) · [Timmy's shop](../2026-11-06-redesign-timmy-shop.md) ·
 [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)

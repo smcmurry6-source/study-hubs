@@ -81,7 +81,7 @@ while playing. The page-load request counts don't change.
 - The admin page in a preview (`node tools/release/run.js` runs it): Fixed and No change needed each make their call.
 
 **Out of scope**: sound for the scenes (the redesign has no sound setting: Sam hasn't asked for one); the journey
-trophies in the case ([the trophy case](2026-11-12-redesign-trophy-case-and-cards.md)); `sw.js`; applying anything.
+trophies in the case ([the trophy case](done/2026-11-12-redesign-trophy-case-and-cards.md)); `sw.js`; applying anything.
 
 ## Done when
 

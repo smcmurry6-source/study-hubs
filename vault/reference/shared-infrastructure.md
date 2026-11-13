@@ -31,7 +31,7 @@ tags: [widget, supabase]
   (Full Arch retired, the journeys and Bowling in), the cards' new look, and `shRanks.trophyCase()`, which fetches
   `widget/trophies.js` + `.css` and `widget/hub-art/trophies.js` on first use. On a live page the list, the cards and
   Full Arch are as before (the smoke test compares the cards' markup).
-  ([the task](../tasks/2026-11-12-redesign-trophy-case-and-cards.md))
+  ([the task](../tasks/done/2026-11-12-redesign-trophy-case-and-cards.md))
 - **`widget/cases.js` + `widget/cases.css`** (`window.shCases`): the dental case kit. A Patient Box question in any
   hub names a case (`pcase`) in that hub's `PCASES`, and the kit draws its periodontal chart, periapical radiograph
   and buccal view from the case's numbers, works out the diagnosis from them and validates that every number is
