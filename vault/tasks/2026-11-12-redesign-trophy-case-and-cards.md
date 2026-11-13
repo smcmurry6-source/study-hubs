@@ -7,7 +7,7 @@ requested-by: Sam
 due: before the redesign's release
 waiting-on: Sam's yes to the recording, then "merge"
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/356
 ---
 
 # The trophy case and the celebration cards, on the design system
@@ -156,7 +156,7 @@ in [the release note](2026-11-06-redesign-release.md): its "From phase 4, part A
 
 ## Outcome
 
-Built 2026-11-13 by session 6 (PR in `pr:` above), on the redesign's pages only. Nothing students see changes: the
+Built 2026-11-13 by session 6 ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356)), on the redesign's pages only. Nothing students see changes: the
 live hubs and the live dashboard keep their 24 trophies, Full Arch, the old Stats panel and today's cards (the smoke test
 compares the live cards' markup with `main`'s). Neither pending migration was applied or changed.
 
