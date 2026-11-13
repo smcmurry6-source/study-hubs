@@ -160,7 +160,13 @@ changes shared code (the dashboard, About, the admin page, `widget/`, assets, th
 preview runtime, the suites or its own workflow) or has the **`full-tests` label**, and then skips the suites Check hubs
 already ran on that commit; question and notes changes skip it. **A tier 2 or 3 change that stays inside hubs** (a new
 hub, lectures added to one, a new mode or game in a hub) gets the `full-tests` label. Run by hand (Actions, Release
-tests, Run workflow), it runs every suite. Regression coverage is the smoke test (every hub a change can reach, every mode, two sizes; `--all` or `SMOKE_ALL=1` for every hub),
+tests, Run workflow), it runs every suite. **Since 2026-11-13 both run in parallel jobs** (Sam: "do 1 and 2 in their own
+PR"): Check hubs as the fast checks with the database suites, the smoke test's desktop half and its phone half
+(`SMOKE_PART`); Release tests as one job per suite and one per browser for the device matrix. Each workflow's result is
+its last job (`check`, `release`), which passes only when every part did. On a PR, both keep an earlier green result
+when only notes (`.md` files, `.obsidian/`) changed since the run that tested the code, as when a merge of `main`
+brought only notes: the long jobs are skipped and the run's summary names the run it kept (`tools/ci/reuse.js`; the
+fast checks always run). An old run steps aside when a newer push has come in. Regression coverage is the smoke test (every hub a change can reach, every mode, two sizes; `--all` or `SMOKE_ALL=1` for every hub),
 the question lint, the baselines (accessibility, performance) and the preview's write-path checks; a bug that slipped
 through gets a check added in the PR that fixes it, where a script can see it.
 
