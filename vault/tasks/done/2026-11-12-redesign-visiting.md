@@ -98,7 +98,7 @@ do at a place besides look and tap; a list of who visited; an opt-out (Sam: none
   `widget/ranks.js`'s and waits for the release.
 - 2026-11-13: [#352](https://github.com/smcmurry6-source/study-hubs/pull/352) merged as `86b81a3` (Sam: "merge when ready",
   "no preview needed"). Then Sam: "build the random visit and next/back", the rest of round 3's visiting: built in
-  [#PR_TOUR](https://github.com/smcmurry6-source/study-hubs/pull/PR_TOUR) (the tour, in the Outcome).
+  [#354](https://github.com/smcmurry6-source/study-hubs/pull/354) (the tour, in the Outcome).
 
 ## Outcome
 

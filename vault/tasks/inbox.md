@@ -15,7 +15,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   row opens that person's place. Both would reuse `widget/place.js`'s `tripIn`/`tripOut` (the round-3 clouds) and the board's visit keys;
   `migration_v54.sql` has no random-visit call (a key comes only on a board row), so "random" would pick among the boards' rows,
   or need a new function after the release: Sam's call. Sam, 2026-11-13: "build the random visit and next/back": built, picking among
-  the board's own rows, nothing on the server ([#PR_TOUR](https://github.com/smcmurry6-source/study-hubs/pull/PR_TOUR)).
+  the board's own rows, nothing on the server ([#354](https://github.com/smcmurry6-source/study-hubs/pull/354)).
 
 - [ ] Learn's answers are filed as context `other` because `migration_v54.sql`'s `record_answer_v2` doesn't list `learn` (v54 isn't
   changed without Sam's word). In the first migration after the release, add `learn` to its context list (the `case` in `sh_answer`),

@@ -431,7 +431,7 @@ These hold for each spec; a spec only adds to them.
     in the baseline at zero). Bugs: BUG-112 (`widget/ranks.js`'s "+1" medal button, at the release) to BUG-115.
   **Next: session 6, the trophy case and the cards** ([its note](2026-11-12-redesign-trophy-case-and-cards.md)).
 - 2026-11-13: [#352](https://github.com/smcmurry6-source/study-hubs/pull/352) merged as `86b81a3` (Sam: "merge when ready").
-  Then Sam: "build the random visit and next/back": the tour, in [#PR_TOUR](https://github.com/smcmurry6-source/study-hubs/pull/PR_TOUR)
+  Then Sam: "build the random visit and next/back": the tour, in [#354](https://github.com/smcmurry6-source/study-hubs/pull/354)
   ([visiting](done/2026-11-12-redesign-visiting.md)'s Outcome): Visit someone random under the board, arrows and Back to
   mine in a visit, each hop through the clouds. Nothing on the server; `widget/place.js`'s `open()` takes `nav` and
   `covered` (above). **Next: session 6** still.
