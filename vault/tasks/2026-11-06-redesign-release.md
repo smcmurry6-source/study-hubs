@@ -24,6 +24,7 @@ task is the one PR that then switches the site over. If something goes wrong, re
   (Context). The other phases: [2](2026-11-05-redesign-phase-2-live-hubs.md), [3](2026-11-05-redesign-phase-3-dashboard.md),
   [4](2026-11-05-redesign-phase-4-game-layer.md); [5](2026-11-05-redesign-phase-5-backend.md) ships as it's ready.
 - The plan: [the redesign audit and plan](done/2026-11-05-redesign-audit-and-plan.md), section 4.
+- **Which model:** this session runs on Fable 5.2 at High effort (Sam, 2026-11-12, [decisions](../decisions.md)).
 - Rules that matter most here: [preview-and-release-test](../rules/preview-and-release-test.md) (tier 3: the release
   suites, UAT, Sam's "merge"), [about-page](../rules/about-page.md),
   [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md), [question-ids-are-permanent](../rules/question-ids-are-permanent.md),
