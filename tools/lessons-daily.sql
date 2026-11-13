@@ -46,3 +46,21 @@ select hub, count(*) mocks, count(distinct visitor_id) people, round(avg(100.0 *
 from mock_scores where created_at >= :since::date group by 1;
 select hub, sum(n) * 25 / 60 drill_mins, count(distinct visitor_id) people from activity_hourly
 where h >= :since::date and section like 'drill/%' group by 1;
+
+-- 6. Did the last refresh's fixes work? Compare them with items that were as low and weren't fixed (2026-11-12: low items
+--    rise on their own, so a before/after alone says little). Replace :hub, :fixed_at (when the fixes went live, e.g.
+--    '2026-11-11 19:20-06') and the fixed ids. `try` counts a person's whole history (widget/qhealth.js), so a first try
+--    comes before they see an explanation: an explanation fix can only show in retries, mostly the 12+ hour ones.
+with b as (select qid, count(*) n, count(*) filter (where correct) ok from question_events
+           where hub = :hub and kind = 'answer' and try = 1 and at < :fixed_at::timestamptz group by 1),
+     s as (select qid, count(*) n, count(*) filter (where correct) ok from question_events
+           where hub = :hub and kind = 'answer' and try = 1 and at >= :fixed_at::timestamptz group by 1)
+select case when b.qid in ('<fixed id>', '<fixed id>') then 'fixed' else 'not fixed' end grp, count(*) items,
+  round(100.0 * sum(b.ok) / sum(b.n)) before_pct, sum(s.n) since_n, round(100.0 * sum(s.ok) / nullif(sum(s.n), 0)) since_pct
+from b join s using (qid) where b.n >= 8 and b.ok::float / b.n < 0.40 and s.n >= 5 group by 1;
+-- retries after a miss, by the gap, for the fixed ids (compare with the whole hub: same-session retries are ~92% right anyway)
+select (at >= :fixed_at::timestamptz) since,
+  case when gap_min < 30 then 'under 30 min' when gap_min < 720 then '30 min-12 h' else '12 h+' end gap, count(*) n,
+  round(100.0 * avg(correct::int)) pct
+from question_events where hub = :hub and kind = 'answer' and try > 1 and prev = false and qid in ('<fixed id>', '<fixed id>')
+group by 1, 2 order by 1, 2;
