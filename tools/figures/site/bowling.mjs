@@ -1,5 +1,5 @@
 /* The bowling egg: eight short clips like the odd cartoons a bowling alley's screens play after a strike or a spare,
-   Timmy style (redesign phase 4, part D; vault/tasks/2026-11-06-redesign-bowling-egg.md). The pins are the Plaque crew
+   Timmy style (redesign phase 4, part D; vault/tasks/done/2026-11-06-redesign-bowling-egg.md). The pins are the Plaque crew
    from the boss egg (widget/eggs.js: their colors and faces), never teeth; the ball is a giant sugar-free mint.
 
    Drawn in Timmy's ink (style.mjs): flat fills, one shade on the side away from the light, ink outlines. No ids,

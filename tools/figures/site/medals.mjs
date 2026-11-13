@@ -596,7 +596,7 @@ Object.keys(J).forEach((k) => { const parts = J[k](); JOURNEY_TROPHIES[k] = { bo
 
 
 /* ---------------- the egg trophies (redesign phase 4, part D): secret trophies kept on the device, not in widget/ranks.js's
-   live list (the server's record_achievement doesn't take them yet: vault/tasks/2026-11-06-redesign-bowling-egg.md), so
+   live list (the server's record_achievement doesn't take them yet: vault/tasks/done/2026-11-06-redesign-bowling-egg.md), so
    they have their own export for the trophy case to list. Its name and clue are widget/bowling.js's (shBowl.TROPHY). ----- */
 const E = {};
 /* Bowling: seen all eight bowling clips. A gold pin on a plinth, the sugar-free mint resting against it, a sparkle */

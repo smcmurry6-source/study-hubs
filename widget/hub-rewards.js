@@ -98,7 +98,7 @@
     RANK.local += xp + (first ? 20 : 0);
     return { xp: xp, met: met, dayBonus: first, mult: mult };
   }
-  /* ---------- the bowling egg (phase 4, part D; vault/tasks/2026-11-06-redesign-bowling-egg.md) ----------
+  /* ---------- the bowling egg (phase 4, part D; vault/tasks/done/2026-11-06-redesign-bowling-egg.md) ----------
      A run of first-try right answers, kept on the device across hubs and reloads (sh_bowl_run). An answer counts when it
      is the first to that question on this device today (sh_bowl_today), on a card outside the mock and the arcade: right
      adds one, wrong puts the run at 0, a second try does neither. At 50 and at 100 a strike clip, one of the six; at 150

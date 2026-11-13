@@ -1742,7 +1742,7 @@
       '<div class="panel s12"><h3>The cast</h3><p>The pins are the Plaque crew from the boss egg, in their colors, never teeth. Each wears what sets it apart: Tartar’s cracks, Biofilm’s drips, the Mutans chain, Cavity Creep’s hole, the Goblin’s ears, the Haze, the Red Complex’s tails.</p>' +
         '<div class="panel-body"><div class="bw-cast">' + cast + guests + "</div></div></div>" +
       bwTrophy() +
-      '<div class="panel s12"><h3>How it’s found</h3><p>On the redesign’s pages only (vault/tasks/2026-11-06-redesign-bowling-egg.md, its build spec).</p><div class="panel-body tp-how bw-how"><ul>' +
+      '<div class="panel s12"><h3>How it’s found</h3><p>On the redesign’s pages only (vault/tasks/done/2026-11-06-redesign-bowling-egg.md, its build spec).</p><div class="panel-body tp-how bw-how"><ul>' +
         "<li><b>In the bank</b>: a run of first-try right answers, kept on the device across hubs. At 50 and at 100 a strike clip (one of the six), at 150 the turkey, and the run starts again. A wrong first try puts it back to 0. Not in the mock or the arcade.</li>" +
         "<li><b>After the verdict</b>, in a small card at the bottom of the screen, never over a question waiting for an answer. A tap skips it; each lasts 3 to 5 seconds. It waits its turn behind a rank-up or trophy card.</li>" +
         "<li><b>At Timmy’s place</b>: tap the bowling lane in the yard for a random clip, the spare included.</li>" +

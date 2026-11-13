@@ -193,7 +193,7 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
 
 **Built and merged, not live until the redesign's release** (2026-11-13). What changed:
 
-- **The clips**: #291's kit (`tools/figures/site/bowling.mjs`) carried over byte for byte, built by `build.mjs` (which now
+- **The clips**: #291's kit (`tools/figures/site/bowling.mjs`) carried over as drawn (only its header's path to this note changed), built by `build.mjs` (which now
   checks every clip: each class the CSS moves is in the drawing, 3 to 5.5 seconds with the word inside, the still has no
   NaN) into `widget/hub-art/bowling.js` (`window.SH_BOWL`, 56 KB, 18 KB gzipped) and a "The bowling egg" section of the
   design page (every clip playing and still, plus the trophy).

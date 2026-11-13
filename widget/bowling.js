@@ -1,6 +1,6 @@
 /* ============ THE BOWLING EGG (widget/bowling.js, window.shBowl): redesign phase 4, part D ============
    Eight short clips like the odd cartoons a bowling alley's screens play after a strike or a spare, Timmy style: the
-   pins are the Plaque crew and the ball is a giant sugar-free mint (vault/tasks/2026-11-06-redesign-bowling-egg.md).
+   pins are the Plaque crew and the ball is a giant sugar-free mint (vault/tasks/done/2026-11-06-redesign-bowling-egg.md).
 
    Only the redesign's pages load this file, and only on first use: the engine (widget/hub-rewards.js) fetches it the
    first time a run of first-try right answers reaches a strike, and Timmy's place (widget/place.js) the first time its
