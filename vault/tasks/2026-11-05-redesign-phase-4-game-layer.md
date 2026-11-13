@@ -51,7 +51,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 | 1 | **The shop's art**: the coin, snacks, boosts, rarity frames, the five undrawn outfits, the five rare costumes, and Timmy's door spot moved off the rank statue (BUG-089). **Done 2026-11-12** ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)), with the shop's look redrawn ("more epic") | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1" | [#335](https://github.com/smcmurry6-source/study-hubs/pull/335) merged |
 | 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes. **Done 2026-11-12** ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345), merged as `510dcb6`; its hand-off in the Log) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
 | 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage. **Done 2026-11-13** ([#348](https://github.com/smcmurry6-source/study-hubs/pull/348), merged as `c5ce92e`; its hand-off in the Log) | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
-| 4 | **Visiting**: a row on the new dashboard's boards opens that person's place. **Done 2026-11-13** (PR_LINK; its hand-off in the Log), in the leaderboard's theater look (Sam: "this window should be more epic"), getting there through the round-3 clouds | [visiting](done/2026-11-12-redesign-visiting.md) | 3 |
+| 4 | **Visiting**: a row on the new dashboard's boards opens that person's place. **Done 2026-11-13** ([#352](https://github.com/smcmurry6-source/study-hubs/pull/352); its hand-off in the Log), in the leaderboard's theater look (Sam: "this window should be more epic"), getting there through the round-3 clouds | [visiting](done/2026-11-12-redesign-visiting.md) | 3 |
 | 5 | **The bowling egg** (part D). **Done 2026-11-13** (merged on Sam's "merge"; the hand-off in the Log) | [the bowling egg](done/2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
 | 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12) | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
 | 7 | **Ask Timmy, part 2** (the chat). **Built 2026-11-12, ahead of its turn** (Sam asked for it then): the Ask icon shows whenever Timmy isn't on the page, so it works before and after session 3 | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), its Log | (3) |
@@ -129,7 +129,7 @@ These hold for each spec; a spec only adds to them.
       reviewed by Sam in a recording from a scripted browser on made-up data, reduced motion too, and once more on the
       release's own preview (Sam, 2026-11-12: no hosted preview before that one)
 - [ ] Part A, B, C and D done as their notes say (each note's "Done when"), and part E's "everyone has Timmy"
-- [x] Visiting from the new dashboard's boards ([its note](done/2026-11-12-redesign-visiting.md); Sam, 2026-11-12: in the release). Built 2026-11-13 (PR_LINK)
+- [x] Visiting from the new dashboard's boards ([its note](done/2026-11-12-redesign-visiting.md); Sam, 2026-11-12: in the release). Built 2026-11-13 ([#352](https://github.com/smcmurry6-source/study-hubs/pull/352))
 - [x] The arcade lobby of each live hub redrawn; game mechanics unchanged (done outside this phase: Occlusion's in
       [phase 1](done/2026-11-05-redesign-phase-1-hub-engine.md), Heme & Endo Exam 2's and Perio's in
       [phase 2](2026-11-05-redesign-phase-2-live-hubs.md), Perio's drawings approved 2026-11-11; the arcade's part of
@@ -402,7 +402,7 @@ These hold for each spec; a spec only adds to them.
     those. Budgets unchanged.
   - Tests: the smoke test's bowling block on a new hub (desktop and phone), `a11y.js`'s clip card. BUG-110 and BUG-111.
   **Next: session 4, visiting** ([visiting](done/2026-11-12-redesign-visiting.md)), then 6.
-- 2026-11-13 (Claude Code), **session 4, visiting; hand-off for session 6** (PR_LINK; [visiting](done/2026-11-12-redesign-visiting.md),
+- 2026-11-13 (Claude Code), **session 4, visiting; hand-off for session 6** ([#352](https://github.com/smcmurry6-source/study-hubs/pull/352); [visiting](done/2026-11-12-redesign-visiting.md),
   its Outcome). Nothing students see changes. On the new dashboard, on the game layer, a row of Ranks or Study streaks
   (and each of the stage's top three, and a winner's Timmy on the stage) opens that person's Timmy's place; your own row
   opens yours. Sam, seeing it: "this window should be more epic", so a visit opens in the leaderboard's theater look,
