@@ -1,11 +1,11 @@
 ---
 type: task
-status: open
+status: blocked
 hub: site
 created: 2026-11-12
 requested-by: Sam
 due: 
-waiting-on: 
+waiting-on: "the redesign's release (the function deployed, ANTHROPIC_API_KEY saved, migration_v55 applied with v54, FULL_FROM set, the About page entries)"
 agent: Claude Code (parts 1, 2 and 3, 2026-11-12; part 4, 2026-11-13)
 pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1), https://github.com/smcmurry6-source/study-hubs/pull/338 (part 2), https://github.com/smcmurry6-source/study-hubs/pull/341 (part 3), https://github.com/smcmurry6-source/study-hubs/pull/348 (part 4)
 ---
@@ -323,12 +323,12 @@ change to HP's rules beyond the 100 start; the old pages.
 - [x] A new hub's Shop row in More shows without adoption (`hasShop()` in `widget/hub-timmy.js`, session 2's hand-off)
 - [x] He wears what is on at his place, and nothing otherwise, on the bar, on the dashboard, at his place, in the
       classroom and on the leaderboard's stage
-- [ ] The live pages are unchanged (the smoke test on every hub)
+- [x] The live pages are unchanged (the smoke test on every hub)
 - [x] `tools/podcast/LORE.md`: from the redesign on, the student dresses him (the holiday costumes he used to pick
       himself are canon for the episodes already out); the About drafts in
       [the release note](2026-11-06-redesign-release.md) say everyone has Timmy and drop "once you adopt Timmy"
 - [x] A box in the release note: at the release `everyone` becomes the only behavior and the adoption code comes out
-- [ ] `node tools/release/run.js` once; screenshots to Sam; the hand-off in phase 4's Log
+- [x] `node tools/release/run.js` once; screenshots to Sam; the hand-off in phase 4's Log
 
 ## Done when
 
@@ -341,15 +341,15 @@ change to HP's rules beyond the 100 start; the old pages.
 - [x] Part 2: the chat on every new hub page and the new dashboard, on a phone and a laptop, with the Report button on
       his answers; the smoke test covers it
 - [x] Part 3: the admin tab (the admin page's Ask Timmy tab, [ask-timmy](../reference/ask-timmy.md); covered by `tools/release/admin-ui.js`)
-- [ ] Part 4: everyone has Timmy
+- [x] Part 4: everyone has Timmy
       - [x] with it: Timmy on a hub's bar (and wherever else `widget/pet.js` draws him) wears the outfit equipped at
             his place (`shop.equipped.outfit` in the v2 bootstrap; `SH_PLACE.dress()` or `SH_OUTFITS.dress()` draws
             it). Part C of phase 4 left pet.js untouched, so today only the place itself shows it
             ([the place](2026-11-06-redesign-timmys-place.md), 2026-11-12)
-      - [ ] as "Build spec, part 4" above says (its own Done when)
+      - [x] as "Build spec, part 4" above says (its own Done when)
 - [x] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
       answered by Claude, Anthropic's AI) in the release note's drafts
-- [ ] CI and `node tools/release/run.js` pass; Sam's look on the screenshots (a preview only if Sam wants one)
+- [x] CI and `node tools/release/run.js` pass; Sam's look on the screenshots (a preview only if Sam wants one)
 - [ ] At the release, as above
 
 ## Log
@@ -456,6 +456,12 @@ change to HP's rules beyond the 100 start; the old pages.
   click-throughs leaving answers in Timmy's tally) found and fixed; BUG-107 (the preview's dashboard shows 0 HP until a
   hub has been opened) is the preview's, open, and on `main` too.
 
+- 2026-11-13: [#348](https://github.com/smcmurry6-source/study-hubs/pull/348) merged as `c5ce92e` (Sam: "Merge when
+  ready", after the screenshots and the recording), once "Check hubs" and "Release tests" passed on its last commit.
+  CI's first run had failed the smoke test on the shop's "He's full" and a first visit at 99 HP: BUG-109, the test's own
+  click-throughs leaving answers in Timmy's tally, fixed in the test before the merge. `postcheck.js`: waiting on GitHub Pages to publish the merge. **Every part of Ask
+  Timmy is built**; what is left is the release's (the box above, and "From Ask Timmy" parts 2 and 4 in
+  [the release note](2026-11-06-redesign-release.md)), so this note waits on the release.
 ## Outcome
 
 Related: [the release](2026-11-06-redesign-release.md) · [phase 4](2026-11-05-redesign-phase-4-game-layer.md) ·

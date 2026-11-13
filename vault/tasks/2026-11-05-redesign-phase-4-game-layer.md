@@ -50,7 +50,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 |---|---|---|---|
 | 1 | **The shop's art**: the coin, snacks, boosts, rarity frames, the five undrawn outfits, the five rare costumes, and Timmy's door spot moved off the rank statue (BUG-089). **Done 2026-11-12** ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)), with the shop's look redrawn ("more epic") | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1" | [#335](https://github.com/smcmurry6-source/study-hubs/pull/335) merged |
 | 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes. **Done 2026-11-12** ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345), merged as `510dcb6`; its hand-off in the Log) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
-| 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage. **Built 2026-11-13** in [#348](https://github.com/smcmurry6-source/study-hubs/pull/348), waiting for Sam's "merge" (its hand-off in the Log) | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
+| 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage. **Done 2026-11-13** ([#348](https://github.com/smcmurry6-source/study-hubs/pull/348), merged as `c5ce92e`; its hand-off in the Log) | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
 | 4 | **Visiting**: a row on the new dashboard's boards opens that person's place | [visiting](2026-11-12-redesign-visiting.md) | 3 |
 | 5 | **The bowling egg** (part D) | [the bowling egg](2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
 | 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12) | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
@@ -378,6 +378,8 @@ These hold for each spec; a spec only adds to them.
     before); the Ask checks now turn Timmy off before they wait for the Ask icon. Bugs: BUG-105 to BUG-109. For the tests: Timmy is now on every new hub's page, so
     the answers a test gives there go into his tally of the day (`sh_pet_log`); a check of his HP starts without it.
   **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)), or session 5, the bowling egg.
+- 2026-11-13: [#348](https://github.com/smcmurry6-source/study-hubs/pull/348) (session 3) merged as `c5ce92e` (Sam:
+  "Merge when ready"). `postcheck.js`: waiting on GitHub Pages to publish the merge. Session 3 is done. **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)).
 
 ## Outcome
 
