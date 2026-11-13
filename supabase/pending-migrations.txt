@@ -10,3 +10,7 @@ migration_v54.sql
 # migration_v55.sql: Ask Timmy's chats, limits and admin reads (vault/tasks/2026-11-12-redesign-ask-timmy.md). Applied at the
 # redesign's release with migration_v54, when the timmy Edge Function is deployed.
 migration_v55.sql
+# migration_v56.sql: Learn and Flashcards' ratings and Learn steps (card_reviews, record_card_v2, get_my_cards; Sam,
+# 2026-11-12: a new file, v54 and v55 unchanged; vault/tasks/2026-11-06-redesign-learn-and-flashcards.md). Applied at the
+# redesign's release, after migration_v54 and migration_v55.
+migration_v56.sql

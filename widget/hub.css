@@ -370,6 +370,8 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .today-stats .ts-art { width: 28px; height: 32px; display: block; }
 .today-stats .ts-xp .ts-art { width: 30px; height: 30px; }
 .today-stats .ts-right .ic { width: 30px; height: 30px; color: var(--right); }
+.today-stats .ts-cards .ic { width: 30px; height: 30px; color: var(--hub-text); }
+.hx .today-stats:has(.ts-cards) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .today-stats b { display: block; font-size: 17px; font-weight: var(--w-head); line-height: 1.2; overflow-wrap: anywhere; }
 .today-stats small { display: block; font-size: var(--fs-meta); color: var(--muted); }
 .today-pet { margin-top: 12px; display: flex; align-items: center; gap: 8px; font-size: var(--fs-label); color: var(--muted); }
@@ -577,6 +579,12 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .qsum { margin: 14px 2px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .sumline { font-size: var(--fs-label); color: var(--muted); }
 .sumline b { color: var(--text); }
+/* Study as: Questions, Learn or Flashcards, above the panel (the two modes' own look is widget/study-modes.css, loaded
+   with them on first use) */
+.studyas { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 14px; }
+.studyas .lab { font-size: var(--fs-label); font-weight: var(--w-head); color: var(--muted); min-width: 64px; }
+.hx .seg-study button { min-height: 40px; padding: 0 16px; font-weight: var(--w-strong); }
+.hx .seg-study .ic { flex: none; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .tagx { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 8px 0 12px; border: 0; border-radius: var(--r-pill); background: var(--hub-soft); color: var(--hub-text);
   font-size: var(--fs-meta); font-weight: var(--w-strong); }
@@ -1072,6 +1080,9 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
 /* ---------- phone: the bar goes to the bottom, with Timmy on it ---------- */
 @media (max-width: 640px) {
   html.shx { --pad: 16px; --fs-title: 24px; --fs-stem: 17px; --panel-pad: 16px; --bar-h: 0px; --sh-tabbar-h: 68px; }
+  .studyas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
+  .hx .seg-study { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .hx .seg-study button { justify-content: center; padding: 0 6px; gap: 5px; }
   .hx { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
   .hx-bar { position: fixed; left: 0; right: 0; top: auto; bottom: 0; height: auto; padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); gap: 4px;
     border-top: 1px solid var(--border); border-bottom: 0; }

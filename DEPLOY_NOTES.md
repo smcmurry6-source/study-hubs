@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (Learn and Flashcards, Claude Code)** — Nothing students see changes yet: the redesign's Question Bank gets
+  **Study as: Questions · Learn · Flashcards** ([the task](vault/tasks/2026-11-06-redesign-learn-and-flashcards.md)), in
+  the three new hubs only. Learn asks the panel's questions in rounds of 7 until each is right twice (the second time
+  without the choices when the question allows it), with a bar that fills, a round track, praise and a streak, and a
+  round recap (Sam asked for it to feel like Quizlet's). Flashcards turn over and are rated Again, Hard, Good or Easy on
+  an Anki-like schedule that ends on exam eve; Home shows "n flashcards due". `widget/study-modes.js` + `.css` load the
+  first time either is opened. The server part is a new pending migration, `migration_v56.sql` (`card_reviews`,
+  `record_card_v2`, `reset_my_learn`, `get_my_cards`, a `card` award: a flat 2 XP for a due or new card's first three
+  ratings a day), applied at the release after v54 and v55, which are unchanged; `xp.js` and `rls.js` check it, the
+  preview answers it. Two icons (`learn`, `cards`), approved by Sam from a contact sheet. `widget/qhealth.js` and
+  `widget/v3.js` gain two hooks nothing on a live hub calls (`shQH.rate`, `window.shNoteJump`).
+
 - **2026-11-12 (Ask Timmy's admin tab, part 3, Claude Code)** — Nothing students see changes: the admin page
   (`review/index.html`) gets an **Ask Timmy** tab for [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md): figures for
   the range, by hub and by day (questions, estimated cost, not covered, declined, errors, thumbs, quotes, reports), his

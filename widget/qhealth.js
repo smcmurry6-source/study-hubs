@@ -60,7 +60,10 @@
     return meta[qid] || null;
   }
 
-  window.shQH = { fp: fp, kindOf: kindOf, version: function(qid){ var m = metaOf(qid); return m ? m.v : ""; }, mount: mount };
+  window.shQH = { fp: fp, kindOf: kindOf, version: function(qid){ var m = metaOf(qid); return m ? m.v : ""; }, mount: mount,
+    /* "Good question?" under a flashcard's back (widget/study-modes.js): the vote only, since a rating isn't an answer
+       (no timing, no answer row) */
+    rate: function(el, qid){ if (el && qid) addRating(el, el, String(qid)); } };
 
   /* ---------- tracking ---------- */
   var H = null, HUB = "", ON = false;
@@ -240,14 +243,15 @@
     try { localStorage.setItem(RATE_KEY, JSON.stringify(r)); } catch (e) {}
   }
   function mine(qid){ var x = loadRates()[qid]; return x && x[2] === verOf(qid) ? x : null; }
-  function addRating(card){
+  /* host and id: a flashcard's back (rate(), below), which isn't a .qcard and is never timed */
+  function addRating(card, host, id){
     if (!ON || card.__shQhRate) return;
-    var ex = card.querySelector('[data-role="explain"]') || card.querySelector(".qcard-explain");
+    var ex = host || card.querySelector('[data-role="explain"]') || card.querySelector(".qcard-explain");
     if (!ex) return;
     card.__shQhRate = true;
-    var qid = card.getAttribute("data-qid");
+    var qid = id || card.getAttribute("data-qid");
     var box = document.createElement("div");
-    box.className = "sh-qrate"; box.setAttribute("data-sh-noread", "");
+    box.className = "sh-qrate"; box.setAttribute("data-sh-noread", ""); box.__qid = qid;
     box.innerHTML = '<span class="sh-qrate-q">Good question?</span>' +
       '<button type="button" class="sh-qrate-b" data-qrate="1" aria-pressed="false" title="A good question">' + THUMB + '<span class="sh-cp-sr">Yes, a good question</span></button>' +
       '<button type="button" class="sh-qrate-b sh-qrate-down" data-qrate="-1" aria-pressed="false" title="Something\'s off">' + THUMB + '<span class="sh-cp-sr">No, something is off</span></button>' +
@@ -271,9 +275,7 @@
         var r = cur && cur[1] === why ? null : why;
         send(qid, v, -1, r); saveRate(qid, [-1, r, v]); tk("qrate:why=" + (r || "none"));
       }
-      document.querySelectorAll(".qcard[data-qid] .sh-qrate").forEach(function(o){
-        var c = o.closest(".qcard"); if (c && c.getAttribute("data-qid") === qid) paint(o, qid, o === box);
-      });
+      document.querySelectorAll(".sh-qrate").forEach(function(o){ if (o.__qid === qid) paint(o, qid, o === box); });
     });
   }
   function paint(box, qid, justNow){

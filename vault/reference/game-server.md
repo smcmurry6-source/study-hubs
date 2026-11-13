@@ -257,18 +257,58 @@ client follows the server in all of them. A new case: stop and tell Sam.
 | `post_idea` takes the sources `board`, `suggest` and `checkin` | An idea Timmy drafts (Ask Timmy, part 2) posts as `board` |
 | `sh_season` and `sh_is_fall` are described as the days Timmy dresses up by himself | They stay as the holiday dates (the hubs' themes, the eggs, the place's props). On the redesign's pages Timmy wears only what the student put on (Sam, 2026-11-12), and a rare costume turns up at the shop on its day instead of being worn |
 
-[Learn and Flashcards](../tasks/2026-11-06-redesign-learn-and-flashcards.md) wants a server part in the pending
-migration: that one is Sam's call when its session starts.
+Learn and Flashcards' server part is its own pending migration, not a change to this one (Sam, 2026-11-12: "B"): below.
+
+## Learn and Flashcards (migration_v56)
+
+The Question Bank's "Study as" toggle ([the task](../tasks/2026-11-06-redesign-learn-and-flashcards.md)): **Learn** asks
+questions in rounds until each is right twice; **Flashcards** turn a question over and the student rates it Again, Hard,
+Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sql` is listed in
+`supabase/pending-migrations.txt` after v54 and v55, needs both, and changes neither (Sam chose B of three options,
+2026-11-12, [decisions](../decisions.md)). It is applied at the release, after them.
+
+- **`card_reviews`**: one row per rating or Learn step (`what`: `again`, `hard`, `good`, `easy`, `learn-0`, `learn-1`,
+  `learn-2`, `learn-reset`), with the visitor, hub, question id, whether it was rated with Study ahead, the server's time,
+  the page's time (`seen_at`, clamped to the 2 days before the server's, used only for the replay's order), the request id
+  and what it paid. Closed to anon (RLS on, no grants); only the functions below touch it.
+- **`record_card_v2(visitor, hub, qid, what, ahead, request, seen)`** records one and pays it, through `sh_card` (closed to
+  anon), which takes the same per-visitor lock as answers. A **rating pays a flat 2** (`xp_awards` source `card`, times
+  `sh_xp_mult`, so a boost doubles it) for a question the server has a key for, only for **a card's first three ratings a
+  Central day**, and only past **the speed limit shared with answers** (2 seconds since the last answer or rating, 30 in a
+  minute, a mock's answers aside). **Study ahead pays nothing and doesn't count toward the three**; **Learn's steps pay
+  nothing** (Learn's answers are ordinary `record_answer_v2` answers and pay as answers). An unknown or retired id is
+  recorded and never paid. The reply is `{ok, xp, base, mult, why, boost, total}` (`why`: `learn`, `ahead`, `unknown`,
+  `retired`, `fast`, `repeat` or null). The same request id again returns the first reply with `repeat: true` and adds
+  nothing; another visitor's request id gets `{ok: false, error: "dup"}`. The page decides whether a card was due or new
+  and sends Study ahead's ratings as such: the three-a-day cap is what keeps tapping Easy over and over from paying.
+- **`reset_my_learn(visitor, hub, qids[])`**: Learn's Start over, one `learn-reset` row per question (up to 2,000 a call),
+  paying nothing; returns how many.
+- **`get_my_cards(visitor, hub)`**: the caller's own rows for one hub, oldest first, as `[qid, what, page time in ms,
+  ahead 1/0, request id]` (the newest 20,000). The page replays them through the same scheduling code
+  (`widget/study-modes.js`'s `rebuild`) with the ratings still waiting on the device, so another device ends up with the
+  same schedule and Learn progress.
+- **Link my devices**: a trigger on `visitor_links` (`sh_cards_on_link`, as v55 does for Timmy's chats) moves the second
+  id's rows onto the first; the `card` XP already paid follows the link the way v54 handles every award (`xp.js` checks
+  both).
+- **Not an answer**: a rating never reaches `personal_answers`, `question_stats`, the class's picks, `answer_xp` or question
+  health, and pays no day bonus (+20), no goal bonus and no medal. A flashcards-only day fills the ring and keeps the
+  flame on every device (the replay marks the day studied), but the server's `xp_days` and the streak board count
+  answers only, as before.
+- **Learn's context**: v54's `record_answer_v2` doesn't list `learn`, so Learn's answers are filed as `other` (Sam,
+  2026-11-12: v54 isn't changed). A later migration can add `learn` to the list.
+- **Before the migration** (the preview's `rpc()` answers all three from fixtures): the page keeps everything on the
+  device, the ratings wait in `STATE.cardq` (up to 3,000), and the first call that finds the functions missing stops
+  trying until the next page load. Test browsers (`navigator.webdriver`) send nothing.
 
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (344 checks: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (392 checks, Learn and Flashcards' in section 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, and a place opened from a board row). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;
-`rls-expectations.json` also lists what must be closed to anon altogether (`anonNone`: `visit_secret`; `anonNoRun`:
-`sh_visit_key`), and it checks that a place and the boards give a key, never an id, and that every board row has one.
+`rls-expectations.json` also lists what must be closed to anon altogether (`anonNone`: `visit_secret`, `card_reviews`;
+`anonNoRun`: `sh_visit_key`, `sh_card`, `sh_cards_on_link`), and it checks that a place and the boards give a key, never an id, and that every board row has one.
 `admin-ops.js` and `retention.js` run with them in place. CI runs all four. `tools/release/rls-audit.sql` checks the same
 two lists on the live database once the migration is applied.
 

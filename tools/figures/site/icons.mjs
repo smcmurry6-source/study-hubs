@@ -163,6 +163,19 @@ export const ICONS = {
     '<path d="M5.4 4.2v15M3.1 16.9l2.3 2.4 2.3-2.4"/>' +
     '<path d="M10.4 6.2c3.2-.2 6.5-.2 9.8 0M10.4 12c2.5-.2 5-.2 7.6 0M10.4 17.8c1.8-.1 3.5-.1 5.2 0"/>' },
 
+  /* the Question Bank's "Study as" toggle (Learn and Flashcards, 2026-11-12): Learn climbs two steps to a check (rounds
+     until mastered); Flashcards is a card in front of the next, with the arrow that turns it over */
+  learn: { label: "Learn", body:
+    '<path d="M2.9 20.5c6.1-.2 12.1-.2 18.2 0"/>' +
+    '<path d="M3.2 20.3v-4.6c1.7-.1 3.5-.1 5.2 0v-4.6c1.7-.1 3.5-.1 5.2 0V6.5c1.7-.1 3.5-.1 5.2 0v13.8"/>' +
+    '<path d="M3.9 8l2.2 2.2 4.1-4.6"/>' },
+
+  cards: { label: "Flashcards", body:
+    '<path d="M7.6 17.9H5.4c-1 0-1.6-.6-1.6-1.6V4.6c0-1 .6-1.6 1.6-1.6h8.6c1 0 1.6.6 1.6 1.6v1.3"/>' +
+    '<path d="M9.7 6.1c2.9-.2 5.8-.2 8.7 0 1 .1 1.6.7 1.7 1.7.2 3.9.2 7.9 0 11.8-.1 1-.7 1.6-1.7 1.7-2.9.2-5.8.2-8.7 0-1-.1-1.6-.7-1.7-1.7-.2-3.9-.2-7.9 0-11.8.1-1 .7-1.6 1.7-1.7z"/>' +
+    '<path d="M11 15.8c.1-2.4 1.8-4 4-3.9 1 0 1.8.4 2.4 1.1"/>' +
+    '<path d="M17.8 11.2l-.3 2.1-2.1-.4"/>' },
+
   sun: { label: "Light theme", body:
     '<path d="M12 7.6c2.5 0 4.4 1.9 4.4 4.4s-1.9 4.4-4.4 4.4-4.4-1.9-4.4-4.4 1.9-4.4 4.4-4.4z"/>' +
     '<path d="M12 2.8v1.9M12 19.3v1.9M2.8 12h1.9M19.3 12h1.9M5.5 5.5l1.4 1.4M17.1 17.1l1.4 1.4M5.5 18.5l1.4-1.4M17.1 6.9l1.4-1.4"/>' },

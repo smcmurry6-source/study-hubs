@@ -51,10 +51,12 @@
       seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + "</span>" : "";
     var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + id + 'h"></article>');
     var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + id + 'h">' + (o.num ? "Question " + o.num + " · " : "") + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
-    var body = "";
+    var body = "", hide = !!o.hide && q.type === "mcq";
     if (q.type === "mcq" || multi) {
       var order = multi ? shuffled(q.choices.map(function(c, i){ return i; })) : choiceOrder(q);
-      body = '<ul class="qc-choices' + (tf ? " qc-tf" : "") + '">' + order.map(function(i){
+      /* Learn's second step (widget/study-modes.js): the stem alone first, then the choices on request, still graded by the key */
+      body = (hide ? '<div class="qc-go qc-think" data-thinkrow><button class="btn btn-primary" type="button" data-showch>' + icon("questions", 18) + 'Show the choices</button><span class="note">Think of your answer first, then show the choices.</span></div>' : "") +
+        '<ul class="qc-choices' + (tf ? " qc-tf" : "") + '"' + (hide ? " hidden" : "") + '>' + order.map(function(i){
         return '<li><button class="ch' + (multi ? " has-box" : "") + '" type="button" data-i="' + i + '" aria-pressed="false">' + (multi ? mark("box") : "") + '<span class="txt">' + esc(q.choices[i]) + '</span><span class="pct num" aria-hidden="true"></span><span class="st-ic" aria-hidden="true"></span><span class="share" aria-hidden="true"></span></button></li>';
       }).join("") + "</ul>" +
       (multi ? '<div class="qc-go"><button class="btn btn-primary" type="button" data-check disabled>Check my answer</button><span class="note">Select every right answer, then check. Partial credit.</span></div>' : "");
@@ -89,6 +91,7 @@
         picked = [i]; b.setAttribute("aria-pressed", "true"); answer(b); return;
       }
       if (b.hasAttribute("data-check")) { if (picked.length) answer(b); return; }
+      if (b.hasAttribute("data-showch")) { var row = $("[data-thinkrow]", el), ul = $(".qc-choices", el); if (ul) ul.hidden = false; if (row) row.remove(); var f0 = $(".ch", el); if (f0) f0.focus(); return; }
       if (b.hasAttribute("data-reveal")) { $(".qc-ans", el).hidden = false; $("[data-reveal-row]", el).hidden = true; $("[data-grade-row]", el).hidden = false; var g = $("[data-grade]", el); if (g) g.focus(); return; }
       if (b.hasAttribute("data-grade")) { self = b.getAttribute("data-grade") === "1"; $("[data-grade-row]", el).hidden = true; answer(b); return; }
       if (b.hasAttribute("data-step")) {
@@ -139,7 +142,7 @@
         right = match.err === 0; if (!right) partial = "Matched, with " + pl(match.err, "wrong try", "wrong tries");
         rec = HX.recordAnswer(q.id, q.lec, right, o.ctx);
       }
-      result(el, q, right, partial, rec.xp, picked);
+      result(el, q, right, partial, rec.xp, picked, o);
       if (o.onAnswer) o.onAnswer(el, q, right);
       HX.reward(from, right, rec);
       classPicks(el, q, picked);
@@ -153,21 +156,23 @@
     if (said) b.querySelector(".txt").insertAdjacentHTML("beforeend", '<span class="sr">, ' + said + "</span>");
     b.setAttribute("aria-disabled", "true");
   }
-  function whyHTML(q, picks, opened){
+  /* plain: a flashcard's back (widget/study-modes.js), where nothing was picked: the right ones marked, no "Your pick" */
+  function whyHTML(q, picks, opened, plain){
     if (!q.why || !q.choices) return "";
     var multi = q.type === "multi", ok = function(i){ return multi ? q.correct.indexOf(i) > -1 : i === q.answer; };
     var idx = q.choices.map(function(c, i){ return i; }).sort(function(a, b){ return (ok(b) ? 1 : 0) - (ok(a) ? 1 : 0) || a - b; });
     var open = {}; (opened || picks || []).forEach(function(i){ open[i] = 1; });
-    idx.forEach(function(i){ if (multi && ok(i) && (picks || []).indexOf(i) < 0) open[i] = 1; });
+    if (!plain) idx.forEach(function(i){ if (multi && ok(i) && (picks || []).indexOf(i) < 0) open[i] = 1; });
     /* folded until tapped, as on the live hubs (Sam, 2026-11-06: open, it took up too much of the screen); inside, your pick is open */
     return '<details class="why"><summary class="why-bar"><span>Why each choice</span><span class="chev">' + icon("chevron", 16) + "</span></summary>" + idx.map(function(i){
-      var pk = (picks || []).indexOf(i) > -1, st = ok(i) ? (pk || !multi ? "right" : "missed") : pk ? "wrong" : "";
-      var tag = pk ? "Your pick" : multi && ok(i) ? "You missed this one" : "";
+      var pk = !plain && (picks || []).indexOf(i) > -1, st = ok(i) ? (plain || pk || !multi ? "right" : "missed") : pk ? "wrong" : "";
+      var tag = pk ? "Your pick" : !plain && multi && ok(i) ? "You missed this one" : "";
       return "<details" + (open[i] ? " open" : "") + '><summary><span class="tick ' + (st === "wrong" ? "no" : st ? "ok" : "") + '">' + (st ? icon(st === "wrong" ? "cross" : "check", 18) : "") + "</span><span>" + esc(q.choices[i]) +
         (tag ? ' <span class="tag">· ' + tag + "</span>" : "") + '</span><span class="chev">' + icon("chevron", 16) + "</span></summary><p>" + esc(q.why[i]) + "</p></details>";
     }).join("") + "</details>";
   }
-  function result(el, q, right, partial, xp, picks){
+  function result(el, q, right, partial, xp, picks, o){
+    o = o || {};
     var res = $(".qc-result", el);
     var verdict = right ? '<p class="verdict ok">' + icon("check", 26) + 'Right<span class="xp num">+' + xp + " XP</span></p>"
       : partial ? '<p class="verdict part">' + icon("goal", 26) + esc(partial) + '<span class="xp num">+' + xp + " XP</span></p>"
@@ -179,7 +184,8 @@
       (q.ref && window.shCases && window.shCases.refHTML ? window.shCases.refHTML(q) : "") +
       whyHTML(q, q.type === "mcq" || q.type === "multi" ? picks : null) +
       '<p class="qc-class note" data-classnote hidden></p>' +
-      '<div class="qc-after"><button class="btn" type="button" data-again>' + icon("retry", 18) + '<span class="l-long">Try it again</span><span class="l-short">Retry</span></button>' +
+      /* Learn asks again by itself, so its cards have no "Try it again" */
+      '<div class="qc-after">' + (o.noAgain ? "" : '<button class="btn" type="button" data-again>' + icon("retry", 18) + '<span class="l-long">Try it again</span><span class="l-short">Retry</span></button>') +
       /* Ask Timmy about it, now that it's answered (widget/ask.js; hub-timmy.js opens the chat with the question attached) */
       (HX.askOn && HX.askOn() ? '<button class="btn" type="button" data-ask-q="card">' + icon("comment", 18) + "<span>" + esc(HX.askLabel()) + "</span></button>" : "") + "</div>";
     res.hidden = false;
@@ -189,7 +195,7 @@
     var gather = function(){ $$(":scope > .sh-nj, :scope > .sh-qrate", res).forEach(function(n){ after.appendChild(n); }); };
     gather();
     if (window.MutationObserver) { var mo = new MutationObserver(gather); mo.observe(res, { childList: true }); setTimeout(function(){ mo.disconnect(); }, 4000); }
-    $("[data-again]", res).addEventListener("click", function(){ var n = card(q, { ctx: el.getAttribute("data-ctx") }); el.replaceWith(n); var f = $(".ch", n); if (f) f.focus(); track("bank:again"); });
+    var ag = $("[data-again]", res); if (ag) ag.addEventListener("click", function(){ var n = card(q, { ctx: el.getAttribute("data-ctx") }); el.replaceWith(n); var f = $(".ch", n); if (f) f.focus(); track("bank:again"); });
     var ak = $("[data-ask-q]", res); if (ak) ak.addEventListener("click", function(){ HX.askAbout(q, right, picks); });
     if (HX.FIG && HX.FIG.ANIMA) { try { HX.FIG.ANIMA.mount(res); } catch (e) {} }
   }
@@ -294,16 +300,65 @@
     needQuestions().then(function(){ if (HX.view === "questions") drawQuestions(el, s); }).catch(function(){ el.innerHTML = offlineHTML("the questions"); });
   }
   var LIST = null;
+  /* ---------- Study as: Questions, Learn or Flashcards (vault/tasks/2026-11-06-redesign-learn-and-flashcards.md). The
+     panel picks which questions, the toggle picks how; saved in STATE.ui.qview like the panel. Learn and Flashcards are
+     widget/study-modes.js and .css, fetched the first time either is opened (nothing new loads with the page). The mock
+     is always questions: the toggle isn't drawn on it. ---------- */
+  var VIEWS = [["questions", "Questions", "questions"], ["learn", "Learn", "learn"], ["cards", "Flashcards", "cards"]];
+  function qview(){ var v = STATE.ui.qview; return v === "learn" || v === "cards" ? v : "questions"; }
+  function viewHTML(){
+    var v = qview();
+    return '<div class="studyas" role="group" aria-labelledby="saL"><span class="lab" id="saL">Study as</span><span class="seg seg-study">' +
+      VIEWS.map(function(x){ return '<button type="button" data-qview="' + x[0] + '" aria-pressed="' + (v === x[0]) + '">' + icon(x[2], 18) + "<span>" + x[1] + "</span></button>"; }).join("") + "</span></div>";
+  }
   function drawQuestions(el, preset){
     var title = preset ? labelOf(SETS, preset) : "Questions";
     el.innerHTML = '<div class="hx-page bank"><div class="bank-head"><h1>' + esc(title) + "</h1></div>" +
-      '<div class="bank-grid"><div class="bank-main">' + panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div></div>' +
+      '<div class="bank-grid"><div class="bank-main">' + (preset === "mock" ? "" : viewHTML()) + panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div></div>' +
       '<aside class="bank-side" aria-label="Today">' + HX.todayPanel() + "</aside></div></div>";
     wirePanel(el, preset);
+    $$("[data-qview]", el).forEach(function(b){ b.addEventListener("click", function(){
+      var v = b.getAttribute("data-qview"); if (v === qview()) return;
+      STATE.ui.qview = v; saveState(); track("bank:view=" + v); drawQuestions(el, preset);
+      var nb = $('[data-qview="' + v + '"]', el); if (nb) nb.focus();
+    }); });
     if (preset === "mock") { drawMock($("#qlist", el), el); return; }
     fill(el, preset);
-    tip(el, "bank", "Your filters and the set you pick are remembered next time; the tags under the panel show what's on.");
+    var v = qview();
+    if (v === "learn") tip(el, "learn", "Learn asks each question until you get it right twice. Your progress is saved.");
+    else if (v === "cards") tip(el, "cards", "Flip the card, then say how well you knew it. It comes back when you're about to forget it.");
+    else tip(el, "bank", "Your filters and the set you pick are remembered next time; the tags under the panel show what's on.");
   }
+  /* Learn and Flashcards, on first use: the module and its stylesheet together, then the set the panel picked */
+  var SM = null, smLoad = null;
+  function cssReady(href){
+    return new Promise(function(res){
+      var have = $('link[href="' + href + '"]'); if (have) { res(); return; }
+      var l = document.createElement("link"); l.rel = "stylesheet"; l.href = href; l.onload = res; l.onerror = res;
+      document.head.appendChild(l);
+    });
+  }
+  function study(){
+    var L = LIST; if (!L) return;
+    var kind = qview();
+    L.host.innerHTML = '<p class="note loading">' + (kind === "learn" ? "Getting Learn ready…" : "Shuffling the flashcards…") + "</p>";
+    if (!smLoad) smLoad = Promise.all([HX.loadScript(HX.WIDGET + "study-modes.js"), cssReady(HX.WIDGET + "study-modes.css")]).then(function(){
+      if (!SM && window.SH_STUDY) SM = window.SH_STUDY(HX);
+      if (!SM) throw new Error("study-modes.js");
+      return SM;
+    });
+    smLoad.then(function(M){
+      if (LIST !== L || !L.host.isConnected) return;
+      return (L.items.some(needsFig) ? needFigures() : Promise.resolve()).then(function(){ if (LIST === L && L.host.isConnected) M[kind](L); });
+    }).catch(function(){
+      smLoad = null;
+      if (!L.host.isConnected) return;
+      L.host.innerHTML = emptyHTML(kind === "learn" ? "Learn couldn't open" : "Flashcards couldn't open", "Check the connection and try again, or study these as questions.", '<button class="btn btn-primary" type="button" data-qview-back>Study as questions</button>');
+      $("[data-qview-back]", L.host).addEventListener("click", function(){ STATE.ui.qview = "questions"; saveState(); drawQuestions(L.el, L.preset); });
+    });
+  }
+  /* the list the panel picked, shown the way the toggle says */
+  function show(){ if (qview() === "questions") page(); else study(); }
   function panelHTML(preset){
     var picked = lecIds(), sum = lecSummary(picked);
     normShow();
@@ -325,7 +380,7 @@
       '<div class="qbar-row chips"><span class="lab">Show</span><span class="chipset">' + SHOW.map(function(x){ return showChip(x[0], x[1]); }).join("") + "</span></div>" +
       '<div class="qbar-row chips only"><span class="lab">Only</span><span class="chipset" role="group" aria-label="Only">' + LIKELY.map(function(x){ return lkChip(x[0], x[1]); }).join("") + "</span></div>" +
       '<div class="qbar-row chips"><span class="lab">Sets</span><span class="chipset">' + SETS.map(function(x){ return setChip(x[0], x[1]); }).join("") + "</span></div>" +
-      '<div class="qbar-row"><span class="lab">Order</span><span class="seg" role="group" aria-label="Order"><button type="button" data-order="in" aria-pressed="' + (STATE.ui.qorder !== "random") + '">In order</button><button type="button" data-order="random" aria-pressed="' + (STATE.ui.qorder === "random") + '">' + icon("shuffle", 16) + "Random</button></span>" +
+      '<div class="qbar-row">' + (qview() === "questions" ? '<span class="lab">Order</span><span class="seg" role="group" aria-label="Order"><button type="button" data-order="in" aria-pressed="' + (STATE.ui.qorder !== "random") + '">In order</button><button type="button" data-order="random" aria-pressed="' + (STATE.ui.qorder === "random") + '">' + icon("shuffle", 16) + "Random</button></span>" : "") +
         '<details class="morefil"' + (STATE.ui.qmore ? " open" : "") + '><summary class="btn btn-text">' + icon("filter", 16) + "More filters" + (more ? ' <span class="badge num">' + more + " on</span>" : "") + "</summary>" +
         '<div class="morefil-body"><p class="lab">Question type</p><span class="chipset">' + [["all", "Any type"]].concat(fmts).map(function(f){ var n = f[0] === "all" ? "" : ' <span class="n num">' + filtered({ fm: f[0] }).length + "</span>"; return '<button class="chip" type="button" data-fmt="' + f[0] + '" aria-pressed="' + ((STATE.ui.qfmt || "all") === f[0]) + '">' + esc(f[1]) + n + "</button>"; }).join("") + "</span>" +
         '<p class="lab">Where it\'s from</p><span class="chipset">' + [["all", "Anywhere"]].concat(srcs.map(function(k){ return [k, HX.CORE.srcLabel[k]]; })).map(function(f){ return '<button class="chip" type="button" data-src="' + esc(f[0]) + '" aria-pressed="' + ((STATE.ui.qsrc || "all") === f[0]) + '">' + esc(f[1]) + "</button>"; }).join("") + "</span></div></details></div>" +
@@ -360,7 +415,7 @@
   }
   function fill(el, preset){
     var host = $("#qlist", el), sumEl = $(".qsum", el);
-    host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {} };
+    host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0 };
     if (preset === "drill") {
       sumEl.innerHTML = '<p class="note">Picking today\'s questions…</p>';
       whenWidget("shDrill", function(D){
@@ -372,9 +427,9 @@
           var done = items.filter(function(it){ return s.res[it.id] === 1 || s.res[it.id] === 0; }).length;
           sumEl.innerHTML = '<p class="sumline"><b class="num">' + done + " of " + items.length + "</b> done today. Spaced review first, then your misses and the high-yield ones.</p>";
           items.forEach(function(it){ LIST.notes[it.id] = it.note; });
-          LIST.items = items.filter(function(it){ return !(s.res[it.id] === 1 || s.res[it.id] === 0); }).map(function(it){ return QBY[it.id]; });
+          LIST.items = (qview() === "questions" ? items.filter(function(it){ return !(s.res[it.id] === 1 || s.res[it.id] === 0); }) : items).map(function(it){ return QBY[it.id]; });
           if (!LIST.items.length) { host.innerHTML = drillDoneHTML(); wireDrillDone(el); return; }
-          page();
+          show();
         });
       });
       return;
@@ -384,22 +439,22 @@
       LIST.items = ids.map(function(id){ return QBY[id]; }).filter(Boolean);
       sumEl.innerHTML = LIST.items.length ? '<p class="sumline"><b class="num">' + LIST.items.length + "</b> you missed yesterday and haven't tried again.</p>" : "";
       if (!LIST.items.length) { host.innerHTML = emptyHTML("No misses from yesterday", "Either you didn't miss any or you've already tried them again.", '<a class="btn" href="#questions" data-showset="missed">Every question you missed last time</a>'); wireEmpty(el); return; }
-      page(); return;
+      show(); return;
     }
     if (preset === "weak") {
       var rows = HX.LECS.map(lecProgress).filter(function(r){ return r.a >= 3; }).sort(function(a, b){ return a.pct - b.pct; });
       LIST.items = weakList();
       sumEl.innerHTML = rows.length ? '<div class="weak-rows"><p class="lab">Your lectures by how much you get right</p><ul>' + rows.slice(0, 6).map(function(r){ return '<li class="' + lc(r.l.id).trim() + '"><span>' + lecDot(r.l.id) + esc(lecName(r.l.id)) + '</span><span class="bar"><i class="right" style="width:' + r.pct + '%"></i></span><span class="num">' + r.pct + "%</span></li>"; }).join("") + '</ul></div><p class="sumline">The questions you missed last time, weakest lecture first, then ' + (rows[0] ? "new ones from " + esc(lecLabel(rows[0].l)) : "new ones") + ".</p>" : "";
       if (!LIST.items.length) { host.innerHTML = emptyHTML("No weak spots yet", "Answer at least 3 questions from a lecture and it shows up here, ranked by how much you get right.", '<a class="btn btn-primary" href="#questions">Practice questions</a>'); return; }
-      page(); return;
+      show(); return;
     }
     var all = HX.QS.filter(function(q){ return !isReview(q.lec); }).length, list = ordered(filtered());
-    LIST.items = list;
+    LIST.items = list; LIST.all = all;
     sumEl.innerHTML = summaryHTML(list, all);
     $$("[data-tagoff]", sumEl).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-tagoff"); if (k === "lec") { STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; } if (k === "show") STATE.ui.qstatus = "all"; if (k === "lk") setLk(""); if (k === "fmt") STATE.ui.qfmt = "all"; if (k === "src") STATE.ui.qsrc = "all"; if (k === "search") bankSearch = ""; saveState(); track("bank:tag-off=" + k); drawQuestions(el, ""); }); });
     var ca = $("[data-clearall]", sumEl); if (ca) ca.addEventListener("click", function(){ bankReset(); bankSearch = ""; saveState(); track("bank:clear"); drawQuestions(el, ""); });
     if (!list.length) { host.innerHTML = emptyHTML("Nothing matches", emptyWhy(), '<button class="btn btn-primary" type="button" data-clearall>Show all ' + all + " questions</button>"); $("[data-clearall]", host).addEventListener("click", function(){ bankReset(); bankSearch = ""; saveState(); track("bank:clear"); drawQuestions(el, ""); }); return; }
-    page();
+    show();
   }
   function summaryHTML(list, all){
     var tags = [], picked = lecIds(), R = C.review || {};
@@ -632,6 +687,9 @@
 
   /* what the other files call from here */
   HX.figKeyHTML = figKeyHTML; HX.card = card; HX.bankReset = bankReset; HX.presetOf = presetOf;
+  /* for Learn and Flashcards (widget/study-modes.js): the card's parts, the bank's order and the bank to redraw */
+  HX.qParts = { choiceOrder: choiceOrder, stemHTML: stemHTML, pboxHTML: pboxHTML, figHTML: figHTML, figAfterHTML: figAfterHTML, whyHTML: whyHTML, likelyTag: likelyTag, emptyHTML: emptyHTML };
+  HX.drawQuestions = drawQuestions; HX.qview = qview;
   HX.lecValue = lecValue; HX.filtered = filtered; HX.renderQuestions = renderQuestions; HX.mockTotal = mockTotal;
   Object.defineProperty(HX, "bankSearch", { get: function(){ return bankSearch; }, set: function(v){ bankSearch = v; }, enumerable: true });
 };

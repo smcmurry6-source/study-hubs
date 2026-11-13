@@ -88,6 +88,9 @@ task is the one PR that then switches the site over. If something goes wrong, re
 - [ ] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"; the steps: [ask-timmy](../reference/ask-timmy.md)): Sam has saved the API key in Supabase and
       set the Console's spending limit; the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
       function reads the content from its released place; everyone has Timmy
+- [ ] Learn and Flashcards ([its note](2026-11-06-redesign-learn-and-flashcards.md); the steps: "From the Learn and
+      Flashcards toggle" below): `migration_v56` applied after `migration_v54` and `migration_v55`, `widget/study-modes.js`
+      and `.css` in `PRECACHE`, the About page's "Study as" entry and its line in "What the hubs record"
 - [ ] After merge: `node tools/release/postcheck.js`, `DEPLOY_NOTES.md` and the site changelog; a notice to the class only
       if Sam wants one
 
@@ -192,7 +195,8 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 ### The engine's files (the split, 2026-11-12, [phase 4](2026-11-05-redesign-phase-4-game-layer.md))
 
 (Since part A, 2026-11-12: `widget/journeys.js` and `widget/hub-art/journeys.js` too. They load on first use, not with
-the page, and are in `tools/ci/syntax.js`.)
+the page, and are in `tools/ci/syntax.js`. Since Learn and Flashcards, 2026-11-12: `widget/study-modes.js` and
+`widget/study-modes.css` too, fetched by `widget/hub-bank.js` the first time Learn or Flashcards is opened.)
 
 `sw.js`: add the engine's four scripts to `PRECACHE` when the new hubs go live: `widget/hub.js`, `widget/hub-rewards.js`,
 `widget/hub-timmy.js` and `widget/hub-bank.js` (`widget/hub.css` and `widget/hub-art.js` are in phase 3's list below).
@@ -326,20 +330,37 @@ own color (`env.lc`, `.gm-sess`), and the games keep their own buttons' style in
 
 ### From the Learn and Flashcards toggle ([Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md))
 
-Sam confirmed the calls in that note (2026-11-06); check against the engine as built.
+Sam confirmed the calls in that note (2026-11-06); built 2026-11-12 and checked against the engine as built (the drafts
+below are the built behavior). At the release:
+
+1. **Apply `migration_v56.sql`** through the connector right after `migration_v54` and `migration_v55` (it needs both). In
+   the switch PR: append it to `supabase/schema.sql` and take its line out of `supabase/pending-migrations.txt`; then
+   `node tools/release/rls.js` and `rls-audit.sql` on the live project. Until it's applied, Learn and Flashcards work on
+   each device and the ratings wait there (`STATE.cardq`), going out on the first page load after it is.
+2. `sw.js`: add `widget/study-modes.js` and `widget/study-modes.css` to `PRECACHE` with the engine's files.
+3. The About page entries below, then `node tools/timmy/build.mjs` (with Ask Timmy's step), so Timmy's site help knows
+   them.
+4. **One Learn round and a few flashcards on the live site** from a phone and a laptop: the ratings reach `card_reviews`
+   (count only, read-only SQL), a second device linked with Link my devices shows the same schedule, and XP shows a
+   `card` award.
 
 **[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (add):
 - **Study as** at the top of the Questions view: **Questions · Learn · Flashcards** (`STATE.ui.qview`, saved like the panel). The
   panel picks which questions and the toggle how; Lectures, Show, the High likelihood toggle, More filters, search, the tags
   and Clear all work the same in all three. Order (In order / Random) shows only for Questions. Drill, Yesterday's misses and
-  Weak spots work in all three; the mock is always questions. Tracked as `bank:view=<view>`.
+  Weak spots work in all three; the mock is always questions (no toggle while it runs). Tracked as `bank:view=<view>`.
+  Learn and Flashcards draw in `widget/study-modes.js` from the set the panel picked ([the task](2026-11-06-redesign-learn-and-flashcards.md)).
 
 **About page**, Questions (new entry, tagged new): **Study as**: Questions as now; **Learn** asks the questions you picked in
-rounds of 7 until you've got each right twice (the second time you think of the answer before the choices show); **Flashcards**
-show the question, you flip it and say how well you knew it (Again, Hard, Good, Easy), and it comes back when you're about to
-forget it, never later than the day before the exam. Learn's answers count like any answer; a flashcard counts toward your
-daily goal and streak and earns 2 XP when it's due. "What the hubs record": how you rated each flashcard, so your schedule
-follows you to your other devices.
+rounds of 7 until you've got each right twice (the second time, when the question allows it, you think of the answer
+before the choices show; a miss comes back at the end of the round); a bar shows how far along you are, and each round
+ends with what you got. **Flashcards** show the question, you flip it (Show the answer, a tap on the card or the space bar)
+and say how well you knew it (Again, Hard, Good, Easy, or keys 1 to 4), and it comes back when you're about to forget
+it, never later than the day before the exam; Home tells you when cards are due. Learn's answers count like any answer;
+a flashcard counts toward your daily goal and streak (not as an answer: no class stats, no "Last time") and earns 2 XP
+when it's due or new, for its first three ratings a day; Study ahead earns none. The mock exam is always questions.
+"What the hubs record": how you rated each flashcard and where you are in Learn, so your schedule and progress follow you
+to your other devices.
 
 ### From phase 4, part A (the journeys' client, [the journeys](2026-11-06-redesign-progression-journeys.md), built 2026-11-12)
 

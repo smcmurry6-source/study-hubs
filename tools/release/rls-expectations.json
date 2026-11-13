@@ -1,5 +1,5 @@
 {
-  "about": "What the anonymous role (every visitor, using the public publishable key) may do to each table directly, without going through a function. Everything else goes through security-definer functions that check their own inputs. tools/release/rls.js fails if the schema allows more than this, or less. Change this file only together with the migration that changes the policy, and say why in the PR. anonNone lists tables that must be closed to anon altogether (no privilege and no policy, tried by hand), and anonNoRun the helper functions anon must never run: what's behind the visit keys of migration_v54 (the secret, and the function that turns a visitor id into a key), and Timmy's chats and the two calls only the timmy Edge Function makes with the service role (migration_v55).",
+  "about": "What the anonymous role (every visitor, using the public publishable key) may do to each table directly, without going through a function. Everything else goes through security-definer functions that check their own inputs. tools/release/rls.js fails if the schema allows more than this, or less. Change this file only together with the migration that changes the policy, and say why in the PR. anonNone lists tables that must be closed to anon altogether (no privilege and no policy, tried by hand), and anonNoRun the helper functions anon must never run: what's behind the visit keys of migration_v54 (the secret, and the function that turns a visitor id into a key), and Timmy's chats and the two calls only the timmy Edge Function makes with the service role (migration_v55), and Learn and Flashcards' log of ratings with its helper and Link my devices' trigger (migration_v56).",
   "anonSelect": [
     "changelog",
     "mode_stats",
@@ -17,12 +17,15 @@
     "visit_secret",
     "timmy_chats",
     "timmy_config",
-    "timmy_messages"
+    "timmy_messages",
+    "card_reviews"
   ],
   "anonNoRun": [
     "sh_visit_key(text)",
     "timmy_begin(text, text, uuid, text, jsonb, text, text)",
     "timmy_finish(bigint, text, text, text, jsonb, text, integer, integer, jsonb, text, text, integer, integer, integer, integer, numeric, integer)",
-    "sh_timmy_on_link()"
+    "sh_timmy_on_link()",
+    "sh_card(timestamptz, text, text, text, text, boolean, text, bigint)",
+    "sh_cards_on_link()"
   ]
 }

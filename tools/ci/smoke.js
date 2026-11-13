@@ -648,6 +648,64 @@ function lint(hub, A){
       notes.push(`${name} (${label}): Timmy's place, its full view and the customizer`);
       await page.close();
     }
+    /* Learn and Flashcards (widget/study-modes.js + .css, the "Study as" toggle above the Question Bank's panel): nothing of
+       them loads with the page or the bank, the toggle loads them; Learn asks a question from the panel's set (answered,
+       no "Try it again", a Next button); a flashcard is never a .qcard (question health and the class's picks leave it
+       alone), turns over to its answer and four ratings, and a rating brings the next card; every button they draw carries
+       a fixed data-* name; the mock has no toggle. The stub answers get_my_cards with [], and the page sends no rating
+       under a test browser, so nothing is recorded. The bank is put back on Questions at the end. */
+    for (const hub of nextHubs.slice(0, 1)) {
+      const page = await context.newPage(); const errs = [], name = `${hub}/next, Learn and Flashcards`, asked = [];
+      page.on('pageerror', e => errs.push(e.message));
+      page.on('request', r => { if (/\/widget\/study-modes\.(js|css)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
+      await page.goto(BASE() + `hubs/${hub}/next/index.html#questions`); await page.waitForTimeout(1500);
+      const views = await page.$$eval('[data-qview]', bs => bs.map(b => b.getAttribute('data-qview')));
+      if (views.join() !== 'questions,learn,cards') problems.push(`${name} (${label}): the Question Bank's "Study as" toggle is ${views.join(', ') || 'missing'}, not Questions, Learn and Flashcards`);
+      if (asked.length) problems.push(`${name} (${label}): Learn and Flashcards' files loaded with the page, before the toggle was used (${asked.join(', ')}): they load on first use`);
+      if (views.length) {
+        await page.click('[data-qview="learn"]');
+        const lc = await page.waitForSelector('[data-smstage] .qcard', { timeout: 15000 }).catch(() => null);
+        if (!asked.includes('study-modes.js') || !asked.includes('study-modes.css')) problems.push(`${name} (${label}): Learn opened without study-modes.js and study-modes.css (${asked.join(', ')})`);
+        if (!lc) problems.push(`${name} (${label}): Learn drew no question`);
+        else {
+          await page.evaluate(() => {
+            const c = document.querySelector('[data-smstage] .qcard'), sc = c.querySelector('[data-showch]'); if (sc && sc.offsetParent) sc.click();
+            const rv = c.querySelector('[data-reveal]'); if (rv) { rv.click(); c.querySelector('[data-grade]').click(); return; }
+            const st = [...c.querySelectorAll('[data-step]')]; if (st.length) { st.forEach(b => b.click()); return; }
+            const l = [...c.querySelectorAll('[data-side="l"]')]; if (l.length) { l.forEach(x => { x.click(); const r = c.querySelector('[data-side="r"]:not(:disabled)'); if (r) r.click(); }); return; }
+            const ch = c.querySelector('.ch'); if (ch) ch.click(); const k = c.querySelector('[data-check]'); if (k && !k.disabled) k.click();
+          });
+          await page.waitForTimeout(500);
+          const st = await page.evaluate(() => { const c = document.querySelector('[data-smstage] .qcard'); return { answered: !!c && c.classList.contains('is-answered'), again: !!(c && c.querySelector('[data-again]')), next: !!document.querySelector('[data-smstage] [data-sm="next"]') }; });
+          if (!st.answered || st.again || !st.next) problems.push(`${name} (${label}): a Learn question should end answered, with Next and without "Try it again" (${JSON.stringify(st)})`);
+        }
+        await page.click('[data-qview="cards"]');
+        const fc = await page.waitForSelector('.sm-cards .fcard', { timeout: 10000 }).catch(() => null);
+        if (!fc) problems.push(`${name} (${label}): Flashcards drew no card`);
+        else {
+          const first = await fc.getAttribute('data-fqid');
+          if (await page.$('.sm-cards .qcard, .sm-cards [data-qid]')) problems.push(`${name} (${label}): a flashcard is drawn as a question card (.qcard / data-qid): question health would log it as an unanswered question`);
+          await page.click('.sm-cards [data-sm="flip"]'); await page.waitForTimeout(900);
+          const back = await page.evaluate(() => { const c = document.querySelector('.sm-cards .fcard'); return { ans: !!c.querySelector('.fc-ans'), rates: c.querySelectorAll('.fc-r').length, shown: !c.querySelector('[data-raterow]').hidden, w: document.documentElement.scrollWidth - innerWidth }; });
+          if (!back.ans || back.rates !== 4 || !back.shown) problems.push(`${name} (${label}): a flashcard turned over should show its answer and four ratings (${JSON.stringify(back)})`);
+          if (back.w > 1) problems.push(`${name} (${label}): a turned-over flashcard scrolls sideways by ${back.w}px`);
+          await page.click('.sm-cards [data-sm="good"]'); await page.waitForTimeout(900);
+          const after = await page.evaluate(() => { const c = document.querySelector('.sm-cards .fcard'); return { id: c && c.getAttribute('data-fqid'), caught: !!document.querySelector('.sm-caught') }; });
+          if (!after.caught && (!after.id || after.id === first)) problems.push(`${name} (${label}): rating a flashcard Good didn't bring the next card`);
+        }
+        /* the bank's own question card inside Learn keeps its buttons as they are; everything Learn and Flashcards draw is named */
+        const unnamed = await page.$$eval('.sm button', bs => bs.filter(b => !b.closest('.qcard') && ![...b.attributes].some(a => /^data-/.test(a.name))).map(b => (b.textContent || '').trim().slice(0, 30)));
+        if (unnamed.length) problems.push(`${name} (${label}): button(s) in Learn or Flashcards without a fixed data-* name (click counts): ${unnamed.join(', ')}`);
+        await page.evaluate(() => { location.hash = 'questions/mock'; }); await page.waitForTimeout(800);
+        if (await page.$('[data-qview]')) problems.push(`${name} (${label}): the "Study as" toggle shows during the mock exam (the mock is always questions)`);
+        await page.evaluate(() => { location.hash = 'questions'; }); await page.waitForTimeout(800);
+        const qb = await page.$('[data-qview="questions"]'); if (qb) { await qb.click(); await page.waitForTimeout(400); }
+        if (!(await page.$('#qlist .qcard'))) problems.push(`${name} (${label}): back on Questions, the bank drew no question cards`);
+      }
+      errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+      notes.push(`${name} (${label}): the "Study as" toggle, a Learn question and a flashcard turned over and rated`);
+      await page.close();
+    }
     /* the new dashboard's "you" card: the place takes the house picture's spot once Timmy is adopted. The page is at its
        request budget, so nothing of the place loads with it; the place draws on first use and keeps a still, and the
        next visit shows that still at once, still without a request. */

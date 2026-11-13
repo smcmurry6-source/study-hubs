@@ -508,6 +508,61 @@
     save();
     return resp;
   }
+  /* Learn and Flashcards (migration_v56): a rating or Learn step, as sh_card answers it. Ratings pay a flat 2 for a card's
+     first three a day (Study ahead's and Learn's pay nothing), behind the same 2-second limit as answers; no day bonus. */
+  var CARD_WHAT = ["again", "hard", "good", "easy", "learn-0", "learn-1", "learn-2", "learn-reset"];
+  function cardRows(){ return db.cards2 || (db.cards2 = []); }
+  function card2(a, t){
+    var hub = a.p_hub, qid = String(a.p_qid || ""), what = a.p_what, req = a.p_request || null, E = hubExport(hub), q = null;
+    if (!a.p_visitor || !hub || !qid || CARD_WHAT.indexOf(what) < 0 || (req && !/^[A-Za-z0-9_-]{8,64}$/.test(req))) return { ok: false, error: "bad" };
+    var rows = cardRows(), rating = what.indexOf("learn") !== 0, ahead = rating && !!a.p_ahead, i;
+    if (req) for (i = 0; i < rows.length; i++) if (rows[i].req === req) {
+      if (rows[i].v !== a.p_visitor) return { ok: false, error: "dup" };
+      var again = {}, k0; for (k0 in rows[i].resp) again[k0] = rows[i].resp[k0]; again.repeat = true; return again;
+    }
+    var seen = t; if (a.p_seen != null && isFinite(+a.p_seen)) seen = Math.min(t, Math.max(t - 2 * 864e5, +a.p_seen));
+    var row = { v: a.p_visitor, hub: hub, qid: qid, what: what, ahead: ahead, t: t, seen: seen, req: req, xp: 0, resp: null };
+    var mine = rows.filter(function(r){ return r.v === a.p_visitor && r.what.indexOf("learn") !== 0; });
+    rows.push(row);
+    var why = null, base = 0, mult = 1, paid = 0;
+    if (!rating) why = "learn";
+    else if (ahead) why = "ahead";
+    else {
+      if (E) for (i = 0; i < E.questions.length; i++) if (E.questions[i].id === qid) { q = E.questions[i]; break; }
+      if (!q) why = "unknown";
+      else {
+        var lastC = mine.length ? mine[mine.length - 1].t : 0, lastA = a.p_visitor === db.visitor ? db.lastAns || 0 : 0;
+        var n60 = mine.filter(function(r){ return r.t >= t - 60e3; }).length + 1;
+        if ((lastA && t - lastA < 2000) || (lastC && t - lastC < 2000) || n60 > 30) why = "fast";
+        else {
+          var dd = day(t), n = mine.filter(function(r){ return r.hub === hub && r.qid === qid && !r.ahead && day(r.t) === dd; }).length + 1;
+          base = n <= 3 ? 2 : 0; if (!base) why = "repeat";
+          mult = boost2(t) ? 2 : 1; paid = base * mult;
+          if (a.p_visitor === db.visitor) db.xp2 = (db.xp2 || 0) + paid;
+        }
+      }
+    }
+    row.xp = paid;
+    row.resp = { ok: true, xp: paid, base: base, mult: mult, why: why, boost: boost2(t), total: a.p_visitor === db.visitor ? myXp() : 0 };
+    if (rows.length > 5000) rows.splice(0, rows.length - 5000);
+    save();
+    return row.resp;
+  }
+  function resetLearn2(a, t){
+    var ids = Array.isArray(a.p_qids) ? a.p_qids.map(String).filter(function(x){ return x && x.length <= 80; }) : [];
+    if (!a.p_visitor || !a.p_hub || !ids.length || ids.length > 2000) return 0;
+    var seen = t; if (a.p_seen != null && isFinite(+a.p_seen)) seen = Math.min(t, Math.max(t - 2 * 864e5, +a.p_seen));
+    var uniq = ids.filter(function(x, i){ return ids.indexOf(x) === i; });
+    uniq.forEach(function(qid){ cardRows().push({ v: a.p_visitor, hub: a.p_hub, qid: qid, what: "learn-reset", ahead: false, t: t, seen: seen, req: null, xp: 0, resp: { ok: true, xp: 0, why: "learn" } }); });
+    save();
+    return uniq.length;
+  }
+  function myCards2(a){
+    if (!a.p_visitor || !a.p_hub) return [];
+    return cardRows().filter(function(r){ return r.v === a.p_visitor && r.hub === a.p_hub; })
+      .sort(function(x, y){ return x.seen - y.seen; }).slice(-20000)
+      .map(function(r){ return [r.qid, r.what, Math.floor(r.seen), r.ahead ? 1 : 0, r.req]; });
+  }
   function classStat(hub, qid){
     var h = hash(hub + "|" + qid), attempts = 12 + h % 49, correct = Math.round(attempts * (0.35 + (h >>> 8) % 61 / 100));
     var d = db.cls[hub + "|" + qid]; if (d) { attempts += d[0]; correct += d[1]; }
@@ -1152,6 +1207,10 @@
     if (fn === "equip_item") return { write: v === db.visitor, data: equip2(v, a.p_slot, a.p_item) };
     if (fn === "get_pet_days_v2") return { data: v === db.visitor ? bootstrapPetDays(t).map(function(r){ return { d: r.d, attempts: r.attempts, correct: r.correct, hp: 0 }; }) : [] };
     if (fn === "record_answer_v2") return { write: true, data: answer2(a, t) };
+    /* Learn and Flashcards (migration_v56) */
+    if (fn === "record_card_v2") return { write: true, data: card2(a, t) };
+    if (fn === "reset_my_learn") return { write: true, data: resetLearn2(a, t) };
+    if (fn === "get_my_cards") return { data: v === db.visitor ? myCards2(a) : [] };
     if (fn === "mark_dark_unlock_seen") { if (v === db.visitor) { db.dark = db.dark || []; if (db.dark.indexOf(a.p_journey) < 0) db.dark.push(a.p_journey); save(); } return { write: true, data: true }; }
     if (fn === "xp_session_start") {
       if (v !== db.visitor) return { data: null };

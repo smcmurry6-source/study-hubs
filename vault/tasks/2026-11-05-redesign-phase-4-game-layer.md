@@ -301,6 +301,14 @@ These hold for each spec; a spec only adds to them.
 - 2026-11-12: beside the sessions, Ask Timmy part 3 (the admin page's Ask Timmy tab, `review/`) merged as `e0737a1`
   ([#341](https://github.com/smcmurry6-source/study-hubs/pull/341), Sam: "merge"); `postcheck.js` passed. **Next: still
   session 2, the shop's client**, then session 3 (Ask Timmy part 4).
+- 2026-11-12 (Claude Code): **Learn and Flashcards built beside the sessions above** ([its note](2026-11-06-redesign-learn-and-flashcards.md)),
+  in [#344](https://github.com/smcmurry6-source/study-hubs/pull/344), a draft waiting for Sam's merge. Its server part is a new pending migration, `migration_v56.sql` (Sam: "B"), after
+  v54 and v55, which it doesn't change. For the sessions still to come: `widget/hub-bank.js` now draws the "Study as"
+  toggle above the panel and exports `HX.qParts`, `HX.drawQuestions` and `HX.qview`; `widget/hub-rewards.js` has
+  `HX.recordCard` and `HX.doneToday` (the ring and Today count flashcards); the preview's `rpc()` answers
+  `record_card_v2`, `reset_my_learn` and `get_my_cards` (keep them in a conflict). **Session 9** counts two more files,
+  `widget/study-modes.js` and `widget/study-modes.css`, loaded on first use, not with the page; **session 8**'s service
+  worker list and the release add them (the release note says so).
 
 ## Outcome
 

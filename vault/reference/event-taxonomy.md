@@ -117,6 +117,15 @@ more people, never for anything about a person.
 | `ideas` | one idea: visitor (none for starters), leaderboard name, title, body, hub, category, source, status, hidden | yes | `post_idea`, `admin_post_starter_idea` | **Public to the class under the poster's name** (no id is ever sent back). `source`: `board`, `suggest`, `checkin`, `starter` (an idea Ask Timmy drafted is posted as `board`, with the student's tap; `ask:offer=idea-posted` counts them). An author's delete (`delete_my_idea`) removes the row with its votes, reports and notes |
 | `idea_votes` / `idea_reports` / `idea_notes` | visitor × idea: up or down; a report; a status note for the Inbox | yes | `vote_idea`, `report_idea`, `admin_set_idea` | Three reports hide an idea |
 
+### Learn and Flashcards (migration_v56, from the redesign's release; [game-server](game-server.md))
+
+A flashcard's rating is not an answer: it never reaches `personal_answers`, `question_stats`, the class's picks or question
+health. Learn's answers are ordinary answers (`record_answer_v2`, filed with context `other`); only its steps are here.
+
+| Table | Grain | Visitor | Written by | Notes |
+|---|---|---|---|---|
+| `card_reviews` | one flashcard rating (`again`, `hard`, `good`, `easy`) or Learn step (`learn-0` to `learn-2`, `learn-reset`): visitor, hub, qid, Study ahead or not, server time and the page's time, request id, XP paid | yes | `record_card_v2`, `reset_my_learn` | So the schedule and Learn's progress follow a student to their other devices (`get_my_cards`, their own rows only). Pays `xp_awards` source `card`. Moved to the remaining id when devices link |
+
 ### Ask Timmy (migration_v55, from the redesign's release; [ask-timmy](ask-timmy.md))
 
 Timmy's chats are stored whole, with the visitor id (Sam, 2026-11-12: "store all chat logs with timmy";
@@ -175,6 +184,7 @@ new one can't go undocumented.
 | `hints` | `hints:likely-practice` | "Practice these" on Exam Hints | hubs | 10-29 |
 | `drill` | `drill:size=20`, `drill:more=10` | Daily Drill size chosen, "more" | `widget/drill.js` | 10-20 |
 | `pin` | `pin:add`, `pin:remove` | pinned questions | `widget/v3.js` | 11-02 |
+| `bank:view` / `learn` / `cards` | `bank:view=questions` / `=learn` / `=cards` (the Question Bank's "Study as" toggle, and Learn's "Flashcards for these"), `learn:round-done`, `learn:all-mastered`, `learn:start-over`, `cards:caught-up` (the "All caught up" screen drawn), `cards:new`, `cards:ahead` (Study new cards, Study ahead), `home:cards-due` (Home's "n flashcards due" row) | Learn and Flashcards; the ratings themselves are `card_reviews` rows, not events | `widget/hub-bank.js`, `widget/study-modes.js`, `widget/hub.js` (redesign only) | the release |
 | `qrate` | `qrate:up`, `qrate:down`, `qrate:undo`, `qrate:why=<reason>` (`wrong-key`, `confusing`, `not-in-notes`, `explanation`, `giveaway`, `other`, `none`) | "Good question?" taps | `widget/qhealth.js` | 11-04 |
 | `hl` | `hl:y`, `hl:g` | highlights made, by color | `widget/highlight.js` | 10-20 |
 | `mmap` | `mmap:open` | mind map opened | `widget/v3.js` | 10-20 |
