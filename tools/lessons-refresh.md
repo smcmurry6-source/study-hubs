@@ -34,7 +34,9 @@ its narration and Timmy Time off the site ([archived-hubs-drop-their-audio](../v
 
 Use "Using the data for questions and notes" in `LESSONS.md` to read each signal. Every student report and
 suggestion gets a verdict: fixed in this run, already fixed, or not a problem (and why). Look for patterns across
-hubs, not one-offs: one report usually means the same problem elsewhere in the bank.
+hubs, not one-offs: one report usually means the same problem elsewhere in the bank. To say whether the last run's
+fixes worked, compare them with unfixed questions that were as low (`tools/lessons-daily.sql`, section 6): low questions
+rise by themselves, and a first try comes before the person has seen the explanation.
 
 ## 3. Update `LESSONS.md`
 

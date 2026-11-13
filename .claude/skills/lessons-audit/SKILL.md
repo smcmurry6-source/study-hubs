@@ -76,6 +76,9 @@ raw `activity_pings` are kept 30 days only (`vault/reference/analytics-retention
 `LESSONS.md` names the questions and features the last run changed, with their before numbers. For each, compute
 **since the change** (cumulative now minus cumulative then: e.g. 24/56 now, 10/33 before -> 14/23 since) and say
 whether it worked. Note confounders (exam eve inflates everything). This is the "Did the last refresh work?" block.
+**Compare fixed questions with unfixed ones that were as low** (`tools/lessons-daily.sql`, section 6): low items rise on
+their own (2026-11-12: 8 fixed 27% -> 60%, 10 unfixed 32% -> 57%), and a first try comes before the person sees the
+explanation, so an explanation fix shows only in retries. Say "can't tell" when the comparison can't.
 
 ## 2b. Newly archived hub: full retrospective + recap
 
