@@ -417,7 +417,10 @@ These hold for each spec; a spec only adds to them.
   - **`widget/place.js`**: `open({ place, onClose })` draws a visit in its theater look (`dlg.is-visit`; `tripIn` and
     `tripOut` for the trip through the clouds, the design page's `clouds()` ported as it is; `guestCard()` for the
     panel) and counts `place:visit`; your own place is unchanged. The bowling lane's clips play at a visited place too.
-    Visit someone random, and next and back while visiting (round 3), aren't built: they'd reuse `tripIn`.
+    The tour (Sam: "build the random visit and next/back", after #352): `open({ place, nav })`, where `nav` is `{ at, list:
+    [{ name, rank }], load(i) }` from `widget/dash.js` (names and ranks only, the keys stay there); `hop(i | "home")` rolls
+    the clouds in, and once they cover the screen and the next place is here, `shut()`s this window and `open()`s the next
+    under the same clouds (`covered`), which then scatter. `onClose(at)` says where the tour ended, for the focus.
   - **For session 6, the trophy case**: the visit's guest card draws hub medals with `shRanks.medal(lvl, 44, hub)` from
     the place's `flair`; a trophy shelf for a visited place, if one is wanted, has nothing to read: `get_place` gives no
     trophies (and migration_v54 isn't changed).
@@ -427,6 +430,11 @@ These hold for each spec; a spec only adds to them.
   - Tests: the smoke test's "visiting" block (desktop and phone), `a11y.js`'s boards and visited place (light and dark,
     in the baseline at zero). Bugs: BUG-112 (`widget/ranks.js`'s "+1" medal button, at the release) to BUG-115.
   **Next: session 6, the trophy case and the cards** ([its note](2026-11-12-redesign-trophy-case-and-cards.md)).
+- 2026-11-13: [#352](https://github.com/smcmurry6-source/study-hubs/pull/352) merged as `86b81a3` (Sam: "merge when ready").
+  Then Sam: "build the random visit and next/back": the tour, in [#354](https://github.com/smcmurry6-source/study-hubs/pull/354)
+  ([visiting](done/2026-11-12-redesign-visiting.md)'s Outcome): Visit someone random under the board, arrows and Back to
+  mine in a visit, each hop through the clouds. Nothing on the server; `widget/place.js`'s `open()` takes `nav` and
+  `covered` (above). **Next: session 6** still.
 
 ## Outcome
 

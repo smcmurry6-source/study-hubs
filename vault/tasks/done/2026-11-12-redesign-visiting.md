@@ -96,6 +96,9 @@ do at a place besides look and tap; a list of who visited; an opt-out (Sam: none
   so a visit opens in the leaderboard's theater look ([decisions](../../decisions.md)). Contact sheets (laptop and phone,
   light and dark) and a recording sent. Bugs: BUG-112 to BUG-115 ([the bug log](../../release/bug-log.md)); BUG-112 is
   `widget/ranks.js`'s and waits for the release.
+- 2026-11-13: [#352](https://github.com/smcmurry6-source/study-hubs/pull/352) merged as `86b81a3` (Sam: "merge when ready",
+  "no preview needed"). Then Sam: "build the random visit and next/back", the rest of round 3's visiting: built in
+  [#354](https://github.com/smcmurry6-source/study-hubs/pull/354) (the tour, in the Outcome).
 
 ## Outcome
 
@@ -128,6 +131,19 @@ do at a place besides look and tap; a list of who visited; an opt-out (Sam: none
   over their home. Until the clouds cover the page, the window and its backdrop are hidden (`is-trip`). The clouds are
   fixed inside the dialog, so they cover the screen from the top layer, and are `aria-hidden`. None with reduced motion;
   no whoosh (the place has no sounds). The smoke test checks the line is text and that all of it is gone 2.6 s in.
+- **The tour** (after #352; Sam: "build the random visit and next/back", from round 3's design page). **Visit someone
+  random** (`#visitRand`, `data-dash="visit-random"`, the design page's die button) sits under the board when it has
+  someone to visit, and picks one of its rows with a key, never your own. A visit opened from a board carries the
+  board (`nav`: the rows with keys but yours, as names and ranks; `load(i)` in `widget/dash.js` asks `get_place` for the
+  i-th, sharing the page's answers). In the visit window, round arrows on either side of the stage go to the previous
+  and next person (wrapping round; "Previous place: <name>", "Next place: <name>"), **Back to mine** sits by the close
+  button (its icon alone on a phone, its name kept), and the guest card says "Place 3 of 9 on the board, Next: <name>".
+  Each hop goes through the clouds: they roll in over the place you're leaving, and once they cover the screen and the
+  next place is here, this window gives way to the next one under the same clouds (`covered`: the same clouds for the
+  same screen), which then scatter. A place that can't be read leaves you where you are with "That place couldn't be
+  opened just now." Pressing Next again keeps going (focus lands on it). Closing gives focus to the row of the place
+  you ended at, your own row after "Back to mine", or the random button after a random visit. Each place counts
+  `place:visit`. With reduced motion there are no clouds. Nothing on the server.
 - **The preview's made-up data** (`tools/preview/runtime/preview.js`): each classmate has a place of their own
   (`FAKE_PLACES`: different homes, scenes, yards, outfits, seasonal sets, rank pieces their rank has reached); Fixture
   Fluoride is a ModuPro (`fakeXp`), the same rank on every board and at the place; three have one hub medal each

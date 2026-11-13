@@ -589,6 +589,9 @@ game layer no row is a button.
   to fly over through the clouds to their Timmy's place: their home, scene and yard, what their Timmy is wearing, their rank's statue and their
   hub medals, under their leaderboard name. Tap their Timmy and he waves; the things around the place do what they do
   at yours. Your own row opens your own place.
+- **Visit someone random** (under the leaderboard) takes you to one of the places on it. While you're visiting, the
+  arrows on either side take you to the next or the last place on the board, and **Back to mine** brings you home,
+  each through the clouds.
 - **What a visitor sees, and doesn't**: only the place. Never your HP, XP as a number, your streak, your answers, your
   Shiny Gold Crowns, what you own beyond what's out, or when you did anything. Nobody can change your place but you,
   and there's no list of who visited. Everyone on a board can be visited (there's no switch to turn it off).

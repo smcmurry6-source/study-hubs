@@ -1143,12 +1143,54 @@ function lint(hub, A){
         await page.click('#board .dx-visit[aria-label="Visit Dee’s place"]'); await page.waitForTimeout(1500);
         const dee = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tpv'), lines: [...document.querySelectorAll('#board .dx-vmsg')].map(m => (m.closest('[data-visit]').querySelector('.dx-visit') || {}).textContent + ': ' + m.textContent) }));
         if (dee.open || dee.lines.length !== 1 || !/^Dee: That place couldn’t be opened just now/.test(dee.lines[0])) problems.push(`${name} (${label}): a key that opens nothing should give one plain line on its row and nothing else (${JSON.stringify(dee)})`);
+        /* the tour (round 3's design page): a visit carries the board's other rows with keys (Alpha, Bee, Cee, Dee here: not
+           Eff, whose key is bad, nor your own). The arrows are named for where they go, carry one fixed click name each and
+           go there through the clouds, one window at a time, asking get_place for nothing the page already has; Dee's place
+           can't be read, so you stay at Cee with one plain line; "Back to mine" goes home, and closing then gives focus to
+           your own row. */
+        const tour = () => page.evaluate(() => { const ds = document.querySelectorAll('dialog.tpv'), d = ds[0]; if (!d) return { n: 0, focus: document.activeElement ? document.activeElement.getAttribute('aria-label') || '' : '' };
+          const btn = k => { const b = d.querySelector('[data-tp="visit-' + k + '"]'); return b ? { label: b.getAttribute('aria-label'), data: [...b.attributes].filter(a => a.name.startsWith('data-')).map(a => a.name).join(' ') } : null; };
+          return { n: ds.length, title: d.querySelector('#tpvT').textContent, visit: d.classList.contains('is-visit'), clouds: !!d.querySelector('.tpv-clouds'), prev: btn('prev'), next: btn('next'), home: btn('home'),
+            gnav: (d.querySelector('.tpv-gnav') || {}).textContent || '', wait: (() => { const w = d.querySelector('.tpv-wait'); return w && !w.hidden ? w.textContent : ''; })(), focus: document.activeElement ? document.activeElement.getAttribute('data-tp') || '' : '', injected: !!window.__visit }; });
+        const vb = () => (placeCalls[K('a')] || 0) + (placeCalls[K('b')] || 0) + (placeCalls[K('c')] || 0) + (placeCalls[K('d')] || 0);
+        await page.click(bee); await page.waitForTimeout(2800);
+        let t = await tour();
+        if (!t.prev || !t.next || !t.home || t.prev.label !== 'Previous place: Visit Alpha' || t.next.label !== 'Next place: Cee' || t.home.label !== 'Back to mine' || [t.prev, t.next, t.home].some(b => b.data !== 'data-tp'))
+          problems.push(`${name} (${label}): a visit from the board should have Previous, Next and Back to mine, named for where they go, each with one fixed click name (${JSON.stringify(t)})`);
+        if (!/^Place 2 of 4 on the board/.test(t.gnav) || !/Next: Cee$/.test(t.gnav) || t.injected) problems.push(`${name} (${label}): the guest card should say where on the board this place is, as text (${JSON.stringify(t.gnav)})`);
+        const before = vb();
+        await page.click('dialog.tpv [data-tp="visit-next"]'); await page.waitForTimeout(400);
+        const mid = await tour();
+        if (!mid.clouds || mid.n !== 1) problems.push(`${name} (${label}): Next should go through the clouds, one window at a time (${JSON.stringify(mid)})`);
+        await page.waitForTimeout(2800); t = await tour();
+        if (t.n !== 1 || t.title !== 'Cee’s place' || t.clouds || t.focus !== 'visit-next' || !/^Place 3 of 4/.test(t.gnav)) problems.push(`${name} (${label}): Next should open Cee's place, the clouds gone and focus on Next again (${JSON.stringify(t)})`);
+        await page.keyboard.press('Enter'); await page.waitForTimeout(3000); t = await tour();
+        if (t.n !== 1 || t.title !== 'Cee’s place' || t.clouds || !/^That place couldn’t be opened just now/.test(t.wait)) problems.push(`${name} (${label}): a place that can't be read should leave you where you are with one plain line (${JSON.stringify(t)})`);
+        if (vb() - before) problems.push(`${name} (${label}): the tour should ask get_place for nothing the page already has (the top three's outfits and the tap on Dee asked; ${vb() - before} more asked)`);
+        await page.click('dialog.tpv [data-tp="visit-home"]'); await page.waitForTimeout(3200); t = await tour();
+        if (t.n !== 1 || t.visit || t.title !== 'Timmy’s place' || t.clouds) problems.push(`${name} (${label}): Back to mine should open your own place (${JSON.stringify(t)})`);
+        await page.keyboard.press('Escape'); await page.waitForTimeout(500); t = await tour();
+        if (t.n || t.focus !== 'Test Molar (you): open your place') problems.push(`${name} (${label}): closing your place after a tour should give focus to your own row (${JSON.stringify(t)})`);
+        const tt = (await page.evaluate(() => window.__tracked || [])).filter(k => /^place:/.test(k));
+        if (tt.filter(k => k === 'place:visit').length < 3 || tt.some(k => /aaaa|cccc|Cee|Bee|Alpha|img/.test(k))) problems.push(`${name} (${label}): each place on a tour is counted as place:visit, never whose (${tt.join(', ')})`);
+        /* Visit someone random: under the board, one of its rows with a key (never your own), and focus back to the button */
+        const rb = await page.evaluate(() => { const p = document.getElementById('visitRand'), b = p && p.querySelector('button'); return p ? { shown: !p.hidden, data: b ? [...b.attributes].filter(a => a.name.startsWith('data-')).map(a => a.name + '=' + a.value).join(' ') : '' } : null; });
+        if (!rb || !rb.shown || rb.data !== 'data-dash=visit-random') problems.push(`${name} (${label}): "Visit someone random" should be under the board with one fixed click name (${JSON.stringify(rb)})`);
+        else {
+          /* the pick made certain for the test: the third of the four (Cee) */
+          await page.evaluate(() => { window.__rnd = Math.random; Math.random = () => .6; });
+          await page.click('#visitRand button'); await page.evaluate(() => { Math.random = window.__rnd; }); await page.waitForTimeout(3000); t = await tour();
+          if (t.n !== 1 || t.title !== 'Cee’s place' || !t.visit || !t.next) problems.push(`${name} (${label}): a random visit should open that place as a visit, with the tour (${JSON.stringify(t)})`);
+          await page.keyboard.press('Escape'); await page.waitForTimeout(500);
+          const rf = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tpv'), rand: !!(document.activeElement && document.activeElement.closest('#visitRand')) }));
+          if (rf.open || !rf.rand) problems.push(`${name} (${label}): closing a random visit should give focus back to the button (${JSON.stringify(rf)})`);
+        }
         await page.click('#boardSeg [data-board="streaks"]'); await page.waitForTimeout(800);
         const sb = await page.$$eval('#board .dx-visit', bs => bs.map(b => b.getAttribute('aria-label')));
         if (sb.length !== 4) problems.push(`${name} (${label}): the study streaks board's rows should be buttons too (${sb.join(' | ')})`);
       }
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
-      notes.push(`${name} (${label}): rows as buttons, a visit, the plain line, focus back, both boards`);
+      notes.push(`${name} (${label}): rows as buttons, a visit, the plain line, focus back, the tour, a random visit, both boards`);
       await page.close();
       /* without the game layer: today's boards, no keys, no buttons */
       const p2 = await context.newPage(); const e2 = [];
@@ -1159,8 +1201,8 @@ function lint(hub, A){
       await p2.goto(BASE() + 'next/index.html'); await p2.waitForTimeout(2000);
       await p2.evaluate(() => document.getElementById('class').scrollIntoView());
       await p2.waitForSelector('#board li', { timeout: 15000 }).catch(() => null); await p2.waitForTimeout(600);
-      const old = await p2.evaluate(() => ({ rows: document.querySelectorAll('#board li').length, buttons: document.querySelectorAll('#board .dx-visit, #board [data-visit]').length }));
-      if (!old.rows || old.buttons) problems.push(`${name} (${label}): without the game layer no row should be a button (${JSON.stringify(old)})`);
+      const old = await p2.evaluate(() => ({ rows: document.querySelectorAll('#board li').length, buttons: document.querySelectorAll('#board .dx-visit, #board [data-visit]').length, rand: !document.getElementById('visitRand').hidden }));
+      if (!old.rows || old.buttons || old.rand) problems.push(`${name} (${label}): without the game layer no row should be a button, and there's no random visit (${JSON.stringify(old)})`);
       e2.forEach(e => problems.push(`${name}, without the game layer (${label}): JavaScript error: ${e}`));
       await p2.close();
     }
