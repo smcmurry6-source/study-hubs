@@ -145,7 +145,7 @@ download it, which keeps the new dashboard inside its request budget (`tools/rel
 
 - **Where it opens.** Timmy's "Ask me": a button in his speech bubble when he's tapped and in the dashboard house's menu
   (`widget/pet.js` adds them only when `window.shAsk` exists, so the live hubs' Timmy is unchanged). When he isn't on the
-  page (turned off, Dashboard only, Focus mode, not adopted yet), an Ask icon takes his spot: `.ska-fab` in a hub's
+  page (turned off, Dashboard only, Focus mode; everyone has Timmy since part 4), an Ask icon takes his spot: `.ska-fab` in a hub's
   bottom-left corner (above the tab bar on a phone), `#askSpot` in the dashboard's "you" card. A 6-second grace after load
   keeps the icon from flashing before Timmy arrives. "Ask Timmy" (or "Ask the hub") on an answered question card
   (`widget/hub-bank.js`, `[data-ask-q]`) opens it with that question attached and "Why is it “…”?" in the box.
@@ -179,12 +179,57 @@ download it, which keeps the new dashboard inside its request budget (`tools/rel
   covered), "nap" (today's limit reached). The preview panel's "class data" switch reaches it too: slow answers in
   4 seconds instead of 1.2, unreachable shows the chat's "can't reach" line with Try again.
 - **The smoke test** (`tools/ci/smoke.js`, `askCheck`) stubs the function and checks, on every new hub (phone and laptop)
-  and the new dashboard: the Ask icon or button shows while Timmy isn't adopted, the chat says chats are saved, the
+  and the new dashboard: Timmy is there and the Ask icon or button isn't, then with Timmy turned off it shows, the chat says chats are saved, the
   request carries what the function reads, an answer's markup is drawn as text, Report and a drafted report work, every
   button has its `data-ska`, a "From the notes" link opens `#notes/<lecture>`, Ask Timmy on an answered card sends its id,
   and the icon hides during the mock.
 - At the release: `sw.js` precaches the new pages' files (add `widget/ask.js` and `widget/ask.css` with the rest), and
   the function's `TIMMY_CONTENT_BASE` points at the released content (above).
+
+## Everyone has Timmy (`widget/pet.js`, part 4)
+
+Built 2026-11-13 ([the task](../tasks/2026-11-12-redesign-ask-timmy.md), "Build spec, part 4"). Sam, 2026-11-12:
+"adopting timmy is no longer an option. once the redesign launches, everyone has timmy", and "if someone doesnt have a
+costume applied, they are naked. What you put wins." Only on the redesign's pages: the live hubs and the live dashboard
+pass nothing and keep every line of the old behavior.
+
+- **The switch** is `shPet.mount({ everyone: true, outfit })`. `widget/v3.js` passes it (and loads pet.js for everyone,
+  adopted or not) on a page whose tag has `data-game="v2"`, which the engine writes on every new hub; `widget/dash.js`
+  passes it on the new dashboard (whose porch line, "Timmy Tooth wants to meet you", is gone).
+- **No adoption**: `adopted()` is true. A first visit sets `sh_pet_born` to today (Central) and sends the `pet-adopt`
+  badge (`record_achievement`) as the introduction did; with two linked devices that each met him on their own, the
+  earliest badge's day wins (`syncBadges`, only with `everyone`). No introduction, no "Tap me!", no "No thanks"; one
+  hello in his bubble on the first visit instead ("Hi, I'm Timmy Tooth! ..."), with "Ask me" when the chat is there.
+- **100 HP to start**: `simulate()` starts at 100, not 70, when `sh_pet_born` is on or after `FULL_FROM`, the day the
+  redesign goes live (`"9999-12-31"` until the release sets it). A Timmy adopted before keeps his history. In a preview,
+  `tools/preview/transform.js` rewrites that line to read `window.SH_PREVIEW_TIMMY_FROM`, which the preview's runtime
+  sets to the day the test account started (so `new` meets him at 100 and the other accounts keep theirs); the smoke test
+  serves pet.js with it set to today. **Pearly Whites** (the 100 HP trophy): a Timmy who starts at 100 earns it by getting
+  back to 100 after a day has ended with him under it (`dipped` in `simulate()`), so it isn't given on the first day.
+- **What he wears**: only the shop's outfit in his `outfit` slot (`shop.equipped.outfit` in the v2 bootstrap, which
+  `load()` reads), never a holiday's, and nothing when nothing is on. `art()` with no `hat` and no `fit` draws him bare
+  and puts the outfit on exactly as the kit's `dress()` does (`dressLayer`), so his bar, the dashboard's card, the
+  chat's avatar and the checkup all wear it; callers that pass `hat: ""` (the place, the shop, the classroom) dress him
+  themselves. `fit()` returns the outfit's id ("" for none) for the hubs' studying-now presence, so the classroom draws
+  him as he is; a change fires `sh:pet-fit`, and `widget/v3.js` sends the presence again.
+- **No request for it at page load**: the outfit's drawing is kept on the device, `sh_pet_outfit` = `{ id, back, face,
+  top, say }` (`say`: its lines, when the place handed them over). When the server's id isn't the kept one (another
+  device changed it, or this is a new device), `widget/hub-art/outfits.js` is fetched after the first scroll, wheel, tap
+  or key (never with the page: the request budgets), and until then he wears nothing rather than the wrong thing. The
+  shop's outfits and the place's kit are used first when they're on the page, so a piece redrawn later reaches the kept
+  copy.
+- **Changing it**: `shPet.setOutfit(id, parts)` puts it on at once. `widget/place.js` calls it whenever its outfit slot
+  changes (`barFollow()`: after the customizer's equip, the server's answer, or a refusal put back), with the kit's
+  drawing and lines, so no file is fetched. The place itself (`timmySvg`) always draws him bare under the outfit.
+- **What he says**: with `everyone` his outfit lines are the worn outfit's own (when kept), and with nothing on he
+  doesn't ask "Do you like my costume?" on Halloween. Holiday jokes and hellos stay.
+- **The tests**: `tools/ci/smoke.js` ("everyone has Timmy"), on a phone and a laptop: a first visit on a new hub (on the
+  bar, no introduction or "Tap me!", 100 HP, today's birthday, one badge, `fit()` the bootstrap's id, no outfits.js
+  with the page, the outfit after the first key, kept; the next visit wears it with no request; nothing on at Halloween
+  is nothing; the customizer dresses the bar without a reload; More has the place and the shop), the same first visit on
+  the new dashboard, and the live hub and live dashboard as before (not shown before adoption, the Halloween costume and
+  `<holiday>:<outfit>`, "Tap me!" and the introduction with "No thanks").
+- **At the release**: the release note's "From Ask Timmy, part 4" (`FULL_FROM`, then the adoption code comes out).
 
 ## The admin page's Ask Timmy tab (`review/index.html`, part 3)
 

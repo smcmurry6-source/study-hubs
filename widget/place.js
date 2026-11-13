@@ -1,8 +1,9 @@
 /* ============ TIMMY'S PLACE (widget/place.js, window.shPlace): redesign phase 4, part C ============
    The house card redrawn as a scene you build. Only the redesign's pages load this file, and only on first use (the new
    dashboard when its "you" card is first touched, a new hub from More, Timmy's place): never with a page, and the live
-   hubs and the live dashboard keep widget/pet.js's house card until the release. widget/pet.js is not changed: this
-   file reads what it already hands out (shPet.hp(), art(), holidayId()).
+   hubs and the live dashboard keep widget/pet.js's house card until the release. From widget/pet.js it reads shPet.hp(),
+   art() and holidayId(), and it tells shPet.setOutfit() when the outfit slot changes, so Timmy on the bar and the
+   dashboard's card wears it at once (everyone has Timmy, vault/tasks/2026-11-12-redesign-ask-timmy.md, part 4).
 
    The drawings are a kit, widget/hub-art/place.js (window.SH_PLACE, built from tools/figures/site/place.mjs), fetched
    here the first time a place is drawn; each seasonal set and the rank sets are a file of their own
@@ -139,12 +140,13 @@
     if (extra) Object.keys(extra).forEach(function(k){ o[k] = extra[k]; });
     return o;
   }
-  /* Timmy, as widget/pet.js draws him at this HP, in what he has on at his place; with nothing on he wears what he wears
-     that day by himself (a holiday's outfit). In the loupes journey he wears his loupes, in the rank's material. */
+  /* Timmy, as widget/pet.js draws him at this HP, in what he has on at his place, and nothing when nothing is on (Sam,
+     2026-11-12: "if someone doesnt have a costume applied, they are naked. What you put wins"): never a holiday's
+     outfit. In the loupes journey he wears his loupes, in the rank's material. */
   function timmySvg(m){
     var P = W.shPet; if (!P || !P.art) return "";
     var k = key("outfit", (m.eq || {}).outfit), r = rankOf(m), svg = "";
-    try { svg = P.art(k || m.visiting ? { hp: hpOf(m), hat: "" } : { hp: hpOf(m) }, 100); } catch (e) { return ""; }
+    try { svg = P.art({ hp: hpOf(m), hat: "" }, 100); } catch (e) { return ""; }
     return TP.dress(svg, k, r.journey === 2 ? { loupes: r.tier } : null);
   }
   /* Timmy inside a scene: his drawing at 36 wide, its feet (pet.js's shadow, y 226) on the spot */
@@ -589,20 +591,30 @@
     }
     e[sl] = id; return e;
   }
+  /* Timmy everywhere else (widget/pet.js: the bar, the dashboard's card) wears what's in the outfit slot here: tell him
+     at once when it changes, with the piece's drawing and lines from the kit, so he needs no file of his own for it */
+  function barFollow(){
+    var P = W.shPet; if (!P || !P.setOutfit || !TP) return;
+    var id = (S.eq || {}).outfit || "", k = key("outfit", id), o = k ? byK(TP.OUTFITS, k) : null, parts = k && TP.outfitParts ? TP.outfitParts(k) : null;
+    if (parts && o && o.say) parts.say = o.say;
+    try { P.setOutfit(id, parts); } catch (e) {}
+  }
   var chain = Promise.resolve(), pending = 0;
   function equip(slot, id, fx){
     if (!canChange()) return;
     S.eq = applied(S.eq, slot, id || null); V.m = mine();
     track("place:equip:" + slot);
+    if (slot === "outfit") needPacks([id]).then(barFollow, barFollow);
     if (fx !== false) { needPacks([id]).then(function(){ if (V) build(fx || {}); repaintCards(); }); }
     pending++;
     chain = chain.then(function(){ return S.sb.rpc("equip_item", { p_visitor: S.visitor, p_slot: slot, p_item: id || null }); }).then(function(r){ pending--; return r; }, function(){ pending--; return null; }).then(function(r){
       var d = r && r.data;
       if (!r || r.error || !d || !d.ok) throw new Error("refused");
-      if (!pending && JSON.stringify(sorted(d.equipped || {})) !== JSON.stringify(sorted(S.eq))) { S.eq = copy(d.equipped); if (V && !V.m.visiting) { V.m = mine(); build(); } repaintCards(); }
+      if (!pending && JSON.stringify(sorted(d.equipped || {})) !== JSON.stringify(sorted(S.eq))) { S.eq = copy(d.equipped); if (V && !V.m.visiting) { V.m = mine(); build(); } repaintCards(); if (slot === "outfit") needPacks(equippedIds({ eq: S.eq })).then(barFollow, barFollow); }
     }).then(null, function(){
       /* it didn't save: show what the server has, and say so */
       return S.sb.rpc("get_my_shop", { p_visitor: S.visitor }).then(function(r){ if (r && !r.error) takeShop(r.data); }, function(){}).then(function(){
+        if (slot === "outfit") needPacks(equippedIds({ eq: S.eq })).then(barFollow, barFollow);
         if (V && !V.m.visiting) { V.m = mine(); needPacks(equippedIds(V.m)).then(function(){ if (V) build({ say: "That didn’t save, so I put it back." }); }); }
         repaintCards();
       });

@@ -1,7 +1,8 @@
 /* ============ THE HUB ENGINE, part: Timmy (widget/hub-timmy.js) ============
    One of the engine's four files (widget/hub.js is the core and says how they fit together). This one holds what the
    engine asks of Timmy Tooth (widget/pet.js, window.shPet): a line for him to say, his HP, his cheer or flinch on the
-   bar at each answer, and loading him when he was adopted on another device; and Timmy's place, the page in More
+   bar at each answer, and the pet-adopt badges from the rank profile (so linked devices count his health from the same
+   day); and Timmy's place, the page in More
    (widget/place.js draws it, fetched the first time that page is opened). Timmy Time, the podcast's page, is in the
    core (More).
    And Ask Timmy (vault/tasks/2026-11-12-redesign-ask-timmy.md, part 2): the chat is widget/ask.js (window.shAsk), loaded
@@ -22,7 +23,8 @@
   var reduced = HX.reduced, $ = HX.$, C = HX.C, HUB = HX.HUB, WIDGET = HX.WIDGET, STATE = HX.STATE, ls = HX.ls, docEl = HX.docEl,
     loadScript = HX.loadScript, whenWidget = HX.whenWidget;
 
-  /* ---------- Timmy (widget/pet.js, window.shPet): what the engine asks of him. He is on the bar once adopted ---------- */
+  /* ---------- Timmy (widget/pet.js, window.shPet): what the engine asks of him. Everyone has Timmy on the redesign's
+     pages (vault/tasks/2026-11-12-redesign-ask-timmy.md, part 4): widget/v3.js loads him for everyone, with no adoption ---------- */
   function say(t, move){ try { if (window.shPet && window.shPet.say) window.shPet.say(t, move, 5000); } catch (e) {} }
   function petHp(){ try { return window.shPet && window.shPet.hp ? window.shPet.hp() : null; } catch (e) { return null; } }
   /* he cheers a right answer and flinches at a miss */
@@ -31,20 +33,20 @@
     var tim = $(".shpet-home .shpet-btn");
     if (tim && !reduced) { clearTimeout(reactT); tim.classList.remove("hx-cheer", "hx-flinch"); void tim.offsetWidth; tim.classList.add(right ? "hx-cheer" : "hx-flinch"); reactT = setTimeout(function(){ tim.classList.remove("hx-cheer", "hx-flinch"); }, 1500); }
   }
-  /* Timmy loads only once he's adopted (widget/v3.js): adopted on another device shows up in the rank profile as a badge */
+  /* the day he was first met on another device comes in the rank profile as a pet-adopt badge: the earliest day wins */
   function petFromBadges(b){
-    if (!window.shPet && window.shLoadPet && b.some(function(x){ return String(x).split(":")[0] === "pet-adopt"; }))
-      window.shLoadPet(function(){ if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(b); });
+    if (!b.some(function(x){ return String(x).split(":")[0] === "pet-adopt"; })) return;
+    whenWidget("shPet", function(P){ if (P && P.syncBadges) P.syncBadges(b); });
   }
 
   /* ---------- Timmy's place (redesign phase 4, part C): its page in More. The card, and the full view from it, are
      widget/place.js (window.shPlace), with the kit of drawings it fetches; none of it loads with the page. What Timmy
      owns and where it stands come in the page's bootstrap once the database has the game layer (migration_v54);
-     without it the place shows the defaults with your rank and medals. He has a place once he's adopted. ---------- */
-  function hasTimmy(){ return !!ls("sh_pet_born"); }
+     without it the place shows the defaults with your rank and medals. Everyone has Timmy, so everyone has a place
+     (the core's More asks hasTimmy() for its row). ---------- */
+  function hasTimmy(){ return true; }
   function morePlace(body){
     var shut = function(){ if (body.isConnected) body.innerHTML = '<p class="note">Timmy’s place couldn’t be opened just now. Try again in a moment.</p>'; };
-    if (!hasTimmy()) { body.innerHTML = '<p class="note">Timmy hasn’t moved in yet. Adopt him on the dashboard and his place opens here.</p>'; return; }
     loadScript(WIDGET + "place.js").then(function(){
       whenWidget("shSupabase", function(sb){
         var go = function(){
@@ -59,7 +61,7 @@
           };
           if (boot && boot.ready && boot.ready.then) boot.ready.then(draw, function(){ draw(null); }); else draw(boot && boot.data);
         };
-        /* his drawing is widget/pet.js's: it is on the page once he's adopted, a moment after the widget */
+        /* his drawing is widget/pet.js's: it is on the page a moment after the widget */
         if (window.shPet) go(); else { if (window.shLoadPet) window.shLoadPet(); whenWidget("shPet", function(){ go(); }); }
       });
     }, shut);
@@ -73,8 +75,8 @@
   function shopCoin(px){ return '<svg class="ic" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + COIN + "</svg>"; }
   var SHOP = null;
   function shopOf(){ var b = window.shBootstrap, d = b && b.data; return SHOP || (d && d.shop && d.shop.wallet ? d.shop : null); }
-  /* he's there once adopted, as his place is (everyone has Timmy comes with the next session) */
-  function hasShop(){ return !!shopOf() && hasTimmy(); }
+  /* the shop is there for everyone once the page's bootstrap carries one (everyone has Timmy, so he's there to draw) */
+  function hasShop(){ return !!shopOf(); }
   function shopMeta(){
     var sh = shopOf(), bal = sh && sh.wallet ? sh.wallet.balance : null;
     return (ls("sh_shop_dot") === dayCT() ? "● A rare costume came in · " : "") + (bal == null ? "" : String(bal).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " gold crowns");
@@ -120,7 +122,6 @@
   }
   function moreShop(body){
     var shut = function(){ if (body.isConnected) body.innerHTML = '<p class="note">The shop couldn’t be opened just now. Try again in a moment.</p>'; };
-    if (!hasTimmy()) { body.innerHTML = '<p class="note">Timmy hasn’t moved in yet. Adopt him on the dashboard and his shop opens here.</p>'; return; }
     var closed = function(){ if (body.isConnected) body.innerHTML = '<p class="note">The shop isn’t open yet. It opens with the new hubs.</p>'; };
     loadScript(WIDGET + "shop.js").then(function(){
       whenWidget("shSupabase", function(sb){

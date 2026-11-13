@@ -49,8 +49,8 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 | # | Session | Its spec | Needs first |
 |---|---|---|---|
 | 1 | **The shop's art**: the coin, snacks, boosts, rarity frames, the five undrawn outfits, the five rare costumes, and Timmy's door spot moved off the rank statue (BUG-089). **Done 2026-11-12** ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)), with the shop's look redrawn ("more epic") | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1" | [#335](https://github.com/smcmurry6-source/study-hubs/pull/335) merged |
-| 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes. **Built 2026-11-12** in [#345](https://github.com/smcmurry6-source/study-hubs/pull/345), waiting for Sam's "merge" (its hand-off in the Log) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
-| 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
+| 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes. **Done 2026-11-12** ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345), merged as `510dcb6`; its hand-off in the Log) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
+| 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage. **Built 2026-11-13**, waiting for Sam's "merge" (its hand-off in the Log) | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
 | 4 | **Visiting**: a row on the new dashboard's boards opens that person's place | [visiting](2026-11-12-redesign-visiting.md) | 3 |
 | 5 | **The bowling egg** (part D) | [the bowling egg](2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
 | 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12) | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
@@ -353,6 +353,31 @@ These hold for each spec; a spec only adds to them.
   - **Left for later, written down**: `sw.js`'s `PRECACHE` (session 8) and the shop on the release's preview, in [the
     release note](2026-11-06-redesign-release.md) ("From phase 4, part B", with the About page's draft).
   **Next: session 3, Timmy everywhere** ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4").
+- 2026-11-12: [#345](https://github.com/smcmurry6-source/study-hubs/pull/345) (session 2, the shop's client) merged as
+  `510dcb6`. Session 2 is done.
+- 2026-11-13 (Claude Code), **session 3, Timmy everywhere; hand-off for session 4** ([Ask Timmy](2026-11-12-redesign-ask-timmy.md),
+  part 4, its Log). Nothing students see changes. On the redesign's pages everyone has Timmy (no adoption, one hello
+  for a first visit, 100 HP for a Timmy met on or after the release) and he wears only the outfit on at his place,
+  nothing otherwise, on a holiday too. What the next sessions can use:
+  - **`shPet.fit()`** on a new page is the outfit's kit id (`"sun-hat"`) or `""`, never `"<holiday>:<outfit>"`; the
+    live pages still return the holiday form. **`shPet.setOutfit(id, parts)`** changes it at once (parts: the kit's
+    `{ back, face, top }`, from `SH_PLACE.outfitParts(k)` or `SH_OUTFITS.parts[id]`; without them pet.js fetches
+    `widget/hub-art/outfits.js` after the first scroll, wheel, tap or key) and does nothing on a live page. It fires
+    **`sh:pet-fit`** on `document` when the id changes (`widget/v3.js` sends the presence again on it).
+  - **Visiting** (session 4): someone else's Timmy is drawn with `shPet.art({ hp: 100, hat: "" }, px)` and dressed
+    from their own equipped outfit, as `widget/dash.js`'s `timmyArt()` does. Without `hat: ""` and `fit`, on a new
+    page `shPet.art()` dresses him in **this** visitor's outfit (the bar's own drawing and the chat's avatar rely on
+    that), so a drawing of someone else's Timmy always passes `hat: ""`.
+  - **`FULL_FROM`** in `widget/pet.js` (`9999-12-31` until the release; the preview swaps in its test account's start,
+    `tools/preview/transform.js`) is the release's day: a box in [the release note](2026-11-06-redesign-release.md),
+    "From Ask Timmy, part 4", with the adoption code that comes out then.
+  - **`widget/place.js`** calls `setOutfit` after the outfit slot changes and after the server answers differently;
+    `timmySvg()` always passes `hat: ""`. **`widget/hub-timmy.js`**: `hasTimmy()` is true and `hasShop()` is only "a
+    `shop` in the bootstrap".
+  - Tests: the smoke test's "Everyone has Timmy" block (a new hub, the new dashboard, the live hub and dashboard as
+    before); the Ask checks now turn Timmy off before they wait for the Ask icon. Bugs: BUG-105 to BUG-109 (BUG-109, the shop's snack state
+    read once when it opens, is open for the shop).
+  **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)), or session 5, the bowling egg.
 
 ## Outcome
 

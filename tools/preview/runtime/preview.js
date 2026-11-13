@@ -17,7 +17,8 @@
   var C = window.SH_PREVIEW_CONFIG || {};
   var PERSONAS = C.personas || [];
   var K = { db: "sh_preview_db_v1", log: "sh_preview_log_v1", persona: "sh_preview_persona", now: "sh_preview_now", ui: "sh_preview_ui", blocked: "sh_preview_blocked",
-    ovr: "sh_preview_overrides_v1" };   /* hub archive overrides: site-wide, kept when the test account changes */
+    ovr: "sh_preview_overrides_v1",   /* hub archive overrides: site-wide, kept when the test account changes */
+    timmyFrom: "sh_preview_timmy_from" };   /* the day this test account started: the preview's "redesign went live" for widget/pet.js */
   function lsGet(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }
   function lsSet(k, v){ try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
   function jget(k, d){ try { var v = JSON.parse(lsGet(k)); return v == null ? d : v; } catch (e) { return d; } }
@@ -78,6 +79,9 @@
     /* Timmy adopted that many days ago, so he shows on the hubs as for a student who adopted him (the new hubs load
        him only once he's adopted) */
     if (p.petDaysAgo != null) lsSet("sh_pet_born", new RealDate(realNow() + OFFSET - p.petDaysAgo * 864e5).toISOString().slice(0, 10));
+    /* Everyone has Timmy (the redesign's pages): a Timmy born on or after the day the redesign goes live starts at 100 HP.
+       Here that day is the day this test account started, so "new" meets him at 100 and the others keep their history. */
+    lsSet(K.timmyFrom, centralDay(realNow() + OFFSET));
     if (p.admin && C.adminSecret) { try { sessionStorage.setItem("sh_admin_secret", C.adminSecret); } catch (e) {} }
     lsSet(K.persona, p.id);
     jset(K.db, freshDb(p));
@@ -105,8 +109,12 @@
     try { var s = JSON.stringify(d); return s && s.length > 240 ? s.slice(0, 237) + "..." : s; } catch (e) { return String(d); }
   }
 
+  function centralDay(t){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new RealDate(t)); } catch (e) { return new RealDate(t).toISOString().slice(0, 10); } }
   var stored = lsGet(K.persona);
   if (wantPersona != null || !stored || !persona(stored)) applyPersona(wantPersona || stored || "returning");
+  /* widget/pet.js's FULL_FROM reads this in a preview (tools/preview/transform.js rewrites its line) */
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(lsGet(K.timmyFrom) || "")) lsSet(K.timmyFrom, centralDay(realNow() + OFFSET));
+  window.SH_PREVIEW_TIMMY_FROM = lsGet(K.timmyFrom);
   var P = persona(lsGet(K.persona)) || PERSONAS[0] || { id: "none", name: "None", visitor: "preview-visitor" };
   var db = jget(K.db, null);
   if (!db || db.v !== 1 || db.visitor !== P.visitor) { db = freshDb(P); jset(K.db, db); }
@@ -408,7 +416,7 @@
     "high-xp": PLACE_OLD.filter(function(k){ return PLACE_CAT[k] && !PLACE_CAT[k].gift && !PLACE_CAT[k].rank; })
   };
   var PLACE_START = {
-    "returning": { "yard-left": "garden", "yard-front": "mailbox", chimney: "chimney" },
+    "returning": { "yard-left": "garden", "yard-front": "mailbox", chimney: "chimney", outfit: "sun-hat" },
     "archived": { home: "giant-mushroom", scene: "forest", "yard-right": "campfire", outfit: "ranger-hat" },
     "admin": { home: "treehouse", "yard-left": "swimming-pool" },
     "high-xp": { home: "castle", scene: "clouds", "yard-left": "mouthwash-fountain", "yard-right": "telescope", "yard-side": "bowling-lane", "yard-front": "podcast-studio", outfit: "rank-gold-outfit", flag: "flag", porch: "porch" }

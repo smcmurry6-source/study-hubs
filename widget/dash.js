@@ -248,7 +248,6 @@
       '<div class="dx-cols">' +
         '<section class="panel dx-you" id="you" aria-labelledby="youH">' +
           '<div class="dx-youhead"><h2 id="youH">You</h2><p class="dx-name" id="youName"></p></div>' +
-          '<div class="dx-porch"><p class="note" id="petPerch">Timmy Tooth wants to meet you. Tap him.</p></div>' +
           '<div id="petHome" hidden></div>' +
           '<div class="dx-ask" id="askSpot" hidden></div>' +
           '<div class="dx-rankcard" id="meRank"></div>' +
@@ -1132,7 +1131,7 @@
     pill.hidden = false;
   }
   /* ------------------------------------------------------------
-     TIMMY'S PLACE in the "you" card (widget/place.js, phase 4 part C). Once Timmy is adopted, his place takes the
+     TIMMY'S PLACE in the "you" card (widget/place.js, phase 4 part C). Everyone has Timmy, and his place takes the
      house picture's spot: widget/pet.js still draws the card (his name, HP bar, status and the three buttons) and
      isn't changed, and this puts the place over its picture. The page is at its request budget, so the renderer and
      its kit never load with it: the card shows the still place.js kept on this device (sh_place_still) and the live
@@ -1185,7 +1184,7 @@
   function placeStart(sb, boot){
     PLACE.sb = sb; PLACE.boot = boot;
     var home = $("petHome"); if (!home) return;
-    /* pet.js writes the card again when Timmy is adopted, renamed or refreshed: put the place back each time */
+    /* pet.js writes the card again when Timmy is turned back on, renamed or refreshed: put the place back each time */
     if (window.MutationObserver) new MutationObserver(function(){ placeHost(); }).observe(home, { childList: true });
     placeHost();
     var woke = function(){
@@ -1701,21 +1700,12 @@
       hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: NEXT[h.id] ? ROOT + "hubs/" + h.id + "/next/content/" : null }; }); },
       href: function(id){ var h = HUBS.concat(ARCHIVED_HUBS).filter(function(x){ return x.id === id; })[0]; return h ? hubHref(h) : ""; },
       spot: function(){ return $("askSpot"); } });
-    /* Timmy (widget/pet.js): until he's adopted he waits on the "you" card's porch (dash.css shows it only while he's
-       there), then he lives in the card. He places himself once and on a resize, so tell him when the page above him
-       changes height (another hub's tab, a card that loads). */
+    /* Timmy (widget/pet.js) lives in the "you" card. Everyone has Timmy (Ask Timmy, part 4): no adoption and no
+       introduction, and he wears what's on at his place (the v2 bootstrap's shop), nothing when nothing is. */
     if (window.shPet) {
-      window.shPet.mount({ where: "dashboard", sb: sb, visitor: VISITOR,
+      window.shPet.mount({ where: "dashboard", sb: sb, visitor: VISITOR, everyone: true,
         name: function(){ return localName || randomName; },
-        perch: function(){ return $("petPerch"); },
         home: function(){ return $("petHome"); }, bootstrap: bootstrap.ready });
-      if (window.ResizeObserver) {
-        var nudge = 0;
-        new ResizeObserver(function(){
-          if (!q(".shpet-perch")) return;
-          clearTimeout(nudge); nudge = setTimeout(function(){ try { window.dispatchEvent(new Event("resize")); } catch (e) {} }, 60);
-        }).observe($("hubs"));
-      }
     }
     placeStart(sb, bootstrap.ready);
     shopStart(sb, bootstrap.ready);

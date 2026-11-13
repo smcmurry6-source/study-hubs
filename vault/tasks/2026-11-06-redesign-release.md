@@ -83,7 +83,9 @@ task is the one PR that then switches the site over. If something goes wrong, re
       Timmy's site help stops describing it. An earned Full Arch stays in its owner's case as retired
 - [ ] From the planning of 2026-11-12 ("What Sam's calls of 2026-11-12 change" below): `widget/pet.js`'s
       `everyone` becomes the only behavior and the adoption code comes out, with the day the redesign went live set
-      in its constant; the prices Sam wants changed are changed with `admin_upsert_shop_item` once the migration is
+      in its constant (`FULL_FROM`, `"9999-12-31"` until then; `tools/preview/transform.js` and the smoke test look for
+      that exact line, so change them with it). Built in [Ask Timmy, part 4](2026-11-12-redesign-ask-timmy.md); what
+      comes out then: "From Ask Timmy, part 4" below; the prices Sam wants changed are changed with `admin_upsert_shop_item` once the migration is
       applied ([the shop](2026-11-06-redesign-timmy-shop.md), "Prices to change after the release")
 - [ ] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"; the steps: [ask-timmy](../reference/ask-timmy.md)): Sam has saved the API key in Supabase and
       set the Console's spending limit; the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
@@ -448,7 +450,7 @@ redesign's pages, on the game layer (`get_my_shop`, `equip_item`), so it goes li
 **About page** (`about/index.html`, a new entry "Timmy's place" in Timmy Tooth's part, tagged new, replacing the lines on
 his house card; the tap surprises go inside a `spoil` element):
 
-- **Timmy's place**: once you adopt Timmy he has a place of his own: a home, the scene around it and a yard with five
+- **Timmy's place**: Timmy has a place of his own: a home, the scene around it and a yard with five
   spots. It is on the dashboard's "You" card and in every hub under More, Timmy's place. Tap the picture to step in.
 - **Timmy at home**: tap anything and he hops over to it; tap him and he waves, and again while he's waving for a
   flip. How he moves is his health: at 90 HP and up he bounces and wanders the most, lower down he slows, and when he
@@ -465,7 +467,7 @@ his house card; the tap surprises go inside a `spoil` element):
   shop with Shiny Gold Crowns. What you own is yours for good, on every device you link; spending never lowers your
   XP or your rank.
 - **Seasons**: the yard follows the year (spring blossom, fall leaves, winter snow), and on Timmy's holidays the place
-  dresses up with him.
+  puts out its holiday props. Timmy himself wears what you put on him.
 - **Study streak flame**: two more colors, blue from 10 days in a row and Dark Matter from 30.
 - In a spoiler: **things to tap at his place**: the sun puts on its shades, the moon has a cow, a cloud rains on the
   garden, Number thirty-one takes his temperature next door, the rabbit down the hill pops out of its burrow, and
@@ -503,9 +505,10 @@ the client uses it"). It runs only on the redesign's pages, on the game layer, s
 - [ ] The shop looked at on the release's own preview, phone and laptop, light and dark, reduced motion too
       (`?persona=returning` about 300 gold crowns, `?persona=high-xp` about 20,000, `?persona=missed` about 80; a
       rare costume: `?persona=returning&now=2027-01-07T10:00`, the detective).
-- [ ] **A hub's Shop row waits for Timmy to be adopted** (the shop draws him in the outfits, and pet.js loads on a new
+- [x] **A hub's Shop row waits for Timmy to be adopted** (the shop draws him in the outfits, and pet.js loads on a new
       hub only once he's adopted). "Everyone has Timmy" ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), part 4) takes
       the condition out (`hasShop()` in `widget/hub-timmy.js`). The new dashboard always shows the balance and the button.
+      Done in part 4: the row shows whenever the bootstrap carries a shop.
 
 **About page** (`about/index.html`, a new entry "Timmy's shop" after "Timmy's place" in Timmy Tooth's part, tagged
 new; the rare costumes go inside a `spoil` element):
@@ -536,12 +539,14 @@ new; the rare costumes go inside a `spoil` element):
 The sessions that build each part fix the drafts they make untrue; this is the list, so none is missed.
 
 - **Everyone has Timmy** ([Timmy everywhere](2026-11-12-redesign-ask-timmy.md)): "once you adopt Timmy" goes from
-  the place's About draft and from anywhere else it appears; the About page's adoption entry goes.
+  the place's About draft and from anywhere else it appears; the About page's adoption entry goes. Done in part 4: the
+  drafts above are fixed, and the About page's changes are in "From Ask Timmy, part 4" below.
 - **Timmy wears only what the student put on** (Sam: "if someone doesnt have a costume applied, they are naked. What
   you put wins"): the place's "Seasons" draft keeps the yard and the holiday props but no longer says the place
   "dresses up with him"; the About page's lines on Timmy's holiday outfits are rewritten (they are in his wardrobe
   now: the seasonal sets); `LORE.md`'s "he can't pick one" is canon for the episodes already out, and from the
-  redesign on the student dresses him. Rare costumes turn up at the shop; he doesn't wear one by himself.
+  redesign on the student dresses him. Rare costumes turn up at the shop; he doesn't wear one by himself. Done in part
+  4 (the place's draft, `LORE.md`, and the About lines in "From Ask Timmy, part 4").
 - **The trophy count** is 27, 14 of them secret (today's 24 without Full Arch, the three journey trophies and
   Bowling): "From phase 4, part A" says 27 and 14 for another reason (the journeys alone), so its wording changes. The Bowling trophy is kept on the device until the first migration after the release, so it
   shows no share of the class at first ([the bowling egg](2026-11-06-redesign-bowling-egg.md)).
@@ -625,7 +630,7 @@ The chat is `widget/ask.js` + `widget/ask.css`, loaded only by the new pages ([a
   leaderboard name.
 - **Ask Timmy on a question**: after you answer a practice question, **Ask Timmy** under it opens the chat with that
   question attached ("Why is it ...?"). Not before you answer.
-- **Timmy off?** When Timmy is turned off (Settings, Dashboard only on a hub, or Focus mode), or before you've met him, an
+- **Timmy off?** When Timmy is turned off (Settings, Dashboard only on a hub, or Focus mode), an
   **Ask button** sits in his spot (a hub's bottom-left corner; the "You" card on the dashboard) and the same chat answers
   in a plain "Ask the hub" voice, with the same rules.
 - **What the hubs record** (`section#widget`; replace "Nothing else you type is recorded"): **Your chats with Ask Timmy
@@ -636,6 +641,43 @@ The chat is `widget/ask.js` + `widget/ask.css`, loaded only by the new pages ([a
   once Sam decides how long: [analytics-retention](../reference/analytics-retention.md) has it as proposed.)
 - **Settings**: Timmy's line reads "Your cartoon tooth buddy, on the bar: tap him to ask about the notes. He hides during
   mock exams. Off, an Ask button takes his place." (the engine's and the dashboard's Settings already say so).
+
+### From Ask Timmy, part 4 (everyone has Timmy, [its note](2026-11-12-redesign-ask-timmy.md), built 2026-11-13)
+
+On the redesign's pages `widget/pet.js` mounts with `everyone: true` (`widget/v3.js` on a page with `data-game="v2"`,
+`widget/dash.js` on the new dashboard): no adoption, a hello on the first visit, 100 HP to start for a Timmy met on or
+after `FULL_FROM`, and he wears only the outfit on at his place ([ask-timmy](../reference/ask-timmy.md), "Everyone has
+Timmy"). At the release, besides the box above:
+
+1. Set `FULL_FROM` in `widget/pet.js` to the day the switch PR merges (Central time). Every Timmy met from then on
+   starts at 100 HP; one adopted before keeps his history.
+2. Once no page mounts without `everyone` (the old dashboard and the old hubs come down): `everyone` becomes the only
+   behavior, and out come `intro()`, the "Tap me!" line, the perch (`perch`, `place()`, `perchSpace()`), the holiday
+   `OUTFITS` and `outfit()` (the eggs, the hubs' themes and the place still read `holidayId()` and `isFall()`: keep
+   those), fit()'s `<holiday>:<outfit>` and `fitOutfit()` once no live page sends one, `hasTimmy()` in
+   `widget/hub-timmy.js` and its use in `widget/hub.js`'s More, and the old `sh_pet_outfit_<holiday>` keys' use.
+3. `sw.js`: nothing new (`widget/hub-art/outfits.js` stays out of `PRECACHE`: it loads only after the first scroll, tap
+   or key when the outfit on isn't the one kept on the device).
+
+**About page** (`section#timmy`, Part 6 Timmy Tooth):
+
+- Part 6's lead: "Your cartoon tooth buddy. Everyone has one. Settings → Timmy Tooth: Everywhere, Dashboard only, or Off.
+  Nobody else can see his health." (it said "An optional cartoon tooth buddy").
+- **Meeting him** is replaced by **Everyone has Timmy** <span class="tag new">new</span>: "Nobody has to adopt him any
+  more: he's there from your first visit, on the dashboard's You card and in the bottom-left corner of every hub, and he
+  says hello. A Timmy you meet from the redesign on starts at full health, 100 HP; one you already had keeps his health
+  and his history. Your other linked devices count his health from the day you first met him."
+- **Where he lives**: "On the dashboard's You card, at his place (Timmy's place), and in the bottom-left corner of every
+  hub with a health bar. He hides during mock exams."
+- **Outfits** is rewritten: "He wears what you put on him at his place (Customize, Timmy), from the shop or from your
+  rank, and nothing when nothing is on: on the bar, on the dashboard, at his place, in the classroom and on the
+  leaderboard's stage. Holiday looks are in the shop's seasonal sets. He no longer dresses himself for holidays." (Part 8's
+  list of his holiday outfits comes out with it; the seasonal sets are in the shop's entry.)
+- **Talking to him**: "a word about the outfit he's wearing" stays (it's the outfit you put on).
+- **His trophies**: "Pearly Whites for getting him to 100 HP (a Timmy who starts at 100 has to slip below it first and
+  come back); Full Recovery for bringing him from 0 back to 100." The trophy table's Pearly Whites row (in a spoiler)
+  reads the same.
+- **The tour** (`widget/tour.js`, the old dashboard's "Meet Timmy Tooth" step) goes with the old dashboard.
 
 ### From phase 3 (the new dashboard, [phase 3](2026-11-05-redesign-phase-3-dashboard.md))
 
@@ -668,10 +710,10 @@ is in [its own note](2026-11-06-idea-board.md).
    last value). `sh_dash_arcade_hub` and `sh_dash_arcade_game` are no longer used; nothing needs migrating.
 8. `get_widget_bootstrap_v2` and the `_v2` boards are called first and fall back to today's functions when the database
    doesn't have them (`rpc2` in `widget/dash.js`); once migration_v54 is applied the fallback can come out.
-9. **What a Timmy wears, after the shop** (phase 4): `shPet.fit()` in `widget/pet.js` sends the holiday outfit today
-   (`<holiday>:<outfit>`). Once the shop is live it should send the equipped shop outfit's id when there is one (the
-   classroom's `cleanFit()` and `timmyArt()` in `widget/dash.js` already take an id and draw it with
-   `widget/hub-art/outfits.js`; the preview's made-up class wears some). The leaderboard's top three get theirs from
+9. **What a Timmy wears, after the shop** (phase 4): done in [Ask Timmy, part 4](2026-11-12-redesign-ask-timmy.md):
+   on the redesign's pages `shPet.fit()` in `widget/pet.js` sends the id of the outfit on at his place ("" for nothing),
+   never a holiday's; the live hubs still send `<holiday>:<outfit>` until the release (the classroom's `cleanFit()` and
+   `timmyArt()` in `widget/dash.js` take both and draw an id with `widget/hub-art/outfits.js`). The leaderboard's top three get theirs from
    `get_place` through the visit key on their row, so they are plain Timmys until migration_v54 is applied.
 
 **About page: Part 1, the dashboard** (rewrite these entries; nothing here is a secret except the last one)
@@ -687,12 +729,12 @@ is in [its own note](2026-11-06-idea-board.md).
   A hub archives itself at 10 pm on its last exam day and moves to **Past hubs** at the bottom for 10 days.
 - **Send luck**: unchanged, under the countdown.
 - **You** (replaces "Greeting and name", "Your rank card" and "Timmy Tooth's house", now one card): the name classmates
-  see with "Pick your name" / "Change name", Timmy's house (or Timmy waiting to meet you), your handpiece medallion, rank,
+  see with "Pick your name" / "Change name", Timmy's house (everyone has Timmy: his place, in what you put on him), your handpiece medallion, rank,
   XP, place in the class and the bar to the next level, your mastery medals, your day streak with **the last seven days
   as dots** and this week's answers. The top bar shows the streak and rank too. The two-weeks strip is gone.
 - **The class**: **Studying right now** is **a drawn classroom** (Sam, 2026-11-11): the count on the chalkboard with
   how many are in each hub, and a Timmy at a desk for everyone who has a hub open, wearing what their own Timmy has on
-  (a plain tooth if they haven't adopted him, or have him or the extras off). When someone opens a hub their Timmy hops
+  (the outfit on at their Timmy's place; a plain tooth when nothing is on, or with Timmy or the extras off). When someone opens a hub their Timmy hops
   in through the door and jumps into a desk; when they close it he gets up and leaves. The desk's front is the hub's
   color, the windows show day or night, rows are added as the room fills, and past a full room a sign by the door says
   how many are in the hall. **Your own Timmy's desk has a "You" plate** while you have a hub open in another tab, on

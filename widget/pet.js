@@ -21,7 +21,19 @@
    shPet.refresh()                                                          // after a setting changes
    shPet.art(state, px)                                                     // just the drawing
    On the redesign's pages, which load Ask Timmy's chat (widget/ask.js, window.shAsk), tapping him offers "Ask me" in his
-   bubble and his house has an "Ask me" button; anywhere else (the live hubs and dashboard) nothing here changes. */
+   bubble and his house has an "Ask me" button; anywhere else (the live hubs and dashboard) nothing here changes.
+
+   Everyone has Timmy (the redesign's pages; vault/tasks/2026-11-12-redesign-ask-timmy.md, part 4): mount({ everyone: true,
+   outfit }) is what widget/v3.js passes on a page whose tag has data-game="v2" and widget/dash.js on the new dashboard.
+   With it there is no adoption: he is there from the first visit (sh_pet_born is set to that day and the pet-adopt badge
+   sent, so every linked device counts from the same day), no introduction, no "Tap me!", one hello instead. A Timmy
+   born on or after FULL_FROM (the day the redesign goes live) starts at 100 HP, not 70. And he wears only what the
+   student put on at his place (Sam, 2026-11-12: "if someone doesnt have a costume applied, they are naked. What you put
+   wins"): the shop's outfit in the `outfit` slot (the v2 bootstrap's shop.equipped.outfit), never a holiday's, and
+   nothing when nothing is on. Its drawing is kept on the device (sh_pet_outfit), so no request is made for it at page
+   load; widget/hub-art/outfits.js is fetched only when the server's outfit isn't the one kept, after the first scroll,
+   tap or key. shPet.setOutfit(id) changes it at once (Timmy's place calls it). Without `everyone` (the live pages pass
+   nothing) every line of the old behavior stays. */
 (function(){
   "use strict";
   if (window.shPet) return;
@@ -31,6 +43,13 @@
   function pick(a){ return a[Math.floor(Math.random() * a.length)]; }
   var reduced = false;
   try { reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+  var ME = document.currentScript, BASE = ME && ME.src ? ME.src.replace(/[^\/]*(\?.*)?$/, "") : "";
+  /* everyone has Timmy (set by mount({ everyone: true }), the redesign's pages only) */
+  var EVERYONE = false;
+  /* The day the redesign goes live, Central time: a Timmy born on or after it (everyone has Timmy) starts at 100 HP.
+     The release sets it; until then it is far in the future. A preview's copy points it at the preview's own start
+     (tools/preview/transform.js), so its "new" test account shows it. */
+  var FULL_FROM = "9999-12-31";
 
   /* days roll over on Central time, the same as the server */
   function centralDay(d){
@@ -109,6 +128,11 @@
   var uid = 0;
   function art(state, px){
     state = state || {};
+    /* everyone has Timmy: he wears what was put on at his place, drawn as the kit's dress() draws it, never a holiday's */
+    if (EVERYONE && state.hat === undefined && !state.fit) {
+      var bare = {}; Object.keys(state).forEach(function(k){ bare[k] = state[k]; }); bare.hat = "";
+      return dressLayer(art(bare, px), WORN.layer);
+    }
     var hp = state.hp == null ? 80 : state.hp, c = conditions(hp), has = {};
     c.forEach(function(k){ has[k] = 1; });
     var mood = state.mood || moodFor(hp), p = "shpt" + (++uid) + "-";
@@ -510,6 +534,7 @@
      person studying, dressed as theirs (Sam, 2026-11-11). No name and no id goes with it. fitOutfit() reads one back. */
   function fit(){
     try { if (!adopted() || ls("sh_pref_pet") === "off" || ls("sh_pref_focus") === "on") return ""; } catch (e) { return ""; }
+    if (EVERYONE) return WORN.id || "";     /* everyone has Timmy: the shop's id of what he has on ("" for nothing) */
     var id = seasonId(), o = outfit(id);
     return o && o.k ? id + ":" + o.k : "";
   }
@@ -519,6 +544,89 @@
     for (var i = 0; i < list.length; i++) if (list[i].k === m[2]) return list[i];
     return null;
   }
+
+  /* ================= what he wears when everyone has Timmy (the redesign's pages) =================
+     WORN.id is the shop's id of the outfit in his `outfit` slot at his place ("" for nothing), WORN.layer its drawing
+     ({ back, face, top }, the place kit's outfitParts(); say: its lines, when Timmy's place handed them over), or null
+     until it's here. The drawing is kept on the device (sh_pet_outfit, with the id it belongs to), so a page draws him
+     dressed without a request. widget/hub-art/outfits.js (window.SH_OUTFITS) is fetched only when the server's id isn't
+     the kept one (a change made on another device, or a new device), and then only after the first scroll, tap or key,
+     so it never loads with a page; until it's here he wears nothing rather than something that isn't on. */
+  var WORN = { id: "", layer: null };
+  var OUTFIT_ID = /^[a-z0-9-]{1,40}$/;
+  function kept(){
+    try { var k = JSON.parse(ls("sh_pet_outfit") || "null"); if (k && typeof k === "object" && (k.id === "" || OUTFIT_ID.test(String(k.id)))) return k; } catch (e) {}
+    return null;
+  }
+  function layerOf(p, say){
+    if (!p || typeof p !== "object") return null;
+    var l = { back: String(p.back || ""), face: String(p.face || ""), top: String(p.top || "") };
+    if (!l.back && !l.face && !l.top) return null;
+    var lines = (Array.isArray(say) ? say : Array.isArray(p.say) ? p.say : []).filter(function(x){ return typeof x === "string" && x; }).slice(0, 6);
+    if (lines.length) l.say = lines;
+    return l;
+  }
+  /* an outfit's drawing from what is already here: the shop's outfits (outfits.js), the place's kit, then the kept copy
+     (the files first, so a piece redrawn in a later release reaches the kept copy whenever one of them is on the page) */
+  function layerFor(id){
+    if (!id) return null;
+    var O = window.SH_OUTFITS, P = window.SH_PLACE, k = kept();
+    if (O && O.parts && Object.prototype.hasOwnProperty.call(O.parts, id)) return layerOf(O.parts[id], k && k.id === id ? k.say : null);
+    if (P && P.OUTFITS && P.outfitParts) for (var i = 0; i < P.OUTFITS.length; i++) if (P.OUTFITS[i].id === id) return layerOf(P.outfitParts(P.OUTFITS[i].k), P.OUTFITS[i].say);
+    return k && k.id === id ? layerOf(k) : null;
+  }
+  /* the same as the kit's dress() (tools/figures/site/place.mjs, widget/hub-art/outfits.js): behind him, then on top */
+  function dressLayer(svg, l){
+    if (!l || !svg) return svg;
+    if (l.back) svg = svg.replace(/(<ellipse cx="100" cy="226"[^>]*\/>)/, function(m){ return m + '<g class="shpet-back">' + l.back + "</g>"; });
+    var add = (l.face ? '<g class="shpet-garb">' + l.face + "</g>" : "") + (l.top ? '<g class="shpet-wobble"><g class="shpet-hat">' + l.top + "</g></g>" : "");
+    return svg.replace(/<\/g><\/svg>\s*$/, function(){ return add + "</g></svg>"; });
+  }
+  function keep(id, l){
+    var rec = { id: id || "" };
+    if (l) { rec.back = l.back; rec.face = l.face; rec.top = l.top; if (l.say) rec.say = l.say; }
+    ls("sh_pet_outfit", JSON.stringify(rec));
+  }
+  /* put outfit `id` on him (l: its drawing, when the caller has it) and redraw him; the hubs' presence hears it */
+  function wear(id, l){
+    id = OUTFIT_ID.test(String(id || "")) ? String(id) : "";
+    var was = WORN.id;
+    if (!l) l = layerFor(id);
+    WORN.id = id; WORN.layer = id ? l : null;
+    if (!id || l) keep(id, WORN.layer); else wantOutfits(id);
+    if (M) draw();
+    if (was !== id) { try { document.dispatchEvent(new CustomEvent("sh:pet-fit")); } catch (e) {} }
+  }
+  function setOutfit(id, parts){ if (EVERYONE) wear(id, parts ? layerOf(parts) : null); }
+  /* the first scroll, tap or key on the page (the wheel too: a page that is too short to scroll): only after it is outfits.js fetched */
+  var woke = false, wakeQ = [], WAKE_ON = ["scroll", "wheel", "pointerdown", "keydown", "touchstart"];
+  function watchWake(){
+    if (woke || watchWake.on) return; watchWake.on = true;
+    var on = function(){ woke = true; WAKE_ON.forEach(function(n){ window.removeEventListener(n, on, true); }); var q = wakeQ; wakeQ = []; q.forEach(function(f){ f(); }); };
+    WAKE_ON.forEach(function(n){ window.addEventListener(n, on, { capture: true, passive: true }); });
+  }
+  function afterWake(fn){ if (woke) fn(); else { wakeQ.push(fn); watchWake(); } }
+  var outfitsLoad = null;
+  function loadOutfits(){
+    if (window.SH_OUTFITS) return Promise.resolve(window.SH_OUTFITS);
+    if (outfitsLoad) return outfitsLoad;
+    outfitsLoad = new Promise(function(res, rej){
+      /* the dashboard's classroom may already be fetching it */
+      var el = document.querySelector('script[src$="hub-art/outfits.js"]');
+      if (!el) {
+        var b = BASE; if (!b) { var me = document.querySelector('script[src*="widget/pet.js"]'); b = me ? me.src.replace(/[^\/]*(\?.*)?$/, "") : "widget/"; }
+        el = document.createElement("script"); el.src = b + "hub-art/outfits.js"; el.async = true; document.head.appendChild(el);
+      }
+      el.addEventListener("load", function(){ res(window.SH_OUTFITS); });
+      el.addEventListener("error", function(){ outfitsLoad = null; rej(new Error("outfits")); });
+    });
+    return outfitsLoad;
+  }
+  function wantOutfits(id){
+    afterWake(function(){ loadOutfits().then(function(){ if (WORN.id === id && !WORN.layer) wear(id); }, function(){}); });
+  }
+  /* what he says about what he has on: the outfit's own lines when the place handed them over */
+  function wornTalk(){ var l = WORN.layer; return l && l.say && l.say.length ? { k: WORN.id, say: l.say } : null; }
 
   /* ================= Timmy's house =================
      A little cottage on a hill with a toothbrush planted by the door. Timmy himself is a separate button over the
@@ -728,7 +836,10 @@
     Object.keys(log).forEach(function(k){ var a = log[k], b = by[k] || [0, 0]; by[k] = [Math.max(a[0], b[0]), Math.max(a[1], b[1])]; });
     var start = born, earliest = addDays(today, -60);
     if (start < earliest) start = earliest;
-    var hp = 70, streak = 0, miss = 0, treat = false, everZero = false, revived = false;
+    /* everyone has Timmy: one born on or after the day the redesign went live starts at full health. dipped: a day has
+       ended with him under 100 since, so his Pearly Whites trophy (100 HP) is earned by getting him back there, not
+       given on his first day */
+    var hp = EVERYONE && born >= FULL_FROM ? 100 : 70, streak = 0, miss = 0, treat = false, everZero = false, revived = false, dipped = hp < 100;
     for (var day = start, i = 0; day <= today && i < 400; day = addDays(day, 1), i++) {
       var r = by[day] || [0, 0], a = r[0], c = r[1];
       if (a > 0) {
@@ -744,11 +855,12 @@
       if (hp <= 0) { hp = 0; treat = true; everZero = true; }
       if (treat && hp >= 50) treat = false;
       if (hp > 100) hp = 100;
+      if (day < today && Math.round(hp) < 100) dipped = true;     /* a day that ended under 100, not one wrong answer */
       if (everZero && hp >= 100) revived = true;
     }
     var t = by[today] || [0, 0];
     return { hp: Math.round(hp), streak: streak, missedYesterday: !(by[addDays(today, -1)] || [0])[0] && born < today,
-      treat: treat, everZero: everZero, revived: revived, today: { a: t[0], c: t[1] }, born: born, away: miss };
+      treat: treat, everZero: everZero, revived: revived, dipped: dipped, today: { a: t[0], c: t[1] }, born: born, away: miss };
   }
 
   /* ================= words ================= */
@@ -1347,11 +1459,16 @@
     return null;
   }
   function joke(){ return (seasonTalk() && Math.random() < (holidayId() ? 0.5 : 0.25) && seasonLine("jokes")) || deal("jokes", JOKES); }
-  function seasonLine(kind){ var s = seasonTalk(); return s && s.t[kind] ? deal(s.id + "-" + kind, s.t[kind]) : ""; }
+  function seasonLine(kind){
+    var s = seasonTalk(), a = s && s.t[kind];
+    /* everyone has Timmy: he only wears what was put on, so with nothing on he doesn't ask how his costume looks */
+    if (a && EVERYONE && !WORN.layer) a = a.filter(function(x){ return !/\bmy costume\?/.test(x); });
+    return a && a.length ? deal(s.id + "-" + kind + (a === s.t[kind] ? "" : "-bare"), a) : "";
+  }
   function fact(){ return deal("fact-lead", FACT_LEAD) + " " + deal("facts", FACTS); }
   /* what a tap gets when it isn't a status or a tip: mostly jokes, sometimes a fact, a thought or a word on today's outfit */
   function chat(){
-    var r = Math.random(), o = outfit(seasonId());
+    var r = Math.random(), o = EVERYONE ? wornTalk() : outfit(seasonId());
     if (r < 0.16) return fact();
     if (r < 0.3) return deal("muse", MUSE);
     if (o && o.say && r < 0.38) return deal("outfit-" + o.k, o.say);
@@ -1401,7 +1518,7 @@
   }
   /* the everyday mix for a hello, when nothing more pressing comes first: [weight, line maker] */
   function smallTalk(st, where){
-    var now = new Date(), sl = daySlot(now.getHours()), hol = holidayId(), sea = seasonTalk(), o = outfit(seasonId()), t = st.today, opts = [];
+    var now = new Date(), sl = daySlot(now.getHours()), hol = holidayId(), sea = seasonTalk(), o = EVERYONE ? wornTalk() : outfit(seasonId()), t = st.today, opts = [];
     if (sea) opts.push([hol ? (where === "hub" ? 30 : 40) : 12, function(){ return seasonLine("hello"); }]);
     if (o && o.say) opts.push([14, function(){ return deal("outfit-" + o.k, o.say); }]);
     if (eggsOn()) opts.push([where === "hub" ? 10 : 15, function(){ return deal("dontsay", DONT_SAY); }]);
@@ -1568,11 +1685,24 @@
   /* ================= the buddy ================= */
   var M = null;   // the mounted instance
   function pref(){ return ls("sh_pref_pet") || "on"; }
-  function adopted(){ return !!ls("sh_pet_born"); }
+  function adopted(){ return EVERYONE || !!ls("sh_pet_born"); }
+  /* everyone has Timmy (mount({ everyone: true })): no adoption. A first visit makes today his birthday and sends the
+     pet-adopt badge as adopting did, so a linked device counts his health from the same day (syncBadges keeps the
+     earliest); he says one hello instead of the introduction. outfit: what he has on, when the page knows already
+     (else the kept one, until the page's bootstrap says) */
+  var firstMeet = false;
+  function meetEveryone(opt){
+    EVERYONE = true;
+    if (!ls("sh_pet_born")) { ls("sh_pet_born", centralDay()); firstMeet = true; }
+    var k = kept();
+    wear(typeof opt.outfit === "string" ? opt.outfit : k ? k.id : "");
+    watchWake();
+  }
   function petName(){ return "Timmy Tooth"; }
 
   function mount(opt){
     if (M || !opt) return M;
+    if (opt.everyone) meetEveryone(opt);
     css();
     var H = opt.H || null, where = opt.where || (H ? "hub" : "dashboard");
     M = {
@@ -1582,6 +1712,7 @@
       sessionStart: Date.now(), longNudges: 0, idleSaid: false, taps: 0, tapT: 0, lastHp: null, lastTalk: 0,
       bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false
     };
+    if (firstMeet) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }   /* once: syncBadges won't send it again */
     load();
     render();
     if (where === "hub") wireHub(); else wireDashboard();
@@ -1608,6 +1739,8 @@
     var boot = M.bootstrap; M.bootstrap = null;
     if (boot && typeof boot.then === "function") {
       boot.then(function(data){
+        /* everyone has Timmy: what's in his outfit slot at his place (the v2 bootstrap's shop; nothing when nothing is on) */
+        if (EVERYONE && data && data.shop && data.shop.equipped && typeof data.shop.equipped === "object") wear(data.shop.equipped.outfit || "");
         if (data && Array.isArray(data.pet_days)) { M.rows = data.pet_days; update(true); return; }
         loadRemote();
       }, loadRemote);
@@ -1631,7 +1764,7 @@
     if (!adopted()) return;
     var hp = M.st.hp;
     /* trophies, recorded once */
-    if (hp >= 100 && !ls("sh_pet_perfect")) { ls("sh_pet_perfect", "1"); award("pet-perfect"); if (!quiet) talk("100 HP! Pearly whites, baby. You earned a trophy for this.", "do-cheer"); }
+    if (hp >= 100 && (!EVERYONE || M.st.dipped) && !ls("sh_pet_perfect")) { ls("sh_pet_perfect", "1"); award("pet-perfect"); if (!quiet) talk("100 HP! Pearly whites, baby. You earned a trophy for this.", "do-cheer"); }
     /* health band once a day (after the server rows load), for how adopted Timmys are doing across the class */
     var day = new Date().toISOString().slice(0, 10);
     if (quiet && M.rows && ls("sh_pet_hp_sent") !== day) { ls("sh_pet_hp_sent", day); track("state:pet-hp=" + (hp >= 80 ? "80-100" : hp >= 50 ? "50-79" : hp >= 25 ? "25-49" : hp > 0 ? "1-24" : "0")); }
@@ -1790,6 +1923,14 @@
   function hello(){
     if (!adopted()) return;
     if (M.skipHello) { M.skipHello = false; return; }
+    if (firstMeet) {
+      /* everyone has Timmy: the first visit's hello, in place of the introduction */
+      firstMeet = false;
+      var hi = M.where === "dashboard" ? "Hi, I'm Timmy Tooth! I live here now. Every right answer keeps me healthy."
+        : "Hi, I'm Timmy Tooth! I'll be down here while you study. Every right answer keeps me healthy.";
+      talk(esc(hi) + (askOn() ? "<br>" + askBtn() : ""), "do-wave", 11000, true);
+      return;
+    }
     if (scaredLeft() > 0) { talk(deal("scared", SCARED), "do-flinch", 6500); return; }
     var st = M.st, nm = (M.name && M.name()) || "", sl = daySlot(new Date().getHours()), visits = visitCount(), line;
     var away = st.away >= 3 && !st.today.a ? fill(deal("away", SAY.away), { d: st.away }) : "";
@@ -2028,12 +2169,15 @@
      where 'pet-adopt' shows up once you've adopted him anywhere (migration_v32) */
   function syncBadges(badges){
     /* the badge is "pet-adopt:<day you adopted him>", so every device counts his health from the same day */
-    var b = (badges || []).filter(function(x){ return String(x).split(":")[0] === "pet-adopt"; })[0];
+    var all = (badges || []).filter(function(x){ return String(x).split(":")[0] === "pet-adopt"; }), b = all[0];
     var day = b && /^\d{4}-\d{2}-\d{2}$/.test(String(b).split(":")[1] || "") ? String(b).split(":")[1] : null;
+    /* everyone has Timmy: two linked devices can each have sent one (each met him on its own first visit): the earliest wins */
+    if (EVERYONE) all.forEach(function(x){ var d = String(x).split(":")[1] || ""; if (/^\d{4}-\d{2}-\d{2}$/.test(d) && (!day || d < day)) day = d; });
+    if (EVERYONE && day && ls("sh_pet_born") > day) firstMeet = false;
     if (b && !adopted()) { ls("sh_pet_born", day || centralDay()); if (M) { M.skipHello = false; update(true); render(); } }
     else if (b && day && ls("sh_pet_born") > day) { ls("sh_pet_born", day); if (M) { update(true); draw(); } }
     else if (!b && adopted() && M && M.sb && M.visitor && !ls("sh_pet_adopt_sent")) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
   }
 
-  window.shPet = { say: function(text, move, ms){ talk(text, move, ms); }, hp: function(){ return M.st && typeof M.st.hp === "number" ? M.st.hp : null; }, mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, fit: fit, house: houseSvg, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
+  window.shPet = { say: function(text, move, ms){ talk(text, move, ms); }, hp: function(){ return M.st && typeof M.st.hp === "number" ? M.st.hp : null; }, mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, fit: fit, setOutfit: setOutfit, house: houseSvg, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
 })();

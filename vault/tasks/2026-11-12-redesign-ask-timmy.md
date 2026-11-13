@@ -319,15 +319,15 @@ no intro; `returning` and `high-xp` wear an outfit (`PLACE_START`), `missed` wea
 change to HP's rules beyond the 100 start; the old pages.
 
 **Done when** (part 4):
-- [ ] On the redesign's pages everyone has Timmy; no adoption anywhere there
-- [ ] A new hub's Shop row in More shows without adoption (`hasShop()` in `widget/hub-timmy.js`, session 2's hand-off)
-- [ ] He wears what is on at his place, and nothing otherwise, on the bar, on the dashboard, at his place, in the
+- [x] On the redesign's pages everyone has Timmy; no adoption anywhere there
+- [x] A new hub's Shop row in More shows without adoption (`hasShop()` in `widget/hub-timmy.js`, session 2's hand-off)
+- [x] He wears what is on at his place, and nothing otherwise, on the bar, on the dashboard, at his place, in the
       classroom and on the leaderboard's stage
 - [ ] The live pages are unchanged (the smoke test on every hub)
-- [ ] `tools/podcast/LORE.md`: from the redesign on, the student dresses him (the holiday costumes he used to pick
+- [x] `tools/podcast/LORE.md`: from the redesign on, the student dresses him (the holiday costumes he used to pick
       himself are canon for the episodes already out); the About drafts in
       [the release note](2026-11-06-redesign-release.md) say everyone has Timmy and drop "once you adopt Timmy"
-- [ ] A box in the release note: at the release `everyone` becomes the only behavior and the adoption code comes out
+- [x] A box in the release note: at the release `everyone` becomes the only behavior and the adoption code comes out
 - [ ] `node tools/release/run.js` once; screenshots to Sam; the hand-off in phase 4's Log
 
 ## Done when
@@ -342,7 +342,7 @@ change to HP's rules beyond the 100 start; the old pages.
       his answers; the smoke test covers it
 - [x] Part 3: the admin tab (the admin page's Ask Timmy tab, [ask-timmy](../reference/ask-timmy.md); covered by `tools/release/admin-ui.js`)
 - [ ] Part 4: everyone has Timmy
-      - [ ] with it: Timmy on a hub's bar (and wherever else `widget/pet.js` draws him) wears the outfit equipped at
+      - [x] with it: Timmy on a hub's bar (and wherever else `widget/pet.js` draws him) wears the outfit equipped at
             his place (`shop.equipped.outfit` in the v2 bootstrap; `SH_PLACE.dress()` or `SH_OUTFITS.dress()` draws
             it). Part C of phase 4 left pet.js untouched, so today only the place itself shows it
             ([the place](2026-11-06-redesign-timmys-place.md), 2026-11-12)
@@ -431,6 +431,30 @@ change to HP's rules beyond the 100 start; the old pages.
   `main`). Part 3 is done. **Next for Ask Timmy: part 4, after the shop's client** (phase 4's session 2): it needs
   nothing from the shop's art, only the order, because both sessions edit `widget/pet.js`'s `simulate()`,
   `widget/hub-timmy.js`, `widget/dash.js` and the preview.
+- 2026-11-13 (part 4, Claude Code, phase 4's session 3, this PR): **everyone has Timmy, and he wears what you put on.**
+  Nothing students see changes: only the redesign's pages pass the new option. `widget/pet.js`'s `mount({ everyone: true })`
+  (from `widget/v3.js` on a `data-game="v2"` page, and from `widget/dash.js`): no adoption, no introduction, "Tap me!" or
+  "No thanks"; a first visit sets `sh_pet_born` to today, sends the `pet-adopt:<day>` badge and gets one hello ("Hi, I'm
+  Timmy Tooth! I'll be down here while you study. Every right answer keeps me healthy.", "I live here now" on the
+  dashboard), and a device that later finds an earlier badge keeps the earlier day and says no hello. A Timmy whose day
+  is on or after `FULL_FROM` (one constant in pet.js, `9999-12-31` until the release; the preview swaps in its test
+  account's start) starts at 100 HP. He wears only the outfit in the `outfit` slot at his place: the v2 bootstrap's
+  `shop.equipped.outfit` (the dashboard's mount and pet.js's own bootstrap read), `shPet.setOutfit(id, parts)` (which
+  `widget/place.js` calls when the slot changes), nothing when nothing is on, never a holiday's. `fit()` returns the id
+  (or `""`), so the classroom and the stage draw it as a kit id; `sh:pet-fit` fires when it changes, and `widget/v3.js`
+  sends the presence again. The drawing's layer is kept on the device (`sh_pet_outfit`), so a page draws it at load;
+  `widget/hub-art/outfits.js` is fetched only after the first scroll, wheel, tap or key when nothing current is kept.
+  `widget/hub-timmy.js`: `hasTimmy()` is true, More has Timmy's place and the shop for everyone (`hasShop()` = a `shop`
+  in the bootstrap). The live pages pass nothing, and every line of their behavior stays (the smoke test checks the live
+  hub's and dashboard's intro, holiday outfit and `fit()`). How it fits together: [ask-timmy](../reference/ask-timmy.md),
+  "Everyone has Timmy"; the release's steps (set `FULL_FROM`, take the adoption code out) and the About drafts:
+  [the release note](2026-11-06-redesign-release.md), "From Ask Timmy, part 4". Choices made, for Sam: a Timmy who starts
+  at 100 earns Pearly Whites only after a day that ended under 100 (otherwise a first visit would award it at once); a
+  new device draws him plain until its first scroll, tap or key when the outfit isn't kept (the request budget); the
+  Loupes journey's loupes stay at his place (elsewhere he wears only the `outfit` slot); no new tracking event. Nothing in the
+  client disagrees with `migration_v54.sql` (unchanged). Bugs: BUG-105, BUG-106 and BUG-108 found and fixed;
+  BUG-107 (the preview's dashboard shows 0 HP until a hub has been opened) is the preview's, open, and on `main` too;
+  BUG-109 (the shop's snack state read once, before his days arrive) is the shop's, open.
 
 ## Outcome
 
