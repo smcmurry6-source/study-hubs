@@ -56,6 +56,11 @@ tags: [map]
   styles inside), with its eight clips in `widget/hub-art/bowling.js` (`window.SH_BOWL`, built from
   `tools/figures/site/bowling.mjs`): `hub-rewards.js` counts the run and fetches it at a strike, and the place's bowling
   lane fetches it on a tap; nothing on the server.
+  The trophy case ([the task](../tasks/2026-11-12-redesign-trophy-case-and-cards.md)) is `widget/trophies.js`
+  (`window.shTrophies.mount`) + `widget/trophies.css` (the case, the rest of More, Stats and trophies, and the
+  celebration cards' redesign look under `html.shx`), with its drawings in `widget/hub-art/trophies.js`
+  (`window.SH_TROPHY_ART`, built by `tools/figures/site/build.mjs` from `medals.mjs`): `widget/ranks.js` fetches all
+  three on first use (`trophyCase`, `trophyCss`), from More, Stats and trophies, the new dashboard's "you" card, or a card.
 - `hubs/<hub-id>/index.html` — one single-file hub each, and it is the source (perio included: its old split-source
   Claude Project is retired; edit the file directly). `hubs/<hub-id>/audio/` holds
   its Kokoro narration (`<lecture>-full.mp3`, `<lecture>-plain.mp3`).

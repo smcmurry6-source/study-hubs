@@ -1,0 +1,355 @@
+/* study-hubs: the trophy case and, on the redesign's pages, the celebration cards' look (redesign phase 4, session 6).
+   Loaded on first use, never with a page: by widget/trophies.js when the case opens, and by widget/ranks.js
+   (shRanks.trophyCss) before the first card on a page with html.shx. Built on widget/hub.css's tokens. A live page never
+   loads it, and every card rule is keyed on html.shx, so its cards are today's.
+   The case: the rank (a hall-of-fame header, the medallion in front of turning rays), the showcase (the trophy you picked
+   on a gold stand) and the cabinet (wood, a brass plaque, a velvet back, lit shelves). Its layout follows the width it is
+   given (container queries), so it fits a hub's More and the new dashboard's dialog alike. Flat fills, ink outlines. */
+
+/* ---------- the flat metals: one solid ink per rank, darker on a light page, lighter on a dark one ---------- */
+.sht, .sh-ru, .sh-ru-lv, .sh-mk {
+  --m-stone: #6b665e; --m-antique: #86602b; --m-bronze: #9b4f1d; --m-silver: #586573; --m-gold: #8a5d00; --m-diamond: #0f6e9b; --m-dark: #6b3fb6;
+}
+html.shx[data-theme="dark"] .sht, html.shx .sh-ru-lv, html.shx .sh-mk, html.shx .sh-ru {
+  --m-stone: #cfc9bf; --m-antique: #e3ba77; --m-bronze: #f2a56b; --m-silver: #cdd7e1; --m-gold: #f2c14e; --m-diamond: #84d4f6; --m-dark: #c0a4ff;
+}
+@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .sht {
+  --m-stone: #cfc9bf; --m-antique: #e3ba77; --m-bronze: #f2a56b; --m-silver: #cdd7e1; --m-gold: #f2c14e; --m-diamond: #84d4f6; --m-dark: #c0a4ff;
+} }
+.sht [data-metal="stone"], .sh-ru[data-metal="stone"], .sh-ru-lv[data-metal="stone"] { --metal: var(--m-stone); }
+.sht [data-metal="antique"], .sh-ru[data-metal="antique"], .sh-ru-lv[data-metal="antique"] { --metal: var(--m-antique); }
+.sht [data-metal="bronze"], .sh-ru[data-metal="bronze"], .sh-ru-lv[data-metal="bronze"] { --metal: var(--m-bronze); }
+.sht [data-metal="silver"], .sh-ru[data-metal="silver"], .sh-ru-lv[data-metal="silver"] { --metal: var(--m-silver); }
+.sht [data-metal="gold"], .sh-ru[data-metal="gold"], .sh-ru-lv[data-metal="gold"] { --metal: var(--m-gold); }
+.sht [data-metal="diamond"], .sh-ru[data-metal="diamond"], .sh-ru-lv[data-metal="diamond"] { --metal: var(--m-diamond); }
+.sht [data-metal="dark"], .sh-ru[data-metal="dark"], .sh-ru-lv[data-metal="dark"] { --metal: var(--m-dark); }
+
+/* ---------- the mount: one container the layout reads its width from ---------- */
+.sht { container: sht / inline-size; display: grid; gap: var(--gap); }
+.sht .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.sht-wait { padding: 24px; color: var(--muted); }
+/* the new dashboard's dialog, wide enough for the cabinet */
+.dx-dlg.sht-dlg .dx-dlgcard { width: min(1040px, 100%); }
+
+/* ---------- the rank: a hall-of-fame header, the medallion in front of turning rays ---------- */
+.sht-rank { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); grid-template-areas: "me road" "foot road"; gap: 18px 32px; align-items: start; overflow: hidden; }
+.sht-me { grid-area: me; display: flex; align-items: center; gap: 22px; min-width: 0; }
+.sht-rank.no-road { grid-template-columns: minmax(0, 1fr); grid-template-areas: "me" "foot"; }
+.sht-road { grid-area: road; } .sht-foot { grid-area: foot; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.sht-medal { position: relative; flex: none; width: 176px; height: 176px; display: grid; place-items: center; }
+.sht-medal .sht-rays { position: absolute; left: 50%; top: 50%; width: 250px; height: 250px; margin: -125px 0 0 -125px; animation: sht-spin 80s linear infinite;
+  -webkit-mask: radial-gradient(closest-side, #000 50%, transparent 100%); mask: radial-gradient(closest-side, #000 50%, transparent 100%); }
+.sht-medal-art { position: relative; width: 152px; height: 152px; }
+.sht-medal-art svg { width: 100%; height: 100%; }
+.sht-mebody { position: relative; flex: 1; min-width: 0; }
+.sht-kicker { font-size: var(--fs-label); font-weight: 800; color: var(--muted); }
+.sht .sht-rname { margin-top: 2px; font-size: 40px; line-height: 1.05; font-weight: 800; letter-spacing: -.015em; color: var(--metal); }
+.sht-lv { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-size: var(--fs-label); font-weight: 800; }
+.sht-pips { display: inline-flex; gap: 4px; }
+.sht-pips i { width: 24px; height: 8px; border-radius: 4px; background: var(--track); box-shadow: inset 0 0 0 1.5px var(--text); }
+.sht-pips i.on { background: var(--metal); }
+.sht-xp { margin-top: 4px; font-size: var(--fs-label); color: var(--muted); } .sht-xp b { color: var(--text); font-weight: 800; }
+.sht-bar { margin-top: 12px; height: 12px; border-radius: 6px; background: var(--track); box-shadow: inset 0 0 0 2px var(--text); overflow: hidden; }
+.sht-bar i { display: block; height: 100%; background: var(--metal); box-shadow: inset 0 0 0 2px var(--text); border-radius: 6px; }
+.sht-next { margin-top: 6px; font-size: var(--fs-label); color: var(--muted); } .sht-next b { color: var(--text); }
+.sht-road h3 { font-size: var(--fs-label); font-weight: 800; }
+.sht-road .shj-road { margin-top: 8px; } .sht-road .shj-road li { background: var(--row); font-size: var(--fs-meta); }
+@keyframes sht-spin { to { transform: rotate(360deg); } }
+
+/* ---------- the showcase: the trophy you picked, on a gold stand in front of rays ---------- */
+.sht-case { display: grid; gap: var(--gap); }
+.sht-show { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); align-items: stretch; gap: 0; padding: 8.5px; overflow: hidden;
+  border: 3px solid #3B2E3A; border-radius: 20px; background: #FFFFFF; box-shadow: inset 0 0 0 6px #F6CD55, inset 0 0 0 8.5px #3B2E3A; color: #3B2E3A; }
+.sht-show.is-secret, .sht-show.is-open { box-shadow: inset 0 0 0 6px #CFC3CD, inset 0 0 0 8.5px #3B2E3A; }
+.sht-show-art { position: relative; height: 300px; display: grid; place-items: end center; overflow: hidden; border-radius: 11px 0 0 11px; background: #FFF3CC; border-right: 3px solid #3B2E3A; }
+.sht-show.is-secret .sht-show-art, .sht-show.is-open .sht-show-art { background: #EDE6EC; }
+.sht-show-art .sht-rays { position: absolute; left: 50%; top: 42%; width: 760px; height: 760px; margin: -380px 0 0 -380px; animation: sht-spin 90s linear infinite; }
+.sht-show-obj { position: absolute; left: 50%; bottom: 64px; width: 184px; height: 184px; margin-left: -92px; animation: sht-bob 4s ease-in-out infinite; }
+.sht-show-obj svg { width: 100%; height: 100%; }
+.sht-show.is-secret .sht-show-obj { color: #8E7F8B; }
+.sht-show.is-open .sht-show-obj svg { filter: grayscale(1); opacity: .5; }
+.sht-stand { position: relative; width: 240px; height: auto; margin-bottom: 14px; }
+.sht-show-tx { align-self: center; padding: 28px 32px; min-width: 0; }
+.sht-tag { display: inline-block; padding: 4px 12px; border: 2.5px solid #3B2E3A; border-radius: 8px; background: #F6CD55; font-size: var(--fs-label); font-weight: 800; }
+.sht-show.is-secret .sht-tag { background: #D9CCF2; } .sht-show.is-open .sht-tag { background: #fff; }
+.sht .sht-show h3 { margin-top: 12px; font-size: 40px; line-height: 1.05; font-weight: 800; letter-spacing: -.015em; }
+.sht-show-d { margin-top: 10px; max-width: 44ch; font-size: 17px; line-height: 1.45; }
+.sht-meter { margin-top: 18px; max-width: 360px; }
+.sht-meter p { font-size: var(--fs-label); } .sht-meter b { font-size: 22px; font-weight: 800; }
+.sht-mbar { display: block; margin-top: 6px; height: 12px; border-radius: 6px; background: #fff; box-shadow: inset 0 0 0 2px #3B2E3A; overflow: hidden; }
+.sht-mbar i { display: block; height: 100%; background: #F6CD55; box-shadow: inset 0 0 0 2px #3B2E3A; border-radius: 6px; }
+@keyframes sht-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+
+/* ---------- the cabinet: wood, a brass plaque, a velvet back, lit shelves ---------- */
+.sht-cab { position: relative; padding: 0 14px; border: 3px solid #3B2E3A; border-radius: 20px; background: #8E5632; color: #F6E9D2; }
+.sht-crown { display: flex; justify-content: center; margin: 0 -14px; padding: 16px 14px 14px; border-bottom: 3px solid #3B2E3A; border-radius: 17px 17px 0 0; background: #A86A3E;
+  box-shadow: inset 0 6px 0 #C1834F; }
+.sht-plaque { display: inline-flex; flex-direction: column; align-items: center; gap: 0; padding: 6px 26px 7px; border: 2.5px solid #3B2E3A; border-radius: 10px; background: #F2C14E;
+  box-shadow: inset 0 3px 0 #FFE39A; color: #3B2E3A; text-align: center; }
+.sht-plaque b { font-size: 22px; font-weight: 800; line-height: 1.15; letter-spacing: -.01em; }
+.sht-plaque span { font-size: var(--fs-meta); font-weight: 800; color: #6B4A00; }
+.sht-bay { position: relative; margin: 14px 0; padding: 14px 0 0; border: 3px solid #3B2E3A; border-radius: 12px; background: #3C2342; overflow: hidden; }
+.sht-glint { position: absolute; top: -20%; height: 140%; background: rgba(255, 255, 255, .06); transform: skewX(-20deg); pointer-events: none; z-index: 2; }
+.sht-glint.g1 { left: 14%; width: 70px; } .sht-glint.g2 { left: 70%; width: 26px; }
+.sht-shelf + .sht-shelf { margin-top: 12px; }
+.sht .sht-shelf-h { display: flex; align-items: baseline; gap: 8px; padding: 0 18px; font-size: var(--fs-label); font-weight: 800; color: #F6E9D2; }
+.sht-shelf-h .num { font-weight: 700; color: #C7AFC4; }
+.sht-row { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); }
+.is-journeys .sht-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.is-retired .sht-row { grid-template-columns: minmax(0, 1fr); }
+.sht-row li { position: relative; display: flex; padding-bottom: 18px; }
+/* the plank under every slot: they join into one shelf */
+.sht-row li::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 18px; background: #B47A47; border-top: 3px solid #3B2E3A; box-shadow: inset 0 3px 0 #D39A63, inset 0 -5px 0 #8E5632; }
+.sht-tro { position: relative; flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 0; padding: 22px 4px 10px; border: 0; background: none; color: inherit; cursor: pointer; }
+.sht-obj { position: relative; z-index: 1; width: 76px; height: 76px; transition: transform var(--t-ui) var(--ease-out); }
+.sht-obj svg { width: 100%; height: 100%; }
+.sht-tro:hover .sht-obj, .sht-tro.is-sel .sht-obj { transform: translateY(-4px) scale(1.06); }
+.sht-pl { position: relative; z-index: 1; display: flex; align-items: flex-end; justify-content: center; width: 100%; min-height: 40px; margin-top: 6px; }
+.sht-plate { position: relative; max-width: 100%; padding: 3px 7px 4px; border: 2px solid #3B2E3A; border-radius: 6px; background: #F2C14E; box-shadow: inset 0 2px 0 #FFE39A;
+  font-size: 12px; font-weight: 800; line-height: 1.2; color: #3B2E3A; text-align: center; overflow-wrap: anywhere; }
+/* won: under its own lamp, a pool of light on the shelf */
+.sht-lamp { position: absolute; left: 50%; top: -14px; bottom: -6px; width: min(150%, 190px); transform: translateX(-50%); clip-path: polygon(42% 0, 58% 0, 100% 100%, 0 100%); background: rgba(255, 232, 170, .16); pointer-events: none; }
+.sht-tro.is-won::before { content: ""; position: absolute; left: 50%; bottom: -1px; width: min(86%, 130px); height: 16px; transform: translateX(-50%); border-radius: 50%; background: rgba(255, 226, 150, .34); }
+/* not won: in the dark, the drawing dimmed, a dull plate */
+.sht-tro.is-open .sht-obj svg { filter: grayscale(1) brightness(.62); opacity: .6; }
+.sht-tro.is-open .sht-plate, .sht-tro.is-secret .sht-plate { background: #9C8A98; box-shadow: none; color: #2A1C2C; }
+/* a secret not found: its shape, in shadow */
+.sht-tro.is-secret .sht-obj { color: #24142A; filter: drop-shadow(0 0 0 #6E5872) drop-shadow(0 0 1px #6E5872); }
+/* the one in the showcase */
+.sht-tro.is-sel::after { content: ""; position: absolute; top: 6px; bottom: 2px; left: 50%; width: min(calc(100% - 8px), 170px); transform: translateX(-50%); border: 3px solid #F6CD55; border-radius: 12px; pointer-events: none; }
+.sht-tro:focus-visible { outline: 3px solid #fff; outline-offset: -3px; border-radius: 12px; }
+.sht-base { height: 22px; margin: 0 -14px; border-top: 3px solid #3B2E3A; border-radius: 0 0 17px 17px; background: #6F3F22; }
+
+
+@container sht (max-width: 900px) {
+  .sht-rank { grid-template-columns: minmax(0, 1fr); grid-template-areas: "me" "road" "foot"; }
+  .sht-show { grid-template-columns: minmax(0, 1fr); }
+  .sht-show-art { height: 250px; border-radius: 11px 11px 0 0; border-right: 0; border-bottom: 3px solid #3B2E3A; }
+  .sht-show-tx { padding: 18px 18px 20px; }
+  .sht-row { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@container sht (max-width: 600px) {
+  .sht-medal { width: 120px; height: 120px; } .sht-medal-art { width: 104px; height: 104px; }
+  .sht-medal .sht-rays { width: 260px; height: 260px; margin: -130px 0 0 -130px; }
+  .sht-me { gap: 14px; }
+  .sht .sht-rname { font-size: 28px; }
+  .sht .sht-show h3 { font-size: 30px; }
+  .sht-show-d { font-size: 16px; }
+  .sht-show-obj { width: 150px; height: 150px; margin-left: -75px; bottom: 56px; }
+  .sht-stand { width: 200px; }
+  .sht-cab { padding: 0 8px; } .sht-crown, .sht-base { margin: 0 -8px; }
+  .sht-obj { width: 60px; height: 60px; }
+  .sht-plate { font-size: 11px; padding: 2px 5px 3px; } .sht-pl { min-height: 36px; }
+  .sht .sht-shelf-h { padding: 0 12px; }
+  .sht-tro { padding: 18px 2px 8px; }
+}
+@media (prefers-reduced-motion: reduce) { .sht-rays, .sht-show-obj, html.shx .sh-ru-lv-medal::before, html.shx .sh-mk-ring::before { animation: none !important; } }
+
+/* the case in the dark (the theme picked, or the device's) */
+html.shx[data-theme="dark"] .sht-show { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
+html.shx[data-theme="dark"] .sht-show-art { background: #3A2E14; } html.shx[data-theme="dark"] .sht-show.is-secret .sht-show-art, html.shx[data-theme="dark"] .sht-show.is-open .sht-show-art { background: #343034; }
+html.shx[data-theme="dark"] .sht-show .sht-tag { color: #3B2E3A; }
+html.shx[data-theme="dark"] .sht-show.is-secret, html.shx[data-theme="dark"] .sht-show.is-open { box-shadow: inset 0 0 0 6px #4A444A, inset 0 0 0 8.5px #3B2E3A; }
+html.shx[data-theme="dark"] .sht-mbar { background: #1c1b1c; }
+@media (prefers-color-scheme: dark) {
+  html.shx:not([data-theme="light"]) .sht-show { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
+  html.shx:not([data-theme="light"]) .sht-show-art { background: #3A2E14; } html.shx:not([data-theme="light"]) .sht-show.is-secret .sht-show-art, html.shx:not([data-theme="light"]) .sht-show.is-open .sht-show-art { background: #343034; }
+  html.shx:not([data-theme="light"]) .sht-show .sht-tag { color: #3B2E3A; }
+  html.shx:not([data-theme="light"]) .sht-show.is-secret, html.shx:not([data-theme="light"]) .sht-show.is-open { box-shadow: inset 0 0 0 6px #4A444A, inset 0 0 0 8.5px #3B2E3A; }
+  html.shx:not([data-theme="light"]) .sht-mbar { background: #1c1b1c; }
+}
+
+/* =================== the cards, on the redesign's pages (html.shx) =================== */
+/* the rank-up cutscene: the dark stage and its rays stay; the site's type; "New rank" on a ribbon in the rank's metal; the name in flat metal */
+html.shx .sh-ru { font-family: var(--font); }
+html.shx .sh-ru-bg { background: #0f0d10; }
+html.shx .sh-ru-title { display: inline-block; padding: 14px 64px 26px; font: 800 40px/1 var(--font); letter-spacing: -.01em; white-space: nowrap; text-shadow: none; color: #3B2E3A;
+  background: center / 100% 100% no-repeat; }
+html.shx .sh-ru[data-metal="stone"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23cfc9bf%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23cfc9bf%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23cfc9bf%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+html.shx .sh-ru[data-metal="antique"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23e3ba77%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23e3ba77%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23e3ba77%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+html.shx .sh-ru[data-metal="bronze"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23f2a56b%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23f2a56b%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23f2a56b%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+html.shx .sh-ru[data-metal="silver"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23cdd7e1%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23cdd7e1%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23cdd7e1%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+html.shx .sh-ru[data-metal="gold"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23f2c14e%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23f2c14e%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23f2c14e%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+html.shx .sh-ru[data-metal="diamond"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%2384d4f6%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%2384d4f6%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%2384d4f6%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+html.shx .sh-ru[data-metal="dark"] .sh-ru-title { background-image: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20100%22%20preserveAspectRatio%3D%22none%22%3E%3Cpath%20d%3D%22M4%2030%20H64%20V92%20H4%20L24%2061Z%22%20fill%3D%22%23c0a4ff%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M396%2030%20H336%20V92%20H396%20L376%2061Z%22%20fill%3D%22%23c0a4ff%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22%20opacity%3D%22.8%22/%3E%3Cpath%20d%3D%22M44%206%20H356%20V80%20H44Z%22%20fill%3D%22%23c0a4ff%22%20stroke%3D%22%233B2E3A%22%20stroke-width%3D%223%22%20vector-effect%3D%22non-scaling-stroke%22%20stroke-linejoin%3D%22round%22/%3E%3Cpath%20d%3D%22M56%2018%20H200%22%20stroke%3D%22%23fff%22%20stroke-width%3D%225%22%20stroke-linecap%3D%22round%22%20opacity%3D%22.5%22%20vector-effect%3D%22non-scaling-stroke%22/%3E%3C/svg%3E"); }
+html.shx .sh-ru-name { margin-top: 6px; font: 800 48px/1.1 var(--font); letter-spacing: -.015em; }
+html.shx .sh-ru-mt { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--metal); -webkit-text-fill-color: var(--metal); animation: none; }
+html.shx .sh-ru-namewrap { filter: none; }
+html.shx .sh-ru-from { gap: 8px; padding: 4px 14px 4px 6px; font-size: var(--fs-meta); font-weight: 700; color: #f5f2f4; background: rgba(255, 255, 255, .1); border: 0; }
+html.shx .sh-ru-stat { font-size: var(--fs-label); color: #b8b0b6; }
+html.shx .sh-ru-unl { max-width: 420px; gap: 8px; }
+html.shx .sh-ru-unl li { gap: 12px; padding: 10px 14px 10px 10px; border: 2.5px solid #3B2E3A; border-radius: 14px; background: #262426; font-size: var(--fs-label); color: #f5f2f4; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .08); }
+html.shx .sh-ru-unl b { font-size: var(--fs-meta); font-weight: 800; letter-spacing: 0; text-transform: none; color: var(--metal); }
+html.shx .sh-ru-ic { width: 40px; height: 40px; border-radius: 10px; background-color: #3a363a; box-shadow: none; }
+html.shx .sh-ru-go { font: 800 16px/1 var(--font); letter-spacing: 0; padding: 15px 40px; color: #3B2E3A; background: var(--metal); border: 3px solid #3B2E3A; box-shadow: inset 0 3px 0 rgba(255, 255, 255, .45); }
+@media (max-width: 520px) { html.shx .sh-ru-title { font-size: 30px; padding: 12px 52px 22px; } html.shx .sh-ru-name { font-size: 36px; } }
+@media (max-height: 700px) { html.shx .sh-ru-title { font-size: 28px; } html.shx .sh-ru-name { font-size: 32px; } }
+
+/* the level, trophy and medal cards: a framed card like the shop's showcase, rays turning behind the medal */
+html.shx .sh-ru-lv { --frame: var(--metal); font-family: var(--font); color: #3B2E3A; width: min(420px, calc(100% - 32px)); padding: 16px 20px 16px 16px; gap: 16px;
+  background: #FFF8E6; border: 3px solid #3B2E3A; border-radius: 20px; box-shadow: inset 0 0 0 5px var(--frame), inset 0 0 0 7.5px #3B2E3A, 0 16px 40px rgba(30, 20, 30, .28); }
+html.shx .sh-ru-lv-medal { width: 92px; height: 92px; }
+html.shx .sh-ru-lv-medal::before { content: ""; position: absolute; left: 50%; top: 50%; width: 170px; height: 170px; margin: -85px 0 0 -85px; border-radius: 50%;
+  background: repeating-conic-gradient(color-mix(in srgb, var(--metal) 45%, transparent) 0deg 9deg, transparent 9deg 22.5deg);
+  -webkit-mask: radial-gradient(closest-side, #000 55%, transparent 100%); mask: radial-gradient(closest-side, #000 55%, transparent 100%); animation: sh-ru-spin 30s linear infinite; }
+html.shx .sh-ru-lv-coin { position: relative; }
+html.shx .sh-ru-lv-coin svg { filter: none; }
+html.shx .sh-ru-lv-ring { border-color: var(--metal); box-shadow: none; }
+html.shx .sh-ru-lv-eye { display: inline-block; padding: 2px 9px 3px; border: 2px solid #3B2E3A; border-radius: 7px; background: var(--metal); font-size: 12px; font-weight: 800; letter-spacing: 0; text-transform: none; color: #3B2E3A; }
+html.shx .sh-ru-lv-name { font: 800 28px/1.1 var(--font); letter-spacing: -.015em; margin-top: 6px; }
+html.shx .sh-ru-lv .sh-ru-mt { color: var(--metal-ink); -webkit-text-fill-color: var(--metal-ink); }
+html.shx .sh-ru-pips { margin: 9px 0 7px; gap: 4px; }
+html.shx .sh-ru-pips i { height: 9px; background: rgba(59, 46, 58, .12); box-shadow: inset 0 0 0 1.5px #3B2E3A; }
+html.shx .sh-ru-pips b { background: var(--metal); box-shadow: inset 0 0 0 1.5px #3B2E3A; }
+html.shx .sh-ru-lv.is-landed .sh-ru-pips .new { box-shadow: inset 0 0 0 1.5px #3B2E3A; }
+html.shx .sh-ru-lv-next { font-size: var(--fs-label); color: inherit; } html.shx .sh-ru-lv-next b, html.shx .sh-ru-tr-rare b { color: inherit; font-weight: 800; }
+html.shx .sh-ru-lv-shine { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .55), transparent); }
+html.shx .sh-ru-tr .sh-ru-lv-medal { width: 96px; height: 96px; }
+html.shx .sh-ru-tr-name { font: 800 26px/1.1 var(--font); letter-spacing: -.015em; margin-top: 6px; }
+html.shx .sh-ru-tr .sh-ru-mt { color: inherit; -webkit-text-fill-color: currentColor; }
+html.shx .sh-ru-tr-desc { margin-top: 3px; font-size: var(--fs-label); color: inherit; }
+html.shx .sh-ru-tr-rare { margin-top: 7px; font-size: var(--fs-meta); color: inherit; }
+html.shx .sh-ru-lv[data-metal="stone"] { --metal-ink: #6b665e; } html.shx .sh-ru-lv[data-metal="antique"] { --metal-ink: #86602b; } html.shx .sh-ru-lv[data-metal="bronze"] { --metal-ink: #9b4f1d; }
+html.shx .sh-ru-lv[data-metal="silver"] { --metal-ink: #586573; } html.shx .sh-ru-lv[data-metal="gold"] { --metal-ink: #8a5d00; } html.shx .sh-ru-lv[data-metal="diamond"] { --metal-ink: #0f6e9b; }
+html.shx .sh-ru-lv[data-metal="dark"] { --metal-ink: #6b3fb6; }
+
+/* the mock exam's results: the same frame, the score's ring in front of rays in its band's color */
+html.shx .sh-mk { font-family: var(--font); color: #3B2E3A; }
+html.shx .sh-mk-bg { background: rgba(30, 22, 29, .55); }
+html.shx .sh-mk[data-band="0"] { --band: #F2C14E; --band-ink: #8a5d00; } html.shx .sh-mk[data-band="1"] { --band: #4cc38a; --band-ink: #1d6a42; }
+html.shx .sh-mk[data-band="2"] { --band: #F0B44A; --band-ink: #8a5300; } html.shx .sh-mk[data-band="3"] { --band: #f0806b; --band-ink: #9c2b1c; }
+html.shx .sh-mk-card { background: #FFF8E6; border: 3px solid #3B2E3A; border-radius: 22px; padding: 22px 24px 22px; overflow: hidden;
+  box-shadow: inset 0 0 0 5px var(--band), inset 0 0 0 7.5px #3B2E3A, 0 24px 64px rgba(30, 20, 30, .32); }
+html.shx .sh-mk-eye { display: inline-block; padding: 3px 10px 4px; border: 2px solid #3B2E3A; border-radius: 7px; background: var(--band); font-size: var(--fs-meta); font-weight: 800; letter-spacing: 0; text-transform: none; color: #3B2E3A; }
+html.shx .sh-mk-ring { width: 160px; height: 160px; margin: 16px auto 8px; }
+html.shx .sh-mk-ring::before { content: ""; position: absolute; left: 50%; top: 50%; width: 330px; height: 330px; margin: -165px 0 0 -165px; border-radius: 50%;
+  background: repeating-conic-gradient(color-mix(in srgb, var(--band) 40%, transparent) 0deg 8deg, transparent 8deg 20deg);
+  -webkit-mask: radial-gradient(closest-side, #000 45%, transparent 100%); mask: radial-gradient(closest-side, #000 45%, transparent 100%); animation: sh-ru-spin 40s linear infinite; }
+html.shx .sh-mk-ring svg { position: relative; }
+html.shx .sh-mk-ring .bg { fill: #fff; stroke: rgba(59, 46, 58, .12); }
+html.shx .sh-mk-ring .fg { stroke: var(--band); filter: none; }
+html.shx .sh-mk-num { font: 800 46px/1 var(--font); letter-spacing: -.02em; }
+html.shx .sh-mk-num span { color: inherit; opacity: .6; }
+html.shx .sh-mk-frac { font-size: var(--fs-label); font-weight: 700; color: inherit; opacity: .75; }
+html.shx .sh-mk-verdict { margin-top: 8px; font: 800 22px/1.2 var(--font); letter-spacing: -.01em; }
+html.shx .sh-mk-best { padding: 4px 12px; font-size: var(--fs-meta); font-weight: 800; color: inherit; background: rgba(59, 46, 58, .08); border: 0; }
+html.shx .sh-mk-best.is-new { color: #3B2E3A; background: #F6CD55; border: 2px solid #3B2E3A; }
+html.shx .sh-mk-best.is-new::after { background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .7), transparent); }
+html.shx .sh-mk-lecs { margin-top: 18px; padding-top: 14px; border-top: 2px dashed rgba(59, 46, 58, .25); gap: 8px; }
+html.shx .sh-mk-lecs li { font-size: var(--fs-meta); font-weight: 700; color: inherit; }
+html.shx .sh-mk-lecs .b { height: 10px; background: rgba(59, 46, 58, .1); box-shadow: inset 0 0 0 1.5px #3B2E3A; }
+html.shx .sh-mk-lecs .b i { box-shadow: inset 0 0 0 1.5px #3B2E3A; }
+html.shx .sh-mk-lecs li[data-band="0"] .b i { background: #F2C14E; } html.shx .sh-mk-lecs li[data-band="1"] .b i { background: #4cc38a; }
+html.shx .sh-mk-lecs li[data-band="2"] .b i { background: #F0B44A; } html.shx .sh-mk-lecs li[data-band="3"] .b i { background: #f0806b; }
+html.shx .sh-mk-lecs .n { color: inherit; opacity: .7; }
+html.shx .sh-mk-actions { margin-top: 20px; }
+html.shx .sh-mk-actions button { font: 800 var(--fs-label)/1 var(--font); min-height: 44px; padding: 0 22px; color: #3B2E3A; background: #fff; border: 2.5px solid #3B2E3A; }
+html.shx .sh-mk-actions .sh-mk-go { background: var(--band); border-color: #3B2E3A; box-shadow: inset 0 3px 0 rgba(255, 255, 255, .45); }
+html.shx .sh-mk-actions button:focus-visible { outline: 3px solid var(--hub-text); }
+
+/* the cards in the dark (the theme picked, or the device's) */
+html.shx[data-theme="dark"] .sh-ru-lv { background: #2a2428; color: #f5f2f4; box-shadow: inset 0 0 0 5px var(--frame), inset 0 0 0 7.5px #3B2E3A, 0 16px 40px rgba(0, 0, 0, .6); }
+html.shx[data-theme="dark"] .sh-ru-pips i { background: rgba(255, 255, 255, .1); box-shadow: inset 0 0 0 1.5px #8a7f88; }
+html.shx[data-theme="dark"] .sh-ru-lv { --metal-ink: var(--metal); }
+html.shx[data-theme="dark"] .sh-mk-bg { background: rgba(0, 0, 0, .7); }
+html.shx[data-theme="dark"] .sh-mk { color: #f5f2f4; }
+html.shx[data-theme="dark"] .sh-mk-card { background: #2a2428; box-shadow: inset 0 0 0 5px var(--band), inset 0 0 0 7.5px #3B2E3A, 0 24px 64px rgba(0, 0, 0, .6); }
+html.shx[data-theme="dark"] .sh-mk-ring .bg { fill: #1c1b1c; stroke: rgba(255, 255, 255, .1); }
+html.shx[data-theme="dark"] .sh-mk-lecs { border-top-color: rgba(255, 255, 255, .15); }
+@media (prefers-color-scheme: dark) {
+  html.shx:not([data-theme="light"]) .sh-ru-lv { background: #2a2428; color: #f5f2f4; box-shadow: inset 0 0 0 5px var(--frame), inset 0 0 0 7.5px #3B2E3A, 0 16px 40px rgba(0, 0, 0, .6); }
+  html.shx:not([data-theme="light"]) .sh-ru-pips i { background: rgba(255, 255, 255, .1); box-shadow: inset 0 0 0 1.5px #8a7f88; }
+  html.shx:not([data-theme="light"]) .sh-ru-lv { --metal-ink: var(--metal); }
+  html.shx:not([data-theme="light"]) .sh-mk-bg { background: rgba(0, 0, 0, .7); }
+  html.shx:not([data-theme="light"]) .sh-mk { color: #f5f2f4; }
+  html.shx:not([data-theme="light"]) .sh-mk-card { background: #2a2428; box-shadow: inset 0 0 0 5px var(--band), inset 0 0 0 7.5px #3B2E3A, 0 24px 64px rgba(0, 0, 0, .6); }
+  html.shx:not([data-theme="light"]) .sh-mk-ring .bg { fill: #1c1b1c; stroke: rgba(255, 255, 255, .1); }
+  html.shx:not([data-theme="light"]) .sh-mk-lecs { border-top-color: rgba(255, 255, 255, .15); }
+}
+
+/* =================== the rest of More, Stats and trophies on a new hub (widget/hub.js statsEpic) ===================
+   Sam, 2026-11-13: "the rest of the page doesnt match the epicness". Three framed pieces under the case, each with a gold
+   plaque hung on its top edge like the cabinet's: the scoreboard (your answers, a gauge for how many are right in its
+   band's color), the lectures (a card each with a two-tone bar: tried, and right now) and the achievements (rosettes). */
+.stats-grid.stx { container: stx / inline-size; grid-template-columns: minmax(0, 1fr); gap: 40px; margin-top: 40px; }
+.stx > section { position: relative; min-width: 0; padding: 38px 22px 22px; border: 3px solid #3B2E3A; border-radius: 20px; }
+.stx .stx-plaque { position: absolute; top: -21px; left: 50%; transform: translateX(-50%); margin: 0; padding: 6px 24px 7px; white-space: nowrap;
+  border: 2.5px solid #3B2E3A; border-radius: 10px; background: #F2C14E; box-shadow: inset 0 3px 0 #FFE39A;
+  font-size: 20px; line-height: 1.15; font-weight: 800; letter-spacing: -.01em; color: #3B2E3A; }
+.stx .stx-plaque .num { margin-left: 6px; font-size: var(--fs-meta); color: #6B4A00; }
+
+/* the scoreboard: a dark board with brass rivets, the gauge in front of rays, the numbers in gold */
+.stx-board { color: #F5ECF3; background: #2A1F2E;
+  background-image: radial-gradient(circle at 18px 18px, #E2B13C 0 4px, #3B2E3A 4.5px 6px, transparent 6.5px), radial-gradient(circle at calc(100% - 18px) 18px, #E2B13C 0 4px, #3B2E3A 4.5px 6px, transparent 6.5px),
+    radial-gradient(circle at 18px calc(100% - 18px), #E2B13C 0 4px, #3B2E3A 4.5px 6px, transparent 6.5px), radial-gradient(circle at calc(100% - 18px) calc(100% - 18px), #E2B13C 0 4px, #3B2E3A 4.5px 6px, transparent 6.5px);
+  box-shadow: inset 0 0 0 6px #4A3550, inset 0 0 0 8.5px #3B2E3A; }
+.stx-board-in { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 24px; align-items: center; }
+.stx-gauge { position: relative; width: 176px; height: 176px; display: grid; place-items: center; }
+.stx-gauge[data-band="0"] { --band: #F2C14E; } .stx-gauge[data-band="1"] { --band: #4cc38a; } .stx-gauge[data-band="2"] { --band: #F5A65B; } .stx-gauge[data-band="3"] { --band: #f0806b; }
+.stx-gauge::before { content: ""; position: absolute; left: 50%; top: 50%; width: 224px; height: 224px; margin: -112px 0 0 -112px; border-radius: 50%;
+  background: repeating-conic-gradient(color-mix(in srgb, var(--band) 38%, transparent) 0deg 8deg, transparent 8deg 20deg);
+  -webkit-mask: radial-gradient(closest-side, #000 42%, transparent 100%); mask: radial-gradient(closest-side, #000 42%, transparent 100%); animation: sht-spin 70s linear infinite; }
+.stx-gauge svg { position: absolute; inset: 10px; width: calc(100% - 20px); height: calc(100% - 20px); transform: rotate(-90deg); }
+.stx-gauge .bg { fill: #1E1620; stroke: #3B2E3A; stroke-width: 15; }
+.stx-gauge .fg { fill: none; stroke: var(--band); stroke-width: 10; stroke-linecap: round; }
+.stx-gauge p { position: relative; text-align: center; line-height: 1; }
+.stx-gauge b { font-size: 42px; font-weight: 800; letter-spacing: -.02em; color: #FFFFFF; }
+.stx-gauge p span { display: block; margin-top: 4px; font-size: var(--fs-label); font-weight: 700; color: #C7AFC4; }
+.stx-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.stx-tile { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 14px 14px 13px; border: 2.5px solid #3B2E3A; border-radius: 14px; background: #1E1620;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .06); }
+.stx-tile .ic { color: #F2C14E; }
+.stx-tile dd { order: 2; margin: 0; font-size: 34px; line-height: 1; font-weight: 800; letter-spacing: -.02em; color: #F6CD55; }
+.stx-tile dt { order: 3; font-size: var(--fs-meta); font-weight: 700; color: #C7AFC4; }
+
+/* the lectures: framed in the hub's color, a card each in the lecture's own */
+.stx-lecs { background: var(--ground); box-shadow: inset 0 0 0 6px var(--hub), inset 0 0 0 8.5px #3B2E3A; }
+.stx-lec-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.stx-lec { min-width: 0; padding: 12px 14px 11px; border: 2.5px solid #3B2E3A; border-radius: 14px; background: var(--lc-soft); }
+.stx-lec-h { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.stx-lec-n { flex: none; padding: 1px 7px 2px; border: 2px solid #3B2E3A; border-radius: 7px; background: var(--lc); color: var(--lc-on); font-size: 12px; font-weight: 800; }
+.stx-lec-h b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-label); font-weight: 800; }
+.stx-flag { flex: none; padding: 1px 8px 2px; border: 2px solid #3B2E3A; border-radius: 999px; font-size: 11px; font-weight: 800; color: #3B2E3A; }
+.stx-flag.is-best { background: #F6CD55; } .stx-flag.is-work { background: #F7B9AC; }
+.stx-lec-bar { position: relative; display: block; height: 14px; margin-top: 10px; border-radius: 7px; background: var(--ground); box-shadow: inset 0 0 0 2px #3B2E3A; overflow: hidden; }
+.stx-lec-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 7px; background: color-mix(in srgb, var(--lc) 35%, var(--ground)); box-shadow: inset 0 0 0 2px #3B2E3A; }
+.stx-lec-bar i.r { background: var(--lc); }
+.stx-lec-nums { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-top: 8px; font-size: var(--fs-meta); font-weight: 700; }
+.stx-acc { margin-left: auto; padding: 2px 9px 3px; border: 2px solid #3B2E3A; border-radius: 8px; background: var(--ground); font-weight: 800; color: var(--text); }
+.stx-acc[data-band] { color: #3B2E3A; }
+.stx-acc[data-band="0"] { background: #F2C14E; } .stx-acc[data-band="1"] { background: #7fd6a8; } .stx-acc[data-band="2"] { background: #F5A65B; } .stx-acc[data-band="3"] { background: #F28B7D; }
+
+/* the achievements: rosettes, the ones won in front of their own rays */
+.stx-ach { background: #FFFFFF; color: #3B2E3A; box-shadow: inset 0 0 0 6px #F6CD55, inset 0 0 0 8.5px #3B2E3A; }
+.stx-badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+.stx-badge { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 10px 12px; border: 2.5px dashed #9C8A98; border-radius: 14px; background: #F4F0F3; }
+.stx-badge.is-got { border: 2.5px solid #3B2E3A; background-color: #FFF8E6; background-image: repeating-conic-gradient(from 0deg at 40px 50%, rgba(246, 205, 85, .42) 0deg 9deg, transparent 9deg 22deg); }
+.stx-badge svg { flex: none; width: 56px; height: 56px; }
+.stx-badge b { display: block; font-size: var(--fs-label); font-weight: 800; }
+.stx-badge small { display: block; margin-top: 2px; font-size: var(--fs-meta); line-height: 1.35; }
+.stx-badge:not(.is-got) small { color: #6E5F6B; }
+
+@container stx (max-width: 760px) {
+  .stx-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stx-lec-list { grid-template-columns: minmax(0, 1fr); }
+}
+@container stx (max-width: 480px) {
+  .stx > section { padding: 36px 12px 14px; }
+  .stx .stx-plaque { font-size: 18px; padding: 5px 18px 6px; }
+  .stx-board-in { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 16px; }
+  .stx-gauge { width: 150px; height: 150px; } .stx-gauge b { font-size: 36px; }
+  .stx-tiles { width: 100%; }
+  .stx-tile { padding: 12px; } .stx-tile dd { font-size: 28px; }
+  .stx-badges { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .stx-gauge::before { animation: none !important; } }
+html.shx[data-theme="dark"] .stx-ach { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
+html.shx[data-theme="dark"] .stx-badge { background: #1c1b1c; border-color: #6E5F6B; }
+html.shx[data-theme="dark"] .stx-badge.is-got { background-color: #3A2E14; border-color: #3B2E3A; background-image: repeating-conic-gradient(from 0deg at 40px 50%, rgba(246, 205, 85, .22) 0deg 9deg, transparent 9deg 22deg); }
+html.shx[data-theme="dark"] .stx-badge:not(.is-got) small { color: #B8ADB5; }
+@media (prefers-color-scheme: dark) {
+  html.shx:not([data-theme="light"]) .stx-ach { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }
+  html.shx:not([data-theme="light"]) .stx-badge { background: #1c1b1c; border-color: #6E5F6B; }
+  html.shx:not([data-theme="light"]) .stx-badge.is-got { background-color: #3A2E14; border-color: #3B2E3A; background-image: repeating-conic-gradient(from 0deg at 40px 50%, rgba(246, 205, 85, .22) 0deg 9deg, transparent 9deg 22deg); }
+  html.shx:not([data-theme="light"]) .stx-badge:not(.is-got) small { color: #B8ADB5; }
+}

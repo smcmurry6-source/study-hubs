@@ -1028,14 +1028,14 @@
   document.addEventListener("sh:name", function(e){ if (nameTold) return; localName = String(e && e.detail && e.detail.name || "").slice(0, 24); paintName(); });
 
   /* Settings: the same keys the hubs' Settings keep (widget/hub.js and widget/v3.js: keep the three lists in step), so a
-     change here shows in every hub. The font choice, background music and the accent metal are cut (plan, 4.6). */
+     change here shows in every hub. The font choice, background music and the accent metal are cut (plan, 4.6), and Full
+     Arch is retired on the redesign (Sam, 2026-11-12), so its switch is in v3.js's list only. */
   var EXTRAS = [
     ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy: ask him about the notes. Right answers and study streaks keep him healthy. Off, an Ask button takes his place.", [["on", "Everywhere"], ["dash", "Dashboard only"], ["off", "Off"]]],
     ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in each hub's trophy case."],
     ["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online."],
     ["sh_pref_fairy", "Tooth Fairy", "Flies across the page now and then. Catch her for the fairy board."],
     ["sh_pref_probe", "Golden Probe", "One question a day is golden. First to get it right wins."],
-    ["sh_pref_arch", "Full Arch chart", "A 32-tooth chart in the corner that fills as you answer right."],
     ["sh_pref_nuke", "Tactical nukes", "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes.", [["on", "On"], ["mine", "Mine only"], ["off", "Off"]]],
     ["sh_pref_celebrate", "Rank-up and trophy cards", "The rank-up cutscene, level-up, trophy and medal cards."],
     ["sh_pref_cheers", "Streak cheers", "Confetti and a toast every 5 right in a row."],
@@ -1130,11 +1130,27 @@
       '<div class="dx-rankbody"><p class="dx-rankname"><b>' + esc(jName(p, lv)) + '</b><span class="num">' + num(xp) + " XP" + (p.position ? " · #" + p.position + " of " + p.of : "") + "</span></p>" +
       '<div class="dx-bar2 dx-rankbar" role="progressbar" aria-label="Progress to ' + esc(nextName || "the top") + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pct * 100) + '"><i style="width:0%"></i></div>' +
       '<p class="note">' + (!xp ? "Answer a question in any hub to start earning XP." : next ? '<b class="num">' + num(next - xp) + " XP</b> to " + esc(nextName) : "The highest rank there is.") + "</p></div>" +
-      (medals ? '<div class="dx-medals"><span class="note">Mastery</span>' + medals + "</div>" : "");
+      (medals ? '<div class="dx-medals"><span class="note">Mastery</span>' + medals + "</div>" : "") +
+      /* the trophy case (widget/trophies.js, phase 4 session 6), in a dialog */
+      (R.trophyCase ? (function(n){ return '<button type="button" class="btn dx-tro" data-dx="trophies">' + icon("trophy", 18) + 'Trophy case <span class="num">' + n.won + " of " + n.of + "</span></button>"; })(R.caseCount(p.badges)) : "");
+    if (!el.__tro) { el.__tro = true; el.addEventListener("click", function(e){ var b = e.target.closest && e.target.closest('[data-dx="trophies"]'); if (b) openTrophies(b); }); }
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ var i = q(".dx-rankbar i", el); if (i) i.style.width = (pct * 100).toFixed(1) + "%"; }); });
     var pill = $("dxRank");
     pill.innerHTML = '<span class="sr">Your rank: ' + esc(jName(p, lv)) + ", " + num(xp) + ' XP</span><span class="dx-seen" aria-hidden="true">' + jMini(p, lv) + "<b>" + esc(jName(p, lv)) + '</b><span class="num dx-fold">' + num(xp) + " XP</span></span>";
     pill.hidden = false;
+  }
+  /* the trophy case in a dialog: the rank, the showcase and the cabinet (widget/trophies.js and its drawings, fetched on
+     the first open); Leaderboards closes it on the class's boards */
+  function openTrophies(back){
+    var R = window.shRanks; if (!R || !R.trophyCase) return;
+    var dlg = dialog("tcH", '<h2 id="tcH">Trophy case</h2><div class="dx-tc"><p class="note">Opening the trophy case…</p></div>', back);
+    dlg.el.classList.add("sht-dlg");
+    var host = q(".dx-tc", dlg.el);
+    R.trophyCase(function(T){
+      if (!host.isConnected) return;
+      if (!T) { host.innerHTML = '<p class="note">The trophy case loads when you’re online.</p>'; return; }
+      T.mount(host, { profile: myRank, sb: boardSb, onBoards: function(){ dlg.close(); var c = $("class"); if (c) try { c.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) { c.scrollIntoView(); } } });
+    });
   }
   /* ------------------------------------------------------------
      TIMMY'S PLACE in the "you" card (widget/place.js, phase 4 part C). Everyone has Timmy, and his place takes the

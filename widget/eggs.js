@@ -901,6 +901,10 @@
   });
 
   /* ================= Full Arch: once per hub. Right answers grow teeth, misses knock them out; fill all 32 ================= */
+  /* retired on the redesign's pages (Sam, 2026-11-12: "I also want to remove the full arch challenge thing"): the hub
+     engine and the new dashboard (html.shx, or data-game="v2" on the widget's tag) never draw it. A live hub keeps it
+     until the release takes the code out. */
+  var ARCH_OFF = (function(){ try { return document.documentElement.classList.contains("shx") || !!document.querySelector('script[src*="v3.js"][data-game="v2"]'); } catch (e) { return false; } })();
   var ARCH_KEY = "sh_egg_arch_" + HUB, ARCH_DONE = "sh_egg_arch_done_" + HUB, archEl = null, archHide = null;
   var archN = Math.max(0, Math.min(31, +(ls(ARCH_KEY) || 0)));
   function archDone(){ return ls(ARCH_DONE) === "1"; }
@@ -958,7 +962,7 @@
     setTimeout(function(){ f.remove(); }, 900);
   }
   function archAnswer(correct){
-    if (archDone() || !feat("arch")) return;
+    if (ARCH_OFF || archDone() || !feat("arch")) return;
     if (!archEl) archShow();
     if (correct) { archN++; archShow(); archDraw(archN); }
     else if (archN > 0) { archShow(); knockOut(archN); archN--; archDraw(0); }

@@ -387,6 +387,13 @@
     var s = db.sboost && new RealDate(db.sboost).getTime() > t ? { mult: 2, until: db.sboost, src: "shop" } : null;
     return b && s ? (new RealDate(s.until).getTime() > new RealDate(b.until).getTime() ? s : b) : b || s;
   }
+  function trophyShares(){
+    var N = { "answers-100": 166, "answers-1000": 44, "days-7": 72, "days-30": 13, "run-25": 87, "run-100": 19, mock90: 38, "arcade-25": 25,
+      golden: 41, fairy: 58, "fairy-5": 9, boss: 23, owl: 17, konami: 31, floss: 64, prof: 12, rootcanal: 8, mirror: 27, fullarch: 15, flosschain: 6,
+      cavity: 11, holiday: 49, "pet-perfect": 21, "pet-revive": 5, "mastery-bronze": 96, "mastery-silver": 72, "mastery-gold": 40, "mastery-crown": 7,
+      "journey-0": 6, "journey-1": 0, "journey-2": 0 };
+    return Object.keys(N).map(function(k){ return { kind: k, n: N[k], total: 212 }; });
+  }
   function profile2(v){
     var p = rpc("get_rank_profile", { p_visitor: v }).data, r = rank2(p.xp || 0), k;
     for (k in r) p[k] = r[k];
@@ -1493,6 +1500,8 @@
       case "redeem_link_code": return { write: true, data: null };
       case "record_achievement": if (a.p_kind && db.achievements.indexOf(a.p_kind) < 0) { db.achievements.push(a.p_kind + (hub ? ":" + hub : "")); save(); } return { write: true, data: null };
       case "get_published_recaps": return { data: recapFixtures() };
+      /* the trophy case's shares on the redesign (phase 4, session 6): made up, out of 212, every one held by at least 5 */
+      case "get_trophy_stats_v2": return { data: trophyShares() };
       case "get_golden_today": case "get_correct_streak_stats": case "get_trophy_stats": case "get_fairy_board": case "get_cavity_week": return { data: [] };
     }
     if (/^get_/.test(fn)) return { data: [] };

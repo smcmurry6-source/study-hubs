@@ -32,14 +32,15 @@
     {
       "id": "high-xp",
       "name": "High-XP learner",
-      "summary": "Top of the rank board: Dark Matter, a long daily streak, most questions answered, trophies and mastery badges.",
+      "summary": "Top of the rank board: Dark Matter, a long daily streak, most questions answered, trophies (Full Arch among them: on the redesign it shows as retired) and mastery badges.",
       "visitor": "00000000-0000-4000-8000-preview00003",
       "displayName": "Preview Cuspid Champion",
       "xp": 61000,
       "skipTour": true,
       "petDaysAgo": 40,
       "answers": { "live": { "share": 0.92, "accuracy": 0.88, "days": 30 }, "archived": { "share": 0.8, "accuracy": 0.85, "days": 30 } },
-      "badges": ["mastery-gold:occlusion", "mastery-crown:perio", "mastery-silver:pcd-implants-exam1", "fairy", "golden", "run-25"],
+      "badges": ["mastery-gold:occlusion", "mastery-crown:perio", "mastery-silver:pcd-implants-exam1", "fairy", "golden", "run-25",
+        "answers-100", "answers-1000", "days-7", "days-30", "mock90", "arcade-25", "owl", "konami", "floss", "fullarch:occlusion"],
       "pins": 3,
       "inbox": []
     },

@@ -53,7 +53,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 | 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage. **Done 2026-11-13** ([#348](https://github.com/smcmurry6-source/study-hubs/pull/348), merged as `c5ce92e`; its hand-off in the Log) | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
 | 4 | **Visiting**: a row on the new dashboard's boards opens that person's place. **Done 2026-11-13** ([#352](https://github.com/smcmurry6-source/study-hubs/pull/352); its hand-off in the Log), in the leaderboard's theater look (Sam: "this window should be more epic"), getting there through the round-3 clouds | [visiting](done/2026-11-12-redesign-visiting.md) | 3 |
 | 5 | **The bowling egg** (part D). **Done 2026-11-13** (merged on Sam's "merge"; the hand-off in the Log) | [the bowling egg](done/2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
-| 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12) | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
+| 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12). **Built 2026-11-13**, waiting on Sam's yes to the recording and "merge" (its hand-off in the Log), with the rest of More, Stats and trophies redrawn to match (Sam: "make it more epic") | [the trophy case and the cards](2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
 | 7 | **Ask Timmy, part 2** (the chat). **Built 2026-11-12, ahead of its turn** (Sam asked for it then): the Ask icon shows whenever Timmy isn't on the page, so it works before and after session 3 | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), its Log | (3) |
 | 8 | **The game layer's wiring** left by part A: the arcade's sessions, Timmy Time's minutes, the service worker's lists | [the wiring](2026-11-12-redesign-game-layer-wiring.md) | 6 |
 | 9 | **Phase 5, part 2**: bundles, one stylesheet, the font, budgets lowered | [phase 5](2026-11-05-redesign-phase-5-backend.md) | every session that adds a file (1 to 8) |
@@ -127,7 +127,8 @@ These hold for each spec; a spec only adds to them.
   smoke, a11y and perf suites passing ([run-a-redesign-session](../how-to/run-a-redesign-session.md), step 4) ([#330](https://github.com/smcmurry6-source/study-hubs/pull/330), 2026-11-12)
 - [ ] The trophy case and the cards on the design system ([its note](2026-11-12-redesign-trophy-case-and-cards.md)),
       reviewed by Sam in a recording from a scripted browser on made-up data, reduced motion too, and once more on the
-      release's own preview (Sam, 2026-11-12: no hosted preview before that one)
+      release's own preview (Sam, 2026-11-12: no hosted preview before that one). Built 2026-11-13 and the recording
+      sent; the look on the release's preview is a box in [the release note](2026-11-06-redesign-release.md)
 - [ ] Part A, B, C and D done as their notes say (each note's "Done when"), and part E's "everyone has Timmy"
 - [x] Visiting from the new dashboard's boards ([its note](done/2026-11-12-redesign-visiting.md); Sam, 2026-11-12: in the release). Built 2026-11-13 ([#352](https://github.com/smcmurry6-source/study-hubs/pull/352))
 - [x] The arcade lobby of each live hub redrawn; game mechanics unchanged (done outside this phase: Occlusion's in
@@ -435,6 +436,37 @@ These hold for each spec; a spec only adds to them.
   ([visiting](done/2026-11-12-redesign-visiting.md)'s Outcome): Visit someone random under the board, arrows and Back to
   mine in a visit, each hop through the clouds. Nothing on the server; `widget/place.js`'s `open()` takes `nav` and
   `covered` (above). **Next: session 6** still.
+- 2026-11-13 (Claude Code), **session 6, the trophy case and the cards; hand-off for session 7 on** ([its note](2026-11-12-redesign-trophy-case-and-cards.md),
+  its Outcome). Nothing students see changes: the live hubs and dashboard keep 24 trophies, Full Arch, the old Stats
+  panel and today's cards (the smoke test compares the live cards' markup with `main`'s). Neither pending migration
+  was applied or changed. Sam saw two contact sheets ("It needs to be more epic", then "sounds good") and asked for the
+  rest of the Stats page to match ("make it more epic").
+  What the next sessions can use:
+  - **The gate**: `NEW` in `widget/ranks.js` and `widget/rankup.js` is the `shx` class the redesign's pages put on
+    `<html>` (`widget/hub.js`, `next/index.html`), read in a `try` (the art build's stub has no `document`).
+    `widget/eggs.js`'s `ARCH_OFF` is that class or a `data-game="v2"` widget tag.
+  - **`widget/ranks.js`** is the case's loader: `trophyCase(cb)` (the drawings, then `widget/trophies.js`, as
+    `window.shTrophies`), `trophyCss(cb)` (`<link id="sh-trophies-css">`), `needTrophyArt(cb)`, `trophyStats(cb, sb)`
+    (`get_trophy_stats_v2`, then `get_trophy_stats`; kept 10 minutes; one copy for the case, the cards and the old panel),
+    `shareOf(k)` (`{ n, total, p, label }`, or `null` for a kind the server doesn't count), `caseCount(badges)` (`{ won, of }`)
+    and `RETIRED` (Full Arch's row). On the redesign `TROPHIES` is 27 rows: 8, the journeys (`scene: true`: the hand-off
+    awards them, `trackTrophies` skips them), 15 secrets, Bowling (`device: "sh_bowl_trophy"`).
+  - **`widget/trophies.js`**: `shTrophies.mount(el, { profile, stats, sb, onBoards })`; it waits for its stylesheet,
+    redraws when the shares arrive and when `sh:bowl-trophy` fires, keeps focus on a redraw, and records no events of its
+    own (its buttons carry `data-sht`). **`widget/trophies.css`** holds the case (`.sht`), the rest of the Stats page
+    (`.stx`, drawn by `statsEpic` in `widget/hub.js`) and the cards' redesign look (`html.shx .sh-ru...`).
+  - **`widget/rankup.js`**: on the redesign a card waits for that stylesheet and the drawings (`xready`, 2.5 s at most;
+    scenes don't); `trophyArt(ic, px, key, k)` draws from `SH_TROPHY_ART`; a card's `next` line; `PLACE_SET`, the rank's
+    pieces for Timmy's place (from `tools/figures/site/sets.mjs`: change both together); `data-metal` on the cards and
+    `data-band` on the mock card. BUG-116 (a level-up card stopped the queue) is fixed on the redesign only.
+  - **For session 8 (the wiring) and session 9 (bundles)**: three files load on first use and join `sw.js`'s
+    `PRECACHE` (a box in [the release note](2026-11-06-redesign-release.md), "From phase 4, session 6"). The page-load
+    files grew a little: `widget/ranks.js` (+7 KB), `widget/rankup.js` (+5 KB), `widget/hub.js` (+7 KB), `widget/dash.js`.
+  - **Open for Sam**: the live fix for BUG-116 and the live About page's secret count ([the inbox](inbox.md)); a shelf
+    for the hub trophies in the case (the release note's box).
+  - Tests: the smoke test's trophy-case block (a new hub, the new dashboard, a live hub; desktop and phone), `a11y.js`'s
+    "trophy case" and "trophy card". Bugs: BUG-116 to BUG-121.
+  **Next: session 7 is built (Ask Timmy, part 2), so session 8, the wiring** ([its note](2026-11-12-redesign-game-layer-wiring.md)).
 
 ## Outcome
 

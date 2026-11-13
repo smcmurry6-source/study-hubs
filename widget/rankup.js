@@ -24,6 +24,12 @@
   "use strict";
   if (window.shRankUp || !window.shRanks) return;
   var R = window.shRanks, T = R.TIERS, ROMAN = ["I", "II", "III"];
+  /* The redesign's pages (html.shx; phase 4, session 6): the cards on the design system. Their look is in
+     widget/trophies.css and the trophies are drawn from widget/hub-art/trophies.js (SH_TROPHY_ART); widget/ranks.js
+     fetches both with the first card, which waits for them (at most 2.5 s). In the markup only what the look needs
+     changes: data-metal and data-band, the title, Timmy's place in place of the cut accents, the next line. Timing, the
+     queue, skip and the reduced-motion stills are the same. A live page never has the class: its cards are today's. */
+  var NEW = (function(){ try { return document.documentElement.classList.contains("shx"); } catch (e) { return false; } })();
 
   /* sparks (c), the glow behind the medal, and the metallic name gradient (n) per rank, made for a dark backdrop */
   var PAL = {
@@ -443,9 +449,41 @@
     var run = queue.shift();
     if (!run) { playing = false; return; }
     playing = true;
-    var called = false;
-    try { run(function(){ if (called) return; called = true; setTimeout(nextUp, 380); }); }
-    catch (e) { playing = false; nextUp(); }
+    (run.scene ? function(f){ f(); } : xready)(function(){
+      var called = false;
+      try { run(function(){ if (called) return; called = true; setTimeout(nextUp, 380); }); }
+      catch (e) { playing = false; nextUp(); }
+    });
+  }
+  /* the redesign's look arrives before its first card (on a live page this calls straight through) */
+  var xq = null;
+  function xready(cb){
+    if (!NEW || xq === true) { cb(); return; }
+    if (xq) { xq.push(cb); return; }
+    xq = [cb];
+    var left = 2, fin = function(){ if (xq === true) return; var q = xq; xq = true; q.forEach(function(f){ f(); }); }, one = function(){ if (--left === 0) fin(); };
+    setTimeout(fin, 2500);
+    if (R.trophyCss) R.trophyCss(one); else one();
+    if (R.needTrophyArt) R.needTrophyArt(one); else one();
+  }
+  /* the rank's pieces for Timmy's place, one set for each full rank-up on the Handpiece (RANKS in
+     tools/figures/site/sets.mjs): on the redesign they stand where the cut accent metals were */
+  var PLACE_SET = ["", "A brass monocle and bowler, and a treadle dental engine for the yard.", "A bronze gladiator helmet, and a bronze bell for the yard.",
+    "A silver knight\u2019s helm, and a silver trophy cup for the yard.", "Golden laurels and toga, and a golden tooth statue for the yard.",
+    "Diamond shades and an ice cape, and a diamond geode for the yard.", "A Dark Matter cloak, and a Dark Matter orb for the yard."];
+  function unlocksNew(d){
+    var out = [];
+    if (!d.jn && d.v2 && PLACE_SET[d.to]) out.push('<span class="sh-ru-ic" style="color:var(--ru-n2)">' + IC_HOUSE + '</span><span><b>Timmy\u2019s place</b>' + esc(PLACE_SET[d.to]) + ' Put them out in the customizer.</span>');
+    if (d.to < 6) {
+      var at = d.jn ? d.tier_next : T[d.to + 1].at;
+      out.push('<span class="sh-ru-ic">' + A(d, d.to + 1, 30) + '</span><span><b>Next rank</b>' + esc((d.jn ? d.jn + " " : "") + T[d.to + 1].name) +
+        (at ? ' at ' + fmt(at) + ' XP' + (d.xp != null && at > d.xp ? ' (' + fmt(at - d.xp) + ' to go)' : '') : '') + '.</span>');
+    } else if (d.v2 || (d.jn && d.jn !== R.JOURNEYS[2])) {
+      out.push('<span class="sh-ru-ic">' + A(d, 6, 30) + '</span><span><b>Next</b>Dark Matter III finishes the ' + esc(d.jn || R.JOURNEYS[0]) + '.</span>');
+    } else {
+      out.push('<span class="sh-ru-ic" style="color:var(--ru-n2)">' + IC_CROWN + '</span><span><b>The top</b>Dark Matter is the highest rank there is.</span>');
+    }
+    return out.map(function(h, i){ return '<li style="--i:' + i + '">' + h + '</li>'; }).join("");
   }
 
   var open = null;
@@ -454,10 +492,10 @@
     css();
     if (open) open(true);
     var to = T[d.to], key = to.key, P = PAL[key], lvl = d.level || 1, fromLvl = d.fromLevel || 3, still = reduced();
-    var name = N(d, d.to, lvl), title = d.to >= 6 && !d.jn ? "MAX RANK" : "RANK UP";
+    var name = N(d, d.to, lvl), title = NEW ? (d.to >= 6 && !d.jn && !d.v2 ? "Top rank" : "New rank") : d.to >= 6 && !d.jn ? "MAX RANK" : "RANK UP";
     var el = document.createElement("div");
     el.className = "sh-ru"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "New rank: " + name); el.tabIndex = -1;
-    vars(el, key);
+    vars(el, key); if (NEW) el.setAttribute("data-metal", key);
     el.innerHTML = '<div class="sh-ru-bg"></div><canvas class="sh-ru-cv" aria-hidden="true"></canvas>' +
       '<div class="sh-ru-fx" aria-hidden="true"><div class="sh-ru-fxc"><div class="sh-ru-rays"><i></i><i></i></div><div class="sh-ru-halo"></div></div></div>' +
       '<div class="sh-ru-stage"><div class="sh-ru-in">' +
@@ -469,7 +507,7 @@
           '<div class="sh-ru-namewrap"><span class="sh-ru-name sh-ru-mt">' + esc(name) + '</span></div>' +
           '<div class="sh-ru-from"><span>' + A(d, d.from, 26) + esc(N(d, d.from, fromLvl)) + '</span><span class="sh-ru-arw" aria-label="to">&rarr;</span><span>' + A(d, d.to, 26) + esc(name) + '</span></div>' +
           (d.xp != null ? '<div class="sh-ru-stat"><b>' + fmt(d.xp) + '</b> XP' + (d.position ? ' · #' + fmt(d.position) + ' of ' + fmt(d.of) + ' in the class' : '') + '</div>' : '') +
-          '<ul class="sh-ru-unl">' + unlocks(d) + '</ul>' +
+          '<ul class="sh-ru-unl">' + (NEW ? unlocksNew(d) : unlocks(d)) + '</ul>' +
           '<button type="button" class="sh-ru-go">Let\'s go</button>' +
         '</div>' +
       '</div></div>' +
@@ -582,12 +620,13 @@
   function level(d){ enqueue(function(done){ levelNow(d, done); }); }
   function levelNow(d, done){
     css();
+    var next = done;
     if (lvClose) lvClose(true);
     var t = T[d.to], key = t.key, P = PAL[key], lv = d.level || 2, old = d.fromLevel && d.fromLevel < lv ? d.fromLevel : Math.max(1, lv - 1), still = reduced();
     var o = ROMAN[old - 1], n = ROMAN[lv - 1];
     var el = document.createElement("div");
     el.className = "sh-ru-lv"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite"); el.setAttribute("aria-label", "Level up: " + N(d, d.to, lv));
-    vars(el, key);
+    vars(el, key); if (NEW) el.setAttribute("data-metal", key);
     el.innerHTML = '<div class="sh-ru-lv-medal" aria-hidden="true"><i class="sh-ru-lv-ring"></i><i class="sh-ru-lv-ring"></i><div class="sh-ru-lv-coin">' + A(d, d.to, 80, { level: old }) + '</div></div>' +
       '<div class="sh-ru-lv-body" aria-hidden="true"><div class="sh-ru-lv-eye">' + (d.jn ? esc(d.jn) + " · level up" : "Level up") + '</div>' +
       '<div class="sh-ru-lv-name"><span class="sh-ru-mt">' + esc(t.name) + '</span><span class="sh-ru-roll"><i>' + (o.length > n.length ? o : n) + '</i>' +
@@ -601,6 +640,17 @@
     function close(now){
       if (closed) return; closed = true; timers.forEach(clearTimeout);
       if (lvClose === close) lvClose = null;
+      /* the redesign (BUG-116): the card fades out and the queue goes on to the next card. On a live page this inner
+         `done` hides the queue's own, so the card goes at once and no later card shows until the page reloads; that
+         stays as it is there until Sam says otherwise */
+      if (NEW) {
+        var gone = function(){ el.remove(); };
+        if (now || still || !el.animate) gone();
+        else el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-14px) scale(.97)" }], { duration: 320, easing: "ease-in", fill: "forwards" }).onfinish = gone;
+        if (sp) setTimeout(function(){ sp.kill(); cv.remove(); }, now ? 0 : 1600);
+        if (next) next();
+        return;
+      }
       var done = function(){ el.remove(); };
       if (now || still || !el.animate) done();
       else el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-14px) scale(.97)" }], { duration: 320, easing: "ease-in", fill: "forwards" }).onfinish = done;
@@ -650,7 +700,10 @@
   }
   /* a medal with ribbon tails and the trophy's own icon engraved on it, in a rank's metal (gold by default) */
   var tuid = 0;
-  function trophyArt(ic, px, key){
+  function trophyArt(ic, px, key, k){
+    /* the redesign: the trophy's own drawing, when its key is given and the drawings are here */
+    var D = NEW && k && window.SH_TROPHY_ART && window.SH_TROPHY_ART[k];
+    if (D) return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 64 64" aria-hidden="true" focusable="false">' + D.body + '</svg>';
     var P = PAL[key] || PAL.gold, id = "shtr" + (++tuid), ink = R.shade ? R.shade(P.n[0], -.55) : "#4A3405";
     return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 80 80" aria-hidden="true"><defs>' +
       '<radialGradient id="' + id + 'g" cx=".36" cy=".3" r=".85"><stop offset="0" stop-color="' + P.n[1] + '"/><stop offset=".55" stop-color="' + P.n[2] + '"/><stop offset="1" stop-color="' + P.n[0] + '"/></radialGradient>' +
@@ -666,6 +719,12 @@
     if (!r.n) return "You're the first in the class to earn it.";
     return "Earned by <b>" + fmt(r.n) + " of " + fmt(r.total) + "</b> classmates so far (" + esc(r.label) + ").";
   }
+  /* the redesign's line under a trophy or medal: the class's share, then what's next */
+  function rarityNew(r, next){
+    var p = r && r.total ? r.n / r.total * 100 : 0;
+    var a = !r || !r.total ? "" : !r.n ? "You\u2019re the first in the class to earn it" : "<b>" + (p < 1 ? "Under 1%" : Math.round(p) + "%") + "</b> of the class has it";
+    return a && next ? a + " \u00b7 " + esc(next) : a || esc(next || "");
+  }
   function trophy(t){ enqueue(function(done){ trophyNow(t || {}, done); }); }
   function trophyNow(t, done){
     css();
@@ -674,13 +733,14 @@
     var el = document.createElement("div");
     el.className = "sh-ru-lv sh-ru-tr"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite");
     el.setAttribute("aria-label", eye + ": " + (t.name || "") + (t.desc ? ". " + t.desc : ""));
-    vars(el, key);
+    vars(el, key); if (NEW) el.setAttribute("data-metal", key);
+    var line = NEW ? rarityNew(rare, t.next) : rare && rare.total ? rarityLine(rare) : "";
     el.innerHTML = '<div class="sh-ru-lv-medal" aria-hidden="true"><i class="sh-ru-lv-ring"></i><i class="sh-ru-lv-ring"></i><div class="sh-ru-lv-coin">' +
-        (t.art || trophyArt(t.ic || "M5 12l4 4 10-10", 84, key)) + '</div></div>' +
+        (t.art || trophyArt(t.ic || "M5 12l4 4 10-10", 84, key, t.k)) + '</div></div>' +
       '<div class="sh-ru-lv-body" aria-hidden="true"><div class="sh-ru-lv-eye">' + esc(eye) + '</div>' +
       '<span class="sh-ru-tr-name sh-ru-mt">' + esc(t.name || "") + '</span>' +
       (t.desc ? '<div class="sh-ru-tr-desc">' + esc(t.desc) + '</div>' : '') +
-      (rare && rare.total ? '<div class="sh-ru-tr-rare">' + rarityLine(rare) + '</div>' : '') + '</div>' +
+      (line ? '<div class="sh-ru-tr-rare">' + line + '</div>' : '') + '</div>' +
       '<i class="sh-ru-lv-shine" aria-hidden="true"></i>';
     document.body.appendChild(el);
     var cv = null, sp = null, timers = [], closed = false;
@@ -746,6 +806,7 @@
     var el = document.createElement("div");
     el.className = "sh-mk"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-labelledby", "sh-mk-t"); el.tabIndex = -1;
     el.style.setProperty("--mk-c", B[1]); el.style.setProperty("--mk-g", B[2]);
+    if (NEW) el.setAttribute("data-band", String(BAND.indexOf(B)));
     el.innerHTML = '<div class="sh-mk-bg"></div><canvas class="sh-ru-cv" aria-hidden="true"></canvas>' +
       '<div class="sh-mk-stage"><div class="sh-mk-card">' +
         '<div class="sh-mk-eye">Mock exam' + (m.hub ? ' · ' + esc(m.hub) : '') + '</div>' +
@@ -757,7 +818,7 @@
         '<div class="sh-mk-best' + (isBest ? ' is-new' : '') + '">' + esc(bestLine) + '</div>' +
         (lecs.length > 1 ? '<ul class="sh-mk-lecs" aria-label="By lecture">' + lecs.map(function(x, i){
           var q = x.correct / x.total;
-          return '<li style="--i:' + i + '"><span class="l">' + esc(x.label) + '</span><span class="b"><i style="--w:' + Math.max(2, Math.round(q * 100)) + '%; --c:' + band(q)[1] + '"></i></span><span class="n">' + x.correct + '/' + x.total + '</span></li>';
+          return '<li style="--i:' + i + '"' + (NEW ? ' data-band="' + BAND.indexOf(band(q)) + '"' : '') + '><span class="l">' + esc(x.label) + '</span><span class="b"><i style="--w:' + Math.max(2, Math.round(q * 100)) + '%; --c:' + band(q)[1] + '"></i></span><span class="n">' + x.correct + '/' + x.total + '</span></li>';
         }).join("") + '</ul>' : '') +
         '<div class="sh-mk-actions"><button type="button" class="sh-mk-go">Review answers</button>' +
           (right < total && typeof m.missed === "function" ? '<button type="button" class="sh-mk-miss">See what I missed</button>' : '') + '</div>' +
@@ -814,5 +875,5 @@
   window.shRankUp = { tier: tier, level: level, trophy: trophy, mock: mock, trophyArt: trophyArt,
     /* another file's full-screen scene takes its turn with the cards: run(done) plays it and calls done when it closes
        (the redesign's hand-off and Dark Matter unlock, widget/journeys.js) */
-    scene: function(run){ if (typeof run === "function") enqueue(run); } };
+    scene: function(run){ if (typeof run === "function") { run.scene = true; enqueue(run); } } };
 })();

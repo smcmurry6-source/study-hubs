@@ -1035,11 +1035,16 @@
     /* Perio's shape counts each question once, the first time it's right: show right on the latest try instead */
     if (ANSWERED) { var tr = 0, rt = 0; Object.keys(STATE.answered).forEach(function(id){ var r = ansOf(id); if (r) { tr++; if (r.last) rt++; } }); rightN = rt; acc = tr ? Math.round(rt / tr * 100) : null; }
     var x = HX.rankXp(), p = HX.RANK.p, days = Object.keys(HX.goalDays()).length, game = HX.gameOn() && p && p.journey != null;
-    body.innerHTML = '<div class="stats-grid">' +
+    /* the trophy case (widget/trophies.js, phase 4 session 6): the rank, the showcase and the cabinet in place of the rank
+       panel, once widget/ranks.js is here; the leaderboards stay behind a button (today's panel). The case is kept when
+       the rank comes in again, so the trophy picked stays picked. */
+    var R = window.shRanks, useCase = !!(R && R.trophyCase), host = $("[data-trophies]", body);
+    var rankPanel = useCase ? "" :
       '<section class="panel" aria-labelledby="srH"><h2 id="srH">Your rank</h2><div class="rank-big"><span class="hp" data-rankart="64" aria-hidden="true">' + HX.rankArt(64) + "</span><div><p class=\"rank-name\">" + esc(HX.rankName()) + '</p><p class="num">' + (x === null ? "+" + fmt(HX.todayRec().xp) + " XP today" : fmt(x) + " XP" + (p && p.next_at && p.next_at > x ? " · " + fmt(p.next_at - x) + " to the next level" : "")) + "</p></div></div>" +
         (game ? '<div data-road></div><p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study. A question pays its first three right and its first three wrong answers a day. More comes from the day\'s 20th answer, fixing a miss, a finished mock exam and every mastery medal, which also starts 24 hours of double XP.</p>'
           : '<p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study (answer XP tops out at 600 a day).</p>') +
-        '<button class="btn" type="button" data-open-stats>' + icon("trophy", 18) + "Trophies and leaderboards</button></section>" +
+        '<button class="btn" type="button" data-open-stats>' + icon("trophy", 18) + "Trophies and leaderboards</button></section>";
+    var grid = '<div class="stats-grid">' + rankPanel +
       '<section class="panel" aria-labelledby="ssH"><h2 id="ssH">Your answers</h2><dl class="kv">' +
         "<div><dt>Answered</dt><dd class=\"num\">" + fmt(answered) + "</dd></div><div><dt>" + (ANSWERED ? "Right on the latest try" : "Right") + "</dt><dd class=\"num\">" + fmt(rightN) + (acc !== null ? " · " + acc + "%" : "") + "</dd></div>" +
         "<div><dt>Best run</dt><dd class=\"num\">" + pl(STATE.bestStreak, "right in a row", "right in a row") + "</dd></div><div><dt>Days goal met</dt><dd class=\"num\">" + fmt(days) + "</dd></div>" +
@@ -1048,7 +1053,24 @@
         rows.map(function(r){ return '<tr><th scope="row">' + lecDot(r.l.id) + esc(lecName(r.l.id)) + '</th><td class="r num">' + r.tried + " of " + r.total + '</td><td class="r num">' + r.right + '</td><td class="r num">' + (r.pct === null ? "–" : r.pct + "%") + "</td></tr>"; }).join("") + "</tbody></table></div></section>" +
       '<section class="panel wide" aria-labelledby="saH"><h2 id="saH">Achievements</h2><ul class="ach">' + (CORE.achievements || []).map(function(a){ var got = achMap()[a.id]; return '<li class="' + (got ? "got" : "") + '">' + icon(got ? "check" : "goal", 20) + "<span><b>" + esc(a.name) + "</b><small>" + esc(a.desc) + (typeof got === "string" ? " · " + esc(dateLabel(got)) : "") + "</small></span></li>"; }).join("") + "</ul></section>" +
       "</div>";
-    $("[data-open-stats]", body).addEventListener("click", function(){ var b = document.getElementById("shstat-stats-pill"); if (b) b.click(); track("more:trophies"); });
+    function boards(){ var b = document.getElementById("shstat-stats-pill"); if (b) b.click(); track("more:trophies"); }
+    if (useCase) {
+      /* the rest of the page in the case's style (Sam, 2026-11-13: "the rest of the page doesnt match the epicness"): its
+         look is in widget/trophies.css, so it shows once that is here */
+      grid = '<div class="stats-grid stx" style="visibility:hidden">' + statsEpic(rows, answered, rightN, acc, days) + "</div>";
+      if (host) $(".stats-grid", body).outerHTML = grid;
+      else { body.innerHTML = '<div class="stats-case" data-trophies><p class="note loading">Opening the trophy case…</p></div>' + grid; host = $("[data-trophies]", body); }
+      var sg = $(".stats-grid", body); (R.trophyCss || function(f){ f(); })(function(){ sg.style.visibility = ""; });
+      var q = null, k; if (p) { q = {}; for (k in p) q[k] = p[k]; if (x !== null) q.xp = x; }
+      R.trophyCase(function(T){
+        if (!host.isConnected) return;
+        if (T) T.mount(host, { profile: q, sb: window.shSupabase || null, onBoards: boards });
+        else host.innerHTML = '<p class="note">The trophy case loads when you’re online.</p>';
+      });
+      return;
+    }
+    body.innerHTML = grid;
+    $("[data-open-stats]", body).addEventListener("click", boards);
     /* the road ahead: the three journeys, where you are on yours and what the next one is (widget/journeys.js, loaded here) */
     var road = $("[data-road]", body);
     if (road && window.shRanks && window.shRanks.journeys) window.shRanks.journeys(function(J){
@@ -1057,15 +1079,62 @@
       road.innerHTML = '<h3 class="road-h">The road ahead</h3>' + J.road(q);
     });
   }
+  /* More, Stats and trophies under the trophy case (widget/trophies.css draws them): the scoreboard (your answers, with a
+     gauge for how many are right), the lectures (a two-tone bar each: tried, and right now; the strongest and the one that
+     needs work tagged, once each has 5 answers) and the hub's achievements as a wall of rosettes */
+  var BANDS = [90, 75, 60, 0];
+  function band(p){ for (var i = 0; i < BANDS.length; i++) if (p >= BANDS[i]) return i; return 3; }
+  function rosette(got){
+    var d = "", i, a, r;
+    for (i = 0; i < 32; i++) { a = i * Math.PI / 16; r = i % 2 ? 25 : 28.5; d += (i ? "L" : "M") + (32 + Math.cos(a) * r).toFixed(1) + " " + (30 + Math.sin(a) * r).toFixed(1); }
+    return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">' +
+      '<path d="M22 46 15 62l8-3.6 4.4 5L32 50z" fill="' + (got ? "#C2414B" : "#B9ADB6") + '" stroke="#3B2E3A" stroke-width="2.5" stroke-linejoin="round"/>' +
+      '<path d="M42 46l7 16-8-3.6-4.4 5L32 50z" fill="' + (got ? "#2F5FA8" : "#B9ADB6") + '" stroke="#3B2E3A" stroke-width="2.5" stroke-linejoin="round"/>' +
+      '<path d="' + d + 'Z" fill="' + (got ? "#F6CD55" : "#E3DCE2") + '" stroke="#3B2E3A" stroke-width="2.5" stroke-linejoin="round"/>' +
+      '<circle cx="32" cy="30" r="17" fill="' + (got ? "#FFE39A" : "#F4F0F3") + '" stroke="#3B2E3A" stroke-width="2.5"/>' +
+      (got ? '<path d="M24.5 30.5l5.2 5.2 10-11" fill="none" stroke="#3B2E3A" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="M21 22.5a13 13 0 0 1 8-6" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".8"/>'
+        : '<circle cx="32" cy="30" r="7" fill="none" stroke="#8E7F8B" stroke-width="2.6"/><circle cx="32" cy="30" r="2.2" fill="#8E7F8B"/>') + "</svg>";
+  }
+  function statsEpic(rows, answered, rightN, acc, days){
+    /* the scoreboard */
+    var tiles = [["questions", "Answered", fmt(answered)], ["check", ANSWERED ? "Right on the latest try" : "Right", fmt(rightN)],
+      ["flame", "Best run", fmt(STATE.bestStreak)], ["calendar", "Days goal met", fmt(days)]];
+    var gauge = acc === null ? "" : '<div class="stx-gauge" data-band="' + band(acc) + '"><svg viewBox="0 0 120 120" aria-hidden="true" focusable="false"><circle class="bg" cx="60" cy="60" r="50"/>' +
+      '<circle class="fg" cx="60" cy="60" r="50" pathLength="100" stroke-dasharray="' + acc + ' 100"/></svg><p><b class="num">' + acc + '%</b><span>right</span></p></div>';
+    var h = '<section class="stx-board" aria-labelledby="ssH"><h2 id="ssH" class="stx-plaque">Your answers</h2><div class="stx-board-in">' + gauge +
+      '<dl class="stx-tiles">' + tiles.map(function(t){ return '<div class="stx-tile">' + icon(t[0], 22) + "<dt>" + esc(t[1]) + '</dt><dd class="num">' + t[2] + "</dd></div>"; }).join("") + "</dl></div></section>";
+    /* the lectures: tagged once at least two of them have 5 answers, so a first look doesn't crown a lecture of one answer */
+    var ok = rows.filter(function(r){ return r.pct !== null && (r.a || r.tried) >= 5; }), best = null, worst = null;
+    if (ok.length >= 2) {
+      ok.forEach(function(r){ if (!best || r.pct > best.pct) best = r; if (!worst || r.pct < worst.pct) worst = r; });
+      if (best.pct === worst.pct) best = worst = null;
+    }
+    h += '<section class="stx-lecs" aria-labelledby="slH"><h2 id="slH" class="stx-plaque">By lecture</h2><ol class="stx-lec-list">' + rows.map(function(r){
+      var t = r.total ? r.tried / r.total * 100 : 0, g = r.total ? r.right / r.total * 100 : 0, tag = r === best ? ["best", "Strongest"] : r === worst ? ["work", "Needs work"] : null;
+      return '<li class="stx-lec' + lc(r.l.id) + '"><p class="stx-lec-h"><span class="stx-lec-n">' + esc(lecLabel(r.l)) + "</span><b>" + esc(shortTitle(r.l)) + "</b>" +
+        (tag ? '<span class="stx-flag is-' + tag[0] + '">' + tag[1] + "</span>" : "") + "</p>" +
+        '<span class="stx-lec-bar" aria-hidden="true"><i style="width:' + t.toFixed(1) + '%"></i><i class="r" style="width:' + g.toFixed(1) + '%"></i></span>' +
+        '<p class="stx-lec-nums"><span class="num">' + fmt(r.tried) + " of " + fmt(r.total) + " tried</span><span class=\"num\">" + fmt(r.right) + " right now</span>" +
+        (r.pct === null ? '<span class="stx-acc">No answers yet</span>' : '<span class="stx-acc num" data-band="' + band(r.pct) + '">' + r.pct + "%<span class=\"sr\"> accuracy</span></span>") + "</p></li>";
+    }).join("") + "</ol></section>";
+    /* the achievements */
+    var A2 = CORE.achievements || [], got = achMap() || {}, n = A2.filter(function(a){ return got[a.id]; }).length;
+    h += '<section class="stx-ach" aria-labelledby="saH"><h2 id="saH" class="stx-plaque">Achievements <span class="num">' + n + " of " + A2.length + "</span></h2>" +
+      '<ul class="stx-badges">' + A2.map(function(a){ var g2 = got[a.id];
+        return '<li class="stx-badge' + (g2 ? " is-got" : "") + '">' + rosette(!!g2) + "<span><b>" + esc(a.name) + "</b><small>" + esc(a.desc) + (typeof g2 === "string" ? " · " + esc(dateLabel(g2)) : "") +
+          '</small><span class="sr">' + (g2 ? "Earned" : "Not earned yet") + "</span></span></li>"; }).join("") + "</ul></section>";
+    return h;
+  }
   /* Settings: the cuts (font, background music, accent metal) are gone; text size and theme stay, plus the goal.
-     The extras use the same keys as widget/v3.js (EXTRAS) and the dashboard: keep the three in step. */
+     The extras use the same keys as widget/v3.js (EXTRAS) and the dashboard: keep the three in step, except Full Arch,
+     retired on the redesign (Sam, 2026-11-12; widget/eggs.js never draws it here), so its switch is in v3.js's list only. */
   var EXTRAS = [
     ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy, on the bar: tap him to ask about the notes. He hides during mock exams. Off, an Ask button takes his place.", [["on", "On"], ["dash", "Dashboard only"], ["off", "Off"]]],
     ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in the trophy case."],
     ["sh_pref_boss", "Plaque bosses", "A boss the whole class fights with right answers when 5+ people are online."],
     ["sh_pref_fairy", "Tooth Fairy", "Flies across the page now and then. Catch her for the fairy board."],
     ["sh_pref_probe", "Golden Probe", "One question a day is golden. First to get it right wins."],
-    ["sh_pref_arch", "Full Arch chart", "A 32-tooth chart in the corner that fills as you answer right."],
     ["sh_pref_nuke", "Tactical nukes", "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes.", [["on", "On"], ["mine", "Mine only"], ["off", "Off"]]],
     ["sh_pref_celebrate", "Rank-up and trophy cards", "The rank-up cutscene, level-up, trophy and medal cards."],
     ["sh_pref_cheers", "Streak cheers", "Confetti and a toast every 5 right in a row."],

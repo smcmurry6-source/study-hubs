@@ -521,6 +521,26 @@
    "focus": null,
    "motion": 0
   },
+  "occlusion/next · bowling clip": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "occlusion/next · trophy case": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "occlusion/next · trophy card": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
   "dashboard/next · boards": {
    "axe": {},
    "focus": null,
