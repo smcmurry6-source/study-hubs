@@ -128,6 +128,20 @@ const HAS_NEXT_DASH = fs.existsSync(path.join(L.ROOT, 'next', 'index.html'));
           await page.keyboard.press('Escape').catch(() => {});
         } else problems.push(`${hub}/next · place: the full view didn't open`);
       } else problems.push(`${hub}/next · place: Timmy's place didn't draw for the returning test account`);
+      /* Timmy's shop (widget/shop.js; loaded on first use): the page under More, then an item's sheet with Buy */
+      await page.evaluate(() => { location.hash = 'more/shop'; });
+      if (await page.waitForSelector('.shop-host .tsh-store', { timeout: 20000 }).catch(() => null)) {
+        await page.waitForTimeout(600);
+        await check(`${hub}/next · shop`, null);
+        results[`${hub}/next · shop`].focus = await keyboard(page); results[`${hub}/next · shop`].motion = await motion(page);
+        await page.click('.tsh-store .tsh-card.s-buy').catch(() => {});
+        if (await page.waitForSelector('dialog.tsh-sheet[open]', { timeout: 8000 }).catch(() => null)) {
+          await page.waitForTimeout(500);
+          await check(`${hub}/next · shop, an item's sheet`, null);
+          results[`${hub}/next · shop, an item's sheet`].motion = await motion(page);
+          await page.keyboard.press('Escape').catch(() => {});
+        } else problems.push(`${hub}/next · shop: an item's sheet didn't open`);
+      } else problems.push(`${hub}/next · shop: the shop didn't draw for the returning test account`);
     }
   }
   await ctx.close();
@@ -143,6 +157,17 @@ const HAS_NEXT_DASH = fs.existsSync(path.join(L.ROOT, 'next', 'index.html'));
     const v = await dp.evaluate(async ([tags, exclude]) => (await window.axe.run({ exclude: exclude.map(s => [s]) }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })).violations
       .map(x => ({ id: x.id, impact: x.impact, n: x.nodes.length, help: x.help, sample: x.nodes[0] && x.nodes[0].target.join(' ') })), [TAGS, PREVIEW_UI]);
     results[key] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: 0 };
+  }
+  /* the shop in dark mode (its own wood and paper colors) */
+  if (next.length) {
+    await dp.goto(srv.url + `hubs/${next[0]}/next/#more/shop`); await L.settle(dp);
+    await dp.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+    if (await dp.waitForSelector('.shop-host .tsh-store', { timeout: 20000 }).catch(() => null)) {
+      await dp.waitForTimeout(600); await dp.addScriptTag({ content: AXE });
+      const v = await dp.evaluate(async ([tags, exclude]) => (await window.axe.run({ exclude: exclude.map(s => [s]) }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })).violations
+        .map(x => ({ id: x.id, impact: x.impact, n: x.nodes.length, help: x.help, sample: x.nodes[0] && x.nodes[0].target.join(' ') })), [TAGS, PREVIEW_UI]);
+      results[`${next[0]}/next · shop (dark)`] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: 0 };
+    } else problems.push(`${next[0]}/next · shop (dark): the shop didn't draw`);
   }
   await dark.close(); await browser.close(); srv.server.close();
 

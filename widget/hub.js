@@ -832,6 +832,7 @@
     ["side", "sidebyside", "Side by side", "The charts that compare across lectures"],
     ["arcade", "arcade", "Arcade", "Games built on the material, with class high scores"],
     ["place", "home", "Timmy’s place", "His home and yard, the medals you’ve earned, and what he wears"],
+    ["shop", "xp", "Timmy’s shop", "Spend your Shiny Gold Crowns: outfits, things for his place, snacks and boosts"],
     ["stats", "stats", "Stats and trophies", "Your answers, your rank, the trophy case and the leaderboards"],
     ["settings", "settings", "Settings", "Theme, text size, your daily goal, Timmy and the extras"]
   ];
@@ -843,11 +844,11 @@
     var back = '<a class="btn btn-text back" href="#more">' + icon("chevron", 18, "flip") + "More</a>";
     el.innerHTML = '<div class="hx-page more-page">' + back + "<h1>" + esc(page[2]) + '</h1><div class="more-body"><p class="note loading">Loading…</p></div></div>';
     var body = $(".more-body", el);
-    ({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body);
+    ({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, shop: HX.moreShop, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body);
   }
   /* More (Sam, 2026-11-06: "can use a spice up"): one tile per part, each on its own field of color with its drawing and
      a line of what's in it; Timmy Time is the big one, its host in headphones. Talk to us stays a list. */
-  var MORE_FIELD = { timmy: "hub", hints: "sun", cram: "mint", side: "lilac", arcade: "peach", place: "mint", stats: "sun", settings: "plain" };
+  var MORE_FIELD = { timmy: "hub", hints: "sun", cram: "mint", side: "lilac", arcade: "peach", place: "mint", shop: "sun", stats: "sun", settings: "plain" };
   function moreMeta(k){
     var pod = CORE.podcast, X = C.arcade || {}, x = HX.rankXp();
     return ({
@@ -857,6 +858,7 @@
       side: "Across every lecture",
       arcade: pl((X.games || []).length, "game"),
       place: HX.petHp() === null ? "" : HX.petHp() + " HP",
+      shop: HX.shopMeta(),
       stats: HX.rankName() + (x === null ? "" : " · " + fmt(x) + " XP"),
       settings: focusOn() ? "Focus mode is on" : "Daily goal: " + pl(HX.goal(), "question")
     })[k] || "";
@@ -865,12 +867,12 @@
     var pod = CORE.podcast;
     var tile = function(m){
       var f = MORE_FIELD[m[0]] || "plain", big = m[0] === "timmy";
-      var art = big ? spot("notes", POD_COL, "mt-notes") + spot("timmyTime", POD_COL, "mt-timmy") : icon(m[1], 40);
+      var art = big ? spot("notes", POD_COL, "mt-notes") + spot("timmyTime", POD_COL, "mt-timmy") : m[0] === "shop" ? HX.shopCoin(40) : icon(m[1], 40);
       return '<li class="mt f-' + f + (big ? " is-big" : "") + '"><a href="#more/' + m[0] + '"><span class="mt-art" aria-hidden="true">' + art + '</span><span class="mt-text"><b>' + esc(m[2]) + "</b><small>" + esc(m[3]) + "</small>" +
         '<span class="mt-meta num">' + esc(moreMeta(m[0])) + "</span></span>" + icon("chevron", 20) + "</a></li>";
     };
     el.innerHTML = '<div class="hx-page more"><h1>More</h1><p class="more-lede">Everything past the notes and the questions: the review, the games, your stats and your settings.</p>' +
-      '<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "place" || HX.hasTimmy()); }).map(tile).join("") + "</ul></nav>" +
+      '<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "place" || HX.hasTimmy()) && (m[0] !== "shop" || HX.hasShop()); }).map(tile).join("") + "</ul></nav>" +
       '<section class="panel menu talk" aria-labelledby="mwH"><h2 id="mwH">Talk to us</h2><ul class="rows">' +
         MORE_ROWS.map(function(m){ return '<li><a href="#more/' + m[0] + '">' + icon(m[1], 22) + "<span><b>" + esc(m[2]) + "</b><small>" + esc(m[3]) + "</small></span>" + icon("chevron", 18) + "</a></li>"; }).join("") +
         '<li><button type="button" data-sh-inbox>' + icon("inbox", 22) + "<span><b>Inbox</b><small>Replies to what you report or suggest, and notices to the class</small></span>" + icon("chevron", 18) + "</button></li>" +
@@ -1274,8 +1276,9 @@
       /* the game layer: v3.js asks the database for it and works as on the live hubs until it is there */
       s.setAttribute("data-game", "v2");
       s.onload = function(){
-        /* Ask Timmy's chat (widget/ask.js, hub-timmy.js mounts it) comes with the shared widget */
-        HX.askStart();
+        /* Ask Timmy's chat (widget/ask.js, hub-timmy.js mounts it) comes with the shared widget; so does the shop's
+           balance and the rare costume of the day (hub-timmy.js) */
+        HX.askStart(); HX.shopStart();
         /* Report and Pin on every card, as on the live hubs (the class picks are the engine's own: classPicks) */
         if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]");
         var boot = window.shBootstrap && window.shBootstrap.ready;

@@ -252,6 +252,7 @@
           '<div id="petHome" hidden></div>' +
           '<div class="dx-ask" id="askSpot" hidden></div>' +
           '<div class="dx-rankcard" id="meRank"></div>' +
+          '<div class="dx-wallet" id="youShop" hidden></div>' +
           '<ul class="dx-stats" id="youStats"></ul>' +
         "</section>" +
         '<section class="panel dx-class" id="class" aria-labelledby="classH">' +
@@ -1194,6 +1195,69 @@
     ["scroll", "pointerdown", "keydown", "touchstart"].forEach(function(n){ window.addEventListener(n, woke, { capture: true, passive: true }); });
   }
 
+  /* ------------------------------------------------------------
+     TIMMY'S SHOP on the "you" card (widget/shop.js, phase 4 part B): your Shiny Gold Crowns and a Shop button, once the
+     page's bootstrap carries a shop (the game layer, migration_v54). The balance is the server's (the bootstrap, then
+     every read and purchase the shop makes: "sh:shop"); no counter ticks here. The coin is one small drawing copied
+     from widget/hub-art/shop.js (coinBody(true)), and the shop itself is fetched on the button's first tap, so the
+     page's requests don't change. Also here: the rare costume of the day (the same function as widget/hub-timmy.js).
+  ------------------------------------------------------------ */
+  var SHOP = { sb: null, shop: null };
+  var SHOP_COIN = '<path d="M6.2 17.4 C4.5 14.3 3.5 10.9 4.3 8.1 C4.9 5.9 6.5 4.4 8.4 4.5 C10 4.6 10.8 6.1 12 6.1 C13.2 6.1 14 4.6 15.6 4.5 C17.5 4.4 19.1 5.9 19.7 8.1 C20.5 10.9 19.5 14.3 17.8 17.4 Z" fill="#F2C94C" stroke="#3B2E3A" stroke-width="2.1"/><path d="M15.9 5.6 C17.4 5.9 18.4 6.9 18.8 8.4 C19.4 10.9 18.6 13.9 17.3 16.4 L15.2 16.2 C16.8 12.6 17.2 9 15.9 5.6 Z" fill="#C9971C"/><path d="M12 6.6 V10" fill="none" stroke="#8A6410" stroke-width="1.5"/><ellipse cx="12" cy="17.6" rx="5.6" ry="2.5" fill="#8A6410" stroke="#3B2E3A" stroke-width="2.1"/><path d="M6.6 10.6 C6.6 8.6 7.3 7.3 8.4 6.7" stroke="#fff" stroke-width="1.9" fill="none" opacity=".85"/>';
+  function ctDay(){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()); } catch (e) { return ""; } }
+  function drawWallet(){
+    var el = $("youShop"); if (!el) return;
+    var sh = SHOP.shop, bal = sh && sh.wallet ? sh.wallet.balance : null;
+    if (bal == null) { el.hidden = true; return; }
+    var dot = ls("sh_shop_dot") === ctDay(), had = el.contains(document.activeElement);
+    el.innerHTML = '<p class="dx-coinnum"><svg viewBox="0 0 24 24" width="22" height="22" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + SHOP_COIN + '</svg><b class="num">' + num(bal) + "</b><span>Shiny Gold Crowns</span></p>" +
+      '<button type="button" class="btn dx-shopbtn" data-dash="shop">Timmy’s shop' + (dot ? '<i class="dx-dot dx-shopdot" aria-hidden="true"></i><span class="sr"> (a rare costume came in)</span>' : "") + "</button>";
+    el.hidden = false;
+    var btn = q(".dx-shopbtn", el); btn.addEventListener("click", openShop);
+    /* a purchase redraws the row while the shop is open: the shop hands focus back to this button when it closes */
+    if (had || SHOP.open) btn.focus({ preventScroll: true });
+  }
+  function openShop(){
+    loadScriptOnce(WIDGET + "shop.js").then(function(){
+      if (!window.shShop) throw new Error("no shop");
+      window.shShop.setup({ sb: SHOP.sb, visitor: VISITOR || null, shop: SHOP.shop, profile: myRank });
+      SHOP.open = true;
+      window.shShop.open({ onClose: function(){ SHOP.open = false; var b = q(".dx-shopbtn"); if (b) b.focus({ preventScroll: true }); } });
+    }).then(null, function(){ toast("The shop didn't open. Try again in a moment."); });
+  }
+  document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); } });
+  /* the rare costume of the day: from the visitor id and the Central day, on about one day in twelve with no holiday
+     (widget/pet.js's holidayId()) outside the fall weeks (September 22 to November 30). The same as hub-timmy.js's. */
+  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+  function costumeOfDay(visitor, day, holiday){
+    if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
+    var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";
+    var s = visitor + "|costume|" + day, h = 2166136261;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+    h = h >>> 0;
+    return h % 12 === 0 ? COSTUMES[Math.floor(h / 12) % COSTUMES.length] : "";
+  }
+  function shopStart(sb, boot){
+    SHOP.sb = sb;
+    if (!sb || !VISITOR || !boot || !boot.then) return;
+    boot.then(function(d){
+      if (!d || !d.shop || !d.shop.wallet) return;
+      SHOP.shop = d.shop; drawWallet();
+      var P = window.shPet, day = ctDay(), hol = "";
+      if (!P || !day) return;
+      try { hol = P.holidayId ? P.holidayId() : ""; } catch (e) { return; }
+      var c = costumeOfDay(VISITOR, day, hol);
+      if (!c || (d.shop.costumes || []).some(function(x){ return x && x.id === c; }) || ls("sh_costume_asked") === day) return;
+      lsSet("sh_costume_asked", day);
+      sb.rpc("record_costume_sighting", { p_visitor: VISITOR, p_costume: c }).then(function(r){
+        var a = r && !r.error && r.data;
+        if (!a || !a.ok || !a.first) return;
+        lsSet("sh_shop_dot", day); track("shop:spotted"); drawWallet();
+        setTimeout(function(){ try { if (P.say) P.say("Something rare came in at the shop today: the " + (c === "captain-enamel" ? "Captain Enamel" : c) + " costume. It’s on the Spotted shelf.", "do-hop", 6000); } catch (e) {} }, 2500);
+      }, function(){});
+    }, function(){});
+  }
+
   /* your own rank: the card, Timmy's flair and the rank-up celebration. It rides in the page bootstrap. */
   function applyMyRank(p){
     myRank = p; renderMyRank(p);
@@ -1654,6 +1718,7 @@
       }
     }
     placeStart(sb, bootstrap.ready);
+    shopStart(sb, bootstrap.ready);
     if (!sb){ renderMyRank(null); whenPanelOpens($("class"), function(){ boardOpen = true; drawBoard(); }); return; }
     nameSb = sb; luckSb = sb; debriefSb = sb; boardSb = sb;
     /* the idea board (widget/ideas.js): its section stays hidden until its first load says the board is up (its

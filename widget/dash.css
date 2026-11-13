@@ -259,6 +259,14 @@ body:has(> .shpet-perch) .dx-porch { display: block; }
 .dx-rankname span { font-size: var(--fs-meta); color: var(--muted); }
 .dx-rankbar i { background: var(--gold); }
 .dx-medals { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; padding-top: 8px; }
+/* Timmy's shop on the "you" card (widget/shop.js): the balance, a gold coin and its number, and the Shop button */
+.dx-wallet { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 10px 14px; border-radius: var(--r-row); background: var(--row); }
+.dx-wallet[hidden] { display: none; }
+.dx-coinnum { display: flex; align-items: center; gap: 8px; margin: 0; min-width: 0; color: var(--sun-ink); font-size: var(--fs-meta); }
+.dx-coinnum svg { flex: none; }
+.dx-coinnum b { font-size: 20px; font-weight: var(--w-head); color: var(--ink); }
+.dx .dx-shopbtn { gap: 8px; }
+.dx-shopdot { background: var(--gold); box-shadow: 0 0 0 2px var(--row); }
 .dx-stats { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
 .dx-stats:empty { display: none; }
 .dx-stat { display: flex; align-items: center; align-content: center; gap: 10px; padding: 12px 14px; border-radius: var(--r-row); background: var(--row); }

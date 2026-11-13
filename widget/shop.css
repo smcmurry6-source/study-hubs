@@ -1,0 +1,279 @@
+/* Timmy's shop (widget/shop.js): the storefront, the showcase, the shelves and an item's sheet. Loaded by shop.js on
+   first use, on the redesign's pages only, and drawn on the design system's tokens (widget/hub.css: html.shx). Built to
+   the design page's shop (tools/preview/design: Sam, 2026-11-12, "more epic"): a wooden shop with plank walls inside a
+   timber frame under a striped awning, Timmy at the counter, each shelf a cabinet. The wood is the shop's own surface in
+   both themes, deeper at night; the cards are paper in both, so one drawing serves both. */
+
+.tsh-store, .tsh-sheet, .tsh-dlg { --tsh-ink: #3B2E3A; }
+.tsh-store *, .tsh-store *::before, .tsh-store *::after, .tsh-sheet *, .tsh-sheet *::before, .tsh-sheet *::after, .tsh-dlg *, .tsh-dlg *::before, .tsh-dlg *::after { box-sizing: border-box; }
+:where(.tsh-store, .tsh-sheet, .tsh-dlg) button { font: inherit; }
+.tsh-store .sr, .tsh-sheet .sr, .tsh-dlg .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tsh-store .num, .tsh-sheet .num { font-variant-numeric: tabular-nums; }
+.tsh-store p, .tsh-store h2, .tsh-store h3, .tsh-store h4, .tsh-store ul, .tsh-sheet p, .tsh-sheet h2 { margin: 0; }
+
+/* ---------- the shop: plank walls inside a timber frame ---------- */
+.tsh-store { --w-wall: #EBCB9C; --w-wall2: #E3BE8B; --w-cab: #D2A56B; --w-cab2: #C99A5F; --w-trim: #C4864A; --w-trim2: #A66C36; --w-board: #B9773F; --w-board2: #96592B; --w-seam: rgba(59, 46, 58, .2);
+  --w-text: #3B2E3A; --w-note: #5A4130; --w-plaque: #F6DFB4;
+  position: relative; display: grid; gap: 18px; padding: 0 24px 24px; border-radius: 22px; border: 3px solid #3B2E3A; overflow: hidden; isolation: isolate; color: var(--w-text);
+  font-size: var(--fs-body, 16px); line-height: 1.45;
+  background: repeating-linear-gradient(180deg, transparent 0 46px, var(--w-seam) 46px 48px), repeating-linear-gradient(180deg, var(--w-wall) 0 48px, var(--w-wall2) 48px 96px);
+  box-shadow: inset 0 0 0 7px var(--w-trim), inset 0 0 0 9px #3B2E3A, inset 0 -14px 0 0 var(--w-trim2); }
+html.shx[data-theme="dark"] .tsh-store { --w-wall: #7A5538; --w-wall2: #704C31; --w-cab: #5C3E29; --w-cab2: #543824; --w-trim: #A66C36; --w-trim2: #86552A; --w-board: #B9773F; --w-board2: #8A5226; --w-seam: rgba(20, 12, 10, .34);
+  --w-text: #FFF1D8; --w-note: #EBD3B0; --w-plaque: #F0D5A4; }
+@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .tsh-store { --w-wall: #7A5538; --w-wall2: #704C31; --w-cab: #5C3E29; --w-cab2: #543824; --w-trim: #A66C36; --w-trim2: #86552A; --w-board: #B9773F; --w-board2: #8A5226; --w-seam: rgba(20, 12, 10, .34);
+  --w-text: #FFF1D8; --w-note: #EBD3B0; --w-plaque: #F0D5A4; } }
+/* the board ends, staggered row by row, and a nail by each */
+.tsh-store::before, .tsh-store::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(90deg, var(--w-seam) 0 2px, transparent 2px) 0 0 / 236px 100%, radial-gradient(circle at 9px 24px, var(--w-seam) 0 1.7px, transparent 2.2px) 0 0 / 236px 48px, radial-gradient(circle at 227px 24px, var(--w-seam) 0 1.7px, transparent 2.2px) 0 0 / 236px 48px;
+  -webkit-mask-image: repeating-linear-gradient(180deg, #000 0 48px, transparent 48px 96px); mask-image: repeating-linear-gradient(180deg, #000 0 48px, transparent 48px 96px); }
+.tsh-store::after { background-position: 118px 0, 118px 0, 118px 0; -webkit-mask-image: repeating-linear-gradient(180deg, transparent 0 48px, #000 48px 96px); mask-image: repeating-linear-gradient(180deg, transparent 0 48px, #000 48px 96px); }
+.tsh-awning { display: flex; justify-content: center; margin: 0 -24px; height: 50px; overflow: hidden; background: var(--w-trim2); border-bottom: 3px solid #3B2E3A; }
+.tsh-awning i { flex: none; width: 46px; height: 44px; margin-left: -2px; border: 2px solid #3B2E3A; border-top: 0; border-radius: 0 0 23px 23px; background: #FF8B7B; box-shadow: inset 0 -7px 0 rgba(59, 46, 58, .14); }
+.tsh-awning i:nth-child(even) { background: #FFF6E5; }
+
+/* ---------- the storefront: the art in two layers with Timmy between them, the sign over the arch, the till's plaque ---------- */
+.tsh-front { position: relative; margin: -24px -14px 0; aspect-ratio: 600 / 200; max-height: 360px; }
+.tsh-frontlayer, .tsh-frontlayer img { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.tsh-frontlayer img { object-fit: cover; }
+.tsh-keeper { position: absolute; left: 50%; top: 9%; height: 80%; transform: translateX(-50%); animation: tsh-keeper 3.6s ease-in-out infinite; }
+.tsh-keeper img { display: block; height: 100%; width: auto; }
+@keyframes tsh-keeper { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-1.6%); } }
+.tsh-sign { position: absolute; z-index: 2; left: 50%; top: 8px; display: grid; justify-items: center; padding: 7px 26px 8px; border-radius: 10px; border: 2px solid #3B2E3A; color: #3B2E3A; text-align: center;
+  box-shadow: 0 4px 0 #3B2E3A; transform: translateX(-50%) rotate(-1.2deg);
+  background: repeating-linear-gradient(180deg, transparent 0 13px, rgba(59, 46, 58, .13) 13px 14px), linear-gradient(180deg, #F2CC92, #DDA667); }
+.tsh-sign::before, .tsh-sign::after { content: ""; position: absolute; bottom: 100%; width: 3px; height: 20px; background: repeating-linear-gradient(180deg, #3B2E3A 0 5px, #8E7B6A 5px 8px); border-radius: 2px; }
+.tsh-sign::before { left: 22px; } .tsh-sign::after { right: 22px; }
+.tsh-nail { position: absolute; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: #6E4A2C; box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .35), 0 1px 0 rgba(255, 255, 255, .35); }
+.tsh-nail.a { left: 7px; } .tsh-nail.b { right: 7px; }
+.tsh-sign b, .tsh-sign .tsh-signh { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-size: 28px; font-weight: var(--w-head, 800); line-height: 1.15; letter-spacing: -.01em; white-space: nowrap; text-shadow: 0 1px 0 rgba(255, 255, 255, .45); }
+.tsh-sign .tsh-coin { width: 28px; height: 28px; }
+.tsh-sign > span { font-size: var(--fs-meta, 13px); font-weight: 600; color: #5A4130; }
+/* the till: your balance on a gold plaque on the counter's front */
+.tsh-wallet { position: absolute; z-index: 2; right: 9.5%; bottom: 3.5%; display: inline-flex; align-items: center; gap: 9px; padding: 4px 18px 5px 9px; border-radius: 12px; border: 2px solid #3B2E3A; color: #3B2E3A;
+  box-shadow: 0 3px 0 #3B2E3A, inset 0 0 0 3px rgba(255, 255, 255, .28); background: repeating-linear-gradient(180deg, transparent 0 10px, rgba(59, 46, 58, .1) 10px 11px), linear-gradient(180deg, #FFE39A, #F1C567); }
+.tsh-wallet .tsh-coin { width: 38px; height: 38px; }
+.tsh-wallet > span:last-child { display: grid; line-height: 1.08; text-align: left; } .tsh-wallet b { font-size: 25px; font-weight: var(--w-head, 800); } .tsh-wallet small { font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.tsh-coin { display: block; flex: none; width: 16px; height: 16px; }
+/* how you earn gold crowns: a line under the counter that opens */
+.tsh-earnrow { display: grid; justify-items: center; gap: 10px; margin-top: -6px; }
+.tsh-earnbtn { min-height: 36px; padding: 4px 14px; border-radius: 999px; border: 2px solid #3B2E3A; background: var(--w-plaque); color: #3B2E3A; box-shadow: 0 3px 0 #3B2E3A; font-size: var(--fs-meta, 13px); font-weight: 800; cursor: pointer; }
+.tsh-earnbtn[aria-expanded="true"] { background: #3B2E3A; color: #FFE9A3; }
+/* a hub's engine sets every button's color to the page's ink (".hx button"), which is light in dark mode; the shop's
+   paper and wood stay the same in both, so its buttons keep their own ink */
+.tsh-store .tsh-card, .tsh-store .tsh-earnbtn { color: #3B2E3A; }
+.tsh-store .tsh-buy { font-size: 17px; font-weight: 800; } .tsh-store .tsh-earnbtn { font-size: var(--fs-meta, 13px); font-weight: 800; }
+.tsh-store .tsh-earnbtn[aria-expanded="true"] { color: #FFE9A3; }
+.tsh-earn { display: grid; gap: 8px; max-width: 520px; padding: 12px 16px; border-radius: 12px; border: 2px solid #3B2E3A; background: #FFF9EE; color: #3B2E3A; box-shadow: 0 3px 0 #3B2E3A; }
+.tsh-earn[hidden] { display: none; }
+.tsh-earn ul { display: grid; gap: 4px; padding-left: 20px; font-size: var(--fs-label, 15px); }
+.tsh-earn b { font-weight: 900; }
+.tsh-earn .tsh-note { color: #5A4130; }
+
+/* ---------- the showcase: the day's rarest piece on its stand, rays turning behind it ---------- */
+.tsh-show { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); margin: 7px; border-radius: 16px; border: 2px solid #3B2E3A; overflow: hidden; color: #3B2E3A; background: #FFFDF6;
+  box-shadow: 0 0 0 5px var(--sr-edge), 0 0 0 7px #3B2E3A; }
+.tsh-showcase { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-height: 340px; padding: 14px 18px; background: var(--sr-fill); border-right: 2px solid #3B2E3A; overflow: hidden; isolation: isolate; }
+.tsh-showcase .tsh-irays { top: 52%; width: 190%; margin: -95% 0 0 -95%; opacity: .34; } .tsh-showcase .tsh-irays g { fill: var(--sr-edge); }
+.tsh-showpiece { position: relative; z-index: 1; width: min(80%, 330px); aspect-ratio: 1; margin-bottom: -24%; animation: tsh-float 4.4s ease-in-out infinite; }
+.tsh-showpiece img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.tsh-showpiece.k-outfit, .tsh-showpiece.k-costume { width: min(46%, 190px); aspect-ratio: 200 / 262; margin-bottom: -5%; }
+.tsh-showpiece.k-scene img { border-radius: 14px; border: 3px solid #3B2E3A; height: auto; }
+.tsh-showstand { width: min(88%, 380px); } .tsh-showstand img { display: block; width: 100%; height: auto; }
+@keyframes tsh-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+.tsh-showtw { position: absolute; z-index: 1; width: 22px; height: 22px; background: #fff; clip-path: polygon(50% 0, 59% 41%, 100% 50%, 59% 59%, 50% 100%, 41% 59%, 0 50%, 41% 41%); animation: tsh-tw 2.4s ease-in-out infinite; }
+.tsh-showtw.a { left: 14%; top: 18%; } .tsh-showtw.b { right: 13%; top: 30%; width: 16px; height: 16px; animation-delay: .8s; } .tsh-showtw.c { right: 24%; top: 10%; width: 13px; height: 13px; animation-delay: 1.5s; }
+@keyframes tsh-tw { 0%, 100% { opacity: .25; transform: scale(.6); } 50% { opacity: 1; transform: scale(1); } }
+.tsh-showinfo { display: grid; align-content: center; justify-items: start; gap: 10px; padding: 24px 28px; }
+.tsh-showkick { padding: 4px 14px 5px; border-radius: 8px; border: 2px solid #3B2E3A; background: var(--sr-edge); color: #3B2E3A; font-size: var(--fs-card, 17px); font-weight: var(--w-head, 800); box-shadow: 0 3px 0 #3B2E3A; transform: rotate(-1deg); }
+.tsh-showname { font-size: clamp(30px, 4.4vw, 46px); font-weight: var(--w-head, 800); line-height: 1.02; letter-spacing: -.02em; overflow-wrap: anywhere; }
+.tsh-itags { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; } .tsh-itags .tsh-rar { font-size: 12.5px; padding: 2px 10px; }
+.tsh-show .tsh-itags span { font-size: 13.5px; font-weight: 700; color: #5A4130; }
+.tsh-showdesc { max-width: 44ch; font-size: 16px; line-height: 1.45; }
+.tsh-showbuy { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 4px; }
+.tsh-showbuy .tsh-big .tsh-coin { width: 40px; height: 40px; } .tsh-showbuy .tsh-big b { font-size: 40px; }
+.tsh-showwhen { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-meta, 13px); font-weight: 700; color: #5A4130; }
+
+/* ---------- the shelves: each a cabinet let into the wall, its name on a plaque, the cards on a board ---------- */
+.tsh-aisle { display: grid; }
+.tsh-seasonbody { display: grid; gap: 16px; }
+.tsh-poster { align-self: start; border: 2px solid #3B2E3A; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 4px 0 #3B2E3A; transform: rotate(-1.2deg); line-height: 0; }
+.tsh-poster img { display: block; width: 100%; height: auto; }
+.tsh-shelf { position: relative; display: grid; gap: 12px; padding: 16px 18px 20px; border-radius: 14px; border: 2px solid #3B2E3A; margin: 7px; min-width: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 58px, var(--w-seam) 58px 60px), linear-gradient(180deg, var(--w-cab), var(--w-cab2));
+  box-shadow: inset 0 6px 0 rgba(59, 46, 58, .2), 0 0 0 5px var(--w-trim), 0 0 0 7px #3B2E3A; }
+.tsh-shelf header { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 6px 12px; }
+.tsh-tagsign { position: relative; justify-self: start; margin: -4px 0 0; padding: 5px 16px 6px 20px; border-radius: 8px; border: 2px solid #3B2E3A; color: #3B2E3A; font-size: var(--fs-card, 17px); font-weight: var(--w-head, 800); line-height: 1.25;
+  background: repeating-linear-gradient(180deg, transparent 0 9px, rgba(59, 46, 58, .09) 9px 10px), var(--w-plaque); box-shadow: 0 3px 0 #3B2E3A, inset 8px 0 0 #8FD0A8; }
+.tsh-shelf-season .tsh-tagsign { box-shadow: 0 3px 0 #3B2E3A, inset 8px 0 0 #FFB648; } .tsh-shelf-back .tsh-tagsign { box-shadow: 0 3px 0 #3B2E3A, inset 8px 0 0 #A98BEA; } .tsh-shelf-week .tsh-tagsign { box-shadow: 0 3px 0 #3B2E3A, inset 8px 0 0 #6FBDEB; }
+.tsh-shelf-spotted .tsh-tagsign { box-shadow: 0 3px 0 #3B2E3A, inset 8px 0 0 #F28BA8; } .tsh-shelf-always .tsh-tagsign { box-shadow: 0 3px 0 #3B2E3A, inset 8px 0 0 #FFD86B; }
+.tsh-note { font-size: var(--fs-meta, 13px); color: var(--muted); }
+.tsh-store .tsh-note { color: var(--w-note); }
+.tsh-shelf .tsh-note { grid-column: 1 / -1; font-weight: 600; }
+.tsh-when { justify-self: end; display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px 2px 8px; border-radius: 999px; border: 2px solid #3B2E3A; background: var(--w-plaque); color: #3B2E3A; font-size: var(--fs-meta, 13px); font-weight: var(--w-strong, 700); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tsh-shelf-back .tsh-when { background: #3B2E3A; color: #FFE9A3; }
+.tsh-storefoot { justify-self: start; margin: 2px 7px 8px; padding: 8px 14px; border-radius: 10px; border: 2px solid #3B2E3A; background: var(--w-plaque); color: #5A4130 !important; }
+
+/* a card: the rarity's frame (the shop's art), the thing on it, its name, rarity and price, and its one state */
+.tsh-rcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 148px)); gap: 30px 12px; padding-bottom: 16px; }
+.tsh-card { position: relative; display: block; aspect-ratio: 4 / 5; margin: 0; padding: 0; container-type: inline-size; border: 0; background: none; color: #3B2E3A; text-align: center; cursor: pointer; isolation: isolate;
+  transition: transform var(--t-press, 120ms) var(--ease-out, ease-out); }
+.tsh-card:active { transform: scale(.97); }
+.tsh-card:focus-visible { outline: 3px solid var(--text, #3B2E3A); outline-offset: 3px; border-radius: 14px; }
+.tsh-rframe { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+.tsh-rthumb { position: absolute; left: 11%; right: 11%; top: 7%; height: 52%; }
+.tsh-rthumb img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.tsh-rthumb.k-scene img { object-fit: cover; border-radius: 10px; border: 2px solid #3B2E3A; }
+.tsh-rtext { position: absolute; left: 9%; right: 9%; top: 63%; bottom: 7.5%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.tsh-rname { font-size: clamp(11px, 10cqw, 13.5px); font-weight: 800; line-height: 1.12; }
+.tsh-rmeta { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px 5px; }
+.tsh-rmeta .tsh-rar { font-size: clamp(11px, 8.6cqw, 12px); padding: 1px 7px; }
+.tsh-rprice { position: absolute; left: 5%; top: 4.5%; z-index: 1; display: inline-flex; align-items: center; padding: 2px 7px 2px 4px; border-radius: 999px; background: #fff; border: 1.5px solid #3B2E3A; color: #3B2E3A; }
+.tsh-price { display: inline-flex; align-items: center; gap: 3px; font-size: clamp(11px, 9cqw, 12.5px); font-weight: var(--w-strong, 700); white-space: nowrap; }
+.tsh-rprice .tsh-coin { width: 1.15em; height: 1.15em; }
+.tsh-rar { font-style: normal; font-size: 11px; font-weight: 800; letter-spacing: .02em; color: #fff; background: var(--rar, #5F5A55); border-radius: 999px; padding: 1px 7px; white-space: nowrap; }
+.tsh-rar.r-Common { --rar: #5F5A55; } .tsh-rar.r-Uncommon { --rar: #1C6E52; } .tsh-rar.r-Rare { --rar: #1C5C88; } .tsh-rar.r-Epic { --rar: #4E3492; } .tsh-rar.r-Legendary { --rar: #7A5600; }
+/* what a snack or a boost does, and the card's state, on its edges */
+.tsh-does { position: absolute; left: 50%; top: 45%; transform: translateX(-50%); z-index: 1; padding: 2px 7px; border-radius: 999px; border: 1.5px solid #3B2E3A; background: #BFEBCF; color: #3B2E3A; font-size: clamp(10.5px, 8cqw, 12.5px); font-weight: 800; white-space: nowrap; }
+.tsh-card.r-Rare .tsh-does, .tsh-card.r-Epic .tsh-does { background: #FFE27A; }
+.tsh-state { position: absolute; left: 50%; bottom: -4px; transform: translateX(-50%); z-index: 2; display: inline-flex; align-items: center; gap: 3px; max-width: 104%; padding: 1px 9px 1px 7px; border-radius: 999px; border: 2px solid #3B2E3A;
+  background: #FFF6E5; color: #3B2E3A; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.tsh-state.s-owned { background: #BFEBCF; } .tsh-state.s-short { background: #FFE0D6; } .tsh-state.s-today, .tsh-state.s-full { background: #E6DAF7; }
+.tsh-card.s-today .tsh-rthumb, .tsh-card.s-full .tsh-rthumb { opacity: .55; }
+.tsh-stamp { position: absolute; right: -5px; top: -7px; z-index: 2; display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px 2px 5px; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFE27A; color: #3B2E3A; font-size: 11px; font-weight: 800; white-space: nowrap; transform: rotate(7deg); box-shadow: 0 2px 0 #3B2E3A; }
+.tsh-stamp svg { width: 12px; height: 12px; }
+/* a rare costume nobody has spotted yet: its shape only */
+.tsh-static { cursor: default; }
+.tsh-unseen .tsh-rthumb img { filter: brightness(0); opacity: .42; } .tsh-unseen .tsh-rframe { filter: grayscale(1); opacity: .75; }
+.tsh-unseen .tsh-rname { color: #6B5A68; }
+/* the shelf board: each card carries its own length of board, and the lengths join across the gap */
+.tsh-plank .tsh-card::before { content: ""; position: absolute; left: -7px; right: -7px; top: calc(100% + 1px); height: 13px; z-index: -2;
+  background: linear-gradient(180deg, #E0A868 0 4px, var(--w-board, #B9773F) 4px 9px, var(--w-board2, #96592B) 9px); border-top: 2px solid #3B2E3A; border-bottom: 2px solid #3B2E3A; box-shadow: 0 5px 0 rgba(59, 46, 58, .22); }
+.tsh-plank .tsh-card:first-child::before { left: -12px; border-left: 2px solid #3B2E3A; border-radius: 5px 0 0 5px; } .tsh-plank .tsh-card:last-child::before { right: -12px; border-right: 2px solid #3B2E3A; border-radius: 0 5px 5px 0; }
+@media (hover: hover) {
+  .tsh-plank button.tsh-card:hover { transform: translateY(-5px) rotate(-1deg); }
+  .tsh-plank button.tsh-card:hover::before { transform: translateY(5px) rotate(1deg); }
+}
+@media (min-width: 721px) {
+  .tsh-aisle.a11 { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .tsh-seasonbody { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); align-items: center; }
+  /* the cards fill their shelf, and their type grows with them */
+  .tsh-store .tsh-shelf .tsh-rcards { grid-template-columns: repeat(var(--n, 4), minmax(0, 1fr)); }
+  .tsh-store .tsh-shelf .tsh-rname { font-size: clamp(11px, 9.6cqw, 17px); } .tsh-store .tsh-shelf .tsh-rmeta .tsh-rar { font-size: clamp(11px, 8.4cqw, 13.5px); } .tsh-store .tsh-shelf .tsh-price { font-size: clamp(11px, 9cqw, 15px); }
+}
+
+/* ---------- the shop as a dialog (the dashboard, the place) ---------- */
+html.tsh-open { overflow: hidden; }
+dialog.tsh-dlg { width: min(1060px, calc(100vw - 24px)); max-width: none; max-height: calc(100dvh - 24px); margin: auto; padding: 0; border: 0; border-radius: 24px; background: transparent; color: var(--text); overflow: visible;
+  font-family: var(--font, system-ui); font-size: var(--fs-body, 16px); }
+dialog.tsh-dlg::backdrop { background: rgba(20, 14, 20, .62); }
+.tsh-dlgin { position: relative; max-height: calc(100dvh - 24px); overflow: auto; overscroll-behavior: contain; border-radius: 24px; }
+.tsh-dlgbody > .tsh-note { padding: 40px 24px; border-radius: 22px; background: var(--ground, #fff); text-align: center; }
+.tsh-x { display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFF9EE; color: #3B2E3A; box-shadow: 0 3px 0 #3B2E3A; cursor: pointer; }
+.tsh-dlgin > .tsh-x { position: absolute; right: 14px; top: 58px; z-index: 5; }
+.tsh-x:focus-visible, .tsh-buy:focus-visible, .tsh-ghost:focus-visible, .tsh-earnbtn:focus-visible { outline: 3px solid #4E3492; outline-offset: 2px; }
+
+/* ---------- an item's sheet: a display case in the rarity's color, what it is, its price against your balance ---------- */
+dialog.tsh-sheet { width: fit-content; max-width: none; max-height: none; margin: auto; padding: 0; border: 0; background: transparent; overflow: visible; color: #3B2E3A; font-family: var(--font, system-ui); font-size: var(--fs-body, 16px); line-height: 1.45; }
+dialog.tsh-sheet::backdrop { background: rgba(20, 14, 20, .55); }
+.tsh-item { position: relative; display: grid; grid-template-columns: minmax(0, 11fr) minmax(0, 10fr); width: min(880px, calc(100vw - 44px)); max-height: calc(100dvh - 52px); overflow: auto; overscroll-behavior: contain;
+  border-radius: 22px; border: 3px solid #3B2E3A; background: #FFF9EE; color: #3B2E3A; box-shadow: 0 0 0 8px #C4864A, 0 0 0 11px #3B2E3A, 0 9px 0 11px #3B2E3A, 0 30px 60px rgba(0, 0, 0, .45); --rar: #5F5A55; --rbg: #E8E3DD; }
+.tsh-item.r-Uncommon { --rar: #1C6E52; --rbg: #CDEEDC; } .tsh-item.r-Rare { --rar: #1C5C88; --rbg: #CBE6F8; } .tsh-item.r-Epic { --rar: #4E3492; --rbg: #DDD0F8; } .tsh-item.r-Legendary { --rar: #7A5600; --rbg: #FFE08A; }
+.tsh-ix { position: absolute; right: 12px; top: 12px; z-index: 4; width: 40px; height: 40px; }
+.tsh-icase { position: relative; display: grid; place-items: center; min-height: 430px; padding: 26px 22px 64px; background: var(--rbg); border-right: 3px solid #3B2E3A; overflow: hidden; isolation: isolate; }
+.tsh-irays { position: absolute; left: 50%; top: 46%; width: 150%; aspect-ratio: 1; margin: -75% 0 0 -75%; opacity: .5; z-index: -1; animation: tsh-rays 40s linear infinite; }
+.tsh-irays g { fill: #fff; }
+@keyframes tsh-rays { to { transform: rotate(360deg); } }
+.tsh-icorner { position: absolute; width: 54px; height: 54px; border: 3px solid var(--rar); opacity: .55; }
+.tsh-icorner.a { left: 12px; top: 12px; border-right: 0; border-bottom: 0; border-radius: 16px 0 0 0; } .tsh-icorner.b { right: 12px; bottom: 12px; border-left: 0; border-top: 0; border-radius: 0 0 16px 0; }
+.tsh-ipiece { position: relative; width: min(100%, 330px); aspect-ratio: 1; display: grid; place-items: center; animation: tsh-float 4.5s ease-in-out infinite; }
+.tsh-ipiece img { position: relative; display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 0 rgba(59, 46, 58, .14)); }
+.tsh-ipiece.k-scene img { border-radius: 18px; border: 3px solid #3B2E3A; object-fit: cover; height: auto; filter: none; box-shadow: 0 6px 0 #3B2E3A; background: #CFEAF8; }
+.tsh-ipiece.k-outfit img, .tsh-ipiece.k-costume img { width: 74%; height: 92%; filter: none; }
+.tsh-ipod { position: absolute; left: 14%; right: 14%; bottom: 0; height: 15%; border-radius: 50%; background: linear-gradient(180deg, #E9BC82, #C98F52); border: 3px solid #3B2E3A; box-shadow: 0 6px 0 #96592B, 0 6px 0 3px #3B2E3A; }
+.tsh-ido { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); padding: 3px 12px; border-radius: 999px; border: 2px solid #3B2E3A; background: #BFEBCF; font-size: 15px; font-weight: 900; box-shadow: 0 3px 0 #3B2E3A; white-space: nowrap; }
+.tsh-item.r-Rare .tsh-ido, .tsh-item.r-Epic .tsh-ido { background: #FFE27A; }
+.tsh-iinfo { display: grid; align-content: start; gap: 10px; padding: 26px 26px 22px; min-width: 0; }
+.tsh-ikind { font-size: var(--fs-meta, 13px); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--rar); padding-right: 44px; }
+.tsh-iinfo h2 { font-size: 30px; font-weight: var(--w-head, 800); line-height: 1.08; letter-spacing: -.015em; color: #3B2E3A; text-wrap: balance; overflow-wrap: anywhere; }
+.tsh-idesc { font-size: var(--fs-label, 15px); line-height: 1.5; color: #4B3C49; }
+.tsh-isay q { display: block; padding: 8px 12px; border-radius: 14px 14px 14px 4px; border: 2px solid #3B2E3A; background: #fff; font-size: var(--fs-label, 15px); font-weight: 650; line-height: 1.35; quotes: none; }
+.tsh-ibuy { display: grid; gap: 12px; margin-top: 6px; padding-top: 14px; border-top: 2px solid #3B2E3A; }
+.tsh-iprice { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 4px 14px; }
+.tsh-big { display: inline-flex; align-items: center; gap: 6px; } .tsh-big .tsh-coin { width: 34px; height: 34px; } .tsh-big b { font-size: 34px; font-weight: var(--w-head, 800); line-height: 1; }
+.tsh-ihave { font-size: var(--fs-meta, 13px); color: #5A4658; }
+.tsh-ibar { grid-column: 1 / -1; height: 12px; border-radius: 999px; border: 2px solid #3B2E3A; background: #fff; overflow: hidden; } .tsh-ibar i { display: block; height: 100%; background: #F2C230; border-right: 2px solid #3B2E3A; }
+.tsh-ishort { grid-column: 1 / -1; font-size: var(--fs-meta, 13px); font-weight: 700; color: #5A4658; }
+.tsh-msg { min-height: 1.45em; font-size: var(--fs-label, 15px); font-weight: 700; color: #8A2B1E; }
+.tsh-msg:empty { display: none; }
+.tsh-iacts { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+.tsh-buy { min-height: 52px; padding: 0 22px; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFD23F; color: #3B2E3A; box-shadow: 0 4px 0 #3B2E3A; font-size: 17px; font-weight: 800; cursor: pointer; white-space: nowrap;
+  transition: transform var(--t-press, 120ms) var(--ease-out, ease-out), box-shadow var(--t-press, 120ms) var(--ease-out, ease-out), background var(--t-press, 120ms) var(--ease-out, ease-out); }
+.tsh-buy:hover { background: #FFDF6B; }
+.tsh-buy:active { transform: translateY(4px); box-shadow: 0 0 0 #3B2E3A; }
+.tsh-buy[disabled] { background: #EDE6DA; color: #5F5162; box-shadow: none; transform: translateY(4px); cursor: not-allowed; }
+.tsh-ghost { min-height: 52px; padding: 0 18px; border-radius: 999px; border: 2px solid #3B2E3A; background: #fff; color: #3B2E3A; font-size: 16px; font-weight: 800; cursor: pointer; }
+.tsh-ghost:hover { background: #F3ECFA; }
+.tsh-iown { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 12px; background: #BFEBCF; border: 2px solid #3B2E3A; font-size: var(--fs-label, 15px); font-weight: 700; }
+.tsh-iown svg { flex: none; }
+.tsh-iown.is-new { animation: tsh-in 320ms var(--ease-out, ease-out) both; }
+@keyframes tsh-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* buying: coins fly into the piece, it pops, and the rarity sets the size of the party */
+.tsh-fx { position: absolute; inset: 0; pointer-events: none; z-index: 3; }
+.tsh-fxcoin { position: absolute; left: 50%; top: 46%; width: 30px; height: 30px; margin: -15px; opacity: 0; animation: tsh-fxcoin 430ms cubic-bezier(.5, 0, .7, .4) calc(var(--i) * 45ms) both; }
+.tsh-fxcoin img { display: block; width: 100%; height: 100%; }
+@keyframes tsh-fxcoin { 0% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(.6) rotate(-90deg); } 20% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(0, 0) scale(.5) rotate(180deg); } }
+.tsh-item.is-bought .tsh-fxcoin { display: none; }
+.tsh-item.is-charging .tsh-ipiece { animation: tsh-charge 750ms ease-in both; }
+.tsh-item.is-charging .tsh-irays { animation-duration: 1.6s; opacity: .85; }
+@keyframes tsh-charge { 0% { transform: scale(1); } 20% { transform: translate(-2px, 1px) scale(1.02) rotate(-1deg); } 40% { transform: translate(3px, -1px) scale(1.05) rotate(1.4deg); } 60% { transform: translate(-3px, 1px) scale(1.08) rotate(-1.8deg); } 80% { transform: translate(3px, 0) scale(1.11) rotate(2deg); } 100% { transform: scale(.86); } }
+.tsh-item.is-bought .tsh-ipiece { animation: tsh-bought 620ms cubic-bezier(.2, 1.6, .4, 1) both; }
+.tsh-item.is-bought.is-spin .tsh-ipiece { animation: tsh-bought-spin 820ms cubic-bezier(.2, 1.3, .4, 1) both; }
+@keyframes tsh-bought { 0% { transform: scale(.7); } 55% { transform: scale(1.2); } 100% { transform: scale(1); } }
+@keyframes tsh-bought-spin { 0% { transform: scale(.6) rotateY(0); } 60% { transform: scale(1.24) rotateY(360deg); } 100% { transform: scale(1) rotateY(360deg); } }
+.tsh-item.is-bought .tsh-irays { animation-duration: 6s; opacity: .8; }
+.tsh-fxflash { position: absolute; inset: 0; background: #fff; opacity: 0; animation: tsh-flash 520ms ease-out both; }
+.tsh-item.is-gold .tsh-fxflash { position: fixed; background: #FFE27A; animation-duration: 760ms; }
+@keyframes tsh-flash { 0% { opacity: .92; } 100% { opacity: 0; } }
+.tsh-fxring { position: absolute; left: 50%; top: 46%; width: 120px; height: 120px; margin: -60px; border-radius: 50%; border: 5px solid var(--rar); opacity: 0; animation: tsh-ring 760ms cubic-bezier(.2, .7, .3, 1) var(--t) both; }
+@keyframes tsh-ring { 0% { opacity: .9; transform: scale(.3); } 100% { opacity: 0; transform: scale(3.6); border-width: 1px; } }
+.tsh-fxbit { position: absolute; left: 50%; top: 46%; width: var(--s); height: var(--s); margin: calc(var(--s) / -2); border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1.5px #3B2E3A; opacity: 0; animation: tsh-bit 1000ms cubic-bezier(.15, .7, .3, 1) var(--t) both; }
+.tsh-fxbit.is-bar { border-radius: 2px; height: calc(var(--s) * .45); }
+.tsh-fxbit.is-star { border-radius: 0; box-shadow: none; clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%); width: calc(var(--s) * 2); height: calc(var(--s) * 2); }
+@keyframes tsh-bit { 0% { opacity: 1; transform: translate(0, 0) scale(.2); } 60% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--x), calc(var(--y) + 70px)) rotate(var(--r)) scale(1); } }
+.tsh-item.is-gold .tsh-fxbit { animation-duration: 1700ms; }
+.tsh-iburst { position: absolute; left: 50%; top: 44%; width: 78%; aspect-ratio: 1; transform: translate(-50%, -50%); pointer-events: none; line-height: 0; }
+.tsh-fxword { position: absolute; left: 50%; top: 14%; padding: 4px 18px 6px; border-radius: 999px; border: 3px solid #3B2E3A; background: var(--rar); color: #fff; font-size: 26px; font-weight: 900; white-space: nowrap; box-shadow: 0 4px 0 #3B2E3A;
+  animation: tsh-word 520ms cubic-bezier(.2, 1.5, .4, 1) 120ms both; }
+.tsh-item.r-Legendary .tsh-fxword { background: #FFD23F; color: #3B2E3A; font-size: 32px; }
+@keyframes tsh-word { 0% { opacity: 0; transform: translateX(-50%) scale(2.6) rotate(-14deg); } 100% { opacity: 1; transform: translateX(-50%) scale(1) rotate(-5deg); } }
+
+/* ---------- a phone: the storefront crops its sides, every shelf is one row that scrolls sideways, the sheet stacks ---------- */
+@media (max-width: 720px) {
+  .tsh-store { padding: 0 15px 22px; gap: 14px; border-radius: 18px; } .tsh-awning { margin: 0 -15px; }
+  .tsh-front { aspect-ratio: auto; height: 236px; margin: -20px -9px 0; }
+  .tsh-sign { padding: 4px 16px 5px; } .tsh-sign b, .tsh-sign .tsh-signh { font-size: 19px; gap: 6px; } .tsh-sign .tsh-coin { width: 20px; height: 20px; } .tsh-sign > span { display: none; }
+  .tsh-sign::before, .tsh-sign::after { height: 14px; }
+  .tsh-wallet { right: auto; left: 50%; bottom: 5px; transform: translateX(-50%); padding: 2px 14px 3px 7px; gap: 7px; } .tsh-wallet .tsh-coin { width: 28px; height: 28px; } .tsh-wallet b { font-size: 19px; } .tsh-wallet small { font-size: 11px; }
+  .tsh-show { grid-template-columns: 1fr; margin: 7px 4px; } .tsh-showcase { min-height: 236px; border-right: 0; border-bottom: 2px solid #3B2E3A; } .tsh-showinfo { padding: 16px 16px 18px; }
+  .tsh-shelf { padding: 14px 11px 16px; margin: 7px 4px; }
+  .tsh-shelf header { grid-template-columns: 1fr; } .tsh-when { justify-self: start; }
+  .tsh-shelf .tsh-rcards { display: flex; gap: 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; padding: 4px 8px 20px; margin: 0 -6px; }
+  .tsh-shelf .tsh-card { flex: 0 0 136px; scroll-snap-align: start; }
+  .tsh-poster { transform: none; }
+  dialog.tsh-dlg { width: calc(100vw - 12px); max-height: calc(100dvh - 12px); }
+  .tsh-dlgin { max-height: calc(100dvh - 12px); }
+  .tsh-dlgin > .tsh-x { right: 10px; top: 54px; width: 40px; height: 40px; }
+  .tsh-item { grid-template-columns: 1fr; width: calc(100vw - 32px); }
+  .tsh-icase { min-height: 0; padding: 20px 16px 56px; border-right: 0; border-bottom: 3px solid #3B2E3A; }
+  .tsh-ipiece { width: min(64%, 250px); }
+  .tsh-iinfo { padding: 18px 16px 16px; } .tsh-iinfo h2 { font-size: 24px; }
+  .tsh-iacts { grid-template-columns: 1fr; }
+  /* the price and Buy stay in reach however long the piece's story is */
+  .tsh-ibuy { position: sticky; bottom: 0; z-index: 2; margin: 6px -16px -16px; padding: 12px 16px 14px; background: #FFF9EE; gap: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tsh-irays, .tsh-ipiece, .tsh-keeper, .tsh-showpiece, .tsh-showtw, .tsh-iown.is-new { animation: none !important; }
+  .tsh-plank button.tsh-card:hover, .tsh-plank button.tsh-card:hover::before, .tsh-card:active { transform: none; }
+}
+.tsh-still .tsh-keeper, .tsh-still .tsh-showpiece, .tsh-still .tsh-showtw, .tsh-still .tsh-irays { animation: none !important; }

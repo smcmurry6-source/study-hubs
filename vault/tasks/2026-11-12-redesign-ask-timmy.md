@@ -285,7 +285,8 @@ plugs in", [the shop](2026-11-06-redesign-timmy-shop.md) ("Sam's calls (2026-11-
 - `widget/dash.js`: the new dashboard mounts with `everyone: true` and the same outfit; the "Timmy Tooth wants to
   meet you. Tap him." perch line (`#petPerch`) goes.
 - `widget/hub-timmy.js`: `hasTimmy()` and `petFromBadges()`'s wait for adoption go; `morePlace` loses its "Timmy
-  hasn't moved in yet" note.
+  hasn't moved in yet" note, and so does `moreShop` (the shop, session 2); `hasShop()` keeps only "a `shop` in the
+  bootstrap", so the Shop row shows for everyone on the game layer.
 - `widget/place.js`: `timmySvg()` always draws him without `pet.js`'s own hat (`hat: ""`), so with nothing on he is
   himself; after the `outfit` slot changes (`equip()`), it calls `shPet.setOutfit(id)` so the bar follows at once.
 - `tools/preview/runtime/preview.js`: the `new` test account has a Timmy; nothing else.
@@ -319,6 +320,7 @@ change to HP's rules beyond the 100 start; the old pages.
 
 **Done when** (part 4):
 - [ ] On the redesign's pages everyone has Timmy; no adoption anywhere there
+- [ ] A new hub's Shop row in More shows without adoption (`hasShop()` in `widget/hub-timmy.js`, session 2's hand-off)
 - [ ] He wears what is on at his place, and nothing otherwise, on the bar, on the dashboard, at his place, in the
       classroom and on the leaderboard's stage
 - [ ] The live pages are unchanged (the smoke test on every hub)

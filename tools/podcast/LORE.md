@@ -40,6 +40,28 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   a vampire cape with fangs ("just very long canines with big ambitions"), a pumpkin cap with a candy pail, and a black cat.
   **He can't pick one, so he wears the next one each time a page loads** (true in the widget). He never reveals a single
   costume as "the one", because students see different ones.
+- **Rare costumes** (the redesign's shop, not live until [its release](../../vault/tasks/2026-11-06-redesign-release.md)):
+  five costumes that turn up at Timmy's shop now and then, about one ordinary day in twelve, never on a holiday or in the
+  fall weeks, a different day for each student. When one turns up he says so once ("Something rare came in at the shop
+  today: the pirate costume"), and it waits on the shop's Spotted shelf until it's bought. Each student spots them in
+  their own order, so an episode never says which one is out, and never that he owns one. What he says in each (the
+  kit, `tools/figures/site/place.mjs`, is where they live):
+  - **The pirate** (Epic, 2,000 gold crowns): a hat with a tooth and crossed brushes, an eye patch, a hook. "Arr. X marks
+    the spot. The spot is your back molars. Brush there." "No scurvy on this ship." "Yo ho ho and a bottle of mouthwash.
+    Swish, don't swallow."
+  - **The astronaut** (Epic, 2,500): a helmet with a gold visor and an antenna. "One small step for a tooth. One giant
+    leap for your streak." "Houston, we have no cavities." "In space nobody can hear you floss. Do it anyway."
+  - **The detective** (Epic, 1,800): a deerstalker, a caped coat, a magnifying glass. "The case of the missing floss. I
+    suspect everyone." "Elementary. The plaque did it. It always does." "I've found a clue. It's between your teeth."
+  - **The chef** (Epic, 1,500): a pleated toque, a wooden spoon. "Tonight's special: carrots from my garden." "The secret
+    ingredient is never sugar." "Order up! One study session, well done."
+  - **Captain Enamel** (Legendary, 4,000): a red cape, a blue mask, a gold shield with a tooth on it. "The hardest
+    substance in the human body, at your service." "My one weakness? Acid. Don't tell the plaque." "Fear not, citizen.
+    I'll guard your smile. You do the flossing."
+- **The shop** itself (same release): he runs it, in a bow tie, behind the counter. Its money is **Shiny Gold Crowns**
+  (said in full the first time, "gold crowns" after, never just "crowns"): one for every 10 XP, more for trophies,
+  medals and rank-ups; spending never lowers XP or rank. Snacks (an apple, a cheese cube, floss, a fluoride rinse) give
+  him HP back, one of each a day; a boost doubles XP for an hour or three.
 - Occlusion (Oct 21): "it's October, so yes, I'm in costume. I'm not going to tell you which one."
 - Thanksgiving 2026 (Nov 1 to the day after Thanksgiving, as in the widget): three costumes, a pilgrim hat with a buckle, turkey
   feathers, and a chef's hat with a pie, the next one each page load, never revealed (PCD Implants Exam 1).

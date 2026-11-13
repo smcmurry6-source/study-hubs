@@ -102,13 +102,42 @@ function transformFile(rel, buf, o){
   return rewriteText(text, o);
 }
 
+/* the shop's catalog, read from the migration that writes it (migration_v54's two inserts into shop_items), so the
+   preview's shelves sell exactly what the server will: one row each, [id, name, kind, rarity, price, season, slot, hp,
+   boost_minutes, boost_mult, shelf, rotates, gift, rank_tier, wide, sort] */
+const SHOP_COLS = ['id', 'name', 'kind', 'rarity', 'price', 'season', 'slot', 'hp', 'boost_minutes', 'boost_mult', 'shelf', 'rotates', 'gift', 'rank_tier', 'wide', 'sort'];
+function shopCatalog(){
+  let sql = '';
+  try { sql = fs.readFileSync(path.join(ROOT, 'migration_v54.sql'), 'utf8'); } catch (e) { return null; }
+  const rows = [], wide = {};
+  const re = /insert into public\.shop_items \(([^)]*)\) values\s*([\s\S]*?)\n(?:on conflict[^;]*)?;/g;
+  let m;
+  while ((m = re.exec(sql))) {
+    const cols = m[1].split(',').map(s => s.trim());
+    const tuple = /\(((?:'(?:[^']|'')*'|[^()'])*)\)/g; let t;
+    while ((t = tuple.exec(m[2]))) {
+      const vals = [], cell = /\s*('(?:[^']|'')*'|[^,]+)\s*(?:,|$)/g; let c;
+      while ((c = cell.exec(t[1])) && c[0]) {
+        const v = c[1].trim();
+        vals.push(v[0] === "'" ? v.slice(1, -1).replace(/''/g, "'") : v === 'null' ? null : v === 'true' ? true : v === 'false' ? false : Number(v));
+      }
+      const r = {}; cols.forEach((k, i) => { r[k] = vals[i]; });
+      rows.push(r);
+    }
+  }
+  (sql.match(/update public\.shop_items set wide = true where id = '([a-z0-9-]+)'/g) || []).forEach(s => { wide[/'([a-z0-9-]+)'/.exec(s)[1]] = true; });
+  if (!rows.length) return null;
+  return rows.map(r => SHOP_COLS.map(k => k === 'wide' ? !!wide[r.id] : k === 'shelf' || k === 'gift' ? !!r[k] : k === 'rotates' ? (r.rotates == null ? true : r.rotates) : r[k] == null ? null : r[k]));
+}
+
 function runtime(o){
   const src = fs.readFileSync(path.join(__dirname, 'runtime', 'preview.js'), 'utf8');
   const personas = JSON.parse(fs.readFileSync(path.join(__dirname, 'fixtures', 'personas.json'), 'utf8'));
   const cfg = {
     label: o.label, ref: o.ref, sha: o.sha, builtAt: o.builtAt, data: o.data,
     fixtureHost: FIXTURE_HOST, stagingHost: o.data === 'staging' ? new URL(o.stagingUrl).host : null,
-    liveSite: LIVE_SITE, audio: o.audio || { mode: 'local', included: [] }, personas: personas.personas, adminSecret: personas.adminSecret
+    liveSite: LIVE_SITE, audio: o.audio || { mode: 'local', included: [] }, personas: personas.personas, adminSecret: personas.adminSecret,
+    shop: { cols: SHOP_COLS, rows: shopCatalog() }
   };
   return `window.SH_PREVIEW_CONFIG = ${JSON.stringify(cfg)};\n` + src;
 }
