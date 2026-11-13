@@ -244,7 +244,9 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
   .hx-meter .fold { display: none; }
   .hx-meter .unfold { display: inline; }
 }
-@container hxstrip (max-width: 300px) { .hx-meter .fold-xp { display: none; } }
+/* with "Hubs" at its start the strip is full on a phone: the XP figure drops its "XP" (the star says it), and it is the
+   one part that may shrink, so a six-figure total never pushes Search off the screen */
+@container hxstrip (max-width: 440px) { .hx-meter .fold-xp { display: none; } .hx-strip #hxXp { flex: 0 1 auto; min-width: 0; overflow: hidden; } }
 @container hxstrip (max-width: 520px) { .hx-live .fold-live { display: none; } }
 .hx-main { outline: none; }
 .hx-page { width: min(1180px, 100% - 2 * var(--pad)); margin: 0 auto; padding: 32px 0 96px; }
@@ -1111,7 +1113,7 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
     .hx-set { width: 44px; padding: 0; }
     .hx-set .lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   }
-  .hx-strip { gap: 10px; padding: 8px 8px 8px 12px; }
+  .hx-strip { gap: 8px; padding: 8px 8px 8px 10px; }
   .hx-page { padding-top: 20px; }
   .examcard h1 { font-size: 26px; }
   .quick { gap: 6px; }

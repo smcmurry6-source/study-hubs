@@ -524,7 +524,9 @@ function lint(hub, A){
       await page.waitForFunction(() => window.SH_BUNDLE && window.shRanks && window.shPet && window.shIdeas, null, { timeout: 15000 }).catch(() => {});
       { const bun = await bundleCheck(page, 'dashboard', label, 'dash', askedFiles);
         notes.push(`${name}: the page asked for ${[...new Set(askedFiles)].length} widget files (${[...new Set(askedFiles)].join(', ')}) and links ${bun.links} stylesheet${bun.links === 1 ? '' : 's'}`); }
-      const sideways = async what => { const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`${name}: ${what} scrolls sideways by ${w}px`); };
+      /* against the device's width, not innerWidth: an emulated phone widens its layout viewport to fit a page that is
+         too wide, so scrollWidth - innerWidth reads 0 on exactly the pages that overflow (BUG-140, BUG-141) */
+      const sideways = async what => { const dw = (page.viewportSize() || {}).width || 0; const w = await page.evaluate(d => Math.max(document.documentElement.scrollWidth, innerWidth) - (d || innerWidth), dw); if (w > 1) problems.push(`${name}: ${what} scrolls sideways by ${w}px`); };
       if (!(await page.$('#dx h1'))) problems.push(`${name}: the page has no title`);
       const tabs = await page.$$eval('#hubTabs [data-tab]', bs => bs.map(b => b.getAttribute('data-tab')));
       if (!tabs.length && !(await page.$('.dx-empty'))) problems.push(`${name}: no hub tabs and no "no hubs are live" message`);
@@ -1240,7 +1242,7 @@ function lint(hub, A){
           await page.waitForTimeout(500);
           const st = await page.evaluate(() => { const c = document.querySelector('[data-smstage] .qcard'); return { answered: !!c && c.classList.contains('is-answered'), again: !!(c && c.querySelector('[data-again]')), next: !!document.querySelector('[data-smstage] [data-sm="next"]') }; });
           if (!st.answered || st.again || !st.next) problems.push(`${name} (${label}): a Learn question should end answered, with Next and without "Try it again" (${JSON.stringify(st)})`);
-          const lw = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+          const lw = await page.evaluate(d => Math.max(document.documentElement.scrollWidth, innerWidth) - (d || innerWidth), (page.viewportSize() || {}).width || 0);
           if (lw > 1) problems.push(`${name} (${label}): Learn's session scrolls sideways by ${lw}px`);
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
           const closed = await page.evaluate(() => ({ gone: !document.querySelector('.sm-focus'), lock: document.documentElement.classList.contains('sm-open'), launcher: !!document.querySelector('.sm-launch [data-sm="start"]') }));
