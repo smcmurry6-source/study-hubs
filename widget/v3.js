@@ -1468,6 +1468,8 @@
     try { channel.track({ online_at: new Date().toISOString(), fit: f }); } catch (e) {}
   }
   document.addEventListener("sh:pref", function(){ setTimeout(trackPresence, 50); });
+  /* everyone has Timmy (the redesign's hubs): what he wears changed at his place, or came in with the page's bootstrap */
+  document.addEventListener("sh:pet-fit", function(){ setTimeout(trackPresence, 50); });
 
   /* ---------- answer + mode tracking (fire-and-forget, never throws into the hub) ---------- */
   /* Automated browsers (Playwright, Puppeteer, Selenium: navigator.webdriver) don't count in the analytics: sessions that
@@ -3027,8 +3029,9 @@
     document.head.appendChild(rankScript);
   }
   /* tooth buddy (widget/pet.js): optional cartoon tooth in the bottom-left corner, adopted on the dashboard.
-     The redesigned hubs (window.SH_HUB, widget/hub.js; not live yet) load him only once he's adopted: on this device, or
-     on another one, which hub.js hears from the rank profile and then calls shLoadPet. The live hubs load him as before. */
+     The redesigned hubs (data-game="v2", widget/hub.js; not live yet): everyone has Timmy, so he loads for everyone and
+     mounts with everyone: true (no adoption; he wears what's on at his place, from the v2 bootstrap's shop). The live
+     hubs (no data-game) load him as before. */
   var petLoading = false;
   function loadPet(then){
     if (window.shPet) { if (then) then(); return; }
@@ -3036,12 +3039,12 @@
     petLoading = true;
     var petScript = document.createElement("script");
     petScript.src = new URL("pet.js", thisScript.src).href; petScript.async = true;
-    petScript.onload = function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); trackPresence(); if (then) then(); };
+    petScript.onload = function(){ if (window.shPet) window.shPet.mount(GAME.want ? { where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready, everyone: true } : { where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); trackPresence(); if (then) then(); };
     document.head.appendChild(petScript);
   }
   window.shLoadPet = loadPet;
   var petBorn = null; try { petBorn = localStorage.getItem("sh_pet_born"); } catch (e) {}
-  if (!EXPORT_ONLY && !(window.SH_HUB && !petBorn)) loadPet();
+  if (!EXPORT_ONLY && (GAME.want || !(window.SH_HUB && !petBorn))) loadPet();
   /* TIMMY (widget/timmy.js): type his name anywhere for a 15-second show */
   if (!EXPORT_ONLY && !window.__timmyLoaded) {
     var timmyScript = document.createElement("script");

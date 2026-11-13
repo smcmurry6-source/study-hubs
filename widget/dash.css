@@ -243,9 +243,6 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-cols { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: start; }
 .dx-you { grid-column: span 5; display: flex; flex-direction: column; gap: 14px; }
 .dx-class { grid-column: span 7; display: grid; gap: 12px; align-content: start; }
-/* before Timmy is adopted he stands on this line (widget/pet.js places him over #petPerch); the room above it is his */
-.dx-porch { display: none; padding: 116px 12px 12px; border-radius: var(--r-row); background: var(--row); text-align: center; }
-body:has(> .shpet-perch) .dx-porch { display: block; }
 .dx-youhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
 .dx-name { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: var(--fs-body); }
 .dx-name b { overflow-wrap: anywhere; }

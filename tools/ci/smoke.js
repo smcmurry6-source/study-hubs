@@ -408,10 +408,14 @@ function lint(hub, A){
         if (board.unnamed) problems.push(`${name}: ${board.unnamed} idea board button(s) have no fixed data-shi name, so click counts would record their text`);
       }
       await sideways('the idea board');
-      // Ask Timmy on the dashboard: the "Ask the hub" button in the "you" card (Timmy not adopted), every live hub at once
+      // Ask Timmy on the dashboard: everyone has Timmy, so the "Ask the hub" button takes his place in the "you" card only
+      // when he's turned off (Settings; put back after), and answers from every live hub at once
+      if (!(await page.$('#askSpot:not([hidden]) [data-ska="spot"]')) && !(await page.$('#petHome.shpet-house:not([hidden])'))) problems.push(`${name}: neither Timmy nor the Ask button is in the "you" card`);
+      await page.evaluate(() => { localStorage.setItem('sh_pref_pet', 'off'); document.dispatchEvent(new CustomEvent('sh:pref', { detail: { key: 'sh_pref_pet', val: 'off' } })); });
       await page.waitForSelector('#askSpot:not([hidden]) [data-ska="spot"]', { timeout: 10000 }).catch(() => {});
       if (!(await page.$('#askSpot:not([hidden]) [data-ska="spot"]'))) problems.push(`${name}: no Ask button in the "you" card while Timmy isn't there`);
       else await askCheck(page, name, { hubId: 'dashboard', open: () => page.click('#askSpot [data-ska="spot"]') });
+      await page.evaluate(() => localStorage.removeItem('sh_pref_pet'));
       errs.forEach(e => problems.push(`${name}: JavaScript error: ${e}`));
       notes.push(`${name}: ${tabs.length} hub tabs, the class board, Settings, the name dialog and the menu`);
       await page.close();
@@ -497,9 +501,12 @@ function lint(hub, A){
           const back = await page.$('[data-level="full"]'); if (back) { await back.click(); await page.waitForTimeout(300); }
         }
       }
-      /* Ask Timmy (widget/ask.js): the Ask icon in Timmy's corner (he isn't adopted here), the chat, then "Ask Timmy" on an
-         answered question, which sends that question with the next message; no Ask icon during a mock */
+      /* Ask Timmy (widget/ask.js): everyone has Timmy, so the Ask icon is in his corner only while he's turned off (Settings;
+         put back after); the chat, then "Ask Timmy" on an answered question, which sends that question with the next
+         message; no Ask icon during a mock */
       await page.evaluate(() => { location.hash = 'home'; }); await page.waitForTimeout(400);
+      if (await page.$('.ska-fab:not([hidden])')) problems.push(`${name} (${label}): the Ask icon is in Timmy's corner while he's there`);
+      await page.evaluate(() => { localStorage.setItem('sh_pref_pet', 'off'); document.dispatchEvent(new CustomEvent('sh:pref', { detail: { key: 'sh_pref_pet', val: 'off' } })); });
       await page.waitForSelector('.ska-fab:not([hidden])', { timeout: 15000 }).catch(() => {});
       if (!(await page.$('.ska-fab:not([hidden])'))) problems.push(`${name} (${label}): no Ask icon in Timmy's corner while he isn't there`);
       else {
@@ -522,6 +529,7 @@ function lint(hub, A){
         await page.evaluate(() => { location.hash = 'questions/mock'; }); await page.waitForTimeout(800);
         if (await page.evaluate(() => { const f = document.querySelector('.ska-fab'); return !!f && !f.hidden && getComputedStyle(f).display !== 'none'; })) problems.push(`${name} (${label}): the Ask icon shows during the mock exam`);
       }
+      await page.evaluate(() => localStorage.removeItem('sh_pref_pet'));
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
       notes.push(`${name} (${label}): clicked through ${screens} screens, ${n} questions`);
       await page.close();
@@ -660,7 +668,9 @@ function lint(hub, A){
       page.on('pageerror', e => errs.push(e.message));
       page.on('request', r => { if (/\/widget\/(shop\.(js|css)|hub-art\/shop\.js)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
       const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date());
-      await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
+      /* Timmy's own tally of today's answers (sh_pet_log) is left by the click-throughs above, where he's on the page for
+         everyone: start without it, so his health is the snack's 100 and nothing else */
+      await page.addInitScript(() => { try { localStorage.removeItem('sh_pet_log'); localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
       const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
       const wallet = { earned: 300, spent: 0, balance: 300, from_xp: 230, trophies: 50, medals: 0, rankups: 20 }, inv = [], seen = new Map();
       let refuse = '', drop = false;
@@ -905,6 +915,163 @@ function lint(hub, A){
       await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(2500);
       if (asked.length) problems.push(`${hub} (${label}): a live hub asked for the shop (${asked.join(', ')}): it stays on the redesign's pages until the release`);
       await page.close();
+    }
+    /* Everyone has Timmy (Ask Timmy, part 4: widget/pet.js mount({ everyone: true }), on the redesign's pages only). widget/pet.js
+       is served with its FULL_FROM at today, as a preview serves it (tools/preview/transform.js), so a Timmy met today starts
+       at 100 HP. A first-time visitor on a new hub has Timmy on the bar with no introduction and no "Tap me!", at 100 HP, his
+       birthday today and the pet-adopt badge sent; he wears the bootstrap's outfit (shop.equipped.outfit): nothing until the
+       first key (outfits.js never loads with a page), then the outfit, kept on the device; on the next visit he wears it at
+       once with no request; with nothing on he wears nothing, on Halloween too; shPet.fit() is the outfit's id; changing
+       it in the customizer changes the bar without a reload; More has Timmy's place and the shop. The same first visit on
+       the new dashboard has him in the "you" card. And the live hub and the live dashboard are as they were: the
+       introduction, "Tap me!", the holiday outfit and fit()'s "<holiday>:<outfit>". */
+    {
+      const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date());
+      const petFrom = async page => page.route(/\/widget\/pet\.js(\?.*)?$/, async route => {
+        const r = await route.fetch(), t = await r.text(), from = 'var FULL_FROM = "9999-12-31";';
+        if (!t.includes(from)) problems.push(`widget/pet.js (${label}): no \`${from}\` line (the release sets it; tools/preview/transform.js points it at a preview's start)`);
+        return route.fulfill({ response: r, body: t.replace(from, `var FULL_FROM = "${today}";`) });
+      });
+      const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
+      const equipped = { outfit: 'bow-tie' };
+      const shop = () => ({ day: today, seasons: [], throwback: false, wallet: { earned: 300, spent: 0, balance: 300 }, items: [], costumes: [], snacks_today: [], boost: null, locked: [],
+        inventory: ['bow-tie', 'sun-hat'].map(id => ({ id, at: '2026-11-01', how: 'bought' })), equipped: Object.assign({}, equipped) });
+      const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+      /* the pages above share this browser's storage, Timmy's tally of their answers too: start each page below as a
+         first visit, once (a reload keeps it), with the rank this device last saw (so no rank-up card) and no tour */
+      const fresh = page => page.addInitScript(() => { try { if (sessionStorage.getItem('sh_smoke_fresh')) return; sessionStorage.setItem('sh_smoke_fresh', '1');
+        ['sh_pet_born', 'sh_pet_log', 'sh_pet_outfit', 'sh_pet_adopt_sent', 'sh_pet_perfect', 'sh_egg_holiday_test', 'sh_pref_pet', 'sh_pref_focus'].forEach(k => localStorage.removeItem(k));
+        localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); localStorage.setItem('sh_tour_done', '1'); } catch (e) {} });
+      const game = async (page, adopts, asked) => {
+        await petFrom(page);
+        page.on('request', r => { if (/\/widget\/hub-art\/outfits\.js/.test(r.url())) asked.push('outfits.js'); });
+        await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => json(route, { rank, mastery: [], shop: shop(), pet_days: [] }));
+        await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => json(route, shop()));
+        await page.route(/supabase\.co\/rest\/v1\/rpc\/record_achievement/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {} if (a.p_kind === 'pet-adopt') adopts.push(a.p_hub); return json(route, true); });
+        await page.route(/supabase\.co\/rest\/v1\/rpc\/equip_item/, route => {
+          let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
+          if (a.p_item) equipped[a.p_slot] = a.p_item; else delete equipped[a.p_slot];
+          return json(route, { ok: true, equipped });
+        });
+      };
+      /* what Timmy on the bar (or in the "you" card) has on, against the shop's drawings (outfits.js, once it is here) */
+      const bar = (page, sel) => page.evaluate(sel => {
+        const b = document.querySelector(sel), h = b ? b.innerHTML : '', O = window.SH_OUTFITS, P = window.shPet;
+        /* the page serializes the drawing its own way (<path/> comes back as <path></path>): compare the parts the same way */
+        const norm = x => { const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.innerHTML = x; return g.innerHTML; };
+        const kept = JSON.parse(localStorage.getItem('sh_pet_outfit') || 'null');
+        /* the kit's drawing of it once outfits.js is here; before that (a later visit), the one kept on the device */
+        const has = id => { const p = (O && O.parts[id]) || (kept && kept.id === id ? kept : null); return !!p && [p.top, p.face, p.back].filter(Boolean).every(x => h.includes(norm(x))); };
+        return { here: !!b, dressed: /shpet-(hat|garb|back)/.test(h), bowTie: has('bow-tie'), sunHat: has('sun-hat'), fit: P ? P.fit() : null, hp: P ? P.hp() : null,
+          kept, born: localStorage.getItem('sh_pet_born'), on: document.documentElement.classList.contains('sh-pet-on'),
+          intro: !!document.querySelector('.shpet-dlg'), perch: !!document.querySelector('.shpet-perch, #petPerch, .dx-porch'), say: (document.querySelector('.shpet-say') || {}).textContent || '' };
+      }, sel);
+      for (const hub of nextHubs.slice(0, 1)) {
+        const page = await context.newPage(), errs = [], adopts = [], asked = [], name = `${hub}/next, everyone has Timmy`;
+        page.on('pageerror', e => errs.push(e.message));
+        await game(page, adopts, asked);
+        await fresh(page);
+        await page.goto(BASE() + `hubs/${hub}/next/index.html#more`); await page.waitForTimeout(3000);
+        let t = await bar(page, '.shpet-home .shpet-btn');
+        if (!t.here || !t.on) problems.push(`${name} (${label}): a first-time visitor has no Timmy on the bar (${JSON.stringify({ here: t.here, on: t.on })})`);
+        if (t.intro || /Tap me!/.test(t.say)) problems.push(`${name} (${label}): a first-time visitor got the adoption introduction or "Tap me!" (${JSON.stringify({ intro: t.intro, say: t.say })})`);
+        if (t.born !== today || adopts.join() !== today) problems.push(`${name} (${label}): meeting Timmy should make today his birthday and send the pet-adopt badge once (${t.born}, ${adopts.join() || 'none sent'})`);
+        if (t.hp !== 100) problems.push(`${name} (${label}): a Timmy met on or after the redesign's day should start at 100 HP, not ${t.hp}`);
+        if (t.fit !== 'bow-tie') problems.push(`${name} (${label}): shPet.fit() should be the bootstrap's outfit id, bow-tie, not "${t.fit}"`);
+        if (asked.length || t.dressed) problems.push(`${name} (${label}): with nothing kept on the device, outfits.js loaded with the page or he wore something before it came (${asked.join(', ')}, ${t.dressed})`);
+        const tiles = await page.evaluate(() => [...document.querySelectorAll('a[href="#more/place"], a[href="#more/shop"]')].map(a => a.getAttribute('href')).join());
+        if (!/#more\/place/.test(tiles) || !/#more\/shop/.test(tiles)) problems.push(`${name} (${label}): More should have Timmy's place and the shop for everyone (${tiles})`);
+        await page.keyboard.press('Shift'); await page.waitForFunction(() => window.SH_OUTFITS, null, { timeout: 15000 }).catch(() => {}); await page.waitForTimeout(500);
+        t = await bar(page, '.shpet-home .shpet-btn');
+        if (!t.bowTie || !t.kept || t.kept.id !== 'bow-tie') problems.push(`${name} (${label}): after the first key Timmy should wear the bow tie and keep it on the device (${JSON.stringify({ bowTie: t.bowTie, kept: t.kept && t.kept.id })})`);
+        /* the next visit: the kept drawing, no request, and no first hello */
+        asked.length = 0;
+        await page.reload(); await page.waitForTimeout(2500); await page.keyboard.press('Shift'); await page.waitForTimeout(800);
+        t = await bar(page, '.shpet-home .shpet-btn');
+        if (!t.bowTie || asked.length) problems.push(`${name} (${label}): on the next visit Timmy should wear the kept bow tie with no request for outfits.js (${t.bowTie}, ${asked.join(', ')})`);
+        if (/Hi, I'm Timmy Tooth/.test(t.say) || adopts.length !== 1) problems.push(`${name} (${label}): the first hello or the badge came again on the next visit (${adopts.length} sent)`);
+        /* nothing on, on Halloween: nothing on him (no holiday costume of his own) */
+        delete equipped.outfit; asked.length = 0;
+        await page.evaluate(() => localStorage.setItem('sh_egg_holiday_test', 'halloween'));
+        await page.reload(); await page.waitForTimeout(2500);
+        t = await bar(page, '.shpet-home .shpet-btn');
+        if (t.dressed || t.fit !== '' || !t.kept || t.kept.id !== '' || asked.length) problems.push(`${name} (${label}): with nothing on, on Halloween, Timmy should wear nothing (${JSON.stringify({ dressed: t.dressed, fit: t.fit, kept: t.kept, asked })})`);
+        /* the customizer: the sun hat goes on, and the bar follows without a reload */
+        await page.evaluate(() => { location.hash = 'more/place'; });
+        const card = await page.waitForSelector('.place-card .tpc.is-live', { timeout: 20000 }).catch(() => null);
+        if (!card) problems.push(`${name} (${label}): Timmy's place didn't draw`);
+        else {
+          await card.click(); await page.waitForSelector('dialog.tpv[open]', { timeout: 8000 }).catch(() => {});
+          await page.click('dialog.tpv [data-tp="customize"]').catch(() => {}); await page.waitForTimeout(500);
+          await page.click('dialog.tpv .tpv-tile[data-pick="timmy"]').catch(() => {}); await page.waitForTimeout(500);
+          const hat = await page.$('dialog.tpv .tpv-card[data-item="sun-hat"]');
+          if (!hat) problems.push(`${name} (${label}): the customizer has no sun hat to put on`);
+          else {
+            await hat.click(); await page.waitForTimeout(1200);
+            const s = await page.evaluate(() => { const b = document.querySelector('.shpet-home .shpet-btn'), K = window.SH_PLACE, o = K && K.OUTFITS.filter(x => x.id === 'sun-hat')[0], p = o && K.outfitParts(o.k);
+              const norm = x => { const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.innerHTML = x; return g.innerHTML; };
+              return { on: !!p && !!b && b.innerHTML.includes(norm(p.top)), fit: window.shPet.fit(), kept: (JSON.parse(localStorage.getItem('sh_pet_outfit') || '{}') || {}).id }; });
+            if (!s.on || s.fit !== 'sun-hat' || s.kept !== 'sun-hat' || equipped.outfit !== 'sun-hat') problems.push(`${name} (${label}): putting on the sun hat at his place should dress Timmy on the bar at once (${JSON.stringify(s)}, saved: ${equipped.outfit})`);
+          }
+          await page.keyboard.press('Escape'); await page.waitForTimeout(300);
+        }
+        errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+        notes.push(`${name} (${label}): a first visit, his outfit kept, nothing on at Halloween, the customizer`);
+        await page.close();
+      }
+      if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
+        equipped.outfit = 'bow-tie';
+        const page = await context.newPage(), errs = [], adopts = [], asked = [], name = 'next (dashboard), everyone has Timmy';
+        page.on('pageerror', e => errs.push(e.message));
+        await game(page, adopts, asked);
+        await fresh(page);
+        await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(3000);
+        let t = await bar(page, '#petHome .shpet-btn');
+        const house = await page.evaluate(() => !!document.querySelector('#petHome.shpet-house:not([hidden])'));
+        if (!house || !t.here || t.perch || t.intro) problems.push(`${name} (${label}): a first-time visitor should find Timmy in the "you" card, with no porch, perch or introduction (${JSON.stringify({ house, here: t.here, perch: t.perch, intro: t.intro })})`);
+        if (t.hp !== 100 || t.born !== today || adopts.join() !== today) problems.push(`${name} (${label}): meeting him starts him at 100 HP, today, with the badge sent (${t.hp}, ${t.born}, ${adopts.join() || 'none'})`);
+        if (t.fit !== 'bow-tie') problems.push(`${name} (${label}): shPet.fit() should be bow-tie, not "${t.fit}"`);
+        await page.keyboard.press('Shift'); await page.waitForFunction(() => window.SH_OUTFITS, null, { timeout: 15000 }).catch(() => {}); await page.waitForTimeout(500);
+        t = await bar(page, '#petHome .shpet-btn');
+        if (!t.bowTie) problems.push(`${name} (${label}): Timmy in the "you" card should wear the bow tie`);
+        errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+        notes.push(`${name} (${label}): a first visit, in his outfit`);
+        await page.close();
+      }
+      /* the live pages, as they were */
+      for (const hub of hubs.slice(0, 1)) {
+        const page = await context.newPage(), errs = [], asked = [], name = `${hub}, Timmy as before`;
+        page.on('pageerror', e => errs.push(e.message));
+        page.on('request', r => { if (/\/widget\/hub-art\/outfits\.js/.test(r.url())) asked.push('outfits.js'); });
+        await fresh(page);
+        await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(2500);
+        const before = await page.evaluate(() => ({ on: document.documentElement.classList.contains('sh-pet-on'), born: localStorage.getItem('sh_pet_born'), fit: window.shPet ? window.shPet.fit() : null }));
+        if (before.on || before.born || before.fit !== '') problems.push(`${name} (${label}): a live hub shouldn't show or adopt a Timmy nobody has met (${JSON.stringify(before)})`);
+        await page.evaluate(() => { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_egg_holiday_test', 'halloween'); });
+        await page.reload(); await page.waitForTimeout(2500);
+        const t = await bar(page, '.shpet-home .shpet-btn');
+        if (!t.on || !/^halloween:[a-z0-9-]+$/.test(t.fit || '') || !t.dressed) problems.push(`${name} (${label}): an adopted Timmy on a live hub should wear his own Halloween costume, fit() "halloween:<outfit>" (${JSON.stringify({ on: t.on, fit: t.fit, dressed: t.dressed })})`);
+        if (t.kept || asked.length) problems.push(`${name} (${label}): a live hub kept or fetched an outfit (${JSON.stringify(t.kept)}, ${asked.join(', ')})`);
+        errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+        await page.close();
+      }
+      {
+        const page = await context.newPage(), errs = [], name = 'dashboard, Timmy as before';
+        page.on('pageerror', e => errs.push(e.message));
+        await fresh(page);
+        await page.goto(BASE() + 'index.html'); await page.waitForTimeout(2600);
+        const p = await page.evaluate(() => ({ perch: !!document.querySelector('.shpet-perch'), say: (document.querySelector('.shpet-perch .shpet-say') || {}).textContent || '', born: localStorage.getItem('sh_pet_born') }));
+        if (!p.perch || !/Tap me/.test(p.say) || p.born) problems.push(`${name} (${label}): before he's adopted, Timmy should wait on the live dashboard with "Tap me!" (${JSON.stringify(p)})`);
+        else {
+          await page.click('.shpet-perch .shpet-btn'); await page.waitForTimeout(500);
+          const i = await page.evaluate(() => { const d = document.querySelector('.shpet-dlg'); return d ? { hi: /Hi! I'm Timmy Tooth/.test(d.textContent), no: !!d.querySelector('[data-no]') } : null; });
+          if (!i || !i.hi || !i.no) problems.push(`${name} (${label}): tapping him should open the adoption introduction with "No thanks" (${JSON.stringify(i)})`);
+        }
+        errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+        notes.push(`${hubs[0]} and the dashboard (${label}): Timmy's adoption, "Tap me!", the holiday outfit and fit() as before`);
+        await page.evaluate(() => { ['sh_pet_born', 'sh_egg_holiday_test'].forEach(k => localStorage.removeItem(k)); });
+        await page.close();
+      }
     }
     await context.close();
   }
