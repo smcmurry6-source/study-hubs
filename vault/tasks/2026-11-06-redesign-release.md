@@ -1082,5 +1082,15 @@ is a new migration and Sam's call, never a restore.
   and the **motion** block at the end of `widget/hub.css` (pop-ups rise, a hub's pages and the dashboard's hub panel
   slide in; `html.hx-still` turns it off). Left as to-dos in the [inbox](inbox.md): Heme & Endo Exam 2's retrospective
   and recap, the two missing recaps, a typed answer in Learn and an undo for a flashcard rating (both only if Sam asks).
+  **The round's tests:** CI and the one local run of `node tools/release/run.js` (16 of 17 suites passed; the smoke
+  test's 8 lines were the two things below) found four bugs in the round's own work, all fixed in the PR
+  ([bug log](../release/bug-log.md)): BUG-141 (the road made the phone dashboard 708 px wide), BUG-142 (the check-ins
+  note's contrast), BUG-143 (a hub's top strip at the largest text size) and BUG-144 (the tab slide widened the page
+  for a moment, and never played for Notes and Questions: it is on the view itself now). A fifth, BUG-145, was found by
+  eye in the screenshots: the new week ring had reused the hub panel ring's class name (`dx-ring`), which put that
+  ring on top of Start studying; **no suite looks for one control drawn over another**, so look at the screenshots.
+  Two tests were taught the hub shelves (`tools/ci/smoke.js`, `tools/release/a11y.js`). When measuring a phone page's
+  width in a script, compare with the device's width (`page.viewportSize().width`), not `innerWidth`: an emulated
+  phone widens `innerWidth` to fit a page that is too wide.
 
 ## Outcome
