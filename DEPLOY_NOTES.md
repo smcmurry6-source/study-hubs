@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-13 (the game layer's wiring, phase 4 session 8, Claude Code)** — Nothing students see changes: every new call
+  runs only on a page on the game layer (`shGame.v2()`), which no live page is, and the smoke test plays two arcade games
+  and Timmy Time on a live hub with this change's files and with `main`'s and fails unless the calls are identical. On
+  the redesign's pages, once migration_v54 is applied: **the arcade** starts and finishes a session per game
+  (`xp_session_start` / `xp_session_finish`: the +50, and the server posts the score, so no `submit_arcade_score`), its
+  answers carry the session, and the toast says "<game> finished: +50 XP." (`widget/games.js`: `shGames.played`, `over`,
+  `session`, `ran`; a hub's own games get the hooks from `tools/hub-next/build.mjs`'s `gameHooks`, so the three hubs'
+  `next/content/arcade.js` were rebuilt); **Timmy Time** sends each minute heard as `pod_minute_v2` and its XP reaches the
+  pill (`widget/podcast.js`, `sh:pod-paid`, `widget/hub-rewards.js`; minutes sent kept in `sh_pod_min:<hub>:<episode>`);
+  **the admin page's Inbox** reads `get_reports_v2` and resolves as "Fixed" (+100 to the sender) or "No change needed"
+  with `admin_resolve_report_v2` (`review/index.html`), today's Inbox without them. The preview answers all of it
+  (BUG-122: its made-up reports now stay resolved). Neither pending migration was applied or changed. Left for the
+  release: the episode lengths (`admin_set_podcast_episode`: 2688 s and 3101 s) and `sw.js` (no new file).
+  [The task](vault/tasks/done/2026-11-12-redesign-game-layer-wiring.md).
 - **2026-11-13 (the trophy case and the cards, phase 4 session 6, Claude Code)** — One live fix (Sam: "ship the BUG-116 live fix
   too"): after a level-up card, later cards (a rank-up, a trophy, a medal, a mock result) play again; until now none
   did until the page reloaded. Otherwise nothing students see changes: the live hubs and dashboard keep 24 trophies, Full Arch, the old Stats panel and today's cards. On the redesign's pages

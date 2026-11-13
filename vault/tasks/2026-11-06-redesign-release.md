@@ -69,10 +69,12 @@ task is the one PR that then switches the site over. If something goes wrong, re
       ([to-do](2026-11-12-audio-off-at-archiving.md)). High yield's recordings (`<lecture>-hy.mp3`) come off with the rest;
       the build's `hyAudio` then lists none by itself (`tools/hub-next/build.mjs` checks the files)
 - [ ] The game layer's wiring left by phase 4, part A (2026-11-12, "From phase 4, part A" below): the arcade's
-      sessions and pick indexes and Timmy Time's minutes are [their own session](2026-11-12-redesign-game-layer-wiring.md)
+      sessions and pick indexes and Timmy Time's minutes are [their own session](done/2026-11-12-redesign-game-layer-wiring.md)
       before this one (Sam, 2026-11-12); the journey trophies join the case in
-      [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md); the scenes stay silent. Left for
-      this PR: each episode's length loaded (`admin_set_podcast_episode`) and the service worker's lists
+      [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md); the scenes stay silent. The arcade,
+      Timmy Time and the admin page's "Fixed" are wired since 2026-11-13 (ticked below). Left for
+      this PR: each episode's length loaded (`admin_set_podcast_episode`, step 4 of the migration's steps) and the service
+      worker's lists (the wiring added no file)
 - [ ] **Full Arch comes out** (Sam, 2026-11-12: "I also want to remove the full arch challenge thing"; the redesign's
       pages stop showing it in [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md)). In this
       PR, from the shared files: its code in `widget/eggs.js` (and the top comment's lines about it), its styles in
@@ -374,13 +376,16 @@ the first answer, or answers are recorded and pay nothing (`why: unknown`).
 
 **Still to wire, at the release or before it** (the box in Done when):
 
-- [ ] **The arcade** (`widget/games.js`, shared with the live hubs until the switch): a game starts a session
+- [x] **The arcade** (`widget/games.js`, shared with the live hubs until the switch): a game starts a session
       (`shGame.startSession("arcade", game)`) and finishes it (`finishSession(id, score)`: the +50, and the server posts
       the score itself, so the page stops calling `submit_arcade_score` for it); its answers send the pick's authored
       index and `session`. An answer without an index is refused by the server and recorded by today's calls instead.
-- [ ] **Timmy Time** (`widget/podcast.js`): each minute heard reports to `pod_minute_v2`; the +100 at 90% is the
+      Done 2026-11-13 by [the wiring](done/2026-11-12-redesign-game-layer-wiring.md) (`shGames.played` / `over`, and
+      `gameHooks` in `tools/hub-next/build.mjs` for a hub's own games).
+- [x] **Timmy Time** (`widget/podcast.js`): each minute heard reports to `pod_minute_v2`; the +100 at 90% is the
       server's. Its XP should reach the pill the way an answer's does (an event like `sh:answer-paid`, or a profile
-      refresh).
+      refresh). Done 2026-11-13 by [the wiring](done/2026-11-12-redesign-game-layer-wiring.md) (`sh:pod-paid`); it pays
+      only once step 4 below has loaded the episode's length.
 - [x] **The journey trophies in the trophy case**: `journey-0` to `journey-2` are drawn (`SH_JOURNEY_ART.trophies`) and
       show on the road ahead and in the hand-off; the case in Stats (`widget/ranks.js`, `TROPHIES`) doesn't list them
       yet, so it still says 24. They join it when phase 4 redraws the case, with `get_trophy_stats_v2` for their
@@ -403,7 +408,8 @@ entries; tagged new; nothing here is a secret):
   in a minute) still count but earn nothing. Counted across every hub.
 - **More ways to earn XP**: +30 at your 20th answer of the day; +5 the first time you get right a question you missed
   on an earlier day; +50 for a mock exam with 10 or more answers (once a hub a day); +50 for finishing an arcade game
-  (each game once a day); 10 a minute for a Timmy Time episode you hear for the first time and +100 for finishing it;
+  (each game once a day, after 20 seconds of play); 10 for each minute of a Timmy Time episode you hear for the first time
+  (most of the minute, up to twice as fast) and +100 for finishing it;
   +100 when a report or suggestion you sent is fixed; and +100, +200, +300 and +500 for a hub's Bronze, Silver, Gold
   and Crown medals.
 - **Double XP**: every new mastery medal starts 24 hours of double XP on answers, the day's bonuses, mocks and games
@@ -696,7 +702,9 @@ The sessions that build each part fix the drafts they make untrue; this is the l
    never committed), through the connector, and check the count it returns. A hub that keeps its old page records answers
    the old way and needs none, but an idea can only name a hub with keys: load them for each live hub, or its ideas use
    "All hubs".
-4. **Set each episode's length** (`admin_set_podcast_episode`), so Timmy Time's minutes pay.
+4. **Set each episode's length** (`admin_set_podcast_episode`), so Timmy Time's minutes pay: Occlusion `midterm-review`
+   2688 s and Heme & Endo Exam 2 `exam2-review` 3101 s (`podcast.duration` in each hub's `next/content/core.json`, rounded
+   up); Perio has no episode. Until then `pod_minute_v2` answers `unknown` and the page stops asking for that visit.
 5. **Post the starter ideas** (`admin_post_starter_idea`, the table in [the idea board](2026-11-06-idea-board.md)), checked
    against the About page first.
 6. The new pages call the new functions: `record_answer_v2` in place of `record_answer`, `record_choice` /

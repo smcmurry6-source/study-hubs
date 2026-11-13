@@ -200,8 +200,27 @@ and `widget/v3.js` then asks for `get_widget_bootstrap_v2`, sends each answer as
 to today's calls when the function isn't there, or when the server answers `bad` because a one-choice question came
 without a pick), starts and finishes a mock's session, and hands the server's reply to the engine as `sh:answer-paid`
 (`window.shGame`). `widget/ranks.js` reads `get_rank_profile_v2` there, plays the hand-off and the Dark Matter unlock
-(`widget/journeys.js`) and calls `mark_dark_unlock_seen` when an unlock ends or is skipped. Not wired yet: an arcade
-game's session, `pod_minute_v2` ([the release](../tasks/2026-11-06-redesign-release.md), "From phase 4, part A").
+(`widget/journeys.js`) and calls `mark_dark_unlock_seen` when an unlock ends or is skipped.
+
+**The arcade, Timmy Time and the admin page's "Fixed" have their pages since 2026-11-13** (phase 4, session 8,
+[the wiring](../tasks/done/2026-11-12-redesign-game-layer-wiring.md)). Each runs only where `shGame.v2()` is true, so a
+live page makes today's calls (the smoke test compares them with `main`'s files):
+- **The arcade** (`widget/games.js`): `shGames.played(game, name)` at a game's start calls
+  `shGame.startSession("arcade", game)`; `shGames.over(game, score, today)` at its end calls `finishSession(id, score)`
+  (the score whole, 0 to 200000) in place of `submit_arcade_score`, and falls back to `today()` when there is no session
+  or the finish fails. The five shared games call `played` in their `begin()`; a hub's own games (`arcade.js`) get both
+  hooks from `tools/hub-next/build.mjs` (`gameHooks`), which fails the build if it can't find every game's start.
+  `widget/hub-rewards.js` puts the session (`shGames.session()`) on an arcade answer and turns `sh:session-paid` into
+  the pill, today's XP and "<the lobby's game name> finished: +50 XP." (`shGames.ran(id)`). Perio's Pocket Crusher
+  answers have no pick, so the server says `bad` and they go out as today's calls, as the server intends.
+- **Timmy Time** (`widget/podcast.js`): a minute counts once three quarters of it (45 s, less for a short last minute)
+  has been heard on the device (`sh_pod_min:<hub>:<episode>`, beside `sh_pod_heard`), and the lowest such minute is
+  sent as `pod_minute_v2` no sooner than 26 s after the last one paid. `unknown` (the episode's length not loaded yet)
+  or a missing function stops the calls for the visit. What a minute pays goes out as `sh:pod-paid`
+  (`{ hub, ep, minute, res }`), which `widget/hub-rewards.js` adds to the pill ("Timmy Time finished: +100 XP." at the end).
+- **The admin page** (`review/index.html`): the Inbox reads `get_reports_v2` (`reportsRpc()`, `repV2` once it answered)
+  and offers "Fixed" and "No change needed" through `admin_resolve_report_v2`, with Reopen as `open`; without the
+  functions it reads `get_reports` and resolves with `set_report_resolved`, as today.
 
 **Timmy's place has its client since 2026-11-12** (phase 4, part C, [the place](../tasks/2026-11-06-redesign-timmys-place.md)):
 `widget/place.js` reads the bootstrap's `shop` (or `get_my_shop`) for `inventory`, `locked` and `equipped`, draws the

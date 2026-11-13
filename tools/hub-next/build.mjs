@@ -61,7 +61,7 @@ function hyRecorded(hub, lec, html){
   try { const d = JSON.parse(readFileSync(wf, "utf8")); return d.v === 1 && d.h === textHash(html) && d.bytes === statSync(mp3).size; } catch (e) { return false; }
 }
 
-/* The game layer's arcade sessions (vault/tasks/2026-11-12-redesign-game-layer-wiring.md; widget/games.js's played and
+/* The game layer's arcade sessions (vault/tasks/done/2026-11-12-redesign-game-layer-wiring.md; widget/games.js's played and
    over). The live hub's arcade is copied as it is, plus two hooks only the redesign's page has, and both do nothing until
    that page is on the game layer (window.shGame.v2()):
    1. A play of one of the hub's own games (Cusp Sort, Pocket Crusher) starts its session where its start overlay comes

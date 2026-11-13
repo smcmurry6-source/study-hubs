@@ -110,7 +110,7 @@ async function askCheck(page, name, o){
   if (await page.$('.ska.is-on')) { await page.click('[data-ska="close"]'); await page.waitForTimeout(300); }
   return sent;
 }
-/* The game layer's wiring (phase 4, session 8; vault/tasks/2026-11-12-redesign-game-layer-wiring.md), desktop only.
+/* The game layer's wiring (phase 4, session 8; vault/tasks/done/2026-11-12-redesign-game-layer-wiring.md), desktop only.
    navigator.webdriver is hidden so the widget records (every call is answered here; nothing is written anywhere).
    1. A new hub on the game layer: Million-Dollar Smile played to the end twice (one right answer and Walk away, then
       Play again and one wrong answer) makes, each play, one xp_session_start ("arcade", "smile") and one xp_session_finish
