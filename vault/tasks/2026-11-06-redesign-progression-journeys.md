@@ -153,7 +153,8 @@ old rate, about half the leaders' new pace); past days as they were. Groups by X
       and asked for a bigger hand-off, which was redrawn and recorded for Sam (full and reduced motion) from the design
       page; no preview was made (asked once, Sam didn't ask for one), so the recording on the preview is left to the
       release's own preview ([phase 4](2026-11-05-redesign-phase-4-game-layer.md), its "Every card and the cutscene" box)
-- [ ] The admin page's resolve control has "Fixed" and "No change needed"
+- [x] The admin page's resolve control has "Fixed" and "No change needed" (2026-11-13, [the wiring](done/2026-11-12-redesign-game-layer-wiring.md):
+      `admin_resolve_report_v2` and `get_reports_v2` when the database has them, today's Inbox otherwise)
 - [ ] The About page's rank, XP and trophy entries rewritten, counts true; event taxonomy and retention rows for any new table
 - [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
 - [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)

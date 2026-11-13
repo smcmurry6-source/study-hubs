@@ -71,14 +71,17 @@ const problems = [], notes = [];
         for (const w of ['write record_answer', 'write record_personal_answer', 'write record_choice']) if (!got.includes(w)) problems.push(`${hub}: answering didn't reach the fixtures as "${w}" (got: ${got.join(', ') || 'nothing'})`);
       });
     }
-    /* the admin page unlocks with the preview's secret only */
+    /* the admin page unlocks with the preview's secret only (its sign-in reads get_reports_v2 where the game layer's
+       migration is there, as in the preview, and get_reports otherwise) */
     await visit(context, 'review/?persona=admin', `admin page (${tag})`, async page => {
       await page.waitForTimeout(800);
-      const r = await page.evaluate(() => { const lg = window.__shPreview.log(); return { reads: lg.filter(x => x.name === 'get_reports' && x.kind === 'read').length, denied: lg.filter(x => x.kind === 'denied').length }; });
+      const r = await page.evaluate(() => { const lg = window.__shPreview.log(); return { reads: lg.filter(x => /^get_reports(_v2)?$/.test(x.name) && x.kind === 'read').length, denied: lg.filter(x => x.kind === 'denied').length }; });
       if (!r.reads) problems.push('admin page: the admin test account didn\'t unlock it with the preview secret');
       if (r.denied) problems.push(`admin page: ${r.denied} admin call(s) refused for the admin test account`);
-      const wrong = await page.evaluate(() => window.__shPreview.rpc('get_reports', { p_secret: 'not-the-secret' }));
-      if (!wrong.error) problems.push('admin page: get_reports accepted a wrong secret in the fixtures');
+      for (const fn of ['get_reports', 'get_reports_v2']) {
+        const wrong = await page.evaluate(f => window.__shPreview.rpc(f, { p_secret: 'not-the-secret' }), fn);
+        if (!wrong.error) problems.push(`admin page: ${fn} accepted a wrong secret in the fixtures`);
+      }
     });
     if (!vp.isMobile) {
       /* writes from a page: a report and a display name */

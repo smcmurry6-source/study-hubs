@@ -12,6 +12,9 @@
 //     reach everyone's chat (on, off); the Inbox's "Read the chat with Timmy" doesn't open that chat; the calls answer
 //     without the admin secret; before the release (the functions missing) the tab doesn't say so; serious or critical
 //     axe violations on the tab with a chat open (when axe-core is installed, as in CI);
+//   - the Inbox on the game layer (migration_v54's get_reports_v2 and admin_resolve_report_v2) doesn't offer No change
+//     needed and Fixed, either doesn't make its own call, a resolved report doesn't say what it was resolved as (and that
+//     Fixed paid +100), Reopen isn't the same call with "open"; before the release, resolving isn't today's set_report_resolved;
 //   - any admin screen scrolls sideways at 390 px, a page throws, or any request heads for Supabase;
 //   - the page turns dark on a dark-mode device (it is light only, Sam 2026-11-06).
 // Screenshots (desktop light, phone on a dark-mode device) go to $SH_RELEASE_OUT/admin-ui/.   node tools/release/admin-ui.js
@@ -67,7 +70,7 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     const calls = () => page.evaluate(() => window.__shPreview.log().map(x => x.name));
     const first = await calls();
     ok(!first.some(n => /get_click_summary|get_search_terms|get_survey_results|get_feature_events|get_nuke_/.test(n)), `the Overview loads only its own data (it asked for ${[...new Set(first)].join(', ')})`);
-    ok(first.filter(n => n === 'get_reports').length === 1, 'the sign-in check\'s reports are reused, not fetched twice');
+    ok(first.filter(n => /^get_reports(_v2)?$/.test(n)).join() === 'get_reports_v2', `the sign-in check's reports (get_reports_v2 on the game layer) are reused, not fetched twice (${first.filter(n => /^get_reports/.test(n)).join(', ')})`);
     /* every view opens with its own title and no error */
     for (const v of ['insights', 'time', 'questions', 'health', 'clicks', 'searches', 'engagement', 'checkins', 'surveys', 'timmy', 'inbox', 'recap', 'overview']) {
       await go(page, v);
@@ -181,13 +184,44 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     ok(/Open/.test(await page.textContent(`${T} [data-tm-report-id="8811"] .report-top`)), 'the reported answer shows as open');
     await page.screenshot({ path: path.join(shots, 'timmy-reported-desktop-light.png'), fullPage: true });
     await page.click(`${T} [data-tm-report-id="8811"] a[href="#inbox"]`);
-    await page.waitForSelector('.report[data-id="8811"] .resolve-btn');
+    await page.waitForSelector('.report[data-id="8811"] .resolve-btn[data-outcome="fixed"]');
     await page.fill('.report[data-id="8811"] .report-replybox', 'Thanks: Timmy\'s rules now say to quote the notes word for word.');
-    await page.click('.report[data-id="8811"] .resolve-btn');
+    await page.click('.report[data-id="8811"] .resolve-btn[data-outcome="fixed"]');
     await page.waitForSelector('[data-panel=inbox] .report[data-id="8811"]', { state: 'detached' });   /* the Inbox shows open reports */
     await go(page, 'timmy'); await page.click('#refreshBtn');
     await page.waitForFunction(() => /Resolved/.test((document.querySelector('[data-panel=timmy] [data-tm-report-id="8811"] .report-top') || {}).textContent || ''), null, { timeout: 10000 });
     notes.push('Ask Timmy: the Inbox opens a reported answer\'s chat; resolving it there shows Resolved here');
+
+    /* the Inbox on the game layer (migration_v54's get_reports_v2 and admin_resolve_report_v2, which the preview answers):
+       an open report offers No change needed and Fixed, each makes its own call (Fixed pays the sender +100, said on the
+       resolved card), Reopen is the same call with "open", and today's set_report_resolved isn't called */
+    const parse = d => { try { return JSON.parse(d || '{}'); } catch (e) { return {}; } };
+    const resolves = () => page.evaluate(() => window.__shPreview.log().filter(x => x.kind === 'write' && /^(admin_resolve_report_v2|set_report_resolved)$/.test(x.name)).map(x => [x.name, x.detail]));
+    const r0 = (await resolves()).length;
+    await go(page, 'inbox');
+    await page.waitForSelector('.report[data-id="8801"] .resolve-btn[data-outcome="fixed"]', { timeout: 10000 });
+    ok(await page.$$eval('.report[data-id="8801"] .resolve-btn', bs => bs.map(b => b.getAttribute('data-outcome') + ':' + b.textContent).join()) === 'no-change:No change needed,fixed:Fixed',
+      'on the game layer an open report offers No change needed and Fixed');
+    ok(/Fixed pays the sender 100 XP/.test(await page.textContent('.report[data-id="8801"] .report-sent')), 'an open report says Fixed pays the sender 100 XP');
+    await page.fill('.report[data-id="8801"] .report-replybox', 'Fixed: choice C reads differently now.');
+    await page.click('.report[data-id="8801"] .resolve-btn[data-outcome="fixed"]');
+    await page.waitForSelector('[data-panel=inbox] .report[data-id="8801"]', { state: 'detached' });
+    await page.click('.report[data-id="8802"] .resolve-btn[data-outcome="no-change"]');
+    await page.waitForSelector('[data-panel=inbox] .report[data-id="8802"]', { state: 'detached' });
+    await page.click('[data-inbox="resolved"]');
+    await page.waitForSelector('.report.is-resolved[data-id="8801"]');
+    const said = await page.evaluate(() => ['8801', '8802'].map(id => (document.querySelector(`.report.is-resolved[data-id="${id}"]`) || {}).textContent || ''));
+    ok(/Fixed/.test(said[0]) && /\+100 XP paid to the sender/.test(said[0]) && /No change needed/.test(said[1]) && !/XP paid/.test(said[1]),
+      `a resolved report says what it was resolved as, and Fixed that its +100 was paid (${JSON.stringify(said.map(t => t.slice(0, 160)))})`);
+    await page.screenshot({ path: path.join(shots, 'inbox-resolved-desktop-light.png'), fullPage: true });
+    await page.click('.report.is-resolved[data-id="8801"] .resolve-btn[data-outcome="open"]');
+    await page.waitForFunction(() => !document.querySelector('.report.is-resolved[data-id="8801"]'));
+    await page.click('[data-inbox="open"]');
+    await page.waitForSelector('.report[data-id="8801"] .resolve-btn[data-outcome="fixed"]');
+    const made = (await resolves()).slice(r0).map(([n, d]) => { const a = parse(d); return [n, a.p_kind, a.p_id, a.p_outcome, a.p_reply || null]; });
+    ok(JSON.stringify(made) === JSON.stringify([['admin_resolve_report_v2', 'flag', 8801, 'fixed', 'Fixed: choice C reads differently now.'], ['admin_resolve_report_v2', 'suggestion', 8802, 'no-change', null], ['admin_resolve_report_v2', 'flag', 8801, 'open', null]]),
+      `Fixed, No change needed and Reopen should each make one admin_resolve_report_v2 call, and none set_report_resolved (${JSON.stringify(made)})`);
+    notes.push('Inbox on the game layer: No change needed and Fixed on an open report, each its own admin_resolve_report_v2 call; Fixed says its +100 was paid; Reopen is the same call with "open"');
 
     /* Live: count, names, no ids, polling only while open and visible */
     const liveCalls = () => page.evaluate(() => window.__shPreview.log().filter(x => x.name === 'admin_live_presence').length);
@@ -335,7 +369,7 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     /* ---------- 3. before the release: the live database has no admin_timmy_* functions, and the tab says so ---------- */
     const pre = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: 'light' });
     const G3 = await L.guard(pre);
-    await pre.addInitScript(() => { try { const u = JSON.parse(localStorage.getItem('sh_preview_ui') || '{}'); u.missing = ['admin_timmy_']; localStorage.setItem('sh_preview_ui', JSON.stringify(u)); } catch (e) {} });
+    await pre.addInitScript(() => { try { const u = JSON.parse(localStorage.getItem('sh_preview_ui') || '{}'); u.missing = ['admin_timmy_', 'get_reports_v2', 'admin_resolve_report_v2']; localStorage.setItem('sh_preview_ui', JSON.stringify(u)); } catch (e) {} });
     const b4 = await admin(pre, `review/?persona=admin&now=${NOW}#timmy`);
     await b4.waitForFunction(() => /migration_v55/.test((document.querySelector('[data-panel=timmy]') || {}).textContent || ''), null, { timeout: 15000 });
     ok(/starts at the redesign’s release/.test(await b4.textContent('#viewSub')) && !(await b4.$('[data-panel=timmy] .err')) && !(await b4.$('[data-panel=timmy] [data-tm-form]')),
@@ -343,9 +377,17 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     await b4.screenshot({ path: path.join(shots, 'timmy-before-release-desktop-light.png') });
     await go(b4, 'overview'); await b4.waitForSelector('[data-panel=overview] .card');
     ok(!(await b4.$('[data-panel=overview] .err')), 'the rest of the page works without them');
+    /* and the Inbox is today's: one Resolve and notify, which calls set_report_resolved */
+    await go(b4, 'inbox'); await b4.waitForSelector('.report[data-id="8802"] .resolve-btn', { timeout: 10000 });
+    ok(await b4.$$eval('.report[data-id="8802"] .resolve-btn', bs => bs.map(b => b.textContent + (b.hasAttribute('data-outcome') ? ' (v2)' : '')).join()) === 'Resolve and notify',
+      'before the release an open report has today\'s one button');
+    await b4.click('.report[data-id="8802"] .resolve-btn');
+    await b4.waitForSelector('[data-panel=inbox] .report[data-id="8802"]', { state: 'detached' });
+    const w4 = await b4.evaluate(() => window.__shPreview.log().filter(x => x.kind === 'write' && /^(admin_resolve_report_v2|set_report_resolved)$/.test(x.name)).map(x => x.name));
+    ok(JSON.stringify(w4) === '["set_report_resolved"]', `before the release resolving makes today's set_report_resolved call (${JSON.stringify(w4)})`);
     ok(G3.leaks.length === 0, `before the release: requests to Supabase: ${G3.leaks.join(', ')}`);
     await pre.close();
-    notes.push('before the release (admin_timmy_* missing, as on the live database): the tab says Ask Timmy starts at the release; the rest of the page works');
+    notes.push('before the release (admin_timmy_*, get_reports_v2 and admin_resolve_report_v2 missing, as on the live database): the tab says Ask Timmy starts at the release; the rest of the page works; the Inbox resolves with today\'s set_report_resolved');
     ok(!errs.length, `page errors: ${errs.slice(0, 3).join(' | ')}`);
     notes.push(`screenshots in ${shots}`);
   } catch (e) {

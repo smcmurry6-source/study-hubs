@@ -608,6 +608,20 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   function table(name, cols){
     return supabase.from(name).select(cols).then(function(r){ return r && r.error ? { error: r.error } : { data: (r && r.data) || [] }; }, function(e){ return { error: e }; });
   }
+  /* the Inbox's list: get_reports_v2 (migration_v54, at the redesign's release) adds each report's outcome and whether its
+     +100 XP was paid, and the resolve control then offers Fixed and No change needed (admin_resolve_report_v2, which pays
+     the sender for Fixed); until the database has it, today's get_reports and set_report_resolved. repV2 is null until the
+     first answer, then true or false. */
+  var repV2 = null;
+  function reportsRpc(){
+    var plain = function(){ return supabase.rpc("get_reports", { p_secret: secret }); };
+    if (repV2 === false) return plain();
+    return supabase.rpc("get_reports_v2", { p_secret: secret }).then(function(res){
+      if (res && res.error && needsMigration(res.error)) { repV2 = false; return plain(); }
+      if (res && !res.error) repV2 = true;
+      return res;
+    });
+  }
   var SRC = {
     summary:     { r: 1, f: function(d){ return rpc("get_visitor_summary", { p_secret: secret, p_days: d }); } },
     byHub:       { r: 1, f: function(d){ return rpc("get_visitor_by_hub", { p_secret: secret, p_days: d }); } },
@@ -620,7 +634,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     nukeHub:     { r: 1, f: function(d){ return rpc("get_nuke_by_hub", { p_secret: secret, p_days: d }); } },
     nukeRecent:  { f: function(){ return rpc("get_nuke_recent", { p_secret: secret, p_limit: 10 }); } },
     nukeUnlocks: { r: 1, f: function(d){ return rpc("get_nuke_unlocks", { p_secret: secret, p_days: d }); } },
-    reports:     { f: function(){ return rpc("get_reports", { p_secret: secret }); } },
+    reports:     { f: function(){ return reportsRpc().then(function(r){ return r && r.error ? { error: r.error } : { data: (r && r.data) || [] }; }, function(e){ return { error: e }; }); } },
     clicks:      { r: 1, f: function(d){ return rpc("get_click_summary", { p_secret: secret, p_days: d }); } },
     features:    { r: 1, f: function(d){ return rpc("get_feature_events", { p_secret: secret, p_days: d }); } },
     searches:    { r: 1, f: function(d){ return rpc("get_search_terms", { p_secret: secret, p_days: d }); } },
@@ -1197,10 +1211,13 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       /* a report from Ask Timmy's Report button ends "— Timmy's answer <id> · <where>": the Timmy tab opens that whole chat */
       if (r.kind === "flag" && /— Timmy's answer \d+/.test(r.note || "")) note += '<div><a class="card-link" href="#timmy" data-tm-report="' + esc(r.id) + '">Read the chat with Timmy</a></div>';
       if (r.resolved) {
-        return '<div class="report is-resolved" data-kind="' + esc(r.kind) + '" data-id="' + esc(r.id) + '">' + head + note +
+        /* on the game layer, what it was resolved as, and whether the sender's +100 XP was paid */
+        var outc = repV2 && r.outcome ? '<div class="report-top"><span class="pill' + (r.outcome === "fixed" ? ' pos">Fixed' : '">No change needed') + '</span>' +
+          (r.xp_paid ? '<span class="report-sent">+100 XP paid to the sender</span>' : '') + '</div>' : '';
+        return '<div class="report is-resolved" data-kind="' + esc(r.kind) + '" data-id="' + esc(r.id) + '">' + head + note + outc +
           (r.reply ? '<div class="report-reply"><b>Your reply:</b> ' + esc(r.reply) + '</div>' : '') +
           '<div class="report-actions"><span class="report-sent grow">' + (r.can_notify ? (r.reply_seen_at ? 'Seen by the sender ' + fmtDate(r.reply_seen_at) : 'The sender sees it on their next visit') : 'Sent before replies existed: the sender can’t be notified') + '</span>' +
-          '<button class="btn resolve-btn is-done" type="button">Reopen</button></div></div>';
+          '<button class="btn resolve-btn is-done" type="button"' + (repV2 ? ' data-outcome="open"' : '') + '>Reopen</button></div></div>';
       }
       var rid = "r-" + esc(r.kind) + "-" + esc(r.id);
       return '<div class="report" data-kind="' + esc(r.kind) + '" data-id="' + esc(r.id) + '">' + head + note +
@@ -1208,8 +1225,11 @@ table.data.tm-table td.lbl{white-space:nowrap;}
         /* what the whole class sees: its own wording, since the reply is written to one person */
         '<div class="report-everyone" hidden><label class="field"><span>Notice title, for everyone</span><input class="input report-all-title" maxlength="120" value="' + esc(r.kind === "flag" ? "A question was fixed after a student report" : "A classmate's suggestion was added") + '"></label>' +
         '<label class="field"><span>Notice message</span><textarea class="input report-all-msg" maxlength="1500"></textarea><small>Shown once on every hub and the dashboard, then kept in everyone’s Inbox for 60 days.</small></label></div>' +
-        '<div class="report-actions"><label class="toggle"><input type="checkbox" class="switch report-all"> Also tell everyone</label><span class="report-sent grow">' + (r.can_notify ? 'The sender is notified when you resolve it.' : 'Sent before replies existed: only a notice to everyone reaches anyone.') + '</span>' +
-        '<span class="inline-msg msg-err report-msg" role="status"></span><button class="btn primary resolve-btn" type="button">Resolve and notify</button></div></div>';
+        '<div class="report-actions"><label class="toggle"><input type="checkbox" class="switch report-all"> Also tell everyone</label><span class="report-sent grow">' + (r.can_notify ? 'The sender is notified when you resolve it.' : 'Sent before replies existed: only a notice to everyone reaches anyone.') + (repV2 ? ' Fixed pays the sender 100 XP.' : '') + '</span>' +
+        '<span class="inline-msg msg-err report-msg" role="status"></span>' + (repV2
+          /* on the game layer: Fixed pays the sender +100 XP; No change needed pays nothing. Both notify, as today */
+          ? '<button class="btn resolve-btn" type="button" data-outcome="no-change">No change needed</button><button class="btn primary resolve-btn" type="button" data-outcome="fixed">Fixed</button>'
+          : '<button class="btn primary resolve-btn" type="button">Resolve and notify</button>') + '</div></div>';
     }).join("") : empty(state.inbox === "open" ? "Nothing open. Every report has a reply." : "Nothing here yet.");
     el.innerHTML = '<div class="stack">' + card("Reports and suggestions", fmtNum(open.length) + " open · " + fmtNum(all.length) + " in all", list, filter) + podCommentsCard() + ideasCard() + '</div>';
     el.dataset.ready = "1";
@@ -2693,7 +2713,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var id = Number(cardEl.getAttribute("data-id"));
     var row = (D("reports").data || []).find(function(r){ return r.kind === kind && r.id === id; });
     if (!row) return;
-    var next = !row.resolved;
+    var next = !row.resolved, outcome = repV2 ? btn.getAttribute("data-outcome") : null;
     var box = cardEl.querySelector(".report-replybox");
     var reply = box ? box.value.trim() : "";
     var toAll = !!(cardEl.querySelector(".report-all") || {}).checked;
@@ -2701,9 +2721,19 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var allMsg = toAll ? cardEl.querySelector(".report-all-msg").value.trim() : "";
     var m = cardEl.querySelector(".report-msg");
     if (next && toAll && (!allTitle || !allMsg)) { if (m) m.textContent = "Write the notice to everyone first: a title and a message."; return; }
-    btn.disabled = true; if (m) m.textContent = "";
-    supabase.rpc("set_report_resolved", { p_secret: secret, p_kind: kind, p_id: id, p_resolved: next, p_reply: reply || null }).then(function(res){
-      if (res && res.error) { btn.disabled = false; if (m) m.textContent = "Couldn’t save: " + (res.error.message || "the server said no") + "."; return; }
+    var btns = cardEl.querySelectorAll(".resolve-btn");
+    btns.forEach(function(b){ b.disabled = true; }); if (m) m.textContent = "";
+    function again(){ btns.forEach(function(b){ b.disabled = false; }); }
+    /* on the game layer: Fixed (+100 XP to the sender), No change needed, or Reopen ("open"); today's call otherwise */
+    var call = outcome ? supabase.rpc("admin_resolve_report_v2", { p_secret: secret, p_kind: kind, p_id: id, p_outcome: outcome, p_reply: reply || null })
+      : supabase.rpc("set_report_resolved", { p_secret: secret, p_kind: kind, p_id: id, p_resolved: next, p_reply: reply || null });
+    call.then(function(res){
+      if (res && res.error) { again(); if (m) m.textContent = "Couldn’t save: " + (res.error.message || "the server said no") + "."; return; }
+      if (outcome && res && res.data && res.data.ok === false) { again(); if (m) m.textContent = "Couldn’t save: that report isn’t there any more. Try Refresh."; return; }
+      if (outcome) {
+        row.outcome = outcome === "open" ? null : outcome;
+        if (res && res.data && res.data.xp > 0) row.xp_paid = true;
+      }
       row.resolved = next;
       if (next) { if (reply) row.reply = reply; row.resolved_at = new Date().toISOString(); row.reply_seen_at = null; }
       /* "Tell everyone": a notice every visitor sees once and keeps in their Inbox (widget/replies.js) */
@@ -2713,7 +2743,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
         });
       }
       updateInboxCount(); renderInbox();
-    }, function(){ btn.disabled = false; if (m) m.textContent = "Couldn’t reach the server. Try again."; });
+    }, function(){ again(); if (m) m.textContent = "Couldn’t reach the server. Try again."; });
   });
 
   /* ---------- sign-in ---------- */
@@ -2726,7 +2756,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     secret = candidate;
     gateBtn.disabled = true;
     gateMsg.textContent = "Checking…";
-    supabase.rpc("get_reports", { p_secret: secret }).then(function(res){
+    reportsRpc().then(function(res){
       gateBtn.disabled = false;
       if (res && res.error) { showApp(false, "That passphrase didn’t work."); return; }
       try { sessionStorage.setItem(SESSION_KEY, secret); } catch (e) {}

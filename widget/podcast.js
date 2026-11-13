@@ -60,9 +60,69 @@
         var key = "sh_pod_heard:" + HUB + ":" + P.id, was = parseFloat(ls(key)) || 0, now = was + dt;
         ls(key, now.toFixed(1));
         if (d) [0.25, 0.5, 0.75, 0.95].forEach(function(f, i){ if (was < f * d && now >= f * d) track("q" + (i + 1)); });
+        minHeard(lastT, dt);
       }
     }
     lastT = t;
+  }
+
+  /* the game layer (migration_v54, at the redesign's release; vault/reference/game-server.md): on a page on it
+     (window.shGame.v2(), the redesign's hubs), each minute of the episode heard pays 10 XP the first time
+     (pod_minute_v2, the minute's index from 0), and the server adds +100 once 90% of its minutes are heard. A minute
+     counts as heard after 45 seconds of it played (seeks excluded, as above; the episode's last, shorter minute after
+     three quarters of it), kept on the device across visits (sh_pod_min:<hub>:<episode>: seconds heard of each minute not
+     yet sent, and the minutes the server took). Minutes go one at a time, never within 26 seconds of the last one paid
+     (the server pays one every 25, so 2x speed still pays them all). What a call paid goes out as sh:pod-paid, for the
+     engine's pill (widget/hub-rewards.js). Off the game layer (every live hub), in an automated browser, or once the
+     server says the function or the episode's length isn't there (until the release loads it), none of this runs. */
+  var MIN = { off: false, busy: false, last: 0, timer: 0 };
+  function minOn(){
+    var G = window.shGame;
+    if (MIN.off || !P || !G || !G.v2 || !G.v2()) return false;
+    try { if (navigator.webdriver) return false; } catch (e) {}
+    return true;
+  }
+  function minKey(){ return "sh_pod_min:" + HUB + ":" + P.id; }
+  function minRead(){
+    var o = null; try { o = JSON.parse(ls(minKey()) || "null"); } catch (e) {}
+    if (!o || typeof o !== "object") o = {};
+    if (!o.h || typeof o.h !== "object") o.h = {};
+    if (!Array.isArray(o.p)) o.p = [];
+    return o;
+  }
+  function minNeed(m){ var d = duration(), left = d ? d - m * 60 : 60; return Math.max(1, Math.min(45, left * 0.75)); }
+  function minHeard(from, dt){
+    if (!minOn()) return;
+    var m = Math.floor(from / 60), o = minRead();
+    if (m < 0 || o.p.indexOf(m) > -1) return;
+    o.h[m] = Math.round(((o.h[m] || 0) + dt) * 10) / 10;
+    ls(minKey(), JSON.stringify(o));
+    if (o.h[m] >= minNeed(m)) minSend();
+  }
+  function minTook(m){ var o = minRead(); if (o.p.indexOf(m) < 0) o.p.push(m); delete o.h[m]; ls(minKey(), JSON.stringify(o)); }
+  function missing(res){ var e = res && res.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
+  function minSend(){
+    if (MIN.busy || MIN.timer || !minOn()) return;
+    var o = minRead(), ready = Object.keys(o.h).map(Number).filter(function(m){ return o.p.indexOf(m) < 0 && o.h[m] >= minNeed(m); }).sort(function(a, b){ return a - b; });
+    var s = sb(); if (!ready.length || !s) return;
+    var wait = MIN.last + 26000 - Date.now();
+    if (wait > 0) { MIN.timer = setTimeout(function(){ MIN.timer = 0; minSend(); }, wait); return; }
+    var m = ready[0];
+    MIN.busy = true;
+    var call; try { call = s.rpc("pod_minute_v2", { p_visitor: visitor(), p_hub: HUB, p_ep: P.id, p_minute: m }); } catch (e) { MIN.busy = false; return; }
+    call.then(function(res){
+      MIN.busy = false;
+      if (missing(res)) { MIN.off = true; return; }
+      var r = res && !res.error ? res.data : null;
+      /* the network or the server hiccuped: the minute waits, and nothing more goes for 26 seconds */
+      if (!r || typeof r !== "object") { MIN.last = Date.now(); return; }
+      if (r.ok === false) { if (r.error === "unknown") { MIN.off = true; return; } minTook(m); minSend(); return; }   // past the episode's end
+      if (r.why === "fast") { MIN.last = Date.now(); minSend(); return; }   // another tab or device was paid just now
+      minTook(m);
+      if (r.xp > 0) MIN.last = Date.now();
+      try { document.dispatchEvent(new CustomEvent("sh:pod-paid", { detail: { hub: HUB, ep: P.id, minute: m, res: r } })); } catch (e) {}
+      minSend();
+    }, function(){ MIN.busy = false; MIN.last = Date.now(); });
   }
 
   function ensureAudio(){

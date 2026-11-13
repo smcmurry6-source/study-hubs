@@ -1,13 +1,13 @@
 ---
 type: task
-status: open
+status: done
 hub: widget
 created: 2026-11-12
 requested-by: Sam
 due: before the redesign's release
 waiting-on: 
-agent: 
-pr: 
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/357
 ---
 
 # The game layer's wiring left by part A: the arcade, Timmy Time and the admin page's "Fixed"
@@ -20,11 +20,11 @@ Fixed (+100). Wire them before the release, in their own session, so the release
 
 ## Context
 
-- Session 8 of [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release". "For every session
-  above" there holds here. Sam, 2026-11-12 ([decisions](../decisions.md)): its own session before the release.
-- What part A wired and left: [the journeys](2026-11-06-redesign-progression-journeys.md) (its Log and "Open
-  calls") and [the release note](2026-11-06-redesign-release.md), "From phase 4, part A". The rules:
-  [game-server](../reference/game-server.md), "Answers and XP".
+- Session 8 of [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release". "For every session
+  above" there holds here. Sam, 2026-11-12 ([decisions](../../decisions.md)): its own session before the release.
+- What part A wired and left: [the journeys](../2026-11-06-redesign-progression-journeys.md) (its Log and "Open
+  calls") and [the release note](../2026-11-06-redesign-release.md), "From phase 4, part A". The rules:
+  [game-server](../../reference/game-server.md), "Answers and XP".
 - What part A built for this: `window.shGame` in `widget/v3.js` (`v2()`, `startSession(kind, game)`,
   `finishSession(id, score, total)`), `HX.recordAnswer(qid, lec, right, ctx, choice, picks, { order, session })`, and
   the events `sh:answer-paid` and `sh:session-paid`, which `widget/hub-rewards.js` already turns into the pill's
@@ -81,28 +81,60 @@ while playing. The page-load request counts don't change.
 - The admin page in a preview (`node tools/release/run.js` runs it): Fixed and No change needed each make their call.
 
 **Out of scope**: sound for the scenes (the redesign has no sound setting: Sam hasn't asked for one); the journey
-trophies in the case ([the trophy case](done/2026-11-12-redesign-trophy-case-and-cards.md)); `sw.js`; applying anything.
+trophies in the case ([the trophy case](2026-11-12-redesign-trophy-case-and-cards.md)); `sw.js`; applying anything.
 
 ## Done when
 
-- [ ] An arcade game on a new hub starts and finishes a session and pays its +50 through the server
-- [ ] Timmy Time's minutes report, and what they pay shows on the pill
-- [ ] The admin page resolves a report as Fixed or No change needed (the box in
-      [the journeys](2026-11-06-redesign-progression-journeys.md))
-- [ ] The live hubs make exactly today's calls (the smoke test on every hub)
-- [ ] The release note's box "The game layer's wiring left by phase 4, part A" ticked for the arcade and Timmy
+- [x] An arcade game on a new hub starts and finishes a session and pays its +50 through the server
+- [x] Timmy Time's minutes report, and what they pay shows on the pill
+- [x] The admin page resolves a report as Fixed or No change needed (the box in
+      [the journeys](../2026-11-06-redesign-progression-journeys.md))
+- [x] The live hubs make exactly today's calls (the smoke test on every hub)
+- [x] The release note's box "The game layer's wiring left by phase 4, part A" ticked for the arcade and Timmy
       Time, with what is left for the release itself (episode lengths, `sw.js`) still listed
-- [ ] `node tools/release/run.js` once; vault written back (`DEPLOY_NOTES.md`, the hand-off in phase 4's Log, this
+- [x] `node tools/release/run.js` once; vault written back (`DEPLOY_NOTES.md`, the hand-off in phase 4's Log, this
       note's Outcome)
 
 ## Log
 
 - 2026-11-12 (Claude Code, planning only): written from the release note's box, as its own session (Sam's call).
+- 2026-11-13 (Claude Code): built (session 8). Nothing students see changes: every new call runs only where
+  `shGame.v2()` is true, which no live page is. Neither pending migration was applied or changed, and nothing in the
+  client disagrees with them. No hosted preview (Sam); screenshots from the preview server on made-up data. See the Outcome.
 
 ## Outcome
 
-Related: [the journeys](2026-11-06-redesign-progression-journeys.md) · [game-server](../reference/game-server.md) ·
-[the release](2026-11-06-redesign-release.md) · [phase 4](2026-11-05-redesign-phase-4-game-layer.md)
+Built 2026-11-13 ([#357](https://github.com/smcmurry6-source/study-hubs/pull/357)). What is where ([game-server](../../reference/game-server.md) has the client's rules):
+
+- **The arcade** (`widget/games.js`): `shGames.played(game, name)` starts a session at a game's start,
+  `shGames.over(game, score, today)` finishes it at its end in place of `submit_arcade_score` (today's call when there
+  is no session or the finish fails), `shGames.session()` and `shGames.ran(id)` (the game and its lobby name). The five
+  shared games call `played` in `begin()`. A hub's own games (`hubs/<hub>/next/content/arcade.js`: Occlusion's and Heme &
+  Endo Exam 2's Sort, Perio's Pocket Crusher) get both hooks from `tools/hub-next/build.mjs` (`gameHooks`; the build
+  fails if a game's start isn't found). Answers inside a game already sent the authored pick (`HX.recordAnswer`); they
+  now carry the session too (`widget/hub-rewards.js`, `arcSession()`). The +50 shows as "<game> finished: +50 XP.".
+- **Timmy Time** (`widget/podcast.js`, `minHeard` / `minSend`): a minute is sent once 45 s of it were heard (less for a
+  short last minute), at most one call every 26 s, the lowest minute first, kept on the device in
+  `sh_pod_min:<hub>:<episode>` so a reload doesn't send it again. `unknown` (no episode length) stops the calls for the
+  visit. `sh:pod-paid` reaches the pill (`widget/hub-rewards.js`), with "Timmy Time finished: +100 XP." at the end.
+- **The admin page** (`review/index.html`): the Inbox reads `get_reports_v2` and resolves with
+  `admin_resolve_report_v2` ("No change needed", "Fixed", and Reopen as `open`); a resolved row says which, and
+  "+100 XP paid to the sender" when it was. Without the functions it is today's Inbox.
+- **The preview** (`tools/preview/runtime/preview.js`): the arcade's sessions, `pod_minute_v2` (from the page's own
+  episode length), `get_reports_v2` and `admin_resolve_report_v2` behind the fixture secret; a resolved fixture
+  report now stays resolved (BUG-122).
+- **Tests**: `tools/ci/smoke.js`'s `wiringCheck` (a new hub on stubbed v2 functions: two Smile games, a hub's own game,
+  a Timmy Time minute, the pill and the toasts; then the live page against `main`'s `games.js` and `podcast.js`:
+  identical calls, no v2 call) and `tools/release/admin-ui.js` (Fixed, No change needed and Reopen make exactly their
+  calls; without the functions, one "Resolve and notify" and `set_report_resolved`). `tools/release/xp.js` unchanged.
+
+**Left for the release** (its note, Done when and the migration steps): each episode's length
+(`admin_set_podcast_episode`: Occlusion `midterm-review` 2688 s, Heme & Endo Exam 2 `exam2-review` 3101 s; Perio has
+no episode), or the minutes pay nothing; `sw.js` (no new file from this session). The About page's XP entries are
+already drafted in the release note.
+
+Related: [the journeys](../2026-11-06-redesign-progression-journeys.md) · [game-server](../../reference/game-server.md) ·
+[the release](../2026-11-06-redesign-release.md) · [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)
 
 ## Opening prompt
 

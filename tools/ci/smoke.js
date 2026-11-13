@@ -110,6 +110,190 @@ async function askCheck(page, name, o){
   if (await page.$('.ska.is-on')) { await page.click('[data-ska="close"]'); await page.waitForTimeout(300); }
   return sent;
 }
+/* The game layer's wiring (phase 4, session 8; vault/tasks/done/2026-11-12-redesign-game-layer-wiring.md), desktop only.
+   navigator.webdriver is hidden so the widget records (every call is answered here; nothing is written anywhere).
+   1. A new hub on the game layer: Million-Dollar Smile played to the end twice (one right answer and Walk away, then
+      Play again and one wrong answer) makes, each play, one xp_session_start ("arcade", "smile") and one xp_session_finish
+      with that session and the score, and no submit_arcade_score; each answer is one record_answer_v2 with the pick's
+      authored index (not its place on screen) and its play's session, and none of today's answer calls; the stubbed +50s
+      reach the rank pill, and the toast names the game. Then Timmy Time plays with 44.9 seconds of minute 0 already heard
+      on this device: one pod_minute_v2 (minute 0), its stubbed 10 XP on the pill, the minute kept as taken.
+   2. The live hub, the same steps, with this branch's widget/games.js and podcast.js and then with the base's (git show
+      of SMOKE_CHANGED_FROM, or where this branch left origin/main): the same calls, in the same order, with the same
+      arguments (the question and the pick aside: they're random); none is a game-layer call; the score goes to
+      submit_arcade_score; nothing writes an sh_pod_min key. */
+async function wiringCheck(context, hub, label){
+  const cp = require('child_process'), QS = JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'questions.json'), 'utf8'));
+  const EP = (JSON.parse(fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'core.json'), 'utf8')).podcast || {}).id || null;
+  const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+  const unbot = () => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} };
+  const args = r => { try { return JSON.parse(r.postData() || '{}'); } catch (e) { return {}; } };
+  const fnOf = u => (/\/rpc\/([a-z0-9_]+)/.exec(u) || [])[1] || '';
+  /* the question on screen, answered right (its authored answer's text) or wrong (another choice): what was picked */
+  async function answer(page, right){
+    await page.waitForFunction(() => document.querySelectorAll('.ms-opt').length && !document.querySelector('.ms-opt.right, .ms-opt.locked'), null, { timeout: 12000 });
+    const shown = await page.evaluate(() => { const q = document.querySelector('.ms-q'), f = q.querySelector('.ms-for');
+      return { stem: q.textContent.slice(f ? f.textContent.length : 0), opts: [...document.querySelectorAll('.ms-opt span')].map(s => s.textContent) }; });
+    const q = QS.find(x => x.stem === shown.stem && shown.opts.every(t => (x.choices || []).includes(t)));
+    if (!q) return null;
+    const at = shown.opts.findIndex(t => (t === q.choices[q.answer]) === !!right);
+    await page.click(`.ms-opt[data-ms="${at}"]`);
+    return { qid: q.id, choice: q.choices.indexOf(shown.opts[at]), at, right: !!right };
+  }
+  /* one right answer and Walk away ($100), then Play again and one wrong answer ($0) */
+  async function play(page, startSel){
+    const picks = [];
+    await page.click(startSel);
+    await page.waitForSelector('#panel-arcade [data-start]', { timeout: 10000 });
+    await page.click('#panel-arcade [data-start]');
+    picks.push(await answer(page, true));
+    await page.waitForSelector('#panel-arcade [data-walk]:not([disabled])', { timeout: 12000 });
+    await page.waitForFunction(() => !document.querySelector('.ms-opt.locked'), null, { timeout: 12000 });
+    await page.click('#panel-arcade [data-walk]');
+    await page.waitForSelector('#panel-arcade [data-overlay] [data-start]', { timeout: 12000 });
+    await page.waitForTimeout(600);
+    await page.click('#panel-arcade [data-overlay] [data-start]');
+    picks.push(await answer(page, false));
+    await page.waitForSelector('#panel-arcade [data-overlay] [data-start]', { timeout: 15000 });
+    await page.waitForTimeout(1200);
+    return picks;
+  }
+  const watch = (page, calls) => page.on('request', r => { const u = r.url(); if (r.method() === 'POST' && /supabase\.co\/rest\/v1\/rpc\//.test(u)) calls.push({ fn: fnOf(u), a: args(r) }); });
+
+  /* 1. the new hub, on the game layer */
+  {
+    const page = await context.newPage(), errs = [], calls = [], name = `${hub}/next, the game layer's wiring`;
+    page.on('pageerror', e => errs.push(e.message));
+    await page.addInitScript(unbot);
+    let total = 2400, sids = 0;
+    const rank = () => ({ xp: total, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null });
+    watch(page, calls);
+    await page.route(/supabase\.co\/rest\/v1\/rpc\/(get_widget_bootstrap_v2|get_rank_profile_v2|record_answer_v2|xp_session_start|xp_session_finish|pod_minute_v2)(\?|$)/, route => {
+      const fn = fnOf(route.request().url());
+      if (fn === 'get_widget_bootstrap_v2') return json(route, { rank: rank(), mastery: [] });
+      if (fn === 'get_rank_profile_v2') return json(route, rank());
+      if (fn === 'record_answer_v2') { total += 1; return json(route, { ok: true, xp: 1, base: 1, mult: 1, why: null, bonus: [], boost: null, total }); }
+      if (fn === 'xp_session_start') return json(route, '00000000-0000-4000-8000-00000000a8c' + (++sids));
+      if (fn === 'xp_session_finish') { total += 50; return json(route, { ok: true, xp: 50, mult: 1 }); }
+      total += 10; return json(route, { ok: true, xp: 10, done: 0, mult: 1, heard: 1, of: 52 });
+    });
+    await page.goto(BASE() + `hubs/${hub}/next/index.html#more/arcade`);
+    const on = await page.waitForFunction(() => window.shGame && window.shGame.v2(), null, { timeout: 15000 }).catch(() => null);
+    await page.waitForSelector('.ar-grid [data-game="smile"]', { timeout: 20000 }).catch(() => {});
+    if (!on || !(await page.$('.ar-grid [data-game="smile"]'))) problems.push(`${name} (${label}): the page didn't come up on the game layer with Million-Dollar Smile in the arcade`);
+    else {
+      const from = calls.length, toasts = [];
+      await page.exposeFunction('__toast', t => toasts.push(t));
+      await page.evaluate(() => { const host = document.getElementById('hxToast'); if (host) new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.classList && n.classList.contains('hx-toast')) window.__toast(n.textContent); }))).observe(host, { childList: true }); });
+      const picks = await play(page, '.ar-grid [data-game="smile"]');
+      for (let i = 0; i < 20 && calls.filter(c => c.fn === 'xp_session_finish').length < 2; i++) await page.waitForTimeout(250);
+      await page.waitForTimeout(500);
+      const got = calls.slice(from), by = fn => got.filter(c => c.fn === fn);
+      const starts = by('xp_session_start'), fins = by('xp_session_finish'), ans = by('record_answer_v2');
+      if (picks.some(p => !p)) problems.push(`${name} (${label}): couldn't read Smile's question from the page`);
+      if (starts.length !== 2 || starts.some(c => c.a.p_kind !== 'arcade' || c.a.p_game !== 'smile' || c.a.p_hub !== hub)) problems.push(`${name} (${label}): two plays should start two arcade sessions for "smile" (${JSON.stringify(starts.map(c => c.a))})`);
+      const fin = fins.map(c => [c.a.p_session, c.a.p_score]);
+      if (JSON.stringify(fin) !== JSON.stringify([['00000000-0000-4000-8000-00000000a8c1', 100], ['00000000-0000-4000-8000-00000000a8c2', 0]])) problems.push(`${name} (${label}): each play should finish its own session with its score ($100, then $0): ${JSON.stringify(fin)}`);
+      if (by('submit_arcade_score').length) problems.push(`${name} (${label}): on the game layer the server posts the score, but the page called submit_arcade_score`);
+      const old = got.filter(c => /^record_(answer|choice|choices|personal_answer|correct_streak)$/.test(c.fn)).map(c => c.fn);
+      if (old.length) problems.push(`${name} (${label}): an arcade answer also went out the old way (${old.join(', ')})`);
+      const want = picks.filter(Boolean).map((p, i) => [p.qid, p.choice, 'arcade', '00000000-0000-4000-8000-00000000a8c' + (i + 1)]);
+      const sent = ans.map(c => [c.a.p_qid, c.a.p_choice, c.a.p_ctx, c.a.p_session]);
+      if (JSON.stringify(sent) !== JSON.stringify(want)) problems.push(`${name} (${label}): each arcade answer should be one record_answer_v2 with the authored index and its play's session: sent ${JSON.stringify(sent)}, picked ${JSON.stringify(want)}`);
+      const pill = await page.evaluate(() => Number(((document.querySelector('#hxRank [data-xp]') || {}).textContent || '').replace(/\D/g, '')));
+      if (pill !== total) problems.push(`${name} (${label}): the rank pill reads ${pill} XP after the games, not the ${total} the server paid`);
+      const gname = await page.evaluate(() => ((((window.SH_HUB || {}).arcade || {}).games || []).find(g => g.id === 'smile') || {}).name || '');
+      if (!toasts.includes(`${gname} finished: +50 XP.`)) problems.push(`${name} (${label}): the +50's toast should name the game as the lobby does ("${gname} finished: +50 XP."): ${JSON.stringify(toasts)}`);
+      /* one of the hub's own games (Cusp Sort, Pocket Crusher): its session starts where its overlay comes off, through
+         the hook tools/hub-next/build.mjs puts in */
+      const AJ = fs.readFileSync(path.join(root, 'hubs', hub, 'next', 'content', 'arcade.js'), 'utf8');
+      const ownId = [...((/var GAMES = \[([\s\S]*?)\n\s*\];/.exec(AJ) || [])[1] || '').matchAll(/\bid:\s*'([a-z]+)'/g)].map(m => m[1]).find(id => !['board', 'cloze', 'escape', 'cross', 'smile'].includes(id));
+      if (ownId) {
+        const f3 = calls.length;
+        await page.click('#panel-arcade [data-back]'); await page.waitForSelector(`.ar-grid [data-game="${ownId}"]`, { timeout: 8000 });
+        await page.click(`.ar-grid [data-game="${ownId}"]`); await page.waitForSelector('#panel-arcade [data-start]', { timeout: 8000 });
+        await page.click('#panel-arcade [data-start]');
+        for (let i = 0; i < 20 && !calls.slice(f3).some(c => c.fn === 'xp_session_start'); i++) await page.waitForTimeout(250);
+        const st = calls.slice(f3).filter(c => c.fn === 'xp_session_start').map(c => c.a.p_game);
+        if (JSON.stringify(st) !== JSON.stringify([ownId])) problems.push(`${name} (${label}): starting ${ownId}, one of the hub's own games, should start one session for it (${JSON.stringify(st)})`);
+        await page.click('#panel-arcade [data-back]').catch(() => {}); await page.waitForTimeout(300);
+      }
+      /* Timmy Time */
+      if (EP) {
+        const key = `sh_pod_min:${hub}:${EP}`, f2 = calls.length;
+        await page.evaluate(k => localStorage.setItem(k, JSON.stringify({ h: { 0: 44.9 }, p: [] })), key);
+        await page.evaluate(() => { location.hash = 'more/timmy'; });
+        await page.waitForSelector('.sh-pod-play', { timeout: 15000 }).catch(() => {});
+        const before = total;
+        await page.click('.sh-pod-play').catch(() => {});
+        for (let i = 0; i < 40 && !calls.slice(f2).some(c => c.fn === 'pod_minute_v2'); i++) await page.waitForTimeout(250);
+        await page.waitForTimeout(1500);
+        await page.evaluate(() => { const a = document.querySelector('audio.sh-pod-audio'); if (a) a.pause(); });
+        const pm = calls.slice(f2).filter(c => c.fn === 'pod_minute_v2');
+        const kept = await page.evaluate(k => localStorage.getItem(k), key);
+        const pill2 = await page.evaluate(() => Number(((document.querySelector('#hxRank [data-xp]') || {}).textContent || '').replace(/\D/g, '')));
+        await page.evaluate(k => localStorage.removeItem(k), key);   /* the live hub below shares this origin's storage */
+        if (pm.length !== 1 || pm[0].a.p_minute !== 0 || pm[0].a.p_ep !== EP || pm[0].a.p_hub !== hub || !pm[0].a.p_visitor) problems.push(`${name} (${label}): a minute heard should report once, as minute 0 of ${EP} (${JSON.stringify(pm.map(c => c.a))})`);
+        else {
+          if (pill2 !== before + 10) problems.push(`${name} (${label}): the rank pill reads ${pill2} after a Timmy Time minute, not the ${before + 10} the server paid`);
+          if (!/"p":\[0\]/.test(kept || '')) problems.push(`${name} (${label}): the minute the server took isn't kept on the device (${kept})`);
+        }
+      }
+      notes.push(`${name} (${label}): two plays of Smile, each a session (start, answers with the authored index, finish with the score), no submit_arcade_score; +50 on the pill${ownId ? `; ${ownId} starts its own session` : ''}${EP ? '; a Timmy Time minute reported once' : ''}`);
+    }
+    errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+    await page.close();
+  }
+
+  /* 2. the live hub: today's calls, with this branch's files and with the base's */
+  let base = null;
+  try {
+    const ref = process.env.SMOKE_CHANGED_FROM || cp.execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    const show = f => cp.execFileSync('git', ['show', `${ref}:${f}`], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 1 << 26 });
+    base = { ref, games: show('widget/games.js'), podcast: show('widget/podcast.js') };
+  } catch (e) {}
+  /* what a live page sends while it plays, without the batches that go out on a timer and carry a per-visit id or the
+     random questions (the activity ping, click and feature counts, question health's record_qh: none of them changed here) */
+  const KEEP = /^(record_(?!activity_ping$|clicks?$|feature_events?$|qh$)|submit_|xp_|pod_|get_arcade_leaderboard$)|_v2$/;
+  const norm = c => c.fn + ' ' + JSON.stringify(Object.keys(c.a).sort().reduce((o, k) => { o[k] = /^p_(qid|choice|choices)$/.test(k) ? '*' : c.a[k]; return o; }, {}));
+  async function live(files){
+    const page = await context.newPage(), errs = [], calls = [];
+    page.on('pageerror', e => errs.push(e.message));
+    await page.addInitScript(unbot);
+    if (files) for (const [re, body] of [[/\/widget\/games\.js(\?|$)/, files.games], [/\/widget\/podcast\.js(\?|$)/, files.podcast]])
+      await page.route(re, route => route.fulfill({ status: 200, contentType: 'application/javascript', body }));
+    watch(page, calls);
+    await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);
+    await page.evaluate(() => Object.keys(localStorage).filter(k => /^sh_pod_(min|pos):/.test(k)).forEach(k => localStorage.removeItem(k)));
+    await page.click('.sh-archived-stay', { timeout: 1000 }).catch(() => {});
+    await page.click('#modeSwitch [data-mode="arcade"]'); await page.waitForTimeout(400);
+    const from = calls.length;
+    let picks = [];
+    try { picks = await play(page, '#panel-arcade .ar-grid [data-game="smile"]'); } catch (e) { errs.push('playing Smile: ' + e.message.split('\n')[0]); }
+    await page.click('#modeSwitch [data-mode="home"]').catch(() => {}); await page.waitForTimeout(400);
+    await page.click('.sh-pod-play').catch(() => {}); await page.waitForTimeout(2500);
+    await page.evaluate(() => { const a = document.querySelector('audio.sh-pod-audio'); if (a) a.pause(); });
+    const pod = await page.evaluate(() => Object.keys(localStorage).filter(k => /^sh_pod_min:/.test(k)));
+    await page.close();
+    return { calls: calls.slice(from).filter(c => KEEP.test(c.fn)), picks, pod, errs };
+  }
+  const name = `${hub} (live), the game layer's wiring`, now = await live(null);
+  const fns = now.calls.map(c => c.fn);
+  if (fns.some(f => /_v2$|^xp_session_|^pod_minute/.test(f))) problems.push(`${name} (${label}): a live hub made a game-layer call (${fns.join(', ')})`);
+  const subs = now.calls.filter(c => c.fn === 'submit_arcade_score').map(c => [c.a.p_game, c.a.p_score]);
+  if (JSON.stringify(subs) !== '[["smile",100]]') problems.push(`${name} (${label}): the $100 game should post its score with submit_arcade_score, as today (${JSON.stringify(subs)})`);
+  const per = now.picks.filter(Boolean).map(p => p.choice), choices = now.calls.filter(c => c.fn === 'record_choice').map(c => c.a.p_choice);
+  if (now.picks.length !== 2 || JSON.stringify(choices) !== JSON.stringify(per) || fns.filter(f => f === 'record_personal_answer').length !== 2) problems.push(`${name} (${label}): each answer should go out as today's calls with the authored index (${JSON.stringify(per)} picked, ${fns.join(', ')})`);
+  if (now.pod.length) problems.push(`${name} (${label}): a live hub kept Timmy Time minutes (${now.pod.join(', ')})`);
+  if (base) {
+    const then = await live(base);
+    const a = now.calls.map(norm), b = then.calls.map(norm);
+    if (JSON.stringify(a) !== JSON.stringify(b)) problems.push(`${name} (${label}): the live hub's calls differ from the base's (${base.ref.slice(0, 8)}) widget/games.js and podcast.js:\n      now:  ${a.join('\n            ')}\n      then: ${b.join('\n            ')}`);
+    then.errs.forEach(e => problems.push(`${name}, with the base's files (${label}): JavaScript error: ${e}`));
+  }
+  now.errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+  notes.push(`${name} (${label}): ${now.calls.length} calls while playing Smile twice and Timmy Time (${fns.join(', ')}), ${base ? `the same as with the base's (${base.ref.slice(0, 8)}) files` : 'no base to compare with'}; none on the game layer`);
+}
 async function stub(context){
   await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, route => {
     const u = route.request().url();
@@ -574,6 +758,14 @@ function lint(hub, A){
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
       notes.push(`${name} (${label}): the journeys' pill, boost, road and hand-off`);
       await page.close();
+    }
+    /* the game layer's wiring (session 8): the arcade's sessions and Timmy Time's minutes on a new hub, and the live hub's
+       calls as today's (wiringCheck, above), on a hub with Million-Dollar Smile, a podcast if one has it */
+    if (!vp.isMobile && nextHubs.length) {
+      const has = (h, f, re) => { try { return re.test(fs.readFileSync(path.join(root, 'hubs', h, 'next', 'content', f), 'utf8')); } catch (e) { return false; } };
+      const smile = nextHubs.filter(h => has(h, 'arcade.js', /id:\s*'smile'/) && fs.existsSync(path.join(root, 'hubs', h, 'index.html')));
+      const wh = smile.find(h => has(h, 'core.json', /"podcast":\s*\{/)) || smile[0];
+      if (wh) await wiringCheck(context, wh, label).catch(e => problems.push(`${wh}, the game layer's wiring (${label}): the check stopped: ${e.message.split('\n')[0]}`));
     }
     /* Timmy's place (phase 4, part C: widget/place.js, its kit widget/hub-art/place.js and one file per set). On the
        game layer, with a made-up shop in the bootstrap: More has the tile once Timmy is adopted, nothing of the place
