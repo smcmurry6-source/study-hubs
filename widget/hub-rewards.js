@@ -79,7 +79,10 @@
     var base = self ? (q[0] + q[1] < 3 ? 2 : 0) : correct ? (q[0] < 3 ? (s && s.c > 0 ? 2 : 10) : 0) : (q[1] < 3 ? 1 : 0);
     return base * (b ? b.mult || 2 : 1);
   }
-  /* more: { order: a sequence's steps as placed (authored indexes), session: the mock's session } */
+  /* the arcade game being played: its session on the game layer (widget/games.js), which its answers carry */
+  function arcSession(){ var G = window.shGames; return G && G.session ? G.session() : null; }
+  /* more: { order: a sequence's steps as placed (authored indexes), session: the mock's session; an arcade answer takes
+     the running game's } */
   function recordAnswer(qid, lecId, correct, ctx, choice, picks, more){
     var qq = QBY[qid], kind = qq ? KIND[qq.type] || "" : "", game = v2();
     var xp = xpFor(qid, correct, kind === "self"), t = todayRec(), first = !t.n, mult = game && boost() ? 2 : 1;
@@ -94,7 +97,7 @@
     bowlRun(qid, correct, ctx);
     more = more || {};
     document.dispatchEvent(new CustomEvent(EVT, { detail: { qid: qid, lec: lecId, correct: !!correct, ctx: ctx || "bank", choice: (typeof choice === "number" ? choice : null), picks: (Array.isArray(picks) && picks.length ? picks.slice() : null),
-      self: kind === "self", order: (kind === "order" && Array.isArray(more.order) ? more.order.slice() : null), session: more.session || null } }));
+      self: kind === "self", order: (kind === "order" && Array.isArray(more.order) ? more.order.slice() : null), session: more.session || (ctx === "arcade" ? arcSession() : null) || null } }));
     RANK.local += xp + (first ? 20 : 0);
     return { xp: xp, met: met, dayBonus: first, mult: mult };
   }
@@ -170,11 +173,24 @@
     if (said.length && d.ctx !== "mock") toast(said.join(". ") + ".");
     if (off || extra || r.medal || boostShown !== !!boost()) paintMeters();
   });
-  /* a finished mock's +50 (the server pays it once per hub per day, with 10 or more answers) */
+  /* a finished mock's +50 (the server pays it once per hub per day, with 10 or more answers), and a finished arcade
+     game's (each game once a day, 20 seconds or more after it started; widget/games.js knows which sessions are games) */
   document.addEventListener("sh:session-paid", function(e){
-    var r = (e.detail || {}).res; if (!r || !(r.xp > 0)) return;
+    var d = e.detail || {}, r = d.res; if (!r || !(r.xp > 0)) return;
+    var G = window.shGames, run = G && G.ran ? G.ran(d.session) : null;
+    /* the game's name as this page's lobby shows it (SH_HUB.arcade.games), not the live hub's skin ("THE YELLOW BODY") */
+    var mine = run ? (((HX.C || {}).arcade || {}).games || []).filter(function(g){ return g.id === run.game; })[0] : null;
     todayRec().xp += r.xp; RANK.local += r.xp; saveState();
-    toast("Mock exam finished: +" + r.xp + " XP."); paintMeters();
+    toast((run ? (mine && mine.name) || run.name || "Arcade game" : "Mock exam") + " finished: +" + r.xp + " XP."); paintMeters();
+  });
+  /* Timmy Time (widget/podcast.js): what a minute heard paid (10, or nothing: heard before, too soon, a boost doubles it)
+     and the +100 for finishing the episode, as the server counted them. The pill takes them at once; finishing is said. */
+  document.addEventListener("sh:pod-paid", function(e){
+    var r = (e.detail || {}).res; if (!r || r.ok === false || r.repeat) return;
+    var x = (r.xp | 0) + (r.done | 0); if (!(x > 0)) return;
+    todayRec().xp += x; RANK.local += x; saveState();
+    if (r.done > 0) toast("Timmy Time finished: +" + r.done + " XP.");
+    paintMeters();
   });
 
   /* ---------- rank: the server's profile (the page bootstrap, then widget/ranks.js every 10 answers) plus what you

@@ -290,6 +290,11 @@ var ARCADE = (function(){
     return c.rpc('get_arcade_leaderboard', { p_hub:HUB_ID, p_game:game, p_visitor:visitorId(), p_limit:limit||10 }).then(function(r){ return (r && !r.error) ? (r.data || []) : null; }, function(){ return null; });
   }
   function submitScore(game, score){
+    var v2 = window.shGames && window.shGames.over ? window.shGames.over(game, score, function(){ return submitToday(game, score); }) : null;
+    return v2 || submitToday(game, score);
+  }
+  /* today's call: the score to the class board (the redesign's page sends it this way only off the game layer) */
+  function submitToday(game, score){
     var c = client(), v = visitorId();
     if(!c || !v || score < 1) return Promise.resolve();
     return c.rpc('submit_arcade_score', { p_visitor:v, p_hub:HUB_ID, p_game:game, p_score:Math.min(200000, Math.round(score)) }).then(function(){}, function(){});
@@ -360,7 +365,7 @@ var ARCADE = (function(){
     var host = root.querySelector('[data-stage]') || root.querySelector('.gm-stage');
     var old = host.querySelector('[data-overlay]'); if(old) old.remove();
     host.insertAdjacentHTML('beforeend', overHTML(g, score, isBest, missed, extra));
-    (score > 0 ? submitScore(g.id, score) : Promise.resolve()).then(function(){ return fetchBoard(g.id, 5); }).then(function(rows){
+    submitScore(g.id, score).then(function(){ return fetchBoard(g.id, 5); }).then(function(rows){
       var el = host.querySelector('[data-lb] .lb-body'); if(el) el.innerHTML = boardRows(rows, 5, g);
     });
   }
@@ -601,7 +606,7 @@ GAME_IMPL.crusher = function(g, C){
   }
   function launch(){ var b = S.ball; if(!running || paused || !b.stuck) return; var sp = bspeed(), a = (Math.random() - .5) * 0.8; b.vx = Math.sin(a)*sp; b.vy = -Math.cos(a)*sp; b.stuck = false; }
   function loop(ts){ if(!running) return; var k = last ? Math.min(2.5, (ts - last)/16.67) : 1; last = ts; if(!paused) step(k); if(running){ render(); raf = requestAnimationFrame(loop); } }
-  function begin(){ var ov = stage.querySelector('[data-overlay]'); if(ov) ov.remove(); reset(); hud(); running = true; paused = false; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); }
+  function begin(){ var ov = stage.querySelector('[data-overlay]'); if(ov) ov.remove(); if(window.shGames && window.shGames.played) window.shGames.played(g.id, g.name); reset(); hud(); running = true; paused = false; last = 0; cancelAnimationFrame(raf); raf = requestAnimationFrame(loop); }
   function end(){ running = false; cancelAnimationFrame(raf); render(); C.finish(g, root, S.score, S.missed); }
   function kd(e){
     if(!root || !document.body.contains(root)) return;

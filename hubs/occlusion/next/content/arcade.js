@@ -111,6 +111,11 @@ var ARCADE = (function(){
     return c.rpc('get_arcade_leaderboard', { p_hub:HUB_ID, p_game:game, p_visitor:visitorId(), p_limit:limit||10 }).then(function(r){ return (r && !r.error) ? (r.data || []) : null; }, function(){ return null; });
   }
   function submitScore(game, score){
+    var v2 = window.shGames && window.shGames.over ? window.shGames.over(game, score, function(){ return submitToday(game, score); }) : null;
+    return v2 || submitToday(game, score);
+  }
+  /* today's call: the score to the class board (the redesign's page sends it this way only off the game layer) */
+  function submitToday(game, score){
     var c = client(), v = visitorId();
     if(!c || !v || score < 1) return Promise.resolve();
     return c.rpc('submit_arcade_score', { p_visitor:v, p_hub:HUB_ID, p_game:game, p_score:score }).then(function(){}, function(){});
@@ -379,7 +384,7 @@ var ARCADE = (function(){
       raf = requestAnimationFrame(loop);
     }
     function start(){
-      var ov = root.querySelector('[data-overlay]'); if(ov) ov.remove();
+      var ov = root.querySelector('[data-overlay]'); if(ov) ov.remove(); if(window.shGames && window.shGames.played) window.shGames.played(g.id, g.name);
       st = { running:true, score:0, lives:3, level:1, combo:0, correct:0, speed:52, wave:0, set:null, queue:[], missed:[], fast:false };
       hud(root, { score:0, lives:hearts(3), level:1 });
       newWave(); nextCard(); last = 0; raf = requestAnimationFrame(loop);

@@ -801,7 +801,10 @@
     return out.sort(function(x, y){ return y.score - x.score; });
   }
 
-  var ADMIN_FNS = /^(admin_|get_reports$|get_visitor_|get_nuke_(summary|by_hub|recent|unlocks)$|get_click_summary$|get_survey_results$|get_exam_debriefs$|get_search_terms$|get_feature_events$|set_report_resolved$|get_hub_recap$|get_insights$|get_insight_retries$|get_data_quality$|get_question_health$)/;
+  /* the arcade games submit_arcade_score (and so xp_session_start) takes */
+  var ARC_GAMES = ["sort", "snake", "stack", "match", "hangman", "fact", "blaster", "search", "whack", "flappy", "crusher", "probe", "quadrants",
+    "perdle", "planer", "smile", "sweeper", "cross", "board", "cloze", "escape"];
+  var ADMIN_FNS = /^(admin_|get_reports$|get_visitor_|get_nuke_(summary|by_hub|recent|unlocks)$|get_click_summary$|get_survey_results$|get_exam_debriefs$|get_search_terms$|get_feature_events$|set_report_resolved$|get_reports_v2$|get_hub_recap$|get_insights$|get_insight_retries$|get_data_quality$|get_question_health$)/;
   function unauthorized(){ return { error: { status: 401, code: "28000", message: "unauthorized" } }; }
   function synthAdmin(fn){
     var d = 864e5, t = now();
@@ -1320,6 +1323,40 @@
     return { error: { status: 404, code: "PGRST202", message: "Could not find the function public." + fn + " in the schema cache" } };
   }
   /* the Inbox lists a Timmy report like any report (question_flags); resolving it there shows on the Timmy tab */
+  /* the Inbox (get_reports, and migration_v54's get_reports_v2 and admin_resolve_report_v2): a resolution is kept for
+     every row, the made-up ones too; on the game layer each row also says what it was resolved as and whether its +100
+     was paid. Fixed pays the sender once a report: the fixture reports are made-up classmates', so only one this
+     preview's account sent from a hub (db.flags, db.suggestions) adds to your XP. */
+  function setResolved(a){
+    db.flags.concat(db.suggestions).forEach(function(r){ if (r.id === a.p_id) { r.resolved = a.p_resolved; r.reply = a.p_reply; } });
+    if (a.p_kind === "flag" && timmyReportRows(now()).some(function(r){ return r.id === a.p_id; })) {
+      db.tmResolved = db.tmResolved || {}; db.tmResolved[a.p_id] = { resolved: !!a.p_resolved, reply: a.p_reply || null }; }
+    db.repRes = db.repRes || {}; db.repRes[a.p_kind + "|" + a.p_id] = { resolved: !!a.p_resolved, reply: a.p_reply || null, at: iso(now()) };
+  }
+  function reports2(v2){
+    var res = db.repRes || {}, out = db.repOut || {}, paid = db.repPaid || {};
+    return synthAdmin("get_reports").map(function(r){
+      var k = r.kind + "|" + r.id, c = {}; Object.keys(r).forEach(function(x){ c[x] = r[x]; });
+      if (res[k]) { c.resolved = res[k].resolved; if (res[k].resolved) { c.reply = res[k].reply || c.reply; c.resolved_at = res[k].at; } }
+      if (v2) { c.outcome = out[k] || null; c.xp_paid = !!paid[k]; }
+      return c;
+    });
+  }
+  function resolve2(a){
+    if (["flag", "suggestion"].indexOf(a.p_kind) < 0 || ["fixed", "no-change", "open"].indexOf(a.p_outcome) < 0) return { data: null, error: true };
+    var k = a.p_kind + "|" + a.p_id, row = synthAdmin("get_reports").filter(function(r){ return r.kind === a.p_kind && r.id === a.p_id; })[0];
+    if (!row) return { data: { ok: false, error: "unknown" } };
+    setResolved({ p_kind: a.p_kind, p_id: a.p_id, p_resolved: a.p_outcome !== "open", p_reply: a.p_reply });
+    db.repOut = db.repOut || {}; db.repPaid = db.repPaid || {};
+    if (a.p_outcome === "open") { delete db.repOut[k]; return { write: true, data: { ok: true, outcome: "open", xp: 0 } }; }
+    db.repOut[k] = a.p_outcome;
+    var xp = 0;
+    if (a.p_outcome === "fixed" && !db.repPaid[k]) {
+      db.repPaid[k] = true; xp = 100;
+      if (db.flags.concat(db.suggestions).some(function(r){ return r.id === a.p_id; })) db.xp2 = (db.xp2 || 0) + 100;
+    }
+    return { write: true, data: { ok: true, outcome: a.p_outcome, xp: xp } };
+  }
   function timmyReportRows(t){
     var out = [];
     timmyFixtures(t).forEach(function(c){ c.messages.forEach(function(m){ if (m.report_id) out.push({ kind: "flag", id: m.report_id, hub: c.hub, note: m.report, resolved: m._resolved,
@@ -1342,10 +1379,11 @@
       if (ops) return ops;
       var tmA = timmyAdmin(fn, a, now());
       if (tmA) { if (tmA.write) save(); return tmA; }
+      if (fn === "get_reports" || fn === "get_reports_v2") return { data: reports2(fn === "get_reports_v2") };
+      if (fn === "admin_resolve_report_v2") { var rv2 = resolve2(a); if (rv2.error) return { error: { status: 400, code: "P0001", message: "bad kind or outcome" } };
+        if (rv2.write) save(); return { write: !!rv2.write, data: rv2.data }; }
       if (/^(admin_|set_report_resolved)/.test(fn) && fn !== "admin_pod_comments") {
-        if (fn === "set_report_resolved") db.flags.concat(db.suggestions).forEach(function(r){ if (r.id === a.p_id) { r.resolved = a.p_resolved; r.reply = a.p_reply; } });
-        if (fn === "set_report_resolved" && a.p_kind === "flag" && timmyReportRows(now()).some(function(r){ return r.id === a.p_id; })) {
-          db.tmResolved = db.tmResolved || {}; db.tmResolved[a.p_id] = { resolved: !!a.p_resolved, reply: a.p_reply || null }; }
+        if (fn === "set_report_resolved") setResolved(a);
         if (fn === "admin_hide_pod_comment") { db.podHidden = db.podHidden || {}; db.podHidden[a.p_id] = !!a.p_hidden; }
         if (fn === "admin_post_notice") db.notices.push({ title: a.p_title, message: a.p_message, at: iso(now()) });
         if (fn === "admin_review_question") { db.qhReviews = db.qhReviews || {}; var rk0 = a.p_hub + "|" + a.p_qid;
@@ -1390,21 +1428,51 @@
     if (fn === "reset_my_learn") return { write: true, data: resetLearn2(a, t) };
     if (fn === "get_my_cards") return { data: v === db.visitor ? myCards2(a) : [] };
     if (fn === "mark_dark_unlock_seen") { if (v === db.visitor) { db.dark = db.dark || []; if (db.dark.indexOf(a.p_journey) < 0) db.dark.push(a.p_journey); save(); } return { write: true, data: true }; }
+    /* a mock or an arcade game: its start, then its end. A game pays +50 the first time it is finished each day, 20
+       seconds or more after it started, and posts its score as submit_arcade_score would; a mock pays +50 with 10 or more
+       answers, once a hub a day. Only the games submit_arcade_score takes start one. */
     if (fn === "xp_session_start") {
-      if (v !== db.visitor) return { data: null };
-      var sid = "00000000-0000-4000-8000-" + ("000000000000" + (hash(String(t) + "|" + hub) >>> 0).toString(16)).slice(-12);
-      db.sess = db.sess || {}; db.sess[sid] = { hub: hub, kind: a.p_kind, t0: t, n: 0, c: 0, q: {}, done: false }; save();
+      if (v !== db.visitor || ["mock", "arcade"].indexOf(a.p_kind) < 0 || (a.p_kind === "arcade" && ARC_GAMES.indexOf(a.p_game || "") < 0)) return { data: null };
+      var sid = "00000000-0000-4000-8000-" + ("000000000000" + (hash(String(t) + "|" + hub + "|" + Math.random()) >>> 0).toString(16)).slice(-12);
+      db.sess = db.sess || {}; db.sess[sid] = { hub: hub, kind: a.p_kind, game: a.p_kind === "arcade" ? a.p_game : null, t0: t, n: 0, c: 0, q: {}, done: false }; save();
       return { write: true, data: sid };
     }
     if (fn === "xp_session_finish") {
       var ss = db.sess && db.sess[a.p_session];
-      if (v !== db.visitor || !ss) return { data: { ok: false, error: "bad" } };
+      if (v !== db.visitor || !ss || ss.t0 > t || t - ss.t0 > 6 * 3600e3) return { data: { ok: false, error: "bad" } };
       if (ss.done) return { data: { ok: true, repeat: true, xp: 0 } };
       ss.done = true; db.mockDay = db.mockDay || {};
       var mk = ss.hub + "|" + day(t), mm = boost2(t) ? 2 : 1, got2 = 0;
+      if (ss.kind === "arcade") {
+        var ak = ss.hub + "|" + ss.game + "|" + day(t), sc = Math.round(Number(a.p_score)); db.arcDay = db.arcDay || {};
+        if (t - ss.t0 >= 20000 && !db.arcDay[ak]) { db.arcDay[ak] = 1; got2 = 50 * mm; db.xp2 = (db.xp2 || 0) + got2; }
+        if (a.p_score != null && sc >= 1 && sc <= 200000) (db.arcade[ss.hub + "|" + ss.game] = db.arcade[ss.hub + "|" + ss.game] || []).push(sc);
+        save();
+        return { write: true, data: { ok: true, xp: got2, mult: mm } };
+      }
       if (ss.kind === "mock" && ss.n >= 10 && !db.mockDay[mk]) { db.mockDay[mk] = 1; got2 = 50 * mm; db.xp2 = (db.xp2 || 0) + got2; }
       save();
       return { write: true, data: { ok: true, xp: got2, mult: mm, answers: ss.n, correct: ss.c } };
+    }
+    /* Timmy Time (migration_v54's pod_minute_v2): a minute (its index from 0) pays 10 the first time, at most one every
+       25 seconds, and +100 once 90% of the episode's minutes are heard (both boosted). The server knows each episode's
+       length from admin_set_podcast_episode, loaded at the release; here it is the page's own episode (SH_PODCAST), and
+       any other answers "unknown", as the live database does before the lengths are loaded. */
+    if (fn === "pod_minute_v2") {
+      var ep = window.SH_PODCAST, mi = a.p_minute;
+      if (v !== db.visitor || !hub || !a.p_ep || typeof mi !== "number") return { data: { ok: false, error: "bad" } };
+      if (!ep || ep.id !== a.p_ep || !(ep.duration >= 60)) return { data: { ok: false, error: "unknown" } };
+      var mins = Math.ceil(ep.duration / 60);
+      if (mi < 0 || mi >= mins || mi !== Math.floor(mi)) return { data: { ok: false, error: "bad" } };
+      db.podMin = db.podMin || {}; var pk2 = hub + "|" + a.p_ep, pm = db.podMin[pk2] = db.podMin[pk2] || { m: {}, done: 0 };
+      if (pm.m[mi]) return { data: { ok: true, xp: 0, repeat: true } };
+      if (db.podLast && t - db.podLast < 25000) return { data: { ok: true, xp: 0, why: "fast" } };
+      var pmult = boost2(t) ? 2 : 1, pdone = 0, heard2;
+      pm.m[mi] = 1; db.podLast = t;
+      heard2 = Object.keys(pm.m).length;
+      if (heard2 >= Math.ceil(mins * 0.9) && !pm.done) { pm.done = 1; pdone = 100 * pmult; }
+      db.xp2 = (db.xp2 || 0) + 10 * pmult + pdone; save();
+      return { write: true, data: { ok: true, xp: 10 * pmult, done: pdone, mult: pmult, heard: heard2, of: mins } };
     }
     /* someone's place (visiting, and the dashboard's stage, where the top three stand as their own Timmys), as
        migration_v54's get_place answers it: the name as the boards show it, what stands in each slot, the rank (journey,

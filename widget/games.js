@@ -74,6 +74,40 @@
   function stillMounted(root){ return root && document.body.contains(root); }
   function typingIn(e){ var t = e.target; return t && (t.tagName === "INPUT" || t.tagName === "SELECT" || t.tagName === "TEXTAREA"); }
 
+  /* ---------- the game layer (migration_v54, at the redesign's release; vault/reference/game-server.md) ----------
+     On a page on the game layer (window.shGame.v2(): the redesign's hubs, once the database has it), each game played is
+     a session on the server: it starts when play starts (played: every game here calls it from begin(); a hub's own games
+     get the call from tools/hub-next/build.mjs), its answers carry it (session(), read by widget/hub-rewards.js), and it
+     finishes with the score (over, which a hub's submitScore asks first, also put there by the build). The finish pays
+     +50 for a game that ended 20 seconds or more after it started, once per game per day, and the server posts the score
+     itself, so the page doesn't call submit_arcade_score for that game. Anywhere else (every live hub) played() returns at
+     once and nothing calls over(), so the games make exactly today's calls. */
+  var RUN = null, RAN = {};
+  function gameOn(){ var G = window.shGame; return !!(G && G.v2 && G.v2() && G.startSession && G.finishSession); }
+  function played(game, name){
+    RUN = null;
+    if (!game || !gameOn()) return;
+    var run = RUN = { game: String(game), name: name ? String(name) : "", id: null };
+    run.p = window.shGame.startSession("arcade", run.game).then(function(id){
+      run.id = typeof id === "string" && id ? id : null;
+      if (run.id) RAN[run.id] = { game: run.game, name: run.name };
+      return run.id;
+    }, function(){ return null; });
+  }
+  /* the game's end: a promise once the server has the score (the session finished), or null for today's call. today()
+     is that call, made when the session never started or its finish was refused, so the score still reaches the board. */
+  function over(game, score, today){
+    var run = RUN;
+    if (!run || run.game !== String(game)) return null;
+    RUN = null;
+    var s = Math.min(200000, Math.max(0, Math.round(+score || 0)));
+    function old(){ return typeof today === "function" ? today() : undefined; }
+    return run.p.then(function(id){
+      if (!id) return old();
+      return window.shGame.finishSession(id, s).then(function(r){ if (!r || !r.ok) return old(); }, old);
+    }, old);
+  }
+
   /* ---------- cloze items: the bolded key terms in a hub's notes, each with the sentence it sits in ---------- */
   var STOP = {};
   ("no not and or nor yes right left more less most least never always only all none both first last before after every any same " +
@@ -290,6 +324,7 @@
     }
     function begin(){
       var ov = stage.querySelector("[data-overlay]"); if (ov) ov.remove();
+      played(g.id, g.name);
       S = { score:0, asked:0, right:0, missed:[], opened:0 }; running = true;
       build(); boardView(); track("board:start");
     }
@@ -403,6 +438,7 @@
     function begin(){
       var ov = stage.querySelector("[data-overlay]"); if (ov) ov.remove();
       var p = pool(); if (!p.length){ body.innerHTML = '<p class="sg-msg">No notes to draw from yet.</p>'; return; }
+      played(g.id, g.name);
       S = { score:0, lives:3, streak:0, n:0, missed:[], deck:shuffled(p) }; running = true; hud(); next(); track("cloze:start");
     }
     return {
@@ -639,6 +675,7 @@
     }
     function begin(){
       var ov = stage.querySelector("[data-overlay]"); if (ov) ov.remove();
+      played(g.id, g.name);
       var scope = C.currentScope(root), pool = C.bankPool(scope);
       if (pool.length < 8) pool = C.bankPool("all");
       draw = dealer(pool);
@@ -796,7 +833,7 @@
       if (a === "word"){ if (wc.every(function(k3){ return S.fill[k3] === P.sol[k3]; })) return; S.revealed = (S.revealed || 0) + 1; wc.forEach(function(k2){ S.fill[k2] = P.sol[k2]; S.marks[k2] = "ok"; }); S.missed.push({ q:e.t.c, a:e.t.w }); }
       render(); checkDone(); focusHidden();
     }
-    function begin(){ var ov = stage.querySelector("[data-overlay]"); if (ov) ov.remove(); S = { total:0, missed:[] }; running = true; newPuzzle(); hud(); clearInterval(clockT); clockT = setInterval(function(){ if (running) hud(); }, 1000); focusHidden(); }
+    function begin(){ var ov = stage.querySelector("[data-overlay]"); if (ov) ov.remove(); played(g.id, g.name); S = { total:0, missed:[] }; running = true; newPuzzle(); hud(); clearInterval(clockT); clockT = setInterval(function(){ if (running) hud(); }, 1000); focusHidden(); }
     function kd(e){
       if (!running || !stillMounted(root)) return;
       if (e.target && e.target.tagName === "SELECT") return;
@@ -930,6 +967,7 @@
     }
     function begin(){
       var ov = stage.querySelector("[data-overlay]"); if (ov) ov.remove();
+      played(g.id, g.name);
       var pool = C.bankPool(C.currentScope(root)); if (pool.length < 12) pool = C.bankPool("all");
       draw = dealer(pool);
       S = { rung:0, used:{}, missed:[] }; running = true; hud(); newQ();
@@ -961,6 +999,11 @@
     ids:Object.keys(MAKERS),
     make:function(id, g, C){ return MAKERS[id] ? MAKERS[id](g, C) : null; },
     clozePool:clozePool,
-    grade:grade
+    grade:grade,
+    /* the game layer's arcade sessions (above): no-ops on every live hub */
+    played:played,
+    over:over,
+    session:function(){ return RUN && RUN.id || null; },
+    ran:function(id){ return id && RAN[id] || null; }   // the session's { game, name }, if it was a game played here
   };
 })();

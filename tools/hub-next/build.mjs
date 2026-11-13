@@ -61,6 +61,30 @@ function hyRecorded(hub, lec, html){
   try { const d = JSON.parse(readFileSync(wf, "utf8")); return d.v === 1 && d.h === textHash(html) && d.bytes === statSync(mp3).size; } catch (e) { return false; }
 }
 
+/* The game layer's arcade sessions (vault/tasks/2026-11-12-redesign-game-layer-wiring.md; widget/games.js's played and
+   over). The live hub's arcade is copied as it is, plus two hooks only the redesign's page has, and both do nothing until
+   that page is on the game layer (window.shGame.v2()):
+   1. A play of one of the hub's own games (Cusp Sort, Pocket Crusher) starts its session where its start overlay comes
+      off, as every play does; the shared games (widget/games.js) call played() themselves.
+   2. Its score goes to window.shGames.over() first, which finishes the session (the +50, and the server posts the score
+      itself), and to today's submit_arcade_score only when over() declines: off the game layer, or a session that never
+      started. Perio's arcade skipped the call for a score of 0, which made no call anyway (its submitScore returns at once
+      for less than 1), so it now always asks, and a game that ends at 0 still finishes its session. */
+const SHARED_GAMES = ["board", "cloze", "escape", "cross", "smile"];
+function gameHooks(code, file){
+  const list = (code.match(/var GAMES = \[([\s\S]*?)\n\s*\];/) || [])[1] || "";
+  const own = [...list.matchAll(/\bid:\s*'([a-z]+)'/g)].map(m => m[1]).filter(id => !SHARED_GAMES.includes(id));
+  let starts = 0;
+  code = code.replace(/var ov = (root|stage)\.querySelector\('\[data-overlay\]'\); if\(ov\) ov\.remove\(\);/g, m => {
+    starts++; return m + " if(window.shGames && window.shGames.played) window.shGames.played(g.id, g.name);"; });
+  if (starts !== own.length) throw new Error(`${file}: the arcade has ${own.length} game(s) of its own (${own.join(", ")}) but ${starts} start(s) to hook (tools/hub-next/build.mjs, gameHooks)`);
+  const sub = "function submitScore(game, score){";
+  if (code.split(sub).length !== 2) throw new Error(`${file}: can't find the arcade's one submitScore (tools/hub-next/build.mjs, gameHooks)`);
+  code = code.replace(sub, sub + "\n    var v2 = window.shGames && window.shGames.over ? window.shGames.over(game, score, function(){ return submitToday(game, score); }) : null;\n" +
+    "    return v2 || submitToday(game, score);\n  }\n  /* today's call: the score to the class board (the redesign's page sends it this way only off the game layer) */\n  function submitToday(game, score){");
+  return code.replace("(score > 0 ? submitScore(g.id, score) : Promise.resolve())", "submitScore(g.id, score)");
+}
+
 const args = process.argv.slice(2);
 const CHECK = args.includes("--check");
 const only = args.includes("--hub") ? args[args.indexOf("--hub") + 1] : null;
@@ -276,7 +300,7 @@ function build(hub){
     "var escHtml = env.esc, STATE = env.state, saveState = env.save, toast = env.toast, QUESTIONS = env.questions, LECTURES = env.lectures, LECTURE_BY_ID = env.lectureById,\n" +
     "  shuffled = env.shuffled, recordAnswer = env.record, lecLabel = env.lecLabel, SORT_SETS = env.sortSets, READINGS = env.readings, REVIEW = env.review;\n" + (AR.env ? AR.env(main, D) : "") +
     /* the page sits one folder down (hubs/<id>/next/), so the hub's pictures are one folder up */
-    (icons + main.slice(arcadeStart, arcadeEnd)).replace(/href="img\//g, 'href="../img/').replace(/href=\\"img\//g, 'href=\\"../img/').replace(/bg:'img\//g, "bg:'../img/") +
+    gameHooks((icons + main.slice(arcadeStart, arcadeEnd)).replace(/href="img\//g, 'href="../img/').replace(/href=\\"img\//g, 'href=\\"../img/').replace(/bg:'img\//g, "bg:'../img/"), file) +
     "\nreturn { arcade: ARCADE, icon: icon };\n};\n";
   const arcCss = (AR.css || [["/* ===================================================================\n   ARCADE", "/* ---------- responsive ---------- */"],
     ["/* ---------- arcade leaderboards ---------- */", "/* ---------- Listen (shared widget TTS) ---------- */"]]).map(([a, b]) => {
