@@ -18,12 +18,15 @@ same test CI runs on every push. Sam: "do these things need to take this long?"
   that changed nothing it tests: a rebase or merge of `main` with no conflict in code you changed, a vault note, a PR
   description. After bringing `main` in, run only the fast checks (`node tools/ci/syntax.js`, `node tools/ci/vault.js`,
   the `--check` builds, `node tools/release/secrets.js`: seconds each), push, and read CI's result. CI tests the branch
-  merged with `main`, which is the thing that will ship.
+  merged with `main`, which is the thing that will ship. CI does the same by itself since 2026-11-13 (Sam: "do 1 and 2
+  in their own PR"): when only notes changed since a run that passed (a merge of `main` that brought only notes, a vault
+  write-back), it keeps that result and skips its long jobs (`tools/ci/reuse.js`).
 - **No gate goes away.** CI is still green before a merge, a red check is still reproduced before it's fixed (with the
   one test that failed, not the whole suite), and a conflict in code you changed, or a fix to code, starts again from
   the second point.
-- **Say how long.** When Sam is waiting on a push, say what is still running and about how long it takes ("Check hubs"
-  about 8 minutes and "Release tests" about 15 when shared code changed; a hub's content or a note, a minute or two).
+- **Say how long.** When Sam is waiting on a push, say what is still running and about how long it takes (since the
+  parallel jobs of 2026-11-13: "Check hubs" about 7 minutes and "Release tests" about 5 when shared code changed, both
+  at once; a hub's content, a minute or two more than the fast checks; only notes since a green run, about 3 minutes).
 
 Related: [verify-before-pushing](../how-to/verify-before-pushing.md) · [ship-a-change](../how-to/ship-a-change.md) ·
 [preview-and-release-test](preview-and-release-test.md) · [run-a-redesign-session](../how-to/run-a-redesign-session.md) ·

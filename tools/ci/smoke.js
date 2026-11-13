@@ -40,7 +40,12 @@ function pickHubs(){
   return { hubs, why: (hubs.length ? `the hub(s) this change touches: ${hubs.join(', ')}` : 'no hub changed, so the dashboard only') + ' (--all checks every hub)' };
 }
 const { hubs, why: hubsWhy } = pickHubs();
-console.log(`Smoke test: ${hubsWhy}`);
+/* SMOKE_PART=desktop or SMOKE_PART=phone runs one half (2026-11-13: CI runs the two at once, as two jobs, to save time).
+   The desktop half has the question-bank lint and the id registry; the phone half has the top bars and tab rows. Without
+   it (the default, and any local run) both halves run, one after the other. */
+const PART = process.env.SMOKE_PART || '';
+if (PART && !['desktop', 'phone'].includes(PART)) { console.error(`SMOKE_PART must be desktop or phone, not "${PART}"`); process.exit(1); }
+console.log(`Smoke test: ${hubsWhy}${PART ? `, the ${PART} half` : ''}`);
 /* the redesign's new versions (hubs/<id>/next/, widget/hub.js), built beside the live hubs until the release: those of
    the hubs picked above (a change to hubs/<id>/next/ touches <id>; the engine is shared, so it picks every hub) */
 const nextHubs = hubs.filter(h => fs.existsSync(path.join(root, 'hubs', h, 'next', 'index.html')));
@@ -310,7 +315,7 @@ function lint(hub, A){
 (async () => {
   await new Promise(r => server.listening ? r() : server.on('listening', r));
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
-  for (const vp of [{ width: 1366, height: 860 }, { width: 390, height: 844, isMobile: true }]) {
+  for (const vp of [{ width: 1366, height: 860 }, { width: 390, height: 844, isMobile: true }].filter(v => !PART || PART === (v.isMobile ? 'phone' : 'desktop'))) {
     const context = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, isMobile: !!vp.isMobile, hasTouch: !!vp.isMobile, serviceWorkers: 'block' }); /* sw.js would bypass the lint hook */
     await stub(context);
     const label = vp.isMobile ? 'phone' : 'desktop';
@@ -1329,7 +1334,7 @@ function lint(hub, A){
   // top bars and tab rows (2026-11-04): at the widths and text sizes where they used to break, every control in the
   // dashboard's and each hub's top bar, the mode tabs and the dashboard's arcade rows is fully on screen, not clipped
   // by a hidden scrollbar, and every mode tab shows its label
-  for (const tb of [{ width: 320, height: 640 }, { width: 1001, height: 800 }, { width: 390, height: 844, size: 'xxlarge' }]) {
+  for (const tb of PART === 'desktop' ? [] : [{ width: 320, height: 640 }, { width: 1001, height: 800 }, { width: 390, height: 844, size: 'xxlarge' }]) {
     const context = await browser.newContext({ viewport: { width: tb.width, height: tb.height }, serviceWorkers: 'block' });
     await stub(context);
     await context.addInitScript(size => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); if (size) localStorage.setItem('sh_pref_size', size); } catch (e) {} }, tb.size || '');
@@ -1381,5 +1386,5 @@ function lint(hub, A){
   await browser.close(); server.close();
   notes.forEach(n => console.log('  ' + n));
   if (problems.length) { console.error('\n✗ ' + problems.length + ' problem(s):\n' + problems.map(p => '  - ' + p).join('\n')); process.exit(1); }
-  console.log(`\n✓ smoke test and question lint passed: ${hubsWhy}`);
+  console.log(`\n✓ smoke test${PART === 'phone' ? '' : ' and question lint'} passed: ${hubsWhy}${PART ? `, the ${PART} half` : ''}`);
 })().catch(e => { console.error(e); process.exit(1); });

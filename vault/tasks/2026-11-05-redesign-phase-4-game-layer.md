@@ -402,6 +402,7 @@ These hold for each spec; a spec only adds to them.
     those. Budgets unchanged.
   - Tests: the smoke test's bowling block on a new hub (desktop and phone), `a11y.js`'s clip card. BUG-110 and BUG-111.
   **Next: session 4, visiting** ([visiting](done/2026-11-12-redesign-visiting.md)), then 6.
+- 2026-11-13: [#349](https://github.com/smcmurry6-source/study-hubs/pull/349) (session 5, the bowling egg) merged as `c496249` (Sam: "merge now"). `postcheck.js` passed (4 of 4 changed files live and identical to `main`; the live dashboard and hubs open with no errors). Session 5 is done. **Next: session 4, visiting** ([visiting](done/2026-11-12-redesign-visiting.md)), then 6.
 - 2026-11-13 (Claude Code), **session 4, visiting; hand-off for session 6** ([#352](https://github.com/smcmurry6-source/study-hubs/pull/352); [visiting](done/2026-11-12-redesign-visiting.md),
   its Outcome). Nothing students see changes. On the new dashboard, on the game layer, a row of Ranks or Study streaks
   (and each of the stage's top three, and a winner's Timmy on the stage) opens that person's Timmy's place; your own row
