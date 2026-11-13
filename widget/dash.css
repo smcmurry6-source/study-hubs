@@ -325,7 +325,7 @@ html.shx .dx .shpet-scene.has-place .shpet-say.is-on { pointer-events: auto; }
   display: grid; overflow: hidden; border-radius: var(--r-panel); background: var(--ar-bg); color: #fff; }
 .dx-set { display: block; width: 100%; height: auto; }
 .dx-podium { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-items: start; padding: 12px 12px 4px; }
-.dx-podium li { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; }
+.dx-podium li { position: relative; display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; }
 .dx-podium .p1 { order: 2; }
 .dx-podium .p2 { order: 1; }
 .dx-podium .p3 { order: 3; }
@@ -345,7 +345,7 @@ html.shx .dx .shpet-scene.has-place .shpet-say.is-on { pointer-events: auto; }
 .dx-step { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--ar-gold); color: #3b2e3a; font-weight: var(--w-title); }
 .dx-arena.has-set .dx-step { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .dx-board { display: grid; gap: 5px; padding: 8px 12px 12px; }
-.dx-board li { display: grid; grid-template-columns: 26px minmax(0, 1.3fr) auto minmax(48px, 1fr) auto; align-items: center; gap: 10px; min-height: 48px; padding: 6px 14px 6px 10px; border-radius: var(--r-row); background: var(--ar-row); }
+.dx-board li { position: relative; display: grid; grid-template-columns: 26px minmax(0, 1.3fr) auto minmax(48px, 1fr) auto; align-items: center; gap: 10px; min-height: 48px; padding: 6px 14px 6px 10px; border-radius: var(--r-row); background: var(--ar-row); }
 .dx-board li.me { box-shadow: inset 0 0 0 2px var(--ar-gold); }
 .dx-board .rk { text-align: center; font-weight: var(--w-title); color: var(--ar-gold); }
 .dx-board .nm { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: var(--w-strong); }
@@ -355,6 +355,23 @@ html.shx .dx .shpet-scene.has-place .shpet-say.is-on { pointer-events: auto; }
 .dx-board .dx-vs i { display: block; height: 100%; border-radius: 3px; background: #f2c94c; transform-origin: 0 50%; animation: dx-fill 900ms var(--ease-expo) both; }
 .dx-board .val { min-width: 76px; text-align: right; font-weight: var(--w-head); white-space: nowrap; }
 .dx-board .val small { margin-left: 4px; font-size: var(--fs-meta); font-weight: var(--w-body); color: var(--ar-soft); }
+/* visiting: on a row with a visit key the name is a button whose ::after covers the whole row, so a tap anywhere on it
+   visits that person's place while the row's other parts still read as text; the medals stay their own button on top */
+.dx-visit { appearance: none; min-width: 24px; min-height: 24px; margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; line-height: inherit;
+  letter-spacing: inherit; text-align: inherit; cursor: pointer; }
+.dx-visit::after { content: ""; position: absolute; inset: 0; border-radius: var(--r-row); transition: background-color 160ms ease; }
+.dx-podium .dx-visit::after { inset: -4px; }
+.dx-visit:hover::after { background: rgba(255, 255, 255, .07); }
+.dx-visit:focus { outline: none; }
+.dx-visit:focus-visible::after { outline: 3px solid #fff; outline-offset: 1px; }   /* white: your own row is already ringed in gold */
+.dx-board .sh-flair, .dx-podium .sh-flair { position: relative; z-index: 1; }
+.dx-board li.is-busy, .dx-podium li.is-busy, .is-busy .dx-visit { cursor: progress; }
+.is-busy .dx-visit::after { background: rgba(255, 255, 255, .1); }
+.dx-arena .st-win.can-visit { cursor: pointer; }
+/* a place that couldn't be opened: one plain line on its row */
+.dx-vmsg { grid-column: 1 / -1; flex-basis: 100%; font-size: var(--fs-meta); color: var(--ar-soft); text-align: inherit; }
+.dx-vmsg:empty { display: none; }
+.dx-podium li.has-vmsg { flex-wrap: wrap; }
 /* by the arena's own width, so the text-size setting counts (it zooms the page, which a media query doesn't see) */
 /* the names stack under their blocks unless there's room for a medallion beside each */
 @container dxarena (max-width: 700px) {
@@ -399,7 +416,7 @@ html.shx .dx .shpet-scene.has-place .shpet-say.is-on { pointer-events: auto; }
 .dx-arena .st-win2 { animation-delay: 350ms; }
 .dx-arena .st-win3 { animation-delay: 100ms; }
 .dx-arena.is-still .st-conf, .dx-arena.is-still .st-twinkle, .dx-arena.is-still .st-lights, .dx-arena.is-still .st-crown, .dx-arena.is-still .st-win, .dx-arena.is-still .dx-vs i { animation: none; }
-@media (prefers-reduced-motion: reduce) { .dx-arena .st-conf, .dx-arena .st-twinkle, .dx-arena .st-lights, .dx-arena .st-crown, .dx-arena .st-win, .dx-board .dx-vs i { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .dx-visit::after { transition: none; } .dx-arena .st-conf, .dx-arena .st-twinkle, .dx-arena .st-lights, .dx-arena .st-crown, .dx-arena .st-win, .dx-board .dx-vs i { animation: none; } }
 .dx-ladder summary { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); cursor: pointer; list-style: none; }
 .dx-ladder summary::-webkit-details-marker { display: none; }
 .dx-ladder[open] summary .ic { transform: rotate(-90deg); }

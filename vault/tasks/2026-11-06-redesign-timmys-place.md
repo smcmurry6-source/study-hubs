@@ -275,7 +275,7 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
     place too: with nothing on he is himself, where part C drew him in that day's holiday outfit. One line in
     `timmySvg()`, made in [Timmy everywhere](2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"). The place's
     own seasons and holiday props don't change.
-  - **Visiting** has its own note and session: [visiting](2026-11-12-redesign-visiting.md).
+  - **Visiting** has its own note and session: [visiting](done/2026-11-12-redesign-visiting.md).
   - **The shop's link** in the customizer and snack HP: [the shop](2026-11-06-redesign-timmy-shop.md), session 2.
   - **The later journeys' rank sets**: after the release, in a new migration
     ([their note](2026-11-12-redesign-later-journeys-rank-sets.md)).

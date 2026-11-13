@@ -10,7 +10,8 @@
      handpiece rank, mastery medals, day streak and the week as dots. Ask Timmy (widget/ask.js) is "Ask me" in his house,
      or an "Ask the hub" button in #askSpot when he isn't there; on the dashboard he answers from every live hub;
    - the class: who is studying right now (the live count and a chip for each hub someone is in), then the board
-     (ranks or study streaks) with the top three on a podium;
+     (ranks or study streaks) with the top three on a podium; on the game layer a row opens that person's Timmy's place
+     (visiting, phase 4);
    - the idea board (widget/ideas.js draws it in #ideas once the board's server is there), then past hubs: each
      finished exam's recap as a live infographic, and the hubs that just closed.
    No What's new list, no arcade scores and no "When people study" chart (Sam, 2026-11-11); a hub's "Updated" label still reads the changelog.
@@ -1177,8 +1178,8 @@
         window.shPlace.setup({ sb: PLACE.sb, visitor: VISITOR || null, shop: d && d.shop, profile: myRank, tints: (window.SH_DASH_ART || {}).tints });
         placeDraw();
       };
-      if (PLACE.boot) PLACE.boot.then(set, function(){ set(null); }); else set(null);
-    }, function(){ PLACE.load = null; });
+      return PLACE.boot ? PLACE.boot.then(set, function(){ set(null); }) : set(null);
+    }, function(){ PLACE.load = null; });   /* resolves either way: a visit checks window.shPlace */
     return PLACE.load;
   }
   function placeStart(sb, boot){
@@ -1349,27 +1350,32 @@
     streaks: "Days in a row with at least one answer."
   };
   function rankMini(r){ return window.shRanks && r.tier != null ? jMini(r, r.level) : ""; }
-  /* a row's name with its mastery medals (`flair`) */
+  /* a row's name with its mastery medals (`flair`). On a row with a visit key the name is the button that visits that
+     person's place (visiting, below): one fixed name for the click count (data-dash="visit"), never the person's, and
+     the button stretches over the whole row in CSS, so the row's place, rank and number still read as text */
   function nameFlair(r, extra){
-    var f = window.shRanks && window.shRanks.flair ? window.shRanks.flair(r.flair, { who: r.display_name }) : "";
-    return '<span class="nm-t">' + esc(r.display_name) + (extra || "") + "</span>" + f;
+    var f = window.shRanks && window.shRanks.flair ? window.shRanks.flair(r.flair, { who: r.display_name }) : "", t = esc(r.display_name) + (extra || "");
+    if (!visitKey(r)) return '<span class="nm-t">' + t + "</span>" + f;
+    return '<button type="button" class="nm-t dx-visit" data-dash="visit" aria-label="' + (r.is_me ? t + ": open your place" : esc("Visit " + r.display_name + "’s place")) + '">' + t + "</button>" + f;
   }
-  /* a row carries its visit key (the _v2 boards, migration_v54) as data-visit: Timmy's place (phase 4) opens from it.
+  function visitAttr(r){ var k = visitKey(r); return k ? ' data-visit="' + k + '"' : ""; }
+  /* a row carries its visit key (the _v2 boards, migration_v54) as data-visit: a tap opens that person's Timmy's place.
      pct: its bar against first place (0 to 1) */
   function rowHTML(r, place, mid, val, unit, pct){
-    return "<li" + (r.is_me ? ' class="me"' : "") + (r.visit ? ' data-visit="' + esc(r.visit) + '"' : "") + '><span class="rk num">' + place + '</span><span class="nm">' + rankMini(r) + nameFlair(r, r.is_me ? " (you)" : "") + "</span>" +
+    return "<li" + (r.is_me ? ' class="me"' : "") + visitAttr(r) + '><span class="rk num">' + place + '</span><span class="nm">' + rankMini(r) + nameFlair(r, r.is_me ? " (you)" : "") + "</span>" +
       '<span class="lvl">' + esc(mid || "") + '</span><span class="dx-vs" aria-hidden="true"><i style="width:' + Math.max(2, Math.min(100, Math.round((pct || 0) * 100))) + '%"></i></span>' +
       '<span class="val num">' + val + "<small>" + unit + "</small></span></li>";
   }
   /* the top three: their names and numbers under the stage (first in the middle, by CSS order), everyone after them in the list */
   function podiumHTML(rows, art, val, mid){
     return '<ol class="dx-podium">' + rows.slice(0, 3).map(function(r, i){
-      return '<li class="p' + (i + 1) + (r.is_me ? " me" : "") + '"' + (r.visit ? ' data-visit="' + esc(r.visit) + '"' : "") + '><span class="dx-step"><span class="sr">Place </span><b class="num">' + (i + 1) + '</b></span><span class="dx-win-who">' + art(r) + "</span>" +
+      return '<li class="p' + (i + 1) + (r.is_me ? " me" : "") + '"' + visitAttr(r) + '><span class="dx-step"><span class="sr">Place </span><b class="num">' + (i + 1) + '</b></span><span class="dx-win-who">' + art(r) + "</span>" +
         '<span class="dx-win-txt"><span class="nm">' + nameFlair(r, r.is_me ? " (you)" : "") + '</span><span class="dx-win-sub">' + (mid ? '<span class="mid">' + esc(mid(r)) + "</span>" : "") + '<span class="val num">' + val(r) + "</span></span></span></li>";
     }).join("") + "</ol>";
   }
   /* the stage (widget/hub-art/class.js, tools/figures/site/stage.mjs): curtains, lights, the three blocks, and each
-     winner's Timmy on top in what theirs is wearing (fits: the top three's outfits, "" for a plain Timmy) */
+     winner's Timmy on top in what theirs is wearing (fits: the top three's outfits, "" for a plain Timmy). The drawing is
+     hidden from screen readers; a tap on a winner's Timmy is a tap on their name's button under the stage (visiting) */
   function stageSvg(w, rows, fits){
     var S = CA.stage, h = w < 480 ? 262 : 300, fl = h - 44, cx = w / 2, k = w < 480 ? .74 : 1, pw = Math.min(150, w * .3), gap = Math.min(170, w * .31);
     var s = S.stage({ w: w, h: h }), fla = (A.flame || {})[5] || (A.flame || {})[3] || "";
@@ -1377,7 +1383,7 @@
     [{ p: 2, x: cx - gap, h: 74 * k, tw: 68 * k }, { p: 1, x: cx, h: 108 * k, tw: 82 * k }, { p: 3, x: cx + gap, h: 54 * k, tw: 64 * k }].forEach(function(b){
       var th = b.tw * 1.31, top = fl + 10 - b.h;
       s += S.G(b.x, fl + 10, 1, S.pedestal(b.p, pw, b.h));
-      if (window.shPet && window.shPet.art && rows[b.p - 1]) s += '<g class="st-win st-win' + b.p + '"><svg x="' + (b.x - b.tw / 2).toFixed(1) + '" y="' + (top - th * (256 / 262) + 2).toFixed(1) + '" width="' + b.tw.toFixed(1) + '" height="' + th.toFixed(1) +
+      if (window.shPet && window.shPet.art && rows[b.p - 1]) s += '<g class="st-win st-win' + b.p + (visitKey(rows[b.p - 1]) ? " can-visit" : "") + '" data-p="' + b.p + '"><svg x="' + (b.x - b.tw / 2).toFixed(1) + '" y="' + (top - th * (256 / 262) + 2).toFixed(1) + '" width="' + b.tw.toFixed(1) + '" height="' + th.toFixed(1) +
         '" viewBox="0 -30 200 262" overflow="visible">' + timmyArt(fits[b.p - 1] || "", "happy") + "</svg></g>";
       if (b.p === 1) s += '<g class="st-crown">' + S.G(b.x, top - th - 6, .78 * k, S.crown()) + "</g>" + S.spark(b.x - 62 * k, top - 52, 7) + S.spark(b.x + 66 * k, top - 76, 9) + S.spark(b.x + 52 * k, top - 12, 5, "#fff");
     });
@@ -1398,19 +1404,88 @@
         return ranks ? rowHTML(r, r.rnk, jName(r, r.level || R.levelFor(r.xp)), num(r.xp), "XP", (+r.xp || 0) / first)
           : rowHTML(r, i + (pod ? 4 : 1), "", r.streak, r.streak === 1 ? "day" : "days", (+r.streak || 0) / first);
       }).join("") + "</ol>" : "") + "</div>";
+    if (d.say) visitSay(d.say.key, d.say.msg, true);
   }
   /* what the top three's Timmys wear: each one's place says (get_place, migration_v54), through the visit key on their
-     row. A place that can't be read, or a database without the game layer yet, gives a plain Timmy. */
+     row. A place that can't be read, or a database without the game layer yet, gives a plain Timmy. The answer is kept
+     for a visit (getPlace), so a tap on one of the top three doesn't ask again. */
   function loadFits(sb, d){
     if (V2 !== true || !sb) return;
     d.rows.slice(0, 3).forEach(function(r, i){
-      if (!r.visit) return;
-      sb.rpc("get_place", { p_key: r.visit }).then(function(res){
-        var f = cleanFit(res && res.data && res.data.equipped && res.data.equipped.outfit);
+      var k = visitKey(r); if (!k) return;
+      getPlace(sb, k).then(function(p){
+        var f = cleanFit(p && p.equipped.outfit);
         if (f && boardData === d) { d.fits[i] = f; paintBoard(); }
       }, function(){});
     });
   }
+
+  /* ---------- VISITING (phase 4, session 4; vault/tasks/2026-11-12-redesign-visiting.md). A row on the boards, or one of
+     the stage's top three, opens that person's Timmy's place. The row's visit key (data-visit: 24 hex characters on every
+     _v2 board row, a digest only the server can make) asks get_place for what a place shows: the leaderboard name, what
+     stands in each slot, the rank (journey, tier, level) and the medals, never an id, XP, HP or a date. widget/place.js
+     draws it as a visit (shPlace.open({ place })): the name in the title, Timmy drawn well, no HP and no Customize, in
+     the leaderboard's theater look. Your own row ("<name> (you): open your place", its visible text first) opens your
+     own place, as the card does. Without the game layer a row has no key and isn't a button. A key that opens nothing
+     (null) or a call that fails puts one plain line on the row and changes nothing else. ---------- */
+  var VISIT_RE = /^[0-9a-f]{24}$/, PLACES = {}, visiting = "";
+  function visitKey(r){ return r && typeof r.visit === "string" && VISIT_RE.test(r.visit) ? r.visit : ""; }
+  /* someone's place, asked once a page (the stage's outfits and a visit share the answer); a call that fails isn't kept.
+     Only what a place shows goes on: the slots as strings, the rank as numbers, the name and medals as text */
+  function getPlace(sb, key){
+    if (PLACES[key]) return PLACES[key];
+    var p = PLACES[key] = sb.rpc("get_place", { p_key: key }).then(function(res){
+      if (!res || res.error) throw new Error("get_place");
+      var d = res.data; if (!d || typeof d !== "object" || Array.isArray(d)) return null;
+      var eq = {}, e = d.equipped && typeof d.equipped === "object" ? d.equipped : {}, rk = d.rank && typeof d.rank === "object" ? d.rank : null;
+      Object.keys(e).forEach(function(k){ if (typeof e[k] === "string" && /^[a-z0-9-]{1,40}$/.test(k)) eq[k] = e[k]; });
+      return { name: String(d.name == null ? "" : d.name), equipped: eq, flair: typeof d.flair === "string" ? d.flair : "",
+        rank: rk ? { journey: +rk.journey || 0, tier: +rk.tier || 0, level: +rk.level || 1 } : null };
+    });
+    p.then(null, function(){ if (PLACES[key] === p) delete PLACES[key]; });
+    return p;
+  }
+  /* the plain line on a row whose place couldn't be opened (kept with the board, so a repaint puts it back) */
+  function visitSay(key, msg, again){
+    qa(".dx-vmsg", $("board")).forEach(function(n){ n.parentNode.classList.remove("has-vmsg"); n.parentNode.removeChild(n); });
+    if (boardData) boardData.say = msg ? { key: key, msg: msg } : null;
+    var li = msg && VISIT_RE.test(key) ? q('[data-visit="' + key + '"]', $("board")) : null; if (!li) return;
+    var line = document.createElement("span"); line.className = "dx-vmsg"; line.setAttribute("role", "status");
+    li.appendChild(line); li.classList.add("has-vmsg");
+    if (again) line.textContent = msg; else setTimeout(function(){ line.textContent = msg; }, 60);   /* filled after it's on the page, so it's read out */
+  }
+  function visitBusy(key, on){
+    var li = q('[data-visit="' + key + '"]', $("board")), b = li && q(".dx-visit", li);
+    if (li) li.classList.toggle("is-busy", on);
+    if (b) { if (on) b.setAttribute("aria-busy", "true"); else b.removeAttribute("aria-busy"); }
+  }
+  /* closing the place gives focus back to the row (the board may have been drawn again while the place was open) */
+  function visitBack(key){
+    var b = q('[data-visit="' + key + '"] .dx-visit', $("board"));
+    if (b && document.activeElement !== b) try { b.focus(); } catch (e) {}
+  }
+  function visit(key, me){
+    if (!VISIT_RE.test(key) || visiting || !boardSb) return;
+    visiting = key; visitSay(key, ""); visitBusy(key, true);
+    var done = function(){ visiting = ""; visitBusy(key, false); };
+    var fail = function(){ done(); visitSay(key, "That place couldn’t be opened just now."); };
+    var back = function(){ visitBack(key); };
+    if (me) {
+      placeLoad().then(function(){ done(); if (window.shPlace) window.shPlace.open({ onClose: back }); else fail(); }, fail);
+      return;
+    }
+    Promise.all([getPlace(boardSb, key), placeLoad()]).then(function(a){
+      if (!a[0] || !window.shPlace) { fail(); return; }
+      done(); window.shPlace.open({ place: a[0], onClose: back });
+    }, fail);
+  }
+  $("board").addEventListener("click", function(e){
+    var b = e.target.closest(".dx-visit"), w = !b && e.target.closest(".st-win.can-visit");
+    /* a winner's Timmy on the stage is their name's button under it */
+    if (w) { var nb = q(".dx-podium .p" + w.getAttribute("data-p") + " .dx-visit", $("board")); if (nb) nb.click(); return; }
+    var li = b && b.closest("[data-visit]"); if (!li) return;
+    visit(li.getAttribute("data-visit"), li.classList.contains("me"));
+  });
   function drawBoard(){
     var sb = boardSb, which = boardNow;
     $("boardNote").textContent = BOARD_NOTE[which]; $("boardNote").hidden = !BOARD_NOTE[which];

@@ -228,6 +228,13 @@
   function iso(ms){ return new RealDate(ms).toISOString(); }
   function day(ms){ var d = new RealDate(ms); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
   var FAKE_NAMES = ["Fixture Fluoride", "Sample Sealant", "Test Tubercle", "Mock Mandible", "Dummy Dentin", "Stub Sulcus", "Placeholder Pulp", "Example Enamel", "Synthetic Cingulum", "Trial Torus", "Pretend Papilla", "Model Mesial"];
+  /* the made-up classmates' XP, the same on every board and at their place (visiting): the first is past the Handpiece,
+     in the ModuPro journey; the rest climb the Handpiece */
+  function fakeXp(n){ var i = FAKE_NAMES.indexOf(n); return i === 0 ? 134000 - hash(n) % 900 : 52000 - i * 4100 - (hash(n) % 900); }
+  /* the mastery medal three of them show, on the game layer's boards and at their place (get_place). One each: a row
+     with two or more draws widget/ranks.js's "+1" medal button, whose name leaves the "+1" out (BUG-112, left for the
+     release), and the accessibility suite would stop on it */
+  var FAKE_FLAIR = { "Fixture Fluoride": "perio:4", "Sample Sealant": "heme-endo-exam2:1", "Test Tubercle": "occlusion:2" };
   var TIER_AT = [0, 300, 1500, 5000, 12000, 25000, 50000, 125000];
   function tierOf(xp){ var t = 0; for (var i = 0; i < 7; i++) if (xp >= TIER_AT[i]) t = i; return t; }
   function stepOf(xp){ var t = tierOf(xp), lo = TIER_AT[t], hi = TIER_AT[t + 1]; return Math.min(20, t * 3 + Math.min(2, Math.floor((xp - lo) * 3 / (hi - lo)))); }
@@ -421,6 +428,24 @@
     "admin": { home: "treehouse", "yard-left": "swimming-pool" },
     "high-xp": { home: "castle", scene: "clouds", "yard-left": "mouthwash-fountain", "yard-right": "telescope", "yard-side": "bowling-lane", "yard-front": "podcast-studio", outfit: "rank-gold-outfit", flag: "flag", porch: "porch" }
   };
+  /* the made-up classmates' places, by their place in FAKE_NAMES (the fifth, Dummy Dentin, can't be read): each a
+     different home, scene, yard and outfit from the catalog, only pieces they could own (a gift, a set's piece, a rank
+     piece their rank has reached), the first a ModuPro with the Handpiece's Dark Matter pieces. Some wear nothing, as
+     on the server when no outfit is on. */
+  var FAKE_PLACES = [
+    { home: "castle", scene: "night-sky", "yard-left": "telescope", "yard-front": "rank-dark-yard", "yard-side": "bowling-lane", "yard-right": "podcast-studio", outfit: "rank-dark-outfit", flag: "flag", chimney: "chimney", paint: "paint-lilac" },
+    { home: "lighthouse", scene: "beach", "yard-left": "sandcastle", "yard-front": "beach-umbrella", "yard-right": "hammock", outfit: "captain-hat", porch: "porch", paint: "paint-sky" },
+    { home: "igloo", scene: "snowy-mountain", "yard-left": "hot-spring", "yard-right": "campfire", outfit: "beanie", windows: "fancy-windows" },
+    { home: "treehouse", scene: "forest", "yard-left": "doghouse", "yard-front": "mailbox", "yard-right": "fairy-ring", outfit: "tooth-fairy" },
+    null,
+    { home: "observatory", scene: "clouds", "yard-left": "mouthwash-fountain", outfit: "astronaut", paint: "paint-butter" },
+    { home: "giant-mushroom", scene: "forest", "yard-left": "garden", "yard-right": "swimming-pool", outfit: "chef", paint: "paint-peach" },
+    { home: "haunted-manor", scene: "pumpkin-patch", "yard-left": "pumpkin-lantern", "yard-right": "haunted-tree", outfit: "floss-mummy" },
+    {},
+    { home: "harvest-barn", scene: "harvest-fields", "yard-left": "hay-bales", "yard-front": "turkey-balloon", outfit: "scarecrow-hat", paint: "paint-mint" },
+    { home: "beach-hut", scene: "beach", "yard-left": "lawn-sprinkler", "yard-right": "barbecue-grill", outfit: "sunglasses-lei" },
+    { scene: "snowy-mountain", "yard-left": "rank-silver-yard", outfit: "white-coat" }
+  ];
   /* what each test account has earned in Shiny Gold Crowns before this preview (Sam's spec: new 0, returning about 300,
      missed about 80 so a purchase is refused for its balance, high-XP about 20,000); answers here add 1 for every 10 XP */
   var WALLET_START = { "new": 0, returning: 300, missed: 80, "high-xp": 20000, archived: 1500, admin: 5000 };
@@ -1324,16 +1349,20 @@
     var tm = timmyRpc(fn, a); if (tm) return tm;
     /* the game layer's functions (migration_v54: written, tested, and not applied until the redesign's release). The new
        dashboard (widget/dash.js) calls them as <name>_v2, so the preview answers them from today's fixtures plus what
-       v54 adds to a row: the journey (0, the Handpiece) and a visit key (made up here; the real one is a digest only
-       the server can make). The shop and Timmy's place get their fixtures with phase 4. */
+       v54 adds to a row: the rank on the 63-step ladder (journey, tier, level, step: from the row's XP, or a made-up
+       classmate's own XP on the boards that don't show it), the medals of the two that have them, and a visit key (made
+       up here; the real one is a digest only the server can make, the same for a person on every board). */
     if (/^get_(widget_bootstrap|rank_profile|rank_board|leaderboard|arcade_leaderboard)_v2$/.test(fn)) {
       if (fn === "get_rank_profile_v2") return { data: profile2(v) };
       var d2 = rpc(fn.slice(0, -3), a).data;
       var vkey = function(n){ var k = ""; for (var i = 0; i < 3; i++) k += ("00000000" + (hash(n + "|visit" + i) >>> 0).toString(16)).slice(-8); return k; };
       if (Array.isArray(d2)) d2 = d2.map(function(r){
         var o2 = {}; Object.keys(r).forEach(function(k){ o2[k] = r[k]; }); o2.journey = 0; o2.visit = vkey(r.display_name);
-        /* a board row with XP stands where the 63-step ladder puts it (your own row, past the Handpiece) */
-        if (typeof r.xp === "number" && r.tier != null) { var rr = rank2(r.xp); o2.journey = rr.journey; o2.tier = rr.tier; o2.level = rr.level; }
+        /* a board row with XP stands where the 63-step ladder puts it (your own row, past the Handpiece); a made-up
+           classmate on a board without XP stands where their own XP does, as the server's sh_rank(xp) puts everyone */
+        var fx = typeof r.xp === "number" && r.tier != null ? r.xp : !r.is_me && FAKE_NAMES.indexOf(r.display_name) >= 0 ? fakeXp(r.display_name) : null;
+        if (fx != null) { var rr = rank2(fx); o2.journey = rr.journey; o2.tier = rr.tier; o2.level = rr.level; o2.step = rr.step; }
+        if (!r.is_me && FAKE_FLAIR[r.display_name]) o2.flair = FAKE_FLAIR[r.display_name];
         return o2; });
       else if (d2 && d2.rank) { d2.rank = profile2(v); if (Array.isArray(d2.inbox)) d2.inbox = d2.inbox.concat(ideaNotes(v)); d2.shop = shop2(v);
         if (Array.isArray(d2.pet_days)) d2.pet_days = petDays2(t); }
@@ -1368,13 +1397,22 @@
       save();
       return { write: true, data: { ok: true, xp: got2, mult: mm, answers: ss.n, correct: ss.c } };
     }
-    /* someone's place, for the dashboard's stage (the top three stand on it as their own Timmys): only the outfit here,
-       the rest of a place gets its fixtures with phase 4. One made-up classmate's place can't be read, for the plain Timmy. */
+    /* someone's place (visiting, and the dashboard's stage, where the top three stand as their own Timmys), as
+       migration_v54's get_place answers it: the name as the boards show it, what stands in each slot, the rank (journey,
+       tier, level) and the medals, never an id, XP, HP or a date. Each made-up classmate has a place of their own from the
+       kit's pieces (FAKE_PLACES), the first in the ModuPro journey; one place can't be read (null), on purpose, for the
+       plain Timmy on the stage and the "couldn't be opened" line. Your own key opens your own place. */
     if (fn === "get_place") {
-      var pk = String(a.p_key || ""), who = -1;
-      FAKE_NAMES.forEach(function(nm, i){ var k = ""; for (var j = 0; j < 3; j++) k += ("00000000" + (hash(nm + "|visit" + j) >>> 0).toString(16)).slice(-8); if (k === pk) who = i; });
+      var pk = String(a.p_key || ""), who = -1, vk = function(n){ var k = ""; for (var j = 0; j < 3; j++) k += ("00000000" + (hash(n + "|visit" + j) >>> 0).toString(16)).slice(-8); return k; };
+      if (!/^[0-9a-f]{24}$/.test(pk)) return { data: null };
+      var myName = db.name || "You (preview)";
+      if (pk === vk(myName)) { var mp = profile2(db.visitor), meq = {}, pe = placeEquipped(); Object.keys(pe).forEach(function(k){ meq[k] = pe[k]; });
+        return { data: { name: myName, equipped: meq, rank: { journey: mp.journey, tier: mp.tier, level: mp.level }, flair: null } }; }
+      FAKE_NAMES.forEach(function(nm, i){ if (vk(nm) === pk) who = i; });
       if (who < 0 || who === 4) return { data: null };
-      return { data: { name: FAKE_NAMES[who], equipped: { outfit: ["rank-dark-outfit", "captain-hat", "tooth-fairy", "tuxedo"][who % 4] }, rank: { journey: 0, tier: 5, level: 1 }, flair: null } };
+      var fr = rank2(fakeXp(FAKE_NAMES[who])), feq = {}, fp = FAKE_PLACES[who] || {};
+      Object.keys(fp).forEach(function(k){ feq[k] = fp[k]; });
+      return { data: { name: FAKE_NAMES[who], equipped: feq, rank: { journey: fr.journey, tier: fr.tier, level: fr.level }, flair: FAKE_FLAIR[FAKE_NAMES[who]] || null } };
     }
     var ideaAns = ideaRpc(fn, a, t);
     if (ideaAns) return ideaAns;
@@ -1408,13 +1446,15 @@
         var xp = myXp(), st = stepOf(xp), tr = tierOf(xp), all = allAnswers(), days = {}; all.forEach(function(r){ days[day(r[2] * 1000)] = 1; });
         return { data: { xp: xp, tier: tr, level: st - tr * 3 + 1, step: st, step_at: stepAt(st), next_at: st < 20 ? stepAt(st + 1) : null, tier_at: TIER_AT[tr],
           answers: all.length, correct: all.filter(function(r){ return r[3]; }).length, days: Object.keys(days).length, best_days: Object.keys(days).length, best_run: 12,
-          position: xp > 50000 ? 1 : xp > 2000 ? 9 : 31, of: 64, badges: (db.badges || []).concat(db.achievements) } };
+          position: xp > fakeXp(FAKE_NAMES[0]) ? 1 : xp > 50000 ? 2 : xp > 2000 ? 9 : 31, of: 64, badges: (db.badges || []).concat(db.achievements) } };
       }
       case "get_rank_board": {
-        var me = myXp(), rows = FAKE_NAMES.slice(0, 10).map(function(n, i){ return { display_name: n, xp: 52000 - i * 4100 - (hash(n) % 900), is_me: false }; });
+        var me = myXp(), rows = FAKE_NAMES.slice(0, 10).map(function(n){ return { display_name: n, xp: fakeXp(n), is_me: false }; });
         rows.push({ display_name: db.name || "You (preview)", xp: me, is_me: true });
         rows.sort(function(x, y){ return y.xp - x.xp; });
-        return { data: rows.map(function(r, i){ var tr2 = tierOf(r.xp); return { rnk: i + 1, display_name: r.display_name, xp: r.xp, tier: tr2, level: stepOf(r.xp) - tr2 * 3 + 1, is_me: r.is_me, flair: null }; }).slice(0, a.p_limit || 10) };
+        /* the top ten, and your own row below them as the server keeps it (rnk <= limit or the caller's own row) */
+        return { data: rows.map(function(r, i){ var tr2 = tierOf(r.xp); return { rnk: i + 1, display_name: r.display_name, xp: r.xp, tier: tr2, level: stepOf(r.xp) - tr2 * 3 + 1, is_me: r.is_me, flair: null }; })
+          .filter(function(r){ return r.rnk <= (a.p_limit || 10) || (r.is_me && !!a.p_visitor); }) };
       }
       case "get_leaderboard": return { data: FAKE_NAMES.slice(0, 8).map(function(n, i){ return { display_name: n, streak: 14 - i, total_answered: 900 - i * 70, tier: Math.max(0, 5 - i), level: 1 + i % 3, flair: null }; }) };
       case "get_arcade_leaderboard": {
