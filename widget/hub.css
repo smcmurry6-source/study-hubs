@@ -1114,6 +1114,18 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
     .hx-set .lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   }
   .hx-strip { gap: 8px; padding: 8px 8px 8px 10px; }
+  /* the large text sizes zoom the page, so the strip has under 350px to lay out in: "Hubs" is its arrow alone, the goal
+     is its count without the ring, and below that the live count (Home has it too) and the XP star go, so the XP
+     figure and Search always stay on the screen */
+  @container hxstrip (max-width: 350px) {
+    .hx-strip { gap: 5px; padding: 8px 6px; }
+    .hx-strip .hx-home { width: 32px; height: 32px; padding: 0; justify-content: center; }
+    .hx-strip .hx-home span { display: none; }
+    .hx-strip .hx-search { width: 32px; height: 32px; }
+    .hx-strip [data-goalm] > svg { display: none; }
+  }
+  @container hxstrip (max-width: 255px) { .hx-strip .hx-live { display: none; } }
+  @container hxstrip (max-width: 225px) { .hx-strip #hxXp > svg { display: none; } }
   .hx-page { padding-top: 20px; }
   .examcard h1 { font-size: 26px; }
   .quick { gap: 6px; }
