@@ -15,7 +15,8 @@
    the live hub's STATE) and its answered event (the same detail as the live recordAnswer), so everyone's answers, XP,
    ranks, pins, spaced review and question health carry over at the release. Then it loads widget/v3.js like any hub.
 
-   The engine is four files, loaded by each hub's page in this order (all deferred, this one last):
+   The engine is four files, in this order, this one last. A hub's page loads them as one, widget/hub.bundle.js (built
+   by tools/bundle/build.mjs with the icons, widget/hub-art.js, in front; run the build after changing any of them):
      widget/hub-rewards.js  what an answer earns: the answer path, XP, the rank, the bar's meters, Today, the recap
      widget/hub-timmy.js    what the engine asks of Timmy (widget/pet.js)
      widget/hub-bank.js     the question card, the bank with its panel and presets, the mock
@@ -190,8 +191,14 @@
     return memo[name] || (memo[name] = fetch(BASE + name).then(function(r){ if (!r.ok) throw new Error(name + " " + r.status); return r.json(); })
       .catch(function(e){ delete memo[name]; throw e; }));
   }
+  /* a script, once: a widget file the page's bundles carry (window.SH_BUNDLE, tools/bundle/build.mjs) runs from there,
+     anything else is fetched */
   function loadScript(src){
-    return memo[src] || (memo[src] = new Promise(function(res, rej){ var s = document.createElement("script"); s.src = src; s.async = true; s.onload = res; s.onerror = function(){ delete memo[src]; rej(new Error(src)); }; document.head.appendChild(s); }));
+    return memo[src] || (memo[src] = new Promise(function(res, rej){
+      var B = window.SH_BUNDLE, name = src.indexOf(WIDGET) === 0 ? src.slice(WIDGET.length) : "";
+      if (B && name && B.has(name)) { B.run(name); res(); return; }
+      var s = document.createElement("script"); s.src = src; s.async = true; s.onload = res; s.onerror = function(){ delete memo[src]; rej(new Error(src)); }; document.head.appendChild(s);
+    }));
   }
   function loadCss(href){ if (memo[href]) return; memo[href] = 1; var l = document.createElement("link"); l.rel = "stylesheet"; l.href = href; document.head.appendChild(l); }
   function lecLabel(l){ return l ? (l.label || ("L" + l.num)) : ""; }
@@ -1332,32 +1339,27 @@
   function whenWidget(name, cb){ var t0 = Date.now(); (function poll(){ if (window[name]) { cb(window[name]); return; } if (Date.now() - t0 > 12000) { cb(null); return; } setTimeout(poll, 250); })(); }
   function startWidget(){
     if (window.__shxWidget) return; window.__shxWidget = true;
-    /* the shared widget's stylesheet comes with it, after the first screen, ahead of hub.css so hub.css still wins */
-    if (!document.querySelector('link[href$="widget/v3.css"]')) {
-      var css = document.createElement("link"); css.rel = "stylesheet"; css.href = WIDGET + "v3.css";
-      var mine = document.querySelector('link[href$="widget/hub.css"]');
-      if (mine) mine.parentNode.insertBefore(css, mine); else document.head.appendChild(css);
-    }
-    var sb = document.createElement("script"); sb.src = WIDGET + "vendor/supabase-2.117.2.js";
-    sb.onload = sb.onerror = function(){
-      var s = document.createElement("script");
-      s.src = WIDGET + "v3.js"; s.setAttribute("data-hub", HUB); s.setAttribute("data-answered-event", EVT); s.setAttribute("data-default-mode", "home");
-      /* the game layer: v3.js asks the database for it and works as on the live hubs until it is there */
-      s.setAttribute("data-game", "v2");
-      s.onload = function(){
-        /* Ask Timmy's chat (widget/ask.js, hub-timmy.js mounts it) comes with the shared widget; so does the shop's
-           balance and the rare costume of the day (hub-timmy.js) */
-        HX.askStart(); HX.shopStart();
-        /* Report and Pin on every card, as on the live hubs (the class picks are the engine's own: classPicks) */
-        if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]");
-        var boot = window.shBootstrap && window.shBootstrap.ready;
-        if (boot && boot.then) boot.then(function(d){ if (d && d.rank && typeof d.rank === "object" && !HX.RANK.p) { HX.RANK.p = d.rank; HX.paintMeters(); } });
-        whenWidget("shRanks", function(){ HX.paintMeters(); });
-        whenWidget("shPet", function(){ setTimeout(function(){ if (HX.SESSION.hp0 === null) HX.SESSION.hp0 = HX.petHp(); }, 1500); });
-      };
-      document.body.appendChild(s);
+    /* The shared widget comes after the first screen, as two bundles (tools/bundle/build.mjs) fetched together and run
+       in this order: rest.bundle.js, the database client and the widgets every page shares (held until asked for);
+       then hub-rest.bundle.js, this hub's own layer: widget/v3.js, which starts as that file runs and reads the hub
+       from its tag, and the files only it loads. Their styles are already here, in the page's one stylesheet. */
+    var rest = document.createElement("script"); rest.src = WIDGET + "rest.bundle.js"; rest.async = false;
+    var s = document.createElement("script"); s.src = WIDGET + "hub-rest.bundle.js"; s.async = false;
+    s.setAttribute("data-hub", HUB); s.setAttribute("data-answered-event", EVT); s.setAttribute("data-default-mode", "home");
+    /* the game layer: v3.js asks the database for it and works as on the live hubs until it is there */
+    s.setAttribute("data-game", "v2");
+    s.onload = function(){
+      /* Ask Timmy's chat (widget/ask.js, hub-timmy.js mounts it) comes with the shared widget; so does the shop's
+         balance and the rare costume of the day (hub-timmy.js) */
+      HX.askStart(); HX.shopStart();
+      /* Report and Pin on every card, as on the live hubs (the class picks are the engine's own: classPicks) */
+      if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]");
+      var boot = window.shBootstrap && window.shBootstrap.ready;
+      if (boot && boot.then) boot.then(function(d){ if (d && d.rank && typeof d.rank === "object" && !HX.RANK.p) { HX.RANK.p = d.rank; HX.paintMeters(); } });
+      whenWidget("shRanks", function(){ HX.paintMeters(); });
+      whenWidget("shPet", function(){ setTimeout(function(){ if (HX.SESSION.hp0 === null) HX.SESSION.hp0 = HX.petHp(); }, 1500); });
     };
-    document.body.appendChild(sb);
+    document.body.appendChild(rest); document.body.appendChild(s);
   }
 
   /* ======================= boot ======================= */

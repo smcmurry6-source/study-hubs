@@ -1,6 +1,6 @@
 {
- "about": "Per-page budgets for tools/release/perf.js, measured as a mid-range phone on slow 4G (see the script). kb = bytes over the wire without narration or video; fcp, lcp, tbt in ms. Raise one only with a reason in the PR that Sam approves; lower them when a page gets lighter.",
- "updated": "2026-11-11",
+ "about": "Per-page budgets for tools/release/perf.js, measured as a mid-range phone on slow 4G (see the script). kb = bytes over the wire without narration or video, requests = network requests, both for the whole visit without a tap (to the moment the network goes quiet, since 2026-11-13: before that the count stopped 3 seconds after the load event); fcp, lcp, tbt in ms. Raise one only with a reason in the PR that Sam approves; lower them when a page gets lighter.",
+ "updated": "2026-11-13",
  "profile": "slow 4G, CPU 4x, 412x823 phone",
  "pages": {
   "index.html": {
@@ -81,31 +81,31 @@
    "tbt": 1000
   },
   "hubs/occlusion/next/": {
-   "kb": 650,
-   "requests": 21,
+   "kb": 800,
+   "requests": 12,
    "fcp": 3000,
    "lcp": 3000,
    "tbt": 500
   },
   "hubs/heme-endo-exam2/next/": {
-   "kb": 680,
-   "requests": 22,
+   "kb": 750,
+   "requests": 12,
    "fcp": 3000,
    "lcp": 3000,
    "tbt": 500
   },
   "hubs/perio/next/": {
-   "kb": 680,
-   "requests": 21,
+   "kb": 830,
+   "requests": 12,
    "fcp": 3000,
    "lcp": 3000,
    "tbt": 500
   },
   "next/": {
-   "kb": 420,
-   "requests": 30,
-   "fcp": 3500,
-   "lcp": 3500,
+   "kb": 345,
+   "requests": 10,
+   "fcp": 3000,
+   "lcp": 3000,
    "tbt": 500
   }
  }

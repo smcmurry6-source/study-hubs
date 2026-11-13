@@ -194,7 +194,7 @@ The live About page describes the live site, so these go in with the redesign's 
   - **Inbox notes** (`widget/replies.js`, live file, a small change): a row of kind `idea` reads "An idea you posted or
     voted for is planned", with the idea's title and Sam's line, once as a pop-up and then in the Inbox. No such row
     exists until migration_v54. The new dashboard gets them (its bootstrap is the `_v2` one); **the hubs get them when
-    `v3.js` moves to `get_widget_bootstrap_v2`** ([phase 5](2026-11-05-redesign-phase-5-backend.md), part 2).
+    `v3.js` moves to `get_widget_bootstrap_v2`** ([phase 5](done/2026-11-05-redesign-phase-5-backend.md), part 2).
   - **The admin page**: Inbox → "Idea board", under the podcast comments: every idea of the last 90 days with its votes
     and reports, Hide / Restore, a status with one line on why ("Saved. N people told in their Inbox."), and an "All /
     Reported or hidden" switch. Before migration_v54 the card says the board opens with the redesign.

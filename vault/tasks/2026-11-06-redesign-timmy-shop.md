@@ -23,7 +23,7 @@ with no holiday, Timmy now and then wears a rare costume, the same one all day. 
 ## Context
 
 - The redesign plan: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) (section 4.10). Client:
-  [phase 4](2026-11-05-redesign-phase-4-game-layer.md) (part B); server: [phase 5](2026-11-05-redesign-phase-5-backend.md)
+  [phase 4](2026-11-05-redesign-phase-4-game-layer.md) (part B); server: [phase 5](done/2026-11-05-redesign-phase-5-backend.md)
   (part 3); live at [the release](2026-11-06-redesign-release.md).
 - What the house items go into: [Timmy's place](2026-11-06-redesign-timmys-place.md) (the house card, redrawn). XP and its
   boosts: [the journeys note](2026-11-06-redesign-progression-journeys.md). Bowling: [its own note](done/2026-11-06-redesign-bowling-egg.md).

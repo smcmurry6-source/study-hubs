@@ -29,7 +29,8 @@ tags: [map]
 - `next/` — the redesign's dashboard, built beside the live one until [the release](../tasks/2026-11-06-redesign-release.md):
   `index.html` (its settings in `window.SH_DASH`; outside a preview it sends visitors to the live dashboard) and `hubs.js`
   (the hub list and archive hours, **generated** from `index.html` by `tools/dash-next/build.mjs`; CI's `--check` fails
-  when it is stale, so run the build after changing `HUBS`). The page is drawn by `widget/dash.js` + `widget/dash.css` on
+  when it is stale, so run the build after changing `HUBS`). The page is drawn by `widget/dash.js` + `widget/dash.css`
+  (loaded as `widget/dash.bundle.js` and `widget/site.bundle.css`: [bundles](bundles.md)) on
   the hub engine's design system (`widget/hub.css`), with `widget/hub-art/dash.js` (every hub's emblem and tint, from
   `tools/figures/site/build.mjs`). Its drawn parts are kits the page draws at its own size: `widget/hub-art/class.js`
   (the studying-now classroom, the leaderboard's stage and the recap's bar graph and crowd, from `classroom.mjs`,
@@ -47,9 +48,15 @@ tags: [map]
   first scroll, tap or key (until then its "you" card shows a still kept on the device). [Phase 3](../tasks/2026-11-05-redesign-phase-3-dashboard.md) says what is on it.
 - `hubs/<hub-id>/next/` — the redesign's new version of a hub, beside the live one until the release: a small page of
   settings (`window.SH_HUB`), its content as JSON in `content/` (written by `tools/hub-next/build.mjs`) and the shared
-  engine. The engine is four scripts the page loads in order, with `widget/hub.css`: `widget/hub-rewards.js` (the answer
+  engine. The engine is four scripts, with `widget/hub.css`: `widget/hub-rewards.js` (the answer
   path, XP, rank, the recap), `widget/hub-timmy.js` (Timmy), `widget/hub-bank.js` (the question card, the bank, the mock),
-  then the core, `widget/hub.js` (its top says how they fit together). The Question Bank's Learn and Flashcards are
+  then the core, `widget/hub.js` (its top says how they fit together). The page loads them as one built file,
+  `widget/hub.bundle.js`, and the stylesheet as `widget/site.bundle.css` (the next entry).
+- `tools/bundle/` and `widget/*.bundle.*` — what a redesigned page loads instead of one request per widget file
+  ([bundles](bundles.md)): `bundles.json` lists each bundle's sources, `build.mjs` writes `widget/hub.bundle.js`,
+  `dash.bundle.js`, `rest.bundle.js`, `hub-rest.bundle.js` and `site.bundle.css` (**generated and committed**: edit the
+  sources, run `node tools/bundle/build.mjs`, commit both; CI's `--check` fails on a stale one), and `client/` builds
+  the slim database client `widget/vendor/supabase-lite-2.117.2.js`. The live pages don't load any of it. The Question Bank's Learn and Flashcards are
   `widget/study-modes.js` + `widget/study-modes.css`, fetched by `hub-bank.js` the first time either is opened
   ([the task](../tasks/2026-11-06-redesign-learn-and-flashcards.md); their server part is the pending `migration_v56.sql`).
   The bowling egg ([the task](../tasks/done/2026-11-06-redesign-bowling-egg.md)) is `widget/bowling.js` (`window.shBowl`, its

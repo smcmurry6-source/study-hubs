@@ -363,6 +363,6 @@ the new tables and calls every function a visitor can run with one visitor's id,
 `admin-ops.js` and `retention.js` run with them in place. CI runs all four. `tools/release/rls-audit.sql` checks the same
 two lists on the live database once the migration is applied.
 
-Related: [the release](../tasks/2026-11-06-redesign-release.md) · [phase 5](../tasks/2026-11-05-redesign-phase-5-backend.md) ·
+Related: [the release](../tasks/2026-11-06-redesign-release.md) · [phase 5](../tasks/done/2026-11-05-redesign-phase-5-backend.md) ·
 [event-taxonomy](event-taxonomy.md) · [analytics-retention](analytics-retention.md) ·
 [learner-data-privacy](../rules/learner-data-privacy.md) · [shared-infrastructure](shared-infrastructure.md)

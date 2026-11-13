@@ -245,7 +245,7 @@ icon library, no stock photographs, no generated images.
 | 2 | [the other live hubs](../2026-11-05-redesign-phase-2-live-hubs.md) | Every live hub on the engine, perio ported |
 | 3 | [dashboard and About](../2026-11-05-redesign-phase-3-dashboard.md) | The new dashboard ("you" card, hub tabs, class board) and the About page rewritten |
 | 4 | [the game layer](../2026-11-05-redesign-phase-4-game-layer.md) | Medals, trophies, celebration cards on the new type, the arcade lobby redrawn |
-| 5 | [backend and loading](../2026-11-05-redesign-phase-5-backend.md) | Bootstrap RPC, XP cache, timers, advisor fixes, bundles, font, sw.js |
+| 5 | [backend and loading](2026-11-05-redesign-phase-5-backend.md) | Bootstrap RPC, XP cache, timers, advisor fixes, bundles, font, sw.js |
 | | | Since 2026-11-06, phase 4 has four parts (A-D) and phase 5 a part 3; Patient Box v2 runs on its own (4.10) |
 
 Each phase is a PR with a preview link first, screenshots on a phone and a laptop, the release suites, and Sam's look

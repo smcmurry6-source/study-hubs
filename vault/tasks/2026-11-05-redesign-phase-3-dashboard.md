@@ -26,7 +26,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 - The About page rule: [about-page](../rules/about-page.md).
 - **Added 2026-11-06 (Sam)**: [the idea board](2026-11-06-idea-board.md) is part of this phase (a dashboard section and a
   page in a hub's More, `widget/ideas.js`), and the "you" card shows [Timmy's place](2026-11-06-redesign-timmys-place.md)
-  (drawn in phase 4, part C). The server side of both is in [phase 5](2026-11-05-redesign-phase-5-backend.md), part 3.
+  (drawn in phase 4, part C). The server side of both is in [phase 5](done/2026-11-05-redesign-phase-5-backend.md), part 3.
 - **Built beside the live dashboard, released with the rest** (Sam, 2026-11-06, [decisions](../decisions.md)): the new
   dashboard is a page next to `index.html` (for example `next/index.html`) that links to the new hub versions, and it
   replaces `index.html` at [the release](2026-11-06-redesign-release.md). The About page's rewrite is drafted in the

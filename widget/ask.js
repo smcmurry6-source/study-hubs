@@ -80,7 +80,8 @@
   function css(){
     if (cssP) return cssP;
     cssP = new Promise(function(ok){
-      var l = document.querySelector('link[href*="widget/ask.css"], link[href$="ask.css"]');
+      /* its own stylesheet, or the redesign's one stylesheet, which carries it (tools/bundle/build.mjs) */
+      var l = document.querySelector('link[href*="widget/ask.css"], link[href$="ask.css"], link[href*="site.bundle.css"]');
       function done(){ cssDone = true; ok(); }
       if (l) { if (l.sheet) done(); else { l.addEventListener("load", done); l.addEventListener("error", done); setTimeout(done, 8000); } return; }
       l = document.createElement("link"); l.rel = "stylesheet"; l.href = SELF ? SELF.replace(/ask\.js(\?.*)?$/, "ask.css") : "ask.css";

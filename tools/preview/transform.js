@@ -96,8 +96,10 @@ function transformSw(js, o){
    Timmy) is, in a preview, the day its test account started (the runtime's SH_PREVIEW_TIMMY_FROM), so the "new" account
    meets him at 100 and the others keep their history. A pet.js without the line fails loudly rather than quietly. */
 const PET_FROM = 'var FULL_FROM = "9999-12-31";';
-function transformPet(js, o){
-  if (!js.includes(PET_FROM)) throw new Error('widget/pet.js has no `' + PET_FROM + '` line for the preview to point at its own start (tools/preview/transform.js)');
+/* the redesign's pages get pet.js inside this bundle (tools/bundle/build.mjs keeps the line as it is written) */
+const PET_FILES = ['widget/pet.js', 'widget/rest.bundle.js'];
+function transformPet(js, o, rel){
+  if (!js.includes(PET_FROM)) throw new Error((rel || 'widget/pet.js') + ' has no `' + PET_FROM + '` line for the preview to point at its own start (tools/preview/transform.js)');
   return rewriteText(js, o).replace(PET_FROM, 'var FULL_FROM = window.SH_PREVIEW_TIMMY_FROM || "9999-12-31";');
 }
 
@@ -108,7 +110,7 @@ function transformFile(rel, buf, o){
   const text = buf.toString('utf8');
   if (ext === '.html') return transformHtml(text, rel, o);
   if (rel === 'sw.js') return transformSw(text, o);
-  if (rel === 'widget/pet.js') return transformPet(text, o);
+  if (PET_FILES.includes(rel)) return transformPet(text, o, rel);
   return rewriteText(text, o);
 }
 
