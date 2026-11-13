@@ -276,7 +276,18 @@ try {
     /* no opt-out (Sam, 2026-11-11): C, on the arcade board only, has a key there and a place it opens */
     const placeC = anonText(`public.get_place(${q(keyC)})`);
     if (!withKeyC || placeC === 'null' || /rls-[ABC]/.test(placeC)) fail(`C (on the arcade board only) should have a key there that opens C's place, without an id: on ${withKeyC} board(s), ${placeC.slice(0, 120)}`);
-    notes.push(`visiting: ${(EXPECT.anonNone || []).length} tables and ${(EXPECT.anonNoRun || []).length} helpers closed to anon; get_place and the four boards give a key, never an id`);
+    /* Visit someone random from the whole class (migration_v57): someone else's place and key, never A's, never an id */
+    const keyA = sql(`select public.sh_visit_key('rls-A')`)[0][0], picks = new Set();
+    for (let i = 0; i < 12; i++) {
+      const text = anonText(`public.get_random_place('rls-A')`);
+      let r = null; try { r = JSON.parse(text); } catch (e) {}
+      if (/rls-[ABC]/.test(text)) { fail(`get_random_place hands back a visitor id: ${text.slice(0, 120)}`); break; }
+      if (!r || !/^[0-9a-f]{24}$/.test(r.visit || '') || Object.keys(r).sort().join(',') !== 'equipped,flair,name,rank,visit') { fail(`get_random_place should give a place and its key, nothing else: ${text.slice(0, 120)}`); break; }
+      if (r.visit === keyA) { fail('get_random_place sent A to A\'s own place'); break; }
+      picks.add(r.visit);
+    }
+    if (picks.size && ![...picks].every(k => k === keyB || k === keyC || anonText(`public.get_place(${q(k)})`) !== 'null')) fail('get_random_place gave a key that opens no place');
+    notes.push(`visiting: ${(EXPECT.anonNone || []).length} tables and ${(EXPECT.anonNoRun || []).length} helpers closed to anon; get_place, get_random_place and the four boards give a key, never an id`);
   }
 
   /* 7. no function a visitor can run hands back another visitor's id: every one (but triggers) is called as anon with A's

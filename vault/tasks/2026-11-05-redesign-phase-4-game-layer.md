@@ -436,6 +436,16 @@ These hold for each spec; a spec only adds to them.
   ([visiting](done/2026-11-12-redesign-visiting.md)'s Outcome): Visit someone random under the board, arrows and Back to
   mine in a visit, each hop through the clouds. Nothing on the server; `widget/place.js`'s `open()` takes `nav` and
   `covered` (above). **Next: session 6** still.
+- 2026-11-13: [#354](https://github.com/smcmurry6-source/study-hubs/pull/354) merged as `0cba9fc` (Sam: "merge");
+  `postcheck.js` passed. Then Sam: "i want random to be for the whole class" ([#355](https://github.com/smcmurry6-source/study-hubs/pull/355)): the pick moved to the server, in **a new
+  pending migration, `migration_v57.sql`** (`get_random_place`; v54 unchanged; applied at the release after v56: its box
+  is in [the release](2026-11-06-redesign-release.md), "From phase 4, visiting"). `widget/place.js`'s `nav` can carry
+  `more()` (a random trip: Next past the last rolls the die again, Previous goes back through the trip);
+  `widget/dash.js`'s `visitRandom()` falls back to the board's rows without the function. Details:
+  [visiting](done/2026-11-12-redesign-visiting.md)'s Outcome, [game-server](../reference/game-server.md), "Visiting".
+  **Next: session 6** still.
+  In the same PR, Sam: "skip people with zero customization" (the random pick needs a place with something chosen) and
+  a number badge for the top ten on a visit (`top` on a place, `.tpv-num`).
 - 2026-11-13 (Claude Code), **session 6, the trophy case and the cards; hand-off for session 7 on** ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356); [its note](done/2026-11-12-redesign-trophy-case-and-cards.md),
   its Outcome). One live change, BUG-116's fix (Sam: "ship the BUG-116 live fix too"); otherwise nothing students see
   changes: the live hubs and dashboard keep 24 trophies, Full Arch, the old Stats
