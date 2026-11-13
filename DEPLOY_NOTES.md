@@ -32,6 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-12 (Timmy's shop, the client, phase 4 part B, Claude Code)** — Nothing students see changes: the shop
+  runs only on the redesign's pages, on the game layer (`migration_v54.sql`, not applied, unchanged). New
+  `widget/shop.js` + `widget/shop.css` (`window.shShop`, fetched on first use): the storefront with the balance, Today's
+  showcase, Today's picks, This week, Back for today, the seasons' sets, Spotted (the rare costumes) and Always here;
+  an item's sheet with Buy, every refusal's line, one request id per sheet, "Put it on" / "Place it" into the
+  customizer. Opened from a new hub's More (`widget/hub.js`, `widget/hub-timmy.js`), the new dashboard's "you" card
+  (the balance and a Shop button, `widget/dash.js`/`.css`) and the place's "Get more in the shop" (`widget/place.js`).
+  `widget/pet.js`: on the game layer only, snacks' HP from `get_pet_days_v2` count in `simulate()`, and
+  `refresh(true)` reads his days again; live pages compute HP exactly as before. The rare costume of the day. The
+  preview sells the catalog read from the migration and answers `buy_item` in the server's order of checks. Tests:
+  the smoke test (the shop on a new hub and the new dashboard; a live hub never asks for it), `xp.js` (367 checks:
+  the preview's purchases against `sh_buy`, the costume of the day over three years), `a11y.js` (the shop, its sheet,
+  dark mode; no issues). BUG-098 to BUG-104 found and fixed in testing.
 - **2026-11-12 (Ask Timmy's admin tab, part 3, Claude Code)** — Nothing students see changes: the admin page
   (`review/index.html`) gets an **Ask Timmy** tab for [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md): figures for
   the range, by hub and by day (questions, estimated cost, not covered, declined, errors, thumbs, quotes, reports), his

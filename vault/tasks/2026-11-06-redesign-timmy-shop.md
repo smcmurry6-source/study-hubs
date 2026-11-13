@@ -395,15 +395,15 @@ editing the About page (draft it in [the release note](2026-11-06-redesign-relea
 with the rare costumes in a spoiler, and finish part C's "What you own" line there).
 
 **Done when** (session 2):
-- [ ] The shop opens from a new hub's More, from the new dashboard's "you" card and from the place's customizer
-- [ ] Buying works end to end on the preview's made-up data, for each kind; every refusal has its line
-- [ ] The balance shows where Sam chose, and changes after a purchase
-- [ ] A snack heals Timmy the same on the bar, at his place and on the dashboard (`simulate()` reads `hp`), and a
+- [x] The shop opens from a new hub's More, from the new dashboard's "you" card and from the place's customizer
+- [x] Buying works end to end on the preview's made-up data, for each kind; every refusal has its line
+- [x] The balance shows where Sam chose, and changes after a purchase
+- [x] A snack heals Timmy the same on the bar, at his place and on the dashboard (`simulate()` reads `hp`), and a
       live page computes his HP exactly as before
-- [ ] A rare costume turns up, is logged once, and sits on the Spotted shelf until bought
-- [ ] The tests above added and passing; `node tools/release/run.js` once; budgets unchanged
-- [ ] Screenshots (phone and laptop, light and dark) and a short recording of one purchase sent to Sam
-- [ ] `tools/podcast/LORE.md` (the five costumes and their lines), the About draft, the event taxonomy and
+- [x] A rare costume turns up, is logged once, and sits on the Spotted shelf until bought
+- [x] The tests above added and passing; `node tools/release/run.js` once; budgets unchanged (2026-11-12: all 17 suites passed, `perf.js` within budget)
+- [x] Screenshots (phone and laptop, light and dark) and a short recording of one purchase sent to Sam
+- [x] `tools/podcast/LORE.md` (the five costumes and their lines), the About draft, the event taxonomy and
       retention rows, [game-server](../reference/game-server.md), the hand-off in phase 4's Log
 
 ## Done when
@@ -415,13 +415,14 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
       tested on a throwaway copy (a double tap, a replayed call, a balance too low, an item not on sale today, a linked device)
 - [ ] Client: the shop in More, the balance on the "you" card, rare costumes (session 2's Done when, above), shown to
       Sam in screenshots and a recording from a scripted browser on made-up data (no hosted preview: Sam, 2026-11-12)
-      - [ ] from part C of phase 4 (2026-11-12, [its hand-off](2026-11-05-redesign-phase-4-game-layer.md)): the place's
+      - [x] from part C of phase 4 (2026-11-12, [its hand-off](2026-11-05-redesign-phase-4-game-layer.md)): the place's
             customizer gets its "Get more in the shop" link; `widget/pet.js` reads snack HP (`get_pet_days_v2`'s `hp`);
             after a purchase the place is told (`shPlace.setup({ shop })`, `shPlace.repaint()`)
       - [x] the five everyday outfits with no drawing are drawn (Sam, 2026-11-12: draw them; session 1;
             [task](done/2026-11-12-five-outfits-without-a-drawing.md))
-- [ ] `LORE.md`, the About page (Shiny Gold Crowns, the shop, rarity, boosts, health items; rare costumes in a spoiler), the event taxonomy
-      and retention rows
+- [x] `LORE.md`, the About page (Shiny Gold Crowns, the shop, rarity, boosts, health items; rare costumes in a spoiler), the event taxonomy
+      and retention rows (session 2; the About page's entry is drafted in [the release note](2026-11-06-redesign-release.md),
+      "From phase 4, part B", and goes on the page with the release)
 - [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
 - [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
 
@@ -465,6 +466,12 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
 - 2026-11-12: Sam's yes for all of it: "Actually its good. Everything looks good. Merge when ready", "i like the
   redesign" ([decisions](../decisions.md)). No price to change. Session 1 is done; `main` (Ask Timmy's chat, #338)
   was brought in before the merge, and this branch's new bug became BUG-095. **Next: session 2, the client.**
+- 2026-11-12 (Claude Code), **session 2, the shop's client** (this PR): `widget/shop.js` + `widget/shop.css`
+  (`window.shShop`), built to the design page's shop; the hub engine's Shop row in More, the new dashboard's balance and
+  Shop button, the place's "Get more in the shop"; snacks heal through `get_pet_days_v2` (`widget/pet.js`); boosts start
+  the 2x chip; the rare costume of the day. `migration_v54.sql` unchanged, and nothing in it disagreed with the client.
+  What it built, the tests and what's left: phase 4's Log (the hand-off for session 3). Screenshots and a recording sent
+  to Sam. Found and fixed while testing: BUG-098 to BUG-104 ([the bug log](../release/bug-log.md)).
 
 ## Outcome
 

@@ -49,7 +49,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 | # | Session | Its spec | Needs first |
 |---|---|---|---|
 | 1 | **The shop's art**: the coin, snacks, boosts, rarity frames, the five undrawn outfits, the five rare costumes, and Timmy's door spot moved off the rank statue (BUG-089). **Done 2026-11-12** ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)), with the shop's look redrawn ("more epic") | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1" | [#335](https://github.com/smcmurry6-source/study-hubs/pull/335) merged |
-| 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
+| 2 | **The shop's client** (part B): the shop, the balance, buying, snacks and HP, boosts, rare costumes. **Built 2026-11-12**, waiting for Sam's "merge" (its hand-off in the Log) | [the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 2" | 1 |
 | 3 | **Timmy everywhere** (part E's part 4): everyone has Timmy, and he wears what you put on, on the bar, at his place, in the classroom and on the stage | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4" | 2 (both edit `widget/pet.js`) |
 | 4 | **Visiting**: a row on the new dashboard's boards opens that person's place | [visiting](2026-11-12-redesign-visiting.md) | 3 |
 | 5 | **The bowling egg** (part D) | [the bowling egg](2026-11-06-redesign-bowling-egg.md), "Build spec" | 2 (it hooks into `widget/place.js`'s lane) |
@@ -301,6 +301,50 @@ These hold for each spec; a spec only adds to them.
 - 2026-11-12: beside the sessions, Ask Timmy part 3 (the admin page's Ask Timmy tab, `review/`) merged as `e0737a1`
   ([#341](https://github.com/smcmurry6-source/study-hubs/pull/341), Sam: "merge"); `postcheck.js` passed. **Next: still
   session 2, the shop's client**, then session 3 (Ask Timmy part 4).
+- 2026-11-12 (Claude Code), **session 2, the shop's client; hand-off for session 3**. Nothing students see changes:
+  the shop runs only on the redesign's pages, on the game layer; `migration_v54.sql` is unchanged and nothing in it
+  disagreed with the client. Screenshots and a recording of one purchase were sent to Sam (no hosted preview).
+  - **New `widget/shop.js` + `widget/shop.css`**, `window.shShop`: `setup({ sb, visitor, shop, profile, onBought })`,
+    `mount(el, { level, title })`, `open({ onClose })`, `close()`, `balance()`, `read()` (one `get_my_shop`), `ready()`,
+    `state()`. Fetched on first use only (14 KB + 8 KB compressed, and `hub-art/shop.js` 11 KB); it fetches the shop's art
+    and the place's kit (`shPlace.ready()`, loading `place.js` if needed) itself. It dispatches `sh:shop` with the new
+    shop after every read or purchase; the hub and the dashboard listen. Every button has a fixed `data-shop` name first.
+  - **The page**, built to the design page's shop: the storefront (Timmy in a bow tie behind the counter, the balance
+    on its plaque, "How you earn gold crowns"), Today's showcase (the rarest piece on sale you don't own, the dearest of
+    those), Today's picks, This week beside Back for today, a shelf per season on sale (with a poster of the set at the
+    place), Spotted (the five costumes, unseen ones as shapes), Always here. An item's sheet: the piece large, its
+    price against the balance, Buy; then "Put it on" / "Place it", which opens the customizer on that piece's tab
+    (`shPlace.open({ pick })`, new). Refusals each have a line; a dropped connection charges nothing and the retry
+    sends the same request id.
+  - **`widget/hub.js`**: the `shop` row in `MORE` (after `place`), its tile shows the balance (`HX.shopMeta()`) and
+    the coin (`HX.shopCoin`); the row shows only when `HX.hasShop()`: a `shop` in the bootstrap **and Timmy adopted**
+    (the shop draws him in the outfits, and pet.js loads on a new hub only once he's adopted). **Session 3, "everyone
+    has Timmy", takes the adoption condition out of `hasShop()`** (`widget/hub-timmy.js`). `startWidget` calls
+    `HX.shopStart()`.
+  - **`widget/hub-timmy.js`**: `moreShop` (waits for the bootstrap, so a link straight to `#more/shop` works),
+    `shopStart` (the rare costume of the day), `shopBought` (a boost's `boost_until` to `shGame.setBoost` unless a
+    longer boost runs, then `HX.paintMeters()`), `costumeOfDay(visitor, day, holiday)`. **`widget/dash.js`** has the
+    same `costumeOfDay` (xp.js checks the two agree, over three years), `#youShop` on the "you" card (the coin, the
+    balance, "Timmy's shop"), and opens the shop as a dialog on the button's first tap.
+  - **`widget/pet.js`** (shared with the live pages, which compute exactly as before): `simulate()` adds each server
+    row's `hp` (snacks) after that day's change; `loadRemote()` asks `get_pet_days_v2` on the game layer (`shGame.v2()`
+    on a new hub, a v2 bootstrap with `shop` on the new dashboard); `refresh(true)` reads his days again (the shop calls
+    it after a snack, then Timmy says the snack's line). **Session 3 changes pet.js again**: keep these three.
+  - **`widget/place.js`**: "Get more in the shop" (`data-tp="shop"`) beside Surprise me; the place closes while the
+    shop is open and comes back on the same tab; `open({ pick })`.
+  - **The preview** sells the catalog read from `migration_v54.sql` at build time (`tools/preview/transform.js`,
+    `shopCatalog()`), with a wallet per test account (new 0, returning 300, missed 80, high-xp 20,000), `buyCore`
+    (the server's order of checks, run by xp.js against `sh_buy`), snack HP in `get_pet_days_v2` and the bootstrap's
+    `pet_days`, shop boosts, `record_costume_sighting`. A rare costume to look at: `?persona=returning&now=2027-01-07T10:00`.
+  - **Tests**: the smoke test (a new hub's shop: the tile, no shop file with the page, the shelves, a purchase, a
+    dropped connection and its retry with the same id, a double tap, a refusal, a snack at 100 HP, `data-shop` first,
+    an item's name as text, "Put it on"; the new dashboard's balance and button; a live hub never asks for the shop);
+    `xp.js` 367 checks (17 purchases through the preview's `buyCore` and `sh_buy`, the costume of the day over three
+    years); `a11y.js` (the shop, its sheet, the shop in dark mode: no issues, in the baseline). Bugs found and fixed:
+    BUG-098 to BUG-104.
+  - **Left for later, written down**: `sw.js`'s `PRECACHE` (session 8) and the shop on the release's preview, in [the
+    release note](2026-11-06-redesign-release.md) ("From phase 4, part B", with the About page's draft).
+  **Next: session 3, Timmy everywhere** ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), "Build spec, part 4").
 
 ## Outcome
 
