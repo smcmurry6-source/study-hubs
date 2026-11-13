@@ -1747,11 +1747,14 @@ function lint(hub, A){
         else {
           const c = await page.evaluate(() => {
             const q = s => [...document.querySelectorAll(s)], k = b => b.getAttribute('data-k');
-            const main = q('.sht-shelf:not(.is-retired) [data-sht="trophy"]'), ret = q('.sht-shelf.is-retired [data-sht="trophy"]');
+            /* the 27 are the first three shelves; each hub's own eight sit on a shelf of their own under them (Sam, 2026-11-13) */
+            const main = q('.sht-shelf:not(.is-retired):not(.is-hub) [data-sht="trophy"]'), ret = q('.sht-shelf.is-retired [data-sht="trophy"]');
+            const hubShelves = q('.sht-shelf.is-hub').map(s => ({ h: ((s.querySelector('h3') || {}).textContent || '').trim(), n: s.querySelectorAll('[data-sht="trophy"]').length, keys: [...s.querySelectorAll('[data-sht="trophy"]')].every(b => /:/.test(k(b))),
+              medals: s.querySelectorAll('[data-k^="mastery-"] .sht-obj svg').length }));
             const secrets = q('.sht-shelf').filter(s => /^Secrets/.test((s.querySelector('h3') || {}).textContent || ''))[0];
             const boss = document.querySelector('[data-sht="trophy"][data-k="boss"]'), first = document.querySelector('[data-sht="trophy"][data-k="answers-100"]');
             const words = document.body.innerHTML + ' ' + q('[aria-label], [title]').map(e => (e.getAttribute('aria-label') || '') + ' ' + (e.getAttribute('title') || '')).join(' ');
-            return { n: main.length, secrets: secrets ? secrets.querySelectorAll('[data-sht="trophy"]').length : 0, arch: main.some(b => k(b) === 'fullarch'),
+            return { hubShelves, n: main.length, secrets: secrets ? secrets.querySelectorAll('[data-sht="trophy"]').length : 0, arch: main.some(b => k(b) === 'fullarch'),
               ret: ret.map(b => k(b) + ':' + b.textContent.trim()).join(), boss: !!boss && boss.classList.contains('is-secret') && /^Secret trophy/.test(boss.getAttribute('aria-label') || '') && !!boss.querySelector('.sht-obj svg path'),
               named: /Final Blow/.test(words), first: !!first && first.classList.contains('is-won') && first.querySelectorAll('.sht-obj svg *').length > 3,
               unnamed: q('.sht button').filter(b => !b.getAttribute('data-sht')).length, boards: !!document.querySelector('[data-sht="boards"]'),
@@ -1759,6 +1762,7 @@ function lint(hub, A){
           });
           const lecs = await page.evaluate(() => (window.SH_EXPORT && window.SH_EXPORT.lectures || []).length);
           if (c.n !== 27 || c.secrets !== 16) problems.push(`${name} (${label}): the case should hold 27 trophies, 16 of them secret (${c.n}, ${c.secrets})`);
+          if (!c.hubShelves.length || c.hubShelves.some(s => s.n !== 8 || !s.keys || s.medals !== 4)) problems.push(`${name} (${label}): the case should have a shelf for this hub with its 8 trophies, each keyed "<trophy>:<hub>", the four mastery medals drawn (${JSON.stringify(c.hubShelves)})`);
           if (c.arch) problems.push(`${name} (${label}): Full Arch is among the case's trophies (it is retired: only on the Retired shelf, for those who won it)`);
           if (c.ret !== 'fullarch:Full Arch (retired)') problems.push(`${name} (${label}): Full Arch, won here, should sit alone on the Retired shelf as "Full Arch (retired)" (${c.ret || 'none'})`);
           if (!c.boss || c.named) problems.push(`${name} (${label}): a secret not found should be its silhouette, announced as a secret, its name nowhere in the page (${JSON.stringify({ boss: c.boss, named: c.named })})`);
@@ -1804,8 +1808,10 @@ function lint(hub, A){
         else {
           await btn.click();
           const ok = await page.waitForSelector('.dx-dlg .sht-cab', { timeout: 20000 }).catch(() => null); await page.waitForTimeout(600);
-          const n = await page.$$eval('.dx-dlg .sht-shelf:not(.is-retired) [data-sht="trophy"]', b => b.length);
+          const n = await page.$$eval('.dx-dlg .sht-shelf:not(.is-retired):not(.is-hub) [data-sht="trophy"]', b => b.length);
           if (!ok || n !== 27) problems.push(`${name} (${label}): the "you" card should open the case with 27 trophies (${n})`);
+          const hs = await page.$$eval('.dx-dlg .sht-shelf.is-hub', ss => ss.map(s => s.querySelectorAll('[data-sht="trophy"]').length));
+          if (!hs.length || hs.some(x => x !== 8)) problems.push(`${name} (${label}): the case on the dashboard should have a shelf of 8 for each hub on the engine (${hs.join(', ') || 'none'})`);
           await page.keyboard.press('Escape');
         }
         errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));

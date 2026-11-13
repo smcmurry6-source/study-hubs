@@ -212,9 +212,9 @@ async function openVisit(page, check){
         await check(k, null);
         results[k].focus = await keyboard(page); results[k].motion = await motion(page);
         const t = await page.evaluate(() => {
-          const b = [...document.querySelectorAll('.sht [data-sht="trophy"]')], R = window.shRanks, all = R.TROPHIES.concat(R.RETIRED || []);
+          const b = [...document.querySelectorAll('.sht [data-sht="trophy"]')], R = window.shRanks, all = R.TROPHIES.concat(R.RETIRED || [], R.HUB_TROPHIES || []);   /* a hub's shelf: '<trophy>:<hub>' */
           const sec = b.filter(x => x.classList.contains('is-secret'));
-          const leak = sec.filter(x => { const m = all.filter(y => y.k === x.getAttribute('data-k'))[0], said = (x.getAttribute('aria-label') || '') + ' ' + x.textContent;
+          const leak = sec.filter(x => { const m = all.filter(y => y.k === x.getAttribute('data-k').split(':')[0])[0], said = (x.getAttribute('aria-label') || '') + ' ' + x.textContent;
             return !/^Secret trophy/.test(x.getAttribute('aria-label') || '') || !m || said.indexOf(m.n) >= 0; });
           return { n: b.length, unnamed: b.filter(x => !/\S/.test(x.getAttribute('aria-label') || '')).length, sec: sec.length, leak: leak.map(x => x.getAttribute('data-k')) };
         });
