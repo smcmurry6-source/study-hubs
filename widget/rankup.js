@@ -640,22 +640,13 @@
     function close(now){
       if (closed) return; closed = true; timers.forEach(clearTimeout);
       if (lvClose === close) lvClose = null;
-      /* the redesign (BUG-116): the card fades out and the queue goes on to the next card. On a live page this inner
-         `done` hides the queue's own, so the card goes at once and no later card shows until the page reloads; that
-         stays as it is there until Sam says otherwise */
-      if (NEW) {
-        var gone = function(){ el.remove(); };
-        if (now || still || !el.animate) gone();
-        else el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-14px) scale(.97)" }], { duration: 320, easing: "ease-in", fill: "forwards" }).onfinish = gone;
-        if (sp) setTimeout(function(){ sp.kill(); cv.remove(); }, now ? 0 : 1600);
-        if (next) next();
-        return;
-      }
-      var done = function(){ el.remove(); };
-      if (now || still || !el.animate) done();
-      else el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-14px) scale(.97)" }], { duration: 320, easing: "ease-in", fill: "forwards" }).onfinish = done;
+      /* the card fades out and the queue goes on to the next card (BUG-116, 2026-11-13: a local `done` here used to
+         hide the queue's own, so after a level-up no later card played until the page reloaded) */
+      var gone = function(){ el.remove(); };
+      if (now || still || !el.animate) gone();
+      else el.animate([{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-14px) scale(.97)" }], { duration: 320, easing: "ease-in", fill: "forwards" }).onfinish = gone;
       if (sp) setTimeout(function(){ sp.kill(); cv.remove(); }, now ? 0 : 1600);
-      if (done) done();
+      if (next) next();
     }
     lvClose = close;
     el.addEventListener("click", function(){ close(); });

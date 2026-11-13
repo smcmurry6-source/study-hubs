@@ -437,7 +437,8 @@ These hold for each spec; a spec only adds to them.
   mine in a visit, each hop through the clouds. Nothing on the server; `widget/place.js`'s `open()` takes `nav` and
   `covered` (above). **Next: session 6** still.
 - 2026-11-13 (Claude Code), **session 6, the trophy case and the cards; hand-off for session 7 on** ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356); [its note](done/2026-11-12-redesign-trophy-case-and-cards.md),
-  its Outcome). Nothing students see changes: the live hubs and dashboard keep 24 trophies, Full Arch, the old Stats
+  its Outcome). One live change, BUG-116's fix (Sam: "ship the BUG-116 live fix too"); otherwise nothing students see
+  changes: the live hubs and dashboard keep 24 trophies, Full Arch, the old Stats
   panel and today's cards (the smoke test compares the live cards' markup with `main`'s). Neither pending migration
   was applied or changed. Sam saw two contact sheets ("It needs to be more epic", then "sounds good") and asked for the
   rest of the Stats page to match ("make it more epic").
@@ -458,12 +459,13 @@ These hold for each spec; a spec only adds to them.
   - **`widget/rankup.js`**: on the redesign a card waits for that stylesheet and the drawings (`xready`, 2.5 s at most;
     scenes don't); `trophyArt(ic, px, key, k)` draws from `SH_TROPHY_ART`; a card's `next` line; `PLACE_SET`, the rank's
     pieces for Timmy's place (from `tools/figures/site/sets.mjs`: change both together); `data-metal` on the cards and
-    `data-band` on the mock card. BUG-116 (a level-up card stopped the queue) is fixed on the redesign only.
+    `data-band` on the mock card. BUG-116 (a level-up card stopped the queue) is fixed on every page (Sam: "ship the BUG-116 live fix too"): the one
+    live change in this PR.
   - **For session 8 (the wiring) and session 9 (bundles)**: three files load on first use and join `sw.js`'s
     `PRECACHE` (a box in [the release note](2026-11-06-redesign-release.md), "From phase 4, session 6"). The page-load
     files grew a little: `widget/ranks.js` (+7 KB), `widget/rankup.js` (+5 KB), `widget/hub.js` (+7 KB), `widget/dash.js`.
-  - **Open for Sam**: the live fix for BUG-116 and the live About page's secret count ([the inbox](inbox.md)); a shelf
-    for the hub trophies in the case (the release note's box).
+  - **Open for Sam**: the live About page's secret count ([the inbox](inbox.md)); a shelf for the hub trophies in the
+    case (the release note's box).
   - Tests: the smoke test's trophy-case block (a new hub, the new dashboard, a live hub; desktop and phone), `a11y.js`'s
     "trophy case" and "trophy card". Bugs: BUG-116 to BUG-121.
   **Next: session 7 is built (Ask Timmy, part 2), so session 8, the wiring** ([its note](2026-11-12-redesign-game-layer-wiring.md)).

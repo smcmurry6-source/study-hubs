@@ -1525,10 +1525,20 @@ function lint(hub, A){
           if (k === 'r' || k === 'k') await page.keyboard.press('Escape'); else await el.click().catch(() => {});
           await page.waitForTimeout(900);
         }
+        /* BUG-116: a card after a level-up card still plays (a local `done` in levelNow's close() once stopped the queue) */
+        await page.evaluate(() => window.shRanks.preview('level', 4, 2));
+        const lv = await page.waitForSelector('.sh-ru-lv:not(.sh-ru-tr)', { timeout: 15000 }).catch(() => null);
+        if (!lv) problems.push(`${name} (${label}): shRanks.preview(level) showed no level-up card`);
+        else {
+          await page.waitForTimeout(1500); await lv.click().catch(() => {});
+          await page.evaluate(() => window.shRanks.preview('tier', 5, 6));
+          if (!(await page.waitForSelector('.sh-ru', { timeout: 8000 }).catch(() => null))) problems.push(`${name} (${label}): after a level-up card no later card played (BUG-116)`);
+          else { await page.waitForTimeout(800); await page.keyboard.press('Escape'); await page.waitForTimeout(900); }
+        }
         if (got.length || (await page.$('#sh-trophies-css'))) problems.push(`${name} (${label}): a live hub fetched the trophy case's files (${got.join(', ')})`);
         errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
         await page.evaluate(h => { ['sh_egg_arch_' + h, 'sh_pet_born'].forEach(k => localStorage.removeItem(k)); }, hub);
-        notes.push(`${hub} (${label}): 24 trophies, Full Arch grows, and the trophy, mastery, rank-up and mock cards as before`);
+        notes.push(`${hub} (${label}): 24 trophies, Full Arch grows, the trophy, mastery, rank-up and mock cards as before, and a card after a level-up plays`);
         await page.close();
       }
     }

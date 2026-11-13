@@ -17,11 +17,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   or need a new function after the release: Sam's call. Sam, 2026-11-13: "build the random visit and next/back": built, picking among
   the board's own rows, nothing on the server ([#354](https://github.com/smcmurry6-source/study-hubs/pull/354)).
 
-- [ ] **A live bug, Sam's call** (BUG-116 in [the bug log](../release/bug-log.md), 2026-11-13): on the live hubs and dashboard, after a
+- [x] **A live bug, Sam's call** (BUG-116 in [the bug log](../release/bug-log.md), 2026-11-13): on the live hubs and dashboard, after a
   level-up card no later card plays until the page reloads (a rank-up, a trophy, a medal, a mock result; the trophy itself is still
   recorded). In `levelNow`'s `close()` in `widget/rankup.js`, a local `var done` hides the queue's `done`. The redesign's pages have the
   fix ([the trophy case](done/2026-11-12-redesign-trophy-case-and-cards.md)); the live fix is to call the queue's `done` there too (the `NEW`
   branch's code for every page). Left out of that PR because Sam asked for the live pages to behave exactly as today. A tier 1 fix.
+  Sam: "ship the BUG-116 live fix too": fixed live in the same PR ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356)).
 
 - [ ] The live About page says the trophy case has "24 trophies ... 14 of them secret", but today's list has 16 secret (Timmy's two
   trophies came later). Fix the number on the live page (a tier 1 text fix), or leave it to the release, whose About draft says 27 and

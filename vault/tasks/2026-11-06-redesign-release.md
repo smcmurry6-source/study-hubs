@@ -612,12 +612,10 @@ old Stats panel and today's cards.
 - [ ] The case and the cards looked at on the release's own preview, phone and laptop, light and dark, reduced motion
       too (phase 4's Done when): More, Stats and trophies as `?persona=high-xp` (most trophies, Full Arch retired) and
       `returning`; the "you" card's Trophy case on the new dashboard; the cards with `shRanks.preview("trophy", 0)`,
-      `("mastery", 2)`, `("tier", 2, 3)`, `("level", 4, 2)`, `("mock", 37, 40)` from the console (a rank-up older than
-      one already shown is skipped, so a level-up before a lower rank-up hides it).
+      `("mastery", 2)`, `("tier", 2, 3)`, `("level", 4, 2)`, `("mock", 37, 40)` from the console.
 - [ ] When the old pages come down: the `NEW` branches in `widget/ranks.js`, `widget/rankup.js` and `widget/eggs.js`
       (`ARCH_OFF`) become the only path, with "Full Arch comes out" above (the `RETIRED` row stays, for those who won it).
-      **BUG-116** ([the bug log](../release/bug-log.md)): on the old pages a level-up card stops later cards; the new
-      pages have the fix, and the old code path goes with them (unless Sam had it fixed live first: [the inbox](inbox.md)).
+      (**BUG-116**, a level-up card stopping later cards, is fixed on every page: [the bug log](../release/bug-log.md).)
 - [ ] The **Bowling** trophy shows no share until the first migration after the release counts the kind (part D's box
       above); the case reads `get_trophy_stats_v2` and shows a share for any kind it returns.
 - [ ] **The hub trophies** (8 a hub: the mastery levels, every question answered, mock exams, the boss) aren't in the

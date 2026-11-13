@@ -156,7 +156,7 @@ in [the release note](../2026-11-06-redesign-release.md): its "From phase 4, par
 
 ## Outcome
 
-Built 2026-11-13 by session 6 ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356)), on the redesign's pages only. Nothing students see changes: the
+Built 2026-11-13 by session 6 ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356)), on the redesign's pages only, with one live fix (BUG-116, below). Otherwise nothing students see changes: the
 live hubs and the live dashboard keep their 24 trophies, Full Arch, the old Stats panel and today's cards (the smoke test
 compares the live cards' markup with `main`'s). Neither pending migration was applied or changed.
 
@@ -193,7 +193,7 @@ compares the live cards' markup with `main`'s). Neither pending migration was ap
   mastery card keeps the hub's medal and adds the next medal ("Gold at 90% right"); the rank-up says "New rank" (or
   "Top rank") and lists the rank's pieces for Timmy's place, then the next rank; the mock card takes its score's
   color. Timing, the queue, skip and the reduced-motion stills are as before, except BUG-116's fix: after a level-up
-  card, later cards now play (on the redesign only).
+  card, later cards now play (on every page, live too: Sam, "ship the BUG-116 live fix too").
 - **Full Arch retired** on the redesign: one gate in `widget/eggs.js` (`ARCH_OFF`: the `shx` class or a `data-game="v2"`
   widget tag), its row out of the Extras in `widget/hub.js` and `widget/dash.js`, out of both trophy lists.
 - **The preview**: `high-xp` won Full Arch in Occlusion (and most trophies), `returning` didn't; `get_trophy_stats_v2`
@@ -204,8 +204,8 @@ compares the live cards' markup with `main`'s). Neither pending migration was ap
 
 **For the release** ([its note](../2026-11-06-redesign-release.md)): `sw.js`'s `PRECACHE` gains the three files (with the
 engine's, in session 8 or 9); the About drafts are written there ("From phase 4, session 6"); the live About page's
-"14 of them secret" is already wrong today (there are 16), a line in [the inbox](../inbox.md). BUG-116's live fix (one line in
-`widget/rankup.js`) waits for Sam's call, also in the inbox. The per-hub trophies (8 a hub) aren't in the new case (the
+"14 of them secret" is already wrong today (there are 16), a line in [the inbox](../inbox.md). BUG-116 is fixed live too (Sam: "ship the
+BUG-116 live fix too", in the same PR). The per-hub trophies (8 a hub) aren't in the new case (the
 task didn't ask for them): they stay in today's panel behind Leaderboards, and a shelf for them is Sam's call (a box in
 the release note's "From phase 4, session 6").
 
