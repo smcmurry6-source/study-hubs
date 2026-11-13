@@ -52,7 +52,7 @@ tags: [map]
   then the core, `widget/hub.js` (its top says how they fit together). The Question Bank's Learn and Flashcards are
   `widget/study-modes.js` + `widget/study-modes.css`, fetched by `hub-bank.js` the first time either is opened
   ([the task](../tasks/2026-11-06-redesign-learn-and-flashcards.md); their server part is the pending `migration_v56.sql`).
-  The bowling egg ([the task](../tasks/2026-11-06-redesign-bowling-egg.md)) is `widget/bowling.js` (`window.shBowl`, its
+  The bowling egg ([the task](../tasks/done/2026-11-06-redesign-bowling-egg.md)) is `widget/bowling.js` (`window.shBowl`, its
   styles inside), with its eight clips in `widget/hub-art/bowling.js` (`window.SH_BOWL`, built from
   `tools/figures/site/bowling.mjs`): `hub-rewards.js` counts the run and fetches it at a strike, and the place's bowling
   lane fetches it on a tap; nothing on the server.

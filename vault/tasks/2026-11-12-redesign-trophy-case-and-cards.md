@@ -23,7 +23,7 @@ the site's type with their motion kept.
 
 ## Context
 
-- Session 6 of phase 4's "From here to the release", after [the bowling egg](2026-11-06-redesign-bowling-egg.md), so
+- Session 6 of phase 4's "From here to the release", after [the bowling egg](done/2026-11-06-redesign-bowling-egg.md), so
   the case lists the three journey trophies and the Bowling trophy once. "For every session above" there holds here.
 - Sam, 2026-11-12 ([decisions](../decisions.md)): build it before the release. And the same day: "I also want to
   remove the full arch challenge thing" ("Full Arch is retired", below). Earlier calls that stand: the eggs'
@@ -75,7 +75,7 @@ one change there); `widget/v3.js`'s Stats panel (the live hubs use it); the jour
   `journey-2` (Handpiece, ModuPro and Loupes finished) and Bowling (secret). An earned trophy: its drawing, name, what it was for, and the share of the
   class that has it. Not earned: the drawing dimmed, with what earns it. A secret one not earned: its silhouette and
   its riddle (`clue`), never its name. Bowling is earned on the device (`sh_bowl_trophy`,
-  [the bowling egg](2026-11-06-redesign-bowling-egg.md)) and shows no share until the server knows the kind.
+  [the bowling egg](done/2026-11-06-redesign-bowling-egg.md)) and shows no share until the server knows the kind.
   **What the bowling egg left for it** (2026-11-13): the drawing and its silhouette are `EGG_TROPHIES.bowling` in
   `tools/figures/site/medals.mjs` (`{ body, sil }`, 64 box; built into the design page's `art.js` as `eggTrophies`, in
   no widget file yet: put it with the case's own art); its words are `shBowl.TROPHY` in `widget/bowling.js`
@@ -147,7 +147,7 @@ the count: Bowling joins and Full Arch leaves; the draft's wording changes to sa
 ## Outcome
 
 Related: [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·
-[the bowling egg](2026-11-06-redesign-bowling-egg.md) · [the release](2026-11-06-redesign-release.md) ·
+[the bowling egg](done/2026-11-06-redesign-bowling-egg.md) · [the release](2026-11-06-redesign-release.md) ·
 [about-page](../rules/about-page.md)
 
 ## Opening prompt

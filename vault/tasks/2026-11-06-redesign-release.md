@@ -531,7 +531,7 @@ new; the rare costumes go inside a `spoil` element):
 - "What the hubs record" gets: opening the shop, a purchase (its kind: an outfit, a snack, a boost..., never which
   piece) and a rare costume turning up are counted. What you bought is kept, so it stays yours on every device.
 
-### From phase 4, part D (the bowling egg, [the bowling egg](2026-11-06-redesign-bowling-egg.md), built 2026-11-13)
+### From phase 4, part D (the bowling egg, [the bowling egg](done/2026-11-06-redesign-bowling-egg.md), built 2026-11-13)
 
 What part D built is in the bowling egg's note (its Log) and phase 4's Log. It runs only on the redesign's pages (the
 engine's answer path and Timmy's place), needs nothing on the server, and goes live with the release.
@@ -577,7 +577,7 @@ The sessions that build each part fix the drafts they make untrue; this is the l
   redesign on the student dresses him. Rare costumes turn up at the shop; he doesn't wear one by himself.
 - **The trophy count** is 27, 14 of them secret (today's 24 without Full Arch, the three journey trophies and
   Bowling): "From phase 4, part A" says 27 and 14 for another reason (the journeys alone), so its wording changes. The Bowling trophy is kept on the device until the first migration after the release, so it
-  shows no share of the class at first ([the bowling egg](2026-11-06-redesign-bowling-egg.md)).
+  shows no share of the class at first ([the bowling egg](done/2026-11-06-redesign-bowling-egg.md)).
 - **Full Arch is gone**: the 32-tooth chart, its switch and its trophy (the box in Done when). Where a draft above
   lists the extras a setting turns off ("the Full Arch chart" in phase 3's Settings draft), it comes out.
 - **New drafts to come**, each written by its session under its own heading here: visiting, the trophy case. (Part B's
