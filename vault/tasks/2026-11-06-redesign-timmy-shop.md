@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: 
 agent: 
-pr: https://github.com/smcmurry6-source/study-hubs/pull/345 (session 2)
+pr: https://github.com/smcmurry6-source/study-hubs/pull/345 (session 2, merged 2026-11-13 as `510dcb6`)
 ---
 
 # Timmy's shop: Shiny Gold Crowns, a rotating shop, rarity, seasonal outfits and rare costumes
