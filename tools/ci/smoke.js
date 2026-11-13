@@ -751,7 +751,7 @@ function lint(hub, A){
       }
       if (!vp.isMobile) { /* Timmy's place: the bowling lane */
         const { page, errs, asked } = await fresh();
-        await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); } catch (e) {} });
+        await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
         const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
         const shop = () => ({ day: '2026-11-12', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], costumes: [], snacks_today: 0, boost: null,
           inventory: [{ id: 'bowling-lane', at: '2026-11-01', how: 'bought' }], locked: [], equipped: { 'yard-side': 'bowling-lane' } });
@@ -762,8 +762,10 @@ function lint(hub, A){
         await clean(page);
         if (!pc) problems.push(`${name} (${label}): Timmy's place didn't draw, so the lane wasn't checked`);
         else {
-          await pc.click(); await page.waitForSelector('dialog.tpv[open]', { timeout: 8000 }).catch(() => null); await page.waitForTimeout(1200);
-          const tap = () => page.evaluate(() => { const sr = document.querySelector('dialog.tpv .tpv-stage').shadowRoot, n = sr && sr.querySelector('[data-egg="lane"]'); if (!n) return false; n.dispatchEvent(new MouseEvent('click', { bubbles: true })); return true; });
+          for (let i = 0; i < 4 && await page.$('.sh-ru.is-on, .shj.is-on'); i++) { await page.keyboard.press('Escape'); await page.waitForTimeout(700); } /* a rank-up card, if one shows */
+          await pc.click({ timeout: 10000 }).catch(() => null); await page.waitForSelector('dialog.tpv[open]', { timeout: 8000 }).catch(() => null); await page.waitForTimeout(1200);
+          if (!(await page.$('dialog.tpv[open]'))) problems.push(`${name} (${label}): the place's full view didn't open, so the lane wasn't checked`);
+          const tap = () => page.evaluate(() => { const st = document.querySelector('dialog.tpv .tpv-stage'), sr = st && st.shadowRoot, n = sr && sr.querySelector('[data-egg="lane"]'); if (!n) return false; n.dispatchEvent(new MouseEvent('click', { bubbles: true })); return true; });
           if (asked.length) problems.push(`${name} (${label}): the bowling egg's files loaded with the place (${asked.join(', ')})`);
           if (!(await tap())) problems.push(`${name} (${label}): the place has no bowling lane to tap`);
           else {
