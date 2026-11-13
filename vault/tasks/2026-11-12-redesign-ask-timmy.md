@@ -459,7 +459,7 @@ change to HP's rules beyond the 100 start; the old pages.
 - 2026-11-13: [#348](https://github.com/smcmurry6-source/study-hubs/pull/348) merged as `c5ce92e` (Sam: "Merge when
   ready", after the screenshots and the recording), once "Check hubs" and "Release tests" passed on its last commit.
   CI's first run had failed the smoke test on the shop's "He's full" and a first visit at 99 HP: BUG-109, the test's own
-  click-throughs leaving answers in Timmy's tally, fixed in the test before the merge. `postcheck.js`: waiting on GitHub Pages to publish the merge. **Every part of Ask
+  click-throughs leaving answers in Timmy's tally, fixed in the test before the merge. `postcheck.js` passed (7 of 7 changed files live and identical to `main`; the live dashboard and hubs open with no errors). **Every part of Ask
   Timmy is built**; what is left is the release's (the box above, and "From Ask Timmy" parts 2 and 4 in
   [the release note](2026-11-06-redesign-release.md)), so this note waits on the release.
 ## Outcome

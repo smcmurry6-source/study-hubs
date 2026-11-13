@@ -379,7 +379,7 @@ These hold for each spec; a spec only adds to them.
     the answers a test gives there go into his tally of the day (`sh_pet_log`); a check of his HP starts without it.
   **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)), or session 5, the bowling egg.
 - 2026-11-13: [#348](https://github.com/smcmurry6-source/study-hubs/pull/348) (session 3) merged as `c5ce92e` (Sam:
-  "Merge when ready"). `postcheck.js`: waiting on GitHub Pages to publish the merge. Session 3 is done. **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)).
+  "Merge when ready"). `postcheck.js` passed (7 of 7 changed files live and identical to `main`; the live dashboard and hubs open with no errors). Session 3 is done. **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)).
 
 ## Outcome
 
