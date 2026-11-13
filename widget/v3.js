@@ -3016,18 +3016,20 @@
     statsPanel: function(){ return document.getElementById("shstat-panel"); },
     srs: srsLoad, day: srsDay
   };
-  if (!EXPORT_ONLY) {
-    var eggScript = document.createElement("script");
-    eggScript.src = new URL("eggs.js", thisScript.src).href; eggScript.async = true;
-    document.head.appendChild(eggScript);
+  /* The widget's other files: each its own <script> beside this one, or run from a redesigned page's bundle
+     (window.SH_BUNDLE, tools/bundle/build.mjs). then: once it has run; fail: it couldn't be fetched. */
+  function widgetFile(file, then, fail){
+    var B = window.SH_BUNDLE;
+    if (B && B.has(file)) { setTimeout(function(){ try { B.run(file); } finally { if (then) then(); } }, 0); return; }
+    var s = document.createElement("script");
+    s.src = new URL(file, thisScript.src).href; s.async = true;
+    if (then) s.onload = then;
+    if (fail) s.onerror = fail;
+    document.head.appendChild(s);
   }
+  if (!EXPORT_ONLY) widgetFile("eggs.js");
   /* handpiece ranks, trophies, accent unlocks, link my devices (widget/ranks.js) */
-  if (!EXPORT_ONLY) {
-    var rankScript = document.createElement("script");
-    rankScript.src = new URL("ranks.js", thisScript.src).href; rankScript.async = true;
-    rankScript.onload = function(){ if (window.shRanks) window.shRanks.mount(window.shEggHooks); };
-    document.head.appendChild(rankScript);
-  }
+  if (!EXPORT_ONLY) widgetFile("ranks.js", function(){ if (window.shRanks) window.shRanks.mount(window.shEggHooks); });
   /* tooth buddy (widget/pet.js): optional cartoon tooth in the bottom-left corner, adopted on the dashboard.
      The redesigned hubs (data-game="v2", widget/hub.js; not live yet): everyone has Timmy, so he loads for everyone and
      mounts with everyone: true (no adoption; he wears what's on at his place, from the v2 bootstrap's shop). The live
@@ -3037,53 +3039,26 @@
     if (window.shPet) { if (then) then(); return; }
     if (petLoading || EXPORT_ONLY) return;
     petLoading = true;
-    var petScript = document.createElement("script");
-    petScript.src = new URL("pet.js", thisScript.src).href; petScript.async = true;
-    petScript.onload = function(){ if (window.shPet) window.shPet.mount(GAME.want ? { where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready, everyone: true } : { where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); trackPresence(); if (then) then(); };
-    document.head.appendChild(petScript);
+    widgetFile("pet.js", function(){ if (window.shPet) window.shPet.mount(GAME.want ? { where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready, everyone: true } : { where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); trackPresence(); if (then) then(); });
   }
   window.shLoadPet = loadPet;
   var petBorn = null; try { petBorn = localStorage.getItem("sh_pet_born"); } catch (e) {}
   if (!EXPORT_ONLY && (GAME.want || !(window.SH_HUB && !petBorn))) loadPet();
   /* TIMMY (widget/timmy.js): type his name anywhere for a 15-second show */
-  if (!EXPORT_ONLY && !window.__timmyLoaded) {
-    var timmyScript = document.createElement("script");
-    timmyScript.src = new URL("timmy.js", thisScript.src).href; timmyScript.async = true;
-    document.head.appendChild(timmyScript);
-  }
+  if (!EXPORT_ONLY && !window.__timmyLoaded) widgetFile("timmy.js");
   /* motion (widget/fx.js): answer feedback, the streak flame, bar fills, view fades, the exam-day countdown pill and the mock results card */
-  if (!EXPORT_ONLY) {
-    var fxScript = document.createElement("script");
-    fxScript.src = new URL("fx.js", thisScript.src).href; fxScript.async = true;
-    fxScript.onload = function(){ if (window.shFx) window.shFx.mount(window.shEggHooks); };
-    document.head.appendChild(fxScript);
-  }
+  if (!EXPORT_ONLY) widgetFile("fx.js", function(){ if (window.shFx) window.shFx.mount(window.shEggHooks); });
   /* highlighter (widget/highlight.js): select text in the lecture notes to highlight it, saved on this device */
-  if (!EXPORT_ONLY) {
-    var hlScript = document.createElement("script");
-    hlScript.src = new URL("highlight.js", thisScript.src).href; hlScript.async = true;
-    hlScript.onload = function(){ if (window.shHighlight) window.shHighlight.mount(HUB); };
-    document.head.appendChild(hlScript);
-  }
+  if (!EXPORT_ONLY) widgetFile("highlight.js", function(){ if (window.shHighlight) window.shHighlight.mount(HUB); });
   /* Timmy Time (widget/podcast.js): a hub's audio review episode, if the hub defines window.SH_PODCAST
      (not on an archived hub whose audio came off: data-audio="off") */
-  if (!EXPORT_ONLY && window.SH_PODCAST && !AUDIO_OFF) {
-    var podScript = document.createElement("script");
-    podScript.src = new URL("podcast.js", thisScript.src).href; podScript.async = true;
-    podScript.onload = function(){ if (window.shPodcast) window.shPodcast.mount(HUB); };
-    document.head.appendChild(podScript);
-  }
+  if (!EXPORT_ONLY && window.SH_PODCAST && !AUDIO_OFF) widgetFile("podcast.js", function(){ if (window.shPodcast) window.shPodcast.mount(HUB); });
   /* question health (widget/qhealth.js): time on each question, abandonment, the explanation, tries and the "Good question?"
      thumbs, sent to record_qh / qh_vote for the admin page's Question health tab (migration_v51). Flags are for review only. */
-  if (!EXPORT_ONLY) {
-    var qhScript = document.createElement("script");
-    qhScript.src = new URL("qhealth.js", thisScript.src).href; qhScript.async = true;
-    qhScript.onload = function(){
-      if (window.shQH) window.shQH.mount({ hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, visit: VISIT_ID, supabase: supabase,
-        sbUrl: supabase ? SB_URL : "", sbKey: SB_KEY, automated: AUTOMATED, hist: function(){ return qhHist; } });
-    };
-    document.head.appendChild(qhScript);
-  }
+  if (!EXPORT_ONLY) widgetFile("qhealth.js", function(){
+    if (window.shQH) window.shQH.mount({ hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, visit: VISIT_ID, supabase: supabase,
+      sbUrl: supabase ? SB_URL : "", sbKey: SB_KEY, automated: AUTOMATED, hist: function(){ return qhHist; } });
+  });
   /* guided tour (widget/tour.js): asked once on a first hub visit; the Tour button and "Take the tour" start it any time.
      A hub that never asks on arrival (SH_TOUR.prompt === false: the redesigned hubs) loads it when the tour is started. */
   var tourLoading = false;
@@ -3091,11 +3066,8 @@
     if (window.shTour) { if (then) then(); return; }
     if (tourLoading || EXPORT_ONLY) return;
     tourLoading = true;
-    var tourScript = document.createElement("script");
-    tourScript.src = new URL("tour.js", thisScript.src).href; tourScript.async = true;
-    tourScript.onload = function(){ tourLoading = false; if (window.shTour) window.shTour.mount({ where: "hub", hub: HUB, section: currentSection }); if (then) then(); };
-    tourScript.onerror = function(){ tourLoading = false; };
-    document.head.appendChild(tourScript);
+    widgetFile("tour.js", function(){ tourLoading = false; if (window.shTour) window.shTour.mount({ where: "hub", hub: HUB, section: currentSection }); if (then) then(); },
+      function(){ tourLoading = false; });
   }
   window.shLoadTour = loadTour;
   if (!EXPORT_ONLY && !(window.SH_TOUR && window.SH_TOUR.prompt === false)) loadTour();
@@ -3104,12 +3076,7 @@
     if (b) setTimeout(function(){ loadTour(function(){ if (window.shTour) window.shTour.start(); }); }, 0);    /* after the menu has closed */
   });
   /* daily drill (widget/drill.js): a short set each day from what you missed + high-yield questions */
-  if (!EXPORT_ONLY) {
-    var drillScript = document.createElement("script");
-    drillScript.src = new URL("drill.js", thisScript.src).href; drillScript.async = true;
-    drillScript.onload = function(){ if (window.shDrill) window.shDrill.mount(window.shEggHooks); };
-    document.head.appendChild(drillScript);
-  }
+  if (!EXPORT_ONLY) widgetFile("drill.js", function(){ if (window.shDrill) window.shDrill.mount(window.shEggHooks); });
   /* archived notice: the dashboard archives a hub at 10 pm on the day of its last exam (index.html, ARCHIVE_HOUR; an exam's
      archiveHour overrides it, e.g. 24 for one due at 11:59 pm; SH_EXPORT.archiveOn can override the date for a temporary reopen);
      a hub page still reachable after that says so once per visit, with a way back to the dashboard.
@@ -3297,24 +3264,9 @@
     if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
   })();
   /* click analytics (widget/clicks.js): what people use, for improving each hub */
-  if (!EXPORT_ONLY && supabase) {
-    var clickScript = document.createElement("script");
-    clickScript.src = new URL("clicks.js", thisScript.src).href; clickScript.async = true;
-    clickScript.onload = function(){ if (window.shClicks) window.shClicks.start({ sb: supabase, hub: HUB, visitor: VISITOR_ID, section: currentSection }); };
-    document.head.appendChild(clickScript);
-  }
+  if (!EXPORT_ONLY && supabase) widgetFile("clicks.js", function(){ if (window.shClicks) window.shClicks.start({ sb: supabase, hub: HUB, visitor: VISITOR_ID, section: currentSection }); });
   /* replies (widget/replies.js): tells someone once when their report or suggestion has been dealt with, plus notices to everyone */
-  if (!EXPORT_ONLY && supabase) {
-    var replyScript = document.createElement("script");
-    replyScript.src = new URL("replies.js", thisScript.src).href; replyScript.async = true;
-    replyScript.onload = function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB, bootstrap: bootstrap.ready }); };
-    document.head.appendChild(replyScript);
-  }
+  if (!EXPORT_ONLY && supabase) widgetFile("replies.js", function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB, bootstrap: bootstrap.ready }); });
   /* "Is this your other device?" (widget/linkask.js): offers to link devices that use the same name */
-  if (!EXPORT_ONLY && supabase) {
-    var linkAskScript = document.createElement("script");
-    linkAskScript.src = new URL("linkask.js", thisScript.src).href; linkAskScript.async = true;
-    linkAskScript.onload = function(){ if (window.shLinkAsk) window.shLinkAsk.start({ sb: supabase, hub: HUB, section: currentSection, bootstrap: bootstrap.ready, bootstrapName: bootstrap.linkName }); };
-    document.head.appendChild(linkAskScript);
-  }
+  if (!EXPORT_ONLY && supabase) widgetFile("linkask.js", function(){ if (window.shLinkAsk) window.shLinkAsk.start({ sb: supabase, hub: HUB, section: currentSection, bootstrap: bootstrap.ready, bootstrapName: bootstrap.linkName }); });
 })();

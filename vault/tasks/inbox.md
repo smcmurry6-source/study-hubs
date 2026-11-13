@@ -10,6 +10,12 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **A new hub's blocking time after the bundles** (2026-11-13, [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md), [#358](https://github.com/smcmurry6-source/study-hubs/pull/358)):
+  on `perf.js`'s slow phone a new hub's total blocking time was 230-365 ms on `main` and is 310-540 ms with the bundles
+  across runs (350-385 in the final run; budget 500, fails past 750). The same scripts run, in fewer and longer tasks.
+  Not looked into: a trace of the first seconds to see which tasks are long (the engine's start, or `widget/v3.js`'s,
+  which is shared with the live hubs). Worth a look at the release, when v3.js no longer has to stay as it is for the old pages.
+
 - [x] Visiting's other two parts from round 3 ([decisions](../decisions.md), 2026-11-10): **Visit someone random**, and **next and back**
   while visiting (the design page has both). The 2026-11-13 session built only what [its task](done/2026-11-12-redesign-visiting.md) asked: a board
   row opens that person's place. Both would reuse `widget/place.js`'s `tripIn`/`tripOut` (the round-3 clouds) and the board's visit keys;

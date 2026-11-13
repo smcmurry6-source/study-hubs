@@ -18,6 +18,12 @@ tags: [widget, supabase]
   review but leaves out of its totals) adds `uncounted()`, returning `{ n, right }` (how many, how many right on the
   latest try), and `widget/ranks.js` takes them off both sides of the mastery medal (Heme & Endo Exam 2's Exam 1
   Refresher, 2026-11-06).
+- **The redesign's pages load the widget from bundles** (2026-11-13, not live until the release): `widget/rest.bundle.js`
+  and, on a hub, `widget/hub-rest.bundle.js` hold the files above, built from them by `node tools/bundle/build.mjs`
+  ([bundles](bundles.md)). `widgetFile()` in `widget/v3.js` is the one place v3.js loads its other files: it runs a
+  file from the page's bundle (`window.SH_BUNDLE`) when there is one and adds the file's own `<script>` otherwise, which
+  is what every live page does. **After changing a widget file that is in `tools/bundle/bundles.json`, rebuild and
+  commit the bundles** (CI fails on a stale one).
 - **The game layer's switch** (the redesign, not live until its release): a page whose `v3.js` tag has
   `data-game="v2"` (the engine writes it; no live hub has it) uses migration_v54's functions once the database has them:
   the v2 bootstrap, one `record_answer_v2` per answer in place of today's four or five calls, mock sessions, and

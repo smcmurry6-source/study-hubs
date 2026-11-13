@@ -103,7 +103,8 @@
     return n || String(id).split("-").map(function(w){ return /^exam\d+$/.test(w) ? "Exam " + w.slice(4) : w.charAt(0).toUpperCase() + w.slice(1); }).join(" ");
   }
   function css(){
-    if (document.querySelector('link[href*="widget/ideas.css"], link[href$="ideas.css"]')) return;
+    /* its own stylesheet, or the redesign's one stylesheet, which carries it (tools/bundle/build.mjs) */
+    if (document.querySelector('link[href*="widget/ideas.css"], link[href$="ideas.css"], link[href*="site.bundle.css"]')) return;
     var l = document.createElement("link"); l.rel = "stylesheet"; l.href = SELF ? SELF.replace(/ideas\.js(\?.*)?$/, "ideas.css") : "ideas.css";
     document.head.appendChild(l);
   }

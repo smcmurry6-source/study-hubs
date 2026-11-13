@@ -49,9 +49,65 @@ console.log(`Smoke test: ${hubsWhy}${PART ? `, the ${PART} half` : ''}`);
 /* the redesign's new versions (hubs/<id>/next/, widget/hub.js), built beside the live hubs until the release: those of
    the hubs picked above (a change to hubs/<id>/next/ touches <id>; the engine is shared, so it picks every hub) */
 const nextHubs = hubs.filter(h => fs.existsSync(path.join(root, 'hubs', h, 'next', 'index.html')));
-/* the engine is four files: its three parts, then the core (widget/hub.js), which runs them and boots. A new hub's page
-   loads every one, deferred, in this order */
-const ENGINE = ['hub-rewards.js', 'hub-timmy.js', 'hub-bank.js', 'hub.js'];
+/* The redesign's pages load bundles (tools/bundle/build.mjs, tools/bundle/bundles.json): the engine as one deferred
+   script with the page, the shared widgets and a hub's own widget layer once it is drawn, and one stylesheet. A page
+   that asks for a file one of its bundles carries has lost the bundle; a live page never asks for a bundle. */
+const BUNDLES = JSON.parse(fs.readFileSync(path.join(root, 'tools/bundle/bundles.json'), 'utf8'));
+const inBundle = out => { const b = BUNDLES.scripts[out] || {}; return [...(b.css || []), ...(b.run || []), ...(b.hold || [])]; };
+const SHEET = Object.keys(BUNDLES.styles)[0];
+/* what a page gets from its bundles, and so must not fetch by itself */
+const BUNDLED = { hub: [...new Set([...inBundle('hub.bundle.js'), ...inBundle('rest.bundle.js'), ...inBundle('hub-rest.bundle.js'), ...BUNDLES.styles[SHEET]])],
+  dash: [...new Set([...inBundle('dash.bundle.js'), ...inBundle('rest.bundle.js'), ...BUNDLES.styles[SHEET]])] };
+const widgetFile = u => { const m = /\/widget\/([^?#]+)/.exec(u); return m && !/[?&]bundle-check\b/.test(u) ? m[1] : ''; };   /* not this test's own reads of a source */
+/* One typeface, self-hosted (assets/fonts/): a redesigned page asks Google Fonts for nothing. */
+const GOOGLE_FONTS = /^https?:\/\/fonts\.(googleapis|gstatic)\.com\//;
+const KONAMI = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+/* the 8-bit code (widget/eggs.js): what it adds to the page for its pixel face, then the code again to leave */
+async function eightBit(page){
+  await page.evaluate(() => { if (document.activeElement && document.activeElement.blur) document.activeElement.blur(); });
+  for (const k of KONAMI) await page.keyboard.press(k);
+  await page.waitForTimeout(400);
+  const r = await page.evaluate(async () => {
+    const el = document.getElementById('sh-egg-8bit-font'), on = document.documentElement.classList.contains('sh-8bit');
+    let face = false; try { face = !el && (await document.fonts.load('16px VT323')).length > 0; } catch (e) {}   /* with no link added: the page's own copy */
+    return { on, tag: el ? el.tagName : '', href: el && el.href || '', face };
+  });
+  for (const k of KONAMI) await page.keyboard.press(k);
+  await page.waitForTimeout(200);
+  return r;
+}
+/* at the end of a page's walk: nothing its bundles carry was fetched by itself, on load or on any screen */
+function ownFiles(name, label, kind, asked){
+  const own = [...new Set(asked.filter(f => BUNDLED[kind].includes(f)))];
+  if (own.length) problems.push(`${name} (${label}): the page fetched ${own.join(', ')} by ${own.length === 1 ? 'itself' : 'themselves'}; its bundles carry ${own.length === 1 ? 'it' : 'them'} (tools/bundle/bundles.json)`);
+}
+/* every style rule of a stylesheet, as the browser reads it back: the bundle's sheet must be its sources' rules, in order */
+const RULES = `(css => { const sh = new CSSStyleSheet(); sh.replaceSync(css); return [...sh.cssRules].map(r => r.cssText); })`;
+async function bundleCheck(page, name, label, kind, asked){
+  const want = kind === 'hub' ? ['hub.bundle.js', 'rest.bundle.js', 'hub-rest.bundle.js', SHEET] : ['dash.bundle.js', 'rest.bundle.js', SHEET];
+  const missing = want.filter(f => !asked.includes(f));
+  if (missing.length) problems.push(`${name} (${label}): the page never asked for ${missing.join(', ')}`);
+  const core = kind === 'hub' ? 'hub.bundle.js' : 'dash.bundle.js';
+  const tag = await page.$eval(`script[src$="widget/${core}"]`, x => ({ defer: x.defer, head: !!x.closest('head') })).catch(() => null);
+  if (!tag || !tag.defer || !tag.head) problems.push(`${name} (${label}): widget/${core} should be a deferred script in the page's head`);
+  const r = await page.evaluate(async ([sheet, parts, rules, v3]) => {
+    const rulesOf = eval(rules), get = async f => (await fetch(new URL('widget/' + f + '?bundle-check', document.querySelector(`link[href*="${sheet}"]`).href.replace(/widget\/.*$/, ''))).then(x => x.text()));
+    const out = { links: document.querySelectorAll('link[rel="stylesheet"]').length };
+    const built = rulesOf(await get(sheet)), src = [];
+    for (const p of parts) src.push(...rulesOf(await get(p)));
+    out.sheet = built.length === src.length && built.every((t, i) => t === src[i]) ? '' : `${built.length} rules, its sources ${src.length}${built.length === src.length ? ', one differs: ' + built.find((t, i) => t !== src[i]).slice(0, 80) : ''}`;
+    if (v3) {
+      const st = document.getElementById('sh-css-v3'), link = document.querySelector(`link[href*="${sheet}"]`);
+      const a = st ? rulesOf(st.textContent) : [], b = rulesOf(await get('v3.css'));
+      out.v3 = !st ? 'no <style id="sh-css-v3"> on the page' : !(st.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING) ? 'it should come before the stylesheet, so the stylesheet wins'
+        : a.length === b.length && a.every((t, i) => t === b[i]) ? '' : `${a.length} rules, widget/v3.css ${b.length}`;
+    }
+    return out;
+  }, [SHEET, BUNDLES.styles[SHEET], RULES, kind === 'hub']);
+  if (r.sheet) problems.push(`${name} (${label}): widget/${SHEET} is not its sources' rules in order (${r.sheet}): run node tools/bundle/build.mjs`);
+  if (r.v3) problems.push(`${name} (${label}): widget/v3.css inside hub-rest.bundle.js: ${r.v3}`);
+  return r;
+}
 const problems = [], notes = [];
 
 /* the idea board (widget/ideas.js; its server is migration_v54, not applied until the redesign's release): a made-up
@@ -505,15 +561,21 @@ function lint(hub, A){
     const label = vp.isMobile ? 'phone' : 'desktop';
     // dashboard
     { const page = await context.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
+      const bundles = []; page.on('request', r => { if (/\.bundle\.(js|css)/.test(r.url())) bundles.push(widgetFile(r.url())); });
       await page.goto(BASE() + 'index.html'); await page.waitForTimeout(800);
       errs.forEach(e => problems.push(`dashboard (${label}): ${e}`));
+      if (bundles.length || await page.evaluate(() => !!window.SH_BUNDLE)) problems.push(`dashboard (${label}): the live dashboard loaded a bundle (${bundles.join(', ') || 'window.SH_BUNDLE'}); only the redesign's pages do`);
       const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`dashboard (${label}): page scrolls sideways by ${w}px`);
       await page.close(); }
     // the redesigned dashboard (next/, widget/dash.js; beside the live one until the release): every hub tab, the class
     // board's two lists, Settings, the name dialog and the menu
     if (fs.existsSync(path.join(root, 'next', 'index.html'))) {
       const page = await context.newPage(); const errs = [], name = `next dashboard (${label})`; page.on('pageerror', e => errs.push(e.message));
+      const askedFiles = [], outside = []; page.on('request', r => { const w = widgetFile(r.url()); if (w) askedFiles.push(w); if (GOOGLE_FONTS.test(r.url())) outside.push(r.url().slice(0, 80)); });
       await page.goto(BASE() + 'next/index.html'); await page.waitForTimeout(1200);
+      await page.waitForFunction(() => window.SH_BUNDLE && window.shRanks && window.shPet && window.shIdeas, null, { timeout: 15000 }).catch(() => {});
+      { const bun = await bundleCheck(page, 'next dashboard', label, 'dash', askedFiles);
+        notes.push(`${name}: the page asked for ${[...new Set(askedFiles)].length} widget files (${[...new Set(askedFiles)].join(', ')}) and links ${bun.links} stylesheet${bun.links === 1 ? '' : 's'}`); }
       const sideways = async what => { const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`${name}: ${what} scrolls sideways by ${w}px`); };
       if (!(await page.$('#dx h1'))) problems.push(`${name}: the page has no title`);
       const tabs = await page.$$eval('#hubTabs [data-tab]', bs => bs.map(b => b.getAttribute('data-tab')));
@@ -606,12 +668,34 @@ function lint(hub, A){
       else await askCheck(page, name, { hubId: 'dashboard', open: () => page.click('#askSpot [data-ska="spot"]') });
       await page.evaluate(() => localStorage.removeItem('sh_pref_pet'));
       errs.forEach(e => problems.push(`${name}: JavaScript error: ${e}`));
+      /* a recap's saved image (widget/recap.js): given a font it is drawn in that one family (this page passes the
+         site's own); without one, in the two faces it has always had (the live dashboard and the admin page) */
+      if (!vp.isMobile) {
+        await page.addScriptTag({ url: BASE() + 'widget/recap.js' });
+        const faces = await page.evaluate(() => {
+          const used = [], d = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'font');
+          Object.defineProperty(CanvasRenderingContext2D.prototype, 'font', { configurable: true, get(){ return d.get.call(this); }, set(v){ used.push(String(v).replace(/^\S+ \S+ /, '')); d.set.call(this, v); } });
+          const R = { hub: 'smoke', first_day: '2026-11-01', last_day: '2026-11-10', exam_day: '2026-11-10', minutes: 1200, people: 30, answers: 5000, correct: 4000,
+            by_day: [{ d: '2026-11-01', minutes: 100 }, { d: '2026-11-09', minutes: 300 }], by_hour: [], after_midnight: 3, night_before: 200, night_before_people: 12, regulars: 9, toughest: [], top_answers: [], best_run: null, awards: {} };
+          const run = o => { used.length = 0; let err = ''; try { window.shRecap.draw(document.createElement('canvas'), R, o); } catch (e) { err = e.message; } return { err, fams: [...new Set(used)] }; };
+          const out = { own: run({ title: 'Smoke' }), one: run({ title: 'Smoke', font: "'Nunito Sans', sans-serif" }) };
+          Object.defineProperty(CanvasRenderingContext2D.prototype, 'font', d);
+          return out;
+        });
+        if (faces.one.err || faces.one.fams.join() !== "'Nunito Sans', sans-serif") problems.push(`${name}: a recap image drawn with a font should use only that family (${faces.one.err || faces.one.fams.join(' | ')})`);
+        if (faces.own.err || !faces.own.fams.some(x => /Fraunces/.test(x)) || !faces.own.fams.some(x => /Work Sans/.test(x)) || faces.own.fams.some(x => /Nunito/.test(x))) problems.push(`${name}: a recap image drawn without a font should keep Fraunces and Work Sans, as on the live dashboard (${faces.own.err || faces.own.fams.join(' | ')})`);
+        if (!/font: FACE/.test(fs.readFileSync(path.join(root, 'widget/dash.js'), 'utf8'))) problems.push(`${name}: widget/dash.js should hand the recap image the site's own typeface (font: FACE)`);
+      }
+      if (outside.length) problems.push(`${name}: the page asked Google Fonts for ${[...new Set(outside)].join(', ')}; the redesign's one typeface is self-hosted`);
+      ownFiles('next dashboard', label, 'dash', askedFiles);
       notes.push(`${name}: ${tabs.length} hub tabs, the class board, Settings, the name dialog and the menu`);
       await page.close();
     }
     for (const hub of hubs) {
       const page = await context.newPage(); const errs = [];
       page.on('pageerror', e => errs.push(e.message));
+      /* a live hub loads its widget files by themselves, as it always has: never a bundle */
+      const liveBundles = []; page.on('request', r => { if (/\.bundle\.(js|css)/.test(r.url())) liveBundles.push(widgetFile(r.url())); });
       if (!vp.isMobile) await page.route(`**/hubs/${hub}/index.html`, async route => {
         const r = await route.fetch(); let h = await r.text(); const i = h.lastIndexOf('window.SH_EXPORT = {');
         if (i > 0) h = h.slice(0, i) + 'window.__CI = { QUESTIONS: typeof QUESTIONS!=="undefined"?QUESTIONS:[], LECTURES: typeof LECTURES!=="undefined"?LECTURES:[], READINGS: typeof READINGS!=="undefined"?READINGS:{}, READINGS_PLAIN: typeof READINGS_PLAIN!=="undefined"?READINGS_PLAIN:{}, LIKELY_TOPICS: typeof LIKELY_TOPICS!=="undefined"?LIKELY_TOPICS:undefined };\n' + h.slice(i);
@@ -622,6 +706,13 @@ function lint(hub, A){
       await page.click(".sh-archived-stay", { timeout: 1000 }).catch(() => {});
       if (!vp.isMobile) { const A = await page.evaluate(() => window.__CI); if (A) lint(hub, A); else problems.push(`${hub}: could not read its question data (is window.SH_EXPORT still set at the end of the script?)`); }
       const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
+      if (liveBundles.length || await page.evaluate(() => !!window.SH_BUNDLE)) problems.push(`${hub} (${label}): the live hub loaded a bundle (${liveBundles.join(', ') || 'window.SH_BUNDLE'}); only the redesign's pages do`);
+      /* and its 8-bit code still asks Google Fonts for the pixel face, as it always has */
+      if (!vp.isMobile && hub === hubs[0]) {
+        await page.waitForFunction(() => !!window.shEggHooks && !!document.querySelector('script[src*="eggs.js"]'), null, { timeout: 8000 }).catch(() => {}); await page.waitForTimeout(600);
+        const e8 = await eightBit(page);
+        if (!e8.on || e8.tag !== 'LINK' || !/fonts\.googleapis\.com\/css2\?family=VT323/.test(e8.href)) problems.push(`${hub} (${label}): the live hub's 8-bit code changed (8-bit mode ${e8.on ? 'on' : 'did not start'}, <${e8.tag.toLowerCase() || 'nothing'}> ${e8.href})`);
+      }
       let screens = 0;
       for (const m of modes) {
         await page.click(`#modeSwitch [data-mode="${m}"]`); await page.waitForTimeout(250); screens++;
@@ -643,13 +734,17 @@ function lint(hub, A){
     for (const hub of nextHubs) {
       const page = await context.newPage(); const errs = [], name = `${hub}/next`;
       page.on('pageerror', e => errs.push(e.message));
+      const askedFiles = [], outside = [], askedFonts = []; page.on('request', r => { const w = widgetFile(r.url()); if (w) askedFiles.push(w); if (GOOGLE_FONTS.test(r.url())) outside.push(r.url().slice(0, 80)); if (/\.woff2?(\?|$)/.test(r.url())) askedFonts.push(r.url()); });
       await page.goto(BASE() + `hubs/${hub}/next/index.html`); await page.waitForTimeout(1500);
       const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
       if (modes.join() !== 'home,notes,questions,more') problems.push(`${name} (${label}): the views are ${modes.join(', ') || 'missing'}, not Home, Notes, Questions and More`);
       const n = await page.evaluate(() => window.SH_EXPORT && window.SH_EXPORT.questions ? window.SH_EXPORT.questions.length : 0);
       if (!n) problems.push(`${name} (${label}): window.SH_EXPORT has no questions (the widget's search, stats and question health read it)`);
-      const eng = await page.$$eval('script[src]', ss => ss.map(x => [x.getAttribute('src').replace(/^.*widget\//, ''), x.defer]).filter(x => /^hub(-(rewards|timmy|bank))?\.js$/.test(x[0])).map(x => x[0] + (x[1] ? '' : ' (not deferred)')));
-      if (eng.join() !== ENGINE.join()) problems.push(`${name} (${label}): the page loads the engine as ${eng.join(', ') || 'nothing'}, not ${ENGINE.join(', ')} (all deferred, the core last)`);
+      /* the bundles: the engine with the page, the shared widgets and the hub's own layer once it is drawn (they come
+         when the browser is idle, after the notes), one stylesheet, and nothing they carry fetched by itself */
+      await page.waitForFunction(() => window.shBootstrap && window.SH_BUNDLE && window.shRanks && window.shPet, null, { timeout: 15000 }).catch(() => {});
+      const bun = await bundleCheck(page, name, label, 'hub', askedFiles);
+      if (hub === nextHubs[0]) notes.push(`${name} (${label}): the page asked for ${[...new Set(askedFiles)].length} widget files (${[...new Set(askedFiles)].join(', ')}) and links ${bun.links} stylesheet${bun.links === 1 ? '' : 's'}`);
       let screens = 0;
       const routes = [...modes, 'questions/drill', 'questions/misses', 'questions/weak', 'questions/mock',
         'more/timmy', 'more/hints', 'more/cram', 'more/side', 'more/arcade', 'more/stats', 'more/settings', 'more/ideas'];
@@ -719,7 +814,28 @@ function lint(hub, A){
         if (await page.evaluate(() => { const f = document.querySelector('.ska-fab'); return !!f && !f.hidden && getComputedStyle(f).display !== 'none'; })) problems.push(`${name} (${label}): the Ask icon shows during the mock exam`);
       }
       await page.evaluate(() => localStorage.removeItem('sh_pref_pet'));
+      /* the 8-bit code's pixel face is the site's own file here, fetched only now (a live hub's comes from Google Fonts) */
+      if (askedFonts.some(u => /vt323/.test(u))) problems.push(`${name} (${label}): the pixel face was fetched before anyone did the 8-bit code`);
+      if (!vp.isMobile && hub === nextHubs[0]) {
+        await page.evaluate(() => { location.hash = 'home'; }); await page.waitForTimeout(400);
+        const e8 = await eightBit(page);
+        if (!e8.on || e8.tag || !e8.face || !askedFonts.some(u => /assets\/fonts\/vt323\.woff2/.test(u)))
+          problems.push(`${name} (${label}): the 8-bit code should take its pixel face from assets/fonts/vt323.woff2, declared in widget/hub.css (8-bit mode ${e8.on ? 'on' : 'did not start'}${e8.tag ? ', a <' + e8.tag.toLowerCase() + '> was added' : ''}${e8.face ? '' : ', the face did not load'})`);
+      }
+      if (outside.length) problems.push(`${name} (${label}): the page asked Google Fonts for ${[...new Set(outside)].join(', ')}; the redesign's one typeface is self-hosted`);
+      /* the one stylesheet carries the dashboard's rules too (widget/dash.css): none of them may reach anything on a hub */
+      for (const r of ['home', 'questions', 'more/stats', 'more']) {
+        await page.evaluate(h => { location.hash = h; }, r); await page.waitForTimeout(500);
+        const hit = await page.evaluate(async ([rules, sheet]) => {
+          const css = await fetch(new URL('widget/dash.css?bundle-check', document.querySelector(`link[href*="${sheet}"]`).href.replace(/widget\/.*$/, ''))).then(x => x.text());
+          const sh = new CSSStyleSheet(); sh.replaceSync(css); const out = [];
+          (function walk(list){ for (const x of list) { if (x.selectorText) { try { if (document.querySelector(x.selectorText)) out.push(x.selectorText.slice(0, 70)); } catch (e) {} } else if (x.cssRules && !/keyframes/i.test(x.constructor.name)) walk(x.cssRules); } })(sh.cssRules);
+          return out;
+        }, [RULES, SHEET]);
+        if (hit.length) { problems.push(`${name} (${label}): ${hit.length} rule(s) of widget/dash.css style something on this hub's ${r} (${hit.slice(0, 4).join(' | ')}): scope them to the dashboard (.dx)`); break; }
+      }
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
+      ownFiles(name, label, 'hub', askedFiles);
       notes.push(`${name} (${label}): clicked through ${screens} screens, ${n} questions`);
       await page.close();
     }
@@ -1459,9 +1575,10 @@ function lint(hub, A){
        introduction, "Tap me!", the holiday outfit and fit()'s "<holiday>:<outfit>". */
     {
       const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date());
-      const petFrom = async page => page.route(/\/widget\/pet\.js(\?.*)?$/, async route => {
+      /* widget/pet.js by itself (a live page) or inside the bundle the redesign's pages load it from */
+      const petFrom = async page => page.route(/\/widget\/(pet|rest\.bundle)\.js(\?.*)?$/, async route => {
         const r = await route.fetch(), t = await r.text(), from = 'var FULL_FROM = "9999-12-31";';
-        if (!t.includes(from)) problems.push(`widget/pet.js (${label}): no \`${from}\` line (the release sets it; tools/preview/transform.js points it at a preview's start)`);
+        if (!t.includes(from)) problems.push(`widget/${widgetFile(route.request().url())} (${label}): no \`${from}\` line (the release sets it; tools/preview/transform.js points it at a preview's start)`);
         return route.fulfill({ response: r, body: t.replace(from, `var FULL_FROM = "${today}";`) });
       });
       const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
@@ -1642,7 +1759,7 @@ function lint(hub, A){
         return { page, got, errs };
       };
       /* n right answers, as the hub's widget hears them */
-      const answer = (page, n) => page.evaluate(n => { const t = document.querySelector('script[src*="v3.js"]'), e = t && t.getAttribute('data-answered-event');
+      const answer = (page, n) => page.evaluate(n => { const t = document.querySelector('script[data-answered-event]'), e = t && t.getAttribute('data-answered-event');
         for (let i = 0; e && i < n; i++) document.dispatchEvent(new CustomEvent(e, { detail: { correct: true, qid: 'smoke-' + i } })); return !!e; }, n);
       for (const hub of nextHubs.slice(0, 1)) {
         const name = `${hub}/next, the trophy case`;

@@ -37,6 +37,9 @@ change would). Run them locally before pushing; the smoke test needs Playwright
 (`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub's
 data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line at the end of each hub script.
 
+- After changing a file in `widget/` that `tools/bundle/bundles.json` lists: `node tools/bundle/build.mjs`, and commit
+  the rebuilt `widget/*.bundle.*` with it ([bundles](../reference/bundles.md)). "Check hubs" runs
+  `node tools/bundle/build.mjs --check` with the other generated-file checks and fails on a stale bundle.
 - `node --check` on each hub's extracted `<script>` block(s) and on `widget/v3.js` / `widget/eggs.js` / `widget/clicks.js` / `widget/replies.js` / `widget/ranks.js` / `widget/rankup.js` / `widget/drill.js` / `widget/fx.js` / `widget/podcast.js` / `widget/archive.js` / `widget/cases.js`.
 - Question / lecture counts match what you expect; no duplicate ids.
 - Grep that the feature you added (and anything from a merged-in branch) is present.

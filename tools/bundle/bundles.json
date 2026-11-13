@@ -1,0 +1,27 @@
+{
+ "about": "What tools/bundle/build.mjs builds for the redesign's pages, from the files in widget/ (the live pages keep loading those files themselves). scripts: 'hold' files are held until the page asks for one (window.SH_BUNDLE.run), the way it would have added that file's own <script>; 'run' files run as the bundle loads, in this order, after the held ones are in place. A bundle's 'css' is a stylesheet only its files need (widget/v3.css styles what widget/v3.js draws, and would restyle the dashboard's widgets if it were in the shared sheet): it goes in as a <style> ahead of the page's stylesheet, where a hub has always had it. styles: the parts of the one stylesheet every redesigned page links, in cascade order. A file under vendor/ goes in as it is. The smoke test and the preview read this file too.",
+ "scripts": {
+  "hub.bundle.js": {
+   "what": "a hub's engine: with the page",
+   "run": ["hub-art.js", "hub-rewards.js", "hub-timmy.js", "hub-bank.js", "hub.js"]
+  },
+  "dash.bundle.js": {
+   "what": "the dashboard's engine: with the page",
+   "run": ["hub-art.js", "hub-art/dash.js", "archive.js", "dash.js"]
+  },
+  "rest.bundle.js": {
+   "what": "the widgets a hub and the dashboard share, and the database client: once the page is drawn",
+   "run": ["vendor/supabase-lite-2.117.2.js"],
+   "hold": ["clicks.js", "replies.js", "linkask.js", "ranks.js", "ask.js", "pet.js", "timmy.js", "ideas.js"]
+  },
+  "hub-rest.bundle.js": {
+   "what": "a hub's own widget layer (widget/v3.js and what it loads): after rest.bundle.js",
+   "css": ["v3.css"],
+   "run": ["v3.js"],
+   "hold": ["eggs.js", "fx.js", "highlight.js", "podcast.js", "qhealth.js", "drill.js"]
+  }
+ },
+ "styles": {
+  "site.bundle.css": ["hub.css", "dash.css", "ask.css", "ideas.css"]
+ }
+}

@@ -33,7 +33,7 @@ Put the ranks, trophies and celebrations on the design system without changing t
   - **E** (Sam, 2026-11-12): [Ask Timmy](2026-11-12-redesign-ask-timmy.md), Timmy as every hub's study assistant. Its
     part 4, **everyone has Timmy** ("adopting timmy is no longer an option"), changes `widget/pet.js`: do it with parts B
     and C, or right after them, so it doesn't collide with their work on Timmy.
-  Their server side is [phase 5](2026-11-05-redesign-phase-5-backend.md), part 3. This changes "without changing their
+  Their server side is [phase 5](done/2026-11-05-redesign-phase-5-backend.md), part 3. This changes "without changing their
   model" in the goal: XP rules, the ladder, the house and HP change as those notes say.
 - **Released with the rest** (Sam, 2026-11-06, [decisions](../decisions.md)): these widget files are shared with the
   live hubs, so the new look goes in files or styles only the new versions load (see
@@ -56,7 +56,7 @@ spec ends with the prompt that starts it. One session each, in this order ([run-
 | 6 | **The trophy case and the cards**: this note's original goal; Full Arch retired (Sam, 2026-11-12). **Done 2026-11-13** ([#356](https://github.com/smcmurry6-source/study-hubs/pull/356), merged on Sam's "merge when ready") (its hand-off in the Log), with the rest of More, Stats and trophies redrawn to match (Sam: "make it more epic") | [the trophy case and the cards](done/2026-11-12-redesign-trophy-case-and-cards.md) | 5 (so the case lists the bowling trophy and the journey trophies once) |
 | 7 | **Ask Timmy, part 2** (the chat). **Built 2026-11-12, ahead of its turn** (Sam asked for it then): the Ask icon shows whenever Timmy isn't on the page, so it works before and after session 3 | [Ask Timmy](2026-11-12-redesign-ask-timmy.md), its Log | (3) |
 | 8 | **The game layer's wiring** left by part A: the arcade's sessions, Timmy Time's minutes, the admin page's "Fixed". **Done 2026-11-13** ([#357](https://github.com/smcmurry6-source/study-hubs/pull/357); its hand-off in the Log); the episode lengths and the service worker's lists stay with the release | [the wiring](done/2026-11-12-redesign-game-layer-wiring.md) | 6 |
-| 9 | **Phase 5, part 2**: bundles, one stylesheet, the font, budgets lowered | [phase 5](2026-11-05-redesign-phase-5-backend.md) | every session that adds a file (1 to 8) |
+| 9 | **Phase 5, part 2**: bundles, one stylesheet, the font, budgets lowered. **Done 2026-11-13** ([#358](https://github.com/smcmurry6-source/study-hubs/pull/358); its hand-off in the Log) | [phase 5](done/2026-11-05-redesign-phase-5-backend.md) | every session that adds a file (1 to 8) |
 | 10 | **The release** | [the release](2026-11-06-redesign-release.md) | all of the above, and Sam's look at the whole thing on its preview |
 
 Beside any of them, because they touch other files: **Ask Timmy, part 3** (the admin page's Timmy tab, `review/`) and
@@ -90,8 +90,10 @@ These hold for each spec; a spec only adds to them.
   written disagree, the client follows the server; the known cases and how each is worked around are in
   [game-server](../reference/game-server.md) ("Where the client works around the server as written"). A new one: stop
   and tell Sam, don't change the migration.
-- **Request budgets** (`tools/release/budgets.json`, measured by `node tools/release/perf.js`): the new Occlusion is at
-  20 of 21 requests, the new Heme & Endo Exam 2 at 20 of 22, the new Perio at 18 of 21, the new dashboard at its 30.
+- **Request budgets** (`tools/release/budgets.json`, measured by `node tools/release/perf.js`): since the bundles
+  (session 9, 2026-11-13: [bundles](../reference/bundles.md)) each new hub is at 11 of 12 requests and the new
+  dashboard at 9 of 10, counted over the whole load. A widget file that is in `tools/bundle/bundles.json` is rebuilt
+  into its bundle after every change (`node tools/bundle/build.mjs`, the bundles committed).
   **Nothing new loads with a page**: fetch a new file the first time it is used (`loadScript` in the engine, the way
   `HX.morePlace` fetches `widget/place.js`; on the dashboard the way `placeStart` waits for the first scroll, tap or
   key), and make the smoke test fail if it loads with a page. No budget is raised.
@@ -499,7 +501,37 @@ These hold for each spec; a spec only adds to them.
     3101 s), step 4 of its migration steps; until they are loaded, `pod_minute_v2` answers `unknown` and the page stops
     asking for the visit.
   - Tests: `tools/ci/smoke.js`'s `wiringCheck`, `tools/release/admin-ui.js`'s Inbox block. Bugs: BUG-122 (the preview's).
-  **Next: session 9, phase 5 part 2** ([phase 5](2026-11-05-redesign-phase-5-backend.md)).
+  **Next: session 9, phase 5 part 2** ([phase 5](done/2026-11-05-redesign-phase-5-backend.md)).
+
+- 2026-11-13 (Claude Code), **session 9, phase 5 part 2: the bundles; hand-off for session 10, the release**
+  ([#358](https://github.com/smcmurry6-source/study-hubs/pull/358); [phase 5](done/2026-11-05-redesign-phase-5-backend.md),
+  its Log and Outcome; [bundles](../reference/bundles.md) says how it works). Nothing students see changes: the live
+  pages load what they loaded (the smoke test fails if one asks for a bundle, and checks the 8-bit code on a live hub
+  still adds its Google Fonts link). Neither pending migration was applied or changed. No hosted preview (Sam).
+  What the release session needs to know:
+  - **A redesigned page loads built files**: `widget/hub.bundle.js` or `widget/dash.bundle.js` with the page, then
+    `widget/rest.bundle.js` and (a hub) `widget/hub-rest.bundle.js`, and one stylesheet, `widget/site.bundle.css`.
+    `tools/bundle/bundles.json` lists what is in each. **Edit the sources, never a `.bundle.` file, then
+    `node tools/bundle/build.mjs` and commit both**; CI fails on a stale bundle.
+  - **The three pages' tags changed**: a hub's page has its own art file and `hub.bundle.js`; the dashboard's has
+    `hubs.js` and `dash.bundle.js`. A file added to the engine is a line in `bundles.json`, not a tag.
+  - **`widgetFile()`** in `widget/v3.js` is the one loader for v3.js's other files; `loadScript()` in `widget/hub.js`
+    and `loadLate()` in `widget/dash.js` ask the bundle first too. A file not in a bundle is fetched as before.
+  - **The database client on the redesign's pages is the slim one** (`widget/vendor/supabase-lite-2.117.2.js`, inside
+    `rest.bundle.js`): `from`, `rpc`, realtime; no auth, storage or functions. A page that needs one of those would have
+    to load the full client; none does.
+  - **No font from another site** on a redesigned page: the 8-bit code's face is `assets/fonts/vt323.woff2`
+    (`@font-face` in `widget/hub.css`, fetched only when the code is entered), and the saved recap image is drawn in
+    Nunito Sans (`font: FACE` in `saveRecap`; Sam's call is open in the release note).
+  - **`node tools/release/perf.js` measures the whole load** (BUG-128), so numbers from before today aren't
+    comparable. The redesign's budgets are set on it; the release moves them to the pages' own addresses.
+  - **For the release**: `sw.js`'s `PRECACHE` takes the bundles, the stylesheet and the three font files instead of
+    the bundled files, and the content JSON's stale-while-revalidate: [the release note](2026-11-06-redesign-release.md),
+    "From phase 5, part 2", which also corrects the earlier sections' lists.
+  - Tests: `tools/ci/smoke.js`'s `bundleCheck`, `ownFiles` and `eightBit`; `node tools/bundle/build.mjs --check`;
+    `node tools/bundle/client/wire-check.mjs` (by hand, read-only, both clients against the project: 10 of 10 the
+    same). Bugs: BUG-127, BUG-128, BUG-129.
+  **Next: session 10, the release** ([the release](2026-11-06-redesign-release.md)).
 
 ## Outcome
 
@@ -513,7 +545,7 @@ Each session's prompt is at the end of its own note; in order:
 6, [the trophy case and the cards](done/2026-11-12-redesign-trophy-case-and-cards.md) ·
 7, [Ask Timmy](2026-11-12-redesign-ask-timmy.md) (part 2, the chat) ·
 8, [the wiring](done/2026-11-12-redesign-game-layer-wiring.md) ·
-9, [phase 5](2026-11-05-redesign-phase-5-backend.md) (part 2) ·
+9, [phase 5](done/2026-11-05-redesign-phase-5-backend.md) (part 2) ·
 10, the release:
 
 > Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then `RELEASE_TEST_PLAN.md` and

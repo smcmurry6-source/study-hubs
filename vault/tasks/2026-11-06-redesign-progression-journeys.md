@@ -24,7 +24,7 @@ version for reduced motion. Ships with the redesign.
 
 - The redesign plan: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) (section 4.10).
   The client side is [phase 4](2026-11-05-redesign-phase-4-game-layer.md) (part A); the server side is
-  [phase 5](2026-11-05-redesign-phase-5-backend.md) (part 3); both go live with [the release](2026-11-06-redesign-release.md).
+  [phase 5](done/2026-11-05-redesign-phase-5-backend.md) (part 3); both go live with [the release](2026-11-06-redesign-release.md).
 - Rules that matter most here: [preview-and-release-test](../rules/preview-and-release-test.md),
   [about-page](../rules/about-page.md), [learner-data-privacy](../rules/learner-data-privacy.md),
   [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md) (the drawn ink style),
@@ -289,5 +289,5 @@ and the pill takes the server's total when the reply comes; no request is added 
 
 ## Outcome
 
-Related: [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [phase 5](2026-11-05-redesign-phase-5-backend.md) ·
+Related: [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [phase 5](done/2026-11-05-redesign-phase-5-backend.md) ·
 [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md)

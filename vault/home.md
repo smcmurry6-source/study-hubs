@@ -101,6 +101,8 @@ Hub building
   notes: [event taxonomy](reference/event-taxonomy.md) · [data quality](reference/analytics-data-quality.md) ·
   [retention](reference/analytics-retention.md) · [Insights dashboard](reference/insights-dashboard.md).
 - [Question health](reference/question-health.md): stable ids, versions, what's tracked per question, the flags and how to act on them.
+- [The redesign's bundles](reference/bundles.md): what a redesigned page loads (four built files and one stylesheet), how a
+  held file runs, the slim database client, and what to run after changing a widget file.
 - [The game layer's server](reference/game-server.md): XP without a cap and its guardrails, server-checked answers, the three
   journeys, Shiny Gold Crowns and Timmy's shop, the idea board (migration_v54, applied at the redesign's release).
 - [Ask Timmy's server](reference/ask-timmy.md): the `timmy` Edge Function, how a question is answered from a hub's content

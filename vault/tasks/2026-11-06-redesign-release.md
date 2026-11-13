@@ -22,7 +22,7 @@ task is the one PR that then switches the site over. If something goes wrong, re
 
 - How the new versions are built and kept in step with the live hubs: [phase 1](done/2026-11-05-redesign-phase-1-hub-engine.md)
   (Context). The other phases: [2](2026-11-05-redesign-phase-2-live-hubs.md), [3](2026-11-05-redesign-phase-3-dashboard.md),
-  [4](2026-11-05-redesign-phase-4-game-layer.md); [5](2026-11-05-redesign-phase-5-backend.md) ships as it's ready.
+  [4](2026-11-05-redesign-phase-4-game-layer.md); [5](done/2026-11-05-redesign-phase-5-backend.md) ships as it's ready.
 - The plan: [the redesign audit and plan](done/2026-11-05-redesign-audit-and-plan.md), section 4.
 - **Which model:** this session runs on Fable 5.2 at High effort (Sam, 2026-11-12, [decisions](../decisions.md)).
 - Rules that matter most here: [preview-and-release-test](../rules/preview-and-release-test.md) (tier 3: the release
@@ -54,7 +54,10 @@ task is the one PR that then switches the site over. If something goes wrong, re
       [build-a-hub](../how-to/build-a-hub.md) rewritten ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)
       already covers High yield, since its narration on 2026-11-12)
 - [ ] The About page rewritten for everything students will see change, counts true
-- [ ] `sw.js` version bumped, so phones drop the old cached pages; perf budgets lowered to the new sizes
+- [ ] `sw.js` version bumped, so phones drop the old cached pages, and its lists rewritten for the bundles ("From phase 5,
+      part 2" below). The redesign's perf budgets were lowered to the bundled sizes in
+      [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md) (2026-11-13); the release moves them from the `next/`
+      addresses to the pages' own and takes the old pages' rows out
 - [ ] CI and the release suites pass on the switch PR, and the UAT is done on its own preview; reverting it there brings
       the old site back
 - [ ] The new dashboard, left from [phase 3](2026-11-05-redesign-phase-3-dashboard.md) (2026-11-12): its three screens
@@ -202,9 +205,10 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 the page, and are in `tools/ci/syntax.js`. Since Learn and Flashcards, 2026-11-12: `widget/study-modes.js` and
 `widget/study-modes.css` too, fetched by `widget/hub-bank.js` the first time Learn or Flashcards is opened.)
 
-`sw.js`: add the engine's four scripts to `PRECACHE` when the new hubs go live: `widget/hub.js`, `widget/hub-rewards.js`,
-`widget/hub-timmy.js` and `widget/hub-bank.js` (`widget/hub.css` and `widget/hub-art.js` are in phase 3's list below).
-A file a later session adds to the engine joins this list, the pages, `tools/ci/syntax.js` and the smoke test's `ENGINE`.
+**Changed 2026-11-13** ("From phase 5, part 2" below): the pages load the engine as one built file,
+`widget/hub.bundle.js`, so `sw.js`'s `PRECACHE` takes that file, not the four scripts, when the new hubs go live. A
+file a later session adds to the engine joins `tools/bundle/bundles.json` (then `node tools/bundle/build.mjs`) and
+`tools/ci/syntax.js`; the pages and the smoke test read the bundle.
 
 ### From phase 2, Heme & Endo Exam 2 ([phase 2](2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../hubs/heme-endo-exam2.md))
 
@@ -688,6 +692,51 @@ The sessions that build each part fix the drafts they make untrue; this is the l
   it switches the dashboard and whichever hub is live then. Sam hasn't named the hub that follows Perio: ask at the
   start of the release session, and build that hub on the engine from the start.
 
+### From phase 5, part 2 (the bundles, [phase 5](done/2026-11-05-redesign-phase-5-backend.md), built 2026-11-13)
+
+A redesigned page no longer loads the widget's files one by one. What it loads is listed in
+`tools/bundle/bundles.json` and built by `node tools/bundle/build.mjs` ([bundles](../reference/bundles.md)):
+`widget/hub.bundle.js` (a hub's engine) or `widget/dash.bundle.js` (the dashboard's), with the page; then
+`widget/rest.bundle.js` (the slim database client and the widgets both kinds of page share) and, on a hub,
+`widget/hub-rest.bundle.js` (`widget/v3.js`, `widget/v3.css` and what v3.js loads); one stylesheet,
+`widget/site.bundle.css`; the fonts in `assets/fonts/` (Nunito Sans, and `vt323.woff2` for the 8-bit code). **This
+changes the drafts above and below wherever they name a bundled file:**
+
+- [ ] `sw.js`'s `PRECACHE` for the redesign's pages: the four bundles, `widget/site.bundle.css`,
+      `assets/fonts/nunito-sans-normal.woff2`, `nunito-sans-italic.woff2` and `vt323.woff2`, **instead of** every file
+      in `tools/bundle/bundles.json` (the engine's four scripts and `widget/hub-art.js`; `widget/hub.css`,
+      `widget/dash.js`, `widget/dash.css`, `widget/hub-art/dash.js`; `widget/ask.js` and `.css`, `widget/ideas.js` and
+      `.css`; and today's `widget/v3.js`, `v3.css`, `archive.js`, `eggs.js`, `clicks.js`, `replies.js`, `linkask.js`,
+      `ranks.js`, `pet.js`, `timmy.js`, `drill.js`, `fx.js`, `highlight.js`, `podcast.js`, `qhealth.js` and the full
+      client, once no page that stays up loads them by name). The files that stay their own keep their boxes as
+      written: `hubs.js`, `widget/hub-art/<hub>.js`, `widget/hub-art/class.js`, `study-modes`, `journeys`, `place`,
+      `shop`, `bowling`, `trophies`, `hub-art/board.js`, `rankup.js`, `tour.js`, `games.js`, `cases`, `recap.js`
+- [ ] `sw.js`: the content JSON (`hubs/<hub>/content/*.json`) served stale-while-revalidate (phase 5's plan; it only
+      serves the new engine, so it comes with the release)
+- [ ] The smoke test's `ENGINE` list is gone: "a file a later session adds to the engine joins ... the smoke test's
+      `ENGINE`" (the engine's files, above) now means **a line in `tools/bundle/bundles.json`**, then
+      `node tools/bundle/build.mjs` and the rebuilt bundles committed. CI fails when a bundle is stale
+      (`node tools/bundle/build.mjs --check`, in "Check hubs"), and the smoke test fails when a redesigned page fetches
+      a bundled file by itself
+- [ ] When the new pages take the old ones' addresses: the pages' paths to `widget/` change (`../../../widget/` to
+      `../../widget/` on a hub, `../widget/` to `widget/` on the dashboard, and `C.widget` / `C.assets` / `C.root` in
+      their settings). Nothing inside a bundle depends on the page's address: a held file finds its neighbors from the
+      bundle's own address (`SH_BUNDLE.dir`), and the stylesheet's `url(...)` are relative to `widget/`
+- [ ] The old pages (the live dashboard, each hub's old `index.html`, `review/`, the About page) keep loading the
+      separate files and the full client `widget/vendor/supabase-2.117.2.js`. Delete a separate file or the full client
+      only when `grep` finds no page loading it by name (`review/` uses the full client and isn't being redesigned);
+      the sources of a bundle are never deleted, the bundles are built from them
+- [ ] The budgets: `tools/release/budgets.json`'s rows for `next/` and `hubs/<hub>/next/` move to the pages' own
+      addresses; `node tools/release/perf.js` now measures a page's **whole load** (until the network has been quiet
+      for 2 s), where it used to stop 3 s after the load event, so a number from before 2026-11-13 isn't comparable
+      with one after
+- [ ] Sam's call, asked in [#358](https://github.com/smcmurry6-source/study-hubs/pull/358): the saved recap image on
+      the new dashboard is set in Nunito Sans (the redesign's one typeface) instead of Fraunces and Work Sans from
+      Google Fonts. To put the old faces back: take `font: FACE` out of `saveRecap` in `widget/dash.js` and load the
+      two families there again (the live dashboard and the admin page still draw it in the old faces)
+- The preview: `tools/preview/transform.js` rewrites `widget/rest.bundle.js` the way it rewrites `widget/pet.js`
+  (Timmy's full-screen date), so a bundle that takes in a file the preview rewrites needs its line in `PET_FILES`.
+
 ### From phase 5, part 3 (the game layer's server, [game-server](../reference/game-server.md))
 
 `migration_v54.sql` is written and tested, not applied. At the release, in this order:
@@ -723,7 +772,7 @@ The sessions that build each part fix the drafts they make untrue; this is the l
 1. After migration_v54 is applied and the keys are loaded (above), **post the starting ideas**: the table in the idea
    board's note and the ones written from the past check-ins, each checked against the About page and the redesign plan first.
 2. The About page: the entries drafted in the idea board's note ("The About page's entries").
-3. `sw.js`: add `widget/ideas.js`, `widget/ideas.css` and `widget/hub-art/board.js` (the board's drawings) to `PRECACHE`.
+3. `sw.js`: add `widget/ideas.js`, `widget/ideas.css` and `widget/hub-art/board.js` (the board's drawings) to `PRECACHE` (since 2026-11-13 only `board.js`: the other two are in the bundles, "From phase 5, part 2").
 4. The admin page's Overview: add "Ideas reported" to "Waiting on you" (`ideas` in the Overview's `needs`), left out
    until the function exists so the live page doesn't ask for it on every load.
 5. The check-in with the tick is `widget/dash.js`'s; the old `index.html`'s goes with the old dashboard.
@@ -737,7 +786,7 @@ The sessions that build each part fix the drafts they make untrue; this is the l
 The chat is `widget/ask.js` + `widget/ask.css`, loaded only by the new pages ([ask-timmy](../reference/ask-timmy.md),
 "The chat in the new pages"). At the release, besides its box above:
 
-1. `sw.js`: add `widget/ask.js` and `widget/ask.css` to `PRECACHE` with the engine's files.
+1. `sw.js`: add `widget/ask.js` and `widget/ask.css` to `PRECACHE` with the engine's files (since 2026-11-13 both are in the bundles: nothing to add, "From phase 5, part 2").
 2. The function's `TIMMY_CONTENT_BASE` is the content's released address (the switch PR says where).
 3. **One question from the live site on a phone and a laptop**, plain voice and Timmy's: a "From the notes" link opens
    the paragraph, Report sends, `admin_timmy_days` shows it with its cost.
@@ -833,7 +882,8 @@ is in [its own note](2026-11-06-idea-board.md).
 3. The new hubs' `back:` already points at `../../../next/`; at the switch it goes back to `../../`.
 4. `hubHref()` in `widget/dash.js` sends a hub with a `next/` folder to it, and to the old page otherwise. Once every live
    hub has switched, drop `next` from the data and the two link shapes (`#drill` and `#timmy` are the old hubs').
-5. `sw.js`: add `hubs.js`, `widget/dash.js`, `widget/dash.css`, `widget/hub.css`, `widget/hub-art.js`,
+5. `sw.js` (since 2026-11-13 `widget/dash.bundle.js` and `widget/site.bundle.css` stand for the bundled ones here:
+   "From phase 5, part 2"): add `hubs.js`, `widget/dash.js`, `widget/dash.css`, `widget/hub.css`, `widget/hub-art.js`,
    `widget/hub-art/dash.js` and `widget/hub-art/class.js` (the classroom and the stage) to `PRECACHE` (not
    `widget/hub-art/outfits.js`, 168 KB, which loads only when someone on the page wears a shop outfit), drop what only the old dashboard used, and bump the version.
 6. `tools/release/a11y.js`, `perf.js`, `matrix.js` and `tools/ci/smoke.js` test `next/` beside the old dashboard today:

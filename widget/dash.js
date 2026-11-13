@@ -1651,17 +1651,15 @@
   }
   function saveRecap(row, btn){
     btn.disabled = true;
-    if (!document.getElementById("recapFonts")) {
-      var l = document.createElement("link"); l.id = "recapFonts"; l.rel = "stylesheet";
-      l.href = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@500;600;700&display=swap";
-      document.head.appendChild(l);
-    }
+    /* the image is set in the site's own typeface, the one self-hosted file every page here already has (the live
+       dashboard's image fetches Fraunces and Work Sans from Google Fonts): its weights are made ready before drawing */
+    var FACE = "'Nunito Sans', system-ui, -apple-system, 'Segoe UI', sans-serif";
     var fonts = function(){ return document.fonts ? Promise.race([
-      Promise.all(["600 40px Fraunces", "500 20px 'Work Sans'", "600 20px 'Work Sans'", "700 20px 'Work Sans'"].map(function(f){ return document.fonts.load(f); })),
+      Promise.all(["500 20px 'Nunito Sans'", "600 40px 'Nunito Sans'", "700 20px 'Nunito Sans'"].map(function(f){ return document.fonts.load(f); })),
       new Promise(function(r){ setTimeout(r, 2500); })]).catch(function(){}) : Promise.resolve(); };
     loadScriptOnce(WIDGET + "recap.js").then(fonts).then(function(){
       var c = document.createElement("canvas");
-      window.shRecap.draw(c, row.data, { title: row.title, color: row.color, names: row.names, question: row.question, footnote: row.footnote });
+      window.shRecap.draw(c, row.data, { title: row.title, color: row.color, names: row.names, question: row.question, footnote: row.footnote, font: FACE });
       var a = document.createElement("a"); a.href = c.toDataURL("image/png");
       a.download = row.title.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() + "-recap.png";
       document.body.appendChild(a); a.click(); a.remove(); track("recap:save");
@@ -1971,15 +1969,20 @@
   /* The page is drawn from this device's own data first. The class's data and the shared widgets (ranks, Timmy, the
      Inbox, click counts) come after, in this order, so the first screen doesn't wait for them on a slow phone. A page
      that lists one of them itself is left alone. */
-  var LATE = ["vendor/supabase-2.117.2.js", "clicks.js", "replies.js", "linkask.js", "ranks.js", "ask.js", "pet.js", "timmy.js", "hub-art/class.js", "ideas.js"];
+  var LATE = ["clicks.js", "replies.js", "linkask.js", "ranks.js", "ask.js", "pet.js", "timmy.js", "ideas.js"];
+  /* They arrive in one file, widget/rest.bundle.js (tools/bundle/build.mjs: the database client, which runs as it
+     loads, and the widgets a hub's page shares with this one, each held until it is run here), beside the one file of
+     drawings that is this page's alone (the room and the stage). */
   function loadLate(done){
-    var need = LATE.filter(function(f){ return !q('script[src$="' + f + '"]'); }), left = need.length;
-    if (!left) { done(); return; }
-    need.forEach(function(f){
-      var s = document.createElement("script"); s.src = WIDGET + f; s.async = false;   /* in order, as they were on the page */
-      s.onload = s.onerror = function(){ if (!--left) done(); };
-      document.head.appendChild(s);
-    });
+    var left = 2;
+    function one(){
+      if (--left) return;
+      var B = window.SH_BUNDLE;
+      LATE.forEach(function(f){ try { if (B) B.run(f); } catch (e) { setTimeout(function(){ throw e; }, 0); } });   /* one that fails doesn't stop the rest */
+      done();
+    }
+    loadScriptOnce(WIDGET + "rest.bundle.js").then(one, one);
+    loadScriptOnce(WIDGET + "hub-art/class.js").then(one, one);
   }
   function afterDraw(){
     loadLate(function(){

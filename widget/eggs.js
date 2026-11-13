@@ -806,7 +806,8 @@
   }, { passive: true });
   function toggle8bit(){
     sh8bit = !sh8bit;
-    if (sh8bit && !document.getElementById("sh-egg-8bit-font")) {
+    /* the pixel face: a redesigned page (shx) has its own copy (widget/hub.css) */
+    if (sh8bit && !document.getElementById("sh-egg-8bit-font") && !document.documentElement.classList.contains("shx")) {
       var l = document.createElement("link");
       l.id = "sh-egg-8bit-font"; l.rel = "stylesheet";
       l.href = "https://fonts.googleapis.com/css2?family=VT323&display=swap";
