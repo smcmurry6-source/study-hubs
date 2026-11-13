@@ -452,9 +452,9 @@ change to HP's rules beyond the 100 start; the old pages.
   at 100 earns Pearly Whites only after a day that ended under 100 (otherwise a first visit would award it at once); a
   new device draws him plain until its first scroll, tap or key when the outfit isn't kept (the request budget); the
   Loupes journey's loupes stay at his place (elsewhere he wears only the `outfit` slot); no new tracking event. Nothing in the
-  client disagrees with `migration_v54.sql` (unchanged). Bugs: BUG-105, BUG-106 and BUG-108 found and fixed;
-  BUG-107 (the preview's dashboard shows 0 HP until a hub has been opened) is the preview's, open, and on `main` too;
-  BUG-109 (the shop's snack state read once, before his days arrive) is the shop's, open.
+  client disagrees with `migration_v54.sql` (unchanged). Bugs: BUG-105, BUG-106, BUG-108 and BUG-109 (the smoke test's
+  click-throughs leaving answers in Timmy's tally) found and fixed; BUG-107 (the preview's dashboard shows 0 HP until a
+  hub has been opened) is the preview's, open, and on `main` too.
 
 ## Outcome
 

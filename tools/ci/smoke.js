@@ -668,7 +668,9 @@ function lint(hub, A){
       page.on('pageerror', e => errs.push(e.message));
       page.on('request', r => { if (/\/widget\/(shop\.(js|css)|hub-art\/shop\.js)/.test(r.url())) asked.push(r.url().replace(/^.*\/widget\//, '')); });
       const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date());
-      await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
+      /* Timmy's own tally of today's answers (sh_pet_log) is left by the click-throughs above, where he's on the page for
+         everyone: start without it, so his health is the snack's 100 and nothing else */
+      await page.addInitScript(() => { try { localStorage.removeItem('sh_pet_log'); localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); } catch (e) {} });
       const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
       const wallet = { earned: 300, spent: 0, balance: 300, from_xp: 230, trophies: 50, medals: 0, rankups: 20 }, inv = [], seen = new Map();
       let refuse = '', drop = false;
@@ -935,10 +937,10 @@ function lint(hub, A){
       const shop = () => ({ day: today, seasons: [], throwback: false, wallet: { earned: 300, spent: 0, balance: 300 }, items: [], costumes: [], snacks_today: [], boost: null, locked: [],
         inventory: ['bow-tie', 'sun-hat'].map(id => ({ id, at: '2026-11-01', how: 'bought' })), equipped: Object.assign({}, equipped) });
       const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
-      /* the pages above share this browser's storage: start each page below as a first visit, once (a reload keeps it),
-         with the rank this device last saw (so no rank-up card) and no tour */
+      /* the pages above share this browser's storage, Timmy's tally of their answers too: start each page below as a
+         first visit, once (a reload keeps it), with the rank this device last saw (so no rank-up card) and no tour */
       const fresh = page => page.addInitScript(() => { try { if (sessionStorage.getItem('sh_smoke_fresh')) return; sessionStorage.setItem('sh_smoke_fresh', '1');
-        ['sh_pet_born', 'sh_pet_outfit', 'sh_pet_adopt_sent', 'sh_pet_perfect', 'sh_egg_holiday_test', 'sh_pref_pet', 'sh_pref_focus'].forEach(k => localStorage.removeItem(k));
+        ['sh_pet_born', 'sh_pet_log', 'sh_pet_outfit', 'sh_pet_adopt_sent', 'sh_pet_perfect', 'sh_egg_holiday_test', 'sh_pref_pet', 'sh_pref_focus'].forEach(k => localStorage.removeItem(k));
         localStorage.setItem('sh_rank_g', '4'); localStorage.setItem('sh_rank_tier', '1'); localStorage.setItem('sh_rank_step', '4'); localStorage.setItem('sh_tour_done', '1'); } catch (e) {} });
       const game = async (page, adopts, asked) => {
         await petFrom(page);

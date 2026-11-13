@@ -375,8 +375,8 @@ These hold for each spec; a spec only adds to them.
     `timmySvg()` always passes `hat: ""`. **`widget/hub-timmy.js`**: `hasTimmy()` is true and `hasShop()` is only "a
     `shop` in the bootstrap".
   - Tests: the smoke test's "Everyone has Timmy" block (a new hub, the new dashboard, the live hub and dashboard as
-    before); the Ask checks now turn Timmy off before they wait for the Ask icon. Bugs: BUG-105 to BUG-109 (BUG-109, the shop's snack state
-    read once when it opens, is open for the shop).
+    before); the Ask checks now turn Timmy off before they wait for the Ask icon. Bugs: BUG-105 to BUG-109. For the tests: Timmy is now on every new hub's page, so
+    the answers a test gives there go into his tally of the day (`sh_pet_log`); a check of his HP starts without it.
   **Next: session 4, visiting** ([visiting](2026-11-12-redesign-visiting.md)), or session 5, the bowling egg.
 
 ## Outcome
