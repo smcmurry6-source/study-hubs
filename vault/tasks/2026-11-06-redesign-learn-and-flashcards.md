@@ -1,11 +1,11 @@
 ---
 type: task
-status: review
+status: blocked
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: "Sam's merge; then the redesign's release (migration_v56 applied after v54 and v55, the About page entries)"
+waiting-on: "the redesign's release (migration_v56 applied after v54 and v55, sw.js's PRECACHE, the About page entries)"
 agent: Claude Code (2026-11-12)
 pr: https://github.com/smcmurry6-source/study-hubs/pull/344
 ---
@@ -207,7 +207,7 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
 
 - 2026-11-12 (Claude Code): asked Sam first, as the session's prompt said, what the server part is and whether the toggle
   could ship without it, with three options (A: no server part, B: a new pending `migration_v56.sql`, C: a section in
-  v54). Sam: "B, go ahead". Built and tested in [#344](https://github.com/smcmurry6-source/study-hubs/pull/344) (draft). Sam also asked mid-session (2026-11-12): "make sure learn has
+  v54). Sam: "B, go ahead". Built and tested in [#344](https://github.com/smcmurry6-source/study-hubs/pull/344). Sam also asked mid-session (2026-11-12): "make sure learn has
   similar progress bar filling animations and such so it is very satisfying to use like quizlet": the overall bar now
   fills instead of jumping (a shine along it when a question is mastered, its numbers counting to their new value, the
   percent counting a question right once as halfway), the round's track fills a step per answer (red for a miss, a
@@ -227,10 +227,14 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
     would cover Again and Easy, so they stay at the card's end); the hidden-choices step uses a conservative test (a
     stem with "which", "the following", "not", "true", "statements" and the like keeps its choices); Study new cards gives
     20 at a time.
+- 2026-11-12 (Claude Code): Sam: "Merge". `main` with #343 (vault only) was brought in first (one conflict in
+  `vault/decisions.md`, both lines kept); merged as `7efb1ad` once "Check hubs" and "Release tests" passed on its last
+  commit; `node tools/release/postcheck.js` passed (9 files live and identical to `main`, the dashboard and the three hubs
+  with 0 errors). The note is `blocked` on the release, its last box. No preview was asked for.
 
 ## Outcome
 
-Built, not released: the Question Bank's **Study as: Questions · Learn · Flashcards** in the three new hubs, with the
+Built and merged ([#344](https://github.com/smcmurry6-source/study-hubs/pull/344), `7efb1ad`), not released: the Question Bank's **Study as: Questions · Learn · Flashcards** in the three new hubs, with the
 server part as `migration_v56.sql` (pending, after v54 and v55, which are unchanged). Nothing students see changes until
 the release; the release note says what goes in then.
 
