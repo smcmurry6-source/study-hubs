@@ -21,6 +21,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **Numbering the questions in a bank set, Sam's call** (the same check-in asked for it; Sam's 11-14 answer covered only the page
   size): a number on each card of the current set, in the redesign's bank (`widget/hub-bank.js`) and the live engines.
 
+- [ ] **Perio's page weight is near its budget** (2026-11-14, [#362](https://github.com/smcmurry6-source/study-hubs/pull/362)): `perf.js`
+  measured the live Perio page at 1167 KB of its 1180 KB budget (`tools/release/budgets.json`) after Figs 6-8 (+38 KB gzipped), and its
+  first paint warns at 1.6 s on the slow phone (budget 1.5 s; CI passed). The next figure or big content change needs room: trim
+  what the anima blocks repeat (each figure's static SVG is drawn again by its live code), or ask Sam before raising the budget.
+
 - [ ] **A new hub's blocking time after the bundles** (2026-11-13, [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md), [#358](https://github.com/smcmurry6-source/study-hubs/pull/358)):
   on `perf.js`'s slow phone a new hub's total blocking time was 230-365 ms on `main` and is 310-540 ms with the bundles
   across runs (350-385 in the final run; budget 500, fails past 750). The same scripts run, in fewer and longer tasks.

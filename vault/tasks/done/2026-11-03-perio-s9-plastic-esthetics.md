@@ -1,13 +1,12 @@
 ---
 type: task
-status: blocked
+status: done
 hub: perio
 created: 2026-11-03
 requested-by: Sam
 due: 2026-11-19
-waiting-on: the live class's capture (gingival excess and abnormal color, the week of Nov 9)
-agent: Claude Code (claude/bold-thompson-v88wcy)
-pr: https://github.com/smcmurry6-source/study-hubs/pull/298
+agent: Claude Code (claude/bold-thompson-v88wcy; the live class: claude/perio-hub-google-drive-815ye9)
+pr: https://github.com/smcmurry6-source/study-hubs/pull/362
 ---
 
 # Perio Session 9 (Periodontal Plastic Therapy & Esthetics)
@@ -20,12 +19,12 @@ slides (then the recording) are in the Drive folder, build it out before the fin
 
 ## Context
 
-- Hub note: [perio](../hubs/perio.md); S6 (slides first, then taught) and S7/S8 (taught from recordings) are the
+- Hub note: [perio](../../hubs/perio.md); S6 (slides first, then taught) and S7/S8 (taught from recordings) are the
   worked examples in `DEPLOY_NOTES.md`.
-- A taught session needs everything in [perio-s6](2026-11-03-perio-s6-regeneration-taught.md)'s "Done when" list:
+- A taught session needs everything in [perio-s6](../2026-11-03-perio-s6-regeneration-taught.md)'s "Done when" list:
   both reading levels and both mp3s, exam hints, `LIKELY_TOPICS`, the three question formats with their minimums,
   a why for every choice, and a diagram review put to Sam one candidate at a time.
-- [LESSONS.md](../../LESSONS.md): read it first (it's a new lecture); [graded-coursework](../rules/graded-coursework.md).
+- [LESSONS.md](../../../LESSONS.md): read it first (it's a new lecture); [graded-coursework](../../rules/graded-coursework.md).
 
 ## Done when
 
@@ -33,9 +32,9 @@ slides (then the recording) are in the Drive folder, build it out before the fin
 - [x] Taught version shipped as soon as the recording arrives, meeting every taught-lecture rule (the recorded part;
   the live class's part is still to come)
 - [x] CI passes; hub note and Outcome written
-- [ ] The live class's capture (gingival excess, altered passive eruption, esthetics, abnormal color): check those
+- [x] The live class's capture (gingival excess, altered passive eruption, esthetics, abnormal color): check those
   sections, their questions and hints against it, take the "(slides; the live session)" labels and the lecture `note`
-  off, regenerate both mp3s
+  off, regenerate both mp3s (2026-11-14; the `note` now says how it was lectured, and Figs 4 and 5 were checked too)
 - [x] Diagram candidates put to Sam (below); build what's approved, note the skipped ones in the hub note (all five
   approved, none skipped)
 
@@ -65,6 +64,8 @@ slides (then the recording) are in the Drive folder, build it out before the fin
 - 2026-11-10: Sam: "Yes to all diagrams. Merge when ready". All five built (`tools/figures/perio/`), placed under
   the notes and in their Review sections, and merged by the agent once green; see Outcome.
 - 2026-11-10: #301's Pages publish timed out; a vault-only PR records it and republishes the site when merged.
+- 2026-11-14: the Nov 12 live class's capture (two parts) was in Drive, with Dr. Abou-Arraj's review for the final at its
+  end; Sam passed on his furcation email. See Outcome.
 
 ## Outcome
 
@@ -102,4 +103,21 @@ slides (then the recording) are in the Drive folder, build it out before the fin
 - **Publishing:** GitHub Pages' first publish of #301 (b115ec3) timed out ("syncing_files" for 10 minutes, then
   canceled), so the live site stayed on #297 until the next merge to `main`. The post-release check and the site
   changelog line wait for that publish.
+
+2026-11-14, the Nov 12 live class and the review for the final ([PR 362](https://github.com/smcmurry6-source/study-hubs/pull/362)):
+- **Notes** (both levels, still aligned: 46 paragraphs each): the old slides-only tail became 15 paragraphs from the class
+  (the four causes of gingival excess, drug enlargement and which class is most common, the gummy smile's causes,
+  passive eruption and Coslet's types with A as 1.5-2 mm, the crown lengthening evaluation with bone sounding, the
+  esthetic evaluation, the treatments, crown lengthening by type, his Patient 1 and the tattoo); his answers on the
+  recording went into their paragraphs (attachment loss and Cairo, the coverage ceiling, RT3's blood supply, palate
+  depth, choosing the graft by its goal). Both S9 mp3s regenerated.
+- **Questions:** 22 new (`q9-L37`-`L52`, `T11`-`T14`, `S06`-`S07`, `N05`); `q9-L31`'s crest moved from 2.5 to 2 mm (the
+  live class's A range). **Hints:** 9 from the class. **Topics** re-ranked, with two new ones (crown lengthening, the
+  tattoo). **Review**, cram, mind map and Figs 4 and 5 (`ape`, `egd`) brought in line; their "(slides)" labels are off.
+- The review for the final and the furcation email touched the other sessions too: the hub note's "Dr. Abou-Arraj's
+  review for the final" says what.
+- **Figures** (Sam, the same day: "Yes to all figures and anima"): Fig 6 `excess` (pseudopocket or enlargement), Fig 7
+  `clsteps` (crown lengthening step by step) and Fig 8 `smile` (the esthetic checklist, with his Patient 1 before and
+  after), under the S9 notes and in Review's `s9-excess`, `ape` and `esthetics`. They sit outside the narrated text, so
+  no audio changed for them.
 

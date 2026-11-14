@@ -13,4 +13,8 @@ import { palate } from "./palate.mjs";
 import { grafts } from "./grafts.mjs";
 import { ape } from "./ape.mjs";
 import { egd } from "./egd.mjs";
-export const FIGURES = [pistates(), meffert(), bop(), xrays(), biofilm(), targets(), hostmod(), cairo(), palate(), grafts(), ape(), egd()];
+// S9 from the Nov 12 live class, approved by Sam 2026-11-14 ("Yes to all figures and anima")
+import { excess } from "./excess.mjs";
+import { clsteps } from "./clsteps.mjs";
+import { smile } from "./smile.mjs";
+export const FIGURES = [pistates(), meffert(), bop(), xrays(), biofilm(), targets(), hostmod(), cairo(), palate(), grafts(), ape(), egd(), excess(), clsteps(), smile()];
