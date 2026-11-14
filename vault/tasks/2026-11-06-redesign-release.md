@@ -1092,5 +1092,13 @@ is a new migration and Sam's call, never a restore.
   Two tests were taught the hub shelves (`tools/ci/smoke.js`, `tools/release/a11y.js`). When measuring a phone page's
   width in a script, compare with the device's width (`page.viewportSize().width`), not `innerWidth`: an emulated
   phone widens `innerWidth` to fit a page that is too wide.
+- 2026-11-14 (Claude Code, round 3, same PR). Two more calls from Sam on the preview ([decisions](../decisions.md),
+  2026-11-14). **Timmy's place's full view** is one theater-look window for your own place and a visit
+  (`widget/place.js` `hostCard()`, `widget/place.css`: the tokens are set on the dialog, the stage sits in
+  `.tpv-frame`, the customizer's foot has Done), and **the dashboard's closed-hub cards are gone** (Past hubs is the
+  check-ins and the recaps; `widget/dash.js` `renderArchived()`). Checked by a click-through of the window on six
+  screens (laptop, short laptop, upright tablet, phone, 320 px, two personas: no sideways scroll, every button with a
+  `data-tp`, focus back where it was after the medals, Done and Escape) and by eye in the screenshots, then the
+  suites named in the PR's report.
 
 ## Outcome

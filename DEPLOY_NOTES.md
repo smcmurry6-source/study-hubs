@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **The release PR's third round (#359, 2026-11-14, Claude Code; live from the merge)** — two more of Sam's calls
+  from the preview ([decisions](vault/decisions.md), 2026-11-14):
+  - **Timmy's place, the full view** (`widget/place.js`, `widget/place.css`): one theater-look window for your own
+    place and a visit. The dialog sets the design tokens for everything inside (`--ground`, `--row`, `--text`...), so
+    it is dark in both themes; the stage and its Close-up chip sit in `.tpv-frame`; your own panel is `hostCard()`
+    (Timmy today with an HP meter, Customize and Shop, the rank plate, the medals); the customizer's foot is sticky on
+    a laptop and has Done (`data-tp="done"`). The window is larger (1240 by 820 at most) and stacks on an upright
+    tablet. Every button still carries a fixed `data-tp`. `.tpv button { color: inherit }` beats a one-class rule, so
+    a button inside the window that needs its own color is written `.tpv .name`.
+  - **The dashboard's closed-hub cards are gone** (`widget/dash.js`: `renderArchived()` only draws the check-ins and
+    Past hubs' note; `#archived` and the `.dx-arch*` styles are removed). Past hubs is the exam check-ins and the
+    recaps. `tools/release/admin-ui.js` now expects no tab and no link for an archived hub.
 - **The release PR's second round (#359, 2026-11-13, Claude Code; live from the merge)** — what Sam asked for after
   using the preview ([decisions](vault/decisions.md), 2026-11-13), all in the same PR:
   - **Dashboard:** the You card's rank is a hero on dark plum (`renderMyRank()`), the wallet and stats match, and
