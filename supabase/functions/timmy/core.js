@@ -477,16 +477,31 @@ export function checkAnswer(parsed, units, ctx){
 
 /* ====================================================================== cost (an estimate: the Console's spending limit is the real backstop) */
 // USD per million tokens, from the price list on 2026-11-12 (cache writes: 1.25x for 5 minutes, 2x for an hour).
+// Sonnet 5.5 and Haiku 5.5 from the price list on 2026-11-14; Haiku 5.5 has a second rate for a prompt over 100K tokens
+// (the dashboard's, with every hub's content in it), cache reads 0.1x either rate.
 export const PRICES = {
   "claude-opus-5-5": { in: 4, out: 20, read: 0.2 },
   "claude-opus-5": { in: 5, out: 25, read: 0.5 },
-  "claude-opus-4-8": { in: 5, out: 25, read: 0.5 }
+  "claude-opus-4-8": { in: 5, out: 25, read: 0.5 },
+  "claude-sonnet-5-5": { in: 2, out: 10, read: 0.1 },
+  "claude-sonnet-5": { in: 2, out: 10, read: 0.2 },
+  "claude-haiku-5-5": { in: 0.1, out: 0.5, read: 0.01, long: { over: 100000, in: 0.5, out: 2.5, read: 0.05 } }
 };
 export function estimateCost(usage, model){
-  const p = PRICES[model] || PRICES["claude-opus-5"], u = usage || {}, cc = u.cache_creation || {};
+  const u = usage || {}, cc = u.cache_creation || {};
   const w1h = cc.ephemeral_1h_input_tokens != null ? cc.ephemeral_1h_input_tokens : (u.cache_creation_input_tokens || 0);
   const w5m = cc.ephemeral_5m_input_tokens != null ? cc.ephemeral_5m_input_tokens : 0;
+  let p = PRICES[model] || PRICES["claude-opus-5"];
+  if (p.long && (u.input_tokens || 0) + (u.cache_read_input_tokens || 0) + w1h + w5m > p.long.over) p = p.long;
   return ((u.input_tokens || 0) * p.in + (u.output_tokens || 0) * p.out + (u.cache_read_input_tokens || 0) * p.read + w5m * p.in * 1.25 + w1h * p.in * 2) / 1e6;
+}
+
+// The request for another model: Haiku 5.5 has no server-side fallback (a declined request just ends), so it goes without
+// the fallback beta and `fallbacks`. Used by buildRequest for MODEL and by the eval's --model.
+export function withModel(params, model){
+  const p = Object.assign({}, params, { model });
+  if (/^claude-haiku/.test(model)) { delete p.betas; delete p.fallbacks; }
+  return p;
 }
 
 /* ====================================================================== lines when Timmy can't answer */
@@ -544,13 +559,13 @@ export function buildRequest(corpora, site, history, sent){
     i++;
   }
   messages.push({ role: "user", content: sent });
-  return {
+  return withModel({
     model: MODEL, max_tokens: MAX_TOKENS, betas: BETAS, fallbacks: "default",
     system: [{ type: "text", text: RULES }, { type: "text", text: content, cache_control: { type: "ephemeral", ttl: "1h" } }],
     messages,
     cache_control: { type: "ephemeral" },
     output_config: { effort: EFFORT, format: { type: "json_schema", schema: SCHEMA } }
-  };
+  }, MODEL);
 }
 
 export async function handle(body, deps){
