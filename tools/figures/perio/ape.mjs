@@ -1,9 +1,9 @@
-// Fig: altered passive eruption (Periodontology S9, from Dr. Abou-Arraj's slides and the exam-review guide; the live
-// class that covers it isn't posted yet). A labiolingual section through a maxillary central incisor, crown down, drawn
+// Fig: altered passive eruption (Periodontology S9, from Dr. Abou-Arraj's slides, his Nov 12 live class and the
+// exam-review guide). A labiolingual section through a maxillary central incisor, crown down, drawn
 // to one scale (13 px = 1 mm). Coslet's two axes, as the notes give them:
 //   Type 1: a wider gingival dimension (free gingival margin to MGJ), the MGJ apical to the alveolar crest;
 //   Type 2: a normal dimension, the MGJ at the level of the CEJ;
-//   Subcategory A: more than 1 mm between the CEJ and the osseous crest; B: the crest in close proximity to the CEJ.
+//   Subcategory A: the crest 1.5-2 mm from the CEJ (the slide: more than 1 mm); B: within about 1 mm of the CEJ, or at it.
 // In every type the gingival margin sits on the enamel, so the clinical crown is shorter than the anatomical crown.
 // After treatment (crown lengthening, matched to the type): 1A gingivectomy alone; 2A an apically positioned flap;
 // 1B and 2B an apically positioned flap plus osseous surgery.
@@ -99,7 +99,7 @@ const D = {
   TXT: {
     muc: "alveolar mucosa",
     mgj: ["MGJ, apical|to the crest", "MGJ, at the|level of the CEJ", "MGJ", "MGJ, moved|apically"],
-    crest: ["bone crest, more than|1 mm from the CEJ", "bone crest, close|to the CEJ", "bone crest, after|osseous surgery"],
+    crest: ["bone crest, 1.5-2 mm|from the CEJ", "bone crest, close|to the CEJ", "bone crest, after|osseous surgery"],
     kg: ["gingiva, wider|than normal", "gingiva, normal|width", "gingiva, still|a band", "gingiva, its|width kept"],
     margin: ["gingival margin,|on the enamel", "new margin, at|about the CEJ"],
     ghost: ["where the|margin was", "gingiva cut|away"],
@@ -107,11 +107,11 @@ const D = {
   },
   TX: { "1A": "gingivectomy alone", "2A": "apically positioned flap", "1B": "apically positioned flap + osseous surgery", "2B": "apically positioned flap + osseous surgery" },
   SUM: {
-    "1A": ["Type 1A: a wider band of gingiva, with the MGJ apical to the bone crest, and more than 1 mm between the CEJ and the crest. The gingival margin sits on the enamel, so the clinical crown is shorter than the anatomical crown. Types 1A and 1B are the ones seen most often.",
+    "1A": ["Type 1A: a wider band of gingiva, with the MGJ apical to the bone crest, and the crest in its normal range, 1.5-2 mm from the CEJ. The gingival margin sits on the enamel, so the clinical crown is shorter than the anatomical crown. Types 1A and 1B are the ones seen most often.",
       "Type 1A, gingivectomy alone: it is the only type with both extra gingiva and room above the bone, so the excess gingiva is cut away and a band of keratinized gingiva still remains."],
     "1B": ["Type 1B: a wider band of gingiva, with the MGJ apical to the crest, but the bone crest in close proximity to the CEJ. Types 1A and 1B are the ones seen most often.",
       "Type 1B, an apically positioned flap plus osseous surgery: the bone itself sits too close to the CEJ, so it has to be moved, whatever the gingiva. Bone is removed and the flap is positioned apically."],
-    "2A": ["Type 2A: a normal width of gingiva, with the MGJ at the level of the CEJ, and more than 1 mm between the CEJ and the crest. The tooth still looks short: the margin sits on the enamel.",
+    "2A": ["Type 2A: a normal width of gingiva, with the MGJ at the level of the CEJ, and the crest in its normal range, 1.5-2 mm from the CEJ. The tooth still looks short: the margin sits on the enamel.",
       "Type 2A, an apically positioned flap: the band of gingiva is only of normal width, so cutting it away would cost keratinized gingiva. The flap moves the whole band apically instead."],
     "2B": ["Type 2B: a normal width of gingiva, with the MGJ at the level of the CEJ, and the bone crest in close proximity to the CEJ.",
       "Type 2B, an apically positioned flap plus osseous surgery: the bone sits too close to the CEJ, so bone is removed, and the flap moves the band of gingiva apically, keeping its width."],
@@ -120,7 +120,7 @@ const D = {
     tooth: "A maxillary central incisor in section. The anatomical crown runs from the incisal edge to the CEJ; the clinical crown is the part that shows above the gingiva.",
     kg: "Keratinized gingiva, from the gingival margin to the MGJ. Type 1 has a wider band than normal; Type 2 a normal width.",
     muc: "Alveolar mucosa, beyond the MGJ.",
-    bone: "The facial bone. Subcategory A has more than 1 mm between the CEJ and the crest; in B the crest sits in close proximity to the CEJ.",
+    bone: "The facial bone. In subcategory A the crest is 1.5-2 mm from the CEJ (the slide: more than 1 mm); in B it sits within about 1 mm of the CEJ, or at it.",
     ghost: "Where the gingiva was before treatment: it covered part of the anatomical crown.",
     boneGhost: "The bone removed in osseous surgery, so the crest no longer sits close to the CEJ.",
   },
@@ -134,13 +134,13 @@ const svg = figureSvg({ width: W, height: H, className: "ap-svg", label: "A sect
   body: `<g class="ap-bonel">${apBoneSvg(st0, D)}</g>${D.STATIC}<g class="ap-dyn">${apDyn(st0, D)}</g>${tags}${scale}` });
 const plate = plateHtml({ fig: "S9 · Fig 4", title: "Altered passive eruption", hint: "pick a type · then treat it", readout: "Type 1A · before", body: `<div class="am-svg ap-box">${svg}</div>` });
 const controls = `<div class="am-controls" role="group" aria-label="Type"><button type="button" class="am-btn" data-apt="1" aria-pressed="true">Type 1: wider gingiva</button><button type="button" class="am-btn" data-apt="2" aria-pressed="false">Type 2: normal width</button></div>
-<div class="am-controls" role="group" aria-label="Subcategory"><button type="button" class="am-btn" data-aps="A" aria-pressed="true">A: crest more than 1 mm from the CEJ</button><button type="button" class="am-btn" data-aps="B" aria-pressed="false">B: crest close to the CEJ</button></div>
+<div class="am-controls" role="group" aria-label="Subcategory"><button type="button" class="am-btn" data-aps="A" aria-pressed="true">A: crest 1.5-2 mm from the CEJ</button><button type="button" class="am-btn" data-aps="B" aria-pressed="false">B: crest within about 1 mm of the CEJ</button></div>
 <div class="am-controls" role="group" aria-label="Treatment"><button type="button" class="am-btn" data-apa="0" aria-pressed="true">Before</button><button type="button" class="am-btn" data-apa="1" aria-pressed="false">After crown lengthening</button></div>
 <div class="am-stats"><span>Treatment <b data-ap="0"></b></span><span>Clinical crown <b data-ap="1"></b></span></div>
 <p class="am-summary" aria-live="polite"></p>
 <p class="am-info">Tap the gingiva, the mucosa, the bone or the tooth.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
-<li>From Dr. Abou-Arraj's slides and the notes (the live class that covers this part of S9 isn't posted yet): the two types and two subcategories, which are the most common, and the treatment for each.</li>
+<li>From Dr. Abou-Arraj's slides, his Nov 12 live class and the notes: the two types and two subcategories, which are the most common, and the treatment for each.</li>
 <li>Outside sources: the classification is Coslet, Vanarsdall and Weisgold's (Alpha Omegan 1977;70:24-8), and passive eruption as the gingiva's migration to a final stable position at the cervical level follows Alpiste-Illueca (Med Oral Patol Oral Cir Bucal 2011;16:e100-4). The tooth's proportions follow Wheeler's Dental Anatomy (Nelson, 11th ed.), and the crest after osseous surgery is drawn about where Gargiulo, Wentz and Orban's supracrestal dimensions put it (J Periodontol 1961;32:261-7); the labels give only the notes' relations.</li>
 <li>A schematic, drawn to one scale (the 5 mm bar): where the margin, the MGJ and the crest sit in each type, how far the margin moves and how much bone comes off are illustrative. Educational, not medical advice.</li></ul></details>`;
 
@@ -195,6 +195,6 @@ const CSS = `
 
 export function ape() {
   return { id: "ape", lec: "perio-plastic-esthetics", title: "Altered passive eruption",
-    caption: "Coslet's types (where the MGJ sits) and subcategories (how close the bone crest is to the CEJ), and the crown lengthening each one gets. From the slides; the live class isn't posted yet.",
+    caption: "Coslet's types (where the MGJ sits) and subcategories (how close the bone crest is to the CEJ), and the crown lengthening each one gets. From the slides and the Nov 12 live class.",
     html: `<div class="anima" data-anima="ape">${plate}${controls}${SOURCES}</div>`, css: CSS, live: apLive.toString(), helpers: [apLerp, apF, apL, apBO, apIn, apTh, apP, apBand, apBone, apDyn, apBoneSvg], data: D };
 }

@@ -32,6 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-14 (Perio: the Nov 12 live class and the review for the final, Claude Code)** — Sam: "Update the perio hub with the
+  added google drive contents", with Dr. Abou-Arraj's furcation email. **S9** now has the live class: its notes' slides-only tail
+  became 15 paragraphs from the class at both levels (gingival excess and drug enlargement, the gummy smile, altered passive
+  eruption with A as 1.5-2 mm, crown lengthening by type and his Patient 1, the esthetic evaluation, the tattoo), his answers on
+  the recording went into their paragraphs, both S9 mp3s were regenerated, 22 questions were added (`q9-L37`-`L52`, `T11`-`T14`,
+  `S06`-`S07`, `N05`), 9 hints, the topics re-ranked, Review, cram, mind map and Figs 4-5 brought in line, and the task moved to
+  done. **The review for the final**: the format (60-65 questions, about 15% from S1-S4, an hour and a half that can be two, no
+  suture images, few or no Patient Box) in an S1 hint, a new final card on Home (`FINAL_FACTS`), `COURSE_GRADING` and the mock
+  (`EXAM_FORMAT` 62 in 90 minutes, 3 matching, `midShare` 0.15 via `drawSplit()`); what to know and skip as hints and session
+  `note`s for S1-S5 and S8; **36 questions retired** under dont-ask-what-professors-skip (S2 suture techniques and pictures, S3
+  Miller & McEntire, S5 entrance widths, S8 doses; Dr. Litz's "know dosing" hint marked superseded), `q3-07`, `q2-P01`, `q2-P02`
+  rewritten (same ids). High yield re-recorded for S1-S5, S8 and S9; `next/` rebuilt with the final's chips, banner and blurb.
+  Engine mock's matching and 15% split: a box in the release task. ([hub note](vault/hubs/perio.md))
 - **2026-11-14 (Lessons refresh follow-up, Claude Code, same PR)** — Sam: "do another sweep", then the calls below. **Special Patient
   Care is off the site** ("remove everything for it"; no recap, no retrospective): `hubs/special-patient-care/` (page, audio, images)
   deleted, its precache line out of `sw.js` (`VERSION` sh-v59), its arcade board out of the dashboard's `ARCADES`, its `HUBS` entry
@@ -791,7 +804,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `recession-11`); 12 Exam Hints and 12 ranked `LIKELY_TOPICS`; Review, cram, mind map and arcade words redone; ten
   names in `tools/podcast/lexicon.json`. The teal and amber session chips are a shade darker in light mode, for AA
   contrast (BUG-050, caught by `a11y.js`). Still to come: the live class's part, and the diagram candidates for Sam
-  ([task](vault/tasks/2026-11-03-perio-s9-plastic-esthetics.md)). S6 still waits on its recording.
+  ([task](vault/tasks/done/2026-11-03-perio-s9-plastic-esthetics.md)). S6 still waits on its recording.
 - **2026-11-10 (Heme & Endo Exam 2: coverage over count, Dr. Herr's FSH and his focus slides, Claude Code)** — Sam: "be
   sure the emphasized points are covered, deemphasized points are left out ... be sure that the high likelihood questions
   are sufficient. I dont know what you took out from them. Go with dr herrs version", then Dr. Herr's in-class focus

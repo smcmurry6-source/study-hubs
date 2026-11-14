@@ -1,5 +1,5 @@
 // Fig: excessive gingival display, finding the cause (Periodontology S9, from Dr. Abou-Arraj's slides and the
-// exam-review guide; the live class that covers it isn't posted yet). A frontal schematic of the smile, in mm from
+// exam-review guide, and his Nov 12 live class). A frontal schematic of the smile, in mm from
 // subnasale (6.5 px = 1 mm), with the slide checklist's norms as the controls:
 //   upper lip length at rest 20-22 mm (women), 22-24 mm (men), under 20 mm a short upper lip;
 //   lip mobility on a full smile 6-8 mm, over 8 mm hypermobile;
@@ -125,7 +125,7 @@ const controls = `<div class="am-controls" role="group" aria-label="View"><butto
 <p class="am-summary" aria-live="polite"></p>
 <p class="am-info">Tap the lip, the gingiva, the teeth or the facial thirds.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
-<li>From Dr. Abou-Arraj's slides and the notes (the live class that covers this part of S9 isn't posted yet): the esthetic checklist's norms (lip length, lip mobility, the facial thirds, the gingival line, the golden proportion), the causes of excessive gingival display and the treatment for each.</li>
+<li>From Dr. Abou-Arraj's slides, his Nov 12 live class and the notes: the esthetic checklist's norms (lip length, lip mobility, the facial thirds, the gingival line, the golden proportion), the causes of excessive gingival display and the treatment for each.</li>
 <li>Outside sources: the lip measured from subnasale at rest and in a full smile, and the way each cause shows more gingiva (teeth that sit lower with a longer maxilla, a lip that rises further or starts higher, crowns covered by gingiva), follow Garber and Salama (Periodontol 2000 1996;11:18-28) and Silberberg, Goldstein and Smidt (Quintessence Int 2009;40:809-18); the golden proportion seen from the front follows Levin (J Prosthet Dent 1978;40:244-52). They settled how each control moves the picture.</li>
 <li>A schematic, drawn to one scale (the 5 mm bar) from subnasale down: where the incisal edge sits, how far a longer lower third moves the teeth (4 mm here) and how much short crowns hide (3 mm) are illustrative. The figure doesn't set a cut-off for a gummy smile. Educational, not medical advice.</li></ul></details>`;
 
@@ -190,6 +190,6 @@ const CSS = `
 
 export function egd() {
   return { id: "egd", lec: "perio-plastic-esthetics", title: "A gummy smile: find the cause",
-    caption: "Excessive gingival display has several causes, and each has its own treatment. Change one finding at a time (the lip, the lower facial third, the crowns) and read which cause it points to. From the slides; the live class isn't posted yet.",
+    caption: "Excessive gingival display has several causes, and each has its own treatment. Change one finding at a time (the lip, the lower facial third, the crowns) and read which cause it points to. From the slides and the Nov 12 live class.",
     html: `<div class="anima" data-anima="egd">${plate}${controls}${SOURCES}</div>`, css: CSS, live: egLive.toString(), helpers: [egModel, egUp, egLo, egP, egTooth, egDyn, egFind], data: D };
 }
