@@ -8,7 +8,8 @@ tags: [questions, hub-ui]
 
 Sam's rules, 2026-10-30, 2026-11-03 ("refine the filtering ... people don't know how to use it") and 2026-11-06, for every live and future hub
 (not `heme-endo-exam1`: Sam said leave it as it is). The bank's filters are **one labeled panel** (`.qbar`), never a row of unlabeled
-dropdowns. Copy it from `special-patient-care` (or `occlusion`, which adds final/midterm presets; Perio has its own engine's copy):
+dropdowns. Copy it from `occlusion` (it adds final/midterm presets; Perio has its own engine's copy; `special-patient-care`, the plain
+model, came off the site 2026-11-14 and is in git history):
 - **Lectures** (Perio: Sessions): a **tick-box list** (`lecPickHTML()` / `wireLecPick()`, every lecture ticked by default, All lectures /
   Untick all) where **every row has an "Only" button** (one tap for one lecture; it closes the list). Beside it, the search box.
 - **Show**: chips for `STATE.ui.qstatus` (`BANK_SHOW`: All, Not answered yet, Missed last time, Pinned), one at a time, each with

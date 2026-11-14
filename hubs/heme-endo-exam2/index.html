@@ -7842,7 +7842,7 @@ function examCardHTML(){
   return '<details class="exam-card" id="examCard"'+(STATE.ui.examCard === 'closed' ? '' : ' open')+'><summary>'+icon('clock')+'<span><b>'+when+'</b> · 50 questions in 90 minutes · 45 new, 5 from Exam 1 (L2, L3, L6, L10)</span></summary>' +
     examInfoHTML() + '<div class="reading-actions"><button type="button" class="btn primary" data-home="mock">Take the 50-question mock</button></div></details>';
 }
-var BANK_PAGE = 30, bankShown = BANK_PAGE, RETRY_GAP = 5;
+var BANK_PAGE = 100, bankShown = BANK_PAGE, RETRY_GAP = 5;
 
 function renderCompendium(){
   if(window.shTTS) window.shTTS.stop();
@@ -9075,7 +9075,7 @@ window.SH_EXPORT = {
 </script>
 <script src="../../widget/vendor/supabase-2.117.2.js" defer></script>
 <script defer src="../../widget/games.js"></script>
-<script defer src="../../widget/v3.js" data-hub="heme-endo-exam2" data-answered-event="hee2:answered" data-default-mode="home"></script>
+<script defer src="../../widget/v3.js" data-hub="heme-endo-exam2" data-answered-event="hee2:answered" data-default-mode="home" data-audio="off"></script>
 <script>document.addEventListener("DOMContentLoaded", function(){ if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]"); });</script>
 </body>
 </html>

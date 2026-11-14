@@ -32,6 +32,36 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-14 (Lessons refresh follow-up, Claude Code, same PR)** — Sam: "do another sweep", then the calls below. **Special Patient
+  Care is off the site** ("remove everything for it"; no recap, no retrospective): `hubs/special-patient-care/` (page, audio, images)
+  deleted, its precache line out of `sw.js` (`VERSION` sh-v59), its arcade board out of the dashboard's `ARCADES`, its `HUBS` entry
+  moved to `ARCHIVED_HUBS` (no card, no check-in), its About page entries out (the arcade table's column, Home, check-ins, filters,
+  pins), `next/hubs.js` and Timmy's `site.json` rebuilt, its perf budget and accessibility baselines dropped; its question-id list and
+  drawn art stay, and a stub in `LESSONS.md` says why it has no retrospective. **The Question Bank shows more at a time**: 100 a page
+  in every single-file hub (`BANK_PAGE`, was 30; opening the bank on a throttled phone: about 0.2-0.3 s against 0.15 s) and 50 in
+  the redesign's bank (`widget/hub-bank.js`, was 20; bundles rebuilt). **Occlusion `in-bennett`**: "Cusp height" became "How
+  steep the cusps can be in protrusion" (data fix after the merge). The sweep found no new reports, no new question-health flags
+  on the live hubs and the live site identical to `main`; it closed the finished Heme & Endo Exam 2 L17-L18 task and added a 9th
+  check-in to that hub's retrospective.
+- **2026-11-13 (Lessons refresh, Claude Code)** — `/lessons-audit`, data read 9 pm Central, the evening of Heme & Endo Exam 2.
+  **Heme & Endo Exam 2 is archived** (10 pm tonight): its retrospective is in `LESSONS.md` (86 people and 360 h, the most of any hub;
+  9 check-ins, 5 "About right", none "Exam asked different things"), its recap went up on the dashboard (`tools/publish-recap.js`),
+  and its narration, High yield recordings and Timmy Time came off the site (232 MB; the site is 533 MB): `data-audio="off"` on its
+  widget tag, its `next/` content rebuilt with no `hyAudio`. **Occlusion**, three days before its final: reports #42 (`dn-support`,
+  the stem now asks which force a complete denture's support resists) and #43 (`dn-resorb-mand`: "less
+  bone, but a bigger arch" in the explanation and whys, the stem asks about the arch's outline), and `in-bennett` (54% picked "Cusp
+  height", which the midterm's determinants table supports for Bennett movement: that choice became "How steep the cusps can be in
+  protrusion", and its 9 old picks are cleared by `tools/data-fixes/2026-11-14-in-bennett.sql` after the merge). Ids, keys and
+  choice order unchanged, so the class's picks on the other choices stay right; no
+  High yield text changed (checked with `tools/hub-next/build.mjs`). Occlusion's page was 93 bytes under its 1480 KB budget on `main`,
+  so the new wording is trimmed to fit (`tools/release/perf.js`: 1,516,026 bytes, 1480 KB). In `tools/ci/smoke.js`, the redesigned-page checks skip a hub whose exam
+  has passed (the release never switches one in) and the live click-through waits for "This hub is archived" on an archived hub:
+  Heme & Endo Exam 2 counts as archived on a UTC runner from 4 pm Central 11-13, and every all-hub run failed on it (BUG-131).
+  **The redesign's new dashboard** (not live): on a phone, two closed hubs sat side by side and made the page 434 px wide on a 390 px
+  screen (BUG-130); `widget/dash.css`'s phone rule now wins (one column), `site.bundle.css` rebuilt, and the smoke test's sideways
+  check counts a layout wider than the screen.
+  Special Patient Care's retrospective waits for Canvas to close (Sat 11-14).
+
 - **2026-11-13 (the redesign's bundles, phase 5 part 2, Claude Code)** — Nothing students see changes: the live
   dashboard and hubs load exactly the files they loaded (the smoke test fails if one asks for a bundle). A redesigned
   page (`next/`, `hubs/<hub>/next/`) now loads the widget as **built files** instead of one request per source file:

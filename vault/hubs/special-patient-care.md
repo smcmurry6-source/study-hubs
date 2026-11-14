@@ -1,11 +1,18 @@
 ---
 type: hub
-tags: [hub, archived]
+tags: [hub, archived, removed]
 hub: special-patient-care
 status: archived
 ---
 
 # Special Patient Care
+
+**Removed from the site 2026-11-14** (Sam: "Dont worry about special patient care at all for a recap. Go ahead an remove
+everything for it"; [decisions](../decisions.md)): its page, narration and images are gone, with its arcade board on the
+dashboard and its About page entries. No recap and no retrospective (a stub in `LESSONS.md` says so, so the archive check
+doesn't flag it). Its entry is in `ARCHIVED_HUBS` in `index.html` (no card, no check-in), `tools/question-ids/special-patient-care.txt`
+stays so its ids are never reused, and its drawn art stays in `tools/figures/site/`. The last version of the page is in git
+history: `git show b115ec3:hubs/special-patient-care/index.html`. In all: 17 people, 9 h, 261 answers.
 
 Dr. Mitchell's course, eight units (the autism unit is an online module; mental illness is a reading, SAID Module 9).
 The exam is on Canvas: opens Fri Nov 6 12:00 am, due Fri Nov 13 11:59 pm, and Canvas keeps it open through Sat Nov 14
@@ -20,7 +27,7 @@ Sam kept the dates above. The exam card (`EXAM_INFO`) carries all of this, and t
 
 ## Before you work on it
 
-- **Source:** `hubs/special-patient-care/index.html`; edit it directly.
+- **Source:** was `hubs/special-patient-care/index.html` (removed 2026-11-14; in git history, above).
 - **Built on** the Heme & Endo Exam 1 engine; palette "Sparks" (DM Serif Text / Source Sans 3 / JetBrains Mono).
 - **The model to copy for the Question Bank's filter panel** ([question-bank-filter-panel](../rules/question-bank-filter-panel.md)).
 - **No figures or animations** (Sam): `FIGS`/`ANIMA` are empty stubs and there is no diagram review for this hub.
