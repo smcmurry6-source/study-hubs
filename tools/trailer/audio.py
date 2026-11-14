@@ -26,28 +26,38 @@ import produce as pp
 
 SR = pp.SR
 FPS = 30
-LEAD = 1.9          # music and the studio before he speaks
-GAP = 0.32          # between two captions of a shot
-SHOT_GAP = 0.6      # between shots: the picture changes in this gap
-TAIL = 3.4          # after his last word: the last chord, the lamp goes off
+LEAD = 2.4          # the cold open: black, the on-air lamp buzzes on, the lights come up, then he speaks
+GAP = 0.3           # between two captions of a shot
+SHOT_GAP = 1.0      # between shots: a chapter card wipes across in this gap
+TITLE = (0.3, 1.45, 0.5)   # after the studio: a breath, the "Rebuilt." title card, then the first chapter's lead-in
+LAMP_OFF = 0.45     # after his last word the lamp goes off...
+END_CARD = 1.15     # ...and the end card cuts in on the last chord
+TAIL = END_CARD + 3.4
 
 
 def lay_out(cues):
-    """-> cue times, shot windows, the length."""
-    t, out, shots = LEAD, [], []
+    """-> cue times, shot windows, the title card's window, the length."""
+    t, out, shots, title = LEAD, [], [], None
     for i, c in enumerate(cues):
         new = i == 0 or c["shot"] != cues[i - 1]["shot"]
-        if i:
+        cut = None
+        if i and new and len(shots) == 1:                 # studio -> the title card -> the first feature shot
+            title = {"t0": round(t + TITLE[0], 3), "t1": round(t + TITLE[0] + TITLE[1], 3)}
+            cut = title["t1"]
+            t = cut + TITLE[2]
+        elif i:
+            if new:
+                cut = t + SHOT_GAP / 2
             t += SHOT_GAP if new else GAP
         t += c["pause"]
         if new:
-            shots.append({"id": c["shot"], "t0": 0.0 if i == 0 else round(t - SHOT_GAP / 2 - c["pause"], 3)})
+            shots.append({"id": c["shot"], "t0": 0.0 if i == 0 else round(cut, 3)})
         out.append({"shot": c["shot"], "shown": c["shown"], "file": c["file"], "t0": round(t, 3), "t1": round(t + c["dur"], 3)})
         t += c["dur"]
     dur = round(t + TAIL, 3)
     for i, s in enumerate(shots):
         s["t1"] = shots[i + 1]["t0"] if i + 1 < len(shots) else dur
-    return out, shots, dur
+    return out, shots, title, dur
 
 
 # ---------- the cue ----------
@@ -68,15 +78,46 @@ def clap(vel=0.3):
     return pp.bp(pp.RNG.standard_normal(len(t)), 900, 4200) * env * vel
 
 
-def music(dur, drop, close, end, bpm):
-    """drop: the drums come in; close: they stop for the sign-off; end: the last chord."""
+def whoosh(dur=0.55, vel=0.2):
+    """A pass of air: noise swept from low to high, swelling and dying. Under a chapter card's wipe."""
+    n = int(dur * SR)
+    k = np.arange(n) / n
+    noise = pp.RNG.standard_normal(n)
+    sig = pp.bp(noise, 250, 1100) * np.clip(1 - 2 * k, 0, 1) + pp.bp(noise, 1100, 3800) * (1 - np.abs(2 * k - 1)) + pp.bp(noise, 3800, 9000) * np.clip(2 * k - 1, 0, 1)
+    return sig * np.sin(np.pi * k) ** 2 * vel
+
+
+def impact(vel=0.55):
+    """A title's hit: a low drop with a soft crack on top."""
+    t = np.arange(int(1.4 * SR)) / SR
+    sub = np.sin(2 * np.pi * np.cumsum(42 + 80 * np.exp(-t * 16)) / SR) * np.exp(-t * 2.8)
+    crack = pp.lp(pp.RNG.standard_normal(len(t)), 2200) * np.exp(-t * 26) * 0.45
+    return (sub + crack) * np.minimum(t / 0.003, 1) * vel
+
+
+def switch(vel=0.22):
+    """The lamp's switch: a short click."""
+    t = np.arange(int(0.06 * SR)) / SR
+    return pp.bp(pp.RNG.standard_normal(len(t)), 1500, 6000) * np.exp(-t * 110) * vel
+
+
+def buzz(dur=1.1, vel=0.05):
+    """The on-air lamp warming up: mains hum that flickers, then settles and fades."""
+    t = np.arange(int(dur * SR)) / SR
+    hum = sum(np.sin(2 * np.pi * 120 * h * t) / h for h in (1, 2, 3, 5))
+    flick = np.where((t < 0.42) & (np.sin(t * 70) < -0.2), 0.15, 1.0)
+    return pp.lp(hum, 1800) * flick * np.minimum(t / 0.02, 1) * np.clip((dur - t) / 0.6, 0, 1) * vel
+
+
+def music(dur, start, drop, close, end, bpm):
+    """start: the first bar (the lamp comes on); drop: the drums come in; close: they stop; end: the last chord."""
     beat = 60 / bpm
     bar = 4 * beat
     buf = np.zeros((int((dur + 4) * SR), 2))
-    nbars = int(end / bar) + 1
+    nbars = int((end - start) / bar) + 1
     for b in range(nbars):
-        t0 = b * bar
-        if t0 >= end - 0.05:
+        t0 = start + b * bar
+        if t0 >= end - bar * 0.45:                       # a rest before the last chord
             break
         root, voicing = CHORDS[b % 4]
         full = drop - 0.01 <= t0 < close - 0.01
@@ -129,7 +170,7 @@ def music(dur, drop, close, end, bpm):
 def main():
     out = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "out")
     vdir = os.path.join(out, "voice")
-    cues, shots, dur = lay_out(json.load(open(os.path.join(vdir, "cues.json"))))
+    cues, shots, title, dur = lay_out(json.load(open(os.path.join(vdir, "cues.json"))))
     n = int(dur * SR)
     voice = np.zeros(n)
     for c in cues:
@@ -137,18 +178,31 @@ def main():
         i = int(c["t0"] * SR)
         voice[i:i + len(v)] += v[: n - i]
 
-    # the drums come in on the cut to the first feature shot: pick the tempo (near 106) that puts a bar line there
-    drop = shots[1]["t0"]
-    bars = max(1, round(drop / (240 / 106)))
-    bpm = 240 * bars / drop
+    # the music starts as the lamp comes on, and the drums come in on the title card: pick the tempo (near 106)
+    # that puts a bar line there
+    lamp_on = 0.5
+    drop = title["t0"]
+    bars = max(1, round((drop - lamp_on) / (240 / 106)))
+    bpm = 240 * bars / (drop - lamp_on)
     bar = 240 / bpm
     close = next(s["t0"] for s in shots if s["id"] == "close")
-    close = round(close / bar) * bar                     # the break starts on a bar line
-    end = cues[-1]["t1"] + 0.35                          # the last chord, just after "tap everything"
-    m = music(dur, drop, close, end, bpm)
+    close = lamp_on + round((close - lamp_on) / bar) * bar   # the break starts on a bar line
+    last = cues[-1]["t1"]
+    end = last + END_CARD                                # the last chord, on the cut to the end card
+    m = music(dur, lamp_on, drop, close, end, bpm)
     duck = pp.duck_curve(voice, under=0.16, alone=0.95, attack=0.06, release=0.5)
-    m = pp.fade(m * duck[:, None] * pp.MUSIC_LEVEL, fin=0.25, fout=1.6)
-    mix = np.stack([voice, voice], axis=1) * 0.92 + m
+    m = pp.fade(m * duck[:, None] * pp.MUSIC_LEVEL, fin=0.05, fout=1.8)
+
+    # sound effects, in the gaps between his lines: the lamp, the title's hit, a pass of air under each chapter card
+    fx = np.zeros((n, 2))
+    pp.place(fx, switch(), lamp_on - 0.02)
+    pp.place(fx, buzz(), lamp_on)
+    pp.place(fx, impact(0.5), drop)
+    for i, s in enumerate(shots[1:]):
+        pp.place(fx, whoosh(), s["t0"] - 0.3, pan=-0.25 if i % 2 else 0.25)
+    pp.place(fx, switch(0.18), last + LAMP_OFF)
+    pp.place(fx, impact(0.42), end)
+    mix = np.stack([voice, voice], axis=1) * 0.92 + m + fx
 
     tmp = os.path.join(out, "audio.mix.wav")
     sf.write(tmp, mix.astype(np.float32), SR, subtype="FLOAT")
@@ -175,9 +229,10 @@ def main():
 
     for c in cues:
         del c["file"]
-    json.dump({"fps": FPS, "dur": dur, "bpm": round(bpm, 2), "drop": drop, "cues": cues, "shots": shots, "mouth": mouth},
+    json.dump({"fps": FPS, "dur": dur, "bpm": round(bpm, 2), "drop": drop, "lampOn": lamp_on, "title": title,
+               "lampOff": round(last + LAMP_OFF, 3), "endCard": round(end, 3), "cues": cues, "shots": shots, "mouth": mouth},
               open(os.path.join(out, "timeline.json"), "w"), indent=1)
-    print(f"{dur:.1f} s, {bpm:.1f} bpm, drums in at {drop:.2f} s", file=sys.stderr)
+    print(f"{dur:.1f} s, {bpm:.1f} bpm, title card {title['t0']:.2f} - {title['t1']:.2f} s, end card at {end:.2f} s", file=sys.stderr)
     for s in shots:
         print(f"  {s['t0']:6.2f} - {s['t1']:6.2f}  {s['id']}", file=sys.stderr)
 

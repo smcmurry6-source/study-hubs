@@ -12,7 +12,8 @@
 
    Parts that move carry a class and nothing else (compose.mjs moves them from the timeline, so a frame is the same
    every time it is rendered): tm-timmy (he bobs), tm-arm-r (a gesture), shpet-eye (blinks), tm-lamp-on and tm-glow
-   (the on-air lamp), tm-seg (the mixer's meters), tm-steam, tm-cloud. */
+   (the on-air lamp), tm-seg (the mixer's meters), tm-steam, tm-cloud, and the light (lights() below). The scene is
+   in layers (st-back, st-tim, st-front, st-lamp), so the camera can put the wall out of focus behind him. */
 import vm from "node:vm";
 import fs from "node:fs";
 import path from "node:path";
@@ -222,9 +223,31 @@ function mic(){
    can move). Timmy stands at TIMMY (x, y, scale) in his own frame. */
 export const TIMMY = { x: 700, y: 262, s: 2.6 }, DOWN = 96;
 export const FACE = { x: TIMMY.x + 100 * TIMMY.s, y: TIMMY.y + 92 * TIMMY.s + DOWN };   // between his eyes and his mouth: where the camera starts
+/* The light. Drawn over the scene and moved by compose.mjs: tm-dark (the room before the lights come up, and after
+   the lamp goes off), tm-spill (the lamp's red on the room), tm-shaft and tm-mote (daylight from the window, with
+   dust in it), tm-key (a soft key light on Timmy). They blend with the drawing under them, so the ink lines stay. */
+function wallShadow(){
+  return `<ellipse cx="1030" cy="560" rx="250" ry="300" fill="${INK}" opacity=".2" style="filter:blur(38px)"/>`;
+}
+function lights(){
+  return `<defs><radialGradient id="tmKeyFill"><stop offset="0" stop-color="#FFF6E0" stop-opacity=".95"/><stop offset=".55" stop-color="#FFF6E0" stop-opacity=".35"/><stop offset="1" stop-color="#FFF6E0" stop-opacity="0"/></radialGradient>` +
+    `<radialGradient id="tmSpillFill"><stop offset="0" stop-color="${LAMP_ON}" stop-opacity=".95"/><stop offset=".45" stop-color="${LAMP_ON}" stop-opacity=".4"/><stop offset="1" stop-color="${LAMP_ON}" stop-opacity="0"/></radialGradient>` +
+    `<linearGradient id="tmShaftFill" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>` +
+    `<rect class="tm-dark" x="-600" y="-700" width="3120" height="2400" fill="#150c28" opacity="0" style="mix-blend-mode:multiply"/>`;
+}
+function lightsOver(){
+  let motes = "";
+  for (let i = 0; i < 18; i++) { const k = (i * 0.618034) % 1, j = (i * 0.381966 + 0.13) % 1; motes += `<circle class="tm-mote" data-i="${i}" cx="${(330 + k * 560 + j * 300).toFixed(0)}" cy="${(230 + j * 470).toFixed(0)}" r="${2 + (i % 3)}" fill="#fff" opacity="0"/>`; }
+  return `<circle class="tm-spill" cx="960" cy="118" r="1150" fill="url(#tmSpillFill)" opacity="0" style="mix-blend-mode:screen"/>` +
+    `<path class="tm-shaft" d="M150 170 L530 170 L1290 760 L520 760 Z" fill="url(#tmShaftFill)" opacity="0" style="mix-blend-mode:screen"/>` + motes +
+    `<circle class="tm-key" cx="930" cy="470" r="640" fill="url(#tmKeyFill)" opacity="0" style="mix-blend-mode:soft-light"/>`;
+}
+
 export function studio(){
-  return `<g transform="translate(0 ${DOWN})">` + wall() + windowLeft() + lamp() + poster() + shelf() +
-    `<g transform="translate(${TIMMY.x} ${TIMMY.y}) scale(${TIMMY.s})">${timmy("a")}</g>` +
-    desk() + mixer() + pages() + mug() + mic() + "</g>";
+  return `<g transform="translate(0 ${DOWN})">` +
+    `<g class="st-back">` + wall() + windowLeft() + poster() + shelf() + wallShadow() + `</g>` +
+    `<g class="st-tim" transform="translate(${TIMMY.x} ${TIMMY.y}) scale(${TIMMY.s})">${timmy("a")}</g>` +
+    `<g class="st-front">` + desk() + mixer() + pages() + mug() + mic() + `</g>` +
+    lights() + `<g class="st-lamp">` + lamp() + `</g>` + lightsOver() + "</g>";
 }
 export const STYLE = { INK, WALL, WALL_SHADE, FOAM, FOAM_DARK, RED: C.red };

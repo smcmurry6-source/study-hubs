@@ -1,14 +1,16 @@
 /* The trailer's footage: each feature shot recorded from a preview of the site, on made-up data.
 
-     node tools/trailer/record.mjs                    every shot (after audio.py), to out/footage/<shot>.mp4
+     node tools/trailer/record.mjs                    every shot (after audio.py), to out/footage/<shot>/00001.jpg...
+                                                      (30 frames a second) and out/footage/<shot>.cam.json
      node tools/trailer/record.mjs --shot notes,ask   only these
      node tools/trailer/record.mjs --sheet            also write out/footage/<shot>.jpg, a contact sheet to look at
 
    It starts its own preview (tools/preview/serve.js: the whole site on fixtures, production blocked), opens it in a
    scripted browser as the high-XP test account on an afternoon before the Occlusion final, and plays each shot of
    shots.mjs against the clock of out/timeline.json, so a tap lands on the word Timmy says. A drawn pointer shows
-   where it taps. The screen is captured at 1600 x 900 (a 1280 x 720 laptop window at 1.25), the size of the framed
-   screen in compose.mjs.
+   where it taps. The screen is captured at 2560 x 1440 (a 1280 x 720 laptop window at 2), so compose.mjs's camera
+   can push in on a part of the page and stay sharp. A script also says where the camera looks (K.cam): those moves
+   are saved beside the frames, with their times, and compose.mjs plays them.
 
    Never the live site (vault/rules/preview-and-release-test.md): its boards show the class, and a scripted visit
    would write to the class's data. Three things in the preview are changed for the camera, in the browser only
@@ -98,7 +100,7 @@ class Rec {
       if (this.on) this.keep(f.data);
       this.cdp.send("Page.screencastFrameAck", { sessionId: f.sessionId }).catch(() => {});
     });
-    await this.cdp.send("Page.startScreencast", { format: "jpeg", quality: 93, everyNthFrame: 1 });
+    await this.cdp.send("Page.startScreencast", { format: "jpeg", quality: 88, everyNthFrame: 1 });
   }
   keep(data){ const name = String(this.n++).padStart(6, "0") + ".jpg"; fs.writeFileSync(path.join(this.dir, name), Buffer.from(data, "base64")); this.frames.push({ t: this.clock(), name }); }
   clock(){ return this.acc + (this.on ? (Date.now() - this.t0) / 1000 : 0); }
@@ -169,6 +171,33 @@ function kit(page, rec, shot){
       if (!q) throw new Error("no multiple-choice question on screen that the bank knows: " + stem);
       return { q, sel: `[data-trl-card] .ch[data-i="${q.answer}"]` };
     },
+    /* Where the camera looks from now on: an element (the first one showing), a box [x, y, w, h] in the window's
+       pixels, "text:..." for the paragraph that starts with those words, or nothing for the whole window; o.up:
+       climb to the first parent at least [w, h] big. o.pad: room around it; o.w, o.h, o.y: that much of the element, or
+       where it will be (said before a scroll that brings it there); o.dur: how long the move takes (0 is a cut);
+       o.max: the most it may push in; o.lead: start this much later. compose.mjs turns the box into a camera move. */
+    cams: [],
+    cam: async (target, o = {}) => {
+      let box = null;
+      if (Array.isArray(target)) box = target.slice();
+      else if (target) {
+        box = await page.evaluate(([sel, up]) => {
+          const seen = (e) => e.getClientRects().length;
+          let e;
+          if (sel.indexOf("text:") === 0) { const t = sel.slice(5); e = Array.prototype.filter.call(document.querySelectorAll("p,li,h2,h3,h4,div"), (x) => seen(x) && x.textContent.trim().indexOf(t) === 0).sort((a, b) => a.textContent.length - b.textContent.length)[0]; }
+          else e = Array.prototype.filter.call(document.querySelectorAll(sel), seen)[0];
+          if (!e) return null;
+          if (up) while (e.parentElement && (e.getBoundingClientRect().width < up[0] || e.getBoundingClientRect().height < up[1])) e = e.parentElement;
+          const r = e.getBoundingClientRect(); return [r.left, r.top, r.width, r.height];
+        }, [target, o.up || null]);
+        if (!box) throw new Error("nothing to look at: " + target);
+      }
+      if (box) {
+        if (o.w) box[2] = o.w; if (o.h) box[3] = o.h; if (o.y != null) box[1] = o.y; if (o.x != null) box[0] = o.x;
+        const p = o.pad == null ? 24 : o.pad; box = [box[0] - p, box[1] - p, box[2] + 2 * p, box[3] + 2 * p].map((v) => Math.round(v));
+      }
+      K.cams.push({ t: +(rec.clock() + (o.lead || 0)).toFixed(3), box, dur: o.dur == null ? 0.8 : o.dur, max: o.max || null, float: !!o.float });
+    },
     retake: (why) => { const e = new Error(why); e.retake = true; throw e; },
     hideCursor: () => page.evaluate(() => window.__trlCursor && window.__trlCursor(false))
   };
@@ -182,8 +211,8 @@ async function main(){
   process.on("exit", () => server.kill());
   for (let i = 0; i < 50; i++) { try { await fetch(BASE); break; } catch (e) { await sleep(200); } }
 
-  /* a real 1.25 device scale (not an emulated one), so the screen capture is 1600 x 900 */
-  const browser = await pw.chromium.launch({ args: ["--force-device-scale-factor=1.25", "--window-size=1280,720", "--hide-scrollbars", "--autoplay-policy=no-user-gesture-required"] });
+  /* a real device scale of 2 (not an emulated one), so the screen capture is 2560 x 1440 */
+  const browser = await pw.chromium.launch({ args: ["--force-device-scale-factor=2", "--window-size=1280,720", "--hide-scrollbars", "--autoplay-policy=no-user-gesture-required"] });
   const ctx = await browser.newContext({ viewport: null, reducedMotion: "no-preference", colorScheme: "light" });
   await ctx.addInitScript(inPage, ASK);
   await ctx.route("**/__preview/preview.js", async (route) => { const r = await route.fetch(); await route.fulfill({ response: r, body: forCamera(await r.text()) }); });
@@ -206,22 +235,25 @@ async function main(){
     console.error("shot: " + shot.id + " (" + (shot.t1 - shot.t0).toFixed(2) + " s)");
     /* a script can ask for another take (K.retake("why")): something it can't control came up, such as Timmy
        answering a tap with a secret tip, which would give an easter egg away */
-    let rec, len, dir = path.join(dirOut, shot.id);
+    let rec, len, K, raw = path.join(dirOut, shot.id + ".raw"), dir = path.join(dirOut, shot.id);
     for (let take = 1; ; take++) {
       const cdp = await ctx.newCDPSession(page); rec = new Rec(page, cdp);
-      await rec.open(dir);
-      const K = kit(page, rec, shot);
+      await rec.open(raw);
+      K = kit(page, rec, shot);
       let again = null;
       try { await script(K); await rec.until(K.dur + 0.25); } catch (e) { if (!e.retake || take >= 8) throw e; again = e.message; }
       len = await rec.close(); await cdp.detach().catch(() => {});
       if (!again) break;
       console.error("  take " + take + " dropped: " + again);
     }
-    const mp4 = path.join(dirOut, shot.id + ".mp4");
-    execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", path.join(dir, "frames.txt"), "-vf", "fps=30,scale=1600:900:flags=lanczos,format=yuv420p", "-c:v", "libx264", "-crf", "12", "-preset", "medium", mp4]);
-    console.error("  " + rec.frames.length + " frames, " + len.toFixed(2) + " s -> " + path.relative(root, mp4));
-    if (sheet) execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", mp4, "-vf", "fps=3,scale=512:-1,tile=5x" + Math.ceil(len * 3 / 5), "-frames:v", "1", "-q:v", "3", path.join(dirOut, shot.id + ".jpg")]);
-    fs.rmSync(dir, { recursive: true, force: true });
+    /* the frames at a steady 30 a second, and the camera's moves */
+    fs.rmSync(dir, { recursive: true, force: true }); fs.mkdirSync(dir, { recursive: true });
+    execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", path.join(raw, "frames.txt"), "-vf", "fps=30", "-q:v", "2", path.join(dir, "%05d.jpg")]);
+    const n = fs.readdirSync(dir).length;
+    fs.writeFileSync(path.join(dirOut, shot.id + ".cam.json"), JSON.stringify({ frames: n, len: +len.toFixed(3), cams: K.cams }, null, 1));
+    console.error("  " + rec.frames.length + " frames captured (" + (rec.frames.length / len).toFixed(0) + " a second), " + len.toFixed(2) + " s -> " + n + " frames, " + K.cams.length + " camera moves");
+    if (sheet) execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-framerate", "30", "-i", path.join(dir, "%05d.jpg"), "-vf", "fps=3,scale=512:-1,tile=5x" + Math.ceil(len * 3 / 5), "-frames:v", "1", "-q:v", "3", path.join(dirOut, shot.id + ".jpg")]);
+    fs.rmSync(raw, { recursive: true, force: true });
   }
   await browser.close(); server.kill();
 }

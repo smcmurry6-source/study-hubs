@@ -3,7 +3,7 @@
 
     python3 tools/trailer/voice.py [out_dir]        default: tools/trailer/out/voice
 
-Same voice, speed and pronunciation lexicon as an episode (tools/podcast/render_podcast.py, whose parser, phonemes and
+Same voice and pronunciation lexicon as an episode (tools/podcast/render_podcast.py, whose parser, phonemes and
 voice blend this imports), so the trailer sounds like the show. One wav per caption (cNN.wav) and cues.json:
 [{ shot, text (as spoken), shown (as captioned), file, dur, pause (silence asked for before it) }].
 audio.py lays them on the timeline; the captions are these same lines, so they match the voice word for word.
@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "podcast"))
 import numpy as np
 import render_podcast as rp
 
-VOICE, SPEED = "am_michael:0.6,am_onyx:0.4", 0.95
+VOICE, SPEED = "am_michael:0.6,am_onyx:0.4", 0.98   # the show reads at 0.95; a trailer a touch brisker, to fit 90 seconds
 SHOWN = [("X-P", "XP")]          # spoken spelling -> what the caption shows
 
 

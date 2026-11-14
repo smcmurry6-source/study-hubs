@@ -59,15 +59,16 @@ narrates a tour of what is new.
 
 - [x] Sam has answered the four calls above, and they are in [decisions](../decisions.md)
 - [x] The script is written (60 to 90 seconds read aloud) and Sam has approved it (Sam read the draft and said "Make it
-      shorter, but just spend less time on the cosmetic extras": done, 58 seconds of speech, `tools/trailer/script.md`;
-      the shortened wording is what the first cut speaks, so Sam's yes to the video is the yes to it)
+      shorter, but just spend less time on the cosmetic extras", then on the first cut "you can make it a bit longer to
+      explain things a little better": `tools/trailer/script.md`, 70 seconds of speech; Sam's yes to the video is the
+      yes to its final wording)
 - [x] The studio scene is drawn, with Timmy close up for the opening (`tools/trailer/studio.mjs`)
 - [x] The feature shots are recorded from a preview on made-up data, phone and laptop as the shape needs (laptop: Sam
       chose wide)
 - [x] Timmy's narration is rendered in the show's voice, with captions that match it word for word
-- [ ] The video is cut (60 to 90 seconds), and Sam has watched it and said yes (cut: 70 seconds; the first cut went to
+- [ ] The video is cut (60 to 90 seconds), and Sam has watched it and said yes (the second cut, 90 seconds, went to
       Sam on 2026-11-14 and waits for the yes)
-- [ ] It is where Sam asked for it (a link: the file handed to Sam). The first cut is handed over; the final file
+- [ ] It is where Sam asked for it (a link: the file handed to Sam). The second cut is handed over; the final file
       follows Sam's yes
 - [x] `DEPLOY_NOTES.md`, and this note's Outcome
 
@@ -81,30 +82,38 @@ narrates a tour of what is new.
   `README.md` says how each step works) and sent Sam the first cut: 70 seconds, 1920 x 1080, 16.6 MB, captions burned
   in, with `.vtt` and `.srt` files beside it. The branch starts from the release branch, because the pages the trailer
   shows aren't on `main` until the release merges.
+- 2026-11-14 (Claude Code), the second cut. Sam on the first: "This needs to feel professional and polished like it
+  could have been released as a real trailer", then "I just redesigned the customize timmy window. Everything else in
+  the hubs should be the same. Also you can make it a bit longer to explain things a little better". The release
+  branch was brought in (the new place window), the script got a line on what each feature does, and the picture was
+  rebuilt: every frame is now drawn in one page (`compose.mjs`), with the recorded pages inside it at 2560 x 1440 so a
+  camera can push in on each feature. 90 seconds, sent to Sam.
 
 ## Outcome
 
-**The first cut is with Sam; the task stays open until Sam says yes** (or says what to change).
+**The second cut is with Sam; the task stays open until Sam says yes** (or says what to change).
 
-- **What it is:** Timmy close up in the studio ("Hey. It's Timmy. And this is not Timmy Time."), the camera pulls back
-  as the ON AIR lamp comes on, then six shots of the redesign in a framed screen with Timmy talking in the corner (the
-  dashboard with its countdowns, classroom and stage; a hub's four views; the three reading levels and Follow along;
-  Learn and Flashcards; Ask Timmy; XP, Shiny Gold Crowns, the shop, Timmy's place and a visit), back to the studio for
-  the sign-off, the lamp goes off, and an end card with the site's address. The cosmetic extras share one shot, as Sam
-  asked.
-- **How it is made:** everything is cut to one timeline that comes from the rendered voice, so the captions, his mouth
-  and every tap on screen follow the words; change a line and run the five steps again
-  ([README](../../tools/trailer/README.md)). The voice is the show's (Kokoro, the same blend, speed, lexicon and voice
-  chain); the music is new, from the show's own synthesized instruments, with nothing to license.
+- **What it is** (90 seconds, 1920 x 1080): black; the ON AIR lamp flickers on in the dark studio; the camera drops to
+  Timmy close up as the lights come up ("Hey. It's Timmy. And this is not Timmy Time."), the wall soft behind him, and
+  pulls back while he talks; a "Rebuilt." title card on the music's first hit; then six chapters, each behind a
+  chapter card (The dashboard; Inside a hub; Notes, three ways; Learn + Flashcards; Ask Timmy; XP + Crowns, Timmy's
+  place), the recorded page on a screen the camera pushes in on, Timmy talking in a round booth cam with his line
+  beside him; the sign-off back in the studio; the lamp goes off; an end card with the site's address on the last
+  chord. The cosmetic extras share one chapter, as Sam asked, and it shows the redesigned place window and customizer.
+- **How it is made:** everything is cut to one timeline that comes from the rendered voice, so the captions, his mouth,
+  every tap and every camera move follow the words; change a line and run the five steps again
+  ([README](../../tools/trailer/README.md)). The voice is the show's (Kokoro, the same blend, lexicon and voice chain,
+  read a touch brisker to fit 90 seconds); the music and the sound effects are new, from the show's own synthesized
+  instruments, with nothing to license.
 - **Not in the repo:** the video and its working files (`tools/trailer/out/`) and the list of leaderboard names
   (`tools/trailer/names.local.json`), both in `.gitignore`. The names on the boards in the video are the class's
   leaderboard names, with Sam's OK; three that read like a person's real name were left out.
 - **Staged, and said so:** Ask Timmy's answer on screen. The preview has no model behind it, so the recorder shows a
   two-sentence answer written from Occlusion's own notes (the Bennett angle), with the real citation chip and the real
   jump to the paragraph.
-- **Checked:** contact sheets of every shot and of the whole cut, frame by frame at the cuts; the captions against the
-  script; the sound by its numbers only (-14 LUFS, peak -1.5 dB, the music about 14 dB under his voice). **Not
-  checked: how it sounds.** The agent can't hear it, so the balance of voice and music is Sam's to judge.
+- **Checked:** contact sheets of every shot and of the whole cut, the cuts frame by frame; the captions against the
+  script; the sound by its numbers only. **Not checked: how it sounds.** The agent can't hear it, so the balance of
+  voice, music and effects is Sam's to judge.
 - **Left:** Sam's yes or changes; then the final file to Sam, the last two boxes above, and this note moves to
   `done/`. If Sam later wants it on the dashboard too, that is a new piece of work: an About page entry, a still with
   a Play button for reduced motion, and the size check (the site has room: under 750 MB).

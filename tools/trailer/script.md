@@ -8,8 +8,9 @@ NOT SPOKEN. The same format as a Timmy Time script (tools/podcast/README.md), so
 - Each paragraph is one caption: it is spoken as one piece and shown word for word while it is spoken.
   Letters read as letters are hyphenated ("X-P"); the caption shows them plain ("XP", voice.py's SHOWN).
 - "[pause N]" on its own line is N seconds of silence before the next line (the picture gets that time).
-- Sam's calls, 2026-11-14: around a minute, less time on the cosmetic extras (the shop, the place, outfits get one
-  shot), a file to send the class, wide 16:9, new music.
+- Sam's calls, 2026-11-14: less time on the cosmetic extras (the shop, the place, outfits get one shot), a file to
+  send the class, wide 16:9, new music; then, on the first cut: "you can make it a bit longer to explain things a
+  little better" (each feature now gets a line on what it does; still under 90 seconds).
 - Lore (tools/podcast/LORE.md): the trailer is not an episode, so he says so; never where he lives today or what he
   is wearing; "Shiny Gold Crowns" in full the first time.
 -->
@@ -20,13 +21,13 @@ Hey. It's Timmy. And this is not Timmy Time.
 
 This is a trailer. I've always wanted to say that.
 
-[pause 0.5]
+[pause 0.4]
 
 The study hubs have been rebuilt.
 
 ## 2. dashboard
 
-A new dashboard. Every hub, with a countdown to its exam.
+A new dashboard. Every hub is a tab, with a countdown to its exam.
 
 The class, studying right now.
 
@@ -34,7 +35,9 @@ And the top three, on a stage. No pressure.
 
 ## 3. hub
 
-Inside a hub: Home, Notes, Questions, and More.
+Open a hub, and Home tells you what to study next.
+
+Then: Notes, Questions, and More.
 
 ## 4. notes
 
@@ -44,7 +47,11 @@ Tap Listen, and the words light up as you hear them.
 
 ## 5. learn
 
-Two new ways to study the Question Bank: Learn, and Flashcards.
+Two new ways to study the Question Bank.
+
+Learn keeps asking until you get each one right twice.
+
+Flashcards come back just before you'd forget them.
 
 ## 6. ask
 
@@ -56,7 +63,9 @@ I answer from the hub's own notes, and I show you the paragraph.
 
 Every answer earns X-P, and Shiny Gold Crowns for my shop.
 
-I have a place now, too. Come visit.
+The shop is for my place: a home, a yard, and me, dressed how you like.
+
+Tap anyone on the leaderboard to visit theirs.
 
 ## 8. close
 

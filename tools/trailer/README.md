@@ -1,26 +1,37 @@
 # The launch trailer
 
-A 70 second video for the day the redesign goes live: it opens close on Timmy in the Timmy Time studio, and he
-narrates a tour of what is new. [The task](../../vault/tasks/2026-11-13-launch-trailer.md) has Sam's calls (a file to
-send the class, wide 16:9, around a minute, new music).
+A 90 second video for the day the redesign goes live: it opens on the ON AIR lamp coming on in the dark Timmy Time
+studio, drops to Timmy close up, and he narrates a tour of what is new.
+[The task](../../vault/tasks/2026-11-13-launch-trailer.md) has Sam's calls (a file to send the class, wide 16:9, new
+music, "professional and polished like it could have been released as a real trailer", a little longer so each
+feature is explained).
 
 **Nothing here is on the site.** The video, the working files (`out/`) and the list of leaderboard names the footage
 shows (`names.local.json`) are never committed (`.gitignore`): the site publishes every file in `main`, and
 per-person names stay out of the repo ([learner-data-privacy](../../vault/rules/learner-data-privacy.md)). This
 folder is the script and the tools that make the video again.
 
+## How it is put together
+
+1. **The cold open** (letterboxed): black, the lamp flickers on, the camera drops to Timmy as the lights come up, the
+   wall soft behind him, then pulls back through the studio while he talks.
+2. **The title card**, "Rebuilt.", on the music's first hit.
+3. **Six chapters**. A chapter card wipes across (its number and name), then the recorded page plays on a screen the
+   camera pushes in on, with Timmy talking in a round booth cam and his line beside him.
+4. **The sign-off** back in the studio; the lamp goes off; **the end card** on the last chord.
+
 ## What is in it
 
 | File | What it does |
 |---|---|
 | `script.md` | Timmy's lines, in the Timmy Time script format. A `##` heading is a shot; each paragraph is one caption. |
-| `voice.py` | Renders each caption in the show's voice (Kokoro, the show's blend, speed and lexicon) to `out/voice/`. |
-| `audio.py` | Lays the lines end to end, writes the new music cue under them (the show's own synthesized instruments), masters `out/audio.wav` and writes `out/timeline.json`: when every caption is spoken and every shot is on screen. Everything else is cut to that file. |
-| `studio.mjs` | The studio's inside, drawn in the site's ink style: foam walls, the window, the ON AIR lamp, the poster, the mixer, the mug, the microphone, and Timmy in headphones (`widget/pet.js`'s Timmy with a mouth that can talk). |
-| `compose.mjs` | The drawn layer, one PNG a frame, from the timeline: the studio (the close-up, the pull-back, his mouth moving with his voice), the frame around the footage with Timmy in a corner, the captions, the end card. |
-| `shots.mjs` | What is on screen in each feature shot: a script of taps and scrolls timed to Timmy's words. |
-| `record.mjs` | Plays `shots.mjs` in a preview (`tools/preview/serve.js`, made-up data, production blocked) and records each shot to `out/footage/`. |
-| `cut.mjs` | Puts the footage, the drawn layer and the sound together: `out/study-hubs-trailer.mp4` (1920 x 1080, 30 fps), with `.vtt` and `.srt` captions beside it. |
+| `voice.py` | Renders each caption in the show's voice (Kokoro, the show's blend and lexicon, a touch brisker) to `out/voice/`. |
+| `audio.py` | Lays the lines end to end, writes the new music cue under them (the show's own synthesized instruments) and the sound effects (the lamp, the title's hit, a pass of air under each chapter card), masters `out/audio.wav` and writes `out/timeline.json`: when every caption is spoken, every shot is on screen, the title and end cards land. Everything else is cut to that file. |
+| `studio.mjs` | The studio's inside, drawn in the site's ink style, in layers (the wall, Timmy, the desk, the lamp) with its light: the dark room, the lamp's red, daylight from the window, a key light on Timmy. Timmy is `widget/pet.js`'s Timmy with a mouth that can talk. |
+| `shots.mjs` | What is on screen in each chapter: a script of taps and scrolls timed to Timmy's words, where the camera looks (`K.cam`), and the chapter cards' names and colors. |
+| `record.mjs` | Plays `shots.mjs` in a preview (`tools/preview/serve.js`, made-up data, production blocked) and records each shot to `out/footage/<shot>/` at 2560 x 1440, with its camera moves in `<shot>.cam.json`. |
+| `compose.mjs` | Draws every frame of the picture in one page, from the timeline alone: the studio and its camera, the title and end cards, the chapter cards, the recorded screen with its camera, the booth cam, the captions. To `out/frames/`. |
+| `cut.mjs` | Puts the frames and the sound together: `out/study-hubs-trailer.mp4` (1920 x 1080, 30 fps), with `.vtt` and `.srt` captions beside it. |
 
 ## Make it again
 
@@ -30,18 +41,19 @@ Playwright with Chromium.
 ```bash
 python3 tools/trailer/voice.py        # the lines             (a minute)
 python3 tools/trailer/audio.py        # the sound, the timeline
-node tools/trailer/compose.mjs        # the drawn layer       (5 minutes, 650 MB of PNGs in out/overlay/)
-node tools/trailer/record.mjs         # the footage           (4 minutes; --shot notes,ask for some, --sheet for a contact sheet)
+node tools/trailer/record.mjs         # the footage           (6 minutes; --shot notes,ask for some, --sheet for a contact sheet)
+node tools/trailer/compose.mjs        # every frame           (25 minutes on 4 cores, 1.5 GB in out/)
 node tools/trailer/cut.mjs            # the video
 ```
 
-Change a line in `script.md` and run all five again: the timeline moves, so the picture is cut again to the voice.
-`node tools/trailer/compose.mjs --at 3.2,14` draws single frames to `out/stills/` while working on the drawing.
+Run `record.mjs` with nothing else busy on the machine: it plays against the clock. Change a line in `script.md` and
+run all five again: the timeline moves, so the picture is cut again to the voice. `node tools/trailer/compose.mjs --at
+3.2,14` draws single frames to `out/stills/` while working on the drawing, and `--from 64 --to 78.4` a stretch.
 
 ## What the footage shows, and what is staged
 
 - **A preview, never the live site**: the high-XP test account on fixtures, with the clock set (`NOW` in `shots.mjs`)
-  to a few days before the finals. It writes nothing to the class's data.
+  to the afternoon before the Occlusion final. It writes nothing to the class's data.
 - **Names**: the preview's boards show made-up names. Sam said the class's real leaderboard names may be in the video
   (2026-11-14: "Its okay to use real usernames from the class. They arent real names"), so `record.mjs` swaps the
   made-up ones for the names in `names.local.json`, in the browser only: a JSON list of display names, read from the
