@@ -34,6 +34,12 @@ Dates and check-in hours: `HUBS` in `index.html`.
   two kept are in different formats where possible, a Patient Box question is kept over a plain one, and nothing was
   retired that would leave a fact unasked or a lecture under its format minimums. The 10% fact is now in `in-2s-4` and
   `mo-tf-3`. **Before adding a final question, check its fact isn't already asked twice.** Don't add questions for it.
+- **Bennett movement vs the Bennett angle setting** (2026-11-13, `in-bennett`): the midterm's determinants table pairs a greater Bennett
+  movement with shorter cusps, while the articulator handout ties the Bennett angle setting to the width of the central fossae. A
+  question on either says which source it means (54% had picked "Cusp height" before the stem named the handout).
+- **The page is at its weight budget** (2026-11-13): `tools/release/perf.js` measures it at 1480 KB over the wire, the most
+  `tools/release/budgets.json` allows, with a few bytes to spare before it rounds up to 1481. Any added text fails
+  "Release tests": trim as much as you add, or raise the budget with a reason in the PR that Sam approves (as BUG-087 did).
 - **The final's format** isn't announced (question count, Canvas or not): `FINAL_TIME` / `FINAL_CLOSES` are `'18:30'` /
   `'19:45'`, and the dashboard's check-in button and pop-up go out at 8 pm (`checkinHour:20, promptHour:20`), after the
   window closes ([task](../tasks/2026-11-03-occlusion-final-time-and-format.md)).

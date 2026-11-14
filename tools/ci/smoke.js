@@ -48,7 +48,20 @@ if (PART && !['desktop', 'phone'].includes(PART)) { console.error(`SMOKE_PART mu
 console.log(`Smoke test: ${hubsWhy}${PART ? `, the ${PART} half` : ''}`);
 /* the redesign's new versions (hubs/<id>/next/, widget/hub.js), built beside the live hubs until the release: those of
    the hubs picked above (a change to hubs/<id>/next/ touches <id>; the engine is shared, so it picks every hub) */
-const nextHubs = hubs.filter(h => fs.existsSync(path.join(root, 'hubs', h, 'next', 'index.html')));
+/* ...except a hub whose last exam has passed (its exams in core.json, archived at 10 pm that day on this machine's clock, as
+   widget/hub-timmy.js and widget/v3.js decide it): the release never switches one in, Ask Timmy is off on it and "This hub is
+   archived" covers it. Heme & Endo Exam 2's counts as archived on a UTC runner from 4 pm Central 2026-11-13. */
+function nextArchived(h){
+  try {
+    const c = JSON.parse(fs.readFileSync(path.join(root, 'hubs', h, 'next', 'content', 'core.json'), 'utf8')); let last = null;
+    (c.exams || []).forEach(x => { const p = String((x && x.date) || '').split('-').map(Number); if (p.length !== 3 || !p[0]) return;
+      const d = new Date(p[0], p[1] - 1, p[2], x.archiveHour != null ? x.archiveHour : 22); if (!last || d > last) last = d; });
+    return !!(last && new Date() >= last);
+  } catch (e) { return false; }
+}
+const nextArchivedHubs = hubs.filter(h => fs.existsSync(path.join(root, 'hubs', h, 'next', 'index.html')) && nextArchived(h));
+const nextHubs = hubs.filter(h => fs.existsSync(path.join(root, 'hubs', h, 'next', 'index.html')) && !nextArchived(h));
+if (nextArchivedHubs.length) console.log(`  the redesigned page of ${nextArchivedHubs.join(', ')} isn't checked: its exam has passed (archived)`);
 /* The redesign's pages load bundles (tools/bundle/build.mjs, tools/bundle/bundles.json): the engine as one deferred
    script with the page, the shared widgets and a hub's own widget layer once it is drawn, and one stylesheet. A page
    that asks for a file one of its bundles carries has lost the bundle; a live page never asks for a bundle. */
@@ -576,7 +589,9 @@ function lint(hub, A){
       await page.waitForFunction(() => window.SH_BUNDLE && window.shRanks && window.shPet && window.shIdeas, null, { timeout: 15000 }).catch(() => {});
       { const bun = await bundleCheck(page, 'next dashboard', label, 'dash', askedFiles);
         notes.push(`${name}: the page asked for ${[...new Set(askedFiles)].length} widget files (${[...new Set(askedFiles)].join(', ')}) and links ${bun.links} stylesheet${bun.links === 1 ? '' : 's'}`); }
-      const sideways = async what => { const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`${name}: ${what} scrolls sideways by ${w}px`); };
+      /* a phone widens its layout to fit what overflows (innerWidth grows past the screen) instead of scrolling, so count that too:
+         two closed hubs side by side made the page 434 px wide on a 390 px phone (2026-11-13) */
+      const sideways = async what => { const w = await page.evaluate(vw => Math.max(document.documentElement.scrollWidth, innerWidth) - Math.min(innerWidth, vw), vp.width); if (w > 1) problems.push(`${name}: ${what} scrolls sideways by ${w}px`); };
       if (!(await page.$('#dx h1'))) problems.push(`${name}: the page has no title`);
       const tabs = await page.$$eval('#hubTabs [data-tab]', bs => bs.map(b => b.getAttribute('data-tab')));
       if (!tabs.length && !(await page.$('.dx-empty'))) problems.push(`${name}: no hub tabs and no "no hubs are live" message`);
@@ -702,8 +717,14 @@ function lint(hub, A){
         route.fulfill({ response: r, body: h });
       });
       await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);
-      // a hub whose last exam has passed opens "This hub is archived" over the page; close it like a student would
-      await page.click(".sh-archived-stay", { timeout: 1000 }).catch(() => {});
+      // a hub whose last exam has passed opens "This hub is archived" over the page; close it like a student would. It waits
+      // for the database's bootstrap (up to 3 s, widget/v3.js), so on an archived hub wait for it rather than try once
+      const archivedNow = await page.evaluate(() => { const E = window.SH_EXPORT || {}; let last = null;
+        [...(E.exams || []), ...(E.archiveOn && E.archiveOn.date ? [Object.assign({}, E.archiveOn, { archiveHour: E.archiveOn.hour })] : [])].forEach(x => {
+          const p = String((x && x.date) || '').split('-').map(Number); if (p.length !== 3 || !p[0]) return;
+          const d = new Date(p[0], p[1] - 1, p[2], x.archiveHour != null ? x.archiveHour : 22); if (!last || d > last) last = d; });
+        return !!(last && new Date() >= last); }).catch(() => false);
+      await page.click(".sh-archived-stay", { timeout: archivedNow ? 5000 : 1000 }).catch(() => {});
       if (!vp.isMobile) { const A = await page.evaluate(() => window.__CI); if (A) lint(hub, A); else problems.push(`${hub}: could not read its question data (is window.SH_EXPORT still set at the end of the script?)`); }
       const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
       if (liveBundles.length || await page.evaluate(() => !!window.SH_BUNDLE)) problems.push(`${hub} (${label}): the live hub loaded a bundle (${liveBundles.join(', ') || 'window.SH_BUNDLE'}); only the redesign's pages do`);
