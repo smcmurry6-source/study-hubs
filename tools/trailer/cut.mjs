@@ -21,7 +21,7 @@ if (have !== frames) throw new Error(`out/frames has ${have} frames, the timelin
 const mp4 = path.join(out, "study-hubs-trailer.mp4");
 execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-framerate", String(FPS), "-i", path.join(out, "frames", "f%05d.jpg"), "-i", path.join(out, "audio.wav"),
   "-map", "0:v", "-map", "1:a", "-frames:v", String(frames), "-vf", "scale=in_range=pc:out_range=tv,format=yuv420p",
-  "-c:v", "libx264", "-preset", "slow", "-crf", "19", "-profile:v", "high", "-pix_fmt", "yuv420p", "-color_range", "tv", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-r", String(FPS),
+  "-c:v", "libx264", "-preset", "slow", "-crf", "23", "-profile:v", "high", "-pix_fmt", "yuv420p", "-color_range", "tv", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", "-r", String(FPS),
   "-c:a", "aac", "-b:a", "192k", "-ar", "48000", "-movflags", "+faststart",
   "-metadata", "title=Study Hubs: the redesign", "-metadata", "artist=Timmy Tooth", mp4], { stdio: "inherit" });
 

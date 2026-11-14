@@ -88,12 +88,17 @@ narrates a tour of what is new.
   branch was brought in (the new place window), the script got a line on what each feature does, and the picture was
   rebuilt: every frame is now drawn in one page (`compose.mjs`), with the recorded pages inside it at 2560 x 1440 so a
   camera can push in on each feature. 90 seconds, sent to Sam.
+- 2026-11-14 (Claude Code). Sam, on the first cut again: "Also the scrolling in the demo looked a little jittery". The
+  recorder played the pages against the clock and caught 20 to 23 frames a second on the heavy ones. It now records
+  **a frame at a time**: the page's clock is stopped and moved on exactly 1/30 s for each frame, and scrolls and the
+  pointer are set once a frame, so every move lands evenly (`record.mjs`; only the Listen shot, which plays sound, is
+  still recorded in real time). Every chapter was recorded again for the second cut.
 
 ## Outcome
 
 **The second cut is with Sam; the task stays open until Sam says yes** (or says what to change).
 
-- **What it is** (90 seconds, 1920 x 1080): black; the ON AIR lamp flickers on in the dark studio; the camera drops to
+- **What it is** (90 seconds, 1920 x 1080, 23 MB): black; the ON AIR lamp flickers on in the dark studio; the camera drops to
   Timmy close up as the lights come up ("Hey. It's Timmy. And this is not Timmy Time."), the wall soft behind him, and
   pulls back while he talks; a "Rebuilt." title card on the music's first hit; then six chapters, each behind a
   chapter card (The dashboard; Inside a hub; Notes, three ways; Learn + Flashcards; Ask Timmy; XP + Crowns, Timmy's
@@ -111,6 +116,8 @@ narrates a tour of what is new.
 - **Staged, and said so:** Ask Timmy's answer on screen. The preview has no model behind it, so the recorder shows a
   two-sentence answer written from Occlusion's own notes (the Bennett angle), with the real citation chip and the real
   jump to the paragraph.
+- **Even motion:** the pages are recorded a frame at a time (Sam: "the scrolling in the demo looked a little
+  jittery"), so a scroll moves the same amount every frame.
 - **Checked:** contact sheets of every shot and of the whole cut, the cuts frame by frame; the captions against the
   script; the sound by its numbers only. **Not checked: how it sounds.** The agent can't hear it, so the balance of
   voice, music and effects is Sam's to judge.
