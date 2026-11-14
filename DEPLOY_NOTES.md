@@ -37,11 +37,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   8 check-ins, 5 "About right", none "Exam asked different things"), its recap went up on the dashboard (`tools/publish-recap.js`),
   and its narration, High yield recordings and Timmy Time came off the site (232 MB; the site is 533 MB): `data-audio="off"` on its
   widget tag, its `next/` content rebuilt with no `hyAudio`. **Occlusion**, three days before its final: reports #42 (`dn-support`,
-  the stem now names support, retention and stability before asking which force support resists) and #43 (`dn-resorb-mand`: "less
+  the stem now asks which force a complete denture's support resists) and #43 (`dn-resorb-mand`: "less
   bone, but a bigger arch" in the explanation and whys, the stem asks about the arch's outline), and `in-bennett` (54% picked "Cusp
   height", which the midterm's determinants table supports for Bennett movement: the stem names the articulator handout, and the
   explanation and why say how the two fit). Ids, keys and choice order unchanged, so the class's picks per choice stay right; no
-  High yield text changed (checked with `tools/hub-next/build.mjs`). In `tools/ci/smoke.js`, the redesigned-page checks skip a hub whose exam
+  High yield text changed (checked with `tools/hub-next/build.mjs`). Occlusion's page was 93 bytes under its 1480 KB budget on `main`,
+  so the new wording is trimmed to fit (`tools/release/perf.js`: 1,516,026 bytes, 1480 KB). In `tools/ci/smoke.js`, the redesigned-page checks skip a hub whose exam
   has passed (the release never switches one in) and the live click-through waits for "This hub is archived" on an archived hub:
   Heme & Endo Exam 2 counts as archived on a UTC runner from 4 pm Central 11-13, and every all-hub run failed on it (BUG-131).
   **The redesign's new dashboard** (not live): on a phone, two closed hubs sat side by side and made the page 434 px wide on a 390 px
