@@ -1100,5 +1100,11 @@ is a new migration and Sam's call, never a restore.
   screens (laptop, short laptop, upright tablet, phone, 320 px, two personas: no sideways scroll, every button with a
   `data-tp`, focus back where it was after the medals, Done and Escape) and by eye in the screenshots, then the
   suites named in the PR's report.
+- 2026-11-14 (Claude Code, round 3 continued). Sam on the customizer: "the things you have should reuse the rarity
+  art instead of just having 'legendary' in yellow". Each card is in its rarity's frame, the shop's card art
+  (`shopArt()` and `rframe()` in `widget/place.js`; `widget/hub-art/shop.js` is fetched when Customize first opens,
+  never with a page). CI's `preview` job failed on the round's first push although the deploy had worked: wrangler
+  printed no alias address and the step's `grep` under `set -e` and `pipefail` ended it before its fallback
+  (BUG-146, fixed in `.github/workflows/preview.yml`; the hosted preview had the new code all along).
 
 ## Outcome

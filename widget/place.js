@@ -428,7 +428,8 @@
     if (mode !== "customize") { build(); return; }
     /* the drawer shows everything owned, and the rank pieces still to earn: fetch those sets' drawings first */
     V.loading = true; build();
-    needPacks(Object.keys(S.own).concat(S.locked.map(function(x){ return x.id; }))).then(function(){ if (V) { V.loading = false; build(); } });
+    var done = function(){ if (V) { V.loading = false; build(); } };
+    Promise.all([needPacks(Object.keys(S.own).concat(S.locked.map(function(x){ return x.id; }))), shopArt()]).then(done, done);
   }
 
   /* the camera: in Customize the view moves in on what's being changed (the home, a yard spot, Timmy), and back out for
@@ -829,6 +830,25 @@
     var cb = $('[data-tp="customize2"]', el); if (cb) cb.addEventListener("click", function(){ setMode("customize"); });
     var sb = $('[data-tp="shop"]', el); if (sb) sb.addEventListener("click", toShop);
   }
+  /* the customizer's cards sit in their rarity's frame, the shop's own card art (widget/hub-art/shop.js, SH_SHOP_ART.frame;
+     Sam, 2026-11-14: "the things you have should reuse the rarity art instead of just having 'legendary' in yellow").
+     Fetched the first time Customize opens; without it the cards are plain, with the rarity as a tag */
+  var SA = null, FRAMES = {};
+  function shopArt(){
+    if (SA || memo.shopArt === 0) return Promise.resolve(SA);
+    return script(BASE + "hub-art/shop.js").then(function(){ SA = W.SH_SHOP_ART && W.SH_SHOP_ART.frame ? W.SH_SHOP_ART : null; if (!SA) memo.shopArt = 0; return SA; }, function(){ memo.shopArt = 0; return null; });
+  }
+  function rarOf(r){ r = String(r || "common").toLowerCase(); return r.charAt(0).toUpperCase() + r.slice(1); }
+  function rframe(r){
+    if (!SA) return "";
+    var key = rarOf(r) + (reduced ? "-still" : "");
+    if (!FRAMES[key]) {
+      var f = SA.frame(rarOf(r));
+      if (!reduced && SA.CSS) f = f.replace(/(<svg[^>]*>)/, "$1<style>" + SA.CSS.split("\n").filter(function(l){ return /ts-r-|@keyframes ts-spin|prefers-reduced/.test(l); }).join("\n") + "</style>");
+      FRAMES[key] = img(f, "", "tpv-rframe");
+    }
+    return FRAMES[key];
+  }
   function rarTag(r){ return '<i class="tpv-rar r-' + String(r || "free").toLowerCase() + '">' + esc(r || "Default") + "</i>"; }
   function owned(x){ return !x.id || !!S.own[x.id]; }
   function howTag(x){ var how = x.id ? S.own[x.id] : ""; return how === "gift" ? "A gift" : how === "rank" ? (x.rankName || "Rank") + " rank" : ""; }
@@ -860,17 +880,27 @@
     V.src[kind] = src; V.srcFor = pick + ":" + curK;
     var tabs = groups.length < 2 ? "" : '<div class="tpv-seg tpv-tabs" role="group" aria-label="Which pieces">' + groups.map(function(g){ return '<button type="button" data-tp="src-' + g[0] + '" data-src="' + g[0] + '" aria-pressed="' + (g[0] === src) + '">' + g[1] + ' <span class="num">' + (g[2].length + (g[0] === "rank" ? lockedOf.length : 0)) + "</span></button>"; }).join("") + "</div>";
     var pic = function(x){ return kind === "outfit" ? thumb("outfit", x.k) : kind === "scene" ? thumb("scene", x.k) : thumb(kind, x.k, { scene: o.scene }); };
-    var cardOf = function(x, on, tag){ return '<button type="button" class="tpv-card' + (on ? " on" : "") + '" data-tp="piece" data-item="' + esc(x.id || "") + '" aria-pressed="' + !!on + '"><span class="tpv-cpic">' + pic(x) + '</span><span class="tpv-cname">' + esc(cardName(x.n)) + "</span>" + (tag || rarTag(x.rarity)) + (howTag(x) ? '<span class="tpv-how">' + esc(howTag(x)) + "</span>" : "") + "</button>"; };
-    var lockCard = function(q){ return '<span class="tpv-card is-locked"><span class="tpv-cpic">' + (byK(all, q.x.k) ? pic(q.x) : "") + '</span><span class="tpv-cname">' + esc(cardName(q.x.n)) + '</span><span class="tpv-how">Reach ' + esc(RANKS[q.tier] || "the next rank") + "</span></span>"; };
+    var SEP = '<span class="tpv-sr">, </span>', framed = !!SA, kc = kind === "scene" ? " k-scene" : "";
+    var face = function(r, picHtml, name, tag, how){ return rframe(r) + '<span class="tpv-cpic' + kc + '">' + picHtml + '</span><span class="tpv-ctext"><span class="tpv-cname">' + esc(name) + "</span>" + SEP + '<span class="tpv-cmeta">' + tag + "</span></span>" +
+      (how ? SEP + '<span class="tpv-how">' + esc(how) + "</span>" : ""); };
+    var cardOf = function(x, on, tag){
+      if (framed) return '<button type="button" class="tpv-card is-framed' + (on ? " on" : "") + '" data-tp="piece" data-item="' + esc(x.id || "") + '" aria-pressed="' + !!on + '">' + face(x.rarity, pic(x), cardName(x.n), tag || rarTag(x.rarity), howTag(x)) + "</button>";
+      return '<button type="button" class="tpv-card' + (on ? " on" : "") + '" data-tp="piece" data-item="' + esc(x.id || "") + '" aria-pressed="' + !!on + '"><span class="tpv-cpic">' + pic(x) + '</span><span class="tpv-cname">' + esc(cardName(x.n)) + "</span>" + (tag || rarTag(x.rarity)) + (howTag(x) ? '<span class="tpv-how">' + esc(howTag(x)) + "</span>" : "") + "</button>"; };
+    var lockCard = function(q){
+      if (framed) return '<span class="tpv-card is-framed is-locked">' + face(q.x.rarity, byK(all, q.x.k) ? pic(q.x) : "", cardName(q.x.n), q.x.rarity ? rarTag(q.x.rarity) : "", "Reach " + (RANKS[q.tier] || "the next rank")) + "</span>";
+      return '<span class="tpv-card is-locked"><span class="tpv-cpic">' + (byK(all, q.x.k) ? pic(q.x) : "") + '</span><span class="tpv-cname">' + esc(cardName(q.x.n)) + '</span><span class="tpv-how">Reach ' + esc(RANKS[q.tier] || "the next rank") + "</span></span>"; };
+    var bare = function(){ var on = !curK;
+      if (framed) return '<button type="button" class="tpv-card is-framed' + (on ? " on" : "") + '" data-tp="piece" data-item="" aria-pressed="' + on + '">' + face("", thumb("outfit", ""), "Just Timmy", rarTag(""), "") + "</button>";
+      return '<button type="button" class="tpv-card' + (on ? " on" : "") + '" data-tp="piece" data-item="" aria-pressed="' + on + '"><span class="tpv-cpic">' + thumb("outfit", "") + '</span><span class="tpv-cname">Just Timmy</span>' + rarTag("") + "</button>"; };
     var shown = (groups.filter(function(g){ return g[0] === src; })[0] || groups[0])[2], cards;
     if (src === "sets") cards = (TP.SETS ? TP.SETS.seasons : []).map(function(se){ var got = shown.filter(function(x){ return x.set === se.k; }); return got.length ? '<h4 class="tpv-seth">' + esc(se.n) + '</h4><div class="tpv-cards">' + got.map(function(x){ return cardOf(x, x.k === curK); }).join("") + "</div>" : ""; }).join("");
     else cards = '<div class="tpv-cards">' +
-      (src === "classic" && kind === "outfit" ? '<button type="button" class="tpv-card' + (curK ? "" : " on") + '" data-tp="piece" data-item="" aria-pressed="' + !curK + '"><span class="tpv-cpic">' + thumb("outfit", "") + '</span><span class="tpv-cname">Just Timmy</span>' + rarTag("") + "</button>" : "") +
+      (src === "classic" && kind === "outfit" ? bare() : "") +
       shown.map(function(x){ return cardOf(x, x.k === curK); }).join("") + (src === "rank" ? lockedOf.map(lockCard).join("") : "") + "</div>" +
       (src === "rank" ? '<p class="tpv-note">Rank pieces are earned, never sold: an outfit and a yard piece at every full rank-up.</p>' : "");
     var head = sl ? [sl.n, cur ? "Here now: " + lowerFirst(cur.n) + "." : "Nothing here yet. Pick something for it."]
       : [DRAWER[pick][0], pick === "timmy" ? (cur ? "Wearing " + lowerFirst(cur.n) + "." : DRAWER.timmy[1]) : (cur ? "Now: " + lowerFirst(cur.n) + ". " : "") + DRAWER[pick][1]];
-    var body = '<div class="tpv-dhead"><div><h3>' + esc(head[0]) + "</h3><p>" + esc(head[1]) + "</p></div>" + (sl && cur ? '<button type="button" class="tpv-btn" data-tp="clear" data-item="">Clear this spot</button>' : "") + "</div>" + tabs + '<div class="tpv-dcards">' + cards + "</div>";
+    var body = '<div class="tpv-dhead"><div><h3>' + esc(head[0]) + "</h3><p>" + esc(head[1]) + "</p></div>" + (sl && cur ? '<button type="button" class="tpv-btn" data-tp="clear" data-item="">Clear this spot</button>' : "") + "</div>" + tabs + '<div class="tpv-dcards' + (framed ? " is-framed" : "") + '">' + cards + "</div>";
     if (kind === "home") {
       var ups = TP.UPGRADES.filter(function(u){ return h.ups.indexOf(u.k) >= 0 && S.own[u.id]; }), paints = h.ups.indexOf("paint") < 0 ? [] : TP.PAINTS.filter(function(p){ return !p.id || S.own[p.id]; });
       if (ups.length) body += '<div class="tpv-extra"><h4>Upgrades for ' + esc(lowerFirst(h.n)) + '</h4><div class="tpv-opts">' + ups.map(function(u){

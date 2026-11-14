@@ -217,6 +217,29 @@ button.tpv-card:active { transform: translateY(1px); }
 .tpv-rar.r-rare { background: #e2effb; color: #1c5486; }
 .tpv-rar.r-epic { background: var(--lilac); color: var(--lilac-ink); }
 .tpv-rar.r-legendary { background: var(--sun); color: var(--sun-ink); }
+/* a piece in its rarity's frame: the shop's own card art (widget/hub-art/shop.js) behind it, the picture in the frame's
+   window, the name and the tier on its name plate. The ornament says the tier, and the tier is printed too */
+.tpv-dcards.is-framed .tpv-cards { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 14px 10px; margin-top: 14px; }
+.tpv-card.is-framed { display: block; aspect-ratio: 4 / 5; padding: 0; border: 0; border-radius: 9% / 7.2%; background: none; color: #3B2E3A; container-type: inline-size; isolation: isolate; }
+button.tpv-card.is-framed:hover { background: none; transform: translateY(-3px) rotate(-1deg); }
+.tpv-card.is-framed.on { background: none; box-shadow: 0 0 0 3px var(--ar-gold), 0 0 0 7px rgba(255, 224, 138, .28), 0 8px 18px rgba(0, 0, 0, .4); }
+.tpv-rframe { position: absolute; inset: 0; z-index: -1; display: block; width: 100%; height: 100%; }
+.is-framed .tpv-cpic { position: absolute; left: 11%; right: 11%; top: 7%; width: auto; height: 52%; aspect-ratio: auto; overflow: visible; }
+.is-framed .tpv-cpic.k-scene img { object-fit: cover; border-radius: 10px; border: 2px solid #3B2E3A; }
+.tpv-ctext { position: absolute; left: 9%; right: 9%; top: 63%; bottom: 7.5%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.is-framed .tpv-cname { font-size: clamp(11px, 10cqw, 13.5px); font-weight: 800; line-height: 1.12; }
+.tpv-cmeta { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px 5px; }
+.is-framed .tpv-rar { --rar: #5F5A55; padding: 1px 7px; font-size: clamp(11px, 8.6cqw, 12px); font-weight: 800; letter-spacing: .02em; color: #fff; background: var(--rar); white-space: nowrap; }
+.is-framed .tpv-rar.r-uncommon { --rar: #1C6E52; } .is-framed .tpv-rar.r-rare { --rar: #1C5C88; } .is-framed .tpv-rar.r-epic { --rar: #4E3492; } .is-framed .tpv-rar.r-legendary { --rar: #7A5600; }
+/* how you got it (a gift, a rank's reward): a stamp on the card's corner */
+.is-framed .tpv-how { position: absolute; left: -4px; top: -6px; z-index: 2; padding: 1px 8px; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFE27A; color: #3B2E3A;
+  font-size: 11px; font-weight: 800; white-space: nowrap; transform: rotate(-6deg); box-shadow: 0 2px 0 #3B2E3A; }
+.tpv-card.is-framed.is-locked { border: 0; background: none; }
+.is-framed.is-locked .tpv-rframe { filter: grayscale(1); opacity: .7; }
+.is-framed.is-locked .tpv-cpic { opacity: 1; filter: none; }
+.is-framed.is-locked .tpv-cpic img { filter: brightness(0); opacity: .38; }
+.is-framed.is-locked .tpv-cname { color: #6B5A68; }
+.is-framed.is-locked .tpv-how { background: #fff; }
 .tpv-extra { margin: 16px 0 0; }
 .tpv-extra h4 { margin: 0 0 8px; font-size: var(--fs-label); font-weight: var(--w-head); }
 .tpv-opts { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -286,7 +309,7 @@ dialog.tpv.is-trip::backdrop { background: transparent; }
   .tpv-top::before, .tpv-stagewrap::before, .tpv-stagewrap::after, .tpv-meter i, .tpv-host > *, .tpv-guest > * { animation: none; }
   .tpv-clouds { display: none; }
   .tpv-vnav, .tpv-chip, .tpv-btn, .tpv-tile, .tpv-card, .tpv-x, .tpv-swatch, .tpv-seg button { transition: none; }
-  .tpv-x:hover, button.tpv-card:hover, .tpv-swatch:hover { transform: none; }
+  .tpv-x:hover, button.tpv-card:hover, button.tpv-card.is-framed:hover, .tpv-swatch:hover { transform: none; }
 }
 html.hx-still .tpv-top::before, html.hx-still .tpv-stagewrap::before, html.hx-still .tpv-stagewrap::after, html.hx-still .tpv-meter i,
 html.hx-still .tpv-host > *, html.hx-still .tpv-guest > * { animation: none; }

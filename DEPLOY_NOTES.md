@@ -41,6 +41,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
     a laptop and has Done (`data-tp="done"`). The window is larger (1240 by 820 at most) and stacks on an upright
     tablet. Every button still carries a fixed `data-tp`. `.tpv button { color: inherit }` beats a one-class rule, so
     a button inside the window that needs its own color is written `.tpv .name`.
+  - **The customizer's cards are in the shop's rarity frames** (Sam: "reuse the rarity art instead of just having
+    'legendary' in yellow"): `shopArt()` in `widget/place.js` fetches `widget/hub-art/shop.js` the first time
+    Customize opens and `rframe()` draws `SH_SHOP_ART.frame(rarity)` behind each card (`.tpv-card.is-framed`, laid
+    out like the shop's `.tsh-card`); without the art the cards are plain, as before. Nothing more loads with a page.
+  - **The Preview workflow** no longer fails when a deploy that worked prints no alias address (BUG-146).
   - **The dashboard's closed-hub cards are gone** (`widget/dash.js`: `renderArchived()` only draws the check-ins and
     Past hubs' note; `#archived` and the `.dx-arch*` styles are removed). Past hubs is the exam check-ins and the
     recaps. `tools/release/admin-ui.js` now expects no tab and no link for an archived hub.
