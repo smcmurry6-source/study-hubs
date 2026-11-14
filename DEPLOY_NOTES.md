@@ -49,6 +49,21 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   - **The dashboard's closed-hub cards are gone** (`widget/dash.js`: `renderArchived()` only draws the check-ins and
     Past hubs' note; `#archived` and the `.dx-arch*` styles are removed). Past hubs is the exam check-ins and the
     recaps. `tools/release/admin-ui.js` now expects no tab and no link for an archived hub.
+- **The launch trailer's tools (#360, 2026-11-14, Claude Code; nothing on the site changes)** — `tools/trailer/` makes a
+  94 second, 16:9 video for the day the redesign goes live, narrated by Timmy from a newly drawn Timmy Time studio
+  ([the task](vault/tasks/2026-11-13-launch-trailer.md), [README](tools/trailer/README.md)): `script.md` (his lines),
+  `voice.py` (the show's Kokoro voice and lexicon), `audio.py` (a new music cue and sound effects from the show's
+  instruments, the master, and the timeline everything is cut to), `studio.mjs` (the studio in the site's ink style,
+  in layers, with its light), `shots.mjs` + `record.mjs` (the feature shots and where the camera looks, recorded from
+  a preview on made-up data at 2560 x 1440), `compose.mjs` (every frame: the cold open, the "Rebuilt." title card, a
+  chapter card before each feature, the recorded page on a screen the camera pushes in on, Timmy's booth cam, the
+  captions, the end card) and `cut.mjs` (the mp4 with `.vtt`/`.srt`). **The video is not in the repo and not on the
+  site** (Sam: "A link/file only"): `tools/trailer/out/` and `names.local.json` (the leaderboard names its boards
+  show, with Sam's OK) are in `.gitignore`. Ask Timmy's answer in the footage is staged from Occlusion's notes (the
+  preview has no model), and the idea board's notes are the preview's made-up ideas under made-up names. The third
+  cut (after Sam's "professional and polished like it could have been released as a real trailer", the redesigned
+  place window, a smaller caption bar and the idea board) is with Sam; the task stays open for Sam's yes. Branched from
+  the release branch (#359), since the pages it shows aren't on `main` until that merges.
 - **The release PR's second round (#359, 2026-11-13, Claude Code; live from the merge)** — what Sam asked for after
   using the preview ([decisions](vault/decisions.md), 2026-11-13), all in the same PR:
   - **Dashboard:** the You card's rank is a hero on dark plum (`renderMyRank()`), the wallet and stats match, and

@@ -104,6 +104,10 @@ tags: [map]
   `tools/timmy/` (`test.mjs`, `test-set.json`, `eval.mjs`), its database suite is `tools/release/timmy.js`, its tables are
   `migration_v55.sql`. Its chat is `widget/ask.js` + `widget/ask.css` (`window.shAsk`), loaded only by the
   dashboard (through `widget/dash.js`) and the hubs on the engine (through `widget/hub-timmy.js`): [ask-timmy](ask-timmy.md).
+- `tools/trailer/` — the redesign's launch trailer, narrated by Timmy from the Timmy Time studio
+  ([the task](../tasks/2026-11-13-launch-trailer.md), its `README.md`): the script, the voice (the show's), a new music
+  cue, the drawn studio, the feature shots recorded from a preview, and the cut. It makes a file to send the class;
+  the video, its working files (`out/`) and the names its boards show (`names.local.json`) are never committed.
 - `tools/reddit-scout/` — `scout.py` reads the Claude subreddits' feeds into one digest for `/reddit-scout`
   (`.claude/skills/reddit-scout/`); `log.md` keeps every run's suggestions, Sam's answers and the posts judged.
 - `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new
