@@ -23,7 +23,7 @@ whose exam is already over).
 
 Perio: add topics for each session as it is taught.
 
-**They also write the redesign's High yield notes** (Sam, 2026-11-12): in the new versions (`hubs/<id>/next/`), each lecture's
+**They also write the High yield notes** (Sam, 2026-11-12): on the engine (every hub since the redesign's release), each lecture's
 notes have a third reading level, **High yield**, built from its topics in this order, each with the notes' paragraphs its
 questions point to and the Exam Hints' takeaways (`tools/hub-next/high-yield.mjs`, run by `tools/hub-next/build.mjs`). So a
 topic's words and its question list decide what that level shows: after changing topics, rebuild and check the picks with

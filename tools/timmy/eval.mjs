@@ -3,7 +3,7 @@
 // (supabase/functions/timmy/core.js, with an in-memory database and this checkout's content) and grades every answer.
 //   node tools/timmy/eval.mjs --dry                checks the test set and the grading with a fake model; free, no key
 //   node tools/timmy/eval.mjs                      the real API: costs money ($11.71 for the whole set; about $1 a hub for a few). Ask Sam first.
-//   node tools/timmy/eval.mjs --only perio,db-03   some hubs (heme-endo-exam2, occlusion, perio, dashboard) or case ids
+//   node tools/timmy/eval.mjs --only perio,db-03   some hubs (occlusion, perio, dashboard) or case ids
 //   --effort low|medium|high   try another effort level      --concurrency 4   requests at a time within a hub
 //   --max-usd 15               stops starting new cases past this estimated spend
 //   --regrade <report.json>    grades a saved run again with this checkout's grader and quote check; free, no key
@@ -37,8 +37,9 @@ const OUT = path.join(process.env.SH_RELEASE_OUT || path.join(os.tmpdir(), "sh-r
 
 const SET = JSON.parse(fs.readFileSync(path.join(ROOT, "tools/timmy/test-set.json"), "utf8"));
 const SITE = JSON.parse(fs.readFileSync(path.join(ROOT, "supabase/functions/timmy/site.json"), "utf8"));
-const HUBS = ["heme-endo-exam2", "occlusion", "perio"];
-const readJson = (hub, f) => { const p = path.join(ROOT, "hubs", hub, "next/content", f); return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, "utf8")) : null; };
+/* the hubs on the engine: the ones Timmy answers on (an old single-file hub has no content JSON for him to read) */
+const HUBS = fs.readdirSync(path.join(ROOT, "hubs")).filter(h => fs.existsSync(path.join(ROOT, "hubs", h, "content/core.json"))).sort();
+const readJson = (hub, f) => { const p = path.join(ROOT, "hubs", hub, "content", f); return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, "utf8")) : null; };
 const DATA = new Map(HUBS.map(h => [h, { core: readJson(h, "core.json"), notes: readJson(h, "notes.json"), study: readJson(h, "study.json") || {} }]));
 const QUESTIONS = new Map(HUBS.map(h => { const q = readJson(h, "questions.json"); return [h, Array.isArray(q) ? q : q && q.questions]; }));
 

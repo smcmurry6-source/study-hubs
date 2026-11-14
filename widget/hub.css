@@ -161,8 +161,18 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 .hx { min-height: 100vh; }
 .hx-bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; height: var(--bar-h); padding: 0 16px 0 12px;
   background: var(--ground); border-bottom: 1px solid var(--border); border-top: 4px solid var(--hub); }
-.hx-back { display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: var(--r-pill); color: var(--muted); flex: none; }
-.hx-back:hover { background: var(--panel); color: var(--text); }
+/* back to the dashboard, with its name on it (Sam, 2026-11-13: "a convenient back to dashboard button"): a labeled pill
+   in the bar on a laptop, and "Hubs" at the start of the top strip on a phone (.hx-home) */
+.hx-back { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 14px 0 10px; border-radius: var(--r-pill); background: var(--panel); color: var(--text);
+  font-size: var(--fs-label); font-weight: var(--w-strong); text-decoration: none; flex: none; transition: background var(--t-hover), transform var(--t-hover); }
+.hx-back::after { content: "All hubs"; }
+.hx-back:hover svg, .hx-home:hover svg { transform: translateX(-2px); }
+.hx-back svg, .hx-home svg { transition: transform var(--t-hover); }
+.hx-home { display: inline-flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px 0 8px; border-radius: var(--r-pill); background: var(--hub-soft, var(--row)); color: var(--text);
+  font-size: var(--fs-label); font-weight: var(--w-strong); text-decoration: none; }
+.hx-home svg { width: 16px; height: 16px; }
+@media (prefers-reduced-motion: reduce) { .hx-back svg, .hx-home svg { transition: none; } }
+.hx-back:hover, .hx-home:hover { background: var(--row); color: var(--text); }
 .hx-back svg { width: 18px; height: 18px; }
 .hx-name { display: flex; align-items: center; gap: 10px; font-weight: var(--w-head); font-size: 17px; white-space: nowrap; text-decoration: none; }
 .hx-emb { width: 40px; height: 40px; flex: none; display: block; }
@@ -229,12 +239,14 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 .hx-strip #hxXp { margin-left: auto; }
 .hx-meter .unfold { display: none; }
 /* a narrow phone, or the largest text size (the widget zooms the page): the meters drop their words, the bar its Settings label */
-@container hxstrip (max-width: 360px) {
+@container hxstrip (max-width: 440px) {
   .hx-strip > * { flex: none; }
   .hx-meter .fold { display: none; }
   .hx-meter .unfold { display: inline; }
 }
-@container hxstrip (max-width: 300px) { .hx-meter .fold-xp { display: none; } }
+/* with "Hubs" at its start the strip is full on a phone: the XP figure drops its "XP" (the star says it), and it is the
+   one part that may shrink, so a six-figure total never pushes Search off the screen */
+@container hxstrip (max-width: 440px) { .hx-meter .fold-xp { display: none; } .hx-strip #hxXp { flex: 0 1 auto; min-width: 0; overflow: hidden; } }
 @container hxstrip (max-width: 520px) { .hx-live .fold-live { display: none; } }
 .hx-main { outline: none; }
 .hx-page { width: min(1180px, 100% - 2 * var(--pad)); margin: 0 auto; padding: 32px 0 96px; }
@@ -1101,7 +1113,19 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
     .hx-set { width: 44px; padding: 0; }
     .hx-set .lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   }
-  .hx-strip { gap: 10px; padding: 8px 8px 8px 12px; }
+  .hx-strip { gap: 8px; padding: 8px 8px 8px 10px; }
+  /* the large text sizes zoom the page, so the strip has under 350px to lay out in: "Hubs" is its arrow alone, the goal
+     is its count without the ring, and below that the live count (Home has it too) and the XP star go, so the XP
+     figure and Search always stay on the screen */
+  @container hxstrip (max-width: 350px) {
+    .hx-strip { gap: 5px; padding: 8px 6px; }
+    .hx-strip .hx-home { width: 32px; height: 32px; padding: 0; justify-content: center; }
+    .hx-strip .hx-home span { display: none; }
+    .hx-strip .hx-search { width: 32px; height: 32px; }
+    .hx-strip [data-goalm] > svg { display: none; }
+  }
+  @container hxstrip (max-width: 255px) { .hx-strip .hx-live { display: none; } }
+  @container hxstrip (max-width: 225px) { .hx-strip #hxXp > svg { display: none; } }
   .hx-page { padding-top: 20px; }
   .examcard h1 { font-size: 26px; }
   .quick { gap: 6px; }
@@ -1170,4 +1194,33 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
   /* transitions off, not 1 ms: an element with no transition of its own has transition-property "all", and a 1 ms
      duration made even its focus ring grow in from 0 px (BUG-043). Nothing waits on transitionend. */
   html.shx *, html.shx *::before, html.shx *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; transition-delay: 0s !important; }
+}
+
+/* ================= motion: pop-ups arrive, pages change (Sam, 2026-11-13: "transition animations for windows that pop
+   up or switching pages and things to make the site feel more responsive and satisfying") =================
+   The pop-ups' keyframes move with translate and scale, not transform, so a pop-up that centers itself with transform
+   keeps doing so; :where() keeps every rule here at zero specificity, so a pop-up with its own entrance keeps it. Off
+   with reduced motion, and with "Answer animations" off (html.hx-still: widget/hub.js and widget/dash.js set it). */
+@keyframes sh-pop-in { from { opacity: 0; translate: 0 16px; scale: .96; } }
+@keyframes sh-fade-in { from { opacity: 0; } }
+@keyframes sh-page-in { from { opacity: 0; translate: var(--from, 0) 10px; } }
+@keyframes sh-tab-pop { 40% { scale: 1.18; } }
+:where(html.shx) :where(.dx-dlg, .sh-la, .shpet-dlg, .sh-flair-pop, .sh-inbox, .sh-name-dlg) { animation: sh-fade-in 200ms ease-out backwards; }
+:where(html.shx) :where(.dx-dlgcard, .sh-la-card, .shpet-card, .sh-flair-card, .sh-inbox-card, .sh-name-card, .tpv-overin, .survey, .sh-reply, .sh-archived, .lp-pop) {
+  animation: sh-pop-in 260ms var(--ease-out, ease-out) backwards; }
+:where(html.shx) :where(dialog[open]) { animation: sh-pop-in 260ms var(--ease-out, ease-out) backwards; }
+:where(html.shx) :where(dialog[open])::backdrop { animation: sh-fade-in 200ms ease-out backwards; }
+/* a page of the hub, or a hub's panel on the dashboard, slides in from the side it's on (--from, set by the router) */
+:where(html.shx) :where(.is-entering) { animation: sh-page-in 300ms var(--ease-out, ease-out) backwards; }
+/* a page that slides in from the right would, for those 300 ms, make the page wider than the screen: its parent clips it */
+:where(html.shx) :where(:has(> .is-entering)) { overflow-x: clip; }
+/* the tab you tapped: its icon pops */
+:where(html.shx) :where(.hx-tab.is-active .ic, .dx-tab[aria-selected="true"] .dx-emb) { animation: sh-tab-pop 320ms var(--ease-out, ease-out); }
+html.hx-still :where(.dx-dlg, .sh-la, .shpet-dlg, .sh-flair-pop, .sh-inbox, .sh-name-dlg, .dx-dlgcard, .sh-la-card, .shpet-card, .sh-flair-card, .sh-inbox-card, .sh-name-card, .tpv-overin, .survey, .sh-reply,
+  .sh-archived, .lp-pop, dialog[open], .is-entering, .hx-tab.is-active .ic, .dx-tab[aria-selected="true"] .dx-emb) { animation: none; }
+html.hx-still dialog[open]::backdrop { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  :where(html.shx) :where(.dx-dlg, .sh-la, .shpet-dlg, .sh-flair-pop, .sh-inbox, .sh-name-dlg, .dx-dlgcard, .sh-la-card, .shpet-card, .sh-flair-card, .sh-inbox-card, .sh-name-card, .tpv-overin, .survey, .sh-reply,
+    .sh-archived, .lp-pop, dialog[open], .is-entering, .hx-tab.is-active .ic, .dx-tab[aria-selected="true"] .dx-emb) { animation: none; }
+  :where(html.shx) :where(dialog[open])::backdrop { animation: none; }
 }

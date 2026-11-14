@@ -67,7 +67,7 @@ try { localStorage.setItem(key, day); } catch (e) {}
 var S = { theme: ls("sh_theme") || "auto", pet: ls("sh_pref_pet") || "on", eggs: ls("sh_pref_eggs") || "on", music: ls("sh_pref_music") || "off",
 font: ls("sh_pref_font") || "default", size: ls("sh_pref_size") || "default", accent: ls("sh_pref_accent") || "default",
 nuke: ls("sh_pref_nuke") || (ls("sh_pref_nuke_alerts") === "off" ? "mine" : "on"), boss: ls("sh_pref_boss") || "on", fairy: ls("sh_pref_fairy") || "on",
-probe: ls("sh_pref_probe") || "on", arch: ls("sh_pref_arch") || "on", celebrate: ls("sh_pref_celebrate") || "on", cheers: ls("sh_pref_cheers") || "on",
+probe: ls("sh_pref_probe") || "on", celebrate: ls("sh_pref_celebrate") || "on", cheers: ls("sh_pref_cheers") || "on",
 flame: ls("sh_pref_flame") || "on", fx: ls("sh_pref_fx") || "on", "pet-adopted": ls("sh_pet_born") ? "yes" : "no", "own-name": ls("sh_display_name") ? "yes" : "no" };
 Object.keys(S).forEach(function(k){ track("state:" + k + "=" + slug(S[k])); });
 }
@@ -966,7 +966,6 @@ var TROPHIES = [
 { k: "prof",         n: "Office Hours",         d: "Get a professor to quote themselves",  ic: "M4 5h16v11H9l-5 4zM8 10h8", secret: true, clue: "Professors repeat themselves. Tap one's name, a few times, quickly." },
 { k: "rootcanal",    n: "Through the Root Canal", d: "10 misses, then 10 right in a row",  ic: "M9 4v6l-3 10M15 4v6l3 10M9 10h6", secret: true, clue: "Go all the way down, then all the way back up. Ten each way." },
 { k: "mirror",       n: "Indirect Vision",      d: "See the hub the way you see a maxillary molar", ic: "M12 4a5 5 0 1 0 0 10 5 5 0 1 0 0-10zM12 14v7M9 21h6", secret: true, clue: "Your most-used instrument shows everything backwards. Type its name." },
-{ k: "fullarch",     n: "Full Arch",            d: "Fill all 32 teeth of the arch",        ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" },
 { k: "flosschain",   n: "Floss Chain",          d: "Floss with two classmates at once",    ic: "M3 14c3-4 6-4 9 0s6 4 9 0M6 9v2M12 7v2M18 9v2", secret: true, clue: "The magic word works better with friends. Three of you, in the same hub, within a minute." },
 { k: "cavity",       n: "Restorative",          d: "Find the week's hidden cavity",        ic: "M7 5c-2 0-3 1.5-3 3.5 0 2.5 1.2 3.5 1.6 5.5.4 2.5.8 5 2 5s1.5-2.4 1.8-4c.2-.8.5-1.2 1.6-1.2s1.4.4 1.6 1.2c.3 1.6.6 4 1.8 4s1.6-2.5 2-5c.4-2 1.6-3 1.6-5.5C20 6.5 19 5 17 5c-1.6 0-2.4.8-5 .8S8.6 5 7 5zM12 9.5h.01", secret: true, clue: "Each week a tiny dark spot hides somewhere in one hub's Lecture Notes. Only five people get to fill it." },
 { k: "holiday",      n: "Holiday Spirit",       d: "Say the season's magic word",          ic: "M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6", secret: true, clue: "Around a holiday the hubs dress up. Each holiday has its own magic word: type it." },
@@ -979,23 +978,22 @@ var HUB_TROPHIES = [
 { k: "mastery-gold",   n: "Gold Mastery",   d: "Get 90% right on your latest try", ic: "M12 4a6 6 0 1 0 0 12 6 6 0 1 0 0-12zM9 15l-2 6 5-2 5 2-2-6", c: "#C9971C" },
 { k: "mastery-crown",  n: "Crown",          d: "Get every question in the hub right on your latest try", ic: "M3 18l1-11 5 4 3-7 3 7 5-4 1 11z", c: "#E0A800" },
 { k: "seen-all",       n: "Seen It All",    d: "Answer every question in the hub at least once", ic: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 1 0 0-6z" },
-{ k: "fullarch",       n: "Full Arch",      d: "Grow all 32 teeth of the arch in this hub", ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" },
 { k: "mock90",         n: "Mock Ace",       d: "90%+ on a mock exam of 20+ questions here", ic: "M12 4a8 8 0 1 0 0 16 8 8 0 1 0 0-16zM12 8v4l3 2" },
 { k: "mock-perfect",   n: "Perfect Mock",   d: "Every question right on a mock exam of 20+ questions here", ic: "M12 3l2.6 5.5 6 .8-4.4 4.2 1 6-5.2-2.9-5.2 2.9 1-6L3.4 9.3l6-.8z", c: "#E0A800" },
 { k: "boss",           n: "Final Blow",     d: "Land the last hit on a boss in this hub", ic: "M12 3c4 0 7 2.5 7 7 0 3-2 4-2 6H7c0-2-2-3-2-6 0-4.5 3-7 7-7zM9 11h.01M15 11h.01M9 20h6", secret: true, clue: "Wait until five or more classmates are online at once, then answer fast." }
 ];
-var RETIRED = [];
+var RETIRED = [
+{ k: "fullarch",     n: "Full Arch",            d: "Fill all 32 teeth of the arch",        ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" }
+];
 if (NEW) {
-RETIRED = TROPHIES.filter(function(t){ return t.k === "fullarch"; });
 TROPHIES = TROPHIES.filter(function(t){ return !t.secret; }).concat([
 { k: "journey-0", n: "Handpiece finished", d: "Reach 125,000 XP: Dark Matter III on the Handpiece", ic: "M3 21l6-6M9 15l8.5-8.5 2.5 2.5L11.5 17.5zM15 5l1.5-1.5 4 4L19 9", scene: true },
 { k: "journey-1", n: "ModuPro finished", d: "Reach 250,000 XP: Dark Matter III on the ModuPro", ic: "M4 5h16v15H4zM4 10h16M4 15h16M10 7.5h4M10 12.5h4M10 17.5h4", scene: true },
 { k: "journey-2", n: "Loupes finished", d: "Reach 375,000 XP: Dark Matter III on the Loupes", ic: "M3 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM14 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM10 15h4M4.5 12L7 5h10l2.5 7", scene: true }
-], TROPHIES.filter(function(t){ return t.secret && t.k !== "fullarch"; }), [
+], TROPHIES.filter(function(t){ return t.secret; }), [
 { k: "bowling", n: "Lane Legend", d: "Saw all eight bowling clips", ic: "M12 3c-1.7 0-2.5 1.6-2 3.5.4 1.4-1.5 3-1.5 6.5 0 3.5 1.6 6 3.5 8 1.9-2 3.5-4.5 3.5-8 0-3.5-1.9-5.1-1.5-6.5C14.5 4.6 13.7 3 12 3zM10.2 8.5h3.6", secret: true, device: "sh_bowl_trophy",
 clue: "The alley\u2019s screen plays something odd after a strike. There are eight." }
 ]);
-HUB_TROPHIES = HUB_TROPHIES.filter(function(t){ return t.k !== "fullarch"; });
 }
 function caseCount(badges){
 var got = {}; (badges || []).forEach(function(b){ got[String(b).split(":")[0]] = 1; });
@@ -1080,7 +1078,8 @@ st.textContent = '.sh-flair{display:inline-flex;align-items:center;gap:1px;verti
 'button.sh-flair:hover,button.sh-flair:focus-visible{background:rgba(127,127,127,.16)}' +
 'button.sh-flair:focus-visible{outline:2px solid currentColor;outline-offset:1px}' +
 '.sh-flair-m{display:inline-flex;width:18px;height:18px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +
-'.sh-flair-m.is-crown{animation:sh-flair-glint 3.2s ease-in-out infinite}' +
+'.sh-flair-m.is-crown{position:relative}' +
+'.sh-flair-m.is-crown::after{content:"";position:absolute;inset:-4px;border-radius:50%;background:radial-gradient(circle,rgba(255,236,150,.9) 0,rgba(255,226,122,.45) 45%,rgba(255,226,122,0) 70%);opacity:0;pointer-events:none;animation:sh-flair-glint 3.2s ease-in-out infinite}' +
 '.sh-flair-more{font-size:10.5px;font-weight:700;opacity:.7;margin-left:1px;font-variant-numeric:tabular-nums}' +
 '.sh-flair.is-list{display:flex;flex-wrap:wrap;gap:5px;white-space:normal;margin:0;vertical-align:baseline;flex:1 1 auto;min-width:0;max-width:100%}' +
 '.sh-flair-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 3px;border-radius:999px;background:rgba(127,127,127,.13);font-size:12px;font-weight:600;line-height:1.2}' +
@@ -1096,8 +1095,8 @@ st.textContent = '.sh-flair{display:inline-flex;align-items:center;gap:1px;verti
 '.sh-flair-card li b{display:block;font-size:14px}.sh-flair-card li small{font-size:12px;color:#B9B5AD}' +
 '.sh-flair-card .sh-flair-x{display:block;margin:10px 0 0 auto;appearance:none;background:rgba(255,255,255,.1);color:inherit;border:0;border-radius:999px;padding:7px 16px;font:inherit;font-weight:600;cursor:pointer}' +
 '@keyframes sh-flair-in{from{opacity:0}to{opacity:1}}' +
-'@keyframes sh-flair-glint{0%,80%,100%{filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}88%{filter:drop-shadow(0 0 4px #FFE27A) brightness(1.15)}}' +
-'@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown,.sh-flair-pop{animation:none}}';
+'@keyframes sh-flair-glint{0%,80%,100%{opacity:0}88%{opacity:1}}' +
+'@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown::after,.sh-flair-pop{animation:none}}';
 (document.head || document.documentElement).appendChild(st);
 document.addEventListener("click", function(e){
 var b = e.target && e.target.closest && e.target.closest("[data-sh-flair]");
@@ -1133,7 +1132,8 @@ return '<span class="sh-flair-chip" title="' + esc(flairLabel(x)) + '"><span cla
 }).join("") + '</span>';
 }
 var here = pageHub(), lead = list.filter(function(x){ return x.hub === here; })[0] || list[0];
-var label = "Mastery medals: " + list.map(flairLabel).join(" · ");
+var rest = list.filter(function(x){ return x !== lead; });
+var label = "Mastery medals: " + flairLabel(lead) + (rest.length ? ", +" + rest.length + " more: " + rest.map(flairLabel).join(" · ") : "");
 return '<button type="button" class="sh-flair" data-sh-flair="medals" data-flair-list="' + esc(s) + '"' + (opt.who ? ' data-flair-who="' + esc(opt.who) + '"' : '') +
 ' aria-label="' + esc(label) + '" title="' + esc(label) + '"><span class="sh-flair-m' + (lead.lvl >= 4 ? ' is-crown' : '') + '">' + medalSvg(lead.lvl, 18, lead.hub) + '</span>' +
 (list.length > 1 ? '<span class="sh-flair-more">+' + (list.length - 1) + '</span>' : '') + '</button>';
@@ -1489,7 +1489,8 @@ if (myFlair) h += '<div class="sh-flair-row"><span>Your mastery medals</span>' +
 var earned = {}; badges.forEach(function(b){ earned[b.split(":")[0]] = true; });
 if (NEW) TROPHIES.forEach(function(x){ if (x.device && ls(x.device)) earned[x.k] = true; });
 h += '<div class="sh-trophies-h"><span>Trophy case</span><b>' + TROPHIES.filter(function(x){ return earned[x.k]; }).length + ' / ' + TROPHIES.length + '</b></div>' +
-'<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") + '</div>' +
+'<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") +
+RETIRED.filter(function(x){ return earned[x.k]; }).map(function(x){ return trophyHTML({ k: x.k, n: x.n + " (retired)", d: x.d, ic: x.ic }, true); }).join("") + '</div>' +
 '<p class="sh-trophy-detail" aria-live="polite">' + psst(earned) + '</p>' +
 hubCases(badges, m) +
 '<details class="sh-rank-how"><summary>How XP works</summary><p>10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss (effort counts), and 20 for every day you study. Answer XP is capped at 600 a day, so steady studying beats cramming. Each rank has three levels (I, II, III). Ranks start at: ' +
@@ -1583,7 +1584,6 @@ try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { prof
 if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
 track(raw, { busy: mockBusy, seen: function(j){ if (!window.shAutomated) rpc("mark_dark_unlock_seen", { p_visitor: H.visitor, p_journey: j }); } });
 badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
-if ((profile.badges || []).indexOf("fullarch:" + H.hub) >= 0) document.dispatchEvent(new CustomEvent("sh:arch-done", { detail: H.hub }));
 }
 function loadOwn(){
 if (loading) return; loading = true;
@@ -2376,7 +2376,6 @@ function pick(a){ return a[Math.floor(Math.random() * a.length)]; }
 var reduced = false;
 try { reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
 var ME = __sh_script, BASE = ME && ME.src ? ME.src.replace(/[^\/]*(\?.*)?$/, "") : "";
-var EVERYONE = false;
 var FULL_FROM = "9999-12-31";
 function centralDay(d){
 var f = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" });
@@ -2443,14 +2442,13 @@ zero: ["Needs treatment", "0 HP. I can't die, but I heal at half speed until I'm
 var uid = 0;
 function art(state, px){
 state = state || {};
-if (EVERYONE && state.hat === undefined && !state.fit) {
+if (state.hat === undefined) {
 var bare = {}; Object.keys(state).forEach(function(k){ bare[k] = state[k]; }); bare.hat = "";
 return dressLayer(art(bare, px), WORN.layer);
 }
 var hp = state.hp == null ? 80 : state.hp, c = conditions(hp), has = {};
 c.forEach(function(k){ has[k] = 1; });
 var mood = state.mood || moodFor(hp), p = "shpt" + (++uid) + "-";
-var o = state.fit ? fitOutfit(state.fit) : outfit(state.hat === undefined ? seasonId() : state.hat);
 var T = has.perio ? 176 : 146;
 var gumC = has.perio ? ["#F07A8E", "#D2405A", "#A82540"] : has.gingivitis ? ["#FF95A6", "#EE5A75", "#C93A56"] : ["#FFC0CD", "#F78FA8", "#E07090"];
 var d = '<defs>' +
@@ -2466,7 +2464,6 @@ var d = '<defs>' +
 (has.fracture ? '<mask id="' + p + 'chip"><rect x="-20" y="-40" width="240" height="300" fill="#fff"/><path d="M30 30 L66 30 L62 37 L52 41 L56 50 L44 62 L30 66 Z" fill="#000"/></mask>' : '') +
 '</defs>';
 var s = '<ellipse cx="100" cy="226" rx="78" ry="7" fill="#000" opacity=".13"/>';
-if (o && o.back) s += '<g class="shpet-back">' + o.back + '</g>';
 s += '<g class="shpet-arm shpet-arm-l"><path d="M56 104 C44 101 33 106 29 115 C26 122 31 128 38 125 C43 122 48 118 56 118" fill="url(#' + p + 'en)" stroke="' + OUT + '" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/></g>';
 s += '<g class="shpet-arm shpet-arm-r"><path d="M144 104 C156 101 167 106 171 115 C174 122 169 128 162 125 C157 122 152 118 144 118" fill="url(#' + p + 'en)" stroke="' + OUT + '" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/></g>';
 var body = '<path d="' + TOOTH + '" fill="url(#' + p + 'en)"/>';
@@ -2525,7 +2522,6 @@ else f += '<ellipse cx="100" cy="108" rx="4.6" ry="5.6" fill="#6B2B3A" stroke="'
 }
 if (mood === "sick" || mood === "scared") f += '<path class="shpet-sweat" d="M146 62 C146 62 140 70 140 74 A6 6 0 0 0 152 74 C152 70 146 62 146 62 Z" fill="#9ED8F5" stroke="#4A9BC4" stroke-width="1.6"/>';
 f += '</g>';
-if (o && o.face) f += '<g class="shpet-garb">' + (typeof o.face === "function" ? o.face(mood) : o.face) + '</g>';
 var bodyG = '<g' + (has.fracture ? ' mask="url(#' + p + 'chip)"' : '') + '>' + body + '</g>' + f;
 var g = '<path d="' + gumPath(T) + '" fill="url(#' + p + 'gum)" stroke="#A8384F" stroke-width="4" stroke-linejoin="round"/>';
 g += '<path d="M24 196 C24 ' + (T + 16) + ' 32 ' + (T + 2) + ' 44 ' + (T - 7) + '" stroke="#fff" stroke-width="3.4" fill="none" opacity=".5" stroke-linecap="round"/>';
@@ -2552,282 +2548,13 @@ x += '<g class="shpet-sparkles" fill="#fff" stroke="#E8C45A" stroke-width="1.4" 
 '<path class="shpet-sp shpet-sp3" d="M152 18 l2 4.6 4.6 2 -4.6 2 -2 4.6 -2 -4.6 -4.6 -2 4.6 -2z"/></g>';
 }
 if (mood === "sleep") x += '<g class="shpet-zz" fill="' + OUT + '" font-family="Georgia,serif" font-weight="700"><text x="150" y="40" font-size="20">z</text><text x="164" y="22" font-size="15">z</text></g>';
-if (o && o.top) x += '<g class="shpet-wobble"><g class="shpet-hat">' + o.top + '</g></g>';
-if (o && o.prop) x += '<g class="shpet-wobble"><g class="shpet-prop">' + o.prop + '</g></g>';
 var cls = "shpet-art" + (has.perio ? " is-loose" : "") + (mood === "sick" ? " is-sick" : "") + (mood === "scared" ? " is-scared" : "");
 return '<svg class="' + cls + '" viewBox="0 -30 200 262" width="' + (px || 100) + '" height="' + Math.round((px || 100) * 1.31) + '" aria-hidden="true">' + d +
 '<g class="shpet-bob"><g class="shpet-wobble">' + s + bodyG + calc + '</g>' + g + x + '</g></svg>';
 }
-function heartPath(cx, cy, s){
-function n(v){ return v.toFixed(1); }
-return "M" + n(cx) + " " + n(cy + s * .8) + " C" + n(cx - s * 1.3) + " " + n(cy - s * .1) + " " + n(cx - s * .95) + " " + n(cy - s * 1.05) + " " + n(cx) + " " + n(cy - s * .45) +
-" C" + n(cx + s * .95) + " " + n(cy - s * 1.05) + " " + n(cx + s * 1.3) + " " + n(cy - s * .1) + " " + n(cx) + " " + n(cy + s * .8) + " Z";
-}
-function starPath(cx, cy, R, r){
-var d = "";
-for (var i = 0; i < 10; i++) { var a = Math.PI / 5 * i - Math.PI / 2, q = i % 2 ? r : R; d += (i ? " L" : "M") + (cx + q * Math.cos(a)).toFixed(1) + " " + (cy + q * Math.sin(a)).toFixed(1); }
-return d + " Z";
-}
-function shamrock(cx, cy, s){
-var g = '<path d="M' + cx + ' ' + cy + ' q' + (s * .3).toFixed(1) + ' ' + (s * .9).toFixed(1) + ' ' + (s * .9).toFixed(1) + ' ' + (s * 1.3).toFixed(1) + '" stroke="#2F7D3A" stroke-width="' + (s * .3).toFixed(1) + '" fill="none" stroke-linecap="round"/>';
-[-90, 30, 150].forEach(function(a){
-var r = a * Math.PI / 180;
-g += '<circle cx="' + (cx + Math.cos(r) * s * .6).toFixed(1) + '" cy="' + (cy + Math.sin(r) * s * .6).toFixed(1) + '" r="' + (s * .58).toFixed(1) + '" fill="#69DB7C" stroke="' + OUT + '" stroke-width="1.4"/>';
-});
-return g;
-}
-function flower(x, y, c){
-var g = '<g stroke="' + OUT + '" stroke-width="1.3">';
-for (var i = 0; i < 5; i++) { var a = i * 1.2566 - 1.5708; g += '<circle cx="' + (x + Math.cos(a) * 4.4).toFixed(1) + '" cy="' + (y + Math.sin(a) * 4.4).toFixed(1) + '" r="4" fill="' + c + '"/>'; }
-return g + '<circle cx="' + x + '" cy="' + y + '" r="2.8" fill="' + (c === "#FFE27A" ? "#F59A1E" : "#FFE27A") + '"/></g>';
-}
-function leaf(x, y, a, c){
-return '<g transform="translate(' + x + ' ' + y + ') rotate(' + a + ')"><path d="M0 0 C-7 -6 -7 -16 0 -24 C7 -16 7 -6 0 0 Z" fill="' + c + '" stroke="' + OUT + '" stroke-width="1.6" stroke-linejoin="round"/>' +
-'<path d="M0 -2 L0 -19" stroke="#000" stroke-opacity=".25" stroke-width="1.2"/></g>';
-}
-function toothIcon(x, y){
-return '<path transform="translate(' + x + ' ' + y + ')" d="M0 0 c0 -4 3 -5 4.5 -3.5 c1.5 -1.5 4.5 -.5 4.5 3.5 c0 3 -1 4 -1.5 7 c-.5 2 -2 2 -2 0 l-1 -3 l-1 3 c0 2 -1.5 2 -2 0 c-.5 -3 -1.5 -4 -1.5 -7z" fill="#fff" opacity=".85"/>';
-}
-var STEAM = function(x){ return '<g class="shpet-steam" fill="none" stroke="#B9B2AA" stroke-width="2.4" stroke-linecap="round"><path d="M' + x + ' 96 c-4 -5 4 -8 0 -13"/><path d="M' + (x + 8) + ' 94 c-4 -5 4 -8 0 -13"/></g>'; };
-var BAND = function(c){ return '<path d="M56 48 Q100 26 144 48" stroke="' + c + '" stroke-width="5" fill="none" stroke-linecap="round"/>'; };
-var OUTFITS = {
-halloween: [
-{ k: "witch", n: "Witch hat",
-top: '<path d="M64 40 Q84 30 98 0 Q104 -16 120 -22 Q112 -10 114 2 Q118 24 136 40 Z" fill="#4A2D6B" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M74 31 Q100 24 128 31 L131 38 Q100 31 71 38 Z" fill="#F59A1E" stroke="' + OUT + '" stroke-width="2.4" stroke-linejoin="round"/>' +
-'<ellipse cx="100" cy="41" rx="50" ry="8.5" fill="#3A2350" stroke="' + OUT + '" stroke-width="4"/><path d="M118 -20 l2 3" stroke="#B08CFF" stroke-width="2"/>',
-say: ["Like my witch hat? My only spell makes plaque disappear.", "I'm a good witch. I hex cavities, not people.", "This hat came with a broom. I use it to sweep up wrong answers."] },
-{ k: "vampire", n: "Vampire cape and fangs",
-back: '<path d="M30 52 L60 86 L140 86 L170 52 L174 100 C178 122 182 140 184 156 L16 156 C18 140 22 122 26 100 Z" fill="#241530" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M34 61 L57 88 L45 102 Z M166 61 L143 88 L155 102 Z" fill="#C0223B"/>',
-face: function(mood){
-if (mood === "happy") return '<path d="M90 101 L93 108 L96 101 Z M104 101 L107 108 L110 101 Z" fill="#fff" stroke="' + OUT + '" stroke-width="1.6" stroke-linejoin="round"/>';
-if (mood === "ok") return '<path d="M90.5 105.1 L93.5 111.5 L96 107.9 Z M104 107.9 L106.5 111.5 L109.5 105.1 Z" fill="#fff" stroke="' + OUT + '" stroke-width="1.6" stroke-linejoin="round"/>';
-return '';
-},
-say: ["I vant to... floss your teeth.", "Vampire costume! Don't worry, I only drink fluoridated water.", "Fangs are just very long canines with big ambitions."] },
-{ k: "pumpkin", n: "Pumpkin cap and a candy pail",
-top: '<path d="M60 42 C55 16 76 2 100 4 C124 2 145 16 140 42 C126 49 74 49 60 42 Z" fill="#F28C28" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M83 6 C76 18 76 34 80 46 M117 6 C124 18 124 34 120 46" stroke="#C8641A" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
-'<path d="M86 24 L90 16 L94 24 Z M106 24 L110 16 L114 24 Z M86 31 Q100 42 114 31 L110 30 L107 34 L103 30 L100 34 L97 30 L93 34 L90 30 Z" fill="#6B3A10"/>' +
-'<path d="M97 5 C96 -4 99 -10 105 -13 L108 -9 C104 -6 103 -1 104 5 Z" fill="#4E7D2A" stroke="' + OUT + '" stroke-width="2.4" stroke-linejoin="round"/>' +
-'<path d="M106 -6 C114 -12 122 -8 124 -2 C116 -2 110 -2 106 -6 Z" fill="#69A83A" stroke="' + OUT + '" stroke-width="2"/>',
-prop: '<path d="M7 128 C6 112 34 110 36 126" stroke="' + OUT + '" stroke-width="2.6" fill="none"/>' +
-'<g stroke="' + OUT + '" stroke-width="1.4"><rect x="12" y="121" width="6" height="10" rx="2" fill="#B08CFF" transform="rotate(-14 15 126)"/><rect x="24" y="120" width="6" height="10" rx="2" fill="#69DB7C" transform="rotate(12 27 125)"/></g>' +
-'<path d="M5 130 C4 150 14 156 21 156 C28 156 38 150 37 130 Z" fill="#F28C28" stroke="' + OUT + '" stroke-width="3" stroke-linejoin="round"/>' +
-'<ellipse cx="21" cy="130" rx="16" ry="4" fill="#C8641A" stroke="' + OUT + '" stroke-width="2.4"/>' +
-'<path d="M13 139 L16 135 L19 139 Z M23 139 L26 135 L29 139 Z M13 144 Q21 151 29 144 Z" fill="#6B3A10"/>',
-say: ["Trick or treat! I'm a pumpkin. A very small, very minty pumpkin.", "I'm collecting candy for science. I won't eat it. Probably.", "Pumpkin hat, candy pail. Peak October."] },
-{ k: "cat", n: "Black cat",
-back: '<path d="M150 146 C176 146 188 120 180 96 C177 87 170 86 168 93" stroke="' + OUT + '" stroke-width="12" fill="none" stroke-linecap="round"/>' +
-'<path d="M150 146 C176 146 188 120 180 96 C177 87 170 86 168 93" stroke="#4A4052" stroke-width="7" fill="none" stroke-linecap="round"/>',
-top: '<path d="M56 48 Q100 24 144 48" stroke="#2B2230" stroke-width="6" fill="none" stroke-linecap="round"/>' +
-'<path d="M62 44 L66 6 L94 32 Z M138 44 L134 6 L106 32 Z" fill="#2B2230" stroke="' + OUT + '" stroke-width="3.4" stroke-linejoin="round"/>' +
-'<path d="M68 36 L70 18 L84 31 Z M132 36 L130 18 L116 31 Z" fill="#FF9FB2"/>',
-face: '<path d="M96 93 L104 93 L100 98 Z" fill="#FF8FA3" stroke="' + OUT + '" stroke-width="1.6" stroke-linejoin="round"/>' +
-'<path d="M58 96 L42 92 M58 101 L41 101 M58 106 L42 110 M142 96 L158 92 M142 101 L159 101 M142 106 L158 110" stroke="' + OUT + '" stroke-width="1.8" stroke-linecap="round"/>',
-say: ["Meow. I'm a black cat. Nine lives, one tooth.", "Black cats are lucky for studying. That's science. Probably.", "I have whiskers now. I feel very distinguished."] }
-],
-thanksgiving: [
-{ k: "pilgrim", n: "Pilgrim hat",
-top: '<ellipse cx="100" cy="40" rx="48" ry="8.5" fill="#2E2A28" stroke="' + OUT + '" stroke-width="4"/><path d="M72 39 L78 -2 L122 -2 L128 39 Z" fill="#3A3532" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M75 19 L125 19 L127 31 L73 31 Z" fill="#8C6B3E"/><rect x="91" y="18" width="18" height="14" rx="1.5" fill="none" stroke="#F6CD55" stroke-width="3"/>',
-say: ["Do you like my buckle hat? Very historical.", "I dressed up for the feast. Buckles and everything.", "Pilgrim hat on. Ready to give thanks and take questions."] },
-{ k: "turkey", n: "Turkey feathers",
-back: (function(){
-var c = ["#8C4A1E", "#C0392B", "#E67E22", "#F1C40F", "#E67E22", "#C0392B", "#8C4A1E"], s = "";
-[-60, -40, -20, 0, 20, 40, 60].forEach(function(a, i){
-s += '<g transform="rotate(' + a + ' 100 122)"><ellipse cx="100" cy="58" rx="17" ry="52" fill="' + c[i] + '" stroke="' + OUT + '" stroke-width="3.4"/>' +
-'<path d="M100 14 L100 96" stroke="#000" stroke-opacity=".2" stroke-width="2"/><ellipse cx="100" cy="20" rx="9" ry="11" fill="' + OUT + '" opacity=".25"/></g>';
-});
-return s;
-})(),
-say: ["Gobble gobble! I'm a turkey. Please don't carve me.", "Like my tail feathers? They took forever to fan out.", "I'm the only turkey at the table who flosses."] },
-{ k: "chef", n: "Chef's hat and a pie",
-top: '<path d="M74 40 L72 14 L128 14 L126 40 Z" fill="#fff" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M72 16 C58 14 58 -6 74 -6 C76 -20 96 -24 102 -12 C110 -24 132 -18 128 -4 C142 -2 140 16 128 16 Z" fill="#fff" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M87 21 L87 36 M100 21 L100 37 M113 21 L113 36" stroke="#D9D2C5" stroke-width="2.4" stroke-linecap="round"/>',
-prop: '<path d="M2 112 L46 112 L42 121 L6 121 Z" fill="#B8BEC6" stroke="' + OUT + '" stroke-width="2.6" stroke-linejoin="round"/>' +
-'<path d="M5 112 C8 100 40 100 43 112 Z" fill="#E9A54B" stroke="' + OUT + '" stroke-width="2.6" stroke-linejoin="round"/>' +
-'<path d="M13 105 L21 111 M21 103 L30 111 M30 103 L37 109 M12 109 L24 103 M20 111 L33 103" stroke="#B87420" stroke-width="1.6" stroke-linecap="round"/>',
-say: ["Chef Timmy in the house. Today's special: practice questions.", "I baked a pie! It's sugar-free. It's also imaginary.", "Pumpkin pie is great. Rinse with water after, okay?"] }
-],
-winter: [
-{ k: "santa", n: "Santa hat",
-top: '<path d="M66 36 C70 6 104 -10 136 2 C146 6 154 18 160 30 L150 36 Z" fill="#D6363C" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<circle cx="160" cy="32" r="9" fill="#fff" stroke="' + OUT + '" stroke-width="3"/><rect x="58" y="28" width="90" height="16" rx="8" fill="#fff" stroke="' + OUT + '" stroke-width="3.4"/>',
-say: ["Ho ho ho! I made a list. It's all practice questions.", "Santa hat on. Holiday cheer: activated.", "I've been very good this year. I flossed every single day."] },
-{ k: "reindeer", n: "Reindeer antlers and a red nose",
-top: BAND("#8C5A2B") +
-'<g stroke="' + OUT + '" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M78 38 C74 22 66 12 56 2 M68 20 C60 20 52 18 46 12 M63 9 C62 1 64 -6 68 -12"/><path d="M122 38 C126 22 134 12 144 2 M132 20 C140 20 148 18 154 12 M137 9 C138 1 136 -6 132 -12"/></g>' +
-'<g stroke="#B07438" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M78 38 C74 22 66 12 56 2 M68 20 C60 20 52 18 46 12 M63 9 C62 1 64 -6 68 -12"/><path d="M122 38 C126 22 134 12 144 2 M132 20 C140 20 148 18 154 12 M137 9 C138 1 136 -6 132 -12"/></g>',
-face: '<circle cx="100" cy="94" r="9" fill="#FF5A5F" opacity=".22"/><circle cx="100" cy="94" r="5.6" fill="#E8343F" stroke="' + OUT + '" stroke-width="2"/><circle cx="98.2" cy="92.2" r="1.7" fill="#fff" opacity=".9"/>',
-say: ["I'm a reindeer! My nose glows, so you can study in the dark.", "Rudolph's got nothing on me. Okay, he can fly. Fine.", "Antlers are heavier than they look. Respect to the reindeer."] },
-{ k: "cocoa", n: "Earmuffs and hot cocoa",
-top: '<path d="M44 74 C38 22 162 22 156 74" stroke="#7A8A99" stroke-width="5" fill="none" stroke-linecap="round"/>' +
-'<circle cx="44" cy="76" r="13" fill="#F4F1EA" stroke="' + OUT + '" stroke-width="3.4"/><circle cx="156" cy="76" r="13" fill="#F4F1EA" stroke="' + OUT + '" stroke-width="3.4"/>' +
-'<g fill="#D6363C" opacity=".85"><circle cx="40" cy="72" r="2.2"/><circle cx="48" cy="80" r="2.2"/><circle cx="152" cy="72" r="2.2"/><circle cx="160" cy="80" r="2.2"/></g>',
-prop: STEAM(17) + '<path d="M10 116 C2 116 2 130 11 130" stroke="' + OUT + '" stroke-width="3.4" fill="none"/>' +
-'<rect x="10" y="108" width="24" height="26" rx="4" fill="#D6363C" stroke="' + OUT + '" stroke-width="3"/>' +
-'<ellipse cx="22" cy="110.5" rx="10" ry="2.6" fill="#7A4A20"/><circle cx="18" cy="109.5" r="2.4" fill="#fff"/><circle cx="24.5" cy="109" r="2.2" fill="#fff"/>' +
-'<path d="M11 120 L33 120" stroke="#fff" stroke-width="2.4" stroke-dasharray="3 3"/>',
-say: ["Earmuffs and hot cocoa. Peak cozy.", "Hot cocoa! I'll rinse with water after. Promise.", "My earmuffs are so fuzzy. Very good study vibes."] }
-],
-newyear: [
-{ k: "party", n: "Party hat",
-top: '<g transform="rotate(-12 100 38)"><path d="M80 40 L100 -20 L120 40 Z" fill="#B08CFF" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M89 13 L111 13 M84 28 L116 28" stroke="#F6CD55" stroke-width="5"/><circle cx="100" cy="-22" r="7" fill="#F6CD55" stroke="' + OUT + '" stroke-width="3"/></g>',
-say: ["Party hat on! Here's to a new year of right answers.", "Is it too early to start the countdown?", "This hat has an elastic strap. It's pinching my cusps."] },
-{ k: "tophat", n: "Top hat and a party horn",
-top: '<g transform="rotate(-6 100 40)"><path d="M72 40 L75 -16 L125 -16 L128 40 Z" fill="#2B2230" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M74 22 L126 22 L127 32 L73 32 Z" fill="#F6CD55"/><ellipse cx="100" cy="40" rx="46" ry="7.5" fill="#2B2230" stroke="' + OUT + '" stroke-width="4"/>' +
-'<path class="shpet-sp shpet-sp2" d="M118 -8 l2 4.6 4.6 2 -4.6 2 -2 4.6 -2 -4.6 -4.6 -2 4.6 -2z" fill="#fff"/></g>',
-prop: '<g transform="rotate(35 30 118)"><path d="M30 113 L4 116 L4 120 L30 123 Z" fill="#F6CD55" stroke="' + OUT + '" stroke-width="2.4" stroke-linejoin="round"/>' +
-'<path d="M22 114 L22 122 M14 115 L14 121" stroke="#E0457B" stroke-width="2.4"/>' +
-'<path d="M4 118 C-4 112 -6 124 0 126" stroke="#B08CFF" stroke-width="3" fill="none" stroke-linecap="round"/></g>',
-say: ["Top hat and a party horn. Very fancy tonight.", "Toot toot! That's my party horn.", "I dressed up for midnight. I might not make it to midnight."] },
-{ k: "stars", n: "Star glasses and a sparkler",
-face: '<path d="' + starPath(80, 84, 19, 10) + '" fill="#F6CD55" fill-opacity=".38" stroke="#E8A33A" stroke-width="3" stroke-linejoin="round"/>' +
-'<path d="' + starPath(120, 84, 19, 10) + '" fill="#F6CD55" fill-opacity=".38" stroke="#E8A33A" stroke-width="3" stroke-linejoin="round"/>' +
-'<path d="M95 82 Q100 78 105 82" stroke="#E8A33A" stroke-width="3" fill="none"/>',
-prop: '<path d="M31 120 L12 84" stroke="#8A8F98" stroke-width="2.6" stroke-linecap="round"/>' +
-'<path class="shpet-sp shpet-sp1" d="' + starPath(11, 81, 10, 3.4) + '" fill="#FFE27A" stroke="#F59A1E" stroke-width="1.4" stroke-linejoin="round"/>' +
-'<g fill="#F6CD55"><circle cx="2" cy="74" r="1.6"/><circle cx="22" cy="72" r="1.4"/><circle cx="4" cy="92" r="1.4"/><circle cx="20" cy="90" r="1.2"/></g>',
-say: ["Star glasses and a sparkler. I'm basically a celebrity.", "New year, new shades.", "Look at me. I'm sparkling. Literally, for once."] }
-],
-valentine: [
-{ k: "hearts", n: "Heart headband",
-top: '<path d="M62 42 Q100 22 138 42" stroke="#E0457B" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M80 32 q-6 -6 0 -12 q6 -6 0 -12 M120 32 q6 -6 0 -12 q-6 -6 0 -12" stroke="#888" stroke-width="2" fill="none"/>' +
-'<path d="M80 9 c-6-4-9-8-9-11 a4.5 4.5 0 0 1 9-2 a4.5 4.5 0 0 1 9 2 c0 3-3 7-9 11z M120 9 c-6-4-9-8-9-11 a4.5 4.5 0 0 1 9-2 a4.5 4.5 0 0 1 9 2 c0 3-3 7-9 11z" fill="#E0457B" stroke="' + OUT + '" stroke-width="2.4"/>',
-say: ["Like my headband? The hearts boing when I hop.", "Heart antennae: picking up good vibes only.", "I'm wearing my heart on my head. Close enough to my sleeve."] },
-{ k: "cupid", n: "Cupid's wings and arrow",
-back: '<g fill="#fff" stroke="' + OUT + '" stroke-width="3.4" stroke-linejoin="round">' +
-'<path d="M52 76 C36 54 16 50 8 62 C16 64 20 70 16 78 C24 78 28 84 26 92 C36 90 44 92 50 98 Z"/>' +
-'<path d="M148 76 C164 54 184 50 192 62 C184 64 180 70 184 78 C176 78 172 84 174 92 C164 90 156 92 150 98 Z"/></g>' +
-'<path d="M22 66 C30 68 38 74 44 82 M28 82 C34 84 40 88 46 92 M178 66 C170 68 162 74 156 82 M172 82 C166 84 160 88 154 92" stroke="#D9CBE0" stroke-width="2" fill="none" stroke-linecap="round"/>',
-prop: '<path d="M40 130 L13 101" stroke="#A86A30" stroke-width="3" stroke-linecap="round"/>' +
-'<path d="' + heartPath(13, 101, 7) + '" fill="#E0457B" stroke="' + OUT + '" stroke-width="2" transform="rotate(139 13 101)"/>' +
-'<path d="M40 130 L44 124 M40 130 L46 132 M36 126 L40 120 M36 126 L42 128" stroke="#E0457B" stroke-width="2.4" stroke-linecap="round"/>',
-say: ["I'm Cupid! My arrows make people floss.", "These wings are a little small. I'm working on it.", "One arrow, one heart, zero cavities. That's the plan."] },
-{ k: "rose", n: "Heart glasses and a rose",
-face: '<path d="' + heartPath(80, 85, 13) + '" fill="#FF8FB1" fill-opacity=".38" stroke="#E0457B" stroke-width="3" stroke-linejoin="round"/>' +
-'<path d="' + heartPath(120, 85, 13) + '" fill="#FF8FB1" fill-opacity=".38" stroke="#E0457B" stroke-width="3" stroke-linejoin="round"/>' +
-'<path d="M95 80 Q100 76 105 80 M64 82 L51 79 M136 82 L149 79" stroke="#E0457B" stroke-width="3" fill="none" stroke-linecap="round"/>',
-prop: '<path d="M31 122 C26 108 22 98 20 86" stroke="#2F7D3A" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-'<path d="M24 104 C16 100 12 104 10 108 C16 110 22 108 24 104 Z" fill="#69A83A" stroke="' + OUT + '" stroke-width="1.6"/>' +
-'<path d="M10 84 C8 74 16 68 20 72 C24 66 33 70 31 80 C30 88 22 90 20 90 C16 90 11 88 10 84 Z" fill="#D6363C" stroke="' + OUT + '" stroke-width="2.4" stroke-linejoin="round"/>' +
-'<path d="M15 80 C16 75 22 74 24 78 C26 82 22 85 20 83" stroke="#9E1F2E" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
-say: ["I got you a rose. Because you study so hard.", "Seeing the world through heart-shaped glasses today.", "These glasses make everything look adorable. Especially you."] }
-],
-dentist: [
-{ k: "mirror", n: "Head mirror",
-top: '<path d="M56 50 Q100 22 144 50" stroke="#59616B" stroke-width="7" fill="none" stroke-linecap="round"/>' +
-'<circle cx="100" cy="20" r="16" fill="#DCE3EA" stroke="' + OUT + '" stroke-width="3.6"/><circle cx="100" cy="20" r="11" fill="#F7FBFF"/><circle cx="100" cy="20" r="3" fill="#59616B"/><path d="M92 14 Q95 10 100 10" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/>',
-say: ["Like my head mirror? Very old-school.", "I'm dressed as a classic dentist. Say ahh.", "This mirror puts the light right where you need it. Like a good study session."] },
-{ k: "loupes", n: "Scrub cap, headlight and loupes",
-top: '<path d="M54 50 C52 18 76 4 100 4 C124 4 148 18 146 50 C128 42 72 42 54 50 Z" fill="#2BA8A0" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-toothIcon(72, 26) + toothIcon(118, 28) + toothIcon(84, 40) +
-'<path d="M146 46 C154 46 160 52 158 60 M148 48 C156 54 156 62 150 66" stroke="#2BA8A0" stroke-width="4" fill="none" stroke-linecap="round"/>' +
-'<rect x="92" y="9" width="16" height="10" rx="3" fill="#59616B" stroke="' + OUT + '" stroke-width="2.4"/><circle cx="100" cy="14" r="3.2" fill="#FFF6B0"/>',
-face: '<g stroke="#3E4A55" stroke-width="2.6"><circle cx="80" cy="84" r="13" fill="#CFE8F7" fill-opacity=".2"/><circle cx="120" cy="84" r="13" fill="#CFE8F7" fill-opacity=".2"/>' +
-'<path d="M93 82 Q100 78 107 82 M67 82 L54 79 M133 82 L146 79" fill="none" stroke-linecap="round"/></g>' +
-'<circle cx="80" cy="94" r="5.4" fill="#3E4A55" stroke="' + OUT + '" stroke-width="1.6"/><circle cx="80" cy="94" r="3" fill="#9FD3F2"/>' +
-'<circle cx="120" cy="94" r="5.4" fill="#3E4A55" stroke="' + OUT + '" stroke-width="1.6"/><circle cx="120" cy="94" r="3" fill="#9FD3F2"/>',
-say: ["Loupes on. I can see every bacterium from here.", "Scrub cap on. Ready for clinic.", "Magnification: 2.5x. Excuses: zero."] },
-{ k: "grad", n: "Graduation cap and diploma",
-top: '<path d="M70 30 L70 44 C86 50 114 50 130 44 L130 30 Z" fill="#2B2230" stroke="' + OUT + '" stroke-width="3.4" stroke-linejoin="round"/>' +
-'<path d="M100 8 L150 22 L100 36 L50 22 Z" fill="#3A3245" stroke="' + OUT + '" stroke-width="3.4" stroke-linejoin="round"/>' +
-'<circle cx="100" cy="22" r="3" fill="#F6CD55"/><path d="M100 22 L140 26 L142 48" stroke="#F6CD55" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' +
-'<path d="M139 46 L145 46 L146 58 L138 58 Z" fill="#F6CD55" stroke="#B8860B" stroke-width="1.4"/>',
-prop: '<g transform="rotate(40 26 116)"><rect x="4" y="110" width="44" height="12" rx="6" fill="#FFF8EC" stroke="' + OUT + '" stroke-width="2.6"/>' +
-'<ellipse cx="46" cy="116" rx="2.6" ry="6" fill="#EADFC8" stroke="' + OUT + '" stroke-width="1.6"/><rect x="22" y="109" width="6" height="14" fill="#C0392B"/></g>',
-say: ["Dressed as you on graduation day. Looks great, right?", "Cap, tassel, diploma. Manifesting it for you.", "Doctor of Molar Dentistry. Close enough."] }
-],
-stpatrick: [
-{ k: "leprechaun", n: "Leprechaun hat",
-top: '<ellipse cx="100" cy="40" rx="48" ry="8.5" fill="#1B6E2E" stroke="' + OUT + '" stroke-width="4"/><path d="M72 39 L76 -6 L124 -6 L128 39 Z" fill="#2F9E44" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M74 21 L126 21 L127 31 L73 31 Z" fill="#2B2B2B"/><path d="M112 13 c-3 -5 3 -8 5 -4 c2 -4 8 -1 5 4 c5 1 4 7 -1 6 c1 5 -5 6 -6 1 c-3 3 -7 -1 -3 -7z" fill="#69DB7C" stroke="' + OUT + '" stroke-width="1.6"/>',
-say: ["Leprechaun hat on. I'm guarding a pot of fluoride.", "Is this hat too green? There's no such thing.", "Catch me if you can. I'm small and very fast."] },
-{ k: "boppers", n: "Shamrock boppers",
-top: BAND("#2F9E44") +
-'<path d="M82 38 C78 30 86 26 82 18 C78 10 86 6 80 -2 M118 38 C122 30 114 26 118 18 C122 10 114 6 120 -2" stroke="' + OUT + '" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
-shamrock(79, -8, 9) + shamrock(121, -8, 9),
-say: ["My shamrocks bounce when I hop. Watch. Boing.", "Three leaves each. Four would be luckier, but I'll take it.", "Feeling lucky? I'm feeling springy."] },
-{ k: "gold", n: "Green bowler and a pot of gold",
-top: '<path d="M66 40 C64 4 136 4 134 40 Z" fill="#2F9E44" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M67 30 C88 26 112 26 133 30 L134 38 C112 34 88 34 66 38 Z" fill="#F6CD55"/>' +
-'<ellipse cx="100" cy="41" rx="48" ry="7.5" fill="#1B6E2E" stroke="' + OUT + '" stroke-width="4"/>' + shamrock(84, 18, 6),
-prop: '<path d="M8 128 C4 146 10 154 22 154 C34 154 40 146 36 128 Z" fill="#2B2B2B" stroke="' + OUT + '" stroke-width="3" stroke-linejoin="round"/>' +
-'<g fill="#F6CD55" stroke="#B8860B" stroke-width="1.4"><circle cx="13" cy="125" r="5"/><circle cx="22" cy="121" r="5"/><circle cx="31" cy="125" r="5"/><circle cx="18" cy="127" r="5"/><circle cx="27" cy="127" r="5"/></g>' +
-'<rect x="5" y="126" width="34" height="6" rx="3" fill="#3A3A3A" stroke="' + OUT + '" stroke-width="2.4"/>' +
-'<path class="shpet-sp shpet-sp3" d="M10 110 l1.6 3.6 3.6 1.6 -3.6 1.6 -1.6 3.6 -1.6 -3.6 -3.6 -1.6 3.6 -1.6z" fill="#fff" stroke="#E8C45A" stroke-width="1"/>',
-say: ["I found the pot of gold! It's all gold crowns.", "Fancy hat, fancy pot of gold, fancy tooth.", "Gold is a great restorative material. Just saying."] }
-],
-easter: [
-{ k: "bunny", n: "Bunny ears",
-top: '<path d="M76 42 C62 8 66 -24 78 -26 C90 -28 94 6 90 38" fill="#fff" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/><path d="M78 30 C72 6 74 -14 79 -16 C84 -16 86 8 84 30" fill="#FFB3C7"/>' +
-'<path d="M124 42 C138 8 134 -24 122 -26 C110 -28 106 6 110 38" fill="#fff" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/><path d="M122 30 C128 6 126 -14 121 -16 C116 -16 114 8 116 30" fill="#FFB3C7"/>',
-say: ["Bunny ears! Hop hop.", "Real bunnies have teeth that never stop growing. I'm a little jealous.", "Some bunny is ready to study."] },
-{ k: "chick", n: "Eggshell hat",
-top: '<path d="M58 46 L65 36 L71 44 L78 33 L85 42 L92 32 L99 41 L106 32 L113 41 L120 33 L127 43 L134 35 L142 46 C144 6 124 -14 100 -14 C76 -14 56 6 58 46 Z" fill="#FFF8EC" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<g fill="#C9B998" opacity=".55"><circle cx="84" cy="10" r="2.6"/><circle cx="112" cy="2" r="2"/><circle cx="122" cy="18" r="2.4"/><circle cx="96" cy="22" r="1.8"/></g>',
-say: ["I just hatched. Peep.", "Fresh out of the shell and ready to study.", "Is the shell a hat now? The shell is a hat now."] },
-{ k: "basket", n: "Flower crown and an egg basket",
-top: '<path d="M54 46 Q100 26 146 46" stroke="#4E9A3A" stroke-width="4" fill="none" stroke-linecap="round"/>' +
-flower(58, 44, "#FF9FB2") + flower(78, 38, "#B08CFF") + flower(100, 35, "#FFE27A") + flower(122, 38, "#9ED8F5") + flower(142, 44, "#FF9FB2"),
-prop: '<path d="M9 124 C8 100 38 100 37 124" stroke="#A86A30" stroke-width="3.4" fill="none"/>' +
-'<g stroke="' + OUT + '" stroke-width="1.6"><ellipse cx="15" cy="122" rx="5" ry="6.5" fill="#B08CFF"/><ellipse cx="24" cy="120" rx="5" ry="6.5" fill="#FFE27A"/><ellipse cx="32" cy="122" rx="5" ry="6.5" fill="#9ED8F5"/></g>' +
-'<path d="M5 124 L41 124 L37 146 L9 146 Z" fill="#D49A5A" stroke="' + OUT + '" stroke-width="3" stroke-linejoin="round"/>' +
-'<path d="M7 131 L39 131 M8 138 L38 138 M16 124 L17 146 M24 124 L24 146 M32 124 L31 146" stroke="#A86A30" stroke-width="1.6"/>',
-say: ["Flowers and a basket of eggs. Very spring.", "I'm the Easter bunny's assistant. Unpaid.", "Every egg in this basket is sugar-free. They're also plastic."] }
-],
-fall: [
-{ k: "beanie", n: "Knit beanie and a latte",
-top: '<path d="M60 40 C58 4 142 4 140 40 Z" fill="#E07A2E" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M76 13 L78 38 M88 9 L89 38 M100 8 L100 38 M112 9 L111 38 M124 13 L122 38" stroke="#C25E1C" stroke-width="2" stroke-linecap="round"/>' +
-'<rect x="55" y="32" width="90" height="14" rx="7" fill="#8C4A1E" stroke="' + OUT + '" stroke-width="3.4"/>' +
-'<circle cx="100" cy="2" r="10" fill="#FFF3DC" stroke="' + OUT + '" stroke-width="3.4"/>',
-prop: STEAM(20) + '<path d="M11 104 L37 104 L33 136 L15 136 Z" fill="#FFF8EC" stroke="' + OUT + '" stroke-width="3" stroke-linejoin="round"/>' +
-'<path d="M12.3 114 L35.7 114 L34.6 124 L13.4 124 Z" fill="#A86A30"/>' +
-'<path d="M9 104 L39 104 L38 98 L10 98 Z" fill="#fff" stroke="' + OUT + '" stroke-width="2.6" stroke-linejoin="round"/>',
-say: ["Beanie on, latte in hand. Peak fall.", "Pumpkin spice latte. I'll rinse with water after, I promise.", "Sweater weather is my favorite weather."] },
-{ k: "leaves", n: "Crown of autumn leaves",
-top: '<path d="M54 46 Q100 26 146 46" stroke="#6B4A2B" stroke-width="4" fill="none" stroke-linecap="round"/>' +
-leaf(58, 44, -55, "#D6363C") + leaf(70, 40, -32, "#E8BE45") + leaf(84, 37, -14, "#E67E22") + leaf(100, 36, 0, "#B5452B") +
-leaf(116, 37, 14, "#E8BE45") + leaf(130, 40, 32, "#E67E22") + leaf(142, 44, 55, "#D6363C"),
-say: ["A crown of leaves! Finally, a crown that didn't need a prep.", "I'm the king of autumn. Bow before the molar.", "These leaves are crunchy. Like a good apple."] },
-{ k: "scarecrow", n: "Scarecrow straw hat",
-top: '<path d="M74 40 C70 10 130 10 126 40 Z" fill="#E8C15A" stroke="' + OUT + '" stroke-width="4" stroke-linejoin="round"/>' +
-'<path d="M73 30 C90 26 110 26 127 30 L127 37 C110 33 90 33 73 37 Z" fill="#C0392B"/>' +
-'<rect x="104" y="14" width="10" height="9" rx="1.5" fill="#6E8BB0" stroke="' + OUT + '" stroke-width="1.6" transform="rotate(12 109 18)"/>' +
-'<ellipse cx="100" cy="41" rx="58" ry="9" fill="#F0CF6B" stroke="' + OUT + '" stroke-width="4"/>' +
-'<path d="M60 40 L140 40" stroke="#D9A93A" stroke-width="1.4" stroke-dasharray="4 4"/>' +
-'<path d="M46 46 L38 56 M52 48 L46 60 M58 49 L55 58 M154 46 L162 56 M148 48 L154 60 M142 49 L145 58" stroke="#D9A93A" stroke-width="3" stroke-linecap="round"/>',
-say: ["I'm a scarecrow. I scare away plaque.", "Straw hat. Very harvest chic.", "If I only had a brain... oh wait, I've got you."] }
-]
-};
-var outfitNow = {};
-function seasonId(){ return holidayId() || (isFall() ? "fall" : ""); }
-function outfit(id){
-var list = id && OUTFITS[id]; if (!list) return null;
-if (outfitNow[id] == null) {
-var key = "sh_pet_outfit_" + id, s = ls(key);
-var i = s == null || s === "" || isNaN(+s) ? Math.floor(Math.random() * list.length) : (+s + 1) % list.length;
-ls(key, String(i)); outfitNow[id] = i;
-}
-return list[outfitNow[id]];
-}
 function fit(){
-try { if (!adopted() || ls("sh_pref_pet") === "off" || ls("sh_pref_focus") === "on") return ""; } catch (e) { return ""; }
-if (EVERYONE) return WORN.id || "";
-var id = seasonId(), o = outfit(id);
-return o && o.k ? id + ":" + o.k : "";
-}
-function fitOutfit(f){
-var m = /^([a-z0-9]{1,20}):([a-z0-9-]{1,30})$/.exec(String(f || "")), list = m && OUTFITS.hasOwnProperty(m[1]) ? OUTFITS[m[1]] : null;
-if (!list) return null;
-for (var i = 0; i < list.length; i++) if (list[i].k === m[2]) return list[i];
-return null;
+try { if (ls("sh_pref_pet") === "off" || ls("sh_pref_focus") === "on") return ""; } catch (e) { return ""; }
+return WORN.id || "";
 }
 var WORN = { id: "", layer: null };
 var OUTFIT_ID = /^[a-z0-9-]{1,40}$/;
@@ -2870,7 +2597,7 @@ if (!id || l) keep(id, WORN.layer); else wantOutfits(id);
 if (M) draw();
 if (was !== id) { try { document.dispatchEvent(new CustomEvent("sh:pet-fit")); } catch (e) {} }
 }
-function setOutfit(id, parts){ if (EVERYONE) wear(id, parts ? layerOf(parts) : null); }
+function setOutfit(id, parts){ wear(id, parts ? layerOf(parts) : null); }
 var woke = false, wakeQ = [], WAKE_ON = ["scroll", "wheel", "pointerdown", "keydown", "touchstart"];
 function watchWake(){
 if (woke || watchWake.on) return; watchWake.on = true;
@@ -2897,16 +2624,6 @@ function wantOutfits(id){
 afterWake(function(){ loadOutfits().then(function(){ if (WORN.id === id && !WORN.layer) wear(id); }, function(){}); });
 }
 function wornTalk(){ var l = WORN.layer; return l && l.say && l.say.length ? { k: WORN.id, say: l.say } : null; }
-var UPGRADES = [
-{ tier: 1, n: "Picket fence", how: "Reach Antique rank" },
-{ tier: 2, n: "Bronze mailbox", how: "Reach Bronze rank" },
-{ tier: 3, n: "Garden lamppost", how: "Reach Silver rank" },
-{ tier: 4, n: "Gold trim and door", how: "Reach Gold rank" },
-{ tier: 5, n: "Diamond windows", how: "Reach Diamond rank" },
-{ tier: 6, n: "A night sky of his own", how: "Reach Dark Matter rank" },
-{ mastery: 1, n: "A pennant for every hub you master", how: "Bronze mastery (50%) in any hub; it turns silver, gold or crowned as you go" },
-{ mastery: 4, n: "A crown on the roof", how: "Crown mastery (100%) in any hub" }
-];
 function houseDeco(){
 var flair = String(ls("sh_rank_flair") || "").split(",").map(function(x){ var i = x.lastIndexOf(":"); return { hub: x.slice(0, i), lvl: +x.slice(i + 1) }; })
 .filter(function(x){ return x.hub && x.lvl >= 1 && x.lvl <= 4; });
@@ -3070,7 +2787,7 @@ var today = centralDay(), born = ls("sh_pet_born") || today, log = readLog(), by
 Object.keys(log).forEach(function(k){ var a = log[k], b = by[k] || [0, 0]; by[k] = [Math.max(a[0], b[0]), Math.max(a[1], b[1])]; });
 var start = born, earliest = addDays(today, -60);
 if (start < earliest) start = earliest;
-var hp = EVERYONE && born >= FULL_FROM ? 100 : 70, streak = 0, miss = 0, treat = false, everZero = false, revived = false, dipped = hp < 100;
+var hp = born >= FULL_FROM ? 100 : 70, streak = 0, miss = 0, treat = false, everZero = false, revived = false, dipped = hp < 100;
 for (var day = start, i = 0; day <= today && i < 400; day = addDays(day, 1), i++) {
 var r = by[day] || [0, 0], a = r[0], c = r[1];
 if (a > 0) {
@@ -3306,8 +3023,8 @@ var TIPS = [
 ["Every day one question in each hub is secretly {golden}. Be the first to get it right.", "golden"],
 ["Sometimes a {Tooth Fairy} flutters past after you answer. Tap her before she's gone!", "Tooth Fairy"],
 ["When {5 or more} people are in the same hub, a Plaque Boss shows up. Every right answer hits it.", "5 or more"],
+["{Fifty right} in a row, first try, and the alley's screen does something. Thirty-one hates the noise.", "Fifty right"],
 ["Each week a tiny {cavity} hides in one paragraph of each hub's Lecture Notes. The first five people to tap it fill it.", "cavity"],
-["Every right answer grows a tooth on the {Full Arch} chart, and every miss knocks one out. Fill all 32.", "Full Arch"],
 ["Get {10 wrong} in a row, then {10 right} in a row. That's going through the root canal.", "10 wrong|10 right"],
 ["Answering questions between {2 and 4 am} earns a trophy. Please also sleep.", "2 and 4 am"],
 ["Get {100 right} in a row and you unlock a tactical nuke you can call in.", "100 right"],
@@ -3355,7 +3072,6 @@ floss: ["Did somebody say floss?", "That's my favorite word.", "Floss! Between e
 flosschain: ["A FLOSS CHAIN. This is the best day of my life.", "Three people flossing at once? I'm getting emotional.", "The floss chain! Unbreakable."],
 mirror: ["Everything's backwards. Is my good side still my good side?", "Everything's flipped. Like reading a mouth mirror.",
 "Mirror mode! Your right is my left. Or something."],
-fullarch: ["A full arch! All 32 of my cousins, together at last.", "All 32! A perfect set.", "A full arch. Somebody call an orthodontist, this is beautiful."],
 cavity: ["You filled a cavity! Show-off. (I love it.)", "Cavity filled! Nice restoration.", "You found the cavity! Great clinical eye."],
 prof: ["Quoting the professor? Very on brand.", "That sounded just like them!", "Straight from the professor. Write that down."],
 konami: ["Whoa. Am I... pixels?", "Eight-bit me! I feel so retro.", "Up, up, down, down... you know the classics."],
@@ -3677,12 +3393,12 @@ return null;
 function joke(){ return (seasonTalk() && Math.random() < (holidayId() ? 0.5 : 0.25) && seasonLine("jokes")) || deal("jokes", JOKES); }
 function seasonLine(kind){
 var s = seasonTalk(), a = s && s.t[kind];
-if (a && EVERYONE && !WORN.layer) a = a.filter(function(x){ return !/\bmy costume\?/.test(x); });
+if (a && !WORN.layer) a = a.filter(function(x){ return !/\bmy costume\?/.test(x); });
 return a && a.length ? deal(s.id + "-" + kind + (a === s.t[kind] ? "" : "-bare"), a) : "";
 }
 function fact(){ return deal("fact-lead", FACT_LEAD) + " " + deal("facts", FACTS); }
 function chat(){
-var r = Math.random(), o = EVERYONE ? wornTalk() : outfit(seasonId());
+var r = Math.random(), o = wornTalk();
 if (r < 0.16) return fact();
 if (r < 0.3) return deal("muse", MUSE);
 if (o && o.say && r < 0.38) return deal("outfit-" + o.k, o.say);
@@ -3713,21 +3429,15 @@ ls("sh_pet_anniv", today);
 return l;
 }
 function houseTalk(){
-var d = houseDeco(), l = ["I watered the lawn today. Green grass, pink gums. That's the look."];
-if (d.tier >= 1) l.push("I painted the picket fence this morning. Do you like it?");
-if (d.tier >= 2) l.push("I checked the mailbox. Just toothpaste coupons. Very exciting.");
-if (d.tier >= 3) l.push("The lamppost makes the yard so cozy at night.");
-if (d.tier >= 4) l.push("Gold trim on the house. We've really made it.");
-if (d.tier >= 5) l.push("The diamond windows sparkle almost as much as I do.");
-if (d.tier >= 6) l.push("We have our own night sky now. I named a star after you.");
-if (d.flair.length) l.push("Every pennant on the flagpole is a hub you mastered. I salute them every morning.");
-if (d.flair.some(function(f){ return f.lvl >= 4; })) l.push("There's a crown on our roof. I'm not saying I'm royalty, but I'm not NOT saying it.");
-if (!d.tier && !d.flair.length) l.push("The house is a little plain right now. Rank up and I'll decorate.");
+var d = houseDeco(), l = ["I watered the lawn today. Green grass, pink gums. That's the look.", "I swept the doorstep. You never know who's visiting."];
+if (d.tier >= 1) l.push("Your rank's statue is right by my door. I polish it every morning.");
+if (d.flair.length) l.push("Every medal on the board by my door is a hub you mastered. I salute them every morning.");
+if (d.flair.some(function(f){ return f.lvl >= 4; })) l.push("There's a crown on our medal board. I'm not saying I'm royalty, but I'm not NOT saying it.");
 if (d.fall) l.push("I raked the leaves. Then they fell again. Every single time.");
 return deal("house", l);
 }
 function smallTalk(st, where){
-var now = new Date(), sl = daySlot(now.getHours()), hol = holidayId(), sea = seasonTalk(), o = EVERYONE ? wornTalk() : outfit(seasonId()), t = st.today, opts = [];
+var now = new Date(), sl = daySlot(now.getHours()), hol = holidayId(), sea = seasonTalk(), o = wornTalk(), t = st.today, opts = [];
 if (sea) opts.push([hol ? (where === "hub" ? 30 : 40) : 12, function(){ return seasonLine("hello"); }]);
 if (o && o.say) opts.push([14, function(){ return deal("outfit-" + o.k, o.say); }]);
 if (eggsOn()) opts.push([where === "hub" ? 10 : 15, function(){ return deal("dontsay", DONT_SAY); }]);
@@ -3840,17 +3550,9 @@ st.textContent = [
 ".shpet-leaf{transform-box:fill-box; transform-origin:center; animation:shpet-leaf 6s ease-in-out infinite;} @keyframes shpet-leaf{0%{transform:translate(0,-8px) rotate(0); opacity:0;} 15%{opacity:1;} 50%{transform:translate(-6px,8px) rotate(140deg);} 85%{opacity:1;} 100%{transform:translate(4px,26px) rotate(300deg); opacity:0;}}",
 ".shpet-snow{animation:shpet-snow 5s ease-in-out infinite;} @keyframes shpet-snow{0%{transform:translate(0,-6px); opacity:0;} 20%{opacity:1;} 100%{transform:translate(4px,18px); opacity:0;}}",
 ".shpet-flag{transform-box:fill-box; transform-origin:0 50%; animation:shpet-flag 2.4s ease-in-out infinite;} @keyframes shpet-flag{0%,100%{transform:scaleX(1) skewY(0);} 50%{transform:scaleX(.9) skewY(4deg);}}",
-".shpet-upg{list-style:none; margin:8px 0 0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:6px;}",
-".shpet-upg li{font-size:12.5px; line-height:1.35; padding:7px 9px; border-radius:10px; border:1px solid var(--pet-line); color:var(--pet-ink2);}",
-".shpet-upg li b{display:block; color:var(--pet-ink); font-size:13px;} .shpet-upg li.is-locked{opacity:.55;} .shpet-upg li.is-on b::after{content:' \\2713'; color:#2E9E5B;}",
-"@media (max-width:480px){ .shpet-upg{grid-template-columns:1fr;} }",
 "@keyframes shpet-smoke{0%,100%{opacity:.85; transform:translateY(0);} 50%{opacity:.4; transform:translateY(-3px);}}",
 "@keyframes shpet-drift{from{transform:translateX(0);} to{transform:translateX(-26px);}}",
 "@media (max-width:600px){ .shpet-house{grid-template-columns:1fr; gap:12px; padding:10px;} .shpet-housesvg{max-height:190px;} }",
-".shpet-perch{position:absolute; z-index:5; width:66px; transition:opacity .3s;}",
-".shpet-perch .shpet-say{bottom:46%; max-width:min(196px, var(--pet-room, 196px));}",
-"@media (max-width:760px){ .shpet-perch .shpet-say{max-width:min(180px, var(--pet-room, 180px));} }",
-"@media (max-width:600px){ .shpet-perch{width:56px;} }",
 ".shpet-dlg{position:fixed; inset:0; z-index:10060; display:flex; align-items:center; justify-content:center; padding:16px; background:rgba(10,8,14,.5); animation:shpet-fade .25s ease;}",
 ".shpet-card{position:relative; width:100%; max-width:440px; max-height:calc(100vh - 32px); overflow:auto; padding:22px 22px 18px; border-radius:22px; background:var(--pet-bg); color:var(--pet-ink); box-shadow:0 30px 80px rgba(0,0,0,.35); animation:shpet-rise .35s cubic-bezier(.2,.8,.3,1);}",
 ".shpet-card h3{margin:0 0 6px; font-family:var(--font-display, var(--serif, Georgia, serif)); font-weight:400; font-size:26px; line-height:1.15;}",
@@ -3881,10 +3583,8 @@ st.textContent = [
 function hpColor(hp){ return hp >= 70 ? "#3ECF7E" : hp >= 40 ? "#E8C15A" : hp >= 12 ? "#F0806B" : "#D6363C"; }
 var M = null;
 function pref(){ return ls("sh_pref_pet") || "on"; }
-function adopted(){ return EVERYONE || !!ls("sh_pet_born"); }
 var firstMeet = false;
-function meetEveryone(opt){
-EVERYONE = true;
+function meet(opt){
 if (!ls("sh_pet_born")) { ls("sh_pet_born", centralDay()); firstMeet = true; }
 var k = kept();
 wear(typeof opt.outfit === "string" ? opt.outfit : k ? k.id : "");
@@ -3893,12 +3593,12 @@ watchWake();
 function petName(){ return "Timmy Tooth"; }
 function mount(opt){
 if (M || !opt) return M;
-if (opt.everyone) meetEveryone(opt);
+meet(opt);
 css();
 var H = opt.H || null, where = opt.where || (H ? "hub" : "dashboard");
 M = {
 where: where, H: H, sb: opt.sb || (H && H.supabase) || null, visitor: opt.visitor || (H && H.visitor) || ls("sh_visitor_id"),
-name: opt.name || (H ? H.name : function(){ return ls("sh_display_name") || ""; }), perch: opt.perch || null, home: opt.home || null,
+name: opt.name || (H ? H.name : function(){ return ls("sh_display_name") || ""; }), home: opt.home || null,
 el: null, btn: null, say: null, st: simulate(null), rows: null, sayT: null, run: 0, wrongRun: 0, lastSection: "", lastInput: Date.now(),
 sessionStart: Date.now(), longNudges: 0, idleSaid: false, taps: 0, tapT: 0, lastHp: null, lastTalk: 0,
 bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false
@@ -3906,9 +3606,8 @@ bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.
 if (firstMeet) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
 load();
 render();
-if (where === "hub") wireHub(); else wireDashboard();
+if (where === "hub") wireHub();
 setInterval(idleLife, 4200);
-window.addEventListener("resize", place);
 document.addEventListener("sh:pref", function(e){ if (e.detail && /^sh_pref_(pet|eggs)$/.test(e.detail.key)) refresh(); });
 document.addEventListener("sh:egg-local", function(e){
 if (!e.detail || e.detail.t !== "timmy") return;
@@ -3921,7 +3620,7 @@ return M;
 function visible(){
 var p = pref();
 if (p === "off") return false;
-if (M.where === "hub") return adopted() && p !== "dash";
+if (M.where === "hub") return p !== "dash";
 return true;
 }
 function load(){
@@ -3930,7 +3629,7 @@ M.loaded = true;
 var boot = M.bootstrap; M.bootstrap = null;
 if (boot && typeof boot.then === "function") {
 boot.then(function(data){
-if (EVERYONE && data && data.shop && data.shop.equipped && typeof data.shop.equipped === "object") wear(data.shop.equipped.outfit || "");
+if (data && data.shop && data.shop.equipped && typeof data.shop.equipped === "object") wear(data.shop.equipped.outfit || "");
 if (data && Array.isArray(data.pet_days)) { M.rows = data.pet_days; update(true); return; }
 loadRemote();
 }, loadRemote);
@@ -3949,9 +3648,8 @@ function update(quiet){
 var prev = M.st ? M.st.hp : null;
 M.st = simulate(M.rows);
 draw();
-if (!adopted()) return;
 var hp = M.st.hp;
-if (hp >= 100 && (!EVERYONE || M.st.dipped) && !ls("sh_pet_perfect")) { ls("sh_pet_perfect", "1"); award("pet-perfect"); if (!quiet) talk("100 HP! Pearly whites, baby. You earned a trophy for this.", "do-cheer"); }
+if (hp >= 100 && M.st.dipped && !ls("sh_pet_perfect")) { ls("sh_pet_perfect", "1"); award("pet-perfect"); if (!quiet) talk("100 HP! Pearly whites, baby. You earned a trophy for this.", "do-cheer"); }
 var day = new Date().toISOString().slice(0, 10);
 if (quiet && M.rows && ls("sh_pet_hp_sent") !== day) { ls("sh_pet_hp_sent", day); track("state:pet-hp=" + (hp >= 80 ? "80-100" : hp >= 50 ? "50-79" : hp >= 25 ? "25-49" : hp > 0 ? "1-24" : "0")); }
 if (M.st.revived && !ls("sh_pet_revived")) { ls("sh_pet_revived", "1"); award("pet-revive"); talk("From 0 to 100. You brought me back. I'll never forget it.", "do-cheer"); }
@@ -3968,10 +3666,9 @@ function render(){
 var home = M.where === "dashboard" && M.home ? M.home() : null;
 if (M.el) { if (M.el === home) { home.innerHTML = ""; home.hidden = true; } else M.el.remove(); M.el = null; M.btn = null; M.say = null; }
 document.documentElement.classList.toggle("sh-pet-on", M.where === "hub" && visible());
-perchSpace(false);
 if (!visible()) return;
 var el;
-if (home && adopted()) {
+if (home) {
 el = home; el.hidden = false; el.className = "shpet shpet-house";
 el.innerHTML = '<div class="shpet-scene">' + houseSvg() + '<div class="shpet-spot"><button type="button" class="shpet-btn"></button><div class="shpet-say" role="status" aria-live="polite"></div></div></div>' +
 '<div class="shpet-info"><div class="shpet-title"><b>' + petName() + '</b><span class="shpet-hpnum"></span></div>' +
@@ -3980,10 +3677,9 @@ el.innerHTML = '<div class="shpet-scene">' + houseSvg() + '<div class="shpet-spo
 if (!el.__shpet) { el.__shpet = true; el.addEventListener("click", homeClick); }
 } else {
 el = document.createElement("div");
-el.className = "shpet " + (M.where === "hub" ? "shpet-home" : "shpet-perch");
+el.className = "shpet shpet-home";
 el.innerHTML = '<button type="button" class="shpet-btn"></button><span class="shpet-hp" aria-hidden="true"><i></i></span><div class="shpet-say" role="status" aria-live="polite"></div>';
 document.body.appendChild(el);
-if (M.where === "dashboard") perchSpace(true);
 }
 M.el = el; M.btn = el.querySelector(".shpet-btn"); M.say = el.querySelector(".shpet-say");
 M.btn.addEventListener("click", onTap);
@@ -3991,9 +3687,8 @@ M.say.addEventListener("click", function(e){
 if (e.target.closest(".shpet-ask")) { hush(); if (askOn()) window.shAsk.open({ from: "timmy" }); return; }
 if (e.target.closest(".shpet-more")) { hush(); checkup(); }
 });
-draw(); place();
-if (!adopted()) setTimeout(function(){ talk("Psst. Up here. Tap me!", "do-wave", 9000); }, 1400);
-else setTimeout(hello, 900);
+draw();
+setTimeout(hello, 900);
 }
 function homeClick(e){
 if (e.target.closest("[data-ask]")) { if (window.shAsk) window.shAsk.open({ from: "house" }); return; }
@@ -4022,46 +3717,16 @@ draw(); calmLater();
 }
 function draw(){
 if (!M || !M.btn) return;
-var hp = adopted() ? M.st.hp : 85, mood = adopted() ? moodFor(hp) : "happy";
+var hp = M.st.hp, mood = moodFor(hp);
 if (M.sleeping) mood = "sleep";
-else if (adopted() && scaredLeft() > 0) mood = "scared";
+else if (scaredLeft() > 0) mood = "scared";
 M.btn.innerHTML = art({ hp: hp, mood: mood }, 100);
-M.btn.setAttribute("aria-label", adopted() ? petName() + ", your tooth buddy, " + hp + " HP. Tap for a joke." : "Timmy Tooth. Tap to meet him.");
+M.btn.setAttribute("aria-label", petName() + ", your tooth buddy, " + hp + " HP. Tap for a joke.");
 var bar = M.el.querySelector(".shpet-hp");
-bar.style.display = adopted() ? "" : "none";
 bar.querySelector("i").style.width = hp + "%"; bar.querySelector("i").style.background = hpColor(hp);
 var num = M.el.querySelector(".shpet-hpnum"), stat = M.el.querySelector(".shpet-status");
 if (num) num.textContent = hp + " HP";
 if (stat) stat.textContent = statusLine(M.st);
-}
-function perchSpace(on){ var g = document.getElementById("greeting"); if (g) g.classList.toggle("has-pet", !!on); }
-function place(){
-if (!M || !M.el || M.where !== "dashboard" || !M.el.classList.contains("shpet-perch")) return;
-var target = M.perch ? M.perch() : null; if (!target) return;
-var r = target.getBoundingClientRect(), w = M.el.offsetWidth || 66;
-if (!target.firstElementChild || target.tagName !== "B") {
-var tn = target.firstChild;
-if (tn && tn.nodeType === 3 && tn.nodeValue.trim()) { try { var rg = document.createRange(); rg.selectNodeContents(tn); r = rg.getBoundingClientRect(); } catch (e) {} }
-}
-var pr0 = M.el.getBoundingClientRect(), z = pr0.width ? (M.el.offsetWidth || w) / pr0.width : 1;
-var x = (r.left + r.width / 2 + window.scrollX) * z - w / 2, y = (r.top + window.scrollY) * z - (M.el.offsetHeight || 92) - 12;
-x = Math.max(8, Math.min(x, document.documentElement.clientWidth * z - w - 8));
-M.el.style.left = x + "px"; M.el.style.top = y + "px";
-var pr = M.el.getBoundingClientRect(), vr = document.documentElement.getBoundingClientRect();
-var k = pr.width ? (M.el.offsetWidth || w) / pr.width : 1, gap = 18 / k;
-var roomR = (vr.right - pr.right - gap) * k, roomL = (pr.left - vr.left - gap) * k;
-var flip = roomR < 200 && roomL > roomR, ss = M.say.style;
-ss.bottom = ""; ss.right = "";
-if (Math.max(roomL, roomR) < 120) {
-var vwCss = vr.width * k, leftCss = (pr.left - vr.left) * k, bw = Math.min(180, vwCss - 16);
-var off = Math.max(8 - leftCss, Math.min(M.el.offsetWidth / 2 - bw / 2, vwCss - 8 - bw - leftCss));
-ss.left = Math.round(off) + "px"; ss.bottom = "calc(100% + 4px)"; ss.borderRadius = "16px";
-ss.setProperty("--pet-room", Math.floor(bw) + "px");
-return;
-}
-ss.left = flip ? "auto" : ""; ss.right = flip ? "calc(100% + 10px)" : "";
-ss.borderRadius = flip ? "16px 16px 4px 16px" : "";
-ss.setProperty("--pet-room", Math.max(96, Math.floor(flip ? roomL : roomR)) + "px");
 }
 function talk(html, move, ms, raw){
 if (!M || !M.say || !visible()) return;
@@ -4093,7 +3758,6 @@ if (M.sleeping) return;
 if (Math.random() < 0.55) act(pick(["do-wave", "do-hop", "do-look", "do-wiggle", "do-look", "do-hat"]));
 }
 function hello(){
-if (!adopted()) return;
 if (M.skipHello) { M.skipHello = false; return; }
 if (firstMeet) {
 firstMeet = false;
@@ -4151,7 +3815,6 @@ if (!e || e.d > 1) return "";
 return fill(e.d ? deal("exam-eve", SAY.examEve) : deal("exam-day", SAY.examDay), e);
 }
 function onTap(){
-if (!adopted()) { intro(); return; }
 track("pet:tap-" + M.where);
 var now = Date.now();
 M.taps = now - M.tapT < 1200 ? M.taps + 1 : 1; M.tapT = now;
@@ -4210,15 +3873,6 @@ talk(fill(deal("long", LONG_SESSION), { m: mins }), "do-wave", 8000);
 }
 }, 60000);
 }
-function wireDashboard(){
-if (window.MutationObserver) {
-var g = document.getElementById("greeting");
-if (g) new MutationObserver(function(){ setTimeout(place, 0); }).observe(g, { childList: true, subtree: true, characterData: true });
-}
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(place);
-window.addEventListener("load", place);
-setTimeout(place, 600); setTimeout(place, 2000);
-}
 function dialog(html, cls){
 var d = document.createElement("div");
 d.className = "shpet shpet-dlg" + (cls ? " " + cls : "");
@@ -4230,50 +3884,6 @@ setTimeout(function(){ var f = d.querySelector("input, .shpet-go"); if (f) try {
 return d;
 }
 function track(k){ try { if (window.shTrack) window.shTrack(k); } catch (e) {} }
-function intro(){
-hush();
-track("pet:intro");
-var step = 0;
-var stages = '<div class="shpet-stages">' + [[90, "Healthy"], [60, "Plaque"], [33, "Caries"], [8, "Fractured"]].map(function(x){
-return '<div>' + art({ hp: x[0], hat: "" }, 72) + x[1] + '</div>'; }).join("") + '</div>';
-var STEPS = [
-'<h3>Hi! I\'m Timmy Tooth.</h3><p>I\'m going to hang out with you while you study: in my little home here on the dashboard, and in the bottom corner of every hub.</p><p><b>Keeping me healthy is your job now.</b> No pressure.</p>',
-'<h3>How you take care of me</h3><p>Every question you get <b>right</b> heals me a little, and studying on <b>back-to-back days</b> adds a streak bonus.</p><p>Skip days and I start to slip: plaque first, then stains and puffy gums, then cavities, periodontitis, and eventually fractures.</p>' + stages,
-'<h3>The fine print</h3><p>I <b>can\'t die</b>. But if you let me hit 0 HP, I need a real treatment plan: I heal at half speed until I\'m back to 50.</p><p>Tap me any time for a dental joke or a checkup, and I\'ll cheer you on during streaks.</p><p>Don\'t want me around? <b>Settings → Extras → Timmy Tooth</b> turns me off, or keeps me on the dashboard only. It\'s also the "No thanks" button below.</p>',
-'<h3>Can I move in?</h3><p>I\'ve got a little house all picked out on your dashboard. I\'ll be there whenever you stop by, and I\'ll come along into the hubs to cheer you on.</p><div class="shpet-hero">' + houseSvg() + '</div>'
-];
-var d = dialog('<button class="shpet-x" type="button" aria-label="Close">&times;</button><div class="shpet-hero"><span class="shpet-btn do-wave"></span></div><div class="shpet-step"></div>' +
-'<div class="shpet-dots">' + STEPS.map(function(){ return '<i></i>'; }).join("") + '</div>' +
-'<div class="shpet-row"><button type="button" class="shpet-ghost" data-no>No thanks</button><span><button type="button" class="shpet-ghost" data-back>Back</button> <button type="button" class="shpet-go" data-next>Next</button></span></div>');
-var hero = d.querySelector(".shpet-hero .shpet-btn");
-function show(){
-d.querySelector(".shpet-step").innerHTML = STEPS[step];
-hero.innerHTML = art({ hp: 92, mood: "happy" }, 120);
-hero.classList.remove("do-wave", "do-hop"); void hero.offsetWidth; hero.classList.add(step % 2 ? "do-hop" : "do-wave");
-d.querySelectorAll(".shpet-dots i").forEach(function(x, i){ x.classList.toggle("is-on", i === step); });
-d.querySelector("[data-back]").style.visibility = step ? "visible" : "hidden";
-d.querySelector("[data-next]").textContent = step === STEPS.length - 1 ? "Adopt Timmy" : "Next";
-}
-var done = false;
-function finish(how){
-if (done) return; done = true;
-track("pet:adopt-" + (how || "closed-step" + (step + 1)));
-ls("sh_pet_born", centralDay());
-award("pet-adopt", centralDay());
-M.skipHello = true;
-d.remove();
-update(true); render();
-setTimeout(function(){ talk("I'm home! Go answer some questions and I'll feel great.", "do-cheer", 7000); }, 700);
-}
-d.addEventListener("click", function(e){
-if (e.target.closest("[data-next]")) { if (step === STEPS.length - 1) finish("button"); else { step++; show(); } }
-else if (e.target.closest("[data-back]")) { if (step) { step--; show(); } }
-else if (e.target.closest("[data-no]")) { done = true; track("pet:no-thanks-step" + (step + 1)); setPref("off"); d.remove(); }
-else if (e.target === d || e.target.closest(".shpet-x")) finish();
-});
-d.addEventListener("keydown", function(e){ if (e.key === "Escape") finish(); });
-show();
-}
 function checkup(){
 var st = M.st, hp = st.hp, cs = conditions(hp).filter(function(k){ return CONDITION_INFO[k]; });
 var colors = { plaque: "#E4CF5C", stain: "#9B6634", gingivitis: "#EE5A75", caries: "#3A2010", perio: "#A82540", fracture: "#3B2E3A", zero: "#D6363C" };
@@ -4285,7 +3895,6 @@ var d = dialog('<button class="shpet-x" type="button" aria-label="Close">&times;
 '<div class="shpet-hpline"><span>Today: ' + st.today.a + ' answered, ' + st.today.c + ' right</span><span>' + st.streak + '-day streak</span></div>' +
 (cs.length ? '<ul class="shpet-conds">' + cs.map(function(k){ return '<li><i style="background:' + colors[k] + '"></i><span><b>' + CONDITION_INFO[k][0] + '.</b> ' + CONDITION_INFO[k][1] + '</span></li>'; }).join("") + '</ul>'
 : '<ul class="shpet-conds"><li><i style="background:#3ECF7E"></i><span><b>All clear.</b> No plaque, no stains, no cavities. Chef\'s kiss.</span></li></ul>') +
-(M.where === "dashboard" ? upgradesHTML() : '') +
 '<p style="margin-top:12px">Each right answer heals me a little (up to 30 HP a day), and studying on back-to-back days adds a bonus. Each day you skip, I slip, faster the longer you\'re gone. At 0 HP I can\'t die, but I heal at half speed until I\'m back to 50.</p>' +
 '<div class="shpet-row"><span>Show me <span class="shpet-seg" role="group" aria-label="Where to show your tooth buddy">' +
 '<button type="button" data-p="on" aria-pressed="' + (p === "on") + '">Everywhere</button><button type="button" data-p="dash" aria-pressed="' + (p === "dash") + '">Dashboard only</button></span></span></div>' +
@@ -4295,13 +3904,6 @@ var b = e.target.closest("[data-p]");
 if (b) { setPref(b.getAttribute("data-p")); d.querySelectorAll("[data-p]").forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); }); return; }
 if (e.target.closest("[data-off]")) { d.remove(); setPref("off"); return; }
 });
-}
-function upgradesHTML(){
-var d = houseDeco(), best = 0; d.flair.forEach(function(f){ best = Math.max(best, f.lvl); });
-return '<h3 style="font-size:19px;margin-top:16px">House upgrades</h3><ul class="shpet-upg">' + UPGRADES.map(function(u){
-var got = u.tier ? d.tier >= u.tier : best >= u.mastery;
-return '<li class="' + (got ? "is-on" : "is-locked") + '"><b>' + esc(u.n) + '</b>' + esc(got ? "Unlocked" : u.how) + '</li>';
-}).join("") + '</ul>';
 }
 document.addEventListener("sh:rank", function(){
 if (!M || !M.el || !M.el.classList.contains("shpet-house")) return;
@@ -4325,11 +3927,11 @@ function refresh(reload){ if (!M) return; hush(); if (reload === true) loadRemot
 function syncBadges(badges){
 var all = (badges || []).filter(function(x){ return String(x).split(":")[0] === "pet-adopt"; }), b = all[0];
 var day = b && /^\d{4}-\d{2}-\d{2}$/.test(String(b).split(":")[1] || "") ? String(b).split(":")[1] : null;
-if (EVERYONE) all.forEach(function(x){ var d = String(x).split(":")[1] || ""; if (/^\d{4}-\d{2}-\d{2}$/.test(d) && (!day || d < day)) day = d; });
-if (EVERYONE && day && ls("sh_pet_born") > day) firstMeet = false;
-if (b && !adopted()) { ls("sh_pet_born", day || centralDay()); if (M) { M.skipHello = false; update(true); render(); } }
+all.forEach(function(x){ var d = String(x).split(":")[1] || ""; if (/^\d{4}-\d{2}-\d{2}$/.test(d) && (!day || d < day)) day = d; });
+if (day && ls("sh_pet_born") > day) firstMeet = false;
+if (b && !ls("sh_pet_born")) { ls("sh_pet_born", day || centralDay()); if (M) { M.skipHello = false; update(true); render(); } }
 else if (b && day && ls("sh_pet_born") > day) { ls("sh_pet_born", day); if (M) { update(true); draw(); } }
-else if (!b && adopted() && M && M.sb && M.visitor && !ls("sh_pet_adopt_sent")) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
+else if (!b && ls("sh_pet_born") && M && M.sb && M.visitor && !ls("sh_pet_adopt_sent")) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
 }
 window.shPet = { say: function(text, move, ms){ talk(text, move, ms); }, hp: function(){ return M.st && typeof M.st.hp === "number" ? M.st.hp : null; }, mount: mount, refresh: refresh, syncBadges: syncBadges, art: art, fit: fit, setOutfit: setOutfit, house: houseSvg, conditions: conditions, simulate: simulate, holidayId: holidayId, _jokes: JOKES };
 })();
@@ -4813,12 +4415,14 @@ function liveHubs(){ var a = []; try { a = (typeof o.hubs === "function" ? o.hub
 function label(id){ var m = liveHubs().filter(function(h){ return h.id === id; })[0]; return (m && m.name) || hubLabel(id, o); }
 el.classList.add("shi");
 el.innerHTML =
-'<div class="shi-head">' + (o.heading === false ? '<p class="shi-lede">' : '<h2 id="' + uid + 'H">Idea board</h2><p class="note shi-lede">') +
-"Ideas for the hubs, from the class. Vote for the ones you'd use: the votes show Sam what the class wants most.</p>" +
-'<button type="button" class="btn btn-primary shi-new" data-shi="new" aria-expanded="false" aria-controls="' + uid + 'F">Post an idea</button></div>' +
+'<div class="shi-head"><span class="shi-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0 0 12 3z"/></svg></span>' +
+'<div class="shi-headtx">' + (o.heading === false ? '<p class="shi-title">Got an idea for the hubs?</p><p class="shi-lede">' : '<h2 id="' + uid + 'H">Idea board</h2><p class="shi-lede">') +
+"Ideas for the hubs, from the class. Vote for the ones you'd use: the votes show Sam what the class wants most.</p></div>" +
+'<button type="button" class="btn btn-primary shi-new" data-shi="new" aria-expanded="false" aria-controls="' + uid + 'F"><svg class="ic" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Post an idea</button></div>' +
 '<form class="shi-form" id="' + uid + 'F" novalidate hidden></form>' +
 '<p class="shi-say" role="status" aria-live="polite"></p>' +
 '<div class="shi-bar">' +
+'<span class="shi-barl" aria-hidden="true">Show</span>' +
 '<span class="seg" role="group" aria-label="Which ideas">' + TABS.map(function(t){ return '<button type="button" data-shi-tab="' + t[0] + '" aria-pressed="' + (t[0] === S.tab) + '">' + t[1] + "</button>"; }).join("") + "</span>" +
 '<label class="shi-pick"><span class="sr">Show ideas for</span><select data-shi-filter="hub"></select></label>' +
 '<label class="shi-pick"><span class="sr">Kind of idea</span><select data-shi-filter="cat"></select></label>' +

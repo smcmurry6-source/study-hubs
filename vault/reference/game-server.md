@@ -9,8 +9,9 @@ How the redesign's game layer works on the database: XP without a daily cap, ser
 Shiny Gold Crowns and Timmy's shop (the seasonal sets, the rank sets and throwback days included), visiting someone's place,
 and the idea board. Written and tested on a throwaway copy on 2026-11-06, changed in place on 2026-11-10 for
 [Sam's third round](../tasks/done/2026-11-10-redesign-timmys-place-round-3.md), and **applied
-at [the release](../tasks/2026-11-06-redesign-release.md), not before**; until then `migration_v54.sql` is listed in
-`supabase/pending-migrations.txt` and the live project runs today's rules. What each part should do and why:
+at [the release](../tasks/2026-11-06-redesign-release.md)**, with `migration_v55.sql` to `v58` after it (all five are in
+`supabase/schema.sql`, after its "the redesign's release" marker, which `tools/release/xp.js` uses to test the moment
+of the switch on made-up history). What each part should do and why:
 [the journeys](../tasks/2026-11-06-redesign-progression-journeys.md), [the shop](../tasks/2026-11-06-redesign-timmy-shop.md),
 [Timmy's place](../tasks/2026-11-06-redesign-timmys-place.md), [the idea board](../tasks/2026-11-06-idea-board.md). The code is
 the home of the details: read `migration_v54.sql` (its sections are numbered as below).
@@ -25,7 +26,7 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   XP; its award pays instead), `sh_xp_rebuild` (adds the award rows and replays the v2 answers) and `redeem_link_code` (also
   moves the new tables, then rebuilds).
 - Section 0 is a fix for today's bootstrap ([BUG-049](../release/bug-log.md)). It was applied to the live project on its own
-  on 2026-11-06 (Sam's OK) and is in `supabase/schema.sql`, so at the release it changes nothing.
+  on 2026-11-06 (Sam's OK) and was already in `supabase/schema.sql`, so at the release it changed nothing.
 - **The switch** is `game_config.v2_at`, set when the migration runs. `game_baseline` keeps each visitor's XP and badges at
   that moment. **No XP back pay** (Sam, 2026-11-06): answers from before keep what they paid, and a medal reached before the
   switch earns no XP and no boost.
@@ -167,7 +168,7 @@ off.
   answer) and opens `shPlace.open({ place })`: the name as text in the title, no HP, no Customize, in the leaderboard's
   theater look. Your own row opens your own place. A null place or a failed call puts one plain line on the row. The
   hubs' boards (`widget/v3.js`) don't visit yet (Sam, 2026-11-12).
-- **Visit someone random, from the whole class** (`migration_v57.sql`, pending, applied at the release after v56; Sam,
+- **Visit someone random, from the whole class** (`migration_v57.sql`, applied at the release after v56; Sam,
   2026-11-13: "i want random to be for the whole class"). `get_random_place(p_visitor, p_skip)` picks on the server from
   everyone `get_place` can open (XP, answer streaks, arcade scores: on a board or not) **who has customized their place**
   (at least one row in `pet_equipped`; Sam: "skip people with zero customization"; null when no one else has, and the page
@@ -208,8 +209,8 @@ live page makes today's calls (the smoke test compares them with `main`'s files)
 - **The arcade** (`widget/games.js`): `shGames.played(game, name)` at a game's start calls
   `shGame.startSession("arcade", game)`; `shGames.over(game, score, today)` at its end calls `finishSession(id, score)`
   (the score whole, 0 to 200000) in place of `submit_arcade_score`, and falls back to `today()` when there is no session
-  or the finish fails. The five shared games call `played` in their `begin()`; a hub's own games (`arcade.js`) get both
-  hooks from `tools/hub-next/build.mjs` (`gameHooks`), which fails the build if it can't find every game's start.
+  or the finish fails. The five shared games call `played` in their `begin()`; a hub's own games (`content/arcade.js`) call both
+  hooks themselves, and a new game of a hub's own must too (the smoke test's game-layer pass plays one through).
   `widget/hub-rewards.js` puts the session (`shGames.session()`) on an arcade answer and turns `sh:session-paid` into
   the pill, today's XP and "<the lobby's game name> finished: +50 XP." (`shGames.ran(id)`). Perio's Pocket Crusher
   answers have no pick, so the server says `bad` and they go out as today's calls, as the server intends.
@@ -314,9 +315,8 @@ Learn and Flashcards' server part is its own pending migration, not a change to 
 
 The Question Bank's "Study as" toggle ([the task](../tasks/2026-11-06-redesign-learn-and-flashcards.md)): **Learn** asks
 questions in rounds until each is right twice; **Flashcards** turn a question over and the student rates it Again, Hard,
-Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sql` is listed in
-`supabase/pending-migrations.txt` after v54 and v55, needs both, and changes neither (Sam chose B of three options,
-2026-11-12, [decisions](../decisions.md)). It is applied at the release, after them.
+Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sql` needs v54 and v55 and changes neither (Sam chose B of three options,
+2026-11-12, [decisions](../decisions.md)). It was applied at the release, after them.
 
 - **`card_reviews`**: one row per rating or Learn step (`what`: `again`, `hard`, `good`, `easy`, `learn-0`, `learn-1`,
   `learn-2`, `learn-reset`), with the visitor, hub, question id, whether it was rated with Study ahead, the server's time,

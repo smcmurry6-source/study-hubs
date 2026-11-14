@@ -193,9 +193,21 @@
         var m = mine(), art = cardArt(m), svg = art.svg, moving = !reduced && !opt.still;
         /* with its caption showing, the button is named by what's in it (the picture's description, then the caption);
            as a bare picture it carries the description itself */
-        btn.innerHTML = img(moving ? svg.replace(/(<svg[^>]*>)/, function(t){ return t + "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") + "</style>"; }) : svg, opt.label === false ? "" : sceneAlt(m) + ". Open it.") +
+        /* the picture is a still, with the moving one drawn over it in its own shadow root (as the full view's stage
+           is). It was one image that moved inside, which a browser draws again whole on every frame: a drawing in the
+           page costs a third of that and can be taken away. A page that wants it quiet (the dashboard, while it
+           scrolls or rests) puts .is-rest on the moving one (.tpc-live), which place.css then doesn't draw: every
+           moving shape in it is a layer to the browser. It starts that way inside anything that is .is-rest */
+        btn.innerHTML = img(svg, opt.label === false ? "" : sceneAlt(m) + ". Open it.") + (moving ? '<span class="tpc-live" aria-hidden="true"></span>' : "") +
           (opt.label === false ? "" : '<span class="tpc-foot"><b>Timmy’s place</b><span>' + esc(cardName(byK(TP.HOMES, optsOf(m).home).n)) + " · " + esc(lowerFirst(byK(TP.SCENES, optsOf(m).scene).n)) + "</span></span>");
         if (opt.label === false) btn.setAttribute("aria-label", sceneAlt(m) + ". Open it"); else btn.removeAttribute("aria-label");
+        var live = moving && btn.attachShadow !== undefined ? $(".tpc-live", btn) : null;
+        if (live) {
+          live.attachShadow({ mode: "open" }).innerHTML = "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") +
+            /* the stars and sparkles hold still on the card: each one that twinkles is a layer (25 on a night sky) */
+            "svg{display:block;width:100%;height:auto}.tp-star,.tp-twinkle{animation:none!important}</style>" + svg;
+          if (btn.closest(".is-rest")) live.classList.add("is-rest");
+        }
         btn.classList.add("is-live");
         if (svg.length < 240000) { lsSet(STILL, /xmlns=/.test(svg) ? svg : svg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"')); lsSet(STILL + "_at", art.at ? art.at.join(",") : null); }
         if (opt.onDraw) opt.onDraw(btn, art.at);
@@ -213,6 +225,7 @@
   /* the stage's own rules, inside its shadow root with the kit's: the tap areas, the bubble over Timmy's head, his wave,
      and how he stands at each health level (as on the design page) */
   var STAGE_CSS = [
+    ":host(.is-rest) *{animation:none!important}",
     ":host{display:block}.tp-box{position:relative;line-height:0}.tp-box>svg.tp-scene{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none}",
     ".tp-egg{outline:none}.tp-egg:focus-visible{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff)}.tp-timmy{cursor:pointer}",
     ".tp-hit{position:absolute;inset:0;width:100%;height:100%}.tp-hitarea{fill:transparent;stroke:transparent;stroke-width:2;cursor:pointer;outline:none;transition:fill .15s}",
@@ -238,6 +251,17 @@
   ].join("\n");
   var V = null;                        // the open view
   var X_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+  /* the window's own icons (20 px, drawn in the button's color) */
+  var IC = function(d){ return '<svg class="tpv-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + d + "</g></svg>"; };
+  var ICON = {
+    visit: IC('<path d="M4.5 17V4.6c0-.9.7-1.6 1.6-1.6h7.8c.9 0 1.6.7 1.6 1.6V17M2.5 17h15"/><path d="M12.2 10.4v.1"/>'),
+    brush: IC('<path d="M16.6 3.4c-1-1-2.5-.4-3.2.4L8 9.6l2.4 2.4 5.8-5.4c.8-.7 1.4-2.2.4-3.2z"/><path d="M7.4 10.6c-2 .2-3 1.5-3.2 3.2-.1 1-.6 1.8-1.4 2.2 2.6.8 6.6.4 6.9-3.2"/>'),
+    dice: IC('<rect x="3" y="3" width="14" height="14" rx="3.2"/><path d="M7 7v.1M13 7v.1M10 10v.1M7 13v.1M13 13v.1"/>'),
+    bag: IC('<path d="M4 7h12l-.9 9.2c-.1.5-.5.8-1 .8H5.9c-.5 0-.9-.3-1-.8z"/><path d="M7.2 9V6.2a2.8 2.8 0 0 1 5.6 0V9"/>'),
+    check: IC('<path d="M4.5 10.5l3.6 3.6 7.4-8"/>'),
+    zoom: IC('<circle cx="9" cy="9" r="5.2"/><path d="M13 13l4 4M9 6.8v4.4M6.8 9h4.4"/>'),
+    medal: IC('<circle cx="10" cy="12" r="4.6"/><path d="M7.2 8.2L5 3h3.2L10 6.6 11.8 3H15l-2.2 5.2"/>')
+  };
   function isStill(){ return reduced; }
   function HL(){ return TP.healthFor(hpOf(V.m)); }
   function hpLine(t){ return String(t || "").replace("{hp}", hpOf(V.m)); }
@@ -361,17 +385,24 @@
     css();
     var dlg = D.createElement("dialog");
     var nav = o.place && o.nav && o.nav.list && o.nav.list.length && typeof o.nav.load === "function" ? o.nav : null;
-    dlg.className = "tpv" + (o.place ? " is-visit" + (reduced || o.covered ? "" : " is-trip") : ""); dlg.setAttribute("aria-labelledby", "tpvT");
-    dlg.innerHTML = '<div class="tpv-in"><header class="tpv-top"><div class="tpv-title">' + (o.place ? '<p class="tpv-kick" aria-hidden="true">Welcome to</p>' : "") + '<h2 id="tpvT">Timmy’s place</h2><p class="tpv-sub"></p></div>' +
-      '<div class="tpv-acts"><span class="tpv-seg" role="group" aria-label="What to do here" hidden><button type="button" data-tp="play" aria-pressed="true">Visit</button><button type="button" data-tp="customize" aria-pressed="false">Customize</button></span>' +
+    dlg.className = "tpv" + (o.place ? " is-visit" + (reduced || o.covered ? "" : " is-trip") : " is-home"); dlg.setAttribute("aria-labelledby", "tpvT");
+    dlg.innerHTML = '<div class="tpv-in"><header class="tpv-top"><div class="tpv-title">' + '<p class="tpv-kick" aria-hidden="true">' + (o.place ? "Welcome to" : "Welcome home") + '</p><h2 id="tpvT">Timmy’s place</h2><p class="tpv-sub"></p></div>' +
+      '<div class="tpv-acts"><span class="tpv-seg" role="group" aria-label="What to do here" hidden><button type="button" data-tp="play" aria-pressed="true">' + ICON.visit + '<span>Visit</span></button><button type="button" data-tp="customize" aria-pressed="false">' + ICON.brush + "<span>Customize</span></button></span>" +
       (nav ? '<button type="button" class="tpv-home" data-tp="visit-home" aria-label="Back to mine">' + HOME_SVG + "<span>Back to mine</span></button>" : "") +
       '<button type="button" class="tpv-x" data-tp="close" aria-label="Close Timmy’s place">' + X_SVG + "</button></div></header>" +
-      '<div class="tpv-body"><div class="tpv-stagewrap"><div class="tpv-stage"></div>' + navHTML(nav) + '<p class="tpv-wait" role="status">Opening the door…</p>' +
-      '<button type="button" class="tpv-chip tpv-zoom" data-tp="zoom" aria-pressed="true" hidden>Close-up</button></div><div class="tpv-side"></div></div><div class="tpv-over" hidden></div></div>';
+      '<div class="tpv-body"><div class="tpv-stagewrap"><div class="tpv-frame"><div class="tpv-stage"></div>' +
+      '<button type="button" class="tpv-chip tpv-zoom" data-tp="zoom" aria-pressed="true" hidden>' + ICON.zoom + "<span>Close-up</span></button></div>" + navHTML(nav) + '<p class="tpv-wait" role="status">Opening the door…</p></div><div class="tpv-side"></div></div><div class="tpv-over" hidden></div></div>';
     D.body.appendChild(dlg);
     V = { dlg: dlg, m: o.place ? theirs(o.place) : mine(), mode: "play", pick: /^(home|scene|timmy|left|front|corner|side|right)$/.test(o.pick || "") ? o.pick : "home", wide: false, src: {}, at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, camRaf: 0, cam: null, bub: null,
       lastTap: 0, wander: 0, visible: true, back: o.back !== undefined ? o.back : D.activeElement, onClose: o.onClose || null, nav: nav };
     dlg.addEventListener("close", function(){ if (V && V.dlg === dlg) shut(); });   /* only this window: on a tour the next one may be open already */
+    /* nothing on the stage moves while something in the window scrolls (scroll events don't bubble: caught on the way down) */
+    dlg.addEventListener("scroll", function(){
+      if (!V || V.dlg !== dlg) return;
+      if (!V.scrolling) { V.scrolling = true; stageRest(true); }
+      clearTimeout(V.scT); V.scT = setTimeout(function(){ if (V && V.dlg === dlg) { V.scrolling = false; stageLife(); } }, 260);
+    }, { capture: true, passive: true });
+    $(".tpv-stage", dlg).addEventListener("mouseenter", function(){ stageLife(); });
     dlg.addEventListener("cancel", function(e){ if (!$(".tpv-over", dlg).hidden) { e.preventDefault(); overClose(); } });
     dlg.addEventListener("click", function(e){ if (e.target === dlg) close(); });
     $('[data-tp="close"]', dlg).addEventListener("click", close);
@@ -411,13 +442,26 @@
     clearTimeout(v.navT);
     if (v.onClose) v.onClose(v.nav ? v.nav.at : undefined);   /* a tour says which place it ended at, for the focus */
   }
+  /* The stage's life (2026-11-14, Sam: "scrolling and things are kind of sluggish and jittery"). What moves on the stage
+     is drawn again on every frame, which a phone can't do while it also scrolls a list. So the stage holds still
+     while anything in the window scrolls, and in Customize it moves for a few seconds after each change (and under a
+     mouse), then rests. In Visit it is the show and keeps moving. */
+  function stageRest(on){ var h = V && $(".tpv-stage", V.dlg); if (h) h.classList.toggle("is-rest", !!on); }
+  function stageLife(){
+    if (!V) return;
+    clearTimeout(V.restT);
+    if (V.scrolling) { stageRest(true); return; }
+    stageRest(false);
+    if (V.mode === "customize") V.restT = setTimeout(function(){ stageRest(true); }, 5000);
+  }
   function setMode(mode){
     if (!V || (mode === "customize" && !canChange())) return;
     V.mode = mode;
     if (mode !== "customize") { build(); return; }
     /* the drawer shows everything owned, and the rank pieces still to earn: fetch those sets' drawings first */
     V.loading = true; build();
-    needPacks(Object.keys(S.own).concat(S.locked.map(function(x){ return x.id; }))).then(function(){ if (V) { V.loading = false; build(); } });
+    var done = function(){ if (V) { V.loading = false; build(); } };
+    Promise.all([needPacks(Object.keys(S.own).concat(S.locked.map(function(x){ return x.id; }))), shopArt()]).then(done, done);
   }
 
   /* the camera: in Customize the view moves in on what's being changed (the home, a yard spot, Timmy), and back out for
@@ -502,6 +546,7 @@
     if (opt.say) say(opt.say);
     else if (opt.hello && !custom) say(m.visiting ? "Hi! Welcome. Have a look around." : hpLine(H.hello[0]));
     wanderOn();
+    stageLife();
   }
 
   /* ---------- Timmy on the stage: the bubble, the hops, the wave, the flip, the wandering (the reference is the design
@@ -793,26 +838,55 @@
         : V.nav && V.nav.list.length > 1 ? '<p class="tpv-gnav">Place ' + (V.nav.at + 1) + " of " + V.nav.list.length + " on the board<span>Next: " + esc(V.nav.list[navStep(V.nav, 1)].name) + "</span></p>" : "") + "</div>";
     var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
   }
+  /* your own place's panel (Sam, 2026-11-14: "way more epic and better buttons/ui"): Timmy as he is today with his
+     health on a meter, your rank drawn big on its plate, the hub medals, and two big buttons: Customize and the shop */
+  function hostCard(el, m, H){
+    var R = W.shRanks, r = rankOf(m), fl = flairOf(m).sort(function(a, b){ return b.lvl - a.lvl; }), hp = hpOf(m), big = "", face = "";
+    try { if (R) big = r.journey > 0 && R.artOf ? R.artOf(r.journey, r.tier, 96, { level: r.level, animate: !reduced }) : R.art(r.tier, 96, { level: r.level, animate: !reduced }); } catch (e) { big = ""; }
+    try { var ts = timmySvg(m); face = ts ? img(ts, "") : ""; } catch (e) { face = ""; }
+    var medal = function(x){ try { return R && R.medal ? R.medal(x.lvl, 44, x.hub) : ""; } catch (e) { return ""; } };
+    var hub = function(h){ try { return R && R.hubName ? R.hubName(h) : h; } catch (e) { return h; } };
+    var lvl = hp >= 70 ? "good" : hp >= 40 ? "fair" : hp >= 12 ? "low" : "out", can = canChange();
+    el.innerHTML = '<div class="tpv-host">' +
+      '<div class="tpv-me is-' + lvl + '">' + (face ? '<span class="tpv-meface" aria-hidden="true">' + face + "</span>" : "") +
+        '<div class="tpv-mebody"><p class="tpv-gk">Timmy today</p><p class="tpv-hp"><b>' + esc(H.n) + '</b><span class="num">' + hp + " HP</span></p>" +
+        '<div class="tpv-meter" aria-hidden="true"><i style="width:' + hp + '%"></i></div><p class="tpv-medoes">' + esc(H.does) + ".</p></div></div>" +
+      (can ? '<div class="tpv-cta"><button type="button" class="tpv-btn tpv-gold tpv-big" data-tp="customize2">' + ICON.brush + '<span>Customize</span></button>' +
+        '<button type="button" class="tpv-btn tpv-big" data-tp="shop" aria-label="Timmy’s shop">' + ICON.bag + "<span>Shop</span></button></div>" : "") +
+      '<div class="tpv-gplate">' + (big ? '<div class="tpv-grank" aria-hidden="true">' + big + "</div>" : "") + '<p class="tpv-gk">Your rank</p><p class="tpv-gr">' + esc(rankName(m)) + "</p></div>" +
+      '<div class="tpv-gmedals"><p class="tpv-gk">Hub mastery</p>' + (fl.length
+        ? '<ul class="tpv-gml">' + fl.slice(0, 8).map(function(x){ var n = hub(x.hub); return '<li title="' + esc(n) + '"><span aria-hidden="true">' + medal(x) + '</span><span class="tpv-gmn">' + esc(n) + "</span></li>"; }).join("") + "</ul>" +
+          '<div class="tpv-row"><button type="button" class="tpv-btn" data-tp="mastery">' + ICON.medal + "<span>See the medals</span></button></div>"
+        : '<p class="tpv-gnone">No hub medals yet: your first one hangs on the board by the house.</p>') + "</div>" +
+      '<p class="tpv-gtip">Tap Timmy and he waves; tap him again while he’s waving. The sun, the house and the things in the yard each do something too.</p></div>';
+    var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
+    var cb = $('[data-tp="customize2"]', el); if (cb) cb.addEventListener("click", function(){ setMode("customize"); });
+    var sb = $('[data-tp="shop"]', el); if (sb) sb.addEventListener("click", toShop);
+  }
+  /* the customizer's cards sit in their rarity's frame, the shop's own card art (widget/hub-art/shop.js, SH_SHOP_ART.frame;
+     Sam, 2026-11-14: "the things you have should reuse the rarity art instead of just having 'legendary' in yellow").
+     Fetched the first time Customize opens; without it the cards are plain, with the rarity as a tag */
+  var SA = null, FRAMES = {};
+  function shopArt(){
+    if (SA || memo.shopArt === 0) return Promise.resolve(SA);
+    return script(BASE + "hub-art/shop.js").then(function(){ SA = W.SH_SHOP_ART && W.SH_SHOP_ART.frame ? W.SH_SHOP_ART : null; if (!SA) memo.shopArt = 0; return SA; }, function(){ memo.shopArt = 0; return null; });
+  }
+  function rarOf(r){ r = String(r || "common").toLowerCase(); return r.charAt(0).toUpperCase() + r.slice(1); }
+  function rframe(r){
+    if (!SA) return "";
+    /* the frames hold still here (in the shop they move): a drawer has dozens of them, each an image, and an image
+       that moves inside is drawn again on every frame, which made the list jitter as it scrolled (2026-11-14) */
+    var key = rarOf(r);
+    if (!FRAMES[key]) FRAMES[key] = img(SA.frame(key), "", "tpv-rframe");
+    return FRAMES[key];
+  }
   function rarTag(r){ return '<i class="tpv-rar r-' + String(r || "free").toLowerCase() + '">' + esc(r || "Default") + "</i>"; }
   function owned(x){ return !x.id || !!S.own[x.id]; }
   function howTag(x){ var how = x.id ? S.own[x.id] : ""; return how === "gift" ? "A gift" : how === "rank" ? (x.rankName || "Rank") + " rank" : ""; }
   function side(o){
     var el = $(".tpv-side", V.dlg), m = V.m, H = HL();
     if (V.mode !== "customize" && m.visiting) { guestCard(el, m); return; }
-    if (V.mode !== "customize") {
-      var fl = flairOf(m), r = rankOf(m);
-      el.innerHTML = '<div class="tpv-visit">' +
-        (m.visiting ? '<p class="tpv-lede">You’re visiting. Tap Timmy and the things around the place.</p>'
-          : '<p class="tpv-hp"><b>' + esc(H.n) + '</b><span class="num">' + hpOf(m) + ' HP</span></p><p class="tpv-note">' + esc(H.does) + ".</p>") +
-        '<dl class="tpv-facts"><div><dt>Rank</dt><dd>' + esc(rankName(m)) + "</dd></div><div><dt>Hub medals</dt><dd>" + (fl.length ? fl.length + " on the board" : "None yet") + "</dd></div></dl>" +
-        '<div class="tpv-row">' + (fl.length ? '<button type="button" class="tpv-btn" data-tp="mastery">See the medals</button>' : "") +
-        (canChange() ? '<button type="button" class="tpv-btn tpv-primary" data-tp="customize2">Customize</button>' : "") + "</div>" +
-        (m.visiting ? "" : '<p class="tpv-note">Tap Timmy and he waves; tap him again while he’s waving. The sun, the house and the things in the yard each do something too.</p>') + "</div>";
-      void r;
-      var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
-      var cb = $('[data-tp="customize2"]', el); if (cb) cb.addEventListener("click", function(){ setMode("customize"); });
-      return;
-    }
+    if (V.mode !== "customize") { hostCard(el, m, H); return; }
     if (V.loading) { el.innerHTML = '<p class="tpv-note" role="status">Getting Timmy’s things out…</p>'; return; }
     var pick = V.pick, h = byK(TP.HOMES, o.home), lane = !!(o.yard.side && byK(TP.YARD, o.yard.side).wide), e = S.eq;
     if (pick === "corner" && lane) pick = V.pick = "side";
@@ -837,17 +911,27 @@
     V.src[kind] = src; V.srcFor = pick + ":" + curK;
     var tabs = groups.length < 2 ? "" : '<div class="tpv-seg tpv-tabs" role="group" aria-label="Which pieces">' + groups.map(function(g){ return '<button type="button" data-tp="src-' + g[0] + '" data-src="' + g[0] + '" aria-pressed="' + (g[0] === src) + '">' + g[1] + ' <span class="num">' + (g[2].length + (g[0] === "rank" ? lockedOf.length : 0)) + "</span></button>"; }).join("") + "</div>";
     var pic = function(x){ return kind === "outfit" ? thumb("outfit", x.k) : kind === "scene" ? thumb("scene", x.k) : thumb(kind, x.k, { scene: o.scene }); };
-    var cardOf = function(x, on, tag){ return '<button type="button" class="tpv-card' + (on ? " on" : "") + '" data-tp="piece" data-item="' + esc(x.id || "") + '" aria-pressed="' + !!on + '"><span class="tpv-cpic">' + pic(x) + '</span><span class="tpv-cname">' + esc(cardName(x.n)) + "</span>" + (tag || rarTag(x.rarity)) + (howTag(x) ? '<span class="tpv-how">' + esc(howTag(x)) + "</span>" : "") + "</button>"; };
-    var lockCard = function(q){ return '<span class="tpv-card is-locked"><span class="tpv-cpic">' + (byK(all, q.x.k) ? pic(q.x) : "") + '</span><span class="tpv-cname">' + esc(cardName(q.x.n)) + '</span><span class="tpv-how">Reach ' + esc(RANKS[q.tier] || "the next rank") + "</span></span>"; };
+    var SEP = '<span class="tpv-sr">, </span>', framed = !!SA, kc = kind === "scene" ? " k-scene" : "";
+    var face = function(r, picHtml, name, tag, how){ return rframe(r) + '<span class="tpv-cpic' + kc + '">' + picHtml + '</span><span class="tpv-ctext"><span class="tpv-cname">' + esc(name) + "</span>" + SEP + '<span class="tpv-cmeta">' + tag + "</span></span>" +
+      (how ? SEP + '<span class="tpv-how">' + esc(how) + "</span>" : ""); };
+    var cardOf = function(x, on, tag){
+      if (framed) return '<button type="button" class="tpv-card is-framed' + (on ? " on" : "") + '" data-tp="piece" data-item="' + esc(x.id || "") + '" aria-pressed="' + !!on + '">' + face(x.rarity, pic(x), cardName(x.n), tag || rarTag(x.rarity), howTag(x)) + "</button>";
+      return '<button type="button" class="tpv-card' + (on ? " on" : "") + '" data-tp="piece" data-item="' + esc(x.id || "") + '" aria-pressed="' + !!on + '"><span class="tpv-cpic">' + pic(x) + '</span><span class="tpv-cname">' + esc(cardName(x.n)) + "</span>" + (tag || rarTag(x.rarity)) + (howTag(x) ? '<span class="tpv-how">' + esc(howTag(x)) + "</span>" : "") + "</button>"; };
+    var lockCard = function(q){
+      if (framed) return '<span class="tpv-card is-framed is-locked">' + face(q.x.rarity, byK(all, q.x.k) ? pic(q.x) : "", cardName(q.x.n), q.x.rarity ? rarTag(q.x.rarity) : "", "Reach " + (RANKS[q.tier] || "the next rank")) + "</span>";
+      return '<span class="tpv-card is-locked"><span class="tpv-cpic">' + (byK(all, q.x.k) ? pic(q.x) : "") + '</span><span class="tpv-cname">' + esc(cardName(q.x.n)) + '</span><span class="tpv-how">Reach ' + esc(RANKS[q.tier] || "the next rank") + "</span></span>"; };
+    var bare = function(){ var on = !curK;
+      if (framed) return '<button type="button" class="tpv-card is-framed' + (on ? " on" : "") + '" data-tp="piece" data-item="" aria-pressed="' + on + '">' + face("", thumb("outfit", ""), "Just Timmy", rarTag(""), "") + "</button>";
+      return '<button type="button" class="tpv-card' + (on ? " on" : "") + '" data-tp="piece" data-item="" aria-pressed="' + on + '"><span class="tpv-cpic">' + thumb("outfit", "") + '</span><span class="tpv-cname">Just Timmy</span>' + rarTag("") + "</button>"; };
     var shown = (groups.filter(function(g){ return g[0] === src; })[0] || groups[0])[2], cards;
     if (src === "sets") cards = (TP.SETS ? TP.SETS.seasons : []).map(function(se){ var got = shown.filter(function(x){ return x.set === se.k; }); return got.length ? '<h4 class="tpv-seth">' + esc(se.n) + '</h4><div class="tpv-cards">' + got.map(function(x){ return cardOf(x, x.k === curK); }).join("") + "</div>" : ""; }).join("");
     else cards = '<div class="tpv-cards">' +
-      (src === "classic" && kind === "outfit" ? '<button type="button" class="tpv-card' + (curK ? "" : " on") + '" data-tp="piece" data-item="" aria-pressed="' + !curK + '"><span class="tpv-cpic">' + thumb("outfit", "") + '</span><span class="tpv-cname">Just Timmy</span>' + rarTag("") + "</button>" : "") +
+      (src === "classic" && kind === "outfit" ? bare() : "") +
       shown.map(function(x){ return cardOf(x, x.k === curK); }).join("") + (src === "rank" ? lockedOf.map(lockCard).join("") : "") + "</div>" +
       (src === "rank" ? '<p class="tpv-note">Rank pieces are earned, never sold: an outfit and a yard piece at every full rank-up.</p>' : "");
     var head = sl ? [sl.n, cur ? "Here now: " + lowerFirst(cur.n) + "." : "Nothing here yet. Pick something for it."]
       : [DRAWER[pick][0], pick === "timmy" ? (cur ? "Wearing " + lowerFirst(cur.n) + "." : DRAWER.timmy[1]) : (cur ? "Now: " + lowerFirst(cur.n) + ". " : "") + DRAWER[pick][1]];
-    var body = '<div class="tpv-dhead"><div><h3>' + esc(head[0]) + "</h3><p>" + esc(head[1]) + "</p></div>" + (sl && cur ? '<button type="button" class="tpv-btn" data-tp="clear" data-item="">Clear this spot</button>' : "") + "</div>" + tabs + '<div class="tpv-dcards">' + cards + "</div>";
+    var body = '<div class="tpv-dhead"><div><h3>' + esc(head[0]) + "</h3><p>" + esc(head[1]) + "</p></div>" + (sl && cur ? '<button type="button" class="tpv-btn" data-tp="clear" data-item="">Clear this spot</button>' : "") + "</div>" + tabs + '<div class="tpv-dcards' + (framed ? " is-framed" : "") + '">' + cards + "</div>";
     if (kind === "home") {
       var ups = TP.UPGRADES.filter(function(u){ return h.ups.indexOf(u.k) >= 0 && S.own[u.id]; }), paints = h.ups.indexOf("paint") < 0 ? [] : TP.PAINTS.filter(function(p){ return !p.id || S.own[p.id]; });
       if (ups.length) body += '<div class="tpv-extra"><h4>Upgrades for ' + esc(lowerFirst(h.n)) + '</h4><div class="tpv-opts">' + ups.map(function(u){
@@ -857,7 +941,8 @@
         return '<button type="button" class="tpv-swatch' + (o.paint === p.k ? " on" : "") + '" data-tp="paint" data-paint="' + p.k + '" aria-pressed="' + (o.paint === p.k) + '" aria-label="' + esc(nm) + '" title="' + esc(nm) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div></div>";
     }
     if (kind === "yard" && (pick === "side" || pick === "corner") && mineOf.some(function(y){ return y.wide; })) body += '<p class="tpv-note">The bowling lane is long: it takes the side yard and the front corner together.</p>';
-    body += '<div class="tpv-row tpv-foot"><button type="button" class="tpv-btn" data-tp="surprise">Surprise me</button><button type="button" class="tpv-btn" data-tp="shop">Get more in the shop</button></div>';
+    body += '<div class="tpv-row tpv-foot"><button type="button" class="tpv-btn" data-tp="surprise">' + ICON.dice + '<span>Surprise me</span></button><button type="button" class="tpv-btn" data-tp="shop" aria-label="Get more in the shop">' + ICON.bag + "<span>Shop</span></button>" +
+      '<button type="button" class="tpv-btn tpv-gold tpv-done" data-tp="done">' + ICON.check + "<span>Done</span></button></div>";
     var keep = $(".tpv-dcards", el), top = keep && V.kept === kind + src ? keep.scrollTop : 0; V.kept = kind + src;
     el.innerHTML = dock + '<div class="tpv-drawer d-' + kind + '">' + body + "</div>";
     if (top) $(".tpv-dcards", el).scrollTop = top;
@@ -878,6 +963,7 @@
     $$("[data-paint]", el).forEach(function(b){ b.addEventListener("click", function(){ var p = byK(TP.PAINTS, b.dataset.paint); equip("paint", p.id || null, {}); }); });
     var su = $('[data-tp="surprise"]', el); if (su) su.addEventListener("click", surprise);
     var sh = $('[data-tp="shop"]', el); if (sh) sh.addEventListener("click", toShop);
+    var dn = $('[data-tp="done"]', el); if (dn) dn.addEventListener("click", function(){ setMode("play"); var n = V && $('[data-tp="customize2"]', V.dlg); if (n) n.focus(); });
   }
   /* Timmy's shop (widget/shop.js, phase 4 part B), fetched the first time it's wanted; it opens over the place, and what
      you buy there is handed back here (setup({ shop }) and repaint()) */

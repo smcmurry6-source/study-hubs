@@ -12,17 +12,23 @@ not comprehensive: L6 on, building on the midterm)**. The hub now leans to the f
 **L9 `nccl`, Noncarious Cervical Lesions, Dr. Lawson's** (prerecorded for the 11/12 session; added 2026-11-10) and
 **L10 `occtrauma`, Occlusion and the Periodontium: Occlusal Trauma, Dr. Abou-Arraj's** (the first hour of the 11/12
 session; added 2026-11-12). L10 is the last lecture on the final (Sam, 2026-11-12: "the last occlusion materials").
-Dates and check-in hours: `HUBS` in `index.html`.
+Dates and check-in hours: its entry in `hubs.js`.
 
 ## Before you work on it
 
-- **Source:** `hubs/occlusion/index.html` (single file), except the generated blocks below.
+- **On the engine since the redesign's release** (2026-11): the page, `hubs/occlusion/index.html`, is settings only
+  (`window.SH_HUB`), and **the source is `hubs/occlusion/content/`**: `core.json` (lectures, exam info, dates, predicted
+  topics, the mock, the podcast, the cases), `questions.json`, `notes.json`, `study.json` (hints, cram, the Side by side
+  tables, sort sets), `arcade.js/css`, and `figures.js/css` (built, below). Edit the JSON, then
+  `node tools/hub-next/build.mjs --hub occlusion`; after a merge that changed questions, load the hub's answer keys
+  ([build-a-hub](../how-to/build-a-hub.md)). The old single-file page's names in this note (`LECTURES`, `MOCK_BLUEPRINT`,
+  `EXAM_INFO`, `two()`, `whyHTML`...) are history: the same data is now in the JSON (`lectures`, `mock.blueprint`,
+  `examInfo`, a question's `fmt` and `why`).
 - **Lectures:** L1-L5 carry `exam:'midterm'`, L6 `instruments`, L7 `malocclusion`, L8 `dentures`, L9 `nccl` and L10
   `occtrauma` carry `exam:'final'`.
-  **Each new final lecture:** add it with `exam:'final'`, add it to `MOCK_BLUEPRINT`, and update `EXAM_INFO`, `COURSE_DATES`,
-  the hints banner, the mock intro, the Home notice ("New: ..."), the dashboard card and the same words in
-  `next/index.html`'s `SH_HUB`. All ten tag colors are in use (L9 is `slate`, added 2026-11-10; L10 is `plum`, added
-  2026-11-12): another lecture would need a new one in the tag CSS (light and both dark blocks). The mock stays at 45
+  **Each new final lecture:** add it to `core.json`'s `lectures` with `"exam": "final"`, add it to `mock.blueprint`, and
+  update `examInfo`, `courseDates`, the words in the page's `SH_HUB` (the hints banner, the mock's blurb, the Home notice
+  "New: ...") and the hub's words in `hubs.js`. The engine gives each lecture its color by its place in the list. The mock stays at 45
   questions, 80 s each (the midterm's pace), split over the final's lectures until the format is announced: 9 each from
   L6-L10 (2026-11-12; 12/12/12/9 with four, 15 each with three).
 - **No fact more than twice** (Sam, 2026-11-10, [decisions](../decisions.md)): a concept may be asked two ways, not for every
@@ -77,8 +83,9 @@ Dates and check-in hours: `HUBS` in `index.html`.
   11/12 lecture: [task](../tasks/done/2026-11-10-occlusion-l9-follow-ups.md).
 - **Figures and the cusp game** come from `tools/figures/occlusion/`: `od.js` (the kit, the contact map, `CASE_IMG`
   and **`FIG_PLACE`**, which lives in the generated block: edit it in `od.js`, never in the hub), `game.js`, `cases.js`,
-  and the anima figures in `anima/*.mjs`. `node tools/figures/occlusion/build.mjs` pastes them between the hub's
-  `od:kit`/`od:css` and `anima:js`/`anima:css` markers; `--check` fails if they're stale; `--preview` writes pages.
+  and the anima figures in `anima/*.mjs`. `node tools/figures/occlusion/build.mjs` writes them to
+  `hubs/occlusion/content/figures.js` and `figures.css` (figure text raised to the engine's 11 px floor); `--check`
+  fails if they're stale; `--preview` writes pages.
   - Controls of a figure inside the notes must not use `data-go`, `data-view`, `data-tab`, `data-sub`, `data-mode`,
     `data-lec` or `data-group` (the notes and the widget read those).
   - The anima kit sets `vector-effect:non-scaling-stroke`; a path drawn with `stroke-dasharray` needs `vector-effect:none`.
@@ -137,35 +144,31 @@ Dates and check-in hours: `HUBS` in `index.html`.
   and calls `narrate.spoken()` / `narrate.render()` (spoken "1/16" as "one sixteenth", "11/5" as "November fifth").
   L9 the same way ("11/12" as "November twelfth", "lower-RDA" as "lower RDA"); the lexicon gained NCCLs, Dzakovich,
   chelator, exostoses, tori, subgingivally and CEJ for it.
-  L10 and L9's slide fixes (2026-11-12) were recorded straight from `next/content/notes.json`
-  (`python3 tools/narrate.py hubs/occlusion/next/content/notes.json --lec <id> --level full|plain|hy --force`); the
+  L10 and L9's slide fixes (2026-11-12) were recorded straight from the content's `notes.json`
+  (now `python3 tools/narrate.py occlusion --lec <id> --level full|plain|hy --force`); the
   lexicon gained Abou-Arraj, Waerhaug, supraperiosteal, suprabony, furcation and a few more for L10.
-  **High yield** (the redesign's third level) is narrated too, since 2026-11-12: `audio/<lecture>-hy.mp3` for the five final
-  lectures, made from `next/content/notes.json`. It changes whenever a final lecture's notes, predicted topics, hints or
+  **High yield** (the third level) is narrated too, since 2026-11-12: `audio/<lecture>-hy.mp3` for the five final
+  lectures, made from `content/notes.json`. It changes whenever a final lecture's notes, predicted topics, hints or
   questions do, so a question edit there can mean recording that lecture's High yield again in the same PR: the smoke lint
   says which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)).
 - **Timmy Time:** the midterm episode (`tools/podcast/occlusion/script.md`); there is no final episode yet.
 - **Arcade:** the Freeway Space Arcade, skin `OCCL_SKIN`. Lab Escape is a painted backdrop (`img/lab-escape.webp`) with
   hotspots measured onto it: a new backdrop means re-measuring every `api.spot()`.
 
-## The new version (the redesign, not live yet)
+## On the engine (since the redesign's release)
 
-`hubs/occlusion/next/` is the redesigned Occlusion, built beside this one ([phase 1](../tasks/done/2026-11-05-redesign-phase-1-hub-engine.md))
-and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Until then **edit content in the live file only**:
-- `node tools/hub-next/build.mjs` rewrites `next/content/` from `hubs/occlusion/index.html` (its `LECTURES`, `QUESTIONS`,
-  `QUESTION_WHY`, `READINGS`, hints, cram, review tables, `PCASES`, the generated figure and arcade blocks). Run it after any
-  change to the live hub and commit the JSON; CI's "generated files are current" step fails when it's stale.
-- The page itself (`next/index.html`) is settings only: `window.SH_HUB` holds the words the live hub writes in its own code
-  (the Home exam card, the hints banner, the mock's blurb, the arcade's games and which one is up front). When one of those
-  changes in the live hub (the final's format, a new lecture's dates), change it there too.
+Built as `hubs/occlusion/next/` beside the old page ([phase 1](../tasks/done/2026-11-05-redesign-phase-1-hub-engine.md))
+and moved to `hubs/occlusion/` at the [release](../tasks/2026-11-06-redesign-release.md), when the old single-file page
+went (git keeps it: the commit before the release's merge).
+- `window.SH_HUB` in the page holds the hub's own words (the Home exam card, the hints banner, the mock's blurb, the
+  arcade's games and which one is up front). When the final's format or a lecture's dates change, change them there.
+- It is in `sw.js`'s `HUBS`, so its page, art and content are precached; a content edit shows on the page load after the
+  one that fetched it.
 - Its art (tint `#2747a3`, emblem, masthead, medals) is `widget/hub-art/occlusion.js`, built by
   `node tools/figures/site/build.mjs` from `tools/figures/site/`.
-- The build raises the figures' 9-10.5 px text to 11 px (the redesign's floor); the live hub keeps its sizes.
-- Narration and the podcast are the live hub's files (`audio/`), loaded from `../audio/`.
-- The "which statement" formats (2026-11-10) reach `next/content/` through the build, and their choices shuffle
-  there too; the new engine's type filter lists them (since phase 2's Heme & Endo Exam 2, 2026-11-11).
-- Test it only through the preview (`node tools/preview/serve.js`, then `/hubs/occlusion/next/`): opened any other way,
-  the page sends you to the live hub, and a plain static server would reach the class's data.
+- Narration and the podcast are in `audio/`.
+- Test it through the preview (`node tools/preview/serve.js`, then `/hubs/occlusion/`) or a scripted browser with the
+  class's data stubbed: a plain static server would reach the class's data.
 - `SH_HUB.home.prof` and `SH_HUB.hints.prof` say "the professors" and `SH_HUB.hints.words` "In the professors' words"
   (2026-11-12, as on Heme & Endo Exam 2 and Perio), since L9's hints are Dr. Lawson's and L10's Dr. Abou-Arraj's.
 - Since 2026-11-11 (Sam's look at Heme & Endo Exam 2's new version: "more color"), **each lecture has its own color** here too,

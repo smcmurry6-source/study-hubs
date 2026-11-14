@@ -6,7 +6,8 @@ tags: [shipping, ci]
 # Verify before pushing
 
 GitHub Actions runs `.github/workflows/check.yml` on every PR: `node tools/ci/syntax.js`
-(every inline script parses, no conflict markers), `node tools/ci/vault.js` (vault links resolve, task notes and
+(every inline script parses, no conflict markers, and the service worker's precache list names files that exist and
+every live hub on the engine), `node tools/ci/vault.js` (vault links resolve, task notes and
 rule notes in order; see [repo-is-the-vault](../rules/repo-is-the-vault.md)) and `node tools/ci/smoke.js` (headless click-through
 of the dashboard and, since 2026-11-06, only the hubs your change touches: every hub when a shared file changes
 (`widget/`, the dashboard, `sw.js`, assets, a workflow, the test itself), on `main`, or with `--all`; notes, tools, SQL
@@ -25,7 +26,7 @@ weekly retention job's deletes on the same kind of copy: the hourly totals, devi
 shop and the idea board; all four database suites apply `supabase/pending-migrations.txt` on top of the schema), `node tools/ci/archive.js` (the hub archive
 rules against the old date logic), `node tools/ci/size.js` (the published site against GitHub Pages' 1 GB limit: warns
 from 750 MB, fails from 900 MB, and lists the hubs still carrying audio; [archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)), `node tools/ci/preview.js` (the preview never reaches production; needs Playwright) and
-`node tools/ci/cases.js` (every drawn Patient Box case has realistic numbers that agree with its key,
+`node tools/ci/cases.js` (every drawn Patient Box case, in an engine hub's `core.json` or an old hub's page, has realistic numbers that agree with its key,
 [how-to](draw-a-patient-box-case.md)), and
 a second workflow, "Release tests", runs accessibility, performance and the device matrix when a PR changes shared code
 (the dashboard, `widget/`, the service worker, the admin page, the database...) or has the `full-tests` label (since
@@ -34,9 +35,13 @@ a second workflow, "Release tests", runs accessibility, performance and the devi
 parallel jobs since 2026-11-13, each read as one result (`check`, `release`), and on a PR both keep an earlier green
 result when only notes changed since it (`tools/ci/reuse.js`; `node tools/ci/reuse.js --diff <sha>` says whether a
 change would). Run them locally before pushing; the smoke test needs Playwright
-(`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub's
-data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line at the end of each hub script.
+(`PLAYWRIGHT_PATH`/`CHROMIUM_PATH` env vars point it at a preinstalled copy). The lint reads a hub on the engine from
+its content JSON (`hubs/<hub>/content/`), and an old single-file hub by injecting a hook just before
+`window.SH_EXPORT = {`, so that line stays at the end of each old hub's script.
 
+- After changing a hub's content (`hubs/<hub>/content/*.json`): `node tools/hub-next/build.mjs`, and commit what it
+  rewrites (the question index, High yield, the layout). After changing the About page: `node tools/timmy/build.mjs`
+  (Ask Timmy's site help). "Check hubs" runs both with `--check`, with the site art's and the figure builds'.
 - After changing a file in `widget/` that `tools/bundle/bundles.json` lists: `node tools/bundle/build.mjs`, and commit
   the rebuilt `widget/*.bundle.*` with it ([bundles](../reference/bundles.md)). "Check hubs" runs
   `node tools/bundle/build.mjs --check` with the other generated-file checks and fails on a stale bundle.
@@ -46,8 +51,9 @@ data by injecting a hook just before `window.SH_EXPORT = {`, so keep that line a
 - Conflict markers: search line-anchored (`^<<<<<<<`, `^=======$`, `^>>>>>>>`) —
   the hubs' CSS uses long `====` comment dividers.
 - If both `widget/v3.js` and `widget/v3.css` changed, make sure both are committed.
-- Smoke test with Playwright against the file (`file://.../hubs/<id>/index.html`),
-  clicking through each mode tab. The Supabase-backed widget parts only work live.
+- Look at the page in a scripted browser with the class's data stubbed (the way `tools/ci/smoke.js` and
+  `node tools/preview/serve.js` do it), clicking through Home, Notes, Questions and More. Never use the plain page as a
+  test account: it saves to the class's real data.
 - If CI's runner can't reach Ubuntu's package mirror, both workflows install the test browsers without their system
   packages and say so in a warning on the run's page (2026-11-11). A "Check hubs" that still fails at "Install headless
   Chromium" is the browser download itself: re-run it once, then say so in the PR.

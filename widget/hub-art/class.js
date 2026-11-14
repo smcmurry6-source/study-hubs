@@ -188,10 +188,12 @@ window.SH_CLASS_ART = {
     2: "M-13 -8 C-13 -16 -5 -20 1 -20 C9 -20 14 -15 14 -8 C14 0 7 6 -1 13 H14 V20 H-13 V14 C-4 6 5 -1 5 -8 C5 -11.6 3 -13 1 -13 C-2 -13 -4.4 -11 -4.4 -8 Z",
     3: "M-12 -14 C-9 -18 -4 -20 1 -20 C9 -20 13 -15.4 13 -10 C13 -5 10 -2 6 -1 C11 0 14 4 14 9 C14 16 8 20 0 20 C-6 20 -11 17 -13 13 L-7 8 C-5 11 -3 13 0 13 C4 13 6 11 6 8 C6 4 3 3 -3 3 V-4 C2 -4 5 -6 5 -9 C5 -12 3 -13 0 -13 C-3 -13 -5 -12 -7 -9 Z"
   };
-  /* a laurel branch curving up from the origin (mirror it for the other side) */
+  /* a laurel branch curving out and up from the origin (mirror it for the other side). Its leaves lie along the
+     branch, tips away from the middle, so a wreath of two leaves the numeral inside it clear (Sam, 2026-11-13: the
+     wreath covered the 1). */
   function laurel(col, shade){
-    var s = L("M0 0 C-14 -4 -22 -18 -20 -34", 1.6, shade);
-    [[-6, -2, -40], [-13, -8, -60], [-18, -16, -78], [-20.6, -25, -96], [-20, -33, -118]].forEach(function(q){
+    var s = L("M-3 0 C-19 -1 -29 -15 -27 -37", 1.6, shade);
+    [[-8, -.6, -176], [-16.5, -4.6, -150], [-23, -12.4, -126], [-26.8, -22.4, -106], [-27.4, -32.6, -90]].forEach(function(q){
       s += '<g transform="translate(' + q[0] + " " + q[1] + ") rotate(" + q[2] + ')">' + P("M0 0 C3 -4 9 -4 12 0 C9 4 3 4 0 0 Z", col, 1.1) + "</g>";
     });
     return s;
@@ -212,8 +214,10 @@ window.SH_CLASS_ART = {
     s += P("M" + f(x - 6) + " " + f(-h) + " H" + f(-x + 6) + " V" + f(-h + 10) + " H" + f(x - 6) + " Z", m.top);                   // the top slab
     s += L("M" + f(x) + " " + f(-h + 3.4) + " H" + f(-x - 14), 2, "#fff", .7);
     var cy = -10 - (h - 20) / 2, k = Math.min(1, (h - 26) / 44, w / 110);
+    /* the wreath first, round the numeral and behind it */
+    var kw = Math.min(1, (h - 30) / 50);
+    if (h > 60) s += G(0, cy + 22 * kw, kw, laurel(m.top, m.mark)) + '<g transform="translate(0 ' + f(cy + 22 * kw) + ") scale(" + f(-kw) + " " + f(kw) + ')">' + laurel(m.top, m.mark) + "</g>";
     s += G(0, cy, k, P(NUM[place], m.mark, 2) + L("M-3 -14 l5 -4", 1.8, "#fff", .5));
-    if (h > 60) s += G(-2, cy + 20 * k, k, laurel(m.top, m.mark)) + '<g transform="translate(2 ' + f(cy + 20 * k) + ") scale(" + (-k) + " " + k + ')">' + laurel(m.top, m.mark) + "</g>";
     return s;
   }
   /* a torch on a stand: the page puts the flame on top (its foot at y -h) */

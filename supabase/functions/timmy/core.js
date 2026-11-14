@@ -175,7 +175,7 @@ function serialize(n){
 export const safe = s => clean(s).replace(/<(?=[A-Za-z\/!?])/g, "< ");
 const esc = s => String(s).replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/* data = { core, notes, study } as published in hubs/<id>/next/content/. prefix: "" on a hub, "<hub>:" on the dashboard. */
+/* data = { core, notes, study } as published in hubs/<id>/content/. prefix: "" on a hub, "<hub>:" on the dashboard. */
 export function buildCorpus(hub, data, prefix){
   prefix = prefix || "";
   const core = data.core || {}, notes = (data.notes || {}).full || {}, study = data.study || {};

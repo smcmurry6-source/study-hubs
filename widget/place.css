@@ -7,112 +7,258 @@
   font: inherit; text-align: left; line-height: 0; overflow: hidden; cursor: pointer; }
 .tpc img { display: block; width: 100%; height: auto; }
 .tpc:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
+.tpc .tpc-live { position: absolute; left: 0; top: 0; display: block; width: 100%; }
+.tpc .tpc-live.is-rest { display: none; }
 .tpc-foot { position: absolute; left: 8px; bottom: 8px; display: grid; gap: 1px; max-width: calc(100% - 16px); padding: 6px 12px; border-radius: var(--r-row);
   background: var(--ground); color: var(--text); font-size: var(--fs-meta); line-height: 1.3; box-shadow: var(--float-shadow); }
 .tpc-foot b { font-weight: var(--w-head); }
 .tpc-foot span { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-@media (hover: hover) { .tpc img { transition: transform var(--t-ui) var(--ease-out); } .tpc:hover img { transform: scale(1.02); } }
+@media (hover: hover) { .tpc img, .tpc .tpc-live { transition: transform var(--t-ui) var(--ease-out); } .tpc:hover img, .tpc:hover .tpc-live { transform: scale(1.02); } }
 
-/* ---------- the full view: one dialog, the stage and the panel beside it ---------- */
+/* ---------- the full view: one dialog, a theater in both themes (the leaderboard's arena, widget/dash.css). A marquee
+   of bulbs under the name, the stage in a gold frame under two spotlights, and the panel beside it. Your own place and
+   a visit share the look (Sam, 2026-11-14: "way more epic and better buttons/ui"); a visit adds the trip through the
+   clouds and the guest card. The design tokens are set on the dialog for everything inside it, so the customizer is
+   drawn on the same dark surfaces in light and dark. ---------- */
 html.tpv-open { overflow: hidden; }
-dialog.tpv { width: min(1120px, calc(100vw - 32px)); height: min(760px, calc(100dvh - 32px)); max-width: none; max-height: none; margin: auto; padding: 0; border: 0;
-  border-radius: 20px; background: var(--ground); color: var(--text); font-family: var(--font); font-size: var(--fs-body); line-height: 1.45; overflow: hidden;
-  box-shadow: 0 24px 60px rgba(20, 14, 20, .35); }
-dialog.tpv::backdrop { background: rgba(20, 14, 20, .6); }
+dialog.tpv { --ar-bg: #2a2233; --ar-deep: #1d1724; --ar-row: #372c44; --ar-soft: #cfc3d6; --ar-gold: #ffe08a; --ar-gold2: #f2c94c; --ar-ink: #3b2e3a;
+  --ground: var(--ar-bg); --panel: var(--ar-deep); --row: var(--ar-row); --active: #4a3c5b; --text: #fff; --muted: var(--ar-soft); --rule: rgba(255, 255, 255, .14);
+  --border: rgba(255, 255, 255, .2); --control: rgba(255, 255, 255, .45); --primary: var(--ar-gold); --on-primary: var(--ar-ink);
+  --sun: #ffe8a3; --sun-ink: #7a5300; --mint: #def4e6; --mint-ink: #1d6a42; --lilac: #ece6f8; --lilac-ink: #58408a;
+  width: min(1240px, calc(100vw - 32px)); height: min(820px, calc(100dvh - 32px)); max-width: none; max-height: none; margin: auto; padding: 0; border: 0;
+  border-radius: 22px; background: var(--ar-bg); color: #fff; font-family: var(--font); font-size: var(--fs-body); line-height: 1.45; overflow: hidden;
+  box-shadow: 0 0 0 2px rgba(255, 224, 138, .55), 0 24px 70px rgba(10, 6, 14, .6); }
+dialog.tpv::backdrop { background: rgba(20, 14, 20, .72); }
 .tpv *, .tpv *::before, .tpv *::after { box-sizing: border-box; }
 .tpv button { font: inherit; color: inherit; }
 .tpv .num { font-variant-numeric: tabular-nums; }
+.tpv-ic { flex: none; display: block; }
 .tpv-in { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; }
-.tpv-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px 10px 20px; border-bottom: 1px solid var(--rule); }
-.tpv-title { min-width: 0; }
-.tpv-title h2 { margin: 0; font-size: var(--fs-section); font-weight: var(--w-head); line-height: 1.2; }
-.tpv-sub { margin: 0; font-size: var(--fs-meta); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tpv-acts { display: flex; align-items: center; gap: 8px; flex: none; }
-.tpv-seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: var(--r-pill); background: var(--panel); }
-.tpv-seg[hidden] { display: none; }
-.tpv-seg button { min-height: 36px; padding: 0 14px; border: 0; border-radius: var(--r-pill); background: transparent; color: var(--muted); font-size: var(--fs-label);
-  font-weight: var(--w-strong); cursor: pointer; }
-.tpv-seg button[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); }
-.tpv-x { display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: var(--panel); color: var(--text); cursor: pointer; }
-.tpv button:focus-visible, .tpv [tabindex]:focus-visible { outline: 3px solid var(--text); outline-offset: 2px; }
 
-.tpv-body { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, 1fr); min-height: 0; }
-.tpv-stagewrap { position: relative; display: grid; place-items: center; min-width: 0; min-height: 0; padding: 16px; background: var(--panel); }
-.tpv-stage { width: min(100%, calc((min(760px, 100dvh - 32px) - 96px) * 1.13)); border-radius: var(--r-panel); overflow: hidden; background: #cfe9f7; }
+/* the top: the name in gold over the marquee, and the controls */
+.tpv-top { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; overflow: hidden; padding: 12px 14px 20px 24px;
+  background: radial-gradient(120% 140% at 50% -40%, rgba(255, 224, 138, .22), transparent 60%), var(--ar-bg); }
+/* the marquee: a row of bulbs along the header's foot, every other one lit in turn */
+.tpv-top::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 5px; height: 8px;
+  background: radial-gradient(circle, #fff6cf 0 2.2px, var(--ar-gold) 2.6px 3.4px, transparent 3.8px) 0 50% / 16px 8px repeat-x; filter: drop-shadow(0 0 3px rgba(255, 214, 102, .9)); }
+.tpv-top::before { content: ""; position: absolute; left: 22px; right: 14px; bottom: 5px; height: 8px; z-index: 1;
+  background: radial-gradient(circle, rgba(42, 34, 51, .75) 0 3.8px, transparent 4px) 0 50% / 32px 8px repeat-x; animation: tpv-chase 1.2s linear infinite; }
+@keyframes tpv-chase { 0%, 50% { transform: none; } 50.01%, 100% { transform: translateX(16px); } }
+.tpv-title { min-width: 0; }
+.tpv-kick { margin: 0 0 1px; font-size: 12px; font-weight: var(--w-head); letter-spacing: .14em; text-transform: uppercase; color: var(--ar-soft); }
+.tpv-title h2 { margin: 0; font-size: clamp(22px, 2.6vw, 30px); font-weight: var(--w-title, 800); line-height: 1.1; color: var(--ar-gold); overflow-wrap: anywhere;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, .35), 0 0 18px rgba(255, 214, 102, .35); }
+.tpv-sub { margin: 2px 0 0; font-size: var(--fs-meta); color: var(--ar-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tpv-num { display: inline-flex; align-items: center; justify-content: center; vertical-align: .12em; min-width: 1.9em; height: 1.9em; margin-left: .3em; padding: 0 .42em; border-radius: 999px;
+  font-size: .62em; font-weight: 800; line-height: 1; letter-spacing: -.01em; color: #3B2E3A; text-shadow: none; background: linear-gradient(180deg, #FFE68F, #EDB021);
+  box-shadow: 0 0 0 2px #3B2E3A, 0 0 0 4px #FFE9A3, 0 5px 14px rgba(0, 0, 0, .4); transform: rotate(-5deg); white-space: nowrap; }   /* a top-ten visit's number */
+.tpv-num i { font-style: normal; font-size: .72em; margin-right: .06em; opacity: .75; }
+.tpv-num.t2 { background: linear-gradient(180deg, #F6F8FC, #B9C1CF); }
+.tpv-num.t3 { background: linear-gradient(180deg, #F6CDA4, #C4834B); }
+.tpv-num.tx { color: #FFE9A3; background: linear-gradient(180deg, #8A79D2, #4A3B8F); box-shadow: 0 0 0 2px #FFE9A3, 0 0 0 4px #3B2E3A, 0 5px 14px rgba(0, 0, 0, .4); }
+.tpv-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tpv-acts { display: flex; align-items: center; gap: 10px; flex: none; }
+/* Visit | Customize, and the drawer's tabs: a dark track, the one that's on a gold pill */
+.tpv-seg { display: inline-flex; padding: 4px; gap: 2px; border-radius: 999px; background: rgba(0, 0, 0, .34); box-shadow: inset 0 0 0 1px rgba(255, 224, 138, .32); }
+.tpv-seg[hidden] { display: none; }
+.tpv-seg button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: transparent;
+  color: var(--ar-soft); font-size: var(--fs-label); font-weight: var(--w-head); white-space: nowrap; cursor: pointer; transition: color var(--t-hover, 120ms) ease-out, background var(--t-hover, 120ms) ease-out; }
+.tpv-seg button:hover { color: #fff; background: rgba(255, 255, 255, .08); }
+.tpv-seg button[aria-pressed="true"] { background: linear-gradient(180deg, #ffeeb5, var(--ar-gold2)); color: var(--ar-ink); box-shadow: 0 2px 0 #b98a1c, 0 4px 12px rgba(0, 0, 0, .35); }
+.tpv-x { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .12); color: #fff; cursor: pointer;
+  transition: background var(--t-hover, 120ms) ease-out, transform var(--t-hover, 120ms) ease-out; }
+.tpv-x:hover { background: rgba(255, 255, 255, .22); transform: rotate(90deg); }
+.tpv button:focus-visible, .tpv [tabindex]:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+/* the tour (widget/place.js, hop): "Back to mine" by the close button, and the design page's round arrows on either
+   side of the stage (round 3) */
+.tpv .tpv-home { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 14px 0 11px; border: 2px solid rgba(255, 224, 138, .6); border-radius: 999px;
+  background: transparent; color: var(--ar-gold); font-weight: var(--w-head); cursor: pointer; white-space: nowrap; }
+.tpv-home:hover { background: rgba(255, 224, 138, .12); }
+.tpv .tpv-vnav { position: absolute; z-index: 2; top: 50%; width: 44px; height: 44px; margin-top: -22px; display: grid; place-items: center; padding: 0; border-radius: 50%;
+  border: 2px solid #3B2E3A; background: #fff; color: #3B2E3A; box-shadow: 0 3px 0 #3B2E3A; cursor: pointer; transition: transform var(--t-press, 120ms) ease-out; }
+.tpv-vnav.prev { left: 6px; } .tpv-vnav.next { right: 6px; }
+.tpv-vnav:hover { background: #FFF3C4; } .tpv-vnav.prev:hover { transform: translateX(-2px); } .tpv-vnav.next:hover { transform: translateX(2px); }
+.tpv-vnav:active { transform: translateY(3px); box-shadow: 0 0 0 #3B2E3A; }
+.tpv .tpv-vnav:focus-visible { outline: 3px solid var(--ar-gold); outline-offset: 2px; }
+
+/* the stage: two spotlights from above, the scene in a gold frame */
+.tpv-body { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr); min-height: 0; }
+.tpv-stagewrap { position: relative; display: grid; place-items: center; min-width: 0; min-height: 0; padding: 20px; overflow: hidden;
+  background: radial-gradient(60% 50% at 50% 100%, rgba(255, 224, 138, .12), transparent 70%), var(--ar-deep); }
+.tpv-stagewrap::before, .tpv-stagewrap::after { content: ""; position: absolute; top: -10%; width: 46%; height: 120%; pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 240, 190, .2), rgba(255, 240, 190, 0) 80%); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
+  animation: tpv-sway 6s ease-in-out infinite alternate; }
+.tpv-stagewrap::before { left: 2%; transform-origin: 50% 0; transform: rotate(-16deg); }
+.tpv-stagewrap::after { right: 2%; transform-origin: 50% 0; transform: rotate(16deg); animation-delay: -3s; }
+@keyframes tpv-sway { from { opacity: .7; } to { opacity: 1; } }
+.tpv-frame { position: relative; z-index: 1; width: min(100%, calc((min(820px, 100dvh - 32px) - 164px) * 1.13)); }
+.tpv-stage { border-radius: var(--r-panel); overflow: hidden; background: #cfe9f7;
+  box-shadow: 0 0 0 4px var(--ar-gold), 0 0 0 7px rgba(42, 34, 51, .9), 0 0 0 9px var(--ar-gold2), 0 18px 40px rgba(0, 0, 0, .5), 0 0 60px rgba(255, 214, 102, .22); }
 .tpv-stage.is-night { background: #1c1f3f; }
-.tpv-wait { position: absolute; inset: auto 16px 16px; margin: 0; padding: 10px 14px; border-radius: var(--r-row); background: var(--ground); color: var(--text);
+.tpv-wait { position: absolute; z-index: 2; inset: auto 20px 20px; margin: 0; padding: 10px 14px; border-radius: var(--r-row); background: var(--ar-row); color: #fff;
   font-size: var(--fs-label); text-align: center; }
 .tpv-wait[hidden] { display: none; }
-.tpv-chip { min-height: 34px; padding: 0 14px; border: 1px solid var(--control); border-radius: var(--r-pill); background: var(--ground); color: var(--text);
-  font-size: var(--fs-meta); font-weight: var(--w-strong); cursor: pointer; }
-.tpv-chip[aria-pressed="true"] { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
-.tpv-zoom { position: absolute; right: 24px; top: 24px; }
-.tpv-zoom[hidden] { display: none; }
-.tpv-side { min-width: 0; min-height: 0; padding: 16px 20px 20px; overflow-y: auto; overscroll-behavior: contain; }
+/* Close-up: a chip on the picture's corner, drawn like the tour's arrows */
+.tpv .tpv-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 14px 0 11px; border: 2px solid #3B2E3A; border-radius: 999px; background: #fff; color: #3B2E3A;
+  font-size: var(--fs-meta); font-weight: var(--w-head); box-shadow: 0 3px 0 #3B2E3A; cursor: pointer; transition: transform var(--t-press, 120ms) ease-out; }
+.tpv-chip:hover { background: #FFF3C4; }
+.tpv-chip:active { transform: translateY(3px); box-shadow: 0 0 0 #3B2E3A; }
+.tpv-chip[aria-pressed="true"] { background: linear-gradient(180deg, #ffeeb5, var(--ar-gold2)); }
+.tpv-zoom { position: absolute; z-index: 2; right: 12px; top: 12px; }
+.tpv .tpv-zoom[hidden] { display: none; }
+.tpv .tpv-chip:focus-visible { outline: 3px solid var(--ar-gold); outline-offset: 2px; }
+.tpv-side { min-width: 0; min-height: 0; padding: 18px 20px 20px; overflow-y: auto; overscroll-behavior: contain; background: var(--ar-bg); box-shadow: inset 1px 0 0 rgba(255, 255, 255, .08);
+  scrollbar-color: rgba(255, 255, 255, .28) transparent; }
 
-.tpv-btn { display: inline-flex; align-items: center; justify-content: center; min-height: var(--control-h); padding: 0 18px; border: 1px solid var(--control);
-  border-radius: var(--r-pill); background: var(--ground); color: var(--text); font-size: var(--fs-label); font-weight: var(--w-strong); cursor: pointer; }
-.tpv-btn.tpv-primary { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+/* buttons: a glass pill, and the gold one that says what to do next; both press down */
+.tpv-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 18px; border: 2px solid rgba(255, 255, 255, .3);
+  border-radius: 999px; background: rgba(255, 255, 255, .07); color: #fff; font-size: var(--fs-label); font-weight: var(--w-head); cursor: pointer;
+  transition: transform var(--t-press, 120ms) ease-out, background var(--t-hover, 120ms) ease-out, border-color var(--t-hover, 120ms) ease-out, box-shadow var(--t-press, 120ms) ease-out; }
+.tpv-btn:hover { background: rgba(255, 255, 255, .15); border-color: rgba(255, 255, 255, .55); }
+.tpv-btn:active { transform: translateY(2px); }
+.tpv-btn.tpv-primary, .tpv-btn.tpv-gold { border-color: transparent; background: linear-gradient(180deg, #ffeeb5, var(--ar-gold2)); color: var(--ar-ink); box-shadow: 0 3px 0 #b98a1c, 0 8px 18px rgba(0, 0, 0, .35); }
+.tpv-btn.tpv-primary:hover, .tpv-btn.tpv-gold:hover { background: linear-gradient(180deg, #fff4cc, #f7d466); border-color: transparent; }
+.tpv-btn.tpv-primary:active, .tpv-btn.tpv-gold:active { transform: translateY(3px); box-shadow: 0 0 0 #b98a1c, 0 4px 10px rgba(0, 0, 0, .3); }
+.tpv-btn.tpv-big { min-height: 54px; padding: 0 20px; font-size: var(--fs-card); }
 .tpv-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
 .tpv-note { margin: 10px 0 0; font-size: var(--fs-meta); color: var(--muted); }
-.tpv-lede { margin: 0; }
 
-/* Visit: his health, his rank, the medals */
-.tpv-hp { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin: 0; font-size: var(--fs-card); }
-.tpv-hp b { font-weight: var(--w-head); }
-.tpv-hp span { color: var(--muted); font-size: var(--fs-label); }
-.tpv-facts { display: grid; gap: 0; margin: 14px 0 0; border-top: 1px solid var(--rule); }
-.tpv-facts div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
-.tpv-facts dt { color: var(--muted); font-size: var(--fs-label); }
-.tpv-facts dd { margin: 0; font-weight: var(--w-strong); text-align: right; }
+/* the panel in Visit: yours (the host card) and theirs (the guest card) are stacks of plates */
+.tpv-host, .tpv-guest { display: grid; gap: 14px; }
+.tpv-gk { margin: 0; font-size: 12px; font-weight: var(--w-head); letter-spacing: .12em; text-transform: uppercase; color: var(--ar-soft); }
+/* Timmy today: his face as he is, how he's doing, and his health on a meter that takes its color from it */
+.tpv-me { --hpc: #7fe0a8; --hpc2: #3fb37a; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 14px; align-items: center; padding: 14px; border-radius: var(--r-panel); background: var(--ar-row); }
+.tpv-me.is-fair { --hpc: #ffd866; --hpc2: #e0a520; }
+.tpv-me.is-low { --hpc: #ffb070; --hpc2: #e0742a; }
+.tpv-me.is-out { --hpc: #ff9a9a; --hpc2: #e05a5a; }
+.tpv-meface { display: grid; place-items: end center; width: 76px; height: 76px; border-radius: 50%; overflow: hidden;
+  background: radial-gradient(circle at 50% 30%, #6a5884, #2a2233 78%); box-shadow: inset 0 0 0 2px rgba(255, 224, 138, .6), 0 6px 14px rgba(0, 0, 0, .35); }
+.tpv-meface img { display: block; width: 58px; height: auto; margin-bottom: 4px; }
+.tpv-mebody { min-width: 0; }
+.tpv-hp { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin: 2px 0 0; }
+.tpv-hp b { min-width: 0; font-size: var(--fs-card); font-weight: var(--w-head); line-height: 1.25; }
+.tpv-hp .num { flex: none; font-size: 20px; font-weight: 800; line-height: 1; color: var(--hpc); white-space: nowrap; }
+.tpv-meter { height: 12px; margin: 7px 0 0; border-radius: 999px; background: rgba(0, 0, 0, .38); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16); overflow: hidden; }
+.tpv-meter i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--hpc2), var(--hpc)); box-shadow: inset 0 2px 0 rgba(255, 255, 255, .35);
+  transform-origin: 0 50%; animation: tpv-fill 700ms var(--ease-out, ease-out) 200ms backwards; }
+@keyframes tpv-fill { from { transform: scaleX(0); } }
+.tpv-medoes { margin: 7px 0 0; font-size: var(--fs-meta); line-height: 1.4; color: var(--ar-soft); }
+/* the rank, drawn big on its plate */
+.tpv-gplate { display: grid; justify-items: center; gap: 2px; padding: 16px 14px 14px; border-radius: var(--r-panel); text-align: center;
+  background: radial-gradient(80% 70% at 50% 30%, rgba(255, 224, 138, .2), transparent 70%), var(--ar-row); box-shadow: inset 0 0 0 2px rgba(255, 224, 138, .55); }
+.tpv-grank { display: grid; place-items: center; width: 112px; height: 112px; margin-bottom: 4px; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); }
+.tpv-grank svg { display: block; width: 112px; height: 112px; }
+.tpv-gr { margin: 0; font-size: var(--fs-card); font-weight: var(--w-head); color: var(--ar-gold); }
+/* yours: the rank beside its name, so the buttons under it stay on the first screen */
+.tpv-host .tpv-gplate { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; justify-items: start; align-items: center; column-gap: 14px; padding: 12px 14px; text-align: left; }
+.tpv-host .tpv-grank { grid-row: 1 / 3; width: 76px; height: 76px; margin: 0; }
+.tpv-host .tpv-grank svg { width: 76px; height: 76px; }
+.tpv-host .tpv-gplate .tpv-gk { align-self: end; }
+.tpv-host .tpv-gplate .tpv-gr { align-self: start; font-size: var(--fs-section); line-height: 1.2; }
+.tpv-gmedals { display: grid; gap: 8px; padding: 14px; border-radius: var(--r-panel); background: var(--ar-row); }
+.tpv-gml { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.tpv-gml li { display: grid; justify-items: center; gap: 2px; min-width: 0; text-align: center; }
+.tpv-gml svg { display: block; width: 44px; height: 44px; }
+.tpv-gmn { max-width: 100%; font-size: 12px; line-height: 1.25; color: var(--ar-soft); overflow-wrap: anywhere; }
+.tpv-gnone { margin: 0; color: var(--ar-soft); font-size: var(--fs-label); }
+.tpv-host .tpv-row, .tpv-guest .tpv-row { margin: 4px 0 0; }
+.tpv-cta { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 10px; }
+.tpv-gtip { margin: 0; font-size: var(--fs-meta); color: var(--ar-soft); }
+.tpv-gnav { display: grid; gap: 2px; margin: 0; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, .12); font-size: var(--fs-meta); color: var(--ar-soft); }
+.tpv-gnav span { color: #fff; font-weight: var(--w-strong, 700); overflow-wrap: anywhere; }
+/* the plates arrive one after another */
+.tpv-host > *, .tpv-guest > * { animation: tpv-rise 380ms var(--ease-out, ease-out) backwards; }
+.tpv-host > :nth-child(2), .tpv-guest > :nth-child(2) { animation-delay: 70ms; }
+.tpv-host > :nth-child(3), .tpv-guest > :nth-child(3) { animation-delay: 140ms; }
+.tpv-host > :nth-child(n+4), .tpv-guest > :nth-child(n+4) { animation-delay: 210ms; }
+@keyframes tpv-rise { from { opacity: 0; transform: translateY(10px); } }
 
 /* Customize: the dock (what's in every spot) and the drawer (what you own of one kind) */
 .tpv-dock { display: grid; gap: 10px; }
 .tpv-dmain { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .tpv-dyard { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
-.tpv-dlab { grid-column: 1 / -1; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--muted); }
-.tpv-tile { display: grid; gap: 4px; justify-items: center; min-width: 0; padding: 6px 4px 8px; border: 2px solid transparent; border-radius: var(--r-row); background: var(--panel);
-  font-size: var(--fs-meta); font-weight: var(--w-strong); line-height: 1.2; text-align: center; cursor: pointer; }
+.tpv-dlab { grid-column: 1 / -1; font-size: 12px; font-weight: var(--w-head); letter-spacing: .12em; text-transform: uppercase; color: var(--ar-soft); }
+.tpv-tile { display: grid; gap: 4px; justify-items: center; min-width: 0; padding: 6px 4px 8px; border: 2px solid transparent; border-radius: var(--r-row); background: var(--ar-row);
+  font-size: var(--fs-meta); font-weight: var(--w-strong); line-height: 1.2; text-align: center; cursor: pointer;
+  transition: transform var(--t-press, 120ms) ease-out, background var(--t-hover, 120ms) ease-out, border-color var(--t-hover, 120ms) ease-out; }
 .tpv-tile.is-slot { padding: 4px 2px 6px; font-size: 12px; font-weight: var(--w-body); }
-.tpv-tile.on { border-color: var(--text); background: var(--ground); }
+.tpv-tile:hover { background: var(--active); }
+.tpv-tile:active { transform: translateY(2px); }
+.tpv-tile.on { border-color: var(--ar-gold); background: var(--active); box-shadow: 0 0 0 3px rgba(255, 224, 138, .2), 0 6px 14px rgba(0, 0, 0, .3); color: var(--ar-gold); }
+.tpv-tile.is-slot.on { font-weight: var(--w-strong); }
 .tpv-tpic { position: relative; display: block; width: 100%; aspect-ratio: 3 / 2; overflow: hidden; color: var(--muted); }
 .tpv-tile.is-slot .tpv-tpic { aspect-ratio: 1; }
 .tpv-tpic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .tpv-tpic svg { position: absolute; inset: 0; margin: auto; }
 .tpv-drawer { margin: 16px 0 0; padding: 16px 0 0; border-top: 1px solid var(--rule); }
 .tpv-dhead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.tpv-dhead h3 { margin: 0; font-size: var(--fs-card); font-weight: var(--w-head); }
-.tpv-dhead p { margin: 2px 0 0; font-size: var(--fs-meta); color: var(--muted); }
-.tpv-dhead .tpv-btn { flex: none; min-height: 34px; padding: 0 12px; font-size: var(--fs-meta); }
+.tpv-dhead h3 { margin: 0; font-size: var(--fs-section); font-weight: var(--w-head); line-height: 1.2; color: var(--ar-gold); }
+.tpv-dhead p { margin: 3px 0 0; font-size: var(--fs-meta); color: var(--muted); }
+.tpv-dhead .tpv-btn { flex: none; min-height: 36px; padding: 0 12px; font-size: var(--fs-meta); }
 .tpv-tabs { margin: 12px 0 0; }
-.tpv-tabs button { min-height: 32px; padding: 0 12px; font-size: var(--fs-meta); }
+.tpv-tabs button { min-height: 34px; padding: 0 12px; font-size: var(--fs-meta); }
 .tpv-seth { margin: 14px 0 0; font-size: var(--fs-label); font-weight: var(--w-head); }
 .tpv-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin: 12px 0 0; }
-.tpv-card { display: grid; gap: 4px; justify-items: center; align-content: start; min-width: 0; padding: 8px 6px 10px; border: 2px solid var(--border); border-radius: var(--r-row);
-  background: var(--row); font-size: var(--fs-meta); line-height: 1.25; text-align: center; cursor: pointer; }
-.tpv-card.on { border-color: var(--text); }
-.tpv-card.is-locked { cursor: default; border-style: dashed; }
+.tpv-card { position: relative; display: grid; gap: 4px; justify-items: center; align-content: start; min-width: 0; padding: 8px 6px 10px; border: 2px solid var(--border); border-radius: var(--r-row);
+  background: var(--ar-row); font-size: var(--fs-meta); line-height: 1.25; text-align: center; cursor: pointer;
+  transition: transform var(--t-press, 120ms) ease-out, background var(--t-hover, 120ms) ease-out, border-color var(--t-hover, 120ms) ease-out; }
+button.tpv-card:hover { background: var(--active); border-color: rgba(255, 255, 255, .45); transform: translateY(-2px); }
+button.tpv-card:active { transform: translateY(1px); }
+.tpv-card.on { border-color: var(--ar-gold); background: var(--active); box-shadow: 0 0 0 3px rgba(255, 224, 138, .2), 0 6px 14px rgba(0, 0, 0, .3); }
+/* the one in use: a gold tick on its corner */
+.tpv-card.on::after { content: ""; position: absolute; right: -7px; top: -7px; width: 22px; height: 22px; border-radius: 50%; box-shadow: 0 0 0 2px var(--ar-bg);
+  background: var(--ar-gold) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.5l3.3 3.3L15 6.6' fill='none' stroke='%233b2e3a' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 16px no-repeat; }
+.tpv-card.is-locked { cursor: default; border-style: dashed; background: transparent; }
 .tpv-card.is-locked .tpv-cpic { opacity: .45; filter: grayscale(1); }
 .tpv-cpic { position: relative; display: block; width: 100%; aspect-ratio: 1; overflow: hidden; }
 .tpv-cpic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .tpv-cname { font-size: 13px; line-height: 1.25; font-weight: var(--w-strong); overflow-wrap: break-word; hyphens: auto; }
 .tpv-how { font-size: 12px; color: var(--muted); }
-.tpv-rar { padding: 1px 8px; border-radius: var(--r-pill); font-size: 12px; font-style: normal; font-weight: var(--w-strong); background: var(--active); color: var(--text); }
+.tpv-rar { padding: 1px 8px; border-radius: var(--r-pill); font-size: 12px; font-style: normal; font-weight: var(--w-strong); background: rgba(255, 255, 255, .16); color: #fff; }
 .tpv-rar.r-uncommon { background: var(--mint); color: var(--mint-ink); }
 .tpv-rar.r-rare { background: #e2effb; color: #1c5486; }
 .tpv-rar.r-epic { background: var(--lilac); color: var(--lilac-ink); }
 .tpv-rar.r-legendary { background: var(--sun); color: var(--sun-ink); }
+/* a piece in its rarity's frame: the shop's own card art (widget/hub-art/shop.js) behind it, the picture in the frame's
+   window, the name and the tier on its name plate. The ornament says the tier, and the tier is printed too */
+.tpv-dcards.is-framed .tpv-cards { grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 14px 10px; margin-top: 14px; }
+.tpv-card.is-framed { display: block; aspect-ratio: 4 / 5; padding: 0; border: 0; border-radius: 9% / 7.2%; background: none; color: #3B2E3A; container-type: inline-size; isolation: isolate; }
+button.tpv-card.is-framed:hover { background: none; transform: translateY(-3px) rotate(-1deg); }
+.tpv-card.is-framed.on { background: none; box-shadow: 0 0 0 3px var(--ar-gold), 0 0 0 7px rgba(255, 224, 138, .28), 0 8px 18px rgba(0, 0, 0, .4); }
+.tpv-rframe { position: absolute; inset: 0; z-index: -1; display: block; width: 100%; height: 100%; }
+.is-framed .tpv-cpic { position: absolute; left: 11%; right: 11%; top: 7%; width: auto; height: 52%; aspect-ratio: auto; overflow: visible; }
+.is-framed .tpv-cpic.k-scene img { object-fit: cover; border-radius: 10px; border: 2px solid #3B2E3A; }
+.tpv-ctext { position: absolute; left: 9%; right: 9%; top: 63%; bottom: 7.5%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.is-framed .tpv-cname { font-size: clamp(11px, 10cqw, 13.5px); font-weight: 800; line-height: 1.12; }
+.tpv-cmeta { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px 5px; }
+.is-framed .tpv-rar { --rar: #5F5A55; padding: 1px 7px; font-size: clamp(11px, 8.6cqw, 12px); font-weight: 800; letter-spacing: .02em; color: #fff; background: var(--rar); white-space: nowrap; }
+.is-framed .tpv-rar.r-uncommon { --rar: #1C6E52; } .is-framed .tpv-rar.r-rare { --rar: #1C5C88; } .is-framed .tpv-rar.r-epic { --rar: #4E3492; } .is-framed .tpv-rar.r-legendary { --rar: #7A5600; }
+/* how you got it (a gift, a rank's reward): a stamp on the card's corner */
+.is-framed .tpv-how { position: absolute; left: -4px; top: -6px; z-index: 2; padding: 1px 8px; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFE27A; color: #3B2E3A;
+  font-size: 11px; font-weight: 800; white-space: nowrap; transform: rotate(-6deg); box-shadow: 0 2px 0 #3B2E3A; }
+.tpv-card.is-framed.is-locked { border: 0; background: none; }
+.is-framed.is-locked .tpv-rframe { filter: grayscale(1); opacity: .7; }
+.is-framed.is-locked .tpv-cpic { opacity: 1; filter: none; }
+.is-framed.is-locked .tpv-cpic img { filter: brightness(0); opacity: .38; }
+.is-framed.is-locked .tpv-cname { color: #6B5A68; }
+.is-framed.is-locked .tpv-how { background: #fff; }
 .tpv-extra { margin: 16px 0 0; }
 .tpv-extra h4 { margin: 0 0 8px; font-size: var(--fs-label); font-weight: var(--w-head); }
 .tpv-opts { display: flex; flex-wrap: wrap; gap: 8px; }
-.tpv-upg { display: grid; gap: 0; min-height: var(--control-h); padding: 4px 14px; border: 2px solid var(--border); border-radius: var(--r-row); background: var(--row);
+.tpv-upg { display: grid; gap: 0; min-height: var(--control-h); padding: 4px 14px; border: 2px solid var(--border); border-radius: var(--r-row); background: var(--ar-row);
   font-size: var(--fs-meta); line-height: 1.25; text-align: left; cursor: pointer; }
 .tpv-upg b { font-weight: var(--w-strong); }
 .tpv-upg small { color: var(--muted); font-size: 12px; }
-.tpv-upg.on { border-color: var(--text); background: var(--active); }
-.tpv-swatch { width: 40px; height: 40px; padding: 0; border: 2px solid var(--border); border-radius: 50%; background: var(--sw); cursor: pointer; }
-.tpv-swatch.on { border-color: var(--text); box-shadow: 0 0 0 3px var(--ground) inset; }
-.tpv-foot { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--rule); }
+.tpv-upg:hover { background: var(--active); }
+.tpv-upg.on { border-color: var(--ar-gold); background: var(--active); color: var(--ar-gold); }
+.tpv-upg.on small { color: #fff; }
+.tpv-swatch { width: 42px; height: 42px; padding: 0; border: 2px solid rgba(255, 255, 255, .35); border-radius: 50%; background: var(--sw); cursor: pointer; transition: transform var(--t-press, 120ms) ease-out; }
+.tpv-swatch:hover { transform: scale(1.08); }
+.tpv-swatch.on { border-color: var(--ar-gold); box-shadow: 0 0 0 3px var(--ar-bg) inset, 0 0 0 3px rgba(255, 224, 138, .25); }
+/* the customizer's foot stays in reach under the drawer: Surprise me, the shop, Done */
+.tpv-foot { position: sticky; bottom: -20px; z-index: 1; margin: 18px -20px -20px; padding: 14px 20px 18px; border-top: 1px solid var(--rule);
+  background: linear-gradient(180deg, rgba(42, 34, 51, .86), var(--ar-bg) 40%); backdrop-filter: blur(6px); }
+.tpv-foot .tpv-done { margin-left: auto; }
 
 /* the medal board's big view, over the place */
 .tpv-over { position: absolute; inset: 0; z-index: 3; display: grid; place-items: center; padding: 16px; background: rgba(20, 14, 20, .55); }
@@ -131,61 +277,9 @@ dialog.tpv::backdrop { background: rgba(20, 14, 20, .6); }
 .tpv-mcard span { color: var(--muted); }
 .tpv-mcard svg { display: block; }
 
-html.shx[data-theme="dark"] .tpv-rar.r-rare { background: #16283a; color: #9ccbf2; }
-@media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .tpv-rar.r-rare { background: #16283a; color: #9ccbf2; } }
+.tpv-overin { box-shadow: 0 0 0 2px rgba(255, 224, 138, .45), 0 24px 60px rgba(0, 0, 0, .5); }
+.tpv-mhead h3 { color: var(--ar-gold); }
 
-/* ---------- a visit (someone's place, opened from a board row): the leaderboard's theater (widget/dash.css, the arena),
-   dark in both themes. A marquee of bulbs under the name, the stage framed in gold under two spotlights, the visit arrives
-   through the clouds (the trip, below), and a guest card with their rank drawn big and their medals. ---------- */
-dialog.tpv.is-visit { --ar-bg: #2a2233; --ar-deep: #1d1724; --ar-row: #372c44; --ar-soft: #cfc3d6; --ar-gold: #ffe08a; --ar-gold2: #f2c94c;
-  background: var(--ar-bg); color: #fff; box-shadow: 0 0 0 2px rgba(255, 224, 138, .55), 0 24px 70px rgba(10, 6, 14, .6); }
-.is-visit .tpv-top { position: relative; overflow: hidden; padding: 12px 12px 18px 22px; border-bottom: 0;
-  background: radial-gradient(120% 140% at 50% -40%, rgba(255, 224, 138, .22), transparent 60%), var(--ar-bg); }
-/* the marquee: a row of bulbs along the header's foot, every other one lit in turn */
-.is-visit .tpv-top::after { content: ""; position: absolute; left: 14px; right: 14px; bottom: 4px; height: 8px;
-  background: radial-gradient(circle, #fff6cf 0 2.2px, var(--ar-gold) 2.6px 3.4px, transparent 3.8px) 0 50% / 16px 8px repeat-x; filter: drop-shadow(0 0 3px rgba(255, 214, 102, .9)); }
-.is-visit .tpv-top::before { content: ""; position: absolute; left: 22px; right: 14px; bottom: 4px; height: 8px; z-index: 1;
-  background: radial-gradient(circle, rgba(42, 34, 51, .75) 0 3.8px, transparent 4px) 0 50% / 32px 8px repeat-x; animation: tpv-chase 1.2s linear infinite; }
-@keyframes tpv-chase { 0%, 50% { transform: none; } 50.01%, 100% { transform: translateX(16px); } }
-.tpv-kick { margin: 0 0 1px; font-size: 12px; font-weight: var(--w-head); letter-spacing: .14em; text-transform: uppercase; color: var(--ar-soft); }
-.is-visit .tpv-title h2 { font-size: clamp(22px, 2.6vw, 30px); font-weight: var(--w-title, 800); line-height: 1.1; color: var(--ar-gold); overflow-wrap: anywhere;
-  text-shadow: 0 2px 0 rgba(0, 0, 0, .35), 0 0 18px rgba(255, 214, 102, .35); }
-.is-visit .tpv-sub { color: var(--ar-soft); }
-.tpv-num { display: inline-flex; align-items: center; justify-content: center; vertical-align: .12em; min-width: 1.9em; height: 1.9em; margin-left: .3em; padding: 0 .42em; border-radius: 999px;
-  font-size: .62em; font-weight: 800; line-height: 1; letter-spacing: -.01em; color: #3B2E3A; text-shadow: none; background: linear-gradient(180deg, #FFE68F, #EDB021);
-  box-shadow: 0 0 0 2px #3B2E3A, 0 0 0 4px #FFE9A3, 0 5px 14px rgba(0, 0, 0, .4); transform: rotate(-5deg); white-space: nowrap; }   /* a top-ten visit's number */
-.tpv-num i { font-style: normal; font-size: .72em; margin-right: .06em; opacity: .75; }
-.tpv-num.t2 { background: linear-gradient(180deg, #F6F8FC, #B9C1CF); }
-.tpv-num.t3 { background: linear-gradient(180deg, #F6CDA4, #C4834B); }
-.tpv-num.tx { color: #FFE9A3; background: linear-gradient(180deg, #8A79D2, #4A3B8F); box-shadow: 0 0 0 2px #FFE9A3, 0 0 0 4px #3B2E3A, 0 5px 14px rgba(0, 0, 0, .4); }
-.tpv-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.is-visit .tpv-x { background: rgba(255, 255, 255, .12); color: #fff; }
-.is-visit .tpv-x:hover { background: rgba(255, 255, 255, .2); }
-/* the tour (widget/place.js, hop): "Back to mine" by the close button, and the design page's round arrows on either
-   side of the stage (round 3) */
-.tpv .tpv-home { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 14px 0 11px; border: 2px solid rgba(255, 224, 138, .6); border-radius: 999px;
-  background: transparent; color: var(--ar-gold); font-weight: var(--w-head); cursor: pointer; white-space: nowrap; }
-.tpv-home:hover { background: rgba(255, 224, 138, .12); }
-.tpv .tpv-vnav { position: absolute; z-index: 2; top: 50%; width: 44px; height: 44px; margin-top: -22px; display: grid; place-items: center; padding: 0; border-radius: 50%;
-  border: 2px solid #3B2E3A; background: #fff; color: #3B2E3A; box-shadow: 0 3px 0 #3B2E3A; cursor: pointer; transition: transform var(--t-press, 120ms) ease-out; }
-.tpv-vnav.prev { left: 6px; } .tpv-vnav.next { right: 6px; }
-.tpv-vnav:hover { background: #FFF3C4; } .tpv-vnav.prev:hover { transform: translateX(-2px); } .tpv-vnav.next:hover { transform: translateX(2px); }
-.tpv-vnav:active { transform: translateY(3px); box-shadow: 0 0 0 #3B2E3A; }
-.is-visit .tpv-vnav:focus-visible { outline: 3px solid var(--ar-gold); outline-offset: 2px; }
-.tpv-gnav { display: grid; gap: 2px; margin: 0; padding-top: 10px; border-top: 1px solid rgba(255, 255, 255, .12); font-size: var(--fs-meta); color: var(--ar-soft); }
-.tpv-gnav span { color: #fff; font-weight: var(--w-strong, 700); overflow-wrap: anywhere; }
-.is-visit button:focus-visible, .is-visit [tabindex]:focus-visible { outline-color: #fff; }
-/* the stage: two spotlights from above, the scene in a gold frame */
-.is-visit .tpv-stagewrap { overflow: hidden; background: radial-gradient(60% 50% at 50% 100%, rgba(255, 224, 138, .12), transparent 70%), var(--ar-deep); }
-.is-visit .tpv-stagewrap::before, .is-visit .tpv-stagewrap::after { content: ""; position: absolute; top: -10%; width: 46%; height: 120%; pointer-events: none;
-  background: linear-gradient(180deg, rgba(255, 240, 190, .2), rgba(255, 240, 190, 0) 80%); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
-  animation: tpv-sway 6s ease-in-out infinite alternate; }
-.is-visit .tpv-stagewrap::before { left: 2%; transform-origin: 50% 0; transform: rotate(-16deg); }
-.is-visit .tpv-stagewrap::after { right: 2%; transform-origin: 50% 0; transform: rotate(16deg); animation-delay: -3s; }
-@keyframes tpv-sway { from { opacity: .7; } to { opacity: 1; } }
-.is-visit .tpv-stage { position: relative; z-index: 1; width: min(100%, calc((min(760px, 100dvh - 32px) - 120px) * 1.13));
-  box-shadow: 0 0 0 4px var(--ar-gold), 0 0 0 7px rgba(42, 34, 51, .9), 0 0 0 9px var(--ar-gold2), 0 18px 40px rgba(0, 0, 0, .5), 0 0 60px rgba(255, 214, 102, .22); }
-.is-visit .tpv-wait { z-index: 2; background: var(--ar-row); color: #fff; }
 /* the trip (widget/place.js, tripIn and tripOut): the design page's clouds, as Sam approved them (2026-11-10). Separate
    soft clouds drift in from every side and pile up over the whole screen, the window shows behind them, and they scatter
    outward again. Until they cover the page the window and its backdrop are hidden (is-trip). Fixed inside the dialog, so
@@ -213,52 +307,51 @@ dialog.tpv.is-trip::backdrop { background: transparent; }
 .tpv-clouds.is-covered .tpv-clmsg.is-new { animation: tpv-clmsg 420ms var(--ease-out) forwards; }   /* a random trip's name, after the die */
 .tpv-clouds.out .tpv-clmsg { opacity: 0; }
 @keyframes tpv-clmsg { from { opacity: 0; transform: translate(-50%, -40%) scale(.9); } to { opacity: 1; transform: translate(-50%, -50%); } }
-/* the guest card */
-.is-visit .tpv-side { background: var(--ar-bg); }
-.tpv-guest { display: grid; gap: 14px; }
-.tpv-gk { margin: 0; font-size: 12px; font-weight: var(--w-head); letter-spacing: .12em; text-transform: uppercase; color: var(--ar-soft); }
-.tpv-gplate { display: grid; justify-items: center; gap: 2px; padding: 16px 14px 14px; border-radius: var(--r-panel); text-align: center;
-  background: radial-gradient(80% 70% at 50% 30%, rgba(255, 224, 138, .2), transparent 70%), var(--ar-row); box-shadow: inset 0 0 0 2px rgba(255, 224, 138, .55); }
-.tpv-grank { display: grid; place-items: center; width: 112px; height: 112px; margin-bottom: 4px; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); }
-.tpv-grank svg { display: block; width: 112px; height: 112px; }
-.tpv-gr { margin: 0; font-size: var(--fs-card); font-weight: var(--w-head); color: var(--ar-gold); }
-.tpv-gmedals { display: grid; gap: 8px; padding: 14px; border-radius: var(--r-panel); background: var(--ar-row); }
-.tpv-gml { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
-.tpv-gml li { display: grid; justify-items: center; gap: 2px; min-width: 0; text-align: center; }
-.tpv-gml svg { display: block; width: 44px; height: 44px; }
-.tpv-gmn { max-width: 100%; font-size: 12px; line-height: 1.25; color: var(--ar-soft); overflow-wrap: anywhere; }
-.tpv-gnone { margin: 0; color: var(--ar-soft); font-size: var(--fs-label); }
-.tpv-guest .tpv-row { margin: 4px 0 0; }
-.tpv-btn.tpv-gold { background: var(--ar-gold); color: #3b2e3a; border-color: var(--ar-gold); font-weight: var(--w-strong); }
-.tpv-gtip { margin: 0; font-size: var(--fs-meta); color: var(--ar-soft); }
 @media (prefers-reduced-motion: reduce) {
-  .is-visit .tpv-top::before, .is-visit .tpv-stagewrap::before, .is-visit .tpv-stagewrap::after { animation: none; }
+  .tpv-top::before, .tpv-stagewrap::before, .tpv-stagewrap::after, .tpv-meter i, .tpv-host > *, .tpv-guest > * { animation: none; }
   .tpv-clouds { display: none; }
-  .tpv-vnav { transition: none; }
+  .tpv-vnav, .tpv-chip, .tpv-btn, .tpv-tile, .tpv-card, .tpv-x, .tpv-swatch, .tpv-seg button { transition: none; }
+  .tpv-x:hover, button.tpv-card:hover, button.tpv-card.is-framed:hover, .tpv-swatch:hover { transform: none; }
 }
+html.hx-still .tpv-top::before, html.hx-still .tpv-stagewrap::before, html.hx-still .tpv-stagewrap::after, html.hx-still .tpv-meter i,
+html.hx-still .tpv-host > *, html.hx-still .tpv-guest > * { animation: none; }
 
 /* a phone: the whole screen, the stage on top and the panel scrolling under it */
 @media (max-width: 760px) {
-  dialog.tpv { width: 100vw; height: 100dvh; border-radius: 0; }
+  dialog.tpv { width: 100vw; height: 100dvh; border-radius: 0; box-shadow: none; }
   .tpv-clmsg b { font-size: 19px; }
-  .tpv-home { width: 40px; padding: 0; justify-content: center; } .tpv-home span { display: none; }   /* its name stays "Back to mine" */
+  .tpv-home { width: 44px; padding: 0; justify-content: center; } .tpv-home span { display: none; }   /* its name stays "Back to mine" */
   .tpv-vnav { width: 40px; height: 40px; margin-top: -20px; }
-  .tpv-top { padding: 8px 8px 8px 16px; }
-  .tpv-title h2 { font-size: var(--fs-card); }
+  .tpv-top { gap: 8px; padding: 8px 8px 17px 16px; }
+  .tpv-top::after, .tpv-top::before { bottom: 4px; }
+  .tpv-acts { gap: 6px; }
+  .tpv-title h2 { font-size: 20px; }
+  .is-home .tpv-kick { display: none; }
   .tpv-seg button { padding: 0 12px; }
+  .tpv-acts .tpv-seg .tpv-ic { display: none; }
   .tpv-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
-  .tpv-stagewrap { padding: 10px; }
-  .tpv-stage { width: min(100%, calc(46dvh * 1.13)); }
-  .tpv.is-custom .tpv-stage { width: min(100%, calc(38dvh * 1.13)); }
-  .tpv-zoom { right: 16px; top: 16px; }
-  .tpv-side { padding: 14px 16px 24px; }
-  .is-visit .tpv-top { padding: 8px 8px 16px 16px; }
+  .tpv-stagewrap { padding: 14px 12px; }
+  .tpv-frame { width: min(100%, calc(44dvh * 1.13)); }
+  .tpv.is-custom .tpv-frame { width: min(100%, calc(36dvh * 1.13)); }
+  .tpv-zoom { right: 8px; top: 8px; }
+  .tpv-side { padding: 14px 16px 24px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); }
   .is-visit .tpv-title h2 { font-size: 22px; }
-  .is-visit .tpv-stage { width: min(100%, calc(44dvh * 1.13)); }
   .tpv-gplate { grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; justify-items: start; align-items: center; column-gap: 14px; padding: 12px 14px; text-align: left; }
   .tpv-grank { grid-row: 1 / 3; width: 76px; height: 76px; margin: 0; }
   .tpv-grank svg { width: 76px; height: 76px; }
   .tpv-gplate .tpv-gk { align-self: end; }
   .tpv-gplate .tpv-gr { align-self: start; }
+  .tpv-foot { position: static; margin: 18px 0 0; padding: 14px 0 0; background: none; backdrop-filter: none; }
+  .tpv-foot .tpv-btn { flex: 1 1 auto; }
+  .tpv-foot .tpv-done { margin-left: 0; }
 }
-@media (prefers-reduced-motion: reduce) { .tpc img { transition: none; } .tpc:hover img { transform: none; } }
+/* a tablet held upright: the stage on top at the window's width, the panel under it, as on a phone */
+@media (min-width: 761px) and (max-width: 1000px) and (min-height: 900px) {
+  dialog.tpv { height: calc(100dvh - 32px); }
+  .tpv-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .tpv-frame { width: min(100%, calc(46dvh * 1.13)); }
+  .tpv.is-custom .tpv-frame { width: min(100%, calc(38dvh * 1.13)); }
+  .tpv-side { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); }
+  .tpv-host, .tpv-guest { max-width: 640px; margin: 0 auto; }
+}
+@media (prefers-reduced-motion: reduce) { .tpc img, .tpc .tpc-live { transition: none; } .tpc:hover img, .tpc:hover .tpc-live { transform: none; } }

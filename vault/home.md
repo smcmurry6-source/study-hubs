@@ -101,6 +101,8 @@ Hub building
   notes: [event taxonomy](reference/event-taxonomy.md) · [data quality](reference/analytics-data-quality.md) ·
   [retention](reference/analytics-retention.md) · [Insights dashboard](reference/insights-dashboard.md).
 - [Question health](reference/question-health.md): stable ids, versions, what's tracked per question, the flags and how to act on them.
+- [What moving pictures cost](reference/motion-cost.md): why the drawn pictures move when you arrive and rest
+  otherwise, which animations are free, and how to measure a page before adding one.
 - [The redesign's bundles](reference/bundles.md): what a redesigned page loads (four built files and one stylesheet), how a
   held file runs, the slim database client, and what to run after changing a widget file.
 - [The game layer's server](reference/game-server.md): XP without a cap and its guardrails, server-checked answers, the three
@@ -129,7 +131,7 @@ Archived (page still up)
 Being built on its own branch
 - [Boards (INBDE + ADEX)](hubs/boards.md): on `claude/boards-hub`, not on `main` yet.
 
-Which hubs are live, and every exam date, comes from `HUBS` in `index.html`: if this list disagrees, the code is right
+Which hubs are live, and every exam date, comes from `hubs.js`: if this list disagrees, the code is right
 and this list needs fixing. A new hub gets a note from [the hub template](templates/hub.md).
 
 ## Templates

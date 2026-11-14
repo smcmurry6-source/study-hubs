@@ -344,7 +344,6 @@
     { k: "prof",         n: "Office Hours",         d: "Get a professor to quote themselves",  ic: "M4 5h16v11H9l-5 4zM8 10h8", secret: true, clue: "Professors repeat themselves. Tap one's name, a few times, quickly." },
     { k: "rootcanal",    n: "Through the Root Canal", d: "10 misses, then 10 right in a row",  ic: "M9 4v6l-3 10M15 4v6l3 10M9 10h6", secret: true, clue: "Go all the way down, then all the way back up. Ten each way." },
     { k: "mirror",       n: "Indirect Vision",      d: "See the hub the way you see a maxillary molar", ic: "M12 4a5 5 0 1 0 0 10 5 5 0 1 0 0-10zM12 14v7M9 21h6", secret: true, clue: "Your most-used instrument shows everything backwards. Type its name." },
-    { k: "fullarch",     n: "Full Arch",            d: "Fill all 32 teeth of the arch",        ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" },
     { k: "flosschain",   n: "Floss Chain",          d: "Floss with two classmates at once",    ic: "M3 14c3-4 6-4 9 0s6 4 9 0M6 9v2M12 7v2M18 9v2", secret: true, clue: "The magic word works better with friends. Three of you, in the same hub, within a minute." },
     { k: "cavity",       n: "Restorative",          d: "Find the week's hidden cavity",        ic: "M7 5c-2 0-3 1.5-3 3.5 0 2.5 1.2 3.5 1.6 5.5.4 2.5.8 5 2 5s1.5-2.4 1.8-4c.2-.8.5-1.2 1.6-1.2s1.4.4 1.6 1.2c.3 1.6.6 4 1.8 4s1.6-2.5 2-5c.4-2 1.6-3 1.6-5.5C20 6.5 19 5 17 5c-1.6 0-2.4.8-5 .8S8.6 5 7 5zM12 9.5h.01", secret: true, clue: "Each week a tiny dark spot hides somewhere in one hub's Lecture Notes. Only five people get to fill it." },
     { k: "holiday",      n: "Holiday Spirit",       d: "Say the season's magic word",          ic: "M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6", secret: true, clue: "Around a holiday the hubs dress up. Each holiday has its own magic word: type it." },
@@ -359,28 +358,28 @@
     { k: "mastery-gold",   n: "Gold Mastery",   d: "Get 90% right on your latest try", ic: "M12 4a6 6 0 1 0 0 12 6 6 0 1 0 0-12zM9 15l-2 6 5-2 5 2-2-6", c: "#C9971C" },
     { k: "mastery-crown",  n: "Crown",          d: "Get every question in the hub right on your latest try", ic: "M3 18l1-11 5 4 3-7 3 7 5-4 1 11z", c: "#E0A800" },
     { k: "seen-all",       n: "Seen It All",    d: "Answer every question in the hub at least once", ic: "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 1 0 0-6z" },
-    { k: "fullarch",       n: "Full Arch",      d: "Grow all 32 teeth of the arch in this hub", ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" },
     { k: "mock90",         n: "Mock Ace",       d: "90%+ on a mock exam of 20+ questions here", ic: "M12 4a8 8 0 1 0 0 16 8 8 0 1 0 0-16zM12 8v4l3 2" },
     { k: "mock-perfect",   n: "Perfect Mock",   d: "Every question right on a mock exam of 20+ questions here", ic: "M12 3l2.6 5.5 6 .8-4.4 4.2 1 6-5.2-2.9-5.2 2.9 1-6L3.4 9.3l6-.8z", c: "#E0A800" },
     { k: "boss",           n: "Final Blow",     d: "Land the last hit on a boss in this hub", ic: "M12 3c4 0 7 2.5 7 7 0 3-2 4-2 6H7c0-2-2-3-2-6 0-4.5 3-7 7-7zM9 11h.01M15 11h.01M9 20h6", secret: true, clue: "Wait until five or more classmates are online at once, then answer fast." }
   ];
-  /* The redesign's trophy case (phase 4, session 6), on its pages only: Full Arch is retired (Sam, 2026-11-12) and
-     leaves both lists, kept in RETIRED for those who earned it (shown as "Full Arch (retired)"); the three journey
-     trophies and the bowling egg's join, so the case holds 27, 16 of them secret. A journey has its own scene (the
-     hand-off), so trackTrophies doesn't announce it again (scene); Bowling is earned on the device (sh_bowl_trophy,
-     widget/bowling.js) and has no class share. A live page keeps today's 24. */
-  var RETIRED = [];
+  /* Full Arch is retired (Sam, 2026-11-12: the 32-tooth chart came out at the redesign's release): it is in neither
+     list, and RETIRED keeps its row for those who earned it (shown as "Full Arch (retired)").
+     The redesign's trophy case (phase 4, session 6), on its pages only: the three journey trophies and the bowling
+     egg's join, so the case holds 27, 16 of them secret. A journey has its own scene (the hand-off), so trackTrophies
+     doesn't announce it again (scene); Bowling is earned on the device (sh_bowl_trophy, widget/bowling.js) and has no
+     class share. An old single-file hub's page keeps the 23 it can still win. */
+  var RETIRED = [
+    { k: "fullarch",     n: "Full Arch",            d: "Fill all 32 teeth of the arch",        ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" }
+  ];
   if (NEW) {
-    RETIRED = TROPHIES.filter(function(t){ return t.k === "fullarch"; });
     TROPHIES = TROPHIES.filter(function(t){ return !t.secret; }).concat([
       { k: "journey-0", n: "Handpiece finished", d: "Reach 125,000 XP: Dark Matter III on the Handpiece", ic: "M3 21l6-6M9 15l8.5-8.5 2.5 2.5L11.5 17.5zM15 5l1.5-1.5 4 4L19 9", scene: true },
       { k: "journey-1", n: "ModuPro finished", d: "Reach 250,000 XP: Dark Matter III on the ModuPro", ic: "M4 5h16v15H4zM4 10h16M4 15h16M10 7.5h4M10 12.5h4M10 17.5h4", scene: true },
       { k: "journey-2", n: "Loupes finished", d: "Reach 375,000 XP: Dark Matter III on the Loupes", ic: "M3 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM14 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM10 15h4M4.5 12L7 5h10l2.5 7", scene: true }
-    ], TROPHIES.filter(function(t){ return t.secret && t.k !== "fullarch"; }), [
+    ], TROPHIES.filter(function(t){ return t.secret; }), [
       { k: "bowling", n: "Lane Legend", d: "Saw all eight bowling clips", ic: "M12 3c-1.7 0-2.5 1.6-2 3.5.4 1.4-1.5 3-1.5 6.5 0 3.5 1.6 6 3.5 8 1.9-2 3.5-4.5 3.5-8 0-3.5-1.9-5.1-1.5-6.5C14.5 4.6 13.7 3 12 3zM10.2 8.5h3.6", secret: true, device: "sh_bowl_trophy",
         clue: "The alley\u2019s screen plays something odd after a strike. There are eight." }
     ]);
-    HUB_TROPHIES = HUB_TROPHIES.filter(function(t){ return t.k !== "fullarch"; });
   }
   /* how many of the case's trophies a profile's badges (and this device, for Bowling) have won */
   function caseCount(badges){
@@ -477,7 +476,11 @@
       'button.sh-flair:hover,button.sh-flair:focus-visible{background:rgba(127,127,127,.16)}' +
       'button.sh-flair:focus-visible{outline:2px solid currentColor;outline-offset:1px}' +
       '.sh-flair-m{display:inline-flex;width:18px;height:18px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +
-      '.sh-flair-m.is-crown{animation:sh-flair-glint 3.2s ease-in-out infinite}' +
+      /* the crown's glint is a glow that fades in and out over the medal: only its opacity moves, which the browser
+         does without redrawing anything (it was an animated filter, which redrew the page's layers on every frame,
+         wherever the medal was: 2026-11-14) */
+      '.sh-flair-m.is-crown{position:relative}' +
+      '.sh-flair-m.is-crown::after{content:"";position:absolute;inset:-4px;border-radius:50%;background:radial-gradient(circle,rgba(255,236,150,.9) 0,rgba(255,226,122,.45) 45%,rgba(255,226,122,0) 70%);opacity:0;pointer-events:none;animation:sh-flair-glint 3.2s ease-in-out infinite}' +
       '.sh-flair-more{font-size:10.5px;font-weight:700;opacity:.7;margin-left:1px;font-variant-numeric:tabular-nums}' +
       /* the showcase (your rank card): every medal with its hub's name */
       '.sh-flair.is-list{display:flex;flex-wrap:wrap;gap:5px;white-space:normal;margin:0;vertical-align:baseline;flex:1 1 auto;min-width:0;max-width:100%}' +
@@ -495,8 +498,8 @@
       '.sh-flair-card li b{display:block;font-size:14px}.sh-flair-card li small{font-size:12px;color:#B9B5AD}' +
       '.sh-flair-card .sh-flair-x{display:block;margin:10px 0 0 auto;appearance:none;background:rgba(255,255,255,.1);color:inherit;border:0;border-radius:999px;padding:7px 16px;font:inherit;font-weight:600;cursor:pointer}' +
       '@keyframes sh-flair-in{from{opacity:0}to{opacity:1}}' +
-      '@keyframes sh-flair-glint{0%,80%,100%{filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}88%{filter:drop-shadow(0 0 4px #FFE27A) brightness(1.15)}}' +
-      '@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown,.sh-flair-pop{animation:none}}';
+      '@keyframes sh-flair-glint{0%,80%,100%{opacity:0}88%{opacity:1}}' +
+      '@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown::after,.sh-flair-pop{animation:none}}';
     (document.head || document.documentElement).appendChild(st);
     document.addEventListener("click", function(e){
       var b = e.target && e.target.closest && e.target.closest("[data-sh-flair]");
@@ -536,7 +539,9 @@
       }).join("") + '</span>';
     }
     var here = pageHub(), lead = list.filter(function(x){ return x.hub === here; })[0] || list[0];
-    var label = "Mastery medals: " + list.map(flairLabel).join(" · ");
+    /* the name carries what the button shows ("+1"), so speech input and a screen reader agree with the screen (BUG-112) */
+    var rest = list.filter(function(x){ return x !== lead; });
+    var label = "Mastery medals: " + flairLabel(lead) + (rest.length ? ", +" + rest.length + " more: " + rest.map(flairLabel).join(" · ") : "");
     return '<button type="button" class="sh-flair" data-sh-flair="medals" data-flair-list="' + esc(s) + '"' + (opt.who ? ' data-flair-who="' + esc(opt.who) + '"' : '') +
       ' aria-label="' + esc(label) + '" title="' + esc(label) + '"><span class="sh-flair-m' + (lead.lvl >= 4 ? ' is-crown' : '') + '">' + medalSvg(lead.lvl, 18, lead.hub) + '</span>' +
       (list.length > 1 ? '<span class="sh-flair-more">+' + (list.length - 1) + '</span>' : '') + '</button>';
@@ -951,7 +956,8 @@
       var earned = {}; badges.forEach(function(b){ earned[b.split(":")[0]] = true; });
       if (NEW) TROPHIES.forEach(function(x){ if (x.device && ls(x.device)) earned[x.k] = true; });
       h += '<div class="sh-trophies-h"><span>Trophy case</span><b>' + TROPHIES.filter(function(x){ return earned[x.k]; }).length + ' / ' + TROPHIES.length + '</b></div>' +
-        '<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") + '</div>' +
+        '<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") +
+          RETIRED.filter(function(x){ return earned[x.k]; }).map(function(x){ return trophyHTML({ k: x.k, n: x.n + " (retired)", d: x.d, ic: x.ic }, true); }).join("") + '</div>' +
         '<p class="sh-trophy-detail" aria-live="polite">' + psst(earned) + '</p>' +
         hubCases(badges, m) +
         '<details class="sh-rank-how"><summary>How XP works</summary><p>10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss (effort counts), and 20 for every day you study. Answer XP is capped at 600 a day, so steady studying beats cramming. Each rank has three levels (I, II, III). Ranks start at: ' +
@@ -1055,8 +1061,6 @@
       if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
       track(raw, { busy: mockBusy, seen: function(j){ if (!window.shAutomated) rpc("mark_dark_unlock_seen", { p_visitor: H.visitor, p_journey: j }); } });
       badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
-      /* Full Arch is once per hub: if it's done on any device, eggs.js stops showing it here */
-      if ((profile.badges || []).indexOf("fullarch:" + H.hub) >= 0) document.dispatchEvent(new CustomEvent("sh:arch-done", { detail: H.hub }));
     }
     function loadOwn(){
       if (loading) return; loading = true;

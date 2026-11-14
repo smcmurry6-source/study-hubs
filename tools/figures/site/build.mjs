@@ -30,8 +30,8 @@
      tools/preview/design/place.js (window.SH_PLACE) as is, after every combination it can draw is checked here;
    - Timmy, his house and the handpiece medallions AS THEY ARE DRAWN TODAY, rendered by the live code itself
      (shPet.art and shPet.house in widget/pet.js, shRanks.art in widget/ranks.js) inside a sandbox with no network and
-     no page, so the preview shows exactly what students see. Holiday outfits and the season are passed in explicitly,
-     so the output doesn't change with the date. */
+     no page, so the preview shows exactly what students see. The season is passed in explicitly, so the output
+     doesn't change with the date. (Timmy has no holiday outfits of his own since the release: he wears the shop's.) */
 import vm from "node:vm";
 import fs from "node:fs";
 import path from "node:path";
@@ -96,7 +96,6 @@ const house = (deco) => W.shPet.house(Object.assign({ flair: [], holiday: "", fa
 const timmy = {
   moods: ["happy", "ok", "sad", "sick", "sleep", "scared"].map((m) => ({ k: m, svg: pet({ hp: 85, mood: m }) })),
   hp: [100, 65, 50, 35, 20, 8, 0].map((hp) => ({ hp, conditions: W.shPet.conditions(hp), svg: pet({ hp }) })),
-  outfits: ["thanksgiving", "winter", "halloween"].map((h) => ({ k: h, svg: pet({ hp: 85, hat: h }) })),
   bar: { happy: pet({ hp: 82, mood: "happy" }), ok: pet({ hp: 82, mood: "ok" }), scared: pet({ hp: 82, mood: "scared" }), sad: pet({ hp: 82, mood: "sad" }) }
 };
 const houses = [
@@ -133,7 +132,8 @@ const journeyTrophies = JK.TROPHIES.map((t) => {
 
 /* ---------- trophies: names and clues from the live lists ---------- */
 const meta = {};
-for (const t of [].concat(W.shRanks.TROPHIES, W.shRanks.HUB_TROPHIES)) if (!meta[t.k]) meta[t.k] = { name: t.n, desc: t.d, secret: !!t.secret, clue: t.clue || "" };
+/* a retired trophy (Full Arch) keeps its drawing: whoever won it still sees it, on the case's Retired shelf */
+for (const t of [].concat(W.shRanks.TROPHIES, W.shRanks.HUB_TROPHIES, W.shRanks.RETIRED || [])) if (!meta[t.k]) meta[t.k] = { name: t.n, desc: t.d, secret: !!t.secret, clue: t.clue || "" };
 const trophies = {};
 for (const k of Object.keys(TROPHIES)) {
   if (!meta[k]) throw new Error("medals.mjs draws a trophy ranks.js doesn't have: " + k);
@@ -434,6 +434,6 @@ if (process.argv.includes("--dry")) {
   for (const [f, t] of outs) fs.writeFileSync(f, t);
   console.log("wrote " + path.relative(root, OUT) + " (" + Math.round(text.length / 1024) + " KB): " +
     Object.keys(ICONS).length + " icons, " + Object.keys(EMBLEMS).length + " emblems, " + Object.keys(MASTHEADS).length + " mastheads, " +
-    Object.keys(trophies).length + " trophies, " + HUBS.length * 4 + " medals, " + (timmy.moods.length + timmy.hp.length + timmy.outfits.length) + " Timmys, " +
+    Object.keys(trophies).length + " trophies, " + HUBS.length * 4 + " medals, " + (timmy.moods.length + timmy.hp.length) + " Timmys, " +
     houses.length + " houses, " + handpieces.length + " handpieces; Timmy's place (" + placeCount + " drawings and " + routeCount + " walks checked); the bowling egg (" + bowlCount + " clips checked); and the hub engine's art (" + (outs.length - 1) + " files)");
 }

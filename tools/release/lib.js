@@ -17,24 +17,23 @@ function hubs(){
   return fs.readdirSync(path.join(ROOT, 'hubs')).filter(h => fs.existsSync(path.join(ROOT, 'hubs', h, 'index.html'))).sort();
 }
 
-/* Exam dates come from the dashboard's HUBS (the one home for them, vault/rules/repo-is-the-vault.md). A hub is
-   "live" until 10 pm on its last exam day (or its archiveOn), the same rule the dashboard uses. */
+/* The dashboard's data (hubs.js, window.SH_DASH_DATA): the one home of hub and exam dates
+   (vault/rules/repo-is-the-vault.md). */
+function hubData(){
+  const w = {}; Function('window', fs.readFileSync(path.join(ROOT, 'hubs.js'), 'utf8'))(w);
+  if (!w.SH_DASH_DATA || !Array.isArray(w.SH_DASH_DATA.hubs)) throw new Error('hubs.js: no window.SH_DASH_DATA.hubs');
+  return w.SH_DASH_DATA;
+}
+/* a hub on the engine (widget/hub.js) keeps its content beside its page; the others are old single-file hubs */
+function isEngine(hub){ return fs.existsSync(path.join(ROOT, 'hubs', hub, 'content', 'core.json')); }
+/* A hub is "live" until 10 pm on its last exam day (or its archiveOn), the same rule the dashboard uses
+   (widget/archive.js, with no admin override). */
 function hubStatus(when){
-  const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-  const start = html.indexOf('var HUBS = ['), end = html.indexOf('];', start);
-  const block = html.slice(start, end);
+  const A = require(path.join(ROOT, 'widget', 'archive.js')), D = A.fromData(hubData());
   const now = when ? new Date(when) : new Date(), out = {};
   for (const id of hubs()) {
-    const i = block.indexOf(`id:"${id}"`);
-    if (i < 0) { out[id] = 'archived'; continue; }
-    /* the next top-level entry starts a line with "{ id:" (an exam's extraQs also have ids, deeper in) */
-    const rest = block.slice(i + 5), m = /\n {4}\{ id:"/.exec(rest), entry = block.slice(i, m ? i + 5 + m.index : undefined);
-    const dates = [...entry.matchAll(/label:"[^"]*", date:"(\d{4}-\d{2}-\d{2})"/g)].map(m => m[1]).sort();   /* exam dates, not check-in or card dates */
-    const ao = /archiveOn:\{ date:"(\d{4}-\d{2}-\d{2})", hour:(\d+) \}/.exec(entry);
-    let cut = null;
-    if (ao) { const [y, m, d] = ao[1].split('-').map(Number); cut = new Date(y, m - 1, d, Number(ao[2])); }
-    else if (dates.length) { const [y, m, d] = dates[dates.length - 1].split('-').map(Number); cut = new Date(y, m - 1, d, 22); }
-    out[id] = cut && now >= cut ? 'archived' : 'live';
+    const h = D.hubs.find(x => x.id === id);
+    out[id] = h && A.resolve(h, null, now, D.options, false).state === 'live' ? 'live' : 'archived';
   }
   return out;
 }
@@ -74,4 +73,4 @@ function outDir(name){
   return path.join(d, name);
 }
 
-module.exports = { ROOT, SUPABASE, launch, hubs, hubStatus, guard, settle, report, outDir };
+module.exports = { ROOT, SUPABASE, launch, hubs, hubData, isEngine, hubStatus, guard, settle, report, outDir };

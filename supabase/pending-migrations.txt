@@ -1,20 +1,8 @@
 # Migrations written and tested but not yet applied to the live project (thytmzsgymydbzcqdnix), one file name per line,
 # in the order they're applied. supabase/schema.sql is the live database; the database tests (tools/release/rls.js,
-# admin-ops.js, retention.js, xp.js) build their throwaway copy from it and then apply these, so a pending migration is
-# tested with everything else. When one is applied (through the connector or the SQL editor), append it to
+# admin-ops.js, retention.js, xp.js, timmy.js) build their throwaway copy from it and then apply these, so a pending
+# migration is tested with everything else. When one is applied (through the connector or the SQL editor), append it to
 # supabase/schema.sql and take its line out of this file, in the same PR.
 #
-# migration_v54.sql: the game layer's server (XP without a daily cap, server-checked answers, the 63-step ladder, Shiny
-# Gold Crowns and Timmy's shop, the idea board). Applied at the redesign's release: vault/tasks/2026-11-06-redesign-release.md
-migration_v54.sql
-# migration_v55.sql: Ask Timmy's chats, limits and admin reads (vault/tasks/2026-11-12-redesign-ask-timmy.md). Applied at the
-# redesign's release with migration_v54, when the timmy Edge Function is deployed.
-migration_v55.sql
-# migration_v56.sql: Learn and Flashcards' ratings and Learn steps (card_reviews, record_card_v2, get_my_cards; Sam,
-# 2026-11-12: a new file, v54 and v55 unchanged; vault/tasks/2026-11-06-redesign-learn-and-flashcards.md). Applied at the
-# redesign's release, after migration_v54 and migration_v55.
-migration_v56.sql
-# migration_v57.sql: Visit someone random from the whole class (get_random_place; Sam, 2026-11-13: "i want random to be
-# for the whole class", a new file, v54 unchanged; vault/tasks/done/2026-11-12-redesign-visiting.md). Applied at the
-# redesign's release, after migration_v56.
-migration_v57.sql
+# None waiting. migration_v54 to migration_v58 were applied at the redesign's release and are in supabase/schema.sql,
+# below its "the redesign's release" marker (tools/release/xp.js still tests the moment they were applied: pg.js).

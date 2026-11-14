@@ -38,7 +38,11 @@ async function keyboard(page){
       const e = document.activeElement;
       if (!e || e === document.body) return null;
       if (e.closest('#shpv-pill, #shpv-panel')) return { skip: true };
-      const s = getComputedStyle(e), ring = (s.outlineStyle !== 'none' && parseFloat(s.outlineWidth) > 0) || (s.boxShadow && s.boxShadow !== 'none');
+      /* the ring is the stop's own outline or shadow, or one drawn on its ::before or ::after: a leaderboard name's
+         button rings the whole row that way (widget/dash.css, .dx-visit) */
+      const has = t => (t.outlineStyle !== 'none' && parseFloat(t.outlineWidth) > 0) || (t.boxShadow && t.boxShadow !== 'none');
+      const drawn = which => { const t = getComputedStyle(e, which); return t.content !== 'none' && t.content !== 'normal' && has(t); };
+      const s = getComputedStyle(e), ring = has(s) || drawn('::after') || drawn('::before');
       const id = e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\s+/)[0] : '');
       /* why a stop has no ring, for the report: is it :focus / :focus-visible, does the page have focus, what outline applies */
       let why = '';
@@ -61,8 +65,7 @@ async function motion(page){
     && !(a.effect.target && a.effect.target.closest && a.effect.target.closest('#shpv-pill, #shpv-panel'))).length);
 }
 
-const HAS_NEXT_DASH = fs.existsSync(path.join(L.ROOT, 'next', 'index.html'));
-/* the new dashboard's boards on the preview's game layer: every row a button; audits the boards (as "dashboard/next · boards"
+/* the dashboard's boards on the preview's game layer: every row a button; audits the boards (as "dashboard · boards"
    when a check is passed in), then taps the second place's name and waits for that classmate's place */
 async function openVisit(page, check){
   await page.evaluate(() => { document.querySelectorAll('section.survey').forEach(s => s.remove()); const c = document.getElementById('class'); if (c) c.scrollIntoView(); });
@@ -99,24 +102,24 @@ async function openVisit(page, check){
     results[key] = r;
   }
   if (!ONLY) {
-    await check('dashboard', 'index.html');
     await check('about', 'about/');
     await check('review (sign-in)', 'review/');
-    /* the redesign's dashboard (next/, widget/dash.js; not live until the release), with its Settings sheet open too */
-    if (HAS_NEXT_DASH) {
-      await check('dashboard/next', 'next/');
-      await check('dashboard/next · settings', null, async () => { await page.click('#setBtn').catch(() => {}); await page.waitForTimeout(300); });
+    /* the dashboard (widget/dash.js), with its Settings sheet open too */
+    {
+      await check('dashboard', 'index.html');
+      await check('dashboard · settings', null, async () => { await page.click('#setBtn').catch(() => {}); await page.waitForTimeout(300); });
       await page.keyboard.press('Escape').catch(() => {});
       /* visiting (phase 4): the boards with their rows as buttons, then a classmate's place opened from one */
-      if (await openVisit(page, () => check('dashboard/next · boards', null))) {
-        await check('dashboard/next · visited place', null);
+      if (await openVisit(page, () => check('dashboard · boards', null))) {
+        await check('dashboard · visited place', null);
         /* motion only, as for a hub's place: Tab inside the scene moves within its shadow root, which reads as one element */
-        results['dashboard/next · visited place'].motion = await motion(page);
+        results['dashboard · visited place'].motion = await motion(page);
         await page.keyboard.press('Escape').catch(() => {});
-      } else problems.push('dashboard/next · visited place: a row on the boards didn\'t open a classmate\'s place');
+      } else problems.push('dashboard · visited place: a row on the boards didn\'t open a classmate\'s place');
     }
   }
-  for (const hub of live) {
+  /* an old single-file hub that is still live: every mode */
+  for (const hub of live.filter(h => !L.isEngine(h))) {
     await page.goto(srv.url + `hubs/${hub}/`); await L.settle(page);
     const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
     let first = true;
@@ -126,45 +129,45 @@ async function openVisit(page, check){
       if (first) { results[`${hub} · ${m}`].focus = await keyboard(page); results[`${hub} · ${m}`].motion = await motion(page); first = false; }
     }
   }
-  /* the redesign's new versions (hubs/<id>/next/, widget/hub.js; not live until the release): the four views */
-  const next = live.filter(h => fs.existsSync(path.join(L.ROOT, 'hubs', h, 'next', 'index.html')));
+  /* a hub on the engine (widget/hub.js): the four views */
+  const next = live.filter(h => L.isEngine(h));
   for (const hub of next) {
-    await page.goto(srv.url + `hubs/${hub}/next/`); await L.settle(page);
+    await page.goto(srv.url + `hubs/${hub}/`); await L.settle(page);
     let first = true;
     for (const v of ['home', 'notes', 'questions', 'more']) {
       await page.evaluate(h => { location.hash = h; }, v); await page.waitForTimeout(900);
-      await check(`${hub}/next · ${v}`, null);
-      if (first) { results[`${hub}/next · ${v}`].focus = await keyboard(page); results[`${hub}/next · ${v}`].motion = await motion(page); first = false; }
+      await check(`${hub} · ${v}`, null);
+      if (first) { results[`${hub} · ${v}`].focus = await keyboard(page); results[`${hub} · ${v}`].motion = await motion(page); first = false; }
     }
     /* Timmy's place (widget/place.js; loaded on first use): its card under More, then the full view and the customizer */
     if (hub === next[0]) {
       await page.evaluate(() => { location.hash = 'more/place'; });
       if (await page.waitForSelector('.place-card .tpc.is-live', { timeout: 20000 }).catch(() => null)) {
-        await check(`${hub}/next · place`, null);
+        await check(`${hub} · place`, null);
         await page.click('.place-card .tpc').catch(() => {});
         if (await page.waitForSelector('dialog.tpv[open]', { timeout: 8000 }).catch(() => null)) {
           await page.waitForTimeout(600);
-          await check(`${hub}/next · place, full view`, null);
-          results[`${hub}/next · place, full view`].motion = await motion(page);
+          await check(`${hub} · place, full view`, null);
+          results[`${hub} · place, full view`].motion = await motion(page);
           await page.click('dialog.tpv [data-tp="customize"]').catch(() => {}); await page.waitForTimeout(900);
-          await check(`${hub}/next · place, customize`, null);
+          await check(`${hub} · place, customize`, null);
           await page.keyboard.press('Escape').catch(() => {});
-        } else problems.push(`${hub}/next · place: the full view didn't open`);
-      } else problems.push(`${hub}/next · place: Timmy's place didn't draw for the returning test account`);
+        } else problems.push(`${hub} · place: the full view didn't open`);
+      } else problems.push(`${hub} · place: Timmy's place didn't draw for the returning test account`);
       /* Timmy's shop (widget/shop.js; loaded on first use): the page under More, then an item's sheet with Buy */
       await page.evaluate(() => { location.hash = 'more/shop'; });
       if (await page.waitForSelector('.shop-host .tsh-store', { timeout: 20000 }).catch(() => null)) {
         await page.waitForTimeout(600);
-        await check(`${hub}/next · shop`, null);
-        results[`${hub}/next · shop`].focus = await keyboard(page); results[`${hub}/next · shop`].motion = await motion(page);
+        await check(`${hub} · shop`, null);
+        results[`${hub} · shop`].focus = await keyboard(page); results[`${hub} · shop`].motion = await motion(page);
         await page.click('.tsh-store .tsh-card.s-buy').catch(() => {});
         if (await page.waitForSelector('dialog.tsh-sheet[open]', { timeout: 8000 }).catch(() => null)) {
           await page.waitForTimeout(500);
-          await check(`${hub}/next · shop, an item's sheet`, null);
-          results[`${hub}/next · shop, an item's sheet`].motion = await motion(page);
+          await check(`${hub} · shop, an item's sheet`, null);
+          results[`${hub} · shop, an item's sheet`].motion = await motion(page);
           await page.keyboard.press('Escape').catch(() => {});
-        } else problems.push(`${hub}/next · shop: an item's sheet didn't open`);
-      } else problems.push(`${hub}/next · shop: the shop didn't draw for the returning test account`);
+        } else problems.push(`${hub} · shop: an item's sheet didn't open`);
+      } else problems.push(`${hub} · shop: the shop didn't draw for the returning test account`);
       /* the bowling egg's clip card (widget/bowling.js; loaded at the first strike): with the run at 49, one first-try
          right answer in the bank shows it. It is named, takes no focus by itself, and closes from the keyboard (its
          close button, and Escape). The pointer rests on it while axe runs, which holds it on the screen. */
@@ -180,7 +183,7 @@ async function openVisit(page, check){
       await bowlAnswer();
       if (await page.waitForSelector('.shb', { timeout: 10000 }).catch(() => null)) {
         await page.hover('.shb .shb-screen').catch(() => {});
-        const k = `${hub}/next · bowling clip`;
+        const k = `${hub} · bowling clip`;
         /* axe on the card alone: the bank under it is checked as its own screen */
         await page.addScriptTag({ content: AXE });
         const v = await page.evaluate(async tags => (await window.axe.run({ include: [['.shb']] }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })).violations
@@ -197,7 +200,7 @@ async function openVisit(page, check){
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
           if (await page.$('.shb')) problems.push(`${k}: Escape doesn't close it`);
         }
-      } else problems.push(`${hub}/next · bowling clip: one first-try right answer with the run at 49 showed no clip`);
+      } else problems.push(`${hub} · bowling clip: one first-try right answer with the run at 49 showed no clip`);
       await page.evaluate(() => ['sh_bowl_run', 'sh_bowl_today', 'sh_bowl_seen'].forEach(k => localStorage.removeItem(k)));
       /* the trophy case (widget/trophies.js; loaded on first use) under More, Stats and trophies: axe and the keyboard; every
          trophy has a name a screen reader gets, and a secret one is announced as a secret, never by its name. Then one
@@ -205,13 +208,13 @@ async function openVisit(page, check){
       await page.evaluate(() => { location.hash = 'more/stats'; });
       if (await page.waitForSelector('.sht .sht-cab', { timeout: 20000 }).catch(() => null)) {
         await page.waitForTimeout(800);
-        const k = `${hub}/next · trophy case`;
+        const k = `${hub} · trophy case`;
         await check(k, null);
         results[k].focus = await keyboard(page); results[k].motion = await motion(page);
         const t = await page.evaluate(() => {
-          const b = [...document.querySelectorAll('.sht [data-sht="trophy"]')], R = window.shRanks, all = R.TROPHIES.concat(R.RETIRED || []);
+          const b = [...document.querySelectorAll('.sht [data-sht="trophy"]')], R = window.shRanks, all = R.TROPHIES.concat(R.RETIRED || [], R.HUB_TROPHIES || []);   /* a hub's shelf: '<trophy>:<hub>' */
           const sec = b.filter(x => x.classList.contains('is-secret'));
-          const leak = sec.filter(x => { const m = all.filter(y => y.k === x.getAttribute('data-k'))[0], said = (x.getAttribute('aria-label') || '') + ' ' + x.textContent;
+          const leak = sec.filter(x => { const m = all.filter(y => y.k === x.getAttribute('data-k').split(':')[0])[0], said = (x.getAttribute('aria-label') || '') + ' ' + x.textContent;
             return !/^Secret trophy/.test(x.getAttribute('aria-label') || '') || !m || said.indexOf(m.n) >= 0; });
           return { n: b.length, unnamed: b.filter(x => !/\S/.test(x.getAttribute('aria-label') || '')).length, sec: sec.length, leak: leak.map(x => x.getAttribute('data-k')) };
         });
@@ -220,14 +223,14 @@ async function openVisit(page, check){
         await page.evaluate(() => window.shRanks.preview('trophy', 1));
         if (await page.waitForSelector('.sh-ru-tr', { timeout: 15000 }).catch(() => null)) {
           await page.waitForTimeout(1200);
-          const kc = `${hub}/next · trophy card`;
+          const kc = `${hub} · trophy card`;
           await page.addScriptTag({ content: AXE });
           const v = await page.evaluate(async tags => (await window.axe.run({ include: [['.sh-ru-tr']] }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })).violations
             .map(x => ({ id: x.id, impact: x.impact, n: x.nodes.length, help: x.help, sample: x.nodes[0] && x.nodes[0].target.join(' ') })), TAGS);
           results[kc] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: await motion(page) };
           await page.click('.sh-ru-tr').catch(() => {});
-        } else problems.push(`${hub}/next · trophy card: shRanks.preview("trophy") showed no card`);
-      } else problems.push(`${hub}/next · trophy case: More, Stats and trophies didn't draw the case for the returning test account`);
+        } else problems.push(`${hub} · trophy card: shRanks.preview("trophy") showed no card`);
+      } else problems.push(`${hub} · trophy case: More, Stats and trophies didn't draw the case for the returning test account`);
     }
   }
   await ctx.close();
@@ -236,7 +239,7 @@ async function openVisit(page, check){
   const dp = await dark.newPage();
   await dp.goto(srv.url + 'index.html?persona=returning'); await L.settle(dp);
   await dp.evaluate(() => { try { localStorage.setItem('sh_theme', 'dark'); } catch (e) {} });
-  for (const [key, url] of [['dashboard (dark)', 'index.html'], ...(HAS_NEXT_DASH ? [['dashboard/next (dark)', 'next/']] : []), ...live.map(h => [`${h} (dark)`, `hubs/${h}/`]), ...next.map(h => [`${h}/next (dark)`, `hubs/${h}/next/`])].filter(([k]) => !ONLY || !/^dashboard/.test(k))) {
+  for (const [key, url] of [['dashboard (dark)', 'index.html'], ...live.map(h => [`${h} (dark)`, `hubs/${h}/`])].filter(([k]) => !ONLY || !/^dashboard/.test(k))) {
     await dp.goto(srv.url + url); await L.settle(dp);
     await dp.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     await dp.addScriptTag({ content: AXE });
@@ -245,26 +248,26 @@ async function openVisit(page, check){
     results[key] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: 0 };
   }
   /* a visited place in dark mode (the theater is dark in both themes; the page behind it isn't) */
-  if (HAS_NEXT_DASH && !ONLY) {
-    await dp.goto(srv.url + 'next/'); await L.settle(dp);
+  if (!ONLY) {
+    await dp.goto(srv.url + 'index.html'); await L.settle(dp);
     await dp.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     if (await openVisit(dp)) {
       await dp.addScriptTag({ content: AXE });
       const v = await dp.evaluate(async ([tags, exclude]) => (await window.axe.run({ exclude: exclude.map(s => [s]) }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })).violations
         .map(x => ({ id: x.id, impact: x.impact, n: x.nodes.length, help: x.help, sample: x.nodes[0] && x.nodes[0].target.join(' ') })), [TAGS, PREVIEW_UI]);
-      results['dashboard/next · visited place (dark)'] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: 0 };
-    } else problems.push('dashboard/next · visited place (dark): a row on the boards didn\'t open a classmate\'s place');
+      results['dashboard · visited place (dark)'] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: 0 };
+    } else problems.push('dashboard · visited place (dark): a row on the boards didn\'t open a classmate\'s place');
   }
   /* the shop in dark mode (its own wood and paper colors) */
   if (next.length) {
-    await dp.goto(srv.url + `hubs/${next[0]}/next/#more/shop`); await L.settle(dp);
+    await dp.goto(srv.url + `hubs/${next[0]}/#more/shop`); await L.settle(dp);
     await dp.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     if (await dp.waitForSelector('.shop-host .tsh-store', { timeout: 20000 }).catch(() => null)) {
       await dp.waitForTimeout(600); await dp.addScriptTag({ content: AXE });
       const v = await dp.evaluate(async ([tags, exclude]) => (await window.axe.run({ exclude: exclude.map(s => [s]) }, { runOnly: { type: 'tag', values: tags }, resultTypes: ['violations'] })).violations
         .map(x => ({ id: x.id, impact: x.impact, n: x.nodes.length, help: x.help, sample: x.nodes[0] && x.nodes[0].target.join(' ') })), [TAGS, PREVIEW_UI]);
-      results[`${next[0]}/next · shop (dark)`] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: 0 };
-    } else problems.push(`${next[0]}/next · shop (dark): the shop didn't draw`);
+      results[`${next[0]} · shop (dark)`] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: 0 };
+    } else problems.push(`${next[0]} · shop (dark): the shop didn't draw`);
   }
   await dark.close(); await browser.close(); srv.server.close();
 

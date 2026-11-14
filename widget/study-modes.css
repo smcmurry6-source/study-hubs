@@ -32,7 +32,7 @@ html.shx .sm-bar.is-shine .b-done::after { animation: sm-shine 900ms 260ms var(-
 
 /* the round's track: a step per question, filling as you answer (a miss adds a dashed step for its second try) */
 /* it stays under the top bar while you answer, so you see it fill */
-html.shx .sm-round { position: sticky; top: var(--sm-top); z-index: 6; margin: -6px -6px 0; padding: 8px 6px 10px; background: var(--ground); }
+html.shx .sm-round { position: sticky; top: -14px; z-index: 6; margin: -6px -6px 0; padding: 8px 6px 10px; background: var(--ground); }
 html.shx .sm-where { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 6px; font-size: var(--fs-label); color: var(--muted); }
 html.shx .sm-where b { color: var(--text); font-weight: var(--w-head); }
 html.shx .sm-streak { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px 2px 6px; border-radius: var(--r-pill);
@@ -51,7 +51,7 @@ html.shx .sm-steps li.is-miss::after { transform: scaleX(1); background: var(--w
 html.shx .sm-stage { display: grid; gap: 14px; min-height: 120px; }
 html.shx .sm-stage > .qc { animation: sm-in 260ms var(--ease-out) both; }
 html.shx .qc-think { margin-top: 16px; }
-html.shx .sm-next { margin: 12px 0 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; scroll-margin-bottom: calc(var(--sh-tabbar-h, 0px) + 88px); }   /* clear of the corner buttons (Ask Timmy, the streak chip) */
+html.shx .sm-next { margin: 12px 0 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; scroll-margin-bottom: 96px; }   /* clear of the corner buttons (Ask Timmy, the streak chip) */
 html.shx .sm-tag { display: inline-flex; align-items: center; gap: 5px; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); }
 html.shx .sm-tag.is-done { position: relative; color: var(--right); }
 html.shx .sm-tag.is-right { padding: 4px 12px; border-radius: var(--r-pill); background: var(--right-bg); color: var(--right-ink); font-weight: var(--w-head); }
@@ -127,14 +127,7 @@ html.shx .fc-ex { margin-top: 14px; }
 html.shx .fc-ex .why { margin-top: 12px; }
 html.shx .fc-ex .sh-nj, html.shx .fc-ex .sh-qrate { margin-top: 12px; }
 html.shx .fc-rate { margin-top: 18px; }
-/* turned over, on a laptop: the four ratings stick to the bottom of the screen while the card runs past it. Not on a phone,
-   where Ask Timmy's icon and the streak chip sit in the bottom corners: there the row stays at the end of the card. */
-@media (min-width: 641px) {
-  html.shx .fcard.is-flipped .fc-rate { position: sticky; bottom: 0; z-index: 2; margin: 14px -10px -10px; padding: 10px 10px 12px;
-    border-radius: var(--r-row) var(--r-row) 0 0; background: var(--panel); box-shadow: 0 -1px 0 var(--border); }
-}
-html.shx .sm-stage > .qc { scroll-margin-top: calc(var(--sm-top) + 76px); scroll-margin-bottom: calc(var(--sh-tabbar-h, 0px) + 12px); }
-html.shx .fc-ans { scroll-margin-top: calc(var(--bar-h) + 12px); scroll-margin-bottom: calc(var(--sh-tabbar-h, 0px) + 130px); }
+html.shx .fc-ans { scroll-margin-top: 12px; scroll-margin-bottom: 130px; }
 html.shx .fc-rate-q { font-size: var(--fs-label); font-weight: var(--w-head); color: var(--muted); }
 html.shx .fc-rate-btns { margin-top: 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 html.shx .hx .fc-r, html.shx .fc-r { position: relative; display: grid; justify-items: center; gap: 2px; min-height: 64px; padding: 8px 6px; border-radius: var(--r-row); text-align: center; }
@@ -154,7 +147,6 @@ html.shx .fc-r:disabled:not(.is-picked) { opacity: .5; }
   html.shx .fc-key { display: none; }
 }
 @media (max-width: 640px) {
-  html.shx .sm { --sm-top: 56px; }   /* under the phone's sticky strip (widget/hub.css, .hx-strip) */
   html.shx .sm-counts li { flex-direction: column; gap: 4px; padding: 10px 12px; }
   html.shx .sm-end .figs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
   html.shx .sm-end .figs b { font-size: 22px; }
@@ -171,3 +163,160 @@ html.shx .fc-r:disabled:not(.is-picked) { opacity: .5; }
   html.shx .is-bump, html.shx .is-pop, html.shx .sm-gain, html.shx .sm-list li, html.shx .sm-steps li.is-now, html.shx .sm-bar.is-shine .b-done::after { animation: none; }
   html.shx .sm-burst { display: none; }
 }
+
+/* ================= the launcher, in the bank (Sam, 2026-11-13: Learn and Flashcards "more like quizlet") ================= */
+html.shx .sm-launch { gap: 16px; padding: 20px; }
+html.shx .sm-launch-head { display: flex; align-items: center; gap: 14px; }
+html.shx .sm-launch-head h2 { font-size: var(--fs-section); line-height: 1.2; font-weight: var(--w-head); }
+html.shx .sm-launch-head .note { margin-top: 2px; }
+html.shx .sm-launch-ic { flex: none; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--hub-soft); color: var(--hub-text); }
+html.shx .sm-launch .sm-counts li { background: var(--row); }
+html.shx .sm-launch-go { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+html.shx .hx .sm-start { min-height: 54px; padding: 0 26px; font-size: 17px; gap: 8px; }
+html.shx .bank-which { margin-top: 8px; font-size: var(--fs-card); font-weight: var(--w-head); }
+
+/* ================= the session: a layer over the hub ================= */
+html.sm-open { overflow: hidden; }
+html.shx .sm-focus { position: fixed; inset: 0; z-index: 30; display: flex; flex-direction: column; gap: 0; background: var(--ground); animation: sm-rise 260ms var(--ease-out) both; }
+html.shx .sm-focus.is-leaving { animation: sm-fall 200ms ease-in both; pointer-events: none; }
+@keyframes sm-rise { from { opacity: 0; transform: translateY(18px) scale(.985); } }
+@keyframes sm-fall { to { opacity: 0; transform: translateY(18px); } }
+html.shx .sm-top { flex: none; display: flex; align-items: center; gap: 12px; min-height: 60px; padding: 6px 16px; border-top: 4px solid var(--hub); border-bottom: 1px solid var(--border); background: var(--ground); }
+html.shx .sm-x { flex: none; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: var(--panel); color: var(--text); cursor: pointer;
+  transition: background var(--t-hover), transform var(--t-hover); }
+html.shx .sm-x:hover { background: var(--row); transform: rotate(90deg); }
+html.shx .sm-x:focus-visible { outline: 3px solid var(--hub-text); outline-offset: 2px; }
+html.shx .sm-topmid { flex: 1; min-width: 0; }
+html.shx .sm-topr { flex: none; display: flex; align-items: center; gap: 12px; font-size: var(--fs-label); }
+html.shx .sm-topr .fold, html.shx .sm-topr .fold-xp { display: none; } html.shx .sm-topr .unfold { display: inline; }
+html.shx .sm-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 14px 16px calc(104px + env(safe-area-inset-bottom, 0px)); }
+html.shx .sm-col { width: min(780px, 100%); margin: 0 auto; display: grid; gap: 14px; }
+
+/* Learn's top row: the percent, the bar, how many are mastered */
+html.shx .sm-focus .sm-prog { display: flex; align-items: center; gap: 12px; padding: 0; width: min(620px, 100%); margin: 0 auto; }
+html.shx .sm-pctn { flex: none; min-width: 44px; font-size: 18px; font-weight: var(--w-head); color: var(--hub-text); text-align: right; }
+html.shx .sm-focus .sm-bar { flex: 1; height: 14px; }
+html.shx .sm-ofn { flex: none; font-size: var(--fs-label); color: var(--muted); white-space: nowrap; }
+html.shx .sm-ofn b { color: var(--text); font-weight: var(--w-head); }
+/* the Auto-next switch, at the end of the round's line */
+html.shx .sm-auto { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 4px; border: 0; background: none; color: var(--muted); font: inherit; font-size: var(--fs-meta);
+  font-weight: var(--w-strong); cursor: pointer; border-radius: var(--r-pill); }
+html.shx .sm-streak + .sm-auto { margin-left: 8px; }
+html.shx .sm-auto i { position: relative; width: 30px; height: 18px; border-radius: 9px; background: var(--control); transition: background var(--t-ui); }
+html.shx .sm-auto i::after { content: ""; position: absolute; left: 2px; top: 2px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transition: transform var(--t-ui); }
+html.shx .sm-auto[aria-pressed="true"] { color: var(--text); }
+html.shx .sm-auto[aria-pressed="true"] i { background: var(--hub-text); }
+html.shx .sm-auto[aria-pressed="true"] i::after { transform: translateX(12px); }
+html.shx .sm-auto:focus-visible { outline: 3px solid var(--hub-text); outline-offset: 2px; }
+
+/* the question, big, and its choices as tiles with their keys */
+html.shx .sm-focus .sm-stage > .qc { padding: 26px; border-radius: 22px; box-shadow: var(--float-shadow); }
+html.shx .sm-focus .qc-stem { font-size: 22px; line-height: 1.38; }
+html.shx .sm-focus .qcard .qc-choices { margin-top: 20px; }
+html.shx .sm-focus .qcard[data-qtype="mcq"] .qc-choices { counter-reset: smch; }
+html.shx .sm-focus .qcard[data-qtype="mcq"] .ch[data-i] { grid-template-columns: auto minmax(0, 1fr) auto auto; min-height: 64px; border-width: 2px; transition: transform 120ms var(--ease-out), border-color var(--t-ui), background var(--t-ui); }
+html.shx .sm-focus .qcard[data-qtype="mcq"] .ch[data-i]::before { counter-increment: smch; content: counter(smch); display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--row); color: var(--muted); font-size: var(--fs-meta); font-weight: var(--w-head); }
+html.shx .sm-focus .qcard:not(.is-answered):not(.is-skipped) .ch[data-i]:hover { transform: translateY(-2px); border-color: var(--hub-text); }
+html.shx .sm-focus .qcard:not(.is-answered):not(.is-skipped) .ch[data-i]:active { transform: scale(.985); }
+html.shx .sm-focus .ch.is-right::before { background: var(--right); color: #fff; }
+html.shx .sm-focus .ch.is-wrong::before { background: var(--wrong); color: #fff; }
+html.shx .sm-focus .ch.is-wrong { animation: sm-shake 360ms var(--ease-out); }
+html.shx .sm-focus .ch.is-right { animation: sm-yes 420ms var(--ease-out); }
+@keyframes sm-shake { 20% { transform: translateX(-6px); } 45% { transform: translateX(5px); } 70% { transform: translateX(-3px); } 100% { transform: none; } }
+@keyframes sm-yes { 40% { transform: scale(1.025); } 100% { transform: none; } }
+html.shx .sm-focus .ch.is-key { border-color: var(--right); background: var(--right-bg); color: var(--right-ink); opacity: 1; }
+html.shx .sm-focus .ch.is-key::before { background: var(--right); color: #fff; }
+html.shx .sm-focus .qcard.is-skipped .ch:not(.is-key) { opacity: .55; }
+html.shx .sm-dk { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 14px; }
+html.shx .sm-dk .btn { padding-left: 8px; }
+@media (min-width: 761px) {
+  html.shx .sm-focus .qcard[data-qtype="mcq"] .qc-choices:not(.qc-tf) { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: stretch; }
+  html.shx .sm-focus .qcard[data-qtype="mcq"] .qc-choices:not(.qc-tf) li { display: flex; }
+  html.shx .sm-focus .qcard[data-qtype="mcq"] .qc-choices:not(.qc-tf) .ch { height: 100%; }
+}
+@media (hover: none) { html.shx .sm-keys { display: none; } }
+/* Next counts down under a right answer when Auto-next is on */
+html.shx .sm-next .btn.is-auto { position: relative; overflow: hidden; }
+html.shx .sm-next .btn.is-auto::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 5px; background: currentColor; opacity: .45; transform-origin: left center;
+  animation: sm-auto 1700ms linear forwards; }
+@keyframes sm-auto { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Flashcards' top row: the three counts, small */
+html.shx .sm-focus .sm-counts { display: flex; justify-content: center; gap: 8px; }
+html.shx .sm-focus .sm-counts li { flex-direction: row; align-items: baseline; gap: 6px; padding: 6px 12px; border-radius: var(--r-pill); white-space: nowrap; }
+html.shx .sm-focus .sm-counts b { font-size: 16px; }
+html.shx .sm-focus .sm-counts span { font-size: var(--fs-meta); }
+/* the card: a card, tall, the question in the middle of it; the ratings stay at the bottom of the screen */
+html.shx .sm-focus .fcard { display: flex; flex-direction: column; min-height: min(58vh, 540px); padding: 26px; border-radius: 22px; box-shadow: var(--float-shadow); touch-action: pan-y; will-change: transform; }
+html.shx .sm-focus .fc-turn { flex: 1; display: grid; align-content: center; }
+html.shx .sm-focus .fcard.is-flipped .fc-turn { align-content: start; }
+html.shx .sm-focus .fcard:not(.is-flipped) .qc-stem { font-size: 24px; text-align: center; }
+html.shx .sm-focus .fcard:not(.is-flipped) .fc-hint, html.shx .sm-focus .fcard:not(.is-flipped) .fc-showch { justify-self: center; text-align: center; }
+html.shx .sm-focus .fcard:not(.is-flipped) .fc-front { display: grid; }
+html.shx .sm-focus .fc-flip { justify-content: center; text-align: center; flex-direction: column; }
+html.shx .sm-focus .fc-flip .btn { min-height: 54px; padding: 0 30px; font-size: 17px; gap: 8px; }
+html.shx .fc-tap { display: none; }
+html.shx .sm-focus .fc-ans-t { font-size: 22px; }
+html.shx .sm-focus .fcard.is-flipped .fc-rate { position: sticky; bottom: -14px; z-index: 2; margin: 16px -12px -12px; padding: 10px 12px 14px; border-radius: var(--r-row) var(--r-row) 16px 16px; background: var(--panel);
+  box-shadow: 0 -1px 0 var(--border); animation: sm-in 240ms var(--ease-out) both; }
+html.shx .hx .fc-r, html.shx .fc-r { transition: transform 120ms var(--ease-out), background var(--t-ui), border-color var(--t-ui); }
+html.shx .fc-r:not(:disabled):hover { transform: translateY(-2px); }
+html.shx .fc-r:not(:disabled):active { transform: scale(.97); }
+html.shx .fc-r.r-again { border-color: color-mix(in srgb, var(--wrong) 45%, transparent); background: var(--wrong-bg); }
+html.shx .fc-r.r-again b { color: var(--wrong-ink); }
+html.shx .fc-r.r-hard { border-color: color-mix(in srgb, var(--gold) 60%, transparent); }
+html.shx .fc-r.r-good { background: var(--hub-soft); }
+html.shx .fc-r.r-easy { border-color: color-mix(in srgb, var(--right) 45%, transparent); background: var(--right-bg); }
+html.shx .fc-r.r-easy b { color: var(--right-ink); }
+/* a finger drags a turned-over card: its edge and a word say what letting go will do */
+html.shx .fc-swipe { position: absolute; top: 14px; z-index: 3; padding: 4px 14px; border-radius: var(--r-pill); color: #fff; font-weight: var(--w-head); opacity: 0; pointer-events: none; transition: opacity 120ms; }
+html.shx .fcard.to-good { box-shadow: 0 0 0 3px var(--right), var(--float-shadow); }
+html.shx .fcard.to-again { box-shadow: 0 0 0 3px var(--wrong), var(--float-shadow); }
+html.shx .fcard.to-good .fc-swipe { right: 16px; background: var(--right); opacity: 1; }
+html.shx .fcard.to-again .fc-swipe { left: 16px; background: var(--wrong); opacity: 1; }
+/* All caught up: what this session was, by rating */
+html.shx .sm-sess { margin-top: 14px; }
+html.shx .sm-sess p { margin: 0; color: var(--muted); font-size: var(--fs-label); }
+html.shx .sm-sess p b { font-size: 26px; font-weight: var(--w-head); color: var(--hub-text); }
+html.shx .sm-sessbar { margin-top: 8px; display: flex; gap: 3px; height: 14px; border-radius: var(--r-pill); overflow: hidden; background: var(--track); }
+html.shx .sm-sessbar i, html.shx .sm-sesskey i { background: var(--hub-text); }
+html.shx .sm-sessbar .s-again, html.shx .sm-sesskey .s-again { background: var(--wrong); }
+html.shx .sm-sessbar .s-hard, html.shx .sm-sesskey .s-hard { background: var(--gold); }
+html.shx .sm-sessbar .s-easy, html.shx .sm-sesskey .s-easy { background: var(--right); }
+html.shx .sm-sesskey { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: var(--fs-meta); color: var(--muted); }
+html.shx .sm-sesskey li { display: inline-flex; align-items: center; gap: 6px; }
+html.shx .sm-sesskey i { width: 10px; height: 10px; border-radius: 50%; }
+html.shx .sm-sesskey b { color: var(--text); }
+html.shx .sm-focus .recap { border-radius: 22px; box-shadow: var(--float-shadow); }
+
+@media (hover: none), (max-width: 640px) {
+  html.shx .sm-focus .fc-tap { display: block; }
+}
+@media (max-width: 640px) {
+  html.shx .sm-launch { padding: 16px; }
+  html.shx .hx .sm-start { width: 100%; }
+  html.shx .sm-top { gap: 8px; padding: 6px 10px; }
+  html.shx .sm-topr { gap: 8px; }
+  html.shx .sm-topr [data-goalm] { display: none; }
+  html.shx .sm-ofw { display: none; }
+  /* Timmy and the Ask button are hidden during a session on a phone, so the page ends near the screen's edge and a
+     flashcard's ratings sit at the bottom of the screen, with nothing showing under them */
+  html.shx .sm-body { padding: 12px 10px calc(22px + env(safe-area-inset-bottom, 0px)); }
+  html.shx .sm-focus .sm-stage > .qc { padding: 18px 16px; border-radius: 18px; }
+  html.shx .sm-focus .qc-stem { font-size: 19px; }
+  html.shx .sm-focus .fcard:not(.is-flipped) .qc-stem { font-size: 21px; }
+  html.shx .sm-focus .fcard { min-height: 56vh; }
+  html.shx .sm-focus .sm-counts { gap: 4px; }
+  html.shx .sm-focus .sm-counts li { padding: 4px 8px; gap: 4px; }
+  html.shx .sm-focus .sm-w { display: none; }
+  html.shx .sm-focus .fcard.is-flipped .fc-rate { margin: 14px -8px -8px; padding: 8px 8px 10px; }
+  /* Timmy's corner button would sit on the ratings: it waits until the session closes (Ask Timmy is on every answered card) */
+  html.sm-open .ska-fab, html.sm-open .shpet-home, html.sm-open .shpet-say { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.shx .sm-focus, html.shx .sm-focus.is-leaving, html.shx .sm-focus .ch.is-wrong, html.shx .sm-focus .ch.is-right, html.shx .sm-focus .fcard.is-flipped .fc-rate { animation: none; }
+  html.shx .sm-x, html.shx .sm-auto i, html.shx .sm-auto i::after, html.shx .fc-r, html.shx .sm-focus .ch[data-i] { transition: none; }
+  html.shx .sm-next .btn.is-auto::after { animation: none; transform: none; opacity: .25; }
+}
+html.shx .sm-col > *, html.shx .sm-stage > * { min-width: 0; }

@@ -312,9 +312,12 @@
       VIEWS.map(function(x){ return '<button type="button" data-qview="' + x[0] + '" aria-pressed="' + (v === x[0]) + '">' + icon(x[2], 18) + "<span>" + x[1] + "</span></button>"; }).join("") + "</span></div>";
   }
   function drawQuestions(el, preset){
-    var title = preset ? labelOf(SETS, preset) : "Questions";
+    var title = preset ? labelOf(SETS, preset) : "Questions", studying = preset !== "mock" && qview() !== "questions";
     el.innerHTML = '<div class="hx-page bank"><div class="bank-head"><h1>' + esc(title) + "</h1></div>" +
-      '<div class="bank-grid"><div class="bank-main">' + (preset === "mock" ? "" : viewHTML()) + panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div></div>' +
+      /* Learn and Flashcards: their launcher first (how far along, Start), then which questions (Sam, 2026-11-13) */
+      '<div class="bank-grid"><div class="bank-main' + (studying ? " is-study" : "") + '">' + (preset === "mock" ? "" : viewHTML()) +
+        (studying ? '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div><h2 class="bank-which">Which questions</h2>' + panelHTML(preset)
+          : panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div>') + "</div>" +
       '<aside class="bank-side" aria-label="Today">' + HX.todayPanel() + "</aside></div></div>";
     wirePanel(el, preset);
     $$("[data-qview]", el).forEach(function(b){ b.addEventListener("click", function(){
@@ -325,8 +328,8 @@
     if (preset === "mock") { drawMock($("#qlist", el), el); return; }
     fill(el, preset);
     var v = qview();
-    if (v === "learn") tip(el, "learn", "Learn asks each question until you get it right twice. Your progress is saved.");
-    else if (v === "cards") tip(el, "cards", "Flip the card, then say how well you knew it. It comes back when you're about to forget it.");
+    if (v === "learn") tip(el, "learn", "Pick the questions below, then Start: Learn asks each one until you get it right twice. Your progress is saved.");
+    else if (v === "cards") tip(el, "cards", "Pick the questions below, then Study: flip each card and say how well you knew it. It comes back when you're about to forget it.");
     else tip(el, "bank", "Your filters and the set you pick are remembered next time; the tags under the panel show what's on.");
   }
   /* Learn and Flashcards, on first use: the module and its stylesheet together, then the set the panel picked */

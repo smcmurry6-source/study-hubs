@@ -98,8 +98,14 @@ jobs:
           BRANCH=$(printf '%s' "$BRANCH" | tr 'A-Z' 'a-z' | tr -c 'a-z0-9' '-' | cut -c1-28)
           npx --yes wrangler@4 pages project create "$CF_PROJECT" --production-branch main > /dev/null 2>&1 || true
           npx --yes wrangler@4 pages deploy _preview --project-name "$CF_PROJECT" --branch "$BRANCH" --commit-hash "$HEAD_SHA" --commit-dirty=true 2>&1 | tee "$RUNNER_TEMP/deploy.log"
-          URL=$(grep -oE "https://$BRANCH\.[a-z0-9-]+\.pages\.dev" "$RUNNER_TEMP/deploy.log" | tail -1)
-          [ -n "$URL" ] || URL=$(grep -oE 'https://[a-z0-9.-]+\.pages\.dev' "$RUNNER_TEMP/deploy.log" | tail -1)
+          # wrangler doesn't always print the branch's alias (2026-11-14: a deploy that worked printed only its own
+          # address, grep found nothing and "set -e" stopped the step before the fallback). A grep that finds nothing
+          # is not a failure here, and the alias is built from the deployment's own address when it isn't printed.
+          URL=$(grep -oE "https://$BRANCH\.[a-z0-9-]+\.pages\.dev" "$RUNNER_TEMP/deploy.log" | tail -1 || true)
+          if [ -z "$URL" ]; then
+            ONE=$(grep -oE 'https://[a-z0-9-]+\.[a-z0-9-]+\.pages\.dev' "$RUNNER_TEMP/deploy.log" | tail -1 || true)
+            [ -z "$ONE" ] || URL="https://$BRANCH.${ONE#https://*.}"
+          fi
           [ -n "$URL" ] || { echo "::error::The deploy finished without printing a preview address"; exit 1; }
           echo "url=$URL" >> "$GITHUB_OUTPUT"
           echo "**Preview:** $URL (this branch on made-up data; noindex)" >> "$GITHUB_STEP_SUMMARY"

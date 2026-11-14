@@ -11,7 +11,7 @@ DENT 2160 Hematology & Endocrinology Exam 2: 50 questions, **5 on Exam 1 materia
 L13-L16** (Sam, 2026-11-10, from Dr. Herr: `EXAM_COUNTS`). **L16 is the last lecture on it**, so L17 and L18 aren't either
 (they go to Exam 3 with A). **Dr. Taylor's Lecture A is not on it** (Sam, 2026-11-10: Dr. Herr said he forgot about it, so it will likely be on the next exam; "i guess save all
 that for exam 3"): the hub's A came out whole that day, and everything it had (notes, narration, 58 questions, hints,
-tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md). Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-in hours: its `HUBS` entry in `index.html`.
+tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md). Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-in hours: its entry in `hubs.js`.
 
 ## Before you work on it
 
@@ -108,11 +108,9 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   sequence and `fh-tf-fshpeak` say it. In L16's recording (2026-11-11) Dr. Madison said the same: FSH rises, far less than LH, because
   inhibin holds it back (his slide's "FSH is suppressed by production of inhibin"). No question's key depends on FSH falling at midcycle (`fp-inhibin` and `fp-lhr-granulosa` stay retired).
 - **Narration:** `hubs/heme-endo-exam2/audio/<lecture>-full.mp3` and `-plain.mp3`, made with `tools/narrate.py`
-  (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). **High yield** (the redesign's third
-  level) is narrated too, since 2026-11-12 (Sam asked for it though the hub archives Nov 13): `audio/<lecture>-hy.mp3` for
-  all eight lectures, made from `next/content/notes.json`. It changes whenever a lecture's notes, predicted topics, hints or
-  questions do, so a question edit can mean recording that lecture's High yield again in the same PR: the smoke lint says
-  which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)). It comes off with the rest at archiving.
+  (`python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`). **High yield** was narrated for all eight lectures on 2026-11-12 for this hub's new version;
+  those recordings (`audio/*-hy.mp3`) went with that version at the redesign's release (below), since the old page has no
+  High yield level. The rest comes off at archiving.
 - **Timmy Time** (2026-11-11): `hubs/heme-endo-exam2/audio/timmy-time.mp3`, 52 min, script `tools/podcast/heme-endo-exam2/script.md`
   (L11-L16 by system, male then female, plus a short Exam 1 refresher on L2, L3, L6 and L10 only, opening with the class's
   split of the five; the histology segments name the two picture questions, the Sertoli cell and the follicle stages;
@@ -230,48 +228,31 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   tagged `which` too (`p1-graves-2`, `p2-pth-fragments`, `p2-cortex-adenoma`, `mh-cilia-stereo`, `r-h1-ccell`,
   `r-ca-calcitonin`).
 
-## The new version (the redesign, not live yet)
+## It keeps its old page (the redesign's release)
 
-`hubs/heme-endo-exam2/next/` is the redesigned hub on the shared engine (`widget/hub.js`), built beside this one
-([phase 2](../tasks/2026-11-05-redesign-phase-2-live-hubs.md), the way [phase 1](../tasks/done/2026-11-05-redesign-phase-1-hub-engine.md)
-built Occlusion's) and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Nothing students see changes
-until then: outside a preview the page sends the visitor to the live hub. Until then **edit content in the live file only**:
-- `node tools/hub-next/build.mjs` rewrites `next/content/` from `hubs/heme-endo-exam2/index.html`. Run it after any change
-  to the live hub (a question, a note, a hint, a figure build) and commit the JSON; CI's "generated files are current" step
-  fails when it's stale. This hub has no drawing kit (`od:kit`), so the build writes its `FIGS` (the Sertoli drawing) and
-  `FIG_PLACE` into `figures.js` as data, with its `anima:js` block as is.
-- **Progress carries over:** same hub id, state key `hee2-state-v1`, answered event `hee2:answered`, and all 495 question
-  ids (402 on the Exam 2 lectures, the Refresher's 93 since 2026-11-11; 609 before its other six lectures were cut).
-- **The Exam 1 Refresher stays review only** (Sam, 2026-11-06 and 2026-11-10, above): the build copies the live hub's
-  `COUNT_SKIP` into `core.json` as `reviewOnly`, and the engine (`isReview()`) keeps R out of Home's totals and "you
-  haven't tried", Where to next, the bank's "of N" ("+ n Exam 1 review") and the mastery medal (`SH_EXPORT.uncounted`),
-  and out of the bank until it is ticked (`bankAll()`); the drill, the mock and a search jump still use it. The picker's and
-  the tag's words are `SH_HUB.review` in `next/index.html`.
-- **Exam 1 High likelihood** is `SH_HUB.bank.only`'s third field, `{ prop: "likely", lec: "refresh" }`: on, it shows R's
-  High Likelihood questions and ticks R; off, it unticks R again if it ticked it (`STATE.ui.qE1auto`, the live hub's flag).
-- **The mock** is the live hub's: `EXAM_GROUPS` (L12a and L12b share their 9) and `MOCK_LIKELY_ONLY` (R's five from its
-  High Likelihood questions, at random) reach `core.json` as `mock.groups` and `mock.likelyOnly`. "Most likely questions"
-  says "9 on the exam for L12a and L12b together".
-- The page (`next/index.html`) is settings only: `window.SH_HUB` holds the words the live hub writes in its own code (Home's
-  exam card and chips, the hints banner, the mock's blurb, the arcade's games, Lab Sort up front). When one changes in the
-  live hub, change it there too. "What the professors said to know" and "In the professors' words" (`hints.words`), since
-  four professors teach the lectures.
-- Its art: tint `#a83232`, emblem and masthead (phase 0) and the six arcade lobby drawings (phase 2: `tools/figures/site/arcade.mjs`,
-  `heSort()` to `heCross()`, from `HEE2_SKIN`), built into `widget/hub-art/heme-endo-exam2.js` by `node tools/figures/site/build.mjs`.
-- **Switched in only if the release beats 11/13** (Sam, 2026-11-11): its exam is Friday, November 13, 10 am; if the release
-  comes later, the live page stays to the end.
-- **Each lecture has its own color** (Sam, 2026-11-11: "more color"), from the engine (`LCOL`, `lc()`, `.lc-0` to `.lc-9` in
-  `widget/hub.css`, by the lecture's place in `LECTURES`): L11 blue, L12a orange, L12b teal, L13 magenta, L14 olive, L15
-  violet, L16 mustard, and the Refresher grey (review only). Adding a lecture at the end keeps the others' colors; one
-  inserted earlier shifts the rest. **Notes done** (`STATE.read`, this device only) fills a lecture's badge.
-- Timmy Time (2026-11-11): `node tools/hub-next/build.mjs --hub heme-endo-exam2` carries the live hub's `SH_PODCAST`
-  (its lore comments included) into `core.json`; the engine draws the Home card, the More tile and the player with likes,
-  dislikes and comments. Rebuild it whenever the live `SH_PODCAST` changes.
-- Test it only through the preview (`node tools/preview/serve.js`, then `/hubs/heme-endo-exam2/next/`).
+Sam, at the release (2026-11-13): "Only hubs still live when it merges get switched: Heme & Endo Exam 2's exam was Nov
+13, so it keeps its old page". So this hub stays a single-file hub (`hubs/heme-endo-exam2/index.html` is the source; it
+is under `legacy` in `hubs.js`), and its new version, `hubs/heme-endo-exam2/next/`, was deleted in the release's PR
+with the High yield recordings only that version played (`audio/*-hy.mp3`, 59 MB). Git keeps both (the commit before
+the release's merge). What that version taught the engine stayed in it for the next Heme & Endo hub: review-only
+lectures (`core.reviewOnly`, `SH_EXPORT.uncounted`), a hub's own Only toggle (`SH_HUB.bank.only` with `{ prop, lec }`),
+grouped mock counts (`mock.groups`, `mock.likelyOnly`) and a color per lecture.
+
+On its old page since the release: everyone has Timmy (no adoption; he wears the outfit kept on the device or nothing),
+Full Arch is retired, and the dashboard opens it from Past hubs once it archives. No game layer, Ask Timmy, place or shop
+there. **Its audio comes off at its archiving** ([the to-do](../tasks/2026-11-12-audio-off-at-archiving.md)).
 
 ## Pending
 
 Open tasks for this hub: `vault/tasks/` notes with `hub: heme-endo-exam2`.
+
+## Archived, audio off (2026-11-13)
+
+Sam, 2026-11-13: "You can also remove the audio for heme and endo 2 and archive it." In the release's PR (#359): `hubs.js`
+gives it `archiveOn` noon Nov 13 (it is under Past hubs from the merge), its narration and Timmy Time are off the site
+(`data-audio="off"` on the v3.js tag; Listen reads in the device's voice) and it keeps its old single-file page. **Still to
+do:** its retrospective and its recap ([inbox](../tasks/inbox.md)). To bring the audio back:
+[archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md).
 
 ## History
 

@@ -32,6 +32,93 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **The release PR's fourth round: smooth scrolling (#359, 2026-11-14, Claude Code; live from the merge)** — Sam on
+  the preview: "scrolling and things are kind of sluggish and jittery" (BUG-147; what was measured and what was
+  learned: [motion-cost](vault/reference/motion-cost.md)).
+  - **The dashboard's drawn pictures move when you arrive, then rest** (`lifeWatch` in `widget/dash.js`): the "you"
+    card's place, the classroom, the stage, the road, the idea board's header and Past hubs are alive for 8 s (`LIFE`)
+    when they come on screen, when a scroll ends on them and under a mouse; they rest at once when a scroll or a touch
+    starts, behind an open window and off screen. `.is-rest` takes the animations inside a drawing away
+    (`widget/dash.css`), which frees their layers (310 on the page before, 23 at rest now); `.is-away` stops
+    everything else in a part that is off screen. Nobody walks in or out of the classroom while it rests.
+  - **The picture of Timmy's place** on a card is a still with the moving one drawn over it in a shadow root
+    (`.tpc-live`; it was one animated image). A page puts `.is-rest` on `.tpc-live` to take it away; its stars hold
+    still. **The full view's stage** holds while anything in the window scrolls and, in Customize, rests 5 s after the
+    last change. **The customizer's rarity frames are stills.**
+  - **The shop** (`widget/shop.js`, `shopLife`): every moving frame and the storefront's two layers have a still under
+    them; the moving ones show for 6 s after it opens, after a scroll ends and under a mouse.
+  - **A crown medal's glint** (`widget/ranks.js`) is a glow whose opacity moves; it was an animated filter.
+  - The little Timmys in the classroom and on the stage no longer blink or sparkle (63 layers nobody could see).
+  - Scrolling the whole dashboard under a 4x slower processor: 59 → 17 ms a frame (phone-size), 81 → 19 (laptop-size).
+- **The release PR's third round (#359, 2026-11-14, Claude Code; live from the merge)** — two more of Sam's calls
+  from the preview ([decisions](vault/decisions.md), 2026-11-14):
+  - **Timmy's place, the full view** (`widget/place.js`, `widget/place.css`): one theater-look window for your own
+    place and a visit. The dialog sets the design tokens for everything inside (`--ground`, `--row`, `--text`...), so
+    it is dark in both themes; the stage and its Close-up chip sit in `.tpv-frame`; your own panel is `hostCard()`
+    (Timmy today with an HP meter, Customize and Shop, the rank plate, the medals); the customizer's foot is sticky on
+    a laptop and has Done (`data-tp="done"`). The window is larger (1240 by 820 at most) and stacks on an upright
+    tablet. Every button still carries a fixed `data-tp`. `.tpv button { color: inherit }` beats a one-class rule, so
+    a button inside the window that needs its own color is written `.tpv .name`.
+  - **The customizer's cards are in the shop's rarity frames** (Sam: "reuse the rarity art instead of just having
+    'legendary' in yellow"): `shopArt()` in `widget/place.js` fetches `widget/hub-art/shop.js` the first time
+    Customize opens and `rframe()` draws `SH_SHOP_ART.frame(rarity)` behind each card (`.tpv-card.is-framed`, laid
+    out like the shop's `.tsh-card`); without the art the cards are plain, as before. Nothing more loads with a page.
+  - **The Preview workflow** no longer fails when a deploy that worked prints no alias address (BUG-146).
+  - **The dashboard's closed-hub cards are gone** (`widget/dash.js`: `renderArchived()` only draws the check-ins and
+    Past hubs' note; `#archived` and the `.dx-arch*` styles are removed). Past hubs is the exam check-ins and the
+    recaps. `tools/release/admin-ui.js` now expects no tab and no link for an archived hub.
+- **The release PR's second round (#359, 2026-11-13, Claude Code; live from the merge)** — what Sam asked for after
+  using the preview ([decisions](vault/decisions.md), 2026-11-13), all in the same PR:
+  - **Dashboard:** the You card's rank is a hero on dark plum (`renderMyRank()`), the wallet and stats match, and
+    **The road** (`#road`, `renderRoad()`) lays out the three journeys rank by rank in place of the folded ladder; one
+    **Exam check-ins** panel at the top of Past hubs (`renderCheckins()`; archived rows no longer carry the button); the
+    Timmy Time card is animated again; the idea board has a banner; the pedestals' wreath sits around the numeral
+    (`tools/figures/site/stage.mjs`); a hub's panel slides in on a tab change.
+  - **Trophy case:** a shelf per hub with its eight (`widget/trophies.js`; badges stay `"<trophy>:<hub>"`).
+  - **Hubs on the engine:** "All hubs" in the bar and "Hubs" on a phone's top strip (`.hx-back`, `.hx-home`); pages
+    slide in from their tab's side (`route()` in `widget/hub.js`).
+  - **Learn and Flashcards** (`widget/study-modes.js` + `.css`, `widget/hub-bank.js`): a launcher in the bank, above
+    the "Which questions" panel, and a **session over the whole screen** (`openFocus()`): numbered tiles, "Don't
+    know?" and Auto-next in Learn; swipe, arrows and a session summary in Flashcards. Tests that drive them click
+    `[data-sm="start"]` first.
+  - **Motion:** the block at the end of `widget/hub.css` (pop-ups rise, pages slide; zero-specificity `:where()` rules
+    with `translate` / `scale`, so a pop-up's own transform and entrance are left alone; `html.hx-still` turns it off,
+    set by `widget/hub.js` and now `widget/dash.js`).
+  - **Heme & Endo Exam 2:** archived (`archiveOn` noon Nov 13 in `hubs.js`) and its audio off the site (173 MB).
+- **THE REDESIGN'S RELEASE (the switch PR, #359, opened 2026-11-13, Claude Code; live from the merge)** — **Read this before
+  touching the dashboard, Occlusion or Perio: the files moved.** One PR switches the site to the redesign
+  ([the release](vault/tasks/2026-11-06-redesign-release.md)); reverting it brings the old site back
+  ([roll-back-a-release](vault/how-to/roll-back-a-release.md); the database stays as it is, the old pages run on it).
+  - **The pages:** `index.html` is the new dashboard (its hub list is **`hubs.js`**, edited by hand: add, date or archive
+    a hub there, not in `index.html`); `hubs/occlusion/` and `hubs/perio/` are on the engine, their old single-file pages
+    gone. `next/` and every `hubs/<hub>/next/` are gone. **Heme & Endo Exam 2 keeps its old page** (Sam: its exam was the
+    13th) and its new version was deleted, with the 59 MB of High yield recordings only that version played.
+  - **A hub's content is its JSON** (`hubs/<hub>/content/`): edit it there, then `node tools/hub-next/build.mjs`
+    (the question index, High yield, one layout; CI's `--check`). `tools/narrate.py`, `narration_words.py`, the figure
+    builds (they write `content/figures.js/css`), `tools/ci/cases.js`, the smoke lint, `tools/xp/keys.js`,
+    `tools/podcast/extract_hub.js`, `dump-banks.js`, `publish-recap.js`, the preview and Ask Timmy all read it.
+    `tools/dash-next/` is gone. New hubs: [build-a-hub](vault/how-to/build-a-hub.md), rewritten.
+  - **After a merge that changes a hub's questions, load its answer keys** (`node tools/xp/keys.js <hub> --sql`): the
+    server grades and pays from its own copy. A new Timmy Time episode is registered with `admin_set_podcast_episode`.
+  - **The database:** `migration_v54.sql` to `migration_v58.sql` (the game layer, Ask Timmy, Learn and Flashcards, the
+    random visit, and v58, new: hidden ideas are deleted after 90 days by the weekly retention job) are applied at the
+    merge and are in `supabase/schema.sql` after a marker line; `supabase/pending-migrations.txt` is empty.
+  - **Shared widget files, on every page (the archived hubs' too):** **Full Arch is retired** (the chart, its switch
+    and its code are gone; 23 trophies on an old page, 27 on the redesign; whoever won it keeps it as "retired").
+    **Everyone has Timmy**: no adoption, introduction, "Tap me!" or holiday outfits in `widget/pet.js`; he wears what
+    is on at his place (on an old hub's page, the outfit kept on the device, or nothing). `FULL_FROM` in `pet.js` is
+    the release day. BUG-112 fixed (the medal button's label for two or more medals). The run flame has its own
+    switch in the new Settings.
+  - **`sw.js`** (`sh-v59`): precaches the dashboard, the bundles, the files fetched on first use and each engine hub in
+    its `HUBS` list; a hub's content JSON is served from the cache and refreshed behind it (**a content edit shows on the
+    load after the one that fetched it**). A new engine hub adds itself to `HUBS`; `tools/ci/syntax.js` checks it.
+  - **The About page** is rewritten for all of it (27 trophies, 16 secret), and Ask Timmy's site help rebuilt from it.
+    Rules and how-tos rewritten for the engine: hub-home-page, arcade-skins, question-bank-filter-panel,
+    every-choice-gets-a-why, archived-hubs-drop-their-audio (`"audio": "off"` in `core.json`), build-a-hub,
+    narrate-with-kokoro, the repo map, shared-infrastructure, `/podcast`, `tools/podcast/LORE.md` (his place).
+  - Tests: the smoke test on every hub, `node tools/release/run.js` (the report is in the PR). Left to do:
+    [the inbox](vault/tasks/inbox.md) (what the old pages still hold up, keys and the function loaded by hand, the
+    first migration after the release, the hub trophies' shelf: Sam's call).
 - **2026-11-13 (the redesign's bundles, phase 5 part 2, Claude Code)** — Nothing students see changes: the live
   dashboard and hubs load exactly the files they loaded (the smoke test fails if one asks for a bundle). A redesigned
   page (`next/`, `hubs/<hub>/next/`) now loads the widget as **built files** instead of one request per source file:

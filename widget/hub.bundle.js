@@ -328,7 +328,6 @@ function petFromBadges(b){
 if (!b.some(function(x){ return String(x).split(":")[0] === "pet-adopt"; })) return;
 whenWidget("shPet", function(P){ if (P && P.syncBadges) P.syncBadges(b); });
 }
-function hasTimmy(){ return true; }
 function morePlace(body){
 var shut = function(){ if (body.isConnected) body.innerHTML = '<p class="note">Timmy’s place couldn’t be opened just now. Try again in a moment.</p>'; };
 loadScript(WIDGET + "place.js").then(function(){
@@ -430,7 +429,7 @@ return askLoad;
 }
 function askMount(){
 if (askMounted || !window.shAsk) return; askMounted = true;
-window.shAsk.mount({ where: "hub", hub: HUB, name: C.name || HUB, exam: C.exam || null, about: C.about || "../../../about/",
+window.shAsk.mount({ where: "hub", hub: HUB, name: C.name || HUB, exam: C.exam || null, about: C.about || "../../about/",
 answeredEvent: HX.EVT, section: function(){ return HX.section(); }, place: askPlace,
 lecName: function(lec){ var l = HX.LBY[lec]; return l ? HX.lecLabel(l) + " " + HX.shortTitle(l) : ""; },
 core: function(){ return HX.CORE; }, state: function(){ return STATE; },
@@ -483,7 +482,7 @@ label: String(q.stem || "").replace(/\s+/g, " ").trim() };
 askReady().then(function(A){ if (A) A.open({ from: "card", text: text, ask: ask }); else HX.toast("The chat didn't load. Try again in a moment."); },
 function(){ HX.toast("The chat didn't load. Check your connection and try again."); });
 }
-HX.say = say; HX.petHp = petHp; HX.timmyReact = timmyReact; HX.petFromBadges = petFromBadges; HX.hasTimmy = hasTimmy; HX.morePlace = morePlace;
+HX.say = say; HX.petHp = petHp; HX.timmyReact = timmyReact; HX.petFromBadges = petFromBadges; HX.morePlace = morePlace;
 HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.costumeOfDay = costumeOfDay;
 HX.askStart = askStart; HX.askOn = askOn; HX.askLabel = askLabel; HX.askAbout = askAbout;
 };
@@ -768,9 +767,11 @@ return '<div class="studyas" role="group" aria-labelledby="saL"><span class="lab
 VIEWS.map(function(x){ return '<button type="button" data-qview="' + x[0] + '" aria-pressed="' + (v === x[0]) + '">' + icon(x[2], 18) + "<span>" + x[1] + "</span></button>"; }).join("") + "</span></div>";
 }
 function drawQuestions(el, preset){
-var title = preset ? labelOf(SETS, preset) : "Questions";
+var title = preset ? labelOf(SETS, preset) : "Questions", studying = preset !== "mock" && qview() !== "questions";
 el.innerHTML = '<div class="hx-page bank"><div class="bank-head"><h1>' + esc(title) + "</h1></div>" +
-'<div class="bank-grid"><div class="bank-main">' + (preset === "mock" ? "" : viewHTML()) + panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div></div>' +
+'<div class="bank-grid"><div class="bank-main' + (studying ? " is-study" : "") + '">' + (preset === "mock" ? "" : viewHTML()) +
+(studying ? '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div><h2 class="bank-which">Which questions</h2>' + panelHTML(preset)
+: panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div>') + "</div>" +
 '<aside class="bank-side" aria-label="Today">' + HX.todayPanel() + "</aside></div></div>";
 wirePanel(el, preset);
 $$("[data-qview]", el).forEach(function(b){ b.addEventListener("click", function(){
@@ -781,8 +782,8 @@ var nb = $('[data-qview="' + v + '"]', el); if (nb) nb.focus();
 if (preset === "mock") { drawMock($("#qlist", el), el); return; }
 fill(el, preset);
 var v = qview();
-if (v === "learn") tip(el, "learn", "Learn asks each question until you get it right twice. Your progress is saved.");
-else if (v === "cards") tip(el, "cards", "Flip the card, then say how well you knew it. It comes back when you're about to forget it.");
+if (v === "learn") tip(el, "learn", "Pick the questions below, then Start: Learn asks each one until you get it right twice. Your progress is saved.");
+else if (v === "cards") tip(el, "cards", "Pick the questions below, then Study: flip each card and say how well you knew it. It comes back when you're about to forget it.");
 else tip(el, "bank", "Your filters and the set you pick are remembered next time; the tags under the panel show what's on.");
 }
 var SM = null, smLoad = null;
@@ -1132,7 +1133,7 @@ Object.defineProperty(HX, "bankSearch", { get: function(){ return bankSearch; },
 if (window.shHub) return;
 var C = window.SH_HUB || {}, A = window.SH_HUB_ART || { icons: {}, flame: {} }, AH = window.SH_HUB_ART_HUB || {};
 var HUB = C.hub || "hub", EVT = C.answeredEvent || (HUB + ":answered"), BASE = C.content || "content/";
-var WIDGET = C.widget || "../../../widget/", ASSETS = C.assets || "../";
+var WIDGET = C.widget || "../../widget/", ASSETS = C.assets || "./";
 var docEl = document.documentElement;
 var reduced = false; try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
 docEl.classList.add("shx");
@@ -1261,6 +1262,7 @@ function saveNow(){ clearTimeout(saveT); saveT = 0; try { localStorage.setItem(S
 function saveState(){ clearTimeout(saveT); saveT = setTimeout(saveNow, 250); }
 addEventListener("pagehide", saveNow);
 document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") saveNow(); });
+var AUDIO_OFF = false;
 var CORE = null, QS = null, QBY = {}, QBL = {}, LECS = [], LBY = {}, IDX = [], NOTES = null, STUDY = null, FIG = null, ARC = null;
 var EXAM = null, EXAM_LECS = {}, REVIEW = {};
 var memo = {};
@@ -1289,6 +1291,8 @@ function isExamLec(id){ return !!EXAM_LECS[id]; }
 function isReview(id){ return !!REVIEW[id]; }
 function hasReview(){ return Object.keys(REVIEW).length > 0; }
 function setCore(c){
+AUDIO_OFF = c.audio === "off";
+if (AUDIO_OFF && c.podcast) { c = Object.assign({}, c); delete c.podcast; }
 CORE = c; LECS = c.lectures || []; LECS.forEach(function(l){ LBY[l.id] = l; QBL[l.id] = []; });
 IDX = (c.index || []).map(function(r){ return { id: r[0], lec: r[1], likely: !!r[2], src: r[3] || "" }; });
 IDX.forEach(function(r){ (QBL[r.lec] = QBL[r.lec] || []).push(r); });
@@ -1327,7 +1331,7 @@ shell = h('<div class="hx" data-hub="' + esc(HUB) + '"></div>');
 shell.innerHTML =
 '<a class="hx-skip" href="#main">Skip to the page</a>' +
 '<header class="hx-bar" id="hxBar">' +
-'<a id="sh-ribbon-back" class="hx-back" href="' + esc(C.back || "../../../index.html") + '" aria-label="All hubs"></a>' +
+'<a id="sh-ribbon-back" class="hx-back" href="' + esc(C.back || "../../") + '" aria-label="All hubs"></a>' +
 '<a class="hx-name" href="#home">' + emblem("hx-emb") + "<span>" + name + "</span></a>" +
 '<nav class="hx-tabs" id="modeSwitch" aria-label="' + name + '">' + VIEWS.map(function(v){
 return '<a class="hx-tab" href="#' + v[0] + '" data-mode="' + v[0] + '">' + icon(v[0], 22) + "<span>" + v[1] + "</span></a>"; }).join("") + "</nav>" +
@@ -1340,7 +1344,7 @@ return '<a class="hx-tab" href="#' + v[0] + '" data-mode="' + v[0] + '">' + icon
 '<button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button>" +
 '<a class="hx-set" href="#more/settings" aria-label="Settings">' + icon("settings", 22) + '<span class="lbl">Settings</span></a>' +
 "</header>" +
-'<div class="hx-strip" id="hxStrip" aria-label="Today"><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="hx-meter hx-live" data-livem></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
+'<div class="hx-strip" id="hxStrip" aria-label="Today"><a class="hx-home" href="' + esc(C.back || "../../") + '" aria-label="All hubs: back to the dashboard"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M13 8H3"/><path d="M7 4 3 8l4 4"/></svg><span>Hubs</span></a><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="hx-meter hx-live" data-livem></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
 '<main class="hx-main" id="main" tabindex="-1">' + VIEWS.map(function(v){ return '<section class="hx-view" data-view="' + v[0] + '" data-mode-panel="' + v[0] + '" hidden></section>'; }).join("") + "</main>" +
 '<div class="hx-toasts" id="hxToast" aria-live="polite"></div>';
 document.body.appendChild(shell);
@@ -1374,6 +1378,7 @@ var r = parse(), v = r[0], s = r[1];
 if (window.shTTS && view === "notes" && (v !== "notes" || s !== sub)) { try { window.shTTS.stop(); } catch (e) {} }
 if (view === "questions" && v !== "questions") leaving = HX.recapDue();
 if (view === "more" && sub === "arcade" && ARC && (v !== "more" || s !== "arcade")) { try { ARC.arcade.stopAll(); } catch (e) {} }
+var was = view, wasSub = sub;
 view = v; sub = s;
 var setOn = v === "more" && s === "settings", gear = $(".hx-set");
 if (gear) { if (setOn) gear.setAttribute("aria-current", "page"); else gear.removeAttribute("aria-current"); }
@@ -1384,6 +1389,14 @@ var el = $('.hx-view[data-view="' + v + '"]');
 STATE.ui.mode = v; saveState();
 try { ({ home: renderHome, notes: renderNotes, questions: HX.renderQuestions, more: renderMore })[v](el, s); } catch (e) { el.innerHTML = '<div class="hx-page"><h1>Something went wrong</h1><p class="note">' + esc(e.message) + "</p></div>"; if (window.console) console.error(e); }
 if (leaving) { HX.showLeftRecap(el, leaving); leaving = null; }
+var pg = el;
+if (pg && was && (was !== v || wasSub !== s)) {
+var order = VIEWS.map(function(x){ return x[0]; }), d = order.indexOf(v) - order.indexOf(was);
+pg.classList.remove("is-entering"); void pg.offsetWidth;
+pg.style.setProperty("--from", was === v ? "0px" : (d > 0 ? "22px" : "-22px"));
+pg.classList.add("is-entering");
+if (!pg._hxEnter) { pg._hxEnter = 1; pg.addEventListener("animationend", function(e){ if (e.target === pg) pg.classList.remove("is-entering"); }); }
+}
 }
 function go(hash, keep){
 if (("#" + hash) === location.hash) { route(); }
@@ -1547,7 +1560,7 @@ var level = hasPlain && STATE.ui.level === "plain" ? "plain" : hasHy && STATE.ui
 var text = (level === "plain" ? NOTES.plain : hy ? NOTES.hy : NOTES.full)[lec.id], nq = (QBL[lec.id] || []).length;
 var nTopics = hy ? (CORE.likelyTopics || []).filter(function(t){ return t.lec === lec.id; }).length : 0;
 var nLikely = (QBL[lec.id] || []).filter(function(r){ return r.likely; }).length;
-var mp3 = !hy ? ASSETS + "audio/" + lec.id + "-" + level + ".mp3" : (NOTES.hyAudio || []).indexOf(lec.id) >= 0 ? ASSETS + "audio/" + lec.id + "-hy.mp3" : "";
+var mp3 = AUDIO_OFF ? "" : !hy ? ASSETS + "audio/" + lec.id + "-" + level + ".mp3" : (NOTES.hyAudio || []).indexOf(lec.id) >= 0 ? ASSETS + "audio/" + lec.id + "-hy.mp3" : "";
 var list = lecListHTML(lec);
 var sub = String(lec.title).split(":").slice(1).join(":").trim();
 var group = (STUDY.review || []).filter(function(g){ return g.lec === lec.id; })[0];
@@ -1878,15 +1891,15 @@ return '<li class="mt f-' + f + (big ? " is-big" : "") + '"><a href="#more/' + m
 '<span class="mt-meta num">' + esc(moreMeta(m[0])) + "</span></span>" + icon("chevron", 20) + "</a></li>";
 };
 el.innerHTML = '<div class="hx-page more"><h1>More</h1><p class="more-lede">Everything past the notes and the questions: the review, the games, your stats and your settings.</p>' +
-'<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "place" || HX.hasTimmy()) && (m[0] !== "shop" || HX.hasShop()); }).map(tile).join("") + "</ul></nav>" +
+'<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "shop" || HX.hasShop()); }).map(tile).join("") + "</ul></nav>" +
 '<section class="panel menu talk" aria-labelledby="mwH"><h2 id="mwH">Talk to us</h2><ul class="rows">' +
 MORE_ROWS.map(function(m){ return '<li><a href="#more/' + m[0] + '">' + icon(m[1], 22) + "<span><b>" + esc(m[2]) + "</b><small>" + esc(m[3]) + "</small></span>" + icon("chevron", 18) + "</a></li>"; }).join("") +
 '<li><button type="button" data-sh-inbox>' + icon("inbox", 22) + "<span><b>Inbox</b><small>Replies to what you report or suggest, and notices to the class</small></span>" + icon("chevron", 18) + "</button></li>" +
 '<li><button type="button" data-open="suggest">' + icon("comment", 22) + "<span><b>Suggest something</b><small>An idea for this hub or the site</small></span>" + icon("chevron", 18) + "</button></li>" +
 '<li><button type="button" data-open="flag">' + icon("report", 22) + "<span><b>Report an issue</b><small>A typo, a wrong key, something broken</small></span>" + icon("chevron", 18) + "</button></li>" +
 '<li><button type="button" data-tour>' + icon("tour", 22) + "<span><b>Take the tour</b><small>Two minutes, on the real buttons</small></span>" + icon("chevron", 18) + "</button></li>" +
-'<li><a href="' + esc(C.about || "../../../about/") + '">' + icon("about", 22) + "<span><b>About</b><small>Every feature, trophy and easter egg</small></span>" + icon("chevron", 18) + "</a></li>" +
-'<li><a href="' + esc(C.back || "../../../index.html") + '">' + icon("home", 22) + "<span><b>All hubs</b><small>Back to the dashboard</small></span>" + icon("chevron", 18) + "</a></li>" +
+'<li><a href="' + esc(C.about || "../../about/") + '">' + icon("about", 22) + "<span><b>About</b><small>Every feature, trophy and easter egg</small></span>" + icon("chevron", 18) + "</a></li>" +
+'<li><a href="' + esc(C.back || "../../") + '">' + icon("home", 22) + "<span><b>All hubs</b><small>Back to the dashboard</small></span>" + icon("chevron", 18) + "</a></li>" +
 "</ul></section></div>";
 $$("[data-open]", el).forEach(function(b){ b.addEventListener("click", function(){
 var k = b.getAttribute("data-open"); if (k === "flag" && window.shOpenFlag) { window.shOpenFlag(); return; }
@@ -2111,12 +2124,13 @@ var EXTRAS = [
 ["sh_pref_nuke", "Tactical nukes", "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes.", [["on", "On"], ["mine", "Mine only"], ["off", "Off"]]],
 ["sh_pref_celebrate", "Rank-up and trophy cards", "The rank-up cutscene, level-up, trophy and medal cards."],
 ["sh_pref_cheers", "Streak cheers", "Confetti and a toast every 5 right in a row."],
+["sh_pref_flame", "Streak flame", "The flame in the corner that counts your run from 3 right in a row."],
 ["sh_pref_fx", "Answer animations", "Pops, shakes, sweeps and fades. Off keeps the check and X marks."]
 ];
 var SIZES = [["small", "Small", .9], ["default", "Default", 1], ["large", "Large", 1.15], ["xlarge", "X-Large", 1.3], ["xxlarge", "XX-Large", 1.45]];
 function prefSet(k, v){ ls(k, v); try { document.dispatchEvent(new CustomEvent("sh:pref", { detail: { key: k, val: v } })); } catch (e) {} }
 function seg(key, opts, cur){ return '<span class="seg" role="group" data-key="' + esc(key) + '">' + opts.map(function(o){ return '<button type="button" data-val="' + esc(o[0]) + '" aria-pressed="' + (cur === o[0]) + '">' + esc(o[1]) + "</button>"; }).join("") + "</span>"; }
-var FOCUS_KEYS = EXTRAS.map(function(x){ return x[0]; }).concat(["sh_pref_flame"]);
+var FOCUS_KEYS = EXTRAS.map(function(x){ return x[0]; });
 function focusOn(){ return ls("sh_pref_focus") === "on"; }
 function setFocus(on){
 if (on === focusOn()) return;
@@ -2291,6 +2305,7 @@ var rest = document.createElement("script"); rest.src = WIDGET + "rest.bundle.js
 var s = document.createElement("script"); s.src = WIDGET + "hub-rest.bundle.js"; s.async = false;
 s.setAttribute("data-hub", HUB); s.setAttribute("data-answered-event", EVT); s.setAttribute("data-default-mode", "home");
 s.setAttribute("data-game", "v2");
+if (AUDIO_OFF) s.setAttribute("data-audio", "off");
 s.onload = function(){
 HX.askStart(); HX.shopStart();
 if (window.shWireClassStats) window.shWireClassStats(".qcard[data-qid]");
@@ -2311,7 +2326,7 @@ getJSON("core.json").then(function(c){
 setCore(c);
 window.SH_EXPORT = { lectures: LECS.map(function(l){ return { id: l.id, title: lecLabel(l) + " " + l.title, who: l.who, status: l.status }; }), exams: (c.exams || []).map(function(x){ return { label: x.label, date: x.date }; }), sections: [], hints: [] };
 if (hasReview()) window.SH_EXPORT.uncounted = function(){ var n = 0, right = 0; IDX.forEach(function(q){ if (!isReview(q.lec)) return; n++; var s = ansOf(q.id); if (s && s.last) right++; }); return { n: n, right: right }; };
-if (c.podcast) window.SH_PODCAST = Object.assign({}, c.podcast, { src: ASSETS + c.podcast.src });
+if (CORE.podcast) window.SH_PODCAST = Object.assign({}, CORE.podcast, { src: ASSETS + CORE.podcast.src });
 route();
 var idle = window.requestIdleCallback || function(f){ setTimeout(f, 300); };
 idle(function(){

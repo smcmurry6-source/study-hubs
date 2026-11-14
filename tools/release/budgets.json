@@ -4,10 +4,10 @@
  "profile": "slow 4G, CPU 4x, 412x823 phone",
  "pages": {
   "index.html": {
-   "kb": 290,
-   "requests": 16,
-   "fcp": 1500,
-   "lcp": 2500,
+   "kb": 345,
+   "requests": 10,
+   "fcp": 3000,
+   "lcp": 3000,
    "tbt": 500
   },
   "about/": {
@@ -22,6 +22,13 @@
    "requests": 33,
    "fcp": 2000,
    "lcp": 2500,
+   "tbt": 1000
+  },
+  "hubs/heme-endo-exam2/": {
+   "kb": 1330,
+   "requests": 33,
+   "fcp": 2000,
+   "lcp": 5500,
    "tbt": 1000
   },
   "hubs/msk-exam3/": {
@@ -39,11 +46,11 @@
    "tbt": 500
   },
   "hubs/occlusion/": {
-   "kb": 1480,
-   "requests": 33,
-   "fcp": 2000,
-   "lcp": 2500,
-   "tbt": 1000
+   "kb": 800,
+   "requests": 12,
+   "fcp": 3000,
+   "lcp": 3000,
+   "tbt": 500
   },
   "hubs/pcd-exam3/": {
    "kb": 850,
@@ -60,52 +67,17 @@
    "tbt": 500
   },
   "hubs/perio/": {
-   "kb": 1180,
-   "requests": 32,
-   "fcp": 1500,
-   "lcp": 4500,
-   "tbt": 1000
-  },
-  "hubs/special-patient-care/": {
-   "kb": 940,
-   "requests": 32,
-   "fcp": 1500,
-   "lcp": 2500,
-   "tbt": 500
-  },
-  "hubs/heme-endo-exam2/": {
-   "kb": 1330,
-   "requests": 33,
-   "fcp": 2000,
-   "lcp": 5500,
-   "tbt": 1000
-  },
-  "hubs/occlusion/next/": {
-   "kb": 800,
-   "requests": 12,
-   "fcp": 3000,
-   "lcp": 3000,
-   "tbt": 500
-  },
-  "hubs/heme-endo-exam2/next/": {
-   "kb": 750,
-   "requests": 12,
-   "fcp": 3000,
-   "lcp": 3000,
-   "tbt": 500
-  },
-  "hubs/perio/next/": {
    "kb": 830,
    "requests": 12,
    "fcp": 3000,
    "lcp": 3000,
    "tbt": 500
   },
-  "next/": {
-   "kb": 345,
-   "requests": 10,
-   "fcp": 3000,
-   "lcp": 3000,
+  "hubs/special-patient-care/": {
+   "kb": 940,
+   "requests": 32,
+   "fcp": 1500,
+   "lcp": 2500,
    "tbt": 500
   }
  }

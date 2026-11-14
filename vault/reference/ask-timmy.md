@@ -7,8 +7,7 @@ tags: [timmy, ask-timmy, supabase, edge-function, claude-api, redesign, privacy]
 
 How Ask Timmy answers a student: the Supabase Edge Function `timmy`, its database half (`migration_v55.sql`), the tests
 and the eval, and the chat in the new pages (`widget/ask.js`, "The chat" below). Built 2026-11-12 as parts 1 and 2 of [the task](../tasks/2026-11-12-redesign-ask-timmy.md) (Sam's calls are
-there and in [decisions](../decisions.md)); **deployed and applied at [the redesign's release](../tasks/2026-11-06-redesign-release.md),
-not before**. Until then `migration_v55.sql` is in `supabase/pending-migrations.txt` and nothing calls the function.
+there and in [decisions](../decisions.md)); **deployed and applied at [the redesign's release](../tasks/2026-11-06-redesign-release.md)**.
 
 ## The files
 
@@ -124,15 +123,18 @@ person to read. The full report (every question and answer) is written as markdo
 
 ## At the release (the release note's Ask Timmy box)
 
+The steps as they were done at the redesign's release ([the release](../tasks/2026-11-06-redesign-release.md)); they are
+also how to set Ask Timmy up again on a new project.
+
 1. Sam saves `ANTHROPIC_API_KEY` in the Supabase dashboard (Edge Functions, Secrets) and sets the Console's spending limit.
    **Make the key inside a workspace** (the Console's workspace, then API keys). A key made outside one is refused
    ("This API key is not scoped to a workspace", found on 2026-11-12's first eval run) unless the workspace's id is also
    saved, as `ANTHROPIC_WORKSPACE_ID`.
-2. Apply `migration_v55.sql` with `migration_v54.sql`, append both to `supabase/schema.sql`, take their lines out of
-   `supabase/pending-migrations.txt` (same PR).
+2. Apply `migration_v55.sql` after `migration_v54.sql` (both are in `supabase/schema.sql`).
 3. Deploy the function with JWT verification off (the Supabase connector's `deploy_edge_function`: `index.ts`, `core.js`,
-   `site.json`), and set `TIMMY_CONTENT_BASE` to the released content address
-   (`https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/content/` or wherever the switch PR puts it).
+   `site.json`). `TIMMY_CONTENT_BASE` needs no setting: its default is the released content address
+   (`https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/content/`). **Deploy it again after a change to
+   `supabase/functions/timmy/`** (`site.json` changes whenever the About page does).
 4. One question from the live site on a phone; the admin page's Ask Timmy tab shows it, with its cost, and opens its chat.
 
 ## The chat in the new pages (`widget/ask.js` + `ask.css`, part 2)
@@ -183,25 +185,25 @@ download it, which keeps the new dashboard inside its request budget (`tools/rel
   request carries what the function reads, an answer's markup is drawn as text, Report and a drafted report work, every
   button has its `data-ska`, a "From the notes" link opens `#notes/<lecture>`, Ask Timmy on an answered card sends its id,
   and the icon hides during the mock.
-- At the release: `sw.js` precaches the new pages' files (add `widget/ask.js` and `widget/ask.css` with the rest), and
-  the function's `TIMMY_CONTENT_BASE` points at the released content (above).
+- `widget/ask.js` and `ask.css` are in the bundles, so `sw.js` precaches them with the rest, and the function's
+  `TIMMY_CONTENT_BASE` defaults to the released content (above).
 
 ## Everyone has Timmy (`widget/pet.js`, part 4)
 
 Built 2026-11-13 ([the task](../tasks/2026-11-12-redesign-ask-timmy.md), "Build spec, part 4"). Sam, 2026-11-12:
 "adopting timmy is no longer an option. once the redesign launches, everyone has timmy", and "if someone doesnt have a
-costume applied, they are naked. What you put wins." Only on the redesign's pages: the live hubs and the live dashboard
-pass nothing and keep every line of the old behavior.
+costume applied, they are naked. What you put wins." **Since the release it is the only behavior, on every page**: the
+adoption, the introduction, "Tap me!", the dashboard's perch and his holiday outfits came out of `pet.js`.
 
-- **The switch** is `shPet.mount({ everyone: true, outfit })`. `widget/v3.js` passes it (and loads pet.js for everyone,
-  adopted or not) on a page whose tag has `data-game="v2"`, which the engine writes on every new hub; `widget/dash.js`
-  passes it on the new dashboard (whose porch line, "Timmy Tooth wants to meet you", is gone).
-- **No adoption**: `adopted()` is true. A first visit sets `sh_pet_born` to today (Central) and sends the `pet-adopt`
+- **No switch**: `widget/v3.js` loads pet.js on every hub page and `widget/dash.js` on the dashboard. An old
+  single-file hub's page has no shop in its bootstrap, so there he wears the outfit kept on the device
+  (`sh_pet_outfit`), or nothing.
+- **No adoption**: a first visit sets `sh_pet_born` to today (Central) and sends the `pet-adopt`
   badge (`record_achievement`) as the introduction did; with two linked devices that each met him on their own, the
-  earliest badge's day wins (`syncBadges`, only with `everyone`). No introduction, no "Tap me!", no "No thanks"; one
+  earliest badge's day wins (`syncBadges`). No introduction, no "Tap me!", no "No thanks"; one
   hello in his bubble on the first visit instead ("Hi, I'm Timmy Tooth! ..."), with "Ask me" when the chat is there.
 - **100 HP to start**: `simulate()` starts at 100, not 70, when `sh_pet_born` is on or after `FULL_FROM`, the day the
-  redesign goes live (`"9999-12-31"` until the release sets it). A Timmy adopted before keeps his history. In a preview,
+  redesign went live (set in the release's last commit). A Timmy adopted before keeps his history. In a preview,
   `tools/preview/transform.js` rewrites that line to read `window.SH_PREVIEW_TIMMY_FROM`, which the preview's runtime
   sets to the day the test account started (so `new` meets him at 100 and the other accounts keep theirs); the smoke test
   serves pet.js with it set to today. **Pearly Whites** (the 100 HP trophy): a Timmy who starts at 100 earns it by getting
@@ -221,15 +223,14 @@ pass nothing and keep every line of the old behavior.
 - **Changing it**: `shPet.setOutfit(id, parts)` puts it on at once. `widget/place.js` calls it whenever its outfit slot
   changes (`barFollow()`: after the customizer's equip, the server's answer, or a refusal put back), with the kit's
   drawing and lines, so no file is fetched. The place itself (`timmySvg`) always draws him bare under the outfit.
-- **What he says**: with `everyone` his outfit lines are the worn outfit's own (when kept), and with nothing on he
+- **What he says**: his outfit lines are the worn outfit's own (when kept), and with nothing on he
   doesn't ask "Do you like my costume?" on Halloween. Holiday jokes and hellos stay.
 - **The tests**: `tools/ci/smoke.js` ("everyone has Timmy"), on a phone and a laptop: a first visit on a new hub (on the
   bar, no introduction or "Tap me!", 100 HP, today's birthday, one badge, `fit()` the bootstrap's id, no outfits.js
   with the page, the outfit after the first key, kept; the next visit wears it with no request; nothing on at Halloween
   is nothing; the customizer dresses the bar without a reload; More has the place and the shop), the same first visit on
-  the new dashboard, and the live hub and live dashboard as before (not shown before adoption, the Halloween costume and
-  `<holiday>:<outfit>`, "Tap me!" and the introduction with "No thanks").
-- **At the release**: the release note's "From Ask Timmy, part 4" (`FULL_FROM`, then the adoption code comes out).
+  the dashboard, and an old single-file hub (on the bar for a first-time visitor, no introduction, nothing on at
+  Halloween, no outfits.js fetched).
 
 ## The admin page's Ask Timmy tab (`review/index.html`, part 3)
 
@@ -255,9 +256,8 @@ with the 7, 30 or 90 days range. Its code and notes are under "Ask Timmy" in the
   at once); Escape or Cancel backs out; Confirm calls `admin_timmy_config` with only what changed.
 - **From the Inbox**: a report from the chat's Report button (its note ends "— Timmy's answer <id>") gets "Read the chat
   with Timmy", which opens the tab with that answer's chat open. The reply is written in the Inbox, as for any report.
-- **Before the release** the live database has none of these functions: the calls answer "Could not find the
-  function", and the tab says Ask Timmy starts at the release (no error, no settings). It fills in once migration_v55 is
-  applied; nothing in the page changes then.
+- On a database without migration_v55 the calls answer "Could not find the function", and the tab says Ask Timmy
+  isn't set up (no error, no settings).
 - **The preview** answers the six calls with made-up chats shaped as migration_v55 returns them
   (`timmyFixtures`/`timmyAdmin` in `tools/preview/runtime/preview.js`; the quotes are real lines of the new hubs' notes,
   one chat carries markup on purpose), keeps the settings in the account's fixture database, and lists the made-up
