@@ -190,7 +190,6 @@ HUBS = live; ARCHIVED_HUBS = rest;
 return sig.join(",");
 }
 var hubSig = partitionHubs();
-function shownArchived(){ return ARCHIVED_HUBS.filter(function(h){ return HUB_STATE[h.id] && HUB_STATE[h.id].state === "archived"; }); }
 function hubHref(hub, part){
 var isNew = !LEGACY[hub.id], base = ROOT + "hubs/" + hub.id + "/";
 if (part === "drill") return base + (isNew ? "#questions/drill" : "#drill");
@@ -308,7 +307,6 @@ root.innerHTML =
 '<div class="dx-checkins" id="checkins" hidden></div>' +
 '<div class="dx-past">' +
 '<div class="rc" id="rc" hidden><div class="rc-chips" id="rcChips" role="tablist" aria-label="Finished exams"></div><div class="rc-body tinted" id="rcBody" role="tabpanel"></div></div>' +
-'<ul class="dx-archived" id="archived"></ul>' +
 "</div>" +
 "</section>" +
 '<footer class="dx-foot"><p>Bookmark this page, not a hub: new hubs show up here as each exam gets close.</p>' +
@@ -675,17 +673,7 @@ var a = e.target.closest("a[data-hub]"); if (!a) return;
 lsSet("sh_dash_last", JSON.stringify({ id: a.getAttribute("data-hub"), t: Date.now() }));
 });
 window.addEventListener("pageshow", function(e){ if (e.persisted) { renderPanel(); renderYouStats(); } });
-function renderArchived(){
-var list = shownArchived();
-$("archived").innerHTML = list.map(function(hub){
-var p = readProgress(hub), last = lastExam(hub);
-return '<li class="dx-arch tinted" style="' + tintVars(hub.id) + '">' + emblem(hub.id, "dx-emb") + "<div><h3>" + esc(hub.title) + '</h3><p class="note">' +
-(last && daysUntil(last.date) < 0 ? "Closed after the exam on " + esc(parseYmd(last.date).toLocaleDateString(undefined, { month: "long", day: "numeric" })) + "."
-: "Archived for now. Your progress on it is kept.") + (p ? " You tried " + num(p.seen) + (p.seen === 1 ? " question" : " questions") + " here." : "") + "</p></div></li>";
-}).join("");
-renderCheckins();
-showPast();
-}
+function renderArchived(){ renderCheckins(); showPast(); }
 function openCheckins(){
 var out = [];
 HUBS_SRC.concat(ARCHIVED_SRC).forEach(function(h){
@@ -710,9 +698,9 @@ return '<li class="tinted" style="' + tintVars(c.hub.id) + '">' + (c.sent
 }).join("") + "</ul>";
 }
 function showPast(){
-var arch = !!$("archived").children.length, rec = !$("rc").hidden;
-$("past").hidden = !arch && !rec && $("checkins").hidden;
-$("pastNote").textContent = rec ? "How the class studied for each exam that's done" + (arch ? ", and the hubs that just closed." : ".") : "Hubs that closed after their exam.";
+var rec = !$("rc").hidden;
+$("past").hidden = !rec && $("checkins").hidden;
+$("pastNote").textContent = rec ? "How the class studied for each exam that's done." : "Hubs that closed after their exam.";
 }
 function surveyVisitor(){
 if (VISITOR) return VISITOR;

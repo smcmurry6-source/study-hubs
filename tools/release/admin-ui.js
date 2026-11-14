@@ -51,23 +51,23 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
   }
   async function confirm(p, hub){ await p.waitForSelector(`[data-arch-form="${hub}"] .arch-confirm`); await p.click(`[data-arch-confirm="${hub}"]`); await p.waitForSelector(`[data-arch-hub="${hub}"] .arch-msg`, { timeout: 10000 }); }
   const writes = p => p.evaluate(() => window.__shPreview.log().filter(x => x.name === 'admin_set_hub_archive' && x.kind === 'write').length);
-  /* the dashboard's hubs as the admin's change left them: a live hub is a tab whose panel has its Start button, an
-     archived one is a row under Past hubs with no way in, a hidden one is neither */
+  /* the dashboard's hubs as the admin's change left them: a live hub is a tab whose panel has its Start button; an
+     archived or hidden one has no tab and no card (the closed hubs' cards came out 2026-11-14), so no way in */
   async function dashboard(ctx, extra){
     const p = await open(ctx, '?persona=returning' + (extra || ''));
-    await p.waitForSelector('.dx-tab[data-tab], #archived li', { timeout: 15000 }); await p.waitForTimeout(1200);   /* get_hub_overrides answers, the page redraws */
+    await p.waitForSelector('.dx-tab[data-tab], #dxMain', { timeout: 15000 }); await p.waitForTimeout(1200);   /* get_hub_overrides answers, the page redraws */
     const cards = await p.evaluate(async () => {
-      const out = [], byTitle = {};
-      (window.SH_DASH_DATA.hubs || []).forEach(h => { byTitle[h.title] = h.id; });
+      const out = [];
       /* a tap redraws the tab row, so each tab is looked up again before it's tapped */
       for (const id of [...document.querySelectorAll('.dx-tab[data-tab]')].map(t => t.getAttribute('data-tab'))) {
         document.querySelector('.dx-tab[data-tab="' + id + '"]').click(); await new Promise(r => setTimeout(r, 80));
         const panel = document.getElementById('hubPanel');
         out.push({ id, archived: false, open: !!(panel && panel.getAttribute('data-hub') === id && panel.querySelector('a.dx-start[href*="hubs/' + id + '/"]')) });
       }
-      for (const li of document.querySelectorAll('#archived li')) {
-        const title = (li.querySelector('h3') || {}).textContent || '';
-        out.push({ id: byTitle[title] || title, archived: true, open: !!li.querySelector('a[href*="hubs/"]') });
+      /* any other way into a hub from the page (there should be none for a hub with no tab) */
+      for (const a of document.querySelectorAll('#dxMain a[href*="hubs/"]')) {
+        const id = ((a.getAttribute('href') || '').match(/hubs\/([a-z0-9-]+)\//) || [])[1];
+        if (id && !out.some(c => c.id === id)) out.push({ id, archived: true, open: true });
       }
       return out;
     });
@@ -291,7 +291,7 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
 
     let cards = await dashboard(ctx);
     const occ = card(cards, 'occlusion');
-    ok(occ && occ.archived && !occ.open, `the dashboard shows Occlusion archived with no Open button (${JSON.stringify(occ)})`);
+    ok(!occ && cards.length, `the dashboard has no tab and no link for Occlusion once it's archived (${JSON.stringify(cards)})`);
     const hp = await open(ctx, 'hubs/occlusion/');
     const notice = await hp.waitForSelector('.sh-archived', { timeout: 8000 }).then(() => hp.textContent('.sh-archived'), () => '');
     ok(/This hub is archived/.test(notice) && /being updated right now/.test(notice), `the hub page says it is archived (got "${notice.slice(0, 80)}")`);

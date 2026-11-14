@@ -2122,8 +2122,8 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   var STATE_WORD = { live: "Live", archived: "Archived", hidden: "Hidden", auto: "Automatic" };
   var STATE_WHAT = {
     live: "a card with an Open button, even after its exam",
-    archived: "a greyed card with no Open button (its check-in buttons still follow the exam dates)",
-    hidden: "no card on the dashboard (the page still opens from a direct link)"
+    archived: "off the dashboard: no tab and no way in (its exam check-in still follows the exam dates)",
+    hidden: "off the dashboard, the same as Archived since the redesign (the page still opens from a direct link)"
   };
   var hubAdm = { rows: null, log: null, err: null, pages: {}, open: null, msg: null, msgHub: null, busy: false, loading: false, at: 0 };
   function when(d){
@@ -2234,7 +2234,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     if (!window.shArchive) { el.innerHTML = errBox("widget/archive.js didn’t load. Reload the page."); return; }
     var rules = card("How it’s decided", "",
       '<ol class="rules"><li><b>A state you set here wins</b> (Live, Archived or Hidden) until you set the hub back to Automatic, or until its end time if you give one.</li>' +
-      '<li><b>Otherwise the dates in the dashboard’s code decide:</b> a hub archives at 10 pm on its last exam day (or its <code>archiveOn</code>) and its card goes 10 days later (or on its <code>hideCardOn</code>).</li>' +
+      '<li><b>Otherwise the dates in the dashboard’s code decide:</b> a hub archives at 10 pm on its last exam day (or its <code>archiveOn</code>) and leaves the dashboard then; it counts as Hidden 10 days later (or on its <code>hideCardOn</code>), which looks the same.</li>' +
       '<li><b>Nothing is deleted or moved.</b> The hub’s page and link, its questions, the analytics and everyone’s progress stay. Check-ins still follow the exam dates.</li></ol>');
     if (!dash.src) {
       setHead("What each hub shows on the dashboard, and why", 0);
