@@ -6,7 +6,7 @@ created: 2026-11-03
 requested-by: Sam
 due: 2026-11-19
 agent: Claude Code (claude/bold-thompson-v88wcy; the live class: claude/perio-hub-google-drive-815ye9)
-pr: https://github.com/smcmurry6-source/study-hubs/pull/298
+pr: https://github.com/smcmurry6-source/study-hubs/pull/362
 ---
 
 # Perio Session 9 (Periodontal Plastic Therapy & Esthetics)
@@ -104,7 +104,7 @@ slides (then the recording) are in the Drive folder, build it out before the fin
   canceled), so the live site stayed on #297 until the next merge to `main`. The post-release check and the site
   changelog line wait for that publish.
 
-2026-11-14, the Nov 12 live class and the review for the final (this branch's PR, `claude/perio-hub-google-drive-815ye9`):
+2026-11-14, the Nov 12 live class and the review for the final ([PR 362](https://github.com/smcmurry6-source/study-hubs/pull/362)):
 - **Notes** (both levels, still aligned: 46 paragraphs each): the old slides-only tail became 15 paragraphs from the class
   (the four causes of gingival excess, drug enlargement and which class is most common, the gummy smile's causes,
   passive eruption and Coslet's types with A as 1.5-2 mm, the crown lengthening evaluation with bone sounding, the
