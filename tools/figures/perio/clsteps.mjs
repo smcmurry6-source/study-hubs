@@ -146,7 +146,7 @@ const tags = `<text class="cl-t cl-tag" x="${CX - 4.6 * S}" y="${PY + 10.4 * S}"
 const st0 = { mode: "os", step: 0 };
 const svg = figureSvg({ width: W, height: H, className: "cl-svg", label: "A section through a maxillary central incisor with the bone crest at the CEJ, step by step through esthetic crown lengthening: sounding to bone, trimming 2 mm of gingiva, a full-thickness flap with 2 mm of bone removed, and the result at six months; or a gingivectomy alone, which grows back.",
   body: `<g class="cl-bonel">${clBoneSvg(st0, D)}</g>${D.STATIC}<g class="cl-dyn">${clDyn(st0, D)}</g>${tags}${scale}` });
-const plate = plateHtml({ fig: "S9 · Fig 7", title: "Crown lengthening, step by step", hint: "step through", readout: "Step 1 · bone off", body: `<div class="am-svg cl-box">${svg}</div>` });
+const plate = plateHtml({ fig: "S9 · Fig 7", title: "Crown lengthening, step by step", hint: "step through", readout: "Step 1 · osseous", body: `<div class="am-svg cl-box">${svg}</div>` });
 const controls = `<div class="am-controls" role="group" aria-label="Step">${[0, 1, 2, 3].map((n) => `<button type="button" class="am-btn" data-cls="${n}" aria-pressed="${n === 0}">${n + 1}. <span>${D.STEP.os[n]}</span></button>`).join("")}</div>
 <div class="am-controls" role="group" aria-label="Approach"><button type="button" class="am-btn" data-clm="os" aria-pressed="true">With osseous surgery</button><button type="button" class="am-btn" data-clm="gv" aria-pressed="false">Gingivectomy alone</button></div>
 <div class="am-stats"><span>Gingiva off <b data-cl="0"></b></span><span>Bone off <b data-cl="1"></b></span><span>Room above the bone <b data-cl="2"></b></span></div>
@@ -163,7 +163,7 @@ function clLive(root, D) {
   function draw() {
     bonel.innerHTML = D.clBoneSvg(st, D); dyn.innerHTML = D.clDyn(st, D);
     sum.textContent = D.SUM[st.mode][st.step];
-    if (readout) readout.textContent = "Step " + (st.step + 1) + " · " + (st.mode === "os" ? "bone off" : "gingivectomy");
+    if (readout) readout.textContent = "Step " + (st.step + 1) + " · " + (st.mode === "os" ? "osseous" : "gingivectomy");
     var off = D.OFF[st.mode][st.step];
     root.querySelector('[data-cl="0"]').textContent = off[0]; root.querySelector('[data-cl="1"]').textContent = off[1]; root.querySelector('[data-cl="2"]').textContent = D.ROOM[st.mode][st.step];
     root.querySelectorAll("[data-cls]").forEach(function (x) { var n = +x.getAttribute("data-cls"); x.setAttribute("aria-pressed", String(n === st.step)); x.querySelector("span").textContent = D.STEP[st.mode][n]; });
