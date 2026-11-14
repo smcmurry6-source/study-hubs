@@ -98,6 +98,10 @@ task is the one PR that then switches the site over. If something goes wrong, re
 - [ ] Learn and Flashcards ([its note](2026-11-06-redesign-learn-and-flashcards.md); the steps: "From the Learn and
       Flashcards toggle" below): `migration_v56` applied after `migration_v54` and `migration_v55`, `widget/study-modes.js`
       and `.css` in `PRECACHE`, the About page's "Study as" entry and its line in "What the hubs record"
+- [ ] Only if Perio is switched in before its final (Nov 19): its exam-format mock follows the final's format in full
+      (2026-11-14, [hub note](../hubs/perio.md)). The live hub's `EXAM_FORMAT` now has `match: 3` and `midShare: 0.15`
+      (`drawSplit()`: about 15% of each kind from Sessions 1-4), which `formatMock` in `widget/hub-bank.js` doesn't read
+      yet: teach it both, or leave `next/index.html`'s mock blurb saying only what the engine draws (as it does now)
 - [ ] After merge: `node tools/release/postcheck.js`, `DEPLOY_NOTES.md` and the site changelog; a notice to the class only
       if Sam wants one
 

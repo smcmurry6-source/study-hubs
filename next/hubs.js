@@ -115,41 +115,6 @@ window.SH_DASH_DATA = {
    }
   },
   {
-   "id": "special-patient-care",
-   "cls": "spc",
-   "title": "Special Patient Care Hub",
-   "code": "Special Patient Care",
-   "exams": [
-    {
-     "name": "Special Patient Care exam",
-     "label": "Due",
-     "date": "2026-11-13",
-     "code": "Special Patient Care",
-     "checkinClosed": true
-    }
-   ],
-   "updated": "2026-11-04",
-   "archiveOn": {
-    "date": "2026-11-06",
-    "hour": 0
-   },
-   "hideCardOn": {
-    "date": "2026-11-06",
-    "hour": 0
-   },
-   "desc": "All eight units: introduction to special patient care, behavior guidance and protective stabilization, Down syndrome, cerebral palsy, syndromes, the autism module, prevention, and the mental illness reading. The exam is on Canvas from Fri Nov 6, due Fri Nov 13 at 11:59 pm (45 questions, 135 minutes, open notes). Its own home page with your countdown and progress, notes in two reading levels with narration, multiple-choice, multiple-answer, true/false, two-statement, numbered-statement and matching questions, exam hints from the recordings, a 45-question mock exam, review tables and the Sparks Arcade.",
-   "modes": [
-    "Home",
-    "Compendium",
-    "Plain-English notes",
-    "Review tables",
-    "Mock exam",
-    "Arcade",
-    "Listen"
-   ],
-   "stateKey": "spc-state-v1"
-  },
-  {
    "id": "heme-endo-exam2",
    "cls": "hemeendo",
    "title": "Heme & Endo Exam 2 Hub",
@@ -416,6 +381,30 @@ window.SH_DASH_DATA = {
     }
    ],
    "hideCardOn": "2026-10-06"
+  },
+  {
+   "id": "special-patient-care",
+   "cls": "spc",
+   "title": "Special Patient Care Hub",
+   "code": "Special Patient Care",
+   "stateKey": "spc-state-v1",
+   "exams": [
+    {
+     "name": "Special Patient Care exam",
+     "label": "Due",
+     "date": "2026-11-13",
+     "code": "Special Patient Care",
+     "checkinClosed": true
+    }
+   ],
+   "archiveOn": {
+    "date": "2026-11-06",
+    "hour": 0
+   },
+   "hideCardOn": {
+    "date": "2026-11-06",
+    "hour": 0
+   }
   }
  ],
  "checkinHour": 8,
@@ -469,40 +458,6 @@ window.SH_DASH_DATA = {
     [
      "sort",
      "Osseo Sort"
-    ]
-   ]
-  },
-  {
-   "hub": "special-patient-care",
-   "title": "Sparks Arcade",
-   "from": "Special Patient Care hub",
-   "money": [
-    "smile"
-   ],
-   "games": [
-    [
-     "board",
-     "Chart Showdown"
-    ],
-    [
-     "escape",
-     "Sparks After Hours"
-    ],
-    [
-     "cloze",
-     "Say It Once"
-    ],
-    [
-     "smile",
-     "Sparks Superstar"
-    ],
-    [
-     "cross",
-     "Cross-Check"
-    ],
-    [
-     "sort",
-     "Chairside Sort"
     ]
    ]
   },
