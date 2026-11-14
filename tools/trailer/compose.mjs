@@ -76,7 +76,7 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; 
 #cap { position: absolute; display: flex; align-items: center; color: #fff; font-weight: 800; letter-spacing: .1px; text-wrap: balance; }
 #cap span { text-shadow: 0 3px 14px rgba(8,3,20,.75); }
 #cap.s { left: 160px; right: 160px; bottom: 0; height: ${BAR}px; justify-content: center; text-align: center; }
-#cap.s span { font-size: 45px; line-height: 1.2; }
+#cap.s span { font-size: 50px; line-height: 1.2; }
 #cap.f { left: ${PIP.x + PIP.r + 46}px; right: 110px; top: ${PIP.y - 88}px; height: 176px; }
 #cap.f span { font-size: 47px; line-height: 1.2; }
 /* the title card and the end card */
@@ -91,7 +91,7 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; 
 #end h1 { font-size: 176px; font-weight: 1000; letter-spacing: -4px; line-height: 1.05; margin-top: 30px; overflow: hidden; padding: 0 20px 8px; white-space: nowrap; text-shadow: 0 9px 0 rgba(8,3,20,.45); }
 #end p { font-size: 58px; font-weight: 800; color: ${GOLD}; margin-top: 4px; }
 #end .url { font-size: 40px; font-weight: 700; margin-top: 44px; padding: 16px 40px 18px; border-radius: 50px; background: rgba(255,255,255,.1); border: 3px solid rgba(255,255,255,.3); }
-#endtim { position: absolute; right: 24px; bottom: -200px; width: 400px; height: 524px; overflow: visible; transform-origin: 50% 100%; }
+#endtim { position: absolute; right: 30px; bottom: -105px; width: 400px; height: 524px; overflow: visible; transform-origin: 50% 100%; }
 .conf { position: absolute; inset: 0; }
 .conf i { position: absolute; left: 0; top: 0; display: block; border: 5px solid ${STYLE.INK}; }
 /* the chapter card: two slanted panels and a name */

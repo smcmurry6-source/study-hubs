@@ -101,7 +101,7 @@ def switch(vel=0.22):
     return pp.bp(pp.RNG.standard_normal(len(t)), 1500, 6000) * np.exp(-t * 110) * vel
 
 
-def buzz(dur=1.1, vel=0.05):
+def buzz(dur=1.1, vel=0.013):
     """The on-air lamp warming up: mains hum that flickers, then settles and fades."""
     t = np.arange(int(dur * SR)) / SR
     hum = sum(np.sin(2 * np.pi * 120 * h * t) / h for h in (1, 2, 3, 5))
@@ -197,11 +197,11 @@ def main():
     fx = np.zeros((n, 2))
     pp.place(fx, switch(), lamp_on - 0.02)
     pp.place(fx, buzz(), lamp_on)
-    pp.place(fx, impact(0.5), drop)
+    pp.place(fx, impact(0.42), drop)
     for i, s in enumerate(shots[1:]):
         pp.place(fx, whoosh(), s["t0"] - 0.3, pan=-0.25 if i % 2 else 0.25)
     pp.place(fx, switch(0.18), last + LAMP_OFF)
-    pp.place(fx, impact(0.42), end)
+    pp.place(fx, impact(0.36), end)
     mix = np.stack([voice, voice], axis=1) * 0.92 + m + fx
 
     tmp = os.path.join(out, "audio.mix.wav")

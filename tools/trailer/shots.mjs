@@ -32,6 +32,9 @@ export const CHAPTERS = {
   close: { n: "", name: "", tint: "#8A76D6" }
 };
 const ALL = [0, 0, 1280, 720];
+/* Shots recorded from the screen in real time, not a frame at a time (record.mjs): the ones that play sound. Listen's
+   words light up with the audio, and audio only plays in real time. No scrolling in these. */
+export const REALTIME = ["notes"];
 
 export const SHOTS = {
   /* "A new dashboard. Every hub is a tab, with a countdown to its exam." / "The class, studying right now." /
@@ -41,7 +44,7 @@ export const SHOTS = {
     /* the board and the classroom draw themselves when they first come near the screen: let them, off camera */
     await K.glide({ sel: "#class", top: 90 }, 300); await K.wait(3500);
     await K.glide(0, 200); await K.wait(600);
-    K.rec.start();
+    await K.rec.start();
     await K.at(K.word(0, "Every hub") - 0.75); await K.cam(ALL, { pad: 0, dur: 0.7 });
     await K.at(K.word(0, "Every hub") - 0.1); await K.tap("#tab-perio", 320);
     await K.at(K.word(0, "countdown") - 0.5); await K.tap("#tab-occlusion", 320);
@@ -54,7 +57,7 @@ export const SHOTS = {
   async hub(K){
     await K.go(HUB, 3200);
     await K.point("a.hx-tab[href='#home']", 100); K.hideCursor();
-    K.rec.start();
+    await K.rec.start();
     await K.at(K.word(0, "Home") - 0.6); await K.cam(ALL, { pad: 0, dur: 0.7 });
     await K.at(K.word(0, "what to study") - 0.7); await K.cam(".panel.next", { y: 150, pad: 26, dur: 0.9 }); await K.glide({ sel: ".panel.next", top: 150 }, 800);
     await K.at(K.line(1) - 0.75); await K.cam(ALL, { pad: 0, dur: 0.6 });
@@ -70,7 +73,7 @@ export const SHOTS = {
     await K.page.click("[data-level=hy]"); await K.wait(300); await K.page.click("[data-level=full]"); await K.wait(500);
     await K.point([560, 330], 100);
     await K.cam("article.reading", { h: 430, pad: 20, dur: 0 });
-    K.rec.start();
+    await K.rec.start();
     await K.at(K.word(0, "as taught") - 0.4); await K.tap("[data-level=full]", 340);
     await K.at(K.word(0, "plain English") - 0.36); await K.tap("[data-level=plain]", 300);
     await K.at(K.word(0, "high yield") - 0.36); await K.tap("[data-level=hy]", 300);
@@ -84,7 +87,7 @@ export const SHOTS = {
     await K.go(HUB + "#questions", 2400);
     await K.point([420, 300], 100);
     await K.cam(".studyas", { w: 620, h: 300, pad: 30, dur: 0 });
-    K.rec.start();
+    await K.rec.start();
     await K.at(K.word(0, "study") - 0.2); await K.tap("[data-qview=learn]", 300);
     await K.at(K.line(1) - 0.6); await K.tap("[data-sm=start]", 300); await K.cam(ALL, { pad: 0, dur: 0.5 });
     await K.wait(450);
@@ -97,7 +100,7 @@ export const SHOTS = {
     await K.page.click("[data-sm=start]"); await K.wait(1100);
     await K.point("button:has-text('Flip the card')", 200);
     await K.cam(".sm", { pad: 0, dur: 0, max: 1.7 });
-    K.rec.start();
+    await K.rec.start();
     await K.at(K.word(2, "come back") - 0.3); await K.tap("button:has-text('Flip the card')", 260);
     await K.wait(250); await K.cam("text:How well did you know", { up: [420, 90], pad: 70, dur: 0.8, max: 1.9 });
     await K.at(K.word(2, "forget") - 0.1); await K.tap("button:has-text('Good')", 320).catch(() => {});
@@ -112,13 +115,13 @@ export const SHOTS = {
     await K.page.click("[data-ska=close]"); await K.wait(4500);
     await K.point([520, 420], 100);
     await K.cam([0, 500, 340, 220], { pad: 0, dur: 0, max: 2.2 });   // his corner of the page, where he and his bubble are
-    K.rec.start();
+    await K.rec.start();
     await K.at(0.5); await K.tap(".shpet-btn", 360);
-    await K.page.locator(".shpet-ask:visible").first().waitFor({ timeout: 3000 });
+    await K.live(K.page.locator(".shpet-ask:visible").first().waitFor({ timeout: 3000 }));
     /* what he says to a tap is drawn at random; a secret tip would give an easter egg away */
     if (/secret tip/i.test(await K.page.locator(".shpet-ask:visible").first().evaluate((b) => b.parentElement.textContent))) K.retake("Timmy answered the tap with a secret tip");
     await K.at(K.word(0, "ask") - 0.3); await K.tap(".shpet-ask", 260);
-    await K.wait(360); await K.page.locator("#skaIn").click().catch(() => {});
+    await K.wait(360); await K.live(K.page.locator("#skaIn").click().catch(() => {}));
     await K.cam("#skaIn", { up: [330, 420], pad: 20, dur: 0.8, max: 1.9 });
     await K.type(ASK.question, 12);
     await K.wait(90); await K.tap("[data-ska=send]", 200);
@@ -137,7 +140,7 @@ export const SHOTS = {
     const r = await K.right();
     await K.point([640, 250], 100);
     await K.cam("[data-trl-card]", { pad: 24, dur: 0, max: 1.8 });
-    K.rec.start();
+    await K.rec.start();
     await K.at(0.75); await K.tap(r.sel, 380);
     await K.at(K.word(0, "Shiny") - 0.35); K.rec.pause();
     /* the crowns on the You card, then the shop. Off camera first: the shop and the place's customizer are fetched
@@ -153,7 +156,7 @@ export const SHOTS = {
     await K.glide({ sel: "#youShop", top: 330 }, 300); await K.wait(900);
     await K.cam("#youShop", { pad: 70, dur: 0, max: 2.2 });
     await K.point([420, 300], 100);
-    K.rec.start();
+    await K.rec.start();
     await K.at(K.word(0, "Crowns") - 0.15); await K.tap("#youShop button", 300); await K.cam(ALL, { pad: 0, dur: 0.5 });
     await K.at(K.line(1) - 0.3); K.rec.pause();
     /* his place: the window, then the customizer */
@@ -163,7 +166,7 @@ export const SHOTS = {
     await K.page.click("#petHome"); await K.wait(3400);
     await K.cam(ALL, { pad: 0, dur: 0 });
     await K.point([900, 420], 100);
-    K.rec.start();
+    await K.rec.start();
     await K.at(K.word(1, "a home") - 0.95); await K.tap("[data-tp=customize2]", 320);
     await K.at(K.word(1, "a home") - 0.05); await K.tap(".tpv-card:has-text('Treehouse')", 320);
     await K.at(K.word(1, "a yard") - 0.1); await K.tap("[data-tp=pick-side]", 300);
@@ -177,11 +180,11 @@ export const SHOTS = {
     await K.glide({ sel: "#board", top: 78 }, 200); await K.wait(1200);
     await K.cam(".dx-arena", { y: 78, pad: 10, dur: 0 });
     await K.point([900, 330], 100);
-    K.rec.start();
+    await K.rec.start();
     await K.at(K.line(2) - 0.05); await K.tap(K.page.locator("#board .dx-visit").first(), 340);
     await K.wait(260); await K.cam(ALL, { pad: 0, dur: 0.5 });
     await K.wait(520); K.rec.pause(); K.hideCursor();
     await K.wait(1150);
-    K.rec.start();
+    await K.rec.start();
   }
 };
