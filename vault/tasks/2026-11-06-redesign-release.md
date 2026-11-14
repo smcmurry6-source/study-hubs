@@ -92,8 +92,8 @@ task is the one PR that then switches the site over. If something goes wrong, re
       that exact line, so change them with it). Built in [Ask Timmy, part 4](2026-11-12-redesign-ask-timmy.md); what
       comes out then: "From Ask Timmy, part 4" below; the prices Sam wants changed are changed with `admin_upsert_shop_item` once the migration is
       applied ([the shop](2026-11-06-redesign-timmy-shop.md), "Prices to change after the release")
-- [ ] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"; the steps: [ask-timmy](../reference/ask-timmy.md)): Sam has saved the API key in Supabase and
-      set the Console's spending limit; the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
+- [ ] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"; the steps: [ask-timmy](../reference/ask-timmy.md)): Sam has saved the API key in Supabase
+      (done 2026-11-14; no Console spending limit for now, [decisions](../decisions.md)); the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
       function reads the content from its released place; everyone has Timmy
 - [ ] Learn and Flashcards ([its note](2026-11-06-redesign-learn-and-flashcards.md); the steps: "From the Learn and
       Flashcards toggle" below): `migration_v56` applied after `migration_v54` and `migration_v55`, `widget/study-modes.js`

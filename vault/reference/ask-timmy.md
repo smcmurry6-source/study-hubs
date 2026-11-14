@@ -126,7 +126,7 @@ person to read. The full report (every question and answer) is written as markdo
 
 ## At the release (the release note's Ask Timmy box)
 
-1. Sam saves `ANTHROPIC_API_KEY` in the Supabase dashboard (Edge Functions, Secrets) and sets the Console's spending limit.
+1. Sam saves `ANTHROPIC_API_KEY` in the Supabase dashboard (Edge Functions, Secrets; saved 2026-11-14) and sets the Console's spending limit (skipped for now, [decisions](../decisions.md)).
    **Make the key inside a workspace** (the Console's workspace, then API keys). A key made outside one is refused
    ("This API key is not scoped to a workspace", found on 2026-11-12's first eval run) unless the workspace's id is also
    saved, as `ANTHROPIC_WORKSPACE_ID`.
