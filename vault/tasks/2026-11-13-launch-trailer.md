@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on: Sam (watch the first cut and say yes, or what to change)
 agent: Claude Code
-pr:
+pr: https://github.com/smcmurry6-source/study-hubs/pull/360
 ---
 
 # A launch trailer for the redesign, narrated by Timmy

@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **The launch trailer's tools (2026-11-14, Claude Code; nothing on the site changes)** — `tools/trailer/` makes a
+- **The launch trailer's tools (#360, 2026-11-14, Claude Code; nothing on the site changes)** — `tools/trailer/` makes a
   70 second, 16:9 video for the day the redesign goes live, narrated by Timmy from a newly drawn Timmy Time studio
   ([the task](vault/tasks/2026-11-13-launch-trailer.md), [README](tools/trailer/README.md)): `script.md` (his lines),
   `voice.py` (the show's Kokoro voice and lexicon), `audio.py` (a new music cue from the show's instruments, the
