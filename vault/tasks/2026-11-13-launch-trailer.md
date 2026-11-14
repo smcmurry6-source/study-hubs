@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: review
 hub: site
 created: 2026-11-13
 requested-by: Sam
 due:
-waiting-on:
-agent:
+waiting-on: Sam (watch the first cut and say yes, or what to change)
+agent: Claude Code
 pr:
 ---
 
@@ -57,19 +57,54 @@ narrates a tour of what is new.
 
 ## Done when
 
-- [ ] Sam has answered the four calls above, and they are in [decisions](../decisions.md)
-- [ ] The script is written (60 to 90 seconds read aloud) and Sam has approved it
-- [ ] The studio scene is drawn, with Timmy close up for the opening
-- [ ] The feature shots are recorded from a preview on made-up data, phone and laptop as the shape needs
-- [ ] Timmy's narration is rendered in the show's voice, with captions that match it word for word
-- [ ] The video is cut (60 to 90 seconds), and Sam has watched it and said yes
-- [ ] It is where Sam asked for it (on the site: the About page entry, reduced motion, the size check; a link: the file
-      handed to Sam)
-- [ ] `DEPLOY_NOTES.md`, and this note's Outcome
+- [x] Sam has answered the four calls above, and they are in [decisions](../decisions.md)
+- [x] The script is written (60 to 90 seconds read aloud) and Sam has approved it (Sam read the draft and said "Make it
+      shorter, but just spend less time on the cosmetic extras": done, 58 seconds of speech, `tools/trailer/script.md`;
+      the shortened wording is what the first cut speaks, so Sam's yes to the video is the yes to it)
+- [x] The studio scene is drawn, with Timmy close up for the opening (`tools/trailer/studio.mjs`)
+- [x] The feature shots are recorded from a preview on made-up data, phone and laptop as the shape needs (laptop: Sam
+      chose wide)
+- [x] Timmy's narration is rendered in the show's voice, with captions that match it word for word
+- [ ] The video is cut (60 to 90 seconds), and Sam has watched it and said yes (cut: 70 seconds; the first cut went to
+      Sam on 2026-11-14 and waits for the yes)
+- [ ] It is where Sam asked for it (a link: the file handed to Sam). The first cut is handed over; the final file
+      follows Sam's yes
+- [x] `DEPLOY_NOTES.md`, and this note's Outcome
 
 ## Log
 
 - 2026-11-13 (Claude Code, the release session). Written from Sam's ask, as a task for a session of its own: the
   release session is holding for Sam's "merge" and its PR should stay the release and nothing else. Nothing built.
+- 2026-11-14 (Claude Code). Sam's four calls, asked in one message: **a link/file only** (nothing on the site), **wide
+  16:9**, the script **"Make it shorter, but just spend less time on the cosmetic extras"**, **new music**; and, with
+  the task: "Its okay to use real usernames from the class. They arent real names". Built `tools/trailer/` (its
+  `README.md` says how each step works) and sent Sam the first cut: 70 seconds, 1920 x 1080, 16.6 MB, captions burned
+  in, with `.vtt` and `.srt` files beside it. The branch starts from the release branch, because the pages the trailer
+  shows aren't on `main` until the release merges.
 
 ## Outcome
+
+**The first cut is with Sam; the task stays open until Sam says yes** (or says what to change).
+
+- **What it is:** Timmy close up in the studio ("Hey. It's Timmy. And this is not Timmy Time."), the camera pulls back
+  as the ON AIR lamp comes on, then six shots of the redesign in a framed screen with Timmy talking in the corner (the
+  dashboard with its countdowns, classroom and stage; a hub's four views; the three reading levels and Follow along;
+  Learn and Flashcards; Ask Timmy; XP, Shiny Gold Crowns, the shop, Timmy's place and a visit), back to the studio for
+  the sign-off, the lamp goes off, and an end card with the site's address. The cosmetic extras share one shot, as Sam
+  asked.
+- **How it is made:** everything is cut to one timeline that comes from the rendered voice, so the captions, his mouth
+  and every tap on screen follow the words; change a line and run the five steps again
+  ([README](../../tools/trailer/README.md)). The voice is the show's (Kokoro, the same blend, speed, lexicon and voice
+  chain); the music is new, from the show's own synthesized instruments, with nothing to license.
+- **Not in the repo:** the video and its working files (`tools/trailer/out/`) and the list of leaderboard names
+  (`tools/trailer/names.local.json`), both in `.gitignore`. The names on the boards in the video are the class's
+  leaderboard names, with Sam's OK; three that read like a person's real name were left out.
+- **Staged, and said so:** Ask Timmy's answer on screen. The preview has no model behind it, so the recorder shows a
+  two-sentence answer written from Occlusion's own notes (the Bennett angle), with the real citation chip and the real
+  jump to the paragraph.
+- **Checked:** contact sheets of every shot and of the whole cut, frame by frame at the cuts; the captions against the
+  script; the sound by its numbers only (-14 LUFS, peak -1.5 dB, the music about 14 dB under his voice). **Not
+  checked: how it sounds.** The agent can't hear it, so the balance of voice and music is Sam's to judge.
+- **Left:** Sam's yes or changes; then the final file to Sam, the last two boxes above, and this note moves to
+  `done/`. If Sam later wants it on the dashboard too, that is a new piece of work: an About page entry, a still with
+  a Play button for reduced motion, and the size check (the site has room: under 750 MB).

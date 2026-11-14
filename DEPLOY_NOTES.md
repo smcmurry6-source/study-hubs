@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **The launch trailer's tools (2026-11-14, Claude Code; nothing on the site changes)** — `tools/trailer/` makes a
+  70 second, 16:9 video for the day the redesign goes live, narrated by Timmy from a newly drawn Timmy Time studio
+  ([the task](vault/tasks/2026-11-13-launch-trailer.md), [README](tools/trailer/README.md)): `script.md` (his lines),
+  `voice.py` (the show's Kokoro voice and lexicon), `audio.py` (a new music cue from the show's instruments, the
+  master, and the timeline everything is cut to), `studio.mjs` + `compose.mjs` (the studio in the site's ink style,
+  Timmy's mouth moving with his voice, the frame, captions and end card), `shots.mjs` + `record.mjs` (the feature
+  shots, recorded from a preview on made-up data) and `cut.mjs` (the mp4 with `.vtt`/`.srt`). **The video is not in
+  the repo and not on the site** (Sam: "A link/file only"): `tools/trailer/out/` and `names.local.json` (the
+  leaderboard names its boards show, with Sam's OK) are in `.gitignore`. Ask Timmy's answer in the footage is staged
+  from Occlusion's notes (the preview has no model). The first cut is with Sam; the task stays open for Sam's yes.
+  Branched from the release branch (#359), since the pages it shows aren't on `main` until that merges.
 - **The release PR's second round (#359, 2026-11-13, Claude Code; live from the merge)** — what Sam asked for after
   using the preview ([decisions](vault/decisions.md), 2026-11-13), all in the same PR:
   - **Dashboard:** the You card's rank is a hero on dark plum (`renderMyRank()`), the wallet and stats match, and

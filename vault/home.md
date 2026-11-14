@@ -82,6 +82,7 @@ Hub building
 - Lessons audit and refresh: `tools/lessons-refresh.md` (Claude Code: `/lessons-audit`). A Timmy Time episode:
   `tools/podcast/README.md` (Claude Code: `/podcast`). Ideas from the Claude subreddits, checked against the repo:
   `.claude/skills/reddit-scout/SKILL.md` (Claude Code: `/reddit-scout`; past runs in `tools/reddit-scout/log.md`).
+  The redesign's launch trailer: `tools/trailer/README.md`.
 
 ## Release testing
 
