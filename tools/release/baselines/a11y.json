@@ -232,82 +232,6 @@
    "focus": null,
    "motion": 0
   },
-  "special-patient-care · home": {
-   "axe": {
-    "color-contrast": {
-     "n": 3,
-     "impact": "serious",
-     "help": "Elements must meet minimum color contrast ratio thresholds",
-     "sample": ".home-next > .tag-sage > .lec-num"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
-    }
-   },
-   "focus": {
-    "invisible": 0,
-    "stuck": 0,
-    "where": []
-   },
-   "motion": 0
-  },
-  "special-patient-care · compendium": {
-   "axe": {
-    "color-contrast": {
-     "n": 4,
-     "impact": "serious",
-     "help": "Elements must meet minimum color contrast ratio thresholds",
-     "sample": "button[data-lec=\"syndromes\"] > .lec-num"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
-    }
-   },
-   "focus": null,
-   "motion": 0
-  },
-  "special-patient-care · review": {
-   "axe": {
-    "color-contrast": {
-     "n": 8,
-     "impact": "serious",
-     "help": "Elements must meet minimum color contrast ratio thresholds",
-     "sample": ".tag-green.gc-lec"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
-    }
-   },
-   "focus": null,
-   "motion": 0
-  },
-  "special-patient-care · arcade": {
-   "axe": {
-    "color-contrast": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must meet minimum color contrast ratio thresholds",
-     "sample": "button[data-mode=\"arcade\"] > .mode-label"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
-    }
-   },
-   "focus": null,
-   "motion": 0
-  },
   "dashboard (dark)": {
    "axe": {},
    "focus": null,
@@ -343,24 +267,6 @@
      "impact": "serious",
      "help": "Elements must meet minimum color contrast ratio thresholds",
      "sample": ".hn-num"
-    }
-   },
-   "focus": null,
-   "motion": 0
-  },
-  "special-patient-care (dark)": {
-   "axe": {
-    "color-contrast": {
-     "n": 2,
-     "impact": "serious",
-     "help": "Elements must meet minimum color contrast ratio thresholds",
-     "sample": ".primary.btn[data-home=\"mock\"]"
-    },
-    "label-content-name-mismatch": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Elements must have their visible text as part of their accessible name",
-     "sample": "#shstat-launch"
     }
    },
    "focus": null,

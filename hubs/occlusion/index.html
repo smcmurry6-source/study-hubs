@@ -9632,9 +9632,9 @@ mcq('in-sci-arb','instruments','handout','When the SCI is set arbitrarily for fi
 mcq('in-neutro','instruments','handout','For neutrocentric dentures, the SCI is set to about:',
   ['0°','20°','30°','45°'],
   'Neutrocentric dentures use a flat (about 0°) setting; 20-30° is the common arbitrary setting for fixed work.');
-mcq('in-bennett','instruments','handout','In the articulator handout, the Bennett angle setting mainly affects which posterior tooth feature?',
-  ['The width of the central fossae','Cusp height','The curve of Wilson','Marginal ridge height'],
-  'In mediotrusion the orbiting condyle moves inward; the angle of that path sets how wide the central fossae must be. Cusp height follows mainly the SCI, though the midterm table links more Bennett movement to shorter cusps.');
+mcq('in-bennett','instruments','handout','The Bennett angle setting mainly affects which feature of the posterior teeth?',
+  ['The width of the central fossae','How steep the cusps can be in protrusion','The curve of Wilson','Marginal ridge height'],
+  'In mediotrusion the orbiting condyle moves inward; the angle of that path sets how wide the central fossae must be. Protrusion follows the SCI: the Bennett angle is a lateral setting.');
 mcq('in-bennett-off','instruments','hub','Which articulator adjustment did Dr. Givan say he would leave off first, because the average values are close enough for most general dentistry?',
   ['The Bennett angle','Sagittal condylar inclination','The incisal guide pin','The centric latch'],
   '"If I was going to leave any feature off of an articulator, I\'d probably leave this one": the Bennett angle is less commonly adjusted.');
@@ -12991,7 +12991,7 @@ var QUESTION_WHY = {
   "in-sci-controls":["Condylar guidance controls posterior disclusion when anterior guidance is minimal, and cusp height and fossa depth.", "Fossa width follows the Bennett angle.", "The VDO is set by the records and the incisal pin, not the SCI.", "Groove and ridge positions follow the intercondylar distance on a fully adjustable articulator."],
   "in-sci-arb":["Fixed work: 20-30° is the common arbitrary setting.", "About 0° is for neutrocentric dentures, not fixed work.", "Steeper than the common arbitrary setting; it risks posterior interferences.", "Far steeper than any common arbitrary setting."],
   "in-neutro":["Neutrocentric dentures use a flat, about 0°, setting.", "20° is within the common range for fixed work, not neutrocentric dentures.", "30° is the common arbitrary fixed setting.", "Steeper than any setting the slides give for dentures."],
-  "in-bennett":["The orbiting condyle's inward path sets how wide the central fossae must be.", "Cusp height follows mainly the SCI.", "The curve of Wilson is a frontal curve of the teeth, not an articulator setting.", "Marginal ridges aren't set by the Bennett angle."],
+  "in-bennett":["The orbiting condyle's inward path sets how wide the central fossae must be.", "Protrusion follows the SCI; the Bennett angle is a lateral setting.", "The curve of Wilson is a frontal curve of the teeth, not an articulator setting.", "Marginal ridges aren't set by the Bennett angle."],
   "in-bennett-off":["He would leave the Bennett angle off first: average values are close enough for most work.", "Condylar guidance is one of the two settings that matter most.", "The incisal guide pin wasn't the feature he named.", "The centric latch holds the condyles in CR; it isn't an average-value setting."],
   "in-iss":["Immediate lateral mandibular translation is the immediate side shift (ISS).", "Progressive side shift is the gradual part of the movement, not the immediate jump.", "The Bennett angle is the angle of the inward path, a separate setting.", "Condylar guidance is the SCI."],
   "in-fb-points":["Two ear canals estimate the hinge axis; one anterior point (nasion, orbitale or a set distance) completes the plane.", "Locating the condyles exactly is a kinematic hinge-axis locator, not the reference plane.", "Hamular notches and the papilla are denture landmarks, not facebow points.", "The mental foramina aren't facebow reference points."],
@@ -14037,7 +14037,7 @@ function examCardHTML(){
   return '<details class="exam-card" id="examCard"'+(STATE.ui.examCard === 'closed' ? '' : ' open')+'><summary>'+icon('clock')+'<span><b>'+when+'</b> · not comprehensive · the lectures from 10/22 on · format not announced yet</span></summary>' +
     examInfoHTML() + '<div class="reading-actions"><button type="button" class="btn primary" data-home="mock">Take the '+mockTotal()+'-question mock</button></div></details>';
 }
-var BANK_PAGE = 30, bankShown = BANK_PAGE, RETRY_GAP = 5;
+var BANK_PAGE = 100, bankShown = BANK_PAGE, RETRY_GAP = 5;
 
 function renderCompendium(){
   if(window.shTTS) window.shTTS.stop();

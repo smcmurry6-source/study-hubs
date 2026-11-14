@@ -8,7 +8,7 @@ status: archived
 # Heme & Endo Exam 2
 
 **Archived 2026-11-13 at 10 pm**, after its exam that morning. Its retrospective is in `LESSONS.md` ("Hub retrospectives", written
-by the 11-13 lessons audit from 8 check-ins: later ones go into the next audit), its recap is on the dashboard, and **its narration,
+by the 11-13 lessons audit from 9 check-ins: later ones go into the next audit), its recap is on the dashboard, and **its narration,
 High yield recordings and Timmy Time came off the site** the same night ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md):
 `data-audio="off"` on its widget tag; `next/content/notes.json`'s `hyAudio` is empty). The page stays up; its card leaves the
 dashboard 11-23. Still by hand: remove `hubs/heme-endo-exam2/` when nothing needs it, and optionally move its entry into `ARCHIVED_HUBS`.
@@ -94,7 +94,7 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   Their questions' `src` is `rec` where the point was said aloud. **L16 went taught on 2026-11-11** from its 11/10 recording (Drive,
   `GMT20261110-190013`, 1 pm; Dr. Madison, captioned "Michael Herr" like the rest): see L16 in the content flags. L17 and L18
   aren't on Exam 2 (Sam, 2026-11-10: "L16 is the last lecture on the test"), so this hub doesn't get them:
-  [the task](../tasks/2026-11-05-heme-endo-exam2-l17-l18-and-recordings.md).
+  [the task](../tasks/done/2026-11-05-heme-endo-exam2-l17-l18-and-recordings.md).
 - **Sources:** Drive, "Hematology and Endocrinology" → "Exam 2" (slides, schedule, syllabus, the recordings'
   transcripts). **Not used**, by the [graded-coursework](../rules/graded-coursework.md) rule: everything in "Resources
   from D3s" (last year's Exam 2 study guide, Anki deck of practice questions, a female repro study doc), Quiz 3 (open

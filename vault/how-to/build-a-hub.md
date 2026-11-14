@@ -22,8 +22,8 @@ where each piece goes. Adding a lecture to a live hub: the last section.
 
 ## Build it
 
-- **Start from the newest engine.** Copy `hubs/pcd-implants-exam1/index.html` (or `hubs/special-patient-care/index.html`,
-  the same engine without figures) to `hubs/<hub-id>/index.html` and replace its content. One file, no build step.
+- **Start from the newest engine.** Copy `hubs/pcd-implants-exam1/index.html` (Special Patient Care's copy of the same
+  engine without figures came off the site 2026-11-14: `git show b115ec3:hubs/special-patient-care/index.html`) to `hubs/<hub-id>/index.html` and replace its content. One file, no build step.
   It already has: Home first ([hub-home-page](../rules/hub-home-page.md)), the filter panel
   ([question-bank-filter-panel](../rules/question-bank-filter-panel.md)), the question helpers `mq()`, `mm()`, `two()`,
   `tf()`, `nums()` with a why for every choice ([every-choice-gets-a-why](../rules/every-choice-gets-a-why.md)),

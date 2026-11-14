@@ -99,7 +99,7 @@ open to Sat 11-14, 11:59 pm, so the next audit writes its retrospective and take
 
 **Student voice since the last audit:** two Occlusion reports tonight, three days before its final: #42 (`dn-support`, "worded weird,
 I wasn't sure what it was asking") and #43 (`dn-resorb-mand`, "wouldn't a resorbed mandible look smaller, since there is less bone?"),
-both fixed this run; Heme & Endo suggestion #15, praise for the cram sheet; 8 Heme & Endo Exam 2 check-ins (its retrospective). The
+both fixed this run; Heme & Endo suggestion #15, praise for the cram sheet; 9 Heme & Endo Exam 2 check-ins (its retrospective). The
 survey was shown to 8 people and all said no thanks; no searches since 10-21.
 
 **Did the last refresh work? Final reading of the 11-11 run's five Heme & Endo explanations** (`dm-pb-cpep-2`, `mh-wall`, `mp-e2-role`,
@@ -112,10 +112,11 @@ sign that the explanations moved a first try, as the standing lesson says; their
 - **Occlusion** (final Mon 11-16): since the last audit 24 people and 965 min; **11-13 23 people and 872 min** (7 under 5), its biggest day
   since the midterm. Since 11-09: L6 (`in-`) 1,151 answers from 16 people (85%), L7 (`mo-`) 988 from 11 (88%), L8 (`dn-`) 183 from 7
   (83%), L9 (`nc-`) 129 from 7, L10 (`ot-`) 191 from 5; tries per question L6 16.8, L7 7.6, L8 2.2, L9 3.3, L10 3.9. The usual lag three
-  days out; the weekend and the eve close it. **Fixed this run:** #42's stem now names the three properties before asking which force
-  support resists; #43's explanation and whys say "less bone, but a bigger arch" (the stem asks about the arch's outline); and
+  days out; the weekend and the eve close it. **Fixed this run:** #42's stem now asks which force a complete denture's support
+  resists; #43's explanation and whys say "less bone, but a bigger arch" (the stem asks about the arch's outline); and
   `in-bennett` (13 first tries, 6 right: "Cusp height" picked by 54%), whose wrong answer the hub's own midterm determinants table
-  supports for Bennett movement: the stem now names the articulator handout, and the explanation and the why say how the two fit. Its
+  supports for Bennett movement: that choice became "How steep the cusps can be in protrusion" (Sam, 11-14), which the Bennett
+  angle has nothing to do with, and its old picks were cleared. Its
   other L6 lows are on 6-9 people each (`in-locator`, `in-level`, `in-full-adj`, `in-30deg`, `in-rec-base`, `mo-57`).
 - **Perio** (final 11-19): since the last audit 8 people and 107 min, 165 answers from a couple of people. Question health: `q5-01` "below chance"
   (2 of 10 first tries, "Mesial" the favorite): the key matches the notes (the buccal entrance is the narrowest; the mesiopalatal is the
@@ -190,7 +191,7 @@ sign that the explanations moved a first try, as the standing lesson says; their
   yet") are where a nudge lands, not a row lower on Home. Heme & Endo Exam 2 again (11-12): L14 and L16 went from 5-6 tries per
   question to 23-26 on the eve. **What the default bank leaves out doesn't catch up**: its Exam 1 Refresher (review only, ticked by
   hand) reached 13 of 59 answerers by the eve and 18 of 64 in the end (3.2 tries per question), for 5 of the exam's 50 questions;
-  none of its 8 check-ins named it, so whether that cost anything can't be told.
+  none of its 9 check-ins named it, so whether that cost anything can't be told.
 - **Questions from class quizzes/polls are practised most.** GI2's exam-2 quiz and PollEv items averaged 32-38
   attempts per question vs 22 for hub-written ones. Tag the source (`src`) and label them. The same goes for the
   professors' own hints: PCD 3's `hint` items (from the course's exam-hint email) got 49 tries per question vs 35-40, and
@@ -296,7 +297,7 @@ sign that the explanations moved a first try, as the standing lesson says; their
   visitor id per page and log one 25 s ping each (24 in ten minutes on MSK 4, 10-14). They inflate people and bounce rates;
   the widget ignores automated browsers from 2026-10-15; drop bursts of one-ping visitors in data before that.
 - **Check-ins and surveys speak for the heavy users.** Every check-in group so far studied several times its hub's median
-  (GI 2: respondents' median 177 minutes against 29 for everyone; PCD Implants: 361 against 199, n = 5; Heme & Endo Exam 2: 481 against 169, n = 8), and 169 of 190 people shown a survey said "No thanks"
+  (GI 2: respondents' median 177 minutes against 29 for everyone; PCD Implants: 361 against 199, n = 5; Heme & Endo Exam 2: 481 against 169, n = 9), and 169 of 190 people shown a survey said "No thanks"
   (to 11-04). Read "About right" next to the use data, never as the class's verdict; the people who bounced aren't in it.
 - **People decline a tour offered on arrival, but finish one they choose.** Dashboard tour: 12 of 97 shown the prompt
   started it, 8 finished; hub tours 11 of 118, 9 finished (10-21 to 11-04). Teach a feature where it's used (a one-line
@@ -481,8 +482,8 @@ Used: "Try it again" shown to 60 people (3,805 retries, 76% right); "Why each ch
 people pressed it 287 times. Little used: the hub tour (10 of 11 offered declined), the search panel (none), mind maps. Plaque bosses: 70
 met one, 14 hid it.
 
-Check-ins, **n = 8 people** by 9 pm on exam day (later ones go into the next audit), all heavy users: their median 481 min (the hub's
-169), 93-1,064 answers, whatever they answered. **About right 5 of 8, the rest "Hub was harder" or "Hub was easier", none "Exam asked
+Check-ins, **n = 9 people** by the morning after the exam (later ones go into the next audit), all heavy users: their median 481 min (the hub's
+169), 93-1,064 answers, whatever they answered. **About right 5 of 9, the rest "Hub was harder" or "Hub was easier", none "Exam asked
 different things"**; most went better than expected, a few as expected or worse; readiness 3-5 (median 4). Written: number the questions, and let the bank show more than
 30 at a time (a feature, not a topic). Reports: one (#38, `mh-fig-seq`: show the slide's picture without labels; fixed within a day) and
 suggestion #15 (the cram sheet).
@@ -499,6 +500,13 @@ Timmy Time made two days out reached 6 people: make an episode only when there i
 (77% vs 88%), so keep the false half honest and plain. Its audio came off the site with this audit; the hub page stays. Cleanup still to
 do by hand: remove `hubs/heme-endo-exam2/` once nothing needs it (its card leaves the dashboard 11-23) and optionally move its entry into
 `ARCHIVED_HUBS`.
+
+### Special Patient Care (`special-patient-care`), Canvas window 2026-11-06 to 11-14, archived 2026-11-06, removed 2026-11-14
+
+No retrospective and no recap, by Sam's call (2026-11-14: "Dont worry about special patient care at all for a recap. Go ahead an
+remove everything for it"); its page, audio and images came off the site with it. In all: 17 people, 9 h, 261 answers, almost all
+from a handful of people, and no check-ins by design: the least use of any hub. It closed when the exam window opened (Sam's call of
+11-05, with its card), so it was never up during the week the class took the exam.
 
 ### PCD Implants Exam 1 (`pcd-implants-exam1`), exam 2026-11-06 (Canvas, 7 am-8 pm), archived 2026-11-06 (written 2026-11-10)
 

@@ -10,14 +10,16 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
-- [ ] **Special Patient Care's retrospective and audio** (2026-11-13, the lessons audit): Canvas closes Sat 11-14, 11:59 pm; the next
-  `/lessons-audit` after that writes its retrospective in `LESSONS.md` (no check-ins: it had none), publishes its recap and takes its
-  audio off ([the audio task](2026-11-12-audio-off-at-archiving.md), [hub note](../hubs/special-patient-care.md)).
+- [x] **Special Patient Care's retrospective and audio** (2026-11-13, the lessons audit): ~~retrospective and recap~~ dropped (Sam,
+  2026-11-14: "Dont worry about special patient care at all for a recap"); the whole hub, audio included, came off the site
+  ([#361](https://github.com/smcmurry6-source/study-hubs/pull/361), [hub note](../hubs/special-patient-care.md)).
 
-- [ ] **The bank's page and numbers, Sam's call** (2026-11-13, the lessons audit; [LESSONS.md](../../LESSONS.md)'s Heme & Endo Exam 2
-  retrospective): 47 of its 61 bank users pressed "Show more" (30 at a time) 287 times, and a check-in asked to number the questions
-  and show more than 30 at a time. Proposal: number the cards in a set and show a bigger page (or load more on scroll), in the
-  redesign's bank (`widget/hub-bank.js`, `PAGE = 20` now) and, if Sam wants it before the release, the live engines' `BANK_PAGE`.
+- [x] **The bank's page size** (2026-11-13, the lessons audit; [LESSONS.md](../../LESSONS.md)'s Heme & Endo Exam 2 retrospective: 47
+  of its 61 bank users pressed "Show more" 287 times): Sam, 2026-11-14, "Show more questions in the question bank at a time": 100 a
+  page in the single-file engines (`BANK_PAGE`, was 30), 50 in the redesign's bank (`PAGE`, was 20)
+  ([#361](https://github.com/smcmurry6-source/study-hubs/pull/361)).
+- [ ] **Numbering the questions in a bank set, Sam's call** (the same check-in asked for it; Sam's 11-14 answer covered only the page
+  size): a number on each card of the current set, in the redesign's bank (`widget/hub-bank.js`) and the live engines.
 
 - [ ] **A new hub's blocking time after the bundles** (2026-11-13, [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md), [#358](https://github.com/smcmurry6-source/study-hubs/pull/358)):
   on `perf.js`'s slow phone a new hub's total blocking time was 230-365 ms on `main` and is 310-540 ms with the bundles
