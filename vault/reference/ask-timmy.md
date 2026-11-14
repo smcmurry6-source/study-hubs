@@ -42,7 +42,7 @@ not before**. Until then `migration_v55.sql` is in `supabase/pending-migrations.
    order) with a 1-hour cache mark; then the earlier turns; then this turn: `<page>` (hub, voice, today in Central time,
    view, lecture, paragraph), `<answered_question>` (its choices without letters, the student's pick by its words: the card
    shuffles the choices and shows no letters), `<progress>`, `<student>` (escaped: what a student types is data).
-   Model `claude-opus-5-5`, effort `medium`, structured output (the schema in `core.js`), the refusal fallback on.
+   Model `claude-sonnet-5-5` (Sam, 2026-11-14; built and first tested on `claude-opus-5-5`), effort `medium`, structured output (the schema in `core.js`), the refusal fallback on.
 4. The answer is checked: every cite's quote must really be in the unit it names, at least three words or the whole of a
    shorter unit such as an exam date (a real quote under the wrong id is moved to the right unit). Only checked cites become links; the rest are stored as `unchecked` for the admin tab.
 5. `timmy_finish` stores the answer with its tokens and estimated cost, and the browser gets:
@@ -72,9 +72,11 @@ with `<hub>:`.
   estimated cost from the usage the API reports. Visitor ids are easy to reset, so this cap and **the Console's spending
   limit** (Sam sets it at the credit) are the real backstop.
 - `admin_timmy_config(secret, enabled, day_cap_usd, per_visitor_day)` turns him off or changes the limits at once.
-- Cost per question (Opus 5.5 list prices on 2026-11-12: $4 in, $20 out, cache reads $0.20 a million, 1-hour cache writes 2x):
-  about 3-6 cents with the content cached (70-84k tokens a hub, about 230k on the dashboard); the first question on a hub
-  in an hour also writes the cache, about $0.60 (about $1.80 on the dashboard).
+- Cost per question (Sonnet 5.5 list prices on 2026-11-14: $2 in, $10 out, cache reads $0.10 a million, 1-hour cache
+  writes 2x; measured on the eval that day): about 2 cents with the content cached (about 5 cents on the dashboard). A hub's
+  content is 130-165k tokens (about 420k on the dashboard), cached for an hour that every question starts again, so the
+  first question on a hub after an idle hour also writes the cache: about $0.60 ($1.70 on the dashboard). Opus 5.5, as
+  first built, cost about twice all of that (measured on 2026-11-12: about $1.10 a hub's cache, 4 cents a question).
 
 ## The database (migration_v55)
 

@@ -350,8 +350,8 @@ change to HP's rules beyond the 100 start; the old pages.
 - [x] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
       answered by Claude, Anthropic's AI) in the release note's drafts
 - [x] CI and `node tools/release/run.js` pass; Sam's look on the screenshots (a preview only if Sam wants one)
-- [ ] Sam picks Timmy's model: Opus 5.5 (as built) or Sonnet 5.5, from the 2026-11-14 comparison (Log); a change is
-      `MODEL` in `core.js`, then the release
+- [x] Sam picks Timmy's model: Sonnet 5.5 (2026-11-14, "Lets do sonnet"), from that day's comparison (Log); `MODEL` in
+      `core.js` ([#363](https://github.com/smcmurry6-source/study-hubs/pull/363))
 - [ ] At the release, as above
 
 ## Log
@@ -477,6 +477,11 @@ change to HP's rules beyond the 100 start; the old pages.
   $0.14 to cache a hub again, under a cent a question. Sonnet: about $0.32 and 1.5-3 cents. The agent recommends Sonnet
   5.5; the model stays Opus 5.5 until Sam picks ([#363](https://github.com/smcmurry6-source/study-hubs/pull/363), which also
   prices both models in `core.js` and leaves the fallback out for Haiku). Reports were kept in the session, not committed.
+- 2026-11-14: Sam: "Lets do sonnet". `MODEL` is `claude-sonnet-5-5` ([#363](https://github.com/smcmurry6-source/study-hubs/pull/363)); that day's
+  Sonnet run is the eval's pass for the change. Measured from the runs' usage, the content is about the same size on both
+  models (130-165k tokens a hub, about 410k on the dashboard; the 70-84k planned on 2026-11-12 was an estimate), so a cache
+  write costs about $0.60 a hub on Sonnet ($1.70 on the dashboard) against about $1.10 ($3.24) on Opus, and a cached
+  question about 2 cents against 4.
 ## Outcome
 
 Related: [the release](2026-11-06-redesign-release.md) · [phase 4](2026-11-05-redesign-phase-4-game-layer.md) ·
