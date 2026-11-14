@@ -545,6 +545,7 @@ setTimeout(function(){ if (rm === my) doorOpen(-1); }, leaving ? total + 200 : 7
 el.animate(frames, { duration: total, easing: "linear", fill: "forwards" }).onfinish = function(){ el.remove(); if (done) done(); };
 }, (n || 0) * 450);
 }
+function roomResting(){ var n = $("now"); return !!n && (n.classList.contains("is-rest") || n.classList.contains("is-away")); }
 function arrive(p, i, quiet, n){
 function sit(){
 var el = seatEl(i); if (!rm || rm.at[p.key] !== i || !el) return;
@@ -553,13 +554,13 @@ q(".rm-tim", el).innerHTML = seated(p); q(".rm-desk", el).innerHTML = CA.room.de
 if (!quiet && q(".rm-tim", el).animate) q(".rm-tim", el).animate([{ transform: "translateY(-4px) scale(.96, 1.06)" }, { transform: "translateY(1px) scale(1.05, .94)" }, { transform: "none" }], { duration: 340, easing: "ease-out" });
 paintMe();
 }
-if (quiet) sit(); else walk(p.fit, i, false, n, sit);
+if (quiet || roomResting()) sit(); else walk(p.fit, i, false, n, sit);
 }
 function depart(i, quiet, n){
 var el = seatEl(i); if (!el) return;
 var tim = q(".rm-tim", el), was = !!tim.firstChild, fit = cleanFit(el.getAttribute("data-fit"));
 tim.innerHTML = ""; el.setAttribute("data-fit", ""); q(".rm-desk", el).innerHTML = CA.room.desk(null, null);
-if (!quiet && was) walk(fit, i, true, n, null);
+if (!quiet && was && !roomResting()) walk(fit, i, true, n, null);
 }
 function syncRoom(){
 var now = $("now"), host = $("room"); if (!now || !host) return;
@@ -1371,6 +1372,7 @@ $("board").innerHTML = '<div class="dx-arena' + (set ? " has-set" : "") + (still
 return ranks ? rowHTML(r, r.rnk, jName(r, r.level || R.levelFor(r.xp)), num(r.xp), "XP", (+r.xp || 0) / first)
 : rowHTML(r, i + (pod ? 4 : 1), "", r.streak, r.streak === 1 ? "day" : "days", (+r.streak || 0) / first);
 }).join("") + "</ol>" : "") + "</div>";
+lifeStage();
 if (d.say) visitSay(d.say.key, d.say.msg, true);
 $("visitRand").hidden = !visitList().length;
 }
@@ -1832,7 +1834,59 @@ done();
 loadScriptOnce(WIDGET + "rest.bundle.js").then(one, one);
 loadScriptOnce(WIDGET + "hub-art/class.js").then(one, one);
 }
+var LIFE = 8000, life = { io: null, parts: [], scrolling: false, st: 0, tt: 0, stage: null };
+function lifeCovered(){ return !!q('dialog[open], [aria-modal="true"]'); }
+function lifeMark(p, rest){
+p.el.classList.toggle("is-rest", rest);
+if (p.el.id === "you") [].forEach.call(p.el.querySelectorAll(".tpc-live"), function(x){ x.classList.toggle("is-rest", rest); });
+}
+function lifeRest(p){ clearTimeout(p.t); p.t = 0; lifeMark(p, true); }
+function lifeWake(p){
+if (!p.on || life.scrolling || lifeCovered()) return;
+clearTimeout(p.t); lifeMark(p, false);
+p.t = setTimeout(function(){ lifeRest(p); }, LIFE);
+}
+function lifeHold(){ life.parts.forEach(function(p){ if (p.t) lifeRest(p); }); }
+function lifePart(el){
+var p = { el: el, on: false, t: 0 };
+el.classList.add("is-rest"); life.parts.push(p); life.io.observe(el);
+el.addEventListener("mouseenter", function(){ lifeWake(p); });
+return p;
+}
+function lifeWatch(){
+if (!window.IntersectionObserver) return;
+life.io = new IntersectionObserver(function(es){
+es.forEach(function(e){
+e.target.classList.toggle("is-away", !e.isIntersecting);
+var p = life.parts.filter(function(x){ return x.el === e.target; })[0]; if (!p) return;
+p.on = e.isIntersecting; if (p.on) lifeWake(p); else lifeRest(p);
+});
+});
+["you", "now", "road", "ideas", "past"].forEach(function(id){ var el = $(id); if (el) lifePart(el); });
+["hubs", "board"].forEach(function(id){ var el = $(id); if (el) life.io.observe(el); });
+lifeStage();
+window.addEventListener("scroll", function(){
+if (!life.scrolling) { life.scrolling = true; lifeHold(); }
+clearTimeout(life.st);
+life.st = setTimeout(function(){ life.scrolling = false; life.parts.forEach(lifeWake); }, 220);
+}, { passive: true });
+document.addEventListener("touchstart", lifeHold, { passive: true });
+document.addEventListener("touchend", function(){
+clearTimeout(life.tt); life.tt = setTimeout(function(){ if (!life.scrolling) life.parts.forEach(lifeWake); }, 500);
+}, { passive: true });
+document.addEventListener("click", function(){ setTimeout(function(){ if (lifeCovered()) lifeHold(); }, 80); }, true);
+if (window.MutationObserver) new MutationObserver(function(){ if (lifeCovered()) lifeHold(); }).observe(document.body, { childList: true });
+document.addEventListener("close", function(){ setTimeout(function(){ life.parts.forEach(lifeWake); }, 320); }, true);
+}
+function lifeStage(){
+if (!life.io) return;
+var el = q(".dx-set", $("board"));
+if (life.stage && life.stage.el === el) return;
+if (life.stage) { life.io.unobserve(life.stage.el); clearTimeout(life.stage.t); life.parts = life.parts.filter(function(x){ return x !== life.stage; }); }
+life.stage = el ? lifePart(el) : null;
+}
 function afterDraw(){
+lifeWatch();
 loadLate(function(){
 CA = window.SH_CLASS_ART || null;
 startClassData(); syncRoom();

@@ -476,7 +476,11 @@
       'button.sh-flair:hover,button.sh-flair:focus-visible{background:rgba(127,127,127,.16)}' +
       'button.sh-flair:focus-visible{outline:2px solid currentColor;outline-offset:1px}' +
       '.sh-flair-m{display:inline-flex;width:18px;height:18px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +
-      '.sh-flair-m.is-crown{animation:sh-flair-glint 3.2s ease-in-out infinite}' +
+      /* the crown's glint is a glow that fades in and out over the medal: only its opacity moves, which the browser
+         does without redrawing anything (it was an animated filter, which redrew the page's layers on every frame,
+         wherever the medal was: 2026-11-14) */
+      '.sh-flair-m.is-crown{position:relative}' +
+      '.sh-flair-m.is-crown::after{content:"";position:absolute;inset:-4px;border-radius:50%;background:radial-gradient(circle,rgba(255,236,150,.9) 0,rgba(255,226,122,.45) 45%,rgba(255,226,122,0) 70%);opacity:0;pointer-events:none;animation:sh-flair-glint 3.2s ease-in-out infinite}' +
       '.sh-flair-more{font-size:10.5px;font-weight:700;opacity:.7;margin-left:1px;font-variant-numeric:tabular-nums}' +
       /* the showcase (your rank card): every medal with its hub's name */
       '.sh-flair.is-list{display:flex;flex-wrap:wrap;gap:5px;white-space:normal;margin:0;vertical-align:baseline;flex:1 1 auto;min-width:0;max-width:100%}' +
@@ -494,8 +498,8 @@
       '.sh-flair-card li b{display:block;font-size:14px}.sh-flair-card li small{font-size:12px;color:#B9B5AD}' +
       '.sh-flair-card .sh-flair-x{display:block;margin:10px 0 0 auto;appearance:none;background:rgba(255,255,255,.1);color:inherit;border:0;border-radius:999px;padding:7px 16px;font:inherit;font-weight:600;cursor:pointer}' +
       '@keyframes sh-flair-in{from{opacity:0}to{opacity:1}}' +
-      '@keyframes sh-flair-glint{0%,80%,100%{filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}88%{filter:drop-shadow(0 0 4px #FFE27A) brightness(1.15)}}' +
-      '@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown,.sh-flair-pop{animation:none}}';
+      '@keyframes sh-flair-glint{0%,80%,100%{opacity:0}88%{opacity:1}}' +
+      '@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown::after,.sh-flair-pop{animation:none}}';
     (document.head || document.documentElement).appendChild(st);
     document.addEventListener("click", function(e){
       var b = e.target && e.target.closest && e.target.closest("[data-sh-flair]");

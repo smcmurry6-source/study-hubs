@@ -1348,7 +1348,10 @@ grid-template-columns: auto minmax(0, 1fr); gap: 12px 16px; align-items: center;
 .dx .dx-rankbar { height: 14px; background: var(--ar-row); }
 .dx-rankbar i { position: relative; overflow: hidden; background: var(--ar-gold); }
 .dx-rankbar i::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 40%; background: rgba(255, 255, 255, .55); transform: skewX(-20deg); animation: dx-shine 2.8s ease-in-out infinite; }
-@keyframes dx-shine { 0%, 55% { left: -40%; } 100% { left: 120%; } }
+@keyframes dx-shine { 0%, 55% { transform: translateX(0) skewX(-20deg); } 100% { transform: translateX(400%) skewX(-20deg); } }
+.is-rest svg *, svg.is-rest *, .is-away svg * { animation: none !important; }
+.dx-room .shpet-sp, .dx-room .shpet-eye, .dx-set .shpet-sp, .dx-set .shpet-eye { animation: none !important; }
+.is-away *, .is-away *::before, .is-away *::after { animation-play-state: paused !important; }
 .dx-rankcard.is-still .dx-rankbar i::after { animation: none; display: none; }
 .dx-nextart { display: grid; place-items: center; width: 44px; height: 44px; }
 .dx-nextart svg { width: 44px; height: 44px; opacity: .92; }

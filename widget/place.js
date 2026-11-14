@@ -193,9 +193,21 @@
         var m = mine(), art = cardArt(m), svg = art.svg, moving = !reduced && !opt.still;
         /* with its caption showing, the button is named by what's in it (the picture's description, then the caption);
            as a bare picture it carries the description itself */
-        btn.innerHTML = img(moving ? svg.replace(/(<svg[^>]*>)/, function(t){ return t + "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") + "</style>"; }) : svg, opt.label === false ? "" : sceneAlt(m) + ". Open it.") +
+        /* the picture is a still, with the moving one drawn over it in its own shadow root (as the full view's stage
+           is). It was one image that moved inside, which a browser draws again whole on every frame: a drawing in the
+           page costs a third of that and can be taken away. A page that wants it quiet (the dashboard, while it
+           scrolls or rests) puts .is-rest on the moving one (.tpc-live), which place.css then doesn't draw: every
+           moving shape in it is a layer to the browser. It starts that way inside anything that is .is-rest */
+        btn.innerHTML = img(svg, opt.label === false ? "" : sceneAlt(m) + ". Open it.") + (moving ? '<span class="tpc-live" aria-hidden="true"></span>' : "") +
           (opt.label === false ? "" : '<span class="tpc-foot"><b>Timmy’s place</b><span>' + esc(cardName(byK(TP.HOMES, optsOf(m).home).n)) + " · " + esc(lowerFirst(byK(TP.SCENES, optsOf(m).scene).n)) + "</span></span>");
         if (opt.label === false) btn.setAttribute("aria-label", sceneAlt(m) + ". Open it"); else btn.removeAttribute("aria-label");
+        var live = moving && btn.attachShadow !== undefined ? $(".tpc-live", btn) : null;
+        if (live) {
+          live.attachShadow({ mode: "open" }).innerHTML = "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") +
+            /* the stars and sparkles hold still on the card: each one that twinkles is a layer (25 on a night sky) */
+            "svg{display:block;width:100%;height:auto}.tp-star,.tp-twinkle{animation:none!important}</style>" + svg;
+          if (btn.closest(".is-rest")) live.classList.add("is-rest");
+        }
         btn.classList.add("is-live");
         if (svg.length < 240000) { lsSet(STILL, /xmlns=/.test(svg) ? svg : svg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"')); lsSet(STILL + "_at", art.at ? art.at.join(",") : null); }
         if (opt.onDraw) opt.onDraw(btn, art.at);
@@ -213,6 +225,7 @@
   /* the stage's own rules, inside its shadow root with the kit's: the tap areas, the bubble over Timmy's head, his wave,
      and how he stands at each health level (as on the design page) */
   var STAGE_CSS = [
+    ":host(.is-rest) *{animation:none!important}",
     ":host{display:block}.tp-box{position:relative;line-height:0}.tp-box>svg.tp-scene{display:block;width:100%;height:auto;user-select:none;-webkit-user-select:none}",
     ".tp-egg{outline:none}.tp-egg:focus-visible{filter:drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff)}.tp-timmy{cursor:pointer}",
     ".tp-hit{position:absolute;inset:0;width:100%;height:100%}.tp-hitarea{fill:transparent;stroke:transparent;stroke-width:2;cursor:pointer;outline:none;transition:fill .15s}",
@@ -383,6 +396,13 @@
     V = { dlg: dlg, m: o.place ? theirs(o.place) : mine(), mode: "play", pick: /^(home|scene|timmy|left|front|corner|side|right)$/.test(o.pick || "") ? o.pick : "home", wide: false, src: {}, at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, camRaf: 0, cam: null, bub: null,
       lastTap: 0, wander: 0, visible: true, back: o.back !== undefined ? o.back : D.activeElement, onClose: o.onClose || null, nav: nav };
     dlg.addEventListener("close", function(){ if (V && V.dlg === dlg) shut(); });   /* only this window: on a tour the next one may be open already */
+    /* nothing on the stage moves while something in the window scrolls (scroll events don't bubble: caught on the way down) */
+    dlg.addEventListener("scroll", function(){
+      if (!V || V.dlg !== dlg) return;
+      if (!V.scrolling) { V.scrolling = true; stageRest(true); }
+      clearTimeout(V.scT); V.scT = setTimeout(function(){ if (V && V.dlg === dlg) { V.scrolling = false; stageLife(); } }, 260);
+    }, { capture: true, passive: true });
+    $(".tpv-stage", dlg).addEventListener("mouseenter", function(){ stageLife(); });
     dlg.addEventListener("cancel", function(e){ if (!$(".tpv-over", dlg).hidden) { e.preventDefault(); overClose(); } });
     dlg.addEventListener("click", function(e){ if (e.target === dlg) close(); });
     $('[data-tp="close"]', dlg).addEventListener("click", close);
@@ -421,6 +441,18 @@
     try { if (v.back && v.back.isConnected && v.back.focus) v.back.focus(); } catch (e) {}
     clearTimeout(v.navT);
     if (v.onClose) v.onClose(v.nav ? v.nav.at : undefined);   /* a tour says which place it ended at, for the focus */
+  }
+  /* The stage's life (2026-11-14, Sam: "scrolling and things are kind of sluggish and jittery"). What moves on the stage
+     is drawn again on every frame, which a phone can't do while it also scrolls a list. So the stage holds still
+     while anything in the window scrolls, and in Customize it moves for a few seconds after each change (and under a
+     mouse), then rests. In Visit it is the show and keeps moving. */
+  function stageRest(on){ var h = V && $(".tpv-stage", V.dlg); if (h) h.classList.toggle("is-rest", !!on); }
+  function stageLife(){
+    if (!V) return;
+    clearTimeout(V.restT);
+    if (V.scrolling) { stageRest(true); return; }
+    stageRest(false);
+    if (V.mode === "customize") V.restT = setTimeout(function(){ stageRest(true); }, 5000);
   }
   function setMode(mode){
     if (!V || (mode === "customize" && !canChange())) return;
@@ -514,6 +546,7 @@
     if (opt.say) say(opt.say);
     else if (opt.hello && !custom) say(m.visiting ? "Hi! Welcome. Have a look around." : hpLine(H.hello[0]));
     wanderOn();
+    stageLife();
   }
 
   /* ---------- Timmy on the stage: the bubble, the hops, the wave, the flip, the wandering (the reference is the design
@@ -841,12 +874,10 @@
   function rarOf(r){ r = String(r || "common").toLowerCase(); return r.charAt(0).toUpperCase() + r.slice(1); }
   function rframe(r){
     if (!SA) return "";
-    var key = rarOf(r) + (reduced ? "-still" : "");
-    if (!FRAMES[key]) {
-      var f = SA.frame(rarOf(r));
-      if (!reduced && SA.CSS) f = f.replace(/(<svg[^>]*>)/, "$1<style>" + SA.CSS.split("\n").filter(function(l){ return /ts-r-|@keyframes ts-spin|prefers-reduced/.test(l); }).join("\n") + "</style>");
-      FRAMES[key] = img(f, "", "tpv-rframe");
-    }
+    /* the frames hold still here (in the shop they move): a drawer has dozens of them, each an image, and an image
+       that moves inside is drawn again on every frame, which made the list jitter as it scrolled (2026-11-14) */
+    var key = rarOf(r);
+    if (!FRAMES[key]) FRAMES[key] = img(SA.frame(key), "", "tpv-rframe");
     return FRAMES[key];
   }
   function rarTag(r){ return '<i class="tpv-rar r-' + String(r || "free").toLowerCase() + '">' + esc(r || "Default") + "</i>"; }

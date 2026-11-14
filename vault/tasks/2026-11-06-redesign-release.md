@@ -1106,5 +1106,13 @@ is a new migration and Sam's call, never a restore.
   never with a page). CI's `preview` job failed on the round's first push although the deploy had worked: wrangler
   printed no alias address and the step's `grep` under `set -e` and `pipefail` ended it before its fallback
   (BUG-146, fixed in `.github/workflows/preview.yml`; the hosted preview had the new code all along).
+- 2026-11-14 (Claude Code, round 4, same PR). Sam on the preview: "scrolling and things are kind of sluggish and
+  jittery" (BUG-147). Measured in a scripted browser under a 4x slower processor: about 130 endless animations inside
+  the dashboard's drawings, 310 layers, a layer rebuild on every frame, 59 to 81 ms a frame while scrolling. Now the
+  drawn pictures move for 8 s when you arrive and rest otherwise (`lifeWatch` in `widget/dash.js`), the place card's
+  moving picture is drawn in the page, the customizer's frames are stills, the shop rests while it scrolls, and a
+  crown's glint moves only its opacity: 17 to 19 ms a frame, 23 layers at rest. What was learned is in
+  [motion-cost](../reference/motion-cost.md), for whoever adds the next moving picture. Not checked on a real phone:
+  Sam's look at the preview is that check, and `LIFE` is the one number to change if the rest feels too quiet.
 
 ## Outcome

@@ -78,6 +78,8 @@ tags: [widget, supabase]
   (no `shop` in the bootstrap) it draws the default place and offers no customizer. Every button carries a fixed
   `data-tp` value, so click counts never record which piece someone picked. It keeps a still of the card on the device
   (`sh_place_still`), which the dashboard's "you" card shows before the renderer is fetched.
+  The card is that still with the moving picture drawn over it in a shadow root (`.tpc-live`): a page takes the moving
+  one away by putting `.is-rest` on it (the dashboard does while it scrolls or rests: [motion-cost](motion-cost.md)).
 - **Supabase project `thytmzsgymydbzcqdnix`** backs the widget: changelog,
   leaderboard, study streaks, activity pulse, and visitor analytics (see
   `migration_v4.sql`/`v5.sql`/`v6.sql` at repo root for schema history — run

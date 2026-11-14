@@ -32,6 +32,24 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **The release PR's fourth round: smooth scrolling (#359, 2026-11-14, Claude Code; live from the merge)** — Sam on
+  the preview: "scrolling and things are kind of sluggish and jittery" (BUG-147; what was measured and what was
+  learned: [motion-cost](vault/reference/motion-cost.md)).
+  - **The dashboard's drawn pictures move when you arrive, then rest** (`lifeWatch` in `widget/dash.js`): the "you"
+    card's place, the classroom, the stage, the road, the idea board's header and Past hubs are alive for 8 s (`LIFE`)
+    when they come on screen, when a scroll ends on them and under a mouse; they rest at once when a scroll or a touch
+    starts, behind an open window and off screen. `.is-rest` takes the animations inside a drawing away
+    (`widget/dash.css`), which frees their layers (310 on the page before, 23 at rest now); `.is-away` stops
+    everything else in a part that is off screen. Nobody walks in or out of the classroom while it rests.
+  - **The picture of Timmy's place** on a card is a still with the moving one drawn over it in a shadow root
+    (`.tpc-live`; it was one animated image). A page puts `.is-rest` on `.tpc-live` to take it away; its stars hold
+    still. **The full view's stage** holds while anything in the window scrolls and, in Customize, rests 5 s after the
+    last change. **The customizer's rarity frames are stills.**
+  - **The shop** (`widget/shop.js`, `shopLife`): every moving frame and the storefront's two layers have a still under
+    them; the moving ones show for 6 s after it opens, after a scroll ends and under a mouse.
+  - **A crown medal's glint** (`widget/ranks.js`) is a glow whose opacity moves; it was an animated filter.
+  - The little Timmys in the classroom and on the stage no longer blink or sparkle (63 layers nobody could see).
+  - Scrolling the whole dashboard under a 4x slower processor: 59 → 17 ms a frame (phone-size), 81 → 19 (laptop-size).
 - **The release PR's third round (#359, 2026-11-14, Claude Code; live from the merge)** — two more of Sam's calls
   from the preview ([decisions](vault/decisions.md), 2026-11-14):
   - **Timmy's place, the full view** (`widget/place.js`, `widget/place.css`): one theater-look window for your own
