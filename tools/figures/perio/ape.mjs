@@ -13,23 +13,23 @@ import { figureSvg, plateHtml } from "./shared.mjs";
 const S = 13, W = 416, H = 392, CX = 279, PY = 223.5, TOP = 15.6;
 
 /* the tooth's facial and palatal outlines: x (mm, facial -) at d (mm from the CEJ, apical +) */
-function apLerp(t, d) { if (d <= t[0][0]) return t[0][1]; for (var i = 1; i < t.length; i++) if (d <= t[i][0]) { var a = t[i - 1], b = t[i]; return a[1] + (b[1] - a[1]) * (d - a[0]) / (b[0] - a[0]); } return t[t.length - 1][1]; }
-function apF(d) { return d < 0 ? apLerp([[-10.5, -.7], [-10, -1.2], [-9.2, -1.8], [-8, -2.4], [-7, -2.75], [-6, -3.02], [-5, -3.22], [-4, -3.37], [-3, -3.46], [-2, -3.5], [-1, -3.47], [0, -3.38]], d) : -3.38 + 3.2 * Math.pow(Math.min(d, 13.4) / 13.4, 1.45); }
-function apL(d) { return d < 0 ? apLerp([[-10.5, -.1], [-10.1, .45], [-9.3, .7], [-8.5, .88], [-7.5, 1.02], [-6.5, 1.22], [-5.5, 1.5], [-4.5, 1.88], [-3.6, 2.35], [-2.7, 2.85], [-1.8, 3.28], [-.9, 3.45], [0, 3.25]], d) : 3.25 - 3.05 * Math.pow(Math.min(d, 13.4) / 13.4, 1.45); }
+export function apLerp(t, d) { if (d <= t[0][0]) return t[0][1]; for (var i = 1; i < t.length; i++) if (d <= t[i][0]) { var a = t[i - 1], b = t[i]; return a[1] + (b[1] - a[1]) * (d - a[0]) / (b[0] - a[0]); } return t[t.length - 1][1]; }
+export function apF(d) { return d < 0 ? apLerp([[-10.5, -.7], [-10, -1.2], [-9.2, -1.8], [-8, -2.4], [-7, -2.75], [-6, -3.02], [-5, -3.22], [-4, -3.37], [-3, -3.46], [-2, -3.5], [-1, -3.47], [0, -3.38]], d) : -3.38 + 3.2 * Math.pow(Math.min(d, 13.4) / 13.4, 1.45); }
+export function apL(d) { return d < 0 ? apLerp([[-10.5, -.1], [-10.1, .45], [-9.3, .7], [-8.5, .88], [-7.5, 1.02], [-6.5, 1.22], [-5.5, 1.5], [-4.5, 1.88], [-3.6, 2.35], [-2.7, 2.85], [-1.8, 3.28], [-.9, 3.45], [0, 3.25]], d) : 3.25 - 3.05 * Math.pow(Math.min(d, 13.4) / 13.4, 1.45); }
 /* the outer surface of the facial bone plate (crest at c), and the surface the soft tissue lies on */
-function apBO(d, c) { return apF(d) - (.95 + .02 * d) * Math.pow(Math.min(1, Math.max(0, (d - c) / 2.2)), .6); }
-function apIn(d, c) { return (d < c ? apF(d) : apBO(d, c)) - .03; }
+export function apBO(d, c) { return apF(d) - (.95 + .02 * d) * Math.pow(Math.min(1, Math.max(0, (d - c) / 2.2)), .6); }
+export function apIn(d, c) { return (d < c ? apF(d) : apBO(d, c)) - .03; }
 /* soft tissue thickness: gingiva 1.4 mm, mucosa 0.95 mm, blended across the MGJ */
-function apTh(d, g) { var u = Math.max(0, Math.min(1, (d - g + .5) / 1.0)); return 1.4 - .45 * u; }
-function apP(D, pts, close) { var o = ""; for (var i = 0; i < pts.length; i++) o += (i ? "L" : "M") + Math.round((D.CX + pts[i][0] * D.S) * 10) / 10 + " " + Math.round((D.PY - pts[i][1] * D.S) * 10) / 10; return o + (close ? "Z" : ""); }
+export function apTh(d, g) { var u = Math.max(0, Math.min(1, (d - g + .5) / 1.0)); return 1.4 - .45 * u; }
+export function apP(D, pts, close) { var o = ""; for (var i = 0; i < pts.length; i++) o += (i ? "L" : "M") + Math.round((D.CX + pts[i][0] * D.S) * 10) / 10 + " " + Math.round((D.PY - pts[i][1] * D.S) * 10) / 10; return o + (close ? "Z" : ""); }
 /* a band of soft tissue from lo to hi; cap rounds its coronal end (the gingival margin) */
-function apBand(lo, hi, c, g, cap) {
+export function apBand(lo, hi, c, g, cap) {
   var a = [], b = [], n = Math.max(6, Math.round((hi - lo) * 3));
   for (var i = 0; i <= n; i++) { var d = lo + (hi - lo) * i / n, x = apIn(d, c); a.push([x, d]); b.push([x - apTh(d, g), d]); }
   var t = apTh(lo, g), r = .55;
   return b.slice().reverse().concat(cap ? [[b[0][0] + t * .12, lo - r * .7], [(a[0][0] + b[0][0]) / 2 + .05, lo - r], [a[0][0] - t * .12, lo - r * .55]] : [], a);
 }
-function apBone(D, c) {
+export function apBone(D, c) {
   var o = [[apF(c) + .02, c]];
   for (var d = c; d <= D.TOP + .01; d += .4) o.push([apBO(d, c), d]);
   return o.concat([[apBO(D.TOP, c), D.TOP], [6.5, D.TOP], [6.5, 3.3], [4.6, 2.6], [apL(2) - .02, 2.0], [1.2, 6], [-1.2, 6]]);
@@ -67,7 +67,7 @@ function apDyn(st, D) {
 function apBoneSvg(st, D) { var P = st.after ? D.AFTER[st.t + st.s] : D.ST[st.t + st.s]; return '<g class="hot" data-info="' + D.HOT.bone + '"><path class="ap-bone" d="' + apP(D, apBone(D, P.crest), true) + '"/></g>'; }
 
 /* the incisor in section, the palatal gingiva, the CEJ and the anatomical-crown bracket (the same in every state) */
-function staticSvg(D) {
+export function staticSvg(D) {
   const X = (mm) => Math.round((CX + mm * S) * 10) / 10, Y = (d) => Math.round((PY - d * S) * 10) / 10;
   const tooth = [];
   for (let d = -10.5; d <= 13.4; d += .3) tooth.push([apF(d), d]);

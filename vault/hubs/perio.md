@@ -118,10 +118,19 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   section each one illustrates: `cairo` in `s9-recession`, `palate` and `grafts` in `grafts`, `ape` in `ape`, `egd` in
   `esthetics`. Figs 4 and 5 (altered passive eruption, the gummy smile) were checked against the live class on
   2026-11-14: Fig 4's subcategory labels now give A as 1.5-2 mm and B as within about 1 mm, and both captions cite the
-  class. The live class's other material (crown lengthening by type, the esthetic checklist, the coverage ceiling) is
-  already drawn in Figs 1, 4 and 5, so no new candidates came from it. Their positions in mm (where the margin, MGJ and crest
-  sit; how far a longer lower third moves the teeth) are illustrative, and their labels give only the notes' relations
-  and numbers. Each cites its outside sources in "What this shows, and what's simplified".
+  class. Their positions in mm (where the margin, MGJ and crest sit; how far a longer lower third moves the teeth) are
+  illustrative, and their labels give only the notes' relations and numbers. Each cites its outside sources in "What
+  this shows, and what's simplified".
+- 2026-11-14: "Yes to all figures and anima" for the Nov 12 live class: three more S9 figures, built in
+  `tools/figures/perio/` and listed after `egd` in `FIG_BY_LEC`. Fig 6 `excess` (pseudopocket or enlargement: Fig 4's
+  incisor section with a probe, gingivitis or drug-induced enlargement, as found, after hygiene and scaling or after a
+  gingivectomy; in Review's `s9-excess`). Fig 7 `clsteps` (crown lengthening step by step in Type 1B, as in Patient 1:
+  sound to bone, trim the gingiva, take off as much bone, or a gingivectomy alone that grows back; in Review's `ape`).
+  Fig 8 `smile` (the esthetic checklist from the front: smile line with a lip slider, gingival line, zeniths and
+  proportions, for an ideal smile and Patient 1 before and after crown lengthening; in Review's `esthetics`, before
+  `egd`). `excess` and `clsteps` import Fig 4's section helpers from `ape.mjs` (exported for them). Patient 1's numbers
+  come from the notes (#7 the reference, laterals 1 mm apical before and 1 mm coronal after, 2 mm for 2 mm on the
+  centrals); how far #6 and #11 sat, the papillae and the lips are illustrative.
 
 ## The new version (the redesign, not live yet)
 

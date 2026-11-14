@@ -116,4 +116,8 @@ slides (then the recording) are in the Drive folder, build it out before the fin
   tattoo). **Review**, cram, mind map and Figs 4 and 5 (`ape`, `egd`) brought in line; their "(slides)" labels are off.
 - The review for the final and the furcation email touched the other sessions too: the hub note's "Dr. Abou-Arraj's
   review for the final" says what.
+- **Figures** (Sam, the same day: "Yes to all figures and anima"): Fig 6 `excess` (pseudopocket or enlargement), Fig 7
+  `clsteps` (crown lengthening step by step) and Fig 8 `smile` (the esthetic checklist, with his Patient 1 before and
+  after), under the S9 notes and in Review's `s9-excess`, `ape` and `esthetics`. They sit outside the narrated text, so
+  no audio changed for them.
 

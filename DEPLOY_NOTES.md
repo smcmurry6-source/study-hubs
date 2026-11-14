@@ -44,7 +44,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `note`s for S1-S5 and S8; **36 questions retired** under dont-ask-what-professors-skip (S2 suture techniques and pictures, S3
   Miller & McEntire, S5 entrance widths, S8 doses; Dr. Litz's "know dosing" hint marked superseded), `q3-07`, `q2-P01`, `q2-P02`
   rewritten (same ids). High yield re-recorded for S1-S5, S8 and S9; `next/` rebuilt with the final's chips, banner and blurb.
-  Engine mock's matching and 15% split: a box in the release task. ([hub note](vault/hubs/perio.md))
+  Engine mock's matching and 15% split: a box in the release task. Then Sam: "Yes to all figures and anima": three new S9
+  figures (`tools/figures/perio/`, under the S9 notes and in Review): Fig 6 `excess` (pseudopocket or drug enlargement,
+  then hygiene or a gingivectomy), Fig 7 `clsteps` (crown lengthening step by step, or a gingivectomy alone that grows back),
+  Fig 8 `smile` (the esthetic checklist on an ideal smile and Patient 1 before and after); the About page's Perio diagrams
+  entry lists 15. Dr. Kaur's word for her part of the final (peri-implant health, mucositis and peri-implantitis) is a
+  line on Home's final card. ([hub note](vault/hubs/perio.md))
 - **2026-11-14 (Lessons refresh follow-up, Claude Code, same PR)** — Sam: "do another sweep", then the calls below. **Special Patient
   Care is off the site** ("remove everything for it"; no recap, no retrospective): `hubs/special-patient-care/` (page, audio, images)
   deleted, its precache line out of `sw.js` (`VERSION` sh-v59), its arcade board out of the dashboard's `ARCADES`, its `HUBS` entry
