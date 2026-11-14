@@ -559,9 +559,8 @@ button.dx-ck:focus-visible { outline: 3px solid var(--text); outline-offset: 2px
 .dx-ck.is-sent { cursor: default; }
 .dx-ck.is-sent .dx-ck-go { padding: 0 12px 0 8px; background: transparent; color: var(--good-ink, var(--text)); }
 @media (prefers-reduced-motion: reduce) { .dx-ck { transition: none; } button.dx-ck:hover { transform: none; } }
-.dx-past { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--gap); align-items: start; }
-.dx-past > .rc[hidden] + .dx-archived, .dx-past > .dx-archived:first-child { grid-column: 1 / -1; }
-.dx-past:has(> .dx-archived:empty) > .rc { grid-column: 1 / -1; max-width: 820px; }
+/* the recaps alone since 2026-11-14 (a closed hub has no card of its own), the page's full width */
+.dx-past { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); align-items: start; }
 .rc { display: grid; gap: 12px; min-width: 0; }
 .rc[hidden] { display: none; }
 .rc-chips { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -640,12 +639,6 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
   .rc-tough { flex-wrap: wrap; }
 }
 @media (prefers-reduced-motion: reduce) { .rc-body .rk-bar, .rc-body .rk-face, .rc-body .rk-tim, .rc-body .rc-peak { animation: none !important; } }
-.dx-archived { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--gap); }
-.dx-past > .rc[hidden] + .dx-archived, .dx-past > .dx-archived:first-child { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.dx-archived:empty { display: none; }
-.dx-arch { display: flex; align-items: flex-start; gap: 14px; padding: var(--panel-pad); border-radius: var(--r-panel); background: var(--panel); }
-.dx-arch:only-child { grid-column: 1 / -1; }
-.dx-arch > div { display: grid; gap: 6px; justify-items: start; min-width: 0; }
 
 .dx-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px; padding-top: 8px; font-size: var(--fs-meta); color: var(--muted); }
 
@@ -703,7 +696,6 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
 /* ---------- a tablet ---------- */
 @media (max-width: 1000px) {
   .dx-past { grid-template-columns: minmax(0, 1fr); }
-  .dx-past > .rc, .dx-past:has(> .dx-archived:empty) > .rc { max-width: none; }
   .dx-stagebody { grid-template-columns: minmax(0, 1fr); }
   .dx-go { grid-template-columns: minmax(0, 1fr) auto; align-items: center; min-width: 0; }
   .dx-pod { grid-column: span 5; }
@@ -745,7 +737,6 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
   .dx-classhead .seg { width: 100%; }
   .dx-classhead .seg button { flex: 1; justify-content: center; padding: 0 8px; }
   /* one column on a phone, also when no recap is beside it (that rule above is more specific and gave two) */
-  .dx-archived, .dx-past > .rc[hidden] + .dx-archived, .dx-past > .dx-archived:first-child { grid-template-columns: minmax(0, 1fr); }
   .dx-roadbox { padding: 16px 12px; }
   .dx-jr-head { gap: 10px; padding: 10px 12px; }
   .dx-jr-n, .dx-jr-chip { display: none; }
@@ -760,8 +751,6 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
   .dx-rankname b { font-size: 24px; }
   .dx-ck-list { grid-template-columns: minmax(0, 1fr); }
   .dx-ck-n { display: none; }
-  .dx-arch > div { justify-items: stretch; }
-  .dx-arch .btn { white-space: normal; text-align: left; }
   .dx-day { grid-template-columns: minmax(0, 1fr); }
   .dx .survey { right: 12px; bottom: 12px; }
   /* a reply to your report: the hubs move it to the top on a phone, clear of their tab bar; here there is none, and at the top it covers the bar's menu */

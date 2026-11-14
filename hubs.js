@@ -4,7 +4,8 @@
                its "updated" date, what it covers, and any archiveOn / hideCardOn override
    archived    hubs kept only for their recaps
    checkinHour, archiveHour, cardDays, debriefDays   when "Check in" shows on exam day, when a hub archives itself (10 pm
-               on its last exam day), how long its archived card stays, and how long the check-in pop-up still goes out
+               on its last exam day), how many days it then counts as archived before hidden (the dashboard draws no card for
+               either since 2026-11-14), and how long the check-in pop-up still goes out
    labels      short names
    legacy      hubs still on their old single-file page (hubs/<id>/index.html holds everything); every other hub is on
                the engine (widget/hub.js, its content in hubs/<id>/content/). A new hub is never added here.

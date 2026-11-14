@@ -238,6 +238,17 @@
   ].join("\n");
   var V = null;                        // the open view
   var X_SVG = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>';
+  /* the window's own icons (20 px, drawn in the button's color) */
+  var IC = function(d){ return '<svg class="tpv-ic" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + d + "</g></svg>"; };
+  var ICON = {
+    visit: IC('<path d="M4.5 17V4.6c0-.9.7-1.6 1.6-1.6h7.8c.9 0 1.6.7 1.6 1.6V17M2.5 17h15"/><path d="M12.2 10.4v.1"/>'),
+    brush: IC('<path d="M16.6 3.4c-1-1-2.5-.4-3.2.4L8 9.6l2.4 2.4 5.8-5.4c.8-.7 1.4-2.2.4-3.2z"/><path d="M7.4 10.6c-2 .2-3 1.5-3.2 3.2-.1 1-.6 1.8-1.4 2.2 2.6.8 6.6.4 6.9-3.2"/>'),
+    dice: IC('<rect x="3" y="3" width="14" height="14" rx="3.2"/><path d="M7 7v.1M13 7v.1M10 10v.1M7 13v.1M13 13v.1"/>'),
+    bag: IC('<path d="M4 7h12l-.9 9.2c-.1.5-.5.8-1 .8H5.9c-.5 0-.9-.3-1-.8z"/><path d="M7.2 9V6.2a2.8 2.8 0 0 1 5.6 0V9"/>'),
+    check: IC('<path d="M4.5 10.5l3.6 3.6 7.4-8"/>'),
+    zoom: IC('<circle cx="9" cy="9" r="5.2"/><path d="M13 13l4 4M9 6.8v4.4M6.8 9h4.4"/>'),
+    medal: IC('<circle cx="10" cy="12" r="4.6"/><path d="M7.2 8.2L5 3h3.2L10 6.6 11.8 3H15l-2.2 5.2"/>')
+  };
   function isStill(){ return reduced; }
   function HL(){ return TP.healthFor(hpOf(V.m)); }
   function hpLine(t){ return String(t || "").replace("{hp}", hpOf(V.m)); }
@@ -361,13 +372,13 @@
     css();
     var dlg = D.createElement("dialog");
     var nav = o.place && o.nav && o.nav.list && o.nav.list.length && typeof o.nav.load === "function" ? o.nav : null;
-    dlg.className = "tpv" + (o.place ? " is-visit" + (reduced || o.covered ? "" : " is-trip") : ""); dlg.setAttribute("aria-labelledby", "tpvT");
-    dlg.innerHTML = '<div class="tpv-in"><header class="tpv-top"><div class="tpv-title">' + (o.place ? '<p class="tpv-kick" aria-hidden="true">Welcome to</p>' : "") + '<h2 id="tpvT">Timmy’s place</h2><p class="tpv-sub"></p></div>' +
-      '<div class="tpv-acts"><span class="tpv-seg" role="group" aria-label="What to do here" hidden><button type="button" data-tp="play" aria-pressed="true">Visit</button><button type="button" data-tp="customize" aria-pressed="false">Customize</button></span>' +
+    dlg.className = "tpv" + (o.place ? " is-visit" + (reduced || o.covered ? "" : " is-trip") : " is-home"); dlg.setAttribute("aria-labelledby", "tpvT");
+    dlg.innerHTML = '<div class="tpv-in"><header class="tpv-top"><div class="tpv-title">' + '<p class="tpv-kick" aria-hidden="true">' + (o.place ? "Welcome to" : "Welcome home") + '</p><h2 id="tpvT">Timmy’s place</h2><p class="tpv-sub"></p></div>' +
+      '<div class="tpv-acts"><span class="tpv-seg" role="group" aria-label="What to do here" hidden><button type="button" data-tp="play" aria-pressed="true">' + ICON.visit + '<span>Visit</span></button><button type="button" data-tp="customize" aria-pressed="false">' + ICON.brush + "<span>Customize</span></button></span>" +
       (nav ? '<button type="button" class="tpv-home" data-tp="visit-home" aria-label="Back to mine">' + HOME_SVG + "<span>Back to mine</span></button>" : "") +
       '<button type="button" class="tpv-x" data-tp="close" aria-label="Close Timmy’s place">' + X_SVG + "</button></div></header>" +
-      '<div class="tpv-body"><div class="tpv-stagewrap"><div class="tpv-stage"></div>' + navHTML(nav) + '<p class="tpv-wait" role="status">Opening the door…</p>' +
-      '<button type="button" class="tpv-chip tpv-zoom" data-tp="zoom" aria-pressed="true" hidden>Close-up</button></div><div class="tpv-side"></div></div><div class="tpv-over" hidden></div></div>';
+      '<div class="tpv-body"><div class="tpv-stagewrap"><div class="tpv-frame"><div class="tpv-stage"></div>' +
+      '<button type="button" class="tpv-chip tpv-zoom" data-tp="zoom" aria-pressed="true" hidden>' + ICON.zoom + "<span>Close-up</span></button></div>" + navHTML(nav) + '<p class="tpv-wait" role="status">Opening the door…</p></div><div class="tpv-side"></div></div><div class="tpv-over" hidden></div></div>';
     D.body.appendChild(dlg);
     V = { dlg: dlg, m: o.place ? theirs(o.place) : mine(), mode: "play", pick: /^(home|scene|timmy|left|front|corner|side|right)$/.test(o.pick || "") ? o.pick : "home", wide: false, src: {}, at: "door", pos: null, dir: 1, busy: false, next: null, raf: 0, camRaf: 0, cam: null, bub: null,
       lastTap: 0, wander: 0, visible: true, back: o.back !== undefined ? o.back : D.activeElement, onClose: o.onClose || null, nav: nav };
@@ -793,26 +804,38 @@
         : V.nav && V.nav.list.length > 1 ? '<p class="tpv-gnav">Place ' + (V.nav.at + 1) + " of " + V.nav.list.length + " on the board<span>Next: " + esc(V.nav.list[navStep(V.nav, 1)].name) + "</span></p>" : "") + "</div>";
     var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
   }
+  /* your own place's panel (Sam, 2026-11-14: "way more epic and better buttons/ui"): Timmy as he is today with his
+     health on a meter, your rank drawn big on its plate, the hub medals, and two big buttons: Customize and the shop */
+  function hostCard(el, m, H){
+    var R = W.shRanks, r = rankOf(m), fl = flairOf(m).sort(function(a, b){ return b.lvl - a.lvl; }), hp = hpOf(m), big = "", face = "";
+    try { if (R) big = r.journey > 0 && R.artOf ? R.artOf(r.journey, r.tier, 96, { level: r.level, animate: !reduced }) : R.art(r.tier, 96, { level: r.level, animate: !reduced }); } catch (e) { big = ""; }
+    try { var ts = timmySvg(m); face = ts ? img(ts, "") : ""; } catch (e) { face = ""; }
+    var medal = function(x){ try { return R && R.medal ? R.medal(x.lvl, 44, x.hub) : ""; } catch (e) { return ""; } };
+    var hub = function(h){ try { return R && R.hubName ? R.hubName(h) : h; } catch (e) { return h; } };
+    var lvl = hp >= 70 ? "good" : hp >= 40 ? "fair" : hp >= 12 ? "low" : "out", can = canChange();
+    el.innerHTML = '<div class="tpv-host">' +
+      '<div class="tpv-me is-' + lvl + '">' + (face ? '<span class="tpv-meface" aria-hidden="true">' + face + "</span>" : "") +
+        '<div class="tpv-mebody"><p class="tpv-gk">Timmy today</p><p class="tpv-hp"><b>' + esc(H.n) + '</b><span class="num">' + hp + " HP</span></p>" +
+        '<div class="tpv-meter" aria-hidden="true"><i style="width:' + hp + '%"></i></div><p class="tpv-medoes">' + esc(H.does) + ".</p></div></div>" +
+      (can ? '<div class="tpv-cta"><button type="button" class="tpv-btn tpv-gold tpv-big" data-tp="customize2">' + ICON.brush + '<span>Customize</span></button>' +
+        '<button type="button" class="tpv-btn tpv-big" data-tp="shop" aria-label="Timmy’s shop">' + ICON.bag + "<span>Shop</span></button></div>" : "") +
+      '<div class="tpv-gplate">' + (big ? '<div class="tpv-grank" aria-hidden="true">' + big + "</div>" : "") + '<p class="tpv-gk">Your rank</p><p class="tpv-gr">' + esc(rankName(m)) + "</p></div>" +
+      '<div class="tpv-gmedals"><p class="tpv-gk">Hub mastery</p>' + (fl.length
+        ? '<ul class="tpv-gml">' + fl.slice(0, 8).map(function(x){ var n = hub(x.hub); return '<li title="' + esc(n) + '"><span aria-hidden="true">' + medal(x) + '</span><span class="tpv-gmn">' + esc(n) + "</span></li>"; }).join("") + "</ul>" +
+          '<div class="tpv-row"><button type="button" class="tpv-btn" data-tp="mastery">' + ICON.medal + "<span>See the medals</span></button></div>"
+        : '<p class="tpv-gnone">No hub medals yet: your first one hangs on the board by the house.</p>') + "</div>" +
+      '<p class="tpv-gtip">Tap Timmy and he waves; tap him again while he’s waving. The sun, the house and the things in the yard each do something too.</p></div>';
+    var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
+    var cb = $('[data-tp="customize2"]', el); if (cb) cb.addEventListener("click", function(){ setMode("customize"); });
+    var sb = $('[data-tp="shop"]', el); if (sb) sb.addEventListener("click", toShop);
+  }
   function rarTag(r){ return '<i class="tpv-rar r-' + String(r || "free").toLowerCase() + '">' + esc(r || "Default") + "</i>"; }
   function owned(x){ return !x.id || !!S.own[x.id]; }
   function howTag(x){ var how = x.id ? S.own[x.id] : ""; return how === "gift" ? "A gift" : how === "rank" ? (x.rankName || "Rank") + " rank" : ""; }
   function side(o){
     var el = $(".tpv-side", V.dlg), m = V.m, H = HL();
     if (V.mode !== "customize" && m.visiting) { guestCard(el, m); return; }
-    if (V.mode !== "customize") {
-      var fl = flairOf(m), r = rankOf(m);
-      el.innerHTML = '<div class="tpv-visit">' +
-        (m.visiting ? '<p class="tpv-lede">You’re visiting. Tap Timmy and the things around the place.</p>'
-          : '<p class="tpv-hp"><b>' + esc(H.n) + '</b><span class="num">' + hpOf(m) + ' HP</span></p><p class="tpv-note">' + esc(H.does) + ".</p>") +
-        '<dl class="tpv-facts"><div><dt>Rank</dt><dd>' + esc(rankName(m)) + "</dd></div><div><dt>Hub medals</dt><dd>" + (fl.length ? fl.length + " on the board" : "None yet") + "</dd></div></dl>" +
-        '<div class="tpv-row">' + (fl.length ? '<button type="button" class="tpv-btn" data-tp="mastery">See the medals</button>' : "") +
-        (canChange() ? '<button type="button" class="tpv-btn tpv-primary" data-tp="customize2">Customize</button>' : "") + "</div>" +
-        (m.visiting ? "" : '<p class="tpv-note">Tap Timmy and he waves; tap him again while he’s waving. The sun, the house and the things in the yard each do something too.</p>') + "</div>";
-      void r;
-      var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
-      var cb = $('[data-tp="customize2"]', el); if (cb) cb.addEventListener("click", function(){ setMode("customize"); });
-      return;
-    }
+    if (V.mode !== "customize") { hostCard(el, m, H); return; }
     if (V.loading) { el.innerHTML = '<p class="tpv-note" role="status">Getting Timmy’s things out…</p>'; return; }
     var pick = V.pick, h = byK(TP.HOMES, o.home), lane = !!(o.yard.side && byK(TP.YARD, o.yard.side).wide), e = S.eq;
     if (pick === "corner" && lane) pick = V.pick = "side";
@@ -857,7 +880,8 @@
         return '<button type="button" class="tpv-swatch' + (o.paint === p.k ? " on" : "") + '" data-tp="paint" data-paint="' + p.k + '" aria-pressed="' + (o.paint === p.k) + '" aria-label="' + esc(nm) + '" title="' + esc(nm) + '" style="--sw:' + c + '"></button>'; }).join("") + "</div></div>";
     }
     if (kind === "yard" && (pick === "side" || pick === "corner") && mineOf.some(function(y){ return y.wide; })) body += '<p class="tpv-note">The bowling lane is long: it takes the side yard and the front corner together.</p>';
-    body += '<div class="tpv-row tpv-foot"><button type="button" class="tpv-btn" data-tp="surprise">Surprise me</button><button type="button" class="tpv-btn" data-tp="shop">Get more in the shop</button></div>';
+    body += '<div class="tpv-row tpv-foot"><button type="button" class="tpv-btn" data-tp="surprise">' + ICON.dice + '<span>Surprise me</span></button><button type="button" class="tpv-btn" data-tp="shop" aria-label="Get more in the shop">' + ICON.bag + "<span>Shop</span></button>" +
+      '<button type="button" class="tpv-btn tpv-gold tpv-done" data-tp="done">' + ICON.check + "<span>Done</span></button></div>";
     var keep = $(".tpv-dcards", el), top = keep && V.kept === kind + src ? keep.scrollTop : 0; V.kept = kind + src;
     el.innerHTML = dock + '<div class="tpv-drawer d-' + kind + '">' + body + "</div>";
     if (top) $(".tpv-dcards", el).scrollTop = top;
@@ -878,6 +902,7 @@
     $$("[data-paint]", el).forEach(function(b){ b.addEventListener("click", function(){ var p = byK(TP.PAINTS, b.dataset.paint); equip("paint", p.id || null, {}); }); });
     var su = $('[data-tp="surprise"]', el); if (su) su.addEventListener("click", surprise);
     var sh = $('[data-tp="shop"]', el); if (sh) sh.addEventListener("click", toShop);
+    var dn = $('[data-tp="done"]', el); if (dn) dn.addEventListener("click", function(){ setMode("play"); var n = V && $('[data-tp="customize2"]', V.dlg); if (n) n.focus(); });
   }
   /* Timmy's shop (widget/shop.js, phase 4 part B), fetched the first time it's wanted; it opens over the place, and what
      you buy there is handed back here (setup({ shop }) and repaint()) */

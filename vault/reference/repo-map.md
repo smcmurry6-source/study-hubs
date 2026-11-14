@@ -119,8 +119,8 @@ tags: [map]
   clicks and reach, engagement, questions, exam check-ins, search terms, reports), write the findings and the
   resulting changes into `LESSONS.md`, fix what's small, and tell Sam the rest. The dashboard archives a hub **by itself** at 10 pm on the day of
   its last exam (`archiveHour` in `hubs.js`), unless Sam set it by hand on the admin page's Hubs tab (that wins until it's cleared or ends:
-  [admin-operations](admin-operations.md)): it moves to Past hubs with no Open button, and its card disappears 10 days
-  later (`cardDays`; `hideCardOn` overrides). "Check in" buttons show from 8 am on exam day; the pop-up only goes out
+  [admin-operations](admin-operations.md)): it leaves the hub tabs and has no card of its own (Sam, 2026-11-14; `cardDays` and `hideCardOn` now only move it
+  from archived to hidden, which looks the same): what stays under Past hubs is its exam check-in and, once published, its recap. "Check in" buttons show from 8 am on exam day; the pop-up only goes out
   from 10 pm and still reaches first visits up to 60 days after (`debriefDays`). The hub's page itself stays up until
   someone removes it, so the retrospective and cleanup are still manual; its narration and Timmy Time come off the site then
   ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)); moving the entry into `archived` in `hubs.js` then is optional. Read the check-ins as late as you can.

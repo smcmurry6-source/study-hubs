@@ -12,7 +12,8 @@
      (ranks or study streaks) with the top three on a podium; on the game layer a row opens that person's Timmy's place
      (visiting, phase 4);
    - the idea board (widget/ideas.js draws it in #ideas once the board's server is there), then past hubs: each
-     finished exam's recap as a live infographic, and the hubs that just closed.
+     finished exam's recap as a live infographic, with the closed hubs' open exam check-ins above it (a closed hub has
+     no card of its own: Sam, 2026-11-14).
    No What's new list, no arcade scores and no "When people study" chart (Sam, 2026-11-11); a hub's "Updated" label still reads the changelog.
    The check-in, survey, name, luck and archive logic is the live dashboard's own, moved here unchanged.
 
@@ -156,7 +157,6 @@
     return sig.join(",");
   }
   var hubSig = partitionHubs();
-  function shownArchived(){ return ARCHIVED_HUBS.filter(function(h){ return HUB_STATE[h.id] && HUB_STATE[h.id].state === "archived"; }); }
 
   /* ---------- where a hub opens: the engine's routes, or an old single-file hub's own ---------- */
   function hubHref(hub, part){
@@ -288,11 +288,10 @@
       '<section class="dx-section" id="ideas" data-sh-ideas hidden></section>' +
       '<section class="dx-section" id="past" aria-labelledby="pastH" hidden>' +
         '<h2 id="pastH">Past hubs</h2><p class="note" id="pastNote"></p>' +
-        /* every open exam check-in in one place (Sam, 2026-11-13: "grouped together, available"), also for a hub whose card has come down */
+        /* every open exam check-in in one place (Sam, 2026-11-13: "grouped together, available"), for every closed hub */
         '<div class="dx-checkins" id="checkins" hidden></div>' +
         '<div class="dx-past">' +
           '<div class="rc" id="rc" hidden><div class="rc-chips" id="rcChips" role="tablist" aria-label="Finished exams"></div><div class="rc-body tinted" id="rcBody" role="tabpanel"></div></div>' +
-          '<ul class="dx-archived" id="archived"></ul>' +
         "</div>" +
       "</section>" +
       '<footer class="dx-foot"><p>Bookmark this page, not a hub: new hubs show up here as each exam gets close.</p>' +
@@ -712,20 +711,10 @@
   /* coming back from a hub (the back button restores this page as it was): redraw the open hub */
   window.addEventListener("pageshow", function(e){ if (e.persisted) { renderPanel(); renderYouStats(); } });
 
-  /* ---------- archived hubs: a short card each, with the check-in ---------- */
-  function renderArchived(){
-    var list = shownArchived();
-    $("archived").innerHTML = list.map(function(hub){
-      var p = readProgress(hub), last = lastExam(hub);
-      return '<li class="dx-arch tinted" style="' + tintVars(hub.id) + '">' + emblem(hub.id, "dx-emb") + "<div><h3>" + esc(hub.title) + '</h3><p class="note">' +
-        (last && daysUntil(last.date) < 0 ? "Closed after the exam on " + esc(parseYmd(last.date).toLocaleDateString(undefined, { month: "long", day: "numeric" })) + "."
-          : "Archived for now. Your progress on it is kept.") + (p ? " You tried " + num(p.seen) + (p.seen === 1 ? " question" : " questions") + " here." : "") + "</p></div></li>";
-    }).join("");
-    renderCheckins();
-    showPast();
-  }
-  /* the exam check-ins that are open, newest exam first: a closed hub's stay here for 60 days (debriefDays), whether or
-     not its card is still up. One that was sent from this device says so and can't be sent twice by mistake. */
+  /* ---------- hubs that closed: no card of their own (Sam, 2026-11-14: "dont seem to be for anything. They can be
+     removed"). A closed hub is in Past hubs through its exam check-in, while that is open, and its recap. ---------- */
+  function renderArchived(){ renderCheckins(); showPast(); }
+  /* the exam check-ins that are open, newest exam first: a closed hub's stay here for 60 days (debriefDays). One that was sent from this device says so and can't be sent twice by mistake. */
   function openCheckins(){
     var out = [];
     HUBS_SRC.concat(ARCHIVED_SRC).forEach(function(h){
@@ -750,9 +739,9 @@
       }).join("") + "</ul>";
   }
   function showPast(){
-    var arch = !!$("archived").children.length, rec = !$("rc").hidden;
-    $("past").hidden = !arch && !rec && $("checkins").hidden;
-    $("pastNote").textContent = rec ? "How the class studied for each exam that's done" + (arch ? ", and the hubs that just closed." : ".") : "Hubs that closed after their exam.";
+    var rec = !$("rc").hidden;
+    $("past").hidden = !rec && $("checkins").hidden;
+    $("pastNote").textContent = rec ? "How the class studied for each exam that's done." : "Hubs that closed after their exam.";
   }
 
   /* ---------- the visitor: a random per-browser id, made on first need ---------- */

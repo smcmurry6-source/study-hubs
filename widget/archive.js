@@ -1,6 +1,7 @@
 /* ============ HUB ARCHIVE STATE (shared) ============
-   Which public state a hub is in right now: "live" (a card with an Open button), "archived" (a greyed card, no Open
-   button, check-in buttons by the exam dates) or "hidden" (no card). Two inputs, in this order of precedence:
+   Which public state a hub is in right now: "live" (a tab with its way in), "archived" or "hidden". The redesign's
+   dashboard draws no card for a closed hub (Sam, 2026-11-14), so archived and hidden look the same there: no tab, its
+   exam check-in by the exam dates, its recap. Two inputs, in this order of precedence:
 
      1. A manual override from the admin page (review/, Hubs tab; table hub_archive_overrides, migration_v50):
         live, archived or hidden, in force until Sam sets the hub back to Automatic or until its end time (until).
