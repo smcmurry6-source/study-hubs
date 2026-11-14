@@ -33,9 +33,9 @@ let pw; try { pw = require("playwright"); } catch (e) { pw = createRequire("/opt
 const TL = JSON.parse(fs.readFileSync(path.join(out, "timeline.json"), "utf8"));
 const arg = (k) => { const i = process.argv.indexOf(k); return i < 0 ? null : process.argv[i + 1]; };
 const BAR = 132;                                   // the letterbox bars in the studio (2.39 : 1)
-const PIP = { x: 150, y: 944, r: 94 };             // Timmy's booth cam over the feature shots
+const PIP = { x: 122, y: 962, r: 76 };             // Timmy's booth cam over the feature shots
 const FOOT = { w: 1280, h: 720, k: 2 };            // the recorded window, and how many frame pixels per window pixel
-const AY = 452;                                    // where on the frame the camera puts what it looks at (above the caption)
+const AY = 486;                                    // where on the frame the camera puts what it looks at (above the caption)
 
 /* the camera's moves for each feature shot, from record.mjs (none yet: the screen stays empty) */
 const CAMS = {};
@@ -53,7 +53,7 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; 
 .sp-tint { fill: ${STYLE.RED}; } .sp-tint-line { stroke: ${STYLE.RED}; }
 .full { position: absolute; inset: 0; overflow: hidden; }
 .tiles { position: absolute; inset: 0; }
-/* the feature shots: a dark stage, the recorded screen on it, a scrim under the caption */
+/* the feature shots: a dark stage, the recorded screen on it */
 #stage { background: radial-gradient(ellipse at 50% 38%, #3b2a6b 0%, #251a45 45%, ${PLUM} 100%); }
 #stage .tiles { opacity: .28; }
 #tintglow { position: absolute; left: 260px; top: 60px; width: 1400px; height: 900px; border-radius: 50%; filter: blur(120px); opacity: .22; }
@@ -61,7 +61,6 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; 
 #scr { position: absolute; left: 0; top: 0; width: ${FOOT.w * FOOT.k}px; height: ${FOOT.h * FOOT.k}px; transform-origin: 0 0; border-radius: 26px; overflow: hidden; background: #fff;
   box-shadow: 0 0 0 7px ${STYLE.INK}, 0 0 0 11px rgba(255,255,255,.16), 0 70px 150px 20px rgba(6,2,18,.62); }
 #foot { display: block; width: 100%; height: 100%; }
-#scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 380px; background: linear-gradient(to top, rgba(22,14,40,.98) 0, rgba(22,14,40,.97) 215px, rgba(22,14,40,.7) 270px, rgba(22,14,40,0) 100%); }
 /* the studio: one drawing, moved by its camera and cut to a circle when it is the booth cam */
 #studio { background: ${STYLE.WALL}; }
 #studio svg { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: visible; }
@@ -69,7 +68,7 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; 
 #vig { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 46%, rgba(0,0,0,0) 48%, rgba(14,6,28,.6) 100%); }
 #pipring { position: absolute; left: ${PIP.x - PIP.r - 10}px; top: ${PIP.y - PIP.r - 10}px; width: ${PIP.r * 2 + 20}px; height: ${PIP.r * 2 + 20}px; border-radius: 50%;
   border: 8px solid ${STYLE.INK}; box-shadow: 0 0 0 6px ${GOLD}, 0 0 0 12px ${STYLE.INK}, 0 14px 40px 8px rgba(6,2,18,.55); }
-#live { position: absolute; left: ${PIP.x + 50}px; top: ${PIP.y + 56}px; width: 34px; height: 34px; border-radius: 50%; background: #FF5A5F; border: 7px solid ${STYLE.INK}; }
+#live { position: absolute; left: ${PIP.x + 40}px; top: ${PIP.y + 45}px; width: 30px; height: 30px; border-radius: 50%; background: #FF5A5F; border: 6px solid ${STYLE.INK}; }
 .bar { position: absolute; left: 0; right: 0; height: ${BAR}px; background: #000; }
 #barT { top: 0; transform-origin: 50% 0; } #barB { bottom: 0; transform-origin: 50% 100%; }
 /* the caption: the line being spoken, word for word */
@@ -77,8 +76,11 @@ html, body { width: 1920px; height: 1080px; overflow: hidden; background: #000; 
 #cap span { text-shadow: 0 3px 14px rgba(8,3,20,.75); }
 #cap.s { left: 160px; right: 160px; bottom: 0; height: ${BAR}px; justify-content: center; text-align: center; }
 #cap.s span { font-size: 50px; line-height: 1.2; }
-#cap.f { left: ${PIP.x + PIP.r + 46}px; right: 110px; top: ${PIP.y - 88}px; height: 176px; }
-#cap.f span { font-size: 47px; line-height: 1.2; }
+/* over a feature shot: a bar that comes out from behind the booth cam and is only as big as the line (Sam, on the
+   second cut: "the subtitles gradient takes up too much of the screen") */
+#capf { position: absolute; left: ${PIP.x}px; top: ${PIP.y}px; box-sizing: border-box; min-height: 104px; max-width: 1240px; padding: 20px 46px 22px ${PIP.r + 40}px; display: flex; align-items: center;
+  border-radius: 0 40px 40px 0; background: rgba(27,18,48,.95); box-shadow: 0 0 0 3px rgba(255,255,255,.1), 0 12px 34px 4px rgba(6,2,18,.45); color: #fff; font-weight: 800; letter-spacing: .1px; text-wrap: balance; }
+#capf span { font-size: 40px; line-height: 1.2; }
 /* the title card and the end card */
 .card { background: radial-gradient(ellipse at 50% 46%, #45307f 0%, #2a1d50 42%, ${PLUM} 100%); color: #fff; }
 .card .tiles { opacity: .3; }
@@ -113,7 +115,8 @@ const letters = (w) => w.split("").map((c) => `<span>${c === " " ? "&nbsp;" : c}
 const mark = (px) => `<svg viewBox="0 0 24 24" width="${px}" height="${px}" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">${ICONS.tooth.body}</svg>`;
 
 const html = `<!doctype html><meta charset="utf-8"><style>${css}</style>
-<div id="stage" class="full">${tiles()}<div id="tintglow"></div><div id="persp"><div id="scr"><img id="foot" alt=""></div></div><div id="scrim"></div></div>
+<div id="stage" class="full">${tiles()}<div id="tintglow"></div><div id="persp"><div id="scr"><img id="foot" alt=""></div></div></div>
+<div id="capf"><span></span></div>
 <div id="studio" class="full"><svg viewBox="0 0 1920 1080"><g id="cam">${studio()}</g></svg><div id="vig"></div></div>
 <div id="pipring"></div><div id="live"></div>
 <div id="barT" class="bar"></div><div id="barB" class="bar"></div>
@@ -165,11 +168,11 @@ function pageSetup(TL, CAMS, CH, G){
   var tBig = all("#title .big span"), eBig = all("#end h1 span");
 
   /* the screen's camera: [x, y of the window point it looks at, zoom (frame px per window px), tilt, where on the frame] */
-  var FLOAT = [G.FOOT.w / 2, G.FOOT.h / 2, 1.12, 1, 436];
+  var FLOAT = [G.FOOT.w / 2, G.FOOT.h / 2, 1.17, 1, 458];
   function aim(ev){
     if (ev.float || !ev.box) return FLOAT;
-    var b = ev.box, Z = clamp(Math.min(W * 0.84 / b[2], 800 * 0.84 / b[3]), 1.5, ev.max || 2.3);
-    var cy = b[3] * Z > 800 ? b[1] + (AY - 34) / Z : b[1] + b[3] / 2;       // too tall to fit: keep its top in view
+    var b = ev.box, Z = clamp(Math.min(W * 0.84 / b[2], 850 * 0.84 / b[3]), 1.5, ev.max || 2.3);
+    var cy = b[3] * Z > 850 ? b[1] + (AY - 34) / Z : b[1] + b[3] / 2;       // too tall to fit: keep its top in view
     return [clamp(b[0] + b[2] / 2, W / 2 / Z, G.FOOT.w - W / 2 / Z), clamp(cy, AY / Z, G.FOOT.h - (G.LOW - AY) / Z), Z, 0, AY];   // the page never goes under the caption
   }
   Object.keys(CAMS).forEach(function(id){ CAMS[id].cams.forEach(function(ev){ ev.s = aim(ev); }); });
@@ -197,7 +200,6 @@ function pageSetup(TL, CAMS, CH, G){
       } else foot.style.visibility = "hidden";
       var s = screenCam(cur.id, tc), k = G.FOOT.k, sway = s[3];
       $("#scr").style.transform = "translate(960px," + s[4].toFixed(2) + "px) rotateY(" + (sway * (-8 + 1.6 * Math.sin(t * 0.7))).toFixed(3) + "deg) rotateX(" + (sway * (3.2 + 0.8 * Math.sin(t * 0.9))).toFixed(3) + "deg) scale(" + (s[2] / k).toFixed(5) + ") translate(" + (-s[0] * k).toFixed(2) + "px," + (-s[1] * k).toFixed(2) + "px)";
-      $("#scrim").style.opacity = 1 - s[3];
       $("#tintglow").style.background = (CH[cur.id] || {}).tint || "#8A76D6";
     }
 
@@ -245,8 +247,10 @@ function pageSetup(TL, CAMS, CH, G){
     /* the caption: the line being spoken, from just before its first word until the next line (or a beat after) */
     var cue = null; TL.cues.forEach(function(q, i){ var nx = TL.cues[i + 1], until = Math.min(q.t1 + 0.4, nx ? nx.t0 - 0.08 : q.t1 + 0.4); if (t >= q.t0 - 0.08 && t < until) cue = q; });
     var cap = $("#cap"), sp = cap.firstElementChild, ca = cue && !inTitle && !inEnd ? clamp((t - (cue.t0 - 0.08)) / 0.16) : 0;
-    cap.className = inFeat ? "f" : "s"; cap.style.opacity = ca; cap.style.transform = "translateY(" + ((1 - eout(ca)) * 16).toFixed(1) + "px)";
-    if (cue && sp.textContent !== cue.shown) sp.textContent = cue.shown;
+    var capf = $("#capf"), spf = capf.firstElementChild;
+    cap.className = "s"; cap.style.opacity = inFeat ? 0 : ca; cap.style.transform = "translateY(" + ((1 - eout(ca)) * 16).toFixed(1) + "px)";
+    capf.style.opacity = inFeat ? ca : 0; capf.style.transform = "translate(" + ((eout(ca) - 1) * 26).toFixed(1) + "px,-50%)";
+    if (cue && sp.textContent !== cue.shown) sp.textContent = spf.textContent = cue.shown;
 
     /* the title card */
     $("#title").style.display = inTitle ? "" : "none";
@@ -300,7 +304,7 @@ async function main(){
   fs.mkdirSync(dir, { recursive: true });
   const file = path.join(out, "compose.html");
   fs.writeFileSync(file, html);
-  const G = { mouth: mouth.toString(), FACE, PIP, INK: STYLE.INK, AY, FOOT, LOW: 846, lampY: 118 + DOWN };
+  const G = { mouth: mouth.toString(), FACE, PIP, INK: STYLE.INK, AY, FOOT, LOW: 890, lampY: 118 + DOWN };
   const frames = at ? at.split(",").map(Number).map((t) => ({ t, name: "t" + t.toFixed(2).replace(".", "_") + ".jpg" }))
     : Array.from({ length: Math.ceil(TL.dur * TL.fps) }, (_, i) => ({ t: i / TL.fps, name: "f" + String(i).padStart(5, "0") + ".jpg" })).filter((f) => f.t >= from && f.t < to);
   const browser = await pw.chromium.launch();

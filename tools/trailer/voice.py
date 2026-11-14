@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.join(HERE, "..", "podcast"))
 import numpy as np
 import render_podcast as rp
 
-VOICE, SPEED = "am_michael:0.6,am_onyx:0.4", 0.98   # the show reads at 0.95; a trailer a touch brisker, to fit 90 seconds
+VOICE, SPEED = "am_michael:0.6,am_onyx:0.4", 0.98   # the show reads at 0.95; a trailer a touch brisker
 SHOWN = [("X-P", "XP")]          # spoken spelling -> what the caption shows
 
 

@@ -10,7 +10,8 @@ NOT SPOKEN. The same format as a Timmy Time script (tools/podcast/README.md), so
 - "[pause N]" on its own line is N seconds of silence before the next line (the picture gets that time).
 - Sam's calls, 2026-11-14: less time on the cosmetic extras (the shop, the place, outfits get one shot), a file to
   send the class, wide 16:9, new music; then, on the first cut: "you can make it a bit longer to explain things a
-  little better" (each feature now gets a line on what it does; still under 90 seconds).
+  little better" (each feature now gets a line on what it does); on the second: "you dont mention the ideas board"
+  (the dashboard's last line; 93 seconds with it).
 - Lore (tools/podcast/LORE.md): the trailer is not an episode, so he says so; never where he lives today or what he
   is wearing; "Shiny Gold Crowns" in full the first time.
 -->
@@ -32,6 +33,8 @@ A new dashboard. Every hub is a tab, with a countdown to its exam.
 The class, studying right now.
 
 And the top three, on a stage. No pressure.
+
+And the idea board: post what you want next, and vote.
 
 ## 3. hub
 

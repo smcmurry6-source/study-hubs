@@ -38,11 +38,12 @@ export const REALTIME = ["notes"];
 
 export const SHOTS = {
   /* "A new dashboard. Every hub is a tab, with a countdown to its exam." / "The class, studying right now." /
-     "And the top three, on a stage. No pressure." */
+     "And the top three, on a stage. No pressure." / "And the idea board: post what you want next, and vote." */
   async dashboard(K){
     await K.go("", 2200);
     /* the board and the classroom draw themselves when they first come near the screen: let them, off camera */
     await K.glide({ sel: "#class", top: 90 }, 300); await K.wait(3500);
+    await K.glide({ sel: "#ideas", top: 76 }, 300); await K.wait(3500);
     await K.glide(0, 200); await K.wait(600);
     await K.rec.start();
     await K.at(K.word(0, "Every hub") - 0.75); await K.cam(ALL, { pad: 0, dur: 0.7 });
@@ -51,6 +52,12 @@ export const SHOTS = {
     await K.at(K.word(0, "countdown") - 0.05); K.hideCursor(); await K.cam(".dx-exam", { pad: 34, dur: 0.9 });
     await K.at(K.line(1) - 0.6); await K.cam("#room", { y: 141, pad: 30, dur: 0.95 }); await K.glide({ sel: "#class", top: 84 }, 850);
     await K.at(K.line(2) - 0.6); await K.cam(".dx-arena", { y: 78, h: 430, pad: 16, dur: 0.95 }); await K.glide({ sel: "#board", top: 78 }, 850);
+    /* the idea board: the whole board, the pointer on "Post an idea", then in on the top idea for a vote */
+    await K.at(K.line(3) - 0.75); await K.cam(ALL, { pad: 0, dur: 0.9 }); await K.glide({ sel: "#ideas", top: 76 }, 900);
+    await K.at(K.word(3, "post") - 0.45); await K.point("#ideas [data-shi=new]", 420);
+    await K.at(K.word(3, "and vote") - 0.75); await K.cam([64, 268, 590, 262], { dur: 0.8, max: 2.1 });
+    await K.at(K.word(3, "vote") - 0.4); await K.tap("#ideas [data-shi=up] >> nth=0", 380);
+    await K.wait(500); K.hideCursor();
   },
 
   /* "Open a hub, and Home tells you what to study next." / "Then: Notes, Questions, and More." A tab on each word. */

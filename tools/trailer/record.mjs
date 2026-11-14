@@ -49,6 +49,7 @@ const TL = JSON.parse(fs.readFileSync(path.join(out, "timeline.json"), "utf8"));
 const PORT = 4179, BASE = `http://127.0.0.1:${PORT}/`;
 const ME = "Molar Bear";                        // the account on camera (the high-XP test account, renamed; nobody's board name)
 const NAMES_FILE = path.join(here, "names.local.json");
+const IDEA_NAMES = ["Enamel Camel", "Bicuspid Bandit", "Captain Cuspid", "Incisor Insider", "Wisdom Wizard", "Crown Jules", "Gum Drop", "Sir Flossalot"];   // who "posted" the made-up ideas
 
 /* ---------- the preview's runtime, changed for the camera ---------- */
 function swap(src, from, to, what){
@@ -65,6 +66,13 @@ function forCamera(src){
     fake.forEach((f, i) => { src = src.split(JSON.stringify(f)).join(JSON.stringify(String(names[i]))); });
   } else console.error("  (no names.local.json: the boards show the preview's made-up names)");
   src = src.split("Preview Cuspid Champion").join(ME);
+  /* the idea board: the preview's made-up ideas without their "Fixture idea:" labels, under made-up names (never a
+     classmate's: nobody posted these), and no answer from Sam on the top one (it would read as a promise) */
+  const ideas = /var IDEA_FIX = \[[\s\S]*?\n  \];/.exec(src);
+  if (!ideas) throw new Error("record.mjs: IDEA_FIX not found in the preview runtime");
+  src = src.replace(ideas[0], ideas[0].replace(/FAKE_NAMES\[(\d+)\]/g, (m, i) => JSON.stringify(IDEA_NAMES[+i % IDEA_NAMES.length]))
+    .replace(/"Fixture (?:idea|starter): (.)/g, (m, c) => '"' + c.toUpperCase()));
+  src = swap(src, '6005: ["planned", "Fixture note: after the redesign ships."]', '6005: ["considering", null]', "the idea board's answers");
   src = swap(src, "r.paragraphs.push(tail);",
     "var TA = window.__TRAILER_ASK, tp = TA && L && low.indexOf(TA.question.toLowerCase().replace(/\\?$/, '')) >= 0 ? paras.filter(function(x){ return x.text.indexOf(TA.find) === 0; })[0] : null;" +
     "if (tp) { r = { kind: 'answer', paragraphs: TA.paragraphs.map(function(t, i){ return { text: t, cites: i ? [] : [{ id: 'N1.' + tp.k, hub: hub, kind: 'notes', label: label(L) + ' notes', quote: tp.text.split(' ').slice(0, 10).join(' '), go: { v: 'notes', lec: L.id, k: tp.k } }] }; }), offer: null, go: { v: 'notes', hub: hub, lec: L.id, k: tp.k }, closest: null }; }" +

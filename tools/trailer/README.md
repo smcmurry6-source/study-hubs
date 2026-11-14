@@ -1,6 +1,6 @@
 # The launch trailer
 
-A 90 second video for the day the redesign goes live: it opens on the ON AIR lamp coming on in the dark Timmy Time
+A 94 second video for the day the redesign goes live: it opens on the ON AIR lamp coming on in the dark Timmy Time
 studio, drops to Timmy close up, and he narrates a tour of what is new.
 [The task](../../vault/tasks/2026-11-13-launch-trailer.md) has Sam's calls (a file to send the class, wide 16:9, new
 music, "professional and polished like it could have been released as a real trailer", a little longer so each
@@ -17,7 +17,8 @@ folder is the script and the tools that make the video again.
    wall soft behind him, then pulls back through the studio while he talks.
 2. **The title card**, "Rebuilt.", on the music's first hit.
 3. **Six chapters**. A chapter card wipes across (its number and name), then the recorded page plays on a screen the
-   camera pushes in on, with Timmy talking in a round booth cam and his line beside him.
+   camera pushes in on, with Timmy talking in a round booth cam and his line in a bar beside him, only as wide as
+   the words (Sam, on the second cut: "the subtitles gradient takes up too much of the screen").
 4. **The sign-off** back in the studio; the lamp goes off; **the end card** on the last chord.
 
 ## What is in it
@@ -59,6 +60,9 @@ run all five again: the timeline moves, so the picture is cut again to the voice
   made-up ones for the names in `names.local.json`, in the browser only: a JSON list of display names, read from the
   leaderboard with read-only SQL, kept on the machine that records and never committed. Leave out any that reads like
   a person's real name. Without the file, the made-up names stay.
+- **The idea board's notes are made up**: the preview's fixture ideas, without their "Fixture idea:" labels, under
+  made-up names (`IDEA_NAMES` in `record.mjs`), never classmates' names, because nobody posted them. The top one
+  carries no answer from Sam, which would read as a promise.
 - **Ask Timmy's answer is staged**: the preview has no model behind it, so `record.mjs` puts a two-sentence answer
   written from the hub's own notes (`ASK` in `shots.mjs`) where the preview's canned reply would be, with the real
   citation chip and the real jump to the paragraph. Keep it true to the notes if the question changes.

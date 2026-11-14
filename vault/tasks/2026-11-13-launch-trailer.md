@@ -5,7 +5,7 @@ hub: site
 created: 2026-11-13
 requested-by: Sam
 due:
-waiting-on: Sam (watch the first cut and say yes, or what to change)
+waiting-on: Sam (watch the third cut and say yes, or what to change)
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/360
 ---
@@ -66,9 +66,10 @@ narrates a tour of what is new.
 - [x] The feature shots are recorded from a preview on made-up data, phone and laptop as the shape needs (laptop: Sam
       chose wide)
 - [x] Timmy's narration is rendered in the show's voice, with captions that match it word for word
-- [ ] The video is cut (60 to 90 seconds), and Sam has watched it and said yes (the second cut, 90 seconds, went to
-      Sam on 2026-11-14 and waits for the yes)
-- [ ] It is where Sam asked for it (a link: the file handed to Sam). The second cut is handed over; the final file
+- [ ] The video is cut (60 to 90 seconds), and Sam has watched it and said yes (Sam on the second cut: "looks great
+      except the subtitles gradient takes up too much of the screen and you dont mention the ideas board"; the third
+      cut, 94 seconds with the idea board in it, went to Sam on 2026-11-14 and waits for the yes)
+- [ ] It is where Sam asked for it (a link: the file handed to Sam). The third cut is handed over; the final file
       follows Sam's yes
 - [x] `DEPLOY_NOTES.md`, and this note's Outcome
 
@@ -93,27 +94,36 @@ narrates a tour of what is new.
   **a frame at a time**: the page's clock is stopped and moved on exactly 1/30 s for each frame, and scrolls and the
   pointer are set once a frame, so every move lands evenly (`record.mjs`; only the Listen shot, which plays sound, is
   still recorded in real time). Every chapter was recorded again for the second cut.
+- 2026-11-14 (Claude Code), the third cut. Sam on the second: "looks great except the subtitles gradient takes up too
+  much of the screen and you dont mention the ideas board". The gradient across the bottom of the feature shots is
+  gone: the line now sits in a bar that comes out from behind a smaller booth cam and is only as wide as the words,
+  so the page shows everywhere else (`compose.mjs`). The dashboard chapter has a fourth line, "And the idea board:
+  post what you want next, and vote.", over the board, the pointer on Post an idea and a vote on the top note. The
+  ideas on screen are the preview's made-up ones, under made-up names (not classmates': nobody posted them), without
+  their "Fixture idea:" labels and with no answer from Sam on the top one (`record.mjs`). Only the dashboard was
+  recorded again. The line adds 4 seconds: 94 seconds in all, 4 over the range, which Sam can have trimmed.
 
 ## Outcome
 
-**The second cut is with Sam; the task stays open until Sam says yes** (or says what to change).
+**The third cut is with Sam; the task stays open until Sam says yes** (or says what to change).
 
-- **What it is** (90 seconds, 1920 x 1080, 23 MB): black; the ON AIR lamp flickers on in the dark studio; the camera drops to
+- **What it is** (94 seconds, 1920 x 1080): black; the ON AIR lamp flickers on in the dark studio; the camera drops to
   Timmy close up as the lights come up ("Hey. It's Timmy. And this is not Timmy Time."), the wall soft behind him, and
   pulls back while he talks; a "Rebuilt." title card on the music's first hit; then six chapters, each behind a
-  chapter card (The dashboard; Inside a hub; Notes, three ways; Learn + Flashcards; Ask Timmy; XP + Crowns, Timmy's
+  chapter card (The dashboard, with the idea board; Inside a hub; Notes, three ways; Learn + Flashcards; Ask Timmy; XP + Crowns, Timmy's
   place), the recorded page on a screen the camera pushes in on, Timmy talking in a round booth cam with his line
-  beside him; the sign-off back in the studio; the lamp goes off; an end card with the site's address on the last
+  in a bar beside him; the sign-off back in the studio; the lamp goes off; an end card with the site's address on the last
   chord. The cosmetic extras share one chapter, as Sam asked, and it shows the redesigned place window and customizer.
 - **How it is made:** everything is cut to one timeline that comes from the rendered voice, so the captions, his mouth,
   every tap and every camera move follow the words; change a line and run the five steps again
   ([README](../../tools/trailer/README.md)). The voice is the show's (Kokoro, the same blend, lexicon and voice chain,
-  read a touch brisker to fit 90 seconds); the music and the sound effects are new, from the show's own synthesized
+  read a touch brisker); the music and the sound effects are new, from the show's own synthesized
   instruments, with nothing to license.
 - **Not in the repo:** the video and its working files (`tools/trailer/out/`) and the list of leaderboard names
   (`tools/trailer/names.local.json`), both in `.gitignore`. The names on the boards in the video are the class's
   leaderboard names, with Sam's OK; three that read like a person's real name were left out.
-- **Staged, and said so:** Ask Timmy's answer on screen. The preview has no model behind it, so the recorder shows a
+- **Staged, and said so:** the idea board's notes are the preview's made-up ideas under made-up names; and Ask
+  Timmy's answer on screen. The preview has no model behind it, so the recorder shows a
   two-sentence answer written from Occlusion's own notes (the Bennett angle), with the real citation chip and the real
   jump to the paragraph.
 - **Even motion:** the pages are recorded a frame at a time (Sam: "the scrolling in the demo looked a little
