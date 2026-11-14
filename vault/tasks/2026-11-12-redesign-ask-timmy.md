@@ -350,6 +350,8 @@ change to HP's rules beyond the 100 start; the old pages.
 - [x] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
       answered by Claude, Anthropic's AI) in the release note's drafts
 - [x] CI and `node tools/release/run.js` pass; Sam's look on the screenshots (a preview only if Sam wants one)
+- [ ] Sam picks Timmy's model: Opus 5.5 (as built) or Sonnet 5.5, from the 2026-11-14 comparison (Log); a change is
+      `MODEL` in `core.js`, then the release
 - [ ] At the release, as above
 
 ## Log
@@ -462,6 +464,19 @@ change to HP's rules beyond the 100 start; the old pages.
   click-throughs leaving answers in Timmy's tally, fixed in the test before the merge. `postcheck.js` passed (7 of 7 changed files live and identical to `main`; the live dashboard and hubs open with no errors). **Every part of Ask
   Timmy is built**; what is left is the release's (the box above, and "From Ask Timmy" parts 2 and 4 in
   [the release note](2026-11-06-redesign-release.md)), so this note waits on the release.
+- 2026-11-14: Sam asked whether a cheaper model could run Timmy ("I feel like we should use haiku or sonnet then", after
+  hearing that a hub's content costs about $0.60 to cache again after an idle hour on Opus). The whole test set, run with
+  `--model` (new) on Sam's eval key, against the Nov 12 Opus run regraded with today's grader (3 failed, the letter bug since
+  fixed; 396 quotes, all checked): **Sonnet 5.5** $6.30, median wait 3.6 s, 5 failed, none harmful: 3 quotes not word for
+  word (no link for that sentence) and 2 hint requests declined as quiz questions (still declined); answered 98, not
+  covered 14, off topic 7, close to Opus's 95, 14, 7. **Haiku 5.5** $2.07, median 3.1 s, 10 failed: 2-3 real misses (a site
+  help question called "not covered" and answered anyway with the wrong closest lecture; another called off topic), 5 quotes
+  not word for word, a date reformatted inside quotation marks, a "50-90%" the case didn't want, and one grader false
+  positive ("It's a graded quiz question" read as naming choice A); answered only 83, with 19 not covered and 15 off topic.
+  Haiku counts a hub's content as about 140K tokens (Opus 70-84K), past its 100K line, so it pays its higher rate: about
+  $0.14 to cache a hub again, under a cent a question. Sonnet: about $0.32 and 1.5-3 cents. The agent recommends Sonnet
+  5.5; the model stays Opus 5.5 until Sam picks ([#363](https://github.com/smcmurry6-source/study-hubs/pull/363), which also
+  prices both models in `core.js` and leaves the fallback out for Haiku). Reports were kept in the session, not committed.
 ## Outcome
 
 Related: [the release](2026-11-06-redesign-release.md) · [phase 4](2026-11-05-redesign-phase-4-game-layer.md) ·

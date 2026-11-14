@@ -117,6 +117,8 @@ person to read. The full report (every question and answer) is written as markdo
   pasted in a chat or written in a file; a key made for the eval, deleted after, is safest. Make it inside a workspace,
   or also set `TIMMY_EVAL_WORKSPACE` to the workspace's id. A variable added to the environment reaches only sessions
   started after it, so a session that started before runs the eval in a fresh session on its branch.
+- `--model <id>`: the same cases on another model (`withModel()` in `core.js` leaves the fallback out for Haiku, which has
+  none). On 2026-11-14 Sonnet 5.5 cost $6.30 for the whole set and Haiku 5.5 $2.07 ([the task](../tasks/2026-11-12-redesign-ask-timmy.md)'s Log).
 - `--regrade <report.json>`: free; grades a saved run again with this checkout's grader and quote check, for a change to
   the grading or to `quoteIn`.
 - Rerun it after changing `RULES`, the schema, the effort level or the model. Not before the release unless one of those
