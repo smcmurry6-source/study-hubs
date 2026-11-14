@@ -634,7 +634,9 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
   html.shx .dx .shpet-house { grid-template-columns: minmax(0, 1fr); }
   .dx-classhead .seg { width: 100%; }
   .dx-classhead .seg button { flex: 1; justify-content: center; padding: 0 8px; }
-  .dx-archived { grid-template-columns: minmax(0, 1fr); }
+  /* one column: the two-column rule for "no recap" above is more specific, and two closed hubs side by side made the page
+     434 px wide on a 390 px phone (2026-11-13, when Heme & Endo Exam 2 joined PCD Implants) */
+  .dx-archived, .dx-past > .rc[hidden] + .dx-archived, .dx-past > .dx-archived:first-child { grid-template-columns: minmax(0, 1fr); }
   .dx-arch > div { justify-items: stretch; }
   .dx-arch .btn { white-space: normal; text-align: left; }
   .dx-day { grid-template-columns: minmax(0, 1fr); }

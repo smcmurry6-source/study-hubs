@@ -23,7 +23,7 @@ after its date. Do each one on its own (a small PR), with the steps in the rule.
 
 - [ ] **Special Patient Care** (`special-patient-care`, 57 MB): its card came down 2026-11-06, but the exam is open on
   Canvas until Fri Nov 13, 11:59 pm, so its audio comes off after that.
-- [ ] **Heme & Endo Exam 2** (`heme-endo-exam2`, 172 MB): archived Fri Nov 13 at 10 pm. If it's on the redesign by then,
+- [x] **Heme & Endo Exam 2** (`heme-endo-exam2`, 172 MB): archived Fri Nov 13 at 10 pm. Done 2026-11-13 by the lessons audit (232 MB with High yield; the site went to 533 MB). If it's on the redesign by then,
   the engine's box in [the redesign release](2026-11-06-redesign-release.md) comes first.
 - [ ] **Occlusion** (`occlusion`, 153 MB): archived after the final, Mon Nov 16 at 10 pm (same note on the redesign).
 - [ ] **Perio** (`perio`, 159 MB): archived after the final, Thu Nov 19 at 10 pm (same note on the redesign).
@@ -35,6 +35,10 @@ after its date. Do each one on its own (a small PR), with the steps in the rule.
 - 2026-11-12: the three redesigned hubs gained High yield narration (`<lecture>-hy.mp3`,
   [task](done/2026-11-12-high-yield-narration.md)): Heme & Endo Exam 2, Occlusion and Perio each carry more than the sizes
   above (`node tools/ci/size.js` lists them). Step 1's `git rm hubs/<hub>/audio/*.mp3` takes those too.
+
+- 2026-11-13: Heme & Endo Exam 2's audio came off with its retrospective (the lessons audit's PR): the narration, High yield and
+  Timmy Time mp3s and their words files, `data-audio="off"` on its widget tag, and its `next/` content rebuilt (no `hyAudio`). The
+  live page wasn't on the redesign, so the engine's box didn't apply. Special Patient Care waits for Canvas to close (Sat 11-14, 11:59 pm).
 
 ## Outcome
 

@@ -1,11 +1,17 @@
 ---
 type: hub
-tags: [hub]
+tags: [hub, archived]
 hub: heme-endo-exam2
-status: live
+status: archived
 ---
 
 # Heme & Endo Exam 2
+
+**Archived 2026-11-13 at 10 pm**, after its exam that morning. Its retrospective is in `LESSONS.md` ("Hub retrospectives", written
+by the 11-13 lessons audit from 8 check-ins: later ones go into the next audit), its recap is on the dashboard, and **its narration,
+High yield recordings and Timmy Time came off the site** the same night ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md):
+`data-audio="off"` on its widget tag; `next/content/notes.json`'s `hyAudio` is empty). The page stays up; its card leaves the
+dashboard 11-23. Still by hand: remove `hubs/heme-endo-exam2/` when nothing needs it, and optionally move its entry into `ARCHIVED_HUBS`.
 
 DENT 2160 Hematology & Endocrinology Exam 2: 50 questions, **5 on Exam 1 material, 8 on L11, 9 on L12 (both hours), 7 each on
 L13-L16** (Sam, 2026-11-10, from Dr. Herr: `EXAM_COUNTS`). **L16 is the last lecture on it**, so L17 and L18 aren't either
@@ -112,7 +118,7 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   level) is narrated too, since 2026-11-12 (Sam asked for it though the hub archives Nov 13): `audio/<lecture>-hy.mp3` for
   all eight lectures, made from `next/content/notes.json`. It changes whenever a lecture's notes, predicted topics, hints or
   questions do, so a question edit can mean recording that lecture's High yield again in the same PR: the smoke lint says
-  which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)). It comes off with the rest at archiving.
+  which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)). It came off with the rest at archiving (2026-11-13).
 - **Timmy Time** (2026-11-11): `hubs/heme-endo-exam2/audio/timmy-time.mp3`, 52 min, script `tools/podcast/heme-endo-exam2/script.md`
   (L11-L16 by system, male then female, plus a short Exam 1 refresher on L2, L3, L6 and L10 only, opening with the class's
   split of the five; the histology segments name the two picture questions, the Sertoli cell and the follicle stages;
