@@ -2376,7 +2376,7 @@ function pick(a){ return a[Math.floor(Math.random() * a.length)]; }
 var reduced = false;
 try { reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
 var ME = __sh_script, BASE = ME && ME.src ? ME.src.replace(/[^\/]*(\?.*)?$/, "") : "";
-var FULL_FROM = "9999-12-31";
+var FULL_FROM = "2026-11-14";
 function centralDay(d){
 var f = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" });
 var p = {}; f.formatToParts(d || new Date()).forEach(function(x){ p[x.type] = x.value; });

@@ -42,7 +42,7 @@
   var ME = document.currentScript, BASE = ME && ME.src ? ME.src.replace(/[^\/]*(\?.*)?$/, "") : "";
   /* The day the redesign went live, Central time: a Timmy born on or after it starts at 100 HP. A preview's copy points
      it at the preview's own start (tools/preview/transform.js), so its "new" test account shows it. */
-  var FULL_FROM = "9999-12-31";
+  var FULL_FROM = "2026-11-14";
 
   /* days roll over on Central time, the same as the server */
   function centralDay(d){
