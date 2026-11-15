@@ -375,9 +375,14 @@ window.SH_DASH_DATA = {
     "Review tables",
     "Mock exam",
     "Arcade",
-    "Listen"
+    "Listen",
+    "Timmy Time"
    ],
-   "stateKey": "perio-d2-compendium-state-v1"
+   "stateKey": "perio-d2-compendium-state-v1",
+   "podcast": {
+    "name": "Timmy Time",
+    "sub": "The last-minute review, 49 min"
+   }
   }
  ],
  "archived": [
