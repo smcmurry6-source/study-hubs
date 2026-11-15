@@ -55,8 +55,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   The title is "Perio final: ..." ("Periodontology" broke mid-word on Home's phone tile). Shared fix with it
   ([BUG-151](vault/release/bug-log.md)): the small line on a hub's Timmy Time tiles (Home and More, `widget/hub.css`) is full
   white, since 86-88% white on Perio's pink failed the 4.5:1 contrast check.
-  **After the merge:** `admin_set_podcast_episode(..., 'perio', 'final-review', 2948)` so listening earns XP, and deploy the
-  `timmy` function again for the new site help.
+  Merged as #367 (Sam: "Merge"). **Done at the merge:** `admin_set_podcast_episode(..., 'perio', 'final-review', 2948)`
+  (listening earns XP), the `timmy` function deployed again for the new site help (version 4), `log_changelog` for Perio,
+  and `node tools/release/postcheck.js` passed (6 of 6 files live, the dashboard, Occlusion and Perio with no errors).
 
 - **The redesign is live (#359 merged 2026-11-14, about 6:46 pm Central; Claude Code)** — Sam: "Merge". The dashboard,
   Occlusion and Perio are on the redesign at their old addresses (`d86f134`); Heme & Endo Exam 2 keeps its old page.
