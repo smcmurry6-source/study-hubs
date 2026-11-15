@@ -1014,7 +1014,7 @@ sitting; the admin secret is typed into the connector by hand and never into a f
 5. **The answer keys**: `node tools/xp/keys.js occlusion --sql` and `node tools/xp/keys.js perio --sql`, each run through
    the connector with the secret put in, and the count it returns checked (844 and 750 since `main`'s Perio update,
    plus the retired ids: the tool prints both numbers).
-6. **Occlusion's episode**: `select admin_set_podcast_episode('<secret>', 'occlusion', 'midterm-review', 2688);`
+6. **Occlusion's episode**: `select admin_set_podcast_episode('<secret>', 'occlusion', 'midterm-review', 2688);` Done (the row is in `podcast_episodes`). On 2026-11-15 the final's episode replaced it on the hub: `final-review` gets its own row after that PR's merge ([the hub note](../../hubs/occlusion.md)).
 7. **The starting ideas** ([the idea board](2026-11-06-idea-board.md), "The starting ideas", and the ones from the past
    check-ins), each checked against the About page first, with `admin_post_starter_idea`.
 8. **Ask Timmy's function**: deploy `timmy` (`index.ts`, `core.js`, `site.json`) with JWT verification off
