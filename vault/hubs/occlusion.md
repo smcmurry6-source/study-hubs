@@ -44,7 +44,7 @@ Dates and check-in hours: its entry in `hubs.js`.
   two kept are in different formats where possible, a Patient Box question is kept over a plain one, and nothing was
   retired that would leave a fact unasked or a lecture under its format minimums. The 10% fact is now in
   `mo-tf-3` (and a true statement of `in-wf-cr`; `in-2s-4` came out on 2026-11-15, its wax fact asked by `in-cr-wax`). **Before adding a final question, check its fact isn't already asked twice.** Don't add questions for it.
-- **The final's bank audit** (2026-11-15, Sam: "audit occlusions question bank ... higher yield ... accurate, with good
+- **The final's bank audit** (2026-11-15, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370), Sam: "audit occlusions question bank ... higher yield ... accurate, with good
   answer options and sufficient explanations", then "make sure the exam hints are utilized as best as possible"): every L6-L10
   question was checked against the notes and the Exam Hints. 156 were fixed (4 keys or case facts that the notes contradict:
   `cs-in-crown-lab`'s case, `nc-sel-acid`, `mo-histo`, `ot-sel-clin`), every emphasized hint was mapped to the questions that

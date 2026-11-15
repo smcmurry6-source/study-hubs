@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **Occlusion: the final's question bank audited, and a mock that leans on High likelihood (2026-11-15, Claude Code)** — Sam:
+- **Occlusion: the final's question bank audited, and a mock that leans on High likelihood (2026-11-15, Claude Code, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370))** — Sam:
   "audit occlusions question bank to see if we can make it higher yield ... accurate, with good answer options and sufficient
   explanations", then "make sure the exam hints are utilized as best as possible". Every L6-L10 question checked against the
   notes and the Exam Hints. **156 questions fixed** in place (ids kept): 4 that the notes contradict ([BUG-152](vault/release/bug-log.md):
