@@ -63,7 +63,7 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   a vampire cape with fangs ("just very long canines with big ambitions"), a pumpkin cap with a candy pail, and a black cat.
   **He couldn't pick one, so he wore the next one each time a page loaded.** He never revealed a single
   costume as "the one", because students saw different ones. This is canon for the episodes already out.
-- **From the redesign on, the student dresses him** ([Ask Timmy](../../vault/tasks/2026-11-12-redesign-ask-timmy.md),
+- **From the redesign on, the student dresses him** ([Ask Timmy](../../vault/tasks/done/2026-11-12-redesign-ask-timmy.md),
   part 4; Sam, 2026-11-12: "What you put wins"). Everyone has Timmy (nobody adopts him any more; he says hello on a first
   visit), and he wears only what the student put on at his place, from the shop or his rank: on the hub's bar, on the
   dashboard, at his place, in the classroom and on the leaderboard's stage. With nothing on he wears nothing, on a holiday
@@ -71,7 +71,7 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   (each student dresses theirs), and never that he picked it: "whatever you put me in" is the line. His holiday looks are
   the shop's seasonal sets now (a floss mummy and a bedsheet ghost at Halloween, a holiday sweater and an elf suit in the
   winter), and the old "he can't pick one" can be a joke about the past ("I used to dress myself. You saw how that went.").
-- **Rare costumes** (the redesign's shop, [released 2026-11](../../vault/tasks/2026-11-06-redesign-release.md)):
+- **Rare costumes** (the redesign's shop, [released 2026-11](../../vault/tasks/done/2026-11-06-redesign-release.md)):
   five costumes that turn up at Timmy's shop now and then, about one ordinary day in twelve, never on a holiday or in the
   fall weeks, a different day for each student. When one turns up he says so once ("Something rare came in at the shop
   today: the pirate costume"), and it waits on the shop's Spotted shelf until it's bought. Each student spots them in

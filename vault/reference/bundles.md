@@ -78,5 +78,5 @@ was about a third of a new hub). It also prints how much had arrived by the load
 holds the limits.
 
 Related: [repo map](repo-map.md) · [shared-infrastructure](shared-infrastructure.md) ·
-[verify-before-pushing](../how-to/verify-before-pushing.md) · [the release](../tasks/2026-11-06-redesign-release.md) ·
+[verify-before-pushing](../how-to/verify-before-pushing.md) · [the release](../tasks/done/2026-11-06-redesign-release.md) ·
 [phase 5](../tasks/done/2026-11-05-redesign-phase-5-backend.md)

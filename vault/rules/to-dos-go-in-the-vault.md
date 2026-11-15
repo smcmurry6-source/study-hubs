@@ -19,7 +19,7 @@ off the High yield narration: "add that as a to do for later".)
     own: what, why, what Sam already decided (quoted), how, and a **Done when** checklist;
   - a line in [the inbox](../tasks/inbox.md) (`- [ ] ...`) for a quick one;
   - a box in the Done when of the task it belongs to, when it's a step of one already written (the redesign's release
-    steps go in [its note](../tasks/2026-11-06-redesign-release.md));
+    steps go in [its note](../tasks/done/2026-11-06-redesign-release.md));
   - a row in [the bug log](../release/bug-log.md) for a bug found in testing or after a release and left open.
   Write it in the same PR as the work it came from; when there is no other PR, a small vault-only one.
 - **Check it off as it's done**, in the PR that does it: tick its box (`- [x]`). When every box of a task is ticked, write

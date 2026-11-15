@@ -256,7 +256,7 @@ landing page with the quick links on the first phone screen; the drill, weak spo
 
 **Changed 2026-11-06 (Sam):** nothing goes live phase by phase. The redesign is built side by side on `main`, in files no
 student sees, and released all at once by one PR when Sam likes the whole thing; the rule edits land with that PR
-([decisions](../../decisions.md), [the release note](../2026-11-06-redesign-release.md)).
+([decisions](../../decisions.md), [the release note](2026-11-06-redesign-release.md)).
 
 ### 4.10 Additions agreed 2026-11-06
 
@@ -270,12 +270,12 @@ and bowling is an Easter egg, not part of the session recap. Later the same day 
 | Where | What it adds | Note |
 |---|---|---|
 | Phase 1 ([#275](https://github.com/smcmurry6-source/study-hubs/pull/275), merged 2026-11-06) | Nothing new: its answer event already carries the picked choice and the context, which the new XP rules need | |
-| Phase 3, the dashboard | The idea board (posts show at once, names and both vote counts shown, agent-written starting ideas); Timmy's place on the "you" card | [idea board](../2026-11-06-idea-board.md) |
+| Phase 3, the dashboard | The idea board (posts show at once, names and both vote counts shown, agent-written starting ideas); Timmy's place on the "you" card | [idea board](2026-11-06-idea-board.md) |
 | Phase 4, part A | Three journeys (Handpiece, ModuPro, Loupes, 125,000 XP each), the hand-off scene, the Dark Matter unlock, the double-XP boost on the rank pill | [journeys](../2026-11-06-redesign-progression-journeys.md) |
 | Phase 4, part B | Shiny Gold Crowns, the rotating shop (daily, weekly, seasonal), rarity tiers, outfits, snacks and floss, XP boosts, rare costumes | [shop](../2026-11-06-redesign-timmy-shop.md) |
 | Phase 4, part C | Timmy's place: the house card redrawn as an isometric scene with homes (castle, giant mushroom, treehouse), scenes and yard items | [Timmy's place](../2026-11-06-redesign-timmys-place.md) |
 | Phase 4, part D | The bowling egg: eight bowling-alley clips with the Plaque crew as pins | [bowling egg](2026-11-06-redesign-bowling-egg.md) |
-| The engine, every hub on it | **Study as: Questions · Learn · Flashcards**, a toggle at the top of the Question Bank (Sam, 2026-11-06): Learn asks the panel's questions in rounds until each is mastered (like Quizlet's Learn); Flashcards flip and rate them, scheduled to come back, never past exam eve (like Anki). The panel still picks which questions; the mock stays questions only. Its server part joins phase 5, part 3 | [Learn and Flashcards](../2026-11-06-redesign-learn-and-flashcards.md) |
+| The engine, every hub on it | **Study as: Questions · Learn · Flashcards**, a toggle at the top of the Question Bank (Sam, 2026-11-06): Learn asks the panel's questions in rounds until each is mastered (like Quizlet's Learn); Flashcards flip and rate them, scheduled to come back, never past exam eve (like Anki). The panel still picks which questions; the mock stays questions only. Its server part joins phase 5, part 3 | [Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md) |
 | Phase 5, part 3 | The server for all of it: no XP cap, server-checked answers, the guardrails, every new XP source and boost, the 63-step ladder, Shiny Gold Crowns and the shop, the idea board's tables. Built and tested now on a throwaway copy, applied at the release | the notes above |
 | Its own track | Patient Box v2: the tooth library (shared with the figure builds), modules, new views and checks; ships to the live hubs step by step | [patient box v2](../2026-11-06-patient-box-v2-modular-cases.md) |
 | Dropped | "Ask the Hub", an AI study assistant | [ask the hub](2026-11-06-ask-the-hub-assistant.md) |

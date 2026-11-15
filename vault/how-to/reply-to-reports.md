@@ -15,7 +15,7 @@ about, post a notice everyone sees once (and keeps in their Inbox): Inbox → "T
 written for the whole class, not the sender), or `insert into site_notices (hub, title, message)`
 (`hub` only labels it, e.g. which hub was fixed; it shows everywhere, pops up for 14 days and stays in the Inbox 60). Ask Sam before sending one to everyone.
 
-**The idea board** (from the redesign's release; [task](../tasks/2026-11-06-idea-board.md)): ideas show to the class as soon
+**The idea board** (from the redesign's release; [task](../tasks/done/2026-11-06-idea-board.md)): ideas show to the class as soon
 as they're posted, so there is nothing to approve. The admin page's Inbox has an "Idea board" card under the podcast
 comments: **Hide** or **Restore** any idea (three reports hide one by themselves), and give one a **status** (Under
 consideration, Planned, Shipped, Not doing) with one line on why. Saving a new status puts that line in the Inbox of the

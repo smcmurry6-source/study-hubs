@@ -148,7 +148,7 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
 - [x] The run, the three triggers and the lane work as above on the redesign's pages; the live hubs are unchanged
 - [x] Sightings and the trophy are kept on the device; the Bowling trophy's drawing and silhouette are in `medals.mjs`
 - [x] The tests above added and passing; `node tools/release/run.js` once; budgets unchanged
-- [x] `tools/podcast/LORE.md`; the About draft in [the release note](../2026-11-06-redesign-release.md) ("From phase 4,
+- [x] `tools/podcast/LORE.md`; the About draft in [the release note](2026-11-06-redesign-release.md) ("From phase 4,
       part D", in a spoiler, with the trophy count); the event taxonomy row; the hand-off in phase 4's Log
 
 ## Done when
@@ -216,7 +216,7 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
   testing (BUG-110, BUG-111).
 
 Left, each written where it belongs: the About page entry and the service worker's precache at the release
-([the release note](../2026-11-06-redesign-release.md), "From phase 4, part D"); the trophy's row and pop-up card
+([the release note](2026-11-06-redesign-release.md), "From phase 4, part D"); the trophy's row and pop-up card
 ([the trophy case](2026-11-12-redesign-trophy-case-and-cards.md)); the trophy on the server after the release.
 
 Related: [Timmy's place](../2026-11-06-redesign-timmys-place.md) · [Timmy's shop](../2026-11-06-redesign-timmy-shop.md) ·

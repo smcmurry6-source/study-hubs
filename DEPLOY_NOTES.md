@@ -32,6 +32,25 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **The redesign is live (#359 merged 2026-11-14, about 6:46 pm Central; Claude Code)** — Sam: "Merge". The dashboard,
+  Occlusion and Perio are on the redesign at their old addresses (`d86f134`); Heme & Endo Exam 2 keeps its old page.
+  Done at the merge, in the release note's order ([the release](vault/tasks/done/2026-11-06-redesign-release.md); its Log's
+  last entry has the detail): `FULL_FROM` in `widget/pet.js` is `"2026-11-14"`; **`migration_v54.sql` to
+  `migration_v58.sql` are applied** to the live project (each file sent whole, as one transaction, through Supabase's
+  management API with the access token in the session's environment, because the connector can't take a file: so they
+  aren't in Supabase's own migration list, and `supabase/schema.sql` is the record); the switch time
+  (`game_config.v2_at`) is 2026-11-15 00:39 UTC; **the answer keys** are loaded (Occlusion 844, Perio 750);
+  Occlusion's episode is registered (2688 s); **eight starting ideas** are on the board; **the `timmy` function is
+  deployed** (JWT verification off); the live permissions audit is clean; `node tools/release/postcheck.js` passed;
+  the site changelog has the release.
+  **BUG-150, found after the merge and fixed in about four minutes:** Ask Timmy answered "I nodded off" to every
+  question, because the key Sam saved in the function's secrets is named `TIMMY_EVAL_KEY`, not `ANTHROPIC_API_KEY`.
+  `supabase/functions/timmy/index.ts` now reads that name when the first isn't set.
+  **Two new commands for the two steps that are by hand after a merge:** `node tools/xp/keys.js <hub> --load` (a hub's
+  answer keys, after every merged change to its questions) and `node tools/timmy/deploy.mjs` (Ask Timmy's function,
+  after every merged change to `supabase/functions/timmy/`, which the About page's site help is part of).
+  **To roll back:** revert #359 with a new PR and leave the database as it is
+  ([roll-back-a-release](vault/how-to/roll-back-a-release.md)); Ask Timmy has his own switch on the admin page.
 - **The release PR takes in `main` (#359, 2026-11-14, Claude Code; live from the merge)** — Sam: "I believe I updated
   the occlusion hub and the perio hub". #361 (the lessons refresh), #362 (Perio's Nov 12 class, the review for the
   final and Figs 6-8) and #363 (Ask Timmy on Sonnet 5.5) were written for the old pages and `next/`; they are now in
@@ -99,7 +118,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   - **Heme & Endo Exam 2:** archived (`archiveOn` noon Nov 13 in `hubs.js`) and its audio off the site (173 MB).
 - **THE REDESIGN'S RELEASE (the switch PR, #359, opened 2026-11-13, Claude Code; live from the merge)** — **Read this before
   touching the dashboard, Occlusion or Perio: the files moved.** One PR switches the site to the redesign
-  ([the release](vault/tasks/2026-11-06-redesign-release.md)); reverting it brings the old site back
+  ([the release](vault/tasks/done/2026-11-06-redesign-release.md)); reverting it brings the old site back
   ([roll-back-a-release](vault/how-to/roll-back-a-release.md); the database stays as it is, the old pages run on it).
   - **The pages:** `index.html` is the new dashboard (its hub list is **`hubs.js`**, edited by hand: add, date or archive
     a hub there, not in `index.html`); `hubs/occlusion/` and `hubs/perio/` are on the engine, their old single-file pages
@@ -135,7 +154,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   release). Sam: "Lets do sonnet": the `timmy` function's model is Sonnet 5.5, not Opus 5.5, after the eval ran the whole
   test set on Sonnet 5.5 and Haiku 5.5 (`--model`, new): Sonnet matched Opus at half the cost and twice the speed; Haiku
   deflected more. `core.js` also prices both models for the day's cap. [#363](https://github.com/smcmurry6-source/study-hubs/pull/363),
-  [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md).
+  [Ask Timmy](vault/tasks/done/2026-11-12-redesign-ask-timmy.md).
 - **2026-11-14 (Perio: the Nov 12 live class and the review for the final, Claude Code)** — Sam: "Update the perio hub with the
   added google drive contents", with Dr. Abou-Arraj's furcation email. **S9** now has the live class: its notes' slides-only tail
   became 15 paragraphs from the class at both levels (gingival excess and drug enlargement, the gummy smile, altered passive
@@ -197,7 +216,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   a third of a new hub: BUG-128), and the redesign's budgets are set on it: the new dashboard 22 requests and 416 KB
   to 9 and 332 KB, a new hub 28-29 requests to 11 and about 100 KB lighter. How it works:
   [vault/reference/bundles.md](vault/reference/bundles.md); for the release:
-  [the release note](vault/tasks/2026-11-06-redesign-release.md), "From phase 5, part 2"
+  [the release note](vault/tasks/done/2026-11-06-redesign-release.md), "From phase 5, part 2"
   ([phase 5](vault/tasks/done/2026-11-05-redesign-phase-5-backend.md), PR #358).
 - **2026-11-13 (the game layer's wiring, phase 4 session 8, Claude Code)** — Nothing students see changes: every new call
   runs only on a page on the game layer (`shGame.v2()`), which no live page is, and the smoke test plays two arcade games
@@ -306,7 +325,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   test account's start (`tools/preview/transform.js`, the runtime's `SH_PREVIEW_TIMMY_FROM`), and "returning" wears the
   sun hat. `tools/ci/smoke.js`: "everyone has Timmy" on a new hub and the new dashboard, and the live hub and dashboard
   as before; the Ask checks turn Timmy off first. `tools/podcast/LORE.md`: from the redesign on, the student dresses him.
-  [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md), [ask-timmy](vault/reference/ask-timmy.md).
+  [Ask Timmy](vault/tasks/done/2026-11-12-redesign-ask-timmy.md), [ask-timmy](vault/reference/ask-timmy.md).
 - **2026-11-12 (Timmy's shop, the client, phase 4 part B, Claude Code)** — Nothing students see changes: the shop
   runs only on the redesign's pages, on the game layer (`migration_v54.sql`, not applied, unchanged). New
   `widget/shop.js` + `widget/shop.css` (`window.shShop`, fetched on first use): the storefront with the balance, Today's
@@ -321,7 +340,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   the preview's purchases against `sh_buy`, the costume of the day over three years), `a11y.js` (the shop, its sheet,
   dark mode; no issues). BUG-098 to BUG-104 found and fixed in testing.
 - **2026-11-12 (Learn and Flashcards, Claude Code)** — Nothing students see changes yet: the redesign's Question Bank gets
-  **Study as: Questions · Learn · Flashcards** ([the task](vault/tasks/2026-11-06-redesign-learn-and-flashcards.md)), in
+  **Study as: Questions · Learn · Flashcards** ([the task](vault/tasks/done/2026-11-06-redesign-learn-and-flashcards.md)), in
   the three new hubs only. Learn asks the panel's questions in rounds of 7 until each is right twice (the second time
   without the choices when the question allows it), with a bar that fills, a round track, praise and a streak, and a
   round recap (Sam asked for it to feel like Quizlet's). Flashcards turn over and are rated Again, Hard, Good or Easy on
@@ -333,7 +352,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `widget/v3.js` gain two hooks nothing on a live hub calls (`shQH.rate`, `window.shNoteJump`).
 
 - **2026-11-12 (Ask Timmy's admin tab, part 3, Claude Code)** — Nothing students see changes: the admin page
-  (`review/index.html`) gets an **Ask Timmy** tab for [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md): figures for
+  (`review/index.html`) gets an **Ask Timmy** tab for [Ask Timmy](vault/tasks/done/2026-11-12-redesign-ask-timmy.md): figures for
   the range, by hub and by day (questions, estimated cost, not covered, declined, errors, thumbs, quotes, reports), his
   switch and daily limits (Save asks first, then `admin_timmy_config`), the answers students reported, the questions the
   notes don't cover, the quotes that didn't check out and every chat, each opening in place; the Inbox links a Timmy report
@@ -360,7 +379,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   here; the client session builds the page to it. Left open: BUG-095. Hand-off for
   the shop's client session: `vault/tasks/2026-11-06-redesign-timmy-shop.md`, "What session 1 built".
 - **2026-11-12 (Ask Timmy's chat, part 2, Claude Code)** — Nothing students see changes yet: the chat half of
-  [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md), in the redesign's pages only. `widget/ask.js` + `ask.css`
+  [Ask Timmy](vault/tasks/done/2026-11-12-redesign-ask-timmy.md), in the redesign's pages only. `widget/ask.js` + `ask.css`
   (a bottom sheet on a phone, a side panel on a laptop) open from Timmy's "Ask me" (his bubble, the dashboard house), from
   an Ask icon in his spot when he isn't shown (a hub's bottom-left corner, the dashboard's "you" card; a plain "Ask the
   hub" voice), and from "Ask Timmy" on an answered question card (`widget/hub-bank.js`). Answers draw as text with "From
@@ -369,7 +388,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   off on an archived hub. `widget/pet.js` adds "Ask me" only where `window.shAsk` exists, so the live hubs' Timmy is
   unchanged. The preview answers the function with canned replies; `tools/ci/smoke.js` checks the chat on every new hub
   (phone and laptop) and the new dashboard. How it works: [ask-timmy](vault/reference/ask-timmy.md); release steps and
-  the About page's entries: [the release](vault/tasks/2026-11-06-redesign-release.md). Parts 3 (the admin tab) and 4
+  the About page's entries: [the release](vault/tasks/done/2026-11-06-redesign-release.md). Parts 3 (the admin tab) and 4
   (everyone has Timmy) are next.
 - **2026-11-12 (the rest of the redesign's phase 4, planned: vault only, Claude Code)** — No code and nothing students
   see. Sam answered one list of calls, and what is left of phase 4 is now ten sessions in order, each with a build
@@ -415,7 +434,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   wire, so its budget went from 1395 to 1480 KB (BUG-087; Sam's "merge when ready"). The site is 760 MB, past `size.js`'s 750 MB warning; no
   archived hub still has audio. Task: [done](vault/tasks/done/2026-11-10-occlusion-l9-follow-ups.md).
 - **2026-11-12 (Ask Timmy's server, part 1, Claude Code)** — Nothing students see changes yet: this is the server half of
-  [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md), which goes live with the redesign. The Supabase Edge Function
+  [Ask Timmy](vault/tasks/done/2026-11-12-redesign-ask-timmy.md), which goes live with the redesign. The Supabase Edge Function
   `timmy` (`supabase/functions/timmy/`: the logic in `core.js`, the Deno wrapper in `index.ts`, the site help in
   `site.json`, built from the About page by `tools/timmy/build.mjs` with the spoilers left out) answers from a hub's own
   notes, review tables, cram sheet, Exam Hints and High likelihood topics with Claude Opus 5.5, every point linked to the
@@ -446,7 +465,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `?xp=<n>`. **Before changing how an answer is recorded, or the rank art, read
   [the journeys note](vault/tasks/2026-11-06-redesign-progression-journeys.md) and
   [game-server](vault/reference/game-server.md).** Left for the release, written in
-  [its note](vault/tasks/2026-11-06-redesign-release.md): the arcade's and Timmy Time's XP, the journey trophies in
+  [its note](vault/tasks/done/2026-11-06-redesign-release.md): the arcade's and Timmy Time's XP, the journey trophies in
   the trophy case, the About entries (drafted there).
 
 - **2026-11-12 (High yield narration for the redesign, Claude Code)** — Nothing students see changes until the redesign's
@@ -508,7 +527,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   #318 merged and approved from a contact sheet: **a cork board in a wood frame, every idea a pinned paper note** (the
   paper's color and a picture for its kind, a pushpin in the hub's tint, Sam's answer as a stamp, a rosette on the top
   idea, Timmy looking over the frame, the form as a page of a pad). The drawings are a kit, `tools/figures/site/board.mjs`,
-  built into `widget/hub-art/board.js`, which `ideas.js` loads itself. Hand-off: [the idea board's note](vault/tasks/2026-11-06-idea-board.md). ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324))
+  built into `widget/hub-art/board.js`, which `ideas.js` loads itself. Hand-off: [the idea board's note](vault/tasks/done/2026-11-06-idea-board.md). ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324))
 
 - **2026-11-12 (a standing rule: run the long tests once, Claude Code)** — Notes only. Sam asked why the dashboard's
   merge took two hours; part of it was the agent running the every-hub smoke test again on its own machine each time
@@ -544,7 +563,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   High likelihood questions (`notes:practice-likely`), and reading to the end doesn't mark the notes done. The smoke test
   opens High yield on each redesigned hub. **Narration held**: about 135 MB of Kokoro would take the site (960 MB) past
   GitHub Pages' 1 GB cap; Sam chose to hold it ([task](vault/tasks/done/2026-11-12-high-yield-narration.md)). The About page text
-  and the rule edits wait in the [redesign release](vault/tasks/2026-11-06-redesign-release.md) note;
+  and the rule edits wait in the [redesign release](vault/tasks/done/2026-11-06-redesign-release.md) note;
   [high-likelihood-topics](vault/rules/high-likelihood-topics.md) now says the topics build it.
 - **2026-11-12 (Follow along: the redesign highlights the word being read, Claude Code)** — The survey's "highlight the words
   being read when listening to the lecture notes voiceover", approved by Sam for the redesign. While Listen plays a lecture's
@@ -561,7 +580,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   is regenerated: its middle (minutes 5-9 Plain English, 6-15 As taught) no longer said what the notes say, found by the
   timings' fit check and confirmed by comparing a fresh rendering minute by minute (`narration_words.py --render`). `widget/v3.js`: `shTTS.audio()` and the `sh:tts-audio` /
   `sh:tts-stop` events for it, and the Listen dock's title no longer repeats a hidden lecture badge ("L11L11 · ...", every
-  hub). The About page text waits in the [redesign release](vault/tasks/2026-11-06-redesign-release.md) note, like the
+  hub). The About page text waits in the [redesign release](vault/tasks/done/2026-11-06-redesign-release.md) note, like the
   redesign's other features. [Task](vault/tasks/done/2026-11-12-redesign-follow-along.md).
 - **2026-11-11 (Lessons refresh, Claude Code)** — Data read 5:30 pm Central, two days before Heme & Endo Exam 2. The 11-10
   evening's six explanation fixes worked (first tries 29% before, 81% since, against the bank's 70% -> 74%), and the Cushing labs
@@ -670,7 +689,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   a fallback to today's, and the preview stubs them. The smoke test, `a11y.js`, `perf.js`, `matrix.js` and the syntax check
   cover the page; the new hubs' Back button goes to it. The idea board is a second session's (its slot is `#ideas`); Timmy's
   place and visiting (`data-visit` on the board's rows) are phase 4's. Drafts for the About page and the switch are in the
-  [release note](vault/tasks/2026-11-06-redesign-release.md); bugs BUG-063 to BUG-067 found and fixed while building.
+  [release note](vault/tasks/done/2026-11-06-redesign-release.md); bugs BUG-063 to BUG-067 found and fixed while building.
 - **2026-11-11 (Occlusion: the final's repeat questions retired, Claude Code)** — Sam: "merge it and check the rest of the
   final questions", with the bar from `mo-10` (a concept may be asked two ways, never more than twice; no new questions).
   Every L6-L9 question's facts were listed, counting each statement of a two-statement or numbered item and facts shared
@@ -1003,7 +1022,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   in these notes", More as colored tiles, and a live "studying now" count in the bar and on Home (`v3.js` sends
   `sh:online` with its presence count; nothing else changes on the live hubs). Sam's third look: Today's goal is a ring of
   20 teeth, Timmy Time is an animated card among Home's quick starts (on the first screen), and Home's spacing is fixed
-  (BUG-047: the reset now uses `:where()`). Rule, About page and build-a-hub changes are drafted in `vault/tasks/2026-11-06-redesign-release.md`. Timmy's secret-tip line now readable in light mode (BUG-048). Approved by Sam ("Looks good. Merge when ready") and merged;
+  (BUG-047: the reset now uses `:where()`). Rule, About page and build-a-hub changes are drafted in `vault/tasks/done/2026-11-06-redesign-release.md`. Timmy's secret-tip line now readable in light mode (BUG-048). Approved by Sam ("Looks good. Merge when ready") and merged;
   the bugs found and fixed are BUG-040 to 048 in `vault/release/bug-log.md` (#281 took 037 to 039 while this was open).
 
 - **2026-11-06 (Pages didn't publish #285 and #281, Claude Code)** — Both publishes ("pages build and deployment")

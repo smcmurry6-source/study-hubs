@@ -14,7 +14,7 @@ pr: https://github.com/smcmurry6-source/study-hubs/pull/275
 
 ## Goal
 
-Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-identical hubs, split a hub's content into JSON loaded on demand, and build the agreed layout (Home · Notes · Questions · More, Timmy on the bar, drill/misses/weak/mock as bank presets, the question card with its rewards, the daily goal ring, the session recap card, three Check-yourself questions per lecture, side-by-side charts next to their lecture). Built side by side with the live Occlusion and released with the rest of the redesign ([the release](../2026-11-06-redesign-release.md)); nothing goes live in this phase.
+Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-identical hubs, split a hub's content into JSON loaded on demand, and build the agreed layout (Home · Notes · Questions · More, Timmy on the bar, drill/misses/weak/mock as bank presets, the question card with its rewards, the daily goal ring, the session recap card, three Check-yourself questions per lecture, side-by-side charts next to their lecture). Built side by side with the live Occlusion and released with the rest of the redesign ([the release](2026-11-06-redesign-release.md)); nothing goes live in this phase.
 
 ## Context
 
@@ -39,7 +39,7 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
   [learner-data-privacy](../../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
 - Hub note: [occlusion](../../hubs/occlusion.md). The engine audit (what is identical, what CI depends on): the audit note, section 3.
 - Rules edited at the release, not in this PR (until then they describe the live hubs; write the changes into the
-  [release note](../2026-11-06-redesign-release.md)): [hub-home-page](../../rules/hub-home-page.md) (Home stays, as a landing page with the quick links on the first phone screen; drill, weak spots and mock as bank presets), [arcade-skins](../../rules/arcade-skins.md) (one game up front, the rest behind more games), [question-bank-filter-panel](../../rules/question-bank-filter-panel.md) (the presets as chips).
+  [release note](2026-11-06-redesign-release.md)): [hub-home-page](../../rules/hub-home-page.md) (Home stays, as a landing page with the quick links on the first phone screen; drill, weak spots and mock as bank presets), [arcade-skins](../../rules/arcade-skins.md) (one game up front, the rest behind more games), [question-bank-filter-panel](../../rules/question-bank-filter-panel.md) (the presets as chips).
 - Keep: `window.SH_EXPORT = {` last, the question-id registry, the lint's question shape and format minimums, the smoke test's selectors (update `tools/ci/smoke.js` with the engine), the `od:kit`/`anima:js` marker blocks (or their new per-figure files), narrate.py's READINGS format (or its new JSON reader), the preview transform's literal strings.
 - Settings cut: font choice, background music, accent metal (text size and theme stay). Tour prompt cut; one-line first-use tips.
 - **From phase 0** ([task](2026-11-05-redesign-phase-0-design-system.md)): the typeface is **Nunito Sans**
@@ -57,7 +57,7 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 - [x] First load of Occlusion well under the perf budget (target: under 400 KB over the wire before the bank's data)
 - [x] Every mode, every question format, the mock, the arcade, narration, the podcast card, pins, reports, the drill, the eggs and Timmy work on the preview (UAT checklist), phone and laptop, light and dark
 - [x] The inspector passes with 0 FAIL on Home, Notes, Questions and More
-- [x] The rule, About page and [build-a-hub](../../how-to/build-a-hub.md) changes written into the [release note](../2026-11-06-redesign-release.md); the hub note says how the new version is built and kept in step with the live one
+- [x] The rule, About page and [build-a-hub](../../how-to/build-a-hub.md) changes written into the [release note](2026-11-06-redesign-release.md); the hub note says how the new version is built and kept in step with the live one
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`): locally, and "Check hubs" and "Release tests" green on PR #275 after the BUG-043 fix
 - [x] Preview link, phone and laptop screenshots, and Sam's look (Sam, in chat, 2026-11-06: "Looks good. Merge when ready")
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
@@ -101,7 +101,7 @@ Extract one shared hub engine (`widget/hub.js` + `hub.css`) from the four byte-i
 - 2026-11-06: BUG-048 (Timmy's secret-tip line too faint in light mode, caught by Release tests). Sam: "Looks good. Merge
   when ready" ([decisions](../../decisions.md)). Rebased over #285 and #281; #281 had taken BUG-037 to 039 meanwhile, so this
   task's bugs are BUG-040 to 048. Merged into `main`; the live hubs are unchanged until the release
-  ([redesign-release](../2026-11-06-redesign-release.md)).
+  ([redesign-release](2026-11-06-redesign-release.md)).
 
 ## Outcome
 
@@ -122,7 +122,7 @@ Built side by side, nothing students see changes ([PR #275](https://github.com/s
   and checks its bar at 320 px and at the largest text; `check.yml` runs both builds' `--check`; `perf.js` measures the page;
   `a11y.js` audits the four views (0 axe issues, light and dark; baseline added). Bugs found and fixed: BUG-040 to BUG-048
   in the [bug log](../../release/bug-log.md).
-- The rule, About page and build-a-hub changes are drafted in the [release note](../2026-11-06-redesign-release.md).
+- The rule, About page and build-a-hub changes are drafted in the [release note](2026-11-06-redesign-release.md).
 - **Sam's three looks** (all built; each item in [decisions](../../decisions.md)): Timmy bottom-left with a Settings button,
   plain answer rows, the grouped lecture list; Focus mode, every arcade game with its own drawing, the one-row answered
   card, notes prev/next and report, the More tiles, more color, the live "studying now" count; Today's ring of 20 teeth

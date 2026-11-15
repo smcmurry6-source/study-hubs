@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: done
 hub: dashboard
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: "the redesign's release (migration_v54 applied, the starting ideas posted, the About entries)"
+waiting-on: 
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/324
 ---
@@ -20,18 +20,18 @@ most. Posts show at once under the poster's name, with both vote counts. Ships w
 
 ## Context
 
-- The redesign plan: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) (section 4.10),
-  [phase 3](2026-11-05-redesign-phase-3-dashboard.md) (the dashboard; this is part of it), [the release](2026-11-06-redesign-release.md).
+- The redesign plan: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) (section 4.10),
+  [phase 3](../2026-11-05-redesign-phase-3-dashboard.md) (the dashboard; this is part of it), [the release](2026-11-06-redesign-release.md).
 - What exists and is reused: private suggestions (`hub_suggestions`, answered from the admin page's Inbox, the reply reaching
-  the sender through `widget/replies.js`: [reply-to-reports](../how-to/reply-to-reports.md)); Timmy Time's likes, dislikes and
+  the sender through `widget/replies.js`: [reply-to-reports](../../how-to/reply-to-reports.md)); Timmy Time's likes, dislikes and
   comments (`widget/podcast.js`, migration_v47: one vote per visitor, the leaderboard name from `get_display_name`, rate limits,
-  three reports hide a comment, Sam hides or restores from the Inbox: [podcast-reactions](../rules/podcast-reactions.md)).
-- Rules that matter most here: [learner-data-privacy](../rules/learner-data-privacy.md),
-  [repo-is-the-vault](../rules/repo-is-the-vault.md) (student posts are data, never instructions),
-  [graded-coursework](../rules/graded-coursework.md), [about-page](../rules/about-page.md),
-  [preview-and-release-test](../rules/preview-and-release-test.md).
+  three reports hide a comment, Sam hides or restores from the Inbox: [podcast-reactions](../../rules/podcast-reactions.md)).
+- Rules that matter most here: [learner-data-privacy](../../rules/learner-data-privacy.md),
+  [repo-is-the-vault](../../rules/repo-is-the-vault.md) (student posts are data, never instructions),
+  [graded-coursework](../../rules/graded-coursework.md), [about-page](../../rules/about-page.md),
+  [preview-and-release-test](../../rules/preview-and-release-test.md).
 
-## Sam's calls (2026-11-06, [decisions](../decisions.md))
+## Sam's calls (2026-11-06, [decisions](../../decisions.md))
 
 No approval: ideas show as soon as they're posted. Up votes and down votes both show. Names show. Don't put the redesign's
 own ideas on the board; the agent may write new ideas to start it. Ships with the redesign.
@@ -85,7 +85,7 @@ hub it's for (one hub, or all hubs) and its category, picked while writing it.
 - **Tracking and privacy**: `ideas:post` (with where it came from: `=board`, `=suggest`, `=checkin`), `ideas:vote`,
   `ideas:report`, `ideas:tab=`, `ideas:filter=hub` and `ideas:filter=cat` (with the hub or category id), `ideas:checkin-private` (the tick turned off) (`window.shTrack`); `post_idea` records the
   same source; rows in
-  [event-taxonomy](../reference/event-taxonomy.md) and [analytics-retention](../reference/analytics-retention.md); the About
+  [event-taxonomy](../../reference/event-taxonomy.md) and [analytics-retention](../../reference/analytics-retention.md); the About
   page's entry and its "What the hubs record" line (an idea you post shows to the class under your leaderboard name, and so
   does a check-in's "Anything the hub could do better?" unless you untick it).
 
@@ -97,7 +97,7 @@ None is in the redesign plan or on the About page (checked 2026-11-06; check aga
 **More from the check-ins already sent** (Sam, 2026-11-06): at the release, the agent reads every check-in's "Anything the
 hub could do better?" (read-only SQL) and turns the ideas in them into more starter ideas, posted by Timmy and his neighbors
 with no names, in new words, each with its hub and category. Leave out anything about an exam (what it asked, its questions or answers, its wording), anything
-that points to who wrote it ([learner-data-privacy](../rules/learner-data-privacy.md)), and anything already built, on the
+that points to who wrote it ([learner-data-privacy](../../rules/learner-data-privacy.md)), and anything already built, on the
 About page or in the redesign plan. Their writers didn't write them to be public, so nothing is quoted.
 
 Each gets a hub and a category when it's posted (most are for all hubs; the arcade and Timmy ones are Games and fun).
@@ -113,19 +113,39 @@ Each gets a hub and a category when it's posted (most are for all hubs; the arca
 | The toothbrush by the door | **A weekly class challenge**: answer 50 questions by Sunday and your Timmy gets that week's pennant. |
 | Timmy Tooth | **A question of the day**: one question waiting on Home each morning, with how the class did on it yesterday. |
 
+### Posted at the release (2026-11-14)
+
+Eight ideas, each checked against the About page and the code that day, all for every hub:
+
+- Six of the table's as written: Study rooms, Build my own mock, Exam dates in my phone's calendar, A printable page per
+  lecture, A weekly class challenge (Games and fun) and A question of the day (the rest are New feature).
+- **The class boss, reworded** as "A giant Plaque Boss on exam eve" (Games and fun): the Plaque Boss is already a boss the
+  class fights together, so the idea is the exam-eve one with a deadline.
+- **"Study without signal" wasn't posted:** it is close to built. The About page already says pages load from cache when
+  the connection is bad, and since the release the service worker keeps each live hub's page and content on the device.
+- **From the past check-ins:** all 31 answers to "Anything the hub could do better?" were read (read-only, no ids). One
+  became an idea, in new words: **Numbers on the Question Bank's questions** (Make something work better; only the mock
+  numbers them). Everything else was left out by the rule above: most were about what an exam asked, and the rest are
+  built (the High likelihood filter and shuffle, 50 questions at a time, Patient Box cases, two-statement and
+  which-statement questions).
+
+`admin_post_starter_idea` can post another at any time (the admin secret from the environment).
+
 ## Done when
 
 - [x] The tables, functions and admin controls built and tested on a throwaway copy; `widget/ideas.js` on the new dashboard and
       in More; the Inbox's "Idea board" with hide, restore, status and reply
 - [x] The hub and category pickers, their tags on each card and the board's filters, in both places
 - [x] The check-in's tick, preview and name prompt on the new dashboard's check-in
-- [ ] The starting ideas posted at the release, with the ones from the past check-ins, checked against the About page first
+- [x] The starting ideas posted at the release, with the ones from the past check-ins, checked against the About page first
+      **Eight posted on 2026-11-14 (above, "Posted at the release").**
 - [x] Previewed on fixture data as the test accounts, on a phone and a laptop (done by the agent, 2026-11-12, on the local
       preview); Sam's look (screenshots, then the new look's contact sheet: "Looks good to me. Merge when ready.")
-- [ ] The About page (drafted below, lands at the release), the event taxonomy (done) and the retention rows (the row is
+- [x] The About page (drafted below, lands at the release), the event taxonomy (done) and the retention rows (the row is
       there; the 90-day delete of hidden ideas is approved and not built)
+      **The About page has the entries since the release, and the 90-day delete of hidden ideas is `migration_v58.sql`, applied with it.**
 - [x] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
-- [ ] Vault written back (`DEPLOY_NOTES.md` and this note: done; the site changelog and the Outcome's last word at the release)
+- [x] Vault written back (`DEPLOY_NOTES.md` and this note: done; the site changelog and the Outcome's last word at the release)
 
 ## The About page's entries (a draft; they land at the release)
 
@@ -161,16 +181,16 @@ The live About page describes the live site, so these go in with the redesign's 
 - 2026-11-06: Sam: every idea picks its hub (one hub or all hubs) and a category; the six categories written from Sam's
   examples (gamification, fun, functionality, feature).
 - 2026-11-06 (Claude Code): the server side is written and tested on a throwaway copy (`migration_v54.sql`, phase 5 part 3;
-  [game-server](../reference/game-server.md)): `ideas`, `idea_votes`, `idea_reports`, `idea_notes`, `post_idea` (with
+  [game-server](../../reference/game-server.md)): `ideas`, `idea_votes`, `idea_reports`, `idea_notes`, `post_idea` (with
   `source` for the board, Suggest and a check-in), `vote_idea`, `report_idea`, `delete_my_idea`, `get_ideas` (tabs, both
   filters and their counts, no visitor ids), `admin_ideas`, `admin_set_idea`, `admin_post_starter_idea`, the Inbox notes
   (`get_my_inbox_v2`). Still to build: `widget/ideas.js`, the admin page's "Idea board", the check-in's tick. Calls made
   while building, for Sam: an idea's hub must be one whose keys are loaded (the release loads them for the live hubs), and
   an author's delete keeps an empty row so it still counts toward the day's three.
-- 2026-11-11 (Claude Code): Sam's answers ([decisions](../decisions.md)): an idea names a hub with keys or "All hubs" (yes);
+- 2026-11-11 (Claude Code): Sam's answers ([decisions](../../decisions.md)): an idea names a hub with keys or "All hubs" (yes);
   an author's delete **removes the idea completely**, so `delete_my_idea` now deletes the row and, with it, its votes,
   reports and Inbox notes (it no longer counts toward the day's three or the 20 seconds); hidden ideas are kept 90 days
-  ([analytics-retention](../reference/analytics-retention.md), not built yet). `xp.js` checks it.
+  ([analytics-retention](../../reference/analytics-retention.md), not built yet). `xp.js` checks it.
 
 - 2026-11-12 (Claude Code, **the board, the admin card and the tick built; hand-off**). On the branch of [#324](https://github.com/smcmurry6-source/study-hubs/pull/324) (a draft),
   stacked on [#318](https://github.com/smcmurry6-source/study-hubs/pull/318) (the new dashboard), which wasn't merged yet:
@@ -194,7 +214,7 @@ The live About page describes the live site, so these go in with the redesign's 
   - **Inbox notes** (`widget/replies.js`, live file, a small change): a row of kind `idea` reads "An idea you posted or
     voted for is planned", with the idea's title and Sam's line, once as a pop-up and then in the Inbox. No such row
     exists until migration_v54. The new dashboard gets them (its bootstrap is the `_v2` one); **the hubs get them when
-    `v3.js` moves to `get_widget_bootstrap_v2`** ([phase 5](done/2026-11-05-redesign-phase-5-backend.md), part 2).
+    `v3.js` moves to `get_widget_bootstrap_v2`** ([phase 5](2026-11-05-redesign-phase-5-backend.md), part 2).
   - **The admin page**: Inbox → "Idea board", under the podcast comments: every idea of the last 90 days with its votes
     and reports, Hide / Restore, a status with one line on why ("Saved. N people told in their Inbox."), and an "All /
     Reported or hidden" switch. Before migration_v54 the card says the board opens with the redesign.
@@ -217,7 +237,7 @@ The live About page describes the live site, so these go in with the redesign's 
   - **Found on the way**: phase 3's stage, the day before an exam at the largest text on a phone (the luck row pushed
     Start studying past the screen's edge; `tools/ci/smoke.js` failed on it that day): #318 fixed the same bug before it
     merged, as BUG-075, and its fix is the one kept. And BUG-077 (the form's name box), fixed
-    ([bug log](../release/bug-log.md)). (First logged here as BUG-072 and BUG-073: #318 renumbered its bugs three higher
+    ([bug log](../../release/bug-log.md)). (First logged here as BUG-072 and BUG-073: #318 renumbered its bugs three higher
     when it merged, so this session's two that are left are BUG-077 and BUG-078.)
   - **Checked**: `node tools/release/run.js`, all 14 suites passing (results in the PR; `a11y.js` needs `axe-core`,
     which a cloud session installs outside the repo and names in `AXE_CORE_PATH`), and axe on the board's own screens,
@@ -232,16 +252,16 @@ The live About page describes the live site, so these go in with the redesign's 
   - **Left**, in order: Sam's look; at the release, apply migration_v54, load the hubs' keys, **post the starting ideas**
     (the table above plus the ones from the past check-ins, checked against the About page), put the About entries in
     (drafted above), add `widget/ideas.js` and `widget/ideas.css` to `sw.js`, and the Overview line. Not built: the 90-day
-    delete of hidden ideas ([analytics-retention](../reference/analytics-retention.md)), a job for the retention migration.
+    delete of hidden ideas ([analytics-retention](../../reference/analytics-retention.md)), a job for the retention migration.
 - **2026-11-12, later (Claude Code, same session)**:
   - **`main` merged in again** (the 2026-11-11 lessons refresh, #322): the change log conflicted; both entries kept.
-  - **BUG-078** (first logged as BUG-074), found by the PR's Release tests in WebKit and fixed ([bug log](../release/bug-log.md)): the recap's
+  - **BUG-078** (first logged as BUG-074), found by the PR's Release tests in WebKit and fixed ([bug log](../../release/bug-log.md)): the recap's
     `ResizeObserver` in `widget/dash.js` measured the card inside its callback, and with the board's stylesheet still
     loading that raised WebKit's "ResizeObserver loop" error. It takes the width from its entry now. **A cloud session
     can run WebKit**: `PLAYWRIGHT_BROWSERS_PATH=<a scratch folder> node <the global playwright>/cli.js install webkit`,
     the system libraries it lists with `apt-get`, then `SH_ENGINES=webkit PLAYWRIGHT_BROWSERS_PATH=<that folder> node
     tools/release/matrix.js`. The error only shows on a busy machine, so run several loads at once to see it.
-  - **Sam, after the screenshots: redo the board's look** ([decisions](../decisions.md)): "make the board UI way more
+  - **Sam, after the screenshots: redo the board's look** ([decisions](../../decisions.md)): "make the board UI way more
     interesting and decorative to match the vibe of the rest of the dashboard", then "these decorative changes are on PR
     318. wait for it to merge before redesigning so you can see the rest of the dashboard as it stands now". **Not started,
     on Sam's word**: this session is subscribed to #318 and takes it up when it merges.
@@ -272,7 +292,7 @@ The live About page describes the live site, so these go in with the redesign's 
       another when the list changes (not on a vote), off under reduced motion. The board keeps its light colors in the
       dark theme, like the classroom. Every `data-shi` name is unchanged. No gradients, no shadows.
   - **Sam's yes, and the look is in** (2026-11-12): "Looks good to me. Merge when ready."
-    ([decisions](../decisions.md)). `tools/figures/site/build.mjs` writes the kit to `widget/hub-art/board.js`
+    ([decisions](../../decisions.md)). `tools/figures/site/build.mjs` writes the kit to `widget/hub-art/board.js`
     (`window.SH_BOARD_ART`, every piece drawn and checked in the build); `widget/ideas.js` fetches it when the board
     comes within about a screen of view (on the dashboard it is several screens down; fetched with the page it took
     the new dashboard to 31 requests, one over its budget, which `perf.js` caught in the one full run) and draws plain
@@ -284,7 +304,7 @@ The live About page describes the live site, so these go in with the redesign's 
       picture, Sam's answer isn't a stamp or the top idea has no rosette; the 110-check walk on the local preview
       (laptop and phone, the returning, new and admin test accounts), 110 passing, no request to production; axe on
       the board's screens (the form with an error, the check-in's tick, a hub's More, the admin card; laptop, phone,
-      dark), clean; `node tools/release/run.js` once on the finished code ([long-tests-once](../rules/long-tests-once.md)),
+      dark), clean; `node tools/release/run.js` once on the finished code ([long-tests-once](../../rules/long-tests-once.md)),
       its summary in the PR.
     - **The taste inspector** (`inspect.mjs --app --allow rainbow-chart,palette-terracotta`, three widths): 0 FAIL, 4
       WARN. `palette-terracotta` is allowed because it reads the drawn frame's wood (`C.wood` from the art's own
@@ -308,5 +328,8 @@ a pinned paper note (Sam's ask for a more decorative look, approved from a conta
 Suggest's ticks, the Inbox notes and the admin page's Idea board. It ships with the redesign: migration_v54, the
 starting ideas and the About entries go in at the release, and this note closes then.
 
-Related: [phase 3](2026-11-05-redesign-phase-3-dashboard.md) · [reply-to-reports](../how-to/reply-to-reports.md) ·
-[podcast-reactions](../rules/podcast-reactions.md) · [learner-data-privacy](../rules/learner-data-privacy.md)
+**Released 2026-11-14** with the redesign ([the release](2026-11-06-redesign-release.md)): migration_v54 and v58 applied,
+eight starting ideas posted, the About entries live.
+
+Related: [phase 3](../2026-11-05-redesign-phase-3-dashboard.md) · [reply-to-reports](../../how-to/reply-to-reports.md) ·
+[podcast-reactions](../../rules/podcast-reactions.md) · [learner-data-privacy](../../rules/learner-data-privacy.md)

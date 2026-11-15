@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: done
 hub: site
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: Sam's "merge" on the switch PR (its preview is up)
+waiting-on: 
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/359
 ---
@@ -15,20 +15,20 @@ pr: https://github.com/smcmurry6-source/study-hubs/pull/359
 ## Goal
 
 Sam wants the whole redesign built and tweaked until Sam likes it before any of it reaches the class (2026-11-06,
-[decisions](../decisions.md)). Phases 1 to 4 build it on `main` beside the live site, in files no student sees. This
+[decisions](../../decisions.md)). Phases 1 to 4 build it on `main` beside the live site, in files no student sees. This
 task is the one PR that then switches the site over. If something goes wrong, reverting that PR brings the old site back.
 
 ## Context
 
-- How the new versions are built and kept in step with the live hubs: [phase 1](done/2026-11-05-redesign-phase-1-hub-engine.md)
-  (Context). The other phases: [2](2026-11-05-redesign-phase-2-live-hubs.md), [3](2026-11-05-redesign-phase-3-dashboard.md),
-  [4](2026-11-05-redesign-phase-4-game-layer.md); [5](done/2026-11-05-redesign-phase-5-backend.md) ships as it's ready.
-- The plan: [the redesign audit and plan](done/2026-11-05-redesign-audit-and-plan.md), section 4.
-- **Which model:** this session runs on Fable 5.2 at High effort (Sam, 2026-11-12, [decisions](../decisions.md)).
-- Rules that matter most here: [preview-and-release-test](../rules/preview-and-release-test.md) (tier 3: the release
-  suites, UAT, Sam's "merge"), [about-page](../rules/about-page.md),
-  [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md), [question-ids-are-permanent](../rules/question-ids-are-permanent.md),
-  [roll-back-a-release](../how-to/roll-back-a-release.md).
+- How the new versions are built and kept in step with the live hubs: [phase 1](2026-11-05-redesign-phase-1-hub-engine.md)
+  (Context). The other phases: [2](../2026-11-05-redesign-phase-2-live-hubs.md), [3](../2026-11-05-redesign-phase-3-dashboard.md),
+  [4](../2026-11-05-redesign-phase-4-game-layer.md); [5](2026-11-05-redesign-phase-5-backend.md) ships as it's ready.
+- The plan: [the redesign audit and plan](2026-11-05-redesign-audit-and-plan.md), section 4.
+- **Which model:** this session runs on Fable 5.2 at High effort (Sam, 2026-11-12, [decisions](../../decisions.md)).
+- Rules that matter most here: [preview-and-release-test](../../rules/preview-and-release-test.md) (tier 3: the release
+  suites, UAT, Sam's "merge"), [about-page](../../rules/about-page.md),
+  [text-and-audio-never-drift](../../rules/text-and-audio-never-drift.md), [question-ids-are-permanent](../../rules/question-ids-are-permanent.md),
+  [roll-back-a-release](../../how-to/roll-back-a-release.md).
 - The hubs that get new versions: **Occlusion, Heme & Endo Exam 2 and Perio** (Sam, 2026-11-06). PCD Implants and Special
   Patient Care keep their pages. **When:** Sam plans the release for after the PCD Implants exam (Nov 6). The exams still
   ahead: Heme & Endo Exam 2 Nov 13, Occlusion's final Nov 16, Perio's final Nov 19 (`HUBS` in `index.html`). Only the hubs that are still live get switched. A hub whose exam passed before the release keeps its old page, like the
@@ -36,12 +36,12 @@ task is the one PR that then switches the site over. If something goes wrong, re
 
 ## Done when
 
-- [x] Every session before this one is merged: 1 to 9 in [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s
+- [x] Every session before this one is merged: 1 to 9 in [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s
       "From here to the release" (the shop's art and client, Timmy everywhere, visiting, the bowling egg, the trophy
       case and the cards, Ask Timmy's chat, the wiring, phase 5 part 2), and beside them Ask Timmy's admin tab and
       Learn and Flashcards (planned with Sam, 2026-11-12)
-- [ ] Sam has used the whole redesign on the preview and says it's ready
-      **Waiting: the switch PR has the `preview` label, and Sam's word is "merge".**
+- [x] Sam has used the whole redesign on the preview and says it's ready
+      **Sam used the preview through four rounds of changes and said "Merge" on 2026-11-14.**
 - [x] One PR: the dashboard and each live hub's address serve the new versions (the new pages take the old ones' place,
       same addresses, so bookmarks and the home-screen app keep working)
       **Done in the switch PR (2026-11-13): the dashboard, Occlusion and Perio. Heme & Endo Exam 2 keeps its old page (Sam: its exam was Nov 13) and its new version was deleted.**
@@ -53,43 +53,43 @@ task is the one PR that then switches the site over. If something goes wrong, re
 - [x] Same hub and question ids, so everyone's answers, XP, ranks, pins and question health carry over (checked on the
       preview with the test accounts)
       **Checked: the smoke test's id registry on Occlusion (844) and Perio (763 then; 750 with 36 retired after `main`'s update of 2026-11-14), and the preview's returning account keeps its streak, XP, misses and pins on both.**
-- [x] The rules edited from the drafts below: [hub-home-page](../rules/hub-home-page.md), [arcade-skins](../rules/arcade-skins.md),
-      [question-bank-filter-panel](../rules/question-bank-filter-panel.md), [every-choice-gets-a-why](../rules/every-choice-gets-a-why.md);
-      [build-a-hub](../how-to/build-a-hub.md) rewritten ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)
+- [x] The rules edited from the drafts below: [hub-home-page](../../rules/hub-home-page.md), [arcade-skins](../../rules/arcade-skins.md),
+      [question-bank-filter-panel](../../rules/question-bank-filter-panel.md), [every-choice-gets-a-why](../../rules/every-choice-gets-a-why.md);
+      [build-a-hub](../../how-to/build-a-hub.md) rewritten ([text-and-audio-never-drift](../../rules/text-and-audio-never-drift.md)
       already covers High yield, since its narration on 2026-11-12)
 - [x] The About page rewritten for everything students will see change, counts true
       **27 trophies, 16 secret; `supabase/functions/timmy/site.json` rebuilt from it.**
 - [x] `sw.js` version bumped, so phones drop the old cached pages, and its lists rewritten for the bundles ("From phase 5,
       part 2" below). The redesign's perf budgets were lowered to the bundled sizes in
-      [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md) (2026-11-13); the release moves them from the `next/`
+      [phase 5, part 2](2026-11-05-redesign-phase-5-backend.md) (2026-11-13); the release moves them from the `next/`
       addresses to the pages' own and takes the old pages' rows out
       **`sh-v60`** (`main` shipped `sh-v59` on 2026-11-14 when Special Patient Care came off).
-- [ ] CI and the release suites pass on the switch PR, and the UAT is done on its own preview; reverting it there brings
+- [x] CI and the release suites pass on the switch PR, and the UAT is done on its own preview; reverting it there brings
       the old site back
       **The smoke test on every hub and `node tools/release/run.js` ran once on the finished code (the report is in the PR); the UAT was done on the preview, phone and laptop. A revert of the merge is the tree before it; the database stays (the old pages run on it, as the archived hubs' do).**
-- [ ] The new dashboard, left from [phase 3](2026-11-05-redesign-phase-3-dashboard.md) (2026-11-12): its three screens
+- [x] The new dashboard, left from [phase 3](../2026-11-05-redesign-phase-3-dashboard.md) (2026-11-12): its three screens
       (`dashboard/next`) added to the accessibility baseline; first paint on the slow-phone profile looked at again (it
       passes its budget but is slower than the live dashboard's); and, once it is the live dashboard, one look with a
       real hub tab open beside it: your Timmy walks in wearing his outfit and his desk says "You" (a preview has no
       realtime, so this was only checked in pieces)
-      **Done at the switch: its three screens are in the accessibility baseline (no finding), and the slow-phone first paint is in the PR's test report. Left for after the merge: the one look with a real hub tab open beside it.**
-- [x] An archived hub on the engine can take its audio off ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md),
+      **Done at the switch: its three screens are in the accessibility baseline (no finding), and the slow-phone first paint is in the PR's test report. The one look with a real hub tab open beside it is Sam's, on the live site ([inbox](../inbox.md)): an agent can't do it without writing to the class's data.**
+- [x] An archived hub on the engine can take its audio off ([archived-hubs-drop-their-audio](../../rules/archived-hubs-drop-their-audio.md),
       2026-11-12): a `core.json` switch that `widget/hub.js` passes to v3.js as `data-audio="off"` (`startWidget`), and that
       hides the engine's own Timmy Time page and Home card and sends Listen to the device's voice without requesting the
       missing mp3s or word files. Needed before Heme & Endo Exam 2, Occlusion or Perio is archived on the engine
-      ([to-do](2026-11-12-audio-off-at-archiving.md)). High yield's recordings (`<lecture>-hy.mp3`) come off with the rest;
+      ([to-do](../2026-11-12-audio-off-at-archiving.md)). High yield's recordings (`<lecture>-hy.mp3`) come off with the rest;
       the build's `hyAudio` then lists none by itself (`tools/hub-next/build.mjs` checks the files)
       **`"audio": "off"` in `core.json`; the steps are in the rule.**
-- [ ] The game layer's wiring left by phase 4, part A (2026-11-12, "From phase 4, part A" below): the arcade's
-      sessions and pick indexes and Timmy Time's minutes are [their own session](done/2026-11-12-redesign-game-layer-wiring.md)
+- [x] The game layer's wiring left by phase 4, part A (2026-11-12, "From phase 4, part A" below): the arcade's
+      sessions and pick indexes and Timmy Time's minutes are [their own session](2026-11-12-redesign-game-layer-wiring.md)
       before this one (Sam, 2026-11-12); the journey trophies join the case in
-      [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md); the scenes stay silent. The arcade,
+      [the trophy case's session](2026-11-12-redesign-trophy-case-and-cards.md); the scenes stay silent. The arcade,
       Timmy Time and the admin page's "Fixed" are wired since 2026-11-13 (ticked below). Left for
       this PR: each episode's length loaded (`admin_set_podcast_episode`, step 4 of the migration's steps) and the service
       worker's lists (the wiring added no file)
-      **The service worker's lists are done. Left for the merge: Occlusion's episode length (`admin_set_podcast_episode`, `midterm-review`, 2688 s). Heme & Endo Exam 2 keeps its old page, which doesn't report minutes, so it needs none.**
+      **The service worker's lists are done, and Occlusion's episode length was loaded at the merge (`admin_set_podcast_episode`, `midterm-review`, 2688 s). Heme & Endo Exam 2 keeps its old page, which doesn't report minutes, so it needs none.**
 - [x] **Full Arch comes out** (Sam, 2026-11-12: "I also want to remove the full arch challenge thing"; the redesign's
-      pages stop showing it in [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md)). In this
+      pages stop showing it in [the trophy case's session](2026-11-12-redesign-trophy-case-and-cards.md)). In this
       PR, from the shared files: its code in `widget/eggs.js` (and the top comment's lines about it), its styles in
       `widget/v3.css`, the `sh_pref_arch` switch in `widget/v3.js` (the old dashboard's goes with `index.html`),
       `sh:arch-done` in `widget/ranks.js`, Timmy's secret tip and his line about it in `widget/pet.js`; and on the
@@ -97,39 +97,42 @@ task is the one PR that then switches the site over. If something goes wrong, re
       and in Part 7's list of switches, with every trophy count made true. Then `tools/timmy/build.mjs`, so Ask
       Timmy's site help stops describing it. An earned Full Arch stays in its owner's case as retired
       **On every page, the archived hubs' too: 23 trophies there, 27 on the redesign; an owner keeps it as retired.**
-- [ ] From the planning of 2026-11-12 ("What Sam's calls of 2026-11-12 change" below): `widget/pet.js`'s
+- [x] From the planning of 2026-11-12 ("What Sam's calls of 2026-11-12 change" below): `widget/pet.js`'s
       `everyone` becomes the only behavior and the adoption code comes out, with the day the redesign went live set
       in its constant (`FULL_FROM`, `"9999-12-31"` until then; `tools/preview/transform.js` and the smoke test look for
       that exact line, so change them with it). Built in [Ask Timmy, part 4](2026-11-12-redesign-ask-timmy.md); what
       comes out then: "From Ask Timmy, part 4" below; the prices Sam wants changed are changed with `admin_upsert_shop_item` once the migration is
-      applied ([the shop](2026-11-06-redesign-timmy-shop.md), "Prices to change after the release")
-      **Done in the switch PR: the adoption code is out, on every page. Left for the merge: `FULL_FROM` set to the merge day (`widget/pet.js`, then the bundles; the preview and the smoke test take any date). No price is waiting to be changed (the shop's note lists none).**
-- [ ] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"; the steps: [ask-timmy](../reference/ask-timmy.md)): Sam has saved the API key in Supabase
-      (done 2026-11-14; no Console spending limit for now, [decisions](../decisions.md)); the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
+      applied ([the shop](../2026-11-06-redesign-timmy-shop.md), "Prices to change after the release")
+      **Done in the switch PR: the adoption code is out, on every page. `FULL_FROM` is `"2026-11-14"`, the merge day in Central time. No price was waiting to be changed (the shop's note lists none).**
+- [x] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"; the steps: [ask-timmy](../../reference/ask-timmy.md)): Sam has saved the API key in Supabase
+      (done 2026-11-14; no Console spending limit for now, [decisions](../../decisions.md)); the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
       function reads the content from its released place; everyone has Timmy
-      **Left for the merge, after Sam has saved the API key and set the spending limit. The function's default content address is the released one.**
-- [ ] Learn and Flashcards ([its note](2026-11-06-redesign-learn-and-flashcards.md); the steps: "From the Learn and
+      **Done at the merge: `migration_v55` applied, the `timmy` function deployed (version 1, JWT verification off). The function's default content address is the released one.**
+- [x] Learn and Flashcards ([its note](2026-11-06-redesign-learn-and-flashcards.md); the steps: "From the Learn and
       Flashcards toggle" below): `migration_v56` applied after `migration_v54` and `migration_v55`, `widget/study-modes.js`
       and `.css` in `PRECACHE`, the About page's "Study as" entry and its line in "What the hubs record"
-      **Done in the switch PR: the precache and the About page. Left for the merge: `migration_v56`.**
+      **Done in the switch PR: the precache and the About page. `migration_v56` was applied at the merge.**
 - [x] Only if Perio is switched in before its final (Nov 19): its exam-format mock follows the final's format in full
-      (2026-11-14, [hub note](../hubs/perio.md)): `match: 3` and `midShare: 0.15` in `mock.format`.
+      (2026-11-14, [hub note](../../hubs/perio.md)): `match: 3` and `midShare: 0.15` in `mock.format`.
       **Done when `main` was brought into the switch PR (2026-11-14): `formatMock` in `widget/hub-bank.js` draws matching items
       (a list beside each row, every pair scored by itself) and takes `midShare` of each kind from the lectures up to
       `midThrough` (4 in Perio's `core.json`); the mock's blurb says both.**
-- [ ] After merge: `node tools/release/postcheck.js`, `DEPLOY_NOTES.md` and the site changelog; a notice to the class only
+- [x] After merge: `node tools/release/postcheck.js`, `DEPLOY_NOTES.md` and the site changelog; a notice to the class only
       if Sam wants one
+      **2026-11-14: the post-release check passed (53 of 53 changed files live and identical to `main`; the dashboard,
+      Occlusion and Perio open without an error), the change log has its entry and the site changelog three lines (all
+      hubs, Occlusion, Perio). No notice was sent: Sam didn't ask for one.**
 
 ## Drafts for the release
 
 Each phase writes here the rule, About page and how-to changes it needs, so they all land together.
 
-### From phase 1 (the engine and the new Occlusion, [phase 1](done/2026-11-05-redesign-phase-1-hub-engine.md))
+### From phase 1 (the engine and the new Occlusion, [phase 1](2026-11-05-redesign-phase-1-hub-engine.md))
 
 Written for the engine as built in `widget/hub.js` / `hub.css` and `hubs/occlusion/next/`. Phase 2 adds what the other hubs
 need; at the release, check each draft against the engine as it is then.
 
-**[hub-home-page](../rules/hub-home-page.md)** (replace the body; keep the date of the original rule):
+**[hub-home-page](../../rules/hub-home-page.md)** (replace the body; keep the date of the original rule):
 - Every hub has four views, **Home, Notes, Questions and More**, as hash routes (`#home`, `#notes/<lecture>`,
   `#questions[/drill|misses|weak|mock]`, `#more[/<page>]`); Home is the default and logs as `home/dashboard` (`SH_SECTION`).
 - Home is a landing page drawn by the engine from the hub's `SH_HUB.home` and its content: the hub's masthead, the exam
@@ -147,14 +150,14 @@ need; at the release, check each draft against the engine as it is then.
 - Drill, Yesterday's misses, Weak spots and the mock are **sets of the Question Bank** (`#questions/<set>`), not modes.
 - The one-time flag rule stays: nothing that moves returning visitors goes in `defaultState()`.
 
-**[arcade-skins](../rules/arcade-skins.md)** (add): the arcade lives in More. Its lobby shows **every game** (Sam,
+**[arcade-skins](../../rules/arcade-skins.md)** (add): the arcade lives in More. Its lobby shows **every game** (Sam,
 2026-11-06), the hub's pick first and full width (`SH_HUB.arcade.first`, Occlusion: Cusp Sort), each tile on its own field
 of color with **the game's own drawing** across its top: SVG in the house ink style, drawn from the hub's own world in
 `tools/figures/site/arcade.mjs` and built into `widget/hub-art/<hub>.js` (`games`); a hub without drawings yet shows each
 game's icon. The live lobby's painted thumbnails (`img/thumb-*.webp`) aren't used. The skin rules are unchanged: each hub's
 games, names, lobby text and look are its own (`arcade.js` / `arcade.css` beside the page).
 
-**[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (edit):
+**[question-bank-filter-panel](../../rules/question-bank-filter-panel.md)** (edit):
 - A **Sets** row in the panel, under Show: Daily drill, Yesterday's misses, Weak spots, Mock exam (`#questions/<set>`). A set
   replaces the list until it's closed; the filters stay as they were.
 - The panel keeps Lectures (tick boxes, Only), Show (All, Not answered yet, Missed last time, Pinned, each with its count),
@@ -165,10 +168,10 @@ games, names, lobby text and look are its own (`arcade.js` / `arcade.css` beside
 - After an answer, one row: **Try it again** (Retry on a phone), the shared widget's **Find this in the notes** (on a miss)
   and **Good question?** at its end. No "Notes for <lecture>" link (Sam, 2026-11-06: Find this in the notes does that job).
 
-**[every-choice-gets-a-why](../rules/every-choice-gets-a-why.md)** (one line): in the new card, "Why each choice" is one folded
+**[every-choice-gets-a-why](../../rules/every-choice-gets-a-why.md)** (one line): in the new card, "Why each choice" is one folded
 bar under the explanation; opened, it lists every choice with your pick's reason open (Sam, 2026-11-06).
 
-**[build-a-hub](../how-to/build-a-hub.md)** (rewrite "Build it" and "Wire it into the site"):
+**[build-a-hub](../../how-to/build-a-hub.md)** (rewrite "Build it" and "Wire it into the site"):
 - A new hub is a page like `hubs/occlusion/next/index.html`: the guard script, `window.SH_HUB` (hub id, name, state key,
   answered event, exam, the Home/Notes/hints/mock/arcade wording), `widget/hub-art.js` + `widget/hub-art/<hub>.js`, `hub.css`
   and the engine's four scripts, deferred, in this order: `hub-rewards.js`, `hub-timmy.js`, `hub-bank.js`, then `hub.js`
@@ -177,7 +180,7 @@ bar under the explanation; opened, it lists every choice with your pick's reason
   `figures.js/css` and `arcade.js/css`. After the release the JSON is the source (edited by hand or by a build step), and
   `narrate.py`, the lint, the figure builds and the question-id registry read it.
 - Its art (emblem, masthead, medals, tint) is drawn in `tools/figures/site/` and built into `widget/hub-art/<hub>.js`
-  ([every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md)).
+  ([every-hub-gets-its-own-art](../../rules/every-hub-gets-its-own-art.md)).
 - The engine owns the frame, the card, the bank, the rewards, the mock and the settings: a hub never copies or patches
   them; a change for every hub goes in the engine (`widget/hub.js` and its three parts, which file holds what is at the
   top of `hub.js`) / `hub.css`.
@@ -218,7 +221,7 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 - **Tour** (changed): no pop-up on arrival; a one-line tip the first time you open each part, and "Take the tour" in More.
 - Timmy Tooth: he stays in the bottom-left corner, as now.
 
-### The engine's files (the split, 2026-11-12, [phase 4](2026-11-05-redesign-phase-4-game-layer.md))
+### The engine's files (the split, 2026-11-12, [phase 4](../2026-11-05-redesign-phase-4-game-layer.md))
 
 (Since part A, 2026-11-12: `widget/journeys.js` and `widget/hub-art/journeys.js` too. They load on first use, not with
 the page, and are in `tools/ci/syntax.js`. Since Learn and Flashcards, 2026-11-12: `widget/study-modes.js` and
@@ -229,7 +232,7 @@ the page, and are in `tools/ci/syntax.js`. Since Learn and Flashcards, 2026-11-1
 file a later session adds to the engine joins `tools/bundle/bundles.json` (then `node tools/bundle/build.mjs`) and
 `tools/ci/syntax.js`; the pages and the smoke test read the bundle.
 
-### From phase 2, Heme & Endo Exam 2 ([phase 2](2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../hubs/heme-endo-exam2.md))
+### From phase 2, Heme & Endo Exam 2 ([phase 2](../2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../../hubs/heme-endo-exam2.md))
 
 Built in `hubs/heme-endo-exam2/next/` (2026-11-11). Its exam is Friday, November 13, 10:00 am: by the rule above ("a hub
 whose exam passed before the release keeps its old page"), **this new version is switched in only if the release comes
@@ -250,21 +253,21 @@ it with an episode has it from the release. Home's animated card stays among the
 under it, always open (tap one to jump there, the one playing is marked); then what the class thinks, as now. The small
 player pinned to the bottom while you're elsewhere is in the hub's color too.
 
-**[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (add, with phase 1's draft):
+**[question-bank-filter-panel](../../rules/question-bank-filter-panel.md)** (add, with phase 1's draft):
 - A hub's **review-only lectures** (`core.json`'s `reviewOnly`, Heme & Endo Exam 2's Exam 1 Refresher) are out of the bank
   until ticked: "All lectures" means the others, the picker's words are the hub's own (`SH_HUB.review`), the tag says when
   they're in, and the summary counts them apart ("Showing n of N questions + m Exam 1 review").
 - A hub's own toggle may name a lecture (`SH_HUB.bank.only`: `[key, label, { prop, lec }]`): on, it ticks that lecture;
   off, it unticks it again if it was what ticked it.
 
-**[hub-home-page](../rules/hub-home-page.md)** (add): review-only lectures are out of Home's totals, "you haven't tried"
+**[hub-home-page](../../rules/hub-home-page.md)** (add): review-only lectures are out of Home's totals, "you haven't tried"
 and Where to next, and listed under their own heading in the progress list (Heme & Endo: "Exam 1 review: not in your
 totals").
 
-**[arcade-skins](../rules/arcade-skins.md)** (with phase 1's line): the hub's pick first, full width (Occlusion: Cusp Sort;
+**[arcade-skins](../../rules/arcade-skins.md)** (with phase 1's line): the hub's pick first, full width (Occlusion: Cusp Sort;
 Heme & Endo Exam 2: Lab Sort).
 
-**[build-a-hub](../how-to/build-a-hub.md)** (with phase 1's rewrite): a hub without the drawing kit (`od:kit`) still builds:
+**[build-a-hub](../../how-to/build-a-hub.md)** (with phase 1's rewrite): a hub without the drawing kit (`od:kit`) still builds:
 its `FIGS` and `FIG_PLACE` go into `figures.js` as data. The mock's blueprint may group lectures (`EXAM_GROUPS`) and draw a
 lecture's questions from its High Likelihood ones only (`MOCK_LIKELY_ONLY`).
 
@@ -273,7 +276,7 @@ Arcade work as now). Its arcade row: every game in the lobby with its own drawin
 the mock's five Exam 1 questions said "each from a different Exam 1 lecture"; Sam, 2026-11-11: "draw at random", so it now
 says they're drawn at random, fixed on the live page in [#312](https://github.com/smcmurry6-source/study-hubs/pull/312).)
 
-### Follow along ([task](done/2026-11-12-redesign-follow-along.md))
+### Follow along ([task](2026-11-12-redesign-follow-along.md))
 
 Built in the engine (2026-11-12), so every redesigned hub has it from the release; it needs a words file beside each
 narration mp3 (`tools/narration_words.py`, written by `tools/narrate.py` since; the smoke lint checks them). When the content
@@ -289,12 +292,12 @@ In a browser too old for it, Listen plays as before, without the highlight.
 
 Sam, 2026-11-12: "a toggle in the lecture notes that only explains the high likelihood/high yield points that are hinted to
 be tested. the toggles can be As taught, plain english, and high yield ... implemented now and also added to the redesign
-rules", then "only do it for the redesign right now" ([decisions](../decisions.md)). Built in the engine
+rules", then "only do it for the redesign right now" ([decisions](../../decisions.md)). Built in the engine
 (`widget/hub.js` `drawNotes`, `hub.css` `.hy-*`) and the content step (`tools/hub-next/high-yield.mjs`, which
 `tools/hub-next/build.mjs` runs into each hub's `notes.json` as `hy`), so every redesigned hub has it from the release. The
 live hubs keep As taught and Plain English.
 
-What it is: for each lecture with predicted topics (`LIKELY_TOPICS`, [high-likelihood-topics](../rules/high-likelihood-topics.md)),
+What it is: for each lecture with predicted topics (`LIKELY_TOPICS`, [high-likelihood-topics](../../rules/high-likelihood-topics.md)),
 the lecture's "What's tested" box, then each topic in the list's order (strongest evidence first) as a numbered heading in the
 lecture's color, why it's on the list ("A professor's hint", "Exam 2 review", ...) and how many questions it has, the
 professor's own takeaways that go with it ("Know this", from the Exam Hints), and the paragraphs of the As taught notes that
@@ -304,23 +307,23 @@ notes" uses, each topic's questions voting for the paragraph that answers them (
 [<lecture>]` lists every pick). A lecture without topics (Occlusion's midterm lectures) has no High yield button. It runs
 about 40-65% of the As taught notes' length (more for Perio's shortest sessions and Heme & Endo's Refresher, a cram list
 already). Listen plays its Kokoro narration (`<lecture>-hy.mp3`, recorded 2026-11-12, with Follow along) where it matches
-today's High yield, and reads it in the device's voice where it doesn't ([task](done/2026-11-12-high-yield-narration.md)).
+today's High yield, and reads it in the device's voice where it doesn't ([task](2026-11-12-high-yield-narration.md)).
 Reading it to the end doesn't mark the lecture's notes done; its button at the end opens the lecture's High likelihood
 questions. Tracked as `notes:level=hy` and `notes:practice-likely`.
 
-**[hub-home-page](../rules/hub-home-page.md)**, in phase 1's draft for Notes (or a line in [build-a-hub](../how-to/build-a-hub.md)):
+**[hub-home-page](../../rules/hub-home-page.md)**, in phase 1's draft for Notes (or a line in [build-a-hub](../../how-to/build-a-hub.md)):
 every hub's notes have three reading levels, **As taught · Plain English · High yield**, High yield on every lecture with
 predicted topics.
 
-**[text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)**: done 2026-11-12 with the High yield narration
-([task](done/2026-11-12-high-yield-narration.md)): "at any level", and a changed `hy` means recording `<lecture>-hy.mp3` again
+**[text-and-audio-never-drift](../../rules/text-and-audio-never-drift.md)**: done 2026-11-12 with the High yield narration
+([task](2026-11-12-high-yield-narration.md)): "at any level", and a changed `hy` means recording `<lecture>-hy.mp3` again
 in the same PR (the smoke lint names it; until then the page doesn't offer the old recording).
 
-**[build-a-hub](../how-to/build-a-hub.md)** (with phase 1's rewrite): a new hub's High yield comes from its `LIKELY_TOPICS`
+**[build-a-hub](../../how-to/build-a-hub.md)** (with phase 1's rewrite): a new hub's High yield comes from its `LIKELY_TOPICS`
 and hints with no extra work; check its picks with `node tools/hub-next/high-yield.mjs <hub>` and fix a weak one by fixing
 the topic (its words, its questions), never by writing High yield text by hand. Narrate it with the other two levels:
 `python3 tools/narrate.py hubs/<hub>/next/content/notes.json --level hy`, then the build
-([narrate-with-kokoro](../how-to/narrate-with-kokoro.md)).
+([narrate-with-kokoro](../../how-to/narrate-with-kokoro.md)).
 
 **About page**, Notes (add, tagged new): **Three ways to read**: As taught (the professor's version), Plain English (the same
 facts in everyday words) and **High yield**: only what's most likely on the exam. Each predicted topic (the same list as Exam
@@ -328,7 +331,7 @@ hints' "Most likely questions"), strongest evidence first, with the part of the 
 "know this", then what else was flagged in class and what you can skip. Its button at the end opens that lecture's High
 likelihood questions. Listen reads High yield too, in the same voice as the other levels, with Follow along.
 
-### From phase 2, Perio ([phase 2](2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../hubs/perio.md))
+### From phase 2, Perio ([phase 2](../2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../../hubs/perio.md))
 
 Built in `hubs/perio/next/` (2026-11-11). Perio's final is Thursday, November 19, so by the rule above it is switched in if
 the release comes before then. At the release its own engine goes with the old page, and its content JSON becomes where
@@ -347,12 +350,12 @@ board).
 - Perio's 16 trophies, its saved progress and the arcade's six games carry over as they are (the games' names as they are
   now: Pocket Showdown, Perio Clinic Escape, Mind the Pocket, Million-Dollar Smile, Cross-Section, Calculus Crusher).
 
-**[question-bank-filter-panel](../rules/question-bank-filter-panel.md)**: "Perio has its own engine's copy" (and `QBANK_FILTER`,
+**[question-bank-filter-panel](../../rules/question-bank-filter-panel.md)**: "Perio has its own engine's copy" (and `QBANK_FILTER`,
 `qbankNorm()`, `STATE.ui.qbank`) comes out: Perio's bank is the engine's, its saved filters moved over once (`ui.qbankIn`).
 
-**[hub-home-page](../rules/hub-home-page.md)**: Perio's Home is the engine's (`SH_HUB.home`): the final's countdown and chips.
+**[hub-home-page](../../rules/hub-home-page.md)**: Perio's Home is the engine's (`SH_HUB.home`): the final's countdown and chips.
 
-**[arcade-skins](../rules/arcade-skins.md)**: Perio: Pocket Showdown first. A hub's game tags its question with the lecture's
+**[arcade-skins](../../rules/arcade-skins.md)**: Perio: Pocket Showdown first. A hub's game tags its question with the lecture's
 own color (`env.lc`, `.gm-sess`), and the games keep their own buttons' style inside the stage (BUG-058).
 
 ### From the Learn and Flashcards toggle ([Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md))
@@ -371,7 +374,7 @@ below are the built behavior). At the release:
    (count only, read-only SQL), a second device linked with Link my devices shows the same schedule, and XP shows a
    `card` award.
 
-**[question-bank-filter-panel](../rules/question-bank-filter-panel.md)** (add):
+**[question-bank-filter-panel](../../rules/question-bank-filter-panel.md)** (add):
 - **Study as** at the top of the Questions view: **Questions · Learn · Flashcards** (`STATE.ui.qview`, saved like the panel). The
   panel picks which questions and the toggle how; Lectures, Show, the High likelihood toggle, More filters, search, the tags
   and Clear all work the same in all three. Order (In order / Random) shows only for Questions. Drill, Yesterday's misses and
@@ -389,7 +392,7 @@ when it's due or new, for its first three ratings a day; Study ahead earns none.
 "What the hubs record": how you rated each flashcard and where you are in Learn, so your schedule and progress follow you
 to your other devices.
 
-### From phase 4, part A (the journeys' client, [the journeys](2026-11-06-redesign-progression-journeys.md), built 2026-11-12)
+### From phase 4, part A (the journeys' client, [the journeys](../2026-11-06-redesign-progression-journeys.md), built 2026-11-12)
 
 **Already wired, switches on by itself when migration_v54 is applied** (step 6 below, in part): the new hubs call
 `get_widget_bootstrap_v2`, `record_answer_v2` in place of today's answer calls, `xp_session_start` / `xp_session_finish`
@@ -403,19 +406,19 @@ the first answer, or answers are recorded and pay nothing (`why: unknown`).
       (`shGame.startSession("arcade", game)`) and finishes it (`finishSession(id, score)`: the +50, and the server posts
       the score itself, so the page stops calling `submit_arcade_score` for it); its answers send the pick's authored
       index and `session`. An answer without an index is refused by the server and recorded by today's calls instead.
-      Done 2026-11-13 by [the wiring](done/2026-11-12-redesign-game-layer-wiring.md) (`shGames.played` / `over`, and
+      Done 2026-11-13 by [the wiring](2026-11-12-redesign-game-layer-wiring.md) (`shGames.played` / `over`, and
       `gameHooks` in `tools/hub-next/build.mjs` for a hub's own games).
 - [x] **Timmy Time** (`widget/podcast.js`): each minute heard reports to `pod_minute_v2`; the +100 at 90% is the
       server's. Its XP should reach the pill the way an answer's does (an event like `sh:answer-paid`, or a profile
-      refresh). Done 2026-11-13 by [the wiring](done/2026-11-12-redesign-game-layer-wiring.md) (`sh:pod-paid`); it pays
+      refresh). Done 2026-11-13 by [the wiring](2026-11-12-redesign-game-layer-wiring.md) (`sh:pod-paid`); it pays
       only once step 4 below has loaded the episode's length.
 - [x] **The journey trophies in the trophy case**: `journey-0` to `journey-2` are drawn (`SH_JOURNEY_ART.trophies`) and
       show on the road ahead and in the hand-off; the case in Stats (`widget/ranks.js`, `TROPHIES`) doesn't list them
       yet, so it still says 24. They join it when phase 4 redraws the case, with `get_trophy_stats_v2` for their
-      shares: 27 trophies then. Done 2026-11-13 by [the trophy case's session](done/2026-11-12-redesign-trophy-case-and-cards.md):
+      shares: 27 trophies then. Done 2026-11-13 by [the trophy case's session](2026-11-12-redesign-trophy-case-and-cards.md):
       on the redesign's pages the case lists them as "The journeys" (27 trophies, their shares from
       `get_trophy_stats_v2`); a live page still says 24.
-- (moved to [the inbox](inbox.md), 2026-11-13) **Sound** for the hand-off and the unlock, only if the redesign gets a sound setting (it has none; the scenes
+- (moved to [the inbox](../inbox.md), 2026-11-13) **Sound** for the hand-off and the unlock, only if the redesign gets a sound setting (it has none; the scenes
       are silent).
 - [x] `sw.js`: `widget/journeys.js` and `widget/hub-art/journeys.js` join `PRECACHE` with the engine's files, so a
       scene still plays offline.
@@ -454,18 +457,18 @@ entries; tagged new; nothing here is a secret):
   leaves ("From phase 4, session 6" below has the case's own entry and the whole count). "All 24 trophies" in the
   contents and Part 9's list become 27.
 
-### From phase 4, part C (Timmy's place as a real client, [the place](2026-11-06-redesign-timmys-place.md), built 2026-11-12)
+### From phase 4, part C (Timmy's place as a real client, [the place](../2026-11-06-redesign-timmys-place.md), built 2026-11-12)
 
-What part C built is in the place's note (its Log) and [game-server](../reference/game-server.md). It runs only on the
+What part C built is in the place's note (its Log) and [game-server](../../reference/game-server.md). It runs only on the
 redesign's pages, on the game layer (`get_my_shop`, `equip_item`), so it goes live with the release and with the shop.
 
 - [x] **The shop first** (part B): until it is built the customizer has no "Get more in the shop" and what Timmy owns
       comes from the server's gifts and rank pieces only (Halloween 2026's set and the Handpiece's rank sets). (Built:
       part B, below; the customizer's "Get more in the shop" opens it.)
-- [x] **Five everyday outfits have no drawing** ([task](done/2026-11-12-five-outfits-without-a-drawing.md), Sam's call:
+- [x] **Five everyday outfits have no drawing** ([task](2026-11-12-five-outfits-without-a-drawing.md), Sam's call:
       draw them or take them out of the catalog) and the five rare costumes are part B's art. Until then the place
       draws Timmy as himself in any of them. (Drawn, all ten, and approved by Sam: [#339](https://github.com/smcmurry6-source/study-hubs/pull/339), 2026-11-12.)
-- (its own task, not part of the release) **The later journeys' rank sets** ([task](2026-11-12-redesign-later-journeys-rank-sets.md)): 28 drawings and 28
+- (its own task, not part of the release) **The later journeys' rank sets** ([task](../2026-11-12-redesign-later-journeys-rank-sets.md)): 28 drawings and 28
       catalog rows, cut from part C with Sam's yes. Not needed for the release (nobody is near 125,000 XP).
 - [x] **Timmy on a hub's bar doesn't wear his place's outfit yet**: `widget/pet.js` wasn't touched in part C. It
       belongs to "everyone has Timmy" ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), part 4), which changes pet.js
@@ -478,7 +481,7 @@ redesign's pages, on the game layer (`get_my_shop`, `equip_item`), so it goes li
       drawn).
 - [x] **The live dashboard's house card comes down with the old dashboard**: nothing to do in `widget/pet.js` for the
       release itself. `houseSvg`, the old flair pennants and `sh_rank_tier`'s use there can go once no page shows them.
-      **At the release: Timmy's lines and checkup no longer describe the old house (BUG-133). `houseSvg` stays as the picture under the place until it has drawn; taking it out is in [the inbox](inbox.md).**
+      **At the release: Timmy's lines and checkup no longer describe the old house (BUG-133). `houseSvg` stays as the picture under the place until it has drawn; taking it out is in [the inbox](../inbox.md).**
 - [x] The place looked at on the release's own preview, phone and laptop, reduced motion too (`?persona=high-xp` has
       everything; `?xp=180000` the ModuPro on the pedestal, `?xp=300000` Timmy in loupes).
       **2026-11-13, on the release's preview as the account that has everything, phone and laptop: the card, the full view, the customizer.**
@@ -531,9 +534,9 @@ his house card; the tap surprises go inside a `spoil` element):
 - **His health shows in how he moves** at his place (bouncing when sparkling, on the doorstep when he needs
   treatment), the same HP as everywhere else. A visitor never sees it: a visited Timmy is always drawn well.
 
-### From phase 4, part B (Timmy's shop, [the shop](2026-11-06-redesign-timmy-shop.md), built 2026-11-12)
+### From phase 4, part B (Timmy's shop, [the shop](../2026-11-06-redesign-timmy-shop.md), built 2026-11-12)
 
-What part B built is in the shop's note (session 2 in its Log) and [game-server](../reference/game-server.md) ("How
+What part B built is in the shop's note (session 2 in its Log) and [game-server](../../reference/game-server.md) ("How
 the client uses it"). It runs only on the redesign's pages, on the game layer, so it goes live with the release.
 
 - [x] `sw.js`: `widget/shop.js`, `widget/shop.css` and `widget/hub-art/shop.js` join `PRECACHE` with the place's files
@@ -571,7 +574,7 @@ new; the rare costumes go inside a `spoil` element):
 - "What the hubs record" gets: opening the shop, a purchase (its kind: an outfit, a snack, a boost..., never which
   piece) and a rare costume turning up are counted. What you bought is kept, so it stays yours on every device.
 
-### From phase 4, part D (the bowling egg, [the bowling egg](done/2026-11-06-redesign-bowling-egg.md), built 2026-11-13)
+### From phase 4, part D (the bowling egg, [the bowling egg](2026-11-06-redesign-bowling-egg.md), built 2026-11-13)
 
 What part D built is in the bowling egg's note (its Log) and phase 4's Log. It runs only on the redesign's pages (the
 engine's answer path and Timmy's place), needs nothing on the server, and goes live with the release.
@@ -581,8 +584,8 @@ engine's answer path and Timmy's place), needs nothing on the server, and goes l
 - [x] The clips looked at on the release's own preview, phone and laptop, reduced motion too (`sh_bowl_run` set to 49
       in the device's storage, then one first-try right answer; `?persona=high-xp` has the lane at Timmy's place).
       **2026-11-13, on the release's preview: a clip on a phone and one on a laptop with reduced motion; the run, the strike at 50 and the turkey are played by the smoke test.**
-- (moved to [the inbox](inbox.md), 2026-11-13: the first migration after the release) **The Bowling trophy is on the device only** until the first migration after the release adds `bowling` to
-      `record_achievement`'s kinds ([the later journeys' rank sets](2026-11-12-redesign-later-journeys-rank-sets.md));
+- (moved to [the inbox](../inbox.md), 2026-11-13: the first migration after the release) **The Bowling trophy is on the device only** until the first migration after the release adds `bowling` to
+      `record_achievement`'s kinds ([the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md));
       until then its row on the About page shows no share of the class.
 
 **About page** (`about/index.html`, in a spoiler; a new entry in Part 7, Easter eggs, tagged new and with the trophy's
@@ -605,7 +608,7 @@ the other changes listed below):
   like "Fifty right in a row, first try, and the alley's screen does something. Thirty-one hates the noise." (one line;
   `pet.js` is shared, so only at the release).
 
-### From phase 4, visiting ([visiting](done/2026-11-12-redesign-visiting.md), built 2026-11-13)
+### From phase 4, visiting ([visiting](2026-11-12-redesign-visiting.md), built 2026-11-13)
 
 What the visiting session built is in its note (its Log) and phase 4's Log. It runs only on the new dashboard, on the
 game layer (the `_v2` boards' visit keys and `get_place`, migration_v54), so it goes live with the release. Without the
@@ -615,7 +618,7 @@ game layer no row is a button.
       row or one of the stage's top three opens that classmate's place (`?persona=returning`: Fixture Fluoride is a
       ModuPro, Dummy Dentin's place can't be opened, on purpose; your own row is #11).
       **2026-11-13, on the release's preview, phone and laptop: a row opens the place with its #1 badge, the arrows and Back to mine.**
-- [ ] **Apply `migration_v57.sql`** (Visit someone random from the whole class, `get_random_place`; Sam, 2026-11-13: "i
+- [x] **Apply `migration_v57.sql`** (applied at the merge, 2026-11-14; Visit someone random from the whole class, `get_random_place`; Sam, 2026-11-13: "i
       want random to be for the whole class") through the connector right after `migration_v56` (it needs v54's
       `get_place` and `sh_visit_key`). In the switch PR: append it to `supabase/schema.sql` and take its line out of
       `supabase/pending-migrations.txt`; then `node tools/release/rls.js` and `rls-audit.sql` on the live project. Until
@@ -623,10 +626,10 @@ game layer no row is a button.
       "skip people with zero customization"), so on the first day it may say "No one else has decorated their place
       yet" until someone does. On the live site, from a laptop, once a few people have: a few presses of Next on a
       random trip reach someone who isn't on the boards, never your own place and never a plain one.
-- (moved to [the inbox](inbox.md), 2026-11-13) The hubs' boards (the shared widget's panel, `widget/v3.js`) don't visit yet (Sam, 2026-11-12: the new dashboard's
+- (moved to [the inbox](../inbox.md), 2026-11-13) The hubs' boards (the shared widget's panel, `widget/v3.js`) don't visit yet (Sam, 2026-11-12: the new dashboard's
       boards only). When the hubs' boards are rebuilt for the redesign, a row there can open a place the same way
       (`shPlace.open({ place })` with what `get_place` gives).
-- [x] **BUG-112** ([the bug log](../release/bug-log.md)): `widget/ranks.js`'s medal button for two or more medals shows
+- [x] **BUG-112** ([the bug log](../../release/bug-log.md)): `widget/ranks.js`'s medal button for two or more medals shows
       "+1" that its name leaves out (axe: label in name, serious). It's shared with the live pages, so it's fixed when
       the old pages come down: put the count in its `aria-label` ("Mastery medals (2): ...").
       **Fixed in the switch PR, on every page: the name holds the text the button shows.**
@@ -648,7 +651,7 @@ game layer no row is a button.
   and there's no list of who visited. Everyone on a board can be visited (there's no switch to turn it off).
 - "What the hubs record" gets: a visit is counted (that one happened, never whose place).
 
-### From phase 4, session 6 (the trophy case and the cards, [its note](done/2026-11-12-redesign-trophy-case-and-cards.md), built 2026-11-13)
+### From phase 4, session 6 (the trophy case and the cards, [its note](2026-11-12-redesign-trophy-case-and-cards.md), built 2026-11-13)
 
 What the session built is in its note (its Outcome) and phase 4's Log. It runs only on the redesign's pages (`html.shx`;
 Full Arch's gate also on `data-game="v2"`), so it goes live with them; a live page keeps 24 trophies, Full Arch, the
@@ -662,12 +665,12 @@ old Stats panel and today's cards.
       `returning`; the "you" card's Trophy case on the new dashboard; the cards with `shRanks.preview("trophy", 0)`,
       `("mastery", 2)`, `("tier", 2, 3)`, `("level", 4, 2)`, `("mock", 37, 40)` from the console.
       **2026-11-13: the case on the release's preview, phone and laptop; the cards by the smoke test (their markup, a card after a level-up).**
-- (moved to [the inbox](inbox.md), 2026-11-13; Full Arch's branches in `widget/eggs.js` went with the release) When the old pages come down: the `NEW` branches in `widget/ranks.js`, `widget/rankup.js` and `widget/eggs.js`
+- (moved to [the inbox](../inbox.md), 2026-11-13; Full Arch's branches in `widget/eggs.js` went with the release) When the old pages come down: the `NEW` branches in `widget/ranks.js`, `widget/rankup.js` and `widget/eggs.js`
       (`ARCH_OFF`) become the only path, with "Full Arch comes out" above (the `RETIRED` row stays, for those who won it).
-      (**BUG-116**, a level-up card stopping later cards, is fixed on every page: [the bug log](../release/bug-log.md).)
-- (moved to [the inbox](inbox.md), 2026-11-13: the first migration after the release) The **Bowling** trophy shows no share until the first migration after the release counts the kind (part D's box
+      (**BUG-116**, a level-up card stopping later cards, is fixed on every page: [the bug log](../../release/bug-log.md).)
+- (moved to [the inbox](../inbox.md), 2026-11-13: the first migration after the release) The **Bowling** trophy shows no share until the first migration after the release counts the kind (part D's box
       above); the case reads `get_trophy_stats_v2` and shows a share for any kind it returns.
-- (Sam's call, moved to [the inbox](inbox.md), 2026-11-13) **The hub trophies** (8 a hub: the mastery levels, every question answered, mock exams, the boss) aren't in the
+- (Sam's call, moved to [the inbox](../inbox.md), 2026-11-13) **The hub trophies** (8 a hub: the mastery levels, every question answered, mock exams, the boss) aren't in the
       new case; they show in today's panel behind its Leaderboards button. Sam's call whether the case gets a shelf for
       them (this hub's first, as today's panel has it) before the release.
 
@@ -710,7 +713,7 @@ The sessions that build each part fix the drafts they make untrue; this is the l
 - **The trophy count** is 27, 16 of them secret (today's 24 without Full Arch, the three journey trophies and
   Bowling; today's 24 already have 16 secret, so the live About page's "14" was out of date: Sam OK'd 16 on 2026-11-13).
   "From phase 4, part A" now says so. The Bowling trophy is kept on the device until the first migration after the release, so it
-  shows no share of the class at first ([the bowling egg](done/2026-11-06-redesign-bowling-egg.md)).
+  shows no share of the class at first ([the bowling egg](2026-11-06-redesign-bowling-egg.md)).
 - **Full Arch is gone**: the 32-tooth chart, its switch and its trophy (the box in Done when). Where a draft above
   lists the extras a setting turns off ("the Full Arch chart" in phase 3's Settings draft), it comes out.
 - **New drafts to come**, each written by its session under its own heading here: none left from phase 4. (Part B's,
@@ -720,10 +723,10 @@ The sessions that build each part fix the drafts they make untrue; this is the l
   it switches the dashboard and whichever hub is live then. Sam hasn't named the hub that follows Perio: ask at the
   start of the release session, and build that hub on the engine from the start.
 
-### From phase 5, part 2 (the bundles, [phase 5](done/2026-11-05-redesign-phase-5-backend.md), built 2026-11-13)
+### From phase 5, part 2 (the bundles, [phase 5](2026-11-05-redesign-phase-5-backend.md), built 2026-11-13)
 
 A redesigned page no longer loads the widget's files one by one. What it loads is listed in
-`tools/bundle/bundles.json` and built by `node tools/bundle/build.mjs` ([bundles](../reference/bundles.md)):
+`tools/bundle/bundles.json` and built by `node tools/bundle/build.mjs` ([bundles](../../reference/bundles.md)):
 `widget/hub.bundle.js` (a hub's engine) or `widget/dash.bundle.js` (the dashboard's), with the page; then
 `widget/rest.bundle.js` (the slim database client and the widgets both kinds of page share) and, on a hub,
 `widget/hub-rest.bundle.js` (`widget/v3.js`, `widget/v3.css` and what v3.js loads); one stylesheet,
@@ -763,11 +766,11 @@ changes the drafts above and below wherever they name a bundled file:**
       the new dashboard is set in Nunito Sans (the redesign's one typeface) instead of Fraunces and Work Sans from
       Google Fonts (the live dashboard and the admin page still draw it in the old faces). **Sam, 2026-11-13: "dont
       worry about it"**: it stays, and the saved image keeps its static layout (it isn't redrawn to match the
-      dashboard's animated infographic; [decisions](../decisions.md))
+      dashboard's animated infographic; [decisions](../../decisions.md))
 - The preview: `tools/preview/transform.js` rewrites `widget/rest.bundle.js` the way it rewrites `widget/pet.js`
   (Timmy's full-screen date), so a bundle that takes in a file the preview rewrites needs its line in `PET_FILES`.
 
-### From phase 5, part 3 (the game layer's server, [game-server](../reference/game-server.md))
+### From phase 5, part 3 (the game layer's server, [game-server](../../reference/game-server.md))
 
 `migration_v54.sql` is written and tested, not applied. At the release, in this order:
 
@@ -790,9 +793,9 @@ changes the drafts above and below wherever they name a bundled file:**
    `record_choices`, `record_personal_answer` and `record_correct_streak`; `xp_session_start` / `xp_session_finish` for a mock
    and an arcade game; `pod_minute_v2`; `get_widget_bootstrap_v2`; the `_v2` boards; the shop, Timmy's place and the idea
    board's functions; the admin page's `admin_resolve_report_v2` ("Fixed" / "No change needed") and `get_reports_v2`.
-7. Before it: Sam confirms the calls made while building it (listed in [game-server](../reference/game-server.md) and the
-   PR that added it), the draft catalog's prices, and how long hidden ideas are kept ([analytics-retention](../reference/analytics-retention.md)).
-   **Done 2026-11-11** ([the open calls](done/2026-11-11-redesign-open-calls.md)): the two changes are in `migration_v54.sql`;
+7. Before it: Sam confirms the calls made while building it (listed in [game-server](../../reference/game-server.md) and the
+   PR that added it), the draft catalog's prices, and how long hidden ideas are kept ([analytics-retention](../../reference/analytics-retention.md)).
+   **Done 2026-11-11** ([the open calls](2026-11-11-redesign-open-calls.md)): the two changes are in `migration_v54.sql`;
    the prices are judged again with the art, and the 90 days for hidden ideas is approved but not built yet.
 8. About page: the XP sources and the guardrails, Shiny Gold Crowns, the shop, the idea board, and "What the hubs record"
    (ideas show to the class under your name).
@@ -809,11 +812,11 @@ changes the drafts above and below wherever they name a bundled file:**
 6. The hubs' Inbox shows an idea's status note once `widget/v3.js` reads `get_widget_bootstrap_v2` (phase 5, part 2);
    the new dashboard's already does.
 7. The 90-day delete of hidden and deleted ideas (approved, not built): add it to the weekly retention job and its
-   suite (`tools/release/retention.js`), with its line in [analytics-retention](../reference/analytics-retention.md).
+   suite (`tools/release/retention.js`), with its line in [analytics-retention](../../reference/analytics-retention.md).
 
 ### From Ask Timmy, part 2 (the chat, [its note](2026-11-12-redesign-ask-timmy.md), built 2026-11-12)
 
-The chat is `widget/ask.js` + `widget/ask.css`, loaded only by the new pages ([ask-timmy](../reference/ask-timmy.md),
+The chat is `widget/ask.js` + `widget/ask.css`, loaded only by the new pages ([ask-timmy](../../reference/ask-timmy.md),
 "The chat in the new pages"). At the release, besides its box above:
 
 1. `sw.js`: add `widget/ask.js` and `widget/ask.css` to `PRECACHE` with the engine's files (since 2026-11-13 both are in the bundles: nothing to add, "From phase 5, part 2").
@@ -849,7 +852,7 @@ The chat is `widget/ask.js` + `widget/ask.css`, loaded only by the new pages ([a
   gaps in the notes and wrong answers). They're answered by **Claude, Anthropic's AI**: your question, the hub's notes and
   what's on your screen go to Anthropic's API to write the answer, and nowhere else. Only Sam and your own browser can
   read your chats; classmates never see them. Nothing else you type is recorded. (Add the chats to "How long it's kept"
-  once Sam decides how long: [analytics-retention](../reference/analytics-retention.md) has it as proposed.)
+  once Sam decides how long: [analytics-retention](../../reference/analytics-retention.md) has it as proposed.)
 - **Settings**: Timmy's line reads "Your cartoon tooth buddy, on the bar: tap him to ask about the notes. He hides during
   mock exams. Off, an Ask button takes his place." (the engine's and the dashboard's Settings already say so).
 
@@ -857,7 +860,7 @@ The chat is `widget/ask.js` + `widget/ask.css`, loaded only by the new pages ([a
 
 On the redesign's pages `widget/pet.js` mounts with `everyone: true` (`widget/v3.js` on a page with `data-game="v2"`,
 `widget/dash.js` on the new dashboard): no adoption, a hello on the first visit, 100 HP to start for a Timmy met on or
-after `FULL_FROM`, and he wears only the outfit on at his place ([ask-timmy](../reference/ask-timmy.md), "Everyone has
+after `FULL_FROM`, and he wears only the outfit on at his place ([ask-timmy](../../reference/ask-timmy.md), "Everyone has
 Timmy"). At the release, besides the box above:
 
 1. Set `FULL_FROM` in `widget/pet.js` to the day the switch PR merges (Central time). Every Timmy met from then on
@@ -890,7 +893,7 @@ Timmy"). At the release, besides the box above:
   reads the same.
 - **The tour** (`widget/tour.js`, the old dashboard's "Meet Timmy Tooth" step) goes with the old dashboard.
 
-### From phase 3 (the new dashboard, [phase 3](2026-11-05-redesign-phase-3-dashboard.md))
+### From phase 3 (the new dashboard, [phase 3](../2026-11-05-redesign-phase-3-dashboard.md))
 
 Written for the dashboard as built in `next/index.html`, `widget/dash.js` and `widget/dash.css`. The idea board's part
 is in [its own note](2026-11-06-idea-board.md).
@@ -906,9 +909,9 @@ is in [its own note](2026-11-06-idea-board.md).
    `tools/dash-next/build.mjs` (it copies them from the old page until then) and its line in `.github/workflows/check.yml`.
    Everything that reads `HUBS` from `index.html` reads `hubs.js` after that: `widget/archive.js`'s callers, `review/`,
    `tools/release/lib.js` (`hubStatus`), `tools/ci/archive.js`, `tools/ci/smoke.js`, `tools/publish-recap.js`,
-   `tools/retro.sql`'s notes. Reword [repo-map](../reference/repo-map.md) ("`index.html` — dashboard. Hub cards come from
-   the `HUBS` / `CLASSES` arrays"), [build-a-hub](../how-to/build-a-hub.md), [hub-home-page](../rules/hub-home-page.md)
-   where they say exam dates live in `HUBS` in `index.html`, and [repo-is-the-vault](../rules/repo-is-the-vault.md)'s example.
+   `tools/retro.sql`'s notes. Reword [repo-map](../../reference/repo-map.md) ("`index.html` — dashboard. Hub cards come from
+   the `HUBS` / `CLASSES` arrays"), [build-a-hub](../../how-to/build-a-hub.md), [hub-home-page](../../rules/hub-home-page.md)
+   where they say exam dates live in `HUBS` in `index.html`, and [repo-is-the-vault](../../rules/repo-is-the-vault.md)'s example.
 3. The new hubs' `back:` already points at `../../../next/`; at the switch it goes back to `../../`.
 4. `hubHref()` in `widget/dash.js` sends a hub with a `next/` folder to it, and to the old page otherwise. Once every live
    hub has switched, drop `next` from the data and the two link shapes (`#drill` and `#timmy` are the old hubs').
@@ -983,10 +986,10 @@ is in [its own note](2026-11-06-idea-board.md).
 
 **Other notes that change with it**
 
-- [ship-a-change](../how-to/ship-a-change.md) step 7 and [github-is-the-source-of-truth](../rules/github-is-the-source-of-truth.md)
+- [ship-a-change](../../how-to/ship-a-change.md) step 7 and [github-is-the-source-of-truth](../../rules/github-is-the-source-of-truth.md)
   step 4 say the site changelog is "shown on the dashboard": after the release it only drives each hub's "Updated" label
   (and the admin page). Keep logging to it; reword both.
-- [repo-map](../reference/repo-map.md): the `ARCADES` list is no longer read by the dashboard (the arcade boards are in the
+- [repo-map](../../reference/repo-map.md): the `ARCADES` list is no longer read by the dashboard (the arcade boards are in the
   hubs); drop it from `hubs.js` at the switch unless something else reads it.
 
 ## The merge, step by step (written 2026-11-13 with the switch PR)
@@ -996,11 +999,11 @@ before I say merge: no migration applied, no function deployed, no price changed
 sitting; the admin secret is typed into the connector by hand and never into a file:
 
 1. **Sam first:** the Anthropic API key saved in Supabase (Edge Functions, Secrets: `ANTHROPIC_API_KEY`, made inside a
-   workspace) and the Console's spending limit set ([ask-timmy](../reference/ask-timmy.md), "At the release", step 1).
+   workspace) and the Console's spending limit set ([ask-timmy](../../reference/ask-timmy.md), "At the release", step 1).
    Without it everything else can still go; Ask Timmy answers "can't reach" until it's there. **The key was saved
-   2026-11-14, and Sam said no Console limit for now ([decisions](../decisions.md)), so this step is done.**
+   2026-11-14, and Sam said no Console limit for now ([decisions](../../decisions.md)), so this step is done.**
 2. Bring `main` in if it moved, and the fast checks. If a hub that is on the engine archived since the PR was opened,
-   nothing changes for it here (its audio comes off in [its own to-do](2026-11-12-audio-off-at-archiving.md)); 
+   nothing changes for it here (its audio comes off in [its own to-do](../2026-11-12-audio-off-at-archiving.md)); 
    **Heme & Endo Exam 2** is already archived and its audio already off in this PR (Sam, 2026-11-13). `main` was
    brought in on 2026-11-14 (#361, #362, #363: the Log); anything merged after that is brought in the same way: a hub
    change made on `main` to an old page or to `next/` goes into `hubs/<hub>/content/` and the page's settings here.
@@ -1015,7 +1018,7 @@ sitting; the admin secret is typed into the connector by hand and never into a f
 7. **The starting ideas** ([the idea board](2026-11-06-idea-board.md), "The starting ideas", and the ones from the past
    check-ins), each checked against the About page first, with `admin_post_starter_idea`.
 8. **Ask Timmy's function**: deploy `timmy` (`index.ts`, `core.js`, `site.json`) with JWT verification off
-   ([ask-timmy](../reference/ask-timmy.md), step 3).
+   ([ask-timmy](../../reference/ask-timmy.md), step 3).
 9. `node tools/release/rls.js`, and `tools/release/rls-audit.sql` on the live project (read-only).
 10. Mark the PR ready, wait for its checks, **merge**.
 11. `node tools/release/postcheck.js`; then on the live site: one Ask Timmy question (a "From the notes" link opens the
@@ -1025,7 +1028,7 @@ sitting; the admin secret is typed into the connector by hand and never into a f
 12. `DEPLOY_NOTES.md`'s entry dated, the site changelog (`log_changelog`), this note's Outcome, `status: done`, and
     the idea board's, Ask Timmy's and Learn and Flashcards' notes closed. A notice to the class only if Sam wants one.
 
-**To roll it back** ([roll-back-a-release](../how-to/roll-back-a-release.md)): revert the merge with a new PR (GitHub's
+**To roll it back** ([roll-back-a-release](../../how-to/roll-back-a-release.md)): revert the merge with a new PR (GitHub's
 Revert button on the merged PR) and merge it when Sam says so. That brings back the old dashboard, the old Occlusion
 and Perio pages and the old shared files, and `sw.js` there has a different `VERSION`, so phones drop the redesign's
 cache. **Leave the database as it is**: the old pages call the old functions, which the migrations keep working (the
@@ -1041,17 +1044,17 @@ is a new migration and Sam's call, never a restore.
   drafts above.
 - 2026-11-06: Sam's third look: Timmy Time among Home's quick starts, animated; Today's ring of 20 teeth.
 - 2026-11-12: High yield, the notes' third reading level, built in the engine; its drafts are above.
-- 2026-11-12: the engine split into its core and three parts ([phase 4](2026-11-05-redesign-phase-4-game-layer.md), its
+- 2026-11-12: the engine split into its core and three parts ([phase 4](../2026-11-05-redesign-phase-4-game-layer.md), its
   first step); the service worker's list for them is above ("The engine's files").
 - 2026-11-12: High yield narrated with Kokoro for all three hubs (21 lectures), played with Follow along where it
-  matches today's High yield ([task](done/2026-11-12-high-yield-narration.md)); the drift rule covers it.
+  matches today's High yield ([task](2026-11-12-high-yield-narration.md)); the drift rule covers it.
 - 2026-11-12 (Claude Code, planning only): the sessions from here to this one are in order in
-  [phase 4](2026-11-05-redesign-phase-4-game-layer.md) ("From here to the release"), each with a build spec; this
+  [phase 4](../2026-11-05-redesign-phase-4-game-layer.md) ("From here to the release"), each with a build spec; this
   note's Done when names them, and "What Sam's calls of 2026-11-12 change in the drafts above" lists the drafts they
   make untrue. Part C ([#335](https://github.com/smcmurry6-source/study-hubs/pull/335)) merged the same day.
 - 2026-11-13 (Claude Code, **the switch PR built; waiting for Sam's "merge"**). Sam: only the hubs still live get
   switched, so the dashboard, Occlusion and Perio; Heme & Endo Exam 2 keeps its old page; the `preview` label on the PR;
-  nothing applied, deployed or priced before "merge" ([decisions](../decisions.md)). Every session in phase 4's "From
+  nothing applied, deployed or priced before "merge" ([decisions](../../decisions.md)). Every session in phase 4's "From
   here to the release" was merged. What the PR does is in `DEPLOY_NOTES.md`'s entry and the boxes above. **Drafts that
   were no longer true and were fixed as they were written in:** the trophy case entry (Full Arch is retired on every
   page, not only the redesign's, so an old page lists 23); "Meeting him" and the outfits (everyone has Timmy on every
@@ -1063,10 +1066,10 @@ is a new migration and Sam's call, never a restore.
   `tools/release/xp.js` can still test the moment of the switch); the idea board's step 7 (the 90-day delete is built:
   `migration_v58.sql`); step 4's Heme & Endo Exam 2 episode (not needed: its old page reports no minutes); an idea
   for a hub without keys (the dashboard offers only engine hubs, and a legacy hub's check-in idea goes under All hubs).
-  **Found and fixed on the way** ([the bug log](../release/bug-log.md), BUG-132 to BUG-135, BUG-148 and BUG-149 (logged here as 130 and 131, renumbered when `main` was brought in), and BUG-112): the cases
+  **Found and fixed on the way** ([the bug log](../../release/bug-log.md), BUG-132 to BUG-135, BUG-148 and BUG-149 (logged here as 130 and 131, renumbered when `main` was brought in), and BUG-112): the cases
   check skipping Perio, the admin page's hub frames, the podcast's extractor, a leftover call that broke the dashboard.
   **New with the release:** after a merge that changes a hub's questions its answer keys are loaded again, and Ask
-  Timmy's function is deployed again when it changes (both by hand for now: [the inbox](inbox.md)). Left to do is in
+  Timmy's function is deployed again when it changes (both by hand for now: [the inbox](../inbox.md)). Left to do is in
   "The merge, step by step" above and the inbox.
 - 2026-11-13 (Claude Code, the switch PR is [#359](https://github.com/smcmurry6-source/study-hubs/pull/359), with the
   `preview` label). Its first CI run and the one run of `node tools/release/run.js` found three suites still reading
@@ -1078,7 +1081,7 @@ is a new migration and Sam's call, never a restore.
   The smoke test in the same state (two hubs under Past hubs) found one bug in the new dashboard itself: on a phone,
   Past hubs went two columns wide when no recap was beside it and the page scrolled sideways (BUG-140, fixed).
 - 2026-11-13 (Claude Code, round 2, same PR). Sam used the preview and asked for more before the merge
-  ([decisions](../decisions.md), 2026-11-13). Built: a shelf per hub in the trophy case (`widget/trophies.js`; a hub's
+  ([decisions](../../decisions.md), 2026-11-13). Built: a shelf per hub in the trophy case (`widget/trophies.js`; a hub's
   mastery medals drawn by `shRanks.medal`, a higher medal counting the lower ones); Heme & Endo Exam 2 archived
   (`archiveOn` noon Nov 13) and its audio off; the dashboard's Timmy Time card animated again; the You card's rank as a
   hero on the arena's dark plum, the wallet and the stats to match, and **The road** (`#road`, `renderRoad()` in
@@ -1089,11 +1092,11 @@ is a new migration and Sam's call, never a restore.
   phone's top strip; **Learn and Flashcards as a session over the whole screen** (`widget/study-modes.js`: a launcher in
   the bank, `openFocus()`, number keys, "Don't know?", Auto-next; swipe, arrows and a session summary for the cards);
   and the **motion** block at the end of `widget/hub.css` (pop-ups rise, a hub's pages and the dashboard's hub panel
-  slide in; `html.hx-still` turns it off). Left as to-dos in the [inbox](inbox.md): Heme & Endo Exam 2's retrospective
+  slide in; `html.hx-still` turns it off). Left as to-dos in the [inbox](../inbox.md): Heme & Endo Exam 2's retrospective
   and recap, the two missing recaps, a typed answer in Learn and an undo for a flashcard rating (both only if Sam asks).
   **The round's tests:** CI and the one local run of `node tools/release/run.js` (16 of 17 suites passed; the smoke
   test's 8 lines were the two things below) found four bugs in the round's own work, all fixed in the PR
-  ([bug log](../release/bug-log.md)): BUG-141 (the road made the phone dashboard 708 px wide), BUG-142 (the check-ins
+  ([bug log](../../release/bug-log.md)): BUG-141 (the road made the phone dashboard 708 px wide), BUG-142 (the check-ins
   note's contrast), BUG-143 (a hub's top strip at the largest text size) and BUG-144 (the tab slide widened the page
   for a moment, and never played for Notes and Questions: it is on the view itself now). A fifth, BUG-145, was found by
   eye in the screenshots: the new week ring had reused the hub panel ring's class name (`dx-ring`), which put that
@@ -1101,7 +1104,7 @@ is a new migration and Sam's call, never a restore.
   Two tests were taught the hub shelves (`tools/ci/smoke.js`, `tools/release/a11y.js`). When measuring a phone page's
   width in a script, compare with the device's width (`page.viewportSize().width`), not `innerWidth`: an emulated
   phone widens `innerWidth` to fit a page that is too wide.
-- 2026-11-14 (Claude Code, round 3, same PR). Two more calls from Sam on the preview ([decisions](../decisions.md),
+- 2026-11-14 (Claude Code, round 3, same PR). Two more calls from Sam on the preview ([decisions](../../decisions.md),
   2026-11-14). **Timmy's place's full view** is one theater-look window for your own place and a visit
   (`widget/place.js` `hostCard()`, `widget/place.css`: the tokens are set on the dialog, the stage sits in
   `.tpv-frame`, the customizer's foot has Done), and **the dashboard's closed-hub cards are gone** (Past hubs is the
@@ -1121,7 +1124,7 @@ is a new migration and Sam's call, never a restore.
   drawn pictures move for 8 s when you arrive and rest otherwise (`lifeWatch` in `widget/dash.js`), the place card's
   moving picture is drawn in the page, the customizer's frames are stills, the shop rests while it scrolls, and a
   crown's glint moves only its opacity: 17 to 19 ms a frame, 23 layers at rest. What was learned is in
-  [motion-cost](../reference/motion-cost.md), for whoever adds the next moving picture. Not checked on a real phone:
+  [motion-cost](../../reference/motion-cost.md), for whoever adds the next moving picture. Not checked on a real phone:
   Sam's look at the preview is that check, and `LIFE` is the one number to change if the rest feels too quiet.
 - 2026-11-14 (Claude Code, `main` brought in, same PR). Sam: "I believe I updated the occlusion hub and the perio hub,
   if that changes anything that you need to do before we merge and launch it. Don't merge just yet, though." Three PRs
@@ -1137,5 +1140,50 @@ is a new migration and Sam's call, never a restore.
   retired and the reworded questions are covered by the same step. `tools/data-fixes/2026-11-14-in-bennett.sql` is
   #361's step ("run once, right after the PR merges"), not this PR's: a read-only look can't tell whether it ran (the
   choice has picks either way, old or new), so it is on the list for Sam, and this session doesn't run it.
+- 2026-11-14 (Claude Code, **the release**). Sam: "Merge". The steps above, in order, in one sitting:
+  - `main` hadn't moved. `FULL_FROM` is `"2026-11-14"` (`ced6488`).
+  - **`migration_v54.sql` to `migration_v58.sql`** applied to the live project one at a time. Each was rehearsed first
+    on a throwaway copy of the database as it was before the release, and checked after: the counts of functions,
+    columns, tables, indexes and triggers against the copy's (204, 434, 70, 114 and 9 at the end; the live database has
+    one index the schema file lacks, from migration_v25: [inbox](../inbox.md)), then the text of every function and index
+    the five files create against the live one's. The switch time (`game_config.v2_at`) is 2026-11-15 00:39 UTC
+    (6:39 pm Central on the 14th); the shop has its 181 items. **How they were sent:** the connector can't take a file
+    and these are too long to paste through it byte for byte, so each file went to Supabase's management API (the
+    project's `database/query`) with the access token already in the session's environment: one file, one request,
+    one transaction (checked first with a script whose second statement fails: its first was rolled back). So they
+    are not in Supabase's own migration list; `supabase/schema.sql` is the record.
+  - **The answer keys**: 844 for Occlusion and 750 for Perio (`admin_load_question_keys` through the public API, the
+    secret from the environment). It answered "retired: 0": a retired id only marks keys that are already there, and
+    this was the first load. `node tools/xp/keys.js <hub> --load` now does this in one command.
+  - **Occlusion's episode** registered (`midterm-review`, 2688 s). **Eight starting ideas** posted
+    ([the idea board](2026-11-06-idea-board.md) says which, and why two of the drafted ones weren't).
+  - **The `timmy` function** deployed through the same API, JWT verification off (`node tools/timmy/deploy.mjs` now
+    does it). `node tools/release/rls.js` passed, and `rls-audit.sql` on the live project returned no finding, with
+    anon's table policies exactly the expectations file's.
+  - CI green on the head; the PR marked ready and squash-merged (`d86f134`, about 6:46 pm Central). Pages published
+    it in about 80 seconds. `node tools/release/postcheck.js` passed.
+  - **One thing was wrong after the merge (BUG-150):** Ask Timmy answered "I nodded off" to every question. The
+    function found no key: the function's secrets had no `ANTHROPIC_API_KEY`, and the key Sam saved on 2026-11-14 is
+    named `TIMMY_EVAL_KEY`. `index.ts` now reads that name when the first isn't set; deployed about four minutes after
+    the merge, and the same test question came back as an answer with four checked quotes from Occlusion's notes
+    (Sonnet 5.5, 6 seconds, $0.60 with the hub's first cache write, as [ask-timmy](../../reference/ask-timmy.md) expects).
+    The test chat is the admin page's Ask Timmy tab's first one (visitor `release-check-2026-11-14`).
+  - **Not done by the agent**, because each writes to the class's data as a made-up student: a Learn round and a
+    flashcard, a random visit, and the dashboard with a hub open beside it. They are Sam's look, in the
+    [inbox](../inbox.md), with scrolling on a real phone (BUG-147).
 
 ## Outcome
+
+**Released 2026-11-14 on Sam's "Merge"** ([#359](https://github.com/smcmurry6-source/study-hubs/pull/359), `d86f134`).
+The dashboard, Occlusion and Perio are on the redesign at their old addresses, with everyone's progress carried over;
+Heme & Endo Exam 2 keeps its old page, archived, without audio. `migration_v54` to `v58` are applied, both hubs' answer
+keys are loaded, Occlusion's episode is registered, eight starting ideas are on the board, the `timmy` function is
+deployed, the live permissions audit is clean and the post-release check passed. One bug showed after the merge
+(BUG-150: Ask Timmy's key was saved under another name) and was fixed in about four minutes.
+
+**Left**, all in the [inbox](../inbox.md): Sam's own look at the live site (an Ask Timmy question from a phone, Learn and a
+flashcard, a random visit, the classroom with a hub open beside it, scrolling on a real phone); #361's Bennett data fix,
+which this session couldn't confirm and didn't run; the redesign's other task notes, still open; `supabase/schema.sql`
+against the live database's text. The launch trailer is [its own task](../2026-11-13-launch-trailer.md).
+
+**To roll back:** "The merge, step by step" above: revert #359 with a new PR, leave the database as it is.

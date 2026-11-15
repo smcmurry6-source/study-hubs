@@ -94,7 +94,7 @@ in the Log.
 - [x] **In a new hub**: a "Timmy's place" tile in More (the card, and the full view from it). Timmy on the bar stays
       as he is.
 - [x] **Only once Timmy is adopted**, as the house card is today, until "everyone has Timmy"
-      ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), part 4).
+      ([Ask Timmy](done/2026-11-12-redesign-ask-timmy.md), part 4).
 
 **`widget/pet.js`**
 
@@ -174,7 +174,7 @@ in the Log.
 Not calls, how it will work: flame levels 4 and 5 (blue at 10 days, Dark Matter at 30) go into the new hubs' and
 the new dashboard's flame; the medal board's big view draws each hub's medal with the hub's tint; the full view is
 one dialog the visiting session can open with someone else's place (always drawn healthy); the tilt is by drag, as on
-the design page; the About page's and `LORE.md`'s lines are drafted in [the release note](2026-11-06-redesign-release.md)
+the design page; the About page's and `LORE.md`'s lines are drafted in [the release note](done/2026-11-06-redesign-release.md)
 and land at the release; BUG-083 is left alone unless the bar is opened.
 
 ## Log
@@ -256,7 +256,7 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
     everything, `new` has no Timmy, `?xp=180000` and `?xp=300000` show the later journeys.
   - **Left, each written down:** the later journeys' rank sets ([task](2026-11-12-redesign-later-journeys-rank-sets.md));
     the five outfits (above); Timmy on the bar wearing his place's outfit, snack HP, `sw.js`, the About page's and
-    `LORE.md`'s lines, drafted ([the release](2026-11-06-redesign-release.md), "From phase 4, part C"); visiting
+    `LORE.md`'s lines, drafted ([the release](done/2026-11-06-redesign-release.md), "From phase 4, part C"); visiting
     (`shPlace.open({ place })` is ready for `get_place`).
   - **Something to look at, Sam:** with the garden in the spot left of the path, the garden and Timmy at the door
     stand in front of the rank statue and hide most of it (the kit's layout since round 3; the statue shows as soon as
@@ -273,7 +273,7 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
   "What session 1 built".
   - **What Timmy wears**: "if someone doesnt have a costume applied, they are naked. What you put wins." At his
     place too: with nothing on he is himself, where part C drew him in that day's holiday outfit. One line in
-    `timmySvg()`, made in [Timmy everywhere](2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"). The place's
+    `timmySvg()`, made in [Timmy everywhere](done/2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"). The place's
     own seasons and holiday props don't change.
   - **Visiting** has its own note and session: [visiting](done/2026-11-12-redesign-visiting.md).
   - **The shop's link** in the customizer and snack HP: [the shop](2026-11-06-redesign-timmy-shop.md), session 2.

@@ -23,7 +23,7 @@ narrates a tour of what is new.
 
 ## Context
 
-- **What it shows** is the redesign: [the release](2026-11-06-redesign-release.md) (its PR's "What changed" is the
+- **What it shows** is the redesign: [the release](done/2026-11-06-redesign-release.md) (its PR's "What changed" is the
   list, round 2 included) and the About page (`about/index.html`), which lists every feature students can see.
 - **Timmy's voice** already exists: the Timmy Time episodes are made with Kokoro, a pronunciation lexicon, synthesized
   music and mastering in `tools/podcast/` (its `README.md`; `LORE.md` is who Timmy is and how he talks;

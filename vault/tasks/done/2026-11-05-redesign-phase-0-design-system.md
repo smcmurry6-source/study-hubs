@@ -67,7 +67,7 @@ Build the design system the redesign runs on and show it to Sam before any hub c
 - 2026-11-05/06: built by Claude Code: the art in `tools/figures/site/`, the page in `tools/preview/design/`, the inspector
   to 0 FAIL, screenshots to Sam and eight AskUserQuestion answers (below). Waiting on Sam's look at the PR.
 - 2026-11-06: Sam chose to build the whole redesign side by side on `main` and release it at once
-  ([decisions](../../decisions.md), [the release note](../2026-11-06-redesign-release.md)); the phase notes say how.
+  ([decisions](../../decisions.md), [the release note](2026-11-06-redesign-release.md)); the phase notes say how.
 - 2026-11-06: Sam: "okay merge". Merged once "Check hubs" and "Release tests" passed; nothing students see changed.
 
 ## Outcome

@@ -25,7 +25,7 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
 - Hub notes: [perio](../hubs/perio.md) (its own engine, `two()`/`tf()`/`nums()`, the case kit), [heme-endo-exam2](../hubs/heme-endo-exam2.md), [special-patient-care](../hubs/special-patient-care.md), [pcd-implants-exam1](../hubs/pcd-implants-exam1.md).
 - Each hub is its own PR with a preview link. Each new version is built beside the live hub, the way
   [phase 1](done/2026-11-05-redesign-phase-1-hub-engine.md) builds Occlusion's (`hubs/<id>/next/`, `tools/hub-next/build.mjs`
-  `--hub <id>`), and goes live with the rest at [the release](2026-11-06-redesign-release.md) (Sam, 2026-11-06).
+  `--hub <id>`), and goes live with the rest at [the release](done/2026-11-06-redesign-release.md) (Sam, 2026-11-06).
 - The two hubs: **Heme & Endo Exam 2** (`hee2-state-v1`, `hee2:answered`; its Exam 1 Refresher's review-only questions
   through `uncounted()`, its "Exam 1 High likelihood" toggle through `SH_HUB.bank.only`) and **Perio** (its own engine:
   `perio-d2-compendium-state-v1`, `perio:answered`, sessions, notes as template literals, `QBANK_FILTER`, Patient Box
@@ -58,7 +58,7 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   lecture, the grouped and High-Likelihood-only mock, the "which statement" filters, focus-list hints and `hints.words`; the
   build without `od:kit`; the six arcade lobby drawings (`arcade.mjs`). Checked on the local preview as the returning test
   account, phone and laptop: the four views, every More page, the six games, the drill, the mock (50: L12a + L12b = 9, R's 5
-  High Likelihood), Exam 1 High likelihood ticking and unticking R; the release drafts are in [the release note](2026-11-06-redesign-release.md).
+  High Likelihood), Exam 1 High likelihood ticking and unticking R; the release drafts are in [the release note](done/2026-11-06-redesign-release.md).
   **Left for Heme & Endo:** Sam's look on [PR #312](https://github.com/smcmurry6-source/study-hubs/pull/312) (one round, screenshots shown in the session) and anything it asks for; the timing question (its
   exam is 11/13, so by the release's rule it is switched in only if the release comes first).
 - 2026-11-11 (Claude Code, same session): Sam's look: "it needs a little bit more color ... to distinguish each lecture", and
@@ -67,7 +67,7 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   notes, or reading to the end after a minute). Checking Timmy Time on the engine found BUG-056 (the player's buttons in the
   default color with dark labels on every new hub), fixed. Sam's answers: switch it in only if the release beats 11/13; the
   About page now says the mock's five Exam 1 questions are drawn at random; a preview (the `preview` label on #312). Learn
-  and Flashcards wasn't lost: it's [its own task](2026-11-06-redesign-learn-and-flashcards.md), not started. **Left for
+  and Flashcards wasn't lost: it's [its own task](done/2026-11-06-redesign-learn-and-flashcards.md), not started. **Left for
   Heme & Endo:** Sam's look at the colors in the preview.
 - 2026-11-11 (Claude Code, same session): Sam: "Looks much better. Redesign the timmy time ui/card", and asked whether the
   animated card still shows on Home (yes, among the quick starts, unchanged). Built in the engine for every hub on it:
@@ -94,8 +94,8 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   The database suites need PostgreSQL, which this session lacks: CI runs them. **Left for Perio:** Sam's look on the PR,
   Sam's yes on the six lobby drawings (contact sheet sent; until then the lobby shows icons; how to switch them in: the hub
   note), BUG-059 (Occlusion's and Heme & Endo's game header buttons, open). The release drafts are in
-  [the release note](2026-11-06-redesign-release.md). **Next step for this task:** Sam's answers on Perio, then the
-  [release](2026-11-06-redesign-release.md); this note's Outcome once both new versions are approved.
+  [the release note](done/2026-11-06-redesign-release.md). **Next step for this task:** Sam's answers on Perio, then the
+  [release](done/2026-11-06-redesign-release.md); this note's Outcome once both new versions are approved.
 - 2026-11-11 (Claude Code, same session): Sam's look at Perio: "the other drawings look good" (five lobby drawings in),
   Pocket Showdown's "teeth ... look terrible" (redrawn as the game's own board, molars in their gums, a column per session,
   like Heme & Endo's approved Showdown; waits for Sam's yes, its tile an icon until then), "use changes i made to the heme
@@ -103,6 +103,6 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   do whatever you need to do for that bug ... merge when ready". BUG-059 fixed in the engine (the games' icons sized as on
   the live hubs). Then Sam approved the redrawn Pocket Showdown board ("yes the redraw is good"), so all six lobby drawings
   are in, in the same PR. **Both new versions are approved** (Heme & Endo #312, Perio #314). **Next step for this task:**
-  the [release](2026-11-06-redesign-release.md); this note goes to `done/` with its Outcome when the release ships.
+  the [release](done/2026-11-06-redesign-release.md); this note goes to `done/` with its Outcome when the release ships.
 
 ## Outcome
