@@ -15,6 +15,17 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `node tools/timmy/deploy.mjs` (needs `SUPABASE_ACCESS_TOKEN`). #366's session didn't, because its permission check stopped
   the deploy; it waits for Sam's OK. Until then, asked about Timmy Time, Ask Timmy doesn't list the Occlusion final's episode.
   Done on Sam's OK: version 5 (#369).
+- [ ] **After Occlusion's final bank audit merges** (2026-11-15; the hub note's "The final's bank audit"). In order:
+  - [ ] Load the answer keys: `node tools/xp/keys.js occlusion --load` (156 questions edited, 4 new, 3 retired).
+  - [ ] Run `tools/data-fixes/2026-11-15-occlusion-audit.sql` once, right after the merge (Sam, or the connector with Sam's
+    OK; it writes to the class's data). It recounts 73 rewritten choices' picks, and 8 re-aimed questions' "% right", from
+    the new versions' answers. If one of its questions is edited again first, read its new version (the file says how).
+    A select-all choice it touches starts again from 0 (its ticks aren't in `question_events`).
+  - [ ] Deploy Ask Timmy's function again (`node tools/timmy/deploy.mjs`, needs `SUPABASE_ACCESS_TOKEN` and Sam's OK):
+    `supabase/functions/timmy/site.json` gained the mock's High likelihood line from the About page.
+  - [ ] `log_changelog` for `occlusion` (needs `ADMIN_SECRET`), then `node tools/release/postcheck.js`.
+  - [ ] Sam: two questions the notes don't settle (the repositioning splint "irreversible" on the slides vs reversible in
+    Okeson; L10's notes calling Dr. Abou-Arraj's scale "Miller's"). No key changed for either.
 - [ ] **Sam's own look at the live site after the release** (2026-11-14, [the release](done/2026-11-06-redesign-release.md)).
   What an agent can't check without writing to the class's data as a made-up student: one Ask Timmy question from a
   phone (a "From the notes" link opens the paragraph; the admin page's Ask Timmy tab shows it with its cost); one Learn
