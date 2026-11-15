@@ -64,6 +64,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   measured the live Perio page at 1167 KB of its 1180 KB budget (`tools/release/budgets.json`) after Figs 6-8 (+38 KB gzipped), and its
   first paint warns at 1.6 s on the slow phone (budget 1.5 s; CI passed). The next figure or big content change needs room: trim
   what the anima blocks repeat (each figure's static SVG is drawn again by its live code), or ask Sam before raising the budget.
+  **On the engine (the release, #359) it is the same story with other numbers:** 812 KB of its 830 KB budget with Figs 6-8
+  in `content/figures.js` (178 KB by the load event; the figures load with Notes), first paint inside its budget.
 
 - [ ] **A new hub's blocking time after the bundles** (2026-11-13, [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md), [#358](https://github.com/smcmurry6-source/study-hubs/pull/358)):
   on `perf.js`'s slow phone a new hub's total blocking time was 230-365 ms on `main` and is 310-540 ms with the bundles
