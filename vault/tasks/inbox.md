@@ -15,10 +15,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `node tools/timmy/deploy.mjs` (needs `SUPABASE_ACCESS_TOKEN`). #366's session didn't, because its permission check stopped
   the deploy; it waits for Sam's OK. Until then, asked about Timmy Time, Ask Timmy doesn't list the Occlusion final's episode.
   Done on Sam's OK: version 5 (#369).
-- [ ] **Sam: give the After merge workflow its secrets** (2026-11-15, [after-a-merge](../how-to/after-a-merge.md)). GitHub →
+- [x] **Sam: give the After merge workflow its secrets** (2026-11-15, [after-a-merge](../how-to/after-a-merge.md)). GitHub →
   the repo's Settings → Environments → New environment `after-merge` → Deployment branches: "Selected branches", add
   `main` → Environment secrets: `SB_KEY`, `ADMIN_SECRET`, `SUPABASE_ACCESS_TOKEN`. Until then each merge's run shows its
   steps as "blocked" (red on `main`), and an agent runs `node tools/after-merge/run.js` by hand after the merge.
+  Done 2026-11-15: the re-run of #373's merge had all three and did every step (Ask Timmy deployed, version 8, and
+  answered; both changelog lines logged; the post-release check passed).
 - [x] **After Occlusion's final bank audit merges** (2026-11-15, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370); the hub note's "The final's bank audit"). In order:
   - [x] Load the answer keys: `node tools/xp/keys.js occlusion --load` (156 questions edited, 4 new, 3 retired).
   - [x] Run `tools/data-fixes/2026-11-15-occlusion-audit.sql` once, right after the merge (Sam, or the connector with Sam's
