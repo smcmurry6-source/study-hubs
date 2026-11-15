@@ -19,10 +19,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   answer keys in the same sitting (`node tools/xp/keys.js perio --load`: 670 questions, 103 retired, 23 new, 263
   edited) and log the changelog line (`log_changelog`). Until the keys load, the new questions earn no XP and edited
   keys grade against the old ones.
-- [ ] **Sam's call: notes the Perio bank audit flagged** (2026-11-15, the list in [its note](done/2026-11-15-perio-bank-audit.md)'s
+- [x] **Sam's call: notes the Perio bank audit flagged** (2026-11-15, the list in [its note](done/2026-11-15-perio-bank-audit.md)'s
   Outcome, "For Sam"). Eight spots in the S1-S8 notes that disagree with each other or with current teaching (S2's
   chromic gut, S3's "#14", S6's contained defect...). No question turns on any; a fix means narrating that session
   again (and Timmy Time if it covers it). Also there: the low-yield retirements Sam may want back.
+  Decided (Sam, 2026-11-15): leave the eight spots as they are; the 27 retirements stand ([decisions](../decisions.md), #371).
 - [ ] **Sam's own look at the live site after the release** (2026-11-14, [the release](done/2026-11-06-redesign-release.md)).
   What an agent can't check without writing to the class's data as a made-up student: one Ask Timmy question from a
   phone (a "From the notes" link opens the paragraph; the admin page's Ask Timmy tab shows it with its cost); one Learn

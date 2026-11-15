@@ -239,7 +239,8 @@ come back with its id (`git show <commit before the merge>:hubs/perio/content/qu
 
 
 **For Sam: things in the notes the reviewers flagged** (not changed, because a notes edit means narrating that session
-again; no question turns on any of them now): see [the inbox](../inbox.md) line for this audit.
+again; no question turns on any of them now). **Sam, 2026-11-15: "Leave the 8 spots"**: they stay as they are
+([decisions](../../decisions.md)).
 
 1. S1: the notes say heavy smoking is "more than 10" cigarettes a day; the review table and the questions say "10 or
    more". `q1-09` (the 2018 merger of chronic and aggressive periodontitis) isn't in the S1 notes, and S8's notes still
@@ -261,7 +262,7 @@ again; no question turns on any of them now): see [the inbox](../inbox.md) line 
    pharmacology; kept as taught (`q8-L19`, `q8-L20`, `q8-P02` rest on it). Hint 87's quote is a dose (20 mg twice a day),
    though doses are off the final.
 
-**Soft calls Sam may reverse:** the 27 low-yield retirements above (the softest: `q4-L11` passive eruption, `q4-48`,
+**Soft calls** (Sam, 2026-11-15: "Thats fine about the 27 questions": they stand): the 27 low-yield retirements above (the softest: `q4-L11` passive eruption, `q4-48`,
 `q4-42`, `q4-45`, `q8-L04` "the most important appointment", `q3-14`/`q3-15` trial numbers, `q3-24` the $633.63 a
 tooth); S6's three text Patient Box items and `pc-e2` (the final has few or none); kept but low-signal: `q9-L04`,
 `q9-T10`, `q2-20`, `q2-09`, `q5-L43`, `q8-12`, `q8-L38`, `q8-T11`.

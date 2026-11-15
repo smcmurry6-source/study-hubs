@@ -208,8 +208,8 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/2026-11-05-r
   column couldn't be read reliably from the PDF text, so it isn't in the hub.
 - The bank audit's list of things in the notes that read wrong or disagree (S1 "more than 10" vs "10 or more", S2's
   chromic gut, S3's "#14", S4's long junctional epithelium, S5's stale cram line, S6's contained defect, S7's B.
-  forsythus, S8's cephalosporin claim): Sam's call, in [the audit's note](../tasks/done/2026-11-15-perio-bank-audit.md)
-  and [the inbox](../tasks/inbox.md). No question turns on any of them; fixing one means narrating that session again.
+  forsythus, S8's cephalosporin claim), in [the audit's note](../tasks/done/2026-11-15-perio-bank-audit.md): Sam said
+  leave them (2026-11-15, [decisions](../decisions.md)). No question turns on any of them; don't re-propose them for this final.
 
 History: grep `perio` in "Recent major changes" (`DEPLOY_NOTES.md`).
 
