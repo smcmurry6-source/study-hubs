@@ -10,6 +10,11 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [x] **Deploy Ask Timmy's function again for the Occlusion final's episode** (2026-11-15, #366). `supabase/functions/timmy/site.json`
+  gained the episode (rebuilt from the About page), but the live function is still version 4, from the Perio final's merge:
+  `node tools/timmy/deploy.mjs` (needs `SUPABASE_ACCESS_TOKEN`). #366's session didn't, because its permission check stopped
+  the deploy; it waits for Sam's OK. Until then, asked about Timmy Time, Ask Timmy doesn't list the Occlusion final's episode.
+  Done on Sam's OK: version 5 (#369).
 - [ ] **Sam's own look at the live site after the release** (2026-11-14, [the release](done/2026-11-06-redesign-release.md)).
   What an agent can't check without writing to the class's data as a made-up student: one Ask Timmy question from a
   phone (a "From the notes" link opens the paragraph; the admin page's Ask Timmy tab shows it with its cost); one Learn
