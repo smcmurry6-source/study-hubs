@@ -4,32 +4,32 @@ q1-01
 q1-02
 q1-03
 q1-04
-q1-05
-q1-06
-q1-07
+q1-05 retired
+q1-06 retired
+q1-07 retired
 q1-08
 q1-09
 q1-10
-q1-11
+q1-11 retired
 q1-12
 q1-13
-q1-14
-q1-15
+q1-14 retired
+q1-15 retired
 q1-16
 q1-17
 q1-18
-q1-19
+q1-19 retired
 q1-20
 q1-21
 q1-22
 q1-23
-q1-24
+q1-24 retired
 q1-25
 q1-26
 q1-27
-q1-28
+q1-28 retired
 q1-29
-q1-30
+q1-30 retired
 q1-31
 q1-32
 q2-01
@@ -38,47 +38,47 @@ q2-03
 q2-04
 q2-05
 q2-06
-q2-07
-q2-08
+q2-07 retired
+q2-08 retired
 q2-09
 q2-10 retired
 q2-11 retired
 q2-12 retired
 q2-13
 q2-14
-q2-15
-q2-16
+q2-15 retired
+q2-16 retired
 q2-17
 q2-18
 q2-19
 q2-20
 q2-21
 q2-22
-q2-23
+q2-23 retired
 q2-24
 q2-25
-q2-26
+q2-26 retired
 q2-27
 q2-28
-q2-29
+q2-29 retired
 q2-30
 q2-31 retired
 q2-32
 q3-01
-q3-02
+q3-02 retired
 q3-03 retired
 q3-04
 q3-05 retired
 q3-06 retired
-q3-07
+q3-07 retired
 q3-08
 q3-09
 q3-10
 q3-11
 q3-12
 q3-13
-q3-14
-q3-15
+q3-14 retired
+q3-15 retired
 q3-16
 q3-17
 q3-18
@@ -87,12 +87,12 @@ q3-20
 q3-21
 q3-22
 q3-23
-q3-24
+q3-24 retired
 q3-25
 q3-26
 q3-27
 q3-28
-q3-29
+q3-29 retired
 q3-30
 q3-31
 q3-32
@@ -120,9 +120,9 @@ q4-05
 q4-06
 q4-07
 q4-08
-q4-09
+q4-09 retired
 q4-10
-q4-11
+q4-11 retired
 q4-12
 q4-13
 q4-14
@@ -131,14 +131,14 @@ q4-16
 q4-17
 q4-18
 q4-19
-q4-20
+q4-20 retired
 q4-21
-q4-22
+q4-22 retired
 q4-23
 q4-24
 q4-25
 q4-26
-q4-27
+q4-27 retired
 q4-28
 q4-29
 q4-30
@@ -146,23 +146,23 @@ q4-31
 q4-32
 q4-33
 q4-34
-q4-35
-q4-36
+q4-35 retired
+q4-36 retired
 q4-37
 q4-38
 q4-39
 q4-40
 q4-41
-q4-42
+q4-42 retired
 q4-43
 q4-44
-q4-45
+q4-45 retired
 q4-46
 q4-47
-q4-48
-q4-49
-q4-50
-q4-51
+q4-48 retired
+q4-49 retired
+q4-50 retired
+q4-51 retired
 q4-52
 q4-L01
 q4-L02
@@ -174,7 +174,7 @@ q4-L07
 q4-L08
 q4-L09
 q4-L10
-q4-L11
+q4-L11 retired
 q4-L12
 q4-L13
 q4-L14
@@ -188,8 +188,8 @@ q4-L21
 q4-L22
 q4-L23
 q4-L24
-q4-L25
-q4-L26
+q4-L25 retired
+q4-L26 retired
 q4-L27
 q4-L28
 q4-L29
@@ -198,38 +198,38 @@ q4-L31
 q4-L32
 q4-L33
 q4-L34
-q4-L35
+q4-L35 retired
 q3-O01
-q4-O01
-q4-O02
-q1-O01
+q4-O01 retired
+q4-O02 retired
+q1-O01 retired
 q4-L36
 q4-L37
 q4-L38
 q4-L39
-q4-L40
-q4-L41
+q4-L40 retired
+q4-L41 retired
 q4-L42
 q1-P01
-q1-P02
-q1-P03
-q1-P04
+q1-P02 retired
+q1-P03 retired
+q1-P04 retired
 q1-P05
-q1-P06
+q1-P06 retired
 q2-P01
-q2-P02
+q2-P02 retired
 q3-P01
 q3-P02
-q4-P01
-q4-P02
-q4-P03
+q4-P01 retired
+q4-P02 retired
+q4-P03 retired
 q4-P04
 q4-P05
-q4-P06
+q4-P06 retired
 q1-M01
 q1-M02
 q1-M03
-q1-M04
+q1-M04 retired
 q2-M01
 q2-M02
 q2-M03
@@ -251,7 +251,7 @@ q5-06
 q5-07
 q5-08
 q5-09
-q5-10
+q5-10 retired
 q5-R01
 q5-R02
 q5-R03
@@ -260,7 +260,7 @@ q5-R05
 q5-R06
 q5-R07
 q5-R08
-q5-R09
+q5-R09 retired
 q5-R10
 q5-R11
 q5-R12
@@ -309,7 +309,7 @@ q5-L24
 q5-L25
 q5-L26
 q5-L27
-q5-L28
+q5-L28 retired
 q5-L29
 q5-L30
 q5-L31
@@ -334,14 +334,14 @@ q5-L49
 q5-L50
 q5-P01
 q5-P02
-q5-P03
+q5-P03 retired
 q5-P04
 q5-M01
 q5-M02
 q5-M03
 q5-S01
-q5-S02
-q5-S03
+q5-S02 retired
+q5-S03 retired
 q5-S04
 q5-S05
 q5-E01
@@ -357,12 +357,12 @@ q6-04
 q6-05
 q6-06
 q6-07
-q6-08
+q6-08 retired
 q6-L01
 q6-L02
 q6-L03
 q6-L04
-q6-L05
+q6-L05 retired
 q6-L06
 q6-L07
 q6-L08
@@ -371,7 +371,7 @@ q6-L10
 q6-L11
 q6-L12
 q6-L13
-q6-L14
+q6-L14 retired
 q6-L15
 q6-L16
 q6-L17
@@ -389,14 +389,14 @@ q6-S02
 q6-S03
 q6-S04
 q6-E01
-q6-E02
+q6-E02 retired
 q6-E03
 q6-M01
 q6-M02
 q6-M03
-q6-P01
-q6-P02
-q6-P03
+q6-P01 retired
+q6-P02 retired
+q6-P03 retired
 q6-X01
 q6-L27
 q6-L28
@@ -411,7 +411,7 @@ q6-L36
 q6-L37
 q6-L38
 q6-P04
-q6-E04
+q6-E04 retired
 q7-01
 q7-02
 q7-03
@@ -420,7 +420,7 @@ q7-05
 q7-06
 q7-07
 q7-08
-q7-09
+q7-09 retired
 q8-01
 q8-02
 q8-03
@@ -445,19 +445,19 @@ q9-06
 q9-07
 q9-08
 q9-09
-q9-10
+q9-10 retired
 q9-11
 q9-12
-q1-S01
-q1-S02
+q1-S01 retired
+q1-S02 retired
 q1-S03
-q1-S04
-q1-S05
+q1-S04 retired
+q1-S05 retired
 q2-S01
 q2-S02
-q2-S03
+q2-S03 retired
 q2-S04
-q3-S01
+q3-S01 retired
 q3-S02
 q3-S03
 q4-S01
@@ -471,10 +471,10 @@ q1-A04
 q1-A05
 q1-A06
 q1-A07
-q1-A08
-q1-S06
+q1-A08 retired
+q1-S06 retired
 q1-S07
-q1-S08
+q1-S08 retired
 q1-S09
 q2-D01 retired
 q2-D02 retired
@@ -489,13 +489,13 @@ q2-D10 retired
 q2-D11 retired
 q2-D12 retired
 q2-D13 retired
-q2-D14
+q2-D14 retired
 q1-E01
 q1-E02
-q2-E01
-q3-E01
-q4-E01
-q4-E02
+q2-E01 retired
+q3-E01 retired
+q4-E01 retired
+q4-E02 retired
 q1-E03
 q1-E04
 q1-E05
@@ -507,7 +507,7 @@ q3-E03
 q3-E04
 q4-E03
 q4-E04
-q4-E05
+q4-E05 retired
 q4-E06
 q7-L01
 q7-L02
@@ -544,11 +544,11 @@ q7-L30
 q7-L31
 q7-L32
 q7-L33
-q7-L34
+q7-L34 retired
 q7-E01
 q7-L35
 q7-L36
-q7-L37
+q7-L37 retired
 q7-L38
 q7-L39
 q7-L40
@@ -566,7 +566,7 @@ q7-S03
 q7-S04
 q7-S05
 q7-T01
-q7-T02
+q7-T02 retired
 q7-T03
 q7-T04
 q7-T05
@@ -581,7 +581,7 @@ q8-L01
 q8-M01
 q8-L02
 q8-L03
-q8-L04
+q8-L04 retired
 q8-E01
 q8-L05
 q8-L06
@@ -602,7 +602,7 @@ q8-L19
 q8-L20
 q8-L21
 q8-L22
-q8-L23
+q8-L23 retired
 q8-L24
 q8-L25 retired
 q8-L26
@@ -612,20 +612,20 @@ q8-L29
 q8-L30
 q8-L31
 q8-L32
-q8-L33
+q8-L33 retired
 q8-L34
 q8-L35
 q8-L36
 q8-L37
 q8-L38
 q8-L39
-q8-L40
+q8-L40 retired
 q8-L41
 q8-L42
 q8-L43
 q8-L44
 q8-L45 retired
-q8-L46
+q8-L46 retired
 q8-E02
 q8-L47
 q8-L48
@@ -640,7 +640,7 @@ q8-S04
 q8-S05
 q8-T01
 q8-T02
-q8-T03
+q8-T03 retired
 q8-T04
 q8-T05
 q8-T06
@@ -652,7 +652,7 @@ q8-N03
 q8-N04
 pc-a1
 pc-a2
-pc-a3
+pc-a3 retired
 pc-b1
 pc-b2
 pc-c1
@@ -661,7 +661,7 @@ pc-d1
 pc-d2
 pc-d3
 pc-e1
-pc-e2
+pc-e2 retired
 pc-e3
 pc-f1
 pc-f2
@@ -695,7 +695,7 @@ q9-L06
 q9-L07
 q9-L08
 q9-L09
-q9-L10
+q9-L10 retired
 q9-L11
 q9-L12
 q9-L13
@@ -712,7 +712,7 @@ q9-L23
 q9-L24
 q9-L25
 q9-L26
-q9-L27
+q9-L27 retired
 q9-L28
 q9-L29
 q9-L30
@@ -729,8 +729,8 @@ q9-M02
 q9-S01
 q9-S02
 q9-S03
-q9-S04
-q9-S05
+q9-S04 retired
+q9-S05 retired
 q9-T01
 q9-T02
 q9-T03
@@ -756,7 +756,7 @@ pc-g4
 pc-h1
 pc-h2
 pc-h3
-pc-h4
+pc-h4 retired
 pc-h5
 pc-i1
 pc-i2
@@ -781,8 +781,31 @@ q9-L51
 q9-L52
 q9-T11
 q9-T12
-q9-T13
+q9-T13 retired
 q9-T14
 q9-S06
 q9-S07
 q9-N05
+q1-F01
+q1-F02
+q1-F03
+q2-F01
+q2-F02
+q2-F03
+q3-F01
+q4-F01
+q4-F02
+q4-F03
+q4-F04
+q4-F05
+q5-F01
+q5-F02
+q5-F03
+q5-F04
+q6-F01
+q7-F01
+q7-F02
+q8-F01
+q8-F02
+q9-F01
+q9-F02

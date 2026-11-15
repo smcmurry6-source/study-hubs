@@ -59,10 +59,11 @@ Dates and check-in hours: its entry in `hubs.js`.
     `tools/data-fixes/2026-11-15-occlusion-audit.sql` recounts them from the new version's answers, to run once after the
     merge ([inbox](../tasks/inbox.md)). The next audit that rewrites a choice's meaning needs the same kind of fix (and
     `2026-11-14-in-bennett.sql` before it).
-  - **Left for Sam** (the notes don't settle them; no key changed): the repositioning splint is "irreversible" on Dr.
-    Givan's slides but reversible in Okeson (`mo-ws-splint`, `mo-2s-6`, `mo-rev-sel` follow the slides); the L10 notes
-    call Dr. Abou-Arraj's mobility scale "Miller's" (`ot-class3` names the scale as Dr. Abou-Arraj's; `mo-miller2` names Dr. Givan's L7
-    handout).
+  - **Sam's calls on the two open points** (2026-11-15, [decisions](../decisions.md)): the repositioning splint is
+    **irreversible**, as on Dr. Givan's slides (Okeson calls it reversible; `mo-ws-splint`, `mo-2s-6`, `mo-rev-sel` follow
+    the slides). L10 keeps **"Miller"**: Dr. Abou-Arraj's slide says "Miller mobility scale" over its Degrees 0-3 (its
+    wording reads like Lindhe's textbook version), so the notes' warning that Dr. Givan's L7 handout grades Miller's
+    index differently stays, and so do `ot-class3` (his scale) and `mo-miller2` (the L7 handout). Don't re-raise either.
 - **Bennett movement vs the Bennett angle setting** (2026-11-13, `in-bennett`): the midterm's determinants table pairs a greater Bennett
   movement with shorter cusps, while the articulator handout ties the Bennett angle setting to the width of the central fossae, so
   "Cusp height" can be argued for either. Don't offer it as a wrong answer to a Bennett question (54% picked it): on 11-14 it
@@ -247,8 +248,7 @@ marks, the TMJ view) stay as they are; use the kit for any new perio chart or ra
 
 ## Pending
 
-- The 2026-11-15 bank audit's two questions for Sam (the repositioning splint's "irreversible"; "Miller's" in L10's
-  notes) and its after-merge steps: "The final's bank audit" above and [the inbox](../tasks/inbox.md).
+- The 2026-11-15 bank audit's after-merge steps: [the inbox](../tasks/inbox.md).
 - [The final's time and format](../tasks/2026-11-03-occlusion-final-time-and-format.md)
 - Figure questions the 2026-11-04 audit left for Sam (the notes don't settle them; listed in [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
   the TMJ figure's TM ligament shortens as the condyle translates while its readout says "taut"; Fig 2b's swing is
