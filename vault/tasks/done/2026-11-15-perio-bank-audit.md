@@ -7,7 +7,7 @@ requested-by: Sam
 due: 2026-11-19
 waiting-on:
 agent: Claude Code
-pr:
+pr: https://github.com/smcmurry6-source/study-hubs/pull/371
 ---
 
 # Perio: audit the question bank for the final
