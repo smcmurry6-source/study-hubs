@@ -550,12 +550,13 @@
     k = Math.max(0, Math.min(setsOf(L) - 1, k)); if (k === L.set) return;
     openSet(L, k); keepSet(L); track("bank:page=" + how); page(true);
   }
-  /* back to the top of the list, under whichever bar is stuck to the top of the screen. Only once the new set's cards are
+  /* back to the top of the list, under whichever bar is stuck to the top of the screen (and the boss band). Only once the new set's cards are
      in: with the list empty the page is too short to get there, and the browser's scroll anchoring then follows the page's
      end down past the cards as they arrive */
   function toListTop(L){
     var top = 0, nav = $(".qsets", L.el), at = nav && !nav.hidden ? nav : L.host;
     $$(".hx-bar, .hx-strip").forEach(function(b){ var r = b.getBoundingClientRect(); if (r.top <= 1 && r.bottom < innerHeight / 2) top = Math.max(top, r.bottom); });
+    top += parseFloat(docEl.style.getPropertyValue("--boss-h")) || 0;   /* the Plaque Boss's band, sticky under the bar while it's up */
     window.scrollTo(0, Math.max(0, scrollY + at.getBoundingClientRect().top - top - 12));
   }
   function page(focus){

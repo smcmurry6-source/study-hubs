@@ -989,6 +989,7 @@ openSet(L, k); keepSet(L); track("bank:page=" + how); page(true);
 function toListTop(L){
 var top = 0, nav = $(".qsets", L.el), at = nav && !nav.hidden ? nav : L.host;
 $$(".hx-bar, .hx-strip").forEach(function(b){ var r = b.getBoundingClientRect(); if (r.top <= 1 && r.bottom < innerHeight / 2) top = Math.max(top, r.bottom); });
+top += parseFloat(docEl.style.getPropertyValue("--boss-h")) || 0;
 window.scrollTo(0, Math.max(0, scrollY + at.getBoundingClientRect().top - top - 12));
 }
 function page(focus){

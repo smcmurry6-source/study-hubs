@@ -49,11 +49,21 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   "Question n" gains "of N". "Try it again" keeps the number; the missed question that comes back a few cards later has
   none; Learn and Flashcards keep their own progress. New events `bank:size=` and `bank:page=next|prev|pick|end`. `widget/hub-bank.js`
   (`qNum()`, `setsBar()`, `toSet()`, `page()`), `widget/hub.css` (`.qc-n`, `.qsets`, `.qset-end`), bundles rebuilt.
-  Found in testing and fixed: BUG-153 (the number crowded the lecture chip on a narrow phone) and BUG-154 (Next 100 left a
+  Found in testing and fixed: BUG-154 (the number crowded the lecture chip on a narrow phone) and BUG-155 (Next 100 left a
   phone at the bottom of the new set: scroll anchoring). The single-file engines weren't touched: every hub still on one is
   archived. About page ("Questions"), the bank's rule note, decisions, the event taxonomy and the inbox updated. **After the
   merge:** the changelog line for Occlusion and Perio, and the `timmy` function deployed again for the About page's new
   words (`supabase/functions/timmy/site.json`).
+- **2026-11-15 (the Plaque Boss gets its own band on the redesign's hubs, Claude Code)** — Sam: "Refine the question bank
+  monsters ui appearance. It looks like its messing up other buttons." Since the release, the boss docked itself inside the
+  engine's top bar (`widget/eggs.js` `bossDock()` found the page's sticky `<header>`, the bar's one row of buttons): on a
+  phone it squeezed the bottom tabs to 4-11 px with their labels piled up, on a laptop it ran off the screen
+  ([BUG-153](vault/release/bug-log.md)). Now, on Occlusion and Perio, it is a band of its own right after the top bar (laptop,
+  tablet) or the top strip (phone), sticky under it and moved when a phone turns (`placeBoss()`), tinted with the boss's
+  own color in the engine's type and tokens (`widget/hub.css` `.sh-egg-boss.is-band`: face, name, HP bar, HP, its line on
+  a laptop, a 32 px ×). While it's up, eggs.js sets `--boss-h` on the page, and what sticks under the bar moves down by it
+  (the lecture list, the bank's side panel, the mock's clock, a pinned figure, Ask Timmy's panel in `widget/ask.css`). The old
+  single-file hubs' docked strip is unchanged. Bundles rebuilt; About page's Plaque Boss line reworded. No schema change.
 - **Occlusion: the final's question bank audited, and a mock that leans on High likelihood (2026-11-15, Claude Code, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370))** — Sam:
   "audit occlusions question bank to see if we can make it higher yield ... accurate, with good answer options and sufficient
   explanations", then "make sure the exam hints are utilized as best as possible". Every L6-L10 question checked against the
