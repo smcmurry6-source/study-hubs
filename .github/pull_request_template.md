@@ -33,5 +33,6 @@ Preview: <!-- only when Sam asked for one (the `preview` label): the link from t
 
 ## Release
 
-- [ ] After merge: `node tools/release/postcheck.js` passed
+- [ ] After merge: the After merge workflow passed on `main` (keys, Ask Timmy, data fixes, changelog, post-release check)
+- [ ] A `<hub> | <message>` line in `tools/after-merge/changelog.txt` if students would notice the change
 - [ ] Vault written back (task note, decisions, hub note), `DEPLOY_NOTES.md`, About page if students can see it

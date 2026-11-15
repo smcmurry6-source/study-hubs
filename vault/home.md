@@ -68,6 +68,7 @@ Hub building
 ## How-tos
 
 - [Ship a change](how-to/ship-a-change.md) · [Verify before pushing](how-to/verify-before-pushing.md) ·
+  [After a merge](how-to/after-a-merge.md): what the After merge workflow does by itself, and what to do when it fails ·
   [Run a redesign session](how-to/run-a-redesign-session.md): one phase per fresh session, decisions before code, cheap tests
 - [Preview a change](how-to/preview-a-change.md): the site from a branch, on made-up data, with test accounts and time
   travel · [Roll back a release](how-to/roll-back-a-release.md)

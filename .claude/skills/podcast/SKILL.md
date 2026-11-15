@@ -108,9 +108,10 @@ result: `ffprobe` duration under the limit Sam gave, `<mp3>.json` chapters in or
 - **The hub's note** (`vault/hubs/<hub-id>.md`): that it has an episode, where its script is
   (`tools/podcast/<hub-id>/script.md`), and that a notes change means fixing the script and rebuilding the episode.
 - If the hub has narration, nothing else changes; the podcast is separate from Listen.
-- **After the merge, tell the server about the episode** so listening earns XP (10 a minute, +100 for finishing;
-  `vault/reference/game-server.md`): `select admin_set_podcast_episode('<admin secret>', '<hub-id>', '<episode id>', <seconds>);`
-  through the Supabase connector, the secret put in by hand (`vault/rules/secrets.md`). Until then the episode plays but pays nothing.
+- **After the merge, the server learns about the episode by itself** so listening earns XP (10 a minute, +100 for
+  finishing; `vault/reference/game-server.md`): the After merge workflow registers a new `podcast` id or length from
+  `content/core.json` (`vault/how-to/after-a-merge.md`). Until it has, the episode plays but pays nothing. By hand, only
+  if that run failed: `select admin_set_podcast_episode('<admin secret>', '<hub-id>', '<episode id>', <seconds>);`.
 
 ## 6. Verify
 
@@ -128,4 +129,5 @@ result: `ffprobe` duration under the limit Sam gave, `<mp3>.json` chapters in or
 Commit the script, lexicon, mp3 (tens of MB is fine; never commit stems or the json), hub, dashboard, About page,
 LORE.md, the hub's vault note and DEPLOY_NOTES.md. Push, open a draft PR (student-facing summary, the length, the chapters, the lore added,
 the pronunciation fixes), subscribe to it, and fix CI until green. Merge only if Sam said to; otherwise Sam merges.
-After merge, log it to the site changelog if `ADMIN_SECRET` is set (`log_changelog`), or tell Sam.
+For the site changelog, add a line to `tools/after-merge/changelog.txt` in the PR (`<hub> | <message>`); the After merge
+workflow logs it after the merge. Read that workflow's result on `main`.

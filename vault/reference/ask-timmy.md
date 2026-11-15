@@ -141,8 +141,10 @@ also how to set Ask Timmy up again on a new project.
    `site.json` as they are through Supabase's management API, with the access token in the session's environment, and
    prints the version; the Supabase connector's `deploy_edge_function` does the same if the three files are pasted into
    it). `TIMMY_CONTENT_BASE` needs no setting: its default is the released content address
-   (`https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/content/`). **Deploy it again after a change to
-   `supabase/functions/timmy/`** (`site.json` changes whenever the About page does).
+   (`https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/content/`). **After a merge that changes
+   `supabase/functions/timmy/`** (`site.json` changes whenever the About page does), the After merge workflow deploys it
+   again by itself and does step 4 ([after-a-merge](../how-to/after-a-merge.md), since 2026-11-15; its chat's visitor id is
+   `after-merge-<commit>`).
 4. **One real question after every deploy.** The tests use a fake model and a preview answers with made-up replies, so a
    missing or refused key shows only here (at the release every answer was "I nodded off" until step 1's name was
    found). From the live site on a phone; the admin page's Ask Timmy tab shows it, with its cost, and opens its chat.
