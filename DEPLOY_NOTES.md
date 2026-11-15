@@ -52,6 +52,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `D-F-D-B-A`, whose final A read "uh"; narration made from now on gets them too). Hub: `content/core.json`'s `podcast`
   (id `final-review`), so Home's Timmy Time quick link and More's tile appear; dashboard card gets `podcast` and "Timmy
   Time" in modes; About page's episode list, `supabase/functions/timmy/site.json`, `LORE.md` and the hub note updated.
+  The title is "Perio final: ..." ("Periodontology" broke mid-word on Home's phone tile). Shared fix with it
+  ([BUG-151](vault/release/bug-log.md)): the small line on a hub's Timmy Time tiles (Home and More, `widget/hub.css`) is full
+  white, since 86-88% white on Perio's pink failed the 4.5:1 contrast check.
   **After the merge:** `admin_set_podcast_episode(..., 'perio', 'final-review', 2948)` so listening earns XP, and deploy the
   `timmy` function again for the new site help.
 
