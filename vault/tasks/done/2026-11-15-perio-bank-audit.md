@@ -40,7 +40,7 @@ hints are utilized as best as possible." The final is Thu Nov 19, cumulative.
 - [x] High yield rebuilt and its narration recorded again for all nine sessions
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
 - [x] Vault written back (hub note, this note's Outcome, the to-dos in the inbox)
-- [ ] After the merge: load the answer keys (`node tools/xp/keys.js perio --load`) and log the changelog line
+- [x] After the merge: load the answer keys (`node tools/xp/keys.js perio --load`) and log the changelog line (2026-11-15: 670 keys loaded, 103 retired; `log_changelog` for Perio)
 
 ## Log
 
