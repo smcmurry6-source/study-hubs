@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-15 (the Plaque Boss gets its own band on the redesign's hubs, Claude Code)** — Sam: "Refine the question bank
+  monsters ui appearance. It looks like its messing up other buttons." Since the release, the boss docked itself inside the
+  engine's top bar (`widget/eggs.js` `bossDock()` found the page's sticky `<header>`, the bar's one row of buttons): on a
+  phone it squeezed the bottom tabs to 4-11 px with their labels piled up, on a laptop it ran off the screen
+  ([BUG-153](vault/release/bug-log.md)). Now, on Occlusion and Perio, it is a band of its own right after the top bar (laptop,
+  tablet) or the top strip (phone), sticky under it and moved when a phone turns (`placeBoss()`), tinted with the boss's
+  own color in the engine's type and tokens (`widget/hub.css` `.sh-egg-boss.is-band`: face, name, HP bar, HP, its line on
+  a laptop, a 32 px ×). While it's up, eggs.js sets `--boss-h` on the page, and what sticks under the bar moves down by it
+  (the lecture list, the bank's side panel, the mock's clock, a pinned figure, Ask Timmy's panel in `widget/ask.css`). The old
+  single-file hubs' docked strip is unchanged. Bundles rebuilt; About page's Plaque Boss line reworded. No schema change.
 - **Occlusion: the final's question bank audited, and a mock that leans on High likelihood (2026-11-15, Claude Code, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370))** — Sam:
   "audit occlusions question bank to see if we can make it higher yield ... accurate, with good answer options and sufficient
   explanations", then "make sure the exam hints are utilized as best as possible". Every L6-L10 question checked against the

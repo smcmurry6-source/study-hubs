@@ -9,7 +9,7 @@
 /* ---------- the panel ---------- */
 .ska { position: fixed; inset: 0; z-index: 9990; pointer-events: none; font-family: var(--font, system-ui, sans-serif); color: var(--text, #3b2e3a); }
 .ska-scrim { display: none; }
-.ska-panel { pointer-events: auto; position: absolute; right: 16px; bottom: 16px; top: calc(var(--bar-h, 64px) + 12px); width: min(420px, calc(100vw - 32px));
+.ska-panel { pointer-events: auto; position: absolute; right: 16px; bottom: 16px; top: calc(var(--bar-h, 64px) + var(--boss-h, 0px) + 12px); width: min(420px, calc(100vw - 32px));
   display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--border, #e8e0e6); border-radius: var(--r-panel, 16px); background: var(--ground, #fff);
   box-shadow: 0 10px 40px rgba(30, 20, 30, .18); outline: none; overflow: hidden;
   transform: translateY(12px); opacity: 0; transition: transform var(--t-ui, 240ms) var(--ease-out, ease), opacity var(--t-ui, 240ms) var(--ease-out, ease); }

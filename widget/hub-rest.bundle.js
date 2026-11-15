@@ -534,6 +534,8 @@ var boss = null, bossHidden = false, lastHitSend = 0;
 function bossId(){ var c = centralParts(); return HUB + "|" + c.day + "|" + Math.floor(c.hour / 2); }
 function bossDown(id){ return ls("sh_egg_boss_down") === id; }
 function bossDock(){
+var bar = document.getElementById("hxBar");
+if (bar) { var strip = document.getElementById("hxStrip"); return strip && getComputedStyle(strip).position === "sticky" ? strip : bar; }
 var h = document.querySelector("header.hub-header") || document.querySelector("header");
 if (!h) return null;
 var pos = getComputedStyle(h).position;
@@ -545,29 +547,45 @@ var cs = getComputedStyle(p);
 el.style.marginLeft = "-" + cs.paddingLeft; el.style.marginRight = "-" + cs.paddingRight; el.style.marginBottom = "-" + cs.paddingBottom;
 el.style.paddingLeft = cs.paddingLeft; el.style.paddingRight = cs.paddingRight;
 }
-window.addEventListener("resize", function(){ if (boss) fitDock(boss.el); });
+function placeBoss(el){
+var dock = bossDock(), band = !!(dock && (dock.id === "hxBar" || dock.id === "hxStrip"));
+el.classList.toggle("is-band", band);
+el.classList.toggle("is-docked", !!dock && !band);
+if (band) {
+if (dock.nextElementSibling !== el) dock.parentNode.insertBefore(el, dock.nextSibling);
+el.style.top = dock.getBoundingClientRect().height + "px";
+} else if (el.parentNode !== (dock || document.body)) (dock || document.body).appendChild(el);
+if (dock && !band) fitDock(el);
+}
+function bossSpace(){
+var el = boss && boss.el, up = !!(el && el.isConnected && el.classList.contains("is-band") && el.classList.contains("is-shown"));
+var st = document.documentElement.style;
+if (up) st.setProperty("--boss-h", el.getBoundingClientRect().height + "px"); else st.removeProperty("--boss-h");
+}
+window.addEventListener("resize", function(){ if (boss) { placeBoss(boss.el); bossSpace(); } });
 function spawnBoss(hp, test){
 var id = bossId();
 if (!test && boss && boss.id === id) return;
 if (!test && bossDown(id)) return;
 if (boss) boss.el.remove();
 var k = test ? test.k : bossKind(id);
-var el = document.createElement("div"), dock = bossDock();
-el.className = "sh-egg sh-egg-boss sh-egg-boss-" + k.id + (dock ? " is-docked" : "");
+var el = document.createElement("div");
+el.className = "sh-egg sh-egg-boss sh-egg-boss-" + k.id;
+el.style.setProperty("--boss", k.color);
 el.title = "Every correct answer from anyone in the hub hits it";
 el.innerHTML = '<span class="sh-egg-boss-face" style="color:' + k.color + '">' + bossIcon(k) + '</span>' +
 '<span class="sh-egg-boss-body"><b>' + bossName(k) + '</b><small><span class="sh-egg-boss-hp"></span><span class="sh-egg-boss-say"></span></small>' +
 '<span class="sh-egg-boss-bar"><i></i></span></span>' +
 '<button type="button" class="sh-egg-x" aria-label="Hide the boss">×</button>';
-(dock || document.body).appendChild(el);
-if (dock) fitDock(el);
-el.querySelector(".sh-egg-x").addEventListener("click", function(){ bossHidden = true; el.classList.remove("is-shown"); });
+placeBoss(el);
+el.querySelector(".sh-egg-x").addEventListener("click", function(){ bossHidden = true; el.classList.remove("is-shown"); bossSpace(); });
 boss = { id: id, k: k, max: k.hp, hp: Math.min(k.hp, hp || k.hp), el: el, test: !!test };
 drawBoss();
-requestAnimationFrame(function(){ if (!bossHidden && feat("boss")) el.classList.add("is-shown"); });
+requestAnimationFrame(function(){ if (!bossHidden && feat("boss")) el.classList.add("is-shown"); bossSpace(); });
 }
 function drawBoss(){
-if (!boss) return;
+if (!boss) { bossSpace(); return; }
+placeBoss(boss.el);
 var f = boss.hp / boss.max, said = boss.k.said;
 boss.el.querySelector(".sh-egg-boss-bar i").style.width = (100 * f) + "%";
 var se = season(), first = se && boss.hp === boss.max ? se.line : said[0];
@@ -575,13 +593,14 @@ boss.el.querySelector(".sh-egg-boss-hp").textContent = boss.hp + " / " + boss.ma
 boss.el.querySelector(".sh-egg-boss-say").textContent = " · " + (f > .6 ? first : f > .25 ? said[1] : said[2]);
 boss.el.classList.toggle("is-low", f <= .25);
 boss.el.classList.toggle("is-shown", !bossHidden && feat("boss"));
+bossSpace();
 }
 function defeatBoss(by){
 if (!boss) return;
 ls("sh_egg_boss_down", boss.id);
 var el = boss.el, k = boss.k; boss = null;
 el.classList.add("is-dead");
-setTimeout(function(){ el.remove(); }, 900);
+setTimeout(function(){ el.remove(); bossSpace(); }, 900);
 if (!on()) return;
 H.confetti(); setTimeout(H.confetti, 350); setTimeout(H.confetti, 700);
 toast(row('<span style="color:' + k.color + ';display:block;width:100%;height:100%">' + bossIcon(k) + '</span>', bossName(k) + " defeated!", "Final blow: " + esc(by || "someone") + ". Nice teamwork."), 6000, "is-gold");
