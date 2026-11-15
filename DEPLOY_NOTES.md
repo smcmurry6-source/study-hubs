@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **The release PR takes in `main` (#359, 2026-11-14, Claude Code; live from the merge)** — Sam: "I believe I updated
+  the occlusion hub and the perio hub". #361 (the lessons refresh), #362 (Perio's Nov 12 class, the review for the
+  final and Figs 6-8) and #363 (Ask Timmy on Sonnet 5.5) were written for the old pages and `next/`; they are now in
+  the switched tree. **Occlusion's and Perio's content** (`hubs/<hub>/content/`) is `main`'s, key for key (the 22 new
+  and 36 retired Perio questions, the session notes, the hints, `in-bennett`, `dn-support`, `dn-resorb-mand`), with
+  Perio's three new figures in `content/figures.js` and its re-recorded audio. **The engine's exam-format mock** learned
+  what Perio's final needs (`formatMock` in `widget/hub-bank.js`): **matching items** (`mock.format.match`; a list
+  beside each row, every pair scored by itself, kept in `STATE.mock.picks[id]` by row) and **the midterm's share**
+  (`midShare` of each kind from the lectures numbered up to `midThrough`; Perio: 0.15 and 4). Special Patient Care is
+  in `archived` in `hubs.js` and out of the About page, the budgets and the baselines, as on `main`. The bank's page
+  is 50 (`main`'s change to `hub-bank.js`). `sw.js` is `sh-v60` (`main` shipped `sh-v59`). Both branches had logged a
+  BUG-130 and a BUG-131: `main`'s keep the numbers, the release's are BUG-148 and BUG-149.
 - **The release PR's fourth round: smooth scrolling (#359, 2026-11-14, Claude Code; live from the merge)** — Sam on
   the preview: "scrolling and things are kind of sluggish and jittery" (BUG-147; what was measured and what was
   learned: [motion-cost](vault/reference/motion-cost.md)).
@@ -109,7 +121,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
     is on at his place (on an old hub's page, the outfit kept on the device, or nothing). `FULL_FROM` in `pet.js` is
     the release day. BUG-112 fixed (the medal button's label for two or more medals). The run flame has its own
     switch in the new Settings.
-  - **`sw.js`** (`sh-v59`): precaches the dashboard, the bundles, the files fetched on first use and each engine hub in
+  - **`sw.js`** (`sh-v60`): precaches the dashboard, the bundles, the files fetched on first use and each engine hub in
     its `HUBS` list; a hub's content JSON is served from the cache and refreshed behind it (**a content edit shows on the
     load after the one that fetched it**). A new engine hub adds itself to `HUBS`; `tools/ci/syntax.js` checks it.
   - **The About page** is rewritten for all of it (27 trophies, 16 secret), and Ask Timmy's site help rebuilt from it.
@@ -119,6 +131,58 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   - Tests: the smoke test on every hub, `node tools/release/run.js` (the report is in the PR). Left to do:
     [the inbox](vault/tasks/inbox.md) (what the old pages still hold up, keys and the function loaded by hand, the
     first migration after the release, the hub trophies' shelf: Sam's call).
+- **2026-11-14 (Ask Timmy's model, Claude Code)** — Nothing students see changes (Ask Timmy starts at the redesign's
+  release). Sam: "Lets do sonnet": the `timmy` function's model is Sonnet 5.5, not Opus 5.5, after the eval ran the whole
+  test set on Sonnet 5.5 and Haiku 5.5 (`--model`, new): Sonnet matched Opus at half the cost and twice the speed; Haiku
+  deflected more. `core.js` also prices both models for the day's cap. [#363](https://github.com/smcmurry6-source/study-hubs/pull/363),
+  [Ask Timmy](vault/tasks/2026-11-12-redesign-ask-timmy.md).
+- **2026-11-14 (Perio: the Nov 12 live class and the review for the final, Claude Code)** — Sam: "Update the perio hub with the
+  added google drive contents", with Dr. Abou-Arraj's furcation email. **S9** now has the live class: its notes' slides-only tail
+  became 15 paragraphs from the class at both levels (gingival excess and drug enlargement, the gummy smile, altered passive
+  eruption with A as 1.5-2 mm, crown lengthening by type and his Patient 1, the esthetic evaluation, the tattoo), his answers on
+  the recording went into their paragraphs, both S9 mp3s were regenerated, 22 questions were added (`q9-L37`-`L52`, `T11`-`T14`,
+  `S06`-`S07`, `N05`), 9 hints, the topics re-ranked, Review, cram, mind map and Figs 4-5 brought in line, and the task moved to
+  done. **The review for the final**: the format (60-65 questions, about 15% from S1-S4, an hour and a half that can be two, no
+  suture images, few or no Patient Box) in an S1 hint, a new final card on Home (`FINAL_FACTS`), `COURSE_GRADING` and the mock
+  (`EXAM_FORMAT` 62 in 90 minutes, 3 matching, `midShare` 0.15 via `drawSplit()`); what to know and skip as hints and session
+  `note`s for S1-S5 and S8; **36 questions retired** under dont-ask-what-professors-skip (S2 suture techniques and pictures, S3
+  Miller & McEntire, S5 entrance widths, S8 doses; Dr. Litz's "know dosing" hint marked superseded), `q3-07`, `q2-P01`, `q2-P02`
+  rewritten (same ids). High yield re-recorded for S1-S5, S8 and S9; `next/` rebuilt with the final's chips, banner and blurb.
+  Engine mock's matching and 15% split: a box in the release task. Then Sam: "Yes to all figures and anima": three new S9
+  figures (`tools/figures/perio/`, under the S9 notes and in Review): Fig 6 `excess` (pseudopocket or drug enlargement,
+  then hygiene or a gingivectomy), Fig 7 `clsteps` (crown lengthening step by step, or a gingivectomy alone that grows back),
+  Fig 8 `smile` (the esthetic checklist on an ideal smile and Patient 1 before and after); the About page's Perio diagrams
+  entry lists 15. Dr. Kaur's word for her part of the final (peri-implant health, mucositis and peri-implantitis) is a
+  line on Home's final card. ([hub note](vault/hubs/perio.md))
+- **2026-11-14 (Lessons refresh follow-up, Claude Code, same PR)** — Sam: "do another sweep", then the calls below. **Special Patient
+  Care is off the site** ("remove everything for it"; no recap, no retrospective): `hubs/special-patient-care/` (page, audio, images)
+  deleted, its precache line out of `sw.js` (`VERSION` sh-v59), its arcade board out of the dashboard's `ARCADES`, its `HUBS` entry
+  moved to `ARCHIVED_HUBS` (no card, no check-in), its About page entries out (the arcade table's column, Home, check-ins, filters,
+  pins), `next/hubs.js` and Timmy's `site.json` rebuilt, its perf budget and accessibility baselines dropped; its question-id list and
+  drawn art stay, and a stub in `LESSONS.md` says why it has no retrospective. **The Question Bank shows more at a time**: 100 a page
+  in every single-file hub (`BANK_PAGE`, was 30; opening the bank on a throttled phone: about 0.2-0.3 s against 0.15 s) and 50 in
+  the redesign's bank (`widget/hub-bank.js`, was 20; bundles rebuilt). **Occlusion `in-bennett`**: "Cusp height" became "How
+  steep the cusps can be in protrusion" (data fix after the merge). The sweep found no new reports, no new question-health flags
+  on the live hubs and the live site identical to `main`; it closed the finished Heme & Endo Exam 2 L17-L18 task and added a 9th
+  check-in to that hub's retrospective.
+- **2026-11-13 (Lessons refresh, Claude Code)** — `/lessons-audit`, data read 9 pm Central, the evening of Heme & Endo Exam 2.
+  **Heme & Endo Exam 2 is archived** (10 pm tonight): its retrospective is in `LESSONS.md` (86 people and 360 h, the most of any hub;
+  9 check-ins, 5 "About right", none "Exam asked different things"), its recap went up on the dashboard (`tools/publish-recap.js`),
+  and its narration, High yield recordings and Timmy Time came off the site (232 MB; the site is 533 MB): `data-audio="off"` on its
+  widget tag, its `next/` content rebuilt with no `hyAudio`. **Occlusion**, three days before its final: reports #42 (`dn-support`,
+  the stem now asks which force a complete denture's support resists) and #43 (`dn-resorb-mand`: "less
+  bone, but a bigger arch" in the explanation and whys, the stem asks about the arch's outline), and `in-bennett` (54% picked "Cusp
+  height", which the midterm's determinants table supports for Bennett movement: that choice became "How steep the cusps can be in
+  protrusion", and its 9 old picks are cleared by `tools/data-fixes/2026-11-14-in-bennett.sql` after the merge). Ids, keys and
+  choice order unchanged, so the class's picks on the other choices stay right; no
+  High yield text changed (checked with `tools/hub-next/build.mjs`). Occlusion's page was 93 bytes under its 1480 KB budget on `main`,
+  so the new wording is trimmed to fit (`tools/release/perf.js`: 1,516,026 bytes, 1480 KB). In `tools/ci/smoke.js`, the redesigned-page checks skip a hub whose exam
+  has passed (the release never switches one in) and the live click-through waits for "This hub is archived" on an archived hub:
+  Heme & Endo Exam 2 counts as archived on a UTC runner from 4 pm Central 11-13, and every all-hub run failed on it (BUG-131).
+  **The redesign's new dashboard** (not live): on a phone, two closed hubs sat side by side and made the page 434 px wide on a 390 px
+  screen (BUG-130); `widget/dash.css`'s phone rule now wins (one column), `site.bundle.css` rebuilt, and the smoke test's sideways
+  check counts a layout wider than the screen.
+  Special Patient Care's retrospective waits for Canvas to close (Sat 11-14).
 - **2026-11-13 (the redesign's bundles, phase 5 part 2, Claude Code)** — Nothing students see changes: the live
   dashboard and hubs load exactly the files they loaded (the smoke test fails if one asks for a bundle). A redesigned
   page (`next/`, `hubs/<hub>/next/`) now loads the widget as **built files** instead of one request per source file:
@@ -848,7 +912,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `recession-11`); 12 Exam Hints and 12 ranked `LIKELY_TOPICS`; Review, cram, mind map and arcade words redone; ten
   names in `tools/podcast/lexicon.json`. The teal and amber session chips are a shade darker in light mode, for AA
   contrast (BUG-050, caught by `a11y.js`). Still to come: the live class's part, and the diagram candidates for Sam
-  ([task](vault/tasks/2026-11-03-perio-s9-plastic-esthetics.md)). S6 still waits on its recording.
+  ([task](vault/tasks/done/2026-11-03-perio-s9-plastic-esthetics.md)). S6 still waits on its recording.
 - **2026-11-10 (Heme & Endo Exam 2: coverage over count, Dr. Herr's FSH and his focus slides, Claude Code)** — Sam: "be
   sure the emphasized points are covered, deemphasized points are left out ... be sure that the high likelihood questions
   are sufficient. I dont know what you took out from them. Go with dr herrs version", then Dr. Herr's in-class focus

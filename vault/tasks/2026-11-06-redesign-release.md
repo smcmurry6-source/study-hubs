@@ -52,7 +52,7 @@ task is the one PR that then switches the site over. If something goes wrong, re
       **Done: `tools/hub-next/build.mjs` no longer reads a hub's page; it rebuilds the question index and High yield from the JSON and CI runs its `--check`.**
 - [x] Same hub and question ids, so everyone's answers, XP, ranks, pins and question health carry over (checked on the
       preview with the test accounts)
-      **Checked: the smoke test's id registry on Occlusion (844) and Perio (763), and the preview's returning account keeps its streak, XP, misses and pins on both.**
+      **Checked: the smoke test's id registry on Occlusion (844) and Perio (763 then; 750 with 36 retired after `main`'s update of 2026-11-14), and the preview's returning account keeps its streak, XP, misses and pins on both.**
 - [x] The rules edited from the drafts below: [hub-home-page](../rules/hub-home-page.md), [arcade-skins](../rules/arcade-skins.md),
       [question-bank-filter-panel](../rules/question-bank-filter-panel.md), [every-choice-gets-a-why](../rules/every-choice-gets-a-why.md);
       [build-a-hub](../how-to/build-a-hub.md) rewritten ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)
@@ -63,7 +63,7 @@ task is the one PR that then switches the site over. If something goes wrong, re
       part 2" below). The redesign's perf budgets were lowered to the bundled sizes in
       [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md) (2026-11-13); the release moves them from the `next/`
       addresses to the pages' own and takes the old pages' rows out
-      **`sh-v59`.**
+      **`sh-v60`** (`main` shipped `sh-v59` on 2026-11-14 when Special Patient Care came off).
 - [ ] CI and the release suites pass on the switch PR, and the UAT is done on its own preview; reverting it there brings
       the old site back
       **The smoke test on every hub and `node tools/release/run.js` ran once on the finished code (the report is in the PR); the UAT was done on the preview, phone and laptop. A revert of the merge is the tree before it; the database stays (the old pages run on it, as the archived hubs' do).**
@@ -104,14 +104,19 @@ task is the one PR that then switches the site over. If something goes wrong, re
       comes out then: "From Ask Timmy, part 4" below; the prices Sam wants changed are changed with `admin_upsert_shop_item` once the migration is
       applied ([the shop](2026-11-06-redesign-timmy-shop.md), "Prices to change after the release")
       **Done in the switch PR: the adoption code is out, on every page. Left for the merge: `FULL_FROM` set to the merge day (`widget/pet.js`, then the bundles; the preview and the smoke test take any date). No price is waiting to be changed (the shop's note lists none).**
-- [ ] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"; the steps: [ask-timmy](../reference/ask-timmy.md)): Sam has saved the API key in Supabase and
-      set the Console's spending limit; the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
+- [ ] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"; the steps: [ask-timmy](../reference/ask-timmy.md)): Sam has saved the API key in Supabase
+      (done 2026-11-14; no Console spending limit for now, [decisions](../decisions.md)); the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
       function reads the content from its released place; everyone has Timmy
       **Left for the merge, after Sam has saved the API key and set the spending limit. The function's default content address is the released one.**
 - [ ] Learn and Flashcards ([its note](2026-11-06-redesign-learn-and-flashcards.md); the steps: "From the Learn and
       Flashcards toggle" below): `migration_v56` applied after `migration_v54` and `migration_v55`, `widget/study-modes.js`
       and `.css` in `PRECACHE`, the About page's "Study as" entry and its line in "What the hubs record"
       **Done in the switch PR: the precache and the About page. Left for the merge: `migration_v56`.**
+- [x] Only if Perio is switched in before its final (Nov 19): its exam-format mock follows the final's format in full
+      (2026-11-14, [hub note](../hubs/perio.md)): `match: 3` and `midShare: 0.15` in `mock.format`.
+      **Done when `main` was brought into the switch PR (2026-11-14): `formatMock` in `widget/hub-bank.js` draws matching items
+      (a list beside each row, every pair scored by itself) and takes `midShare` of each kind from the lectures up to
+      `midThrough` (4 in Perio's `core.json`); the mock's blurb says both.**
 - [ ] After merge: `node tools/release/postcheck.js`, `DEPLOY_NOTES.md` and the site changelog; a notice to the class only
       if Sam wants one
 
@@ -992,16 +997,20 @@ sitting; the admin secret is typed into the connector by hand and never into a f
 
 1. **Sam first:** the Anthropic API key saved in Supabase (Edge Functions, Secrets: `ANTHROPIC_API_KEY`, made inside a
    workspace) and the Console's spending limit set ([ask-timmy](../reference/ask-timmy.md), "At the release", step 1).
-   Without it everything else can still go; Ask Timmy answers "can't reach" until it's there.
+   Without it everything else can still go; Ask Timmy answers "can't reach" until it's there. **The key was saved
+   2026-11-14, and Sam said no Console limit for now ([decisions](../decisions.md)), so this step is done.**
 2. Bring `main` in if it moved, and the fast checks. If a hub that is on the engine archived since the PR was opened,
    nothing changes for it here (its audio comes off in [its own to-do](2026-11-12-audio-off-at-archiving.md)); 
-   **Heme & Endo Exam 2** is already archived and its audio already off in this PR (Sam, 2026-11-13).
+   **Heme & Endo Exam 2** is already archived and its audio already off in this PR (Sam, 2026-11-13). `main` was
+   brought in on 2026-11-14 (#361, #362, #363: the Log); anything merged after that is brought in the same way: a hub
+   change made on `main` to an old page or to `next/` goes into `hubs/<hub>/content/` and the page's settings here.
 3. **`FULL_FROM`** in `widget/pet.js` set to the merge day (Central), then `node tools/bundle/build.mjs`; commit, push.
 4. **The migrations**, through the connector, in order, each checked before the next: `migration_v54.sql`, `v55`, `v56`,
    `v57`, `v58`. v54 sets the switch time (`game_config.v2_at`) and takes everyone's baseline as it runs, so apply
    them in the same few minutes as the merge.
 5. **The answer keys**: `node tools/xp/keys.js occlusion --sql` and `node tools/xp/keys.js perio --sql`, each run through
-   the connector with the secret put in, and the count it returns checked (844 and 763, plus the retired ids).
+   the connector with the secret put in, and the count it returns checked (844 and 750 since `main`'s Perio update,
+   plus the retired ids: the tool prints both numbers).
 6. **Occlusion's episode**: `select admin_set_podcast_episode('<secret>', 'occlusion', 'midterm-review', 2688);`
 7. **The starting ideas** ([the idea board](2026-11-06-idea-board.md), "The starting ideas", and the ones from the past
    check-ins), each checked against the About page first, with `admin_post_starter_idea`.
@@ -1054,7 +1063,7 @@ is a new migration and Sam's call, never a restore.
   `tools/release/xp.js` can still test the moment of the switch); the idea board's step 7 (the 90-day delete is built:
   `migration_v58.sql`); step 4's Heme & Endo Exam 2 episode (not needed: its old page reports no minutes); an idea
   for a hub without keys (the dashboard offers only engine hubs, and a legacy hub's check-in idea goes under All hubs).
-  **Found and fixed on the way** ([the bug log](../release/bug-log.md), BUG-130 to BUG-135, and BUG-112): the cases
+  **Found and fixed on the way** ([the bug log](../release/bug-log.md), BUG-132 to BUG-135, BUG-148 and BUG-149 (logged here as 130 and 131, renumbered when `main` was brought in), and BUG-112): the cases
   check skipping Perio, the admin page's hub frames, the podcast's extractor, a leftover call that broke the dashboard.
   **New with the release:** after a merge that changes a hub's questions its answer keys are loaded again, and Ask
   Timmy's function is deployed again when it changes (both by hand for now: [the inbox](inbox.md)). Left to do is in
@@ -1114,5 +1123,19 @@ is a new migration and Sam's call, never a restore.
   crown's glint moves only its opacity: 17 to 19 ms a frame, 23 layers at rest. What was learned is in
   [motion-cost](../reference/motion-cost.md), for whoever adds the next moving picture. Not checked on a real phone:
   Sam's look at the preview is that check, and `LIFE` is the one number to change if the rest feels too quiet.
+- 2026-11-14 (Claude Code, `main` brought in, same PR). Sam: "I believe I updated the occlusion hub and the perio hub,
+  if that changes anything that you need to do before we merge and launch it. Don't merge just yet, though." Three PRs
+  had landed on `main` since the branch was cut (#361 the lessons refresh, #362 Perio's Nov 12 class and the review for
+  the final, #363 Ask Timmy on Sonnet 5.5), written for the old pages and `next/`; 30 files conflicted. Resolved by
+  hand, neither side wholesale: the hubs' content JSON is `main`'s, key for key (checked against
+  `origin/main:hubs/<hub>/next/content/`), the page settings carry `main`'s chips, banner and blurb, Special Patient
+  Care is in `archived`, both sessions' notes, decisions and log entries are kept, and two bug numbers both branches
+  had used were renumbered here (BUG-148, BUG-149). **One thing the update needed from the engine:** Perio's mock on
+  the old page now draws 3 matching items and about 15% from Sessions 1-4, which `formatMock` didn't do; it does now
+  (the box above), so switching Perio in loses nothing its final's mock had. The merge's own step list is unchanged
+  except `sw.js` (`sh-v60`); loading the answer keys at the merge already reads the content JSON, so the 22 new, 36
+  retired and the reworded questions are covered by the same step. `tools/data-fixes/2026-11-14-in-bennett.sql` is
+  #361's step ("run once, right after the PR merges"), not this PR's: a read-only look can't tell whether it ran (the
+  choice has picks either way, old or new), so it is on the list for Sam, and this session doesn't run it.
 
 ## Outcome

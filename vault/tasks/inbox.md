@@ -33,13 +33,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [x] **Sam's call: the hub trophies in the trophy case** (2026-11-13: "Each hub should get a shelf"; built in #359) (2026-11-13, from [the trophy case](done/2026-11-12-redesign-trophy-case-and-cards.md)).
   The 8 trophies each hub has (the mastery levels, every question answered, mock exams, the boss) aren't in the new case:
   they are behind its Leaderboards button, in the shared widget's panel. A shelf for them in the case, or leave them there?
-- [ ] **Heme & Endo Exam 2's retrospective and recap** (2026-11-13, from the release's PR #359): Sam had it archived and its
-  audio taken off in the PR; its retrospective (`/lessons-audit`: `tools/retro.sql`, `LESSONS.md`) and its recap on the
-  dashboard (`tools/publish-recap.js`, which writes to the live database, so after the merge) are still to do. Read the
-  check-ins as late as you can.
-- [ ] **Recaps missing from Past hubs** (2026-11-13, Sam: "There are a lot of past hubs missing from the recap card"): the
-  live site has 8 published recaps; **Special Patient Care** (its exam closes Nov 13, 11:59 pm) and **Heme & Endo Exam 2**
-  have none yet. Publish each with its retrospective. Hubs archived before recaps existed (GI Exam 1, Genetics, Fixed
+- [x] **Heme & Endo Exam 2's retrospective and recap** (2026-11-13, from the release's PR #359): done on `main` by the
+  lessons audit ([#361](https://github.com/smcmurry6-source/study-hubs/pull/361)): the retrospective is in `LESSONS.md` and
+  the recap is on the dashboard.
+- [x] **Recaps missing from Past hubs** (2026-11-13, Sam: "There are a lot of past hubs missing from the recap card"):
+  **Heme & Endo Exam 2**'s went up with its retrospective ([#361](https://github.com/smcmurry6-source/study-hubs/pull/361));
+  **Special Patient Care** gets none (Sam, 2026-11-14: "Dont worry about special patient care at all for a recap"). Hubs archived before recaps existed (GI Exam 1, Genetics, Fixed
   Pros and older) have no bank dump to draw one from: say so to Sam if he asks for them.
 - [ ] **Learn: a typed answer** (2026-11-13, idea from making Learn "more like quizlet"): Quizlet's Learn ends on written
   questions. Ours ends on recall before the choices show (Sam's call 5, 2026-11-06), because a typed answer can't be
@@ -50,6 +49,21 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   hub's own panel (`widget/v3.js`) don't open anyone's place yet (Sam, 2026-11-12: the dashboard's boards first).
 - [ ] **Sound for the hand-off and the Dark Matter unlock**, only if the redesign ever gets a sound setting (it has none; the
   scenes are silent on purpose: [the journeys](2026-11-06-redesign-progression-journeys.md)).
+- [x] **Special Patient Care's retrospective and audio** (2026-11-13, the lessons audit): ~~retrospective and recap~~ dropped (Sam,
+  2026-11-14: "Dont worry about special patient care at all for a recap"); the whole hub, audio included, came off the site
+  ([#361](https://github.com/smcmurry6-source/study-hubs/pull/361), [hub note](../hubs/special-patient-care.md)).
+
+- [x] **The bank's page size** (2026-11-13, the lessons audit; [LESSONS.md](../../LESSONS.md)'s Heme & Endo Exam 2 retrospective: 47
+  of its 61 bank users pressed "Show more" 287 times): Sam, 2026-11-14, "Show more questions in the question bank at a time": 100 a
+  page in the single-file engines (`BANK_PAGE`, was 30), 50 in the redesign's bank (`PAGE`, was 20)
+  ([#361](https://github.com/smcmurry6-source/study-hubs/pull/361)).
+- [ ] **Numbering the questions in a bank set, Sam's call** (the same check-in asked for it; Sam's 11-14 answer covered only the page
+  size): a number on each card of the current set, in the redesign's bank (`widget/hub-bank.js`) and the live engines.
+
+- [ ] **Perio's page weight is near its budget** (2026-11-14, [#362](https://github.com/smcmurry6-source/study-hubs/pull/362)): `perf.js`
+  measured the live Perio page at 1167 KB of its 1180 KB budget (`tools/release/budgets.json`) after Figs 6-8 (+38 KB gzipped), and its
+  first paint warns at 1.6 s on the slow phone (budget 1.5 s; CI passed). The next figure or big content change needs room: trim
+  what the anima blocks repeat (each figure's static SVG is drawn again by its live code), or ask Sam before raising the budget.
 
 - [ ] **A new hub's blocking time after the bundles** (2026-11-13, [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md), [#358](https://github.com/smcmurry6-source/study-hubs/pull/358)):
   on `perf.js`'s slow phone a new hub's total blocking time was 230-365 ms on `main` and is 310-540 ms with the bundles

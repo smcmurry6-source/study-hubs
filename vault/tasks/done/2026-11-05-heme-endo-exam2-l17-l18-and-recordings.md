@@ -1,11 +1,10 @@
 ---
 type: task
-status: blocked
+status: done
 hub: heme-endo-exam2
 created: 2026-11-05
 requested-by: Sam
 due: 2026-11-13
-waiting-on: the Exam 2 review (Wed 11/11)
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/310
 ---
@@ -19,23 +18,23 @@ add L17 (Pregnancy and lactation, Dr. Madison, Tue 11/10) and L18 (Estrogens and
 when their slides are posted, take Lecture A and L13-L16 from slides-only to taught as their recordings land, and
 re-rank High Likelihood from the review on Wed 11/11. **Changed 2026-11-10:** L16 is the last lecture on Exam 2 (Sam, from
 Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam 3 hub
-([carry-over task](2026-11-10-heme-endo-exam3-carry-lecture-a.md)).
+([carry-over task](../2026-11-10-heme-endo-exam3-carry-lecture-a.md)).
 
 ## Context
 
-- Hub note: [heme-endo-exam2](../hubs/heme-endo-exam2.md)
+- Hub note: [heme-endo-exam2](../../hubs/heme-endo-exam2.md)
 - Sources: Drive, "Hematology and Endocrinology" → "Exam 2" (slides, and the class recordings' transcripts). Read them;
   never commit them. Never use "Resources from D3s" (last year's study guide, deck and practice questions).
 - A new lecture or one going from slides-only to taught brings in every per-lecture rule:
-  [two-statement-and-true-false](../rules/two-statement-and-true-false.md),
-  [numbered-statements](../rules/numbered-statements.md),
-  [every-choice-gets-a-why](../rules/every-choice-gets-a-why.md),
-  [high-likelihood-topics](../rules/high-likelihood-topics.md) (topics for L17 and L18; re-rank after the review),
-  [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md) (both mp3s for every lecture whose notes change:
+  [two-statement-and-true-false](../../rules/two-statement-and-true-false.md),
+  [numbered-statements](../../rules/numbered-statements.md),
+  [every-choice-gets-a-why](../../rules/every-choice-gets-a-why.md),
+  [high-likelihood-topics](../../rules/high-likelihood-topics.md) (topics for L17 and L18; re-rank after the review),
+  [text-and-audio-never-drift](../../rules/text-and-audio-never-drift.md) (both mp3s for every lecture whose notes change:
   `python3 tools/narrate.py hubs/heme-endo-exam2/index.html --lec <id> --force`),
-  [diagram-review](../rules/diagram-review.md) (Sam said yes to all animations for this hub on 2026-11-05).
+  [diagram-review](../../rules/diagram-review.md) (Sam said yes to all animations for this hub on 2026-11-05).
 - Quiz 3 is open until Thu 11/12, 11:59 pm and the take-home until 11/15: never use either
-  ([graded-coursework](../rules/graded-coursework.md)).
+  ([graded-coursework](../../rules/graded-coursework.md)).
 - `MOCK_BLUEPRINT` and `EXAM_COUNTS` in the hub: set from Dr. Herr's count per lecture on 2026-11-10 (see the hub note).
   The counts never trim High Likelihood: a topic the review raises is added or ranked higher.
 - **The bank is kept high yield** (Sam, 2026-11-08: "803 is way too many questions"; it was cut to 339): L17 and L18 get
@@ -47,9 +46,10 @@ Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam
       `LIKELY_TOPICS`; `MOCK_BLUEPRINT` gives them questions~~ Dropped 2026-11-10: not on Exam 2 (L16 is its last lecture)
 - [x] Lecture A and L13-L16 are `status:'taught'` with notes checked against the recordings (both mp3s regenerated)
       and Exam Hints quoted from what was said (A, L13, L14 and L15 done 2026-11-08; L16 2026-11-11)
-- [ ] High Likelihood re-ranked from the 11/11 review
-- [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
-- [ ] Vault written back (hub note, decisions, this note's Outcome)
+- [x] High Likelihood re-ranked from the 11/11 review (each lecture's "Exam 2 in-class review (11/11)" topic, with the review's
+      questions and their twins: [#320](https://github.com/smcmurry6-source/study-hubs/pull/320))
+- [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`), in each of its PRs
+- [x] Vault written back (hub note, decisions, this note's Outcome)
 
 ## Log
 
@@ -68,7 +68,7 @@ Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam
 - 2026-11-08: Sam: "2 should come out along with any questions that professors say we dont need to know". `mh-2s-6`
   retired; every recording and Exam 1's de-emphasis hints checked, nothing else tested a skipped point. Do the same
   check for L16-L18 and the review. Then "That should be a standing rule" (now
-  [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)) and "803 is way too many questions. They need
+  [dont-ask-what-professors-skip](../../rules/dont-ask-what-professors-skip.md)) and "803 is way too many questions. They need
   to be higher yield": the bank was cut to 339 high-yield questions (464 ids retired), High Likelihood made selective
   (about half of each lecture), the Refresher to one question per Exam 1 topic. (Superseded by the next entry.)
 - 2026-11-08 to 11-10: Sam: "be sure the emphasized points are covered, deemphasized points are left out ... be sure
@@ -84,7 +84,7 @@ Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam
   decks' real slide order. Still to do: the same as above.
 - 2026-11-10: Lecture A is not on Exam 2 (Sam asked Dr. Herr: he forgot about it, so it will likely be on the next exam;
   "i guess save all that for exam 3"). It came out of the hub whole; the Exam 3 hub picks it up:
-  [the carry-over task](2026-11-10-heme-endo-exam3-carry-lecture-a.md). A's line under "Done when" is met by its removal.
+  [the carry-over task](../2026-11-10-heme-endo-exam3-carry-lecture-a.md). A's line under "Done when" is met by its removal.
 - 2026-11-10: Sam, from Dr. Herr: "There are 5 review, 8 for l11, 9 for l12, and 7 for the rest of the lectures. L16 is the
   last lecture on the test." `EXAM_COUNTS` and the mock follow it (High Likelihood keeps every topic: Sam, "Dont remove any
   high likelihood questions"), and L17 and L18 are dropped from this task (the first "Done when" box no longer applies; they go to the Exam 3 hub). Still to do:
@@ -100,3 +100,9 @@ Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam
   tables (a follicular versus luteal table), sequences, the `cycle` figure's FSH text, and both mp3s. His FSH at midcycle
   agrees with Dr. Herr's, so the L14/L16 conflict is closed (hub note). Still to do: the 11/11 review.
 ## Outcome
+
+Done. Exam 2 (2026-11-13) covered Lectures 11-16 and the review: L11-L16 went to taught from their recordings, the
+11/11 in-class review's 20 questions and their twins went in with a High Likelihood topic in each lecture
+([#320](https://github.com/smcmurry6-source/study-hubs/pull/320)), and Lecture A, L17 and L18 moved to the Exam 3 hub
+([the carry-over task](../2026-11-10-heme-endo-exam3-carry-lecture-a.md)). The hub archived the night of the exam; its
+retrospective is in `LESSONS.md` (the 2026-11-13 lessons refresh). Closed by that refresh's follow-up sweep, 2026-11-14.

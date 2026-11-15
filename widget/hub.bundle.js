@@ -704,7 +704,7 @@ if (STATE.ui.qlikely && !isLk(STATE.ui.qlikely)) STATE.ui.qlikely = "";
 function bankReset(){ STATE.ui.qset = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; STATE.ui.qstatus = "all"; STATE.ui.qlikely = ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; }
 var SETS = [["drill", "Daily drill"], ["misses", "Yesterday's misses"], ["weak", "Weak spots"], ["mock", "Mock exam"]];
 var FMTS = [["recall", "Recall (self-graded)"], ["2stmt", "Two statements"], ["tf", "True or false"], ["numbered", "Numbered statements"], ["which", "Which statement is true"], ["whichf", "Which statement is false"], ["except", "EXCEPT / NOT"], ["pbox", "Patient Box cases"], ["img", "Diagram questions"], ["multi", "Select all that apply"], ["match", "Matching"], ["sequence", "Put in order"]];
-var PAGE = 20, bankSearch = "";
+var PAGE = 50, bankSearch = "";
 function isFmt(q, fm){ return fm === "pbox" ? !!q.pbox : fm === "img" ? !!q.img : (fm === "multi" || fm === "match" || fm === "sequence" || fm === "recall") ? q.type === fm : q.fmt === fm; }
 function labelOf(list, k){ for (var i = 0; i < list.length; i++) if (list[i][0] === k) return list[i][1]; return k; }
 function presetOf(){ var s = parse()[1]; return SETS.some(function(x){ return x[0] === s; }) ? s : s === "missed" ? "" : ""; }
@@ -992,11 +992,19 @@ var keys = shuffled(Object.keys(by)), out = [];
 while (out.length < n && keys.some(function(k){ return by[k].length; })) keys.forEach(function(k){ if (out.length < n && by[k].length) out.push(by[k].shift()); });
 return out;
 }
-var pb = rr(all.filter(function(q){ return q.pbox && q.type === "mcq"; }), f.pbox || 0);
-var mu = rr(all.filter(function(q){ return q.type === "multi" && !q.pbox; }), f.multi || 0);
-var od = rr(all.filter(function(q){ return q.type === "sequence" && q.steps.length > 2; }), f.order || 0);
-var mc = rr(all.filter(function(q){ return q.type === "mcq" && !q.pbox; }), f.total - pb.length - mu.length - od.length);
-var order = {}, oc = {};
+function draw(qs, n){
+if (!f.midShare || !f.midThrough) return rr(qs, n);
+var mid = function(q){ var l = LBY[q.lec]; return !!l && l.num <= f.midThrough; };
+var late = rr(qs.filter(function(q){ return !mid(q); }), n - Math.round(n * f.midShare));
+return late.concat(rr(qs.filter(mid), n - late.length));
+}
+var pb = draw(all.filter(function(q){ return q.pbox && q.type === "mcq"; }), f.pbox || 0);
+var mu = draw(all.filter(function(q){ return q.type === "multi" && !q.pbox; }), f.multi || 0);
+var ma = draw(all.filter(function(q){ return q.type === "match" && q.pairs && q.pairs.length > 1; }), f.match || 0);
+var od = draw(all.filter(function(q){ return q.type === "sequence" && q.steps.length > 2; }), f.order || 0);
+var mc = draw(all.filter(function(q){ return q.type === "mcq" && !q.pbox; }), f.total - pb.length - mu.length - ma.length - od.length);
+var order = {}, oc = {}, ro = {};
+ma.forEach(function(q){ var ix = q.pairs.map(function(x, k){ return k; }); order[q.id] = shuffled(ix); ro[q.id] = shuffled(ix); });
 pb.concat(mc).forEach(function(q){ order[q.id] = choiceOrder(q); });
 mu.forEach(function(q){ order[q.id] = shuffled(q.choices.map(function(c, k){ return k; })); });
 od.forEach(function(q){
@@ -1006,7 +1014,7 @@ shuffled(q.steps.slice(0, -1).map(function(x, i){ var a = q.steps.slice(); a[i] 
 oc[q.id] = { stem: String(q.stem).replace(/^Put /, "Select the right order: ").replace(/ in order(,|\.)/, "$1"), choices: [right].concat(alts), answer: 0 };
 order[q.id] = shuffled(oc[q.id].choices.map(function(c, k){ return k; }));
 });
-STATE.mock = { ids: shuffled(pb.concat(mu, od, mc).map(function(q){ return q.id; })), t0: Date.now(), picks: {}, order: order, oc: oc, res: {}, pts: {}, submitted: false };
+STATE.mock = { ids: shuffled(pb.concat(mu, ma, od, mc).map(function(q){ return q.id; })), t0: Date.now(), picks: {}, order: order, oc: oc, ro: ro, res: {}, pts: {}, submitted: false };
 saveNow(); mockSession();
 }
 function buildMock(){
@@ -1048,7 +1056,13 @@ var need = m.ids.some(function(id){ return needsFig(QBY[id]); });
 }
 function mockList(host, el, m, total, lim){
 var F = !!mockFormat(), oc = m.oc || {}, pts = m.pts || {};
-var has = function(id){ var p = m.picks[id]; return Array.isArray(p) ? p.length > 0 : p !== undefined && p !== null; };
+var set = function(v){ return v !== undefined && v !== null; };
+var has = function(id){ var p = m.picks[id]; return Array.isArray(p) ? p.some(set) : set(p); };
+var matched = function(q, k){ var v = (Array.isArray(m.picks[q.id]) ? m.picks[q.id] : [])[k]; return set(v) && !!q.pairs[v] && q.pairs[v][1] === q.pairs[k][1]; };
+var prog = function(){
+$$("[data-prog]", host).forEach(function(p){ p.textContent = m.ids.filter(has).length + " of " + m.ids.length + " answered"; });
+$$("[data-submit][data-confirm]", host).forEach(function(s){ s.removeAttribute("data-confirm"); s.textContent = "Submit the exam"; });
+};
 var picked = m.ids.filter(has).length, correct = m.submitted ? m.ids.filter(function(id){ return m.res[id]; }).length : 0;
 var points = m.ids.reduce(function(n, id){ return n + (pts[id] || 0); }, 0), p1 = function(x){ return String(Math.round(x * 10) / 10); };
 var top = '<div class="mock-bar panel"><span class="clock num" data-clock>' + icon("clock", 18) + "0:00</span>" +
@@ -1064,6 +1078,19 @@ host.innerHTML = top + byLec;
 m.ids.forEach(function(id, i){
 var q = QBY[id]; if (!q) return;
 if (m.submitted && m.onlyMissed && m.res[id]) return;
+if (q.type === "match") {
+var mp = Array.isArray(m.picks[id]) ? m.picks[id] : [], ix = q.pairs.map(function(x, k){ return k; }), rows = (m.order && m.order[id]) || ix, opts = (m.ro && m.ro[id]) || ix, mpp = pts[id] || 0, mnone = !has(id);
+var em = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="match" data-ctx="mock" aria-labelledby="mk' + i + '"></article>');
+em.innerHTML = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="mk' + i + '">Question ' + (i + 1) + " · " + lecChip(q.lec) + '</span><span class="qc-flag">Matching · each pair is scored</span></span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(q) +
+'<div class="mk-match">' + rows.map(function(k){
+var ok = matched(q, k);
+return '<label class="mk-row' + (m.submitted ? (ok ? " is-right" : " is-wrong") : "") + '"><span class="txt">' + esc(q.pairs[k][0]) + '</span><span class="mk-pick"><select data-mock-match="' + k + '"' + (m.submitted ? " disabled" : "") + '><option value="">Choose…</option>' +
+opts.map(function(r){ return '<option value="' + r + '"' + (mp[k] === r ? " selected" : "") + ">" + esc(q.pairs[r][1]) + "</option>"; }).join("") + '</select><span class="st-ic" aria-hidden="true">' + (m.submitted ? icon(ok ? "check" : "cross", 20) : "") + "</span></span></label>"; }).join("") + "</div>" +
+(m.submitted ? '<section class="qc-result qcard-explain" data-role="explain"><p class="verdict ' + (mnone ? "no" : m.res[id] ? "ok" : mpp > 0 ? "part" : "no") + '">' + icon(m.res[id] ? "check" : mpp > 0 ? "goal" : "cross", 26) + (mnone ? "Not answered" : m.res[id] ? "Right" : mpp > 0 ? "Partly right: " + Math.round(mpp * 100) + "% credit" : "Missed") + "</p>" + figAfterHTML(q) +
+'<dl class="qc-pairs">' + q.pairs.map(function(p){ return "<div><dt>" + esc(p[0]) + "</dt><dd>" + esc(p[1]) + "</dd></div>"; }).join("") + '</dl><p class="qc-ex">' + esc(q.ex || "") + "</p></section>" : '<section class="qcard-explain" data-role="explain" hidden></section>');
+host.appendChild(em);
+return;
+}
 var o2 = oc[id], multi = q.type === "multi", choices = o2 ? o2.choices : q.choices, ans = o2 ? o2.answer : q.answer;
 var pick = id in m.picks ? m.picks[id] : null, picks = multi ? (pick || []) : [], order = (m.order && m.order[id]) || choices.map(function(c, k){ return k; });
 var none = multi ? !picks.length : pick === null, pp = pts[id] || 0;
@@ -1087,9 +1114,7 @@ var arr = Array.isArray(m.picks[id]) ? m.picks[id] : [], at = arr.indexOf(k);
 if (at > -1) arr.splice(at, 1); else arr.push(k);
 m.picks[id] = arr; b.setAttribute("aria-pressed", String(at < 0));
 } else { m.picks[id] = k; $$("[data-mock-pick]", c).forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); }); }
-saveState();
-$$("[data-prog]", host).forEach(function(p){ p.textContent = m.ids.filter(has).length + " of " + m.ids.length + " answered"; });
-$$("[data-submit][data-confirm]", host).forEach(function(s){ s.removeAttribute("data-confirm"); s.textContent = "Submit the exam"; });
+saveState(); prog();
 } else if (b.hasAttribute("data-submit")) {
 var left = m.ids.length - m.ids.filter(has).length;
 if (left > 0 && !b.getAttribute("data-confirm")) { b.setAttribute("data-confirm", "1"); b.textContent = left + " unanswered: submit anyway?"; return; }
@@ -1097,6 +1122,11 @@ m.submitted = true; m.tEnd = Date.now(); m.res = {}; m.pts = pts = {};
 var sid = mockSid(m);
 m.ids.forEach(function(id){
 var q = QBY[id]; if (!q) return;
+if (q.type === "match") {
+pts[id] = q.pairs.filter(function(x, k){ return matched(q, k); }).length / q.pairs.length; m.res[id] = pts[id] === 1;
+if (has(id)) HX.recordAnswer(q.id, q.lec, m.res[id], "mock", null, null, { session: sid });
+return;
+}
 if (q.type === "multi") {
 var pk = Array.isArray(m.picks[id]) ? m.picks[id] : [], hit = pk.filter(function(i){ return q.correct.indexOf(i) > -1; }).length;
 pts[id] = pk.length ? Math.max(0, (hit - (pk.length - hit)) / q.correct.length) : 0; m.res[id] = pts[id] === 1;
@@ -1114,6 +1144,13 @@ if (sid) window.shGame.finishSession(sid, nRight, m.ids.length);
 saveNow(); HX.paintMeters(); track("mock:submit"); drawMock(host, el); window.scrollTo(0, 0);
 } else if (b.hasAttribute("data-onlymissed")) { m.onlyMissed = !m.onlyMissed; saveState(); drawMock(host, el); }
 else if (b.hasAttribute("data-newmock")) { STATE.mock = null; saveState(); drawMock(host, el); }
+};
+host.onchange = function(e){
+var s = e.target && e.target.closest ? e.target.closest("[data-mock-match]") : null; if (!s || m.submitted) return;
+var c = s.closest(".qcard"), id = c && c.getAttribute("data-qid"), q = QBY[id]; if (!q || !q.pairs) return;
+var arr = Array.isArray(m.picks[id]) ? m.picks[id] : q.pairs.map(function(){ return null; });
+arr[+s.getAttribute("data-mock-match")] = s.value === "" ? null : +s.value; m.picks[id] = arr;
+saveState(); prog();
 };
 var clock = $("[data-clock]", host);
 function tick(){ if (!clock.isConnected) { clearInterval(mockTimer); return; } var sec = Math.floor(((m.tEnd || Date.now()) - m.t0) / 1000); clock.innerHTML = icon("clock", 18) + Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0") + " of " + Math.floor(lim / 60) + ":" + String(lim % 60).padStart(2, "0"); clock.classList.toggle("is-over", sec > lim); }

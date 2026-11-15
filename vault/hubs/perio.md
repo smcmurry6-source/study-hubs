@@ -24,8 +24,8 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
 - **Sessions** (`status`): S1-S5 taught (exempt from the format minimums, taught before the rules), S6 `preview`
   (slides only), S7 taught (Dr. Kaur), S8 taught (antibiotics from Dr. Litz's 2024 recording; host modulation and his
   dosing chart from the Nov 5 class, [task](../tasks/done/2026-11-03-perio-s8-host-modulation-class.md)), S9 taught (2026-11-10)
-  from Dr. Abou-Arraj's recorded first part (posted Nov 9) plus his slides: gingival excess, altered passive eruption,
-  esthetics and tattoos are from the slides and the guide until the live class is posted ([task](../tasks/2026-11-03-perio-s9-plastic-esthetics.md)). Any session going
+  from Dr. Abou-Arraj's recorded first part (posted Nov 9), and since 2026-11-14 from the Nov 12 live class too: gingival
+  excess, altered passive eruption and crown lengthening, the esthetic evaluation and the tattoo ([task](../tasks/done/2026-11-03-perio-s9-plastic-esthetics.md)). Any session going
   to taught needs the full set: [two-statement-and-true-false](../rules/two-statement-and-true-false.md),
   [numbered-statements](../rules/numbered-statements.md), [high-likelihood-topics](../rules/high-likelihood-topics.md).
 - **Sources:** Drive, Periodontology/hubs (class captures, sometimes as base64 `.txt`; slide PDFs; recordings). The Drive
@@ -52,6 +52,30 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   line, and one drawn case per state: `implant-19` (health that probes 5 mm, with first-year remodeling), `implant-5`
   (mucositis) and `implant-14` (peri-implantitis; risk factors, suppuration, cause), questions `pc-g1`-`g4`, `pc-h1`-`h5`,
   `pc-i1`-`i5`. If she sends anything more about the final, add it beside these.
+- **Dr. Abou-Arraj's review for the final** (the end of the Nov 12 class, in Drive with the class's capture; added
+  2026-11-14). The format: 60-65 questions, about 15% (20% at most) from S1-S4, an hour and a half that he said can be
+  two, multiple choice, multiple answers, maybe categorization, some matching, images and radiographs but no suture
+  images, few or no Patient Box cases. It is in an S1 Exam Hint, Home's chips, the hints banner and the mock's blurb
+  (`window.SH_HUB` in the page) and the mock (`mock.format` in `content/core.json`: 62 in 90 minutes, 2 Patient Box, 6
+  multiple-answer, 3 matching, 1 ordering, and `midShare` 0.15 with `midThrough` 4: `formatMock` in `widget/hub-bank.js`
+  takes about 15% of each kind from S1-S4). What he said to know
+  and to skip is an Exam Hint per session (S1-S5, S8) and a line in each session's `note`. **36 questions came out**
+  under [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md) (`retired` in
+  `tools/question-ids/perio.txt`): S2's suture techniques and suture pictures ("not techniques, but the different
+  materials... no images of suture": `q2-10`-`12`, `q2-31`, `q2-E02`, `q2-D01`-`D13`; the diagrams and the technique
+  notes stay for clinic), S3's Miller & McEntire ("I would not worry about learning the McIntyre one": `q3-03`, `05`, `06`,
+  `33`, `36`, `37`), S5's entrance widths (his email: "This will NOT be a question on the exam": `q5-01`, `q5-04`) and S8's
+  doses ("no specific, like, dosing": `q8-L10`, `L17`, `L25`, `L27`, `L45`, `L53`, `L57`-`L59`, `q8-S07`). Kept, same ids:
+  `q3-07` (now McGuire & Nunn vs Kwok & Caton), `q2-P01` and `q2-P02` (the suture choice is now PGA, a material), and the
+  questions that read a dose's meaning or a drug's use without asking the number (`q8-L11`, `q8-M03`). The chart-reading
+  recession items (`pc-c1`, `pc-c2`, `q9-P02`, `q9-P04`) stay: "I don't think I'm going to ask numbers that way" is about
+  the format, and they test the RT types he said to know.
+- **Two calls that follow his later word** (flagged to Sam in the PR): Dr. Litz said in the Nov 5 class to know his dosing
+  chart for the exam; Dr. Abou-Arraj's review a week later said not to, so Dr. Litz's hint is now a de-emphasis that
+  says it was superseded, and the chart stays in the notes and Review. And his furcation email corrects what he said at
+  the review (the maxillary buccal entrance is the narrowest, mesial and distal about the same and wider, as the notes
+  have it from Dr. Litz); its aside that the mandibular buccal entrance is the widest disagrees with Dr. Litz's slide
+  (lingual wider, kept as taught below), and since width won't be asked, the notes keep the slide.
 - **Narration:** all three levels for every session, made with `python3 tools/narrate.py perio --lec <id>
   --force` (`--text` shows what it will say; it writes the word timings for Follow along beside each mp3 too). Session 5's two mp3s were regenerated on 2026-11-12: their
   middle (minutes 5-9 of Plain English, 6-15 of As taught) no longer said what the notes say, found while making the
@@ -69,7 +93,8 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   whole dentition" and is about whether a tooth can be maintained, "meaning kept in the mouth" ("tooth retention"). So
   don't make "retention" or "per tooth" the line between them: Miller & McEntire is molars and a number, Kwok & Caton is
   stability and the whole dentition, McGuire & Nunn is maintainability. `q3-04`, `q3-08` and `q3-S03` were rewritten that
-  way (same ids); `q3-01` and `q3-05` still call McGuire & Nunn the per-tooth system, which their stems allow.
+  way (same ids); `q3-01` still calls McGuire & Nunn the per-tooth system, which its stem allows (`q3-05` was retired
+  with Miller & McEntire, 2026-11-14).
 
 ## Diagram decisions
 
@@ -96,10 +121,21 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
 - 2026-11-10: all five S9 candidates approved ("Yes to all diagrams. Merge when ready") and built in
   `tools/figures/perio/` (`cairo`, `palate`, `grafts`, `ape`, `egd`), under the S9 notes (`FIG_BY_LEC`) and in the Review
   section each one illustrates: `cairo` in `s9-recession`, `palate` and `grafts` in `grafts`, `ape` in `ape`, `egd` in
-  `esthetics`. Figs 4 and 5 (altered passive eruption, the gummy smile) follow the slides and the review guide: check
-  them against the live class with the rest of that part of S9. Their positions in mm (where the margin, MGJ and crest
-  sit; how far a longer lower third moves the teeth) are illustrative, and their labels give only the notes' relations
-  and numbers. Each cites its outside sources in "What this shows, and what's simplified".
+  `esthetics`. Figs 4 and 5 (altered passive eruption, the gummy smile) were checked against the live class on
+  2026-11-14: Fig 4's subcategory labels now give A as 1.5-2 mm and B as within about 1 mm, and both captions cite the
+  class. Their positions in mm (where the margin, MGJ and crest sit; how far a longer lower third moves the teeth) are
+  illustrative, and their labels give only the notes' relations and numbers. Each cites its outside sources in "What
+  this shows, and what's simplified".
+- 2026-11-14: "Yes to all figures and anima" for the Nov 12 live class: three more S9 figures, built in
+  `tools/figures/perio/` and listed after `egd` in `FIG_BY_LEC`. Fig 6 `excess` (pseudopocket or enlargement: Fig 4's
+  incisor section with a probe, gingivitis or drug-induced enlargement, as found, after hygiene and scaling or after a
+  gingivectomy; in Review's `s9-excess`). Fig 7 `clsteps` (crown lengthening step by step in Type 1B, as in Patient 1:
+  sound to bone, trim the gingiva, take off as much bone, or a gingivectomy alone that grows back; in Review's `ape`).
+  Fig 8 `smile` (the esthetic checklist from the front: smile line with a lip slider, gingival line, zeniths and
+  proportions, for an ideal smile and Patient 1 before and after crown lengthening; in Review's `esthetics`, before
+  `egd`). `excess` and `clsteps` import Fig 4's section helpers from `ape.mjs` (exported for them). Patient 1's numbers
+  come from the notes (#7 the reference, laterals 1 mm apical before and 1 mm coronal after, 2 mm for 2 mm on the
+  centrals); how far #6 and #11 sat, the papillae and the lips are illustrative.
 
 ## On the engine (since the redesign's release)
 
@@ -119,8 +155,9 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/2026-11-05-r
   Patient Box rows before the stem, a multi's keys: `core.exportCase`).
 - The engine learned, gated to the hubs that have them: **recall cards** (reveal, then "I got it" / "I missed it"),
   **case links** ("In the notes", `shCases.refHTML`), a lecture's **note** under its title, **HTML review sections**, and the
-  **exam-format mock** (`EXAM_FORMAT`: 46 in 80 minutes, 5 Patient Box, 5 multiple-answer with partial credit, 1 ordering,
-  points per session). Its arcade (`content/arcade.js`, with `PERIO_SKIN`) is the old page's, wrapped like the others';
+  **exam-format mock** (`mock.format` in `core.json`, since 2026-11-14 the final's: 62 in 90 minutes, 2 Patient Box, 6
+  multiple-answer with partial credit, 3 matching scored pair by pair, 1 ordering, about 15% of each kind from S1-S4
+  (`midShare`, `midThrough`), points per session). Its arcade (`content/arcade.js`, with `PERIO_SKIN`) is the old page's, wrapped like the others';
   its `start` / `stop` are mapped to the engine's `startGame` / `stopAll` (`--ar-*` colors ending in `--ar-lilac`; Bungee,
   which the page doesn't load, so it falls back to Arial Black).
 - `window.SH_HUB` in the page holds the hub's own words (Home's final card and chips, the hints banner, the mock's blurb,
@@ -141,16 +178,15 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/2026-11-05-r
 
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
-- [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md) (still no recording in Drive, 2026-11-10) ·
-  [S9](../tasks/2026-11-03-perio-s9-plastic-esthetics.md): the live class's part (gingival excess, abnormal color),
-  and a check of Figs 4 and 5 against it.
+- [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md) (still no recording in Drive, 2026-11-14).
 - S9's two sources differ on recession prevalence (the recording vs the slide's 88% / 50%) and on ADM (a slide says
   comparable or superior to autografts, the exam-review guide says it doesn't work as well): the notes give both and
   no question turns on either. S9's drawn cases, modeled on two of his recorded cases, are `no-kg-24` and
   `recession-11` in `PCASES`.
 - S8's dosing chart (the last table in Dr. Litz's slides, which he said to know for the exam) differs from his
   drug-by-drug slides for clindamycin (qid × 10 days vs tid × 7), doxycycline (a double first-day dose) and Augmentin
-  (250 or 500 mg tid vs 500 or 875 mg): the notes give both and no question turns on the difference. Its meal-timing
+  (250 or 500 mg tid vs 500 or 875 mg): the notes give both and no question turns on the difference. Since 2026-11-14
+  the doses aren't on the final at all (Dr. Abou-Arraj's review), and the dose questions are retired. Its meal-timing
   column couldn't be read reliably from the PDF text, so it isn't in the hub.
 
 History: grep `perio` in "Recent major changes" (`DEPLOY_NOTES.md`).

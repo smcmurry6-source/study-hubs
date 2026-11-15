@@ -166,7 +166,7 @@ const base = { visitor: "visitor-1", hub: HUB, text: "What does this paragraph m
   const f = db.calls.finish[0];
   ok(f.p_cites_ok === 1 && f.p_cites_bad === 0 && f.p_kind === "answer" && f.p_sent === p.messages[0].content && typeof f.p_raw === "string" && JSON.parse(f.p_raw).kind === "answer",
     "timmy_finish gets the kind, the checked quotes, the exact turn sent and the model's own text");
-  ok(Math.abs(f.p_cost - (1200 * 4 + 300 * 20 + 76000 * 0.2) / 1e6) < 1e-9, `the cost estimate (${f.p_cost})`);
+  { const P = T.PRICES[T.MODEL]; ok(Math.abs(f.p_cost - (1200 * P.in + 300 * P.out + 76000 * P.read) / 1e6) < 1e-9, `the cost estimate at ${T.MODEL}'s prices (${f.p_cost})`); }
   eq(db.calls.begin[0].p_context.view, "compendium/notes", "the context saved with the question");
   ok(!JSON.stringify(db.calls.begin[0].p_context).includes(base.text), "the saved context doesn't repeat the question's words");
 }

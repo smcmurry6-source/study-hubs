@@ -337,7 +337,7 @@ const FORMAT_MIN = { '2stmt': 3, tf: 5, numbered: 2 };
    needs at least one of each. Hubs archived before the rule are exempt, and so are the lectures already taught then
    (Occlusion's midterm lectures, Heme & Endo Exam 2's Exam 1 Refresher, Perio's sessions through Session 9). */
 const WHICH_MIN = { which: 1, whichf: 1 };
-const WHICH_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3', 'heme-endo-exam1', 'pcd-implants-exam1', 'special-patient-care']);
+const WHICH_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3', 'heme-endo-exam1', 'pcd-implants-exam1']);
 const WHICH_GRANDFATHERED = new Set(['occlusion:review', 'occlusion:anatomy', 'occlusion:function', 'occlusion:concepts', 'occlusion:applying',
   'heme-endo-exam2:refresh', 'perio:diagnosis-tx-planning', 'perio:incisions-flaps-sutures', 'perio:risk-assessment', 'perio:phase1-therapy',
   'perio:resective-furcation', 'perio:implants-perio', 'perio:antibiotics-host-mod', 'perio:perio-plastic-esthetics']);
@@ -426,7 +426,7 @@ function lint(hub, A){
   });
   if (!LIKELY_EXEMPT.has(hub)) {
     const T = A.LIKELY_TOPICS;
-    if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from special-patient-care)`);
+    if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from occlusion)`);
     else {
       const byId = new Map(Q.map(q => [q.id, q]));
       T.forEach(t => (t.ids || []).forEach(id => { const q = byId.get(id);
@@ -653,8 +653,14 @@ function lint(hub, A){
         route.fulfill({ response: r, body: h });
       });
       await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);
-      // a hub whose last exam has passed opens "This hub is archived" over the page; close it like a student would
-      await page.click(".sh-archived-stay", { timeout: 1000 }).catch(() => {});
+      // a hub whose last exam has passed opens "This hub is archived" over the page; close it like a student would. It waits
+      // for the database's bootstrap (up to 3 s, widget/v3.js), so on an archived hub wait for it rather than try once
+      const archivedNow = await page.evaluate(() => { const E = window.SH_EXPORT || {}; let last = null;
+        [...(E.exams || []), ...(E.archiveOn && E.archiveOn.date ? [Object.assign({}, E.archiveOn, { archiveHour: E.archiveOn.hour })] : [])].forEach(x => {
+          const p = String((x && x.date) || '').split('-').map(Number); if (p.length !== 3 || !p[0]) return;
+          const d = new Date(p[0], p[1] - 1, p[2], x.archiveHour != null ? x.archiveHour : 22); if (!last || d > last) last = d; });
+        return !!(last && new Date() >= last); }).catch(() => false);
+      await page.click(".sh-archived-stay", { timeout: archivedNow ? 5000 : 1000 }).catch(() => {});
       if (!vp.isMobile) { const A = await page.evaluate(() => window.__CI); if (A) lint(hub, A); else problems.push(`${hub}: could not read its question data (is window.SH_EXPORT still set at the end of the script?)`); }
       const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
       if (liveBundles.length || await page.evaluate(() => !!window.SH_BUNDLE)) problems.push(`${hub} (${label}): an old single-file hub loaded a bundle (${liveBundles.join(', ') || 'window.SH_BUNDLE'}); only the dashboard and the engine's hubs do`);
