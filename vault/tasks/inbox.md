@@ -116,8 +116,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   choice 1's count to the new version's picks from `question_events` (a plain delete would also drop the picks made since the change).
 - [x] **Numbering the questions in a bank set, Sam's call** (the same check-in asked for it; Sam's 11-14 answer covered only the page
   size): a number on each card of the current set, in the redesign's bank (`widget/hub-bank.js`) and the live engines. Sam, 2026-11-15:
-  "Lets implement the numbering", then "intervals of 100": the bank in sets of 100, "Question 12 of 100" on every card of the
-  bank, its sets and the mock. The single-file engines
+  "Lets implement the numbering", then "intervals of 100", then "50/100/200/all": At a time in the panel, the bank in sets of that
+  size, "Question 12 of 100" on every card of the bank, its sets and the mock. The single-file engines
   weren't touched: every hub on one is archived ([#373](https://github.com/smcmurry6-source/study-hubs/pull/373)).
 
 - [ ] **Perio's page weight is near its budget** (2026-11-14, [#362](https://github.com/smcmurry6-source/study-hubs/pull/362)): `perf.js`

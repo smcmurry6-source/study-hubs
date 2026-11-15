@@ -247,7 +247,11 @@
   function bankReset(){ STATE.ui.qset = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; STATE.ui.qstatus = "all"; STATE.ui.qlikely = ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; }
   var SETS = [["drill", "Daily drill"], ["misses", "Yesterday's misses"], ["weak", "Weak spots"], ["mock", "Mock exam"]];
   var FMTS = [["recall", "Recall (self-graded)"], ["2stmt", "Two statements"], ["tf", "True or false"], ["numbered", "Numbered statements"], ["which", "Which statement is true"], ["whichf", "Which statement is false"], ["except", "EXCEPT / NOT"], ["pbox", "Patient Box cases"], ["img", "Diagram questions"], ["multi", "Select all that apply"], ["match", "Matching"], ["sequence", "Put in order"]];
-  var PAGE = 50, SET = 100, bankSearch = "";
+  var PAGE = 50, bankSearch = "";
+  /* how many questions at a time (Sam, 2026-11-15: "an option by the filters with how many questions to show at a time.
+     50/100/200/all"), STATE.ui.qsize; 100 to start, as Sam first asked ("intervals of 100") */
+  var SIZES = [[50, "50"], [100, "100"], [200, "200"], ["all", "All"]];
+  function qsize(){ var v = STATE.ui.qsize; return v === 50 || v === 100 || v === 200 || v === "all" ? v : 100; }
   function isFmt(q, fm){ return fm === "pbox" ? !!q.pbox : fm === "img" ? !!q.img : (fm === "multi" || fm === "match" || fm === "sequence" || fm === "recall") ? q.type === fm : q.fmt === fm; }
   function labelOf(list, k){ for (var i = 0; i < list.length; i++) if (list[i][0] === k) return list[i][1]; return k; }
   function presetOf(){ var s = parse()[1]; return SETS.some(function(x){ return x[0] === s; }) ? s : s === "missed" ? "" : ""; }
@@ -365,7 +369,11 @@
     });
   }
   /* the list the panel picked, shown the way the toggle says */
-  function show(){ if (qview() === "questions") { openSet(LIST, firstSet(LIST)); keepSet(LIST); page(); } else study(); }
+  function show(){
+    if (qview() !== "questions") { study(); return; }
+    var z = qsize(); LIST.size = z === "all" ? Math.max(1, setTotal(LIST)) : z;
+    openSet(LIST, firstSet(LIST)); keepSet(LIST); page();
+  }
   function panelHTML(preset){
     var picked = lecIds(), sum = lecSummary(picked);
     normShow();
@@ -387,7 +395,8 @@
       '<div class="qbar-row chips"><span class="lab">Show</span><span class="chipset">' + SHOW.map(function(x){ return showChip(x[0], x[1]); }).join("") + "</span></div>" +
       '<div class="qbar-row chips only"><span class="lab">Only</span><span class="chipset" role="group" aria-label="Only">' + LIKELY.map(function(x){ return lkChip(x[0], x[1]); }).join("") + "</span></div>" +
       '<div class="qbar-row chips"><span class="lab">Sets</span><span class="chipset">' + SETS.map(function(x){ return setChip(x[0], x[1]); }).join("") + "</span></div>" +
-      '<div class="qbar-row">' + (qview() === "questions" ? '<span class="lab">Order</span><span class="seg" role="group" aria-label="Order"><button type="button" data-order="in" aria-pressed="' + (STATE.ui.qorder !== "random") + '">In order</button><button type="button" data-order="random" aria-pressed="' + (STATE.ui.qorder === "random") + '">' + icon("shuffle", 16) + "Random</button></span>" : "") +
+      '<div class="qbar-row">' + (qview() === "questions" ? '<span class="lab">Order</span><span class="seg" role="group" aria-label="Order"><button type="button" data-order="in" aria-pressed="' + (STATE.ui.qorder !== "random") + '">In order</button><button type="button" data-order="random" aria-pressed="' + (STATE.ui.qorder === "random") + '">' + icon("shuffle", 16) + "Random</button></span>" +
+          '<span class="lab" id="qzL">At a time</span><span class="seg seg-size" role="group" aria-labelledby="qzL">' + SIZES.map(function(x){ return '<button type="button" data-qsize="' + x[0] + '" aria-pressed="' + (qsize() === x[0]) + '"' + (x[0] === "all" ? ' aria-label="All at once"' : ' aria-label="' + x[1] + ' at a time"') + ">" + x[1] + "</button>"; }).join("") + "</span>" : "") +
         '<details class="morefil"' + (STATE.ui.qmore ? " open" : "") + '><summary class="btn btn-text">' + icon("filter", 16) + "More filters" + (more ? ' <span class="badge num">' + more + " on</span>" : "") + "</summary>" +
         '<div class="morefil-body"><p class="lab">Question type</p><span class="chipset">' + [["all", "Any type"]].concat(fmts).map(function(f){ var n = f[0] === "all" ? "" : ' <span class="n num">' + filtered({ fm: f[0] }).length + "</span>"; return '<button class="chip" type="button" data-fmt="' + f[0] + '" aria-pressed="' + ((STATE.ui.qfmt || "all") === f[0]) + '">' + esc(f[1]) + n + "</button>"; }).join("") + "</span>" +
         '<p class="lab">Where it\'s from</p><span class="chipset">' + [["all", "Anywhere"]].concat(srcs.map(function(k){ return [k, HX.CORE.srcLabel[k]]; })).map(function(f){ return '<button class="chip" type="button" data-src="' + esc(f[0]) + '" aria-pressed="' + ((STATE.ui.qsrc || "all") === f[0]) + '">' + esc(f[1]) + "</button>"; }).join("") + "</span></div></details></div>" +
@@ -405,6 +414,7 @@
     $$("[data-show]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qstatus = b.getAttribute("data-show"); redraw("show=" + STATE.ui.qstatus); }); });
     $$("[data-lk]", el).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-lk"); setLk(!preset && STATE.ui.qlikely === k ? "" : k); redraw("show=" + (STATE.ui.qlikely || k + "-off")); }); });
     $$("[data-order]", el).forEach(function(b){ b.addEventListener("click", function(){ var o = b.getAttribute("data-order"); if (o === "random") STATE.ui.qseed = Math.floor(Math.random() * 2e9) + 1; STATE.ui.qorder = o; redraw("order=" + o); }); });
+    $$("[data-qsize]", el).forEach(function(b){ b.addEventListener("click", function(){ var v = b.getAttribute("data-qsize"); STATE.ui.qsize = v === "all" ? "all" : +v; redraw("size=" + v); }); });
     $$("[data-fmt]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qfmt = b.getAttribute("data-fmt"); STATE.ui.qmore = 1; redraw("type=" + STATE.ui.qfmt); }); });
     $$("[data-src]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qsrc = b.getAttribute("data-src"); STATE.ui.qmore = 1; redraw("src=" + STATE.ui.qsrc); }); });
     $$("[data-set]", el).forEach(function(a){ a.addEventListener("click", function(){ track("bank:set=" + a.getAttribute("data-set")); }); });
@@ -423,8 +433,8 @@
   function fill(el, preset){
     var host = $("#qlist", el), sumEl = $(".qsum", el);
     /* base: what the list leaves out at its start, counted in the cards' numbers (page()): the drill's ones done today, so
-       its first card left is "Question 6 of 20". set, shown, end: the set of 100 on screen and how far into it the cards go */
-    host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0, base: 0, set: 0, end: 0 };
+       its first card left is "Question 6 of 20". size, set, shown, end: how many a set holds (qsize()), the set on screen and how far into it the cards go */
+    host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0, base: 0, set: 0, end: 0, size: 100 };
     if (preset === "drill") {
       sumEl.innerHTML = '<p class="note">Picking today\'s questions…</p>';
       whenWidget("shDrill", function(D){
@@ -494,29 +504,29 @@
   }
   function emptyHTML(t, p, act){ return '<div class="empty panel"><h2>' + esc(t) + "</h2><p>" + esc(p) + "</p>" + (act || "") + "</div>"; }
   function wireEmpty(el){ $$("[data-showset]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qstatus = a.getAttribute("data-showset"); STATE.ui.qlikely = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; saveState(); }); }); }
-  /* A list is shown a set of 100 at a time (Sam, 2026-11-15: "I want the questions to be shown in intervals of 100 unless
-     there are less questions than that in the filter. Showing all 844 feels unmanageable"), each card numbered in its set:
-     "Question 12 of 100", or of what a shorter set or list has. Inside a set the cards come fifty at a time and the next
+  /* A list is shown a set at a time (Sam, 2026-11-15: "I want the questions to be shown in intervals of 100 unless there are
+     less questions than that in the filter. Showing all 844 feels unmanageable", then 50, 100, 200 or All by the filters:
+     qsize()), each card numbered in its set: "Question 12 of 100", or of what a shorter set or list has; All is one set. Inside a set the cards come fifty at a time and the next
      fifty load by themselves as you reach them (Sam, 2026-11-14); the next set waits for its button at the end of the set,
      or the picker above the list (setsBar). The bank keeps its set while its filters stay the same (STATE.ui.qpage), except
      Not answered yet and Missed last time, which shrink as you answer and so start again at their first set. */
   var io = null;
   function setTotal(L){ return L.base + L.items.length; }
-  function setsOf(L){ return Math.max(1, Math.ceil(setTotal(L) / SET)); }
-  function setSize(L, k){ return Math.min(SET, setTotal(L) - k * SET); }
+  function setsOf(L){ return Math.max(1, Math.ceil(setTotal(L) / L.size)); }
+  function setSize(L, k){ return Math.min(L.size, setTotal(L) - k * L.size); }
   function setKey(){
     var st = STATE.ui.qstatus || "all";
     return st === "unseen" || st === "missed" ? "" : JSON.stringify([STATE.ui.qlec, st, STATE.ui.qlikely || "", STATE.ui.qfmt || "all", STATE.ui.qsrc || "all", STATE.ui.qorder === "random" ? STATE.ui.qseed || 1 : 0, bankSearch.trim()]);
   }
   function firstSet(L){
     var last = setsOf(L) - 1;
-    if (L.ctx === "drill") return Math.min(Math.floor(L.base / SET), last);
+    if (L.ctx === "drill") return Math.min(Math.floor(L.base / L.size), last);
     var p = STATE.ui.qpage, k = L.ctx === "bank" ? setKey() : "";
-    return k && p && p.k === k ? Math.min(Math.max(0, p.n | 0), last) : 0;
+    return k && p && p.k === k ? Math.min(Math.floor(Math.max(0, p.at | 0) / L.size), last) : 0;
   }
-  function keepSet(L){ if (L.ctx !== "bank") return; var k = setKey(); STATE.ui.qpage = k ? { k: k, n: L.set } : null; saveState(); }
+  function keepSet(L){ if (L.ctx !== "bank") return; var k = setKey(); STATE.ui.qpage = k ? { k: k, at: L.set * L.size } : null; saveState(); }
   function openSet(L, k){
-    L.set = k; L.shown = Math.max(0, k * SET - L.base); L.end = Math.min(L.items.length, (k + 1) * SET - L.base);
+    L.set = k; L.shown = Math.max(0, k * L.size - L.base); L.end = Math.min(L.items.length, (k + 1) * L.size - L.base);
     if (io) io.disconnect();
     L.host.innerHTML = "";
     setsBar(L);
@@ -526,11 +536,11 @@
     var nav = $(".qsets", L.el); if (!nav) return;
     var n = setsOf(L), T = setTotal(L), k = L.set;
     if (n < 2) { nav.hidden = true; nav.innerHTML = ""; return; }
-    var range = function(j){ return (j * SET + 1) + "–" + Math.min(T, (j + 1) * SET); };
+    var range = function(j){ return (j * L.size + 1) + "–" + Math.min(T, (j + 1) * L.size); };
     var opts = []; for (var j = 0; j < n; j++) opts.push('<option value="' + j + '"' + (j === k ? " selected" : "") + ">" + range(j) + "</option>");
     nav.innerHTML = '<span class="lab" id="qsL">Questions</span><span class="qsets-pick"><select data-setpick aria-labelledby="qsL qsO">' + opts.join("") + '</select><span class="note num" id="qsO">of ' + T + "</span></span>" +
       '<span class="seg qsets-step"><button type="button" data-setstep="-1"' + (k ? "" : " disabled") + ">" + icon("chevron", 16, "flip") + "Previous</button>" +
-      '<button type="button" data-setstep="1"' + (k + 1 < n ? "" : " disabled") + ">Next " + (k + 1 < n ? setSize(L, k + 1) : SET) + icon("chevron", 16) + "</button></span>";
+      '<button type="button" data-setstep="1"' + (k + 1 < n ? "" : " disabled") + ">Next " + (k + 1 < n ? setSize(L, k + 1) : L.size) + icon("chevron", 16) + "</button></span>";
     nav.hidden = false;
     nav.onchange = function(e){ var sel = e.target.closest && e.target.closest("[data-setpick]"); if (sel) toSet(L, +sel.value, "pick"); };
     nav.onclick = function(e){ var b = e.target.closest("[data-setstep]"); if (b && !b.disabled) { var d = +b.getAttribute("data-setstep"); toSet(L, L.set + d, d > 0 ? "next" : "prev"); } };
@@ -555,7 +565,7 @@
     (next.some(needsFig) ? needFigures() : Promise.resolve()).then(function(){
       if (LIST !== L || !L.host.isConnected || L.set !== k || L.shown !== at) return;
       var old = $(".sentinel", L.host); if (old) old.remove();
-      var n0 = k * SET - L.base, of = setSize(L, k);
+      var n0 = k * L.size - L.base, of = setSize(L, k);
       next.forEach(function(q, i){ L.host.appendChild(card(q, { ctx: L.ctx, note: L.notes[q.id], onAnswer: onBankAnswer, num: at + i - n0 + 1, of: of })); });
       L.shown += next.length;
       /* a new set: back to the top of the list, and keyboard focus to its first card */
@@ -567,7 +577,7 @@
         if ("IntersectionObserver" in window) { if (io) io.disconnect(); io = new IntersectionObserver(function(es){ if (es.some(function(e){ return e.isIntersecting; })) { io.disconnect(); page(); } }, { rootMargin: "600px 0px" }); io.observe(s); }
       } else if (k + 1 < setsOf(L)) {
         /* the end of a set: the next one waits for this button (or the picker above) */
-        var T = setTotal(L), e = h('<div class="qset-end panel"><p class="sumline">That\'s questions <b class="num">' + (k * SET + 1) + "–" + Math.min(T, (k + 1) * SET) + "</b> of " + T + '.</p><button class="btn btn-primary" type="button" data-setnext>Next ' + pl(setSize(L, k + 1), "question") + icon("chevron", 18) + "</button></div>");
+        var T = setTotal(L), e = h('<div class="qset-end panel"><p class="sumline">That\'s questions <b class="num">' + (k * L.size + 1) + "–" + Math.min(T, (k + 1) * L.size) + "</b> of " + T + '.</p><button class="btn btn-primary" type="button" data-setnext>Next ' + pl(setSize(L, k + 1), "question") + icon("chevron", 18) + "</button></div>");
         $("[data-setnext]", e).addEventListener("click", function(){ toSet(L, k + 1, "end"); });
         L.host.appendChild(e);
       } else if (L.ctx === "bank") L.host.appendChild(h('<p class="note end">That\'s all ' + L.items.length + " for these filters.</p>"));
