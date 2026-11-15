@@ -15,10 +15,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `node tools/timmy/deploy.mjs` (needs `SUPABASE_ACCESS_TOKEN`). #366's session didn't, because its permission check stopped
   the deploy; it waits for Sam's OK. Until then, asked about Timmy Time, Ask Timmy doesn't list the Occlusion final's episode.
   Done on Sam's OK: version 5 (#369).
-- [ ] **After the Perio bank audit merges** (2026-11-15, [its note](done/2026-11-15-perio-bank-audit.md)): load Perio's
+- [x] **After the Perio bank audit merges** (2026-11-15, [its note](done/2026-11-15-perio-bank-audit.md)): load Perio's
   answer keys in the same sitting (`node tools/xp/keys.js perio --load`: 670 questions, 103 retired, 23 new, 263
   edited) and log the changelog line (`log_changelog`). Until the keys load, the new questions earn no XP and edited
-  keys grade against the old ones.
+  keys grade against the old ones. Done at the merge of #371: 670 loaded, 103 retired, the changelog logged.
 - [x] **Sam's call: notes the Perio bank audit flagged** (2026-11-15, the list in [its note](done/2026-11-15-perio-bank-audit.md)'s
   Outcome, "For Sam"). Eight spots in the S1-S8 notes that disagree with each other or with current teaching (S2's
   chromic gut, S3's "#14", S6's contained defect...). No question turns on any; a fix means narrating that session
