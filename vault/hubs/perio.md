@@ -82,7 +82,16 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   word timings ([narrate-with-kokoro](../how-to/narrate-with-kokoro.md)). **High yield** (the third level) is
   narrated too, since 2026-11-12: `audio/<id>-hy.mp3` for all nine sessions, made from `content/notes.json`. It changes
   whenever a session's notes, predicted topics, hints or questions do, so a question edit can mean recording that session's
-  High yield again in the same PR: the smoke lint says which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)); **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
+  High yield again in the same PR: the smoke lint says which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)).
+- **Timmy Time** (since 2026-11-15, for the final; Perio's first episode): `audio/timmy-time.mp3`, its script
+  `tools/podcast/perio/script.md`, registered in `content/core.json`'s `podcast` (id `final-review`, chapters, the lore
+  comments in `fans`) and `hubs.js`. It follows the final's split (S1-S4 about a sixth of it), leaves out what the Nov 12
+  review said to skip (suture techniques, Miller & McEntire, entrance widths, doses) and quotes the hints word for word,
+  so **a change to the notes or hints it covers means fixing the script and rebuilding the episode in the same PR**
+  (`/podcast`, [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)). After its merge the server needs
+  `admin_set_podcast_episode('<admin secret>', 'perio', 'final-review', <seconds>)` for listening to earn XP. At archiving it
+  comes off with the narration ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)).
+- **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
   (`img/clinic-escape.webp`).
 - **Kept as taught** after an outside fact check (2026-10-21), so don't "fix" them: molar-area CTG harvest, Kwok & Caton
   whole-dentition prognosis, stage regression only by regenerating the defect, clinic piezo can't root plane, lingual
@@ -161,8 +170,8 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/2026-11-05-r
   its `start` / `stop` are mapped to the engine's `startGame` / `stopAll` (`--ar-*` colors ending in `--ar-lilac`; Bungee,
   which the page doesn't load, so it falls back to Arial Black).
 - `window.SH_HUB` in the page holds the hub's own words (Home's final card and chips, the hints banner, the mock's blurb,
-  the arcade's games with their current names, Pocket Showdown first). Perio has no Timmy Time episode, so More has no
-  Timmy tile.
+  the arcade's games with their current names, Pocket Showdown first). Its Timmy Time episode is `content/core.json`'s
+  `podcast` ("Timmy Time" above), so Home has the Timmy Time quick link and More its tile.
 - Its text color is a deeper pink than its art's ink (`#9e3a60`, 5.1:1 on its light pink; the ink is 4.05:1), in `widget/hub.css`.
 - Its art: tint `#b4466f`, emblem and masthead (phase 0), and the arcade lobby drawings (`tools/figures/site/arcade.mjs`,
   `pBoard()` to `pCrusher()`, built into `widget/hub-art/perio.js`). Sam approved five on 2026-11-11 ("the other drawings

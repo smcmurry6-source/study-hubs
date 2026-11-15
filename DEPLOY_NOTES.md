@@ -32,6 +32,32 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-15 (Timmy Time: the Perio final episode, Claude Code)** — Sam: "Podcast for perio final. Replace the midterm
+  with it." Perio never had an episode, so this is its first, for the final (Thu Nov 19); Occlusion's midterm episode
+  stays (Sam's answer, [decisions](vault/decisions.md)). A 49-minute (49.1) review: `hubs/perio/audio/timmy-time.mp3`
+  (35 MB, -16.4 LUFS, 96 kbps), script `tools/podcast/perio/script.md`, from the hub's notes (As taught), Exam Hints (every
+  professor quote word for word; Dr. Kaur's final focus as a paraphrase, as the hub has it), the cram sheet, the High
+  Likelihood topics and LESSONS.md's live signals (the select-all on what SRP aims for, the closest furcation entrance
+  mixed up with the narrowest). 13 chapters: S1-S3, S4 (with the instruments, in for the final), furcations, resective
+  surgery, regeneration, implants (health, mucositis and peri-implantitis read case by case), antibiotics, host
+  modulation, recession and grafts, gingival excess with crown lengthening and the esthetic norms, a 32-question
+  lightning round and the sign-off. S1-S4 take 16% of it, as the final's split does. Left out on the Nov 12 review's word:
+  suture techniques and pictures, Miller & McEntire, entrance widths and the doses (it says Dr. Litz's "know the chart" was
+  superseded). Lore (Sam took all four): Timmy's own furcation (a lower first molar's two entrances, about 2.5 mm down, and
+  its mesial root concavity), thirty-one stages himself with a toothpick ("You're not staged. You're anxious."), may have
+  an enamel projection and wasn't Dr. Kaur's thirty-one, the toothbrush's big episode, and the pie after the release.
+  Two lore comments (rolled): thirty-one and the toothbrush by the door. `lexicon.json` gains 43 entries (gingiva,
+  gingival, gingivitis, gingivectomy and mucogingival, which espeak read with a hard g; Kaur, Geurs, Caton, McGuire,
+  Salud, debride, digoxin, the cyclines, PerioChip, Periostat, Arestin, and `C-A-L`, `P-G-A`, `E-D-T-A`, `F-D-A`,
+  `D-F-D-B-A`, whose final A read "uh"; narration made from now on gets them too). Hub: `content/core.json`'s `podcast`
+  (id `final-review`), so Home's Timmy Time quick link and More's tile appear; dashboard card gets `podcast` and "Timmy
+  Time" in modes; About page's episode list, `supabase/functions/timmy/site.json`, `LORE.md` and the hub note updated.
+  The title is "Perio final: ..." ("Periodontology" broke mid-word on Home's phone tile). Shared fix with it
+  ([BUG-151](vault/release/bug-log.md)): the small line on a hub's Timmy Time tiles (Home and More, `widget/hub.css`) is full
+  white, since 86-88% white on Perio's pink failed the 4.5:1 contrast check.
+  **After the merge:** `admin_set_podcast_episode(..., 'perio', 'final-review', 2948)` so listening earns XP, and deploy the
+  `timmy` function again for the new site help.
+
 - **The redesign is live (#359 merged 2026-11-14, about 6:46 pm Central; Claude Code)** — Sam: "Merge". The dashboard,
   Occlusion and Perio are on the redesign at their old addresses (`d86f134`); Heme & Endo Exam 2 keeps its old page.
   Done at the merge, in the release note's order ([the release](vault/tasks/done/2026-11-06-redesign-release.md); its Log's

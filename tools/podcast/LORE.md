@@ -44,11 +44,23 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   On Exam Two, the diseases he said he has (Heme & Endo Exam 2), he bought a **glucose meter** after the diabetes lecture
   and checks himself after every meal, "not his meal, yours" ("You don't have a pancreas."). His glucose is normal; he
   credits metformin, which he isn't on (and which wouldn't lower a normal glucose anyway: Dr. Fasinu).
+  After the diagnosis lecture (Perio final) he **staged himself**: probed with a toothpick, found a four and announced Stage
+  four, Grade C ("A toothpick is not a probe. You have no bone loss. And a four is not a stage. You're not staged. You're
+  anxious."; he doesn't smoke "and you don't have a pancreas", so no Grade C either). By the sign-off he was "Stage zero"
+  ("That's not a stage either, thirty-one. It's called health."). He asked whether he has a cervical enamel projection:
+  as a lower second molar he is "the likelier of the two of us" (true: they're more common on mandibular molars, about
+  30%, and on second molars). And Dr. Kaur's number thirty-one implant case, heard through the wall, "was a different
+  number thirty-one."
 - **The rabbit down the hill** (new in the implants episode's comments): offended that Timmy called rabbits "showy" for
   teeth that never stop growing (true: rabbit teeth grow all their lives and are worn down by chewing). Proud that
   osseointegration was found in rabbit bone (Brånemark, 1952).
 - **The toothbrush by the front door** (canon since Occlusion) talks now, in the comments: feels left out of every episode,
   and reminds everyone that implants need cleaning too.
+  **Its big episode was the Perio final**: Phase one starts with oral hygiene instruction, which Dr. Litz called "arguably
+  the most important appointment", and "we clean their teeth two to four times a year; they clean them seven hundred to
+  eight hundred" (it asked Timmy to say it twice; he said it once, and its own summary, "seven hundred brushings at home
+  beat four cleanings in the chair", is "near enough"). Nobody has told it that toothbrushing is the most common
+  traumatic factor in recession ("It's having a big episode. Let it have tonight."). Its comment: it's soft-bristled.
 - **The bowling alley** (the redesign's bowling egg, `widget/bowling.js`, from its release): a bowling lane can stand in
   his yard, and the alley's screen plays odd cartoons after a strike, the way real alleys do. The pins are the Plaque crew
   from the boss fights (Plaque Boss, Tartar Titan, Biofilm Blob, the Strep Mutans Swarm, Cavity Creep, the Gingivitis
@@ -98,6 +110,9 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   feathers, and a chef's hat with a pie, the next one each page load, never revealed (PCD Implants Exam 1).
   The pie is not a snack, "it is a postprandial event"; it stays uneaten and is "decorative" ("Postprandial events are for
   people with a pancreas.") (Heme & Endo Exam 2).
+- **After the release** (Perio final, Nov 19, a week before Thanksgiving): "I used to dress myself for the holidays. You saw
+  how that went. These days you dress me, so whatever you put me in, that's what I'm wearing." One thing hasn't changed:
+  the pie is still decorative, still a postprandial event, and he's keeping an eye on it.
 
 ## TIMMY, the other one
 
@@ -119,6 +134,13 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   follicle, the sac of tissue around the developing tooth, and his made his cementum, his periodontal ligament and the bone
   around his roots (true: the dental follicle forms the cementum, the ligament and the alveolar bone proper). "You know
   how I feel about my ligament. Turns out it runs in the family."
+- **His own furcation** (Perio final): as a lower first molar he has two furcation entrances, buccal and lingual, on a
+  short root trunk, about 2.4 and 2.5 mm from the CEJ (Bower, the S5 notes): "about two and a half millimeters of
+  attachment loss, and you're in my furcation. Please be gentle with the Nabers probe." His mesial root has the concavity
+  every lower first molar has facing the furcation, about 0.7 mm, 100% of the time: "It's not a flaw. It's character."
+  He thanks Dr. Litz, "on behalf of my furcation", for never taking down furcation bone in osseous surgery. And his
+  first periodontics episode: "periodontics is about me. The gum around me, the ligament holding me in, the bone around
+  my roots."
 
 ## Who comments
 
@@ -129,7 +151,7 @@ number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a n
 
 - Opens: "Hey. It's Timmy, and this is Timmy Time." Closes: "This has been Timmy Time. I'm Timmy. Brush, floss, and ..."
   with a new ending each time (MSK: "go get it"; Occlusion: "bite down with confidence"; Heme & Endo: "keep your feedback
-  negative"; PCD Implants: "torque responsibly"; Heme & Endo Exam 2: "surge when it counts", the L-H surge).
+  negative"; PCD Implants: "torque responsibly"; Heme & Endo Exam 2: "surge when it counts", the L-H surge; Perio final: "mind the furcation").
 - Lightning round intro: answer out loud, "nobody can hear you. Except me." (Heme & Endo added "And, apparently, number
   thirty-one.")
 - Warm, dry, a little vain. Jokes are short and come after the fact, never instead of it. He quotes the professors
@@ -144,3 +166,4 @@ number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a n
 | `heme-endo-exam1` | `heme-endo-exam1/script.md` | 53 min | Four Halloween costumes, one per page load; neighbor number thirty-one; TIMMY as adrenaline; enamel is not a calcium bank |
 | `pcd-implants-exam1` | `pcd-implants-exam1/script.md` | 48 min | Thanksgiving costumes, one per page load; proud of his ligament; thirty-one thinks he's a failing implant; Brånemark's rabbit. First episode with comments: thirty-one, the rabbit down the hill, the toothbrush by the door |
 | `heme-endo-exam2` | `heme-endo-exam2/script.md` | 52 min | Thirty-one's glucose meter ("You don't have a pancreas"); Timmy came from a dental follicle; the pie is a postprandial event. Comments: thirty-one, the toothbrush by the door |
+| `perio` | `perio/script.md` | 49 min | Timmy's own furcation (two entrances, about 2.5 mm down; the mesial root concavity); thirty-one stages himself with a toothpick ("You're not staged. You're anxious."), may have an enamel projection, and wasn't Dr. Kaur's thirty-one; the toothbrush's big episode (Phase one starts with oral hygiene); the pie, still decorative, after the release. Comments: thirty-one, the toothbrush by the door |

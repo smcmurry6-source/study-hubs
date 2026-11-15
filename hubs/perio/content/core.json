@@ -134,7 +134,16 @@
   {"id":"mastery-antibiotics-host-mod","name":"Session 8 Mastered","desc":"Every S8 question right at least once","cond":{"type":"lecRight","lec":"antibiotics-host-mod","pct":100}},
   {"id":"mastery-perio-plastic-esthetics","name":"Session 9 Mastered","desc":"Every S9 question right at least once","cond":{"type":"lecRight","lec":"perio-plastic-esthetics","pct":100}}
  ],
- "podcast": null,
+ "podcast": {
+  "id": "final-review",
+  "show": "Timmy Time",
+  "title": "Perio final: the last-minute review",
+  "src": "audio/timmy-time.mp3",
+  "duration": 2948.1,
+  "blurb": "49 min with Timmy Tooth: all nine sessions, weighted like the final toward Sessions 5-9, what Dr. Abou-Arraj's review said to know and to skip, Dr. Kaur's three implant states, and a lightning round to finish.",
+  "chapters": [{"t":0,"title":"Cold open"},{"t":111.95,"title":"Sessions one to three: diagnosis, flaps and prognosis"},{"t":409.98,"title":"Session four: Phase one and the instruments"},{"t":594.81,"title":"Furcations"},{"t":897.63,"title":"Resective surgery"},{"t":1050.52,"title":"Regeneration"},{"t":1235.89,"title":"Implants: health, mucositis and peri-implantitis"},{"t":1567.47,"title":"Antibiotics"},{"t":1859.61,"title":"Host modulation"},{"t":2048.15,"title":"Recession and soft tissue grafts"},{"t":2295.05,"title":"Gingival excess, crown lengthening and the smile"},{"t":2538.25,"title":"Lightning round"},{"t":2842.11,"title":"Sign-off"}],
+  "fans": [{"who":"Number thirty-one","tag":"Timmy's neighbor","text":"Update: I bought a real Nabers probe. It turns out I have a furcation too, two entrances, and I'm told that's normal. I am not reassured. Also, for the record, that implant case was a different number thirty-one."},{"who":"The toothbrush by the door","tag":"Timmy's world","text":"Finally, a segment of my own. Phase one starts with oral hygiene, every patient, every time. About the recession part: that's hard bristles and aggressive brushing. I'm soft. Be gentle with me and I'll be gentle with your gingiva."}]
+ },
  "figByLec": {
   "implants-perio": ["pistates","meffert","bop","xrays"],
   "antibiotics-host-mod": ["biofilm","targets","hostmod"],
