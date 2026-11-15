@@ -605,6 +605,19 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .qlist { margin-top: 14px; display: grid; gap: var(--gap); }
 .sentinel { display: flex; justify-content: center; padding: 8px 0; }
 .end { text-align: center; padding: 8px 0; }
+/* a list in sets of 100 (widget/hub-bank.js setsBar): which hundred is on screen, Previous and Next; and the end of a set */
+.qsets { margin: 12px 2px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.qsets[hidden] { display: none; }
+.qsets .lab { font-size: var(--fs-label); font-weight: var(--w-head); color: var(--muted); }
+.qsets-pick { display: inline-flex; align-items: center; gap: 8px; }
+.qsets-pick .note { font-size: var(--fs-label); }
+.hx .qsets select { min-height: 40px; padding: 0 10px; border: 1px solid var(--control); border-radius: 10px; background: var(--ground); color: var(--text); font-weight: var(--w-strong); }
+.qsets-step { margin-left: auto; }
+.hx .qsets-step button { min-height: 40px; padding: 0 12px; gap: 4px; font-weight: var(--w-strong); }
+.hx .qsets-step button:disabled { opacity: .45; cursor: default; background: transparent; }
+.hx .ic.flip { transform: rotate(180deg); }
+.qset-end { display: grid; justify-items: center; gap: 12px; text-align: center; }
+.qset-end .btn .ic { margin-right: -4px; }
 .empty { text-align: left; }
 .empty p { margin-top: 6px; color: var(--muted); }
 .empty .btn, .empty .qc-go { margin-top: 14px; }
@@ -629,6 +642,7 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .qc-tools { display: flex; align-items: center; gap: 2px; flex: none; margin: 0 -8px 0 0; }
 html.shx .qc-tools .sh-qflag, html.shx .qc-tools .sh-qpin { margin-left: 0; }
 .qc-lec { font-weight: var(--w-strong); }
+.qc-n { font-weight: var(--w-strong); color: var(--text); }   /* "Question 12 of 84": the card's place in its set */
 .likely { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px; border-radius: var(--r-pill); background: var(--hub-soft); color: var(--hub-text);
   font-weight: var(--w-strong); font-size: var(--fs-meta); }
 .qc-flag { display: inline-flex; align-items: center; gap: 5px; color: var(--hub-text); font-weight: var(--w-strong); }

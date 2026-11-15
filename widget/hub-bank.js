@@ -42,6 +42,8 @@
   function figHTML(q){ var f = HX.FIG && q.img && !q.imgAfter && HX.FIG.FIGS[q.img]; return f ? '<figure class="qfig" aria-label="' + esc(f.title) + '">' + f.svg + "</figure>" : ""; }
   function figKeyHTML(f, open){ return f.key ? '<details class="fig-key"' + (open ? " open" : "") + "><summary>" + (open ? "Key" : "Show the key") + "</summary><dl>" + f.key.map(function(k){ return "<dt>" + esc(k[0]) + "</dt><dd>" + esc(k[1]) + "</dd>"; }).join("") + "</dl></details>" : ""; }
   function figAfterHTML(q){ var f = HX.FIG && q.img && HX.FIG.FIGS[q.img]; return f && (q.imgAfter || f.key) ? '<figure class="qfig qfig-after" aria-label="' + esc(f.title) + '">' + f.svg + figKeyHTML(f, true) + "</figure>" : ""; }
+  /* a card's number in its set, its own item in the card's top line (it wraps above the lecture chip on a phone) */
+  function qNum(n, of, id){ return '<span class="qc-n num" id="' + id + '">Question&nbsp;' + n + (of ? " of&nbsp;" + of : "") + "</span>"; }
 
   function card(q, o){
     o = o || {};
@@ -49,8 +51,10 @@
     var seen = ansOf(q.id);
     var status = o.retry ? '<span class="qc-flag">' + icon("retry", 14) + "Again: you missed this a few questions ago</span>" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
       seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + "</span>" : "";
-    var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + id + 'h"></article>');
-    var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + id + 'h">' + (o.num ? "Question " + o.num + " · " : "") + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
+    var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
+    /* o.num, o.of: the card's place in the set ("Question 12 of 84"), so you can see how many are left (a classmate's
+       ask, from the idea board, 2026-11-15) */
+    var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
     var body = "", hide = !!o.hide && q.type === "mcq";
     if (q.type === "mcq" || multi) {
       var order = multi ? shuffled(q.choices.map(function(c, i){ return i; })) : choiceOrder(q);
@@ -195,7 +199,7 @@
     var gather = function(){ $$(":scope > .sh-nj, :scope > .sh-qrate", res).forEach(function(n){ after.appendChild(n); }); };
     gather();
     if (window.MutationObserver) { var mo = new MutationObserver(gather); mo.observe(res, { childList: true }); setTimeout(function(){ mo.disconnect(); }, 4000); }
-    var ag = $("[data-again]", res); if (ag) ag.addEventListener("click", function(){ var n = card(q, { ctx: el.getAttribute("data-ctx") }); el.replaceWith(n); var f = $(".ch", n); if (f) f.focus(); track("bank:again"); });
+    var ag = $("[data-again]", res); if (ag) ag.addEventListener("click", function(){ var n = card(q, { ctx: el.getAttribute("data-ctx"), num: o.num, of: o.of }); el.replaceWith(n); var f = $(".ch", n); if (f) f.focus(); track("bank:again"); });
     var ak = $("[data-ask-q]", res); if (ak) ak.addEventListener("click", function(){ HX.askAbout(q, right, picks); });
     if (HX.FIG && HX.FIG.ANIMA) { try { HX.FIG.ANIMA.mount(res); } catch (e) {} }
   }
@@ -244,6 +248,10 @@
   var SETS = [["drill", "Daily drill"], ["misses", "Yesterday's misses"], ["weak", "Weak spots"], ["mock", "Mock exam"]];
   var FMTS = [["recall", "Recall (self-graded)"], ["2stmt", "Two statements"], ["tf", "True or false"], ["numbered", "Numbered statements"], ["which", "Which statement is true"], ["whichf", "Which statement is false"], ["except", "EXCEPT / NOT"], ["pbox", "Patient Box cases"], ["img", "Diagram questions"], ["multi", "Select all that apply"], ["match", "Matching"], ["sequence", "Put in order"]];
   var PAGE = 50, bankSearch = "";
+  /* how many questions at a time (Sam, 2026-11-15: "an option by the filters with how many questions to show at a time.
+     50/100/200/all"), STATE.ui.qsize; 100 to start, as Sam first asked ("intervals of 100") */
+  var SIZES = [[50, "50"], [100, "100"], [200, "200"], ["all", "All"]];
+  function qsize(){ var v = STATE.ui.qsize; return v === 50 || v === 100 || v === 200 || v === "all" ? v : 100; }
   function isFmt(q, fm){ return fm === "pbox" ? !!q.pbox : fm === "img" ? !!q.img : (fm === "multi" || fm === "match" || fm === "sequence" || fm === "recall") ? q.type === fm : q.fmt === fm; }
   function labelOf(list, k){ for (var i = 0; i < list.length; i++) if (list[i][0] === k) return list[i][1]; return k; }
   function presetOf(){ var s = parse()[1]; return SETS.some(function(x){ return x[0] === s; }) ? s : s === "missed" ? "" : ""; }
@@ -317,7 +325,7 @@
       /* Learn and Flashcards: their launcher first (how far along, Start), then which questions (Sam, 2026-11-13) */
       '<div class="bank-grid"><div class="bank-main' + (studying ? " is-study" : "") + '">' + (preset === "mock" ? "" : viewHTML()) +
         (studying ? '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div><h2 class="bank-which">Which questions</h2>' + panelHTML(preset)
-          : panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div>') + "</div>" +
+          : panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><nav class="qsets" aria-label="Which questions" hidden></nav><div class="qlist" id="qlist"></div>') + "</div>" +
       '<aside class="bank-side" aria-label="Today">' + HX.todayPanel() + "</aside></div></div>";
     wirePanel(el, preset);
     $$("[data-qview]", el).forEach(function(b){ b.addEventListener("click", function(){
@@ -361,7 +369,11 @@
     });
   }
   /* the list the panel picked, shown the way the toggle says */
-  function show(){ if (qview() === "questions") page(); else study(); }
+  function show(){
+    if (qview() !== "questions") { study(); return; }
+    var z = qsize(); LIST.size = z === "all" ? Math.max(1, setTotal(LIST)) : z;
+    openSet(LIST, firstSet(LIST)); keepSet(LIST); page();
+  }
   function panelHTML(preset){
     var picked = lecIds(), sum = lecSummary(picked);
     normShow();
@@ -383,7 +395,8 @@
       '<div class="qbar-row chips"><span class="lab">Show</span><span class="chipset">' + SHOW.map(function(x){ return showChip(x[0], x[1]); }).join("") + "</span></div>" +
       '<div class="qbar-row chips only"><span class="lab">Only</span><span class="chipset" role="group" aria-label="Only">' + LIKELY.map(function(x){ return lkChip(x[0], x[1]); }).join("") + "</span></div>" +
       '<div class="qbar-row chips"><span class="lab">Sets</span><span class="chipset">' + SETS.map(function(x){ return setChip(x[0], x[1]); }).join("") + "</span></div>" +
-      '<div class="qbar-row">' + (qview() === "questions" ? '<span class="lab">Order</span><span class="seg" role="group" aria-label="Order"><button type="button" data-order="in" aria-pressed="' + (STATE.ui.qorder !== "random") + '">In order</button><button type="button" data-order="random" aria-pressed="' + (STATE.ui.qorder === "random") + '">' + icon("shuffle", 16) + "Random</button></span>" : "") +
+      '<div class="qbar-row">' + (qview() === "questions" ? '<span class="lab">Order</span><span class="seg" role="group" aria-label="Order"><button type="button" data-order="in" aria-pressed="' + (STATE.ui.qorder !== "random") + '">In order</button><button type="button" data-order="random" aria-pressed="' + (STATE.ui.qorder === "random") + '">' + icon("shuffle", 16) + "Random</button></span>" +
+          '<span class="lab" id="qzL">At a time</span><span class="seg seg-size" role="group" aria-labelledby="qzL">' + SIZES.map(function(x){ return '<button type="button" data-qsize="' + x[0] + '" aria-pressed="' + (qsize() === x[0]) + '"' + (x[0] === "all" ? ' aria-label="All at once"' : ' aria-label="' + x[1] + ' at a time"') + ">" + x[1] + "</button>"; }).join("") + "</span>" : "") +
         '<details class="morefil"' + (STATE.ui.qmore ? " open" : "") + '><summary class="btn btn-text">' + icon("filter", 16) + "More filters" + (more ? ' <span class="badge num">' + more + " on</span>" : "") + "</summary>" +
         '<div class="morefil-body"><p class="lab">Question type</p><span class="chipset">' + [["all", "Any type"]].concat(fmts).map(function(f){ var n = f[0] === "all" ? "" : ' <span class="n num">' + filtered({ fm: f[0] }).length + "</span>"; return '<button class="chip" type="button" data-fmt="' + f[0] + '" aria-pressed="' + ((STATE.ui.qfmt || "all") === f[0]) + '">' + esc(f[1]) + n + "</button>"; }).join("") + "</span>" +
         '<p class="lab">Where it\'s from</p><span class="chipset">' + [["all", "Anywhere"]].concat(srcs.map(function(k){ return [k, HX.CORE.srcLabel[k]]; })).map(function(f){ return '<button class="chip" type="button" data-src="' + esc(f[0]) + '" aria-pressed="' + ((STATE.ui.qsrc || "all") === f[0]) + '">' + esc(f[1]) + "</button>"; }).join("") + "</span></div></details></div>" +
@@ -401,6 +414,7 @@
     $$("[data-show]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qstatus = b.getAttribute("data-show"); redraw("show=" + STATE.ui.qstatus); }); });
     $$("[data-lk]", el).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-lk"); setLk(!preset && STATE.ui.qlikely === k ? "" : k); redraw("show=" + (STATE.ui.qlikely || k + "-off")); }); });
     $$("[data-order]", el).forEach(function(b){ b.addEventListener("click", function(){ var o = b.getAttribute("data-order"); if (o === "random") STATE.ui.qseed = Math.floor(Math.random() * 2e9) + 1; STATE.ui.qorder = o; redraw("order=" + o); }); });
+    $$("[data-qsize]", el).forEach(function(b){ b.addEventListener("click", function(){ var v = b.getAttribute("data-qsize"); STATE.ui.qsize = v === "all" ? "all" : +v; redraw("size=" + v); }); });
     $$("[data-fmt]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qfmt = b.getAttribute("data-fmt"); STATE.ui.qmore = 1; redraw("type=" + STATE.ui.qfmt); }); });
     $$("[data-src]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qsrc = b.getAttribute("data-src"); STATE.ui.qmore = 1; redraw("src=" + STATE.ui.qsrc); }); });
     $$("[data-set]", el).forEach(function(a){ a.addEventListener("click", function(){ track("bank:set=" + a.getAttribute("data-set")); }); });
@@ -418,7 +432,9 @@
   }
   function fill(el, preset){
     var host = $("#qlist", el), sumEl = $(".qsum", el);
-    host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0 };
+    /* base: what the list leaves out at its start, counted in the cards' numbers (page()): the drill's ones done today, so
+       its first card left is "Question 6 of 20". size, set, shown, end: how many a set holds (qsize()), the set on screen and how far into it the cards go */
+    host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0, base: 0, set: 0, end: 0, size: 100 };
     if (preset === "drill") {
       sumEl.innerHTML = '<p class="note">Picking today\'s questions…</p>';
       whenWidget("shDrill", function(D){
@@ -431,6 +447,7 @@
           sumEl.innerHTML = '<p class="sumline"><b class="num">' + done + " of " + items.length + "</b> done today. Spaced review first, then your misses and the high-yield ones.</p>";
           items.forEach(function(it){ LIST.notes[it.id] = it.note; });
           LIST.items = (qview() === "questions" ? items.filter(function(it){ return !(s.res[it.id] === 1 || s.res[it.id] === 0); }) : items).map(function(it){ return QBY[it.id]; });
+          if (qview() === "questions") LIST.base = done;
           if (!LIST.items.length) { host.innerHTML = drillDoneHTML(); wireDrillDone(el); return; }
           show();
         });
@@ -487,22 +504,83 @@
   }
   function emptyHTML(t, p, act){ return '<div class="empty panel"><h2>' + esc(t) + "</h2><p>" + esc(p) + "</p>" + (act || "") + "</div>"; }
   function wireEmpty(el){ $$("[data-showset]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qstatus = a.getAttribute("data-showset"); STATE.ui.qlikely = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; saveState(); }); }); }
-  /* fifty cards, then the next fifty load by themselves as you reach the end (Sam, 2026-11-14: "show more questions at a time"; was twenty) */
+  /* A list is shown a set at a time (Sam, 2026-11-15: "I want the questions to be shown in intervals of 100 unless there are
+     less questions than that in the filter. Showing all 844 feels unmanageable", then 50, 100, 200 or All by the filters:
+     qsize()), each card numbered in its set: "Question 12 of 100", or of what a shorter set or list has; All is one set. Inside a set the cards come fifty at a time and the next
+     fifty load by themselves as you reach them (Sam, 2026-11-14); the next set waits for its button at the end of the set,
+     or the picker above the list (setsBar). The bank keeps its set while its filters stay the same (STATE.ui.qpage), except
+     Not answered yet and Missed last time, which shrink as you answer and so start again at their first set. */
   var io = null;
-  function page(){
+  function setTotal(L){ return L.base + L.items.length; }
+  function setsOf(L){ return Math.max(1, Math.ceil(setTotal(L) / L.size)); }
+  function setSize(L, k){ return Math.min(L.size, setTotal(L) - k * L.size); }
+  function setKey(){
+    var st = STATE.ui.qstatus || "all";
+    return st === "unseen" || st === "missed" ? "" : JSON.stringify([STATE.ui.qlec, st, STATE.ui.qlikely || "", STATE.ui.qfmt || "all", STATE.ui.qsrc || "all", STATE.ui.qorder === "random" ? STATE.ui.qseed || 1 : 0, bankSearch.trim()]);
+  }
+  function firstSet(L){
+    var last = setsOf(L) - 1;
+    if (L.ctx === "drill") return Math.min(Math.floor(L.base / L.size), last);
+    var p = STATE.ui.qpage, k = L.ctx === "bank" ? setKey() : "";
+    return k && p && p.k === k ? Math.min(Math.floor(Math.max(0, p.at | 0) / L.size), last) : 0;
+  }
+  function keepSet(L){ if (L.ctx !== "bank") return; var k = setKey(); STATE.ui.qpage = k ? { k: k, at: L.set * L.size } : null; saveState(); }
+  function openSet(L, k){
+    L.set = k; L.shown = Math.max(0, k * L.size - L.base); L.end = Math.min(L.items.length, (k + 1) * L.size - L.base);
+    if (io) io.disconnect();
+    L.host.innerHTML = "";
+    setsBar(L);
+  }
+  /* above the list: which hundred is on screen, a picker for any of them, Previous and Next */
+  function setsBar(L){
+    var nav = $(".qsets", L.el); if (!nav) return;
+    var n = setsOf(L), T = setTotal(L), k = L.set;
+    if (n < 2) { nav.hidden = true; nav.innerHTML = ""; return; }
+    var range = function(j){ return (j * L.size + 1) + "–" + Math.min(T, (j + 1) * L.size); };
+    var opts = []; for (var j = 0; j < n; j++) opts.push('<option value="' + j + '"' + (j === k ? " selected" : "") + ">" + range(j) + "</option>");
+    nav.innerHTML = '<span class="lab" id="qsL">Questions</span><span class="qsets-pick"><select data-setpick aria-labelledby="qsL qsO">' + opts.join("") + '</select><span class="note num" id="qsO">of ' + T + "</span></span>" +
+      '<span class="seg qsets-step"><button type="button" data-setstep="-1"' + (k ? "" : " disabled") + ">" + icon("chevron", 16, "flip") + "Previous</button>" +
+      '<button type="button" data-setstep="1"' + (k + 1 < n ? "" : " disabled") + ">Next " + (k + 1 < n ? setSize(L, k + 1) : L.size) + icon("chevron", 16) + "</button></span>";
+    nav.hidden = false;
+    nav.onchange = function(e){ var sel = e.target.closest && e.target.closest("[data-setpick]"); if (sel) toSet(L, +sel.value, "pick"); };
+    nav.onclick = function(e){ var b = e.target.closest("[data-setstep]"); if (b && !b.disabled) { var d = +b.getAttribute("data-setstep"); toSet(L, L.set + d, d > 0 ? "next" : "prev"); } };
+  }
+  function toSet(L, k, how){
+    if (LIST !== L || !L.host.isConnected) return;
+    k = Math.max(0, Math.min(setsOf(L) - 1, k)); if (k === L.set) return;
+    openSet(L, k); keepSet(L); track("bank:page=" + how); page(true);
+  }
+  /* back to the top of the list, under whichever bar is stuck to the top of the screen (and the boss band). Only once the new set's cards are
+     in: with the list empty the page is too short to get there, and the browser's scroll anchoring then follows the page's
+     end down past the cards as they arrive */
+  function toListTop(L){
+    var top = 0, nav = $(".qsets", L.el), at = nav && !nav.hidden ? nav : L.host;
+    $$(".hx-bar, .hx-strip").forEach(function(b){ var r = b.getBoundingClientRect(); if (r.top <= 1 && r.bottom < innerHeight / 2) top = Math.max(top, r.bottom); });
+    top += parseFloat(docEl.style.getPropertyValue("--boss-h")) || 0;   /* the Plaque Boss's band, sticky under the bar while it's up */
+    window.scrollTo(0, Math.max(0, scrollY + at.getBoundingClientRect().top - top - 12));
+  }
+  function page(focus){
     var L = LIST; if (!L) return;
-    var next = L.items.slice(L.shown, L.shown + PAGE);
+    var k = L.set, at = L.shown, next = L.items.slice(at, Math.min(at + PAGE, L.end));
     if (!next.length) return;
     (next.some(needsFig) ? needFigures() : Promise.resolve()).then(function(){
-      if (LIST !== L || !L.host.isConnected) return;
+      if (LIST !== L || !L.host.isConnected || L.set !== k || L.shown !== at) return;
       var old = $(".sentinel", L.host); if (old) old.remove();
-      next.forEach(function(q){ L.host.appendChild(card(q, { ctx: L.ctx, note: L.notes[q.id], onAnswer: onBankAnswer })); });
+      var n0 = k * L.size - L.base, of = setSize(L, k);
+      next.forEach(function(q, i){ L.host.appendChild(card(q, { ctx: L.ctx, note: L.notes[q.id], onAnswer: onBankAnswer, num: at + i - n0 + 1, of: of })); });
       L.shown += next.length;
-      if (L.shown < L.items.length) {
-        var s = h('<div class="sentinel"><button class="btn" type="button">Next ' + Math.min(PAGE, L.items.length - L.shown) + " questions</button></div>");
-        $("button", s).addEventListener("click", page);
+      /* a new set: back to the top of the list, and keyboard focus to its first card */
+      if (focus === true) { toListTop(L); var c1 = $(".qcard", L.host); if (c1) { c1.setAttribute("tabindex", "-1"); try { c1.focus({ preventScroll: true }); } catch (e) {} } }
+      if (L.shown < L.end) {
+        var s = h('<div class="sentinel"><button class="btn" type="button">Next ' + Math.min(PAGE, L.end - L.shown) + " questions</button></div>");
+        $("button", s).addEventListener("click", function(){ page(); });
         L.host.appendChild(s);
         if ("IntersectionObserver" in window) { if (io) io.disconnect(); io = new IntersectionObserver(function(es){ if (es.some(function(e){ return e.isIntersecting; })) { io.disconnect(); page(); } }, { rootMargin: "600px 0px" }); io.observe(s); }
+      } else if (k + 1 < setsOf(L)) {
+        /* the end of a set: the next one waits for this button (or the picker above) */
+        var T = setTotal(L), e = h('<div class="qset-end panel"><p class="sumline">That\'s questions <b class="num">' + (k * L.size + 1) + "–" + Math.min(T, (k + 1) * L.size) + "</b> of " + T + '.</p><button class="btn btn-primary" type="button" data-setnext>Next ' + pl(setSize(L, k + 1), "question") + icon("chevron", 18) + "</button></div>");
+        $("[data-setnext]", e).addEventListener("click", function(){ toSet(L, k + 1, "end"); });
+        L.host.appendChild(e);
       } else if (L.ctx === "bank") L.host.appendChild(h('<p class="note end">That\'s all ' + L.items.length + " for these filters.</p>"));
     });
   }
@@ -659,8 +737,8 @@
       if (q.type === "match") {
         /* the format mock's matching item: a list to choose from beside each row, every pair scored by itself */
         var mp = Array.isArray(m.picks[id]) ? m.picks[id] : [], ix = q.pairs.map(function(x, k){ return k; }), rows = (m.order && m.order[id]) || ix, opts = (m.ro && m.ro[id]) || ix, mpp = pts[id] || 0, mnone = !has(id);
-        var em = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="match" data-ctx="mock" aria-labelledby="mk' + i + '"></article>');
-        em.innerHTML = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="mk' + i + '">Question ' + (i + 1) + " · " + lecChip(q.lec) + '</span><span class="qc-flag">Matching · each pair is scored</span></span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(q) +
+        var em = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="match" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
+        em.innerHTML = '<header class="qc-head"><span class="qc-meta">' + qNum(i + 1, m.ids.length, "mk" + i + "n") + '<span class="qc-lec" id="mk' + i + '">' + lecChip(q.lec) + '</span><span class="qc-flag">Matching · each pair is scored</span></span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(q) +
           '<div class="mk-match">' + rows.map(function(k){
             var ok = matched(q, k);
             return '<label class="mk-row' + (m.submitted ? (ok ? " is-right" : " is-wrong") : "") + '"><span class="txt">' + esc(q.pairs[k][0]) + '</span><span class="mk-pick"><select data-mock-match="' + k + '"' + (m.submitted ? " disabled" : "") + '><option value="">Choose…</option>' +
@@ -673,8 +751,8 @@
       var o2 = oc[id], multi = q.type === "multi", choices = o2 ? o2.choices : q.choices, ans = o2 ? o2.answer : q.answer;
       var pick = id in m.picks ? m.picks[id] : null, picks = multi ? (pick || []) : [], order = (m.order && m.order[id]) || choices.map(function(c, k){ return k; });
       var none = multi ? !picks.length : pick === null, pp = pts[id] || 0;
-      var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + (multi ? "multi" : "mcq") + '" data-ctx="mock" aria-labelledby="mk' + i + '"></article>');
-      el2.innerHTML = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="mk' + i + '">Question ' + (i + 1) + " · " + lecChip(q.lec) + "</span>" + (multi ? '<span class="qc-flag">Select all that apply · partial credit</span>' : o2 ? '<span class="qc-flag">Ordering</span>' : "") + '</span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(o2 ? { stem: o2.stem } : q) +
+      var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + (multi ? "multi" : "mcq") + '" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
+      el2.innerHTML = '<header class="qc-head"><span class="qc-meta">' + qNum(i + 1, m.ids.length, "mk" + i + "n") + '<span class="qc-lec" id="mk' + i + '">' + lecChip(q.lec) + "</span>" + (multi ? '<span class="qc-flag">Select all that apply · partial credit</span>' : o2 ? '<span class="qc-flag">Ordering</span>' : "") + '</span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(o2 ? { stem: o2.stem } : q) +
         '<ul class="qc-choices' + (q.fmt === "tf" ? " qc-tf" : "") + '">' + order.map(function(k){
           var on = multi ? picks.indexOf(k) > -1 : k === pick, good = multi ? q.correct.indexOf(k) > -1 : k === ans;
           var st = m.submitted ? (good && (on || !multi) ? "right" : on ? "wrong" : good ? "missed" : "") : "";

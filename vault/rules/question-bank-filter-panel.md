@@ -27,7 +27,7 @@ it, and adds only its own toggles (`SH_HUB.bank.only`). The single-file hubs arc
   until it's closed; the filters stay as they were. Above the panel, **Study as** picks how the chosen questions are asked:
   Questions, Learn or Flashcards (`widget/study-modes.js`; the mock is always questions). In Learn and Flashcards the
   launcher (how far along, Start) comes first and the panel follows under "Which questions" (Sam, 2026-11-13).
-- **Order**: **In order / Random** only (`STATE.ui.qorder`; In order = by lecture, then bank order; Random shuffles once and keeps that
+- **Order**: **In order / Random** only (with **At a time** beside it, above) (`STATE.ui.qorder`; In order = by lecture, then bank order; Random shuffles once and keeps that
   order until Random is tapped again). **No "Likely first"** (Sam, 2026-11-03): High likelihood is a filter, either those questions or the whole bank.
 - **More filters** (folded, with a "n on" badge): question type (`STATE.ui.qfmt`, only the formats the bank has, each with its count) and
   where it's from (`STATE.ui.qsrc`).
@@ -36,7 +36,18 @@ it, and adds only its own toggles (`SH_HUB.bank.only`). The single-file hubs arc
   time (saved in `STATE.ui`; Perio `STATE.ui.qbank`), which is why the tags matter: a saved filter is never hidden.
 - Filter changes are tracked (`bank:show=` for a Show chip or a toggle turned on, `bank:show=<toggle>-off`, `bank:lec-only`, `bank:type=`, `bank:src=`, `bank:tag-off=`, `bank:clear`, `bank:more`,
   `bank:search`, `bank:order=`), since `widget/clicks.js` doesn't see `<select>` changes.
-- **The card**: Report and Pin sit in each card's head (`.qc-tools`), right of the lecture and status. After an answer, one row:
+- **At a time** (Sam, 2026-11-15: "I want the questions to be shown in intervals of 100 unless there are less questions than that in
+  the filter. Showing all 844 feels unmanageable", then "an option by the filters with how many questions to show at a time.
+  50/100/200/all"): beside Order (`STATE.ui.qsize`, 100 to start, `bank:size=`), a list longer than the size is shown a set at a
+  time. Above it, "Questions [101–200] of 845" with Previous and Next (`.qsets`, `setsBar()`); at the end of a set, "Next 100
+  questions". All is one list. Inside a set the cards still come fifty at a time and load by themselves (Sam, 2026-11-14). The
+  bank keeps its place while the filters stay the same (`STATE.ui.qpage`, the set's first question, so a new size keeps it too),
+  except Not answered yet and Missed last time, which start at their first set.
+- **The card**: Report and Pin sit in each card's head (`.qc-tools`), right of the lecture and status. Before the lecture, the card's
+  **number in its set** (Sam, 2026-11-15, from a classmate's idea: "so we know how many more are left"): "Question 12 of 100", or of
+  what a shorter set or list has ("of 84"; All: "of 845"), in the bank, the Daily drill (counting the ones done today), Yesterday's misses, Weak
+  spots and the mock (`qNum()` in `widget/hub-bank.js`); "Try it again" keeps it, the missed question that comes back a few cards
+  later has none. After an answer, one row:
   **Try it again** (Retry on a phone), the shared widget's **Find this in the notes** (on a miss), **Ask Timmy** and **Good question?**
   at its end. No "Notes for <lecture>" link (Sam, 2026-11-06: Find this in the notes does that job). On a laptop a Today column (the
   goal ring, streak, XP, this session) sits beside the questions.

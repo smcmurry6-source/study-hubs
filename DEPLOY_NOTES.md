@@ -32,6 +32,29 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-15 (Question Bank: 50, 100, 200 or all at a time, every card numbered, Claude Code, #373)** — Sam: "Lets implement the numbering of
+  the questions in the question bank idea" (a classmate: "adding question numbers so we know how many more are left ... if
+  it's like 80+ questions I'm not just scrolling forever and I could maybe take a break when I hit #40"; also on the idea
+  board), then "I want the questions to be shown in intervals of 100 unless there are less questions than that in the
+  filter. Showing all 844 feels unmanageable", then "an option by the filters with how many questions to show at a time.
+  50/100/200/all questions". **At a time**, beside Order in the panel: 50, 100 (to start), 200 or All (`STATE.ui.qsize`). A
+  longer list is shown a set of that size at a time: above it, "Questions [101–200] of 845" with Previous, Next and a
+  picker for any set (`.qsets`); at the end of a set, "That's questions 1–100 of 845" and **Next 100 questions**, which goes
+  to the top of the next set. Every card starts with **"Question 12 of 100"**, its place in the set (fewer than the size,
+  one set: "of 84"; All: "of 845"). Inside a set the cards still come fifty at a time and
+  load by themselves (Sam's 11-14 call). The bank keeps its place while the filters stay the same (`STATE.ui.qpage`, the
+  set's first question, so a new size keeps it: 101–200 becomes 101–150), except
+  Not answered yet and Missed last time, which start at their first set. The Daily drill counts the ones done today (with 5
+  done, its first card left is "Question 6 of 20"); Yesterday's misses and Weak spots count from 1; the mock's existing
+  "Question n" gains "of N". "Try it again" keeps the number; the missed question that comes back a few cards later has
+  none; Learn and Flashcards keep their own progress. New events `bank:size=` and `bank:page=next|prev|pick|end`. `widget/hub-bank.js`
+  (`qNum()`, `setsBar()`, `toSet()`, `page()`), `widget/hub.css` (`.qc-n`, `.qsets`, `.qset-end`), bundles rebuilt.
+  Found in testing and fixed: BUG-154 (the number crowded the lecture chip on a narrow phone) and BUG-155 (Next 100 left a
+  phone at the bottom of the new set: scroll anchoring). The single-file engines weren't touched: every hub still on one is
+  archived. About page ("Questions"), the bank's rule note, decisions, the event taxonomy and the inbox updated. **After the
+  merge** (the After merge workflow, #375): Ask Timmy deployed again for the About page's new words
+  (`supabase/functions/timmy/site.json`), the post-check, and the changelog lines for Occlusion and Perio
+  (`tools/after-merge/changelog.txt`).
 - **After merge: the after-merge steps run by themselves (2026-11-15, Claude Code)** — Sam: "for the after the merge, lets
   make all of that automatic." A new workflow, **After merge** (`.github/workflows/after-merge.yml`), runs
   `tools/after-merge/run.js` on every push to `main`. The script works out from git what the push changed and does only
