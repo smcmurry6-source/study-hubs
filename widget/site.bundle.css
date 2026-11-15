@@ -565,6 +565,7 @@ font-size: var(--fs-meta); font-weight: var(--w-strong); }
 .qc-tools { display: flex; align-items: center; gap: 2px; flex: none; margin: 0 -8px 0 0; }
 html.shx .qc-tools .sh-qflag, html.shx .qc-tools .sh-qpin { margin-left: 0; }
 .qc-lec { font-weight: var(--w-strong); }
+.qc-n { font-weight: var(--w-strong); color: var(--text); }
 .likely { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px; border-radius: var(--r-pill); background: var(--hub-soft); color: var(--hub-text);
 font-weight: var(--w-strong); font-size: var(--fs-meta); }
 .qc-flag { display: inline-flex; align-items: center; gap: 5px; color: var(--hub-text); font-weight: var(--w-strong); }

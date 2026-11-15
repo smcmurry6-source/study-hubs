@@ -32,6 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-15 (Question Bank: every card numbered, Claude Code)** — Sam: "Lets implement the numbering of the questions in
+  the question bank idea" (a classmate: "adding question numbers so we know how many more are left ... if it's like 80+
+  questions I'm not just scrolling forever and I could maybe take a break when I hit #40"; also on the idea board). Every
+  card in the bank now starts its top line with **"Question 12 of 84"**: its place among the questions the filters picked
+  (the "of" is the set on screen, not the whole bank). The sets count the same way: the Daily drill counts the ones done
+  today (with 5 done, the first card left is "Question 6 of 20"), Yesterday's misses and Weak spots from 1, and the mock's
+  existing "Question n" gains "of N". "Try it again" keeps the card's number; the missed question that comes back a few
+  cards later has none. Learn and Flashcards keep their own progress. `widget/hub-bank.js` (`qNum()`, `LIST.base`/`of`),
+  `.qc-n` in `widget/hub.css`, bundles rebuilt. The number is its own item in the card's top line (BUG-152: inside the
+  lecture label it crowded the chip on a narrow phone). The card's spoken name starts with it. The single-file engines
+  weren't touched: every hub still on one is archived. About page ("Questions"), the bank's rule note, decisions and the
+  inbox updated. **After the merge:** the changelog line for Occlusion and Perio, and the `timmy` function deployed again
+  for the About page's new words (`supabase/functions/timmy/site.json`).
 - **2026-11-15 (Perio: the question bank audited for the final, Claude Code)** — Sam: "audit perios question bank to see
   if we can make it higher yield ... accurate, with good answer options and sufficient explanations. Make sure the exam
   hints are utilized as best as possible." Every question was read against its session's notes, hints, review tables

@@ -36,7 +36,10 @@ it, and adds only its own toggles (`SH_HUB.bank.only`). The single-file hubs arc
   time (saved in `STATE.ui`; Perio `STATE.ui.qbank`), which is why the tags matter: a saved filter is never hidden.
 - Filter changes are tracked (`bank:show=` for a Show chip or a toggle turned on, `bank:show=<toggle>-off`, `bank:lec-only`, `bank:type=`, `bank:src=`, `bank:tag-off=`, `bank:clear`, `bank:more`,
   `bank:search`, `bank:order=`), since `widget/clicks.js` doesn't see `<select>` changes.
-- **The card**: Report and Pin sit in each card's head (`.qc-tools`), right of the lecture and status. After an answer, one row:
+- **The card**: Report and Pin sit in each card's head (`.qc-tools`), right of the lecture and status. Before the lecture, the card's
+  **number in its set** (Sam, 2026-11-15, from a classmate's idea: "so we know how many more are left"): "Question 12 of 84" in the
+  bank (of what the filters show), the Daily drill (counting the ones done today), Yesterday's misses, Weak spots and the mock
+  (`qNum()` in `widget/hub-bank.js`); "Try it again" keeps it, the missed question that comes back a few cards later has none. After an answer, one row:
   **Try it again** (Retry on a phone), the shared widget's **Find this in the notes** (on a miss), **Ask Timmy** and **Good question?**
   at its end. No "Notes for <lecture>" link (Sam, 2026-11-06: Find this in the notes does that job). On a laptop a Today column (the
   goal ring, streak, XP, this session) sits beside the questions.

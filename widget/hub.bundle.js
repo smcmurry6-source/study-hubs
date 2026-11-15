@@ -521,14 +521,15 @@ q.pbox.map(function(r){ return "<div><dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1])
 function figHTML(q){ var f = HX.FIG && q.img && !q.imgAfter && HX.FIG.FIGS[q.img]; return f ? '<figure class="qfig" aria-label="' + esc(f.title) + '">' + f.svg + "</figure>" : ""; }
 function figKeyHTML(f, open){ return f.key ? '<details class="fig-key"' + (open ? " open" : "") + "><summary>" + (open ? "Key" : "Show the key") + "</summary><dl>" + f.key.map(function(k){ return "<dt>" + esc(k[0]) + "</dt><dd>" + esc(k[1]) + "</dd>"; }).join("") + "</dl></details>" : ""; }
 function figAfterHTML(q){ var f = HX.FIG && q.img && HX.FIG.FIGS[q.img]; return f && (q.imgAfter || f.key) ? '<figure class="qfig qfig-after" aria-label="' + esc(f.title) + '">' + f.svg + figKeyHTML(f, true) + "</figure>" : ""; }
+function qNum(n, of, id){ return '<span class="qc-n num" id="' + id + '">Question&nbsp;' + n + (of ? " of&nbsp;" + of : "") + "</span>"; }
 function card(q, o){
 o = o || {};
 var id = "q" + (++uid), multi = q.type === "multi", tf = q.fmt === "tf";
 var seen = ansOf(q.id);
 var status = o.retry ? '<span class="qc-flag">' + icon("retry", 14) + "Again: you missed this a few questions ago</span>" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
 seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + "</span>" : "";
-var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + id + 'h"></article>');
-var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + id + 'h">' + (o.num ? "Question " + o.num + " · " : "") + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
+var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
+var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
 var body = "", hide = !!o.hide && q.type === "mcq";
 if (q.type === "mcq" || multi) {
 var order = multi ? shuffled(q.choices.map(function(c, i){ return i; })) : choiceOrder(q);
@@ -665,7 +666,7 @@ var after = $(".qc-after", res);
 var gather = function(){ $$(":scope > .sh-nj, :scope > .sh-qrate", res).forEach(function(n){ after.appendChild(n); }); };
 gather();
 if (window.MutationObserver) { var mo = new MutationObserver(gather); mo.observe(res, { childList: true }); setTimeout(function(){ mo.disconnect(); }, 4000); }
-var ag = $("[data-again]", res); if (ag) ag.addEventListener("click", function(){ var n = card(q, { ctx: el.getAttribute("data-ctx") }); el.replaceWith(n); var f = $(".ch", n); if (f) f.focus(); track("bank:again"); });
+var ag = $("[data-again]", res); if (ag) ag.addEventListener("click", function(){ var n = card(q, { ctx: el.getAttribute("data-ctx"), num: o.num, of: o.of }); el.replaceWith(n); var f = $(".ch", n); if (f) f.focus(); track("bank:again"); });
 var ak = $("[data-ask-q]", res); if (ak) ak.addEventListener("click", function(){ HX.askAbout(q, right, picks); });
 if (HX.FIG && HX.FIG.ANIMA) { try { HX.FIG.ANIMA.mount(res); } catch (e) {} }
 }
@@ -870,7 +871,7 @@ return out.filter(Boolean);
 }
 function fill(el, preset){
 var host = $("#qlist", el), sumEl = $(".qsum", el);
-host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0 };
+host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0, base: 0, of: 0 };
 if (preset === "drill") {
 sumEl.innerHTML = '<p class="note">Picking today\'s questions…</p>';
 whenWidget("shDrill", function(D){
@@ -883,6 +884,7 @@ var done = items.filter(function(it){ return s.res[it.id] === 1 || s.res[it.id] 
 sumEl.innerHTML = '<p class="sumline"><b class="num">' + done + " of " + items.length + "</b> done today. Spaced review first, then your misses and the high-yield ones.</p>";
 items.forEach(function(it){ LIST.notes[it.id] = it.note; });
 LIST.items = (qview() === "questions" ? items.filter(function(it){ return !(s.res[it.id] === 1 || s.res[it.id] === 0); }) : items).map(function(it){ return QBY[it.id]; });
+LIST.base = done; LIST.of = items.length;
 if (!LIST.items.length) { host.innerHTML = drillDoneHTML(); wireDrillDone(el); return; }
 show();
 });
@@ -945,7 +947,7 @@ if (!next.length) return;
 (next.some(needsFig) ? needFigures() : Promise.resolve()).then(function(){
 if (LIST !== L || !L.host.isConnected) return;
 var old = $(".sentinel", L.host); if (old) old.remove();
-next.forEach(function(q){ L.host.appendChild(card(q, { ctx: L.ctx, note: L.notes[q.id], onAnswer: onBankAnswer })); });
+next.forEach(function(q, i){ L.host.appendChild(card(q, { ctx: L.ctx, note: L.notes[q.id], onAnswer: onBankAnswer, num: L.base + L.shown + i + 1, of: L.of || L.items.length })); });
 L.shown += next.length;
 if (L.shown < L.items.length) {
 var s = h('<div class="sentinel"><button class="btn" type="button">Next ' + Math.min(PAGE, L.items.length - L.shown) + " questions</button></div>");
@@ -1080,8 +1082,8 @@ var q = QBY[id]; if (!q) return;
 if (m.submitted && m.onlyMissed && m.res[id]) return;
 if (q.type === "match") {
 var mp = Array.isArray(m.picks[id]) ? m.picks[id] : [], ix = q.pairs.map(function(x, k){ return k; }), rows = (m.order && m.order[id]) || ix, opts = (m.ro && m.ro[id]) || ix, mpp = pts[id] || 0, mnone = !has(id);
-var em = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="match" data-ctx="mock" aria-labelledby="mk' + i + '"></article>');
-em.innerHTML = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="mk' + i + '">Question ' + (i + 1) + " · " + lecChip(q.lec) + '</span><span class="qc-flag">Matching · each pair is scored</span></span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(q) +
+var em = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="match" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
+em.innerHTML = '<header class="qc-head"><span class="qc-meta">' + qNum(i + 1, m.ids.length, "mk" + i + "n") + '<span class="qc-lec" id="mk' + i + '">' + lecChip(q.lec) + '</span><span class="qc-flag">Matching · each pair is scored</span></span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(q) +
 '<div class="mk-match">' + rows.map(function(k){
 var ok = matched(q, k);
 return '<label class="mk-row' + (m.submitted ? (ok ? " is-right" : " is-wrong") : "") + '"><span class="txt">' + esc(q.pairs[k][0]) + '</span><span class="mk-pick"><select data-mock-match="' + k + '"' + (m.submitted ? " disabled" : "") + '><option value="">Choose…</option>' +
@@ -1094,8 +1096,8 @@ return;
 var o2 = oc[id], multi = q.type === "multi", choices = o2 ? o2.choices : q.choices, ans = o2 ? o2.answer : q.answer;
 var pick = id in m.picks ? m.picks[id] : null, picks = multi ? (pick || []) : [], order = (m.order && m.order[id]) || choices.map(function(c, k){ return k; });
 var none = multi ? !picks.length : pick === null, pp = pts[id] || 0;
-var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + (multi ? "multi" : "mcq") + '" data-ctx="mock" aria-labelledby="mk' + i + '"></article>');
-el2.innerHTML = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="mk' + i + '">Question ' + (i + 1) + " · " + lecChip(q.lec) + "</span>" + (multi ? '<span class="qc-flag">Select all that apply · partial credit</span>' : o2 ? '<span class="qc-flag">Ordering</span>' : "") + '</span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(o2 ? { stem: o2.stem } : q) +
+var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + (multi ? "multi" : "mcq") + '" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
+el2.innerHTML = '<header class="qc-head"><span class="qc-meta">' + qNum(i + 1, m.ids.length, "mk" + i + "n") + '<span class="qc-lec" id="mk' + i + '">' + lecChip(q.lec) + "</span>" + (multi ? '<span class="qc-flag">Select all that apply · partial credit</span>' : o2 ? '<span class="qc-flag">Ordering</span>' : "") + '</span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(o2 ? { stem: o2.stem } : q) +
 '<ul class="qc-choices' + (q.fmt === "tf" ? " qc-tf" : "") + '">' + order.map(function(k){
 var on = multi ? picks.indexOf(k) > -1 : k === pick, good = multi ? q.correct.indexOf(k) > -1 : k === ans;
 var st = m.submitted ? (good && (on || !multi) ? "right" : on ? "wrong" : good ? "missed" : "") : "";
