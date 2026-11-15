@@ -127,7 +127,12 @@ tags: [map]
   `supabase/pending-migrations.txt` until it's applied (none waiting since the redesign's release, which applied
   `migration_v54.sql` to `v58`: the game layer's server, [game-server](game-server.md)); the database suites apply the
   listed ones on top of `supabase/schema.sql`. When it's applied: append it to `supabase/schema.sql` and take its line
-  out of the list, in the same PR. `tools/xp/keys.js <hub>` builds a hub's `question_keys` from its content JSON (`--load` loads them): **load
-  them again after every merged change to a hub's questions** ([build-a-hub](../how-to/build-a-hub.md)).
+  out of the list, in the same PR. `tools/xp/keys.js <hub>` builds a hub's `question_keys` from its content JSON (`--load` loads them): the After merge
+  workflow loads them again after every merged change to a hub's questions ([build-a-hub](../how-to/build-a-hub.md)).
+- `tools/after-merge/` and `.github/workflows/after-merge.yml` — what happens by itself after every push to `main`
+  ([after-a-merge](../how-to/after-a-merge.md)): `run.js` works out from git what the push needs (a hub's answer keys, Ask
+  Timmy's deploy and one real question, a new Timmy Time episode, the data fixes it added to `tools/data-fixes/`, the
+  lines it added to `changelog.txt`, the post-release check) and does it with the `after-merge` environment's secrets;
+  `test.js` checks the plan on made-up pushes ("Check hubs").
 - `deploy_rollout.py` / `.ps1` — the Cowork-era API deploy scripts. A Claude Code
   session doesn't need them: use git.

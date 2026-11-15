@@ -32,6 +32,30 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **After merge: the after-merge steps run by themselves (2026-11-15, Claude Code)** — Sam: "for the after the merge, lets
+  make all of that automatic." A new workflow, **After merge** (`.github/workflows/after-merge.yml`), runs
+  `tools/after-merge/run.js` on every push to `main`. The script works out from git what the push changed and does only
+  what that needs:
+  - **answer keys:** a changed hub bank's keys load;
+  - **Ask Timmy:** the function deploys when `supabase/functions/timmy/` changed, then gets one real question (it fails on
+    a nap);
+  - **Timmy Time:** a new episode (or a new length) is registered;
+  - **pages:** it waits up to 15 minutes for GitHub Pages to serve the push;
+  - **data fixes:** a fix the push added to `tools/data-fixes/` runs once, after the pages are live;
+  - **changelog:** each line the push added to `tools/after-merge/changelog.txt` (`<hub> | <message>`, the new home of
+    the changelog line) is logged;
+  - **post-release check:** `postcheck.js` runs.
+
+  Each run's summary is a table of the steps. A missing secret shows as "blocked", and either a blocked or a failed step
+  turns `main` red. The secrets go in the repository's `after-merge` environment, limited to `main`, so no pull request's
+  workflow can read them; **Sam adds them once** (the inbox). The logs are public, so it prints no secret and no row of
+  data. `tools/after-merge/test.js` checks the plan on made-up pushes in "Check hubs". It was dry-run on #361, #366, #369
+  and #371, and every plan matched what those merges needed.
+  **First real run, by hand, for #370:** 845 Occlusion keys loaded, Ask Timmy version 6 (its question answered), Pages
+  live in 61 s, both data fixes run (#370's and the 11-14 `in-bennett` one, which had never run), the post-release check
+  passed, and the changelog line logged. Docs: [after-a-merge](vault/how-to/after-a-merge.md), ship-a-change steps 3, 7
+  and 8, build-a-hub's answer keys, ask-timmy, secrets, the release plan, the PR template, and the podcast and
+  lessons-audit skills. **Not automated:** migrations.
 - **2026-11-15 (the Plaque Boss gets its own band on the redesign's hubs, Claude Code)** — Sam: "Refine the question bank
   monsters ui appearance. It looks like its messing up other buttons." Since the release, the boss docked itself inside the
   engine's top bar (`widget/eggs.js` `bossDock()` found the page's sticky `<header>`, the bar's one row of buttons): on a

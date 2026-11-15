@@ -56,8 +56,9 @@ Dates and check-in hours: its entry in `hubs.js`.
     added or removed), rewrite the copies of every question it lists, or the bank's chip and the High yield won't follow.
     One topic per question.
   - **Choices rewritten in place keep their old picks** (class numbers are stored by choice position):
-    `tools/data-fixes/2026-11-15-occlusion-audit.sql` recounts them from the new version's answers, to run once after the
-    merge ([inbox](../tasks/inbox.md)). The next audit that rewrites a choice's meaning needs the same kind of fix (and
+    `tools/data-fixes/2026-11-15-occlusion-audit.sql` recounted them from the new version's answers (run once after the
+    merge, 2026-11-15, with the 11-14 Bennett fix that hadn't run). A data fix added to `tools/data-fixes/` now runs by
+    itself after its merge ([after-a-merge](../how-to/after-a-merge.md)). The next audit that rewrites a choice's meaning needs the same kind of fix (and
     `2026-11-14-in-bennett.sql` before it).
   - **Sam's calls on the two open points** (2026-11-15, [decisions](../decisions.md)): the repositioning splint is
     **irreversible**, as on Dr. Givan's slides (Okeson calls it reversible; `mo-ws-splint`, `mo-2s-6`, `mo-rev-sel` follow

@@ -1,0 +1,5 @@
+# The site changelog's lines, one per change students would notice (vault/how-to/after-a-merge.md).
+# Add a line in your PR: "<hub> | <message>", the hub's id (or "all" for the whole site) and one plain, student-facing
+# sentence or two in American English (under 400 characters). After the merge, .github/workflows/after-merge.yml logs
+# each line the push added (log_changelog), which sets that hub's "Updated" label on the dashboard. A line is logged
+# once, when it's added; editing or deleting an old line changes nothing. Newest at the bottom.
