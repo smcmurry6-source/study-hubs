@@ -165,7 +165,7 @@ Dates and check-in hours: its entry in `hubs.js`.
 ## On the engine (since the redesign's release)
 
 Built as `hubs/occlusion/next/` beside the old page ([phase 1](../tasks/done/2026-11-05-redesign-phase-1-hub-engine.md))
-and moved to `hubs/occlusion/` at the [release](../tasks/2026-11-06-redesign-release.md), when the old single-file page
+and moved to `hubs/occlusion/` at the [release](../tasks/done/2026-11-06-redesign-release.md), when the old single-file page
 went (git keeps it: the commit before the release's merge).
 - `window.SH_HUB` in the page holds the hub's own words (the Home exam card, the hints banner, the mock's blurb, the
   arcade's games and which one is up front). When the final's format or a lecture's dates change, change them there.

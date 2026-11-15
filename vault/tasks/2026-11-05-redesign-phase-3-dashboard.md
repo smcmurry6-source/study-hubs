@@ -24,22 +24,22 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   [learner-data-privacy](../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
 - The dashboard today: `HUBS`/`CLASSES`/`ARCHIVED_HUBS`/`ARCADES` arrays, `#petHome`, `widget/archive.js`, the check-in and survey flows, `widget/tour.js` (the full tour stays in the menu; no prompt on arrival).
 - The About page rule: [about-page](../rules/about-page.md).
-- **Added 2026-11-06 (Sam)**: [the idea board](2026-11-06-idea-board.md) is part of this phase (a dashboard section and a
+- **Added 2026-11-06 (Sam)**: [the idea board](done/2026-11-06-idea-board.md) is part of this phase (a dashboard section and a
   page in a hub's More, `widget/ideas.js`), and the "you" card shows [Timmy's place](2026-11-06-redesign-timmys-place.md)
   (drawn in phase 4, part C). The server side of both is in [phase 5](done/2026-11-05-redesign-phase-5-backend.md), part 3.
 - **Built beside the live dashboard, released with the rest** (Sam, 2026-11-06, [decisions](../decisions.md)): the new
   dashboard is a page next to `index.html` (for example `next/index.html`) that links to the new hub versions, and it
-  replaces `index.html` at [the release](2026-11-06-redesign-release.md). The About page's rewrite is drafted in the
+  replaces `index.html` at [the release](done/2026-11-06-redesign-release.md). The About page's rewrite is drafted in the
   release note and lands with it, since the live About page describes the live site until then.
 
 ## Done when
 
 - [x] The idea board on the new dashboard and in More, with its starting ideas ready to post at the release (built
-      2026-11-12, [#324](https://github.com/smcmurry6-source/study-hubs/pull/324); [its note](2026-11-06-idea-board.md) has the hand-off)
+      2026-11-12, [#324](https://github.com/smcmurry6-source/study-hubs/pull/324); [its note](done/2026-11-06-idea-board.md) has the hand-off)
 
 - [x] The dashboard on the design system, inspector 0 FAIL at three widths, light and dark
 - [x] Check-ins, surveys, notices, luck, the leaderboard, streaks, archive rules and the tour all work on the preview
-- [ ] About page lists every changed feature, counts true (drafted in [the release note](2026-11-06-redesign-release.md), "From phase 3"; it lands at the release)
+- [ ] About page lists every changed feature, counts true (drafted in [the release note](done/2026-11-06-redesign-release.md), "From phase 3"; it lands at the release)
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`) (#318)
 - [x] Preview link, phone and laptop screenshots, and Sam's look, then Sam's "merge": the preview on 2026-11-11 ("All that looks good"), "merge" on 2026-11-12 (#318)
 - [ ] BUG-076 ([bug log](../release/bug-log.md)): at 320 px wide with the largest text, "Start studying" is 2 px past
@@ -85,7 +85,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
     is 1.5 s; `next/` has its own budget of 3.5 s in `tools/release/budgets.json`). It was 3.1 s before the shared
     widgets moved to late loading. Worth another look before the release.
   - **Bugs** found and fixed while building: BUG-063 to BUG-067 in the [bug log](../release/bug-log.md).
-  - **The switch and the About page draft** are in [the release note](2026-11-06-redesign-release.md), "From phase 3".
+  - **The switch and the About page draft** are in [the release note](done/2026-11-06-redesign-release.md), "From phase 3".
   - **Checks** on the second pass (commit f1264f6): `node tools/release/run.js`, all 14 suites passed (syntax, vault,
     archive, secrets, the smoke test on every hub, preview safety, the four database suites on a throwaway copy, the
     admin page, accessibility with 0 axe issues on the dashboard's three new screens, performance, devices). A scripted
@@ -147,7 +147,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
     The dashboard treats `fit` as untrusted: `cleanFit()` keeps only `[a-z0-9:-]`, and it is used only to look an outfit
     up (`fitOutfit()` in pet.js for a holiday one, `SH_OUTFITS.parts` for a shop one), never written as markup. The
     smoke test sends markup as an outfit and fails if it is drawn. After the shop's release `fit()` should send the
-    equipped shop outfit's id ([release note](2026-11-06-redesign-release.md), step 9); the dashboard already draws those.
+    equipped shop outfit's id ([release note](done/2026-11-06-redesign-release.md), step 9); the dashboard already draws those.
   - **The stage** (`stageSvg()`, `paintBoard()`; art `stage.mjs`): the top three stand on drawn blocks as Timmys; their
     outfits come from `get_place` through each row's visit key (`loadFits()`), only when the game layer exists, so no
     change to migration_v54 was needed. Someone with visiting off, and everyone until v54 is applied, is a plain Timmy.
@@ -208,7 +208,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
     redesign's release, or on a staging database.
   - **Where this leaves the task.** Everything in this note except the idea board is built, checked and shown to Sam,
     who said it looks good. Left: **the idea board** (a second session; its slot on the page is `#ideas`, its server is
-    in migration_v54, its About entry is drafted in [the release note](2026-11-06-redesign-release.md)); **Sam's tick**
+    in migration_v54, its About entry is drafted in [the release note](done/2026-11-06-redesign-release.md)); **Sam's tick**
     on "Sam approved this release" in the PR and the merge; after the merge `node tools/release/postcheck.js` and the
     changelog line. The next session can start from `main` once the PR is merged, or from this branch before that.
     Still open from earlier entries: the three `dashboard/next` screens aren't in the accessibility baseline, and first
@@ -234,10 +234,10 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   rule, [long-tests-once](../rules/long-tests-once.md). The idea board's session starts from `main`. What's left is
   on the to-do list ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)): the idea board and BUG-076 in this
   note's Done when, and the accessibility baseline, the slow-phone first paint and the real-presence look in
-  [the release note](2026-11-06-redesign-release.md)'s.
+  [the release note](done/2026-11-06-redesign-release.md)'s.
 - 2026-11-12 (Claude Code, **the idea board**). Built in its own session, in [#324](https://github.com/smcmurry6-source/study-hubs/pull/324), stacked on #318: `widget/ideas.js`
   fills `#ideas`, the check-in has its tick, the admin page its Idea board. The hand-off is in
-  [the idea board's note](2026-11-06-idea-board.md).
+  [the idea board's note](done/2026-11-06-idea-board.md).
 - 2026-11-12: the idea board merged ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324), `728279c`), so this
   note no longer waits on it. Left here: BUG-076 (open, S4) and the About entries at the release.
 

@@ -7,7 +7,7 @@ tags: [redesign, agents, cost]
 
 Sam asked on 2026-11-11 how to make the rest of the redesign use fewer tokens. Most of the cost is what each turn carries
 (the loaded notes, the session's history, big files, screenshots) and rework after a look round, not the code itself.
-Do the redesign's remaining phases this way. What's left and in what order: [the release note](../tasks/2026-11-06-redesign-release.md)
+Do the redesign's remaining phases this way. What's left and in what order: [the release note](../tasks/done/2026-11-06-redesign-release.md)
 and the phase notes it links.
 
 1. **One phase (or one part) per session, started fresh.** Don't run two phases in one long session: every turn re-reads
@@ -38,5 +38,5 @@ and the phase notes it links.
 8. **Migrations wait for their release.** A file in `supabase/pending-migrations.txt` is never applied before the release
    its note names, even when asked to "apply the sql": ask which one (2026-11-10, `migration_v54`, undone).
 
-Related: [the release](../tasks/2026-11-06-redesign-release.md) · [the open calls](../tasks/done/2026-11-11-redesign-open-calls.md) ·
+Related: [the release](../tasks/done/2026-11-06-redesign-release.md) · [the open calls](../tasks/done/2026-11-11-redesign-open-calls.md) ·
 [ship-a-change](ship-a-change.md) · [verify-before-pushing](verify-before-pushing.md) · [tasks](../tasks/README.md)

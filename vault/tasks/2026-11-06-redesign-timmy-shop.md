@@ -24,7 +24,7 @@ with no holiday, Timmy now and then wears a rare costume, the same one all day. 
 
 - The redesign plan: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) (section 4.10). Client:
   [phase 4](2026-11-05-redesign-phase-4-game-layer.md) (part B); server: [phase 5](done/2026-11-05-redesign-phase-5-backend.md)
-  (part 3); live at [the release](2026-11-06-redesign-release.md).
+  (part 3); live at [the release](done/2026-11-06-redesign-release.md).
 - What the house items go into: [Timmy's place](2026-11-06-redesign-timmys-place.md) (the house card, redrawn). XP and its
   boosts: [the journeys note](2026-11-06-redesign-progression-journeys.md). Bowling: [its own note](done/2026-11-06-redesign-bowling-egg.md).
 - Rules that matter most here: [podcast-reactions](../rules/podcast-reactions.md) (the lore rules: never contradict
@@ -128,7 +128,7 @@ his own (what Timmy wears).
     at the shop today: the pirate costume"), it is logged (`record_costume_sighting`) and stays on that student's
     "Spotted" shelf until bought, exactly as the server already does it. Worn only once bought and put on.
   - The build of this rule on Timmy himself (the bar, his place, the classroom, the stage) is
-    [Timmy everywhere](2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"), the session after the shop's client.
+    [Timmy everywhere](done/2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"), the session after the shop's client.
 - **Where the balance shows**: the new dashboard's "you" card, the shop's header and the Shop row in a hub's More. Not
   on a hub's top bar (it already runs past the screen on the longest hub name, BUG-083).
 - **The rank statue hidden behind Timmy at the door** (BUG-089): Timmy's door spot moves to the open side of the door,
@@ -391,7 +391,7 @@ a replay or `dup`, `unknown`, `owned`, `rank`, `not-today`, `today`, `balance`);
 
 **Out of scope**: what Timmy wears on the bar and "everyone has Timmy" (session 3); visiting; the bowling egg;
 price changes; a sixth costume; gold crowns on a hub's top bar or a counter that ticks after an answer; gifting;
-editing the About page (draft it in [the release note](2026-11-06-redesign-release.md), "From phase 4, part B",
+editing the About page (draft it in [the release note](done/2026-11-06-redesign-release.md), "From phase 4, part B",
 with the rare costumes in a spoiler, and finish part C's "What you own" line there).
 
 **Done when** (session 2):
@@ -421,7 +421,7 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
       - [x] the five everyday outfits with no drawing are drawn (Sam, 2026-11-12: draw them; session 1;
             [task](done/2026-11-12-five-outfits-without-a-drawing.md))
 - [x] `LORE.md`, the About page (Shiny Gold Crowns, the shop, rarity, boosts, health items; rare costumes in a spoiler), the event taxonomy
-      and retention rows (session 2; the About page's entry is drafted in [the release note](2026-11-06-redesign-release.md),
+      and retention rows (session 2; the About page's entry is drafted in [the release note](done/2026-11-06-redesign-release.md),
       "From phase 4, part B", and goes on the page with the release)
 - [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
 - [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)

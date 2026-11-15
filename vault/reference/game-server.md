@@ -9,11 +9,11 @@ How the redesign's game layer works on the database: XP without a daily cap, ser
 Shiny Gold Crowns and Timmy's shop (the seasonal sets, the rank sets and throwback days included), visiting someone's place,
 and the idea board. Written and tested on a throwaway copy on 2026-11-06, changed in place on 2026-11-10 for
 [Sam's third round](../tasks/done/2026-11-10-redesign-timmys-place-round-3.md), and **applied
-at [the release](../tasks/2026-11-06-redesign-release.md)**, with `migration_v55.sql` to `v58` after it (all five are in
+at [the release](../tasks/done/2026-11-06-redesign-release.md)**, with `migration_v55.sql` to `v58` after it (all five are in
 `supabase/schema.sql`, after its "the redesign's release" marker, which `tools/release/xp.js` uses to test the moment
 of the switch on made-up history). What each part should do and why:
 [the journeys](../tasks/2026-11-06-redesign-progression-journeys.md), [the shop](../tasks/2026-11-06-redesign-timmy-shop.md),
-[Timmy's place](../tasks/2026-11-06-redesign-timmys-place.md), [the idea board](../tasks/2026-11-06-idea-board.md). The code is
+[Timmy's place](../tasks/2026-11-06-redesign-timmys-place.md), [the idea board](../tasks/done/2026-11-06-idea-board.md). The code is
 the home of the details: read `migration_v54.sql` (its sections are numbered as below).
 
 ## Beside today's, not instead
@@ -237,7 +237,7 @@ that had no drawing and the five rare costumes are drawn as kit outfits under th
 `costume`), and `tools/release/xp.js` fails if a catalog piece has no drawing, a kit costume has no row, or a snack's
 or boost's thumbnail (`widget/hub-art/shop.js`) differs from its row.
 
-The pages that call them (built 2026-11-12, [the idea board](../tasks/2026-11-06-idea-board.md)): `widget/ideas.js` (the
+The pages that call them (built 2026-11-12, [the idea board](../tasks/done/2026-11-06-idea-board.md)): `widget/ideas.js` (the
 board and the tick), `widget/replies.js` (a status note shows as a pop-up once and stays in the Inbox; it reads
 `get_my_inbox_v2` where the page says the game layer is there, which only the new dashboard does so far) and the admin
 page's Inbox, "Idea board" (`admin_ideas`, `admin_set_idea`). The preview answers all of them from made-up ideas
@@ -313,7 +313,7 @@ Learn and Flashcards' server part is its own pending migration, not a change to 
 
 ## Learn and Flashcards (migration_v56)
 
-The Question Bank's "Study as" toggle ([the task](../tasks/2026-11-06-redesign-learn-and-flashcards.md)): **Learn** asks
+The Question Bank's "Study as" toggle ([the task](../tasks/done/2026-11-06-redesign-learn-and-flashcards.md)): **Learn** asks
 questions in rounds until each is right twice; **Flashcards** turn a question over and the student rates it Again, Hard,
 Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sql` needs v54 and v55 and changes neither (Sam chose B of three options,
 2026-11-12, [decisions](../decisions.md)). It was applied at the release, after them.
@@ -363,6 +363,6 @@ the new tables and calls every function a visitor can run with one visitor's id,
 `admin-ops.js` and `retention.js` run with them in place. CI runs all four. `tools/release/rls-audit.sql` checks the same
 two lists on the live database once the migration is applied.
 
-Related: [the release](../tasks/2026-11-06-redesign-release.md) · [phase 5](../tasks/done/2026-11-05-redesign-phase-5-backend.md) ·
+Related: [the release](../tasks/done/2026-11-06-redesign-release.md) · [phase 5](../tasks/done/2026-11-05-redesign-phase-5-backend.md) ·
 [event-taxonomy](event-taxonomy.md) · [analytics-retention](analytics-retention.md) ·
 [learner-data-privacy](../rules/learner-data-privacy.md) · [shared-infrastructure](shared-infrastructure.md)

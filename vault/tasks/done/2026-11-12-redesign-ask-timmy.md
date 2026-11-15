@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: done
 hub: site
 created: 2026-11-12
 requested-by: Sam
 due: 
-waiting-on: "the redesign's release (the function deployed, ANTHROPIC_API_KEY saved, migration_v55 applied with v54, FULL_FROM set, the About page entries)"
+waiting-on: 
 agent: Claude Code (parts 1, 2 and 3, 2026-11-12; part 4, 2026-11-13)
 pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1), https://github.com/smcmurry6-source/study-hubs/pull/338 (part 2), https://github.com/smcmurry6-source/study-hubs/pull/341 (part 3), https://github.com/smcmurry6-source/study-hubs/pull/348 (part 4)
 ---
@@ -17,17 +17,17 @@ pr: https://github.com/smcmurry6-source/study-hubs/pull/334 (part 1), https://gi
 From the redesign's release, Timmy Tooth answers students' questions in every live hub and on the dashboard, from the
 hubs' own content only, with each point linked to the paragraph it came from. Everyone has Timmy: adopting him stops
 being a choice. When a student brings up a problem he offers to send a report; when they have an idea, to put it on the
-idea board. It brings back the dropped [Ask the Hub](done/2026-11-06-ask-the-hub-assistant.md) idea in Timmy's voice;
+idea board. It brings back the dropped [Ask the Hub](2026-11-06-ask-the-hub-assistant.md) idea in Timmy's voice;
 that note's design is the starting point, and where the two differ this one wins.
 
-## Sam's calls (2026-11-12, in chat; [decisions](../decisions.md))
+## Sam's calls (2026-11-12, in chat; [decisions](../../decisions.md))
 
 - "lets make this part of the redesign. this will be incorporated with timmy, he will be your assistant."
 - "adopting timmy is no longer an option. once the redesign launches, everyone has timmy."
 - "This will be for every live hub. use opus 5.5. it will be on the entire time."
 - Paid from Sam's $100 of Claude API credit: "I dont really have much else use for the credits, so im not too concerned
   if they dont get used."
-- "store all chat logs with timmy" (the privacy rule now says so: [learner-data-privacy](../rules/learner-data-privacy.md)).
+- "store all chat logs with timmy" (the privacy rule now says so: [learner-data-privacy](../../rules/learner-data-privacy.md)).
 - "we will need to have some confines for what timmy can do though. limited to the hub content. If they bring up an
   issue, ask them if they want to send a report. if they offer a suggestion, ask them if they want to add a suggestion to
   the suggestion board."
@@ -62,12 +62,12 @@ that note's design is the starting point, and where the two differ this one wins
 
 ## Context
 
-- The redesign: [the release](2026-11-06-redesign-release.md) (its "Ask Timmy" box), [phase 4](2026-11-05-redesign-phase-4-game-layer.md)
-  (part E is this note), [run-a-redesign-session](../how-to/run-a-redesign-session.md) (one part per fresh session).
-- Rules that matter most: [secrets](../rules/secrets.md) (the key lives only in Supabase's secrets),
-  [learner-data-privacy](../rules/learner-data-privacy.md), [graded-coursework](../rules/graded-coursework.md),
-  [about-page](../rules/about-page.md), [preview-and-release-test](../rules/preview-and-release-test.md) (tier 3: a new
-  server function, a migration, shared widget code), [long-tests-once](../rules/long-tests-once.md).
+- The redesign: [the release](2026-11-06-redesign-release.md) (its "Ask Timmy" box), [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)
+  (part E is this note), [run-a-redesign-session](../../how-to/run-a-redesign-session.md) (one part per fresh session).
+- Rules that matter most: [secrets](../../rules/secrets.md) (the key lives only in Supabase's secrets),
+  [learner-data-privacy](../../rules/learner-data-privacy.md), [graded-coursework](../../rules/graded-coursework.md),
+  [about-page](../../rules/about-page.md), [preview-and-release-test](../../rules/preview-and-release-test.md) (tier 3: a new
+  server function, a migration, shared widget code), [long-tests-once](../../rules/long-tests-once.md).
 - **Measured 2026-11-12** (the new versions' content JSON): the as-taught notes are about 41-47k tokens per hub and
   `study.json` (hints, cram sheet, review tables, sequences, sort sets) 23-30k, so about 70-80k a hub and about 220k for
   the dashboard's three. Opus 5.5's list price then: $4 per million tokens in, $20 out, cache reads $0.20 per million,
@@ -147,8 +147,8 @@ that note's design is the starting point, and where the two differ this one wins
 - "From the notes" links go through the hub's router to the paragraph. Thumbs on each answer. Past chats on this hub.
 - Paused during a mock (the chat says why); not on an archived hub.
 - Previews: `tools/preview/runtime/preview.js` answers the function with canned replies; a preview never calls it.
-- Events (`ask:*`) in [event-taxonomy](../reference/event-taxonomy.md); the tables in
-  [analytics-retention](../reference/analytics-retention.md).
+- Events (`ask:*`) in [event-taxonomy](../../reference/event-taxonomy.md); the tables in
+  [analytics-retention](../../reference/analytics-retention.md).
 
 ### The admin page: a Timmy tab
 
@@ -160,7 +160,7 @@ that note's design is the starting point, and where the two differ this one wins
 The engine is four files since #330 (2026-11-12): `widget/hub.js` (the core: routes, Settings, Focus mode, notes,
 `SH_GOTO`, `exportSections`, More), `widget/hub-bank.js` (the question card and the bank), `widget/hub-rewards.js` (the
 answer path, XP, rank, recap) and `widget/hub-timmy.js` (what the engine asks of Timmy). Part 2 works in `hub-bank.js`
-and `hub-timmy.js` and touches the core only for Settings ([run-a-redesign-session](../how-to/run-a-redesign-session.md), step 4).
+and `hub-timmy.js` and touches the core only for Settings ([run-a-redesign-session](../../how-to/run-a-redesign-session.md), step 4).
 
 - **Timmy on a new hub page**: the core's `startWidget()` loads `v3.js`, whose `loadPet()` loads `widget/pet.js` and
   calls `shPet.mount({ where:"hub", H: window.shEggHooks, bootstrap })`. On the new pages he loads **only once adopted**
@@ -246,11 +246,11 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
 
 ## Build spec, part 4: Timmy everywhere (written 2026-11-12, with Sam's calls of that day)
 
-Session 3 of [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release"; it comes after the
+Session 3 of [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release"; it comes after the
 shop's client, because both edit `widget/pet.js`. Read first: "For every session above" there, this note's "Where it
-plugs in", [the shop](2026-11-06-redesign-timmy-shop.md) ("Sam's calls (2026-11-12)"), `widget/place.js`'s top comment.
+plugs in", [the shop](../2026-11-06-redesign-timmy-shop.md) ("Sam's calls (2026-11-12)"), `widget/place.js`'s top comment.
 
-**Sam's calls** ([decisions](../decisions.md)):
+**Sam's calls** ([decisions](../../decisions.md)):
 - 2026-11-12 (above): "adopting timmy is no longer an option. once the redesign launches, everyone has timmy", with
   the defaults Sam left as proposed (full HP to start, existing Timmys keep theirs, the intro goes, he answers at
   any HP).
@@ -332,37 +332,39 @@ change to HP's rules beyond the 100 start; the old pages.
 
 ## Done when
 
-- [x] Sam's calls written down (this note, [decisions](../decisions.md), the privacy rule)
-- [x] Part 1: the migration, the function and its tests ([ask-timmy](../reference/ask-timmy.md)); the test set and the
+- [x] Sam's calls written down (this note, [decisions](../../decisions.md), the privacy rule)
+- [x] Part 1: the migration, the function and its tests ([ask-timmy](../../reference/ask-timmy.md)); the test set and the
       eval, which passes with a fake model (`node tools/timmy/eval.mjs --dry`, in CI)
 - [x] Part 1: the test set passes on the real API (every quote checks out, "not covered" when it should be, quiz and
       practice questions declined, offers drafted, no rule broken): the full run on 2026-11-12, its fixes, and a rerun of
       the fixed prompt (Log)
 - [x] Part 2: the chat on every new hub page and the new dashboard, on a phone and a laptop, with the Report button on
       his answers; the smoke test covers it
-- [x] Part 3: the admin tab (the admin page's Ask Timmy tab, [ask-timmy](../reference/ask-timmy.md); covered by `tools/release/admin-ui.js`)
+- [x] Part 3: the admin tab (the admin page's Ask Timmy tab, [ask-timmy](../../reference/ask-timmy.md); covered by `tools/release/admin-ui.js`)
 - [x] Part 4: everyone has Timmy
       - [x] with it: Timmy on a hub's bar (and wherever else `widget/pet.js` draws him) wears the outfit equipped at
             his place (`shop.equipped.outfit` in the v2 bootstrap; `SH_PLACE.dress()` or `SH_OUTFITS.dress()` draws
             it). Part C of phase 4 left pet.js untouched, so today only the place itself shows it
-            ([the place](2026-11-06-redesign-timmys-place.md), 2026-11-12)
+            ([the place](../2026-11-06-redesign-timmys-place.md), 2026-11-12)
       - [x] as "Build spec, part 4" above says (its own Done when)
 - [x] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
       answered by Claude, Anthropic's AI) in the release note's drafts
 - [x] CI and `node tools/release/run.js` pass; Sam's look on the screenshots (a preview only if Sam wants one)
 - [x] Sam picks Timmy's model: Sonnet 5.5 (2026-11-14, "Lets do sonnet"), from that day's comparison (Log); `MODEL` in
       `core.js` ([#363](https://github.com/smcmurry6-source/study-hubs/pull/363))
-- [ ] At the release, as above
+- [x] At the release, as above
+      **2026-11-14: `migration_v55` applied, the function deployed, `FULL_FROM` set, the About entries live; one real
+      question answered from the notes (the Log's last entry).**
 
 ## Log
 
 - 2026-11-12: written from Sam's calls in chat. This session wrote the plan and the vault changes only; the build is in
-  the four parts above, each in a fresh session ([run-a-redesign-session](../how-to/run-a-redesign-session.md)), and the
+  the four parts above, each in a fresh session ([run-a-redesign-session](../../how-to/run-a-redesign-session.md)), and the
   code map above is from a survey of the redesign's code that day, so they can start without exploring. Next step: part 1.
 - 2026-11-12 (part 1, Claude Code): the server, the database and the test set. `supabase/functions/timmy/` (`core.js`,
   `index.ts`, `site.json`), `migration_v55.sql` (pending), `tools/timmy/` (`test.mjs`, `build.mjs`, `test-set.json`,
   `eval.mjs`), `tools/release/timmy.js`; CI runs the tests, the database suite and the eval's `--dry`. How it works and
-  what parts 2 and 3 need: [ask-timmy](../reference/ask-timmy.md) (its last section). Sam added the Report button mid-way;
+  what parts 2 and 3 need: [ask-timmy](../../reference/ask-timmy.md) (its last section). Sam added the Report button mid-way;
   its server half is in. Choices made: the SDK is `@anthropic-ai/sdk@1.3.0` (it sends the key as `Authorization: Bearer`);
   content paragraphs are numbered with the engine's own rule, tested in Chromium against `exportSections`; the dashboard
   holds at most 4 hubs; a question holds $0.08 against the day's cap while it's answered. Left: the real-API eval run
@@ -370,7 +372,7 @@ change to HP's rules beyond the 100 start; the old pages.
 - 2026-11-12: the first real-API run (in a fresh session, which has the variable) was refused before any answer, at no
   cost: "This API key is not scoped to a workspace". The eval and the function now send a workspace's id when one is
   set (`TIMMY_EVAL_WORKSPACE`; `ANTHROPIC_WORKSPACE_ID` in Supabase); a key made inside a workspace needs neither. The
-  release steps in [ask-timmy](../reference/ask-timmy.md) say so.
+  release steps in [ask-timmy](../../reference/ask-timmy.md) say so.
 - 2026-11-12: the full real-API run (Sam's workspace key, effort medium): 134 cases (137 turns), $11.71, a median wait
   of 7.5 s (90th percentile 12.1 s); 396 quotes checked out and 4 didn't. Every answer was read by hand, and the numbers and
   names in them checked against the content by script: nothing from outside the content, the quiz and practice questions
@@ -388,11 +390,11 @@ change to HP's rules beyond the 100 start; the old pages.
   oc-24, oc-25 and oc-38 all passed ($1.23), choices named by their words, every quote checked out, every fact in the
   content. Spent on the eval in all: about $17.50 (a one-case try $1.32, the full run $11.71, the reruns $3.26 and
   $1.23). Reports: branch `claude/timmy-eval-run-1`, `tools/timmy/runs/` (not merged). Part 1 is done. Sam: "dont
-  bother with the rerun before release" ([decisions](../decisions.md)): the eval runs again only after a change to
+  bother with the rerun before release" ([decisions](../../decisions.md)): the eval runs again only after a change to
   `RULES`, the schema, the effort level or the model.
 - 2026-11-12 (Claude Code, planning only): part 4's build spec is above ("Timmy everywhere": everyone has Timmy, and
   he wears only what the student put on, Sam's call that day), with the prompts for parts 2, 3 and 4 at the end of
-  this note. Where it sits among the sessions left: [phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here
+  this note. Where it sits among the sessions left: [phase 4](../2026-11-05-redesign-phase-4-game-layer.md), "From here
   to the release" (part 4 before part 2, so the chat is built on a Timmy who is always there). For part 2: an idea
   Timmy drafts is posted with source `board`, because the pending `post_idea` refuses `timmy`.
 - 2026-11-12 (part 2, Claude Code, [#338](https://github.com/smcmurry6-source/study-hubs/pull/338)): the chat. `widget/ask.js` + `widget/ask.css`, mounted by `widget/hub-timmy.js` on a
@@ -400,7 +402,7 @@ change to HP's rules beyond the 100 start; the old pages.
   `window.shAsk` exists, so the live hubs are unchanged); the Ask icon in his spot when he isn't shown; "Ask Timmy" in an
   answered card's row (`widget/hub-bank.js`); Report on every answer, nap and error; report and idea drafts (an idea
   posts with source `board`, as the planning entry above says: neither pending migration is changed); the preview's canned replies; `tools/ci/smoke.js`'s `askCheck`. How it fits together:
-  [ask-timmy](../reference/ask-timmy.md), "The chat in the new pages". The About page's entries and the release steps
+  [ask-timmy](../../reference/ask-timmy.md), "The chat in the new pages". The About page's entries and the release steps
   (`sw.js`'s `PRECACHE`, one live question on a phone and a laptop, `site.json` rebuilt after the About edits) are in
   [the release note](2026-11-06-redesign-release.md), "From Ask Timmy, part 2". Choices made: on the dashboard the Ask
   button sits in the "you" card where Timmy's house is; a link from the dashboard's chat opens the hub's new page and
@@ -418,11 +420,11 @@ change to HP's rules beyond the 100 start; the old pages.
 - 2026-11-12 (part 3, Claude Code, [#341](https://github.com/smcmurry6-source/study-hubs/pull/341)): the admin page's **Ask Timmy** tab (`review/index.html`): figures for the range, By
   hub, his settings (switch, daily cap, questions a person a day; Save asks first), By day, and four lists (reported
   answers, not covered, quotes that didn't check out, chats), each row opening its whole chat in place; hub chips; the
-  Inbox's "Read the chat with Timmy" on a report from the Report button. How it works: [ask-timmy](../reference/ask-timmy.md),
+  Inbox's "Read the chat with Timmy" on a report from the Report button. How it works: [ask-timmy](../../reference/ask-timmy.md),
   "The admin page's Ask Timmy tab". Neither pending migration is applied or changed: until the release the tab says Ask
   Timmy starts then (the calls answer "Could not find the function") and it works once they answer. The preview answers
   the six calls with made-up chats shaped as migration_v55 returns them, and a new preview setting (`missing`) shows a
-  page as it is before a migration ([preview-a-change](../how-to/preview-a-change.md)); `tools/release/admin-ui.js` covers
+  page as it is before a migration ([preview-a-change](../../how-to/preview-a-change.md)); `tools/release/admin-ui.js` covers
   the tab (figures, chats as text, no ids, settings, the Inbox link, before the release, axe, a phone). Choices made: no
   people total for a range (the daily rows count distinct people per day and hub, which don't add up), so By hub shows the
   busiest day; the chat list loads the newest 200 in the range; a chat's context is drawn field by field, never whole.
@@ -448,7 +450,7 @@ change to HP's rules beyond the 100 start; the old pages.
   `widget/hub-art/outfits.js` is fetched only after the first scroll, wheel, tap or key when nothing current is kept.
   `widget/hub-timmy.js`: `hasTimmy()` is true, More has Timmy's place and the shop for everyone (`hasShop()` = a `shop`
   in the bootstrap). The live pages pass nothing, and every line of their behavior stays (the smoke test checks the live
-  hub's and dashboard's intro, holiday outfit and `fit()`). How it fits together: [ask-timmy](../reference/ask-timmy.md),
+  hub's and dashboard's intro, holiday outfit and `fit()`). How it fits together: [ask-timmy](../../reference/ask-timmy.md),
   "Everyone has Timmy"; the release's steps (set `FULL_FROM`, take the adoption code out) and the About drafts:
   [the release note](2026-11-06-redesign-release.md), "From Ask Timmy, part 4". Choices made, for Sam: a Timmy who starts
   at 100 earns Pearly Whites only after a day that ended under 100 (otherwise a first visit would award it at once); a
@@ -482,11 +484,23 @@ change to HP's rules beyond the 100 start; the old pages.
   models (130-165k tokens a hub, about 410k on the dashboard; the 70-84k planned on 2026-11-12 was an estimate), so a cache
   write costs about $0.60 a hub on Sonnet ($1.70 on the dashboard) against about $1.10 ($3.24) on Opus, and a cached
   question about 2 cents against 4.
+- 2026-11-14, the release ([its note](2026-11-06-redesign-release.md)): `migration_v55` applied with v54, the function
+  deployed with JWT verification off (`node tools/timmy/deploy.mjs`), `FULL_FROM` is `"2026-11-14"`. **The first live
+  question failed (BUG-150):** the function's secrets had no `ANTHROPIC_API_KEY`; the key Sam saved that day is named
+  `TIMMY_EVAL_KEY`, the eval's name for it. `index.ts` reads that name when the first isn't set, and the same question
+  then came back as an answer with four checked quotes from Occlusion's notes (6 s, $0.60 with the first cache write).
+  The fake model in the tests and the made-up replies in a preview can't see a missing key; one real question after a
+  deploy is the check ([ask-timmy](../../reference/ask-timmy.md), "At the release", step 4).
+
 ## Outcome
 
-Related: [the release](2026-11-06-redesign-release.md) · [phase 4](2026-11-05-redesign-phase-4-game-layer.md) ·
-[Ask the Hub](done/2026-11-06-ask-the-hub-assistant.md) · [learner-data-privacy](../rules/learner-data-privacy.md) ·
-[decisions](../decisions.md)
+**Released 2026-11-14** with the redesign. Ask Timmy answers on the dashboard, Occlusion and Perio from each hub's own
+notes, on Sonnet 5.5, with his switch, cap and chats on the admin page's Ask Timmy tab. Left for Sam, in the
+[inbox](../inbox.md): one question from a phone, and the key's name in Supabase (it works as it is).
+
+Related: [the release](2026-11-06-redesign-release.md) · [phase 4](../2026-11-05-redesign-phase-4-game-layer.md) ·
+[Ask the Hub](2026-11-06-ask-the-hub-assistant.md) · [learner-data-privacy](../../rules/learner-data-privacy.md) ·
+[decisions](../../decisions.md)
 
 ## Opening prompts
 
@@ -494,7 +508,7 @@ Part 4, Timmy everywhere (after the shop's client is merged):
 
 > Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then "From here to the release" in
 > `vault/tasks/2026-11-05-redesign-phase-4-game-layer.md` and its Log's last entries, then do **"Build spec, part 4:
-> Timmy everywhere"** in `vault/tasks/2026-11-12-redesign-ask-timmy.md`. Grep the big files (`widget/pet.js` is 180 KB),
+> Timmy everywhere"** in `vault/tasks/done/2026-11-12-redesign-ask-timmy.md`. Grep the big files (`widget/pet.js` is 180 KB),
 > never read them whole. No subagents. The live pages must behave exactly as today. `migration_v54.sql` is not applied
 > and is not to be changed: if the client disagrees with it, tell me. No hosted preview: screenshots from a scripted
 > browser on the preview's made-up data. Open a draft PR with the test report; I'll say "merge".
@@ -503,7 +517,7 @@ Part 2, the chat (after part 4 is merged):
 
 > Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then "From here to the release" in
 > `vault/tasks/2026-11-05-redesign-phase-4-game-layer.md`, then do **part 2** of
-> `vault/tasks/2026-11-12-redesign-ask-timmy.md` (the chat in the new pages), from its "Where it plugs in" and
+> `vault/tasks/done/2026-11-12-redesign-ask-timmy.md` (the chat in the new pages), from its "Where it plugs in" and
 > `vault/reference/ask-timmy.md`. Everyone has Timmy now, so the Ask icon takes his place only when he is turned off
 > or in Focus mode. An idea he drafts posts with source `board`. Grep the big files, never read them whole. No
 > subagents. Neither pending migration is applied or changed. No hosted preview. Open a draft PR with the test report.
@@ -511,7 +525,7 @@ Part 2, the chat (after part 4 is merged):
 Part 3, the admin page's Timmy tab (any time; it touches only `review/`):
 
 > Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then do **part 3** of
-> `vault/tasks/2026-11-12-redesign-ask-timmy.md` (the admin page's Timmy tab), from its "Where it plugs in" and
+> `vault/tasks/done/2026-11-12-redesign-ask-timmy.md` (the admin page's Timmy tab), from its "Where it plugs in" and
 > `vault/reference/ask-timmy.md` (its admin calls and "Notes for the admin tab"). Grep `review/index.html`, never read it
 > whole. No subagents. Neither pending migration is applied or changed: the live admin page has no `admin_timmy_*`
 > functions until the release, so the tab says so then and works once they answer. Give the preview's `rpc()` the

@@ -30,4 +30,4 @@ topic's words and its question list decide what that level shows: after changing
 `node tools/hub-next/high-yield.mjs <hub> <lecture>`. Never write High yield text by hand.
 
 Related: [question-bank-filter-panel](question-bank-filter-panel.md) (the High likelihood toggle) ·
-[the redesign release](../tasks/2026-11-06-redesign-release.md) (High yield's drafts)
+[the redesign release](../tasks/done/2026-11-06-redesign-release.md) (High yield's drafts)

@@ -28,7 +28,7 @@ surveys, comments, a leaderboard name). No accounts, emails, IP addresses, devic
   anything typed (except search terms, already trimmed and without an id, and Timmy's chats, below), and add no
   third-party analytics or ad scripts. Kinds and click targets never carry free text, names or per-student ids.
 - **Timmy's chats are stored** (Sam, 2026-11-12: "store all chat logs with timmy", from the redesign's release,
-  [the task](../tasks/2026-11-12-redesign-ask-timmy.md)): every message to and from Timmy, with the visitor id, so a whole
+  [the task](../tasks/done/2026-11-12-redesign-ask-timmy.md)): every message to and from Timmy, with the visitor id, so a whole
   conversation can be read. They are sent to Anthropic's API to be answered (that's how Timmy works) and nowhere else. Only
   the admin page reads them, behind the admin secret; a student's browser reads only its own. Students are told above the
   chat box that chats are saved to help improve the hub, and the About page says so. Everything above still holds for

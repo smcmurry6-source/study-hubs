@@ -82,8 +82,9 @@ Since the redesign's release (2026-11) every hub runs on the shared engine (`wid
 
 The server grades answers and pays XP from its own copy of each hub's keys ([game-server](../reference/game-server.md)).
 After a PR that adds, edits, retires or re-keys a question is merged, load that hub's keys again:
-`node tools/xp/keys.js <hub-id> --sql` prints one statement for the Supabase connector (put the admin secret in by
-hand, never in a file: [secrets](../rules/secrets.md)). Until it's loaded a new question is recorded but earns nothing,
+**`node tools/xp/keys.js <hub-id> --load`** loads them (it needs `SB_KEY` and `ADMIN_SECRET` in the environment and
+prints the count, which should be the hub's question count); without them, `--sql` prints one statement for the
+Supabase connector (put the admin secret in by hand, never in a file: [secrets](../rules/secrets.md)). Until it's loaded a new question is recorded but earns nothing,
 and an edited one is graded against the key it had before, so do it in the same sitting as the merge. A page a
 student still has open from before the edit is graded against the key it showed.
 

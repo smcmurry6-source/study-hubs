@@ -6,8 +6,8 @@ tags: [timmy, ask-timmy, supabase, edge-function, claude-api, redesign, privacy]
 # Ask Timmy: the server (the `timmy` Edge Function and migration_v55) and the chat
 
 How Ask Timmy answers a student: the Supabase Edge Function `timmy`, its database half (`migration_v55.sql`), the tests
-and the eval, and the chat in the new pages (`widget/ask.js`, "The chat" below). Built 2026-11-12 as parts 1 and 2 of [the task](../tasks/2026-11-12-redesign-ask-timmy.md) (Sam's calls are
-there and in [decisions](../decisions.md)); **deployed and applied at [the redesign's release](../tasks/2026-11-06-redesign-release.md)**.
+and the eval, and the chat in the new pages (`widget/ask.js`, "The chat" below). Built 2026-11-12 as parts 1 and 2 of [the task](../tasks/done/2026-11-12-redesign-ask-timmy.md) (Sam's calls are
+there and in [decisions](../decisions.md)); **deployed and applied at [the redesign's release](../tasks/done/2026-11-06-redesign-release.md)**.
 
 ## The files
 
@@ -119,7 +119,7 @@ person to read. The full report (every question and answer) is written as markdo
   or also set `TIMMY_EVAL_WORKSPACE` to the workspace's id. A variable added to the environment reaches only sessions
   started after it, so a session that started before runs the eval in a fresh session on its branch.
 - `--model <id>`: the same cases on another model (`withModel()` in `core.js` leaves the fallback out for Haiku, which has
-  none). On 2026-11-14 Sonnet 5.5 cost $6.30 for the whole set and Haiku 5.5 $2.07 ([the task](../tasks/2026-11-12-redesign-ask-timmy.md)'s Log).
+  none). On 2026-11-14 Sonnet 5.5 cost $6.30 for the whole set and Haiku 5.5 $2.07 ([the task](../tasks/done/2026-11-12-redesign-ask-timmy.md)'s Log).
 - `--regrade <report.json>`: free; grades a saved run again with this checkout's grader and quote check, for a change to
   the grading or to `quoteIn`.
 - Rerun it after changing `RULES`, the schema, the effort level or the model. Not before the release unless one of those
@@ -127,19 +127,28 @@ person to read. The full report (every question and answer) is written as markdo
 
 ## At the release (the release note's Ask Timmy box)
 
-The steps as they were done at the redesign's release ([the release](../tasks/2026-11-06-redesign-release.md)); they are
+The steps as they were done at the redesign's release ([the release](../tasks/done/2026-11-06-redesign-release.md)); they are
 also how to set Ask Timmy up again on a new project.
 
-1. Sam saves `ANTHROPIC_API_KEY` in the Supabase dashboard (Edge Functions, Secrets; saved 2026-11-14) and sets the Console's spending limit (skipped for now, [decisions](../decisions.md)).
+1. Sam saves `ANTHROPIC_API_KEY` in the Supabase dashboard (Edge Functions, Secrets) and sets the Console's spending limit (skipped for now, [decisions](../decisions.md)).
+   **The key saved on 2026-11-14 is named `TIMMY_EVAL_KEY`** (found at the release, BUG-150), so `index.ts` reads that
+   name when there is no `ANTHROPIC_API_KEY`; a secret with the right name, once saved, is the one used.
    **Make the key inside a workspace** (the Console's workspace, then API keys). A key made outside one is refused
    ("This API key is not scoped to a workspace", found on 2026-11-12's first eval run) unless the workspace's id is also
    saved, as `ANTHROPIC_WORKSPACE_ID`.
 2. Apply `migration_v55.sql` after `migration_v54.sql` (both are in `supabase/schema.sql`).
-3. Deploy the function with JWT verification off (the Supabase connector's `deploy_edge_function`: `index.ts`, `core.js`,
-   `site.json`). `TIMMY_CONTENT_BASE` needs no setting: its default is the released content address
+3. Deploy the function with JWT verification off: **`node tools/timmy/deploy.mjs`** (it sends `index.ts`, `core.js` and
+   `site.json` as they are through Supabase's management API, with the access token in the session's environment, and
+   prints the version; the Supabase connector's `deploy_edge_function` does the same if the three files are pasted into
+   it). `TIMMY_CONTENT_BASE` needs no setting: its default is the released content address
    (`https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/content/`). **Deploy it again after a change to
    `supabase/functions/timmy/`** (`site.json` changes whenever the About page does).
-4. One question from the live site on a phone; the admin page's Ask Timmy tab shows it, with its cost, and opens its chat.
+4. **One real question after every deploy.** The tests use a fake model and a preview answers with made-up replies, so a
+   missing or refused key shows only here (at the release every answer was "I nodded off" until step 1's name was
+   found). From the live site on a phone; the admin page's Ask Timmy tab shows it, with its cost, and opens its chat.
+   An agent sends one POST to the function with the site's origin and a made-up visitor id of its own (the body is in
+   "One question, start to finish" above; `kind` should be `answer`), reads the function's log if it isn't, and tells
+   Sam the chat is its own.
 
 ## The chat in the new pages (`widget/ask.js` + `ask.css`, part 2)
 
@@ -194,7 +203,7 @@ download it, which keeps the new dashboard inside its request budget (`tools/rel
 
 ## Everyone has Timmy (`widget/pet.js`, part 4)
 
-Built 2026-11-13 ([the task](../tasks/2026-11-12-redesign-ask-timmy.md), "Build spec, part 4"). Sam, 2026-11-12:
+Built 2026-11-13 ([the task](../tasks/done/2026-11-12-redesign-ask-timmy.md), "Build spec, part 4"). Sam, 2026-11-12:
 "adopting timmy is no longer an option. once the redesign launches, everyone has timmy", and "if someone doesnt have a
 costume applied, they are naked. What you put wins." **Since the release it is the only behavior, on every page**: the
 adoption, the introduction, "Tap me!", the dashboard's perch and his holiday outfits came out of `pet.js`.
@@ -272,6 +281,6 @@ with the 7, 30 or 90 days range. Its code and notes are under "Ask Timmy" in the
   refused, asked first, Escape, saved once, off and on again), the Inbox's link, the tab before the release, axe on the
   tab with chats open, and a 390 px phone with a chat open.
 
-Related: [the task](../tasks/2026-11-12-redesign-ask-timmy.md) · [the release](../tasks/2026-11-06-redesign-release.md) ·
+Related: [the task](../tasks/done/2026-11-12-redesign-ask-timmy.md) · [the release](../tasks/done/2026-11-06-redesign-release.md) ·
 [game-server](game-server.md) · [event-taxonomy](event-taxonomy.md) · [analytics-retention](analytics-retention.md) ·
 [learner-data-privacy](../rules/learner-data-privacy.md) · [secrets](../rules/secrets.md)

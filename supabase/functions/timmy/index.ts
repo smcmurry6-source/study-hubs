@@ -1,7 +1,8 @@
 // Ask Timmy: the Supabase Edge Function `timmy` (vault/reference/ask-timmy.md). A thin wrapper: everything it decides is
 // in core.js, which the tests run under Node. This file only connects it to the world:
 //   - the model: Anthropic's API, with ANTHROPIC_API_KEY from the function's secrets (Sam saves it in the Supabase
-//     dashboard, Edge Functions > Secrets; never in the repo or a chat);
+//     dashboard, Edge Functions > Secrets; never in the repo or a chat). When no secret has that name it reads
+//     TIMMY_EVAL_KEY: at the release (2026-11-14) the key Sam had saved there was under that name;
 //   - the database: timmy_begin and timmy_finish (migration_v55), called with the service-role key the runtime provides;
 //   - the content: each hub's published content JSON, fetched from the site and kept in memory for 10 minutes;
 //   - the site help: site.json beside this file (tools/timmy/build.mjs builds it from the About page).
@@ -23,7 +24,8 @@ const TTL = 10 * 60 * 1000;
 
 // a key made outside a workspace needs the workspace's id with every call (ANTHROPIC_WORKSPACE_ID, optional)
 const WORKSPACE = Deno.env.get("ANTHROPIC_WORKSPACE_ID") ?? "";
-const client = new Anthropic({ apiKey: Deno.env.get("ANTHROPIC_API_KEY"), maxRetries: 1, timeout: 120_000,
+const API_KEY = Deno.env.get("ANTHROPIC_API_KEY") || Deno.env.get("TIMMY_EVAL_KEY") || undefined;
+const client = new Anthropic({ apiKey: API_KEY, maxRetries: 1, timeout: 120_000,
   defaultHeaders: WORKSPACE ? { "anthropic-workspace-id": WORKSPACE } : undefined });
 
 async function rpc(name: string, args: Record<string, unknown>) {

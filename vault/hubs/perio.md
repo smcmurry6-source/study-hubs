@@ -140,7 +140,7 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
 ## On the engine (since the redesign's release)
 
 Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/2026-11-05-redesign-phase-2-live-hubs.md)) and moved to
-`hubs/perio/` at the [release](../tasks/2026-11-06-redesign-release.md).
+`hubs/perio/` at the [release](../tasks/done/2026-11-06-redesign-release.md).
 - It is in `sw.js`'s `HUBS`, so its page, art and content are precached; a content edit shows on the page load after the
   one that fetched it.
 - Each session's Review tables sit under that session's notes (`core.noSide`: More's Side by side has nothing left, so
@@ -172,7 +172,7 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/2026-11-05-r
   `widget/hub-art/perio.js` and `tools/preview/design/art.js`, and show Sam before it goes in.
 - Not carried over (on purpose): the MCQ sprint and the midterm's scope (the midterm is over), the old lobby's daily
   rotating first game (Pocket Showdown is first), hints' slide and email source tags. Active recall is the
-  [Learn and Flashcards](../tasks/2026-11-06-redesign-learn-and-flashcards.md) task's.
+  [Learn and Flashcards](../tasks/done/2026-11-06-redesign-learn-and-flashcards.md) task's.
 
 ## Pending
 

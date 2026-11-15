@@ -98,7 +98,7 @@ owns that tier's set and not the next), `node tools/release/rls.js`, the smoke t
 ## Outcome
 
 Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·
-[game-server](../reference/game-server.md) · [the release](2026-11-06-redesign-release.md)
+[game-server](../reference/game-server.md) · [the release](done/2026-11-06-redesign-release.md)
 
 ## Opening prompt
 

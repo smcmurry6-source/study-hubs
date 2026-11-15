@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: done
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: "the redesign's release (migration_v56 applied after v54 and v55, sw.js's PRECACHE, the About page entries)"
+waiting-on: 
 agent: Claude Code (2026-11-12)
 pr: https://github.com/smcmurry6-source/study-hubs/pull/344
 ---
@@ -16,7 +16,7 @@ pr: https://github.com/smcmurry6-source/study-hubs/pull/344
 
 Still wanted (Sam, 2026-11-11, on the new Heme & Endo Exam 2: "i had previously asked for a quizlet learn mode and an anki
 flashcard mode ... did that get lost"). It wasn't built in phase 1 or 2; it's this task, in a session of its own
-([run-a-redesign-session](../how-to/run-a-redesign-session.md)).
+([run-a-redesign-session](../../how-to/run-a-redesign-session.md)).
 
 Sam's idea (2026-11-06): "a toggle in the question bank to switch the format to Quizlet Learn or Anki flashcards." The
 Questions view gets a three-way toggle, **Study as: Questions · Learn · Flashcards**. It changes how the questions the
@@ -26,20 +26,20 @@ by side in the engine and **ships with the redesign's release**.
 
 ## Context
 
-- The redesign plan: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) (section 4.4, the question card and the
+- The redesign plan: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) (section 4.4, the question card and the
   core loop; section 4.10, the additions), [the release](2026-11-06-redesign-release.md) (the drafts for the rule and About
-  page edits), [phase 2](2026-11-05-redesign-phase-2-live-hubs.md) (every hub that switches gets it from the engine).
+  page edits), [phase 2](../2026-11-05-redesign-phase-2-live-hubs.md) (every hub that switches gets it from the engine).
 - The engine, four files since 2026-11-12 (the top of `widget/hub.js` says how they fit): `widget/hub-bank.js` (`card()`
   and `wireCard()`, the bank's `drawQuestions()` and `filtered()`, the sets in `SETS`), `widget/hub-rewards.js`
-  (`recordAnswer()`) and `widget/hub.js` (`SH_SYNC`); the server: [game-server](../reference/game-server.md) (`record_answer_v2`, its `ctx`
+  (`recordAnswer()`) and `widget/hub.js` (`SH_SYNC`); the server: [game-server](../../reference/game-server.md) (`record_answer_v2`, its `ctx`
   list, the guardrails, self-graded pay) in `migration_v54.sql`, which is still pending, so it can still change.
-- Rules that matter most here: [question-bank-filter-panel](../rules/question-bank-filter-panel.md) (the panel stays as
-  written; the toggle is added to it at the release), [every-choice-gets-a-why](../rules/every-choice-gets-a-why.md),
-  [two-statement-and-true-false](../rules/two-statement-and-true-false.md) and [numbered-statements](../rules/numbered-statements.md)
-  (fixed choice order, kept here), [question-ids-are-permanent](../rules/question-ids-are-permanent.md) (all saved progress is
-  keyed by id), [question-health-flags-are-leads](../rules/question-health-flags-are-leads.md),
-  [learner-data-privacy](../rules/learner-data-privacy.md) (a new per-person log), [about-page](../rules/about-page.md),
-  [preview-and-release-test](../rules/preview-and-release-test.md) (tier 3, with the redesign).
+- Rules that matter most here: [question-bank-filter-panel](../../rules/question-bank-filter-panel.md) (the panel stays as
+  written; the toggle is added to it at the release), [every-choice-gets-a-why](../../rules/every-choice-gets-a-why.md),
+  [two-statement-and-true-false](../../rules/two-statement-and-true-false.md) and [numbered-statements](../../rules/numbered-statements.md)
+  (fixed choice order, kept here), [question-ids-are-permanent](../../rules/question-ids-are-permanent.md) (all saved progress is
+  keyed by id), [question-health-flags-are-leads](../../rules/question-health-flags-are-leads.md),
+  [learner-data-privacy](../../rules/learner-data-privacy.md) (a new per-person log), [about-page](../../rules/about-page.md),
+  [preview-and-release-test](../../rules/preview-and-release-test.md) (tier 3, with the redesign).
 
 ## What the data says (2026-11-06, read-only, totals only)
 
@@ -150,19 +150,19 @@ by side in the engine and **ships with the redesign's release**.
 - The server part is added to the pending game-layer server (a section in `migration_v54.sql` while it's unapplied, or
   `migration_v55.sql` listed in `supabase/pending-migrations.txt`), with checks in `tools/release/xp.js` (pay, a replayed call,
   a double tap, a linked device, Study ahead paying nothing) and `tools/release/rls.js` (no other visitor's rows), and a section
-  in [game-server](../reference/game-server.md).
+  in [game-server](../../reference/game-server.md).
 
 ### Tracking, privacy and the About page
 
 - `bank:view=questions|learn|cards` (the toggle), `learn:round-done`, `learn:all-mastered`, `learn:start-over`,
   `cards:caught-up`, `cards:ahead`, `cards:new` (`window.shTrack`); the ratings themselves are in `card_reviews`, not clicks.
-- `card_reviews` is per-person: its row in [event-taxonomy](../reference/event-taxonomy.md), its line in
-  [analytics-retention](../reference/analytics-retention.md) (kept like `personal_answers`), and "What the hubs record" on the
+- `card_reviews` is per-person: its row in [event-taxonomy](../../reference/event-taxonomy.md), its line in
+  [analytics-retention](../../reference/analytics-retention.md) (kept like `personal_answers`), and "What the hubs record" on the
   About page ("how you rated each flashcard, so your schedule follows you to your other devices").
 - About page, Questions: a new entry for **Study as** with Learn and Flashcards (what each does, the schedule ending on exam
   eve, what earns XP), tagged new.
 
-## Sam's calls (2026-11-06, [decisions](../decisions.md))
+## Sam's calls (2026-11-06, [decisions](../../decisions.md))
 
 Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 are all good with me"):
 
@@ -183,7 +183,7 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
       any page's first load), in every hub on the engine (Occlusion, Heme & Endo Exam 2, Perio)
 - [x] The two icons drawn in `tools/figures/site/icons.mjs` and built into `widget/hub-art.js` (Sam: "Yes, both")
 - [x] The server part: `migration_v56.sql`, pending after v54 and v55 (Sam: "B"), with its `xp.js` and `rls.js` checks, and
-      [game-server](../reference/game-server.md) updated
+      [game-server](../../reference/game-server.md) updated
 - [x] Every format checked in both views on a phone and a laptop: one-answer, select-all, true/false, two-statement,
       numbered, EXCEPT, which-is-true and which-is-false, put-in-order, match, Patient box, figure questions, self-graded
       recall (light and dark, motion on and off)
@@ -191,7 +191,7 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
 - [x] Event taxonomy, analytics retention; the About page's "What the hubs record" is in the release note's drafts
 - [x] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
 - [x] Vault written back (`DEPLOY_NOTES.md`, this note's Outcome)
-- [ ] At the release: `migration_v56.sql` applied after v54 and v55, `widget/study-modes.js` and `.css` in `sw.js`'s
+- [x] At the release (2026-11-14, done): `migration_v56.sql` applied after v54 and v55, `widget/study-modes.js` and `.css` in `sw.js`'s
       `PRECACHE`, the About page entries (the steps are in [the release note](2026-11-06-redesign-release.md), "From the
       Learn and Flashcards toggle")
 
@@ -201,7 +201,7 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
   they are; the calls above are proposals until Sam confirms them.
 - 2026-11-06: Sam confirmed all six calls; ready to build.
 - 2026-11-12 (Claude Code, planning the rest of phase 4): not built yet. It touches `widget/hub-bank.js` and can run
-  beside the phase 4 sessions ([phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here to the release"). Its
+  beside the phase 4 sessions ([phase 4](../2026-11-05-redesign-phase-4-game-layer.md), "From here to the release"). Its
   "server part in the pending migration" is a change to `migration_v54.sql`, which Sam has said not to change without
   his word: ask him at the start of the session (or build it with no server part).
 
@@ -215,7 +215,7 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
   and a streak chip from 3 in a row, Mastered pops with a small burst, the round's end fills the bar from where the
   round began (+n%) and lists the round's questions, and "You mastered all" ends in a burst. Motion off: the end states
   only.
-  - How it's built: [game-server](../reference/game-server.md), "Learn and Flashcards"; `widget/study-modes.js`'s header.
+  - How it's built: [game-server](../../reference/game-server.md), "Learn and Flashcards"; `widget/study-modes.js`'s header.
     Learn's step and the flashcard schedule are kept per question on the device (`STATE.learn`, `STATE.cards`); each
     rating or step goes to `card_reviews` (queued in `STATE.cardq` while offline or before the migration) and
     `get_my_cards` replays them on another device. A flashcard is drawn as `.qc.fcard` with `data-fqid`, never a
@@ -241,7 +241,7 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
   stops it). Flashcards: a tall card, the ratings stuck to the bottom of the screen, swipe left for Again and right for
   Good on a phone, the arrow keys, choices never opened stay folded on the back, and "All caught up" shows the session
   by rating. The six calls above stand (rounds of 7, two rights, the schedule, what pays). Not built: a typed answer and
-  an undo for a rating ([inbox](inbox.md)).
+  an undo for a rating ([inbox](../inbox.md)).
 
 ## Outcome
 
@@ -249,15 +249,19 @@ Built and merged ([#344](https://github.com/smcmurry6-source/study-hubs/pull/344
 server part as `migration_v56.sql` (pending, after v54 and v55, which are unchanged). Nothing students see changes until
 the release; the release note says what goes in then.
 
-Related: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) · [the release](2026-11-06-redesign-release.md) ·
-[phase 2](2026-11-05-redesign-phase-2-live-hubs.md) · [question-bank-filter-panel](../rules/question-bank-filter-panel.md) ·
-[game-server](../reference/game-server.md)
+**Released 2026-11-14** with the redesign ([the release](2026-11-06-redesign-release.md)), in Occlusion and Perio, as
+rebuilt in the release's second round (full-screen sessions, Quizlet-style Learn, rated flashcards). `migration_v56` is
+applied. Left for Sam, in the [inbox](../inbox.md): one Learn round and a flashcard on the live site.
+
+Related: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) · [the release](2026-11-06-redesign-release.md) ·
+[phase 2](../2026-11-05-redesign-phase-2-live-hubs.md) · [question-bank-filter-panel](../../rules/question-bank-filter-panel.md) ·
+[game-server](../../reference/game-server.md)
 
 ## Opening prompt
 
 > Work in smcmurry6-source/study-hubs. Read `AGENTS.md`, then "For every session above" in
 > `vault/tasks/2026-11-05-redesign-phase-4-game-layer.md`, then do the task in
-> `vault/tasks/2026-11-06-redesign-learn-and-flashcards.md`. Its note asks for a server part in the pending
+> `vault/tasks/done/2026-11-06-redesign-learn-and-flashcards.md`. Its note asks for a server part in the pending
 > migration: before any code, tell me in one message what that part is and whether the toggle can ship without it,
 > and wait for my answer. `migration_v54.sql` is not applied and is not changed without my word. Grep the big files,
 > never read them whole. No subagents. No hosted preview. Open a draft PR with the test report.

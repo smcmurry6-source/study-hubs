@@ -24,7 +24,7 @@ version for reduced motion. Ships with the redesign.
 
 - The redesign plan: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) (section 4.10).
   The client side is [phase 4](2026-11-05-redesign-phase-4-game-layer.md) (part A); the server side is
-  [phase 5](done/2026-11-05-redesign-phase-5-backend.md) (part 3); both go live with [the release](2026-11-06-redesign-release.md).
+  [phase 5](done/2026-11-05-redesign-phase-5-backend.md) (part 3); both go live with [the release](done/2026-11-06-redesign-release.md).
 - Rules that matter most here: [preview-and-release-test](../rules/preview-and-release-test.md),
   [about-page](../rules/about-page.md), [learner-data-privacy](../rules/learner-data-privacy.md),
   [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md) (the drawn ink style),
@@ -283,7 +283,7 @@ and the pill takes the server's total when the reply comes; no request is added 
     handpiece medallions are byte for byte what they were (every tier, size and option). The smoke test has a new
     block for it on one new hub. The preview takes `?xp=<n>` to stand a test account anywhere on the ladder.
   - **Left, written down**: the arcade's +50 and Timmy Time's minutes, the journey trophies in the trophy case, sound,
-    and the About entries are boxes and drafts in [the release note](2026-11-06-redesign-release.md) ("From phase 4,
+    and the About entries are boxes and drafts in [the release note](done/2026-11-06-redesign-release.md) ("From phase 4,
     part A"); the admin page's resolve control and the About page are this note's own open boxes; Timmy's place past
     125,000 is [part C](2026-11-06-redesign-timmys-place.md)'s.
 

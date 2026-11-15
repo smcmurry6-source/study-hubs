@@ -3,6 +3,8 @@
 // admin_load_question_keys), worked out from the hub's content JSON, so record_answer_v2 can decide right or wrong.
 //   node tools/xp/keys.js <hub>                    the JSON array for admin_load_question_keys's p_keys
 //   node tools/xp/keys.js <hub> --sql              one SQL statement for the connector (the admin secret stays a placeholder)
+//   node tools/xp/keys.js <hub> --load             load them into the live project now (SB_KEY and ADMIN_SECRET from the
+//                                                  environment, never printed: vault/rules/secrets.md); prints the count
 //   node tools/xp/keys.js <hub> --file <questions.json>   another content file (default hubs/<hub>/content/questions.json)
 // Each key: { id, v, kind, answer, counted }. kind: "one" (mcq: the right choice's authored index), "all" (multi: the
 // right choices), "order" (sequence: the steps 0..n-1 in their right order), "self" (match and recall cards, graded by the
@@ -55,9 +57,19 @@ module.exports = { keys, keyFor, fp, exported };
 
 if (require.main === module) {
   const a = process.argv.slice(2), hub = a[0], fi = a.indexOf('--file');
-  if (!hub || !/^[a-z0-9][a-z0-9-]{0,39}$/.test(hub)) { console.error('usage: node tools/xp/keys.js <hub> [--sql] [--file questions.json]'); process.exit(2); }
+  if (!hub || !/^[a-z0-9][a-z0-9-]{0,39}$/.test(hub)) { console.error('usage: node tools/xp/keys.js <hub> [--sql | --load] [--file questions.json]'); process.exit(2); }
   const k = keys(hub, fi > 0 ? a[fi + 1] : null), json = JSON.stringify(k);
   if (a.includes('--sql')) console.log(`select admin_load_question_keys('<ADMIN_SECRET>', '${hub}', '${json.replace(/'/g, "''")}'::jsonb, true);`);
+  else if (a.includes('--load')) {
+    // the public API, the way the admin page calls an admin function; a key missing from the bank is retired, as with --sql
+    const key = process.env.SB_KEY, secret = process.env.ADMIN_SECRET;
+    if (!key || !secret) { console.error('✗ --load needs SB_KEY and ADMIN_SECRET in the environment'); process.exit(2); }
+    fetch('https://thytmzsgymydbzcqdnix.supabase.co/rest/v1/rpc/admin_load_question_keys', { method: 'POST',
+      headers: { apikey: key, Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_secret: secret, p_hub: hub, p_keys: k, p_retire_missing: true }) })
+      .then(async r => { console.log((r.ok ? '✓ ' : '✗ ') + r.status + ' ' + (await r.text()).split(secret).join('<secret>').slice(0, 400)); process.exitCode = r.ok ? 0 : 1; })
+      .catch(e => { console.error('✗ ' + e.message); process.exitCode = 1; });
+  }
   else console.log(json);
   console.error(`${k.filter(x => !x.retired).length} keys, ${k.filter(x => x.retired).length} retired ids`);
 }

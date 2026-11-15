@@ -66,7 +66,7 @@ tags: [map]
   sources, run `node tools/bundle/build.mjs`, commit both; CI's `--check` fails on a stale one), and `client/` builds
   the slim database client `widget/vendor/supabase-lite-2.117.2.js`. The old single-file hub pages don't load any of it. The Question Bank's Learn and Flashcards are
   `widget/study-modes.js` + `widget/study-modes.css`, fetched by `hub-bank.js` the first time either is opened
-  ([the task](../tasks/2026-11-06-redesign-learn-and-flashcards.md); their server part is `migration_v56.sql`).
+  ([the task](../tasks/done/2026-11-06-redesign-learn-and-flashcards.md); their server part is `migration_v56.sql`).
   The bowling egg ([the task](../tasks/done/2026-11-06-redesign-bowling-egg.md)) is `widget/bowling.js` (`window.shBowl`, its
   styles inside), with its eight clips in `widget/hub-art/bowling.js` (`window.SH_BOWL`, built from
   `tools/figures/site/bowling.mjs`): `hub-rewards.js` counts the run and fetches it at a strike, and the place's bowling
@@ -76,7 +76,7 @@ tags: [map]
   celebration cards' redesign look under `html.shx`), with its drawings in `widget/hub-art/trophies.js`
   (`window.SH_TROPHY_ART`, built by `tools/figures/site/build.mjs` from `medals.mjs`): `widget/ranks.js` fetches all
   three on first use (`trophyCase`, `trophyCss`), from More, Stats and trophies, the dashboard's "you" card, or a card.
-- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics and feature events (`window.shTrack`), `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades, and `widget/podcast.js`, the Timmy Time player with its likes, dislikes and comments; `widget/tour.js`, the guided tours of the dashboard and of a hub, loaded by `index.html` and v3.js; `widget/qhealth.js`, question health: per-question timing, retries and the "Good question?" thumbs, [question-health](question-health.md); `widget/cases.js` + `widget/cases.css`, the dental case kit behind every hub's drawn Patient Box cases, loaded by the hubs that have them, [how-to](../how-to/draw-a-patient-box-case.md); `widget/ideas.js` + `widget/ideas.css`, the idea board (a section on the dashboard, a page in a hub's More, and the "Also post it on the idea board" tick under the check-in and the Suggest box; [task](../tasks/2026-11-06-idea-board.md), [server](game-server.md)); `widget/archive.js`, which hubs
+- `widget/v3.js` + `widget/v3.css` (+ `widget/eggs.js`, the easter eggs, `widget/clicks.js`, click analytics and feature events (`window.shTrack`), `widget/replies.js`, report replies and notices, `widget/ranks.js`, handpiece ranks, `widget/rankup.js`, the rank-up, level-up, trophy and mock-results cards, `widget/drill.js`, the Daily Drill, and `widget/fx.js`, the motion layer: answer feedback, the streak flame, bar fills, tab fades, and `widget/podcast.js`, the Timmy Time player with its likes, dislikes and comments; `widget/tour.js`, the guided tours of the dashboard and of a hub, loaded by `index.html` and v3.js; `widget/qhealth.js`, question health: per-question timing, retries and the "Good question?" thumbs, [question-health](question-health.md); `widget/cases.js` + `widget/cases.css`, the dental case kit behind every hub's drawn Patient Box cases, loaded by the hubs that have them, [how-to](../how-to/draw-a-patient-box-case.md); `widget/ideas.js` + `widget/ideas.css`, the idea board (a section on the dashboard, a page in a hub's More, and the "Also post it on the idea board" tick under the check-in and the Suggest box; [task](../tasks/done/2026-11-06-idea-board.md), [server](game-server.md)); `widget/archive.js`, which hubs
   are live, archived or hidden: the dates and Sam's overrides, loaded by the dashboard and `review/`) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
@@ -101,7 +101,7 @@ tags: [map]
 - `supabase/functions/timmy/` — Ask Timmy's server, the Supabase Edge Function `timmy`:
   `core.js` (the logic, run under Node by the tests), `index.ts` (the Deno wrapper), `site.json` (the site help, built from
   the About page by `tools/timmy/build.mjs`; rebuild it when `about/index.html` changes). Its tests and eval are in
-  `tools/timmy/` (`test.mjs`, `test-set.json`, `eval.mjs`), its database suite is `tools/release/timmy.js`, its tables are
+  `tools/timmy/` (`test.mjs`, `test-set.json`, `eval.mjs`; `deploy.mjs` deploys the function), its database suite is `tools/release/timmy.js`, its tables are
   `migration_v55.sql`. Its chat is `widget/ask.js` + `widget/ask.css` (`window.shAsk`), loaded only by the
   dashboard (through `widget/dash.js`) and the hubs on the engine (through `widget/hub-timmy.js`): [ask-timmy](ask-timmy.md).
 - `tools/reddit-scout/` — `scout.py` reads the Claude subreddits' feeds into one digest for `/reddit-scout`
@@ -127,7 +127,7 @@ tags: [map]
   `supabase/pending-migrations.txt` until it's applied (none waiting since the redesign's release, which applied
   `migration_v54.sql` to `v58`: the game layer's server, [game-server](game-server.md)); the database suites apply the
   listed ones on top of `supabase/schema.sql`. When it's applied: append it to `supabase/schema.sql` and take its line
-  out of the list, in the same PR. `tools/xp/keys.js <hub>` builds a hub's `question_keys` from its content JSON: **load
+  out of the list, in the same PR. `tools/xp/keys.js <hub>` builds a hub's `question_keys` from its content JSON (`--load` loads them): **load
   them again after every merged change to a hub's questions** ([build-a-hub](../how-to/build-a-hub.md)).
 - `deploy_rollout.py` / `.ps1` — the Cowork-era API deploy scripts. A Claude Code
   session doesn't need them: use git.

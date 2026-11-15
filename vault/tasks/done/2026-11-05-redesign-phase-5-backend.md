@@ -26,17 +26,17 @@ One `bootstrap` RPC per page load; rank, board and trophy RPCs only when a panel
 - Tests: `node tools/release/rls.js`, `admin-ops.js`, `retention.js` on a throwaway copy; `tools/release/perf.js` budgets lowered to the new sizes.
 - **Still ships when ready** (Sam, 2026-11-06, [decisions](../../decisions.md)): the rest of the redesign waits for one
   release, but this phase's changes don't change what students see. Part 2's pieces that only serve the new engine
-  (precaching it, the one font) come with [the release](../2026-11-06-redesign-release.md).
+  (precaching it, the one font) come with [the release](2026-11-06-redesign-release.md).
 
 - **Part 3, added 2026-11-06 (Sam): the server for the game-layer additions**, built and tested now on a throwaway copy and
-  applied at [the release](../2026-11-06-redesign-release.md), because it changes how the class earns XP: no daily XP cap,
+  applied at [the release](2026-11-06-redesign-release.md), because it changes how the class earns XP: no daily XP cap,
   `question_keys` and server-checked answers, the guardrails, every new XP source and boost, award rows, the 63-step ladder
   ([journeys](../2026-11-06-redesign-progression-journeys.md)); Shiny Gold Crowns, the shop catalog and rotation, `buy_item`, `equip_item`,
   inventory, HP from snacks ([shop](../2026-11-06-redesign-timmy-shop.md), [Timmy's place](../2026-11-06-redesign-timmys-place.md));
-  the idea board's tables and functions ([idea board](../2026-11-06-idea-board.md)). The new functions sit beside today's, so the
+  the idea board's tables and functions ([idea board](2026-11-06-idea-board.md)). The new functions sit beside today's, so the
   live hubs keep today's rules until the release switches them. **Still to add** (Sam, 2026-11-06, after part 3 merged):
   the Learn and Flashcards toggle's server, `learn` in `record_answer_v2`'s `ctx` list, the `card_reviews` log,
-  `record_card_v2` and `get_my_cards` ([Learn and Flashcards](../2026-11-06-redesign-learn-and-flashcards.md)), in the pending
+  `record_card_v2` and `get_my_cards` ([Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md)), in the pending
   migration with its checks.
 - **Suited to a parallel agent (Codex 5.6 Terra, Sam, 2026-11-05)**: this phase does not depend on the design work. The
   numbers to beat and the RPC inventory are in the audit note (sections 1 and 3) and in the session's architecture
@@ -47,7 +47,7 @@ One `bootstrap` RPC per page load; rank, board and trophy RPCs only when a panel
 Part 1 (the loading and the database) is [PR #266](https://github.com/smcmurry6-source/study-hubs/pull/266), live since 2026-11-06
 with `migration_v53.sql` applied. Part 3 is [PR #290](https://github.com/smcmurry6-source/study-hubs/pull/290). Part 2 (the
 bundles, the stylesheet, the font, the client, the budgets) is [PR #358](https://github.com/smcmurry6-source/study-hubs/pull/358);
-what only the release can do (`sw.js`'s lists) is a box in [the release](../2026-11-06-redesign-release.md), "From phase 5, part 2".
+what only the release can do (`sw.js`'s lists) is a box in [the release](2026-11-06-redesign-release.md), "From phase 5, part 2".
 
 - [x] Hub load: one bootstrap round trip (plus presence); dashboard the same (part 1)
 - [x] `get_rank_profile` and friends under 50 ms: about 2 ms after `migration_v53.sql` (it was about 0.9 s); `get_trophy_stats` 5 ms. XP cache verified on live data: 157 of 157 visitors identical before, all 158 matching the per-day XP after
@@ -55,8 +55,8 @@ what only the release can do (`sw.js`'s lists) is a box in [the release](../2026
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`) (part 1)
 - [x] Preview link, phone and laptop screenshots, and Sam's look (part 1: approved in chat, "Go ahead"; the PR's box is Sam's to tick)
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome) (part 1; no About-page change, no new feature)
-- [x] Part 3: the server for the game-layer additions (above), each note's server items done, its migration ready to apply at the release (`migration_v54.sql`, tested on a throwaway copy; not applied: [the release](../2026-11-06-redesign-release.md) applies it)
-- [x] Part 2: the widget bundles, one shared stylesheet, one self-hosted font, a thinner Supabase client (2026-11-13). `sw.js` precaching the bundles and fonts and caching content JSON stale-while-revalidate only serve the new engine, so they are boxes in [the release](../2026-11-06-redesign-release.md) ("From phase 5, part 2")
+- [x] Part 3: the server for the game-layer additions (above), each note's server items done, its migration ready to apply at the release (`migration_v54.sql`, tested on a throwaway copy; not applied: [the release](2026-11-06-redesign-release.md) applies it)
+- [x] Part 2: the widget bundles, one shared stylesheet, one self-hosted font, a thinner Supabase client (2026-11-13). `sw.js` precaching the bundles and fonts and caching content JSON stale-while-revalidate only serve the new engine, so they are boxes in [the release](2026-11-06-redesign-release.md) ("From phase 5, part 2")
 
 ## Log
 
@@ -84,7 +84,7 @@ what only the release can do (`sw.js`'s lists) is a box in [the release](../2026
 
 - 2026-11-13 (Claude Code, part 2, [PR #358](https://github.com/smcmurry6-source/study-hubs/pull/358)): the bundles.
   How it works is in [bundles](../../reference/bundles.md); what the release does with it is in
-  [the release note](../2026-11-06-redesign-release.md) ("From phase 5, part 2"). Nothing students see changes: the live
+  [the release note](2026-11-06-redesign-release.md) ("From phase 5, part 2"). Nothing students see changes: the live
   pages load what they loaded, and the smoke test fails if one asks for a bundle. Neither pending migration was applied
   or changed. No hosted preview (Sam).
   - **Built**: `tools/bundle/` (`bundles.json`, `build.mjs`, the vendored parser, `client/`), four script bundles and
@@ -127,14 +127,14 @@ less than half the size: 23 KB instead of 55) and, on a hub, one file of the hub
 from another site (the 8-bit face is `assets/fonts/vt323.woff2`, and the new dashboard's saved recap image is set in
 Nunito Sans). The new dashboard goes from 22 requests to 9 and from 416 KB to 332; a new hub from 28-29 requests to 11
 and about 100 KB lighter. The budgets are lowered to match, on a meter that now counts the whole load. Left for the
-release: `sw.js`'s lists and the content JSON's caching ([the release note](../2026-11-06-redesign-release.md), "From
+release: `sw.js`'s lists and the content JSON's caching ([the release note](2026-11-06-redesign-release.md), "From
 phase 5, part 2"). Sam, 2026-11-13: "dont worry about it. merge when ready" (the saved recap image stays in Nunito Sans,
 with its static layout: [decisions](../../decisions.md)).
 
 **Part 3 is written and tested, waiting for the release** (`migration_v54.sql`; [game-server](../../reference/game-server.md)). The
 server for the journeys, Shiny Gold Crowns and Timmy's shop, Timmy's place and the idea board sits beside today's functions, so
 the live hubs keep today's rules (and the 600-a-day cap) until the release switches the pages to the new calls. No XP back pay.
-What the release does with it is in [the release note](../2026-11-06-redesign-release.md) ("From phase 5, part 3"). The judgment
+What the release does with it is in [the release note](2026-11-06-redesign-release.md) ("From phase 5, part 3"). The judgment
 calls made while building it, for Sam to confirm before the release, are listed in the reference note and the PR.
 
 ## Opening prompt (part 2)

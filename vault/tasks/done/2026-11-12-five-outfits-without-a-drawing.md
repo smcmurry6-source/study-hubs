@@ -22,7 +22,7 @@ Every outfit the shop can sell is one Timmy can be drawn in. Today five can't be
   [phase 4](../2026-11-05-redesign-phase-4-game-layer.md) part C), checking the client against the server as written
   ([game-server](../../reference/game-server.md)). Sam's instruction for that session: "If they disagree, tell me instead
   of changing the migration." So the migration is unchanged.
-- `migration_v54.sql` (pending, [the release](../2026-11-06-redesign-release.md)) lists twelve everyday outfits. Seven are
+- `migration_v54.sql` (pending, [the release](2026-11-06-redesign-release.md)) lists twelve everyday outfits. Seven are
   drawn by the place's kit (`tools/figures/site/place.mjs`, `OUTFITS`): `sun-hat`, `sunglasses-lei`, `captain-hat`,
   `ranger-hat`, `beanie`, `nightcap`, `aviator-cap`. **Five are not drawn anywhere**: `scrub-cap` (common, 150),
   `bow-tie` (common, 120), `safety-glasses` (uncommon, 300), `white-coat` (uncommon, 450) and `graduation-cap` (rare,
@@ -75,7 +75,7 @@ catalog piece without a drawing. Sam approved them on the outfits sheet, light a
 BUG-090 is closed. Nothing left.
 
 Related: [Timmy's shop](../2026-11-06-redesign-timmy-shop.md) · [Timmy's place](../2026-11-06-redesign-timmys-place.md) ·
-[game-server](../../reference/game-server.md) · [the release](../2026-11-06-redesign-release.md)
+[game-server](../../reference/game-server.md) · [the release](2026-11-06-redesign-release.md)
 
 ## Opening prompt
 

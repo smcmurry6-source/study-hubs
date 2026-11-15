@@ -10,14 +10,41 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
-- [ ] **After the redesign's release: what the old pages still hold up** (2026-11-13, [the release](2026-11-06-redesign-release.md)).
+- [ ] **Sam's own look at the live site after the release** (2026-11-14, [the release](done/2026-11-06-redesign-release.md)).
+  What an agent can't check without writing to the class's data as a made-up student: one Ask Timmy question from a
+  phone (a "From the notes" link opens the paragraph; the admin page's Ask Timmy tab shows it with its cost); one Learn
+  round and a flashcard; a random visit; the dashboard with a hub open in another tab (your Timmy walks into the
+  classroom in his outfit, his desk says "You"); and scrolling on a real phone (BUG-147 is `fixed`; it is `retested`
+  when Sam says it's smooth). Anything wrong goes in [the bug log](../release/bug-log.md).
+- [ ] **Sam: the Bennett data fix from #361** (2026-11-14). `tools/data-fixes/2026-11-14-in-bennett.sql` clears the
+  class's old picks on Occlusion's reworded Bennett choice, "run once, right after the PR merges". The release session
+  couldn't tell from a read-only look whether it ran, and didn't run it (it writes to the class's data). Run it, or say
+  it was run.
+- [ ] **Ask Timmy's key is saved as `TIMMY_EVAL_KEY`** (2026-11-14, BUG-150). It works: the function reads that name
+  when there is no `ANTHROPIC_API_KEY`. If Sam saves the key again under `ANTHROPIC_API_KEY` (Supabase, Edge Functions,
+  Secrets), the fallback line in `supabase/functions/timmy/index.ts` can come out. The admin page's Ask Timmy tab also
+  shows the release's test chat (visitor `release-check-2026-11-14`, one failed and one answered question, $0.60).
+- [ ] **The redesign's other task notes are still open** (2026-11-14): [phase 2](2026-11-05-redesign-phase-2-live-hubs.md),
+  [phase 3](2026-11-05-redesign-phase-3-dashboard.md), [phase 4](2026-11-05-redesign-phase-4-game-layer.md),
+  [the journeys](2026-11-06-redesign-progression-journeys.md), [the shop](2026-11-06-redesign-timmy-shop.md) and
+  [Timmy's place](2026-11-06-redesign-timmys-place.md). Go through each one's Done when now that the release has
+  merged, tick what it finished, close the ones with nothing left and write what is left as its own to-do.
+- [ ] **`supabase/schema.sql` against the live database's text** (2026-11-14, the release's look before the migrations).
+  Columns, policies and triggers matched. The text of 25 older functions differs (line endings, and the comments and
+  layout the file was tidied with; one was read through and differs only in comments), and the live database has an
+  index the file lacks, `question_flags_visitor_idx` (migration_v25). Nothing v54 to v58 touch. Confirm each difference
+  is only text, and add the index to the file. Compare by hash (`md5(prosrc)`), never by printing a function's body: a
+  secret-gated function's source must not land in a transcript or a note. The release's five migrations are also
+  missing from Supabase's own migration list (they went through the management API): only bookkeeping.
+- [ ] **After the redesign's release: what the old pages still hold up** (2026-11-13, [the release](done/2026-11-06-redesign-release.md)).
   When the last single-file hub's page comes down (the archived ones and Heme & Endo Exam 2): take out the `NEW` (`html.shx`)
   branches in `widget/ranks.js` and `widget/rankup.js` (the old cards, the 23-trophy list), the old house picture and
   `sh_rank_tier`'s use in `widget/pet.js` (`houseSvg`: today only the fallback under the place on the dashboard), the
   `rpc2` fallbacks in `widget/dash.js` for a database without the game layer, `legacy` and the unused `modes` in `hubs.js`,
   and any separate widget file or the full client (`widget/vendor/supabase-2.117.2.js`) that `grep` finds no page loading
   by name (`review/` keeps the full client). The sources of a bundle are never deleted.
-- [ ] **Load a hub's answer keys by itself after a question change** (2026-11-13, the release). Today it is a step by hand
+- [ ] **Load a hub's answer keys by itself after a question change** (2026-11-13, the release; since 2026-11-14 the step
+  is one command, `node tools/xp/keys.js <hub> --load`). Today it is a step by hand
   after every merge that changes `hubs/<hub>/content/questions.json` ([build-a-hub](../how-to/build-a-hub.md), "The answer
   keys"): until it's done a new question earns nothing and a re-keyed one is graded on its old key. Make it hard to
   forget: a check that compares the bank with the server's keys (an admin function that returns each hub's ids and
@@ -25,7 +52,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   secret as a repository secret: Sam's call).
 - [ ] **Deploy Ask Timmy's function by itself when it changes** (2026-11-13, the release). `supabase/functions/timmy/site.json`
   is rebuilt from the About page in every PR that changes it, but the `timmy` Edge Function is deployed by hand
-  ([ask-timmy](../reference/ask-timmy.md), "At the release", step 3), so Timmy's site help lags the About page until
+  ([ask-timmy](../reference/ask-timmy.md), "At the release", step 3; one command since 2026-11-14,
+  `node tools/timmy/deploy.mjs`), so Timmy's site help lags the About page until
   someone deploys. Until this is automated, a session that changes `supabase/functions/timmy/` deploys it after the merge.
 - [ ] **The first migration after the release** (2026-11-13) also counts the **Bowling** trophy on the server (add `bowling`
   to the achievement kinds; until then it is kept on the device and shows no share of the class:
@@ -89,18 +117,18 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 
 - [x] The live About page says the trophy case has "24 trophies ... 14 of them secret", but today's list has 16 secret (Timmy's two
   trophies came later). Fix the number on the live page (a tier 1 text fix), or leave it to the release, whose About draft says 27 and
-  16 ([the release](2026-11-06-redesign-release.md), "From phase 4, session 6"). Found 2026-11-13. Done with the release's About page
+  16 ([the release](done/2026-11-06-redesign-release.md), "From phase 4, session 6"). Found 2026-11-13. Done with the release's About page
   (27, 16 secret).
 
 - [ ] Learn's answers are filed as context `other` because `migration_v54.sql`'s `record_answer_v2` doesn't list `learn` (v54 isn't
   changed without Sam's word). In the first migration after the release, add `learn` to its context list (the `case` in `sh_answer`),
-  so the admin page can tell Learn's answers from the bank's (2026-11-12, [Learn and Flashcards](2026-11-06-redesign-learn-and-flashcards.md),
+  so the admin page can tell Learn's answers from the bank's (2026-11-12, [Learn and Flashcards](done/2026-11-06-redesign-learn-and-flashcards.md),
   [game-server](../reference/game-server.md)).
 
 - [ ] Ask Timmy's "What should I study tonight?" on the new dashboard reads each hub's progress from this device's saved state
   (`progressFrom` in `widget/ask.js`), so on a new or linked device it sees nothing until a hub page has synced the answers. Read the
   student's own answers from the server there instead (their own rows, like the v2 bootstrap), or say "open a hub first" when every
-  hub's state is empty (2026-11-12, [Ask Timmy](2026-11-12-redesign-ask-timmy.md) part 2).
+  hub's state is empty (2026-11-12, [Ask Timmy](done/2026-11-12-redesign-ask-timmy.md) part 2).
 
 - [ ] Class picks on each choice ignore question versions: `question_choices` (and `question_stats`) are keyed by position, so when
   an edit moves or rewrites choices, last week's percentages show beside a different choice until someone moves or clears the rows by

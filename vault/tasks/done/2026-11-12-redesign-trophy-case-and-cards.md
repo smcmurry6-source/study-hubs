@@ -101,7 +101,7 @@ one change there); `widget/v3.js`'s Stats panel (the live hubs use it); the jour
   it isn't one of the 27. **Someone who already earned it keeps it**, shown after the others as "Full Arch
   (retired)" with its drawing (the agent's default, told to Sam; Sam, asked again with #337: "Sounds good". The other way was that it vanishes
   for everyone). Nothing on the server changes: the kind stays in `record_achievement`'s list and nothing calls it.
-- What is left for the release itself is a box in [the release note](../2026-11-06-redesign-release.md): the code out
+- What is left for the release itself is a box in [the release note](2026-11-06-redesign-release.md): the code out
   of the shared files, the About page's entries, Timmy's tip and line about it.
 
 **The preview's made-up data**: `high-xp` has earned Full Arch in one hub (so the retired trophy can be seen),
@@ -122,7 +122,7 @@ card first shows, never with a page. Report `hub-art/trophies.js`'s size.
   secret, never by name) and one card, added to the baseline with no issues.
 
 **Out of scope**: new trophies beyond the four; the leaderboards' look; sound; the old pages; the About page (draft
-in [the release note](../2026-11-06-redesign-release.md): its "From phase 4, part A" draft said 27 trophies and 14 secret; the count is
+in [the release note](2026-11-06-redesign-release.md): its "From phase 4, part A" draft said 27 trophies and 14 secret; the count is
 27 and 16: Bowling joins and Full Arch leaves; the draft's wording changes to say so).
 
 ## Done when
@@ -202,7 +202,7 @@ compares the live cards' markup with `main`'s). Neither pending migration was ap
   `a11y.js`'s "trophy case" and "trophy card" screens (in the baseline at zero, with the bowling clip's screen that
   wasn't); the keyboard check now tells stops apart by their spoken names too. `node tools/release/run.js` once.
 
-**For the release** ([its note](../2026-11-06-redesign-release.md)): `sw.js`'s `PRECACHE` gains the three files (with the
+**For the release** ([its note](2026-11-06-redesign-release.md)): `sw.js`'s `PRECACHE` gains the three files (with the
 engine's, in session 8 or 9); the About drafts are written there ("From phase 4, session 6"); the live About page's
 "14 of them secret" is already wrong today (there are 16), a line in [the inbox](../inbox.md). BUG-116 is fixed live too (Sam: "ship the
 BUG-116 live fix too", in the same PR). The per-hub trophies (8 a hub) aren't in the new case (the
@@ -210,7 +210,7 @@ task didn't ask for them): they stay in today's panel behind Leaderboards, and a
 the release note's "From phase 4, session 6").
 
 Related: [phase 4](../2026-11-05-redesign-phase-4-game-layer.md) · [the journeys](../2026-11-06-redesign-progression-journeys.md) ·
-[the bowling egg](2026-11-06-redesign-bowling-egg.md) · [the release](../2026-11-06-redesign-release.md) ·
+[the bowling egg](2026-11-06-redesign-bowling-egg.md) · [the release](2026-11-06-redesign-release.md) ·
 [about-page](../../rules/about-page.md)
 
 ## Opening prompt

@@ -23,7 +23,7 @@ Fixed (+100). Wire them before the release, in their own session, so the release
 - Session 8 of [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release". "For every session
   above" there holds here. Sam, 2026-11-12 ([decisions](../../decisions.md)): its own session before the release.
 - What part A wired and left: [the journeys](../2026-11-06-redesign-progression-journeys.md) (its Log and "Open
-  calls") and [the release note](../2026-11-06-redesign-release.md), "From phase 4, part A". The rules:
+  calls") and [the release note](2026-11-06-redesign-release.md), "From phase 4, part A". The rules:
   [game-server](../../reference/game-server.md), "Answers and XP".
 - What part A built for this: `window.shGame` in `widget/v3.js` (`v2()`, `startSession(kind, game)`,
   `finishSession(id, score, total)`), `HX.recordAnswer(qid, lec, right, ctx, choice, picks, { order, session })`, and
@@ -134,7 +134,7 @@ no episode), or the minutes pay nothing; `sw.js` (no new file from this session)
 already drafted in the release note.
 
 Related: [the journeys](../2026-11-06-redesign-progression-journeys.md) · [game-server](../../reference/game-server.md) ·
-[the release](../2026-11-06-redesign-release.md) · [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)
+[the release](2026-11-06-redesign-release.md) · [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)
 
 ## Opening prompt
 

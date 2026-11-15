@@ -70,5 +70,5 @@ fast. Measure in a scripted browser on the preview (`node tools/preview/serve.js
 Check a real phone when one is at hand: the numbers above come from a slowed desktop browser.
 
 Related: [shared-infrastructure](shared-infrastructure.md) · [bundles](bundles.md) ·
-[verify-before-pushing](../how-to/verify-before-pushing.md) · [the release](../tasks/2026-11-06-redesign-release.md) ·
+[verify-before-pushing](../how-to/verify-before-pushing.md) · [the release](../tasks/done/2026-11-06-redesign-release.md) ·
 [decisions](../decisions.md)
