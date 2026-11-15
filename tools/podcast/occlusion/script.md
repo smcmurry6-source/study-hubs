@@ -1,4 +1,4 @@
-# Timmy Time: the Occlusion midterm, the last-minute review
+# Timmy Time: the Occlusion final, the last-minute review
 
 <!--
 NOT SPOKEN. Notes for whoever renders this with Kokoro (see tools/podcast/README.md).
@@ -6,398 +6,346 @@ NOT SPOKEN. Notes for whoever renders this with Kokoro (see tools/podcast/README
 - A line "[pause N]" (or an inline "[pause N]") is N seconds of silence; inline pauses cue the answer bell.
 - Blank line = new paragraph (0.6 s gap). A "##" heading = new segment (1.4 s gap).
 - Hard words are spelled normally here; lexicon.json maps them to exact Kokoro phonemes.
-  Letters read as letters are hyphenated and capitalized (M-I-P, C-O, C-R, V-D-O, P-D-L, T-M-J).
-  Tooth numbers are written "number thirty", never "#30".
-- Content source: hubs/occlusion lecture notes (As taught), exam hints and cram sheet, L1 to L5, Dr. Givan.
-  The exam: Wed Oct 21, 6:30 pm, 40-45 MCQ, one hour, all five lectures (mock blueprint 15/8/7/8/7).
+  Letters read as letters are hyphenated and capitalized (C-R, C-O, M-I-P, M-I-C-P, S-C-I, V-P-S, T-M-D, P-D-L, R-D-A).
+  Tooth numbers are written "number seven", never "#7"; numbers, units and symbols are spelled out.
+- This episode replaced the midterm one on the hub (Sam, 2026-11-15: "Replace the midterm with it"). The midterm's
+  script is midterm.md, kept for the canon.
+- Content source: hubs/occlusion lecture notes (As taught), Exam Hints (the professors' quotes from the recordings and
+  slides), cram sheet and High Likelihood topics, L6 to L10: Dr. Givan's L6 Occlusal Instrumentation, L7 Malocclusion
+  and Dysfunction and L8 Denture Occlusion, Dr. Lawson's L9 Noncarious Cervical Lesions (prerecorded) and
+  Dr. Abou-Arraj's L10 Occlusion and the Periodontium. Plus LESSONS.md's live signals (the Bennett angle setting and the
+  fossae, the facebow's level, the record base; "less bone, but a bigger arch" for the resorbed mandible; L8 to L10
+  least practiced). No graded quiz, take-home or previous years' content.
+- The exam: Monday, November 16, not comprehensive (the lectures from 10/22 on), building on the midterm. Format not
+  announced. Sam, 2026-11-04: the cold open leaves out minutiae (no question counts, no exact time, no logistics).
+- Where class and slides differ, the script says both or leaves it out: lingualized anterior contact (class: never;
+  slides: difficult, can be compensated); the two Miller scales (Dr. Givan's L7 handout vs Dr. Abou-Arraj's slide);
+  abfraction (Dr. Lawson teaches it as a cause; Dr. Givan's L7 calls it unproven clinically). The Bennett angle is
+  tied to the width of the central fossae (the L6 notes), never offered against cusp height (the hub note, in-bennett).
+  The researchers in L10 are not named ("Conclusions are enough"), nor is L9's toothbrushing researcher.
+  Thielemann is spelled as L8's slides spell it (the midterm script and the Review lecture keep Thielmann).
+- Timmy lore so far: tools/podcast/LORE.md. Since the redesign's release he wears what the student puts on, so the
+  episode never says what he's wearing or where his place is. New here: number thirty-one wants a night guard for one
+  tooth ("You don't have a brainstem"), the toothbrush by the door is vindicated by L9 (no toothpaste, no lesions) and
+  has no pressure sensor, and thirty-one checks his own mobility between two mirror handles ("You have a ligament. It's
+  supposed to give."). Timmy's self-facts: denture teeth are not teeth (Dr. Givan's words: no pulp, no enamel or dentin);
+  multi-rooted teeth are less mobile than single-rooted ones; dentin's critical pH is higher than enamel's.
 -->
 
 ## 1. Cold open
 
 Hey. It's Timmy, and this is Timmy Time.
 
-Some of you remember me from M-S-K Exam Four. Small tooth. Big voice. We got through it together. A few things have changed since then. I have a house now. A little cottage on a hill, with a toothbrush planted by the front door. The tree out front is dropping its leaves. And it's October, so yes, I'm in costume. I'm not going to tell you which one.
+Some of you were here for the midterm. Back then it was October, I was in costume, and I wouldn't tell you which one. I used to dress myself. You saw how that went. These days I wear whatever you put me in. So whatever I've got on right now, that's on you.
 
-But tonight is different. Tonight's subject is occlusion, and for me, this one is personal. Occlusion is the study of who I touch, and when. It's basically my love life, with diagrams.
+Things at my place are quiet, mostly. The toothbrush by the front door has been insufferable all week, and I'll tell you why when we get to Doctor Lawson. And number thirty-one, my neighbor, the second molar who lives right behind me, has been listening through the wall since the midterm. He has news. It's about his health. It's always about his health.
 
-So here's the exam. It's tonight, Wednesday, at six thirty. Forty to forty-five multiple-choice questions, in one hour, on Canvas, with LockDown Browser and Monitor. You can log in from six twenty-five, and the window closes at seven forty-five. So start by six forty-five at the latest, or you lose part of your hour. Update LockDown Browser before then, and plug in your laptop.
+So. The Occlusion final, on Monday. It isn't comprehensive: it covers the lectures from October twenty-second on. But it builds on the midterm, so the words still matter. Centric relation is the joints seated. Centric occlusion, on Doctor Givan's exams, is the teeth touching with the joints seated. Never M-I-P.
 
-It covers all five of Doctor Givan's lectures. Lecture one, the review of basic occlusion, is the biggest. Think about a third of the exam. Then the joint and the muscles. Then chewing, swallowing, and speech. Then the history of occlusal concepts. And finally, applying occlusion in real dentistry. We'll go in that order.
+Five lectures. Three are Doctor Givan's: occlusal instrumentation, malocclusion and dysfunction, and denture occlusion. Then Doctor Lawson's noncarious cervical lesions, and Doctor Abou-Arraj's lecture on occlusion and the periodontium. We'll go in that order, lectures six through ten, then a lightning round, then a plan for the night before.
 
-One more thing. You're allowed one blank sheet of paper. Show both sides of it to the camera in your environmental scan. And then use it. Doctor Givan said it himself: the only thing you really have to remember on fence posts is how to draw fence posts. That sheet is where you draw them. We'll get to that.
+When a professor said a line was on the exam, I'll quote it word for word. When they said you don't need something, I'll say so.
 
-Settle in. Let's talk about teeth touching.
-
-[pause 1.5]
-
-## 2. Speaking the same language
-
-Doctor Givan opened the course by saying this material is fundamental. It's the starting point. So we start with the words, because half of this exam is knowing exactly what a word means.
-
-Occlusion is the static relationship between the upper and lower teeth. Articulation is the static and the dynamic contact relationship, during function. People use them interchangeably, but, in his words, they're not quite the same. Occlusion is still. Articulation moves.
-
-The neutral zone is the space between the lips and cheeks on one side, and the tongue on the other, where their forces are equal. It's thought to guide where teeth develop. Anything you restore, or move with orthodontics, should stay inside it. Put something in the way of those muscles, and they'll just knock it out of the way.
-
-The occlusal plane is the average plane of the incisal and occlusal surfaces. It isn't really flat. It's the average of their curves.
-
-And the curves. Four of them, and the exam likes to swap them.
-
-The curve of Spee is in the sagittal plane, seen from the side. It runs from the lower canine tip, along the buccal cusp tips of the premolars and molars, up to the front of the condyle. Graf von Spee, eighteen ninety.
-
-The curve of Wilson is in the frontal plane, seen from the front. It's the side-to-side curve of the cusps. Concave in the lower arch, convex in the upper, because the lower back teeth tip in, and the upper ones tip out.
-
-The compensating curve is the same idea, for artificial teeth. It's a denture term, used to build balanced occlusion. His line: the curve of Spee is specific for teeth.
-
-And the sphere of Monson is three-dimensional. Every cusp sits on an imaginary sphere, with about a four-inch radius, centered near the glabella.
-
-So, from the side, Spee. From the front, Wilson. For dentures, compensating. In three dimensions, Monson.
-
-Now, how the arches fit. Normally, the upper lingual cusps sit in the lower central fossa line, and the lower buccal cusps sit in the upper central fossa line. A crossbite flips it. And Doctor Givan's point about crossbite is that there is absolutely, functionally, no problem with it. After bone loss, most back implant crowns have to be built in crossbite. Just don't trap the cheek.
-
-The occlusal table, between the buccal and lingual cusp tips, is about fifty to sixty percent of the tooth's width. The contacts between teeth sit to the buccal, so the lingual embrasures are bigger, and food goes back toward the tongue.
-
-And here's a table you should own. Centric cusps versus non-centric cusps.
-
-The centric cusps are the upper lingual and the lower buccal. They're also called supporting, holding, or stamp cusps. They're broad and rounded, about a third of the tooth's width. Their job is to hold the vertical dimension, and do the final crushing.
-
-The non-centric cusps are the upper buccal and the lower lingual. Shearing, or guiding, cusps. They're sharp, about a sixth of the tooth's width. They shear food, keep the cheek and tongue out of the way, and hold the bolus on the table.
-
-The hook. Centric cusps are the ones that land in a fossa and hold the bite up. Upper lingual, lower buccal.
-
-Now, the three words he cares about most. M-I-P. Centric occlusion. Centric relation.
-
-Maximum intercuspation, M-I-P, is the complete intercuspation of the teeth, no matter where the condyles are. It's a tooth position, set by the muscles to protect the teeth. And it is not constant. In his words, M-I-P is a constantly updated position. It won't be the same this year as last year. Every filling, every tooth that moves or goes missing, changes it.
-
-Centric occlusion, C-O, is the tooth contact when the jaw is in centric relation. When you hear the word centric, think joint. If Doctor Givan had a giant eraser, he'd erase the term centric occlusion from the world, because so many people use it to mean M-I-P. But here's the rule, and he said it as plainly as he could. On his exam, centric occlusion always means the teeth touching with the joints seated. It never means M-I-P. Never.
-
-So M-I-P is neuromuscular. Centric occlusion is structural.
-
-About ninety percent of people have a slide between the centric occlusion contact and M-I-P, averaging one and a quarter millimeters, plus or minus one. A slide that swings left or right tends to be worse. Only about ten percent have the two coincide. And when we close into that unstable first contact, without the muscles protecting us, we get wear facets, fractures, and mobility.
-
-Centric relation, C-R, is a joint position. The condyles sit against the thinnest, avascular part of their discs, in the anterior superior position, against the slopes of the articular eminences. It doesn't depend on the teeth at all. It's reproducible, and in C-R the jaw can only rotate, about the transverse horizontal axis. His short version: it's where the condyle is seated in the joint. That's it.
-
-So. M-I-P is teeth. C-R is joints. C-O is teeth, with the joints seated.
-
-Last, Angle's classes. Class one, neutroclusion, about seventy percent. Normal molar relationship. Class two, distoclusion, about twenty-five percent. The lower first molar sits distal. Division one has a narrow arch and protruding incisors. Division two has a square arch, retruded centrals, flared laterals, and a deep overlap. Class three, mesioclusion, about five percent. The lower first molar sits mesial, and the incisors are usually edge to edge, or in crossbite.
-
-Two traps the class kept falling into. Retruded centrals with flared laterals is Class two, division two. Edge-to-edge incisors is Class three. Don't trade them.
-
-And the exam rule. If the question doesn't name a class, assume Class one.
+Settle in. Let's talk about teeth touching. And, for one lecture, about teeth that aren't teeth.
 
 [pause 1.5]
 
-## 3. What cusp hits where
+## 2. Articulators: the job dictates the tool
 
-This is the section he warned you about. Questions on which cusp hits where come up, in his words, repeatedly through the years. On exams, and on boards. So let's take it slowly.
+Lecture six, Doctor Givan, occlusal instrumentation. The devices we use to relate the arches.
 
-First, two ways teeth can meet. In a cusp to marginal ridge occlusion, some centric cusps land in the embrasure between two teeth. One tooth against two. That's what most adults actually have. In a cusp to fossa occlusion, every centric cusp lands in a fossa. Tooth against tooth. It's the ideal, it's rarely natural, and it's what exam questions usually assume.
+He put one line on every objectives slide. In the slide's words: Remember this if nothing else. An articulator has best value if similar size to patient. A little palm-sized hinge never follows the patient's arcs.
 
-So the default for every question: Class one, cusp to fossa. Unless the question tells you otherwise.
+And the one point he most wanted to get across. In his words: Your selection of the right articulator is going to make or break your time treating a patient. Whatever the articulator gets wrong, you fix in the chair, at the delivery, with a bur.
 
-Now, the fence post. On your blank sheet, draw two rows of posts. For each arch: the canine, the first premolar, the second premolar, then the front half and the back half of the first molar, and the front half and the back half of the second molar. Upper row on top, lower row on the bottom.
+For diagnosis, a C-R mounting is the most useful, and it's a one-way street. From a C-R mounting, you can always find M-I-P. From an M-I-P mounting, you can't get back to centric occlusion.
 
-In Class one, slide each lower post half a step forward, toward the mesial. The lower canine sits just in front of the upper canine. For Class two, the lower row steps back by one post. For Class three, it comes forward by one tooth.
+Arcon stands for articulating condyle. The condylar element is on the lower member and the fossa is on the upper member, just like the patient. Non-arcon has them the other way around.
 
-The fence post tells you which opposing cusp comes closest. That's all it does. It's not real anatomy. And it looks like cusp to marginal ridge, but remember, the questions are usually cusp to fossa. So once the fence post tells you which tooth is across the way, you switch to anatomy.
+The U-A-B classification has three groups: non-adjustable, semi-adjustable, like the Denar three twenty you have, and fully adjustable.
 
-Here's the anatomy. Premolars first. In Class one, and in Class three, the contacts are in the mesial fossae of the upper premolars, and in the distal fossae of the lower premolars. In Class two, it's the opposite.
+Non-adjustable first. However different they look, they're accurate in only one position: M-I-C-P. Any record that separates the teeth adds error, because the articulator closes on a different arc than the patient does. The smaller the articulator, the bigger the error. In his words: Non-adjustable articulators is primarily an advantage to the laboratory, not to you. They're cheap, quick, and small to ship. The dentist pays for it in chair time, grinding away anatomy. The exception is a non-adjustable about the size of a person, with the condyles about four inches, or a hundred ten millimeters, apart.
 
-So, in Class one, the buccal cusp of number twenty-nine sits in the mesial fossa of number four. And the lingual cusp of number five sits in the distal fossa of number twenty-eight.
+And in his words: Why on earth would you ever use a non-adjustable on an anterior teeth when a semi-adjustable is going to move in the right direction? Any tooth that's part of the anterior guidance gets at least a semi-adjustable.
 
-Molars have two opposing contacts each, a front one and a back one. The mesiolingual cusp of number three sits in the central fossa of number thirty. And the back contact on the upper first molar comes from the distobuccal cusp of number thirty. It's highly variable. Anywhere from the oblique ridge to the distal fossa.
+A semi-adjustable has two common settings. The sagittal condylar inclination, the S-C-I, also called condylar guidance. It's the angle the condyle travels down the eminence, seen from the side. It controls how the back teeth disclude when there's little anterior guidance, and it affects cusp height and fossa depth. And the Bennett angle: the inward path of the orbiting condyle, seen from above. On the articulator, it shapes how wide the central fossae are. Of the two, the Bennett angle is the one he'd skip. In his words: If I was going to leave any feature off of an articulator, I'd probably leave this one because, again, the average values are close enough to allow us to do good clinical dentistry.
 
-And now a confession. I'm a lower first molar. Two roots. So my distobuccal cusp is the one that lands somewhere between the oblique ridge and the distal fossa of the tooth above me. Highly variable. I like to keep them guessing.
+Set without a record, twenty to thirty degrees is common for fixed work. Most patients are steeper, commonly thirty-five to forty, so a thirty-degree setting gives decent anatomy and still discludes. Twenty makes the cusps too shallow. For a non-balanced denture, it's zero. Hold that thought.
 
-Then use anchor and step. Say the question asks whether the mesiobuccal cusp of number thirty-one hits the mesial fossa of number two, or the distal fossa of number three. Start at the anchor, the back contact on the upper first molar. That's taken by number thirty's distobuccal cusp. Step back one. Number thirty-one's mesiobuccal cusp has to go into the mesial fossa of number two.
+Fully adjustable articulators program everything. They start with a kinematic facebow, which finds the exact hinge axis. That's the hinge-axis locator: a grid on the upper bow, a stylus on the lower, and you hinge the jaw in C-R until the stylus only rotates. They used to tattoo that point on the skin. Then a pantograph records the movement itself: six recording tables, six styli, and a central bearing device, so the teeth can't steer.
 
-That one beat a lot of you in practice, so here's the reason the wrong answer tempts you. In a cusp to marginal ridge reading, the way the fence post looks, that cusp would sit between two and three. But the question says cusp to fossa. So it's the mesial fossa of number two.
-
-Now, movement. Any movement away from the intercuspal position is eccentric.
-
-In protrusion, the jaw moves forward, and the condyle slides down the articular eminence, carrying the disc. As it drops, the back teeth separate. That gap is Christensen's phenomenon. And if the back teeth don't separate, they hit on the distal inclines of the upper teeth, and the mesial inclines of the lower teeth. The lower jaw slides forward, so its front slopes run into the upper tooth's back slopes.
-
-In a side movement, the working side is the side the jaw moves toward. It's also called the laterotrusive side. Its condyle mostly rotates. The non-working side is the other one. Mediotrusive, or balancing, which is a denture word. Its condyle orbits: forward, down, and toward the midline, along the eminence. Working-side contacts are on the side the jaw moves toward. Non-working contacts are interferences.
-
-Which inclines collide? Here's the help sheet method. Draw the molars in M-I-P, and move the lower tooth in your mind's eye.
-
-On the working side, like cusps meet. The lingual incline of the upper palatal cusp meets the buccal incline of the lower lingual cusp. And the facial incline of the lower buccal cusp meets the lingual incline of the upper buccal cusp. Lingual with lingual, buccal with buccal. If you didn't want it, it's an interference. If you did, it's group function.
-
-On the non-working side, the two centric cusps meet. The facial incline of the upper palatal cusp runs into the lingual incline of the lower buccal cusp. Inner slope on inner slope.
-
-Now cusp pathways. These are the arrows on an occlusal drawing. Here's the trick. On an upper tooth, you're watching a lower cusp move, so you just follow the jaw. In protrusive, the jaw goes forward, so the path runs mesial. In working, it runs buccal. In non-working, it runs mesiopalatal.
-
-On a lower tooth, you're watching an upper cusp, and everything flips. Protrusive runs distal. Working runs lingual. Non-working runs distobuccal. And retrusive is the short one, going back.
-
-In any picture, the M-I-P contact is at the base of the arrow. So name the movement first, cross out the wrong choices, and then name the cusp.
+So how do you choose? Four things. The patient's occlusion: strong anterior guidance lets you get away with a simpler articulator for a back tooth, and poor guidance needs more. The extent of the work. The limits of the instrument. And the clinician: a semi-adjustable in knowledgeable hands beats a fully adjustable in inexperienced ones. In his words: The job dictates the tool, okay, not the other way around.
 
 [pause 1.5]
 
-## 4. Guidance, the determinants, and the envelope of motion
+## 3. The facebow and the records
 
-Guidance. Canine guidance, or canine-protected articulation, means the overlap of the canines lifts the back teeth apart in every side movement. The canine has the bone and the proprioception for the job.
+The facebow has one job. In his words: This is for the maxillary cast. That's what it's for. It is not involved with the mandibular cast, only the maxillary.
 
-Group function means several teeth share the working-side contacts. For example, numbers seven, six, and five. You use it when the canine has lost periodontal support, is missing, or is an implant, since an implant has no proprioception. And today, group function means a few front teeth, maybe the first premolar. Not every tooth.
+It sets up a reference plane from three points: two in the back, usually the ear canals, which estimate the hinge axis, and one in front. The plane is usually Frankfort horizontal. An arbitrary facebow lands within about two to five millimeters of the true hinge axis, and a kinematic one finds it exactly. In his words: ninety-nine point nine percent of patients, maybe ninety-nine point nine nine percent of patients, are easily treated with an arbitrary facebow.
 
-Which matters more for separating the back teeth, anterior guidance or condylar guidance? The closer determinant has the greater impact. So anterior guidance. But only if the patient has it. Plenty don't.
+On the school's Denar Slidematic, the anterior point is forty-three millimeters above the incisal edge of the right lateral incisor, number seven. And the bow's level is what carries the esthetic planes to the articulator: a cant of the incisal plane, and the tilt of the occlusal plane.
 
-Now the list. He said you'll see it twenty million times before you graduate. Equal, simultaneous, stable centric contacts. Force directed down the long axes of the teeth. No balancing contacts. And canine disclusion, or group function, of the front teeth. Put that together and you have mutually protected articulation. The back teeth protect the front teeth from heavy force in M-I-P. The front teeth lift the back teeth apart in every excursion. And balanced occlusion is for dentures, not natural teeth.
+Skip the facebow, and you risk exactly that. In his words: When you're hesitant to hand the patient the mirror, you've got a problem. You also risk interferences in protrusion and in working and non-working movements, and grooves and cusps that don't match the patient.
 
-Next, the determinants of posterior morphology. Thielmann's formula says balanced occlusion equals condylar guidance times anterior guidance, over cusp height, times compensating curve, times the plane of occlusion. Change one, and the others have to change.
+Mounting errors. Casts mounted too far back or too high hit heavy on the front teeth. Too far forward or too low, on the back teeth. Back or up, the front hits. Forward or down, the back hits.
 
-For natural teeth, the question is how tall can the back cusps be. Here's the logic. Anything that drops the jaw away from the back teeth faster lets the cusps be taller. Anything that keeps them close, or swings them sideways, makes the cusps shorter.
+The C-R record. Make it without tooth contact, because contact triggers the reflexes that pull the jaw toward M-I-P. And make it at the smallest opening that avoids contact, or at the vertical dimension you plan to restore. The more you open on an arbitrary axis, the bigger the error. Wax is often preferred. And remember, M-I-P doesn't equal centric occlusion in about ninety percent of people.
 
-So. Steeper condylar guidance: taller cusps. More vertical overlap in front: taller. More horizontal overlap in front: shorter. A plane of occlusion more parallel to the condylar guidance: shorter. A more acute curve of Spee: shorter, for the back-most cusps. And more Bennett movement, or a bigger immediate side shift: shorter.
+The M-I-P record. In his words: The most common record that you will use is an M-I-P record. And I will suggest to you it is also the most misused record. The number one cause of lab problems is a bad impression. Number two is the mounting, usually a misused M-I-P record. So, in his words: Probably the most important thing I can tell you is, if possible, don't use a record. Hand articulate always when you can. If you send the lab a record, they'll mount with it. Don't send one just in case.
 
-The horizontal factors set the direction of ridges and grooves, so the cusps can escape each other. The angle between a cusp's working and non-working paths gets bigger with more distance from the rotating condyle, more distance from the midline, and more Bennett movement. It gets smaller with a wider intercondylar distance. That's why a tiny articulator makes crowns you have to adjust.
+If you do take one in V-P-S, it goes over the prep only. In his words: Normally we would never want to put something on the occlusal surface of an unprepped tooth. In M-I-P, those teeth are supposed to touch. Trim it off the cusp tips, keep it off soft tissue, and if missing teeth won't give you a stable mounting, you need a record base.
 
-Vertical dimension. Vertical dimension of occlusion, V-D-O, is measured with the teeth together. Vertical dimension at rest is measured at physiologic rest. The difference is the freeway space, also called the interocclusal rest space. Usually two to six millimeters. And neither two nor six is better.
+Eccentric records program the articulator. The protrusive record: forward three to five millimeters from C-R, with no deviation to either side. One protrusive record sets the S-C-I on both sides. Lateral records: you need two, and each one sets the opposite side. A right lateral record sets the left side.
 
-Posterior overclosure, the old name is posterior bite collapse, is losing vertical dimension as back teeth are lost or drift. Treatment starts by correcting the plane of occlusion.
+Protrusive is preferred. A lateral record reads the S-C-I steeper, down the medial wall, and the protrusive one reads it shallower. If the articulator is shallower than the patient, the patient just gets more disclusion. If it's steeper, the crown may hit. For full mouth reconstruction, he takes protrusive records.
 
-Now the envelope of motion. Start at C-R. Pure rotation, with the condyles seated, opens the incisors about twenty to twenty-five millimeters. Past that, the condyles have to translate, down and forward. Rotation plus translation gets you to about forty to sixty millimeters.
+Why three to five millimeters? Farther out, the Bennett angle reads smaller, and that builds narrow fossae and interferences.
 
-Posselt's envelope, from about nineteen fifty-eight, puts the border movements together, in three planes. The top border is set by the teeth. The front and back opening borders are set by the ligaments and the joint.
-
-From the side, tracing the lower incisor. From C-R, pure rotation down to about twenty-five millimeters. Then rotation plus translation, down to maximum opening. That's the posterior opening border. Closing with the jaw pushed all the way forward traces the anterior opening border, up to maximum protrusion. And the top, the superior contact border, runs from the centric occlusion contact, up and forward into M-I-P, down the anterior guidance to edge to edge, flat across the incisal edges, and on to maximum protrusion.
-
-From above, you'll see left lateral, left lateral with protrusion, right lateral with protrusion, and right lateral. From the front, left lateral superior, left lateral opening, right lateral opening, right lateral superior. He asked, would I ask you questions like that? And answered, yeah, of course I would. So know the names of those borders.
-
-We rarely work at a border, except the top one. Function happens in a small teardrop just below M-I-P.
-
-Two rest positions, and the class mixes them up. The postural position is about two to four millimeters below M-I-P, held there by a reflex against gravity. The clinical rest position is where muscle activity is lowest, about eight millimeters down and three millimeters forward. And posture matters. Contacts recorded lying back can shift forward when the patient sits up. Doctor Givan checks almost every restoration with the patient upright.
-
-The Bennett movement, or lateral translation, is the side shift of the jaw toward the working side. Immediate, measured in millimeters. Or progressive, measured as an angle, the Bennett angle. Whether it matters clinically is a big debate. He doesn't want the debate. Just know what it is.
-
-And articulators. An articulator is only useful when it represents the patient. Know the parts of the Whip Mix twenty-two forty. Upper and lower members. The anterior guide pin, and don't call it the incisal pin, because that's rude to the canines. The anterior guide table. The mounting plates. The condylar elements. And the centric latch, which holds it on the hinge axis.
-
-One last line from lecture one. In occlusion, we're talking in the language of microns. You can feel a twenty-five micron hair between your teeth. Believe me. I can.
+And record thickness. On a fully adjustable articulator the hinge axis is exact, so a thick C-R record doesn't matter. On a semi-adjustable it's estimated, so the thicker the record, the bigger the error.
 
 [pause 1.5]
 
-## 5. The joint and the muscles
+## 4. Functional disturbances and T-M-D
 
-Lecture two. Functional T-M-J anatomy, and the muscles of mastication. He said he presented it at the level he'd test you at. And he doesn't plan to ask about nerves or blood supply. You did that in gross anatomy.
+Lecture seven, Doctor Givan, malocclusion and dysfunction. Where occlusion matters, and, more often, where it doesn't.
 
-A ginglymus joint is a hinge, like the elbow. An arthrodial joint glides, like the wrist. The T-M-J does both, so it's a ginglymoarthrodial joint. That word was the single hardest question in the bank, so say it with me. Ginglymoarthrodial. Hinge, plus glide.
+First, the scope. Learn the general themes, not every disorder on the classification list. Apart from one or two, like local muscle soreness, those are your third-year course.
 
-And it's a compound joint, because the disc acts like a third bone. Careful. Hinge plus glide is ginglymoarthrodial. Compound means the disc. Those are different answers.
+The model. Normal function, plus an event, greater than physiologic tolerance, gives symptoms. If the total stays under the tolerance, the patient adapts. The event can be local, like a high crown or a burned palate, or systemic, like stress or the flu. And the tolerance changes from day to day. That's the patient who was fine until last Monday.
 
-It's also one bone with two joints. Neither side moves without the other.
+Patients say they have T-M-J, but that's the joint. A temporomandibular disorder, a T-M-D, is a collective term: over forty different entities, in the muscles, the joint, or both. Muscles, maybe fifty percent. Joints, maybe thirty-five. In his words: When someone says I'm being treated for a T-M-D, it tells you almost nothing, because you don't know what they have, and these things are quite a bit different. And a T-M-D is not the same as orofacial pain, which is a much bigger category.
 
-The disc. From the side, it's biconcave. A thick anterior band, a thin intermediate zone, and an even thicker posterior band. The condyle sits in the intermediate zone, which has no blood vessels and no nerves. From the front, the disc is a bit thicker on the medial side, so if it slips, it tends to go forward or medially. And it's a disc, not a meniscus. A meniscus is crescent-shaped, like in the knee.
+The five etiologies of functional disturbances. One, mandibular stability. Two, trauma. Three, emotional stress. Four, deep pain input. Five, parafunctional activity. He spent the most time on the first, because it's the one in our hands.
 
-The disc splits the joint in two. The upper compartment is between the disc and the temporal bone, and that's where translation happens. The lower compartment is between the disc and the condyle, and that's where rotation happens. Lower rotates. Upper translates.
+What does the evidence say about occlusion and T-M-D? Pullinger and Seligman found more of these signs in T-M-D patients: a skeletal anterior open bite, a slide from centric occlusion to M-I-P over two millimeters, overjet over four millimeters, and five or more missing posterior teeth. But the same signs turn up in people without T-M-D, so occlusion isn't the most important factor. And the textbook's review of fifty-seven studies: twenty-two found no relationship, and thirty-five found one. Related isn't caused.
 
-Behind the disc are the retrodiscal tissues. Loaded with vessels and nerves. Function on them, and it hurts. The superior lamina is elastic. The inferior lamina is collagen.
+Two kinds of stability. Joints fully seated is orthopedic stability. Teeth fully together, in M-I-P, is occlusal stability. Bite down with the joints seated, and only about ten percent of people land right in M-I-P. Everyone else gives up a little orthopedic stability to get their teeth together. That's orthopedic instability, and it matters only when it's big. One to two millimeters is unlikely to be a problem. In his words: When we get over three millimeters, and some would say four millimeters, that's when we start to see an increased risk. Does it mean that you will have a problem? The answer is no. And loading, like bruxism, adds to the risk.
 
-And the joint is load-bearing. To crush a bolus, you need something to pivot on, and that's the seated joint.
+So, the high crown. You seat a crown that's slightly high, and the patient guards: restricted, careful movement. In his words: It's called protective co-contraction, okay? And there's nothing pathologic about it. But moving that way for long makes the muscles sore. So introducing an interference can cause pain.
 
-The ligaments, and what each one limits. The capsular ligament wraps the joint like a curtain. The discal, or collateral, ligaments keep the disc on the condyle. Stretch them, and you get clicking. The stylomandibular and sphenomandibular ligaments limit opening and forward movement.
+Existing interferences are a different story. In his words: Here's what we know, is that we will see these both in symptomatic and asymptomatic patients almost in equal frequency. That's a very important point. So grinding them away to prevent a T-M-D isn't supported. And in his words: We very much want to avoid putting in a mediotrusive contact because that's too sudden of a change for a patient. But if they already had one, then taking it away or leaving it there is probably not going to change their symptoms at all. Don't add one. Don't chase the old ones.
 
-And the temporomandibular ligament has two parts. The outer oblique portion limits rotational opening. That's the one that ends pure rotation. The inner horizontal portion limits backward movement of the condyle and disc, and protects the joint from a blow to the chin. Outer oblique, opening. Inner horizontal, backward.
-
-If a patient can't close after a long appointment, the condyle may be stuck in front of the eminence. That's an open lock. Press gently down on the buccal shelf, to distract it. Down. Not back.
-
-Now the muscles. Muscles only pull.
-
-The masseter is the power closer. It's thick, flat, and quadrangular, from the zygomatic arch to the angle of the ramus. The superficial belly elevates and protrudes a little. The deep belly elevates and retrudes. And its fibers run up and forward, so it pushes the jaw up and forward, which is exactly the seated position.
-
-The temporalis is fan-shaped, and it inserts on the thin coronoid process. His words: it's a positioner. It is not a power closer. The anterior fibers elevate. The posterior fibers retrude.
-
-The medial pterygoid is the unsung hero. A meaty elevator on the inside of the ramus. With the masseter on the outside, it forms the pterygomasseteric sling.
-
-And the lateral pterygoid is really two muscles, and he expects you to know which head does what. The inferior head pulls the condyle forward, down, and toward the midline. Both sides together: opening and protrusion. One side alone: the chin swings to the opposite side. Contract on the right, and the jaw goes left. The superior head is relaxed during opening, and active during closing, where it steadies the disc.
-
-Now the exam slide. He said any question about which muscle does which motion will come from this slide. So here it is.
-
-Elevation: temporalis, medial pterygoid, and masseter.
-
-Depression: the inferior lateral pterygoid, plus the suprahyoid and infrahyoid muscles.
-
-Protrusion: the inferior lateral pterygoid, plus the superficial masseter.
-
-Retrusion: the posterior temporalis, plus the deep masseter.
-
-And a move to the right: the right temporalis and right masseter, plus the left lateral pterygoid and the left medial pterygoid. Same side closers, opposite side pterygoids. A move to the left is the mirror image.
-
-Opening happens below the jaw, around the hyoid, which floats, attached to no other bone. The suprahyoids, digastric, geniohyoid, mylohyoid, and stylohyoid, help open the jaw. The infrahyoids, sternohyoid, omohyoid, sternothyroid, and thyrohyoid, hold the hyoid steady. First the infrahyoids fix the hyoid like a rock, then the suprahyoids pull the jaw down.
+And a rule of thumb, with exceptions. Problems moving the jaw are usually in the muscles. Pain with the teeth together, under load, is usually in the joints.
 
 [pause 1.5]
 
-## 6. Chewing, swallowing, and speech
+## 5. Splints, mobility, wear, and bruxism
 
-Lecture three. The system has three primary functions: chewing, swallowing, and speech. And two secondary ones: breathing, and showing emotion.
+Occlusal therapy is any treatment that changes the occlusion, and it's either reversible or irreversible. Reversible: patient education, physical therapy, medication, counseling, and the flat plane stabilization splint. Irreversible: equilibration, restorative dentistry, orthodontics, surgery, and the repositioning splint. Yes, the repositioning splint is on the irreversible side. It puts the jaw somewhere new.
 
-When the teeth are apart, the jaw is positioned by the muscles and ligaments. Not by anterior or condylar guidance. Teeth only steer when they touch.
+The stabilization splint seats the joints and gives the teeth new contacts against plastic. In his words: Hugely effective. It's hugely effective. Very, very important. So effective that dentistry decided occlusion must be the problem. It isn't.
 
-Chewing is run by a central pattern generator in the brainstem, which builds learned patterns called engrams. It's mostly subconscious, and it keeps adjusting, for example to particle size. Bite down on something hard by surprise, and a polysynaptic reflex shuts off the closers and fires the openers at once.
+Maxillary or mandibular? A maxillary splint has a flat posterior plane and an anterior ramp. It's sturdier, very stable and retentive, better for heavy clenchers, and ideal for Class two, division one. It shows, so it's for nighttime. A mandibular splint gets in the way of speech less and shows less, so it's the daytime one. And full coverage, every tooth in the arch, in almost every situation. With partial coverage, covered teeth can intrude and uncovered teeth can supererupt, and a small splint is an aspiration hazard at night.
 
-The chewing stroke has an opening phase, then a closing phase in two parts: crushing, then grinding. Chewing opens only about sixteen to eighteen millimeters, and moves about five to six millimeters to the side. And it comes back to the intercuspal position every time. His line: like coming back to home plate. M-I-P, not centric occlusion.
+Irreversible treatment for a functional disturbance comes only when the evidence says the occlusion is the main cause. You can't ungrind a tooth. The rule of thirds picks the method. If the discrepancy is in the first third of the tooth, selective grinding. The middle third, minor orthodontics and fixed prosthetics. Beyond that, major orthodontics, orthognathic surgery and prosthetics. And reversible and irreversible treatments both succeed about fifty to ninety percent of the time. In his words: Because we see similar success, conservative treatments should always be our first go.
 
-On the working side, seen from the side, the jaw opens forward, and closes from behind. About seventy-eight percent of people chew mostly on one side, usually the side with the most stable contacts. Tall cusps give a more vertical stroke. Flat cusps give a broader, more horizontal one. And patients with T-M-J pain chew slower, shorter, and less regularly.
+Trauma. In his words: A force is only traumatic when it produces trauma. Five factors make a force traumatic: magnitude, frequency, duration, direction, and distribution.
 
-Bite force numbers. The greatest ever measured was nine hundred seventy-five pounds. A typical male maximum is one hundred eighteen to one hundred forty-two pounds. A female maximum, seventy-nine to ninety-nine. The first molar has three to five times the force of the central incisor, which is how the front teeth get away with off-axis loads. A long, high-angle face means lower forces. A square face means higher. Leave a restoration half a millimeter high, and you double the force. And most chewing happens on the second premolar and first molar, which supports the shortened dental arch.
+Mobility, with Doctor Givan's numbers. A healthy tooth moves about twenty-eight microns vertically, and full recovery takes almost four hours. An implant moves two to three microns. Horizontally, a tooth moves about fifty-six to a hundred eight microns, and a hundred fifty microns is the limit of physiologic horizontal mobility. Teeth are most mobile when you wake up. Adapted mobility is stable, so you monitor it. Traumatic mobility keeps increasing, and that's an indication for splinting the teeth together.
 
-The tongue is our knife, fork, and spoon. And it couldn't do it without the buccinator, which forms the wall and puts food back on the table.
+Miller's index, as Doctor Givan's handout grades it. Zero, no movement. One, barely distinguishable. Two, any horizontal movement up to a millimeter. Three, more than a millimeter, or depressed, or rotated. Doctor Abou-Arraj grades it differently.
 
-Swallowing. The point of the swallow is stabilizing the jaw, so the hyoid can move. Adults use a somatic swallow: teeth together in M-I-P, held there by the closers. A visceral, or infantile, swallow braces the jaw by pushing the tongue forward between the teeth. It's normal until the back teeth erupt. Keep it past then, and it can push the front teeth forward, and cause an anterior open bite.
+Wear. In his words: Pain is rarely, in fact, it's just not a symptom associated with tooth wear. It's too slow. Patients come in for esthetics, usually late. Attrition is tooth against tooth: shiny, sharp facets that match. Abrasion is third-body wear, most often the toothbrush. Erosion is chemically assisted: dull facets, cupping, and proud restorations standing above the tooth. And abfraction is flexing. In his words: Our clinical data is not really supporting that, and this is why we don't include this as a primary mechanism of wear. Hold on to that. Doctor Lawson teaches it as a cause, and we'll get there.
 
-Swallowing contacts are heavy and long. About sixty-six and a half pounds, for about six hundred eighty-three milliseconds, and they happen in the intercuspal position. We swallow about five hundred ninety times a day.
+The erosion patterns. Reflux: the lingual of all the maxillary teeth, back to the second molars, plus the occlusal surfaces of the mandibular molars, often worse on the side the patient sleeps on. Bulimia: mostly the maxillary anteriors, while the mandibular anteriors are protected by the tongue.
 
-Three stages. Stage one is voluntary. The tongue presses the bolus up and back, lips sealed, teeth together. Stage two, the bolus moves through the pharynx. The soft palate rises and seals off the nose. The epiglottis closes over the airway. And the Eustachian tube openings open. Stages one and two take about one second. Stage three is the esophagus, about six to seven seconds.
+Bruxism. Its forces are three to five times greater than chewing, they're horizontal, and there are no protective reflexes, because you're asleep. It's centrally mediated: tied to arousal from deeper to lighter sleep, to oxygen saturation, stress, medications and genetics. In his words: Occlusion is not an initiator to bruxing as once we thought, and that's just not the case. A splint stops it for a while, and then it comes back. So the splint's job is to protect the teeth. In his words: The idea here is that you're going to brux against the four hundred dollar splint and avoid the forty thousand dollar rehab.
 
-Speech. The big one: teeth don't normally touch when we speak. It's too fast, and contact would damage them.
-
-For the f and v sounds, the upper incisal edge should lightly touch the wet-dry line of the lower lip. If the patient can't make the sound, the incisors may be too short. If the edge pushes the lip down, they're too long. That's how you place incisors a patient no longer has.
-
-For the s sound, the teeth come closest, about one to one and a half millimeters apart. Let s be your guide. That closest speaking space helps set the vertical dimension.
-
-And wide open vowels, like eight, and nine, separate the teeth about five to ten millimeters.
+Now. Number thirty-one heard this lecture through the wall, and he has decided he grinds at night. He wants a night guard. He measured himself for it. One tooth. Thirty-one, a splint that covers one tooth is partial coverage, and Doctor Givan wants full coverage in almost every situation. You heard what he said about small ones at night. Also, bruxism is centrally mediated. You don't have a brainstem.
 
 [pause 1.5]
 
-## 7. Occlusal concepts: how we got here
+## 6. Keeping a denture in the mouth
 
-Lecture four is a history lecture, so the questions are, who did what.
+Lecture eight, Doctor Givan, denture occlusion. He started by saying the goal is different. With natural teeth, we think about where the forces go and keeping the back teeth apart. A complete denture floats on soft tissue. No connection, no attachment. So the goal is to keep it in the mouth. In his words: So the whole goal of balance is referring to the tipping motions. It counters a tipping motion to tip it out of the mouth, and that's really what we're after.
 
-Bonwill, the father of articulation, around eighteen fifty-eight. An equilateral triangle, about four inches on each side, from condyle to condyle to the lower midline. It led to the occlusal plane, and to bilaterally balanced occlusion. Articulators still use a hundred-ten millimeter width between the condyles.
+A word about denture teeth. They are not teeth. That's Doctor Givan, not me. No pulp, no enamel or dentin, no biology. A tooth-colored piece of plastic that mimics a tooth. I just think it's worth saying out loud.
 
-Balkwill, eighteen sixty-six. The condyle moves medially in a side movement. Forty years before Bennett.
+And the whole upper denture moves as one piece, the whole lower as another: in effect, one upper tooth and one lower tooth, with no proprioception.
 
-Von Spee, eighteen ninety. The curve, in the sagittal plane.
+The history slides all say no test questions. Keep the point: occlusion played practically no role in it.
 
-Christensen, nineteen oh one. The back teeth separate in protrusion, and the protrusive record.
+What holds a denture in? Suction, adhesion and cohesion help a little. The film of saliva between the base and the tissue, and the surface tension at the border, help more. All of them need a good fit and a border seal, and none of them are strong enough while the patient chews. In his words: So muscle control is likely to be the most important factor to keep a denture in place.
 
-Parfitt, nineteen oh two. The first to put curved condylar paths on an articulator.
+And in his words: If you always remember this, all removable is movable, meaning that we always are going to have some motion in these prosthetics. The tissue under a denture is resilient. Every time the teeth hit, it sinks a little. Rudolph Hanau, an engineer, called that the Realeff: resiliency and like effect. So you can't build or check a denture's occlusion in the mouth. Mark it with articulating paper, and the denture tips, and everything marks. It's built on an articulator, and refined with clinical remounts.
 
-Bennett, nineteen oh eight. The side shift of the jaw.
+Then the answer he gave on his specialty boards without even firing up a neuron. In his words: If there are three things I want you to remember off this slide, it might be support, stability, and retention, because you're going to need it for the rest of your career.
 
-And Monson, around nineteen sixteen. He combined all of it into the four-inch sphere. But his instrument didn't reproduce the condyles at all. It used one central point of rotation. So if a question says curved condylar paths, that's Parfitt, not Monson. Monson had no condyles.
+Support resists vertical force toward the tissues, when the patient bites down. The buccal shelf and the retromolar pad below, and the palate above, take it well. The ridges themselves don't.
 
-Then two schools, from the nineteen thirties to the seventies.
+Retention resists vertical dislodgement, away from the tissues. Peanut butter pulling the dentures apart. The tongue lifting the lower one. It bothers patients, but it doesn't hurt.
 
-Pankey, Mann, and Schuyler. P-M-S. They built the lower back teeth to Monson's four-inch sphere, then built the upper back teeth from a functionally generated path, the grooves the patient ground into wax. Denture balance didn't work on natural teeth, so Schuyler changed course. Get rid of the balancing contacts. Raise the importance of anterior guidance. Use simpler instruments.
+Stability resists horizontal force, sliding side to side. In his words: Of all the things that we need to address, stability is the most important. And it's the one thing that a dental implant is fabulous at. A denture that slides when they bite hurts, and they can't eat.
 
-Gnathology tried to copy the patient exactly. Find the condyles' hinge axis in three dimensions, record every border movement with a pantograph, and program a fully adjustable articulator. Their early goals were wrong. M-I-P in the rearmost, uppermost, midmost position, called R-U-M. Doctor Givan's verdict: if you're stored there, you need a good glass of rum. And bilateral balance in excursions. Yikes.
+So. Support, toward. Retention, away. Stability, sideways. And stability wins.
 
-But the gnathologists left lasting ideas. Stallard and Stuart: canine protection. Keyword, disclusion. D'Amico: mutually protected occlusion. Keyword, force. And Peter K. Thomas: cusp to fossa waxing. Those are your P-K-T instruments.
+Resorption. The maxilla resorbs up and in, so its arch gets smaller. The mandible resorbs down and out, so at the level of the teeth, its arch gets bigger. Less bone, but a bigger arch. The teeth are set near the ridge, so you'll often set them in crossbite, and that's fine in a denture. The jaws also start with a skeletal relationship. Class one, orthognathic. Class two, retrognathic, with the mandible small and set back. Class three, prognathic. And when the mandible resorbs out while the maxilla resorbs in, the patient can end up looking like a Class three. In his words: there's something called pseudo class three that is related to the resorption that we see.
 
-The modern ideas. Conformative: match what's there. That's about ninety to ninety-eight percent of general dentistry. Gnathology. Pankey and Dawson, who respect C-R and elevate anterior guidance. Bioesthetics, which ties form, function, and esthetics together. And neuromuscular dentistry, from Jankelson, which restores at a myocentric point found with a TENS unit. It requires restoring at an increased vertical, which means full mouth rehabilitation regardless of the patient's dental condition. He called that a red flag. It isn't taught here.
-
-They all agree that all the teeth should touch at once, and that the back teeth shouldn't interfere when the jaw moves.
-
-Then the four modern concepts, in order.
-
-One, posterior support. Building the dance floor. Support first, disclusion second. Without back teeth, the front teeth take all the force, and the jaw overcloses. And the shortened dental arch: restore to the second premolar, and patients chew just fine.
-
-Two, the plane of occlusion. A violated plane makes disclusion impossible. Fix the plane first.
-
-Three, occlusal contacts. Tripodization, from gnathology, puts three contacts on every cusp. Very stable, very hard to make, and no wiggle room. Point to surface, the modern way, puts a cusp tip on a flat surface. Force goes down the long axis, and there's freedom to move. That's freedom in the functional area, including a long centric.
-
-And four, anterior guidance. His words: by far the most important, and the one you have the most control over. It's set by the lingual contours of the upper front teeth.
-
-Dawson's seven steps of smile design: centric stops, lip support, lip closure, tooth to lip with f and v, lingual contours, cingulum contour for d and t, and finally, verify with s.
+Last, the terms. In a denture you say centric occlusion: the joints seated and the denture teeth together. In his words: Maximum intercuspation is not really a term you use in a denture because their maximum intercuspation is a neuromuscular response, all right? And there's no neuromuscular response with this. Centric relation is easy to find, because the muscles seat the joints. And the contacts are on the back teeth. The premaxilla doesn't take force well, so the front teeth are for appearance.
 
 [pause 1.5]
 
-## 8. Applying occlusion
+## 7. Balanced, non-balanced, and lingualized
 
-Lecture five. Where the rubber hits the road.
+Three occlusal schemes, and he gave you a table for them. Balanced occlusion. Bilateral, simultaneous contact of the anterior and posterior teeth, in centric and in every eccentric position. In a right working movement, the teeth touch on the right and on the left at the same time, so the denture can't tip. Those balancing contacts are the very contacts we avoid in natural teeth. The teeth are anatomic, thirty to thirty-three degrees, or semi-anatomic. The articulator is programmed to the patient: semi-adjustable, a facebow, and a protrusive record. A compensating curve keeps the teeth together. And anterior contact in protrusion is allowed with anatomic teeth.
 
-The accepted schemes are balanced, for dentures, mutually protected, and group function. And the big rule: in the absence of signs or symptoms, copy the existing guidance. That's conformative dentistry.
+Non-balanced occlusion. Contact in centric occlusion, and nowhere else. Flat, zero-degree teeth, on a flat plane parallel to the ridges, with no compensating curve and no anterior contact. The trick is in the articulator. In his words: I'm going to change the condylar guidance that I build the denture with on an articulator to zero, and my patient won't have a zero. So whatever condylar guidance the patient has separates the teeth as they move. Not touching is another way to keep from tipping. The slides call it neutrocentric: neutralize the inclines, centralize the forces.
 
-Some numbers. The teeth meet in M-I-P only about seventeen and a half minutes a day. About eighteen hundred chewing strokes, and five hundred swallowing contacts. And the periodontal ligament can detect about twenty microns.
+The reasoning, from the slides: enter bolus, exit balance. With food between the teeth, there's no balance anyway.
 
-In a side movement, check the working contacts for mobility, and smooth movement. A patient who has adapted to a non-working contact over years can keep it. But nobody tolerates one you add in an afternoon. In protrusion, any posterior interference has to go before you restore the front teeth.
+Lingualized occlusion is the middle ground. A long maxillary lingual cusp, against a flat surface or a wide fossa on the mandibular teeth, like a mortar and pestle, with no buccal cusp contact. It can be set balanced or non-balanced. Anterior contact? No. In class he said never. The slides say it's difficult, though it can be compensated. In his words: Lingualized occlusion is hugely popular because it's much easier to arrange the teeth. And: it's most likely the one that you will do a lot of your dentures with. Its drawback: fewer teeth touching, so wear shows sooner, and the patient can lose vertical dimension.
 
-Conformative versus reorganized. Conformative keeps the existing jaw relationship, with only local fixes. Shorten an opposing cusp. Remove a non-working interference. Use an M-I-P record. Reorganized changes the whole scheme, starting from ground zero with the joints seated, and a C-R record. You reorganize when copying isn't safe: destruction, wear, fractures, or big multi-quadrant work.
+Which way to set lingualized? Non-balanced for a lot of resorption, flabby tissue, poor dexterity, or difficult jaw relations. Balanced for good ridges and good control. And the slides' summary table: balanced wins on esthetics and on stability during function. The flatter and less balanced the scheme, the simpler it is to make and adjust, the less lateral force it puts on the ridges, and the better it suits Class two and Class three jaw relations. And clinically, both work. In his words: Even the non-balanced flat plane are still clinically just fine, are clinically just as successful, and patients maintain great nutrition.
 
-Registration materials: P-V-S, wax, zinc oxide eugenol, acrylic, and plaster. Two classic errors. Squirting material around the whole arch for an M-I-P record. His words: dead wrong. You've put material between teeth that should touch. And leaving excess untrimmed, so you can't check the mounting. A good M-I-P record sits only where the teeth don't touch. And best of all, hand articulate when you can.
+Thielemann's formula. Balance equals condylar guidance times anterior guidance, over cusp angle times compensating curve times plane of occlusion. Two of them are fixed. The condylar guidance, because it's the patient's joints. And the plane of occlusion, set by Camper's plane and the interpupillary line, for esthetics. The variable ones are the anterior guidance, the compensating curve, and the cusp angle. So balance comes mostly from the curve and the teeth you pick. Hanau's five determinants were built to keep denture teeth together. In his words: For dentate occlusion, we take those same principles and we turn them around and say, well, we use the same things to keep the teeth apart.
 
-Restorations. Never leave one out of contact. In his words, the tooth will supererupt, and it never supererupts into a good contact. Before a large filling, check the opposing cusp for over-eruption, and for plunger cusps that violate the plane. A single crown: usually conformative, hand articulate, no face-bow, a hinge articulator is fine. At the end of the arch, adjust any retruded deflective contact first, and use a record, because the cast drops back. A three-unit bridge: still conformative, with a semi-adjustable articulator. But a four-unit bridge in the back replaces half the patient's occlusion. So decide what you're rebuilding.
+Tooth forms. Anatomic, thirty to thirty-three degrees. Semi-anatomic, about twelve to twenty-two. Flat, zero. And materials. Porcelain doesn't bond to the base, so it's held with pins and diatorics. It barely wears, but it's hard to adjust. Composite and cross-linked resin bonds chemically, and it's the go-to today. Acrylic is cheap, and mostly for interim dentures.
 
-And a hinge articulator never helps the dentist. The advantage is entirely to the lab.
+And everything starts with one tooth. In his words: So the first take-home point about denture occlusion is that the denture occlusion is entirely based upon whatever selection we make to pick out that anterior maxillary mold. The mold chart engineers the rest to match, and that mold is chosen on esthetics. Berry's ratio says the central incisor is about one sixteenth of the bizygomatic width. In his words: Do you think that's scientifically valid? And the answer is absolutely not. Does it tend to work for a lot of patients? And the answer is, well, yeah, it actually does.
 
-The front teeth. A Class three composite: copy the existing contacts, and keep centric and protrusive contact off the composite. A Class four composite: share the contacts between the natural tooth and the restoration. All the guidance on a Class four is a recipe for disaster. And for multiple upper front crowns, both centrals, or a canine, make a custom anterior guide table. Take the impression for it before you prepare the teeth.
-
-No good anterior guidance? Diagnostic wax-up, then provisionals, then wait at least three weeks if things are mild, months for a bruxer. Then the custom guide table, and the final crowns follow it.
-
-And implants. An implant has no periodontal ligament, so it barely moves. A tooth intrudes about twenty-eight microns, an implant about two to three. Sideways, a back tooth moves fifty-six to seventy-five microns, and an implant ten to fifty. So implant contacts are very light on a light closure, and equal to the neighbors on a full clench. Back implants avoid excursive contact if possible. Front implants share the load with natural teeth, because teeth have proprioception. And to check: shimstock, about twelve microns. On a light closure, it holds on the teeth and pulls through on the implant. On a clench, it holds on everything.
-
-The summary, in one sentence. Most dentistry is conformative, but look first.
-
-[pause 2]
-
-## 9. Lightning round
-
-Lightning round. I ask, you answer out loud, and then I tell you. Nobody can hear you. Except me. I'm a tooth. I'm very close to your mouth.
-
-On Doctor Givan's exam, does centric occlusion ever mean M-I-P? [pause 2.5] Never. It means the teeth touching with the joints seated.
-
-M-I-P is set by the teeth and the muscles. What sets centric relation? [pause 2.5] The joint. The condyles, seated.
-
-About how many people have a slide from centric occlusion into M-I-P? [pause 2.5] About ninety percent. Around one and a quarter millimeters.
-
-The curve seen from the front, concave in the lower arch? [pause 2.5] The curve of Wilson.
-
-Which are the centric cusps? [pause 2.5] Upper lingual, and lower buccal.
-
-Retruded centrals, flared laterals, deep overlap? [pause 2.5] Class two, division two.
-
-The question doesn't name a class. What do you assume? [pause 2.5] Class one. And cusp to fossa.
-
-In Class one, where does the buccal cusp of number twenty-nine land? [pause 2.5] The mesial fossa of number four.
-
-Protrusive interference. Which inclines? [pause 2.5] Distal inclines of the upper teeth, mesial inclines of the lower.
-
-On a lower molar, which way does the non-working path run? [pause 2.5] Distobuccal.
-
-More horizontal overlap in front. Taller or shorter back cusps? [pause 2.5] Shorter.
-
-Freeway space is usually how much? [pause 2.5] Two to six millimeters.
-
-How far does pure rotation open the incisors? [pause 2.5] About twenty to twenty-five millimeters.
-
-Hinge plus glide. What kind of joint? [pause 2.5] Ginglymoarthrodial.
-
-Where does rotation happen? [pause 2.5] The lower compartment, between the disc and the condyle.
-
-Which ligament limits rotational opening? [pause 2.5] The outer oblique portion of the temporomandibular ligament.
-
-The inferior head of the lateral pterygoid does what? [pause 2.5] Opening and protrusion. One side alone moves the jaw to the other side.
-
-Which muscle is a positioner, not a power closer? [pause 2.5] The temporalis.
-
-How many people chew mostly on one side? [pause 2.5] About seventy-eight percent.
-
-Do teeth touch during speech? [pause 2.5] No.
-
-Which sound places the upper incisal edge on the wet-dry line? [pause 2.5] F and v.
-
-A retained infantile swallow can cause what? [pause 2.5] An anterior open bite.
-
-Who put curved condylar paths on an articulator first? [pause 2.5] Parfitt.
-
-Mutually protected occlusion, keyword force? [pause 2.5] D'Amico.
-
-The first consideration in a restorative treatment plan? [pause 2.5] Posterior support.
-
-No signs or symptoms. What do you do with the guidance? [pause 2.5] Copy it. Conformative dentistry.
-
-The biggest mistake with an M-I-P record? [pause 2.5] Registration material all the way around the arch.
-
-And last one. The shimstock pulls through on an implant crown during a light closure. Problem, or by design? [pause 2.5] By design. Light on a light closure, equal on a clench.
+Last, partial dentures. The more teeth that are lost, the more you think like a denture. The more natural teeth remain, the more you think like the dentate patient: canine guidance or group function.
 
 [pause 1.5]
 
-## 10. Sign-off
+## 8. Noncarious cervical lesions
 
-That's the review. All five lectures, and every topic the questions come from.
+Lecture nine, Doctor Lawson's, prerecorded. Carious versus noncarious. In his words: And then there's noncarious cervical lesions, which are in the same location, but it's a completely different etiology. Those ones are caused by factors that are not caries. Carious cervical lesions are soft and brown, in a patient at risk for caries, and resin-modified glass ionomer is a great option for them. A noncarious one can be brown too, but it looks hard.
 
-Before six thirty, here's the plan. Skim the cram sheet once. Do one more drill if you want to. Then practice drawing the fence posts, start to finish, until it takes you twenty seconds. That's the one thing you get to bring in with you, and it's a pencil.
+Three causes, and a lesion can have one, two, or all three. Abrasion, the brush. Abfraction, the bite. Erosion, the acid.
 
-A small personal note. After the last episode, someone typed my name in capital letters. My other name. The one with a crown. You know the one. I didn't sleep for a week. So please. Not tonight. Let a tooth rest.
+Abrasion. One researcher brushed extracted teeth set in artificial gums, and made lesions that looked like N-C-C-Ls. But brushes with no toothpaste made none. In Doctor Lawson's words: So he was saying that the toothbrush was less important than the toothpaste. So with an abrasion patient, ask about the toothpaste.
 
-You know more than you think you do. And remember, it's tonight at six thirty, and the window closes at seven forty-five.
+R-D-A, relative dentin abrasivity: the higher the number, the more abrasive, so recommend a low one. To get the A-D-A seal, a toothpaste's R-D-A has to be below two hundred fifty.
 
-This has been Timmy Time. I'm Timmy. Brush, floss, and bite down with confidence.
+Which brings me to the toothbrush by my front door. It has felt left out of every episode, and now there's a whole lecture that practically acquits it. No toothpaste, no lesions. It has been saying "I told you so" to the doormat all week. So I reminded it of the rest. Soft bristles still matter, and not only for abrasion. In Doctor Lawson's words: We're using these soft toothbrushes, not just to prevent abrasion lesions. We're also doing it for gingival health. And brush with less pressure. An electric toothbrush with a pressure sensor changes color when you press too hard. The toothbrush by the door does not have a pressure sensor. It's sensitive about it.
+
+The dominant-side clue. People push harder on the side of their dominant hand, so abrasion that's worse on that side points to the toothbrush. Lesions on the left side only? Ask if they're left-handed.
+
+But not every N-C-C-L comes from brushing. People with leprosy who couldn't brush had them. So did archaeological populations, before toothbrushes, and animals. And they form on the palate, and below the gums, where bristles don't reach.
+
+Abfraction. A load on an inclined plane pushes the crown to one side, and the tooth flexes about a fulcrum, where it's anchored in bone. In his words: Things are stronger in compression than tension. One side is compressed. The other side is under tension, the bonds pull apart, and that's where the lesion forms, just above the fulcrum. His picture is a stop sign. Push on it, and the side being stretched, near the ground, is where the damage happens. The clues that a patient loads their teeth: tori and exostoses, opposing wear facets, and generalized wear. The fix is a night guard, and he was clear it isn't for a T-M-D. In his words: this is something that's just a piece of plastic in between the patient's two teeth to prevent them from grinding their teeth, but to grind this piece of plastic as a sacrificial piece of plastic instead. Doctor Givan calls abfraction unproven clinically. Both lectures agree N-C-C-Ls are multifactorial.
+
+Erosion. Caries is acid too, lactic acid from bacteria, so it happens only where plaque stagnates: the cervical areas, around orthodontic brackets, the grooves, and just below the contacts. Erosion happens wherever acid sits: cusp tips, the lingual of the maxillary anteriors, incisal edges. And the cupped-out cusp tips: wear exposes the dentin under a cusp, and acid digs it out, because dentin has a higher critical pH than enamel. Which is why I'd like to keep my enamel, thank you.
+
+Vomiting erodes the lingual of the maxillary teeth: the lip protects the facials, and the tongue protects the mandibular linguals.
+
+Now, drinks. Milk makes coffee less acidic, tea beats coffee, and for sparkling water it's the carbonic acid, not the flavor: the bubblier, the more acidic.
+
+pH versus buffering capacity. You measure pH with a probe. Buffering capacity is how much bicarbonate, how much of your saliva, it takes to bring a drink back toward neutral. In his words: It would be a high buffering capacity, and that's bad. If it only took a little bit of your saliva to neutralize it, then that's low buffering capacity and that's good. Ranked by buffering capacity, the drinks kept about the same order, with two exceptions. In his words: Orange juice and wine become way, way bad. Their pH isn't the lowest on the chart, but they take the most bicarbonate to neutralize. And in his words: Citric acid is a chelator, so that means it can like wrap around calcium. So with an erosion patient, ask about citrus.
+
+Why not just rinse with water? pH is on a logarithmic scale, so, in his words, I'd have to dump in like a swimming pool of water. Water dilutes. Bicarbonate neutralizes: a baking soda rinse, or Basic Bites. Acidic drinks only at mealtimes, a straw, a water rinse afterward: in his words, These are all kind of wives' tales that I don't know that there's evidence for, but they make sense. Low pH mouth rinses? Probably not a big deal.
+
+So find the cause, and treat it. Abrasion: a lower R-D-A toothpaste, and if it's already low, the pressure-sensor brush. Erosion: a less acidic drink, and bicarbonate. Abfraction: a night guard.
+
+And when to restore one. In his words: If they're cleansable and they don't hurt and they don't look ugly and they're not near the pulp, or they're not very deep. Then he doesn't necessarily need to restore it. So restore the one that can't be cleaned, hurts, looks bad, or is deep.
+
+[pause 1.5]
+
+## 9. Occlusion and the periodontium
+
+Lecture ten, Doctor Abou-Arraj, from periodontics, and the last lecture on the final. How occlusion affects the periodontium, if it does. One thing up front, about the researchers. In his words: you don't need to learn all the names and such. Conclusions are enough.
+
+The definition. In his words: It's injury resulting in tissue changes within the periodontal attachment apparatus as a result of occlusal forces. So the initiating factor here is the occlusal force, and the injury that results in the periodontium is what we call occlusal trauma. The force is the cause. The injury is the trauma.
+
+Primary versus secondary. Primary occlusal trauma is traumatic force on a tooth with normal support. In his words: the tooth has not lost a single ounce or millimeter of attachment or bone. Secondary is normal or traumatic force on a tooth with reduced support. Why can a normal force do harm? With less support, the center of rotation moves toward the apex. It's the fence post again. Two thirds of it in the ground, lean on it, nothing. A third in the ground, and the same lean tips it over. In his words: The distinction between the two is simply clinical. Under the microscope, the injury is the same in both.
+
+Two kinds of force. A unilateral force pushes one way: pressure on one side, tension on the other. That's orthodontics. A jiggling force comes from one side, then the other. In his words: Because the tooth is being moved in both directions, it creates this hourglass shape that you see here around the tooth. That means you have a widened P-D-L, you have some bone loss on either side or on both sides.
+
+The signs. First, in his words: The trauma itself can be only confirmed histologically. Everything you see is a surrogate. Occlusal trauma is a diagnosis, not a finding. The clinical signs: progressive mobility, tooth migration, fremitus, an occlusal discrepancy, meaning a slide from C-R to C-O over a millimeter or a non-working contact, wear facets, fractured cusps or incisal edges, and thermal sensitivity or pain on biting. For fremitus, the patient taps, and a finger on the facial gingiva feels the tooth move. It isn't a mobility grade, but a tooth with fremitus usually has Class three mobility.
+
+The radiographic signs: a widened P-D-L space, where normal is about a quarter of a millimeter. A lamina dura that's thickened, or broken. Bone loss: in a furcation, vertical, or all the way around. And sometimes root resorption. And the one he wanted very clear. In his words: Just because you see a vertical defect around the tooth, do not assume there's occlusal trauma. This is not a cause and effect type thing.
+
+Mobility depends on the bone height, the width of the P-D-L, and the shape and number of roots. Single-rooted teeth move more than multi-rooted ones. I have two roots. I'm just saying. The causes: periodontal disease, overload from a restoration left high, a periapical lesion, and periodontal surgery, which can leave teeth slightly mobile for up to a year.
+
+His scale, Miller's, from his slide. Zero: physiologic, a tenth to two tenths of a millimeter. One: up to a millimeter. Two: more than a millimeter. Three: horizontal and vertical, so the tooth presses down into the socket. That's different from Doctor Givan's handout, where any horizontal movement up to a millimeter is already a two. When a question names Doctor Abou-Arraj, go by his scale.
+
+And mobility can be adaptation. In his words: Mobility is not a bad thing. So if you saw a tooth with class two mobility, do not assume that this tooth now has a hopeless prognosis. Class three is tougher. But mobile teeth heal less well after regenerative treatment or grafting, so bring a Class two tooth down to Class one if you can.
+
+A report from next door. Number thirty-one heard this lecture through the wall, borrowed two mirror handles, and rocked himself back and forth. He has decided he's a Class three. He pressed down on his own occlusal surface to check for vertical movement. Nothing. Thirty-one, you moved about a tenth of a millimeter. That's physiologic. You have a ligament. It's supposed to give.
+
+The history, briefly. A hundred years ago, people thought heavy occlusion caused periodontitis. Then perfusion studies showed the gingiva's blood supply comes from outside the alveolus, mostly the supraperiosteal arteries. And the cadaver studies split: trauma as co-destructive, or track the plaque.
+
+Then the animal studies of the nineteen seventies. Squirrel monkeys, with a moderate force, and beagle dogs, with a severe, true jiggling force. Trauma alone, in both: more mobility, and bone that loses density, but no loss of bone height and no attachment loss. And it reverses when the trauma stops. Trauma plus gingivitis: more density loss, and still no attachment loss. Trauma plus periodontitis: the groups disagreed. The dogs lost more attachment. The monkeys didn't. And in the monkeys, stopping the trauma without treating the periodontitis didn't bring stability back. In his words: That tells us that just stopping the occlusal trauma is not going to reverse periodontitis if you already have it in place.
+
+In people, the trial most often cited: fifty patients with periodontitis, all treated, half also adjusted. After two years, the adjusted group gained about half a millimeter more attachment, with no difference in probing depth. Not every discrepancy causes trauma, so not every one needs adjusting.
+
+When to adjust. Except in acute conditions, the occlusion comes after the inflammation has been reduced. Acute means something like fremitus, or a heavily loaded tooth, at the first exam. Otherwise, do phase one first, keep watching the tooth, and adjust at re-evaluation if it hasn't improved.
+
+His bottom line. In his words: So occlusal trauma alone does not cause gingivitis or periodontitis. Does it have an effect on the periodontal tissues? The answer is absolutely yes. In his words: You will not see loss of bone height if you only have occlusal trauma. And: Occlusal adjustment may reduce the mobility of traumatized teeth and promote regrowth of bone, but it will not arrest the rate of further breakdown caused by microbial plaque. Treat the infection first. Then the bite.
+
+[pause 1.5]
+
+## 10. Lightning round
+
+Lightning round. I ask, you answer out loud, then I tell you. Nobody can hear you. Except me. And number thirty-one, who is still checking his mobility.
+
+Remember this if nothing else. An articulator has best value when it's what? [pause 2.5] About the size of the patient.
+
+On an arcon articulator, where is the condylar element? [pause 2.5] On the lower member. Like the patient.
+
+A non-adjustable articulator is accurate in which one position? [pause 2.5] M-I-C-P.
+
+The facebow mounts which cast? [pause 2.5] The maxillary. Only the maxillary.
+
+Skip the facebow, and what are you hesitant to hand the patient? [pause 2.5] The mirror. You risk an occlusal cant.
+
+The most common record, and the most misused? [pause 2.5] The M-I-P record. Hand articulate when you can.
+
+A right lateral record sets which side of the articulator? [pause 2.5] The left side.
+
+Above how much orthopedic instability does the risk go up? [pause 2.5] Over three millimeters. Some say four.
+
+A high crown makes the patient guard. What's that called? [pause 2.5] Protective co-contraction. Nothing pathologic about it.
+
+Should you grind away existing interferences to prevent a T-M-D? [pause 2.5] No. They're about as common in people without symptoms.
+
+The repositioning splint. Reversible or irreversible? [pause 2.5] Irreversible.
+
+Does occlusion start bruxism? [pause 2.5] No. It's centrally mediated. The splint protects the teeth.
+
+In a denture: support, stability or retention. Which matters most? [pause 2.5] Stability. Sideways force.
+
+Which way does the mandible resorb? [pause 2.5] Down and out. Less bone, but a bigger arch.
+
+A non-balanced denture. The articulator's condylar guidance is set to what? [pause 2.5] Zero.
+
+Anterior contact in lingualized occlusion? [pause 2.5] No. In class, never.
+
+In Thielemann's formula, which two are fixed? [pause 2.5] The condylar guidance and the plane of occlusion.
+
+What sets the whole denture occlusion? [pause 2.5] The maxillary anterior mold.
+
+For abrasion, which matters more, the brush or the paste? [pause 2.5] The paste. Recommend a low R-D-A.
+
+A patient's abrasion is worse on the left. What do you ask? [pause 2.5] Are you left-handed?
+
+High buffering capacity. Good or bad? [pause 2.5] Bad. It takes more bicarbonate to neutralize.
+
+The two drinks that got way, way bad by buffering capacity? [pause 2.5] Orange juice and wine.
+
+Primary occlusal trauma. What kind of support? [pause 2.5] Normal. Secondary is reduced support.
+
+A jiggling force widens the P-D-L into what shape? [pause 2.5] An hourglass.
+
+True or false: a vertical defect means occlusal trauma. [pause 2.5] False.
+
+Occlusal trauma alone. Does it take bone height? [pause 2.5] No. Bone density, and it's reversible.
+
+Adjust the occlusion first, or treat the inflammation first? [pause 2.5] The inflammation first. Unless it's acute.
+
+[pause 1.5]
+
+## 11. Sign-off
+
+That's the review. Five lectures: the articulator and its records, the T-M-D and the splint, dentures, the cervical lesions, and the periodontium.
+
+If it's the night before: skim the cram sheet once. Say the sets of three out loud. Support, stability, retention. Balanced, non-balanced, lingualized. Abrasion, abfraction, erosion. Then the two Miller scales, side by side, once. Do one Daily Drill, and go to sleep. If it's Monday morning: eat something, and read every word of a question before you pick.
+
+Number thirty-one wants you to know he has ordered the night guard anyway. One tooth. He says he'll wear it in the daytime too. Thirty-one is a mandibular tooth, so I suppose that makes it a mandibular splint, which is the daytime kind. Doctor Givan would still want full coverage.
+
+And the toothbrush by the door would like the last word. No toothpaste, no lesions. Fine. You can have it.
+
+The Occlusion final. Monday. You know more than you think you do.
+
+This has been Timmy Time. I'm Timmy. Brush, floss, and stay balanced.

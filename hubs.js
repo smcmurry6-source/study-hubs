@@ -321,7 +321,7 @@ window.SH_DASH_DATA = {
    "stateKey": "occl-state-v1",
    "podcast": {
     "name": "Timmy Time",
-    "sub": "The midterm review, 45 min"
+    "sub": "The final review, 48 min"
    }
   },
   {

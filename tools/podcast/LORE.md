@@ -51,6 +51,13 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   as a lower second molar he is "the likelier of the two of us" (true: they're more common on mandibular molars, about
   30%, and on second molars). And Dr. Kaur's number thirty-one implant case, heard through the wall, "was a different
   number thirty-one."
+  After the Occlusion final's L7 he decided he **grinds at night** and wants a **night guard for one tooth**: that's partial
+  coverage (Dr. Givan wants full coverage in almost every situation, and a small splint is an aspiration hazard at night),
+  and bruxism is centrally mediated ("You don't have a brainstem."). He ordered it anyway and says he'll wear it in the
+  daytime too; he's a mandibular tooth, so that makes it a mandibular splint, the daytime kind. After L10 he **checked his
+  own mobility** between two mirror handles (Miller's index), decided he's a Class three, and pressed down on himself for
+  vertical movement: nothing. He moved about a tenth of a millimeter, physiologic ("You have a ligament. It's supposed to
+  give.").
 - **The rabbit down the hill** (new in the implants episode's comments): offended that Timmy called rabbits "showy" for
   teeth that never stop growing (true: rabbit teeth grow all their lives and are worn down by chewing). Proud that
   osseointegration was found in rabbit bone (Brånemark, 1952).
@@ -61,6 +68,10 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   eight hundred" (it asked Timmy to say it twice; he said it once, and its own summary, "seven hundred brushings at home
   beat four cleanings in the chair", is "near enough"). Nobody has told it that toothbrushing is the most common
   traumatic factor in recession ("It's having a big episode. Let it have tonight."). Its comment: it's soft-bristled.
+  It was **also vindicated, by Dr. Lawson's L9** (the Occlusion final): brushes
+  used without toothpaste made no cervical lesions, so the toothpaste matters more than the brush. It spent the week
+  saying "I told you so" to the doormat. Its comment there: soft bristles (for the gums too), **no pressure sensor**, and
+  it is sensitive about that. (Still nobody has told it about recession.)
 - **The bowling alley** (the redesign's bowling egg, `widget/bowling.js`, from its release): a bowling lane can stand in
   his yard, and the alley's screen plays odd cartoons after a strike, the way real alleys do. The pins are the Plaque crew
   from the boss fights (Plaque Boss, Tartar Titan, Biofilm Blob, the Strep Mutans Swarm, Cavity Creep, the Gingivitis
@@ -106,6 +117,8 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   medals and rank-ups; spending never lowers XP or rank. Snacks (an apple, a cheese cube, floss, a fluoride rinse) give
   him HP back, one of each a day; a boost doubles XP for an hour or three.
 - Occlusion (Oct 21): "it's October, so yes, I'm in costume. I'm not going to tell you which one."
+- The Occlusion final (Nov 16, the first exam after the release): "Back then it was October, I was in costume, and I
+  wouldn't tell you which one. I used to dress myself. You saw how that went. These days I wear whatever you put me in."
 - Thanksgiving 2026 (Nov 1 to the day after Thanksgiving, as in the widget): three costumes, a pilgrim hat with a buckle, turkey
   feathers, and a chef's hat with a pie, the next one each page load, never revealed (PCD Implants Exam 1).
   The pie is not a snack, "it is a postprandial event"; it stays uneaten and is "decorative" ("Postprandial events are for
@@ -141,6 +154,12 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   He thanks Dr. Litz, "on behalf of my furcation", for never taking down furcation bone in osseous surgery. And his
   first periodontics episode: "periodontics is about me. The gum around me, the ligament holding me in, the bone around
   my roots."
+- **Denture teeth are not teeth** (the Occlusion final, Dr. Givan's own words: no pulp, no enamel or dentin, no biology,
+  a tooth-colored piece of plastic). "That's Doctor Givan, not me. I just think it's worth saying out loud."
+- **Two roots, so he moves less**: single-rooted teeth are more mobile than multi-rooted ones (Dr. Givan's L7, Dr.
+  Abou-Arraj's L10). "I have two roots. I'm just saying."
+- **He'd like to keep his enamel**: dentin has a higher critical pH than enamel, so acid digs out exposed dentin first
+  (the cupped cusp tips, Dr. Lawson's L9).
 
 ## Who comments
 
@@ -151,7 +170,8 @@ number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a n
 
 - Opens: "Hey. It's Timmy, and this is Timmy Time." Closes: "This has been Timmy Time. I'm Timmy. Brush, floss, and ..."
   with a new ending each time (MSK: "go get it"; Occlusion: "bite down with confidence"; Heme & Endo: "keep your feedback
-  negative"; PCD Implants: "torque responsibly"; Heme & Endo Exam 2: "surge when it counts", the L-H surge; Perio final: "mind the furcation").
+  negative"; PCD Implants: "torque responsibly"; Heme & Endo Exam 2: "surge when it counts", the L-H surge; Perio final: "mind the furcation"; the Occlusion
+  final: "stay balanced", the denture's bilateral balance).
 - Lightning round intro: answer out loud, "nobody can hear you. Except me." (Heme & Endo added "And, apparently, number
   thirty-one.")
 - Warm, dry, a little vain. Jokes are short and come after the fact, never instead of it. He quotes the professors
@@ -162,8 +182,9 @@ number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a n
 | Hub | Script | Length | Lore added |
 | --- | --- | --- | --- |
 | `msk-exam4` | `msk-exam4/script.md` | 42 min | Small tooth, big voice; "I have one job"; they grind |
-| `occlusion` | `occlusion/script.md` | 45 min | The cottage; lower first molar, two roots; October costume (unrevealed); TIMMY kept him up a week |
+| `occlusion` (midterm) | `occlusion/midterm.md` | 45 min | The cottage; lower first molar, two roots; October costume (unrevealed); TIMMY kept him up a week. Replaced on the hub by the final's episode, 2026-11-15 |
 | `heme-endo-exam1` | `heme-endo-exam1/script.md` | 53 min | Four Halloween costumes, one per page load; neighbor number thirty-one; TIMMY as adrenaline; enamel is not a calcium bank |
 | `pcd-implants-exam1` | `pcd-implants-exam1/script.md` | 48 min | Thanksgiving costumes, one per page load; proud of his ligament; thirty-one thinks he's a failing implant; Brånemark's rabbit. First episode with comments: thirty-one, the rabbit down the hill, the toothbrush by the door |
 | `heme-endo-exam2` | `heme-endo-exam2/script.md` | 52 min | Thirty-one's glucose meter ("You don't have a pancreas"); Timmy came from a dental follicle; the pie is a postprandial event. Comments: thirty-one, the toothbrush by the door |
 | `perio` | `perio/script.md` | 49 min | Timmy's own furcation (two entrances, about 2.5 mm down; the mesial root concavity); thirty-one stages himself with a toothpick ("You're not staged. You're anxious."), may have an enamel projection, and wasn't Dr. Kaur's thirty-one; the toothbrush's big episode (Phase one starts with oral hygiene); the pie, still decorative, after the release. Comments: thirty-one, the toothbrush by the door |
+| `occlusion` (final) | `occlusion/script.md` | 48 min | The first exam after the release: "whatever you put me in"; thirty-one's one-tooth night guard ("You don't have a brainstem") and his self-checked mobility ("You have a ligament. It's supposed to give."); the toothbrush vindicated by L9, with no pressure sensor; denture teeth are not teeth; two roots move less. Comment: the toothbrush by the door |

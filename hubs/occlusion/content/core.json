@@ -120,13 +120,14 @@
   {"id":"all","name":"Full Envelope","icon":"medal","desc":"Answer every question in the bank at least once","cond":{"type":"allSeen"}}
  ],
  "podcast": {
-  "id": "midterm-review",
+  "id": "final-review",
   "show": "Timmy Time",
-  "title": "Occlusion midterm: the last-minute review",
+  "title": "Occlusion final: the last-minute review",
   "src": "audio/timmy-time.mp3",
-  "duration": 2687.1,
-  "blurb": "45 min with Timmy Tooth: all five lectures, what Dr. Givan said to know, the fence post, and a lightning round to finish.",
-  "chapters": [{"t":0,"title":"Cold open"},{"t":112.82,"title":"Speaking the same language"},{"t":501.81,"title":"What cusp hits where"},{"t":853.42,"title":"Guidance, determinants and the envelope of motion"},{"t":1238.02,"title":"The joint and the muscles"},{"t":1559.92,"title":"Chewing, swallowing and speech"},{"t":1809.67,"title":"Occlusal concepts: how we got here"},{"t":2085.61,"title":"Applying occlusion"},{"t":2335.46,"title":"Lightning round"},{"t":2618.26,"title":"Sign-off"}]
+  "duration": 2862.1,
+  "blurb": "48 min with Timmy Tooth: all five lectures on the final, what Dr. Givan, Dr. Lawson and Dr. Abou-Arraj said to know, the denture schemes side by side, and a lightning round to finish.",
+  "chapters": [{"t":0,"title":"Cold open"},{"t":105.14,"title":"Articulators: the job dictates the tool"},{"t":357.94,"title":"The facebow and the records"},{"t":601.68,"title":"Functional disturbances and TMD"},{"t":847,"title":"Splints, mobility, wear, and bruxism"},{"t":1160.45,"title":"Keeping a denture in the mouth"},{"t":1424.81,"title":"Balanced, non-balanced, and lingualized"},{"t":1720.74,"title":"Noncarious cervical lesions"},{"t":2088.46,"title":"Occlusion and the periodontium"},{"t":2496.73,"title":"Lightning round"},{"t":2774.05,"title":"Sign-off"}],
+  "fans": [{"who":"The toothbrush by the door","tag":"Timmy's world","text":"Finally, a lecture that clears my name: no toothpaste, no lesions. And yes, my bristles are soft, for the gums too. I don't have a pressure sensor, but I do have feelings."}]
  },
  "figByLec": {
   "review": ["fence","envSag","envHoriz","envFront","pathMax","pathMand","cuspmotion","inclines","interferences","cuspheight","envelope","crslide","guidance"],

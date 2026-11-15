@@ -44,9 +44,10 @@ Dates and check-in hours: its entry in `hubs.js`.
   movement with shorter cusps, while the articulator handout ties the Bennett angle setting to the width of the central fossae, so
   "Cusp height" can be argued for either. Don't offer it as a wrong answer to a Bennett question (54% picked it): on 11-14 it
   became "How steep the cusps can be in protrusion" (the Bennett angle is a lateral setting), and its old picks were cleared.
-- **The page is at its weight budget** (2026-11-13): `tools/release/perf.js` measures it at 1480 KB over the wire, the most
-  `tools/release/budgets.json` allows, with a few bytes to spare before it rounds up to 1481. Any added text fails
-  "Release tests": trim as much as you add, or raise the budget with a reason in the PR that Sam approves (as BUG-087 did).
+- **The page's weight budget** is `hubs/occlusion/` in `tools/release/budgets.json` (800 KB since the engine's bundles,
+  2026-11-13; the old single-file page was at 1480 KB, its limit). On 2026-11-15 `node tools/release/perf.js --page
+  hubs/occlusion/` measured 771 KB: room for content, but check it after a big addition, and raise the budget only with a
+  reason in the PR that Sam approves (as BUG-087 did).
 - **The final's format** isn't announced (question count, Canvas or not): `FINAL_TIME` / `FINAL_CLOSES` are `'18:30'` /
   `'19:45'`, and the dashboard's check-in button and pop-up go out at 8 pm (`checkinHour:20, promptHour:20`), after the
   window closes ([task](../tasks/2026-11-03-occlusion-final-time-and-format.md)).
@@ -158,7 +159,12 @@ Dates and check-in hours: its entry in `hubs.js`.
   lectures, made from `content/notes.json`. It changes whenever a final lecture's notes, predicted topics, hints or
   questions do, so a question edit there can mean recording that lecture's High yield again in the same PR: the smoke lint
   says which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)).
-- **Timmy Time:** the midterm episode (`tools/podcast/occlusion/script.md`); there is no final episode yet.
+- **Timmy Time:** the **final's episode** (`final-review`, since 2026-11-15, Sam: "Podcast for occlusion final. Replace
+  the midterm with it"): L6-L10, script `tools/podcast/occlusion/script.md`, `podcast` in `content/core.json`, the mp3
+  `audio/timmy-time.mp3`. It took the midterm episode's place (`midterm-review`, script kept as
+  `tools/podcast/occlusion/midterm.md`; its likes and comments stay with its id). **A change to L6-L10's notes means fixing
+  the script and rebuilding the episode in the same PR** ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)).
+  The server pays its minutes once `podcast_episodes` has the row (`admin_set_podcast_episode`, after the merge).
 - **Arcade:** the Freeway Space Arcade, skin `OCCL_SKIN`. Lab Escape is a painted backdrop (`img/lab-escape.webp`) with
   hotspots measured onto it: a new backdrop means re-measuring every `api.spot()`.
 
