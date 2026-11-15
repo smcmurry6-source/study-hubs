@@ -106,7 +106,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [x] **Numbering the questions in a bank set, Sam's call** (the same check-in asked for it; Sam's 11-14 answer covered only the page
   size): a number on each card of the current set, in the redesign's bank (`widget/hub-bank.js`) and the live engines. Sam, 2026-11-15:
   "Lets implement the numbering"; "Question 12 of 84" on every card of the bank, its sets and the mock. The single-file engines
-  weren't touched: every hub on one is archived (PR_LINK).
+  weren't touched: every hub on one is archived ([#373](https://github.com/smcmurry6-source/study-hubs/pull/373)).
 
 - [ ] **Perio's page weight is near its budget** (2026-11-14, [#362](https://github.com/smcmurry6-source/study-hubs/pull/362)): `perf.js`
   measured the live Perio page at 1167 KB of its 1180 KB budget (`tools/release/budgets.json`) after Figs 6-8 (+38 KB gzipped), and its

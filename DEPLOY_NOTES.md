@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-15 (Question Bank: every card numbered, Claude Code)** — Sam: "Lets implement the numbering of the questions in
+- **2026-11-15 (Question Bank: every card numbered, Claude Code, #373)** — Sam: "Lets implement the numbering of the questions in
   the question bank idea" (a classmate: "adding question numbers so we know how many more are left ... if it's like 80+
   questions I'm not just scrolling forever and I could maybe take a break when I hit #40"; also on the idea board). Every
   card in the bank now starts its top line with **"Question 12 of 84"**: its place among the questions the filters picked
