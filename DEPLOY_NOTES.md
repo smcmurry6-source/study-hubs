@@ -37,7 +37,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   it's like 80+ questions I'm not just scrolling forever and I could maybe take a break when I hit #40"; also on the idea
   board), then "I want the questions to be shown in intervals of 100 unless there are less questions than that in the
   filter. Showing all 844 feels unmanageable". A list over 100 is now shown **a hundred at a time**: above it, "Questions
-  [101–200] of 844" with Previous, Next and a picker for any hundred (`.qsets`); at the end of a set, "That's questions
+  [101–200] of 845" with Previous, Next and a picker for any hundred (`.qsets`); at the end of a set, "That's questions
   1–100 of 844" and **Next 100 questions**, which goes to the top of the next set. Every card starts with **"Question 12 of
   100"**, its place in the set (fewer than 100, one set: "of 84"). Inside a set the cards still come fifty at a time and
   load by themselves (Sam's 11-14 call). The bank keeps its set while the filters stay the same (`STATE.ui.qpage`), except
@@ -46,11 +46,29 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   "Question n" gains "of N". "Try it again" keeps the number; the missed question that comes back a few cards later has
   none; Learn and Flashcards keep their own progress. New events `bank:page=next|prev|pick|end`. `widget/hub-bank.js`
   (`qNum()`, `setsBar()`, `toSet()`, `page()`), `widget/hub.css` (`.qc-n`, `.qsets`, `.qset-end`), bundles rebuilt.
-  Found in testing and fixed: BUG-152 (the number crowded the lecture chip on a narrow phone) and BUG-153 (Next 100 left a
+  Found in testing and fixed: BUG-153 (the number crowded the lecture chip on a narrow phone) and BUG-154 (Next 100 left a
   phone at the bottom of the new set: scroll anchoring). The single-file engines weren't touched: every hub still on one is
   archived. About page ("Questions"), the bank's rule note, decisions, the event taxonomy and the inbox updated. **After the
   merge:** the changelog line for Occlusion and Perio, and the `timmy` function deployed again for the About page's new
   words (`supabase/functions/timmy/site.json`).
+- **Occlusion: the final's question bank audited, and a mock that leans on High likelihood (2026-11-15, Claude Code, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370))** — Sam:
+  "audit occlusions question bank to see if we can make it higher yield ... accurate, with good answer options and sufficient
+  explanations", then "make sure the exam hints are utilized as best as possible". Every L6-L10 question checked against the
+  notes and the Exam Hints. **156 questions fixed** in place (ids kept): 4 that the notes contradict ([BUG-152](vault/release/bug-log.md):
+  `cs-in-crown-lab`'s case, `nc-sel-acid`, `mo-histo`, `ot-sel-clin`), keys that were the longest choice trimmed, giveaway and
+  arguable distractors rewritten, whys and explanations completed, professors' words quoted where a hint backs the point. **Every
+  emphasized hint is now tested**: 4 new questions (`in-worth`, `mo-joint-load`, `mo-splint-cause`, `dn-wf-skel`), weak ones
+  re-aimed, 3 new High likelihood topics for L7's orphan hints (the splint as an environment of healing, painless wear, a
+  traumatic force), and topics renamed, added to and trimmed across L6-L10 (63 in all). **Retired** on Sam's call: `mo-better-q`,
+  `mo-swim`, `in-2s-4` (kept: `mo-bell`, `mo-occupational`, `ot-tf-4`, `ot-tf-5`, `dn-tf-6`). 845 questions. **The mock**: 7 of each
+  lecture's 9 from its High likelihood questions (Sam: "mostly high likelihood. Like 75%"): `core.mock.likelyShare` (0-1),
+  read by `buildMock()` in `widget/hub-bank.js` for any hub that sets it, each side unseen and missed first, topped up from the
+  other side when short (L10 is all High likelihood: 9 of 9). The mock's blurb and the About page's High Likelihood entry say
+  so; Ask Timmy's site help rebuilt. High yield rebuilt and **recorded again for all five final lectures**. Class data:
+  `tools/data-fixes/2026-11-15-occlusion-audit.sql` (73 rewritten choices' picks, 8 re-aimed questions' "% right", recounted
+  from the new versions' answers) runs once after the merge. Sam's calls on its two open questions: the splint follows Dr. Givan's slides, and L10 keeps "Miller" as
+  Dr. Abou-Arraj's slide has it ([decisions](vault/decisions.md)); after-merge steps: [the inbox](vault/tasks/inbox.md);
+  what the next audit needs to know: "The final's bank audit" in [the hub note](vault/hubs/occlusion.md).
 - **2026-11-15 (Perio: the question bank audited for the final, Claude Code)** — Sam: "audit perios question bank to see
   if we can make it higher yield ... accurate, with good answer options and sufficient explanations. Make sure the exam
   hints are utilized as best as possible." Every question was read against its session's notes, hints, review tables
