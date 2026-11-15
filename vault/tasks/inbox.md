@@ -85,6 +85,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   of its 61 bank users pressed "Show more" 287 times): Sam, 2026-11-14, "Show more questions in the question bank at a time": 100 a
   page in the single-file engines (`BANK_PAGE`, was 30), 50 in the redesign's bank (`PAGE`, was 20)
   ([#361](https://github.com/smcmurry6-source/study-hubs/pull/361)).
+- [ ] **Run `tools/data-fixes/2026-11-14-in-bennett.sql` in the Supabase SQL editor** (Sam approved it: "Run it", 2026-11-14). Until it
+  runs, Occlusion's `in-bennett` card shows the old "Cusp height" picks beside the new choice. The connector's `execute_sql` asks
+  for approval before a write, and that prompt timed out unanswered three times (11-14 and 11-15), so Sam runs it by hand. It sets
+  choice 1's count to the new version's picks from `question_events` (a plain delete would also drop the picks made since the change).
 - [ ] **Numbering the questions in a bank set, Sam's call** (the same check-in asked for it; Sam's 11-14 answer covered only the page
   size): a number on each card of the current set, in the redesign's bank (`widget/hub-bank.js`) and the live engines.
 
