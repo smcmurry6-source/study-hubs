@@ -101,9 +101,18 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   McEntire; the in-class session (the notes, `PROGNOSIS_COMPARE`) says McGuire & Nunn "can be given per tooth or for the
   whole dentition" and is about whether a tooth can be maintained, "meaning kept in the mouth" ("tooth retention"). So
   don't make "retention" or "per tooth" the line between them: Miller & McEntire is molars and a number, Kwok & Caton is
-  stability and the whole dentition, McGuire & Nunn is maintainability. `q3-04`, `q3-08` and `q3-S03` were rewritten that
-  way (same ids); `q3-01` still calls McGuire & Nunn the per-tooth system, which its stem allows (`q3-05` was retired
+  stability and the whole dentition, McGuire & Nunn is maintainability. `q3-04` and `q3-08` were rewritten that way (same
+  ids); since the bank audit (2026-11-15) `q3-01` asks which system can be used diagnostically (McGuire & Nunn only, the
+  in-class poll) and `q3-S03` tests poor vs questionable, so neither leans on "per tooth" any more (`q3-05` was retired
   with Miller & McEntire, 2026-11-14).
+- **The question bank: no fact more than twice** (the audit of 2026-11-15, [its note](../tasks/done/2026-11-15-perio-bank-audit.md)).
+  Sam's bar from Occlusion holds here too: a fact may be asked two ways, never more than twice in the bank, counting a
+  statement inside a two-statement, true/false or numbered item and counting across sessions. 750 → 670 questions (103
+  retired, 23 new, 263 edited). When you add a question, check the fact isn't already asked twice. Who owns a shared
+  fact: S9 the recession types' treatment (S1 keeps the RT definitions, `q1-08`, and the chart readings `pc-c1`,
+  `pc-c2`), S9 the palate's layers, S4 the Glickman definitions and S5 reading one on a case, S5 the re-evaluation
+  timing (`q5-R02`) with S4 the reason for it (`q4-L28`). New ids since the audit use `q<session>-F01`, `-F02`...
+  Every emphasize hint has a question on its own point; the audit's note lists, by hint, which ones.
 
 ## Diagram decisions
 
@@ -197,6 +206,10 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/2026-11-05-r
   (250 or 500 mg tid vs 500 or 875 mg): the notes give both and no question turns on the difference. Since 2026-11-14
   the doses aren't on the final at all (Dr. Abou-Arraj's review), and the dose questions are retired. Its meal-timing
   column couldn't be read reliably from the PDF text, so it isn't in the hub.
+- The bank audit's list of things in the notes that read wrong or disagree (S1 "more than 10" vs "10 or more", S2's
+  chromic gut, S3's "#14", S4's long junctional epithelium, S5's stale cram line, S6's contained defect, S7's B.
+  forsythus, S8's cephalosporin claim), in [the audit's note](../tasks/done/2026-11-15-perio-bank-audit.md): Sam said
+  leave them (2026-11-15, [decisions](../decisions.md)). No question turns on any of them; don't re-propose them for this final.
 
 History: grep `perio` in "Recent major changes" (`DEPLOY_NOTES.md`).
 
