@@ -26,10 +26,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   - [ ] `log_changelog` for `occlusion` (needs `ADMIN_SECRET`), then `node tools/release/postcheck.js`.
   - [x] Sam: two questions the notes don't settle. Decided 2026-11-15: follow Dr. Givan's slides on the splint (irreversible);
     L10 keeps "Miller", which is what Dr. Abou-Arraj's slide says ([decisions](../decisions.md)). No change needed.
-- [ ] **After the Perio bank audit merges** (2026-11-15, [its note](done/2026-11-15-perio-bank-audit.md)): load Perio's
+- [x] **After the Perio bank audit merges** (2026-11-15, [its note](done/2026-11-15-perio-bank-audit.md)): load Perio's
   answer keys in the same sitting (`node tools/xp/keys.js perio --load`: 670 questions, 103 retired, 23 new, 263
   edited) and log the changelog line (`log_changelog`). Until the keys load, the new questions earn no XP and edited
-  keys grade against the old ones.
+  keys grade against the old ones. Done at the merge of #371: 670 loaded, 103 retired, the changelog logged.
 - [x] **Sam's call: notes the Perio bank audit flagged** (2026-11-15, the list in [its note](done/2026-11-15-perio-bank-audit.md)'s
   Outcome, "For Sam"). Eight spots in the S1-S8 notes that disagree with each other or with current teaching (S2's
   chromic gut, S3's "#14", S6's contained defect...). No question turns on any; a fix means narrating that session
