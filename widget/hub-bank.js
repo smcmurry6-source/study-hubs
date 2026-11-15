@@ -247,7 +247,7 @@
   function bankReset(){ STATE.ui.qset = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; STATE.ui.qstatus = "all"; STATE.ui.qlikely = ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; }
   var SETS = [["drill", "Daily drill"], ["misses", "Yesterday's misses"], ["weak", "Weak spots"], ["mock", "Mock exam"]];
   var FMTS = [["recall", "Recall (self-graded)"], ["2stmt", "Two statements"], ["tf", "True or false"], ["numbered", "Numbered statements"], ["which", "Which statement is true"], ["whichf", "Which statement is false"], ["except", "EXCEPT / NOT"], ["pbox", "Patient Box cases"], ["img", "Diagram questions"], ["multi", "Select all that apply"], ["match", "Matching"], ["sequence", "Put in order"]];
-  var PAGE = 50, bankSearch = "";
+  var PAGE = 50, SET = 100, bankSearch = "";
   function isFmt(q, fm){ return fm === "pbox" ? !!q.pbox : fm === "img" ? !!q.img : (fm === "multi" || fm === "match" || fm === "sequence" || fm === "recall") ? q.type === fm : q.fmt === fm; }
   function labelOf(list, k){ for (var i = 0; i < list.length; i++) if (list[i][0] === k) return list[i][1]; return k; }
   function presetOf(){ var s = parse()[1]; return SETS.some(function(x){ return x[0] === s; }) ? s : s === "missed" ? "" : ""; }
@@ -321,7 +321,7 @@
       /* Learn and Flashcards: their launcher first (how far along, Start), then which questions (Sam, 2026-11-13) */
       '<div class="bank-grid"><div class="bank-main' + (studying ? " is-study" : "") + '">' + (preset === "mock" ? "" : viewHTML()) +
         (studying ? '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div><h2 class="bank-which">Which questions</h2>' + panelHTML(preset)
-          : panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div>') + "</div>" +
+          : panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><nav class="qsets" aria-label="Which questions" hidden></nav><div class="qlist" id="qlist"></div>') + "</div>" +
       '<aside class="bank-side" aria-label="Today">' + HX.todayPanel() + "</aside></div></div>";
     wirePanel(el, preset);
     $$("[data-qview]", el).forEach(function(b){ b.addEventListener("click", function(){
@@ -365,7 +365,7 @@
     });
   }
   /* the list the panel picked, shown the way the toggle says */
-  function show(){ if (qview() === "questions") page(); else study(); }
+  function show(){ if (qview() === "questions") { openSet(LIST, firstSet(LIST)); keepSet(LIST); page(); } else study(); }
   function panelHTML(preset){
     var picked = lecIds(), sum = lecSummary(picked);
     normShow();
@@ -422,8 +422,9 @@
   }
   function fill(el, preset){
     var host = $("#qlist", el), sumEl = $(".qsum", el);
-    /* base, of: how the cards are numbered (page()): the drill counts the ones done today, so its first card left is "Question 6 of 20" */
-    host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0, base: 0, of: 0 };
+    /* base: what the list leaves out at its start, counted in the cards' numbers (page()): the drill's ones done today, so
+       its first card left is "Question 6 of 20". set, shown, end: the set of 100 on screen and how far into it the cards go */
+    host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0, base: 0, set: 0, end: 0 };
     if (preset === "drill") {
       sumEl.innerHTML = '<p class="note">Picking today\'s questions…</p>';
       whenWidget("shDrill", function(D){
@@ -436,7 +437,7 @@
           sumEl.innerHTML = '<p class="sumline"><b class="num">' + done + " of " + items.length + "</b> done today. Spaced review first, then your misses and the high-yield ones.</p>";
           items.forEach(function(it){ LIST.notes[it.id] = it.note; });
           LIST.items = (qview() === "questions" ? items.filter(function(it){ return !(s.res[it.id] === 1 || s.res[it.id] === 0); }) : items).map(function(it){ return QBY[it.id]; });
-          LIST.base = done; LIST.of = items.length;
+          if (qview() === "questions") LIST.base = done;
           if (!LIST.items.length) { host.innerHTML = drillDoneHTML(); wireDrillDone(el); return; }
           show();
         });
@@ -493,22 +494,82 @@
   }
   function emptyHTML(t, p, act){ return '<div class="empty panel"><h2>' + esc(t) + "</h2><p>" + esc(p) + "</p>" + (act || "") + "</div>"; }
   function wireEmpty(el){ $$("[data-showset]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qstatus = a.getAttribute("data-showset"); STATE.ui.qlikely = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; saveState(); }); }); }
-  /* fifty cards, then the next fifty load by themselves as you reach the end (Sam, 2026-11-14: "show more questions at a time"; was twenty) */
+  /* A list is shown a set of 100 at a time (Sam, 2026-11-15: "I want the questions to be shown in intervals of 100 unless
+     there are less questions than that in the filter. Showing all 844 feels unmanageable"), each card numbered in its set:
+     "Question 12 of 100", or of what a shorter set or list has. Inside a set the cards come fifty at a time and the next
+     fifty load by themselves as you reach them (Sam, 2026-11-14); the next set waits for its button at the end of the set,
+     or the picker above the list (setsBar). The bank keeps its set while its filters stay the same (STATE.ui.qpage), except
+     Not answered yet and Missed last time, which shrink as you answer and so start again at their first set. */
   var io = null;
-  function page(){
+  function setTotal(L){ return L.base + L.items.length; }
+  function setsOf(L){ return Math.max(1, Math.ceil(setTotal(L) / SET)); }
+  function setSize(L, k){ return Math.min(SET, setTotal(L) - k * SET); }
+  function setKey(){
+    var st = STATE.ui.qstatus || "all";
+    return st === "unseen" || st === "missed" ? "" : JSON.stringify([STATE.ui.qlec, st, STATE.ui.qlikely || "", STATE.ui.qfmt || "all", STATE.ui.qsrc || "all", STATE.ui.qorder === "random" ? STATE.ui.qseed || 1 : 0, bankSearch.trim()]);
+  }
+  function firstSet(L){
+    var last = setsOf(L) - 1;
+    if (L.ctx === "drill") return Math.min(Math.floor(L.base / SET), last);
+    var p = STATE.ui.qpage, k = L.ctx === "bank" ? setKey() : "";
+    return k && p && p.k === k ? Math.min(Math.max(0, p.n | 0), last) : 0;
+  }
+  function keepSet(L){ if (L.ctx !== "bank") return; var k = setKey(); STATE.ui.qpage = k ? { k: k, n: L.set } : null; saveState(); }
+  function openSet(L, k){
+    L.set = k; L.shown = Math.max(0, k * SET - L.base); L.end = Math.min(L.items.length, (k + 1) * SET - L.base);
+    if (io) io.disconnect();
+    L.host.innerHTML = "";
+    setsBar(L);
+  }
+  /* above the list: which hundred is on screen, a picker for any of them, Previous and Next */
+  function setsBar(L){
+    var nav = $(".qsets", L.el); if (!nav) return;
+    var n = setsOf(L), T = setTotal(L), k = L.set;
+    if (n < 2) { nav.hidden = true; nav.innerHTML = ""; return; }
+    var range = function(j){ return (j * SET + 1) + "–" + Math.min(T, (j + 1) * SET); };
+    var opts = []; for (var j = 0; j < n; j++) opts.push('<option value="' + j + '"' + (j === k ? " selected" : "") + ">" + range(j) + "</option>");
+    nav.innerHTML = '<span class="lab" id="qsL">Questions</span><span class="qsets-pick"><select data-setpick aria-labelledby="qsL qsO">' + opts.join("") + '</select><span class="note num" id="qsO">of ' + T + "</span></span>" +
+      '<span class="seg qsets-step"><button type="button" data-setstep="-1"' + (k ? "" : " disabled") + ">" + icon("chevron", 16, "flip") + "Previous</button>" +
+      '<button type="button" data-setstep="1"' + (k + 1 < n ? "" : " disabled") + ">Next " + (k + 1 < n ? setSize(L, k + 1) : SET) + icon("chevron", 16) + "</button></span>";
+    nav.hidden = false;
+    nav.onchange = function(e){ var sel = e.target.closest && e.target.closest("[data-setpick]"); if (sel) toSet(L, +sel.value, "pick"); };
+    nav.onclick = function(e){ var b = e.target.closest("[data-setstep]"); if (b && !b.disabled) { var d = +b.getAttribute("data-setstep"); toSet(L, L.set + d, d > 0 ? "next" : "prev"); } };
+  }
+  function toSet(L, k, how){
+    if (LIST !== L || !L.host.isConnected) return;
+    k = Math.max(0, Math.min(setsOf(L) - 1, k)); if (k === L.set) return;
+    openSet(L, k); keepSet(L); track("bank:page=" + how); page(true);
+  }
+  /* back to the top of the list, under whichever bar is stuck to the top of the screen. Only once the new set's cards are
+     in: with the list empty the page is too short to get there, and the browser's scroll anchoring then follows the page's
+     end down past the cards as they arrive */
+  function toListTop(L){
+    var top = 0, nav = $(".qsets", L.el), at = nav && !nav.hidden ? nav : L.host;
+    $$(".hx-bar, .hx-strip").forEach(function(b){ var r = b.getBoundingClientRect(); if (r.top <= 1 && r.bottom < innerHeight / 2) top = Math.max(top, r.bottom); });
+    window.scrollTo(0, Math.max(0, scrollY + at.getBoundingClientRect().top - top - 12));
+  }
+  function page(focus){
     var L = LIST; if (!L) return;
-    var next = L.items.slice(L.shown, L.shown + PAGE);
+    var k = L.set, at = L.shown, next = L.items.slice(at, Math.min(at + PAGE, L.end));
     if (!next.length) return;
     (next.some(needsFig) ? needFigures() : Promise.resolve()).then(function(){
-      if (LIST !== L || !L.host.isConnected) return;
+      if (LIST !== L || !L.host.isConnected || L.set !== k || L.shown !== at) return;
       var old = $(".sentinel", L.host); if (old) old.remove();
-      next.forEach(function(q, i){ L.host.appendChild(card(q, { ctx: L.ctx, note: L.notes[q.id], onAnswer: onBankAnswer, num: L.base + L.shown + i + 1, of: L.of || L.items.length })); });
+      var n0 = k * SET - L.base, of = setSize(L, k);
+      next.forEach(function(q, i){ L.host.appendChild(card(q, { ctx: L.ctx, note: L.notes[q.id], onAnswer: onBankAnswer, num: at + i - n0 + 1, of: of })); });
       L.shown += next.length;
-      if (L.shown < L.items.length) {
-        var s = h('<div class="sentinel"><button class="btn" type="button">Next ' + Math.min(PAGE, L.items.length - L.shown) + " questions</button></div>");
-        $("button", s).addEventListener("click", page);
+      /* a new set: back to the top of the list, and keyboard focus to its first card */
+      if (focus === true) { toListTop(L); var c1 = $(".qcard", L.host); if (c1) { c1.setAttribute("tabindex", "-1"); try { c1.focus({ preventScroll: true }); } catch (e) {} } }
+      if (L.shown < L.end) {
+        var s = h('<div class="sentinel"><button class="btn" type="button">Next ' + Math.min(PAGE, L.end - L.shown) + " questions</button></div>");
+        $("button", s).addEventListener("click", function(){ page(); });
         L.host.appendChild(s);
         if ("IntersectionObserver" in window) { if (io) io.disconnect(); io = new IntersectionObserver(function(es){ if (es.some(function(e){ return e.isIntersecting; })) { io.disconnect(); page(); } }, { rootMargin: "600px 0px" }); io.observe(s); }
+      } else if (k + 1 < setsOf(L)) {
+        /* the end of a set: the next one waits for this button (or the picker above) */
+        var T = setTotal(L), e = h('<div class="qset-end panel"><p class="sumline">That\'s questions <b class="num">' + (k * SET + 1) + "–" + Math.min(T, (k + 1) * SET) + "</b> of " + T + '.</p><button class="btn btn-primary" type="button" data-setnext>Next ' + pl(setSize(L, k + 1), "question") + icon("chevron", 18) + "</button></div>");
+        $("[data-setnext]", e).addEventListener("click", function(){ toSet(L, k + 1, "end"); });
+        L.host.appendChild(e);
       } else if (L.ctx === "bank") L.host.appendChild(h('<p class="note end">That\'s all ' + L.items.length + " for these filters.</p>"));
     });
   }

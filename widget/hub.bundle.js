@@ -705,7 +705,7 @@ if (STATE.ui.qlikely && !isLk(STATE.ui.qlikely)) STATE.ui.qlikely = "";
 function bankReset(){ STATE.ui.qset = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; STATE.ui.qstatus = "all"; STATE.ui.qlikely = ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; }
 var SETS = [["drill", "Daily drill"], ["misses", "Yesterday's misses"], ["weak", "Weak spots"], ["mock", "Mock exam"]];
 var FMTS = [["recall", "Recall (self-graded)"], ["2stmt", "Two statements"], ["tf", "True or false"], ["numbered", "Numbered statements"], ["which", "Which statement is true"], ["whichf", "Which statement is false"], ["except", "EXCEPT / NOT"], ["pbox", "Patient Box cases"], ["img", "Diagram questions"], ["multi", "Select all that apply"], ["match", "Matching"], ["sequence", "Put in order"]];
-var PAGE = 50, bankSearch = "";
+var PAGE = 50, SET = 100, bankSearch = "";
 function isFmt(q, fm){ return fm === "pbox" ? !!q.pbox : fm === "img" ? !!q.img : (fm === "multi" || fm === "match" || fm === "sequence" || fm === "recall") ? q.type === fm : q.fmt === fm; }
 function labelOf(list, k){ for (var i = 0; i < list.length; i++) if (list[i][0] === k) return list[i][1]; return k; }
 function presetOf(){ var s = parse()[1]; return SETS.some(function(x){ return x[0] === s; }) ? s : s === "missed" ? "" : ""; }
@@ -772,7 +772,7 @@ var title = preset ? labelOf(SETS, preset) : "Questions", studying = preset !== 
 el.innerHTML = '<div class="hx-page bank"><div class="bank-head"><h1>' + esc(title) + "</h1></div>" +
 '<div class="bank-grid"><div class="bank-main' + (studying ? " is-study" : "") + '">' + (preset === "mock" ? "" : viewHTML()) +
 (studying ? '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div><h2 class="bank-which">Which questions</h2>' + panelHTML(preset)
-: panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div>') + "</div>" +
+: panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><nav class="qsets" aria-label="Which questions" hidden></nav><div class="qlist" id="qlist"></div>') + "</div>" +
 '<aside class="bank-side" aria-label="Today">' + HX.todayPanel() + "</aside></div></div>";
 wirePanel(el, preset);
 $$("[data-qview]", el).forEach(function(b){ b.addEventListener("click", function(){
@@ -814,7 +814,7 @@ L.host.innerHTML = emptyHTML(kind === "learn" ? "Learn couldn't open" : "Flashca
 $("[data-qview-back]", L.host).addEventListener("click", function(){ STATE.ui.qview = "questions"; saveState(); drawQuestions(L.el, L.preset); });
 });
 }
-function show(){ if (qview() === "questions") page(); else study(); }
+function show(){ if (qview() === "questions") { openSet(LIST, firstSet(LIST)); keepSet(LIST); page(); } else study(); }
 function panelHTML(preset){
 var picked = lecIds(), sum = lecSummary(picked);
 normShow();
@@ -871,7 +871,7 @@ return out.filter(Boolean);
 }
 function fill(el, preset){
 var host = $("#qlist", el), sumEl = $(".qsum", el);
-host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0, base: 0, of: 0 };
+host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0, base: 0, set: 0, end: 0 };
 if (preset === "drill") {
 sumEl.innerHTML = '<p class="note">Picking today\'s questions…</p>';
 whenWidget("shDrill", function(D){
@@ -884,7 +884,7 @@ var done = items.filter(function(it){ return s.res[it.id] === 1 || s.res[it.id] 
 sumEl.innerHTML = '<p class="sumline"><b class="num">' + done + " of " + items.length + "</b> done today. Spaced review first, then your misses and the high-yield ones.</p>";
 items.forEach(function(it){ LIST.notes[it.id] = it.note; });
 LIST.items = (qview() === "questions" ? items.filter(function(it){ return !(s.res[it.id] === 1 || s.res[it.id] === 0); }) : items).map(function(it){ return QBY[it.id]; });
-LIST.base = done; LIST.of = items.length;
+if (qview() === "questions") LIST.base = done;
 if (!LIST.items.length) { host.innerHTML = drillDoneHTML(); wireDrillDone(el); return; }
 show();
 });
@@ -940,20 +940,69 @@ return "Those filters together leave no questions.";
 function emptyHTML(t, p, act){ return '<div class="empty panel"><h2>' + esc(t) + "</h2><p>" + esc(p) + "</p>" + (act || "") + "</div>"; }
 function wireEmpty(el){ $$("[data-showset]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qstatus = a.getAttribute("data-showset"); STATE.ui.qlikely = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; saveState(); }); }); }
 var io = null;
-function page(){
+function setTotal(L){ return L.base + L.items.length; }
+function setsOf(L){ return Math.max(1, Math.ceil(setTotal(L) / SET)); }
+function setSize(L, k){ return Math.min(SET, setTotal(L) - k * SET); }
+function setKey(){
+var st = STATE.ui.qstatus || "all";
+return st === "unseen" || st === "missed" ? "" : JSON.stringify([STATE.ui.qlec, st, STATE.ui.qlikely || "", STATE.ui.qfmt || "all", STATE.ui.qsrc || "all", STATE.ui.qorder === "random" ? STATE.ui.qseed || 1 : 0, bankSearch.trim()]);
+}
+function firstSet(L){
+var last = setsOf(L) - 1;
+if (L.ctx === "drill") return Math.min(Math.floor(L.base / SET), last);
+var p = STATE.ui.qpage, k = L.ctx === "bank" ? setKey() : "";
+return k && p && p.k === k ? Math.min(Math.max(0, p.n | 0), last) : 0;
+}
+function keepSet(L){ if (L.ctx !== "bank") return; var k = setKey(); STATE.ui.qpage = k ? { k: k, n: L.set } : null; saveState(); }
+function openSet(L, k){
+L.set = k; L.shown = Math.max(0, k * SET - L.base); L.end = Math.min(L.items.length, (k + 1) * SET - L.base);
+if (io) io.disconnect();
+L.host.innerHTML = "";
+setsBar(L);
+}
+function setsBar(L){
+var nav = $(".qsets", L.el); if (!nav) return;
+var n = setsOf(L), T = setTotal(L), k = L.set;
+if (n < 2) { nav.hidden = true; nav.innerHTML = ""; return; }
+var range = function(j){ return (j * SET + 1) + "–" + Math.min(T, (j + 1) * SET); };
+var opts = []; for (var j = 0; j < n; j++) opts.push('<option value="' + j + '"' + (j === k ? " selected" : "") + ">" + range(j) + "</option>");
+nav.innerHTML = '<span class="lab" id="qsL">Questions</span><span class="qsets-pick"><select data-setpick aria-labelledby="qsL qsO">' + opts.join("") + '</select><span class="note num" id="qsO">of ' + T + "</span></span>" +
+'<span class="seg qsets-step"><button type="button" data-setstep="-1"' + (k ? "" : " disabled") + ">" + icon("chevron", 16, "flip") + "Previous</button>" +
+'<button type="button" data-setstep="1"' + (k + 1 < n ? "" : " disabled") + ">Next " + (k + 1 < n ? setSize(L, k + 1) : SET) + icon("chevron", 16) + "</button></span>";
+nav.hidden = false;
+nav.onchange = function(e){ var sel = e.target.closest && e.target.closest("[data-setpick]"); if (sel) toSet(L, +sel.value, "pick"); };
+nav.onclick = function(e){ var b = e.target.closest("[data-setstep]"); if (b && !b.disabled) { var d = +b.getAttribute("data-setstep"); toSet(L, L.set + d, d > 0 ? "next" : "prev"); } };
+}
+function toSet(L, k, how){
+if (LIST !== L || !L.host.isConnected) return;
+k = Math.max(0, Math.min(setsOf(L) - 1, k)); if (k === L.set) return;
+openSet(L, k); keepSet(L); track("bank:page=" + how); page(true);
+}
+function toListTop(L){
+var top = 0, nav = $(".qsets", L.el), at = nav && !nav.hidden ? nav : L.host;
+$$(".hx-bar, .hx-strip").forEach(function(b){ var r = b.getBoundingClientRect(); if (r.top <= 1 && r.bottom < innerHeight / 2) top = Math.max(top, r.bottom); });
+window.scrollTo(0, Math.max(0, scrollY + at.getBoundingClientRect().top - top - 12));
+}
+function page(focus){
 var L = LIST; if (!L) return;
-var next = L.items.slice(L.shown, L.shown + PAGE);
+var k = L.set, at = L.shown, next = L.items.slice(at, Math.min(at + PAGE, L.end));
 if (!next.length) return;
 (next.some(needsFig) ? needFigures() : Promise.resolve()).then(function(){
-if (LIST !== L || !L.host.isConnected) return;
+if (LIST !== L || !L.host.isConnected || L.set !== k || L.shown !== at) return;
 var old = $(".sentinel", L.host); if (old) old.remove();
-next.forEach(function(q, i){ L.host.appendChild(card(q, { ctx: L.ctx, note: L.notes[q.id], onAnswer: onBankAnswer, num: L.base + L.shown + i + 1, of: L.of || L.items.length })); });
+var n0 = k * SET - L.base, of = setSize(L, k);
+next.forEach(function(q, i){ L.host.appendChild(card(q, { ctx: L.ctx, note: L.notes[q.id], onAnswer: onBankAnswer, num: at + i - n0 + 1, of: of })); });
 L.shown += next.length;
-if (L.shown < L.items.length) {
-var s = h('<div class="sentinel"><button class="btn" type="button">Next ' + Math.min(PAGE, L.items.length - L.shown) + " questions</button></div>");
-$("button", s).addEventListener("click", page);
+if (focus === true) { toListTop(L); var c1 = $(".qcard", L.host); if (c1) { c1.setAttribute("tabindex", "-1"); try { c1.focus({ preventScroll: true }); } catch (e) {} } }
+if (L.shown < L.end) {
+var s = h('<div class="sentinel"><button class="btn" type="button">Next ' + Math.min(PAGE, L.end - L.shown) + " questions</button></div>");
+$("button", s).addEventListener("click", function(){ page(); });
 L.host.appendChild(s);
 if ("IntersectionObserver" in window) { if (io) io.disconnect(); io = new IntersectionObserver(function(es){ if (es.some(function(e){ return e.isIntersecting; })) { io.disconnect(); page(); } }, { rootMargin: "600px 0px" }); io.observe(s); }
+} else if (k + 1 < setsOf(L)) {
+var T = setTotal(L), e = h('<div class="qset-end panel"><p class="sumline">That\'s questions <b class="num">' + (k * SET + 1) + "–" + Math.min(T, (k + 1) * SET) + "</b> of " + T + '.</p><button class="btn btn-primary" type="button" data-setnext>Next ' + pl(setSize(L, k + 1), "question") + icon("chevron", 18) + "</button></div>");
+$("[data-setnext]", e).addEventListener("click", function(){ toSet(L, k + 1, "end"); });
+L.host.appendChild(e);
 } else if (L.ctx === "bank") L.host.appendChild(h('<p class="note end">That\'s all ' + L.items.length + " for these filters.</p>"));
 });
 }

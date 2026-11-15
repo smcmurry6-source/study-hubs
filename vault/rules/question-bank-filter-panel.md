@@ -36,10 +36,16 @@ it, and adds only its own toggles (`SH_HUB.bank.only`). The single-file hubs arc
   time (saved in `STATE.ui`; Perio `STATE.ui.qbank`), which is why the tags matter: a saved filter is never hidden.
 - Filter changes are tracked (`bank:show=` for a Show chip or a toggle turned on, `bank:show=<toggle>-off`, `bank:lec-only`, `bank:type=`, `bank:src=`, `bank:tag-off=`, `bank:clear`, `bank:more`,
   `bank:search`, `bank:order=`), since `widget/clicks.js` doesn't see `<select>` changes.
+- **Sets of 100** (Sam, 2026-11-15: "I want the questions to be shown in intervals of 100 unless there are less questions than that in
+  the filter. Showing all 844 feels unmanageable"): a list longer than 100 is shown a hundred at a time. Above it, "Questions
+  [101–200] of 844" with Previous and Next (`.qsets`, `setsBar()`); at the end of a set, "Next 100 questions". Inside a set the
+  cards still come fifty at a time and load by themselves (Sam, 2026-11-14). The bank keeps its set while the filters stay the
+  same (`STATE.ui.qpage`), except Not answered yet and Missed last time, which start at their first set.
 - **The card**: Report and Pin sit in each card's head (`.qc-tools`), right of the lecture and status. Before the lecture, the card's
-  **number in its set** (Sam, 2026-11-15, from a classmate's idea: "so we know how many more are left"): "Question 12 of 84" in the
-  bank (of what the filters show), the Daily drill (counting the ones done today), Yesterday's misses, Weak spots and the mock
-  (`qNum()` in `widget/hub-bank.js`); "Try it again" keeps it, the missed question that comes back a few cards later has none. After an answer, one row:
+  **number in its set** (Sam, 2026-11-15, from a classmate's idea: "so we know how many more are left"): "Question 12 of 100", or of
+  what a shorter set or list has ("of 84"), in the bank, the Daily drill (counting the ones done today), Yesterday's misses, Weak
+  spots and the mock (`qNum()` in `widget/hub-bank.js`); "Try it again" keeps it, the missed question that comes back a few cards
+  later has none. After an answer, one row:
   **Try it again** (Retry on a phone), the shared widget's **Find this in the notes** (on a miss), **Ask Timmy** and **Good question?**
   at its end. No "Notes for <lecture>" link (Sam, 2026-11-06: Find this in the notes does that job). On a laptop a Today column (the
   goal ring, streak, XP, this session) sits beside the questions.
