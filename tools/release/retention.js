@@ -3,7 +3,7 @@
 // supabase/schema.sql, seeds made-up rows of every age, and checks that sh_retention_run():
 //   - with p_apply false only counts, and changes nothing;
 //   - deletes exactly the approved rows (raw pings > 30 days, click reach > 90 days, feature events > 180 days, test
-//     hubs, old link attempts) and removes ids on schedule (reports, check-ins, closed surveys), and nothing else;
+//     hubs, old link attempts, an idea hidden for 90 days with its votes, reports and notes: migration_v58) and removes ids on schedule (reports, check-ins, closed surveys), and nothing else;
 //   - keeps every hour of study time: activity_hourly and activity_visits are the same before and after the trim,
 //     and get_hub_recap gives the same answer before and after;
 //   - "Link my devices" after a trim moves every hour to the kept id instead of rebuilding from what raw pings remain;
@@ -100,6 +100,20 @@ try {
       (9102, 'ret-A', null, now() - interval '2 days'), (9102, 'ret-B', '{"q1":4}', now() - interval '2 days');
     insert into link_attempts (visitor_id, tried_at) values ('ret-A', now() - interval '10 days'), ('ret-A', now() - interval '1 hour');
   `);
+  /* the idea board (migration_v54; hidden ideas kept 90 days: migration_v58): one hidden 100 days ago with a vote, a
+     report and an Inbox note, one hidden today, one never hidden and older than both */
+  sql(`
+    insert into ideas (visitor_id, name, title, category, source, hidden, hidden_by, created_at) values
+      ('ret-A', 'Made Up Molar', 'ret old hidden', 'other', 'board', true, 'reports', now() - interval '120 days'),
+      ('ret-A', 'Made Up Molar', 'ret new hidden', 'other', 'board', true, 'admin', now() - interval '120 days'),
+      ('ret-B', 'Made Up Incisor', 'ret shown', 'other', 'board', false, null, now() - interval '200 days');
+    update ideas set hidden_at = now() - interval '100 days' where title = 'ret old hidden';
+    insert into idea_votes (idea_id, visitor_id, val) select id, 'ret-B', 1 from ideas where title like 'ret %';
+    insert into idea_reports (idea_id, visitor_id) select id, 'ret-B' from ideas where title = 'ret old hidden';
+    insert into idea_notes (idea_id, visitor_id, status, note) select id, 'ret-A', 'considering', 'made up' from ideas where title = 'ret old hidden';
+  `);
+  expect('a hidden idea records when it was hidden', one(`select count(*) from ideas where title = 'ret new hidden' and hidden_at > now() - interval '1 minute'`), 1);
+  expect('an idea that was never hidden has no hidden_at', one(`select count(*) from ideas where title = 'ret shown' and hidden_at is null`), 1);
   const hours = () => one(`select coalesce(sum(n), 0) || '/' || count(*) from activity_hourly where hub = 'ret-hub'`);
   const visits = () => one(`select string_agg(visit_id || ':' || visitor_id || ':' || first_at || ':' || last_at, ',' order by visit_id, visitor_id) from activity_visits where visitor_id like 'ret-%'`);
   const recap = () => one(`select (get_hub_recap('${SECRET}', 'ret-hub', null) - 'answers' - 'correct' - 'questions_seen')::text`);
@@ -110,10 +124,11 @@ try {
   const dry = JSON.parse(one(`select sh_retention_run()::text`));
   const testHours = Number(one(`select count(*) from activity_hourly where hub = 'zz-test'`));   /* 1 or 2: the 10 pings may cross an hour */
   const want = { activity_pings: 390, ui_click_reach: 2, feature_events: 3, activity_hourly_test: testHours, ui_clicks_test: 0, question_flags_ids: 1,
-    hub_suggestions_ids: 1, exam_debriefs_ids: 1, survey_declines: 1, survey_answer_ids: 1, link_attempts: 1 };
+    hub_suggestions_ids: 1, exam_debriefs_ids: 1, survey_declines: 1, survey_answer_ids: 1, ideas_hidden: 1, link_attempts: 1 };
   for (const k of Object.keys(want)) expect(`dry run counts ${k}`, dry.counts[k], want[k]);
   expect('dry run left the raw pings', one(`select count(*) from activity_pings`), 570);
   expect('dry run logged nothing', one(`select count(*) from retention_runs`), 0);
+  expect('dry run left the ideas', one(`select count(*) from ideas where title like 'ret %'`), 3);
 
   /* the real run */
   const done = JSON.parse(one(`select sh_retention_run(true)::text`));
@@ -136,6 +151,12 @@ try {
   expect('live survey untouched', one(`select count(*) from survey_responses where survey_id = 9102 and visitor_id like 'ret-%'`), 2);
   expect('answers untouched', one(`select count(*) from personal_answers where visitor_id = 'ret-A'`), 20);
   expect('link attempts kept', one(`select count(*) from link_attempts`), 1);
+  expect('the idea hidden 100 days ago is gone; the one hidden today and the one showing stay', one(`select string_agg(title, ',' order by title) from ideas where title like 'ret %'`), 'ret new hidden,ret shown');
+  expect('its votes, reports and Inbox notes went with it', one(`select (select count(*) from idea_votes v join ideas i on i.id = v.idea_id where i.title like 'ret %') || '/' || (select count(*) from idea_votes) || '/' || (select count(*) from idea_reports) || '/' || (select count(*) from idea_notes)`), '2/2/0/0');
+  sql(`update ideas set hidden = false, hidden_by = null where title = 'ret new hidden'`);
+  expect('restoring an idea clears when it was hidden', one(`select count(*) from ideas where title = 'ret new hidden' and hidden_at is null`), 1);
+  sql(`update ideas set hidden = true, hidden_by = 'admin' where title = 'ret new hidden'`);
+  expect('hiding it again starts the 90 days over', one(`select count(*) from ideas where title = 'ret new hidden' and hidden_at > now() - interval '1 minute'`), 1);
   expect('run logged', one(`select count(*) from retention_runs`), 1);
   notes.push(`removed ${done.counts.activity_pings} raw pings with every hour kept (${h0.split('/')[0]} pings in activity_hourly before and after); recap identical`);
 

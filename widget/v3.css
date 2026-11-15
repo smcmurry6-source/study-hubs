@@ -519,24 +519,6 @@ body.sh-nuke-active{overflow:hidden;}
 @keyframes sh-egg-chain-sway{from{transform:translateX(-8px);} to{transform:translateX(8px);}}
 @keyframes sh-egg-chain-in{from{opacity:0; transform:translateY(50px);}}
 
-/* Full Arch: a little dental arch at the bottom left (above the tooth buddy when it's there) */
-.sh-egg-arch{position:fixed; z-index:9991; left:16px; bottom:16px; width:150px; padding:8px 10px 6px; border-radius:16px; background:var(--shw-bg); border:1px solid var(--shw-line);
-  box-shadow:var(--shw-shadow); pointer-events:none; opacity:0; transform:translateY(12px) scale(.96); transition:opacity .3s, transform .3s cubic-bezier(.2,.8,.3,1), bottom .3s;}
-html.sh-pet-on .sh-egg-arch{bottom:132px;}
-.sh-egg-arch.is-shown{opacity:1; transform:none;}
-.sh-egg-arch svg{width:100%; height:auto; aspect-ratio:136/44; overflow:visible; color:var(--shw-ink2);}
-.sh-egg-arch .egg-arch-t{fill:color-mix(in srgb, var(--shw-ink) 5%, transparent); stroke:color-mix(in srgb, var(--shw-ink) 32%, transparent); stroke-width:.55; stroke-dasharray:1.2 .9; transition:fill .25s, stroke .25s;}
-.sh-egg-arch .egg-arch-t.is-in{fill:#FFFDF6; stroke:#4A3E48; stroke-dasharray:none; stroke-width:.7;}
-.sh-egg-arch .egg-arch-t.is-pop{animation:sh-egg-erupt .45s cubic-bezier(.3,1.6,.5,1); transform-box:fill-box; transform-origin:center;}
-.sh-egg-arch.is-full{border-color:var(--egg-gold); box-shadow:0 0 0 3px color-mix(in srgb, var(--egg-gold) 25%, transparent), var(--shw-shadow);}
-.sh-egg-arch.is-full .egg-arch-t.is-in{fill:#FFF6D6; stroke:var(--egg-gold);}
-.sh-egg-arch-cap{display:flex; justify-content:space-between; align-items:baseline; margin-top:2px; font-size:12px; color:var(--shw-ink2);}
-.sh-egg-arch-cap b{color:var(--shw-ink); font-size:12.5px;}
-.sh-egg-arch-n{font-variant-numeric:tabular-nums;}
-.sh-egg-arch-fly{position:fixed; z-index:9992; width:14px; height:14px; color:var(--shw-ink); pointer-events:none; animation:sh-egg-knock .85s cubic-bezier(.3,.1,.6,1) forwards;}
-@keyframes sh-egg-erupt{0%{transform:scale(0);} 100%{transform:scale(1);}}
-@keyframes sh-egg-knock{0%{transform:none; opacity:1;} 30%{transform:translate(18px,-26px) rotate(160deg);} 100%{transform:translate(40px,60px) rotate(520deg); opacity:0;}}
-
 /* Cavity Search: a tiny carious lesion tucked between two words of the notes */
 .sh-egg-cavity{display:inline-block; width:9px; height:7px; margin:0 1px 0 3px; padding:0; border:0; vertical-align:middle; cursor:pointer;
   border-radius:55% 45% 60% 40% / 60% 50% 50% 40%; background:radial-gradient(circle at 45% 40%, #1d120a 0 35%, #4a2b14 60%, #8a5a2b 100%);
@@ -565,12 +547,10 @@ html.sh-8bit button, html.sh-8bit .card, html.sh-8bit [class*="card"]{box-shadow
   .sh-egg-boss{bottom:calc(var(--sh-tabbar-h) + 12px + env(safe-area-inset-bottom,0px));}
   .sh-egg-boss.is-docked{bottom:auto;}
   .sh-egg-boss.is-docked .sh-egg-boss-say{display:none;}
-  .sh-egg-arch{left:10px; width:124px; bottom:calc(var(--sh-tabbar-h) + 12px + env(safe-area-inset-bottom,0px));}
-  html.sh-pet-on .sh-egg-arch{bottom:calc(var(--sh-tabbar-h) + 100px + env(safe-area-inset-bottom,0px));}
 }
 @media (prefers-reduced-motion: reduce){
   .sh-mirror-flip{animation:none;}
-  .sh-egg-chain *, .sh-egg-arch *{animation:none !important;}
+  .sh-egg-chain *{animation:none !important;}
 }
 /* mastery medals in the hub's rank card: the label, then one chip per hub (they wrap) */
 .sh-flair-row{display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin:12px 0 4px; font-size:13px; color:var(--shw-ink2);}

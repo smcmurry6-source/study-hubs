@@ -1,6 +1,5 @@
-/* The new dashboard (redesign phase 3, vault/tasks/2026-11-05-redesign-phase-3-dashboard.md). Loaded only by
-   next/index.html, the page built beside the live dashboard (index.html) until the redesign is released: outside a preview
-   that page sends the visitor to the live dashboard, so nothing here reaches the class before then.
+/* The dashboard (the redesign's, live since its release; vault/tasks/2026-11-05-redesign-phase-3-dashboard.md). Loaded by
+   index.html inside widget/dash.bundle.js (tools/bundle/build.mjs: edit this file, then rebuild).
 
    What it draws, on the hub engine's design system (widget/hub.css, with widget/dash.css for the layout):
    - the hubs as tabs (emblem, tint, days to the exam), the next exam's first, and under them that hub's stage: its
@@ -13,28 +12,30 @@
      (ranks or study streaks) with the top three on a podium; on the game layer a row opens that person's Timmy's place
      (visiting, phase 4);
    - the idea board (widget/ideas.js draws it in #ideas once the board's server is there), then past hubs: each
-     finished exam's recap as a live infographic, and the hubs that just closed.
+     finished exam's recap as a live infographic, with the closed hubs' open exam check-ins above it (a closed hub has
+     no card of its own: Sam, 2026-11-14).
    No What's new list, no arcade scores and no "When people study" chart (Sam, 2026-11-11); a hub's "Updated" label still reads the changelog.
    The check-in, survey, name, luck and archive logic is the live dashboard's own, moved here unchanged.
 
-   Its data is next/hubs.js (window.SH_DASH_DATA), written from index.html by tools/dash-next/build.mjs until the release.
-   The game layer's functions (migration_v54, not applied until the release) are called as <name>_v2 with today's function
-   as the fallback, so the page works before and after the migration; a preview answers both from fixtures. */
+   Its data is hubs.js (window.SH_DASH_DATA), where a hub is added, dated or archived.
+   The game layer's functions (migration_v54) are called as <name>_v2 with the older function as the fallback, so the
+   page still works on a database without them (a preview answers both from fixtures). */
 (function(){
   "use strict";
   if (window.shDash) return;
   var D = window.SH_DASH_DATA; if (!D) return;
   var C = window.SH_DASH || {}, A = window.SH_HUB_ART || { icons: {}, flame: {}, spots: {} }, DA = window.SH_DASH_ART || { tints: {}, emblems: {} };
-  var ROOT = C.root || "../", WIDGET = C.widget || (ROOT + "widget/");
+  var ROOT = C.root || "./", WIDGET = C.widget || (ROOT + "widget/");
   var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co";
   var SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
   var docEl = document.documentElement;
   docEl.classList.add("shx", "sh-dash");
 
-  /* ---------- the data (next/hubs.js) ---------- */
+  /* ---------- the data (hubs.js) ---------- */
   var CLASSES = D.classes, HUBS = D.hubs.slice(), ARCHIVED_HUBS = D.archived.slice(), HUB_LABEL = D.labels || {};
   var CHECKIN_HOUR = D.checkinHour, ARCHIVE_HOUR = D.archiveHour, CARD_DAYS = D.cardDays, DEBRIEF_DAYS = D.debriefDays;
-  var NEXT = {}; (D.next || []).forEach(function(id){ NEXT[id] = 1; });
+  /* hubs still on their old single-file page; every other hub is on the engine (widget/hub.js) */
+  var LEGACY = {}; (D.legacy || []).forEach(function(id){ LEGACY[id] = 1; });
 
   /* ---------- helpers ---------- */
   function $(id){ return document.getElementById(id); }
@@ -127,7 +128,7 @@
   applyTheme(ls("sh_theme") || ""); applySize();
 
   /* ---------- live, archived or hidden (the live dashboard's rules: widget/archive.js decides from the dates in
-     next/hubs.js plus any override set on the admin page; without it the dates alone decide) ---------- */
+     hubs.js plus any override set on the admin page; without it the dates alone decide) ---------- */
   function examAt(x, hour){ var d = parseYmd(x.date); d.setHours(hour, 0, 0, 0); return d; }
   function lastExam(hub){ return (hub.exams || []).filter(function(x){ return x.date; }).sort(function(a, b){ return a.date < b.date ? 1 : -1; })[0] || null; }
   function archiveAt(hub){
@@ -156,11 +157,10 @@
     return sig.join(",");
   }
   var hubSig = partitionHubs();
-  function shownArchived(){ return ARCHIVED_HUBS.filter(function(h){ return HUB_STATE[h.id] && HUB_STATE[h.id].state === "archived"; }); }
 
-  /* ---------- where a hub opens: its new version when it has one (hubs/<id>/next/), with that version's own routes ---------- */
+  /* ---------- where a hub opens: the engine's routes, or an old single-file hub's own ---------- */
   function hubHref(hub, part){
-    var isNew = !!NEXT[hub.id], base = ROOT + "hubs/" + hub.id + "/" + (isNew ? "next/" : "");
+    var isNew = !LEGACY[hub.id], base = ROOT + "hubs/" + hub.id + "/";
     if (part === "drill") return base + (isNew ? "#questions/drill" : "#drill");
     if (part === "timmy") return base + (isNew ? "#more/timmy" : "#timmy");
     return base;
@@ -278,17 +278,20 @@
           '<div id="board" aria-live="polite"><p class="note">Loading…</p></div>' +
           /* Visit someone random: one of the board's rows (the tour, below); shown when the board has someone to visit */
           '<p class="dx-rand" id="visitRand" hidden><button type="button" data-dash="visit-random">' + DICE + '<span>Visit someone random</span></button><span class="dx-rmsg" role="status"></span></p>' +
-          '<details class="dx-ladder" id="ladderFold" hidden><summary>' + icon("chevron", 18, "rot") + "Every rank, Stone to Dark Matter</summary><div class=\"dx-rungs\" id=\"rankLadder\"></div></details>" +
           '<p class="dx-line" id="goldenLine" hidden></p>' +
         "</section>" +
       "</div>" +
+      /* the road: every rank of the Handpiece, then the ModuPro, then the Loupes, with where you stand (Sam, 2026-11-13:
+         "the rank progression should be displayed better from each rank to the modupro and loupes") */
+      '<section class="dx-section dx-roadsec" id="road" aria-labelledby="roadH" hidden></section>' +
       /* the idea board (vault/tasks/2026-11-06-idea-board.md): widget/ideas.js draws into this section and unhides it */
       '<section class="dx-section" id="ideas" data-sh-ideas hidden></section>' +
       '<section class="dx-section" id="past" aria-labelledby="pastH" hidden>' +
         '<h2 id="pastH">Past hubs</h2><p class="note" id="pastNote"></p>' +
+        /* every open exam check-in in one place (Sam, 2026-11-13: "grouped together, available"), for every closed hub */
+        '<div class="dx-checkins" id="checkins" hidden></div>' +
         '<div class="dx-past">' +
           '<div class="rc" id="rc" hidden><div class="rc-chips" id="rcChips" role="tablist" aria-label="Finished exams"></div><div class="rc-body tinted" id="rcBody" role="tabpanel"></div></div>' +
-          '<ul class="dx-archived" id="archived"></ul>' +
         "</div>" +
       "</section>" +
       '<footer class="dx-foot"><p>Bookmark this page, not a hub: new hubs show up here as each exam gets close.</p>' +
@@ -337,7 +340,11 @@
   }
   $("hubTabs").addEventListener("click", function(e){
     var b = e.target.closest("[data-tab]"); if (!b || b.getAttribute("data-tab") === selected) return;
+    var ids = tabOrder().map(function(o){ return o.hub.id; }), from = ids.indexOf(selected);
     selected = b.getAttribute("data-tab"); track("dash:tab=" + selected); renderTabs(); var n = $("tab-" + selected); if (n) n.focus();
+    /* the hub's panel slides in from the side its tab is on (widget/hub.css, .is-entering) */
+    var pn = $("hubPanel");
+    if (pn && !still()) { pn.classList.remove("is-entering"); void pn.offsetWidth; pn.style.setProperty("--from", ids.indexOf(selected) > from ? "22px" : "-22px"); pn.classList.add("is-entering"); }
   });
   $("hubTabs").addEventListener("keydown", function(e){
     if (e.key !== "ArrowRight" && e.key !== "ArrowLeft" && e.key !== "Home" && e.key !== "End") return;
@@ -448,6 +455,9 @@
   var CA = null;            /* window.SH_CLASS_ART, once widget/hub-art/class.js has loaded */
   var rm = null;            /* the room as drawn: { w, h, night, rows, seats, order, at: { key: seat }, fits: { key: fit }, geo, door } */
   function still(){ return reduced() || ls("sh_pref_fx") === "off"; }
+  /* the pop-ups' and pages' entrances (widget/hub.css, "motion") follow the same switch */
+  function paintStill(){ document.documentElement.classList.toggle("hx-still", still()); }
+  paintStill(); document.addEventListener("sh:pref", paintStill);
   function roomReady(){ return !!(CA && CA.room && window.shPet && window.shPet.art && !focusOn()); }
   function hashOf(k){ var h = 0; k = String(k); for (var i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) | 0; return Math.abs(h); }
   var outfitsAsked = false;
@@ -462,11 +472,12 @@
   function timmyArt(fit, mood){
     var P = window.shPet, O = window.SH_OUTFITS, svg;
     fit = cleanFit(fit);
-    if (fit.indexOf(":") > 0) svg = P.art({ hp: 100, mood: mood || "happy", hat: "", fit: fit }, 200);
-    else {
-      svg = P.art({ hp: 100, mood: mood || "happy", hat: "" }, 200);
-      if (fit && O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
-      else if (fit && !O) wantOutfits();
+    svg = P.art({ hp: 100, mood: mood || "happy", hat: "" }, 200);
+    /* "<holiday>:<outfit>" is what a page from before the release still sends (he dressed himself for holidays then):
+       those drawings are gone, so that Timmy sits with nothing on */
+    if (fit && fit.indexOf(":") < 0) {
+      if (O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
+      else if (!O) wantOutfits();
     }
     return String(svg).replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
   }
@@ -558,6 +569,8 @@
       el.animate(frames, { duration: total, easing: "linear", fill: "forwards" }).onfinish = function(){ el.remove(); if (done) done(); };
     }, (n || 0) * 450);
   }
+  /* nobody walks while the room rests (off screen, mid-scroll, behind a window): they are just there, or gone */
+  function roomResting(){ var n = $("now"); return !!n && (n.classList.contains("is-rest") || n.classList.contains("is-away")); }
   function arrive(p, i, quiet, n){
     function sit(){
       var el = seatEl(i); if (!rm || rm.at[p.key] !== i || !el) return;
@@ -566,13 +579,13 @@
       if (!quiet && q(".rm-tim", el).animate) q(".rm-tim", el).animate([{ transform: "translateY(-4px) scale(.96, 1.06)" }, { transform: "translateY(1px) scale(1.05, .94)" }, { transform: "none" }], { duration: 340, easing: "ease-out" });
       paintMe();
     }
-    if (quiet) sit(); else walk(p.fit, i, false, n, sit);
+    if (quiet || roomResting()) sit(); else walk(p.fit, i, false, n, sit);
   }
   function depart(i, quiet, n){
     var el = seatEl(i); if (!el) return;
     var tim = q(".rm-tim", el), was = !!tim.firstChild, fit = cleanFit(el.getAttribute("data-fit"));
     tim.innerHTML = ""; el.setAttribute("data-fit", ""); q(".rm-desk", el).innerHTML = CA.room.desk(null, null);
-    if (!quiet && was) walk(fit, i, true, n, null);
+    if (!quiet && was && !roomResting()) walk(fit, i, true, n, null);
   }
   /* bring the room in line with who is studying: draw it, redraw it for a new size, time of day or number of rows, or
      walk the comings and goings in and out */
@@ -624,10 +637,12 @@
   /* Timmy Time: a hub's audio review episode (hub.podcast = { name, sub }), on the hub's color with the host in headphones */
   function podHTML(hub){
     if (!hub.podcast) return "";
-    var t = tintOf(hub.id);
-    return '<a class="dx-card dx-pod" href="' + esc(hubHref(hub, "timmy")) + '" data-hub="' + esc(hub.id) + '" data-pod="dash">' +
-      '<span class="dx-pod-txt"><b>' + esc(hub.podcast.name) + '</b><small>' + esc(hub.podcast.sub) + '</small><span class="dx-pod-go">' + icon("play", 16) + "Listen</span></span>" +
-      spot("timmyTime", { tint: t.mid, light: t.light, line: t.dark }, "dx-pod-art") + "</a>";
+    /* animated as on a hub's Home (Sam, 2026-11-13: "animated like i had it before"): Timmy bobs in his headphones,
+       notes float over him and a little equalizer plays; still when motion is off */
+    var col = { tint: "#F2C94C", light: "#FFFFFF", line: "#F2C94C" };
+    return '<a class="dx-card dx-pod' + (still() || focusOn() ? " is-still" : "") + '" href="' + esc(hubHref(hub, "timmy")) + '" data-hub="' + esc(hub.id) + '" data-pod="dash">' +
+      '<span class="dx-pod-txt"><b>' + esc(hub.podcast.name) + ' <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(hub.podcast.sub) + '</small><span class="dx-pod-go">' + icon("play", 16) + "Listen</span></span>" +
+      '<span class="dx-pod-art" aria-hidden="true">' + spot("notes", col, "pm-notes") + spot("timmyTime", col, "pm-timmy") + "</span></a>";
   }
   function checkinButtonsHTML(hub){
     return pastExams(hub, false).map(function(x){
@@ -698,21 +713,37 @@
   /* coming back from a hub (the back button restores this page as it was): redraw the open hub */
   window.addEventListener("pageshow", function(e){ if (e.persisted) { renderPanel(); renderYouStats(); } });
 
-  /* ---------- archived hubs: a short card each, with the check-in ---------- */
-  function renderArchived(){
-    var list = shownArchived();
-    $("archived").innerHTML = list.map(function(hub){
-      var p = readProgress(hub), last = lastExam(hub);
-      return '<li class="dx-arch tinted" style="' + tintVars(hub.id) + '">' + emblem(hub.id, "dx-emb") + "<div><h3>" + esc(hub.title) + '</h3><p class="note">' +
-        (last && daysUntil(last.date) < 0 ? "Closed after the exam on " + esc(parseYmd(last.date).toLocaleDateString(undefined, { month: "long", day: "numeric" })) + ". Tell us how it went: it shapes the next hubs."
-          : "Archived for now. Your progress on it is kept.") + (p ? " You tried " + num(p.seen) + (p.seen === 1 ? " question" : " questions") + " here." : "") + "</p>" + checkinButtonsHTML(hub) + "</div></li>";
-    }).join("");
-    showPast();
+  /* ---------- hubs that closed: no card of their own (Sam, 2026-11-14: "dont seem to be for anything. They can be
+     removed"). A closed hub is in Past hubs through its exam check-in, while that is open, and its recap. ---------- */
+  function renderArchived(){ renderCheckins(); showPast(); }
+  /* the exam check-ins that are open, newest exam first: a closed hub's stay here for 60 days (debriefDays). One that was sent from this device says so and can't be sent twice by mistake. */
+  function openCheckins(){
+    var out = [];
+    HUBS_SRC.concat(ARCHIVED_SRC).forEach(function(h){
+      if (HUB_STATE[h.id] && HUB_STATE[h.id].state === "live") return;   /* a live hub's is on its own panel */
+      pastExams(h, false).forEach(function(x){ out.push({ hub: h, x: x, sent: !!ls("sh_debrief_sent_" + h.id + "_" + x.date) }); });
+    });
+    return out.sort(function(a, b){ return a.x.date < b.x.date ? 1 : -1; });
+  }
+  function renderCheckins(){
+    var el = $("checkins"), list = openCheckins(), todo = list.filter(function(c){ return !c.sent; }).length;
+    el.hidden = !list.length;
+    if (!list.length) { el.innerHTML = ""; return; }
+    el.innerHTML = '<div class="dx-ck-head">' + icon("comment", 22) + '<div><h3>Exam check-ins</h3><p class="note">' +
+      (todo ? "How did " + (todo === 1 ? "it" : "they") + " go? Two minutes each, and the answers shape the next hubs." : "All sent. Thank you: they shape the next hubs.") + "</p></div>" +
+      (todo ? '<span class="dx-ck-n num" aria-hidden="true">' + todo + " open</span>" : "") + "</div>" +
+      '<ul class="dx-ck-list">' + list.map(function(c){
+        var when = parseYmd(c.x.date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+        var inner = emblem(c.hub.id, "dx-emb") + "<span><b>" + esc(c.x.name || c.hub.title) + "</b><small>Exam on " + esc(when) + "</small></span>";
+        return '<li class="tinted" style="' + tintVars(c.hub.id) + '">' + (c.sent
+          ? '<span class="dx-ck is-sent">' + inner + '<span class="dx-ck-go">' + icon("check", 16) + "Sent</span></span>"
+          : '<button type="button" class="dx-ck" data-checkin="' + esc(c.hub.id) + '" data-exam="' + esc(c.x.date) + '">' + inner + '<span class="dx-ck-go">Check in' + icon("chevron", 16) + "</span></button>") + "</li>";
+      }).join("") + "</ul>";
   }
   function showPast(){
-    var arch = !!$("archived").children.length, rec = !$("rc").hidden;
-    $("past").hidden = !arch && !rec;
-    $("pastNote").textContent = rec ? "How the class studied for each exam that's done" + (arch ? ", and the hubs that just closed." : ".") : "Hubs that closed after their exam.";
+    var rec = !$("rc").hidden;
+    $("past").hidden = !rec && $("checkins").hidden;
+    $("pastNote").textContent = rec ? "How the class studied for each exam that's done." : "Hubs that closed after their exam.";
   }
 
   /* ---------- the visitor: a random per-browser id, made on first need ---------- */
@@ -809,8 +840,9 @@
       if (step < last) h += '<button type="button" class="btn ' + (v != null ? 'btn-primary' : 'btn-quiet') + '" data-act="next">' + (v != null ? 'Next' : 'Skip') + '</button>';
       else h += '<button type="button" class="btn btn-primary survey-send" data-act="send">Send</button>';
       box.innerHTML = h + '</div>';
+      /* an old single-file hub has no answer keys on the server, so an idea from its check-in is for all hubs */
       var th = box.querySelector("[data-idea-tick]");
-      ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
+      ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: LEGACY[hub.id] ? null : hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
       refresh();
       var t = box.querySelector("textarea"); if (t && step && window.matchMedia && matchMedia("(hover:hover)").matches) setTimeout(function(){ try{ t.focus({ preventScroll:true }); }catch(e){} }, 60);
     }
@@ -864,6 +896,7 @@
         if (!debriefSb) { box.innerHTML = failed; setTimeout(close, 4000); return; }
         debriefSb.rpc("submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
           if (r.error || r.data !== true) { box.innerHTML = failed; setTimeout(close, 4000); return; }
+          lsSet("sh_debrief_sent_" + hub.id + "_" + x.date, "1"); renderCheckins();
           if (!toBoard) { box.innerHTML = thanks; setTimeout(close, 3600); return; }
           /* the check-in is in; now the post. If it doesn't go up (three ideas today, say), the check-in still counts */
           tk.post().then(function(p){
@@ -1028,8 +1061,7 @@
   document.addEventListener("sh:name", function(e){ if (nameTold) return; localName = String(e && e.detail && e.detail.name || "").slice(0, 24); paintName(); });
 
   /* Settings: the same keys the hubs' Settings keep (widget/hub.js and widget/v3.js: keep the three lists in step), so a
-     change here shows in every hub. The font choice, background music and the accent metal are cut (plan, 4.6), and Full
-     Arch is retired on the redesign (Sam, 2026-11-12), so its switch is in v3.js's list only. */
+     change here shows in every hub. The font choice, background music and the accent metal are cut (plan, 4.6). */
   var EXTRAS = [
     ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy: ask him about the notes. Right answers and study streaks keep him healthy. Off, an Ask button takes his place.", [["on", "Everywhere"], ["dash", "Dashboard only"], ["off", "Off"]]],
     ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in each hub's trophy case."],
@@ -1039,12 +1071,13 @@
     ["sh_pref_nuke", "Tactical nukes", "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes.", [["on", "On"], ["mine", "Mine only"], ["off", "Off"]]],
     ["sh_pref_celebrate", "Rank-up and trophy cards", "The rank-up cutscene, level-up, trophy and medal cards."],
     ["sh_pref_cheers", "Streak cheers", "Confetti and a toast every 5 right in a row."],
+    ["sh_pref_flame", "Streak flame", "The flame in the corner that counts your run from 3 right in a row."],
     ["sh_pref_fx", "Answer animations", "Pops, shakes, sweeps and fades. Off keeps the check and X marks."]
   ];
   function prefSet(k, v){ lsSet(k, v); try { document.dispatchEvent(new CustomEvent("sh:pref", { detail: { key: k, val: v } })); } catch (e) {} }
   function seg(key, opts, cur){ return '<span class="seg" role="group" data-key="' + esc(key) + '">' + opts.map(function(o){ return '<button type="button" data-val="' + esc(o[0]) + '" aria-pressed="' + (cur === o[0]) + '">' + esc(o[1]) + "</button>"; }).join("") + "</span>"; }
   /* Focus mode (Sam, 2026-11-06): one switch that turns every extra off, and back to what you had. Same keys as widget/hub.js. */
-  var FOCUS_KEYS = EXTRAS.map(function(x){ return x[0]; }).concat(["sh_pref_flame"]);
+  var FOCUS_KEYS = EXTRAS.map(function(x){ return x[0]; });
   function focusOn(){ return ls("sh_pref_focus") === "on"; }
   function setFocus(on){
     if (on === focusOn()) return;
@@ -1117,6 +1150,54 @@
     if (jAsked || window.SH_JOURNEY_ART || !R || !R.needJourneyArt || !rows.some(function(r){ return r && r.journey > 0; })) return;
     jAsked = true; R.needJourneyArt(function(K){ if (K) again(); });
   }
+  /* flat rays behind the medallion (no gradient), turning slowly */
+  function heroRays(){
+    var d = "", n = 14;
+    for (var i = 0; i < n; i++) { var a0 = i / n * Math.PI * 2, a1 = a0 + Math.PI / n * .9; d += "M0 0L" + (Math.cos(a0) * 120).toFixed(1) + " " + (Math.sin(a0) * 120).toFixed(1) + "L" + (Math.cos(a1) * 120).toFixed(1) + " " + (Math.sin(a1) * 120).toFixed(1) + "Z"; }
+    return '<svg viewBox="-100 -100 200 200" focusable="false"><path d="' + d + '" fill="currentColor"/></svg>';
+  }
+  /* The road. Three journeys of seven ranks (each rank has levels I, II and III): the Handpiece from 0 XP, the ModuPro
+     from 125,000 and the Loupes from 250,000. The ranks you've passed are lit, yours is marked with its level, and a
+     journey you haven't reached shows what it takes. The later objects' drawings load when the road comes near the screen. */
+  var roadP = null, roadSeen = false;
+  function roadFloor(j, i){ var R = window.shRanks, K = window.SH_JOURNEY_ART; return j === 0 ? R.TIERS[i].at : K && K.floor ? K.floor(j, i) : 125000 * j + Math.floor(i * 3 * 125000 / 21); }
+  function renderRoad(p){
+    var R = window.shRanks, el = $("road"); if (!R || !el || !R.TIERS) return;
+    roadP = p = p || roadP || { xp: 0, tier: 0, level: 1, journey: 0 };
+    var K = window.SH_JOURNEY_ART, JN = R.JOURNEYS || ["Handpiece"], mj = Math.max(0, Math.min(JN.length - 1, p.journey | 0)), mt = jTier(p), lv = p.level || 1, xp = p.xp || 0, ROMAN = ["I", "II", "III"];
+    var open = el.__open != null ? el.__open : mj;
+    el.hidden = false;
+    el.innerHTML = '<div class="dx-roadbox"><div class="dx-roadhead"><div><h2 id="roadH">The road</h2><p class="dx-roadsub">Seven ranks, Stone to Dark Matter, three times over: the Handpiece, then the ModuPro, then the Loupes.</p></div>' +
+        '<p class="dx-roadme"><span>You are</span><b>' + esc(jName(p, lv)) + '</b><span class="num">' + num(xp) + " XP</span></p></div>" +
+      '<ol class="dx-road">' + JN.map(function(name, j){
+        var st = j < mj ? "is-done" : j === mj ? "is-now" : "is-lock", lo = 125000 * j, hi = 125000 * (j + 1), drawn = j === 0 || !!K;
+        var fill = j < mj ? 100 : j > mj ? 0 : Math.max(0, Math.min(100, ((mt + (lv - 1) / 3 + .5) / 7) * 100));
+        return '<li class="dx-jr ' + st + (open === j ? " is-open" : "") + '">' +
+          '<button type="button" class="dx-jr-head" data-dash="road-journey" data-j="' + j + '" aria-expanded="' + (open === j) + '">' +
+            '<span class="dx-jr-n num" aria-hidden="true">' + (j + 1) + '</span><span class="dx-jr-art" aria-hidden="true">' + (drawn ? jArt({ journey: j, tier: j < mj ? 6 : j === mj ? mt : 6 }, 64, { animate: false, level: j === mj ? lv : 3 }) : "") + "</span>" +
+            '<span class="dx-jr-tx"><b>The ' + esc(name) + '</b><small class="num">' + (j < mj ? "Finished" : j === mj ? num(Math.max(0, hi - xp)) + " XP to " + (j < JN.length - 1 ? "the " + JN[j + 1] : "the end of the road") : "Starts at " + num(lo) + " XP") + "</small></span>" +
+            '<span class="dx-jr-chip">' + (j < mj ? icon("check", 16) + "Done" : j === mj ? "You are here" : "Locked") + "</span>" + icon("chevron", 18, "rot") + "</button>" +
+          '<div class="dx-jr-body"' + (open === j ? "" : " hidden") + '><ol class="dx-steps" style="--fill:' + fill.toFixed(1) + '%">' + R.TIERS.map(function(t, i){
+            var cls = j < mj || (j === mj && i < mt) ? "is-past" : j === mj && i === mt ? "is-me" : "is-ahead";
+            return '<li class="' + cls + '"><span class="dx-step-art">' + (drawn ? jArt({ journey: j, tier: i }, 56, { animate: false, level: cls === "is-me" ? lv : cls === "is-past" ? 3 : 0 }) : "") + "</span><b>" + esc(t.name) + "</b>" +
+              '<span class="dx-step-xp num">' + (roadFloor(j, i) ? num(roadFloor(j, i)) + " XP" : "Start") + "</span>" +
+              (cls === "is-me" ? '<span class="dx-step-lv" aria-label="Level ' + lv + ' of 3">' + ROMAN.map(function(r, n){ return "<i" + (n < lv ? ' class="on"' : "") + ">" + r + "</i>"; }).join("") + "</span>" : "") + "</li>";
+          }).join("") + "</ol>" +
+          '<p class="dx-jr-end">' + (j < JN.length - 1 ? "Finish Dark Matter III at " + num(hi) + " XP and you are handed the " + esc(JN[j + 1]) + ": the same seven ranks, on a new instrument."
+            : "Dark Matter III on the Loupes, at " + num(hi) + " XP, is the end of the road.") + "</p></div></li>";
+      }).join("") + "</ol></div>";
+    if (!el.__on) {
+      el.__on = true;
+      el.addEventListener("click", function(e){
+        var b = e.target.closest && e.target.closest('[data-dash="road-journey"]'); if (!b) return;
+        var j = +b.getAttribute("data-j"); el.__open = el.__open === j || (el.__open == null && j === mj) ? -1 : j; renderRoad();
+        var again = q('[data-j="' + j + '"]', el); if (again) try { again.focus({ preventScroll: true }); } catch (err) {}
+      });
+      /* the ModuPro's and the Loupes' drawings: fetched once, when the road is near the screen */
+      var need = function(){ if (roadSeen || !R.needJourneyArt) return; roadSeen = true; R.needJourneyArt(function(k){ if (k) renderRoad(); }); };
+      if (window.IntersectionObserver) { var io = new IntersectionObserver(function(es){ if (es.some(function(x){ return x.isIntersecting; })) { io.disconnect(); need(); } }, { rootMargin: "200px 0px" }); io.observe(el); } else need();
+    }
+  }
   function renderMyRank(p){
     var R = window.shRanks, el = $("meRank"); if (!R || !el) return;
     p = p || { xp: 0, tier: 0, level: 1, step: 0, step_at: 0, next_at: 100 };
@@ -1126,13 +1207,25 @@
     var ns = step + 1, nextName = next ? jName({ journey: Math.floor(ns / 21), tier: Math.floor(ns % 21 / 3) }, ns % 3 + 1) : "";
     jNeed([p], function(){ renderMyRank(myRank || p); });
     var medals = R.flair && R.flairFromBadges && R.flairFromBadges(p.badges) ? R.flair(R.flairFromBadges(p.badges), { list: true }) : "";
-    el.innerHTML = '<div class="dx-rankart">' + jArt(p, 64, { level: lv }) + "</div>" +
-      '<div class="dx-rankbody"><p class="dx-rankname"><b>' + esc(jName(p, lv)) + '</b><span class="num">' + num(xp) + " XP" + (p.position ? " · #" + p.position + " of " + p.of : "") + "</span></p>" +
-      '<div class="dx-bar2 dx-rankbar" role="progressbar" aria-label="Progress to ' + esc(nextName || "the top") + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pct * 100) + '"><i style="width:0%"></i></div>' +
-      '<p class="note">' + (!xp ? "Answer a question in any hub to start earning XP." : next ? '<b class="num">' + num(next - xp) + " XP</b> to " + esc(nextName) : "The highest rank there is.") + "</p></div>" +
+    var nxt = next ? { journey: Math.floor(ns / 21), tier: Math.floor(ns % 21 / 3) } : null;
+    el.className = "dx-rankcard dx-hero" + (still() ? " is-still" : "");
+    el.innerHTML = '<div class="dx-heroglow" aria-hidden="true">' + heroRays() + "</div>" +
+      '<div class="dx-rankart">' + jArt(p, 96, { level: lv }) + "</div>" +
+      '<div class="dx-rankbody"><p class="dx-rankeyebrow">Your rank' + (p.position ? ' <span class="dx-pos num">#' + p.position + " of " + p.of + "</span>" : "") + "</p>" +
+      '<p class="dx-rankname"><b>' + esc(jName(p, lv)) + "</b></p>" +
+      '<p class="dx-xp"><b class="num" data-xp="' + xp + '">' + num(xp) + "</b> XP</p></div>" +
+      '<div class="dx-heroroad"><div class="dx-bar2 dx-rankbar" role="progressbar" aria-label="Progress to ' + esc(nextName || "the top") + '" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + Math.round(pct * 100) + '"><i style="width:0%"></i></div>' +
+        (nxt ? '<span class="dx-nextart" aria-hidden="true">' + jArt(nxt, 44, { animate: false, level: ns % 3 + 1 }) + "</span>" : "") +
+      '<p class="dx-heronote">' + (!xp ? "Answer a question in any hub to start earning XP." : next ? '<b class="num">' + num(next - xp) + " XP</b> to " + esc(nextName) : "The highest rank there is.") + "</p></div>" +
       (medals ? '<div class="dx-medals"><span class="note">Mastery</span>' + medals + "</div>" : "") +
+      '<div class="dx-heroact">' +
       /* the trophy case (widget/trophies.js, phase 4 session 6), in a dialog */
-      (R.trophyCase ? (function(n){ return '<button type="button" class="btn dx-tro" data-dx="trophies">' + icon("trophy", 18) + 'Trophy case <span class="num">' + n.won + " of " + n.of + "</span></button>"; })(R.caseCount(p.badges)) : "");
+      (R.trophyCase ? (function(n){ return '<button type="button" class="btn dx-tro" data-dx="trophies">' + icon("trophy", 18) + 'Trophy case <span class="num">' + n.won + " of " + n.of + "</span></button>"; })(R.caseCount(p.badges)) : "") +
+      '<a class="btn dx-roadlink" href="#road">The road ahead' + icon("chevron", 16) + "</a></div>";
+    /* the XP counts up the first time it is seen, unless motion is off */
+    if (!still() && xp && el.__xp !== xp) { var xe = q("[data-xp]", el), t0 = null; el.__xp = xp;
+      (function tick(t){ if (!xe.isConnected) return; if (t0 === null) t0 = t; var k = Math.min(1, (t - t0) / 900), e = 1 - Math.pow(1 - k, 3); xe.textContent = num(Math.round(xp * e)); if (k < 1) requestAnimationFrame(tick); })(performance.now()); }
+    renderRoad(p);
     if (!el.__tro) { el.__tro = true; el.addEventListener("click", function(e){ var b = e.target.closest && e.target.closest('[data-dx="trophies"]'); if (b) openTrophies(b); }); }
     requestAnimationFrame(function(){ requestAnimationFrame(function(){ var i = q(".dx-rankbar i", el); if (i) i.style.width = (pct * 100).toFixed(1) + "%"; }); });
     var pill = $("dxRank");
@@ -1231,7 +1324,7 @@
     var sh = SHOP.shop, bal = sh && sh.wallet ? sh.wallet.balance : null;
     if (bal == null) { el.hidden = true; return; }
     var dot = ls("sh_shop_dot") === ctDay(), had = el.contains(document.activeElement);
-    el.innerHTML = '<p class="dx-coinnum"><svg viewBox="0 0 24 24" width="22" height="22" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + SHOP_COIN + '</svg><b class="num">' + num(bal) + "</b><span>Shiny Gold Crowns</span></p>" +
+    el.innerHTML = '<p class="dx-coinnum"><svg viewBox="0 0 24 24" width="22" height="22" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + SHOP_COIN + '</svg><span class="dx-cointx"><b class="num">' + num(bal) + "</b><span>Shiny Gold Crowns</span></span></p>" +
       '<button type="button" class="btn dx-shopbtn" data-dash="shop">Timmy’s shop' + (dot ? '<i class="dx-dot dx-shopdot" aria-hidden="true"></i><span class="sr"> (a rare costume came in)</span>' : "") + "</button>";
     el.hidden = false;
     var btn = q(".dx-shopbtn", el); btn.addEventListener("click", openShop);
@@ -1308,13 +1401,16 @@
     var streak = 0, j = by[keys[0]] ? 0 : 1;
     while (j < keys.length && by[keys[j]]) { streak++; j++; }
     keys.slice(0, 7).forEach(function(k){ if (by[k]) { a7 += by[k].a || 0; c7 += by[k].c || 0; } });
+    var pct7 = a7 ? Math.round(c7 / a7 * 100) : 0;
     var week = keys.slice(0, 7).reverse(), on7 = week.filter(function(k){ return by[k]; }).length;
     var dots = '<span class="dx-week" aria-hidden="true">' + week.map(function(k, i){
       return '<i class="' + (by[k] ? "on" : "") + (i === 6 ? " today" : "") + '">' + "SMTWTFS".charAt(parseYmd(k).getDay()) + "</i>"; }).join("") + "</span>";
     $("youStats").innerHTML =
       '<li class="dx-stat s-flame">' + flame(streak) + '<span><b class="num">' + streak + "</b> " + (streak === 1 ? "day" : "days") + "<small>" + (streak ? "Study streak" : "Answer one question to start a streak") + "</small></span>" +
         dots + '<span class="sr">You studied on ' + on7 + " of the last 7 days.</span></li>" +
-      (weekSource === "server" ? '<li class="dx-stat s-week"><span><b class="num">' + num(a7) + "</b> " + (a7 === 1 ? "answer" : "answers") + "<small>This week" + (a7 ? ", " + Math.round(c7 / a7 * 100) + "% right" : "") + "</small></span></li>" : "");
+      (weekSource === "server" ? '<li class="dx-stat s-week"><span><b class="num">' + num(a7) + "</b> " + (a7 === 1 ? "answer" : "answers") + "<small>This week" + (a7 ? ", " + pct7 + "% right" : "") + "</small></span>" +
+        /* how many of the week's answers were right, as a ring */
+        (a7 ? '<span class="dx-wring" aria-hidden="true"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="18" class="t"/><circle cx="22" cy="22" r="18" class="v" pathLength="100" stroke-dasharray="' + pct7 + ' 100" transform="rotate(-90 22 22)"/></svg><b class="num">' + pct7 + "</b></span>" : "") + "</li>" : "");
     var m = $("dxStreak");
     /* read out in full whatever the bar has room to show (the words fold away on a phone) */
     m.innerHTML = '<span class="sr">Your study streak: ' + streak + (streak === 1 ? " day" : " days") + '</span><span class="dx-seen" aria-hidden="true">' + flame(streak) + '<b class="num">' + streak + '</b><span class="dx-fold">' + (streak === 1 ? "day" : "days") + "</span></span>";
@@ -1425,6 +1521,7 @@
         return ranks ? rowHTML(r, r.rnk, jName(r, r.level || R.levelFor(r.xp)), num(r.xp), "XP", (+r.xp || 0) / first)
           : rowHTML(r, i + (pod ? 4 : 1), "", r.streak, r.streak === 1 ? "day" : "days", (+r.streak || 0) / first);
       }).join("") + "</ol>" : "") + "</div>";
+    lifeStage();
     if (d.say) visitSay(d.say.key, d.say.msg, true);
     $("visitRand").hidden = !visitList().length;
   }
@@ -1592,7 +1689,6 @@
   function drawBoard(){
     var sb = boardSb, which = boardNow;
     $("boardNote").textContent = BOARD_NOTE[which]; $("boardNote").hidden = !BOARD_NOTE[which];
-    $("ladderFold").hidden = which !== "ranks" || !window.shRanks;
     if (!sb) { boardMsg(); return; }
     if (!boardData || boardData.which !== which) $("board").innerHTML = '<p class="note">Loading…</p>';
     if (which === "ranks") {
@@ -1603,16 +1699,7 @@
         if (!rows.length || !R){ boardMsg("No ranks yet. Answer a question in any hub to get your first handpiece."); return; }
         boardData = { which: which, rows: rows, fits: [] }; TOP = topFrom(rows); paintBoard(); loadFits(sb, boardData);
         var me = rows.filter(function(r){ return r.is_me; })[0];
-        /* the ladder under the board is the journey you are on: the Handpiece's seven ranks, or the next object's */
-        var paintLadder = function(){
-          var K = window.SH_JOURNEY_ART, mj = me && me.journey > 0 && K ? Math.min(2, me.journey | 0) : 0;
-          $("rankLadder").innerHTML = R.TIERS.map(function(t, i){
-            var mine = me && me.tier === i, at = mj ? K.floor(mj, i) : t.at;
-            return '<div class="dx-rung' + (mine ? " me" : "") + '">' + jArt({ journey: mj, tier: i }, 56, { animate: false, level: mine ? (me.level || R.levelFor(me.xp)) : 0 }) + "<b>" + esc(t.name) + '</b><span class="note num">' + (at ? num(at) + " XP" : "Start") + (mine ? " · you" : "") + "</span></div>";
-          }).join("");
-        };
-        paintLadder();
-        jNeed(rows, function(){ if (boardData && boardData.rows === rows) { paintBoard(); paintLadder(); } });
+        jNeed(rows, function(){ if (boardData && boardData.rows === rows) paintBoard(); });
       }, function(){ if (boardNow === which) boardMsg(); });
     } else if (which === "streaks") {
       rpc2(sb, "get_leaderboard", { p_limit: 8 }).then(function(res){
@@ -1873,13 +1960,13 @@
        hub (Sam, 2026-11-12: "timmy doesnt ask what hub when on the dashboard"); a link opens that hub's page at it */
     if (window.shAsk) window.shAsk.mount({ where: "dashboard", sb: sb, name: "Study Hubs", about: C.about || ROOT + "about/",
       section: function(){ return "dashboard"; },
-      hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: NEXT[h.id] ? ROOT + "hubs/" + h.id + "/next/content/" : null }; }); },
+      hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: LEGACY[h.id] ? null : ROOT + "hubs/" + h.id + "/content/" }; }); },
       href: function(id){ var h = HUBS.concat(ARCHIVED_HUBS).filter(function(x){ return x.id === id; })[0]; return h ? hubHref(h) : ""; },
       spot: function(){ return $("askSpot"); } });
     /* Timmy (widget/pet.js) lives in the "you" card. Everyone has Timmy (Ask Timmy, part 4): no adoption and no
        introduction, and he wears what's on at his place (the v2 bootstrap's shop), nothing when nothing is. */
     if (window.shPet) {
-      window.shPet.mount({ where: "dashboard", sb: sb, visitor: VISITOR, everyone: true,
+      window.shPet.mount({ where: "dashboard", sb: sb, visitor: VISITOR,
         name: function(){ return localName || randomName; },
         home: function(){ return $("petHome"); }, bootstrap: bootstrap.ready });
     }
@@ -1890,7 +1977,9 @@
     /* the idea board (widget/ideas.js): its section stays hidden until its first load says the board is up (its
        server is migration_v54). An idea can be for a live hub or all hubs; an archived hub's ideas keep its name. */
     if (window.shIdeas) window.shIdeas.mount($("ideas"), { sb: sb,
-      hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h) }; }); },
+      /* only a hub on the engine can be named: the server takes an idea's hub from the hubs whose answer keys it holds,
+         and an old single-file hub has none ("All hubs" is always there) */
+      hubs: function(){ return HUBS.filter(function(h){ return !LEGACY[h.id]; }).map(function(h){ return { id: h.id, name: hubName(h) }; }); },
       name: function(id){ var h = debriefHub(id); return h ? hubName(h) : HUB_LABEL[id] || ""; },
       tint: tintVars, editName: openNameEditor, nameHint: function(){ return randomName; },
       onReady: function(ok){ $("ideas").hidden = !ok; } });
@@ -1984,7 +2073,75 @@
     loadScriptOnce(WIDGET + "rest.bundle.js").then(one, one);
     loadScriptOnce(WIDGET + "hub-art/class.js").then(one, one);
   }
+  /* The drawn pictures move when you arrive at them, not all the time (Sam, 2026-11-14: "scrolling and things are kind
+     of sluggish and jittery"). Anything that moves inside a drawing (the stage's confetti and lights, the classroom's
+     Timmys, the road, the board's Timmy, the picture of Timmy's place) makes the browser redraw that picture and
+     rebuild the page's layers on every frame, and about 130 of them ran the whole time, wherever the page was
+     scrolled. So each such part of the page rests (.is-rest: dash.css and place.css hold what moves inside it) and
+     comes alive for LIFE ms when it comes on screen, when a scroll ends on it and under a mouse. It rests at once when
+     a scroll or a touch starts, while a window is open over the page and when it leaves the screen. What costs
+     nothing keeps moving while it is on screen: the Timmy Time card, the rays, the rank bar's shine and a crown's glint
+     are moved by the compositor. Off screen (.is-away) nothing moves at all. */
+  var LIFE = 8000, life = { io: null, parts: [], scrolling: false, st: 0, tt: 0, stage: null };
+  function lifeCovered(){ return !!q('dialog[open], [aria-modal="true"]'); }
+  /* the picture of Timmy's place is drawn in a shadow root, which a rule out here can't reach: it is told by itself */
+  function lifeMark(p, rest){
+    p.el.classList.toggle("is-rest", rest);
+    if (p.el.id === "you") [].forEach.call(p.el.querySelectorAll(".tpc-live"), function(x){ x.classList.toggle("is-rest", rest); });
+  }
+  function lifeRest(p){ clearTimeout(p.t); p.t = 0; lifeMark(p, true); }
+  function lifeWake(p){
+    if (!p.on || life.scrolling || lifeCovered()) return;
+    clearTimeout(p.t); lifeMark(p, false);
+    p.t = setTimeout(function(){ lifeRest(p); }, LIFE);
+  }
+  function lifeHold(){ life.parts.forEach(function(p){ if (p.t) lifeRest(p); }); }
+  function lifePart(el){
+    var p = { el: el, on: false, t: 0 };
+    el.classList.add("is-rest"); life.parts.push(p); life.io.observe(el);
+    el.addEventListener("mouseenter", function(){ lifeWake(p); });
+    return p;
+  }
+  function lifeWatch(){
+    if (!window.IntersectionObserver) return;
+    life.io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        e.target.classList.toggle("is-away", !e.isIntersecting);
+        var p = life.parts.filter(function(x){ return x.el === e.target; })[0]; if (!p) return;
+        p.on = e.isIntersecting; if (p.on) lifeWake(p); else lifeRest(p);
+      });
+    });
+    ["you", "now", "road", "ideas", "past"].forEach(function(id){ var el = $(id); if (el) lifePart(el); });
+    /* these two have nothing that rests, only what stops off screen (.is-away): the Timmy Time card, the board's rows */
+    ["hubs", "board"].forEach(function(id){ var el = $(id); if (el) life.io.observe(el); });
+    lifeStage();
+    window.addEventListener("scroll", function(){
+      if (!life.scrolling) { life.scrolling = true; lifeHold(); }
+      clearTimeout(life.st);
+      life.st = setTimeout(function(){ life.scrolling = false; life.parts.forEach(lifeWake); }, 220);
+    }, { passive: true });
+    document.addEventListener("touchstart", lifeHold, { passive: true });
+    /* a tap that scrolled nothing: the pictures come back */
+    document.addEventListener("touchend", function(){
+      clearTimeout(life.tt); life.tt = setTimeout(function(){ if (!life.scrolling) life.parts.forEach(lifeWake); }, 500);
+    }, { passive: true });
+    /* a window opened over the page (most open on a click; one that had to be fetched first is added to the body
+       later) or closed */
+    document.addEventListener("click", function(){ setTimeout(function(){ if (lifeCovered()) lifeHold(); }, 80); }, true);
+    if (window.MutationObserver) new MutationObserver(function(){ if (lifeCovered()) lifeHold(); }).observe(document.body, { childList: true });
+    document.addEventListener("close", function(){ setTimeout(function(){ life.parts.forEach(lifeWake); }, 320); }, true);
+  }
+  /* the stage is drawn again with every board, so its picture is watched by itself (the list under it is tall: the
+     stage is often off screen while the list is on it) */
+  function lifeStage(){
+    if (!life.io) return;
+    var el = q(".dx-set", $("board"));
+    if (life.stage && life.stage.el === el) return;
+    if (life.stage) { life.io.unobserve(life.stage.el); clearTimeout(life.stage.t); life.parts = life.parts.filter(function(x){ return x !== life.stage; }); }
+    life.stage = el ? lifePart(el) : null;
+  }
   function afterDraw(){
+    lifeWatch();
     loadLate(function(){
       CA = window.SH_CLASS_ART || null;
       startClassData(); syncRoom();

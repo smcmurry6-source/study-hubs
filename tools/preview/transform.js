@@ -27,7 +27,7 @@ const ROBOTS = 'noindex, nofollow, noarchive, nosnippet, noimageindex';
 
 /* What the live site serves (and so what a preview serves). Everything else in the repo (vault, tools, SQL, notes)
    isn't part of the site. */
-const SITE_ENTRIES = ['index.html', 'next', 'about', 'review', 'hubs', 'widget', 'assets', 'manifest.webmanifest', 'sw.js'];   // next: the redesigned dashboard, beside the live one until the release
+const SITE_ENTRIES = ['index.html', 'hubs.js', 'about', 'review', 'hubs', 'widget', 'assets', 'manifest.webmanifest', 'sw.js'];   // hubs.js: the dashboard's hubs and dates
 /* Pages that aren't part of the site but are shown in a preview for Sam to look at: the redesign's design system
    (tools/preview/design, Phase 0). A preview serves and builds them like a site page; a release doesn't check them. */
 const PREVIEW_PAGES = ['tools/preview/design'];
@@ -92,15 +92,15 @@ function transformSw(js, o){
   return rewriteText(js, o).replace(/var VERSION = '([^']+)';/, (m, v) => `var VERSION = '${v}-preview-${(o.sha || 'local').slice(0, 7)}';`);
 }
 
-/* widget/pet.js: the day the redesign goes live (FULL_FROM: a Timmy born on or after it starts at 100 HP, everyone has
+/* widget/pet.js: the day the redesign went live (FULL_FROM: a Timmy born on or after it starts at 100 HP, everyone has
    Timmy) is, in a preview, the day its test account started (the runtime's SH_PREVIEW_TIMMY_FROM), so the "new" account
    meets him at 100 and the others keep their history. A pet.js without the line fails loudly rather than quietly. */
-const PET_FROM = 'var FULL_FROM = "9999-12-31";';
+const PET_FROM = /var FULL_FROM = "(\d{4}-\d{2}-\d{2})";/;
 /* the redesign's pages get pet.js inside this bundle (tools/bundle/build.mjs keeps the line as it is written) */
 const PET_FILES = ['widget/pet.js', 'widget/rest.bundle.js'];
 function transformPet(js, o, rel){
-  if (!js.includes(PET_FROM)) throw new Error((rel || 'widget/pet.js') + ' has no `' + PET_FROM + '` line for the preview to point at its own start (tools/preview/transform.js)');
-  return rewriteText(js, o).replace(PET_FROM, 'var FULL_FROM = window.SH_PREVIEW_TIMMY_FROM || "9999-12-31";');
+  if (!PET_FROM.test(js)) throw new Error((rel || 'widget/pet.js') + ' has no `var FULL_FROM = "yyyy-mm-dd";` line for the preview to point at its own start (tools/preview/transform.js)');
+  return rewriteText(js, o).replace(PET_FROM, (m, day) => 'var FULL_FROM = window.SH_PREVIEW_TIMMY_FROM || "' + day + '";');
 }
 
 /* body for a site-relative file, or null to serve it untouched (binary) */

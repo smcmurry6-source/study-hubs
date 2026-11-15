@@ -76,7 +76,7 @@ page's Insights tab (`review/`); the local checks are in `tools/analytics-qualit
 
 - Test hub rows and blank hubs: excluded in `sh_insights()`, `sh_insight_retries()` and `sh_data_quality()` (v49).
 - The admin page's own list of archived hubs had fallen behind (it showed MSK 3, MSK 4, PCD 3 and Heme & Endo as live):
-  it now reads hub status and exam dates from `HUBS` / `ARCHIVED_HUBS` in `index.html` (2026-11-04).
+  it now reads hub status and exam dates from the dashboard's hub list (2026-11-04; `hubs.js` since the redesign's release).
 - Automated browsers (10-15), the idle rule (09-25), select-all picks for Occlusion-engine hubs (11-04): see the change log.
 
 Related: [analytics-governance](analytics-governance.md) · [event-taxonomy](event-taxonomy.md) ·

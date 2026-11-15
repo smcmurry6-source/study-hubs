@@ -15,6 +15,9 @@
    - Every rating and Learn step also goes to the server (record_card_v2, reset_my_learn), queued in STATE.cardq until it
      arrives, and the first time this opens on a page load, get_my_cards brings the rows from your other devices and the
      same sched() replays them. Until the database has migration_v56 (the redesign's release), it all stays on the device.
+   - Both run as a session over the whole screen (Sam, 2026-11-13: "more like it does on quizlet"): the bank keeps a
+     launcher (what's picked, how far along, Start), and Start opens a layer with its own top row (Close, how far along,
+     today's goal and XP), one card at a time in the middle. Escape or Close goes back to the bank.
    Every button here carries a fixed data-sm name, so click counts never record a question's words. ============ */
 (function(){
   "use strict";
@@ -183,6 +186,63 @@
     }
     function emptyHTML(t, p, act){ return P.emptyHTML(t, p, act); }
 
+    /* ======================= the session: a layer over the hub ======================= */
+    var FOCUS = null;
+    function openFocus(kind, title, onClose){
+      if (FOCUS) FOCUS.close(true);
+      var shell = document.querySelector(".hx") || document.body;
+      var root = h('<div class="sm sm-focus sm-' + kind + '" role="dialog" aria-modal="true" aria-label="' + esc(title) + '">' +
+        '<header class="sm-top"><button class="sm-x" type="button" data-sm="exit" aria-label="Close ' + esc(title) + '">' + icon("cross", 20) + "</button>" +
+        '<div class="sm-topmid" data-smtop></div>' +
+        '<div class="sm-topr"><span class="hx-meter" data-goalm></span><span class="hx-meter" id="smXp" data-xpm></span></div></header>' +
+        '<div class="sm-body" data-smbody><div class="sm-col" data-smcol></div></div></div>');
+      shell.appendChild(root);
+      document.documentElement.classList.add("sm-open");
+      var F = { root: root, top: $("[data-smtop]", root), body: $("[data-smbody]", root), col: $("[data-smcol]", root), kind: kind, closed: false, onKey: null };
+      function inside(){ var a = document.activeElement; return !a || a === document.body || root.contains(a); }
+      function key(e){
+        if (F.closed || document.querySelector("dialog[open]") || !inside()) return;
+        if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); F.close(); return; }
+        if (e.key === "Tab") {   // Tab stays in the session
+          var f = $$("a[href], button:not([disabled]), input, select, textarea, summary, [tabindex]:not([tabindex='-1'])", root).filter(function(n){ return n.offsetParent !== null; });
+          if (!f.length) return;
+          var a = document.activeElement, first = f[0], lastEl = f[f.length - 1];
+          if (e.shiftKey && (a === first || !root.contains(a))) { e.preventDefault(); lastEl.focus(); }
+          else if (!e.shiftKey && (a === lastEl || !root.contains(a))) { e.preventDefault(); first.focus(); }
+          return;
+        }
+        if (F.onKey) F.onKey(e);
+      }
+      function moved(){ F.close(true); }
+      F.close = function(quiet){
+        if (F.closed) return; F.closed = true;
+        document.removeEventListener("keydown", key, true); window.removeEventListener("hashchange", moved);
+        document.documentElement.classList.remove("sm-open");
+        if (FOCUS === F) FOCUS = null;
+        if (reduced || quiet) root.remove(); else { root.classList.add("is-leaving"); setTimeout(function(){ root.remove(); }, 200); }
+        if (F.onClose) F.onClose();
+        if (onClose) onClose(!!quiet);
+      };
+      document.addEventListener("keydown", key, true); window.addEventListener("hashchange", moved);
+      $("[data-sm=exit]", root).addEventListener("click", function(){ F.close(); });
+      if (HX.paintMeters) { try { HX.paintMeters(); } catch (e) {} }
+      FOCUS = F; return F;
+    }
+    /* the launcher's button, and what the bank does when the session closes: the launcher again, with the numbers as they are now */
+    function launch(L, kind, title, html, run, draw){
+      L.host.innerHTML = '<section class="panel sm sm-launch sm-launch-' + kind + '" aria-label="' + esc(title) + '">' + html + "</section>";
+      var b = $("[data-sm=start]", L.host);
+      if (b) b.addEventListener("click", function(){
+        track(kind + ":start");
+        var F = openFocus(kind, title, function(quiet){
+          if (!L.host.isConnected) return;
+          draw();
+          if (!quiet) { var again = $("[data-sm=start]", L.host) || $("[data-sm]", L.host); if (again) again.focus({ preventScroll: true }); }
+        });
+        run(F);
+      });
+    }
+
     /* ======================= Learn ======================= */
     /* what makes it feel good (Sam, 2026-11-12: "similar progress bar filling animations and such so it is very
        satisfying to use like quizlet"): the overall bar is drawn once and its fills grow (a shine runs along it when a
@@ -203,39 +263,83 @@
       for (var i = 0; i < n; i++) out += '<i style="--a:' + Math.round(i * 360 / n + (i % 2 ? 9 : -9)) + "deg;--d:" + (big ? 70 + (i * 37 % 60) : 26 + (i * 13 % 14)) + "px;--c:" + (i % 4) + '"></i>';
       return out + "</span>";
     }
+    function autoOn(){ return STATE.ui.smAuto !== 0; }
     function learn(L){
-      var items = inBankOrder(L.items), S = learnStore(), host = L.host, R = null, last = null;
-      host.innerHTML = '<div class="sm sm-learn"><div class="sm-prog panel" data-smprog></div><div class="sm-round" data-smround hidden></div><div class="sm-stage" data-smstage aria-live="polite"></div></div>';
-      var prog = $("[data-smprog]", host), roundEl = $("[data-smround]", host), stage = $("[data-smstage]", host);
+      var items = inBankOrder(L.items), S = learnStore();
       function stepOf(id){ var s = S.q[id]; return s === 1 || s === 2 ? s : s === 0 ? 0 : -1; }
       function counts(){ var c = { fresh: 0, learning: 0, done: 0, half: 0 }; items.forEach(function(q){ var s = stepOf(q.id); if (s < 0) c.fresh++; else if (s === 2) c.done++; else { c.learning++; if (s === 1) c.half++; } }); return c; }
       /* how far along: a question right once is halfway, mastered is all the way (a miss is back at the start) */
       function pctOf(c){ return items.length ? Math.round((c.half + 2 * c.done) / (2 * items.length) * 100) : 0; }
       function w(x){ return (Math.round(x / (items.length || 1) * 1000) / 10) + "%"; }
+      function resetAll(){
+        var ids = items.map(function(q){ return q.id; });
+        ids.forEach(function(id){ delete S.q[id]; }); saveState();
+        for (var i = 0; i < ids.length; i += 2000) enqueue(["*", "learn-reset", Date.now(), 0, null, ids.slice(i, i + 2000)]);
+        track("learn:start-over");
+      }
+      /* the launcher, in the bank: how far along these questions are, and Start */
+      function drawLaunch(){
+        var c = counts(), all = c.done === items.length, begun = c.done + c.learning > 0;
+        sumline(L, setName(L) ? "Learning the <b class=\"num\">" + fmt(items.length) + "</b> in " + esc(setName(L)) : "Learning <b class=\"num\">" + fmt(items.length) + "</b> of " + fmt(L.all || items.length) + " questions");
+        launch(L, "learn", "Learn",
+          '<div class="sm-launch-head"><span class="sm-launch-ic" aria-hidden="true">' + icon("learn", 26) + '</span><div><h2>Learn</h2><p class="note">' +
+            (all ? "Every one of these is mastered." : "Rounds of 7, one question at a time. A question is mastered once you've had it right twice.") + "</p></div></div>" +
+          '<div class="sm-prog"><div class="sm-prog-top"><p class="sm-pct"><b class="num">' + pctOf(c) + '%</b> of the way</p><p class="sm-of note"><span class="num">' + fmt(c.done) + " of " + fmt(items.length) + " mastered</span></p></div>" +
+          '<div class="sm-bar" role="img" aria-label="' + c.done + " mastered, " + c.learning + " learning, " + c.fresh + ' not started"><i class="b-done" style="width:' + w(c.done) + '"></i><i class="b-learn" style="width:' + w(c.learning) + '"></i></div>' +
+          '<ul class="sm-legend"><li><i class="k-new" aria-hidden="true"></i><b class="num">' + fmt(c.fresh) + '</b> Not started</li><li><i class="k-learn" aria-hidden="true"></i><b class="num">' + fmt(c.learning) + '</b> Learning</li><li><i class="k-done" aria-hidden="true"></i><b class="num">' + fmt(c.done) + "</b> Mastered</li></ul></div>" +
+          '<div class="qc-go sm-launch-go">' + (all ? '<button class="btn btn-primary" type="button" data-sm="tocards">' + icon("cards", 18) + 'Flashcards for these</button><button class="btn" type="button" data-sm="reset">' + icon("retry", 18) + "Start over</button>"
+            : '<button class="btn btn-primary sm-start" type="button" data-sm="start">' + (begun ? "Keep learning" : "Start learning") + icon("chevron", 18) + "</button>" + (begun ? '<button class="btn btn-text" type="button" data-sm="reset">Start over</button>' : "")) + "</div>",
+          function(F){ run(F); }, drawLaunch);
+        var rb = $("[data-sm=reset]", L.host), tc = $("[data-sm=tocards]", L.host);
+        if (rb) rb.addEventListener("click", function(){ resetAll(); drawLaunch(); var s = $("[data-sm=start]", L.host); if (s) s.focus({ preventScroll: true }); });
+        if (tc) tc.addEventListener("click", function(){ STATE.ui.qview = "cards"; saveState(); track("bank:view=cards"); HX.drawQuestions(L.el, L.preset); });
+      }
+      if (!items.length) { L.host.innerHTML = emptyHTML("Nothing to learn here", "These filters leave no questions. Change them above, or clear them."); return; }
+      drawLaunch();
+      /* rows from your other devices: the launcher follows (an open session keeps its own bar up to date) */
+      pull(function(changed){ if (changed && L.host.isConnected && !FOCUS) drawLaunch(); });
+
+      function run(F){
+      var R = null, last = null, autoT = 0;
+      F.top.innerHTML = '<div class="sm-prog" data-smprog></div>';
+      F.col.innerHTML = '<div class="sm-round" data-smround hidden></div><div class="sm-stage" data-smstage aria-live="polite"></div>';
+      var prog = $("[data-smprog]", F.root), roundEl = $("[data-smround]", F.root), stage = $("[data-smstage]", F.root);
+      F.onClose = function(){ clearTimeout(autoT); };
+      /* the keys: 1 to 6 pick a choice, as on Quizlet; Enter or Space on Next is the button's own */
+      F.onKey = function(e){
+        if (e.altKey || e.ctrlKey || e.metaKey || !/^[1-9]$/.test(e.key)) return;
+        var t = e.target, tag = t && t.tagName; if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+        var card = $(".qcard", stage); if (!card || card.classList.contains("is-answered") || card.classList.contains("is-skipped")) return;
+        var ul = $(".qc-choices", card); if (!ul || ul.hidden) return;
+        var b = $$(".ch[data-i]", ul)[+e.key - 1]; if (b && !b.disabled) { e.preventDefault(); b.click(); }
+      };
       /* the overall bar: drawn once, then only its widths and numbers change, so it fills instead of jumping */
       function paintProg(){
         var c = counts(), fresh = !$("[data-bar]", prog);
-        if (fresh) prog.innerHTML = '<div class="sm-prog-top"><p class="sm-pct"><b class="num" data-pct>0%</b> of the way</p><p class="sm-of note"><span class="num" data-of></span></p></div>' +
+        /* in the session's top row: the percent, the bar, how many are mastered */
+        if (fresh) prog.innerHTML = '<b class="sm-pctn num" data-pct>0%</b>' +
           '<div class="sm-bar" data-bar role="img"><i class="b-done" data-fill="done" style="width:0"></i><i class="b-learn" data-fill="learning" style="width:0"></i></div>' +
-          '<ul class="sm-legend"><li><i class="k-new" aria-hidden="true"></i><b class="num" data-n="fresh">0</b> Not started</li><li><i class="k-learn" aria-hidden="true"></i><b class="num" data-n="learning">0</b> Learning</li><li><i class="k-done" aria-hidden="true"></i><b class="num" data-n="done">0</b> Mastered</li></ul>';
+          '<span class="sm-ofn"><b class="num" data-n="done">0</b><span class="num" data-of></span></span>';
         var bar = $("[data-bar]", prog), from = last || (reduced ? c : { fresh: c.fresh + c.learning + c.done, learning: 0, done: 0, half: 0 });
         bar.setAttribute("aria-label", c.done + " mastered, " + c.learning + " learning, " + c.fresh + " not started");
         var set = function(){ $('[data-fill="done"]', prog).style.width = w(c.done); $('[data-fill="learning"]', prog).style.width = w(c.learning); };
         if (fresh && !reduced) requestAnimationFrame(function(){ requestAnimationFrame(set); }); else set();
         ["fresh", "learning", "done"].forEach(function(k){ tween($('[data-n="' + k + '"]', prog), from[k], c[k]); });
         tween($("[data-pct]", prog), pctOf(from), pctOf(c), "%");
-        $("[data-of]", prog).textContent = fmt(c.done) + " of " + fmt(items.length) + " mastered";
+        $("[data-of]", prog).innerHTML = " / " + fmt(items.length) + '<span class="sm-ofw"> mastered</span>';
         if (last && c.done > last.done) { replay(bar, "is-shine"); replay($('[data-n="done"]', prog), "is-bump"); }
         if (last && pctOf(c) > pctOf(last)) replay($("[data-pct]", prog), "is-bump");
         last = c;
-        sumline(L, setName(L) ? "Learning the <b class=\"num\">" + fmt(items.length) + "</b> in " + esc(setName(L)) : "Learning <b class=\"num\">" + fmt(items.length) + "</b> of " + fmt(L.all || items.length) + " questions");
         return c;
       }
       /* the round's track: a step for each question asked (a miss adds one at the end, for its second try) */
       function paintRound(){
         if (!R) { roundEl.hidden = true; return; }
         roundEl.hidden = false;
-        if (!$("[data-steps]", roundEl)) roundEl.innerHTML = '<p class="sm-where"><b>Round ' + R.no + '</b><span class="num" data-at></span><span class="sm-streak" data-streak hidden>' + icon("flame", 16) + '<span class="num"></span></span></p><ol class="sm-steps" data-steps aria-hidden="true"></ol>';
+        if (!$("[data-steps]", roundEl)) roundEl.innerHTML = '<p class="sm-where"><b>Round ' + R.no + '</b><span class="num" data-at></span><span class="sm-streak" data-streak hidden>' + icon("flame", 16) + '<span class="num"></span></span>' +
+          '<button class="sm-auto" type="button" data-sm="auto" aria-pressed="' + autoOn() + '" title="After a right answer, go to the next question by itself"><i aria-hidden="true"></i>Auto-next</button></p><ol class="sm-steps" data-steps aria-hidden="true"></ol>';
+        var au = $("[data-sm=auto]", roundEl);
+        if (au && !au.__w) { au.__w = 1; au.addEventListener("click", function(){ STATE.ui.smAuto = autoOn() ? 0 : 1; saveState(); au.setAttribute("aria-pressed", autoOn()); track("learn:auto=" + (autoOn() ? "on" : "off")); if (!autoOn()) stopAuto(); }); }
         var ol = $("[data-steps]", roundEl);
         while (ol.children.length < R.slots.length) ol.appendChild(h("<li></li>"));
         R.slots.forEach(function(sl, i){ var li = ol.children[i], cls = "is-" + sl.st + (sl.again ? " is-again" : ""); if (li.className !== cls) li.className = cls; });
@@ -256,6 +360,7 @@
         next();
       }
       function next(){
+        clearTimeout(autoT);
         if (!R) return;
         if (!R.queue.length) { roundDone(); return; }
         var i = R.queue.shift(), sl = R.slots[i], q = sl.q;
@@ -264,15 +369,36 @@
         stage.innerHTML = "";
         var el = HX.card(q, { ctx: "learn", noAgain: true, hide: hide, note: sl.again ? "Second try" : second ? (hide ? "Once more to master it: recall it first" : "Once more to master it") : (s === 0 ? "Still learning this one" : ""), onAnswer: answered });
         stage.appendChild(el);
-        var f = $("[data-showch]", el) || $(".ch", el) || $("[data-reveal]", el), asked = R.slots.filter(function(x){ return x.st !== "todo"; }).length;
-        if (f && asked > 1) f.focus({ preventScroll: true });
-        if (asked > 1) el.scrollIntoView({ block: "nearest", behavior: reduced ? "auto" : "smooth" });
+        /* "Don't know?": the answer, with no guess recorded; the question comes back like a miss */
+        if (q.type === "mcq") {
+          var dk = h('<p class="sm-dk" data-dk><button class="btn btn-text" type="button" data-sm="dontknow">Don\u2019t know?</button><span class="note sm-keys">Keys 1 to ' + Math.min(9, q.choices.length) + " pick a choice</span></p>");
+          var res0 = $(".qc-result", el); if (res0) el.insertBefore(dk, res0); else el.appendChild(dk);
+          $("[data-sm=dontknow]", dk).addEventListener("click", function(){ skip(el, q); });
+        }
+        var f = $("[data-showch]", el) || $(".ch", el) || $("[data-reveal]", el);
+        if (f) f.focus({ preventScroll: true });
+        F.body.scrollTop = 0;
+      }
+      function stopAuto(){ clearTimeout(autoT); autoT = 0; var b = $(".sm-next .is-auto", stage); if (b) b.classList.remove("is-auto"); }
+      function skip(el, q){
+        var sl = R.slots[R.cur]; if (!sl || el.classList.contains("is-answered") || el.classList.contains("is-skipped")) return;
+        el.classList.add("is-skipped");
+        var think = $("[data-thinkrow]", el), ul = $(".qc-choices", el); if (think) think.remove(); if (ul) ul.hidden = false;
+        $$(".ch", el).forEach(function(b){ b.disabled = true; if (+b.getAttribute("data-i") === q.answer) { b.classList.add("is-key"); $(".txt", b).insertAdjacentHTML("beforeend", '<span class="sr">, the answer</span>'); } });
+        R.streak = 0;
+        if (!R.slots.some(function(x){ return x.again && x.q.id === q.id; })) { R.slots.push({ q: q, st: "todo", again: true }); R.queue.push(R.slots.length - 1); }
+        sl.st = "miss"; R.log.push({ q: q, right: false, first: !sl.again, done: false });
+        S.q[q.id] = 0; saveState();
+        enqueue([q.id, "learn-0", Date.now(), 0, reqId()]);
+        track("learn:dont-know");
+        paintProg(); paintRound();
+        var res = $(".qc-result", el);
+        if (res) { res.innerHTML = '<p class="verdict part">' + icon("hints", 26) + "Here\u2019s the answer</p>" + P.figAfterHTML(q) + '<p class="qc-ex">' + esc(q.ex || "") + "</p>" +
+          (q.cue ? '<p class="qc-cue">' + icon("hints", 18) + "<span><b>Remember it:</b> " + esc(q.cue) + "</span></p>" : "") + P.whyHTML(q, null, null, true); res.hidden = false; }
+        nextRow(el, q, false, 0);
       }
       /* Next and the praise above a phone's tab bar and clear of the corner buttons (Ask Timmy, the streak chip) */
-      function showRow(row){
-        var r = row.getBoundingClientRect(), tb = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sh-tabbar-h")) || 0, room = innerHeight - tb - 88;
-        if (r.bottom > room && r.top > 120) window.scrollTo({ top: scrollY + Math.min(r.bottom - room, r.top - 120), behavior: reduced ? "auto" : "smooth" });
-      }
+      function showRow(row){ row.scrollIntoView({ block: "nearest", behavior: reduced ? "auto" : "smooth" }); }
       function answered(el, q, right){
         var s = stepOf(q.id), ns, sl = R.slots[R.cur], first = !sl.again;
         if (right) { ns = s === 1 ? 2 : 1; R.right++; R.streak++; R.best = Math.max(R.best, R.streak); }
@@ -282,6 +408,10 @@
         S.q[q.id] = ns; saveState();
         enqueue([q.id, "learn-" + ns, Date.now(), 0, reqId()]);
         paintProg(); paintRound();
+        nextRow(el, q, right, ns);
+      }
+      function nextRow(el, q, right, ns){
+        var dk = $("[data-dk]", el); if (dk) dk.remove();
         var res = $(".qc-result", el), word = PRAISE[(R.right + q.id.length) % PRAISE.length];
         var tag = ns === 2 ? '<span class="sm-tag is-done is-pop">' + burstHTML(10) + icon("check", 16) + "Mastered</span>"
           : right ? '<span class="sm-tag is-right is-pop">' + esc(word) + '</span><span class="note sm-sub">' + (hideable(q) ? "Once more, without the choices, and it's mastered" : "Once more in a later round and it's mastered") + "</span>"
@@ -292,7 +422,13 @@
         if (verdict) verdict.insertAdjacentElement("afterend", row); else (res || el).appendChild(row);
         var b = $("[data-sm=next]", row); b.addEventListener("click", next);
         setTimeout(function(){ if (!b.isConnected) return; b.focus({ preventScroll: true }); showRow(row); }, 0);
-        setTimeout(function(){ if (b.isConnected) showRow(row); }, 500);   // again once the page has settled (a smooth scroll can be cut short)
+        /* a right answer moves on by itself, as on Quizlet, unless you touch the card (to read why) or turned Auto-next off */
+        if (right && autoOn()) {
+          b.classList.add("is-auto");
+          autoT = setTimeout(function(){ if (b.isConnected && b.classList.contains("is-auto")) next(); }, 1700);
+          var stop = function(e){ if (e.type === "keydown" && (e.key === "Enter" || e.key === " ")) return; if (e.target && e.target.closest && e.target.closest("[data-sm=next]")) return; stopAuto(); };
+          ["pointerdown", "keydown", "wheel", "touchmove"].forEach(function(t){ el.addEventListener(t, stop, { passive: true }); });
+        }
       }
       function roundDone(){
         var c = paintProg(), left = c.fresh + c.learning, a = pctOf(R.start), z = pctOf(c), gained = c.done - R.start.done;
@@ -310,15 +446,16 @@
           '<div><b class="num" data-count="' + R.best + '">' + R.best + "</b><span>best streak</span></div>" +
           '<div><b class="num" data-count="' + left + '">' + fmt(left) + "</b><span>left to master</span></div></div>" +
           '<ol class="sm-list">' + list + "</ol>" +
-          '<div class="qc-go"><button class="btn btn-primary" type="button" data-sm="round">Next round</button><button class="btn" type="button" data-sm="break">Take a break</button></div>' +
+          '<div class="qc-go"><button class="btn btn-primary" type="button" data-sm="round">Next round' + icon("chevron", 16) + '</button><button class="btn" type="button" data-sm="break">Take a break</button></div>' +
           '<p class="note sm-saved">Your progress is saved, here and on your other devices.</p></section>';
         countUp(stage);
         if (!reduced) setTimeout(function(){ var f = $('[data-endfill="done"]', stage), g = $('[data-endfill="learning"]', stage); if (!f) return;
           f.style.width = w(c.done); g.style.width = w(c.learning); tween($("[data-endpct]", stage), a, z, "%"); }, 250);
         $$(".sm-list li", stage).forEach(function(li, i){ li.style.setProperty("--i", i); });
         $("[data-sm=round]", stage).addEventListener("click", newRound);
-        $("[data-sm=break]", stage).addEventListener("click", function(){ HX.go("home"); });
+        $("[data-sm=break]", stage).addEventListener("click", function(){ F.close(); });
         $("[data-sm=round]", stage).focus({ preventScroll: true });
+        F.body.scrollTop = 0;
         R = null; roundEl.hidden = true;
       }
       function allDone(){
@@ -330,19 +467,13 @@
           "<p>Each one right twice, the second time " + (items.some(hideable) ? "without the choices when it could be." : "in a later round.") + " Flashcards bring them back before you forget them.</p>" +
           '<div class="qc-go"><button class="btn btn-primary" type="button" data-sm="tocards">' + icon("cards", 18) + 'Flashcards for these</button><button class="btn" type="button" data-sm="reset">' + icon("retry", 18) + "Start over</button></div></section>";
         replay($("[data-bar]", prog), "is-shine");
-        $("[data-sm=tocards]", stage).addEventListener("click", function(){ STATE.ui.qview = "cards"; saveState(); track("bank:view=cards"); HX.drawQuestions(L.el, L.preset); });
-        $("[data-sm=reset]", stage).addEventListener("click", function(){
-          var ids = items.map(function(q){ return q.id; });
-          ids.forEach(function(id){ delete S.q[id]; }); saveState();
-          for (var i = 0; i < ids.length; i += 2000) enqueue(["*", "learn-reset", Date.now(), 0, null, ids.slice(i, i + 2000)]);
-          track("learn:start-over"); paintProg(); newRound();
-        });
+        $("[data-sm=tocards]", stage).addEventListener("click", function(){ F.close(true); STATE.ui.qview = "cards"; saveState(); track("bank:view=cards"); HX.drawQuestions(L.el, L.preset); });
+        $("[data-sm=reset]", stage).addEventListener("click", function(){ resetAll(); paintProg(); newRound(); });
         $("[data-sm=tocards]", stage).focus({ preventScroll: true });
+        F.body.scrollTop = 0;
       }
-      if (!items.length) { host.innerHTML = emptyHTML("Nothing to learn here", "These filters leave no questions. Change them above, or clear them."); return; }
       paintProg(); newRound();
-      /* rows from your other devices: the progress bar follows; the round already started keeps going */
-      pull(function(changed){ if (changed && prog.isConnected) paintProg(); });
+      }
     }
 
     /* ======================= Flashcards ======================= */
@@ -355,13 +486,33 @@
       return { due: due, learning: learning, fresh: fresh, later: later };
     }
     function flashcards(L){
-      var items = inBankOrder(L.items), host = L.host, newLeft = 20, ahead = null, timer = 0, drawn = 0;
-      host.innerHTML = '<div class="sm sm-cards"><ul class="sm-counts" data-smcounts aria-label="This deck"></ul><div class="sm-stage" data-smstage aria-live="polite"></div></div>';
-      var countsEl = $("[data-smcounts]", host), stage = $("[data-smstage]", host);
+      var items = inBankOrder(L.items);
+      function countsHTML(D){ return '<li class="c-due"><b class="num">' + fmt(D.due.length) + "</b><span>Due<span class=\"sm-w\"> now</span></span></li><li class=\"c-learn\"><b class=\"num\">" + fmt(D.learning.length) + "</b><span>Learning</span></li><li class=\"c-new\"><b class=\"num\">" + fmt(D.fresh.length) + "</b><span>New</span></li>"; }
+      function sum(D){ sumline(L, '<b class="num">' + fmt(items.length) + "</b> " + (items.length === 1 ? "card" : "cards") + (setName(L) ? " in " + esc(setName(L)) : "") + ': <b class="num">' + fmt(D.due.length) + "</b> due now"); }
+      /* the launcher, in the bank: what's due, and Study */
+      function drawLaunch(){
+        var D = deckOf(items, Date.now()), n = D.due.length + Math.min(D.fresh.length, 20);
+        sum(D);
+        launch(L, "cards", "Flashcards",
+          '<div class="sm-launch-head"><span class="sm-launch-ic" aria-hidden="true">' + icon("cards", 26) + '</span><div><h2>Flashcards</h2><p class="note">Flip the card, then say how well you knew it. Each one comes back when you\u2019re about to forget it.</p></div></div>' +
+          '<ul class="sm-counts" aria-label="This deck">' + countsHTML(D) + "</ul>" +
+          '<div class="qc-go sm-launch-go"><button class="btn btn-primary sm-start" type="button" data-sm="start">' + (n ? "Study " + fmt(n) + (n === 1 ? " card" : " cards") : "Open the deck") + icon("chevron", 18) + "</button></div>",
+          function(F){ run(F); }, drawLaunch);
+      }
+      if (!items.length) { L.host.innerHTML = emptyHTML("No cards here", "These filters leave no questions. Change them above, or clear them."); return; }
+      drawLaunch();
+      pull(function(changed){ if (changed && L.host.isConnected && !FOCUS) drawLaunch(); });
+
+      function run(F){
+      var newLeft = 20, ahead = null, timer = 0, sess = { n: 0, again: 0, hard: 0, good: 0, easy: 0 };
+      F.top.innerHTML = '<ul class="sm-counts" data-smcounts aria-label="This deck"></ul>';
+      F.col.innerHTML = '<div class="sm-stage" data-smstage aria-live="polite"></div>';
+      var countsEl = $("[data-smcounts]", F.root), stage = $("[data-smstage]", F.root);
+      F.onClose = function(){ clearTimeout(timer); current = null; };
       function paintCounts(D){
         D = D || deckOf(items, Date.now());
-        countsEl.innerHTML = '<li class="c-due"><b class="num">' + fmt(D.due.length) + "</b><span>Due now</span></li><li class=\"c-learn\"><b class=\"num\">" + fmt(D.learning.length) + "</b><span>Learning</span></li><li class=\"c-new\"><b class=\"num\">" + fmt(D.fresh.length) + "</b><span>New</span></li>";
-        sumline(L, '<b class="num">' + fmt(items.length) + "</b> " + (items.length === 1 ? "card" : "cards") + (setName(L) ? " in " + esc(setName(L)) : "") + ': <b class="num">' + fmt(D.due.length) + "</b> due now");
+        countsEl.innerHTML = countsHTML(D);
+        sum(D);
         return D;
       }
       function pick(){
@@ -383,15 +534,23 @@
         var nextAt = soon.length ? C[soon[0].id].d : 0;
         current = null;
         track("cards:caught-up");
-        stage.innerHTML = '<section class="recap sm-caught enter" aria-label="All caught up"><h2>All caught up</h2><p>' +
+        var KEYN = ["again", "hard", "good", "easy"];
+        var sessHTML = !sess.n ? "" : '<div class="sm-sess"><p><b class="num" data-count="' + sess.n + '">' + fmt(sess.n) + "</b> " + (sess.n === 1 ? "card" : "cards") + " this session</p>" +
+          '<div class="sm-sessbar" role="img" aria-label="' + KEYN.map(function(k){ return NAMES[k] + " " + sess[k]; }).join(", ") + '">' + KEYN.map(function(k){ return sess[k] ? '<i class="s-' + k + '" style="flex:' + sess[k] + '"></i>' : ""; }).join("") + "</div>" +
+          '<ul class="sm-sesskey">' + KEYN.map(function(k){ return '<li><i class="s-' + k + '" aria-hidden="true"></i>' + NAMES[k] + ' <b class="num">' + sess[k] + "</b></li>"; }).join("") + "</ul></div>";
+        stage.innerHTML = '<section class="recap sm-caught enter" aria-label="All caught up"><h2>All caught up</h2>' + sessHTML + "<p>" +
           (nextAt ? "The next card is back " + (dayNo(nextAt) === dayNo(Date.now()) ? "at " + clock(nextAt) : dayNo(nextAt) - dayNo(Date.now()) === 1 ? "tomorrow at " + clock(nextAt) : "on " + new Date(nextAt).toLocaleDateString("en-US", { weekday: "long" }) + " at " + clock(nextAt)) + "." : D.fresh.length ? "You've seen today's new cards." : "Nothing here is scheduled yet.") +
           "</p><div class=\"qc-go\">" + (D.fresh.length ? '<button class="btn btn-primary" type="button" data-sm="new">Study new cards <span class="num">(' + fmt(D.fresh.length) + ")</span></button>" : "") +
-          (soon.length ? '<button class="btn' + (D.fresh.length ? "" : " btn-primary") + '" type="button" data-sm="ahead">Study ahead</button>' : "") + "</div>" +
+          (soon.length ? '<button class="btn' + (D.fresh.length ? "" : " btn-primary") + '" type="button" data-sm="ahead">Study ahead</button>' : "") +
+          '<button class="btn' + (D.fresh.length || soon.length ? "" : " btn-primary") + '" type="button" data-sm="done">Done</button></div>' +
           (soon.length ? '<p class="note">Study ahead brings the soonest cards forward. They move on your schedule but earn no XP.</p>' : "") + "</section>";
         var nb = $("[data-sm=new]", stage), ab = $("[data-sm=ahead]", stage);
         if (nb) nb.addEventListener("click", function(){ newLeft = 20; track("cards:new"); next(); });
         if (ab) ab.addEventListener("click", function(){ ahead = soon.slice(0, 10); track("cards:ahead"); next(); });
-        var f = nb || ab; if (f) f.focus({ preventScroll: true });
+        var db = $("[data-sm=done]", stage); db.addEventListener("click", function(){ F.close(); });
+        countUp(stage);
+        var f = nb || ab || db; if (f) f.focus({ preventScroll: true });
+        F.body.scrollTop = 0;
         /* a card back within the half hour (a learning step): it comes up by itself while the deck is open */
         if (nextAt && nextAt - Date.now() < 30 * MIN) timer = setTimeout(function(){ if (stage.isConnected && !current) next(); }, Math.max(1000, nextAt - Date.now() + 500));
       }
@@ -402,7 +561,7 @@
         var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + uid + 'h">' + lecChip(q.lec) + "</span>" + P.likelyTag(q) + '<span class="fc-state">' + esc(state) + '</span></span><span class="qc-tools fc-tools"></span></header>';
         var body = '<div class="fc-front" data-face>' + P.figHTML(q) + P.pboxHTML(q) + P.stemHTML(q) + frontChoices(q, hide) + "</div>";
         el.innerHTML = head + '<div class="fc-turn">' + body + '<div class="fc-back" data-back hidden></div></div>' +
-          '<div class="qc-go fc-flip" data-fliprow><button class="btn btn-primary" type="button" data-sm="flip">Show the answer</button><span class="note fc-key">or press Space</span></div>' +
+          '<div class="qc-go fc-flip" data-fliprow><button class="btn btn-primary" type="button" data-sm="flip">' + icon("retry", 18) + 'Flip the card</button><span class="note fc-key">Space flips it. Then 1 to 4 rate it, or \u2190 Again and \u2192 Good.</span><span class="note fc-tap">Tap the card to flip it. Then swipe left for Again, right for Good.</span></div>' +
           '<div class="fc-rate" data-raterow hidden role="group" aria-label="How well did you know it?"><p class="fc-rate-q">How well did you know it?</p><div class="fc-rate-btns">' +
           KEYS.map(function(r, i){ return '<button class="btn fc-r r-' + r + '" type="button" data-sm="' + r + '"><b>' + NAMES[r] + '</b><small class="num">' + esc(inWords(sched(c, r, now).d, now)) + '</small><kbd class="fc-key" aria-hidden="true">' + (i + 1) + "</kbd></button>"; }).join("") + "</div></div>";
         tools(el, q);
@@ -423,8 +582,39 @@
           if (e.target.closest("[data-face]")) flip();
         });
         var fb = $("[data-sm=flip]", el); if (fb) fb.focus({ preventScroll: true });
-        /* the next card where you were rating the last one: its top in view (the first stays below the panel) */
-        if (drawn++) el.scrollIntoView({ block: "nearest", behavior: reduced ? "auto" : "smooth" });
+        F.body.scrollTop = 0;
+        swipe(el);
+      }
+      /* a turned-over card follows a finger: past a third of the way left it's Again, right it's Good (as on Quizlet) */
+      function swipe(el){
+        var x0 = 0, y0 = 0, on = false, drag = false, id = null;
+        var lab = h('<span class="fc-swipe" aria-hidden="true"></span>'); el.appendChild(lab);
+        function end(commit){
+          if (!on) return; on = false;
+          var dx = drag ? parseFloat(el.getAttribute("data-dx")) || 0 : 0, far = Math.abs(dx) > Math.min(110, el.offsetWidth / 3);
+          el.removeAttribute("data-dx"); el.classList.remove("is-drag", "to-good", "to-again");
+          if (commit && drag && far && current && current.el === el && current.flipped) {
+            var r = dx > 0 ? "good" : "again";
+            if (!reduced) { el.style.transition = "transform 180ms ease-in, opacity 180ms ease-in"; el.style.transform = "translateX(" + (dx > 0 ? 120 : -120) + "%) rotate(" + (dx > 0 ? 8 : -8) + "deg)"; el.style.opacity = "0"; }
+            track("cards:swipe"); rate(r, $('[data-sm="' + r + '"]', el));
+          } else { el.style.transition = reduced ? "" : "transform 180ms var(--ease-out)"; el.style.transform = ""; }
+          drag = false;
+        }
+        el.addEventListener("pointerdown", function(e){
+          if (e.pointerType !== "touch" || !current || current.el !== el || !current.flipped || e.target.closest("button, a, summary, input, label")) return;
+          on = true; drag = false; id = e.pointerId; x0 = e.clientX; y0 = e.clientY; el.style.transition = "";
+        });
+        el.addEventListener("pointermove", function(e){
+          if (!on || e.pointerId !== id) return;
+          var dx = e.clientX - x0, dy = e.clientY - y0;
+          if (!drag) { if (Math.abs(dx) < 14 || Math.abs(dx) < Math.abs(dy) * 1.5) { if (Math.abs(dy) > 24) on = false; return; } drag = true; el.classList.add("is-drag"); }
+          el.setAttribute("data-dx", dx);
+          el.style.transform = "translateX(" + dx + "px) rotate(" + (dx / 40) + "deg)";
+          el.classList.toggle("to-good", dx > 40); el.classList.toggle("to-again", dx < -40);
+          lab.textContent = dx > 0 ? "Good" : "Again";
+        });
+        el.addEventListener("pointerup", function(e){ if (e.pointerId === id) end(true); });
+        el.addEventListener("pointercancel", function(e){ if (e.pointerId === id) end(false); });
       }
       function frontChoices(q, hide){
         var idx = (q.choices || []).map(function(x, i){ return i; });
@@ -469,8 +659,10 @@
         var show = function(){
           var ul = $(".fc-choices", el), sc = $("[data-sm=choices]", el);
           if (sc) sc.remove();
-          if (ul && (q.type === "mcq" || q.type === "multi")) {
-            ul.hidden = false; ul.classList.add("is-answered");
+          /* choices you never opened stay folded: the answer alone is the back of the card */
+          if (ul && ul.hidden) ul.remove();
+          else if (ul && (q.type === "mcq" || q.type === "multi")) {
+            ul.classList.add("is-answered");
             $$("li", ul).forEach(function(li){ var i = +li.getAttribute("data-i"), key = q.type === "multi" ? q.correct.indexOf(i) > -1 : i === q.answer; if (key) { li.classList.add("is-key"); li.insertAdjacentHTML("afterbegin", icon("check", 18)); li.insertAdjacentHTML("beforeend", '<span class="sr"> (right)</span>'); } });
           } else if (ul) ul.classList.add("is-answered");
           var back = $("[data-back]", el);
@@ -497,6 +689,7 @@
         current = null;
         var q = cur.q, C = cards(), now = Date.now(), c0 = C[q.id], pays = !cur.ahead && (!c0 || c0.d <= now), req = reqId();
         if (!c0) newLeft--;
+        sess.n++; sess[r]++;
         C[q.id] = sched(c0, r, now);
         var rec = HX.recordCard(q.id, r, pays, req);
         enqueue([q.id, r, now, cur.ahead ? 1 : 0, req]);
@@ -504,12 +697,11 @@
         $$(".fc-r", cur.el).forEach(function(b){ b.disabled = true; b.classList.toggle("is-picked", b === from); });
         setTimeout(function(){ if (stage.isConnected) next(); }, reduced ? 0 : 280);
       }
-      if (!items.length) { host.innerHTML = emptyHTML("No cards here", "These filters leave no questions. Change them above, or clear them."); return; }
       next();
-      pull(function(changed){ if (!changed || !stage.isConnected) return; paintCounts(); if (!current) next(); });
+      }
     }
 
-    /* the keys on a laptop: Space (or Enter on the card) turns it over, 1 to 4 rate it */
+    /* the keys on a laptop: Space turns it over, 1 to 4 rate it, and the arrows are Again (left) and Good (right) */
     document.addEventListener("keydown", function(e){
       var cur = current;
       if (!cur || !cur.el.isConnected || e.altKey || e.ctrlKey || e.metaKey) return;
@@ -518,8 +710,9 @@
       if (!cur.flipped && (e.key === " " || e.key === "Spacebar")) {
         if (t && t.closest && t.closest("button, a, summary") && !t.closest("[data-sm=flip]")) return;
         e.preventDefault(); var fb = $("[data-sm=flip]", cur.el); if (fb) fb.click();
-      } else if (cur.flipped && /^[1-4]$/.test(e.key)) {
-        e.preventDefault(); var b = $('[data-sm="' + KEYS[+e.key - 1] + '"]', cur.el); if (b && !b.disabled) b.click();
+      } else if (cur.flipped && (/^[1-4]$/.test(e.key) || e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+        var r = e.key === "ArrowLeft" ? "again" : e.key === "ArrowRight" ? "good" : KEYS[+e.key - 1];
+        e.preventDefault(); var b = $('[data-sm="' + r + '"]', cur.el); if (b && !b.disabled) b.click();
       }
     });
     /* rows waiting from an earlier visit go out now */

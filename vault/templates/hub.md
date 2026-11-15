@@ -7,7 +7,7 @@ status: live
 
 # {{title}}
 
-What it covers, which course and professors. Exams, dates and check-in hours: its `HUBS` entry in `index.html`.
+What it covers, which course and professors. Exams, dates and check-in hours: its entry in `hubs.js`.
 
 ## Before you work on it
 

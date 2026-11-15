@@ -1,5 +1,5 @@
 // Shared pieces for the Occlusion anima figures: the kit's frame and CSS, mapped onto the hub's palette.
-// Built offline (node tools/figures/occlusion/build.mjs) and pasted into hubs/occlusion/index.html; nothing here loads at runtime.
+// Built offline (node tools/figures/occlusion/build.mjs) and built into hubs/occlusion/content/figures.js and figures.css; nothing here loads at runtime.
 import { ISO_CSS, figureSvg, plateHtml } from "../../../../.claude/skills/anima/kit/iso-kit.mjs";
 
 export { figureSvg, plateHtml };

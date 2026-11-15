@@ -532,6 +532,9 @@ These hold for each spec; a spec only adds to them.
     `node tools/bundle/client/wire-check.mjs` (by hand, read-only, both clients against the project: 10 of 10 the
     same). Bugs: BUG-127, BUG-128, BUG-129.
   **Next: session 10, the release** ([the release](2026-11-06-redesign-release.md)).
+- 2026-11-13 (Claude Code): every session in "From here to the release" is merged, and the switch PR is built and waiting for
+  Sam's "merge" ([the release](2026-11-06-redesign-release.md), "The merge, step by step"). What this phase left for it is
+  ticked there or in [the inbox](inbox.md).
 
 ## Outcome
 

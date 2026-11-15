@@ -1,11 +1,13 @@
-// Pastes the Periodontology hub's anima figures into hubs/perio/index.html between its markers.
-//   node tools/figures/perio/build.mjs            rebuild the hub's anima blocks from the files here
-//   node tools/figures/perio/build.mjs --check    exit 1 if the hub's blocks are out of date
+// Builds the Periodontology hub's anima figures into its content: hubs/perio/content/figures.js (between its anima:js
+// markers; the rest of that file is the engine's wrapper and the suture pictures, edited there) and
+// hubs/perio/content/figures.css (all of it).
+//   node tools/figures/perio/build.mjs            rebuild them from the files here
+//   node tools/figures/perio/build.mjs --check    exit 1 if they are out of date
 //   node tools/figures/perio/build.mjs --preview  also write standalone pages to dist/ for anima's checks
 // --check also runs node tools/ci/cases.js, so every drawn Patient Box case (PCASES; the kit is widget/cases.js)
 // stays realistic and agrees with its own numbers.
-// Each figure is one module here (static SVG + a live function sharing one model); edit them, never the generated
-// blocks in the hub. Standing rules: CLAUDE.md -> "Diagrams (the anima skill)".
+// Each figure is one module here (static SVG + a live function sharing one model); edit them, never the built
+// blocks in the hub's content. Standing rules: CLAUDE.md -> "Diagrams (the anima skill)".
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { baseCss } from "./shared.mjs";
 import { FIGURES } from "./index.mjs";
@@ -13,10 +15,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const HUB = join(HERE, "../../../hubs/perio/index.html");
+const JS = join(HERE, "../../../hubs/perio/content/figures.js"), CSS = join(HERE, "../../../hubs/perio/content/figures.css");
 const read = (f) => readFileSync(join(HERE, f), "utf8").trimEnd() + "\n";
 const AJB = "/* anima:js begin (built from tools/figures/perio; edit there) */\n", AJE = "/* anima:js end */\n";
-const ACB = "/* anima:css begin */\n", ACE = "/* anima:css end */\n";
+/* the stylesheet is built whole. No label under 11px on the engine (the taste skill's floor); the last two rules are
+   the suture pictures': labels that give a picture's answer away hide while it sits above its question (.sd-hint). */
+const CSS_HEAD = "/* Built by tools/figures/perio/build.mjs from the anima figures in tools/figures/perio/. Do not edit: change those and rebuild. */\n";
+const CSS_TAIL = "\nhtml.shx .qfig:not(.qfig-after) .sd-hint{display:none}\nhtml.shx .fig-card svg{display:block;width:100%;height:auto}\n";
+const floor = (css) => css.replace(/font-size:\s*(?:9|9\.5|10|10\.5)px/g, "font-size:11px");
 
 /* the anima figures: static SVG + a live function per figure; helpers are declared inside the figure's data scope so
    the live code and the build share one model */
@@ -50,28 +56,27 @@ function between(src, b, e, body){
   if (i < 0 || j < i) throw new Error("markers not found: " + b.trim());
   return src.slice(0, i) + b + body + src.slice(j);
 }
-const hub = readFileSync(HUB, "utf8");
-let out = between(hub, AJB, AJE, animaJs());
-out = between(out, ACB, ACE, animaCss());
+const js = readFileSync(JS, "utf8"), css = readFileSync(CSS, "utf8");
+const out = between(js, AJB, AJE, animaJs());
+const outCss = CSS_HEAD + floor("\n" + animaCss() + CSS_TAIL);
 if (process.argv.includes("--check")) {
-  if (out !== hub) { console.error("hubs/perio/index.html: the anima blocks are stale; run node tools/figures/perio/build.mjs"); process.exit(1); }
-  console.log("perio anima blocks are up to date");
+  if (out !== js || outCss !== css) { console.error("hubs/perio/content/figures." + (out !== js ? "js" : "css") + " is stale; run node tools/figures/perio/build.mjs"); process.exit(1); }
+  console.log("perio's figures are up to date");
   const { spawnSync } = await import("node:child_process");
   if (spawnSync(process.execPath, [join(HERE, "../../ci/cases.js")], { stdio: "inherit" }).status) process.exit(1);
 } else {
-  writeFileSync(HUB, out);
-  console.log("wrote", HUB, "(anima: " + FIGURES.map((f) => f.id).join(", ") + ")");
+  writeFileSync(JS, out); writeFileSync(CSS, outCss);
+  console.log("wrote", JS, "and figures.css (anima: " + FIGURES.map((f) => f.id).join(", ") + ")");
   const { spawnSync } = await import("node:child_process");
   spawnSync(process.execPath, [join(HERE, "../../ci/cases.js")], { stdio: "inherit" });
 }
 if (process.argv.includes("--preview")) {
-  // standalone pages with the hub's tokens, for anima's capture and line checks
-  const tokens = hub.slice(hub.indexOf(":root{"), hub.indexOf("html,body{") > 0 ? hub.indexOf("html,body{") : hub.indexOf(":root{") + 4000);
+  // standalone pages on the engine's stylesheet (widget/site.bundle.css), for anima's capture and line checks
   mkdirSync(join(HERE, "dist"), { recursive: true });
   for (const theme of ["light", "dark"]) for (const f of FIGURES) {
-    const page = `<!doctype html><html lang="en" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${f.title}</title><style>${tokens}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,sans-serif}main{max-width:760px;margin:24px auto;padding:0 16px}
-${animaCss()}</style></head><body><main id="figs"></main><script>${animaJs()}
+    const page = `<!doctype html><html lang="en" class="shx" data-hx-hub="perio" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${f.title}</title><link rel="stylesheet" href="../../../../widget/site.bundle.css"><style>
+main{max-width:760px;margin:24px auto;padding:0 16px}
+${outCss}</style></head><body><main id="figs"></main><script>${animaJs()}
 document.getElementById("figs").innerHTML = ANIMA.html(${JSON.stringify(f.id)}); ANIMA.mount(document);
 </script></body></html>`;
     writeFileSync(join(HERE, "dist", `${f.id}-${theme}.html`), page);

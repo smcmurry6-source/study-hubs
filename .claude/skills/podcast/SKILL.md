@@ -10,7 +10,7 @@ Read first: `vault/rules/graded-coursework.md` (it applies to scripts too), `vau
 works and how to write for Kokoro), `tools/podcast/LORE.md` (the canon), and the most recent `tools/podcast/*/script.md`
 as the model for voice and pacing. Every rule in `vault/rules/` applies (`CLAUDE.md` loads the rest); where this skill and
 the vault disagree, the vault wins: follow it and fix this file. The argument, if any, names the hub (`/podcast heme-endo-exam1`); otherwise take the
-live hub with the next exam from `HUBS` in `index.html`, and say which.
+live hub with the next exam from `hubs.js`, and say which.
 
 ## 0. Set up and ask
 
@@ -28,13 +28,12 @@ live hub with the next exam from `HUBS` in `index.html`, and say which.
 ## 1. Gather the material
 
 ```bash
-node tools/podcast/extract_hub.js hubs/<hub>/index.html <scratch>/src
+node tools/podcast/extract_hub.js <hub> <scratch>/src
 ```
 
 That writes each lecture's As taught notes (with its exam count), `exam.txt` (`EXAM_INFO`, counts, course dates),
 `hints.txt` (the professors' quotes, emphasize and deemphasize), `cram.txt` and `likely.txt`. Read all of it. Also read
-the hub's in-class review items if it has them (`grep -n 'mcq("rv-' hubs/<hub>/index.html` or its `src:'review'`
-questions) and `LESSONS.md`'s live signals for the hub (what the class misses).
+the hub's in-class review items if it has them (its `"src":"review"` questions in `hubs/<hub>/content/questions.json`) and `LESSONS.md`'s live signals for the hub (what the class misses).
 
 Never use graded quiz, take-home or exam content, or anything still open (Canvas quizzes): same rule as the hub.
 
@@ -95,37 +94,33 @@ result: `ffprobe` duration under the limit Sam gave, `<mp3>.json` chapters in or
 
 ## 5. Wire it in
 
-- **Hub**: `window.SH_PODCAST = { id, show:'Timmy Time', title, src:'audio/timmy-time.mp3', duration, blurb, chapters, fans }`
-  right before `window.SH_EXPORT = {` (copy `duration` and `chapters` from the json; chapter titles are the `##` titles
-  without numbers). `fans` is the episode's lore comments (`vault/rules/podcast-reactions.md`): roll 1-3 at random, write
-  each in character about this episode, from `LORE.md`'s characters (or a new one added there). The widget draws them
-  above the class's comments, with the like and dislike buttons. A `<div data-sh-podcast></div>` slot where students will see it: on **Home** in hubs that have it
-  (under the quick-start row), else at the top of Compendium. `#timmy` must open that mode (boot: `if(location.hash ===
-  '#timmy') m = '<mode>'`). In Home's "Also here" list, a `data-sh-podcast-open` link. `widget/podcast.js` does the
-  rest (player, dock, menu item, resume, tracking).
-- **Dashboard** (`index.html` `HUBS` entry): `podcast:{ name:"Timmy Time", sub:"The last-minute review, NN min" }`
-  and "Timmy Time" in `modes`.
+- **Hub** (on the engine): `"podcast": { id, show: "Timmy Time", title, src: "audio/timmy-time.mp3", duration, blurb,
+  chapters, fans }` in `hubs/<hub-id>/content/core.json` (copy `duration` and `chapters` from the json; chapter titles are
+  the `##` titles without numbers), then `node tools/hub-next/build.mjs --hub <hub-id>`. `fans` is the episode's lore
+  comments (`vault/rules/podcast-reactions.md`): roll 1-3 at random, write each in character about this episode, from
+  `LORE.md`'s characters (or a new one added there). The engine draws the rest itself: the animated Timmy Time card among
+  Home's quick links, the big tile in More (`#more/timmy`) and the player with its likes, dislikes and comments
+  (`widget/podcast.js`); the lore comments sit above the class's.
+- **Dashboard** (`hubs.js`, the hub's entry): `"podcast": { "name": "Timmy Time", "sub": "The last-minute review, NN min" }`.
 - **About page** (`about/index.html`, the Timmy Time entry): where the card sits and the episode list with lengths.
 - **`tools/podcast/LORE.md`**: the new tidbits and a row in "Episodes so far". **`DEPLOY_NOTES.md`**: a "Recent major
   changes" line (what, length, sources, lexicon words added, where the card is).
 - **The hub's note** (`vault/hubs/<hub-id>.md`): that it has an episode, where its script is
   (`tools/podcast/<hub-id>/script.md`), and that a notes change means fixing the script and rebuilding the episode.
 - If the hub has narration, nothing else changes; the podcast is separate from Listen.
-- **A hub with a new version** (`hubs/<hub-id>/next/`, the redesign on `widget/hub.js`): after wiring the live hub, run
-  `node tools/hub-next/build.mjs --hub <hub-id>` and commit its `next/content/`, so the new version carries the same
-  `SH_PODCAST` (`fans` included). The engine draws the rest itself: the animated Timmy Time card among Home's quick starts,
-  the big tile in More and the player with its likes, dislikes and comments (`widget/podcast.js`). CI's "generated files
-  are current" step fails if you skip it.
+- **After the merge, tell the server about the episode** so listening earns XP (10 a minute, +100 for finishing;
+  `vault/reference/game-server.md`): `select admin_set_podcast_episode('<admin secret>', '<hub-id>', '<episode id>', <seconds>);`
+  through the Supabase connector, the secret put in by hand (`vault/rules/secrets.md`). Until then the episode plays but pays nothing.
 
 ## 6. Verify
 
 - `node tools/ci/syntax.js`, `node tools/ci/vault.js` and the smoke test (`node tools/ci/smoke.js`, Playwright
   preinstalled: set `PLAYWRIGHT_PATH` to the global module) all pass.
-- In Playwright on `file://.../hubs/<hub>/index.html#timmy`: the hub opens on the slot's mode, the episode card shows
-  the title, length and chapters, the "Timmy Time" link scrolls to it, and pressing play loads the mp3 (check
-  `audio.duration`). Screenshot it at 390 px and desktop for the PR.
+- In a scripted browser with the class's data stubbed (the way `tools/ci/smoke.js` does it), on
+  `hubs/<hub>/#more/timmy`: the episode card shows the title, length and chapters, and pressing play loads the mp3
+  (check `audio.duration`). Screenshot it at 390 px and desktop for the PR.
 - Grep that the old episode list on the About page and the dashboard `sub` text match the real length.
-- A hub with a new version: in the preview (`node tools/preview/serve.js`), `hubs/<hub-id>/next/#more/timmy` shows the
+- In the preview (`node tools/preview/serve.js`), `hubs/<hub-id>/#more/timmy` shows the
   card with its chapters, likes, dislikes and the lore comments, and Home shows the Timmy Time quick start.
 
 ## 7. Ship

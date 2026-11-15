@@ -671,12 +671,11 @@
     var hp = A.timmy.hp.map(function(t){ var c = t.conditions.filter(function(x){ return x !== "zero" || t.hp === 0; }); var last = c.length ? condName[c[c.length - 1]] : "Healthy";
       return '<figure><span class="t">' + img(t.svg, "Timmy at " + t.hp + " HP") + '</span><b class="num">' + t.hp + " HP</b><span>" + esc(last) + "</span></figure>"; }).join("");
     var moods = A.timmy.moods.map(function(t){ return '<figure><span class="t">' + img(t.svg, "Timmy, " + moodName[t.k]) + "</span><b>" + moodName[t.k] + "</b><span>Mood</span></figure>"; }).join("");
-    var outfits = A.timmy.outfits.map(function(t){ return '<figure><span class="t">' + img(t.svg, "Timmy in an outfit") + "</span><b>" + (t.k === "winter" ? "Christmas" : t.k.charAt(0).toUpperCase() + t.k.slice(1)) + "</b><span>Outfit</span></figure>"; }).join("");
     var houses = A.houses.map(function(x){ return '<figure><div class="scene">' + img(x.svg, "Timmy's house at " + x.k) + '<span class="spot">' + img(x.timmy, "") + "</span></div><figcaption><b>" + esc(x.k) + "</b><span>" + esc(x.note) + "</span></figcaption></figure>"; }).join("");
     $("#timmyGrid").innerHTML =
       '<div class="panel s12"><h3>As his HP drops</h3><p>What shows at each level, worst last.</p><div class="panel-body timmys">' + hp + "</div></div>" +
-      '<div class="panel s12"><h3>Moods and holiday outfits</h3><p>The moods his reactions use, and three of the outfits he wears around a holiday.</p><div class="panel-body timmys" style="grid-template-columns:repeat(auto-fill,minmax(104px,1fr))">' + moods + outfits + "</div></div>" +
-      '<div class="panel s12"><h3>His house</h3><p>It grows with your rank: a fence, a mailbox, gold trim, a night sky, and a pennant for every hub you master.</p><div class="panel-body houses">' + houses + "</div></div>";
+      '<div class="panel s12"><h3>Moods</h3><p>The moods his reactions use. He wears only what you put on him at his place (the shop\'s outfits, below).</p><div class="panel-body timmys" style="grid-template-columns:repeat(auto-fill,minmax(104px,1fr))">' + moods + "</div></div>" +
+      '<div class="panel s12"><h3>His old house</h3><p>The house card from before the redesign (it grew with your rank). His place, below, took its spot; the dashboard still draws this under the place until the place has loaded.</p><div class="panel-body houses">' + houses + "</div></div>";
   }
 
   /* ---------- Timmy's place (redesign phase 4, part C): place.js, built from tools/figures/site/place.mjs ----------

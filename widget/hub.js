@@ -1,19 +1,21 @@
-/* ============ THE HUB ENGINE (widget/hub.js + widget/hub.css): the redesign, phase 1 ============
-   One engine for every redesigned hub. Only the new versions load it (hubs/<id>/next/): nothing links to them, and
-   outside a preview their page sends the visitor to the live hub. The live hubs keep widget/v3.js and their own code
-   until the redesign is released all at once (vault/tasks/2026-11-06-redesign-release.md).
+/* ============ THE HUB ENGINE (widget/hub.js + widget/hub.css) ============
+   One engine for every hub built since the redesign (live since its release, vault/tasks/2026-11-06-redesign-release.md).
+   The older hubs keep their single-file pages, widget/v3.js and their own code.
 
    A hub's page is configuration (window.SH_HUB), its art (widget/hub-art/<hub>.js: tint, emblem, masthead, built by
-   tools/figures/site/build.mjs) and its content, in files next to it (content/), written from the live hub by
-   tools/hub-next/build.mjs (CI's --check fails when they're stale):
+   tools/figures/site/build.mjs) and its content, in files next to it (content/). The JSON is where the content is edited;
+   tools/hub-next/build.mjs rebuilds the parts worked out from it (High yield, the question index), and CI's --check
+   fails when they're stale:
      core.json       lectures, exams, dates, likely topics, the mock's blueprint, the podcast, the question index
      questions.json  the bank;  notes.json  the notes at both levels and High yield;  study.json  hints, cram, review charts
      figures.js/css  the drawn figures and case pictures;  arcade.js/css  the arcade's games and its skin
    Only core.json comes before the first screen; the rest loads in the background or when a view needs it.
 
    It keeps everything progress is keyed on: the hub id, the question ids, the hub's own state key (the same shape as
-   the live hub's STATE) and its answered event (the same detail as the live recordAnswer), so everyone's answers, XP,
-   ranks, pins, spaced review and question health carry over at the release. Then it loads widget/v3.js like any hub.
+   the old single-file hubs' STATE) and its answered event (the same detail as their recordAnswer), so everyone's
+   answers, XP, ranks, pins, spaced review and question health carried over at the release. Then it loads widget/v3.js
+   like any hub. (In the comments below, "the live hub" is a hub's old single-file page, which the engine was built
+   beside and matches.)
 
    The engine is four files, in this order, this one last. A hub's page loads them as one, widget/hub.bundle.js (built
    by tools/bundle/build.mjs with the icons, widget/hub-art.js, in front; run the build after changing any of them):
@@ -31,7 +33,7 @@
   if (window.shHub) return;
   var C = window.SH_HUB || {}, A = window.SH_HUB_ART || { icons: {}, flame: {} }, AH = window.SH_HUB_ART_HUB || {};
   var HUB = C.hub || "hub", EVT = C.answeredEvent || (HUB + ":answered"), BASE = C.content || "content/";
-  var WIDGET = C.widget || "../../../widget/", ASSETS = C.assets || "../";
+  var WIDGET = C.widget || "../../widget/", ASSETS = C.assets || "./";
   var docEl = document.documentElement;
   var reduced = false; try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
   docEl.classList.add("shx");
@@ -184,6 +186,7 @@
   document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") saveNow(); });
 
   /* ---------- the content ---------- */
+  var AUDIO_OFF = false;   // core.json's "audio": "off" (setCore)
   var CORE = null, QS = null, QBY = {}, QBL = {}, LECS = [], LBY = {}, IDX = [], NOTES = null, STUDY = null, FIG = null, ARC = null;
   var EXAM = null, EXAM_LECS = {}, REVIEW = {};
   var memo = {};
@@ -224,6 +227,11 @@
   function isReview(id){ return !!REVIEW[id]; }
   function hasReview(){ return Object.keys(REVIEW).length > 0; }
   function setCore(c){
+    /* an archived hub whose narration and Timmy Time came off the site (core.json's "audio": "off";
+       vault/rules/archived-hubs-drop-their-audio.md): no Timmy Time on Home or in More, Listen reads in the device's
+       voice, nothing asks for an mp3 or a words file, and the shared widget is told the same (startWidget) */
+    AUDIO_OFF = c.audio === "off";
+    if (AUDIO_OFF && c.podcast) { c = Object.assign({}, c); delete c.podcast; }
     CORE = c; LECS = c.lectures || []; LECS.forEach(function(l){ LBY[l.id] = l; QBL[l.id] = []; });
     IDX = (c.index || []).map(function(r){ return { id: r[0], lec: r[1], likely: !!r[2], src: r[3] || "" }; });
     IDX.forEach(function(r){ (QBL[r.lec] = QBL[r.lec] || []).push(r); });
@@ -264,7 +272,7 @@
     shell.innerHTML =
       '<a class="hx-skip" href="#main">Skip to the page</a>' +
       '<header class="hx-bar" id="hxBar">' +
-        '<a id="sh-ribbon-back" class="hx-back" href="' + esc(C.back || "../../../index.html") + '" aria-label="All hubs"></a>' +
+        '<a id="sh-ribbon-back" class="hx-back" href="' + esc(C.back || "../../") + '" aria-label="All hubs"></a>' +
         '<a class="hx-name" href="#home">' + emblem("hx-emb") + "<span>" + name + "</span></a>" +
         '<nav class="hx-tabs" id="modeSwitch" aria-label="' + name + '">' + VIEWS.map(function(v){
           return '<a class="hx-tab" href="#' + v[0] + '" data-mode="' + v[0] + '">' + icon(v[0], 22) + "<span>" + v[1] + "</span></a>"; }).join("") + "</nav>" +
@@ -277,7 +285,7 @@
         '<button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button>" +
         '<a class="hx-set" href="#more/settings" aria-label="Settings">' + icon("settings", 22) + '<span class="lbl">Settings</span></a>' +
       "</header>" +
-      '<div class="hx-strip" id="hxStrip" aria-label="Today"><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="hx-meter hx-live" data-livem></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
+      '<div class="hx-strip" id="hxStrip" aria-label="Today"><a class="hx-home" href="' + esc(C.back || "../../") + '" aria-label="All hubs: back to the dashboard"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M13 8H3"/><path d="M7 4 3 8l4 4"/></svg><span>Hubs</span></a><span class="hx-meter" data-streakm></span><span class="hx-meter" data-goalm></span><span class="hx-meter hx-live" data-livem></span><span class="hx-meter" id="hxXp" data-xpm></span><button class="hx-search" type="button" data-search-open aria-label="Search this hub">' + icon("search", 20) + "</button></div>" +
       '<main class="hx-main" id="main" tabindex="-1">' + VIEWS.map(function(v){ return '<section class="hx-view" data-view="' + v[0] + '" data-mode-panel="' + v[0] + '" hidden></section>'; }).join("") + "</main>" +
       '<div class="hx-toasts" id="hxToast" aria-live="polite"></div>';
     document.body.appendChild(shell);
@@ -318,6 +326,7 @@
     if (window.shTTS && view === "notes" && (v !== "notes" || s !== sub)) { try { window.shTTS.stop(); } catch (e) {} }
     if (view === "questions" && v !== "questions") leaving = HX.recapDue();
     if (view === "more" && sub === "arcade" && ARC && (v !== "more" || s !== "arcade")) { try { ARC.arcade.stopAll(); } catch (e) {} }
+    var was = view, wasSub = sub;
     view = v; sub = s;
     var setOn = v === "more" && s === "settings", gear = $(".hx-set");
     if (gear) { if (setOn) gear.setAttribute("aria-current", "page"); else gear.removeAttribute("aria-current"); }
@@ -328,6 +337,16 @@
     STATE.ui.mode = v; saveState();
     try { ({ home: renderHome, notes: renderNotes, questions: HX.renderQuestions, more: renderMore })[v](el, s); } catch (e) { el.innerHTML = '<div class="hx-page"><h1>Something went wrong</h1><p class="note">' + esc(e.message) + "</p></div>"; if (window.console) console.error(e); }
     if (leaving) { HX.showLeftRecap(el, leaving); leaving = null; }
+    /* the page slides in from the side its tab is on (a new page of the same view just rises); hub.css, .is-entering */
+    /* on the view itself, not the page inside it: Notes and Questions draw their page again once their content is in */
+    var pg = el;
+    if (pg && was && (was !== v || wasSub !== s)) {
+      var order = VIEWS.map(function(x){ return x[0]; }), d = order.indexOf(v) - order.indexOf(was);
+      pg.classList.remove("is-entering"); void pg.offsetWidth;
+      pg.style.setProperty("--from", was === v ? "0px" : (d > 0 ? "22px" : "-22px"));
+      pg.classList.add("is-entering");
+      if (!pg._hxEnter) { pg._hxEnter = 1; pg.addEventListener("animationend", function(e){ if (e.target === pg) pg.classList.remove("is-entering"); }); }
+    }
   }
   function go(hash, keep){
     if (("#" + hash) === location.hash) { route(); }
@@ -513,7 +532,7 @@
     /* High yield's narration (<lecture>-hy.mp3) is offered only where notes.json's hyAudio lists the lecture: the build lists
        it while the recording was spoken from today's High yield (tools/hub-next/build.mjs, hyRecorded). Anywhere else
        Listen reads it in the device's voice, which can't drift from the text. */
-    var mp3 = !hy ? ASSETS + "audio/" + lec.id + "-" + level + ".mp3" : (NOTES.hyAudio || []).indexOf(lec.id) >= 0 ? ASSETS + "audio/" + lec.id + "-hy.mp3" : "";
+    var mp3 = AUDIO_OFF ? "" : !hy ? ASSETS + "audio/" + lec.id + "-" + level + ".mp3" : (NOTES.hyAudio || []).indexOf(lec.id) >= 0 ? ASSETS + "audio/" + lec.id + "-hy.mp3" : "";
     var list = lecListHTML(lec);
     var sub = String(lec.title).split(":").slice(1).join(":").trim();
     var group = (STUDY.review || []).filter(function(g){ return g.lec === lec.id; })[0];
@@ -879,15 +898,15 @@
         '<span class="mt-meta num">' + esc(moreMeta(m[0])) + "</span></span>" + icon("chevron", 20) + "</a></li>";
     };
     el.innerHTML = '<div class="hx-page more"><h1>More</h1><p class="more-lede">Everything past the notes and the questions: the review, the games, your stats and your settings.</p>' +
-      '<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "place" || HX.hasTimmy()) && (m[0] !== "shop" || HX.hasShop()); }).map(tile).join("") + "</ul></nav>" +
+      '<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "shop" || HX.hasShop()); }).map(tile).join("") + "</ul></nav>" +
       '<section class="panel menu talk" aria-labelledby="mwH"><h2 id="mwH">Talk to us</h2><ul class="rows">' +
         MORE_ROWS.map(function(m){ return '<li><a href="#more/' + m[0] + '">' + icon(m[1], 22) + "<span><b>" + esc(m[2]) + "</b><small>" + esc(m[3]) + "</small></span>" + icon("chevron", 18) + "</a></li>"; }).join("") +
         '<li><button type="button" data-sh-inbox>' + icon("inbox", 22) + "<span><b>Inbox</b><small>Replies to what you report or suggest, and notices to the class</small></span>" + icon("chevron", 18) + "</button></li>" +
         '<li><button type="button" data-open="suggest">' + icon("comment", 22) + "<span><b>Suggest something</b><small>An idea for this hub or the site</small></span>" + icon("chevron", 18) + "</button></li>" +
         '<li><button type="button" data-open="flag">' + icon("report", 22) + "<span><b>Report an issue</b><small>A typo, a wrong key, something broken</small></span>" + icon("chevron", 18) + "</button></li>" +
         '<li><button type="button" data-tour>' + icon("tour", 22) + "<span><b>Take the tour</b><small>Two minutes, on the real buttons</small></span>" + icon("chevron", 18) + "</button></li>" +
-        '<li><a href="' + esc(C.about || "../../../about/") + '">' + icon("about", 22) + "<span><b>About</b><small>Every feature, trophy and easter egg</small></span>" + icon("chevron", 18) + "</a></li>" +
-        '<li><a href="' + esc(C.back || "../../../index.html") + '">' + icon("home", 22) + "<span><b>All hubs</b><small>Back to the dashboard</small></span>" + icon("chevron", 18) + "</a></li>" +
+        '<li><a href="' + esc(C.about || "../../about/") + '">' + icon("about", 22) + "<span><b>About</b><small>Every feature, trophy and easter egg</small></span>" + icon("chevron", 18) + "</a></li>" +
+        '<li><a href="' + esc(C.back || "../../") + '">' + icon("home", 22) + "<span><b>All hubs</b><small>Back to the dashboard</small></span>" + icon("chevron", 18) + "</a></li>" +
       "</ul></section></div>";
     $$("[data-open]", el).forEach(function(b){ b.addEventListener("click", function(){
       var k = b.getAttribute("data-open"); if (k === "flag" && window.shOpenFlag) { window.shOpenFlag(); return; }
@@ -1134,8 +1153,7 @@
     return h;
   }
   /* Settings: the cuts (font, background music, accent metal) are gone; text size and theme stay, plus the goal.
-     The extras use the same keys as widget/v3.js (EXTRAS) and the dashboard: keep the three in step, except Full Arch,
-     retired on the redesign (Sam, 2026-11-12; widget/eggs.js never draws it here), so its switch is in v3.js's list only. */
+     The extras use the same keys as widget/v3.js (EXTRAS) and the dashboard: keep the three in step. */
   var EXTRAS = [
     ["sh_pref_pet", "Timmy Tooth", "Your cartoon tooth buddy, on the bar: tap him to ask about the notes. He hides during mock exams. Off, an Ask button takes his place.", [["on", "On"], ["dash", "Dashboard only"], ["off", "Off"]]],
     ["sh_pref_eggs", "Hidden secrets", "Holidays, magic words and the other easter eggs. Clues are in the trophy case."],
@@ -1145,6 +1163,7 @@
     ["sh_pref_nuke", "Tactical nukes", "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes.", [["on", "On"], ["mine", "Mine only"], ["off", "Off"]]],
     ["sh_pref_celebrate", "Rank-up and trophy cards", "The rank-up cutscene, level-up, trophy and medal cards."],
     ["sh_pref_cheers", "Streak cheers", "Confetti and a toast every 5 right in a row."],
+    ["sh_pref_flame", "Streak flame", "The flame in the corner that counts your run from 3 right in a row."],
     ["sh_pref_fx", "Answer animations", "Pops, shakes, sweeps and fades. Off keeps the check and X marks."]
   ];
   var SIZES = [["small", "Small", .9], ["default", "Default", 1], ["large", "Large", 1.15], ["xlarge", "X-Large", 1.3], ["xxlarge", "XX-Large", 1.45]];
@@ -1152,7 +1171,7 @@
   function seg(key, opts, cur){ return '<span class="seg" role="group" data-key="' + esc(key) + '">' + opts.map(function(o){ return '<button type="button" data-val="' + esc(o[0]) + '" aria-pressed="' + (cur === o[0]) + '">' + esc(o[1]) + "</button>"; }).join("") + "</span>"; }
   /* Focus mode (Sam, 2026-11-06): one switch that turns every extra off, and back to what you had when you turn it off.
      It writes the same keys as each extra's own switch, so every hub and the dashboard follow it. */
-  var FOCUS_KEYS = EXTRAS.map(function(x){ return x[0]; }).concat(["sh_pref_flame"]);
+  var FOCUS_KEYS = EXTRAS.map(function(x){ return x[0]; });
   function focusOn(){ return ls("sh_pref_focus") === "on"; }
   function setFocus(on){
     if (on === focusOn()) return;
@@ -1348,6 +1367,7 @@
     s.setAttribute("data-hub", HUB); s.setAttribute("data-answered-event", EVT); s.setAttribute("data-default-mode", "home");
     /* the game layer: v3.js asks the database for it and works as on the live hubs until it is there */
     s.setAttribute("data-game", "v2");
+    if (AUDIO_OFF) s.setAttribute("data-audio", "off");
     s.onload = function(){
       /* Ask Timmy's chat (widget/ask.js, hub-timmy.js mounts it) comes with the shared widget; so does the shop's
          balance and the rare costume of the day (hub-timmy.js) */
@@ -1374,7 +1394,7 @@
       window.SH_EXPORT = { lectures: LECS.map(function(l){ return { id: l.id, title: lecLabel(l) + " " + l.title, who: l.who, status: l.status }; }), exams: (c.exams || []).map(function(x){ return { label: x.label, date: x.date }; }), sections: [], hints: [] };
       /* review-only questions left out of the mastery medal (widget/ranks.js), as on the live hub */
       if (hasReview()) window.SH_EXPORT.uncounted = function(){ var n = 0, right = 0; IDX.forEach(function(q){ if (!isReview(q.lec)) return; n++; var s = ansOf(q.id); if (s && s.last) right++; }); return { n: n, right: right }; };
-      if (c.podcast) window.SH_PODCAST = Object.assign({}, c.podcast, { src: ASSETS + c.podcast.src });
+      if (CORE.podcast) window.SH_PODCAST = Object.assign({}, CORE.podcast, { src: ASSETS + CORE.podcast.src });
       route();
       /* the rest of the content in the background, then the shared widget (it needs the notes for its search and eggs) */
       var idle = window.requestIdleCallback || function(f){ setTimeout(f, 300); };

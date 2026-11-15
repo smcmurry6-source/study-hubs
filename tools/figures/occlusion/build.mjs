@@ -1,9 +1,10 @@
-// Pastes the Occlusion hub's drawing kit into hubs/occlusion/index.html between its markers.
-//   node tools/figures/occlusion/build.mjs          rebuild the hub's kit blocks from the files here
-//   node tools/figures/occlusion/build.mjs --check  exit 1 if the hub's blocks are out of date
+// Builds the Occlusion hub's drawing kit into its content: hubs/occlusion/content/figures.js (between its od:kit and
+// anima:js markers; the rest of that file is the engine's wrapper) and hubs/occlusion/content/figures.css (all of it).
+//   node tools/figures/occlusion/build.mjs          rebuild them from the files here
+//   node tools/figures/occlusion/build.mjs --check  exit 1 if they are out of date
 // The kit (od.js: occlusal teeth, fence posts, contact maps, the redrawn FIGS), the case images (cases.js), the
 // "What cusp hits where?" game (game.js) and their CSS (od.css) are plain browser JS/CSS: edit them here, never the
-// generated blocks in the hub. Standing rules: CLAUDE.md -> "Diagrams (the anima skill)".
+// built blocks in the hub's content. Standing rules: CLAUDE.md -> "Diagrams (the anima skill)".
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { baseCss } from "./anima/shared.mjs";
 import { FIGURES } from "./anima/index.mjs";
@@ -11,12 +12,14 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const HUB = join(HERE, "../../../hubs/occlusion/index.html");
+const JS = join(HERE, "../../../hubs/occlusion/content/figures.js"), CSS = join(HERE, "../../../hubs/occlusion/content/figures.css");
 const read = (f) => readFileSync(join(HERE, f), "utf8").trimEnd() + "\n";
 const JB = "/* od:kit begin (built from tools/figures/occlusion; edit there) */\n", JE = "/* od:kit end */\n";
-const CB = "/* od:css begin */\n", CE = "/* od:css end */\n";
 const AJB = "/* anima:js begin (built from tools/figures/occlusion/anima; edit there) */\n", AJE = "/* anima:js end */\n";
-const ACB = "/* anima:css begin */\n", ACE = "/* anima:css end */\n";
+/* the stylesheet is built whole. No label under 11px on the engine (the taste skill's floor; the kit draws some at
+   9 to 10.5px): everything else about the figures' look is restyled in widget/hub.css, under html.shx. */
+const CSS_HEAD = "/* Built by tools/figures/occlusion/build.mjs from od.css and the anima figures in tools/figures/occlusion/. Do not edit: change those and rebuild. */\n";
+const floor = (css) => css.replace(/font-size:\s*(?:9|9\.5|10|10\.5)px/g, "font-size:11px");
 
 /* the anima figures: static SVG + a live function per figure; helpers are declared inside the figure's data scope so
    the live code and the build share one model */
@@ -56,26 +59,24 @@ function between(src, b, e, body){
   if (i < 0 || j < i) throw new Error("markers not found: " + b.trim());
   return src.slice(0, i) + b + body + src.slice(j);
 }
-const hub = readFileSync(HUB, "utf8");
-let out = between(hub, JB, JE, read("od.js") + read("cases.js") + read("game.js"));
-out = between(out, CB, CE, read("od.css"));
+const js = readFileSync(JS, "utf8"), css = readFileSync(CSS, "utf8");
+let out = between(js, JB, JE, read("od.js") + read("cases.js") + read("game.js"));
 out = between(out, AJB, AJE, animaJs());
-out = between(out, ACB, ACE, animaCss());
+const outCss = CSS_HEAD + floor("\n" + read("od.css") + "\n" + animaCss());
 if (process.argv.includes("--check")) {
-  if (out !== hub) { console.error("hubs/occlusion/index.html: the kit blocks are stale; run node tools/figures/occlusion/build.mjs"); process.exit(1); }
-  console.log("occlusion kit blocks are up to date");
+  if (out !== js || outCss !== css) { console.error("hubs/occlusion/content/figures." + (out !== js ? "js" : "css") + " is stale; run node tools/figures/occlusion/build.mjs"); process.exit(1); }
+  console.log("occlusion's figures are up to date");
 } else {
-  writeFileSync(HUB, out);
-  console.log("wrote", HUB, "(anima: " + FIGURES.map((f) => f.id).join(", ") + ")");
+  writeFileSync(JS, out); writeFileSync(CSS, outCss);
+  console.log("wrote", JS, "and figures.css (anima: " + FIGURES.map((f) => f.id).join(", ") + ")");
 }
 if (process.argv.includes("--preview")) {
-  // standalone pages with the hub's tokens, for anima's capture and line checks
-  const tokens = hub.slice(hub.indexOf(":root{"), hub.indexOf("html,body{") > 0 ? hub.indexOf("html,body{") : hub.indexOf(":root{") + 4000);
+  // standalone pages on the engine's stylesheet (widget/site.bundle.css), for anima's capture and line checks
   mkdirSync(join(HERE, "dist"), { recursive: true });
   for (const theme of ["light", "dark"]) for (const f of FIGURES) {
-    const page = `<!doctype html><html lang="en" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${f.title}</title><style>${tokens}
-html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,sans-serif}main{max-width:760px;margin:24px auto;padding:0 16px}
-${read("od.css")}${animaCss()}</style></head><body><main id="figs"></main><script>${animaJs()}
+    const page = `<!doctype html><html lang="en" class="shx" data-hx-hub="occlusion" data-theme="${theme}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${f.title}</title><link rel="stylesheet" href="../../../../widget/site.bundle.css"><style>
+main{max-width:760px;margin:24px auto;padding:0 16px}
+${outCss}</style></head><body><main id="figs"></main><script>${animaJs()}
 document.getElementById("figs").innerHTML = ANIMA.html(${JSON.stringify(f.id)}); ANIMA.mount(document);
 </script></body></html>`;
     writeFileSync(join(HERE, "dist", `${f.id}-${theme}.html`), page);

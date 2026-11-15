@@ -3,7 +3,7 @@
 // admin_load_question_keys), worked out from the hub's content JSON, so record_answer_v2 can decide right or wrong.
 //   node tools/xp/keys.js <hub>                    the JSON array for admin_load_question_keys's p_keys
 //   node tools/xp/keys.js <hub> --sql              one SQL statement for the connector (the admin secret stays a placeholder)
-//   node tools/xp/keys.js <hub> --file <questions.json>   another content file (default hubs/<hub>/next/content/questions.json)
+//   node tools/xp/keys.js <hub> --file <questions.json>   another content file (default hubs/<hub>/content/questions.json)
 // Each key: { id, v, kind, answer, counted }. kind: "one" (mcq: the right choice's authored index), "all" (multi: the
 // right choices), "order" (sequence: the steps 0..n-1 in their right order), "self" (match and recall cards, graded by the
 // student). v is the question's version as the page reports it (question health's fingerprint of the exported question,
@@ -43,7 +43,7 @@ function keyFor(q){
   return k;
 }
 function keys(hub, file){
-  const qs = JSON.parse(fs.readFileSync(file || path.join(ROOT, 'hubs', hub, 'next', 'content', 'questions.json'), 'utf8'));
+  const qs = JSON.parse(fs.readFileSync(file || path.join(ROOT, 'hubs', hub, 'content', 'questions.json'), 'utf8'));
   const out = qs.map(keyFor), have = new Set(out.map(k => k.id));
   const reg = path.join(ROOT, 'tools', 'question-ids', hub + '.txt');
   if (fs.existsSync(reg)) fs.readFileSync(reg, 'utf8').split('\n').map(l => l.replace(/#.*/, '').trim().split(/\s+/))

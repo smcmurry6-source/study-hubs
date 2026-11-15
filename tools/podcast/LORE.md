@@ -15,9 +15,25 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
 
 ## Where he lives
 
-- A **cottage on a hill**, with a toothbrush planted by the front door and a tree out front (Occlusion; in the widget the
-  house card, `houseSvg`). Its decorations grow with the student's handpiece rank, mastered hubs fly pennants, and the
-  yard follows the seasons (fall leaves, winter snow): say nothing that contradicts that.
+- His **place** (the redesign, 2026-11; `widget/place.js`): the cottage on a hill is every Timmy's first home, with the
+  toothbrush planted by the front door and a tree out front (Occlusion). A student can move him (a castle, a giant
+  mushroom, a treehouse, a beach hut, a lighthouse, an igloo, an observatory, and a home in each seasonal set) and set the
+  scene around it (the beach, the forest, above the clouds, a snowy mountain, the night sky), so an episode never says
+  where he lives today: "my place", "the yard", "the front door" are always true. The yard follows the seasons (spring
+  blossom, fall leaves, winter snow): say nothing that contradicts that.
+- **By the door**: the toothbrush (it talks now), and a statue of the student's rank in the rank's metal; past the
+  Handpiece a ModuPro shares the pedestal, and in the Loupes journey Timmy wears loupes. The medal board by the house
+  hangs one medal for every hub the student has mastered. (The old house card's picket fence, lamppost and pennants
+  went with the old dashboard; the episodes never named them.)
+- **Neighbors, seen from the yard**: Number thirty-one's house is the small one up the hill (tap it and he takes his
+  temperature; his letters come to Timmy's mailbox, usually about a bump). The rabbit down the hill has a burrow at
+  the bottom of the yard. New, and only at certain scenes: a crab on the beach (it has moved into a sandcastle), an
+  owl in the forest, a yeti behind a rock on the mountain, a friend in a crater under the night sky, a whale off the
+  beach, and the dog in the doghouse, who brushes twice a day.
+- **The podcast studio** is a yard piece: where it stands, that's where Timmy Time is recorded. Nothing in an episode
+  says otherwise so far; don't place the studio anywhere else.
+- **His health shows in how he moves** at his place (bouncing when sparkling, on the doorstep when he needs
+  treatment), the same HP as everywhere else. A visitor never sees it: a visited Timmy is always drawn well.
 - **Number thirty-one**, the second molar who lives right behind him, is his neighbor (Heme & Endo Exam 1). A hypochondriac
   who listens to the lectures through the wall and believes he has every disease in them: asked whether his jaw looks
   heavy after hearing about acromegaly ("You don't have a jaw. You live in one."), wore a tiny scarf for cold intolerance,
@@ -43,11 +59,10 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
 
 ## Costumes
 
-- He dresses for holidays and the fall weeks (`OUTFITS` in `widget/pet.js`). Halloween 2026: four costumes, a witch hat,
+- Until the redesign's release (2026-11) he dressed himself for holidays and the fall weeks. Halloween 2026: four costumes, a witch hat,
   a vampire cape with fangs ("just very long canines with big ambitions"), a pumpkin cap with a candy pail, and a black cat.
-  **He can't pick one, so he wears the next one each time a page loads** (true in the widget). He never reveals a single
-  costume as "the one", because students see different ones. This is canon for the episodes already out, and stays true
-  on the live hubs until the redesign's release.
+  **He couldn't pick one, so he wore the next one each time a page loaded.** He never revealed a single
+  costume as "the one", because students saw different ones. This is canon for the episodes already out.
 - **From the redesign on, the student dresses him** ([Ask Timmy](../../vault/tasks/2026-11-12-redesign-ask-timmy.md),
   part 4; Sam, 2026-11-12: "What you put wins"). Everyone has Timmy (nobody adopts him any more; he says hello on a first
   visit), and he wears only what the student put on at his place, from the shop or his rank: on the hub's bar, on the
@@ -56,7 +71,7 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   (each student dresses theirs), and never that he picked it: "whatever you put me in" is the line. His holiday looks are
   the shop's seasonal sets now (a floss mummy and a bedsheet ghost at Halloween, a holiday sweater and an elf suit in the
   winter), and the old "he can't pick one" can be a joke about the past ("I used to dress myself. You saw how that went.").
-- **Rare costumes** (the redesign's shop, not live until [its release](../../vault/tasks/2026-11-06-redesign-release.md)):
+- **Rare costumes** (the redesign's shop, [released 2026-11](../../vault/tasks/2026-11-06-redesign-release.md)):
   five costumes that turn up at Timmy's shop now and then, about one ordinary day in twelve, never on a holiday or in the
   fall weeks, a different day for each student. When one turns up he says so once ("Something rare came in at the shop
   today: the pirate costume"), and it waits on the shop's Spotted shelf until it's bought. Each student spots them in

@@ -35,11 +35,30 @@
       secrets: T.filter(function(t){ return t.secret; })
     };
   }
-  function meta(k){ return R.TROPHIES.concat(R.RETIRED || []).filter(function(t){ return t.k === k; })[0] || null; }
+  /* a hub's own trophy (Sam, 2026-11-13: "each hub should get a shelf") is keyed "<trophy>:<hub>", as its badge is */
+  function hubOf(k){ var i = String(k).indexOf(":"); return i > 0 ? String(k).slice(i + 1) : ""; }
+  function base(k){ return String(k).split(":")[0]; }
+  function hubMeta(k){ return hubOf(k) ? (R.HUB_TROPHIES || []).filter(function(t){ return t.k === base(k); })[0] || null : null; }
+  function hubName(h){ var D = window.SH_DASH_DATA; return (D && D.labels && D.labels[h]) || (R.hubName ? R.hubName(h) : h); }
+  function meta(k){ return hubMeta(k) || R.TROPHIES.concat(R.RETIRED || []).filter(function(t){ return t.k === k; })[0] || null; }
   function isRetired(k){ return (R.RETIRED || []).some(function(t){ return t.k === k; }); }
+  /* the hubs that get a shelf: the one you're in, the hubs on the new design, and any hub you've won one in */
+  function hubShelves(st){
+    var seen = {}, out = [], D = window.SH_DASH_DATA, here = (window.SH_HUB && window.SH_HUB.hub) || "";
+    function add(h){ if (h && /^[a-z0-9-]+$/.test(h) && !seen[h]) { seen[h] = 1; out.push(h); } }
+    add(here);
+    if (D && D.hubs) { var old = {}; (D.legacy || []).forEach(function(h){ old[h] = 1; }); D.hubs.forEach(function(h){ if (!old[h.id]) add(h.id); }); }
+    Object.keys(st.earned).map(hubOf).filter(Boolean).sort(function(a, b){ return hubName(a) < hubName(b) ? -1 : 1; }).forEach(add);
+    return out;
+  }
   function earnedOf(p){
-    var e = {}; ((p && p.badges) || []).forEach(function(b){ e[String(b).split(":")[0]] = 1; });
+    var e = {}, hubKeys = {};
+    (R.HUB_TROPHIES || []).forEach(function(t){ hubKeys[t.k] = 1; });
+    ((p && p.badges) || []).forEach(function(b){ b = String(b); var k = b.split(":")[0]; if (hubKeys[k] && hubOf(b)) e[b] = 1; else e[k] = 1; });
     R.TROPHIES.forEach(function(t){ if (t.device && ls(t.device)) e[t.k] = 1; });
+    /* a hub's Gold medal means its Silver and Bronze were passed on the way (the server keeps only what was reached) */
+    var M = ["mastery-bronze", "mastery-silver", "mastery-gold", "mastery-crown"];
+    Object.keys(e).forEach(function(b){ var i = M.indexOf(base(b)), h = hubOf(b); if (i > 0 && h) while (i--) e[M[i] + ":" + h] = 1; });
     return e;
   }
   function shareOf(st, k){
@@ -52,7 +71,10 @@
 
   /* ---------- the drawings ---------- */
   function svg(k, sil){
-    var A = window.SH_TROPHY_ART, t = A && A[k]; if (!t) return "";
+    /* a hub's mastery trophies are that hub's medal, in the tier's metal (shRanks.medal) */
+    var mi = ["mastery-bronze", "mastery-silver", "mastery-gold", "mastery-crown"].indexOf(base(k));
+    if (mi >= 0) return R.medal ? R.medal(mi + 1, 64, hubOf(k)) : "";
+    var A = window.SH_TROPHY_ART, t = A && A[base(k)]; if (!t) return "";
     return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">' + (sil ? t.sil || "" : t.body) + "</svg>";
   }
   /* rays behind the stand or the medallion: flat wedges, no gradient */
@@ -77,6 +99,7 @@
     var t = meta(k), s = stateOf(st, k), sh = shareOf(st, k);
     if (s === "secret") return "Secret trophy, not found yet. Clue: " + t.clue + (sh && sh.n ? " Found by " + sh.label + " of the class." : "");
     if (isRetired(k)) return t.n + " (retired), won. " + t.d + ".";
+    if (hubOf(k)) return t.n + " in " + hubName(hubOf(k)) + (s === "won" ? ", won. " : ", not won yet. ") + t.d + ".";
     return t.n + (s === "won" ? ", won. " : ", not won yet. ") + t.d + "." + (sh ? " " + (sh.n ? sh.label + " of the class has it." : "Nobody has it yet.") : "");
   }
   function slot(st, k){
@@ -98,6 +121,7 @@
     var k = st.sel, t = meta(k); if (!t) return "";
     var s = stateOf(st, k), sh = shareOf(st, k), retired = isRetired(k), secret = s === "secret";
     var tag = st.why || (s === "won" ? "Won" : secret ? "Secret" : "Not won yet");
+    if (hubOf(k)) tag = hubName(hubOf(k)) + " · " + tag;
     return '<div class="sht-show is-' + s + '"><div class="sht-show-art" aria-hidden="true">' + rays(18, s === "won" ? "#F6CD55" : "#B9ADB6", s === "won" ? .55 : .3) +
       '<span class="sht-show-obj">' + svg(k, secret) + "</span>" + STAND + "</div>" +
       '<div class="sht-show-tx"><span class="sht-tag">' + esc(tag) + "</span>" +
@@ -154,6 +178,7 @@
       '<div class="sht-cab"><div class="sht-crown"><span class="sht-plaque" aria-hidden="true"><b>Trophy case</b><span class="num">' + won + " of " + all.length + " · " + found + " of " + g.secrets.length + " secrets</span></span></div>" +
       '<div class="sht-bay"><i class="sht-glint g1" aria-hidden="true"></i><i class="sht-glint g2" aria-hidden="true"></i>' +
       shelf(st, "Won by studying", g.study) + shelf(st, "The journeys", g.journeys, "is-journeys") + shelf(st, "Secrets", g.secrets) +
+      hubShelves(st).map(function(h){ return shelf(st, hubName(h), (R.HUB_TROPHIES || []).map(function(t){ return { k: t.k + ":" + h }; }), "is-hub"); }).join("") +
       (kept.length ? shelf(st, "Retired", kept, "is-retired") : "") +
       '</div><div class="sht-base" aria-hidden="true"></div></div></section>';
   }

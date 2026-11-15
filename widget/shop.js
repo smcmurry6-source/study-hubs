@@ -139,25 +139,38 @@
     var x = piece(it), n = it.name || (x && x.n) || it.id;
     return { name: cardName(n), note: sentence(x && x.note || ""), say: x && x.say && x.say[0] || "", kind: KIND_N[it.kind] || "" };
   }
-  /* the card's frame from the shop's art, with its own motion inside (still when the page is) */
+  /* The card's frame from the shop's art, and the storefront's two layers. Each is a still, with the moving one over
+     it (.tsh-live) unless motion is off: an image that moves inside is drawn again whole on every frame, and a shelf
+     has dozens. So the shop moves for a few seconds when it opens, when a scroll ends and under a mouse, and rests
+     otherwise (shopLife; shop.css takes the moving ones away under .is-rest). 2026-11-14, Sam: "scrolling and things
+     are kind of sluggish and jittery". */
   var FRAMES = {};
+  function moving(s, re){ return s.replace(/(<svg[^>]*>)/, "$1<style>" + SA.CSS.split("\n").filter(function(l){ return re.test(l); }).join("\n") + "</style>"); }
   function frame(r){
-    var key = r + (reduced ? "-still" : "");
-    if (!FRAMES[key]) {
+    if (!FRAMES[r]) {
       var s = SA.frame(r);
-      if (!reduced) s = s.replace(/(<svg[^>]*>)/, "$1<style>" + SA.CSS.split("\n").filter(function(l){ return /ts-r-|@keyframes ts-spin|prefers-reduced/.test(l); }).join("\n") + "</style>");
-      FRAMES[key] = img(s, "", "tsh-rframe");
+      FRAMES[r] = img(s, "", "tsh-rframe") + (reduced || !/ts-r-/.test(s) ? "" : img(moving(s, /ts-r-|@keyframes ts-spin|prefers-reduced/), "", "tsh-rframe tsh-live"));
+    }
+    return FRAMES[r];
+  }
+  function store(layer){
+    var key = "store-" + layer;
+    if (!FRAMES[key]) {
+      var s = SA.store(layer);
+      FRAMES[key] = img(s, "", "tsh-frontart") + (reduced || !/ts-s-/.test(s) ? "" : img(moving(s, /ts-s-|@keyframes ts-spin|@keyframes ts-r-tw|prefers-reduced/), "", "tsh-frontart tsh-live"));
     }
     return FRAMES[key];
   }
-  function store(layer){
-    var key = layer + (reduced ? "-still" : "");
-    if (!FRAMES[key]) {
-      var s = SA.store(layer);
-      if (!reduced) s = s.replace(/(<svg[^>]*>)/, "$1<style>" + SA.CSS.split("\n").filter(function(l){ return /ts-s-|@keyframes ts-spin|@keyframes ts-r-tw|prefers-reduced/.test(l); }).join("\n") + "</style>");
-      FRAMES[key] = img(s, "", "tsh-frontart");
-    }
-    return FRAMES[key];
+  function shopLife(dlg){
+    var t = 0, st = 0, scrolling = false;
+    function rest(){ clearTimeout(t); t = 0; dlg.classList.add("is-rest"); }
+    function wake(){ if (scrolling) return; clearTimeout(t); dlg.classList.remove("is-rest"); t = setTimeout(rest, 6000); }
+    dlg.addEventListener("scroll", function(){
+      if (!scrolling) { scrolling = true; rest(); }
+      clearTimeout(st); st = setTimeout(function(){ scrolling = false; wake(); }, 260);
+    }, { capture: true, passive: true });
+    dlg.addEventListener("mousemove", function(){ if (!t) wake(); }, { passive: true });
+    wake();
   }
   function coin(cls){ return img('<svg viewBox="0 0 24 24">' + SA.coinBody(false) + "</svg>", "", cls || "tsh-coin"); }
   function rarTag(r){ return '<i class="tsh-rar r-' + r + '">' + esc(r) + "</i>"; }
@@ -349,6 +362,7 @@
     $('[data-shop="close"]', dlg).addEventListener("click", close);
     try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); }
     D.documentElement.classList.add("tsh-open");
+    shopLife(dlg);
     mount($(".tsh-dlgbody", dlg), { level: 3, title: "tshT" });
     return api;
   }

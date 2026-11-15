@@ -22,7 +22,7 @@ The whole procedure, from asking Sam to merging, is the `/podcast` skill (`.clau
 ```bash
 pip install scipy                               # plus ffmpeg on PATH; Kokoro and its model install themselves on the
                                                 # first render (tools/kokoro-setup.sh, vault/how-to/narrate-with-kokoro.md)
-node tools/podcast/extract_hub.js hubs/msk-exam4/index.html /tmp/src                   # the material to write from
+node tools/podcast/extract_hub.js <hub> /tmp/src                   # the material to write from
 python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md --words        # hard words + heteronyms
 python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md --check        # every paragraph's phonemes
 python tools/podcast/render_podcast.py tools/podcast/msk-exam4/script.md /tmp/stems     # ~10 min on 4 CPUs

@@ -5,8 +5,8 @@ tags: [widget, bundles, loading, performance, redesign]
 
 # The redesign's bundles
 
-A redesigned page (`next/`, `hubs/<hub>/next/`) loads the widget in a few built files instead of one request per source
-file ([phase 5, part 2](../tasks/done/2026-11-05-redesign-phase-5-backend.md), 2026-11-13). The live pages are not
+A page on the redesign (the dashboard, `index.html`, and every hub on the engine, `hubs/<hub>/index.html`) loads the widget in a few built files instead of one request per source
+file ([phase 5, part 2](../tasks/done/2026-11-05-redesign-phase-5-backend.md), 2026-11-13). The old single-file hub pages are not
 part of this: they keep loading `widget/v3.js` and the rest by name, exactly as before.
 
 ## What is built

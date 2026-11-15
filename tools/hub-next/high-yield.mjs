@@ -1,6 +1,6 @@
 /*
  * The notes' third reading level, **High yield** (Sam, 2026-11-12: "a toggle in the lecture notes that only explains the
- * high likelihood/high yield points that are hinted to be tested"; for the redesign first). Beside As taught and Plain
+ * high likelihood/high yield points that are hinted to be tested"; on every hub on the engine). Beside As taught and Plain
  * English, it shows a lecture's predicted exam topics (LIKELY_TOPICS, strongest evidence first) and, under each, the
  * paragraphs of the As taught notes that teach it, with the professor's own takeaways from the Exam Hints. Nothing in it
  * is written by hand: every word comes from the notes, the topics or the hints, so it can't say anything the notes don't.
@@ -220,11 +220,11 @@ export function highYield({ notes, topics, hints, questions }){
   return out;
 }
 
-/* the report: what each topic matched, from a hub's built content (hubs/<hub>/next/content/) */
+/* the report: what each topic matched, from a hub's content (hubs/<hub>/content/) */
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const [hub, only] = process.argv.slice(2);
   if (!hub) { console.error("usage: node tools/hub-next/high-yield.mjs <hub> [<lecture>]"); process.exit(2); }
-  const dir = join(resolve(dirname(fileURLToPath(import.meta.url)), "../.."), "hubs", hub, "next", "content");
+  const dir = join(resolve(dirname(fileURLToPath(import.meta.url)), "../.."), "hubs", hub, "content");
   const read = (f) => JSON.parse(readFileSync(join(dir, f), "utf8"));
   const core = read("core.json"), notes = read("notes.json"), study = read("study.json"), qs = read("questions.json");
   const QB = {}; qs.forEach((q) => { QB[q.id] = q; });

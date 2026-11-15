@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // The game layer's server (migration_v54, vault/reference/game-server.md) on a throwaway PostgreSQL: supabase/schema.sql
-// with made-up history first, then the migrations waiting for their release (supabase/pending-migrations.txt), as the
-// release will run them. Made-up visitors only; nothing here touches the live database. Checks:
+// as it was before the redesign's release, with made-up history first, then the release's migrations (the part of
+// schema.sql after its "the redesign's release" marker: tools/release/pg.js) and any still waiting, as the release ran them. Made-up visitors only; nothing here touches the live database. Checks:
 //   - today's rules stay: every XP total, rank profile, board and the 600-a-day cap are the same after the migration,
 //     and record_personal_answer still pays as before;
 //   - the 63-step ladder: the Handpiece is today's 21 steps exactly, then the ModuPro and the Loupes;
@@ -41,7 +41,7 @@ let checks = 0;
 function ok(cond, what){ checks++; if (!cond) problems.push(what); return !!cond; }
 function eq(got, want, what){ return ok(JSON.stringify(got) === JSON.stringify(want), `${what}: got ${JSON.stringify(got)}, expected ${JSON.stringify(want)}`); }
 
-const db = throwaway(SECRET, { pending: false }), { sql, q } = db;
+const db = throwaway(SECRET, { pending: false, beforeRelease: true }), { sql, q } = db;
 const one = t => (sql(t)[0] || [])[0];
 const num = t => Number(one(t));
 const json = t => { const r = one(`select (${t})::text`); try { return JSON.parse(r); } catch (e) { throw new Error(`no JSON from ${t.slice(0, 120)}: ${r}`); } };
@@ -93,9 +93,11 @@ try {
   ok(Array.isArray(pd0) && pd0.length === 1 && typeof pd0[0] === 'object' && pd0[0].attempts === 3 && pd0[0].correct === 2,
     `BUG-049 stays fixed in today's schema (v54 section 0, applied live 2026-11-06): Timmy's days are rows with their answers (${JSON.stringify(pd0).slice(0, 80)})`);
 
-  /* ====================================================== the release: the pending migrations */
+  /* ====================================================== the release: migration_v54 to v58 (the part of
+     supabase/schema.sql after its "the redesign's release" marker), then any migration still waiting */
+  db.applyRelease();
   const applied = db.applyPending();
-  notes.push(`applied ${applied.join(', ')} on top of supabase/schema.sql with made-up history`);
+  notes.push(`applied the release's migrations${applied.length ? ' and ' + applied.join(', ') : ''} on top of the schema as it was before them, with made-up history`);
 
   /* ---------- 1. today's rules stay ---------- */
   eq(rows(`select visitor_id, xp, days, answers, correct, best_days from xp_visitors order by 1`), before.xp, 'every XP total is the same after the migration');
@@ -148,7 +150,7 @@ try {
   const occ = KEYS.keys('occlusion');
   const loaded = anonJson(`admin_load_question_keys(${S}, 'occlusion', ${q(JSON.stringify(occ))}::jsonb, true)`);
   ok(loaded.loaded === occ.filter(k => !k.retired).length && loaded.keys === loaded.loaded, `Occlusion's ${loaded.loaded} keys load from its content JSON (${JSON.stringify(loaded)})`);
-  const oq = JSON.parse(fs.readFileSync(path.join(ROOT, 'hubs/occlusion/next/content/questions.json'), 'utf8'));
+  const oq = JSON.parse(fs.readFileSync(path.join(ROOT, 'hubs/occlusion/content/questions.json'), 'utf8'));
   const om = oq.find(x => x.type === 'mcq'), omu = oq.find(x => x.type === 'multi'), os = oq.find(x => x.type === 'sequence');
   eq(ans('xp-O', om.id, { hub: 'occlusion', choice: om.answer, v: KEYS.fp(KEYS.exported(om)), at: 0 }).xp, 10, 'an Occlusion question answered right with its version: 10 XP');
   eq(ans('xp-O', omu.id, { hub: 'occlusion', picks: omu.correct.slice().reverse(), at: 10 }).correct, true, 'an Occlusion select-all answered right in any order');

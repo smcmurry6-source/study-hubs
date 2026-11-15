@@ -645,7 +645,6 @@
     { key: "sh_pref_boss", label: "Plaque bosses", hint: "A boss the whole class fights with right answers when 5+ people are online." },
     { key: "sh_pref_fairy", label: "Tooth Fairy", hint: "Flies across the page now and then. Catch her for the fairy board." },
     { key: "sh_pref_probe", label: "Golden Probe", hint: "One question a day is golden. First to get it right wins." },
-    { key: "sh_pref_arch", label: "Full Arch chart", hint: "A 32-tooth chart in the corner that fills as you answer right." },
     { key: "sh_pref_nuke", label: "Tactical nukes", opts: [["on", "On"], ["mine", "Mine only"], ["off", "Off"]],
       hint: "100 right in a row unlocks a strike. Mine only: you won't see classmates' strikes." },
     { key: "sh_pref_celebrate", label: "Rank-up and trophy cards", hint: "The rank-up cutscene, level-up, trophy and medal cards." },
@@ -656,13 +655,13 @@
       hint: "Your cartoon tooth buddy. He hides during mock exams." },
     { key: "sh_pref_eggs", label: "Hidden secrets", hint: "Holidays, magic words and the other easter eggs. Clues are in the trophy case." }
   ];
-  /* one time: Surprises off used to hide the bosses, fairy, probe, arch, flame and the celebration cards, and
+  /* one time: Surprises off used to hide the bosses, fairy, probe, flame and the celebration cards, and
      nuke alerts off meant "mine only"; carry both over to the new switches */
   (function(){
     if (prefGet("sh_pref_extras_v", "") === "1") return;
     try {
       if (localStorage.getItem("sh_pref_eggs") === "off")
-        ["sh_pref_boss", "sh_pref_fairy", "sh_pref_probe", "sh_pref_arch", "sh_pref_celebrate", "sh_pref_flame"].forEach(function(k){
+        ["sh_pref_boss", "sh_pref_fairy", "sh_pref_probe", "sh_pref_celebrate", "sh_pref_flame"].forEach(function(k){
           if (localStorage.getItem(k) === null) localStorage.setItem(k, "off");
         });
       if (localStorage.getItem("sh_pref_nuke_alerts") === "off" && localStorage.getItem("sh_pref_nuke") === null) localStorage.setItem("sh_pref_nuke", "mine");
@@ -3030,20 +3029,18 @@
   if (!EXPORT_ONLY) widgetFile("eggs.js");
   /* handpiece ranks, trophies, accent unlocks, link my devices (widget/ranks.js) */
   if (!EXPORT_ONLY) widgetFile("ranks.js", function(){ if (window.shRanks) window.shRanks.mount(window.shEggHooks); });
-  /* tooth buddy (widget/pet.js): optional cartoon tooth in the bottom-left corner, adopted on the dashboard.
-     The redesigned hubs (data-game="v2", widget/hub.js; not live yet): everyone has Timmy, so he loads for everyone and
-     mounts with everyone: true (no adoption; he wears what's on at his place, from the v2 bootstrap's shop). The live
-     hubs (no data-game) load him as before. */
+  /* tooth buddy (widget/pet.js): Timmy Tooth, in the bottom-left corner. Everyone has Timmy (the redesign's release):
+     he loads for everyone, with no adoption, and wears what's on at his place (the v2 bootstrap's shop; on an old
+     single-file hub, which has no shop, the outfit kept on the device). */
   var petLoading = false;
   function loadPet(then){
     if (window.shPet) { if (then) then(); return; }
     if (petLoading || EXPORT_ONLY) return;
     petLoading = true;
-    widgetFile("pet.js", function(){ if (window.shPet) window.shPet.mount(GAME.want ? { where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready, everyone: true } : { where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); trackPresence(); if (then) then(); });
+    widgetFile("pet.js", function(){ if (window.shPet) window.shPet.mount({ where: "hub", H: window.shEggHooks, bootstrap: bootstrap.ready }); trackPresence(); if (then) then(); });
   }
   window.shLoadPet = loadPet;
-  var petBorn = null; try { petBorn = localStorage.getItem("sh_pet_born"); } catch (e) {}
-  if (!EXPORT_ONLY && (GAME.want || !(window.SH_HUB && !petBorn))) loadPet();
+  if (!EXPORT_ONLY) loadPet();
   /* TIMMY (widget/timmy.js): type his name anywhere for a 15-second show */
   if (!EXPORT_ONLY && !window.__timmyLoaded) widgetFile("timmy.js");
   /* motion (widget/fx.js): answer feedback, the streak flame, bar fills, view fades, the exam-day countdown pill and the mock results card */

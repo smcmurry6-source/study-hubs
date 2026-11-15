@@ -7,8 +7,8 @@
 //   - the site help: site.json beside this file (tools/timmy/build.mjs builds it from the About page).
 // Deploy with JWT verification off (the site's publishable key isn't a JWT); the function checks its own input, answers
 // only the site's own origin, and the database keeps the limits.
-// Settings (all optional): TIMMY_CONTENT_BASE (where the content is: "{hub}" is replaced by the hub's id; until the
-// redesign's release the new hubs' content is under hubs/<id>/next/content/), TIMMY_ORIGINS (comma separated),
+// Settings (all optional): TIMMY_CONTENT_BASE (where the content is: "{hub}" is replaced by the hub's id; the default
+// is the live site's hubs/<id>/content/, so it only needs setting to read another copy), TIMMY_ORIGINS (comma separated),
 // ANTHROPIC_WORKSPACE_ID (only for a key made outside a workspace: the API refuses such a key without it).
 import Anthropic from "npm:@anthropic-ai/sdk@1.3.0";
 import site from "./site.json" with { type: "json" };
@@ -16,7 +16,7 @@ import { serve } from "./core.js";
 
 const SB_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SB_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-const BASE = Deno.env.get("TIMMY_CONTENT_BASE") ?? "https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/next/content/";
+const BASE = Deno.env.get("TIMMY_CONTENT_BASE") ?? "https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/content/";
 const ORIGINS = (Deno.env.get("TIMMY_ORIGINS") ?? "https://smcmurry6-source.github.io").split(",").map((s) => s.trim()).filter(Boolean);
 const HUB_RE = /^[a-z0-9][a-z0-9-]{0,39}$/;
 const TTL = 10 * 60 * 1000;

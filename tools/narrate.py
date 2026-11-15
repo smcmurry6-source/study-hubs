@@ -1,5 +1,5 @@
 """Narrate a hub's lecture notes with Kokoro: audio/<lecture>-full.mp3 (As taught), audio/<lecture>-plain.mp3 (Plain English)
-and, for the redesign, audio/<lecture>-hy.mp3 (High yield, read from hubs/<hub>/next/content/notes.json).
+and, on a hub on the engine, audio/<lecture>-hy.mp3 (High yield).
 
 The rule (vault/rules/text-and-audio-never-drift.md): change a lecture's notes at any level and regenerate that
 level's mp3 in the same PR. High yield is rebuilt from the notes, predicted topics, hints and questions
@@ -7,16 +7,17 @@ level's mp3 in the same PR. High yield is rebuilt from the notes, predicted topi
 its mp3, and tools/hub-next/build.mjs offers the recording to the page only while it matches. Kokoro installs itself the first time it's missing (tools/kokoro-setup.sh: kokoro-onnx,
 soundfile and the model files in /tmp/kokoro, or $KOKORO_DIR; vault/how-to/narrate-with-kokoro.md). Hard words use tools/podcast/lexicon.json, the same lexicon as Timmy Time.
 
-  python3 tools/narrate.py hubs/<hub>/index.html                      every lecture, both levels (skips existing files)
-  python3 tools/narrate.py hubs/<hub>/index.html --lec dmpharm --level full --force
-  python3 tools/narrate.py hubs/<hub>/index.html --text --lec dmpharm  print the spoken text, no audio
-  python3 tools/narrate.py hubs/<hub>/index.html --jobs 4              lectures in parallel processes
-  python3 tools/narrate.py hubs/<hub>/next/content/notes.json --level hy --jobs 4
-                                                                      High yield (the redesign), every lecture that has it;
+A hub on the engine (its notes are hubs/<hub>/content/notes.json: full, plain and hy; name the hub, or the file):
+  python3 tools/narrate.py <hub>                                       every lecture, all three levels (skips existing files)
+  python3 tools/narrate.py <hub> --lec dmpharm --level full --force
+  python3 tools/narrate.py <hub> --text --lec dmpharm                  print the spoken text, no audio
+  python3 tools/narrate.py <hub> --jobs 4                              lectures in parallel processes
+  python3 tools/narrate.py <hub> --level hy --lec dmpharm --force      High yield again, after it changed;
                                                                       then node tools/hub-next/build.mjs --hub <hub>
+An old single-file hub (its notes are in its page): the same, with hubs/<hub>/index.html in place of <hub>.
 
-It reads the hub's `var READINGS = {...};` and `var READINGS_PLAIN = {...};` lines (one JSON object each), or perio's
-READINGS['<id>'] = `...`; template-literal blocks, or the redesign's notes.json (full, plain and hy), turns the HTML
+It reads notes.json (full, plain and hy), or an old hub's `var READINGS = {...};` and `var READINGS_PLAIN = {...};`
+lines (one JSON object each) or READINGS['<id>'] = `...`; template-literal blocks, turns the HTML
 into spoken text (the "What's tested" box, headings with a pause, paragraphs, list items, and each table row read as
 "first cell: header, cell; ..."), and writes a 24 kHz mono 64 kbps mp3 like the hubs' existing narration, and beside it
 <lecture>-<level>.words.json, when each word of the notes is spoken (Kokoro's own timings), for the redesign's Follow along
@@ -144,11 +145,18 @@ def text_hash(html_text):
 
 
 def load(path):
-    """({level: {lecture: html}}, the audio folder) from a hub's index.html (full, plain) or the redesign's notes.json
-    (hubs/<hub>/next/content/notes.json: full, plain and hy)."""
+    """({level: {lecture: html}}, the audio folder) from a hub on the engine (hubs/<hub>/content/notes.json: full, plain
+    and hy; named by its hub id, its folder, its page or the file itself) or an old single-file hub's index.html (full, plain)."""
+    root = os.path.dirname(HERE)
+    if not os.path.isfile(path) and os.path.isfile(os.path.join(root, "hubs", path, "content", "notes.json")):
+        path = os.path.join(root, "hubs", path, "content", "notes.json")            # a hub id
+    elif os.path.isdir(path) and os.path.isfile(os.path.join(path, "content", "notes.json")):
+        path = os.path.join(path, "content", "notes.json")                          # the hub's folder
+    elif path.endswith(".html") and os.path.isfile(os.path.join(os.path.dirname(os.path.abspath(path)), "content", "notes.json")):
+        path = os.path.join(os.path.dirname(os.path.abspath(path)), "content", "notes.json")   # the engine hub's page
     if path.endswith(".json"):
         notes = json.load(open(path, encoding="utf-8"))
-        hub_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(path))))
+        hub_dir = os.path.dirname(os.path.dirname(os.path.abspath(path)))
         return {lv: notes[lv] for lv in ("full", "plain", "hy") if isinstance(notes.get(lv), dict)}, os.path.join(hub_dir, "audio")
     return readings(open(path, encoding="utf-8").read()), os.path.join(os.path.dirname(os.path.abspath(path)), "audio")
 

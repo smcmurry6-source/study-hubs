@@ -44,7 +44,7 @@ copy (or tell Sam to, for a claude.ai skill or a Project doc).
   bug-log, test-report) and `tags`;
   rules carry `since`, tasks carry the fields in [tasks/README](../tasks/README.md).
 - **Link, don't copy.** Each fact has one home; everywhere else links to it. Code is the home of anything code says
-  (exam dates live in `HUBS` in `index.html`, not in a note): a note says where to look.
+  (exam dates live in `hubs.js`, not in a note): a note says where to look.
 - **End with Related links** to the notes an agent would want next. Home links every rule, how-to, reference and hub note.
 - **A new rule** gets its own note in `vault/rules/`, a line in [home](../home.md) and an `@vault/rules/<name>.md` line
   in `CLAUDE.md` (so Claude Code loads it). A rule for **one feature only** (writing questions, an arcade, the podcast, figures) is **on

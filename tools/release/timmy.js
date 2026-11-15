@@ -50,7 +50,7 @@ function finish(mid, o){
 const age = (mid, mins) => sql(`update timmy_messages set created_at = now() - make_interval(mins => ${mins}) where id = ${mid}`);
 
 try {
-  notes.push(`applied ${db.pending.join(', ')} on top of supabase/schema.sql`);
+  notes.push(db.pending.length ? `applied ${db.pending.join(', ')} on top of supabase/schema.sql` : 'supabase/schema.sql has the game layer and Ask Timmy (no migration waiting)');
 
   /* ---------- 1. input ---------- */
   for (const [what, o] of [['no text', { text: '' }], ['1,001 characters', { text: 'x'.repeat(1001) }], ['a bad hub id', { hub: 'Perio!' }],

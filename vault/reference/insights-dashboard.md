@@ -12,7 +12,7 @@ Part of [analytics governance](analytics-governance.md).
 - **Data**: `get_insights(p_secret, p_exams)`, `get_insight_retries(p_secret)`, `get_data_quality(p_secret)`
   (`migration_v49.sql`). Agents on the Supabase connector call the same logic without the secret:
   `select sh_insights('{"<hub>":"YYYY-MM-DD", ...}')`, `select sh_insight_retries()`, `select sh_data_quality()`.
-- **Exam dates and live/archived status** come from `HUBS` / `ARCHIVED_HUBS` in `index.html`, read by the admin page at
+- **Exam dates and live/archived status** come from `hubs.js` (the dashboard's hub list), read by the admin page at
   load (the one place they live), through `widget/archive.js`, so a hub set by hand on the Hubs view counts as what the
   dashboard shows ([admin-operations](admin-operations.md)); `p_exams` is each hub's most recent exam. The **Past hubs**
   switch in the view's header adds the archived ones.

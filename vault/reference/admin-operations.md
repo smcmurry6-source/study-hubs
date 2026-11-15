@@ -57,13 +57,15 @@ its ink and blue-grey, each hub's class color as a dot).
 
 ## Hubs: archive overrides
 
-Each hub's dashboard state is **live** (card with Open), **archived** (greyed card, no Open button) or **hidden** (no
-card). Precedence, highest first (`shArchive.resolve` in `widget/archive.js`; the database stores only the override):
+Each hub's dashboard state is **live** (a tab with Start studying), **archived** or **hidden**. Since the redesign's
+release an archived hub has no card (Sam, 2026-11-14: the closed hubs' cards "dont seem to be for anything"), so
+archived and hidden look the same on the dashboard: no tab and no way in; the hub's open exam check-in is in the
+**Exam check-ins** panel and its recap under Past hubs either way. Precedence, highest first (`shArchive.resolve` in `widget/archive.js`; the database stores only the override):
 
 1. **An override that is in force** (`hub_archive_overrides`): set on the Hubs view to Live, Archived or Hidden. It lasts
    until Sam sets the hub back to **Automatic**, or until its optional end time; after that the dates decide again
    (Sam, 2026-11-04). The end time must be in the future and at most 400 days away.
-2. **The dates in `HUBS`** in `index.html`: `archiveOn` and `hideCardOn` if a hub has them.
+2. **The dates in `hubs.js`** (the dashboard's hub list): `archiveOn` and `hideCardOn` if a hub has them.
 3. **The exam dates**: archived at `ARCHIVE_HOUR` (10 pm) on the last exam day, hidden `CARD_DAYS` (10) days later. A hub
    listed in `ARCHIVED_HUBS` starts archived.
 

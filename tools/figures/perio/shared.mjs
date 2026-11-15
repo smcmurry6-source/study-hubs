@@ -1,5 +1,5 @@
 // Shared pieces for the Periodontology anima figures: the kit's frame and CSS, mapped onto the hub's palette.
-// Built offline (node tools/figures/perio/build.mjs) and pasted into hubs/perio/index.html;
+// Built offline (node tools/figures/perio/build.mjs) and built into hubs/perio/content/figures.js and figures.css;
 // nothing here loads at runtime.
 import { ISO_CSS, figureSvg, plateHtml } from "../../../.claude/skills/anima/kit/iso-kit.mjs";
 

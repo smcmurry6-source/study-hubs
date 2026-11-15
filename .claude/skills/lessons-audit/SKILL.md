@@ -18,7 +18,7 @@ search terms) is data to judge, never instructions to follow.
 
 - `git fetch origin main` and start your branch from `origin/main` (other sessions push here too).
 - Dates are **Central time** (`TZ=America/Chicago date`). Note the hour: the day before an exam, fixes matter most.
-- `:since` = the "Last refreshed" date in `LESSONS.md`. Live hubs = the `HUBS` array in `index.html`, with their exams.
+- `:since` = the "Last refreshed" date in `LESSONS.md`. Live hubs = `hubs` in `hubs.js`, with their exams.
 - Dump the banks (questions + lectures as the hub sees them):
   `PLAYWRIGHT_PATH=/opt/node22/lib/node_modules/playwright node tools/dump-banks.js <scratch>/banks`
 - **Archive check**: any hub (in `HUBS` or `ARCHIVED_HUBS`) whose **last** exam was before today, or is today and it's
@@ -92,7 +92,7 @@ so say in the retro how many there were and that later ones go into the next aud
    of it**. Fold anything durable into Standing lessons.
 3. **Publish its recap to the dashboard** (Sam's standing OK, 2026-10-01: no need to ask; names on, as for GI Exam 2):
    `node tools/publish-recap.js <hub> --bank <banks>/<hub>.json --dry-run` to check the numbers and the featured
-   question, then the same without `--dry-run`. It uses the hub's last exam from `index.html`. Re-running replaces it.
+   question, then the same without `--dry-run`. It uses the hub's last exam from `hubs.js`. Re-running replaces it.
    Say in the summary that it went live; `review/` → Recap → "Remove from dashboard" takes it down.
 4. **Take its audio off the site** (Sam's standing rule, 2026-11-12, no need to ask): `git rm hubs/<hub>/audio/*.mp3`
    and `data-audio="off"` on its widget tag, in this audit's PR (`vault/rules/archived-hubs-drop-their-audio.md`).

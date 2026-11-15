@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Hub archive state (widget/archive.js): the precedence between the dashboard's dates and an admin override, tested
 // without a browser or a database. Fails if
-//   - with no override, any hub in index.html (HUBS and ARCHIVED_HUBS) gets a different state than the dashboard gave
+//   - with no override, any hub in hubs.js (hubs and archived) gets a different state than the dashboard gave
 //     it before overrides existed (a frozen copy of that logic is below), at every hour from Sep 1 to Dec 31 2026;
 //   - an override in force doesn't win, or still wins after it is cleared or its end time passes;
 //   - a bad override (unknown state, a past end time) changes anything.
@@ -14,12 +14,12 @@ const problems = [];
 let checks = 0;
 function eq(got, want, what){ checks++; if (got !== want) problems.push(`${what}: got ${got}, want ${want}`); }
 
-/* ---------- the hubs, read from the dashboard (index.html is the one home of exam dates) ---------- */
-const html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-const D = A.fromDashboardHtml(html), HUBS = D.hubs, ARCHIVED = D.archived, OPT = D.options;
-if (!/var CHECKIN_HOUR = \d+, ARCHIVE_HOUR = \d+, CARD_DAYS = \d+;/.test(html)) throw new Error('index.html: ARCHIVE_HOUR / CARD_DAYS not found');
+/* ---------- the hubs, read from the dashboard's data (hubs.js is the one home of exam dates) ---------- */
+const src = fs.readFileSync(path.join(ROOT, 'hubs.js'), 'utf8');
+const D = A.fromHubsJs(src), HUBS = D.hubs, ARCHIVED = D.archived, OPT = D.options;
+if (!/"archiveHour": \d+/.test(src) || !/"cardDays": \d+/.test(src)) throw new Error('hubs.js: archiveHour / cardDays not found');
 
-/* ---------- a frozen copy of the dashboard's logic before overrides (index.html, 2026-11-04) ---------- */
+/* ---------- a frozen copy of the dashboard's logic before overrides (the old index.html, 2026-11-04) ---------- */
 function oldState(hub, listed, now){
   const ARCHIVE_HOUR = OPT.archiveHour, CARD_DAYS = OPT.cardDays;
   function parseYmd(s){ const p = String(s).split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }

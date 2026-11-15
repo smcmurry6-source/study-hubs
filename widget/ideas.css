@@ -5,11 +5,16 @@
 /* ---------- the board ---------- */
 .shi { display: grid; gap: 12px; min-width: 0; }
 .shi.is-off > * { display: none; }
-.shi-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; }
-.shi-head h2 { grid-column: 1; }
-.shi-head .shi-lede { grid-column: 1; max-width: 62ch; }
-.shi-head p.shi-lede:not(.note) { color: var(--muted); }
-.shi-head .shi-new { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+/* the top of the board: a sunny banner (what the board is, and the button), then one row of tools */
+.shi-head { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: var(--r-panel); background: var(--sun); color: var(--sun-ink); }
+.shi-mark { flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--sun-ink); color: var(--sun); }
+.shi-headtx { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.shi-head h2, .shi-head .shi-title { margin: 0; color: inherit; font-size: var(--fs-section, 22px); font-weight: var(--w-head); line-height: 1.2; }
+.shi-head .shi-lede { margin: 0; max-width: 62ch; color: inherit; opacity: .9; font-size: var(--fs-label); }
+.shi-head .shi-new { flex: none; gap: 6px; min-height: 48px; padding: 0 22px 0 16px; box-shadow: var(--float-shadow); transition: transform var(--t-hover); }
+.shi-head .shi-new:hover { transform: translateY(-2px); }
+.shi-barl { font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+@media (prefers-reduced-motion: reduce) { .shi-head .shi-new { transition: none; } .shi-head .shi-new:hover { transform: none; } }
 .shi-say { margin: 0; min-height: 0; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--text); }
 .shi-say:empty { display: none; }
 .shi-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
@@ -161,8 +166,12 @@
   .shi-bulb { left: 0; top: 0; width: 32px; }
 }
 @media (max-width: 560px) {
-  .shi-head { grid-template-columns: minmax(0, 1fr); }
-  .shi-head .shi-new { grid-column: 1; grid-row: auto; justify-self: start; }
+  .shi-head { flex-wrap: wrap; padding: 16px; gap: 12px; }
+  .shi-mark { width: 44px; height: 44px; }
+  .shi-mark svg { width: 24px; height: 24px; }
+  .shi-headtx { flex: 1 1 60%; }
+  .shi-head .shi-new { flex: 1 1 100%; justify-content: center; }
+  .shi-barl { display: none; }
   .shi-kinds { grid-template-columns: minmax(0, 1fr); }
   .shi-frame { padding: 7px; border-radius: 18px; }
   .shi-cork { padding: 28px 12px 14px; }

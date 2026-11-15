@@ -1,17 +1,18 @@
 /* ============ HUB ARCHIVE STATE (shared) ============
-   Which public state a hub is in right now: "live" (a card with an Open button), "archived" (a greyed card, no Open
-   button, check-in buttons by the exam dates) or "hidden" (no card). Two inputs, in this order of precedence:
+   Which public state a hub is in right now: "live" (a tab with its way in), "archived" or "hidden". The redesign's
+   dashboard draws no card for a closed hub (Sam, 2026-11-14), so archived and hidden look the same there: no tab, its
+   exam check-in by the exam dates, its recap. Two inputs, in this order of precedence:
 
      1. A manual override from the admin page (review/, Hubs tab; table hub_archive_overrides, migration_v50):
         live, archived or hidden, in force until Sam sets the hub back to Automatic or until its end time (until).
-     2. Automatic, from the dashboard's dates in index.html: a hub in HUBS archives at ARCHIVE_HOUR (10 pm) on the day
+     2. Automatic, from the dashboard's dates in hubs.js: a hub in its `hubs` archives at archiveHour (10 pm) on the day
         of its last exam (an exam's archiveHour, or the hub's archiveOn {date, hour}, moves that), and its card is
-        hidden CARD_DAYS (10) days later (hideCardOn moves that). A hub listed in ARCHIVED_HUBS is archived from the
+        hidden cardDays (10) days later (hideCardOn moves that). A hub listed in `archived` is archived from the
         start and hidden at its card-removal time.
 
    An override in force always wins; when it ends or is cleared, the dates decide again. Nothing here deletes or moves
    anything: the hub's page and direct link, questions, analytics and progress stay, and check-ins follow the exam dates.
-   Loaded by index.html (before its main script), review/index.html, and tested by tools/ci/archive.js (Node).
+   Loaded by the dashboard (inside widget/dash.bundle.js), review/index.html, and tested by tools/ci/archive.js (Node).
    widget/v3.js applies the same override rule to its "This hub is archived" notice. Reference:
    vault/reference/admin-operations.md. */
 (function(root){
@@ -72,33 +73,20 @@
   }
   function writeCache(rows){ try { localStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), rows: rows || [] })); } catch (e) {} }
 
-  /* the hubs from the dashboard's own source (index.html is the one home of hub dates): { hubs, archived, options }.
-     review/ (Hubs tab) and tools/ci/archive.js read it this way, so the admin page shows the same schedule. */
-  function literalAt(html, name){
-    var start = html.indexOf("var " + name + " = ["); if (start < 0) return null;
-    var i = html.indexOf("[", start), depth = 0, q = null;
-    for (; i < html.length; i++) {
-      var c = html[i];
-      if (q) { if (c === "\\") { i++; continue; } if (c === q) q = null; continue; }
-      /* skip comments, so an apostrophe in one ("the hub's week") doesn't open a string that never closes */
-      if (c === "/" && html[i + 1] === "*") { var e = html.indexOf("*/", i + 2); if (e < 0) return null; i = e + 1; continue; }
-      if (c === "/" && html[i + 1] === "/") { var nl = html.indexOf("\n", i + 2); if (nl < 0) return null; i = nl; continue; }
-      if (c === '"' || c === "'" || c === "`") { q = c; continue; }
-      if (c === "[") depth++;
-      else if (c === "]" && --depth === 0) return html.slice(html.indexOf("[", start), i + 1);
-    }
-    return null;
+  /* the hubs from the dashboard's own data (hubs.js is the one home of hub dates): { hubs, archived, options }.
+     fromData takes window.SH_DASH_DATA; fromHubsJs takes the file's text (review/'s Hubs tab fetches it fresh, and
+     tools/ci/archive.js reads it from disk), so the admin page shows the same schedule as the dashboard. */
+  function fromData(d){
+    if (!d || !Array.isArray(d.hubs)) throw new Error("no hubs in hubs.js");
+    return { hubs: d.hubs, archived: d.archived || [], options: opt({ archiveHour: d.archiveHour, cardDays: d.cardDays }) };
   }
-  function fromDashboardHtml(html){
-    var h = literalAt(html, "HUBS"), a = literalAt(html, "ARCHIVED_HUBS");
-    if (!h) throw new Error("no HUBS in the dashboard");
-    var k = /var CHECKIN_HOUR = \d+, ARCHIVE_HOUR = (\d+), CARD_DAYS = (\d+);/.exec(html);
-    /* the dashboard's own data literals (same origin, from this repo): plain objects, arrays and strings */
-    function ev(src){ return Function('"use strict"; return (' + src + ');')(); }
-    return { hubs: ev(h), archived: a ? ev(a) : [], options: k ? { archiveHour: Number(k[1]), cardDays: Number(k[2]) } : opt() };
+  function fromHubsJs(src){
+    /* the site's own file (same origin, from this repo): it only sets window.SH_DASH_DATA */
+    var w = {}; Function("window", String(src))(w);
+    return fromData(w.SH_DASH_DATA);
   }
 
-  var api = { STATES: STATES, fromDashboardHtml: fromDashboardHtml, DEFAULTS: DEFAULTS, parseYmd: parseYmd, lastExam: lastExam, archiveAt: archiveAt, cardGoneAt: cardGoneAt,
+  var api = { STATES: STATES, fromData: fromData, fromHubsJs: fromHubsJs, DEFAULTS: DEFAULTS, parseYmd: parseYmd, lastExam: lastExam, archiveAt: archiveAt, cardGoneAt: cardGoneAt,
     autoState: autoState, activeOverride: activeOverride, resolve: resolve, index: index, readCache: readCache, writeCache: writeCache, CACHE_KEY: CACHE_KEY };
   root.shArchive = api;
   if (typeof module !== "undefined" && module.exports) module.exports = api;

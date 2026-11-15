@@ -20,7 +20,9 @@ Why and how: [vault/rules/repo-is-the-vault.md](vault/rules/repo-is-the-vault.md
 5. The note for each hub you'll touch: `vault/hubs/<hub-id>.md`.
 6. Before building a hub or adding a lecture: `LESSONS.md` and [vault/how-to/build-a-hub.md](vault/how-to/build-a-hub.md).
 
-Don't read the big files whole. Each `hubs/<id>/index.html` is one large single-file app: grep for what you need.
+Don't read the big files whole. A hub's content is JSON in `hubs/<id>/content/` (a question or a lecture to a line),
+the engine that draws it is `widget/hub.js` and its parts, and an older hub is one large single-file
+`hubs/<id>/index.html`: grep for what you need.
 `DEPLOY_NOTES.md` is the change log: read its top entries and grep it for your hub or feature.
 
 ## 2. Doing a task
@@ -70,5 +72,7 @@ Knowledge left only in your chat or memory is lost to the next agent.
 - **Text and audio never drift:** editing a lecture's notes means regenerating its narration in the same PR; if you
   can't, don't edit the text ([text-and-audio-never-drift](vault/rules/text-and-audio-never-drift.md)).
 - **Ship it now:** never hold a change until after an exam ([ship-it-now](vault/rules/ship-it-now.md)).
-- Shared features go in `widget/`, never patched into one hub. Keep `window.SH_EXPORT = {` as the last statement of a
-  hub's script (the CI lint hooks in there).
+- Shared features go in `widget/`, never patched into one hub. A hub's content is edited in `hubs/<id>/content/`, then
+  `node tools/hub-next/build.mjs`; after a merge that changed questions, load the hub's answer keys
+  ([build-a-hub](vault/how-to/build-a-hub.md)). In an old single-file hub, keep `window.SH_EXPORT = {` as the last
+  statement of its script (the CI lint hooks in there).

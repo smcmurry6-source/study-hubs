@@ -17,7 +17,7 @@ its narration and Timmy Time off the site ([archived-hubs-drop-their-audio](../v
 
 ## 1. Pull the data
 
-- Read `LESSONS.md` and note its **Last refreshed** date (`:since`). Read the live hubs from `HUBS` in `index.html`.
+- Read `LESSONS.md` and note its **Last refreshed** date (`:since`). Read the live hubs from `hubs.js`.
 - Run `select sh_data_quality();` first (`tools/analytics-quality.sql`): if tracking stopped, a test hub or a new event
   family shows up, fix or note it before trusting the rest ([analytics-data-quality](../vault/reference/analytics-data-quality.md)).
 - Run every query in `tools/lessons-daily.sql` with the Supabase connector (`execute_sql`, project
@@ -27,7 +27,7 @@ its narration and Timmy Time off the site ([archived-hubs-drop-their-audio](../v
   ([question-health](../vault/reference/question-health.md)). The flags are leads, not verdicts
   ([question-health-flags-are-leads](../vault/rules/question-health-flags-are-leads.md)): check each against the notes,
   fix only what step 4 allows, and list the rest for Sam with what you found. Never write to `question_reviews`.
-- For question ids that come up, read the question in the hub's bank (`hubs/<id>/index.html`) so you judge the
+- For question ids that come up, read the question in the hub's bank (`hubs/<id>/content/questions.json`; an old single-file hub: `hubs/<id>/index.html`) so you judge the
   actual stem, choices, key and explanation, not just the numbers.
 
 ## 2. Decide what it means

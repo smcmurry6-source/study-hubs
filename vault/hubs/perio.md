@@ -8,15 +8,19 @@ status: live
 # Periodontology (perio)
 
 The D2 Periodontology course (DENT 2145), nine sessions with different professors. Midterm Oct 1 (S1-S4, done, check-in
-closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `MIDTERM_DATE` / `FINAL_DATE` in the hub).
+closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `exams` in `content/core.json`).
 
 ## Before you work on it
 
-- **Source:** `hubs/perio/index.html` is the source; edit it directly. The old Perio Claude Project's split sources are
-  retired (Sam, 2026-11-03), so every "Perio Project: carry ... into the split sources" line in the change log is obsolete.
-- **Its own engine**, not the shared Occlusion one: the bank keeps its filters in `STATE.ui.qbank`, matching grades by
-  answer text, picture questions use `figAfter`, `recordAnswer` passes select-all picks. Since 2026-11-03 it has `two()`,
-  `tf()`, `nums()`, `mq()` and `mm()`.
+- **On the shared engine since the redesign's release** (2026-11): the page, `hubs/perio/index.html`, is settings only
+  (`window.SH_HUB`), and **the source is `hubs/perio/content/`** (`core.json`, `questions.json`, `notes.json`,
+  `study.json`, `arcade.js/css`, and `figures.js/css`, built below). Edit the JSON, then
+  `node tools/hub-next/build.mjs --hub perio`; after a merge that changed questions, load the hub's answer keys
+  ([build-a-hub](../how-to/build-a-hub.md)). Perio's own engine and single-file page went at the release (git keeps
+  them: the commit before the release's merge), so the old page's names in this note and in the change log (`REF_SECTIONS`,
+  `EXAM_HINTS`, `PCASES`, `two()`, `STATE.ui.qbank`...) are history: the same data is in the JSON (a session's `review`
+  sections, `hints`, `pcases`, a question's `fmt`). The old Perio Claude Project's split sources were retired earlier (Sam,
+  2026-11-03).
 - **Sessions** (`status`): S1-S5 taught (exempt from the format minimums, taught before the rules), S6 `preview`
   (slides only), S7 taught (Dr. Kaur), S8 taught (antibiotics from Dr. Litz's 2024 recording; host modulation and his
   dosing chart from the Nov 5 class, [task](../tasks/done/2026-11-03-perio-s8-host-modulation-class.md)), S9 taught (2026-11-10)
@@ -27,7 +31,8 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
 - **Sources:** Drive, Periodontology/hubs (class captures, sometimes as base64 `.txt`; slide PDFs; recordings). The Drive
   connector can't download over 10 MB, so a big PDF may be text only.
 - **Quiz card:** `NEXT_QUIZ` shows on Home until its date passes; set the next one there.
-- **Figures:** `tools/figures/perio/` (`build.mjs` fills the `anima:js`/`anima:css` markers; `--check`, `--preview`),
+- **Figures:** `tools/figures/perio/` (`build.mjs` writes the anima figures into `hubs/perio/content/figures.js` and
+  `figures.css`; `--check`, `--preview`),
   placed with `FIG_BY_LEC` / `figsHTML`. The suture diagrams are hand-drawn SVG in the hub (`SUTURE_DIAGRAMS`).
 - **Patient Box cases drawn from their numbers** (since 2026-11-04, [task](../tasks/done/2026-11-04-perio-visual-case-engine.md)):
   `PCASES` in the hub (between the `pcases` markers) holds each case's box rows, its spec (per-tooth probing depths,
@@ -50,9 +55,10 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
 - **Dr. Abou-Arraj's review for the final** (the end of the Nov 12 class, in Drive with the class's capture; added
   2026-11-14). The format: 60-65 questions, about 15% (20% at most) from S1-S4, an hour and a half that he said can be
   two, multiple choice, multiple answers, maybe categorization, some matching, images and radiographs but no suture
-  images, few or no Patient Box cases. It is in an S1 Exam Hint, Home's final card (`FINAL_FACTS`), `COURSE_GRADING`, the
-  mock (`EXAM_FORMAT`: 62 in 90 minutes, 2 Patient Box, 6 multiple-answer, 3 matching, 1 ordering, and `midShare` 0.15:
-  `drawSplit()` takes about 15% of each kind from S1-S4) and the redesign's chips, banner and blurb. What he said to know
+  images, few or no Patient Box cases. It is in an S1 Exam Hint, Home's chips, the hints banner and the mock's blurb
+  (`window.SH_HUB` in the page) and the mock (`mock.format` in `content/core.json`: 62 in 90 minutes, 2 Patient Box, 6
+  multiple-answer, 3 matching, 1 ordering, and `midShare` 0.15 with `midThrough` 4: `formatMock` in `widget/hub-bank.js`
+  takes about 15% of each kind from S1-S4). What he said to know
   and to skip is an Exam Hint per session (S1-S5, S8) and a line in each session's `note`. **36 questions came out**
   under [dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md) (`retired` in
   `tools/question-ids/perio.txt`): S2's suture techniques and suture pictures ("not techniques, but the different
@@ -70,12 +76,11 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   the review (the maxillary buccal entrance is the narrowest, mesial and distal about the same and wider, as the notes
   have it from Dr. Litz); its aside that the mandibular buccal entrance is the widest disagrees with Dr. Litz's slide
   (lingual wider, kept as taught below), and since width won't be asked, the notes keep the slide.
-- **Narration:** both levels for every session, made with `python3 tools/narrate.py hubs/perio/index.html --lec <id>
-  --force` (it reads perio's template-literal `READINGS['<id>']` blocks since 2026-11-05; `--text` shows what it will say;
-  it writes the redesign's word timings beside each mp3 too). Session 5's two mp3s were regenerated on 2026-11-12: their
+- **Narration:** all three levels for every session, made with `python3 tools/narrate.py perio --lec <id>
+  --force` (`--text` shows what it will say; it writes the word timings for Follow along beside each mp3 too). Session 5's two mp3s were regenerated on 2026-11-12: their
   middle (minutes 5-9 of Plain English, 6-15 of As taught) no longer said what the notes say, found while making the
-  word timings ([narrate-with-kokoro](../how-to/narrate-with-kokoro.md)). **High yield** (the redesign's third level) is
-  narrated too, since 2026-11-12: `audio/<id>-hy.mp3` for all nine sessions, made from `next/content/notes.json`. It changes
+  word timings ([narrate-with-kokoro](../how-to/narrate-with-kokoro.md)). **High yield** (the third level) is
+  narrated too, since 2026-11-12: `audio/<id>-hy.mp3` for all nine sessions, made from `content/notes.json`. It changes
   whenever a session's notes, predicted topics, hints or questions do, so a question edit can mean recording that session's
   High yield again in the same PR: the smoke lint says which ([text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)); **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
   (`img/clinic-escape.webp`).
@@ -132,38 +137,32 @@ closed); **final Thu Nov 19, cumulative**. Dates: `HUBS` in `index.html` (and `M
   come from the notes (#7 the reference, laterals 1 mm apical before and 1 mm coronal after, 2 mm for 2 mm on the
   centrals); how far #6 and #11 sat, the papillae and the lips are illustrative.
 
-## The new version (the redesign, not live yet)
+## On the engine (since the redesign's release)
 
-`hubs/perio/next/` is the redesigned hub on the shared engine (`widget/hub.js`), built beside this one
-([phase 2](../tasks/2026-11-05-redesign-phase-2-live-hubs.md), the way Occlusion's and [Heme & Endo Exam 2's](heme-endo-exam2.md)
-were) and switched in at the [release](../tasks/2026-11-06-redesign-release.md). Perio needs no engine of its own there: its
-old one goes at the release. Nothing students see changes until then: outside a preview the page sends the visitor to the
-live hub. Until then **edit content in the live file only**:
-- `node tools/hub-next/build.mjs` rewrites `next/content/` from `hubs/perio/index.html`. Run it after any change to the live
-  hub (a question, a note, a hint, a case, a figure) and commit the JSON; CI's "generated files are current" step fails when
-  it's stale. Its `adaptPerio()` turns Perio's own names into the engine's shapes: `EXAM_HINTS` (hints, `type` → kind),
-  `CRAM_CONTENT`, the achievements (`topicPercent` → `lecRight`, "every question of a session right once"), `EXAM_FORMAT`
-  (the mock), the suture pictures (`SUTURE_DIAGRAMS`, `SUTURE_DEFS` → figures), and each session's `REF_SECTIONS` into the
-  Review tables under that session's notes (the live hub's own HTML; More's Side by side has nothing left, so it's hidden,
-  `core.noSide`). The sandbox runs `widget/cases.js` first, so the Patient Box rows (`foldBox`) come out as the live hub draws them.
+Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/2026-11-05-redesign-phase-2-live-hubs.md)) and moved to
+`hubs/perio/` at the [release](../tasks/2026-11-06-redesign-release.md).
+- It is in `sw.js`'s `HUBS`, so its page, art and content are precached; a content edit shows on the page load after the
+  one that fetched it.
+- Each session's Review tables sit under that session's notes (`core.noSide`: More's Side by side has nothing left, so
+  it's hidden). The Patient Box cases are `core.json`'s `pcases`, checked by `node tools/ci/cases.js`.
 - **Progress carries over:** same hub id, state key `perio-d2-compendium-state-v1`, answered event `perio:answered`, every
   question id (`tools/question-ids/perio.txt`), and **Perio's own saved shape** (`SH_HUB.stateShape: "answered"`:
   `answered`, `totalSeen`, `activeDates`, `achievements` as `true`), which the dashboard reads as it is. The engine reads and
-  writes it only through `ansOf()`, `putAnswer()`, `studyDayList()` and `achMap()`, so the live page reads a save the new
-  one wrote (checked: a rollback keeps every answer). It adds `nx` (the daily goal) and `read` (Notes done), which the live
+  writes it only through `ansOf()`, `putAnswer()`, `studyDayList()` and `achMap()`, so the old page reads a save the
+  engine wrote (checked: a rollback keeps every answer). It adds `nx` (the daily goal) and `read` (Notes done), which the old
   page ignores. The bank's saved filters (`ui.qbank`) move into the engine's once (`ui.qbankIn`).
-- **Question health keeps every version:** the export (`SH_EXPORT.questions`) matches the live hub's for every question (the
+- **Question health keeps every version:** the export (`SH_EXPORT.questions`) matches the old page's for every question (the
   Patient Box rows before the stem, a multi's keys: `core.exportCase`).
 - The engine learned, gated to the hubs that have them: **recall cards** (reveal, then "I got it" / "I missed it"),
   **case links** ("In the notes", `shCases.refHTML`), a lecture's **note** under its title, **HTML review sections**, and the
-  **exam-format mock** (`EXAM_FORMAT`, since 2026-11-14 the final's: 62 in 90 minutes, 2 Patient Box, 6 multiple-answer
-  with partial credit, 1 ordering, points per session). The engine's `formatMock` doesn't draw matching items or the
-  15% S1-S4 share (`match`, `midShare`): a box in [the release](../tasks/2026-11-06-redesign-release.md). Its arcade (`POCKET ARCADE` to `BOOT`, with `PERIO_SKIN`) is the live hub's, wrapped like the others';
-  its `start` / `stop` are mapped to the engine's `startGame` / `stopAll`, and its colors and fonts come through the build
-  (`--ar-*` ending in `--ar-lilac`; Bungee, which the new page doesn't load, so it falls back to Arial Black).
-- The page (`next/index.html`) is settings only: `window.SH_HUB` holds the words the live hub writes in its own code (Home's
-  final card and chips, the hints banner, the mock's blurb, the arcade's games with their current names, Pocket Showdown
-  first). When one changes in the live hub, change it there too. Perio has no Timmy Time episode, so More has no Timmy tile.
+  **exam-format mock** (`mock.format` in `core.json`, since 2026-11-14 the final's: 62 in 90 minutes, 2 Patient Box, 6
+  multiple-answer with partial credit, 3 matching scored pair by pair, 1 ordering, about 15% of each kind from S1-S4
+  (`midShare`, `midThrough`), points per session). Its arcade (`content/arcade.js`, with `PERIO_SKIN`) is the old page's, wrapped like the others';
+  its `start` / `stop` are mapped to the engine's `startGame` / `stopAll` (`--ar-*` colors ending in `--ar-lilac`; Bungee,
+  which the page doesn't load, so it falls back to Arial Black).
+- `window.SH_HUB` in the page holds the hub's own words (Home's final card and chips, the hints banner, the mock's blurb,
+  the arcade's games with their current names, Pocket Showdown first). Perio has no Timmy Time episode, so More has no
+  Timmy tile.
 - Its text color is a deeper pink than its art's ink (`#9e3a60`, 5.1:1 on its light pink; the ink is 4.05:1), in `widget/hub.css`.
 - Its art: tint `#b4466f`, emblem and masthead (phase 0), and the arcade lobby drawings (`tools/figures/site/arcade.mjs`,
   `pBoard()` to `pCrusher()`, built into `widget/hub-art/perio.js`). Sam approved five on 2026-11-11 ("the other drawings
@@ -171,7 +170,7 @@ live hub. Until then **edit content in the live file only**:
   in their gums, a column per session, like Heme & Endo's approved Showdown), and Sam approved the redraw the same day. All
   six are in. A change to one: edit it in `arcade.mjs`, run `node tools/figures/site/build.mjs`, commit
   `widget/hub-art/perio.js` and `tools/preview/design/art.js`, and show Sam before it goes in.
-- Not carried over (on purpose): the MCQ sprint and the midterm's scope (the midterm is over), the live lobby's daily
+- Not carried over (on purpose): the MCQ sprint and the midterm's scope (the midterm is over), the old lobby's daily
   rotating first game (Pocket Showdown is first), hints' slide and email source tags. Active recall is the
   [Learn and Flashcards](../tasks/2026-11-06-redesign-learn-and-flashcards.md) task's.
 

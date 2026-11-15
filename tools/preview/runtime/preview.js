@@ -236,7 +236,7 @@
   /* the mastery medal three of them show, on the game layer's boards and at their place (get_place). One each: a row
      with two or more draws widget/ranks.js's "+1" medal button, whose name leaves the "+1" out (BUG-112, left for the
      release), and the accessibility suite would stop on it */
-  var FAKE_FLAIR = { "Fixture Fluoride": "perio:4", "Sample Sealant": "heme-endo-exam2:1", "Test Tubercle": "occlusion:2" };
+  var FAKE_FLAIR = { "Fixture Fluoride": "perio:4,occlusion:3", "Sample Sealant": "heme-endo-exam2:1", "Test Tubercle": "occlusion:2" };   // one classmate has two, so the "+1" on a medal button is drawn (BUG-112)
   var TIER_AT = [0, 300, 1500, 5000, 12000, 25000, 50000, 125000];
   function tierOf(xp){ var t = 0; for (var i = 0; i < 7; i++) if (xp >= TIER_AT[i]) t = i; return t; }
   function stepOf(xp){ var t = tierOf(xp), lo = TIER_AT[t], hi = TIER_AT[t + 1]; return Math.min(20, t * 3 + Math.min(2, Math.floor((xp - lo) * 3 / (hi - lo)))); }
@@ -353,7 +353,7 @@
       mastery: hub ? rpc("get_hub_mastery", { p_visitor: v }).data : []
     };
   }
-  /* two published recaps for the dashboard's slideshow: made-up totals in the shape get_hub_recap returns (the live
+  /* the published recaps for the dashboard's slideshow: made-up totals in the shape get_hub_recap returns (the live
      site's are drawn from the class's real totals, which a preview never loads) */
   function recapFixtures(){
     function one(hub, title, color, exam, people, minutes, answers, correct, tough){
@@ -365,8 +365,16 @@
         data: { hub: hub, people: people, minutes: minutes, answers: answers, correct: correct, first_day: byDay[0].d, last_day: exam, exam_day: exam,
           by_day: byDay, by_hour: byHour, toughest: tough ? [{ qid: "pv-tough", attempts: 52, correct: 16 }] : [], night_before: Math.round(minutes * .18), night_before_people: Math.round(people * .8), after_midnight: 6, regulars: Math.round(people * .6) } };
     }
+    /* one for each exam the live site has a recap of (Sam, 2026-11-13: the preview showed two and looked as if past
+       hubs were missing), newest first; every number is made up */
     return [one("pcd-implants-exam1", "PCD Implants Exam 1", "#2f6f84", "2026-11-06", 58, 9120, 21480, 14820),
-            one("heme-endo-exam1", "Heme & Endo Exam 1", "#a83232", "2026-10-30", 61, 11340, 26950, 17790, true)];
+            one("heme-endo-exam1", "Heme & Endo Exam 1", "#a83232", "2026-10-30", 61, 11340, 26950, 17790, true),
+            one("occlusion", "Occlusion Midterm", "#7a5c9c", "2026-10-22", 60, 8740, 19860, 13920),
+            one("msk-exam4", "MSK Exam 4", "#3d7a5a", "2026-10-16", 57, 7980, 18340, 12650, true),
+            one("pcd-exam3", "PCD Exam 3", "#2f6f84", "2026-10-16", 55, 6420, 15210, 10980),
+            one("hepatobiliary", "GI Exam 2", "#b0672b", "2026-10-09", 59, 9480, 22110, 15070),
+            one("msk-exam3", "MSK Exam 3", "#3d7a5a", "2026-10-09", 56, 8010, 17650, 11930, true),
+            one("perio", "Perio Midterm", "#b8456b", "2026-10-01", 62, 10230, 24400, 16840)];
   }
   /* the account's starting XP, plus a little for each answer given in this preview (the server's real rule is per day) */
   function myXp(){ var extra = 0; allAnswers().forEach(function(a){ if (!a[4]) extra += a[3] ? 3 : 1; }); return (db.xp || 0) + extra + (db.xp2 || 0); }
@@ -1095,7 +1103,7 @@
   var timmyContent = {};
   function timmyHub(hub){
     if (!timmyContent[hub]) {
-      var base = ROOT + "hubs/" + hub + "/next/content/";
+      var base = ROOT + "hubs/" + hub + "/content/";
       timmyContent[hub] = Promise.all([realFetch(base + "core.json").then(function(r){ return r.json(); }), realFetch(base + "notes.json").then(function(r){ return r.json(); })])
         .then(function(x){ return { core: x[0], notes: x[1] }; }, function(){ delete timmyContent[hub]; return null; });
     }
@@ -1724,7 +1732,7 @@
       var r = Math.random();
       if (crowd.length <= 4 || (r < .55 && crowd.length < 16)) add(); else crowd.splice(1 + Math.floor(Math.random() * (crowd.length - 1)), 1);
       send();
-    }, /\/next\/(index\.html)?$/.test(location.pathname) && !/\/hubs\//.test(location.pathname) ? 7000 : 20000);
+    }, /\/(index\.html)?$/.test(location.pathname) && !/\/(hubs|about|review|tools)\//.test(location.pathname) ? 7000 : 20000);   /* faster on the dashboard, where the classroom shows it */
   }
   function mount(){
     if (document.getElementById("shpv-pill")) return;

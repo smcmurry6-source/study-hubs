@@ -70,15 +70,13 @@ const QUICK = process.argv.includes('--quick');
       };
       await sideways('dashboard');
       let screens = 1, tiny = 0;
-      /* the redesign's dashboard (next/, widget/dash.js; beside the live one until the release): each hub's tab and the class board's two lists */
-      if (fs.existsSync(path.join(L.ROOT, 'next', 'index.html'))) {
-        await page.goto(srv.url + 'next/?persona=returning'); await L.settle(page);
-        await sideways('dashboard/next'); screens++;
+      /* the dashboard (widget/dash.js): each hub's tab and the class board's two lists */
+      {
         const tabs = await page.$$eval('#hubTabs [data-tab]', ts => ts.map(t => t.getAttribute('data-tab')));
-        if (!tabs.length) problems.push(`${tag}: dashboard/next shows no hub tabs`);
-        for (const t of tabs) { await page.click(`#hubTabs [data-tab="${t}"]`).catch(() => {}); await page.waitForTimeout(250); await sideways(`dashboard/next · ${t}`); screens++; }
+        if (!tabs.length) problems.push(`${tag}: dashboard shows no hub tabs`);
+        for (const t of tabs) { await page.click(`#hubTabs [data-tab="${t}"]`).catch(() => {}); await page.waitForTimeout(250); await sideways(`dashboard · ${t}`); screens++; }
         for (const bn of await page.$$('#boardSeg button')) { await bn.click().catch(() => {}); await page.waitForTimeout(350); }
-        await sideways('dashboard/next · class board');
+        await sideways('dashboard · class board');
       }
       for (const hub of live) {
         await page.goto(srv.url + `hubs/${hub}/`); await L.settle(page);
@@ -112,13 +110,16 @@ const QUICK = process.argv.includes('--quick');
       const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
       const target = modes[1] || modes[0];
       await page.click(`#modeSwitch [data-mode="${target}"]`); await page.waitForTimeout(400);
-      const qid = await page.evaluate(() => { const ev = document.querySelector('script[src*="widget/v3.js"]').dataset.answeredEvent, q = window.SH_EXPORT.questions[1];
-        document.dispatchEvent(new CustomEvent(ev, { detail: { qid: q.id, correct: false, choice: 1 } })); return q.id; });
+      /* a hub on the engine fills SH_EXPORT.questions once its bank has loaded, and its widget tag comes with the bundle */
+      await page.waitForFunction(() => window.SH_EXPORT && Array.isArray(window.SH_EXPORT.questions) && window.SH_EXPORT.questions.length > 1 && document.querySelector('script[data-answered-event]'), null, { timeout: 30000 }).catch(() => {});
+      const qid = await page.evaluate(() => { const ev = document.querySelector('script[data-answered-event]').dataset.answeredEvent, q = window.SH_EXPORT.questions[1];
+        /* a miss: the game layer's pages are graded from the key, so the choice sent is one that isn't it */
+        document.dispatchEvent(new CustomEvent(ev, { detail: { qid: q.id, correct: false, choice: q.answer === 1 ? 0 : 1 } })); return q.id; });
       await page.waitForTimeout(600);
       const logBefore = await page.evaluate(() => window.__shPreview.log().length);
       await page.reload(); await L.settle(page);
-      const after = await page.evaluate(([h, q]) => ({ mode: (document.querySelector('#modeSwitch [aria-selected="true"]') || {}).dataset, srs: (localStorage.getItem('sh_srs_' + h) || '').includes(q),
-        log: window.__shPreview.log().length, mine: (window.__shPreview.db().answers[h] || []).some(r => r[0] === q && !r[3]) }), [hub, qid]);
+      const after = await page.evaluate(([h, q]) => ({ mode: (document.querySelector('#modeSwitch [aria-selected="true"], #modeSwitch [aria-current="page"]') || {}).dataset, srs: (localStorage.getItem('sh_srs_' + h) || '').includes(q),
+        log: window.__shPreview.log().length, mine: (window.__shPreview.db().answers[h] || []).some(r => r[0] === q && !r[2]) }), [hub, qid]);
       if (!after.mode || after.mode.mode !== target) problems.push(`refresh (${label}): ${hub} reopened in ${after.mode ? after.mode.mode : 'no mode'}, not ${target}`);
       if (!after.srs) problems.push(`refresh (${label}): the missed question isn't in spaced review after a reload`);
       if (!after.mine) problems.push(`refresh (${label}): the answer didn't reach the (fixture) server`);
@@ -132,18 +133,28 @@ const QUICK = process.argv.includes('--quick');
       const ctx = await browser.newContext(Object.assign(strip(dev), { serviceWorkers: 'block' })); await L.guard(ctx);
       const page = await ctx.newPage(); const errs = []; page.on('pageerror', e => errs.push(e.message));
       await page.goto(srv.url + 'index.html?persona=returning'); await L.settle(page);
+      /* the dashboard shows one hub at a time: its tab first, then the way in */
+      await page.click(`#hubTabs [data-tab="${hub}"]`).then(() => page.waitForTimeout(250), () => {});
       const link = await page.$(`a[href*="hubs/${hub}/"]`);
       if (!link) problems.push(`history (${label}): no link to ${hub} on the dashboard`);
       else {
         await Promise.all([page.waitForNavigation(), link.click()]); await L.settle(page);
         if (!page.url().includes(`hubs/${hub}/`)) problems.push(`history (${label}): the dashboard's link didn't open ${hub}`);
         await page.click('#modeSwitch [data-mode]:nth-child(2)').catch(() => {});
-        await page.goBack(); await page.waitForLoadState(); await L.settle(page);
+        /* a hub on the engine keeps its views in the address (#notes), so Back walks its views first and then leaves
+           the hub; an old hub leaves at once. Forward takes the same number of steps back in. */
+        let steps = 0;
+        do { await page.goBack(); await page.waitForLoadState(); await page.waitForTimeout(300); steps++; } while (page.url().includes('/hubs/') && steps < 4);
+        await L.settle(page);
         if (page.url().includes('/hubs/')) problems.push(`history (${label}): Back from ${hub} didn't return to the dashboard (${page.url()})`);
         if (!(await page.$('#shpv-pill'))) problems.push(`history (${label}): the dashboard didn't render after Back`);
-        await page.goForward(); await page.waitForLoadState(); await L.settle(page);
+        for (let i = 0; i < steps; i++) { await page.goForward(); await page.waitForLoadState(); await page.waitForTimeout(300); }
+        await L.settle(page);
         if (!page.url().includes(`hubs/${hub}/`) || !(await page.$('#modeSwitch'))) problems.push(`history (${label}): Forward didn't bring ${hub} back`);
-        await page.click('#sh-ribbon-back, #shhome-pill', { timeout: 3000 }).catch(() => problems.push(`history (${label}): no back-to-dashboard button in ${hub}`));
+        /* the way back to the dashboard, always on the screen: the bar's "All hubs", or on a phone on the engine "Hubs"
+           at the start of the top strip (Sam, 2026-11-13: "a convenient back to dashboard button when you are in a hub") */
+        const backSel = (await page.isVisible('#sh-ribbon-back')) ? '#sh-ribbon-back' : (await page.isVisible('.hx-strip .hx-home')) ? '.hx-strip .hx-home' : '#shhome-pill';
+        await page.click(backSel, { timeout: 3000 }).catch(() => problems.push(`history (${label}): no back-to-dashboard button on the screen in ${hub}`));
         await page.waitForLoadState(); await L.settle(page);
         if (page.url().includes('/hubs/')) problems.push(`history (${label}): ${hub}'s back button didn't open the dashboard`);
       }
