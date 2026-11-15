@@ -32,6 +32,24 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **Occlusion: the final's question bank audited, and a mock that leans on High likelihood (2026-11-15, Claude Code, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370))** — Sam:
+  "audit occlusions question bank to see if we can make it higher yield ... accurate, with good answer options and sufficient
+  explanations", then "make sure the exam hints are utilized as best as possible". Every L6-L10 question checked against the
+  notes and the Exam Hints. **156 questions fixed** in place (ids kept): 4 that the notes contradict ([BUG-152](vault/release/bug-log.md):
+  `cs-in-crown-lab`'s case, `nc-sel-acid`, `mo-histo`, `ot-sel-clin`), keys that were the longest choice trimmed, giveaway and
+  arguable distractors rewritten, whys and explanations completed, professors' words quoted where a hint backs the point. **Every
+  emphasized hint is now tested**: 4 new questions (`in-worth`, `mo-joint-load`, `mo-splint-cause`, `dn-wf-skel`), weak ones
+  re-aimed, 3 new High likelihood topics for L7's orphan hints (the splint as an environment of healing, painless wear, a
+  traumatic force), and topics renamed, added to and trimmed across L6-L10 (63 in all). **Retired** on Sam's call: `mo-better-q`,
+  `mo-swim`, `in-2s-4` (kept: `mo-bell`, `mo-occupational`, `ot-tf-4`, `ot-tf-5`, `dn-tf-6`). 845 questions. **The mock**: 7 of each
+  lecture's 9 from its High likelihood questions (Sam: "mostly high likelihood. Like 75%"): `core.mock.likelyShare` (0-1),
+  read by `buildMock()` in `widget/hub-bank.js` for any hub that sets it, each side unseen and missed first, topped up from the
+  other side when short (L10 is all High likelihood: 9 of 9). The mock's blurb and the About page's High Likelihood entry say
+  so; Ask Timmy's site help rebuilt. High yield rebuilt and **recorded again for all five final lectures**. Class data:
+  `tools/data-fixes/2026-11-15-occlusion-audit.sql` (73 rewritten choices' picks, 8 re-aimed questions' "% right", recounted
+  from the new versions' answers) runs once after the merge. Sam's calls on its two open questions: the splint follows Dr. Givan's slides, and L10 keeps "Miller" as
+  Dr. Abou-Arraj's slide has it ([decisions](vault/decisions.md)); after-merge steps: [the inbox](vault/tasks/inbox.md);
+  what the next audit needs to know: "The final's bank audit" in [the hub note](vault/hubs/occlusion.md).
 - **2026-11-15 (Perio: the question bank audited for the final, Claude Code)** — Sam: "audit perios question bank to see
   if we can make it higher yield ... accurate, with good answer options and sufficient explanations. Make sure the exam
   hints are utilized as best as possible." Every question was read against its session's notes, hints, review tables
