@@ -505,7 +505,7 @@ cs-in-high-fix
 in-2s-1
 in-2s-2 retired
 in-2s-3
-in-2s-4
+in-2s-4 retired
 in-2s-5 retired
 in-2s-6
 in-2s-7
@@ -567,7 +567,7 @@ mo-interf-equal
 mo-slide2
 mo-prophy
 mo-new-medio
-mo-better-q
+mo-better-q retired
 mo-muscle-joint
 mo-straw retired
 mo-therapy-def
@@ -614,7 +614,7 @@ mo-gerd-side
 mo-bulimia retired
 mo-screwdriver
 mo-soda
-mo-swim
+mo-swim retired
 mo-nccl-site
 mo-nccl-tx
 mo-abfraction
@@ -910,3 +910,7 @@ ot-wf-2
 ot-sel-clin
 ot-sel-mob
 ot-match-anim
+in-worth
+mo-joint-load
+mo-splint-cause
+dn-wf-skel

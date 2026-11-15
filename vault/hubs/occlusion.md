@@ -31,6 +31,10 @@ Dates and check-in hours: its entry in `hubs.js`.
   "New: ...") and the hub's words in `hubs.js`. The engine gives each lecture its color by its place in the list. The mock stays at 45
   questions, 80 s each (the midterm's pace), split over the final's lectures until the format is announced: 9 each from
   L6-L10 (2026-11-12; 12/12/12/9 with four, 15 each with three).
+  **Seven of each lecture's nine are High likelihood questions** (Sam, 2026-11-15: "mostly high likelihood. Like 75%"):
+  `mock.likelyShare: 0.75` in `core.json`, read by `buildMock()` in `widget/hub-bank.js` (each side unseen and missed first;
+  a side that runs short is topped up from the other, so L10, all High likelihood, gives 9 of 9). If the blueprint changes,
+  the mock's blurb in `SH_HUB` and the About page's High Likelihood entry say "7 of each lecture's 9": fix them too.
 - **No fact more than twice** (Sam, 2026-11-10, [decisions](../decisions.md)): a concept may be asked two ways, not for every
   concept. `mo-10` was retired for it, and on 2026-11-11 the rest of the final's questions were checked the same way
   ("check the rest of the final questions"): 58 facts in L6-L9 were asked three to five times, and 58 questions came out,
@@ -38,8 +42,28 @@ Dates and check-in hours: its entry in `hubs.js`.
   **How it was counted:** every statement of a two-statement or numbered item counts as asking its fact, a which/whichf
   item counts for its key, a case question for what it applies, and a fact asked in two lectures counts across both. The
   two kept are in different formats where possible, a Patient Box question is kept over a plain one, and nothing was
-  retired that would leave a fact unasked or a lecture under its format minimums. The 10% fact is now in `in-2s-4` and
-  `mo-tf-3`. **Before adding a final question, check its fact isn't already asked twice.** Don't add questions for it.
+  retired that would leave a fact unasked or a lecture under its format minimums. The 10% fact is now in
+  `mo-tf-3` (and a true statement of `in-wf-cr`; `in-2s-4` came out on 2026-11-15, its wax fact asked by `in-cr-wax`). **Before adding a final question, check its fact isn't already asked twice.** Don't add questions for it.
+- **The final's bank audit** (2026-11-15, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370), Sam: "audit occlusions question bank ... higher yield ... accurate, with good
+  answer options and sufficient explanations", then "make sure the exam hints are utilized as best as possible"): every L6-L10
+  question was checked against the notes and the Exam Hints. 156 were fixed (4 keys or case facts that the notes contradict:
+  `cs-in-crown-lab`'s case, `nc-sel-acid`, `mo-histo`, `ot-sel-clin`), every emphasized hint was mapped to the questions that
+  test it, 4 questions were written for hints none tested (`in-worth`, `mo-joint-load`, `mo-splint-cause`, `dn-wf-skel`),
+  3 High likelihood topics were added for L7's orphan hints, and Sam retired `mo-better-q`, `mo-swim` and `in-2s-4` (kept:
+  `mo-bell`, `mo-occupational`, `ot-tf-4`, `ot-tf-5`, `dn-tf-6`). The PR lists every change.
+  - **Every question carries its own copy of its topic** (`likely` on the question, the whole `{lec, t, basis, ids}`
+    object): the build doesn't make it from `core.json`'s `likelyTopics`. After changing a topic (its words, or a question
+    added or removed), rewrite the copies of every question it lists, or the bank's chip and the High yield won't follow.
+    One topic per question.
+  - **Choices rewritten in place keep their old picks** (class numbers are stored by choice position):
+    `tools/data-fixes/2026-11-15-occlusion-audit.sql` recounts them from the new version's answers, to run once after the
+    merge ([inbox](../tasks/inbox.md)). The next audit that rewrites a choice's meaning needs the same kind of fix (and
+    `2026-11-14-in-bennett.sql` before it).
+  - **Sam's calls on the two open points** (2026-11-15, [decisions](../decisions.md)): the repositioning splint is
+    **irreversible**, as on Dr. Givan's slides (Okeson calls it reversible; `mo-ws-splint`, `mo-2s-6`, `mo-rev-sel` follow
+    the slides). L10 keeps **"Miller"**: Dr. Abou-Arraj's slide says "Miller mobility scale" over its Degrees 0-3 (its
+    wording reads like Lindhe's textbook version), so the notes' warning that Dr. Givan's L7 handout grades Miller's
+    index differently stays, and so do `ot-class3` (his scale) and `mo-miller2` (the L7 handout). Don't re-raise either.
 - **Bennett movement vs the Bennett angle setting** (2026-11-13, `in-bennett`): the midterm's determinants table pairs a greater Bennett
   movement with shorter cusps, while the articulator handout ties the Bennett angle setting to the width of the central fossae, so
   "Cusp height" can be argued for either. Don't offer it as a wrong answer to a Bennett question (54% picked it): on 11-14 it
@@ -224,6 +248,7 @@ marks, the TMJ view) stay as they are; use the kit for any new perio chart or ra
 
 ## Pending
 
+- The 2026-11-15 bank audit's after-merge steps: [the inbox](../tasks/inbox.md).
 - [The final's time and format](../tasks/2026-11-03-occlusion-final-time-and-format.md)
 - Figure questions the 2026-11-04 audit left for Sam (the notes don't settle them; listed in [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
   the TMJ figure's TM ligament shortens as the condyle translates while its readout says "taut"; Fig 2b's swing is

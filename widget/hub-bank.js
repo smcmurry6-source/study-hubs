@@ -582,16 +582,24 @@
   }
   function buildMock(){
     if (mockFormat()) return formatMock();
-    var ids = [], bp = HX.CORE.mock.blueprint, lo = HX.CORE.mock.likelyOnly || {};
+    var ids = [], bp = HX.CORE.mock.blueprint, lo = HX.CORE.mock.likelyOnly || {}, share = +HX.CORE.mock.likelyShare || 0;
+    var fresh = function(q){ var r = ansOf(q.id); return !r || r.last === false; };
+    var freshFirst = function(qs){ var a = shuffled(qs); return a.filter(fresh).concat(a.filter(function(q){ return !fresh(q); })); };
     Object.keys(bp).forEach(function(lec){
       var pool = mockLecs(lec).reduce(function(a, l){ return a.concat(QBL[l] || []); }, []).map(function(r){ return QBY[r.id]; }).filter(function(q){ return q && q.type === "mcq"; });
       /* a lecture in core.mock.likelyOnly gives only its High likelihood questions, drawn at random (Heme & Endo Exam 2's
          five Exam 1 questions, Sam, 2026-11-10); none, and it falls back to the whole lecture */
       var hl = lo[lec] ? pool.filter(function(q){ return q.likely; }) : [];
       if (hl.length) { shuffled(hl).slice(0, bp[lec]).forEach(function(q){ ids.push(q.id); }); return; }
-      var fresh = shuffled(pool.filter(function(q){ var r = ansOf(q.id); return !r || r.last === false; }));
-      var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
-      fresh.concat(rest).slice(0, bp[lec]).forEach(function(q){ ids.push(q.id); });
+      /* core.mock.likelyShare (0-1): about that share of each lecture's count from its High likelihood questions and the
+         rest from the others, each side unseen and missed first; a side that runs short is topped up from the other
+         (Occlusion's final: 0.75, so 7 of each lecture's 9; Sam, 2026-11-15) */
+      if (share > 0) {
+        var n = bp[lec], k = Math.round(n * share), a = freshFirst(pool.filter(function(q){ return q.likely; })), b = freshFirst(pool.filter(function(q){ return !q.likely; }));
+        var pick = a.slice(0, k); pick = pick.concat(b.slice(0, n - pick.length)); pick = pick.concat(a.slice(k, k + n - pick.length));
+        pick.forEach(function(q){ ids.push(q.id); }); return;
+      }
+      freshFirst(pool).slice(0, bp[lec]).forEach(function(q){ ids.push(q.id); });
     });
     var order = {}; ids.forEach(function(id){ order[id] = choiceOrder(QBY[id]); });
     STATE.mock = { ids: shuffled(ids), t0: Date.now(), picks: {}, order: order, res: {}, submitted: false };
