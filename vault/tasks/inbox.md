@@ -15,15 +15,22 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `node tools/timmy/deploy.mjs` (needs `SUPABASE_ACCESS_TOKEN`). #366's session didn't, because its permission check stopped
   the deploy; it waits for Sam's OK. Until then, asked about Timmy Time, Ask Timmy doesn't list the Occlusion final's episode.
   Done on Sam's OK: version 5 (#369).
-- [ ] **After Occlusion's final bank audit merges** (2026-11-15, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370); the hub note's "The final's bank audit"). In order:
-  - [ ] Load the answer keys: `node tools/xp/keys.js occlusion --load` (156 questions edited, 4 new, 3 retired).
-  - [ ] Run `tools/data-fixes/2026-11-15-occlusion-audit.sql` once, right after the merge (Sam, or the connector with Sam's
+- [ ] **Sam: give the After merge workflow its secrets** (2026-11-15, [after-a-merge](../how-to/after-a-merge.md)). GitHub →
+  the repo's Settings → Environments → New environment `after-merge` → Deployment branches: "Selected branches", add
+  `main` → Environment secrets: `SB_KEY`, `ADMIN_SECRET`, `SUPABASE_ACCESS_TOKEN`. Until then each merge's run shows its
+  steps as "blocked" (red on `main`), and an agent runs `node tools/after-merge/run.js` by hand after the merge.
+- [x] **After Occlusion's final bank audit merges** (2026-11-15, [#370](https://github.com/smcmurry6-source/study-hubs/pull/370); the hub note's "The final's bank audit"). In order:
+  - [x] Load the answer keys: `node tools/xp/keys.js occlusion --load` (156 questions edited, 4 new, 3 retired).
+  - [x] Run `tools/data-fixes/2026-11-15-occlusion-audit.sql` once, right after the merge (Sam, or the connector with Sam's
     OK; it writes to the class's data). It recounts 73 rewritten choices' picks, and 8 re-aimed questions' "% right", from
     the new versions' answers. If one of its questions is edited again first, read its new version (the file says how).
     A select-all choice it touches starts again from 0 (its ticks aren't in `question_events`).
-  - [ ] Deploy Ask Timmy's function again (`node tools/timmy/deploy.mjs`, needs `SUPABASE_ACCESS_TOKEN` and Sam's OK):
+  - [x] Deploy Ask Timmy's function again (`node tools/timmy/deploy.mjs`, needs `SUPABASE_ACCESS_TOKEN` and Sam's OK):
     `supabase/functions/timmy/site.json` gained the mock's High likelihood line from the About page.
-  - [ ] `log_changelog` for `occlusion` (needs `ADMIN_SECRET`), then `node tools/release/postcheck.js`.
+  - [x] `log_changelog` for `occlusion` (needs `ADMIN_SECRET`), then `node tools/release/postcheck.js`.
+  Done 2026-11-15 right after the merge, with `tools/after-merge/run.js` (Sam: "lets make all of that automatic"): 845
+  keys loaded, Ask Timmy version 6 (its test question answered), both data fixes run once Pages served the push (this one
+  and the 11-14 Bennett fix), the post-release check passed, and the changelog line logged.
   - [x] Sam: two questions the notes don't settle. Decided 2026-11-15: follow Dr. Givan's slides on the splint (irreversible);
     L10 keeps "Miller", which is what Dr. Abou-Arraj's slide says ([decisions](../decisions.md)). No change needed.
 - [x] **After the Perio bank audit merges** (2026-11-15, [its note](done/2026-11-15-perio-bank-audit.md)): load Perio's
@@ -41,7 +48,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   round and a flashcard; a random visit; the dashboard with a hub open in another tab (your Timmy walks into the
   classroom in his outfit, his desk says "You"); and scrolling on a real phone (BUG-147 is `fixed`; it is `retested`
   when Sam says it's smooth). Anything wrong goes in [the bug log](../release/bug-log.md).
-- [ ] **Sam: the Bennett data fix from #361** (2026-11-14). `tools/data-fixes/2026-11-14-in-bennett.sql` clears the
+- [x] **Sam: the Bennett data fix from #361** (2026-11-14). `tools/data-fixes/2026-11-14-in-bennett.sql` clears the
   class's old picks on Occlusion's reworded Bennett choice, "run once, right after the PR merges". The release session
   couldn't tell from a read-only look whether it ran, and didn't run it (it writes to the class's data). Run it, or say
   it was run.
@@ -68,14 +75,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `rpc2` fallbacks in `widget/dash.js` for a database without the game layer, `legacy` and the unused `modes` in `hubs.js`,
   and any separate widget file or the full client (`widget/vendor/supabase-2.117.2.js`) that `grep` finds no page loading
   by name (`review/` keeps the full client). The sources of a bundle are never deleted.
-- [ ] **Load a hub's answer keys by itself after a question change** (2026-11-13, the release; since 2026-11-14 the step
+- [x] **Load a hub's answer keys by itself after a question change** (2026-11-15: the After merge workflow, [after-a-merge](../how-to/after-a-merge.md)) (2026-11-13, the release; since 2026-11-14 the step
   is one command, `node tools/xp/keys.js <hub> --load`). Today it is a step by hand
   after every merge that changes `hubs/<hub>/content/questions.json` ([build-a-hub](../how-to/build-a-hub.md), "The answer
   keys"): until it's done a new question earns nothing and a re-keyed one is graded on its old key. Make it hard to
   forget: a check that compares the bank with the server's keys (an admin function that returns each hub's ids and
   versions, read by `tools/release/postcheck.js`), or a workflow on `main` that loads them (it would need the admin
   secret as a repository secret: Sam's call).
-- [ ] **Deploy Ask Timmy's function by itself when it changes** (2026-11-13, the release). `supabase/functions/timmy/site.json`
+- [x] **Deploy Ask Timmy's function by itself when it changes** (2026-11-15: the After merge workflow deploys it and asks one question, [after-a-merge](../how-to/after-a-merge.md)) (2026-11-13, the release). `supabase/functions/timmy/site.json`
   is rebuilt from the About page in every PR that changes it, but the `timmy` Edge Function is deployed by hand
   ([ask-timmy](../reference/ask-timmy.md), "At the release", step 3; one command since 2026-11-14,
   `node tools/timmy/deploy.mjs`), so Timmy's site help lags the About page until
@@ -110,7 +117,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   of its 61 bank users pressed "Show more" 287 times): Sam, 2026-11-14, "Show more questions in the question bank at a time": 100 a
   page in the single-file engines (`BANK_PAGE`, was 30), 50 in the redesign's bank (`PAGE`, was 20)
   ([#361](https://github.com/smcmurry6-source/study-hubs/pull/361)).
-- [ ] **Run `tools/data-fixes/2026-11-14-in-bennett.sql` in the Supabase SQL editor** (Sam approved it: "Run it", 2026-11-14). Until it
+- [x] **Run `tools/data-fixes/2026-11-14-in-bennett.sql` in the Supabase SQL editor** (run 2026-11-15 with #370's after-merge steps, `tools/after-merge/run.js --fix`; the card now counts only the new choice's picks) (Sam approved it: "Run it", 2026-11-14). Until it
   runs, Occlusion's `in-bennett` card shows the old "Cusp height" picks beside the new choice. The connector's `execute_sql` asks
   for approval before a write, and that prompt timed out unanswered three times (11-14 and 11-15), so Sam runs it by hand. It sets
   choice 1's count to the new version's picks from `question_events` (a plain delete would also drop the picks made since the change).
