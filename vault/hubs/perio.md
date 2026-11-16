@@ -194,6 +194,8 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/2026-11-05-r
 
 ## Pending
 
+- Sam's call on report #44: retire `q7-07`, a recall card that asks a fact `q7-03` and `q7-N03` already ask (the
+  2026-11-15 lessons audit; steps in [the inbox](../tasks/inbox.md)).
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
 - [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md) (still no recording in Drive, 2026-11-14).
