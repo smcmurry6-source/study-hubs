@@ -169,5 +169,79 @@
 .lec-fig > h4{margin:0 0 4px;font-size:1rem}
 .lec-fig > .lec-fig-cap{margin:0 0 10px;font-size:.86rem;color:var(--ink-soft)}
 
+.anima[data-anima="laminadura"] .am-svg{max-width:500px}
+.anima .laminadura-svg{--ld-f0:#141414;--ld-f1:#202020;--ld-st:#2a2a2a;--ld-bone:#6b6b6b;--ld-mar:#474747;--ld-gl1:#747474;--ld-gl2:#606060;--ld-ldw:#d6d6d6;--ld-pdlc:#262626;
+  --ld-den:#b4b4b4;--ld-ena:#f0f0f0;--ld-pulp:#4a4a4a;--ld-bt:#2c2c2c;--ld-btr:#4b4b4b;--ld-ink:#f2f2f2}
+.anima .laminadura-svg .t.ld-xs{font-size:11.5px}
+.anima .laminadura-svg .t.ld-badt{fill:var(--bx-inhib);font-weight:600}
+.anima .laminadura-svg .ld-film{fill:var(--ld-st)}
+.anima .laminadura-svg .ld-air{fill:var(--ld-f1)}
+.anima .laminadura-svg .ld-bone{fill:var(--ld-bone)}
+.anima .laminadura-svg .ld-marrow{fill:var(--ld-mar)}
+.anima .laminadura-svg .ld-gl-l{fill:var(--ld-gl1)}
+.anima .laminadura-svg .ld-gl-d{fill:var(--ld-gl2)}
+.anima .laminadura-svg .ld-ld{fill:none;stroke:var(--ld-ldw);stroke-width:10.8;stroke-linejoin:round}
+.anima .laminadura-svg .ld-crest{fill:none;stroke:var(--ld-ldw);stroke-width:3;stroke-linecap:round}
+.anima .laminadura-svg .ld-pdl{fill:none;stroke:var(--ld-pdlc);stroke-width:5.2;stroke-linejoin:round}
+.anima .laminadura-svg .ld-dentin{fill:var(--ld-den)}
+.anima .laminadura-svg .ld-enamel{fill:var(--ld-ena)}
+.anima .laminadura-svg .ld-pulp{fill:var(--ld-pulp)}
+.anima .laminadura-svg .ld-bt{fill:var(--ld-bt)}
+.anima .laminadura-svg .ld-bt-rim{fill:var(--ld-btr)}
+.anima .laminadura-svg .ld-bt-sep{fill:none;stroke:var(--ld-btr);stroke-width:1.6;stroke-linecap:round}
+.anima .laminadura-svg .ld-hit{fill:none;stroke:transparent;stroke-width:9;pointer-events:stroke}
+.anima .laminadura-svg .ld-hit-f{fill:transparent;stroke:none}
+.anima .laminadura-svg .ld-box{fill:none;stroke:var(--bx-hot);stroke-width:1.6}
+.anima .laminadura-svg .ld-mob{fill:none;stroke:var(--bx-hot);stroke-width:2.2}
+.anima .laminadura-svg .ld-mobh{fill:var(--bx-hot)}
+.anima .laminadura-svg .ld-veil{fill:var(--surface)}
+.anima .laminadura-svg .ld-stamp{fill:var(--surface);stroke:var(--anatomy-mid);stroke-width:1.2}
+.anima .laminadura-svg .t.ld-stampt{fill:var(--anatomy-strong);font-weight:600}
+.anima .laminadura-svg .ld-mask{fill:var(--surface)}
+.anima .laminadura-svg .ld-edge{fill:none;stroke:var(--anatomy-lo);stroke-width:1.2}
+.anima .laminadura-svg .ld-lin-u{fill:none;stroke:var(--ld-f0);stroke-width:2.6;stroke-linecap:round}
+.anima .laminadura-svg .ld-lin{fill:none;stroke:var(--ld-ink);stroke-width:.9}
+.anima .laminadura-svg .ld-pin{fill:var(--bx-hot);stroke:var(--ld-f0);stroke-width:1}
+.anima .laminadura-svg .ld-panel{fill:var(--anatomy-face);stroke:var(--anatomy-lo);stroke-width:1}
+.anima .laminadura-svg .ld-dent{fill:color-mix(in srgb,var(--bx-eosin) 45%,var(--bx-matrix))}
+.anima .laminadura-svg .ld-tub{fill:none;stroke:var(--bx-cyto-line);stroke-width:.6;opacity:.5}
+.anima .laminadura-svg .ld-cem{fill:color-mix(in srgb,var(--bx-eosin) 70%,var(--bx-memb))}
+.anima .laminadura-svg .ld-pdlz{fill:var(--bx-matrix)}
+.anima .laminadura-svg .ld-mrw{fill:color-mix(in srgb,var(--bx-fat) 70%,var(--bx-cyto))}
+.anima .laminadura-svg .ld-ct{fill:var(--bx-matrix)}
+.anima .laminadura-svg .ld-fat{fill:var(--bx-fat);stroke:var(--bx-fat-line);stroke-width:1}
+.anima .laminadura-svg .ld-mcell{fill:var(--bx-nuc);opacity:.6}
+.anima .laminadura-svg .ld-trab{fill:var(--bx-eosin);stroke:var(--bx-cyto-line);stroke-width:1}
+.anima .laminadura-svg .ld-band{fill:color-mix(in srgb,var(--bx-eosin) 80%,var(--bx-memb));stroke:var(--bx-memb);stroke-width:1.2}
+.anima .laminadura-svg .ld-lam{fill:none;stroke:var(--bx-cyto-line);stroke-width:.7;opacity:.7}
+.anima .laminadura-svg .ld-ocy{fill:var(--bx-nuc-line)}
+.anima .laminadura-svg .ld-fib{fill:none;stroke:var(--bx-cyto-line);stroke-width:1.1;opacity:.8}
+.anima .laminadura-svg .ld-fnu{fill:var(--bx-nuc)}
+.anima .laminadura-svg .ld-obl{fill:var(--bx-cyto);stroke:var(--bx-cyto-line);stroke-width:.9}
+.anima .laminadura-svg .ld-obn,.anima .laminadura-svg .ld-ocn{fill:var(--bx-nuc)}
+.anima .laminadura-svg .ld-ocl{fill:color-mix(in srgb,var(--bx-violet-soft) 55%,var(--bx-cyto));stroke:var(--bx-violet);stroke-width:1.4}
+.anima .laminadura-svg .ld-ruf{fill:none;stroke:var(--bx-violet);stroke-width:1.1;stroke-linejoin:round}
+.anima .laminadura-svg .ld-rankl{fill:none;stroke:var(--bx-stim);stroke-width:1.5;stroke-dasharray:3 2}
+.anima .laminadura-svg .ld-ves{fill:var(--bx-blood-soft)}
+.anima .laminadura-svg .ld-vw{fill:none;stroke:var(--bx-blood);stroke-width:1.6}
+.anima .laminadura-svg .ld-rbc{fill:var(--bx-blood);opacity:.8}
+.anima .laminadura-svg .ld-rbcc{fill:var(--bx-blood-soft);opacity:.6}
+.anima .laminadura-svg .ld-ca{fill:var(--bx-gold);stroke:var(--anatomy-hi);stroke-width:.6}
+.anima .laminadura-svg .ld-pth{fill:var(--bx-violet);stroke:var(--surface);stroke-width:.6}
+.anima .laminadura-svg .ld-chip{fill:var(--surface);stroke:var(--anatomy-lo);stroke-width:1.1}
+.anima .laminadura-svg .ld-chip.ld-up{stroke:var(--bx-hot);stroke-width:1.6;fill:var(--bx-hot-soft)}
+.anima .laminadura-svg .ld-chip.ld-dn{stroke:var(--bx-blue);stroke-width:1.6;fill:var(--bx-blue-soft)}
+.anima .laminadura-svg .ld-chip.ld-q{stroke-dasharray:3 3}
+.anima .laminadura-svg .t.ld-lv{font-weight:700}
+.anima .laminadura-svg .t.ld-lv.ld-up{fill:var(--bx-hot)}
+.anima .laminadura-svg .t.ld-lv.ld-dn{fill:var(--bx-blue)}
+.anima .laminadura-svg .t.ld-lv.ld-eq{fill:var(--anatomy-strong)}
+.anima .laminadura-svg .t.ld-lv.ld-q{fill:var(--anatomy-muted);font-weight:500}
+.anima .laminadura-svg .ld-bnb{fill:var(--anatomy-shade-1);stroke:var(--anatomy-mid);stroke-width:1}
+.anima .laminadura-svg .ld-tend{fill:none;stroke:var(--anatomy-mid);stroke-width:3;stroke-linecap:butt}
+.anima .laminadura-svg .ld-mus{fill:color-mix(in srgb,var(--bx-blood) 35%,var(--bx-eosin));stroke:var(--bx-memb);stroke-width:1.2}
+.anima .laminadura-svg .ld-mus.is-tet{fill:color-mix(in srgb,var(--bx-blood) 60%,var(--bx-eosin));stroke:var(--bx-inhib);stroke-width:1.6}
+.anima .laminadura-svg .ld-stri{fill:none;stroke:var(--bx-memb);stroke-width:.8;opacity:.6}
+
 
 html.shx .fig-card svg{display:block;width:100%;height:auto}
