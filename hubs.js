@@ -55,6 +55,7 @@ window.SH_DASH_DATA = {
      "code": "PCD Implants · Exam 1",
      "checkinHour": 20,
      "promptHour": 20,
+     "checkinClosed": true,
      "extraQs": [
       {
        "id": "pbox_better",
@@ -333,7 +334,8 @@ window.SH_DASH_DATA = {
     {
      "name": "Musculoskeletal Exam 3",
      "label": "Exam",
-     "date": "2026-10-02"
+     "date": "2026-10-02",
+     "checkinClosed": true
     }
    ],
    "updated": "2026-09-23",
@@ -396,7 +398,8 @@ window.SH_DASH_DATA = {
     {
      "name": "GI Exam 2",
      "label": "Exam",
-     "date": "2026-09-18"
+     "date": "2026-09-18",
+     "checkinClosed": true
     }
    ],
    "hideCardOn": "2026-10-06"
