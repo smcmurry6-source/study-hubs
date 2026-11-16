@@ -118,7 +118,9 @@ Dates and check-in hours: its entry in `hubs.js`.
   and **`FIG_PLACE`**, which lives in the generated block: edit it in `od.js`, never in the hub), `game.js`, `cases.js`,
   and the anima figures in `anima/*.mjs`. `node tools/figures/occlusion/build.mjs` writes them to
   `hubs/occlusion/content/figures.js` and `figures.css` (figure text raised to the engine's 11 px floor); `--check`
-  fails if they're stale; `--preview` writes pages.
+  fails if they're stale; `--preview` writes pages. The Question Bank mounts `CUSP_GAME` only if
+  `SH_HUB.bank.cuspGame` is true (currently Occlusion), on its base Questions route before the filters; preserve that
+  engine wiring when changing the bank.
   - Controls of a figure inside the notes must not use `data-go`, `data-view`, `data-tab`, `data-sub`, `data-mode`,
     `data-lec` or `data-group` (the notes and the widget read those).
   - The anima kit sets `vector-effect:non-scaling-stroke`; a path drawn with `stroke-dasharray` needs `vector-effect:none`.

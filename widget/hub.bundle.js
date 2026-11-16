@@ -770,13 +770,22 @@ return '<div class="studyas" role="group" aria-labelledby="saL"><span class="lab
 VIEWS.map(function(x){ return '<button type="button" data-qview="' + x[0] + '" aria-pressed="' + (v === x[0]) + '">' + icon(x[2], 18) + "<span>" + x[1] + "</span></button>"; }).join("") + "</span></div>";
 }
 function drawQuestions(el, preset){
-var title = preset ? labelOf(SETS, preset) : "Questions", studying = preset !== "mock" && qview() !== "questions";
+var title = preset ? labelOf(SETS, preset) : "Questions", studying = preset !== "mock" && qview() !== "questions",
+cuspGame = !preset && !studying && !!(C.bank && C.bank.cuspGame);
 el.innerHTML = '<div class="hx-page bank"><div class="bank-head"><h1>' + esc(title) + "</h1></div>" +
 '<div class="bank-grid"><div class="bank-main' + (studying ? " is-study" : "") + '">' + (preset === "mock" ? "" : viewHTML()) +
+(cuspGame ? '<div class="cg-host" data-cusp-game></div>' : "") +
 (studying ? '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div><h2 class="bank-which">Which questions</h2>' + panelHTML(preset)
 : panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><nav class="qsets" aria-label="Which questions" hidden></nav><div class="qlist" id="qlist"></div>') + "</div>" +
 '<aside class="bank-side" aria-label="Today">' + HX.todayPanel() + "</aside></div></div>";
 wirePanel(el, preset);
+if (cuspGame) {
+var cgHost = $("[data-cusp-game]", el);
+needFigures().then(function(fig){
+if (!cgHost || !cgHost.isConnected || !fig || !fig.CUSP_GAME) return;
+fig.CUSP_GAME.mount(cgHost);
+}).catch(function(){});
+}
 $$("[data-qview]", el).forEach(function(b){ b.addEventListener("click", function(){
 var v = b.getAttribute("data-qview"); if (v === qview()) return;
 STATE.ui.qview = v; saveState(); track("bank:view=" + v); drawQuestions(el, preset);
