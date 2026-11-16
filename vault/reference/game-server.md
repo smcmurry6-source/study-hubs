@@ -345,8 +345,9 @@ Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sq
   health, and pays no day bonus (+20), no goal bonus and no medal. A flashcards-only day fills the ring and keeps the
   flame on every device (the replay marks the day studied), but the server's `xp_days` and the streak board count
   answers only, as before.
-- **Learn's context**: v54's `record_answer_v2` doesn't list `learn`, so Learn's answers are filed as `other` (Sam,
-  2026-11-12: v54 isn't changed). A later migration can add `learn` to the list.
+- **Learn's context**: v54's `record_answer_v2` didn't list `learn`, so Learn's answers were filed as `other` (Sam,
+  2026-11-12: v54 isn't changed). `migration_v59.sql` (2026-11-16) adds `learn` to `sh_answer`'s list, so from then on
+  `answer_xp.ctx` says `learn`; the rows before it stay `other`. Nothing pays or checks by the context.
 - **Before the migration** (the preview's `rpc()` answers all three from fixtures): the page keeps everything on the
   device, the ratings wait in `STATE.cardq` (up to 3,000), and the first call that finds the functions missing stops
   trying until the next page load. Test browsers (`navigator.webdriver`) send nothing.

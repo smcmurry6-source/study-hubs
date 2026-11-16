@@ -7,7 +7,9 @@
 //   - archive overrides: anon can't touch the tables; get_hub_overrides shows only overrides in force, without notes;
 //     a change needs the secret, checks the version the page saw, ignores a repeat, refuses a bad state, hub, end time
 //     or note, writes one log row per change, ends at its end time, and can be reversed back to automatic;
-//   - check-ins and surveys come back newest first by created_at, with id breaking ties.
+//   - check-ins and surveys come back newest first by created_at, with id breaking ties;
+//   - sh_surface() (the Insights tab's "Where time goes") places every section the engine sends (widget/hub.js
+//     section()), Learn and Flashcards apart from the bank (migration_v59).
 // Nothing here touches the live database.   node tools/release/admin-ops.js   (PostgreSQL 14+ server binaries)
 'use strict';
 const { throwaway } = require('./pg');
@@ -141,10 +143,22 @@ try {
   const nw = SV.find(x => x.slug === 'fx-new');
   ok(nw && nw.answers.map(a => a.q1).join(',') === 'third,second-b,second-a,first', `survey answers newest first, the later id first on a tie (${nw && nw.answers.map(a => a.q1)})`);
   notes.push('check-ins and surveys: newest first by created_at, id breaks ties');
+
+  /* ---------- 4. every section the engine sends has a surface (migration_v59) ---------- */
+  const SURF = { 'home/dashboard': 'home', 'compendium/notes': 'notes', 'compendium/bank': 'bank', 'compendium/learn': 'learn',
+    'compendium/cards': 'cards', 'compendium/mock': 'mock', 'compendium/weak': 'weak-spots', 'compendium/drill': 'drill',
+    'compendium/misses': 'drill', 'compendium/hints': 'hints', 'compendium/cram': 'cram', 'review/side': 'review',
+    'arcade/lobby': 'arcade', 'drill/daily': 'drill', 'podcast/timmy-time': 'podcast', 'more/timmy': 'podcast', 'more/menu': 'more',
+    'more/stats': 'more', 'more/settings': 'more', 'more/place': 'more', 'more/shop': 'more', 'more/ideas': 'more',
+    'compendium/question-bank': 'bank', 'compendium/learning': 'other', 'moreover': 'other', '': 'unknown' };
+  const got = anonJson(`(select json_object_agg(s, sh_surface(s)) from unnest(array[${Object.keys(SURF).map(q).join(', ')}]) s)`);
+  const wrong = Object.keys(SURF).filter(k => got[k] !== SURF[k]);
+  ok(!wrong.length, `sh_surface: ${wrong.map(k => `"${k}" is ${got[k]}, expected ${SURF[k]}`).join('; ')}`);
+  notes.push(`sh_surface: ${Object.keys(SURF).length} section names placed (Learn and Flashcards apart from the bank, Drill and Misses as the drill, More)`);
 } catch (e) {
   problems.push(`test run failed: ${e.message.split('\n')[0]}`);
 }
 db.stop();
 notes.forEach(n => console.log('  ' + n));
 if (problems.length) { console.error(`\n✗ admin operations: ${problems.length} problem(s) in ${checks} checks:\n` + problems.map(p => '  - ' + p).join('\n')); process.exit(1); }
-console.log(`\n✓ admin operations (live presence, archive overrides, order): ${checks} checks passed`);
+console.log(`\n✓ admin operations (live presence, archive overrides, order, surfaces): ${checks} checks passed`);
