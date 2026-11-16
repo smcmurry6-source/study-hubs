@@ -28,24 +28,42 @@ function crs(p, closed, per) {
   return out;
 }
 const dOf = (pts, close) => pts.map((q, i) => (i ? "L" : "M") + f1(q[0]) + " " + f1(q[1])).join("") + (close ? "Z" : "");
+/* the same Catmull-Rom curve as exact cubic Beziers (b + (c - a) / 6): closed, or the run of a closed curve from point
+   i0 forward to i1 (closed with a straight line), or an open curve */
+function bz(p, closed, i0, i1) {
+  const n = p.length, q = p.map(PX), seg = [];
+  if (i0 === undefined) { i0 = 0; i1 = closed ? n : n - 1; } else if (i1 <= i0) i1 += n;
+  let d = "M" + f1(q[i0 % n][0]) + " " + f1(q[i0 % n][1]);
+  for (let i = i0; i < i1; i++) {
+    const b = q[i % n], c = q[(i + 1) % n];
+    const a = closed || i > 0 ? q[(i - 1 + n) % n] : b, e = closed || i + 2 < n ? q[(i + 2) % n] : c;
+    d += "C" + f1(b[0] + (c[0] - a[0]) / 6) + " " + f1(b[1] + (c[1] - a[1]) / 6) + " " + f1(c[0] - (e[0] - b[0]) / 6) + " " + f1(c[1] - (e[1] - b[1]) / 6) + " " + f1(c[0]) + " " + f1(c[1]);
+  }
+  return d + (closed || i0 ? "Z" : "");
+}
+/* an ellipse as two relative arcs (no element, so a texture of many is one path) */
+function ell(cx, cy, rx, ry, deg) {
+  const r = deg * Math.PI / 180, dx = rx * Math.cos(r), dy = rx * Math.sin(r), A = "a" + f1(rx) + " " + f1(ry) + " " + Math.round(deg) + " 1 0 ";
+  return "M" + f1(cx + dx) + " " + f1(cy + dy) + A + f1(-2 * dx) + " " + f1(-2 * dy) + A + f1(2 * dx) + " " + f1(2 * dy) + "z";
+}
 
 /* the teeth, buccal view, clockwise from the cusp tip (mm; y grows toward the apex). Proportions from Wheeler's: lower
    premolar crowns 8-8.5 mm on 14-14.5 mm roots, 7 mm at the contacts and 5 mm at the neck; the canine's 11 mm crown
    and 16 mm root; the first molar's 11 mm crown, 7.5 mm long, on two 14 mm roots. */
 const TEETH = [
-  { id: "c", cej: 12.6,
+  { id: "c", cej: 12.6, ci: [15, 5],
     out: [[0.9, 1.8], [2.6, 3.3], [4.2, 5.0], [4.6, 6.4], [4.3, 9.4], [3.8, 12.6], [3.7, 16.5], [3.1, 21.5], [2.3, 26.0], [1.4, 28.6], [0.6, 28.9], [-0.4, 28.2], [-1.2, 25.5], [-1.8, 21.0], [-1.7, 16.0], [-1.6, 12.6], [-2.2, 9.4], [-2.5, 6.0], [-1.6, 3.6]],
     dej: [[-1.6, 12.6], [-1.75, 9.4], [-1.9, 6.4], [-1.0, 4.6], [0.9, 3.4], [2.4, 4.6], [3.6, 6.2], [3.65, 9.4], [3.8, 12.6]],
     pulp: [[0.9, 5.4], [1.6, 6.6], [1.9, 9.0], [1.8, 12.4], [1.55, 17.0], [1.2, 22.0], [0.75, 27.6], [0.55, 27.6], [0.55, 22.0], [0.45, 17.0], [0.1, 12.4], [-0.1, 9.0], [0.2, 6.6]] },
-  { id: "p1", cej: 11.5,
+  { id: "p1", cej: 11.5, ci: [15, 5],
     out: [[7.9, 3.0], [9.6, 4.3], [11.4, 5.5], [11.8, 6.6], [11.4, 8.8], [10.8, 11.5], [10.6, 15.0], [10.2, 19.0], [9.4, 23.0], [8.8, 25.2], [8.4, 25.6], [7.9, 25.2], [7.2, 23.0], [6.4, 19.0], [5.9, 15.0], [5.8, 11.5], [5.2, 8.6], [4.8, 6.0], [5.1, 5.0], [6.4, 3.8]],
     dej: [[5.8, 11.5], [5.85, 8.7], [5.6, 6.6], [6.0, 5.8], [7.0, 5.0], [7.9, 4.7], [9.1, 5.4], [10.5, 6.3], [10.9, 7.0], [10.6, 9.0], [10.8, 11.5]],
     pulp: [[7.9, 6.4], [8.6, 7.2], [9.3, 8.6], [9.3, 10.2], [9.0, 11.6], [8.75, 14.5], [8.55, 19.5], [8.45, 24.8], [8.3, 24.8], [8.05, 19.5], [7.75, 14.5], [7.5, 11.6], [7.2, 10.2], [7.2, 8.6], [7.5, 7.2]] },
-  { id: "p2", cej: 11.4,
+  { id: "p2", cej: 11.4, ci: [15, 5],
     out: [[15.5, 3.4], [17.0, 4.3], [18.7, 5.4], [19.1, 6.7], [18.7, 9.0], [18.1, 11.4], [18.0, 15.0], [17.6, 19.0], [16.9, 23.2], [16.3, 25.5], [15.85, 25.9], [15.3, 25.5], [14.6, 23.2], [13.7, 19.0], [13.2, 15.0], [13.1, 11.4], [12.5, 9.0], [12.1, 6.5], [12.5, 5.3], [14.0, 4.3]],
     dej: [[13.1, 11.4], [13.15, 9.0], [12.9, 6.8], [13.4, 6.0], [14.5, 5.3], [15.5, 5.0], [16.6, 5.4], [17.8, 6.2], [18.3, 7.0], [17.95, 9.1], [18.1, 11.4]],
     pulp: [[15.5, 6.6], [16.2, 7.3], [16.7, 8.6], [16.6, 10.2], [16.3, 11.6], [16.1, 14.5], [15.95, 19.5], [15.9, 25.2], [15.75, 25.2], [15.45, 19.5], [15.15, 14.5], [14.9, 11.6], [14.6, 10.2], [14.6, 8.6], [15.0, 7.3]] },
-  { id: "m1", cej: 11.5,
+  { id: "m1", cej: 11.5, ci: [26, 9],
     out: [[21.9, 4.0], [23.2, 4.6], [24.5, 5.3], [25.6, 4.7], [26.9, 4.3], [28.3, 4.8], [29.6, 5.6], [30.4, 6.8], [30.1, 9.2], [29.1, 11.5], [28.9, 15.0], [28.4, 20.0], [27.8, 24.0], [27.0, 24.9], [26.2, 24.2], [25.8, 20.0], [25.5, 16.3], [24.9, 15.1], [24.3, 16.2], [24.0, 20.0], [23.6, 24.0], [22.6, 25.6], [21.6, 25.0], [20.9, 21.5], [20.4, 17.0], [20.3, 13.5], [20.4, 11.5], [19.75, 9.0], [19.45, 6.6], [19.9, 5.1], [20.8, 4.4]],
     dej: [[20.4, 11.5], [20.35, 9.0], [20.2, 6.9], [20.9, 5.9], [21.9, 5.6], [23.2, 6.1], [24.5, 6.7], [25.6, 6.2], [26.9, 5.9], [28.3, 6.3], [29.4, 7.0], [29.45, 9.2], [29.1, 11.5]],
     pulp: [[21.3, 7.6], [22.2, 8.2], [25.6, 8.4], [26.9, 7.8], [27.6, 8.6], [27.5, 10.6], [27.0, 12.0], [27.05, 16.0], [27.0, 20.0], [26.95, 24.3], [26.8, 24.3], [26.6, 20.0], [26.4, 16.0], [26.0, 12.4], [24.9, 11.9], [23.6, 12.4], [23.25, 16.0], [22.85, 20.0], [22.55, 25.0], [22.4, 25.0], [22.2, 20.0], [21.95, 16.0], [21.6, 12.4], [21.0, 11.0], [20.9, 9.0]] },
@@ -77,42 +95,39 @@ function filmArt() {
   const o = { SOCK: [], TOOTH: [] }, dense = {}, polys = [];
   for (const t of TEETH) {
     const d = crs(t.out, true, 10); dense[t.id] = d; polys.push(d);
-    const crown = d.filter((q) => q[1] <= t.cej + 0.02);
-    /* the crown run is contiguous once the list starts at the cusp tip, which it does */
-    const enamel = dOf(crown.map(PX), true), dej = dOf(crs(t.dej, false, 8).map(PX), true);
-    o.TOOTH.push('<path class="ld-dentin" d="' + dOf(d.map(PX), true) + '"/><path class="ld-enamel" d="' + enamel + '"/><path class="ld-dentin" d="' + dej + '"/><path class="ld-pulp" d="' + dOf(crs(t.pulp, true, 6).map(PX), true) + '"/>');
-    o.SOCK.push(dOf(socketRun(d).map(PX), false));
+    o.TOOTH.push('<path class="ld-dentin" d="' + bz(t.out, true) + '"/><path class="ld-enamel" d="' + bz(t.out, true, t.ci[0], t.ci[1]) + '"/><path class="ld-dentin" d="' + bz(t.dej, false) + 'Z"/><path class="ld-pulp" d="' + bz(t.pulp, true) + '"/>');
+    o.SOCK.push(dOf(socketRun(crs(t.out, true, 5)).map(PX), false));
   }
-  o.CRESTL = CREST_SEG.map((s) => dOf(crs(s, false, 6).map(PX), false)).join("");
+  o.CRESTL = CREST_SEG.map((s) => bz(s, false)).join("");
   /* bone below the crest, and the air and soft tissue above it */
-  o.BONE = dOf(crs(CREST, false, 6).map(PX).concat([PX([32, 38]), PX([-3, 38])]), true);
+  o.BONE = bz(CREST, false).replace(/Z$/, "") + "L" + PX([32, 38]).map(f1).join(" ") + "L" + PX([-3, 38]).map(f1).join(" ") + "Z";
   /* marrow spaces: the mandible's thick trabeculae with large, roughly horizontal spaces */
   const r = rand(7), blobs = [];
   for (let gy = 0; gy < 20; gy++) for (let gx = 0; gx < 19; gx++) {
     const cx = -0.4 + gx * 1.5 + (gy % 2) * 0.75 + (r() - 0.5) * 0.7, cy = 13.6 + gy * 1.18 + (r() - 0.5) * 0.5;
     if (cy < crestY(cx) + 0.75 || cy > 36.6) continue;
     if (polys.some((p) => inPoly([cx, cy], p))) continue;
-    const rx = 0.32 + r() * 0.42, ry = rx * (0.5 + r() * 0.3), rot = (r() - 0.5) * 0.7, pts = [];
-    for (let k = 0; k < 7; k++) { const a = k / 7 * Math.PI * 2, j = 0.82 + r() * 0.36, x = Math.cos(a) * rx * j, y = Math.sin(a) * ry * j; pts.push([cx + x * Math.cos(rot) - y * Math.sin(rot), cy + x * Math.sin(rot) + y * Math.cos(rot)]); }
-    blobs.push(dOf(crs(pts, true, 3).map(PX), true));
+    const rx = 0.32 + r() * 0.42, ry = rx * (0.5 + r() * 0.3), rot = (r() - 0.5) * 40, c = PX([cx, cy]);
+    blobs.push(ell(c[0], c[1], rx * S, ry * S, rot));
   }
   o.MARROW = '<path class="ld-marrow" d="' + blobs.join("") + '"/>';
-  /* "ground glass": the trabecular pattern gone to a fine, even granularity */
-  const g = rand(11); let lt = "", dk = "";
-  for (let gy = 0; gy < 34; gy++) for (let gx = 0; gx < 40; gx++) {
-    const x = -0.2 + gx * 0.68 + (g() - 0.5) * 0.5, y = 13.3 + gy * 0.7 + (g() - 0.5) * 0.4;
-    if (y < crestY(x) + 0.3 || polys.some((p) => inPoly([x, y], p))) continue;
-    const q = PX([x, y]), s = "M" + f1(q[0]) + " " + f1(q[1]) + "h1.3v1.3h-1.3z";
-    if (g() < 0.5) lt += s; else dk += s;
+  /* "ground glass": the trabecular pattern gone to a fine, even granularity: rows of short dashes in two tones, each
+     row cut where the bone ends at the crest */
+  let gl = "", gd = "";
+  for (let j = 0; j < 46; j++) {
+    const y = 13.3 + j * 0.5, segs = []; let x0 = null;
+    for (let x = -1.5; x <= 27.6; x += 0.1) { const ok = y > crestY(x) + 0.35; if (ok && x0 === null) x0 = x; if ((!ok || x > 27.5) && x0 !== null) { segs.push([x0, x]); x0 = null; } }
+    const sg = segs.map((g) => "M" + f1(PX([g[0], y])[0]) + " " + f1(PX([0, y])[1]) + "H" + f1(PX([g[1], y])[0])).join("");
+    if (j % 2) gl += sg; else gd += sg;
   }
-  o.GLASS = '<path class="ld-gl-l" d="' + lt + '"/><path class="ld-gl-d" d="' + dk + '"/>';
+  o.GLASS = '<path class="ld-gl-l" d="' + gl + '"/><path class="ld-gl-d" d="' + gd + '"/>';
   /* the brown tumor: a lobulated radiolucency in the bone below the second premolar, with faint septa */
   const bt = [];
   for (let k = 0; k < 16; k++) { const a = k / 16 * Math.PI * 2, m = 1 + 0.08 * Math.sin(3 * a + 0.4) + 0.05 * Math.sin(5 * a + 1.3); bt.push([15.9 + Math.cos(a) * 4.3 * m, 31.0 + Math.sin(a) * 3.05 * m]); }
   const btRim = bt.map((q) => [15.9 + (q[0] - 15.9) * 1.1, 31.0 + (q[1] - 31.0) * 1.12]);
-  o.BT = '<path class="ld-bt-rim" d="' + dOf(crs(btRim, true, 4).map(PX), true) + '"/><path class="ld-bt" d="' + dOf(crs(bt, true, 4).map(PX), true) + '"/>' +
-    '<path class="ld-bt-sep" d="' + dOf(crs([[13.6, 28.6], [14.4, 30.6], [14.1, 33.3]], false, 6).map(PX), false) + dOf(crs([[17.9, 28.4], [17.3, 30.8], [18.5, 33.0]], false, 6).map(PX), false) + '"/>';
-  o.BTHIT = dOf(crs(btRim, true, 3).map(PX), true);
+  o.BT = '<path class="ld-bt-rim" d="' + bz(btRim, true) + '"/><path class="ld-bt" d="' + bz(bt, true) + '"/>' +
+    '<path class="ld-bt-sep" d="' + bz([[13.6, 28.6], [14.4, 30.6], [14.1, 33.3]], false) + bz([[17.9, 28.4], [17.3, 30.8], [18.5, 33.0]], false) + '"/>';
+  o.BTHIT = bz(btRim, true);
   o.FILM = [FX, FY, FW * S, FH * S];
   /* where the labels point: the canine's distal lamina dura and PDL space, its root, the molar's mesial root, the bone */
   const cD = (y) => sideX(dense.c.filter((q) => q[0] > 1), y, "max");
@@ -400,8 +415,8 @@ export default function laminadura() {
 .anima .laminadura-svg .ld-air{fill:var(--ld-f1)}
 .anima .laminadura-svg .ld-bone{fill:var(--ld-bone)}
 .anima .laminadura-svg .ld-marrow{fill:var(--ld-mar)}
-.anima .laminadura-svg .ld-gl-l{fill:var(--ld-gl1)}
-.anima .laminadura-svg .ld-gl-d{fill:var(--ld-gl2)}
+.anima .laminadura-svg .ld-gl-l{fill:none;stroke:var(--ld-gl1);stroke-width:1.4;stroke-dasharray:1.3 3.1 1.2 4.4}
+.anima .laminadura-svg .ld-gl-d{fill:none;stroke:var(--ld-gl2);stroke-width:1.4;stroke-dasharray:1.2 3.7 1.4 2.9;stroke-dashoffset:2}
 .anima .laminadura-svg .ld-ld{fill:none;stroke:var(--ld-ldw);stroke-width:10.8;stroke-linejoin:round}
 .anima .laminadura-svg .ld-crest{fill:none;stroke:var(--ld-ldw);stroke-width:3;stroke-linecap:round}
 .anima .laminadura-svg .ld-pdl{fill:none;stroke:var(--ld-pdlc);stroke-width:5.2;stroke-linejoin:round}
