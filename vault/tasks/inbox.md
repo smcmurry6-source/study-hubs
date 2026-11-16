@@ -92,7 +92,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **The first migration after the release** (2026-11-13) also counts the **Bowling** trophy on the server (add `bowling`
   to the achievement kinds; until then it is kept on the device and shows no share of the class:
   [the bowling egg](done/2026-11-06-redesign-bowling-egg.md)), with Learn's `learn` context (the line below).
-- [ ] **Sam's call: retire Perio's `q7-07`** (2026-11-15, the lessons audit; report #44, "too many details for a non-MC question"). A
+- [x] **Sam's call: retire Perio's `q7-07`** (Sam: "retire it"; done in [#380](https://github.com/smcmurry6-source/study-hubs/pull/380)) (2026-11-15, the lessons audit; report #44, "too many details for a non-MC question"). A
   self-graded recall card (the final has none) on the immune changes smoking causes, which `q7-03` asks and statement 2 of `q7-N03`
   tests: the third ask that [the Perio bank audit](done/2026-11-15-perio-bank-audit.md)'s own rule retires ("a recall card was retired
   wherever it repeated a fact asked in a scored format"). With a yes: `q7-07 retired` in `tools/question-ids/perio.txt`, out of
