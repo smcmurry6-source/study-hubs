@@ -37,6 +37,22 @@
 .od-cap{fill:var(--ink-faint)}
 .od-row{font-weight:700;fill:var(--ink-soft)}
 .od-side{fill:var(--ink-faint);font-size:11px}
+/* the drawn figures' base ink (lines, labels, letter pins): on the page before the redesign's release, restored here
+   2026-11-16 after a report that the A-D pins were black dots in dark mode. Theme tokens, so they follow light and dark. */
+.fg-line{fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+.fg-soft{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.4;stroke-dasharray:4 3}
+.fg-soft-line{fill:none;stroke:var(--ink-faint);stroke-width:1.4;stroke-dasharray:3 3}
+.fg-acc{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round}
+.fg-head{fill:var(--accent)}
+.fg-tooth{fill:var(--surface);stroke:var(--ink);stroke-width:2.2;stroke-linejoin:round}
+.fg-tooth2{fill:var(--surface-2);stroke:var(--ink);stroke-width:2.2;stroke-linejoin:round}
+.fg-post{stroke:var(--tag-blue);stroke-width:6;stroke-linecap:round}
+.fg-post2{stroke:var(--tag-red);stroke-width:6;stroke-linecap:round}
+.fg-dot{fill:var(--accent)}
+.fg-t{fill:var(--ink-soft);font:600 13px var(--font-body)}
+.fg-t.sm{font-size:11px}
+.fg-pin circle{fill:var(--surface);stroke:var(--accent);stroke-width:2}
+.fg-pin text{fill:var(--accent-ink);font:700 12px var(--font-mono)}
 .fg-acc-head{fill:var(--accent)}
 .fg-incl{fill:none;stroke-width:5.5;stroke-linecap:round}
 .fg-incl.max{stroke:#2f62a8}

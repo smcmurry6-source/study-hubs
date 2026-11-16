@@ -7,3 +7,4 @@ occlusion | The Question Bank numbers every card ("Question 12 of 100") and lets
 perio | The Question Bank numbers every card ("Question 12 of 100") and lets you pick how many questions come at a time: 50, 100, 200 or All, beside Order in the filters.
 perio | Session 7's smoking recall card is gone: a classmate pointed out it asked you to recall a whole list, which the final won't, and two multiple-choice questions already cover the same facts.
 heme-endo-exam3 | The Heme & Endo Exam 3 hub is open: Dr. Taylor's Lecture A (moved from Exam 2), L17 pregnancy and lactation, L18 estrogens and androgens, and L19 and L20 from their slides, with 285 questions, a mock and the Cycle Arcade.
+occlusion | The lettered arrows and borders in the drawn figures (cusp pathways, envelopes of motion) show their letters again, in dark mode too, and two questions were reworded after classmates' reports.

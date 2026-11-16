@@ -32,6 +32,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-16 (Occlusion, Claude Code)** — Sam: "fix the open reports in occlusion, send the replies, and merge." The
+  drawn figures' base styles (letter pins, lines, labels: `.fg-pin`, `.fg-line`, `.fg-t`...) had been left behind on the old
+  page at the redesign's release, so the A-D pins were black dots (unreadable in dark mode); restored in
+  `tools/figures/occlusion/od.css` and rebuilt. `mo-orth-occ` rewritten (two choices were the same words swapped) and
+  `nc-tf-4` reworded to Dr. Lawson's "night guard". Reports 45-48 resolved with replies.
 - **2026-11-16 (Heme & Endo Exam 3 hub, Claude Code, #379)** — Sam: "create the hub for endo exam 3. you can reuse the art
   that was made for endo exam 2. also, the lecture from dr taylor was moved from exam 2 to exam 3. you can reuse what was
   made for his lecture for this exam". New hub `hubs/heme-endo-exam3/` on the engine (Exam 3, Fri 11/20, 8:00-9:30 am, 35
