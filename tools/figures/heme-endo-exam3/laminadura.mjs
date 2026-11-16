@@ -43,8 +43,8 @@ function bz(p, closed, i0, i1) {
 }
 /* an ellipse as two relative arcs (no element, so a texture of many is one path) */
 function ell(cx, cy, rx, ry, deg) {
-  const r = deg * Math.PI / 180, dx = rx * Math.cos(r), dy = rx * Math.sin(r), A = "a" + f1(rx) + " " + f1(ry) + " " + Math.round(deg) + " 1 0 ";
-  return "M" + f1(cx + dx) + " " + f1(cy + dy) + A + f1(-2 * dx) + " " + f1(-2 * dy) + A + f1(2 * dx) + " " + f1(2 * dy) + "z";
+  const r = deg * Math.PI / 180, dx = Math.round(rx * Math.cos(r)), dy = Math.round(rx * Math.sin(r)), A = "a" + rx + " " + ry + " " + Math.round(deg) + " 1 0 ";
+  return "M" + (cx + dx) + " " + (cy + dy) + A + (-2 * dx) + " " + (-2 * dy) + A + (2 * dx) + " " + (2 * dy) + "z";
 }
 
 /* the teeth, buccal view, clockwise from the cusp tip (mm; y grows toward the apex). Proportions from Wheeler's: lower
@@ -96,25 +96,25 @@ function filmArt() {
   for (const t of TEETH) {
     const d = crs(t.out, true, 10); dense[t.id] = d; polys.push(d);
     o.TOOTH.push('<path class="ld-dentin" d="' + bz(t.out, true) + '"/><path class="ld-enamel" d="' + bz(t.out, true, t.ci[0], t.ci[1]) + '"/><path class="ld-dentin" d="' + bz(t.dej, false) + 'Z"/><path class="ld-pulp" d="' + bz(t.pulp, true) + '"/>');
-    o.SOCK.push(dOf(socketRun(crs(t.out, true, 5)).map(PX), false));
+    o.SOCK.push(dOf(socketRun(crs(t.out, true, 4)).map(PX), false));
   }
   o.CRESTL = CREST_SEG.map((s) => bz(s, false)).join("");
   /* bone below the crest, and the air and soft tissue above it */
-  o.BONE = bz(CREST, false).replace(/Z$/, "") + "L" + PX([32, 38]).map(f1).join(" ") + "L" + PX([-3, 38]).map(f1).join(" ") + "Z";
+  o.BONE = bz(CREST, false).replace(/Z$/, "") + "L" + PX([32, 36.6]).map(f1).join(" ") + "L" + PX([-3, 36.6]).map(f1).join(" ") + "Z";
   /* marrow spaces: the mandible's thick trabeculae with large, roughly horizontal spaces */
   const r = rand(7), blobs = [];
-  for (let gy = 0; gy < 20; gy++) for (let gx = 0; gx < 19; gx++) {
-    const cx = -0.4 + gx * 1.5 + (gy % 2) * 0.75 + (r() - 0.5) * 0.7, cy = 13.6 + gy * 1.18 + (r() - 0.5) * 0.5;
-    if (cy < crestY(cx) + 0.75 || cy > 36.6) continue;
+  for (let gy = 0; gy < 17; gy++) for (let gx = 0; gx < 16; gx++) {
+    const cx = -0.4 + gx * 1.8 + (gy % 2) * 0.9 + (r() - 0.5) * 0.8, cy = 13.7 + gy * 1.38 + (r() - 0.5) * 0.6;
+    if (cy < crestY(cx) + 0.75 || cy > 36.3) continue;
     if (polys.some((p) => inPoly([cx, cy], p))) continue;
-    const rx = 0.32 + r() * 0.42, ry = rx * (0.5 + r() * 0.3), rot = (r() - 0.5) * 40, c = PX([cx, cy]);
-    blobs.push(ell(c[0], c[1], rx * S, ry * S, rot));
+    const rx = 0.38 + r() * 0.5, ry = rx * (0.5 + r() * 0.3), rot = (r() - 0.5) * 40, c = PX([cx, cy]);
+    blobs.push(ell(Math.round(c[0]), Math.round(c[1]), Math.round(rx * S * 2) / 2, Math.round(ry * S * 2) / 2, rot));
   }
   o.MARROW = '<path class="ld-marrow" d="' + blobs.join("") + '"/>';
   /* "ground glass": the trabecular pattern gone to a fine, even granularity: rows of short dashes in two tones, each
      row cut where the bone ends at the crest */
   let gl = "", gd = "";
-  for (let j = 0; j < 46; j++) {
+  for (let j = 0; j < 46 && 13.3 + j * 0.5 < 36.2; j++) {
     const y = 13.3 + j * 0.5, segs = []; let x0 = null;
     for (let x = -1.5; x <= 27.6; x += 0.1) { const ok = y > crestY(x) + 0.35; if (ok && x0 === null) x0 = x; if ((!ok || x > 27.5) && x0 !== null) { segs.push([x0, x]); x0 = null; } }
     const sg = segs.map((g) => "M" + f1(PX([g[0], y])[0]) + " " + f1(PX([0, y])[1]) + "H" + f1(PX([g[1], y])[0])).join("");
@@ -167,12 +167,13 @@ function panelArt() {
   }
   o.FAT = fat.map((f) => '<circle class="ld-fat" cx="' + f1(f[0]) + '" cy="' + f1(f[1]) + '" r="' + f1(f[2]) + '"/>').join("");
   /* marrow cells between the fat cells */
-  let mc = ""; for (let n = 0; n < 900 && mc.length < 2600; n++) {
-    const x = 200 + r() * 190, y = PT + 3 + r() * (PB - PT - 6);
+  /* (zero-length strokes with round caps: one path of dots) */
+  let mc = "", nmc = 0; for (let n = 0; n < 900 && nmc < 90; n++) {
+    const x = Math.round(200 + r() * 190), y = Math.round(PT + 3 + r() * (PB - PT - 6));
     if (!clear(x, y, 2) || fat.some((f) => Math.hypot(f[0] - x, f[1] - y) < f[2] + 2.2)) continue;
-    mc += '<circle cx="' + f1(x) + '" cy="' + f1(y) + '" r="1.5"/>';
+    mc += "M" + x + " " + y + "h0"; nmc++;
   }
-  o.MCELL = '<g class="ld-mcell">' + mc + "</g>";
+  o.MCELL = '<path class="ld-mcell" d="' + mc + '"/>';
   /* bone cells on the trabeculae: [x, y, angle] */
   o.OBT = [[232, 445.5, 92], [270, 449.5, 98], [214, 511, -86], [238, 515.5, -78], [334, 466.5, -80], [352, 507, 70]];
   return o;
@@ -194,8 +195,8 @@ function ldDots(p, n, per, t, cls, r, ph, op) {
 }
 /* a resorption bay's depth at height y */
 function ldBay(y, B, k) { var d = 0, i; for (i = 0; i < B.length; i++) { var q = (y - B[i][0]) / B[i][1]; if (q > -1 && q < 1) d += B[i][2] * k * (0.5 + 0.5 * Math.cos(Math.PI * q)); } return d; }
-function ldLeft(y, k, D) { return 142 + 6 * k + ldBay(y, D.BAYL, k); }
-function ldRight(y, k, D) { return 188 - 8 * k - ldBay(y, D.BAYR, k); }
+function ldLeft(y, k, D) { return 142 + 8 * k + ldBay(y, D.BAYL, k); }
+function ldRight(y, k, D) { return 188 - 10 * k - ldBay(y, D.BAYR, k); }
 /* a callout from a label outside the film to a part on it: the leader is split at the film's edge so the part on the
    film is drawn light over a dark core, and it ends on a ringed pin */
 function ldCall(x, y, s, px, py, a, cls, D) {
@@ -235,8 +236,8 @@ function ldRender(st, D) {
     '<path class="ld-mobh" d="M' + f1(G.mob[0][0]) + " " + f1(G.mob[0][1]) + "l8 -4.5v9z" + "M" + f1(G.mob[1][0]) + " " + f1(G.mob[1][1]) + "l-8 -4.5v9z" + '"/></g>';
   /* hypoparathyroidism: no film finding in the lecture */
   if (h > 0.02) o += '<rect class="ld-veil" x="' + F[0] + '" y="' + F[1] + '" width="' + F[2] + '" height="' + F[3] + '" rx="12" opacity="' + f1(0.62 * h) + '"/>' +
-    '<g opacity="' + f1(h) + '"><rect class="ld-stamp" x="' + f1(F[0] + F[2] / 2 - 84) + '" y="' + f1(F[1] + 128) + '" width="168" height="40" rx="6"/>' +
-    T(F[0] + F[2] / 2, F[1] + 145, "no film finding", "ld-xs ld-stampt", "middle") + T(F[0] + F[2] / 2, F[1] + 160, "in this lecture", "ld-xs ld-stampt", "middle") + "</g>";
+    '<g opacity="' + f1(h) + '"><rect class="ld-stamp" x="' + f1(F[0] + F[2] / 2 - 84) + '" y="' + f1(F[1] + 30) + '" width="168" height="40" rx="6"/>' +
+    T(F[0] + F[2] / 2, F[1] + 47, "no film finding", "ld-xs ld-stampt", "middle") + T(F[0] + F[2] / 2, F[1] + 62, "in this lecture", "ld-xs ld-stampt", "middle") + "</g>";
   /* the film's frame: the paper covers the teeth where the film ends */
   o += '<path class="ld-mask" fill-rule="evenodd" d="M' + (F[0] - 60) + " " + (F[1] - 30) + "H" + (F[0] + F[2] + 60) + "V" + (F[1] + F[3] + 12) + "H" + (F[0] - 60) + "Z" +
     "M" + (F[0] + 12) + " " + F[1] + "H" + (F[0] + F[2] - 12) + "A12 12 0 0 1 " + (F[0] + F[2]) + " " + (F[1] + 12) + "V" + (F[1] + F[3] - 12) + "A12 12 0 0 1 " + (F[0] + F[2] - 12) + " " + (F[1] + F[3]) +
@@ -266,7 +267,7 @@ function ldRender(st, D) {
   o += D.FAT + D.MCELL + D.TRAB;
   /* the lamina dura: a band of dense bone, eaten into by resorption bays when PTH is high */
   var lp = [], rp = [];
-  for (y = PT; y <= PB; y += 2) { lp.push([ldLeft(y, k, D), y]); rp.push([ldRight(y, k, D), y]); }
+  for (y = PT; y <= PB + 2; y += 3) { var yy = Math.min(y, PB); lp.push([ldLeft(yy, k, D), yy]); rp.push([ldRight(yy, k, D), yy]); }
   p = lp.concat(rp.reverse());
   o += HOT(hy ? D.INFO.pldH : D.INFO.pld, '<path class="ld-band" d="M' + p.map(function (q) { return f1(q[0]) + " " + f1(q[1]); }).join("L") + 'Z"/>' + (function () {
     var s = "", lx, ok, run;
@@ -323,10 +324,10 @@ function ldRender(st, D) {
   var top = [], bot = [];
   for (i = 0; i <= 16; i++) { x = xa + 8 + (len - 2) * i / 16; var hh = thk * Math.sin(Math.PI * i / 16); top.push([x, yc - hh]); bot.push([x, yc + hh]); }
   var stri = ""; for (i = 2; i <= 14; i += 2) stri += "M" + f1(top[i][0]) + " " + f1(top[i][1] + 1) + "L" + f1(bot[i][0]) + " " + f1(bot[i][1] - 1);
-  o += HOT(lv.mus === "tet" ? D.INFO.tet : D.INFO.mus, '<rect class="ld-bnb" x="' + (xa - 8) + '" y="589" width="8" height="28" rx="2"/><rect class="ld-bnb" x="' + f1(xb + 8) + '" y="589" width="8" height="28" rx="2"/>' +
+  o += HOT(lv.mus === "tet" ? D.INFO.tet : lv.mus === "ng" ? D.INFO.musq : D.INFO.mus, '<g' + (lv.mus === "ng" ? ' opacity=".45"' : "") + '><rect class="ld-bnb" x="' + (xa - 8) + '" y="589" width="8" height="28" rx="2"/><rect class="ld-bnb" x="' + f1(xb + 8) + '" y="589" width="8" height="28" rx="2"/>' +
     '<path class="ld-tend" d="M' + xa + " " + f1(yc) + "H" + f1(xa + 8) + "M" + f1(xb) + " " + f1(yc) + "H" + f1(xb + 8) + '"/>' +
     '<path class="ld-mus' + (tet > 0.5 ? " is-tet" : "") + '" d="M' + top.map(function (q) { return f1(q[0]) + " " + f1(q[1]); }).join("L") + "L" + bot.slice().reverse().map(function (q) { return f1(q[0]) + " " + f1(q[1]); }).join("L") + 'Z"/>' +
-    '<path class="ld-stri" d="' + stri + '"/>' + T((xa + xb + 8) / 2, 636, tet > 0.5 ? "locked: won't relax" : "relaxes normally", "ld-xs" + (tet > 0.5 ? " ld-badt" : " mut"), "middle"));
+    '<path class="ld-stri" d="' + stri + '"/></g>' + T((xa + xb + 8) / 2, 636, tet > 0.5 ? "locked: won't relax" : lv.mus === "ng" ? "not in the lecture" : "relaxes normally", "ld-xs" + (tet > 0.5 ? " ld-badt" : " mut"), "middle"));
   return o;
 }
 /* an osteoclast: a big multinucleated cell in its bay, ruffled border against the bone (side 1: bone to its left) */
@@ -407,7 +408,7 @@ export default function laminadura() {
     ],
     css: `
 .anima[data-anima="laminadura"] .am-svg{max-width:500px}
-.anima .laminadura-svg{--ld-f0:#141414;--ld-f1:#202020;--ld-st:#2a2a2a;--ld-bone:#6b6b6b;--ld-mar:#474747;--ld-gl1:#747474;--ld-gl2:#606060;--ld-ldw:#d6d6d6;--ld-pdlc:#262626;
+.anima .laminadura-svg{--ld-f0:#141414;--ld-f1:#202020;--ld-st:#2a2a2a;--ld-bone:#6b6b6b;--ld-mar:#505050;--ld-gl1:#747474;--ld-gl2:#606060;--ld-ldw:#d6d6d6;--ld-pdlc:#262626;
   --ld-den:#b4b4b4;--ld-ena:#f0f0f0;--ld-pulp:#4a4a4a;--ld-bt:#2c2c2c;--ld-btr:#4b4b4b;--ld-ink:#f2f2f2}
 .anima .laminadura-svg .t.ld-xs{font-size:11.5px}
 .anima .laminadura-svg .t.ld-badt{fill:var(--bx-inhib);font-weight:600}
@@ -447,7 +448,7 @@ export default function laminadura() {
 .anima .laminadura-svg .ld-mrw{fill:color-mix(in srgb,var(--bx-fat) 70%,var(--bx-cyto))}
 .anima .laminadura-svg .ld-ct{fill:var(--bx-matrix)}
 .anima .laminadura-svg .ld-fat{fill:var(--bx-fat);stroke:var(--bx-fat-line);stroke-width:1}
-.anima .laminadura-svg .ld-mcell{fill:var(--bx-nuc);opacity:.6}
+.anima .laminadura-svg .ld-mcell{fill:none;stroke:var(--bx-nuc);stroke-width:3;stroke-linecap:round;opacity:.6}
 .anima .laminadura-svg .ld-trab{fill:var(--bx-eosin);stroke:var(--bx-cyto-line);stroke-width:1}
 .anima .laminadura-svg .ld-band{fill:color-mix(in srgb,var(--bx-eosin) 80%,var(--bx-memb));stroke:var(--bx-memb);stroke-width:1.2}
 .anima .laminadura-svg .ld-lam{fill:none;stroke:var(--bx-cyto-line);stroke-width:.7;opacity:.7}
