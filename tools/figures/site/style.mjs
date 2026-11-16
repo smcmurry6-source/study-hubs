@@ -38,6 +38,8 @@ export const TINTS = {
   "perio":                { name: "Perio",                ink: "#b4466f", mid: "#D97FA0", light: "#F6DDE6", dark: "#EC93B5" },
   "pcd-implants-exam1":   { name: "PCD Implants",         ink: "#2f6f84", mid: "#6FA9BB", light: "#D7E9EF", dark: "#7CC0D6" },
   "heme-endo-exam2":      { name: "Heme & Endo 2",        ink: "#a83232", mid: "#D86F6F", light: "#F5DADA", dark: "#EE8A8A" },
+  /* Heme & Endo Exam 3 reuses Exam 2's art and tint (Sam, 2026-11-15: "you can reuse the art that was made for endo exam 2") */
+  "heme-endo-exam3":      { name: "Heme & Endo 3",        ink: "#a83232", mid: "#D86F6F", light: "#F5DADA", dark: "#EE8A8A" },
   "special-patient-care": { name: "Special Patient Care", ink: "#2e7d4f", mid: "#6DB58A", light: "#D7EEDF", dark: "#76CB98" },
   "generic":              { name: "A new hub",            ink: "#6B5A68", mid: "#A897A4", light: "#ECE6EA", dark: "#C4B3C0" }
 };

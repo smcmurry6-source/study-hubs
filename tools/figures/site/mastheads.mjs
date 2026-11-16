@@ -439,6 +439,7 @@ export const MASTHEADS = {
   "perio":                { label: "A row of teeth in their gums with a probe walked into a pocket and a bleeding point beside it, a perio chart on a clipboard, a mouth mirror and a curette", body: perio() },
   "pcd-implants-exam1":   { label: "A cutaway model of an implant between two natural teeth in gum and bone, CBCT cross-sections on a lightbox, a surgical guide, a torque wrench and an implant vial", body: implants() },
   "heme-endo-exam2":      { label: "A chart of the thyroid on the trachea, an insulin pen and vial, a glucose meter with a drop on its strip, a rack of blood tubes and red cells drifting by", body: hemeEndo() },
+  "heme-endo-exam3":      { label: "A chart of the thyroid on the trachea, an insulin pen and vial, a glucose meter with a drop on its strip, a rack of blood tubes and red cells drifting by", body: hemeEndo() },   // Exam 2's, reused (Sam, 2026-11-15)
   "special-patient-care": { label: "A calm operatory corner: the chair under a soft blanket, a picture schedule on the wall, the light turned low, tinted sunglasses and a foam-grip toothbrush on the tray", body: spc() },
   "generic":              { label: "A study desk: a lamp, a stack of books in the hubs' colors, a molar model, a mug, an open notebook and an exam calendar with a day circled", body: generic() }
 };
