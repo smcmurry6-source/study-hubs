@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-16 (Time in Learn and in Flashcards, told apart from the Question Bank, Claude Code, [#381](https://github.com/smcmurry6-source/study-hubs/pull/381))** — Sam asked
+  "do we have tracking for how people do questions between the bank, learn, and flashcards", then "i want to see where people
+  spend the most time between the three", then "yes do it. merge when ready". Nothing students see changes. The engine logged
+  all three as `compendium/bank`, so the admin page's time by section couldn't split them (a first day's estimate from answer
+  and rating timing: about 94% of the time in the bank, 5% in Learn, under 1% in Flashcards). Now `section()` in
+  `widget/hub.js` sends `compendium/learn` or `compendium/cards` while the bank is studied as Learn or Flashcards (on any set
+  but the mock, the launcher and the full-screen session alike), and `migration_v59.sql` (applied through the connector)
+  replaces `sh_surface()` with the surfaces `learn` and `cards`, and places the redesign's other sections the lessons audit
+  found unplaced (`compendium/drill` and `compendium/misses` as `drill`, `more/timmy` as `podcast`, the rest of More as a
+  new `more`; days already recorded are placed too). It also keeps Learn's answers as context `learn` in `answer_xp`
+  (they were `other`; nothing pays by it). The admin page's Insights → "Where time goes" has Learn, Flashcards and More
+  columns. Tests: `tools/release/admin-ops.js` checks 26 section names, `tools/release/xp.js` Learn's context and pay.
+  Bundles rebuilt; the event taxonomy, game-server, Insights notes, decisions and the inbox (two lines ticked) updated.
+
 - **2026-11-15 (Perio: `q7-07` retired, Claude Code, the lessons audit's follow-up)** — Report #44 ("too many details for a
   non-MC question"): `q7-07` was a self-graded recall card listing the immune changes smoking causes, which `q7-03` and
   statement 2 of `q7-N03` already ask; the final has no recall items, and the bank audit's own rule retires a recall card that

@@ -120,7 +120,8 @@ more people, never for anything about a person.
 ### Learn and Flashcards (migration_v56, from the redesign's release; [game-server](game-server.md))
 
 A flashcard's rating is not an answer: it never reaches `personal_answers`, `question_stats`, the class's picks or question
-health. Learn's answers are ordinary answers (`record_answer_v2`, filed with context `other`); only its steps are here.
+health. Learn's answers are ordinary answers (`record_answer_v2`; `answer_xp.ctx` is `learn` since `migration_v59.sql`,
+2026-11-16, and `other` before it; question health's `question_events.ctx` has said `learn` all along); only its steps are here.
 
 | Table | Grain | Visitor | Written by | Notes |
 |---|---|---|---|---|
@@ -147,9 +148,13 @@ its own (`get_timmy_history`). Quote them only as short paraphrases, totals over
 `<mode>/<sub-view>`, read by the widget from the hub's `#modeSwitch [data-mode]` and its active sub-view. Hubs name the same
 view differently (`compendium/bank` and `compendium/question-bank`; `compendium/notes` and `compendium/lecture-notes`;
 `compendium/mock` and `compendium/mock-exam`), so **cross-hub numbers go through `sh_surface(section)`**
-(`migration_v49.sql`, the one home of the mapping), which returns one of: `notes`, `bank`, `mock`, `cram`, `hints`,
-`weak-spots`, `recall`, `home` (incl. perio's `compendium/course-info`), `review`, `drill`, `arcade`, `podcast`, `retired`
-(Atlas), `other`, `unknown` (no section). A new mode or sub-view either uses an existing name or gets a line in
+(`migration_v49.sql`, the one home of the mapping; replaced whole by `migration_v59.sql`), which returns one of: `notes`, `bank`,
+`learn`, `cards`, `mock`, `cram`, `hints`, `weak-spots`, `recall`, `home` (incl. perio's `compendium/course-info`), `review`,
+`drill`, `arcade`, `podcast`, `more`, `retired` (Atlas), `other`, `unknown` (no section). The engine (`section()` in
+`widget/hub.js`) sends `compendium/learn` and `compendium/cards` while the Question Bank is studied as Learn or as
+Flashcards (on any set but the mock; before 2026-11-16 they were `compendium/bank`), `compendium/drill` and
+`compendium/misses` for those sets (`drill`), `more/timmy` for Timmy Time (`podcast`) and `more/<page>` for the rest of
+More (`more`). A new mode or sub-view either uses an existing name or gets a line in
 `sh_surface()` in its own migration; the data-quality check lists sections it can't place. **New hubs: use the names
 `home`, `compendium/notes`, `compendium/bank`, `compendium/mock`, `compendium/hints`, `compendium/cram`,
 `compendium/weak`, `review/<group>`, `arcade/<game>`, `drill/daily`, `podcast/<episode>`.**

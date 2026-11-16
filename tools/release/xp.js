@@ -1037,6 +1037,12 @@ try {
   eq([num(`select count(*) from card_reviews where visitor_id = 'xp-CL2'`), anonJson(`get_my_cards('xp-CL', 'xh')`).length], [0, 3], 'linked: every rating and Learn step is under the id that remains');
   eq(xpOf('xp-CL'), 4, 'linked: both devices\' card XP (the same card twice in a day: still within its three)');
   notes.push('Learn and Flashcards: a flat 2 for a card\'s first three ratings a day, the shared speed limit, Study ahead and Learn steps pay nothing, a replay, a double tap, a boost, the rebuild, no class numbers or day studied, get_my_cards, Link my devices');
+  // Learn's answers keep their own context (migration_v59) and pay exactly as the bank's; anything unknown is still `other`
+  const ctxOf = v => one(`select x.ctx from answer_xp x join personal_answers a on a.id = x.answer_id where a.visitor_id = ${q(v)}`);
+  const lA = ans('xp-LA', 'x1', { choice: 1, ctx: 'learn', at: CD + 3000 }), lB = ans('xp-LB', 'x1', { choice: 1, ctx: 'bank', at: CD + 3000 });
+  ans('xp-LO', 'x1', { choice: 1, ctx: 'somewhere', at: CD + 3000 });
+  eq([ctxOf('xp-LA'), ctxOf('xp-LB'), ctxOf('xp-LO')], ['learn', 'bank', 'other'], 'an answer in Learn is filed as learn, the bank\'s as bank, an unknown context as other');
+  eq([lA.xp, lA.correct, lA.first], [lB.xp, lB.correct, lB.first], 'an answer in Learn pays exactly as the same answer in the bank');
 
   /* ---------- 15. the private parts stay private ---------- */
   for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])

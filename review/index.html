@@ -1756,9 +1756,9 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     minPeople: 5,      /* a hub or page with fewer people is left out of the tables: its percentages are noise (and the privacy rule's floor) */
     minRetries: 20     /* a hub's retry share is flagged only with at least this many retries */
   };
-  var SURFACES = ["notes", "bank", "review", "mock", "drill", "hints", "cram", "weak-spots", "home", "podcast", "arcade", "recall", "other", "unknown", "retired"];
-  var SURFACE_LABEL = { notes: "Notes", bank: "Question bank", review: "Review", mock: "Mock exam", drill: "Daily drill", hints: "Exam hints", cram: "Cram sheet",
-    "weak-spots": "Weak spots", home: "Home", podcast: "Timmy Time", arcade: "Arcade", recall: "Active recall", other: "Other", unknown: "No section sent", retired: "Retired (Atlas)" };
+  var SURFACES = ["notes", "bank", "learn", "cards", "review", "mock", "drill", "hints", "cram", "weak-spots", "home", "podcast", "arcade", "recall", "more", "other", "unknown", "retired"];
+  var SURFACE_LABEL = { notes: "Notes", bank: "Question bank", learn: "Learn", cards: "Flashcards", review: "Review", mock: "Mock exam", drill: "Daily drill", hints: "Exam hints", cram: "Cram sheet",
+    "weak-spots": "Weak spots", home: "Home", podcast: "Timmy Time", arcade: "Arcade", recall: "Active recall", more: "More", other: "Other", unknown: "No section sent", retired: "Retired (Atlas)" };
   var insights = null;
   /* each hub's most recent exam (its first if none has passed yet), from the dashboard's own hubs.js (hubs and archived) */
   function hubExam(h){
@@ -1860,7 +1860,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var low = {};
     used.forEach(function(sf){
       var have = hubs.filter(function(h){ return h.s[sf]; });
-      if (have.length >= 3 && sf !== "other" && sf !== "unknown" && sf !== "retired" && have.every(function(h){ return pctN(h.s[sf].people, people[h.hub]) < R.reach; })) low[sf] = have.length;
+      if (have.length >= 3 && sf !== "other" && sf !== "unknown" && sf !== "retired" && sf !== "more" && have.every(function(h){ return pctN(h.s[sf].people, people[h.hub]) < R.reach; })) low[sf] = have.length;
     });
     var body = hubs.map(function(h){
       return '<tr><td class="lbl">' + hubName(h.hub) + '<span class="sub2">' + fmtMin(h.mins) + '</span></td>' + used.map(function(sf){
