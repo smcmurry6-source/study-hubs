@@ -120,6 +120,7 @@ Hub building
 Live
 - [Occlusion](hubs/occlusion.md)
 - [Periodontology](hubs/perio.md)
+- [Heme & Endo Exam 3](hubs/heme-endo-exam3.md)
 
 Archived (page still up)
 - [Heme & Endo Exam 2](hubs/heme-endo-exam2.md) · [PCD Implants Exam 1](hubs/pcd-implants-exam1.md) ·

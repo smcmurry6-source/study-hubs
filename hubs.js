@@ -43,6 +43,34 @@ window.SH_DASH_DATA = {
  },
  "hubs": [
   {
+   "id": "heme-endo-exam3",
+   "cls": "hemeendo",
+   "title": "Heme & Endo Exam 3 Hub",
+   "code": "Heme & Endo · Exam 3",
+   "exams": [
+    {
+     "name": "Hematology & Endocrinology Exam 3",
+     "label": "Exam",
+     "date": "2026-11-20",
+     "code": "Heme & Endo · Exam 3",
+     "checkinHour": 10,
+     "promptHour": 10
+    }
+   ],
+   "updated": "2026-11-16",
+   "desc": "Dr. Taylor's Lecture A (dental endocrinology, moved here from Exam 2), L17 Pregnancy and lactation, L18 Estrogens and androgens, L19 Introduction to hematology and L20 Lymphomas and leukemias; L21 and L22, the pathology of the male and female reproductive systems, join when their slides are posted. The exam is Fri Nov 20, 8:00-9:30 am (35 questions, new material only). Its own home page with your countdown and progress, notes in three reading levels with narration, animated diagrams, Patient Box cases, two-statement, true/false, numbered and which-statement questions with every choice explained, High Likelihood Exam Questions, exam hints from the recordings, review tables with side-by-side look-alikes, a mock exam and the Cycle Arcade.",
+   "modes": [
+    "Home",
+    "Compendium",
+    "Plain-English notes",
+    "Review tables",
+    "Mock exam",
+    "Arcade",
+    "Listen"
+   ],
+   "stateKey": "hee3-state-v1"
+  },
+  {
    "id": "pcd-implants-exam1",
    "cls": "implants",
    "title": "PCD Implants Exam 1 Hub",
@@ -445,6 +473,7 @@ window.SH_DASH_DATA = {
   "pcd-exam3": "PCD Exam 3",
   "heme-endo-exam1": "Heme & Endo 1",
   "heme-endo-exam2": "Heme & Endo 2",
+  "heme-endo-exam3": "Heme & Endo 3",
   "special-patient-care": "Special Patient Care",
   "pcd-implants-exam1": "PCD Implants 1"
  },

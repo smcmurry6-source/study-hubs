@@ -677,5 +677,5 @@ const buildPerio = (T) => ({
 
 export const ARCADE_VIEWBOX = [0, 0, 320, 170];
 /* Occlusion's (phase 1), Heme & Endo Exam 2's and Perio's (phase 2) */
-const SETS = { occlusion: build, "heme-endo-exam2": buildHE, perio: buildPerio };
+const SETS = { occlusion: build, "heme-endo-exam2": buildHE, "heme-endo-exam3": buildHE, perio: buildPerio };   // Exam 3 reuses Exam 2's lobby (Sam, 2026-11-15)
 export function arcadeArt(hub, tint){ return SETS[hub] ? SETS[hub](tint) : null; }

@@ -1,13 +1,13 @@
 ---
 type: task
-status: blocked
+status: done
 hub: heme-endo-exam3
 created: 2026-11-10
 requested-by: Sam
 due: 2026-11-20
-waiting-on: the Heme & Endo Exam 3 hub being built (it doesn't exist yet), and the course confirming Exam 3's lectures
-agent: 
-pr: 
+waiting-on: 
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/379
 ---
 
 # Heme & Endo Exam 3: bring back Dr. Taylor's Lecture A
@@ -21,8 +21,8 @@ it, already taught and vetted, instead of writing it again.
 
 ## Context
 
-- Hub notes: [heme-endo-exam2](../hubs/heme-endo-exam2.md) (where A came from; its content flags for A are below) and
-  [heme-endo-exam1](../hubs/heme-endo-exam1.md). Exam 3 is on the Exam 2 hub's timeline as Fri 11/20 (`COURSE_DATES`).
+- Hub notes: [heme-endo-exam2](../../hubs/heme-endo-exam2.md) (where A came from; its content flags for A are below) and
+  [heme-endo-exam1](../../hubs/heme-endo-exam1.md). Exam 3 is on the Exam 2 hub's timeline as Fri 11/20 (`COURSE_DATES`).
 - **Where it is:** commit `43ece52` on `main` (the last one with A in it). Get the file with
   `git show 43ece52:hubs/heme-endo-exam2/index.html > /tmp/hee2-with-a.html`, and the narration with
   `git show 43ece52:hubs/heme-endo-exam2/audio/dental-full.mp3 > dental-full.mp3` (and `dental-plain.mp3`).
@@ -33,7 +33,7 @@ it, already taught and vetted, instead of writing it again.
     right after `mq()`'s block: `dc-ws-calcium`, `dc-ws-thyroid`, `dc-wf-addison`, `dc-wf-dmmouth`. Every choice has its
     why; the formats meet `FORMAT_MIN` and `WHICH_MIN`;
   - the notes, both levels: `READINGS["dental"]`, `READINGS_PLAIN["dental"]` (and the two mp3s above, which match them:
-    reuse them only if the text is copied unchanged, [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md));
+    reuse them only if the text is copied unchanged, [text-and-audio-never-drift](../../rules/text-and-audio-never-drift.md));
   - `NOTE_TABLES["dental"]`, `CRAM["dental"]`, the `REVIEW` group `id:"dental"` and three "Side by side" sections
     (`A · Hyperthyroidism vs hypothyroidism`, `A · Thyroid storm vs adrenal crisis vs hypoglycemia`,
     `A · Addison disease vs Cushing syndrome`);
@@ -44,7 +44,7 @@ it, already taught and vetted, instead of writing it again.
   - its mock share was 5 of 45 in Exam 2's `MOCK_BLUEPRINT` (weighted by lecture time, one hour).
 - **Question ids:** the `dc-*` ids are retired in `tools/question-ids/heme-endo-exam2.txt`. The Exam 3 hub has its own
   registry (`tools/question-ids/heme-endo-exam3.txt`), so it keeps the same ids
-  ([question-ids-are-permanent](../rules/question-ids-are-permanent.md)).
+  ([question-ids-are-permanent](../../rules/question-ids-are-permanent.md)).
 - **Content flags (kept as taught, from the Exam 2 hub note):** slide 15's PTH "inhibits osteoblasts" he also said aloud
   (13:21); the notes keep Exam 1's mechanism (PTH acts on osteoblasts, which drive osteoclasts); no key depends on it.
   Slide 17 is the lamina dura radiographs and a brown tumor (14:52-15:58); slide 35 an image he didn't teach. Kept as
@@ -63,19 +63,31 @@ it, already taught and vetted, instead of writing it again.
   (Dr. Madison, Tue 11/10) and L18 Estrogens and androgens (Dr. Fasinu, Wed 11/11) were never built; the Exam 3 hub builds
   them from their slides and recordings, with every per-lecture rule.
 - Sources: Drive, "Hematology and Endocrinology" → "Exam 2" (A's slides and the `GMT20261106` 8 am transcript). Never
-  commit them; the [graded-coursework](../rules/graded-coursework.md) rules apply as in Exam 2.
+  commit them; the [graded-coursework](../../rules/graded-coursework.md) rules apply as in Exam 2.
 
 ## Done when
 
-- [ ] The Exam 3 hub has Lecture A with its notes at both levels and narration, its 58 questions (same ids), hints,
+- [x] The Exam 3 hub has Lecture A with its notes at both levels and narration, its 58 questions (same ids), hints,
       tables, cram lines, sequences, sort set and High Likelihood topics, ranked with the rest
-- [ ] Its `MOCK_BLUEPRINT` gives A a share, and Exam 3's exam facts say A is on it (or, if the course says it isn't, ask Sam)
-- [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
-- [ ] Vault written back (the Exam 3 hub note, decisions, this note's Outcome)
+- [x] Its `MOCK_BLUEPRINT` gives A a share, and Exam 3's exam facts say A is on it (or, if the course says it isn't, ask Sam)
+- [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
+- [x] Vault written back (the Exam 3 hub note, decisions, this note's Outcome)
 
 ## Log
 
 - 2026-11-10: written when Lecture A came out of `heme-endo-exam2` (Sam: Dr. Herr left it off Exam 2; "i guess save all
   that for exam 3").
+- 2026-11-16: done in the Exam 3 hub's first PR (Sam, 2026-11-15: "the lecture from dr taylor was moved from exam 2 to exam
+  3. you can reuse what was made for his lecture for this exam").
 
 ## Outcome
+
+Done in [#379](https://github.com/smcmurry6-source/study-hubs/pull/379), which built the Exam 3 hub
+([heme-endo-exam3](../../hubs/heme-endo-exam3.md)). The page at `43ece52` was run through the old converter
+(`tools/hub-next/build.mjs` at `d86f134^`, in a scratch worktree), and A's pieces went into the new hub's content JSON
+unchanged: notes at both levels, 58 questions with the same `dc-` ids (now in `tools/question-ids/heme-endo-exam3.txt`), 15
+hints, 11 High Likelihood topics, its review group, three Side by side tables, three processes and its sort set. Its
+narration was recorded again at all three levels (the engine's text is what Listen reads), and its High yield is built
+from its topics like every lecture's. The mock gives it 5 of the 25 (5 per lecture). Exam 3's facts on Home say A moved
+here. The figures drawn for it (lamina dura, the glands and the mouth) aren't finished:
+[the figures task](../2026-11-16-heme-endo-exam3-figures.md).
