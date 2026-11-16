@@ -92,6 +92,22 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **The first migration after the release** (2026-11-13) also counts the **Bowling** trophy on the server (add `bowling`
   to the achievement kinds; until then it is kept on the device and shows no share of the class:
   [the bowling egg](done/2026-11-06-redesign-bowling-egg.md)), with Learn's `learn` context (the line below).
+- [ ] **Sam's call: retire Perio's `q7-07`** (2026-11-15, the lessons audit; report #44, "too many details for a non-MC question"). A
+  self-graded recall card (the final has none) on the immune changes smoking causes, which `q7-03` asks and statement 2 of `q7-N03`
+  tests: the third ask that [the Perio bank audit](done/2026-11-15-perio-bank-audit.md)'s own rule retires ("a recall card was retired
+  wherever it repeated a fact asked in a scored format"). With a yes: `q7-07 retired` in `tools/question-ids/perio.txt`, out of
+  `questions.json` and out of the smoking topic's `ids` in every question that carries a copy of it, the build, and S7's High yield
+  recorded again (its topic then counts 7 questions). Then resolve #44 with its reply.
+- [ ] **`sh_surface()` doesn't place the redesign's sections** (2026-11-15, the lessons audit; `sh_data_quality()`'s
+  `unmapped_sections`): `compendium/drill` and `compendium/misses` (the bank's Daily drill and Yesterday's misses sets) and
+  `more/stats`, `more/timmy`, `more/settings`, `more/place`, `more/menu`, `more/ideas`, `more/shop` all read as `other`, so the
+  admin page's Insights undercounts the drill on Occlusion and Perio. Add them in the first migration after the release (the line
+  above): the two sets as `drill`, `more/timmy` as `podcast`, the rest as a new `more`
+  ([analytics-data-quality](../reference/analytics-data-quality.md)).
+- [ ] **The redesign's bank doesn't send `bank:retry-shown`** (2026-11-15, the lessons audit): `widget/hub-bank.js` tracks
+  `bank:retry-right` and `-missed` when a missed question comes back a few cards later, but not when it is shown (the old pages did:
+  20 people on 11-14, 3 on 11-15, all from old pages), so how many people a re-ask reaches can't be read. One `track()` where the
+  retry card is put in the list, then the bundles.
 - [x] **Sam's call: the hub trophies in the trophy case** (2026-11-13: "Each hub should get a shelf"; built in #359) (2026-11-13, from [the trophy case](done/2026-11-12-redesign-trophy-case-and-cards.md)).
   The 8 trophies each hub has (the mastery levels, every question answered, mock exams, the boss) aren't in the new case:
   they are behind its Leaderboards button, in the shared widget's panel. A shelf for them in the case, or leave them there?
