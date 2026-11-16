@@ -116,6 +116,8 @@ hand: remove `hubs/pcd-implants-exam1/` and optionally move its entry into `ARCH
   of these); `changes` (keep improving up to the exam / hardly noticed / rather it held still). About half the people who
   answered anything reached a Patient Box case (34 of 65 on exam morning), which is why the "didn't use" button is there. The
   admin page's Check-ins view tallies all four. Read them in the retrospective next to each person's use of that feature.
+  **Closed 2026-11-16** (Sam: "close the check ins for implants"; `checkinClosed:true` on the exam in `hubs.js`): no new
+  answers come in, so the next audit reads the final set.
 
 History: grep `PCD Implants` in "Recent major changes" (`DEPLOY_NOTES.md`).
 
