@@ -170,7 +170,7 @@
 .lec-fig > .lec-fig-cap{margin:0 0 10px;font-size:.86rem;color:var(--ink-soft)}
 
 .anima[data-anima="laminadura"] .am-svg{max-width:500px}
-.anima .laminadura-svg{--ld-f0:#141414;--ld-f1:#202020;--ld-st:#2a2a2a;--ld-bone:#6b6b6b;--ld-mar:#474747;--ld-gl1:#747474;--ld-gl2:#606060;--ld-ldw:#d6d6d6;--ld-pdlc:#262626;
+.anima .laminadura-svg{--ld-f0:#141414;--ld-f1:#202020;--ld-st:#2a2a2a;--ld-bone:#6b6b6b;--ld-mar:#505050;--ld-gl1:#747474;--ld-gl2:#606060;--ld-ldw:#d6d6d6;--ld-pdlc:#262626;
   --ld-den:#b4b4b4;--ld-ena:#f0f0f0;--ld-pulp:#4a4a4a;--ld-bt:#2c2c2c;--ld-btr:#4b4b4b;--ld-ink:#f2f2f2}
 .anima .laminadura-svg .t.ld-xs{font-size:11.5px}
 .anima .laminadura-svg .t.ld-badt{fill:var(--bx-inhib);font-weight:600}
@@ -210,7 +210,7 @@
 .anima .laminadura-svg .ld-mrw{fill:color-mix(in srgb,var(--bx-fat) 70%,var(--bx-cyto))}
 .anima .laminadura-svg .ld-ct{fill:var(--bx-matrix)}
 .anima .laminadura-svg .ld-fat{fill:var(--bx-fat);stroke:var(--bx-fat-line);stroke-width:1}
-.anima .laminadura-svg .ld-mcell{fill:var(--bx-nuc);opacity:.6}
+.anima .laminadura-svg .ld-mcell{fill:none;stroke:var(--bx-nuc);stroke-width:3;stroke-linecap:round;opacity:.6}
 .anima .laminadura-svg .ld-trab{fill:var(--bx-eosin);stroke:var(--bx-cyto-line);stroke-width:1}
 .anima .laminadura-svg .ld-band{fill:color-mix(in srgb,var(--bx-eosin) 80%,var(--bx-memb));stroke:var(--bx-memb);stroke-width:1.2}
 .anima .laminadura-svg .ld-lam{fill:none;stroke:var(--bx-cyto-line);stroke-width:.7;opacity:.7}
