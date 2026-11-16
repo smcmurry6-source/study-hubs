@@ -108,7 +108,8 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
 - **The question bank: no fact more than twice** (the audit of 2026-11-15, [its note](../tasks/done/2026-11-15-perio-bank-audit.md)).
   Sam's bar from Occlusion holds here too: a fact may be asked two ways, never more than twice in the bank, counting a
   statement inside a two-statement, true/false or numbered item and counting across sessions. 750 → 670 questions (103
-  retired, 23 new, 263 edited). When you add a question, check the fact isn't already asked twice. Who owns a shared
+  retired, 23 new, 263 edited); that evening `q7-07` came out too (report #44: a recall card, the third ask of smoking's
+  immune changes; Sam: "retire it"), so 669. When you add a question, check the fact isn't already asked twice. Who owns a shared
   fact: S9 the recession types' treatment (S1 keeps the RT definitions, `q1-08`, and the chart readings `pc-c1`,
   `pc-c2`), S9 the palate's layers, S4 the Glickman definitions and S5 reading one on a case, S5 the re-evaluation
   timing (`q5-R02`) with S4 the reason for it (`q4-L28`). New ids since the audit use `q<session>-F01`, `-F02`...
@@ -194,8 +195,6 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/2026-11-05-r
 
 ## Pending
 
-- Sam's call on report #44: retire `q7-07`, a recall card that asks a fact `q7-03` and `q7-N03` already ask (the
-  2026-11-15 lessons audit; steps in [the inbox](../tasks/inbox.md)).
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
 - [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md) (still no recording in Drive, 2026-11-14).
