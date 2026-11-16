@@ -18,7 +18,7 @@ add L17 (Pregnancy and lactation, Dr. Madison, Tue 11/10) and L18 (Estrogens and
 when their slides are posted, take Lecture A and L13-L16 from slides-only to taught as their recordings land, and
 re-rank High Likelihood from the review on Wed 11/11. **Changed 2026-11-10:** L16 is the last lecture on Exam 2 (Sam, from
 Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam 3 hub
-([carry-over task](../2026-11-10-heme-endo-exam3-carry-lecture-a.md)).
+([carry-over task](2026-11-10-heme-endo-exam3-carry-lecture-a.md)).
 
 ## Context
 
@@ -84,7 +84,7 @@ Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam
   decks' real slide order. Still to do: the same as above.
 - 2026-11-10: Lecture A is not on Exam 2 (Sam asked Dr. Herr: he forgot about it, so it will likely be on the next exam;
   "i guess save all that for exam 3"). It came out of the hub whole; the Exam 3 hub picks it up:
-  [the carry-over task](../2026-11-10-heme-endo-exam3-carry-lecture-a.md). A's line under "Done when" is met by its removal.
+  [the carry-over task](2026-11-10-heme-endo-exam3-carry-lecture-a.md). A's line under "Done when" is met by its removal.
 - 2026-11-10: Sam, from Dr. Herr: "There are 5 review, 8 for l11, 9 for l12, and 7 for the rest of the lectures. L16 is the
   last lecture on the test." `EXAM_COUNTS` and the mock follow it (High Likelihood keeps every topic: Sam, "Dont remove any
   high likelihood questions"), and L17 and L18 are dropped from this task (the first "Done when" box no longer applies; they go to the Exam 3 hub). Still to do:
@@ -104,5 +104,5 @@ Dr. Herr), so L17 and L18 aren't added here; they, and Lecture A, go to the Exam
 Done. Exam 2 (2026-11-13) covered Lectures 11-16 and the review: L11-L16 went to taught from their recordings, the
 11/11 in-class review's 20 questions and their twins went in with a High Likelihood topic in each lecture
 ([#320](https://github.com/smcmurry6-source/study-hubs/pull/320)), and Lecture A, L17 and L18 moved to the Exam 3 hub
-([the carry-over task](../2026-11-10-heme-endo-exam3-carry-lecture-a.md)). The hub archived the night of the exam; its
+([the carry-over task](2026-11-10-heme-endo-exam3-carry-lecture-a.md)). The hub archived the night of the exam; its
 retrospective is in `LESSONS.md` (the 2026-11-13 lessons refresh). Closed by that refresh's follow-up sweep, 2026-11-14.

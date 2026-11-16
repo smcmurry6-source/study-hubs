@@ -5,3 +5,4 @@
 # once, when it's added; editing or deleting an old line changes nothing. Newest at the bottom.
 occlusion | The Question Bank numbers every card ("Question 12 of 100") and lets you pick how many questions come at a time: 50, 100, 200 or All, beside Order in the filters.
 perio | The Question Bank numbers every card ("Question 12 of 100") and lets you pick how many questions come at a time: 50, 100, 200 or All, beside Order in the filters.
+heme-endo-exam3 | The Heme & Endo Exam 3 hub is open: Dr. Taylor's Lecture A (moved from Exam 2), L17 pregnancy and lactation, L18 estrogens and androgens, and L19 and L20 from their slides, with 285 questions, a mock and the Cycle Arcade.

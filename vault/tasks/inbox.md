@@ -10,6 +10,7 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **A Timmy Time episode for Heme & Endo Exam 3?** (2026-11-16) Exam 2 had one; Exam 3's hub shipped without (`core.json` `podcast: null`). Ask Sam before making it (`/podcast`), ideally once L21 and L22 are in ([the hub](../hubs/heme-endo-exam3.md)).
 - [x] **Deploy Ask Timmy's function again for the Occlusion final's episode** (2026-11-15, #366). `supabase/functions/timmy/site.json`
   gained the episode (rebuilt from the About page), but the live function is still version 4, from the Perio final's merge:
   `node tools/timmy/deploy.mjs` (needs `SUPABASE_ACCESS_TOKEN`). #366's session didn't, because its permission check stopped

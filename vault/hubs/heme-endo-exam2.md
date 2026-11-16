@@ -17,7 +17,7 @@ DENT 2160 Hematology & Endocrinology Exam 2: 50 questions, **5 on Exam 1 materia
 L13-L16** (Sam, 2026-11-10, from Dr. Herr: `EXAM_COUNTS`). **L16 is the last lecture on it**, so L17 and L18 aren't either
 (they go to Exam 3 with A). **Dr. Taylor's Lecture A is not on it** (Sam, 2026-11-10: Dr. Herr said he forgot about it, so it will likely be on the next exam; "i guess save all
 that for exam 3"): the hub's A came out whole that day, and everything it had (notes, narration, 58 questions, hints,
-tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md). Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-in hours: its entry in `hubs.js`.
+tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/done/2026-11-10-heme-endo-exam3-carry-lecture-a.md). Fri Nov 13, 10:00-11:30 am (the dental sitting). Exam date and check-in hours: its entry in `hubs.js`.
 
 ## Before you work on it
 
@@ -189,7 +189,7 @@ tables, topics) waits for the Exam 3 hub in [the carry-over task](../tasks/2026-
   "1/3 of cases have sodium wasting" may be inverted (references say most classic cases); p2-tf-12 is keyed True to the
   slide. Adrenal cortical carcinoma "> 2 cm" on the slide (likely meant larger).
 - **A:** no longer in this hub (2026-11-10); its content flags moved with it to
-  [the carry-over task](../tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md).
+  [the carry-over task](../tasks/done/2026-11-10-heme-endo-exam3-carry-lecture-a.md).
 - **L13 (taught, 11/6 recording):** he said "lower" for the testis temperature (3:58), so 35 °C stays from the slide;
   74 days said aloud (14:59). Slips the hub doesn't follow: "gap junctions" for the Sertoli occluding junctions (7:09),
   "ductus deferens" for the efferent ductules (1:45), "seminiferous tubules" for the seminal vesicles (33:35). His

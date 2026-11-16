@@ -63,7 +63,6 @@ window.SH_DASH_DATA = {
     "Home",
     "Compendium",
     "Plain-English notes",
-    "Diagrams",
     "Review tables",
     "Mock exam",
     "Arcade",
