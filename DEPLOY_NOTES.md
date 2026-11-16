@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-15 (Perio: `q7-07` retired, Claude Code, the lessons audit's follow-up)** — Report #44 ("too many details for a
+  non-MC question"): `q7-07` was a self-graded recall card listing the immune changes smoking causes, which `q7-03` and
+  statement 2 of `q7-N03` already ask; the final has no recall items, and the bank audit's own rule retires a recall card that
+  repeats a scored item's fact. Sam: "retire it". Out of `questions.json` and the smoking topic's `ids` (core.json and the seven
+  questions that carry a copy); `q7-07 retired` in `tools/question-ids/perio.txt`; 670 → 669 questions. S7's High yield
+  ("8 questions in the bank" → 7) recorded again (`audio/implants-perio-hy.mp3` and its words file). The class's numbers on
+  the other questions are untouched (nothing moved).
 - **2026-11-16 (PCD Implants Exam 1, MSK Exam 3 and GI Exam 2 check-ins closed, Claude Code)** — Sam: "close the check
   ins for implants, musculoskeletal 3, and gi 2". `checkinClosed:true` on each exam in `hubs.js` (`pcd-implants-exam1`,
   `msk-exam3`, `hepatobiliary`); `pastExams()` in `widget/dash.js` skips them, so they leave the Exam check-ins panel in
