@@ -1509,7 +1509,11 @@ window.addEventListener("hashchange", function(){ route(); window.scrollTo(0, 0)
 function section(){
 if (view === "home") return "home/dashboard";
 if (view === "notes") return "compendium/notes";
-if (view === "questions") { var p = HX.presetOf(); return "compendium/" + (p === "mock" ? "mock" : p === "weak" ? "weak" : p === "drill" ? "drill" : p === "misses" ? "misses" : "bank"); }
+if (view === "questions") {
+var p = HX.presetOf(), how = p !== "mock" && HX.qview ? HX.qview() : "questions";
+if (how === "learn" || how === "cards") return "compendium/" + how;
+return "compendium/" + (p === "mock" ? "mock" : p === "weak" ? "weak" : p === "drill" ? "drill" : p === "misses" ? "misses" : "bank");
+}
 if (view === "more") {
 if (sub === "arcade") return "arcade/" + (ARC && ARC.arcade.current() || "lobby");
 if (sub === "side") return "review/side";

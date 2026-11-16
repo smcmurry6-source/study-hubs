@@ -51,6 +51,33 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   narration for L17-L20 (`vault/tasks/2026-11-16-heme-endo-exam3-figures.md`); L19 and L20 to taught and L21 and L22, whose
   slides weren't posted (`vault/tasks/2026-11-16-heme-endo-exam3-l19-l22.md`). Not used (graded-coursework): the Exam 3 Anki
   deck in Drive, "Resources from D3s", Quiz 4 (open until 11/19). Hub note: `vault/hubs/heme-endo-exam3.md`.
+- **2026-11-16 (Time in Learn and in Flashcards, told apart from the Question Bank, Claude Code, [#381](https://github.com/smcmurry6-source/study-hubs/pull/381))** — Sam asked
+  "do we have tracking for how people do questions between the bank, learn, and flashcards", then "i want to see where people
+  spend the most time between the three", then "yes do it. merge when ready". Nothing students see changes. The engine logged
+  all three as `compendium/bank`, so the admin page's time by section couldn't split them (a first day's estimate from answer
+  and rating timing: about 94% of the time in the bank, 5% in Learn, under 1% in Flashcards). Now `section()` in
+  `widget/hub.js` sends `compendium/learn` or `compendium/cards` while the bank is studied as Learn or Flashcards (on any set
+  but the mock, the launcher and the full-screen session alike), and `migration_v59.sql` (applied through the connector)
+  replaces `sh_surface()` with the surfaces `learn` and `cards`, and places the redesign's other sections the lessons audit
+  found unplaced (`compendium/drill` and `compendium/misses` as `drill`, `more/timmy` as `podcast`, the rest of More as a
+  new `more`; days already recorded are placed too). It also keeps Learn's answers as context `learn` in `answer_xp`
+  (they were `other`; nothing pays by it). The admin page's Insights → "Where time goes" has Learn, Flashcards and More
+  columns. Tests: `tools/release/admin-ops.js` checks 26 section names, `tools/release/xp.js` Learn's context and pay.
+  Bundles rebuilt; the event taxonomy, game-server, Insights notes, decisions and the inbox (two lines ticked) updated.
+
+- **2026-11-15 (Perio: `q7-07` retired, Claude Code, the lessons audit's follow-up)** — Report #44 ("too many details for a
+  non-MC question"): `q7-07` was a self-graded recall card listing the immune changes smoking causes, which `q7-03` and
+  statement 2 of `q7-N03` already ask; the final has no recall items, and the bank audit's own rule retires a recall card that
+  repeats a scored item's fact. Sam: "retire it". Out of `questions.json` and the smoking topic's `ids` (core.json and the seven
+  questions that carry a copy); `q7-07 retired` in `tools/question-ids/perio.txt`; 670 → 669 questions. S7's High yield
+  ("8 questions in the bank" → 7) recorded again (`audio/implants-perio-hy.mp3` and its words file). The class's numbers on
+  the other questions are untouched (nothing moved).
+- **2026-11-16 (PCD Implants Exam 1, MSK Exam 3 and GI Exam 2 check-ins closed, Claude Code)** — Sam: "close the check
+  ins for implants, musculoskeletal 3, and gi 2". `checkinClosed:true` on each exam in `hubs.js` (`pcd-implants-exam1`,
+  `msk-exam3`, `hepatobiliary`); `pastExams()` in `widget/dash.js` skips them, so they leave the Exam check-ins panel in
+  Past hubs and the pop-up no longer goes out. Answers already sent stay on `review/` → Check-ins. The hub pages, their
+  recaps and the other open check-ins (Heme & Endo Exam 2, the Occlusion midterm and final) are unchanged.
+
 - **2026-11-15 (Question Bank: 50, 100, 200 or all at a time, every card numbered, Claude Code, #373)** — Sam: "Lets implement the numbering of
   the questions in the question bank idea" (a classmate: "adding question numbers so we know how many more are left ... if
   it's like 80+ questions I'm not just scrolling forever and I could maybe take a break when I hit #40"; also on the idea
