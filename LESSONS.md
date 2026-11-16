@@ -130,7 +130,8 @@ page it proposed shipped as the sets (#373): in its first afternoon about ten pe
 - **Perio** (final 11-19): quiet, as it was before the midterm until three days out: 7-12 people a day (108-328 min); its bank audit
   went live today, so its numbers start fresh. Report #44 is fair: `q7-07` is a self-graded recall card (the final has none) on the
   immune changes smoking causes, the fact `q7-03` asks and statement 2 of `q7-N03` tests, so it is the third ask the audit's own rule
-  would have retired. Retiring it is Sam's call (it also changes S7's High yield, which is recorded again). Question health: `q8-S01`
+  would have retired. Sam retired it that evening ("retire it"), and S7's High yield was
+  recorded again. Question health: `q8-S01`
   (9 of 13 picks call statement 2 true; the notes: "it's not a heat-seeking missile") and `q8-03` match the notes. Expect the class from
   Monday night, once Occlusion's final ends.
 
