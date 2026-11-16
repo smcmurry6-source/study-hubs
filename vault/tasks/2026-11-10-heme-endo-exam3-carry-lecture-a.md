@@ -1,13 +1,13 @@
 ---
 type: task
-status: blocked
+status: in-progress
 hub: heme-endo-exam3
 created: 2026-11-10
 requested-by: Sam
 due: 2026-11-20
-waiting-on: the Heme & Endo Exam 3 hub being built (it doesn't exist yet), and the course confirming Exam 3's lectures
-agent: 
-pr: 
+waiting-on: 
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/379
 ---
 
 # Heme & Endo Exam 3: bring back Dr. Taylor's Lecture A

@@ -27,7 +27,7 @@ entry in `hubs.js`.
   `heme-endo-exam2.js` under this hub's id. The arcade is Exam 2's **Cycle Arcade** (`content/arcade.js` and `arcade.css`,
   copied from Exam 2's redesign version; `HUB_ID` is this hub's, so its scores are its own), with the Path Lab Escape's story
   moved to the week of Exam 3.
-- **Lecture A came over whole** from Exam 2 ([the carry-over task](../tasks/done/2026-11-10-heme-endo-exam3-carry-lecture-a.md)):
+- **Lecture A came over whole** from Exam 2 ([the carry-over task](../tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md)):
   the Exam 2 page at `43ece52` (the last commit with A) was run through the old converter (`tools/hub-next/build.mjs` as of
   `d86f134^`, which read a single-file hub) and A's pieces were kept unchanged: its notes at both levels, its 58 questions
   (same `dc-` ids, retired in Exam 2's registry, live in this hub's), 15 hints, 11 High Likelihood topics, review tables, three
@@ -57,7 +57,7 @@ entry in `hubs.js`.
 
 ## Content flags (kept as taught; check when a recording or review lands)
 
-- **A:** in [the carry-over task](../tasks/done/2026-11-10-heme-endo-exam3-carry-lecture-a.md).
+- **A:** in [the carry-over task](../tasks/2026-11-10-heme-endo-exam3-carry-lecture-a.md).
 
 ## Pending
 
