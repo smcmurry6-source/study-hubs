@@ -92,7 +92,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **A migration after the release** (2026-11-13) counts the **Bowling** trophy on the server (add `bowling`
   to the achievement kinds; until then it is kept on the device and shows no share of the class:
   [the bowling egg](done/2026-11-06-redesign-bowling-egg.md)). The first one after the release, `migration_v59.sql`
-  (2026-11-16, PR PRNUM), took Learn's context and the sections (the two lines ticked below); this one is still open.
+  (2026-11-16, [#381](https://github.com/smcmurry6-source/study-hubs/pull/381)), took Learn's context and the sections (the two lines ticked below); this one is still open.
 - [ ] **Sam's call: retire Perio's `q7-07`** (2026-11-15, the lessons audit; report #44, "too many details for a non-MC question"). A
   self-graded recall card (the final has none) on the immune changes smoking causes, which `q7-03` asks and statement 2 of `q7-N03`
   tests: the third ask that [the Perio bank audit](done/2026-11-15-perio-bank-audit.md)'s own rule retires ("a recall card was retired
@@ -105,7 +105,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   admin page's Insights undercounts the drill on Occlusion and Perio. Add them in the first migration after the release (the line
   above): the two sets as `drill`, `more/timmy` as `podcast`, the rest as a new `more`
   ([analytics-data-quality](../reference/analytics-data-quality.md)). Done in `migration_v59.sql`, with Learn and Flashcards
-  as their own sections (PR PRNUM).
+  as their own sections ([#381](https://github.com/smcmurry6-source/study-hubs/pull/381)).
 - [ ] **The redesign's bank doesn't send `bank:retry-shown`** (2026-11-15, the lessons audit): `widget/hub-bank.js` tracks
   `bank:retry-right` and `-missed` when a missed question comes back a few cards later, but not when it is shown (the old pages did:
   20 people on 11-14, 3 on 11-15, all from old pages), so how many people a re-ask reaches can't be read. One `track()` where the
@@ -182,7 +182,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [x] Learn's answers are filed as context `other` because `migration_v54.sql`'s `record_answer_v2` doesn't list `learn` (v54 isn't
   changed without Sam's word). In the first migration after the release, add `learn` to its context list (the `case` in `sh_answer`),
   so the admin page can tell Learn's answers from the bank's (2026-11-12, [Learn and Flashcards](done/2026-11-06-redesign-learn-and-flashcards.md),
-  [game-server](../reference/game-server.md)). Done in `migration_v59.sql` (PR PRNUM).
+  [game-server](../reference/game-server.md)). Done in `migration_v59.sql` ([#381](https://github.com/smcmurry6-source/study-hubs/pull/381)).
 
 - [ ] Ask Timmy's "What should I study tonight?" on the new dashboard reads each hub's progress from this device's saved state
   (`progressFrom` in `widget/ask.js`), so on a new or linked device it sees nothing until a hub page has synced the answers. Read the

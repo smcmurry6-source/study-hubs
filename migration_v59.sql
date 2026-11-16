@@ -2,7 +2,8 @@
 -- answers keep their own context. The first migration after the redesign's release (vault/tasks/inbox.md had its two lines).
 -- Sam: "i want to see where people spend the most time between the three" (the Question Bank, Learn and Flashcards), then
 -- "yes do it. merge when ready". Written and tested on a throwaway copy of supabase/schema.sql (tools/release/rls.js,
--- admin-ops.js, xp.js); it changes two functions and nothing else (no table, no data, no grant).
+-- admin-ops.js, xp.js); it changes two functions and nothing else (no table, no data, no grant). Applied to the live
+-- project on 2026-11-16 through the Supabase connector, before PR #381 merged (the engine's new sections need it first).
 --
 -- 1. sh_surface(section) (migration_v49, the one home of the section-to-surface mapping) places:
 --    - compendium/learn and compendium/cards, which the engine (widget/hub.js section()) sends from this release on while

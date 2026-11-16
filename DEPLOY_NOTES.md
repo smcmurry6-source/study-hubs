@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-16 (Time in Learn and in Flashcards, told apart from the Question Bank, Claude Code, PR PRNUM)** — Sam asked
+- **2026-11-16 (Time in Learn and in Flashcards, told apart from the Question Bank, Claude Code, [#381](https://github.com/smcmurry6-source/study-hubs/pull/381))** — Sam asked
   "do we have tracking for how people do questions between the bank, learn, and flashcards", then "i want to see where people
   spend the most time between the three", then "yes do it. merge when ready". Nothing students see changes. The engine logged
   all three as `compendium/bank`, so the admin page's time by section couldn't split them (a first day's estimate from answer
