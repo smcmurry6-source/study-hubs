@@ -11,5 +11,6 @@ occlusion | The lettered arrows and borders in the drawn figures (cusp pathways,
 occlusion | "What cusp hits where?" is back at the top of the Occlusion Question Bank: practice Contacts or Movements, with your best score kept on this device.
 all | Answer a survey, or check in after an exam, and earn +500 XP and +1,000 Shiny Gold Crowns: once for each survey, and for your first check-in for each exam.
 all | The reward for answering a survey or checking in after an exam is now +1,000 XP (and still +1,000 Shiny Gold Crowns). If you already got +500, the other 500 has been added.
+perio | The long-root-trunk question (Session 5) now asks for both halves, why a long trunk helps at first and why it's a problem later, after a classmate pointed out the old answer only gave the second half.
 all | Listening to a lecture? Tap any word in the notes and the narration jumps there, on a phone too. And the Highlight button now works with a tap on phones, and your highlight colors show again (they had all come out gold).
 all | A missed question that comes back in the Question Bank now looks different: a "Second try" card, tinted with a dashed edge. Home's Today card shows your Shiny Gold Crowns.

@@ -49,6 +49,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   headless Chromium as an iPhone 13, a Pixel 7 and a laptop on the preview's made-up data.
   **BUG-158, highlight colors** (Sam: "Re add the ability to highlight in multiple colors"): on the engine's hubs every highlight was
   drawn gold, because `hub.css`'s `.hx mark.sh-hl` tied with v3.css's pen colors and came later; each pen has its color again (`--hl`).
+- **2026-11-17 (Perio report #53, Claude Code)** — `q5-L06` (why a long root trunk is only initially favorable): the
+  keyed choice gave only the later drawback, while the favorable half sat in the explanation. Stem, choices and whys
+  rewritten so the key names both halves (more loss to reach the furcation; short roots left for resection). Same id and
+  key position; High yield unchanged, so no narration to redo.
 - **2026-11-17 (The survey and check-in reward goes to 1,000 XP, Claude Code)** — Sam: "Lets up the xp to 1000".
   `migration_v61.sql`: `sh_form_reward` pays 1,000 XP (crowns stay 1,000: `sh_wallet` already leaves a reward row's whole
   base out of the 1-per-10 share), and a one-time top-up moves every reward row paid at 500 to 1,000 and adds 500 to its
