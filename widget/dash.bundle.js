@@ -789,6 +789,11 @@ return '<div class="survey-peek" aria-hidden="true"><div class="survey-tim"><div
 '<p class="survey-say" aria-hidden="true"></p>';
 }
 var formNow = null;
+function whenUncovered(fn, n){
+n = n || 0;
+if (!lifeCovered()) { fn(); return; }
+if (n < 200) setTimeout(function(){ whenUncovered(fn, n + 1); }, 1500);
+}
 function formWindow(o){
 if (formNow) formNow.close(true);
 var back = document.activeElement, peek = peekHtml(), shut = false;
@@ -1008,6 +1013,7 @@ if (!sv || (!re && ls("sh_survey_done_" + sv.id))) return;
 var qs = Array.isArray(sv.questions) ? sv.questions.slice(0, 5) : [];
 if (!qs.length) return;
 if (document.querySelector(".survey")) return;
+if (lifeCovered()) { whenUncovered(function(){ show(rows, re); }); return; }
 if (re) lsSet("sh_survey_again_" + sv.id + "_" + AGAIN[sv.id], "1");
 var answers = {}, sent = false;
 var W = formWindow({ label: "Quick survey", closeLabel: "Later", dismiss: function(){ if (sent) W.close(); else done(null, false); },
@@ -1994,7 +2000,7 @@ if (window.shLinkAsk) window.shLinkAsk.start({ sb: sb, hub: "dashboard", bootstr
 var held = 0;
 function askNext(){
 if (q(".sh-reply") && held++ < 200) { setTimeout(askNext, 1500); return; }
-tourIdle(function(){ if (!autoDebrief()) startSurvey(sb, bootstrap.ready); });
+tourIdle(function(){ whenUncovered(function(){ if (!autoDebrief()) startSurvey(sb, bootstrap.ready); }); });
 }
 setTimeout(askNext, 4000);
 function showGolden(rows){

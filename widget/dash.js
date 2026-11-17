@@ -862,6 +862,14 @@
      of the page looks for), win, body, set(html), say(line), cheer(), timer(fn, ms), close(now), closed (a hook run as
      it closes) }. */
   var formNow = null;
+  /* The pop-ups never open over another window (a classmate's place, the shop, a rank-up card, a dialog): a <dialog>
+     opened with showModal sits above everything, so the check-in would open hidden under it and take its Escape. They
+     wait for it to close, looking every 1.5 s for up to five minutes, then leave it for the next visit. */
+  function whenUncovered(fn, n){
+    n = n || 0;
+    if (!lifeCovered()) { fn(); return; }
+    if (n < 200) setTimeout(function(){ whenUncovered(fn, n + 1); }, 1500);
+  }
   function formWindow(o){
     if (formNow) formNow.close(true);
     var back = document.activeElement, peek = peekHtml(), shut = false;
@@ -1113,6 +1121,7 @@
       var qs = Array.isArray(sv.questions) ? sv.questions.slice(0, 5) : [];
       if (!qs.length) return;
       if (document.querySelector(".survey")) return;   /* a check-in opened from a card is already up: the survey waits for the next visit */
+      if (lifeCovered()) { whenUncovered(function(){ show(rows, re); }); return; }   /* the answer came while a window was open */
       if (re) lsSet("sh_survey_again_" + sv.id + "_" + AGAIN[sv.id], "1");
       var answers = {}, sent = false;
       /* "Later" (the button, the ×, Escape or a tap on the dimmed page) stops the pop-up; the survey waits in the Inbox */
@@ -2265,7 +2274,7 @@
     var held = 0;
     function askNext(){
       if (q(".sh-reply") && held++ < 200) { setTimeout(askNext, 1500); return; }
-      tourIdle(function(){ if (!autoDebrief()) startSurvey(sb, bootstrap.ready); });
+      tourIdle(function(){ whenUncovered(function(){ if (!autoDebrief()) startSurvey(sb, bootstrap.ready); }); });
     }
     setTimeout(askNext, 4000);
 
