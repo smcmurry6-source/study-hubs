@@ -12,18 +12,21 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 
 - [x] **Tap a word in the notes to jump the narration there** (Sam, 2026-11-17; done, on phones too, with the Highlight button's phone fix, BUG-157: #391): in Listen / Follow along, clicking a word
   skips the recording to that word (each recording's `.words.json` has the timings).
-- [ ] **Let Ask Timmy use outside sources** (Sam, 2026-11-17): today he answers from the hub's content and the site help
-  (`supabase/functions/timmy/`); let the API reach outside sources (web search or similar), with the cost and privacy
-  questions settled first ([ask-timmy](../reference/ask-timmy.md), [learner-data-privacy](../rules/learner-data-privacy.md)).
+- [x] **Let Ask Timmy use outside sources** (Sam, 2026-11-17; done: when the notes don't cover it, he looks it up on trusted
+  medical and dental sites and adds a "Not in your notes" box with the sources, #399; [ask-timmy](../reference/ask-timmy.md)).
+  Sam: "the outside source would only be used when there was something about the content that ask timmy doesnt have an
+  answer for ... just to fill in the gaps", then "we can do web search, the sites and others like them are good to go on
+  the list, no limit on gap answers".
 - [x] **Show the Shiny Gold Crowns you've earned on Home's Today card** (Sam, 2026-11-17). Done: a Crowns tile with the balance (what's left to spend; "earned in all" in its tooltip) that opens the shop (#391).
 - [ ] **More cosmetics for Timmy and Timmy's place** (Sam, 2026-11-17): new outfits and place pieces
-  ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`).
+  ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`). **On hold** (Sam, 2026-11-17: "lets
+  leave the more cosmetics for later"): don't start it until Sam brings it up again.
 - [x] **A different way to mark retries in the Question Bank** (Sam, 2026-11-17; done: a tinted card with a dashed edge and a "Second try" / "Third try" band, #391): a missed question that comes back a few
   cards later should look clearly different from a new one (`widget/hub-bank.js`; see also the `bank:retry-shown` line below).
 - [x] **Refine what double XP boosts cost** (Sam, 2026-11-17; done: 150 and 400 crowns, from the class's earning rate, `migration_v62.sql`, #394): the shop's boosts were 600 crowns for 1 hour (`boost-1h`)
   and 1,500 for 3 hours (`boost-3h`), set in the shop's items (`supabase/schema.sql`); retune them against how fast crowns
   are earned (1 per 10 XP, plus trophies, medals and rank-ups), in a migration ([the shop](2026-11-06-redesign-timmy-shop.md)).
-- [ ] **A Timmy Time episode for Heme & Endo Exam 3?** (2026-11-16) Exam 2 had one; Exam 3's hub shipped without (`core.json` `podcast: null`). Ask Sam before making it (`/podcast`), ideally once L21 and L22 are in ([the hub](../hubs/heme-endo-exam3.md)).
+- [ ] **A Timmy Time episode for Heme & Endo Exam 3** (2026-11-16) Exam 2 had one; Exam 3's hub shipped without (`core.json` `podcast: null`). Sam, 2026-11-17: "wait for timmy time until we have all the lectures for exam 3": make it (`/podcast`) once every Exam 3 lecture is in the hub, not before ([the hub](../hubs/heme-endo-exam3.md)).
 - [x] **Deploy Ask Timmy's function again for the Occlusion final's episode** (2026-11-15, #366). `supabase/functions/timmy/site.json`
   gained the episode (rebuilt from the About page), but the live function is still version 4, from the Perio final's merge:
   `node tools/timmy/deploy.mjs` (needs `SUPABASE_ACCESS_TOKEN`). #366's session didn't, because its permission check stopped
@@ -223,6 +226,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   it, and the boost's remaining time (up to 3 hours) doubles nothing (never more than 2x). The fix is in the medal function
   (`sh_medal_check`'s `insert into xp_boosts ... 'medal'`): move the unused part of a running or waiting shop boost to after the
   medal's 24 hours (end the running row now, add the rest after), with a test in `tools/release/xp.js` and the preview's medal.
-- [ ] **320px phone at XX-Large, two more spots** (2026-11-17, seen while fixing Home's sideways scroll): the hub's tab bar labels
+- [x] **320px phone at XX-Large, two more spots** (2026-11-17, seen while fixing Home's sideways scroll; done: #397, BUG-161, which found
+  both wider than this: the tabs at XX-Large on any phone, the hand-off scene too): the hub's tab bar labels
   (Home, Notes, Questions, More) run into each other, and the Dark Matter unlock scene (`widget/journeys.js`) cuts off its "Rank 7 of 7"
   line and its sentence at the right edge. Neither scrolls the page; both only at that size.

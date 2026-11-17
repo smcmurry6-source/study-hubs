@@ -51,6 +51,26 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   and survey 4, round `2026-11-17`. `rewardLine` gone. The preview: `submit_survey_v2` and `submit_exam_debrief_v2` pay as
   migration_v60/v61 do (`formReward`, its crowns kept out of the 1-per-10 share), and "Later" now leaves the survey in the Inbox
   (`get_my_survey`) while the pop-up (`get_active_survey`) stops, as on the live database. About page and Ask Timmy's site help.
+- **2026-11-17 (Ask Timmy looks up what the notes don't cover, Claude Code, #399)** — Sam: "the outside source would only be
+  used when there was something about the content that ask timmy doesnt have an answer for" (exostoses was the example),
+  then "we can do web search, the sites and others like them are good to go on the list, no limit on gap answers". When
+  the answer from the notes is `not_covered`, `supabase/functions/timmy/core.js` makes a second call (`gapRequest`: Sonnet
+  5.5 at effort low, `GAP_RULES`, the basic `web_search_20250305` tool, two searches at most, plain text) and keeps its few
+  sentences only when the model searched, didn't answer `NONE`, and every cited source is on `GAP_SITES` (`gapCheck`,
+  `gapSite`): the tool's `allowed_domains` didn't filter results when tried. The reply carries `gap: { text, sources }`;
+  `widget/ask.js` + `ask.css` draw it in a dashed "Not in your notes · looked up" box with the sources as links (the chat
+  waits 75 s now, was 45); the admin page's chat view shows it. Costs: about 4-5 cents and 2-6 seconds a lookup (8 real
+  calls tried, 28 cents). Off switch: the secret `TIMMY_LOOKUP=off`. The About page (Ask Timmy, What the hubs record), Ask
+  Timmy's site help, the privacy rule (the search words go to Anthropic's search provider), the event taxonomy, the Ask Timmy
+  reference, the tests and the eval's grading. The preview answers "what is an exostosis?" with a made-up lookup.
+- **2026-11-17 (The large text sizes on a phone: the tab bar and the journeys' scenes, Claude Code, #397)** — The inbox's 320px
+  line (BUG-161). The size setting zooms the page (`html` `zoom`, 1.45 at XX-Large), so a phone lays out in about 220-270px.
+  `widget/hub.css`: under 290px of bar (`@container hxbar`) the four tabs take their labels' widths at 11px instead of equal
+  widths ("Questions" was wider than its tab on any phone at XX-Large). `widget/journeys.js`: `vw`/`vh` don't follow the zoom,
+  so the scenes are a size container (`container: shj / size`, not on the design page's inline stills) and size the stage and
+  title in `cqw`/`cqh` with `100%` as a cap; `overflow-x` is hidden (the glow and rays scrolled the scene sideways a little at
+  every size); the eyebrows break only at their "·"; the small-screen rules also apply as container queries; on a scene under
+  420px the hand-off's track starts below Skip, and under 300px it shares the width and the seven ranks wrap. Bundles rebuilt.
 - **2026-11-17 (Heme & Endo Exam 3: its 22 figures and High yield narration, Claude Code, #396)** — Sam: "continue with where things
   left off" (the hub was merged without them, #379). 22 anima figures, Fig 1-22 in lecture order: A's endocrine glands and
   the mouth and the lamina dura in hyperparathyroidism; L17's oocyte, first weeks, implantation, estriol and breastfeeding

@@ -1378,6 +1378,11 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     if (o && o.kind === "report") out += '<div class="tm-box"><span class="tm-label">Offered to send a report' + esc(done) + '</span><div class="tm-text">' + esc(o.text) + '</div></div>';
     if (o && o.kind === "idea") out += '<div class="tm-box"><span class="tm-label">Offered to post an idea' + esc(done) + '</span><div class="tm-text"><b>' + esc(o.title) + '</b>' +
       (o.body ? "\n" + esc(o.body) : "") + '</div><span class="tm-meta">' + esc((IDEA_CAT[o.category] || o.category || "") + " · " + (o.hub ? hubLabel(o.hub) : "all hubs")) + '</span></div>';
+    var gp = r && r.gap && typeof r.gap === "object" && r.gap.text ? r.gap : null;   // a gap in the notes, looked up on a trusted site
+    if (gp) out += '<div class="tm-box"><span class="tm-label">Not in the notes: looked up</span><div class="tm-text">' + esc(gp.text) + '</div>' +
+      '<ul class="tm-cites">' + (Array.isArray(gp.sources) ? gp.sources : []).filter(function(x){ return x && /^https:\/\//.test(String(x.url || "")); }).map(function(x){
+        return '<li><span class="pill ok">' + esc(x.site || "Source") + '</span><a href="' + esc(x.url) + '" target="_blank" rel="noopener noreferrer">' + esc(x.title || x.url) + '</a></li>';
+      }).join("") + '</ul></div>';
     var extra = [], cl = r && tmClosest(r.closest);
     if (r && r.go) extra.push("Button: " + tmGo(r.go));
     if (cl) extra.push("Closest: " + tmLecName(cl, hub));

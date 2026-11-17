@@ -49,6 +49,9 @@ there and in [decisions](../decisions.md)); **deployed and applied at [the redes
    plus `limited` (`limit`, `cap`, `off`, `busy`) on a "napping" line and `repeat` on a retried send. `message` is Timmy's
    message id (for thumbs, offers and Report). A nap that never reached the database has no `message`.
 
+6. **A gap in the notes is looked up** (from 2026-11-17, "Not in your notes" below): when the answer is `not_covered`, a
+   second call searches trusted sites and the reply also carries `gap: { text, sources: [{ url, title, site }] }`.
+
 **Kinds:** `answer`, `not_covered` (with `closest`: `{ hub, lec, label, title }`), `quiz_declined`, `hint_declined`,
 `off_topic`, `support`; and from the function itself `error`, `refusal`, `paused`, `hub`, `limit`, `cap`, `off`, `busy`.
 
@@ -63,6 +66,44 @@ answered question `{ v: "bank", q }`; "go" buttons: `{ v: "notes", hub, lec, k }
 table section, `C<l>.<j>` a cram line, `H<i>` an Exam Hint, `K<i>` a High likelihood topic, `X<i>` an exam fact, `S<i>`
 site help, `Q` the answered question; lectures are `L<n>` in `core.json` order. On the dashboard every id but `S` starts
 with `<hub>:`.
+
+## "Not in your notes": a gap, looked up (from 2026-11-17)
+
+Sam, 2026-11-17: "the outside source would only be used when there was something about the content that ask timmy doesnt
+have an answer for. For example, someone asked what an exostoses was and timmy couldnt answer. i dont want people to use it
+for everything, just to fill in the gaps", then "we can do web search, the sites and others like them are good to go on the
+list, no limit on gap answers. they are uncommon" ([decisions](../decisions.md)).
+
+- **When:** only when the answer from the notes is `not_covered` (not a partial answer, a declined question or off-topic).
+  The notes still come first: Timmy's own rules (`RULES`) are unchanged, so anything the content covers is answered from it.
+- **The call** (`gapRequest` in `core.js`): Sonnet 5.5 at effort `low`, its own short rules (`GAP_RULES`), the API's **basic**
+  web search tool (`web_search_20250305`, two searches at most) and plain text, because a search's citations don't mix with
+  structured output. The newer tool (`web_search_20260209`) was tried first: its filtering step runs code, which dropped the
+  citations and let the model's working notes into the answer. Sent: the question, the last four messages as text, the
+  closest lecture and the hub's title. No visitor id, no notes, no progress.
+- **The sites** (`GAP_SITES`, each with the name the chat shows): NIH (StatPearls, PubMed, PMC, DailyMed), MedlinePlus, CDC,
+  FDA, the National Cancer Institute, WHO, the Merck and MSD Manuals, the ADA, AAP, AAE, AAPD, AAOMS, AAOMP, AAO, Radiopaedia,
+  Cleveland Clinic and Mayo Clinic. Sam OK'd "the sites and others like them": add one by adding its row. **The tool's
+  `allowed_domains` didn't filter the results** when tried on 2026-11-17 (with two sites listed, preprints and patents still
+  came back), so `gapCheck` keeps the answer only when every source it cites is on the list (`gapSite`: https, the domain or
+  a subdomain of it), the model searched, and it didn't write `NONE` (its answer when the sites don't have it, or the
+  question isn't one for them: the site, the course, an exam, a graded question, a practice question's choice).
+  Otherwise the student gets the "not covered" answer alone.
+- **What the student sees** (`widget/ask.js`): under the answer, a dashed box, "Not in your notes · looked up", with the
+  few sentences and each source (its site in bold, its title) as a link that opens in a new tab (`ask:gap=source`). The
+  note at the top of the chat says the notes come first and gaps are looked up on trusted sites. The admin page's chat view
+  shows the box with its links, and the "Not covered" list still counts the question (it's still a gap in the notes).
+- **Stored:** the reply's `gap` in `timmy_messages.reply`; the message's text gets "Not in your notes (looked up): ..." and
+  the source links, so a later lookup in the same chat sees it; the tokens and cost are both calls' together.
+- **Cost and time:** on 2026-11-17's trial (8 questions, the gap call alone) a lookup cost 4 to 5 cents (about 14,000
+  tokens of search results read, one search at a cent) and took 2 to 6 seconds; a question it turned away cost under a
+  cent. "Not covered" was a few of the first 125 answers, so this adds cents a week. No limit of its own (Sam: "no limit on
+  gap answers"); the day's cap and the Console's limit still hold. The chat waits up to 75 s for an answer (was 45).
+- **Off switch:** the function's secret `TIMMY_LOOKUP=off` (Supabase, Edge Functions, Secrets) turns lookups off without a
+  deploy; gaps are then answered from the notes alone.
+- **Tests:** `tools/timmy/test.mjs` (the second call's shape, what it's sent, the checks, costs, the off switch),
+  `tools/timmy/eval.mjs` (a looked-up answer only on `not_covered`, every source on the list, plain text; its words in the
+  report).
 
 ## Limits and money
 

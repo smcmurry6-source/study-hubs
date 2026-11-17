@@ -105,6 +105,16 @@ function grade(c, turn, r){
   if (BRITISH.test(text)) warns.push(`British spelling: ${text.match(BRITISH)[0]}`);
   const words = text.split(/\s+/).filter(Boolean).length;
   if (words > 170) warns.push(`${words} words`);
+  /* "Not in your notes": only on a gap, short, plain, every source on the list (the function drops any other; this checks it) */
+  if (b.gap) {
+    const g = b.gap, gw = String(g.text || "").split(/\s+/).filter(Boolean).length;
+    if (kind !== "not_covered") fails.push(`looked up an answer that wasn't "not covered" (${kind})`);
+    if (!Array.isArray(g.sources) || !g.sources.length || g.sources.some(x => !T.gapSite(x && x.url))) fails.push("a looked-up source that isn't on the list");
+    if (/\*\*|`|(^|\n)\s*(#{1,6}\s|[-*•]\s)/.test(g.text)) fails.push("markdown in the looked-up answer");
+    if (gw > 110) warns.push(`looked-up answer: ${gw} words`);
+    if (BRITISH.test(g.text)) warns.push(`British spelling in the looked-up answer: ${g.text.match(BRITISH)[0]}`);
+  }
+  if (e.gap === false && b.gap) fails.push("looked something up that it shouldn't have");
 
   const cites = (b.paragraphs || []).flatMap(p => p.cites || []);
   const min = e.cites != null ? e.cites : (e.lec || c.type === "practice_after") ? 1 : 0;
@@ -298,6 +308,7 @@ for (const c of done) for (const [i, t] of results.get(c.id).entries()) {
   if (t.reply && t.reply.offer) md.push(`Offer: ${JSON.stringify(t.reply.offer)}`, "");
   if (t.reply && t.reply.go) md.push(`Go: ${JSON.stringify(t.reply.go)}`, "");
   if (t.reply && t.reply.closest) md.push(`Closest: ${JSON.stringify(t.reply.closest)}`, "");
+  if (t.reply && t.reply.gap) md.push(`Not in your notes (looked up): ${t.reply.gap.text}`, "", ...t.reply.gap.sources.map(x => `- ${x.site}: [${x.title}](${x.url})`), "");
   if (t.unchecked && t.unchecked.length) md.push(`Quotes that didn't check out: ${JSON.stringify(t.unchecked)}`, "");
   if (t.fails.length) md.push("**Fails:** " + t.fails.join("; "), "");
   if (t.warns.length) md.push("Warnings: " + t.warns.join("; "), "");

@@ -27,7 +27,7 @@ html.sh-dash .ska-panel { top: 76px; }
 .ska-ib { flex: none; display: inline-grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--text, #3b2e3a); cursor: pointer; }
 .ska-ib:hover { background: var(--active, #eee7ec); }
 .ska-ib[aria-pressed="true"] { background: var(--text, #3b2e3a); color: var(--ground, #fff); }
-.ska-ib:focus-visible, .ska-btn:focus-visible, .ska-chip:focus-visible, .ska-cite:focus-visible, .ska-link:focus-visible, .ska-send:focus-visible, .ska-fab:focus-visible, .ska-pastb:focus-visible, .ska-x:focus-visible,
+.ska-ib:focus-visible, .ska-btn:focus-visible, .ska-chip:focus-visible, .ska-cite:focus-visible, .ska-src:focus-visible, .ska-link:focus-visible, .ska-send:focus-visible, .ska-fab:focus-visible, .ska-pastb:focus-visible, .ska-x:focus-visible,
 .ska textarea:focus-visible, .ska input:focus-visible, .ska select:focus-visible { outline: 3px solid var(--hub, #6b5a68); outline-offset: 2px; }
 
 .ska-note { margin: 0; padding: 8px 14px; font-size: 12.5px; line-height: 1.4; color: var(--muted, #685c66); border-bottom: 1px solid var(--rule, #efe9ed); }
@@ -52,6 +52,16 @@ html.sh-dash .ska-av { border-color: var(--primary, #3b2e3a); }
 .ska-cite span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ska-cite .ska-ic { flex: none; color: var(--hub, #6b5a68); }
 .ska-cite:hover { background: var(--active, #eee7ec); }
+/* a gap in the notes, looked up on a trusted site (Sam, 2026-11-17): set apart from the notes' answer, its sources as links */
+.ska-gap { margin: 10px 0 2px; padding: 10px 12px; border: 1px dashed var(--control, #cdc2ca); border-radius: 12px; background: var(--ground, #fff); }
+.ska-m.is-tim .ska-b p.ska-gap-h { display: flex; align-items: center; gap: 6px; margin: 0 0 6px; font-size: 12px; font-weight: var(--w-strong, 700); color: var(--muted, #685c66); }
+.ska-gap-h .ska-ic { flex: none; color: var(--hub, #6b5a68); }
+.ska-srcs { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 2px; }
+.ska-src { display: flex; align-items: center; gap: 6px; min-height: 32px; max-width: 100%; color: var(--text, #3b2e3a); font-size: 13px; text-decoration: none; }
+.ska-src b { flex: none; font-weight: var(--w-strong, 700); color: var(--hub-text, var(--hub, #6b5a68)); }
+.ska-src span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted, #685c66); }
+.ska-src .ska-ic { flex: none; color: var(--muted, #685c66); }
+.ska-src:hover span { text-decoration: underline; }
 .ska-dots { display: inline-flex; gap: 4px; margin-right: 8px; vertical-align: middle; }
 .ska-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--hub, #6b5a68); animation: ska-dot 1.1s infinite ease-in-out; }
 .ska-dots i:nth-child(2) { animation-delay: .15s; } .ska-dots i:nth-child(3) { animation-delay: .3s; }

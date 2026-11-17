@@ -39,7 +39,7 @@
   try { SELF = document.currentScript.src; } catch (e) {}
   var docEl = document.documentElement;
   var reduced = false; try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
-  var MAX = 1000, TIMEOUT = 45000, KEEP_HOURS = 6;
+  var MAX = 1000, TIMEOUT = 75000, KEEP_HOURS = 6;   // a gap in the notes is looked up on the web too (a second call)
 
   /* ---------- small helpers ---------- */
   function ls(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }
@@ -67,7 +67,9 @@
     plus: '<path d="M12 5v14M5 12h14"/>',
     ask: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10.5L6 20v-4h-.5A1.5 1.5 0 0 1 4 14.5z"/><path d="M9.9 8.1a2.2 2.2 0 1 1 3.1 2c-.6.3-1 .8-1 1.5"/><path d="M12 14h.01"/>',
     back: '<path d="M15 6l-6 6 6 6"/>',
-    clock: '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/>'
+    clock: '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/>',
+    look: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+    ext: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'
   };
   function icon(k, px){
     var A = window.SH_HUB_ART, b = OWN[k] || (A && A.icons && A.icons[k] ? A.icons[k].body : OWN.ask);
@@ -199,7 +201,7 @@
     P.av.innerHTML = art || icon("ask", 26);
     P.av.classList.toggle("is-icon", !art);
     P.note.textContent = (v === "timmy" ? "Timmy answers" : "Answers come") + " from " + (dash ? "the live hubs' notes" : "this hub's notes") +
-      " only, with Claude, Anthropic's AI. Chats are saved to help improve the hub.";
+      ", with Claude, Anthropic's AI; what the notes don't cover is looked up on trusted medical and dental sites. Chats are saved to help improve the hub.";
     setBusy(S.busy);
     paintPaused();
     drawStarters();
@@ -438,6 +440,29 @@
         b.appendChild(ul);
       }
     });
+    /* a gap in the notes, looked up on a trusted site (the function's gapCheck): set apart from the notes' answer, with its
+       sources, which open in a new tab (Sam, 2026-11-17: outside sources "just to fill in the gaps") */
+    var gp = d.gap && typeof d.gap === "object" && d.gap.text ? d.gap : null;
+    if (gp) {
+      var gx = el("div", "ska-gap", { role: "group", "aria-label": "Not in your notes, looked up" });
+      var gh = el("p", "ska-gap-h"); gh.innerHTML = icon("look", 15); gh.appendChild(txt("span", "", "Not in your notes · looked up"));
+      gx.appendChild(gh); gx.appendChild(txt("p", "", gp.text));
+      var srcs = (Array.isArray(gp.sources) ? gp.sources : []).filter(function(x){ return x && /^https:\/\/[^\s"<>]+$/.test(String(x.url || "")); }).slice(0, 3);
+      if (srcs.length) {
+        var su = el("ul", "ska-srcs", { "aria-label": "Sources" });
+        srcs.forEach(function(x){
+          var li = el("li"), a = el("a", "ska-src", { href: String(x.url), target: "_blank", rel: "noopener noreferrer", "data-ska": "source",
+            "aria-label": (x.site || "Source") + (x.title ? ": " + x.title : "") + " (opens in a new tab)" });
+          a.appendChild(txt("b", "", x.site || "Source"));
+          if (x.title) a.appendChild(txt("span", "", x.title));
+          a.insertAdjacentHTML("beforeend", icon("ext", 14));
+          a.addEventListener("click", function(){ track("gap=source"); });
+          li.appendChild(a); su.appendChild(li);
+        });
+        gx.appendChild(su);
+      }
+      b.appendChild(gx);
+    }
     if (!b.childNodes.length) b.appendChild(txt("p", "", voice() === "timmy" ? "Hmm. Ask me that one more time?" : "Something went wrong. Ask again?"));
     m.appendChild(b);
 
