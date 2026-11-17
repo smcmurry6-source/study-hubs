@@ -10,6 +10,16 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **Tap a word in the notes to jump the narration there** (Sam, 2026-11-17): in Listen / Follow along, clicking a word
+  skips the recording to that word (each recording's `.words.json` has the timings).
+- [ ] **Let Ask Timmy use outside sources** (Sam, 2026-11-17): today he answers from the hub's content and the site help
+  (`supabase/functions/timmy/`); let the API reach outside sources (web search or similar), with the cost and privacy
+  questions settled first ([ask-timmy](../reference/ask-timmy.md), [learner-data-privacy](../rules/learner-data-privacy.md)).
+- [ ] **Show the Shiny Gold Crowns you've earned on Home's Today card** (Sam, 2026-11-17).
+- [ ] **More cosmetics for Timmy and Timmy's place** (Sam, 2026-11-17): new outfits and place pieces
+  ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`).
+- [ ] **A different way to mark retries in the Question Bank** (Sam, 2026-11-17): a missed question that comes back a few
+  cards later should look clearly different from a new one (`widget/hub-bank.js`; see also the `bank:retry-shown` line below).
 - [ ] **A Timmy Time episode for Heme & Endo Exam 3?** (2026-11-16) Exam 2 had one; Exam 3's hub shipped without (`core.json` `podcast: null`). Ask Sam before making it (`/podcast`), ideally once L21 and L22 are in ([the hub](../hubs/heme-endo-exam3.md)).
 - [x] **Deploy Ask Timmy's function again for the Occlusion final's episode** (2026-11-15, #366). `supabase/functions/timmy/site.json`
   gained the episode (rebuilt from the About page), but the live function is still version 4, from the Perio final's merge:
