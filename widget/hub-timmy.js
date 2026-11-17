@@ -75,6 +75,8 @@
   function shopOf(){ var b = window.shBootstrap, d = b && b.data; return SHOP || (d && d.shop && d.shop.wallet ? d.shop : null); }
   /* the shop is there for everyone once the page's bootstrap carries one (everyone has Timmy, so he's there to draw) */
   function hasShop(){ return !!shopOf(); }
+  /* the wallet ({ earned, spent, balance }), for Home's Today card (hub-rewards.js), or null before the bootstrap */
+  function wallet(){ var sh = shopOf(); return sh && sh.wallet && typeof sh.wallet.balance === "number" ? sh.wallet : null; }
   function shopMeta(){
     var sh = shopOf(), bal = sh && sh.wallet ? sh.wallet.balance : null;
     return (ls("sh_shop_dot") === dayCT() ? "● A rare costume came in · " : "") + (bal == null ? "" : String(bal).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " gold crowns");
@@ -100,6 +102,7 @@
       if (!d || !d.shop || !d.shop.wallet) return;
       SHOP = d.shop;
       if (HX.view === "more" && !HX.sub) HX.go("more", true);
+      HX.paintMeters();   // the Today card's crowns
       whenWidget("shPet", function(P){
         var sb = window.shSupabase, v = ls("sh_visitor_id"), day = dayCT(), hol = "";
         if (!P || !sb || !v || !day) return;
@@ -150,7 +153,7 @@
     if (!cur || new Date(cur.until).getTime() < new Date(res.boost_until).getTime()) G.setBoost({ mult: 2, until: res.boost_until, src: "shop" });
     HX.paintMeters();
   }
-  document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) SHOP = sh; });
+  document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP = sh; HX.paintMeters(); } });
 
   /* ---------- Ask Timmy (widget/ask.js, window.shAsk) ---------- */
   var askLoad = null, askMounted = false;
@@ -224,6 +227,6 @@
 
   /* what the other files call from here */
   HX.say = say; HX.petHp = petHp; HX.timmyReact = timmyReact; HX.petFromBadges = petFromBadges; HX.morePlace = morePlace;
-  HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.costumeOfDay = costumeOfDay;
+  HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.wallet = wallet; HX.costumeOfDay = costumeOfDay;
   HX.askStart = askStart; HX.askOn = askOn; HX.askLabel = askLabel; HX.askAbout = askAbout;
 };

@@ -39,6 +39,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   questions on the thinner items (`hi-sg-platelets`, `hi-tf-sg-neut`, `ll-sg-classify`, `ll-num-sg-leuk`, `ea-sg-pop`), a
   "Study guide" row in Exam info and new Exam Hints wording. Only High yield text changed in the notes (L17-L20 read it in the
   device's voice, so no narration to redo); Lecture A untouched. L21-L22's lists wait in the L19-L22 task note.
+- **2026-11-17 (Inbox: tap a word to jump the narration, the highlighter on phones and its colors, retries, crowns on Today, Claude Code, #391)** —
+  Sam: "Lets start working on the open to do items. Also for the highlighting fix, can we make sure it works on mobile too".
+  **Tap a word** (`widget/hub.js`, Follow along's `tapped()`): while a lecture's narration plays or is paused, a tap or click on a
+  word in the notes seeks the mp3 to that word's time from its `.words.json` and plays. It listens on `.reading-prose` itself, not
+  the document, because iPhone Safari only sends a tap's click to an element that listens for it (plus `cursor: pointer` on touch
+  screens and no gray tap flash, `widget/hub.css`); not on a link, a figure, a highlight or a selection, not after Stop, not with
+  Follow along off; a mouse's double-click doesn't jump; a finger gets 10 px of slack, a mouse 3. One tip toast per device
+  (`sh_tip_wordseek`); `notes:follow-seek` tracked. **BUG-157, the Highlight button on phones** (`widget/highlight.js`, every hub,
+  old pages too): the bar cancels touchstart to keep the selection, which also cancelled the tap's click, so a finger never made a
+  highlight since 10-15; it now acts on touchend (a mouse and the keyboard still click). **Retries** (`widget/hub-bank.js`): a missed
+  question comes back tinted with a dashed edge and a "Second try" / "Third try" band (`data-try`), one waiting retry per question,
+  and `bank:retry-shown` is sent again. **Crowns on Today** (`widget/hub-rewards.js`, `hub-timmy.js` `HX.wallet()`): a tile with the
+  bootstrap's `shop.wallet.balance` that opens `#more/shop`, repainted on `sh:shop`. **320px at XX-Large**: Home's ring caption wraps
+  under the ring (flex-wrap) and the timeline's words wrap. Bundles and Ask Timmy's site help rebuilt; About page updated. Checked in
+  headless Chromium as an iPhone 13, a Pixel 7 and a laptop on the preview's made-up data.
+  **BUG-158, highlight colors** (Sam: "Re add the ability to highlight in multiple colors"): on the engine's hubs every highlight was
+  drawn gold, because `hub.css`'s `.hx mark.sh-hl` tied with v3.css's pen colors and came later; each pen has its color again (`--hl`).
 - **2026-11-17 (Perio report #53, Claude Code)** — `q5-L06` (why a long root trunk is only initially favorable): the
   keyed choice gave only the later drawback, while the favorable half sat in the explanation. Stem, choices and whys
   rewritten so the key names both halves (more loss to reach the furcation; short roots left for resection). Same id and
