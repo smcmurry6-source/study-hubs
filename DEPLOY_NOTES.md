@@ -44,6 +44,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   on the card), the About page's Diagrams entry, Ask Timmy's site help. Vault: the figures task is done
   (`vault/tasks/done/2026-11-16-heme-endo-exam3-figures.md`), the hub note, the L19-L22 task (check L19's and L20's figures
   against their recordings).
+- **2026-11-17 (A medal no longer runs over a bought boost; the Bowling trophy on the server, Claude Code, #395)** —
+  Two inbox lines. `migration_v63.sql`: **`sh_boost_bump`** (new), called by `sh_medal_check` when a new medal starts its 24
+  hours: what's left of the visitor's shop boosts (running or waiting) moves to start when the last medal boost ends, as one
+  row (`shop:moved:<time>`); the part already used stays. The medal's `boost_until` is then the moved boost's end (BUG-160,
+  the other order of #394's BUG-159). **`record_achievement` takes `bowling`**: `widget/v3.js` sends the bowling egg's trophy
+  once (`sh_bowl_trophy` set, `sh_bowl_trophy_sent` not), on `sh:bowl-trophy` or 5 s after a hub page loads, so it pays its
+  25 crowns (`sh_wallet` counts the badge) and gets a class share (`get_trophy_stats` counts every kind); the trophy case
+  already shows a share when the stats have one. Comments in `bowling.js`, `ranks.js`, `trophies.js`; the preview's medal
+  moves its shop boost too; `tools/release/xp.js` (a medal during a boost, a second medal, a medal with none, the trophy once,
+  its crowns and share); About page (Double XP, Timmy's shop, Bowling night), Ask Timmy's site help, game-server note.
 - **2026-11-17 (Double XP boosts: 150 and 400 crowns, and a boost bought during a medal's waits its turn, Claude Code, #394)** —
   Sam: "Refine what double XP boosts cost" (the inbox). `migration_v62.sql`: `boost-1h` 600 → 150 crowns (Rare → Common),
   `boost-3h` 1,500 → 400 (Epic → Uncommon), from the class's earning rate (Nov 14-17, 77 people: a median study day earns about 95

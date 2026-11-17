@@ -366,8 +366,8 @@
      list, and RETIRED keeps its row for those who earned it (shown as "Full Arch (retired)").
      The redesign's trophy case (phase 4, session 6), on its pages only: the three journey trophies and the bowling
      egg's join, so the case holds 27, 16 of them secret. A journey has its own scene (the hand-off), so trackTrophies
-     doesn't announce it again (scene); Bowling is earned on the device (sh_bowl_trophy, widget/bowling.js) and has no
-     class share. An old single-file hub's page keeps the 23 it can still win. */
+     doesn't announce it again (scene); Bowling is earned on the device (sh_bowl_trophy, widget/bowling.js), which counts it
+     at once, and widget/v3.js sends it to the server (migration_v63), which gives it its class share. An old single-file hub's page keeps the 23 it can still win. */
   var RETIRED = [
     { k: "fullarch",     n: "Full Arch",            d: "Fill all 32 teeth of the arch",        ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" }
   ];
