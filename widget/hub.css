@@ -1194,6 +1194,11 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
     .hx-set { width: 44px; padding: 0; }
     .hx-set .lbl { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   }
+  /* the large text sizes zoom the page, so on a phone at XX-Large (any phone) or X-Large (a 320px one) four equal tabs
+     are narrower than "Questions": each tab takes its own label's width instead, at 11px */
+  @container hxbar (max-width: 290px) {
+    .hx-tab { flex: 1 1 auto; padding: 0 1px; font-size: 11px; }
+  }
   .hx-strip { gap: 8px; padding: 8px 8px 8px 10px; }
   /* the large text sizes zoom the page, so the strip has under 350px to lay out in: "Hubs" is its arrow alone, the goal
      is its count without the ring, and below that the live count (Home has it too) and the XP star go, so the XP

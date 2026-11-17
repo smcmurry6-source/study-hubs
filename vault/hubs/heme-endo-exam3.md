@@ -65,7 +65,7 @@ entry in `hubs.js`.
 - **Narration:** `hubs/heme-endo-exam3/audio/<lecture>-full|plain|hy.mp3` with their words files
   (`python3 tools/narrate.py heme-endo-exam3 --lec <id> --level <level> --force`). Every lecture has all three levels (High
   yield for L17-L20 recorded 2026-11-17, after the study guide's rebuild). High yield again after any change to a lecture's
-  notes, topics, hints or questions, then the content build. No Timmy Time episode yet.
+  notes, topics, hints or questions, then the content build. No Timmy Time episode yet: Sam, 2026-11-17, "wait for timmy time until we have all the lectures for exam 3" ([inbox](../tasks/inbox.md)).
 - **Quirks:** `SH_HUB` has no `exam` key on purpose: with one, the engine counts only lectures whose `exam` matches, so
   nothing would count. Lecture A's id is `dental` and its label "A".
 
