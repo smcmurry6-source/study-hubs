@@ -37,6 +37,25 @@ each one in as soon as its file lands: the exam is two days after the last lectu
 - Diagrams: Sam said yes to every candidate for this hub (2026-11-16, [decisions](../decisions.md)), so L21 and L22's
   candidates are built without asking (`tools/figures/heme-endo-exam3/`).
 
+## Dr. Herr's study guide for L21 and L22
+
+Sam, 2026-11-17: no in-class review; Dr. Herr's study guide is "very indicative" and everything on it is High Likelihood
+([decisions](../decisions.md)). When L21 and L22 go in, give each a `focus` hint first in its Exam Hints (the guide's words as the
+quote, as L17-L20 have) and a High Likelihood topic for every item, with every question on it, ranked first (basis "study guide
++ slides", then "+ recording"). Write questions on every item and key term. From the guide (Drive, Exam 3 folder,
+`Exam 3 Study Guide (1).docx`):
+
+- **L21, Male reproductive pathology.** Focus on: disorders of testicular development/descent; major categories of testicular
+  tumors; common infections of the male reproductive tract; major benign and malignant prostate disorders. Key terms:
+  cryptorchidism, germ-cell tumors, seminoma, BPH, prostatic adenocarcinoma, Gleason grading.
+- **L22, Female reproductive pathology.** Focus on: common disorders of the vulva, vagina, and cervix; distinguishing neoplastic
+  from non-neoplastic lesions; important infectious causes of reproductive tract disease; relationship between HPV and cervical
+  neoplasia; important age-related patterns of reproductive tract tumors. Key terms: lichen sclerosus, condyloma acuminatum,
+  sarcoma botryoides, HPV, cervical neoplasia, infectious vaginitis.
+
+L19 and L20 already have theirs (focus hints and topics, 2026-11-17). When they go taught, keep the guide's topics first and
+add the recording's hints beside them.
+
 ## Done when
 
 - [ ] L19 taught: checked against its recording, hints, topics re-ranked, narration redone
@@ -51,5 +70,7 @@ each one in as soon as its file lands: the exam is two days after the last lectu
 ## Log
 
 - 2026-11-16: written when the hub shipped without L21 and L22 (no slides yet) and with L19 and L20 from their slides.
+- 2026-11-17: Dr. Herr's study guide applied to L17-L20 (focus hints, topics re-ranked, five new questions); L21 and L22's lists
+  added above. Still waiting on L19-L20's recordings and L21-L22's slides (not in the Drive folder on 11/17).
 
 ## Outcome

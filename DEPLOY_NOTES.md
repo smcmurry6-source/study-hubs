@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (Heme & Endo Exam 3: Dr. Herr's study guide, Claude Code)** — Sam: no in-class review for Exam 3; Dr. Herr's
+  study guide is "very indicative" and "everything on the study guide should be high likelihood questions". L17-L20: each
+  lecture's Exam Hints open with its focus list (`focus` hints in `study.json`), `likelyTopics` rewritten so every question on a
+  guide item is High Likelihood (62 topics, 260 of 290 questions; nothing previously High Likelihood dropped), five new
+  questions on the thinner items (`hi-sg-platelets`, `hi-tf-sg-neut`, `ll-sg-classify`, `ll-num-sg-leuk`, `ea-sg-pop`), a
+  "Study guide" row in Exam info and new Exam Hints wording. Only High yield text changed in the notes (L17-L20 read it in the
+  device's voice, so no narration to redo); Lecture A untouched. L21-L22's lists wait in the L19-L22 task note.
 - **2026-11-17 (Perio report #53, Claude Code)** — `q5-L06` (why a long root trunk is only initially favorable): the
   keyed choice gave only the later drawback, while the favorable half sat in the explanation. Stem, choices and whys
   rewritten so the key names both halves (more loss to reach the furcation; short roots left for resection). Same id and
