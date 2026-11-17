@@ -32,6 +32,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (Every Supabase tool without a prompt, Claude Code)** — Sam: "I allow all supabase". `.claude/settings.json`
+  now allows the whole Supabase connector (`mcp__Supabase`) in place of the six tools it listed (SQL, migrations, the list and
+  advisor tools). Nothing students see changes. The data rules are unchanged: reads stay read-only, student rows aren't
+  changed without Sam's OK ([decisions](vault/decisions.md)). `CLAUDE.md`, the repo map and analytics governance say so.
 - **2026-11-17 (The survey and check-in reward goes to 1,000 XP, Claude Code)** — Sam: "Lets up the xp to 1000".
   `migration_v61.sql`: `sh_form_reward` pays 1,000 XP (crowns stay 1,000: `sh_wallet` already leaves a reward row's whole
   base out of the 1-per-10 share), and a one-time top-up moves every reward row paid at 500 to 1,000 and adds 500 to its
