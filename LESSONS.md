@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-11-15** (data read 6 pm Central, the eve of the Occlusion final; no hub archived since the last run). Sam
+**Last refreshed: 2026-11-17** (data read 8:40 am Central; Occlusion archived after its final on 11-16: its retrospective is below). Sam
 runs the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and suggestions
 and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -90,50 +90,40 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-11-15 (data read 6 pm Central, the eve of the Occlusion final).** "Since" = the 11-13 audit (data read 9 pm). Live hubs:
-**Occlusion** (final Mon 11-16, 6:30-7:45 pm, L6-L10; it archives at 10 pm that night, so the next audit writes its retrospective and
-recap and takes its audio off: [task](vault/tasks/2026-11-12-audio-off-at-archiving.md)) and **perio** (final Thu 11-19, cumulative).
-Since the last audit: the redesign's release (11-14, 6:46 pm: both hubs on the engine), both banks audited for their finals
-(Occlusion #370, live 11-15 12:48 pm: 156 edited, 4 new, 3 retired; Perio #371: 750 -> 670), a Timmy Time episode for each final, and
-the bank in sets of 50, 100, 200 or all with every card numbered (#373, 1:27 pm). Data quality (`sh_data_quality()`): no test rows, 35
-overcounted minutes, the usual counter drift (Occlusion 31,319 stats vs 31,417 answers). Two gaps the release opened, both on the
-[inbox](vault/tasks/inbox.md): `sh_surface()` doesn't place the redesign's sections (`compendium/drill`, `compendium/misses`,
-`more/*`), and the redesign's bank sends `bank:retry-right`/`-missed` but not `bank:retry-shown`, so the re-ask's reach can't be read.
+**2026-11-17 (data read 8:40 am Central).** "Since" = the 11-15 audit (data read 6 pm, the eve of the Occlusion final). **Occlusion
+archived** at 10 pm on 11-16, after its final: its retrospective is below, its recap went on the dashboard this morning, and its
+narration and Timmy Time came off the site (the site went from about 640 MB to 427 MB). Live hubs: **Perio** (final Thu 11-19,
+cumulative) and **Heme & Endo Exam 3** (exam Fri 11-20; opened 11-16, 6 people so far, nothing to read yet). Data quality
+(`sh_data_quality()`): no test rows; 103 overcounted minutes over 14 visitor-hours; the usual counter drift (Occlusion 49,515 stats vs
+49,613 answers). Closed since the last audit: `sh_surface()` now places the redesign's sections, Learn and Flashcards included
+(`migration_v59.sql`, #381). Still open on the [inbox](vault/tasks/inbox.md): the redesign's bank doesn't send `bank:retry-shown`
+(the 11-14 to 11-16 rows, 20 people and then 2-3, come from cached old pages).
 
-**Student voice since the last audit:** Perio report #44 (`q7-07`, "too many details for a non-MC question"); 5 more Heme & Endo
-Exam 2 check-ins (n = 14 now: its retrospective); one survey answer, "flashcards based on the lecture notes" (the bank has had
-Flashcards since the release: 4 Occlusion people opened them on 11-15), and 7 of the 8 shown the survey said no thanks; no searches
-since 10-21.
+**Student voice since the last audit:** 8 reports, all on 11-15/16: Perio #44 (fixed: `q7-07` retired, #380); Occlusion #45-#48
+(fixed and answered on 11-16, #382: the figures' letter pins were black dots in dark mode, `mo-orth-occ` had two choices that were
+the same words swapped, `nc-tf-4` reworded); Occlusion **#49-#52 left open by Sam's call** ("dont worry about any of occclusions open
+reports since the exam is over", [decisions](vault/decisions.md)). For the record: #49 (`fig-hor-d`, "nothing is labelled D") came in
+before #382 restored the pins, so it is the same bug, already fixed; #50 and #51 are the two Miller scales Sam settled on 11-15 (the L7
+handout's grading for `mo-miller2`); #52 (a Timmy-drafted report) asks where N8.25's "most of the time patients have their teeth
+apart" comes from, which this audit couldn't check without the slides. Check-ins: 3 for the Occlusion final (its retrospective), 7
+more for Heme & Endo Exam 2 (n = 21 now: About right 17), 1 late one for the Occlusion midterm (n = 19). No survey answers; 3 searches.
 
-**Did the last refresh work?** Its three Occlusion fixes went live 11-14, 9:18 am. `in-bennett` (the arguable choice replaced): 6 of
-13 first tries before, **11 of 20 since**, and the new choice, "How steep the cusps can be in protrusion", still drew 9 of the 20: the
-class carries the midterm table's pairing of Bennett movement with cusp height, and a replacement that keeps the word "cusps" pulls
-the same picks. The item is fair now, just hard. `dn-support` (#42's stem rewritten) 3 of 4 -> 8 of 12; `dn-resorb-mand` (#43's
-explanation) 3 of 4 -> 15 of 16. Unfixed items as low (under 45% on 8+ first tries before): 6 of 16 -> 11 of 22 (38% -> 50%); the
-whole bank's first tries 84% (11-09 to 11-14) -> 82%. Too few tries to credit the fixes, as the standing lesson says. The bigger bank
-page it proposed shipped as the sets (#373): in its first afternoon about ten people picked a size (All 4, 50 4, 100 2, 200 1).
+**Did the last refresh work?** It changed nothing (the eve of the Occlusion final), so there is nothing to measure. The fixes from
+Sam's 11-16 report session (#382) went live the day of the final: too late and too few tries to read.
 
 **Per hub:**
-- **Occlusion** (final tomorrow): **11-14 51 people and 3,472 min** (13 under 5 min); **11-15 47 people and 4,384 min by 6 pm** (8
-  under 5), its biggest day of the final with the evening still to come. 85 people have used it since the midterm, 25 of them first
-  on 11-14 or 11-15. Since the last audit: bank 4,525 min (52 people), notes 2,833 (39), cram 300 (7), Home 150 (60); two mocks (97%),
-  the drill a few people, the final's Timmy Time one listener (16 min), Learn 9 people, Flashcards 4, Ask Timmy 13 (7 sent a question).
-  **The lecture lag is closing on the eve**: since 11-14, L6 2,009 answers from 36 people (79% on first tries), L7 2,100 from 28
-  (85%), L8 1,319 from 24 (79%), L9 764 from 22 (87%), L10 894 from 21 (81%), 14-24 tries per question (11-09 to 11-13: 5-7 people
-  each on L8-L10). Hardest since 11-14, first tries: `in-seq-prog` 0 of 13 (a 5-step ordering, 1 of 21 people ever right on a first
-  try; the key follows the notes' programming steps, so it is the format), `mo-splint-cause` 2 of 9 (new 11-15; "bruxism" picked 5),
-  `ot-sel-clin` 2 of 11 (select-all; "A widened PDL space" ticked: radiographic, its why says so), `cs-dn-bal-marks` 2 of 10 ("The
-  balance is perfect" 7), `dn-quint` 2 of 10 (the notes say it word for word: raise the plane, flatten the curve or the teeth),
-  `dn-2s-9` 1 of 7 (monoline teeth are flat teeth), `mo-proud` 3 of 14, `mo-bell` 4 of 13 (kept by Sam 11-15), `nc-2s-5` 4 of 13,
-  `in-locator` 6 of 17. Each key matches the notes and each favorite wrong answer has its why, as do question health's other leads
-  (`mo-wf-tmd`, `mo-tf-10`, `ot-2s-1`, `in-indirect`): **nothing changed the night before the final**.
-- **Perio** (final 11-19): quiet, as it was before the midterm until three days out: 7-12 people a day (108-328 min); its bank audit
-  went live today, so its numbers start fresh. Report #44 is fair: `q7-07` is a self-graded recall card (the final has none) on the
-  immune changes smoking causes, the fact `q7-03` asks and statement 2 of `q7-N03` tests, so it is the third ask the audit's own rule
-  would have retired. Sam retired it that evening ("retire it"), and S7's High yield was
-  recorded again. Question health: `q8-S01`
-  (9 of 13 picks call statement 2 true; the notes: "it's not a heat-seeking missile") and `q8-03` match the notes. Expect the class from
-  Monday night, once Occlusion's final ends.
+- **Perio** (final Thu 11-19): picking up as Occlusion ended: **11-16 30 people, 1,076 min** (its most since the midterm; 11-15 15
+  people, 673 min), 11-17 13 people by 8:40 am. Since the last audit, notes 758 min (20 people) and the bank 747 (16): the notes lead
+  three days out, as they did in PCD Implants and Heme & Endo Exam 2. Practice is lopsided toward the latest sessions so far (S5 586
+  answers from 10 people, S9 462 from 7; S1-S4 under 100 each): the class reviewed the early sessions for the midterm, so expect the
+  lag to close by the eve. First tries since the bank audit 83% (S8 and S9 74-75%, the newest). Question health's leads, each checked
+  against the notes: `q9-L09` (6 of 10 first tries picked "Trauma"; the lecture's "the key word here is inflammation", and the why
+  addresses trauma), `q9-L26` (7 of 10 picked "A CTG has no connective tissue to induce keratinization", a keyword trap; its why says a
+  CTG is all connective tissue), `q5-S04`, `q8-S01` and `q8-03` (all match the notes, read 11-15). Ten first tries is too few to act
+  on two days out: **nothing changed**. Read them again after the final.
+- **Heme & Endo Exam 3** (exam Fri 11-20, 8 am): 6 people, 7 minutes since it opened on 11-16. Its figures and L17-L20's High yield
+  narration wait in [their task](vault/tasks/2026-11-16-heme-endo-exam3-figures.md), and L19-L22 in
+  [theirs](vault/tasks/2026-11-16-heme-endo-exam3-l19-l22.md). Exam 2's curve says the class arrives three to four days out (11-16/17).
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order
@@ -156,7 +146,8 @@ page it proposed shipped as the sets (#373): in its first afternoon about ten pe
 - **Almost all studying happens in the last 3-4 days.** GI Exam 2: 35% of all time was the day before the exam
   (53 of 78 people); days 5+ out were small. Perio midterm: 42% of all perio time was the day before (57 people, 91 h). MSK Exam 3: 44% (61 of 87 people, 89 h),
   and 26 of those 61 opened the hub for the first time that evening; PCD Implants: 40% (73 of 88 people, 20 of them new that evening); Heme & Endo Exam 2: 37% (62 of 86, 12 new that evening); over half of all MSK answers came on the eve and
-  exam morning. Have every lecture's questions in the hub by ~4 days before the exam,
+  exam morning. **For an evening exam the exam day is the eve**: the Occlusion final (6:30 pm) took 42% of its time on
+  exam day (83 people, nearly all of it before the exam) and the day before only 30%. Have every lecture's questions in the hub by ~4 days before the exam,
   and put the quickest high-yield review (Daily Drill, cram sheet, exam hints) where the night-before crowd lands.
 - **Lecture notes and the question bank are the hub.** In perio and MSK (per-section data, 2026-09-23 on) notes +
   bank are ~80% of time; the first survey's "most helpful" answers were Question bank 4, Lecture notes 1. Arcade,
@@ -439,6 +430,74 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
   staging/grading and EXCEPT items, the formats the bank lacked. Read the check-ins next to accuracy by lecture.
 
 ## Hub retrospectives
+
+### Occlusion (`occlusion`), midterm 2026-10-21, final 2026-11-16 (6:30-7:45 pm), archived 2026-11-16 (written 2026-11-17)
+
+The first hub that served two exams and the first archived on the engine (the redesign's release, 11-14, two days before its final).
+The midterm half is in the standing lessons (the formats gap, n = 19 check-ins by now: About right 10, "Exam asked different things"
+7, easier 2); this section is the final (10-22 to 11-16, L6-L10). Data, final: **104 people, 439 h**; 26 came on one day only, 56 on
+3+ days, median **153 min** each, 18 under 5 min. **29,177 answers from 78 people** (median 336, most 1,570; 51 answered on 2+ days),
+85%. The whole hub, both exams: 137 people, 815 h, 49,515 answers. Recap on the dashboard since 11-17 (featured: `cs-pro-incline`, a
+midterm item). Its narration and Timmy Time came off the site with this audit (211 MB).
+
+**Exam day was the eve**: the final was at 6:30 pm, so the day before was a normal study day and the exam day took its place. Quiet
+until 11-13 (1,130 min, 23 people), then 11-14 3,472 (51), 11-15 7,814 (63), **11-16 11,033 min from 83 people (42% of the final's
+time), 10,926 of them before 6:30 pm**; 9 people studied after midnight. 21 people opened the hub for the first time in the last
+four days, 6 of them on exam day. 14 mocks from 13 people, 88% (the midterm's 45 from 33, 82%). Arcade 12 runs from a few people.
+
+| Section (final) | Minutes | People |
+|---|---|---|
+| Question bank | 14,198 | 81 |
+| Lecture notes | 8,792 | 75 |
+| Cram sheet | 870 | 31 |
+| Home | 599 | 99 |
+| Exam hints | 336 | 21 |
+| Daily drill (old and new) | ~510 | 16 |
+| Mock exam | 298 | 15 |
+| Learn | 290 | 9 |
+| Timmy Time (the final's) | 113 | 7 (8 pressed play, about 260 min heard) |
+| Weak spots | 95 | 19 |
+| Review tables (all) | ~100 | about 12 |
+| Flashcards | 16 | 4 |
+
+| By lecture (final, answers 10-22 to 11-16) | All tries | First tries | People | Tries per question |
+|---|---|---|---|---|
+| L8 Denture Occlusion | 82% | **77%** | 62 | 58 |
+| L6 Occlusal Instrumentation | 86% | 80% | 70 | 62 |
+| L10 Occlusal Trauma (Dr. Abou-Arraj) | 84% | 80% | 57 | 66 |
+| L7 Malocclusion and Dysfunction | 88% | 85% | 68 | 51 |
+| L9 Noncarious Cervical Lesions (Dr. Lawson) | 87% | 85% | 61 | 49 |
+
+**The lecture lag closed on exam day, as it does**: on 11-14 9-16 people answered each final lecture; on 11-16, 47-51 each, and L10,
+taught last (11-12), took more answers that day than L6. By format (the whole bank, both exams): true/false 91%, "which is true" 87%,
+plain MCQ 84%, numbered 84%, EXCEPT 81%, two-statement 79%, "which is false" 75%, select-all 74%, matching 75%, ordering 60%. By
+source: handout and hub-written 85% each, the help sheet 72% (the midterm's fence post and cusp pathways). **Hardest on first tries,
+final**: `in-seq-prog` 3 of 34 (a 5-step ordering), `dn-quint` 7 of 43 ("steepen the compensating curve" 21 of 90 picks: the
+balanced-denture determinants run backward from intuition), `ot-sel-clin` 8 of 45 (select-all; "A widened PDL space", radiographic,
+ticked 37 times), `cs-dn-bal-marks` 11 of 43 ("The balance is perfect" 29 of 86), `in-locator` 13 of 38 and `in-cbd` 18 of 37 and
+`in-level` 15 of 35 (the facebow and pantograph parts mixed up with one another: tracing tables, hinge axis, the Slidematic's level),
+`nc-2s-5` 15 of 47, `mo-seq-grind` 14 of 27 (ordering), `mo-57` 17 of 32, `mo-bell` 17 of 36, `mo-splint-cause` 18 of 41. Every key
+matched the notes at the 11-15 audit. The bank audit two days out (156 edited, 4 new, 3 retired) left first tries where they were.
+
+Used: "Try it again" 64 people (2,899 right on the retry); the lecture picker 53; the High likelihood chip 40, "Not answered yet" 37,
+Random 30; **the bank's sets** (#373, 11-15): All 16 people, 50 9, 100 7, 200 4; Weak spots 19 and the drill set 12; Learn 14
+started, 9 finished a round; Flashcards 4; **Ask Timmy** opened by 31, 17 sent a question; reading levels As taught 18, High yield 17,
+Plain English 9; Listen 8 people (about 420 min); "Find this in the notes" shown to 70 after a miss, opened by about 20. Figures: the
+mounting-error, Sci-Rec and Bennett figures were each seen by 41-45 people. Plaque bosses: 83 met one.
+
+Check-ins for the final, **n = 3** by the morning after (later ones go into the next audit), all heavy users (507-798 min, 260-1,570
+answers): About right 1, Hub was easier 1, Exam asked different things 1; went better 1, **worse 2**; readiness 2-3. Nothing written.
+Too few to read; the midterm's took weeks to reach 19. Reports during the final: 12 (#39-#52), no suggestions; the last four, on exam day
+(#49-#52), were left open by Sam's call once the exam was over.
+
+What changes because of it: (1) **for an evening exam, exam day is the eve**: Home's exam-day view, the drill and the cram sheet are
+what the class uses that day, all day; put the night-before tools there, not only the night before; (2) **instrument parts and
+look-alike devices need a side-by-side table**, not paragraphs: three of the hardest L6 items were one facebow or pantograph part
+taken for another (the standing lesson on look-alikes, again); (3) **"turn the dial" rules (Hanau's quint) need a worked table**: one
+factor changed, which way each other one moves; `dn-quint` was the hardest MCQ of the final; (4) the hub carried two exams well: 68 of
+the midterm's 108 people came back for the final (5+ minutes in each), and the bank's new formats held at 79-84%; (5) Timmy Time made the day before reached 8
+people, as the standing lesson says; (6) the bank's sets: given the choice, most people take "All". Cleanup still to do by hand: the
+hub page stays up for now; moving its entry into `archived` in `hubs.js` is optional.
 
 ### Heme & Endo Exam 2 (`heme-endo-exam2`), exam 2026-11-13 (10 am), archived 2026-11-13 (written that evening)
 

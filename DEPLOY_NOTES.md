@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (Lessons refresh: Occlusion archived, Claude Code)** — `/lessons-audit` the morning after the Occlusion final. Its
+  **retrospective** is in `LESSONS.md` ("Hub retrospectives": 104 people and 439 h for the final, 42% of it on exam day, the evening
+  exam's eve; the instrument look-alikes and Hanau's quint the hardest), its **recap is on the dashboard**, and **its narration, High
+  yield and Timmy Time came off the site** (51 files, 211 MB; `"audio": "off"` in `content/core.json`, rebuilt, out of `HUBS` in
+  `sw.js`, now `sh-v62`): the site is 427 MB. No question or notes changed on Perio or Heme & Endo Exam 3 (Perio's leads are 10 first
+  tries each, two days out). Occlusion's last reports (#49-#52) left open by Sam's call. Also: Sam asked that every session can run
+  SQL without a prompt, so `.claude/settings.json` pre-approves the Supabase connector's `execute_sql` (and its list and advisor
+  tools) beside `apply_migration`. The stale task for the final's format went to `done/` as dropped.
+  **The smoke test learned that a hub on the engine can be archived** (Occlusion is the first): it presses "Keep browsing" on the
+  archived dialog whenever it comes (it never closed it on the engine's pages, so every run failed from 10 pm on 11-16, `main`
+  included), expects no Ask icon on an archived hub (Timmy isn't there, `hub-timmy.js`), and checks Timmy Time's minute on a hub
+  whose audio is still up.
 - **2026-11-16 (Occlusion Question Bank, Codex)** — Restored **What cusp hits where?** at the top of the base Question Bank (`/hubs/occlusion/#questions`): students can choose **Contacts** or **Movements**, and the existing best-score behavior remains. The game had survived the redesign in the generated figures code, but its mount point had been removed. It is intentionally absent from Learn, Flashcards, Daily drill, Yesterday's misses, Weak spots and the mock; the Occlusion-only `SH_HUB.bank.cuspGame` configuration makes that explicit. `tools/ci/smoke.js` now holds that placement and launcher behavior.
 - **2026-11-16 (Occlusion, Claude Code)** — Sam: "fix the open reports in occlusion, send the replies, and merge." The
   drawn figures' base styles (letter pins, lines, labels: `.fg-pin`, `.fg-line`, `.fg-t`...) had been left behind on the old

@@ -27,7 +27,7 @@ after its date. Do each one on its own (a small PR), with the steps in the rule.
   ([#361](https://github.com/smcmurry6-source/study-hubs/pull/361); the site went to 533 MB) and in the release's PR (#359;
   Sam: "You can also remove the audio for heme and endo 2 and archive it"), which agree: the files removed and
   `data-audio="off"` on its v3.js tag (the old steps: it kept its old single-file page at the redesign's release).
-- [ ] **Occlusion** (`occlusion`, 206 MB with High yield): archived after the final, Mon Nov 16 at 10 pm. On the engine:
+- [x] **Occlusion** (`occlusion`, 211 MB with High yield): archived after the final, Mon Nov 16 at 10 pm. Done 2026-11-17 by the lessons audit (the site 638 -> 427 MB). On the engine:
   `"audio": "off"` in `content/core.json`, the content build, and out of `HUBS` in `sw.js` (the rule's step 2).
 - [ ] **Perio** (`perio`, 216 MB with High yield): archived after the final, Thu Nov 19 at 10 pm. On the engine, the same.
 - [ ] `node tools/ci/size.js` lists no archived hub among those with audio.
@@ -46,6 +46,7 @@ after its date. Do each one on its own (a small PR), with the steps in the rule.
   Timmy Time mp3s and their words files, `data-audio="off"` on its widget tag, and its `next/` content rebuilt (no `hyAudio`). The
   live page wasn't on the redesign, so the engine's box didn't apply. Special Patient Care waits for Canvas to close (Sat 11-14, 11:59 pm).
 - 2026-11-14: Special Patient Care's page came off with its audio (Sam: "remove everything for it"), in the same PR.
+- 2026-11-17: Occlusion's audio came off with its retrospective (the lessons audit): the 51 files, `"audio": "off"` in its `core.json`, the content build, and out of `HUBS` in `sw.js` (`sh-v62`).
 
 ## Outcome
 

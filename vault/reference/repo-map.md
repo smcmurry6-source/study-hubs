@@ -122,7 +122,7 @@ tags: [map]
   ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)); moving the entry into `archived` in `hubs.js` then is optional. Read the check-ins as late as you can.
 - `migration_v*.sql` — Supabase schema history (project `thytmzsgymydbzcqdnix`).
   New migrations are run once, by hand, in the Supabase SQL editor, or by a Claude Code session through the
-  Supabase connector (`apply_migration` is pre-approved in `.claude/settings.json`). Commit the `.sql` file and
+  Supabase connector (`apply_migration` and `execute_sql` are pre-approved in `.claude/settings.json`). Commit the `.sql` file and
   refresh `supabase/schema.sql` either way. A migration written ahead of its release is listed in
   `supabase/pending-migrations.txt` until it's applied (none waiting since the redesign's release, which applied
   `migration_v54.sql` to `v58`: the game layer's server, [game-server](game-server.md)); the database suites apply the
