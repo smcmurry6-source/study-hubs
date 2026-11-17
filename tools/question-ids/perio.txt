@@ -83,7 +83,7 @@ q3-16
 q3-17
 q3-18
 q3-19
-q3-20
+q3-20 retired
 q3-21
 q3-22
 q3-23
@@ -496,7 +496,7 @@ q2-E01 retired
 q3-E01 retired
 q4-E01 retired
 q4-E02 retired
-q1-E03
+q1-E03 retired
 q1-E04
 q1-E05
 q1-E06
