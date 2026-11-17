@@ -4,7 +4,8 @@
 -- matching item itself (every row matched with no wrong try), so from this change the page sends each row's first pick and
 -- the key lists a matching item as 'order', the kind of a put-in-order item: right when row k's pick is k for every row.
 -- It then pays 10 the first time it's right, 2 after, 1 for a miss, like every other graded question.
--- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js).
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js). Applied to the live project on
+-- 2026-11-17 through the connector, before its PR merged: it changes nothing until the matching keys are reloaded.
 --
 -- sh_answer (migration_v54, as v59 left it) changes in one place: an 'order' answer that comes with no order is graded by
 -- the student's word and paid as a self-graded answer (a flat 2), as a matching item was until now. That is a page cached
