@@ -47,6 +47,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   bootstrap's `shop.wallet.balance` that opens `#more/shop`, repainted on `sh:shop`. **320px at XX-Large**: Home's ring caption wraps
   under the ring (flex-wrap) and the timeline's words wrap. Bundles and Ask Timmy's site help rebuilt; About page updated. Checked in
   headless Chromium as an iPhone 13, a Pixel 7 and a laptop on the preview's made-up data.
+  **BUG-158, highlight colors** (Sam: "Re add the ability to highlight in multiple colors"): on the engine's hubs every highlight was
+  drawn gold, because `hub.css`'s `.hx mark.sh-hl` tied with v3.css's pen colors and came later; each pen has its color again (`--hl`).
 - **2026-11-17 (The survey and check-in reward goes to 1,000 XP, Claude Code)** — Sam: "Lets up the xp to 1000".
   `migration_v61.sql`: `sh_form_reward` pays 1,000 XP (crowns stay 1,000: `sh_wallet` already leaves a reward row's whole
   base out of the 1-per-10 share), and a one-time top-up moves every reward row paid at 500 to 1,000 and adds 500 to its
