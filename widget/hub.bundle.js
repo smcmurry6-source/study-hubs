@@ -14,7 +14,7 @@ achMap = HX.achMap, putAnswer = HX.putAnswer, saveNow = HX.saveNow, saveState = 
 lecName = HX.lecName, lecDot = HX.lecDot, paintLive = HX.paintLive, go = HX.go, lecStat = HX.lecStat, QBY = HX.QBY;
 function v2(){ var G = window.shGame; return !!(G && G.v2 && G.v2()); }
 function boost(){ var G = window.shGame; return v2() && G.boost ? G.boost() : null; }
-var KIND = { sequence: "order", recall: "self", match: "self" };
+var KIND = { sequence: "order", match: "order", recall: "self" };
 var SESSION = { n: 0, r: 0, xp: 0, miss: {}, since: 0, recapAt: 0, hp0: null, k: 0, again: 0, kSince: 0, againAt: 0 };
 function todayRec(){
 var d = day(0), x = STATE.nx.days[d];
@@ -559,7 +559,7 @@ wireCard(el, q, o);
 return el;
 }
 function wireCard(el, q, o){
-var multi = q.type === "multi", picked = [], seqP = [], match = { sel: null, done: 0, err: 0 }, self = false;
+var multi = q.type === "multi", picked = [], seqP = [], match = { sel: null, done: 0, err: 0, first: [] }, self = false;
 el.addEventListener("click", function(e){
 var b = e.target.closest("button"); if (!b || !el.contains(b) || el.classList.contains("is-answered")) return;
 if (b.hasAttribute("data-i")) {
@@ -592,7 +592,9 @@ var p = +b.getAttribute("data-pair");
 if (b.getAttribute("data-side") === "l") { $$('[data-side="l"]', el).forEach(function(x){ x.setAttribute("aria-pressed", "false"); }); b.setAttribute("aria-pressed", "true"); match.sel = p; return; }
 if (match.sel === null) return;
 var left = $('[data-side="l"][data-pair="' + match.sel + '"]', el);
-if (p === match.sel) { [b, left].forEach(function(x){ x.classList.add("is-matched"); x.disabled = true; x.setAttribute("aria-pressed", "false"); }); match.done++; match.sel = null; if (match.done === q.pairs.length) answer(b); }
+var same = p === match.sel || q.pairs[p][1] === q.pairs[match.sel][1];
+if (match.first[match.sel] == null) match.first[match.sel] = same ? match.sel : p;
+if (same) { [b, left].forEach(function(x){ x.classList.add("is-matched"); x.disabled = true; x.setAttribute("aria-pressed", "false"); }); match.done++; match.sel = null; if (match.done === q.pairs.length) answer(b); }
 else { match.err++; b.classList.remove("is-shake"); void b.offsetWidth; b.classList.add("is-shake"); }
 }
 });
@@ -621,7 +623,7 @@ right = self; if (!right) partial = "You marked it missed";
 rec = HX.recordAnswer(q.id, q.lec, right, o.ctx);
 } else {
 right = match.err === 0; if (!right) partial = "Matched, with " + pl(match.err, "wrong try", "wrong tries");
-rec = HX.recordAnswer(q.id, q.lec, right, o.ctx);
+rec = HX.recordAnswer(q.id, q.lec, right, o.ctx, null, null, { order: q.pairs.map(function(x, k){ return match.first[k] == null ? k : match.first[k]; }) });
 }
 result(el, q, right, partial, rec.xp, picked, o);
 if (o.onAnswer) o.onAnswer(el, q, right);
@@ -1206,7 +1208,8 @@ m.ids.forEach(function(id){
 var q = QBY[id]; if (!q) return;
 if (q.type === "match") {
 pts[id] = q.pairs.filter(function(x, k){ return matched(q, k); }).length / q.pairs.length; m.res[id] = pts[id] === 1;
-if (has(id)) HX.recordAnswer(q.id, q.lec, m.res[id], "mock", null, null, { session: sid });
+var rowsSent = q.pairs.map(function(x, k){ var v = (Array.isArray(m.picks[id]) ? m.picks[id] : [])[k]; return matched(q, k) ? k : set(v) && q.pairs[v] ? v : (k + 1) % q.pairs.length; });
+if (has(id)) HX.recordAnswer(q.id, q.lec, m.res[id], "mock", null, null, { session: sid, order: rowsSent });
 return;
 }
 if (q.type === "multi") {

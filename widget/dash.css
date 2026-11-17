@@ -235,8 +235,20 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-desc { max-width: 78ch; font-size: var(--fs-label); color: var(--muted); }
 .dx-desc.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .dx .dx-more { align-self: flex-start; min-height: 32px; margin: -2px 0 0 -10px; }
-.dx-about .updated { margin-top: auto; }
 .dx-about .updated:empty { display: none; }
+/* What's new: the "Updated" line opens the hub's last five changes (widget/dash.js applyUpdated) */
+.dx-news { margin-top: auto; }
+.dx-news > summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; list-style: none; cursor: pointer; min-height: 32px; }
+.dx-news > summary::-webkit-details-marker { display: none; }
+.dx-news-cta { display: inline-flex; align-items: center; gap: 2px; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--hub); }
+.dx-news-cta svg { transform: rotate(90deg); transition: transform 200ms ease; }
+.dx-news[open] .dx-news-cta svg { transform: rotate(-90deg); }
+.dx-news > summary:focus-visible { outline: 2px solid var(--hub); outline-offset: 2px; border-radius: 6px; }
+.dx-news.is-empty > summary { cursor: default; pointer-events: none; }
+.dx-news.is-empty .dx-news-cta, .dx-news.is-empty .dx-news-list { display: none; }
+.dx-news-list { display: grid; gap: 10px; margin: 6px 0 0; padding: 10px 0 0; border-top: 1px solid var(--line); list-style: none; }
+.dx-news-list p { max-width: 78ch; font-size: var(--fs-label); line-height: 1.45; }
+.dx-news-list small { display: block; margin-top: 2px; font-size: var(--fs-meta); }
 .dx-checks { display: flex; flex-wrap: wrap; gap: 8px; }
 .dx .dx-checkin { background: var(--peach); color: var(--peach-ink); border-color: transparent; white-space: normal; text-align: left; padding: 8px 18px; }
 .dx .dx-checkin:hover { background: var(--peach); filter: brightness(.97); }
@@ -632,9 +644,10 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
   html.shx:not([data-theme="light"]) .dx .rc-chart h4 { color: #3b2e3a; }
 }
 .rk-bar { transform-box: fill-box; transform-origin: 50% 100%; }
-.rc-body.is-in:not(.is-redraw) .rk-bar { animation: rk-grow 700ms var(--ease-expo) both; }
-.rc-body.is-in:not(.is-redraw) .rk-face, .rc-body.is-in:not(.is-redraw) .rk-tim, .rc-body.is-in:not(.is-redraw) .rc-peak { animation: rk-in 500ms ease both; }
-.rc-body.is-in:not(.is-redraw) .rk-tim, .rc-body.is-in:not(.is-redraw) .rc-peak { animation-delay: 900ms; }
+/* the bars grow once; .is-played (widget/dash.js, after the first run) keeps them still while the page rests and wakes */
+.rc-body.is-in:not(.is-redraw):not(.is-played) .rk-bar { animation: rk-grow 700ms var(--ease-expo) both; }
+.rc-body.is-in:not(.is-redraw):not(.is-played) .rk-face, .rc-body.is-in:not(.is-redraw):not(.is-played) .rk-tim, .rc-body.is-in:not(.is-redraw):not(.is-played) .rc-peak { animation: rk-in 500ms ease both; }
+.rc-body.is-in:not(.is-redraw):not(.is-played) .rk-tim, .rc-body.is-in:not(.is-redraw):not(.is-played) .rc-peak { animation-delay: 900ms; }
 @keyframes rk-grow { from { transform: scaleY(0); } }
 @keyframes rk-in { from { opacity: 0; } }
 @container rc (max-width: 620px) {

@@ -680,7 +680,9 @@
         '<div class="dx-card dx-about"><h3>' + esc(hub.title) + "</h3>" +
           (others.length ? '<ul class="dx-exams">' + others.map(function(e){ var dd = daysUntil(e.date); return "<li><b>" + esc(e.label || "Exam") + "</b> " + esc(shortDate(e.date)) + " · " + (dd < 0 ? "done" : esc(daysText(dd))) + "</li>"; }).join("") + "</ul>" : "") +
           '<p class="dx-desc clamp" id="hubDesc">' + esc(hub.desc || "") + '</p><button class="btn btn-text dx-more" type="button" data-more aria-expanded="false">Read more</button>' +
-          '<p class="note updated" data-updated="' + esc(hub.updated || "") + '" data-hub="' + esc(hub.id) + '">' + (hub.updated ? "Updated " + esc(relDay(parseYmd(hub.updated))) : "") + "</p>" +
+          /* the changelog, back in one line (Sam, 2026-11-17: "I dont want it to take up much space"): "Updated ..." opens
+             this hub's and the whole site's last few changes (applyUpdated fills it from the changelog) */
+          '<details class="dx-news is-empty" data-news="' + esc(hub.id) + '"><summary tabindex="-1"><span class="note updated" data-updated="' + esc(hub.updated || "") + '" data-hub="' + esc(hub.id) + '">' + (hub.updated ? "Updated " + esc(relDay(parseYmd(hub.updated))) : "") + '</span><span class="dx-news-cta">What\'s new' + icon("chevron", 16) + '</span></summary><ul class="dx-news-list"></ul></details>' +
         "</div>" +
       "</div>" +
       (checks ? '<div class="dx-checks">' + checks + "</div>" : "");
@@ -1822,7 +1824,7 @@
     }
   }
   function startRecaps(rows){
-    var chips = $("rcChips"), body = $("rcBody"), wrap = $("rc"), cur = -1, seen = false;
+    var chips = $("rcChips"), body = $("rcBody"), wrap = $("rc"), cur = -1, seen = false, playT = 0;
     chips.innerHTML = rows.map(function(r, i){
       return '<button type="button" role="tab" class="rc-chip tinted" style="' + tintVars(r.hub) + '" id="rc-tab-' + i + '" data-rc="' + i + '" aria-selected="false" aria-controls="rcBody" tabindex="-1">' +
         emblem(r.hub, "dx-emb") + "<span><b>" + esc(r.title) + "</b>" + (r.data.exam_day ? "<small>" + esc(recapDay(r.data.exam_day)) + "</small>" : "") + "</span></button>";
@@ -1838,6 +1840,10 @@
         (function step(t){ if (t0 === null) t0 = t; var k = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - k, 3); el.textContent = num(Math.round(to * e)) + suf; if (k < 1) requestAnimationFrame(step); })(performance.now());
       });
       body.classList.add("is-in");
+      /* once the bars have grown they stay still (Sam, 2026-11-17: "shouldnt reset every time you scroll"): the page rests
+         its pictures while it scrolls (.is-rest takes their animations away), which started the bars over from zero.
+         .is-played leaves them drawn until another hub's recap is shown. */
+      clearTimeout(playT); playT = setTimeout(function(){ body.classList.add("is-played"); }, 1600);
     }
     function show(i){
       i = (i + rows.length) % rows.length; if (i === cur) return; cur = i;
@@ -1851,7 +1857,7 @@
       if (d.after_midnight) facts.push(["owls", '<b class="num">' + num(d.after_midnight) + "</b> night owl" + (d.after_midnight === 1 ? "" : "s"), "after midnight"]);
       if (d.regulars) facts.push(["regulars", '<b class="num">' + num(d.regulars) + "</b> regular" + (d.regulars === 1 ? "" : "s"), "3 or more days"]);
       var tq = (d.toughest || [])[0], qq = row.question, hrs = Math.round((d.minutes || 0) / 60);
-      body.classList.remove("is-in"); body.setAttribute("style", tintVars(row.hub)); body.setAttribute("aria-labelledby", "rc-tab-" + i);
+      clearTimeout(playT); body.classList.remove("is-in", "is-played"); body.setAttribute("style", tintVars(row.hub)); body.setAttribute("aria-labelledby", "rc-tab-" + i);
       body.innerHTML =
         '<div class="rc-head">' + emblem(row.hub, "dx-emb") + "<div><h3>" + esc(row.title) + '</h3><p class="note">' +
           (d.exam_day ? "Exam " + esc(recapDay(d.exam_day, true)) : "") + (d.first_day && (d.exam_day || d.last_day) ? " · studied " + esc(recapDay(d.first_day)) + " to " + esc(recapDay(d.exam_day || d.last_day)) : "") + "</p></div>" +
@@ -1908,9 +1914,11 @@
   /* back on the tab after a while: check again (one small request, at most every 5 minutes) */
   document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible" && ovSb && Date.now() - ovAt > 5 * 60 * 1000) loadOverrides(ovSb); });
 
-  /* ---------- each hub's "Updated", from the changelog every deploy logs to (the What's new list itself is gone:
-     Sam, 2026-11-11) ---------- */
-  var latestBy = null;
+  /* ---------- each hub's "Updated", from the changelog every deploy logs to, and its What's new (the long list went on
+     2026-11-11; Sam brought it back as one line on 2026-11-17) ---------- */
+  var latestBy = null, logRows = [];
+  /* a changelog row's hubs ("all", one hub, or a comma list; empty is the whole site) */
+  function logHubs(r){ var t = String(r.hub || "").toLowerCase().split(/[,\s]+/).filter(Boolean); return t.length ? t : ["all"]; }
   function applyUpdated(){
     if (!latestBy) return;
     qa(".updated[data-hub]").forEach(function(el){
@@ -1918,13 +1926,23 @@
       if (latestBy.all && (!best || latestBy.all > best)) best = latestBy.all;
       if (best) el.textContent = "Updated " + relDay(new Date(best));
     });
+    /* What's new: the hub's and the whole site's five latest changes, newest first, a line each with its day */
+    qa("[data-news]").forEach(function(d){
+      var id = d.getAttribute("data-news"), mine = logRows.filter(function(r){ var t = logHubs(r); return t.indexOf(id) > -1 || t.indexOf("all") > -1; }).slice(0, 5);
+      d.classList.toggle("is-empty", !mine.length); q("summary", d).tabIndex = mine.length ? 0 : -1;
+      q(".dx-news-list", d).innerHTML = mine.map(function(r){
+        return "<li><p>" + esc(r.message) + '</p><small class="note">' + esc(relDay(new Date(r.created_at))) + (logHubs(r).indexOf("all") > -1 ? " · every hub" : "") + "</small></li>";
+      }).join("");
+      if (!d.getAttribute("data-wired")) { d.setAttribute("data-wired", "1"); d.addEventListener("toggle", function(){ if (d.open) track("news:open"); }); }
+    });
   }
   function loadChangelog(){
-    rest("changelog?select=hub,created_at&order=created_at.desc&limit=40").then(function(rows){
+    rest("changelog?select=hub,message,created_at&order=created_at.desc&limit=40").then(function(rows){
       if (!rows || !rows.length) return;
       /* the freshest entry per hub drives its "Updated" (a row's hub can be "all" or a comma list) */
       latestBy = {};
       rows.forEach(function(r){ String(r.hub || "").toLowerCase().split(/[,\s]+/).filter(Boolean).forEach(function(t){ if (!latestBy[t] || r.created_at > latestBy[t]) latestBy[t] = r.created_at; }); });
+      logRows = rows.filter(function(r){ return r && typeof r.message === "string" && r.message.trim(); });
       applyUpdated();
     }).catch(function(){});
   }

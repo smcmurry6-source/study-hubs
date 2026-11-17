@@ -156,7 +156,16 @@ try {
   eq(ans('xp-O', omu.id, { hub: 'occlusion', picks: omu.correct.slice().reverse(), at: 10 }).correct, true, 'an Occlusion select-all answered right in any order');
   eq(ans('xp-O', os.id, { hub: 'occlusion', picks: os.steps.map((s, i) => i), at: 20 }).correct, true, 'an Occlusion sequence in its right order');
   eq(ans('xp-O', os.id, { hub: 'occlusion', picks: os.steps.map((s, i) => i).reverse(), at: 30 }).correct, false, 'an Occlusion sequence out of order');
-  notes.push(`keys: ${loaded.loaded} Occlusion keys from tools/xp/keys.js, versions, retired ids`);
+  // a matching item is graded like an order (v64): each row's first pick, row k's own being k
+  const omt = oq.find(x => x.type === 'match');
+  eq(occ.find(k => k.id === omt.id).kind, 'order', 'tools/xp/keys.js lists a matching item as an order');
+  const rowsRight = omt.pairs.map((p, i) => i), rowsWrong = rowsRight.map((v, i) => i === 0 ? 1 : i === 1 ? 0 : v);
+  eq(ans('xp-O', omt.id, { hub: 'occlusion', picks: rowsRight, at: 40 }).xp, 10, 'an Occlusion matching item with every row right: 10 XP, not a self-graded 2');
+  const mWrong = ans('xp-O2', omt.id, { hub: 'occlusion', picks: rowsWrong, claim: true, at: 0 });
+  ok(mWrong.correct === false && mWrong.xp === 1, `a matching item with two rows swapped is wrong, whatever the page claims (${JSON.stringify(mWrong)})`);
+  const mOld = ans('xp-O3', omt.id, { hub: 'occlusion', self: true, claim: true, at: 0 });
+  ok(mOld.correct === true && mOld.kind === 'self' && mOld.xp === 2, `a page cached before v64 (no rows sent) is taken at its word and paid as self graded (${JSON.stringify(mOld)})`);
+  notes.push(`keys: ${loaded.loaded} Occlusion keys from tools/xp/keys.js, versions, retired ids, matching graded by its rows`);
 
   /* ---------- 4. answers, the per-question limit and the speed limit ---------- */
   const seq = [];
