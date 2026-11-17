@@ -1,4 +1,4 @@
-// Fig 20.2: where in the follicle (L20 Lymphomas and Leukemias, Dr. Borak, from the slides: follicular lymphoma, mantle
+// Fig 19: where in the follicle (L20 Lymphomas and Leukemias, Dr. Borak, from the slides: follicular lymphoma, mantle
 // cell lymphoma, marginal zone and MALT lymphoma). A secondary lymphoid follicle cut through its middle, drawn cell by
 // cell in code: the germinal center (larger, paler B cells and a few macrophages), the mantle zone (a dense rim of small
 // B cells, thicker on one side, as it is in a real follicle) and the marginal zone outside it (medium cells with more,
@@ -148,15 +148,15 @@ function foSay(st, D) { var c = st.z === "all" ? D.ALL : D.ZN[st.z]; return [c.s
 const ZN = {
   gc: { zone: "germinal center", lym: "follicular lymphoma", tag: "t(14;18)", tc: "fo-gct", sw: "fo-gcs", ly: 176, px: 176, py: 190, ins: "GC",
     title: "Follicular lymphoma",
-    lines: ["from the germinal center (follicle center)", "t(14;18): BCL2 next to IGH, always on,", "so the cells don't die", "widespread when found, often no symptoms", "indolent: median survival over 17 years"],
-    ilab: [["normal node", 410], ["follicular lymphoma:", 480], ["back-to-back follicles", 494]],
+    lines: ["from the germinal center", "(the follicle center)", "t(14;18): BCL2 next to IGH,", "always on: the cells don't die", "widespread, often no symptoms", "indolent: median survival", "over 17 years"],
+    ilab: [["normal node", 410], ["back-to-back", 480], ["follicles", 494]],
     info: "Germinal center, the follicle center: the pale middle of the follicle, with larger B cells. Follicular lymphoma comes from here: t(14;18) moves BCL2 next to IGH.",
     inset: "A normal node has a few follicles in its outer cortex. Follicular lymphoma fills the node with crowded, back-to-back follicles; the neoplastic follicles stain for BCL2, which helps separate them from reactive ones.",
     say: "Follicular lymphoma, from the germinal center (the follicle center): it grows in a follicular pattern, crowded back-to-back follicles filling the node, and makes up 10 to 20 percent of all lymphomas. t(14;18), in 85 to 90 percent, moves BCL2 next to IGH, so BCL2 is switched on all the time and the cells don't die. Most patients have widespread disease when it is found (the marrow in 40 to 70 percent), yet are often asymptomatic, and B symptoms are uncommon. It is indolent, with a median survival over 17 years, but it keeps progressing, and the prognosis is tied to how far it had spread at diagnosis.",
     ro: "center · follicular" },
   mantle: { zone: "mantle zone", lym: "mantle cell lymphoma", tag: "t(11;14)", tc: "fo-mnt", sw: "fo-mns", ly: 94, px: 198, py: 128, ins: "MN",
     title: "Mantle cell lymphoma",
-    lines: ["from the mantle zone, the rim of small", "B cells around the germinal center", "t(11;14): cyclin D1 on, its stain diagnostic", "older (median 68 to 69), enlarged nodes", "survival: from 3 years to more than 5 to 10"],
+    lines: ["from the mantle zone: the rim of", "small B cells around the center", "t(11;14): cyclin D1 on, and", "its stain is diagnostic", "median age 68 to 69", "survival up from 3 years", "to more than 5 to 10"],
     ilab: [["small to medium", 446], ["cells, slightly", 460], ["irregular nuclei", 474]],
     info: "Mantle zone: the rim of small B cells around the germinal center. Mantle cell lymphoma comes from here: t(11;14) switches on cyclin D1.",
     inset: "Mantle cell lymphoma: small to medium-sized cells with slightly irregular nuclei and scant cytoplasm.",
@@ -164,7 +164,7 @@ const ZN = {
     ro: "mantle · mantle cell" },
   marginal: { zone: "marginal zone", lym: "MALT lymphoma", tag: "chronic inflammation", tc: "fo-mzt", sw: "fo-mzs", ly: 262, px: 238, py: 240, ins: "MZ",
     title: "MALT lymphoma",
-    lines: ["extranodal marginal zone lymphoma", "grows on chronic inflammation:", "stomach H. pylori · salivary Sjögren", "thyroid Hashimoto · skin Borrelia", "indolent; some respond to antibiotics", "about 90% alive at 5 years"],
+    lines: ["extranodal marginal zone lymphoma", "grows on chronic inflammation:", "stomach: H. pylori", "salivary gland: Sjögren", "thyroid: Hashimoto", "indolent; some respond to antibiotics", "about 90% alive at 5 years"],
     ilab: [["lymphoepithelial", 454], ["lesion", 468]],
     info: "Marginal zone: outside the mantle, with medium cells and more cytoplasm. Marginal zone lymphoma comes from here; its extranodal form is MALT lymphoma, which grows on chronic inflammation.",
     inset: "A lymphoepithelial lesion: tumor cells invading a gland's epithelium, often seen in MALT lymphoma as it effaces the tissue.",
@@ -178,7 +178,7 @@ const ALL = {
 export default function follicle() {
   const A = art(), H = 520;
   return makeFig({
-    id: "follicle", lec: "lymleuk", fig: "Fig 20.2", short: "Where in the follicle", hint: "pick · hover",
+    id: "follicle", lec: "lymleuk", fig: "Fig 19", short: "Where in the follicle", hint: "pick · hover",
     title: "Where in the follicle",
     caption: "A lymphoid follicle cut open, each zone labeled with the B-cell lymphoma it gives rise to. Pick a zone to see its lymphoma's translocation or link and its course.",
     W: 460, H,
@@ -187,7 +187,7 @@ export default function follicle() {
     render: foRender, say: foSay,
     controls: `<div class="am-controls" role="group" aria-label="Zone">` + [["all", "All three"], ["gc", "Germinal center"], ["mantle", "Mantle zone"], ["marginal", "Marginal zone"]].map((b) => `<button type="button" class="am-btn" data-amk="z" data-amv="${b[0]}">${b[1]}</button>`).join("") + `</div>`,
     sources: [
-      "From the L20 notes (Dr. Borak's slides): mantle cell lymphoma from the mantle zone of the lymphoid follicle, the rim of small B cells around the germinal center, with small to medium cells, slightly irregular nuclei and scant cytoplasm, t(11;14) and cyclin D1, median age 68 to 69, survival from 3 years to more than 5 to 10; follicular lymphoma's back-to-back follicles, t(14;18) with BCL2 next to IGH, 10 to 20 percent of lymphomas, widespread disease, a median survival over 17 years; marginal zone lymphoma from marginal zone B cells, its extranodal MALT form, the five chronic inflammatory links, antibiotics, lymphoepithelial lesions and survival. The notes don't name the zone follicular lymphoma comes from; the WHO classification (Swerdlow et al., 2017) and Robbins settle it as the follicle center (germinal center) B cell, and the lecture's \"follicle center\" wording for it follows them.",
+      "From the L20 notes (Dr. Borak's slides): mantle cell lymphoma from the mantle zone of the lymphoid follicle, the rim of small B cells around the germinal center, with small to medium cells, slightly irregular nuclei and scant cytoplasm, t(11;14) and cyclin D1, median age 68 to 69, survival from 3 years to more than 5 to 10; follicular lymphoma's back-to-back follicles, t(14;18) with BCL2 next to IGH, 10 to 20 percent of lymphomas, widespread disease, a median survival over 17 years; marginal zone lymphoma from marginal zone B cells, its extranodal MALT form, the five chronic inflammatory links, antibiotics, lymphoepithelial lesions and survival. The notes don't say which zone follicular lymphoma comes from; the WHO classification (Swerdlow et al., 2017) and Robbins settle it: follicle center (germinal center) B cells.",
       "Robbins and Cotran Pathologic Basis of Disease and Wheater's Functional Histology set the drawing: the germinal center's larger, paler cells (with more large cells toward one pole and more small cleaved cells toward the other) and its macrophages holding debris, the dense rim of small lymphocytes in the mantle, thicker toward the follicle's cap, and the marginal zone's medium cells with more pale cytoplasm outside it; the normal node with its follicles in the outer cortex. Those part names are left unlabeled, as the lecture doesn't teach them.",
       "Schematic and not to scale: one follicle drawn cell by cell in code (not traced from any image), with the marginal zone drawn as wide as in mucosa or spleen so it can be seen; in many nodes it is thin. The small drawings in the card are illustrations, not specimens. CD markers are left out, as his objectives say they aren't needed. Educational, not medical advice.",
     ],
@@ -238,7 +238,7 @@ export default function follicle() {
 .anima .follicle-svg .fo-epn{fill:color-mix(in srgb,var(--bx-nuc) 70%,var(--bx-eosin))}
 .anima .follicle-svg .fo-lum{fill:var(--bx-lumen);stroke:var(--bx-cyto-line);stroke-width:.8}
 .anima .follicle-svg .fo-tumn{fill:var(--bx-nuc)}
-@media (max-width:560px){.anima .follicle-svg .t.fo-zn{font-size:14.5px}.anima .follicle-svg .t.fo-ly{font-size:14px}.anima .follicle-svg .t.fo-h{font-size:12px}}
+@media (max-width:560px){.anima .follicle-svg .t.fo-zn{font-size:14.5px}.anima .follicle-svg .t.fo-ly{font-size:14px}.anima .follicle-svg .t.fo-h{font-size:12.5px}.anima .follicle-svg .t.fo-row,.anima .follicle-svg .t.fo-mn-t,.anima .follicle-svg .t.fo-ln{font-size:14px}.anima .follicle-svg .t.fo-title{font-size:16.5px}.anima .follicle-svg .t.fo-il{font-size:13px}}
 `,
   });
 }

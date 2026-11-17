@@ -8,24 +8,25 @@
 // and an HEV magnified with a lymphocyte crossing its wall. Step through three stories: antigen in the lymph (in, filtered
 // in the sinuses, out), a lymphocyte from the blood (artery, across the HEV, out the efferent), and a primary follicle
 // becoming a secondary one. Schematic, not to scale: the vein at the hilum and the medullary cords are drawn unlabeled
-// because the lecture doesn't name them.
+// because the lecture doesn't name them. (Started from the 2026-11-16 draft; relaid out for phones on 2026-11-17.)
 import { makeFig, f1, T, L, HOT } from "./shared.mjs";
 
 /* ---------- build-time geometry ---------- */
-const W = 520, H = 628;
-const CX = 260, CY = 190, RX = 164, RY = 124, DENT = 54, DW = 0.36, RAD = Math.PI / 180;
+const W = 460, H = 520;
+const CX = 230, CY = 150, RX = 134, RY = 100, DENT = 44, DW = 0.36, RAD = Math.PI / 180;
+const CAPD = 4.5, SIND = 9; /* the capsule is 0..4.5 deep, the subcapsular sinus 4.5..9, the cortex starts at 9 */
 function ang(a, b) { let d = a - b; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; return d; }
-/* the outline: an ellipse with the hilum pushed in at the bottom */
+/* the outline: an ellipse with the hilum pushed in at the bottom (90 degrees is straight down) */
 function rim(th) { const g = Math.exp(-Math.pow(ang(th, Math.PI / 2) / DW, 2)); return [CX + RX * Math.cos(th), CY + RY * Math.sin(th) - DENT * g]; }
 function nrm(th) {
   const e = 1e-3, a = rim(th - e), b = rim(th + e), p = rim(th);
   let tx = b[0] - a[0], ty = b[1] - a[1]; const l = Math.hypot(tx, ty); tx /= l; ty /= l;
-  let nx = -ty, ny = tx; if ((CX - p[0]) * nx + (CY - 20 - p[1]) * ny < 0) { nx = -nx; ny = -ny; }
+  let nx = -ty, ny = tx; if ((CX - p[0]) * nx + (CY - 16 - p[1]) * ny < 0) { nx = -nx; ny = -ny; }
   return [nx, ny];
 }
-/* how far the cortex and paracortex reach: full on the convex side, thinning to nothing at the hilum */
+/* how deep the cortex and paracortex reach: full on the convex side, thinning to nothing at the hilum */
 function wv(th) { return 1 - Math.exp(-Math.pow(ang(th, Math.PI / 2) / 0.8, 2)); }
-const dCor = (th) => 10 + 46 * wv(th), dPar = (th) => 10 + 80 * wv(th);
+const dCor = (th) => SIND + 42 * wv(th), dPar = (th) => SIND + 74 * wv(th), dHev = (th) => (dCor(th) + dPar(th)) / 2 + 2;
 function at(deg, d) { const th = deg * RAD, p = rim(th), n = nrm(th), dd = typeof d === "function" ? d(th) : d; return [p[0] + n[0] * dd, p[1] + n[1] * dd]; }
 function ring(d, n) { const p = []; for (let i = 0; i < n; i++) p.push(at(i * 360 / n, d)); return p; }
 function sm(p) {
@@ -52,16 +53,18 @@ function rng(seed) { let a = seed >>> 0; return function () { a = (a + 0x6D2B79F
 const dotD = (pts) => pts.map((q) => "M" + f1(q[0]) + " " + f1(q[1]) + "h0").join("");
 function segDist(p, a, b) { const vx = b[0] - a[0], vy = b[1] - a[1], u = Math.max(0, Math.min(1, ((p[0] - a[0]) * vx + (p[1] - a[1]) * vy) / (vx * vx + vy * vy))); return Math.hypot(p[0] - a[0] - u * vx, p[1] - a[1] - u * vy); }
 function unitDisk(r, n, minD) { const o = []; let k = 0; while (o.length < n && k++ < 5000) { const x = r() * 2 - 1, y = r() * 2 - 1; if (x * x + y * y > 1) continue; if (o.some((q) => Math.hypot(q[0] - x, q[1] - y) < minD)) continue; o.push([f1(x * 100) / 100, f1(y * 100) / 100]); } return o; }
+const inBox = (p, b, pad) => p[0] > b[0] - pad && p[0] < b[2] + pad && p[1] > b[1] - pad && p[1] < b[3] + pad;
+const P1 = (p) => [f1(p[0]), f1(p[1])];
 
 /* the follicles: angle on the outline, radius, kind (sec = secondary, pri = primary, focus = the one that changes) */
 const FOL = [
-  { a: 164, r: 22, k: "sec" }, { a: 196, r: 22, k: "pri" }, { a: 228, r: 23, k: "sec" }, { a: 262, r: 24, k: "sec" },
-  { a: 296, r: 22, k: "pri" }, { a: 329, r: 23, k: "focus" }, { a: 1, r: 21, k: "pri" },
+  { a: 148, r: 15, k: "sec" }, { a: 184, r: 18, k: "pri" }, { a: 219, r: 19, k: "sec" }, { a: 255, r: 19, k: "sec" },
+  { a: 290, r: 18, k: "pri" }, { a: 324, r: 19, k: "focus" }, { a: 0, r: 18, k: "pri" }, { a: 35, r: 15, k: "sec" },
 ];
-const TRAB = [148, 180, 212, 245, 279, 312, 345, 17];
-const HEVA = [174, 236, 302, 9];
-const AFF = [206, 238, 286, 321];
-const MAC = [224, 300, 196];
+const TRAB = [166, 201, 237, 272, 307, 342, 52, 128];
+const HEVA = [184, 254, 290, 17];
+const AFF = [233, 306];
+const MAC = [222, 300, 330];
 
 /* ---------- page helpers (serialized into the page) ---------- */
 function lnD(p) { var o = "", i; for (i = 0; i < p.length; i++) o += (i ? "L" : "M") + f1(p[i][0]) + " " + f1(p[i][1]); return o; }
@@ -78,21 +81,21 @@ function lnFlow(p, n, per, t, kind, off, fadeEnd) {
   var o = "", tot = lnLen(p), i;
   for (i = 0; i < n; i++) {
     var u = t ? ((t / per + i / n + (off || 0)) % 1 + 1) % 1 : ((i + 0.5) / n + (off || 0)) % 1, q = lnAt(p, u * tot);
-    var op = Math.min(1, u * 8, fadeEnd ? (1 - u) * 2.2 : (1 - u) * 8);
+    var op = t ? Math.min(1, u * 8, fadeEnd ? (1 - u) * 2.2 : (1 - u) * 8) : 1;
     o += lnMark(kind, q[0], q[1], q[2], op);
   }
   return o;
 }
 function lnMark(kind, x, y, a, op) {
   var g = '<g class="ln-pt" opacity="' + f1(Math.max(0, op)) + '" transform="translate(' + f1(x) + " " + f1(y) + ')">';
-  if (kind === "ag") return g + '<path class="ln-ag" d="M0 -3.2L2.8 1.6L-2.8 1.6Z"/></g>';
-  if (kind === "ly") return g + '<circle class="ln-lyf" r="2"/></g>';
-  if (kind === "rbc") return g + '<ellipse class="ln-rbc" rx="2.8" ry="2" transform="rotate(' + f1(a * 57.3) + ')"/></g>';
-  if (kind === "B" || kind === "T") return g + '<circle class="ln-c' + kind + '" r="4.2"/><circle class="ln-cn" r="2.6"/></g>';
-  if (kind === "ab") return g + '<path class="ln-ab" d="M0 3.4V0L-2.6 -3M0 0L2.6 -3"/></g>';
+  if (kind === "ag") return g + '<path class="ln-ag" d="M0 -3.6L3.2 1.8L-3.2 1.8Z"/></g>';
+  if (kind === "ly") return g + '<circle class="ln-lyf" r="2.2"/></g>';
+  if (kind === "rbc") return g + '<ellipse class="ln-rbc" rx="3" ry="2.1" transform="rotate(' + f1(a * 57.3) + ')"/></g>';
+  if (kind === "B" || kind === "T") return g + '<circle class="ln-c' + kind + '" r="4.6"/><circle class="ln-cn" r="2.7"/></g>';
+  if (kind === "ab") return g + '<path class="ln-ab" d="M0 3.6V0L-2.8 -3.2M0 0L2.8 -3.2"/></g>';
   return "";
 }
-/* one cell travelling along p once per lap (rest at the end for the last part of the lap); at rest it sits at u0 */
+/* one cell travelling along p once per lap (resting at the end for the last part of the lap); at rest it sits at u0 */
 function lnTrip(p, t, per, kind, u0, delay) {
   var tot = lnLen(p), u;
   if (!t) u = u0; else { var k = (((t - (delay || 0)) / per) % 1 + 1) % 1; u = Math.min(1, k / 0.72); u = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; }
@@ -110,7 +113,7 @@ function lnFol(c, r, g, FD, dir, hl) {
   if (g > 0.2) {
     for (i = 0; i < FD.gc.length; i++) { var px = gx + FD.gc[i][0] * rg * 0.78, py = gy + FD.gc[i][1] * rg * 0.78; gcc += "M" + f1(px) + " " + f1(py) + "h0"; gcn += "M" + f1(px + 0.4) + " " + f1(py) + "h0"; }
     for (i = 0; i < FD.fdc.length; i++) { var fx = gx + FD.fdc[i][0] * rg * 0.5, fy = gy + FD.fdc[i][1] * rg * 0.5, k;
-      for (k = 0; k < 4; k++) { var aa = FD.fdc[i][2] + k * 1.57; fd += "M" + f1(fx) + " " + f1(fy) + "L" + f1(fx + Math.cos(aa) * 4.6) + " " + f1(fy + Math.sin(aa) * 4.6); } }
+      for (k = 0; k < 4; k++) { var aa = FD.fdc[i][2] + k * 1.57; fd += "M" + f1(fx) + " " + f1(fy) + "L" + f1(fx + Math.cos(aa) * 4.2) + " " + f1(fy + Math.sin(aa) * 4.2); } }
     o += '<g opacity="' + f1(Math.min(1, (g - 0.2) / 0.5)) + '"><path class="ln-gcc" d="' + gcc + '"/><path class="ln-gcn" d="' + gcn + '"/><path class="ln-fdcs" d="' + fd + '"/></g>';
   }
   if (hl) o += '<circle class="ln-ring" cx="' + f1(c[0]) + '" cy="' + f1(c[1]) + '" r="' + f1(r + 4) + '"/>';
@@ -120,177 +123,206 @@ function lnTube(p, cls) { var d = lnD(p); return '<path class="ln-tw ' + cls + '
 /* a valve: two leaflets pointing the way the lymph flows */
 function lnValve(p, s, w) { var q = lnAt(p, s), a = q[2], c = Math.cos(a), si = Math.sin(a), h = w / 2 - 0.6;
   return '<path class="ln-valve" d="M' + f1(q[0] - c * 4 - si * h) + " " + f1(q[1] - si * 4 + c * h) + "L" + f1(q[0] + c * 3) + " " + f1(q[1] + si * 3) + "L" + f1(q[0] - c * 4 + si * h) + " " + f1(q[1] - si * 4 - c * h) + '"/>'; }
+/* a label whose leader leaves from (sx, sy), a point beside the text that doesn't depend on its width */
+function lnLab(x, y, s, sx, sy, px, py, a, cls) { return '<g class="am-callout"><path class="lead" d="M' + f1(sx) + " " + f1(sy) + "L" + f1(px) + " " + f1(py) + '"/><circle class="dot" cx="' + f1(px) + '" cy="' + f1(py) + '" r="1.8"/>' + T(x, y, s, cls, a) + "</g>"; }
 function lnEase(u) { u = Math.max(0, Math.min(1, u)); return u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; }
 
 /* ---------- the fixed drawing ---------- */
 function nodeArt() {
-  const o = {}, R = rng(19), rp = (d) => ring(d, 64);
-  const fols = FOL.map((f) => Object.assign({}, f, { c: at(f.a, 10 + f.r + 1), dir: nrm(f.a * RAD) }));
-  const hevs = HEVA.map((a) => at(a, (th) => (dCor(th) + dPar(th)) / 2 + 2));
+  const o = {}, R = rng(19), rp = (d) => ring(d, 72);
+  const fols = FOL.map((f) => Object.assign({}, f, { c: at(f.a, SIND + f.r + 1), dir: nrm(f.a * RAD) }));
+  const hevs = HEVA.map((a) => at(a, dHev));
   const inFol = (p, pad) => fols.some((f) => Math.hypot(p[0] - f.c[0], p[1] - f.c[1]) < f.r + pad);
-  const trabSeg = TRAB.map((a) => [at(a, 4), at(a, dPar(a * RAD) - 4)]);
+  const trabSeg = TRAB.map((a) => [at(a, 4), at(a, dPar(a * RAD) - 2)]);
   const nearTrab = (p, pad) => trabSeg.some((s) => segDist(p, s[0], s[1]) < pad);
   const nearHev = (p, pad) => hevs.some((h) => Math.hypot(p[0] - h[0], p[1] - h[1]) < pad);
-  function band(lo, hi, n, pad) {
+  function band(lo, hi, n) {
     const out = []; let k = 0;
     while (out.length < n && k++ < n * 40) { const th = R() * 2 * Math.PI, a = typeof lo === "function" ? lo(th) : lo, b = hi(th); if (b - a < 4) continue;
-      const p = at(th / RAD, a + 1.5 + R() * (b - a - 3)); if (inFol(p, 1.5) || nearTrab(p, 5) || nearHev(p, 9)) continue; out.push(p); }
+      const p = at(th / RAD, a + 1.5 + R() * (b - a - 3)); if (inFol(p, 1.5) || nearTrab(p, 5) || nearHev(p, 8.5)) continue; out.push(p); }
     return out;
   }
   /* the regions, outside in */
-  const capsule = sm(rp(0)), sinus = sm(rp(5)), cortex = sm(rp(10)), para = sm(rp(dCor)), med = sm(rp(dPar));
+  const capsule = sm(rp(0)), sinus = sm(rp(CAPD)), cortex = sm(rp(SIND)), para = sm(rp(dCor)), med = sm(rp(dPar));
   let s = "";
-  s += HOT(INFO.capsule, '<path class="ln-cap" d="' + capsule + '"/>');
+  s += HOT(INFO.capsule, '<path class="ln-capz" d="' + capsule + '"/>');
   s += HOT(INFO.sinus, '<path class="ln-sin" d="' + sinus + '"/>');
-  s += HOT(INFO.cortex, '<path class="ln-cor" d="' + cortex + '"/><path class="ln-dot" d="' + dotD(band(10, dCor, 170, 0)) + '"/>');
-  s += HOT(INFO.para, '<path class="ln-par" d="' + para + '"/><path class="ln-dot" d="' + dotD(band(dCor, dPar, 230, 0)) + '"/>');
+  s += HOT(INFO.cortex, '<path class="ln-cor" d="' + cortex + '"/><path class="ln-dot" d="' + dotD(band(SIND, dCor, 150)) + '"/>');
+  s += HOT(INFO.para, '<path class="ln-par" d="' + para + '"/><path class="ln-dot" d="' + dotD(band(dCor, dPar, 200)) + '"/>');
   /* the medulla: pale sinuses between cords that fan out from the hilum */
-  const HIL = [262, 252];
+  const HIL = [CX + 4, CY + RY - DENT + 2];
   let cords = "", cdots = [];
-  [150, 178, 203, 228, 262, 296, 324, 354, 28].forEach((a, j) => {
-    const e = at(a, (th) => dPar(th) - 3), b = [HIL[0] + (e[0] - HIL[0]) * 0.34, HIL[1] + (e[1] - HIL[1]) * 0.34 + 4];
-    const m = [(e[0] + b[0]) / 2 + (j % 2 ? 4 : -4), (e[1] + b[1]) / 2];
+  [150, 177, 203, 228, 252, 288, 312, 338, 3, 30].forEach((a, j) => {
+    const e = at(a, (th) => dPar(th) - 3), b = [HIL[0] + (e[0] - HIL[0]) * 0.3, HIL[1] + (e[1] - HIL[1]) * 0.3 + 2];
+    const m = [(e[0] + b[0]) / 2 + (j % 2 ? 3.5 : -3.5), (e[1] + b[1]) / 2];
     const p = cr([e, m, b], 6); cords += lnD(p);
-    for (let i = 1; i < p.length - 1; i += 2) cdots.push([p[i][0] + (R() - 0.5) * 4, p[i][1] + (R() - 0.5) * 4]);
+    for (let i = 1; i < p.length - 1; i += 2) cdots.push([p[i][0] + (R() - 0.5) * 3.4, p[i][1] + (R() - 0.5) * 3.4]);
   });
   s += HOT(INFO.medulla, '<path class="ln-med" d="' + med + '"/><path class="ln-cord" d="' + cords + '"/><path class="ln-dot" d="' + dotD(cdots) + '"/>');
-  o.HIL = HIL;
+  o.HIL = P1(HIL);
   /* trabeculae from the capsule, with sinuses running beside them */
   let tsin = "", trab = "";
   TRAB.forEach((a) => {
     const th = a * RAD, n = 9, L1 = [], L2 = [], S1 = [], S2 = [], dEnd = dPar(th) - 2;
-    for (let i = 0; i <= n; i++) { const d = 3 + (dEnd - 3) * i / n, p = at(a, d), q = nrm(th), tx = -q[1], ty = q[0], w = 2.8 - 1.6 * i / n, sw = w + 2.6;
+    for (let i = 0; i <= n; i++) { const d = 3 + (dEnd - 3) * i / n, p = at(a, d), q = nrm(th), tx = -q[1], ty = q[0], w = 2.6 - 1.4 * i / n, sw = w + 2.4;
       L1.push([p[0] + tx * w, p[1] + ty * w]); L2.unshift([p[0] - tx * w, p[1] - ty * w]); S1.push([p[0] + tx * sw, p[1] + ty * sw]); S2.unshift([p[0] - tx * sw, p[1] - ty * sw]); }
     tsin += lnD(S1.concat(S2)) + "Z"; trab += lnD(L1.concat(L2)) + "Z";
   });
   s += HOT(INFO.sinus, '<path class="ln-tsin" d="' + tsin + '"/>') + HOT(INFO.trab, '<path class="ln-trab" d="' + trab + '"/>');
   /* HEVs in the paracortex */
-  o.HEVS = hevs.map((h) => [f1(h[0]), f1(h[1])]);
+  o.HEVS = hevs.map(P1);
   hevs.forEach((h) => {
     let cells = "";
-    for (let k = 0; k < 7; k++) { const a = k / 7 * 2 * Math.PI; cells += "M" + f1(h[0] + Math.cos(a) * 4.2) + " " + f1(h[1] + Math.sin(a) * 4.2) + "h0"; }
-    s += HOT(INFO.hev, '<circle class="ln-hevw" cx="' + f1(h[0]) + '" cy="' + f1(h[1]) + '" r="6.6"/><path class="ln-hevc" d="' + cells + '"/><circle class="ln-hevl" cx="' + f1(h[0]) + '" cy="' + f1(h[1]) + '" r="2.2"/>');
+    for (let k = 0; k < 7; k++) { const a = k / 7 * 2 * Math.PI; cells += "M" + f1(h[0] + Math.cos(a) * 4) + " " + f1(h[1] + Math.sin(a) * 4) + "h0"; }
+    s += HOT(INFO.hev, '<circle class="ln-hevw" cx="' + f1(h[0]) + '" cy="' + f1(h[1]) + '" r="6.4"/><path class="ln-hevc" d="' + cells + '"/><circle class="ln-hevl" cx="' + f1(h[0]) + '" cy="' + f1(h[1]) + '" r="2.1"/>');
   });
   /* the follicles (all but the one that changes) */
-  const FD = { dots: unitDisk(R, 46, 0.2), gc: unitDisk(R, 9, 0.48), fdc: [[0.15, -0.35, 0.4], [-0.4, 0.3, 1.1]] };
+  const FD = { dots: unitDisk(R, 42, 0.2), gc: unitDisk(R, 8, 0.5), fdc: [[0.15, -0.35, 0.4], [-0.4, 0.3, 1.1]] };
   o.FD = FD;
   let fs = "";
   fols.forEach((f) => {
-    if (f.k === "focus") { o.FOCUS = { c: [f1(f.c[0]), f1(f.c[1])], r: f.r, dir: [f1(f.dir[0] * 100) / 100, f1(f.dir[1] * 100) / 100] }; return; }
+    if (f.k === "focus") { o.FOCUS = { c: P1(f.c), r: f.r, dir: [f1(f.dir[0] * 100) / 100, f1(f.dir[1] * 100) / 100] }; return; }
     fs += HOT(f.k === "sec" ? INFO.sec : INFO.pri, lnFol(f.c, f.r, f.k === "sec" ? 1 : 0, FD, f.dir, false));
   });
-  o.FOLS = fols.map((f) => ({ c: [f1(f.c[0]), f1(f.c[1])], r: f.r, k: f.k }));
+  o.FOLS = fols.map((f) => ({ a: f.a, c: P1(f.c), r: f.r, k: f.k, dir: [f1(f.dir[0] * 100) / 100, f1(f.dir[1] * 100) / 100] }));
   o.BG = s + fs;
-  /* macrophages reaching into the sinuses */
+  /* macrophages reaching into the subcapsular sinus */
   let mac = "";
-  MAC.forEach((a) => { const p = at(a, 7.4), q = nrm(a * RAD), tx = -q[1], ty = q[0];
-    mac += HOT(INFO.mac, '<path class="ln-mac" d="M' + f1(p[0] - tx * 5.6) + " " + f1(p[1] - ty * 5.6) + "Q" + f1(p[0] + q[0] * 4) + " " + f1(p[1] + q[1] * 4) + " " + f1(p[0] + tx * 5.6) + " " + f1(p[1] + ty * 5.6) + "Q" + f1(p[0] - q[0] * 2.4) + " " + f1(p[1] - q[1] * 2.4) + " " + f1(p[0] - tx * 5.6) + " " + f1(p[1] - ty * 5.6) + 'Z"/><circle class="ln-macn" cx="' + f1(p[0] + q[0] * 0.6) + '" cy="' + f1(p[1] + q[1] * 0.6) + '" r="1.7"/>'); });
-  o.MACS = MAC.map((a) => { const p = at(a, 7.4); return [f1(p[0]), f1(p[1])]; });
-  /* the hilum: artery in, the vein (unlabeled) and the efferent lymphatic out; cut ends below */
-  const ART = cr([[232, 402], [231, 340], [233, 296], [240, 262]], 6);
-  const ARTR = cr([[240, 262], [262, 238], [304, 222], [hevs[3][0] - 8, hevs[3][1] + 3]], 6);
-  const ARTL = cr([[240, 262], [226, 236], [196, 214], [hevs[0][0] + 7, hevs[0][1] + 2]], 6);
-  const VEIN = cr([[256, 402], [256, 330], [257, 290], [255, 268]], 6);
-  const EFF = cr([[HIL[0] + 22, HIL[1] + 6], [286, 290], [288, 340], [289, 402]], 6);
-  o.ART = ART; o.ARTR = ARTR; o.ARTL = ARTL; o.EFF = EFF; o.VEIN = VEIN;
+  MAC.forEach((a) => { const p = at(a, 6.8), q = nrm(a * RAD), tx = -q[1], ty = q[0];
+    mac += HOT(INFO.mac, '<path class="ln-mac" d="M' + f1(p[0] - tx * 5.4) + " " + f1(p[1] - ty * 5.4) + "Q" + f1(p[0] + q[0] * 4) + " " + f1(p[1] + q[1] * 4) + " " + f1(p[0] + tx * 5.4) + " " + f1(p[1] + ty * 5.4) + "Q" + f1(p[0] - q[0] * 2.4) + " " + f1(p[1] - q[1] * 2.4) + " " + f1(p[0] - tx * 5.4) + " " + f1(p[1] - ty * 5.4) + 'Z"/><circle class="ln-macn" cx="' + f1(p[0] + q[0] * 0.6) + '" cy="' + f1(p[1] + q[1] * 0.6) + '" r="1.6"/>'); });
+  /* the hilum: artery in, a vein (unlabeled) and the efferent lymphatic out; cut ends below */
+  const BOT = 262, AX = CX - 18, VX = CX - 1, EX = CX + 18;
+  const hR = hevs[3], hL = hevs[0];
+  const ART = cr([[AX, BOT], [AX, 230], [AX + 1, 206], [AX + 6, 188]], 6);
+  const ARTR = cr([[AX + 6, 188], [CX + 14, 172], [CX + 40, 166], [hR[0] - 8, hR[1] + 3]], 6);
+  const ARTL = cr([[AX + 6, 188], [AX - 6, 170], [CX - 50, 160], [hL[0] + 7, hL[1] + 1]], 6);
+  const VEIN = cr([[VX, BOT], [VX, 226], [VX + 1, 204], [VX, 190]], 6);
+  const EFF = cr([[HIL[0] + 10, HIL[1] - 12], [EX, HIL[1] + 6], [EX + 1, 232], [EX + 1, BOT]], 6);
+  o.ART = ART; o.ARTR = ARTR; o.ARTL = ARTL; o.EFF = EFF;
   /* the afferent lymphatics: from outside, through the capsule, into the sinus */
-  o.AFFV = AFF.map((a) => cr([at(a + 7, -40), at(a + 2, -20), at(a, 5.5)], 6));
+  o.AFFV = AFF.map((a) => cr([at(a + 6, -30), at(a + 2, -15), at(a, 6.8)], 6));
   /* the lymph's way on from each afferent: along the sinus to the next trabecula, down beside it, across the medulla to
      the efferent */
-  o.SUB = AFF.map((a, k) => { const b = k < 2 ? a + 6 : a - 7, p = []; for (let i = 0; i <= 6; i++) p.push(at(a + (b - a) * i / 6, 7.4)); return p.map((q) => [f1(q[0]), f1(q[1])]); });
-  const tFor = AFF.map((a, k) => (k < 2 ? a + 6 : a - 7));
-  o.TRS = tFor.map((a) => { const th = a * RAD, q = nrm(th), tx = -q[1], ty = q[0], p = []; for (let i = 0; i <= 8; i++) { const d = 7.4 + (dPar(th) - 9) * i / 8, c = at(a, d), w = 2.8 - 1.6 * i / 8 + 1.3; p.push([f1(c[0] + tx * w), f1(c[1] + ty * w)]); } return p; });
-  o.MEDS = tFor.map((a) => { const e = at(a, (th) => dPar(th) + 2); return cr([e, [e[0] + (HIL[0] + 22 - e[0]) * 0.5, e[1] + (HIL[1] - e[1]) * 0.5 - 8], [HIL[0] + 22, HIL[1] + 4]], 6); });
-  o.MACP = cr([at(286, 7.4), at(292, 7.4), at(299, 7.4)], 4);
+  const tFor = [237, 307];
+  o.SUB = AFF.map((a, k) => { const b = tFor[k], p = []; for (let i = 0; i <= 6; i++) p.push(at(a + (b - a) * i / 6, 6.8)); return p.map(P1); });
+  o.SUB2 = AFF.map((a, k) => { const b = k ? 342 : 201, p = []; for (let i = 0; i <= 12; i++) p.push(at(a + (b - a) * i / 12, 6.8)); return p.map(P1); });
+  o.TRS = tFor.concat([201, 342]).map((a) => { const th = a * RAD, q = nrm(th), tx = -q[1], ty = q[0], p = []; for (let i = 0; i <= 8; i++) { const d = 6.8 + (dPar(th) - 8) * i / 8, c = at(a, d), w = 2.6 - 1.4 * i / 8 + 1.2; p.push(P1([c[0] + tx * w, c[1] + ty * w])); } return p; });
+  const HO = [HIL[0] + 10, HIL[1] - 12];
+  o.MEDS = tFor.concat([201, 342]).map((a) => { const e = at(a, (th) => dPar(th) + 2); return cr([e, [e[0] + (HO[0] - e[0]) * 0.5, e[1] + (HO[1] - e[1]) * 0.5 - 6], HO], 6); });
+  o.MACP = cr([at(AFF[1] + 6, 6.8), at(AFF[1] + 14, 6.8), at(MAC[2] - 1, 6.8)], 4);
   /* a dendritic cell carrying antigen from the sinus to the T cells */
-  o.DCP = cr([at(250, 8), at(252, 30), at(247, 54), at(240, (th) => (dCor(th) + dPar(th)) / 2 - 4)], 6);
-  /* a lymphocyte from the HEV: T cells stay in the paracortex, B cells go on to the follicles */
-  const hR = hevs[3], fc = fols.find((f) => f.k === "focus").c;
-  o.TP = cr([[hR[0], hR[1]], [hR[0] - 10, hR[1] - 12], [hR[0] - 20, hR[1] - 16]], 6);
-  o.BP = cr([[hR[0], hR[1]], [hR[0] + 6, hR[1] - 22], [fc[0] + 4, fc[1] + 16], [fc[0] - 2, fc[1] + 4]], 6);
-  o.TOUT = cr([[hR[0] - 20, hR[1] - 16], [hR[0] - 40, hR[1] + 4], [300, 244], [HIL[0] + 22, HIL[1] + 4]], 6).concat(EFF.slice(1));
-  const tb = at(345, 9);
-  o.BOUT = cr([[fc[0] - 2, fc[1] + 4], [fc[0] - 18, fc[1] - 4], [tb[0], tb[1]]], 6).concat(o.TRS[3].slice(0).reverse().slice(0, 0)).concat(cr([at(345, 12), at(345, 40), at(345, (th) => dPar(th) - 2), [300, 240], [HIL[0] + 22, HIL[1] + 4]], 6)).concat(EFF.slice(1));
-  o.AGF = cr([at(321, 7.4), at(327, 7.4), at(330, 12), [fc[0] + 2, fc[1] - 8]], 6);
+  o.DCP = cr([at(246, 7), at(247, 24), at(244, 44), at(240, dHev)], 6);
+  /* a lymphocyte from the HEV: T cells stay in the paracortex, B cells go on to a follicle */
+  const fB = fols.find((f) => f.a === 0).c;
+  o.TP = cr([hR, [hR[0] - 6, hR[1] - 12], [hR[0] - 4, hR[1] - 26]], 6);
+  o.BP = cr([hR, [hR[0] + 10, hR[1] - 12], [fB[0] - 2, fB[1] + 10], [fB[0] - 1, fB[1] + 1]], 6);
+  const t1 = o.TP[o.TP.length - 1];
+  o.TOUT = cr([t1, [t1[0] - 16, t1[1] + 10], [CX + 34, CY + 22], HO], 6).concat(EFF.slice(1));
+  o.BOUT = cr([[fB[0] - 1, fB[1] + 1], [fB[0] - 22, fB[1] - 4], [CX + 50, CY + 4], [CX + 26, CY + 30], HO], 6).concat(EFF.slice(1));
+  const fc = fols.find((f) => f.k === "focus").c;
+  o.AGF = cr([at(AFF[1] + 2, 6.8), at(AFF[1] + 10, 6.8), at(318, 10), [fc[0] - 4, fc[1] - 6]], 6);
   /* the fixed parts drawn over the tissue */
   let fg = mac;
-  fg += HOT(INFO.vein, lnTube(VEIN, "ln-vn") + '<ellipse class="ln-cutv" cx="256" cy="402" rx="5.4" ry="2.4"/>');
-  fg += HOT(INFO.art, lnTube(ART, "ln-ar") + lnTube(ARTR, "ln-ar ln-ar2") + lnTube(ARTL, "ln-ar ln-ar2") + '<ellipse class="ln-cuta" cx="232" cy="402" rx="4.4" ry="2"/>');
-  fg += HOT(INFO.eff, lnTube(EFF, "ln-ly") + lnValve(EFF, 46, 10) + lnValve(EFF, 96, 10) + '<ellipse class="ln-cutl" cx="289" cy="402" rx="5.8" ry="2.5"/>');
-  o.AFFV.forEach((p) => { fg += HOT(INFO.aff, lnTube(p, "ln-ly") + lnValve(p, 20, 10) + '<circle class="ln-cutl" cx="' + p[0][0] + '" cy="' + p[0][1] + '" r="5"/>'); });
+  fg += lnTube(VEIN, "ln-vn") + '<ellipse class="ln-cutv" cx="' + VX + '" cy="' + BOT + '" rx="5" ry="2.2"/>';
+  fg += HOT(INFO.art, lnTube(ART, "ln-ar") + lnTube(ARTR, "ln-ar ln-ar2") + lnTube(ARTL, "ln-ar ln-ar2") + '<ellipse class="ln-cuta" cx="' + AX + '" cy="' + BOT + '" rx="4.2" ry="1.9"/>');
+  fg += HOT(INFO.eff, lnTube(EFF, "ln-ly") + lnValve(EFF, 40, 9) + '<ellipse class="ln-cutl" cx="' + (EX + 1) + '" cy="' + BOT + '" rx="5.2" ry="2.3"/>');
+  o.AFFV.forEach((p) => { fg += HOT(INFO.aff, lnTube(p, "ln-ly") + lnValve(p, 16, 9) + '<circle class="ln-cutl" cx="' + p[0][0] + '" cy="' + p[0][1] + '" r="4.6"/>'); });
   o.FG = fg;
+  /* where the labels point */
+  const top = fols.find((f) => f.a === 255), tg = [top.c[0] + top.dir[0] * top.r * 0.16, top.c[1] + top.dir[1] * top.r * 0.16];
+  o.LB = {
+    aff: P1(lnAtB(o.AFFV[0], 0.3)), trab: P1(at(201, 16)), cor: P1([fols.find((f) => f.a === 184).c[0] - 6, fols.find((f) => f.a === 184).c[1] + 4]), par: P1(at(153, (th) => dPar(th) - 7)),
+    hil: P1(at(108, 2.2)), art: [AX - 3.6, 244], cap: P1(at(321, 2.2)), sin: P1(at(336.5, 6.8)),
+    pri: P1([fB[0] + 14, fB[1] - 8]), hev: P1([hR[0] + 6, hR[1]]), med: [CX + 34, CY + 32], eff: [EX + 4.4, 244],
+    gc: P1([tg[0] - 3, tg[1] + 2]), sec: P1((() => { const f = fols.find((q) => q.a === 219); return [f.c[0] - f.r * 0.62, f.c[1] - f.r * 0.5]; })()), man: P1([top.c[0] + 10, top.c[1] - 13]), foc: P1([fc[0] + 14, fc[1] - 10]),
+  };
   return o;
 }
+function lnAtB(p, u) { const q = lnAt(p, u * lnLen(p)); return [q[0], q[1]]; }
 
 /* ---------- the insets ---------- */
+const IY0 = 300, IY1 = 486, GX0 = 4, GX1 = 226, HX0 = 234, HX1 = 456;
 function gcInset() {
-  const R = rng(7), X0 = 10, Y0 = 438, X1 = 250, Y1 = 612;
+  const R = rng(7), X0 = GX0, Y0 = IY0, X1 = GX1, Y1 = IY1, MB = Y0 + 26, FB = Y1 - 40;
+  const FDC = [86, 394], keepB = [X0 + 4, MB + 4, X0 + 64, MB + 22], keepIC = [X1 - 112, MB + 4, X1 - 4, MB + 40];
   let o = '<rect class="ln-ibg ln-igc" x="' + X0 + '" y="' + Y0 + '" width="' + (X1 - X0) + '" height="' + (Y1 - Y0) + '" rx="10"/>';
   /* the mantle along the top: small lymphocytes, tightly packed */
   let man = "", mn = "";
-  for (let y = Y0 + 7; y < Y0 + 30; y += 6.4) for (let x = X0 + 8 + ((y / 6.4) % 2) * 3.2; x < X1 - 6; x += 6.6) { const jx = x + (R() - 0.5) * 1.6, jy = y + (R() - 0.5) * 1.6; man += "M" + f1(jx) + " " + f1(jy) + "h0"; mn += "M" + f1(jx + 0.3) + " " + f1(jy) + "h0"; }
-  o += HOT(INFO.mantle, '<rect class="ln-imant" x="' + X0 + '" y="' + Y0 + '" width="' + (X1 - X0) + '" height="30" rx="10"/><path class="ln-ims" d="' + man + '"/><path class="ln-imn" d="' + mn + '"/>');
+  for (let y = Y0 + 6; y < MB - 2; y += 6.2) for (let x = X0 + 7 + ((y / 6.2) % 2) * 3.1; x < X1 - 5; x += 6.4) { const jx = x + (R() - 0.5) * 1.4, jy = y + (R() - 0.5) * 1.4; man += "M" + f1(jx) + " " + f1(jy) + "h0"; mn += "M" + f1(jx + 0.3) + " " + f1(jy) + "h0"; }
+  o += HOT(INFO.mantle, '<path class="ln-imant" d="M' + X0 + " " + MB + "V" + (Y0 + 10) + "Q" + X0 + " " + Y0 + " " + (X0 + 10) + " " + Y0 + "H" + (X1 - 10) + "Q" + X1 + " " + Y0 + " " + X1 + " " + (Y0 + 10) + "V" + MB + 'Z"/><path class="ln-ims" d="' + man + '"/><path class="ln-imn" d="' + mn + '"/>');
   /* the germinal center's B cells: small and large lymphocytes and lymphoblasts */
-  const FDC = [118, 530], cells = [];
-  for (let k = 0; k < 400 && cells.length < 34; k++) {
-    const big = R() < 0.3, r = big ? 9.5 : 7, x = X0 + 10 + R() * (X1 - X0 - 20), y = Y0 + 40 + R() * (Y1 - Y0 - 50);
-    if (Math.hypot(x - FDC[0], y - FDC[1]) < 20 + r) continue; if (cells.some((c) => Math.hypot(c[0] - x, c[1] - y) < c[2] + r + 2.5)) continue;
-    if (x < X0 + 4 + r || x > X1 - 4 - r || y > Y1 - 4 - r) continue; cells.push([x, y, r, big]);
+  const cells = [];
+  for (let k = 0; k < 900 && cells.length < 30; k++) {
+    const big = R() < 0.3, r = big ? 9 : 6.6, x = X0 + 8 + R() * (X1 - X0 - 16), y = MB + 6 + R() * (FB - MB - 8);
+    if (Math.hypot(x - FDC[0], y - FDC[1]) < 18 + r) continue; if (cells.some((c) => Math.hypot(c[0] - x, c[1] - y) < c[2] + r + 2.5)) continue;
+    if (inBox([x, y], keepB, r + 1) || inBox([x, y], keepIC, r + 1)) continue;
+    if (x < X0 + 4 + r || x > X1 - 4 - r || y > FB - 2 - r || y < MB + 3 + r) continue; cells.push([x, y, r, big]);
   }
   let bc = "";
-  cells.forEach((c) => { bc += '<circle class="ln-ibc" cx="' + f1(c[0]) + '" cy="' + f1(c[1]) + '" r="' + c[2] + '"/><circle class="' + (c[3] ? "ln-ibn2" : "ln-ibn") + '" cx="' + f1(c[0] + 0.6) + '" cy="' + f1(c[1] - 0.4) + '" r="' + (c[3] ? 6 : 4.6) + '"/>' + (c[3] ? '<circle class="ln-inuc" cx="' + f1(c[0] + 1.6) + '" cy="' + f1(c[1] - 1.4) + '" r="1.3"/>' : ""); });
+  cells.forEach((c) => { bc += '<circle class="ln-ibc" cx="' + f1(c[0]) + '" cy="' + f1(c[1]) + '" r="' + c[2] + '"/><circle class="' + (c[3] ? "ln-ibn2" : "ln-ibn") + '" cx="' + f1(c[0] + 0.6) + '" cy="' + f1(c[1] - 0.4) + '" r="' + (c[3] ? 5.6 : 4.3) + '"/>' + (c[3] ? '<circle class="ln-inuc" cx="' + f1(c[0] + 1.6) + '" cy="' + f1(c[1] - 1.4) + '" r="1.2"/>' : ""); });
   o += HOT(INFO.gcB, bc);
   /* the follicular dendritic cell: thin hair-like processes between the B cells, immune complexes stuck along them */
-  const procs = [[-0.2, 62], [0.6, 56], [1.5, 46], [2.3, 64], [3.1, 70], [3.9, 52], [4.7, 44], [5.5, 58]];
-  let pr = "", ic = "";
+  const procs = [[-0.4, 58], [0.4, 70], [1.2, 40], [2.0, 50], [2.8, 64], [3.6, 46], [4.4, 36], [5.2, 50]];
+  let pr = "", ic = "", icPts = [];
+  const okP = (z) => z[0] > X0 + 4 && z[0] < X1 - 4 && z[1] > MB + 3 && z[1] < FB - 2 && !inBox(z, keepB, 2) && !inBox(z, keepIC, 2);
   procs.forEach((p, j) => {
     const a0 = p[0], len = p[1], pts = [];
-    for (let i = 0; i <= 8; i++) { const u = i / 8, a = a0 + Math.sin(u * 3 + j) * 0.28; pts.push([FDC[0] + Math.cos(a) * (9 + len * u), FDC[1] + Math.sin(a) * (9 + len * u) * 0.86]); }
-    const q = cr(pts, 3).filter((z) => z[0] > X0 + 3 && z[0] < X1 - 3 && z[1] > Y0 + 33 && z[1] < Y1 - 3);
+    for (let i = 0; i <= 8; i++) { const u = i / 8, a = a0 + Math.sin(u * 3 + j) * 0.26; pts.push([FDC[0] + Math.cos(a) * (9 + len * u), FDC[1] + Math.sin(a) * (9 + len * u) * 0.8]); }
+    const all = cr(pts, 3), q = []; for (const z of all) { if (!okP(z)) break; q.push(z); }
+    if (q.length < 3) return;
     pr += lnD(q);
-    const b = q[Math.floor(q.length * 0.55)], br = [b[0] + Math.cos(a0 + 0.9) * 14, b[1] + Math.sin(a0 + 0.9) * 12];
-    if (br[0] > X0 + 4 && br[0] < X1 - 4 && br[1] > Y0 + 33 && br[1] < Y1 - 4) pr += "M" + f1(b[0]) + " " + f1(b[1]) + "Q" + f1((b[0] + br[0]) / 2 + 3) + " " + f1((b[1] + br[1]) / 2) + " " + f1(br[0]) + " " + f1(br[1]);
-    [0.4, 0.8].forEach((f) => { const z = q[Math.min(q.length - 1, Math.floor(q.length * f))]; if (!z) return; const a = Math.atan2(z[1] - FDC[1], z[0] - FDC[0]) + Math.PI / 2;
+    const b = q[Math.floor(q.length * 0.55)], br = [b[0] + Math.cos(a0 + 0.9) * 12, b[1] + Math.sin(a0 + 0.9) * 10];
+    if (okP(br)) pr += "M" + f1(b[0]) + " " + f1(b[1]) + "Q" + f1((b[0] + br[0]) / 2 + 3) + " " + f1((b[1] + br[1]) / 2) + " " + f1(br[0]) + " " + f1(br[1]);
+    [0.45, 0.85].forEach((f) => { const z = q[Math.min(q.length - 1, Math.floor(q.length * f))]; const a = Math.atan2(z[1] - FDC[1], z[0] - FDC[0]) + Math.PI / 2;
+      icPts.push([z[0] + Math.cos(a - Math.PI / 2) * 0, z[1], a]);
       ic += '<g transform="translate(' + f1(z[0]) + " " + f1(z[1]) + ") rotate(" + f1(a * 57.3) + ')"><path class="ln-iy" d="M0 0V-3.4M0 -3.4L-2.6 -6.2M0 -3.4L2.6 -6.2"/><path class="ln-iag" d="M-2.6 -6.4L0 -9.6L2.6 -6.4Z"/></g>'; });
   });
-  o += HOT(INFO.fdc, '<path class="ln-fdcp" d="' + pr + '"/><ellipse class="ln-fdcb" cx="' + FDC[0] + '" cy="' + FDC[1] + '" rx="11" ry="9"/><ellipse class="ln-fdcn" cx="' + (FDC[0] + 1) + '" cy="' + FDC[1] + '" rx="6.4" ry="4.4"/>');
+  o += HOT(INFO.fdc, '<path class="ln-fdcp" d="' + pr + '"/><ellipse class="ln-fdcb" cx="' + FDC[0] + '" cy="' + FDC[1] + '" rx="11" ry="9"/><ellipse class="ln-fdcn" cx="' + (FDC[0] + 1) + '" cy="' + FDC[1] + '" rx="6.2" ry="4.2"/>');
   o += HOT(INFO.ic, ic);
-  return { svg: o, FDC };
+  /* the label for the complexes points at the one nearest its box */
+  let best = null, bd = 1e9;
+  icPts.forEach((z) => { const d = Math.hypot(z[0] - (keepIC[0] + 20), z[1] - keepIC[3]); if (d < bd) { bd = d; best = z; } });
+  const tip = [best[0] + Math.sin(best[2]) * 8, best[1] - Math.cos(best[2]) * 8];
+  const bcell = cells.reduce((m, c) => (Math.hypot(c[0] - keepB[2], c[1] - keepB[3]) < Math.hypot(m[0] - keepB[2], m[1] - keepB[3]) ? c : m));
+  return { svg: o, FDC, ICL: P1(tip), BC: [f1(bcell[0]), f1(bcell[1])], MB, FB, keepB, keepIC };
 }
 function hevInset() {
-  const R = rng(23), X0 = 270, Y0 = 438, X1 = 510, Y1 = 612, C = [392, 528], RI = 20, RO = 40;
+  const R = rng(23), X0 = HX0, Y0 = IY0, X1 = HX1, Y1 = IY1, FB = Y1 - 26, C = [312, 392], RI = 17, RO = 35, GAP = -0.62;
+  const keepH = [X0 + 4, Y0 + 4, X0 + 46, Y0 + 24], keepX = [X1 - 92, Y0 + 4, X1 - 4, Y0 + 40];
   let o = '<rect class="ln-ibg ln-ihev" x="' + X0 + '" y="' + Y0 + '" width="' + (X1 - X0) + '" height="' + (Y1 - Y0) + '" rx="10"/>';
   /* T cells of the paracortex around it */
-  let tc = "", tn = "";
-  for (let k = 0, n = 0; k < 900 && n < 58; k++) {
-    const x = X0 + 9 + R() * (X1 - X0 - 18), y = Y0 + 9 + R() * (Y1 - Y0 - 18);
-    if (Math.hypot(x - C[0], y - C[1]) < RO + 9) continue; if (y < Y0 + 22 && x < X0 + 130) continue;
-    tc += "M" + f1(x) + " " + f1(y) + "h0"; tn += "M" + f1(x + 0.4) + " " + f1(y - 0.3) + "h0"; n++;
+  let tc = "", tn = "", pts = [];
+  for (let k = 0, n = 0; k < 3000 && n < 60; k++) {
+    const x = X0 + 8 + R() * (X1 - X0 - 16), y = Y0 + 8 + R() * (FB - Y0 - 12);
+    if (Math.hypot(x - C[0], y - C[1]) < RO + 8) continue; if (inBox([x, y], keepH, 5) || inBox([x, y], keepX, 5)) continue;
+    if (pts.some((q) => Math.hypot(q[0] - x, q[1] - y) < 10.5)) continue;
+    pts.push([x, y]); tc += "M" + f1(x) + " " + f1(y) + "h0"; tn += "M" + f1(x + 0.4) + " " + f1(y - 0.3) + "h0"; n++;
   }
   o += HOT(INFO.hevT, '<path class="ln-its" d="' + tc + '"/><path class="ln-itn" d="' + tn + '"/>');
-  /* the venule: a ring of plump endothelial cells around the lumen, one gap where the lymphocyte crosses */
-  const GAP = -0.72, n = 10;
+  /* the venule: a ring of tall endothelial cells around the lumen, one gap where the lymphocyte crosses */
+  const n = 10;
   let cells = "";
   for (let k = 0; k < n; k++) {
     const a0 = GAP + 0.17 + k * (2 * Math.PI - 0.34) / n, a1 = a0 + (2 * Math.PI - 0.34) / n - 0.06, am = (a0 + a1) / 2;
     const p = (a, r) => f1(C[0] + Math.cos(a) * r) + " " + f1(C[1] + Math.sin(a) * r);
-    cells += '<path class="ln-iendo" d="M' + p(a0, RI) + "A" + RI + " " + RI + " 0 0 1 " + p(a1, RI) + "L" + p(a1 + 0.03, RO) + "A" + RO + " " + RO + " 0 0 0 " + p(a0 - 0.03, RO) + 'Z"/><ellipse class="ln-iendn" cx="' + f1(C[0] + Math.cos(am) * 30) + '" cy="' + f1(C[1] + Math.sin(am) * 30) + '" rx="5.4" ry="4.4" transform="rotate(' + f1(am * 57.3) + " " + f1(C[0] + Math.cos(am) * 30) + " " + f1(C[1] + Math.sin(am) * 30) + ')"/>';
+    cells += '<path class="ln-iendo" d="M' + p(a0, RI) + "A" + RI + " " + RI + " 0 0 1 " + p(a1, RI) + "L" + p(a1 + 0.03, RO) + "A" + RO + " " + RO + " 0 0 0 " + p(a0 - 0.03, RO) + 'Z"/><ellipse class="ln-iendn" cx="' + f1(C[0] + Math.cos(am) * 26) + '" cy="' + f1(C[1] + Math.sin(am) * 26) + '" rx="5" ry="4" transform="rotate(' + f1(am * 57.3) + " " + f1(C[0] + Math.cos(am) * 26) + " " + f1(C[1] + Math.sin(am) * 26) + ')"/>';
   }
   o += HOT(INFO.hevI, '<circle class="ln-ibm" cx="' + C[0] + '" cy="' + C[1] + '" r="' + (RO + 1.5) + '"/><circle class="ln-ilum" cx="' + C[0] + '" cy="' + C[1] + '" r="' + RI + '"/>' + cells +
-    '<ellipse class="ln-irbc" cx="' + (C[0] - 7) + '" cy="' + (C[1] + 6) + '" rx="6.4" ry="4.6"/><ellipse class="ln-irbc2" cx="' + (C[0] - 7) + '" cy="' + (C[1] + 6) + '" rx="2.6" ry="1.6"/>');
-  return { svg: o, C, RI, RO, GAP };
+    '<ellipse class="ln-irbc" cx="' + (C[0] - 6) + '" cy="' + (C[1] + 5) + '" rx="6" ry="4.3"/><ellipse class="ln-irbc2" cx="' + (C[0] - 6) + '" cy="' + (C[1] + 5) + '" rx="2.4" ry="1.5"/>');
+  const tcell = pts.reduce((m, q) => (Math.abs(q[1] - (FB - 10)) + Math.abs(q[0] - (X0 + 70)) < Math.abs(m[1] - (FB - 10)) + Math.abs(m[0] - (X0 + 70)) ? q : m));
+  return { svg: o, C, RI, RO, GAP, TC: P1(tcell), FB };
 }
 /* the crossing lymphocyte in the HEV inset: u 0 in the lumen, 1 out among the T cells; it narrows in the wall */
 function lnCross(I, u) {
-  var r = 6 + u * 52, sq = u > 0.18 && u < 0.62 ? Math.sin((u - 0.18) / 0.44 * Math.PI) : 0, x = I.C[0] + Math.cos(I.GAP) * r, y = I.C[1] + Math.sin(I.GAP) * r;
-  var rx = 6.4 + sq * 3.2, ry = 6.4 - sq * 3.4, rot = I.GAP * 57.3;
+  var r = 5 + u * 50, sq = u > 0.16 && u < 0.6 ? Math.sin((u - 0.16) / 0.44 * Math.PI) : 0, x = I.C[0] + Math.cos(I.GAP) * r, y = I.C[1] + Math.sin(I.GAP) * r;
+  var rx = 6.2 + sq * 3, ry = 6.2 - sq * 3.2, rot = I.GAP * 57.3;
   return '<g transform="translate(' + f1(x) + " " + f1(y) + ") rotate(" + f1(rot) + ')"><ellipse class="ln-ixl" rx="' + f1(rx) + '" ry="' + f1(ry) + '"/><ellipse class="ln-ixn" cx="0.5" rx="' + f1(rx * 0.7) + '" ry="' + f1(ry * 0.72) + '"/></g>';
 }
 
 /* ---------- the steps ---------- */
 const STEPS = [
-  { ch: 0, ro: "zones · B cortex · T paracortex",
-    say: "A lymph node cut in half. A dense fibrous capsule sends trabeculae inward. The outer cortex holds the lymphoid follicles of B cells (blue), the paracortex, or deep cortex, holds the T cells (gold), and the medulla is the inner part, opening at the hilum. Lymph comes in through afferent lymphatics and leaves through the efferent lymphatic at the hilum, where the artery comes in. Pick a story to follow." },
+  { ch: 0, ro: "B: cortex · T: paracortex",
+    say: "A lymph node cut in half. A dense fibrous capsule sends trabeculae inward. The outer cortex holds the follicles of B cells (blue), the paracortex, or deep cortex, holds the T cells (gold), and the medulla is the inner part, opening at the hilum. Lymph comes in through afferent lymphatics and leaves through the efferent lymphatic at the hilum, where the artery comes in. Pick a story to follow." },
   { ch: 1, ro: "lymph 1/3 · afferent → sinuses",
     say: "Antigen in the lymph, 1 of 3: afferent lymphatic vessels bring lymph from the surrounding tissues and neighboring nodes through the capsule into a network of lymphatic sinuses. The antigen comes in soluble form or carried by dendritic cells." },
   { ch: 1, ro: "lymph 2/3 · filtered in the sinuses",
@@ -300,29 +332,28 @@ const STEPS = [
   { ch: 4, ro: "blood 1/3 · artery at the hilum",
     say: "A lymphocyte from the blood, 1 of 3: blood comes in through an artery at the hilum, and its branches carry the blood's lymphocytes up through the medulla to the deep cortex." },
   { ch: 4, ro: "blood 2/3 · across the HEV",
-    say: "2 of 3: the lymphocytes cross into the deep cortex through the high endothelial venules (HEVs) of the paracortex. T cells and dendritic cells are directed to the paracortex; B cells go on to the cortex and its follicles." },
+    say: "2 of 3: the lymphocytes cross into the deep cortex through the high endothelial venules (HEVs) of the paracortex (magnified at the right). T cells and dendritic cells are directed to the paracortex; B cells go on to the cortex and its follicles." },
   { ch: 4, ro: "blood 3/3 · out the efferent",
     say: "3 of 3: both leave the node through the efferent lymphatic vessel. That is how a node recirculates lymphocytes, one of its four jobs, with filtering lymph, adding lymphocytes to it and making antibodies, mostly IgG." },
   { ch: 7, ro: "primary follicle",
-    say: "A primary, unstimulated follicle is a spherical aggregate of B cells in a meshwork of reticular fibers. Antigen arrives in the lymph, and its B cells interact with the antigen and with T cells." },
+    say: "A primary, unstimulated follicle (ringed) is a spherical aggregate of B cells in a meshwork of reticular fibers. Antigen arrives in the lymph, and its B cells interact with the antigen and with T cells." },
   { ch: 7, ro: "secondary follicle · germinal center",
-    say: "After antigenic stimulation it becomes a secondary, stimulated follicle: a germinal center, the major site of B cell proliferation (small and large lymphocytes, lymphoblasts and follicular dendritic cells), inside a mantle zone of small lymphocytes. Plasma cells release antibody into the lymph. This is the tender, swollen node under the jaw after a tooth infection." },
+    say: "After antigenic stimulation it becomes a secondary, stimulated follicle: a germinal center, the major site of B cell proliferation (small and large lymphocytes, lymphoblasts and follicular dendritic cells, magnified at the left), inside a mantle zone of small lymphocytes. Plasma cells release antibody into the lymph. This is the tender, swollen node under the jaw after a tooth infection." },
 ];
 const INFO = {
   capsule: "Capsule: dense fibrous connective tissue around the node. It sends trabeculae of collagen inward, which support the node and carry its blood vessels. Lymph nodes are small, bean-shaped and encapsulated, up to about 20 mm across; there are 500 to 600 of them, in places such as the neck, groin and axillae.",
   trab: "Trabecula: collagen from the capsule. Trabeculae support the node and carry its blood vessels; the lymph runs in the sinuses beside them.",
   sinus: "Lymphatic sinuses: the afferent lymph pours into this network. The sinus walls let the lymph percolate into the cortex and deep cortex, and macrophages reach into the sinuses to phagocytose antigens and foreign material: that is how the node filters lymph.",
   cortex: "Cortex, just under the capsule: lymphoid nodules, or follicles, of B cells from the bone marrow, in a stroma of reticular fibers.",
-  pri: "Primary, unstimulated follicle: a spherical aggregate of B cells in a meshwork of reticular fibers.",
+  pri: "Primary, unstimulated follicle: a spherical aggregate of B cells in a meshwork of reticular fibers. No germinal center yet.",
   sec: "Secondary, stimulated follicle, after antigenic stimulation: a pale germinal center, the major site of B cell proliferation, surrounded by a darker mantle zone of small lymphocytes.",
   para: "Paracortex (deep cortex): the T cell zone. Antigen-dependent T cell differentiation and proliferation happen here, and its high endothelial venules let lymphocytes in from the blood.",
   medulla: "Medulla: the inner part of the node. Its sinuses gather the lymph toward the hilum, where it leaves in the efferent lymphatic.",
   hev: "High endothelial venule (HEV), in the paracortex: lymphocytes from the blood cross its wall into the deep cortex. T cells and dendritic cells stay in the paracortex; B cells go on to the cortex. An HEV means the lymph node paracortex.",
   mac: "Macrophage reaching into a sinus: it phagocytoses antigens and foreign material, and it also presents antigen. There are fewer macrophages than dendritic cells.",
-  aff: "Afferent lymphatic vessel: it brings lymph from the surrounding tissues and neighboring nodes through the capsule into the sinuses. Like veins, lymphatic vessels have valves and thin walls.",
+  aff: "Afferent lymphatic vessel: it brings lymph from the surrounding tissues and neighboring nodes through the capsule into the sinuses. Its valves keep the lymph moving one way.",
   eff: "Efferent lymphatic vessel, at the hilum: lymph, B and T cells, and antibody from the plasma cells leave the node here. The lymph node is the only lymphoid structure with both afferent and efferent lymphatics.",
   art: "Artery at the hilum: blood comes in here, and its branches carry the blood's lymphocytes up to the high endothelial venules of the deep cortex.",
-  vein: "Blood leaves the node at the hilum.",
   dc: "Dendritic cell: an antigen-presenting cell. It watches for foreign particles, carries antigen in with the lymph and presents it to the T cells of the paracortex.",
   mantle: "Mantle zone: small lymphocytes, packed around the germinal center.",
   gcB: "B cells of the germinal center: small and large lymphocytes and lymphoblasts. This is the major site of B cell proliferation, where B cells proliferate and differentiate after meeting antigen and T cells.",
@@ -334,68 +365,75 @@ const INFO = {
 
 /* ---------- live drawing ---------- */
 function lnRender(st, D) {
-  var t = st.t || 0, s = st.s, o = "", i, k;
+  var t = st.t || 0, s = st.s, o = "", i, LB = D.LB;
   st.ch = D.STEPS[s].ch;
   if (st._s !== s) { st._s = s; st._t0 = t; }
   var age = t ? t - st._t0 : 1e9;
   /* the follicle that changes: primary until step 8, then it grows a germinal center */
   var g = s === 8 ? (t ? lnEase(age / 1800) : 1) : 0, F = D.FOCUS;
-  var fr = F.r + 3 * g;
-  o += D.BG + HOT(g > 0.5 ? D.INFO.sec : D.INFO.pri, lnFol(F.c, fr, g, D.FD, F.dir, s >= 7)) + D.FG;
+  o += D.BG + HOT(g > 0.5 ? D.INFO.sec : D.INFO.pri, lnFol(F.c, F.r + 2 * g, g, D.FD, F.dir, s >= 7)) + D.FG;
   /* what this step lights up, and what moves */
   var lit = [], f = "";
   if (s === 0) { D.AFFV.forEach(function (p, j) { f += lnFlow(p, 2, 5200, t, "ly", j / 4); }); f += lnFlow(D.EFF, 3, 5200, t, "ly", 0.2); }
-  if (s === 1) { lit = D.AFFV.concat(D.SUB); D.AFFV.forEach(function (p, j) { f += lnFlow(p.concat(D.SUB[j].slice(1)), 4, 3600, t, "ag", j / 7, true); }); }
+  if (s === 1) { lit = D.AFFV.concat(D.SUB2); D.AFFV.forEach(function (p, j) { f += lnFlow(p.concat(D.SUB2[j].slice(1)), 5, 4200, t, "ag", j / 7, true); }); }
   if (s === 2) {
     lit = D.TRS.concat([D.MACP, D.DCP]);
-    D.TRS.forEach(function (p, j) { if (j !== 2) f += lnFlow(p, 4, 4200, t, "ag", j / 5, true); });
+    D.TRS.forEach(function (p, j) { f += lnFlow(p, 3, 4200, t, "ag", j / 5, true); });
     f += lnFlow(D.MACP, 3, 2600, t, "ag", 0, true);
     var dcq = lnAt(D.DCP, (t ? (t / 5200) % 1 : 0.7) * lnLen(D.DCP));
-    f += HOT(D.INFO.dc, '<g transform="translate(' + f1(dcq[0]) + " " + f1(dcq[1]) + ')"><path class="ln-dcp" d="M0 0L8 -3M0 0L5 6M0 0L-6 5M0 0L-7 -4M0 0L1 -8"/><circle class="ln-dcb" r="3.4"/><path class="ln-ag" d="M6 -6.6L8.6 -2.2L3.4 -2.2Z"/></g>');
+    f += HOT(D.INFO.dc, '<g transform="translate(' + f1(dcq[0]) + " " + f1(dcq[1]) + ')"><path class="ln-dcp" d="M0 0L8 -3M0 0L5 6M0 0L-6 5M0 0L-7 -4M0 0L1 -8"/><circle class="ln-dcb" r="3.6"/><path class="ln-ag" d="M6 -6.8L9 -1.8L3 -1.8Z"/></g>');
   }
   if (s === 3) { lit = D.MEDS.concat([D.EFF]); D.MEDS.forEach(function (p, j) { f += lnFlow(p.concat(D.EFF.slice(1)), 4, 4600, t, j % 2 ? "ag" : "ly", j / 6); }); }
   if (s === 4) { lit = [D.ART, D.ARTR, D.ARTL]; f += lnFlow(D.ART.concat(D.ARTR.slice(1)), 6, 3000, t, "rbc", 0) + lnFlow(D.ART.concat(D.ARTL.slice(1)), 4, 3000, t, "rbc", 0.1);
-    f += lnTrip(D.ART.concat(D.ARTR.slice(1)), t, 3000, "B", 0.75, 0) + lnTrip(D.ART.concat(D.ARTR.slice(1)), t, 3000, "T", 0.55, 900); }
-  if (s === 5) { lit = [D.TP, D.BP]; f += lnTrip(D.TP, t, 3600, "T", 0.8, 0) + lnTrip(D.BP, t, 3600, "B", 0.8, 300); }
-  if (s === 6) { lit = [D.TOUT, D.BOUT]; f += lnTrip(D.TOUT, t, 5200, "T", 0.55, 0) + lnTrip(D.BOUT, t, 5200, "B", 0.4, 700); }
-  if (s === 7) { lit = [D.AGF]; f += lnFlow(D.AGF, 3, 3600, t, "ag", 0, true); var tq = D.TP[D.TP.length - 1]; f += lnMark("T", F.c[0] - 4, F.c[1] + F.r + 6, 0, 1); }
+    f += lnTrip(D.ART.concat(D.ARTR.slice(1)), t, 3000, "B", 0.8, 0) + lnTrip(D.ART.concat(D.ARTR.slice(1)), t, 3000, "T", 0.55, 900); }
+  if (s === 5) { lit = [D.TP, D.BP]; f += lnTrip(D.TP, t, 3600, "T", 1, 0) + lnTrip(D.BP, t, 3600, "B", 1, 300); }
+  if (s === 6) { lit = [D.TOUT, D.BOUT]; f += lnTrip(D.TOUT, t, 5200, "T", 0.62, 0) + lnTrip(D.BOUT, t, 5200, "B", 0.45, 700); }
+  if (s === 7) { lit = [D.AGF]; f += lnFlow(D.AGF, 3, 3600, t, "ag", 0, true); }
   if (s === 8) { lit = D.MEDS.concat([D.EFF]); D.MEDS.forEach(function (p, j) { f += lnFlow(p.concat(D.EFF.slice(1)), 3, 4800, t, "ab", j / 5); }); }
   for (i = 0; i < lit.length; i++) o += '<path class="ln-lit" d="' + lnD(lit[i]) + '"/>';
   o += f;
-  /* ---------- labels ---------- */
+  /* ---------- labels: left column right-aligned at x 88, right column from x 372 ---------- */
   function on(a) { return a.indexOf(s) >= 0 ? " ln-on" : ""; }
-  o += L(108, 34, "afferent lymphatics", D.AFFV[1][3][0], D.AFFV[1][3][1], "end", "ln-xs b" + on([1]));
-  o += L(408, 34, "capsule", 414, 112, "start", "ln-xs b" + on([0]));
-  o += L(408, 62, "sinus", 401, 116, "start", "ln-xs b" + on([1, 2]));
-  o += L(38, 112, "trabecula", 106, 132, "start", "ln-xs b");
-  o += L(196, 26, "germinal center", D.FOLS[3].c[0] - 2, D.FOLS[3].c[1] + 4, "end", "ln-xs b" + on([8]));
-  o += L(298, 26, "mantle zone", D.FOLS[3].c[0] + 12, D.FOLS[3].c[1] - 14, "start", "ln-xs b" + on([8]));
-  o += T(270, 52, "secondary follicle", "ln-xs mut", "start");
-  o += L(468, 150, "primary", F.c[0] + 16, F.c[1] - 10, "start", "ln-xs b" + on([7])) + T(468, 164, "follicle", "ln-xs b" + on([7]), "start");
-  o += L(8, 196, "cortex", D.FOLS[1].c[0] - 6, D.FOLS[1].c[1] + 22, "start", "ln-xs ln-bt") + T(8, 210, "B cells", "ln-xs ln-bt", "start");
-  o += L(8, 252, "paracortex", 128, 236, "start", "ln-xs ln-tt") + T(8, 266, "T cells", "ln-xs ln-tt", "start");
-  o += L(470, 236, "HEV", D.HEVS[3][0] + 6, D.HEVS[3][1] + 2, "start", "ln-xs b" + on([4, 5]));
-  o += L(470, 284, "medulla", 330, 246, "start", "ln-xs b");
-  o += L(160, 322, "hilum", 236, 284, "end", "ln-xs b");
-  o += L(214, 380, "artery", 230, 372, "end", "ln-xs b" + on([4]));
-  o += L(306, 360, "efferent", 291, 352, "start", "ln-xs b" + on([3, 6])) + T(306, 374, "lymphatic", "ln-xs b" + on([3, 6]), "start");
-  /* legend */
-  o += '<rect class="ln-swB" x="358" y="392" width="10" height="10" rx="2"/>' + T(372, 401, "B cells", "ln-xs", "start") + '<rect class="ln-swT" x="430" y="392" width="10" height="10" rx="2"/>' + T(444, 401, "T cells", "ln-xs", "start");
-  o += '<g transform="translate(14 396)"><path class="ln-ag" d="M0 -3.2L2.8 1.6L-2.8 1.6Z"/></g>' + T(24, 401, "antigen", "ln-xs", "start") + '<path class="ln-lw" d="M84 397H104"/><path class="ln-ll" d="M84 397H104"/>' + T(108, 401, "lymph", "ln-xs", "start");
+  o += L(88, 26, "afferent", LB.aff[0], LB.aff[1], "end", "ln-l b" + on([1])) + T(88, 42, "lymphatic", "ln-l b" + on([1]), "end");
+  o += L(88, 72, "secondary", LB.sec[0], LB.sec[1], "end", "ln-l b") + T(88, 88, "follicle", "ln-l b", "end");
+  o += L(88, 118, "trabecula", LB.trab[0], LB.trab[1], "end", "ln-l b");
+  o += L(88, 150, "cortex", LB.cor[0], LB.cor[1], "end", "ln-l ln-bt") + T(88, 166, "B cells", "ln-l ln-bt", "end");
+  o += L(88, 196, "paracortex", LB.par[0], LB.par[1], "end", "ln-l ln-tt") + T(88, 212, "T cells", "ln-l ln-tt", "end");
+  o += L(130, 240, "hilum", LB.hil[0], LB.hil[1], "end", "ln-l b");
+  o += L(190, 258, "artery", LB.art[0], LB.art[1], "end", "ln-l b" + on([4]));
+  o += L(212, 20, "germinal center", LB.gc[0], LB.gc[1], "end", "ln-l b");
+  o += L(266, 20, "mantle zone", LB.man[0], LB.man[1], "start", "ln-l b");
+  o += L(372, 40, "capsule", LB.cap[0], LB.cap[1], "start", "ln-l b");
+  o += L(372, 64, "sinus", LB.sin[0], LB.sin[1], "start", "ln-l b" + on([1, 2]));
+  if (s >= 7) o += L(372, 96, s === 8 ? "secondary" : "primary", LB.foc[0], LB.foc[1], "start", "ln-l ln-on") + T(372, 112, "follicle", "ln-l ln-on", "start");
+  else o += L(372, 132, "primary", LB.pri[0], LB.pri[1], "start", "ln-l b") + T(372, 148, "follicle", "ln-l b", "start");
+  o += L(372, 184, "HEV", LB.hev[0], LB.hev[1], "start", "ln-l b" + on([4, 5]));
+  o += L(372, 214, "medulla", LB.med[0], LB.med[1], "start", "ln-l b");
+  o += L(270, 246, "efferent", LB.eff[0], LB.eff[1], "start", "ln-l b" + on([3, 6])) + T(270, 262, "lymphatic", "ln-l b" + on([3, 6]), "start");
   /* ---------- the insets ---------- */
   var gcOn = s === 8, hevOn = s === 4 || s === 5;
-  o += '<path class="ln-zoom" d="M' + D.FOLS[0].c[0] + " " + f1(D.FOLS[0].c[1] + D.FOLS[0].r + 2) + "L60 438" + '"/><circle class="ln-zr" cx="' + D.FOLS[0].c[0] + '" cy="' + D.FOLS[0].c[1] + '" r="' + (D.FOLS[0].r + 2) + '"/>';
-  o += '<path class="ln-zoom" d="M' + D.HEVS[3][0] + " " + f1(D.HEVS[3][1] + 9) + "L470 438" + '"/><circle class="ln-zr" cx="' + D.HEVS[3][0] + '" cy="' + D.HEVS[3][1] + '" r="9"/>';
-  o += '<g class="' + (gcOn ? "ln-inset is-on" : "ln-inset") + '">' + D.GCI + '</g>';
+  o += T(D.GX0 + 2, D.IY0 - 7, "a germinal center, magnified", "ln-l ln-cap", "start") + T(D.HX1 - 2, D.IY0 - 7, "an HEV, magnified", "ln-l ln-cap", "end");
+  o += '<g class="' + (gcOn ? "ln-inset is-on" : "ln-inset") + '">' + D.GCI + "</g>";
   o += '<g class="' + (hevOn ? "ln-inset is-on" : "ln-inset") + '">' + D.HEVI;
-  var cu = hevOn && t ? (((t - 400) / 3200) % 1 + 1) % 1 : 0.42;
+  var cu = hevOn && t ? (((t - 400) / 3200) % 1 + 1) % 1 : 0.4;
   o += HOT(D.INFO.hevI, lnCross(D.HI, Math.min(1, cu / 0.8))) + "</g>";
-  o += T(18, 432, "a germinal center, magnified", "ln-xs ln-cap", "start") + T(278, 432, "an HEV, magnified", "ln-xs ln-cap", "start");
-  o += L(52, 604, "follicular dendritic cell", D.FDC[0] - 6, D.FDC[1] + 6, "start", "ln-xs b" + on([8]));
-  o += T(52, 590, "no MHC II: presents nothing", "ln-xs ln-no", "start");
-  o += T(18, 456, "mantle zone", "ln-xs ln-capw", "start");
-  o += L(238, 574, "antigen-antibody", D.ICL[0], D.ICL[1], "end", "ln-xs") + T(238, 588, "complexes (Fc receptors)", "ln-xs", "end");
-  o += L(502, 470, "lymphocyte crossing", 430, 492, "end", "ln-xs b" + on([5])) + T(502, 604, "T cells (paracortex)", "ln-xs ln-tt", "end") + L(330, 470, "HEV", 362, 500, "end", "ln-xs b");
+  var kb = D.KB, ki = D.KI;
+  o += T(D.GX0 + 8, D.IY0 + 18, "mantle zone", "ln-l ln-capw", "start");
+  o += lnLab(kb[0] + 2, kb[1] + 13, "B cells", kb[0] + 16, kb[1] + 18, D.BC[0], D.BC[1], "start", "ln-l b");
+  o += T(ki[2] - 2, ki[1] + 15, "antigen-antibody", "ln-l b", "end") + lnLab(ki[2] - 2, ki[1] + 31, "complexes", ki[2] - 34, ki[1] + 36, D.ICL[0], D.ICL[1], "end", "ln-l b");
+  o += lnLab(D.GX0 + 10, D.IY1 - 23, "follicular dendritic cell", D.GX0 + 50, D.IY1 - 37, D.FDC[0] - 2, D.FDC[1] + 3, "start", "ln-l b" + on([8]));
+  o += T(D.GX0 + 10, D.IY1 - 8, "no MHC II: presents nothing", "ln-l ln-no", "start");
+  o += lnLab(D.HX0 + 8, D.IY0 + 18, "HEV", D.HX0 + 20, D.IY0 + 23, D.HI.C[0] - D.HI.RO * 0.62, D.HI.C[1] - D.HI.RO * 0.72, "start", "ln-l b" + on([4, 5]));
+  var xq = [D.HI.C[0] + Math.cos(D.HI.GAP) * 26, D.HI.C[1] + Math.sin(D.HI.GAP) * 26];
+  o += T(D.HX1 - 6, D.IY0 + 18, "lymphocyte", "ln-l b" + on([5]), "end") + lnLab(D.HX1 - 6, D.IY0 + 34, "crossing", D.HX1 - 40, D.IY0 + 39, xq[0] + 6, xq[1] - 4, "end", "ln-l b" + on([5]));
+  o += L(D.HX0 + 104, D.IY1 - 8, "T cells", D.TC[0], D.TC[1], "start", "ln-l ln-tt");
+  /* legend */
+  var ly = D.IY1 + 24;
+  o += '<g class="ln-pt" transform="translate(12 ' + (ly - 4) + ')"><circle class="ln-cB" r="4.6"/><circle class="ln-cn" r="2.7"/></g>' + T(22, ly, "B cell", "ln-l", "start");
+  o += '<g class="ln-pt" transform="translate(88 ' + (ly - 4) + ')"><circle class="ln-cT" r="4.6"/><circle class="ln-cn" r="2.7"/></g>' + T(98, ly, "T cell", "ln-l", "start");
+  o += lnMark("ag", 164, ly - 5, 0, 1) + T(174, ly, "antigen", "ln-l", "start");
+  o += lnMark("ab", 248, ly - 5, 0, 1) + T(258, ly, "antibody", "ln-l", "start");
+  o += lnMark("rbc", 340, ly - 4, 0, 1) + T(350, ly, "red cell", "ln-l", "start");
   return o;
 }
 function lnSay(st, D) { var S = D.STEPS[st.s]; return [S.say, S.ro]; }
@@ -403,94 +441,90 @@ function lnOnset(st, k, D) { if (k === "ch") st.s = st.ch; }
 
 export default function node() {
   const A = nodeArt(), G = gcInset(), HV = hevInset();
-  /* where the "antigen-antibody complexes" label points: a complex low and right of the FDC */
   const D = Object.assign({}, A, {
-    STEPS, INFO, GCI: G.svg, FDC: G.FDC, HEVI: HV.svg, HI: { C: HV.C, GAP: HV.GAP }, ICL: [176, 552],
+    STEPS, INFO, GCI: G.svg, FDC: G.FDC, ICL: G.ICL, BC: G.BC, KB: G.keepB, KI: G.keepIC,
+    HEVI: HV.svg, HI: { C: HV.C, GAP: HV.GAP, RO: HV.RO }, TC: HV.TC,
+    GX0, GX1, HX0, HX1, IY0, IY1,
     ANIM: true, PLAYMS: 4200, INIT: { s: 0, ch: 0 }, STEPKEY: "s", STEPMAX: 8, ONSET: "lnOnset",
   });
   return makeFig({
-    id: "node", lec: "hemeintro", fig: "Fig 4", short: "A lymph node", hint: "step · hover",
+    id: "node", lec: "hemeintro", fig: "Fig 16", short: "A lymph node", hint: "step · hover",
     title: "A lymph node, with its B and T cell zones",
     caption: "A node cut in half, hilum down: B cell follicles in the cortex, T cells in the paracortex, the medulla inside. Follow antigen in the lymph, a lymphocyte from the blood, and a follicle meeting antigen.",
     W, H,
     label: "A lymph node in section: afferent lymphatics with valves entering the capsule, sinuses under the capsule and beside the trabeculae, the cortex with primary and secondary follicles (germinal center and mantle zone), the paracortex with high endothelial venules, the medulla, and the artery and efferent lymphatic at the hilum; with insets of a germinal center (B cells and a follicular dendritic cell holding antigen-antibody complexes) and a high endothelial venule with a lymphocyte crossing its wall.",
-    D, render: lnRender, say: lnSay, helpers: [lnD, lnAt, lnLen, lnFlow, lnMark, lnTrip, lnFol, lnTube, lnValve, lnEase, lnCross, lnOnset],
+    D, render: lnRender, say: lnSay, helpers: [lnD, lnAt, lnLen, lnFlow, lnMark, lnTrip, lnFol, lnTube, lnValve, lnEase, lnCross, lnOnset, lnLab],
     controls: `<div class="am-controls" role="group" aria-label="Story">${[[0, "The zones"], [1, "Antigen in the lymph"], [4, "A lymphocyte from the blood"], [7, "A follicle meets antigen"]].map((b) => `<button type="button" class="am-btn" data-amk="ch" data-amv="${b[0]}">${b[1]}</button>`).join("")}</div>
 <div class="am-controls" role="group" aria-label="Step"><button type="button" class="am-btn" data-amstep="-1">Back</button><button type="button" class="am-btn" data-amstep="1">Next</button><button type="button" class="am-btn" data-amplay aria-pressed="false">Play</button></div>`,
     sources: [
       "From the L19 notes (Dr. Herr): the capsule and its collagen trabeculae, the reticular stroma; the cortex's follicles of B cells, primary (a spherical aggregate of B cells) and secondary (a germinal center, the major site of B cell proliferation, with small and large lymphocytes, lymphoblasts and follicular dendritic cells, inside a mantle zone of small lymphocytes); the paracortex (deep cortex) with the T cells; the medulla; afferent lymphatics into the sinuses, percolation through the cortex, macrophages in the sinuses as the filter, and the efferent lymphatic at the hilum (the only lymphoid structure with both); blood in through an artery at the hilum and its lymphocytes across the high endothelial venules, T cells and dendritic cells to the paracortex and B cells to the cortex; follicular dendritic cells holding antigen-antibody complexes by Fc receptors and lacking MHC II; his B cell activation figure and the swollen node of a tooth infection.",
-      "Size: the notes say up to about 20 mm across. His slide gives 1 to 20 mm and its speaker notes 2 to 20 mm; the figure follows the notes, and no question depends on it. His slide 30 notes have lymphocytes reentering across the efferent lymphatic walls; the figure follows slide 33 and the notes (in through the HEVs, out through the efferent lymphatic).",
-      "Junqueira's Basic Histology and Ross and Pawlina's Histology settled the drawing: where the afferent lymphatics enter (the convex side) and the efferent leaves (the hilum), valves in both, the sinuses under the capsule and beside the trabeculae draining through the medulla, the mantle as a darker cap on the capsule side of a pale germinal center, an HEV's plump, tall endothelial cells with a lymphocyte crossing between them, and a follicular dendritic cell's long processes among the B cells.",
-      "Schematic and not to scale: the follicles, HEVs and insets are enlarged, and the routes are idealized. The vein at the hilum and the cords of the medulla are drawn but not named, because the lecture doesn't name them. Lymphocytes are drawn as dots; the colors code B (blue) and T (gold) zones, not stains.",
+      "Where the slides disagree: slide 30 gives a node as 1 to 20 mm and its speaker notes 2 to 20 mm; the figure follows the notes (up to about 20 mm, in the capsule's hover text), and no question depends on it. Slide 30's notes have lymphocytes reentering across the efferent lymphatic walls; the figure follows slide 33 and the notes (in through the HEVs, out through the efferent lymphatic).",
+      "Junqueira's Basic Histology and Ross and Pawlina's Histology: A Text and Atlas settled the drawing: the afferent lymphatics enter on the convex side and the efferent leaves at the hilum, with valves in both; the sinuses run under the capsule and beside the trabeculae and drain through the medulla; the mantle is a darker cap on the capsule side of a pale germinal center; an HEV has tall endothelial cells with a lymphocyte crossing between them; a follicular dendritic cell's long processes run among the B cells.",
+      "Schematic and not to scale: the follicles, HEVs and insets are enlarged, and the routes are idealized. A vein at the hilum and the cords of the medulla are drawn but not named, because the lecture doesn't name them. Lymphocytes are drawn as dots; blue and gold code the B and T zones, not stains.",
     ],
     css: `
-.anima[data-anima="node"] .am-svg{max-width:560px}
-.anima .node-svg .t.ln-xs{font-size:11px}
-.anima .node-svg .t.ln-on{fill:var(--anatomy-lit)}
+.anima[data-anima="node"] .am-svg{max-width:540px}
+.anima .node-svg .t.ln-l{font-size:13px}
+@media (max-width:560px){.anima .node-svg .t.ln-l{font-size:14.8px}}
+.anima .node-svg .t.ln-on{fill:var(--bx-hot);font-weight:700}
 .anima .node-svg .t.ln-bt{fill:var(--bx-blue);font-weight:600}
 .anima .node-svg .t.ln-tt{fill:color-mix(in srgb,var(--bx-gold) 62%,var(--anatomy-strong));font-weight:600}
-.anima .node-svg .t.ln-cap{fill:var(--anatomy-muted);letter-spacing:.03em}
+.anima .node-svg .t.ln-cap{fill:var(--anatomy-muted)}
 .anima .node-svg .t.ln-capw{fill:var(--anatomy-strong);font-weight:600}
 .anima .node-svg .t.ln-no{fill:var(--bx-inhib);font-weight:600}
-.anima .node-svg .ln-cap{fill:var(--bx-eosin);stroke:var(--bx-cyto-line);stroke-width:1.2}
+.anima .node-svg .ln-capz{fill:var(--bx-eosin);stroke:var(--bx-cyto-line);stroke-width:1.2}
 .anima .node-svg .ln-sin{fill:var(--bx-lumen)}
 .anima .node-svg .ln-cor{fill:color-mix(in srgb,var(--bx-blue-soft) 62%,var(--anatomy-face))}
 .anima .node-svg .ln-par{fill:color-mix(in srgb,var(--bx-gold-soft) 85%,var(--anatomy-face))}
 .anima .node-svg .ln-med{fill:var(--bx-lumen);stroke:color-mix(in srgb,var(--bx-gold) 40%,transparent);stroke-width:.8}
-.anima .node-svg .ln-cord{fill:none;stroke:color-mix(in srgb,var(--bx-eosin) 55%,var(--bx-matrix));stroke-width:9;stroke-linecap:round;stroke-linejoin:round}
-.anima .node-svg .ln-dot{fill:none;stroke:var(--bx-nuc);stroke-width:2.5;stroke-linecap:round;opacity:.75}
+.anima .node-svg .ln-cord{fill:none;stroke:color-mix(in srgb,var(--bx-eosin) 55%,var(--bx-matrix));stroke-width:8;stroke-linecap:round;stroke-linejoin:round}
+.anima .node-svg .ln-dot{fill:none;stroke:var(--bx-nuc);stroke-width:2.4;stroke-linecap:round;opacity:.75}
 .anima .node-svg .ln-tsin{fill:var(--bx-lumen)}
 .anima .node-svg .ln-trab{fill:var(--bx-eosin);stroke:var(--bx-cyto-line);stroke-width:.6}
 .anima .node-svg .ln-fol{fill:var(--bx-blue-soft);stroke:var(--bx-blue);stroke-width:1}
 .anima .node-svg .ln-man{fill:color-mix(in srgb,var(--bx-blue) 38%,var(--bx-blue-soft))}
 .anima .node-svg .ln-gc{fill:color-mix(in srgb,var(--bx-blue-soft) 45%,var(--anatomy-face));stroke:color-mix(in srgb,var(--bx-blue) 50%,transparent);stroke-width:.8}
-.anima .node-svg .ln-gcc{fill:none;stroke:color-mix(in srgb,var(--bx-cyto) 70%,var(--anatomy-face));stroke-width:5;stroke-linecap:round}
-.anima .node-svg .ln-gcn{fill:none;stroke:color-mix(in srgb,var(--bx-nuc) 60%,var(--anatomy-face));stroke-width:2.6;stroke-linecap:round}
+.anima .node-svg .ln-gcc{fill:none;stroke:color-mix(in srgb,var(--bx-cyto) 70%,var(--anatomy-face));stroke-width:4.6;stroke-linecap:round}
+.anima .node-svg .ln-gcn{fill:none;stroke:color-mix(in srgb,var(--bx-nuc) 60%,var(--anatomy-face));stroke-width:2.4;stroke-linecap:round}
 .anima .node-svg .ln-fdcs{fill:none;stroke:var(--bx-violet);stroke-width:.9;stroke-linecap:round}
-.anima .node-svg .ln-ring{fill:none;stroke:var(--anatomy-lit);stroke-width:2;stroke-dasharray:4 3}
+.anima .node-svg .ln-ring{fill:none;stroke:var(--bx-hot);stroke-width:2;stroke-dasharray:4 3}
 .anima .node-svg .ln-hevw{fill:var(--bx-cyto);stroke:var(--bx-blood);stroke-width:1}
-.anima .node-svg .ln-hevc{fill:none;stroke:var(--bx-nuc);stroke-width:2.4;stroke-linecap:round}
+.anima .node-svg .ln-hevc{fill:none;stroke:var(--bx-nuc);stroke-width:2.3;stroke-linecap:round}
 .anima .node-svg .ln-hevl{fill:var(--bx-blood-soft);stroke:var(--bx-blood);stroke-width:.6}
 .anima .node-svg .ln-mac{fill:color-mix(in srgb,var(--bx-eosin) 70%,var(--bx-cyto));stroke:var(--bx-cyto-line);stroke-width:.8}
 .anima .node-svg .ln-macn{fill:var(--bx-nuc)}
 .anima .node-svg .ln-tw{fill:none;stroke-linecap:round;stroke-linejoin:round}
 .anima .node-svg .ln-tl{fill:none;stroke-linecap:round;stroke-linejoin:round}
-.anima .node-svg .ln-tw.ln-ly{stroke:var(--bx-ins);stroke-width:10}
-.anima .node-svg .ln-tl.ln-ly{stroke:var(--bx-ins-soft);stroke-width:7}
-.anima .node-svg .ln-tw.ln-ar{stroke:var(--bx-blood);stroke-width:7.5}
-.anima .node-svg .ln-tl.ln-ar{stroke:var(--bx-blood-soft);stroke-width:3.6}
-.anima .node-svg .ln-tw.ln-ar2{stroke-width:4.6}
-.anima .node-svg .ln-tl.ln-ar2{stroke-width:1.8}
-.anima .node-svg .ln-tw.ln-vn{stroke:color-mix(in srgb,var(--bx-blood) 55%,var(--bx-violet));stroke-width:10}
-.anima .node-svg .ln-tl.ln-vn{stroke:color-mix(in srgb,var(--bx-blood-soft) 70%,var(--bx-violet-soft));stroke-width:7}
+.anima .node-svg .ln-tw.ln-ly{stroke:var(--bx-ins);stroke-width:9}
+.anima .node-svg .ln-tl.ln-ly{stroke:var(--bx-ins-soft);stroke-width:6.2}
+.anima .node-svg .ln-tw.ln-ar{stroke:var(--bx-blood);stroke-width:7}
+.anima .node-svg .ln-tl.ln-ar{stroke:var(--bx-blood-soft);stroke-width:3.4}
+.anima .node-svg .ln-tw.ln-ar2{stroke-width:4.4}
+.anima .node-svg .ln-tl.ln-ar2{stroke-width:1.7}
+.anima .node-svg .ln-tw.ln-vn{stroke:color-mix(in srgb,var(--bx-blood) 55%,var(--bx-violet));stroke-width:9}
+.anima .node-svg .ln-tl.ln-vn{stroke:color-mix(in srgb,var(--bx-blood-soft) 70%,var(--bx-violet-soft));stroke-width:6.2}
 .anima .node-svg .ln-valve{fill:none;stroke:var(--bx-ins);stroke-width:1.3;stroke-linejoin:round}
 .anima .node-svg .ln-cutl{fill:var(--bx-ins-soft);stroke:var(--bx-ins);stroke-width:1.4}
 .anima .node-svg .ln-cuta{fill:var(--bx-blood-soft);stroke:var(--bx-blood);stroke-width:1.4}
 .anima .node-svg .ln-cutv{fill:color-mix(in srgb,var(--bx-blood-soft) 70%,var(--bx-violet-soft));stroke:color-mix(in srgb,var(--bx-blood) 55%,var(--bx-violet));stroke-width:1.4}
-.anima .node-svg .ln-lit{fill:none;stroke:var(--anatomy-lit);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;opacity:.5}
+.anima .node-svg .ln-lit{fill:none;stroke:var(--bx-hot);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;opacity:.55}
 .anima .node-svg .ln-pt{pointer-events:none}
 .anima .node-svg .ln-ag{fill:var(--bx-stim);stroke:var(--surface);stroke-width:.7;stroke-linejoin:round}
-.anima .node-svg .ln-lyf{fill:var(--bx-ins);opacity:.7}
+.anima .node-svg .ln-lyf{fill:var(--bx-ins);opacity:.75}
 .anima .node-svg .ln-rbc{fill:var(--bx-blood);stroke:var(--surface);stroke-width:.5}
 .anima .node-svg .ln-cB{fill:var(--bx-blue);stroke:var(--surface);stroke-width:1}
 .anima .node-svg .ln-cT{fill:var(--bx-gold);stroke:var(--surface);stroke-width:1}
 .anima .node-svg .ln-cn{fill:var(--bx-nuc-line)}
-.anima .node-svg .ln-ab{fill:none;stroke:var(--bx-blue);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.anima .node-svg .ln-ab{fill:none;stroke:var(--bx-blue);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .anima .node-svg .ln-dcb{fill:var(--bx-violet);stroke:var(--surface);stroke-width:.8}
 .anima .node-svg .ln-dcp{fill:none;stroke:var(--bx-violet);stroke-width:1.4;stroke-linecap:round}
-.anima .node-svg .ln-swB{fill:var(--bx-blue-soft);stroke:var(--bx-blue);stroke-width:1}
-.anima .node-svg .ln-swT{fill:var(--bx-gold-soft);stroke:var(--bx-gold);stroke-width:1}
-.anima .node-svg .ln-lw{fill:none;stroke:var(--bx-ins);stroke-width:7;stroke-linecap:round}
-.anima .node-svg .ln-ll{fill:none;stroke:var(--bx-ins-soft);stroke-width:4;stroke-linecap:round}
-.anima .node-svg .ln-zoom{fill:none;stroke:var(--anatomy-mid);stroke-width:1;stroke-dasharray:3 3}
-.anima .node-svg .ln-zr{fill:none;stroke:var(--anatomy-mid);stroke-width:1.2}
 .anima .node-svg .ln-ibg{fill:var(--anatomy-face);stroke:var(--anatomy-lo);stroke-width:1.2}
 .anima .node-svg .ln-igc{fill:color-mix(in srgb,var(--bx-blue-soft) 45%,var(--anatomy-face))}
 .anima .node-svg .ln-ihev{fill:color-mix(in srgb,var(--bx-gold-soft) 80%,var(--anatomy-face))}
-.anima .node-svg .ln-inset.is-on .ln-ibg{stroke:var(--anatomy-lit);stroke-width:2}
+.anima .node-svg .ln-inset.is-on .ln-ibg{stroke:var(--bx-hot);stroke-width:2}
 .anima .node-svg .ln-imant{fill:color-mix(in srgb,var(--bx-blue) 30%,var(--bx-blue-soft))}
-.anima .node-svg .ln-ims{fill:none;stroke:color-mix(in srgb,var(--bx-cyto) 60%,var(--anatomy-face));stroke-width:5.6;stroke-linecap:round}
-.anima .node-svg .ln-imn{fill:none;stroke:var(--bx-nuc);stroke-width:4;stroke-linecap:round}
+.anima .node-svg .ln-ims{fill:none;stroke:color-mix(in srgb,var(--bx-cyto) 60%,var(--anatomy-face));stroke-width:5.4;stroke-linecap:round}
+.anima .node-svg .ln-imn{fill:none;stroke:var(--bx-nuc);stroke-width:3.8;stroke-linecap:round}
 .anima .node-svg .ln-ibc{fill:color-mix(in srgb,var(--bx-cyto) 75%,var(--anatomy-face));stroke:var(--bx-cyto-line);stroke-width:.8}
 .anima .node-svg .ln-ibn{fill:var(--bx-nuc);stroke:var(--bx-nuc-line);stroke-width:.6}
 .anima .node-svg .ln-ibn2{fill:color-mix(in srgb,var(--bx-nuc) 55%,var(--anatomy-face));stroke:var(--bx-nuc-line);stroke-width:.6}
@@ -501,7 +535,7 @@ export default function node() {
 .anima .node-svg .ln-iy{fill:none;stroke:var(--bx-blue);stroke-width:1.3;stroke-linecap:round}
 .anima .node-svg .ln-iag{fill:var(--bx-stim);stroke:var(--surface);stroke-width:.5}
 .anima .node-svg .ln-its{fill:none;stroke:color-mix(in srgb,var(--bx-gold) 55%,var(--anatomy-face));stroke-width:8;stroke-linecap:round}
-.anima .node-svg .ln-itn{fill:none;stroke:var(--bx-nuc);stroke-width:5.4;stroke-linecap:round}
+.anima .node-svg .ln-itn{fill:none;stroke:var(--bx-nuc);stroke-width:5.2;stroke-linecap:round}
 .anima .node-svg .ln-ibm{fill:none;stroke:var(--bx-cyto-line);stroke-width:1.2}
 .anima .node-svg .ln-ilum{fill:var(--bx-blood-soft)}
 .anima .node-svg .ln-iendo{fill:var(--bx-cyto);stroke:var(--bx-cyto-line);stroke-width:1}

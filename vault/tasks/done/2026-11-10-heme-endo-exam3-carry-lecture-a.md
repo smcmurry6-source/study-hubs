@@ -90,4 +90,4 @@ hints, 11 High Likelihood topics, its review group, three Side by side tables, t
 narration was recorded again at all three levels (the engine's text is what Listen reads), and its High yield is built
 from its topics like every lecture's. The mock gives it 5 of the 25 (5 per lecture). Exam 3's facts on Home say A moved
 here. The figures drawn for it (lamina dura, the glands and the mouth) aren't finished:
-[the figures task](../2026-11-16-heme-endo-exam3-figures.md).
+[the figures task](2026-11-16-heme-endo-exam3-figures.md).

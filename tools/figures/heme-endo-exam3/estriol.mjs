@@ -44,6 +44,13 @@ function offset(pl, off) {
 }
 const r1 = (p) => p.map((q) => [f1(q[0]), f1(q[1])]);
 
+/* a limb segment as one smooth tapered shape: from a (width wa) to b (width wb), round at both ends, a little fuller
+   in the middle; segments drawn in order overlap like a flexed limb seen from the side */
+function taper(a, b, wa, wb) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], m = Math.hypot(dx, dy), tx = dx / m, ty = dy / m, nx = -ty, ny = tx, wm = (wa + wb) / 2 * 1.06, c = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+  const q = (p, w, s, k) => [p[0] + nx * w / 2 * s + tx * w / 2 * k, p[1] + ny * w / 2 * s + ty * w / 2 * k];
+  return sm(r1([q(a, wa, 1, 0), q(c, wm, 1, 0), q(b, wb, 1, 0), q(b, wb, 0.7, 0.7), q(b, wb, 0, 1), q(b, wb, -0.7, 0.7), q(b, wb, -1, 0), q(c, wm, -1, 0), q(a, wa, -1, 0), q(a, wa, -0.7, -0.7), q(a, wa, 0, -1), q(a, wa, 0.7, -0.7)]), true);
+}
 /* a villous tree: a stem from the chorionic plate that branches three times, ending in knobs (the terminal villi) */
 function tree(x0, top, seed) {
   const segs = [], knobs = [];
@@ -106,26 +113,26 @@ function staticArt() {
   o.BODY = '<path class="es-skin" d="' + sm(trunk, true) + '"/>';
   o.HEAD = '<path class="es-skin" d="' + sm(head, true) + '"/><path class="es-ear" d="M446 438C454 434 460 442 457 450C454 458 446 458 444 452"/>' +
     '<path class="es-lid" d="M466 412C471 417 478 417 482 412"/>';
-  /* the near leg folded tight (thigh up along the belly, shin back down beside it, foot by the buttocks) */
-  o.LEG = '<path class="es-skin" d="' + sm([[176, 470], [186, 436], [206, 404], [222, 384], [236, 380], [242, 392], [232, 414], [214, 446], [200, 474], [188, 482]], true) + '"/>' +
-    '<path class="es-skin" d="' + sm([[228, 386], [210, 396], [190, 412], [172, 432], [160, 448], [158, 460], [168, 462], [184, 448], [204, 428], [226, 408], [238, 396]], true) + '"/>' +
-    '<path class="es-skin" d="' + sm([[160, 446], [150, 452], [146, 464], [154, 470], [166, 464], [170, 454]], true) + '"/>';
-  /* the near arm folded, hand at the chin */
-  o.ARM = '<path class="es-skin" d="' + sm([[384, 452], [366, 438], [352, 420], [352, 404], [364, 396], [384, 394], [396, 398], [394, 408], [378, 408], [368, 412], [372, 424], [390, 440]], true) + '"/>';
+  /* the near leg flexed: the thigh up from the hip toward the belly, the shin folded back over it, the foot turned up */
+  o.LEG = '<path class="es-skin" d="' + taper([198, 470], [226, 400], 32, 22) + '"/><path class="es-skin" d="' + taper([224, 400], [178, 418], 20, 12) + '"/>' +
+    '<path class="es-skin" d="' + taper([182, 424], [168, 405], 12, 10) + '"/>';
+  /* the near arm folded: the upper arm toward the belly, the forearm back up, the hand at the chin */
+  o.ARM = '<path class="es-skin" d="' + taper([388, 440], [366, 405], 17, 13) + '"/><path class="es-skin" d="' + taper([366, 405], [398, 393], 12, 9) + '"/>' +
+    '<path class="es-skin" d="' + taper([398, 393], [410, 388], 11, 9) + '"/>';
   /* the window into the abdomen and the organs in it */
-  o.WIN = '<ellipse class="es-win" cx="292" cy="452" rx="62" ry="44"/>';
-  o.WINRIM = '<ellipse class="es-rim" cx="292" cy="452" rx="62" ry="44"/>';
-  o.LIVER = '<path class="es-liver" d="' + sm([[284, 424], [308, 413], [332, 416], [348, 430], [344, 445], [320, 450], [298, 447], [282, 437]], true) + '"/><path class="es-livl" d="M314 415C320 424 320 438 316 449"/>';
-  o.KIDNEY = '<path class="es-kid" d="' + sm([[240, 470], [256, 463], [272, 465], [280, 474], [274, 485], [256, 489], [242, 485], [236, 477]], true) + '"/><path class="es-hil" d="M258 477C262 475 266 475 270 477"/>';
-  o.ADR = '<path class="es-adr" d="' + sm([[272, 458], [290, 455], [305, 464], [307, 480], [296, 491], [283, 489], [282, 477], [276, 466]], true) + '"/><path class="es-adrc" d="' + sm([[284, 463], [296, 463], [301, 472], [298, 482], [290, 483], [287, 472]], true) + '"/>';
+  o.WIN = '<ellipse class="es-win" cx="292" cy="452" rx="66" ry="48"/>';
+  o.WINRIM = '<ellipse class="es-rim" cx="292" cy="452" rx="66" ry="48"/>';
+  o.LIVER = '<path class="es-liver" d="' + sm([[272, 436], [290, 420], [312, 413], [334, 418], [346, 429], [344, 442], [328, 449], [306, 450], [286, 447]], true) + '"/><path class="es-livl" d="M314 414C321 424 321 438 316 450"/>';
+  o.KIDNEY = '<path class="es-kid" d="' + sm([[244, 468], [258, 461], [274, 462], [284, 471], [278, 482], [262, 486], [250, 482], [243, 475]], true) + '"/><path class="es-hil" d="M256 479C260 476 265 476 269 478"/>';
+  o.ADR = '<path class="es-adr" d="' + sm([[274, 458], [292, 454], [307, 462], [310, 477], [300, 489], [287, 488], [284, 477], [278, 466]], true) + '"/><path class="es-adrc" d="' + sm([[286, 463], [298, 462], [303, 471], [300, 481], [292, 482], [289, 472]], true) + '"/>';
   /* the routes; TRK_* are the parts drawn as tracks (in the cord its vessels are the track) */
-  const PRE_A = [[104, 150], [104, 196]].concat(r1(sampleSm(o.CHV_L, 6)).slice(1)), PRE_B = [DN[DN.length - 1], [253, 400], [250, 422], [260, 446], [276, 457]];
-  const OH_A = [[290, 420], [UP[0][0], UP[0][1]]], OH_B = [UP[UP.length - 1]].concat(r1(sampleSm(o.CHV_R, 6)).slice(1)).concat([[420, 196], [420, 150]]);
+  const PRE_A = [[104, 150], [104, 196]].concat(r1(sampleSm(o.CHV_L, 6)).slice(1)), PRE_B = [DN[DN.length - 1], [253, 400], [250, 422], [262, 446], [286, 464]];
+  const OH_A = [[296, 428], [UP[0][0], UP[0][1]]], OH_B = [UP[UP.length - 1]].concat(r1(sampleSm(o.CHV_R, 6)).slice(1)).concat([[420, 196], [420, 150]]);
   o.P_CHOL = [[6, 66], [64, 66], [64, 104], [88, 128]];
   o.P_PROG = [[112, 122], [176, 102], [176, 66], [250, 66]];
   o.P_PREG = PRE_A.concat(DN.slice(1)).concat(PRE_B.slice(1));
   o.P_PROGF = PRE_A.concat(DN.slice(1));
-  o.P_DHEAS = [[298, 460], [304, 448]];
+  o.P_DHEAS = [[296, 466], [302, 442]];
   o.P_16OH = OH_A.concat(UP.slice(1)).concat(OH_B.slice(1));
   o.P_E3 = [[432, 124], [446, 102], [446, 66], [514, 66]];
   o.TRK_PREG = [PRE_A, PRE_B]; o.TRK_16OH = [OH_A, OH_B];
@@ -186,7 +193,7 @@ function esRender(st, D) {
   o += HOT("Fetal liver: it hydroxylates DHEA sulfate, giving 16-hydroxy DHEA sulfate." + (livOff ? " Not working in this case." : ""), '<g class="' + (livOff ? "es-fail" : "") + '">' + D.LIVER + "</g>");
   o += HOT("Fetal kidney: not part of this route. (The 16-hydroxylation is the liver's, not the kidney's.)", D.KIDNEY);
   o += HOT("Fetal adrenal gland, large in the fetus, capping the kidney: its 17,20 desmolase makes the androgen DHEA, and it adds a sulfate (DHEA sulfate), which keeps the androgen from virilizing the fetus." + (adrOff ? " Not working in this case." : ""), '<g class="' + (adrOff ? "es-fail" : "") + '">' + D.ADR + "</g>");
-  o += D.WINRIM + D.HEAD + D.ARM;
+  o += D.WINRIM + HOT("The fetus, on its back with its head to the right, its near arm folded up to its chin.", D.HEAD + D.ARM);
   o += HOT("The umbilical cord: pregnenolone (and progesterone) travel down it to the fetus, and 16-hydroxy DHEA sulfate travels back up it to the placenta.", D.CORD);
 
   /* ----- the route: tracks, then dots ----- */
@@ -217,7 +224,7 @@ function esRender(st, D) {
   o += HOT("What the placenta lacks: 17,20 desmolase. You need an androgen to make an estrogen, and that step takes the fetus. So to make estrogen, the placenta \"needs help from the baby.\"",
     (lit(3) ? '<rect class="es-ring" x="204.5" y="138.5" width="119" height="44" rx="10"/>' : "") + '<rect class="es-card es-lack" x="208" y="142" width="112" height="37" rx="7"/>' +
     '<path class="es-x" d="M218 152L226 160M226 152L218 160"/>' + T(232, 157, "lacks", "es-xs es-badt", "start") + T(216, 171, "17,20 desmolase", "es-xs b", "start"));
-  o += '<path class="lead" d="M372 354L334 428"/><circle class="dot" cx="334" cy="428" r="1.8"/>';
+  o += '<path class="lead" d="M352 358L318 428"/><circle class="dot" cx="318" cy="428" r="1.8"/>';
   o += esCard(334, 308, 176, [["fetal liver", ""], ["16-hydroxylation", ""], ["→ 16-hydroxy DHEA sulfate", "es-oht"]],
     "The fetal liver hydroxylates DHEA sulfate, giving 16-hydroxy DHEA sulfate, which goes back to the placenta." + (livOff ? " Not working in this case." : ""), lit(4), livOff);
   o += '<path class="lead" d="M294 538L294 476"/><circle class="dot" cx="294" cy="476" r="1.8"/>';
@@ -229,7 +236,7 @@ function esRender(st, D) {
 }
 
 function esSay(st, D) {
-  var C = D.CASE[st.sc], sum = D.STEPS[st.s][1] + (st.sc === "ok" ? "" : " " + C.say);
+  var C = D.CASE[st.sc], sum = st.sc === "ok" ? D.STEPS[st.s][1] : st.s === 0 ? C.say : D.STEPS[st.s][1] + " " + C.say;
   var ro = (st.s ? st.s + "/6 " + D.STEPS[st.s][0] : "whole route") + " · " + C.ro;
   return [sum, ro];
 }
@@ -246,9 +253,9 @@ const STEPS = [
 ];
 const CASE = {
   ok: { flows: ["chol", "prog", "preg", "dheas", "oh", "e3"], prog: "n", e3: "n", ro: "estriol normal", say: "" },
-  adr: { flows: ["chol", "prog", "preg"], prog: "n", e3: "d", ro: "adrenal off, estriol ↓",
+  adr: { flows: ["chol", "prog", "preg"], prog: "n", e3: "d", ro: "no adrenal · estriol ↓",
     say: "Fetal adrenal not working: there's no 17,20 desmolase step, so no DHEA sulfate, nothing for the liver or the placenta's aromatase, and the mother's estriol falls. Her progesterone doesn't: the placenta makes it on its own." },
-  liv: { flows: ["chol", "prog", "preg", "dheas"], prog: "n", e3: "d", ro: "liver off, estriol ↓",
+  liv: { flows: ["chol", "prog", "preg", "dheas"], prog: "n", e3: "d", ro: "no liver · estriol ↓",
     say: "Fetal liver not working: DHEA sulfate isn't 16-hydroxylated, so the placenta's aromatase has nothing to make estriol from, and the mother's estriol falls. Her progesterone holds: the placenta makes it on its own." },
 };
 
@@ -256,7 +263,7 @@ export default function estriol() {
   const A = staticArt();
   const D = Object.assign({}, A, { STEPS, CASE, ANIM: true, INIT: { s: 0, sc: "ok" }, STEPKEY: "s", STEPMAX: 6, PLAYMS: 3200, ONSET: "esOnset" });
   return makeFig({
-    id: "estriol", lec: "preg", fig: "Fig 3", short: "Making estriol", hint: "step · switch off · hover",
+    id: "estriol", lec: "preg", fig: "Fig 6", short: "Making estriol", hint: "step · switch off · hover",
     title: "The fetoplacental unit makes estriol",
     caption: "Dr. Madison's route from the mother's cholesterol to estriol, back and forth between the placenta and the fetus. Step through it, tap an enzyme to see who has it, and switch off the fetal adrenal or liver to watch the mother's estriol fall.",
     W, H,
@@ -298,10 +305,6 @@ export default function estriol() {
 .anima .estriol-svg .es-cvein{fill:none;stroke:color-mix(in srgb,var(--bx-blood) 60%,var(--anatomy-face));stroke-width:4.4;opacity:.55}
 .anima .estriol-svg .es-cart{fill:none;stroke:color-mix(in srgb,var(--bx-blue) 60%,var(--anatomy-face));stroke-width:3;opacity:.55}
 .anima .estriol-svg .es-skin{fill:var(--anatomy-shade-2);stroke:var(--anatomy-mid);stroke-width:1.3}
-.anima .estriol-svg .es-limbo{fill:none;stroke:var(--anatomy-mid);stroke-width:27;stroke-linecap:round;stroke-linejoin:round}
-.anima .estriol-svg .es-limb{fill:none;stroke:var(--anatomy-shade-2);stroke-width:24.4;stroke-linecap:round;stroke-linejoin:round}
-.anima .estriol-svg .es-limbo.es-arm{stroke-width:17}
-.anima .estriol-svg .es-limb.es-arm{stroke-width:14.4}
 .anima .estriol-svg .es-ear,.anima .estriol-svg .es-lid{fill:none;stroke:var(--anatomy-mid);stroke-width:1.3;stroke-linecap:round}
 .anima .estriol-svg .es-win{fill:var(--anatomy-shade-0)}
 .anima .estriol-svg .es-rim{fill:none;stroke:var(--anatomy-mid);stroke-width:2}
