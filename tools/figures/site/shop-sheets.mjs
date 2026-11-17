@@ -44,7 +44,7 @@ if (SHOP) sheets.shelf = () => {
   const coins = [16, 24, 48].map((px) => `<div class="coin"><span class="num" style="font-size:${Math.max(13, px * .62)}px">${coinSvg(px)}<b>${px === 16 ? "1,250" : px === 24 ? "320" : "20"}</b></span><small>${px} px</small></div>`).join("") +
     `<div class="coin"><span>${coinSvg(120)}</span><small>large</small></div>`;
   const items = SHOP.ITEMS.map((it) => `<figure><div class="thumb">${SHOP.thumb(it.id)}</div><figcaption><b>${esc(it.n)}</b><span>${esc(it.note)}</span><span class="pr">${coinSvg(16)}${price(it.price)} · ${esc(it.rarity)}</span></figcaption></figure>`).join("");
-  const sample = { Common: ["shop", "apple"], Uncommon: ["shop", "floss"], Rare: ["shop", "boost-1h"], Epic: ["outfit", "pirate"], Legendary: ["outfit", "captain-enamel"] };
+  const sample = { Common: ["shop", "apple"], Uncommon: ["shop", "floss"], Rare: ["outfit", "nightcap"], Epic: ["outfit", "pirate"], Legendary: ["outfit", "captain-enamel"] };
   const cards = SHOP.RARITIES.map((r) => {
     const s = sample[r.k], it = s[0] === "shop" ? SHOP.ITEMS.find((x) => x.id === s[1]) : K.OUTFITS.find((x) => x.k === s[1]) || { n: s[1], price: r.band[0] };
     const th = s[0] === "shop" ? SHOP.thumb(s[1]) : big(s[1]);

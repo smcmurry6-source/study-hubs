@@ -182,8 +182,8 @@ export function shopKit(INK, C){
     { id: "cheese-cube", n: "Cheese cube", kind: "snack", rarity: "Common", price: 150, hp: 15, note: "+15 HP. Calcium, and kind to enamel" },
     { id: "floss", n: "Floss", kind: "snack", rarity: "Uncommon", price: 250, hp: 25, note: "+25 HP. Between every contact" },
     { id: "fluoride-rinse", n: "Fluoride rinse", kind: "snack", rarity: "Uncommon", price: 400, hp: 40, note: "+40 HP. Swish, don't swallow" },
-    { id: "boost-1h", n: "Double XP for 1 hour", kind: "boost", rarity: "Rare", price: 600, minutes: 60, mult: 2, note: "2x XP, starting when you buy it" },
-    { id: "boost-3h", n: "Double XP for 3 hours", kind: "boost", rarity: "Epic", price: 1500, minutes: 180, mult: 2, note: "2x XP for a whole study session" }
+    { id: "boost-1h", n: "Double XP for 1 hour", kind: "boost", rarity: "Common", price: 150, minutes: 60, mult: 2, note: "2x XP for an hour of studying" },
+    { id: "boost-3h", n: "Double XP for 3 hours", kind: "boost", rarity: "Uncommon", price: 400, minutes: 180, mult: 2, note: "2x XP for a whole study session" }
   ];
 
   /* ------------------------------------------------------------------ the rarity frames ---------------------------

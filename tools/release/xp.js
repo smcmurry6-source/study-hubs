@@ -13,7 +13,7 @@
 //   - a replayed call, a double tap and a linked device pay once, and the rebuild gives exactly what the live calls paid;
 //   - Shiny Gold Crowns (from base XP, the grants since the switch, minus spending), the shop's rotation and seasons,
 //     buy_item (a double tap, a replayed call, a balance too low, not on sale today, owned, one snack a day, boosts that
-//     extend), equip_item, snack HP in Timmy's days, rare-costume sightings; the preview's purchases (buyCore) answer as
+//     extend or wait for a medal's to end), equip_item, snack HP in Timmy's days, rare-costume sightings; the preview's purchases (buyCore) answer as
 //     sh_buy does, and the rare costume of the day (widget/hub-timmy.js, widget/dash.js) never lands on a holiday or fall day;
 //   - the idea board: names, limits, votes, reports, statuses with Inbox notes, an author's delete that removes the idea
 //     completely, starter ideas, no visitor ids;
@@ -420,6 +420,23 @@ try {
     && num(`select count(*) from xp_boosts where visitor_id = 'xp-B' and src = 'shop'`) === 1, 'a second boost extends the first instead of stacking');
   sql(`insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at) values ('xp-B', 'mb:xh:1', 'medal', 2, now() - interval '1 minute', now() + interval '1 day')`);
   eq([num(`select count(*) from xp_boosts where visitor_id = 'xp-B' and starts_at < now() and ends_at > now()`), num(`select sh_xp_mult('xp-B', now())`)], [2, 2], 'a shop boost and a medal boost together: still 2x');
+  // a boost bought during a medal's 24 hours waits for them to end, and the next one extends it (migration_v62)
+  eq(['boost-1h', 'boost-3h'].map(id => one(`select rarity || ' ' || price from shop_items where id = ${q(id)}`)), ['common 150', 'uncommon 400'], 'the boosts cost 150 and 400 crowns');
+  award('xp-Q', 'rep:flag:9032', 6000);
+  sql(`insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at) values ('xp-Q', 'mb:xh:1', 'medal', 2, now() - interval '1 hour', now() + interval '23 hours')`);
+  const mEnd = q(one(`select ends_at from xp_boosts where visitor_id = 'xp-Q' and src = 'medal'`)) + '::timestamptz';
+  const qb1 = buy('xp-Q', 'boost-1h', 'buy-q-0000001');
+  ok(qb1.ok && num(`select extract(epoch from (${q(qb1.boost_until)}::timestamptz - ${mEnd}))`) === 3600
+    && num(`select count(*) from xp_boosts where visitor_id = 'xp-Q' and src = 'shop' and starts_at = ${mEnd}`) === 1, `a boost bought during a medal's 24 hours starts when they end (${JSON.stringify(qb1)})`);
+  eq([`now() + interval '1 hour'`, `${mEnd} + interval '30 minutes'`, `${mEnd} + interval '61 minutes'`].map(t => num(`select sh_xp_mult('xp-Q', ${t})`)), [2, 2, 1],
+    'double XP through the medal\'s hours, then the boost\'s hour, then over');
+  const qb2 = buy('xp-Q', 'boost-3h', 'buy-q-0000002');
+  ok(qb2.ok && num(`select extract(epoch from (${q(qb2.boost_until)}::timestamptz - ${mEnd}))`) === 4 * 3600
+    && num(`select count(*) from xp_boosts where visitor_id = 'xp-Q' and src = 'shop'`) === 1, 'a second boost extends the one waiting');
+  const qbj = json(`sh_boost_json('xp-Q', now())`);
+  ok(qbj && qbj.mult === 2 && qbj.src === 'medal' && Date.parse(qbj.until) === Date.parse(qb2.boost_until), `the running boost's "until" runs on through the waiting one (${JSON.stringify(qbj)})`);
+  const qbs = json(`get_my_shop('xp-Q')`);
+  ok(qbs.boost && Date.parse(qbs.boost.until) === Date.parse(qb2.boost_until) && qbs.wallet.spent === 550, `the shop's boost and wallet (${JSON.stringify([qbs.boost, qbs.wallet.spent])})`);
   // equip
   sql(`insert into pet_inventory (visitor_id, item_id) values ('xp-B', 'garden'), ('xp-B', 'castle'), ('xp-B', 'porch'), ('xp-B', 'bowling-lane'), ('xp-B', 'mailbox') on conflict do nothing`);
   eq(anonJson(`equip_item('xp-B', 'outfit', 'white-coat')`).error, 'not-owned', 'equipping something not owned');
@@ -780,7 +797,7 @@ try {
   {
   // the preview answers buy_item with buyCore (tools/preview/runtime/preview.js): one list of purchases through it and
   // through sh_buy gives the same answers, in the server's order of checks (the preview's world is read from the server
-  // before each call: what's on sale that day, what's owned, the balance, a running shop boost)
+  // before each call: what's on sale that day, what's owned, the balance, the end of the boosts running or waiting)
   const grabIn = (src, name) => { const i = src.indexOf('function ' + name + '('); if (i < 0) return ''; let k = src.indexOf('{', i), depth = 0; for (; k < src.length; k++) { if (src[k] === '{') depth++; else if (src[k] === '}' && --depth === 0) break; } return src.slice(i, k + 1); };
   const prevSrc = fs.readFileSync(path.join(ROOT, 'tools/preview/runtime/preview.js'), 'utf8');
   ok(!!grabIn(prevSrc, 'buyCore'), 'tools/preview/runtime/preview.js has buyCore');
@@ -788,10 +805,10 @@ try {
   const CAT = Object.fromEntries(rows(`select id, kind, price, hp, boost_minutes, rank_tier from shop_items where active`).map(r => [r.id, r]));
   const PD = '2027-07-10', plog = [];
   const arr = l => q('{' + l.join(',') + '}') + '::text[]';
-  const shopBoostMs = v => { const t = one(`select (extract(epoch from max(ends_at)) * 1000)::bigint from xp_boosts where visitor_id = ${q(v)} and src = 'shop' and starts_at <= now() and ends_at > now()`); return t ? Number(t) : null; };
+  const boostEndMs = v => { const t = one(`select (extract(epoch from max(ends_at)) * 1000)::bigint from xp_boosts where visitor_id = ${q(v)} and ends_at > now()`); return t ? Number(t) : null; };
   const world = v => ({ cat: CAT, log: plog, sale: rows(`select item_id from sh_shop_for(${q(v)}, ${q(PD)}::date)`).map(r => r.item_id),
     owns: id => one(`select sh_owns(${q(v)}, ${q(id)})`) === 't', balance: () => num(`select (sh_wallet(${q(v)})->>'balance')::int`),
-    boost: () => shopBoostMs(v), setBoost: () => {}, day: PD, now: Date.now() });
+    boost: () => boostEndMs(v), setBoost: () => {}, day: PD, now: Date.now() });
   award('xp-PV', 'rep:flag:9030', 20000); award('xp-PW', 'rep:flag:9031', 300);
   const pvSale = world('xp-PV').sale;
   const cheap = one(`select id from shop_items where id = any(${arr(pvSale)}) and kind not in ('snack', 'boost', 'costume') order by price, id limit 1`);

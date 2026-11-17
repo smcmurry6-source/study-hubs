@@ -114,8 +114,8 @@ function transformFile(rel, buf, o){
   return rewriteText(text, o);
 }
 
-/* the shop's catalog, read from the migration that writes it (migration_v54's two inserts into shop_items), so the
-   preview's shelves sell exactly what the server will: one row each, [id, name, kind, rarity, price, season, slot, hp,
+/* the shop's catalog, read from the migration that writes it (migration_v54's two inserts into shop_items, then any later
+   migration's `update public.shop_items set ... where id = '...'`), so the preview's shelves sell exactly what the server will: one row each, [id, name, kind, rarity, price, season, slot, hp,
    boost_minutes, boost_mult, shelf, rotates, gift, rank_tier, wide, sort] */
 const SHOP_COLS = ['id', 'name', 'kind', 'rarity', 'price', 'season', 'slot', 'hp', 'boost_minutes', 'boost_mult', 'shelf', 'rotates', 'gift', 'rank_tier', 'wide', 'sort'];
 function shopCatalog(){
@@ -138,6 +138,18 @@ function shopCatalog(){
     }
   }
   (sql.match(/update public\.shop_items set wide = true where id = '([a-z0-9-]+)'/g) || []).forEach(s => { wide[/'([a-z0-9-]+)'/.exec(s)[1]] = true; });
+  /* a later migration's change to a row (migration_v62: the boosts' rarity and price), in the migrations' order */
+  const lit = v => v[0] === "'" ? v.slice(1, -1).replace(/''/g, "'") : v === 'null' ? null : v === 'true' ? true : v === 'false' ? false : Number(v);
+  fs.readdirSync(ROOT).map(f => /^migration_v(\d+)\.sql$/.exec(f)).filter(f => f && +f[1] > 54).sort((x, y) => x[1] - y[1]).forEach(f => {
+    const text = fs.readFileSync(path.join(ROOT, f[0]), 'utf8').replace(/--[^\n]*/g, '');
+    const up = /update public\.shop_items set ((?:\s*[a-z_]+ = (?:'(?:[^']|'')*'|-?[0-9]+|true|false|null)\s*,?)+) where id = '([a-z0-9-]+)';/g;
+    let u;
+    while ((u = up.exec(text))) {
+      const row = rows.find(r => r.id === u[2]), as = /([a-z_]+) = ('(?:[^']|'')*'|-?[0-9]+|true|false|null)/g;
+      let x;
+      if (row) while ((x = as.exec(u[1]))) row[x[1]] = lit(x[2]);
+    }
+  });
   if (!rows.length) return null;
   return rows.map(r => SHOP_COLS.map(k => k === 'wide' ? !!wide[r.id] : k === 'shelf' || k === 'gift' ? !!r[k] : k === 'rotates' ? (r.rotates == null ? true : r.rotates) : r[k] == null ? null : r[k]));
 }
