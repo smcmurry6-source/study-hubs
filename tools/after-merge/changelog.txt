@@ -14,3 +14,4 @@ all | The reward for answering a survey or checking in after an exam is now +1,0
 perio | The long-root-trunk question (Session 5) now asks for both halves, why a long trunk helps at first and why it's a problem later, after a classmate pointed out the old answer only gave the second half.
 all | Listening to a lecture? Tap any word in the notes and the narration jumps there, on a phone too. And the Highlight button now works with a tap on phones, and your highlight colors show again (they had all come out gold).
 all | A missed question that comes back in the Question Bank now looks different: a "Second try" card, tinted with a dashed edge. Home's Today card shows your Shiny Gold Crowns.
+all | Double XP boosts in Timmy's shop now cost 150 crowns for an hour and 400 for three hours. Buy one while double XP is already on (a medal's 24 hours) and it starts when that ends, so none of it is wasted.
