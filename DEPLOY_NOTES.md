@@ -40,9 +40,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 - **2026-11-17 (A reward for surveys and check-ins, Claude Code, #387)** — Sam: "Also give 500xp and 1000 crowns as a reward for
   completing a survey or check in. Only reward for the first submission of each". `migration_v60.sql`: two award kinds, `survey`
   and `checkin`, +500 XP each through `sh_award` (one row per survey and per hub's exam, so a replay, a second check-in or a
-  linked device pays once; not boosted; no back pay), and `sh_wallet` adds 1,000 crowns per reward row while leaving its XP out
+  linked device pays once; not boosted), and `sh_wallet` adds 1,000 crowns per reward row while leaving its XP out
   of the 1-per-10 share. `submit_survey` and `submit_exam_debrief` keep their signatures (old pages) and pay too;
-  `submit_survey_v2` and `submit_exam_debrief_v2` answer `{ ok, xp, crowns }`. The dashboard's check-in and survey cards and the
+  `submit_survey_v2` and `submit_exam_debrief_v2` answer `{ ok, xp, crowns }`.
+  Back pay (Sam: "You can implement backpay for the active survey and occlusion check in only"):
+  `tools/data-fixes/2026-11-17-reward-backpay.sql`, run by After merge, pays survey 4's answers and Occlusion's final
+  check-ins once each (the midterm's don't). The dashboard's check-in and survey cards and the
   Inbox's survey (`widget/replies.js`) say what was paid and refresh the You card; both fall back to the old calls until the
   migration is applied. About page updated (check-ins, surveys, the shop's crowns, More ways to earn XP). Tested in
   `tools/release/xp.js` (section 14c).

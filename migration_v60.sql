@@ -10,7 +10,8 @@
 -- 2. "Only the first submission of each": a survey answered (not "Later") for the first time pays; its row can't be
 --    answered twice anyway (unique per survey and visitor). An exam check-in pays only when nobody on this visitor's
 --    linked ids had checked in for that hub and exam before, so someone who checked in before this release gets nothing
---    for checking in again. No back pay for check-ins or surveys sent before this migration.
+--    for checking in again. Back pay only for the survey active on 11-17 and
+--    Occlusion's final check-ins (Sam), in tools/data-fixes/2026-11-17-reward-backpay.sql, run after this migration.
 -- 3. 1,000 Shiny Gold Crowns per reward. The crowns come from sh_wallet, which works them out from the award rows (1,000 a
 --    `survey` or `checkin` row) and leaves those rows' XP out of the "1 crown per 10 XP" share, so the reward pays exactly
 --    1,000 crowns, not 1,050. No new column: redeem_link_code copies award rows by column, and the kind travels with them.
