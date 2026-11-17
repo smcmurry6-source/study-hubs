@@ -263,7 +263,7 @@ return '<svg class="teeth' + (of && done >= of ? " is-met" : "") + '" viewBox="0
 out + "</svg>";
 }
 function todayPanel(){
-var t = todayRec(), g = goal(), n = streakDays(), dn = doneToday(t), left = Math.max(0, g - dn), hp = HX.petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" };
+var t = todayRec(), g = goal(), n = streakDays(), dn = doneToday(t), left = Math.max(0, g - dn), hp = HX.petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" }, w = HX.wallet ? HX.wallet() : null;
 var cap = dn >= g ? "Goal met for today." : left === g ? "Your goal today: " + g + " questions or flashcards. One keeps your streak going." : left + " more meets today's goal.";
 return '<div class="panel today" data-today><div class="today-head"><div><h2>Today</h2><p class="today-date">' + esc(dateLabel(day(0), { weekday: "long", month: "long", day: "numeric" })) + "</p></div>" +
 spot("today", { tint: T.ink, light: T.light, line: T.ink }, "today-art") + "</div>" +
@@ -273,6 +273,7 @@ spot("today", { tint: T.ink, light: T.light, line: T.ink }, "today-art") + "</di
 '<li class="ts-xp">' + artSvg(A.xp, "0 0 24 24", "ts-art", "") + '<span><b class="num">+' + fmt(t.xp) + "</b><small>XP today</small></span></li>" +
 '<li class="ts-right">' + icon("check", 26) + '<span><b class="num">' + fmt(t.r || 0) + " of " + fmt(t.n) + "</b><small>Right today</small></span></li>" +
 (t.k ? '<li class="ts-cards">' + icon("cards", 26) + '<span><b class="num">' + fmt(t.k) + "</b><small>" + (t.k === 1 ? "Flashcard" : "Flashcards") + " today</small></span></li>" : "") +
+(w ? '<li class="ts-crowns"><a href="#more/shop" title="' + fmt(w.earned || w.balance) + ' Shiny Gold Crowns earned in all">' + HX.shopCoin(30) + '<span><b class="num">' + fmt(w.balance) + "</b><small>" + (w.balance === 1 ? "Gold crown" : "Gold crowns") + '<span class="sr"> to spend in Timmy’s shop</span></small></span></a></li>' : "") +
 "</ul>" +
 (hp !== null ? '<p class="today-pet">' + icon("tooth", 18) + "<span>Timmy has <b class=\"num\">" + hp + " HP</b></span></p>" : "") + "</div>";
 }
@@ -353,6 +354,7 @@ function shopCoin(px){ return '<svg class="ic" viewBox="0 0 24 24" width="' + px
 var SHOP = null;
 function shopOf(){ var b = window.shBootstrap, d = b && b.data; return SHOP || (d && d.shop && d.shop.wallet ? d.shop : null); }
 function hasShop(){ return !!shopOf(); }
+function wallet(){ var sh = shopOf(); return sh && sh.wallet && typeof sh.wallet.balance === "number" ? sh.wallet : null; }
 function shopMeta(){
 var sh = shopOf(), bal = sh && sh.wallet ? sh.wallet.balance : null;
 return (ls("sh_shop_dot") === dayCT() ? "● A rare costume came in · " : "") + (bal == null ? "" : String(bal).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " gold crowns");
@@ -374,6 +376,7 @@ boot.then(function(d){
 if (!d || !d.shop || !d.shop.wallet) return;
 SHOP = d.shop;
 if (HX.view === "more" && !HX.sub) HX.go("more", true);
+HX.paintMeters();
 whenWidget("shPet", function(P){
 var sb = window.shSupabase, v = ls("sh_visitor_id"), day = dayCT(), hol = "";
 if (!P || !sb || !v || !day) return;
@@ -421,7 +424,7 @@ if (!res || !res.boost_until || !G || !G.setBoost) return;
 if (!cur || new Date(cur.until).getTime() < new Date(res.boost_until).getTime()) G.setBoost({ mult: 2, until: res.boost_until, src: "shop" });
 HX.paintMeters();
 }
-document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) SHOP = sh; });
+document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP = sh; HX.paintMeters(); } });
 var askLoad = null, askMounted = false;
 function askReady(){
 if (!askLoad) askLoad = HX.loadScript(WIDGET + "ask.js").then(function(){ askMount(); return window.shAsk || null; });
@@ -483,7 +486,7 @@ askReady().then(function(A){ if (A) A.open({ from: "card", text: text, ask: ask 
 function(){ HX.toast("The chat didn't load. Check your connection and try again."); });
 }
 HX.say = say; HX.petHp = petHp; HX.timmyReact = timmyReact; HX.petFromBadges = petFromBadges; HX.morePlace = morePlace;
-HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.costumeOfDay = costumeOfDay;
+HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.wallet = wallet; HX.costumeOfDay = costumeOfDay;
 HX.askStart = askStart; HX.askOn = askOn; HX.askLabel = askLabel; HX.askAbout = askAbout;
 };
 ;
@@ -526,9 +529,9 @@ function card(q, o){
 o = o || {};
 var id = "q" + (++uid), multi = q.type === "multi", tf = q.fmt === "tf";
 var seen = ansOf(q.id);
-var status = o.retry ? '<span class="qc-flag">' + icon("retry", 14) + "Again: you missed this a few questions ago</span>" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
+var status = o.retry ? "" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
 seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + "</span>" : "";
-var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
+var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
 var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
 var body = "", hide = !!o.hide && q.type === "mcq";
 if (q.type === "mcq" || multi) {
@@ -550,6 +553,7 @@ var L = shuffled(q.pairs.map(function(p, i){ return i; })), R = shuffled(q.pairs
 body = '<p class="note qc-hint">Tap an item on the left, then its partner on the right.</p><div class="qc-match"><ul>' + L.map(function(i){ return '<li><button class="ch" type="button" data-side="l" data-pair="' + i + '"><span class="txt">' + esc(q.pairs[i][0]) + "</span></button></li>"; }).join("") +
 "</ul><ul>" + R.map(function(i){ return '<li><button class="ch" type="button" data-side="r" data-pair="' + i + '"><span class="txt">' + esc(q.pairs[i][1]) + "</span></button></li>"; }).join("") + "</ul></div>";
 }
+if (o.retry) { var tryN = +o.retry || 2; head = '<p class="qc-retry">' + icon("retry", 18) + "<span><b>" + (tryN === 2 ? "Second try" : tryN === 3 ? "Third try" : "Try " + tryN) + "</b> · You missed this " + (tryN === 2 ? "a few questions ago" : "again") + ". Take another shot.</span></p>" + head; }
 el.innerHTML = head + figHTML(q) + pboxHTML(q) + stemHTML(q) + body + '<section class="qc-result qcard-explain" data-role="explain" hidden aria-live="polite"></section>';
 wireCard(el, q, o);
 return el;
@@ -1027,9 +1031,13 @@ L.host.appendChild(e);
 function onBankAnswer(cardEl, q, right){
 var L = LIST; if (!L) return;
 if (!right && (L.ctx === "bank" || L.ctx === "weak" || L.ctx === "misses")) {
+var waiting = Array.prototype.some.call(cardEl.parentNode.querySelectorAll(".qcard.is-retry:not(.is-answered)"), function(c){ return c !== cardEl && c.getAttribute("data-qid") === q.id; });
+if (!waiting) {
 var after = cardEl, k = 0; while (after.nextElementSibling && after.nextElementSibling.classList.contains("qcard") && k < RETRY_GAP) { after = after.nextElementSibling; k++; }
-var again = card(q, { ctx: L.ctx, retry: true, onAnswer: onBankAnswer });
+var again = card(q, { ctx: L.ctx, retry: (+cardEl.getAttribute("data-try") || 1) + 1, onAnswer: onBankAnswer });
 after.parentNode.insertBefore(again, after.nextSibling);
+track("bank:retry-shown");
+}
 }
 if (cardEl.classList.contains("is-retry")) track("bank:retry-" + (right ? "right" : "missed"));
 if (L.ctx === "drill") {
@@ -1685,7 +1693,7 @@ var art = '<article class="reading' + lc(lec.id) + '" id="lec-' + esc(lec.id) + 
 (lec.note ? '<p class="note lec-note">' + lec.note + "</p>" : "") +
 '<div class="toolbar" role="toolbar" aria-label="Notes tools">' +
 (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn"' + (mp3 ? ' data-sh-tts-audio="1"' : ' title="Read aloud in your device\'s voice"') + ' aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
-'<button type="button" class="btn btn-text follow-btn" data-follow hidden aria-pressed="' + followOn() + '" title="Highlight each word as it is read">' + icon("highlight", 18) + "Follow along</button>" : "") +
+'<button type="button" class="btn btn-text follow-btn" data-follow hidden aria-pressed="' + followOn() + '" title="Highlight each word as it is read. Tap a word to jump there.">' + icon("highlight", 18) + "Follow along</button>" : "") +
 (hasPlain || hasHy ? '<span class="seg" role="group" aria-label="Reading level"><button type="button" data-level="full" aria-pressed="' + (level === "full") + '">As taught</button>' +
 (hasPlain ? '<button type="button" data-level="plain" aria-pressed="' + (level === "plain") + '">Plain English</button>' : "") +
 (hasHy ? '<button type="button" data-level="hy" aria-pressed="' + hy + '">High yield</button>' : "") + "</span>" : "") +
@@ -1776,7 +1784,14 @@ if (blk !== prevBlk && i) sid++;
 sent[i] = sid; prevBlk = blk;
 if (/[.!?]["”')\]]*$/.test(fw[i])) sid++;
 }
-F.dw = dw; F.map = map; F.sent = sent; F.dirty = false; F.cur = -2;
+var inv = new Array(dw.length), byNode = new Map();
+for (i = 0; i < dw.length; i++) {
+inv[i] = -1;
+(byNode.get(dw[i].a) || (byNode.set(dw[i].a, []), byNode.get(dw[i].a))).push(i);
+if (dw[i].b !== dw[i].a) (byNode.get(dw[i].b) || (byNode.set(dw[i].b, []), byNode.get(dw[i].b))).push(i);
+}
+for (i = 0; i < fw.length; i++) if (map[i] >= 0 && inv[map[i]] < 0) inv[map[i]] = i;
+F.dw = dw; F.map = map; F.sent = sent; F.inv = inv; F.byNode = byNode; F.dirty = false; F.cur = -2;
 }
 function rangeOf(a, b){
 var r = document.createRange();
@@ -1822,11 +1837,57 @@ if (i !== F.cur) paint(i, F.jump); F.jump = false;
 if (!F.audio.paused && !F.audio.ended) F.raf = requestAnimationFrame(tick);
 }
 function kick(){ if (F && F.on && !F.raf) F.raf = requestAnimationFrame(tick); }
+function wordAt(x, y, slack){
+var node = null, off = 0, p;
+if (document.caretPositionFromPoint) { p = document.caretPositionFromPoint(x, y); if (p) { node = p.offsetNode; off = p.offset; } }
+else if (document.caretRangeFromPoint) { p = document.caretRangeFromPoint(x, y); if (p) { node = p.startContainer; off = p.startOffset; } }
+if (!node || node.nodeType !== 3) return -1;
+var ks = F.byNode.get(node) || [];
+for (var n = 0; n < ks.length; n++) {
+var w = F.dw[ks[n]];
+if ((w.a === node && off < w.ai) || (w.b === node && off > w.bi)) continue;
+var r = rangeOf(w, w), rs = r ? r.getClientRects() : [];
+for (var q = 0; q < rs.length; q++) if (x >= rs[q].left - slack && x <= rs[q].right + slack && y >= rs[q].top - slack && y <= rs[q].bottom + slack) return ks[n];
+return -1;
+}
+return -1;
+}
+function tapped(e){
+var me = F;
+if (!me || !me.on || !me.w || e.button || e.defaultPrevented) return;
+if (!(window.shTTS && window.shTTS.audio && window.shTTS.audio() === me.audio)) return;
+if (e.target.closest && e.target.closest("a, button, input, select, textarea, label, summary, mark.sh-hl, [data-sh-noread], .sh-hl-pop")) return;
+var sel = window.getSelection && window.getSelection();
+if (sel && !sel.isCollapsed) return;
+clearTimeout(me.tapT);
+if (e.detail > 1) return;
+var touch = Date.now() - (me.touchAt || 0) < 1000;
+if (me.dirty) build();
+var k = wordAt(e.clientX, e.clientY, touch ? 10 : 3); if (k < 0) return;
+var i = me.inv[k];
+for (var d = 1; i < 0 && d < 40; d++) i = k + d < me.inv.length && me.inv[k + d] >= 0 ? me.inv[k + d] : k - d >= 0 && me.inv[k - d] >= 0 ? me.inv[k - d] : -1;
+if (i < 0) return;
+e.preventDefault();
+me.tapT = setTimeout(function(){
+if (F !== me) return;
+var s2 = window.getSelection && window.getSelection(); if (s2 && !s2.isCollapsed) return;
+var a = me.audio;
+try { a.currentTime = me.t[2 * i] / 100; } catch (err) { return; }
+me.jump = true; me.cur = -2; userAt = 0;
+if (a.paused) { var pl = a.play(); if (pl && pl.catch) pl.catch(function(){}); }
+kick();
+track("notes:follow-seek");
+}, touch ? 0 : 250);
+}
+function touched(){ if (F) F.touchAt = Date.now(); }
 function detach(){
 if (!F) return;
 if (F.raf) cancelAnimationFrame(F.raf);
 if (F.mo) F.mo.disconnect();
+clearTimeout(F.tapT);
 F.off.forEach(function(x){ F.audio.removeEventListener(x[0], x[1]); });
+F.root.removeEventListener("click", tapped); F.root.removeEventListener("touchstart", touched);
+F.root.classList.remove("is-following");
 F = null; clear();
 }
 function load(url){
@@ -1842,7 +1903,14 @@ load(wurl).then(function(d){
 if (F !== me || !d || d.v !== 1 || !d.w || !d.t) return;
 var w = String(d.w).split(" ");
 if (w.length * 2 !== d.t.length) return;
-function ready(){ if (F !== me) return; if (audio.duration && isFinite(audio.duration) && Math.abs(audio.duration - d.dur) > 2) { detach(); return; } me.w = w; me.t = d.t; show(true); kick(); }
+function ready(){
+if (F !== me) return;
+if (audio.duration && isFinite(audio.duration) && Math.abs(audio.duration - d.dur) > 2) { detach(); return; }
+me.w = w; me.t = d.t; show(true); kick();
+root.addEventListener("click", tapped); root.addEventListener("touchstart", touched, { passive: true });
+root.classList.toggle("is-following", me.on);
+if (me.on && !ls("sh_tip_wordseek")) { ls("sh_tip_wordseek", "1"); toast("Tip: tap any word in the notes to jump the narration there."); }
+}
 if (audio.readyState >= 1) ready(); else audio.addEventListener("loadedmetadata", ready, { once: true });
 function on(x, f){ audio.addEventListener(x, f); me.off.push([x, f]); }
 on("play", kick); on("seeked", function(){ if (F === me) { me.jump = true; me.cur = -2; kick(); } });
@@ -1857,7 +1925,7 @@ function show(on){ var b = F && F.root.closest(".reading") ? $("[data-follow]", 
 document.addEventListener("sh:tts-audio", function(e){ var d = e.detail || {}; attach(d.audio, d.container, d.url); });
 document.addEventListener("sh:tts-stop", function(){ if (F && !(window.shTTS && window.shTTS.audio && window.shTTS.audio() === F.audio)) detach(); });
 return {
-pref: function(){ if (!F) return; F.on = followOn(); if (F.on) { F.cur = -2; F.jump = true; kick(); } else clear(); },
+pref: function(){ if (!F) return; F.on = followOn(); if (F.w) F.root.classList.toggle("is-following", F.on); if (F.on) { F.cur = -2; F.jump = true; kick(); } else clear(); },
 reattach: function(root, mp3){ var a = window.shTTS && window.shTTS.audio && window.shTTS.audio(); if (a && F && F.audio === a && !F.root.isConnected && F.url === mp3.replace(/\.mp3$/, ".words.json")) attach(a, root, mp3); }
 };
 })();

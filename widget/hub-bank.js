@@ -49,9 +49,9 @@
     o = o || {};
     var id = "q" + (++uid), multi = q.type === "multi", tf = q.fmt === "tf";
     var seen = ansOf(q.id);
-    var status = o.retry ? '<span class="qc-flag">' + icon("retry", 14) + "Again: you missed this a few questions ago</span>" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
+    var status = o.retry ? "" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
       seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + "</span>" : "";
-    var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
+    var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
     /* o.num, o.of: the card's place in the set ("Question 12 of 84"), so you can see how many are left (a classmate's
        ask, from the idea board, 2026-11-15) */
     var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
@@ -77,6 +77,9 @@
       body = '<p class="note qc-hint">Tap an item on the left, then its partner on the right.</p><div class="qc-match"><ul>' + L.map(function(i){ return '<li><button class="ch" type="button" data-side="l" data-pair="' + i + '"><span class="txt">' + esc(q.pairs[i][0]) + "</span></button></li>"; }).join("") +
         "</ul><ul>" + R.map(function(i){ return '<li><button class="ch" type="button" data-side="r" data-pair="' + i + '"><span class="txt">' + esc(q.pairs[i][1]) + "</span></button></li>"; }).join("") + "</ul></div>";
     }
+    /* a missed question back a few cards later (Sam, 2026-11-17: "a different way to mark retries"): a band across the top
+       says which try it is, and the card is tinted with a dashed edge, so it can't be taken for a new one */
+    if (o.retry) { var tryN = +o.retry || 2; head = '<p class="qc-retry">' + icon("retry", 18) + "<span><b>" + (tryN === 2 ? "Second try" : tryN === 3 ? "Third try" : "Try " + tryN) + "</b> · You missed this " + (tryN === 2 ? "a few questions ago" : "again") + ". Take another shot.</span></p>" + head; }
     el.innerHTML = head + figHTML(q) + pboxHTML(q) + stemHTML(q) + body + '<section class="qc-result qcard-explain" data-role="explain" hidden aria-live="polite"></section>';
     wireCard(el, q, o);
     return el;
@@ -596,9 +599,14 @@
   function onBankAnswer(cardEl, q, right){
     var L = LIST; if (!L) return;
     if (!right && (L.ctx === "bank" || L.ctx === "weak" || L.ctx === "misses")) {
-      var after = cardEl, k = 0; while (after.nextElementSibling && after.nextElementSibling.classList.contains("qcard") && k < RETRY_GAP) { after = after.nextElementSibling; k++; }
-      var again = card(q, { ctx: L.ctx, retry: true, onAnswer: onBankAnswer });
-      after.parentNode.insertBefore(again, after.nextSibling);
+      /* one retry of a question waits in the list at a time (as on the old pages) */
+      var waiting = Array.prototype.some.call(cardEl.parentNode.querySelectorAll(".qcard.is-retry:not(.is-answered)"), function(c){ return c !== cardEl && c.getAttribute("data-qid") === q.id; });
+      if (!waiting) {
+        var after = cardEl, k = 0; while (after.nextElementSibling && after.nextElementSibling.classList.contains("qcard") && k < RETRY_GAP) { after = after.nextElementSibling; k++; }
+        var again = card(q, { ctx: L.ctx, retry: (+cardEl.getAttribute("data-try") || 1) + 1, onAnswer: onBankAnswer });
+        after.parentNode.insertBefore(again, after.nextSibling);
+        track("bank:retry-shown");   // the old pages' event, so how many people a re-ask reaches can be read again
+      }
     }
     if (cardEl.classList.contains("is-retry")) track("bank:retry-" + (right ? "right" : "missed"));
     if (L.ctx === "drill") {

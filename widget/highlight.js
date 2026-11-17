@@ -105,10 +105,20 @@
   function barEl(){
     if (bar) return bar;
     bar = document.createElement("div"); bar.className = "sh-hl-pop"; bar.hidden = true;
-    var keep = function(e){ e.preventDefault(); };
+    var keep = function(e){ e.preventDefault(); }, tapAt = 0;
     bar.addEventListener("mousedown", keep); bar.addEventListener("touchstart", keep, { passive: false });
-    bar.addEventListener("click", function(e){
-      var b = e.target.closest("[data-hl-act]"); if (!b || !pending) return;
+    /* On a phone, cancelling the touchstart (so the tap doesn't clear the selection) also cancels the tap's click, so the
+       button never answered a finger (found 2026-11-17). A finger acts when it lifts off a button; a mouse or the keyboard
+       clicks as before, and the click a browser may still send after a touch is ignored. */
+    bar.addEventListener("touchend", function(e){
+      var t = e.changedTouches && e.changedTouches[0], at = t ? document.elementFromPoint(t.clientX, t.clientY) : e.target;
+      var b = at && at.closest && at.closest("[data-hl-act]");
+      if (!b || !bar.contains(b)) return;
+      e.preventDefault(); tapAt = Date.now(); act(b);
+    }, { passive: false });
+    bar.addEventListener("click", function(e){ if (Date.now() - tapAt > 700) act(e.target.closest("[data-hl-act]")); });
+    function act(b){
+      if (!b || !pending) return;
       var c = b.getAttribute("data-hl-c") || pen();
       setPen(c);
       var p = pending, k = keyOf(p.el);
@@ -116,7 +126,7 @@
       if (window.shTrack) window.shTrack("hl:" + c);
       try { window.getSelection().removeAllRanges(); } catch (e2) {}
       hideBar();
-    });
+    }
     document.body.appendChild(bar);
     return bar;
   }
