@@ -62,5 +62,5 @@ The design page (`tools/preview/design/`, "The seasonal sets" and "Rank sets") s
 is wired into `widget/pet.js` ([preview-and-release-test](../rules/preview-and-release-test.md)).
 
 Related: [game-server](../reference/game-server.md) · [Timmy's place, round 3](../tasks/done/2026-11-10-redesign-timmys-place-round-3.md) ·
-[Timmy's shop](../tasks/2026-11-06-redesign-timmy-shop.md) · [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md) ·
+[Timmy's shop](../tasks/done/2026-11-06-redesign-timmy-shop.md) · [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md) ·
 [repo-map](../reference/repo-map.md)

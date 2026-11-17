@@ -62,7 +62,7 @@ that note's design is the starting point, and where the two differ this one wins
 
 ## Context
 
-- The redesign: [the release](2026-11-06-redesign-release.md) (its "Ask Timmy" box), [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)
+- The redesign: [the release](2026-11-06-redesign-release.md) (its "Ask Timmy" box), [phase 4](2026-11-05-redesign-phase-4-game-layer.md)
   (part E is this note), [run-a-redesign-session](../../how-to/run-a-redesign-session.md) (one part per fresh session).
 - Rules that matter most: [secrets](../../rules/secrets.md) (the key lives only in Supabase's secrets),
   [learner-data-privacy](../../rules/learner-data-privacy.md), [graded-coursework](../../rules/graded-coursework.md),
@@ -246,9 +246,9 @@ limit; the function is deployed (the Supabase connector's `deploy_edge_function`
 
 ## Build spec, part 4: Timmy everywhere (written 2026-11-12, with Sam's calls of that day)
 
-Session 3 of [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release"; it comes after the
+Session 3 of [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release"; it comes after the
 shop's client, because both edit `widget/pet.js`. Read first: "For every session above" there, this note's "Where it
-plugs in", [the shop](../2026-11-06-redesign-timmy-shop.md) ("Sam's calls (2026-11-12)"), `widget/place.js`'s top comment.
+plugs in", [the shop](2026-11-06-redesign-timmy-shop.md) ("Sam's calls (2026-11-12)"), `widget/place.js`'s top comment.
 
 **Sam's calls** ([decisions](../../decisions.md)):
 - 2026-11-12 (above): "adopting timmy is no longer an option. once the redesign launches, everyone has timmy", with
@@ -345,7 +345,7 @@ change to HP's rules beyond the 100 start; the old pages.
       - [x] with it: Timmy on a hub's bar (and wherever else `widget/pet.js` draws him) wears the outfit equipped at
             his place (`shop.equipped.outfit` in the v2 bootstrap; `SH_PLACE.dress()` or `SH_OUTFITS.dress()` draws
             it). Part C of phase 4 left pet.js untouched, so today only the place itself shows it
-            ([the place](../2026-11-06-redesign-timmys-place.md), 2026-11-12)
+            ([the place](2026-11-06-redesign-timmys-place.md), 2026-11-12)
       - [x] as "Build spec, part 4" above says (its own Done when)
 - [x] The About page entries (what Timmy does; "What the hubs record": chats are saved to help improve the hub and are
       answered by Claude, Anthropic's AI) in the release note's drafts
@@ -394,7 +394,7 @@ change to HP's rules beyond the 100 start; the old pages.
   `RULES`, the schema, the effort level or the model.
 - 2026-11-12 (Claude Code, planning only): part 4's build spec is above ("Timmy everywhere": everyone has Timmy, and
   he wears only what the student put on, Sam's call that day), with the prompts for parts 2, 3 and 4 at the end of
-  this note. Where it sits among the sessions left: [phase 4](../2026-11-05-redesign-phase-4-game-layer.md), "From here
+  this note. Where it sits among the sessions left: [phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here
   to the release" (part 4 before part 2, so the chat is built on a Timmy who is always there). For part 2: an idea
   Timmy drafts is posted with source `board`, because the pending `post_idea` refuses `timmy`.
 - 2026-11-12 (part 2, Claude Code, [#338](https://github.com/smcmurry6-source/study-hubs/pull/338)): the chat. `widget/ask.js` + `widget/ask.css`, mounted by `widget/hub-timmy.js` on a
@@ -498,7 +498,7 @@ change to HP's rules beyond the 100 start; the old pages.
 notes, on Sonnet 5.5, with his switch, cap and chats on the admin page's Ask Timmy tab. Left for Sam, in the
 [inbox](../inbox.md): one question from a phone, and the key's name in Supabase (it works as it is).
 
-Related: [the release](2026-11-06-redesign-release.md) · [phase 4](../2026-11-05-redesign-phase-4-game-layer.md) ·
+Related: [the release](2026-11-06-redesign-release.md) · [phase 4](2026-11-05-redesign-phase-4-game-layer.md) ·
 [Ask the Hub](2026-11-06-ask-the-hub-assistant.md) · [learner-data-privacy](../../rules/learner-data-privacy.md) ·
 [decisions](../../decisions.md)
 

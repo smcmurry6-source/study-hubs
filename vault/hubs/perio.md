@@ -171,7 +171,7 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
 
 ## On the engine (since the redesign's release)
 
-Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/2026-11-05-redesign-phase-2-live-hubs.md)) and moved to
+Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11-05-redesign-phase-2-live-hubs.md)) and moved to
 `hubs/perio/` at the [release](../tasks/done/2026-11-06-redesign-release.md).
 - It is in `sw.js`'s `HUBS`, so its page, art and content are precached; a content edit shows on the page load after the
   one that fetched it.

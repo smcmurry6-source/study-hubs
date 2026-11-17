@@ -29,7 +29,7 @@ tags: [widget, supabase]
   `window.shGame` for the engine. Without the attribute v3.js works exactly as it did before the release, which
   is what the old hub pages get. `widget/ranks.js` and `widget/rankup.js` draw a rank past the Handpiece only for a v2 profile (`journey`
   set); `shRanks.art()` without a shape is byte for byte what it was. How it fits together:
-  [game-server](game-server.md) and [the journeys](../tasks/2026-11-06-redesign-progression-journeys.md).
+  [game-server](game-server.md) and [the journeys](../tasks/done/2026-11-06-redesign-progression-journeys.md).
 - **The trophy case and the cards on the redesign** (phase 4 session 6): `widget/ranks.js` and `widget/rankup.js` are
   shared with the old single-file hub pages, so what's new there is gated on the `shx` class the redesign's pages put on
   `<html>` (`NEW`): 27 trophies (the journeys and Bowling in), the cards' new look, and `shRanks.trophyCase()`, which

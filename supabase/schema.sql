@@ -11,6 +11,13 @@
 -- with the real value from Sam's local ops scripts before running.
 --
 -- Refresh this file whenever you run a new migration.
+--
+-- Checked against the live database on 2026-11-17: the same 210 functions and the same 114 indexes. To check again,
+-- run one read-only query on the live project and the same on a throwaway copy of this file (tools/release/pg.js,
+-- with '<ADMIN_SECRET>' as its secret): md5(string_agg(name || args || h)) over the public sql and plpgsql functions,
+-- h being md5 of prosrc with carriage returns, -- comments and the secret (the literal after "is distinct from")
+-- taken out and whitespace collapsed, and md5(string_agg(indexdef)) over the indexes. Compare hashes only: never
+-- print a secret-gated function's body.
 -- ============================================================================
 
 -- ---------------------------------------------------------------- tables
@@ -121,6 +128,8 @@ create index if not exists activity_pings_visit_idx on public.activity_pings (vi
 create index if not exists activity_pings_hub_idx on public.activity_pings (hub, pinged_at);
 create index if not exists activity_pings_visitor_hub_idx on public.activity_pings (visitor_id, hub);
 create index if not exists activity_pings_time_idx on public.activity_pings (pinged_at) include (hub, section, visitor_id);
+-- migration_v25 (replies to reports); its twin on hub_suggestions was dropped by migration_v53
+create index if not exists question_flags_visitor_idx on public.question_flags (visitor_id) where visitor_id is not null;
 
 -- ---------------------------------------------------------------- row level security
 -- Every table has RLS on. Tables with no policy are reachable only through the
@@ -186,7 +195,10 @@ $$;
 
 create or replace function public.get_display_name(p_visitor text)
 returns text language sql stable security definer set search_path = public as $$
-  select coalesce((select display_name from visitor_names where visitor_id = p_visitor), anon_name(p_visitor));
+  select coalesce(
+    (select display_name from visitor_names where visitor_id = p_visitor),
+    anon_name(p_visitor)
+  );
 $$;
 
 create or replace function public.set_display_name(p_visitor text, p_name text)
@@ -505,7 +517,7 @@ returns table(hub text, launches bigint)
 language plpgsql security definer set search_path = public as $$
 begin
   if p_secret is distinct from '<ADMIN_SECRET>' then raise exception 'unauthorized' using errcode = '28000'; end if;
-  return query select coalesce(nullif(n.hub, ''), '(unknown)'), count(*)::bigint as launches from nuke_launches n
+  return query select coalesce(nullif(n.hub, ''), '(unknown)') as hub, count(*)::bigint as launches from nuke_launches n
   where n.launched_at >= now() - (p_days || ' days')::interval group by coalesce(nullif(n.hub, ''), '(unknown)') order by launches desc;
 end;
 $$;
@@ -515,7 +527,7 @@ returns table(display_name text, hub text, launched_at timestamptz)
 language plpgsql security definer set search_path = public as $$
 begin
   if p_secret is distinct from '<ADMIN_SECRET>' then raise exception 'unauthorized' using errcode = '28000'; end if;
-  return query select coalesce(n.display_name, anon_name(n.visitor_id)), coalesce(nullif(n.hub, ''), '(unknown)'), n.launched_at
+  return query select coalesce(n.display_name, anon_name(n.visitor_id)) as display_name, coalesce(nullif(n.hub, ''), '(unknown)') as hub, n.launched_at
   from nuke_launches n order by n.launched_at desc limit p_limit;
 end;
 $$;

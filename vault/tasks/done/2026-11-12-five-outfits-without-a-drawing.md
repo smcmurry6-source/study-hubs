@@ -18,15 +18,15 @@ Every outfit the shop can sell is one Timmy can be drawn in. Today five can't be
 
 ## Context
 
-- Found on 2026-11-12 while building Timmy's place as a real client ([the place](../2026-11-06-redesign-timmys-place.md),
-  [phase 4](../2026-11-05-redesign-phase-4-game-layer.md) part C), checking the client against the server as written
+- Found on 2026-11-12 while building Timmy's place as a real client ([the place](2026-11-06-redesign-timmys-place.md),
+  [phase 4](2026-11-05-redesign-phase-4-game-layer.md) part C), checking the client against the server as written
   ([game-server](../../reference/game-server.md)). Sam's instruction for that session: "If they disagree, tell me instead
   of changing the migration." So the migration is unchanged.
 - `migration_v54.sql` (pending, [the release](2026-11-06-redesign-release.md)) lists twelve everyday outfits. Seven are
   drawn by the place's kit (`tools/figures/site/place.mjs`, `OUTFITS`): `sun-hat`, `sunglasses-lei`, `captain-hat`,
   `ranger-hat`, `beanie`, `nightcap`, `aviator-cap`. **Five are not drawn anywhere**: `scrub-cap` (common, 150),
   `bow-tie` (common, 120), `safety-glasses` (uncommon, 300), `white-coat` (uncommon, 450) and `graduation-cap` (rare,
-  900). They look like the first draft of the catalog ([the shop note](../2026-11-06-redesign-timmy-shop.md) names "a scrub
+  900). They look like the first draft of the catalog ([the shop note](2026-11-06-redesign-timmy-shop.md) names "a scrub
   cap, a white coat, safety glasses, a bow tie, a beanie, a graduation cap"), from before "the server's names follow
   the art" (Sam, 2026-11-06).
 - All five `rotate`, so the daily and weekly shelves would offer them. Bought and put on, the place draws Timmy as
@@ -41,7 +41,7 @@ Every outfit the shop can sell is one Timmy can be drawn in. Today five can't be
 
 Sam chose the first way ([decisions](../../decisions.md)): **the five are drawn**, in the shop's art session, with the
 five rare costumes, on one contact sheet for his yes. The migration is not changed. The build spec is
-[the shop](../2026-11-06-redesign-timmy-shop.md)'s "Build spec, session 1: the shop's art" (item 5 there), and that
+[the shop](2026-11-06-redesign-timmy-shop.md)'s "Build spec, session 1: the shop's art" (item 5 there), and that
 session ticks this note's boxes and moves it to `done/`. In the bug log this is BUG-090.
 
 ## The two ways, as they were asked
@@ -74,10 +74,10 @@ safety glasses are on `NO_LOUPES`; the other four are drawn with the loupes. `no
 catalog piece without a drawing. Sam approved them on the outfits sheet, light and dark (2026-11-12, [#339](https://github.com/smcmurry6-source/study-hubs/pull/339)).
 BUG-090 is closed. Nothing left.
 
-Related: [Timmy's shop](../2026-11-06-redesign-timmy-shop.md) · [Timmy's place](../2026-11-06-redesign-timmys-place.md) ·
+Related: [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [Timmy's place](2026-11-06-redesign-timmys-place.md) ·
 [game-server](../../reference/game-server.md) · [the release](2026-11-06-redesign-release.md)
 
 ## Opening prompt
 
 This note has no session of its own: it is done by the shop's art session. Its prompt is the first one at the end of
-[the shop's note](../2026-11-06-redesign-timmy-shop.md).
+[the shop's note](2026-11-06-redesign-timmy-shop.md).

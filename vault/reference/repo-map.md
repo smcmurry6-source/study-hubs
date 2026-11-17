@@ -21,7 +21,7 @@ tags: [map]
   set; `pack-preview.mjs`, a contact sheet of one set: [draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md)), and
   the shop's own art (`shop.mjs`: the Shiny Gold Crown coin, the snack and boost thumbnails, the rarity frames, built
   into `widget/hub-art/shop.js`, `window.SH_SHOP_ART`; `shop-sheets.mjs`, its contact sheets:
-  [the shop](../tasks/2026-11-06-redesign-timmy-shop.md)).
+  [the shop](../tasks/done/2026-11-06-redesign-timmy-shop.md)).
 - `DEPLOY_NOTES.md` — the change log ("Recent major changes", newest first): what every session shipped. Grep it for a
   hub or feature; don't read it whole.
 - `index.html` — the dashboard (the redesign's, since its release in 2026-11): a small page of settings
@@ -36,16 +36,16 @@ tags: [map]
   (the studying-now classroom, the leaderboard's stage and the recap's bar graph and crowd, from `classroom.mjs`,
   `stage.mjs` and `recap.mjs` in `tools/figures/site/`)
   and `widget/hub-art/outfits.js` (the shop's outfits and `dress()`, loaded only when someone on the page wears one).
-  The three journeys (Handpiece, ModuPro, Loupes: [task](../tasks/2026-11-06-redesign-progression-journeys.md)):
+  The three journeys (Handpiece, ModuPro, Loupes: [task](../tasks/done/2026-11-06-redesign-progression-journeys.md)):
   `widget/journeys.js` (the hand-off and the Dark Matter unlock, full-screen scenes, and the road ahead) and
   `widget/hub-art/journeys.js` (the ModuPro's and the loupes' shapes for `shRanks.art` and the three journey trophies,
   from `tools/figures/site/journeys.mjs` and `medals.mjs`), both fetched by `widget/ranks.js` on first use.
-  Timmy's place ([task](../tasks/2026-11-06-redesign-timmys-place.md)): `widget/place.js` + `widget/place.css`
+  Timmy's place ([task](../tasks/done/2026-11-06-redesign-timmys-place.md)): `widget/place.js` + `widget/place.css`
   (`window.shPlace`: the card, the full view, Timmy's hops, the medal view and the customizer, which saves through
   `equip_item`), with its kit `widget/hub-art/place.js` (`window.SH_PLACE`, from `tools/figures/site/place.mjs`) and
   one file per set in `widget/hub-art/place/` (`<season>.js` and `ranks.js`, each fetched only when a piece of that set
   is drawn). None of it loads with a page: a hub fetches it from More, Timmy's place, and the dashboard on the
-  first scroll, tap or key (until then its "you" card shows a still kept on the device). [Phase 3](../tasks/2026-11-05-redesign-phase-3-dashboard.md) says what is on it.
+  first scroll, tap or key (until then its "you" card shows a still kept on the device). [Phase 3](../tasks/done/2026-11-05-redesign-phase-3-dashboard.md) says what is on it.
 - `hubs/<hub-id>/` — **a hub on the engine** (Occlusion, Perio and every hub built since the redesign's release):
   `index.html`, a small page of settings (`window.SH_HUB`), and `content/`, its content as JSON, **which is where the
   hub is edited** (`core.json`, `questions.json`, `notes.json`, `study.json`, plus `figures.js/css` and

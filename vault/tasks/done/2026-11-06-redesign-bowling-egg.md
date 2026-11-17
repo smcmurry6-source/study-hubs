@@ -51,7 +51,7 @@ Each has a still version for reduced motion: the last frame and the word ("Strik
   and the mock too, so more often than the real trigger): a run of 10 right came about 5,200 times, about 4.6 times a day for
   each person studying; a run of 50 about 110 times, for 43 people, about once in ten study days; a run of 150 only a couple
   of times. So the turkey is rare by design, and the bowling lane at Timmy's place still plays any clip.
-- **At Timmy's place**: the bowling lane yard item ([Timmy's place](../2026-11-06-redesign-timmys-place.md)); tapping it plays a
+- **At Timmy's place**: the bowling lane yard item ([Timmy's place](2026-11-06-redesign-timmys-place.md)); tapping it plays a
   random clip.
 - **First sighting** of each clip goes in the egg log; seeing all eight is a secret trophy (keep the About page's trophy count true).
   (2026-11-12: there is no egg log on the site; sightings and the trophy are kept on the device, see "Sam's calls
@@ -80,7 +80,7 @@ Each has a still version for reduced motion: the last frame and the word ("Strik
 
 ## Build spec
 
-Session 5 of [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release", after the shop's
+Session 5 of [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release", after the shop's
 client. Read first: "For every session above" there, this note, the lore rules in
 [podcast-reactions](../../rules/podcast-reactions.md), `widget/place.js`'s `playEgg`.
 
@@ -157,7 +157,7 @@ lane, never with a page; the three new hubs stay at 20, 20 and 18 requests.
 - [x] The triggers ~~in `widget/eggs.js`~~ (in the engine's answer path instead, per the build spec) and the bowling
       lane at Timmy's place, built in phase 4
       (the lane is at his place since part C, 2026-11-12: a wide yard piece with a small tap surprise of its own;
-      where a clip hooks in is in [phase 4's Log](../2026-11-05-redesign-phase-4-game-layer.md))
+      where a clip hooks in is in [phase 4's Log](2026-11-05-redesign-phase-4-game-layer.md))
 - [x] `LORE.md` (the bowling alley, number thirty-one's fainting), the About page (in a spoiler: drafted in the release
       note, written to `about/index.html` at the release), the event taxonomy
 - [x] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
@@ -219,8 +219,8 @@ Left, each written where it belongs: the About page entry and the service worker
 ([the release note](2026-11-06-redesign-release.md), "From phase 4, part D"); the trophy's row and pop-up card
 ([the trophy case](2026-11-12-redesign-trophy-case-and-cards.md)); the trophy on the server after the release.
 
-Related: [Timmy's place](../2026-11-06-redesign-timmys-place.md) · [Timmy's shop](../2026-11-06-redesign-timmy-shop.md) ·
-[phase 4](../2026-11-05-redesign-phase-4-game-layer.md)
+Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) ·
+[phase 4](2026-11-05-redesign-phase-4-game-layer.md)
 
 ## Opening prompt
 

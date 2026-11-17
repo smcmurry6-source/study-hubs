@@ -21,8 +21,8 @@ task is the one PR that then switches the site over. If something goes wrong, re
 ## Context
 
 - How the new versions are built and kept in step with the live hubs: [phase 1](2026-11-05-redesign-phase-1-hub-engine.md)
-  (Context). The other phases: [2](../2026-11-05-redesign-phase-2-live-hubs.md), [3](../2026-11-05-redesign-phase-3-dashboard.md),
-  [4](../2026-11-05-redesign-phase-4-game-layer.md); [5](2026-11-05-redesign-phase-5-backend.md) ships as it's ready.
+  (Context). The other phases: [2](2026-11-05-redesign-phase-2-live-hubs.md), [3](2026-11-05-redesign-phase-3-dashboard.md),
+  [4](2026-11-05-redesign-phase-4-game-layer.md); [5](2026-11-05-redesign-phase-5-backend.md) ships as it's ready.
 - The plan: [the redesign audit and plan](2026-11-05-redesign-audit-and-plan.md), section 4.
 - **Which model:** this session runs on Fable 5.2 at High effort (Sam, 2026-11-12, [decisions](../../decisions.md)).
 - Rules that matter most here: [preview-and-release-test](../../rules/preview-and-release-test.md) (tier 3: the release
@@ -36,7 +36,7 @@ task is the one PR that then switches the site over. If something goes wrong, re
 
 ## Done when
 
-- [x] Every session before this one is merged: 1 to 9 in [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s
+- [x] Every session before this one is merged: 1 to 9 in [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s
       "From here to the release" (the shop's art and client, Timmy everywhere, visiting, the bowling egg, the trophy
       case and the cards, Ask Timmy's chat, the wiring, phase 5 part 2), and beside them Ask Timmy's admin tab and
       Learn and Flashcards (planned with Sam, 2026-11-12)
@@ -67,7 +67,7 @@ task is the one PR that then switches the site over. If something goes wrong, re
 - [x] CI and the release suites pass on the switch PR, and the UAT is done on its own preview; reverting it there brings
       the old site back
       **The smoke test on every hub and `node tools/release/run.js` ran once on the finished code (the report is in the PR); the UAT was done on the preview, phone and laptop. A revert of the merge is the tree before it; the database stays (the old pages run on it, as the archived hubs' do).**
-- [x] The new dashboard, left from [phase 3](../2026-11-05-redesign-phase-3-dashboard.md) (2026-11-12): its three screens
+- [x] The new dashboard, left from [phase 3](2026-11-05-redesign-phase-3-dashboard.md) (2026-11-12): its three screens
       (`dashboard/next`) added to the accessibility baseline; first paint on the slow-phone profile looked at again (it
       passes its budget but is slower than the live dashboard's); and, once it is the live dashboard, one look with a
       real hub tab open beside it: your Timmy walks in wearing his outfit and his desk says "You" (a preview has no
@@ -102,7 +102,7 @@ task is the one PR that then switches the site over. If something goes wrong, re
       in its constant (`FULL_FROM`, `"9999-12-31"` until then; `tools/preview/transform.js` and the smoke test look for
       that exact line, so change them with it). Built in [Ask Timmy, part 4](2026-11-12-redesign-ask-timmy.md); what
       comes out then: "From Ask Timmy, part 4" below; the prices Sam wants changed are changed with `admin_upsert_shop_item` once the migration is
-      applied ([the shop](../2026-11-06-redesign-timmy-shop.md), "Prices to change after the release")
+      applied ([the shop](2026-11-06-redesign-timmy-shop.md), "Prices to change after the release")
       **Done in the switch PR: the adoption code is out, on every page. `FULL_FROM` is `"2026-11-14"`, the merge day in Central time. No price was waiting to be changed (the shop's note lists none).**
 - [x] Ask Timmy ([its note](2026-11-12-redesign-ask-timmy.md), "At the release"; the steps: [ask-timmy](../../reference/ask-timmy.md)): Sam has saved the API key in Supabase
       (done 2026-11-14; no Console spending limit for now, [decisions](../../decisions.md)); the `timmy` function deployed; `migration_v55` applied with `migration_v54`; the
@@ -221,7 +221,7 @@ bar under the explanation; opened, it lists every choice with your pick's reason
 - **Tour** (changed): no pop-up on arrival; a one-line tip the first time you open each part, and "Take the tour" in More.
 - Timmy Tooth: he stays in the bottom-left corner, as now.
 
-### The engine's files (the split, 2026-11-12, [phase 4](../2026-11-05-redesign-phase-4-game-layer.md))
+### The engine's files (the split, 2026-11-12, [phase 4](2026-11-05-redesign-phase-4-game-layer.md))
 
 (Since part A, 2026-11-12: `widget/journeys.js` and `widget/hub-art/journeys.js` too. They load on first use, not with
 the page, and are in `tools/ci/syntax.js`. Since Learn and Flashcards, 2026-11-12: `widget/study-modes.js` and
@@ -232,7 +232,7 @@ the page, and are in `tools/ci/syntax.js`. Since Learn and Flashcards, 2026-11-1
 file a later session adds to the engine joins `tools/bundle/bundles.json` (then `node tools/bundle/build.mjs`) and
 `tools/ci/syntax.js`; the pages and the smoke test read the bundle.
 
-### From phase 2, Heme & Endo Exam 2 ([phase 2](../2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../../hubs/heme-endo-exam2.md))
+### From phase 2, Heme & Endo Exam 2 ([phase 2](2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../../hubs/heme-endo-exam2.md))
 
 Built in `hubs/heme-endo-exam2/next/` (2026-11-11). Its exam is Friday, November 13, 10:00 am: by the rule above ("a hub
 whose exam passed before the release keeps its old page"), **this new version is switched in only if the release comes
@@ -331,7 +331,7 @@ hints' "Most likely questions"), strongest evidence first, with the part of the 
 "know this", then what else was flagged in class and what you can skip. Its button at the end opens that lecture's High
 likelihood questions. Listen reads High yield too, in the same voice as the other levels, with Follow along.
 
-### From phase 2, Perio ([phase 2](../2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../../hubs/perio.md))
+### From phase 2, Perio ([phase 2](2026-11-05-redesign-phase-2-live-hubs.md), [hub note](../../hubs/perio.md))
 
 Built in `hubs/perio/next/` (2026-11-11). Perio's final is Thursday, November 19, so by the rule above it is switched in if
 the release comes before then. At the release its own engine goes with the old page, and its content JSON becomes where
@@ -392,7 +392,7 @@ when it's due or new, for its first three ratings a day; Study ahead earns none.
 "What the hubs record": how you rated each flashcard and where you are in Learn, so your schedule and progress follow you
 to your other devices.
 
-### From phase 4, part A (the journeys' client, [the journeys](../2026-11-06-redesign-progression-journeys.md), built 2026-11-12)
+### From phase 4, part A (the journeys' client, [the journeys](2026-11-06-redesign-progression-journeys.md), built 2026-11-12)
 
 **Already wired, switches on by itself when migration_v54 is applied** (step 6 below, in part): the new hubs call
 `get_widget_bootstrap_v2`, `record_answer_v2` in place of today's answer calls, `xp_session_start` / `xp_session_finish`
@@ -457,7 +457,7 @@ entries; tagged new; nothing here is a secret):
   leaves ("From phase 4, session 6" below has the case's own entry and the whole count). "All 24 trophies" in the
   contents and Part 9's list become 27.
 
-### From phase 4, part C (Timmy's place as a real client, [the place](../2026-11-06-redesign-timmys-place.md), built 2026-11-12)
+### From phase 4, part C (Timmy's place as a real client, [the place](2026-11-06-redesign-timmys-place.md), built 2026-11-12)
 
 What part C built is in the place's note (its Log) and [game-server](../../reference/game-server.md). It runs only on the
 redesign's pages, on the game layer (`get_my_shop`, `equip_item`), so it goes live with the release and with the shop.
@@ -534,7 +534,7 @@ his house card; the tap surprises go inside a `spoil` element):
 - **His health shows in how he moves** at his place (bouncing when sparkling, on the doorstep when he needs
   treatment), the same HP as everywhere else. A visitor never sees it: a visited Timmy is always drawn well.
 
-### From phase 4, part B (Timmy's shop, [the shop](../2026-11-06-redesign-timmy-shop.md), built 2026-11-12)
+### From phase 4, part B (Timmy's shop, [the shop](2026-11-06-redesign-timmy-shop.md), built 2026-11-12)
 
 What part B built is in the shop's note (session 2 in its Log) and [game-server](../../reference/game-server.md) ("How
 the client uses it"). It runs only on the redesign's pages, on the game layer, so it goes live with the release.
@@ -893,7 +893,7 @@ Timmy"). At the release, besides the box above:
   reads the same.
 - **The tour** (`widget/tour.js`, the old dashboard's "Meet Timmy Tooth" step) goes with the old dashboard.
 
-### From phase 3 (the new dashboard, [phase 3](../2026-11-05-redesign-phase-3-dashboard.md))
+### From phase 3 (the new dashboard, [phase 3](2026-11-05-redesign-phase-3-dashboard.md))
 
 Written for the dashboard as built in `next/index.html`, `widget/dash.js` and `widget/dash.css`. The idea board's part
 is in [its own note](2026-11-06-idea-board.md).
@@ -1044,12 +1044,12 @@ is a new migration and Sam's call, never a restore.
   drafts above.
 - 2026-11-06: Sam's third look: Timmy Time among Home's quick starts, animated; Today's ring of 20 teeth.
 - 2026-11-12: High yield, the notes' third reading level, built in the engine; its drafts are above.
-- 2026-11-12: the engine split into its core and three parts ([phase 4](../2026-11-05-redesign-phase-4-game-layer.md), its
+- 2026-11-12: the engine split into its core and three parts ([phase 4](2026-11-05-redesign-phase-4-game-layer.md), its
   first step); the service worker's list for them is above ("The engine's files").
 - 2026-11-12: High yield narrated with Kokoro for all three hubs (21 lectures), played with Follow along where it
   matches today's High yield ([task](2026-11-12-high-yield-narration.md)); the drift rule covers it.
 - 2026-11-12 (Claude Code, planning only): the sessions from here to this one are in order in
-  [phase 4](../2026-11-05-redesign-phase-4-game-layer.md) ("From here to the release"), each with a build spec; this
+  [phase 4](2026-11-05-redesign-phase-4-game-layer.md) ("From here to the release"), each with a build spec; this
   note's Done when names them, and "What Sam's calls of 2026-11-12 change in the drafts above" lists the drafts they
   make untrue. Part C ([#335](https://github.com/smcmurry6-source/study-hubs/pull/335)) merged the same day.
 - 2026-11-13 (Claude Code, **the switch PR built; waiting for Sam's "merge"**). Sam: only the hubs still live get

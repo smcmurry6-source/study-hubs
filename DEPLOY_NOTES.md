@@ -58,6 +58,24 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   for every session whose `hy` changed. **The dashboard:** a hub card's "Updated" opens What's new (its last few changelog
   lines and the site's), and the hub recap plays its bars once, then stays still while you scroll.
 
+- **2026-11-17 (the dashboard at the large text sizes, BUG-076 and BUG-163, Claude Code, #401)** — `widget/dash.css` (and
+  the rebuilt `widget/site.bundle.css`). On a 320 px phone at XX-Large the page scrolled 49 px sideways (10 px at X-Large):
+  the "You" card's week dots now shrink, still round, when the card is narrower than the week, and "Start studying" wraps
+  inside its row. That sideways scroll had also widened the layout so a reply to your report opened wider than the screen;
+  it fits now with no change of its own. Found while checking: at X-Large and XX-Large the rank card gave its words about
+  50 px beside the medallion ("Bronze I" broke in two, the Trophy case count was cut off, even at 390 px), so the "You"
+  column is a size container (`dxyou`) and under 260 px the medallion goes above the words, and the card's buttons wrap
+  between label and count. The hub card's exam block keeps to one column the card's width, and under a 215 px column
+  (`dxhubs`) the title is 21 px, so "Periodontology final" fits at 320 px. Default and Large measure as before.
+- **2026-11-17 (two inbox to-dos, notes and the schema record only, Claude Code, #401)** — `supabase/schema.sql` checked
+  against the live database by hash: every difference was text only. With comments, line endings, layout and the secret
+  left out, only three functions differed: `get_display_name` (laid out on four lines live) and `get_nuke_by_hub` and
+  `get_nuke_recent` (column labels live, which change nothing in a `returns table` function). The file now matches live,
+  and it has `question_flags_visitor_idx` (migration_v25). The same 210 functions and 114 indexes now hash the same on both
+  sides; the file's header says how to check again. Nothing was applied to the database. And the redesign's six task notes
+  still open after the release (phases 2, 3 and 4, the journeys, the shop, Timmy's place) are ticked, given their Outcome
+  and moved to `vault/tasks/done/`, with 383 links rewritten. The one thing left, BUG-076 (the dashboard at 320 px with the
+  largest text) and a report-reply pop-up cut off at that size, is a to-do in the inbox.
 - **2026-11-17 (The check-in and the survey in a window, Timmy peeking over it, a celebration for the reward, and one more ask, Claude Code, #398)** —
   Sam: "make the check in and survey prompt more interesting and also advertise that it earns you 1000xp and 1000 gold crowns.
   make it take up the center of the screen and a window. have timmy peek over the top of the window", then "the thank you stage
@@ -803,7 +821,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   chip on the rank pill), runs a mock inside a server session and shows the road ahead in More, Stats; the new
   dashboard (`widget/dash.js`) knows the journeys. The preview answers the new calls from made-up data and takes
   `?xp=<n>`. **Before changing how an answer is recorded, or the rank art, read
-  [the journeys note](vault/tasks/2026-11-06-redesign-progression-journeys.md) and
+  [the journeys note](vault/tasks/done/2026-11-06-redesign-progression-journeys.md) and
   [game-server](vault/reference/game-server.md).** Left for the release, written in
   [its note](vault/tasks/done/2026-11-06-redesign-release.md): the arcade's and Timmy Time's XP, the journey trophies in
   the trophy case, the About entries (drafted there).
@@ -831,7 +849,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   engine, find the function's file first (`grep -n "function name" widget/hub*.js`). Three more requests a page (20,
   20 and 18 against budgets of 21, 22 and 21, not raised). No behavior change: the same scripted visit on `main`'s copy
   and on the split gave identical pages and saved state at all 368 steps. Hand-off for parts A to D:
-  [phase 4's note](vault/tasks/2026-11-05-redesign-phase-4-game-layer.md). ([#330](https://github.com/smcmurry6-source/study-hubs/pull/330))
+  [phase 4's note](vault/tasks/done/2026-11-05-redesign-phase-4-game-layer.md). ([#330](https://github.com/smcmurry6-source/study-hubs/pull/330))
 
 - **2026-11-12 (archived hubs' audio off the site, Claude Code)** — The site was 958 MB of GitHub Pages' 1 GB limit, 909 MB
   of it mp3s. Sam kept the bitrates (narration 64 kbps, Timmy Time 96 kbps) and made it a standing rule that an archived
@@ -1095,7 +1113,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   (`podDress` in `widget/hub.js`, `.pod-x` in `widget/hub.css`), so the live hubs' player looks the same. Home's animated
   Timmy Time card stays where it was. **Live, no look change: BUG-057**, fixed in `widget/podcast.js`: the speed and
   like/dislike buttons' spoken names now include what they show ("Playback speed 1×", "Like this episode, 7 likes").
-  Notes: [hub note](vault/hubs/heme-endo-exam2.md), [phase 2](vault/tasks/2026-11-05-redesign-phase-2-live-hubs.md).
+  Notes: [hub note](vault/hubs/heme-endo-exam2.md), [phase 2](vault/tasks/done/2026-11-05-redesign-phase-2-live-hubs.md).
 
 - **2026-11-11 (CI: the test browsers install when Ubuntu's mirror is down, Claude Code)** — Three "Check hubs" runs on
   #312 in a row failed before any browser test ran: the GitHub runner couldn't resolve `azure.archive.ubuntu.com`, so
@@ -1326,7 +1344,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   drawings and 1872 walks checked). `migration_v54.sql` (still unapplied) follows Sam's calls: five yard spots, the
   bowling lane `wide`, the art's names and ids in the catalog (68 rows); `tools/release/xp.js` 247 checks.
   `widget/pet.js` is unchanged until Sam approves the art
-  ([task](vault/tasks/2026-11-06-redesign-timmys-place.md)).
+  ([task](vault/tasks/done/2026-11-06-redesign-timmys-place.md)).
 - **2026-11-06 (redesign phase 5, part 3: the game layer's server, written and tested, not applied, Claude Code)** — Nothing
   changes for students and nothing reaches the live database: `migration_v54.sql` waits in `supabase/pending-migrations.txt`
   for the redesign's release ([vault/reference/game-server.md](vault/reference/game-server.md)). It adds, beside today's
