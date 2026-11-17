@@ -20,6 +20,9 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`).
 - [ ] **A different way to mark retries in the Question Bank** (Sam, 2026-11-17): a missed question that comes back a few
   cards later should look clearly different from a new one (`widget/hub-bank.js`; see also the `bank:retry-shown` line below).
+- [ ] **Refine what double XP boosts cost** (Sam, 2026-11-17): the shop's boosts are 600 crowns for 1 hour (`boost-1h`)
+  and 1,500 for 3 hours (`boost-3h`), set in the shop's items (`supabase/schema.sql`); retune them against how fast crowns
+  are earned (1 per 10 XP, plus trophies, medals and rank-ups), in a migration ([the shop](2026-11-06-redesign-timmy-shop.md)).
 - [ ] **A Timmy Time episode for Heme & Endo Exam 3?** (2026-11-16) Exam 2 had one; Exam 3's hub shipped without (`core.json` `podcast: null`). Ask Sam before making it (`/podcast`), ideally once L21 and L22 are in ([the hub](../hubs/heme-endo-exam3.md)).
 - [x] **Deploy Ask Timmy's function again for the Occlusion final's episode** (2026-11-15, #366). `supabase/functions/timmy/site.json`
   gained the episode (rebuilt from the About page), but the live function is still version 4, from the Perio final's merge:
