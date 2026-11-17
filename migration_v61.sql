@@ -1,5 +1,6 @@
 -- v61 (2026-11-17): the survey and check-in reward goes from 500 XP to 1,000 XP. Sam: "Lets up the xp to 1000" (the crowns
 -- stay 1,000). Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js).
+-- Applied to the live project on 2026-11-17 through the Supabase connector, at Sam's "merge" (PR #388).
 --
 -- 1. sh_form_reward pays 1,000 XP (migration_v60 paid 500). Still once per person and key, not boosted, on the linked id.
 -- 2. Everyone already paid at 500 (the live functions since v60 and the back pay, tools/data-fixes/2026-11-17-reward-backpay.sql)
