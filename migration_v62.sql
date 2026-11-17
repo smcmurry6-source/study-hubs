@@ -1,6 +1,7 @@
 -- v62 (2026-11-17): what the shop's double XP boosts cost, and a boost bought during another one waits its turn.
 -- Sam, 2026-11-17: "Refine what double XP boosts cost": retune them against how fast crowns are earned.
--- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js).
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js). Sam took the proposed prices
+-- ("merge when ready"). Applied to the live project on 2026-11-17 through the Supabase connector, at Sam's "merge" (PR #394).
 --
 -- The class's numbers, 2026-11-14 to 11-17 (77 people): a median study day earns about 95 crowns (a quarter of days under
 -- 31, a quarter over 190) and a median study hour about 270 XP. At 600 and 1,500 crowns a boost cost 6 and 16 median days'
