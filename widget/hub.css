@@ -485,7 +485,13 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .toolbar .follow-btn[aria-pressed="true"] { color: var(--hub-text); }
 .toolbar .follow-btn[aria-pressed="false"] { color: var(--muted); }
 .toolbar .follow-btn[aria-pressed="false"] .ic { opacity: .5; }
-.reading-prose mark, .hx mark.sh-hl { background: color-mix(in srgb, var(--gold) 40%, transparent); color: inherit; border-radius: 3px; }
+/* the student's highlights (widget/highlight.js): yellow is the hub's gold; the other four pens keep their own color, in both
+   themes (this rule follows v3.css's color rules and used to paint every pen gold: found 2026-11-17) */
+.reading-prose mark, .hx mark.sh-hl { background: color-mix(in srgb, var(--hl, var(--gold)) 40%, transparent); color: inherit; border-radius: 3px; }
+.hx mark.sh-hl.sh-hl-c-g { --hl: #4cc85e; }
+.hx mark.sh-hl.sh-hl-c-b { --hl: #4a9bff; }
+.hx mark.sh-hl.sh-hl-c-p { --hl: #ff5fae; }
+.hx mark.sh-hl.sh-hl-c-o { --hl: #ff8c1e; }
 .lec-fig-inline { margin: 20px 0; }
 /* High yield, the third reading level (tools/hub-next/high-yield.mjs writes its HTML): each predicted topic a numbered
    heading in the lecture's color, why it's on the list, the professor's takeaways, then the notes' own paragraphs */

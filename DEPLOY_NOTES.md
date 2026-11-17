@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-17 (Inbox: tap a word to jump the narration, the Highlight button on phones, retries, crowns on Today, Claude Code, PR_NUM)** —
+- **2026-11-17 (Inbox: tap a word to jump the narration, the highlighter on phones and its colors, retries, crowns on Today, Claude Code, PR_NUM)** —
   Sam: "Lets start working on the open to do items. Also for the highlighting fix, can we make sure it works on mobile too".
   **Tap a word** (`widget/hub.js`, Follow along's `tapped()`): while a lecture's narration plays or is paused, a tap or click on a
   word in the notes seeks the mp3 to that word's time from its `.words.json` and plays. It listens on `.reading-prose` itself, not

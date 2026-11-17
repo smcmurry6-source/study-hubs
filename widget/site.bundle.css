@@ -428,7 +428,11 @@ background: var(--lc-soft); color: var(--lc-ink); font-weight: var(--w-strong); 
 .toolbar .follow-btn[aria-pressed="true"] { color: var(--hub-text); }
 .toolbar .follow-btn[aria-pressed="false"] { color: var(--muted); }
 .toolbar .follow-btn[aria-pressed="false"] .ic { opacity: .5; }
-.reading-prose mark, .hx mark.sh-hl { background: color-mix(in srgb, var(--gold) 40%, transparent); color: inherit; border-radius: 3px; }
+.reading-prose mark, .hx mark.sh-hl { background: color-mix(in srgb, var(--hl, var(--gold)) 40%, transparent); color: inherit; border-radius: 3px; }
+.hx mark.sh-hl.sh-hl-c-g { --hl: #4cc85e; }
+.hx mark.sh-hl.sh-hl-c-b { --hl: #4a9bff; }
+.hx mark.sh-hl.sh-hl-c-p { --hl: #ff5fae; }
+.hx mark.sh-hl.sh-hl-c-o { --hl: #ff8c1e; }
 .lec-fig-inline { margin: 20px 0; }
 .hy-intro { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; max-width: 72ch; }
 .hy-intro .ic { flex: none; margin-top: 2px; color: var(--hub-text); }
