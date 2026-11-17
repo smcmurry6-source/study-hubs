@@ -35,19 +35,23 @@
 
   /* ---------- the stylesheet ---------- */
   var CSS = [
-    ".shj{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;overflow:auto;padding:14px 16px;color:#F5F2F4;text-align:center;opacity:0;transition:opacity .4s ease;",
+    ".shj{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;overflow:hidden auto;padding:14px 16px;color:#F5F2F4;text-align:center;opacity:0;transition:opacity .4s ease;",
     "background:radial-gradient(120% 90% at 50% 8%,#2A1456 0%,#130A2B 52%,#05020C 100%);font-family:var(--font,system-ui,sans-serif);-webkit-tap-highlight-color:transparent}",
     ".shj.is-on{opacity:1}.shj.is-out{opacity:0;transition-duration:.28s}",
+    /* sized by the scene, not the viewport: the large text sizes zoom the page, and vw and vh don't follow the zoom (a 320px
+       phone at XX-Large has 221px for the scene, where 72vw is 230px). The design page's stills have no container, and
+       there cqw and cqh are the viewport's. */
+    ".shj:not(.shj-inline){container:shj / size}",
     ".shj *{box-sizing:border-box}",
     ".shj-sky{position:absolute;inset:0;width:100%;height:100%;opacity:.75;pointer-events:none}",
     ".shj-tw{animation:shj-tw 3.4s ease-in-out infinite;animation-delay:calc(var(--tw) * -.9s)}",
     "@keyframes shj-tw{0%,100%{opacity:1}50%{opacity:.25}}",
     ".shj-in{position:relative;display:grid;justify-items:center;gap:6px;width:min(720px,100%);margin:auto}",
-    ".shj-stage{position:relative;display:grid;place-items:center;width:min(300px,72vw,34vh);aspect-ratio:1;margin:2px 0 0}",
+    ".shj-stage{position:relative;display:grid;place-items:center;width:min(300px,100%,72cqw,34cqh);aspect-ratio:1;margin:2px 0 0}",
     ".shj-stage>*{grid-area:1/1}",
     ".shj-med{display:block;width:78%;aspect-ratio:1}.shj-med svg{display:block;width:100%;height:100%}",
-    ".shj-eyebrow{margin:6px 0 0;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#C9B6F5}",
-    ".shj-title{margin:0;font-size:clamp(28px,min(6.6vw,7.4vh),56px);line-height:1.06;font-weight:800;letter-spacing:-.01em;text-wrap:balance}",
+    ".shj-eyebrow{margin:6px 0 0;font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#C9B6F5}.shj-nw{white-space:nowrap}",
+    ".shj-title{margin:0;font-size:clamp(28px,min(6.6cqw,7.4cqh),56px);line-height:1.06;font-weight:800;letter-spacing:-.01em;text-wrap:balance}",
     ".shj-line{margin:2px 0 0;max-width:44ch;font-size:16px;line-height:1.5;color:#D9D0E6;text-wrap:pretty}",
     ".shj-go{margin-top:10px;min-height:48px;padding:0 26px;border:0;border-radius:999px;background:#F5F2F4;color:#1B1220;font:inherit;font-size:16px;font-weight:800;cursor:pointer}",
     ".shj-go:focus-visible,.shj-skip:focus-visible{outline:3px solid #fff;outline-offset:3px}",
@@ -75,7 +79,7 @@
     ".shj-track .is-lock .shj-sock{color:#8E81A3}",
     ".shj-track .shj-lock{width:20px;height:20px}",
     ".shj-track .shj-check{position:absolute;right:-5px;bottom:-4px;width:18px;height:18px;color:#C9F5D6}",
-    ".shj-hand .shj-stage{width:min(320px,74vw,31vh)}",
+    ".shj-hand .shj-stage{width:min(320px,100%,74cqw,31cqh)}",
     ".shj-hand.is-on .shj-sky{animation:shj-warp 8s cubic-bezier(.16,1,.3,1) both}",
     "@keyframes shj-warp{from{transform:scale(1)}to{transform:scale(1.18)}}",
     ".shj-hand.is-on .shj-in{animation:shj-shake .55s linear;animation-delay:var(--slam)}",
@@ -156,6 +160,13 @@
     ".shj.shj-inline .shj-skip{display:none}.shj.shj-inline .shj-go{pointer-events:none}",
     "@media (max-width:520px){.shj-track li{width:86px;font-size:12px}.shj-ahead{gap:4px}.shj-ahead svg{width:32px;height:32px}.shj-ahead li{font-size:10px}.shj-line{font-size:15px}}",
     "@media (max-height:700px){.shj-line{font-size:15px}.shj-track li{font-size:12px}.shj-sock{width:40px;height:40px}.shj-sock svg.sh-rank-art{width:34px;height:34px}.shj-track li+li::before{top:19px}}",
+    /* the same at the large text sizes, which zoom the page: the scene is narrower or shorter than the screen */
+    "@container shj (max-width:520px){.shj-track li{width:86px;font-size:12px}.shj-ahead{gap:4px}.shj-ahead svg{width:32px;height:32px}.shj-ahead li{font-size:10px}.shj-line{font-size:15px}}",
+    "@container shj (max-height:700px){.shj-line{font-size:15px}.shj-track li{font-size:12px}.shj-sock{width:40px;height:40px}.shj-sock svg.sh-rank-art{width:34px;height:34px}.shj-track li+li::before{top:19px}}",
+    /* a phone: Skip sits over the right end of the hand-off's track, so the track starts below it; a phone at the large
+       text sizes: the track shares the width, and the seven ranks wrap to a second row */
+    "@container shj (max-width:420px){.shj-hand .shj-in{padding-top:46px}}",
+    "@container shj (max-width:300px){.shj-track{justify-self:stretch}.shj-track li{flex:1 1 0;width:auto;min-width:0;font-size:11px}.shj-ahead{flex-wrap:wrap;row-gap:6px}}",
 
     /* ----- the road ahead (the 'you' panels) ----- */
     ".shj-road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 0;padding:0;list-style:none}",
@@ -246,7 +257,7 @@
         '<p class="shj-pre" aria-hidden="true">Dark Matter III. The ' + esc(JN[from]) + " is finished.</p>" +
         '<span class="shj-new">' + med(to, 0, 240, { animate: true, level: 1 }) + "</span>" + sparks +
       "</div>" +
-      '<p class="shj-eyebrow" data-at style="--at:' + (AT + .7) + 's">Journey ' + (to + 1) + " of 3 · " + fmt(125000 * to) + " XP</p>" +
+      '<p class="shj-eyebrow" data-at style="--at:' + (AT + .7) + 's"><span class="shj-nw">Journey ' + (to + 1) + ' of 3</span> · <span class="shj-nw">' + fmt(125000 * to) + " XP</span></p>" +
       '<h2 class="shj-title" data-at style="--at:' + (AT + .85) + 's">The ' + esc(name) + (to === 2 ? " are yours." : " is yours.") + "</h2>" +
       '<p class="shj-line" data-at style="--at:' + (AT + 1.05) + 's">You finished the ' + esc(JN[from]) + ". Your XP, your trophies and everything you earned come with you.</p>" +
       '<ol class="shj-ahead" aria-label="Seven new ranks" style="--at:' + (AT + 1.5) + 's">' + ahead + "</ol>" +
@@ -285,7 +296,7 @@
         '<span class="shj-was" aria-hidden="true">' + med(j, 5, 200, { animate: true, level: 3 }) + "</span>" +
         '<span class="shj-void"></span>' +
         '<span class="shj-is">' + med(j, 6, 240, { animate: true, level: 1 }) + "</span></div>" +
-      '<p class="shj-eyebrow" data-at style="--at:3.6s">' + esc(JN[j]) + " · rank 7 of 7</p>" +
+      '<p class="shj-eyebrow" data-at style="--at:3.6s"><span class="shj-nw">' + esc(JN[j]) + '</span> · <span class="shj-nw">rank 7 of 7</span></p>' +
       '<h2 class="shj-title" data-at style="--at:3.75s">Dark Matter</h2>' +
       '<p class="shj-line" data-at style="--at:3.95s">' + fmt(floorOf(j, 6)) + " XP. " + DARK_LINE[j] + "</p>" +
       '<button type="button" class="shj-go" data-shj="go" data-at style="--at:4.6s">Keep going</button></div>';

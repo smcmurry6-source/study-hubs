@@ -223,6 +223,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   it, and the boost's remaining time (up to 3 hours) doubles nothing (never more than 2x). The fix is in the medal function
   (`sh_medal_check`'s `insert into xp_boosts ... 'medal'`): move the unused part of a running or waiting shop boost to after the
   medal's 24 hours (end the running row now, add the rest after), with a test in `tools/release/xp.js` and the preview's medal.
-- [ ] **320px phone at XX-Large, two more spots** (2026-11-17, seen while fixing Home's sideways scroll): the hub's tab bar labels
+- [x] **320px phone at XX-Large, two more spots** (2026-11-17, seen while fixing Home's sideways scroll; done: #PRNUM, BUG-161, which found
+  both wider than this: the tabs at XX-Large on any phone, the hand-off scene too): the hub's tab bar labels
   (Home, Notes, Questions, More) run into each other, and the Dark Matter unlock scene (`widget/journeys.js`) cuts off its "Rank 7 of 7"
   line and its sentence at the right edge. Neither scrolls the page; both only at that size.
