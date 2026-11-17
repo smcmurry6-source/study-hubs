@@ -10,15 +10,15 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
-- [x] **Tap a word in the notes to jump the narration there** (Sam, 2026-11-17; done, on phones too, with the Highlight button's phone fix, BUG-157: PR_NUM): in Listen / Follow along, clicking a word
+- [x] **Tap a word in the notes to jump the narration there** (Sam, 2026-11-17; done, on phones too, with the Highlight button's phone fix, BUG-157: #391): in Listen / Follow along, clicking a word
   skips the recording to that word (each recording's `.words.json` has the timings).
 - [ ] **Let Ask Timmy use outside sources** (Sam, 2026-11-17): today he answers from the hub's content and the site help
   (`supabase/functions/timmy/`); let the API reach outside sources (web search or similar), with the cost and privacy
   questions settled first ([ask-timmy](../reference/ask-timmy.md), [learner-data-privacy](../rules/learner-data-privacy.md)).
-- [x] **Show the Shiny Gold Crowns you've earned on Home's Today card** (Sam, 2026-11-17). Done: a Crowns tile with the balance (what's left to spend; "earned in all" in its tooltip) that opens the shop (PR_NUM).
+- [x] **Show the Shiny Gold Crowns you've earned on Home's Today card** (Sam, 2026-11-17). Done: a Crowns tile with the balance (what's left to spend; "earned in all" in its tooltip) that opens the shop (#391).
 - [ ] **More cosmetics for Timmy and Timmy's place** (Sam, 2026-11-17): new outfits and place pieces
   ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`).
-- [x] **A different way to mark retries in the Question Bank** (Sam, 2026-11-17; done: a tinted card with a dashed edge and a "Second try" / "Third try" band, PR_NUM): a missed question that comes back a few
+- [x] **A different way to mark retries in the Question Bank** (Sam, 2026-11-17; done: a tinted card with a dashed edge and a "Second try" / "Third try" band, #391): a missed question that comes back a few
   cards later should look clearly different from a new one (`widget/hub-bank.js`; see also the `bank:retry-shown` line below).
 - [ ] **Refine what double XP boosts cost** (Sam, 2026-11-17): the shop's boosts are 600 crowns for 1 hour (`boost-1h`)
   and 1,500 for 3 hours (`boost-3h`), set in the shop's items (`supabase/schema.sql`); retune them against how fast crowns
@@ -120,7 +120,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   above): the two sets as `drill`, `more/timmy` as `podcast`, the rest as a new `more`
   ([analytics-data-quality](../reference/analytics-data-quality.md)). Done in `migration_v59.sql`, with Learn and Flashcards
   as their own sections ([#381](https://github.com/smcmurry6-source/study-hubs/pull/381)).
-- [x] **The redesign's bank doesn't send `bank:retry-shown`** (2026-11-15, the lessons audit; sent again from PR_NUM, with one waiting retry per question as on the old pages): `widget/hub-bank.js` tracks
+- [x] **The redesign's bank doesn't send `bank:retry-shown`** (2026-11-15, the lessons audit; sent again from #391, with one waiting retry per question as on the old pages): `widget/hub-bank.js` tracks
   `bank:retry-right` and `-missed` when a missed question comes back a few cards later, but not when it is shown (the old pages did:
   20 people on 11-14, 3 on 11-15, all from old pages), so how many people a re-ask reaches can't be read. One `track()` where the
   retry card is put in the list, then the bundles.
@@ -217,7 +217,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   taken off (958 → 589 MB), and every hub's at its archiving ([rule](../rules/archived-hubs-drop-their-audio.md),
   [next ones](2026-11-12-audio-off-at-archiving.md)). The publishes take 1-3 minutes at 958 MB; 11-10's timeout was a one-off.
 - [ ] Retention, the part not built yet (approved 2026-11-04, [analytics-retention](../reference/analytics-retention.md)): before the school year ends (spring 2027), collapse `activity_hourly` / `activity_visits` older than the school year to hub × section × day with people counts and no ids, as one more step in `sh_retention_run`. Also ask Sam about the two rows the question-health work proposed (`question_events`, `question_feedback`).
-- [x] A hub's Home on a 320px-wide phone at the XX-Large text size scrolls sideways by about 40px (fixed in PR_NUM: the ring's caption drops under the ring when there's no room, the timeline's words wrap): the course timeline's rows (`.tl-what`) and the goal ring's caption (`.ring-cap`) don't wrap that narrow. Found 2026-11-13 while fixing BUG-143; not one of the sizes the smoke test checks (320px at the default size and 390px at the largest both fit).
+- [x] A hub's Home on a 320px-wide phone at the XX-Large text size scrolls sideways by about 40px (fixed in #391: the ring's caption drops under the ring when there's no room, the timeline's words wrap): the course timeline's rows (`.tl-what`) and the goal ring's caption (`.ring-cap`) don't wrap that narrow. Found 2026-11-13 while fixing BUG-143; not one of the sizes the smoke test checks (320px at the default size and 390px at the largest both fit).
 - [ ] **320px phone at XX-Large, two more spots** (2026-11-17, seen while fixing Home's sideways scroll): the hub's tab bar labels
   (Home, Notes, Questions, More) run into each other, and the Dark Matter unlock scene (`widget/journeys.js`) cuts off its "Rank 7 of 7"
   line and its sentence at the right edge. Neither scrolls the page; both only at that size.
