@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-17 (Crowns go up as you earn them, and prizes that pay XP and crowns, Claude Code)** —
+- **2026-11-17 (Crowns go up as you earn them, and prizes that pay XP and crowns, Claude Code, #403)** —
   Sam: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp earn rates",
   then a list of prizes. The crowns were paid but never redrawn (BUG-163): `migration_v64.sql` puts `crowns` (the balance
   after it) in every paying reply and `widget/v3.js` sends it as `sh:crowns` (the hub's meters, its shop, the dashboard's
