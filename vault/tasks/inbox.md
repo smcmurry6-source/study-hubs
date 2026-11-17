@@ -83,7 +83,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [x] **The dashboard at 320 px with the largest text: BUG-076, and the report-reply pop-up** (2026-11-17, from
   [phase 3](done/2026-11-05-redesign-phase-3-dashboard.md); done the same day, #401). The week's dots shrink to fit and
   "Start studying" wraps; the pop-up needed nothing (it was wider only because the page scrolled sideways). Looking at the
-  large sizes found BUG-162 too, fixed in the same PR: the rank card stacks its medallion above the words from X-Large up,
+  large sizes found BUG-163 too, fixed in the same PR: the rank card stacks its medallion above the words from X-Large up,
   and the hub card's title fits at 320 px ([bug log](../release/bug-log.md)).
 - [x] **`supabase/schema.sql` against the live database's text** (2026-11-14, the release's look before the migrations;
   done 2026-11-17, #401). Every difference was text only. With comments, line endings, layout and the secret left out,

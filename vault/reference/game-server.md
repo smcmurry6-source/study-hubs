@@ -50,7 +50,7 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   and +100 at 90% of its minutes; +100 to the sender when Sam resolves a report as Fixed (`admin_resolve_report_v2`; "No change
   needed" pays nothing); +1,000 for a survey answered (500 until migration_v61 raised it, with a top-up for those paid 500) (once per survey) and for the first exam check-in for each hub and exam
   (migration_v60, Sam 2026-11-17: `survey:<id>` and `checkin:<hub>:<exam>`, paid to the linked id, never for a check-in sent
-  before by any of the person's linked ids; back pay only for survey 4 and Occlusion's final check-ins, by `tools/data-fixes/2026-11-17-reward-backpay.sql`; `submit_survey_v2` and `submit_exam_debrief_v2` say what was paid); +100 / 200 / 300 / 500 for a hub's Bronze, Silver, Gold and Crown, which also start **24 hours of
+  before by any of the person's linked ids; back pay only for survey 4 and Occlusion's final check-ins, by `tools/data-fixes/2026-11-17-reward-backpay.sql`; `submit_survey_v2` and `submit_exam_debrief_v2` say what was paid, which the dashboard's window advertises before and celebrates after: `celebrate` in `widget/dash.js`); +100 / 200 / 300 / 500 for a hub's Bronze, Silver, Gold and Crown, which also start **24 hours of
   double XP**.
 - **The guardrails**: an answer under 2 seconds after the last, or the 31st in a minute, still counts in your answers and the
   class stats but earns nothing. A mock's answers arrive together at the end, so they need 2 seconds of mock time each instead

@@ -674,15 +674,31 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
 .dx-namemsg:empty { display: none; }
 .dx .dx-namereset { justify-self: start; margin-left: -10px; color: var(--muted); }
 
-.dx .survey { position: fixed; z-index: 50; right: 20px; bottom: 20px; display: grid; gap: 10px; width: min(400px, calc(100vw - 24px)); max-height: calc(100vh - 40px); overflow-y: auto;
-  padding: 20px; border-radius: var(--r-panel); background: var(--ground); box-shadow: var(--float-shadow); opacity: 0; transform: translateY(16px);
-  transition: opacity 300ms var(--ease-out), transform 300ms var(--ease-out); }
-.dx .survey.is-shown { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) { .dx .survey { transition: none; transform: none; } }
-.dx .survey h3 { font-size: 18px; padding-right: 36px; }
-.dx .survey-x { position: absolute; right: 10px; top: 10px; width: 36px; height: 36px; border: 0; border-radius: var(--r-pill); background: transparent; font-size: 22px; line-height: 1; color: var(--muted); }
-.dx .survey-x:hover { background: var(--panel); color: var(--text); }
-.dx .survey-eyebrow { font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--muted); padding-right: 36px; }
+/* ---------- the exam check-in and the survey (widget/dash.js, formWindow): a window in the middle of the screen over the
+   dimmed page (Sam, 2026-11-17), its title bar in the hub's tint (gold for a survey), the reward on it, and Timmy looking
+   over its top edge with his hands on it and a line for each step. --tw is Timmy's width; the edge cuts him at .77 of it. ---------- */
+.dx .survey { --tw: 124px; --top: 16px; position: fixed; inset: 0; z-index: 60; display: flex; padding: var(--top) 16px 16px; overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain;
+  background: rgba(30, 20, 30, .5); opacity: 0; transition: opacity 240ms ease-out; animation: none; }
+.dx .survey.has-peek { --top: calc(var(--tw) * .77 + 24px); }
+.dx .survey.is-shown { opacity: 1; }
+/* the middle of the screen for a window about 600px tall, and the same top for every step (a shorter step doesn't move
+   it, or Timmy with it); a taller one, or a short screen, scrolls */
+.dx .survey-win { position: relative; display: grid; align-self: flex-start; width: min(480px, 100%); margin: max(0px, calc((100vh - var(--top) - 16px - 600px) / 2)) auto 0;
+  margin-top: max(0px, calc((100dvh - var(--top) - 16px - 600px) / 2)); border-radius: 22px; background: var(--ground); color: var(--text);
+  box-shadow: 0 24px 64px rgba(30, 20, 30, .35); transform: translateY(28px) scale(.96); transition: transform 420ms var(--ease-out); }
+.dx .survey.is-shown .survey-win { transform: none; }
+.dx .survey-win:focus { outline: none; }
+.dx .survey-bar { display: flex; align-items: center; gap: 10px; min-height: 58px; padding: 8px 8px 8px 16px; border-radius: 22px 22px 0 0; background: var(--hub-soft); color: var(--hub-text); }
+.dx .survey-win.is-gold .survey-bar { background: var(--sun); color: var(--sun-ink); }
+.dx .survey-emb { flex: none; width: 34px; height: 34px; }
+.dx .survey-emb-ic { display: grid; place-items: center; border-radius: 50%; background: var(--ground); }
+.dx .survey-title { display: grid; min-width: 0; line-height: 1.25; }
+.dx .survey-title b { font-size: var(--fs-label); font-weight: var(--w-head); }
+.dx .survey-title small { font-size: var(--fs-meta); font-weight: var(--w-strong); overflow-wrap: anywhere; }
+.dx .survey-x { flex: none; display: grid; place-items: center; width: 40px; height: 40px; margin-left: auto; padding: 0; border: 0; border-radius: var(--r-pill); background: transparent; color: inherit; }
+.dx .survey-x:hover { background: var(--ground); }
+.dx .survey-body { display: grid; gap: 12px; min-width: 0; padding: 18px 20px 20px; }
+.dx .survey h3 { font-size: 20px; font-weight: var(--w-head); }
 .dx .survey-why { font-size: var(--fs-meta); color: var(--muted); }
 /* what the idea board's tick still needs before the check-in is sent (a name, a title) */
 .dx .survey .debrief-warn { font-weight: var(--w-strong); color: var(--wrong-ink); }
@@ -691,8 +707,10 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
 .dx .survey-q > p:first-child { font-weight: var(--w-strong); }
 .dx .survey-q > p.debrief-prompt { font-size: 18px; font-weight: var(--w-head); }
 .dx .survey-opts { display: flex; flex-wrap: wrap; gap: 6px; }
-.dx .survey-opt { min-height: 40px; padding: 6px 14px; border: 1px solid var(--control); border-radius: var(--r-pill); background: var(--row); font-size: var(--fs-label); font-weight: var(--w-strong); text-align: left; }
+.dx .survey-opt { min-height: 40px; padding: 6px 14px; border: 1px solid var(--control); border-radius: var(--r-pill); background: var(--row); font-size: var(--fs-label); font-weight: var(--w-strong); text-align: left;
+  transition: transform var(--t-press) var(--ease-out), background var(--t-hover); }
 .dx .survey-opt:hover { background: var(--active); }
+.dx .survey-opt:active { transform: scale(.97); }
 .dx .survey-opt[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
 .dx .survey-scale .survey-opt { flex: 1; min-width: 44px; text-align: center; font-variant-numeric: tabular-nums; }
 .dx .survey-scale-ends { display: flex; justify-content: space-between; gap: 8px; font-size: var(--fs-meta); color: var(--muted); }
@@ -703,11 +721,121 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
 .dx .survey-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
 .dx .survey-skip { min-height: 40px; padding: 0 10px; border: 0; border-radius: var(--r-pill); background: transparent; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); }
 .dx .survey-skip:hover { background: var(--panel); }
+.dx .survey-done { display: grid; gap: 10px; }
 .dx .survey-thanks { font-size: var(--fs-label); }
-.dx .survey-reward { font-size: var(--fs-label); margin-top: 6px; color: var(--ink); }
-.dx .debrief-steps { display: flex; gap: 4px; }
-.dx .debrief-steps i { flex: 1; height: 4px; border-radius: var(--r-pill); background: var(--track); }
-.dx .debrief-steps i.on { background: var(--text); }
+
+/* the check-in's steps: a bar that fills toward the crown coin at its end */
+.dx .survey-prog { display: flex; align-items: center; gap: 10px; }
+.dx .survey-count { flex: none; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--muted); }
+.dx .survey-meter { flex: 1; display: flex; gap: 4px; }
+.dx .survey-meter i { flex: 1; height: 6px; border-radius: var(--r-pill); background: var(--track); }
+.dx .survey-meter i.on { background: var(--hub-text, var(--text)); }
+.dx .survey-prize { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 50%; background: var(--sun); }
+.dx .survey-prize.is-near { box-shadow: 0 0 0 3px var(--gold); }
+.dx .survey.is-shown .survey-prize.is-near { animation: survey-wiggle 900ms ease-in-out 2; }
+@keyframes survey-wiggle { 30% { transform: scale(1.2) rotate(-10deg); } 60% { transform: scale(1.1) rotate(8deg); } }
+
+/* the reward: two tiles on gold, a shine across them as the window opens */
+.dx .survey-loot { position: relative; display: grid; gap: 8px; padding: 12px; border-radius: var(--r-row); background: var(--sun); color: var(--sun-ink); }
+.dx .survey-loot { overflow: hidden; }
+.dx .survey-loot::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .6) 50%, transparent 70%);
+  transform: translateX(-100%); pointer-events: none; }
+.dx .survey.is-shown .survey-loot::after { animation: survey-sheen 1100ms 900ms ease-out both; }
+@keyframes survey-sheen { to { transform: translateX(100%); } }
+.dx .survey-loot-lead { margin: 0; font-size: var(--fs-label); font-weight: var(--w-head); }
+.dx .survey-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.dx .survey-tile { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 8px 12px 8px 10px; border-radius: 12px; background: var(--ground); color: var(--text); box-shadow: inset 0 0 0 2px var(--gold); }
+.dx .survey-tile > span { display: grid; min-width: 0; line-height: 1.15; }
+.dx .survey-tile b { font-size: 20px; font-weight: var(--w-title); }
+.dx .survey-tile small { font-size: 12px; font-weight: var(--w-strong); color: var(--muted); }
+.dx .survey-coin, .dx .survey-star { flex: none; display: block; }
+
+/* the thank-you with a reward (celebrate): a sunburst turning behind it, a shockwave, crowns, stars and confetti bursting
+   out of the window, the tiles popping in while their numbers count up, Collect */
+.dx .survey-cele { position: relative; justify-items: center; gap: 8px; text-align: center; isolation: isolate; }
+.dx .survey-cele > :not(.survey-raysbox):not(.survey-confetti):not(.survey-wave):not(.sr) { position: relative; z-index: 1; }
+.dx .survey-raysbox { position: absolute; inset: -18px -20px -20px; z-index: 0; overflow: hidden; border-radius: 0 0 22px 22px; pointer-events: none; }
+.dx .survey-rays { position: absolute; left: 50%; top: 46%; width: 640px; height: 640px; margin: -320px 0 0 -320px; border-radius: 50%;
+  background: repeating-conic-gradient(rgba(242, 193, 78, .34) 0deg 9deg, rgba(242, 193, 78, 0) 9deg 18deg);
+  -webkit-mask: radial-gradient(closest-side, #000 25%, transparent 100%); mask: radial-gradient(closest-side, #000 25%, transparent 100%); }
+.dx .survey.is-shown .survey-rays { animation: survey-rays-in 700ms ease-out both, survey-spin 16s linear infinite; }
+@keyframes survey-rays-in { from { opacity: 0; scale: .4; } }
+@keyframes survey-spin { to { rotate: 360deg; } }
+.dx .survey-wave { position: absolute; left: 50%; top: 46%; z-index: 0; width: 120px; height: 120px; margin: -60px 0 0 -60px; border: 6px solid var(--gold); border-radius: 50%; opacity: 0; pointer-events: none; }
+.dx .survey.is-shown .survey-wave { animation: survey-wave 900ms 120ms ease-out both; }
+@keyframes survey-wave { 0% { opacity: .9; transform: scale(.2); } 100% { opacity: 0; transform: scale(4); border-width: 1px; } }
+.dx .survey-confetti { position: absolute; left: 50%; top: 46%; z-index: 2; width: 0; height: 0; pointer-events: none; }
+.dx .survey-confetti i { position: absolute; left: -9px; top: -9px; width: 18px; height: 18px; opacity: 0; }
+.dx .survey-confetti i.is-bit { left: -4px; top: -7px; width: 8px; height: 14px; border-radius: 2px; background: var(--c); }
+.dx .survey-confetti svg { display: block; width: 100%; height: 100%; }
+.dx .survey.is-shown .survey-confetti i { animation: survey-confetti var(--t, 1800ms) var(--d, 0ms) both; }
+@keyframes survey-confetti {
+  0% { opacity: 0; transform: translate(0, 0) scale(.3) rotate(0deg); animation-timing-function: cubic-bezier(.15, .8, .35, 1); }
+  8% { opacity: 1; }
+  40% { transform: translate(calc(var(--x) * .7), var(--up)) scale(1) rotate(calc(var(--r) * .45)); animation-timing-function: cubic-bezier(.5, 0, .9, .6); }
+  85% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--x), calc(var(--up) + var(--fall))) scale(.9) rotate(var(--r)); }
+}
+.dx .survey-cele h3 { font-size: 26px; font-weight: var(--w-title); }
+.dx .survey.is-shown .survey-cele h3 { animation: survey-title 600ms cubic-bezier(.34, 1.56, .64, 1) both; }
+@keyframes survey-title { from { opacity: 0; transform: scale(.4); } }
+.dx .survey-cele-lead { font-size: var(--fs-label); font-weight: var(--w-head); color: var(--muted); }
+.dx .survey-bigs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; width: 100%; margin: 2px 0 4px; }
+.dx .survey-big { display: grid; justify-items: center; gap: 2px; min-width: 0; padding: 14px 10px 12px; border-radius: 16px; background: var(--ground); color: var(--text);
+  box-shadow: inset 0 0 0 3px var(--gold), 0 8px 24px rgba(226, 167, 46, .28); }
+.dx .survey-big svg { width: 46px; height: 46px; margin-bottom: 4px; }
+.dx .survey-big b { font-size: 30px; font-weight: var(--w-title); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.dx .survey-big small { font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--muted); }
+.dx .survey.is-shown .survey-big { animation: survey-bigpop 700ms 160ms cubic-bezier(.34, 1.56, .64, 1) both, survey-glow 1400ms 900ms ease-in-out 2; }
+.dx .survey.is-shown .survey-big.is-crowns { animation-delay: 340ms, 1080ms; }
+.dx .survey.is-shown .survey-big svg { animation: survey-iconspin 900ms 300ms cubic-bezier(.34, 1.4, .64, 1) both; }
+@keyframes survey-bigpop { 0% { opacity: 0; transform: translateY(24px) scale(.3) rotate(-10deg); } 100% { opacity: 1; transform: none; } }
+@keyframes survey-glow { 50% { box-shadow: inset 0 0 0 3px var(--gold), 0 0 0 6px rgba(242, 193, 78, .35), 0 10px 34px rgba(226, 167, 46, .55); } }
+@keyframes survey-iconspin { from { transform: rotateY(540deg) scale(.4); } }
+.dx .survey-cele .survey-thanks { max-width: 34ch; color: var(--muted); }
+.dx .survey-collect { display: inline-flex; align-items: center; gap: 8px; min-width: 160px; justify-content: center; margin-top: 6px; }
+.dx .survey.is-shown .survey-collect { animation: survey-title 500ms 1400ms cubic-bezier(.34, 1.56, .64, 1) both; }
+/* the crowns and stars flying from the tiles into your rank in the bar, and the rank glowing as they land */
+.dx .survey-flyer { position: fixed; z-index: 70; pointer-events: none; }
+.dx .survey-flyer svg { display: block; width: 100%; height: 100%; }
+.dx .dx-rank.is-gain { animation: survey-gain 1200ms ease-out; }
+@keyframes survey-gain { 0% { transform: scale(1); } 20% { transform: scale(1.18); box-shadow: 0 0 0 4px rgba(242, 193, 78, .6), 0 0 28px rgba(242, 193, 78, .8); } 100% { transform: scale(1); box-shadow: none; } }
+
+/* Timmy over the top edge: the box's bottom is the edge, so his drawing is cut there (only there: clip-path, not overflow,
+   so a hat or a hop isn't cut at the top), and his hands, drawn again in his own frame, hang over it in front */
+.dx .survey-peek { position: absolute; left: 22px; bottom: 100%; z-index: 1; width: var(--tw); height: calc(var(--tw) * .77); pointer-events: none; }
+.dx .survey-tim { position: absolute; inset: 0; clip-path: inset(-80px -40px 0 -40px); }
+.dx .survey-timin { position: absolute; left: 0; top: 0; width: 100%; }
+.dx .survey-timin svg, .dx .survey-hands { display: block; width: 100%; height: auto; }
+.dx .survey-hands { position: absolute; left: 0; top: 0; overflow: visible; filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .14)); }
+.dx .survey.is-shown .survey-hands { animation: survey-grab 260ms 260ms var(--ease-out) both; }
+.dx .survey.is-shown .survey-timin { animation: survey-up 640ms 420ms cubic-bezier(.34, 1.45, .64, 1) both; }
+.dx .survey.is-shown .survey-peek.is-cheer .survey-timin { animation: survey-jump 1300ms cubic-bezier(.3, 1.3, .5, 1) 2; }
+.dx .survey.is-shown .survey-peek.is-cheer .survey-hands { animation: survey-letgo 2600ms ease-in-out both; }
+.dx .survey.is-shown .survey-peek.is-cheer .shpet-arm-l, .dx .survey.is-shown .survey-peek.is-cheer .shpet-arm-r { animation: shpet-cheer .26s ease-in-out 10 alternate; }
+@keyframes survey-grab { from { opacity: 0; transform: translateY(-6%); } }
+@keyframes survey-up { from { transform: translateY(70%); } }
+@keyframes survey-jump { 0%, 100% { transform: none; } 30% { transform: translateY(-34%) rotate(-4deg); } 50% { transform: translateY(-28%) rotate(3deg); } 70% { transform: translateY(-32%); } }
+@keyframes survey-letgo { 0%, 100% { opacity: 1; } 8%, 92% { opacity: 0; } }
+/* what he says, beside his head */
+.dx .survey-say { position: absolute; left: calc(22px + var(--tw) + 2px); bottom: calc(100% + var(--tw) * .2); z-index: 1; width: max-content; max-width: min(250px, calc(100% - var(--tw) - 40px));
+  margin: 0; padding: 8px 12px; border: 2px solid var(--text); border-radius: 16px 16px 16px 4px; background: var(--ground); color: var(--text);
+  font-size: var(--fs-label); font-weight: var(--w-strong); line-height: 1.3; box-shadow: 0 6px 18px rgba(30, 20, 30, .2); pointer-events: none; transform-origin: 0 100%; }
+.dx .survey-say:empty { display: none; }
+.dx .survey.is-shown .survey-say { animation: survey-say 300ms 900ms var(--ease-out) both; }
+.dx .survey.is-shown .survey-say.is-new { animation: survey-say 260ms var(--ease-out) both; }
+@keyframes survey-say { from { opacity: 0; transform: scale(.85); } }
+/* still with reduced motion or "Answer animations" off: the window simply appears, Timmy already up */
+@media (prefers-reduced-motion: reduce) {
+  .dx .survey, .dx .survey-win { transition: none; }
+  .dx .survey-win { transform: none; }
+  .dx .survey *, .dx .survey *::after { animation: none !important; }
+  .dx .dx-rank.is-gain { animation: none; }
+}
+html.hx-still .dx .survey, html.hx-still .dx .survey-win { transition: none; }
+html.hx-still .dx .survey-win { transform: none; }
+html.hx-still .dx .survey *, html.hx-still .dx .survey *::after { animation: none !important; }
+html.hx-still .dx .dx-rank.is-gain { animation: none; }
 .dx-update { position: fixed; z-index: 55; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; width: max-content; max-width: calc(100vw - 24px);
   padding: 8px 8px 8px 18px; border-radius: var(--r-pill); background: var(--ground); box-shadow: var(--float-shadow); font-size: var(--fs-label); font-weight: var(--w-strong); }
 
@@ -770,7 +898,10 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
   .dx-ck-list { grid-template-columns: minmax(0, 1fr); }
   .dx-ck-n { display: none; }
   .dx-day { grid-template-columns: minmax(0, 1fr); }
-  .dx .survey { right: 12px; bottom: 12px; }
+  .dx .survey { --tw: 100px; padding-left: 12px; padding-right: 12px; }
+  .dx .survey-peek { left: 14px; }
+  .dx .survey-say { left: calc(14px + var(--tw) + 2px); font-size: var(--fs-meta); }
+  .dx .survey-body { padding: 16px; }
   /* a reply to your report: the hubs move it to the top on a phone, clear of their tab bar; here there is none, and at the top it covers the bar's menu */
   html.shx.sh-dash .sh-reply { top: auto; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); max-height: calc(100vh - 120px); }
   .dx-dlgcard { padding: 20px 16px; }
