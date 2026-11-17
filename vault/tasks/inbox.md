@@ -18,6 +18,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   answer for ... just to fill in the gaps", then "we can do web search, the sites and others like them are good to go on
   the list, no limit on gap answers".
 - [x] **Show the Shiny Gold Crowns you've earned on Home's Today card** (Sam, 2026-11-17). Done: a Crowns tile with the balance (what's left to spend; "earned in all" in its tooltip) that opens the shop (#391).
+- [ ] **More ways to earn crowns, if Sam wants them** (2026-11-17; Sam, with the prizes of `migration_v64.sql`: "im open to
+  other ways too"). Ideas offered, none built: catching the Tooth Fairy or the Golden Probe, a perfect mock, Yesterday's
+  misses all right, an idea of yours marked done on the idea board, the first day back after a week away. Each would be one
+  `xp_awards` row with a key that pays once and an amount in `sh_prizes()` ([game-server](../reference/game-server.md)).
+  Also open: whether studying should pay more than 1 crown per 10 XP (the shop's prices assume it).
 - [ ] **More cosmetics for Timmy and Timmy's place** (Sam, 2026-11-17): new outfits and place pieces
   ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`). **On hold** (Sam, 2026-11-17: "lets
   leave the more cosmetics for later"): don't start it until Sam brings it up again.

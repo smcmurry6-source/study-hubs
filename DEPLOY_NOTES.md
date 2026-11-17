@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (Crowns go up as you earn them, and prizes that pay XP and crowns, Claude Code)** —
+  Sam: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp earn rates",
+  then a list of prizes. The crowns were paid but never redrawn (BUG-163): `migration_v64.sql` puts `crowns` (the balance
+  after it) in every paying reply and `widget/v3.js` sends it as `sh:crowns` (the hub's meters, its shop, the dashboard's
+  wallet; a gold "+n crowns" under the rank). No daily cap on either (the 600 cap is the old pages' only). Prizes, one
+  `xp_awards` row each, paying as many crowns as XP (`sh_prizes()`, copied as `PRIZES` in `v3.js`): the name 500, the daily
+  ring 5 a question of the goal, a Plaque Boss's 500 by damage (`widget/eggs.js`), 10/25/50 in a row, day streaks
+  3-100, a nuke 10,000 (`launch_nuke_v2`), the all-time run record 20,000, a lecture read to the end 50 (timed on the
+  page, `widget/hub.js`), a new trophy 200 (`widget/ranks.js`), medals 250-1,000, the day's first game 100, a personal best
+  50 and a hub high score 250, a daily visit 50 (`widget/dash.js`), a fixed report's 100 crowns. Every card says what it
+  pays (Timmy Time, Mark as read, the arcade, the goal, the visit, the name, the nuke badge, the shop's list). About page,
+  [game-server](vault/reference/game-server.md), event taxonomy and retention updated; `xp.js` 516 checks.
 - **2026-11-17 (The check-in and the survey in a window, Timmy peeking over it, a celebration for the reward, and one more ask, Claude Code, #398)** —
   Sam: "make the check in and survey prompt more interesting and also advertise that it earns you 1000xp and 1000 gold crowns.
   make it take up the center of the screen and a window. have timmy peek over the top of the window", then "the thank you stage

@@ -296,7 +296,7 @@ root.innerHTML =
 "</span></div>" +
 '<p class="note" id="boardNote"></p>' +
 '<div id="board" aria-live="polite"><p class="note">Loading…</p></div>' +
-'<p class="dx-rand" id="visitRand" hidden><button type="button" data-dash="visit-random">' + DICE + '<span>Visit someone random</span></button><span class="dx-rmsg" role="status"></span></p>' +
+'<p class="dx-rand" id="visitRand" hidden><button type="button" data-dash="visit-random">' + DICE + '<span>Visit someone random</span></button><span class="dx-vearn" hidden></span><span class="dx-rmsg" role="status"></span></p>' +
 '<p class="dx-line" id="goldenLine" hidden></p>' +
 "</section>" +
 "</div>" +
@@ -603,11 +603,15 @@ return '<div class="dx-ring" role="img" aria-label="' + (p ? pct + "% " + esc(p.
 '<span class="dx-ring-cap">' + (p ? '<b class="num">' + num(p.seen) + "</b> " + (p.seen === 1 ? "question" : "questions") + " tried" + (p.best ? "<br>Best run " + p.best : "")
 : "Your progress in this hub shows here") + "</span></div>";
 }
+function podEarn(hub){
+var m = /(\d+)\s*min/.exec(hub.podcast.sub || ""), mins = m ? +m[1] : 0;
+return '<span class="dx-pod-earn">' + (mins ? "Up to +" + num(mins * 10 + 100) + " XP and " + num(mins + 100) + " crowns" : "Earns XP and crowns as you listen") + "</span>";
+}
 function podHTML(hub){
 if (!hub.podcast) return "";
 var col = { tint: "#F2C94C", light: "#FFFFFF", line: "#F2C94C" };
 return '<a class="dx-card dx-pod' + (still() || focusOn() ? " is-still" : "") + '" href="' + esc(hubHref(hub, "timmy")) + '" data-hub="' + esc(hub.id) + '" data-pod="dash">' +
-'<span class="dx-pod-txt"><b>' + esc(hub.podcast.name) + ' <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(hub.podcast.sub) + '</small><span class="dx-pod-go">' + icon("play", 16) + "Listen</span></span>" +
+'<span class="dx-pod-txt"><b>' + esc(hub.podcast.name) + ' <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(hub.podcast.sub) + '</small>' + podEarn(hub) + '<span class="dx-pod-go">' + icon("play", 16) + "Listen</span></span>" +
 '<span class="dx-pod-art" aria-hidden="true">' + spot("notes", col, "pm-notes") + spot("timmyTime", col, "pm-timmy") + "</span></a>";
 }
 function checkinButtonsHTML(hub){
@@ -1145,7 +1149,7 @@ q("form", d).addEventListener("submit", function(e){
 e.preventDefault();
 var v = input.value.trim().slice(0, 24);
 if (!v){ msg.textContent = "Type a name first."; input.focus(); return; }
-if (nameSb) nameSb.rpc("set_display_name", { p_visitor: VISITOR, p_name: v }).then(function(){}, function(){});
+if (nameSb) dashPrize(nameSb, "set_display_name_v2", { p_visitor: VISITOR, p_name: v }, "name").then(function(r){ if (!r || r.missing) nameSb.rpc("set_display_name", { p_visitor: VISITOR, p_name: v }).then(function(){}, function(){}); });
 track("name:set");
 localName = v; lsSet("sh_display_name", v); paintName(); nameChanged();
 if (window.shLinkAsk) window.shLinkAsk.check(v);
@@ -1396,7 +1400,45 @@ SHOP.open = true;
 window.shShop.open({ onClose: function(){ SHOP.open = false; var b = q(".dx-shopbtn"); if (b) b.focus({ preventScroll: true }); } });
 }).then(null, function(){ toast("The shop didn't open. Try again in a moment."); });
 }
-document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); } });
+document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); visitEarn(); } });
+function setCrowns(n){
+var w = SHOP.shop && SHOP.shop.wallet; if (!w || typeof n !== "number" || !isFinite(n)) return;
+if (n > w.balance) w.earned = (w.earned || 0) + (n - w.balance);
+w.balance = n; drawWallet();
+}
+var PRIZE_SAYS = { visit: "Visiting a classmate's Timmy", name: "Your leaderboard name", trophy: "New trophy" };
+function prizeLine(src, xp){ return (PRIZE_SAYS[src] || "Bonus") + ": +" + num(xp) + " XP and " + num(xp) + " crowns"; }
+document.addEventListener("sh:crowns", function(e){ var d = e.detail || {}; setCrowns(d.balance); });
+document.addEventListener("sh:prize", function(e){ var d = e.detail || {}; if (d.xp > 0) toast(d.text || prizeLine(d.src, d.xp)); });
+function dashPrize(sb, fn, args, src){
+var bot = false; try { bot = !!navigator.webdriver; } catch (e) {}
+if (!sb || bot) return Promise.resolve(null);
+return sb.rpc(fn, args).then(function(res){
+var e = res && res.error;
+if (e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404)) return { missing: true };
+var r = res && !e ? res.data : null;
+if (!r || typeof r !== "object" || r.ok === false) return r;
+setCrowns(r.crowns);
+if (r.xp > 0) try { document.dispatchEvent(new CustomEvent("sh:prize", { detail: { src: src, xp: r.xp, text: prizeLine(src, r.xp), res: r } })); } catch (x) {}
+if (src === "name" && SHOP.shop && SHOP.shop.wallet && SHOP.shop.wallet.got) SHOP.shop.wallet.got.name = true;
+return r;
+}, function(){ return null; });
+}
+function visitPays(){ var w = SHOP.shop && SHOP.shop.wallet; return w && w.pays && w.pays.visit ? w.pays.visit : 0; }
+function visitTaken(){ var w = SHOP.shop && SHOP.shop.wallet; return ls("sh_visit_paid") === ctDay() || !!(w && w.got && w.got.visit); }
+function visitEarn(){
+var el = q(".dx-vearn"), n = visitPays(); if (!el) return;
+el.hidden = !n || visitTaken();
+if (n) el.textContent = "Visit someone today: +" + num(n) + " XP and " + num(n) + " crowns";
+}
+function visitPaid(key){
+if (!VISITOR || !key || visitTaken() || !visitPays()) return;
+lsSet("sh_visit_paid", ctDay());
+dashPrize(SHOP.sb || boardSb, "claim_visit_v2", { p_visitor: VISITOR, p_key: key }, "visit").then(function(r){
+if (!r || r.missing || r.ok === false) lsSet("sh_visit_paid", null);
+visitEarn();
+});
+}
 var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
 function costumeOfDay(visitor, day, holiday){
 if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
@@ -1428,7 +1470,9 @@ setTimeout(function(){ try { if (P.say) P.say("Something rare came in at the sho
 }
 function applyMyRank(p){
 myRank = p; renderMyRank(p);
-if (window.shRanks && window.shRanks.track) window.shRanks.track(p, { seen: function(j){ var bot = false; try { bot = !!navigator.webdriver; } catch (e) {} if (boardSb && VISITOR && !bot) boardSb.rpc("mark_dark_unlock_seen", { p_visitor: VISITOR, p_journey: j }).then(function(){}, function(){}); } });
+var bot = false; try { bot = !!navigator.webdriver; } catch (e) {}
+if (window.shRanks && window.shRanks.track) window.shRanks.track(p, { seen: function(j){ if (boardSb && VISITOR && !bot) boardSb.rpc("mark_dark_unlock_seen", { p_visitor: VISITOR, p_journey: j }).then(function(){}, function(){}); },
+claim: boardSb && VISITOR && !bot ? function(fn, args){ return boardSb.rpc(fn, Object.assign({ p_visitor: VISITOR }, args)).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); } : null });
 else lsSet("sh_rank_tier", String(p.tier || 0));
 if (window.shRanks && window.shRanks.flairFromBadges){ lsSet("sh_rank_flair", window.shRanks.flairFromBadges(p.badges)); }
 if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(p.badges);
@@ -1569,7 +1613,7 @@ return ranks ? rowHTML(r, r.rnk, jName(r, r.level || R.levelFor(r.xp)), num(r.xp
 }).join("") + "</ol>" : "") + "</div>";
 lifeStage();
 if (d.say) visitSay(d.say.key, d.say.msg, true);
-$("visitRand").hidden = !visitList().length;
+$("visitRand").hidden = !visitList().length; visitEarn();
 }
 function loadFits(sb, d){
 if (V2 !== true || !sb) return;
@@ -1653,6 +1697,7 @@ return;
 Promise.all([placeTop(key), placeLoad()]).then(function(a){
 if (!a[0] || !window.shPlace) { fail(); return; }
 done(); window.shPlace.open({ place: a[0], onClose: back, nav: nav ? { at: nav.at, list: nav.list, load: nav.load } : null });
+visitPaid(key);
 }, fail);
 }
 function getRandom(skip){
@@ -1687,7 +1732,7 @@ Promise.all([getRandom([]), placeLoad(), topTen()]).then(function(a){
 done();
 if (!a[0]) { none(); return; }
 if (!window.shPlace) { fromBoard(); return; }
-add(a[0]);
+add(a[0]); visitPaid(a[0].key);
 window.shPlace.open({ place: withTop(a[0].place, a[0].key, a[2]), onClose: back, nav: { at: 0, list: list,
 load: function(i){ return keys[i] ? placeTop(keys[i]) : Promise.reject(new Error("key")); },
 more: function(){ return getRandom(keys).then(function(r){ if (!r) throw new Error("none"); return add(r); }); } } });
