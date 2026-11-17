@@ -20,3 +20,7 @@ all | Win a mastery medal while a double XP boost you bought is running, and the
 heme-endo-exam3 | 22 diagrams you can play with are in the notes and each lecture's Review: the oocyte and the first weeks of pregnancy, testosterone's two fates, the SERM map, the lymph node and spleen, the neutrophil ladder, five translocations and more. High yield now has its narration for L17-L20 too.
 all | On a phone with the text size at X-Large or XX-Large (Settings), the tab bar's labels no longer run into each other, and the Dark Matter and new-journey scenes fit the screen instead of cutting off their words.
 all | Ask Timmy now looks up what your notes don't cover: a term or fact the notes leave out (say, what an exostosis is) gets a few sentences from trusted medical and dental sites, marked "Not in your notes", with links to the sources.
+perio | New: Stage & Grade, a staging and grading game at the top of the Question Bank, on Home and in the arcade. Ten drawn patients to stage and grade, with the finding that decides each call lit up, or set every criterion yourself and watch the diagnosis follow.
+all | Matching questions now pay like the others: 10 XP the first time you get one right (they gave a flat 2).
+all | Tap "Updated" on a hub's card on the dashboard to see what's new: the last few changes to that hub and the site.
+all | The dashboard's hub recap now plays its bar graph once and then stays still while you scroll, until you open another hub's recap.

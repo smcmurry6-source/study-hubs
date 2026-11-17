@@ -430,8 +430,8 @@ var STAGE_GAME = (function(){
     function out(){
       var c = exCase(), r = rules(c), all = r.sk.concat(r.ek, r.gk), o2 = body().querySelector(".stg-out"); if (!o2) return;
       o2.innerHTML = '<p class="stg-diag">' + esc(diag(r)) + "</p>" + vizHTML(c, all) +
-        '<div class="stg-whys"><h3>' + (r.perio ? "The stage: " + r.stage : "No periodontitis") + "</h3><ul>" + r.sw.map(li).join("") + "</ul>" +
-        (r.perio ? "<h3>The extent: " + esc(label("extent", r.extent)) + "</h3><ul>" + r.ew.map(li).join("") + "</ul><h3>The grade: " + r.grade + "</h3><ul>" + r.gw.map(li).join("") + "</ul>" : "") + "</div>";
+        '<div class="stg-whys"><h3>' + (r.perio ? "Why Stage " + r.stage : "Why it isn't periodontitis") + "</h3><ul>" + r.sw.map(li).join("") + "</ul>" +
+        (r.perio ? "<h3>Why " + esc(label("extent", r.extent).toLowerCase()) + "</h3><ul>" + r.ew.map(li).join("") + "</ul><h3>Why Grade " + r.grade + "</h3><ul>" + r.gw.map(li).join("") + "</ul>" : "") + "</div>";
     }
     function li(x){ return "<li>" + esc(x) + "</li>"; }
     function input(e){
