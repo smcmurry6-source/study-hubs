@@ -7,4 +7,4 @@
 # None waiting. migration_v54 to migration_v58 were applied at the redesign's release and are in supabase/schema.sql,
 # below its "the redesign's release" marker (tools/release/xp.js still tests the moment they were applied: pg.js).
 # migration_v59 (Learn's and Flashcards' sections, Learn's answer context) was applied on 2026-11-16 (PR #381).
-migration_v60.sql
+# migration_v60 (the survey and check-in reward) was applied on 2026-11-17 (PR #387).

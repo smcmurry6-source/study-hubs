@@ -1,6 +1,7 @@
 -- v60 (2026-11-17): a reward for a survey or an exam check-in. Sam: "Also give 500xp and 1000 crowns as a reward for
 -- completing a survey or check in. Only reward for the first submission of each".
--- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js, admin-ops.js).
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js, admin-ops.js). Applied to the live
+-- project on 2026-11-17 through the Supabase connector, at Sam's "merge" (PR #387).
 --
 -- 1. Two new award kinds, `survey` and `checkin` (xp_awards.src). Each pays +500 XP once, through sh_award, so it is a row
 --    keyed per visitor: `survey:<survey id>` and `checkin:<hub>:<exam>` (the exam string the check-in carries, e.g.
