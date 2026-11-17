@@ -622,16 +622,29 @@
     var f = boss.hp / boss.max, said = boss.k.said;
     boss.el.querySelector(".sh-egg-boss-bar i").style.width = (100 * f) + "%";
     var se = season(), first = se && boss.hp === boss.max ? se.line : said[0];
-    boss.el.querySelector(".sh-egg-boss-hp").textContent = boss.hp + " / " + boss.max + " HP";
+    var G = window.shGame, pay = G && G.live && G.live() && G.prizes ? G.prizes.boss : 0;
+    boss.el.querySelector(".sh-egg-boss-hp").textContent = boss.hp + " / " + boss.max + " HP" + (pay ? " · your share of +" + pay + " XP and crowns" : "");
     boss.el.querySelector(".sh-egg-boss-say").textContent = " · " + (f > .6 ? first : f > .25 ? said[1] : said[2]);
     boss.el.classList.toggle("is-low", f <= .25);
     boss.el.classList.toggle("is-shown", !bossHidden && feat("boss"));
     bossSpace();
   }
+  /* your share of a boss (migration_v64; Sam: "defeating a question boss prorated to how much damage you did"): the HP you
+     took off it is kept on this device (sh_boss_dmg) and, once it's down, sent for 500 XP and crowns times your share of its
+     HP. The server checks the damage against your right answers in that hub in the boss's 2 hours. */
+  function myDmg(id){ var d = null; try { d = JSON.parse(ls("sh_boss_dmg") || "null"); } catch (e) {} return d && d.id === id ? d.d | 0 : 0; }
+  function addDmg(id, n){ ls("sh_boss_dmg", JSON.stringify({ id: id, d: myDmg(id) + n })); }
+  function claimBoss(id, k){
+    var G = window.shGame, d = myDmg(id), parts = String(id).split("|");
+    if (!d || !G || !G.claim || parts.length !== 3 || ls("sh_boss_paid") === id) return;
+    ls("sh_boss_paid", id);
+    G.claim("claim_boss_v2", { p_visitor: VISITOR, p_hub: HUB, p_boss: parts[1] + "|" + parts[2], p_damage: d, p_hp: k.hp }, "boss");
+  }
   function defeatBoss(by){
     if (!boss) return;
     ls("sh_egg_boss_down", boss.id);
-    var el = boss.el, k = boss.k; boss = null;
+    var el = boss.el, k = boss.k, id = boss.id, test = boss.test; boss = null;
+    if (!test) claimBoss(id, k);
     el.classList.add("is-dead");
     setTimeout(function(){ el.remove(); bossSpace(); }, 900);
     if (!on()) return;
@@ -642,8 +655,9 @@
   /* every 5th right answer in a row lands a critical hit for 2 */
   function hitBoss(streak){
     if (!boss || boss.id !== bossId()) return;
-    var crit = streak > 0 && streak % 5 === 0, dmg = crit ? 2 : 1;
+    var crit = streak > 0 && streak % 5 === 0, dmg = Math.min(crit ? 2 : 1, boss.hp);
     boss.hp = Math.max(0, boss.hp - dmg);
+    if (!boss.test && dmg > 0) addDmg(boss.id, dmg);
     boss.el.classList.remove("is-hit"); void boss.el.offsetWidth; boss.el.classList.add("is-hit");
     var pop = document.createElement("span"); pop.className = "sh-egg-boss-dmg" + (crit ? " is-crit" : ""); pop.textContent = crit ? "CRIT -2" : "-1";
     pop.style.left = (14 + Math.random() * 16) + "px";
@@ -680,7 +694,7 @@
       if (boss && typeof d.hp === "number" && d.hp < boss.hp) { boss.hp = Math.max(0, d.hp); drawBoss(); }
       if (boss && boss.hp === 0) defeatBoss("a classmate");
     } else if (d.t === "boss-down" && d.id === bossId()) {
-      if (!boss) { ls("sh_egg_boss_down", d.id); return; }
+      if (!boss) { ls("sh_egg_boss_down", d.id); claimBoss(d.id, bossKind(d.id)); return; }
       defeatBoss(String(d.by || "a classmate").slice(0, 40));
     } else if (d.t === "golden" && feat("probe")) {
       toast(row(IC.probe, esc(String(d.name || "A classmate").slice(0, 40)) + " just found today's Golden Probe", "One question here is golden each day. Tomorrow it could be you."), 5000, "is-gold");

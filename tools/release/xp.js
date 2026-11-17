@@ -245,10 +245,10 @@ try {
   // hub mastery medals and their double XP (hub xm: 10 counted questions and one review-only)
   const md = [];
   for (let i = 1; i <= 10; i++) md.push(ans('xp-D', 'm' + i, { hub: 'xm', choice: 0, at: i * 10 }));
-  ok(md[4].medal && md[4].medal.kind === 'mastery-bronze' && md[4].medal.xp === 100, `50% of the bank right: Bronze, +100 (${JSON.stringify(md[4].medal)})`);
+  ok(md[4].medal && md[4].medal.kind === 'mastery-bronze' && md[4].medal.xp === 250, `50% of the bank right: Bronze, +250 (migration_v64; ${JSON.stringify(md[4].medal)})`);
   ok(md[5].mult === 2 && md[5].xp === 20, `the next answer is double XP (${md[5].mult}x, ${md[5].xp})`);
   ok(md[7].medal && md[7].medal.kind === 'mastery-silver' && md[7].mult === 2 && md[8].mult === 2, 'Silver during the boost: still 2x, never more');
-  ok(md[8].medal && md[8].medal.kind === 'mastery-gold' && md[9].medal && md[9].medal.kind === 'mastery-crown' && md[9].medal.xp === 500, 'Gold at 90%, the Crown at 100% (+500)');
+  ok(md[8].medal && md[8].medal.kind === 'mastery-gold' && md[9].medal && md[9].medal.kind === 'mastery-crown' && md[9].medal.xp === 1000, 'Gold at 90%, the Crown at 100% (+1,000, migration_v64)');
   ok(num(`select count(*) from achievements where visitor_id = 'xp-D' and kind like 'mastery-%' and hub = 'xm'`) === 4, 'the medals are achievements, as the page records them today');
   const bEnd = one(`select max(ends_at) = ${T(100)} + interval '24 hours' from xp_boosts where visitor_id = 'xp-D'`);
   eq(bEnd, 't', 'each new medal restarts the 24 hours');
@@ -260,7 +260,7 @@ try {
   // a medal the page recorded itself after the switch is paid at the next answer
   anon(`select record_achievement('xp-D2', 'mastery-bronze', 'xm')`);
   const d2 = []; for (let i = 1; i <= 5; i++) d2.push(ans('xp-D2', 'm' + i, { hub: 'xm', choice: 0, at: 1000 + i * 10 }));
-  ok(d2[4].medal && d2[4].medal.xp === 100, 'a Bronze recorded by today\'s page after the switch is paid when it\'s reached');
+  ok(d2[4].medal && d2[4].medal.xp === 250, 'a Bronze recorded by today\'s page after the switch is paid when it\'s reached');
   // a medal won during a shop boost: the boost's unused time moves after the medal's 24 hours (migration_v63)
   sql(`insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at) values ('xp-DB', 'shop:t1', 'shop', 2, ${T(1990)}, ${T(1990 + 3600)})`);
   const mb1 = []; for (let i = 1; i <= 5; i++) mb1.push(ans('xp-DB', 'm' + i, { hub: 'xm', choice: 0, at: 2000 + i * 10 }));
@@ -346,7 +346,7 @@ try {
   const k1 = one(`select sh_session_start(${T(0)}, 'xp-K', 'xh', 'arcade', 'board')`), k2 = one(`select sh_session_start(${T(300)}, 'xp-K2', 'xh', 'arcade', 'board')`);
   json(`sh_session_finish(${T(40)}, 'xp-K', ${q(k1)}::uuid, null, null)`); json(`sh_session_finish(${T(340)}, 'xp-K2', ${q(k2)}::uuid, null, null)`);
   award('xp-K2', 'rep:flag:9001', 10000);
-  eq([xpOf('xp-K'), xpOf('xp-K2')], [20 + 10 + 10 + 50, 20 + 10 + 10 + 50 + 10000], 'two devices before linking');
+  eq([xpOf('xp-K'), xpOf('xp-K2')], [20 + 10 + 10 + 50 + 100, 20 + 10 + 10 + 50 + 100 + 10000], 'two devices before linking (each with the day\'s first game, migration_v64)');
   sql(`insert into pet_inventory (visitor_id, item_id, bought_at) values ('xp-K', 'bow-tie', now() - interval '2 days'), ('xp-K2', 'scrub-cap', now() - interval '1 day'), ('xp-K2', 'bow-tie', now() - interval '1 day');
        insert into pet_equipped (visitor_id, slot, item_id, set_at) values ('xp-K', 'outfit', 'bow-tie', now() - interval '2 hours'), ('xp-K2', 'outfit', 'scrub-cap', now() - interval '1 hour');
        insert into costume_log (visitor_id, costume, first_day) values ('xp-K2', 'pirate', current_date - 3);`);
@@ -358,7 +358,7 @@ try {
   eq(anon(`select redeem_link_code(${q(code)}, 'xp-K2')`)[0][0], 'xp-K', 'the second device links to the first');
   eq(num(`select count(*) from personal_answers where visitor_id = 'xp-K2'`) + num(`select count(*) from xp_awards where visitor_id = 'xp-K2'`) + num(`select count(*) from xp_visitors where visitor_id = 'xp-K2'`), 0,
     'nothing is left on the second id');
-  eq(xpOf('xp-K'), 20 + 10 + 2 + 10 + 50 + 10000, 'linked: the question first right once (10 + 2), the minute and the game once a day, the report kept');
+  eq(xpOf('xp-K'), 20 + 10 + 2 + 10 + 50 + 100 + 10000, 'linked: the question first right once (10 + 2), the minute, the game and the day\'s first game once a day, the report kept');
   const kx = xpOf('xp-K'); sql(`select sh_xp_rebuild(array['xp-K'])`); eq(xpOf('xp-K'), kx, 'rebuilding again changes nothing');
   eq(rows(`select item_id from pet_inventory where visitor_id = 'xp-K' order by 1`).map(r => r.item_id), ['bow-tie', 'scrub-cap'], 'the inventories merge');
   eq(one(`select item_id from pet_equipped where visitor_id = 'xp-K' and slot = 'outfit'`), 'scrub-cap', 'what\'s equipped: the newer choice wins');
@@ -370,15 +370,16 @@ try {
 
   /* ---------- 9. Shiny Gold Crowns ---------- */
   const dw = json(`sh_wallet('xp-D')`), dExtra = num(`select sum(xp - base) from xp_awards where visitor_id = 'xp-D'`);
-  ok(dExtra > 0 && dw.from_xp === Math.floor((xpOf('xp-D') - dExtra) / 10), `gold crowns from base XP only: a boost's extra earns none (${dw.from_xp}, extra ${dExtra})`);
+  const dPrize = num(`select coalesce(sum(base), 0) from xp_awards where visitor_id = 'xp-D' and sh_is_prize(src)`);
+  ok(dExtra > 0 && dPrize === 2525 && dw.from_xp === Math.floor((xpOf('xp-D') - dExtra - dPrize) / 10), `gold crowns from study XP only: a boost's extra earns none, and a prize (the four medals' 2,500, ten right in a row's 25) pays its own (${dw.from_xp}, extra ${dExtra}, prizes ${dPrize})`);
   eq([dw.medals, dw.trophies], [4, 0], 'four medals since the switch');
-  eq(dw.earned, dw.from_xp + 4 * 50 + 20 * dw.rankups, 'earned = base XP / 10 + 50 a medal + 20 a rank-up');
+  eq([dw.prizes, dw.earned], [2525, dw.from_xp + 2525 + 4 * 50 + 20 * dw.rankups], 'earned = study XP / 10 + a prize\'s XP in crowns (migration_v64) + 50 a medal + 20 a rank-up');
   const lw = json(`sh_wallet('xp-L1')`);
   ok(lw.from_xp === Math.floor(xpOf('xp-L1') / 10) && lw.medals === 0 && lw.trophies === 0 && lw.rankups === 0, `back pay: L1's XP from before the switch counts, its old medal and trophy don't (${JSON.stringify(lw)})`);
   award('xp-U', 'rep:flag:9002', 1300);
   anon(`select record_achievement('xp-U', 'owl', '')`);
   const uw = json(`sh_wallet('xp-U')`);
-  ok(uw.rankups === 2 && uw.trophies === 1 && uw.earned === Math.floor(xpOf('xp-U') / 10) + 2 * 20 + 25, `rank-ups and trophies since the switch: +20 and +25 each (${JSON.stringify(uw)})`);
+  ok(uw.rankups === 2 && uw.trophies === 1 && uw.earned === Math.floor((xpOf('xp-U') - 1300) / 10) + 1300 + 2 * 20 + 25, `rank-ups and trophies since the switch: +20 and +25 each, a fixed report's XP in crowns (${JSON.stringify(uw)})`);
 
   /* ---------- 10. the shop ---------- */
   // seasons: in step with holidayId() and isFall() in widget/pet.js, every day of three years
@@ -1126,6 +1127,159 @@ try {
     eq(xpOf('xp-TU') - t0, 500, 'running the top-up again changes nothing');
     sql(`select sh_xp_rebuild(array['xp-TU'])`); eq(xpOf('xp-TU') - t0, 500, 'the rebuild agrees with the top-up');
     notes.push('a survey or check-in: 1,000 XP and 1,000 crowns once each, nothing for "Later", a second check-in, an earlier one or a linked device');
+  }
+
+  /* ---------- 14c. migration_v64: the crowns in every reply, and the prizes ---------- */
+  {
+    // a hub of 60 questions that count for nothing (no medals in the way): the run of right answers, the nuke, the record
+    const xr = []; for (let i = 1; i <= 60; i++) xr.push({ id: 'r' + i, kind: 'one', answer: [0], counted: false });
+    xr.push({ id: 'rs', kind: 'self', counted: false });
+    anon(`select admin_load_question_keys(${S}, 'xr', ${q(JSON.stringify(xr))}::jsonb)`);
+    const BASE = 40 * DAY;   // a day of its own
+    const rq = i => 'r' + ((i % 60) + 1);
+    const wal = v => json(`sh_wallet(${q(v)})`);
+    // every reply carries the balance
+    const a0 = ans('xp-RN', 'r1', { hub: 'xr', choice: 0, at: BASE });
+    eq([typeof a0.crowns, a0.crowns], ['number', wal('xp-RN').balance], 'an answer\'s reply carries the crowns after it');
+    // the run: 10, 25 and 50 right in a row pay 25, 100 and 250, once per run
+    const runs = [a0];
+    for (let i = 1; i < 50; i++) runs.push(ans('xp-RN', rq(i), { hub: 'xr', choice: 0, at: BASE + i * 3 }));
+    const rowsPaid = runs.map((r, i) => (r.bonus || []).filter(b => b.src === 'row').map(b => (i + 1) + ':' + b.xp)).flat();
+    eq(rowsPaid, ['10:25', '25:100', '50:250'], 'right in a row: 10, 25 and 50 pay 25, 100 and 250');
+    // a self-graded card and a too-fast answer neither add nor break it; a wrong one ends it
+    ans('xp-RN', 'rs', { hub: 'xr', self: false, at: BASE + 50 * 3 });
+    ans('xp-RN', rq(50), { hub: 'xr', choice: 0, at: BASE + 50 * 3 + 0.5 });
+    eq(num(`select n from xp_runs where visitor_id = 'xp-RN'`), 50, 'a self-graded miss and a too-fast answer leave the run at 50');
+    // the same question right a 4th time today pays nothing and doesn't add to the run
+    ans('xp-RQ', 'r1', { hub: 'xr', choice: 0, at: BASE }); ans('xp-RQ', 'r1', { hub: 'xr', choice: 0, at: BASE + 3 }); ans('xp-RQ', 'r1', { hub: 'xr', choice: 0, at: BASE + 6 });
+    const r4 = ans('xp-RQ', 'r1', { hub: 'xr', choice: 0, at: BASE + 9 });
+    eq([r4.xp, num(`select n from xp_runs where visitor_id = 'xp-RQ'`)], [0, 3], 'one question answered right a 4th time today: no XP, and the run stays at 3');
+    // the nuke: nothing before 100, 10,000 XP and crowns at the launch after 100, once; 100 more for the next
+    eq(json(`sh_launch_nuke(${T(BASE + 160)}, 'xp-RN', 'xr', 'Test')`).xp, 0, 'a launch before the run reaches 100 pays nothing');
+    eq(num(`select count(*) from nuke_launches where visitor_id = 'xp-RN'`), 1, 'the launch is still logged for the admin page');
+    sql(`update game_records set value = 130, run = null, visitor_id = null where kind = 'run'`);
+    let t = BASE + 200; const more = [];
+    for (let i = 50; i < 140; i++) more.push(ans('xp-RN', rq(i), { hub: 'xr', choice: 0, at: (t += 3) }));
+    eq(num(`select n from xp_runs where visitor_id = 'xp-RN'`), 140, 'the run reaches 140');
+    const x0 = xpOf('xp-RN'), w0 = wal('xp-RN');
+    const nk = json(`sh_launch_nuke(${T(t + 5)}, 'xp-RN', 'xr', 'Test')`);
+    const w1n = wal('xp-RN');
+    eq([nk.xp, nk.won, xpOf('xp-RN') - x0, nk.crowns - w0.balance - 20 * (w1n.rankups - w0.rankups), nk.crowns], [10000, 10000, 10000, 10000, w1n.balance], 'launching after 100 in a row: 10,000 XP and 10,000 crowns (and a rank-up\'s 20), and the reply says so');
+    eq(json(`sh_launch_nuke(${T(t + 6)}, 'xp-RN', 'xr', 'Test')`).xp, 0, 'a second launch from the same 100 pays nothing');
+    // the class's record: passing it (130 here) pays 20,000 once per run, and the record follows the run
+    const at = more.map((r, i) => (r.bonus || []).filter(b => b.src === 'alltime').map(b => (51 + i) + ':' + b.xp + ':' + b.was)).flat();
+    eq(at, ['131:20000:130'], 'passing the class\'s longest run (130): 20,000 once, at 131');
+    eq(json(`select json_build_array(value, visitor_id) from game_records where kind = 'run'`), [140, 'xp-RN'], 'the record follows the run up');
+    // 100 more right, the next day (each question pays its first three right a day): a second nuke
+    t = BASE + DAY;
+    for (let i = 140; i < 240; i++) ans('xp-RN', rq(i), { hub: 'xr', choice: 0, at: (t += 3) });
+    eq(json(`sh_launch_nuke(${T(t + 5)}, 'xp-RN', 'xr', 'Test')`).xp, 10000, '100 more right after a launch: another 10,000');
+    // a miss ends the run; the next one must pass the record again (240 now) to pay, and a run under 100 never does
+    ans('xp-RN', 'r1', { hub: 'xr', choice: 1, at: (t += 3) });
+    eq(num(`select n from xp_runs where visitor_id = 'xp-RN'`), 0, 'a miss ends the run');
+    sql(`update game_records set value = 20, run = null where kind = 'run'`);
+    const low = []; for (let i = 0; i < 25; i++) low.push(ans('xp-RL', rq(i), { hub: 'xr', choice: 0, at: BASE + i * 3 }));
+    ok(!low.some(r => (r.bonus || []).some(b => b.src === 'alltime')), 'passing a record of 20 pays nothing: the record prize starts at 100');
+    notes.push('right in a row (10, 25, 50), the nuke (10,000 once per 100), the class\'s record (20,000 once per run), repeats and self-graded cards don\'t count');
+
+    // the streak of days: 3 and 7 days in a row pay 100 and 300 at the day's first answer, once
+    const sd = []; for (let d = 0; d < 8; d++) sd.push(ans('xp-SD', 'r1', { hub: 'xr', choice: 0, at: BASE + d * DAY + 7200 }));
+    eq(sd.map(r => (r.bonus || []).filter(b => b.src === 'streak').map(b => b.n + ':' + b.xp).join('')), ['', '', '3:100', '', '', '', '7:300', ''], 'a streak of days: 3 days pay 100, 7 days 300');
+    eq(ans('xp-SD', 'r2', { hub: 'xr', choice: 0, at: BASE + 6 * DAY + 7300 }).bonus.filter(b => b.src === 'streak').length, 0, 'the day\'s second answer pays no streak prize');
+
+    // the daily ring: 5 a question of the goal, once per hub per day, when the answers reach it
+    const ringAt = BASE + 20 * DAY;
+    for (let i = 0; i < 19; i++) ans('xp-RG', rq(i), { hub: 'xr', choice: 0, at: ringAt + i * 3 });
+    const rg1 = json(`sh_claim_ring(${T(ringAt + 100)}, 'xp-RG', 'xr', 20)`);
+    eq([rg1.xp, rg1.why], [0, 'short'], 'the ring with 19 of 20: nothing yet');
+    ans('xp-RG', rq(19), { hub: 'xr', choice: 0, at: ringAt + 120 });
+    const rg2 = json(`sh_claim_ring(${T(ringAt + 130)}, 'xp-RG', 'xr', 20)`);
+    eq([rg2.xp, rg2.won, rg2.crowns], [100, 100, wal('xp-RG').balance], 'the ring filled at 20: 100 XP and crowns');
+    eq(json(`sh_claim_ring(${T(ringAt + 140)}, 'xp-RG', 'xr', 10)`).xp, 0, 'once a day, whatever the goal');
+    eq(json(`sh_claim_ring(${T(ringAt + 140)}, 'xp-RG', 'xr', 15)`).error, 'bad', 'a goal the page doesn\'t offer is refused');
+
+    // a Plaque Boss: the share of its HP, never more than the right answers in its window, once
+    const bossAt = BASE + 22 * DAY, bossDay = num(`select 1`) && one(`select ((${T(bossAt)}) at time zone 'America/Chicago')::date`);
+    const win = Math.floor(num(`select extract(hour from (${T(bossAt)}) at time zone 'America/Chicago')`) / 2), bid = bossDay + '|' + win;
+    for (let i = 0; i < 10; i++) ans('xp-BS', rq(i), { hub: 'xr', choice: 0, at: bossAt + 60 + i * 3 });
+    const bs = json(`sh_claim_boss(${T(bossAt + 200)}, 'xp-BS', 'xr', ${q(bid)}, 40, 40)`);
+    eq([bs.damage, bs.xp], [12, 150], 'a boss: 40 damage claimed, 10 right answers (12 with crits) count: 12/40 of 500');
+    eq(json(`sh_claim_boss(${T(bossAt + 210)}, 'xp-BS', 'xr', ${q(bid)}, 40, 40)`).xp, 0, 'once per boss');
+    eq(json(`sh_claim_boss(${T(bossAt + 3 * 3600)}, 'xp-BS2', 'xr', ${q(bid)}, 5, 40)`).error, 'late', 'after its window: refused');
+    eq(json(`sh_claim_boss(${T(bossAt + 200)}, 'xp-BS2', 'xr', ${q(bid)}, 5, 40)`).why, 'hits', 'no right answers in its window: nothing');
+
+    // a lecture's notes: at least 60 seconds from opening to the end, 50 once per lecture
+    const nAt = BASE + 24 * DAY;
+    const rd = one(`select sh_notes_start(${T(nAt)}, 'xp-NT', 'xr', 'L1')`);
+    const nd1 = json(`sh_notes_done(${T(nAt + 20)}, 'xp-NT', ${q(rd)}::uuid)`);
+    eq([nd1.xp, nd1.why], [0, 'fast'], 'jumping to the end after 20 seconds: nothing');
+    const nd2 = json(`sh_notes_done(${T(nAt + 90)}, 'xp-NT', ${q(rd)}::uuid)`);
+    eq([nd2.xp, nd2.lec], [50, 'L1'], 'read to the end after 90 seconds: 50');
+    eq(one(`select sh_notes_start(${T(nAt + 100)}, 'xp-NT', 'xr', 'L1') is null`), 't', 'a lecture already paid gives no read id');
+    raises(() => anon(`select count(*) from notes_reads`), '42501', 'anon reads notes_reads directly');
+    eq(json(`sh_notes_done(${T(nAt + 90)}, 'xp-NT2', ${q(rd)}::uuid)`).error, 'bad', 'someone else\'s read id is refused');
+
+    // a name: 500 the first time, never for the made-up default name; the old call pays too
+    const nm = anonJson(`set_display_name_v2('xp-NM', 'Prize Premolar')`);
+    eq([nm.xp, nm.crowns], [500, wal('xp-NM').balance], 'choosing a name: 500 XP and crowns');
+    eq(anonJson(`set_display_name_v2('xp-NM', 'Other Name')`).xp, 0, 'changing it again pays nothing');
+    const dflt = one(`select anon_name('xp-NM2')`);
+    eq(anonJson(`set_display_name_v2('xp-NM2', ${q(dflt)})`).xp, 0, 'saving the made-up default name pays nothing');
+    anon(`select set_display_name('xp-NM3', 'Old Page Name')`);
+    eq(num(`select coalesce(sum(base), 0) from xp_awards where visitor_id = 'xp-NM3' and src = 'name'`), 500, 'a name saved through the old call pays too');
+    eq(wal('xp-NM').got.name, true, 'the wallet says the name prize is taken');
+
+    // a visit: 50 once a day, never your own place or a linked device's
+    const vAt = BASE + 26 * DAY, key = one(`select sh_visit_key('xp-RN')`);
+    const vs = json(`sh_claim_visit(${T(vAt)}, 'xp-VI', ${q(key)})`);
+    eq([vs.xp, vs.crowns], [50, wal('xp-VI').balance], 'visiting someone: 50 XP and crowns');
+    eq(json(`sh_claim_visit(${T(vAt + 60)}, 'xp-VI', ${q(key)})`).xp, 0, 'once a day');
+    eq(json(`sh_claim_visit(${T(vAt + DAY)}, 'xp-VI', ${q(key)})`).xp, 50, 'again the next day');
+    eq(json(`sh_claim_visit(${T(vAt)}, 'xp-RN', ${q(key)})`).why, 'self', 'your own place pays nothing');
+    eq(json(`sh_claim_visit(${T(vAt)}, 'xp-VI2', '000000000000000000000000')`).error, 'unknown', 'an unknown key is refused');
+
+    // trophies: the ones held when v64 ran pay nothing; a new one pays 200 once
+    const heldBefore = num(`select count(*) from prize_seen where visitor_id = 'xp-U' and key = 'trophy:owl'`);
+    eq(heldBefore, 0, 'xp-U won Night Owl after the snapshot (in this test, after the migration)');
+    const tr1 = anonJson(`claim_trophies_v2('xp-U')`);
+    ok(tr1.won.includes('owl') && tr1.xp >= 200 && tr1.xp % 200 === 0, `a trophy won from now on: 200 XP and crowns (${JSON.stringify(tr1)})`);
+    eq(anonJson(`claim_trophies_v2('xp-U')`).xp, 0, 'claiming again pays nothing');
+    sql(`insert into prize_seen (visitor_id, key) values ('xp-TS', 'trophy:owl')`); anon(`select record_achievement('xp-TS', 'owl', '')`);
+    ans('xp-TS', 'r1', { hub: 'xr', choice: 0, at: BASE });
+    eq(anonJson(`claim_trophies_v2('xp-TS')`).won.includes('owl'), false, 'a trophy held when the migration ran pays nothing');
+
+    // games: the day's first game 100 once; beating your best 50, the hub's top score 250, each once per game a day
+    const gAt = BASE + 30 * DAY;
+    sql(`insert into arcade_scores (hub, game, visitor_id, score, played_at) values ('xr', 'board', 'xp-GO', 500, now() - interval '1 day'), ('xr', 'board', 'xp-GM', 100, now() - interval '1 day')`);
+    const g1 = one(`select sh_session_start(${T(gAt)}, 'xp-GM', 'xr', 'arcade', 'board')`);
+    const gf1 = json(`sh_session_finish(${T(gAt + 30)}, 'xp-GM', ${q(g1)}::uuid, 200, null)`);
+    eq([gf1.xp, gf1.game, gf1.pb, gf1.top, gf1.crowns], [50, 100, 50, 0, wal('xp-GM').balance], 'a game: 50 XP, the day\'s first game 100, a new personal best 50');
+    sql(`update arcade_scores set played_at = now() - interval '1 hour' where visitor_id = 'xp-GM'`);
+    const g2 = one(`select sh_session_start(${T(gAt + 60)}, 'xp-GM', 'xr', 'arcade', 'board')`);
+    const gf2 = json(`sh_session_finish(${T(gAt + 90)}, 'xp-GM', ${q(g2)}::uuid, 900, null)`);
+    eq([gf2.xp, gf2.game, gf2.pb, gf2.top], [0, 0, 0, 250], 'the same day: the hub\'s top score pays 250 (the personal best already paid today)');
+    const g3 = one(`select sh_session_start(${T(gAt + 120)}, 'xp-GM', 'xr', 'arcade', 'board')`);
+    const gf3 = json(`sh_session_finish(${T(gAt + 125)}, 'xp-GM', ${q(g3)}::uuid, 5000, null)`);
+    eq([gf3.game, gf3.pb, gf3.top], [0, 0, 0], 'a game under 20 seconds pays no prize');
+
+    // crowns for a prize equal its XP: a fixed report, a finished episode, a medal (crowns only for those paid before)
+    const w1 = wal('xp-GM'); award('xp-GM', 'rep:flag:9100', 100);
+    eq(wal('xp-GM').balance - w1.balance, 100, 'a fixed report: 100 crowns with its 100 XP');
+    // the rebuild keeps every prize
+    const keep = ['xp-RN', 'xp-SD', 'xp-RG', 'xp-GM'].map(xpOf);
+    sql(`select sh_xp_rebuild(array['xp-RN', 'xp-SD', 'xp-RG', 'xp-GM'])`);
+    eq(['xp-RN', 'xp-SD', 'xp-RG', 'xp-GM'].map(xpOf), keep, 'the rebuild keeps every prize');
+    // the page's table of prizes says what the server pays
+    const v3src = fs.readFileSync(path.join(ROOT, 'widget/v3.js'), 'utf8'), pm = /var PRIZES = (\{[^;]*\});/.exec(v3src);
+    ok(pm, 'widget/v3.js has its PRIZES table');
+    const canon = o => JSON.stringify(Object.keys(o).sort().map(k => [k, o[k]]));   /* jsonb sorts its keys its own way */
+    if (pm) eq(canon(JSON.parse(pm[1].replace(/([{,]\s*)([a-z0-9]+):/g, '$1"$2":'))), canon(json(`sh_prizes()`)), 'widget/v3.js\'s PRIZES match sh_prizes()');
+    for (const f of [`sh_run_step('x', 'xr', 1, true, now())`, `sh_streak_step('x', 'xr', current_date, now())`, `sh_launch_nuke(null, 'x', 'xr', 'x')`,
+      `sh_claim_ring(null, 'x', 'xr', 20)`, `sh_claim_boss(null, 'x', 'xr', '2030-03-04|6', 1, 40)`, `sh_notes_start(null, 'x', 'xr', 'L1')`,
+      `sh_name_prize('x', 'y')`, `sh_claim_visit(null, 'x', ${q(key)})`, `sh_crowns('x')`])
+      raises(() => anon(`select ${f}`), '42501', `anon runs ${f.split('(')[0]}`);
+    for (const tb of ['xp_runs', 'game_records', 'prize_seen']) raises(() => anon(`select count(*) from public.${tb}`), '42501', `anon reads ${tb} directly`);
+    notes.push('v64 prizes: the streak of days, the daily ring, a boss\'s share, a lecture read, a name, a visit, trophies from now on, the day\'s first game and records, a fixed report\'s crowns, crowns in every reply, the rebuild keeps them');
   }
 
   /* ---------- 15. the private parts stay private ---------- */

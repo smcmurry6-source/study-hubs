@@ -242,6 +242,29 @@
     else svg = svg.replace(/(<svg[^>]*>)/, function(m){ return m + "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") + "</style>"; });
     return '<div class="tsh-poster">' + img(svg, "The whole " + se.n + " set at Timmy’s place") + "</div>";
   }
+  /* how crowns are earned: studying pays 1 for 10 XP, and every prize (migration_v64) pays as many crowns as XP. The
+     amounts are the server's (the wallet's pays, sh_prizes()), or the page's copy of them (shGame.prizes) */
+  function earnList(w){
+    var G = window.shGame, P = w.pays || (G && G.prizes) || null;
+    var li = function(n, what){ return "<li><b>" + n + "</b> " + what + "</li>"; };
+    var html = li("1", "for every 10 XP you earn studying (a boost’s extra XP doesn’t count)");
+    if (P) {
+      var top = function(list){ return list && list.length ? num(list[list.length - 1][1]) : ""; };
+      html += li("+ the XP", "on top for every bonus: a bonus pays as many crowns as XP") +
+        li(num(P.ring), "a question, up to " + num(P.ring * 50) + ", for filling your daily ring") +
+        li(num(P.boss), "split by your share of the damage, for bringing down a Plaque Boss") +
+        li(num(P.notes), "for reading a lecture’s notes to the end (scrolling straight down doesn’t count)") +
+        li(num(P.visit), "once a day for visiting a classmate’s Timmy") +
+        li(num(P.game), "for your first arcade game of the day, " + num(P.pb) + " for a personal best and " + num(P.top) + " for a new high score") +
+        li(num(P.trophy), "for each new trophy, and " + num((P.medal || [])[0]) + " to " + num((P.medal || []).slice(-1)[0]) + " for a mastery medal") +
+        li((P.streak ? num(P.streak[0][1]) + " to " + top(P.streak) : ""), "for study streaks of 3 to 100 days") +
+        li((P.row ? num(P.row[0][1]) + " to " + top(P.row) : ""), "for 10, 25 and 50 right in a row") +
+        li(num(P.report), "when a report you sent gets fixed") +
+        li(num(P.name), "for picking your leaderboard name") +
+        li(num(P.nuke), "for launching a nuke, and " + num(P.alltime) + " for breaking the all-time streak record");
+    }
+    return html + li("25", "for each trophy you hold, 50 for each mastery medal and 20 for each rank-up");
+  }
   function page(root, o){
     var sh = S.shop, lvl = o.level || 2, items = sh.items || [], bal = balance();
     var on = function(s){ return items.filter(function(it){ return it.shelf === s; }); };
@@ -254,7 +277,7 @@
         '<div class="tsh-sign"><i class="tsh-nail a"></i><i class="tsh-nail b"></i>' + (o.title ? "<h" + (lvl - 1) + ' class="tsh-signh" id="' + o.title + '">' : "<b>") + coin() + "Timmy’s Shop" + (o.title ? "</h" + (lvl - 1) + ">" : "</b>") + "<span>Tap anything for a closer look.</span></div>" +
         '<span class="tsh-wallet"><span class="sr">Your balance: </span>' + coin() + '<span><b class="num" data-shop-bal>' + (bal === null ? "–" : num(bal)) + "</b><small>Shiny Gold Crowns</small></span></span></div>" +
       '<div class="tsh-earnrow"><button type="button" class="tsh-earnbtn" data-shop="earn" aria-expanded="false">How you earn gold crowns</button>' +
-        '<div class="tsh-earn" hidden><ul><li><b>1</b> for every 10 XP you earn (a boost’s extra XP doesn’t count)</li><li><b>25</b> for each trophy</li><li><b>50</b> for each mastery medal</li><li><b>20</b> for each rank-up</li></ul>' +
+        '<div class="tsh-earn" hidden><ul>' + earnList(w) + "</ul>" +
         '<p class="tsh-note">So far: ' + num(w.earned) + " earned" + (w.spent ? ", " + num(w.spent) + " spent" : "") + ". Spending never lowers your XP or your rank.</p></div></div>";
     /* the showcase: the rarest piece on sale you don't own yet (the dearest among those), large, on its stand */
     var star = showcase(items);

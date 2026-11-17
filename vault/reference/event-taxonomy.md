@@ -103,7 +103,7 @@ more people, never for anything about a person.
 |---|---|---|---|---|
 | `question_keys` | hub × qid × version: kind, answer, counted, retired | no | `admin_load_question_keys` (`tools/xp/keys.js`) | The bank's keys, so the server grades answers |
 | `answer_xp` | one v2 answer: its request id, context, mock or game session, kind, the result sent back | via `personal_answers` | `record_answer_v2` | One row per `personal_answers` row the new pages write; deleted with it |
-| `xp_awards` | visitor × award key: source, hub, base and paid XP, time, Central day | yes | `record_answer_v2`, `xp_session_finish`, `pod_minute_v2`, `admin_resolve_report_v2`, `submit_survey(_v2)`, `submit_exam_debrief(_v2)` | The XP ledger. Sources: `answer`, `goal20`, `fix`, `mock`, `medal`, `pod-min`, `pod-done`, `arcade`, `report`, `card`, `survey`, `checkin` (migration_v60: one per survey and per hub's exam check-in) |
+| `xp_awards` | visitor × award key: source, hub, base and paid XP, time, Central day | yes | `record_answer_v2`, `xp_session_finish`, `pod_minute_v2`, `admin_resolve_report_v2`, `submit_survey(_v2)`, `submit_exam_debrief(_v2)` | The XP ledger. Sources: `answer`, `goal20`, `fix`, `mock`, `medal`, `pod-min`, `pod-done`, `arcade`, `report`, `card`, `survey`, `checkin` (migration_v60: one per survey and per hub's exam check-in), and the prizes of migration_v64 (`name`, `ring`, `boss`, `streak`, `row`, `nuke`, `alltime`, `notes`, `trophy`, `visit`, `game`, `record`; written by `set_display_name(_v2)`, `claim_ring_v2`, `claim_boss_v2`, `notes_done_v2`, `claim_visit_v2`, `claim_trophies_v2`, `launch_nuke_v2` and the calls above; [game-server](game-server.md)) |
 | `xp_boosts` | visitor × boost: source (`medal`, `shop`), 2x, start and end | yes | medals, `buy_item` | Double XP |
 | `xp_sessions` | one mock or arcade game: visitor, hub, game, start and finish | yes | `xp_session_start` / `xp_session_finish` | Lets a mock's answers arrive together, and times a game |
 | `game_baseline` | visitor: XP and badges at the switch | yes | the migration, once | Why no medal or trophy from before the switch pays twice |
@@ -116,6 +116,10 @@ more people, never for anything about a person.
 | `costume_log` | visitor × rare costume: first day seen | yes | `record_costume_sighting` | The "you" panel's costume log |
 | `ideas` | one idea: visitor (none for starters), leaderboard name, title, body, hub, category, source, status, hidden | yes | `post_idea`, `admin_post_starter_idea` | **Public to the class under the poster's name** (no id is ever sent back). `source`: `board`, `suggest`, `checkin`, `starter` (an idea Ask Timmy drafted is posted as `board`, with the student's tap; `ask:offer=idea-posted` counts them). An author's delete (`delete_my_idea`) removes the row with its votes, reports and notes |
 | `idea_votes` / `idea_reports` / `idea_notes` | visitor × idea: up or down; a report; a status note for the Inbox | yes | `vote_idea`, `report_idea`, `admin_set_idea` | Three reports hide an idea |
+| `xp_runs` | visitor: the current run of paying right answers, its id, answers since the last nuke, a nuke ready to launch | yes | `record_answer_v2` (migration_v64) | Pays the in-a-row, nuke and all-time prizes; one row a visitor, overwritten |
+| `game_records` | one class record (`run`): the value, its holder, the run's id, the time | yes (the holder) | `record_answer_v2` (migration_v64) | Seeded from `correct_streaks`; the holder never leaves the database |
+| `notes_reads` | one lecture opened to read: visitor, hub, lecture, start, finish | yes | `notes_start_v2` / `notes_done_v2` (migration_v64) | Times "read to the end" for its 50; **kept 2 days** |
+| `prize_seen` | visitor × trophy kind held when migration_v64 ran | yes | the migration, once | Why trophies held before the prizes don't pay 200 |
 
 ### Learn and Flashcards (migration_v56, from the redesign's release; [game-server](game-server.md))
 

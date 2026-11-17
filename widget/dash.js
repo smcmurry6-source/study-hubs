@@ -277,7 +277,7 @@
           '<p class="note" id="boardNote"></p>' +
           '<div id="board" aria-live="polite"><p class="note">Loading…</p></div>' +
           /* Visit someone random: one of the board's rows (the tour, below); shown when the board has someone to visit */
-          '<p class="dx-rand" id="visitRand" hidden><button type="button" data-dash="visit-random">' + DICE + '<span>Visit someone random</span></button><span class="dx-rmsg" role="status"></span></p>' +
+          '<p class="dx-rand" id="visitRand" hidden><button type="button" data-dash="visit-random">' + DICE + '<span>Visit someone random</span></button><span class="dx-vearn" hidden></span><span class="dx-rmsg" role="status"></span></p>' +
           '<p class="dx-line" id="goldenLine" hidden></p>' +
         "</section>" +
       "</div>" +
@@ -635,13 +635,19 @@
         : "Your progress in this hub shows here") + "</span></div>";
   }
   /* Timmy Time: a hub's audio review episode (hub.podcast = { name, sub }), on the hub's color with the host in headphones */
+  /* what the episode pays (migration_v64): 10 XP and 1 crown a minute heard, then 100 of each for finishing it; the
+     minutes come from the card's "48 min" */
+  function podEarn(hub){
+    var m = /(\d+)\s*min/.exec(hub.podcast.sub || ""), mins = m ? +m[1] : 0;
+    return '<span class="dx-pod-earn">' + (mins ? "Up to +" + num(mins * 10 + 100) + " XP and " + num(mins + 100) + " crowns" : "Earns XP and crowns as you listen") + "</span>";
+  }
   function podHTML(hub){
     if (!hub.podcast) return "";
     /* animated as on a hub's Home (Sam, 2026-11-13: "animated like i had it before"): Timmy bobs in his headphones,
        notes float over him and a little equalizer plays; still when motion is off */
     var col = { tint: "#F2C94C", light: "#FFFFFF", line: "#F2C94C" };
     return '<a class="dx-card dx-pod' + (still() || focusOn() ? " is-still" : "") + '" href="' + esc(hubHref(hub, "timmy")) + '" data-hub="' + esc(hub.id) + '" data-pod="dash">' +
-      '<span class="dx-pod-txt"><b>' + esc(hub.podcast.name) + ' <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(hub.podcast.sub) + '</small><span class="dx-pod-go">' + icon("play", 16) + "Listen</span></span>" +
+      '<span class="dx-pod-txt"><b>' + esc(hub.podcast.name) + ' <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(hub.podcast.sub) + '</small>' + podEarn(hub) + '<span class="dx-pod-go">' + icon("play", 16) + "Listen</span></span>" +
       '<span class="dx-pod-art" aria-hidden="true">' + spot("notes", col, "pm-notes") + spot("timmyTime", col, "pm-timmy") + "</span></a>";
   }
   function checkinButtonsHTML(hub){
@@ -1262,7 +1268,8 @@
       e.preventDefault();
       var v = input.value.trim().slice(0, 24);
       if (!v){ msg.textContent = "Type a name first."; input.focus(); return; }
-      if (nameSb) nameSb.rpc("set_display_name", { p_visitor: VISITOR, p_name: v }).then(function(){}, function(){});
+      /* the first name chosen pays 500 XP and crowns (set_display_name_v2, migration_v64); the old call when it isn't there */
+      if (nameSb) dashPrize(nameSb, "set_display_name_v2", { p_visitor: VISITOR, p_name: v }, "name").then(function(r){ if (!r || r.missing) nameSb.rpc("set_display_name", { p_visitor: VISITOR, p_name: v }).then(function(){}, function(){}); });
       track("name:set");
       localName = v; lsSet("sh_display_name", v); paintName(); nameChanged();
       /* another, unlinked device already uses this name: ask whether it's theirs (widget/linkask.js) */
@@ -1558,7 +1565,50 @@
       window.shShop.open({ onClose: function(){ SHOP.open = false; var b = q(".dx-shopbtn"); if (b) b.focus({ preventScroll: true }); } });
     }).then(null, function(){ toast("The shop didn't open. Try again in a moment."); });
   }
-  document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); } });
+  document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); visitEarn(); } });
+  /* ---------- prizes (migration_v64): a reply that pays carries the balance after it, and the prize says what it paid
+     (a visit, a name, trophies: widget/ranks.js sends theirs as sh:crowns and sh:prize) ---------- */
+  function setCrowns(n){
+    var w = SHOP.shop && SHOP.shop.wallet; if (!w || typeof n !== "number" || !isFinite(n)) return;
+    if (n > w.balance) w.earned = (w.earned || 0) + (n - w.balance);
+    w.balance = n; drawWallet();
+  }
+  var PRIZE_SAYS = { visit: "Visiting a classmate's Timmy", name: "Your leaderboard name", trophy: "New trophy" };
+  function prizeLine(src, xp){ return (PRIZE_SAYS[src] || "Bonus") + ": +" + num(xp) + " XP and " + num(xp) + " crowns"; }
+  document.addEventListener("sh:crowns", function(e){ var d = e.detail || {}; setCrowns(d.balance); });
+  document.addEventListener("sh:prize", function(e){ var d = e.detail || {}; if (d.xp > 0) toast(d.text || prizeLine(d.src, d.xp)); });
+  /* one prize call with the page's own client: { missing: true } when the database doesn't have it yet */
+  function dashPrize(sb, fn, args, src){
+    var bot = false; try { bot = !!navigator.webdriver; } catch (e) {}
+    if (!sb || bot) return Promise.resolve(null);
+    return sb.rpc(fn, args).then(function(res){
+      var e = res && res.error;
+      if (e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404)) return { missing: true };
+      var r = res && !e ? res.data : null;
+      if (!r || typeof r !== "object" || r.ok === false) return r;
+      setCrowns(r.crowns);
+      if (r.xp > 0) try { document.dispatchEvent(new CustomEvent("sh:prize", { detail: { src: src, xp: r.xp, text: prizeLine(src, r.xp), res: r } })); } catch (x) {}
+      if (src === "name" && SHOP.shop && SHOP.shop.wallet && SHOP.shop.wallet.got) SHOP.shop.wallet.got.name = true;
+      return r;
+    }, function(){ return null; });
+  }
+  /* visiting someone else's Timmy pays 50 XP and crowns once a day (claim_visit_v2): asked once a day per device, and the
+     offer under "Visit someone random" says so until it's taken */
+  function visitPays(){ var w = SHOP.shop && SHOP.shop.wallet; return w && w.pays && w.pays.visit ? w.pays.visit : 0; }
+  function visitTaken(){ var w = SHOP.shop && SHOP.shop.wallet; return ls("sh_visit_paid") === ctDay() || !!(w && w.got && w.got.visit); }
+  function visitEarn(){
+    var el = q(".dx-vearn"), n = visitPays(); if (!el) return;
+    el.hidden = !n || visitTaken();
+    if (n) el.textContent = "Visit someone today: +" + num(n) + " XP and " + num(n) + " crowns";
+  }
+  function visitPaid(key){
+    if (!VISITOR || !key || visitTaken() || !visitPays()) return;
+    lsSet("sh_visit_paid", ctDay());
+    dashPrize(SHOP.sb || boardSb, "claim_visit_v2", { p_visitor: VISITOR, p_key: key }, "visit").then(function(r){
+      if (!r || r.missing || r.ok === false) lsSet("sh_visit_paid", null);
+      visitEarn();
+    });
+  }
   /* the rare costume of the day: from the visitor id and the Central day, on about one day in twelve with no holiday
      (widget/pet.js's holidayId()) outside the fall weeks (September 22 to November 30). The same as hub-timmy.js's. */
   var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
@@ -1596,7 +1646,10 @@
     myRank = p; renderMyRank(p);
     /* the rank-up cards, and on the game layer the hand-off and the Dark Matter unlock (seen: the unlock is marked
        played on the server, once ever) */
-    if (window.shRanks && window.shRanks.track) window.shRanks.track(p, { seen: function(j){ var bot = false; try { bot = !!navigator.webdriver; } catch (e) {} if (boardSb && VISITOR && !bot) boardSb.rpc("mark_dark_unlock_seen", { p_visitor: VISITOR, p_journey: j }).then(function(){}, function(){}); } });
+    var bot = false; try { bot = !!navigator.webdriver; } catch (e) {}
+    if (window.shRanks && window.shRanks.track) window.shRanks.track(p, { seen: function(j){ if (boardSb && VISITOR && !bot) boardSb.rpc("mark_dark_unlock_seen", { p_visitor: VISITOR, p_journey: j }).then(function(){}, function(){}); },
+      /* a trophy won from now on pays 200 XP and crowns (migration_v64, widget/ranks.js asks when the profile shows a new one) */
+      claim: boardSb && VISITOR && !bot ? function(fn, args){ return boardSb.rpc(fn, Object.assign({ p_visitor: VISITOR }, args)).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); } : null });
     else lsSet("sh_rank_tier", String(p.tier || 0));
     if (window.shRanks && window.shRanks.flairFromBadges){ lsSet("sh_rank_flair", window.shRanks.flairFromBadges(p.badges)); }
     if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(p.badges);
@@ -1763,7 +1816,7 @@
       }).join("") + "</ol>" : "") + "</div>";
     lifeStage();
     if (d.say) visitSay(d.say.key, d.say.msg, true);
-    $("visitRand").hidden = !visitList().length;
+    $("visitRand").hidden = !visitList().length; visitEarn();
   }
   /* what the top three's Timmys wear: each one's place says (get_place, migration_v54), through the visit key on their
      row. A place that can't be read, or a database without the game layer yet, gives a plain Timmy. The answer is kept
@@ -1870,6 +1923,7 @@
     Promise.all([placeTop(key), placeLoad()]).then(function(a){
       if (!a[0] || !window.shPlace) { fail(); return; }
       done(); window.shPlace.open({ place: a[0], onClose: back, nav: nav ? { at: nav.at, list: nav.list, load: nav.load } : null });
+      visitPaid(key);
     }, fail);
   }
   /* "Visit someone random" (Sam, 2026-11-13: "i want random to be for the whole class", then "skip people with zero
@@ -1912,7 +1966,7 @@
       done();
       if (!a[0]) { none(); return; }
       if (!window.shPlace) { fromBoard(); return; }
-      add(a[0]);
+      add(a[0]); visitPaid(a[0].key);
       window.shPlace.open({ place: withTop(a[0].place, a[0].key, a[2]), onClose: back, nav: { at: 0, list: list,
         load: function(i){ return keys[i] ? placeTop(keys[i]) : Promise.reject(new Error("key")); },
         more: function(){ return getRandom(keys).then(function(r){ if (!r) throw new Error("none"); return add(r); }); } } });

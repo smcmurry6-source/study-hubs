@@ -1096,7 +1096,9 @@
   function saveName(name){
     name = String(name || "").trim().slice(0, 24);
     if (!name) return false;
-    safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
+    /* the first name chosen pays 500 XP and crowns (set_display_name_v2, migration_v64); the old call otherwise */
+    if (GAME.want && GAME.on !== false) claimPrize("set_display_name_v2", { p_visitor: VISITOR_ID, p_name: name }, "name").then(function(r){ if (!r || r.missing) safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name }); });
+    else safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
     shTrackSafe("name:set");
     prefSet(SH_NAME_KEY, name);
     renderNameBadge(); syncNameInputs();
@@ -1681,6 +1683,7 @@
     var tries = 0;
     function paid(r){
       if (r.boost !== undefined) GAME.boost = r.boost || null;
+      if (!r.repeat) setCrowns(r.crowns);   /* the balance after this answer (migration_v64) */
       try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: qid, ctx: d.ctx || "", session: d.session || null, res: r } })); } catch (e) {}
     }
     function send(){
@@ -1717,9 +1720,62 @@
   }
   document.addEventListener("sh:bowl-trophy", sendBowlTrophy);
   setTimeout(sendBowlTrophy, 5000);
+  /* ---------- prizes (migration_v64, vault/reference/game-server.md) ----------
+     What each prize pays in XP, with as many Shiny Gold Crowns (study XP pays 1 crown per 10). The server's sh_prizes()
+     says the same and tools/release/xp.js checks the two match. ring is per question of the daily goal; streak and row
+     are [reached, pays]; medal is Bronze to Crown. The cards that offer a prize read it from here (window.shGame.prizes). */
+  var PRIZES = { name: 500, ring: 5, boss: 500, nuke: 10000, alltime: 20000, notes: 50, trophy: 200, visit: 50, game: 100, pb: 50, top: 250, report: 100, streak: [[3, 100], [7, 300], [14, 700], [30, 1500], [60, 3000], [100, 5000]], row: [[10, 25], [25, 100], [50, 250]], medal: [250, 500, 750, 1000] };
+  function fmtN(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
+  /* what a prize says when it's paid: "Daily goal done: +100 XP and 100 crowns" */
+  function prizeText(src, xp, d){
+    d = d || {};
+    var won = Array.isArray(d.won) ? d.won.length : 0;
+    var what = { name: "Your leaderboard name", ring: "Daily goal done", boss: "Your share of the Plaque Boss", nuke: "Tactical nuke launched",
+      alltime: "New all-time record, " + (d.n || "") + " right in a row", notes: "Notes read to the end", trophy: won > 1 ? won + " new trophies" : "New trophy",
+      visit: "Visiting a classmate's Timmy", game: "First game today", pb: "New personal best", top: "Top score in this hub", report: "Report fixed",
+      row: (d.n || "") + " right in a row", streak: (d.n || "") + " days in a row", medal: "Hub medal", "pod-done": "Timmy Time finished" }[src] || "Bonus";
+    return what + ": +" + fmtN(xp) + " XP and " + fmtN(xp) + (xp === 1 ? " crown" : " crowns");
+  }
+  /* the crowns: every reply that pays carries the balance after it (migration_v64), which goes out as sh:crowns for
+     whatever shows it (Home's Today card, More's shop tile, the shop) */
+  var CROWNS = null;
+  function setCrowns(n){
+    if (typeof n !== "number" || !isFinite(n)) return;
+    var was = CROWNS; CROWNS = n;
+    try { document.dispatchEvent(new CustomEvent("sh:crowns", { detail: { balance: n, was: was } })); } catch (e) {}
+  }
+  /* a prize paid: sh:prize { src, xp, text, res } for the engine to add to the day and say (widget/hub-rewards.js) */
+  function prizeWon(src, xp, d){
+    if (!(xp > 0)) return;
+    try { document.dispatchEvent(new CustomEvent("sh:prize", { detail: { src: src, xp: xp, text: prizeText(src, xp, d), res: d || null } })); } catch (e) {}
+  }
+  /* one prize call (claim_ring_v2, claim_boss_v2, notes_done_v2, launch_nuke_v2, ...): what it paid goes out as sh:prize
+     (after `delay` ms, for the nuke's countdown), the balance as sh:crowns. Answers { missing: true } when the database
+     doesn't have the function yet, so a caller can do what it did before; null when it couldn't be asked. */
+  function claimPrize(fn, args, src, delay){
+    if (!supabase || AUTOMATED || !GAME.want || GAME.on === false) return Promise.resolve(null);
+    var call; try { call = supabase.rpc(fn, args); } catch (e) { return Promise.resolve(null); }
+    return call.then(function(res){
+      if (rpcMissing(res)) return { missing: true };
+      var r = res && !res.error && res.data !== undefined ? res.data : null;
+      if (!r || typeof r !== "object" || r.ok === false) return r;
+      setCrowns(r.crowns);
+      if (r.xp > 0) { if (delay) setTimeout(function(){ prizeWon(src || r.src, r.xp, r); }, delay); else prizeWon(src || r.src, r.xp, r); }
+      return r;
+    }, function(){ return null; });
+  }
   /* for the engine: is the game layer there, the running boost, and a mock's session (the server pays a mock's
      answers and its +50 only inside one, and saves the mock's score itself when it is finished) */
   window.shGame = {
+    prizes: PRIZES, prizeText: prizeText, claim: claimPrize, setCrowns: setCrowns, crowns: function(){ return CROWNS; },
+    /* whether to offer prizes on the page: the game layer is wanted and hasn't been found missing (before the bootstrap
+       answers, v2() is still false; a card drawn then still says what it pays) */
+    live: function(){ return GAME.want && GAME.on !== false; },
+    /* a plain rpc that answers a value (notes_start_v2's read id), or null */
+    ask: function(fn, args){
+      if (!supabase || AUTOMATED || !GAME.want || GAME.on === false) return Promise.resolve(null);
+      try { return supabase.rpc(fn, args).then(function(res){ return res && !res.error ? res.data : null; }, function(){ return null; }); } catch (e) { return Promise.resolve(null); }
+    },
     want: GAME.want,
     v2: function(){ return GAME.on === true; },
     boost: function(){ var b = GAME.boost; return b && b.until && new Date(b.until).getTime() > Date.now() ? b : null; },
@@ -1741,6 +1797,8 @@
       }).then(function(res){
         var r = res && !res.error && res.data && typeof res.data === "object" ? res.data : null;
         if (r && r.ok) try { document.dispatchEvent(new CustomEvent("sh:session-paid", { detail: { session: id, res: r } })); } catch (e) {}
+        /* a game's prizes (migration_v64): the day's first game, a personal best, the hub's top score */
+        if (r && r.ok) { setCrowns(r.crowns); prizeWon("game", r.game, r); prizeWon("pb", r.pb, r); prizeWon("top", r.top, r); }
         return r;
       }, function(){ return null; });
     }
@@ -1937,8 +1995,10 @@
     nukeBadgeEl = document.createElement("button");
     nukeBadgeEl.type = "button";
     nukeBadgeEl.id = "sh-nuke-badge";
-    nukeBadgeEl.innerHTML = '<span class="sh-nuke-icon sh-nuke-icon-md" aria-hidden="true"></span><span class="sh-nuke-badge-label">Tactical Nuke Ready</span>';
-    nukeBadgeEl.setAttribute("aria-label", "Tactical nuke ready -- tap to call it in");
+    var prize = GAME.want && GAME.on !== false ? fmtN(PRIZES.nuke) : "";
+    nukeBadgeEl.innerHTML = '<span class="sh-nuke-icon sh-nuke-icon-md" aria-hidden="true"></span><span class="sh-nuke-badge-label">Tactical Nuke Ready</span>' +
+      (prize ? '<span class="sh-nuke-badge-prize" aria-hidden="true">+' + prize + "<i> XP and crowns</i></span>" : "");
+    nukeBadgeEl.setAttribute("aria-label", "Tactical nuke ready" + (prize ? ", worth " + prize + " XP and " + prize + " crowns" : "") + " -- tap to call it in");
     document.body.appendChild(nukeBadgeEl);
     requestAnimationFrame(function(){ if (nukeBadgeEl) nukeBadgeEl.classList.add("is-shown"); });
     nukeBadgeEl.addEventListener("click", handleNukeBadgeClick);
@@ -1980,7 +2040,12 @@
     sessionCorrectStreak = 0;
     nukeReady = false;
     shNukeSfx.play("launch");
-    safeRpc("record_nuke_launch", { p_hub: HUB, p_visitor: VISITOR_ID, p_name: name });
+    /* the launch pays 10,000 XP and crowns when the server's own run reached 100 (launch_nuke_v2, migration_v64; it logs
+       the launch too), said once the strike has played; without it, the launch is logged as before */
+    var reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    claimPrize("launch_nuke_v2", { p_visitor: VISITOR_ID, p_hub: HUB, p_name: name }, "nuke", reduce ? 5000 : 16000).then(function(r){
+      if (!r || r.missing) safeRpc("record_nuke_launch", { p_hub: HUB, p_visitor: VISITOR_ID, p_name: name });
+    });
     // On exam day the strike plays only for the person who launched it, so classmates cramming aren't interrupted.
     if (!isExamDay()) { try { if (channel) channel.send({ type: "broadcast", event: "nuke", payload: { name: name } }); } catch (e) {} }
     playNukeSequence(name);

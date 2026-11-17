@@ -83,7 +83,7 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
 
 - **The balance** (`sh_wallet`, never stored): 1 per 10 XP of base XP (a boost's extra earns none; nor does a survey's or
   check-in's 1,000 XP), +1,000 a survey or check-in reward (migration_v60: counted from its award row's `src`), +25 a trophy, +50 a medal,
-  +20 a rank-up (a tier) since the switch, minus what was spent. Spending never lowers XP or rank. The XP from before the
+  +20 a rank-up (a tier) since the switch, **+ every prize's XP again as crowns** (migration_v64, next to last section), minus what was spent. Spending never lowers XP or rank. The XP from before the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
 - **The catalog** (`shop_items`): each item's kind, rarity, price (checked against its rarity's band), season, slot, HP or
   boost, `wide` for a yard item that takes two spots (the bowling lane), `gift` (everyone owns it) and `rank_tier` (owned
@@ -361,10 +361,44 @@ Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sq
   device, the ratings wait in `STATE.cardq` (up to 3,000), and the first call that finds the functions missing stops
   trying until the next page load. Test browsers (`navigator.webdriver`) send nothing.
 
+## Prizes (migration_v64)
+
+Sam, 2026-11-17: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp
+earn rates", then a list of prizes. **There is no daily cap** on XP or crowns (the 600-a-day cap is the old pages' only;
+the per-question limits, three a day each way and the speed limit, stay as anti-farming). The crowns *were* being earned;
+the page just never redrew the balance after an answer (bug log). Now every paying reply (`record_answer_v2`,
+`finish_session_v2`, `pod_minute_v2` and every prize call) carries `crowns`, the balance after it, and `widget/v3.js` sends
+it as `sh:crowns` (the hub's meters and a gold "+n crowns" pop, the dashboard's wallet).
+
+- **The rate stays 1 crown per 10 XP of studying** (v62 priced the shop on it); **a prize pays as many crowns as XP**
+  (`sh_is_prize(src)`: the survey and check-in keep their fixed 1,000; report, medal and pod-done now pay theirs too, also
+  for the ones already won since the release). One table, `sh_prizes()`, holds every amount; `PRIZES` in `widget/v3.js` is
+  its copy (xp.js fails if they differ) and every card's "+n XP and crowns" reads it. The wallet also returns `pays` and
+  `got` (`name`, today's `visit` and `game`) so a page offers only what's still to win.
+- **Each prize is one `xp_awards` row** with a key that pays once: `name` 500 (`set_display_name_v2`, and the old
+  `set_display_name` pays too); `ring:<hub>:<day>` 5 a question of a goal of 10-50 (`claim_ring_v2`, which counts the day's
+  answers in the hub itself); `boss:<hub>:<day>|<window>` round(500 × damage / hp), damage capped at the visitor's right
+  answers in the boss's two hours plus a fifth (`claim_boss_v2`, 2 h 15 min grace); `notes:<hub>:<lec>` 50
+  (`notes_start_v2` then `notes_done_v2` at least 60 s later, no more than 6 h; the page asks after the words ÷ 600 a
+  minute of time on the page); `visit:<day>` 50 for opening someone else's place by its key (`claim_visit_v2`; not your own
+  or a linked device's); `trophy:<kind>` 200 for a trophy not held at the switch (`prize_seen`, a snapshot of everyone's
+  badges when the migration ran, plus `game_baseline`), asked by `widget/ranks.js` when the profile shows a new one
+  (`claim_trophies_v2`); medals 250/500/750/1,000; `game:<day>` 100 for the first arcade game of 20 s or more, `pb:` 50 and
+  `top:` 250 (src `record`) for a personal best and a new hub high score, once a day per game (`finish_session_v2`);
+  `report` 100 crowns with its XP.
+- **Runs and streaks are the server's own** (`xp_runs`, one row a visitor): a right answer that pays base XP adds to the
+  run (a fourth try that day, a self-graded card or a too-fast answer doesn't; a wrong one ends it). `row` pays 25/100/250 at
+  10/25/50; at 100 since the last nuke the run is `ready`, and `launch_nuke_v2` (which also logs the launch) pays
+  `nuke:<run>:<n>` 10,000 once. `alltime` pays 20,000 once per run when it passes the class's record (`game_records`
+  `run`, seeded from `correct_streaks`) and the record is over 100. `streak:<start>:<days>` pays 100/300/700/1,500/3,000/
+  5,000 at 3/7/14/30/60/100 days of `xp_days`, on the day's first answer.
+- **The rebuild keeps them**: `sh_xp_rebuild` replays only answers, goals and fixes; prize rows stay. Link my devices
+  copies them like any award row (a key already paid on the other device is skipped).
+
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (416 checks, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (516 checks, the prizes of migration_v64 in section 14c, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, a place opened from a board row, and a random visit going through the whole class, in 14a). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;
