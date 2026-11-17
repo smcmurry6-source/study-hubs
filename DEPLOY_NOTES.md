@@ -54,6 +54,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   The pop-ups now wait while another window is open (`whenUncovered`, on `lifeCovered()`): a classmate's place or the shop is a
   `<dialog>` above everything, so the check-in opened hidden under it and took its Escape (CI's smoke test caught it). The smoke
   test closes the window when it opens over the dashboard, like the tour and the archived notice, and checks a visit has none under it.
+- **2026-11-17 (Heme & Endo Exam 3: the exam's count per lecture, Claude Code)** — Sam gave the breakdown: A 3, L17 4, L18 6,
+  L19 8, L20 6, L21 4, L22 4. `core.json` `examCounts` (all seven; "n on the exam" under Most likely questions, and Ask Timmy's
+  exam facts through `examInfo`) and `mock.blueprint` (the five lectures in the hub, 27 questions in 69 minutes at the exam's
+  pace; L21 and L22 add theirs when they go in). The hints banner and mock blurb in `index.html`; the hub note and the L19-L22
+  task. High Likelihood topics unchanged.
 - **2026-11-17 (Ask Timmy looks up what the notes don't cover, Claude Code, #399)** — Sam: "the outside source would only be
   used when there was something about the content that ask timmy doesnt have an answer for" (exostoses was the example),
   then "we can do web search, the sites and others like them are good to go on the list, no limit on gap answers". When

@@ -13,7 +13,7 @@
   ["Study guide","There's no in-class review for Exam 3: Dr. Herr gave a study guide instead (November 17), with the points to focus on and the key terms for L17 to L22. Everything on it is a High Likelihood question in this hub, and its lists open each lecture's Exam Hints."],
   ["Lecture A","Dr. Taylor's lecture was taught November 6 but left off Exam 2 (Dr. Herr said he forgot it), so it moved to Exam 3 with everything the Exam 2 hub had for it."],
   ["Still to come","L19 and L20 are taught Tuesday, November 17, and their notes here come from the slides until the recordings are posted. L21 and L22 are Wednesday, November 18, and join this hub when their slides are posted."],
-  ["Per lecture","The count per lecture hasn't been announced. The mock gives each lecture 5, one for each hour of class."],
+  ["Per lecture","Of the 35: Lecture A (Clinical application) 3, L17 Pregnancy and lactation 4, L18 Estrogens and androgens 6, L19 Introduction to hematology 8, L20 Lymphomas and leukemias 6, L21 Male reproductive pathology 4 and L22 Female reproductive pathology 4. The mock follows the same counts."],
   ["Before","Quiz 4 is due Thursday, November 19, at 11:59 pm. This hub uses nothing from the quizzes or the take-home."]
  ],
  "courseDates": [
@@ -96,10 +96,18 @@
   {"lec":"lymleuk","t":"Diagnosing lymphoma: tissue sampling, a fresh specimen (not formalin) for flow cytometry, forward and side scatter, the B symptoms","basis":"objectives","ids":["ll-dx-tissue","ll-specimen","ll-2s-scatter","ll-num-bsx"]},
   {"lec":"lymleuk","t":"Plasma cell neoplasms: plasmacytoma versus multiple myeloma, rouleaux, the M-spike and CRAB","basis":"objectives","ids":["ll-2s-pc","ll-mm-case","ll-crab-except"]}
  ],
- "examCounts": {},
+ "examCounts": {
+  "dental": 3,
+  "preg": 4,
+  "sexster": 6,
+  "hemeintro": 8,
+  "lymleuk": 6,
+  "mpath": 4,
+  "fpath": 4
+ },
  "mock": {
-  "blueprint": {"dental":5,"preg":5,"sexster":5,"hemeintro":5,"lymleuk":5},
-  "limit": 3840
+  "blueprint": {"dental":3,"preg":4,"sexster":6,"hemeintro":8,"lymleuk":6},
+  "limit": 4140
  },
  "srcLabel": {
   "rec": "From the recording",
