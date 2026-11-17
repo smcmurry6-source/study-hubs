@@ -6,6 +6,7 @@
 
 /* a tinted piece carries its hub's four colors inline (dash.js tintVars) and works them out for the theme here */
 .dx .tinted { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
+.dx .tinted[data-hub="perio"] { --hub-text: #9e3a60; }   /* as in widget/hub.css: Perio's #b4466f is 4.05:1 on its light tint */
 html.shx[data-theme="dark"] .dx .tinted { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }
 @media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .dx .tinted { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); } }
 
@@ -220,7 +221,7 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-pod:focus-visible { outline-color: var(--text); }
 .dx-pod-txt { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-right: 64px; }
 .dx-pod-txt b { font-size: var(--fs-card); font-weight: var(--w-head); color: #fff; }
-.dx-pod-txt small { font-size: var(--fs-meta); color: rgba(255, 255, 255, .88); }
+.dx-pod-txt small { font-size: var(--fs-meta); color: #fff; }   /* full white, as on a hub's Home: .88 is 4.4:1 on Perio's #b4466f */
 .dx-pod-go { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; height: 32px; margin-top: auto; padding: 0 14px 0 10px; border-radius: var(--r-pill);
   background: #fff; color: var(--hub); font-size: var(--fs-meta); font-weight: var(--w-strong); }
 .dx-pod-txt b { display: flex; align-items: center; gap: 8px; }

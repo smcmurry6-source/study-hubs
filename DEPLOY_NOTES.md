@@ -32,6 +32,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (Dashboard contrast with Perio first, Claude Code, #387)** — Once Occlusion archived, Perio became the
+  dashboard's first hub and "Release tests" failed accessibility on every branch, `main` included: Perio's `#b4466f` is
+  4.05:1 as text on its light tint (`.dx-when`, the timeline's dates) and 4.4:1 under the Timmy Time card's .88-white
+  subtitle. `widget/dash.css` now gives Perio the darker text color the hub pages already use (`#9e3a60`, `widget/hub.css`)
+  and the subtitle full white, as on a hub's Home. Bundles rebuilt; `node tools/release/a11y.js` passes.
 - **2026-11-17 (A reward for surveys and check-ins, Claude Code, #387)** — Sam: "Also give 500xp and 1000 crowns as a reward for
   completing a survey or check in. Only reward for the first submission of each". `migration_v60.sql`: two award kinds, `survey`
   and `checkin`, +500 XP each through `sh_award` (one row per survey and per hub's exam, so a replay, a second check-in or a
