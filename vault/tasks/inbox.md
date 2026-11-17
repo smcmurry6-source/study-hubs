@@ -12,18 +12,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 
 - [x] **Tap a word in the notes to jump the narration there** (Sam, 2026-11-17; done, on phones too, with the Highlight button's phone fix, BUG-157: #391): in Listen / Follow along, clicking a word
   skips the recording to that word (each recording's `.words.json` has the timings).
-- [ ] **Let Ask Timmy use outside sources** (Sam, 2026-11-17): today he answers from the hub's content and the site help
-  (`supabase/functions/timmy/`); let the API reach outside sources (web search or similar), with the cost and privacy
-  questions settled first ([ask-timmy](../reference/ask-timmy.md), [learner-data-privacy](../rules/learner-data-privacy.md)).
-  **Only to fill gaps** (Sam, 2026-11-17: "the outside source would only be used when there was something about the content
-  that ask timmy doesnt have an answer for. For example, someone asked what an exostoses was and timmy couldnt answer. i dont
-  want people to use it for everything, just to fill in the gaps. let me know if thats possible before we move forward on
-  it"). Proposed in chat the same day, **not built, waiting on Sam's go-ahead**: only when his first answer comes back
-  `not_covered`, a second call with the API's web search tool, restricted to a short list of trusted medical and dental sites,
-  one or two searches, answering in a few sentences labeled "Not in your notes" with the source's link and his closest
-  lecture, with a small daily cap per person; the search query leaves Anthropic for its search provider, so the privacy
-  rule's "and nowhere else" and the About page's Ask Timmy entry change with it (Sam's call). Open choices for Sam: web search
-  or his own knowledge without a link, which sites, the daily cap.
+- [x] **Let Ask Timmy use outside sources** (Sam, 2026-11-17; done: when the notes don't cover it, he looks it up on trusted
+  medical and dental sites and adds a "Not in your notes" box with the sources, #PRNUM; [ask-timmy](../reference/ask-timmy.md)).
+  Sam: "the outside source would only be used when there was something about the content that ask timmy doesnt have an
+  answer for ... just to fill in the gaps", then "we can do web search, the sites and others like them are good to go on
+  the list, no limit on gap answers".
 - [x] **Show the Shiny Gold Crowns you've earned on Home's Today card** (Sam, 2026-11-17). Done: a Crowns tile with the balance (what's left to spend; "earned in all" in its tooltip) that opens the shop (#391).
 - [ ] **More cosmetics for Timmy and Timmy's place** (Sam, 2026-11-17): new outfits and place pieces
   ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`). **On hold** (Sam, 2026-11-17: "lets

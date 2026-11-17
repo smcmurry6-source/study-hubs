@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (Ask Timmy looks up what the notes don't cover, Claude Code, #PRNUM)** — Sam: "the outside source would only be
+  used when there was something about the content that ask timmy doesnt have an answer for" (exostoses was the example),
+  then "we can do web search, the sites and others like them are good to go on the list, no limit on gap answers". When
+  the answer from the notes is `not_covered`, `supabase/functions/timmy/core.js` makes a second call (`gapRequest`: Sonnet
+  5.5 at effort low, `GAP_RULES`, the basic `web_search_20250305` tool, two searches at most, plain text) and keeps its few
+  sentences only when the model searched, didn't answer `NONE`, and every cited source is on `GAP_SITES` (`gapCheck`,
+  `gapSite`): the tool's `allowed_domains` didn't filter results when tried. The reply carries `gap: { text, sources }`;
+  `widget/ask.js` + `ask.css` draw it in a dashed "Not in your notes · looked up" box with the sources as links (the chat
+  waits 75 s now, was 45); the admin page's chat view shows it. Costs: about 4-5 cents and 2-6 seconds a lookup (8 real
+  calls tried, 28 cents). Off switch: the secret `TIMMY_LOOKUP=off`. The About page (Ask Timmy, What the hubs record), Ask
+  Timmy's site help, the privacy rule (the search words go to Anthropic's search provider), the event taxonomy, the Ask Timmy
+  reference, the tests and the eval's grading. The preview answers "what is an exostosis?" with a made-up lookup.
 - **2026-11-17 (The large text sizes on a phone: the tab bar and the journeys' scenes, Claude Code, #397)** — The inbox's 320px
   line (BUG-161). The size setting zooms the page (`html` `zoom`, 1.45 at XX-Large), so a phone lays out in about 220-270px.
   `widget/hub.css`: under 290px of bar (`@container hxbar`) the four tabs take their labels' widths at 11px instead of equal
