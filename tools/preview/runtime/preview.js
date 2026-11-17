@@ -531,7 +531,8 @@
     if (v && v === db.visitor) { var own = placeOwned(v); (db.costumes || []).forEach(function(c){ if (PLACE_CAT[c.id] && !own[c.id]) out.push({ id: c.id, shelf: "spotted", pos: 1 }); }); }
     return { seasons: seasons, throwback: isThrowback(dd), items: out };
   }
-  function shopBoost(t){ var b = db.sboost; return b && new RealDate(b).getTime() > t ? new RealDate(b).getTime() : null; }
+  /* where a bought boost's time starts (sh_buy, migration_v62): the end of every boost running or waiting, a medal's included */
+  function boostEnd(t){ var b = boost2(t); return b ? new RealDate(b.until).getTime() : null; }
   function shop2(v){
     var mine = v && v === db.visitor, own = v ? placeOwned(v) : {}, eq = {}, dd = day(now()), sd = shopDay(v, dd);
     if (mine) { var e = placeEquipped(); Object.keys(e).forEach(function(k){ eq[k] = e[k]; }); }
@@ -576,7 +577,7 @@
     if (!v || v !== db.visitor) return buyCore({ cat: PLACE_CAT, log: [], sale: [], owns: function(){ return false; }, balance: function(){ return 0; }, boost: function(){ return null; }, setBoost: function(){}, day: day(now()), now: now() }, v, item, req);
     db.buys = db.buys || [];
     var t = now(), res = buyCore({ cat: PLACE_CAT, log: db.buys, sale: shopDay(v, day(t)).items.map(function(x){ return x.id; }), owns: function(id){ return !!placeOwned(v)[id]; },
-      balance: function(){ return wallet2(v).balance; }, boost: function(){ return shopBoost(t); }, setBoost: function(ms){ db.sboost = iso(ms); }, day: day(t), now: t }, v, item, req);
+      balance: function(){ return wallet2(v).balance; }, boost: function(){ return boostEnd(t); }, setBoost: function(ms){ db.sboost = iso(ms); }, day: day(t), now: t }, v, item, req);
     save();
     return res;
   }

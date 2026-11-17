@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (Double XP boosts: 150 and 400 crowns, and a boost bought during a medal's waits its turn, Claude Code, #394)** —
+  Sam: "Refine what double XP boosts cost" (the inbox). `migration_v62.sql`: `boost-1h` 600 → 150 crowns (Rare → Common),
+  `boost-3h` 1,500 → 400 (Epic → Uncommon), from the class's earning rate (Nov 14-17, 77 people: a median study day earns about 95
+  crowns, a median study hour about 270 XP; no boost had been bought). **BUG-159**: `sh_buy` started a shop boost at once, so one
+  bought during a medal's 24 hours ran under it and doubled nothing; a boost's time now goes after every boost running or waiting
+  (extending the last one when it's a shop boost), and `sh_boost_json`'s `until` runs on through a boost waiting right after the
+  running ones. `widget/shop.js`: the boost sheet says when it will start ("Double XP is already on until …, so this one starts
+  then and runs to …") and the always-shelf's note says so. The shop's art data (`tools/figures/site/shop.mjs` →
+  `widget/hub-art/shop.js`), the preview's catalog (`tools/preview/transform.js` now applies a later migration's
+  `update public.shop_items set ... where id = ...`) and its buy (`boostEnd`), `tools/release/xp.js` (the prices, the wait, the
+  chip's `until`), the About page, Ask Timmy's site help, `vault/reference/game-server.md`. Applied to the live project at the merge.
 - **2026-11-17 (Heme & Endo Exam 3: Dr. Herr's study guide, Claude Code)** — Sam: no in-class review for Exam 3; Dr. Herr's
   study guide is "very indicative" and "everything on the study guide should be high likelihood questions". L17-L20: each
   lecture's Exam Hints open with its focus list (`focus` hints in `study.json`), `likelyTopics` rewritten so every question on a

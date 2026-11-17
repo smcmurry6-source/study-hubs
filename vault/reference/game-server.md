@@ -56,8 +56,12 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   class stats but earns nothing. A mock's answers arrive together at the end, so they need 2 seconds of mock time each instead
   (the session from `xp_session_start`, one answer per question per mock). A podcast minute needs 25 seconds since the last
   paid one.
-- **Boosts** (`xp_boosts`): never more than 2x at once, whatever is running; a new medal restarts its 24 hours; a shop boost
-  extends the running shop boost. Medal, report, survey and check-in awards aren't boosted; answers, the day's bonuses, mocks and games are.
+- **Boosts** (`xp_boosts`): never more than 2x at once, whatever is running; a new medal restarts its 24 hours; a shop boost's
+  time goes after every boost running or waiting (`migration_v62.sql`): it extends the last one when that's a shop boost, and
+  otherwise starts now, or when a medal's 24 hours end, so bought double XP never runs under a medal's and doubles nothing.
+  `sh_boost_json`'s `until` runs on through a shop boost waiting right after the running ones. (A medal won *during* a shop
+  boost still runs over the rest of it: [inbox](../tasks/inbox.md).) The shop's boosts cost 150 (1 hour, Common) and 400
+  crowns (3 hours, Uncommon) since v62, priced against how fast crowns come (a median study day, about 95). Medal, report, survey and check-in awards aren't boosted; answers, the day's bonuses, mocks and games are.
 - **Every award is a row** (`xp_awards`, unique per visitor and key), and `answer_xp` keeps each v2 answer's request id and
   result, so a replayed call returns the first result and pays nothing, and another visitor reusing the request id is
   refused. `sh_xp_replay` works out the answer, 20th-answer and fix awards from the answers alone, so `sh_xp_rebuild` (Link my
@@ -86,7 +90,8 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   they follow Timmy's place's art, `tools/figures/site/place.mjs`; Sam, 2026-11-06: the names follow the art; the mint
   fountain is now `mouthwash-fountain`; Timmy's podcast studio, `podcast-studio`, an Epic yard piece, joined on 2026-11-10), 112 seasonal and 12 rank. The seasonal and rank rows are **exactly** `allSetItems()` of
   `tools/figures/site/sets.mjs` (generated from it; `xp.js` fails if they differ). The outfits that aren't drawn yet, the
-  snacks and the boosts are still drafts (`admin_upsert_shop_item` edits them).
+  snacks are still drafts (`admin_upsert_shop_item` edits them); the boosts' prices were set from the class's earning rate
+  in `migration_v62.sql`.
 - **A season's set** (Sam, 2026-11-10): 1 home and 1 scene (both Legendary) and a Rare, an Epic and a Legendary outfit and
   yard thing, 8 pieces, for each of fourteen seasons. `sh_shop_seasons(date)` gives every season whose set is on sale that
   Central day (several can be at once): Halloween in October; Thanksgiving from November 1 to the day after the fourth
@@ -270,7 +275,7 @@ Each is one line in `migration_v54.sql` to change.
 - A rare costume Timmy was seen in stays on that visitor's shop until bought (one new sighting a day).
 - An idea's hub must have keys loaded. (Asked as: an author's delete keeps an empty row for the day's limit. Sam: no, it
   removes the idea completely.)
-- The catalog's undrawn outfits, snacks and boosts, and their prices, are drafts. (The seasonal and rank rows are no longer
+- The catalog's undrawn outfits and snacks, and their prices, are drafts (the boosts' prices: `migration_v62.sql`). (The seasonal and rank rows are no longer
   drafts: they follow `tools/figures/site/sets.mjs`.)
 - From the third round (2026-11-10), each also one place in `migration_v54.sql`:
   - The two throwback days are one in each half of the month (the 1st-14th and the 15th-28th), so they are never back to
