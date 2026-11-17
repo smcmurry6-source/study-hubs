@@ -124,6 +124,9 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   `pc-c2`), S9 the palate's layers, S4 the Glickman definitions and S5 reading one on a case, S5 the re-evaluation
   timing (`q5-R02`) with S4 the reason for it (`q4-L28`). New ids since the audit use `q<session>-F01`, `-F02`...
   Every emphasize hint has a question on its own point; the audit's note lists, by hint, which ones.
+  A second audit on 2026-11-17 ([its note](../tasks/done/2026-11-17-perio-final-hints-audit.md)) read the bank against the
+  final's hints and the 28 midterm check-ins: 111 fixed in place, `q3-20` and `q1-E03` retired, 8 new (the suture
+  materials, `q2-F04`-`F06`: the final asks the materials, not the techniques or pictures), 675.
 
 ## Diagram decisions
 
