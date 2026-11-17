@@ -45,7 +45,7 @@ entry in `hubs.js`.
   topics from a recorded hint that the guide doesn't list (L17's fertilization, implantation, capacitation, the maternal hormones)
   stay High Likelihood, ranked after. Five questions were written for the thinner items (`hi-sg-platelets`, `hi-tf-sg-neut`,
   `ll-sg-classify`, `ll-num-sg-leuk`, `ea-sg-pop`). L21 and L22's lists are in [their task](../tasks/2026-11-16-heme-endo-exam3-l19-l22.md):
-  they become those lectures' focus hints and topics when the lectures go in. Lecture A's topics weren't changed.
+  they become those lectures' focus hints and topics when the lectures go in. Lecture A's topics weren't changed, and stay that way (Sam: "lecture a shouldnt be ranked lower").
 - **Sources:** Drive, "Hematology and Endocrinology" → "Hubs" → "Exam 3" (L17-L20's slides and the two transcripts), and the
   course's learning objectives ("Exam 1" folder). **Not used**, by the [graded-coursework](../rules/graded-coursework.md) rule:
   the Exam 3 Anki deck in that folder (a previous year's practice questions), everything in "Resources from D3s", Quiz 4 (open
