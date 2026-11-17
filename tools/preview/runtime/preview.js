@@ -1149,6 +1149,11 @@
         r.paragraphs = [{ text: pick ? "Start with " + label(PL) + (PL ? " " + String(PL.title).split(":")[0] : "") + (pick.missed ? ": you've missed " + pick.missed + " there on your latest tries." : pick.answered ? ": you've tried " + pick.answered + " of its " + pick.questions + " questions so far." : ": you haven't tried its " + pick.questions + " questions yet.") : "Start with the first lecture's notes, then its questions.", cites: [] },
           { text: "Read its notes first, then practice its questions until the misses are gone. Finish with the Daily drill.", cites: cite }];
         r.go = PL ? { v: "practice", hub: pick ? pick.hub || hub : hub, lec: PL.id } : { v: "drill", hub: dash ? hub : a.hub }; }
+      else if (/exostos|look (it|that) up/.test(low)) { r.kind = "not_covered"; r.paragraphs = [{ text: plain ? "The notes don't cover that." : "My notes don't cover exostoses. The closest lecture is below.", cites: [] }];
+        r.closest = L ? { hub: hub, lec: L.id, label: label(L), title: L.title } : null;
+        /* "Not in your notes": what the function's lookup adds (made up here: the preview never calls the API) */
+        r.gap = { text: "Fixture lookup: an exostosis is a benign bony outgrowth from the surface of a bone. In the mouth the common ones are torus palatinus and torus mandibularis, which rarely need treatment unless they get in the way of a denture.",
+          sources: [{ url: "https://medlineplus.gov/", title: "Fixture source: bony growths in the mouth", site: "MedlinePlus" }, { url: "https://www.ncbi.nlm.nih.gov/books/", title: "Fixture source: oral exostoses (StatPearls)", site: "NIH" }] }; }
       else if (/dragon|weather|football|recipe|movie/.test(low)) { r.kind = "not_covered"; r.paragraphs = [{ text: plain ? "The notes don't cover that." : "My notes don't cover that one. Ask me about the lectures?", cites: [] }];
         r.closest = L ? { hub: hub, lec: L.id, label: label(L), title: L.title } : null; }
       else { r.paragraphs = [{ text: me + (P0 ? "The notes put it this way: " + P0.text.slice(0, 260) : "The notes cover it in the lectures."), cites: cite }]; if (L && P0) r.go = { v: "notes", hub: hub, lec: L.id, k: P0.k }; }

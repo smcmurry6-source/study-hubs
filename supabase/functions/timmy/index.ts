@@ -10,7 +10,8 @@
 // only the site's own origin, and the database keeps the limits.
 // Settings (all optional): TIMMY_CONTENT_BASE (where the content is: "{hub}" is replaced by the hub's id; the default
 // is the live site's hubs/<id>/content/, so it only needs setting to read another copy), TIMMY_ORIGINS (comma separated),
-// ANTHROPIC_WORKSPACE_ID (only for a key made outside a workspace: the API refuses such a key without it).
+// ANTHROPIC_WORKSPACE_ID (only for a key made outside a workspace: the API refuses such a key without it),
+// TIMMY_LOOKUP ("off" turns off the "Not in your notes" lookup: a gap is then answered from the notes alone).
 import Anthropic from "npm:@anthropic-ai/sdk@1.3.0";
 import site from "./site.json" with { type: "json" };
 import { serve } from "./core.js";
@@ -66,7 +67,8 @@ async function loadQuestions(hub: string) {
 const deps = {
   db: { begin: (a: Record<string, unknown>) => rpc("timmy_begin", a), finish: (a: Record<string, unknown>) => rpc("timmy_finish", a) },
   // deno-lint-ignore no-explicit-any
-  model: (params: any) => client.beta.messages.create(params),
+  model: (params: any, options?: any) => client.beta.messages.create(params, options),
+  lookup: (Deno.env.get("TIMMY_LOOKUP") ?? "") !== "off",
   loadHub, loadQuestions, site, origins: ORIGINS,
   now: () => Date.now(),
   log: (event: string, data: unknown) => console.log(JSON.stringify({ event, ...(data as object) }))
