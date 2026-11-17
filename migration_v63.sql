@@ -1,5 +1,6 @@
 -- v63 (2026-11-17): a medal's double XP never runs over a boost someone bought, and the Bowling trophy counts on the server.
--- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js).
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js). Applied to the live project on
+-- 2026-11-17 through the Supabase connector, at Sam's "merge when ready" (PR #395).
 --
 -- 1. sh_boost_bump (new) and sh_medal_check: when a new mastery medal starts its 24 hours of double XP, what is left of the
 --    visitor's shop boosts (running or waiting) moves to start when the last medal boost ends; the part already used stays

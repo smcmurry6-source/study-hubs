@@ -10,4 +10,4 @@
 # migration_v60 (the survey and check-in reward) was applied on 2026-11-17 (PR #387).
 # migration_v61 (the reward at 1,000 XP, with the top-up) was applied on 2026-11-17 (PR #388).
 # migration_v62 (the boosts' prices; a boost bought during a medal's double XP waits its turn) was applied on 2026-11-17 (PR #394).
-migration_v63.sql
+# migration_v63 (a medal moves a bought boost after its 24 hours; the Bowling trophy on the server) was applied on 2026-11-17 (PR #395).
