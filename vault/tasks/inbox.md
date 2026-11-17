@@ -103,7 +103,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   ([ask-timmy](../reference/ask-timmy.md), "At the release", step 3; one command since 2026-11-14,
   `node tools/timmy/deploy.mjs`), so Timmy's site help lags the About page until
   someone deploys. Until this is automated, a session that changes `supabase/functions/timmy/` deploys it after the merge.
-- [x] **A migration after the release** (2026-11-13; done: `migration_v63.sql`, #PRNUM) counts the **Bowling** trophy on the server (add `bowling`
+- [x] **A migration after the release** (2026-11-13; done: `migration_v63.sql`, #395) counts the **Bowling** trophy on the server (add `bowling`
   to the achievement kinds; until then it is kept on the device and shows no share of the class:
   [the bowling egg](done/2026-11-06-redesign-bowling-egg.md)). The first one after the release, `migration_v59.sql`
   (2026-11-16, [#381](https://github.com/smcmurry6-source/study-hubs/pull/381)), took Learn's context and the sections (the two lines ticked below); this one is still open.
@@ -218,7 +218,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   [next ones](2026-11-12-audio-off-at-archiving.md)). The publishes take 1-3 minutes at 958 MB; 11-10's timeout was a one-off.
 - [ ] Retention, the part not built yet (approved 2026-11-04, [analytics-retention](../reference/analytics-retention.md)): before the school year ends (spring 2027), collapse `activity_hourly` / `activity_visits` older than the school year to hub × section × day with people counts and no ids, as one more step in `sh_retention_run`. Also ask Sam about the two rows the question-health work proposed (`question_events`, `question_feedback`).
 - [x] A hub's Home on a 320px-wide phone at the XX-Large text size scrolls sideways by about 40px (fixed in #391: the ring's caption drops under the ring when there's no room, the timeline's words wrap): the course timeline's rows (`.tl-what`) and the goal ring's caption (`.ring-cap`) don't wrap that narrow. Found 2026-11-13 while fixing BUG-143; not one of the sizes the smoke test checks (320px at the default size and 390px at the largest both fit).
-- [x] **A medal won during a shop boost runs over the rest of it** (2026-11-17, seen in #394; done: `sh_boost_bump`, `migration_v63.sql`, #PRNUM): since `migration_v62.sql` a boost
+- [x] **A medal won during a shop boost runs over the rest of it** (2026-11-17, seen in #394; done: `sh_boost_bump`, `migration_v63.sql`, #395): since `migration_v62.sql` a boost
   bought during a medal's 24 hours waits for them, but a medal won while a shop boost is running starts its 24 hours on top of
   it, and the boost's remaining time (up to 3 hours) doubles nothing (never more than 2x). The fix is in the medal function
   (`sh_medal_check`'s `insert into xp_boosts ... 'medal'`): move the unused part of a running or waiting shop boost to after the

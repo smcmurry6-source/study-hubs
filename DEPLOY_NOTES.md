@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-17 (A medal no longer runs over a bought boost; the Bowling trophy on the server, Claude Code, #PRNUM)** —
+- **2026-11-17 (A medal no longer runs over a bought boost; the Bowling trophy on the server, Claude Code, #395)** —
   Two inbox lines. `migration_v63.sql`: **`sh_boost_bump`** (new), called by `sh_medal_check` when a new medal starts its 24
   hours: what's left of the visitor's shop boosts (running or waiting) moves to start when the last medal boost ends, as one
   row (`shop:moved:<time>`); the part already used stays. The medal's `boost_until` is then the moved boost's end (BUG-160,

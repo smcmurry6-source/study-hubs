@@ -86,7 +86,7 @@ owns that tier's set and not the next), `node tools/release/rls.js`, the smoke t
 - [ ] The 28 pieces drawn (a contact sheet per journey, light and dark) and approved by Sam
 - [ ] In `sets.mjs`, a pack file, the generated kit files (`node tools/figures/site/build.mjs`) and the catalog
 - [ ] `widget/place.js` names the later ranks on a locked card
-- [x] `bowling` added to the trophy kinds, and the client records the trophy (done on its own, ahead of the rank sets: `migration_v63.sql`, `widget/v3.js`, #PRNUM)
+- [x] `bowling` added to the trophy kinds, and the client records the trophy (done on its own, ahead of the rank sets: `migration_v63.sql`, `widget/v3.js`, #395)
 - [ ] `node tools/release/xp.js` and the smoke test pass
 
 ## Log
@@ -94,7 +94,7 @@ owns that tier's set and not the next), `node tools/release/rls.js`, the smoke t
 - 2026-11-12 (Claude Code): written when part C cut it.
 - 2026-11-12 (Claude Code, planning only): Sam: after the release, in a new migration. Build spec above; the
   Bowling trophy's server kind rides in the same migration.
-- 2026-11-17 (Claude Code): the Bowling trophy went in on its own (`migration_v63.sql`, #PRNUM), from the inbox's line; the
+- 2026-11-17 (Claude Code): the Bowling trophy went in on its own (`migration_v63.sql`, #395), from the inbox's line; the
   rank sets' migration no longer needs to carry it.
 
 ## Outcome
