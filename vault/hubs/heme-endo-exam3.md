@@ -64,7 +64,7 @@ entry in `hubs.js`.
   (`python3 tools/narrate.py heme-endo-exam3 --lec <id> --level <level> --force`). Every lecture has As taught and Plain
   English; High yield is recorded for A only so far (the others read it in the device's voice until it is:
   [the figures task](../tasks/2026-11-16-heme-endo-exam3-figures.md) has the step). High yield again after any change to a
-  lecture's notes, topics, hints or questions, then the content build. No Timmy Time episode yet.
+  lecture's notes, topics, hints or questions, then the content build. No Timmy Time episode yet: Sam, 2026-11-17, "wait for timmy time until we have all the lectures for exam 3" ([inbox](../tasks/inbox.md)).
 - **Quirks:** `SH_HUB` has no `exam` key on purpose: with one, the engine counts only lectures whose `exam` matches, so
   nothing would count. Lecture A's id is `dental` and its label "A".
 
