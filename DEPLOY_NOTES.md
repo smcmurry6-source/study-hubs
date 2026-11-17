@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (Heme & Endo Exam 3: its 22 figures and High yield narration, Claude Code, #396)** — Sam: "continue with where things
+  left off" (the hub was merged without them, #379). 22 anima figures, Fig 1-22 in lecture order: A's endocrine glands and
+  the mouth and the lamina dura in hyperparathyroidism; L17's oocyte, first weeks, implantation, estriol and breastfeeding
+  reflex; L18's testosterone's two fates, pulsed vs continuous GnRH, clots, the SERM map and the emergency contraception
+  window; L19's hematopoiesis, the five white cells, the thymus, the lymph node and the spleen; L20's neutrophil ladder, the
+  follicle, smear look-alikes, the head and neck map and five translocations. One module each in
+  `tools/figures/heme-endo-exam3/` (the `drafts/` folder is gone), built into `content/figures.js` (2.3 MB, fetched only with
+  the notes) and `figures.css`, placed by `FIG_PLACE`, `figByLec` and a "Diagrams" section in each Review group. High yield
+  recorded for L17-L20 (after the study guide's rebuild, #393), so every lecture has all three levels. `hubs.js` (Diagrams back
+  on the card), the About page's Diagrams entry, Ask Timmy's site help. Vault: the figures task is done
+  (`vault/tasks/done/2026-11-16-heme-endo-exam3-figures.md`), the hub note, the L19-L22 task (check L19's and L20's figures
+  against their recordings).
 - **2026-11-17 (A medal no longer runs over a bought boost; the Bowling trophy on the server, Claude Code, #395)** —
   Two inbox lines. `migration_v63.sql`: **`sh_boost_bump`** (new), called by `sh_medal_check` when a new medal starts its 24
   hours: what's left of the visitor's shop boosts (running or waiting) moves to start when the last medal boost ends, as one

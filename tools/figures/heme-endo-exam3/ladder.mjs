@@ -1,4 +1,4 @@
-// Fig 20.1: the neutrophil ladder (L20 Lymphomas and Leukemias, Dr. Borak, from the slides: how blood cells mature,
+// Fig 18: the neutrophil ladder (L20 Lymphomas and Leukemias, Dr. Borak, from the slides: how blood cells mature,
 // acute versus chronic leukemia, blasts and Auer rods, acute promyelocytic leukemia, chronic myeloid leukemia). The six
 // stages of the neutrophil line on a vertical ladder, youngest at the top: myeloblast, promyelocyte, myelocyte,
 // metamyelocyte, band, segmented neutrophil (PMN), each cell drawn in code at its relative size, as on a stained smear.
@@ -106,10 +106,11 @@ function nlRender(st, D) {
     if (S.ab === i) kind += "A";
     var g = '<circle class="nl-badge" cx="16" cy="' + Y[i] + '" r="9"/>' + T(16, Y[i] + 4, String(i + 1), "nl-bn", "middle");
     g += '<g transform="translate(66 ' + Y[i] + ')"' + (dim ? ' opacity=".34"' : "") + ">" + D.CELL[kind] + "</g>";
-    var nm = D.NAME[i], ty = nm.length > 1 ? Y[i] - 13 : Y[i] - 5;
+    var nm = D.NAME[i], lk = S.ab === i ? D.LOOKA[i] : D.LOOK[i], nl = nm.length + (lk ? 1 : 0), ty = Y[i] + 5 - (nl - 1) * 8;
     g += '<g' + (dim ? ' opacity=".34"' : "") + ">";
-    for (k = 0; k < nm.length; k++) g += T(104, ty + k * 15, nm[k], "nl-nm", "start");
-    g += T(104, ty + nm.length * 15 + 1, (S.ab === i ? D.LOOKA[i] : D.LOOK[i]), "nl-lk" + (S.ab === i ? " nl-lk-ab" : ""), "start") + "</g>";
+    for (k = 0; k < nm.length; k++) g += T(104, ty + k * 16, nm[k], "nl-nm", "start");
+    if (lk) g += T(104, ty + nm.length * 16, lk, "nl-lk" + (S.ab === i ? " nl-lk-ab" : ""), "start");
+    g += "</g>";
     /* the pile: how many of this stage are where the state looks (schematic) */
     var n = S.pile[i], pk = S.ab === i ? D.KIND[i] + "A" : D.KIND[i];
     for (k = 0; k < n; k++) {
@@ -126,7 +127,7 @@ function nlRender(st, D) {
       nlBlock(gy, S.lift ? "nl-blk-off" : "", 244) + T(254, gy + 4, S.blabel, "nl-btag" + (S.lift ? " nl-btag-off" : ""), "start"));
   }
   /* the column's heading: where the pile is, and the state's fact */
-  o += T(254, 20, S.comp === "blood" ? "IN THE BLOOD" : "IN THE MARROW", "nl-h nl-hb", "start") + T(254, 34, S.sub, "nl-sub", "start");
+  o += T(254, 18, S.comp === "blood" ? "IN THE BLOOD" : "IN THE MARROW", "nl-h nl-hb", "start") + T(254, 35, S.sub, "nl-sub", "start");
   /* the verdict */
   o += '<rect class="nl-ban' + (st.ds === "normal" ? "" : " is-on") + '" x="6" y="' + (Y[5] + 46) + '" width="428" height="46" rx="10"/>' +
     T(18, Y[5] + 64, S.name.toUpperCase(), "nl-h", "start") + T(18, Y[5] + 82, S.verdict, "nl-v", "start");
@@ -141,11 +142,11 @@ const ST = {
     verdict: "Only the last stages leave the marrow: no blasts",
     say: "Normal: a neutrophil matures in a fixed order, myeloblast, promyelocyte, myelocyte, metamyelocyte, band, then the segmented neutrophil (PMN). The blast is the youngest cell, and it stays in the marrow: outside the newborn period, blasts in the peripheral blood are always abnormal.",
     ro: "normal · blood" },
-  aml: { name: "Acute myeloid leukemia", comp: "marrow", sub: "most AML: 20% blasts", pile: [8, 0, 0, 0, 1, 1], block: 0, ab: 0, blabel: "blasts don't mature",
+  aml: { name: "Acute myeloid leukemia", comp: "marrow", sub: "most AML: over 20% blasts", pile: [8, 0, 0, 0, 1, 1], block: 0, ab: 0, blabel: "blasts don't mature",
     note: ["Here they fill the marrow; this one carries an Auer rod, a red-blue needle in its cytoplasm, which marks it as myeloid and excludes ALL.", "", "", "", "", ""],
     verdict: "Blasts that don't mature fill the marrow",
-    say: "Acute myeloid leukemia: blasts that don't mature fill the marrow fast, crowding out normal blood-making, so the other lines fail (anemia, low platelets, too few working neutrophils). Most AML needs 20 percent blasts in the marrow; an AML with one of its defining genetic abnormalities is diagnosed whatever the blast count. An Auer rod, a red-blue needle in a myeloblast's cytoplasm, marks the blast as myeloid: Auer rods exclude ALL.",
-    ro: "AML · 20% blasts" },
+    say: "Acute myeloid leukemia: blasts that don't mature fill the marrow fast, crowding out normal blood-making, so the other lines fail (anemia, low platelets, too few working neutrophils). Most AML needs blasts over 20 percent of the marrow (the WHO writes 20 percent or more); an AML with one of its defining genetic abnormalities is diagnosed whatever the blast count. An Auer rod, a red-blue needle in a myeloblast's cytoplasm, marks the blast as myeloid: Auer rods exclude ALL.",
+    ro: "AML · over 20% blasts" },
   apl: { name: "Acute promyelocytic leukemia", comp: "marrow", sub: "t(15;17), PML::RARA", pile: [1, 8, 0, 0, 0, 1], block: 1, ab: 1, blabel: "maturation stops here",
     note: ["", "In APL these abnormal promyelocytes predominate: large, dense granules and bundles of Auer rods.", "", "", "", ""],
     verdict: "Maturation stops at the promyelocyte",
@@ -166,10 +167,10 @@ const ST = {
 const INFO = [
   "Myeloblast (stage 1): the youngest cell, with a large nucleus (a high nuclear-to-cytoplasmic ratio), fine chromatin and distinct nucleoli. Acute leukemia is a disease of blasts.",
   "Promyelocyte (stage 2): its cytoplasm holds large granules. In acute promyelocytic leukemia, maturation stops here.",
-  "Myelocyte (stage 3): the cell right after the promyelocyte, with a round nucleus.",
-  "Metamyelocyte (stage 4): the nucleus begins to indent.",
-  "Band (stage 5): the nucleus is a curved band, the last stage before the segmented neutrophil.",
-  "Segmented neutrophil, or PMN (stage 6): the mature cell, its nucleus in lobes.",
+  "Myelocyte (stage 3): the cell right after the promyelocyte.",
+  "Metamyelocyte (stage 4): after the myelocyte, before the band.",
+  "Band (stage 5): the last stage before the segmented neutrophil.",
+  "Segmented neutrophil, or PMN (stage 6): the mature cell, the end of the line.",
 ];
 
 export default function ladder() {
@@ -181,20 +182,20 @@ export default function ladder() {
   MINI.blastA = cell("blastA", 7.6, 101, true); MINI.proA = cell("proA", 7.6, 114, true);
   const Y = [72, 140, 208, 276, 344, 412];
   return makeFig({
-    id: "ladder", lec: "lymleuk", fig: "Fig 20.1", short: "The neutrophil ladder", hint: "pick · hover",
+    id: "ladder", lec: "lymleuk", fig: "Fig 18", short: "The neutrophil ladder", hint: "pick · hover",
     title: "The neutrophil ladder",
     caption: "The six stages of the neutrophil line, youngest at the top, and where the cells pile up in each disease. Pick a state to see where AML and APL stop and which stages fill CML's blood.",
     W: 440, H: Y[5] + 98,
     label: "The neutrophil line on a ladder: myeloblast, promyelocyte, myelocyte, metamyelocyte, band and segmented neutrophil, each drawn as a stained cell, with a row of small cells beside each stage showing how many there are in the blood or the marrow in the state picked.",
     D: { ST, INFO, KIND, CELL, MINI, Y, ANIM: true, INIT: { ds: "normal" },
       NAME: [["myeloblast"], ["promyelocyte"], ["myelocyte"], ["metamyelocyte"], ["band"], ["segmented", "neutrophil (PMN)"]],
-      LOOK: ["fine chromatin", "large granules", "round nucleus", "indented nucleus", "band nucleus", "lobed nucleus"],
+      LOOK: ["fine chromatin", "large granules", "", "", "", ""],
       LOOKA: ["an Auer rod", "Auer rod bundles", "", "", "", ""] },
     render: nlRender, say: nlSay, helpers: [nlBlock],
     controls: `<div class="am-controls" role="group" aria-label="State">` + [["normal", "Normal"], ["aml", "AML"], ["apl", "APL"], ["atra", "APL on ATRA"], ["cml", "CML"]].map((b) => `<button type="button" class="am-btn" data-amk="ds" data-amv="${b[0]}">${b[1]}</button>`).join("") + `</div>`,
     sources: [
       "From the L20 notes (Dr. Borak's slides): the order myeloblast, promyelocyte, myelocyte, metamyelocyte, band, segmented neutrophil (PMN); the blast as the youngest cell, with a high nuclear-to-cytoplasmic ratio, fine chromatin and distinct nucleoli; Auer rods in myeloblasts, red-blue needles that exclude ALL; most AML needing 20 percent blasts (his slide writes it \"greater than 20 percent\"; the WHO says 20 percent or more), except the AML types defined by a genetic abnormality; APL's abnormal promyelocytes with large, dense granules and bundles of Auer rods, t(15;17) and PML::RARA stopping maturation at the promyelocyte, DIC, and ATRA with arsenic trioxide letting them mature; CML's blood with neutrophils at every stage, peaks at the myelocytes and segmented neutrophils, fewer than 20 percent blasts, and its white count; no blasts in normal blood after the newborn period.",
-      "Rodak's Hematology: Clinical Principles and Applications (Keohane, Otto and Walenga), the chapter on leukocyte development, and Bain's Blood Cells: A Practical Guide set how each stage is drawn: the relative sizes (the promyelocyte the largest, the cells shrinking from the myelocyte on), the blue cytoplasm of the early cells turning pink, the promyelocyte's eccentric nucleus with its pale area beside it, and the nucleus going from round to indented to a band to lobes. The lecture names stages 3 to 6 without describing them, so their one-line looks are only what their names mean. No size is labeled, since the lecture gives none.",
+      "Rodak's Hematology: Clinical Principles and Applications (Keohane, Otto and Walenga), the chapter on leukocyte development, and Bain's Blood Cells: A Practical Guide set how each stage is drawn: the relative sizes (the promyelocyte the largest, the cells shrinking from the myelocyte on), the blue cytoplasm of the early cells turning pink, the promyelocyte's eccentric nucleus with its pale area beside it, and the nucleus going from round to indented to a band to lobes. The lecture names stages 3 to 6 without describing them, so their nuclei (round, indented, a band, lobes) are drawn as Rodak's describes them but not labeled. No size is labeled, since the lecture gives none.",
       "Schematic: the cells are drawn in code as on a stained smear, not traced from any image. The rows of small cells are not counts; they only say which stages are many or few, in the blood for normal and CML and in the marrow for AML and APL (where his numbers for those diseases are). The only number shown is his 20 percent. CD markers are left out, as his objectives say they aren't needed. Educational, not medical advice.",
     ],
     css: `
@@ -241,7 +242,7 @@ export default function ladder() {
 .anima .ladder-svg .nl-ban{fill:var(--anatomy-shade-1);stroke:var(--anatomy-lo);stroke-width:1}
 .anima .ladder-svg .nl-ban.is-on{stroke:var(--anatomy-lit);stroke-width:1.4}
 .anima .ladder-svg .t.nl-v{font-size:12.5px;font-weight:600;fill:var(--anatomy-strong)}
-@media (max-width:560px){.anima .ladder-svg .t.nl-nm{font-size:15px}.anima .ladder-svg .t.nl-lk,.anima .ladder-svg .t.nl-sub,.anima .ladder-svg .t.nl-tag,.anima .ladder-svg .t.nl-v{font-size:13.5px}.anima .ladder-svg .t.nl-btag{font-size:13px}.anima .ladder-svg .t.nl-h{font-size:12.5px}.anima .ladder-svg .t.nl-bn{font-size:12px}}
+@media (max-width:560px){.anima .ladder-svg .t.nl-nm{font-size:15.5px}.anima .ladder-svg .t.nl-lk,.anima .ladder-svg .t.nl-sub,.anima .ladder-svg .t.nl-tag,.anima .ladder-svg .t.nl-v{font-size:14px}.anima .ladder-svg .t.nl-btag{font-size:14px}.anima .ladder-svg .t.nl-h{font-size:13.5px}.anima .ladder-svg .t.nl-bn{font-size:13px}}
 `,
   });
 }

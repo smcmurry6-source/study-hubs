@@ -58,8 +58,8 @@ add the recording's hints beside them.
 
 ## Done when
 
-- [ ] L19 taught: checked against its recording, hints, topics re-ranked, narration redone
-- [ ] L20 taught: the same
+- [ ] L19 taught: checked against its recording, hints, topics re-ranked, narration redone (all three levels), and its five figures checked against it too (the node's size, slide 40's "(PALS)", open vs closed circulation)
+- [ ] L20 taught: the same, its five figures included
 - [ ] L21 in the hub (slides, then taught once its recording is posted): notes at both levels and three recordings,
       questions in every format with every why, topics, hints, tables, cram, sequences, a sort set, its figures
 - [ ] L22 the same
@@ -72,5 +72,7 @@ add the recording's hints beside them.
 - 2026-11-16: written when the hub shipped without L21 and L22 (no slides yet) and with L19 and L20 from their slides.
 - 2026-11-17: Dr. Herr's study guide applied to L17-L20 (focus hints, topics re-ranked, five new questions); L21 and L22's lists
   added above. Still waiting on L19-L20's recordings and L21-L22's slides (not in the Drive folder on 11/17).
+- 2026-11-17: L19 and L20 got their figures (five each, from the slides) and High yield narration
+  ([the figures task](done/2026-11-16-heme-endo-exam3-figures.md)): check both when they go taught.
 
 ## Outcome

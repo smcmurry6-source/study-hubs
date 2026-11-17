@@ -163,7 +163,7 @@ function ocRender(st, D) {
 
   /* labels in the strip, by step */
   if (s <= 1) o += L(tx + 22, P.y - 4, "acrosome", tx + 4.5, P.y - 3.2, "start", "oc-s b");
-  if (s === 2) o += L(tx + 20, P.y - 14, "acrosomal reaction", tx + 6, P.y - 5, "start", "oc-s oc-hot");
+  if (s === 2) o += L(tx + 22, 152, "acrosomal reaction", tx + 5, P.y + 3, "start", "oc-s oc-hot");
   if (s === 3 || s === 4) o += L(tx + 26, 146, "binds ZP2", ocTipX(Z.ZP) + 19, Z.ZP + 6, "start", "oc-s oc-v");
   if (s === 3) o += L(ocTipX(Z.ZP) + 40, Z.ZP - 22, "ZP3 cleaved away", ocTipX(Z.ZP) + 23, Z.ZP - 19.5, "start", "oc-s oc-tl");
   if (s === 4) { var kx = Math.round((bX - 13) / 10) * 10 + 13; o += '<path class="lead" d="M' + f1(bX - 4) + " 138L" + kx + " " + (Z.ZP - 6) + '"/><circle class="dot" cx="' + kx + '" cy="' + (Z.ZP - 6) + '" r="1.8"/>' + T(bX - 4, 151, "binds ZP3", "oc-s oc-tl", "middle"); }
@@ -177,7 +177,7 @@ function ocRender(st, D) {
   o += L(308, 131, "ZP2", 294, Z.ZP + 6, "start", "oc-c oc-v" + on(3));
   o += L(308, 156, "zona pellucida", 294, 156, "start", "oc-c");
   o += L(308, 192, "plasma membrane", 294, Z.M + 0.8 * Math.sin(294 / 7), "start", "oc-c" + on(6)) + T(308, 207, "(oolemma)", "oc-c mut", "start");
-  o += L(308, 230, P.cort > 0.5 ? "granules released" : "cortical granules", 287, P.cort > 0.5 ? Z.M + 5.6 : 198, "start", "oc-c oc-gr" + on(5));
+  o += L(308, 230, "cortical granules", 287, P.cort > 0.5 ? Z.M + 5.6 : 198, "start", "oc-c oc-gr" + on(5));
 
   /* ================= the whole oocyte ================= */
   var RT = O.Y - O.RM - (Z.M - Z.Y0) / Z.K * O.KW, RW = (Z.X1 - Z.X0) / Z.K * O.KW, RH = (Z.Y1 - Z.Y0) / Z.K * O.KW, RX = O.X - RW / 2;
@@ -273,7 +273,7 @@ export default function oocyte() {
     RO: ["three layers", "cumulus", "ZP3 · acrosome", "ZP2", "meiosis II", "cortical reaction", "zygote"],
   });
   return makeFig({
-    id: "oocyte", lec: "preg", fig: "Fig 1", short: "Getting into the oocyte", hint: "step · hover",
+    id: "oocyte", lec: "preg", fig: "Fig 3", short: "Getting into the oocyte", hint: "step · hover",
     title: "Getting into the oocyte",
     caption: "Step a sperm in through the three layers around the ovulated oocyte: ZP3 and the acrosomal reaction, ZP3 cleaved away and ZP2 bound, the second meiotic division, the cortical reaction that blocks a second sperm, and the pronuclei fusing.",
     W, H,
@@ -291,7 +291,7 @@ export default function oocyte() {
 .anima .oocyte-svg .oc-h{font:600 11px var(--anatomy-mono);letter-spacing:.06em;fill:var(--anatomy-muted)}
 .anima .oocyte-svg .t.oc-c{font-size:12px}
 .anima .oocyte-svg .t.oc-c.is-on{fill:var(--accent-ink);font-weight:700}
-.anima .oocyte-svg .t.oc-s{font-size:11.5px}
+.anima .oocyte-svg .t.oc-s{font-size:11.5px;stroke-width:4.5px}
 .anima .oocyte-svg .t.oc-tl{fill:var(--bx-ins);font-weight:600}
 .anima .oocyte-svg .t.oc-v{fill:var(--bx-violet);font-weight:600}
 .anima .oocyte-svg .t.oc-gr{fill:var(--bx-blue);font-weight:600}

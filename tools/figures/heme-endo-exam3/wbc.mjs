@@ -96,7 +96,7 @@ export function cellArt(kind, x, y, r, k, seed) {
     o.cyto = '<path class="' + k + "cell " + k + 'c-mk" d="' + polar(x, y, (a) => r * (1 + 0.05 * Math.sin(5 * a + 1) + 0.09 * Math.exp(-Math.pow(Math.atan2(Math.sin(a), Math.cos(a)) / 0.35, 2))), 40) + '"/>';
     const g = scatter(R, Math.round(r * 1.2), r * 0.88, r * 0.08);
     o.gran = '<path class="' + k + 'g-mk" d="' + dots(x, y, g, Math.max(0.5, r * 0.03), R, 0.3) + '"/>';
-    o.nuc = '<path class="' + k + 'nu" d="' + polar(x - 0.12 * r, y, (a) => r * 0.5 * (1 + 0.2 * Math.sin(5 * a + 0.4) + 0.08 * Math.sin(9 * a + 2)), 48) + '"/>';
+    o.nuc = '<path class="' + k + 'nu" d="' + polar(x - 0.12 * r, y, (a) => r * 0.5 * (1 + 0.12 * Math.sin(4 * a + 0.4) + 0.06 * Math.sin(7 * a + 2)), 48) + '"/>';
   } else if (kind === "blast") {
     /* a stem or progenitor cell: a large, finely granular nucleus with nucleoli in a thin, pale cytoplasm */
     o.cyto = body("c-blast", 0.025);
@@ -159,7 +159,7 @@ const CELLS = {
 };
 const NAME = { neu: "Neutrophil", eos: "Eosinophil", bas: "Basophil", mono: "Monocyte", lym: "Lymphocyte" };
 const COL = {
-  neu: ["neutrophil", "50 to 70%", "multi-lobed nucleus", "fine granules"],
+  neu: ["neutrophil", "50 to 70%", "multi-lobed nucleus", "two types of granules"],
   eos: ["eosinophil", "1 to 4%", "bilobed nucleus", "red granules"],
   bas: ["basophil", "under 1%", "bilobed nucleus", "dark blue granules"],
   mono: ["monocyte", "2 to 8%", "horseshoe nucleus", "becomes a macrophage"],
@@ -268,7 +268,7 @@ function wbOn(st, key, D) {
 export default function wbc() {
   const D = { INIT: { mode: "ex", sel: "", q: 0, pq: -1, nx: 0 }, ONSET: "wbOn", CELLS, ART: wbArt(), PART, SUM, CLUES, NOT, NAME, COL };
   return makeFig({
-    id: "wbc", lec: "hemeintro", fig: "Fig 19.2", short: "The five white cells", hint: "pick · hover · quiz",
+    id: "wbc", lec: "hemeintro", fig: "Fig 14", short: "The five white cells", hint: "pick · hover · quiz",
     title: "The five white cells side by side",
     caption: "Schematic drawings of the five white blood cells at relative size, with a red cell for scale. Pick a cell to read its features, granules and job, or press Quiz me: the names hide and a clue asks which cell it describes.",
     W, H,
@@ -296,7 +296,7 @@ export default function wbc() {
 .anima .wbc-svg .t.wb-ft{font-size:11.5px}
 .anima .wbc-svg .t.wb-sub{font-size:11.5px}
 .anima .wbc-svg .t.wb-q{font-size:20px;font-weight:700;fill:var(--anatomy-muted)}
-@media (max-width:560px){.anima .wbc-svg .wb-h{font-size:12px}.anima .wbc-svg .t.wb-name{font-size:14.5px}.anima .wbc-svg .t.wb-share{font-size:13.5px}.anima .wbc-svg .t.wb-ft,.anima .wbc-svg .t.wb-sub{font-size:12.5px}}
+@media (max-width:560px){.anima .wbc-svg .wb-h{font-size:13px}.anima .wbc-svg .t.wb-name{font-size:15.5px}.anima .wbc-svg .t.wb-share{font-size:14.5px}.anima .wbc-svg .t.wb-ft,.anima .wbc-svg .t.wb-sub{font-size:13.5px}}
 ${cellCss("wbc-svg", "wb-")}`,
   });
 }
