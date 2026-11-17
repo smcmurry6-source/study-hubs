@@ -324,6 +324,11 @@ async function stub(context){
   // engine's checks below never closed it.
   await context.addInitScript(() => { try { new MutationObserver(() => { const b = document.querySelector('.sh-archived-stay'); if (b) b.click(); })
     .observe(document, { childList: true, subtree: true }); } catch (e) {} });
+  // the dashboard's exam check-in and survey open in a window over the dimmed page (widget/dash.js formWindow, 2026-11-17)
+  // four seconds after it loads, for anyone with progress in a hub whose exam has passed; press its × ("Not now", "Later")
+  // like a student would, whenever it comes. A survey's "Later" first says "Saved to your Inbox.", so the second press closes it.
+  await context.addInitScript(() => { try { new MutationObserver(() => { const b = document.querySelector('section.survey.is-shown .survey-x'); if (b) b.click(); })
+    .observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] }); } catch (e) {} });
 }
 
 /* matching items allowed to repeat an answer because that hub grades matches by answer text (perio, since 2026-09-29) */
