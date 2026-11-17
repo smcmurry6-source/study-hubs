@@ -1044,6 +1044,38 @@ try {
   eq([ctxOf('xp-LA'), ctxOf('xp-LB'), ctxOf('xp-LO')], ['learn', 'bank', 'other'], 'an answer in Learn is filed as learn, the bank\'s as bank, an unknown context as other');
   eq([lA.xp, lA.correct, lA.first], [lB.xp, lB.correct, lB.first], 'an answer in Learn pays exactly as the same answer in the bank');
 
+  /* ---------- 14c. a survey or an exam check-in: 500 XP and 1,000 crowns, first submission of each (migration_v60) ---------- */
+  {
+    const sid = num(`insert into surveys (slug, title, questions, active) values ('xp-sv', 'T', '[{"id":"a","kind":"text","prompt":"p"}]', true) returning id`);
+    const sv = (v, a) => anonJson(`submit_survey_v2(${sid}, ${q(v)}, ${a === null ? 'null' : q(JSON.stringify(a))}::jsonb)`);
+    const W0 = json(`sh_wallet('xp-SV')`), w0 = W0.balance, x0 = xpOf('xp-SV');
+    eq(sv('xp-SV', null), { ok: true, xp: 0, crowns: 0 }, '"Later" on a survey pays nothing');
+    eq(sv('xp-SV', { a: 'yes' }), { ok: true, xp: 500, crowns: 1000 }, 'a survey answered: 500 XP and 1,000 crowns');
+    const W1 = json(`sh_wallet('xp-SV')`);   /* the 500 XP can be a rank-up, which pays its own +20 */
+    eq([xpOf('xp-SV') - x0, W1.balance - w0 - 20 * (W1.rankups - W0.rankups)], [500, 1000], 'the XP and the wallet move by exactly the reward (its XP earns no crowns of its own)');
+    eq(sv('xp-SV', { a: 'again' }).ok, false, 'a survey can\'t be answered twice');
+    eq(anon(`select submit_survey(${sid}, 'xp-SV2', '{"a":"old page"}'::jsonb)`)[0][0], 't', 'the old name still answers true');
+    eq(xpOf('xp-SV2'), 500, 'and pays the same');
+    // a check-in: the first for each hub and exam pays; a second, or one after an earlier check-in, doesn't
+    const ex = `${one(`select (now() at time zone 'America/Chicago')::date`)} Final`;
+    const ci = (v, hub, exam) => anonJson(`submit_exam_debrief_v2(${q(hub)}, ${q(exam)}, ${q(v)}, '{"ready":4}'::jsonb)`);
+    sql(`insert into exam_debriefs (hub, exam, visitor_id, answers) values ('xh', ${q(ex)}, 'xp-CI0', '{"ready":3}')`);   // checked in before v60
+    eq(ci('xp-CI', 'xh', ex), { ok: true, xp: 500, crowns: 1000 }, 'a first check-in: 500 XP and 1,000 crowns');
+    eq(ci('xp-CI', 'xh', ex), { ok: true, xp: 0, crowns: 0 }, 'a second check-in for the same exam is saved and pays nothing');
+    eq(ci('xp-CI', 'xh2', ex).xp, 500, 'another hub\'s check-in pays once too');
+    eq(ci('xp-CI0', 'xh', ex), { ok: true, xp: 0, crowns: 0 }, 'someone who checked in before the reward existed gets nothing for checking in again');
+    eq(anon(`select submit_exam_debrief('xh', '2099-01-01 Final', 'xp-CI', '{"ready":4}'::jsonb)`)[0][0], 'f', 'a check-in for an exam that hasn\'t happened is refused, as before');
+    eq(json(`sh_wallet('xp-CI')`).rewards, 2, 'the wallet counts two rewards');
+    // a linked device: the reward was paid on one id, so the other's first check-in for that exam pays nothing
+    const lc = anon(`select create_link_code('xp-CI')`)[0][0];
+    eq(anon(`select redeem_link_code(${q(lc)}, 'xp-CI3')`)[0][0], 'xp-CI', 'a second device links');
+    eq(ci('xp-CI3', 'xh', ex).xp, 0, 'the linked device\'s check-in for the same exam pays nothing');
+    eq([json(`sh_wallet('xp-CI')`).rewards, num(`select count(*) from xp_awards where visitor_id = 'xp-CI' and src = 'checkin'`)], [2, 2], 'still two rewards after linking');
+    const cxp = xpOf('xp-CI'); sql(`select sh_xp_rebuild(array['xp-CI'])`); eq(xpOf('xp-CI'), cxp, 'the rebuild keeps the rewards');
+    raises(() => anon(`select sh_form_reward('x', 'survey:1', 'survey', '')`), '42501', 'anon pays itself a reward');
+    notes.push('a survey or check-in: 500 XP and 1,000 crowns once each, nothing for "Later", a second check-in, an earlier one or a linked device');
+  }
+
   /* ---------- 15. the private parts stay private ---------- */
   for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);

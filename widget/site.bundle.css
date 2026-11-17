@@ -1165,6 +1165,7 @@ html.hx-still dialog[open]::backdrop { animation: none; }
 }
 /* ---- widget/dash.css ---- */
 .dx .tinted { --hub-text: var(--hub); --hub-soft: var(--hub-light); }
+.dx .tinted[data-hub="perio"] { --hub-text: #9e3a60; }
 html.shx[data-theme="dark"] .dx .tinted { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); }
 @media (prefers-color-scheme: dark) { html.shx:not([data-theme="light"]) .dx .tinted { --hub-text: var(--hub-dark); --hub-soft: color-mix(in srgb, var(--hub) 34%, #1c1b1c); } }
 html.sh-dash { scroll-behavior: smooth; scroll-padding-top: 80px; }
@@ -1354,7 +1355,7 @@ text-align: left; transition: background var(--t-hover) var(--ease-out), transfo
 .dx-pod:focus-visible { outline-color: var(--text); }
 .dx-pod-txt { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; padding-right: 64px; }
 .dx-pod-txt b { font-size: var(--fs-card); font-weight: var(--w-head); color: #fff; }
-.dx-pod-txt small { font-size: var(--fs-meta); color: rgba(255, 255, 255, .88); }
+.dx-pod-txt small { font-size: var(--fs-meta); color: #fff; }
 .dx-pod-go { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; height: 32px; margin-top: auto; padding: 0 14px 0 10px; border-radius: var(--r-pill);
 background: #fff; color: var(--hub); font-size: var(--fs-meta); font-weight: var(--w-strong); }
 .dx-pod-txt b { display: flex; align-items: center; gap: 8px; }
@@ -1776,6 +1777,7 @@ transition: opacity 300ms var(--ease-out), transform 300ms var(--ease-out); }
 .dx .survey-skip { min-height: 40px; padding: 0 10px; border: 0; border-radius: var(--r-pill); background: transparent; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); }
 .dx .survey-skip:hover { background: var(--panel); }
 .dx .survey-thanks { font-size: var(--fs-label); }
+.dx .survey-reward { font-size: var(--fs-label); margin-top: 6px; color: var(--ink); }
 .dx .debrief-steps { display: flex; gap: 4px; }
 .dx .debrief-steps i { flex: 1; height: 4px; border-radius: var(--r-pill); background: var(--track); }
 .dx .debrief-steps i.on { background: var(--text); }

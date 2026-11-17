@@ -1,11 +1,18 @@
 ---
 type: hub
-tags: [hub, live]
+tags: [hub, archived]
 hub: occlusion
-status: live
+status: archived
 ---
 
 # Occlusion
+
+**Archived 2026-11-16 at 10 pm**, after its final that evening. Its retrospective is in `LESSONS.md` ("Hub retrospectives",
+written by the 11-17 lessons audit from the first 3 check-ins: later ones go into the next audit), its recap is on the dashboard
+(published 11-17), and **its narration, High yield recordings and Timmy Time came off the site** with that audit
+([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md): `"audio": "off"` in `content/core.json`, out of `HUBS`
+in `sw.js`). Its last reports (#49-#52, exam day) were left open by Sam's call ([decisions](../decisions.md)). The page stays up; moving its
+entry into `archived` in `hubs.js` is optional. Everything below is how the hub was built and run.
 
 Dr. Givan's D2 Occlusion course. Two exams: the midterm (Wed Oct 21, L1-L5, done) and the **final (Mon Nov 16, 6:30-7:45 pm, the midterm's window, moved up from Thu Nov 19;
 not comprehensive: L6 on, building on the midterm)**. The hub now leans to the final. Its lectures are Dr. Givan's except
@@ -75,7 +82,7 @@ Dates and check-in hours: its entry in `hubs.js`.
   reason in the PR that Sam approves (as BUG-087 did).
 - **The final's format** isn't announced (question count, Canvas or not): `FINAL_TIME` / `FINAL_CLOSES` are `'18:30'` /
   `'19:45'`, and the dashboard's check-in button and pop-up go out at 8 pm (`checkinHour:20, promptHour:20`), after the
-  window closes ([task](../tasks/2026-11-03-occlusion-final-time-and-format.md)).
+  window closes ([task](../tasks/done/2026-11-03-occlusion-final-time-and-format.md)).
 - **Built on** the MSK Exam 4 engine; palette "articulating paper" (Bricolage Grotesque / Public Sans / JetBrains Mono).
   It is the model other hubs copy for `two()`, `tf()`, `nums()`, `choiceOrder()`, `whyHTML`, shared patients (`CASES`,
   `pc()`) and Patient Box pictures (`pimg`, `CASE_IMG`).
@@ -252,7 +259,7 @@ marks, the TMJ view) stay as they are; use the kit for any new perio chart or ra
 ## Pending
 
 - The 2026-11-15 bank audit's after-merge steps: [the inbox](../tasks/inbox.md).
-- [The final's time and format](../tasks/2026-11-03-occlusion-final-time-and-format.md)
+- [The final's time and format](../tasks/done/2026-11-03-occlusion-final-time-and-format.md)
 - Figure questions the 2026-11-04 audit left for Sam (the notes don't settle them; listed in [PR #232](https://github.com/smcmurry6-source/study-hubs/pull/232)):
   the TMJ figure's TM ligament shortens as the condyle translates while its readout says "taut"; Fig 2b's swing is
   exaggerated (about 9°); group function's lower partners (#26-28) are inferred; the thirds (Fig 18) are counted from the

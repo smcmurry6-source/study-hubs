@@ -894,10 +894,11 @@
         else if (tk && tk.shown() && answers.missed) track("ideas:checkin-private");
         act.disabled = true;
         if (!debriefSb) { box.innerHTML = failed; setTimeout(close, 4000); return; }
-        debriefSb.rpc("submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
-          if (r.error || r.data !== true) { box.innerHTML = failed; setTimeout(close, 4000); return; }
+        sendForm(debriefSb, "submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
+          if (!r.ok) { box.innerHTML = failed; setTimeout(close, 4000); return; }
           lsSet("sh_debrief_sent_" + hub.id + "_" + x.date, "1"); renderCheckins();
-          if (!toBoard) { box.innerHTML = thanks; setTimeout(close, 3600); return; }
+          thanks += rewardLine(r); rewardPaid(debriefSb, r);
+          if (!toBoard) { box.innerHTML = thanks; setTimeout(close, r.xp > 0 ? 5200 : 3600); return; }
           /* the check-in is in; now the post. If it doesn't go up (three ideas today, say), the check-in still counts */
           tk.post().then(function(p){
             box.innerHTML = thanks + '<p class="survey-why">' + (p.ok ? "Your idea is on the idea board." : "Your check-in was sent, but the idea didn\'t post. " + esc(p.msg || "")) + "</p>";
@@ -959,8 +960,12 @@
       function done(payload, thanks){
         try{ localStorage.setItem("sh_survey_done_" + sv.id, "1"); }catch(e){}
         /* "Later" (null) stops the pop-up, but the survey waits in the Inbox (widget/replies.js) until it's answered */
-        sb.rpc("submit_survey", { p_survey:sv.id, p_visitor:me, p_answers:payload }).then(function(){
+        sendForm(sb, "submit_survey", { p_survey:sv.id, p_visitor:me, p_answers:payload }).then(function(r){
           if (window.shReplies && window.shReplies.refresh) window.shReplies.refresh();
+          /* the reward arrives after the thanks is drawn: add its line if the card is still up */
+          var t = thanks && r.xp > 0 && box.isConnected && box.querySelector(".survey-thanks");
+          if (t) t.insertAdjacentHTML("afterend", rewardLine(r));
+          rewardPaid(sb, r);
         }, function(){});
         if (!thanks){
           box.innerHTML = '<div class="survey-eyebrow">Quick survey</div><p class="survey-thanks"><b>Saved to your Inbox.</b> Answer it there anytime.</p>';
@@ -968,7 +973,7 @@
           return;
         }
         box.innerHTML = '<div class="survey-eyebrow">Quick survey</div><p class="survey-thanks"><b>Thank you!</b> This goes straight into what gets built next.</p>';
-        setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 2600);
+        setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 4500);
       }
       box.addEventListener("input", refresh);
       /* answered from the Inbox while this card is still open */
@@ -1426,6 +1431,30 @@
   /* the game layer's function when the database has it (<name>_v2, migration_v54), today's otherwise */
   var V2 = C.v2 === false ? false : null;
   function missing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
+  /* a survey or a check-in (migration_v60): the _v2 call answers { ok, xp, crowns } with the reward it paid (500 XP and 1,000
+     crowns, once per survey and per hub's exam check-in); without it, the old call's true or false. Kept apart from rpc2 so
+     a missing _v2 here never turns the rest of the game layer's calls off. Resolves { ok, xp, crowns }. */
+  function sendForm(sb, name, args){
+    function old(){ return sb.rpc(name, args).then(function(r){ return { ok: !r.error && r.data === true, xp: 0, crowns: 0 }; }); }
+    return sb.rpc(name + "_v2", args).then(function(r){
+      if (missing(r)) return old();
+      var d = !r.error && r.data && typeof r.data === "object" ? r.data : null;
+      return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0 };
+    });
+  }
+  /* what a reward paid, in the thanks line, and the "you" card's XP and crowns read again from the server */
+  function rewardLine(r){
+    return r && r.xp > 0 ? '<p class="survey-reward"><b>+' + num(r.xp) + ' XP</b> and <b>+' + num(r.crowns) + ' Shiny Gold Crowns</b> for sharing.</p>' : "";
+  }
+  function rewardPaid(sb, r){
+    if (!r || !(r.xp > 0) || !sb || !VISITOR) return;
+    loadMyRank(sb);
+    sb.rpc("get_my_shop", { p_visitor: VISITOR }).then(function(x){
+      if (x && !x.error && x.data && x.data.wallet) try { document.dispatchEvent(new CustomEvent("sh:shop", { detail: { shop: x.data } })); } catch (e) {}
+    }, function(){});
+  }
+  /* a survey answered in the Inbox (widget/replies.js) paid a reward: read the card's XP and crowns again */
+  document.addEventListener("sh:reward", function(e){ rewardPaid(debriefSb || boardSb, e.detail); });
   function rpc2(sb, name, args){
     if (V2 === false) return sb.rpc(name, args);
     return sb.rpc(name + "_v2", args).then(function(r){

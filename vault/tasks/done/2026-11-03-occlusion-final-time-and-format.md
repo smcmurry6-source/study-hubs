@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: dropped
 hub: occlusion
 created: 2026-11-03
 requested-by: Sam
 due: 2026-11-16
-waiting-on: Dr. Givan announcing the final's format
+waiting-on:
 agent: 
 pr: 
 ---
@@ -20,19 +20,19 @@ clock. When the announcement arrives (Sam passes it on), make the hub match it.
 
 ## Context
 
-- Hub note: [occlusion](../hubs/occlusion.md)
+- Hub note: [occlusion](../../hubs/occlusion.md)
 - `hubs/occlusion/index.html`: `FINAL_TIME` / `FINAL_CLOSES` (`'18:30'` / `'19:45'` since 2026-11-05), `EXAM_INFO` (the exam card), `MOCK_BLUEPRINT` and the mock clock (now 80 s a question).
 - `index.html` `HUBS` entry `occlusion`: the final's exam entry (`checkinHour:20, promptHour:20`, after the 7:45 close).
 - If it gives counts per lecture: `EXAM_COUNTS` and `MOCK_BLUEPRINT` follow them, and each lecture gets that many
-  `LIKELY_TOPICS` ([high-likelihood-topics](../rules/high-likelihood-topics.md)).
+  `LIKELY_TOPICS` ([high-likelihood-topics](../../rules/high-likelihood-topics.md)).
 
 ## Done when
 
 - [x] Countdown, exam card, hints banner and timeline say the new date and the 6:30-7:45 pm window (2026-11-05)
-- [ ] Exam card, hints banner and mock intro say the announced format
-- [ ] Mock length and clock match the real exam
+- [ ] ~~Exam card, hints banner and mock intro say the announced format~~ dropped: the final is over (2026-11-16)
+- [ ] ~~Mock length and clock match the real exam~~ dropped: the final is over
 - [x] Dashboard check-in timing matches when the exam closes (8 pm, 2026-11-05)
-- [ ] CI passes; hub note and Outcome written
+- [x] Hub note and Outcome written (2026-11-17)
 
 ## Log
 
@@ -47,3 +47,5 @@ clock. When the announcement arrives (Sam passes it on), make the hub match it.
 
 ## Outcome
 
+**Dropped 2026-11-17** by the lessons audit: the final was held on 11-16 and the hub archived that night. The format was never
+passed on, so the hub kept the midterm's clock (45 questions, 80 s each) for its mock. Nothing left to do.

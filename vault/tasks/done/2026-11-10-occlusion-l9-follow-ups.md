@@ -98,4 +98,4 @@ final (Mon Nov 16), the sooner the better ([ship-it-now](../../rules/ship-it-now
 
 Done 2026-11-12. The diagrams shipped 2026-11-10; Dr. Lawson's slides were checked against L9 and L10 was added with its
 figures and narration on 2026-11-12 (see the Log; [hub note](../../hubs/occlusion.md)). L10 is the last lecture on the
-final. Still open for the hub: [the final's format](../2026-11-03-occlusion-final-time-and-format.md).
+final. Still open for the hub: [the final's format](2026-11-03-occlusion-final-time-and-format.md).

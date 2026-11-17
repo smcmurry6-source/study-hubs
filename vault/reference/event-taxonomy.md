@@ -103,7 +103,7 @@ more people, never for anything about a person.
 |---|---|---|---|---|
 | `question_keys` | hub × qid × version: kind, answer, counted, retired | no | `admin_load_question_keys` (`tools/xp/keys.js`) | The bank's keys, so the server grades answers |
 | `answer_xp` | one v2 answer: its request id, context, mock or game session, kind, the result sent back | via `personal_answers` | `record_answer_v2` | One row per `personal_answers` row the new pages write; deleted with it |
-| `xp_awards` | visitor × award key: source, hub, base and paid XP, time, Central day | yes | `record_answer_v2`, `xp_session_finish`, `pod_minute_v2`, `admin_resolve_report_v2` | The XP ledger. Sources: `answer`, `goal20`, `fix`, `mock`, `medal`, `pod-min`, `pod-done`, `arcade`, `report` |
+| `xp_awards` | visitor × award key: source, hub, base and paid XP, time, Central day | yes | `record_answer_v2`, `xp_session_finish`, `pod_minute_v2`, `admin_resolve_report_v2`, `submit_survey(_v2)`, `submit_exam_debrief(_v2)` | The XP ledger. Sources: `answer`, `goal20`, `fix`, `mock`, `medal`, `pod-min`, `pod-done`, `arcade`, `report`, `card`, `survey`, `checkin` (migration_v60: one per survey and per hub's exam check-in) |
 | `xp_boosts` | visitor × boost: source (`medal`, `shop`), 2x, start and end | yes | medals, `buy_item` | Double XP |
 | `xp_sessions` | one mock or arcade game: visitor, hub, game, start and finish | yes | `xp_session_start` / `xp_session_finish` | Lets a mock's answers arrive together, and times a game |
 | `game_baseline` | visitor: XP and badges at the switch | yes | the migration, once | Why no medal or trophy from before the switch pays twice |

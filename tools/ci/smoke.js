@@ -186,7 +186,8 @@ async function askCheck(page, name, o){
    main's, to prove the live pages' calls hadn't changed; those pages were replaced at the release.) */
 async function wiringCheck(context, hub, label){
   const QS = JSON.parse(fs.readFileSync(content(hub, 'questions.json'), 'utf8'));
-  const EP = (JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8')).podcast || {}).id || null;
+  const CORE0 = JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8'));
+  const EP = CORE0.audio === 'off' ? null : (CORE0.podcast || {}).id || null;   /* an archived hub's episode came off the site */
   const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
   const unbot = () => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} };
   const args = r => { try { return JSON.parse(r.postData() || '{}'); } catch (e) { return {}; } };
@@ -318,6 +319,11 @@ async function stub(context){
   if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
   // the first-visit "Want a quick tour?" prompt dims the page and would block the clicks below; answer it up front
   await context.addInitScript(() => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); } catch (e) {} });
+  // an archived hub opens "This hub is archived" over the page once the database answers (widget/v3.js); press "Keep browsing"
+  // like a student would, whenever it comes. Occlusion (2026-11-16) is the first hub on the engine to be archived, and the
+  // engine's checks below never closed it.
+  await context.addInitScript(() => { try { new MutationObserver(() => { const b = document.querySelector('.sh-archived-stay'); if (b) b.click(); })
+    .observe(document, { childList: true, subtree: true }); } catch (e) {} });
 }
 
 /* matching items allowed to repeat an answer because that hub grades matches by answer text (perio, since 2026-09-29) */
@@ -654,7 +660,9 @@ function lint(hub, A){
       });
       await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);
       // a hub whose last exam has passed opens "This hub is archived" over the page; close it like a student would. It waits
-      // for the database's bootstrap (up to 3 s, widget/v3.js), so on an archived hub wait for it rather than try once
+      // for the database's bootstrap (up to 3 s, widget/v3.js), so on an archived hub wait for it rather than try once. A hub on
+      // the engine sets SH_EXPORT (its exams) only once its content JSON has loaded, so wait for that first (Occlusion, 2026-11-17)
+      await page.waitForFunction(() => window.SH_EXPORT && window.SH_EXPORT.exams, null, { timeout: 5000 }).catch(() => {});
       const archivedNow = await page.evaluate(() => { const E = window.SH_EXPORT || {}; let last = null;
         [...(E.exams || []), ...(E.archiveOn && E.archiveOn.date ? [Object.assign({}, E.archiveOn, { archiveHour: E.archiveOn.hour })] : [])].forEach(x => {
           const p = String((x && x.date) || '').split('-').map(Number); if (p.length !== 3 || !p[0]) return;
@@ -770,8 +778,14 @@ function lint(hub, A){
       await page.evaluate(() => { location.hash = 'home'; }); await page.waitForTimeout(400);
       if (await page.$('.ska-fab:not([hidden])')) problems.push(`${name} (${label}): the Ask icon is in Timmy's corner while he's there`);
       await page.evaluate(() => { localStorage.setItem('sh_pref_pet', 'off'); document.dispatchEvent(new CustomEvent('sh:pref', { detail: { key: 'sh_pref_pet', val: 'off' } })); });
-      await page.waitForSelector('.ska-fab:not([hidden])', { timeout: 15000 }).catch(() => {});
-      if (!(await page.$('.ska-fab:not([hidden])'))) problems.push(`${name} (${label}): no Ask icon in Timmy's corner while he isn't there`);
+      /* Timmy isn't on an archived hub (widget/hub-timmy.js askArchived), so there is no Ask icon there at all (Occlusion, 2026-11-17) */
+      const archived = (() => { try { const c = JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8')); let last = null;
+        (c.exams || []).forEach(x => { const p = String(x.date || '').split('-').map(Number); if (p.length === 3 && p[0]) { const d = new Date(p[0], p[1] - 1, p[2], 22); if (!last || d > last) last = d; } });
+        return !!(last && new Date() >= last); } catch (e) { return false; } })();
+      if (!archived) await page.waitForSelector('.ska-fab:not([hidden])', { timeout: 15000 }).catch(() => {});
+      else await page.waitForTimeout(1500);
+      if (archived) { if (await page.$('.ska-fab:not([hidden])')) problems.push(`${name} (${label}): an archived hub shows the Ask icon`); }
+      else if (!(await page.$('.ska-fab:not([hidden])'))) problems.push(`${name} (${label}): no Ask icon in Timmy's corner while he isn't there`);
       else {
         const lec0 = (() => { try { return JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8')).lectures[0].id; } catch (e) { return null; } })();
         const sent = await askCheck(page, `${name} (${label})`, { hubId: hub, hub, lec: lec0, open: () => page.click('.ska-fab') });
@@ -859,7 +873,8 @@ function lint(hub, A){
     if (!vp.isMobile && engineHubs.length) {
       const has = (h, f, re) => { try { return re.test(fs.readFileSync(content(h, f), 'utf8')); } catch (e) { return false; } };
       const smile = engineHubs.filter(h => has(h, 'arcade.js', /id:\s*'smile'/));
-      const wh = smile.find(h => has(h, 'core.json', /"podcast":\s*\{/)) || smile[0];
+      const live = smile.filter(h => !has(h, 'core.json', /"audio":\s*"off"/));
+      const wh = live.find(h => has(h, 'core.json', /"podcast":\s*\{/)) || live[0] || smile[0];
       if (wh) await wiringCheck(context, wh, label).catch(e => problems.push(`${wh}, the game layer's wiring (${label}): the check stopped: ${e.message.split('\n')[0]}`));
     }
     /* Timmy's place (phase 4, part C: widget/place.js, its kit widget/hub-art/place.js and one file per set). On the

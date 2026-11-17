@@ -336,13 +336,21 @@ refreshAnswers();
 send.addEventListener("click", function(){
 if (send.disabled) return;
 send.disabled = true; note.textContent = "Sending…";
-sb.rpc("submit_survey", { p_survey: r.id, p_visitor: visitor, p_answers: answers }).then(function(res){
-if (!res || res.error || res.data === false) { send.disabled = false; note.textContent = "That didn't send. Try again?"; return; }
+var args = { p_survey: r.id, p_visitor: visitor, p_answers: answers };
+function missing(res){ var e = res && res.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
+sb.rpc("submit_survey_v2", args).then(function(res){
+if (missing(res)) return sb.rpc("submit_survey", args).then(function(o){ return { ok: !!o && !o.error && o.data !== false, xp: 0, crowns: 0 }; });
+var d = res && !res.error && res.data && typeof res.data === "object" ? res.data : null;
+return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0 };
+}).then(function(res){
+if (!res.ok) { send.disabled = false; note.textContent = "That didn't send. Try again?"; return; }
 try { localStorage.setItem("sh_survey_done_" + r.id, "1"); } catch (e) {}
 items = items.filter(function(x){ return x !== r; });
 updateBadges();
-el.innerHTML = '<div class="sh-reply-top">' + CHECK + '<span>Thank you!</span></div><div class="sh-reply-msg">Your answers go straight into what gets built next.</div>';
+el.innerHTML = '<div class="sh-reply-top">' + CHECK + '<span>Thank you!</span></div><div class="sh-reply-msg">Your answers go straight into what gets built next.' +
+(res.xp > 0 ? ' <b>+' + Number(res.xp).toLocaleString() + ' XP</b> and <b>+' + Number(res.crowns).toLocaleString() + ' Shiny Gold Crowns</b> for sharing.' : '') + '</div>';
 try { document.dispatchEvent(new CustomEvent("sh:survey-done", { detail: { id: r.id } })); } catch (e) {}
+if (res.xp > 0) try { document.dispatchEvent(new CustomEvent("sh:reward", { detail: { xp: res.xp, crowns: res.crowns } })); } catch (e) {}
 }, function(){ send.disabled = false; note.textContent = "That didn't send. Try again?"; });
 });
 }

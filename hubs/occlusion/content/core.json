@@ -2,6 +2,7 @@
  "hub": "occlusion",
  "title": "Occlusion Final Hub",
  "stateKey": "occl-state-v1",
+ "audio": "off",
  "exams": [
   {"id":"midterm","label":"Midterm","date":"2026-10-21","time":"18:30","closes":"19:45"},
   {"id":"final","label":"Final","date":"2026-11-16","time":"18:30","closes":"19:45"}
