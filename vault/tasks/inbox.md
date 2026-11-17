@@ -20,7 +20,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`).
 - [x] **A different way to mark retries in the Question Bank** (Sam, 2026-11-17; done: a tinted card with a dashed edge and a "Second try" / "Third try" band, #391): a missed question that comes back a few
   cards later should look clearly different from a new one (`widget/hub-bank.js`; see also the `bank:retry-shown` line below).
-- [x] **Refine what double XP boosts cost** (Sam, 2026-11-17; done: 150 and 400 crowns, from the class's earning rate, `migration_v62.sql`, #PRNUM): the shop's boosts were 600 crowns for 1 hour (`boost-1h`)
+- [x] **Refine what double XP boosts cost** (Sam, 2026-11-17; done: 150 and 400 crowns, from the class's earning rate, `migration_v62.sql`, #394): the shop's boosts were 600 crowns for 1 hour (`boost-1h`)
   and 1,500 for 3 hours (`boost-3h`), set in the shop's items (`supabase/schema.sql`); retune them against how fast crowns
   are earned (1 per 10 XP, plus trophies, medals and rank-ups), in a migration ([the shop](2026-11-06-redesign-timmy-shop.md)).
 - [ ] **A Timmy Time episode for Heme & Endo Exam 3?** (2026-11-16) Exam 2 had one; Exam 3's hub shipped without (`core.json` `podcast: null`). Ask Sam before making it (`/podcast`), ideally once L21 and L22 are in ([the hub](../hubs/heme-endo-exam3.md)).
@@ -218,7 +218,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   [next ones](2026-11-12-audio-off-at-archiving.md)). The publishes take 1-3 minutes at 958 MB; 11-10's timeout was a one-off.
 - [ ] Retention, the part not built yet (approved 2026-11-04, [analytics-retention](../reference/analytics-retention.md)): before the school year ends (spring 2027), collapse `activity_hourly` / `activity_visits` older than the school year to hub × section × day with people counts and no ids, as one more step in `sh_retention_run`. Also ask Sam about the two rows the question-health work proposed (`question_events`, `question_feedback`).
 - [x] A hub's Home on a 320px-wide phone at the XX-Large text size scrolls sideways by about 40px (fixed in #391: the ring's caption drops under the ring when there's no room, the timeline's words wrap): the course timeline's rows (`.tl-what`) and the goal ring's caption (`.ring-cap`) don't wrap that narrow. Found 2026-11-13 while fixing BUG-143; not one of the sizes the smoke test checks (320px at the default size and 390px at the largest both fit).
-- [ ] **A medal won during a shop boost runs over the rest of it** (2026-11-17, seen in #PRNUM): since `migration_v62.sql` a boost
+- [ ] **A medal won during a shop boost runs over the rest of it** (2026-11-17, seen in #394): since `migration_v62.sql` a boost
   bought during a medal's 24 hours waits for them, but a medal won while a shop boost is running starts its 24 hours on top of
   it, and the boost's remaining time (up to 3 hours) doubles nothing (never more than 2x). The fix is in the medal function
   (`sh_medal_check`'s `insert into xp_boosts ... 'medal'`): move the unused part of a running or waiting shop boost to after the

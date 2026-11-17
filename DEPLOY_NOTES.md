@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-17 (Double XP boosts: 150 and 400 crowns, and a boost bought during a medal's waits its turn, Claude Code, #PRNUM)** —
+- **2026-11-17 (Double XP boosts: 150 and 400 crowns, and a boost bought during a medal's waits its turn, Claude Code, #394)** —
   Sam: "Refine what double XP boosts cost" (the inbox). `migration_v62.sql`: `boost-1h` 600 → 150 crowns (Rare → Common),
   `boost-3h` 1,500 → 400 (Epic → Uncommon), from the class's earning rate (Nov 14-17, 77 people: a median study day earns about 95
   crowns, a median study hour about 270 XP; no boost had been bought). **BUG-159**: `sh_buy` started a shop boost at once, so one
