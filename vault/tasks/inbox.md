@@ -13,7 +13,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [x] **Tap a word in the notes to jump the narration there** (Sam, 2026-11-17; done, on phones too, with the Highlight button's phone fix, BUG-157: #391): in Listen / Follow along, clicking a word
   skips the recording to that word (each recording's `.words.json` has the timings).
 - [x] **Let Ask Timmy use outside sources** (Sam, 2026-11-17; done: when the notes don't cover it, he looks it up on trusted
-  medical and dental sites and adds a "Not in your notes" box with the sources, #PRNUM; [ask-timmy](../reference/ask-timmy.md)).
+  medical and dental sites and adds a "Not in your notes" box with the sources, #399; [ask-timmy](../reference/ask-timmy.md)).
   Sam: "the outside source would only be used when there was something about the content that ask timmy doesnt have an
   answer for ... just to fill in the gaps", then "we can do web search, the sites and others like them are good to go on
   the list, no limit on gap answers".

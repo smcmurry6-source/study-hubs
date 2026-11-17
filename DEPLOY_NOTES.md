@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-17 (Ask Timmy looks up what the notes don't cover, Claude Code, #PRNUM)** — Sam: "the outside source would only be
+- **2026-11-17 (Ask Timmy looks up what the notes don't cover, Claude Code, #399)** — Sam: "the outside source would only be
   used when there was something about the content that ask timmy doesnt have an answer for" (exostoses was the example),
   then "we can do web search, the sites and others like them are good to go on the list, no limit on gap answers". When
   the answer from the notes is `not_covered`, `supabase/functions/timmy/core.js` makes a second call (`gapRequest`: Sonnet
