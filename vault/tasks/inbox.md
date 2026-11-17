@@ -80,13 +80,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   [the journeys](done/2026-11-06-redesign-progression-journeys.md), [the shop](done/2026-11-06-redesign-timmy-shop.md) and
   [Timmy's place](done/2026-11-06-redesign-timmys-place.md) are ticked, given their Outcome and moved to `done/`: all of
   it shipped with the release. The one thing left, BUG-076, is the next line.
-- [ ] **The dashboard at 320 px with the largest text: BUG-076, and the report-reply pop-up** (2026-11-17, from
-  [phase 3](done/2026-11-05-redesign-phase-3-dashboard.md); [bug log](../release/bug-log.md)). Still on the live dashboard,
-  measured on the preview's made-up data: at 320 px with XX-Large the page scrolls 49 px sideways, because the "You" card's
-  seven week dots run 48 px past the edge and "Start studying" 2 px; at X-Large the dots run 10 px past. 375 px and wider
-  are fine at every size. At 320 px with XX-Large, the pop-up that shows a reply to your report (`widget/replies.js`, on the
-  dashboard and the hubs) is wider than the screen: its close button and the ends of its lines are cut off. Fix both in
-  `widget/dash.css` and the reply pop-up's styles, rebuild the bundles, and check at 320 px, Large to XX-Large.
+- [x] **The dashboard at 320 px with the largest text: BUG-076, and the report-reply pop-up** (2026-11-17, from
+  [phase 3](done/2026-11-05-redesign-phase-3-dashboard.md); done the same day, #401). The week's dots shrink to fit and
+  "Start studying" wraps; the pop-up needed nothing (it was wider only because the page scrolled sideways). Looking at the
+  large sizes found BUG-162 too, fixed in the same PR: the rank card stacks its medallion above the words from X-Large up,
+  and the hub card's title fits at 320 px ([bug log](../release/bug-log.md)).
 - [x] **`supabase/schema.sql` against the live database's text** (2026-11-14, the release's look before the migrations;
   done 2026-11-17, #401). Every difference was text only. With comments, line endings, layout and the secret left out,
   all but three functions already matched. `get_display_name` was laid out on four lines live and one in the file.

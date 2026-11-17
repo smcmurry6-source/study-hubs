@@ -145,9 +145,11 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-scene.is-active .dx-mast { animation: dx-nudge 500ms var(--ease-out); }
 @keyframes dx-nudge { 40% { transform: scale(1.025); } }
 .dx-stagebody { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px 40px; align-items: center; padding: 20px 24px 24px; }
-.dx-exam { display: grid; gap: 8px; min-width: 0; }
+.dx-exam { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; min-width: 0; }
 .dx-when { font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--hub-text); }
-.dx .dx-title { font-size: 32px; line-height: 1.12; font-weight: var(--w-title); letter-spacing: -0.015em; text-wrap: balance; }
+.dx .dx-title { font-size: 32px; line-height: 1.12; font-weight: var(--w-title); letter-spacing: -0.015em; text-wrap: balance; overflow-wrap: break-word; }
+/* a 320px phone at the large text sizes: "Periodontology" alone was wider than the card at 26px (BUG-076) */
+@container dxhubs (max-width: 215px) { .dx .dx-exam .dx-title { font-size: 21px; } }
 .dx-countrow { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 32px; margin-top: 4px; }
 .dx-count { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; }
 .dx-count b { min-width: 76px; padding: 4px 16px; border-radius: var(--r-row); background: var(--hub); color: #fff; font-size: 52px; line-height: 1.15; font-weight: var(--w-title); text-align: center; }
@@ -179,7 +181,7 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-ring-cap { font-size: var(--fs-label); color: var(--muted); }
 .dx-ring-cap b { color: var(--text); }
 .dx-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-.dx .dx-start { min-height: 52px; padding: 0 22px 0 28px; font-size: 17px; }
+.dx .dx-start { min-height: 52px; padding: 0 22px 0 28px; font-size: 17px; max-width: 100%; white-space: normal; text-align: center; }
 .dx .dx-stage .dx-start { background: var(--hub); color: #fff; }
 .dx .dx-stage .dx-start:hover { filter: brightness(1.1); }
 .dx .dx-drill { min-height: 52px; }
@@ -247,7 +249,7 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 /* the two cards end where their content ends: the leaderboard's stage makes the class card the taller one, and tiles
    stretched to match it were mostly empty */
 .dx-cols { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); align-items: start; }
-.dx-you { grid-column: span 5; display: flex; flex-direction: column; gap: 14px; }
+.dx-you { container: dxyou / inline-size; grid-column: span 5; display: flex; flex-direction: column; gap: 14px; }
 .dx-class { grid-column: span 7; display: grid; gap: 12px; align-content: start; }
 .dx-youhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
 .dx-name { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: var(--fs-body); }
@@ -296,10 +298,14 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx .dx-heroact .btn:focus-visible { outline-color: var(--ar-gold); }
 .dx .dx-heroact .dx-tro { background: var(--ar-gold); color: #2a2233; }
 .dx .dx-heroact .dx-tro:hover { background: #ffe9a8; }
-.dx-tro .num { font-weight: 700; opacity: .8; }
+.dx-tro .num { font-weight: 700; opacity: .8; white-space: nowrap; }
 .dx-roadlink { gap: 4px; text-decoration: none; }
 .dx-rankcard .dx-medals { position: relative; }
 .dx-rankcard .dx-medals .note { color: var(--ar-soft); }
+/* a narrow card (a phone at the large text sizes): the medallion above the words, which had about 50px beside it and
+   broke "Bronze I" in two, and a button's words wrap rather than run past the card's edge (BUG-076) */
+@container dxyou (max-width: 260px) { .dx-rankcard { grid-template-columns: minmax(0, 1fr); } }
+.dx .dx-heroact .btn { max-width: 100%; flex-wrap: wrap; row-gap: 0; white-space: normal; }
 @media (prefers-reduced-motion: reduce) { .dx-heroglow svg, .dx-rankbar i::after { animation: none; } .dx-rankbar i::after { display: none; } }
 
 /* ---------- the road: three journeys of seven ranks, on the arena's dark plum ---------- */
@@ -373,9 +379,10 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-stat.s-week { background: var(--mint); }
 .dx-stat.s-week small { color: var(--mint-ink); }
 /* the last seven days, today last: a filled dot for each day studied */
-.dx-week { display: flex; gap: 4px; margin-left: auto; }
-.dx-week i { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: color-mix(in srgb, var(--sun-ink) 14%, transparent); color: var(--sun-ink);
-  font-style: normal; font-size: 11px; font-weight: var(--w-head); }
+/* the dots shrink, still round, only when the card is narrower than the week (320 px at the largest text: BUG-076) */
+.dx-week { display: flex; align-items: center; gap: 4px; margin-left: auto; min-width: 0; max-width: 100%; }
+.dx-week i { display: grid; place-items: center; width: 26px; min-width: 0; aspect-ratio: 1; border-radius: 50%; background: color-mix(in srgb, var(--sun-ink) 14%, transparent); color: var(--sun-ink);
+  font-style: normal; font-size: 11px; line-height: 1; font-weight: var(--w-head); }
 .dx-week i.on { background: var(--flame); color: #3d2200; }
 .dx-week i.today { outline: 2px solid var(--sun-ink); outline-offset: 1px; }
 .dx-stat:only-child { grid-column: 1 / -1; }

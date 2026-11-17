@@ -21,3 +21,4 @@ heme-endo-exam3 | 22 diagrams you can play with are in the notes and each lectur
 all | On a phone with the text size at X-Large or XX-Large (Settings), the tab bar's labels no longer run into each other, and the Dark Matter and new-journey scenes fit the screen instead of cutting off their words.
 all | Ask Timmy now looks up what your notes don't cover: a term or fact the notes leave out (say, what an exostosis is) gets a few sentences from trusted medical and dental sites, marked "Not in your notes", with links to the sources.
 heme-endo-exam3 | The exam's question count for each lecture is in: A 3, L17 4, L18 6, L19 8, L20 6, L21 4, L22 4. Exam Hints shows it beside each lecture, and the mock now weights its questions the same way.
+all | The dashboard fits a phone at the largest text sizes: nothing scrolls sideways or gets cut off, and your rank card puts the medallion above your rank so the words have room.

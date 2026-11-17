@@ -32,6 +32,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (the dashboard at the large text sizes, BUG-076 and BUG-162, Claude Code, #401)** — `widget/dash.css` (and
+  the rebuilt `widget/site.bundle.css`). On a 320 px phone at XX-Large the page scrolled 49 px sideways (10 px at X-Large):
+  the "You" card's week dots now shrink, still round, when the card is narrower than the week, and "Start studying" wraps
+  inside its row. That sideways scroll had also widened the layout so a reply to your report opened wider than the screen;
+  it fits now with no change of its own. Found while checking: at X-Large and XX-Large the rank card gave its words about
+  50 px beside the medallion ("Bronze I" broke in two, the Trophy case count was cut off, even at 390 px), so the "You"
+  column is a size container (`dxyou`) and under 260 px the medallion goes above the words, and the card's buttons wrap
+  between label and count. The hub card's exam block keeps to one column the card's width, and under a 215 px column
+  (`dxhubs`) the title is 21 px, so "Periodontology final" fits at 320 px. Default and Large measure as before.
 - **2026-11-17 (two inbox to-dos, notes and the schema record only, Claude Code, #401)** — `supabase/schema.sql` checked
   against the live database by hash: every difference was text only. With comments, line endings, layout and the secret
   left out, only three functions differed: `get_display_name` (laid out on four lines live) and `get_nuke_by_hub` and
