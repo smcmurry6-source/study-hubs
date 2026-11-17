@@ -10,3 +10,4 @@ heme-endo-exam3 | The Heme & Endo Exam 3 hub is open: Dr. Taylor's Lecture A (mo
 occlusion | The lettered arrows and borders in the drawn figures (cusp pathways, envelopes of motion) show their letters again, in dark mode too, and two questions were reworded after classmates' reports.
 occlusion | "What cusp hits where?" is back at the top of the Occlusion Question Bank: practice Contacts or Movements, with your best score kept on this device.
 all | Answer a survey, or check in after an exam, and earn +500 XP and +1,000 Shiny Gold Crowns: once for each survey, and for your first check-in for each exam.
+all | The reward for answering a survey or checking in after an exam is now +1,000 XP (and still +1,000 Shiny Gold Crowns). If you already got +500, the other 500 has been added.
