@@ -32,6 +32,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (A reward for surveys and check-ins, Claude Code, #387)** — Sam: "Also give 500xp and 1000 crowns as a reward for
+  completing a survey or check in. Only reward for the first submission of each". `migration_v60.sql`: two award kinds, `survey`
+  and `checkin`, +500 XP each through `sh_award` (one row per survey and per hub's exam, so a replay, a second check-in or a
+  linked device pays once; not boosted; no back pay), and `sh_wallet` adds 1,000 crowns per reward row while leaving its XP out
+  of the 1-per-10 share. `submit_survey` and `submit_exam_debrief` keep their signatures (old pages) and pay too;
+  `submit_survey_v2` and `submit_exam_debrief_v2` answer `{ ok, xp, crowns }`. The dashboard's check-in and survey cards and the
+  Inbox's survey (`widget/replies.js`) say what was paid and refresh the You card; both fall back to the old calls until the
+  migration is applied. About page updated (check-ins, surveys, the shop's crowns, More ways to earn XP). Tested in
+  `tools/release/xp.js` (section 14c).
 - **2026-11-17 (Lessons refresh: Occlusion archived, Claude Code)** — `/lessons-audit` the morning after the Occlusion final. Its
   **retrospective** is in `LESSONS.md` ("Hub retrospectives": 104 people and 439 h for the final, 42% of it on exam day, the evening
   exam's eve; the instrument look-alikes and Hanau's quint the hardest), its **recap is on the dashboard**, and **its narration, High

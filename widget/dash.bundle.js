@@ -826,10 +826,11 @@ if (toBoard) { var bad = tk.check(); if (bad) { if (warn) warn.textContent = bad
 else if (tk && tk.shown() && answers.missed) track("ideas:checkin-private");
 act.disabled = true;
 if (!debriefSb) { box.innerHTML = failed; setTimeout(close, 4000); return; }
-debriefSb.rpc("submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
-if (r.error || r.data !== true) { box.innerHTML = failed; setTimeout(close, 4000); return; }
+sendForm(debriefSb, "submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
+if (!r.ok) { box.innerHTML = failed; setTimeout(close, 4000); return; }
 lsSet("sh_debrief_sent_" + hub.id + "_" + x.date, "1"); renderCheckins();
-if (!toBoard) { box.innerHTML = thanks; setTimeout(close, 3600); return; }
+thanks += rewardLine(r); rewardPaid(debriefSb, r);
+if (!toBoard) { box.innerHTML = thanks; setTimeout(close, r.xp > 0 ? 5200 : 3600); return; }
 tk.post().then(function(p){
 box.innerHTML = thanks + '<p class="survey-why">' + (p.ok ? "Your idea is on the idea board." : "Your check-in was sent, but the idea didn\'t post. " + esc(p.msg || "")) + "</p>";
 setTimeout(close, p.ok ? 3600 : 7000);
@@ -888,8 +889,11 @@ send.disabled = !Object.keys(answers).length;
 }
 function done(payload, thanks){
 try{ localStorage.setItem("sh_survey_done_" + sv.id, "1"); }catch(e){}
-sb.rpc("submit_survey", { p_survey:sv.id, p_visitor:me, p_answers:payload }).then(function(){
+sendForm(sb, "submit_survey", { p_survey:sv.id, p_visitor:me, p_answers:payload }).then(function(r){
 if (window.shReplies && window.shReplies.refresh) window.shReplies.refresh();
+var t = thanks && r.xp > 0 && box.isConnected && box.querySelector(".survey-thanks");
+if (t) t.insertAdjacentHTML("afterend", rewardLine(r));
+rewardPaid(sb, r);
 }, function(){});
 if (!thanks){
 box.innerHTML = '<div class="survey-eyebrow">Quick survey</div><p class="survey-thanks"><b>Saved to your Inbox.</b> Answer it there anytime.</p>';
@@ -897,7 +901,7 @@ setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ 
 return;
 }
 box.innerHTML = '<div class="survey-eyebrow">Quick survey</div><p class="survey-thanks"><b>Thank you!</b> This goes straight into what gets built next.</p>';
-setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 2600);
+setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 4500);
 }
 box.addEventListener("input", refresh);
 document.addEventListener("sh:survey-done", function(e){
@@ -1289,6 +1293,25 @@ return fetch(SB_URL + "/rest/v1/" + path, { headers: { apikey: SB_KEY, Authoriza
 }
 var V2 = C.v2 === false ? false : null;
 function missing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
+function sendForm(sb, name, args){
+function old(){ return sb.rpc(name, args).then(function(r){ return { ok: !r.error && r.data === true, xp: 0, crowns: 0 }; }); }
+return sb.rpc(name + "_v2", args).then(function(r){
+if (missing(r)) return old();
+var d = !r.error && r.data && typeof r.data === "object" ? r.data : null;
+return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0 };
+});
+}
+function rewardLine(r){
+return r && r.xp > 0 ? '<p class="survey-reward"><b>+' + num(r.xp) + ' XP</b> and <b>+' + num(r.crowns) + ' Shiny Gold Crowns</b> for sharing.</p>' : "";
+}
+function rewardPaid(sb, r){
+if (!r || !(r.xp > 0) || !sb || !VISITOR) return;
+loadMyRank(sb);
+sb.rpc("get_my_shop", { p_visitor: VISITOR }).then(function(x){
+if (x && !x.error && x.data && x.data.wallet) try { document.dispatchEvent(new CustomEvent("sh:shop", { detail: { shop: x.data } })); } catch (e) {}
+}, function(){});
+}
+document.addEventListener("sh:reward", function(e){ rewardPaid(debriefSb || boardSb, e.detail); });
 function rpc2(sb, name, args){
 if (V2 === false) return sb.rpc(name, args);
 return sb.rpc(name + "_v2", args).then(function(r){

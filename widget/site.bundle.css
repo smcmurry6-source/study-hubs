@@ -1776,6 +1776,7 @@ transition: opacity 300ms var(--ease-out), transform 300ms var(--ease-out); }
 .dx .survey-skip { min-height: 40px; padding: 0 10px; border: 0; border-radius: var(--r-pill); background: transparent; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); }
 .dx .survey-skip:hover { background: var(--panel); }
 .dx .survey-thanks { font-size: var(--fs-label); }
+.dx .survey-reward { font-size: var(--fs-label); margin-top: 6px; color: var(--ink); }
 .dx .debrief-steps { display: flex; gap: 4px; }
 .dx .debrief-steps i { flex: 1; height: 4px; border-radius: var(--r-pill); background: var(--track); }
 .dx .debrief-steps i.on { background: var(--text); }

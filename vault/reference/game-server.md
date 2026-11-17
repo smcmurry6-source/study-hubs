@@ -48,14 +48,16 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   today (once per question); +50 for a mock with 10 or more answers (once per hub per day); +50 for an arcade game finished 20
   seconds or more after it started (once per game per day); 10 a minute of a Timmy Time episode heard for the first time
   and +100 at 90% of its minutes; +100 to the sender when Sam resolves a report as Fixed (`admin_resolve_report_v2`; "No change
-  needed" pays nothing); +100 / 200 / 300 / 500 for a hub's Bronze, Silver, Gold and Crown, which also start **24 hours of
+  needed" pays nothing); +500 for a survey answered (once per survey) and for the first exam check-in for each hub and exam
+  (migration_v60, Sam 2026-11-17: `survey:<id>` and `checkin:<hub>:<exam>`, paid to the linked id, never for a check-in sent
+  before by any of the person's linked ids, so no back pay; `submit_survey_v2` and `submit_exam_debrief_v2` say what was paid); +100 / 200 / 300 / 500 for a hub's Bronze, Silver, Gold and Crown, which also start **24 hours of
   double XP**.
 - **The guardrails**: an answer under 2 seconds after the last, or the 31st in a minute, still counts in your answers and the
   class stats but earns nothing. A mock's answers arrive together at the end, so they need 2 seconds of mock time each instead
   (the session from `xp_session_start`, one answer per question per mock). A podcast minute needs 25 seconds since the last
   paid one.
 - **Boosts** (`xp_boosts`): never more than 2x at once, whatever is running; a new medal restarts its 24 hours; a shop boost
-  extends the running shop boost. Medal and report awards aren't boosted; answers, the day's bonuses, mocks and games are.
+  extends the running shop boost. Medal, report, survey and check-in awards aren't boosted; answers, the day's bonuses, mocks and games are.
 - **Every award is a row** (`xp_awards`, unique per visitor and key), and `answer_xp` keeps each v2 answer's request id and
   result, so a replayed call returns the first result and pays nothing, and another visitor reusing the request id is
   refused. `sh_xp_replay` works out the answer, 20th-answer and fix awards from the answers alone, so `sh_xp_rebuild` (Link my
@@ -74,7 +76,8 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
 
 ## Shiny Gold Crowns and the shop
 
-- **The balance** (`sh_wallet`, never stored): 1 per 10 XP of base XP (a boost's extra earns none), +25 a trophy, +50 a medal,
+- **The balance** (`sh_wallet`, never stored): 1 per 10 XP of base XP (a boost's extra earns none; nor does a survey's or
+  check-in's 500 XP), +1,000 a survey or check-in reward (migration_v60: counted from its award row's `src`), +25 a trophy, +50 a medal,
   +20 a rank-up (a tier) since the switch, minus what was spent. Spending never lowers XP or rank. The XP from before the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
 - **The catalog** (`shop_items`): each item's kind, rarity, price (checked against its rarity's band), season, slot, HP or
