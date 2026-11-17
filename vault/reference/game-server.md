@@ -48,7 +48,7 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   today (once per question); +50 for a mock with 10 or more answers (once per hub per day); +50 for an arcade game finished 20
   seconds or more after it started (once per game per day); 10 a minute of a Timmy Time episode heard for the first time
   and +100 at 90% of its minutes; +100 to the sender when Sam resolves a report as Fixed (`admin_resolve_report_v2`; "No change
-  needed" pays nothing); +500 for a survey answered (once per survey) and for the first exam check-in for each hub and exam
+  needed" pays nothing); +1,000 for a survey answered (500 until migration_v61 raised it, with a top-up for those paid 500) (once per survey) and for the first exam check-in for each hub and exam
   (migration_v60, Sam 2026-11-17: `survey:<id>` and `checkin:<hub>:<exam>`, paid to the linked id, never for a check-in sent
   before by any of the person's linked ids; back pay only for survey 4 and Occlusion's final check-ins, by `tools/data-fixes/2026-11-17-reward-backpay.sql`; `submit_survey_v2` and `submit_exam_debrief_v2` say what was paid); +100 / 200 / 300 / 500 for a hub's Bronze, Silver, Gold and Crown, which also start **24 hours of
   double XP**.
@@ -77,7 +77,7 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
 ## Shiny Gold Crowns and the shop
 
 - **The balance** (`sh_wallet`, never stored): 1 per 10 XP of base XP (a boost's extra earns none; nor does a survey's or
-  check-in's 500 XP), +1,000 a survey or check-in reward (migration_v60: counted from its award row's `src`), +25 a trophy, +50 a medal,
+  check-in's 1,000 XP), +1,000 a survey or check-in reward (migration_v60: counted from its award row's `src`), +25 a trophy, +50 a medal,
   +20 a rank-up (a tier) since the switch, minus what was spent. Spending never lowers XP or rank. The XP from before the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
 - **The catalog** (`shop_items`): each item's kind, rarity, price (checked against its rarity's band), season, slot, HP or

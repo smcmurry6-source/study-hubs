@@ -1431,7 +1431,7 @@
   /* the game layer's function when the database has it (<name>_v2, migration_v54), today's otherwise */
   var V2 = C.v2 === false ? false : null;
   function missing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
-  /* a survey or a check-in (migration_v60): the _v2 call answers { ok, xp, crowns } with the reward it paid (500 XP and 1,000
+  /* a survey or a check-in (migration_v60): the _v2 call answers { ok, xp, crowns } with the reward it paid (1,000 XP since migration_v61, and 1,000
      crowns, once per survey and per hub's exam check-in); without it, the old call's true or false. Kept apart from rpc2 so
      a missing _v2 here never turns the rest of the game layer's calls off. Resolves { ok, xp, crowns }. */
   function sendForm(sb, name, args){

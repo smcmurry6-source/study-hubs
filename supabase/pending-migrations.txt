@@ -8,3 +8,4 @@
 # below its "the redesign's release" marker (tools/release/xp.js still tests the moment they were applied: pg.js).
 # migration_v59 (Learn's and Flashcards' sections, Learn's answer context) was applied on 2026-11-16 (PR #381).
 # migration_v60 (the survey and check-in reward) was applied on 2026-11-17 (PR #387).
+# migration_v61 (the reward at 1,000 XP, with the top-up) was applied on 2026-11-17 (PR #388).

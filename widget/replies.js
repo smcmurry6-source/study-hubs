@@ -221,7 +221,7 @@
       send.addEventListener("click", function(){
         if (send.disabled) return;
         send.disabled = true; note.textContent = "Sending…";
-        /* submit_survey_v2 (migration_v60) answers { ok, xp, crowns }: the first answer to each survey pays 500 XP and 1,000
+        /* submit_survey_v2 (migration_v60) answers { ok, xp, crowns }: the first answer to each survey pays 1,000 XP (migration_v61) and 1,000
            crowns. Without it, the old call's true or false. */
         var args = { p_survey: r.id, p_visitor: visitor, p_answers: answers };
         function missing(res){ var e = res && res.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }

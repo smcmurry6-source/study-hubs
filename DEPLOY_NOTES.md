@@ -32,6 +32,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (The survey and check-in reward goes to 1,000 XP, Claude Code)** — Sam: "Lets up the xp to 1000".
+  `migration_v61.sql`: `sh_form_reward` pays 1,000 XP (crowns stay 1,000: `sh_wallet` already leaves a reward row's whole
+  base out of the 1-per-10 share), and a one-time top-up moves every reward row paid at 500 to 1,000 and adds 500 to its
+  owner's XP (a second run changes nothing; the rebuild agrees). About page, Ask Timmy's site help, a changelog line.
+  `tools/release/xp.js` 14c checks 1,000 and the top-up.
 - **2026-11-17 (Dashboard contrast with Perio first, Claude Code, #387)** — Once Occlusion archived, Perio became the
   dashboard's first hub and "Release tests" failed accessibility on every branch, `main` included: Perio's `#b4466f` is
   4.05:1 as text on its light tint (`.dx-when`, the timeline's dates) and 4.4:1 under the Timmy Time card's .88-white
