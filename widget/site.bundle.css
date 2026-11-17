@@ -248,7 +248,7 @@ transition: background var(--t-hover) var(--ease-out), transform var(--t-press) 
 .ql.is-primary small { opacity: .85; }
 .ql.is-primary:hover { background: var(--primary); opacity: .92; }
 .quick:not(:has(.ql:nth-child(7))) .ql.is-primary { grid-column: span 3; }
-.quick-more { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 8px; margin-top: calc(8px - var(--gap)); }
+.quick-more { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 8px; margin-top: calc(8px - var(--gap)); }
 .ql.ql-wide { background: var(--hub-soft); }
 .ql.ql-wide:hover { background: var(--active); }
 .quick.has-pod .ql.is-primary { grid-column: auto; }
