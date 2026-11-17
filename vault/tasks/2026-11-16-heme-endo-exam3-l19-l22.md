@@ -63,7 +63,8 @@ add the recording's hints beside them.
 - [ ] L21 in the hub (slides, then taught once its recording is posted): notes at both levels and three recordings,
       questions in every format with every why, topics, hints, tables, cram, sequences, a sort set, its figures
 - [ ] L22 the same
-- [ ] The mock is 35 questions in 90 minutes, and the "join later" wording is gone
+- [ ] The mock is 35 questions in 90 minutes (the exam's count per lecture, 2026-11-17: add `mpath: 4` and `fpath: 4` to
+      `core.json` `mock.blueprint`, `limit` 5400), and the "join later" wording is gone (`index.html` mock blurb, `examInfo`)
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
 - [ ] Vault written back (hub note, decisions, this note's Outcome)
 
@@ -74,5 +75,7 @@ add the recording's hints beside them.
   added above. Still waiting on L19-L20's recordings and L21-L22's slides (not in the Drive folder on 11/17).
 - 2026-11-17: L19 and L20 got their figures (five each, from the slides) and High yield narration
   ([the figures task](done/2026-11-16-heme-endo-exam3-figures.md)): check both when they go taught.
+- 2026-11-17: Sam gave the exam's count per lecture (A 3, L17 4, L18 6, L19 8, L20 6, L21 4, L22 4); the mock follows it
+  for the lectures in the hub ([the hub note](../hubs/heme-endo-exam3.md)).
 
 ## Outcome

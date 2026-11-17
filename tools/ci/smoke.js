@@ -324,6 +324,11 @@ async function stub(context){
   // engine's checks below never closed it.
   await context.addInitScript(() => { try { new MutationObserver(() => { const b = document.querySelector('.sh-archived-stay'); if (b) b.click(); })
     .observe(document, { childList: true, subtree: true }); } catch (e) {} });
+  // the dashboard's exam check-in and survey open in a window over the dimmed page (widget/dash.js formWindow, 2026-11-17)
+  // four seconds after it loads, for anyone with progress in a hub whose exam has passed; press its × ("Not now", "Later")
+  // like a student would, whenever it comes. A survey's "Later" first says "Saved to your Inbox.", so the second press closes it.
+  await context.addInitScript(() => { try { new MutationObserver(() => { const b = document.querySelector('section.survey.is-shown .survey-x'); if (b) b.click(); })
+    .observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] }); } catch (e) {} });
 }
 
 /* matching items allowed to repeat an answer because that hub grades matches by answer text (perio, since 2026-09-29) */
@@ -1450,6 +1455,7 @@ function lint(hub, A){
             const h = d.querySelector('#tpvT').cloneNode(true), tb = h.querySelector('.tpv-num'); if (tb) tb.remove();
             return { title: h.textContent.trim(), titleEls: h.children.length, top: tb ? { shown: (tb.querySelector('[aria-hidden="true"]') || {}).textContent, said: (tb.querySelector('.tpv-sr') || {}).textContent, cls: tb.className } : null, seg: d.querySelector('.tpv-seg').hidden, cust: !!d.querySelector('[data-tp="customize2"], [data-tp="customize"]:not([hidden]) ') && !d.querySelector('.tpv-seg').hidden,
               hp: !!d.querySelector('.tpv-hp'), timmy: t ? t.getAttribute('aria-label') : '', home: (d.querySelector('.tpv-sub') || {}).textContent || '', injected: !!window.__visit || !!d.querySelector('img[src="x"]'), w: d.scrollWidth - d.clientWidth,
+              forms: !!document.querySelector('section.survey'),
               look: { visit: d.classList.contains('is-visit'), kick: (d.querySelector('.tpv-kick') || {}).textContent || '', rank: (d.querySelector('.tpv-guest .tpv-gr') || {}).textContent || '', art: !!d.querySelector('.tpv-grank svg') } }; });
           if (!v.look.visit || v.look.kick !== 'Welcome to' || !/Gold/.test(v.look.rank) || !v.look.art) problems.push(`${name} (${label}): a visit should open in its theater look, "Welcome to" over the name and their rank drawn on the guest card (${JSON.stringify(v.look)})`);
           if (v.title !== BAD + '’s place' || v.titleEls) problems.push(`${name} (${label}): the visited place's title should be "<name>'s place" as text (${JSON.stringify(v.title)}, ${v.titleEls} elements)`);
@@ -1460,6 +1466,9 @@ function lint(hub, A){
           if (!/Igloo/i.test(v.home)) problems.push(`${name} (${label}): the visited place isn't theirs (their home is the igloo; the view says "${v.home}")`);
           if (v.injected) problems.push(`${name} (${label}): a visited place drew its name as markup`);
           if (v.w > 1) problems.push(`${name} (${label}): the visited place scrolls sideways by ${v.w}px`);
+          /* the dashboard asks for the check-in four seconds after it loads, while this visit is open: it waits for the place
+             to close, since under the <dialog> it would be hidden and take the Escape that closes the place */
+          if (v.forms) problems.push(`${name} (${label}): the check-in or survey window opened under a classmate's place`);
           if (placeCalls[K('b')] !== 1) problems.push(`${name} (${label}): get_place was asked ${placeCalls[K('b')] || 0} times for one of the top three: the stage's outfits and the visit share one answer`);
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
           const back = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tpv'), focus: document.activeElement ? document.activeElement.getAttribute('aria-label') || '' : '', tracked: window.__tracked || [] }));

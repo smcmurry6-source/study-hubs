@@ -12,7 +12,7 @@ DENT 2160 Hematology & Endocrinology, Exam 3: **35 multiple-choice questions, ne
 schedule): **A** Dental endocrinology clinical application (Dr. Taylor, taught 11/6, moved here from Exam 2), **L17** Pregnancy
 and lactation (Dr. Madison, 11/10), **L18** Estrogens and androgens (Dr. Fasinu, 11/11), **L19** Introduction to hematology
 (Dr. Herr, 11/17), **L20** Lymphomas and leukemias (Dr. Borak, 11/17), **L21** and **L22** Pathology of the male and female
-reproductive systems (Dr. Dal Zotto, 11/18). The count per lecture hasn't been announced. Exam date and check-in hours: its
+reproductive systems (Dr. Dal Zotto, 11/18). Exam date and check-in hours: its
 entry in `hubs.js`.
 
 ## Before you work on it
@@ -50,8 +50,13 @@ entry in `hubs.js`.
   course's learning objectives ("Exam 1" folder). **Not used**, by the [graded-coursework](../rules/graded-coursework.md) rule:
   the Exam 3 Anki deck in that folder (a previous year's practice questions), everything in "Resources from D3s", Quiz 4 (open
   until 11/19), the crosswords and the take-home.
-- **The mock** gives each lecture 5 questions (one per hour of class, since no count per lecture was announced), at the exam's
-  pace (35 in 90 minutes): 25 now; with L21 and L22, the exam's 35 in 90 minutes (`core.json` `mock`).
+- **The exam's count per lecture** (Sam, 2026-11-17): Clinical application (A) 3, Pregnancy and lactation (L17) 4, Estrogens and
+  androgens (L18) 6, Introduction to hematology (L19) 8, Lymphomas and leukemias (L20) 6, Male reproductive pathology (L21) 4,
+  Female reproductive pathology (L22) 4: 35. `core.json` `examCounts` has all seven ("n on the exam" beside each lecture under
+  Most likely questions; Ask Timmy reads the exam facts), and the mock's `blueprint` has the lectures in the hub, at the exam's
+  pace (35 in 90 minutes): 27 questions in 69 minutes now. When L21 and L22 go in, add `mpath: 4` and `fpath: 4` to the
+  blueprint and set its `limit` to 5400 (35 in 90 minutes), and fix the mock's wording in `index.html`. **The counts never trim
+  High Likelihood** ([high-likelihood-topics](../rules/high-likelihood-topics.md)).
 - **Figures:** 22 anima figures (Sam said yes to every candidate, 2026-11-16), two for A and five for each of L17-L20, numbered
   Fig 1-22 in lecture order; shipped 2026-11-17, after the hub ([the figures task](../tasks/done/2026-11-16-heme-endo-exam3-figures.md)
   has each one's plan, where it went and its judgment calls). One module each in `tools/figures/heme-endo-exam3/`
