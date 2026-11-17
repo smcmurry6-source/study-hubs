@@ -1,11 +1,12 @@
 // Fig: the endocrine glands and the mouth (Lecture A, Dental Endocrinology Clinical Application, Dr. Taylor). A body
 // outline, front view, with the glands the lecture walks through: the hypothalamus and pituitary, the thyroid with the
 // four parathyroids behind it, the adrenals on the kidneys (with a magnified section for cortex and medulla), the
-// pancreas, and the ovaries or the testes (a Female / Male switch). Tap a gland (or its button): the card beside the body
-// gives what it makes and, for each disorder, the notes' own table rows (what it does, what it looks like in the mouth,
-// what changes in dental care), with small drawn mouths where the finding can be seen: acromegaly's forward jaw and
-// spacing, hypothyroid macroglossia, Addison pigment, diabetic candidiasis, pubertal and pregnancy gingivitis with the
-// pyogenic granuloma, and the hyperparathyroid film. The summary under the figure repeats the card in full sentences.
+// pancreas, and the ovaries or the testes (a Female / Male switch). Tap a gland (or its button): the column beside the
+// body gives what it makes, small drawn mouths where a finding can be seen (acromegaly's forward jaw and spacing,
+// hypothyroid macroglossia, Addison pigment, diabetic candidiasis, pubertal and pregnancy gingivitis with the pyogenic
+// granuloma, the hyperparathyroid film) and the dental points to keep in mind; the table below compares its disorders in
+// the notes' own rows. Laid out 440 wide, with the table full width under the body, so its text reads at phone width.
+// The summary under the figure repeats the card in full sentences.
 import { makeFig, f1, T, HOT } from "./shared.mjs";
 
 /* ---------- text: Nunito Sans advance widths (em), for wrapping at build time ---------- */
@@ -24,12 +25,19 @@ function wrap(s, width, fs, bold, first) {
 }
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 function tx(x, y, s, cls, a) { return '<text class="t ' + cls + '" x="' + f1(x) + '" y="' + f1(y) + '"' + (a ? ' text-anchor="' + a + '"' : "") + ">" + s + "</text>"; }
-/* a bold lead and its text, wrapped: returns [svg, lines] */
+/* a bold lead and its text, wrapped: returns [svg, lines]. A lead too long for the width wraps on its own, and the text
+   starts on a new line when its first word won't fit after the lead */
 function rich(x, y, lead, text, width, fs, lh) {
-  const lw = tw(lead + ": ", fs, true), lines = wrap(text, width, fs, false, lw);
-  let o = '<text class="t gm-tx" x="' + f1(x) + '" y="' + f1(y) + '"><tspan class="gm-b">' + esc(lead) + ":</tspan> " + esc(lines[0] || "") + "</text>";
-  for (let i = 1; i < lines.length; i++) o += tx(x, y + i * lh, esc(lines[i]), "gm-tx");
-  return [o, lines.length];
+  const L = wrap(lead + ":", width, fs, true), lw = tw(L[L.length - 1] + " ", fs, true);
+  let lines = wrap(text, width, fs, false, lw), joined = true;
+  if (lw + tw(text.split(" ")[0], fs, false) > width) { lines = wrap(text, width, fs, false); joined = false; }
+  let o = "", k = 0;
+  L.forEach((ln, i) => {
+    const last = i === L.length - 1;
+    o += '<text class="t gm-tx" x="' + f1(x) + '" y="' + f1(y + k * lh) + '"><tspan class="gm-b">' + esc(ln) + "</tspan>" + (last && joined ? " " + esc(lines[0] || "") : "") + "</text>"; k++;
+  });
+  for (let i = joined ? 1 : 0; i < lines.length; i++) { o += tx(x, y + k * lh, esc(lines[i]), "gm-tx"); k++; }
+  return [o, k];
 }
 
 /* ---------- the little mouths, drawn in a 120 x 64 box ---------- */
@@ -123,8 +131,8 @@ const mir = (p) => p.map((q) => [2 * X0 - q[0], q[1]]);
 function bodyArt() {
   const o = {};
   /* torso and thighs, no arms (a schematic outline), front view: patient's right on the viewer's left */
-  const side = [[128, 88], [128, 117], [146, 125], [166, 132], [177, 142], [179, 156], [174, 170], [170, 196], [165, 238], [160, 284], [165, 326], [171, 366], [172, 402], [167, 452], [161, 520]];
-  const inner = [[126, 520], [123, 476], [X0, 430]];
+  const side = [[128, 88], [128, 117], [146, 125], [166, 132], [177, 142], [179, 156], [174, 170], [170, 196], [165, 238], [160, 284], [165, 326], [171, 366], [172, 402], [168, 448], [165, 482]];
+  const inner = [[127, 482], [124, 466], [X0, 430]];
   const L = mir(side).reverse(), Li = mir(inner.slice(0, 2)).reverse();
   /* right side down, across the right thigh's cut, up its inner edge to the crotch, down the left inner thigh, across, up the left side */
   o.TORSO = '<path class="gm-skinb" d="' + bzc(side, false) + "L" + inner.map((q) => f1(q[0]) + " " + f1(q[1])).join("L") + "L" + Li.map((q) => f1(q[0]) + " " + f1(q[1])).join("L") + "L" + f1(L[0][0]) + " " + f1(L[0][1]) + bzc(L, false).replace(/^M[^C]*/, "") + 'Z"/>';
@@ -161,28 +169,28 @@ const GL = {
     cols: [["Growth hormone excess", "up"], ["Too little ADH", "dn"]],
     rows: [["What it is", "Before puberty: very tall, 7 feet or more. After puberty: acromegaly", "Diabetes insipidus: the kidneys let out far too much fluid; always thirsty"],
       ["In the mouth", "The mandible grows: Class I to edge-to-edge or Class III; diastemas; macroglossia", "None given"]],
-    mouth: [["acro", { gums: true, c3: true, gaps: true }], null],
+    mouth: [["acro", { gums: true, c3: true, gaps: true }, "Acromegaly: Class III, diastemas"], null],
     notes: [["Implants", "the sex hormones fuse the growth plates at puberty: wait for growth to stop"], ["Not diabetes mellitus", "same first word, different hormone"]] },
   thy: { title: "Thyroid", sub: "in the neck, over the trachea",
     makes: [["T3 and T4", "metabolism, the body's thermostat; regulated by TSH"], ["Calcitonin", "released when blood calcium rises; reverses PTH's effects on bone"]],
     cols: [["Hyperthyroidism", "up"], ["Hypothyroidism", "dn"]],
     rows: [["How often you'll see it", "On occasion", "Far more often"], ["Weight", "Loss", "Gain"], ["Heart rate", "Tachycardia", "Bradycardia"], ["Other", "Heat intolerance", "Fatigue"],
       ["Eruption in children", "Accelerated", "Delayed"], ["Other dental points", "Increased sensitivity to epinephrine; avoid excessive vasoconstrictor when uncontrolled", "Macroglossia; delayed wound healing"]],
-    mouth: [null, ["hypothy", { open: true, big: true }]],
+    mouth: [null, ["hypothy", { open: true, big: true }, "Hypothyroidism: macroglossia"]],
     notes: [["Thyroid storm", "high fever, heart rate 140 or higher, agitation, delirium: call 911"], ["Surgery", "find the recurrent laryngeal nerve: damage leaves a hoarse, raspy voice"]] },
   para: { title: "Parathyroids", sub: "four glands, behind the thyroid",
     makes: [["PTH", "the fast-acting calcium regulator: osteoclasts resorb bone, the kidney reabsorbs calcium, calcitriol so the gut absorbs more"]],
     cols: [["Hyperparathyroidism", "up"], ["Hypoparathyroidism", "dn"]],
     rows: [["What it does", "Too much bone resorption; at times osteoporosis", "Hypocalcemia"], ["Signs", "Tooth mobility", "Neuromuscular irritability; tetany"],
       ["On the radiograph", "Loss of the lamina dura; brown tumors (radiolucent)", "None given"], ["Dental care", "A brown tumor: ask about other symptoms, refer to the physician", "None given"]],
-    mouth: [["hyperpara", { film: true }], null],
+    mouth: [["hyperpara", { film: true }, "Hyperparathyroidism: the film"], null],
     notes: [["Vitamin D", "the long-term regulator, activated in the kidney"]] },
   cortex: { title: "Adrenal cortex", sub: "the outer layer of each adrenal, on the kidney",
     makes: [["Cortisol", "stress response, immune regulation, glucose metabolism"], ["Aldosterone", "sodium retention, potassium regulation"]],
     cols: [["Addison disease", "dn"], ["Cushing syndrome", "up"]],
     rows: [["Cortisol", "Too little (often with low aldosterone)", "Too much (or long-term steroid therapy)"], ["Clinical features", "Hypotension, fatigue, hyperpigmentation", "Moon face, buffalo hump, hyperglycemia"],
       ["In the mouth", "Brown patches; diffuse oral melanosis", "Increased infection risk, delayed healing"], ["Emergency", "Adrenal crisis; extra steroid after a big procedure", "None listed"]],
-    mouth: [["addison", { gums: true, mel: true }], null],
+    mouth: [["addison", { gums: true, mel: true }, "Addison disease: brown patches"], null],
     notes: [["Why brown", "low cortisol lets ACTH rise, and ACTH stimulates melanocytes"], ["Crisis triggers", "long or stressful surgery, infection or trauma, a missed steroid dose"]] },
   med: { title: "Adrenal medulla", sub: "the core of each adrenal",
     makes: [["Epinephrine and norepinephrine", "amines (his example): fight or flight. The heart speeds up, vessels constrict, the bronchioles dilate, the stomach stops moving"]],
@@ -194,19 +202,19 @@ const GL = {
     cols: [["Type 1 diabetes", "eq"], ["Type 2 diabetes", "eq"]],
     rows: [["Cause", "Autoimmune destruction of the beta cells", "Insulin resistance"], ["Insulin", "None made: insulin injections to survive", "Hyperinsulinemia: ineffective, not deficient"], ["Usually", "Starts young", "Production may decline over time"],
       ["In the mouth, both", "Xerostomia (most common, not specific), candidiasis, burning mouth, delayed healing, more periodontal disease and caries", null]],
-    mouth: [["dm", { open: true, cand: true, red: true }], "span"],
+    mouth: [["dm", { open: true, cand: true, red: true }, "Diabetes: candidiasis"], "span"],
     notes: [["HbA1c above 7", "poorly controlled: implant failure, periodontal disease"], ["Glucose under 60", "give straight glucose; IV dextrose or glucagon if that fails"], ["Schedule", "mornings, after the meal and medications"]] },
   gonf: { title: "Ovaries", sub: "the sex hormones, driven by the pituitary",
     makes: [["Estrogen and progesterone", "steroids (estrogen is his example); higher in pregnancy, falling at menopause"]],
     cols: [["Puberty", "eq"], ["Pregnancy", "eq"], ["Menopause", "eq"]],
     rows: [["Oral effects", "Increased gingival inflammation", "Pregnancy gingivitis; pyogenic granuloma (\"pregnancy tumor\"), usually interproximal", "Xerostomia; altered taste; osteoporosis implications"]],
-    mouth: [["puberty", { gums: true, red: true }], ["preg", { gums: true, red: true, gp: true, pg: true }], null],
+    mouth: [["puberty", { gums: true, red: true }, "Puberty: gingival inflammation"], ["preg", { gums: true, red: true, gp: true, pg: true }, "Pregnancy: pyogenic granuloma"], null],
     notes: [["Growth plates", "puberty's sex hormones fuse them: wait for growth to stop before an implant"]] },
   gonm: { title: "Testes", sub: "the sex hormones, driven by the pituitary",
     makes: [["Testosterone", "a steroid (his example); aromatase converts it to estrogen"]],
     cols: [["Puberty", "eq"], ["Pregnancy", "off"], ["Menopause", "off"]],
     rows: [["Oral effects", "Increased gingival inflammation", "The ovaries' stage: switch to Female", "The ovaries' stage: switch to Female"]],
-    mouth: [["puberty", { gums: true, red: true }], null, null],
+    mouth: [["puberty", { gums: true, red: true }, "Puberty: gingival inflammation"], null, null],
     notes: [["Growth plates", "puberty's sex hormones fuse them: wait for growth to stop before an implant"]] },
 };
 const VINFO = {
@@ -218,44 +226,55 @@ const VINFO = {
   puberty: "Puberty: increased gingival inflammation, red and swollen gums.",
   preg: "Pregnancy: pregnancy gingivitis, and a pyogenic granuloma (the \"pregnancy tumor\"), an overgrowth of gum tissue, usually interproximal.",
 };
-const X1 = 248, CWID = 278;
+/* the layout: the body on the left of the top band, the gland's side column beside it (what it makes, the drawn mouths,
+   the reminders), and its disorders compared row by row below, full width, so the text reads at phone width */
+const W = 440, BAND = 490, X1 = 248, CW1 = 178, TX = 20, TW = 400;
 function card(G) {
-  let o = "", y = 30;
-  o += tx(X1, y, esc(G.title), "gm-ttl", "start"); y += 15;
-  if (G.sub) { o += tx(X1, y, esc(G.sub), "gm-sub", "start"); y += 17; }
-  o += tx(X1, y, "MAKES", "gm-cap", "start"); y += 15;
-  for (const m of G.makes) { const r = rich(X1, y, m[0], m[1], CWID, 12, 14.5); o += r[0]; y += r[1] * 14.5 + 3; }
-  y += 6;
-  const n = G.cols.length, gap = n === 3 ? 8 : 10, cw = (CWID - gap * (n - 1)) / n, cx = (i) => X1 + i * (cw + gap);
-  o += '<path class="gm-rule" d="M238 ' + f1(y - 9) + "H536" + '"/>';
-  /* column heads */
-  let hh = 0; const heads = G.cols.map((c) => wrap(c[0], cw, 12.5, true)); heads.forEach((h) => { hh = Math.max(hh, h.length); });
+  let o = "", y = 34;
+  /* the side column */
+  wrap(G.title, CW1, 17, true).forEach((ln) => { o += tx(X1, y, esc(ln), "gm-ttl", "start"); y += 20; });
+  if (G.sub) { y -= 3; wrap(G.sub, CW1, 12, false).forEach((ln) => { o += tx(X1, y, esc(ln), "gm-sub", "start"); y += 15; }); }
+  y += 8; o += tx(X1, y, "MAKES", "gm-cap", "start"); y += 17;
+  for (const m of G.makes) { const r = rich(X1, y, m[0], m[1], CW1, 12.5, 15); o += r[0]; y += r[1] * 15 + 5; }
+  const ms = (G.mouth || []).map((m, i) => (m && m !== "span" ? [m, i] : null)).filter(Boolean);
+  if (ms.length) {
+    o += '<path class="gm-rule" d="M240 ' + f1(y - 2) + "H432" + '"/>'; y += 14;
+    o += tx(X1, y, "WHAT IT LOOKS LIKE", "gm-cap", "start"); y += 4;
+    ms.forEach(([m, i]) => {
+      const c = G.cols[Math.min(i, G.cols.length - 1)], sc = 1.4, h = 64 * sc;
+      y += 15; o += tx(X1, y, esc(m[2]), "gm-mc gm-" + c[1], "start"); y += 5;
+      o += HOT(VINFO[m[0]], '<g transform="translate(' + f1(X1) + " " + f1(y) + ") scale(" + sc + ')">' + mouth(m[1]) + "</g>");
+      y += h + 4;
+    });
+  }
+  if (G.notes && G.notes.length) {
+    o += '<path class="gm-rule" d="M240 ' + f1(y + 4) + "H432" + '"/>'; y += 20;
+    o += tx(X1, y, "KEEP IN MIND", "gm-cap", "start"); y += 17;
+    for (const m of G.notes) { const r = rich(X1, y, m[0], m[1], CW1, 12.5, 15); o += HOT(m[0] + ": " + m[1] + ".", r[0]); y += r[1] * 15 + 5; }
+  }
+  const T0 = Math.max(BAND, y + 4) + 8;
+  o = '<rect class="gm-card" x="238" y="8" width="196" height="' + f1(T0 - 16) + '" rx="12"/>' + o;
+  /* the table, full width: the row labels in a column of their own, as in the notes' tables */
+  let t = "";
+  y = T0 + 26;
+  const n = G.cols.length, gap = 14, LW = G.rows.some((r) => r[0]) ? 80 : 0, C0 = TX + (LW ? LW + 12 : 0);
+  const cw = (TX + TW - C0 - gap * (n - 1)) / n, cx = (i) => C0 + i * (cw + gap);
+  let hh = 0; const heads = G.cols.map((c) => wrap(c[0], cw, 13, true)); heads.forEach((h) => { hh = Math.max(hh, h.length); });
   const colInfo = G.cols.map((c, i) => c[0] + ": " + G.rows.map((r) => (r[0] ? r[0] + ": " : "") + (r[i + 1] || r[1])).join(". ") + ".");
   const colSvg = G.cols.map(() => "");
-  G.cols.forEach((c, i) => { let s = ""; heads[i].forEach((ln, j) => { s += tx(cx(i), y + 4 + j * 15, esc(ln), "gm-ch gm-" + c[1], "start"); }); s += '<rect class="gm-bar gm-' + c[1] + '" x="' + f1(cx(i)) + '" y="' + f1(y + 9 + (hh - 1) * 15) + '" width="' + f1(cw) + '" height="3" rx="1.5"/>'; colSvg[i] += s; });
-  y += 9 + (hh - 1) * 15 + 17;
-  for (const r of G.rows) {
-    if (r[0]) { o += tx(X1, y, esc(r[0]), "gm-rl", "start"); y += 14; }
-    let mx = 1;
+  G.cols.forEach((c, i) => { let s = ""; heads[i].forEach((ln, j) => { s += tx(cx(i), y + j * 16, esc(ln), "gm-ch gm-" + c[1], "start"); }); s += '<rect class="gm-bar gm-' + c[1] + '" x="' + f1(cx(i)) + '" y="' + f1(y + 6 + (hh - 1) * 16) + '" width="' + f1(cw) + '" height="3" rx="1.5"/>'; colSvg[i] += s; });
+  y += 6 + (hh - 1) * 16 + 23;
+  G.rows.forEach((r, k) => {
+    let mx = 1, ml = 0;
+    if (k) t += '<path class="gm-hair" d="M' + TX + " " + f1(y - 13) + "H" + (TX + TW) + '"/>';
+    if (r[0]) { const ls = wrap(r[0], LW, 11.5, true); ls.forEach((ln, j) => { t += tx(TX, y + j * 14, esc(ln), "gm-rl", "start"); }); ml = ls.length * 14 - 15; }
     if (r[2] === null) { /* one cell across the columns */
-      const ls = wrap(r[1], CWID, 12, false); ls.forEach((ln, j) => { o += tx(X1, y + j * 14.5, esc(ln), "gm-tx", "start"); }); mx = ls.length;
-    } else G.cols.forEach((c, i) => { const ls = wrap(r[i + 1], cw, 12, false); ls.forEach((ln, j) => { colSvg[i] += tx(cx(i), y + j * 14.5, esc(ln), "gm-tx" + (c[1] === "off" || r[i + 1] === "None given" || r[i + 1] === "None listed" ? " mut" : ""), "start"); }); mx = Math.max(mx, ls.length); });
-    y += mx * 14.5 + 6;
-  }
-  /* the drawn mouths */
-  if (G.mouth && G.mouth.some((m) => m && m !== "span")) {
-    const span = G.mouth[1] === "span";
-    o += tx(X1, y, "What it looks like", "gm-rl", "start"); y += 6;
-    let mh = 0;
-    G.mouth.forEach((m, i) => { if (!m || m === "span") return; const w = Math.min(span ? 150 : 128, cw), sc = w / 120, h = 64 * sc, x = span ? X1 : cx(i);
-      const g = HOT(VINFO[m[0]], '<g transform="translate(' + f1(x) + " " + f1(y) + ") scale(" + f1(sc * 1000) / 1000 + ')">' + mouth(m[1]) + "</g>");
-      if (span) o += g; else colSvg[i] += g; mh = Math.max(mh, h); });
-    y += mh + 10;
-  }
-  G.cols.forEach((c, i) => { o += HOT(colInfo[i], colSvg[i]); });
-  o += '<path class="gm-rule" d="M238 ' + f1(y - 2) + "H536" + '"/>'; y += 14;
-  for (const m of G.notes || []) { const r = rich(X1, y, m[0], m[1], CWID, 12, 14.5); o += HOT(m[0] + ": " + m[1] + ".", r[0]); y += r[1] * 14.5 + 4; }
-  return { svg: o, h: y };
+      const ls = wrap(r[1], TX + TW - C0, 12.5, false); ls.forEach((ln, j) => { t += tx(C0, y + j * 15, esc(ln), "gm-tx", "start"); }); mx = ls.length;
+    } else G.cols.forEach((c, i) => { const ls = wrap(r[i + 1], cw, 12.5, false); ls.forEach((ln, j) => { colSvg[i] += tx(cx(i), y + j * 15, esc(ln), "gm-tx" + (c[1] === "off" || r[i + 1] === "None given" || r[i + 1] === "None listed" ? " mut" : ""), "start"); }); mx = Math.max(mx, ls.length); });
+    y += Math.max(mx * 15, ml + 15) + 11;
+  });
+  G.cols.forEach((c, i) => { t += HOT(colInfo[i], colSvg[i]); });
+  return { svg: o, table: t, t0: T0, h: y };
 }
 
 /* ---------- page helpers (serialized) ---------- */
@@ -287,18 +306,24 @@ function gmRender(st, D) {
   o += gmTap(on("med") ? "med" : "cortex", D.INFO.adr, (ad ? '<ellipse class="gm-halo" cx="89.5" cy="248" rx="15" ry="11"/><ellipse class="gm-halo" cx="141" cy="244" rx="15" ry="11"/>' : "") + D.ADR, ad);
   o += gmTap("panc", D.INFO.panc, (on("panc") ? '<path class="gm-halo" d="M88 288C92 270 140 252 162 256C166 270 120 300 88 288Z"/>' : "") + D.PANC, on("panc"));
   o += gmTap("gon", m ? D.INFO.tes : D.INFO.ova, (on("gon") ? (m ? '<ellipse class="gm-halo" cx="115" cy="449" rx="17" ry="14"/>' : '<ellipse class="gm-halo" cx="97.5" cy="384" rx="11" ry="9"/><ellipse class="gm-halo" cx="132.5" cy="384" rx="11" ry="9"/>') : "") + (m ? D.TES : D.OVA), on("gon"));
+  /* bigger tap targets over the small glands, so a finger finds them on a phone */
+  var hit = function (k, info, shapes) { return gmTap(k, info, shapes.map(function (e) { return '<ellipse class="gm-hit" cx="' + e[0] + '" cy="' + e[1] + '" rx="' + e[2] + '" ry="' + e[3] + '"/>'; }).join(""), false); };
+  o += hit("hp", D.INFO.hp, [[115, 66, 11, 12]]) + hit("thy", D.INFO.thy, [[115, 120, 9, 8.5]]) + hit("para", D.INFO.para, [[104.6, 114.5, 5, 5], [125.4, 114.5, 5, 5], [104.8, 125.5, 5, 5], [125.2, 125.5, 5, 5]]);
+  o += hit(on("med") ? "med" : "cortex", D.INFO.adr, [[89.5, 248, 12, 9], [141, 244, 12, 9]]);
+  o += m ? hit("gon", D.INFO.tes, [[115, 450, 13, 11]]) : hit("gon", D.INFO.ova, [[97.5, 384, 10, 8], [132.5, 384, 10, 8]]);
   /* the magnified adrenal: cortex and medulla, each its own entry */
   o += '<path class="gm-zoom" d="M147 238L171 226M147 238L222 224"/>';
   o += gmTap("cortex", D.INFO.cortex, '<path class="gm-g gm-ga' + (on("cortex") ? " gm-sel" : "") + '" d="' + I.cortex + '"/>', on("cortex"));
   o += gmTap("med", D.INFO.med, '<path class="gm-g gm-gm' + (on("med") ? " gm-sel" : "") + '" d="' + I.medulla + '"/>', on("med"));
   o += gmLab(176, 180, "cortex", 186, 199, "start", on("cortex")) + gmLab(198, 244, "medulla", 205, 213, "middle", on("med"));
   /* labels */
-  o += gmLab(84, 79, "pituitary", 110.5, 73, "end", on("hp")) + gmLab(146, 48, "hypothalamus", 122, 59, "start", on("hp"));
+  o += gmLab(84, 79, "pituitary", 110.5, 73, "end", on("hp")) + gmLab(150, 46, "hypothalamus", 122, 59, "start", on("hp"));
   o += gmLab(98, 106, "thyroid", 107, 116, "end", on("thy")) + gmLab(140, 104, "parathyroids", 127.5, 113.5, "start", on("para"));
   o += gmLab(64, 246, "adrenal", 85, 247, "end", ad) + gmLab(178, 300, "pancreas", 150, 268, "start", on("panc"));
   o += m ? gmLab(64, 470, "testes", 107, 455, "end", on("gon")) : gmLab(64, 388, "ovaries", 93, 385, "end", on("gon"));
   /* the card */
-  o += '<rect class="gm-card" x="238" y="8" width="298" height="' + (D.H - 16) + '" rx="12"/>' + D.CARDS[key];
+  var C = D.CARDS[key];
+  o += C.svg + '<rect class="gm-card" x="8" y="' + C.t0 + '" width="426" height="' + f1(C.h - C.t0 + 2) + '" rx="12"/>' + C.table;
   return o;
 }
 function gmSay(st, D) {
@@ -336,14 +361,14 @@ const INFO = {
 
 export default function glandmap() {
   const B = bodyArt(), CARDS = {}; let H = 0;
-  for (const k of Object.keys(GL)) { const c = card(GL[k]); CARDS[k] = c.svg; H = Math.max(H, c.h); }
-  H = Math.max(530, Math.ceil(H + 14));
+  for (const k of Object.keys(GL)) { const c = card(GL[k]); CARDS[k] = { svg: c.svg, table: c.table, t0: c.t0, h: c.h }; H = Math.max(H, c.h); }
+  H = Math.ceil(H + 12);
   const D = Object.assign({}, B, { CARDS, SUM, RO, INFO, H, ANIM: false, INIT: { g: "thy", sx: "f" } });
   return makeFig({
-    id: "glandmap", lec: "dental", fig: "Fig A2", short: "Glands and the mouth", hint: "tap a gland",
+    id: "glandmap", lec: "dental", fig: "Fig 1", short: "Glands and the mouth", hint: "tap a gland",
     title: "The endocrine glands and the mouth",
     caption: "Tap a gland on the body (or a button) to see what it makes, its disorders side by side as the notes' tables give them, what each looks like in the mouth and what changes in the chair.",
-    W: 544, H,
+    W, H,
     label: "A front-view body outline with the hypothalamus and pituitary, the thyroid with the four parathyroids behind it, the adrenal glands on the kidneys with a magnified adrenal showing cortex and medulla, the pancreas, and the ovaries or testes. Beside it, a card for the selected gland: its hormones, its disorders compared row by row, small drawings of the mouth findings, and the dental care points.",
     D, render: gmRender, say: gmSay, helpers: [gmWire, gmTap, gmLab],
     controls: `<div class="am-controls" role="group" aria-label="Gland">${[["hp", "Hypothalamus and pituitary"], ["thy", "Thyroid"], ["para", "Parathyroids"], ["cortex", "Adrenal cortex"], ["med", "Adrenal medulla"], ["panc", "Pancreas"], ["gon", "Ovaries or testes"]].map((b) => `<button type="button" class="am-btn" data-amk="g" data-amv="${b[0]}">${b[1]}</button>`).join("")}</div>
@@ -352,10 +377,10 @@ export default function glandmap() {
       "From Lecture A's notes (Dr. Taylor, recording and slides): every hormone, disorder, oral finding and dental point on the cards, in its words, with the notes' tables (anterior pituitary hormones; hyperthyroidism vs hypothyroidism; Addison disease vs Cushing syndrome; sex hormones and the mouth) and the three hormone classes' examples (amines, epinephrine and norepinephrine; peptides, insulin; steroids, estrogen or testosterone). Where the notes add another lecture's version (Graves disease as the most common cause of hyperthyroidism, Lecture 11's diagnostic cutoffs), the card keeps Dr. Taylor's.",
       "Gray's Anatomy and Netter's Atlas of Human Anatomy: where each gland sits. The pituitary hangs from the hypothalamus at the base of the brain; the thyroid's two lobes and isthmus wrap the front of the trachea below the larynx, with four parathyroids on the back of the lobes; the adrenals cap the upper poles of the kidneys (the right one pyramidal, the left crescent-shaped), and the right kidney sits a little lower; the pancreas crosses in front of the kidneys, its head on the right and its tail toward the left; the ovaries lie beside the uterus on the pelvic wall, the testes in the scrotum. The adrenal's cortex surrounds its medulla.",
       "Little JW, Falace DA and others, Dental Management of the Medically Compromised Patient, and Neville BW and others, Oral and Maxillofacial Pathology: what the drawn findings look like. Acromegaly's mandibular prognathism (an anterior crossbite) with spaced teeth; macroglossia, drawn with the scalloped tongue edges it leaves against the teeth (unlabeled); Addison disease's patchy brown-black pigment on the attached gingiva; pseudomembranous candidiasis as white plaques on the tongue; gingival inflammation as red, swollen margins and papillae; the pyogenic granuloma as a red, lobulated mass on an interdental papilla, most often on the upper front gingiva; the hyperparathyroid film's lost lamina dura and radiolucent brown tumor.",
-      "Schematic: the body is an outline without arms and its glands are enlarged to be tapped; nothing is to scale. The parathyroids are on the back of the thyroid, so they are drawn showing through it when selected. The small mouths are illustrations of each finding, not photographs or cases. Educational, not medical advice.",
+      "Schematic: the body is an outline without arms, cut at the thighs, and its glands are enlarged to be tapped; nothing is to scale. The parathyroids are on the back of the thyroid, so they are drawn showing through it when selected. The small mouths are illustrations of each finding, not photographs or cases. Educational, not medical advice.",
     ],
     css: `
-.anima[data-anima="glandmap"] .am-svg{max-width:600px}
+.anima[data-anima="glandmap"] .am-svg{max-width:500px}
 .anima[data-anima="glandmap"] .am-summary{white-space:pre-line}
 .anima[data-anima="glandmap"] .am-controls > span{font:500 .8rem var(--font-body);color:var(--ink-soft)}
 .anima .glandmap-svg{--gm-skin:#efd9c7;--gm-skinl:#c9a58c;--gm-lip:#d98a87;--gm-lipl:#a8524f;--gm-cav:#5a1f27;--gm-tooth:#fbf6ea;--gm-toothl:#b9ab93;--gm-gum:#ef9c9a;--gm-guml:#c0605e;
@@ -384,20 +409,26 @@ export default function glandmap() {
 .anima .glandmap-svg .gm-sel{stroke:var(--anatomy-lit);stroke-width:2.4}
 .anima .glandmap-svg .gm-halo{fill:var(--accent-soft);stroke:var(--anatomy-lit);stroke-width:1.4;stroke-dasharray:3 2.5;opacity:.9}
 .anima .glandmap-svg .gm-tap{cursor:pointer}
+.anima .glandmap-svg .gm-hit{fill:transparent;stroke:none}
 .anima .glandmap-svg .gm-zoom{fill:none;stroke:var(--anatomy-lo);stroke-width:1;stroke-dasharray:3 3}
 .anima .glandmap-svg .t.gm-lab{font-size:12.5px}
 .anima .glandmap-svg .t.gm-lsel{fill:var(--accent-ink);font-weight:700}
 .anima .glandmap-svg .lead.gm-lon{stroke:var(--anatomy-lit);stroke-width:1.2}
 .anima .glandmap-svg .gm-card{fill:var(--anatomy-face);stroke:var(--anatomy-lo);stroke-width:1}
 .anima .glandmap-svg .gm-rule{fill:none;stroke:var(--anatomy-lo);stroke-width:1}
-.anima .glandmap-svg .t.gm-ttl{font-size:16px;font-weight:700;fill:var(--anatomy-strong)}
+.anima .glandmap-svg .gm-hair{fill:none;stroke:var(--anatomy-faint);stroke-width:1}
+.anima .glandmap-svg .t.gm-ttl{font-size:17px;font-weight:700;fill:var(--anatomy-strong)}
 .anima .glandmap-svg .t.gm-sub{font-size:12px;fill:var(--anatomy-muted)}
 .anima .glandmap-svg .t.gm-cap{font-size:11px;font-weight:700;letter-spacing:.08em;fill:var(--anatomy-muted)}
-.anima .glandmap-svg .t.gm-tx{font-size:12px;fill:var(--anatomy-text)}
+.anima .glandmap-svg .t.gm-tx{font-size:12.5px;fill:var(--anatomy-text)}
 .anima .glandmap-svg .t.gm-tx.mut{fill:var(--anatomy-muted)}
 .anima .glandmap-svg .gm-b{font-weight:700;fill:var(--anatomy-strong)}
-.anima .glandmap-svg .t.gm-rl{font-size:11px;font-weight:600;fill:var(--anatomy-muted)}
-.anima .glandmap-svg .t.gm-ch{font-size:12.5px;font-weight:700}
+.anima .glandmap-svg .t.gm-rl{font-size:11.5px;font-weight:600;fill:var(--anatomy-muted)}
+.anima .glandmap-svg .t.gm-ch{font-size:13px;font-weight:700}
+.anima .glandmap-svg .t.gm-mc{font-size:12px;font-weight:700;fill:var(--anatomy-strong)}
+.anima .glandmap-svg .t.gm-mc.gm-up{fill:var(--bx-hot)}
+.anima .glandmap-svg .t.gm-mc.gm-dn{fill:var(--bx-blue)}
+.anima .glandmap-svg .t.gm-mc.gm-eq{fill:var(--accent-ink)}
 .anima .glandmap-svg .t.gm-ch.gm-up{fill:var(--bx-hot)}
 .anima .glandmap-svg .t.gm-ch.gm-dn{fill:var(--bx-blue)}
 .anima .glandmap-svg .t.gm-ch.gm-eq{fill:var(--accent-ink)}

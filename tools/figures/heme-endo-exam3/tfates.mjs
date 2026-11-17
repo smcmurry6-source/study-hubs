@@ -84,7 +84,7 @@ function molSvg(m, cx, cy, ring) {
 }
 
 /* ---------- layout ---------- */
-const CL = 80, CM = 228, CR = 394, R0 = 66, R1 = 190, R2 = 318, R3 = 430;
+const CL = 80, CM = 228, CR = 402, R0 = 66, R1 = 190, R2 = 318, R3 = 430;
 const POS = { chol: [62, R0 + 6], dhea: [CM, R0], adione: [CL, R1], testo: [CM, R1], dht: [CR, R1], e1: [CL, R2], e2: [CM, R2], e3: [128, R3] };
 const RING = { testo: "tt-raT", dht: "tt-raD", e2: "tt-raE", e1: "tt-raE", e3: "tt-raE", adione: "tt-raT" };
 const MS = {}; for (const k in MOL) MS[k] = molSvg(MOL[k], POS[k][0], POS[k][1], RING[k]);
@@ -94,7 +94,7 @@ const AR = {
   chol: [136, R0 + 4, 182, R0 + 4],
   dhea: [212, R0 + 48, 120, R1 - 30],
   ad2t: [116, R1 + 4, 186, R1 + 4],
-  t2d: [268, R1 + 6, 352, R1 + 6],
+  t2d: [270, R1 + 6, 360, R1 + 6],
   ad2e1: [CL, R1 + 48, CL, R2 - 30],
   t2e2: [CM, R1 + 48, CM, R2 - 30],
   e12: [116, R2 + 4, 186, R2 + 4],
@@ -241,14 +241,14 @@ function ttRender(st, D) {
     ttArrow(A.t2d, "tt-and", u5) + '<rect class="tt-hit" x="' + (A.t2d[0] - 2) + '" y="' + (A.t2d[1] - 22) + '" width="' + (A.t2d[2] - A.t2d[0] + 4) + '" height="26"/>' + T(mx, A.t2d[1] - 9, "5α-reductase", "tt-en tt-and-t", "middle"));
   o += ttFlow(A.t2d, t, "tt-da", u5, 0.2);
   o += HOT("The 5-alpha-reductase inhibitors he highlighted: finasteride (Proscar for BPH, Propecia for hair loss: the same drug at different strengths) and dutasteride (Avodart).",
-    '<path class="tt-tie" d="M' + mx + " " + (A.t2d[1] + 1) + "V" + (A.t2d[1] + 9) + '"/><rect class="tt-tag' + (b5 ? " is-on" : "") + '" x="' + (mx - 40) + '" y="' + (A.t2d[1] + 9) + '" width="80" height="36" rx="7"/>' +
-    T(mx, A.t2d[1] + 23, "finasteride", "tt-drug" + (b5 ? " is-on" : ""), "middle") + T(mx, A.t2d[1] + 38, "dutasteride", "tt-drug" + (b5 ? " is-on" : ""), "middle"));
+    '<path class="tt-tie" d="M' + mx + " " + (A.t2d[1] + 1) + "V" + (A.t2d[1] + 9) + '"/><rect class="tt-tag' + (b5 ? " is-on" : "") + '" x="' + (mx - 40) + '" y="' + (A.t2d[1] + 9) + '" width="80" height="34" rx="7"/>' +
+    T(mx, A.t2d[1] + 22.5, "finasteride", "tt-drug" + (b5 ? " is-on" : ""), "middle") + T(mx, A.t2d[1] + 37, "dutasteride", "tt-drug" + (b5 ? " is-on" : ""), "middle"));
   if (b5) o += ttStop(A.t2d[0] + (A.t2d[2] - A.t2d[0]) * 0.5, A.t2d[1], "drug");
   /* aromatase, twice */
   var ua = bAr ? 0.64 : undefined, kind = s === "none" ? "none" : "drug";
   var arInfo = "Aromatase aromatizes one of testosterone's rings, turning it into estradiol (and androstenedione into estrone): \"When you aromatize the ring, it becomes estrogen.\"" + (s === "none" ? " This man was born without it." : "");
-  o += HOT(arInfo, ttArrow(A.ad2e1, "tt-est", ua) + '<rect class="tt-hit" x="' + (A.ad2e1[0] - 66) + '" y="' + A.ad2e1[1] + '" width="70" height="' + (A.ad2e1[3] - A.ad2e1[1]) + '"/>' + T(A.ad2e1[0] - 7, A.ad2e1[1] + 13, "aromatase", "tt-en tt-est-t", "end"));
-  o += HOT(arInfo, ttArrow(A.t2e2, "tt-est", ua) + '<rect class="tt-hit" x="' + (A.t2e2[0] - 4) + '" y="' + A.t2e2[1] + '" width="70" height="' + (A.t2e2[3] - A.t2e2[1]) + '"/>' + T(A.t2e2[0] + 7, A.t2e2[1] + 13, "aromatase", "tt-en tt-est-t", "start"));
+  o += HOT(arInfo, ttArrow(A.ad2e1, "tt-est", ua) + '<rect class="tt-hit" x="' + (A.ad2e1[0] - 66) + '" y="' + A.ad2e1[1] + '" width="70" height="' + (A.ad2e1[3] - A.ad2e1[1]) + '"/>' + T(A.ad2e1[0] - 7, A.ad2e1[1] + 16, "aromatase", "tt-en tt-est-t", "end"));
+  o += HOT(arInfo, ttArrow(A.t2e2, "tt-est", ua) + '<rect class="tt-hit" x="' + (A.t2e2[0] - 4) + '" y="' + A.t2e2[1] + '" width="70" height="' + (A.t2e2[3] - A.t2e2[1]) + '"/>' + T(A.t2e2[0] + 7, A.t2e2[1] + 16, "aromatase", "tt-en tt-est-t", "start"));
   o += ttFlow(A.ad2e1, t, "tt-de", ua, 0.5) + ttFlow(A.t2e2, t, "tt-de", ua, 0.15);
   var ym = A.t2e2[1] + (A.t2e2[3] - A.t2e2[1]) * 0.64;
   if (bAr) o += ttStop(A.ad2e1[0], ym, kind) + ttStop(A.t2e2[0], ym, kind);
@@ -263,8 +263,8 @@ function ttRender(st, D) {
   if (!lowE) o += ttFlow(A.e1e3, t, "tt-de", undefined, 0.3) + ttFlow(A.e2e3, t, "tt-de", undefined, 0.8);
   /* ---- the molecules ---- */
   function mol(k, name, sub, info, low, cls) {
-    var p = D.POS[k], r = HOT(info, '<g class="tt-m' + (low ? " is-low" : "") + '">' + D.MS[k] + "</g>"), nx = p[0] + 4;
-    r += T(nx, p[1] + 41, name + (low ? ' <tspan class="tt-fall">' + (s === "none" ? "✕" : "↓") + "</tspan>" : ""), "tt-nm" + (cls ? " " + cls + "-t" : "") + (low ? " is-low" : ""), "middle");
+    var p = D.POS[k], r = HOT(info, '<g class="tt-m' + (low ? " is-low" : "") + '">' + D.MS[k] + "</g>"), nx = p[0] + (k === "testo" ? -4 : 4);
+    r += T(nx + (k === "dht" ? (low ? 19 : 12) : 0), p[1] + 41, name + (low ? ' <tspan class="tt-fall">' + (s === "none" ? "✕" : "↓") + "</tspan>" : ""), "tt-nm" + (cls ? " " + cls + "-t" : "") + (low ? " is-low" : ""), "middle");
     if (sub) r += T(nx, p[1] + 55, sub, "tt-sub" + (low ? " is-low" : ""), "middle");
     return r;
   }
@@ -301,7 +301,7 @@ function ttRender(st, D) {
   o += vgFrame(D.VG.sX, py, 140, 160, "scalp", "DHT" + Ls, "tt-chA");
   o += HOT(lowD ? "Finasteride makes people grow hair: that side effect is why a lower strength was approved for hair loss (Propecia), the same drug as Proscar." : "Hair loss (alopecia): on the scalp, DHT shrinks the hair follicles and the hairs thin out. Blocking 5-alpha-reductase lets hair grow.", lowD ? D.HAIR1 : D.HAIR0);
   o += T(D.VG.sX + 70, py + 151, lowD ? "hair grows" : "hair loss (alopecia)", "tt-lb" + (lowD ? " tt-ok" : ""), "middle");
-  o += vgFrame(D.VG.bX, py, 140, 160, "breast", "estradiol" + (lowE ? (s === "none" ? " ✕" : " ↓") : ""), "tt-chE");
+  o += vgFrame(D.VG.bX, py, 140, 160, "breast", "E2" + (lowE ? (s === "none" ? " ✕" : " ↓") : ""), "tt-chE");
   o += HOT(s === "ai" ? "Breast cancer: with aromatase blocked, the estrogen-fueled cancer cells are starved of estradiol. Aromatase inhibitors treat breast cancer, and are not for premenopausal women." : s === "none" ? "No estradiol is made at all without aromatase." : "ER-positive breast cancer cells: they overexpress estrogen receptors, so estrogen fuels their growth and an anti-estrogen will work. Avoid estrogen with breast cancer.", lowE ? D.BR0 : D.BR1);
   o += T(D.VG.bX + 70, py + 151, s === "ai" ? "cancer treated" : s === "none" ? "no estradiol" : "ER-positive cancer", "tt-lb" + (s === "ai" ? " tt-ok" : ""), "middle");
   return o;
@@ -315,7 +315,7 @@ function ttSay(st) {
 }
 
 export default function tfates() {
-  return makeFig({ id: "tfates", lec: "sexster", fig: "Fig 18.1", short: "Testosterone's two fates", hint: "pick a drug · hover",
+  return makeFig({ id: "tfates", lec: "sexster", fig: "Fig 8", short: "Testosterone's two fates", hint: "pick a drug · hover",
     title: "Testosterone's two fates",
     caption: "Dr. Fasinu's pathway from cholesterol to testosterone, then the fork: 5-alpha-reductase makes DHT, the active form, and aromatase makes estradiol. Pick a drug to stop its enzyme and see which product falls and what that treats, or a man born without aromatase.",
     W, H, label: "Skeletal formulas of cholesterol, DHEA, androstenedione, testosterone, DHT, estrone, estradiol and estriol joined by reaction arrows, with 5-alpha-reductase and aromatase marked, the drugs that block each, a long bone's growth plate, and the prostate, scalp and breast cancer cells.",

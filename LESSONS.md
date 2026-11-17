@@ -122,7 +122,7 @@ Sam's 11-16 report session (#382) went live the day of the final: too late and t
   CTG is all connective tissue), `q5-S04`, `q8-S01` and `q8-03` (all match the notes, read 11-15). Ten first tries is too few to act
   on two days out: **nothing changed**. Read them again after the final.
 - **Heme & Endo Exam 3** (exam Fri 11-20, 8 am): 6 people, 7 minutes since it opened on 11-16. Its figures and L17-L20's High yield
-  narration wait in [their task](vault/tasks/2026-11-16-heme-endo-exam3-figures.md), and L19-L22 in
+  narration wait in [their task](vault/tasks/done/2026-11-16-heme-endo-exam3-figures.md), and L19-L22 in
   [theirs](vault/tasks/2026-11-16-heme-endo-exam3-l19-l22.md). Exam 2's curve says the class arrives three to four days out (11-16/17).
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**

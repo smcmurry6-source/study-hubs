@@ -52,19 +52,20 @@ entry in `hubs.js`.
   until 11/19), the crosswords and the take-home.
 - **The mock** gives each lecture 5 questions (one per hour of class, since no count per lecture was announced), at the exam's
   pace (35 in 90 minutes): 25 now; with L21 and L22, the exam's 35 in 90 minutes (`core.json` `mock`).
-- **Figures:** Sam said yes to every candidate (2026-11-16), 22 in all (two for A, five for each of L17-L20), but the hub
-  was merged before they were done (Sam was running out of usage), so it **shipped with none**. Their drafts are in
-  `tools/figures/heme-endo-exam3/drafts/` and each one's plan is in [the figures task](../tasks/2026-11-16-heme-endo-exam3-figures.md).
-  They are anima figures: one module each in `tools/figures/heme-endo-exam3/` (`index.mjs` builds every `.mjs` there, not
-  `drafts/`; `node tools/figures/heme-endo-exam3/build.mjs` writes `content/figures.js` and `figures.css`; `preview.mjs <id>`
-  draws one on its own). Placed by `FIG_PLACE` in `content/figures.js` (the start of a heading's text at each level),
-  `figByLec` in `core.json` and a `figs` section in the lecture's Review group. Helpers and palette are Exam 2's
-  (`shared.mjs`, `makeFig`).
+- **Figures:** 22 anima figures (Sam said yes to every candidate, 2026-11-16), two for A and five for each of L17-L20, numbered
+  Fig 1-22 in lecture order; shipped 2026-11-17, after the hub ([the figures task](../tasks/done/2026-11-16-heme-endo-exam3-figures.md)
+  has each one's plan, where it went and its judgment calls). One module each in `tools/figures/heme-endo-exam3/`
+  (`index.mjs` builds every `.mjs` there; `node tools/figures/heme-endo-exam3/build.mjs` writes `content/figures.js` and
+  `figures.css`; `preview.mjs <id>` draws one on its own). Each is placed three times: `FIG_PLACE` in `content/figures.js`
+  (the start of the text of the heading, or with `end` the paragraph, it follows, at each level), `figByLec` in `core.json`
+  and the `figs` section ("Diagrams") of its lecture's Review group in `study.json`. Helpers and palette are Exam 2's
+  (`shared.mjs`, `makeFig`); each figure's CSS classes carry its own prefix (`lm-` is the lamina dura's, `ld-` the letdown's).
+  L19's and L20's follow their slides: check them against the recordings when those lectures go taught. L21 and L22 get
+  a diagram review when they go in ([diagram-review](../rules/diagram-review.md)); new figures number on from Fig 23.
 - **Narration:** `hubs/heme-endo-exam3/audio/<lecture>-full|plain|hy.mp3` with their words files
-  (`python3 tools/narrate.py heme-endo-exam3 --lec <id> --level <level> --force`). Every lecture has As taught and Plain
-  English; High yield is recorded for A only so far (the others read it in the device's voice until it is:
-  [the figures task](../tasks/2026-11-16-heme-endo-exam3-figures.md) has the step). High yield again after any change to a
-  lecture's notes, topics, hints or questions, then the content build. No Timmy Time episode yet: Sam, 2026-11-17, "wait for timmy time until we have all the lectures for exam 3" ([inbox](../tasks/inbox.md)).
+  (`python3 tools/narrate.py heme-endo-exam3 --lec <id> --level <level> --force`). Every lecture has all three levels (High
+  yield for L17-L20 recorded 2026-11-17, after the study guide's rebuild). High yield again after any change to a lecture's
+  notes, topics, hints or questions, then the content build. No Timmy Time episode yet: Sam, 2026-11-17, "wait for timmy time until we have all the lectures for exam 3" ([inbox](../tasks/inbox.md)).
 - **Quirks:** `SH_HUB` has no `exam` key on purpose: with one, the engine counts only lectures whose `exam` matches, so
   nothing would count. Lecture A's id is `dental` and its label "A".
 
@@ -98,10 +99,9 @@ No question's key depends on any of these.
 ## Pending
 
 Open tasks for this hub: `vault/tasks/` notes with `hub: heme-endo-exam3`:
-[the figures and High yield narration](../tasks/2026-11-16-heme-endo-exam3-figures.md) and
 [L19 and L20 to taught, L21 and L22 in](../tasks/2026-11-16-heme-endo-exam3-l19-l22.md). Shipped with 285 questions
 (A 58, L17 58, L18 59, L19 55, L20 55) and 53 High Likelihood topics; after the study guide (2026-11-17), 290 questions
-(L17 58, L18 60, L19 57, L20 57) and 62 topics, 260 questions High Likelihood.
+(L17 58, L18 60, L19 57, L20 57) and 62 topics, 260 questions High Likelihood; 22 figures since 2026-11-17.
 
 ## History
 

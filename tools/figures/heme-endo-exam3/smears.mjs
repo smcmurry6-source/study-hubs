@@ -1,4 +1,4 @@
-// Fig 20.3: smear look-alikes (L20 Lymphomas and Leukemias, Dr. Borak, from the slides). Six cells from the blood smears
+// Fig 20: smear look-alikes (L20 Lymphomas and Leukemias, Dr. Borak, from the slides). Six cells from the blood smears
 // the lecture describes, drawn anew as schematic cells at one scale, each with a red cell beside it for size: a lymphoblast,
 // a myeloblast with an Auer rod, an APL promyelocyte with a bundle of Auer rods, a Sézary cell with its cerebriform
 // nucleus, a CLL lymphocyte with soccer-ball chromatin beside a smudge cell, and rouleaux. Pick a cell (A to F) to enlarge
@@ -13,7 +13,7 @@ const W = 420, H = 528;
 const TS = 3.9, ZS = 6.4;                         // drawing units per micrometer: the grid, and the enlarged view (1.64x)
 const PW = 130, PH = 120, PX = [5, 145, 285], PY = [6, 134];
 const ZC = [110, 404];                            // the enlarged cell's center
-const SLOT = [372, 408, 444, 480];                // the labels' baselines in the enlarged view
+const SLOT0 = 372;                                // the first label's baseline in the enlarged view (then every 36, 54 after a two-line label)
 let seed = 20261117;
 const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 
@@ -164,7 +164,7 @@ function rouleaux() {
 /* the panels, A to F: the blasts on the top row, the mature lymphocytes and the red cells on the bottom */
 const CELLS = [lymphoblast(), myeloblast(), promyelocyte(), sezary(), cll(), rouleaux()];
 const LET = ["A", "B", "C", "D", "E", "F"];
-const CENTER = { cll: [68, 66], rl: [65, 56] };
+const CENTER = { cll: [68, 66], rl: [70, 62] };
 const NM = {
   mb: { sh: "myeloblast", nm: "Myeloblast", dz: "AML", a: "a myeloblast, the blast of AML",
     tell: "it is medium to large, with moderate cytoplasm holding granules, fine chromatin and distinct nucleoli, and it has an Auer rod, the red-blue needle that marks the blast as myeloid (Auer rods exclude ALL). Most AML needs 20 percent blasts.",
@@ -173,7 +173,7 @@ const NM = {
     tell: "it is small to medium, with a thin rim of scant cytoplasm and no granules, fine chromatin and indistinct nucleoli, and no Auer rod. ALL is the acute leukemia of young children (peak 2 to 3 years).",
     look: "a lymphoblast is small to medium, with a thin rim of cytoplasm, no granules, indistinct nucleoli and never an Auer rod." },
   pro: { sh: "promyelocyte", nm: "APL promyelocyte", dz: "APL · t(15;17)", a: "an abnormal promyelocyte of acute promyelocytic leukemia (APL)",
-    tell: "it is bigger than a myeloblast, its cytoplasm packed with large, dense pink-purple granules, and it holds a bundle of Auer rods. In APL maturation stops at the promyelocyte (t(15;17), PML::RARA), and the danger is DIC.",
+    tell: "its cytoplasm is packed with large, dense granules staining pink, red or purple, and it holds a bundle of Auer rods. In APL, maturation stops at the promyelocyte (t(15;17), PML::RARA), and the danger is DIC.",
     look: "an APL promyelocyte is packed with large, dense granules and can hold a bundle of Auer rods." },
   sz: { sh: "Sézary cell", nm: "Sézary cell", dz: "Sézary syndrome", a: "a Sézary cell",
     tell: "it is a T cell whose dark nucleus is folded on itself by deep grooves, cerebriform, like the surface of a brain, with scant cytoplasm. In the blood, with erythroderma and generalized lymphadenopathy, these cells complete Sézary syndrome's triad.",
@@ -182,7 +182,7 @@ const NM = {
     tell: "the lymphocyte is small and mature, not much bigger than a red cell, its chromatin clumped in blocks like a soccer ball or cracked mud, and the smudge cell is a fragile lymphocyte crushed flat as the smear was made. His objective stresses this look in the blood.",
     look: "a CLL cell is a small, mature lymphocyte with clumped, soccer-ball chromatin, with smudge cells around it." },
   rl: { sh: "rouleaux", nm: "Rouleaux", dz: "plasma cell myeloma", a: "rouleaux, red cells stacked like coins",
-    tell: "there is no white cell here at all: the red cells stick together in stacks because myeloma's large amount of monoclonal immunoglobulin makes them stick. Look for the M-spike and CRAB with it.",
+    tell: "there is no white cell here at all. The red cells stack like coins because the large amount of monoclonal immunoglobulin protein in myeloma makes them stick together. Look for the M-spike and CRAB with it.",
     look: "rouleaux are red cells stacked like coins, not a white cell." },
 };
 const GUESS = [["pro", "APL promyelocyte"], ["cll", "CLL cell + smudge cell"], ["lb", "Lymphoblast"], ["mb", "Myeloblast"], ["rl", "Rouleaux"], ["sz", "Sézary cell"]];
@@ -194,7 +194,8 @@ const PANELS = CELLS.map((c, i) => {
   /* enlarged: one layer per part, and the labels' slots in order of height so the leaders don't cross */
   const zx = ZC[0] + (c.k === "cll" ? 8 : 0), zy = ZC[1];
   const labeled = c.layers.map((l, j) => [j, l]).filter(([, l]) => l.lab).sort((a, b) => a[1].p[1] - b[1].p[1]);
-  const slot = {}; labeled.forEach(([j], m) => { slot[j] = SLOT[m + (labeled.length <= 2 ? 1 : 0)]; });
+  const slot = {}; let sy = SLOT0 + (labeled.length <= 2 ? 36 : 0);
+  labeled.forEach(([j, l]) => { slot[j] = sy; sy += 36 + (l.lab.length > 1 ? 18 : 0); });
   const z = c.layers.map((l, j) => ({ svg: draw(l.shapes, zx, zy, ZS), q: l.q, n: l.n, lab: l.lab || null,
     p: l.p ? [f1(zx + l.p[0] * ZS), f1(zy + l.p[1] * ZS)] : null, y: slot[j] || 0 }));
   return { x: x0, y: y0, th, z, k: c.k };
@@ -219,11 +220,11 @@ function srRender(st, D) {
     P = D.PAN[i]; g = st.done[i]; rev = st.all || !!g; on = i === st.c; nm = D.NM[P.k];
     inner = '<rect class="sr-bg' + (on ? " is-on" : "") + '" x="' + P.x + '" y="' + P.y + '" width="130" height="120" rx="10"/>' + P.th +
       '<rect class="sr-tag' + (on ? " is-on" : "") + '" x="' + (P.x + 6) + '" y="' + (P.y + 6) + '" width="21" height="21" rx="5"/>' + T(P.x + 16.5, P.y + 21.5, D.LET[i], "b sr-tagt" + (on ? " is-on" : ""), "middle");
-    if (rev) inner += T(P.x + 65, P.y + 112, nm.sh, "s " + (g ? (g === P.k ? "ok" : "bad") : "b"), "middle");
+    if (rev) inner += T(P.x + (g ? 59 : 65), P.y + 112, nm.sh, "s " + (g ? (g === P.k ? "ok" : "bad") : "b"), "middle");
     if (g) inner += srMark(P.x + 118, P.y + 107, g === P.k);
     o += HOT(rev ? "Cell " + D.LET[i] + ": " + nm.nm + " (" + nm.dz + ")." : "Cell " + D.LET[i] + ", drawn at the same scale as the other five; the pink disc is a red cell, for size. Pick " + D.LET[i] + " under the drawing to enlarge it.", inner);
   }
-  o += T(210, 273, "one scale for all six · pink disc = a red cell", "s mut", "middle");
+  o += T(210, 273, "one scale for all six · corner disc = a red cell", "s mut", "middle");
   /* the picked cell, enlarged */
   P = D.PAN[st.c]; g = st.done[st.c]; rev = st.all || !!g; nm = D.NM[P.k];
   o += '<rect class="sr-zm" x="5" y="284" width="410" height="240" rx="12"/>';
@@ -233,7 +234,7 @@ function srRender(st, D) {
   if (rev) {
     o += T(222, 304, nm.nm, "b", "start") + T(222, 320, nm.dz, "s mut", "start");
     if (g) { o += srMark(404, 300, g === P.k); if (g !== P.k) o += T(222, 336, "you said " + D.NM[g].sh, "s bad", "start"); }
-    P.z.forEach(function (l) { if (l.lab) { o += L(222, l.y, l.lab[0], l.p[0], l.p[1], "start", "b"); if (l.lab[1]) o += T(222, l.y + 14, l.lab[1], "b", "start"); } });
+    P.z.forEach(function (l) { if (l.lab) { o += L(222, l.y, l.lab[0], l.p[0], l.p[1], "start", "b"); if (l.lab[1]) o += T(222, l.y + 18, l.lab[1], "b", "start"); } });
   } else {
     o += T(222, 352, "What is it?", "b", "start");
     ["Size: set it against", "the red cell.", "Cytoplasm: how much?", "Granules? Needles?", "Nucleus: fine or", "clumped? Nucleoli?"].forEach(function (s, j) { o += T(222, 378 + j * 17, s, "s mut", "start"); });
@@ -257,7 +258,7 @@ export default function smears() {
   };
   const btn = (k, v, s, aria) => `<button type="button" class="am-btn" data-amk="${k}" data-amv="${v}"${aria ? ` aria-label="${aria}"` : ""}>${s}</button>`;
   return makeFig({
-    id: "smears", lec: "lymleuk", fig: "Fig 20.3", short: "Smear look-alikes", hint: "pick · name · hover",
+    id: "smears", lec: "lymleuk", fig: "Fig 20", short: "Smear look-alikes", hint: "pick · name · hover",
     title: "Smear look-alikes",
     caption: "Six cells from the blood smears in Dr. Borak's lecture, drawn at one scale beside a red cell. Pick a cell, name it, and see what gives it away.",
     W, H,
@@ -303,6 +304,7 @@ export default function smears() {
 .anima .smears-svg .sr-okc{fill:var(--bx-stim)}
 .anima .smears-svg .sr-noc{fill:var(--bx-inhib)}
 .anima .smears-svg .sr-okm,.anima .smears-svg .sr-nom{fill:none;stroke:var(--surface);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:560px){.anima .smears-svg .t{font-size:14px}.anima .smears-svg .t.s,.anima .smears-svg .t.sr-tagt{font-size:13.6px}}
 `,
   });
 }

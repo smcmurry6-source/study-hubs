@@ -132,11 +132,11 @@ function smRender(st, D) {
   o += HOT("The brain, front view. Estrogen's negative feedback acts on the hypothalamus and pituitary; that brake is what holds LH and FSH down.",
     '<path class="sm-brain" d="' + D.BRAIN + '"/><path class="sm-gyr" d="' + D.GYR + '"/>');
   o += HOT(D.CARD.ov.info + " " + g.name + ": " + fx.ov.info,
-    '<ellipse class="sm-tis ' + cls("ov") + '" cx="123" cy="113" rx="7" ry="4.4"/><path class="sm-stalk" d="M124 117L125.5 121"/><circle class="sm-pit" cx="126" cy="125" r="4.2"/>');
+    '<ellipse class="sm-tis ' + cls("ov") + '" cx="122" cy="113" rx="7" ry="4.4"/><path class="sm-stalk" d="M122 117.4V121"/><circle class="sm-pit" cx="122" cy="125" r="4.2"/>');
   /* the LH and FSH monitor */
   var amp = { lo: 5, n: 12, hi: 21 }[g.lhfsh];
-  o += HOT("LH and FSH pulses from the pituitary. " + { lo: "Smaller here: estrogen's feedback holds them down.", n: "Ordinary pulses: ovulation isn't inhibited.", hi: "Larger here: clomiphene blocks estrogen's negative feedback, so the pulses grow and drive the ovary to ovulate." }[g.lhfsh],
-    '<path class="sm-probe" d="M121 127L90 112"/><rect class="sm-mon" x="12" y="74" width="78" height="52" rx="7"/><path class="sm-base" d="M18 119H84"/>' +
+  o += HOT("LH and FSH pulses from the pituitary. " + { lo: "Smaller here: estrogen's feedback holds them down.", n: "Not held down the way estradiol holds them: ovulation isn't inhibited (a minus on his table).", hi: "Larger here: clomiphene blocks estrogen's negative feedback, so the pulses grow and drive the ovary to ovulate." }[g.lhfsh],
+    '<path class="sm-probe" d="M118.1 123.4L90 112"/><rect class="sm-mon" x="12" y="74" width="78" height="52" rx="7"/><path class="sm-base" d="M18 119H84"/>' +
     '<path class="sm-trace ' + cls("ov") + 't" d="' + smTrace(amp, t, 18, 84, 119) + '"/>' + T(18, 87, "LH, FSH", "sm-xs sm-bold sm-ink", "start"));
   /* breasts */
   var bon = fx.br.s === "+";
@@ -159,7 +159,7 @@ function smRender(st, D) {
     else if (g.ovy === "one") fol += '<circle class="sm-fol" cx="' + f1(c[0] - 4.5) + '" cy="' + f1(c[1] + 1.5) + '" r="1.4"/><circle class="sm-fol sm-big" cx="' + f1(c[0] + 2.5) + '" cy="' + f1(c[1] - 0.5) + '" r="3.4"/>';
     else fol += '<circle class="sm-fol sm-big" cx="' + f1(c[0] + (j ? -3 : 3)) + '" cy="' + f1(c[1] - 1) + '" r="4.4"/><circle class="sm-fol sm-big" cx="' + f1(c[0] + (j ? 4.2 : -4.2)) + '" cy="' + f1(c[1] + 1.2) + '" r="3"/>';
   });
-  o += HOT("The ovaries. " + { quiet: "Only small follicles: with LH and FSH held down, none matures to ovulate.", one: "One follicle matures as in an ordinary cycle: ovulation isn't inhibited.", eggs: "With larger LH and FSH pulses the ovaries are driven to ovulate, and more than one egg can be released: twins, triplets, even quadruplets. Ovarian cysts are the other adverse effect." }[g.ovy], fol);
+  o += HOT("The ovaries. " + { quiet: "Only small follicles: with LH and FSH held down, none matures to ovulate.", one: "A follicle can still mature: the drug doesn't inhibit ovulation the way estradiol does (a minus on his table).", eggs: "With larger LH and FSH pulses the ovaries are driven to ovulate, and more than one egg can be released: twins, triplets, even quadruplets. Ovarian cysts are the other adverse effect." }[g.ovy], fol);
   if (g.ovy === "eggs") {
     var EP = [[[166, 296.5], [173, 293], [166, 288], [156, 287.5], [146, 291], [141, 295]], [[78, 296.5], [71, 293], [78, 288], [88, 287.5], [98, 291], [103, 295]]];
     EP.forEach(function (p, j) { var u = t ? ((t / 5200 + j * 0.45) % 1) : 0.42 + j * 0.2, q = smAt(p, u), op = Math.min(1, u / 0.1, (1 - u) / 0.1);
@@ -221,7 +221,7 @@ function smSay(st, D) { var g = D.DRUGS[st.d]; return [g.say, g.ro]; }
 
 /* ---------- the drugs, from his summary table and his slides on each SERM ---------- */
 const CARD = {
-  ov: { name: "OVULATION", to: [131, 113], info: "Ovulation: the hypothalamus and pituitary send LH and FSH to the ovary, and estrogen's negative feedback holds them down." },
+  ov: { name: "OVULATION", to: [129, 113], info: "Ovulation: the hypothalamus and pituitary send LH and FSH to the ovary, and estrogen's negative feedback holds them down." },
   br: { name: "BREAST CELLS", to: [161, 202], info: "Breast cell proliferation: estrogen stimulates it, and ER-positive breast cancer grows on it." },
   li: { name: "SERUM LIPIDS", to: [151, 241], info: "Serum lipids, drawn at the liver: estrogen raises HDL, unlike testosterone, which lowers it." },
   ut: { name: "UTERINE LINING", to: [134, 305], info: "Uterine cell proliferation: estrogen grows the uterine muscle and develops the lining (endometrium)." },
@@ -277,7 +277,7 @@ export default function sermmap() {
     INIT: { d: 1 }, STEPKEY: "d", STEPMAX: 3, PLAYMS: 4200,
   });
   return makeFig({
-    id: "sermmap", lec: "sexster", fig: "Fig 3", short: "The SERM map", hint: "pick · hover",
+    id: "sermmap", lec: "sexster", fig: "Fig 11", short: "The SERM map", hint: "pick · hover",
     title: "One drug, different tissues: the SERM map",
     caption: "Estradiol and the three SERMs on the five tissues of his summary table. Estrogen's two receptors, ER-alpha and ER-beta, sit at different levels in each tissue, so one drug can act like estrogen in one and against it in another. Pick a drug.",
     W: 480, H: 622,
@@ -287,7 +287,7 @@ export default function sermmap() {
       `<button type="button" class="am-btn" data-amplay aria-pressed="false">Play</button></div>`,
     sources: [
       "From the L18 notes (Dr. Fasinu, recording and slides): estrogen's two receptor subtypes, ER-alpha and ER-beta, with differential tissue expression; his SERM summary table (estradiol, tamoxifen, raloxifene, clomiphene; a plus for the same effect as estradiol, a minus for the opposite) for ovulation, breast cell proliferation, uterine cell proliferation, bone density and serum lipids; tamoxifen as a breast antagonist and uterine agonist for ER-positive breast cancer only (about 50 percent response), with his figure's lower LDL and stronger bones; raloxifene for postmenopausal osteoporosis, high affinity for both receptors, no endometrial or breast tumor proliferation, and a 2- to 3-fold rise in DVT and PE; clomiphene as a weak agonist and strong antagonist that opposes estrogen's negative feedback, so the LH and FSH pulses grow larger, in women with an intact axis, with multiple births and ovarian cysts; estrogen's effects on HDL and on PTH-mediated bone resorption. The rarely used SERMs on his table (toremifene, ospemifene, bazedoxifene, fulvestrant) are left out, as he said.",
-      "Where his words and the slides differ, the figure follows the notes: he said clomiphene is a weak agonist at ER-alpha and a strong antagonist at ER-beta, while his slide doesn't assign the subtypes (and standard texts call it a mixed agonist-antagonist without that split), so no subtype is drawn for it. His effects slide says estrogen slightly raises LDL while his hormone therapy figure says it lowers it; the lipid cards name only HDL for estradiol and his tamoxifen figure's LDL for tamoxifen.",
+      "Where his words and the slides differ, the figure follows the notes: he said clomiphene is a weak agonist at ER-alpha and a strong antagonist at ER-beta, while his slide doesn't assign the subtypes (and standard texts call it a mixed agonist-antagonist without that split), so no subtype is drawn for it. The ovulation column is his table's comparison with estradiol: a drug with a minus there doesn't inhibit ovulation. Raloxifene is given after menopause, so its ovaries show the table's comparison, not a postmenopausal woman's own ovaries. His effects slide says estrogen slightly raises LDL while his hormone therapy figure says it lowers it; the lipid cards name only HDL for estradiol and his tamoxifen figure's LDL for tamoxifen.",
       "For accuracy of the drawing (outside sources, for how it looks and behaves, not for what is labeled): organ positions follow a standard front view of the female body and pelvis (uterus with its tubes, the ovaries beside it, the femoral heads in the hips); the endometrium is drawn thicker and glandular under estrogen's proliferative effect and thin without it, and the trabeculae at the top of the femur (where osteoporotic hip fractures happen) thin out where bone density falls, as in histology and bone texts (Ross and Pawlina, Histology; Katzung's Basic and Clinical Pharmacology, the SERM and estrogen chapters). The LH and FSH trace is qualitative: pulse heights only say smaller, ordinary or larger.",
       "Schematic and not to scale: the uterus, ovaries and breast lobules are enlarged, and the bone is a magnified sample, not a measured density. Educational, not medical advice.",
     ],
