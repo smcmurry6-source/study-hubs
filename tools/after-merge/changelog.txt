@@ -26,3 +26,4 @@ perio | New: Stage & Grade, a staging and grading game at the top of the Questio
 all | Matching questions now pay like the others: 10 XP the first time you get one right (they gave a flat 2).
 all | Tap "Updated" on a hub's card on the dashboard to see what's new: the last few changes to that hub and the site.
 all | The dashboard's hub recap now plays its bar graph once and then stays still while you scroll, until you open another hub's recap.
+perio | The question bank was checked against Dr. Abou-Arraj's final exam hints: 111 questions got clearer stems or better explanations, two repeats came out, and eight are new, three of them on suture materials (what the final asks about sutures).
