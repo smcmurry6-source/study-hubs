@@ -38,6 +38,14 @@ entry in `hubs.js`.
   from their slides only (taught Tue 11/17): their `status` is `slides`, a `note` under the title says so, and they have no
   hints yet. **L21 and L22 aren't in the hub yet**: their slides weren't posted when it was built. Both are
   [a task](../tasks/2026-11-16-heme-endo-exam3-l19-l22.md).
+- **Dr. Herr's Exam 3 study guide** (Sam, 2026-11-17: no in-class review; the guide is "very indicative" and "everything on the study
+  guide should be high likelihood questions"; Drive, Exam 3 folder, `Exam 3 Study Guide (1).docx`): a focus list and key terms for
+  each of L17-L22, nothing for Lecture A. Each lecture's Exam Hints open with its list (a `focus` hint, the guide's words, then the
+  hub's take), and every question on a guide item is in a `likelyTopics` entry with basis "study guide + ...", ranked first;
+  topics from a recorded hint that the guide doesn't list (L17's fertilization, implantation, capacitation, the maternal hormones)
+  stay High Likelihood, ranked after. Five questions were written for the thinner items (`hi-sg-platelets`, `hi-tf-sg-neut`,
+  `ll-sg-classify`, `ll-num-sg-leuk`, `ea-sg-pop`). L21 and L22's lists are in [their task](../tasks/2026-11-16-heme-endo-exam3-l19-l22.md):
+  they become those lectures' focus hints and topics when the lectures go in. Lecture A's topics weren't changed, and stay that way (Sam: "lecture a shouldnt be ranked lower").
 - **Sources:** Drive, "Hematology and Endocrinology" → "Hubs" → "Exam 3" (L17-L20's slides and the two transcripts), and the
   course's learning objectives ("Exam 1" folder). **Not used**, by the [graded-coursework](../rules/graded-coursework.md) rule:
   the Exam 3 Anki deck in that folder (a previous year's practice questions), everything in "Resources from D3s", Quiz 4 (open
@@ -92,7 +100,8 @@ No question's key depends on any of these.
 Open tasks for this hub: `vault/tasks/` notes with `hub: heme-endo-exam3`:
 [the figures and High yield narration](../tasks/2026-11-16-heme-endo-exam3-figures.md) and
 [L19 and L20 to taught, L21 and L22 in](../tasks/2026-11-16-heme-endo-exam3-l19-l22.md). Shipped with 285 questions
-(A 58, L17 58, L18 59, L19 55, L20 55) and 53 High Likelihood topics.
+(A 58, L17 58, L18 59, L19 55, L20 55) and 53 High Likelihood topics; after the study guide (2026-11-17), 290 questions
+(L17 58, L18 60, L19 57, L20 57) and 62 topics, 260 questions High Likelihood.
 
 ## History
 

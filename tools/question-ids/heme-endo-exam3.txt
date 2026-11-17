@@ -285,3 +285,8 @@ ll-amol-case
 ll-ball-case
 ll-tf-tall-look
 ll-num-secondary
+hi-sg-platelets
+hi-tf-sg-neut
+ll-sg-classify
+ll-num-sg-leuk
+ea-sg-pop
