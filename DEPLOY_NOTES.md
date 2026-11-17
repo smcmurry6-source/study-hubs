@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-17 (The large text sizes on a phone: the tab bar and the journeys' scenes, Claude Code, #PRNUM)** — The inbox's 320px
+- **2026-11-17 (The large text sizes on a phone: the tab bar and the journeys' scenes, Claude Code, #397)** — The inbox's 320px
   line (BUG-161). The size setting zooms the page (`html` `zoom`, 1.45 at XX-Large), so a phone lays out in about 220-270px.
   `widget/hub.css`: under 290px of bar (`@container hxbar`) the four tabs take their labels' widths at 11px instead of equal
   widths ("Questions" was wider than its tab on any phone at XX-Large). `widget/journeys.js`: `vw`/`vh` don't follow the zoom,
