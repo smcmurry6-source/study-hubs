@@ -4,9 +4,10 @@
 # migration is tested with everything else. When one is applied (through the connector or the SQL editor), append it to
 # supabase/schema.sql and take its line out of this file, in the same PR.
 #
-# None waiting. migration_v54 to migration_v58 were applied at the redesign's release and are in supabase/schema.sql,
+# migration_v54 to migration_v58 were applied at the redesign's release and are in supabase/schema.sql,
 # below its "the redesign's release" marker (tools/release/xp.js still tests the moment they were applied: pg.js).
 # migration_v59 (Learn's and Flashcards' sections, Learn's answer context) was applied on 2026-11-16 (PR #381).
 # migration_v60 (the survey and check-in reward) was applied on 2026-11-17 (PR #387).
 # migration_v61 (the reward at 1,000 XP, with the top-up) was applied on 2026-11-17 (PR #388).
 # migration_v62 (the boosts' prices; a boost bought during a medal's double XP waits its turn) was applied on 2026-11-17 (PR #394).
+migration_v63.sql

@@ -12,8 +12,8 @@
    - the cabinet: Won by studying, The journeys, Secrets (27 trophies, 16 of them secret: shRanks.TROPHIES on the
      redesign) and, only for someone who earned it, Full Arch on a shelf of its own, "Full Arch (retired)".
    A trophy won: its drawing, lit. Not won: dimmed, with what earns it. A secret not found: its silhouette and its
-   riddle, never its name (not in the page, not in a label). Bowling is won on this device (sh_bowl_trophy) and the
-   server has no share for it. Mounting again on the same element redraws it and keeps the trophy picked.
+   riddle, never its name (not in the page, not in a label). Bowling is won on a device (sh_bowl_trophy), counted here at once,
+   and sent to the server by widget/v3.js (migration_v63), which gives it its share once it has one. Mounting again on the same element redraws it and keeps the trophy picked.
    options = { profile (the rank profile, v2 or not; badges are the trophies won), stats (kind -> { n, total }; read
    with shRanks.trophyStats when left out), sb (a Supabase client for that), onBoards (shows a Leaderboards button) }.
    Every button carries a fixed data-sht value first, so click counts never record which trophy was tapped. */

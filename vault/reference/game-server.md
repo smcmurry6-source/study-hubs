@@ -59,8 +59,9 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
 - **Boosts** (`xp_boosts`): never more than 2x at once, whatever is running; a new medal restarts its 24 hours; a shop boost's
   time goes after every boost running or waiting (`migration_v62.sql`): it extends the last one when that's a shop boost, and
   otherwise starts now, or when a medal's 24 hours end, so bought double XP never runs under a medal's and doubles nothing.
-  `sh_boost_json`'s `until` runs on through a shop boost waiting right after the running ones. (A medal won *during* a shop
-  boost still runs over the rest of it: [inbox](../tasks/inbox.md).) The shop's boosts cost 150 (1 hour, Common) and 400
+  `sh_boost_json`'s `until` runs on through a shop boost waiting right after the running ones. A medal won *during* a shop
+  boost moves the rest of it to after the medal's 24 hours (`sh_boost_bump`, called by `sh_medal_check`, `migration_v63.sql`;
+  the medal's `boost_until` then says when the moved boost ends). The shop's boosts cost 150 (1 hour, Common) and 400
   crowns (3 hours, Uncommon) since v62, priced against how fast crowns come (a median study day, about 95). Medal, report, survey and check-in awards aren't boosted; answers, the day's bonuses, mocks and games are.
 - **Every award is a row** (`xp_awards`, unique per visitor and key), and `answer_xp` keeps each v2 answer's request id and
   result, so a replayed call returns the first result and pays nothing, and another visitor reusing the request id is
@@ -311,7 +312,7 @@ client follows the server in all of them. A new case: stop and tell Sam.
 | `buy_item` sells a snack at 100 HP | The shop greys it out ("He's full") |
 | `get_my_shop` says which seasons are on sale, not until when | A season's shelf says "Limited time", with no countdown |
 | `sh_wallet` counts every badge kind that isn't `mastery-`, `dark-seen-` or `pet-adopt` as a trophy (+25) | The client records no new badge kinds except real trophies |
-| `record_achievement` takes only the kinds it lists; `bowling` isn't one | The Bowling trophy and the clips seen are kept on the device; the kind is added in the first migration after the release ([the rank sets](../tasks/2026-11-12-redesign-later-journeys-rank-sets.md)) |
+| `record_achievement` takes only the kinds it lists (`bowling` since `migration_v63.sql`) | The clips seen are kept on the device; the Bowling trophy is won on the device (`sh_bowl_trophy`) and `widget/v3.js` sends it once (`sh_bowl_trophy_sent`), when it's won on a hub or at the next hub page load: then it pays its 25 crowns and has a class share |
 | Nothing pays XP for a bowling clip | No XP for it |
 | Rank items exist for tiers 1 to 6 only | The ModuPro's and the Loupes' sets come after the release, in a new migration |
 | `post_idea` takes the sources `board`, `suggest` and `checkin` | An idea Timmy drafts (Ask Timmy, part 2) posts as `board` |

@@ -1704,6 +1704,19 @@
     /* a mock's answers go out together; its session is finished only once they have all arrived (finishSession) */
     if (d.session) (gamePending[d.session] = gamePending[d.session] || []).push(p);
   }
+  /* the bowling egg's secret trophy: widget/bowling.js keeps it on the device that saw all eight clips (sh_bowl_trophy);
+     the server takes the kind since migration_v63, so it is sent once, when it is won or at the next page load (the
+     trophy then pays its 25 crowns and counts in the class's share). sh_bowl_trophy_sent marks it sent. */
+  function sendBowlTrophy(){
+    try { if (!supabase || !localStorage.getItem("sh_bowl_trophy") || localStorage.getItem("sh_bowl_trophy_sent")) return; } catch (e) { return; }
+    try {
+      supabase.rpc("record_achievement", { p_visitor: VISITOR_ID, p_kind: "bowling", p_hub: HUB || "" }).then(function(res){
+        if (res && !res.error) try { localStorage.setItem("sh_bowl_trophy_sent", "1"); } catch (e) {}
+      }, function(){});
+    } catch (e) {}
+  }
+  document.addEventListener("sh:bowl-trophy", sendBowlTrophy);
+  setTimeout(sendBowlTrophy, 5000);
   /* for the engine: is the game layer there, the running boost, and a mock's session (the server pays a mock's
      answers and its +50 only inside one, and saves the mock's score itself when it is finished) */
   window.shGame = {
