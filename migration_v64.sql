@@ -10,6 +10,12 @@
 -- the student's word and paid as a self-graded answer (a flat 2), as a matching item was until now. That is a page cached
 -- before this change answering a matching item after its key became 'order'; without this it would be recorded as wrong.
 -- Everything else in the function is exactly as v59 wrote it.
+--
+-- And Perio's arcade gets a seventh game, Stage & Grade ('stage', Sam: "add an interactive visualization/game for staging
+-- and grading ... accessible on the home of perio hub, top of the question bank, and in the arcade"): submit_arcade_score
+-- and sh_session_start take its id, so its scores reach the class board and a finished game pays its +50 like the others.
+-- Both functions are otherwise exactly as they were (submit_arcade_score from migration_v40's list, sh_session_start
+-- from v54).
 
 create or replace function public.sh_answer(p_at timestamptz, p_visitor text, p_hub text, p_qid text, p_choice integer,
   p_picks integer[], p_self boolean, p_v text, p_ctx text, p_request text, p_session uuid, p_claim boolean)
@@ -146,3 +152,38 @@ begin
 end;
 $$;
 revoke all on function public.sh_answer(timestamptz, text, text, text, integer, integer[], boolean, text, text, text, uuid, boolean) from public, anon, authenticated;
+
+-- ---------- the arcade's games: Perio's Stage & Grade ('stage', v64) ----------
+create or replace function public.submit_arcade_score(p_visitor text, p_hub text, p_game text, p_score integer)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if p_visitor is null or length(trim(p_visitor)) = 0 then return; end if;
+  if p_game not in (
+    'sort', 'snake', 'stack', 'match', 'hangman', 'fact', 'blaster', 'search', 'whack',          -- msk-exam3 Bone Zone Arcade
+    'flappy', 'crusher', 'probe', 'quadrants', 'perdle', 'planer', 'smile', 'sweeper', 'cross',  -- perio Pocket Arcade
+    'board', 'cloze', 'escape',                                                                  -- shared games (widget/games.js, migration_v40)
+    'stage'                                                                                      -- perio Stage & Grade (v64)
+  ) then return; end if;
+  if p_score is null or p_score < 1 or p_score > 200000 then return; end if;
+  if exists (select 1 from arcade_scores where visitor_id = p_visitor and hub = coalesce(p_hub, '') and game = p_game
+             and played_at > now() - interval '10 seconds') then return; end if;
+  insert into arcade_scores (hub, game, visitor_id, score) values (coalesce(p_hub, ''), p_game, p_visitor, p_score);
+end;
+$$;
+
+create or replace function public.sh_session_start(p_at timestamptz, p_visitor text, p_hub text, p_kind text, p_game text)
+returns uuid language plpgsql security definer set search_path = public as $$
+declare v_at timestamptz := coalesce(p_at, clock_timestamp()); sid uuid;
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 or p_hub is null or p_hub !~ '^[a-z0-9][a-z0-9-]{0,39}$'
+     or p_kind not in ('mock', 'arcade') then return null; end if;
+  if p_kind = 'arcade' and coalesce(p_game, '') not in (
+    'sort', 'snake', 'stack', 'match', 'hangman', 'fact', 'blaster', 'search', 'whack',
+    'flappy', 'crusher', 'probe', 'quadrants', 'perdle', 'planer', 'smile', 'sweeper', 'cross',
+    'board', 'cloze', 'escape', 'stage') then return null; end if;   -- the games submit_arcade_score takes
+  if (select count(*) from xp_sessions where visitor_id = p_visitor and started_at > v_at - interval '1 day') >= 200 then return null; end if;
+  insert into xp_sessions (visitor_id, hub, kind, game, started_at)
+    values (p_visitor, p_hub, p_kind, case when p_kind = 'arcade' then p_game end, v_at) returning id into sid;
+  return sid;
+end;
+$$;
