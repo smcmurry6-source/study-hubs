@@ -2001,11 +2001,12 @@ setInterval(function(){
 var r = READ, now = Date.now(); if (!r) return;
 if (view === "notes" && STATE.ui.lec === r.lec && document.visibilityState === "visible") r.active += Math.min(now - r.last, 6000);
 r.last = now;
+if (r.wait && r.active >= r.need && isRead(r.lec)) { if (LBY[r.lec]) readClaim(LBY[r.lec]); }
 }, 5000);
 function readClaim(lec){
 var r = READ, G = window.shGame;
 if (!r || r.lec !== lec.id || !r.id || !G || !G.claim) return;
-if (r.active < r.need) { toast("Notes done. The +" + G.prizes.notes + " XP and crowns come with reading a lecture through, not jumping to the end."); return; }
+if (r.active < r.need) { if (!r.wait) toast("Notes done. Keep reading: the +" + G.prizes.notes + " XP and crowns come once you've had time to read it through."); r.wait = true; return; }
 READ = null;
 G.claim("notes_done_v2", { p_visitor: ls("sh_visitor_id"), p_read: r.id }, "notes");
 }
