@@ -240,7 +240,7 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-news { margin-top: auto; }
 .dx-news > summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; list-style: none; cursor: pointer; min-height: 32px; }
 .dx-news > summary::-webkit-details-marker { display: none; }
-.dx-news-cta { display: inline-flex; align-items: center; gap: 2px; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--hub); }
+.dx-news-cta { display: inline-flex; align-items: center; gap: 2px; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--hub-text, var(--hub)); }
 .dx-news-cta svg { transform: rotate(90deg); transition: transform 200ms ease; }
 .dx-news[open] .dx-news-cta svg { transform: rotate(-90deg); }
 .dx-news > summary:focus-visible { outline: 2px solid var(--hub); outline-offset: 2px; border-radius: 6px; }
