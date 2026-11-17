@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-17 (two inbox to-dos, notes and the schema record only, Claude Code, #PR)** — `supabase/schema.sql` checked
+- **2026-11-17 (two inbox to-dos, notes and the schema record only, Claude Code, #401)** — `supabase/schema.sql` checked
   against the live database by hash: every difference was text only. With comments, line endings, layout and the secret
   left out, only three functions differed: `get_display_name` (laid out on four lines live) and `get_nuke_by_hub` and
   `get_nuke_recent` (column labels live, which change nothing in a `returns table` function). The file now matches live,

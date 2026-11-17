@@ -472,7 +472,7 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
   the 2x chip; the rare costume of the day. `migration_v54.sql` unchanged, and nothing in it disagreed with the client.
   What it built, the tests and what's left: phase 4's Log (the hand-off for session 3). Screenshots and a recording sent
   to Sam. Found and fixed while testing: BUG-098 to BUG-104 ([the bug log](../../release/bug-log.md)).
-- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #PR): the client ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345))
+- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #401): the client ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345))
   shipped with the release; no price was on "Prices to change after the release". Nothing left.
 
 ## Outcome

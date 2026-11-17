@@ -287,7 +287,7 @@ and the pill takes the server's total when the reply comes; no request is added 
     and the About entries are boxes and drafts in [the release note](2026-11-06-redesign-release.md) ("From phase 4,
     part A"); the admin page's resolve control and the About page are this note's own open boxes; Timmy's place past
     125,000 is [part C](2026-11-06-redesign-timmys-place.md)'s.
-- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #PR): what part A left (the arcade's +50, Timmy Time's
+- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #401): what part A left (the arcade's +50, Timmy Time's
   minutes, the journey trophies in the case, the About entries) shipped with the release; the scenes stay silent (the
   site has no sound setting). Nothing left.
 

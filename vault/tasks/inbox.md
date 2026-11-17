@@ -75,7 +75,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   when there is no `ANTHROPIC_API_KEY`. If Sam saves the key again under `ANTHROPIC_API_KEY` (Supabase, Edge Functions,
   Secrets), the fallback line in `supabase/functions/timmy/index.ts` can come out. The admin page's Ask Timmy tab also
   shows the release's test chat (visitor `release-check-2026-11-14`, one failed and one answered question, $0.60).
-- [x] **The redesign's other task notes are still open** (2026-11-14; done 2026-11-17, #PR): [phase 2](done/2026-11-05-redesign-phase-2-live-hubs.md),
+- [x] **The redesign's other task notes are still open** (2026-11-14; done 2026-11-17, #401): [phase 2](done/2026-11-05-redesign-phase-2-live-hubs.md),
   [phase 3](done/2026-11-05-redesign-phase-3-dashboard.md), [phase 4](done/2026-11-05-redesign-phase-4-game-layer.md),
   [the journeys](done/2026-11-06-redesign-progression-journeys.md), [the shop](done/2026-11-06-redesign-timmy-shop.md) and
   [Timmy's place](done/2026-11-06-redesign-timmys-place.md) are ticked, given their Outcome and moved to `done/`: all of
@@ -88,7 +88,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   dashboard and the hubs) is wider than the screen: its close button and the ends of its lines are cut off. Fix both in
   `widget/dash.css` and the reply pop-up's styles, rebuild the bundles, and check at 320 px, Large to XX-Large.
 - [x] **`supabase/schema.sql` against the live database's text** (2026-11-14, the release's look before the migrations;
-  done 2026-11-17, #PR). Every difference was text only. With comments, line endings, layout and the secret left out,
+  done 2026-11-17, #401). Every difference was text only. With comments, line endings, layout and the secret left out,
   all but three functions already matched. `get_display_name` was laid out on four lines live and one in the file.
   `get_nuke_by_hub` and `get_nuke_recent` have column labels live (`as hub`, `as display_name`), which change nothing in
   a `returns table` function. The file now has those, and `question_flags_visitor_idx` (migration_v25; its twin on

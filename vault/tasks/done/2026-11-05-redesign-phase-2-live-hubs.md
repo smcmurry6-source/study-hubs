@@ -107,7 +107,7 @@ Build new versions of **Heme & Endo Exam 2 and Perio** on `widget/hub.js`, with 
   the live hubs). Then Sam approved the redrawn Pocket Showdown board ("yes the redraw is good"), so all six lobby drawings
   are in, in the same PR. **Both new versions are approved** (Heme & Endo #312, Perio #314). **Next step for this task:**
   the [release](2026-11-06-redesign-release.md); this note goes to `done/` with its Outcome when the release ships.
-- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #PR): every box met; nothing left.
+- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #401): every box met; nothing left.
 
 ## Outcome
 

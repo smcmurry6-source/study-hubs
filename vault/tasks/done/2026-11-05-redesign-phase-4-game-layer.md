@@ -540,7 +540,7 @@ These hold for each spec; a spec only adds to them.
 - 2026-11-13 (Claude Code): every session in "From here to the release" is merged, and the switch PR is built and waiting for
   Sam's "merge" ([the release](2026-11-06-redesign-release.md), "The merge, step by step"). What this phase left for it is
   ticked there or in [the inbox](../inbox.md).
-- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #PR): every session in "From here to the release" merged and shipped; nothing left.
+- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #401): every session in "From here to the release" merged and shipped; nothing left.
 
 ## Outcome
 

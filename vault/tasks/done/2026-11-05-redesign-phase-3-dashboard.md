@@ -241,7 +241,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   [the idea board's note](2026-11-06-idea-board.md).
 - 2026-11-12: the idea board merged ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324), `728279c`), so this
   note no longer waits on it. Left here: BUG-076 (open, S4) and the About entries at the release.
-- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #PR): the About entries went on the page with the
+- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #401): the About entries went on the page with the
   release. BUG-076 is still there on the live dashboard (measured on the preview's made-up data: at 320 px with XX-Large
   the page scrolls 49 px sideways, the week's dots 48 px past the edge and "Start studying" 2 px; at X-Large 10 px), and a
   report-reply pop-up has its close button off the screen at that size; both are one to-do in the [inbox](../inbox.md).

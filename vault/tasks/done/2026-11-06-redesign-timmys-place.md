@@ -281,7 +281,7 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
   - **The shop's link** in the customizer and snack HP: [the shop](2026-11-06-redesign-timmy-shop.md), session 2.
   - **The later journeys' rank sets**: after the release, in a new migration
     ([their note](../2026-11-12-redesign-later-journeys-rank-sets.md)).
-- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #PR): the place shipped with the release; nothing left here.
+- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #401): the place shipped with the release; nothing left here.
 
 ## Outcome
 
