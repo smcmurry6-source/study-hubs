@@ -1,12 +1,12 @@
 ---
 type: task
-status: open
+status: done
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: 
-agent: 
+waiting-on:
+agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/345 (session 2)
 ---
 
@@ -22,20 +22,20 @@ with no holiday, Timmy now and then wears a rare costume, the same one all day. 
 
 ## Context
 
-- The redesign plan: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) (section 4.10). Client:
-  [phase 4](2026-11-05-redesign-phase-4-game-layer.md) (part B); server: [phase 5](done/2026-11-05-redesign-phase-5-backend.md)
-  (part 3); live at [the release](done/2026-11-06-redesign-release.md).
+- The redesign plan: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) (section 4.10). Client:
+  [phase 4](2026-11-05-redesign-phase-4-game-layer.md) (part B); server: [phase 5](2026-11-05-redesign-phase-5-backend.md)
+  (part 3); live at [the release](2026-11-06-redesign-release.md).
 - What the house items go into: [Timmy's place](2026-11-06-redesign-timmys-place.md) (the house card, redrawn). XP and its
-  boosts: [the journeys note](2026-11-06-redesign-progression-journeys.md). Bowling: [its own note](done/2026-11-06-redesign-bowling-egg.md).
-- Rules that matter most here: [podcast-reactions](../rules/podcast-reactions.md) (the lore rules: never contradict
-  `tools/podcast/LORE.md` or `widget/pet.js`), [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md) (drawn in
-  SVG in Timmy's ink style, nothing generated), [about-page](../rules/about-page.md) (spoilers for secrets),
-  [learner-data-privacy](../rules/learner-data-privacy.md).
+  boosts: [the journeys note](2026-11-06-redesign-progression-journeys.md). Bowling: [its own note](2026-11-06-redesign-bowling-egg.md).
+- Rules that matter most here: [podcast-reactions](../../rules/podcast-reactions.md) (the lore rules: never contradict
+  `tools/podcast/LORE.md` or `widget/pet.js`), [every-hub-gets-its-own-art](../../rules/every-hub-gets-its-own-art.md) (drawn in
+  SVG in Timmy's ink style, nothing generated), [about-page](../../rules/about-page.md) (spoilers for secrets),
+  [learner-data-privacy](../../rules/learner-data-privacy.md).
 - **This changes an earlier call**: on 2026-11-05 Sam kept Timmy's HP model as it is. Its decay and moods stay, but
   snacks and floss from the shop now restore HP (Sam, 2026-11-06).
 - Code: `widget/pet.js` (`OUTFITS`, `holidayId()`, `isFall()`, `houseSvg`), `widget/eggs.js` (`HOLIDAYS`).
 
-## Sam's calls (2026-11-06, [decisions](../decisions.md))
+## Sam's calls (2026-11-06, [decisions](../../decisions.md))
 
 Shiny Gold Crowns is the name (Sam changed it from Mints the same day). The shop rotates daily and weekly, has limited-time seasonal outfits and rarity tiers priced by rarity,
 sells house cosmetics, snacks and floss that boost health, and XP boosts. The house card gets a full redesign
@@ -104,14 +104,14 @@ spec win.
   A first sighting goes in the "you" panel's costume log ("Spotted: the pirate") and puts it in the shop's rotation for them.
 - Holiday costumes keep changing each page load (canon in `LORE.md`: "he can't pick one").
 
-## Sam's calls (2026-11-12, [decisions](../decisions.md))
+## Sam's calls (2026-11-12, [decisions](../../decisions.md))
 
 Asked as one list before any of the shop was built; Sam: "Your recommendations are good otherwise", with one answer of
 his own (what Timmy wears).
 
 - **Two sessions**: the art first (contact sheets, Sam's yes), then the client.
 - **The five undrawn everyday outfits are drawn** (`scrub-cap`, `bow-tie`, `safety-glasses`, `white-coat`,
-  `graduation-cap`), in the art session ([their note](done/2026-11-12-five-outfits-without-a-drawing.md)).
+  `graduation-cap`), in the art session ([their note](2026-11-12-five-outfits-without-a-drawing.md)).
 - **Five rare costumes**, the ones in the migration (`pirate`, `astronaut`, `detective`, `chef`, `captain-enamel`), not
   "about a dozen". More can join after the release with `admin_upsert_shop_item`, no migration.
 - **Prices stay as the migration has them** for the release. Any Sam wants changed when he sees the art go on a list
@@ -128,14 +128,14 @@ his own (what Timmy wears).
     at the shop today: the pirate costume"), it is logged (`record_costume_sighting`) and stays on that student's
     "Spotted" shelf until bought, exactly as the server already does it. Worn only once bought and put on.
   - The build of this rule on Timmy himself (the bar, his place, the classroom, the stage) is
-    [Timmy everywhere](done/2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"), the session after the shop's client.
+    [Timmy everywhere](2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"), the session after the shop's client.
 - **Where the balance shows**: the new dashboard's "you" card, the shop's header and the Shop row in a hub's More. Not
   on a hub's top bar (it already runs past the screen on the longest hub name, BUG-083).
 - **The rank statue hidden behind Timmy at the door** (BUG-089): Timmy's door spot moves to the open side of the door,
   home by home, and the spot left of the path is nudged so the statue's base shows; in the art session, on one sheet
   of every home ([Timmy's place](2026-11-06-redesign-timmys-place.md)).
 - **Where the server as written and the client differ**, nothing in the migration changes
-  ([game-server](../reference/game-server.md) has the list): an answer's reply carries no balance, so the balance
+  ([game-server](../../reference/game-server.md) has the list): an answer's reply carries no balance, so the balance
   refreshes at page load, when the shop or the "you" card opens and after a purchase, with no ticking counter; the
   server sells a snack at 100 HP, so the shop greys it out ("He's full"); `get_my_shop` sends no end date for a
   season, so a season's shelf says "Limited time" with no countdown.
@@ -148,8 +148,8 @@ None yet. (The art session adds a line for each price Sam wants changed: the ite
 ## Build spec, session 1: the shop's art
 
 Read first: "For every session above" in [phase 4](2026-11-05-redesign-phase-4-game-layer.md), this note,
-[draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md),
-the lore rules in [podcast-reactions](../rules/podcast-reactions.md). Art only: no client code.
+[draw-a-seasonal-set](../../how-to/draw-a-seasonal-set.md), [every-hub-gets-its-own-art](../../rules/every-hub-gets-its-own-art.md),
+the lore rules in [podcast-reactions](../../rules/podcast-reactions.md). Art only: no client code.
 
 **What to draw** (SVG, Timmy's ink style, the kit's palette in `tools/figures/site/style.mjs`; nothing generated):
 
@@ -209,14 +209,14 @@ on the list above, never into the migration.
 clips; the About page.
 
 **Done when** (session 1):
-- [x] The three sheets sent, light and dark, and Sam's yes (his words in [decisions](../decisions.md):
+- [x] The three sheets sent, light and dark, and Sam's yes (his words in [decisions](../../decisions.md):
       "Everything looks good. Merge when ready")
 - [x] The ten outfits in the kit with the catalog's ids; `node tools/figures/site/build.mjs` passes and the generated
       files are committed
 - [x] `widget/hub-art/shop.js` built, with the coin, four snacks, two boosts and five frames
-- [x] Timmy at the door hides the statue in no home; BUG-089 retested and closed in [the bug log](../release/bug-log.md)
+- [x] Timmy at the door hides the statue in no home; BUG-089 retested and closed in [the bug log](../../release/bug-log.md)
 - [x] `tools/release/xp.js` expects no undrawn outfit or costume and passes; BUG-090 closed; the
-      [five outfits' note](done/2026-11-12-five-outfits-without-a-drawing.md) done and moved to `done/`
+      [five outfits' note](2026-11-12-five-outfits-without-a-drawing.md) done and moved to `done/`
 - [x] `node tools/release/run.js` once; the hand-off in [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s Log
       (the kit's new names, sizes, anything session 2 must know). 16 of 17 suites passed; accessibility needs
       `axe-core`, which the cloud container doesn't have, so CI's "Release tests" ran it
@@ -283,7 +283,7 @@ clips; the About page.
 ## Build spec, session 2: the shop's client
 
 Read first: "For every session above" in [phase 4](2026-11-05-redesign-phase-4-game-layer.md), this note,
-[game-server](../reference/game-server.md) ("Shiny Gold Crowns and the shop", "Where the client works around the
+[game-server](../../reference/game-server.md) ("Shiny Gold Crowns and the shop", "Where the client works around the
 server as written"), session 1's hand-off in phase 4's Log, and `widget/place.js`'s top comment.
 
 **What gets built**: the shop as a page students can open, buying, the balance, snacks that heal, boosts, and rare
@@ -391,7 +391,7 @@ a replay or `dup`, `unknown`, `owned`, `rank`, `not-today`, `today`, `balance`);
 
 **Out of scope**: what Timmy wears on the bar and "everyone has Timmy" (session 3); visiting; the bowling egg;
 price changes; a sixth costume; gold crowns on a hub's top bar or a counter that ticks after an answer; gifting;
-editing the About page (draft it in [the release note](done/2026-11-06-redesign-release.md), "From phase 4, part B",
+editing the About page (draft it in [the release note](2026-11-06-redesign-release.md), "From phase 4, part B",
 with the rare costumes in a spoiler, and finish part C's "What you own" line there).
 
 **Done when** (session 2):
@@ -404,7 +404,7 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
 - [x] The tests above added and passing; `node tools/release/run.js` once; budgets unchanged (2026-11-12: all 17 suites passed, `perf.js` within budget)
 - [x] Screenshots (phone and laptop, light and dark) and a short recording of one purchase sent to Sam
 - [x] `tools/podcast/LORE.md` (the five costumes and their lines), the About draft, the event taxonomy and
-      retention rows, [game-server](../reference/game-server.md), the hand-off in phase 4's Log
+      retention rows, [game-server](../../reference/game-server.md), the hand-off in phase 4's Log
 
 ## Done when
 
@@ -413,27 +413,27 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
       Sam, 2026-11-12: "Everything looks good" ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339))
 - [x] Server: gold crowns, the catalog and rotation, `buy_item`, `equip_item`, the inventory and purchases, HP from snacks, the boosts,
       tested on a throwaway copy (a double tap, a replayed call, a balance too low, an item not on sale today, a linked device)
-- [ ] Client: the shop in More, the balance on the "you" card, rare costumes (session 2's Done when, above), shown to
+- [x] Client: the shop in More, the balance on the "you" card, rare costumes (session 2's Done when, above), shown to
       Sam in screenshots and a recording from a scripted browser on made-up data (no hosted preview: Sam, 2026-11-12)
       - [x] from part C of phase 4 (2026-11-12, [its hand-off](2026-11-05-redesign-phase-4-game-layer.md)): the place's
             customizer gets its "Get more in the shop" link; `widget/pet.js` reads snack HP (`get_pet_days_v2`'s `hp`);
             after a purchase the place is told (`shPlace.setup({ shop })`, `shPlace.repaint()`)
       - [x] the five everyday outfits with no drawing are drawn (Sam, 2026-11-12: draw them; session 1;
-            [task](done/2026-11-12-five-outfits-without-a-drawing.md))
+            [task](2026-11-12-five-outfits-without-a-drawing.md))
 - [x] `LORE.md`, the About page (Shiny Gold Crowns, the shop, rarity, boosts, health items; rare costumes in a spoiler), the event taxonomy
-      and retention rows (session 2; the About page's entry is drafted in [the release note](done/2026-11-06-redesign-release.md),
+      and retention rows (session 2; the About page's entry is drafted in [the release note](2026-11-06-redesign-release.md),
       "From phase 4, part B", and goes on the page with the release)
-- [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
-- [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
+- [x] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
+- [x] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
 
 ## Log
 
 - 2026-11-06: workshop of Sam's idea.
-- 2026-11-06: Sam's calls (above). Bowling moved to [its own note](done/2026-11-06-redesign-bowling-egg.md) as an Easter egg; the
+- 2026-11-06: Sam's calls (above). Bowling moved to [its own note](2026-11-06-redesign-bowling-egg.md) as an Easter egg; the
   house card's redesign to [Timmy's place](2026-11-06-redesign-timmys-place.md).
 - 2026-11-06: the currency renamed from Mints to Shiny Gold Crowns (Sam).
 - 2026-11-06 (Claude Code): the server is written and tested on a throwaway copy (`migration_v54.sql`, phase 5 part 3;
-  [game-server](../reference/game-server.md)): `sh_wallet`, `shop_items` with the price bands checked, the daily, weekly,
+  [game-server](../../reference/game-server.md)): `sh_wallet`, `shop_items` with the price bands checked, the daily, weekly,
   seasonal and always shelves (`sh_season` / `sh_is_fall` match `widget/pet.js` on every day of 2026-2028), `buy_item`,
   `equip_item`, `pet_inventory`, `pet_purchases`, snack HP in `get_pet_days_v2`, shop boosts that extend, the costume log
   (`record_costume_sighting`; a spotted costume joins that visitor's shop), Link my devices merging all of it. The 48-item
@@ -444,8 +444,8 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
   and `wide` for the bowling lane ([Timmy's place](2026-11-06-redesign-timmys-place.md), PR #289). The outfits not drawn
   yet, the snacks, boosts and seasonal items are still drafts.
 - 2026-11-10: Sam's new calls for the shop (daily and weekly items plus a seasonal section; a full seasonal set per season
-  with a Legendary house and scene; past seasons unlocked for everyone; rank-up unlocks) are in [round 3](done/2026-11-10-redesign-timmys-place-round-3.md).
-- 2026-11-10 (Claude Code): round 3 ([its note](done/2026-11-10-redesign-timmys-place-round-3.md)): the catalog is 180 rows
+  with a Legendary house and scene; past seasons unlocked for everyone; rank-up unlocks) are in [round 3](2026-11-10-redesign-timmys-place-round-3.md).
+- 2026-11-10 (Claude Code): round 3 ([its note](2026-11-10-redesign-timmys-place-round-3.md)): the catalog is 180 rows
   (181 later that day, with Timmy's podcast studio, `podcast-studio`)
   (56 everyday, 112 seasonal in 14 sets, 12 rank pieces); `get_my_shop` returns the daily and weekly picks, the seasons
   on sale and a "Back for today" shelf on two throwback days a month; rank sets are earned, Halloween's set is a gift;
@@ -464,19 +464,30 @@ with the rare costumes in a spoiler, and finish part C's "What you own" line the
   `shop.mjs`; "The shop's look", above), still no client code. Sent to Sam as screenshots at 1280 and 390 px, light
   and dark (`node tools/figures/site/shop-sheets.mjs <out-dir> ui`).
 - 2026-11-12: Sam's yes for all of it: "Actually its good. Everything looks good. Merge when ready", "i like the
-  redesign" ([decisions](../decisions.md)). No price to change. Session 1 is done; `main` (Ask Timmy's chat, #338)
+  redesign" ([decisions](../../decisions.md)). No price to change. Session 1 is done; `main` (Ask Timmy's chat, #338)
   was brought in before the merge, and this branch's new bug became BUG-095. **Next: session 2, the client.**
 - 2026-11-12 (Claude Code), **session 2, the shop's client** ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345)): `widget/shop.js` + `widget/shop.css`
   (`window.shShop`), built to the design page's shop; the hub engine's Shop row in More, the new dashboard's balance and
   Shop button, the place's "Get more in the shop"; snacks heal through `get_pet_days_v2` (`widget/pet.js`); boosts start
   the 2x chip; the rare costume of the day. `migration_v54.sql` unchanged, and nothing in it disagreed with the client.
   What it built, the tests and what's left: phase 4's Log (the hand-off for session 3). Screenshots and a recording sent
-  to Sam. Found and fixed while testing: BUG-098 to BUG-104 ([the bug log](../release/bug-log.md)).
+  to Sam. Found and fixed while testing: BUG-098 to BUG-104 ([the bug log](../../release/bug-log.md)).
+- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #401): the client ([#345](https://github.com/smcmurry6-source/study-hubs/pull/345))
+  shipped with the release; no price was on "Prices to change after the release". Nothing left.
 
 ## Outcome
 
+**Done with the redesign's release** (2026-11-14, [#359](https://github.com/smcmurry6-source/study-hubs/pull/359)). The
+art ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339), Sam: "Everything looks good") and the client
+([#345](https://github.com/smcmurry6-source/study-hubs/pull/345)) are live: Shiny Gold Crowns, the shop in More with its
+daily rotation, snacks and HP, boosts, the five rare costumes, and Timmy wearing only what you put on. No price was waiting
+for after the release; the double XP boosts were repriced since, on Sam's call
+([#394](https://github.com/smcmurry6-source/study-hubs/pull/394), migration_v62). More cosmetics are on hold (Sam,
+2026-11-17: "lets leave the more cosmetics for later"; [the inbox](../inbox.md)). New items need no migration
+(`admin_upsert_shop_item`).
+
 Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·
-[phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [podcast-reactions](../rules/podcast-reactions.md)
+[phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [podcast-reactions](../../rules/podcast-reactions.md)
 
 ## Opening prompts
 

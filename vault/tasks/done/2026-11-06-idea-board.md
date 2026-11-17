@@ -21,7 +21,7 @@ most. Posts show at once under the poster's name, with both vote counts. Ships w
 ## Context
 
 - The redesign plan: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) (section 4.10),
-  [phase 3](../2026-11-05-redesign-phase-3-dashboard.md) (the dashboard; this is part of it), [the release](2026-11-06-redesign-release.md).
+  [phase 3](2026-11-05-redesign-phase-3-dashboard.md) (the dashboard; this is part of it), [the release](2026-11-06-redesign-release.md).
 - What exists and is reused: private suggestions (`hub_suggestions`, answered from the admin page's Inbox, the reply reaching
   the sender through `widget/replies.js`: [reply-to-reports](../../how-to/reply-to-reports.md)); Timmy Time's likes, dislikes and
   comments (`widget/podcast.js`, migration_v47: one vote per visitor, the leaderboard name from `get_display_name`, rate limits,
@@ -331,5 +331,5 @@ starting ideas and the About entries go in at the release, and this note closes 
 **Released 2026-11-14** with the redesign ([the release](2026-11-06-redesign-release.md)): migration_v54 and v58 applied,
 eight starting ideas posted, the About entries live.
 
-Related: [phase 3](../2026-11-05-redesign-phase-3-dashboard.md) · [reply-to-reports](../../how-to/reply-to-reports.md) ·
+Related: [phase 3](2026-11-05-redesign-phase-3-dashboard.md) · [reply-to-reports](../../how-to/reply-to-reports.md) ·
 [podcast-reactions](../../rules/podcast-reactions.md) · [learner-data-privacy](../../rules/learner-data-privacy.md)

@@ -12,8 +12,8 @@ and the idea board. Written and tested on a throwaway copy on 2026-11-06, change
 at [the release](../tasks/done/2026-11-06-redesign-release.md)**, with `migration_v55.sql` to `v58` after it (all five are in
 `supabase/schema.sql`, after its "the redesign's release" marker, which `tools/release/xp.js` uses to test the moment
 of the switch on made-up history). What each part should do and why:
-[the journeys](../tasks/2026-11-06-redesign-progression-journeys.md), [the shop](../tasks/2026-11-06-redesign-timmy-shop.md),
-[Timmy's place](../tasks/2026-11-06-redesign-timmys-place.md), [the idea board](../tasks/done/2026-11-06-idea-board.md). The code is
+[the journeys](../tasks/done/2026-11-06-redesign-progression-journeys.md), [the shop](../tasks/done/2026-11-06-redesign-timmy-shop.md),
+[Timmy's place](../tasks/done/2026-11-06-redesign-timmys-place.md), [the idea board](../tasks/done/2026-11-06-idea-board.md). The code is
 the home of the details: read `migration_v54.sql` (its sections are numbered as below).
 
 ## Beside today's, not instead
@@ -137,7 +137,7 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   `how`: `bought`, `gift` or `rank`), `locked` (the rank items not reached yet, with the `rank_tier` that unlocks each),
   what's equipped, the costume log, today's snacks and the boost. Snack HP shows in `get_pet_days_v2`.
   `sh_buy(day, ...)` and `sh_my_shop(day, ...)` are the same two with the date given, private, for the tests.
-- **How the client uses it** (`widget/shop.js`, session 2 of [the shop](../tasks/2026-11-06-redesign-timmy-shop.md)):
+- **How the client uses it** (`widget/shop.js`, session 2 of [the shop](../tasks/done/2026-11-06-redesign-timmy-shop.md)):
   the balance and the shelves come from the bootstrap's `shop`, then one `get_my_shop` when the shop opens and one after
   each purchase (handed to the place: `shPlace.setup({ shop })`); `buy_item`'s `balance` is shown at once. A purchase's
   request id is made when an item's sheet opens and reused for every try from it (a double tap, a retry after a dropped
@@ -205,7 +205,7 @@ every up-voter get an Inbox note, `get_my_inbox_v2`, `mark_idea_note_seen`) and 
 neighbors, no visitor).
 
 **The answer call, the ladder and mock sessions have their pages since 2026-11-12** (phase 4, part A,
-[the journeys](../tasks/2026-11-06-redesign-progression-journeys.md)): a new hub's widget tag carries `data-game="v2"`,
+[the journeys](../tasks/done/2026-11-06-redesign-progression-journeys.md)): a new hub's widget tag carries `data-game="v2"`,
 and `widget/v3.js` then asks for `get_widget_bootstrap_v2`, sends each answer as one `record_answer_v2` (falling back
 to today's calls when the function isn't there, or when the server answers `bad` because a one-choice question came
 without a pick), starts and finishes a mock's session, and hands the server's reply to the engine as `sh:answer-paid`
@@ -232,7 +232,7 @@ live page makes today's calls (the smoke test compares them with `main`'s files)
   and offers "Fixed" and "No change needed" through `admin_resolve_report_v2`, with Reopen as `open`; without the
   functions it reads `get_reports` and resolves with `set_report_resolved`, as today.
 
-**Timmy's place has its client since 2026-11-12** (phase 4, part C, [the place](../tasks/2026-11-06-redesign-timmys-place.md)):
+**Timmy's place has its client since 2026-11-12** (phase 4, part C, [the place](../tasks/done/2026-11-06-redesign-timmys-place.md)):
 `widget/place.js` reads the bootstrap's `shop` (or `get_my_shop`) for `inventory`, `locked` and `equipped`, draws the
 place from them and the v2 profile's `journey`, `tier` and `level`, and saves every change in its customizer with one
 `equip_item`. It shows a change before the server answers by the same rules (a yard piece stands in one spot, the wide
@@ -307,7 +307,7 @@ client follows the server in all of them. A new case: stop and tell Sam.
 |---|---|
 | Five everyday outfits have rows and no drawing | They are drawn (the shop's art session) |
 | Five rare costumes, where the shop's first note said "about a dozen" | Five. More can join later with `admin_upsert_shop_item` |
-| The prices are the draft ones | Released as written; any Sam wants changed are changed afterwards with `admin_upsert_shop_item` ([the shop](../tasks/2026-11-06-redesign-timmy-shop.md) keeps the list) |
+| The prices are the draft ones | Released as written; any Sam wants changed are changed afterwards with `admin_upsert_shop_item` ([the shop](../tasks/done/2026-11-06-redesign-timmy-shop.md) keeps the list) |
 | `record_answer_v2`'s reply has the XP and the total, not the balance | The balance is read at page load (the bootstrap's `shop.wallet`), when the shop or the "you" card opens (`get_my_shop`) and from `buy_item`'s reply; no counter ticks after an answer |
 | `buy_item` sells a snack at 100 HP | The shop greys it out ("He's full") |
 | `get_my_shop` says which seasons are on sale, not until when | A season's shelf says "Limited time", with no countdown |
