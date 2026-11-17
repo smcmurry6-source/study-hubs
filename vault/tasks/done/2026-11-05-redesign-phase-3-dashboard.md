@@ -1,11 +1,11 @@
 ---
 type: task
-status: in-progress
+status: done
 hub: dashboard
 created: 2026-11-05
 requested-by: Sam
 due: 
-waiting-on: "the redesign's release (BUG-076 and the About entries)"
+waiting-on:
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/318
 ---
@@ -18,32 +18,33 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 
 ## Context
 
-- The plan and Sam's decisions: [the redesign audit and plan](done/2026-11-05-redesign-audit-and-plan.md), section 4.
-- Rules that matter most here: [preview-and-release-test](../rules/preview-and-release-test.md) (every phase is tier 2 or 3:
-  preview link first, screenshots, the release suites, Sam's look), [about-page](../rules/about-page.md),
-  [learner-data-privacy](../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
+- The plan and Sam's decisions: [the redesign audit and plan](2026-11-05-redesign-audit-and-plan.md), section 4.
+- Rules that matter most here: [preview-and-release-test](../../rules/preview-and-release-test.md) (every phase is tier 2 or 3:
+  preview link first, screenshots, the release suites, Sam's look), [about-page](../../rules/about-page.md),
+  [learner-data-privacy](../../rules/learner-data-privacy.md), the taste skill in full (Sam, 2026-11-04).
 - The dashboard today: `HUBS`/`CLASSES`/`ARCHIVED_HUBS`/`ARCADES` arrays, `#petHome`, `widget/archive.js`, the check-in and survey flows, `widget/tour.js` (the full tour stays in the menu; no prompt on arrival).
-- The About page rule: [about-page](../rules/about-page.md).
-- **Added 2026-11-06 (Sam)**: [the idea board](done/2026-11-06-idea-board.md) is part of this phase (a dashboard section and a
+- The About page rule: [about-page](../../rules/about-page.md).
+- **Added 2026-11-06 (Sam)**: [the idea board](2026-11-06-idea-board.md) is part of this phase (a dashboard section and a
   page in a hub's More, `widget/ideas.js`), and the "you" card shows [Timmy's place](2026-11-06-redesign-timmys-place.md)
-  (drawn in phase 4, part C). The server side of both is in [phase 5](done/2026-11-05-redesign-phase-5-backend.md), part 3.
-- **Built beside the live dashboard, released with the rest** (Sam, 2026-11-06, [decisions](../decisions.md)): the new
+  (drawn in phase 4, part C). The server side of both is in [phase 5](2026-11-05-redesign-phase-5-backend.md), part 3.
+- **Built beside the live dashboard, released with the rest** (Sam, 2026-11-06, [decisions](../../decisions.md)): the new
   dashboard is a page next to `index.html` (for example `next/index.html`) that links to the new hub versions, and it
-  replaces `index.html` at [the release](done/2026-11-06-redesign-release.md). The About page's rewrite is drafted in the
+  replaces `index.html` at [the release](2026-11-06-redesign-release.md). The About page's rewrite is drafted in the
   release note and lands with it, since the live About page describes the live site until then.
 
 ## Done when
 
 - [x] The idea board on the new dashboard and in More, with its starting ideas ready to post at the release (built
-      2026-11-12, [#324](https://github.com/smcmurry6-source/study-hubs/pull/324); [its note](done/2026-11-06-idea-board.md) has the hand-off)
+      2026-11-12, [#324](https://github.com/smcmurry6-source/study-hubs/pull/324); [its note](2026-11-06-idea-board.md) has the hand-off)
 
 - [x] The dashboard on the design system, inspector 0 FAIL at three widths, light and dark
 - [x] Check-ins, surveys, notices, luck, the leaderboard, streaks, archive rules and the tour all work on the preview
-- [ ] About page lists every changed feature, counts true (drafted in [the release note](done/2026-11-06-redesign-release.md), "From phase 3"; it lands at the release)
+- [x] About page lists every changed feature, counts true (drafted in [the release note](2026-11-06-redesign-release.md), "From phase 3"; it landed with the release, [#359](https://github.com/smcmurry6-source/study-hubs/pull/359))
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`) (#318)
 - [x] Preview link, phone and laptop screenshots, and Sam's look, then Sam's "merge": the preview on 2026-11-11 ("All that looks good"), "merge" on 2026-11-12 (#318)
-- [ ] BUG-076 ([bug log](../release/bug-log.md)): at 320 px wide with the largest text, "Start studying" is 2 px past
+- [ ] BUG-076 ([bug log](../../release/bug-log.md)): at 320 px wide with the largest text, "Start studying" is 2 px past
   the screen's edge and the "You" card's seven day dots run off its side
+  **Moved to its own to-do in the [inbox](../inbox.md)** (2026-11-17), so this note could close: still on the live dashboard.
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
 ## Log
@@ -56,7 +57,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   `widget/hub-art/dash.js` (every hub's emblem and tint). migration_v54's functions are called through a fallback and
   stubbed in the preview; nothing was applied. Then Sam asked (same day) for a second pass: familiar, but much more
   visually interesting; a better way to show the recaps and who is studying; the What's new log, the arcade scores and
-  the When people study card out ([decisions](../decisions.md), four rows dated 2026-11-11).
+  the When people study card out ([decisions](../../decisions.md), four rows dated 2026-11-11).
 - 2026-11-11 (Claude Code, **hand-off of the second pass**). The second pass is built and in the PR. Everything on the
   page except the idea board works; Sam has since asked for a third pass (next entry).
   - **What's on the page**, top to bottom: the top bar (studying-now count, streak, rank, Inbox, Settings, menu); the
@@ -84,15 +85,15 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   - **Not as good as the live page:** first paint on the slow-phone profile is about 2.3 s (the live dashboard's budget
     is 1.5 s; `next/` has its own budget of 3.5 s in `tools/release/budgets.json`). It was 3.1 s before the shared
     widgets moved to late loading. Worth another look before the release.
-  - **Bugs** found and fixed while building: BUG-063 to BUG-067 in the [bug log](../release/bug-log.md).
-  - **The switch and the About page draft** are in [the release note](done/2026-11-06-redesign-release.md), "From phase 3".
+  - **Bugs** found and fixed while building: BUG-063 to BUG-067 in the [bug log](../../release/bug-log.md).
+  - **The switch and the About page draft** are in [the release note](2026-11-06-redesign-release.md), "From phase 3".
   - **Checks** on the second pass (commit f1264f6): `node tools/release/run.js`, all 14 suites passed (syntax, vault,
     archive, secrets, the smoke test on every hub, preview safety, the four database suites on a throwaway copy, the
     admin page, accessibility with 0 axe issues on the dashboard's three new screens, performance, devices). A scripted
     walk-through on the preview, 41 checks, all passed. The three `dashboard/next` screens aren't in the a11y baseline
     yet (`a11y.js --update` at the release).
 - 2026-11-11 (Claude Code, **third pass, waiting on Sam**). After the second pass's screenshots Sam asked for three more
-  things ([decisions](../decisions.md)): the studying-now tile as a fully drawn, animated classroom (the total shown;
+  things ([decisions](../../decisions.md)): the studying-now tile as a fully drawn, animated classroom (the total shown;
   a Timmy for each person studying, wearing what that person has him dressed as; they walk in and sit, or get up and
   leave); the leaderboard and its pedestals "more epic"; and the recap infographics are "boring". New art goes to Sam
   as a contact sheet first, so nothing of this is in the page yet. Sent as three contact sheets, made-up data:
@@ -116,8 +117,8 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
       payload (nothing else: no name, no visitor id), and the dashboard draws one Timmy per presence key. Until the shop
       is released (migration_v54, phase 5) the only outfit anyone has is the day's holiday look; after it, it is
       `pet_equipped.outfit`. Timmy off or Focus mode: a plain tooth. That is a change to the live shared widget and a
-      new thing shared between browsers, so it needs its line in [event-taxonomy](../reference/event-taxonomy.md) and
-      the About page's "What the hubs record" ([learner-data-privacy](../rules/learner-data-privacy.md)), and Sam's OK.
+      new thing shared between browsers, so it needs its line in [event-taxonomy](../../reference/event-taxonomy.md) and
+      the About page's "What the hubs record" ([learner-data-privacy](../../rules/learner-data-privacy.md)), and Sam's OK.
     - *The outfit art at run time.* The 55 outfits are in the place kit (`tools/figures/site/place.mjs`, `OUTFITS`,
       `dress()`), which so far is only built into the design page (`tools/preview/design/place.js`). The dashboard needs
       `dress()` and the outfits in a widget file (phase 4 wires the whole kit; the classroom needs only that part).
@@ -129,7 +130,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 
 - 2026-11-11 (Claude Code, **third pass built: the classroom and the stage**). Sam on the sheets: "b, yes, yes, the
   mountain range doesnt read as a bar graph and it also also needs to fit in a smaller card, yes"
-  ([decisions](../decisions.md)). So the classroom (50 px taller) and the stage are in the page; the recap is not.
+  ([decisions](../../decisions.md)). So the classroom (50 px taller) and the stage are in the page; the recap is not.
   - **The classroom** (`#now`, `syncRoom()` and its helpers in `widget/dash.js`; art `tools/figures/site/classroom.mjs`):
     150 px tall, 170 on a phone. The count and the three busiest hubs are HTML laid over the drawn chalkboard
     (`placeBoard()`; a narrow board stacks them), so screen readers get the same words as before, every hub included. One
@@ -143,11 +144,11 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   - **Whose outfit.** Each hub tab sends `fit` with its presence (`trackPresence()` in `widget/v3.js`, `shPet.fit()` in
     `widget/pet.js`): `<holiday>:<outfit>` today, empty before Timmy is adopted, with him off or in Focus mode. No name,
     no id, not stored. **This is the one live change in the PR**; it is on the live About page ("What the hubs
-    record"), in [event-taxonomy](../reference/event-taxonomy.md) and [analytics-retention](../reference/analytics-retention.md).
+    record"), in [event-taxonomy](../../reference/event-taxonomy.md) and [analytics-retention](../../reference/analytics-retention.md).
     The dashboard treats `fit` as untrusted: `cleanFit()` keeps only `[a-z0-9:-]`, and it is used only to look an outfit
     up (`fitOutfit()` in pet.js for a holiday one, `SH_OUTFITS.parts` for a shop one), never written as markup. The
     smoke test sends markup as an outfit and fails if it is drawn. After the shop's release `fit()` should send the
-    equipped shop outfit's id ([release note](done/2026-11-06-redesign-release.md), step 9); the dashboard already draws those.
+    equipped shop outfit's id ([release note](2026-11-06-redesign-release.md), step 9); the dashboard already draws those.
   - **The stage** (`stageSvg()`, `paintBoard()`; art `stage.mjs`): the top three stand on drawn blocks as Timmys; their
     outfits come from `get_place` through each row's visit key (`loadFits()`), only when the game layer exists, so no
     change to migration_v54 was needed. Someone with visiting off, and everyone until v54 is applied, is a plain Timmy.
@@ -174,7 +175,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 
 - 2026-11-11 (Claude Code, **the recap's redraw built**). Sam, looking at the preview: "It looks like the infographic
   art changes were dropped?" They had been held back for a yes on the redrawn sheet; Sam expected them in, so they are
-  in ([decisions](../decisions.md)). The recap is now a compact card (`show()` in `startRecaps`, `recapArt()`,
+  in ([decisions](../../decisions.md)). The recap is now a compact card (`show()` in `startRecaps`, `recapArt()`,
   `recapClimber()`, `rcIcon()` in `widget/dash.js`): the hours on a block of the hub's color, the classmates as a crowd
   of teeth, hours per day as drawn columns (`SH_CLASS_ART.recap.bars()`: one a day, the exam day's with its flag, the
   most hours on a label, Timmy in the ranger hat on the tallest column clear of the label), fact chips with trophy
@@ -186,7 +187,7 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
   55 KB. Save image is unchanged (`widget/recap.js`). The preview's second recap has a made-up "one that got us".
   BUG-072 and BUG-073 found and fixed.
 - 2026-11-11 (Claude Code, **your own Timmy marked; hand-off**). Sam on the preview with the recap in: "Mark your
-  timmy, yes to the redrawn recap. All that looks good" ([decisions](../decisions.md)).
+  timmy, yes to the redrawn recap. All that looks good" ([decisions](../../decisions.md)).
   - **The mark.** The classroom is anonymous on purpose and stays so: the dashboard only listens, and every hub tab is
     in its channel under a random key made for that page load. So the hub tab now keeps that key in its own browser
     while it is open (`rememberMine()` in the live `widget/v3.js`, `localStorage` `sh_presence_mine`: taken out when the
@@ -208,13 +209,13 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
     redesign's release, or on a staging database.
   - **Where this leaves the task.** Everything in this note except the idea board is built, checked and shown to Sam,
     who said it looks good. Left: **the idea board** (a second session; its slot on the page is `#ideas`, its server is
-    in migration_v54, its About entry is drafted in [the release note](done/2026-11-06-redesign-release.md)); **Sam's tick**
+    in migration_v54, its About entry is drafted in [the release note](2026-11-06-redesign-release.md)); **Sam's tick**
     on "Sam approved this release" in the PR and the merge; after the merge `node tools/release/postcheck.js` and the
     changelog line. The next session can start from `main` once the PR is merged, or from this branch before that.
     Still open from earlier entries: the three `dashboard/next` screens aren't in the accessibility baseline, and first
     paint on the slow-phone profile is worth another look before the release.
 
-- 2026-11-12 (Claude Code, **merged on Sam's word**). Sam, in the session: "merge" ([decisions](../decisions.md)): the
+- 2026-11-12 (Claude Code, **merged on Sam's word**). Sam, in the session: "merge" ([decisions](../../decisions.md)): the
   approval of this release and a one-time OK for the agent to merge PR #318. Before the merge the branch was rebased
   onto `main` (the `migration_v54` changes and a lessons refresh had landed since its last CI run) and CI ran on the
   result. `migration_v54` no longer has a visiting opt-out, so the two places here that spoke of "visiting off" (a
@@ -231,17 +232,28 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 - 2026-11-12 (Claude Code, **merged**). [#318](https://github.com/smcmurry6-source/study-hubs/pull/318) was merged
   once CI was green on the head with `main` in it; `node tools/release/postcheck.js` passed after the publish. No site
   changelog line: nothing students can see changed. Sam asked why it took so long, and the answer became a standing
-  rule, [long-tests-once](../rules/long-tests-once.md). The idea board's session starts from `main`. What's left is
-  on the to-do list ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)): the idea board and BUG-076 in this
+  rule, [long-tests-once](../../rules/long-tests-once.md). The idea board's session starts from `main`. What's left is
+  on the to-do list ([to-dos-go-in-the-vault](../../rules/to-dos-go-in-the-vault.md)): the idea board and BUG-076 in this
   note's Done when, and the accessibility baseline, the slow-phone first paint and the real-presence look in
-  [the release note](done/2026-11-06-redesign-release.md)'s.
+  [the release note](2026-11-06-redesign-release.md)'s.
 - 2026-11-12 (Claude Code, **the idea board**). Built in its own session, in [#324](https://github.com/smcmurry6-source/study-hubs/pull/324), stacked on #318: `widget/ideas.js`
   fills `#ideas`, the check-in has its tick, the admin page its Idea board. The hand-off is in
-  [the idea board's note](done/2026-11-06-idea-board.md).
+  [the idea board's note](2026-11-06-idea-board.md).
 - 2026-11-12: the idea board merged ([#324](https://github.com/smcmurry6-source/study-hubs/pull/324), `728279c`), so this
   note no longer waits on it. Left here: BUG-076 (open, S4) and the About entries at the release.
+- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #PR): the About entries went on the page with the
+  release. BUG-076 is still there on the live dashboard (measured on the preview's made-up data: at 320 px with XX-Large
+  the page scrolls 49 px sideways, the week's dots 48 px past the edge and "Start studying" 2 px; at X-Large 10 px), and a
+  report-reply pop-up has its close button off the screen at that size; both are one to-do in the [inbox](../inbox.md).
 
 ## Outcome
+
+**Done with the redesign's release** (2026-11-14, [#359](https://github.com/smcmurry6-source/study-hubs/pull/359)): the
+dashboard built here ([#318](https://github.com/smcmurry6-source/study-hubs/pull/318)) and the idea board
+([#324](https://github.com/smcmurry6-source/study-hubs/pull/324)) are the live dashboard, `hubs.js` is where hubs are added,
+dated and archived, and the About page describes all of it. **Left, as its own to-do in the [inbox](../inbox.md):** BUG-076
+(the "You" card's week and "Start studying" past the edge at 320 px with the largest text) and the report-reply pop-up's
+close button at that size.
 
 Not finished. The new dashboard is built beside the live one (`next/`), on the design system, with everything from the
 plan except the idea board, and with Sam's second-pass changes; nothing students see has changed

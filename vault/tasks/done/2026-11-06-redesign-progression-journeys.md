@@ -1,6 +1,6 @@
 ---
 type: task
-status: in-progress
+status: done
 hub: widget
 created: 2026-11-06
 requested-by: Sam
@@ -22,20 +22,20 @@ version for reduced motion. Ships with the redesign.
 
 ## Context
 
-- The redesign plan: [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md) (section 4.10).
+- The redesign plan: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) (section 4.10).
   The client side is [phase 4](2026-11-05-redesign-phase-4-game-layer.md) (part A); the server side is
-  [phase 5](done/2026-11-05-redesign-phase-5-backend.md) (part 3); both go live with [the release](done/2026-11-06-redesign-release.md).
-- Rules that matter most here: [preview-and-release-test](../rules/preview-and-release-test.md),
-  [about-page](../rules/about-page.md), [learner-data-privacy](../rules/learner-data-privacy.md),
-  [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md) (the drawn ink style),
-  [outside-sources-for-figures](../rules/outside-sources-for-figures.md).
+  [phase 5](2026-11-05-redesign-phase-5-backend.md) (part 3); both go live with [the release](2026-11-06-redesign-release.md).
+- Rules that matter most here: [preview-and-release-test](../../rules/preview-and-release-test.md),
+  [about-page](../../rules/about-page.md), [learner-data-privacy](../../rules/learner-data-privacy.md),
+  [every-hub-gets-its-own-art](../../rules/every-hub-gets-its-own-art.md) (the drawn ink style),
+  [outside-sources-for-figures](../../rules/outside-sources-for-figures.md).
 - Code: `widget/ranks.js` (`TIERS`, `art()`, `levelFor`), `widget/rankup.js` (the tier cutscene and cards), `widget/pet.js`
   (the house grows with the tier), `sh_tier`, `sh_tier_floor`, `sh_step`, `sh_xp_on_insert`, `sh_xp_rebuild`, `xp_seen`,
   `xp_days`, `xp_visitors`, `record_personal_answer`, `record_choice` in `supabase/schema.sql` (migration_v53). The new
   engine's `recordAnswer` (phase 1; in `widget/hub-rewards.js` since the split, 2026-11-12) already sends the picked choice's index and the context (`bank`,
   `mock`, `arcade`...) with every answer.
 
-## Sam's calls (2026-11-06, [decisions](../decisions.md))
+## Sam's calls (2026-11-06, [decisions](../../decisions.md))
 
 - **No cap on the XP earn rate** (the 600-a-day cap goes, and no new daily caps).
 - **More ways to earn XP**: double XP for 24 hours on hub mastery, XP for listening to Timmy Time and for playing the
@@ -153,11 +153,12 @@ old rate, about half the leaders' new pace); past days as they were. Groups by X
       and asked for a bigger hand-off, which was redrawn and recorded for Sam (full and reduced motion) from the design
       page; no preview was made (asked once, Sam didn't ask for one), so the recording on the preview is left to the
       release's own preview ([phase 4](2026-11-05-redesign-phase-4-game-layer.md), its "Every card and the cutscene" box)
-- [x] The admin page's resolve control has "Fixed" and "No change needed" (2026-11-13, [the wiring](done/2026-11-12-redesign-game-layer-wiring.md):
+- [x] The admin page's resolve control has "Fixed" and "No change needed" (2026-11-13, [the wiring](2026-11-12-redesign-game-layer-wiring.md):
       `admin_resolve_report_v2` and `get_reports_v2` when the database has them, today's Inbox otherwise)
-- [ ] The About page's rank, XP and trophy entries rewritten, counts true; event taxonomy and retention rows for any new table
-- [ ] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
-- [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
+- [x] The About page's rank, XP and trophy entries rewritten, counts true; event taxonomy and retention rows for any new table
+      (the rows with phase 5, part 3; the About page with the release)
+- [x] CI and the release suites pass (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`)
+- [x] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
 
 ## Log
 
@@ -165,7 +166,7 @@ old rate, about half the leaders' new pace); past days as they were. Groups by X
 - 2026-11-06: Sam's calls (above); the ladder keeps its length, the cap goes, more sources added. Ready for phases 4 and 5.
 - 2026-11-06: the June 1 projection added, at Sam's request. Sam: no back pay; "that projection looks good".
 - 2026-11-06 (Claude Code): the server is written and tested on a throwaway copy (`migration_v54.sql`, phase 5 part 3;
-  [game-server](../reference/game-server.md)): `question_keys` and `record_answer_v2` (the server grades; today's
+  [game-server](../../reference/game-server.md)): `question_keys` and `record_answer_v2` (the server grades; today's
   `record_personal_answer` keeps the cap for the old pages), the guardrails, every source in the table with its award rows,
   the medal boost, `sh_rank` (the Handpiece identical to today's below 125,000), the `_v2` profile, boards and trophies, the
   Dark Matter unlock mark, `sh_xp_rebuild` with a replay. The admin page's "Fixed" / "No change needed" is
@@ -194,7 +195,7 @@ old rate, about half the leaders' new pace); past days as they were. Groups by X
 ## Open calls (2026-11-12, asked before part A was built)
 
 Asked in chat on 2026-11-12; each has the recommendation that gets built if Sam says "yes to all". **Sam's answer, the
-same day: "Make the hand off more epic. Everything else looks great"** ([decisions](../decisions.md)). The agent read
+same day: "Make the hand off more epic. Everything else looks great"** ([decisions](../../decisions.md)). The agent read
 that as a yes to the art and to every recommendation below (its reading, said back to Sam before building), so each is
 ticked as built that way; the hand-off was redrawn as a full-screen scene. Any of them is one small change if Sam
 meant otherwise.
@@ -283,11 +284,22 @@ and the pill takes the server's total when the reply comes; no request is added 
     handpiece medallions are byte for byte what they were (every tier, size and option). The smoke test has a new
     block for it on one new hub. The preview takes `?xp=<n>` to stand a test account anywhere on the ladder.
   - **Left, written down**: the arcade's +50 and Timmy Time's minutes, the journey trophies in the trophy case, sound,
-    and the About entries are boxes and drafts in [the release note](done/2026-11-06-redesign-release.md) ("From phase 4,
+    and the About entries are boxes and drafts in [the release note](2026-11-06-redesign-release.md) ("From phase 4,
     part A"); the admin page's resolve control and the About page are this note's own open boxes; Timmy's place past
     125,000 is [part C](2026-11-06-redesign-timmys-place.md)'s.
+- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #PR): what part A left (the arcade's +50, Timmy Time's
+  minutes, the journey trophies in the case, the About entries) shipped with the release; the scenes stay silent (the
+  site has no sound setting). Nothing left.
 
 ## Outcome
 
-Related: [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [phase 5](done/2026-11-05-redesign-phase-5-backend.md) ·
-[Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the audit and plan](done/2026-11-05-redesign-audit-and-plan.md)
+**Done with the redesign's release** (2026-11-14, [#359](https://github.com/smcmurry6-source/study-hubs/pull/359)). The
+ladder of three journeys (Handpiece, ModuPro, Loupes; 63 steps), XP checked by the server with no cap, the hand-off and the
+Dark Matter unlock, double XP on the rank pill, the journey trophies in the case, and the admin page's "Fixed" / "No change
+needed" are live. Since then: the boost prices retuned ([#394](https://github.com/smcmurry6-source/study-hubs/pull/394)),
+a medal over a boost and the Bowling trophy counted on the server (migration_v63), and the scenes fit the screen at the
+large text sizes ([#397](https://github.com/smcmurry6-source/study-hubs/pull/397)). What's next is its own task:
+[the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md).
+
+Related: [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [phase 5](2026-11-05-redesign-phase-5-backend.md) ·
+[Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the audit and plan](2026-11-05-redesign-audit-and-plan.md)

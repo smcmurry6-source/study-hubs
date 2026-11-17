@@ -14,7 +14,7 @@ pr: https://github.com/smcmurry6-source/study-hubs/pull/356
 
 ## Goal
 
-[Phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s original goal, never built: the redesign's pages still open
+[Phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s original goal, never built: the redesign's pages still open
 today's trophy panel (an emoji grid with ??? for secrets) and show today's rank-up, level, trophy and mock cards.
 The trophies and their silhouettes were drawn in phase 0. This puts the trophy case and the cards on the design
 system, on the redesign's pages only: drawn trophies in place of emoji and ???, a secret trophy as its silhouette
@@ -209,7 +209,7 @@ BUG-116 live fix too", in the same PR). The per-hub trophies (8 a hub) aren't in
 task didn't ask for them): they stay in today's panel behind Leaderboards, and a shelf for them is Sam's call (a box in
 the release note's "From phase 4, session 6").
 
-Related: [phase 4](../2026-11-05-redesign-phase-4-game-layer.md) · [the journeys](../2026-11-06-redesign-progression-journeys.md) ·
+Related: [phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·
 [the bowling egg](2026-11-06-redesign-bowling-egg.md) · [the release](2026-11-06-redesign-release.md) ·
 [about-page](../../rules/about-page.md)
 

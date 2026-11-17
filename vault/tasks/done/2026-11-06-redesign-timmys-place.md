@@ -1,11 +1,11 @@
 ---
 type: task
-status: in-progress
+status: done
 hub: widget
 created: 2026-11-06
 requested-by: Sam
 due: 
-waiting-on: 
+waiting-on:
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/335
 ---
@@ -23,10 +23,10 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
 - Today's card: `houseSvg` in `widget/pet.js`, a 240 x 150 SVG cottage on a hill with a toothbrush by the door and a tree out
   front; decorations grow with the handpiece rank, mastered hubs fly pennants, the yard follows the seasons and holidays.
   The redesign plan puts Timmy and the house on one SVG symbol sheet and on the dashboard's "you" card
-  ([the audit and plan](done/2026-11-05-redesign-audit-and-plan.md), 4.5, 4.7; [phase 3](2026-11-05-redesign-phase-3-dashboard.md)).
-- Rules that matter most here: [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md) (drawn by the agent in
-  SVG in Timmy's ink style; nothing generated, no emoji), [podcast-reactions](../rules/podcast-reactions.md) (the lore
-  rules), [preview-and-release-test](../rules/preview-and-release-test.md), [about-page](../rules/about-page.md).
+  ([the audit and plan](2026-11-05-redesign-audit-and-plan.md), 4.5, 4.7; [phase 3](2026-11-05-redesign-phase-3-dashboard.md)).
+- Rules that matter most here: [every-hub-gets-its-own-art](../../rules/every-hub-gets-its-own-art.md) (drawn by the agent in
+  SVG in Timmy's ink style; nothing generated, no emoji), [podcast-reactions](../../rules/podcast-reactions.md) (the lore
+  rules), [preview-and-release-test](../../rules/preview-and-release-test.md), [about-page](../../rules/about-page.md).
 - Lore: the cottage on a hill is canon (`tools/podcast/LORE.md`). It stays every Timmy's starting home and the podcast's
   Timmy keeps it; a student's own Timmy can move up. Add a line to `LORE.md` saying so.
 
@@ -41,7 +41,7 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
     (a lighthouse, a houseboat...). Each home has its own spots for Timmy and its own night lights.
   - **The scene**: the hill (free), then a beach, a forest, a snowy mountain, a night sky with the Dark Matter stars.
   - **The yard**: four to six spots by the home for a garden, a swimming pool, a hammock, a mailbox, a bowling lane (the
-    [bowling egg](done/2026-11-06-redesign-bowling-egg.md) lives there), a doghouse...
+    [bowling egg](2026-11-06-redesign-bowling-egg.md) lives there), a doghouse...
   - **Upgrades of the home itself**: windows, a porch, a chimney, a flag, a paint color.
 - **What students already earned still shows** on any home and scene: the rank decorations (now one set per journey: the
   ModuPro on the porch, Timmy in loupes: [the journeys](2026-11-06-redesign-progression-journeys.md)), the mastery
@@ -53,8 +53,10 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
 
 ## Done when
 
-- [ ] The homes, scenes, yard items and upgrades drawn and approved by Sam in a preview (phone and laptop, light and dark),
+- [x] The homes, scenes, yard items and upgrades drawn and approved by Sam in a preview (phone and laptop, light and dark),
       starting with the cottage redrawn, the castle, the giant mushroom, the treehouse, the pool and the garden
+      (on contact sheets rather than a preview, as Sam asked: [round 3](2026-11-10-redesign-timmys-place-round-3.md), "Looks good",
+      and every home's sheet in [#339](https://github.com/smcmurry6-source/study-hubs/pull/339), "Everything looks good")
 - [x] The scene renderer (slots, depth order, the rank and season layers) and the full view built in phase 4, recorded on the
       preview with reduced motion too (built 2026-11-12, [#335](https://github.com/smcmurry6-source/study-hubs/pull/335);
       no recording: Sam said "no preview", so it was used in a scripted browser on made-up data, phone and laptop, light
@@ -70,21 +72,21 @@ mushroom, a treehouse. The shop sells the pieces ([Timmy's shop](2026-11-06-rede
       left of the path is nudged; the statue stays by the door. In the shop's art session, on one sheet of every home
       ([the shop](2026-11-06-redesign-timmy-shop.md), "Build spec, session 1", item 7; BUG-089 in the bug log).
       Fixed in [#339](https://github.com/smcmurry6-source/study-hubs/pull/339); Sam, on the sheet of every home: "Everything looks good"
-- [ ] `LORE.md` and the About page (Timmy's place) updated
-- [ ] CI and the release suites pass, perf budgets met (`node tools/release/run.js`)
-- [ ] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
+- [x] `LORE.md` and the About page (Timmy's place) updated
+- [x] CI and the release suites pass, perf budgets met (`node tools/release/run.js`)
+- [x] Vault written back (decisions, `DEPLOY_NOTES.md`, this note's Outcome)
 
 ## Open calls (2026-11-12, asked before part C, the place as a real client)
 
 Asked in chat on 2026-11-12, before any code; each has the recommendation that gets built if Sam says "yes to all".
 Part C is the renderer and the full view (the box above) and the place's share of
-[round 3's wiring list](done/2026-11-10-redesign-timmys-place-round-3.md). The shop (part B), the bowling egg (part D),
+[round 3's wiring list](2026-11-10-redesign-timmys-place-round-3.md). The shop (part B), the bowling egg (part D),
 visiting and "everyone has Timmy" are their own sessions, and none of them blocks part C.
 
 **Answered the same day.** Sam: "okay thats fine. no preview": yes to every recommendation below, no preview, and the
 first cut taken (the second wasn't needed: the camera, the close-up and "Surprise me" are built). The new art, the
 ModuPro on the pedestal and Timmy in loupes, went to Sam as a contact sheet, light and dark, before it went into the
-engine: "contact sheet looks good" ([decisions](../decisions.md)). Every box is ticked as answered; what was built is
+engine: "contact sheet looks good" ([decisions](../../decisions.md)). Every box is ticked as answered; what was built is
 in the Log.
 
 **Where it lives**
@@ -94,7 +96,7 @@ in the Log.
 - [x] **In a new hub**: a "Timmy's place" tile in More (the card, and the full view from it). Timmy on the bar stays
       as he is.
 - [x] **Only once Timmy is adopted**, as the house card is today, until "everyone has Timmy"
-      ([Ask Timmy](done/2026-11-12-redesign-ask-timmy.md), part 4).
+      ([Ask Timmy](2026-11-12-redesign-ask-timmy.md), part 4).
 
 **`widget/pet.js`**
 
@@ -155,7 +157,7 @@ in the Log.
 **Tracking**
 
 - [x] Two feature events, no words and no item names: the place opened, a piece changed (the slot only), with
-      their rows in [event-taxonomy](../reference/event-taxonomy.md) and [analytics-retention](../reference/analytics-retention.md).
+      their rows in [event-taxonomy](../../reference/event-taxonomy.md) and [analytics-retention](../../reference/analytics-retention.md).
       Every button carries a fixed label, as the idea board's do.
 
 **A preview?**
@@ -174,7 +176,7 @@ in the Log.
 Not calls, how it will work: flame levels 4 and 5 (blue at 10 days, Dark Matter at 30) go into the new hubs' and
 the new dashboard's flame; the medal board's big view draws each hub's medal with the hub's tint; the full view is
 one dialog the visiting session can open with someone else's place (always drawn healthy); the tilt is by drag, as on
-the design page; the About page's and `LORE.md`'s lines are drafted in [the release note](done/2026-11-06-redesign-release.md)
+the design page; the About page's and `LORE.md`'s lines are drafted in [the release note](2026-11-06-redesign-release.md)
 and land at the release; BUG-083 is left alone unless the bar is opened.
 
 ## Log
@@ -182,7 +184,7 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
 - 2026-11-06: written from Sam's calls in chat.
 - 2026-11-06 (Claude Code): `equip_item` and `pet_equipped` keep the home, the scene, six yard spots and the home's upgrades
   (windows, porch, chimney, flag, paint) on the server; a yard item moves between spots; on Link my devices the newer
-  choice per slot wins (`migration_v54.sql`, [game-server](../reference/game-server.md)). The slot names are a draft for
+  choice per slot wins (`migration_v54.sql`, [game-server](../../reference/game-server.md)). The slot names are a draft for
   phase 4's renderer.
 - 2026-11-06 (Claude Code): the art, drawn first on the design page, for Sam's look before anything goes into
   `widget/pet.js`. One kit, `tools/figures/site/place.mjs`, built by `build.mjs` into `tools/preview/design/place.js`
@@ -222,13 +224,13 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
   then the renderer goes into `widget/pet.js`, and `LORE.md` (the new critters: the rabbit, a crab, an owl, a yeti, a
   friend in a crater, a whale, the dog) and the About page get their lines.
 - 2026-11-10: Sam's third round of feedback (the art, the scenes, the yard, mastery, rank-up unlocks, seasonal sets, the
-  shop's shelves, visiting someone's Timmy) is its own task: [round 3](done/2026-11-10-redesign-timmys-place-round-3.md). PR #289 stays open for it.
-- 2026-11-10 (Claude Code): round 3 is built on the design page ([its note](done/2026-11-10-redesign-timmys-place-round-3.md)):
+  shop's shelves, visiting someone's Timmy) is its own task: [round 3](2026-11-10-redesign-timmys-place-round-3.md). PR #289 stays open for it.
+- 2026-11-10 (Claude Code): round 3 is built on the design page ([its note](2026-11-10-redesign-timmys-place-round-3.md)):
   the scenes, homes and yard redrawn, Timmy's wave and his bubble, two mastery displays for Sam to pick from, and the
   seasonal and rank sets as packs (`tools/figures/site/packs/`). Still nothing in `widget/pet.js`.
 - 2026-11-10 (Claude Code): Sam's second look: hub mastery is one **medal board** (each hub's own medal, a big view on
   tap), the statue stands upright, and the design page has the shop's window, the customizer, the rank board and
-  visiting ([round 3's note](done/2026-11-10-redesign-timmys-place-round-3.md)). Still nothing in `widget/pet.js`.
+  visiting ([round 3's note](2026-11-10-redesign-timmys-place-round-3.md)). Still nothing in `widget/pet.js`.
 - 2026-11-12 (Claude Code): **part C of phase 4: the place is a real client** ([#335](https://github.com/smcmurry6-source/study-hubs/pull/335)),
   on the redesign's pages only. `widget/pet.js` is untouched and the live hubs and the live dashboard load none of it.
   - **Files.** `widget/place.js` + `widget/place.css` (`window.shPlace`), the kit `widget/hub-art/place.js`
@@ -250,19 +252,19 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
   - **Checked against the server as written** (`tools/release/xp.js`, 350 checks): the customizer's rules against
     `equip_item` through fourteen changes, the place's seasons against `sh_shop_seasons` for three years, the kit's ids
     against the catalog. **One disagreement, told to Sam, migration unchanged**: five everyday outfits in the catalog
-    have no drawing ([task](done/2026-11-12-five-outfits-without-a-drawing.md)).
+    have no drawing ([task](2026-11-12-five-outfits-without-a-drawing.md)).
   - **The preview** answers `get_my_shop`, `equip_item` and `get_pet_days_v2` from made-up data per test account
     (`shop2`, `equip2`, `PLACE_BOUGHT`, `PLACE_START` in `tools/preview/runtime/preview.js`): `high-xp` owns
     everything, `new` has no Timmy, `?xp=180000` and `?xp=300000` show the later journeys.
-  - **Left, each written down:** the later journeys' rank sets ([task](2026-11-12-redesign-later-journeys-rank-sets.md));
+  - **Left, each written down:** the later journeys' rank sets ([task](../2026-11-12-redesign-later-journeys-rank-sets.md));
     the five outfits (above); Timmy on the bar wearing his place's outfit, snack HP, `sw.js`, the About page's and
-    `LORE.md`'s lines, drafted ([the release](done/2026-11-06-redesign-release.md), "From phase 4, part C"); visiting
+    `LORE.md`'s lines, drafted ([the release](2026-11-06-redesign-release.md), "From phase 4, part C"); visiting
     (`shPlace.open({ place })` is ready for `get_place`).
   - **Something to look at, Sam:** with the garden in the spot left of the path, the garden and Timmy at the door
     stand in front of the rank statue and hide most of it (the kit's layout since round 3; the statue shows as soon as
     Timmy walks off or the spot is empty). Not changed here.
 - 2026-11-12 (Claude Code, planning only), Sam's calls for what is left around the place
-  ([decisions](../decisions.md); the order is in [phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here to
+  ([decisions](../../decisions.md); the order is in [phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here to
   the release"):
   - **The statue behind Timmy** (BUG-089): fixed in the shop's art session (the box above).
 - 2026-11-12 (Claude Code), the shop's art session ([#339](https://github.com/smcmurry6-source/study-hubs/pull/339)):
@@ -273,14 +275,21 @@ and land at the release; BUG-083 is left alone unless the bar is opened.
   "What session 1 built".
   - **What Timmy wears**: "if someone doesnt have a costume applied, they are naked. What you put wins." At his
     place too: with nothing on he is himself, where part C drew him in that day's holiday outfit. One line in
-    `timmySvg()`, made in [Timmy everywhere](done/2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"). The place's
+    `timmySvg()`, made in [Timmy everywhere](2026-11-12-redesign-ask-timmy.md) ("Build spec, part 4"). The place's
     own seasons and holiday props don't change.
-  - **Visiting** has its own note and session: [visiting](done/2026-11-12-redesign-visiting.md).
+  - **Visiting** has its own note and session: [visiting](2026-11-12-redesign-visiting.md).
   - **The shop's link** in the customizer and snack HP: [the shop](2026-11-06-redesign-timmy-shop.md), session 2.
   - **The later journeys' rank sets**: after the release, in a new migration
-    ([their note](2026-11-12-redesign-later-journeys-rank-sets.md)).
+    ([their note](../2026-11-12-redesign-later-journeys-rank-sets.md)).
+- 2026-11-17 (Claude Code, closed after the release; the inbox's "the redesign's other task notes are still open", #PR): the place shipped with the release; nothing left here.
 
 ## Outcome
 
-Related: [round 3](done/2026-11-10-redesign-timmys-place-round-3.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the bowling egg](done/2026-11-06-redesign-bowling-egg.md) ·
-[phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [diagrams-anima](../rules/diagrams-anima.md)
+**Done with the redesign's release** (2026-11-14, [#359](https://github.com/smcmurry6-source/study-hubs/pull/359)). Timmy's
+place is live on the dashboard and in each hub's More: the homes and seasonal sets, the five yard spots kept on the server
+(`equip_item`) and the same on every linked device, the customizer, visiting from the boards, and the bowling lane; the
+About page and `LORE.md` describe it. BUG-095 (a tall piece by the path in front of Timmy at the door) was accepted as it is
+(Sam, 2026-11-12). What's next is its own task: [the later journeys' rank sets](../2026-11-12-redesign-later-journeys-rank-sets.md).
+
+Related: [round 3](2026-11-10-redesign-timmys-place-round-3.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) · [the bowling egg](2026-11-06-redesign-bowling-egg.md) ·
+[phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [diagrams-anima](../../rules/diagrams-anima.md)

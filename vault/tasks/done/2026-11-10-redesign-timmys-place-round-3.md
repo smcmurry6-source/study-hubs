@@ -14,7 +14,7 @@ pr: https://github.com/smcmurry6-source/study-hubs/pull/299
 
 ## Goal
 
-Sam looked at the design page after the second round ([Timmy's place](../2026-11-06-redesign-timmys-place.md), PR #289, and
+Sam looked at the design page after the second round ([Timmy's place](2026-11-06-redesign-timmys-place.md), PR #289, and
 [the bowling egg](2026-11-06-redesign-bowling-egg.md), PR #291) and sent the list below. Fix the art, add what's missing
 and change how unlocks, seasons and the shop work, on the design page first, then show Sam before anything goes into
 `widget/pet.js`, `widget/eggs.js` or the live hubs.
@@ -107,7 +107,7 @@ fall in the school year (with their dates), and ask Sam which to add before draw
   returns only what a place shows (the home, scene, yard, outfit, rank, mastery) for someone who chose to be visitable,
   by their leaderboard name, and nothing that identifies them further ([learner-data-privacy](../../rules/learner-data-privacy.md)).
 - **Rank-up unlocks**: which decoration, outfit and house each full rank gives (the ladder is in
-  [game-server](../../reference/game-server.md) and [the journeys](../2026-11-06-redesign-progression-journeys.md)); whether
+  [game-server](../../reference/game-server.md) and [the journeys](2026-11-06-redesign-progression-journeys.md)); whether
   they're free unlocks or also in the shop.
 - **Seasonal returns**: how often "rare intervals" is (for example one seasonal item in the daily picks a few times a
   month), and whether a returning item keeps its price.
@@ -145,7 +145,7 @@ fall in the school year (with their dates), and ask Sam which to add before draw
 - [x] `node tools/figures/site/build.mjs --check`, `node tools/ci/syntax.js`, `node tools/ci/vault.js`, the database
       suites, and the smoke test pass
 - [x] Vault written back: this note's Log and Outcome, [decisions](../../decisions.md),
-      [Timmy's place](../2026-11-06-redesign-timmys-place.md), [the shop](../2026-11-06-redesign-timmy-shop.md),
+      [Timmy's place](2026-11-06-redesign-timmys-place.md), [the shop](2026-11-06-redesign-timmy-shop.md),
       [game-server](../../reference/game-server.md), `DEPLOY_NOTES.md`
 
 ## Log
@@ -265,6 +265,6 @@ checks are green, carrying #289's commits (it was stacked on it), so #289 is clo
 - A tall yard piece in the front spot (the wishing well, the swing) stands in front of the door, and one in the side
   yard or the front corner can cover part of the medal board: that is the player's choice of spot, not a drawing fault.
 
-Related: [Timmy's place](../2026-11-06-redesign-timmys-place.md) · [Timmy's shop](../2026-11-06-redesign-timmy-shop.md) ·
-[the bowling egg](2026-11-06-redesign-bowling-egg.md) · [the journeys](../2026-11-06-redesign-progression-journeys.md) ·
-[phase 4](../2026-11-05-redesign-phase-4-game-layer.md) · [game-server](../../reference/game-server.md)
+Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [Timmy's shop](2026-11-06-redesign-timmy-shop.md) ·
+[the bowling egg](2026-11-06-redesign-bowling-egg.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·
+[phase 4](2026-11-05-redesign-phase-4-game-layer.md) · [game-server](../../reference/game-server.md)
