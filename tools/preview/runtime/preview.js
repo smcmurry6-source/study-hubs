@@ -296,8 +296,11 @@
       return { kind: "notice", id: 9500 + i, hub: null, title: n.title, note: null, message: n.message, at: n.at, seen: false, expires_at: null };
     })) : [];
   }
-  function bootstrapSurvey(t){
-    if (!P.survey || db.surveys.answered) return [];
+  /* as the live functions answer: the pop-up (get_active_survey, survey_popup) only before any reply, "Later" included;
+     the Inbox (get_my_survey, survey) until it is answered */
+  function bootstrapSurvey(t, popup){
+    var r = db.surveys.answered;
+    if (!P.survey || (popup ? r : r && r.p_answers)) return [];
     return [{ id: 501, title: "Preview survey (fixture)", starts_at: iso(t - 864e5), questions: [
       { id: "q1", kind: "scale", prompt: "How useful was the Daily Drill this week?", ends: ["Not useful", "Very useful"] },
       { id: "q2", kind: "choice", prompt: "Where do you study most?", options: ["Phone", "Laptop", "Tablet"] },
@@ -343,7 +346,7 @@
       cavity: [],
       podcast: bootstrapPodcast(hub, ep, t),
       dashboard_week: dashboard ? bootstrapWeek() : [],
-      survey_popup: dashboard ? bootstrapSurvey(t) : [],
+      survey_popup: dashboard ? bootstrapSurvey(t, true) : [],
       exam_luck: dashboard && a.p_luck_hub && a.p_luck_date ? { count: 0, mine: false, recent: [] } : null,
       recaps: dashboard ? recapFixtures() : [],
       golden: [],
@@ -479,9 +482,18 @@
     if (!db.equip) { db.equip = {}; var st = PLACE_START[db.persona] || {}, own = placeOwned(db.visitor); Object.keys(st).forEach(function(k){ if (own[st[k]]) db.equip[k] = st[k]; }); }
     return db.equip;
   }
+  /* a survey's or a check-in's reward, once per key: 1,000 XP, and 1,000 crowns that aren't in the 1-per-10-XP share */
+  function formReward(v, key){
+    if (!v || v !== db.visitor) return false;
+    db.forms = db.forms || [];
+    if (db.forms.indexOf(key) >= 0) return false;
+    db.forms.push(key); db.xp2 = (db.xp2 || 0) + 1000;
+    return true;
+  }
   function wallet2(v){
     if (!v || v !== db.visitor) return null;
-    var earned = (WALLET_START[db.persona] || 0) + Math.floor((db.xp2 || 0) / 10), spent = 0;
+    var forms = (db.forms || []).length;
+    var earned = (WALLET_START[db.persona] || 0) + Math.floor(Math.max(0, (db.xp2 || 0) - 1000 * forms) / 10) + 1000 * forms, spent = 0;
     (db.buys || []).forEach(function(b){ spent += b.price || 0; });
     return { earned: earned, spent: spent, balance: earned - spent, from_xp: earned, trophies: 0, medals: 0, rankups: 0 };
   }
@@ -1574,10 +1586,24 @@
         return { write: true, data: null };
       case "get_my_inbox": return { data: bootstrapInbox(v) };
       case "mark_reply_seen": db.inbox.forEach(function(m){ if (m.id === a.p_id) m.seen = true; }); save(); return { write: true, data: null };
-      case "get_active_survey": case "get_my_survey": return { data: bootstrapSurvey(t) };
-      case "submit_survey": db.surveys.answered = a; save(); return { write: true, data: null };
+      case "get_active_survey": return { data: bootstrapSurvey(t, true) };
+      case "get_my_survey": return { data: bootstrapSurvey(t) };
+      case "submit_survey": if (!db.surveys.answered || !db.surveys.answered.p_answers) db.surveys.answered = a; save(); return { write: true, data: null };
       /* the exam check-in shows "Thank you" only on true, as the live function returns */
       case "submit_exam_debrief": (db.debriefs = db.debriefs || []).push(a); save(); return { write: true, data: true };
+      /* the reward (migration_v60, v61): the first answer to each survey and the first check-in for each hub's exam pay
+         1,000 XP and 1,000 crowns (formReward); a second one pays nothing. The dashboard's window shows what was paid. */
+      case "submit_survey_v2": {
+        if (db.surveys.answered && db.surveys.answered.p_answers) return { data: { ok: false } };
+        var svPay = !!a.p_answers && formReward(v, "survey:" + a.p_survey);
+        db.surveys.answered = a; save();
+        return { write: true, data: { ok: true, xp: svPay ? 1000 : 0, crowns: svPay ? 1000 : 0 } };
+      }
+      case "submit_exam_debrief_v2": {
+        (db.debriefs = db.debriefs || []).push(a);
+        var ckPay = formReward(v, "checkin:" + hub + ":" + a.p_exam);
+        save(); return { write: true, data: { ok: true, xp: ckPay ? 1000 : 0, crowns: ckPay ? 1000 : 0 } };
+      }
       case "pod_feed": {
         return { data: bootstrapPodcast(hub, a.p_ep, t) };
       }
