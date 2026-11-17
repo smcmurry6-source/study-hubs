@@ -1,11 +1,14 @@
 /* The dashboard's hubs: where a hub is added, dated or archived (edit this file by hand).
    classes     each class's name and the line its drawn scene says when tapped
-   hubs        every hub with a card: its class, title, exams (name, label, date, the check-in's hours and extra questions),
-               its "updated" date, what it covers, and any archiveOn / hideCardOn override
+   hubs        every hub with a card: its class, title, exams (name, label, date, the check-in's hours and extra questions,
+               and askAgain: a round, "yyyy-mm-dd", that shows the check-in pop-up once more to every device that showed it
+               and never sent it), its "updated" date, what it covers, and any archiveOn / hideCardOn override
    archived    hubs kept only for their recaps
    checkinHour, archiveHour, cardDays, debriefDays   when "Check in" shows on exam day, when a hub archives itself (10 pm
                on its last exam day), how many days it then counts as archived before hidden (the dashboard draws no card for
                either since 2026-11-14), and how long the check-in pop-up still goes out
+   surveyAgain { "<survey id>": "yyyy-mm-dd" }: a round that shows that survey's pop-up once more to everyone who said
+               "Later" to it (it waits in their Inbox until answered)
    labels      short names
    legacy      hubs still on their old single-file page (hubs/<id>/index.html holds everything); every other hub is on
                the engine (widget/hub.js, its content in hubs/<id>/content/). A new hub is never added here.
@@ -334,7 +337,8 @@ window.SH_DASH_DATA = {
      "date": "2026-11-16",
      "code": "Occlusion · Final",
      "checkinHour": 20,
-     "promptHour": 20
+     "promptHour": 20,
+     "askAgain": "2026-11-17"
     }
    ],
    "updated": "2026-11-12",
@@ -462,6 +466,9 @@ window.SH_DASH_DATA = {
  "archiveHour": 22,
  "cardDays": 10,
  "debriefDays": 60,
+ "surveyAgain": {
+  "4": "2026-11-17"
+ },
  "labels": {
   "genetics": "Genetics",
   "hepatobiliary": "Hepatobiliary",

@@ -32,6 +32,28 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-17 (The check-in and the survey in a window, Timmy peeking over it, a celebration for the reward, and one more ask, Claude Code, #398)** —
+  Sam: "make the check in and survey prompt more interesting and also advertise that it earns you 1000xp and 1000 gold crowns.
+  make it take up the center of the screen and a window. have timmy peek over the top of the window", then "the thank you stage
+  should show that you earned the crowns and xp. make it do a super epic and cool animation" and "push this new prompt to anyone
+  who has said no on the occlusion final check in and the new survey". `widget/dash.js`: `formWindow` (one window for both: the
+  middle of the screen over the dimmed page, a title bar in the hub's tint or gold, the same top for every step so it doesn't jump,
+  focus kept inside and given back, Escape / × / a tap outside = Not now or Later) with Timmy (`shPet.art`, in his outfit) cut at
+  its top edge and his hands drawn again over it (`PEEK_HANDS`), a line for each step in a bubble; the reward as two tiles before
+  sending (`lootHtml`, only when it would pay: a check-in already sent from this device doesn't offer it); the check-in's bar fills
+  toward a crown coin. `celebrate`: when `_v2` says it paid, a turning sunburst, a shockwave, 28 pieces of confetti, crowns and
+  stars, the tiles popping in and counting up, Timmy jumping with his arms up, and Collect (or ×, Escape, 12 s), which flies 12
+  crowns and stars from the tiles into the bar's rank (`#dxRank`, which glows) and only then calls `rewardPaid`, so a rank-up card
+  follows instead of covering it. All still with reduced motion or "Answer animations" off (the CSS stops every animation in
+  `.survey`; no flyers, no counting). **Ask again**: `hubs.js` `askAgain` on an exam (a device that showed the check-in and never
+  sent it gets it once more per round, `sh_debrief_again_*`) and `surveyAgain` (`{ "<id>": "<round>" }`: whoever said Later, i.e.
+  in the bootstrap's `survey` but not `survey_popup`, gets the pop-up once more, `sh_survey_again_*`); set for the Occlusion final
+  and survey 4, round `2026-11-17`. `rewardLine` gone. The preview: `submit_survey_v2` and `submit_exam_debrief_v2` pay as
+  migration_v60/v61 do (`formReward`, its crowns kept out of the 1-per-10 share), and "Later" now leaves the survey in the Inbox
+  (`get_my_survey`) while the pop-up (`get_active_survey`) stops, as on the live database. About page and Ask Timmy's site help.
+  The pop-ups now wait while another window is open (`whenUncovered`, on `lifeCovered()`): a classmate's place or the shop is a
+  `<dialog>` above everything, so the check-in opened hidden under it and took its Escape (CI's smoke test caught it). The smoke
+  test closes the window when it opens over the dashboard, like the tour and the archived notice, and checks a visit has none under it.
 - **2026-11-17 (Heme & Endo Exam 3: the exam's count per lecture, Claude Code)** — Sam gave the breakdown: A 3, L17 4, L18 6,
   L19 8, L20 6, L21 4, L22 4. `core.json` `examCounts` (all seven; "n on the exam" under Most likely questions, and Ask Timmy's
   exam facts through `examInfo`) and `mock.blueprint` (the five lectures in the hub, 27 questions in 69 minutes at the exam's
