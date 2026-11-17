@@ -261,6 +261,31 @@ try {
   anon(`select record_achievement('xp-D2', 'mastery-bronze', 'xm')`);
   const d2 = []; for (let i = 1; i <= 5; i++) d2.push(ans('xp-D2', 'm' + i, { hub: 'xm', choice: 0, at: 1000 + i * 10 }));
   ok(d2[4].medal && d2[4].medal.xp === 100, 'a Bronze recorded by today\'s page after the switch is paid when it\'s reached');
+  // a medal won during a shop boost: the boost's unused time moves after the medal's 24 hours (migration_v63)
+  sql(`insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at) values ('xp-DB', 'shop:t1', 'shop', 2, ${T(1990)}, ${T(1990 + 3600)})`);
+  const mb1 = []; for (let i = 1; i <= 5; i++) mb1.push(ans('xp-DB', 'm' + i, { hub: 'xm', choice: 0, at: 2000 + i * 10 }));
+  const mbM = mb1[4].medal, left = 3600 - 60;   // the boost ran 60 of its 3,600 seconds before the Bronze at 2050
+  const since = (t, from) => num(`select extract(epoch from (${q(t)}::timestamptz - ${T(from)}))::int`);
+  ok(mb1[0].mult === 2 && mbM && mbM.kind === 'mastery-bronze' && since(mbM.boost_until, 2050) === 86400 + left,
+    `a medal during a shop boost: double XP lasts 24 hours and the boost's ${left} unused seconds (${JSON.stringify(mbM)})`);
+  eq(rows(`select extract(epoch from starts_at - ${T(0)})::int || '-' || extract(epoch from ends_at - ${T(0)})::int as span from xp_boosts where visitor_id = 'xp-DB' and src = 'shop' order by starts_at`).map(r => r.span),
+    ['1990-2050', `${2050 + 86400}-${2050 + 86400 + left}`], 'the boost keeps the part it ran and its rest starts as the medal\'s 24 hours end');
+  eq([2050 + 86400 - 5, 2050 + 86400 + 100, 2050 + 86400 + left + 5].map(t => num(`select sh_xp_mult('xp-DB', ${T(t)})`)), [2, 2, 1], 'double XP through the medal\'s hours and then the boost\'s rest, then over');
+  ok(Date.parse(json(`sh_boost_json('xp-DB', ${T(3000)})`).until) === Date.parse(mbM.boost_until), 'the running boost\'s "until" runs on through the moved boost');
+  const mb2 = []; for (let i = 6; i <= 8; i++) mb2.push(ans('xp-DB', 'm' + i, { hub: 'xm', choice: 0, at: 2100 + i * 10 }));
+  ok(mb2[2].medal && mb2[2].medal.kind === 'mastery-silver' && num(`select count(*) from xp_boosts where visitor_id = 'xp-DB' and src = 'shop' and ends_at > ${T(2180)}`) === 1
+    && num(`select extract(epoch from ends_at - starts_at)::int from xp_boosts where visitor_id = 'xp-DB' and src = 'shop' and ends_at > ${T(2180)}`) === left
+    && num(`select extract(epoch from min(starts_at) - ${T(2180)})::int from xp_boosts where visitor_id = 'xp-DB' and src = 'shop' and ends_at > ${T(2180)}`) === 86400,
+    'a second medal moves the waiting boost again, whole, after its own 24 hours');
+  const mbN = []; for (let i = 1; i <= 5; i++) mbN.push(ans('xp-DN', 'm' + i, { hub: 'xm', choice: 0, at: 3000 + i * 10 }));
+  ok(mbN[4].medal && since(mbN[4].medal.boost_until, 3050) === 86400
+    && num(`select count(*) from xp_boosts where visitor_id = 'xp-DN' and src = 'shop'`) === 0, 'a medal with no shop boost: 24 hours, as before');
+  // the bowling egg's secret trophy (migration_v63)
+  award('xp-BW', 'rep:flag:9034', 100);
+  const bw1 = anon(`select record_achievement('xp-BW', 'bowling', '')`)[0][0], bw2 = anon(`select record_achievement('xp-BW', 'bowling', '')`)[0][0];
+  ok(bw1 === 't' && bw2 === 'f' && json(`sh_wallet('xp-BW')`).trophies === 1, `the Bowling trophy is recorded once and pays 25 crowns as a trophy (${bw1}, ${bw2})`);
+  ok(rows(`select n from get_trophy_stats() where kind = 'bowling'`).length === 1, 'and it has a share of the class');
+  eq(anon(`select record_achievement('xp-BW', 'no-such-trophy', '')`)[0][0], 'f', 'a kind not on the list is still refused');
   // Timmy Time
   anon(`select admin_set_podcast_episode(${S}, 'xh', 'ep1', 600)`);
   raises(() => anon(`select admin_set_podcast_episode('wrong', 'xh', 'ep1', 600)`), '28000', 'setting an episode with a wrong secret');

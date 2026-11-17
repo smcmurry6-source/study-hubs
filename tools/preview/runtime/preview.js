@@ -678,8 +678,13 @@
       var lvl = medalLevel(hub), pays = [0, 100, 200, 300, 500], got = 0;
       for (var m = db.medals[hub] + 1; m <= lvl; m++) got += pays[m];
       if (got) {
+        /* a shop boost's unused time moves after the medal's 24 hours (sh_boost_bump, migration_v63); one waiting after an
+           earlier medal's hours keeps only its own (db.sboost is where the shop's double XP ends) */
+        var prev = db.boost ? new RealDate(db.boost.until).getTime() : 0, sb = db.sboost ? new RealDate(db.sboost).getTime() : 0,
+          rest = sb - Math.max(t, prev);
         db.medals[hub] = lvl; db.xp2 += got; db.boost = { until: iso(t + 864e5), src: "medal" };
-        medal = { kind: ["", "mastery-bronze", "mastery-silver", "mastery-gold", "mastery-crown"][lvl], level: lvl, xp: got, boost_until: iso(t + 864e5) };
+        if (rest > 0) db.sboost = iso(t + 864e5 + rest);
+        medal = { kind: ["", "mastery-bronze", "mastery-silver", "mastery-gold", "mastery-crown"][lvl], level: lvl, xp: got, boost_until: rest > 0 ? db.sboost : iso(t + 864e5) };
       }
     }
     var resp = { ok: true, correct: correct, kind: kind, xp: paid, base: base, mult: mult, first: correct && paid > 0 && base === 10, why: why, bonus: bonus, medal: medal, boost: boost2(t), total: 0 };

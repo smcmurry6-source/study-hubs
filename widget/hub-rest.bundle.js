@@ -3959,6 +3959,16 @@ paid(r);
 var p = send();
 if (d.session) (gamePending[d.session] = gamePending[d.session] || []).push(p);
 }
+function sendBowlTrophy(){
+try { if (!supabase || !localStorage.getItem("sh_bowl_trophy") || localStorage.getItem("sh_bowl_trophy_sent")) return; } catch (e) { return; }
+try {
+supabase.rpc("record_achievement", { p_visitor: VISITOR_ID, p_kind: "bowling", p_hub: HUB || "" }).then(function(res){
+if (res && !res.error) try { localStorage.setItem("sh_bowl_trophy_sent", "1"); } catch (e) {}
+}, function(){});
+} catch (e) {}
+}
+document.addEventListener("sh:bowl-trophy", sendBowlTrophy);
+setTimeout(sendBowlTrophy, 5000);
 window.shGame = {
 want: GAME.want,
 v2: function(){ return GAME.on === true; },
