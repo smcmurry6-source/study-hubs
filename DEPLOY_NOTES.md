@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-17 (The check-in and the survey in a window, Timmy peeking over it, a celebration for the reward, and one more ask, Claude Code)** —
+- **2026-11-17 (The check-in and the survey in a window, Timmy peeking over it, a celebration for the reward, and one more ask, Claude Code, #398)** —
   Sam: "make the check in and survey prompt more interesting and also advertise that it earns you 1000xp and 1000 gold crowns.
   make it take up the center of the screen and a window. have timmy peek over the top of the window", then "the thank you stage
   should show that you earned the crowns and xp. make it do a super epic and cool animation" and "push this new prompt to anyone
@@ -51,6 +51,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   and survey 4, round `2026-11-17`. `rewardLine` gone. The preview: `submit_survey_v2` and `submit_exam_debrief_v2` pay as
   migration_v60/v61 do (`formReward`, its crowns kept out of the 1-per-10 share), and "Later" now leaves the survey in the Inbox
   (`get_my_survey`) while the pop-up (`get_active_survey`) stops, as on the live database. About page and Ask Timmy's site help.
+  The pop-ups now wait while another window is open (`whenUncovered`, on `lifeCovered()`): a classmate's place or the shop is a
+  `<dialog>` above everything, so the check-in opened hidden under it and took its Escape (CI's smoke test caught it). The smoke
+  test closes the window when it opens over the dashboard, like the tour and the archived notice, and checks a visit has none under it.
 - **2026-11-17 (Ask Timmy looks up what the notes don't cover, Claude Code, #399)** — Sam: "the outside source would only be
   used when there was something about the content that ask timmy doesnt have an answer for" (exostoses was the example),
   then "we can do web search, the sites and others like them are good to go on the list, no limit on gap answers". When
