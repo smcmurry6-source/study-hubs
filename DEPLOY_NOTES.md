@@ -43,7 +43,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   page, `widget/hub.js`), a new trophy 200 (`widget/ranks.js`), medals 250-1,000, the day's first game 100, a personal best
   50 and a hub high score 250, a daily visit 50 (`widget/dash.js`), a fixed report's 100 crowns. Every card says what it
   pays (Timmy Time, Mark as read, the arcade, the goal, the visit, the name, the nuke badge, the shop's list). About page,
-  [game-server](vault/reference/game-server.md), event taxonomy and retention updated; `xp.js` 516 checks.
+  [game-server](vault/reference/game-server.md), event taxonomy and retention updated; `xp.js` 519 checks.
+  Then Sam: "Every right answer should give xp": `sh_answer` pays every right answer graded from its key (a retired
+  question's too), with no speed limit and no limit a day (a double tap and the same question twice in a mock count once);
+  misses keep their limits, and the run toward the nuke still counts only answers at the speed limit. `sh_xp_replay` pays the
+  same, and the migration rebuilds every visitor from it, paying the right answers since the release that had paid nothing
+  (about 80 from about 25 people since the release, nearly all under 2 seconds after the one before). The page's guess
+  (`xpFor` in `widget/hub-rewards.js`), the About page's XP entry and More's note say the same.
 - **2026-11-17 (The check-in and the survey in a window, Timmy peeking over it, a celebration for the reward, and one more ask, Claude Code, #398)** —
   Sam: "make the check in and survey prompt more interesting and also advertise that it earns you 1000xp and 1000 gold crowns.
   make it take up the center of the screen and a window. have timmy peek over the top of the window", then "the thank you stage

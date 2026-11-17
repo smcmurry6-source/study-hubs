@@ -43,7 +43,9 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   server grades the answer from the key and records all of it, then pays. Unknown and retired ids are recorded with the
   page's own verdict (`claim`) and earn nothing.
 - **What pays** (no daily cap): 10 for a question's first right answer ever, 2 for a later right one, 1 for a wrong one,
-  self-graded cards a flat 2; a question pays its first three right and its first three wrong answers each Central day; +20
+  self-graded cards a flat 2; **every right answer pays** (migration_v64, Sam 2026-11-17: "Every right answer should give
+  xp"; graded from its key, a retired question's too, never past the guardrails below), and a question pays its first three
+  wrong answers each Central day (a self-graded miss: its first three answers); +20
   for a day studied (as today); +30 at the day's 20th answer; +5 for a question missed the last time before today and right
   today (once per question); +50 for a mock with 10 or more answers (once per hub per day); +50 for an arcade game finished 20
   seconds or more after it started (once per game per day); 10 a minute of a Timmy Time episode heard for the first time
@@ -52,9 +54,14 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   (migration_v60, Sam 2026-11-17: `survey:<id>` and `checkin:<hub>:<exam>`, paid to the linked id, never for a check-in sent
   before by any of the person's linked ids; back pay only for survey 4 and Occlusion's final check-ins, by `tools/data-fixes/2026-11-17-reward-backpay.sql`; `submit_survey_v2` and `submit_exam_debrief_v2` say what was paid, which the dashboard's window advertises before and celebrates after: `celebrate` in `widget/dash.js`); +100 / 200 / 300 / 500 for a hub's Bronze, Silver, Gold and Crown, which also start **24 hours of
   double XP**.
-- **The guardrails**: an answer under 2 seconds after the last, or the 31st in a minute, still counts in your answers and the
-  class stats but earns nothing. A mock's answers arrive together at the end, so they need 2 seconds of mock time each instead
-  (the session from `xp_session_start`, one answer per question per mock). A podcast minute needs 25 seconds since the last
+- **The guardrails** (since migration_v64, for misses only; a right answer always pays): a miss under 2 seconds after the
+  last, or the 31st in a minute, still counts in your answers and the class stats but earns nothing. A mock's answers arrive
+  together at the end, so its misses need 2 seconds of mock time each instead (the session from `xp_session_start`). Two
+  things are one answer, not two, and pay once: a double tap (the same question again within 2 seconds) and the same
+  question twice in one mock. The run of right answers in a row (`xp_runs`: its prizes, the nuke and the class record) still
+  counts only right answers at the speed limit and a question's first three right of the day. `sh_xp_replay` pays the same,
+  and migration_v64 rebuilt every visitor from it, which paid the right answers given since the release that had paid
+  nothing (about 80, mostly under 2 seconds after the one before). A podcast minute needs 25 seconds since the last
   paid one.
 - **Boosts** (`xp_boosts`): never more than 2x at once, whatever is running; a new medal restarts its 24 hours; a shop boost's
   time goes after every boost running or waiting (`migration_v62.sql`): it extends the last one when that's a shop boost, and
@@ -398,7 +405,7 @@ it as `sh:crowns` (the hub's meters and a gold "+n crowns" pop, the dashboard's 
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (516 checks, the prizes of migration_v64 in section 14c, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (519 checks, the prizes of migration_v64 in section 14c, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, a place opened from a board row, and a random visit going through the whole class, in 14a). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;

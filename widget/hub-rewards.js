@@ -69,14 +69,15 @@
   }
   /* XP as the server counts it. On the live rules (widget/ranks.js, "How XP works"): 10 the first time you get a
      question right, 2 for any other right answer, 1 for a miss, 20 for every day you study; answer XP is capped at 600
-     a day. On the game layer: the same 10, 2 and 1 with no cap, a self-graded card a flat 2, each question paying
-     its first three right and its first three wrong answers a day, all of it doubled while a boost runs. This is the
+     a day. On the game layer: the same 10, 2 and 1 with no cap, a self-graded card a flat 2, every right answer paying
+     (migration_v64, Sam: "Every right answer should give xp") and a question's first three misses a day, all of it doubled
+     while a boost runs. This is the
      page's guess, shown at once; the server's own figure follows and corrects it (sh:answer-paid, below). */
   function xpFor(qid, correct, self){
     var s = ansOf(qid), t = todayRec();
     if (!v2()) { var x = correct ? (s && s.c > 0 ? 2 : 10) : 1; return Math.max(0, Math.min(x, 600 - t.xp)); }
     var q = (t.q || {})[qid] || [0, 0], b = boost();
-    var base = self ? (q[0] + q[1] < 3 ? 2 : 0) : correct ? (q[0] < 3 ? (s && s.c > 0 ? 2 : 10) : 0) : (q[1] < 3 ? 1 : 0);
+    var base = self ? (correct || q[0] + q[1] < 3 ? 2 : 0) : correct ? (s && s.c > 0 ? 2 : 10) : (q[1] < 3 ? 1 : 0);
     return base * (b ? b.mult || 2 : 1);
   }
   /* the arcade game being played: its session on the game layer (widget/games.js), which its answers carry */

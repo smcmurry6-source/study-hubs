@@ -144,8 +144,8 @@ try {
   eq(ans('xp-V', 'v1', { hub: 'xv', choice: 1, v: 'old', at: 0 }).correct, true, 'a page showing the old version is graded against the old key');
   eq(ans('xp-V', 'v1', { hub: 'xv', choice: 3, v: 'new', at: 10 }).correct, true, 'the new version against the new key');
   eq(ans('xp-V', 'v1', { hub: 'xv', choice: 3, v: 'unknown-v', at: 20 }).correct, true, 'an unknown version falls back to the current key');
-  const ret = ans('xp-V', 'v2', { hub: 'xv', choice: 0, at: 30, claim: true });
-  ok(ret.kind === 'retired' && ret.xp === 0, `a retired id earns nothing (${JSON.stringify(ret)})`);
+  const ret = ans('xp-V', 'v2', { hub: 'xv', choice: 0, at: 30, claim: false });
+  ok(ret.kind === 'one' && ret.correct === true && ret.xp > 0, `a retired id that still has its key is graded from it and pays (migration_v64; ${JSON.stringify(ret)})`);
   // the real Occlusion bank through tools/xp/keys.js
   const occ = KEYS.keys('occlusion');
   const loaded = anonJson(`admin_load_question_keys(${S}, 'occlusion', ${q(JSON.stringify(occ))}::jsonb, true)`);
@@ -165,14 +165,17 @@ try {
   eq(xpOf('xp-A'), 30, 'with the day studied: 20 + 10');
   A('x1', { choice: 1, at: 5 }, 2, 'second right answer that day: 2');
   A('x1', { choice: 1, at: 10 }, 2, 'third: 2');
-  const r4 = A('x1', { choice: 1, at: 15 }, 0, 'fourth right answer that day: nothing');
-  eq(r4.why, 'repeat', 'the fourth says why');
-  const fast = A('x2', { choice: 1, at: 16 }, 0, 'an answer 1 second after the last: nothing');
-  eq(fast.why, 'fast', 'it says why');
+  /* migration_v64 (Sam: "Every right answer should give xp"): no limit a day and no speed limit on a right answer */
+  const r4 = A('x1', { choice: 1, at: 15 }, 2, 'fourth right answer that day: 2 (migration_v64)');
+  eq(r4.why, null, 'the fourth has no why');
+  const fast = A('x2', { choice: 1, at: 16 }, 10, 'a right answer 1 second after the last: 10 (migration_v64)');
+  eq(fast.why, null, 'nothing to say why');
+  const fastMiss = A('x3', { choice: 0, at: 16.5 }, 0, 'a miss half a second after the last: nothing');
+  eq(fastMiss.why, 'fast', 'it says why');
   ok(num(`select count(*) from personal_answers where visitor_id = 'xp-A' and qid = 'x2'`) === 1 && num(`select attempts from question_stats where hub = 'xh' and qid = 'x2'`) >= 1, 'a fast answer still counts in your answers and the class stats');
   A('x3', { choice: 0, at: 20 }, 1, 'a wrong answer: 1');
   A('x3', { choice: 0, at: 25 }, 1, 'second wrong: 1');
-  A('x3', { choice: 0, at: 30 }, 1, 'third wrong: 1');
+  A('x3', { choice: 0, at: 30 }, 0, 'third wrong (the fast one was the first): nothing');
   A('x3', { choice: 0, at: 35 }, 0, 'fourth wrong answer that day: nothing');
   A('x17', { picks: [2, 0], at: 40 }, 10, 'select all, right in any order: 10');
   A('x17', { picks: [0], at: 45 }, 1, 'select all, one missing: wrong');
@@ -181,21 +184,22 @@ try {
   A('x19', { self: true, at: 60 }, 2, 'self graded: a flat 2');
   A('x19', { self: false, at: 65 }, 2, 'self graded, missed: 2');
   A('x19', { self: true, at: 70 }, 2, 'self graded, third: 2');
-  A('x19', { self: true, at: 75 }, 0, 'self graded, fourth that day: nothing');
+  A('x19', { self: true, at: 75 }, 2, 'self graded, fourth that day, got it: 2 (migration_v64)');
+  A('x19', { self: false, at: 77 }, 0, 'self graded, fifth that day, missed: nothing');
   const unk = ans('xp-A', 'nope', { choice: 1, claim: true, at: 80 });
   ok(unk.kind === 'unknown' && unk.xp === 0 && unk.correct === true, `an unknown id earns nothing, recorded with the page's verdict (${JSON.stringify(unk)})`);
   ok(num(`select count(*) from personal_answers where visitor_id = 'xp-A' and qid = 'nope'`) === 1, 'an unknown id is still recorded');
   const bad = ans('xp-A', 'x4', { choice: 25, at: 85 });
   ok(bad.ok === false && num(`select count(*) from personal_answers where visitor_id = 'xp-A' and qid = 'x4'`) === 0, 'a choice out of range is refused and records nothing');
   A('x1', { choice: 1, at: DAY }, 2, 'the next day, a question already right before: 2');
-  ok(xpOf('xp-A') === 20 + 10 + 2 + 2 + 3 + 10 + 1 + 10 + 1 + 6 + 20 + 2, `A's total: two days studied plus every answer (${xpOf('xp-A')})`);
+  ok(xpOf('xp-A') === 20 + 10 + 2 + 2 + 2 + 10 + 2 + 10 + 1 + 10 + 1 + 6 + 2 + 20 + 2, `A's total: two days studied plus every answer (${xpOf('xp-A')})`);
   // thirty a minute: 31 answers exactly 2 seconds apart; the 31st is the 31st in 60 seconds
   const w = [];
   for (let i = 0; i < 31; i++) w.push(ans('xp-W', 'x' + (1 + (i % 16)), { choice: 1, at: i * 2 }).xp);
-  ok(w.slice(0, 30).every(x => x > 0) && w[30] === 0, `the 31st answer in a minute earns nothing (${w.slice(28).join(',')})`);
-  eq(ans('xp-W', 'x5', { choice: 1, at: 62 }).xp, 0, 'still 31 in the last minute two seconds later');
-  ok(ans('xp-W', 'x6', { choice: 1, at: 95 }).xp > 0, 'pays again once the minute has room');
-  notes.push('answers: 10 / 2 / 1, three a day each way, self graded 2, unknown and retired 0, 2 seconds and 30 a minute');
+  ok(w.every(x => x > 0), `31 right answers in a minute all pay (migration_v64; ${w.slice(28).join(',')})`);
+  eq(ans('xp-W', 'x5', { choice: 0, at: 62 }).xp, 0, 'a miss as the 32nd in the last minute earns nothing');
+  ok(ans('xp-W', 'x6', { choice: 0, at: 95 }).xp > 0, 'a miss pays again once the minute has room');
+  notes.push('answers: 10 / 2 / 1, every right answer pays (no limit a day, no speed limit), misses three a day and 2 seconds and 30 a minute, self graded 2, unknown 0, retired graded from its key');
 
   /* ---------- 5. a replayed call and a double tap ---------- */
   const r1 = ans('xp-R', 'x3', { choice: 1, req: 'req-aaaa-0001', at: 0 });
@@ -234,14 +238,14 @@ try {
   ok(num(`select count(*) from mock_scores where visitor_id = 'xp-M' and correct = 10 and total = 40`) === 1, 'the mock\'s score is saved from the server\'s count');
   ok(json(`sh_session_finish(${T(40)}, 'xp-M', ${q(m1)}::uuid, null, null)`).repeat === true, 'finishing it again: nothing new');
   const m2 = one(`select sh_session_start(${T(100)}, 'xp-M', 'xh', 'mock', null)`);
-  const mk2 = []; for (let i = 0; i < 12; i++) mk2.push(ans('xp-M', 'x' + (i + 1), { choice: 1, ctx: 'mock', session: m2, at: 110 + i * 0.1 }).xp);
-  ok(mk2.slice(0, 5).every(x => x > 0) && mk2.slice(5).every(x => x === 0), `a mock sent in after 10 seconds: only its first 5 answers pay (${mk2.join(',')})`);
+  const mk2 = []; for (let i = 0; i < 12; i++) mk2.push(ans('xp-M', 'x' + (i + 1), { choice: i % 3 ? 1 : 0, ctx: 'mock', session: m2, at: 110 + i * 0.1 }).xp);
+  ok(mk2.every((x, i) => i % 3 ? x > 0 : i < 5 ? x > 0 : x === 0), `a mock sent in after 10 seconds: every right answer pays, a miss only among its first 5 (${mk2.join(',')})`);
   eq(json(`sh_session_finish(${T(120)}, 'xp-M', ${q(m2)}::uuid, null, null)`).xp, 0, 'a second mock in the same hub that day: no second +50');
   const m3 = one(`select sh_session_start(${T(0)}, 'xp-M3', 'xh', 'mock', null)`);
   for (let i = 0; i < 5; i++) ans('xp-M3', 'x' + (i + 1), { choice: 1, ctx: 'mock', session: m3, at: 60 + i });
   eq(json(`sh_session_finish(${T(70)}, 'xp-M3', ${q(m3)}::uuid, null, null)`).xp, 0, 'a mock with fewer than 10 answers: no +50');
-  ok(ans('xp-M4', 'x1', { choice: 1, ctx: 'mock', session: m1, at: 200 }).xp === 10 && ans('xp-M4', 'x2', { choice: 1, ctx: 'mock', session: m1, at: 200.1 }).xp === 0,
-    'someone else\'s mock gives no mock timing: the usual speed limit');
+  ok(ans('xp-M4', 'x1', { choice: 1, ctx: 'mock', session: m1, at: 200 }).xp === 10 && ans('xp-M4', 'x2', { choice: 0, ctx: 'mock', session: m1, at: 200.1 }).xp === 0,
+    'someone else\'s mock gives no mock timing: the usual speed limit for a miss');
   // hub mastery medals and their double XP (hub xm: 10 counted questions and one review-only)
   const md = [];
   for (let i = 1; i <= 10; i++) md.push(ans('xp-D', 'm' + i, { hub: 'xm', choice: 0, at: i * 10 }));
@@ -1150,10 +1154,10 @@ try {
     ans('xp-RN', 'rs', { hub: 'xr', self: false, at: BASE + 50 * 3 });
     ans('xp-RN', rq(50), { hub: 'xr', choice: 0, at: BASE + 50 * 3 + 0.5 });
     eq(num(`select n from xp_runs where visitor_id = 'xp-RN'`), 50, 'a self-graded miss and a too-fast answer leave the run at 50');
-    // the same question right a 4th time today pays nothing and doesn't add to the run
+    // the same question right a 4th time today pays (every right answer does) but doesn't add to the run
     ans('xp-RQ', 'r1', { hub: 'xr', choice: 0, at: BASE }); ans('xp-RQ', 'r1', { hub: 'xr', choice: 0, at: BASE + 3 }); ans('xp-RQ', 'r1', { hub: 'xr', choice: 0, at: BASE + 6 });
     const r4 = ans('xp-RQ', 'r1', { hub: 'xr', choice: 0, at: BASE + 9 });
-    eq([r4.xp, num(`select n from xp_runs where visitor_id = 'xp-RQ'`)], [0, 3], 'one question answered right a 4th time today: no XP, and the run stays at 3');
+    eq([r4.xp, num(`select n from xp_runs where visitor_id = 'xp-RQ'`)], [2, 3], 'one question answered right a 4th time today: 2 XP, and the run stays at 3');
     // the nuke: nothing before 100, 10,000 XP and crowns at the launch after 100, once; 100 more for the next
     eq(json(`sh_launch_nuke(${T(BASE + 160)}, 'xp-RN', 'xr', 'Test')`).xp, 0, 'a launch before the run reaches 100 pays nothing');
     eq(num(`select count(*) from nuke_launches where visitor_id = 'xp-RN'`), 1, 'the launch is still logged for the admin page');

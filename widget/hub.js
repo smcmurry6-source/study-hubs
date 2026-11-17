@@ -1187,7 +1187,7 @@
     var R = window.shRanks, useCase = !!(R && R.trophyCase), host = $("[data-trophies]", body);
     var rankPanel = useCase ? "" :
       '<section class="panel" aria-labelledby="srH"><h2 id="srH">Your rank</h2><div class="rank-big"><span class="hp" data-rankart="64" aria-hidden="true">' + HX.rankArt(64) + "</span><div><p class=\"rank-name\">" + esc(HX.rankName()) + '</p><p class="num">' + (x === null ? "+" + fmt(HX.todayRec().xp) + " XP today" : fmt(x) + " XP" + (p && p.next_at && p.next_at > x ? " · " + fmt(p.next_at - x) + " to the next level" : "")) + "</p></div></div>" +
-        (game ? '<div data-road></div><p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study. A question pays its first three right and its first three wrong answers a day. More comes from the day\'s 20th answer, fixing a miss, a finished mock exam and every mastery medal, which also starts 24 hours of double XP.</p>'
+        (game ? '<div data-road></div><p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study. Every right answer pays; a question pays its first three misses a day. More comes from the day\'s 20th answer, fixing a miss, a finished mock exam and every mastery medal, which also starts 24 hours of double XP.</p>'
           : '<p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study (answer XP tops out at 600 a day).</p>') +
         '<button class="btn" type="button" data-open-stats>' + icon("trophy", 18) + "Trophies and leaderboards</button></section>";
     var grid = '<div class="stats-grid">' + rankPanel +

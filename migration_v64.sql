@@ -40,6 +40,12 @@
 --      game     100 for the first arcade game finished each day (at least 20 seconds, like its 50 XP)
 --      record   50 for beating your own best in a game, 250 for the hub's top score in it, each once per game a day
 -- 4. Every reply that pays says so (`xp`, and `crowns`, the balance after it), so the page can show it at once.
+-- 5. Every right answer pays (Sam, 2026-11-17: "Every right answer should give xp"): 10 the first time ever, 2 after (a
+--    self-graded card 2), with no speed limit and no limit a day on a question; only a double tap (the same question again
+--    within 2 seconds) and the same question twice in one mock don't. A retired question still holding its key is graded from it. Misses keep the speed limit and three a day; the
+--    run of right answers in a row (and so the nuke and the record) still counts only answers at the speed limit and a
+--    question's first three right of the day. sh_xp_replay pays the same, and every visitor is rebuilt from it, so the
+--    right answers since the release that paid nothing are paid now.
 
 -- ====================================================================== the award kinds
 alter table public.xp_awards drop constraint if exists xp_awards_src_check;
@@ -260,8 +266,8 @@ declare
   k public.question_keys; v_kind text; v_ctx text; v_ok boolean; v_correct boolean; v_at timestamptz;
   s public.xp_sessions; s_ok boolean := false; s_n int := 0; s_dup boolean := false;
   aid bigint; dd date; prev_t timestamptz; n60 int; rn_same int; rn_all int; rn_ever int := 0; pos_day int; dp boolean;
-  speed_ok boolean := false; v_base int := 0; v_mult int := 1; paid int := 0; v_n int; why text; bonus jsonb := '[]'::jsonb;
-  medal jsonb; v_resp jsonb; prev record; day_n int;
+  speed_ok boolean := false; right_ok boolean := false; v_base int := 0; v_mult int := 1; paid int := 0; v_n int; why text; bonus jsonb := '[]'::jsonb;
+  medal jsonb; v_resp jsonb; prev record; day_n int; tap boolean := false;
 begin
   if p_visitor is null or length(p_visitor) not between 1 and 80 or p_hub is null or p_hub !~ '^[a-z0-9][a-z0-9-]{0,39}$'
      or p_qid is null or length(p_qid) not between 1 and 80
@@ -285,7 +291,9 @@ begin
 
   -- right or wrong, from the key
   select * into k from sh_key(p_hub, p_qid, p_v);
-  v_kind := case when k.qid is null then 'unknown' when k.retired then 'retired' else k.kind end;
+  -- v64: a retired question that still has its key is graded from it (Sam: "Every right answer should give xp")
+  v_kind := case when k.qid is null then 'unknown'
+                 when k.retired and k.kind <> 'self' and coalesce(cardinality(k.answer), 0) = 0 then 'retired' else k.kind end;
   if v_kind = 'one' then
     if p_choice is null and coalesce(cardinality(p_picks), 0) <> 1 then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
     v_correct := coalesce(p_choice, p_picks[1]) = k.answer[1];
@@ -341,19 +349,27 @@ begin
           and coalesce(ss.kind, '') <> 'mock';
       speed_ok := (prev_t is null or v_at - prev_t >= interval '2 seconds') and n60 <= 30;
     end if;
-    if not speed_ok then why := 'fast'; end if;
+    -- v64 (Sam, 2026-11-17: "Every right answer should give xp"): a right answer always pays, however fast and however
+    -- often that day; only the same question twice in one mock (one answer sent twice) doesn't. The speed limit and the
+    -- three a day still hold for misses, and for the runs of right answers in a row (the nuke's 100 among them).
+    -- a double tap: the same question again within 2 seconds of answering it is one answer sent twice
+    select a.hub = p_hub and a.qid = p_qid and v_at - a.answered_at < interval '2 seconds' into tap
+      from personal_answers a where a.visitor_id = p_visitor and a.id <> aid and a.answered_at <= v_at
+      order by a.answered_at desc, a.id desc limit 1;
+    right_ok := v_correct and not coalesce(tap, false) and not (s_ok and s.kind = 'mock' and s_dup);
+    if not speed_ok and not right_ok then why := 'fast'; end if;
   else
     why := v_kind;
   end if;
 
-  if speed_ok then
-    select count(*) filter (where a.correct = v_correct), count(*), count(*) filter (where a.correct)
-      into rn_same, rn_all, v_n
-      from personal_answers a where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid
-        and (a.answered_at at time zone 'America/Chicago')::date = dd;
+  select count(*) filter (where a.correct = v_correct), count(*), count(*) filter (where a.correct)
+    into rn_same, rn_all, v_n
+    from personal_answers a where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid
+      and (a.answered_at at time zone 'America/Chicago')::date = dd;
+  if speed_ok or right_ok then
     if v_correct then select count(*) into rn_ever from personal_answers a where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid and a.correct; end if;
-    v_base := case when v_kind = 'self' then case when rn_all <= 3 then 2 else 0 end
-                   when v_correct then case when rn_same <= 3 then case when rn_ever = 1 then 10 else 2 end else 0 end
+    v_base := case when right_ok then case when v_kind = 'self' or rn_ever > 1 then 2 else 10 end
+                   when v_kind = 'self' then case when rn_all <= 3 then 2 else 0 end
                    else case when rn_same <= 3 then 1 else 0 end end;
     if v_base = 0 then why := 'repeat'; end if;
     v_mult := sh_xp_mult(p_visitor, v_at);
@@ -373,9 +389,9 @@ begin
         if v_n > 0 then bonus := bonus || jsonb_build_object('src', 'fix', 'xp', v_n); end if;
       end if;
     end if;
-    -- v64: the run of right answers in a row (graded from a key), with its prizes
-    -- (a right answer counts only when it pays: a question answered right a 4th time today neither adds nor breaks it)
-    if v_kind in ('one', 'all', 'order') and (v_base > 0 or not v_correct) then
+    -- v64: the run of right answers in a row (graded from a key), with its prizes. Only within the speed limit and a
+    -- question's first three right answers of the day: a 4th, or one under 2 seconds, pays but neither adds nor breaks it
+    if speed_ok and v_kind in ('one', 'all', 'order') and (rn_same <= 3 or not v_correct) then
       bonus := bonus || sh_run_step(p_visitor, p_hub, aid, v_correct, v_at);
     end if;
   end if;
@@ -701,6 +717,76 @@ begin
   return jsonb_build_object('ok', true, 'xp', paid, 'done', done, 'mult', v_mult, 'heard', heard, 'of', mins, 'crowns', sh_crowns(p_visitor));
 end;
 $$;
+
+-- ---------- every right answer pays (Sam, 2026-11-17: "Every right answer should give xp"), in the replay too ----------
+-- sh_xp_replay is what Link my devices rebuilds a visitor's answers from (sh_xp_rebuild), so it pays exactly what
+-- sh_answer pays: a right answer graded from its key always pays (10 the first time ever, 2 after; a self-graded card 2),
+-- except a double tap (the same question again within 2 seconds) and the same question twice in one mock; misses keep the
+-- speed limit and their three a day. As v54's otherwise.
+create or replace function public.sh_xp_replay(p_ids text[])
+returns table(visitor_id text, key text, src text, hub text, base integer, xp integer, at timestamptz, d date)
+language sql stable security definer set search_path = public as $$
+  with pa as (
+    select a.id, a.visitor_id, a.hub, a.qid, a.correct, a.answered_at as t,
+      (a.answered_at at time zone 'America/Chicago')::date as d,
+      x.answer_id is not null as v2, x.kind, x.session_id, s.kind as s_kind, s.started_at as s_start
+    from personal_answers a
+    left join answer_xp x on x.answer_id = a.id
+    left join xp_sessions s on s.id = x.session_id
+    where a.visitor_id = any(p_ids)
+  ), w as (
+    select pa.*,
+      lag(pa.t) over (partition by pa.visitor_id order by pa.t, pa.id) as prev_t,
+      lag(pa.hub || '|' || pa.qid) over (partition by pa.visitor_id order by pa.t, pa.id) as prev_hq,
+      count(*) filter (where coalesce(pa.s_kind, '') <> 'mock')
+        over (partition by pa.visitor_id order by pa.t range between interval '60 seconds' preceding and current row) as n60,
+      row_number() over (partition by pa.session_id order by pa.t, pa.id) as s_rank,
+      row_number() over (partition by pa.session_id, pa.qid order by pa.t, pa.id) as s_qrank,
+      row_number() over (partition by pa.visitor_id, pa.hub, pa.qid, pa.d, pa.correct order by pa.t, pa.id) as rn_same,
+      row_number() over (partition by pa.visitor_id, pa.hub, pa.qid, pa.d order by pa.t, pa.id) as rn_all,
+      row_number() over (partition by pa.visitor_id, pa.hub, pa.qid, pa.correct order by pa.t, pa.id) as rn_ever,
+      row_number() over (partition by pa.visitor_id, pa.d order by pa.t, pa.id) as pos_day,
+      lag(pa.correct) over (partition by pa.visitor_id, pa.hub, pa.qid order by pa.t, pa.id) as prev_c,
+      lag(pa.d) over (partition by pa.visitor_id, pa.hub, pa.qid order by pa.t, pa.id) as prev_d
+    from pa
+  ), e0 as (
+    select w.*,
+      coalesce(w.v2 and w.kind in ('one', 'all', 'order', 'self') and case
+        when w.s_kind = 'mock' then w.s_qrank = 1 and w.s_rank <= 300 and w.t - w.s_start >= w.s_rank * interval '2 seconds'
+        else (w.prev_t is null or w.t - w.prev_t >= interval '2 seconds') and w.n60 <= 30 end, false) as g_ok,
+      coalesce(w.v2 and w.kind in ('one', 'all', 'order', 'self') and w.correct
+        and not coalesce(w.prev_hq = w.hub || '|' || w.qid and w.t - w.prev_t < interval '2 seconds', false)
+        and (w.s_kind is distinct from 'mock' or w.s_qrank = 1), false) as r_ok,
+      max(case when w.prev_d is distinct from w.d then case when w.prev_c then 1 when not w.prev_c then 0 end end)
+        over (partition by w.visitor_id, w.hub, w.qid, w.d) as day_prev
+    from w
+  ), e as (
+    select e0.*, e0.g_ok or e0.r_ok as ok from e0
+  ), b as (
+    select e.*,
+      case when e.r_ok then case when e.kind = 'self' or e.rn_ever > 1 then 2 else 10 end
+        when not e.g_ok then 0
+        when e.kind = 'self' then case when e.rn_all <= 3 then 2 else 0 end
+        else case when e.rn_same <= 3 then 1 else 0 end end as base_xp,
+      sh_xp_mult(e.visitor_id, e.t) as mult
+    from e
+  )
+  select b.visitor_id, 'a:' || b.id, 'answer'::text, b.hub, b.base_xp, b.base_xp * b.mult, b.t, b.d from b where b.base_xp > 0
+  union all
+  select g.visitor_id, 'g20:' || g.d, 'goal20'::text, g.hub, 30, 30 * g.mult, g.t, g.d from (
+    select distinct on (b.visitor_id, b.d) b.visitor_id, b.d, b.hub, b.mult, b.t from b
+    where b.ok and b.pos_day >= 20 order by b.visitor_id, b.d, b.t, b.id) g
+  union all
+  select f.visitor_id, 'fix:' || f.hub || ':' || f.qid, 'fix'::text, f.hub, 5, 5 * f.mult, f.t, f.d from (
+    select distinct on (b.visitor_id, b.hub, b.qid) b.visitor_id, b.hub, b.qid, b.mult, b.t, b.d from b
+    where b.ok and b.correct and b.kind <> 'self' and b.day_prev = 0 order by b.visitor_id, b.hub, b.qid, b.t, b.id) f;
+$$;
+
+-- the right answers given since the release that paid nothing (under 2 seconds after the one before, or a question's
+-- 4th right answer of a day) are paid now, by rebuilding every visitor with a v2 answer from the replay above: the same
+-- thing Link my devices does, so the two never disagree. (A retired question's answers from before stay as they were:
+-- they were recorded without a key to grade them.)
+select public.sh_xp_rebuild(array(select distinct a.visitor_id from personal_answers a join answer_xp x on x.answer_id = a.id));
 
 -- ====================================================================== privileges
 revoke all on table public.xp_runs, public.game_records, public.notes_reads, public.prize_seen from public, anon, authenticated;
