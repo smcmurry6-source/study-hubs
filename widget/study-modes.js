@@ -556,6 +556,8 @@
       }
       function draw(q, isAhead){
         var C = cards(), c = C[q.id], now = Date.now(), state = !c ? "New" : isAhead ? "Ahead of schedule" : c.s === "R" ? "Due for review" : "Learning";
+        /* a card seen before comes back reworded (widget/hub.js worded(): the next wording each review) */
+        if (HX.worded) q = HX.worded(q, c ? c.n || 0 : 0);
         var hide = hideable(q), uid = "fc" + Math.floor(Math.random() * 1e9);
         var el = h('<article class="qc fcard' + lc(q.lec) + '" data-fqid="' + esc(q.id) + '" aria-labelledby="' + uid + 'h"></article>');
         var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + uid + 'h">' + lecChip(q.lec) + "</span>" + P.likelyTag(q) + '<span class="fc-state">' + esc(state) + '</span></span><span class="qc-tools fc-tools"></span></header>';

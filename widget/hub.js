@@ -250,6 +250,27 @@
       return QS;
     });
   }
+  /* a question's other wordings (content/variants.json, { id: { stem, choices, why[, ex] } or a list of them), fetched the
+     first time the bank, the mock, the drill or a bank game opens, never with Home or the notes (CORE.variants says the hub
+     has them). It never fails a view: without it every try shows the original. Choice k of a wording is choice k reworded,
+     so the key, the answer keys on the server, XP and the mock's scoring don't change (vault/tasks/2026-11-17-reworded-question-variants.md). */
+  var VARS = null;
+  function needVariants(){
+    if (!CORE || !CORE.variants) return Promise.resolve(null);
+    return VARS ? Promise.resolve(VARS) : getJSON("variants.json").then(function(v){ VARS = v || {}; return VARS; }, function(){ return null; });
+  }
+  /* the wording a question shows: the first try the original, each later try the next wording (n, the tries so far: the
+     answers by default, a flashcard's reviews in Flashcards). A worded copy keeps the original as _base and its number as
+     _w (1 = the first extra wording); search, Find this in the notes, question health and SH_EXPORT read the original. */
+  function worded(q, n){
+    var base = q && q._base || q; if (!base || !VARS) return base;
+    var vs = VARS[base.id]; if (!vs) return base; if (!Array.isArray(vs)) vs = [vs];
+    if (n == null) { var a = ansOf(base.id); n = a ? a.n || 0 : 0; }
+    var k = n % (vs.length + 1), v = vs[k - 1]; if (!k || !v || !v.stem) return base;
+    var o = {}; for (var key in base) o[key] = base[key];
+    o.stem = v.stem; if (v.choices) o.choices = v.choices; if (v.why) o.why = v.why; if (v.ex) o.ex = v.ex;
+    o._base = base; o._w = k; return o;
+  }
   function needNotes(){ return getJSON("notes.json").then(function(n){ NOTES = n; return n; }); }
   function needStudy(){ return getJSON("study.json").then(function(s){ STUDY = s; return s; }); }
   function needFigures(){
@@ -1102,9 +1123,9 @@
      their skin are the hub's own (arcade.js, from the live hub), so only the lobby is drawn here */
   function needArcade(){
     loadCss(WIDGET + "games.css"); loadCss(BASE + "arcade.css");
-    return Promise.all([needQuestions(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
+    return Promise.all([needQuestions(), needVariants(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
       if (!ARC && window.SH_ARCADE) ARC = window.SH_ARCADE({ esc: esc, state: STATE, save: saveState, toast: toast, questions: QS, lectures: LECS, lectureById: LBY, shuffled: shuffled,
-        record: HX.recordAnswer, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [], figures: needFigures });
+        record: HX.recordAnswer, worded: worded, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [], figures: needFigures });
       /* Perio's arcade names them start / stop (Occlusion's and Heme & Endo's: startGame / stopAll) */
       var A0 = ARC && ARC.arcade;
       if (A0 && !A0.startGame && A0.start) ARC.arcade = { startGame: A0.start, stopAll: A0.stop, current: A0.current };
@@ -1508,7 +1529,7 @@
     QBY: QBY, QBL: QBL, LBY: LBY, EXAM_LECS: EXAM_LECS, REVIEW: REVIEW, loadScript: loadScript, loadCss: loadCss,
     lecLabel: lecLabel, shortTitle: shortTitle, lecName: lecName, LCOL: LCOL, lc: lc, lecDot: lecDot,
     lecChip: lecChip, lecHead: lecHead, isRead: isRead, isExamLec: isExamLec, isReview: isReview,
-    hasReview: hasReview, needQuestions: needQuestions, needNotes: needNotes, needStudy: needStudy,
+    hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, needNotes: needNotes, needStudy: needStudy,
     needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
     go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
     offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget
@@ -1524,6 +1545,6 @@
     if (!PARTS[k]) throw new Error("widget/hub-" + k + ".js is not loaded: the page loads it before widget/hub.js");
     PARTS[k](HX);
   });
-  window.shHub = { go: go, state: function(){ return STATE; }, card: function(id){ var q = QBY[id]; return q ? HX.card(q, {}) : null; } };
+  window.shHub = { go: go, state: function(){ return STATE; }, card: function(id){ var q = QBY[id]; return q ? HX.card(q, {}) : null; }, worded: worded };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();
