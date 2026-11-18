@@ -32,6 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (the outage repairs and raw pings kept 3 days, Claude Code)** — Sam: "we can do fixes for 1 and 2. do 3 days.
+  dont cut anything for now". The evening outage (19:35-21:03 UTC) lost about 1,300 answer saves and about 2,900 activity
+  pings (about 20 hours of the class's time, with the crowns it pays) for the 53 people studying then, in Perio and Heme &
+  Endo Exam 3. (1) `tools/data-fixes/2026-11-18-outage-time.sql` (After merge runs it) fills each visit's 40 s to 10 minute
+  gaps in that window with the pings that would have been there: 2,691 (18.7 hours) for 52 people, under what was lost;
+  `activity_hourly` and the time crowns follow by the insert trigger; safe twice. (2) `migration_v73.sql` (applied live):
+  `restore_outage_v2` takes a device's kept day (answers, right, XP, ring met) and pays the missing answers' XP (crowns as
+  answers pay), the 20th answer, the day's first answer, the ring and the streak, once a person and hub, only for someone
+  studying in that hub during the outage, 3 answers a minute at most, until 11-21; `widget/hub-rewards.js` asks once, a few
+  seconds after a hub opens, and shows "Saved from Wednesday's outage". The answers themselves aren't added (the device
+  doesn't keep which choice was picked). (3) `migration_v74.sql` (applied live): raw pings kept 3 days, the retention job
+  nightly (`sh-retention-nightly`, 3:23 am Central); the admin page reads the nightly schedule; the About page says 3 days
+  and every night. `tools/release/xp.js` (569 checks) and `retention.js` updated.
 - **2026-11-18 (pages back off when the database fails: a quiet spell, Claude Code)** — In the evening outage each failed
   answer retried on its own timer (#421), which doubled the answer calls while 9 in 10 failed, with every page's analytics
   on top. Now (Sam: "Stay free, keep fixing") a call the server fails (a 5xx, or no answer) starts a quiet spell on that

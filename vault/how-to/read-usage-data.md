@@ -13,7 +13,7 @@ what may be written down: [learner-data-privacy](../rules/learner-data-privacy.m
 
 To decide what to improve or cut, read the data before guessing (Supabase connector, read-only SQL):
 `activity_hourly` (time per `<mode>/<sub-view>`: n pings of 25 s per hour and person; the raw `activity_pings` are kept
-30 days, [analytics-retention](../reference/analytics-retention.md)), `ui_clicks` + `ui_click_reach` (clicks per
+3 days since 2026-11-18, [analytics-retention](../reference/analytics-retention.md)), `ui_clicks` + `ui_click_reach` (clicks per
 button/tab and distinct people, per day; who tapped what is kept 90 days), `question_stats` / `question_choices` (accuracy, popular wrong answers),
 `mode_stats`, `exam_debriefs` (post-exam check-ins), `search_terms` (what people searched for, with result
 counts), `podcast_reactions` / `podcast_comments` (Timmy Time likes, dislikes and comments, migration_v47), question health (migration_v51:

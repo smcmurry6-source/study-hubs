@@ -393,6 +393,31 @@
       else ringAsked = "";   /* the server counted fewer (another device's answers still on their way): ask after the next */
     });
   }
+  /* ---------- the evening outage of 2026-11-18 (migration_v73; vault/tasks/2026-11-18-database-load.md) ----------
+     From about 1:35 to 3:05 pm Central that Wednesday most answers didn't reach the database. This page kept the day's
+     answers, right answers and XP (STATE.nx.days), so once, on a visit before 11-22, it sends those numbers and the server
+     pays what the missing ones would have (restore_outage_v2: only for someone studying in this hub then, within the answer
+     rules), with the ring and the day for the streak. Asked a few seconds after the page opens, never while the database is
+     struggling (window.shDb), and again on the next visit if it couldn't be asked. */
+  var OUTAGE = "2026-11-18";
+  function restoreOutage(tries){
+    var G = window.shGame, t = STATE.nx && STATE.nx.days ? STATE.nx.days[OUTAGE] : null, key = "sh_restore_" + OUTAGE + "_" + HX.HUB;
+    if (!t || !(t.n > 0) || ls(key) || Date.now() > Date.parse("2026-11-22T06:00:00Z")) return;
+    if (!v2() || !G || !G.ask || (window.shDb && window.shDb.busy())) { if (tries < 6) setTimeout(function(){ restoreOutage(tries + 1); }, 20000); return; }
+    G.ask("restore_outage_v2", { p_visitor: ls("sh_visitor_id"), p_hub: HX.HUB, p_n: t.n | 0, p_r: t.r | 0, p_xp: Math.max(0, Math.round(t.xp || 0)),
+      p_goal: goal(), p_met: !!t.met }).then(function(r){
+      if (!r || typeof r !== "object" || (r.ok === false && r.error !== "closed")) return;   /* not asked: the next visit asks */
+      ls(key, "1");
+      if (!(r.ok && r.xp > 0)) return;
+      var a = r.answers | 0, c = (r.xp | 0) - a + Math.floor(a / 2);   /* answer XP pays a crown for 2 XP; the ring and streak prizes one for one */
+      if (G.setCrowns) G.setCrowns(r.crowns);
+      RANK.local += r.xp; saveState();
+      prizeCard([{ t: "Saved from Wednesday's outage", xp: r.xp, c: c, src: "restore",
+        sub: r.n + (r.n === 1 ? " answer" : " answers") + " that didn't save on Wednesday afternoon" }]);
+      paintMeters();
+    });
+  }
+  setTimeout(function(){ restoreOutage(0); }, 6000);
   /* the crowns after a reply (sh:crowns from widget/v3.js): the shop's wallet takes them (widget/hub-timmy.js), and a gain
      pops up a coin by the rank pill, so they're seen going up while you answer */
   document.addEventListener("sh:crowns", function(e){

@@ -1378,6 +1378,57 @@ try {
     notes.push('v68 prizes: the streak of days, the daily ring, a boss\'s share, a lecture read, a name, a visit, trophies from now on, the day\'s first game and records, a fixed report\'s crowns, crowns in every reply, the rebuild keeps them');
   }
 
+  /* ---------- 14b. the catch-up after the evening outage of 2026-11-18 (migration_v73) ----------
+     A device sends the day's answers, right answers and XP it kept; the server pays what the missing ones would have,
+     once, only for someone studying in that hub during the outage, within the answer rules and 3 a minute. */
+  if (one(`select to_regprocedure('restore_outage_v2(text,text,integer,integer,integer,integer,boolean)') is not null`) === 't') {
+    const R = (v, hub, n, r, x, goal, met) => json(`restore_outage_v2(${q(v)}, ${q(hub)}, ${n}, ${r}, ${x}, ${goal}, ${met})`);
+    const pings = (v, hub, from, mins) => sql(`insert into activity_pings (visitor_id, visit_id, hub, section, pinged_at)
+      select ${q(v)}, ${q(v + '-visit')}, ${q(hub)}, 'questions/bank', ${q(from)}::timestamptz + make_interval(secs => g * 25) from generate_series(0, ${mins * 60 / 25}) g`);
+    if (one(`select now() < '2026-11-22 06:00+00'`) === 't') {
+      // OUT studied in xo through the outage (60 minutes); 5 of the day's answers saved (3 right), the device has 30 (20 right)
+      pings('xp-OUT', 'xo', '2026-11-18 19:40+00', 60);
+      sql(`insert into personal_answers (visitor_id, hub, qid, correct, answered_at)
+        select 'xp-OUT', 'xo', 'o' || g, g <= 3, '2026-11-18 19:00+00'::timestamptz + make_interval(secs => g * 60) from generate_series(1, 5) g`);
+      for (let i = 1; i <= 5; i++) sql(`select sh_award('xp-OUT', 'a:out${i}', 'answer', 'xo', ${i <= 3 ? 10 : 1}, 1, '2026-11-18 19:00+00')`);
+      const x0 = xpOf('xp-OUT'), w0 = json(`sh_wallet('xp-OUT')`);
+      const r1 = R('xp-OUT', 'xo', 30, 20, 32 + 17 * 10 + 8, 20, true);
+      ok(r1.ok && r1.n === 25 && r1.right === 17, `the catch-up counts 25 missing answers, 17 right (${JSON.stringify(r1).slice(0, 160)})`);
+      eq(r1.answers, 178 + 30, 'their XP (10 a right one, 1 a miss) and the day\'s 20th answer (30), less what was saved');
+      eq(r1.ring, 100, 'the daily ring the device met (5 a question of 20), which the saved answers alone didn\'t reach');
+      eq(xpOf('xp-OUT') - x0, 308, 'XP goes up by what the reply says');
+      const w1 = json(`sh_wallet('xp-OUT')`);
+      ok(Math.abs(w1.from_xp - w0.from_xp - 104) <= 1 && w1.prizes - w0.prizes === 100,
+        `crowns: one for 2 XP of answers, one for one of the ring (${w1.from_xp - w0.from_xp} and ${w1.prizes - w0.prizes})`);
+      eq(num(`select n from xp_days where visitor_id = 'xp-OUT' and d = '2026-11-18'`), 30, 'the day counts the missing answers');
+      const r2 = R('xp-OUT', 'xo', 30, 20, 210, 20, true);
+      ok(r2.ok && r2.xp === 0 && r2.why === 'done' && xpOf('xp-OUT') - x0 === 308, 'a second call pays nothing');
+      // NEW: only pings in the outage (10 minutes), nothing saved that day, two days studied before it
+      pings('xp-NEW', 'xo', '2026-11-18 20:00+00', 10);
+      sql(`insert into xp_days (visitor_id, d, n, c, raw) values ('xp-NEW', '2026-11-16', 5, 5, 0), ('xp-NEW', '2026-11-17', 5, 5, 0)`);
+      const r3 = R('xp-NEW', 'xo', 400, 300, 4000, 20, false);
+      ok(r3.ok && r3.n === 30 && r3.right === 30, `3 answers a minute at most: 30 for 10 minutes (${JSON.stringify(r3).slice(0, 160)})`);
+      eq(r3.answers, 300 + 30 + 20, 'their XP within the rules, the 20th answer and the day\'s first answer (20)');
+      ok(r3.ring === 0 && r3.day === true, 'no ring the device didn\'t meet; a new day');
+      ok(Array.isArray(r3.bonus) && r3.bonus.some(b => b.src === 'streak' && b.n === 3), `the day keeps the streak: 3 days in a row pays (${JSON.stringify(r3.bonus)})`);
+      eq(num(`select days from xp_visitors where visitor_id = 'xp-NEW'`), 3, 'days studied counts the day');
+      // OFF wasn't studying in xo during the outage; ODD sends nonsense
+      pings('xp-OFF', 'xo', '2026-11-18 22:00+00', 10);
+      const r4 = R('xp-OFF', 'xo', 30, 20, 210, 20, true);
+      ok(r4.ok && r4.xp === 0 && r4.why === 'none' && xpOf('xp-OFF') === 0, 'nothing for someone not studying in that hub during the outage');
+      ok(R('xp-OUT', 'xo', 5, 9, 10, 20, true).error === 'bad' && R('xp-OUT', 'XO!', 5, 1, 10, 20, true).error === 'bad', 'more right than answers, or a bad hub: refused');
+      // the rebuild (Link my devices) keeps it
+      const keep = xpOf('xp-OUT'); sql(`select sh_xp_rebuild(array['xp-OUT'])`);
+      ok(num(`select count(*) from xp_awards where visitor_id = 'xp-OUT' and src = 'restore'`) === 1 && num(`select count(*) from xp_awards where visitor_id = 'xp-OUT' and key = 'ring:xo:2026-11-18'`) === 1,
+        `the rebuild keeps the catch-up's award and ring (XP ${keep} → ${xpOf('xp-OUT')})`);
+      eq(anonJson(`restore_outage_v2('xp-OFF', 'xo', 1, 1, 10, 20, false)`).why, 'none', 'anon can ask (the page does)');
+      notes.push('the outage catch-up (migration_v73): only someone studying in the hub then, 3 answers a minute, the rules\' XP, the 20th answer, the ring, the day and its streak, once, kept by the rebuild');
+    } else {
+      eq(R('xp-OUT', 'xo', 30, 20, 210, 20, true).error, 'closed', 'the outage catch-up is closed after 2026-11-21');
+      notes.push('the outage catch-up (migration_v73) is closed (after 2026-11-21): only that is checked');
+    }
+  }
+
   /* ---------- 15. the private parts stay private ---------- */
   for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);

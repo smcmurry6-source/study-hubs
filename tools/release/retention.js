@@ -2,7 +2,7 @@
 // Retention test (migration_v52, vault/reference/analytics-retention.md): builds a throwaway PostgreSQL database from
 // supabase/schema.sql, seeds made-up rows of every age, and checks that sh_retention_run():
 //   - with p_apply false only counts, and changes nothing;
-//   - deletes exactly the approved rows (raw pings > 30 days, click reach > 90 days, feature events > 180 days, test
+//   - deletes exactly the approved rows (raw pings > 3 days since migration_v74, 30 before, click reach > 90 days, feature events > 180 days, test
 //     hubs, old link attempts, an idea hidden for 90 days with its votes, reports and notes: migration_v58) and removes ids on schedule (reports, check-ins, closed surveys), and nothing else;
 //   - keeps every hour of study time: activity_hourly and activity_visits are the same before and after the trim,
 //     and get_hub_recap gives the same answer before and after;
@@ -70,7 +70,9 @@ try {
     insert into activity_pings (visitor_id, visit_id, hub, section, pinged_at)
       select 'ret-A', 'visit-A-old', 'ret-hub', 'compendium/notes', now() - interval '40 days' + g * interval '25 seconds' from generate_series(1, 300) g;
     insert into activity_pings (visitor_id, visit_id, hub, section, pinged_at)
-      select 'ret-A', 'visit-A-new', 'ret-hub', 'compendium/bank', now() - interval '5 days' + g * interval '25 seconds' from generate_series(1, 120) g;
+      select 'ret-A', 'visit-A-new', 'ret-hub', 'compendium/bank', now() - interval '60 hours' + g * interval '25 seconds' from generate_series(1, 120) g;
+    insert into activity_pings (visitor_id, visit_id, hub, section, pinged_at)
+      select 'ret-B', 'visit-B-mid', 'ret-hub', 'compendium/bank', now() - interval '10 days' + g * interval '25 seconds' from generate_series(1, 40) g;
     insert into activity_pings (visitor_id, visit_id, hub, section, pinged_at)
       select 'ret-B', 'visit-B-old', 'ret-hub', 'arcade/showdown', now() - interval '35 days' + g * interval '25 seconds' from generate_series(1, 80) g;
     insert into activity_pings (visitor_id, visit_id, hub, section, pinged_at)
@@ -117,23 +119,23 @@ try {
   const hours = () => one(`select coalesce(sum(n), 0) || '/' || count(*) from activity_hourly where hub = 'ret-hub'`);
   const visits = () => one(`select string_agg(visit_id || ':' || visitor_id || ':' || first_at || ':' || last_at, ',' order by visit_id, visitor_id) from activity_visits where visitor_id like 'ret-%'`);
   const recap = () => one(`select (get_hub_recap('${SECRET}', 'ret-hub', null) - 'answers' - 'correct' - 'questions_seen')::text`);
-  expect('seeded hours (pings/rows)', hours().split('/')[0], 560);
+  expect('seeded hours (pings/rows)', hours().split('/')[0], 600);
   const h0 = hours(), v0 = visits(), r0 = recap();
 
   /* dry run: counts only */
   const dry = JSON.parse(one(`select sh_retention_run()::text`));
   const testHours = Number(one(`select count(*) from activity_hourly where hub = 'zz-test'`));   /* 1 or 2: the 10 pings may cross an hour */
-  const want = { activity_pings: 390, ui_click_reach: 2, feature_events: 3, activity_hourly_test: testHours, ui_clicks_test: 0, question_flags_ids: 1,
+  const want = { activity_pings: 430, ui_click_reach: 2, feature_events: 3, activity_hourly_test: testHours, ui_clicks_test: 0, question_flags_ids: 1,
     hub_suggestions_ids: 1, exam_debriefs_ids: 1, survey_declines: 1, survey_answer_ids: 1, ideas_hidden: 1, link_attempts: 1 };
   for (const k of Object.keys(want)) expect(`dry run counts ${k}`, dry.counts[k], want[k]);
-  expect('dry run left the raw pings', one(`select count(*) from activity_pings`), 570);
+  expect('dry run left the raw pings', one(`select count(*) from activity_pings`), 610);
   expect('dry run logged nothing', one(`select count(*) from retention_runs`), 0);
   expect('dry run left the ideas', one(`select count(*) from ideas where title like 'ret %'`), 3);
 
   /* the real run */
   const done = JSON.parse(one(`select sh_retention_run(true)::text`));
   for (const k of Object.keys(want)) expect(`run removed ${k}`, done.counts[k], want[k]);
-  expect('raw pings kept (last 30 days, real hubs)', one(`select count(*) from activity_pings`), 180);
+  expect('raw pings kept (last 3 days, real hubs)', one(`select count(*) from activity_pings`), 180);
   expect('study hours unchanged after the trim', hours(), h0);
   expect('visits unchanged after the trim', visits(), v0);
   expect('test-hub hours gone', one(`select count(*) from activity_hourly where hub = 'zz-test'`), 0);
@@ -186,7 +188,7 @@ try {
     expect(`${t} has row-level security`, one(`select relrowsecurity from pg_class where oid = 'public.${t}'::regclass`), 't');
   const st = JSON.parse(one(`select sh_retention_status()::text`));
   expect('status lists the runs', st.runs.length, 2);
-  notes.push('pg_cron ' + (st.schedule ? 'scheduled: ' + st.schedule : 'not in this database (the migration skips the weekly job)'));
+  notes.push('pg_cron ' + (st.schedule ? 'scheduled: ' + st.schedule : 'not in this database (the migration skips the nightly job)'));
 } catch (e) {
   if (e.message !== 'stop') problems.push(`test run failed: ${e.message.split('\n')[0]}`);
 }

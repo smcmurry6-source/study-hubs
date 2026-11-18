@@ -69,7 +69,7 @@ a `missed` answer only as a topic, a format or a feature request. If one quotes 
 Also pull, for the live hubs: people/minutes/bounce (< 5 min) all-time and since, per day; time by section; click
 targets and reach for anything the last refresh changed (e.g. `practice=midterm`, `sh-drill=quick`); mocks
 (`mock_scores`) and drill (`drill/%` sections) per day. Time comes from `activity_hourly` (`sum(n) * 25 / 60` minutes):
-raw `activity_pings` are kept 30 days only (`vault/reference/analytics-retention.md`).
+raw `activity_pings` are kept 3 days only (`vault/reference/analytics-retention.md`).
 
 ## 1b. The game economy: XP, crowns and the shop's prices
 

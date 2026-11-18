@@ -397,6 +397,25 @@ if (r && r.ok && (r.xp > 0 || r.repeat) && r.why !== "short") ls(key, d);
 else ringAsked = "";
 });
 }
+var OUTAGE = "2026-11-18";
+function restoreOutage(tries){
+var G = window.shGame, t = STATE.nx && STATE.nx.days ? STATE.nx.days[OUTAGE] : null, key = "sh_restore_" + OUTAGE + "_" + HX.HUB;
+if (!t || !(t.n > 0) || ls(key) || Date.now() > Date.parse("2026-11-22T06:00:00Z")) return;
+if (!v2() || !G || !G.ask || (window.shDb && window.shDb.busy())) { if (tries < 6) setTimeout(function(){ restoreOutage(tries + 1); }, 20000); return; }
+G.ask("restore_outage_v2", { p_visitor: ls("sh_visitor_id"), p_hub: HX.HUB, p_n: t.n | 0, p_r: t.r | 0, p_xp: Math.max(0, Math.round(t.xp || 0)),
+p_goal: goal(), p_met: !!t.met }).then(function(r){
+if (!r || typeof r !== "object" || (r.ok === false && r.error !== "closed")) return;
+ls(key, "1");
+if (!(r.ok && r.xp > 0)) return;
+var a = r.answers | 0, c = (r.xp | 0) - a + Math.floor(a / 2);
+if (G.setCrowns) G.setCrowns(r.crowns);
+RANK.local += r.xp; saveState();
+prizeCard([{ t: "Saved from Wednesday's outage", xp: r.xp, c: c, src: "restore",
+sub: r.n + (r.n === 1 ? " answer" : " answers") + " that didn't save on Wednesday afternoon" }]);
+paintMeters();
+});
+}
+setTimeout(function(){ restoreOutage(0); }, 6000);
 document.addEventListener("sh:crowns", function(e){
 var d = e.detail || {}, was = HX.hasShop && HX.hasShop() && HX.wallet ? HX.wallet() : null, before = was ? was.balance : d.was;
 if (HX.setWallet) HX.setWallet(d.balance);

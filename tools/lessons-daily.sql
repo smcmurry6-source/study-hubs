@@ -20,7 +20,7 @@ select hub, term, sum(searches) searches from search_terms
 where day >= :since::date and hits = 0 group by 1, 2 order by 3 desc limit 60;
 
 -- 3. Use per hub since the last refresh: people, minutes, top sections
---    (activity_hourly: n pings of 25 s per hour, hub, section and person; raw pings are kept 30 days only, migration_v52)
+--    (activity_hourly: n pings of 25 s per hour, hub, section and person; raw pings are kept 3 days only, migration_v74)
 select hub, count(distinct visitor_id) people, sum(n) * 25 / 60 mins from activity_hourly
 where h >= :since::date group by 1 order by 3 desc;
 select hub, coalesce(nullif(section, ''), '(none)') section, sum(n) * 25 / 60 mins, count(distinct visitor_id) people
