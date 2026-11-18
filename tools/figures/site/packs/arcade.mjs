@@ -126,7 +126,7 @@ export function pack(T){
       draw: function(o){
         var u = o.up || {}, bp = (o.paint && o.paint !== "cream" && T.BOLD[o.paint]) || { c: "#6A4FD6", s: "#5139B0" }, s = "", lights = "", i, n = o.night;
         var x0 = 2.6, x1 = 8.4, y0 = 3.0, y1 = 8.6, zt = 4.4;
-        var roof = o.snow ? "#F4F8FC" : "#4E4470", trim = { top: o.snow ? "#FFFFFF" : "#FFFDF6", left: "#FFFDF6", right: "#DDD6E8" };
+        var roof = o.snow ? "#F4F8FC" : "#7A6E9C", trim = { top: o.snow ? "#FFFFFF" : "#FFFDF6", left: "#FFFDF6", right: "#DDD6E8" };
         /* the checkerboard step at the door */
         s += box(4.5, y1, 0, 2.0, 1.0, .14, { top: "#FFFDF6", left: "#59647A", right: "#3F4A5E" }, { sw: 1.4, si: .9 });
         var cw = .5, cb = "";
@@ -135,6 +135,7 @@ export function pack(T){
         if (o.snow) s += ell.apply(null, P(6.2, 9.4, .14).concat([5, 1.6, "#FFFFFF", 0]));
         /* the walls, the kick band, three racing stripes round both of them */
         s += box(x0, y0, 0, x1 - x0, y1 - y0, zt, { top: roof, left: bp.c, right: bp.s });
+        if (!o.snow) s += L(D([[x0 + .2, 4.6, zt], [x1 - .2, 4.6, zt]], true) + D([[x0 + .2, 6.2, zt], [x1 - .2, 6.2, zt]], true) + D([[5.0, y0 + .2, zt], [5.0, y1 - .2, zt]], true), 1, "#5E527E", .8);
         s += F(D(onY(y1, rectUV(x0, x1, 0, .26))), "#2B2240") + F(D(onX(x1, rectUV(y0, y1, 0, .26))), "#221A36");
         [[.36, .5, "#FFFDF6", "#DCD3EA"], [.56, .7, NEON.yellow, "#DDB53A"], [.76, .9, NEON.pink, "#D93C88"]].forEach(function(st){
           s += F(D(onY(y1, rectUV(x0, 4.62, st[0], st[1]))) + D(onY(y1, rectUV(6.38, x1, st[0], st[1]))), st[2]) + F(D(onX(x1, rectUV(y0, y1, st[0], st[1]))), st[3]);
@@ -159,26 +160,26 @@ export function pack(T){
           [["y", y1, 2.95, 4.3, NEON.cyan], ["y", y1, 6.7, 8.05, NEON.cyan], ["x", x1, 3.85, 7.75, NEON.pink]].forEach(function(w){
             var on = w[0] === "y" ? onY : onX, d = D(on(w[1], rectUV(w[2] - .1, w[3] + .1, .86, 2.44)));
             s += tube(d, w[4], n, .9);
-            if (n && (w[0] === "x" || w[2] > 6)) lights += halo(d, w[4], .8) + tube(d, w[4], true, .9);
+            if (n && w[0] === "x") lights += halo(d, w[4], .8) + tube(d, w[4], true, .9);
           });
         }
         /* the glass doors in their frame, a cabinet glimpsed through the left one */
         s += FO(D(onY(y1, rectUV(4.68, 6.32, 0, 2.5))), "#3B3355", 1.6);
         [[4.82, 5.47], [5.53, 6.18]].forEach(function(lf, k){
-          s += FO(D(onY(y1, rectUV(lf[0], lf[1], .08, 2.36))), n ? "#7553C4" : NAVY, 1.2);
+          s += FO(D(onY(y1, rectUV(lf[0], lf[1], .08, 2.36))), n ? "#7553C4" : "#463C94", 1.2);
           if (!k) s += F(D(onY(y1, rectUV(lf[0] + .12, lf[0] + .48, .08, 1.7))), n ? "#3A2A70" : "#463A7C") + F(D(onY(y1, rectUV(lf[0] + .18, lf[0] + .42, .9, 1.3))), NEON.cyan);
           else s += F(D(onY(y1, rectUV(lf[1] - .3, lf[1], .08, 1.6))), n ? "#3A2A70" : "#463A7C") + F(D(onY(y1, rectUV(lf[1] - .24, lf[1], .85, 1.22))), NEON.pink);
           s += L(D(onY(y1, [[lf[0] + .08, 1.15], [lf[1] - .08, 1.15]]), true), 2.6) + L(D(onY(y1, [[lf[0] + .08, 1.15], [lf[1] - .08, 1.15]]), true), 1.2, "#D9DFE5");
-          if (!n) s += T.HI(D(onY(y1, [[lf[0] + .12, 2.1], [lf[0] + .4, 1.6]]), true), 1.3);
+          if (!n) s += T.HI(D(onY(y1, [[lf[0] + .12, 2.15], [lf[0] + .42, 1.6]]), true) + D(onY(y1, [[lf[0] + .3, 2.2], [lf[0] + .56, 1.74]]), true), 1.2);
         });
         /* the marquee over the door: a gold box, a dark panel with a pixel tooth between two stars, bulbs all round */
-        var ym = y1 + .62;
-        s += box(4.0, y1, 2.6, 3.0, .62, 1.05, { top: o.snow ? "#FFFFFF" : GOLD[2], left: GOLD[0], right: GOLD[1] }, { sw: 1.6, si: 1 });
-        s += FO(D(onY(ym, rectUV(4.24, 6.76, 2.8, 3.45))), n ? "#3A2E7A" : NAVY, 1.1);
-        s += pix(SPR.tooth, { "#": "#FFFFFF", s: "#CFD8F2" }, wallY(ym, 5.15, 3.36, .1, .078), { sw: .7 });
-        s += pix(SPR.star, { "#": NEON.pink }, wallY(ym, 4.42, 3.3, .085, .075), { sw: .6 }) + pix(SPR.star, { "#": NEON.cyan }, wallY(ym, 6.16, 3.3, .085, .075), { sw: .6 });
-        s += bulbs(ym, 4.12, 6.88, 2.7, 3.55, 13, 5, n ? "#FFFDE8" : "#FFF3C4", { r: 1.15, chase: n ? 1.4 : 0 });
-        if (n){ [4.6, 5.5, 6.4].forEach(function(xx){ var g = P(xx, ym, 3.72); lights += glowC(g[0], g[1], 7, K.glow); }); }
+        var ym = y1 + .66;
+        s += box(3.8, y1, 2.55, 3.4, .66, 1.25, { top: o.snow ? "#FFFFFF" : GOLD[2], left: GOLD[0], right: GOLD[1] }, { sw: 1.6, si: 1 });
+        s += FO(D(onY(ym, rectUV(4.04, 6.96, 2.76, 3.6))), n ? "#3A2E7A" : NAVY, 1.1);
+        s += pix(SPR.tooth, { "#": "#FFFFFF", s: "#CFD8F2" }, wallY(ym, 5.08, 3.48, .12, .1), { sw: .8 });
+        s += pix(SPR.star, { "#": NEON.pink }, wallY(ym, 4.24, 3.42, .1, .09), { sw: .7 }) + pix(SPR.star, { "#": NEON.cyan }, wallY(ym, 6.26, 3.42, .1, .09), { sw: .7 });
+        s += bulbs(ym, 3.92, 7.08, 2.66, 3.7, 15, 5, n ? "#FFFDE8" : "#FFF3C4", { r: 1.2, chase: n ? 1.4 : 0 });
+        if (n){ [4.5, 5.5, 6.5].forEach(function(xx){ var g = P(xx, ym, 3.95); lights += glowC(g[0], g[1], 7, K.glow); }); }
         /* the roof: a white parapet, an air unit at the back, the flag */
         s += box(x0, y0, zt, .16, y1 - y0, .24, trim, { sw: 1.3, si: .8 }) + box(x0, y0, zt, x1 - x0, .16, .24, trim, { sw: 1.3, si: .8 });
         s += box(3.2, 3.5, zt, 1.1, .9, .5, STEEL, { sw: 1.4, si: .9 });
@@ -398,13 +399,11 @@ export function pack(T){
         });
         /* the backbox and its lit backglass: rays from a big tooth in a crown, stars at the corners, a strip of lights */
         s += box(1.0, .42, 1.55, 1.6, .38, 2.25, PBC);
-        var bgx = function(u0, u1, v0, v1){ return D(onY(.8, rectUV(u0, u1, v0, v1))); }, bc = P(1.8, .8, 2.62), rays = "", cols = [NEON.pink, NEON.yellow, NEON.cyan, NEON.violet];
+        var bgx = function(u0, u1, v0, v1){ return D(onY(.8, rectUV(u0, u1, v0, v1))); }, rays = "", cols = [NEON.pink, NEON.yellow, NEON.cyan, NEON.violet];
         s += FO(bgx(1.12, 2.48, 2.36, 3.68), n ? "#3A2E7A" : NAVY, 1.2);
-        for (var i = 0; i < 7; i++){
-          var a0 = Math.PI * (1.08 + i * .12), a1 = a0 + .12;
-          rays += F("M" + f(bc[0]) + " " + f(bc[1]) + " L" + f(bc[0] + Math.cos(a0) * 15) + " " + f(bc[1] + Math.sin(a0) * 15 + Math.cos(a0) * 7.5) + " L" + f(bc[0] + Math.cos(a1) * 15) + " " + f(bc[1] + Math.sin(a1) * 15 + Math.cos(a1) * 7.5) + " Z", cols[i % 4], n ? 1 : .85);
-        }
-        s += rays + shY(1.8, .8, 2.5, FO(molarD(.36), "#FFFFFF", 1.2) + pix(SPR.crown, { "#": GOLD[0] }, grid(-3.6, -14.4, 1.44), { sw: .7 }));
+        var per = [[-7.1, -1.4], [-7.1, -7.6], [-7.1, -13.8], [-3.6, -13.8], [0, -13.8], [3.6, -13.8], [7.1, -13.8], [7.1, -7.6], [7.1, -1.4]], i;
+        for (i = 0; i < 8; i++) if (i % 2 === 0) rays += F("M0 -1.6 L" + per[i].join(" ") + " L" + per[i + 1].join(" ") + " Z", cols[(i >> 1) % 4], n ? 1 : .9);
+        s += shY(1.8, .8, 2.36, rays + FO(molarD(.36, 0, -1.2), "#FFFFFF", 1.2) + pix(SPR.crown, { "#": GOLD[0] }, grid(-3.6, -15.6, 1.44), { sw: .7 }));
         s += T.star5.apply(null, P(1.24, .8, 3.5).concat([2.2, NEON.yellow])).replace('stroke-width="1.2"', 'stroke-width=".7"') + T.star5.apply(null, P(2.36, .8, 3.5).concat([2.2, NEON.cyan])).replace('stroke-width="1.2"', 'stroke-width=".7"');
         s += FO(bgx(1.3, 2.3, 2.14, 2.3), "#1E1A2E", .9);
         for (i = 0; i < 6; i++) s += F(bgx(1.36 + i * .155, 1.46 + i * .155, 2.17, 2.27), NEON.orange);
@@ -537,24 +536,25 @@ export function pack(T){
     },
     "high-score-jacket": {
       note: "A shiny satin bomber with a ribbed collar, cuffs and waistband, a joystick patch and a star patch",
-      face: /* the sleeves and their cuffs */
-        p("M57 101 C50 99 43 100 38.6 105 L43.6 123 C48 120 52 118 57 118 Z", SATIN, O3) + p("M143 101 C150 99 157 100 161.4 105 L156.4 123 C152 120 148 118 143 118 Z", SATIN_S, O3) +
-        p("M38.6 105 L43.6 123 L48.6 121 L43.8 103.4 Z", RIB, O2) + p("M161.4 105 L156.4 123 L151.4 121 L156.2 103.4 Z", RIB, O2) +
-        ln("M40.4 108.4 L45.4 106.8 M41.6 112.6 L46.6 111 M42.8 116.8 L47.8 115.2", GOLD[0], 1.2) + ln("M159.6 108.4 L154.6 106.8 M158.4 112.6 L153.4 111 M157.2 116.8 L152.2 115.2", GOLD[0], 1.2) +
-        /* the body in two panels, the right in shade */
+      face: /* puffy sleeves down his arms, ribbed cuffs, his hands out of them */
+        p("M58 100 C46 94 34 98 31 108 C30 114 32 120 36 125 C44 123 51 121 58 120 Z", SATIN, O3) + p("M142 100 C154 94 166 98 169 108 C170 114 168 120 164 125 C156 123 149 121 142 120 Z", SATIN_S, O3) +
+        p("M31 108 C30 114 32 120 36 125 L41 123.4 C37.4 119 36.2 113.6 36.8 108.2 Z", RIB, O2) + p("M169 108 C170 114 168 120 164 125 L159 123.4 C162.6 119 163.8 113.6 163.2 108.2 Z", RIB, O2) +
+        ln("M33.6 116.4 L38.6 115.6 M33 111.6 L37.8 111", GOLD[0], 1.2) + ln("M166.4 116.4 L161.4 115.6 M167 111.6 L162.2 111", GOLD[0], 1.2) +
+        ln("M40 103 Q46 99.6 53 100.4", "#FFFFFF", 2.4, .55) + ln("M56 106 Q48 106 42 110", SATIN_S, 1.6, .8) + ln("M144 106 Q152 106 158 110", "#4A2A9E", 1.6, .8) +
+        /* the body in two panels, the right in shade, a sheen down the lit side */
         p("M50.6 110 Q100 126 149.4 110 " + HEM + " Z", SATIN, O3) +
         '<path d="M100 118 Q125 117 149.4 110 Q149.6 121 146.6 131 Q140 132 135 143 Q120 156 100 157 Z" fill="' + SATIN_S + '"/>' +
         '<path d="M50.6 110 Q100 126 149.4 110 ' + HEM + ' Z" fill="none" ' + O3 + "/>" +
-        ln("M58 120 Q60 134 70 144", "#FFFFFF", 3, .45) + ln("M64 118 Q66 126 72 132", "#FFFFFF", 1.6, .35) + ln("M43 108 Q47 111 52 110", "#FFFFFF", 1.8, .5) +
-        /* the collar and the waistband, ribbed, with gold stripes */
-        p("M50.6 110 Q100 126 149.4 110 L148.4 116.4 Q100 133 51.6 116.4 Z", RIB, O3) + ln("M51.2 113.4 Q100 129.6 148.8 113.4", GOLD[0], 1.4) +
-        p("M67.6 138.6 Q82 150.6 100 151.4 Q118 150.6 132.4 138.6 L135 143 Q120 156 100 157 Q80 156 65 143 Z", RIB, O3) + ln("M66.4 140.8 Q81 153.4 100 154.2 Q119 153.4 133.6 140.8", GOLD[0], 1.4) +
+        ln("M57 121 Q59 136 71 147", "#FFFFFF", 3.4, .45) + ln("M63 120 Q65 128 70 133", "#FFFFFF", 1.6, .35) +
+        /* the collar and the waistband, ribbed, a gold stripe in each */
+        p("M50.6 110 Q100 126 149.4 110 L149 114.6 Q100 131 51 114.6 Z", RIB, O3) + ln("M51 112.4 Q100 128.4 149 112.4", GOLD[0], 1.2) +
+        p("M69.6 141 Q83 151.8 100 152.6 Q117 151.8 130.4 141 L135 143 Q120 156 100 157 Q80 156 65 143 Z", RIB, O3) + ln("M67.4 142.4 Q82 154.6 100 155.2 Q118 154.6 132.6 142.4", GOLD[0], 1.2) +
         /* the zipper */
-        ln("M100 125 V151", INK, 3.4) + ln("M100 125 V151", GOLD[0], 1.4) + p("M97.6 125 h4.8 v6 h-4.8 z", GOLD[0], O2.replace("2.2", "1.4")) +
+        ln("M100 124 V152", INK, 3.4) + ln("M100 124 V152", GOLD[0], 1.4) + p("M97.6 124 h4.8 v6 h-4.8 z", GOLD[0], O2.replace("2.2", "1.4")) +
         /* the joystick patch and the star patch */
-        '<circle cx="73" cy="131" r="7.6" fill="' + RIB + '" ' + O2 + '/><circle cx="73" cy="131" r="5.8" fill="none" stroke="' + NEON.yellow + '" stroke-width="1.2"/>' +
-        '<ellipse cx="73" cy="134.4" rx="3.4" ry="1.4" fill="#59647A"/>' + ln("M73 134 L74.6 127.6", INK, 2.6) + ln("M73 134 L74.6 127.6", "#D9DFE5", 1.1) + '<circle cx="74.8" cy="126.8" r="2.2" fill="' + NEON.red + '" stroke="' + INK + '" stroke-width="1"/>' +
-        '<circle cx="127" cy="131" r="7.6" fill="' + NEON.cyan + '" ' + O2 + "/>" + T.star5(127, 131.4, 5.4, NEON.yellow),
+        '<circle cx="76" cy="132" r="8" fill="' + RIB + '" ' + O2 + '/><circle cx="76" cy="132" r="6.2" fill="none" stroke="' + NEON.yellow + '" stroke-width="1.2"/>' +
+        '<ellipse cx="76" cy="135.6" rx="3.6" ry="1.5" fill="#59647A"/>' + ln("M76 135.2 L77.8 128.4", INK, 2.6) + ln("M76 135.2 L77.8 128.4", "#D9DFE5", 1.1) + '<circle cx="78" cy="127.6" r="2.3" fill="' + NEON.red + '" stroke="' + INK + '" stroke-width="1"/>' +
+        '<circle cx="124" cy="132" r="8" fill="' + NEON.cyan + '" ' + O2 + "/>" + T.star5(124, 132.4, 5.8, NEON.yellow),
       say: ["High-score jacket! My record: zero cavities.", "Top of the leaderboard. Top of the gum line, too.", "Insert coin? I only take floss."]
     }
   };
