@@ -136,6 +136,9 @@ jobs:
       - name: Preview safety (no production requests, noindex, fixtures)
         if: ${{ !cancelled() && matrix.part == 'desktop' }}
         run: node tools/ci/preview.js
+      - name: The database's quiet spell (a failed answer save holds the page's answers and analytics, then saves them in order)
+        if: ${{ !cancelled() && matrix.part == 'desktop' }}
+        run: node tools/ci/quiet.js
 
   # The one result to read: passes when the fast checks passed and both smoke halves passed (or kept an earlier green
   # result because only notes changed).
