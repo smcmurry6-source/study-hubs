@@ -49,8 +49,8 @@ people get stuck, which questions mislead, whether a change worked. **Never** to
 - **Sam** owns the data and the admin secret, approves surveys, notices, deletions and any new kind of tracking that
   students wouldn't expect, and makes the calls the Insights tab proposes.
 - **Agents** read through the Supabase connector with read-only SQL (`sh_*` functions, `tools/*.sql`), write findings to
-  `LESSONS.md` and the vault, and ship schema changes only as a migration in a PR (`apply_migration` is pre-approved for
-  Claude Code; read-only functions may be applied before merge, anything that changes or deletes rows waits for Sam).
+  `LESSONS.md` and the vault, and ship schema changes only as a migration in a PR (`apply_migration`, like every Supabase tool, is
+  pre-approved for Claude Code; read-only functions may be applied before merge, anything that changes or deletes rows waits for Sam).
 - **Students** are the data subjects: the About page's "What the hubs record" tells them what's kept.
 
 ## Routines

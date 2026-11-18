@@ -7,7 +7,11 @@
 //   - archive overrides: anon can't touch the tables; get_hub_overrides shows only overrides in force, without notes;
 //     a change needs the secret, checks the version the page saw, ignores a repeat, refuses a bad state, hub, end time
 //     or note, writes one log row per change, ends at its end time, and can be reversed back to automatic;
-//   - check-ins and surveys come back newest first by created_at, with id breaking ties.
+//   - check-ins and surveys come back newest first by created_at, with id breaking ties;
+//   - question health's A/B versions (migration_v67): the version shown is kept on each answer, first tries are split
+//     by version, and a gap of 20 points with 10+ people a version is flagged (ab_gap);
+//   - sh_surface() (the Insights tab's "Where time goes") places every section the engine sends (widget/hub.js
+//     section()), Learn and Flashcards apart from the bank (migration_v59).
 // Nothing here touches the live database.   node tools/release/admin-ops.js   (PostgreSQL 14+ server binaries)
 'use strict';
 const { throwaway } = require('./pg');
@@ -141,10 +145,63 @@ try {
   const nw = SV.find(x => x.slug === 'fx-new');
   ok(nw && nw.answers.map(a => a.q1).join(',') === 'third,second-b,second-a,first', `survey answers newest first, the later id first on a tie (${nw && nw.answers.map(a => a.q1)})`);
   notes.push('check-ins and surveys: newest first by created_at, id breaks ties');
+
+  /* ---------- 4. every section the engine sends has a surface (migration_v59) ---------- */
+  const SURF = { 'home/dashboard': 'home', 'compendium/notes': 'notes', 'compendium/bank': 'bank', 'compendium/learn': 'learn',
+    'compendium/cards': 'cards', 'compendium/mock': 'mock', 'compendium/weak': 'weak-spots', 'compendium/drill': 'drill',
+    'compendium/misses': 'drill', 'compendium/hints': 'hints', 'compendium/cram': 'cram', 'review/side': 'review',
+    'arcade/lobby': 'arcade', 'drill/daily': 'drill', 'podcast/timmy-time': 'podcast', 'more/timmy': 'podcast', 'more/menu': 'more',
+    'more/stats': 'more', 'more/settings': 'more', 'more/place': 'more', 'more/shop': 'more', 'more/ideas': 'more',
+    'compendium/question-bank': 'bank', 'compendium/learning': 'other', 'moreover': 'other', '': 'unknown' };
+  const got = anonJson(`(select json_object_agg(s, sh_surface(s)) from unnest(array[${Object.keys(SURF).map(q).join(', ')}]) s)`);
+  const wrong = Object.keys(SURF).filter(k => got[k] !== SURF[k]);
+  ok(!wrong.length, `sh_surface: ${wrong.map(k => `"${k}" is ${got[k]}, expected ${SURF[k]}`).join('; ')}`);
+  notes.push(`sh_surface: ${Object.keys(SURF).length} section names placed (Learn and Flashcards apart from the bank, Drill and Misses as the drill, More)`);
+
+  /* ---------- 5. question health: A/B versions (migration_v67) ---------- */
+  {
+    const items = [];
+    const send = (vis, its) => anon(`select record_qh('perio', ${q(vis)}, ${q(vis + '-visit')}, ${q(JSON.stringify(its))}::jsonb)`);
+    /* qa: A 10 of 12, B 3 of 12 on a first try (a real gap); qb: A 8 of 12, B 7 of 12 (no gap); qc: 6 and 1 (too few) */
+    for (let i = 0; i < 12; i++) {
+      const a = `fx-qh-a${String(i).padStart(2, '0')}`, b = `fx-qh-b${String(i).padStart(2, '0')}`;
+      send(a, [{ q: 'qa', v: 'v1', k: 'a', c: 'bank', t: 'mcq', n: 1, ok: i < 10 ? 1 : 0, ch: i < 10 ? 2 : 0, nch: 4, key: 2, w: 0 },
+               { q: 'qb', v: 'v1', k: 'a', c: 'bank', t: 'mcq', n: 1, ok: i < 8 ? 1 : 0, w: 0 },
+               ...(i < 6 ? [{ q: 'qc', v: 'v1', k: 'a', c: 'bank', t: 'mcq', n: 1, ok: 1, w: 0 }] : []),
+               /* the second try, on the other version: not a first try, so not in the comparison */
+               { q: 'qa', v: 'v1', k: 'a', c: 'drill', t: 'mcq', n: 2, p: 1, g: 60, ok: 0, w: 1 }]);
+      send(b, [{ q: 'qa', v: 'v1', k: 'a', c: 'bank', t: 'mcq', n: 1, ok: i < 3 ? 1 : 0, ch: i < 3 ? 2 : 1, nch: 4, key: 2, w: 1 },
+               { q: 'qb', v: 'v1', k: 'a', c: 'bank', t: 'mcq', n: 1, ok: i < 7 ? 1 : 0, w: 1 },
+               ...(i < 6 ? [{ q: 'qc', v: 'v1', k: 'a', c: 'bank', t: 'mcq', n: 1, ok: i < 1 ? 1 : 0, w: 1 }] : []),
+               { q: 'qb', v: 'v1', k: 'v', c: 'bank', t: 'mcq', ms: 4000, w: 1 }]);
+    }
+    /* a page before this change (no w) and a bad w: recorded, with no version */
+    send('fx-qh-old1', [{ q: 'qa', v: 'v1', k: 'a', c: 'bank', t: 'mcq', n: 1, ok: 1 }]);
+    send('fx-qh-bad1', [{ q: 'qa', v: 'v1', k: 'a', c: 'bank', t: 'mcq', n: 1, ok: 1, w: 'b' }, { q: 'qb', v: 'v1', k: 'a', c: 'bank', t: 'mcq', n: 1, ok: 1, w: 12 }]);
+    const W = sql(`select coalesce(w::text, 'null'), count(*) from question_events where hub = 'perio' group by 1 order by 1`).map(r => r.join('=')).join(' ');
+    ok(W === '0=30 1=54 null=3', `record_qh keeps the version shown (0 = A, 1 = B; none or out of range: null): ${W}`);
+    ok(anon(`select count(*) from question_events`)[0][0] === '0', 'question_events: anon reads no rows');
+    raises(() => anon(`select get_question_health('wrong', 'perio')`), '28000', 'question health with a wrong secret');
+    const QH = anonJson(`get_question_health(${S}, 'perio')`), by = {};
+    QH.forEach(r => { by[r.qid] = r; });
+    const wa = by.qa && by.qa.wordings, codes = r => (r && r.flags || []).map(f => f.code);
+    ok(wa && wa['0'] && wa['0'].n === 12 && wa['0'].c === 10 && wa['1'] && wa['1'].n === 12 && wa['1'].c === 3,
+      `qh_report wordings: first tries by version, one per person, without the pages that sent none (${JSON.stringify(wa)})`);
+    ok(by.qa && by.qa.n1 === 26, `first tries still count every version and the old pages (n1 ${by.qa && by.qa.n1})`);
+    const gap = (by.qa && by.qa.flags || []).find(f => f.code === 'ab_gap');
+    ok(gap && gap.harder === 1 && /version B gets 25% right on a first try \(12 people\), version A gets 83% \(12 people\)/.test(gap.why),
+      `ab_gap flags qa, B the harder (${gap && gap.why})`);
+    ok(!codes(by.qb).includes('ab_gap'), `no ab_gap for a gap of 8 points (qb: ${codes(by.qb)})`);
+    ok(!codes(by.qc).includes('ab_gap'), `no ab_gap under 10 people a version (qc: ${codes(by.qc)})`);
+    const fx = JSON.parse(sql(`select qh_flags('{"wordings": {"0": {"n": 30, "c": 15}, "1": {"n": 30, "c": 27}}}'::jsonb)::text`)[0][0]);
+    ok(fx.flags.some(f => f.code === 'ab_gap' && f.harder === 0), 'ab_gap: A can be the harder one');
+    raises(() => anon(`select qh_report('perio')`), '42501', 'qh_report: anon runs it');
+    notes.push('question health A/B: the version shown kept on each answer, first tries by version, ab_gap at 20 points with 10+ people a version');
+  }
 } catch (e) {
   problems.push(`test run failed: ${e.message.split('\n')[0]}`);
 }
 db.stop();
 notes.forEach(n => console.log('  ' + n));
 if (problems.length) { console.error(`\n✗ admin operations: ${problems.length} problem(s) in ${checks} checks:\n` + problems.map(p => '  - ' + p).join('\n')); process.exit(1); }
-console.log(`\n✓ admin operations (live presence, archive overrides, order): ${checks} checks passed`);
+console.log(`\n✓ admin operations (live presence, archive overrides, order, surfaces, question health A/B): ${checks} checks passed`);

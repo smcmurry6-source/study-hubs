@@ -13,8 +13,8 @@ tags: [shipping]
 3. Verify before pushing ([verify-before-pushing](verify-before-pushing.md)). **A substantial change** (tier 2 or 3 in
    [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)) also gets the release suites, its bug-log rows and a test
    report in the PR (and a preview with UAT in it only if Sam says yes when you ask once: [preview-a-change](preview-a-change.md)), and waits for Sam's "merge"
-   ([preview-and-release-test](../rules/preview-and-release-test.md)). After the merge:
-   `node tools/release/postcheck.js`.
+   ([preview-and-release-test](../rules/preview-and-release-test.md)). After the merge, the **After merge** workflow
+   runs `node tools/release/postcheck.js` by itself ([after-a-merge](after-a-merge.md)).
 4. In the PR description, write what changed in plain, student-facing language, in
    [American English](../rules/american-english.md).
 5. **Any student-visible feature, easter egg, trophy, holiday or setting goes on the About page in the same PR**
@@ -22,11 +22,14 @@ tags: [shipping]
 6. **Write back to the vault in the same PR** ([repo-is-the-vault](../rules/repo-is-the-vault.md)): the task note's
    outcome, any decision Sam made, anything the next agent working on this hub needs to know.
 7. Add a line to "Recent major changes" in `DEPLOY_NOTES.md` for anything non-trivial (in the PR, or after merge),
-   and log it to the site changelog (`log_changelog`, see [secrets](../rules/secrets.md)) if students would notice it:
-   it sets the hub's "Updated" label on the dashboard (there is no "What's new" list any more).
-8. **After a merge that changed a hub's questions** (added, edited, re-keyed or retired, in `hubs/<hub>/content/questions.json`):
-   load that hub's answer keys again, so the server grades and pays the new version
-   ([build-a-hub](build-a-hub.md), "The answer keys"). A new Timmy Time episode is registered the same way (`/podcast`).
+   and, if students would notice it, a line `<hub> | <message>` in `tools/after-merge/changelog.txt`: after the merge
+   it is logged to the site changelog, which sets the hub's "Updated" label on the dashboard (there is no "What's new"
+   list any more).
+8. **The rest happens by itself after the merge** (Sam, 2026-11-15: "lets make all of that automatic"): the **After merge**
+   workflow loads a changed hub's answer keys, deploys Ask Timmy when its function changed, registers a new Timmy Time
+   episode, runs a data fix the PR added to `tools/data-fixes/`, logs the changelog lines and runs the post-release check
+   ([after-a-merge](after-a-merge.md)). After merging, read its result on `main` (Actions → After merge); a red one says
+   which step to fix and run again.
 
 Never force-push `main`. If a PR conflicts, rebase and resolve deliberately —
 don't take one side wholesale; the other side is usually another session's work.

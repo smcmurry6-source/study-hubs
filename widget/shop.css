@@ -120,6 +120,8 @@ html.shx[data-theme="dark"] .tsh-store { --w-wall: #7A5538; --w-wall2: #704C31; 
 .tsh-card:active { transform: scale(.97); }
 .tsh-card:focus-visible { outline: 3px solid var(--text, #3B2E3A); outline-offset: 3px; border-radius: 14px; }
 .tsh-rframe { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+/* the frames and the storefront move for a few seconds at a time (shop.js, shopLife): at rest the moving pictures aren't drawn */
+.tsh-dlg.is-rest .tsh-live { display: none; }
 .tsh-rthumb { position: absolute; left: 11%; right: 11%; top: 7%; height: 52%; }
 .tsh-rthumb img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .tsh-rthumb.k-scene img { object-fit: cover; border-radius: 10px; border: 2px solid #3B2E3A; }
@@ -205,6 +207,8 @@ dialog.tsh-sheet::backdrop { background: rgba(20, 14, 20, .55); }
 .tsh-ishort { grid-column: 1 / -1; font-size: var(--fs-meta, 13px); font-weight: 700; color: #5A4658; }
 .tsh-msg { min-height: 1.45em; font-size: var(--fs-label, 15px); font-weight: 700; color: #8A2B1E; }
 .tsh-msg:empty { display: none; }
+/* a note, not a problem: when a boost will start because double XP is already on */
+.tsh-msg.is-note { font-weight: 600; color: #5A4658; }
 .tsh-iacts { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
 .tsh-buy { min-height: 52px; padding: 0 22px; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFD23F; color: #3B2E3A; box-shadow: 0 4px 0 #3B2E3A; font-size: 17px; font-weight: 800; cursor: pointer; white-space: nowrap;
   transition: transform var(--t-press, 120ms) var(--ease-out, ease-out), box-shadow var(--t-press, 120ms) var(--ease-out, ease-out), background var(--t-press, 120ms) var(--ease-out, ease-out); }

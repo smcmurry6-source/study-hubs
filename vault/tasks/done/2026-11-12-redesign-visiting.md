@@ -19,14 +19,14 @@ opens a place yet. This makes a row on the new dashboard's boards open that pers
 
 ## Context
 
-- Session 4 of [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release", after
-  [Timmy everywhere](../2026-11-12-redesign-ask-timmy.md). "For every session above" there holds here.
+- Session 4 of [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release", after
+  [Timmy everywhere](2026-11-12-redesign-ask-timmy.md). "For every session above" there holds here.
 - Sam, 2026-11-12 ([decisions](../../decisions.md)): visiting is in the release, as one small session; the new
   dashboard's boards only, the hubs' boards wait.
 - The server: [game-server](../../reference/game-server.md), "Visiting". No opt-out (Sam, 2026-11-11). A visitor sees
   only the place, under the leaderboard name; a visitor id never leaves the database
   ([learner-data-privacy](../../rules/learner-data-privacy.md)).
-- The place: [Timmy's place](../2026-11-06-redesign-timmys-place.md); `widget/place.js`'s top comment.
+- The place: [Timmy's place](2026-11-06-redesign-timmys-place.md); `widget/place.js`'s top comment.
 
 ## Build spec
 
@@ -85,7 +85,7 @@ do at a place besides look and tap; a list of who visited; an opt-out (Sam: none
 - [x] A visited place shows only what `get_place` gives, under the leaderboard name, and can't be changed
 - [x] The tests above added and passing; `node tools/release/run.js` once; the budget unchanged
 - [x] Screenshots (phone and laptop, light and dark) sent to Sam
-- [x] The About draft in [the release note](../2026-11-06-redesign-release.md) ("From phase 4, visiting": anyone on a
+- [x] The About draft in [the release note](2026-11-06-redesign-release.md) ("From phase 4, visiting": anyone on a
       board can be visited, what a visitor sees and doesn't), the event taxonomy row, the hand-off in phase 4's Log
 - [x] Vault written back (`DEPLOY_NOTES.md`, this note's Outcome)
 
@@ -182,11 +182,11 @@ do at a place besides look and tap; a list of who visited; an opt-out (Sam: none
   a key that isn't one, and no buttons without the game layer); `a11y.js`'s "dashboard/next · boards", "· visited place"
   and "· visited place (dark)" (no issues; in the baseline at zero). Both checked to fail on a name drawn as markup and on
   `get_place` asked twice. `rls.js` passes unchanged (a place and the boards give a key, never an id).
-- **Left for later**, written down: the hubs' boards ([the release](../2026-11-06-redesign-release.md), "From phase 4,
+- **Left for later**, written down: the hubs' boards ([the release](2026-11-06-redesign-release.md), "From phase 4,
   visiting", with its About draft and BUG-112).
 
-Related: [Timmy's place](../2026-11-06-redesign-timmys-place.md) · [game-server](../../reference/game-server.md) ·
-[phase 3](../2026-11-05-redesign-phase-3-dashboard.md) · [phase 4](../2026-11-05-redesign-phase-4-game-layer.md) ·
+Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [game-server](../../reference/game-server.md) ·
+[phase 3](2026-11-05-redesign-phase-3-dashboard.md) · [phase 4](2026-11-05-redesign-phase-4-game-layer.md) ·
 [learner-data-privacy](../../rules/learner-data-privacy.md)
 
 ## Opening prompt

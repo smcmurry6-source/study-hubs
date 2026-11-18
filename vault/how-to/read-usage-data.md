@@ -23,5 +23,5 @@ podcast and Listen minutes and progress, diagrams; per day, page, kind and perso
 totals per day, page and kind remain). When you ship something a click
 can't measure, add a `window.shTrack("<area>:<what>")` call for it. The admin page (`review/`) shows the same under Time by section, Clicks and Questions.
 Surveys: one live at a time on the dashboard, shown once per visitor. Publish from `review/` → Surveys, or
-`admin_upsert_survey(p_secret, p_slug, p_title, p_questions, p_active)` with 1-3 questions
+`admin_upsert_survey(p_secret, p_slug, p_title, p_questions, p_active)` with 1-5 questions (the database's limit; the dashboard shows up to 5)
 (`kind`: choice | multi | scale | text). Results: `get_survey_results(p_secret)`. Ask Sam before a survey goes live.

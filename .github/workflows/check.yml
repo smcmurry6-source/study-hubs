@@ -81,6 +81,9 @@ jobs:
       - name: Ask Timmy's function with a fake model (paragraph links against the engine's own, quotes, offers, limits, HTTP)
         if: ${{ !cancelled() }}
         run: node tools/timmy/test.mjs && node tools/timmy/eval.mjs --dry
+      - name: The after-merge plan (what a push to main needs afterwards, on made-up pushes; nothing is sent)
+        if: ${{ !cancelled() }}
+        run: node tools/after-merge/test.js
       - name: Hub archive state (the dashboard's dates and admin overrides)
         if: ${{ !cancelled() }}
         run: node tools/ci/archive.js
@@ -90,9 +93,9 @@ jobs:
       - name: Drawn Patient Box cases (realistic numbers, keys agree)
         if: ${{ !cancelled() }}
         run: node tools/ci/cases.js
-      - name: Generated files are current (site art, each hub's question index and High yield from its content, Occlusion's and Perio's figures, Ask Timmy's site help from the About page, the bundles from the widget files)
+      - name: Generated files are current (site art, each hub's question index and High yield from its content, Occlusion's, Perio's and Heme & Endo Exam 3's figures, Ask Timmy's site help from the About page, the bundles from the widget files)
         if: ${{ !cancelled() }}
-        run: node tools/figures/site/build.mjs --check && node tools/hub-next/build.mjs --check && node tools/figures/occlusion/build.mjs --check && node tools/figures/perio/build.mjs --check && node tools/timmy/build.mjs --check && node tools/bundle/build.mjs --check
+        run: node tools/figures/site/build.mjs --check && node tools/hub-next/build.mjs --check && node tools/figures/occlusion/build.mjs --check && node tools/figures/perio/build.mjs --check && node tools/figures/heme-endo-exam3/build.mjs --check && node tools/timmy/build.mjs --check && node tools/bundle/build.mjs --check
 
   smoke:
     needs: scope
@@ -117,7 +120,7 @@ jobs:
         # couldn't resolve azure.archive.ubuntu.com, and every package that failed was an optional font), install the
         # browser alone: the runner image already has the libraries Chromium needs.
         run: |
-          npm i --no-save playwright@1.56.1
+          npm i --no-save playwright@1.63.0
           npx playwright install --with-deps chromium || {
             echo "::warning::Ubuntu's package mirror was unreachable: Chromium installed without its system packages (the runner image has the ones it needs)"
             npx playwright install chromium

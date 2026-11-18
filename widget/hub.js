@@ -250,6 +250,47 @@
       return QS;
     });
   }
+  /* a question's other wordings (content/variants.json, { id: { stem, choices, why[, ex] } or a list of them), fetched the
+     first time the bank, the mock, the drill or a bank game opens, never with Home or the notes (CORE.variants says the hub
+     has them). It never fails a view: without it every try shows the original. Choice k of a wording is choice k reworded,
+     so the key, the answer keys on the server, XP and the mock's scoring don't change (vault/tasks/done/2026-11-17-reworded-question-variants.md). */
+  var VARS = null;
+  function needVariants(){
+    if (!CORE || !CORE.variants) return Promise.resolve(null);
+    return VARS ? Promise.resolve(VARS) : getJSON("variants.json").then(function(v){ VARS = v || {}; return VARS; }, function(){ return null; });
+  }
+  /* A/B: which version a question starts on, by device (Sam, 2026-11-18: "They are A/B versions of questions", "Split the
+     class"): a hash of the device id (sh_visitor_id, widget/v3.js) and the question id, so about half the class starts each
+     question on A (the original) and half on B, and a person's questions are mixed. Without a device id, A. */
+  var VID = "";
+  function abStart(id, n){
+    if (!VID) try { VID = localStorage.getItem("sh_visitor_id") || ""; } catch (e) {}
+    if (!VID) return 0;
+    var s = VID + "|" + id, x = 2166136261;
+    for (var i = 0; i < s.length; i++) x = Math.imul(x ^ s.charCodeAt(i), 16777619);
+    /* mixed (murmur3's finish): FNV-1a's low bit is only the parity of the characters, so every device would get one of
+       two patterns */
+    x ^= x >>> 16; x = Math.imul(x, 0x85ebca6b); x ^= x >>> 13; x = Math.imul(x, 0xc2b2ae35); x ^= x >>> 16;
+    return (x >>> 0) % n;
+  }
+  /* does this question come in versions (false until variants.json has come)? */
+  function hasVersions(id){ return !!(VARS && VARS[id]); }
+  /* the version a question shows: the device's first version on the first try, then the next one each try (n, the tries
+     so far: the answers by default, a flashcard's reviews in Flashcards). A copy keeps the original as _base and the
+     version shown as _w (0 = A, the original; 1 = B, the first of variants.json); question health records _w with each
+     answer (migration_v67). Search, Find this in the notes, question health's fingerprint and SH_EXPORT read the original. */
+  function worded(q, n, k){
+    var base = q && q._base || q; if (!base || !VARS) return base;
+    var vs = VARS[base.id]; if (!vs) return base; if (!Array.isArray(vs)) vs = [vs];
+    if (n == null) { var a = ansOf(base.id); n = a ? a.n || 0 : 0; }
+    /* k: a version already picked (the mock keeps the one each question was drawn in until it's submitted) */
+    if (k == null || k < 0 || k > vs.length) k = (n + abStart(base.id, vs.length + 1)) % (vs.length + 1);
+    var v = vs[k - 1];
+    var o = {}; for (var key in base) o[key] = base[key];
+    if (k && v && v.stem) { o.stem = v.stem; if (v.choices) o.choices = v.choices; if (v.why) o.why = v.why; if (v.ex) o.ex = v.ex; }
+    else k = 0;
+    o._base = base; o._w = k; return o;
+  }
   function needNotes(){ return getJSON("notes.json").then(function(n){ NOTES = n; return n; }); }
   function needStudy(){ return getJSON("study.json").then(function(s){ STUDY = s; return s; }); }
   function needFigures(){
@@ -325,7 +366,7 @@
     var r = parse(), v = r[0], s = r[1];
     if (window.shTTS && view === "notes" && (v !== "notes" || s !== sub)) { try { window.shTTS.stop(); } catch (e) {} }
     if (view === "questions" && v !== "questions") leaving = HX.recapDue();
-    if (view === "more" && sub === "arcade" && ARC && (v !== "more" || s !== "arcade")) { try { ARC.arcade.stopAll(); } catch (e) {} }
+    if (view === "more" && /^arcade(\/|$)/.test(sub) && ARC && (v !== "more" || s !== sub)) { try { ARC.arcade.stopAll(); } catch (e) {} }
     var was = view, wasSub = sub;
     view = v; sub = s;
     var setOn = v === "more" && s === "settings", gear = $(".hx-set");
@@ -357,9 +398,15 @@
   function section(){
     if (view === "home") return "home/dashboard";
     if (view === "notes") return "compendium/notes";
-    if (view === "questions") { var p = HX.presetOf(); return "compendium/" + (p === "mock" ? "mock" : p === "weak" ? "weak" : p === "drill" ? "drill" : p === "misses" ? "misses" : "bank"); }
+    if (view === "questions") {
+      var p = HX.presetOf(), how = p !== "mock" && HX.qview ? HX.qview() : "questions";
+      /* studied as Learn or Flashcards (the bank's "Study as", on any set but the mock): its own section, so time in each
+         is told apart from the bank's (sh_surface() in migration_v59: `learn`, `cards`) */
+      if (how === "learn" || how === "cards") return "compendium/" + how;
+      return "compendium/" + (p === "mock" ? "mock" : p === "weak" ? "weak" : p === "drill" ? "drill" : p === "misses" ? "misses" : "bank");
+    }
     if (view === "more") {
-      if (sub === "arcade") return "arcade/" + (ARC && ARC.arcade.current() || "lobby");
+      if (/^arcade(\/|$)/.test(sub)) return "arcade/" + (ARC && ARC.arcade.current() || "lobby");
       if (sub === "side") return "review/side";
       if (sub === "hints" || sub === "cram") return "compendium/" + sub;
       return "more/" + (sub || "menu");
@@ -425,6 +472,9 @@
           q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
           (pod ? podMiniHTML(pod) : "") +
         "</nav>" +
+        /* a hub's own links under the quick starts (SH_HUB.home.links: { href, icon, title, sub }), a row of their own so
+           the grid above keeps its shape; Perio's Stage & Grade game (2026-11-17) */
+        (X.links && X.links.length ? '<nav class="quick-more" aria-label="More to do">' + X.links.map(function(l){ return q(l.href, l.icon || "arcade", l.title, l.sub || "", "ql-wide"); }).join("") + "</nav>" : "") +
       "</div>" +
       (X.notice ? '<p class="notice">' + icon("notes", 20) + "<span><b>" + esc(X.notice[0]) + "</b> " + esc(X.notice[1]) + "</span></p>" : "") +
       '<div class="home-grid">' +
@@ -542,7 +592,7 @@
       (lec.note ? '<p class="note lec-note">' + lec.note + "</p>" : "") +
       '<div class="toolbar" role="toolbar" aria-label="Notes tools">' +
         (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn"' + (mp3 ? ' data-sh-tts-audio="1"' : ' title="Read aloud in your device\'s voice"') + ' aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
-          '<button type="button" class="btn btn-text follow-btn" data-follow hidden aria-pressed="' + followOn() + '" title="Highlight each word as it is read">' + icon("highlight", 18) + "Follow along</button>" : "") +
+          '<button type="button" class="btn btn-text follow-btn" data-follow hidden aria-pressed="' + followOn() + '" title="Highlight each word as it is read. Tap a word to jump there.">' + icon("highlight", 18) + "Follow along</button>" : "") +
         (hasPlain || hasHy ? '<span class="seg" role="group" aria-label="Reading level"><button type="button" data-level="full" aria-pressed="' + (level === "full") + '">As taught</button>' +
           (hasPlain ? '<button type="button" data-level="plain" aria-pressed="' + (level === "plain") + '">Plain English</button>' : "") +
           (hasHy ? '<button type="button" data-level="hy" aria-pressed="' + hy + '">High yield</button>' : "") + "</span>" : "") +
@@ -597,7 +647,8 @@
      (::highlight(sh-read) in hub.css), so the notes' text and the student's own highlights are never touched; a browser
      without it simply doesn't highlight. The page scrolls to keep the word in view while the reader is following (the word
      was on screen), but not for 6 seconds after they scroll, and never to pull them back from elsewhere in the notes; a
-     seek moves the page to the new place. "Follow along" in the toolbar turns it off (sh_pref_follow, this device). */
+     seek moves the page to the new place. "Follow along" in the toolbar turns it off (sh_pref_follow, this device).
+     Tapping a word moves the narration to it (below, tapped()). */
   function followOn(){ return ls("sh_pref_follow") !== "off"; }
   var follow = (function(){
     var OK = !!(window.CSS && CSS.highlights && typeof window.Highlight === "function");
@@ -651,7 +702,16 @@
         sent[i] = sid; prevBlk = blk;
         if (/[.!?]["”')\]]*$/.test(fw[i])) sid++;
       }
-      F.dw = dw; F.map = map; F.sent = sent; F.dirty = false; F.cur = -2;
+      /* back the other way, for a tapped word: each page word -> the first narrated word on it, and each text node -> the
+         page words that start or end in it */
+      var inv = new Array(dw.length), byNode = new Map();
+      for (i = 0; i < dw.length; i++) {
+        inv[i] = -1;
+        (byNode.get(dw[i].a) || (byNode.set(dw[i].a, []), byNode.get(dw[i].a))).push(i);
+        if (dw[i].b !== dw[i].a) (byNode.get(dw[i].b) || (byNode.set(dw[i].b, []), byNode.get(dw[i].b))).push(i);
+      }
+      for (i = 0; i < fw.length; i++) if (map[i] >= 0 && inv[map[i]] < 0) inv[map[i]] = i;
+      F.dw = dw; F.map = map; F.sent = sent; F.inv = inv; F.byNode = byNode; F.dirty = false; F.cur = -2;
     }
     function rangeOf(a, b){
       var r = document.createRange();
@@ -698,11 +758,62 @@
       if (!F.audio.paused && !F.audio.ended) F.raf = requestAnimationFrame(tick);
     }
     function kick(){ if (F && F.on && !F.raf) F.raf = requestAnimationFrame(tick); }
+    /* Tap a word to jump the narration there (Sam, 2026-11-17): a tap or click on a word in the notes moves the recording
+       to that word and plays from it, the way the device's voice already starts from a tapped word. It listens on the
+       notes themselves, not the document, because iPhone Safari sends a tap's click only to an element that listens for
+       it. Not on a link, a figure, a highlight (its own menu opens) or while text is selected (the highlighter's), nor
+       once the narration has ended or been stopped; a mouse's double-click (selecting a word) doesn't jump. */
+    function wordAt(x, y, slack){
+      var node = null, off = 0, p;
+      if (document.caretPositionFromPoint) { p = document.caretPositionFromPoint(x, y); if (p) { node = p.offsetNode; off = p.offset; } }
+      else if (document.caretRangeFromPoint) { p = document.caretRangeFromPoint(x, y); if (p) { node = p.startContainer; off = p.startOffset; } }
+      if (!node || node.nodeType !== 3) return -1;
+      var ks = F.byNode.get(node) || [];
+      for (var n = 0; n < ks.length; n++) {
+        var w = F.dw[ks[n]];
+        if ((w.a === node && off < w.ai) || (w.b === node && off > w.bi)) continue;
+        var r = rangeOf(w, w), rs = r ? r.getClientRects() : [];   // the tap has to land on the word, not beside a line
+        for (var q = 0; q < rs.length; q++) if (x >= rs[q].left - slack && x <= rs[q].right + slack && y >= rs[q].top - slack && y <= rs[q].bottom + slack) return ks[n];
+        return -1;
+      }
+      return -1;
+    }
+    function tapped(e){
+      var me = F;
+      if (!me || !me.on || !me.w || e.button || e.defaultPrevented) return;
+      if (!(window.shTTS && window.shTTS.audio && window.shTTS.audio() === me.audio)) return;   // ended or stopped
+      if (e.target.closest && e.target.closest("a, button, input, select, textarea, label, summary, mark.sh-hl, [data-sh-noread], .sh-hl-pop")) return;
+      var sel = window.getSelection && window.getSelection();
+      if (sel && !sel.isCollapsed) return;
+      clearTimeout(me.tapT);
+      if (e.detail > 1) return;
+      var touch = Date.now() - (me.touchAt || 0) < 1000;
+      if (me.dirty) build();
+      var k = wordAt(e.clientX, e.clientY, touch ? 10 : 3); if (k < 0) return;
+      var i = me.inv[k];
+      for (var d = 1; i < 0 && d < 40; d++) i = k + d < me.inv.length && me.inv[k + d] >= 0 ? me.inv[k + d] : k - d >= 0 && me.inv[k - d] >= 0 ? me.inv[k - d] : -1;
+      if (i < 0) return;
+      e.preventDefault();
+      me.tapT = setTimeout(function(){
+        if (F !== me) return;
+        var s2 = window.getSelection && window.getSelection(); if (s2 && !s2.isCollapsed) return;
+        var a = me.audio;
+        try { a.currentTime = me.t[2 * i] / 100; } catch (err) { return; }
+        me.jump = true; me.cur = -2; userAt = 0;
+        if (a.paused) { var pl = a.play(); if (pl && pl.catch) pl.catch(function(){}); }
+        kick();
+        track("notes:follow-seek");
+      }, touch ? 0 : 250);
+    }
+    function touched(){ if (F) F.touchAt = Date.now(); }
     function detach(){
       if (!F) return;
       if (F.raf) cancelAnimationFrame(F.raf);
       if (F.mo) F.mo.disconnect();
+      clearTimeout(F.tapT);
       F.off.forEach(function(x){ F.audio.removeEventListener(x[0], x[1]); });
+      F.root.removeEventListener("click", tapped); F.root.removeEventListener("touchstart", touched);
+      F.root.classList.remove("is-following");
       F = null; clear();
     }
     function load(url){
@@ -718,7 +829,14 @@
         if (F !== me || !d || d.v !== 1 || !d.w || !d.t) return;
         var w = String(d.w).split(" ");
         if (w.length * 2 !== d.t.length) return;
-        function ready(){ if (F !== me) return; if (audio.duration && isFinite(audio.duration) && Math.abs(audio.duration - d.dur) > 2) { detach(); return; } me.w = w; me.t = d.t; show(true); kick(); }   // a words file made from another mp3 is never shown
+        function ready(){
+          if (F !== me) return;
+          if (audio.duration && isFinite(audio.duration) && Math.abs(audio.duration - d.dur) > 2) { detach(); return; }   // a words file made from another mp3 is never shown
+          me.w = w; me.t = d.t; show(true); kick();
+          root.addEventListener("click", tapped); root.addEventListener("touchstart", touched, { passive: true });
+          root.classList.toggle("is-following", me.on);
+          if (me.on && !ls("sh_tip_wordseek")) { ls("sh_tip_wordseek", "1"); toast("Tip: tap any word in the notes to jump the narration there."); }
+        }
         if (audio.readyState >= 1) ready(); else audio.addEventListener("loadedmetadata", ready, { once: true });
         function on(x, f){ audio.addEventListener(x, f); me.off.push([x, f]); }
         on("play", kick); on("seeked", function(){ if (F === me) { me.jump = true; me.cur = -2; kick(); } });
@@ -734,7 +852,7 @@
     document.addEventListener("sh:tts-stop", function(){ if (F && !(window.shTTS && window.shTTS.audio && window.shTTS.audio() === F.audio)) detach(); });
     return {
       /* the toolbar's toggle changed */
-      pref: function(){ if (!F) return; F.on = followOn(); if (F.on) { F.cur = -2; F.jump = true; kick(); } else clear(); },
+      pref: function(){ if (!F) return; F.on = followOn(); if (F.w) F.root.classList.toggle("is-following", F.on); if (F.on) { F.cur = -2; F.jump = true; kick(); } else clear(); },
       /* the notes were drawn again while the narration plays (a lecture's own page): follow the new text if it's the same file */
       reattach: function(root, mp3){ var a = window.shTTS && window.shTTS.audio && window.shTTS.audio(); if (a && F && F.audio === a && !F.root.isConnected && F.url === mp3.replace(/\.mp3$/, ".words.json")) attach(a, root, mp3); }
     };
@@ -865,12 +983,14 @@
   /* pages in More that aren't tiles: the idea board is a row under "Talk to us" */
   var MORE_ROWS = [["ideas", "thumbup", "Idea board", "Ideas for the hubs from the class: vote on them, or post your own"]];
   function renderMore(el, s){
+    /* #more/<page>/<what>: the arcade opens a game straight away (#more/arcade/stage: Perio's Home link) */
+    var bits = String(s || "").split("/"), what = bits.slice(1).join("/"); s = bits[0];
     var page = MORE.concat(MORE_ROWS).filter(function(m){ return m[0] === s; })[0];
     if (!page) { drawMoreMenu(el); return; }
     var back = '<a class="btn btn-text back" href="#more">' + icon("chevron", 18, "flip") + "More</a>";
     el.innerHTML = '<div class="hx-page more-page">' + back + "<h1>" + esc(page[2]) + '</h1><div class="more-body"><p class="note loading">Loading…</p></div></div>';
     var body = $(".more-body", el);
-    ({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, shop: HX.moreShop, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body);
+    ({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, shop: HX.moreShop, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body, what);
   }
   /* More (Sam, 2026-11-06: "can use a spice up"): one tile per part, each on its own field of color with its drawing and
      a line of what's in it; Timmy Time is the big one, its host in headphones. Talk to us stays a list. */
@@ -1023,9 +1143,9 @@
      their skin are the hub's own (arcade.js, from the live hub), so only the lobby is drawn here */
   function needArcade(){
     loadCss(WIDGET + "games.css"); loadCss(BASE + "arcade.css");
-    return Promise.all([needQuestions(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
+    return Promise.all([needQuestions(), needVariants(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
       if (!ARC && window.SH_ARCADE) ARC = window.SH_ARCADE({ esc: esc, state: STATE, save: saveState, toast: toast, questions: QS, lectures: LECS, lectureById: LBY, shuffled: shuffled,
-        record: HX.recordAnswer, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [] });
+        record: HX.recordAnswer, worded: worded, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [], figures: needFigures });
       /* Perio's arcade names them start / stop (Occlusion's and Heme & Endo's: startGame / stopAll) */
       var A0 = ARC && ARC.arcade;
       if (A0 && !A0.startGame && A0.start) ARC.arcade = { startGame: A0.start, stopAll: A0.stop, current: A0.current };
@@ -1033,7 +1153,7 @@
     });
   }
   var GAME_INFO = {};
-  function moreArcade(body){
+  function moreArcade(body, open){
     body.innerHTML = '<p class="note loading">Loading the arcade…</p>';
     needArcade().then(function(){
       var X = C.arcade || {}, first = X.first || "sort", games = (X.games || []).slice();
@@ -1052,6 +1172,8 @@
       $$("[data-game]", body).forEach(function(b){ b.addEventListener("click", function(){ lobby.hidden = true; stage.hidden = false; track("arcade:open=" + b.getAttribute("data-game")); ARC.arcade.startGame(b.getAttribute("data-game")); stage.scrollIntoView({ block: "start" }); }); });
       /* the games' own Back buttons go to this lobby, not the live hub's */
       stage.addEventListener("click", function(e){ if (e.target.closest("[data-back]")) { e.stopPropagation(); e.preventDefault(); back(); } }, true);
+      /* #more/arcade/<game>: straight into it; its Back still goes to this lobby */
+      var deep = open && by[open] && $('[data-game="' + open + '"]', body); if (deep) deep.click();
     }).catch(function(e){ body.innerHTML = "<p>Couldn't load the arcade. Check your connection.</p>"; if (window.console) console.error(e); });
   }
   /* the rank comes from the server after the page is up, and again as you answer: Stats shows it as it changes */
@@ -1202,7 +1324,9 @@
         '<div class="set-row"><div><b>Text size</b><small>Makes everything bigger or smaller.</small></div>' + seg("size", SIZES, size) + "</div></section>" +
       '<section class="panel" aria-labelledby="sgH"><h2 id="sgH">Your daily goal</h2>' +
         '<div class="set-row"><div><b>Questions a day</b><small>The ring in the bar fills as you answer, right or wrong. Your streak counts any day you answer a question.</small></div>' + seg("goal", [["10", "10"], ["20", "20"], ["30", "30"], ["40", "40"], ["50", "50"]], String(HX.goal())) + "</div>" +
-        (window.shEditName ? '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' : "") + "</section>" +
+        /* drawn even before the shared widget is in (a page opened straight on Settings): a tap waits for it */
+        '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' +
+        '<div class="set-row"><div><b>Link my devices</b><small>One rank, streak, trophy case and question progress on your phone, tablet and laptop.</small></div><button class="btn" type="button" data-link>Link my devices</button></div></section>' +
       '<section class="panel" aria-labelledby="sxH"><h2 id="sxH">Timmy and the extras</h2><p class="note">The fun stuff that isn\'t studying. None of it shows during a mock exam.</p><div data-extras>' +
         extrasHTML() + "</div></section></div>";
     function paintFocus(){ var fp = $(".focus-panel", body); fp.classList.toggle("is-on", focusOn()); fp.innerHTML = focusRowHTML(); }
@@ -1226,7 +1350,10 @@
         track("settings:" + k + "=" + v);
         return;
       }
-      if (e.target.closest("[data-name]") && window.shEditName) window.shEditName();
+      if (e.target.closest("[data-name]")) whenWidget("shEditName", function(f){ if (f) f(); else toast("Couldn’t open your name. Are you online?"); });
+      /* Link my devices (widget/linkask.js, which widget/v3.js loads): beside the name, as everywhere a name is changed */
+      var lk = e.target.closest("[data-link]");
+      if (lk) whenWidget("shLinkAsk", function(L){ if (L && L.link) L.link({ back: lk, from: "settings" }); else toast("Couldn’t open Link my devices. Are you online?"); });
     });
   }
   function applyTheme(t){ if (t === "light" || t === "dark") docEl.setAttribute("data-theme", t); else docEl.removeAttribute("data-theme"); }
@@ -1422,7 +1549,7 @@
     QBY: QBY, QBL: QBL, LBY: LBY, EXAM_LECS: EXAM_LECS, REVIEW: REVIEW, loadScript: loadScript, loadCss: loadCss,
     lecLabel: lecLabel, shortTitle: shortTitle, lecName: lecName, LCOL: LCOL, lc: lc, lecDot: lecDot,
     lecChip: lecChip, lecHead: lecHead, isRead: isRead, isExamLec: isExamLec, isReview: isReview,
-    hasReview: hasReview, needQuestions: needQuestions, needNotes: needNotes, needStudy: needStudy,
+    hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, hasVersions: hasVersions, needNotes: needNotes, needStudy: needStudy,
     needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
     go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
     offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget
@@ -1438,6 +1565,6 @@
     if (!PARTS[k]) throw new Error("widget/hub-" + k + ".js is not loaded: the page loads it before widget/hub.js");
     PARTS[k](HX);
   });
-  window.shHub = { go: go, state: function(){ return STATE; }, card: function(id){ var q = QBY[id]; return q ? HX.card(q, {}) : null; } };
+  window.shHub = { go: go, state: function(){ return STATE; }, card: function(id){ var q = QBY[id]; return q ? HX.card(q, {}) : null; }, worded: worded };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();

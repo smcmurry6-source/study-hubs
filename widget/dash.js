@@ -460,11 +460,13 @@
   paintStill(); document.addEventListener("sh:pref", paintStill);
   function roomReady(){ return !!(CA && CA.room && window.shPet && window.shPet.art && !focusOn()); }
   function hashOf(k){ var h = 0; k = String(k); for (var i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) | 0; return Math.abs(h); }
-  var outfitsAsked = false;
-  /* the shop's outfits (widget/hub-art/outfits.js, 55 of them) load only when someone is wearing one */
-  function wantOutfits(){
-    if (outfitsAsked) return; outfitsAsked = true;
-    var el = document.createElement("script"); el.src = WIDGET + "hub-art/outfits.js"; el.async = true;
+  var outfitsAsked = {};
+  /* the shop's outfits load only when someone is wearing one: widget/hub-art/outfits.js (the everyday ones and the
+     rank outfits), then hub-art/outfits/costumes.js, seasons.js or collections.js for the rest */
+  function wantOutfits(set){
+    var file = set ? "outfits/" + set + ".js" : "outfits.js";
+    if (outfitsAsked[file]) return; outfitsAsked[file] = 1;
+    var el = document.createElement("script"); el.src = WIDGET + "hub-art/" + file; el.async = true;
     el.onload = function(){ rm = null; syncRoom(); paintBoard(); };
     document.head.appendChild(el);
   }
@@ -478,6 +480,7 @@
     if (fit && fit.indexOf(":") < 0) {
       if (O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
       else if (!O) wantOutfits();
+      else if (O.where && O.where[fit] && !(O.got && O.got[O.where[fit]])) wantOutfits(O.where[fit]);
     }
     return String(svg).replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
   }
@@ -569,6 +572,8 @@
       el.animate(frames, { duration: total, easing: "linear", fill: "forwards" }).onfinish = function(){ el.remove(); if (done) done(); };
     }, (n || 0) * 450);
   }
+  /* nobody walks while the room rests (off screen, mid-scroll, behind a window): they are just there, or gone */
+  function roomResting(){ var n = $("now"); return !!n && (n.classList.contains("is-rest") || n.classList.contains("is-away")); }
   function arrive(p, i, quiet, n){
     function sit(){
       var el = seatEl(i); if (!rm || rm.at[p.key] !== i || !el) return;
@@ -577,13 +582,13 @@
       if (!quiet && q(".rm-tim", el).animate) q(".rm-tim", el).animate([{ transform: "translateY(-4px) scale(.96, 1.06)" }, { transform: "translateY(1px) scale(1.05, .94)" }, { transform: "none" }], { duration: 340, easing: "ease-out" });
       paintMe();
     }
-    if (quiet) sit(); else walk(p.fit, i, false, n, sit);
+    if (quiet || roomResting()) sit(); else walk(p.fit, i, false, n, sit);
   }
   function depart(i, quiet, n){
     var el = seatEl(i); if (!el) return;
     var tim = q(".rm-tim", el), was = !!tim.firstChild, fit = cleanFit(el.getAttribute("data-fit"));
     tim.innerHTML = ""; el.setAttribute("data-fit", ""); q(".rm-desk", el).innerHTML = CA.room.desk(null, null);
-    if (!quiet && was) walk(fit, i, true, n, null);
+    if (!quiet && was && !roomResting()) walk(fit, i, true, n, null);
   }
   /* bring the room in line with who is studying: draw it, redraw it for a new size, time of day or number of rows, or
      walk the comings and goings in and out */
@@ -678,7 +683,9 @@
         '<div class="dx-card dx-about"><h3>' + esc(hub.title) + "</h3>" +
           (others.length ? '<ul class="dx-exams">' + others.map(function(e){ var dd = daysUntil(e.date); return "<li><b>" + esc(e.label || "Exam") + "</b> " + esc(shortDate(e.date)) + " · " + (dd < 0 ? "done" : esc(daysText(dd))) + "</li>"; }).join("") + "</ul>" : "") +
           '<p class="dx-desc clamp" id="hubDesc">' + esc(hub.desc || "") + '</p><button class="btn btn-text dx-more" type="button" data-more aria-expanded="false">Read more</button>' +
-          '<p class="note updated" data-updated="' + esc(hub.updated || "") + '" data-hub="' + esc(hub.id) + '">' + (hub.updated ? "Updated " + esc(relDay(parseYmd(hub.updated))) : "") + "</p>" +
+          /* the changelog, back in one line (Sam, 2026-11-17: "I dont want it to take up much space"): "Updated ..." opens
+             this hub's and the whole site's last few changes (applyUpdated fills it from the changelog) */
+          '<details class="dx-news is-empty" data-news="' + esc(hub.id) + '"><summary tabindex="-1"><span class="note updated" data-updated="' + esc(hub.updated || "") + '" data-hub="' + esc(hub.id) + '">' + (hub.updated ? "Updated " + esc(relDay(parseYmd(hub.updated))) : "") + '</span><span class="dx-news-cta">What\'s new' + icon("chevron", 16) + '</span></summary><ul class="dx-news-list"></ul></details>' +
         "</div>" +
       "</div>" +
       (checks ? '<div class="dx-checks">' + checks + "</div>" : "");
@@ -755,9 +762,172 @@
   }
 
   /* ====================================================================
-     EXAM CHECK-INS AND SURVEYS: the live dashboard's own code (index.html), moved here unchanged except for its
-     buttons' classes and, in the check-in, the idea board's tick (below). Keep the rest in step until the release.
+     EXAM CHECK-INS AND SURVEYS: the live dashboard's own code (index.html), moved here at the release with the idea
+     board's tick in the check-in (below). Since 2026-11-17 both open in a window in the middle of the screen, with the
+     reward on it and Timmy looking over its top edge (Sam: "make the check in and survey prompt more interesting and also
+     advertise that it earns you 1000xp and 1000 gold crowns. make it take up the center of the screen and a window. have
+     timmy peek over the top of the window").
      ==================================================================== */
+  /* the reward the server pays for the first answer to each survey and each hub's exam check-in (migration_v60, v61) */
+  var FORM_XP = 1000, FORM_CROWNS = 1000;
+  function coinSvg(px){ return '<svg class="survey-coin" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + SHOP_COIN + "</svg>"; }
+  function starSvg(px){ return '<svg class="survey-star" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" aria-hidden="true" focusable="false"><path d="M12 2.6 L14.4 9.6 L21.4 12 L14.4 14.4 L12 21.4 L9.6 14.4 L2.6 12 L9.6 9.6 Z" fill="#F2C94C" stroke="#3B2E3A" stroke-width="2" stroke-linejoin="round"/></svg>'; }
+  /* the reward as two tiles on gold, before anything is sent ("Send it and earn") */
+  function lootHtml(lead, xp, crowns){
+    return '<div class="survey-loot"><p class="survey-loot-lead">' + lead + '</p><p class="survey-tiles">' +
+      '<span class="survey-tile is-xp">' + starSvg(30) + '<span><b class="num">+' + num(xp) + "</b><small>XP</small></span></span>" +
+      '<span class="sr"> and </span><span class="survey-tile is-crowns">' + coinSvg(30) + '<span><b class="num">+' + num(crowns) + "</b><small>Shiny Gold Crowns</small></span></span></p></div>";
+  }
+  function thanksHtml(title, text){ return '<div class="survey-done" role="status"><h3>' + title + '</h3><p class="survey-thanks">' + text + "</p></div>"; }
+
+  /* The thank-you when a reward was paid (Sam, 2026-11-17: "the thank you stage should show that you earned the crowns
+     and xp. make it do a super epic and cool animation so people feel good for doing these"): a gold sunburst turning
+     behind it, a shockwave, crowns, stars and confetti bursting out of the window, "You earned" with the two tiles
+     popping in and their numbers counting up to what was paid, and Timmy jumping up over the edge to cheer. Collect (or
+     the ×, Escape, or 12 seconds) closes it, and the crowns and stars fly out of the tiles into your rank in the bar,
+     which glows as they land; then the page reads your XP and crowns again (rewardPaid), so a rank-up card comes after,
+     not on top. With reduced motion or "Answer animations" off: the same thank-you, still. */
+  function celebrate(W, r, text, extra, sb){
+    var calm = still(), bits = "", COLORS = ["#F2C94C", "#FF8FA3", "#7FD8A8", "#8FA6EC", "#C3A9F0", "#F7A83C"], flown = false;
+    if (!calm) for (var i = 0; i < 28; i++) {
+      var ang = (-90 + (Math.random() * 160 - 80)) * Math.PI / 180, dist = 150 + Math.random() * 190, art = i % 4 === 0 ? coinSvg(22) : i % 4 === 1 ? starSvg(18) : "";
+      bits += '<i class="' + (art ? "is-art" : "is-bit") + '" style="--x:' + Math.round(Math.cos(ang) * dist) + "px;--up:" + Math.round(Math.sin(ang) * dist * .8) + "px;--fall:" +
+        Math.round(240 + Math.random() * 260) + "px;--r:" + Math.round(Math.random() * 900 - 450) + "deg;--d:" + Math.round(80 + Math.random() * 380) + "ms;--t:" +
+        Math.round(1500 + Math.random() * 900) + "ms;--c:" + COLORS[i % COLORS.length] + '">' + art + "</i>";
+    }
+    W.set('<div class="survey-done survey-cele" role="status"><span class="sr">You earned ' + num(r.xp) + " XP and " + num(r.crowns) + " Shiny Gold Crowns. Thank you!</span>" +
+      '<span class="survey-raysbox" aria-hidden="true"><span class="survey-rays"></span></span>' +
+      '<span class="survey-wave" aria-hidden="true"></span><span class="survey-confetti" aria-hidden="true">' + bits + "</span>" +
+      '<h3 aria-hidden="true">Thank you!</h3><p class="survey-cele-lead" aria-hidden="true">You earned</p>' +
+      '<div class="survey-bigs" aria-hidden="true">' +
+        '<span class="survey-big is-xp">' + starSvg(46) + '<b class="num" data-to="' + r.xp + '">+' + num(r.xp) + "</b><small>XP</small></span>" +
+        '<span class="survey-big is-crowns">' + coinSvg(46) + '<b class="num" data-to="' + r.crowns + '">+' + num(r.crowns) + "</b><small>Shiny Gold Crowns</small></span></div>" +
+      '<p class="survey-thanks">' + text + "</p>" + (extra || "") +
+      '<button type="button" class="btn btn-primary survey-collect">' + coinSvg(20) + "Collect</button></div>");
+    W.say("Ka-ching! You earned it!"); W.cheer();
+    var btn = q(".survey-collect", W.body);
+    try { btn.focus({ preventScroll: true }); } catch (e) {}
+    btn.addEventListener("click", function(){ W.close(); });
+    /* the numbers count up from 0, the crowns a beat after the XP */
+    if (!calm && window.requestAnimationFrame) Array.prototype.forEach.call(W.body.querySelectorAll(".survey-big b"), function(b, k){
+      var to = +b.getAttribute("data-to") || 0, t0 = null, wait = 420 + k * 200, dur = 1200;
+      b.textContent = "+0";
+      function step(ts){
+        if (!b.isConnected) return;
+        if (t0 == null) t0 = ts;
+        var x = Math.min(1, Math.max(0, (ts - t0 - wait) / dur)), e = 1 - Math.pow(1 - x, 3);
+        b.textContent = "+" + num(Math.round(to * e));
+        if (x < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+    /* closing, however it closes: the crowns and stars fly to your rank in the bar, then the page reads the reward */
+    W.closed = function(){
+      if (flown) return; flown = true;
+      var tgt = document.getElementById("dxRank"), tr = tgt && !tgt.hidden && tgt.getBoundingClientRect(), icons = W.body.querySelectorAll(".survey-big > svg"), land = 0;
+      if (!calm && tr && tr.width && icons.length === 2 && document.body.animate) {
+        for (var i = 0; i < 12; i++) (function(i){
+          var src = icons[i % 2], sr = src.getBoundingClientRect(), f = document.createElement("span");
+          f.className = "survey-flyer"; f.setAttribute("aria-hidden", "true"); f.innerHTML = src.outerHTML;
+          f.style.left = sr.left + "px"; f.style.top = sr.top + "px"; f.style.width = sr.width + "px"; f.style.height = sr.height + "px";
+          root.appendChild(f);
+          var dx = tr.left + tr.width / 2 - (sr.left + sr.width / 2), dy = tr.top + tr.height / 2 - (sr.top + sr.height / 2),
+            mx = dx * .35 + (Math.random() * 160 - 80), my = Math.min(0, dy) * .45 - 60 - Math.random() * 80, ms = 760 + i * 30, delay = i * 60;
+          land = Math.max(land, ms + delay);
+          f.animate([{ transform: "translate(0,0) scale(.6) rotate(0deg)", opacity: 0 }, { transform: "translate(" + mx + "px," + my + "px) scale(1.1) rotate(" + (i % 2 ? 200 : -200) + "deg)", opacity: 1, offset: .45 },
+            { transform: "translate(" + dx + "px," + dy + "px) scale(.3) rotate(" + (i % 2 ? 360 : -360) + "deg)", opacity: .9 }],
+            { duration: ms, delay: delay, easing: "cubic-bezier(.45,0,.6,1)", fill: "both" }).onfinish = function(){ f.remove(); };
+        })(i);
+        setTimeout(function(){ tgt.classList.remove("is-gain"); void tgt.offsetWidth; tgt.classList.add("is-gain"); setTimeout(function(){ tgt.classList.remove("is-gain"); }, 1300); }, Math.min(land, 900));
+      }
+      setTimeout(function(){ rewardPaid(sb, r); }, land + 150);
+    };
+    W.timer(function(){ W.close(); }, 12000);
+  }
+  /* Timmy over the window's top edge (none with him or the extras off): his drawing, in what he wears at his place, cut
+     at the edge, and his hands drawn again on top of it, holding on. Both in his own 200 x 262 frame, so they line up. */
+  var PEEK_HANDS = '<svg class="survey-hands" viewBox="0 -30 200 262" aria-hidden="true" focusable="false">' +
+    '<g fill="#FBF7EE" stroke="#3B2E3A" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">' +
+    '<path d="M19 124 C18 116 25 110 34 110 C43 110 50 116 49 124 C49 129 47 133 43 133 C41 135 37 135 35 133 C33 135 29 135 27 133 C23 133 19 129 19 124 Z"/>' +
+    '<path d="M181 124 C182 116 175 110 166 110 C157 110 150 116 151 124 C151 129 153 133 157 133 C159 135 163 135 165 133 C167 135 171 135 173 133 C177 133 181 129 181 124 Z"/></g>' +
+    '<g fill="none" stroke="#3B2E3A" stroke-width="2.6" stroke-linecap="round"><path d="M27.5 126 V132 M35 126 V132.5 M42.5 126 V132 M172.5 126 V132 M165 126 V132.5 M157.5 126 V132"/></g>' +
+    '<g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".9"><path d="M26 117 C28 114 31 113 34 113 M174 117 C172 114 169 113 166 113"/></g></svg>';
+  function peekHtml(){
+    var P = window.shPet, t = "";
+    if (!P || !P.art || focusOn() || ls("sh_pref_pet") === "off") return "";
+    try { t = String(P.art({ hp: 100, mood: "happy" }, 200)); } catch (e) { return ""; }
+    return '<div class="survey-peek" aria-hidden="true"><div class="survey-tim"><div class="survey-timin">' + t + "</div></div>" + PEEK_HANDS + "</div>" +
+      '<p class="survey-say" aria-hidden="true"></p>';
+  }
+
+  /* The window both open in: the middle of the screen over the dimmed page, a title bar (the hub's tint for a check-in,
+     gold for a survey) and Timmy over its top edge, with a line for each step. It keeps the keyboard while it is open
+     and gives the focus back when it closes. o = { label, bar (the title bar's inside, markup), hub (its tint; none for
+     gold), closeLabel, dismiss() (the ×, Escape or a tap on the dimmed page) }. Returns { box (the section.survey the rest
+     of the page looks for), win, body, set(html), say(line), cheer(), timer(fn, ms), close(now), closed (a hook run as
+     it closes) }. */
+  var formNow = null;
+  /* The pop-ups never open over another window (a classmate's place, the shop, a rank-up card, a dialog): a <dialog>
+     opened with showModal sits above everything, so the check-in would open hidden under it and take its Escape. They
+     wait for it to close, looking every 1.5 s for up to five minutes, then leave it for the next visit. */
+  function whenUncovered(fn, n){
+    n = n || 0;
+    if (!lifeCovered()) { fn(); return; }
+    if (n < 200) setTimeout(function(){ whenUncovered(fn, n + 1); }, 1500);
+  }
+  function formWindow(o){
+    if (formNow) formNow.close(true);
+    var back = document.activeElement, peek = peekHtml(), shut = false;
+    var box = document.createElement("section");
+    box.className = "survey" + (peek ? " has-peek" : "");
+    box.innerHTML = '<div class="survey-win' + (o.hub ? " tinted" : " is-gold") + '" role="dialog" aria-modal="true" aria-label="' + esc(o.label) + '" tabindex="-1"' +
+      (o.hub ? ' data-hub="' + esc(o.hub) + '" style="' + tintVars(o.hub) + '"' : "") + ">" + peek +
+      '<div class="survey-bar">' + o.bar + '<button type="button" class="survey-x" aria-label="' + esc(o.closeLabel || "Close") + '">' + icon("close", 20) + "</button></div>" +
+      '<div class="survey-body"></div></div>';
+    root.appendChild(box);
+    var win = q(".survey-win", box), body = q(".survey-body", box), bubble = q(".survey-say", box);
+    function hold(){ if (!win.contains(document.activeElement)) try { win.focus({ preventScroll: true }); } catch (e) {} }
+    function key(e){
+      if (e.key === "Escape") { e.preventDefault(); o.dismiss(); return; }
+      if (e.key !== "Tab") return;
+      var f = Array.prototype.filter.call(win.querySelectorAll("button, textarea, input, select, a[href]"), function(el){ return !el.disabled && el.offsetParent !== null; });
+      if (!f.length) { e.preventDefault(); return; }
+      var at = document.activeElement;
+      if (e.shiftKey && (at === f[0] || at === win || !win.contains(at))) { e.preventDefault(); f[f.length - 1].focus(); }
+      else if (!e.shiftKey && (at === f[f.length - 1] || !win.contains(at))) { e.preventDefault(); f[0].focus(); }
+    }
+    document.addEventListener("keydown", key);
+    box.addEventListener("click", function(e){ if (e.target === box || e.target.closest(".survey-x")) o.dismiss(); });
+    requestAnimationFrame(function(){ box.classList.add("is-shown"); hold(); });
+    var tmr = null;
+    var W = {
+      box: box, win: win, body: body, closed: null,
+      /* one timer for the window (an auto-close): a new one replaces the last, and closing clears it */
+      timer: function(fn, ms){ clearTimeout(tmr); tmr = setTimeout(fn, ms); },
+      set: function(html){ body.innerHTML = html; hold(); },
+      say: function(t){
+        if (!bubble || !t || bubble.textContent === t) return;
+        var first = !bubble.textContent;
+        bubble.textContent = t;
+        if (first) return;
+        bubble.classList.remove("is-new"); void bubble.offsetWidth; bubble.classList.add("is-new");
+      },
+      cheer: function(){ var p = q(".survey-peek", box); if (p) { p.classList.remove("is-cheer"); void p.offsetWidth; p.classList.add("is-cheer"); } },
+      close: function(now){
+        if (shut) return; shut = true;
+        clearTimeout(tmr);
+        if (formNow === W) formNow = null;
+        if (W.closed) try { W.closed(); } catch (e) {}
+        document.removeEventListener("keydown", key);
+        if (now) box.remove();
+        else { box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 320); }
+        try { if (back && back.focus && back !== document.body && document.contains(back)) back.focus({ preventScroll: true }); } catch (e) {}
+      }
+    };
+    formNow = W;
+    return W;
+  }
+
   /* Exam check-in (exam_debriefs, migration_v23/v24). After an exam, anyone with progress in that hub gets the
      check-in as a pop-up once, on their first visit after it, however late. Every hub (live or archived) with a
      finished exam keeps a "Check in" button, so people can send more than one. Answers are read back when the hub
@@ -784,44 +954,64 @@
       .sort(function(a, b){ return a.date < b.date ? 1 : -1; });
   }
   function debriefHub(id){ return HUBS.concat(ARCHIVED_HUBS).filter(function(h){ return h.id === id; })[0]; }
-  /* the pop-up: the newest finished exam this device studied for that it hasn't been shown yet */
+  /* the pop-up: the newest finished exam this device studied for that it hasn't been shown yet, or, once per round, one
+     whose exam has askAgain in hubs.js ("<round>") that this device showed and never sent: whoever said no gets it again
+     (Sam, 2026-11-17: "lets push this new prompt to anyone who has said no on the occlusion final check in"). A no isn't
+     recorded anywhere else, so the device decides. */
   function autoDebrief(){
     var best = null;
     HUBS.concat(ARCHIVED_HUBS).forEach(function(h){
       if (!readProgress(h)) return;
       pastExams(h, true).forEach(function(x){
-        if (ls("sh_debrief_" + h.id + "_" + x.date)) return;
-        if (!best || x.date > best.x.date) best = { h:h, x:x };
+        var k = h.id + "_" + x.date, again = false;
+        if (ls("sh_debrief_" + k)) {
+          if (!x.askAgain || ls("sh_debrief_sent_" + k) || ls("sh_debrief_again_" + k + "_" + x.askAgain)) return;
+          again = true;
+        }
+        if (!best || x.date > best.x.date) best = { h:h, x:x, again:again };
       });
     });
     if (!best) return false;
-    openDebrief(best.h, best.x);
+    if (best.again) lsSet("sh_debrief_again_" + best.h.id + "_" + best.x.date + "_" + best.x.askAgain, "1");
+    openDebrief(best.h, best.x, best.again);
     return true;
   }
   /* an exam's extraQs (e.g. Occlusion's diagram ratings) go just before the closing text question, which stays last */
   function debriefQs(x){ var n = DEBRIEF_QS.length - 1; return DEBRIEF_QS.slice(0, n).concat(x.extraQs || [], DEBRIEF_QS.slice(n)); }
-  /* One question per step (with a progress bar) so the card stays short on any screen instead of scrolling.
-     Tapping a choice moves on by itself; the text question at the end has Send. Every question is optional. */
-  function openDebrief(hub, x){
+  /* One question per step so the window stays short on any screen instead of scrolling: a bar fills toward the crown
+     coin at its end, and Timmy has a line for each. Tapping a choice moves on by itself; the text question at the end
+     has Send. Every question is optional. */
+  function openDebrief(hub, x, again){
     var me = surveyVisitor();
     if (!me) return;
     lsSet("sh_debrief_" + hub.id + "_" + x.date, "1");   /* shown = seen; the card button stays for later */
-    var old = document.querySelector(".survey"); if (old) old.remove();
     var QS = debriefQs(x), answers = {}, examId = x.date + " " + (x.label || "Exam"), step = 0, last = QS.length - 1, timer = null;
+    /* the server pays for the first check-in for this exam; one already sent from this device had it, so it isn't offered */
+    var pays = !ls("sh_debrief_sent_" + hub.id + "_" + x.date);
     /* the idea board's tick under "Anything the hub could do better?" (widget/ideas.js, Sam 2026-11-06): ticked to
        start, it shows the answer as the post it would make (a title, the text cut to 280, its kind) and posts it under
        the writer's leaderboard name when the check-in is sent. Unticked, the answer stays private, as before. The tick
        draws nothing until the board is up, and what it holds (ideaPost) outlives a Back and Next. */
     var ideaTick = null, ideaPost = {};
-    var box = document.createElement("section");
-    box.className = "survey debrief"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Exam check-in");
-    root.appendChild(box);
+    var W = formWindow({ label: "Exam check-in", hub: hub.id, dismiss: function(){ close(); },
+      bar: emblem(hub.id, "survey-emb") + '<span class="survey-title"><b>Exam check-in</b><small>' + esc(x.name || hub.title) + "</small></span>" });
+    var box = W.box;
+    /* what Timmy says over the window, step by step */
+    function line(q){
+      if (step === last) return pays ? "Last one! Send it and the crowns are yours." : "Last one. What could I do better?";
+      if (step === 0) return pays ? (again ? "Me again! " : "Psst! ") + "A few quick taps and " + num(FORM_CROWNS) + " crowns are yours." : "Back again? I'm all ears.";
+      if (q.id === "went") return "So? How did it go?";
+      if (q.id === "match") return "Did my questions look like the real thing?";
+      return pays ? "Almost there. The crowns are close!" : "Almost there!";
+    }
     function render(){
-      var q = QS[step], v = answers[q.id], h = '<button type="button" class="survey-x" aria-label="Close">×</button>' +
-        '<div class="survey-eyebrow">Exam check-in · ' + (step + 1) + ' of ' + QS.length + '</div>' +
-        '<div class="debrief-steps" aria-hidden="true">' + QS.map(function(_, i){ return '<i' + (i <= step ? ' class="on"' : '') + '></i>'; }).join("") + '</div>';
+      var q = QS[step], v = answers[q.id];
+      var h = '<div class="survey-prog"><span class="survey-count">Question ' + (step + 1) + " of " + QS.length + "</span>" +
+        '<span class="survey-meter" aria-hidden="true">' + QS.map(function(_, i){ return "<i" + (i <= step ? ' class="on"' : "") + "></i>"; }).join("") + "</span>" +
+        (pays ? '<span class="survey-prize' + (step === last ? " is-near" : "") + '" aria-hidden="true">' + coinSvg(20) + "</span>" : "") + "</div>";
       if (step === 0) h += '<h3>How did ' + esc(x.name || hub.title) + ' go?</h3>' +
-        '<p class="survey-why">What you say here, along with how everyone used the hub, goes to the AI that builds these hubs, so the ones for your next exams come out better.</p>';
+        '<p class="survey-why">What you say here, along with how everyone used the hub, goes to the AI that builds these hubs, so the ones for your next exams come out better.</p>' +
+        (pays ? lootHtml("Send it and earn", FORM_XP, FORM_CROWNS) : "");
       h += '<div class="survey-q" data-sq="' + q.id + '" data-kind="' + q.kind + '"><p' + (step ? ' class="debrief-prompt"' : '') + '>' + esc(q.prompt) + '</p>';
       if (q.kind === "text") h += (q.note ? '<p class="survey-why">' + esc(q.note) + '</p>' : '') +
         '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '" placeholder="e.g. more on suture types, more EXCEPT questions">' + esc(v || "") + '</textarea>' +
@@ -837,7 +1027,8 @@
       h += '</div><div class="survey-foot"><button type="button" class="survey-skip" data-act="' + (step ? 'back' : 'close') + '">' + (step ? 'Back' : 'Not now') + '</button>';
       if (step < last) h += '<button type="button" class="btn ' + (v != null ? 'btn-primary' : 'btn-quiet') + '" data-act="next">' + (v != null ? 'Next' : 'Skip') + '</button>';
       else h += '<button type="button" class="btn btn-primary survey-send" data-act="send">Send</button>';
-      box.innerHTML = h + '</div>';
+      W.set(h + '</div>');
+      W.say(line(q));
       /* an old single-file hub has no answer keys on the server, so an idea from its check-in is for all hubs */
       var th = box.querySelector("[data-idea-tick]");
       ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: LEGACY[hub.id] ? null : hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
@@ -850,9 +1041,8 @@
       if (send) send.disabled = !Object.keys(answers).length;
     }
     function go(n){ clearTimeout(timer); step = Math.max(0, Math.min(last, n)); render(); }
-    function close(){ clearTimeout(timer); box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }
+    function close(){ clearTimeout(timer); W.close(); }
     render();
-    requestAnimationFrame(function(){ box.classList.add("is-shown"); });
     box.addEventListener("input", refresh);
     box.addEventListener("click", function(e){
       var opt = e.target.closest(".survey-opt");
@@ -876,7 +1066,6 @@
         if (on) timer = setTimeout(function(){ go(step + 1); }, 320); else render();
         return;
       }
-      if (e.target.closest(".survey-x")) { close(); return; }
       var act = e.target.closest("[data-act]"); if (!act) return;
       var a = act.getAttribute("data-act");
       if (a === "close") close();
@@ -884,24 +1073,33 @@
       else if (a === "next") go(step + 1);
       else if (a === "send" && !act.disabled){
         refresh();
-        var thanks = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>Thank you!</b> Thought of something else? Check in again any time from the hub on this page.</p>';
-        var failed = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>That didn\'t save.</b> Please try again in a minute from the hub on this page.</p>';
         /* the tick: a ticked answer needs a name and a title before anything is sent; an unticked one is counted */
         var tk = ideaTick, toBoard = !!(tk && tk.on()), warn = box.querySelector(".debrief-warn");
         if (toBoard) { var bad = tk.check(); if (bad) { if (warn) warn.textContent = bad; return; } }
         else if (tk && tk.shown() && answers.missed) track("ideas:checkin-private");
         act.disabled = true;
-        if (!debriefSb) { box.innerHTML = failed; setTimeout(close, 4000); return; }
-        debriefSb.rpc("submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
-          if (r.error || r.data !== true) { box.innerHTML = failed; setTimeout(close, 4000); return; }
+        var failed = function(){
+          W.set(thanksHtml("That didn't save.", "Please try again in a minute from the hub on this page."));
+          W.say("Uh oh. Try me again in a minute?");
+          setTimeout(close, 4000);
+        };
+        if (!debriefSb) { failed(); return; }
+        sendForm(debriefSb, "submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
+          if (!r.ok) { failed(); return; }
           lsSet("sh_debrief_sent_" + hub.id + "_" + x.date, "1"); renderCheckins();
-          if (!toBoard) { box.innerHTML = thanks; setTimeout(close, 3600); return; }
+          var text = "Thought of something else? Check in again any time from the hub on this page.";
+          function done(more, ms){
+            if (r.xp > 0) { celebrate(W, r, text, more, debriefSb); return; }
+            W.set(thanksHtml("Thank you!", text) + (more || ""));
+            W.say("Thank you! That helps a lot.");
+            setTimeout(close, ms);
+          }
+          if (!toBoard) { done("", 3600); return; }
           /* the check-in is in; now the post. If it doesn't go up (three ideas today, say), the check-in still counts */
           tk.post().then(function(p){
-            box.innerHTML = thanks + '<p class="survey-why">' + (p.ok ? "Your idea is on the idea board." : "Your check-in was sent, but the idea didn\'t post. " + esc(p.msg || "")) + "</p>";
-            setTimeout(close, p.ok ? 3600 : 7000);
-          }, function(){ box.innerHTML = thanks; setTimeout(close, 3600); });
-        }, function(){ box.innerHTML = failed; setTimeout(close, 4000); });
+            done('<p class="survey-why">' + (p.ok ? "Your idea is on the idea board." : "Your check-in was sent, but the idea didn\'t post. " + esc(p.msg || "")) + "</p>", p.ok ? 3600 : 7000);
+          }, function(){ done("", 3600); });
+        }, failed);
       }
     });
   }
@@ -913,17 +1111,30 @@
   function startSurvey(sb, bootstrap){
     var me = surveyVisitor();
     if (!me) return;
-    function show(rows){
+    /* Ask again: a survey in hubs.js's surveyAgain ({ "<survey id>": "<round>" }) comes back as a pop-up once per round for
+       anyone who said "Later" to it (Sam, 2026-11-17: "lets push this new prompt to anyone who has said no on ... the new
+       survey"). Saying Later leaves a row, so get_active_survey (survey_popup) skips them; get_my_survey (the Inbox's
+       `survey`) still has it until it's answered, on whichever device they said no. */
+    var AGAIN = D.surveyAgain || {};
+    function again(list){
+      var sv = (Array.isArray(list) ? list : []).filter(function(x){ return x && AGAIN[x.id] && !ls("sh_survey_again_" + x.id + "_" + AGAIN[x.id]); })[0];
+      return sv ? [sv] : null;
+    }
+    function show(rows, re){
       var sv = rows && rows[0];
-      if (!sv || ls("sh_survey_done_" + sv.id)) return;
+      if (!sv || (!re && ls("sh_survey_done_" + sv.id))) return;
       var qs = Array.isArray(sv.questions) ? sv.questions.slice(0, 5) : [];
       if (!qs.length) return;
       if (document.querySelector(".survey")) return;   /* a check-in opened from a card is already up: the survey waits for the next visit */
-      var answers = {};
-      var box = document.createElement("section");
-      box.className = "survey"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Quick survey");
-      var h = '<button type="button" class="survey-x" aria-label="Later">×</button><div class="survey-eyebrow">Quick survey · ' +
-        (qs.length === 1 ? "1 question" : qs.length + " questions") + '</div><h3>' + esc(sv.title) + '</h3>';
+      if (lifeCovered()) { whenUncovered(function(){ show(rows, re); }); return; }   /* the answer came while a window was open */
+      if (re) lsSet("sh_survey_again_" + sv.id + "_" + AGAIN[sv.id], "1");
+      var answers = {}, sent = false;
+      /* "Later" (the button, the ×, Escape or a tap on the dimmed page) stops the pop-up; the survey waits in the Inbox */
+      var W = formWindow({ label: "Quick survey", closeLabel: "Later", dismiss: function(){ if (sent) W.close(); else done(null, false); },
+        bar: '<span class="survey-emb survey-emb-ic">' + icon("comment", 20) + '</span><span class="survey-title"><b>Quick survey</b><small>' +
+          (qs.length === 1 ? "1 question" : qs.length + " questions") + "</small></span>" });
+      var box = W.box;
+      var h = '<h3>' + esc(sv.title) + '</h3>' + lootHtml("Send it and earn", FORM_XP, FORM_CROWNS);
       qs.forEach(function(q, qi){
         var id = String(q.id || ("q" + (qi + 1)));
         h += '<div class="survey-q" data-sq="' + esc(id) + '" data-kind="' + esc(q.kind || "choice") + '"><p>' + esc(q.prompt || "") + '</p>';
@@ -941,9 +1152,8 @@
         h += '</div>';
       });
       h += '<div class="survey-foot"><button type="button" class="survey-skip">Later</button><button type="button" class="btn btn-primary survey-send" disabled>Send</button></div>';
-      box.innerHTML = h;
-      root.appendChild(box);
-      requestAnimationFrame(function(){ box.classList.add("is-shown"); });
+      W.set(h);
+      W.say(re ? "Me again! There are still " + num(FORM_CROWNS) + " crowns in it for you." : "Got a minute? I pay in crowns.");
       var send = box.querySelector(".survey-send");
       function refresh(){
         box.querySelectorAll("textarea").forEach(function(t){
@@ -955,23 +1165,29 @@
         send.disabled = !Object.keys(answers).length;
       }
       function done(payload, thanks){
+        sent = true;
         try{ localStorage.setItem("sh_survey_done_" + sv.id, "1"); }catch(e){}
         /* "Later" (null) stops the pop-up, but the survey waits in the Inbox (widget/replies.js) until it's answered */
-        sb.rpc("submit_survey", { p_survey:sv.id, p_visitor:me, p_answers:payload }).then(function(){
+        sendForm(sb, "submit_survey", { p_survey:sv.id, p_visitor:me, p_answers:payload }).then(function(r){
           if (window.shReplies && window.shReplies.refresh) window.shReplies.refresh();
+          /* the reward arrives after the thank-you is drawn: the celebration takes its place if the window is still up */
+          if (thanks && r.xp > 0 && box.isConnected) celebrate(W, r, "This goes straight into what gets built next.", "", sb);
+          else rewardPaid(sb, r);
         }, function(){});
         if (!thanks){
-          box.innerHTML = '<div class="survey-eyebrow">Quick survey</div><p class="survey-thanks"><b>Saved to your Inbox.</b> Answer it there anytime.</p>';
-          setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 2200);
+          W.set(thanksHtml("Saved to your Inbox.", "Answer it there anytime. The " + num(FORM_XP) + " XP and " + num(FORM_CROWNS) + " crowns wait with it."));
+          W.say("No rush. It'll be in your Inbox.");
+          W.timer(function(){ W.close(); }, 2600);
           return;
         }
-        box.innerHTML = '<div class="survey-eyebrow">Quick survey</div><p class="survey-thanks"><b>Thank you!</b> This goes straight into what gets built next.</p>';
-        setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 2600);
+        W.set(thanksHtml("Thank you!", "This goes straight into what gets built next."));
+        W.say("Thank you!");
+        W.timer(function(){ W.close(); }, 5500);
       }
       box.addEventListener("input", refresh);
-      /* answered from the Inbox while this card is still open */
+      /* answered from the Inbox while this window is still open */
       document.addEventListener("sh:survey-done", function(e){
-        if (e.detail && e.detail.id === sv.id && box.isConnected){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }
+        if (e.detail && e.detail.id === sv.id && box.isConnected) { sent = true; W.close(); }
       });
       box.addEventListener("click", function(e){
         var opt = e.target.closest(".survey-opt");
@@ -990,16 +1206,26 @@
           else answers[id] = multi ? picked : (q.getAttribute("data-kind") === "scale" ? +picked[0] : picked[0]);
           refresh(); return;
         }
-        if (e.target.closest(".survey-x, .survey-skip")) done(null, false);
+        if (sent) return;
+        if (e.target.closest(".survey-skip")) done(null, false);
         else if (e.target.closest(".survey-send") && !send.disabled) done(answers, true);
       });
     }
-    function remote(){ sb.rpc("get_active_survey", { p_visitor:me }).then(function(res){ show(res && !res.error ? res.data : null); }, function(){}); }
+    function remote(){
+      sb.rpc("get_active_survey", { p_visitor:me }).then(function(res){
+        var rows = res && !res.error ? res.data : null;
+        if (rows && rows.length) { show(rows); return; }
+        if (Object.keys(AGAIN).length) sb.rpc("get_my_survey", { p_visitor:me }).then(function(r){ var a = again(r && !r.error ? r.data : null); if (a) show(a, true); }, function(){});
+      }, function(){});
+    }
     if (bootstrap && typeof bootstrap.then === "function") {
-      bootstrap.then(function(data){ if (data && Array.isArray(data.survey_popup)) show(data.survey_popup); else remote(); }, remote);
+      bootstrap.then(function(data){
+        if (!data || !Array.isArray(data.survey_popup)) { remote(); return; }
+        if (data.survey_popup.length) show(data.survey_popup);
+        else { var a = again(data.survey); if (a) show(a, true); }
+      }, remote);
     } else remote();
   }
-
 
   /* ====================================================================
      DIALOGS: your name, Settings
@@ -1019,7 +1245,18 @@
   function paintName(){
     var name = localName || randomName;
     $("youName").innerHTML = (name ? "<b>" + esc(name) + "</b>" : "<b>No name yet</b>") +
-      ' <button type="button" class="btn btn-text dx-rename" id="greetEdit" title="Change the name classmates see on the leaderboards">' + (localName ? "Change name" : "Pick your name") + "</button>";
+      ' <button type="button" class="btn btn-text dx-rename" id="greetEdit" title="Change the name classmates see on the leaderboards">' + (localName ? "Change name" : "Pick your name") + "</button>" +
+      '<button type="button" class="btn btn-text dx-rename" id="greetLink" title="Share one rank, streak and progress with your phone, tablet or laptop">Link my devices</button>';
+  }
+  /* Link my devices (widget/linkask.js), beside every name button (Sam, 2026-11-18: "link my device is nowhere to be
+     found"). It comes with the shared widgets just after the page is drawn, so a tap before they're in waits for them. */
+  function openLink(back, from){
+    var t0 = Date.now();
+    (function go(){
+      if (window.shLinkAsk && window.shLinkAsk.link) { window.shLinkAsk.link({ back: back, from: from }); return; }
+      if (Date.now() - t0 > 8000) { toast("Couldn’t open Link my devices. Are you online?"); return; }
+      setTimeout(go, 200);
+    })();
   }
   function openNameEditor(){
     surveyVisitor();
@@ -1028,10 +1265,12 @@
       (!localName && randomName ? " Right now you have a random one: <b>" + esc(randomName) + "</b>." : "") + "</p>" +
       '<form class="dx-nameform"><input type="text" maxlength="24" autocomplete="nickname" enterkeyhint="done" aria-label="Your name" placeholder="Pick a name" value="' + esc(localName) + '"><button class="btn btn-primary" type="submit">Save</button></form>' +
       '<p class="note dx-namemsg" aria-live="polite"></p>' +
-      (localName ? '<button class="btn btn-text dx-namereset" type="button">Go back to a random name</button>' : '<p class="note">Up to 24 characters. You can change it any time.</p>'), $("greetEdit"));
+      (localName ? '<button class="btn btn-text dx-namereset" type="button">Go back to a random name</button>' : '<p class="note">Up to 24 characters. You can change it any time.</p>') +
+      '<p class="note dx-namelink">Using the hubs on another device too? <button class="btn btn-text" type="button" data-namelink>Link my devices</button></p>', $("greetEdit"));
     var d = dlg.el, input = q("input", d), msg = q(".dx-namemsg", d);
     setTimeout(function(){ try{ input.select(); }catch(e){} }, 40);
     d.addEventListener("click", function(e){
+      if (e.target.closest("[data-namelink]")) { dlg.close(); openLink($("greetLink") || $("greetEdit"), "name"); return; }
       if (!e.target.closest(".dx-namereset")) return;
       localName = ""; lsSet("sh_display_name", null); track("name:reset"); nameChanged();
       if (nameSb) nameSb.rpc("clear_display_name", { p_visitor: VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; paintName(); } }, function(){});
@@ -1051,7 +1290,10 @@
     });
   }
   paintName();
-  $("youName").addEventListener("click", function(e){ if (e.target.closest("#greetEdit")) openNameEditor(); });
+  $("youName").addEventListener("click", function(e){
+    if (e.target.closest("#greetEdit")) openNameEditor();
+    else if (e.target.closest("#greetLink")) openLink($("greetLink"), "you");
+  });
   /* the name changed here: say so (the idea board shows who you post as). A name picked in the idea board's form says
      so the same way, and this page takes it. */
   var nameTold = false;
@@ -1103,7 +1345,8 @@
       '<section class="panel" aria-labelledby="stH"><h3 id="stH">Look</h3>' +
         '<div class="set-row"><div><b>Theme</b><small>Every hub and the dashboard follow it.</small></div>' + seg("theme", [["light", "Light"], ["dark", "Dark"], ["", "Match my device"]], themeNow()) + "</div>" +
         '<div class="set-row"><div><b>Text size</b><small>Makes everything bigger or smaller.</small></div>' + seg("size", SIZES, ls("sh_pref_size") || "default") + "</div>" +
-        '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (localName || randomName ? ": " + esc(localName || randomName) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div></section>' +
+        '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (localName || randomName ? ": " + esc(localName || randomName) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' +
+        '<div class="set-row"><div><b>Link my devices</b><small>One rank, streak, trophy case and question progress on your phone, tablet and laptop.</small></div><button class="btn" type="button" data-link>Link my devices</button></div></section>' +
       '<section class="panel" aria-labelledby="sxH"><h3 id="sxH">Timmy and the extras</h3><p class="note">The fun stuff that isn\'t studying, in every hub.</p><div data-extras>' + extrasHTML() + "</div></section></div>", $("setBtn"));
     var body = dlg.el; body.classList.add("dx-dlg-wide");
     function paintFocus(){ var fp = q(".focus-panel", body); fp.classList.toggle("is-on", focusOn()); fp.innerHTML = focusRowHTML(); }
@@ -1115,6 +1358,7 @@
         q("[data-focus]", body).focus(); return;
       }
       if (e.target.closest("[data-name]")) { dlg.close(); openNameEditor(); return; }
+      if (e.target.closest("[data-link]")) { dlg.close(); openLink($("setBtn"), "settings"); return; }
       var b = e.target.closest(".seg [data-val]"); if (!b) return;
       var k = b.parentNode.getAttribute("data-key"), v = b.getAttribute("data-val");
       qa("[data-val]", b.parentNode).forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); });
@@ -1340,7 +1584,7 @@
   document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); } });
   /* the rare costume of the day: from the visitor id and the Central day, on about one day in twelve with no holiday
      (widget/pet.js's holidayId()) outside the fall weeks (September 22 to November 30). The same as hub-timmy.js's. */
-  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
   function costumeOfDay(visitor, day, holiday){
     if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
     var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";
@@ -1424,6 +1668,27 @@
   /* the game layer's function when the database has it (<name>_v2, migration_v54), today's otherwise */
   var V2 = C.v2 === false ? false : null;
   function missing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
+  /* a survey or a check-in (migration_v60): the _v2 call answers { ok, xp, crowns } with the reward it paid (1,000 XP since migration_v61, and 1,000
+     crowns, once per survey and per hub's exam check-in); without it, the old call's true or false. Kept apart from rpc2 so
+     a missing _v2 here never turns the rest of the game layer's calls off. Resolves { ok, xp, crowns }. */
+  function sendForm(sb, name, args){
+    function old(){ return sb.rpc(name, args).then(function(r){ return { ok: !r.error && r.data === true, xp: 0, crowns: 0 }; }); }
+    return sb.rpc(name + "_v2", args).then(function(r){
+      if (missing(r)) return old();
+      var d = !r.error && r.data && typeof r.data === "object" ? r.data : null;
+      return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0 };
+    });
+  }
+  /* a reward was paid (the window celebrates it: celebrate): the "you" card's XP and crowns read again from the server */
+  function rewardPaid(sb, r){
+    if (!r || !(r.xp > 0) || !sb || !VISITOR) return;
+    loadMyRank(sb);
+    sb.rpc("get_my_shop", { p_visitor: VISITOR }).then(function(x){
+      if (x && !x.error && x.data && x.data.wallet) try { document.dispatchEvent(new CustomEvent("sh:shop", { detail: { shop: x.data } })); } catch (e) {}
+    }, function(){});
+  }
+  /* a survey answered in the Inbox (widget/replies.js) paid a reward: read the card's XP and crowns again */
+  document.addEventListener("sh:reward", function(e){ rewardPaid(debriefSb || boardSb, e.detail); });
   function rpc2(sb, name, args){
     if (V2 === false) return sb.rpc(name, args);
     return sb.rpc(name + "_v2", args).then(function(r){
@@ -1519,6 +1784,7 @@
         return ranks ? rowHTML(r, r.rnk, jName(r, r.level || R.levelFor(r.xp)), num(r.xp), "XP", (+r.xp || 0) / first)
           : rowHTML(r, i + (pod ? 4 : 1), "", r.streak, r.streak === 1 ? "day" : "days", (+r.streak || 0) / first);
       }).join("") + "</ol>" : "") + "</div>";
+    lifeStage();
     if (d.say) visitSay(d.say.key, d.say.msg, true);
     $("visitRand").hidden = !visitList().length;
   }
@@ -1790,7 +2056,7 @@
     }
   }
   function startRecaps(rows){
-    var chips = $("rcChips"), body = $("rcBody"), wrap = $("rc"), cur = -1, seen = false;
+    var chips = $("rcChips"), body = $("rcBody"), wrap = $("rc"), cur = -1, seen = false, playT = 0;
     chips.innerHTML = rows.map(function(r, i){
       return '<button type="button" role="tab" class="rc-chip tinted" style="' + tintVars(r.hub) + '" id="rc-tab-' + i + '" data-rc="' + i + '" aria-selected="false" aria-controls="rcBody" tabindex="-1">' +
         emblem(r.hub, "dx-emb") + "<span><b>" + esc(r.title) + "</b>" + (r.data.exam_day ? "<small>" + esc(recapDay(r.data.exam_day)) + "</small>" : "") + "</span></button>";
@@ -1806,6 +2072,10 @@
         (function step(t){ if (t0 === null) t0 = t; var k = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - k, 3); el.textContent = num(Math.round(to * e)) + suf; if (k < 1) requestAnimationFrame(step); })(performance.now());
       });
       body.classList.add("is-in");
+      /* once the bars have grown they stay still (Sam, 2026-11-17: "shouldnt reset every time you scroll"): the page rests
+         its pictures while it scrolls (.is-rest takes their animations away), which started the bars over from zero.
+         .is-played leaves them drawn until another hub's recap is shown. */
+      clearTimeout(playT); playT = setTimeout(function(){ body.classList.add("is-played"); }, 1600);
     }
     function show(i){
       i = (i + rows.length) % rows.length; if (i === cur) return; cur = i;
@@ -1819,7 +2089,7 @@
       if (d.after_midnight) facts.push(["owls", '<b class="num">' + num(d.after_midnight) + "</b> night owl" + (d.after_midnight === 1 ? "" : "s"), "after midnight"]);
       if (d.regulars) facts.push(["regulars", '<b class="num">' + num(d.regulars) + "</b> regular" + (d.regulars === 1 ? "" : "s"), "3 or more days"]);
       var tq = (d.toughest || [])[0], qq = row.question, hrs = Math.round((d.minutes || 0) / 60);
-      body.classList.remove("is-in"); body.setAttribute("style", tintVars(row.hub)); body.setAttribute("aria-labelledby", "rc-tab-" + i);
+      clearTimeout(playT); body.classList.remove("is-in", "is-played"); body.setAttribute("style", tintVars(row.hub)); body.setAttribute("aria-labelledby", "rc-tab-" + i);
       body.innerHTML =
         '<div class="rc-head">' + emblem(row.hub, "dx-emb") + "<div><h3>" + esc(row.title) + '</h3><p class="note">' +
           (d.exam_day ? "Exam " + esc(recapDay(d.exam_day, true)) : "") + (d.first_day && (d.exam_day || d.last_day) ? " · studied " + esc(recapDay(d.first_day)) + " to " + esc(recapDay(d.exam_day || d.last_day)) : "") + "</p></div>" +
@@ -1876,9 +2146,11 @@
   /* back on the tab after a while: check again (one small request, at most every 5 minutes) */
   document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible" && ovSb && Date.now() - ovAt > 5 * 60 * 1000) loadOverrides(ovSb); });
 
-  /* ---------- each hub's "Updated", from the changelog every deploy logs to (the What's new list itself is gone:
-     Sam, 2026-11-11) ---------- */
-  var latestBy = null;
+  /* ---------- each hub's "Updated", from the changelog every deploy logs to, and its What's new (the long list went on
+     2026-11-11; Sam brought it back as one line on 2026-11-17) ---------- */
+  var latestBy = null, logRows = [];
+  /* a changelog row's hubs ("all", one hub, or a comma list; empty is the whole site) */
+  function logHubs(r){ var t = String(r.hub || "").toLowerCase().split(/[,\s]+/).filter(Boolean); return t.length ? t : ["all"]; }
   function applyUpdated(){
     if (!latestBy) return;
     qa(".updated[data-hub]").forEach(function(el){
@@ -1886,13 +2158,23 @@
       if (latestBy.all && (!best || latestBy.all > best)) best = latestBy.all;
       if (best) el.textContent = "Updated " + relDay(new Date(best));
     });
+    /* What's new: the hub's and the whole site's five latest changes, newest first, a line each with its day */
+    qa("[data-news]").forEach(function(d){
+      var id = d.getAttribute("data-news"), mine = logRows.filter(function(r){ var t = logHubs(r); return t.indexOf(id) > -1 || t.indexOf("all") > -1; }).slice(0, 5);
+      d.classList.toggle("is-empty", !mine.length); q("summary", d).tabIndex = mine.length ? 0 : -1;
+      q(".dx-news-list", d).innerHTML = mine.map(function(r){
+        return "<li><p>" + esc(r.message) + '</p><small class="note">' + esc(relDay(new Date(r.created_at))) + (logHubs(r).indexOf("all") > -1 ? " · every hub" : "") + "</small></li>";
+      }).join("");
+      if (!d.getAttribute("data-wired")) { d.setAttribute("data-wired", "1"); d.addEventListener("toggle", function(){ if (d.open) track("news:open"); }); }
+    });
   }
   function loadChangelog(){
-    rest("changelog?select=hub,created_at&order=created_at.desc&limit=40").then(function(rows){
+    rest("changelog?select=hub,message,created_at&order=created_at.desc&limit=40").then(function(rows){
       if (!rows || !rows.length) return;
       /* the freshest entry per hub drives its "Updated" (a row's hub can be "all" or a comma list) */
       latestBy = {};
       rows.forEach(function(r){ String(r.hub || "").toLowerCase().split(/[,\s]+/).filter(Boolean).forEach(function(t){ if (!latestBy[t] || r.created_at > latestBy[t]) latestBy[t] = r.created_at; }); });
+      logRows = rows.filter(function(r){ return r && typeof r.message === "string" && r.message.trim(); });
       applyUpdated();
     }).catch(function(){});
   }
@@ -1931,7 +2213,7 @@
     if (o.visible($("ideas"))) S.push({ el: "#ideas", title: "The idea board", body: "<p>Ideas for the hubs, from the class. Vote the ones you'd use up or down, or post your own: it shows right away under your name, with the hub it's for and what kind of idea it is.</p>" });
     if (o.visible($("past"))) S.push({ el: "#past", title: "Past hubs", body: "<p>How the class studied for each exam that's done: the hours, the people, the busiest day. <b>Save image</b> keeps a picture of it. A hub that just closed keeps its check-in here.</p>" });
     S.push({ el: "#inboxBtn", title: "Inbox", body: "<p>Replies to your reports and suggestions, notices to the whole class and the occasional short survey. A number on it means something new.</p>" });
-    S.push({ el: "#setBtn", title: "Settings", body: "<p>Focus mode, the theme, text size, your name, Timmy and the extras. Set them once here and every hub follows.</p>" });
+    S.push({ el: "#setBtn", title: "Settings", body: "<p>Focus mode, the theme, text size, your name, <b>Link my devices</b> (your phone and laptop count as one you), Timmy and the extras. Set them once here and every hub follows.</p>" });
     S.push({ el: "#menuBtn", title: "About and this tour", body: "<p>The full guide to every feature, trophy and easter egg, the light or dark switch, and this tour.</p>", last: true });
     return S;
   } };
@@ -2031,7 +2313,7 @@
     var held = 0;
     function askNext(){
       if (q(".sh-reply") && held++ < 200) { setTimeout(askNext, 1500); return; }
-      tourIdle(function(){ if (!autoDebrief()) startSurvey(sb, bootstrap.ready); });
+      tourIdle(function(){ whenUncovered(function(){ if (!autoDebrief()) startSurvey(sb, bootstrap.ready); }); });
     }
     setTimeout(askNext, 4000);
 
@@ -2070,7 +2352,75 @@
     loadScriptOnce(WIDGET + "rest.bundle.js").then(one, one);
     loadScriptOnce(WIDGET + "hub-art/class.js").then(one, one);
   }
+  /* The drawn pictures move when you arrive at them, not all the time (Sam, 2026-11-14: "scrolling and things are kind
+     of sluggish and jittery"). Anything that moves inside a drawing (the stage's confetti and lights, the classroom's
+     Timmys, the road, the board's Timmy, the picture of Timmy's place) makes the browser redraw that picture and
+     rebuild the page's layers on every frame, and about 130 of them ran the whole time, wherever the page was
+     scrolled. So each such part of the page rests (.is-rest: dash.css and place.css hold what moves inside it) and
+     comes alive for LIFE ms when it comes on screen, when a scroll ends on it and under a mouse. It rests at once when
+     a scroll or a touch starts, while a window is open over the page and when it leaves the screen. What costs
+     nothing keeps moving while it is on screen: the Timmy Time card, the rays, the rank bar's shine and a crown's glint
+     are moved by the compositor. Off screen (.is-away) nothing moves at all. */
+  var LIFE = 8000, life = { io: null, parts: [], scrolling: false, st: 0, tt: 0, stage: null };
+  function lifeCovered(){ return !!q('dialog[open], [aria-modal="true"]'); }
+  /* the picture of Timmy's place is drawn in a shadow root, which a rule out here can't reach: it is told by itself */
+  function lifeMark(p, rest){
+    p.el.classList.toggle("is-rest", rest);
+    if (p.el.id === "you") [].forEach.call(p.el.querySelectorAll(".tpc-live"), function(x){ x.classList.toggle("is-rest", rest); });
+  }
+  function lifeRest(p){ clearTimeout(p.t); p.t = 0; lifeMark(p, true); }
+  function lifeWake(p){
+    if (!p.on || life.scrolling || lifeCovered()) return;
+    clearTimeout(p.t); lifeMark(p, false);
+    p.t = setTimeout(function(){ lifeRest(p); }, LIFE);
+  }
+  function lifeHold(){ life.parts.forEach(function(p){ if (p.t) lifeRest(p); }); }
+  function lifePart(el){
+    var p = { el: el, on: false, t: 0 };
+    el.classList.add("is-rest"); life.parts.push(p); life.io.observe(el);
+    el.addEventListener("mouseenter", function(){ lifeWake(p); });
+    return p;
+  }
+  function lifeWatch(){
+    if (!window.IntersectionObserver) return;
+    life.io = new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        e.target.classList.toggle("is-away", !e.isIntersecting);
+        var p = life.parts.filter(function(x){ return x.el === e.target; })[0]; if (!p) return;
+        p.on = e.isIntersecting; if (p.on) lifeWake(p); else lifeRest(p);
+      });
+    });
+    ["you", "now", "road", "ideas", "past"].forEach(function(id){ var el = $(id); if (el) lifePart(el); });
+    /* these two have nothing that rests, only what stops off screen (.is-away): the Timmy Time card, the board's rows */
+    ["hubs", "board"].forEach(function(id){ var el = $(id); if (el) life.io.observe(el); });
+    lifeStage();
+    window.addEventListener("scroll", function(){
+      if (!life.scrolling) { life.scrolling = true; lifeHold(); }
+      clearTimeout(life.st);
+      life.st = setTimeout(function(){ life.scrolling = false; life.parts.forEach(lifeWake); }, 220);
+    }, { passive: true });
+    document.addEventListener("touchstart", lifeHold, { passive: true });
+    /* a tap that scrolled nothing: the pictures come back */
+    document.addEventListener("touchend", function(){
+      clearTimeout(life.tt); life.tt = setTimeout(function(){ if (!life.scrolling) life.parts.forEach(lifeWake); }, 500);
+    }, { passive: true });
+    /* a window opened over the page (most open on a click; one that had to be fetched first is added to the body
+       later) or closed */
+    document.addEventListener("click", function(){ setTimeout(function(){ if (lifeCovered()) lifeHold(); }, 80); }, true);
+    if (window.MutationObserver) new MutationObserver(function(){ if (lifeCovered()) lifeHold(); }).observe(document.body, { childList: true });
+    document.addEventListener("close", function(){ setTimeout(function(){ life.parts.forEach(lifeWake); }, 320); }, true);
+  }
+  /* the stage is drawn again with every board, so its picture is watched by itself (the list under it is tall: the
+     stage is often off screen while the list is on it) */
+  function lifeStage(){
+    if (!life.io) return;
+    var el = q(".dx-set", $("board"));
+    if (life.stage && life.stage.el === el) return;
+    if (life.stage) { life.io.unobserve(life.stage.el); clearTimeout(life.stage.t); life.parts = life.parts.filter(function(x){ return x !== life.stage; }); }
+    life.stage = el ? lifePart(el) : null;
+  }
   function afterDraw(){
+    lifeWatch();
     loadLate(function(){
       CA = window.SH_CLASS_ART || null;
       startClassData(); syncRoom();

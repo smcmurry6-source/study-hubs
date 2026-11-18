@@ -21,7 +21,7 @@ A survey answer asked to "highlight the words being read when listening to the l
 ## Context
 
 - The engine: `widget/hub.js` / `hub.css`, the redesigned hubs in `hubs/<id>/next/` (Occlusion, Heme & Endo Exam 2, Perio);
-  they reach the class at the [redesign release](../2026-11-06-redesign-release.md), which holds the About page text.
+  they reach the class at the [redesign release](2026-11-06-redesign-release.md), which holds the About page text.
 - Listen plays pre-recorded Kokoro narration (`hubs/<hub>/audio/<lecture>-<level>.mp3`, [narrate-with-kokoro](../../how-to/narrate-with-kokoro.md))
   through `shTTS` in `widget/v3.js`. Its browser-voice fallback already highlighted words (it speaks them one by one); the
   narration files had no timings.

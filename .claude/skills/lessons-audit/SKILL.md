@@ -120,8 +120,9 @@ For each item under ~45% with 12+ tries, read the stem, choices, key and explana
 - Keep ids and answer positions. `node tools/ci/syntax.js` after each batch. Since 2026-11-04 every answered card shows the
   class's picks per choice, read from `question_choices` by position and not by version: a change that moves or rewrites
   choices shows old percentages beside the wrong choice. When one must (a key pattern, a giveaway), write the SQL that moves
-  the moved rows and clears the rewritten ones, test it on a throwaway Postgres, put it in the PR, and run it only with
-  Sam's OK, right after the merge (example: `tools/data-fixes/2026-11-04-statement-keys.sql`).
+  the moved rows and clears the rewritten ones (safe to run twice: a recount, not an increment), test it on a throwaway
+  Postgres and put it in the PR as a new file in `tools/data-fixes/` (example: `2026-11-15-occlusion-audit.sql`). Sam's
+  "merge" is the OK: the After merge workflow runs it once, when the pages are live (`vault/how-to/after-a-merge.md`).
 - A changed explanation, stem or choice also updates that question's "why each choice" lines, so they still agree
   (`vault/rules/every-choice-gets-a-why.md`; in hubs with `QUESTION_WHY` it's that row, in `mq()` hubs the pairs).
 - The CI lint fails on a matching item that repeats an answer (unless that hub grades by text and the id is in
@@ -149,8 +150,9 @@ For each item under ~45% with 12+ tries, read the stem, choices, key and explana
   what Sam already skipped or settled.
 - **Reports and suggestions**: give each open one a verdict and a draft reply in plain, kind words (never make the
   student feel silly). Don't resolve them yourself: resolving sends the reply, so Sam picks the wording.
-- Watch the PR until CI is green. Merge only when Sam says so. After merge, log a student-facing line per changed
-  hub with `log_changelog` (`ADMIN_SECRET`, `SB_KEY` from the environment; skip and say so if missing).
+- Watch the PR until CI is green. Merge only when Sam says so. For the changelog, add a student-facing line per changed
+  hub to `tools/after-merge/changelog.txt` in the PR (`<hub> | <message>`); after the merge the After merge workflow logs
+  them, loads the changed hubs' answer keys and runs any data fix. Read its result on `main`.
 
 ## Finish with
 

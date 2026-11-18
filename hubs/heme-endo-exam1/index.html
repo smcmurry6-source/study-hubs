@@ -5373,7 +5373,7 @@ function examCardHTML(){
   return '<details class="exam-card" id="examCard"'+(STATE.ui.examCard === 'closed' ? '' : ' open')+'><summary>'+icon('clock')+'<span><b>'+when+'</b> · 55 multiple choice · 90 minutes · in person, LockDown Browser</span></summary>' +
     examInfoHTML() + '<div class="reading-actions"><button type="button" class="btn primary" data-home="mock">Take the 55-question mock</button></div></details>';
 }
-var BANK_PAGE = 30, bankShown = BANK_PAGE, RETRY_GAP = 5;
+var BANK_PAGE = 100, bankShown = BANK_PAGE, RETRY_GAP = 5;
 
 function renderCompendium(){
   if(window.shTTS) window.shTTS.stop();

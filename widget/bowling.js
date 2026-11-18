@@ -14,8 +14,8 @@
      during a mock (html.sh-mock-on), with the eggs off (sh_pref_eggs) or in Focus mode (sh_pref_focus).
    shBowl.random()   a clip for the lane, any of the eight, not the one just shown.
    shBowl.seen()     the clips seen on this device (sh_bowl_seen). All eight sets sh_bowl_trophy (the date), Timmy says
-                     a line and the page hears sh:bowl-trophy. Nothing goes to the server for a sighting or the trophy:
-                     the server's record_achievement doesn't take the kind yet (Sam's calls, 2026-11-12).
+                     a line and the page hears sh:bowl-trophy. Nothing goes to the server for a sighting; the trophy
+                     is sent once by widget/v3.js (record_achievement takes 'bowling' since migration_v63).
    shBowl.TROPHY     the secret trophy's words, for the trophy case; its drawing is medals.mjs's EGG_TROPHIES.bowling.
 
    Every play is counted as egg:bowling=<clip> (window.shTrack). The card's close button carries data-bowl="close",

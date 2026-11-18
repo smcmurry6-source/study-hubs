@@ -42,7 +42,7 @@
   var ME = document.currentScript, BASE = ME && ME.src ? ME.src.replace(/[^\/]*(\?.*)?$/, "") : "";
   /* The day the redesign went live, Central time: a Timmy born on or after it starts at 100 HP. A preview's copy points
      it at the preview's own start (tools/preview/transform.js), so its "new" test account shows it. */
-  var FULL_FROM = "9999-12-31";
+  var FULL_FROM = "2026-11-14";
 
   /* days roll over on Central time, the same as the server */
   function centralDay(d){
@@ -319,24 +319,29 @@
     WAKE_ON.forEach(function(n){ window.addEventListener(n, on, { capture: true, passive: true }); });
   }
   function afterWake(fn){ if (woke) fn(); else { wakeQ.push(fn); watchWake(); } }
-  var outfitsLoad = null;
-  function loadOutfits(){
-    if (window.SH_OUTFITS) return Promise.resolve(window.SH_OUTFITS);
-    if (outfitsLoad) return outfitsLoad;
-    outfitsLoad = new Promise(function(res, rej){
-      /* the dashboard's classroom may already be fetching it */
-      var el = document.querySelector('script[src$="hub-art/outfits.js"]');
-      if (!el) {
-        var b = BASE; if (!b) { var me = document.querySelector('script[src*="widget/pet.js"]'); b = me ? me.src.replace(/[^\/]*(\?.*)?$/, "") : "widget/"; }
-        el = document.createElement("script"); el.src = b + "hub-art/outfits.js"; el.async = true; document.head.appendChild(el);
-      }
+  var outfitsLoad = null, setLoad = {};
+  function artBase(){ var b = BASE; if (!b) { var me = document.querySelector('script[src*="widget/pet.js"]'); b = me ? me.src.replace(/[^\/]*(\?.*)?$/, "") : "widget/"; } return b; }
+  /* a script the page may already be fetching (the dashboard's classroom does too), or a new one */
+  function fetchArt(file){
+    return new Promise(function(res, rej){
+      var el = document.querySelector('script[src$="hub-art/' + file + '"]');
+      if (!el) { el = document.createElement("script"); el.src = artBase() + "hub-art/" + file; el.async = true; document.head.appendChild(el); }
       el.addEventListener("load", function(){ res(window.SH_OUTFITS); });
-      el.addEventListener("error", function(){ outfitsLoad = null; rej(new Error("outfits")); });
+      el.addEventListener("error", function(){ rej(new Error(file)); });
     });
-    return outfitsLoad;
+  }
+  /* the everyday outfits and the rank outfits (outfits.js), then, for a costume or a season's or a collection's
+     outfit, the file with its drawing (hub-art/outfits/costumes.js, seasons.js or collections.js, `where`) */
+  function loadOutfits(id){
+    var core = window.SH_OUTFITS ? Promise.resolve(window.SH_OUTFITS) : outfitsLoad || (outfitsLoad = fetchArt("outfits.js").then(null, function(e){ outfitsLoad = null; throw e; }));
+    return core.then(function(O){
+      var set = O && id && !Object.prototype.hasOwnProperty.call(O.parts, id) && O.where && O.where[id];
+      if (!set || (O.got && O.got[set])) return O;
+      return setLoad[set] || (setLoad[set] = fetchArt("outfits/" + set + ".js").then(null, function(e){ setLoad[set] = null; throw e; }));
+    });
   }
   function wantOutfits(id){
-    afterWake(function(){ loadOutfits().then(function(){ if (WORN.id === id && !WORN.layer) wear(id); }, function(){}); });
+    afterWake(function(){ loadOutfits(id).then(function(){ if (WORN.id === id && !WORN.layer) wear(id); }, function(){}); });
   }
   /* what he says about what he has on: the outfit's own lines when the place handed them over */
   function wornTalk(){ var l = WORN.layer; return l && l.say && l.say.length ? { k: WORN.id, say: l.say } : null; }

@@ -50,11 +50,34 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   On Exam Two, the diseases he said he has (Heme & Endo Exam 2), he bought a **glucose meter** after the diabetes lecture
   and checks himself after every meal, "not his meal, yours" ("You don't have a pancreas."). His glucose is normal; he
   credits metformin, which he isn't on (and which wouldn't lower a normal glucose anyway: Dr. Fasinu).
+  After the diagnosis lecture (Perio final) he **staged himself**: probed with a toothpick, found a four and announced Stage
+  four, Grade C ("A toothpick is not a probe. You have no bone loss. And a four is not a stage. You're not staged. You're
+  anxious."; he doesn't smoke "and you don't have a pancreas", so no Grade C either). By the sign-off he was "Stage zero"
+  ("That's not a stage either, thirty-one. It's called health."). He asked whether he has a cervical enamel projection:
+  as a lower second molar he is "the likelier of the two of us" (true: they're more common on mandibular molars, about
+  30%, and on second molars). And Dr. Kaur's number thirty-one implant case, heard through the wall, "was a different
+  number thirty-one."
+  After the Occlusion final's L7 he decided he **grinds at night** and wants a **night guard for one tooth**: that's partial
+  coverage (Dr. Givan wants full coverage in almost every situation, and a small splint is an aspiration hazard at night),
+  and bruxism is centrally mediated ("You don't have a brainstem."). He ordered it anyway and says he'll wear it in the
+  daytime too; he's a mandibular tooth, so that makes it a mandibular splint, the daytime kind. After L10 he **checked his
+  own mobility** between two mirror handles (Miller's index), decided he's a Class three, and pressed down on himself for
+  vertical movement: nothing. He moved about a tenth of a millimeter, physiologic ("You have a ligament. It's supposed to
+  give.").
 - **The rabbit down the hill** (new in the implants episode's comments): offended that Timmy called rabbits "showy" for
   teeth that never stop growing (true: rabbit teeth grow all their lives and are worn down by chewing). Proud that
   osseointegration was found in rabbit bone (Brånemark, 1952).
 - **The toothbrush by the front door** (canon since Occlusion) talks now, in the comments: feels left out of every episode,
   and reminds everyone that implants need cleaning too.
+  **Its big episode was the Perio final**: Phase one starts with oral hygiene instruction, which Dr. Litz called "arguably
+  the most important appointment", and "we clean their teeth two to four times a year; they clean them seven hundred to
+  eight hundred" (it asked Timmy to say it twice; he said it once, and its own summary, "seven hundred brushings at home
+  beat four cleanings in the chair", is "near enough"). Nobody has told it that toothbrushing is the most common
+  traumatic factor in recession ("It's having a big episode. Let it have tonight."). Its comment: it's soft-bristled.
+  It was **also vindicated, by Dr. Lawson's L9** (the Occlusion final): brushes
+  used without toothpaste made no cervical lesions, so the toothpaste matters more than the brush. It spent the week
+  saying "I told you so" to the doormat. Its comment there: soft bristles (for the gums too), **no pressure sensor**, and
+  it is sensitive about that. (Still nobody has told it about recession.)
 - **The bowling alley** (the redesign's bowling egg, `widget/bowling.js`, from its release): a bowling lane can stand in
   his yard, and the alley's screen plays odd cartoons after a strike, the way real alleys do. The pins are the Plaque crew
   from the boss fights (Plaque Boss, Tartar Titan, Biofilm Blob, the Strep Mutans Swarm, Cavity Creep, the Gingivitis
@@ -69,7 +92,7 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   a vampire cape with fangs ("just very long canines with big ambitions"), a pumpkin cap with a candy pail, and a black cat.
   **He couldn't pick one, so he wore the next one each time a page loaded.** He never revealed a single
   costume as "the one", because students saw different ones. This is canon for the episodes already out.
-- **From the redesign on, the student dresses him** ([Ask Timmy](../../vault/tasks/2026-11-12-redesign-ask-timmy.md),
+- **From the redesign on, the student dresses him** ([Ask Timmy](../../vault/tasks/done/2026-11-12-redesign-ask-timmy.md),
   part 4; Sam, 2026-11-12: "What you put wins"). Everyone has Timmy (nobody adopts him any more; he says hello on a first
   visit), and he wears only what the student put on at his place, from the shop or his rank: on the hub's bar, on the
   dashboard, at his place, in the classroom and on the leaderboard's stage. With nothing on he wears nothing, on a holiday
@@ -77,8 +100,8 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   (each student dresses theirs), and never that he picked it: "whatever you put me in" is the line. His holiday looks are
   the shop's seasonal sets now (a floss mummy and a bedsheet ghost at Halloween, a holiday sweater and an elf suit in the
   winter), and the old "he can't pick one" can be a joke about the past ("I used to dress myself. You saw how that went.").
-- **Rare costumes** (the redesign's shop, [released 2026-11](../../vault/tasks/2026-11-06-redesign-release.md)):
-  five costumes that turn up at Timmy's shop now and then, about one ordinary day in twelve, never on a holiday or in the
+- **Rare costumes** (the redesign's shop, [released 2026-11](../../vault/tasks/done/2026-11-06-redesign-release.md)):
+  ten costumes (five at the release, five more on 2026-11-18) that turn up at Timmy's shop now and then, about one ordinary day in twelve, never on a holiday or in the
   fall weeks, a different day for each student. When one turns up he says so once ("Something rare came in at the shop
   today: the pirate costume"), and it waits on the shop's Spotted shelf until it's bought. Each student spots them in
   their own order, so an episode never says which one is out, and never that he owns one. What he says in each (the
@@ -95,15 +118,30 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   - **Captain Enamel** (Legendary, 4,000): a red cape, a blue mask, a gold shield with a tooth on it. "The hardest
     substance in the human body, at your service." "My one weakness? Acid. Don't tell the plaque." "Fear not, citizen.
     I'll guard your smile. You do the flossing."
+  - **The wizard** (Epic, 2,000): a tall starry hat with a floppy tip, a robe of stars and moons, a staff topped with a
+    glowing crystal tooth. "Abracadabra! The plaque vanishes. The trick? Two minutes, twice a day."
+  - **The robot** (Epic, 2,200): a square silver helmet with two antennae and a visor his face shows through, a chest
+    panel of buttons and lights, a dial. "Beep boop. Scanning for plaque. Scan complete: you missed a spot."
+  - **The firefighter** (Epic, 1,600): a red helmet with a tooth on its shield, a tan turnout coat with reflective
+    stripes, a hose nozzle with a little spray. "I fight fires and inflammation. Gingivitis doesn't stand a chance."
+  - **The shark** (Epic, 2,400): a gray hood with a dorsal fin, its mouth open round his face with two rows of soft teeth,
+    fins and a tail. "Sharks grow new teeth all their lives. I'm not jealous. Okay, I'm a little jealous."
+  - **The dragon** (Legendary, 4,500): a green-scaled hood with horns, a frill and its own friendly eyes, bat wings, a
+    golden belly plate, a tail curled round the front. "Dragons guard treasure. I guard enamel. Same thing, really."
 - **The shop** itself (same release): he runs it, in a bow tie, behind the counter. Its money is **Shiny Gold Crowns**
   (said in full the first time, "gold crowns" after, never just "crowns"): one for every 10 XP, more for trophies,
   medals and rank-ups; spending never lowers XP or rank. Snacks (an apple, a cheese cube, floss, a fluoride rinse) give
   him HP back, one of each a day; a boost doubles XP for an hour or three.
 - Occlusion (Oct 21): "it's October, so yes, I'm in costume. I'm not going to tell you which one."
+- The Occlusion final (Nov 16, the first exam after the release): "Back then it was October, I was in costume, and I
+  wouldn't tell you which one. I used to dress myself. You saw how that went. These days I wear whatever you put me in."
 - Thanksgiving 2026 (Nov 1 to the day after Thanksgiving, as in the widget): three costumes, a pilgrim hat with a buckle, turkey
   feathers, and a chef's hat with a pie, the next one each page load, never revealed (PCD Implants Exam 1).
   The pie is not a snack, "it is a postprandial event"; it stays uneaten and is "decorative" ("Postprandial events are for
   people with a pancreas.") (Heme & Endo Exam 2).
+- **After the release** (Perio final, Nov 19, a week before Thanksgiving): "I used to dress myself for the holidays. You saw
+  how that went. These days you dress me, so whatever you put me in, that's what I'm wearing." One thing hasn't changed:
+  the pie is still decorative, still a postprandial event, and he's keeping an eye on it.
 
 ## TIMMY, the other one
 
@@ -125,6 +163,19 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   follicle, the sac of tissue around the developing tooth, and his made his cementum, his periodontal ligament and the bone
   around his roots (true: the dental follicle forms the cementum, the ligament and the alveolar bone proper). "You know
   how I feel about my ligament. Turns out it runs in the family."
+- **His own furcation** (Perio final): as a lower first molar he has two furcation entrances, buccal and lingual, on a
+  short root trunk, about 2.4 and 2.5 mm from the CEJ (Bower, the S5 notes): "about two and a half millimeters of
+  attachment loss, and you're in my furcation. Please be gentle with the Nabers probe." His mesial root has the concavity
+  every lower first molar has facing the furcation, about 0.7 mm, 100% of the time: "It's not a flaw. It's character."
+  He thanks Dr. Litz, "on behalf of my furcation", for never taking down furcation bone in osseous surgery. And his
+  first periodontics episode: "periodontics is about me. The gum around me, the ligament holding me in, the bone around
+  my roots."
+- **Denture teeth are not teeth** (the Occlusion final, Dr. Givan's own words: no pulp, no enamel or dentin, no biology,
+  a tooth-colored piece of plastic). "That's Doctor Givan, not me. I just think it's worth saying out loud."
+- **Two roots, so he moves less**: single-rooted teeth are more mobile than multi-rooted ones (Dr. Givan's L7, Dr.
+  Abou-Arraj's L10). "I have two roots. I'm just saying."
+- **He'd like to keep his enamel**: dentin has a higher critical pH than enamel, so acid digs out exposed dentin first
+  (the cupped cusp tips, Dr. Lawson's L9).
 
 ## Who comments
 
@@ -135,7 +186,8 @@ number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a n
 
 - Opens: "Hey. It's Timmy, and this is Timmy Time." Closes: "This has been Timmy Time. I'm Timmy. Brush, floss, and ..."
   with a new ending each time (MSK: "go get it"; Occlusion: "bite down with confidence"; Heme & Endo: "keep your feedback
-  negative"; PCD Implants: "torque responsibly"; Heme & Endo Exam 2: "surge when it counts", the L-H surge).
+  negative"; PCD Implants: "torque responsibly"; Heme & Endo Exam 2: "surge when it counts", the L-H surge; Perio final: "mind the furcation"; the Occlusion
+  final: "stay balanced", the denture's bilateral balance).
 - Lightning round intro: answer out loud, "nobody can hear you. Except me." (Heme & Endo added "And, apparently, number
   thirty-one.")
 - Warm, dry, a little vain. Jokes are short and come after the fact, never instead of it. He quotes the professors
@@ -146,7 +198,9 @@ number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a n
 | Hub | Script | Length | Lore added |
 | --- | --- | --- | --- |
 | `msk-exam4` | `msk-exam4/script.md` | 42 min | Small tooth, big voice; "I have one job"; they grind |
-| `occlusion` | `occlusion/script.md` | 45 min | The cottage; lower first molar, two roots; October costume (unrevealed); TIMMY kept him up a week |
+| `occlusion` (midterm) | `occlusion/midterm.md` | 45 min | The cottage; lower first molar, two roots; October costume (unrevealed); TIMMY kept him up a week. Replaced on the hub by the final's episode, 2026-11-15 |
 | `heme-endo-exam1` | `heme-endo-exam1/script.md` | 53 min | Four Halloween costumes, one per page load; neighbor number thirty-one; TIMMY as adrenaline; enamel is not a calcium bank |
 | `pcd-implants-exam1` | `pcd-implants-exam1/script.md` | 48 min | Thanksgiving costumes, one per page load; proud of his ligament; thirty-one thinks he's a failing implant; Brånemark's rabbit. First episode with comments: thirty-one, the rabbit down the hill, the toothbrush by the door |
 | `heme-endo-exam2` | `heme-endo-exam2/script.md` | 52 min | Thirty-one's glucose meter ("You don't have a pancreas"); Timmy came from a dental follicle; the pie is a postprandial event. Comments: thirty-one, the toothbrush by the door |
+| `perio` | `perio/script.md` | 49 min | Timmy's own furcation (two entrances, about 2.5 mm down; the mesial root concavity); thirty-one stages himself with a toothpick ("You're not staged. You're anxious."), may have an enamel projection, and wasn't Dr. Kaur's thirty-one; the toothbrush's big episode (Phase one starts with oral hygiene); the pie, still decorative, after the release. Comments: thirty-one, the toothbrush by the door |
+| `occlusion` (final) | `occlusion/script.md` | 48 min | The first exam after the release: "whatever you put me in"; thirty-one's one-tooth night guard ("You don't have a brainstem") and his self-checked mobility ("You have a ligament. It's supposed to give."); the toothbrush vindicated by L9, with no pressure sensor; denture teeth are not teeth; two roots move less. Comment: the toothbrush by the door |

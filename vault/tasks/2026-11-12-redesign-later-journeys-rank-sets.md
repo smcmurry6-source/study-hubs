@@ -19,8 +19,8 @@ never sold. Fourteen ranks (seven in the ModuPro, seven in the Loupes), 28 drawi
 
 ## Context
 
-- Cut from part C of [phase 4](2026-11-05-redesign-phase-4-game-layer.md) with Sam's yes (2026-11-12, to the open
-  calls in [the place's note](2026-11-06-redesign-timmys-place.md): "okay thats fine"): the place as a real client was
+- Cut from part C of [phase 4](done/2026-11-05-redesign-phase-4-game-layer.md) with Sam's yes (2026-11-12, to the open
+  calls in [the place's note](done/2026-11-06-redesign-timmys-place.md): "okay thats fine"): the place as a real client was
   one session's work already, and nobody is within reach of 125,000 XP.
 - What exists: the Handpiece's six rank sets (`tools/figures/site/packs/ranks.mjs`, listed in `sets.mjs` `RANKS`, gtier
   1 to 6), their twelve catalog rows in `migration_v54.sql` (`rank_tier` 1 to 6), and the client. `widget/place.js`
@@ -47,7 +47,7 @@ never sold. Fourteen ranks (seven in the ModuPro, seven in the Loupes), 28 drawi
 
 ## Build spec
 
-Not one of the sessions before the release ([phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here to the
+Not one of the sessions before the release ([phase 4](done/2026-11-05-redesign-phase-4-game-layer.md), "From here to the
 release"); "For every session above" there still holds, except that the redesign is live by then, so this is an
 ordinary tier 2 change to the live site ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)).
 
@@ -86,7 +86,7 @@ owns that tier's set and not the next), `node tools/release/rls.js`, the smoke t
 - [ ] The 28 pieces drawn (a contact sheet per journey, light and dark) and approved by Sam
 - [ ] In `sets.mjs`, a pack file, the generated kit files (`node tools/figures/site/build.mjs`) and the catalog
 - [ ] `widget/place.js` names the later ranks on a locked card
-- [ ] `bowling` added to the trophy kinds in the same migration, and the client records the trophy
+- [x] `bowling` added to the trophy kinds, and the client records the trophy (done on its own, ahead of the rank sets: `migration_v63.sql`, `widget/v3.js`, #395)
 - [ ] `node tools/release/xp.js` and the smoke test pass
 
 ## Log
@@ -94,11 +94,13 @@ owns that tier's set and not the next), `node tools/release/rls.js`, the smoke t
 - 2026-11-12 (Claude Code): written when part C cut it.
 - 2026-11-12 (Claude Code, planning only): Sam: after the release, in a new migration. Build spec above; the
   Bowling trophy's server kind rides in the same migration.
+- 2026-11-17 (Claude Code): the Bowling trophy went in on its own (`migration_v63.sql`, #395), from the inbox's line; the
+  rank sets' migration no longer needs to carry it.
 
 ## Outcome
 
-Related: [Timmy's place](2026-11-06-redesign-timmys-place.md) · [the journeys](2026-11-06-redesign-progression-journeys.md) ·
-[game-server](../reference/game-server.md) · [the release](2026-11-06-redesign-release.md)
+Related: [Timmy's place](done/2026-11-06-redesign-timmys-place.md) · [the journeys](done/2026-11-06-redesign-progression-journeys.md) ·
+[game-server](../reference/game-server.md) · [the release](done/2026-11-06-redesign-release.md)
 
 ## Opening prompt
 

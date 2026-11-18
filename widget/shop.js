@@ -59,7 +59,7 @@
 
   /* ---------- what the shop knows ---------- */
   var S = { sb: null, visitor: null, shop: null, profile: null, onBought: null, roots: [], tick: 0 };
-  var SPOTS = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+  var SPOTS = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
   function take(sh){
     if (!sh || typeof sh !== "object" || !Array.isArray(sh.items) || !sh.wallet) return false;
     S.shop = sh;
@@ -108,8 +108,12 @@
   }
   function rarityOf(it){ return cap(String(it.rarity || "common").toLowerCase()); }
   function seasonOf(it){ var k = it.season || (TP.setOf(it.id) !== "rank" ? TP.setOf(it.id) : ""); return k && TP.SETS ? TP.SETS.seasons.filter(function(q){ return q.k === k; })[0] || null : null; }
-  /* a set's piece stands in its own set's scene; anything else on the hill */
-  function sceneFor(it){ var se = seasonOf(it), sc = se ? TP.SCENES.filter(function(q){ return q.set === se.k; })[0] : null; return sc ? sc.k : "hill"; }
+  /* a year-round collection's piece (sets.mjs COLLECTIONS: in the everyday rotation, never limited) */
+  function collOf(it){ var k = TP.collOf ? TP.collOf(it.id) : ""; return k && TP.SETS && TP.SETS.collections ? TP.SETS.collections.filter(function(q){ return q.k === k; })[0] || null : null; }
+  /* "· Halloween set" or "· Dino valley collection" after a piece's kind */
+  function setTag(it){ var se = seasonOf(it), co = se ? null : collOf(it); return se ? " · " + se.n + " set" : co ? " · " + co.n + " collection" : ""; }
+  /* a set's or a collection's piece stands in its own scene; anything else on the hill */
+  function sceneFor(it){ var se = seasonOf(it), co = se ? null : collOf(it), k = se ? se.k : co ? co.k : "", sc = k ? TP.SCENES.filter(function(q){ return q.set === k; })[0] : null; return sc ? sc.k : "hill"; }
   function img(svg, alt, cls){
     if (!svg) return "";
     if (!/xmlns=/.test(svg)) svg = svg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
@@ -139,25 +143,38 @@
     var x = piece(it), n = it.name || (x && x.n) || it.id;
     return { name: cardName(n), note: sentence(x && x.note || ""), say: x && x.say && x.say[0] || "", kind: KIND_N[it.kind] || "" };
   }
-  /* the card's frame from the shop's art, with its own motion inside (still when the page is) */
+  /* The card's frame from the shop's art, and the storefront's two layers. Each is a still, with the moving one over
+     it (.tsh-live) unless motion is off: an image that moves inside is drawn again whole on every frame, and a shelf
+     has dozens. So the shop moves for a few seconds when it opens, when a scroll ends and under a mouse, and rests
+     otherwise (shopLife; shop.css takes the moving ones away under .is-rest). 2026-11-14, Sam: "scrolling and things
+     are kind of sluggish and jittery". */
   var FRAMES = {};
+  function moving(s, re){ return s.replace(/(<svg[^>]*>)/, "$1<style>" + SA.CSS.split("\n").filter(function(l){ return re.test(l); }).join("\n") + "</style>"); }
   function frame(r){
-    var key = r + (reduced ? "-still" : "");
-    if (!FRAMES[key]) {
+    if (!FRAMES[r]) {
       var s = SA.frame(r);
-      if (!reduced) s = s.replace(/(<svg[^>]*>)/, "$1<style>" + SA.CSS.split("\n").filter(function(l){ return /ts-r-|@keyframes ts-spin|prefers-reduced/.test(l); }).join("\n") + "</style>");
-      FRAMES[key] = img(s, "", "tsh-rframe");
+      FRAMES[r] = img(s, "", "tsh-rframe") + (reduced || !/ts-r-/.test(s) ? "" : img(moving(s, /ts-r-|@keyframes ts-spin|prefers-reduced/), "", "tsh-rframe tsh-live"));
+    }
+    return FRAMES[r];
+  }
+  function store(layer){
+    var key = "store-" + layer;
+    if (!FRAMES[key]) {
+      var s = SA.store(layer);
+      FRAMES[key] = img(s, "", "tsh-frontart") + (reduced || !/ts-s-/.test(s) ? "" : img(moving(s, /ts-s-|@keyframes ts-spin|@keyframes ts-r-tw|prefers-reduced/), "", "tsh-frontart tsh-live"));
     }
     return FRAMES[key];
   }
-  function store(layer){
-    var key = layer + (reduced ? "-still" : "");
-    if (!FRAMES[key]) {
-      var s = SA.store(layer);
-      if (!reduced) s = s.replace(/(<svg[^>]*>)/, "$1<style>" + SA.CSS.split("\n").filter(function(l){ return /ts-s-|@keyframes ts-spin|@keyframes ts-r-tw|prefers-reduced/.test(l); }).join("\n") + "</style>");
-      FRAMES[key] = img(s, "", "tsh-frontart");
-    }
-    return FRAMES[key];
+  function shopLife(dlg){
+    var t = 0, st = 0, scrolling = false;
+    function rest(){ clearTimeout(t); t = 0; dlg.classList.add("is-rest"); }
+    function wake(){ if (scrolling) return; clearTimeout(t); dlg.classList.remove("is-rest"); t = setTimeout(rest, 6000); }
+    dlg.addEventListener("scroll", function(){
+      if (!scrolling) { scrolling = true; rest(); }
+      clearTimeout(st); st = setTimeout(function(){ scrolling = false; wake(); }, 260);
+    }, { capture: true, passive: true });
+    dlg.addEventListener("mousemove", function(){ if (!t) wake(); }, { passive: true });
+    wake();
   }
   function coin(cls){ return img('<svg viewBox="0 0 24 24">' + SA.coinBody(false) + "</svg>", "", cls || "tsh-coin"); }
   function rarTag(r){ return '<i class="tsh-rar r-' + r + '">' + esc(r) + "</i>"; }
@@ -251,7 +268,7 @@
         '<span class="tsh-showpiece k-' + star.kind + '">' + img(pic(star), "") + '</span><span class="tsh-showstand">' + img(SA.stand(r), "") + "</span>" +
         '<i class="tsh-showtw a"></i><i class="tsh-showtw b"></i><i class="tsh-showtw c"></i></div>' +
         '<div class="tsh-showinfo"><h' + lvl + ' class="tsh-showkick">Today’s showcase</h' + lvl + '><p class="tsh-showname">' + esc(ws.name) + "</p>" +
-        '<p class="tsh-itags">' + rarTag(r) + "<span>" + esc(ws.kind) + (se ? " · " + esc(se.n) + " set" : "") + "</span></p>" + (ws.note ? '<p class="tsh-showdesc">' + esc(ws.note) + ".</p>" : "") +
+        '<p class="tsh-itags">' + rarTag(r) + "<span>" + esc(ws.kind) + esc(setTag(star)) + "</span></p>" + (ws.note ? '<p class="tsh-showdesc">' + esc(ws.note) + ".</p>" : "") +
         '<div class="tsh-showbuy"><span class="tsh-big">' + coin() + '<b class="num">' + num(star.price) + '</b></span><button type="button" class="tsh-buy" data-shop="showcase" data-item="' + esc(star.id) + '" data-shelf="' + esc(star.shelf) + '">Take a closer look</button></div>' +
         '<p class="tsh-showwhen">' + IC.clock + esc(whenOf(star.shelf)) + "</p></div></section>";
     }
@@ -281,7 +298,7 @@
     }).join("");
     html += shelf("spotted", lvl, "Spotted", seen + " of " + spotted.length + " so far", IC.glass, "Rare costumes turn up at the shop now and then, and Timmy tells you when one does. One that turned up waits here until you buy it.", spotHtml, spotted.length);
     var always = on("always");
-    if (always.length) html += shelf("always", lvl, "Always here", "Never sells out", IC.check, "Snacks put health back on Timmy’s bar, one of each a day. A boost doubles your XP from the moment you buy it; a second one adds its time.", cards(always, "always"), always.length);
+    if (always.length) html += shelf("always", lvl, "Always here", "Never sells out", IC.check, "Snacks put health back on Timmy’s bar, one of each a day. A boost doubles your XP from the moment you buy it; bought while double XP is already on, it adds its time on the end.", cards(always, "always"), always.length);
     html += '<p class="tsh-note tsh-storefoot">Rank sets are never on a shelf: you earn them. What you buy is yours on every device you link.</p></div>';
     root.innerHTML = html;
     wire(root);
@@ -349,6 +366,7 @@
     $('[data-shop="close"]', dlg).addEventListener("click", close);
     try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); }
     D.documentElement.classList.add("tsh-open");
+    shopLife(dlg);
     mount($(".tsh-dlgbody", dlg), { level: 3, title: "tshT" });
     return api;
   }
@@ -368,19 +386,33 @@
     try { dlg.showModal(); } catch (e) { dlg.setAttribute("open", ""); }
   }
   function closeSheet(){ if (SH) { try { SH.dlg.close(); } catch (e) {} } }
+  /* a boost bought while double XP is on (a medal's 24 hours or another boost) waits its turn: the server adds its time on the
+     end (migration_v62), so the sheet says when it will start and stop */
+  function boostWait(it){
+    var g = W.shGame && W.shGame.boost ? W.shGame.boost() : null, b = S.shop && S.shop.boost, now = Date.now(), end = 0;
+    [g, b].forEach(function(x){ var t = x && x.until ? new Date(x.until).getTime() : 0; if (t > end) end = t; });
+    if (!(end > now)) return "";
+    return "Double XP is already on until " + clock(end) + ", so this one starts then and runs to " + clock(end + (it.boost_minutes || 60) * 60000) + ".";
+  }
+  function clock(ms){
+    var d = new Date(ms), t = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }), n = new Date();
+    if (d.toDateString() === n.toDateString()) return t;
+    n.setDate(n.getDate() + 1);
+    return (d.toDateString() === n.toDateString() ? "tomorrow at " : d.toLocaleDateString([], { weekday: "long" }) + " at ") + t;
+  }
   function drawSheet(msg){
     if (!SH) return;
     var it = SH.it, r = rarityOf(it), w = words(it), se = seasonOf(it), st = stateOf(it), bal = balance(), d = does(it), done = SH.done;
-    var kind = w.kind + (se ? " · " + se.n + " set" : "") + (it.shelf === "throwback" ? " · Back for today" : "");
+    var kind = w.kind + setTag(it) + (it.shelf === "throwback" ? " · Back for today" : "");
     var buy;
     if (done) buy = doneHtml(it);
     else if (st.k === "owned") buy = '<p class="tsh-iown">' + IC.check + (it.gift ? "Yours: everyone has this set." : "Yours. It’s in your things at Timmy’s place for good.") + "</p>" + placeBtn(it);
     else {
-      var after = bal === null ? null : bal - it.price, why = st.k === "today" ? "Timmy already had one of these today. One of each snack a day." : st.k === "full" ? "He’s full: Timmy is at 100 HP. Save it for a day he needs it." : "";
+      var after = bal === null ? null : bal - it.price, why = st.k === "today" ? "Timmy already had one of these today. One of each snack a day." : st.k === "full" ? "He’s full: Timmy is at 100 HP. Save it for a day he needs it." : it.kind === "boost" ? boostWait(it) : "";
       buy = '<div class="tsh-iprice"><span class="tsh-big">' + coin() + '<b class="num">' + num(it.price) + '</b><span class="sr"> gold crowns</span></span>' +
         '<span class="tsh-ihave">' + (bal === null ? "" : "You have " + num(bal) + (after >= 0 ? ". After: " + num(after) + "." : ".")) + "</span>" +
         (st.k === "short" ? '<span class="tsh-ibar" aria-hidden="true"><i style="width:' + Math.max(3, Math.min(100, Math.round(bal / it.price * 100))) + '%"></i></span><span class="tsh-ishort">' + esc(st.t) + ". Keep studying: every 10 XP is one more.</span>" : "") + "</div>" +
-        '<p class="tsh-msg" role="status" aria-live="polite">' + esc(msg || why) + "</p>" +
+        '<p class="tsh-msg' + (!msg && why && it.kind === "boost" ? " is-note" : "") + '" role="status" aria-live="polite">' + esc(msg || why) + "</p>" +
         '<div class="tsh-iacts"><button type="button" class="tsh-buy" data-shop="confirm"' + (st.k === "buy" && canBuy() ? "" : " disabled") + ">" + (SH.busy ? "Buying…" : "Buy for " + num(it.price)) + '</button><button type="button" class="tsh-ghost" data-shop="cancel">Not now</button></div>';
     }
     SH.dlg.className = "tsh-sheet";

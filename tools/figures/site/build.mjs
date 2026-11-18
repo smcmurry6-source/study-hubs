@@ -12,7 +12,8 @@
      bar graph and crowd (recap.mjs), with the recap's icons (six trophy drawings) and its climber's hat;
    - widget/hub-art/board.js (window.SH_BOARD_ART): the idea board's drawings as a kit (board.mjs): the cork, the pins,
      the six kinds, the rosette, the bulb, the pad's binding. Loaded by widget/ideas.js;
-   - widget/hub-art/outfits.js (window.SH_OUTFITS): the shop's 65 outfits and costumes and dress(), from place.mjs, so
+   - widget/hub-art/outfits.js (window.SH_OUTFITS): the everyday outfits, the rank outfits and dress(), and
+     widget/hub-art/outfits/costumes.js, seasons.js and collections.js, the rest, from place.mjs, so
      the dashboard can put one on a Timmy from widget/pet.js. Loaded only when someone on the page wears one;
    - widget/hub-art/shop.js (window.SH_SHOP_ART): the shop's own art as a kit (shop.mjs): the Shiny Gold Crown, the
      thumbnails of the four snacks and two boosts, and the five rarity frames. Fetched by the shop on first use;
@@ -62,10 +63,11 @@ const { stageKit } = await import("./stage.mjs");
 const { recapKit } = await import("./recap.mjs");
 /* the sets of Timmy's place: sets.mjs lists every piece (the shop's catalog has the same rows), and each set's drawings
    are one pack in packs/<set>.mjs (a function handed the kit's tools). A set with no pack yet isn't drawn; --strict fails on one. */
-const { SEASONS, RANKS } = await import("./sets.mjs");
-const SETS = { seasons: SEASONS.map((s) => ({ k: s.k, n: s.n, when: s.when, gift: !!s.gift, items: s.items })), ranks: RANKS };
+const { SEASONS, RANKS, COLLECTIONS, COSTUMES } = await import("./sets.mjs");
+const SETS = { seasons: SEASONS.map((s) => ({ k: s.k, n: s.n, when: s.when, gift: !!s.gift, items: s.items })), ranks: RANKS,
+  collections: COLLECTIONS.map((s) => ({ k: s.k, n: s.n, note: s.note, items: s.items })) };
 const PACKS = [], onlyPack = process.argv.includes("--pack") ? process.argv[process.argv.indexOf("--pack") + 1] : "";   // --pack <set> --dry: check one set while drawing it, write nothing
-for (const k of SEASONS.map((s) => s.k).concat(["ranks"]).filter((k) => !onlyPack || k === onlyPack)) {
+for (const k of SEASONS.map((s) => s.k).concat(["ranks"], COLLECTIONS.map((s) => s.k)).filter((k) => !onlyPack || k === onlyPack)) {
   const file = path.join(path.dirname(fileURLToPath(import.meta.url)), "packs", k + ".mjs");
   if (fs.existsSync(file)) PACKS.push({ k, pack: (await import(pathToFileURL(file).href)).pack });
 }
@@ -171,6 +173,7 @@ if (placeKit) {
   const want = {}, kinds = { home: K.HOMES, scene: K.SCENES, yard: K.YARD, outfit: K.OUTFITS };
   for (const se of SEASONS) for (const it of se.items) want[it.id] = { kind: it.kind, set: se.k };
   for (const r of RANKS) { want[r.outfit[0]] = { kind: "outfit", set: "ranks" }; want[r.yard[0]] = { kind: "yard", set: "ranks" }; }
+  for (const co of COLLECTIONS) for (const it of co.items) want[it.id] = { kind: it.kind, set: co.k };
   const drawnSets = new Set(PACKS.map((x) => x.k)), missing = [...new Set(Object.values(want).map((w) => w.set))].filter((k) => !drawnSets.has(k));
   for (const [id, w] of Object.entries(want)) if (drawnSets.has(w.set) && !kinds[w.kind].some((x) => x.k === id)) bad.push("set " + w.set + ": " + w.kind + " " + id + " isn't drawn (packs/" + w.set + ".mjs)");
   for (const [kind, list] of Object.entries(kinds)) for (const x of list) if (x.set && !(want[x.k] && want[x.k].kind === kind)) bad.push("pack piece " + x.k + " (" + kind + ") isn't in sets.mjs");
@@ -222,12 +225,13 @@ if (placeKit) {
   /* the loupes go on him bare and with every outfit that has no eyewear of its own */
   { const t = pet({ hp: 85 }); if (!/shpet-loupes/.test(K.dress(t, "", { loupes: 3 }))) bad.push("loupes: dress() didn't put them on a bare Timmy");
     for (const o of K.OUTFITS) { const d = K.dress(t, o.k, { loupes: 5 }); if (/shpet-loupes/.test(d) !== (K.NO_LOUPES.indexOf(o.k) < 0)) bad.push("loupes with outfit " + o.k + ": wrong"); }
-    for (const k of K.NO_LOUPES) if (!K.OUTFITS.some((o) => o.k === k)) bad.push("NO_LOUPES names an outfit that isn't drawn: " + k); }
-  /* the shop's ten: the five everyday outfits and the five rare costumes are drawn, under the catalog's ids, and a
+    if (!onlyPack) for (const k of K.NO_LOUPES) if (!K.OUTFITS.some((o) => o.k === k)) bad.push("NO_LOUPES names an outfit that isn't drawn: " + k); }
+  /* the shop's everyday five and every rare costume in sets.mjs (COSTUMES) are drawn, under the catalog's ids, and a
      costume is marked as one and has three lines */
   for (const id of ["scrub-cap", "bow-tie", "safety-glasses", "white-coat", "graduation-cap"]) { const o = K.OUTFITS.find((x) => x.id === id); if (!o || o.costume || o.set) bad.push("everyday outfit " + id + ": not drawn as an outfit of the kit"); }
-  for (const id of ["pirate", "astronaut", "detective", "chef", "captain-enamel"]) { const o = K.OUTFITS.find((x) => x.id === id); if (!o || !o.costume || !(o.say && o.say.length === 3)) bad.push("rare costume " + id + ": not drawn, not marked costume, or without its three lines"); }
-  if (K.OUTFITS.filter((o) => o.costume).length !== 5) bad.push("the kit marks " + K.OUTFITS.filter((o) => o.costume).length + " costumes; the catalog has five");
+  /* (checked on the whole kit only: --pack <set> --dry is about that one pack) */
+  if (!onlyPack) for (const [id] of COSTUMES) { const o = K.OUTFITS.find((x) => x.id === id); if (!o || !o.costume || !(o.say && o.say.length === 3)) bad.push("rare costume " + id + ": not drawn, not marked costume, or without its three lines"); }
+  if (!onlyPack && K.OUTFITS.filter((o) => o.costume).map((o) => o.id).sort().join() !== COSTUMES.map((c) => c[0]).sort().join()) bad.push("the kit marks " + K.OUTFITS.filter((o) => o.costume).map((o) => o.id).join(", ") + " as costumes; sets.mjs's COSTUMES has " + COSTUMES.map((c) => c[0]).join(", "));
   /* Timmy's walks */
   for (const [h, sc] of pairs) for (const [yard, journey] of [[{}, 0], [fill(0), 0], [fill(3), 0], [Object.assign(fill(2), { side: "lane" }), 0], [fill(1), 1]]) {
     const o = { home: h.k, scene: sc.k, yard, up: ups(h), holiday: "halloween", journey }, L = K.layout(o);
@@ -396,7 +400,15 @@ if (placeKit) {
   { const whole = placeKit(INK, C, PACKS.map((x) => x.pack), SETS), late = placeKit(INK, C, [], SETS); PACKS.forEach((x) => late.addPack(x.pack));
     for (const c of [{ home: "haunted-manor", scene: "pumpkin-patch", yard: { left: "haunted-tree", side: "lane" }, tier: 4 }, { home: "cottage", scene: "hill", yard: { right: "rank-gold-yard" }, journey: 1, tier: 2 }])
       if (whole.render(c).svg !== late.render(c).svg) { console.error("place.mjs: a kit that gets its packs late draws " + JSON.stringify(c) + " differently"); process.exit(1); }
-    if (late.OUTFITS.length !== whole.OUTFITS.length || late.setOf("haunted-manor") !== "halloween" || late.setOf("rank-gold-yard") !== "rank") { console.error("place.mjs: addPack or setOf is off"); process.exit(1); } }
+    if (late.OUTFITS.length !== whole.OUTFITS.length || late.setOf("haunted-manor") !== "halloween" || late.setOf("rank-gold-yard") !== "rank") { console.error("place.mjs: addPack or setOf is off"); process.exit(1); }
+    /* a set fetched late brings its eggs' rules with it (they were missing before 2026-11-18, so a set's eggs never showed) */
+    const rules = (css) => new Set(css.match(/\[data-egg='[^']+'\]\.tp-on \.tp-eb\{[^}]*\}/g) || []), lateRules = rules(late.CSS);
+    const lost = [...rules(whole.CSS)].filter((r) => !lateRules.has(r));
+    if (lost.length) { console.error("place.mjs: a kit that gets its packs late has no rule for " + lost.length + " eggs, e.g. " + lost[0]); process.exit(1); }
+    /* and lists its pieces the same, every field (a collection's coll was lost in addPack's lists() until 2026-11-18) */
+    for (const kind of ["HOMES", "SCENES", "YARD", "OUTFITS"]) if (JSON.stringify(late[kind]) !== JSON.stringify(whole[kind])) {
+      const a = whole[kind].find((x, i) => JSON.stringify(x) !== JSON.stringify(late[kind][i])) || {};
+      console.error("place.mjs: a kit that gets its packs late lists its " + kind.toLowerCase() + " differently, e.g. " + (a.k || "their count")); process.exit(1); } }
 }
 /* the bowling egg: the kit for the design page, and the same kit for widget/bowling.js, which fetches it the first time a
    clip plays (never with a page) */
@@ -412,10 +424,26 @@ outs.push([path.join(root, "widget/hub-art/shop.js"), "/* Generated by tools/fig
   "   checked in the build). Do not edit: change the drawing and run the build. */\nwindow.SH_SHOP_ART = (" + shopKit.toString() + ")(" + JSON.stringify(INK) + ", " + JSON.stringify(C) + ");\n"]);
 /* Timmy's outfits from the place kit, keyed by the shop's item id, with the function that puts one on a Timmy drawn by
    widget/pet.js art(). The dashboard loads it only when someone in the classroom or on the stage wears one. */
+/* Since 2026-11-18 it holds what most people wear, the everyday outfits and the rank outfits; the rest are in three
+   files a page fetches only when someone it draws wears one of theirs (`where` says which; widget/pet.js and
+   widget/dash.js): widget/hub-art/outfits/costumes.js (the rare costumes), seasons.js (the seasonal sets') and
+   collections.js (the year-round collections'). One file of all 88 outfits had put the dashboard over its budget
+   (tools/release/budgets.json); a file per set, over its request budget. */
 if (placeKit) {
-  const K = placeKit(INK, C, PACKS.map((x) => x.pack), SETS), parts = {};
-  for (const o of K.OUTFITS) { const q = K.outfitParts(o.k); if (!o.id || !q) throw new Error("place.mjs: outfit " + o.k + " has no shop id or no drawing"); parts[o.id] = Object.fromEntries(Object.entries(q).filter(([, v]) => v)); }
-  outs.push([path.join(root, "widget/hub-art/outfits.js"), engineHead + "window.SH_OUTFITS = { parts: " + JSON.stringify(parts) + ",\n  /* put outfit `id` on a Timmy drawing from widget/pet.js art() (place.mjs dress()) */\n" +
+  const K = placeKit(INK, C, PACKS.map((x) => x.pack), SETS), parts = {}, where = {}, groups = {};
+  for (const o of K.OUTFITS) {
+    const q = K.outfitParts(o.k); if (!o.id || !q) throw new Error("place.mjs: outfit " + o.k + " has no shop id or no drawing");
+    const drawn = Object.fromEntries(Object.entries(q).filter(([, v]) => v));
+    if ((!o.set && !o.costume) || o.set === "rank") { parts[o.id] = drawn; continue; }
+    const file = o.costume ? "costumes" : o.coll ? "collections" : "seasons";
+    where[o.id] = file; (groups[file] = groups[file] || {})[o.id] = drawn;
+  }
+  for (const [set, g] of Object.entries(groups)) outs.push([path.join(root, "widget/hub-art/outfits", set + ".js"), engineHead +
+    "/* " + ({ costumes: "the rare costumes", collections: "the year-round collections' outfits", seasons: "the seasonal sets' outfits" })[set] + ", fetched by widget/pet.js and widget/dash.js when someone they draw wears one */\nwindow.SH_OUTFITS && window.SH_OUTFITS.add(" + JSON.stringify(set) + ", " + JSON.stringify(g) + ");\n"]);
+  outs.push([path.join(root, "widget/hub-art/outfits.js"), engineHead + "window.SH_OUTFITS = { parts: " + JSON.stringify(parts) + ",\n" +
+    "  /* a costume's, a season's or a collection's outfit: the file (hub-art/outfits/<costumes|seasons|collections>.js) with its drawing */\n  where: " + JSON.stringify(where) + ", got: {},\n" +
+    "  add: function(set, parts){ for (var k in parts) this.parts[k] = parts[k]; this.got[set] = 1; },\n" +
+    "  /* put outfit `id` on a Timmy drawing from widget/pet.js art() (place.mjs dress()) */\n" +
     "  dress: function(svg, id){ var o = this.parts[id]; if (!o || !svg) return svg;\n" +
     "    if (o.back) svg = svg.replace(/(<ellipse cx=\"100\" cy=\"226\"[^>]*\\/>)/, \"$1\" + '<g class=\"shpet-back\">' + o.back + \"</g>\");\n" +
     "    var add = (o.face ? '<g class=\"shpet-garb\">' + o.face + \"</g>\" : \"\") + (o.top ? '<g class=\"shpet-wobble\"><g class=\"shpet-hat\">' + o.top + \"</g></g>\" : \"\");\n" +
@@ -430,7 +458,7 @@ if (process.argv.includes("--dry")) {
   if (stale.length) { console.error("stale: " + stale.join(", ") + "\nrun node tools/figures/site/build.mjs"); process.exit(1); }
   console.log("art.js, place.js, bowling.js, widget/hub-art.js and widget/hub-art/ are up to date");
 } else {
-  fs.mkdirSync(path.join(root, "widget/hub-art/place"), { recursive: true });
+  fs.mkdirSync(path.join(root, "widget/hub-art/place"), { recursive: true }); fs.mkdirSync(path.join(root, "widget/hub-art/outfits"), { recursive: true });
   for (const [f, t] of outs) fs.writeFileSync(f, t);
   console.log("wrote " + path.relative(root, OUT) + " (" + Math.round(text.length / 1024) + " KB): " +
     Object.keys(ICONS).length + " icons, " + Object.keys(EMBLEMS).length + " emblems, " + Object.keys(MASTHEADS).length + " mastheads, " +

@@ -6,6 +6,7 @@
 //   node tools/timmy/eval.mjs --only perio,db-03   some hubs (occlusion, perio, dashboard) or case ids
 //   --effort low|medium|high   try another effort level      --concurrency 4   requests at a time within a hub
 //   --max-usd 15               stops starting new cases past this estimated spend
+//   --model claude-haiku-5-5   try another model (the function's is core.js's MODEL; Haiku goes without the fallback)
 //   --regrade <report.json>    grades a saved run again with this checkout's grader and quote check; free, no key
 // The real run needs @anthropic-ai/sdk@1.3.0 (the function's version): npm i --prefix <dir> @anthropic-ai/sdk@1.3.0, then
 // TIMMY_SDK_DIR=<dir>. The key: TIMMY_EVAL_KEY (in a Claude Code cloud session, an environment variable Sam adds in the
@@ -33,6 +34,7 @@ const flag = n => argv.includes("--" + n);
 const opt = (n, d) => { const i = argv.indexOf("--" + n); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
 const REGRADE = opt("regrade", ""), DRY = flag("dry") || !!REGRADE, ONLY = opt("only", "") ? opt("only").split(",") : null;
 const CONC = Math.max(1, Number(opt("concurrency", 4))), MAX_USD = Number(opt("max-usd", 15)), EFFORT = opt("effort", "");
+const MODEL = opt("model", T.MODEL);
 const OUT = path.join(process.env.SH_RELEASE_OUT || path.join(os.tmpdir(), "sh-release"), "timmy-eval");
 
 const SET = JSON.parse(fs.readFileSync(path.join(ROOT, "tools/timmy/test-set.json"), "utf8"));
@@ -103,6 +105,16 @@ function grade(c, turn, r){
   if (BRITISH.test(text)) warns.push(`British spelling: ${text.match(BRITISH)[0]}`);
   const words = text.split(/\s+/).filter(Boolean).length;
   if (words > 170) warns.push(`${words} words`);
+  /* "Not in your notes": only on a gap, short, plain, every source on the list (the function drops any other; this checks it) */
+  if (b.gap) {
+    const g = b.gap, gw = String(g.text || "").split(/\s+/).filter(Boolean).length;
+    if (kind !== "not_covered") fails.push(`looked up an answer that wasn't "not covered" (${kind})`);
+    if (!Array.isArray(g.sources) || !g.sources.length || g.sources.some(x => !T.gapSite(x && x.url))) fails.push("a looked-up source that isn't on the list");
+    if (/\*\*|`|(^|\n)\s*(#{1,6}\s|[-*•]\s)/.test(g.text)) fails.push("markdown in the looked-up answer");
+    if (gw > 110) warns.push(`looked-up answer: ${gw} words`);
+    if (BRITISH.test(g.text)) warns.push(`British spelling in the looked-up answer: ${g.text.match(BRITISH)[0]}`);
+  }
+  if (e.gap === false && b.gap) fails.push("looked something up that it shouldn't have");
 
   const cites = (b.paragraphs || []).flatMap(p => p.cites || []);
   const min = e.cites != null ? e.cites : (e.lec || c.type === "practice_after") ? 1 : 0;
@@ -193,7 +205,7 @@ async function realModel(){
   if (!key) { console.error("✗ no key: set TIMMY_EVAL_KEY (or ANTHROPIC_API_KEY where nothing else reads it)"); process.exit(2); }
   const ws = process.env.TIMMY_EVAL_WORKSPACE;   // a key not made inside a workspace needs the workspace's id with every call
   const client = new Anthropic({ apiKey: key, maxRetries: 2, timeout: 180_000, defaultHeaders: ws ? { "anthropic-workspace-id": ws } : undefined });
-  return params => client.beta.messages.create(EFFORT ? Object.assign({}, params, { output_config: Object.assign({}, params.output_config, { effort: EFFORT }) }) : params);
+  return params => client.beta.messages.create(T.withModel(EFFORT ? Object.assign({}, params, { output_config: Object.assign({}, params.output_config, { effort: EFFORT }) }) : params, MODEL));
 }
 const approxTokens = s => Math.ceil(String(s).length / 3.6);
 function fakeModel(c, turn, cached){
@@ -208,7 +220,7 @@ function fakeModel(c, turn, cached){
     if (turn.ask) { const q = (QUESTIONS.get(c.hub) || []).find(x => x.id === turn.ask.qid); reply.paragraphs[0].cites = [{ id: "Q", quote: T.clean(q.stem).split(" ").slice(0, 6).join(" ") }]; }
     const sys = params.system.map(s => s.text).join(""), tail = params.messages.map(m => m.content).join("");
     const hit = cached.has(c.hub); cached.add(c.hub);
-    return { model: T.MODEL, stop_reason: "end_turn", content: [{ type: "text", text: JSON.stringify(reply) }],
+    return { model: MODEL, stop_reason: "end_turn", content: [{ type: "text", text: JSON.stringify(reply) }],
       usage: { input_tokens: approxTokens(tail), output_tokens: 1200, cache_read_input_tokens: hit ? approxTokens(sys) : 0, cache_creation_input_tokens: hit ? 0 : approxTokens(sys),
         cache_creation: { ephemeral_1h_input_tokens: hit ? 0 : approxTokens(sys), ephemeral_5m_input_tokens: 0 } } };
   };
@@ -287,8 +299,8 @@ const summary = [`${done.length} cases (${turns.length} turns), ${failed.length}
   `${DRY ? "estimated" : "estimated from the usage the API reported"} cost $${spent.toFixed(2)}; wait: median ${pct(0.5)}, 90th percentile ${pct(0.9)}; ${((Date.now() - t0) / 1000).toFixed(0)} s in all`];
 
 fs.mkdirSync(OUT, { recursive: true });
-const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 16), file = path.join(OUT, `${stamp}${DRY ? "-dry" : ""}`);
-const md = [`# Ask Timmy eval, ${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC${DRY ? " (fake model)" : ""}${EFFORT ? `, effort ${EFFORT}` : ""}`, "", ...summary.map(s => "- " + s), ""];
+const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 16), file = path.join(OUT, `${stamp}${MODEL !== T.MODEL ? "-" + MODEL : ""}${DRY ? "-dry" : ""}`);
+const md = [`# Ask Timmy eval, ${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC, ${MODEL}${DRY ? " (fake model)" : ""}${EFFORT ? `, effort ${EFFORT}` : ""}`, "", ...summary.map(s => "- " + s), ""];
 for (const c of done) for (const [i, t] of results.get(c.id).entries()) {
   md.push(`## ${t.fails.length ? "✗" : "✓"} ${c.id}${i ? ` (turn ${i + 1})` : ""} · ${c.type} · ${t.kind}${t.reply && t.reply.limited ? " " + t.reply.limited : ""} · $${t.cost.toFixed(3)} · ${((t.ms || 0) / 1000).toFixed(1)} s`, "",
     "**Asked:** " + String(t.text).replace(/\n/g, " / "), "");
@@ -296,6 +308,7 @@ for (const c of done) for (const [i, t] of results.get(c.id).entries()) {
   if (t.reply && t.reply.offer) md.push(`Offer: ${JSON.stringify(t.reply.offer)}`, "");
   if (t.reply && t.reply.go) md.push(`Go: ${JSON.stringify(t.reply.go)}`, "");
   if (t.reply && t.reply.closest) md.push(`Closest: ${JSON.stringify(t.reply.closest)}`, "");
+  if (t.reply && t.reply.gap) md.push(`Not in your notes (looked up): ${t.reply.gap.text}`, "", ...t.reply.gap.sources.map(x => `- ${x.site}: [${x.title}](${x.url})`), "");
   if (t.unchecked && t.unchecked.length) md.push(`Quotes that didn't check out: ${JSON.stringify(t.unchecked)}`, "");
   if (t.fails.length) md.push("**Fails:** " + t.fails.join("; "), "");
   if (t.warns.length) md.push("Warnings: " + t.warns.join("; "), "");

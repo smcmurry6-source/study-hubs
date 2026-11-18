@@ -296,8 +296,11 @@
       return { kind: "notice", id: 9500 + i, hub: null, title: n.title, note: null, message: n.message, at: n.at, seen: false, expires_at: null };
     })) : [];
   }
-  function bootstrapSurvey(t){
-    if (!P.survey || db.surveys.answered) return [];
+  /* as the live functions answer: the pop-up (get_active_survey, survey_popup) only before any reply, "Later" included;
+     the Inbox (get_my_survey, survey) until it is answered */
+  function bootstrapSurvey(t, popup){
+    var r = db.surveys.answered;
+    if (!P.survey || (popup ? r : r && r.p_answers)) return [];
     return [{ id: 501, title: "Preview survey (fixture)", starts_at: iso(t - 864e5), questions: [
       { id: "q1", kind: "scale", prompt: "How useful was the Daily Drill this week?", ends: ["Not useful", "Very useful"] },
       { id: "q2", kind: "choice", prompt: "Where do you study most?", options: ["Phone", "Laptop", "Tablet"] },
@@ -343,7 +346,7 @@
       cavity: [],
       podcast: bootstrapPodcast(hub, ep, t),
       dashboard_week: dashboard ? bootstrapWeek() : [],
-      survey_popup: dashboard ? bootstrapSurvey(t) : [],
+      survey_popup: dashboard ? bootstrapSurvey(t, true) : [],
       exam_luck: dashboard && a.p_luck_hub && a.p_luck_date ? { count: 0, mine: false, recent: [] } : null,
       recaps: dashboard ? recapFixtures() : [],
       golden: [],
@@ -479,9 +482,18 @@
     if (!db.equip) { db.equip = {}; var st = PLACE_START[db.persona] || {}, own = placeOwned(db.visitor); Object.keys(st).forEach(function(k){ if (own[st[k]]) db.equip[k] = st[k]; }); }
     return db.equip;
   }
+  /* a survey's or a check-in's reward, once per key: 1,000 XP, and 1,000 crowns that aren't in the 1-per-10-XP share */
+  function formReward(v, key){
+    if (!v || v !== db.visitor) return false;
+    db.forms = db.forms || [];
+    if (db.forms.indexOf(key) >= 0) return false;
+    db.forms.push(key); db.xp2 = (db.xp2 || 0) + 1000;
+    return true;
+  }
   function wallet2(v){
     if (!v || v !== db.visitor) return null;
-    var earned = (WALLET_START[db.persona] || 0) + Math.floor((db.xp2 || 0) / 10), spent = 0;
+    var forms = (db.forms || []).length;
+    var earned = (WALLET_START[db.persona] || 0) + Math.floor(Math.max(0, (db.xp2 || 0) - 1000 * forms) / 10) + 1000 * forms, spent = 0;
     (db.buys || []).forEach(function(b){ spent += b.price || 0; });
     return { earned: earned, spent: spent, balance: earned - spent, from_xp: earned, trophies: 0, medals: 0, rankups: 0 };
   }
@@ -531,7 +543,8 @@
     if (v && v === db.visitor) { var own = placeOwned(v); (db.costumes || []).forEach(function(c){ if (PLACE_CAT[c.id] && !own[c.id]) out.push({ id: c.id, shelf: "spotted", pos: 1 }); }); }
     return { seasons: seasons, throwback: isThrowback(dd), items: out };
   }
-  function shopBoost(t){ var b = db.sboost; return b && new RealDate(b).getTime() > t ? new RealDate(b).getTime() : null; }
+  /* where a bought boost's time starts (sh_buy, migration_v62): the end of every boost running or waiting, a medal's included */
+  function boostEnd(t){ var b = boost2(t); return b ? new RealDate(b.until).getTime() : null; }
   function shop2(v){
     var mine = v && v === db.visitor, own = v ? placeOwned(v) : {}, eq = {}, dd = day(now()), sd = shopDay(v, dd);
     if (mine) { var e = placeEquipped(); Object.keys(e).forEach(function(k){ eq[k] = e[k]; }); }
@@ -576,7 +589,7 @@
     if (!v || v !== db.visitor) return buyCore({ cat: PLACE_CAT, log: [], sale: [], owns: function(){ return false; }, balance: function(){ return 0; }, boost: function(){ return null; }, setBoost: function(){}, day: day(now()), now: now() }, v, item, req);
     db.buys = db.buys || [];
     var t = now(), res = buyCore({ cat: PLACE_CAT, log: db.buys, sale: shopDay(v, day(t)).items.map(function(x){ return x.id; }), owns: function(id){ return !!placeOwned(v)[id]; },
-      balance: function(){ return wallet2(v).balance; }, boost: function(){ return shopBoost(t); }, setBoost: function(ms){ db.sboost = iso(ms); }, day: day(t), now: t }, v, item, req);
+      balance: function(){ return wallet2(v).balance; }, boost: function(){ return boostEnd(t); }, setBoost: function(ms){ db.sboost = iso(ms); }, day: day(t), now: t }, v, item, req);
     save();
     return res;
   }
@@ -677,8 +690,13 @@
       var lvl = medalLevel(hub), pays = [0, 100, 200, 300, 500], got = 0;
       for (var m = db.medals[hub] + 1; m <= lvl; m++) got += pays[m];
       if (got) {
+        /* a shop boost's unused time moves after the medal's 24 hours (sh_boost_bump, migration_v63); one waiting after an
+           earlier medal's hours keeps only its own (db.sboost is where the shop's double XP ends) */
+        var prev = db.boost ? new RealDate(db.boost.until).getTime() : 0, sb = db.sboost ? new RealDate(db.sboost).getTime() : 0,
+          rest = sb - Math.max(t, prev);
         db.medals[hub] = lvl; db.xp2 += got; db.boost = { until: iso(t + 864e5), src: "medal" };
-        medal = { kind: ["", "mastery-bronze", "mastery-silver", "mastery-gold", "mastery-crown"][lvl], level: lvl, xp: got, boost_until: iso(t + 864e5) };
+        if (rest > 0) db.sboost = iso(t + 864e5 + rest);
+        medal = { kind: ["", "mastery-bronze", "mastery-silver", "mastery-gold", "mastery-crown"][lvl], level: lvl, xp: got, boost_until: rest > 0 ? db.sboost : iso(t + 864e5) };
       }
     }
     var resp = { ok: true, correct: correct, kind: kind, xp: paid, base: base, mult: mult, first: correct && paid > 0 && base === 10, why: why, bonus: bonus, medal: medal, boost: boost2(t), total: 0 };
@@ -1143,6 +1161,11 @@
         r.paragraphs = [{ text: pick ? "Start with " + label(PL) + (PL ? " " + String(PL.title).split(":")[0] : "") + (pick.missed ? ": you've missed " + pick.missed + " there on your latest tries." : pick.answered ? ": you've tried " + pick.answered + " of its " + pick.questions + " questions so far." : ": you haven't tried its " + pick.questions + " questions yet.") : "Start with the first lecture's notes, then its questions.", cites: [] },
           { text: "Read its notes first, then practice its questions until the misses are gone. Finish with the Daily drill.", cites: cite }];
         r.go = PL ? { v: "practice", hub: pick ? pick.hub || hub : hub, lec: PL.id } : { v: "drill", hub: dash ? hub : a.hub }; }
+      else if (/exostos|look (it|that) up/.test(low)) { r.kind = "not_covered"; r.paragraphs = [{ text: plain ? "The notes don't cover that." : "My notes don't cover exostoses. The closest lecture is below.", cites: [] }];
+        r.closest = L ? { hub: hub, lec: L.id, label: label(L), title: L.title } : null;
+        /* "Not in your notes": what the function's lookup adds (made up here: the preview never calls the API) */
+        r.gap = { text: "Fixture lookup: an exostosis is a benign bony outgrowth from the surface of a bone. In the mouth the common ones are torus palatinus and torus mandibularis, which rarely need treatment unless they get in the way of a denture.",
+          sources: [{ url: "https://medlineplus.gov/", title: "Fixture source: bony growths in the mouth", site: "MedlinePlus" }, { url: "https://www.ncbi.nlm.nih.gov/books/", title: "Fixture source: oral exostoses (StatPearls)", site: "NIH" }] }; }
       else if (/dragon|weather|football|recipe|movie/.test(low)) { r.kind = "not_covered"; r.paragraphs = [{ text: plain ? "The notes don't cover that." : "My notes don't cover that one. Ask me about the lectures?", cites: [] }];
         r.closest = L ? { hub: hub, lec: L.id, label: label(L), title: L.title } : null; }
       else { r.paragraphs = [{ text: me + (P0 ? "The notes put it this way: " + P0.text.slice(0, 260) : "The notes cover it in the lectures."), cites: cite }]; if (L && P0) r.go = { v: "notes", hub: hub, lec: L.id, k: P0.k }; }
@@ -1568,10 +1591,24 @@
         return { write: true, data: null };
       case "get_my_inbox": return { data: bootstrapInbox(v) };
       case "mark_reply_seen": db.inbox.forEach(function(m){ if (m.id === a.p_id) m.seen = true; }); save(); return { write: true, data: null };
-      case "get_active_survey": case "get_my_survey": return { data: bootstrapSurvey(t) };
-      case "submit_survey": db.surveys.answered = a; save(); return { write: true, data: null };
+      case "get_active_survey": return { data: bootstrapSurvey(t, true) };
+      case "get_my_survey": return { data: bootstrapSurvey(t) };
+      case "submit_survey": if (!db.surveys.answered || !db.surveys.answered.p_answers) db.surveys.answered = a; save(); return { write: true, data: null };
       /* the exam check-in shows "Thank you" only on true, as the live function returns */
       case "submit_exam_debrief": (db.debriefs = db.debriefs || []).push(a); save(); return { write: true, data: true };
+      /* the reward (migration_v60, v61): the first answer to each survey and the first check-in for each hub's exam pay
+         1,000 XP and 1,000 crowns (formReward); a second one pays nothing. The dashboard's window shows what was paid. */
+      case "submit_survey_v2": {
+        if (db.surveys.answered && db.surveys.answered.p_answers) return { data: { ok: false } };
+        var svPay = !!a.p_answers && formReward(v, "survey:" + a.p_survey);
+        db.surveys.answered = a; save();
+        return { write: true, data: { ok: true, xp: svPay ? 1000 : 0, crowns: svPay ? 1000 : 0 } };
+      }
+      case "submit_exam_debrief_v2": {
+        (db.debriefs = db.debriefs || []).push(a);
+        var ckPay = formReward(v, "checkin:" + hub + ":" + a.p_exam);
+        save(); return { write: true, data: { ok: true, xp: ckPay ? 1000 : 0, crowns: ckPay ? 1000 : 0 } };
+      }
       case "pod_feed": {
         return { data: bootstrapPodcast(hub, a.p_ep, t) };
       }

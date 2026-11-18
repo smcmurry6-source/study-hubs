@@ -9,11 +9,11 @@ How the redesign's game layer works on the database: XP without a daily cap, ser
 Shiny Gold Crowns and Timmy's shop (the seasonal sets, the rank sets and throwback days included), visiting someone's place,
 and the idea board. Written and tested on a throwaway copy on 2026-11-06, changed in place on 2026-11-10 for
 [Sam's third round](../tasks/done/2026-11-10-redesign-timmys-place-round-3.md), and **applied
-at [the release](../tasks/2026-11-06-redesign-release.md)**, with `migration_v55.sql` to `v58` after it (all five are in
+at [the release](../tasks/done/2026-11-06-redesign-release.md)**, with `migration_v55.sql` to `v58` after it (all five are in
 `supabase/schema.sql`, after its "the redesign's release" marker, which `tools/release/xp.js` uses to test the moment
 of the switch on made-up history). What each part should do and why:
-[the journeys](../tasks/2026-11-06-redesign-progression-journeys.md), [the shop](../tasks/2026-11-06-redesign-timmy-shop.md),
-[Timmy's place](../tasks/2026-11-06-redesign-timmys-place.md), [the idea board](../tasks/2026-11-06-idea-board.md). The code is
+[the journeys](../tasks/done/2026-11-06-redesign-progression-journeys.md), [the shop](../tasks/done/2026-11-06-redesign-timmy-shop.md),
+[Timmy's place](../tasks/done/2026-11-06-redesign-timmys-place.md), [the idea board](../tasks/done/2026-11-06-idea-board.md). The code is
 the home of the details: read `migration_v54.sql` (its sections are numbered as below).
 
 ## Beside today's, not instead
@@ -37,7 +37,11 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   with `admin_load_question_keys(secret, hub, keys, retire_missing)`. `node tools/xp/keys.js <hub>` builds the list from a hub's
   content JSON (`--sql` prints the call with the secret left out); retired ids come from `tools/question-ids/<hub>.txt`. A
   question's version is the same fingerprint `widget/qhealth.js` uses, so a page still showing an older version is graded
-  against its own key; an unknown version falls back to the current one.
+  against its own key; an unknown version falls back to the current one. Since migration_v66 a one-choice or select-all key
+  also carries `cv`, the version of its choices (a fingerprint of the choices and the key, `choiceVersion` in
+  `tools/xp/keys.js`): `record_choice` stamps the class's picks with it, and when it changes the old picks move to
+  `question_choices_past`, so the percentages beside each choice start again (an edit to the stem, the explanation or a why
+  keeps them). The loader's reply says how many questions' picks started again (`picks_restarted`).
 - **`record_answer_v2(visitor, hub, qid, choice, picks, self, v, ctx, request, session, claim)`** replaces five calls the page
   makes today (`record_answer`, `record_choice` or `record_choices`, `record_personal_answer`, `record_correct_streak`): the
   server grades the answer from the key and records all of it, then pays. Unknown and retired ids are recorded with the
@@ -48,14 +52,21 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   today (once per question); +50 for a mock with 10 or more answers (once per hub per day); +50 for an arcade game finished 20
   seconds or more after it started (once per game per day); 10 a minute of a Timmy Time episode heard for the first time
   and +100 at 90% of its minutes; +100 to the sender when Sam resolves a report as Fixed (`admin_resolve_report_v2`; "No change
-  needed" pays nothing); +100 / 200 / 300 / 500 for a hub's Bronze, Silver, Gold and Crown, which also start **24 hours of
+  needed" pays nothing); +1,000 for a survey answered (500 until migration_v61 raised it, with a top-up for those paid 500) (once per survey) and for the first exam check-in for each hub and exam
+  (migration_v60, Sam 2026-11-17: `survey:<id>` and `checkin:<hub>:<exam>`, paid to the linked id, never for a check-in sent
+  before by any of the person's linked ids; back pay only for survey 4 and Occlusion's final check-ins, by `tools/data-fixes/2026-11-17-reward-backpay.sql`; `submit_survey_v2` and `submit_exam_debrief_v2` say what was paid, which the dashboard's window advertises before and celebrates after: `celebrate` in `widget/dash.js`); +100 / 200 / 300 / 500 for a hub's Bronze, Silver, Gold and Crown, which also start **24 hours of
   double XP**.
 - **The guardrails**: an answer under 2 seconds after the last, or the 31st in a minute, still counts in your answers and the
   class stats but earns nothing. A mock's answers arrive together at the end, so they need 2 seconds of mock time each instead
   (the session from `xp_session_start`, one answer per question per mock). A podcast minute needs 25 seconds since the last
   paid one.
-- **Boosts** (`xp_boosts`): never more than 2x at once, whatever is running; a new medal restarts its 24 hours; a shop boost
-  extends the running shop boost. Medal and report awards aren't boosted; answers, the day's bonuses, mocks and games are.
+- **Boosts** (`xp_boosts`): never more than 2x at once, whatever is running; a new medal restarts its 24 hours; a shop boost's
+  time goes after every boost running or waiting (`migration_v62.sql`): it extends the last one when that's a shop boost, and
+  otherwise starts now, or when a medal's 24 hours end, so bought double XP never runs under a medal's and doubles nothing.
+  `sh_boost_json`'s `until` runs on through a shop boost waiting right after the running ones. A medal won *during* a shop
+  boost moves the rest of it to after the medal's 24 hours (`sh_boost_bump`, called by `sh_medal_check`, `migration_v63.sql`;
+  the medal's `boost_until` then says when the moved boost ends). The shop's boosts cost 150 (1 hour, Common) and 400
+  crowns (3 hours, Uncommon) since v62, priced against how fast crowns come (a median study day, about 95). Medal, report, survey and check-in awards aren't boosted; answers, the day's bonuses, mocks and games are.
 - **Every award is a row** (`xp_awards`, unique per visitor and key), and `answer_xp` keeps each v2 answer's request id and
   result, so a replayed call returns the first result and pays nothing, and another visitor reusing the request id is
   refused. `sh_xp_replay` works out the answer, 20th-answer and fix awards from the answers alone, so `sh_xp_rebuild` (Link my
@@ -74,7 +85,8 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
 
 ## Shiny Gold Crowns and the shop
 
-- **The balance** (`sh_wallet`, never stored): 1 per 10 XP of base XP (a boost's extra earns none), +25 a trophy, +50 a medal,
+- **The balance** (`sh_wallet`, never stored): 1 per 10 XP of base XP (a boost's extra earns none; nor does a survey's or
+  check-in's 1,000 XP), +1,000 a survey or check-in reward (migration_v60: counted from its award row's `src`), +25 a trophy, +50 a medal,
   +20 a rank-up (a tier) since the switch, minus what was spent. Spending never lowers XP or rank. The XP from before the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
 - **The catalog** (`shop_items`): each item's kind, rarity, price (checked against its rarity's band), season, slot, HP or
@@ -83,7 +95,15 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   they follow Timmy's place's art, `tools/figures/site/place.mjs`; Sam, 2026-11-06: the names follow the art; the mint
   fountain is now `mouthwash-fountain`; Timmy's podcast studio, `podcast-studio`, an Epic yard piece, joined on 2026-11-10), 112 seasonal and 12 rank. The seasonal and rank rows are **exactly** `allSetItems()` of
   `tools/figures/site/sets.mjs` (generated from it; `xp.js` fails if they differ). The outfits that aren't drawn yet, the
-  snacks and the boosts are still drafts (`admin_upsert_shop_item` edits them).
+  snacks are still drafts (`admin_upsert_shop_item` edits them); the boosts' prices were set from the class's earning rate
+  in `migration_v62.sql`.
+  **`migration_v65.sql` adds 59 rows** (Sam, 2026-11-18: "Go crazy"; [the task](../tasks/done/2026-11-18-more-cosmetics.md)), to 240:
+  the six **year-round collections** (48 rows, `COLLECTIONS` in `sets.mjs`, exactly `allCollectionItems()`): eight pieces
+  each like a season's set (a Legendary home, an Epic scene, outfits Common to Rare, yard pieces Uncommon to Epic), but
+  with `season` null and `rotates`, so they are everyday pieces in the daily and weekly picks; five more **rare costumes**
+  (`COSTUMES` in `sets.mjs`, ten in all) and six more **paints**. No function changed: the rotation, `buy_item`,
+  `equip_item` and `get_my_shop` already handle any active row by its kind and slot. It is applied once its PR is live
+  (`supabase/pending-migrations.txt` until then), so the daily picks never show a piece before its drawing ships.
 - **A season's set** (Sam, 2026-11-10): 1 home and 1 scene (both Legendary) and a Rare, an Epic and a Legendary outfit and
   yard thing, 8 pieces, for each of fourteen seasons. `sh_shop_seasons(date)` gives every season whose set is on sale that
   Central day (several can be at once): Halloween in October; Thanksgiving from November 1 to the day after the fourth
@@ -128,7 +148,7 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   `how`: `bought`, `gift` or `rank`), `locked` (the rank items not reached yet, with the `rank_tier` that unlocks each),
   what's equipped, the costume log, today's snacks and the boost. Snack HP shows in `get_pet_days_v2`.
   `sh_buy(day, ...)` and `sh_my_shop(day, ...)` are the same two with the date given, private, for the tests.
-- **How the client uses it** (`widget/shop.js`, session 2 of [the shop](../tasks/2026-11-06-redesign-timmy-shop.md)):
+- **How the client uses it** (`widget/shop.js`, session 2 of [the shop](../tasks/done/2026-11-06-redesign-timmy-shop.md)):
   the balance and the shelves come from the bootstrap's `shop`, then one `get_my_shop` when the shop opens and one after
   each purchase (handed to the place: `shPlace.setup({ shop })`); `buy_item`'s `balance` is shown at once. A purchase's
   request id is made when an item's sheet opens and reused for every try from it (a double tap, a retry after a dropped
@@ -196,7 +216,7 @@ every up-voter get an Inbox note, `get_my_inbox_v2`, `mark_idea_note_seen`) and 
 neighbors, no visitor).
 
 **The answer call, the ladder and mock sessions have their pages since 2026-11-12** (phase 4, part A,
-[the journeys](../tasks/2026-11-06-redesign-progression-journeys.md)): a new hub's widget tag carries `data-game="v2"`,
+[the journeys](../tasks/done/2026-11-06-redesign-progression-journeys.md)): a new hub's widget tag carries `data-game="v2"`,
 and `widget/v3.js` then asks for `get_widget_bootstrap_v2`, sends each answer as one `record_answer_v2` (falling back
 to today's calls when the function isn't there, or when the server answers `bad` because a one-choice question came
 without a pick), starts and finishes a mock's session, and hands the server's reply to the engine as `sh:answer-paid`
@@ -223,7 +243,7 @@ live page makes today's calls (the smoke test compares them with `main`'s files)
   and offers "Fixed" and "No change needed" through `admin_resolve_report_v2`, with Reopen as `open`; without the
   functions it reads `get_reports` and resolves with `set_report_resolved`, as today.
 
-**Timmy's place has its client since 2026-11-12** (phase 4, part C, [the place](../tasks/2026-11-06-redesign-timmys-place.md)):
+**Timmy's place has its client since 2026-11-12** (phase 4, part C, [the place](../tasks/done/2026-11-06-redesign-timmys-place.md)):
 `widget/place.js` reads the bootstrap's `shop` (or `get_my_shop`) for `inventory`, `locked` and `equipped`, draws the
 place from them and the v2 profile's `journey`, `tier` and `level`, and saves every change in its customizer with one
 `equip_item`. It shows a change before the server answers by the same rules (a yard piece stands in one spot, the wide
@@ -237,7 +257,7 @@ that had no drawing and the five rare costumes are drawn as kit outfits under th
 `costume`), and `tools/release/xp.js` fails if a catalog piece has no drawing, a kit costume has no row, or a snack's
 or boost's thumbnail (`widget/hub-art/shop.js`) differs from its row.
 
-The pages that call them (built 2026-11-12, [the idea board](../tasks/2026-11-06-idea-board.md)): `widget/ideas.js` (the
+The pages that call them (built 2026-11-12, [the idea board](../tasks/done/2026-11-06-idea-board.md)): `widget/ideas.js` (the
 board and the tick), `widget/replies.js` (a status note shows as a pop-up once and stays in the Inbox; it reads
 `get_my_inbox_v2` where the page says the game layer is there, which only the new dashboard does so far) and the admin
 page's Inbox, "Idea board" (`admin_ideas`, `admin_set_idea`). The preview answers all of them from made-up ideas
@@ -267,7 +287,7 @@ Each is one line in `migration_v54.sql` to change.
 - A rare costume Timmy was seen in stays on that visitor's shop until bought (one new sighting a day).
 - An idea's hub must have keys loaded. (Asked as: an author's delete keeps an empty row for the day's limit. Sam: no, it
   removes the idea completely.)
-- The catalog's undrawn outfits, snacks and boosts, and their prices, are drafts. (The seasonal and rank rows are no longer
+- The catalog's undrawn outfits and snacks, and their prices, are drafts (the boosts' prices: `migration_v62.sql`). (The seasonal and rank rows are no longer
   drafts: they follow `tools/figures/site/sets.mjs`.)
 - From the third round (2026-11-10), each also one place in `migration_v54.sql`:
   - The two throwback days are one in each half of the month (the 1st-14th and the 15th-28th), so they are never back to
@@ -298,12 +318,12 @@ client follows the server in all of them. A new case: stop and tell Sam.
 |---|---|
 | Five everyday outfits have rows and no drawing | They are drawn (the shop's art session) |
 | Five rare costumes, where the shop's first note said "about a dozen" | Five. More can join later with `admin_upsert_shop_item` |
-| The prices are the draft ones | Released as written; any Sam wants changed are changed afterwards with `admin_upsert_shop_item` ([the shop](../tasks/2026-11-06-redesign-timmy-shop.md) keeps the list) |
+| The prices are the draft ones | Released as written; any Sam wants changed are changed afterwards with `admin_upsert_shop_item` ([the shop](../tasks/done/2026-11-06-redesign-timmy-shop.md) keeps the list) |
 | `record_answer_v2`'s reply has the XP and the total, not the balance | The balance is read at page load (the bootstrap's `shop.wallet`), when the shop or the "you" card opens (`get_my_shop`) and from `buy_item`'s reply; no counter ticks after an answer |
 | `buy_item` sells a snack at 100 HP | The shop greys it out ("He's full") |
 | `get_my_shop` says which seasons are on sale, not until when | A season's shelf says "Limited time", with no countdown |
 | `sh_wallet` counts every badge kind that isn't `mastery-`, `dark-seen-` or `pet-adopt` as a trophy (+25) | The client records no new badge kinds except real trophies |
-| `record_achievement` takes only the kinds it lists; `bowling` isn't one | The Bowling trophy and the clips seen are kept on the device; the kind is added in the first migration after the release ([the rank sets](../tasks/2026-11-12-redesign-later-journeys-rank-sets.md)) |
+| `record_achievement` takes only the kinds it lists (`bowling` since `migration_v63.sql`) | The clips seen are kept on the device; the Bowling trophy is won on the device (`sh_bowl_trophy`) and `widget/v3.js` sends it once (`sh_bowl_trophy_sent`), when it's won on a hub or at the next hub page load: then it pays its 25 crowns and has a class share |
 | Nothing pays XP for a bowling clip | No XP for it |
 | Rank items exist for tiers 1 to 6 only | The ModuPro's and the Loupes' sets come after the release, in a new migration |
 | `post_idea` takes the sources `board`, `suggest` and `checkin` | An idea Timmy drafts (Ask Timmy, part 2) posts as `board` |
@@ -313,7 +333,7 @@ Learn and Flashcards' server part is its own pending migration, not a change to 
 
 ## Learn and Flashcards (migration_v56)
 
-The Question Bank's "Study as" toggle ([the task](../tasks/2026-11-06-redesign-learn-and-flashcards.md)): **Learn** asks
+The Question Bank's "Study as" toggle ([the task](../tasks/done/2026-11-06-redesign-learn-and-flashcards.md)): **Learn** asks
 questions in rounds until each is right twice; **Flashcards** turn a question over and the student rates it Again, Hard,
 Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sql` needs v54 and v55 and changes neither (Sam chose B of three options,
 2026-11-12, [decisions](../decisions.md)). It was applied at the release, after them.
@@ -345,8 +365,9 @@ Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sq
   health, and pays no day bonus (+20), no goal bonus and no medal. A flashcards-only day fills the ring and keeps the
   flame on every device (the replay marks the day studied), but the server's `xp_days` and the streak board count
   answers only, as before.
-- **Learn's context**: v54's `record_answer_v2` doesn't list `learn`, so Learn's answers are filed as `other` (Sam,
-  2026-11-12: v54 isn't changed). A later migration can add `learn` to the list.
+- **Learn's context**: v54's `record_answer_v2` didn't list `learn`, so Learn's answers were filed as `other` (Sam,
+  2026-11-12: v54 isn't changed). `migration_v59.sql` (2026-11-16) adds `learn` to `sh_answer`'s list, so from then on
+  `answer_xp.ctx` says `learn`; the rows before it stay `other`. Nothing pays or checks by the context.
 - **Before the migration** (the preview's `rpc()` answers all three from fixtures): the page keeps everything on the
   device, the ratings wait in `STATE.cardq` (up to 3,000), and the first call that finds the functions missing stops
   trying until the next page load. Test browsers (`navigator.webdriver`) send nothing.
@@ -363,6 +384,6 @@ the new tables and calls every function a visitor can run with one visitor's id,
 `admin-ops.js` and `retention.js` run with them in place. CI runs all four. `tools/release/rls-audit.sql` checks the same
 two lists on the live database once the migration is applied.
 
-Related: [the release](../tasks/2026-11-06-redesign-release.md) · [phase 5](../tasks/done/2026-11-05-redesign-phase-5-backend.md) ·
+Related: [the release](../tasks/done/2026-11-06-redesign-release.md) · [phase 5](../tasks/done/2026-11-05-redesign-phase-5-backend.md) ·
 [event-taxonomy](event-taxonomy.md) · [analytics-retention](analytics-retention.md) ·
 [learner-data-privacy](../rules/learner-data-privacy.md) · [shared-infrastructure](shared-infrastructure.md)

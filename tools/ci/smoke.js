@@ -185,8 +185,14 @@ async function askCheck(page, name, o){
    (Until the redesign's release this also played an old hub with this branch's widget/games.js and podcast.js and with
    main's, to prove the live pages' calls hadn't changed; those pages were replaced at the release.) */
 async function wiringCheck(context, hub, label){
-  const QS = JSON.parse(fs.readFileSync(content(hub, 'questions.json'), 'utf8'));
-  const EP = (JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8')).podcast || {}).id || null;
+  const QS0 = JSON.parse(fs.readFileSync(content(hub, 'questions.json'), 'utf8'));
+  /* a hub with A/B versions (content/variants.json): a question may be shown in either, the first one picked by device;
+     choice k of a version is choice k of the original, so a version is matched like the original and answered by index */
+  const VF = content(hub, 'variants.json'), VS = fs.existsSync(VF) ? JSON.parse(fs.readFileSync(VF, 'utf8')) : {};
+  const QS = QS0.concat(...QS0.map(q => [].concat(VS[q.id] || []).filter(v => v && v.stem && Array.isArray(v.choices))
+    .map(v => Object.assign({}, q, { stem: v.stem, choices: v.choices }))));
+  const CORE0 = JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8'));
+  const EP = CORE0.audio === 'off' ? null : (CORE0.podcast || {}).id || null;   /* an archived hub's episode came off the site */
   const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
   const unbot = () => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} };
   const args = r => { try { return JSON.parse(r.postData() || '{}'); } catch (e) { return {}; } };
@@ -318,6 +324,16 @@ async function stub(context){
   if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
   // the first-visit "Want a quick tour?" prompt dims the page and would block the clicks below; answer it up front
   await context.addInitScript(() => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); } catch (e) {} });
+  // an archived hub opens "This hub is archived" over the page once the database answers (widget/v3.js); press "Keep browsing"
+  // like a student would, whenever it comes. Occlusion (2026-11-16) is the first hub on the engine to be archived, and the
+  // engine's checks below never closed it.
+  await context.addInitScript(() => { try { new MutationObserver(() => { const b = document.querySelector('.sh-archived-stay'); if (b) b.click(); })
+    .observe(document, { childList: true, subtree: true }); } catch (e) {} });
+  // the dashboard's exam check-in and survey open in a window over the dimmed page (widget/dash.js formWindow, 2026-11-17)
+  // four seconds after it loads, for anyone with progress in a hub whose exam has passed; press its × ("Not now", "Later")
+  // like a student would, whenever it comes. A survey's "Later" first says "Saved to your Inbox.", so the second press closes it.
+  await context.addInitScript(() => { try { new MutationObserver(() => { const b = document.querySelector('section.survey.is-shown .survey-x'); if (b) b.click(); })
+    .observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] }); } catch (e) {} });
 }
 
 /* matching items allowed to repeat an answer because that hub grades matches by answer text (perio, since 2026-09-29) */
@@ -337,7 +353,7 @@ const FORMAT_MIN = { '2stmt': 3, tf: 5, numbered: 2 };
    needs at least one of each. Hubs archived before the rule are exempt, and so are the lectures already taught then
    (Occlusion's midterm lectures, Heme & Endo Exam 2's Exam 1 Refresher, Perio's sessions through Session 9). */
 const WHICH_MIN = { which: 1, whichf: 1 };
-const WHICH_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3', 'heme-endo-exam1', 'pcd-implants-exam1', 'special-patient-care']);
+const WHICH_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3', 'heme-endo-exam1', 'pcd-implants-exam1']);
 const WHICH_GRANDFATHERED = new Set(['occlusion:review', 'occlusion:anatomy', 'occlusion:function', 'occlusion:concepts', 'occlusion:applying',
   'heme-endo-exam2:refresh', 'perio:diagnosis-tx-planning', 'perio:incisions-flaps-sutures', 'perio:risk-assessment', 'perio:phase1-therapy',
   'perio:resective-furcation', 'perio:implants-perio', 'perio:antibiotics-host-mod', 'perio:perio-plastic-esthetics']);
@@ -372,6 +388,30 @@ function checkIds(hub, qids){
     `# "<id> retired" marks a question deleted on purpose. Rules: vault/rules/question-ids-are-permanent.md\n` : (text.endsWith('\n') ? '' : '\n');
   fs.appendFileSync(file, head + fresh.join('\n') + '\n');
   notes.push(`${hub}: added ${fresh.length} new question id(s) to ${rel} (commit it)`);
+}
+/* each wording of a question, as the card would show it: the original with the wording's stem, choices, whys and ex */
+function lintWordings(hub, Q, V, core){
+  const by = new Map(Q.map(q => [q.id, q])), W = [];
+  if (core.variants !== Object.keys(V).length) problems.push(`${hub}: core.json's "variants" (${core.variants}) doesn't count variants.json's ${Object.keys(V).length} questions (run: node tools/hub-next/build.mjs)`);
+  Object.entries(V).forEach(([id, raw]) => (Array.isArray(raw) ? raw : [raw]).forEach((v, k) => {
+    const q = by.get(id); if (!q) { problems.push(`${hub}: variants.json has ${id}, which isn't a question`); return; }
+    W.push(Object.assign({}, q, { stem: v.stem, choices: v.choices || q.choices, why: v.why || q.why, ex: v.ex || q.ex, _at: `${id} (wording ${k + 2})` }));
+  }));
+  W.forEach(q => {
+    const at = q._at, ch = q.choices || [];
+    if (q.type === 'mcq' || q.type === 'multi') {
+      const low = ch.map(c => String(c).trim().toLowerCase()); if (new Set(low).size !== low.length) problems.push(`${hub}: ${at} has duplicate choices`);
+      if (!Array.isArray(q.why) || q.why.length !== ch.length || q.why.some(w => !String(w || '').trim())) problems.push(`${hub}: ${at} needs a "why" for every choice`);
+    }
+    if (q.type === 'mcq' && !(q.answer >= 0 && q.answer < ch.length)) problems.push(`${hub}: ${at} answer index out of range`);
+    if (q.type === 'multi' && !(Array.isArray(q.correct) && q.correct.every(i => i >= 0 && i < ch.length))) problems.push(`${hub}: ${at} has a key outside its choices`);
+    if (!String(q.stem || '').trim()) problems.push(`${hub}: ${at} has no stem`);
+  });
+  const mc = W.filter(q => q.type === 'mcq' && (q.choices || []).length >= 3);
+  const longest = mc.filter(q => { const len = q.choices.map(c => String(c).length), a = len[q.answer]; return a > Math.max(...len.filter((_, i) => i !== q.answer)); }).length;
+  const pct = mc.length ? Math.round(100 * longest / mc.length) : 0;
+  notes.push(`${hub}: ${W.length} reworded questions; correct answer is the longest choice in ${pct}% of their MCQs`);
+  if (pct > 40) problems.push(`${hub}: in the reworded questions the correct answer is the longest choice in ${pct}% of MCQs (keep it under 40%)`);
 }
 function lint(hub, A){
   const Q = A.QUESTIONS || [], L = A.LECTURES || [], ids = new Set(), lecIds = new Set(L.map(l => l.id)), longItems = [];
@@ -426,7 +466,7 @@ function lint(hub, A){
   });
   if (!LIKELY_EXEMPT.has(hub)) {
     const T = A.LIKELY_TOPICS;
-    if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from special-patient-care)`);
+    if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from occlusion)`);
     else {
       const byId = new Map(Q.map(q => [q.id, q]));
       T.forEach(t => (t.ids || []).forEach(id => { const q = byId.get(id);
@@ -653,8 +693,16 @@ function lint(hub, A){
         route.fulfill({ response: r, body: h });
       });
       await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);
-      // a hub whose last exam has passed opens "This hub is archived" over the page; close it like a student would
-      await page.click(".sh-archived-stay", { timeout: 1000 }).catch(() => {});
+      // a hub whose last exam has passed opens "This hub is archived" over the page; close it like a student would. It waits
+      // for the database's bootstrap (up to 3 s, widget/v3.js), so on an archived hub wait for it rather than try once. A hub on
+      // the engine sets SH_EXPORT (its exams) only once its content JSON has loaded, so wait for that first (Occlusion, 2026-11-17)
+      await page.waitForFunction(() => window.SH_EXPORT && window.SH_EXPORT.exams, null, { timeout: 5000 }).catch(() => {});
+      const archivedNow = await page.evaluate(() => { const E = window.SH_EXPORT || {}; let last = null;
+        [...(E.exams || []), ...(E.archiveOn && E.archiveOn.date ? [Object.assign({}, E.archiveOn, { archiveHour: E.archiveOn.hour })] : [])].forEach(x => {
+          const p = String((x && x.date) || '').split('-').map(Number); if (p.length !== 3 || !p[0]) return;
+          const d = new Date(p[0], p[1] - 1, p[2], x.archiveHour != null ? x.archiveHour : 22); if (!last || d > last) last = d; });
+        return !!(last && new Date() >= last); }).catch(() => false);
+      await page.click(".sh-archived-stay", { timeout: archivedNow ? 5000 : 1000 }).catch(() => {});
       if (!vp.isMobile) { const A = await page.evaluate(() => window.__CI); if (A) lint(hub, A); else problems.push(`${hub}: could not read its question data (is window.SH_EXPORT still set at the end of the script?)`); }
       const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
       if (liveBundles.length || await page.evaluate(() => !!window.SH_BUNDLE)) problems.push(`${hub} (${label}): an old single-file hub loaded a bundle (${liveBundles.join(', ') || 'window.SH_BUNDLE'}); only the dashboard and the engine's hubs do`);
@@ -688,6 +736,9 @@ function lint(hub, A){
         try {
           const rd = f => JSON.parse(fs.readFileSync(content(hub, f), 'utf8')), core = rd('core.json'), nts = rd('notes.json');
           lint(hub, { QUESTIONS: rd('questions.json'), LECTURES: core.lectures || [], READINGS: nts.full || {}, READINGS_PLAIN: nts.plain || {}, LIKELY_TOPICS: core.likelyTopics, CORE: core, NOTES: nts });
+          /* a hub's other wordings (content/variants.json, shown on later tries): the build checks their shape
+             (tools/hub-next/build.mjs checkVariants); here each wording gets the bank's own per-question lint */
+          if (fs.existsSync(content(hub, 'variants.json'))) lintWordings(hub, rd('questions.json'), rd('variants.json'), core);
         } catch (e) { problems.push(`${hub}: could not read its content (hubs/${hub}/content/): ${e.message}`); }
       }
       const page = await context.newPage(); const errs = [], name = `${hub}`;
@@ -721,6 +772,21 @@ function lint(hub, A){
         const st = await page.evaluate(() => { const v = document.querySelector('.hx-view:not([hidden])'); return { h1: !!(v && v.querySelector('h1')), w: document.documentElement.scrollWidth - innerWidth }; });
         if (!st.h1) problems.push(`${name} (${label}): ${r} has no page title`);
         if (st.w > 1) problems.push(`${name} (${label}): ${r} scrolls sideways by ${st.w}px`);
+        if (hub === 'occlusion' && r === 'questions') {
+          /* The generated CUSP game is intentionally only on the base Question Bank, ahead of its filters. It is lazy
+             loaded with figures.js, so wait for its launcher rather than only testing the question cards below it. */
+          await page.waitForSelector('[data-cusp-game] .cg-launch', { timeout: 15000 }).catch(() => {});
+          const cusp = await page.evaluate(() => { const host = document.querySelector('[data-cusp-game]'); return host && {
+            launch: !!host.querySelector('.cg-launch'), title: (host.querySelector('.cg-launch-t b') || {}).textContent || '',
+            contacts: !!host.querySelector('[data-cg="contacts"]'), moves: !!host.querySelector('[data-cg="moves"]'),
+            w: document.documentElement.scrollWidth - innerWidth
+          }; });
+          if (!cusp || !cusp.launch || cusp.title.trim() !== 'What cusp hits where?' || !cusp.contacts || !cusp.moves)
+            problems.push(`${name} (${label}): the base Question Bank has no working What cusp hits where? launcher`);
+          else if (cusp.w > 1) problems.push(`${name} (${label}): the What cusp hits where? launcher scrolls sideways by ${cusp.w}px`);
+        }
+        if (hub === 'occlusion' && /^questions\/(drill|misses|weak|mock)$/.test(r) && await page.$('[data-cusp-game]'))
+          problems.push(`${name} (${label}): ${r} should not show the base Question Bank's What cusp hits where? game`);
         if (r === 'questions') { const c = await page.$('#qlist .qcard .ch'); if (c) { await c.click(); await page.waitForTimeout(300); if (!(await page.$('#qlist .qcard.is-answered'))) problems.push(`${name} (${label}): answering a question didn't mark the card answered`); } }
         if (r === 'more/arcade') { const g = await page.$('.ar-grid [data-game]'); if (g) { await g.click(); await page.waitForTimeout(400); const back = await page.$('#panel-arcade [data-back]'); if (back) await back.click().catch(() => {}); } }
       }
@@ -749,8 +815,14 @@ function lint(hub, A){
       await page.evaluate(() => { location.hash = 'home'; }); await page.waitForTimeout(400);
       if (await page.$('.ska-fab:not([hidden])')) problems.push(`${name} (${label}): the Ask icon is in Timmy's corner while he's there`);
       await page.evaluate(() => { localStorage.setItem('sh_pref_pet', 'off'); document.dispatchEvent(new CustomEvent('sh:pref', { detail: { key: 'sh_pref_pet', val: 'off' } })); });
-      await page.waitForSelector('.ska-fab:not([hidden])', { timeout: 15000 }).catch(() => {});
-      if (!(await page.$('.ska-fab:not([hidden])'))) problems.push(`${name} (${label}): no Ask icon in Timmy's corner while he isn't there`);
+      /* Timmy isn't on an archived hub (widget/hub-timmy.js askArchived), so there is no Ask icon there at all (Occlusion, 2026-11-17) */
+      const archived = (() => { try { const c = JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8')); let last = null;
+        (c.exams || []).forEach(x => { const p = String(x.date || '').split('-').map(Number); if (p.length === 3 && p[0]) { const d = new Date(p[0], p[1] - 1, p[2], 22); if (!last || d > last) last = d; } });
+        return !!(last && new Date() >= last); } catch (e) { return false; } })();
+      if (!archived) await page.waitForSelector('.ska-fab:not([hidden])', { timeout: 15000 }).catch(() => {});
+      else await page.waitForTimeout(1500);
+      if (archived) { if (await page.$('.ska-fab:not([hidden])')) problems.push(`${name} (${label}): an archived hub shows the Ask icon`); }
+      else if (!(await page.$('.ska-fab:not([hidden])'))) problems.push(`${name} (${label}): no Ask icon in Timmy's corner while he isn't there`);
       else {
         const lec0 = (() => { try { return JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8')).lectures[0].id; } catch (e) { return null; } })();
         const sent = await askCheck(page, `${name} (${label})`, { hubId: hub, hub, lec: lec0, open: () => page.click('.ska-fab') });
@@ -838,7 +910,8 @@ function lint(hub, A){
     if (!vp.isMobile && engineHubs.length) {
       const has = (h, f, re) => { try { return re.test(fs.readFileSync(content(h, f), 'utf8')); } catch (e) { return false; } };
       const smile = engineHubs.filter(h => has(h, 'arcade.js', /id:\s*'smile'/));
-      const wh = smile.find(h => has(h, 'core.json', /"podcast":\s*\{/)) || smile[0];
+      const live = smile.filter(h => !has(h, 'core.json', /"audio":\s*"off"/));
+      const wh = live.find(h => has(h, 'core.json', /"podcast":\s*\{/)) || live[0] || smile[0];
       if (wh) await wiringCheck(context, wh, label).catch(e => problems.push(`${wh}, the game layer's wiring (${label}): the check stopped: ${e.message.split('\n')[0]}`));
     }
     /* Timmy's place (phase 4, part C: widget/place.js, its kit widget/hub-art/place.js and one file per set). On the
@@ -854,7 +927,7 @@ function lint(hub, A){
       const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
       const equipped = { 'yard-left': 'garden' };
       const shop = () => ({ day: '2026-11-12', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], costumes: [], snacks_today: 0, boost: null,
-        inventory: ['garden', 'mailbox', 'bowling-lane', 'castle'].map(id => ({ id, at: '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
+        inventory: ['garden', 'mailbox', 'bowling-lane', 'castle', 'cowboy-hat', 'floss-mummy'].map(id => ({ id, at: '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
         locked: [{ id: 'rank-bronze-outfit', name: 'Bronze outfit', kind: 'outfit', rarity: 'rare', rank_tier: 2 }], equipped: Object.assign({}, equipped) });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rank, mastery: [], shop: shop() }) }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(shop()) }));
@@ -913,6 +986,15 @@ function lint(hub, A){
             if (after.corner) problems.push(`${name} (${label}): with the bowling lane in the side yard, the front corner should not be offered`);
             if (after.w > 1) problems.push(`${name} (${label}): Customize scrolls sideways by ${after.w}px`);
             await page.click('dialog.tpv .tpv-tile[data-pick="timmy"]'); await page.waitForTimeout(400);
+            /* a year-round collection's piece (the desert's cowboy hat, migration_v65) is under its own tab, Collections,
+               headed by its collection, and its drawings (hub-art/place/desert.js) are fetched only because it's owned */
+            const co = await page.$('dialog.tpv [data-src="coll"]'); if (co) { await co.click(); await page.waitForTimeout(600); }
+            const coll = await page.evaluate(() => ({ cards: [...document.querySelectorAll('dialog.tpv .tpv-card[data-item]')].map(e => e.dataset.item), head: [...document.querySelectorAll('dialog.tpv .tpv-seth')].map(e => e.textContent),
+              tabs: (() => { const t = document.querySelector('dialog.tpv .tpv-tabs'); return t ? Math.round(t.getBoundingClientRect().right - t.parentElement.getBoundingClientRect().right) : 0; })(), w: (() => { const d = document.querySelector('dialog.tpv'); return d.scrollWidth - d.clientWidth; })() }));
+            if (!co || !coll.cards.includes('cowboy-hat') || coll.head.join() !== 'Desert ranch') problems.push(`${name} (${label}): an owned collection piece should be under Collections, headed by its collection (${JSON.stringify(coll)})`);
+            /* four tabs now (Classics, Collections, Seasonal, Rank): they fit the panel on a phone */
+            if (coll.tabs > 1 || coll.w > 1) problems.push(`${name} (${label}): the outfit tabs run ${coll.tabs}px past their panel (the view scrolls sideways by ${coll.w}px)`);
+            if (!asked.includes('hub-art/place/desert.js') || asked.some(u => /hub-art\/place\/(dino|moonbase|reef|arcade|rockshow)\.js/.test(u))) problems.push(`${name} (${label}): only the owned collection's drawings should load (${asked.join(', ')})`);
             const rk = await page.$('dialog.tpv [data-src="rank"]'); if (rk) { await rk.click(); await page.waitForTimeout(300); }
             const lk = await page.evaluate(() => { const l = document.querySelector('dialog.tpv .tpv-card.is-locked'); return l ? l.textContent : ''; });
             if (!/Reach Bronze/.test(lk)) problems.push(`${name} (${label}): a rank outfit not reached yet should show locked, with the rank that gives it (${lk})`);
@@ -1144,9 +1226,9 @@ function lint(hub, A){
             w: document.documentElement.scrollWidth - innerWidth };
         });
         if (s.bal !== '300') problems.push(`${name} (${label}): the shop's balance reads "${s.bal}", not 300`);
-        if (s.shelves.join() !== 'today,week,spotted,always') problems.push(`${name} (${label}): the shop's shelves are ${s.shelves.join(', ')}, not Today's picks, This week, Spotted (the five costumes as shapes) and Always here (an empty shelf is left out)`);
+        if (s.shelves.join() !== 'today,week,spotted,always') problems.push(`${name} (${label}): the shop's shelves are ${s.shelves.join(', ')}, not Today's picks, This week, Spotted (the ten costumes as shapes) and Always here (an empty shelf is left out)`);
         const spot = await page.evaluate(() => ({ shapes: document.querySelectorAll('.tsh-shelf-spotted .tsh-unseen').length, cards: document.querySelectorAll('.tsh-shelf-spotted .tsh-card[data-item]').length }));
-        if (spot.shapes !== 5 || spot.cards) problems.push(`${name} (${label}): with no costume spotted yet, the Spotted shelf shows the five as shapes and nothing to buy (${JSON.stringify(spot)})`);
+        if (spot.shapes !== 10 || spot.cards) problems.push(`${name} (${label}): with no costume spotted yet, the Spotted shelf shows the ten as shapes and nothing to buy (${JSON.stringify(spot)})`);
         if (s.state.sandcastle !== 'buy' || s.state.igloo !== 'short' || s.state.apple !== 'full' || s.state['boost-1h'] !== 'short') problems.push(`${name} (${label}): the cards' states are ${JSON.stringify(s.state)}`);
         if (s.x) problems.push(`${name} (${label}): an item's name was drawn as markup`);
         else if (!/<img/.test(s.nameTxt)) problems.push(`${name} (${label}): an item's name should show as text (${s.nameTxt})`);
@@ -1414,6 +1496,7 @@ function lint(hub, A){
             const h = d.querySelector('#tpvT').cloneNode(true), tb = h.querySelector('.tpv-num'); if (tb) tb.remove();
             return { title: h.textContent.trim(), titleEls: h.children.length, top: tb ? { shown: (tb.querySelector('[aria-hidden="true"]') || {}).textContent, said: (tb.querySelector('.tpv-sr') || {}).textContent, cls: tb.className } : null, seg: d.querySelector('.tpv-seg').hidden, cust: !!d.querySelector('[data-tp="customize2"], [data-tp="customize"]:not([hidden]) ') && !d.querySelector('.tpv-seg').hidden,
               hp: !!d.querySelector('.tpv-hp'), timmy: t ? t.getAttribute('aria-label') : '', home: (d.querySelector('.tpv-sub') || {}).textContent || '', injected: !!window.__visit || !!d.querySelector('img[src="x"]'), w: d.scrollWidth - d.clientWidth,
+              forms: !!document.querySelector('section.survey'),
               look: { visit: d.classList.contains('is-visit'), kick: (d.querySelector('.tpv-kick') || {}).textContent || '', rank: (d.querySelector('.tpv-guest .tpv-gr') || {}).textContent || '', art: !!d.querySelector('.tpv-grank svg') } }; });
           if (!v.look.visit || v.look.kick !== 'Welcome to' || !/Gold/.test(v.look.rank) || !v.look.art) problems.push(`${name} (${label}): a visit should open in its theater look, "Welcome to" over the name and their rank drawn on the guest card (${JSON.stringify(v.look)})`);
           if (v.title !== BAD + '’s place' || v.titleEls) problems.push(`${name} (${label}): the visited place's title should be "<name>'s place" as text (${JSON.stringify(v.title)}, ${v.titleEls} elements)`);
@@ -1424,6 +1507,9 @@ function lint(hub, A){
           if (!/Igloo/i.test(v.home)) problems.push(`${name} (${label}): the visited place isn't theirs (their home is the igloo; the view says "${v.home}")`);
           if (v.injected) problems.push(`${name} (${label}): a visited place drew its name as markup`);
           if (v.w > 1) problems.push(`${name} (${label}): the visited place scrolls sideways by ${v.w}px`);
+          /* the dashboard asks for the check-in four seconds after it loads, while this visit is open: it waits for the place
+             to close, since under the <dialog> it would be hidden and take the Escape that closes the place */
+          if (v.forms) problems.push(`${name} (${label}): the check-in or survey window opened under a classmate's place`);
           if (placeCalls[K('b')] !== 1) problems.push(`${name} (${label}): get_place was asked ${placeCalls[K('b')] || 0} times for one of the top three: the stage's outfits and the visit share one answer`);
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
           const back = await page.evaluate(() => ({ open: !!document.querySelector('dialog.tpv'), focus: document.activeElement ? document.activeElement.getAttribute('aria-label') || '' : '', tracked: window.__tracked || [] }));

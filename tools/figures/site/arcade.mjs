@@ -34,7 +34,10 @@
    - cloze:  Mind the Pocket. A page of notes with one term missing, beside a probe in a tooth's pocket.
    - smile:  Million-Dollar Smile. Twelve rungs up to a smile with healthy gums and one gold tooth.
    - cross:  Cross-Section. A mini crossword beside an incisor cut in section in its bone and gum, a probe in the sulcus.
-   - crusher: Calculus Crusher. A wall of calculus bricks, one breaking, a ball and a curette for a paddle. */
+   - crusher: Calculus Crusher. A wall of calculus bricks, one breaking, a ball and a curette for a paddle.
+   - stage:  Stage & Grade (2026-11-17). A molar's film on the viewer, its bone crest lowered, a vertical defect and the
+             furcation open, the root's thirds ruled beside it; the staging chart on a clipboard, one stage ticked and
+             the grade's three tokens, the worst one circled. */
 import { INK, C, HI } from "./style.mjs";
 
 const ink = (w = 2.5) => `stroke="${INK}" stroke-width="${w}" stroke-linejoin="round" stroke-linecap="round"`;
@@ -664,18 +667,55 @@ function pCrusher(T){
     star(300, 112, 1) + star(30, 104, .8);
 }
 
+function pStage(T){
+  /* the viewer and its film: a lower molar, the crest at the middle third, a vertical defect down its mesial root and the
+     furcation open between the roots; the root's thirds ruled in gold */
+  const film = `<rect x="34" y="22" width="104" height="112" rx="6" fill="#2E2533"/>` +
+    `<path d="M38 82 L52 82 L64 106 L64 82 L134 82 L134 130 L38 130 Z" fill="${C.metalShade}"/>` +
+    [46, 62, 78, 94, 110, 126].map((x, i) => `<path d="M${x} 128 Q${x + 6} ${108 + (i % 2) * 8} ${x + 2} ${90 + (i % 3) * 3}" fill="none" stroke="#6C7076" stroke-width="1.4"/>`).join("") +
+    `<path d="M66 54 C65 78 68 104 76 124 C80 122 82 104 85 90 L89 90 C92 104 94 122 98 124 C106 104 109 78 108 54 Z" fill="#D4D6D9"/>` +
+    `<path d="M85 90 L89 90 C91 98 92 104 91 108 C89 110 85 110 83 108 C82 104 83 98 85 90 Z" fill="#2E2533"/>` +
+    `<path d="M66 54 L63 36 Q64 27 73 28 Q80 33 87 29 Q94 33 101 28 Q110 27 111 36 L108 54 Z" fill="#F3F4F5"/>` +
+    `<path d="M75 40 Q87 35 99 40 L97 62 L77 62 Z" fill="#5B5F64"/>` +
+    line("M38 82 L134 82", 2.2, C.blue) +
+    line("M126 54 L126 124", 2, C.gold) + [54, 77, 101, 124].map((y) => line(`M122 ${y} L130 ${y}`, 2, C.gold)).join("");
+  /* the clipboard: four stage rows, the third ticked; the grade's tokens under it, C circled */
+  const rows = [0, 1, 2, 3].map((i) => { const y = 50 + i * 17, on = i === 2;
+    return (on ? `<rect x="190" y="${y - 7}" width="92" height="14" rx="4" fill="${T.light}"/>` : "") +
+      `<rect x="194" y="${y - 4}" width="9" height="9" rx="2" fill="${C.paper}" ${ink(1.6)}/>` +
+      line(`M210 ${y} L${i % 2 ? 258 : 270} ${y}`, 2.4, on ? T.ink : C.metalShade) +
+      (on ? line(`M195 ${y} L198 ${y + 3} L204 ${y - 5}`, 2.2, C.green) : ""); }).join("");
+  const tokens = [[206, C.green], [232, C.yellow], [258, C.red]].map(([x, f]) => `<circle cx="${x}" cy="126" r="8" fill="${f}" ${ink(2)}/>`).join("") +
+    `<circle cx="258" cy="126" r="13" fill="none" stroke="${T.ink}" stroke-width="2.6"/>`;
+  return ground(T.light) +
+    `<path d="M0 148 L320 148 L320 170 L0 170 Z" fill="${C.wood}"/>` + line("M0 148 L320 148", 3) +
+    /* the viewer on its stand */
+    `<rect x="78" y="138" width="16" height="10" fill="${C.metalShade}" ${ink(2)}/>` +
+    `<rect x="22" y="12" width="128" height="130" rx="8" fill="${C.paper}" ${ink(2.5)}/>` + film +
+    `<rect x="34" y="22" width="104" height="112" rx="6" fill="none" ${ink(2)}/>` + hi("M28 22 L28 60") +
+    /* the clipboard */
+    `<rect x="176" y="18" width="122" height="130" rx="8" fill="${C.wood}" ${ink(2.5)}/>` +
+    `<rect x="184" y="30" width="106" height="112" rx="3" fill="${C.paper}" ${ink(2)}/>` +
+    `<rect x="215" y="12" width="44" height="14" rx="4" fill="${C.metal}" ${ink(2.2)}/>` +
+    line("M194 38 L240 38", 3, T.ink) + rows + line("M194 110 L250 110", 2.2, C.metalShade) + tokens +
+    /* the pencil, laid across the board */
+    `<g transform="rotate(-32 300 120)"><rect x="262" y="114" width="52" height="9" rx="2" fill="${C.yellow}" ${ink(2)}/><path d="M262 114 L252 118.5 L262 123 Z" fill="${C.enamelShade}" ${ink(2)}/><path d="M255.5 117 L252 118.5 L255.5 120 Z" fill="${INK}"/><rect x="310" y="114" width="7" height="9" rx="2" fill="${C.pink}" ${ink(2)}/></g>` +
+    star(164, 28, .8) + star(306, 38, .7);
+}
+
 const buildPerio = (T) => ({
   board: { label: "Pocket Showdown: the game's board as a perio chart, a column per session under its colored head, molars in their gums for tiles, a probe in a pocket that bleeds, one tile answered right and a Deep Pocket star", body: pBoard(T) },
   escape: { label: "Perio Clinic Escape: the perio clinic after hours, with the panoramic viewer off, the locked charting computer, the perio chart, the typodont, the taped cassette and the door's keypad", body: pEscape(T) },
   cloze: { label: "Mind the Pocket: a page of notes with one term missing, beside a probe in a tooth's pocket", body: pCloze(T) },
   smile: { label: "Million-Dollar Smile: twelve rungs up to a smile with healthy gums and one gold tooth", body: pSmile(T) },
   cross: { label: "Cross-Section: a mini crossword beside a tooth cut in section in its bone and gum, a probe in the sulcus", body: pCross(T) },
-  crusher: { label: "Calculus Crusher: a wall of calculus bricks, one breaking, a ball and a curette for a paddle", body: pCrusher(T) }
+  crusher: { label: "Calculus Crusher: a wall of calculus bricks, one breaking, a ball and a curette for a paddle", body: pCrusher(T) },
+  stage: { label: "Stage & Grade: a molar's film on the viewer with its bone lowered, a vertical defect and the furcation open, beside the staging chart on a clipboard, one stage ticked and the worst grade circled", body: pStage(T) }
 });
 /* Sam, 2026-11-11, on the contact sheet: "the other drawings look good", Pocket Showdown's teeth "look terrible"; the board,
    redrawn as the game's own board (molars in their gums), approved the same day ("the redraw is good"). All six are in. */
 
 export const ARCADE_VIEWBOX = [0, 0, 320, 170];
 /* Occlusion's (phase 1), Heme & Endo Exam 2's and Perio's (phase 2) */
-const SETS = { occlusion: build, "heme-endo-exam2": buildHE, perio: buildPerio };
+const SETS = { occlusion: build, "heme-endo-exam2": buildHE, "heme-endo-exam3": buildHE, perio: buildPerio };   // Exam 3 reuses Exam 2's lobby (Sam, 2026-11-15)
 export function arcadeArt(hub, tint){ return SETS[hub] ? SETS[hub](tint) : null; }

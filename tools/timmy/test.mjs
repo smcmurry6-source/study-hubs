@@ -166,7 +166,7 @@ const base = { visitor: "visitor-1", hub: HUB, text: "What does this paragraph m
   const f = db.calls.finish[0];
   ok(f.p_cites_ok === 1 && f.p_cites_bad === 0 && f.p_kind === "answer" && f.p_sent === p.messages[0].content && typeof f.p_raw === "string" && JSON.parse(f.p_raw).kind === "answer",
     "timmy_finish gets the kind, the checked quotes, the exact turn sent and the model's own text");
-  ok(Math.abs(f.p_cost - (1200 * 4 + 300 * 20 + 76000 * 0.2) / 1e6) < 1e-9, `the cost estimate (${f.p_cost})`);
+  { const P = T.PRICES[T.MODEL]; ok(Math.abs(f.p_cost - (1200 * P.in + 300 * P.out + 76000 * P.read) / 1e6) < 1e-9, `the cost estimate at ${T.MODEL}'s prices (${f.p_cost})`); }
   eq(db.calls.begin[0].p_context.view, "compendium/notes", "the context saved with the question");
   ok(!JSON.stringify(db.calls.begin[0].p_context).includes(base.text), "the saved context doesn't repeat the question's words");
 }
@@ -305,6 +305,65 @@ ok(!T.quoteIn("Final: 2026", "Final: 2026-11-19") && !T.quoteIn("Final", "Final:
     - (1000 * 4 + 500 * 20 + 78000 * 8 + 2000 * 5) / 1e6) < 1e-9, "cache writes: 2x for an hour, 1.25x for 5 minutes");
   ok(T.estimateCost({ input_tokens: 1e6 }, "claude-unknown") === 5, "an unknown model is priced like the dearer fallback");
 }
+// "Not in your notes": a gap is looked up, and kept only when every source it cites is on the list
+{
+  const first = { id: "msg_1", model: T.MODEL, stop_reason: "end_turn", content: [{ type: "text", text: JSON.stringify(answer([{ text: "The notes don't cover exostoses.", cites: [] }], { kind: "not_covered", closest: "L2" })) }],
+    usage: { input_tokens: 1200, output_tokens: 300, cache_read_input_tokens: 76000, cache_creation_input_tokens: 0 } };
+  const looked = (cites, o) => Object.assign({ id: "msg_2", model: T.MODEL, stop_reason: "end_turn", content: [
+    ...(o && o.pre ? [{ type: "text", text: "Let me look that up." }] : []),
+    { type: "server_tool_use", id: "srv_1", name: "web_search", input: { query: "exostosis oral" } },
+    { type: "web_search_tool_result", tool_use_id: "srv_1", content: [{ type: "web_search_result", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC1/", title: "Oral exostoses", encrypted_content: "x" }] },
+    { type: "text", text: "An exostosis is a benign bony outgrowth.", citations: cites },
+    { type: "text", text: " It ties to **L2**." }],
+    usage: { input_tokens: 14000, output_tokens: 240, server_tool_use: { web_search_requests: 1 } } }, o && o.msg);
+  const onList = [{ type: "web_search_result_location", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC1/", title: "Oral exostoses: a review", cited_text: "benign bony outgrowth" },
+    { type: "web_search_result_location", url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC1/", title: "Oral exostoses: a review", cited_text: "again" }];
+  const two = second => { const calls = []; const fn = async (params, opts) => { calls.push({ params, opts }); if (calls.length === 1) return first; if (second instanceof Error) throw second; return second; }; fn.calls = calls; return fn; };
+  const hist = [{ who: "student", text: "what is a torus?" }, { who: "timmy", text: "Covered in L2." }];
+
+  let m = two(looked(onList)), db = fakeDb({ history: hist });
+  let out = await T.handle(Object.assign({}, base, { text: "what is an exostosis?" }), deps(m, db));
+  const gp = m.calls[1] && m.calls[1].params;
+  ok(m.calls.length === 2 && gp.tools.length === 1 && gp.tools[0].type === "web_search_20250305" && gp.tools[0].max_uses === 2 && JSON.stringify(gp.tools[0].allowed_domains) === JSON.stringify(T.GAP_DOMAINS),
+    "not covered: a second call, with the basic web search on the listed sites, two searches at most");
+  ok(gp.system === T.GAP_RULES && !(gp.output_config && gp.output_config.format) && gp.output_config.effort === "low" && !gp.cache_control && m.calls[1].opts.timeout === T.GAP_TIMEOUT,
+    "the lookup: its own short rules, plain text (citations don't mix with structured output), low effort, its own timeout");
+  const gt = gp.messages[0].content;
+  ok(gt.includes("<question>what is an exostosis?</question>") && gt.includes("Student: what is a torus?") && gt.includes(C.lectures[1].title) && !JSON.stringify(gp).includes("visitor-1") && !gt.includes(T.clean(realUnit.text)),
+    "the lookup is sent the question, the last few messages and the closest lecture: no visitor id, no notes");
+  eq([out.body.kind, out.body.gap && out.body.gap.text, out.body.gap && out.body.gap.sources], ["not_covered", "An exostosis is a benign bony outgrowth. It ties to L2.",
+    [{ url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC1/", title: "Oral exostoses: a review", site: "NIH" }]], "the looked-up answer: its text (no markdown) and each source once, with its site");
+  const f = db.calls.finish[0], c1 = T.estimateCost(first.usage, T.MODEL);
+  ok(Math.abs(f.p_cost - (c1 + (14000 * 2 + 240 * 10) / 1e6 + T.SEARCH_USD)) < 1e-6 && f.p_input === 15200 && f.p_output === 540 && /Not in your notes \(looked up\): An exostosis/.test(f.p_text) && f.p_kind === "not_covered",
+    "both calls are logged: the summed tokens, the search's cost, the looked-up text with the answer");
+
+  out = await T.handle(base, deps(two(looked(onList, { pre: true })), fakeDb()));
+  ok(out.body.gap && !/look that up/.test(out.body.gap.text), "words written before the search are left out");
+  for (const [what, second] of [
+    ["a source off the list", looked([onList[0], { type: "web_search_result_location", url: "https://www.medrxiv.org/x", title: "Preprint", cited_text: "x" }])],
+    ["a plain-http source", looked([{ type: "web_search_result_location", url: "http://pmc.ncbi.nlm.nih.gov/x", title: "t", cited_text: "x" }])],
+    ["a look-alike host", looked([{ type: "web_search_result_location", url: "https://nih.gov.example.com/x", title: "t", cited_text: "x" }])],
+    ["no citations", looked([])],
+    ["NONE", looked(onList, { msg: { content: [{ type: "server_tool_use", id: "s", name: "web_search", input: {} }, { type: "web_search_tool_result", tool_use_id: "s", content: [] }, { type: "text", text: "NONE" }] } })],
+    ["no search", looked(onList, { msg: { content: [{ type: "text", text: "NONE" }] } })],
+    ["cut off", looked(onList, { msg: { stop_reason: "max_tokens" } })],
+    ["the API down", Object.assign(new Error("overloaded"), { status: 529 })]]) {
+    db = fakeDb();
+    out = await T.handle(base, deps(two(second), db));
+    ok(out.body.kind === "not_covered" && out.body.gap === null && out.body.closest && !/looked up/.test(db.calls.finish[0].p_text), `${what}: the "not covered" answer goes alone`);
+  }
+  m = two(looked(onList));
+  out = await T.handle(base, deps(m, fakeDb(), { lookup: false }));
+  ok(m.calls.length === 1 && out.body.gap === null, "TIMMY_LOOKUP=off: no lookup");
+  m = fakeModel(answer([{ text: "It means the thing.", cites: [{ id: realUnit.id, quote: realQuote }] }]));
+  await T.handle(base, deps(m, fakeDb()));
+  eq(m.calls.length, 1, "an answer from the notes is never looked up");
+  for (const [u, site] of [["https://pmc.ncbi.nlm.nih.gov/a", "NIH"], ["https://medlineplus.gov/ency/article/1.htm", "MedlinePlus"], ["https://www.ada.org/x", "ADA"],
+    ["https://evilnih.gov/x", null], ["https://nih.gov.evil.example/x", null], ["http://nih.gov/x", null], ["https://user@nih.gov/x", null], ["https://nih.gov:8443/x", null], ["javascript:alert(1)", null], ["", null]])
+    eq(T.gapSite(u), site, `a source's site: ${u || "(empty)"}`);
+  ok(Math.abs(T.estimateCost({ input_tokens: 0, server_tool_use: { web_search_requests: 2 } }, T.MODEL) - 0.02) < 1e-9, "each web search costs a cent");
+  ok(T.GAP_RULES.includes("NONE") && T.GAP_DOMAINS.every(d => T.GAP_RULES.includes(d)), "the lookup's rules name every listed site and the way out (NONE)");
+}
 // HTTP
 {
   const d = deps(fakeModel(answer([{ text: "hi", cites: [] }])), fakeDb());
@@ -325,9 +384,20 @@ ok(!T.quoteIn("Final: 2026", "Final: 2026-11-19") && !T.quoteIn("Final", "Final:
   const j = await r.json();
   ok(r.status === 200 && j.ok && j.paragraphs[0].text === "hi" && r.headers.get("access-control-allow-origin") === "https://smcmurry6-source.github.io", "a question from the site is answered with CORS");
 }
-notes.push("one turn with a fake model and database: the request, quotes, offers, go, Ask Timmy, the dashboard, history, naps, errors, cost, HTTP");
+notes.push("one turn with a fake model and database: the request, quotes, offers, go, Ask Timmy, the dashboard, history, naps, errors, cost, a gap looked up, HTTP");
 
 notes.forEach(n => console.log("  " + n));
+/* the wording the student saw (a hub's variants.json): swapped in by its number, the original when it's missing */
+{
+  const q = { id: "x1", type: "mcq", stem: "Original?", choices: ["A", "B"], answer: 0, why: ["a", "b"], ex: "E" };
+  const V = { x1: { stem: "Reworded?", choices: ["A2", "B2"], why: ["a2", "b2"] } };
+  eq(T.wordingOf(q, V, 1).stem, "Reworded?", "wordingOf: wording 1 is the file's first");
+  eq(T.wordingOf(q, V, 1).choices, ["A2", "B2"], "wordingOf: its choices, in the same order");
+  eq(T.wordingOf(q, V, 1).answer, 0, "wordingOf: the key stays the original's");
+  eq(T.wordingOf(q, V, 2).stem, "Original?", "wordingOf: a wording the file doesn't have is the original");
+  eq(T.wordingOf(q, null, 1).stem, "Original?", "wordingOf: no file, the original");
+  eq(T.wordingOf(q, { x1: { stem: "R", choices: ["only one"] } }, 1).choices, ["A", "B"], "wordingOf: choices of another length are ignored");
+}
 console.log(`  ${checks} checks`);
 if (problems.length) { console.error(`\n✗ Ask Timmy's function: ${problems.length} problem(s):\n` + problems.map(p => "  - " + p).join("\n")); process.exit(1); }
 console.log(pw ? "\n✓ Ask Timmy's function (core.js with a fake model and database) passed" : "\n✓ Ask Timmy's function passed (paragraph addresses against Chromium blocked: no Playwright)");

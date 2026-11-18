@@ -13,7 +13,7 @@
 //   - a replayed call, a double tap and a linked device pay once, and the rebuild gives exactly what the live calls paid;
 //   - Shiny Gold Crowns (from base XP, the grants since the switch, minus spending), the shop's rotation and seasons,
 //     buy_item (a double tap, a replayed call, a balance too low, not on sale today, owned, one snack a day, boosts that
-//     extend), equip_item, snack HP in Timmy's days, rare-costume sightings; the preview's purchases (buyCore) answer as
+//     extend or wait for a medal's to end), equip_item, snack HP in Timmy's days, rare-costume sightings; the preview's purchases (buyCore) answer as
 //     sh_buy does, and the rare costume of the day (widget/hub-timmy.js, widget/dash.js) never lands on a holiday or fall day;
 //   - the idea board: names, limits, votes, reports, statuses with Inbox notes, an author's delete that removes the idea
 //     completely, starter ideas, no visitor ids;
@@ -156,7 +156,77 @@ try {
   eq(ans('xp-O', omu.id, { hub: 'occlusion', picks: omu.correct.slice().reverse(), at: 10 }).correct, true, 'an Occlusion select-all answered right in any order');
   eq(ans('xp-O', os.id, { hub: 'occlusion', picks: os.steps.map((s, i) => i), at: 20 }).correct, true, 'an Occlusion sequence in its right order');
   eq(ans('xp-O', os.id, { hub: 'occlusion', picks: os.steps.map((s, i) => i).reverse(), at: 30 }).correct, false, 'an Occlusion sequence out of order');
-  notes.push(`keys: ${loaded.loaded} Occlusion keys from tools/xp/keys.js, versions, retired ids`);
+  // a matching item is graded like an order (v64): each row's first pick, row k's own being k
+  const omt = oq.find(x => x.type === 'match');
+  eq(occ.find(k => k.id === omt.id).kind, 'order', 'tools/xp/keys.js lists a matching item as an order');
+  const rowsRight = omt.pairs.map((p, i) => i), rowsWrong = rowsRight.map((v, i) => i === 0 ? 1 : i === 1 ? 0 : v);
+  eq(ans('xp-O', omt.id, { hub: 'occlusion', picks: rowsRight, at: 40 }).xp, 10, 'an Occlusion matching item with every row right: 10 XP, not a self-graded 2');
+  const mWrong = ans('xp-O2', omt.id, { hub: 'occlusion', picks: rowsWrong, claim: true, at: 0 });
+  ok(mWrong.correct === false && mWrong.xp === 1, `a matching item with two rows swapped is wrong, whatever the page claims (${JSON.stringify(mWrong)})`);
+  const mOld = ans('xp-O3', omt.id, { hub: 'occlusion', self: true, claim: true, at: 0 });
+  ok(mOld.correct === true && mOld.kind === 'self' && mOld.xp === 2, `a page cached before v64 (no rows sent) is taken at its word and paid as self graded (${JSON.stringify(mOld)})`);
+  notes.push(`keys: ${loaded.loaded} Occlusion keys from tools/xp/keys.js, versions, retired ids, matching graded by its rows`);
+
+  /* ---------- 3b. the class's picks follow the version of the choices (migration_v66) ---------- */
+  const picksOf = (hub, qid) => rows(`select choice, picks, v from question_choices where hub = ${q(hub)} and qid = ${q(qid)} order by choice`).map(r => [r.choice, r.picks, r.v]);
+  const pastOf = (hub, qid) => rows(`select v, choice, picks from question_choices_past where hub = ${q(hub)} and qid = ${q(qid)} order by v, choice`).map(r => [r.v, r.choice, r.picks]);
+  const loadXc = list => anonJson(`admin_load_question_keys(${S}, 'xc', ${q(JSON.stringify(list))}::jsonb)`);
+  // picks counted before versions existed: c1 and c5 as the old pages counted them, c3's set aside as migration_v66 does
+  sql(`insert into question_choices (hub, qid, choice, picks) values ('xc', 'c1', 0, 4), ('xc', 'c1', 1, 6), ('xc', 'c3', 2, 5), ('xc', 'c5', 0, 3), ('xc', 'c5', 2, 2);
+       update question_choices set v = 'before' where hub = 'xc' and qid = 'c3';`);
+  eq(picksOf('xc', 'c1'), [[0, 4, ''], [1, 6, '']], 'picks counted before versions have none');
+  // keys loaded without a version (a keys.js before this change): nothing moves, a pick counts as it always did
+  loadXc([{ id: 'c1', v: 'f1', kind: 'one', answer: [1] }]);
+  ans('xp-CP', 'c1', { hub: 'xc', choice: 0, at: 0 });
+  eq(picksOf('xc', 'c1'), [[0, 5, ''], [1, 6, '']], 'without a version a pick counts as before');
+  const first = loadXc([{ id: 'c1', v: 'f1', kind: 'one', answer: [1], cv: 'a1' }, { id: 'c3', v: 'f3', kind: 'one', answer: [0], cv: 'c1' },
+    { id: 'c4', v: 'f4', kind: 'one', answer: [2], cv: 'd1' }, { id: 'c5', v: 'f5', kind: 'all', answer: [0, 2], cv: 'e1' },
+    { id: 'c6', v: 'f6', kind: 'order', answer: [0, 1], cv: 'zz' }]);
+  eq(picksOf('xc', 'c1'), [[0, 5, 'a1'], [1, 6, 'a1']], 'the first version a question gets takes the picks counted before it');
+  eq([picksOf('xc', 'c3'), pastOf('xc', 'c3')], [[], [['before', 2, 5]]], 'picks set aside by the migration move out when its keys load, kept in question_choices_past');
+  eq(first.picks_restarted, 1, `the loader says how many questions' picks start again (${JSON.stringify(first)})`);
+  eq(one(`select (cv = '')::text from question_keys where hub = 'xc' and qid = 'c6' and is_current`), 'true', 'only one-choice and select-all questions have a choice version');
+  ans('xp-CP', 'c1', { hub: 'xc', choice: 1, v: 'f1', at: 10 });
+  ans('xp-CP', 'c5', { hub: 'xc', picks: [0, 1], at: 20 });
+  ans('xp-CP', 'c4', { hub: 'xc', choice: 2, at: 30 });
+  eq([picksOf('xc', 'c1'), picksOf('xc', 'c5'), picksOf('xc', 'c4')],
+    [[[0, 5, 'a1'], [1, 7, 'a1']], [[0, 4, 'e1'], [1, 1, 'e1'], [2, 2, 'e1']], [[2, 1, 'd1']]], 'answers through sh_answer stamp their picks with the current version (one choice, select all, a new question)');
+  // an edit to the choices: the old version's picks move out and the new one starts from nothing
+  const edit = loadXc([{ id: 'c1', v: 'f1b', kind: 'one', answer: [0], cv: 'a2' }]);
+  eq([picksOf('xc', 'c1'), pastOf('xc', 'c1'), edit.picks_restarted], [[], [['a1', 0, 5], ['a1', 1, 7]], 1], 'new choices: the old picks move to question_choices_past');
+  ans('xp-CP2', 'c1', { hub: 'xc', choice: 0, v: 'f1b', at: 0 });
+  eq(picksOf('xc', 'c1'), [[0, 1, 'a2']], 'the new choices count from their first pick');
+  // reloading the same keys moves nothing; a reload from an older keys.js (no cv) keeps the version
+  eq(loadXc([{ id: 'c1', v: 'f1b', kind: 'one', answer: [0], cv: 'a2' }]).picks_restarted, 0, 'the same keys again: nothing moves');
+  loadXc([{ id: 'c1', v: 'f1b', kind: 'one', answer: [0] }]);
+  eq([one(`select cv from question_keys where hub = 'xc' and qid = 'c1' and is_current`), picksOf('xc', 'c1')], ['a2', [[0, 1, 'a2']]], 'a key loaded again without a version keeps its version and its picks');
+  // the edit undone: its picks come back, the other version's go out
+  loadXc([{ id: 'c1', v: 'f1', kind: 'one', answer: [1], cv: 'a1' }]);
+  eq([picksOf('xc', 'c1'), pastOf('xc', 'c1')], [[[0, 5, 'a1'], [1, 7, 'a1']], [['a2', 0, 1]]], 'an edit undone: the old picks come back, the other version\'s are kept');
+  // the backstop: picks of another version still in the table (a key changed outside the loader) move at the next pick
+  sql(`update question_keys set cv = 'a3' where hub = 'xc' and qid = 'c1' and is_current`);
+  anon(`select record_choice('xc', 'c1', 3)`);
+  eq(picksOf('xc', 'c1'), [[3, 1, 'a3']], 'record_choice moves another version\'s picks before it counts its own');
+  ok(num(`select coalesce(sum(picks), 0) from question_choices_past where hub = 'xc' and qid = 'c1' and v = 'a1'`) === 12, 'and keeps them');
+  // a hub without keys (an old single-file page): no versions, as before
+  anon(`select record_choice('xold', 'o1', 2); select record_choice('xold', 'o1', 2); select record_choices('xold', 'o2', array[0, 3])`);
+  eq([picksOf('xold', 'o1'), picksOf('xold', 'o2')], [[[2, 2, '']], [[0, 1, ''], [3, 1, '']]], 'an old page\'s picks count as before');
+  // the past and the helpers are closed to the public; the current picks stay open, as the cards read them
+  raises(() => anon(`select * from question_choices_past`), '42501', 'anon can\'t read question_choices_past');
+  raises(() => anon(`select sh_choices_to('xc', 'c1', 'zz')`), '42501', 'anon can\'t move a question\'s picks');
+  raises(() => anon(`select sh_choice_version('xc', 'c1')`), '42501', 'anon can\'t run sh_choice_version');
+  ok(anon(`select count(*) from question_choices where hub = 'xc'`)[0][0] > 0, 'anon still reads question_choices');
+  raises(() => loadXc([{ id: 'c1', v: 'f1', kind: 'one', answer: [1], cv: 'Bad One' }]), null, 'a bad choice version is refused');
+  // tools/xp/keys.js: the version changes with a choice, the order or the key, and not with the stem or the explanation
+  const base = { id: 't', type: 'mcq', stem: 'S', choices: ['a', 'b', 'c'], answer: 1, ex: 'E', why: ['x', 'y', 'z'] }, CV = KEYS.choiceVersion;
+  ok(CV(base) && CV(base) === CV({ ...base, stem: 'S2', ex: 'E2', why: ['p', 'q', 'r'] }), 'keys.js: a new stem, explanation or why keeps the version');
+  ok(new Set([CV(base), CV({ ...base, choices: ['a', 'b', 'd'] }), CV({ ...base, choices: ['b', 'a', 'c'], answer: 0 }), CV({ ...base, answer: 2 })]).size === 4,
+    'keys.js: a new choice, a new order or a new key changes the version');
+  ok(CV({ ...base, type: 'multi', correct: [2, 0] }) === CV({ ...base, type: 'multi', correct: [0, 2] }) && CV({ id: 's', type: 'sequence', steps: ['a', 'b'] }) === '',
+    'keys.js: a select-all\'s version doesn\'t depend on the order of its key; other kinds have none');
+  ok(occ.filter(k => k.kind === 'one' || k.kind === 'all').every(k => /^[a-z0-9]{1,40}$/.test(k.cv)) && occ.filter(k => k.kind === 'order' || k.kind === 'self').every(k => !k.cv),
+    'keys.js gives every Occlusion one-choice and select-all key a version, and no other');
+  notes.push('class picks: stamped with the version of the choices, moved out (and back) when it changes, set aside from before versions, closed past');
 
   /* ---------- 4. answers, the per-question limit and the speed limit ---------- */
   const seq = [];
@@ -261,6 +331,31 @@ try {
   anon(`select record_achievement('xp-D2', 'mastery-bronze', 'xm')`);
   const d2 = []; for (let i = 1; i <= 5; i++) d2.push(ans('xp-D2', 'm' + i, { hub: 'xm', choice: 0, at: 1000 + i * 10 }));
   ok(d2[4].medal && d2[4].medal.xp === 100, 'a Bronze recorded by today\'s page after the switch is paid when it\'s reached');
+  // a medal won during a shop boost: the boost's unused time moves after the medal's 24 hours (migration_v63)
+  sql(`insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at) values ('xp-DB', 'shop:t1', 'shop', 2, ${T(1990)}, ${T(1990 + 3600)})`);
+  const mb1 = []; for (let i = 1; i <= 5; i++) mb1.push(ans('xp-DB', 'm' + i, { hub: 'xm', choice: 0, at: 2000 + i * 10 }));
+  const mbM = mb1[4].medal, left = 3600 - 60;   // the boost ran 60 of its 3,600 seconds before the Bronze at 2050
+  const since = (t, from) => num(`select extract(epoch from (${q(t)}::timestamptz - ${T(from)}))::int`);
+  ok(mb1[0].mult === 2 && mbM && mbM.kind === 'mastery-bronze' && since(mbM.boost_until, 2050) === 86400 + left,
+    `a medal during a shop boost: double XP lasts 24 hours and the boost's ${left} unused seconds (${JSON.stringify(mbM)})`);
+  eq(rows(`select extract(epoch from starts_at - ${T(0)})::int || '-' || extract(epoch from ends_at - ${T(0)})::int as span from xp_boosts where visitor_id = 'xp-DB' and src = 'shop' order by starts_at`).map(r => r.span),
+    ['1990-2050', `${2050 + 86400}-${2050 + 86400 + left}`], 'the boost keeps the part it ran and its rest starts as the medal\'s 24 hours end');
+  eq([2050 + 86400 - 5, 2050 + 86400 + 100, 2050 + 86400 + left + 5].map(t => num(`select sh_xp_mult('xp-DB', ${T(t)})`)), [2, 2, 1], 'double XP through the medal\'s hours and then the boost\'s rest, then over');
+  ok(Date.parse(json(`sh_boost_json('xp-DB', ${T(3000)})`).until) === Date.parse(mbM.boost_until), 'the running boost\'s "until" runs on through the moved boost');
+  const mb2 = []; for (let i = 6; i <= 8; i++) mb2.push(ans('xp-DB', 'm' + i, { hub: 'xm', choice: 0, at: 2100 + i * 10 }));
+  ok(mb2[2].medal && mb2[2].medal.kind === 'mastery-silver' && num(`select count(*) from xp_boosts where visitor_id = 'xp-DB' and src = 'shop' and ends_at > ${T(2180)}`) === 1
+    && num(`select extract(epoch from ends_at - starts_at)::int from xp_boosts where visitor_id = 'xp-DB' and src = 'shop' and ends_at > ${T(2180)}`) === left
+    && num(`select extract(epoch from min(starts_at) - ${T(2180)})::int from xp_boosts where visitor_id = 'xp-DB' and src = 'shop' and ends_at > ${T(2180)}`) === 86400,
+    'a second medal moves the waiting boost again, whole, after its own 24 hours');
+  const mbN = []; for (let i = 1; i <= 5; i++) mbN.push(ans('xp-DN', 'm' + i, { hub: 'xm', choice: 0, at: 3000 + i * 10 }));
+  ok(mbN[4].medal && since(mbN[4].medal.boost_until, 3050) === 86400
+    && num(`select count(*) from xp_boosts where visitor_id = 'xp-DN' and src = 'shop'`) === 0, 'a medal with no shop boost: 24 hours, as before');
+  // the bowling egg's secret trophy (migration_v63)
+  award('xp-BW', 'rep:flag:9034', 100);
+  const bw1 = anon(`select record_achievement('xp-BW', 'bowling', '')`)[0][0], bw2 = anon(`select record_achievement('xp-BW', 'bowling', '')`)[0][0];
+  ok(bw1 === 't' && bw2 === 'f' && json(`sh_wallet('xp-BW')`).trophies === 1, `the Bowling trophy is recorded once and pays 25 crowns as a trophy (${bw1}, ${bw2})`);
+  ok(rows(`select n from get_trophy_stats() where kind = 'bowling'`).length === 1, 'and it has a share of the class');
+  eq(anon(`select record_achievement('xp-BW', 'no-such-trophy', '')`)[0][0], 'f', 'a kind not on the list is still refused');
   // Timmy Time
   anon(`select admin_set_podcast_episode(${S}, 'xh', 'ep1', 600)`);
   raises(() => anon(`select admin_set_podcast_episode('wrong', 'xh', 'ep1', 600)`), '28000', 'setting an episode with a wrong secret');
@@ -285,6 +380,9 @@ try {
   const a4 = one(`select sh_session_start(${T(110)}, 'xp-Q', 'xh', 'arcade', 'cloze')`);
   eq(json(`sh_session_finish(${T(150)}, 'xp-Q', ${q(a4)}::uuid, 500, null)`).xp, 50, 'another game that day: +50');
   ok(!one(`select sh_session_start(${T(0)}, 'xp-Q', 'xh', 'arcade', 'not-a-game')`), 'an unknown game gets no session');
+  const a5 = one(`select sh_session_start(${T(160)}, 'xp-Q', 'xh', 'arcade', 'stage')`);
+  ok(!!a5 && json(`sh_session_finish(${T(200)}, 'xp-Q', ${q(a5)}::uuid, 24, null)`).xp === 50 && num(`select count(*) from arcade_scores where visitor_id = 'xp-Q' and game = 'stage'`) === 1,
+    'Perio\'s Stage & Grade (v64) gets a session, its +50 and its score on the board');
   ok(num(`select count(*) from arcade_scores where visitor_id = 'xp-Q'`) >= 2, 'a finished game posts its score');
   ok(anonJson(`xp_session_finish('xp-Q', (select xp_session_start('xp-Q', 'xh', 'arcade', 'escape')))`).ok === true, 'xp_session_start and xp_session_finish as a visitor');
   // a fixed report, paid to the sender's linked id
@@ -420,6 +518,23 @@ try {
     && num(`select count(*) from xp_boosts where visitor_id = 'xp-B' and src = 'shop'`) === 1, 'a second boost extends the first instead of stacking');
   sql(`insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at) values ('xp-B', 'mb:xh:1', 'medal', 2, now() - interval '1 minute', now() + interval '1 day')`);
   eq([num(`select count(*) from xp_boosts where visitor_id = 'xp-B' and starts_at < now() and ends_at > now()`), num(`select sh_xp_mult('xp-B', now())`)], [2, 2], 'a shop boost and a medal boost together: still 2x');
+  // a boost bought during a medal's 24 hours waits for them to end, and the next one extends it (migration_v62)
+  eq(['boost-1h', 'boost-3h'].map(id => one(`select rarity || ' ' || price from shop_items where id = ${q(id)}`)), ['common 150', 'uncommon 400'], 'the boosts cost 150 and 400 crowns');
+  award('xp-Q', 'rep:flag:9032', 6000);
+  sql(`insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at) values ('xp-Q', 'mb:xh:1', 'medal', 2, now() - interval '1 hour', now() + interval '23 hours')`);
+  const mEnd = q(one(`select ends_at from xp_boosts where visitor_id = 'xp-Q' and src = 'medal'`)) + '::timestamptz';
+  const qb1 = buy('xp-Q', 'boost-1h', 'buy-q-0000001');
+  ok(qb1.ok && num(`select extract(epoch from (${q(qb1.boost_until)}::timestamptz - ${mEnd}))`) === 3600
+    && num(`select count(*) from xp_boosts where visitor_id = 'xp-Q' and src = 'shop' and starts_at = ${mEnd}`) === 1, `a boost bought during a medal's 24 hours starts when they end (${JSON.stringify(qb1)})`);
+  eq([`now() + interval '1 hour'`, `${mEnd} + interval '30 minutes'`, `${mEnd} + interval '61 minutes'`].map(t => num(`select sh_xp_mult('xp-Q', ${t})`)), [2, 2, 1],
+    'double XP through the medal\'s hours, then the boost\'s hour, then over');
+  const qb2 = buy('xp-Q', 'boost-3h', 'buy-q-0000002');
+  ok(qb2.ok && num(`select extract(epoch from (${q(qb2.boost_until)}::timestamptz - ${mEnd}))`) === 4 * 3600
+    && num(`select count(*) from xp_boosts where visitor_id = 'xp-Q' and src = 'shop'`) === 1, 'a second boost extends the one waiting');
+  const qbj = json(`sh_boost_json('xp-Q', now())`);
+  ok(qbj && qbj.mult === 2 && qbj.src === 'medal' && Date.parse(qbj.until) === Date.parse(qb2.boost_until), `the running boost's "until" runs on through the waiting one (${JSON.stringify(qbj)})`);
+  const qbs = json(`get_my_shop('xp-Q')`);
+  ok(qbs.boost && Date.parse(qbs.boost.until) === Date.parse(qb2.boost_until) && qbs.wallet.spent === 550, `the shop's boost and wallet (${JSON.stringify([qbs.boost, qbs.wallet.spent])})`);
   // equip
   sql(`insert into pet_inventory (visitor_id, item_id) values ('xp-B', 'garden'), ('xp-B', 'castle'), ('xp-B', 'porch'), ('xp-B', 'bowling-lane'), ('xp-B', 'mailbox') on conflict do nothing`);
   eq(anonJson(`equip_item('xp-B', 'outfit', 'white-coat')`).error, 'not-owned', 'equipping something not owned');
@@ -578,13 +693,20 @@ try {
   // the catalog is exactly tools/figures/site/sets.mjs (an ES module, and this file is CommonJS: read it in a child process)
   const setsUrl = require('url').pathToFileURL(path.join(ROOT, 'tools/figures/site/sets.mjs')).href;
   const SETS = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e',
-    `import { SEASONS, RANKS, allSetItems } from ${JSON.stringify(setsUrl)}; process.stdout.write(JSON.stringify({ seasons: SEASONS.map(s => s.k), gifts: SEASONS.filter(s => s.gift).map(s => s.k), ranks: RANKS.map(r => r.gtier), items: allSetItems() }));`], { encoding: 'utf8' }));
+    `import { SEASONS, RANKS, COLLECTIONS, COSTUMES, allSetItems, allCollectionItems } from ${JSON.stringify(setsUrl)}; process.stdout.write(JSON.stringify({ seasons: SEASONS.map(s => s.k), gifts: SEASONS.filter(s => s.gift).map(s => s.k), ranks: RANKS.map(r => r.gtier), items: allSetItems(), colls: COLLECTIONS.map(c => c.k), coll: allCollectionItems(), costumes: COSTUMES.map(c => ({ id: c[0], name: c[1], rarity: c[2], price: c[3] })) }));`], { encoding: 'utf8' }));
   const byId = a => Object.fromEntries(a.map(r => [r.id, JSON.stringify(r)]));
   const wantSets = byId(SETS.items.map(i => ({ id: i.id, name: i.n, kind: i.kind, rarity: i.rarity, price: i.price, season: i.season || null, gift: !!i.gift, rank_tier: i.rank == null ? null : i.rank })));
   const gotSets = byId(rows(`select id, name, kind, rarity, price, season, gift, rank_tier from shop_items where season is not null or gift or rank_tier is not null`));
   const setDiff = [...new Set([...Object.keys(wantSets), ...Object.keys(gotSets)])].filter(id => wantSets[id] !== gotSets[id]).sort();
   ok(setDiff.length === 0 && SETS.items.length === 124, `the catalog's seasonal and rank rows are exactly allSetItems() of tools/figures/site/sets.mjs (${SETS.items.length} items; ${setDiff.length} differ${setDiff.length ? ': ' + setDiff.slice(0, 5).map(id => `${id} ${gotSets[id] || 'missing'} vs ${wantSets[id] || 'not in sets.mjs'}`).join('; ') : ''})`);
-  eq(num(`select count(*) from shop_items where id <> 'lab-goggles'`), 57 + SETS.items.length, 'the catalog has 181 rows: 57 everyday ones (the rotation, the always-shelf, the rare costumes), 112 seasonal and 12 rank');
+  // the year-round collections (migration_v65; Sam, 2026-11-18: "Go crazy"): exactly allCollectionItems(), every one in
+  // the everyday rotation (season null, rotates), none a gift or a rank piece; and the ten rare costumes, as COSTUMES says
+  const wantColl = byId(SETS.coll.map(i => ({ id: i.id, name: i.n, kind: i.kind, rarity: i.rarity, price: i.price, season: null, gift: false, rank_tier: null, rotates: true, shelf: false })));
+  const gotColl = byId(rows(`select id, name, kind, rarity, price, season, gift, rank_tier, rotates, shelf from shop_items where id in (${SETS.coll.map(i => "'" + i.id + "'").join(', ')})`));
+  const collDiff = Object.keys(wantColl).filter(id => wantColl[id] !== gotColl[id]).sort();
+  ok(collDiff.length === 0 && SETS.coll.length === 48 && SETS.colls.length === 6, `the catalog's collection rows are exactly allCollectionItems() of sets.mjs, all in the rotation (${SETS.coll.length} items in ${SETS.colls.length} collections; ${collDiff.length} differ${collDiff.length ? ': ' + collDiff.slice(0, 5).map(id => `${id} ${gotColl[id] || 'missing'} vs ${wantColl[id]}`).join('; ') : ''})`);
+  eq(rows(`select id, name, rarity, price from shop_items where kind = 'costume' order by id`), SETS.costumes.slice().sort((a, b) => a.id < b.id ? -1 : 1), 'the catalog\'s rare costumes are exactly COSTUMES of sets.mjs (ten, with their names, rarities and prices)');
+  eq(num(`select count(*) from shop_items where id <> 'lab-goggles'`), 68 + SETS.coll.length + SETS.items.length, 'the catalog has 240 rows: 68 everyday ones (the rotation, the always-shelf, the ten rare costumes), 48 in the six collections, 112 seasonal and 12 rank');
   const perSeason = rows(`select season, count(*)::int as n, count(*) filter (where kind = 'home' and rarity = 'legendary')::int as h, count(*) filter (where kind = 'scene' and rarity = 'legendary')::int as s,
       string_agg(rarity, ',' order by price) filter (where kind = 'outfit') as o, string_agg(rarity, ',' order by price) filter (where kind = 'yard') as y, bool_or(rotates or shelf) as r, bool_and(gift) as g
     from shop_items where season is not null group by 1 order by 1`);
@@ -609,7 +731,7 @@ try {
   // the rare costumes: each catalog row of kind costume is a kit outfit marked as a costume, with its three lines, and
   // the kit marks no other outfit as one
   const costumeRows = rows(`select id, rarity, price from shop_items where kind = 'costume' order by id`), kitOutfit = Object.fromEntries(KIT.OUTFITS.filter(o => o.id).map(o => [o.id, o]));
-  eq(costumeRows.map(r => r.id), ['astronaut', 'captain-enamel', 'chef', 'detective', 'pirate'], 'the catalog has the five rare costumes');
+  eq(costumeRows.map(r => r.id), SETS.costumes.map(c => c.id).sort(), 'the catalog has the ten rare costumes');
   eq(costumeRows.filter(r => { const o = kitOutfit[r.id]; return !(o && o.costume && Array.isArray(o.say) && o.say.length === 3 && o.say.every(t => t && typeof t === 'string')); }).map(r => r.id), [], 'every rare costume is drawn, marked as a costume, and has its three lines');
   eq(KIT.OUTFITS.filter(o => o.costume).map(o => o.id).sort(), costumeRows.map(r => r.id), 'the kit marks only the catalog\'s costumes as costumes');
   // what the kit says an outfit or costume costs is what the catalog charges (the ten of the shop's art session)
@@ -780,7 +902,7 @@ try {
   {
   // the preview answers buy_item with buyCore (tools/preview/runtime/preview.js): one list of purchases through it and
   // through sh_buy gives the same answers, in the server's order of checks (the preview's world is read from the server
-  // before each call: what's on sale that day, what's owned, the balance, a running shop boost)
+  // before each call: what's on sale that day, what's owned, the balance, the end of the boosts running or waiting)
   const grabIn = (src, name) => { const i = src.indexOf('function ' + name + '('); if (i < 0) return ''; let k = src.indexOf('{', i), depth = 0; for (; k < src.length; k++) { if (src[k] === '{') depth++; else if (src[k] === '}' && --depth === 0) break; } return src.slice(i, k + 1); };
   const prevSrc = fs.readFileSync(path.join(ROOT, 'tools/preview/runtime/preview.js'), 'utf8');
   ok(!!grabIn(prevSrc, 'buyCore'), 'tools/preview/runtime/preview.js has buyCore');
@@ -788,10 +910,10 @@ try {
   const CAT = Object.fromEntries(rows(`select id, kind, price, hp, boost_minutes, rank_tier from shop_items where active`).map(r => [r.id, r]));
   const PD = '2027-07-10', plog = [];
   const arr = l => q('{' + l.join(',') + '}') + '::text[]';
-  const shopBoostMs = v => { const t = one(`select (extract(epoch from max(ends_at)) * 1000)::bigint from xp_boosts where visitor_id = ${q(v)} and src = 'shop' and starts_at <= now() and ends_at > now()`); return t ? Number(t) : null; };
+  const boostEndMs = v => { const t = one(`select (extract(epoch from max(ends_at)) * 1000)::bigint from xp_boosts where visitor_id = ${q(v)} and ends_at > now()`); return t ? Number(t) : null; };
   const world = v => ({ cat: CAT, log: plog, sale: rows(`select item_id from sh_shop_for(${q(v)}, ${q(PD)}::date)`).map(r => r.item_id),
     owns: id => one(`select sh_owns(${q(v)}, ${q(id)})`) === 't', balance: () => num(`select (sh_wallet(${q(v)})->>'balance')::int`),
-    boost: () => shopBoostMs(v), setBoost: () => {}, day: PD, now: Date.now() });
+    boost: () => boostEndMs(v), setBoost: () => {}, day: PD, now: Date.now() });
   award('xp-PV', 'rep:flag:9030', 20000); award('xp-PW', 'rep:flag:9031', 300);
   const pvSale = world('xp-PV').sale;
   const cheap = one(`select id from shop_items where id = any(${arr(pvSale)}) and kind not in ('snack', 'boost', 'costume') order by price, id limit 1`);
@@ -820,8 +942,8 @@ try {
   const bst = rows(`select ends_at - starts_at as len from xp_boosts where visitor_id = 'xp-PV' and src = 'shop'`);
   ok(bst.length === 1 && /02:00:00/.test(JSON.stringify(bst[0].len)), `two one-hour boosts make one boost of two hours (${JSON.stringify(bst)})`);
 
-  // the rare costume of the day: widget/hub-timmy.js and widget/dash.js pick it the same way, only the catalog's five
-  // costumes, never on a holiday (sh_season, which section 10 checks against pet.js's holidayId) or in the fall weeks
+  // the rare costume of the day: widget/hub-timmy.js and widget/dash.js pick it the same way, from COSTUMES in sets.mjs's
+  // order (widget/shop.js's SPOTS too), only the catalog's ten costumes, never on a holiday (sh_season, which section 10 checks against pet.js's holidayId) or in the fall weeks
   // (sh_is_fall), on about one day in twelve of the rest; every day of three years, for 60 made-up visitors
   const costumeFn = f => { const src = fs.readFileSync(path.join(ROOT, f), 'utf8'), m = /var COSTUMES = \[[^\]]*\];/.exec(src); return m && grabIn(src, 'costumeOfDay') ? new Function(m[0] + '\n' + grabIn(src, 'costumeOfDay') + '\nreturn costumeOfDay;')() : null; };
   const cHub = costumeFn('widget/hub-timmy.js'), cDash = costumeFn('widget/dash.js');
@@ -838,8 +960,10 @@ try {
       if (a && !five.includes(a)) cOff.push(`${v} ${r.d}: ${a} isn't a costume in the catalog`);
       if (!r.s && !r.f) { open++; if (a) { hits++; seenC.add(a); } }
     }
-    ok(five.length === 5 && cOff.length === 0, `the costume of the day: the hub's and the dashboard's agree, only the catalog's costumes, never on a holiday or a fall day (${days3.length} days x ${vis.length} visitors; ${cOff.length} wrong${cOff.length ? ': ' + cOff.slice(0, 3).join(' | ') : ''})`);
-    ok(hits / open > 1 / 15 && hits / open < 1 / 10 && seenC.size === 5, `about one open day in twelve (${hits} of ${open}, 1 in ${(open / hits).toFixed(1)}), all five turn up (${[...seenC].sort().join(', ')})`);
+    const listOf = f => { const m = new RegExp('var ' + (f === 'widget/shop.js' ? 'SPOTS' : 'COSTUMES') + ' = (\\[[^\\]]*\\]);').exec(fs.readFileSync(path.join(ROOT, f), 'utf8')); return m ? JSON.parse(m[1]) : null; };
+    eq(['widget/hub-timmy.js', 'widget/dash.js', 'widget/shop.js'].map(listOf), [0, 1, 2].map(() => SETS.costumes.map(c => c.id)), 'the hub, the dashboard and the shop name the ten costumes in sets.mjs\'s order');
+    ok(five.length === 10 && cOff.length === 0, `the costume of the day: the hub's and the dashboard's agree, only the catalog's costumes, never on a holiday or a fall day (${days3.length} days x ${vis.length} visitors; ${cOff.length} wrong${cOff.length ? ': ' + cOff.slice(0, 3).join(' | ') : ''})`);
+    ok(hits / open > 1 / 15 && hits / open < 1 / 10 && seenC.size === 10, `about one open day in twelve (${hits} of ${open}, 1 in ${(open / hits).toFixed(1)}), all ten turn up (${[...seenC].sort().join(', ')})`);
     ok(cHub('', '2027-07-10', '') === '' && cHub('xp-A', 'not-a-day', '') === '', 'no costume without a visitor or a day');
   }
   notes.push(`the shop's client: ${LIST.length} purchases through the preview's buyCore and sh_buy, the costume of the day over three years`);
@@ -1037,6 +1161,54 @@ try {
   eq([num(`select count(*) from card_reviews where visitor_id = 'xp-CL2'`), anonJson(`get_my_cards('xp-CL', 'xh')`).length], [0, 3], 'linked: every rating and Learn step is under the id that remains');
   eq(xpOf('xp-CL'), 4, 'linked: both devices\' card XP (the same card twice in a day: still within its three)');
   notes.push('Learn and Flashcards: a flat 2 for a card\'s first three ratings a day, the shared speed limit, Study ahead and Learn steps pay nothing, a replay, a double tap, a boost, the rebuild, no class numbers or day studied, get_my_cards, Link my devices');
+  // Learn's answers keep their own context (migration_v59) and pay exactly as the bank's; anything unknown is still `other`
+  const ctxOf = v => one(`select x.ctx from answer_xp x join personal_answers a on a.id = x.answer_id where a.visitor_id = ${q(v)}`);
+  const lA = ans('xp-LA', 'x1', { choice: 1, ctx: 'learn', at: CD + 3000 }), lB = ans('xp-LB', 'x1', { choice: 1, ctx: 'bank', at: CD + 3000 });
+  ans('xp-LO', 'x1', { choice: 1, ctx: 'somewhere', at: CD + 3000 });
+  eq([ctxOf('xp-LA'), ctxOf('xp-LB'), ctxOf('xp-LO')], ['learn', 'bank', 'other'], 'an answer in Learn is filed as learn, the bank\'s as bank, an unknown context as other');
+  eq([lA.xp, lA.correct, lA.first], [lB.xp, lB.correct, lB.first], 'an answer in Learn pays exactly as the same answer in the bank');
+
+  /* ---------- 14c. a survey or an exam check-in: 1,000 XP and 1,000 crowns, first submission of each (migration_v60, v61) ---------- */
+  {
+    const sid = num(`insert into surveys (slug, title, questions, active) values ('xp-sv', 'T', '[{"id":"a","kind":"text","prompt":"p"}]', true) returning id`);
+    const sv = (v, a) => anonJson(`submit_survey_v2(${sid}, ${q(v)}, ${a === null ? 'null' : q(JSON.stringify(a))}::jsonb)`);
+    const W0 = json(`sh_wallet('xp-SV')`), w0 = W0.balance, x0 = xpOf('xp-SV');
+    eq(sv('xp-SV', null), { ok: true, xp: 0, crowns: 0 }, '"Later" on a survey pays nothing');
+    eq(sv('xp-SV', { a: 'yes' }), { ok: true, xp: 1000, crowns: 1000 }, 'a survey answered: 1,000 XP and 1,000 crowns');
+    const W1 = json(`sh_wallet('xp-SV')`);   /* the 1,000 XP can be a rank-up, which pays its own +20 */
+    eq([xpOf('xp-SV') - x0, W1.balance - w0 - 20 * (W1.rankups - W0.rankups)], [1000, 1000], 'the XP and the wallet move by exactly the reward (its XP earns no crowns of its own)');
+    eq(sv('xp-SV', { a: 'again' }).ok, false, 'a survey can\'t be answered twice');
+    eq(anon(`select submit_survey(${sid}, 'xp-SV2', '{"a":"old page"}'::jsonb)`)[0][0], 't', 'the old name still answers true');
+    eq(xpOf('xp-SV2'), 1000, 'and pays the same');
+    // a check-in: the first for each hub and exam pays; a second, or one after an earlier check-in, doesn't
+    const ex = `${one(`select (now() at time zone 'America/Chicago')::date`)} Final`;
+    const ci = (v, hub, exam) => anonJson(`submit_exam_debrief_v2(${q(hub)}, ${q(exam)}, ${q(v)}, '{"ready":4}'::jsonb)`);
+    sql(`insert into exam_debriefs (hub, exam, visitor_id, answers) values ('xh', ${q(ex)}, 'xp-CI0', '{"ready":3}')`);   // checked in before v60
+    eq(ci('xp-CI', 'xh', ex), { ok: true, xp: 1000, crowns: 1000 }, 'a first check-in: 1,000 XP and 1,000 crowns');
+    eq(ci('xp-CI', 'xh', ex), { ok: true, xp: 0, crowns: 0 }, 'a second check-in for the same exam is saved and pays nothing');
+    eq(ci('xp-CI', 'xh2', ex).xp, 1000, 'another hub\'s check-in pays once too');
+    eq(ci('xp-CI0', 'xh', ex), { ok: true, xp: 0, crowns: 0 }, 'someone who checked in before the reward existed gets nothing for checking in again');
+    eq(anon(`select submit_exam_debrief('xh', '2099-01-01 Final', 'xp-CI', '{"ready":4}'::jsonb)`)[0][0], 'f', 'a check-in for an exam that hasn\'t happened is refused, as before');
+    eq(json(`sh_wallet('xp-CI')`).rewards, 2, 'the wallet counts two rewards');
+    // a linked device: the reward was paid on one id, so the other's first check-in for that exam pays nothing
+    const lc = anon(`select create_link_code('xp-CI')`)[0][0];
+    eq(anon(`select redeem_link_code(${q(lc)}, 'xp-CI3')`)[0][0], 'xp-CI', 'a second device links');
+    eq(ci('xp-CI3', 'xh', ex).xp, 0, 'the linked device\'s check-in for the same exam pays nothing');
+    eq([json(`sh_wallet('xp-CI')`).rewards, num(`select count(*) from xp_awards where visitor_id = 'xp-CI' and src = 'checkin'`)], [2, 2], 'still two rewards after linking');
+    const cxp = xpOf('xp-CI'); sql(`select sh_xp_rebuild(array['xp-CI'])`); eq(xpOf('xp-CI'), cxp, 'the rebuild keeps the rewards');
+    raises(() => anon(`select sh_form_reward('x', 'survey:1', 'survey', '')`), '42501', 'anon pays itself a reward');
+    // migration_v61's top-up: a reward paid at 500 (v60) becomes 1,000, its XP total moves by 500, the crowns stay 1,000, and a second run changes nothing
+    eq(num(`select sh_award('xp-TU', 'survey:99', 'survey', '', 500, 1, now())`), 500, 'a reward paid at 500, as v60 did');
+    const T0 = json(`sh_wallet('xp-TU')`), t0 = xpOf('xp-TU');
+    const v61 = fs.readFileSync(path.join(ROOT, 'migration_v61.sql'), 'utf8');
+    sql('begin;\n' + v61 + '\ncommit;');
+    const T1 = json(`sh_wallet('xp-TU')`);
+    eq([xpOf('xp-TU') - t0, json(`select json_build_array(base, xp) from xp_awards where visitor_id = 'xp-TU' and key = 'survey:99'`), T1.balance - T0.balance - 20 * (T1.rankups - T0.rankups)], [500, [1000, 1000], 0], 'the top-up: +500 XP, the row at 1,000, the crowns unchanged');
+    sql('begin;\n' + v61 + '\ncommit;');
+    eq(xpOf('xp-TU') - t0, 500, 'running the top-up again changes nothing');
+    sql(`select sh_xp_rebuild(array['xp-TU'])`); eq(xpOf('xp-TU') - t0, 500, 'the rebuild agrees with the top-up');
+    notes.push('a survey or check-in: 1,000 XP and 1,000 crowns once each, nothing for "Later", a second check-in, an earlier one or a linked device');
+  }
 
   /* ---------- 15. the private parts stay private ---------- */
   for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])

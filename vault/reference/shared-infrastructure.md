@@ -29,7 +29,7 @@ tags: [widget, supabase]
   `window.shGame` for the engine. Without the attribute v3.js works exactly as it did before the release, which
   is what the old hub pages get. `widget/ranks.js` and `widget/rankup.js` draw a rank past the Handpiece only for a v2 profile (`journey`
   set); `shRanks.art()` without a shape is byte for byte what it was. How it fits together:
-  [game-server](game-server.md) and [the journeys](../tasks/2026-11-06-redesign-progression-journeys.md).
+  [game-server](game-server.md) and [the journeys](../tasks/done/2026-11-06-redesign-progression-journeys.md).
 - **The trophy case and the cards on the redesign** (phase 4 session 6): `widget/ranks.js` and `widget/rankup.js` are
   shared with the old single-file hub pages, so what's new there is gated on the `shx` class the redesign's pages put on
   `<html>` (`NEW`): 27 trophies (the journeys and Bowling in), the cards' new look, and `shRanks.trophyCase()`, which
@@ -78,6 +78,8 @@ tags: [widget, supabase]
   (no `shop` in the bootstrap) it draws the default place and offers no customizer. Every button carries a fixed
   `data-tp` value, so click counts never record which piece someone picked. It keeps a still of the card on the device
   (`sh_place_still`), which the dashboard's "you" card shows before the renderer is fetched.
+  The card is that still with the moving picture drawn over it in a shadow root (`.tpc-live`): a page takes the moving
+  one away by putting `.is-rest` on it (the dashboard does while it scrolls or rests: [motion-cost](motion-cost.md)).
 - **Supabase project `thytmzsgymydbzcqdnix`** backs the widget: changelog,
   leaderboard, study streaks, activity pulse, and visitor analytics (see
   `migration_v4.sql`/`v5.sql`/`v6.sql` at repo root for schema history — run

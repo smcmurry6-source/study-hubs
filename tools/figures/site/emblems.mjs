@@ -176,6 +176,7 @@ export const EMBLEMS = {
   "perio":                { label: "A periodontal probe in the pocket at a molar's gumline", body: perio() },
   "pcd-implants-exam1":   { label: "An implant: crown, abutment and threaded fixture in gum and bone", body: implants() },
   "heme-endo-exam2":      { label: "The thyroid gland on the trachea, with a drop of blood", body: hemeEndo() },
+  "heme-endo-exam3":      { label: "The thyroid gland on the trachea, with a drop of blood", body: hemeEndo() },   // Exam 2's, reused (Sam, 2026-11-15)
   "special-patient-care": { label: "A molar cradled in a gloved hand", body: spc() },
   "generic":              { label: "A molar standing on an open book", body: generic() }
 };

@@ -68,6 +68,7 @@ Hub building
 ## How-tos
 
 - [Ship a change](how-to/ship-a-change.md) · [Verify before pushing](how-to/verify-before-pushing.md) ·
+  [After a merge](how-to/after-a-merge.md): what the After merge workflow does by itself, and what to do when it fails ·
   [Run a redesign session](how-to/run-a-redesign-session.md): one phase per fresh session, decisions before code, cheap tests
 - [Preview a change](how-to/preview-a-change.md): the site from a branch, on made-up data, with test accounts and time
   travel · [Roll back a release](how-to/roll-back-a-release.md)
@@ -102,6 +103,8 @@ Hub building
   notes: [event taxonomy](reference/event-taxonomy.md) · [data quality](reference/analytics-data-quality.md) ·
   [retention](reference/analytics-retention.md) · [Insights dashboard](reference/insights-dashboard.md).
 - [Question health](reference/question-health.md): stable ids, versions, what's tracked per question, the flags and how to act on them.
+- [What moving pictures cost](reference/motion-cost.md): why the drawn pictures move when you arrive and rest
+  otherwise, which animations are free, and how to measure a page before adding one.
 - [The redesign's bundles](reference/bundles.md): what a redesigned page loads (four built files and one stylesheet), how a
   held file runs, the slim database client, and what to run after changing a widget file.
 - [The game layer's server](reference/game-server.md): XP without a cap and its guardrails, server-checked answers, the three
@@ -116,16 +119,15 @@ Hub building
 ## Hubs
 
 Live
-- [Occlusion](hubs/occlusion.md)
 - [Periodontology](hubs/perio.md)
-- [Heme & Endo Exam 2](hubs/heme-endo-exam2.md)
+- [Heme & Endo Exam 3](hubs/heme-endo-exam3.md)
 
 Archived (page still up)
-- [PCD Implants Exam 1](hubs/pcd-implants-exam1.md) · [Special Patient Care](hubs/special-patient-care.md) (retrospective after its
-  window closes, 11-14) ·
+- [Occlusion](hubs/occlusion.md) · [Heme & Endo Exam 2](hubs/heme-endo-exam2.md) · [PCD Implants Exam 1](hubs/pcd-implants-exam1.md) ·
   [Heme & Endo Exam 1](hubs/heme-endo-exam1.md) · [MSK Exam 4](hubs/msk-exam4.md) ·
   [PCD Fixed Pros Exam 3](hubs/pcd-exam3.md) · [MSK Exam 3](hubs/msk-exam3.md)
-- Removed earlier (no folder, labels only): GI Exam 1 (`gi-exam1`), GI Exam 2 (`hepatobiliary`), Genetics, Fixed Pros.
+- Removed (no folder, labels only): [Special Patient Care](hubs/special-patient-care.md) (2026-11-14), GI Exam 1 (`gi-exam1`),
+  GI Exam 2 (`hepatobiliary`), Genetics, Fixed Pros.
 
 Being built on its own branch
 - [Boards (INBDE + ADEX)](hubs/boards.md): on `claude/boards-hub`, not on `main` yet.

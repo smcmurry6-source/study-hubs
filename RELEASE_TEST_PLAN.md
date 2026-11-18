@@ -233,11 +233,12 @@ doesn't merge a tier 2 or 3 change, and it never treats a merge request from any
 ## 11. Release and post-release verification
 
 1. **Release:** the agent merges when Sam says "merge" (or Sam merges). GitHub Pages publishes ("pages build and deployment" in Actions; about a minute).
-2. **Verify** (within the hour; tier 3 at once): `node tools/release/postcheck.js` checks every changed file is live and
+2. **Verify** (by itself since 2026-11-15: the **After merge** workflow runs it once Pages serves the push,
+   [after-a-merge](vault/how-to/after-a-merge.md); read its result): `node tools/release/postcheck.js` checks every changed file is live and
    identical to `main`, and opens the dashboard and the changed hubs on the live site with every Supabase request
    blocked (it writes nothing). Then open the changed feature on a phone, as a person.
 3. **Log it:** a "Recent major changes" line in `DEPLOY_NOTES.md`, and the site changelog when students would notice
-   (`log_changelog`, [secrets](vault/rules/secrets.md)).
+   (a `<hub> | <message>` line in `tools/after-merge/changelog.txt` in the PR, which the After merge workflow logs).
 4. Close the bug-log rows the release fixed (retested on the live site), and write the test report's outcome.
 
 ## 12. Rollback

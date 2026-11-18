@@ -6,8 +6,8 @@ tags: [timmy, ask-timmy, supabase, edge-function, claude-api, redesign, privacy]
 # Ask Timmy: the server (the `timmy` Edge Function and migration_v55) and the chat
 
 How Ask Timmy answers a student: the Supabase Edge Function `timmy`, its database half (`migration_v55.sql`), the tests
-and the eval, and the chat in the new pages (`widget/ask.js`, "The chat" below). Built 2026-11-12 as parts 1 and 2 of [the task](../tasks/2026-11-12-redesign-ask-timmy.md) (Sam's calls are
-there and in [decisions](../decisions.md)); **deployed and applied at [the redesign's release](../tasks/2026-11-06-redesign-release.md)**.
+and the eval, and the chat in the new pages (`widget/ask.js`, "The chat" below). Built 2026-11-12 as parts 1 and 2 of [the task](../tasks/done/2026-11-12-redesign-ask-timmy.md) (Sam's calls are
+there and in [decisions](../decisions.md)); **deployed and applied at [the redesign's release](../tasks/done/2026-11-06-redesign-release.md)**.
 
 ## The files
 
@@ -41,13 +41,16 @@ there and in [decisions](../decisions.md)); **deployed and applied at [the redes
    order) with a 1-hour cache mark; then the earlier turns; then this turn: `<page>` (hub, voice, today in Central time,
    view, lecture, paragraph), `<answered_question>` (its choices without letters, the student's pick by its words: the card
    shuffles the choices and shows no letters), `<progress>`, `<student>` (escaped: what a student types is data).
-   Model `claude-opus-5-5`, effort `medium`, structured output (the schema in `core.js`), the refusal fallback on.
+   Model `claude-sonnet-5-5` (Sam, 2026-11-14; built and first tested on `claude-opus-5-5`), effort `medium`, structured output (the schema in `core.js`), the refusal fallback on.
 4. The answer is checked: every cite's quote must really be in the unit it names, at least three words or the whole of a
    shorter unit such as an exam date (a real quote under the wrong id is moved to the right unit). Only checked cites become links; the rest are stored as `unchecked` for the admin tab.
 5. `timmy_finish` stores the answer with its tokens and estimated cost, and the browser gets:
    `{ ok, chat, message, kind, paragraphs: [{ text, cites: [{ id, hub, kind, label, quote, go }] }], offer, go, closest }`,
    plus `limited` (`limit`, `cap`, `off`, `busy`) on a "napping" line and `repeat` on a retried send. `message` is Timmy's
    message id (for thumbs, offers and Report). A nap that never reached the database has no `message`.
+
+6. **A gap in the notes is looked up** (from 2026-11-17, "Not in your notes" below): when the answer is `not_covered`, a
+   second call searches trusted sites and the reply also carries `gap: { text, sources: [{ url, title, site }] }`.
 
 **Kinds:** `answer`, `not_covered` (with `closest`: `{ hub, lec, label, title }`), `quiz_declined`, `hint_declined`,
 `off_topic`, `support`; and from the function itself `error`, `refusal`, `paused`, `hub`, `limit`, `cap`, `off`, `busy`.
@@ -64,6 +67,44 @@ table section, `C<l>.<j>` a cram line, `H<i>` an Exam Hint, `K<i>` a High likeli
 site help, `Q` the answered question; lectures are `L<n>` in `core.json` order. On the dashboard every id but `S` starts
 with `<hub>:`.
 
+## "Not in your notes": a gap, looked up (from 2026-11-17)
+
+Sam, 2026-11-17: "the outside source would only be used when there was something about the content that ask timmy doesnt
+have an answer for. For example, someone asked what an exostoses was and timmy couldnt answer. i dont want people to use it
+for everything, just to fill in the gaps", then "we can do web search, the sites and others like them are good to go on the
+list, no limit on gap answers. they are uncommon" ([decisions](../decisions.md)).
+
+- **When:** only when the answer from the notes is `not_covered` (not a partial answer, a declined question or off-topic).
+  The notes still come first: Timmy's own rules (`RULES`) are unchanged, so anything the content covers is answered from it.
+- **The call** (`gapRequest` in `core.js`): Sonnet 5.5 at effort `low`, its own short rules (`GAP_RULES`), the API's **basic**
+  web search tool (`web_search_20250305`, two searches at most) and plain text, because a search's citations don't mix with
+  structured output. The newer tool (`web_search_20260209`) was tried first: its filtering step runs code, which dropped the
+  citations and let the model's working notes into the answer. Sent: the question, the last four messages as text, the
+  closest lecture and the hub's title. No visitor id, no notes, no progress.
+- **The sites** (`GAP_SITES`, each with the name the chat shows): NIH (StatPearls, PubMed, PMC, DailyMed), MedlinePlus, CDC,
+  FDA, the National Cancer Institute, WHO, the Merck and MSD Manuals, the ADA, AAP, AAE, AAPD, AAOMS, AAOMP, AAO, Radiopaedia,
+  Cleveland Clinic and Mayo Clinic. Sam OK'd "the sites and others like them": add one by adding its row. **The tool's
+  `allowed_domains` didn't filter the results** when tried on 2026-11-17 (with two sites listed, preprints and patents still
+  came back), so `gapCheck` keeps the answer only when every source it cites is on the list (`gapSite`: https, the domain or
+  a subdomain of it), the model searched, and it didn't write `NONE` (its answer when the sites don't have it, or the
+  question isn't one for them: the site, the course, an exam, a graded question, a practice question's choice).
+  Otherwise the student gets the "not covered" answer alone.
+- **What the student sees** (`widget/ask.js`): under the answer, a dashed box, "Not in your notes · looked up", with the
+  few sentences and each source (its site in bold, its title) as a link that opens in a new tab (`ask:gap=source`). The
+  note at the top of the chat says the notes come first and gaps are looked up on trusted sites. The admin page's chat view
+  shows the box with its links, and the "Not covered" list still counts the question (it's still a gap in the notes).
+- **Stored:** the reply's `gap` in `timmy_messages.reply`; the message's text gets "Not in your notes (looked up): ..." and
+  the source links, so a later lookup in the same chat sees it; the tokens and cost are both calls' together.
+- **Cost and time:** on 2026-11-17's trial (8 questions, the gap call alone) a lookup cost 4 to 5 cents (about 14,000
+  tokens of search results read, one search at a cent) and took 2 to 6 seconds; a question it turned away cost under a
+  cent. "Not covered" was a few of the first 125 answers, so this adds cents a week. No limit of its own (Sam: "no limit on
+  gap answers"); the day's cap and the Console's limit still hold. The chat waits up to 75 s for an answer (was 45).
+- **Off switch:** the function's secret `TIMMY_LOOKUP=off` (Supabase, Edge Functions, Secrets) turns lookups off without a
+  deploy; gaps are then answered from the notes alone.
+- **Tests:** `tools/timmy/test.mjs` (the second call's shape, what it's sent, the checks, costs, the off switch),
+  `tools/timmy/eval.mjs` (a looked-up answer only on `not_covered`, every source on the list, plain text; its words in the
+  report).
+
 ## Limits and money
 
 - 40 questions a person a Central day (answers that failed don't count), one at a time, 1,000 characters each.
@@ -71,9 +112,11 @@ with `<hub>:`.
   estimated cost from the usage the API reports. Visitor ids are easy to reset, so this cap and **the Console's spending
   limit** (Sam sets it at the credit) are the real backstop.
 - `admin_timmy_config(secret, enabled, day_cap_usd, per_visitor_day)` turns him off or changes the limits at once.
-- Cost per question (Opus 5.5 list prices on 2026-11-12: $4 in, $20 out, cache reads $0.20 a million, 1-hour cache writes 2x):
-  about 3-6 cents with the content cached (70-84k tokens a hub, about 230k on the dashboard); the first question on a hub
-  in an hour also writes the cache, about $0.60 (about $1.80 on the dashboard).
+- Cost per question (Sonnet 5.5 list prices on 2026-11-14: $2 in, $10 out, cache reads $0.10 a million, 1-hour cache
+  writes 2x; measured on the eval that day): about 2 cents with the content cached (about 5 cents on the dashboard). A hub's
+  content is 130-165k tokens (about 420k on the dashboard), cached for an hour that every question starts again, so the
+  first question on a hub after an idle hour also writes the cache: about $0.60 ($1.70 on the dashboard). Opus 5.5, as
+  first built, cost about twice all of that (measured on 2026-11-12: about $1.10 a hub's cache, 4 cents a question).
 
 ## The database (migration_v55)
 
@@ -116,6 +159,8 @@ person to read. The full report (every question and answer) is written as markdo
   pasted in a chat or written in a file; a key made for the eval, deleted after, is safest. Make it inside a workspace,
   or also set `TIMMY_EVAL_WORKSPACE` to the workspace's id. A variable added to the environment reaches only sessions
   started after it, so a session that started before runs the eval in a fresh session on its branch.
+- `--model <id>`: the same cases on another model (`withModel()` in `core.js` leaves the fallback out for Haiku, which has
+  none). On 2026-11-14 Sonnet 5.5 cost $6.30 for the whole set and Haiku 5.5 $2.07 ([the task](../tasks/done/2026-11-12-redesign-ask-timmy.md)'s Log).
 - `--regrade <report.json>`: free; grades a saved run again with this checkout's grader and quote check, for a change to
   the grading or to `quoteIn`.
 - Rerun it after changing `RULES`, the schema, the effort level or the model. Not before the release unless one of those
@@ -123,19 +168,30 @@ person to read. The full report (every question and answer) is written as markdo
 
 ## At the release (the release note's Ask Timmy box)
 
-The steps as they were done at the redesign's release ([the release](../tasks/2026-11-06-redesign-release.md)); they are
+The steps as they were done at the redesign's release ([the release](../tasks/done/2026-11-06-redesign-release.md)); they are
 also how to set Ask Timmy up again on a new project.
 
-1. Sam saves `ANTHROPIC_API_KEY` in the Supabase dashboard (Edge Functions, Secrets) and sets the Console's spending limit.
+1. Sam saves `ANTHROPIC_API_KEY` in the Supabase dashboard (Edge Functions, Secrets) and sets the Console's spending limit (skipped for now, [decisions](../decisions.md)).
+   **The key saved on 2026-11-14 is named `TIMMY_EVAL_KEY`** (found at the release, BUG-150), so `index.ts` reads that
+   name when there is no `ANTHROPIC_API_KEY`; a secret with the right name, once saved, is the one used.
    **Make the key inside a workspace** (the Console's workspace, then API keys). A key made outside one is refused
    ("This API key is not scoped to a workspace", found on 2026-11-12's first eval run) unless the workspace's id is also
    saved, as `ANTHROPIC_WORKSPACE_ID`.
 2. Apply `migration_v55.sql` after `migration_v54.sql` (both are in `supabase/schema.sql`).
-3. Deploy the function with JWT verification off (the Supabase connector's `deploy_edge_function`: `index.ts`, `core.js`,
-   `site.json`). `TIMMY_CONTENT_BASE` needs no setting: its default is the released content address
-   (`https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/content/`). **Deploy it again after a change to
-   `supabase/functions/timmy/`** (`site.json` changes whenever the About page does).
-4. One question from the live site on a phone; the admin page's Ask Timmy tab shows it, with its cost, and opens its chat.
+3. Deploy the function with JWT verification off: **`node tools/timmy/deploy.mjs`** (it sends `index.ts`, `core.js` and
+   `site.json` as they are through Supabase's management API, with the access token in the session's environment, and
+   prints the version; the Supabase connector's `deploy_edge_function` does the same if the three files are pasted into
+   it). `TIMMY_CONTENT_BASE` needs no setting: its default is the released content address
+   (`https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/content/`). **After a merge that changes
+   `supabase/functions/timmy/`** (`site.json` changes whenever the About page does), the After merge workflow deploys it
+   again by itself and does step 4 ([after-a-merge](../how-to/after-a-merge.md), since 2026-11-15; its chat's visitor id is
+   `after-merge-<commit>`).
+4. **One real question after every deploy.** The tests use a fake model and a preview answers with made-up replies, so a
+   missing or refused key shows only here (at the release every answer was "I nodded off" until step 1's name was
+   found). From the live site on a phone; the admin page's Ask Timmy tab shows it, with its cost, and opens its chat.
+   An agent sends one POST to the function with the site's origin and a made-up visitor id of its own (the body is in
+   "One question, start to finish" above; `kind` should be `answer`), reads the function's log if it isn't, and tells
+   Sam the chat is its own.
 
 ## The chat in the new pages (`widget/ask.js` + `ask.css`, part 2)
 
@@ -190,7 +246,7 @@ download it, which keeps the new dashboard inside its request budget (`tools/rel
 
 ## Everyone has Timmy (`widget/pet.js`, part 4)
 
-Built 2026-11-13 ([the task](../tasks/2026-11-12-redesign-ask-timmy.md), "Build spec, part 4"). Sam, 2026-11-12:
+Built 2026-11-13 ([the task](../tasks/done/2026-11-12-redesign-ask-timmy.md), "Build spec, part 4"). Sam, 2026-11-12:
 "adopting timmy is no longer an option. once the redesign launches, everyone has timmy", and "if someone doesnt have a
 costume applied, they are naked. What you put wins." **Since the release it is the only behavior, on every page**: the
 adoption, the introduction, "Tap me!", the dashboard's perch and his holiday outfits came out of `pet.js`.
@@ -217,7 +273,8 @@ adoption, the introduction, "Tap me!", the dashboard's perch and his holiday out
 - **No request for it at page load**: the outfit's drawing is kept on the device, `sh_pet_outfit` = `{ id, back, face,
   top, say }` (`say`: its lines, when the place handed them over). When the server's id isn't the kept one (another
   device changed it, or this is a new device), `widget/hub-art/outfits.js` is fetched after the first scroll, wheel, tap
-  or key (never with the page: the request budgets), and until then he wears nothing rather than the wrong thing. The
+  or key (never with the page: the request budgets), and with it, for a costume or a set's outfit, the file `where` names
+  (`widget/hub-art/outfits/costumes.js`, `seasons.js` or `collections.js`, since 2026-11-18), and until then he wears nothing rather than the wrong thing. The
   shop's outfits and the place's kit are used first when they're on the page, so a piece redrawn later reaches the kept
   copy.
 - **Changing it**: `shPet.setOutfit(id, parts)` puts it on at once. `widget/place.js` calls it whenever its outfit slot
@@ -268,6 +325,6 @@ with the 7, 30 or 90 days range. Its code and notes are under "Ask Timmy" in the
   refused, asked first, Escape, saved once, off and on again), the Inbox's link, the tab before the release, axe on the
   tab with chats open, and a 390 px phone with a chat open.
 
-Related: [the task](../tasks/2026-11-12-redesign-ask-timmy.md) · [the release](../tasks/2026-11-06-redesign-release.md) ·
+Related: [the task](../tasks/done/2026-11-12-redesign-ask-timmy.md) · [the release](../tasks/done/2026-11-06-redesign-release.md) ·
 [game-server](game-server.md) · [event-taxonomy](event-taxonomy.md) · [analytics-retention](analytics-retention.md) ·
 [learner-data-privacy](../rules/learner-data-privacy.md) · [secrets](../rules/secrets.md)

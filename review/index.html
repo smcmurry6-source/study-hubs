@@ -496,9 +496,9 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   var SESSION_KEY = "sh_admin_secret";
   var PREF_KEY = "sh_admin_prefs";
 
-  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo Exam 1", "heme-endo-exam2": "Heme & Endo Exam 2", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants Exam 1", dashboard: "Dashboard", about: "About page" };
+  var HUB_LABEL = { genetics: "Genetics", hepatobiliary: "GI Exam 2 · Hepatobiliary", "fixed-pros": "Fixed Pros", "gi-exam1": "GI Exam 1", perio: "Perio", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo Exam 1", "heme-endo-exam2": "Heme & Endo Exam 2", "heme-endo-exam3": "Heme & Endo Exam 3", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants Exam 1", dashboard: "Dashboard", about: "About page" };
   /* each hub's class colour on the dashboard (the old dashboard's CLASSES / HUB_RING), drawn as a dot wherever the hub is named */
-  var HUB_DOT = { occlusion: "#A94E34", "pcd-exam3": "#A94E34", "fixed-pros": "#A94E34", "pcd-implants-exam1": "#A94E34", perio: "#A23F5E", genetics: "#246B64", "special-patient-care": "#246B64", "heme-endo-exam1": "#7E3F8F", "heme-endo-exam2": "#8C2F5A", hepatobiliary: "#A8752A", "gi-exam1": "#A8752A", "msk-exam3": "#A8752A", "msk-exam4": "#A8752A" };
+  var HUB_DOT = { occlusion: "#A94E34", "pcd-exam3": "#A94E34", "fixed-pros": "#A94E34", "pcd-implants-exam1": "#A94E34", perio: "#A23F5E", genetics: "#246B64", "special-patient-care": "#246B64", "heme-endo-exam1": "#7E3F8F", "heme-endo-exam2": "#8C2F5A", "heme-endo-exam3": "#8C2F5A", hepatobiliary: "#A8752A", "gi-exam1": "#A8752A", "msk-exam3": "#A8752A", "msk-exam4": "#A8752A" };
   /* used only until the dashboard's own hub list has loaded (then a hub is "past" when the dashboard doesn't show it live) */
   var ARCHIVED = { genetics: 1, "fixed-pros": 1, "gi-exam1": 1, hepatobiliary: 1 };
 
@@ -1378,6 +1378,11 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     if (o && o.kind === "report") out += '<div class="tm-box"><span class="tm-label">Offered to send a report' + esc(done) + '</span><div class="tm-text">' + esc(o.text) + '</div></div>';
     if (o && o.kind === "idea") out += '<div class="tm-box"><span class="tm-label">Offered to post an idea' + esc(done) + '</span><div class="tm-text"><b>' + esc(o.title) + '</b>' +
       (o.body ? "\n" + esc(o.body) : "") + '</div><span class="tm-meta">' + esc((IDEA_CAT[o.category] || o.category || "") + " · " + (o.hub ? hubLabel(o.hub) : "all hubs")) + '</span></div>';
+    var gp = r && r.gap && typeof r.gap === "object" && r.gap.text ? r.gap : null;   // a gap in the notes, looked up on a trusted site
+    if (gp) out += '<div class="tm-box"><span class="tm-label">Not in the notes: looked up</span><div class="tm-text">' + esc(gp.text) + '</div>' +
+      '<ul class="tm-cites">' + (Array.isArray(gp.sources) ? gp.sources : []).filter(function(x){ return x && /^https:\/\//.test(String(x.url || "")); }).map(function(x){
+        return '<li><span class="pill ok">' + esc(x.site || "Source") + '</span><a href="' + esc(x.url) + '" target="_blank" rel="noopener noreferrer">' + esc(x.title || x.url) + '</a></li>';
+      }).join("") + '</ul></div>';
     var extra = [], cl = r && tmClosest(r.closest);
     if (r && r.go) extra.push("Button: " + tmGo(r.go));
     if (cl) extra.push("Closest: " + tmLecName(cl, hub));
@@ -1630,8 +1635,8 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   tmPanel.addEventListener("keydown", function(e){ if (e.key === "Escape" && e.target.closest("[data-tm-confirm-box] .arch-confirm")) { e.preventDefault(); tmCancel(e.target); } });
 
   /* ---------- Recap: a shareable image of how the class used one hub (made when a hub is archived) ---------- */
-  var HUB_COLOR = { hepatobiliary: "#DDAE52", "gi-exam1": "#DDAE52", "msk-exam3": "#DDAE52", "msk-exam4": "#DDAE52", occlusion: "#E08566", "pcd-exam3": "#E08566", perio: "#E88EA9", genetics: "#6FC2B8", "fixed-pros": "#E08566", "heme-endo-exam1": "#C99BE0", "heme-endo-exam2": "#EC9AC0", "special-patient-care": "#6FC2B8", "pcd-implants-exam1": "#8FB8E8" };
-  var HUB_TITLE = { hepatobiliary: "GI Exam 2", "gi-exam1": "GI Exam 1", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion", "pcd-exam3": "PCD Fixed Pros Exam 3", perio: "Periodontology", genetics: "Genetics", "fixed-pros": "Fixed Pros", "heme-endo-exam1": "Heme & Endo Exam 1", "heme-endo-exam2": "Heme & Endo Exam 2", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants Exam 1" };
+  var HUB_COLOR = { hepatobiliary: "#DDAE52", "gi-exam1": "#DDAE52", "msk-exam3": "#DDAE52", "msk-exam4": "#DDAE52", occlusion: "#E08566", "pcd-exam3": "#E08566", perio: "#E88EA9", genetics: "#6FC2B8", "fixed-pros": "#E08566", "heme-endo-exam1": "#C99BE0", "heme-endo-exam2": "#EC9AC0", "heme-endo-exam3": "#EC9AC0", "special-patient-care": "#6FC2B8", "pcd-implants-exam1": "#8FB8E8" };
+  var HUB_TITLE = { hepatobiliary: "GI Exam 2", "gi-exam1": "GI Exam 1", "msk-exam3": "MSK Exam 3", "msk-exam4": "MSK Exam 4", occlusion: "Occlusion", "pcd-exam3": "PCD Fixed Pros Exam 3", perio: "Periodontology", genetics: "Genetics", "fixed-pros": "Fixed Pros", "heme-endo-exam1": "Heme & Endo Exam 1", "heme-endo-exam2": "Heme & Endo Exam 2", "heme-endo-exam3": "Heme & Endo Exam 3", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants Exam 1" };
   /* the recap image draws in Fraunces and Work Sans (widget/recap.js): loaded only when this view opens */
   function recapFonts(){
     if (!$("#recapFonts")) { var l = document.createElement("link"); l.id = "recapFonts"; l.rel = "stylesheet"; l.href = "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Work+Sans:wght@500;600;700&display=swap"; document.head.appendChild(l); }
@@ -1756,9 +1761,9 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     minPeople: 5,      /* a hub or page with fewer people is left out of the tables: its percentages are noise (and the privacy rule's floor) */
     minRetries: 20     /* a hub's retry share is flagged only with at least this many retries */
   };
-  var SURFACES = ["notes", "bank", "review", "mock", "drill", "hints", "cram", "weak-spots", "home", "podcast", "arcade", "recall", "other", "unknown", "retired"];
-  var SURFACE_LABEL = { notes: "Notes", bank: "Question bank", review: "Review", mock: "Mock exam", drill: "Daily drill", hints: "Exam hints", cram: "Cram sheet",
-    "weak-spots": "Weak spots", home: "Home", podcast: "Timmy Time", arcade: "Arcade", recall: "Active recall", other: "Other", unknown: "No section sent", retired: "Retired (Atlas)" };
+  var SURFACES = ["notes", "bank", "learn", "cards", "review", "mock", "drill", "hints", "cram", "weak-spots", "home", "podcast", "arcade", "recall", "more", "other", "unknown", "retired"];
+  var SURFACE_LABEL = { notes: "Notes", bank: "Question bank", learn: "Learn", cards: "Flashcards", review: "Review", mock: "Mock exam", drill: "Daily drill", hints: "Exam hints", cram: "Cram sheet",
+    "weak-spots": "Weak spots", home: "Home", podcast: "Timmy Time", arcade: "Arcade", recall: "Active recall", more: "More", other: "Other", unknown: "No section sent", retired: "Retired (Atlas)" };
   var insights = null;
   /* each hub's most recent exam (its first if none has passed yet), from the dashboard's own hubs.js (hubs and archived) */
   function hubExam(h){
@@ -1860,7 +1865,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var low = {};
     used.forEach(function(sf){
       var have = hubs.filter(function(h){ return h.s[sf]; });
-      if (have.length >= 3 && sf !== "other" && sf !== "unknown" && sf !== "retired" && have.every(function(h){ return pctN(h.s[sf].people, people[h.hub]) < R.reach; })) low[sf] = have.length;
+      if (have.length >= 3 && sf !== "other" && sf !== "unknown" && sf !== "retired" && sf !== "more" && have.every(function(h){ return pctN(h.s[sf].people, people[h.hub]) < R.reach; })) low[sf] = have.length;
     });
     var body = hubs.map(function(h){
       return '<tr><td class="lbl">' + hubName(h.hub) + '<span class="sub2">' + fmtMin(h.mins) + '</span></td>' + used.map(function(sf){
@@ -2369,7 +2374,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
      version} worked out here from the hub's own SH_EXPORT (shQH.fp, widget/qhealth.js), so the numbers are for the question
      as it reads now and ids with data that the hub no longer has show up. Flags are leads, not verdicts: Sam marks each
      Looks fine / Needs a fix / Fixed (admin_review_question), which only stores the call. Nothing here changes a question. */
-  var QH = { hub: null, rows: null, ex: {}, filter: "review", loading: false, err: null, shown: 40, saving: {}, at: 0 };
+  var QH = { hub: null, rows: null, ex: {}, vx: {}, filter: "review", loading: false, err: null, shown: 40, saving: {}, at: 0 };
   var QH_FILTERS = [["review", "To review"], ["todo", "Needs a fix"], ["reviewed", "Reviewed"], ["all", "All with data"]];
   var QH_STATE = { "new": "To review", changed: "Changed since “Needs a fix”: check it", todo: "Needs a fix", reviewed: "Reviewed", clear: "No flags" };
   var QH_SRC = { version: "this version", all: "all answers ever", feedback: "students", ids: "ids" };
@@ -2409,9 +2414,16 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       }, 20000);
     });
   }
+  /* a hub's A/B versions (content/variants.json on a hub on the engine); none is fine */
+  function qhVariants(hub){
+    if (QH.vx[hub] !== undefined) return Promise.resolve(QH.vx[hub]);
+    return fetch("../hubs/" + encodeURIComponent(hub) + "/content/variants.json", { cache: "no-cache" })
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })
+      .then(function(v){ QH.vx[hub] = v && typeof v === "object" ? v : null; return QH.vx[hub]; });
+  }
   function qhLoad(hub){
     QH.hub = hub; QH.rows = null; QH.err = null; QH.loading = true; QH.shown = 40; renderHealth();
-    qhExport(hub).then(function(ex){
+    Promise.all([qhExport(hub), qhVariants(hub)]).then(function(all){ return all[0]; }).then(function(ex){
       var cur = null;
       /* the live version's fingerprint, key, choice count and kind: the miskey and chance checks work before any version row exists */
       if (ex) { cur = {}; ex.questions.forEach(function(q){ cur[q.id] = { v: q.fp, key: typeof q.answer === "number" ? q.answer : null,
@@ -2447,10 +2459,23 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var lab = !tot ? "No picks recorded yet" : useV ? "First tries on this version (" + tot + ")" : "Every pick, all versions and tries (" + tot + ")";
     return '<ol class="qh-chs">' + rows + '</ol><div class="qh-small muted">' + lab + '</div>';
   }
+  /* the question's other versions (B, C...) from the hub's content/variants.json, folded under the original (version A) */
+  function qhVersions(r){
+    var vs = QH.vx[QH.hub] && QH.vx[QH.hub][r.qid]; if (!vs) return "";
+    if (!Array.isArray(vs)) vs = [vs];
+    return vs.map(function(v, i){
+      if (!v || !v.stem) return "";
+      return '<details class="qh-reps"><summary>Version ' + String.fromCharCode(66 + i) + ' (variants.json)</summary><div class="qh-stem">' + esc(v.stem) + '</div>' +
+        (Array.isArray(v.choices) ? '<ol class="qh-chs">' + v.choices.map(function(c){ return '<li class="qh-ch"><span class="qh-ch-t">' + esc(c) + '</span></li>'; }).join("") + '</ol>' : '') + '</details>';
+    }).join("");
+  }
   function qhStats(r){
     var s = [];
     if (r.n1) s.push("First try (this version): <b>" + qhPct(r.c1, r.n1) + "</b> of " + r.n1);
     if (r.a_n1) s.push("First try (all ever): <b>" + qhPct(r.a_c1, r.a_n1) + "</b> of " + r.a_n1);
+    /* A/B (migration_v67): first tries by the version shown; the class is split by device, so the halves are alike */
+    var wk = r.wordings ? Object.keys(r.wordings).sort() : [];
+    if (wk.length) s.push("First try by version: " + wk.map(function(k){ var x = r.wordings[k] || {}; return String.fromCharCode(65 + +k) + " <b>" + qhPct(x.c, x.n) + "</b> of " + x.n; }).join(" · "));
     if (r.a_attempts) s.push("Every answer: " + qhPct(r.a_correct, r.a_attempts) + " of " + fmtNum(r.a_attempts));
     if (r.nrm) s.push("Right after a miss: " + r.crm + " of " + r.nrm);
     else if (r.a_nrm) s.push("Right after a miss (all ever): " + r.a_crm + " of " + r.a_nrm);
@@ -2486,7 +2511,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     return '<article class="qh-item" data-qh-qid="' + esc(r.qid) + '">' +
       '<div class="qh-top"><code class="qh-id">' + esc(r.qid) + '</code>' + (lec ? '<span class="muted qh-lec">' + lec + '</span>' : '') + pills + '</div>' +
       (q ? '<div class="qh-stem">' + esc(q.text) + '</div>' + qhChoices(r, q) : '<div class="qh-stem muted">This id isn’t in the hub’s current bank.</div>') +
-      (flags ? '<ul class="qh-flags">' + flags + '</ul>' : '') + qhStats(r) +
+      qhVersions(r) + (flags ? '<ul class="qh-flags">' + flags + '</ul>' : '') + qhStats(r) +
       (reps ? '<details class="qh-reps"><summary>' + (r.reports || []).length + ' report' + ((r.reports || []).length === 1 ? '' : 's') + ' from students</summary>' + reps + '</details>' : '') +
       rev +
       '<div class="qh-act"><input type="text" class="input qh-note" maxlength="1000" aria-label="Note on ' + esc(r.qid) + '" placeholder="Note: what you checked, what to change (optional)" value="' + esc(r.review_note || "") + '">' +

@@ -75,6 +75,8 @@
   function shopOf(){ var b = window.shBootstrap, d = b && b.data; return SHOP || (d && d.shop && d.shop.wallet ? d.shop : null); }
   /* the shop is there for everyone once the page's bootstrap carries one (everyone has Timmy, so he's there to draw) */
   function hasShop(){ return !!shopOf(); }
+  /* the wallet ({ earned, spent, balance }), for Home's Today card (hub-rewards.js), or null before the bootstrap */
+  function wallet(){ var sh = shopOf(); return sh && sh.wallet && typeof sh.wallet.balance === "number" ? sh.wallet : null; }
   function shopMeta(){
     var sh = shopOf(), bal = sh && sh.wallet ? sh.wallet.balance : null;
     return (ls("sh_shop_dot") === dayCT() ? "● A rare costume came in · " : "") + (bal == null ? "" : String(bal).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " gold crowns");
@@ -82,9 +84,9 @@
   function dayCT(){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()); } catch (e) { return ""; } }
   /* the rare costume of the day, the same on every reload and every linked device: from the visitor id and the Central
      day, on about one day in twelve among the days with no holiday (holiday: widget/pet.js's holidayId() that day) and
-     outside the fall weeks (September 22 to November 30), one of the five. widget/dash.js has the same function, and
+     outside the fall weeks (September 22 to November 30), one of the ten (tools/figures/site/sets.mjs COSTUMES, in its order). widget/dash.js has the same function, and
      tools/release/xp.js checks both against the server's sh_season and sh_is_fall for every day of three years. */
-  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
   function costumeOfDay(visitor, day, holiday){
     if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
     var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";
@@ -100,6 +102,7 @@
       if (!d || !d.shop || !d.shop.wallet) return;
       SHOP = d.shop;
       if (HX.view === "more" && !HX.sub) HX.go("more", true);
+      HX.paintMeters();   // the Today card's crowns
       whenWidget("shPet", function(P){
         var sb = window.shSupabase, v = ls("sh_visitor_id"), day = dayCT(), hol = "";
         if (!P || !sb || !v || !day) return;
@@ -150,7 +153,7 @@
     if (!cur || new Date(cur.until).getTime() < new Date(res.boost_until).getTime()) G.setBoost({ mult: 2, until: res.boost_until, src: "shop" });
     HX.paintMeters();
   }
-  document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) SHOP = sh; });
+  document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP = sh; HX.paintMeters(); } });
 
   /* ---------- Ask Timmy (widget/ask.js, window.shAsk) ---------- */
   var askLoad = null, askMounted = false;
@@ -217,13 +220,13 @@
       : q.type === "multi" ? "Why are those the right ones?" : q.type === "sequence" ? "Why does it go in that order?"
       : q.type === "match" ? "Can you explain these matches?" : "Can you explain this one?";
     var ask = { qid: q.id, right: q.type === "recall" ? null : !!right, picks: q.type === "mcq" || q.type === "multi" ? (picks || []).slice() : [],
-      label: String(q.stem || "").replace(/\s+/g, " ").trim() };
+      label: String(q.stem || "").replace(/\s+/g, " ").trim(), w: q._w || 0 };   /* w: the wording on screen (widget/hub.js worded()) */
     askReady().then(function(A){ if (A) A.open({ from: "card", text: text, ask: ask }); else HX.toast("The chat didn't load. Try again in a moment."); },
       function(){ HX.toast("The chat didn't load. Check your connection and try again."); });
   }
 
   /* what the other files call from here */
   HX.say = say; HX.petHp = petHp; HX.timmyReact = timmyReact; HX.petFromBadges = petFromBadges; HX.morePlace = morePlace;
-  HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.costumeOfDay = costumeOfDay;
+  HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.wallet = wallet; HX.costumeOfDay = costumeOfDay;
   HX.askStart = askStart; HX.askOn = askOn; HX.askLabel = askLabel; HX.askAbout = askAbout;
 };

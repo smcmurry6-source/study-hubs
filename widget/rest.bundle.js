@@ -336,13 +336,21 @@ refreshAnswers();
 send.addEventListener("click", function(){
 if (send.disabled) return;
 send.disabled = true; note.textContent = "Sending…";
-sb.rpc("submit_survey", { p_survey: r.id, p_visitor: visitor, p_answers: answers }).then(function(res){
-if (!res || res.error || res.data === false) { send.disabled = false; note.textContent = "That didn't send. Try again?"; return; }
+var args = { p_survey: r.id, p_visitor: visitor, p_answers: answers };
+function missing(res){ var e = res && res.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
+sb.rpc("submit_survey_v2", args).then(function(res){
+if (missing(res)) return sb.rpc("submit_survey", args).then(function(o){ return { ok: !!o && !o.error && o.data !== false, xp: 0, crowns: 0 }; });
+var d = res && !res.error && res.data && typeof res.data === "object" ? res.data : null;
+return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0 };
+}).then(function(res){
+if (!res.ok) { send.disabled = false; note.textContent = "That didn't send. Try again?"; return; }
 try { localStorage.setItem("sh_survey_done_" + r.id, "1"); } catch (e) {}
 items = items.filter(function(x){ return x !== r; });
 updateBadges();
-el.innerHTML = '<div class="sh-reply-top">' + CHECK + '<span>Thank you!</span></div><div class="sh-reply-msg">Your answers go straight into what gets built next.</div>';
+el.innerHTML = '<div class="sh-reply-top">' + CHECK + '<span>Thank you!</span></div><div class="sh-reply-msg">Your answers go straight into what gets built next.' +
+(res.xp > 0 ? ' <b>+' + Number(res.xp).toLocaleString() + ' XP</b> and <b>+' + Number(res.crowns).toLocaleString() + ' Shiny Gold Crowns</b> for sharing.' : '') + '</div>';
 try { document.dispatchEvent(new CustomEvent("sh:survey-done", { detail: { id: r.id } })); } catch (e) {}
+if (res.xp > 0) try { document.dispatchEvent(new CustomEvent("sh:reward", { detail: { xp: res.xp, crowns: res.crowns } })); } catch (e) {}
 }, function(){ send.disabled = false; note.textContent = "That didn't send. Try again?"; });
 });
 }
@@ -482,8 +490,9 @@ function visitor(){ return ls("sh_visitor_id") || ""; }
 function norm(n){ return String(n || "").trim().toLowerCase(); }
 function noList(){ try { return JSON.parse(ls(NO_KEY) || "[]") || []; } catch (e) { return []; } }
 function rpc(fn, args){
-if (!C.sb) return Promise.resolve(null);
-try { return C.sb.rpc(fn, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); }
+var sb = C.sb || window.shSupabase || null;
+if (!sb) return Promise.resolve(null);
+try { return sb.rpc(fn, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); }
 catch (e) { return Promise.resolve(null); }
 }
 function blocked(){
@@ -497,6 +506,7 @@ var CSS =
 "--la-bg2:var(--surface-2,rgba(127,127,127,.08));--la-accent:var(--accent,var(--focus,#2F6FD6));color:var(--la-ink);animation:shLaFade .2s ease-out;}" +
 "@keyframes shLaFade{from{opacity:0;}to{opacity:1;}}" +
 ".sh-la *{box-sizing:border-box;}" +
+".sh-la [hidden]{display:none !important;}" +
 ".sh-la-card{position:relative;width:min(440px,100%);max-height:100%;overflow:auto;padding:20px 20px 16px;border-radius:18px;background:var(--la-bg);" +
 "border:1px solid var(--la-line);box-shadow:0 18px 50px -12px rgba(0,0,0,.45);}" +
 ".sh-la-card h3{margin:0 30px 8px 0;font-size:18px;font-weight:700;font-family:inherit;color:var(--la-ink);}" +
@@ -522,17 +532,24 @@ function css(){
 if (document.getElementById("sh-la-css")) return;
 var st = document.createElement("style"); st.id = "sh-la-css"; st.textContent = CSS; document.head.appendChild(st);
 }
-function close(){ if (card) { card.remove(); card = null; } }
-function redeem(code, msg){
+var back = null, escKey = null;
+function close(){
+if (card) { card.remove(); card = null; }
+if (escKey) { document.removeEventListener("keydown", escKey, true); escKey = null; }
+var b = back; back = null;
+try { if (b && b.isConnected) b.focus(); } catch (e) {}
+}
+function redeem(code, msg, tr){
+tr = tr || track;
 code = String(code || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
 if (code.length !== 6) { msg.textContent = "Codes are 6 letters and numbers."; return; }
 if (redeem.busy) return;
 redeem.busy = true; msg.textContent = "Linking…";
 rpc("redeem_link_code", { p_code: code, p_visitor: visitor() }).then(function(id){
 redeem.busy = false;
-if (!id) { track("fail"); msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
+if (!id) { tr("fail"); msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
 if (id === visitor()) { msg.textContent = "This device is already linked to that one."; return; }
-track("linked");
+tr("linked");
 try { if (window.shClicks && window.shClicks.flush) window.shClicks.flush(); } catch (e) {}
 ls("sh_visitor_id", id); ls("sh_display_name", null); ls("sh_rank_tier", null); ls("sh_trophy_seen", null);
 rpc("get_display_name", { p_visitor: id }).then(function(n){
@@ -551,9 +568,9 @@ card.innerHTML = '<div class="sh-la-card" role="dialog" aria-modal="true" aria-l
 document.body.appendChild(card);
 return card.querySelector(".sh-la-body");
 }
-function wireEnter(){
-var inp = card.querySelector(".sh-la-enter input"), msg = card.querySelector(".sh-la-step .sh-la-msg");
-if (inp) inp.addEventListener("input", function(){ if (inp.value.replace(/[^A-Za-z0-9]/g, "").length === 6) redeem(inp.value, msg); });
+function wireEnter(tr){
+var inp = card.querySelector(".sh-la-enter input"), msg = inp && inp.closest(".sh-la-step").querySelector(".sh-la-msg");
+if (inp) inp.addEventListener("input", function(){ if (inp.value.replace(/[^A-Za-z0-9]/g, "").length === 6) redeem(inp.value, msg, tr); });
 }
 function fromUrl(){
 var m = /[?&]link=([A-Za-z0-9]{6})(?:&|$)/.exec(location.search);
@@ -572,9 +589,9 @@ if (e.target === card || e.target.closest(".sh-la-x") || a === "url-no") { close
 if (a === "url-go") redeem(code, body.querySelector(".sh-la-msg"));
 });
 }
-function share(code, out){
+function share(code, out, fromCard){
 var url = ROOT + "?link=" + code;
-track("share");
+if (fromCard) linkTrack("share"); else track("share");
 if (navigator.share) {
 navigator.share({ title: "Link my study hubs", text: "Open this on my other device to link it", url: url }).catch(function(){});
 return;
@@ -646,7 +663,57 @@ if (window.shTour && window.shTour.whenIdle) window.shTour.whenIdle(function(){ 
 });
 }, fromSave ? 1200 : 0);
 }
+function linkTrack(k){ try { if (window.shTrack) window.shTrack("link:" + k); } catch (e) {} }
+var FROM = /^[a-z-]{1,16}$/;
+function link(opts){
+opts = opts || {};
+if (card) close();
+back = opts.back || document.activeElement || null;
+linkTrack("open" + (FROM.test(String(opts.from || "")) ? "=" + opts.from : ""));
+var body = shell("Link my devices",
+'<p>Use one rank, streak, trophy case and question progress on your phone, tablet and laptop. Whatever each one has done so far comes along, and your name follows.</p>' +
+'<div class="sh-la-step"><b>1. On the device you use most</b>' +
+'<div class="sh-la-row" data-la-ask><button type="button" class="sh-la-btn is-main" data-la="make">Get a code</button></div>' +
+'<div data-la-made hidden><div class="sh-la-codebox"><span class="sh-la-big">…</span><small>Good for 10 minutes</small></div>' +
+'<div class="sh-la-row"><button type="button" class="sh-la-btn is-main" data-la="share" disabled>' + (navigator.share ? "Send the link" : "Copy the link") + '</button></div>' +
+'<small>Open the link on your other device, or type the code there.</small></div>' +
+'<div class="sh-la-msg sh-la-out" aria-live="polite"></div></div>' +
+'<div class="sh-la-step"><b>2. On your other device</b>' +
+'<div class="sh-la-enter"><input type="text" maxlength="7" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="Type the code" aria-label="Link code">' +
+'<button type="button" class="sh-la-btn" data-la="go">Link</button></div>' +
+'<small>On that device it’s in Settings, next to your name, the same as here. It links as soon as the sixth character is in.</small>' +
+'<div class="sh-la-msg" aria-live="polite"></div></div>');
+card.classList.add("sh-la-link");
+wireEnter(linkTrack);
+var enterMsg = body.querySelector(".sh-la-enter").parentNode.querySelector(".sh-la-msg"), out = body.querySelector(".sh-la-out");
+escKey = function(e){ if (e.key === "Escape") { e.stopPropagation(); close(); } };
+document.addEventListener("keydown", escKey, true);
+card.addEventListener("click", function(e){
+var b = e.target.closest("[data-la]"), a = b && b.getAttribute("data-la");
+if (e.target === card || e.target.closest(".sh-la-x")) { close(); return; }
+if (a === "make") {
+b.disabled = true; out.textContent = "Making a code…";
+rpc("create_link_code", { p_visitor: visitor() }).then(function(c){
+if (!card || !body.isConnected) return;
+if (!c) { b.disabled = false; out.textContent = "Couldn’t make a code. Are you online?"; return; }
+linkTrack("code");
+out.textContent = "";
+body.querySelector("[data-la-ask]").hidden = true;
+var made = body.querySelector("[data-la-made]"), btn = made.querySelector('[data-la="share"]');
+made.hidden = false;
+made.querySelector(".sh-la-big").textContent = c.slice(0, 3) + " " + c.slice(3);
+btn.disabled = false; btn.setAttribute("data-code", c);
+try { btn.focus(); } catch (err) {}
+});
+return;
+}
+if (a === "share") { share(b.getAttribute("data-code") || "", out, true); return; }
+if (a === "go") redeem(body.querySelector(".sh-la-enter input").value, enterMsg, linkTrack);
+});
+setTimeout(function(){ try { var f = card && card.querySelector('[data-la="make"]'); if (f) f.focus(); } catch (e) {} }, 30);
+}
 window.shLinkAsk = {
+link: link,
 start: function(opts){
 C.sb = opts.sb || null; C.hub = opts.hub || "";
 C.bootstrap = opts.bootstrap || (window.shBootstrap && window.shBootstrap.ready) || null;
@@ -1005,7 +1072,7 @@ var MASTERY = [
 ];
 var HUB_NAMES = { "perio": "Perio", "msk-exam3": "MSK Exam 3", "gi-exam1": "GI Exam 1", "gi-exam2": "GI Exam 2",
 "hepatobiliary": "Hepatobiliary", "genetics": "Genetics", "fixed-pros": "Fixed Pros",
-"msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo 1", "heme-endo-exam2": "Heme & Endo 2", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants 1" };
+"msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo 1", "heme-endo-exam2": "Heme & Endo 2", "heme-endo-exam3": "Heme & Endo 3", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants 1" };
 function hubName(h){ return (window.SH_HUB_NAMES && window.SH_HUB_NAMES[h]) || HUB_NAMES[h] || String(h).replace(/-/g, " ").replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
 var MEDAL = {
 1: ["#5A2A0E", "#B0672B", "#F2B884", "#FFE6CC"],
@@ -1018,6 +1085,7 @@ var HUB_MEDAL = {
 "pcd-implants-exam1": { rib: ["#2D5F92", "#AAB6C4"], g: [["f", "M7.5 3.5h9v3.2h-9z"], ["f", "M8.6 7.4h6.8l-.5 2-5.8 1.6 5.8 1.6-5.8 1.6 5.8 1.6-5.8 1.6L12 21l2.4-4.2z"]] },
 "special-patient-care": { rib: ["#1D6B66", "#FF8A6B"], g: TOOTH },
 "heme-endo-exam2": { rib: ["#8C2F5A", "#E2A82B"], g: [["s", "M12 3.6a8.4 8.4 0 1 0 .01 0z"], ["f", "M14.4 6.4a3.6 3.6 0 1 1-.01 0z"], ["l", "M6.6 13.2h.01M8.4 17.2h.01M12.6 19h.01M16.8 16.6h.01"]] },
+"heme-endo-exam3": { rib: ["#8C2F5A", "#E2A82B"], g: [["s", "M12 3.6a8.4 8.4 0 1 0 .01 0z"], ["f", "M14.4 6.4a3.6 3.6 0 1 1-.01 0z"], ["l", "M6.6 13.2h.01M8.4 17.2h.01M12.6 19h.01M16.8 16.6h.01"]] },
 "heme-endo-exam1": { rib: ["#6B3FA0", "#E86A9E"], g: [["f", "M11.2 13.6C10.8 8.6 9.4 4.4 7.2 4.4 4.6 4.4 4 9 4.9 12.7c.9 3.5 3.6 5.2 5.9 3.9z"], ["f", "M12.8 13.6c.4-5 1.8-9.2 4-9.2 2.6 0 3.2 4.6 2.3 8.3-.9 3.5-3.6 5.2-5.9 3.9z"], ["f", "M10 12.4h4v3.4h-4z"]] },
 "perio":        { rib: ["#B23A5B", "#E98AA4"], g: [["s", "M4.5 19.5 13 11l2.6-2.6"], ["s", "M15.6 8.4c1.4-1.4 3-1 3.6.4l.6 2.6"], ["l", "M8.4 14.2l1.4 1.4M10.6 12l1.4 1.4"]] },
 "occlusion":    { rib: ["#2F5FA8", "#C2414B"], g: [["f", "M4 3.5h16v5.5l-2.7 3.2-2.6-3.2-2.7 3.2-2.7-3.2-2.6 3.2L4 9z"], ["f", "M4 20.5h16V15l-2.7-3.2-2.6 3.2-2.7-3.2-2.7 3.2-2.6-3.2L4 15z"]] },
@@ -1078,7 +1146,8 @@ st.textContent = '.sh-flair{display:inline-flex;align-items:center;gap:1px;verti
 'button.sh-flair:hover,button.sh-flair:focus-visible{background:rgba(127,127,127,.16)}' +
 'button.sh-flair:focus-visible{outline:2px solid currentColor;outline-offset:1px}' +
 '.sh-flair-m{display:inline-flex;width:18px;height:18px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +
-'.sh-flair-m.is-crown{animation:sh-flair-glint 3.2s ease-in-out infinite}' +
+'.sh-flair-m.is-crown{position:relative}' +
+'.sh-flair-m.is-crown::after{content:"";position:absolute;inset:-4px;border-radius:50%;background:radial-gradient(circle,rgba(255,236,150,.9) 0,rgba(255,226,122,.45) 45%,rgba(255,226,122,0) 70%);opacity:0;pointer-events:none;animation:sh-flair-glint 3.2s ease-in-out infinite}' +
 '.sh-flair-more{font-size:10.5px;font-weight:700;opacity:.7;margin-left:1px;font-variant-numeric:tabular-nums}' +
 '.sh-flair.is-list{display:flex;flex-wrap:wrap;gap:5px;white-space:normal;margin:0;vertical-align:baseline;flex:1 1 auto;min-width:0;max-width:100%}' +
 '.sh-flair-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px 2px 3px;border-radius:999px;background:rgba(127,127,127,.13);font-size:12px;font-weight:600;line-height:1.2}' +
@@ -1094,8 +1163,8 @@ st.textContent = '.sh-flair{display:inline-flex;align-items:center;gap:1px;verti
 '.sh-flair-card li b{display:block;font-size:14px}.sh-flair-card li small{font-size:12px;color:#B9B5AD}' +
 '.sh-flair-card .sh-flair-x{display:block;margin:10px 0 0 auto;appearance:none;background:rgba(255,255,255,.1);color:inherit;border:0;border-radius:999px;padding:7px 16px;font:inherit;font-weight:600;cursor:pointer}' +
 '@keyframes sh-flair-in{from{opacity:0}to{opacity:1}}' +
-'@keyframes sh-flair-glint{0%,80%,100%{filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}88%{filter:drop-shadow(0 0 4px #FFE27A) brightness(1.15)}}' +
-'@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown,.sh-flair-pop{animation:none}}';
+'@keyframes sh-flair-glint{0%,80%,100%{opacity:0}88%{opacity:1}}' +
+'@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown::after,.sh-flair-pop{animation:none}}';
 (document.head || document.documentElement).appendChild(st);
 document.addEventListener("click", function(e){
 var b = e.target && e.target.closest && e.target.closest("[data-sh-flair]");
@@ -1473,7 +1542,8 @@ var h = '<div class="sh-rank-card sh-tier-' + TIERS[t].key + '">' +
 '<div class="sh-rank-xp"><b>' + fmt(xp) + '</b> XP' + (profile.position ? ' · #' + profile.position + ' of ' + profile.of : '') + '</div>' +
 '<div class="sh-rank-bar"><i style="width:' + (pct * 100).toFixed(1) + '%"></i></div>' +
 '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + nextName : 'The highest rank there is.') + '</div>' +
-(window.shEditName ? '<button type="button" class="sh-rank-rename">' + (window.shNameNow && window.shNameNow() ? 'Shown as ' + esc(window.shNameNow()) + ' · change' : 'Change your name') + '</button>' : '') +
+(window.shEditName ? '<div class="sh-rank-namerow"><button type="button" class="sh-rank-rename">' + (window.shNameNow && window.shNameNow() ? 'Shown as ' + esc(window.shNameNow()) + ' · change' : 'Change your name') + '</button>' +
+'<button type="button" class="sh-rank-linkbtn" data-sh-link="rank">Link my devices</button></div>' : '') +
 '</div></div>';
 if (m.bank) {
 h += '<div class="sh-mastery"><div class="sh-mastery-top"><span>Mastery in this hub</span><b>' + Math.round(m.pct * 100) + '%' + (m.lvl >= 0 ? ' · ' + MASTERY[m.lvl].n : '') + '</b></div>' +
@@ -1698,7 +1768,7 @@ var SELF = "";
 try { SELF = __sh_script.src; } catch (e) {}
 var docEl = document.documentElement;
 var reduced = false; try { reduced = matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
-var MAX = 1000, TIMEOUT = 45000, KEEP_HOURS = 6;
+var MAX = 1000, TIMEOUT = 75000, KEEP_HOURS = 6;
 function ls(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }
 function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 function track(k){ try { if (window.shTrack) window.shTrack("ask:" + k); } catch (e) {} }
@@ -1723,7 +1793,9 @@ send: '<path d="M5 12h13M13 6l6 6-6 6"/>',
 plus: '<path d="M12 5v14M5 12h14"/>',
 ask: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v8a2.5 2.5 0 0 1-2.5 2.5H10.5L6 20v-4h-.5A1.5 1.5 0 0 1 4 14.5z"/><path d="M9.9 8.1a2.2 2.2 0 1 1 3.1 2c-.6.3-1 .8-1 1.5"/><path d="M12 14h.01"/>',
 back: '<path d="M15 6l-6 6 6 6"/>',
-clock: '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/>'
+clock: '<path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3 4v4h4"/><path d="M12 8v4l3 2"/>',
+look: '<circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/>',
+ext: '<path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>'
 };
 function icon(k, px){
 var A = window.SH_HUB_ART, b = OWN[k] || (A && A.icons && A.icons[k] ? A.icons[k].body : OWN.ask);
@@ -1840,7 +1912,7 @@ if (v === "timmy" && window.shPet && window.shPet.art) { try { var hp = null; tr
 P.av.innerHTML = art || icon("ask", 26);
 P.av.classList.toggle("is-icon", !art);
 P.note.textContent = (v === "timmy" ? "Timmy answers" : "Answers come") + " from " + (dash ? "the live hubs' notes" : "this hub's notes") +
-" only, with Claude, Anthropic's AI. Chats are saved to help improve the hub.";
+", with Claude, Anthropic's AI; what the notes don't cover is looked up on trusted medical and dental sites. Chats are saved to help improve the hub.";
 setBusy(S.busy);
 paintPaused();
 drawStarters();
@@ -1889,7 +1961,7 @@ P.panel.setAttribute("aria-modal", String(phone()));
 P.root.hidden = false;
 docEl.classList.add("ska-open");
 requestAnimationFrame(function(){ P.root.classList.add("is-on"); });
-if (o.ask && o.ask.qid) { S.attach = { qid: String(o.ask.qid), right: o.ask.right === true ? true : o.ask.right === false ? false : null, picks: Array.isArray(o.ask.picks) ? o.ask.picks.slice(0, 12) : [], label: o.ask.label || "" }; }
+if (o.ask && o.ask.qid) { S.attach = { qid: String(o.ask.qid), right: o.ask.right === true ? true : o.ask.right === false ? false : null, picks: Array.isArray(o.ask.picks) ? o.ask.picks.slice(0, 12) : [], label: o.ask.label || "", w: +o.ask.w > 0 ? +o.ask.w : 0 }; }
 dress(); drawAttach(); hidePast();
 if (o.text != null) { P.input.value = String(o.text).slice(0, MAX); grow(); counter(); }
 if (!was) track("open=" + (o.from || "other"));
@@ -1982,7 +2054,7 @@ if (text.length > MAX) { counter(); P.count.hidden = false; return; }
 build();
 var body = { visitor: visitor(), hub: hubId(), text: text, chat: S.chat, request: rid(), voice: voice(), context: context() };
 if (isDash()) body.hubs = (opt("hubs") || []).map(function(h){ return h.id; });
-var ask = S.attach && !isDash() ? { qid: S.attach.qid, right: S.attach.right, picks: S.attach.picks } : null;
+var ask = S.attach && !isDash() ? { qid: S.attach.qid, right: S.attach.right, picks: S.attach.picks, w: S.attach.w || undefined } : null;
 if (ask) body.ask = ask;
 var wantProgress = x.progress || TONIGHT.test(text);
 S.busy = true; setBusy(true);
@@ -2064,6 +2136,27 @@ li.appendChild(a); ul.appendChild(li);
 b.appendChild(ul);
 }
 });
+var gp = d.gap && typeof d.gap === "object" && d.gap.text ? d.gap : null;
+if (gp) {
+var gx = el("div", "ska-gap", { role: "group", "aria-label": "Not in your notes, looked up" });
+var gh = el("p", "ska-gap-h"); gh.innerHTML = icon("look", 15); gh.appendChild(txt("span", "", "Not in your notes · looked up"));
+gx.appendChild(gh); gx.appendChild(txt("p", "", gp.text));
+var srcs = (Array.isArray(gp.sources) ? gp.sources : []).filter(function(x){ return x && /^https:\/\/[^\s"<>]+$/.test(String(x.url || "")); }).slice(0, 3);
+if (srcs.length) {
+var su = el("ul", "ska-srcs", { "aria-label": "Sources" });
+srcs.forEach(function(x){
+var li = el("li"), a = el("a", "ska-src", { href: String(x.url), target: "_blank", rel: "noopener noreferrer", "data-ska": "source",
+"aria-label": (x.site || "Source") + (x.title ? ": " + x.title : "") + " (opens in a new tab)" });
+a.appendChild(txt("b", "", x.site || "Source"));
+if (x.title) a.appendChild(txt("span", "", x.title));
+a.insertAdjacentHTML("beforeend", icon("ext", 14));
+a.addEventListener("click", function(){ track("gap=source"); });
+li.appendChild(a); su.appendChild(li);
+});
+gx.appendChild(su);
+}
+b.appendChild(gx);
+}
 if (!b.childNodes.length) b.appendChild(txt("p", "", voice() === "timmy" ? "Hmm. Ask me that one more time?" : "Something went wrong. Ask again?"));
 m.appendChild(b);
 var row = el("div", "ska-go");
@@ -2375,7 +2468,7 @@ function pick(a){ return a[Math.floor(Math.random() * a.length)]; }
 var reduced = false;
 try { reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
 var ME = __sh_script, BASE = ME && ME.src ? ME.src.replace(/[^\/]*(\?.*)?$/, "") : "";
-var FULL_FROM = "9999-12-31";
+var FULL_FROM = "2026-11-14";
 function centralDay(d){
 var f = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" });
 var p = {}; f.formatToParts(d || new Date()).forEach(function(x){ p[x.type] = x.value; });
@@ -2604,23 +2697,26 @@ var on = function(){ woke = true; WAKE_ON.forEach(function(n){ window.removeEven
 WAKE_ON.forEach(function(n){ window.addEventListener(n, on, { capture: true, passive: true }); });
 }
 function afterWake(fn){ if (woke) fn(); else { wakeQ.push(fn); watchWake(); } }
-var outfitsLoad = null;
-function loadOutfits(){
-if (window.SH_OUTFITS) return Promise.resolve(window.SH_OUTFITS);
-if (outfitsLoad) return outfitsLoad;
-outfitsLoad = new Promise(function(res, rej){
-var el = document.querySelector('script[src$="hub-art/outfits.js"]');
-if (!el) {
-var b = BASE; if (!b) { var me = document.querySelector('script[src*="widget/pet.js"]'); b = me ? me.src.replace(/[^\/]*(\?.*)?$/, "") : "widget/"; }
-el = document.createElement("script"); el.src = b + "hub-art/outfits.js"; el.async = true; document.head.appendChild(el);
-}
+var outfitsLoad = null, setLoad = {};
+function artBase(){ var b = BASE; if (!b) { var me = document.querySelector('script[src*="widget/pet.js"]'); b = me ? me.src.replace(/[^\/]*(\?.*)?$/, "") : "widget/"; } return b; }
+function fetchArt(file){
+return new Promise(function(res, rej){
+var el = document.querySelector('script[src$="hub-art/' + file + '"]');
+if (!el) { el = document.createElement("script"); el.src = artBase() + "hub-art/" + file; el.async = true; document.head.appendChild(el); }
 el.addEventListener("load", function(){ res(window.SH_OUTFITS); });
-el.addEventListener("error", function(){ outfitsLoad = null; rej(new Error("outfits")); });
+el.addEventListener("error", function(){ rej(new Error(file)); });
 });
-return outfitsLoad;
+}
+function loadOutfits(id){
+var core = window.SH_OUTFITS ? Promise.resolve(window.SH_OUTFITS) : outfitsLoad || (outfitsLoad = fetchArt("outfits.js").then(null, function(e){ outfitsLoad = null; throw e; }));
+return core.then(function(O){
+var set = O && id && !Object.prototype.hasOwnProperty.call(O.parts, id) && O.where && O.where[id];
+if (!set || (O.got && O.got[set])) return O;
+return setLoad[set] || (setLoad[set] = fetchArt("outfits/" + set + ".js").then(null, function(e){ setLoad[set] = null; throw e; }));
+});
 }
 function wantOutfits(id){
-afterWake(function(){ loadOutfits().then(function(){ if (WORN.id === id && !WORN.layer) wear(id); }, function(){}); });
+afterWake(function(){ loadOutfits(id).then(function(){ if (WORN.id === id && !WORN.layer) wear(id); }, function(){}); });
 }
 function wornTalk(){ var l = WORN.layer; return l && l.say && l.say.length ? { k: WORN.id, say: l.say } : null; }
 function houseDeco(){
@@ -4540,8 +4636,10 @@ var name = nameNow(), hubs = liveHubs();
 if (here && !hubs.some(function(h){ return h.id === here; })) hubs = [{ id: here, name: label(here) }].concat(hubs);
 return "<" + HN + ' class="shi-formh">Post an idea</' + HN + ">" +
 '<p class="note">It shows to the class right away, under your name. ' + RULES + "</p>" +
-(name ? '<p class="shi-as">Posting as <b>' + esc(name) + "</b>" + (o.editName ? ' · <button type="button" class="shi-act" data-shi="rename">change</button>' : "") + "</p>"
-: '<label class="shi-f"><span>Your name</span><input type="text" data-shi-f="name" maxlength="24" autocomplete="nickname" placeholder="Pick a name" value="' + esc(nameHint(o)) + '"><small>Ideas show under your leaderboard name, the one classmates see on the boards. Keep it or change it.</small></label>') +
+(name ? '<p class="shi-as">Posting as <b>' + esc(name) + "</b>" + (o.editName ? ' · <button type="button" class="shi-act" data-shi="rename">change</button>' : "") +
+(window.shLinkAsk && window.shLinkAsk.link ? ' · <button type="button" class="shi-act" data-shi="link">link a device</button>' : "") + "</p>"
+: '<label class="shi-f"><span>Your name</span><input type="text" data-shi-f="name" maxlength="24" autocomplete="nickname" placeholder="Pick a name" value="' + esc(nameHint(o)) + '"><small>Ideas show under your leaderboard name, the one classmates see on the boards. Keep it or change it.</small></label>' +
+(window.shLinkAsk && window.shLinkAsk.link ? '<p class="shi-as">Already have a name on another device? <button type="button" class="shi-act" data-shi="link">Link my devices</button></p>' : "")) +
 '<label class="shi-f"><span>Title</span><input type="text" data-shi-f="title" maxlength="80" placeholder="The idea in a few words" required></label>' +
 '<label class="shi-f"><span>Details <i>(optional)</i></span><textarea data-shi-f="body" maxlength="280" rows="3" placeholder="What it would do, and why it would help"></textarea><small class="shi-left num" aria-live="polite"></small></label>' +
 '<label class="shi-f"><span>For</span><select data-shi-f="hub">' +
@@ -4608,6 +4706,7 @@ var a = b.getAttribute("data-shi"), li = b.closest("[data-idea]"), it = li ? fin
 if (a === "new") openForm(true);
 else if (a === "cancel") openForm(false);
 else if (a === "rename") { try { o.editName(); } catch (err) {} }
+else if (a === "link") { try { window.shLinkAsk.link({ back: b, from: "ideas" }); } catch (err) {} }
 else if (a === "more") { S.shown += PAGE; var n = list.children.length; paint(); var nx = list.children[n]; if (nx) { var fb = nx.querySelector("button"); try { fb.focus(); } catch (err) {} } }
 else if (!it) return;
 else if (a === "up" || a === "down") vote(li, it, a === "up" ? 1 : -1);

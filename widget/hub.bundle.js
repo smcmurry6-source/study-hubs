@@ -14,7 +14,7 @@ achMap = HX.achMap, putAnswer = HX.putAnswer, saveNow = HX.saveNow, saveState = 
 lecName = HX.lecName, lecDot = HX.lecDot, paintLive = HX.paintLive, go = HX.go, lecStat = HX.lecStat, QBY = HX.QBY;
 function v2(){ var G = window.shGame; return !!(G && G.v2 && G.v2()); }
 function boost(){ var G = window.shGame; return v2() && G.boost ? G.boost() : null; }
-var KIND = { sequence: "order", recall: "self", match: "self" };
+var KIND = { sequence: "order", match: "order", recall: "self" };
 var SESSION = { n: 0, r: 0, xp: 0, miss: {}, since: 0, recapAt: 0, hp0: null, k: 0, again: 0, kSince: 0, againAt: 0 };
 function todayRec(){
 var d = day(0), x = STATE.nx.days[d];
@@ -263,7 +263,7 @@ return '<svg class="teeth' + (of && done >= of ? " is-met" : "") + '" viewBox="0
 out + "</svg>";
 }
 function todayPanel(){
-var t = todayRec(), g = goal(), n = streakDays(), dn = doneToday(t), left = Math.max(0, g - dn), hp = HX.petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" };
+var t = todayRec(), g = goal(), n = streakDays(), dn = doneToday(t), left = Math.max(0, g - dn), hp = HX.petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" }, w = HX.wallet ? HX.wallet() : null;
 var cap = dn >= g ? "Goal met for today." : left === g ? "Your goal today: " + g + " questions or flashcards. One keeps your streak going." : left + " more meets today's goal.";
 return '<div class="panel today" data-today><div class="today-head"><div><h2>Today</h2><p class="today-date">' + esc(dateLabel(day(0), { weekday: "long", month: "long", day: "numeric" })) + "</p></div>" +
 spot("today", { tint: T.ink, light: T.light, line: T.ink }, "today-art") + "</div>" +
@@ -273,6 +273,7 @@ spot("today", { tint: T.ink, light: T.light, line: T.ink }, "today-art") + "</di
 '<li class="ts-xp">' + artSvg(A.xp, "0 0 24 24", "ts-art", "") + '<span><b class="num">+' + fmt(t.xp) + "</b><small>XP today</small></span></li>" +
 '<li class="ts-right">' + icon("check", 26) + '<span><b class="num">' + fmt(t.r || 0) + " of " + fmt(t.n) + "</b><small>Right today</small></span></li>" +
 (t.k ? '<li class="ts-cards">' + icon("cards", 26) + '<span><b class="num">' + fmt(t.k) + "</b><small>" + (t.k === 1 ? "Flashcard" : "Flashcards") + " today</small></span></li>" : "") +
+(w ? '<li class="ts-crowns"><a href="#more/shop" title="' + fmt(w.earned || w.balance) + ' Shiny Gold Crowns earned in all">' + HX.shopCoin(30) + '<span><b class="num">' + fmt(w.balance) + "</b><small>" + (w.balance === 1 ? "Gold crown" : "Gold crowns") + '<span class="sr"> to spend in Timmy’s shop</span></small></span></a></li>' : "") +
 "</ul>" +
 (hp !== null ? '<p class="today-pet">' + icon("tooth", 18) + "<span>Timmy has <b class=\"num\">" + hp + " HP</b></span></p>" : "") + "</div>";
 }
@@ -353,12 +354,13 @@ function shopCoin(px){ return '<svg class="ic" viewBox="0 0 24 24" width="' + px
 var SHOP = null;
 function shopOf(){ var b = window.shBootstrap, d = b && b.data; return SHOP || (d && d.shop && d.shop.wallet ? d.shop : null); }
 function hasShop(){ return !!shopOf(); }
+function wallet(){ var sh = shopOf(); return sh && sh.wallet && typeof sh.wallet.balance === "number" ? sh.wallet : null; }
 function shopMeta(){
 var sh = shopOf(), bal = sh && sh.wallet ? sh.wallet.balance : null;
 return (ls("sh_shop_dot") === dayCT() ? "● A rare costume came in · " : "") + (bal == null ? "" : String(bal).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " gold crowns");
 }
 function dayCT(){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()); } catch (e) { return ""; } }
-var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
 function costumeOfDay(visitor, day, holiday){
 if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
 var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";
@@ -374,6 +376,7 @@ boot.then(function(d){
 if (!d || !d.shop || !d.shop.wallet) return;
 SHOP = d.shop;
 if (HX.view === "more" && !HX.sub) HX.go("more", true);
+HX.paintMeters();
 whenWidget("shPet", function(P){
 var sb = window.shSupabase, v = ls("sh_visitor_id"), day = dayCT(), hol = "";
 if (!P || !sb || !v || !day) return;
@@ -421,7 +424,7 @@ if (!res || !res.boost_until || !G || !G.setBoost) return;
 if (!cur || new Date(cur.until).getTime() < new Date(res.boost_until).getTime()) G.setBoost({ mult: 2, until: res.boost_until, src: "shop" });
 HX.paintMeters();
 }
-document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) SHOP = sh; });
+document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP = sh; HX.paintMeters(); } });
 var askLoad = null, askMounted = false;
 function askReady(){
 if (!askLoad) askLoad = HX.loadScript(WIDGET + "ask.js").then(function(){ askMount(); return window.shAsk || null; });
@@ -478,12 +481,12 @@ var text = q.type === "mcq" && q.choices && q.choices[q.answer] != null ? "Why i
 : q.type === "multi" ? "Why are those the right ones?" : q.type === "sequence" ? "Why does it go in that order?"
 : q.type === "match" ? "Can you explain these matches?" : "Can you explain this one?";
 var ask = { qid: q.id, right: q.type === "recall" ? null : !!right, picks: q.type === "mcq" || q.type === "multi" ? (picks || []).slice() : [],
-label: String(q.stem || "").replace(/\s+/g, " ").trim() };
+label: String(q.stem || "").replace(/\s+/g, " ").trim(), w: q._w || 0 };
 askReady().then(function(A){ if (A) A.open({ from: "card", text: text, ask: ask }); else HX.toast("The chat didn't load. Try again in a moment."); },
 function(){ HX.toast("The chat didn't load. Check your connection and try again."); });
 }
 HX.say = say; HX.petHp = petHp; HX.timmyReact = timmyReact; HX.petFromBadges = petFromBadges; HX.morePlace = morePlace;
-HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.costumeOfDay = costumeOfDay;
+HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.wallet = wallet; HX.costumeOfDay = costumeOfDay;
 HX.askStart = askStart; HX.askOn = askOn; HX.askLabel = askLabel; HX.askAbout = askAbout;
 };
 ;
@@ -521,14 +524,16 @@ q.pbox.map(function(r){ return "<div><dt>" + esc(r[0]) + "</dt><dd>" + esc(r[1])
 function figHTML(q){ var f = HX.FIG && q.img && !q.imgAfter && HX.FIG.FIGS[q.img]; return f ? '<figure class="qfig" aria-label="' + esc(f.title) + '">' + f.svg + "</figure>" : ""; }
 function figKeyHTML(f, open){ return f.key ? '<details class="fig-key"' + (open ? " open" : "") + "><summary>" + (open ? "Key" : "Show the key") + "</summary><dl>" + f.key.map(function(k){ return "<dt>" + esc(k[0]) + "</dt><dd>" + esc(k[1]) + "</dd>"; }).join("") + "</dl></details>" : ""; }
 function figAfterHTML(q){ var f = HX.FIG && q.img && HX.FIG.FIGS[q.img]; return f && (q.imgAfter || f.key) ? '<figure class="qfig qfig-after" aria-label="' + esc(f.title) + '">' + f.svg + figKeyHTML(f, true) + "</figure>" : ""; }
+function qNum(n, of, id){ return '<span class="qc-n num" id="' + id + '">Question&nbsp;' + n + (of ? " of&nbsp;" + of : "") + "</span>"; }
 function card(q, o){
 o = o || {};
+q = HX.worded ? HX.worded(q) : q;
 var id = "q" + (++uid), multi = q.type === "multi", tf = q.fmt === "tf";
 var seen = ansOf(q.id);
-var status = o.retry ? '<span class="qc-flag">' + icon("retry", 14) + "Again: you missed this a few questions ago</span>" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
-seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + "</span>" : "";
-var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + id + 'h"></article>');
-var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + id + 'h">' + (o.num ? "Question " + o.num + " · " : "") + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
+var status = o.retry ? "" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
+seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + (q._base ? " · reworded" : "") + "</span>" : "";
+var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '"' + (q._base ? ' data-wording="' + (q._w || 0) + '"' : "") + ' data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
+var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
 var body = "", hide = !!o.hide && q.type === "mcq";
 if (q.type === "mcq" || multi) {
 var order = multi ? shuffled(q.choices.map(function(c, i){ return i; })) : choiceOrder(q);
@@ -549,12 +554,13 @@ var L = shuffled(q.pairs.map(function(p, i){ return i; })), R = shuffled(q.pairs
 body = '<p class="note qc-hint">Tap an item on the left, then its partner on the right.</p><div class="qc-match"><ul>' + L.map(function(i){ return '<li><button class="ch" type="button" data-side="l" data-pair="' + i + '"><span class="txt">' + esc(q.pairs[i][0]) + "</span></button></li>"; }).join("") +
 "</ul><ul>" + R.map(function(i){ return '<li><button class="ch" type="button" data-side="r" data-pair="' + i + '"><span class="txt">' + esc(q.pairs[i][1]) + "</span></button></li>"; }).join("") + "</ul></div>";
 }
+if (o.retry) { var tryN = +o.retry || 2; head = '<p class="qc-retry">' + icon("retry", 18) + "<span><b>" + (tryN === 2 ? "Second try" : tryN === 3 ? "Third try" : "Try " + tryN) + "</b> · You missed this " + (tryN === 2 ? "a few questions ago" : "again") + ". Take another shot.</span></p>" + head; }
 el.innerHTML = head + figHTML(q) + pboxHTML(q) + stemHTML(q) + body + '<section class="qc-result qcard-explain" data-role="explain" hidden aria-live="polite"></section>';
 wireCard(el, q, o);
 return el;
 }
 function wireCard(el, q, o){
-var multi = q.type === "multi", picked = [], seqP = [], match = { sel: null, done: 0, err: 0 }, self = false;
+var multi = q.type === "multi", picked = [], seqP = [], match = { sel: null, done: 0, err: 0, first: [] }, self = false;
 el.addEventListener("click", function(e){
 var b = e.target.closest("button"); if (!b || !el.contains(b) || el.classList.contains("is-answered")) return;
 if (b.hasAttribute("data-i")) {
@@ -587,7 +593,9 @@ var p = +b.getAttribute("data-pair");
 if (b.getAttribute("data-side") === "l") { $$('[data-side="l"]', el).forEach(function(x){ x.setAttribute("aria-pressed", "false"); }); b.setAttribute("aria-pressed", "true"); match.sel = p; return; }
 if (match.sel === null) return;
 var left = $('[data-side="l"][data-pair="' + match.sel + '"]', el);
-if (p === match.sel) { [b, left].forEach(function(x){ x.classList.add("is-matched"); x.disabled = true; x.setAttribute("aria-pressed", "false"); }); match.done++; match.sel = null; if (match.done === q.pairs.length) answer(b); }
+var same = p === match.sel || q.pairs[p][1] === q.pairs[match.sel][1];
+if (match.first[match.sel] == null) match.first[match.sel] = same ? match.sel : p;
+if (same) { [b, left].forEach(function(x){ x.classList.add("is-matched"); x.disabled = true; x.setAttribute("aria-pressed", "false"); }); match.done++; match.sel = null; if (match.done === q.pairs.length) answer(b); }
 else { match.err++; b.classList.remove("is-shake"); void b.offsetWidth; b.classList.add("is-shake"); }
 }
 });
@@ -616,7 +624,7 @@ right = self; if (!right) partial = "You marked it missed";
 rec = HX.recordAnswer(q.id, q.lec, right, o.ctx);
 } else {
 right = match.err === 0; if (!right) partial = "Matched, with " + pl(match.err, "wrong try", "wrong tries");
-rec = HX.recordAnswer(q.id, q.lec, right, o.ctx);
+rec = HX.recordAnswer(q.id, q.lec, right, o.ctx, null, null, { order: q.pairs.map(function(x, k){ return match.first[k] == null ? k : match.first[k]; }) });
 }
 result(el, q, right, partial, rec.xp, picked, o);
 if (o.onAnswer) o.onAnswer(el, q, right);
@@ -665,7 +673,7 @@ var after = $(".qc-after", res);
 var gather = function(){ $$(":scope > .sh-nj, :scope > .sh-qrate", res).forEach(function(n){ after.appendChild(n); }); };
 gather();
 if (window.MutationObserver) { var mo = new MutationObserver(gather); mo.observe(res, { childList: true }); setTimeout(function(){ mo.disconnect(); }, 4000); }
-var ag = $("[data-again]", res); if (ag) ag.addEventListener("click", function(){ var n = card(q, { ctx: el.getAttribute("data-ctx") }); el.replaceWith(n); var f = $(".ch", n); if (f) f.focus(); track("bank:again"); });
+var ag = $("[data-again]", res); if (ag) ag.addEventListener("click", function(){ var n = card(q, { ctx: el.getAttribute("data-ctx"), num: o.num, of: o.of }); el.replaceWith(n); var f = $(".ch", n); if (f) f.focus(); track("bank:again"); });
 var ak = $("[data-ask-q]", res); if (ak) ak.addEventListener("click", function(){ HX.askAbout(q, right, picks); });
 if (HX.FIG && HX.FIG.ANIMA) { try { HX.FIG.ANIMA.mount(res); } catch (e) {} }
 }
@@ -704,7 +712,9 @@ if (STATE.ui.qlikely && !isLk(STATE.ui.qlikely)) STATE.ui.qlikely = "";
 function bankReset(){ STATE.ui.qset = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; STATE.ui.qstatus = "all"; STATE.ui.qlikely = ""; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; }
 var SETS = [["drill", "Daily drill"], ["misses", "Yesterday's misses"], ["weak", "Weak spots"], ["mock", "Mock exam"]];
 var FMTS = [["recall", "Recall (self-graded)"], ["2stmt", "Two statements"], ["tf", "True or false"], ["numbered", "Numbered statements"], ["which", "Which statement is true"], ["whichf", "Which statement is false"], ["except", "EXCEPT / NOT"], ["pbox", "Patient Box cases"], ["img", "Diagram questions"], ["multi", "Select all that apply"], ["match", "Matching"], ["sequence", "Put in order"]];
-var PAGE = 20, bankSearch = "";
+var PAGE = 50, bankSearch = "";
+var SIZES = [[50, "50"], [100, "100"], [200, "200"], ["all", "All"]];
+function qsize(){ var v = STATE.ui.qsize; return v === 50 || v === 100 || v === 200 || v === "all" ? v : 100; }
 function isFmt(q, fm){ return fm === "pbox" ? !!q.pbox : fm === "img" ? !!q.img : (fm === "multi" || fm === "match" || fm === "sequence" || fm === "recall") ? q.type === fm : q.fmt === fm; }
 function labelOf(list, k){ for (var i = 0; i < list.length; i++) if (list[i][0] === k) return list[i][1]; return k; }
 function presetOf(){ var s = parse()[1]; return SETS.some(function(x){ return x[0] === s; }) ? s : s === "missed" ? "" : ""; }
@@ -756,7 +766,7 @@ function renderQuestions(el, s){
 if (s === "missed") { STATE.ui.qset = ""; STATE.ui.qstatus = "missed"; STATE.ui.qlikely = ""; STATE.ui.qlec = "all"; saveState(); history.replaceState(null, "", "#questions"); s = ""; }
 if (HX.SESSION.hp0 === null) HX.SESSION.hp0 = HX.petHp();
 el.innerHTML = '<div class="hx-page bank"><p class="note loading">Loading the questions…</p></div>';
-needQuestions().then(function(){ if (HX.view === "questions") drawQuestions(el, s); }).catch(function(){ el.innerHTML = offlineHTML("the questions"); });
+Promise.all([needQuestions(), HX.needVariants ? HX.needVariants() : null]).then(function(){ if (HX.view === "questions") drawQuestions(el, s); }).catch(function(){ el.innerHTML = offlineHTML("the questions"); });
 }
 var LIST = null;
 var VIEWS = [["questions", "Questions", "questions"], ["learn", "Learn", "learn"], ["cards", "Flashcards", "cards"]];
@@ -767,13 +777,22 @@ return '<div class="studyas" role="group" aria-labelledby="saL"><span class="lab
 VIEWS.map(function(x){ return '<button type="button" data-qview="' + x[0] + '" aria-pressed="' + (v === x[0]) + '">' + icon(x[2], 18) + "<span>" + x[1] + "</span></button>"; }).join("") + "</span></div>";
 }
 function drawQuestions(el, preset){
-var title = preset ? labelOf(SETS, preset) : "Questions", studying = preset !== "mock" && qview() !== "questions";
+var title = preset ? labelOf(SETS, preset) : "Questions", studying = preset !== "mock" && qview() !== "questions",
+cuspGame = !preset && !studying && !!(C.bank && C.bank.cuspGame);
 el.innerHTML = '<div class="hx-page bank"><div class="bank-head"><h1>' + esc(title) + "</h1></div>" +
 '<div class="bank-grid"><div class="bank-main' + (studying ? " is-study" : "") + '">' + (preset === "mock" ? "" : viewHTML()) +
+(cuspGame ? '<div class="cg-host" data-cusp-game></div>' : "") +
 (studying ? '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div><h2 class="bank-which">Which questions</h2>' + panelHTML(preset)
-: panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><div class="qlist" id="qlist"></div>') + "</div>" +
+: panelHTML(preset) + '<div class="qsum" aria-live="polite"></div><nav class="qsets" aria-label="Which questions" hidden></nav><div class="qlist" id="qlist"></div>') + "</div>" +
 '<aside class="bank-side" aria-label="Today">' + HX.todayPanel() + "</aside></div></div>";
 wirePanel(el, preset);
+if (cuspGame) {
+var cgHost = $("[data-cusp-game]", el);
+needFigures().then(function(fig){
+if (!cgHost || !cgHost.isConnected || !fig || !fig.CUSP_GAME) return;
+fig.CUSP_GAME.mount(cgHost);
+}).catch(function(){});
+}
 $$("[data-qview]", el).forEach(function(b){ b.addEventListener("click", function(){
 var v = b.getAttribute("data-qview"); if (v === qview()) return;
 STATE.ui.qview = v; saveState(); track("bank:view=" + v); drawQuestions(el, preset);
@@ -813,7 +832,11 @@ L.host.innerHTML = emptyHTML(kind === "learn" ? "Learn couldn't open" : "Flashca
 $("[data-qview-back]", L.host).addEventListener("click", function(){ STATE.ui.qview = "questions"; saveState(); drawQuestions(L.el, L.preset); });
 });
 }
-function show(){ if (qview() === "questions") page(); else study(); }
+function show(){
+if (qview() !== "questions") { study(); return; }
+var z = qsize(); LIST.size = z === "all" ? Math.max(1, setTotal(LIST)) : z;
+openSet(LIST, firstSet(LIST)); keepSet(LIST); page();
+}
 function panelHTML(preset){
 var picked = lecIds(), sum = lecSummary(picked);
 normShow();
@@ -835,7 +858,8 @@ HX.LECS.map(function(l){ var on = picked.indexOf(l.id) > -1; return '<li><label>
 '<div class="qbar-row chips"><span class="lab">Show</span><span class="chipset">' + SHOW.map(function(x){ return showChip(x[0], x[1]); }).join("") + "</span></div>" +
 '<div class="qbar-row chips only"><span class="lab">Only</span><span class="chipset" role="group" aria-label="Only">' + LIKELY.map(function(x){ return lkChip(x[0], x[1]); }).join("") + "</span></div>" +
 '<div class="qbar-row chips"><span class="lab">Sets</span><span class="chipset">' + SETS.map(function(x){ return setChip(x[0], x[1]); }).join("") + "</span></div>" +
-'<div class="qbar-row">' + (qview() === "questions" ? '<span class="lab">Order</span><span class="seg" role="group" aria-label="Order"><button type="button" data-order="in" aria-pressed="' + (STATE.ui.qorder !== "random") + '">In order</button><button type="button" data-order="random" aria-pressed="' + (STATE.ui.qorder === "random") + '">' + icon("shuffle", 16) + "Random</button></span>" : "") +
+'<div class="qbar-row">' + (qview() === "questions" ? '<span class="lab">Order</span><span class="seg" role="group" aria-label="Order"><button type="button" data-order="in" aria-pressed="' + (STATE.ui.qorder !== "random") + '">In order</button><button type="button" data-order="random" aria-pressed="' + (STATE.ui.qorder === "random") + '">' + icon("shuffle", 16) + "Random</button></span>" +
+'<span class="lab" id="qzL">At a time</span><span class="seg seg-size" role="group" aria-labelledby="qzL">' + SIZES.map(function(x){ return '<button type="button" data-qsize="' + x[0] + '" aria-pressed="' + (qsize() === x[0]) + '"' + (x[0] === "all" ? ' aria-label="All at once"' : ' aria-label="' + x[1] + ' at a time"') + ">" + x[1] + "</button>"; }).join("") + "</span>" : "") +
 '<details class="morefil"' + (STATE.ui.qmore ? " open" : "") + '><summary class="btn btn-text">' + icon("filter", 16) + "More filters" + (more ? ' <span class="badge num">' + more + " on</span>" : "") + "</summary>" +
 '<div class="morefil-body"><p class="lab">Question type</p><span class="chipset">' + [["all", "Any type"]].concat(fmts).map(function(f){ var n = f[0] === "all" ? "" : ' <span class="n num">' + filtered({ fm: f[0] }).length + "</span>"; return '<button class="chip" type="button" data-fmt="' + f[0] + '" aria-pressed="' + ((STATE.ui.qfmt || "all") === f[0]) + '">' + esc(f[1]) + n + "</button>"; }).join("") + "</span>" +
 '<p class="lab">Where it\'s from</p><span class="chipset">' + [["all", "Anywhere"]].concat(srcs.map(function(k){ return [k, HX.CORE.srcLabel[k]]; })).map(function(f){ return '<button class="chip" type="button" data-src="' + esc(f[0]) + '" aria-pressed="' + ((STATE.ui.qsrc || "all") === f[0]) + '">' + esc(f[1]) + "</button>"; }).join("") + "</span></div></details></div>" +
@@ -853,6 +877,7 @@ $("[data-lpnone]", el).addEventListener("click", function(){ $$("input", pop).fo
 $$("[data-show]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qstatus = b.getAttribute("data-show"); redraw("show=" + STATE.ui.qstatus); }); });
 $$("[data-lk]", el).forEach(function(b){ b.addEventListener("click", function(){ var k = b.getAttribute("data-lk"); setLk(!preset && STATE.ui.qlikely === k ? "" : k); redraw("show=" + (STATE.ui.qlikely || k + "-off")); }); });
 $$("[data-order]", el).forEach(function(b){ b.addEventListener("click", function(){ var o = b.getAttribute("data-order"); if (o === "random") STATE.ui.qseed = Math.floor(Math.random() * 2e9) + 1; STATE.ui.qorder = o; redraw("order=" + o); }); });
+$$("[data-qsize]", el).forEach(function(b){ b.addEventListener("click", function(){ var v = b.getAttribute("data-qsize"); STATE.ui.qsize = v === "all" ? "all" : +v; redraw("size=" + v); }); });
 $$("[data-fmt]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qfmt = b.getAttribute("data-fmt"); STATE.ui.qmore = 1; redraw("type=" + STATE.ui.qfmt); }); });
 $$("[data-src]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qsrc = b.getAttribute("data-src"); STATE.ui.qmore = 1; redraw("src=" + STATE.ui.qsrc); }); });
 $$("[data-set]", el).forEach(function(a){ a.addEventListener("click", function(){ track("bank:set=" + a.getAttribute("data-set")); }); });
@@ -870,7 +895,7 @@ return out.filter(Boolean);
 }
 function fill(el, preset){
 var host = $("#qlist", el), sumEl = $(".qsum", el);
-host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0 };
+host.innerHTML = ""; LIST = { el: el, host: host, items: [], shown: 0, ctx: preset || "bank", notes: {}, preset: preset || "", all: 0, base: 0, set: 0, end: 0, size: 100 };
 if (preset === "drill") {
 sumEl.innerHTML = '<p class="note">Picking today\'s questions…</p>';
 whenWidget("shDrill", function(D){
@@ -883,6 +908,7 @@ var done = items.filter(function(it){ return s.res[it.id] === 1 || s.res[it.id] 
 sumEl.innerHTML = '<p class="sumline"><b class="num">' + done + " of " + items.length + "</b> done today. Spaced review first, then your misses and the high-yield ones.</p>";
 items.forEach(function(it){ LIST.notes[it.id] = it.note; });
 LIST.items = (qview() === "questions" ? items.filter(function(it){ return !(s.res[it.id] === 1 || s.res[it.id] === 0); }) : items).map(function(it){ return QBY[it.id]; });
+if (qview() === "questions") LIST.base = done;
 if (!LIST.items.length) { host.innerHTML = drillDoneHTML(); wireDrillDone(el); return; }
 show();
 });
@@ -938,29 +964,83 @@ return "Those filters together leave no questions.";
 function emptyHTML(t, p, act){ return '<div class="empty panel"><h2>' + esc(t) + "</h2><p>" + esc(p) + "</p>" + (act || "") + "</div>"; }
 function wireEmpty(el){ $$("[data-showset]", el).forEach(function(a){ a.addEventListener("click", function(){ STATE.ui.qstatus = a.getAttribute("data-showset"); STATE.ui.qlikely = ""; STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; saveState(); }); }); }
 var io = null;
-function page(){
+function setTotal(L){ return L.base + L.items.length; }
+function setsOf(L){ return Math.max(1, Math.ceil(setTotal(L) / L.size)); }
+function setSize(L, k){ return Math.min(L.size, setTotal(L) - k * L.size); }
+function setKey(){
+var st = STATE.ui.qstatus || "all";
+return st === "unseen" || st === "missed" ? "" : JSON.stringify([STATE.ui.qlec, st, STATE.ui.qlikely || "", STATE.ui.qfmt || "all", STATE.ui.qsrc || "all", STATE.ui.qorder === "random" ? STATE.ui.qseed || 1 : 0, bankSearch.trim()]);
+}
+function firstSet(L){
+var last = setsOf(L) - 1;
+if (L.ctx === "drill") return Math.min(Math.floor(L.base / L.size), last);
+var p = STATE.ui.qpage, k = L.ctx === "bank" ? setKey() : "";
+return k && p && p.k === k ? Math.min(Math.floor(Math.max(0, p.at | 0) / L.size), last) : 0;
+}
+function keepSet(L){ if (L.ctx !== "bank") return; var k = setKey(); STATE.ui.qpage = k ? { k: k, at: L.set * L.size } : null; saveState(); }
+function openSet(L, k){
+L.set = k; L.shown = Math.max(0, k * L.size - L.base); L.end = Math.min(L.items.length, (k + 1) * L.size - L.base);
+if (io) io.disconnect();
+L.host.innerHTML = "";
+setsBar(L);
+}
+function setsBar(L){
+var nav = $(".qsets", L.el); if (!nav) return;
+var n = setsOf(L), T = setTotal(L), k = L.set;
+if (n < 2) { nav.hidden = true; nav.innerHTML = ""; return; }
+var range = function(j){ return (j * L.size + 1) + "–" + Math.min(T, (j + 1) * L.size); };
+var opts = []; for (var j = 0; j < n; j++) opts.push('<option value="' + j + '"' + (j === k ? " selected" : "") + ">" + range(j) + "</option>");
+nav.innerHTML = '<span class="lab" id="qsL">Questions</span><span class="qsets-pick"><select data-setpick aria-labelledby="qsL qsO">' + opts.join("") + '</select><span class="note num" id="qsO">of ' + T + "</span></span>" +
+'<span class="seg qsets-step"><button type="button" data-setstep="-1"' + (k ? "" : " disabled") + ">" + icon("chevron", 16, "flip") + "Previous</button>" +
+'<button type="button" data-setstep="1"' + (k + 1 < n ? "" : " disabled") + ">Next " + (k + 1 < n ? setSize(L, k + 1) : L.size) + icon("chevron", 16) + "</button></span>";
+nav.hidden = false;
+nav.onchange = function(e){ var sel = e.target.closest && e.target.closest("[data-setpick]"); if (sel) toSet(L, +sel.value, "pick"); };
+nav.onclick = function(e){ var b = e.target.closest("[data-setstep]"); if (b && !b.disabled) { var d = +b.getAttribute("data-setstep"); toSet(L, L.set + d, d > 0 ? "next" : "prev"); } };
+}
+function toSet(L, k, how){
+if (LIST !== L || !L.host.isConnected) return;
+k = Math.max(0, Math.min(setsOf(L) - 1, k)); if (k === L.set) return;
+openSet(L, k); keepSet(L); track("bank:page=" + how); page(true);
+}
+function toListTop(L){
+var top = 0, nav = $(".qsets", L.el), at = nav && !nav.hidden ? nav : L.host;
+$$(".hx-bar, .hx-strip").forEach(function(b){ var r = b.getBoundingClientRect(); if (r.top <= 1 && r.bottom < innerHeight / 2) top = Math.max(top, r.bottom); });
+top += parseFloat(docEl.style.getPropertyValue("--boss-h")) || 0;
+window.scrollTo(0, Math.max(0, scrollY + at.getBoundingClientRect().top - top - 12));
+}
+function page(focus){
 var L = LIST; if (!L) return;
-var next = L.items.slice(L.shown, L.shown + PAGE);
+var k = L.set, at = L.shown, next = L.items.slice(at, Math.min(at + PAGE, L.end));
 if (!next.length) return;
 (next.some(needsFig) ? needFigures() : Promise.resolve()).then(function(){
-if (LIST !== L || !L.host.isConnected) return;
+if (LIST !== L || !L.host.isConnected || L.set !== k || L.shown !== at) return;
 var old = $(".sentinel", L.host); if (old) old.remove();
-next.forEach(function(q){ L.host.appendChild(card(q, { ctx: L.ctx, note: L.notes[q.id], onAnswer: onBankAnswer })); });
+var n0 = k * L.size - L.base, of = setSize(L, k);
+next.forEach(function(q, i){ L.host.appendChild(card(q, { ctx: L.ctx, note: L.notes[q.id], onAnswer: onBankAnswer, num: at + i - n0 + 1, of: of })); });
 L.shown += next.length;
-if (L.shown < L.items.length) {
-var s = h('<div class="sentinel"><button class="btn" type="button">Next ' + Math.min(PAGE, L.items.length - L.shown) + " questions</button></div>");
-$("button", s).addEventListener("click", page);
+if (focus === true) { toListTop(L); var c1 = $(".qcard", L.host); if (c1) { c1.setAttribute("tabindex", "-1"); try { c1.focus({ preventScroll: true }); } catch (e) {} } }
+if (L.shown < L.end) {
+var s = h('<div class="sentinel"><button class="btn" type="button">Next ' + Math.min(PAGE, L.end - L.shown) + " questions</button></div>");
+$("button", s).addEventListener("click", function(){ page(); });
 L.host.appendChild(s);
 if ("IntersectionObserver" in window) { if (io) io.disconnect(); io = new IntersectionObserver(function(es){ if (es.some(function(e){ return e.isIntersecting; })) { io.disconnect(); page(); } }, { rootMargin: "600px 0px" }); io.observe(s); }
+} else if (k + 1 < setsOf(L)) {
+var T = setTotal(L), e = h('<div class="qset-end panel"><p class="sumline">That\'s questions <b class="num">' + (k * L.size + 1) + "–" + Math.min(T, (k + 1) * L.size) + "</b> of " + T + '.</p><button class="btn btn-primary" type="button" data-setnext>Next ' + pl(setSize(L, k + 1), "question") + icon("chevron", 18) + "</button></div>");
+$("[data-setnext]", e).addEventListener("click", function(){ toSet(L, k + 1, "end"); });
+L.host.appendChild(e);
 } else if (L.ctx === "bank") L.host.appendChild(h('<p class="note end">That\'s all ' + L.items.length + " for these filters.</p>"));
 });
 }
 function onBankAnswer(cardEl, q, right){
 var L = LIST; if (!L) return;
 if (!right && (L.ctx === "bank" || L.ctx === "weak" || L.ctx === "misses")) {
+var waiting = Array.prototype.some.call(cardEl.parentNode.querySelectorAll(".qcard.is-retry:not(.is-answered)"), function(c){ return c !== cardEl && c.getAttribute("data-qid") === q.id; });
+if (!waiting) {
 var after = cardEl, k = 0; while (after.nextElementSibling && after.nextElementSibling.classList.contains("qcard") && k < RETRY_GAP) { after = after.nextElementSibling; k++; }
-var again = card(q, { ctx: L.ctx, retry: true, onAnswer: onBankAnswer });
+var again = card(q, { ctx: L.ctx, retry: (+cardEl.getAttribute("data-try") || 1) + 1, onAnswer: onBankAnswer });
 after.parentNode.insertBefore(again, after.nextSibling);
+track("bank:retry-shown");
+}
 }
 if (cardEl.classList.contains("is-retry")) track("bank:retry-" + (right ? "right" : "missed"));
 if (L.ctx === "drill") {
@@ -992,11 +1072,19 @@ var keys = shuffled(Object.keys(by)), out = [];
 while (out.length < n && keys.some(function(k){ return by[k].length; })) keys.forEach(function(k){ if (out.length < n && by[k].length) out.push(by[k].shift()); });
 return out;
 }
-var pb = rr(all.filter(function(q){ return q.pbox && q.type === "mcq"; }), f.pbox || 0);
-var mu = rr(all.filter(function(q){ return q.type === "multi" && !q.pbox; }), f.multi || 0);
-var od = rr(all.filter(function(q){ return q.type === "sequence" && q.steps.length > 2; }), f.order || 0);
-var mc = rr(all.filter(function(q){ return q.type === "mcq" && !q.pbox; }), f.total - pb.length - mu.length - od.length);
-var order = {}, oc = {};
+function draw(qs, n){
+if (!f.midShare || !f.midThrough) return rr(qs, n);
+var mid = function(q){ var l = LBY[q.lec]; return !!l && l.num <= f.midThrough; };
+var late = rr(qs.filter(function(q){ return !mid(q); }), n - Math.round(n * f.midShare));
+return late.concat(rr(qs.filter(mid), n - late.length));
+}
+var pb = draw(all.filter(function(q){ return q.pbox && q.type === "mcq"; }), f.pbox || 0);
+var mu = draw(all.filter(function(q){ return q.type === "multi" && !q.pbox; }), f.multi || 0);
+var ma = draw(all.filter(function(q){ return q.type === "match" && q.pairs && q.pairs.length > 1; }), f.match || 0);
+var od = draw(all.filter(function(q){ return q.type === "sequence" && q.steps.length > 2; }), f.order || 0);
+var mc = draw(all.filter(function(q){ return q.type === "mcq" && !q.pbox; }), f.total - pb.length - mu.length - ma.length - od.length);
+var order = {}, oc = {}, ro = {};
+ma.forEach(function(q){ var ix = q.pairs.map(function(x, k){ return k; }); order[q.id] = shuffled(ix); ro[q.id] = shuffled(ix); });
 pb.concat(mc).forEach(function(q){ order[q.id] = choiceOrder(q); });
 mu.forEach(function(q){ order[q.id] = shuffled(q.choices.map(function(c, k){ return k; })); });
 od.forEach(function(q){
@@ -1006,19 +1094,24 @@ shuffled(q.steps.slice(0, -1).map(function(x, i){ var a = q.steps.slice(); a[i] 
 oc[q.id] = { stem: String(q.stem).replace(/^Put /, "Select the right order: ").replace(/ in order(,|\.)/, "$1"), choices: [right].concat(alts), answer: 0 };
 order[q.id] = shuffled(oc[q.id].choices.map(function(c, k){ return k; }));
 });
-STATE.mock = { ids: shuffled(pb.concat(mu, od, mc).map(function(q){ return q.id; })), t0: Date.now(), picks: {}, order: order, oc: oc, res: {}, pts: {}, submitted: false };
+STATE.mock = { ids: shuffled(pb.concat(mu, ma, od, mc).map(function(q){ return q.id; })), t0: Date.now(), picks: {}, order: order, oc: oc, ro: ro, res: {}, pts: {}, submitted: false };
 saveNow(); mockSession();
 }
 function buildMock(){
 if (mockFormat()) return formatMock();
-var ids = [], bp = HX.CORE.mock.blueprint, lo = HX.CORE.mock.likelyOnly || {};
+var ids = [], bp = HX.CORE.mock.blueprint, lo = HX.CORE.mock.likelyOnly || {}, share = +HX.CORE.mock.likelyShare || 0;
+var fresh = function(q){ var r = ansOf(q.id); return !r || r.last === false; };
+var freshFirst = function(qs){ var a = shuffled(qs); return a.filter(fresh).concat(a.filter(function(q){ return !fresh(q); })); };
 Object.keys(bp).forEach(function(lec){
 var pool = mockLecs(lec).reduce(function(a, l){ return a.concat(QBL[l] || []); }, []).map(function(r){ return QBY[r.id]; }).filter(function(q){ return q && q.type === "mcq"; });
 var hl = lo[lec] ? pool.filter(function(q){ return q.likely; }) : [];
 if (hl.length) { shuffled(hl).slice(0, bp[lec]).forEach(function(q){ ids.push(q.id); }); return; }
-var fresh = shuffled(pool.filter(function(q){ var r = ansOf(q.id); return !r || r.last === false; }));
-var rest = shuffled(pool.filter(function(q){ return fresh.indexOf(q) === -1; }));
-fresh.concat(rest).slice(0, bp[lec]).forEach(function(q){ ids.push(q.id); });
+if (share > 0) {
+var n = bp[lec], k = Math.round(n * share), a = freshFirst(pool.filter(function(q){ return q.likely; })), b = freshFirst(pool.filter(function(q){ return !q.likely; }));
+var pick = a.slice(0, k); pick = pick.concat(b.slice(0, n - pick.length)); pick = pick.concat(a.slice(k, k + n - pick.length));
+pick.forEach(function(q){ ids.push(q.id); }); return;
+}
+freshFirst(pool).slice(0, bp[lec]).forEach(function(q){ ids.push(q.id); });
 });
 var order = {}; ids.forEach(function(id){ order[id] = choiceOrder(QBY[id]); });
 STATE.mock = { ids: shuffled(ids), t0: Date.now(), picks: {}, order: order, res: {}, submitted: false };
@@ -1048,7 +1141,13 @@ var need = m.ids.some(function(id){ return needsFig(QBY[id]); });
 }
 function mockList(host, el, m, total, lim){
 var F = !!mockFormat(), oc = m.oc || {}, pts = m.pts || {};
-var has = function(id){ var p = m.picks[id]; return Array.isArray(p) ? p.length > 0 : p !== undefined && p !== null; };
+var set = function(v){ return v !== undefined && v !== null; };
+var has = function(id){ var p = m.picks[id]; return Array.isArray(p) ? p.some(set) : set(p); };
+var matched = function(q, k){ var v = (Array.isArray(m.picks[q.id]) ? m.picks[q.id] : [])[k]; return set(v) && !!q.pairs[v] && q.pairs[v][1] === q.pairs[k][1]; };
+var prog = function(){
+$$("[data-prog]", host).forEach(function(p){ p.textContent = m.ids.filter(has).length + " of " + m.ids.length + " answered"; });
+$$("[data-submit][data-confirm]", host).forEach(function(s){ s.removeAttribute("data-confirm"); s.textContent = "Submit the exam"; });
+};
 var picked = m.ids.filter(has).length, correct = m.submitted ? m.ids.filter(function(id){ return m.res[id]; }).length : 0;
 var points = m.ids.reduce(function(n, id){ return n + (pts[id] || 0); }, 0), p1 = function(x){ return String(Math.round(x * 10) / 10); };
 var top = '<div class="mock-bar panel"><span class="clock num" data-clock>' + icon("clock", 18) + "0:00</span>" +
@@ -1064,11 +1163,25 @@ host.innerHTML = top + byLec;
 m.ids.forEach(function(id, i){
 var q = QBY[id]; if (!q) return;
 if (m.submitted && m.onlyMissed && m.res[id]) return;
+if (HX.hasVersions && HX.hasVersions(id)) { m.wv = m.wv || {}; if (m.wv[id] == null) m.wv[id] = HX.worded(q)._w || 0; q = HX.worded(q, null, m.wv[id]); }
+if (q.type === "match") {
+var mp = Array.isArray(m.picks[id]) ? m.picks[id] : [], ix = q.pairs.map(function(x, k){ return k; }), rows = (m.order && m.order[id]) || ix, opts = (m.ro && m.ro[id]) || ix, mpp = pts[id] || 0, mnone = !has(id);
+var em = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="match" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
+em.innerHTML = '<header class="qc-head"><span class="qc-meta">' + qNum(i + 1, m.ids.length, "mk" + i + "n") + '<span class="qc-lec" id="mk' + i + '">' + lecChip(q.lec) + '</span><span class="qc-flag">Matching · each pair is scored</span></span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(q) +
+'<div class="mk-match">' + rows.map(function(k){
+var ok = matched(q, k);
+return '<label class="mk-row' + (m.submitted ? (ok ? " is-right" : " is-wrong") : "") + '"><span class="txt">' + esc(q.pairs[k][0]) + '</span><span class="mk-pick"><select data-mock-match="' + k + '"' + (m.submitted ? " disabled" : "") + '><option value="">Choose…</option>' +
+opts.map(function(r){ return '<option value="' + r + '"' + (mp[k] === r ? " selected" : "") + ">" + esc(q.pairs[r][1]) + "</option>"; }).join("") + '</select><span class="st-ic" aria-hidden="true">' + (m.submitted ? icon(ok ? "check" : "cross", 20) : "") + "</span></span></label>"; }).join("") + "</div>" +
+(m.submitted ? '<section class="qc-result qcard-explain" data-role="explain"><p class="verdict ' + (mnone ? "no" : m.res[id] ? "ok" : mpp > 0 ? "part" : "no") + '">' + icon(m.res[id] ? "check" : mpp > 0 ? "goal" : "cross", 26) + (mnone ? "Not answered" : m.res[id] ? "Right" : mpp > 0 ? "Partly right: " + Math.round(mpp * 100) + "% credit" : "Missed") + "</p>" + figAfterHTML(q) +
+'<dl class="qc-pairs">' + q.pairs.map(function(p){ return "<div><dt>" + esc(p[0]) + "</dt><dd>" + esc(p[1]) + "</dd></div>"; }).join("") + '</dl><p class="qc-ex">' + esc(q.ex || "") + "</p></section>" : '<section class="qcard-explain" data-role="explain" hidden></section>');
+host.appendChild(em);
+return;
+}
 var o2 = oc[id], multi = q.type === "multi", choices = o2 ? o2.choices : q.choices, ans = o2 ? o2.answer : q.answer;
 var pick = id in m.picks ? m.picks[id] : null, picks = multi ? (pick || []) : [], order = (m.order && m.order[id]) || choices.map(function(c, k){ return k; });
 var none = multi ? !picks.length : pick === null, pp = pts[id] || 0;
-var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + (multi ? "multi" : "mcq") + '" data-ctx="mock" aria-labelledby="mk' + i + '"></article>');
-el2.innerHTML = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="mk' + i + '">Question ' + (i + 1) + " · " + lecChip(q.lec) + "</span>" + (multi ? '<span class="qc-flag">Select all that apply · partial credit</span>' : o2 ? '<span class="qc-flag">Ordering</span>' : "") + '</span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(o2 ? { stem: o2.stem } : q) +
+var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '"' + (q._base ? ' data-wording="' + (q._w || 0) + '"' : "") + ' data-qtype="' + (multi ? "multi" : "mcq") + '" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
+el2.innerHTML = '<header class="qc-head"><span class="qc-meta">' + qNum(i + 1, m.ids.length, "mk" + i + "n") + '<span class="qc-lec" id="mk' + i + '">' + lecChip(q.lec) + "</span>" + (multi ? '<span class="qc-flag">Select all that apply · partial credit</span>' : o2 ? '<span class="qc-flag">Ordering</span>' : "") + '</span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(o2 ? { stem: o2.stem } : q) +
 '<ul class="qc-choices' + (q.fmt === "tf" ? " qc-tf" : "") + '">' + order.map(function(k){
 var on = multi ? picks.indexOf(k) > -1 : k === pick, good = multi ? q.correct.indexOf(k) > -1 : k === ans;
 var st = m.submitted ? (good && (on || !multi) ? "right" : on ? "wrong" : good ? "missed" : "") : "";
@@ -1087,9 +1200,7 @@ var arr = Array.isArray(m.picks[id]) ? m.picks[id] : [], at = arr.indexOf(k);
 if (at > -1) arr.splice(at, 1); else arr.push(k);
 m.picks[id] = arr; b.setAttribute("aria-pressed", String(at < 0));
 } else { m.picks[id] = k; $$("[data-mock-pick]", c).forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); }); }
-saveState();
-$$("[data-prog]", host).forEach(function(p){ p.textContent = m.ids.filter(has).length + " of " + m.ids.length + " answered"; });
-$$("[data-submit][data-confirm]", host).forEach(function(s){ s.removeAttribute("data-confirm"); s.textContent = "Submit the exam"; });
+saveState(); prog();
 } else if (b.hasAttribute("data-submit")) {
 var left = m.ids.length - m.ids.filter(has).length;
 if (left > 0 && !b.getAttribute("data-confirm")) { b.setAttribute("data-confirm", "1"); b.textContent = left + " unanswered: submit anyway?"; return; }
@@ -1097,6 +1208,12 @@ m.submitted = true; m.tEnd = Date.now(); m.res = {}; m.pts = pts = {};
 var sid = mockSid(m);
 m.ids.forEach(function(id){
 var q = QBY[id]; if (!q) return;
+if (q.type === "match") {
+pts[id] = q.pairs.filter(function(x, k){ return matched(q, k); }).length / q.pairs.length; m.res[id] = pts[id] === 1;
+var rowsSent = q.pairs.map(function(x, k){ var v = (Array.isArray(m.picks[id]) ? m.picks[id] : [])[k]; return matched(q, k) ? k : set(v) && q.pairs[v] ? v : (k + 1) % q.pairs.length; });
+if (has(id)) HX.recordAnswer(q.id, q.lec, m.res[id], "mock", null, null, { session: sid, order: rowsSent });
+return;
+}
 if (q.type === "multi") {
 var pk = Array.isArray(m.picks[id]) ? m.picks[id] : [], hit = pk.filter(function(i){ return q.correct.indexOf(i) > -1; }).length;
 pts[id] = pk.length ? Math.max(0, (hit - (pk.length - hit)) / q.correct.length) : 0; m.res[id] = pts[id] === 1;
@@ -1114,6 +1231,13 @@ if (sid) window.shGame.finishSession(sid, nRight, m.ids.length);
 saveNow(); HX.paintMeters(); track("mock:submit"); drawMock(host, el); window.scrollTo(0, 0);
 } else if (b.hasAttribute("data-onlymissed")) { m.onlyMissed = !m.onlyMissed; saveState(); drawMock(host, el); }
 else if (b.hasAttribute("data-newmock")) { STATE.mock = null; saveState(); drawMock(host, el); }
+};
+host.onchange = function(e){
+var s = e.target && e.target.closest ? e.target.closest("[data-mock-match]") : null; if (!s || m.submitted) return;
+var c = s.closest(".qcard"), id = c && c.getAttribute("data-qid"), q = QBY[id]; if (!q || !q.pairs) return;
+var arr = Array.isArray(m.picks[id]) ? m.picks[id] : q.pairs.map(function(){ return null; });
+arr[+s.getAttribute("data-mock-match")] = s.value === "" ? null : +s.value; m.picks[id] = arr;
+saveState(); prog();
 };
 var clock = $("[data-clock]", host);
 function tick(){ if (!clock.isConnected) { clearInterval(mockTimer); return; } var sec = Math.floor(((m.tEnd || Date.now()) - m.t0) / 1000); clock.innerHTML = icon("clock", 18) + Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0") + " of " + Math.floor(lim / 60) + ":" + String(lim % 60).padStart(2, "0"); clock.classList.toggle("is-over", sec > lim); }
@@ -1311,6 +1435,32 @@ exportQuestions();
 return QS;
 });
 }
+var VARS = null;
+function needVariants(){
+if (!CORE || !CORE.variants) return Promise.resolve(null);
+return VARS ? Promise.resolve(VARS) : getJSON("variants.json").then(function(v){ VARS = v || {}; return VARS; }, function(){ return null; });
+}
+var VID = "";
+function abStart(id, n){
+if (!VID) try { VID = localStorage.getItem("sh_visitor_id") || ""; } catch (e) {}
+if (!VID) return 0;
+var s = VID + "|" + id, x = 2166136261;
+for (var i = 0; i < s.length; i++) x = Math.imul(x ^ s.charCodeAt(i), 16777619);
+x ^= x >>> 16; x = Math.imul(x, 0x85ebca6b); x ^= x >>> 13; x = Math.imul(x, 0xc2b2ae35); x ^= x >>> 16;
+return (x >>> 0) % n;
+}
+function hasVersions(id){ return !!(VARS && VARS[id]); }
+function worded(q, n, k){
+var base = q && q._base || q; if (!base || !VARS) return base;
+var vs = VARS[base.id]; if (!vs) return base; if (!Array.isArray(vs)) vs = [vs];
+if (n == null) { var a = ansOf(base.id); n = a ? a.n || 0 : 0; }
+if (k == null || k < 0 || k > vs.length) k = (n + abStart(base.id, vs.length + 1)) % (vs.length + 1);
+var v = vs[k - 1];
+var o = {}; for (var key in base) o[key] = base[key];
+if (k && v && v.stem) { o.stem = v.stem; if (v.choices) o.choices = v.choices; if (v.why) o.why = v.why; if (v.ex) o.ex = v.ex; }
+else k = 0;
+o._base = base; o._w = k; return o;
+}
 function needNotes(){ return getJSON("notes.json").then(function(n){ NOTES = n; return n; }); }
 function needStudy(){ return getJSON("study.json").then(function(s){ STUDY = s; return s; }); }
 function needFigures(){
@@ -1377,7 +1527,7 @@ function route(){
 var r = parse(), v = r[0], s = r[1];
 if (window.shTTS && view === "notes" && (v !== "notes" || s !== sub)) { try { window.shTTS.stop(); } catch (e) {} }
 if (view === "questions" && v !== "questions") leaving = HX.recapDue();
-if (view === "more" && sub === "arcade" && ARC && (v !== "more" || s !== "arcade")) { try { ARC.arcade.stopAll(); } catch (e) {} }
+if (view === "more" && /^arcade(\/|$)/.test(sub) && ARC && (v !== "more" || s !== sub)) { try { ARC.arcade.stopAll(); } catch (e) {} }
 var was = view, wasSub = sub;
 view = v; sub = s;
 var setOn = v === "more" && s === "settings", gear = $(".hx-set");
@@ -1407,9 +1557,13 @@ window.addEventListener("hashchange", function(){ route(); window.scrollTo(0, 0)
 function section(){
 if (view === "home") return "home/dashboard";
 if (view === "notes") return "compendium/notes";
-if (view === "questions") { var p = HX.presetOf(); return "compendium/" + (p === "mock" ? "mock" : p === "weak" ? "weak" : p === "drill" ? "drill" : p === "misses" ? "misses" : "bank"); }
+if (view === "questions") {
+var p = HX.presetOf(), how = p !== "mock" && HX.qview ? HX.qview() : "questions";
+if (how === "learn" || how === "cards") return "compendium/" + how;
+return "compendium/" + (p === "mock" ? "mock" : p === "weak" ? "weak" : p === "drill" ? "drill" : p === "misses" ? "misses" : "bank");
+}
 if (view === "more") {
-if (sub === "arcade") return "arcade/" + (ARC && ARC.arcade.current() || "lobby");
+if (/^arcade(\/|$)/.test(sub)) return "arcade/" + (ARC && ARC.arcade.current() || "lobby");
 if (sub === "side") return "review/side";
 if (sub === "hints" || sub === "cram") return "compendium/" + sub;
 return "more/" + (sub || "menu");
@@ -1472,6 +1626,7 @@ q("#more/hints", "hints", "Exam hints", "What " + (X.prof || "the professor") + 
 q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
 (pod ? podMiniHTML(pod) : "") +
 "</nav>" +
+(X.links && X.links.length ? '<nav class="quick-more" aria-label="More to do">' + X.links.map(function(l){ return q(l.href, l.icon || "arcade", l.title, l.sub || "", "ql-wide"); }).join("") + "</nav>" : "") +
 "</div>" +
 (X.notice ? '<p class="notice">' + icon("notes", 20) + "<span><b>" + esc(X.notice[0]) + "</b> " + esc(X.notice[1]) + "</span></p>" : "") +
 '<div class="home-grid">' +
@@ -1570,7 +1725,7 @@ var art = '<article class="reading' + lc(lec.id) + '" id="lec-' + esc(lec.id) + 
 (lec.note ? '<p class="note lec-note">' + lec.note + "</p>" : "") +
 '<div class="toolbar" role="toolbar" aria-label="Notes tools">' +
 (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn"' + (mp3 ? ' data-sh-tts-audio="1"' : ' title="Read aloud in your device\'s voice"') + ' aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
-'<button type="button" class="btn btn-text follow-btn" data-follow hidden aria-pressed="' + followOn() + '" title="Highlight each word as it is read">' + icon("highlight", 18) + "Follow along</button>" : "") +
+'<button type="button" class="btn btn-text follow-btn" data-follow hidden aria-pressed="' + followOn() + '" title="Highlight each word as it is read. Tap a word to jump there.">' + icon("highlight", 18) + "Follow along</button>" : "") +
 (hasPlain || hasHy ? '<span class="seg" role="group" aria-label="Reading level"><button type="button" data-level="full" aria-pressed="' + (level === "full") + '">As taught</button>' +
 (hasPlain ? '<button type="button" data-level="plain" aria-pressed="' + (level === "plain") + '">Plain English</button>' : "") +
 (hasHy ? '<button type="button" data-level="hy" aria-pressed="' + hy + '">High yield</button>' : "") + "</span>" : "") +
@@ -1661,7 +1816,14 @@ if (blk !== prevBlk && i) sid++;
 sent[i] = sid; prevBlk = blk;
 if (/[.!?]["”')\]]*$/.test(fw[i])) sid++;
 }
-F.dw = dw; F.map = map; F.sent = sent; F.dirty = false; F.cur = -2;
+var inv = new Array(dw.length), byNode = new Map();
+for (i = 0; i < dw.length; i++) {
+inv[i] = -1;
+(byNode.get(dw[i].a) || (byNode.set(dw[i].a, []), byNode.get(dw[i].a))).push(i);
+if (dw[i].b !== dw[i].a) (byNode.get(dw[i].b) || (byNode.set(dw[i].b, []), byNode.get(dw[i].b))).push(i);
+}
+for (i = 0; i < fw.length; i++) if (map[i] >= 0 && inv[map[i]] < 0) inv[map[i]] = i;
+F.dw = dw; F.map = map; F.sent = sent; F.inv = inv; F.byNode = byNode; F.dirty = false; F.cur = -2;
 }
 function rangeOf(a, b){
 var r = document.createRange();
@@ -1707,11 +1869,57 @@ if (i !== F.cur) paint(i, F.jump); F.jump = false;
 if (!F.audio.paused && !F.audio.ended) F.raf = requestAnimationFrame(tick);
 }
 function kick(){ if (F && F.on && !F.raf) F.raf = requestAnimationFrame(tick); }
+function wordAt(x, y, slack){
+var node = null, off = 0, p;
+if (document.caretPositionFromPoint) { p = document.caretPositionFromPoint(x, y); if (p) { node = p.offsetNode; off = p.offset; } }
+else if (document.caretRangeFromPoint) { p = document.caretRangeFromPoint(x, y); if (p) { node = p.startContainer; off = p.startOffset; } }
+if (!node || node.nodeType !== 3) return -1;
+var ks = F.byNode.get(node) || [];
+for (var n = 0; n < ks.length; n++) {
+var w = F.dw[ks[n]];
+if ((w.a === node && off < w.ai) || (w.b === node && off > w.bi)) continue;
+var r = rangeOf(w, w), rs = r ? r.getClientRects() : [];
+for (var q = 0; q < rs.length; q++) if (x >= rs[q].left - slack && x <= rs[q].right + slack && y >= rs[q].top - slack && y <= rs[q].bottom + slack) return ks[n];
+return -1;
+}
+return -1;
+}
+function tapped(e){
+var me = F;
+if (!me || !me.on || !me.w || e.button || e.defaultPrevented) return;
+if (!(window.shTTS && window.shTTS.audio && window.shTTS.audio() === me.audio)) return;
+if (e.target.closest && e.target.closest("a, button, input, select, textarea, label, summary, mark.sh-hl, [data-sh-noread], .sh-hl-pop")) return;
+var sel = window.getSelection && window.getSelection();
+if (sel && !sel.isCollapsed) return;
+clearTimeout(me.tapT);
+if (e.detail > 1) return;
+var touch = Date.now() - (me.touchAt || 0) < 1000;
+if (me.dirty) build();
+var k = wordAt(e.clientX, e.clientY, touch ? 10 : 3); if (k < 0) return;
+var i = me.inv[k];
+for (var d = 1; i < 0 && d < 40; d++) i = k + d < me.inv.length && me.inv[k + d] >= 0 ? me.inv[k + d] : k - d >= 0 && me.inv[k - d] >= 0 ? me.inv[k - d] : -1;
+if (i < 0) return;
+e.preventDefault();
+me.tapT = setTimeout(function(){
+if (F !== me) return;
+var s2 = window.getSelection && window.getSelection(); if (s2 && !s2.isCollapsed) return;
+var a = me.audio;
+try { a.currentTime = me.t[2 * i] / 100; } catch (err) { return; }
+me.jump = true; me.cur = -2; userAt = 0;
+if (a.paused) { var pl = a.play(); if (pl && pl.catch) pl.catch(function(){}); }
+kick();
+track("notes:follow-seek");
+}, touch ? 0 : 250);
+}
+function touched(){ if (F) F.touchAt = Date.now(); }
 function detach(){
 if (!F) return;
 if (F.raf) cancelAnimationFrame(F.raf);
 if (F.mo) F.mo.disconnect();
+clearTimeout(F.tapT);
 F.off.forEach(function(x){ F.audio.removeEventListener(x[0], x[1]); });
+F.root.removeEventListener("click", tapped); F.root.removeEventListener("touchstart", touched);
+F.root.classList.remove("is-following");
 F = null; clear();
 }
 function load(url){
@@ -1727,7 +1935,14 @@ load(wurl).then(function(d){
 if (F !== me || !d || d.v !== 1 || !d.w || !d.t) return;
 var w = String(d.w).split(" ");
 if (w.length * 2 !== d.t.length) return;
-function ready(){ if (F !== me) return; if (audio.duration && isFinite(audio.duration) && Math.abs(audio.duration - d.dur) > 2) { detach(); return; } me.w = w; me.t = d.t; show(true); kick(); }
+function ready(){
+if (F !== me) return;
+if (audio.duration && isFinite(audio.duration) && Math.abs(audio.duration - d.dur) > 2) { detach(); return; }
+me.w = w; me.t = d.t; show(true); kick();
+root.addEventListener("click", tapped); root.addEventListener("touchstart", touched, { passive: true });
+root.classList.toggle("is-following", me.on);
+if (me.on && !ls("sh_tip_wordseek")) { ls("sh_tip_wordseek", "1"); toast("Tip: tap any word in the notes to jump the narration there."); }
+}
 if (audio.readyState >= 1) ready(); else audio.addEventListener("loadedmetadata", ready, { once: true });
 function on(x, f){ audio.addEventListener(x, f); me.off.push([x, f]); }
 on("play", kick); on("seeked", function(){ if (F === me) { me.jump = true; me.cur = -2; kick(); } });
@@ -1742,7 +1957,7 @@ function show(on){ var b = F && F.root.closest(".reading") ? $("[data-follow]", 
 document.addEventListener("sh:tts-audio", function(e){ var d = e.detail || {}; attach(d.audio, d.container, d.url); });
 document.addEventListener("sh:tts-stop", function(){ if (F && !(window.shTTS && window.shTTS.audio && window.shTTS.audio() === F.audio)) detach(); });
 return {
-pref: function(){ if (!F) return; F.on = followOn(); if (F.on) { F.cur = -2; F.jump = true; kick(); } else clear(); },
+pref: function(){ if (!F) return; F.on = followOn(); if (F.w) F.root.classList.toggle("is-following", F.on); if (F.on) { F.cur = -2; F.jump = true; kick(); } else clear(); },
 reattach: function(root, mp3){ var a = window.shTTS && window.shTTS.audio && window.shTTS.audio(); if (a && F && F.audio === a && !F.root.isConnected && F.url === mp3.replace(/\.mp3$/, ".words.json")) attach(a, root, mp3); }
 };
 })();
@@ -1860,12 +2075,13 @@ var MORE = [
 ];
 var MORE_ROWS = [["ideas", "thumbup", "Idea board", "Ideas for the hubs from the class: vote on them, or post your own"]];
 function renderMore(el, s){
+var bits = String(s || "").split("/"), what = bits.slice(1).join("/"); s = bits[0];
 var page = MORE.concat(MORE_ROWS).filter(function(m){ return m[0] === s; })[0];
 if (!page) { drawMoreMenu(el); return; }
 var back = '<a class="btn btn-text back" href="#more">' + icon("chevron", 18, "flip") + "More</a>";
 el.innerHTML = '<div class="hx-page more-page">' + back + "<h1>" + esc(page[2]) + '</h1><div class="more-body"><p class="note loading">Loading…</p></div></div>';
 var body = $(".more-body", el);
-({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, shop: HX.moreShop, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body);
+({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, shop: HX.moreShop, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body, what);
 }
 var MORE_FIELD = { timmy: "hub", hints: "sun", cram: "mint", side: "lilac", arcade: "peach", place: "mint", shop: "sun", stats: "sun", settings: "plain" };
 function moreMeta(k){
@@ -2003,16 +2219,16 @@ if ($("[data-figs]", body)) needFigures().then(function(){ $$("[data-figs]", bod
 }
 function needArcade(){
 loadCss(WIDGET + "games.css"); loadCss(BASE + "arcade.css");
-return Promise.all([needQuestions(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
+return Promise.all([needQuestions(), needVariants(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
 if (!ARC && window.SH_ARCADE) ARC = window.SH_ARCADE({ esc: esc, state: STATE, save: saveState, toast: toast, questions: QS, lectures: LECS, lectureById: LBY, shuffled: shuffled,
-record: HX.recordAnswer, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [] });
+record: HX.recordAnswer, worded: worded, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [], figures: needFigures });
 var A0 = ARC && ARC.arcade;
 if (A0 && !A0.startGame && A0.start) ARC.arcade = { startGame: A0.start, stopAll: A0.stop, current: A0.current };
 return ARC;
 });
 }
 var GAME_INFO = {};
-function moreArcade(body){
+function moreArcade(body, open){
 body.innerHTML = '<p class="note loading">Loading the arcade…</p>';
 needArcade().then(function(){
 var X = C.arcade || {}, first = X.first || "sort", games = (X.games || []).slice();
@@ -2029,6 +2245,7 @@ var stage = $("#panel-arcade", body), lobby = $(".arcade-lobby", body);
 function back(){ try { ARC.arcade.stopAll(); } catch (e) {} stage.hidden = true; stage.innerHTML = ""; lobby.hidden = false; }
 $$("[data-game]", body).forEach(function(b){ b.addEventListener("click", function(){ lobby.hidden = true; stage.hidden = false; track("arcade:open=" + b.getAttribute("data-game")); ARC.arcade.startGame(b.getAttribute("data-game")); stage.scrollIntoView({ block: "start" }); }); });
 stage.addEventListener("click", function(e){ if (e.target.closest("[data-back]")) { e.stopPropagation(); e.preventDefault(); back(); } }, true);
+var deep = open && by[open] && $('[data-game="' + open + '"]', body); if (deep) deep.click();
 }).catch(function(e){ body.innerHTML = "<p>Couldn't load the arcade. Check your connection.</p>"; if (window.console) console.error(e); });
 }
 document.addEventListener("sh:rank-profile", function(){ setTimeout(function(){ var g = $(".more-body .stats-grid"); if (g && g.parentNode) moreStats(g.parentNode); }, 0); });
@@ -2161,7 +2378,8 @@ body.innerHTML = '<div class="settings">' +
 '<div class="set-row"><div><b>Text size</b><small>Makes everything bigger or smaller.</small></div>' + seg("size", SIZES, size) + "</div></section>" +
 '<section class="panel" aria-labelledby="sgH"><h2 id="sgH">Your daily goal</h2>' +
 '<div class="set-row"><div><b>Questions a day</b><small>The ring in the bar fills as you answer, right or wrong. Your streak counts any day you answer a question.</small></div>' + seg("goal", [["10", "10"], ["20", "20"], ["30", "30"], ["40", "40"], ["50", "50"]], String(HX.goal())) + "</div>" +
-(window.shEditName ? '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' : "") + "</section>" +
+'<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' +
+'<div class="set-row"><div><b>Link my devices</b><small>One rank, streak, trophy case and question progress on your phone, tablet and laptop.</small></div><button class="btn" type="button" data-link>Link my devices</button></div></section>' +
 '<section class="panel" aria-labelledby="sxH"><h2 id="sxH">Timmy and the extras</h2><p class="note">The fun stuff that isn\'t studying. None of it shows during a mock exam.</p><div data-extras>' +
 extrasHTML() + "</div></section></div>";
 function paintFocus(){ var fp = $(".focus-panel", body); fp.classList.toggle("is-on", focusOn()); fp.innerHTML = focusRowHTML(); }
@@ -2184,7 +2402,9 @@ if (v !== "off" && focusOn()) { prefSet("sh_pref_focus", "off"); ls("sh_pref_foc
 track("settings:" + k + "=" + v);
 return;
 }
-if (e.target.closest("[data-name]") && window.shEditName) window.shEditName();
+if (e.target.closest("[data-name]")) whenWidget("shEditName", function(f){ if (f) f(); else toast("Couldn’t open your name. Are you online?"); });
+var lk = e.target.closest("[data-link]");
+if (lk) whenWidget("shLinkAsk", function(L){ if (L && L.link) L.link({ back: lk, from: "settings" }); else toast("Couldn’t open Link my devices. Are you online?"); });
 });
 }
 function applyTheme(t){ if (t === "light" || t === "dark") docEl.setAttribute("data-theme", t); else docEl.removeAttribute("data-theme"); }
@@ -2345,7 +2565,7 @@ studyDayList: studyDayList, achMap: achMap, putAnswer: putAnswer, saveNow: saveN
 QBY: QBY, QBL: QBL, LBY: LBY, EXAM_LECS: EXAM_LECS, REVIEW: REVIEW, loadScript: loadScript, loadCss: loadCss,
 lecLabel: lecLabel, shortTitle: shortTitle, lecName: lecName, LCOL: LCOL, lc: lc, lecDot: lecDot,
 lecChip: lecChip, lecHead: lecHead, isRead: isRead, isExamLec: isExamLec, isReview: isReview,
-hasReview: hasReview, needQuestions: needQuestions, needNotes: needNotes, needStudy: needStudy,
+hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, hasVersions: hasVersions, needNotes: needNotes, needStudy: needStudy,
 needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
 go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
 offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget
@@ -2361,7 +2581,7 @@ var PARTS = window.SH_HUB_PARTS || {};
 if (!PARTS[k]) throw new Error("widget/hub-" + k + ".js is not loaded: the page loads it before widget/hub.js");
 PARTS[k](HX);
 });
-window.shHub = { go: go, state: function(){ return STATE; }, card: function(id){ var q = QBY[id]; return q ? HX.card(q, {}) : null; } };
+window.shHub = { go: go, state: function(){ return STATE; }, card: function(id){ var q = QBY[id]; return q ? HX.card(q, {}) : null; }, worded: worded };
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();
 ;

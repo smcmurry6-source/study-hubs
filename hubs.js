@@ -1,11 +1,14 @@
 /* The dashboard's hubs: where a hub is added, dated or archived (edit this file by hand).
    classes     each class's name and the line its drawn scene says when tapped
-   hubs        every hub with a card: its class, title, exams (name, label, date, the check-in's hours and extra questions),
-               its "updated" date, what it covers, and any archiveOn / hideCardOn override
+   hubs        every hub with a card: its class, title, exams (name, label, date, the check-in's hours and extra questions,
+               and askAgain: a round, "yyyy-mm-dd", that shows the check-in pop-up once more to every device that showed it
+               and never sent it), its "updated" date, what it covers, and any archiveOn / hideCardOn override
    archived    hubs kept only for their recaps
    checkinHour, archiveHour, cardDays, debriefDays   when "Check in" shows on exam day, when a hub archives itself (10 pm
                on its last exam day), how many days it then counts as archived before hidden (the dashboard draws no card for
                either since 2026-11-14), and how long the check-in pop-up still goes out
+   surveyAgain { "<survey id>": "yyyy-mm-dd" }: a round that shows that survey's pop-up once more to everyone who said
+               "Later" to it (it waits in their Inbox until answered)
    labels      short names
    legacy      hubs still on their old single-file page (hubs/<id>/index.html holds everything); every other hub is on
                the engine (widget/hub.js, its content in hubs/<id>/content/). A new hub is never added here.
@@ -43,6 +46,35 @@ window.SH_DASH_DATA = {
  },
  "hubs": [
   {
+   "id": "heme-endo-exam3",
+   "cls": "hemeendo",
+   "title": "Heme & Endo Exam 3 Hub",
+   "code": "Heme & Endo · Exam 3",
+   "exams": [
+    {
+     "name": "Hematology & Endocrinology Exam 3",
+     "label": "Exam",
+     "date": "2026-11-20",
+     "code": "Heme & Endo · Exam 3",
+     "checkinHour": 10,
+     "promptHour": 10
+    }
+   ],
+   "updated": "2026-11-17",
+   "desc": "Dr. Taylor's Lecture A (dental endocrinology, moved here from Exam 2), L17 Pregnancy and lactation, L18 Estrogens and androgens, L19 Introduction to hematology and L20 Lymphomas and leukemias; L21 and L22, the pathology of the male and female reproductive systems, join when their slides are posted. The exam is Fri Nov 20, 8:00-9:30 am (35 questions, new material only). Its own home page with your countdown and progress, notes in three reading levels with narration, 22 interactive diagrams, Patient Box cases, two-statement, true/false, numbered and which-statement questions with every choice explained, High Likelihood Exam Questions, exam hints from the recordings, review tables with side-by-side look-alikes, a mock exam and the Cycle Arcade.",
+   "modes": [
+    "Home",
+    "Compendium",
+    "Plain-English notes",
+    "Diagrams",
+    "Review tables",
+    "Mock exam",
+    "Arcade",
+    "Listen"
+   ],
+   "stateKey": "hee3-state-v1"
+  },
+  {
    "id": "pcd-implants-exam1",
    "cls": "implants",
    "title": "PCD Implants Exam 1 Hub",
@@ -55,6 +87,7 @@ window.SH_DASH_DATA = {
      "code": "PCD Implants · Exam 1",
      "checkinHour": 20,
      "promptHour": 20,
+     "checkinClosed": true,
      "extraQs": [
       {
        "id": "pbox_better",
@@ -123,41 +156,6 @@ window.SH_DASH_DATA = {
     "name": "Timmy Time",
     "sub": "The last-minute review, 48 min"
    }
-  },
-  {
-   "id": "special-patient-care",
-   "cls": "spc",
-   "title": "Special Patient Care Hub",
-   "code": "Special Patient Care",
-   "exams": [
-    {
-     "name": "Special Patient Care exam",
-     "label": "Due",
-     "date": "2026-11-13",
-     "code": "Special Patient Care",
-     "checkinClosed": true
-    }
-   ],
-   "updated": "2026-11-04",
-   "archiveOn": {
-    "date": "2026-11-06",
-    "hour": 0
-   },
-   "hideCardOn": {
-    "date": "2026-11-06",
-    "hour": 0
-   },
-   "desc": "All eight units: introduction to special patient care, behavior guidance and protective stabilization, Down syndrome, cerebral palsy, syndromes, the autism module, prevention, and the mental illness reading. The exam is on Canvas from Fri Nov 6, due Fri Nov 13 at 11:59 pm (45 questions, 135 minutes, open notes). Its own home page with your countdown and progress, notes in two reading levels with narration, multiple-choice, multiple-answer, true/false, two-statement, numbered-statement and matching questions, exam hints from the recordings, a 45-question mock exam, review tables and the Sparks Arcade.",
-   "modes": [
-    "Home",
-    "Compendium",
-    "Plain-English notes",
-    "Review tables",
-    "Mock exam",
-    "Arcade",
-    "Listen"
-   ],
-   "stateKey": "spc-state-v1"
   },
   {
    "id": "heme-endo-exam2",
@@ -339,7 +337,8 @@ window.SH_DASH_DATA = {
      "date": "2026-11-16",
      "code": "Occlusion · Final",
      "checkinHour": 20,
-     "promptHour": 20
+     "promptHour": 20,
+     "askAgain": "2026-11-17"
     }
    ],
    "updated": "2026-11-12",
@@ -356,7 +355,7 @@ window.SH_DASH_DATA = {
    "stateKey": "occl-state-v1",
    "podcast": {
     "name": "Timmy Time",
-    "sub": "The midterm review, 45 min"
+    "sub": "The final review, 48 min"
    }
   },
   {
@@ -368,7 +367,8 @@ window.SH_DASH_DATA = {
     {
      "name": "Musculoskeletal Exam 3",
      "label": "Exam",
-     "date": "2026-10-02"
+     "date": "2026-10-02",
+     "checkinClosed": true
     }
    ],
    "updated": "2026-09-23",
@@ -410,9 +410,14 @@ window.SH_DASH_DATA = {
     "Review tables",
     "Mock exam",
     "Arcade",
-    "Listen"
+    "Listen",
+    "Timmy Time"
    ],
-   "stateKey": "perio-d2-compendium-state-v1"
+   "stateKey": "perio-d2-compendium-state-v1",
+   "podcast": {
+    "name": "Timmy Time",
+    "sub": "The last-minute review, 49 min"
+   }
   }
  ],
  "archived": [
@@ -426,16 +431,44 @@ window.SH_DASH_DATA = {
     {
      "name": "GI Exam 2",
      "label": "Exam",
-     "date": "2026-09-18"
+     "date": "2026-09-18",
+     "checkinClosed": true
     }
    ],
    "hideCardOn": "2026-10-06"
+  },
+  {
+   "id": "special-patient-care",
+   "cls": "spc",
+   "title": "Special Patient Care Hub",
+   "code": "Special Patient Care",
+   "stateKey": "spc-state-v1",
+   "exams": [
+    {
+     "name": "Special Patient Care exam",
+     "label": "Due",
+     "date": "2026-11-13",
+     "code": "Special Patient Care",
+     "checkinClosed": true
+    }
+   ],
+   "archiveOn": {
+    "date": "2026-11-06",
+    "hour": 0
+   },
+   "hideCardOn": {
+    "date": "2026-11-06",
+    "hour": 0
+   }
   }
  ],
  "checkinHour": 8,
  "archiveHour": 22,
  "cardDays": 10,
  "debriefDays": 60,
+ "surveyAgain": {
+  "4": "2026-11-17"
+ },
  "labels": {
   "genetics": "Genetics",
   "hepatobiliary": "Hepatobiliary",
@@ -448,6 +481,7 @@ window.SH_DASH_DATA = {
   "pcd-exam3": "PCD Exam 3",
   "heme-endo-exam1": "Heme & Endo 1",
   "heme-endo-exam2": "Heme & Endo 2",
+  "heme-endo-exam3": "Heme & Endo 3",
   "special-patient-care": "Special Patient Care",
   "pcd-implants-exam1": "PCD Implants 1"
  },

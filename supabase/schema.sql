@@ -11,6 +11,13 @@
 -- with the real value from Sam's local ops scripts before running.
 --
 -- Refresh this file whenever you run a new migration.
+--
+-- Checked against the live database on 2026-11-17: the same 210 functions and the same 114 indexes. To check again,
+-- run one read-only query on the live project and the same on a throwaway copy of this file (tools/release/pg.js,
+-- with '<ADMIN_SECRET>' as its secret): md5(string_agg(name || args || h)) over the public sql and plpgsql functions,
+-- h being md5 of prosrc with carriage returns, -- comments and the secret (the literal after "is distinct from")
+-- taken out and whitespace collapsed, and md5(string_agg(indexdef)) over the indexes. Compare hashes only: never
+-- print a secret-gated function's body.
 -- ============================================================================
 
 -- ---------------------------------------------------------------- tables
@@ -121,6 +128,8 @@ create index if not exists activity_pings_visit_idx on public.activity_pings (vi
 create index if not exists activity_pings_hub_idx on public.activity_pings (hub, pinged_at);
 create index if not exists activity_pings_visitor_hub_idx on public.activity_pings (visitor_id, hub);
 create index if not exists activity_pings_time_idx on public.activity_pings (pinged_at) include (hub, section, visitor_id);
+-- migration_v25 (replies to reports); its twin on hub_suggestions was dropped by migration_v53
+create index if not exists question_flags_visitor_idx on public.question_flags (visitor_id) where visitor_id is not null;
 
 -- ---------------------------------------------------------------- row level security
 -- Every table has RLS on. Tables with no policy are reachable only through the
@@ -186,7 +195,10 @@ $$;
 
 create or replace function public.get_display_name(p_visitor text)
 returns text language sql stable security definer set search_path = public as $$
-  select coalesce((select display_name from visitor_names where visitor_id = p_visitor), anon_name(p_visitor));
+  select coalesce(
+    (select display_name from visitor_names where visitor_id = p_visitor),
+    anon_name(p_visitor)
+  );
 $$;
 
 create or replace function public.set_display_name(p_visitor text, p_name text)
@@ -505,7 +517,7 @@ returns table(hub text, launches bigint)
 language plpgsql security definer set search_path = public as $$
 begin
   if p_secret is distinct from '<ADMIN_SECRET>' then raise exception 'unauthorized' using errcode = '28000'; end if;
-  return query select coalesce(nullif(n.hub, ''), '(unknown)'), count(*)::bigint as launches from nuke_launches n
+  return query select coalesce(nullif(n.hub, ''), '(unknown)') as hub, count(*)::bigint as launches from nuke_launches n
   where n.launched_at >= now() - (p_days || ' days')::interval group by coalesce(nullif(n.hub, ''), '(unknown)') order by launches desc;
 end;
 $$;
@@ -515,7 +527,7 @@ returns table(display_name text, hub text, launched_at timestamptz)
 language plpgsql security definer set search_path = public as $$
 begin
   if p_secret is distinct from '<ADMIN_SECRET>' then raise exception 'unauthorized' using errcode = '28000'; end if;
-  return query select coalesce(n.display_name, anon_name(n.visitor_id)), coalesce(nullif(n.hub, ''), '(unknown)'), n.launched_at
+  return query select coalesce(n.display_name, anon_name(n.visitor_id)) as display_name, coalesce(nullif(n.hub, ''), '(unknown)') as hub, n.launched_at
   from nuke_launches n order by n.launched_at desc limit p_limit;
 end;
 $$;
@@ -7381,3 +7393,1685 @@ begin
 end;
 $$;
 revoke all on function public.sh_retention_run(boolean) from public, anon, authenticated;
+
+-- ====================================================================== migration_v59.sql
+-- v59 (2026-11-16): time in Learn and in Flashcards, and the redesign's other sections, placed for the admin page; Learn's
+-- answers keep their own context. The first migration after the redesign's release (vault/tasks/inbox.md had its two lines).
+-- Sam: "i want to see where people spend the most time between the three" (the Question Bank, Learn and Flashcards), then
+-- "yes do it. merge when ready". Written and tested on a throwaway copy of supabase/schema.sql (tools/release/rls.js,
+-- admin-ops.js, xp.js); it changes two functions and nothing else (no table, no data, no grant). Applied to the live
+-- project on 2026-11-16 through the Supabase connector, before PR #381 merged (the engine's new sections need it first).
+--
+-- 1. sh_surface(section) (migration_v49, the one home of the section-to-surface mapping) places:
+--    - compendium/learn and compendium/cards, which the engine (widget/hub.js section()) sends from this release on while
+--      the Question Bank is studied as Learn or as Flashcards: new surfaces `learn` and `cards`. Until now all three
+--      were compendium/bank, so the Insights tab's "Where time goes" couldn't tell them apart.
+--    - compendium/drill and compendium/misses (the bank's Daily drill and Yesterday's misses sets) as `drill`;
+--      more/timmy (the Timmy Time page) as `podcast`; every other more/<page> as a new `more`. They read as `other`
+--      since the release (sh_data_quality's unmapped_sections, the 2026-11-15 lessons audit). sh_surface runs when the
+--      Insights queries run (no index or column keeps its result), so the days already recorded are placed too.
+-- 2. sh_answer (migration_v54, behind record_answer_v2) keeps `learn` as the context of an answer given in Learn, which the
+--    page already sends, instead of filing it as `other`. The context is only written to answer_xp.ctx: nothing reads it
+--    to pay or check an answer, so what an answer pays doesn't change. The function is otherwise exactly as v54 wrote it.
+
+create or replace function public.sh_surface(p_section text)
+returns text language sql immutable parallel safe set search_path = public as $$
+  select case
+    when p_section is null or p_section = '' then 'unknown'
+    when p_section ~ '^compendium/(bank|question-bank)(/|$)' then 'bank'
+    when p_section ~ '^compendium/learn(/|$)' then 'learn'
+    when p_section ~ '^compendium/(cards|flashcards)(/|$)' then 'cards'
+    when p_section ~ '^(compendium/(notes|lecture-notes)|notes)(/|$)' then 'notes'
+    when p_section ~ '^(compendium/(mock|mock-exam|mockexam)|mock|mockexam)(/|$)' then 'mock'
+    when p_section ~ '^compendium/(cram|cram-sheet)(/|$)' then 'cram'
+    when p_section ~ '^compendium/(hints|exam-hints)(/|$)' then 'hints'
+    when p_section ~ '^compendium/weak' then 'weak-spots'
+    when p_section ~ '^compendium/(recall|active-recall)(/|$)' then 'recall'
+    when p_section ~ '^(home|compendium/(home|course-info|dashboard))(/|$)' then 'home'
+    when p_section ~ '^review(/|$)' then 'review'
+    when p_section ~ '^(drill|compendium/(drill|misses))(/|$)' then 'drill'
+    when p_section ~ '^(arcade|game|quest)(/|$)' then 'arcade'
+    when p_section ~ '^(podcast|more/timmy)(/|$)' then 'podcast'
+    when p_section ~ '^more(/|$)' then 'more'
+    when p_section ~ '^atlas(/|$)' then 'retired'
+    else 'other' end
+$$;
+grant execute on function public.sh_surface(text) to anon, authenticated;
+
+-- ---------- one answer, checked and paid by the server ----------
+-- p_choice: the picked choice's authored index (one-choice questions); p_picks: the ticked indexes (select all) or the
+-- order of the authored steps as placed (put in order); p_self: the student's own grade (recall cards, matching);
+-- p_v: the question's version as shown; p_ctx: where it was answered (bank, drill, weak, misses, mock, arcade, check,
+-- review, case, learn); p_request: a random id per answer, so a retried or replayed call records and pays once; p_session: the
+-- mock or arcade game it belongs to (xp_session_start); p_claim: the page's own verdict, used only for a question the
+-- server has no key for (recorded for class stats and your progress, never paid). p_at is null except in the tests.
+create or replace function public.sh_answer(p_at timestamptz, p_visitor text, p_hub text, p_qid text, p_choice integer,
+  p_picks integer[], p_self boolean, p_v text, p_ctx text, p_request text, p_session uuid, p_claim boolean)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare
+  k public.question_keys; v_kind text; v_ctx text; v_ok boolean; v_correct boolean; v_at timestamptz;
+  s public.xp_sessions; s_ok boolean := false; s_n int := 0; s_dup boolean := false;
+  aid bigint; dd date; prev_t timestamptz; n60 int; rn_same int; rn_all int; rn_ever int := 0; pos_day int; dp boolean;
+  speed_ok boolean := false; v_base int := 0; v_mult int := 1; paid int := 0; v_n int; why text; bonus jsonb := '[]'::jsonb;
+  medal jsonb; v_resp jsonb; prev record;
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 or p_hub is null or p_hub !~ '^[a-z0-9][a-z0-9-]{0,39}$'
+     or p_qid is null or length(p_qid) not between 1 and 80
+     or (p_request is not null and p_request !~ '^[A-Za-z0-9_-]{8,64}$')
+     or (p_picks is not null and (cardinality(p_picks) > 20 or exists (select 1 from unnest(p_picks) z where z is null or z not between 0 and 19)))
+     or (p_choice is not null and p_choice not between 0 and 19) then
+    return jsonb_build_object('ok', false, 'error', 'bad');
+  end if;
+  v_ctx := case when p_ctx in ('bank', 'drill', 'weak', 'misses', 'mock', 'arcade', 'check', 'review', 'case', 'learn') then p_ctx else 'other' end;
+  perform pg_advisory_xact_lock(hashtext('xp|' || p_visitor));
+  v_at := coalesce(p_at, clock_timestamp());
+
+  -- the same answer again (a retry, a reload, a replayed call): what it got the first time, nothing new
+  if p_request is not null then
+    select x.resp, a.visitor_id into prev from answer_xp x join personal_answers a on a.id = x.answer_id where x.request_id = p_request;
+    if found then
+      if prev.visitor_id = p_visitor then return coalesce(prev.resp, '{}'::jsonb) || jsonb_build_object('repeat', true); end if;
+      return jsonb_build_object('ok', false, 'error', 'dup');
+    end if;
+  end if;
+
+  -- right or wrong, from the key
+  select * into k from sh_key(p_hub, p_qid, p_v);
+  v_kind := case when k.qid is null then 'unknown' when k.retired then 'retired' else k.kind end;
+  if v_kind = 'one' then
+    if p_choice is null and coalesce(cardinality(p_picks), 0) <> 1 then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
+    v_correct := coalesce(p_choice, p_picks[1]) = k.answer[1];
+  elsif v_kind = 'all' then
+    if p_picks is null then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
+    v_correct := (select coalesce(array_agg(distinct z order by z), '{}') from unnest(p_picks) z)
+               = (select array_agg(distinct z::int order by z::int) from unnest(k.answer) z);
+  elsif v_kind = 'order' then
+    v_correct := p_picks is not null and p_picks = k.answer::integer[];
+  elsif v_kind = 'self' then
+    v_correct := coalesce(p_self, p_claim, false);
+  else
+    v_correct := coalesce(p_claim, false);
+  end if;
+
+  -- the mock or arcade game it belongs to: this visitor's, this hub's, started within 6 hours, not finished long ago
+  if p_session is not null then
+    select * into s from xp_sessions where id = p_session and visitor_id = p_visitor and hub = p_hub
+      and started_at <= v_at and started_at > v_at - interval '6 hours'
+      and (finished_at is null or finished_at > v_at - interval '10 minutes');
+    if found then
+      s_ok := true;
+      select count(*), coalesce(bool_or(a.qid = p_qid), false) into s_n, s_dup
+        from answer_xp x join personal_answers a on a.id = x.answer_id where x.session_id = p_session;
+    end if;
+  end if;
+
+  -- record it as the four calls a page makes today do: class stats, the class's picks, the right-in-a-row streak, your answers
+  perform record_answer(p_hub, p_qid, v_correct);
+  if p_choice is not null then perform record_choice(p_hub, p_qid, p_choice);
+  elsif p_picks is not null and v_kind <> 'order' then
+    if cardinality(p_picks) = 1 and v_kind <> 'all' then perform record_choice(p_hub, p_qid, p_picks[1]);
+    else perform record_choices(p_hub, p_qid, p_picks); end if;
+  end if;
+  perform record_correct_streak(p_visitor, v_correct);
+  perform set_config('sh.xp_v2', 'on', true);
+  insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values (p_visitor, p_hub, p_qid, v_correct, v_at)
+    returning id into aid;
+  perform set_config('sh.xp_v2', 'off', true);
+  insert into answer_xp (answer_id, request_id, session_id, ctx, kind)
+    values (aid, p_request, case when s_ok then p_session end, v_ctx, v_kind);
+  dd := (v_at at time zone 'America/Chicago')::date;
+
+  -- the guardrails: no key, no XP; then the speed limit
+  if v_kind in ('one', 'all', 'order', 'self') then
+    if s_ok and s.kind = 'mock' then
+      speed_ok := not s_dup and s_n + 1 <= 300 and v_at - s.started_at >= (s_n + 1) * interval '2 seconds';
+    else
+      select max(a.answered_at) into prev_t from personal_answers a where a.visitor_id = p_visitor and a.id <> aid and a.answered_at <= v_at;
+      select count(*) into n60 from personal_answers a
+        left join answer_xp x on x.answer_id = a.id left join xp_sessions ss on ss.id = x.session_id
+        where a.visitor_id = p_visitor and a.answered_at >= v_at - interval '60 seconds' and a.answered_at <= v_at
+          and coalesce(ss.kind, '') <> 'mock';
+      speed_ok := (prev_t is null or v_at - prev_t >= interval '2 seconds') and n60 <= 30;
+    end if;
+    if not speed_ok then why := 'fast'; end if;
+  else
+    why := v_kind;
+  end if;
+
+  if speed_ok then
+    select count(*) filter (where a.correct = v_correct), count(*), count(*) filter (where a.correct)
+      into rn_same, rn_all, v_n
+      from personal_answers a where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid
+        and (a.answered_at at time zone 'America/Chicago')::date = dd;
+    if v_correct then select count(*) into rn_ever from personal_answers a where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid and a.correct; end if;
+    v_base := case when v_kind = 'self' then case when rn_all <= 3 then 2 else 0 end
+                   when v_correct then case when rn_same <= 3 then case when rn_ever = 1 then 10 else 2 end else 0 end
+                   else case when rn_same <= 3 then 1 else 0 end end;
+    if v_base = 0 then why := 'repeat'; end if;
+    v_mult := sh_xp_mult(p_visitor, v_at);
+    paid := sh_award(p_visitor, 'a:' || aid, 'answer', p_hub, v_base, v_mult, v_at);
+    -- the day's 20th answer
+    select n into pos_day from xp_days where visitor_id = p_visitor and d = dd;
+    if coalesce(pos_day, 0) >= 20 then
+      v_n := sh_award(p_visitor, 'g20:' || dd, 'goal20', p_hub, 30, v_mult, v_at);
+      if v_n > 0 then bonus := bonus || jsonb_build_object('src', 'goal20', 'xp', v_n); end if;
+    end if;
+    -- a question missed the last time you answered it before today, right today
+    if v_correct and v_kind <> 'self' then
+      select a.correct into dp from personal_answers a where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid
+        and (a.answered_at at time zone 'America/Chicago')::date < dd order by a.answered_at desc, a.id desc limit 1;
+      if found and not dp then
+        v_n := sh_award(p_visitor, 'fix:' || p_hub || ':' || p_qid, 'fix', p_hub, 5, v_mult, v_at);
+        if v_n > 0 then bonus := bonus || jsonb_build_object('src', 'fix', 'xp', v_n); end if;
+      end if;
+    end if;
+  end if;
+  if v_kind in ('one', 'all', 'order', 'self') then medal := sh_medal_check(p_visitor, p_hub, v_at); end if;
+
+  v_resp := jsonb_build_object('ok', true, 'correct', v_correct, 'kind', v_kind, 'xp', paid, 'base', v_base, 'mult', v_mult,
+    'first', v_correct and rn_ever = 1 and paid > 0, 'why', why, 'bonus', bonus, 'medal', medal,
+    'boost', sh_boost_json(p_visitor, v_at), 'total', (select xv.xp from xp_visitors xv where xv.visitor_id = p_visitor));
+  update answer_xp set resp = v_resp where answer_id = aid;
+  return v_resp;
+end;
+$$;
+revoke all on function public.sh_answer(timestamptz, text, text, text, integer, integer[], boolean, text, text, text, uuid, boolean) from public, anon, authenticated;
+
+-- ====================================================================== migration_v60.sql
+-- v60 (2026-11-17): a reward for a survey or an exam check-in. Sam: "Also give 500xp and 1000 crowns as a reward for
+-- completing a survey or check in. Only reward for the first submission of each".
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js, admin-ops.js). Applied to the live
+-- project on 2026-11-17 through the Supabase connector, at Sam's "merge" (PR #387).
+--
+-- 1. Two new award kinds, `survey` and `checkin` (xp_awards.src). Each pays +500 XP once, through sh_award, so it is a row
+--    keyed per visitor: `survey:<survey id>` and `checkin:<hub>:<exam>` (the exam string the check-in carries, e.g.
+--    '2026-11-16 Final'). A replayed call, a second check-in for the same exam or a linked device's copy pays nothing more
+--    (Link my devices dedupes award rows by key). Not boosted: like medals and fixed reports, a double XP boost doesn't
+--    double it. Paid to the linked id (visitor_links), as a fixed report is.
+-- 2. "Only the first submission of each": a survey answered (not "Later") for the first time pays; its row can't be
+--    answered twice anyway (unique per survey and visitor). An exam check-in pays only when nobody on this visitor's
+--    linked ids had checked in for that hub and exam before, so someone who checked in before this release gets nothing
+--    for checking in again. Back pay only for the survey active on 11-17 and
+--    Occlusion's final check-ins (Sam), in tools/data-fixes/2026-11-17-reward-backpay.sql, run after this migration.
+-- 3. 1,000 Shiny Gold Crowns per reward. The crowns come from sh_wallet, which works them out from the award rows (1,000 a
+--    `survey` or `checkin` row) and leaves those rows' XP out of the "1 crown per 10 XP" share, so the reward pays exactly
+--    1,000 crowns, not 1,050. No new column: redeem_link_code copies award rows by column, and the kind travels with them.
+-- 4. submit_survey and submit_exam_debrief keep their signatures and still answer true or false (the old single-file hub
+--    pages call them through widget/replies.js and v3.js). They pay too. submit_survey_v2 and submit_exam_debrief_v2 answer
+--    { ok, xp, crowns } so the dashboard and the Inbox can say what was paid; the pages fall back to the old name when the
+--    _v2 one isn't there.
+
+alter table public.xp_awards drop constraint if exists xp_awards_src_check;
+alter table public.xp_awards add constraint xp_awards_src_check
+  check (src in ('answer', 'goal20', 'fix', 'mock', 'medal', 'pod-min', 'pod-done', 'arcade', 'report', 'card', 'survey', 'checkin'));
+
+-- pays a survey's or a check-in's reward once: 500 XP (and, through sh_wallet, 1,000 crowns); returns the XP paid
+create or replace function public.sh_form_reward(p_visitor text, p_key text, p_src text, p_hub text)
+returns integer language plpgsql security definer set search_path = public as $$
+declare me text;
+begin
+  if p_visitor is null or p_src not in ('survey', 'checkin') then return 0; end if;
+  me := coalesce((select primary_id from visitor_links where alias_id = p_visitor), p_visitor);
+  return sh_award(me, p_key, p_src, coalesce(p_hub, ''), 500, 1, now());
+end;
+$$;
+
+create or replace function public.sh_submit_survey(p_survey bigint, p_visitor text, p_answers jsonb)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare paid int := 0;
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 then return jsonb_build_object('ok', false); end if;
+  if p_answers is not null and (jsonb_typeof(p_answers) <> 'object' or length(p_answers::text) > 4000) then return jsonb_build_object('ok', false); end if;
+  if not exists (select 1 from surveys where id = p_survey and active) then return jsonb_build_object('ok', false); end if;
+  insert into survey_responses (survey_id, visitor_id, answers) values (p_survey, p_visitor, p_answers)
+    on conflict (survey_id, visitor_id) do update set answers = excluded.answers, created_at = now()
+    where survey_responses.answers is null and excluded.answers is not null;
+  if not found then return jsonb_build_object('ok', false); end if;
+  if p_answers is not null then paid := sh_form_reward(p_visitor, 'survey:' || p_survey, 'survey', ''); end if;
+  return jsonb_build_object('ok', true, 'xp', paid, 'crowns', case when paid > 0 then 1000 else 0 end);
+end;
+$$;
+
+create or replace function public.submit_survey(p_survey bigint, p_visitor text, p_answers jsonb)
+returns boolean language sql security definer set search_path = public as $$
+  select coalesce((sh_submit_survey(p_survey, p_visitor, p_answers)->>'ok')::boolean, false);
+$$;
+
+create or replace function public.submit_survey_v2(p_survey bigint, p_visitor text, p_answers jsonb)
+returns jsonb language sql security definer set search_path = public as $$
+  select sh_submit_survey(p_survey, p_visitor, p_answers);
+$$;
+
+create or replace function public.sh_submit_exam_debrief(p_hub text, p_exam text, p_visitor text, p_answers jsonb)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare me text; first boolean; paid int := 0;
+begin
+  if p_hub is null or length(p_hub) not between 1 and 40 then return jsonb_build_object('ok', false); end if;
+  if p_exam is null or p_exam !~ '^\d{4}-\d{2}-\d{2}' or length(p_exam) > 60 then return jsonb_build_object('ok', false); end if;
+  if p_visitor is null or length(p_visitor) not between 1 and 80 then return jsonb_build_object('ok', false); end if;
+  if p_answers is null or jsonb_typeof(p_answers) <> 'object' or p_answers = '{}'::jsonb or length(p_answers::text) > 3000 then return jsonb_build_object('ok', false); end if;
+  -- only for an exam that has happened (exam day counts), and not forever after
+  if left(p_exam, 10)::date > (now() at time zone 'America/Chicago')::date
+     or left(p_exam, 10)::date < (now() at time zone 'America/Chicago')::date - 90 then return jsonb_build_object('ok', false); end if;
+  if (select count(*) from exam_debriefs where hub = p_hub and exam = p_exam and visitor_id = p_visitor) >= 10 then return jsonb_build_object('ok', false); end if;
+  -- the first check-in for this hub and exam from any of this person's linked ids
+  me := coalesce((select primary_id from visitor_links where alias_id = p_visitor), p_visitor);
+  first := not exists (select 1 from exam_debriefs d where d.hub = p_hub and d.exam = p_exam
+    and (d.visitor_id = me or d.visitor_id in (select alias_id from visitor_links where primary_id = me)));
+  insert into exam_debriefs (hub, exam, visitor_id, answers) values (p_hub, p_exam, p_visitor, p_answers);
+  if first then paid := sh_form_reward(p_visitor, 'checkin:' || p_hub || ':' || p_exam, 'checkin', p_hub); end if;
+  return jsonb_build_object('ok', true, 'xp', paid, 'crowns', case when paid > 0 then 1000 else 0 end);
+exception when others then return jsonb_build_object('ok', false);
+end;
+$$;
+
+create or replace function public.submit_exam_debrief(p_hub text, p_exam text, p_visitor text, p_answers jsonb)
+returns boolean language sql security definer set search_path = public as $$
+  select coalesce((sh_submit_exam_debrief(p_hub, p_exam, p_visitor, p_answers)->>'ok')::boolean, false);
+$$;
+
+create or replace function public.submit_exam_debrief_v2(p_hub text, p_exam text, p_visitor text, p_answers jsonb)
+returns jsonb language sql security definer set search_path = public as $$
+  select sh_submit_exam_debrief(p_hub, p_exam, p_visitor, p_answers);
+$$;
+
+-- the wallet (migration_v54), plus 1,000 crowns a survey or check-in reward; those rewards' XP earns no crowns of its own
+create or replace function public.sh_wallet(p_visitor text)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+declare v_xp int; extra int; form_xp int; n_f int; base_xp int; bl public.game_baseline; badges text[]; t_now text[]; t_was text[]; m_now text[]; m_was text[];
+  n_t int; n_m int; n_r int; earned int; spent int;
+begin
+  select coalesce(max(x.xp), 0) into v_xp from xp_visitors x where x.visitor_id = p_visitor;
+  select coalesce(sum(a.xp - a.base), 0) into extra from xp_awards a where a.visitor_id = p_visitor;
+  select coalesce(sum(a.base), 0), count(*) into form_xp, n_f from xp_awards a where a.visitor_id = p_visitor and a.src in ('survey', 'checkin');
+  base_xp := greatest(0, v_xp - extra - form_xp);
+  select * into bl from game_baseline where visitor_id = p_visitor;
+  badges := array(select jsonb_array_elements_text(coalesce(get_rank_profile_v2(p_visitor)->'badges', '[]'::jsonb)));
+  t_now := array(select distinct split_part(b, ':', 1) from unnest(badges) b
+                 where b not like 'mastery-%' and b not like 'dark-seen-%' and split_part(b, ':', 1) <> 'pet-adopt');
+  t_was := array(select distinct split_part(b, ':', 1) from unnest(coalesce(bl.badges, '{}')) b
+                 where b not like 'mastery-%' and b not like 'dark-seen-%' and split_part(b, ':', 1) <> 'pet-adopt');
+  m_now := array(select b from unnest(badges) b where b like 'mastery-%:%');
+  m_was := array(select b from unnest(coalesce(bl.badges, '{}')) b where b like 'mastery-%:%');
+  n_t := (select count(*) from unnest(t_now) z where not (z = any(t_was)));
+  n_m := (select count(*) from unnest(m_now) z where not (z = any(m_was)));
+  n_r := greatest(0, (select gtier from sh_rank(v_xp)) - (select gtier from sh_rank(coalesce(bl.xp, 0))));
+  earned := base_xp / 10 + 25 * n_t + 50 * n_m + 20 * n_r + 1000 * n_f;
+  select coalesce(sum(price), 0) into spent from pet_purchases where visitor_id = p_visitor;
+  return jsonb_build_object('earned', earned, 'spent', spent, 'balance', earned - spent, 'from_xp', base_xp / 10,
+    'trophies', n_t, 'medals', n_m, 'rankups', n_r, 'rewards', n_f);
+end;
+$$;
+
+revoke all on function public.sh_form_reward(text, text, text, text) from public, anon, authenticated;
+revoke all on function public.sh_submit_survey(bigint, text, jsonb) from public, anon, authenticated;
+revoke all on function public.sh_submit_exam_debrief(text, text, text, jsonb) from public, anon, authenticated;
+revoke all on function public.sh_wallet(text) from public, anon, authenticated;
+grant execute on function public.submit_survey(bigint, text, jsonb) to anon, authenticated;
+grant execute on function public.submit_exam_debrief(text, text, text, jsonb) to anon, authenticated;
+grant execute on function public.submit_survey_v2(bigint, text, jsonb) to anon, authenticated;
+grant execute on function public.submit_exam_debrief_v2(text, text, text, jsonb) to anon, authenticated;
+
+-- ====================================================================== migration_v61.sql
+-- v61 (2026-11-17): the survey and check-in reward goes from 500 XP to 1,000 XP. Sam: "Lets up the xp to 1000" (the crowns
+-- stay 1,000). Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js).
+-- Applied to the live project on 2026-11-17 through the Supabase connector, at Sam's "merge" (PR #388).
+--
+-- 1. sh_form_reward pays 1,000 XP (migration_v60 paid 500). Still once per person and key, not boosted, on the linked id.
+-- 2. Everyone already paid at 500 (the live functions since v60 and the back pay, tools/data-fixes/2026-11-17-reward-backpay.sql)
+--    gets the other 500: their award row becomes base 1,000 / xp 1,000 and their XP total goes up by 500. Only rows still at
+--    500 move, so running this twice changes nothing. sh_wallet needs no change: it takes a reward row's whole base out of the
+--    1-crown-per-10-XP share and pays 1,000 crowns a row, so the crowns stay exactly 1,000.
+
+create or replace function public.sh_form_reward(p_visitor text, p_key text, p_src text, p_hub text)
+returns integer language plpgsql security definer set search_path = public as $$
+declare me text;
+begin
+  if p_visitor is null or p_src not in ('survey', 'checkin') then return 0; end if;
+  me := coalesce((select primary_id from visitor_links where alias_id = p_visitor), p_visitor);
+  return sh_award(me, p_key, p_src, coalesce(p_hub, ''), 1000, 1, now());
+end;
+$$;
+revoke all on function public.sh_form_reward(text, text, text, text) from public, anon, authenticated;
+
+-- the top-up for rewards paid at 500
+do $$
+declare r record;
+begin
+  for r in select visitor_id, key from xp_awards where src in ('survey', 'checkin') and base = 500 and xp = 500 for update loop
+    perform pg_advisory_xact_lock(hashtext('xp|' || r.visitor_id));
+    update xp_awards set base = 1000, xp = 1000 where visitor_id = r.visitor_id and key = r.key and base = 500;
+    insert into xp_visitors (visitor_id, xp) values (r.visitor_id, 500)
+      on conflict (visitor_id) do update set xp = xp_visitors.xp + 500;
+  end loop;
+end;
+$$;
+
+-- ====================================================================== migration_v62.sql
+-- v62 (2026-11-17): what the shop's double XP boosts cost, and a boost bought during another one waits its turn.
+-- Sam, 2026-11-17: "Refine what double XP boosts cost": retune them against how fast crowns are earned.
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js). Sam took the proposed prices
+-- ("merge when ready"). Applied to the live project on 2026-11-17 through the Supabase connector, at Sam's "merge" (PR #394).
+--
+-- The class's numbers, 2026-11-14 to 11-17 (77 people): a median study day earns about 95 crowns (a quarter of days under
+-- 31, a quarter over 190) and a median study hour about 270 XP. At 600 and 1,500 crowns a boost cost 6 and 16 median days'
+-- crowns for about 270 more XP an hour (its extra XP earns no crowns), and no one had bought one (the 15 purchases so far:
+-- snacks, outfits and yard pieces).
+--
+-- 1. The 1-hour boost costs 150 crowns and the 3-hour one 400, priced with the snacks, the shop's other thing that gets used
+--    up; three hours stay cheaper an hour (133 against 150). Their rarity follows the price (the catalog's bands: Common
+--    100-200, Uncommon 250-500).
+-- 2. sh_buy: a boost's time goes after every boost running or waiting. Before, a boost bought during a medal's 24 hours ran
+--    alongside it and doubled nothing (never more than 2x), so its crowns were lost. When the last boost is a shop one it is
+--    extended, as before.
+-- 3. sh_boost_json: "until" runs on to the end of a shop boost that starts as the running ones end, so the 2x chip shows the
+--    whole stretch of double XP.
+
+update public.shop_items set rarity = 'common', price = 150 where id = 'boost-1h';
+update public.shop_items set rarity = 'uncommon', price = 400 where id = 'boost-3h';
+
+-- buy one thing: not owned already (outfits, costumes, the home's things; a gift is everyone's, so it can never be
+-- bought), not a rank item (earned by rank, never sold), on sale today for this visitor (a shelf of sh_shop_for: daily,
+-- weekly, a season on sale, a throwback day's three, the always-shelf, a spotted costume), at most one of each snack a
+-- day, enough gold crowns. Idempotent on p_request (a double tap or a replayed call buys once). A snack's HP counts today
+-- (get_pet_days_v2); a boost's time goes after every boost running or waiting (v62).
+-- sh_buy takes the Central date (the tests set it; null = today); buy_item is what a page calls.
+create or replace function public.sh_buy(p_day date, p_visitor text, p_item text, p_request text)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare it record; prev record; dd date := coalesce(p_day, (now() at time zone 'America/Chicago')::date); w jsonb; bal int; pid bigint;
+  v_resp jsonb; b_until timestamptz; l_key text; l_src text; l_end timestamptz;
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 or p_item is null or p_item !~ '^[a-z0-9][a-z0-9-]{0,39}$'
+     or p_request is null or p_request !~ '^[A-Za-z0-9_-]{8,64}$' then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
+  perform pg_advisory_xact_lock(hashtext('xp|' || p_visitor));
+  select visitor_id, resp into prev from pet_purchases where request_id = p_request;
+  if found then
+    if prev.visitor_id = p_visitor then return coalesce(prev.resp, '{}'::jsonb) || jsonb_build_object('repeat', true); end if;
+    return jsonb_build_object('ok', false, 'error', 'dup');
+  end if;
+  select * into it from shop_items where id = p_item and active;
+  if not found then return jsonb_build_object('ok', false, 'error', 'unknown'); end if;
+  if it.kind not in ('snack', 'boost') and sh_owns(p_visitor, p_item) then return jsonb_build_object('ok', false, 'error', 'owned'); end if;
+  if it.rank_tier is not null then return jsonb_build_object('ok', false, 'error', 'rank', 'rank_tier', it.rank_tier); end if;
+  if not exists (select 1 from sh_shop_for(p_visitor, dd) s where s.item_id = p_item) then return jsonb_build_object('ok', false, 'error', 'not-today'); end if;
+  if it.kind = 'snack' and exists (select 1 from pet_purchases where visitor_id = p_visitor and item_id = p_item and day = dd) then
+    return jsonb_build_object('ok', false, 'error', 'today'); end if;
+  w := sh_wallet(p_visitor); bal := (w->>'balance')::integer;
+  if bal < it.price then return jsonb_build_object('ok', false, 'error', 'balance', 'balance', bal, 'price', it.price); end if;
+  insert into pet_purchases (visitor_id, item_id, kind, price, hp, request_id, day)
+    values (p_visitor, p_item, it.kind, it.price, it.hp, p_request, dd) returning id into pid;
+  if it.kind not in ('snack', 'boost') then
+    insert into pet_inventory (visitor_id, item_id) values (p_visitor, p_item) on conflict do nothing;
+  end if;
+  if it.kind = 'boost' then
+    -- its time goes after every boost running or waiting (v62): the last one a shop boost, it is extended; otherwise a new
+    -- one starts now, or when the last one (a medal's 24 hours) ends
+    select b.key, b.src, b.ends_at into l_key, l_src, l_end from xp_boosts b where b.visitor_id = p_visitor and b.ends_at > now()
+      order by b.ends_at desc, (b.src = 'shop') desc limit 1;
+    if l_src = 'shop' then
+      update xp_boosts set ends_at = ends_at + make_interval(mins => it.boost_minutes) where visitor_id = p_visitor and key = l_key
+        returning ends_at into b_until;
+    else
+      insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at)
+        values (p_visitor, 'shop:' || pid, 'shop', it.boost_mult, coalesce(l_end, now()),
+          coalesce(l_end, now()) + make_interval(mins => it.boost_minutes))
+        returning ends_at into b_until;
+    end if;
+  end if;
+  v_resp := jsonb_build_object('ok', true, 'item', p_item, 'kind', it.kind, 'price', it.price, 'balance', bal - it.price,
+    'hp', it.hp, 'boost_until', b_until);
+  update pet_purchases set resp = v_resp where id = pid;
+  return v_resp;
+end;
+$$;
+
+-- the running boost: its multiplier (never over 2), the source of the one that ends last, and until when double XP lasts,
+-- a shop boost that starts as the running ones end included (v62)
+create or replace function public.sh_boost_json(p_visitor text, p_at timestamptz)
+returns jsonb language sql stable security definer set search_path = public as $$
+  with run as (select b.mult, b.src, b.ends_at from xp_boosts b where b.visitor_id = p_visitor and b.starts_at < p_at and b.ends_at > p_at),
+  nxt as (select max(q.ends_at) e from xp_boosts q where q.visitor_id = p_visitor and q.starts_at >= p_at
+    and q.starts_at <= (select max(run.ends_at) from run))
+  select case when count(*) = 0 then null else jsonb_build_object('mult', least(2, max(r.mult)),
+    'until', greatest(max(r.ends_at), (select nxt.e from nxt)), 'src', (array_agg(r.src order by r.ends_at desc))[1]) end
+  from run r;
+$$;
+revoke all on function public.sh_boost_json(text, timestamptz) from public, anon, authenticated;
+revoke all on function public.sh_buy(date, text, text, text) from public, anon, authenticated;
+
+-- ====================================================================== migration_v63.sql
+-- v63 (2026-11-17): a medal's double XP never runs over a boost someone bought, and the Bowling trophy counts on the server.
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js). Applied to the live project on
+-- 2026-11-17 through the Supabase connector, at Sam's "merge when ready" (PR #395).
+--
+-- 1. sh_boost_bump (new) and sh_medal_check: when a new mastery medal starts its 24 hours of double XP, what is left of the
+--    visitor's shop boosts (running or waiting) moves to start when the last medal boost ends; the part already used stays
+--    where it was. Before, the medal's 24 hours ran over it, and XP is never more than doubled, so up to 3 bought hours
+--    doubled nothing. (migration_v62 did the same for a boost bought during a medal's 24 hours; this is the other order.)
+--    The medal's reply says until when double XP lasts, the moved boost included, for the 2x chip.
+-- 2. record_achievement takes 'bowling', the bowling egg's secret trophy (all eight clips seen). widget/bowling.js kept it on
+--    the device only, since the kind wasn't listed (vault/tasks/done/2026-11-06-redesign-bowling-egg.md); widget/v3.js now
+--    sends it once from the device that won it. Like every other trophy it then pays 25 crowns (sh_wallet counts the
+--    profile's badges) and gets its share of the class (get_trophy_stats counts every achievement kind).
+
+-- a medal's 24 hours never run over double XP someone bought (v63): the rest of every shop boost of the visitor's that is
+-- still to come at p_at moves to start when the last other boost ends, as one row; the part already used stays where it
+-- was. Returns when the moved boost ends (null when there was none). Called by sh_medal_check, under its caller's lock.
+create or replace function public.sh_boost_bump(p_visitor text, p_at timestamptz)
+returns timestamptz language plpgsql security definer set search_path = public as $$
+declare r record; rest interval := interval '0'; m timestamptz;
+begin
+  for r in select b.key, b.starts_at, b.ends_at from xp_boosts b
+           where b.visitor_id = p_visitor and b.src = 'shop' and b.ends_at > p_at order by b.starts_at loop
+    rest := rest + (r.ends_at - greatest(r.starts_at, p_at));
+    if r.starts_at < p_at then
+      update xp_boosts set ends_at = p_at where visitor_id = p_visitor and key = r.key;
+    else
+      delete from xp_boosts where visitor_id = p_visitor and key = r.key;
+    end if;
+  end loop;
+  if rest <= interval '0' then return null; end if;
+  select max(b.ends_at) into m from xp_boosts b where b.visitor_id = p_visitor and b.src <> 'shop' and b.ends_at > p_at;
+  m := greatest(coalesce(m, p_at), p_at);
+  insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at)
+    values (p_visitor, 'shop:moved:' || to_char(clock_timestamp() at time zone 'UTC', 'YYYYMMDDHH24MISSUS'), 'shop', 2, m, m + rest);
+  return m + rest;
+end;
+$$;
+revoke all on function public.sh_boost_bump(text, timestamptz) from public, anon, authenticated;
+
+-- ---------- a hub mastery medal, worked out from the server-checked answers ----------
+-- The share of the hub's counted questions whose latest answer is right: Bronze 50%, Silver 75%, Gold 90%, Crown 100%.
+-- Each new medal pays +100/+200/+300/+500 (not boosted) and starts 24 hours of double XP (a new medal during a boost
+-- restarts the 24 hours). A medal reached before the switch pays nothing (no back pay). A shop boost's unused time moves
+-- after the medal's 24 hours (sh_boost_bump, v63).
+create or replace function public.sh_medal_check(p_visitor text, p_hub text, p_at timestamptz)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare bank int; got int; lvl int := 0; i int; kinds text[] := array['mastery-bronze', 'mastery-silver', 'mastery-gold', 'mastery-crown'];
+  pays int[] := array[100, 200, 300, 500]; c timestamptz; paid int; total int := 0; newest int := 0; b_end timestamptz;
+begin
+  select count(*) into bank from question_keys k where k.hub = p_hub and k.is_current and not k.retired and k.counted;
+  if bank = 0 then return null; end if;
+  select count(*) filter (where l.correct) into got from (
+    select distinct on (a.qid) a.qid, a.correct from personal_answers a
+    where a.visitor_id = p_visitor and a.hub = p_hub order by a.qid, a.answered_at desc, a.id desc
+  ) l join question_keys k on k.hub = p_hub and k.qid = l.qid and k.is_current and not k.retired and k.counted;
+  lvl := case when got >= bank then 4 when got * 10 >= bank * 9 then 3 when got * 4 >= bank * 3 then 2 when got * 2 >= bank then 1 else 0 end;
+  for i in 1..lvl loop
+    c := null;
+    select a.created_at into c from achievements a where a.visitor_id = p_visitor and a.kind = kinds[i] and a.hub = p_hub;
+    if c is not null and c < sh_v2_at() then continue; end if;
+    if c is null then
+      insert into achievements (visitor_id, kind, hub, created_at) values (p_visitor, kinds[i], p_hub, p_at) on conflict do nothing;
+    end if;
+    paid := sh_award(p_visitor, 'medal:' || p_hub || ':' || i, 'medal', p_hub, pays[i], 1, p_at);
+    if paid > 0 then
+      insert into xp_boosts (visitor_id, key, src, mult, starts_at, ends_at)
+        values (p_visitor, 'mb:' || p_hub || ':' || i, 'medal', 2, p_at, p_at + interval '24 hours')
+        on conflict (visitor_id, key) do nothing;
+      total := total + paid; newest := i;
+    end if;
+  end loop;
+  if newest = 0 then return null; end if;
+  b_end := sh_boost_bump(p_visitor, p_at);   -- v63: bought double XP moves after the medal's 24 hours
+  return jsonb_build_object('kind', kinds[newest], 'level', newest, 'xp', total,
+    'boost_until', greatest(p_at + interval '24 hours', b_end));
+end;
+$$;
+revoke all on function public.sh_medal_check(text, text, timestamptz) from public, anon, authenticated;
+
+-- the trophies a page can record (v63: 'bowling', the bowling egg's secret trophy)
+create or replace function public.record_achievement(p_visitor text, p_kind text, p_hub text default '')
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 then return false; end if;
+  if p_kind not in ('boss', 'owl', 'rootcanal', 'mock90', 'konami', 'floss', 'prof',
+                    'mastery-bronze', 'mastery-silver', 'mastery-gold', 'mastery-crown',
+                    'mirror', 'fullarch', 'flosschain', 'holiday', 'pet-revive', 'pet-perfect', 'pet-adopt',
+                    'seen-all', 'mock-perfect', 'bowling') then return false; end if;  -- seen-all, mock-perfect: v38; bowling: v63
+  insert into achievements (visitor_id, kind, hub) values (p_visitor, p_kind, left(coalesce(p_hub, ''), 40))
+    on conflict do nothing;
+  return found;
+end;
+$$;
+
+-- ====================================================================== migration_v64.sql
+-- v64 (2026-11-17): a matching item is graded by the server and pays like any graded answer.
+-- Sam: "matching questions are only giving 2xp instead of 10". The answer keys (tools/xp/keys.js) listed a matching item
+-- as 'self', the kind of a recall card the student grades, which pays a flat 2 for every answer. The page grades a
+-- matching item itself (every row matched with no wrong try), so from this change the page sends each row's first pick and
+-- the key lists a matching item as 'order', the kind of a put-in-order item: right when row k's pick is k for every row.
+-- It then pays 10 the first time it's right, 2 after, 1 for a miss, like every other graded question.
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js). Applied to the live project on
+-- 2026-11-17 through the connector, before its PR merged: it changes nothing until the matching keys are reloaded.
+--
+-- sh_answer (migration_v54, as v59 left it) changes in one place: an 'order' answer that comes with no order is graded by
+-- the student's word and paid as a self-graded answer (a flat 2), as a matching item was until now. That is a page cached
+-- before this change answering a matching item after its key became 'order'; without this it would be recorded as wrong.
+-- Everything else in the function is exactly as v59 wrote it.
+--
+-- And Perio's arcade gets a seventh game, Stage & Grade ('stage', Sam: "add an interactive visualization/game for staging
+-- and grading ... accessible on the home of perio hub, top of the question bank, and in the arcade"): submit_arcade_score
+-- and sh_session_start take its id, so its scores reach the class board and a finished game pays its +50 like the others.
+-- Both functions are otherwise exactly as they were (submit_arcade_score from migration_v40's list, sh_session_start
+-- from v54).
+
+create or replace function public.sh_answer(p_at timestamptz, p_visitor text, p_hub text, p_qid text, p_choice integer,
+  p_picks integer[], p_self boolean, p_v text, p_ctx text, p_request text, p_session uuid, p_claim boolean)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare
+  k public.question_keys; v_kind text; v_ctx text; v_ok boolean; v_correct boolean; v_at timestamptz;
+  s public.xp_sessions; s_ok boolean := false; s_n int := 0; s_dup boolean := false;
+  aid bigint; dd date; prev_t timestamptz; n60 int; rn_same int; rn_all int; rn_ever int := 0; pos_day int; dp boolean;
+  speed_ok boolean := false; v_base int := 0; v_mult int := 1; paid int := 0; v_n int; why text; bonus jsonb := '[]'::jsonb;
+  medal jsonb; v_resp jsonb; prev record;
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 or p_hub is null or p_hub !~ '^[a-z0-9][a-z0-9-]{0,39}$'
+     or p_qid is null or length(p_qid) not between 1 and 80
+     or (p_request is not null and p_request !~ '^[A-Za-z0-9_-]{8,64}$')
+     or (p_picks is not null and (cardinality(p_picks) > 20 or exists (select 1 from unnest(p_picks) z where z is null or z not between 0 and 19)))
+     or (p_choice is not null and p_choice not between 0 and 19) then
+    return jsonb_build_object('ok', false, 'error', 'bad');
+  end if;
+  v_ctx := case when p_ctx in ('bank', 'drill', 'weak', 'misses', 'mock', 'arcade', 'check', 'review', 'case', 'learn') then p_ctx else 'other' end;
+  perform pg_advisory_xact_lock(hashtext('xp|' || p_visitor));
+  v_at := coalesce(p_at, clock_timestamp());
+
+  -- the same answer again (a retry, a reload, a replayed call): what it got the first time, nothing new
+  if p_request is not null then
+    select x.resp, a.visitor_id into prev from answer_xp x join personal_answers a on a.id = x.answer_id where x.request_id = p_request;
+    if found then
+      if prev.visitor_id = p_visitor then return coalesce(prev.resp, '{}'::jsonb) || jsonb_build_object('repeat', true); end if;
+      return jsonb_build_object('ok', false, 'error', 'dup');
+    end if;
+  end if;
+
+  -- right or wrong, from the key
+  select * into k from sh_key(p_hub, p_qid, p_v);
+  v_kind := case when k.qid is null then 'unknown' when k.retired then 'retired' else k.kind end;
+  if v_kind = 'one' then
+    if p_choice is null and coalesce(cardinality(p_picks), 0) <> 1 then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
+    v_correct := coalesce(p_choice, p_picks[1]) = k.answer[1];
+  elsif v_kind = 'all' then
+    if p_picks is null then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
+    v_correct := (select coalesce(array_agg(distinct z order by z), '{}') from unnest(p_picks) z)
+               = (select array_agg(distinct z::int order by z::int) from unnest(k.answer) z);
+  elsif v_kind = 'order' and p_picks is null then
+    -- (v64) no order sent: a page cached before matching items were graded as an order. The student's word, paid as self.
+    v_kind := 'self';
+    v_correct := coalesce(p_self, p_claim, false);
+  elsif v_kind = 'order' then
+    v_correct := p_picks = k.answer::integer[];
+  elsif v_kind = 'self' then
+    v_correct := coalesce(p_self, p_claim, false);
+  else
+    v_correct := coalesce(p_claim, false);
+  end if;
+
+  -- the mock or arcade game it belongs to: this visitor's, this hub's, started within 6 hours, not finished long ago
+  if p_session is not null then
+    select * into s from xp_sessions where id = p_session and visitor_id = p_visitor and hub = p_hub
+      and started_at <= v_at and started_at > v_at - interval '6 hours'
+      and (finished_at is null or finished_at > v_at - interval '10 minutes');
+    if found then
+      s_ok := true;
+      select count(*), coalesce(bool_or(a.qid = p_qid), false) into s_n, s_dup
+        from answer_xp x join personal_answers a on a.id = x.answer_id where x.session_id = p_session;
+    end if;
+  end if;
+
+  -- record it as the four calls a page makes today do: class stats, the class's picks, the right-in-a-row streak, your answers
+  perform record_answer(p_hub, p_qid, v_correct);
+  if p_choice is not null then perform record_choice(p_hub, p_qid, p_choice);
+  elsif p_picks is not null and v_kind <> 'order' then
+    if cardinality(p_picks) = 1 and v_kind <> 'all' then perform record_choice(p_hub, p_qid, p_picks[1]);
+    else perform record_choices(p_hub, p_qid, p_picks); end if;
+  end if;
+  perform record_correct_streak(p_visitor, v_correct);
+  perform set_config('sh.xp_v2', 'on', true);
+  insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values (p_visitor, p_hub, p_qid, v_correct, v_at)
+    returning id into aid;
+  perform set_config('sh.xp_v2', 'off', true);
+  insert into answer_xp (answer_id, request_id, session_id, ctx, kind)
+    values (aid, p_request, case when s_ok then p_session end, v_ctx, v_kind);
+  dd := (v_at at time zone 'America/Chicago')::date;
+
+  -- the guardrails: no key, no XP; then the speed limit
+  if v_kind in ('one', 'all', 'order', 'self') then
+    if s_ok and s.kind = 'mock' then
+      speed_ok := not s_dup and s_n + 1 <= 300 and v_at - s.started_at >= (s_n + 1) * interval '2 seconds';
+    else
+      select max(a.answered_at) into prev_t from personal_answers a where a.visitor_id = p_visitor and a.id <> aid and a.answered_at <= v_at;
+      select count(*) into n60 from personal_answers a
+        left join answer_xp x on x.answer_id = a.id left join xp_sessions ss on ss.id = x.session_id
+        where a.visitor_id = p_visitor and a.answered_at >= v_at - interval '60 seconds' and a.answered_at <= v_at
+          and coalesce(ss.kind, '') <> 'mock';
+      speed_ok := (prev_t is null or v_at - prev_t >= interval '2 seconds') and n60 <= 30;
+    end if;
+    if not speed_ok then why := 'fast'; end if;
+  else
+    why := v_kind;
+  end if;
+
+  if speed_ok then
+    select count(*) filter (where a.correct = v_correct), count(*), count(*) filter (where a.correct)
+      into rn_same, rn_all, v_n
+      from personal_answers a where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid
+        and (a.answered_at at time zone 'America/Chicago')::date = dd;
+    if v_correct then select count(*) into rn_ever from personal_answers a where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid and a.correct; end if;
+    v_base := case when v_kind = 'self' then case when rn_all <= 3 then 2 else 0 end
+                   when v_correct then case when rn_same <= 3 then case when rn_ever = 1 then 10 else 2 end else 0 end
+                   else case when rn_same <= 3 then 1 else 0 end end;
+    if v_base = 0 then why := 'repeat'; end if;
+    v_mult := sh_xp_mult(p_visitor, v_at);
+    paid := sh_award(p_visitor, 'a:' || aid, 'answer', p_hub, v_base, v_mult, v_at);
+    -- the day's 20th answer
+    select n into pos_day from xp_days where visitor_id = p_visitor and d = dd;
+    if coalesce(pos_day, 0) >= 20 then
+      v_n := sh_award(p_visitor, 'g20:' || dd, 'goal20', p_hub, 30, v_mult, v_at);
+      if v_n > 0 then bonus := bonus || jsonb_build_object('src', 'goal20', 'xp', v_n); end if;
+    end if;
+    -- a question missed the last time you answered it before today, right today
+    if v_correct and v_kind <> 'self' then
+      select a.correct into dp from personal_answers a where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid
+        and (a.answered_at at time zone 'America/Chicago')::date < dd order by a.answered_at desc, a.id desc limit 1;
+      if found and not dp then
+        v_n := sh_award(p_visitor, 'fix:' || p_hub || ':' || p_qid, 'fix', p_hub, 5, v_mult, v_at);
+        if v_n > 0 then bonus := bonus || jsonb_build_object('src', 'fix', 'xp', v_n); end if;
+      end if;
+    end if;
+  end if;
+  if v_kind in ('one', 'all', 'order', 'self') then medal := sh_medal_check(p_visitor, p_hub, v_at); end if;
+
+  v_resp := jsonb_build_object('ok', true, 'correct', v_correct, 'kind', v_kind, 'xp', paid, 'base', v_base, 'mult', v_mult,
+    'first', v_correct and rn_ever = 1 and paid > 0, 'why', why, 'bonus', bonus, 'medal', medal,
+    'boost', sh_boost_json(p_visitor, v_at), 'total', (select xv.xp from xp_visitors xv where xv.visitor_id = p_visitor));
+  update answer_xp set resp = v_resp where answer_id = aid;
+  return v_resp;
+end;
+$$;
+revoke all on function public.sh_answer(timestamptz, text, text, text, integer, integer[], boolean, text, text, text, uuid, boolean) from public, anon, authenticated;
+
+-- ---------- the arcade's games: Perio's Stage & Grade ('stage', v64) ----------
+create or replace function public.submit_arcade_score(p_visitor text, p_hub text, p_game text, p_score integer)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if p_visitor is null or length(trim(p_visitor)) = 0 then return; end if;
+  if p_game not in (
+    'sort', 'snake', 'stack', 'match', 'hangman', 'fact', 'blaster', 'search', 'whack',          -- msk-exam3 Bone Zone Arcade
+    'flappy', 'crusher', 'probe', 'quadrants', 'perdle', 'planer', 'smile', 'sweeper', 'cross',  -- perio Pocket Arcade
+    'board', 'cloze', 'escape',                                                                  -- shared games (widget/games.js, migration_v40)
+    'stage'                                                                                      -- perio Stage & Grade (v64)
+  ) then return; end if;
+  if p_score is null or p_score < 1 or p_score > 200000 then return; end if;
+  if exists (select 1 from arcade_scores where visitor_id = p_visitor and hub = coalesce(p_hub, '') and game = p_game
+             and played_at > now() - interval '10 seconds') then return; end if;
+  insert into arcade_scores (hub, game, visitor_id, score) values (coalesce(p_hub, ''), p_game, p_visitor, p_score);
+end;
+$$;
+
+create or replace function public.sh_session_start(p_at timestamptz, p_visitor text, p_hub text, p_kind text, p_game text)
+returns uuid language plpgsql security definer set search_path = public as $$
+declare v_at timestamptz := coalesce(p_at, clock_timestamp()); sid uuid;
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 or p_hub is null or p_hub !~ '^[a-z0-9][a-z0-9-]{0,39}$'
+     or p_kind not in ('mock', 'arcade') then return null; end if;
+  if p_kind = 'arcade' and coalesce(p_game, '') not in (
+    'sort', 'snake', 'stack', 'match', 'hangman', 'fact', 'blaster', 'search', 'whack',
+    'flappy', 'crusher', 'probe', 'quadrants', 'perdle', 'planer', 'smile', 'sweeper', 'cross',
+    'board', 'cloze', 'escape', 'stage') then return null; end if;   -- the games submit_arcade_score takes
+  if (select count(*) from xp_sessions where visitor_id = p_visitor and started_at > v_at - interval '1 day') >= 200 then return null; end if;
+  insert into xp_sessions (visitor_id, hub, kind, game, started_at)
+    values (p_visitor, p_hub, p_kind, case when p_kind = 'arcade' then p_game end, v_at) returning id into sid;
+  return sid;
+end;
+$$;
+
+-- ====================================================================== migration_v65.sql
+-- v65 (2026-11-18): more cosmetics for Timmy and Timmy's place. Sam: "Lets work on timmy outfits and place cosmetics.
+-- Go crazy". 59 new rows in the shop's catalog, nothing else changes:
+--   - six year-round collections, eight pieces each (48 rows): a home, a scene, three outfits and three yard pieces that
+--     belong together, like a season's set, but in the everyday rotation (season null, rotates): the daily and weekly
+--     picks draw from them with the rest, the rarer ones less often. Dino valley, Moon base, Coral reef, Desert ranch,
+--     Retro arcade and Rock show. Exactly allCollectionItems() of tools/figures/site/sets.mjs (tools/release/xp.js checks),
+--     drawn in tools/figures/site/packs/<collection>.mjs;
+--   - five more rare costumes (the wizard, the robot, the firefighter, the shark and the legendary dragon): like the first
+--     five, never on a shelf until spotted (record_costume_sighting), the page names the day's costume itself
+--     (costumeOfDay in widget/hub-timmy.js and widget/dash.js, from sets.mjs COSTUMES);
+--   - six more paints (coral, sage, sand, rose, slate, teal), in the rotation like the first five.
+-- Every price is inside its rarity's band (the table's check). The functions are unchanged: sh_shop_day, buy_item,
+-- equip_item and get_my_shop already sell, equip and list any active row by its kind and slot. Written and tested on a
+-- throwaway copy of supabase/schema.sql (tools/release/xp.js). Apply after the pages that draw these pieces are live, so
+-- the daily picks never show a piece before its drawing has shipped.
+-- Applied to the live project on 2026-11-18 through the connector, right after #409 merged and its drawings were live
+-- (240 rows in shop_items: 48 in the six collections, ten rare costumes, eleven paints).
+
+insert into public.shop_items (id, name, kind, rarity, price, season, slot, hp, boost_minutes, boost_mult, shelf, rotates, sort) values
+  ('stone-den', 'Stone-age den', 'home', 'legendary', 6000, null, null, null, null, null, false, true, 3001),
+  ('volcano-valley', 'Volcano valley', 'scene', 'epic', 2400, null, null, null, null, null, false, true, 3002),
+  ('field-hat', 'Fossil hunter''s hat', 'outfit', 'common', 150, null, null, null, null, null, false, true, 3003),
+  ('fossil-vest', 'Dig-site vest and brush', 'outfit', 'uncommon', 350, null, null, null, null, null, false, true, 3004),
+  ('stego-hood', 'Stegosaurus hood', 'outfit', 'rare', 900, null, null, null, null, null, false, true, 3005),
+  ('dino-nest', 'Dino egg nest', 'yard', 'uncommon', 400, null, null, null, null, null, false, true, 3006),
+  ('fossil-dig', 'Fossil dig', 'yard', 'rare', 900, null, null, null, null, null, false, true, 3007),
+  ('trex-skeleton', 'T. rex skeleton', 'yard', 'epic', 2200, null, null, null, null, null, false, true, 3008),
+  ('moon-dome', 'Moon base dome', 'home', 'legendary', 6500, null, null, null, null, null, false, true, 3011),
+  ('lunar-plains', 'Lunar plains', 'scene', 'epic', 2600, null, null, null, null, null, false, true, 3012),
+  ('antenna-headband', 'Antenna headband', 'outfit', 'common', 150, null, null, null, null, null, false, true, 3013),
+  ('space-visor', 'Space visor', 'outfit', 'uncommon', 400, null, null, null, null, null, false, true, 3014),
+  ('jetpack', 'Jetpack', 'outfit', 'rare', 1000, null, null, null, null, null, false, true, 3015),
+  ('moon-rover', 'Moon rover', 'yard', 'uncommon', 450, null, null, null, null, null, false, true, 3016),
+  ('satellite-dish', 'Satellite dish', 'yard', 'rare', 1000, null, null, null, null, null, false, true, 3017),
+  ('rocket', 'Rocket on its pad', 'yard', 'epic', 2400, null, null, null, null, null, false, true, 3018),
+  ('conch-house', 'Conch shell house', 'home', 'legendary', 6000, null, null, null, null, null, false, true, 3021),
+  ('sunlit-reef', 'Sunlit reef', 'scene', 'epic', 2600, null, null, null, null, null, false, true, 3022),
+  ('starfish-clip', 'Starfish clip', 'outfit', 'common', 120, null, null, null, null, null, false, true, 3023),
+  ('octopus-hat', 'Octopus hat', 'outfit', 'uncommon', 400, null, null, null, null, null, false, true, 3024),
+  ('mer-tail', 'Mer-tail', 'outfit', 'rare', 950, null, null, null, null, null, false, true, 3025),
+  ('coral-garden', 'Coral garden', 'yard', 'uncommon', 350, null, null, null, null, null, false, true, 3026),
+  ('giant-clam', 'Giant clam', 'yard', 'rare', 900, null, null, null, null, null, false, true, 3027),
+  ('sunken-chest', 'Sunken treasure chest', 'yard', 'epic', 2000, null, null, null, null, null, false, true, 3028),
+  ('adobe-ranch', 'Adobe ranch house', 'home', 'legendary', 5500, null, null, null, null, null, false, true, 3031),
+  ('red-rocks', 'Red rock desert', 'scene', 'epic', 2200, null, null, null, null, null, false, true, 3032),
+  ('bandana', 'Bandana', 'outfit', 'common', 120, null, null, null, null, null, false, true, 3033),
+  ('cowboy-hat', 'Cowboy hat', 'outfit', 'uncommon', 350, null, null, null, null, null, false, true, 3034),
+  ('sheriff-vest', 'Sheriff''s vest and star', 'outfit', 'rare', 800, null, null, null, null, null, false, true, 3035),
+  ('cactus-garden', 'Cactus garden', 'yard', 'uncommon', 300, null, null, null, null, null, false, true, 3036),
+  ('windmill-pump', 'Windmill', 'yard', 'rare', 800, null, null, null, null, null, false, true, 3037),
+  ('covered-wagon', 'Covered wagon', 'yard', 'epic', 1900, null, null, null, null, null, false, true, 3038),
+  ('arcade-hall', 'Arcade hall', 'home', 'legendary', 6500, null, null, null, null, null, false, true, 3041),
+  ('pixel-hills', 'Pixel hills', 'scene', 'epic', 2400, null, null, null, null, null, false, true, 3042),
+  ('gamer-headset', 'Gamer headset', 'outfit', 'common', 180, null, null, null, null, null, false, true, 3043),
+  ('pixel-shades', 'Pixel shades', 'outfit', 'uncommon', 300, null, null, null, null, null, false, true, 3044),
+  ('high-score-jacket', 'High-score jacket', 'outfit', 'rare', 850, null, null, null, null, null, false, true, 3045),
+  ('arcade-cabinet', 'Arcade cabinet', 'yard', 'uncommon', 450, null, null, null, null, null, false, true, 3046),
+  ('pinball', 'Pinball machine', 'yard', 'rare', 1000, null, null, null, null, null, false, true, 3047),
+  ('claw-machine', 'Giant claw machine', 'yard', 'epic', 2200, null, null, null, null, null, false, true, 3048),
+  ('record-shop', 'Record shop', 'home', 'legendary', 6000, null, null, null, null, null, false, true, 3051),
+  ('festival-field', 'Festival field', 'scene', 'epic', 2400, null, null, null, null, null, false, true, 3052),
+  ('band-tee', 'Band tee', 'outfit', 'common', 120, null, null, null, null, null, false, true, 3053),
+  ('leather-jacket', 'Leather jacket', 'outfit', 'uncommon', 450, null, null, null, null, null, false, true, 3054),
+  ('electric-guitar', 'Electric guitar', 'outfit', 'rare', 1000, null, null, null, null, null, false, true, 3055),
+  ('amp-stack', 'Amp stack', 'yard', 'uncommon', 400, null, null, null, null, null, false, true, 3056),
+  ('drum-kit', 'Drum kit', 'yard', 'rare', 1000, null, null, null, null, null, false, true, 3057),
+  ('tour-stage', 'Little stage and lights', 'yard', 'epic', 2400, null, null, null, null, null, false, true, 3058),
+  ('wizard', 'Wizard', 'costume', 'epic', 2000, null, null, null, null, null, false, false, 906),
+  ('robot', 'Robot', 'costume', 'epic', 2200, null, null, null, null, null, false, false, 907),
+  ('firefighter', 'Firefighter', 'costume', 'epic', 1600, null, null, null, null, null, false, false, 908),
+  ('shark', 'Shark', 'costume', 'epic', 2400, null, null, null, null, null, false, false, 909),
+  ('dragon', 'Dragon', 'costume', 'legendary', 4500, null, null, null, null, null, false, false, 910),
+  ('paint-coral', 'Coral paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 510),
+  ('paint-sage', 'Sage paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 511),
+  ('paint-sand', 'Sand paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 512),
+  ('paint-rose', 'Rose paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 513),
+  ('paint-slate', 'Slate paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 514),
+  ('paint-teal', 'Teal paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 515)
+on conflict (id) do nothing;
+
+-- ====================================================================== migration_v66.sql
+-- v66 (2026-11-18): the class's picks on each choice follow the version of the question's choices.
+-- The inbox (2026-11-04 evening lessons audit): "Class picks on each choice ignore question versions: question_choices is
+-- keyed by position, so when an edit moves or rewrites choices, last week's percentages show beside a different choice."
+-- Since the release, Perio's audits rewrote the choices of 169 of its questions (8 only moved: the same choices in a new
+-- order) and Occlusion's 125, so on those cards the "% of the class picked it" counted picks of the old choices.
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js).
+--
+-- How it works now:
+-- 1. A question's choices have a version (question_keys.cv): a fingerprint of its choices and its key, worked out by
+--    tools/xp/keys.js and loaded with the answer keys after every merged change to a hub's questions. Only one-choice and
+--    select-all questions have one. An edit to the stem, the explanation or a why doesn't change it; an edit to any choice,
+--    their order or the key does.
+-- 2. record_choice and record_choices stamp each pick with the current version of the question's choices
+--    (question_choices.v). The page and sh_answer are unchanged: the server looks the version up itself.
+-- 3. question_choices holds only the current version's counts, so nothing that reads it changes (the cards' percentages
+--    in widget/v3.js and widget/hub-bank.js, the recap, question health, the admin page, the lessons and retro SQL).
+--    When a question's choices get a new version, the old version's counts move to question_choices_past (closed to
+--    the public; nothing is deleted), and the new version's start from nothing; if an edit is undone, its counts come
+--    back. That happens when the keys are loaded (admin_load_question_keys) and, as a backstop, at the next pick.
+-- 4. The picks counted before versions existed (v = '') are taken as the current version's the first time a question's
+--    choices get a version, except for the questions whose choices changed since their hub's content JSON first shipped
+--    (tools/xp/choice-history.js, from git: the 301 listed at the end, 169 Perio, 125 Occlusion and 7 Heme & Endo
+--    Exam 3), whose old picks are set aside (v = 'before') and
+--    moved to question_choices_past when their keys load. An edit made on an old single-file page before the redesign's
+--    release can't be seen in git, so those picks are kept as they are, as they were shown until now.
+-- Hubs without answer keys (the old single-file pages) have no versions and behave exactly as before.
+-- It changes nothing a student sees until the keys are loaded with their versions (the After merge workflow does that
+-- for every engine hub when tools/xp/keys.js changes); an older keys.js that sends no cv leaves every version as it is.
+-- class % right (question_stats) is per question, not per choice, and stays as it is.
+
+-- ---------------------------------------------------------------- tables
+alter table public.question_keys add column if not exists cv text not null default '';
+alter table public.question_choices add column if not exists v text not null default '';
+create table if not exists public.question_choices_past (
+  hub text not null,
+  qid text not null,
+  v text not null,                       -- the version of the choices these picks were made on ('before': unknown, older)
+  choice integer not null,
+  picks integer not null default 0,
+  moved_at timestamptz not null default now(),
+  primary key (hub, qid, v, choice)
+);
+alter table public.question_choices_past enable row level security;   -- no policies: only the functions below touch it
+revoke all on table public.question_choices_past from anon, authenticated;
+
+-- ---------------------------------------------------------------- the version and the move
+-- the current version of a question's choices, '' when it has none (no key, a retired id, a key loaded without one)
+create or replace function public.sh_choice_version(p_hub text, p_qid text)
+returns text language sql stable security definer set search_path = public as $$
+  select coalesce((select k.cv from question_keys k where k.hub = p_hub and k.qid = p_qid and k.is_current and not k.retired limit 1), '');
+$$;
+
+-- Makes question_choices hold version p_cv's counts for a question: any other version's move to question_choices_past
+-- (added to what is kept there), and p_cv's own come back if they were moved out before (an edit undone). Returns how many
+-- rows moved out. A row moves in a delete ... returning, which only one of two racing answers gets, so nothing counts twice.
+create or replace function public.sh_choices_to(p_hub text, p_qid text, p_cv text)
+returns integer language plpgsql security definer set search_path = public as $$
+declare n int := 0;
+begin
+  if coalesce(p_cv, '') = '' then return 0; end if;
+  if exists (select 1 from question_choices where hub = p_hub and qid = p_qid and v <> p_cv) then
+    with moved as (delete from question_choices where hub = p_hub and qid = p_qid and v <> p_cv returning hub, qid, v, choice, picks)
+    insert into question_choices_past (hub, qid, v, choice, picks) select hub, qid, v, choice, picks from moved
+    on conflict (hub, qid, v, choice) do update set picks = question_choices_past.picks + excluded.picks, moved_at = now();
+    get diagnostics n = row_count;
+  end if;
+  if exists (select 1 from question_choices_past where hub = p_hub and qid = p_qid and v = p_cv) then
+    with back as (delete from question_choices_past where hub = p_hub and qid = p_qid and v = p_cv returning hub, qid, v, choice, picks)
+    insert into question_choices (hub, qid, choice, picks, v) select hub, qid, choice, picks, v from back
+    on conflict (hub, qid, choice) do update set picks = question_choices.picks + excluded.picks, v = excluded.v;
+  end if;
+  return n;
+end;
+$$;
+revoke all on function public.sh_choice_version(text, text) from public, anon, authenticated;
+revoke all on function public.sh_choices_to(text, text, text) from public, anon, authenticated;
+
+-- ---------------------------------------------------------------- recording (public, as before)
+create or replace function public.record_choice(p_hub text, p_qid text, p_choice integer)
+returns void language plpgsql security definer set search_path = public as $$
+declare v_cv text;
+begin
+  if p_hub is null or p_qid is null or p_choice is null or p_choice < 0 or p_choice > 9 then return; end if;
+  v_cv := sh_choice_version(p_hub, p_qid);
+  perform sh_choices_to(p_hub, p_qid, v_cv);
+  insert into question_choices (hub, qid, choice, picks, v) values (p_hub, p_qid, p_choice, 1, v_cv)
+  on conflict (hub, qid, choice) do update set picks = question_choices.picks + 1;
+end;
+$$;
+
+-- select-all questions: one pick per ticked option (migration_v28)
+create or replace function public.record_choices(p_hub text, p_qid text, p_choices integer[])
+returns void language plpgsql security definer set search_path = public as $$
+declare v_cv text;
+begin
+  if p_hub is null or p_qid is null or p_choices is null
+     or cardinality(p_choices) = 0 or cardinality(p_choices) > 10 then return; end if;
+  v_cv := sh_choice_version(p_hub, p_qid);
+  perform sh_choices_to(p_hub, p_qid, v_cv);
+  insert into question_choices (hub, qid, choice, picks, v)
+  select p_hub, p_qid, c, 1, v_cv from (select distinct unnest(p_choices) c) x where c between 0 and 9
+  on conflict (hub, qid, choice) do update set picks = question_choices.picks + 1;
+end;
+$$;
+
+-- ---------------------------------------------------------------- loading the keys
+-- p_keys: [{"id": "q1", "v": "<fingerprint>", "kind": "one", "answer": [2], "cv": "<choices' version>", "counted": true},
+--          {"id": "q9", "retired": true}]
+-- p_retire_missing: a current key of this hub missing from p_keys is retired (its id is out of use for good).
+-- As migration_v54 wrote it, plus cv: stored with the key (a key loaded again without one keeps the one it had), and the
+-- question's picks moved to that version (above). Returns picks_restarted: the questions whose picks start again.
+create or replace function public.admin_load_question_keys(p_secret text, p_hub text, p_keys jsonb, p_retire_missing boolean default false)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare it jsonb; v_id text; v_v text; v_kind text; v_ans smallint[]; v_cv text; v_prev text; n_loaded int := 0; n_retired int := 0;
+  n_restarted int := 0; k int; ids text[] := '{}';
+begin
+  if not sh_admin_ok(p_secret) then raise exception 'unauthorized' using errcode = '28000'; end if;
+  if p_hub is null or p_hub !~ '^[a-z0-9][a-z0-9-]{0,39}$' then raise exception 'bad hub id'; end if;
+  if jsonb_typeof(p_keys) is distinct from 'array' then raise exception 'p_keys must be a JSON array'; end if;
+  for it in select * from jsonb_array_elements(p_keys) loop
+    v_id := it->>'id';
+    if v_id is null or length(v_id) not between 1 and 80 then raise exception 'bad question id: %', left(coalesce(v_id, 'null'), 90); end if;
+    ids := ids || v_id;
+    if coalesce((it->>'retired')::boolean, false) then
+      update question_keys set retired = true where hub = p_hub and qid = v_id and not retired;
+      get diagnostics k = row_count; n_retired := n_retired + k;
+      continue;
+    end if;
+    v_kind := it->>'kind';
+    v_v := left(coalesce(it->>'v', ''), 40);
+    v_cv := coalesce(it->>'cv', '');
+    if v_cv !~ '^[a-z0-9]{0,40}$' then raise exception '%: bad choice version', v_id; end if;
+    v_ans := array(select x::smallint from jsonb_array_elements_text(coalesce(it->'answer', '[]'::jsonb)) x);
+    if v_kind = 'one' and not (cardinality(v_ans) = 1 and v_ans[1] between 0 and 19) then raise exception '%: a one-choice key needs one answer', v_id; end if;
+    if v_kind = 'all' and not (cardinality(v_ans) between 1 and 20 and (select bool_and(x between 0 and 19) and count(distinct x) = count(*) from unnest(v_ans) x))
+      then raise exception '%: a select-all key needs distinct answers 0-19', v_id; end if;
+    if v_kind = 'order' and not (cardinality(v_ans) between 2 and 20 and (select array_agg(x order by x) from unnest(v_ans) x) = (select array_agg(g::smallint) from generate_series(0, cardinality(v_ans) - 1) g))
+      then raise exception '%: an order key is the steps 0..n-1 in their right order', v_id; end if;
+    if v_kind = 'self' then v_ans := '{}'; end if;
+    if v_kind is null or v_kind not in ('one', 'all', 'order', 'self') then raise exception '%: bad kind %', v_id, coalesce(v_kind, 'null'); end if;
+    if v_kind not in ('one', 'all') then v_cv := ''; end if;
+    v_prev := (select q.cv from question_keys q where q.hub = p_hub and q.qid = v_id and q.is_current limit 1);
+    update question_keys set is_current = false where hub = p_hub and qid = v_id and v <> v_v and is_current;
+    insert into question_keys (hub, qid, v, kind, answer, counted, is_current, retired, loaded_at, cv)
+      values (p_hub, v_id, v_v, v_kind, v_ans, coalesce((it->>'counted')::boolean, true), true, false, now(), v_cv)
+      on conflict (hub, qid, v) do update set kind = excluded.kind, answer = excluded.answer, counted = excluded.counted,
+        is_current = true, retired = false, loaded_at = now(),
+        cv = case when excluded.cv <> '' then excluded.cv else question_keys.cv end;
+    if v_cv <> '' then
+      -- the first version a question's choices get: the picks counted before versions existed are this version's
+      -- (not the ones this migration set aside as 'before', whose choices changed in the meantime)
+      if coalesce(v_prev, '') = '' then update question_choices set v = v_cv where hub = p_hub and qid = v_id and v = ''; end if;
+      if sh_choices_to(p_hub, v_id, v_cv) > 0 then n_restarted := n_restarted + 1; end if;
+    end if;
+    n_loaded := n_loaded + 1;
+  end loop;
+  if p_retire_missing then
+    update question_keys set retired = true where hub = p_hub and is_current and not retired and not (qid = any(ids));
+    get diagnostics k = row_count; n_retired := n_retired + k;
+  end if;
+  return jsonb_build_object('hub', p_hub, 'loaded', n_loaded, 'retired', n_retired, 'picks_restarted', n_restarted,
+    'keys', (select count(*) from question_keys where hub = p_hub and is_current and not retired));
+end;
+$$;
+revoke all on function public.admin_load_question_keys(text, text, jsonb, boolean) from public;
+grant execute on function public.admin_load_question_keys(text, text, jsonb, boolean) to anon, authenticated;
+
+-- ---------------------------------------------------------------- the picks counted before versions, set aside
+-- The questions whose choices (or key) changed since their hub's content JSON first shipped, from git
+-- (node tools/xp/choice-history.js --sql, run on main as this was applied): their picks so far mix the old choices with
+-- the new, so they are set aside and these questions' percentages start again when their keys load.
+update public.question_choices set v = 'before' where v = '' and (hub, qid) in (values
+  ('heme-endo-exam3', 'hi-tf-spleen-cm'),
+  ('heme-endo-exam3', 'hi-ws-blood'),
+  ('heme-endo-exam3', 'hi-ws-nucleus'),
+  ('heme-endo-exam3', 'll-2s-bl'),
+  ('heme-endo-exam3', 'll-multi-ebv'),
+  ('heme-endo-exam3', 'll-num-secondary'),
+  ('heme-endo-exam3', 'll-wf-hl'),
+  ('occlusion', 'cc-envelope-fn'),
+  ('occlusion', 'cs-dn-bal-records'),
+  ('occlusion', 'cs-in-rehab-sci'),
+  ('occlusion', 'cs-mo-brux-ask'),
+  ('occlusion', 'cs-mo-brux-splint'),
+  ('occlusion', 'cs-mo-eros-sign'),
+  ('occlusion', 'cs-mo-mob-tx'),
+  ('occlusion', 'cs-ot-fr-dx'),
+  ('occlusion', 'cs-ot-pe-defect'),
+  ('occlusion', 'cs-ot-pe-when'),
+  ('occlusion', 'dn-acrylic'),
+  ('occlusion', 'dn-bal-def'),
+  ('occlusion', 'dn-chew'),
+  ('occlusion', 'dn-cr'),
+  ('occlusion', 'dn-fit'),
+  ('occlusion', 'dn-flat-pro'),
+  ('occlusion', 'dn-implant-why'),
+  ('occlusion', 'dn-ling-ant'),
+  ('occlusion', 'dn-m2'),
+  ('occlusion', 'dn-md-length'),
+  ('occlusion', 'dn-neutro-40'),
+  ('occlusion', 'dn-num-3'),
+  ('occlusion', 'dn-num-4'),
+  ('occlusion', 'dn-partial'),
+  ('occlusion', 'dn-resorb-mand'),
+  ('occlusion', 'dn-ret-fluid'),
+  ('occlusion', 'dn-reverse'),
+  ('occlusion', 'dn-support-areas'),
+  ('occlusion', 'dn-tongue'),
+  ('occlusion', 'dn-wear'),
+  ('occlusion', 'dn-wf-co'),
+  ('occlusion', 'dn-wf-ling'),
+  ('occlusion', 'in-30deg'),
+  ('occlusion', 'in-3to5'),
+  ('occlusion', 'in-cbd'),
+  ('occlusion', 'in-indirect'),
+  ('occlusion', 'in-interchange'),
+  ('occlusion', 'in-kinematic'),
+  ('occlusion', 'in-lab-errors'),
+  ('occlusion', 'in-locator'),
+  ('occlusion', 'in-nofb'),
+  ('occlusion', 'in-nonadj-who'),
+  ('occlusion', 'in-sel-poor'),
+  ('occlusion', 'in-sel-strong'),
+  ('occlusion', 'in-semi-records'),
+  ('occlusion', 'in-vps-fit'),
+  ('occlusion', 'in-vps-time'),
+  ('occlusion', 'in-wf-artic'),
+  ('occlusion', 'in-zirconia'),
+  ('occlusion', 'mo-3mm'),
+  ('occlusion', 'mo-abfraction'),
+  ('occlusion', 'mo-acute-malocc'),
+  ('occlusion', 'mo-brux-forces'),
+  ('occlusion', 'mo-brux-o2'),
+  ('occlusion', 'mo-brux-return'),
+  ('occlusion', 'mo-brux-tx'),
+  ('occlusion', 'mo-cause'),
+  ('occlusion', 'mo-class2'),
+  ('occlusion', 'mo-deep'),
+  ('occlusion', 'mo-direction'),
+  ('occlusion', 'mo-div1'),
+  ('occlusion', 'mo-gerd'),
+  ('occlusion', 'mo-goal1'),
+  ('occlusion', 'mo-healing'),
+  ('occlusion', 'mo-histo'),
+  ('occlusion', 'mo-interf-equal'),
+  ('occlusion', 'mo-lit-weak'),
+  ('occlusion', 'mo-max-splint'),
+  ('occlusion', 'mo-nccl-load'),
+  ('occlusion', 'mo-new-medio'),
+  ('occlusion', 'mo-num-1'),
+  ('occlusion', 'mo-num-5'),
+  ('occlusion', 'mo-num-6'),
+  ('occlusion', 'mo-occupational'),
+  ('occlusion', 'mo-orth-occ'),
+  ('occlusion', 'mo-philosophy'),
+  ('occlusion', 'mo-prophy'),
+  ('occlusion', 'mo-redlight'),
+  ('occlusion', 'mo-reflex'),
+  ('occlusion', 'mo-regulated'),
+  ('occlusion', 'mo-risk-load'),
+  ('occlusion', 'mo-scallop'),
+  ('occlusion', 'mo-screwdriver'),
+  ('occlusion', 'mo-signs'),
+  ('occlusion', 'mo-sleep'),
+  ('occlusion', 'mo-soda'),
+  ('occlusion', 'mo-tmd-def'),
+  ('occlusion', 'mo-tmd-split'),
+  ('occlusion', 'mo-tuesday'),
+  ('occlusion', 'mo-wear-first'),
+  ('occlusion', 'mo-wear-pain'),
+  ('occlusion', 'mo-wf-mobility'),
+  ('occlusion', 'mo-wf-tmd'),
+  ('occlusion', 'mo-where'),
+  ('occlusion', 'mo-ws-splint'),
+  ('occlusion', 'nc-citric'),
+  ('occlusion', 'nc-sel-acid'),
+  ('occlusion', 'nc-sel-evid'),
+  ('occlusion', 'nc-tension'),
+  ('occlusion', 'nc-wf-1'),
+  ('occlusion', 'nc-ws-2'),
+  ('occlusion', 'ot-adapt'),
+  ('occlusion', 'ot-anim-alone'),
+  ('occlusion', 'ot-anim-ging'),
+  ('occlusion', 'ot-anim-perio'),
+  ('occlusion', 'ot-cause'),
+  ('occlusion', 'ot-class3'),
+  ('occlusion', 'ot-codestruct'),
+  ('occlusion', 'ot-discrep'),
+  ('occlusion', 'ot-fence'),
+  ('occlusion', 'ot-fremitus'),
+  ('occlusion', 'ot-heal'),
+  ('occlusion', 'ot-histology'),
+  ('occlusion', 'ot-initiate'),
+  ('occlusion', 'ot-mob-dep'),
+  ('occlusion', 'ot-oa-does'),
+  ('occlusion', 'ot-sel-clin'),
+  ('occlusion', 'ot-select'),
+  ('occlusion', 'ot-stop'),
+  ('occlusion', 'ot-timing'),
+  ('occlusion', 'ot-trial'),
+  ('occlusion', 'ot-wf-1'),
+  ('occlusion', 'ot-wf-2'),
+  ('occlusion', 'ot-ws-1'),
+  ('occlusion', 'ot-ws-2'),
+  ('perio', 'pc-b2'),
+  ('perio', 'pc-e1'),
+  ('perio', 'q1-03'),
+  ('perio', 'q1-04'),
+  ('perio', 'q1-13'),
+  ('perio', 'q1-17'),
+  ('perio', 'q1-18'),
+  ('perio', 'q1-20'),
+  ('perio', 'q1-22'),
+  ('perio', 'q1-23'),
+  ('perio', 'q1-27'),
+  ('perio', 'q1-29'),
+  ('perio', 'q1-32'),
+  ('perio', 'q1-E04'),
+  ('perio', 'q1-E06'),
+  ('perio', 'q2-09'),
+  ('perio', 'q2-13'),
+  ('perio', 'q2-14'),
+  ('perio', 'q2-17'),
+  ('perio', 'q2-19'),
+  ('perio', 'q2-20'),
+  ('perio', 'q2-25'),
+  ('perio', 'q2-27'),
+  ('perio', 'q2-28'),
+  ('perio', 'q2-E03'),
+  ('perio', 'q2-F02'),
+  ('perio', 'q2-M02'),
+  ('perio', 'q2-P01'),
+  ('perio', 'q2-S02'),
+  ('perio', 'q3-01'),
+  ('perio', 'q3-11'),
+  ('perio', 'q3-12'),
+  ('perio', 'q3-16'),
+  ('perio', 'q3-19'),
+  ('perio', 'q3-20'),
+  ('perio', 'q3-22'),
+  ('perio', 'q3-23'),
+  ('perio', 'q3-26'),
+  ('perio', 'q3-28'),
+  ('perio', 'q3-30'),
+  ('perio', 'q3-34'),
+  ('perio', 'q3-35'),
+  ('perio', 'q3-41'),
+  ('perio', 'q3-44'),
+  ('perio', 'q3-48'),
+  ('perio', 'q3-E02'),
+  ('perio', 'q3-E04'),
+  ('perio', 'q3-P02'),
+  ('perio', 'q4-06'),
+  ('perio', 'q4-07'),
+  ('perio', 'q4-14'),
+  ('perio', 'q4-17'),
+  ('perio', 'q4-21'),
+  ('perio', 'q4-26'),
+  ('perio', 'q4-30'),
+  ('perio', 'q4-31'),
+  ('perio', 'q4-37'),
+  ('perio', 'q4-38'),
+  ('perio', 'q4-43'),
+  ('perio', 'q4-E04'),
+  ('perio', 'q4-L08'),
+  ('perio', 'q4-L12'),
+  ('perio', 'q4-L17'),
+  ('perio', 'q4-L18'),
+  ('perio', 'q4-L19'),
+  ('perio', 'q4-L24'),
+  ('perio', 'q4-L29'),
+  ('perio', 'q4-L34'),
+  ('perio', 'q4-M05'),
+  ('perio', 'q4-M06'),
+  ('perio', 'q4-P05'),
+  ('perio', 'q4-S02'),
+  ('perio', 'q5-06'),
+  ('perio', 'q5-07'),
+  ('perio', 'q5-08'),
+  ('perio', 'q5-E01'),
+  ('perio', 'q5-E02'),
+  ('perio', 'q5-E03'),
+  ('perio', 'q5-E05'),
+  ('perio', 'q5-L01'),
+  ('perio', 'q5-L02'),
+  ('perio', 'q5-L03'),
+  ('perio', 'q5-L04'),
+  ('perio', 'q5-L06'),
+  ('perio', 'q5-L09'),
+  ('perio', 'q5-L13'),
+  ('perio', 'q5-L16'),
+  ('perio', 'q5-L17'),
+  ('perio', 'q5-L24'),
+  ('perio', 'q5-L26'),
+  ('perio', 'q5-L31'),
+  ('perio', 'q5-L34'),
+  ('perio', 'q5-L38'),
+  ('perio', 'q5-L39'),
+  ('perio', 'q5-L42'),
+  ('perio', 'q5-L43'),
+  ('perio', 'q5-L47'),
+  ('perio', 'q5-L48'),
+  ('perio', 'q5-P01'),
+  ('perio', 'q5-P02'),
+  ('perio', 'q5-P04'),
+  ('perio', 'q5-R01'),
+  ('perio', 'q5-R04'),
+  ('perio', 'q5-R06'),
+  ('perio', 'q5-R13'),
+  ('perio', 'q5-R18'),
+  ('perio', 'q5-R21'),
+  ('perio', 'q5-R24'),
+  ('perio', 'q5-S05'),
+  ('perio', 'q6-01'),
+  ('perio', 'q6-02'),
+  ('perio', 'q6-03'),
+  ('perio', 'q6-04'),
+  ('perio', 'q6-05'),
+  ('perio', 'q6-06'),
+  ('perio', 'q6-07'),
+  ('perio', 'q6-L18'),
+  ('perio', 'q6-L29'),
+  ('perio', 'q6-L31'),
+  ('perio', 'q6-L32'),
+  ('perio', 'q6-P04'),
+  ('perio', 'q6-S01'),
+  ('perio', 'q6-S03'),
+  ('perio', 'q7-03'),
+  ('perio', 'q7-05'),
+  ('perio', 'q7-08'),
+  ('perio', 'q7-L04'),
+  ('perio', 'q7-L07'),
+  ('perio', 'q7-L22'),
+  ('perio', 'q7-L24'),
+  ('perio', 'q7-P01'),
+  ('perio', 'q7-P02'),
+  ('perio', 'q8-01'),
+  ('perio', 'q8-03'),
+  ('perio', 'q8-06'),
+  ('perio', 'q8-09'),
+  ('perio', 'q8-13'),
+  ('perio', 'q8-E01'),
+  ('perio', 'q8-F01'),
+  ('perio', 'q8-L02'),
+  ('perio', 'q8-L08'),
+  ('perio', 'q8-L19'),
+  ('perio', 'q8-L20'),
+  ('perio', 'q8-L22'),
+  ('perio', 'q8-L31'),
+  ('perio', 'q8-L42'),
+  ('perio', 'q8-L43'),
+  ('perio', 'q8-N03'),
+  ('perio', 'q8-P01'),
+  ('perio', 'q8-S01'),
+  ('perio', 'q9-01'),
+  ('perio', 'q9-02'),
+  ('perio', 'q9-03'),
+  ('perio', 'q9-04'),
+  ('perio', 'q9-06'),
+  ('perio', 'q9-07'),
+  ('perio', 'q9-08'),
+  ('perio', 'q9-L02'),
+  ('perio', 'q9-L11'),
+  ('perio', 'q9-L19'),
+  ('perio', 'q9-L26'),
+  ('perio', 'q9-L30'),
+  ('perio', 'q9-L35'),
+  ('perio', 'q9-L40'),
+  ('perio', 'q9-L49'),
+  ('perio', 'q9-L51'),
+  ('perio', 'q9-M02'),
+  ('perio', 'q9-S06'),
+  ('perio', 'q9-S07')
+);
+-- ======================================================================
+-- migration_v67 (2026-11-18): A/B versions of a question in question health
+-- ======================================================================
+-- v67 (2026-11-18): A/B versions of a question, recorded on every answer, and a question-health flag when they differ.
+-- Sam, 2026-11-18: "Do the database change. They are A/B versions of questions", and, asked whether to split the class so
+-- half see version B first: "Split the class". A hub with content/variants.json (Perio, #405) shows each question in two
+-- versions, A (questions.json) and B (the reworded one). The page now picks the first version by device (a hash of the
+-- device id and the question id, so about half the class starts on each) and alternates after (widget/hub.js worded()).
+-- So each version's first tries come from a like half of the class, and they can be compared fairly.
+--
+-- 1. question_events.w: the version shown (0 = A, 1 = B; null on a page before this change or a hub without versions).
+--    The answer's fingerprint (v) stays the original's, so the two versions are one question with one set of numbers.
+-- 2. record_qh takes it as the item's 'w' (0 to 9). Otherwise exactly as migration_v51 wrote it.
+-- 3. qh_report gets one more column, wordings: { "<w>": { n: people, c: right } } over first tries on this version.
+--    Its return type changes, so the old one is renamed qh_report_v51 (kept, unused, locked like the rest) and the new one
+--    created (nothing depends on it but get_question_health, whose plpgsql body names it at run time). A rename, not a
+--    drop, so the connector applies it without asking. Otherwise exactly as v51 wrote it.
+-- 4. qh_flags: a new flag, ab_gap ("Versions differ"), when the hardest and the easiest version (10+ people each) are 20
+--    points or more apart and that is unlikely to be chance (z >= 1.96). Medium, like very_hard; a new code brings a
+--    reviewed question back, as every new flag does. Otherwise exactly as v51 wrote it.
+-- Nothing here changes grading, XP or what a student sees; it is read only on the admin page (behind the admin secret).
+-- Applied to the live project on 2026-11-18 through the connector, in three parts (v65a_question_ab_record, v65b_question_ab_flag,
+-- v65c_question_ab_report), before its PR merged: a page before this change sends no 'w', which records as null.
+-- It was written as v65; main's v65 (the shop's cosmetics, #409) and v66 (choice versions, #408) took the numbers first, so the file is v67 and the
+-- live functions' comments still say migration_v65.
+-- Tested on a throwaway copy of supabase/schema.sql (tools/release/admin-ops.js, section 5; rls.js).
+
+alter table public.question_events add column if not exists w smallint;
+
+create or replace function public.record_qh(p_hub text, p_visitor text, p_visit text, p_items jsonb)
+returns void language plpgsql security definer set search_path = public as $$
+declare it jsonb; c int := 0; x_q text; x_v text; x_k text; x_ctx text; x_qt text;
+begin
+  if p_hub is null or p_hub !~ '^[a-z0-9-]{1,40}$' or p_visitor is null or length(p_visitor) not between 8 and 80
+     or p_visit is null or length(p_visit) not between 8 and 80 or jsonb_typeof(p_items) is distinct from 'array' then return; end if;
+  for it in select * from jsonb_array_elements(p_items) loop
+    c := c + 1; exit when c > 60;
+    continue when jsonb_typeof(it) is distinct from 'object';
+    x_q := it->>'q'; continue when x_q is null or x_q !~ '^[A-Za-z0-9][A-Za-z0-9_.:-]{0,79}$';
+    x_v := coalesce(it->>'v', ''); continue when x_v !~ '^[a-z0-9]{0,16}$';
+    x_k := case it->>'k' when 'a' then 'answer' when 'v' then 'view' end; continue when x_k is null;
+    x_ctx := lower(coalesce(it->>'c', '')); if x_ctx !~ '^[a-z0-9-]{0,16}$' then x_ctx := ''; end if;
+    x_qt := lower(coalesce(it->>'t', '')); if x_qt !~ '^[a-z0-9:]{0,16}$' then x_qt := ''; end if;
+    insert into question_events (hub, qid, v, visitor_id, visit_id, kind, ctx, try, prev, gap_min, correct, choice, ms, expl_ms, expl_acts, w)
+    values (p_hub, x_q, x_v, p_visitor, p_visit, x_k, x_ctx,
+      case when x_k = 'answer' then qh_int(it->>'n', 1, 9999) end,
+      case when x_k = 'answer' then case it->>'p' when '1' then true when '0' then false end end,
+      case when x_k = 'answer' then qh_int(it->>'g', 0, 525600) end,
+      case when x_k = 'answer' then case it->>'ok' when '1' then true when '0' then false end end,
+      case when x_k = 'answer' then qh_int(it->>'ch', 0, 19) end,
+      qh_int(it->>'ms', 0, 3600000),
+      case when x_k = 'answer' then qh_int(it->>'em', 0, 3600000) end,
+      case when x_k = 'answer' then qh_int(it->>'ea', 0, 999) end,
+      qh_int(it->>'w', 0, 9));
+    if x_v <> '' then
+      insert into question_versions (hub, qid, v, qt, nch, key) values (p_hub, x_q, x_v, x_qt, qh_int(it->>'nch', 1, 20), qh_int(it->>'key', 0, 19))
+      on conflict (hub, qid, v) do update set last_seen = now(),
+        qt = case when excluded.qt <> '' then excluded.qt else question_versions.qt end,
+        nch = coalesce(excluded.nch, question_versions.nch), key = coalesce(excluded.key, question_versions.key);
+    end if;
+  end loop;
+exception when others then return;  -- analytics must never surface an error to a student
+end;
+$$;
+
+
+create or replace function public.qh_flags(r jsonb)
+returns jsonb language plpgsql immutable as $$
+declare
+  f jsonb := '[]'::jsonb; score int := 0; codes text[] := '{}'; rf text[] := '{}'; state text;
+  st text := r->>'review_status';
+  n1 int; c1 int; p1 numeric; src text;
+  nch int := (r->>'nch')::int; key int := (r->>'key')::int; qt text := coalesce(r->>'qt', '');
+  ch jsonb; tot int; kp int; twn int := 0; tw text; x record;
+  du int; dl int; pu numeric; pl numeric; pp numeric; se numeric; dsrc text;
+  nrm int; crm int; rsrc text;
+  n int; m numeric; hm numeric; e int; a int; ha numeric;
+  rs jsonb := coalesce(r->'reasons', '{}'::jsonb); dn int := coalesce((r->>'down')::int, 0); up int := coalesce((r->>'up')::int, 0);
+  reason_hit boolean := false;
+  wl text; wln int; wlc int; wh text; whn int; whc int;
+begin
+  -- 1. first-try accuracy: this version if it has 10+ people, else every answer ever (unreviewed questions only)
+  if coalesce((r->>'n1')::int, 0) >= 10 then n1 := (r->>'n1')::int; c1 := (r->>'c1')::int; src := 'version';
+  elsif st is null and coalesce((r->>'a_n1')::int, 0) >= 10 then n1 := (r->>'a_n1')::int; c1 := (r->>'a_c1')::int; src := 'all';
+  end if;
+  if src is not null then
+    p1 := c1::numeric / n1;
+    if qt like 'mcq%' and nch >= 2 and p1 < 1.0 / nch then
+      f := f || jsonb_build_object('code', 'below_chance', 'sev', 'high', 'src', src, 'why',
+        format('Below chance: %s%% right on the first try (%s people), less than guessing among %s choices (%s%%). Check the key.',
+          round(100 * p1), n1, nch, round(100.0 / nch)));
+    elsif p1 < 0.40 then
+      f := f || jsonb_build_object('code', 'very_hard', 'sev', 'medium', 'src', src, 'why',
+        format('Very hard: only %s%% right on the first try (%s people). Is the stem clear and the key right?', round(100 * p1), n1));
+    end if;
+  end if;
+
+  -- 2. a wrong choice beats the key (multiple choice with a known key): first tries on this version, else all picks ever
+  if key is not null then
+    -- a missing count arrives as JSON null, not SQL null: only an object counts
+    ch := case when jsonb_typeof(r->'choices') = 'object' then r->'choices' else '{}'::jsonb end; src := 'version';
+    tot := (select coalesce(sum(value::int), 0) from jsonb_each_text(ch));
+    if tot < 8 and st is null then
+      ch := case when jsonb_typeof(r->'a_choices') = 'object' then r->'a_choices' else '{}'::jsonb end; src := 'all';
+      tot := (select coalesce(sum(value::int), 0) from jsonb_each_text(ch)); end if;
+    if tot >= (case src when 'version' then 8 else 12 end) then
+      kp := coalesce((ch->>key::text)::int, 0);
+      for x in select k, value::int as val from jsonb_each_text(ch) as t(k, value) where k <> key::text loop
+        if x.val > twn then twn := x.val; tw := x.k; end if;
+      end loop;
+      if twn > kp and twn::numeric / tot >= 0.35 then
+        f := f || jsonb_build_object('code', 'miskey', 'sev', 'high', 'src', src, 'choice', tw::int, 'why',
+          format('Possible miskey: choice %s (as written) was picked by %s%%, the key by %s%% (%s %s).',
+            tw::int + 1, round(100.0 * twn / tot), round(100.0 * kp / tot), tot, case src when 'version' then 'first tries' else 'picks, all tries' end));
+      end if;
+    end if;
+  end if;
+
+  -- 3. upside down: the stronger half of the class gets it right less often than the weaker half
+  if coalesce((r->>'du')::int, 0) >= 8 and coalesce((r->>'dl')::int, 0) >= 8 then
+    du := (r->>'du')::int; dl := (r->>'dl')::int; pu := (r->>'pu')::numeric; pl := (r->>'pl')::numeric; dsrc := 'version';
+  elsif st is null and coalesce((r->>'a_du')::int, 0) >= 8 and coalesce((r->>'a_dl')::int, 0) >= 8 then
+    du := (r->>'a_du')::int; dl := (r->>'a_dl')::int; pu := (r->>'a_pu')::numeric; pl := (r->>'a_pl')::numeric; dsrc := 'all';
+  end if;
+  -- a gap of 15 points or more that is also unlikely to be chance (z <= -1.65, one-sided 5%): small groups swing a lot
+  if dsrc is not null then
+    pp := (pu * du + pl * dl) / (du + dl);
+    se := sqrt(pp * (1 - pp) * (1.0 / du + 1.0 / dl));
+    if pu - pl <= -0.15 and se > 0 and (pu - pl) / se <= -1.65 then
+      f := f || jsonb_build_object('code', 'upside_down', 'sev', 'high', 'src', dsrc, 'why',
+        format('Stronger students miss it more: %s%% of the top half of the class got it right on the first try, %s%% of the bottom half (%s and %s people). Often a miskey or a trick of wording.',
+          round(100 * pu), round(100 * pl), du, dl));
+    end if;
+  end if;
+
+  -- 4. missed again after seeing the answer
+  if coalesce((r->>'nrm')::int, 0) >= 6 then nrm := (r->>'nrm')::int; crm := (r->>'crm')::int; rsrc := 'version';
+  elsif st is null and coalesce((r->>'a_nrm')::int, 0) >= 6 then nrm := (r->>'a_nrm')::int; crm := (r->>'a_crm')::int; rsrc := 'all';
+  end if;
+  if rsrc is not null and crm::numeric / nrm < 0.5 then
+    f := f || jsonb_build_object('code', 'missed_again', 'sev', 'medium', 'src', rsrc, 'why',
+      format('Missed again after seeing the answer: of %s people who missed it, only %s got it right the next time. The key, the explanation or the stem may be unclear.', nrm, crm));
+  end if;
+
+  -- 5. students' own feedback: open reports, and thumbs down with a reason (this version)
+  if coalesce((r->>'reports_open')::int, 0) > 0 then
+    f := f || jsonb_build_object('code', 'reported', 'sev', 'high', 'src', 'feedback', 'why',
+      format('%s open report%s from students (Inbox).', r->>'reports_open', case when (r->>'reports_open')::int = 1 then '' else 's' end));
+  end if;
+  if coalesce((rs->>'wrong-key')::int, 0) >= 2 then reason_hit := true;
+    f := f || jsonb_build_object('code', 'voted_wrong', 'sev', 'high', 'src', 'feedback', 'why', format('%s people say the answer looks wrong.', rs->>'wrong-key')); end if;
+  if coalesce((rs->>'confusing')::int, 0) >= 2 then reason_hit := true;
+    f := f || jsonb_build_object('code', 'voted_confusing', 'sev', 'medium', 'src', 'feedback', 'why', format('%s people say the wording is confusing.', rs->>'confusing')); end if;
+  if coalesce((rs->>'not-in-notes')::int, 0) >= 2 then reason_hit := true;
+    f := f || jsonb_build_object('code', 'voted_notes', 'sev', 'medium', 'src', 'feedback', 'why', format('%s people say it isn''t in the notes.', rs->>'not-in-notes')); end if;
+  if coalesce((rs->>'explanation')::int, 0) >= 2 then reason_hit := true;
+    f := f || jsonb_build_object('code', 'voted_explanation', 'sev', 'low', 'src', 'feedback', 'why', format('%s people say the explanation didn''t help.', rs->>'explanation')); end if;
+  if coalesce((rs->>'giveaway')::int, 0) >= 2 then reason_hit := true;
+    f := f || jsonb_build_object('code', 'voted_giveaway', 'sev', 'low', 'src', 'feedback', 'why', format('%s people say it gives the answer away.', rs->>'giveaway')); end if;
+  if not reason_hit and dn >= 3 and dn::numeric / (dn + up) >= 0.5 then
+    f := f || jsonb_build_object('code', 'disliked', 'sev', 'medium', 'src', 'feedback', 'why', format('%s of %s votes say it isn''t a good question.', dn, dn + up));
+  end if;
+
+  -- 6. time, abandonment and the explanation (this version only: these are new measurements)
+  n := coalesce((r->>'nt')::int, 0); m := (r->>'med_ms')::numeric; hm := (r->>'hub_med_ms')::numeric;
+  if n >= 8 and m >= 45000 and hm > 0 and m >= 2 * hm then
+    f := f || jsonb_build_object('code', 'slow', 'sev', 'low', 'src', 'version', 'why',
+      format('Slow: the median first try takes %s s, %s times the hub''s median for this kind of question (%s s). Long or confusing stem?',
+        round(m / 1000), round(m / hm, 1), round(hm / 1000)));
+  end if;
+  e := coalesce((r->>'engaged')::int, 0); a := coalesce((r->>'abandoned')::int, 0); ha := (r->>'hub_abandon')::numeric;
+  if e >= 10 and a::numeric / e >= 0.30 and (ha is null or a::numeric / e >= 2 * ha) then
+    f := f || jsonb_build_object('code', 'abandoned', 'sev', 'low', 'src', 'version', 'why',
+      format('Often left unanswered: %s of %s people who read it for 8 s or more moved on without answering (hub: %s%%).',
+        a, e, coalesce(round(100 * ha)::text, '?')));
+  end if;
+  if coalesce((r->>'miss_n')::int, 0) >= 10 and (r->>'miss_quick')::numeric / (r->>'miss_n')::numeric >= 0.7 then
+    f := f || jsonb_build_object('code', 'expl_skipped', 'sev', 'low', 'src', 'version', 'why',
+      format('Explanation skipped: %s of %s who missed it left the explanation within 3 s. Too long, or not helpful?', r->>'miss_quick', r->>'miss_n'));
+  end if;
+
+  -- 8. A/B: the question's versions (A, questions.json; B, content/variants.json) compared on first tries. The class is
+  -- split by device, so each version's first tries come from a like group (migration_v67): the hardest and the easiest
+  -- with 10+ people each, 20 points apart or more and unlikely to be chance (two-sided 5%, z >= 1.96)
+  if jsonb_typeof(r->'wordings') = 'object' then
+    select wv.key, (wv.value->>'n')::int, (wv.value->>'c')::int into wl, wln, wlc from jsonb_each(r->'wordings') wv
+      where (wv.value->>'n')::int >= 10 order by (wv.value->>'c')::numeric / (wv.value->>'n')::int, wv.key limit 1;
+    select wv.key, (wv.value->>'n')::int, (wv.value->>'c')::int into wh, whn, whc from jsonb_each(r->'wordings') wv
+      where (wv.value->>'n')::int >= 10 order by (wv.value->>'c')::numeric / (wv.value->>'n')::int desc, wv.key limit 1;
+    if wl is not null and wh is not null and wl <> wh then
+      pp := (wlc + whc)::numeric / (wln + whn);
+      se := sqrt(pp * (1 - pp) * (1.0 / wln + 1.0 / whn));
+      if whc::numeric / whn - wlc::numeric / wln >= 0.20 and se > 0 and (whc::numeric / whn - wlc::numeric / wln) / se >= 1.96 then
+        f := f || jsonb_build_object('code', 'ab_gap', 'sev', 'medium', 'src', 'version', 'harder', wl::int, 'why',
+          format('Versions differ: version %s gets %s%% right on a first try (%s people), version %s gets %s%% (%s people). The harder one may be unclear, or the easier one may give the answer away (A is questions.json, B is variants.json).',
+            chr(65 + wl::int), round(100.0 * wlc / wln), wln, chr(65 + wh::int), round(100.0 * whc / whn), whn));
+      end if;
+    end if;
+  end if;
+
+  -- 7. class data under an id the hub no longer has (only known when the admin page passes the live ids)
+  if (r->>'in_hub') = 'false' then
+    f := f || jsonb_build_object('code', 'gone', 'sev', 'low', 'src', 'ids', 'why',
+      'This id has class data but isn''t in the hub any more. Renamed or removed? Ids are permanent (tools/question-ids/).');
+  end if;
+
+  select coalesce(array_agg(j->>'code'), '{}'), coalesce(sum(case j->>'sev' when 'high' then 3 when 'medium' then 2 else 1 end), 0)
+    into codes, score from jsonb_array_elements(f) j;
+  if jsonb_typeof(r->'review_flags') = 'array' then
+    rf := array(select jsonb_array_elements_text(r->'review_flags'));
+  end if;
+  state := case
+    when st = 'fix' then case when r->>'review_v' = r->>'v' then 'todo' else 'changed' end
+    when jsonb_array_length(f) = 0 then 'clear'
+    when st in ('ok', 'fixed') and r->>'review_v' = r->>'v'
+         and codes <@ rf then 'reviewed'
+    else 'new' end;
+  return jsonb_build_object('flags', f, 'score', score, 'state', state);
+end;
+$$;
+
+
+alter function public.qh_report(text, integer, jsonb) rename to qh_report_v51;
+create function public.qh_report(p_hub text, p_days integer default 120, p_current jsonb default null)
+returns table(
+  hub text, qid text, in_hub boolean, v text, versions integer, v_since timestamptz, qt text, nch integer, key integer,
+  n1 integer, c1 integer, choices jsonb, nr integer, cr integer, nrm integer, crm integer,
+  nt integer, med_ms integer, hub_med_ms integer, engaged integer, abandoned integer, hub_abandon numeric,
+  answers integer, miss_n integer, miss_quick integer, expl_med_ms integer, expl_acts numeric,
+  du integer, pu numeric, dl integer, pl numeric,
+  a_n1 integer, a_c1 integer, a_nrm integer, a_crm integer, a_du integer, a_pu numeric, a_dl integer, a_pl numeric,
+  a_attempts integer, a_correct integer, a_choices jsonb, wordings jsonb,
+  up integer, down integer, reasons jsonb, reports_open integer, reports jsonb,
+  review_status text, review_v text, review_flags text[], review_note text, review_at timestamptz,
+  flags jsonb, score integer, state text)
+language sql stable set search_path = public as $$
+with
+win as (select now() - make_interval(days => greatest(1, least(coalesce(p_days, 120), 730))) as since),
+vers as (select qv.qid, qv.v, qv.qt, qv.nch, qv.key, qv.first_seen from question_versions qv where qv.hub = p_hub),
+latest as (select distinct on (vers.qid) vers.* from vers order by vers.qid, vers.first_seen desc),
+nv as (select vers.qid, count(*)::int n from vers group by vers.qid),
+rep as (
+  select substring(f.note from '  — question ([^ ]+)') qid, f.id, f.note, f.resolved, f.created_at, f.reply
+  from question_flags f where f.hub = p_hub
+),
+uni as (
+  select vers.qid from vers
+  union select pa.qid from personal_answers pa where pa.hub = p_hub
+  union select fb.qid from question_feedback fb where fb.hub = p_hub
+  union select rep.qid from rep where rep.qid is not null
+  union select rv.qid from question_reviews rv where rv.hub = p_hub
+),
+-- p_current values: the live fingerprint, or { v, key, nch, qt } (the admin page sends both, read off SH_EXPORT, so the
+-- key and choice count are known before any version row exists)
+pcur as (
+  select u.qid,
+    case jsonb_typeof(p_current->u.qid) when 'object' then p_current->u.qid->>'v' when 'string' then p_current->>u.qid end v,
+    case when jsonb_typeof(p_current->u.qid->'qt') = 'string' then p_current->u.qid->>'qt' end qt,
+    case when jsonb_typeof(p_current->u.qid->'nch') = 'number' then (p_current->u.qid->>'nch')::int end nch,
+    case when jsonb_typeof(p_current->u.qid->'key') = 'number' then (p_current->u.qid->>'key')::int end key
+  from uni u
+),
+cur as (
+  select u.qid, coalesce(pc.v, l.v, '') v, coalesce(nv.n, 0) versions,
+         coalesce(nullif(pc.qt, ''), nullif(m.qt, ''), l.qt, '') qt, coalesce(pc.nch, m.nch, l.nch)::int nch,
+         coalesce(pc.key, m.key, l.key)::int key, m.first_seen v_since,
+         case when p_current is null then null else p_current ? u.qid end in_hub
+  from uni u join pcur pc on pc.qid = u.qid left join latest l on l.qid = u.qid left join nv on nv.qid = u.qid
+  left join vers m on m.qid = u.qid and m.v = coalesce(pc.v, l.v)
+),
+ev as (
+  select e.qid, e.kind, e.ctx, e.try, e.prev, e.correct, e.choice, e.ms, e.expl_ms, e.expl_acts, e.visit_id, e.at, e.w,
+         coalesce(lk.primary_id, e.visitor_id) person
+  from question_events e
+  join cur c on c.qid = e.qid and c.v = e.v
+  left join visitor_links lk on lk.alias_id = e.visitor_id
+  where e.hub = p_hub and e.at > (select since from win)
+),
+ft as (select distinct on (ev.qid, ev.person) ev.qid, ev.person, ev.correct, ev.choice, ev.ms, ev.ctx
+       from ev where ev.kind = 'answer' and ev.try = 1 order by ev.qid, ev.person, ev.at),
+ft_agg as (
+  select ft.qid, count(*)::int n1, count(*) filter (where ft.correct)::int c1,
+    count(*) filter (where ft.ms is not null and ft.ctx <> 'mock')::int nt,
+    (percentile_cont(0.5) within group (order by ft.ms) filter (where ft.ms is not null and ft.ctx <> 'mock'))::int med_ms
+  from ft group by ft.qid
+),
+ft_ch as (select x.qid, jsonb_object_agg(x.choice::text, x.n) choices
+          from (select ft.qid, ft.choice, count(*)::int n from ft where ft.choice is not null group by 1, 2) x group by x.qid),
+-- A/B: each person's first try at the question, by the version they were shown (null w: a page before migration_v67)
+ft_w as (
+  select y.qid, jsonb_object_agg(y.w::text, jsonb_build_object('n', y.n, 'c', y.c)) wordings
+  from (select z.qid, z.w, count(*)::int n, count(*) filter (where z.correct)::int c
+        from (select distinct on (ev.qid, ev.person) ev.qid, ev.w, ev.correct from ev
+              where ev.kind = 'answer' and ev.try = 1 order by ev.qid, ev.person, ev.at) z
+        where z.w is not null group by 1, 2) y
+  group by y.qid
+),
+hub_ms as (select c.qt, (percentile_cont(0.5) within group (order by ft.ms))::int m
+           from ft join cur c on c.qid = ft.qid where ft.ms is not null and ft.ctx <> 'mock' group by c.qt),
+r1 as (select distinct on (ev.qid, ev.person) ev.qid, ev.correct from ev where ev.kind = 'answer' and ev.try > 1 order by ev.qid, ev.person, ev.at),
+rm as (select distinct on (ev.qid, ev.person) ev.qid, ev.correct from ev where ev.kind = 'answer' and ev.try > 1 and ev.prev = false order by ev.qid, ev.person, ev.at),
+r_agg as (select r1.qid, count(*)::int nr, count(*) filter (where r1.correct)::int cr from r1 group by r1.qid),
+rm_agg as (select rm.qid, count(*)::int nrm, count(*) filter (where rm.correct)::int crm from rm group by rm.qid),
+vis as (
+  select ev.qid, ev.person, coalesce(sum(ev.ms) filter (where ev.kind = 'view'), 0) vms, bool_or(ev.kind = 'answer') ans
+  from ev where ev.ctx <> 'mock' group by ev.qid, ev.person, ev.visit_id
+),
+vis_p as (select vis.qid, vis.person, bool_or(vis.vms >= 8000 or vis.ans) eng, bool_or(vis.vms >= 8000 and not vis.ans) and not bool_or(vis.ans) ab
+          from vis group by vis.qid, vis.person),
+ab_agg as (select vis_p.qid, count(*) filter (where vis_p.eng)::int engaged, count(*) filter (where vis_p.ab)::int abandoned from vis_p group by vis_p.qid),
+hub_ab as (select sum(ab_agg.abandoned)::numeric / nullif(sum(ab_agg.engaged), 0) r from ab_agg),
+ex_agg as (
+  select ev.qid, count(*)::int answers,
+    count(*) filter (where not ev.correct and ev.expl_ms is not null)::int miss_n,
+    count(*) filter (where not ev.correct and ev.expl_ms is not null and ev.expl_ms < 3000)::int miss_quick,
+    (percentile_cont(0.5) within group (order by ev.expl_ms) filter (where not ev.correct and ev.expl_ms is not null))::int expl_med_ms,
+    round(avg(ev.expl_acts) filter (where ev.expl_acts is not null), 2) expl_acts
+  from ev where ev.kind = 'answer' and ev.ctx <> 'mock' group by ev.qid
+),
+pa as (
+  select p.visitor_id person, p.qid, p.correct, p.answered_at,
+    row_number() over (partition by p.visitor_id, p.qid order by p.answered_at, p.id) rn,
+    lag(p.correct) over (partition by p.visitor_id, p.qid order by p.answered_at, p.id) prevc
+  from personal_answers p where p.hub = p_hub
+),
+abil as (select pa.person, avg(pa.correct::int) acc from pa where pa.rn = 1 group by pa.person having count(*) >= 20),
+abm as (select percentile_cont(0.5) within group (order by abil.acc) m from abil),
+d_v as (
+  select ft.qid,
+    count(*) filter (where a.acc > abm.m)::int du, round(avg(ft.correct::int) filter (where a.acc > abm.m), 3) pu,
+    count(*) filter (where a.acc <= abm.m)::int dl, round(avg(ft.correct::int) filter (where a.acc <= abm.m), 3) pl
+  from ft join abil a on a.person = ft.person cross join abm group by ft.qid
+),
+pa_w as (select pa.* from pa where pa.answered_at > (select since from win)),
+a_ft as (select pa_w.qid, count(*)::int a_n1, count(*) filter (where pa_w.correct)::int a_c1 from pa_w where pa_w.rn = 1 group by pa_w.qid),
+a_rm as (select x.qid, count(*)::int a_nrm, count(*) filter (where x.correct)::int a_crm
+         from (select distinct on (pa_w.qid, pa_w.person) pa_w.qid, pa_w.correct from pa_w where pa_w.prevc = false order by pa_w.qid, pa_w.person, pa_w.answered_at) x
+         group by x.qid),
+d_a as (
+  select pa_w.qid,
+    count(*) filter (where a.acc > abm.m)::int a_du, round(avg(pa_w.correct::int) filter (where a.acc > abm.m), 3) a_pu,
+    count(*) filter (where a.acc <= abm.m)::int a_dl, round(avg(pa_w.correct::int) filter (where a.acc <= abm.m), 3) a_pl
+  from pa_w join abil a on a.person = pa_w.person cross join abm where pa_w.rn = 1 group by pa_w.qid
+),
+a_ch as (select qc.qid, jsonb_object_agg(qc.choice::text, qc.picks) a_choices from question_choices qc where qc.hub = p_hub group by qc.qid),
+a_st as (select qs.qid, qs.attempts, qs.correct from question_stats qs where qs.hub = p_hub),
+fb as (
+  select f.qid, count(*) filter (where f.vote = 1)::int up, count(*) filter (where f.vote = -1)::int down
+  from question_feedback f join cur c on c.qid = f.qid and c.v = f.v where f.hub = p_hub group by f.qid
+),
+fbr as (
+  select x.qid, jsonb_object_agg(x.reason, x.n) reasons
+  from (select f.qid, f.reason, count(*)::int n from question_feedback f join cur c on c.qid = f.qid and c.v = f.v
+        where f.hub = p_hub and f.vote = -1 and f.reason is not null group by 1, 2) x group by x.qid
+),
+rep_agg as (
+  select rep.qid, count(*) filter (where not rep.resolved)::int reports_open,
+    jsonb_agg(jsonb_build_object('id', rep.id, 'note', left(rep.note, 500), 'resolved', rep.resolved, 'at', rep.created_at,
+      'reply', left(rep.reply, 300)) order by rep.created_at desc) reports
+  from rep where rep.qid is not null group by rep.qid
+),
+base as (
+  select p_hub hub, c.qid, c.in_hub, c.v, c.versions, c.v_since, c.qt, c.nch, c.key,
+    fa.n1, fa.c1, fc.choices, ra.nr, ra.cr, rma.nrm, rma.crm,
+    fa.nt, fa.med_ms, hm.m hub_med_ms, ab.engaged, ab.abandoned, round((select r from hub_ab), 3) hub_abandon,
+    ex.answers, ex.miss_n, ex.miss_quick, ex.expl_med_ms, ex.expl_acts,
+    dv.du, dv.pu, dv.dl, dv.pl,
+    af.a_n1, af.a_c1, arm.a_nrm, arm.a_crm, da.a_du, da.a_pu, da.a_dl, da.a_pl,
+    st.attempts a_attempts, st.correct a_correct, ach.a_choices, fw.wordings,
+    coalesce(fb.up, 0) up, coalesce(fb.down, 0) down, coalesce(fbr.reasons, '{}'::jsonb) reasons,
+    coalesce(rp.reports_open, 0) reports_open, coalesce(rp.reports, '[]'::jsonb) reports,
+    rv.status review_status, rv.v review_v, rv.flags review_flags, rv.note review_note, rv.updated_at review_at
+  from cur c
+  left join ft_agg fa on fa.qid = c.qid left join ft_ch fc on fc.qid = c.qid left join hub_ms hm on hm.qt = c.qt
+  left join r_agg ra on ra.qid = c.qid left join rm_agg rma on rma.qid = c.qid left join ab_agg ab on ab.qid = c.qid
+  left join ex_agg ex on ex.qid = c.qid left join d_v dv on dv.qid = c.qid
+  left join a_ft af on af.qid = c.qid left join a_rm arm on arm.qid = c.qid left join d_a da on da.qid = c.qid
+  left join a_st st on st.qid = c.qid left join a_ch ach on ach.qid = c.qid left join ft_w fw on fw.qid = c.qid
+  left join fb on fb.qid = c.qid left join fbr on fbr.qid = c.qid left join rep_agg rp on rp.qid = c.qid
+  left join question_reviews rv on rv.hub = p_hub and rv.qid = c.qid
+)
+select b.*, (g.x->'flags') flags, (g.x->>'score')::int score, (g.x->>'state') state
+from base b cross join lateral (select qh_flags(to_jsonb(b)) x) g
+order by (g.x->>'score')::int desc, b.n1 desc nulls last, b.a_n1 desc nulls last, b.qid;
+$$;
+
+revoke all on function public.qh_flags(jsonb) from public, anon, authenticated;
+revoke all on function public.qh_report(text, integer, jsonb) from public, anon, authenticated;
+revoke all on function public.qh_report_v51(text, integer, jsonb) from public, anon, authenticated;
+revoke all on function public.record_qh(text, text, text, jsonb) from public;
+grant execute on function public.record_qh(text, text, text, jsonb) to anon, authenticated;
+alter function public.qh_flags(jsonb) set search_path = public;

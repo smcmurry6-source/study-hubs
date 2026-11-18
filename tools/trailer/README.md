@@ -2,7 +2,7 @@
 
 A 94 second video for the day the redesign goes live: it opens on the ON AIR lamp coming on in the dark Timmy Time
 studio, drops to Timmy close up, and he narrates a tour of what is new.
-[The task](../../vault/tasks/2026-11-13-launch-trailer.md) has Sam's calls (a file to send the class, wide 16:9, new
+[The task](../../vault/tasks/done/2026-11-13-launch-trailer.md) has Sam's calls (a file to send the class, wide 16:9, new
 music, "professional and polished like it could have been released as a real trailer", a little longer so each
 feature is explained).
 

@@ -21,9 +21,9 @@ agent records each answer in [decisions](../../decisions.md) and changes the cod
 ## Context
 
 - The game layer's server: [game-server](../../reference/game-server.md) ("Calls made while building it"); each is one line in
-  `migration_v54.sql`, still unapplied (it goes in at [the release](../2026-11-06-redesign-release.md)).
-- The shop: [Timmy's shop](../2026-11-06-redesign-timmy-shop.md); the release's step 7 ([the release](../2026-11-06-redesign-release.md)).
-- The idea board: [idea board](../2026-11-06-idea-board.md).
+  `migration_v54.sql`, still unapplied (it goes in at [the release](2026-11-06-redesign-release.md)).
+- The shop: [Timmy's shop](2026-11-06-redesign-timmy-shop.md); the release's step 7 ([the release](2026-11-06-redesign-release.md)).
+- The idea board: [idea board](2026-11-06-idea-board.md).
 
 ## The calls (Sam: yes, or what instead)
 
@@ -76,7 +76,7 @@ agent records each answer in [decisions](../../decisions.md) and changes the cod
 
 All 16 calls answered by Sam on 2026-11-11 and recorded in [decisions](../../decisions.md). The two that changed something
 are made in `migration_v54.sql`, which is still unapplied and still listed in `supabase/pending-migrations.txt` (it goes in
-at [the release](../2026-11-06-redesign-release.md)):
+at [the release](2026-11-06-redesign-release.md)):
 
 - **No opt-out from visiting.** `set_visiting`, the `pet_visit_off` table, `visiting` in `get_my_shop`, Link my devices'
   move of the choice and `sh_visit_link` are gone; the four `_v2` boards call `sh_visit_key` directly, so every row has a

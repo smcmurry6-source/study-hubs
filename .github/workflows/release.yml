@@ -111,7 +111,7 @@ jobs:
       - name: Install Playwright's ${{ matrix.browsers }} and axe-core
         if: env.SKIP_ENGINE != 'true'
         run: |
-          npm i --no-save playwright@1.56.1 axe-core@4.14.0
+          npm i --no-save playwright@1.63.0 axe-core@4.14.0
           # when Ubuntu's mirror is unreachable, the browser alone (see check.yml); an engine that then can't start is
           # reported as skipped by the device matrix, with this warning on the run's page
           npx playwright install --with-deps ${{ matrix.browsers }} || {
@@ -149,7 +149,7 @@ jobs:
           node-version: 22
       - name: Install Playwright's Chromium and PostgreSQL
         run: |
-          npm i --no-save playwright@1.56.1
+          npm i --no-save playwright@1.63.0
           npx playwright install --with-deps chromium || npx playwright install chromium
           ls /usr/lib/postgresql/*/bin/initdb >/dev/null 2>&1 || (sudo apt-get update -q && sudo apt-get install -y -q postgresql)
       - name: Run the other suites

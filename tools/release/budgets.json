@@ -73,11 +73,11 @@
    "lcp": 3000,
    "tbt": 500
   },
-  "hubs/special-patient-care/": {
-   "kb": 940,
-   "requests": 32,
-   "fcp": 1500,
-   "lcp": 2500,
+  "hubs/heme-endo-exam3/": {
+   "kb": 830,
+   "requests": 12,
+   "fcp": 3000,
+   "lcp": 3000,
    "tbt": 500
   }
  }

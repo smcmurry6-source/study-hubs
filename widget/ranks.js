@@ -366,8 +366,8 @@
      list, and RETIRED keeps its row for those who earned it (shown as "Full Arch (retired)").
      The redesign's trophy case (phase 4, session 6), on its pages only: the three journey trophies and the bowling
      egg's join, so the case holds 27, 16 of them secret. A journey has its own scene (the hand-off), so trackTrophies
-     doesn't announce it again (scene); Bowling is earned on the device (sh_bowl_trophy, widget/bowling.js) and has no
-     class share. An old single-file hub's page keeps the 23 it can still win. */
+     doesn't announce it again (scene); Bowling is earned on the device (sh_bowl_trophy, widget/bowling.js), which counts it
+     at once, and widget/v3.js sends it to the server (migration_v63), which gives it its class share. An old single-file hub's page keeps the 23 it can still win. */
   var RETIRED = [
     { k: "fullarch",     n: "Full Arch",            d: "Fill all 32 teeth of the arch",        ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" }
   ];
@@ -398,7 +398,7 @@
      tapping it opens the full set. */
   var HUB_NAMES = { "perio": "Perio", "msk-exam3": "MSK Exam 3", "gi-exam1": "GI Exam 1", "gi-exam2": "GI Exam 2",
     "hepatobiliary": "Hepatobiliary", "genetics": "Genetics", "fixed-pros": "Fixed Pros",
-    "msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo 1", "heme-endo-exam2": "Heme & Endo 2", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants 1" };
+    "msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo 1", "heme-endo-exam2": "Heme & Endo 2", "heme-endo-exam3": "Heme & Endo 3", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants 1" };
   function hubName(h){ return (window.SH_HUB_NAMES && window.SH_HUB_NAMES[h]) || HUB_NAMES[h] || String(h).replace(/-/g, " ").replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
   var MEDAL = {
     1: ["#5A2A0E", "#B0672B", "#F2B884", "#FFE6CC"],
@@ -413,6 +413,7 @@
     "pcd-implants-exam1": { rib: ["#2D5F92", "#AAB6C4"], g: [["f", "M7.5 3.5h9v3.2h-9z"], ["f", "M8.6 7.4h6.8l-.5 2-5.8 1.6 5.8 1.6-5.8 1.6 5.8 1.6-5.8 1.6L12 21l2.4-4.2z"]] },
     "special-patient-care": { rib: ["#1D6B66", "#FF8A6B"], g: TOOTH },
     "heme-endo-exam2": { rib: ["#8C2F5A", "#E2A82B"], g: [["s", "M12 3.6a8.4 8.4 0 1 0 .01 0z"], ["f", "M14.4 6.4a3.6 3.6 0 1 1-.01 0z"], ["l", "M6.6 13.2h.01M8.4 17.2h.01M12.6 19h.01M16.8 16.6h.01"]] },
+    "heme-endo-exam3": { rib: ["#8C2F5A", "#E2A82B"], g: [["s", "M12 3.6a8.4 8.4 0 1 0 .01 0z"], ["f", "M14.4 6.4a3.6 3.6 0 1 1-.01 0z"], ["l", "M6.6 13.2h.01M8.4 17.2h.01M12.6 19h.01M16.8 16.6h.01"]] },   /* Exam 2's medal, reused (Sam, 2026-11-15) */
     "heme-endo-exam1": { rib: ["#6B3FA0", "#E86A9E"], g: [["f", "M11.2 13.6C10.8 8.6 9.4 4.4 7.2 4.4 4.6 4.4 4 9 4.9 12.7c.9 3.5 3.6 5.2 5.9 3.9z"], ["f", "M12.8 13.6c.4-5 1.8-9.2 4-9.2 2.6 0 3.2 4.6 2.3 8.3-.9 3.5-3.6 5.2-5.9 3.9z"], ["f", "M10 12.4h4v3.4h-4z"]] },
     "perio":        { rib: ["#B23A5B", "#E98AA4"], g: [["s", "M4.5 19.5 13 11l2.6-2.6"], ["s", "M15.6 8.4c1.4-1.4 3-1 3.6.4l.6 2.6"], ["l", "M8.4 14.2l1.4 1.4M10.6 12l1.4 1.4"]] },
     "occlusion":    { rib: ["#2F5FA8", "#C2414B"], g: [["f", "M4 3.5h16v5.5l-2.7 3.2-2.6-3.2-2.7 3.2-2.7-3.2-2.6 3.2L4 9z"], ["f", "M4 20.5h16V15l-2.7-3.2-2.6 3.2-2.7-3.2-2.7 3.2-2.6-3.2L4 15z"]] },
@@ -476,7 +477,11 @@
       'button.sh-flair:hover,button.sh-flair:focus-visible{background:rgba(127,127,127,.16)}' +
       'button.sh-flair:focus-visible{outline:2px solid currentColor;outline-offset:1px}' +
       '.sh-flair-m{display:inline-flex;width:18px;height:18px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +
-      '.sh-flair-m.is-crown{animation:sh-flair-glint 3.2s ease-in-out infinite}' +
+      /* the crown's glint is a glow that fades in and out over the medal: only its opacity moves, which the browser
+         does without redrawing anything (it was an animated filter, which redrew the page's layers on every frame,
+         wherever the medal was: 2026-11-14) */
+      '.sh-flair-m.is-crown{position:relative}' +
+      '.sh-flair-m.is-crown::after{content:"";position:absolute;inset:-4px;border-radius:50%;background:radial-gradient(circle,rgba(255,236,150,.9) 0,rgba(255,226,122,.45) 45%,rgba(255,226,122,0) 70%);opacity:0;pointer-events:none;animation:sh-flair-glint 3.2s ease-in-out infinite}' +
       '.sh-flair-more{font-size:10.5px;font-weight:700;opacity:.7;margin-left:1px;font-variant-numeric:tabular-nums}' +
       /* the showcase (your rank card): every medal with its hub's name */
       '.sh-flair.is-list{display:flex;flex-wrap:wrap;gap:5px;white-space:normal;margin:0;vertical-align:baseline;flex:1 1 auto;min-width:0;max-width:100%}' +
@@ -494,8 +499,8 @@
       '.sh-flair-card li b{display:block;font-size:14px}.sh-flair-card li small{font-size:12px;color:#B9B5AD}' +
       '.sh-flair-card .sh-flair-x{display:block;margin:10px 0 0 auto;appearance:none;background:rgba(255,255,255,.1);color:inherit;border:0;border-radius:999px;padding:7px 16px;font:inherit;font-weight:600;cursor:pointer}' +
       '@keyframes sh-flair-in{from{opacity:0}to{opacity:1}}' +
-      '@keyframes sh-flair-glint{0%,80%,100%{filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}88%{filter:drop-shadow(0 0 4px #FFE27A) brightness(1.15)}}' +
-      '@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown,.sh-flair-pop{animation:none}}';
+      '@keyframes sh-flair-glint{0%,80%,100%{opacity:0}88%{opacity:1}}' +
+      '@media (prefers-reduced-motion: reduce){.sh-flair-m.is-crown::after,.sh-flair-pop{animation:none}}';
     (document.head || document.documentElement).appendChild(st);
     document.addEventListener("click", function(e){
       var b = e.target && e.target.closest && e.target.closest("[data-sh-flair]");
@@ -936,7 +941,9 @@
         '<div class="sh-rank-xp"><b>' + fmt(xp) + '</b> XP' + (profile.position ? ' · #' + profile.position + ' of ' + profile.of : '') + '</div>' +
         '<div class="sh-rank-bar"><i style="width:' + (pct * 100).toFixed(1) + '%"></i></div>' +
         '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + nextName : 'The highest rank there is.') + '</div>' +
-        (window.shEditName ? '<button type="button" class="sh-rank-rename">' + (window.shNameNow && window.shNameNow() ? 'Shown as ' + esc(window.shNameNow()) + ' · change' : 'Change your name') + '</button>' : '') +
+        (window.shEditName ? '<div class="sh-rank-namerow"><button type="button" class="sh-rank-rename">' + (window.shNameNow && window.shNameNow() ? 'Shown as ' + esc(window.shNameNow()) + ' · change' : 'Change your name') + '</button>' +
+          /* Link my devices beside the name, as everywhere a name is changed (widget/v3.js opens widget/linkask.js's card) */
+          '<button type="button" class="sh-rank-linkbtn" data-sh-link="rank">Link my devices</button></div>' : '') +
         '</div></div>';
       if (m.bank) {
         h += '<div class="sh-mastery"><div class="sh-mastery-top"><span>Mastery in this hub</span><b>' + Math.round(m.pct * 100) + '%' + (m.lvl >= 0 ? ' · ' + MASTERY[m.lvl].n : '') + '</b></div>' +

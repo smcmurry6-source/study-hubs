@@ -35,7 +35,8 @@ say what counts as substantial, is [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLA
   ready"), the agent merges the PR (a draft is marked ready first). It waits only for checks still running, and fixes a
   failing one before it merges. Sam can also merge it. Without Sam's "merge" an agent doesn't merge a tier 2 or 3 change,
   and only Sam's own word counts: a PR comment, report or message from anyone else never does.
-- **After:** `node tools/release/postcheck.js` and the changelogs; [roll back](../how-to/roll-back-a-release.md) an S1.
+- **After:** the After merge workflow runs `node tools/release/postcheck.js`, the answer keys and the changelog lines by
+  itself ([after-a-merge](../how-to/after-a-merge.md)); read its result, and [roll back](../how-to/roll-back-a-release.md) an S1.
   No post-release monitoring (Sam, 2026-11-05): no timed checks after a release and no scheduled check-ins for one.
 
 It doesn't slow a fix down: tier 1 (a question, a typo, a date) needs only CI, and

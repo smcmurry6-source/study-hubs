@@ -4,7 +4,7 @@
 window.SH_HUB_ART = {"ink":"#3B2E3A","icons":{"home":{"label":"Home","body":"<path d=\"M3.4 11.6C6 9 8.9 6.2 11.4 4.2c.4-.3.9-.3 1.2 0 2.5 2 5.4 4.8 8 7.4\"/><path d=\"M5.7 10.2v8.6c0 1 .6 1.6 1.6 1.6h9.4c1 0 1.6-.6 1.6-1.6v-8.6\"/><path d=\"M10 20.3v-3.9c0-1.2.9-2.1 2-2.1s2 .9 2 2.1v3.9\"/><path d=\"M15.6 6.6V4.5\"/><circle cx=\"12\" cy=\"8.3\" r=\"1.1\" fill=\"currentColor\" stroke=\"none\"/>"},"notes":{"label":"Notes","body":"<path d=\"M12 6.7C9.9 5.2 7.1 4.7 3.8 5.1c-.5.1-.8.4-.8.9v11.6c0 .5.4.8.9.8 3.1-.3 5.8.2 8.1 1.8 2.3-1.6 5-2.1 8.1-1.8.5 0 .9-.3.9-.8V6c0-.5-.3-.8-.8-.9-3.3-.4-6.1.1-8.2 1.6z\"/><path d=\"M12 6.8v12.3\"/><path d=\"M6 9.4c1.4-.1 2.6.1 3.6.6M6 12.6c1.4-.1 2.6.1 3.6.6\"/>"},"questions":{"label":"Questions","body":"<path d=\"M6.7 3.2c3.5-.3 7-.3 10.5 0 1.3.1 2.1.9 2.2 2.2.3 4.5.3 8.8 0 13.3-.1 1.3-.9 2.1-2.2 2.2-3.5.3-7 .3-10.5 0-1.3-.1-2.1-.9-2.2-2.2-.3-4.5-.3-8.8 0-13.3.1-1.3.9-2.1 2.2-2.2z\"/><path d=\"M9.3 9.2c0-1.7 1.2-2.8 2.8-2.8 1.5 0 2.7 1 2.7 2.5 0 1.5-1.2 2-2 2.6-.6.5-.8 1-.8 1.8\"/><circle cx=\"12\" cy=\"16.6\" r=\"1.35\" fill=\"currentColor\" stroke=\"none\"/>"},"more":{"label":"More","body":"<circle cx=\"5.5\" cy=\"12\" r=\"1.9\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"12\" cy=\"12\" r=\"1.9\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"18.5\" cy=\"12\" r=\"1.9\" fill=\"currentColor\" stroke=\"none\"/>"},"drill":{"label":"Daily drill","body":"<g transform=\"rotate(-38 12 12)\"><path d=\"M9.2 12h5.6\"/><path d=\"M6.6 6.6c1.3 0 2.2.9 2.2 2.2v6.4c0 1.3-.9 2.2-2.2 2.2s-2.2-.9-2.2-2.2V8.8c0-1.3.9-2.2 2.2-2.2zM17.4 6.6c1.3 0 2.2.9 2.2 2.2v6.4c0 1.3-.9 2.2-2.2 2.2s-2.2-.9-2.2-2.2V8.8c0-1.3.9-2.2 2.2-2.2z\"/><path d=\"M3.1 10.6v2.8M20.9 10.6v2.8\"/></g>"},"misses":{"label":"Yesterday's misses","body":"<path d=\"M4.6 8.6A8.3 8.3 0 1 1 3.7 13\"/><path d=\"M3.6 4.9l.6 4.3 4.3-.6\"/><path d=\"M10 10.2l4 4M14 10.2l-4 4\"/>"},"weak":{"label":"Weak spots","body":"<g transform=\"rotate(-42 12 12)\"><path d=\"M5.4 8.3h13.2c2 0 3.5 1.6 3.5 3.7s-1.5 3.7-3.5 3.7H5.4c-2 0-3.5-1.6-3.5-3.7s1.5-3.7 3.5-3.7z\"/><path d=\"M9.2 8.4v7.2M14.8 8.4v7.2\"/></g><circle cx=\"11.1\" cy=\"11.2\" r=\"0.85\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"12.9\" cy=\"12.8\" r=\"0.85\" fill=\"currentColor\" stroke=\"none\"/>"},"mock":{"label":"Mock exam","body":"<path d=\"M12 6.4c4.1 0 7.3 3.2 7.3 7.3S16.1 21 12 21s-7.3-3.2-7.3-7.3S7.9 6.4 12 6.4z\"/><path d=\"M10.8 2.6h2.4c.5 0 .8.3.8.8v.5c0 .5-.3.8-.8.8h-2.4c-.5 0-.8-.3-.8-.8v-.5c0-.5.3-.8.8-.8zM12 4.8v1.6\"/><path d=\"M18.1 7.2l1.3-1.3\"/><path d=\"M12 13.7V10M12 13.7l2.6 1.5\"/>"},"podcast":{"label":"Timmy Time","body":"<path d=\"M12 2.8c1.8 0 3.1 1.3 3.1 3.1v5c0 1.8-1.3 3.2-3.1 3.2S8.9 12.7 8.9 10.9v-5c0-1.8 1.3-3.1 3.1-3.1z\"/><path d=\"M5.8 10.6c0 3.6 2.7 6.3 6.2 6.3s6.2-2.7 6.2-6.3\"/><path d=\"M12 17v3.4M8.9 20.8c2-.3 4.1-.3 6.2 0\"/><path d=\"M10.9 5.4v2.2\"/>"},"hints":{"label":"Exam hints","body":"<path d=\"M8.8 15.3C7.1 14 6.1 12.2 6.1 10 6.1 6.6 8.7 3.8 12 3.8s5.9 2.8 5.9 6.2c0 2.2-1 4-2.7 5.3-.4.3-.6.8-.6 1.3v.8H9.4v-.8c0-.5-.2-1-.6-1.3z\"/><path d=\"M9.7 20.3c1.5.3 3.1.3 4.6 0\"/><path d=\"M10.3 11.5l1.7 1.6 1.7-1.6M12 13.2v3.4\"/><path d=\"M8.6 8.4c.4-1.1 1.2-1.9 2.3-2.2\"/>"},"cram":{"label":"Cram sheet","body":"<path d=\"M8.3 6.2l.3-1.4c.2-1 1-1.5 2-1.3l9.1 1.9c1 .2 1.5 1 1.3 2l-1.7 8.2c-.2 1-1 1.5-2 1.3l-.4-.1\"/><path d=\"M4.8 7.4h10.5c1.1 0 1.8.7 1.8 1.8v9.3c0 1.1-.7 1.8-1.8 1.8H4.8c-1.1 0-1.8-.7-1.8-1.8V9.2c0-1.1.7-1.8 1.8-1.8z\"/><path d=\"M6.2 11.6h7.6M6.2 15h5\"/>"},"sidebyside":{"label":"Side by side","body":"<path d=\"M4.9 4h4.8c1 0 1.7.7 1.7 1.7v12.6c0 1-.7 1.7-1.7 1.7H4.9c-1 0-1.7-.7-1.7-1.7V5.7c0-1 .7-1.7 1.7-1.7z\"/><path d=\"M14.3 4h4.8c1 0 1.7.7 1.7 1.7v12.6c0 1-.7 1.7-1.7 1.7h-4.8c-1 0-1.7-.7-1.7-1.7V5.7c0-1 .7-1.7 1.7-1.7z\"/><path d=\"M5.6 8.2h3.4M5.6 11.6h2.6M15 8.2h3.4M15 11.6h2.6\"/>"},"arcade":{"label":"Arcade","body":"<path d=\"M7.4 7.4h9.2c2.7 0 4.3 2 4.7 5l.5 3.7c.3 2-1.1 3.4-2.8 3.1-1.2-.2-1.9-1.2-2.6-2.3l-.8-1.2H8.4l-.8 1.2c-.7 1.1-1.4 2.1-2.6 2.3-1.7.3-3.1-1.1-2.8-3.1l.5-3.7c.4-3 2-5 4.7-5z\"/><path d=\"M7.7 10.4v3.6M5.9 12.2h3.6\"/><circle cx=\"15.4\" cy=\"11\" r=\"1.15\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"17.6\" cy=\"13.3\" r=\"1.15\" fill=\"currentColor\" stroke=\"none\"/>"},"stats":{"label":"Stats","body":"<path d=\"M5.9 12.4c.9 0 1.5.6 1.5 1.5v5c0 .9-.6 1.5-1.5 1.5s-1.5-.6-1.5-1.5v-5c0-.9.6-1.5 1.5-1.5z\"/><path d=\"M12 6.4c.9 0 1.5.6 1.5 1.5v11c0 .9-.6 1.5-1.5 1.5s-1.5-.6-1.5-1.5v-11c0-.9.6-1.5 1.5-1.5z\"/><path d=\"M18.1 3.6c.9 0 1.5.6 1.5 1.5v13.8c0 .9-.6 1.5-1.5 1.5s-1.5-.6-1.5-1.5V5.1c0-.9.6-1.5 1.5-1.5z\"/>"},"trophy":{"label":"Trophies","body":"<path d=\"M7.4 3.9h9.2v4.9c0 2.9-2 5-4.6 5s-4.6-2.1-4.6-5V3.9z\"/><path d=\"M7.4 5.8H5.5c-1 0-1.6.7-1.5 1.7.2 1.9 1.6 3.2 3.7 3.3M16.6 5.8h1.9c1 0 1.6.7 1.5 1.7-.2 1.9-1.6 3.2-3.7 3.3\"/><path d=\"M12 13.9v3\"/><path d=\"M9.6 6.4v2.4\"/><path d=\"M8.4 20.4c0-2 1.6-3.4 3.6-3.4s3.6 1.4 3.6 3.4H8.4z\"/>"},"settings":{"label":"Settings","body":"<path d=\"M3.6 7h4.6M12.6 7h7.8M3.6 12.1h9.6M17.6 12.1h2.8M3.6 17.2h2M10 17.2h10.4\"/><path d=\"M10.4 4.9c1.2 0 2.1.9 2.1 2.1s-.9 2.1-2.1 2.1-2.1-.9-2.1-2.1.9-2.1 2.1-2.1zM15.4 10c1.2 0 2.1.9 2.1 2.1s-.9 2.1-2.1 2.1-2.1-.9-2.1-2.1.9-2.1 2.1-2.1zM7.8 15.1c1.2 0 2.1.9 2.1 2.1s-.9 2.1-2.1 2.1-2.1-.9-2.1-2.1.9-2.1 2.1-2.1z\"/>"},"inbox":{"label":"Inbox","body":"<path d=\"M3.4 13.4l2.3-7.1c.3-.9 1-1.4 1.9-1.4h8.8c.9 0 1.6.5 1.9 1.4l2.3 7.1v4.7c0 1.2-.8 2-2 2H5.4c-1.2 0-2-.8-2-2v-4.7z\"/><path d=\"M3.6 13.5H8l1.3 2.3h5.4l1.3-2.3h4.4\"/>"},"about":{"label":"About","body":"<path d=\"M12 3.2c4.9 0 8.7 3.9 8.7 8.8s-3.8 8.8-8.7 8.8-8.7-3.9-8.7-8.8S7.1 3.2 12 3.2z\"/><path d=\"M12 11v5.8M10.6 11.1H12\"/><circle cx=\"12\" cy=\"7.7\" r=\"1.3\" fill=\"currentColor\" stroke=\"none\"/>"},"tour":{"label":"Tour","body":"<path d=\"M12 3v18M9.2 20.9c1.9-.3 3.7-.3 5.6 0\"/><path d=\"M12 5h6.1c.4 0 .7.1 1 .4l1.8 1.8-1.8 1.8c-.3.3-.6.4-1 .4H12\"/><path d=\"M12 11.6H5.9c-.4 0-.7.1-1 .4l-1.8 1.8 1.8 1.8c.3.3.6.4 1 .4H12\"/>"},"search":{"label":"Search","body":"<path d=\"M10.4 3.8c3.7 0 6.6 2.9 6.6 6.6s-2.9 6.6-6.6 6.6-6.6-2.9-6.6-6.6 2.9-6.6 6.6-6.6z\"/><path d=\"M15.3 15.3l5.2 5.2\"/><path d=\"M7.6 9c.5-1.1 1.4-1.8 2.6-2\"/>"},"pin":{"label":"Pin","body":"<g transform=\"rotate(32 12 12)\"><path d=\"M8.6 3.4h6.8M9.6 3.6l-.5 5L6.6 11.4c-.3.3-.4.6-.4 1v.6h11.6v-.6c0-.4-.1-.7-.4-1l-2.5-2.8-.5-5\"/><path d=\"M12 13.1v7.7\"/></g>"},"report":{"label":"Report","body":"<path d=\"M5.4 21V3.6\"/><path d=\"M5.4 4.6c2.6-1.5 5-.8 7.1.3 2 1 4.2 1.5 6.5.3v8.6c-2.3 1.2-4.5.7-6.5-.3-2.1-1.1-4.5-1.8-7.1-.3\"/>"},"listen":{"label":"Listen","body":"<path d=\"M4.1 9.2h2.8l4.4-3.9c.5-.4 1.3-.1 1.3.6v12.2c0 .7-.8 1-1.3.6l-4.4-3.9H4.1c-.6 0-1.1-.5-1.1-1.1V10.3c0-.6.5-1.1 1.1-1.1z\"/><path d=\"M15.9 9c.9.8 1.4 1.9 1.4 3s-.5 2.2-1.4 3\"/><path d=\"M18.4 6.3c1.7 1.5 2.6 3.5 2.6 5.7s-.9 4.2-2.6 5.7\"/>"},"mindmap":{"label":"Mind map","body":"<path d=\"M12 9.3c1.6 0 2.8 1.2 2.8 2.7s-1.2 2.7-2.8 2.7-2.8-1.2-2.8-2.7 1.2-2.7 2.8-2.7z\"/><path d=\"M5.2 3.6c1.1 0 1.9.8 1.9 1.9s-.8 1.9-1.9 1.9-1.9-.8-1.9-1.9.8-1.9 1.9-1.9zM18.8 4.4c1.1 0 1.9.8 1.9 1.9s-.8 1.9-1.9 1.9-1.9-.8-1.9-1.9.8-1.9 1.9-1.9zM17.6 16.6c1.1 0 1.9.8 1.9 1.9s-.8 1.9-1.9 1.9-1.9-.8-1.9-1.9.8-1.9 1.9-1.9zM5.6 16c1.1 0 1.9.8 1.9 1.9s-.8 1.9-1.9 1.9-1.9-.8-1.9-1.9.8-1.9 1.9-1.9z\"/><path d=\"M6.6 6.9l3.2 3.1M17.3 7.6l-2.9 2.8M14.4 13.5l1.9 3.1M9.7 13.6l-2.8 2.7\"/>"},"highlight":{"label":"Highlighter","body":"<path d=\"M14.9 3.9l5.2 5.2-8.2 8.2-5.2-5.2 8.2-8.2z\"/><path d=\"M6.7 12.1l-1.2 3.8 2.6 2.6 3.8-1.2\"/><path d=\"M5.5 15.9l-2.2 2.2 1.9.5\"/><path d=\"M12.4 20.6c2.6-.3 5.2-.3 7.8 0\"/>"},"retry":{"label":"Try it again","body":"<path d=\"M19.3 12.4c-.2 4-3.4 7.2-7.4 7.2-4.2 0-7.5-3.4-7.5-7.6s3.3-7.6 7.5-7.6c2.4 0 4.6 1.1 6 2.9\"/><path d=\"M18.6 3.4l-.2 4.4-4.3-.4\"/>"},"findnotes":{"label":"Find this in the notes","body":"<path d=\"M9.4 6.3C7.8 5.1 5.8 4.7 3.4 5c-.4 0-.6.3-.6.7v9.6c0 .4.3.6.7.6 2.3-.2 4.3.2 5.9 1.4\"/><path d=\"M9.4 6.3c1.6-1.2 3.6-1.6 6-1.3.4 0 .6.3.6.7v4.4\"/><path d=\"M9.4 6.3v11\"/><path d=\"M16.1 11.6c2.1 0 3.7 1.6 3.7 3.7s-1.6 3.7-3.7 3.7-3.7-1.6-3.7-3.7 1.6-3.7 3.7-3.7z\"/><path d=\"M18.8 18l2.4 2.5\"/>"},"filter":{"label":"Filters","body":"<path d=\"M4.1 4.8h15.8c.7 0 1 .8.6 1.3l-6.1 7v5.4c0 .4-.2.7-.5.9l-2.5 1.4c-.6.3-1.2-.1-1.2-.7v-7L3.5 6.1c-.4-.5-.1-1.3.6-1.3z\"/>"},"shuffle":{"label":"Random order","body":"<path d=\"M3.4 7.6h3c2.1 0 3.5 1.1 4.7 3l1.8 2.9c1.2 1.9 2.6 3 4.8 3h2.6\"/><path d=\"M3.4 16.5h3c1.6 0 2.7-.5 3.7-1.5M13.9 9c1-1 2.2-1.5 3.8-1.5h2.6\"/><path d=\"M18.1 5.2l2.4 2.3-2.4 2.3M18.1 14.2l2.4 2.3-2.4 2.3\"/>"},"order":{"label":"In order","body":"<path d=\"M5.4 4.2v15M3.1 16.9l2.3 2.4 2.3-2.4\"/><path d=\"M10.4 6.2c3.2-.2 6.5-.2 9.8 0M10.4 12c2.5-.2 5-.2 7.6 0M10.4 17.8c1.8-.1 3.5-.1 5.2 0\"/>"},"learn":{"label":"Learn","body":"<path d=\"M2.9 20.5c6.1-.2 12.1-.2 18.2 0\"/><path d=\"M3.2 20.3v-4.6c1.7-.1 3.5-.1 5.2 0v-4.6c1.7-.1 3.5-.1 5.2 0V6.5c1.7-.1 3.5-.1 5.2 0v13.8\"/><path d=\"M3.9 8l2.2 2.2 4.1-4.6\"/>"},"cards":{"label":"Flashcards","body":"<path d=\"M7.6 17.9H5.4c-1 0-1.6-.6-1.6-1.6V4.6c0-1 .6-1.6 1.6-1.6h8.6c1 0 1.6.6 1.6 1.6v1.3\"/><path d=\"M9.7 6.1c2.9-.2 5.8-.2 8.7 0 1 .1 1.6.7 1.7 1.7.2 3.9.2 7.9 0 11.8-.1 1-.7 1.6-1.7 1.7-2.9.2-5.8.2-8.7 0-1-.1-1.6-.7-1.7-1.7-.2-3.9-.2-7.9 0-11.8.1-1 .7-1.6 1.7-1.7z\"/><path d=\"M11 15.8c.1-2.4 1.8-4 4-3.9 1 0 1.8.4 2.4 1.1\"/><path d=\"M17.8 11.2l-.3 2.1-2.1-.4\"/>"},"sun":{"label":"Light theme","body":"<path d=\"M12 7.6c2.5 0 4.4 1.9 4.4 4.4s-1.9 4.4-4.4 4.4-4.4-1.9-4.4-4.4 1.9-4.4 4.4-4.4z\"/><path d=\"M12 2.8v1.9M12 19.3v1.9M2.8 12h1.9M19.3 12h1.9M5.5 5.5l1.4 1.4M17.1 17.1l1.4 1.4M5.5 18.5l1.4-1.4M17.1 6.9l1.4-1.4\"/>"},"moon":{"label":"Dark theme","body":"<path d=\"M19.6 14.4A8 8 0 1 1 9.6 4.4c.4-.1.6.3.4.7a6.4 6.4 0 0 0 8.9 8.9c.4-.2.8 0 .7.4z\"/><path d=\"M16.4 3.6v2.8M15 5h2.8\"/>"},"textsize":{"label":"Text size","body":"<path d=\"M2.9 19.2L7.8 5.4c.1-.4.7-.4.8 0l4.9 13.8M4.9 14.4h6.4\"/><path d=\"M17.8 12.4c-1.7 0-2.9 1.3-2.9 3.1s1.2 3.1 2.9 3.1 2.9-1.3 2.9-3.1-1.2-3.1-2.9-3.1zM20.7 12.5v6.7\"/>"},"tooth":{"label":"Timmy","body":"<path d=\"M7.3 3.9C4.9 3.9 3.5 5.9 3.7 8.5c.2 2 1.3 3.4 1.7 5.4.5 2.6.9 6.1 2.4 6.1 1.4 0 1.6-2.6 1.9-4 .2-1 .8-1.6 2.3-1.6s2.1.6 2.3 1.6c.3 1.4.5 4 1.9 4 1.5 0 1.9-3.5 2.4-6.1.4-2 1.5-3.4 1.7-5.4.2-2.6-1.2-4.6-3.6-4.6-1.9 0-2.7 1.2-4.7 1.2S9.2 3.9 7.3 3.9z\"/><path d=\"M7 8.6c.3-.9.9-1.5 1.7-1.7\"/>"},"flame":{"label":"Streak","body":"<path d=\"M12 21.2c-3.9 0-6.6-2.7-6.6-6.3 0-2.8 1.6-4.6 3-6.2 1-1.1 1.7-2.4 1.6-4.4 0-.4.4-.7.8-.5 2.6 1.4 4 3.6 4.1 6.1.6-.5 1-1.2 1.1-2 .1-.4.5-.6.8-.3 1.2 1.3 1.9 3.1 1.9 5.3 0 4.1-2.8 6.3-6.7 6.3z\"/><path d=\"M12 18.5c-1.4 0-2.4-.9-2.4-2.3 0-1.5 1.1-2.3 1.9-3.4.9 1 2.9 1.9 2.9 3.4 0 1.4-1 2.3-2.4 2.3z\"/>"},"xp":{"label":"XP","body":"<path d=\"M10.8 3.2c.6 3.6 2.2 5.8 6.3 6.9.6.2.6 1 0 1.1-4.1 1.1-5.7 3.3-6.3 6.9-.1.6-.9.6-1 0-.6-3.6-2.2-5.8-6.3-6.9-.6-.1-.6-.9 0-1.1 4.1-1.1 5.7-3.3 6.3-6.9.1-.6.9-.6 1 0z\"/><path d=\"M18.6 15.4v5M16.1 17.9h5\"/>"},"goal":{"label":"Daily goal","body":"<path d=\"M12 3.3c4.8 0 8.7 3.9 8.7 8.7s-3.9 8.7-8.7 8.7-8.7-3.9-8.7-8.7c0-2.4 1-4.6 2.6-6.2\"/><path d=\"M8.3 12.3l2.6 2.6 4.9-5.1\"/>"},"calendar":{"label":"Course timeline","body":"<path d=\"M6 4.6c4-.2 8-.2 12 0 1.2.1 2 .8 2.1 2 .2 4.1.2 8.1 0 12.2-.1 1.2-.9 1.9-2.1 2-4 .2-8 .2-12 0-1.2-.1-2-.8-2.1-2-.2-4.1-.2-8.1 0-12.2.1-1.2.9-1.9 2.1-2z\"/><path d=\"M4.2 9.6c5.2-.2 10.4-.2 15.6 0M8.4 3v3.2M15.6 3v3.2\"/><circle cx=\"8.2\" cy=\"13.4\" r=\"1.05\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"12\" cy=\"13.4\" r=\"1.05\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"15.8\" cy=\"13.4\" r=\"1.05\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"8.2\" cy=\"17\" r=\"1.05\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"12\" cy=\"17\" r=\"1.05\" fill=\"currentColor\" stroke=\"none\"/>"},"clock":{"label":"Countdown","body":"<path d=\"M6.3 3.4c3.8-.3 7.6-.3 11.4 0M6.3 20.6c3.8.3 7.6.3 11.4 0\"/><path d=\"M7.8 3.7c0 4 1.6 6 4.2 8.3-2.6 2.3-4.2 4.3-4.2 8.3M16.2 3.7c0 4-1.6 6-4.2 8.3 2.6 2.3 4.2 4.3 4.2 8.3\"/><path d=\"M9.4 19.3c.4-1.7 1.2-2.7 2.6-3.6 1.4.9 2.2 1.9 2.6 3.6z\" fill=\"currentColor\" stroke-width=\"1.2\"/>"},"check":{"label":"Right","body":"<path d=\"M4.4 12.9l4.4 4.3c.3.3.8.3 1.1 0L19.7 7\"/>"},"cross":{"label":"Wrong","body":"<path d=\"M6.1 6.5c3.7 3.3 7.9 7.6 11.6 11.2M17.7 6.2c-3.6 3.6-7.8 7.8-11.4 11.6\"/>"},"chevron":{"label":"Open","body":"<path d=\"M9.2 5.4l6.1 6.1c.3.3.3.7 0 1l-6.1 6.1\"/>"},"close":{"label":"Close","body":"<path d=\"M7 7l10 10M17 7L7 17\"/>"},"play":{"label":"Play","body":"<path d=\"M7.6 5.5c0-.9.9-1.4 1.7-1l9.1 5.8c.7.5.7 1.4 0 1.9l-9.1 5.8c-.8.5-1.7-.1-1.7-1V5.5z\"/>"},"pause":{"label":"Pause","body":"<path d=\"M8.2 4.8c.9 0 1.6.7 1.6 1.6v11.2c0 .9-.7 1.6-1.6 1.6s-1.6-.7-1.6-1.6V6.4c0-.9.7-1.6 1.6-1.6zM15.8 4.8c.9 0 1.6.7 1.6 1.6v11.2c0 .9-.7 1.6-1.6 1.6s-1.6-.7-1.6-1.6V6.4c0-.9.7-1.6 1.6-1.6z\"/>"},"thumbup":{"label":"Good question","body":"<path d=\"M3.6 10.9h3.6v9.2H3.6c-.4 0-.6-.3-.6-.6v-8c0-.4.2-.6.6-.6z\"/><path d=\"M7.2 11l3.6-6.3c.4-.7 1.2-1 2-.8 1 .3 1.5 1.3 1.2 2.3l-.8 3.1h4.7c1.3 0 2.2 1.2 1.9 2.4l-1.6 6.7c-.2.9-1 1.6-1.9 1.6H7.2\"/>"},"thumbdown":{"label":"Not a good question","body":"<g transform=\"rotate(180 12 12)\"><path d=\"M3.6 10.9h3.6v9.2H3.6c-.4 0-.6-.3-.6-.6v-8c0-.4.2-.6.6-.6z\"/><path d=\"M7.2 11l3.6-6.3c.4-.7 1.2-1 2-.8 1 .3 1.5 1.3 1.2 2.3l-.8 3.1h4.7c1.3 0 2.2 1.2 1.9 2.4l-1.6 6.7c-.2.9-1 1.6-1.9 1.6H7.2\"/></g>"},"comment":{"label":"Comments","body":"<path d=\"M12 4c4.7 0 8.4 3 8.4 6.9s-3.7 6.9-8.4 6.9c-.9 0-1.8-.1-2.6-.3l-4.2 2c-.5.2-1-.2-.8-.7l1.1-2.8C4.3 14.8 3.6 13 3.6 10.9 3.6 7 7.3 4 12 4z\"/><circle cx=\"8.6\" cy=\"11\" r=\"1.1\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"12\" cy=\"11\" r=\"1.1\" fill=\"currentColor\" stroke=\"none\"/><circle cx=\"15.4\" cy=\"11\" r=\"1.1\" fill=\"currentColor\" stroke=\"none\"/>"},"menu":{"label":"Menu","body":"<path d=\"M4.4 6.8c5-.4 10.1-.3 15.2 0M4.4 12h15.2M4.4 17.2c5 .3 10.1.2 15.2 0\"/>"}},"flame":{"1":"<g class=\"fl-out\"><path d=\"M20 18 C22.6 23.4 28 26.8 28 34 C28 40 24.4 44 20 44 C15.6 44 12 40.4 12 35 C12 31 14.2 28.4 16.2 26 C16.4 29 17.6 30.6 19.2 31 C18.2 26.6 18.4 21.8 20 18 Z\" fill=\"#F59A1E\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></g><g class=\"fl-in\"><path d=\"M20.2 30 C22 32.6 24.4 34.4 24.2 37.6 C24 40.4 22.4 42 20.2 42 C17.8 42 16.2 40.4 16.4 37.8 C16.6 35.8 17.8 34.6 18.6 33.2 C19 34.4 19.6 35 20.4 35.2 C19.8 33.6 19.8 31.6 20.2 30 Z\" fill=\"#FFE27A\"/></g><path d=\"M15.4 33.6 C15.6 31.4 16.6 29.8 17.6 28.6\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\" opacity=\".7\"/>","2":"<g class=\"fl-out\"><path d=\"M20 3.5 C23.6 11 33.5 16.4 33.8 28.6 C34 38.4 27.8 45 20 45 C12.2 45 6 38.8 6.2 30 C6.4 23.6 9.6 19.2 13 15.2 C12.6 20.4 14.6 24 17.6 25.2 C16.4 17.6 16.6 9.8 20 3.5 Z\" fill=\"#F59A1E\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></g><g class=\"fl-in\"><path d=\"M20.4 21.6 C23.4 26.6 27.6 29.8 27.4 35.2 C27.2 40 24 42.6 20.2 42.6 C16.2 42.6 13 40 13.2 35.6 C13.4 31.6 15.8 29.6 17.4 26.6 C18 29.2 19.2 30.4 20.6 30.6 C19.6 27.6 19.6 24.6 20.4 21.6 Z\" fill=\"#FFE27A\"/></g><path d=\"M10.4 30.6 C10.6 26.8 12.2 23.6 14 21.4\" stroke=\"#fff\" stroke-width=\"1.8\" stroke-linecap=\"round\" fill=\"none\" opacity=\".7\"/>","3":"<g class=\"fl-spark\"><path d=\"M5 12 l1.2 2.6 2.6 1.2 -2.6 1.2 -1.2 2.6 -1.2 -2.6 -2.6 -1.2 2.6 -1.2 Z\" fill=\"#FFE27A\" stroke=\"#3B2E3A\" stroke-width=\"1.2\" stroke-linejoin=\"round\"/><circle cx=\"35\" cy=\"9\" r=\"1.8\" fill=\"#F59A1E\" stroke=\"#3B2E3A\" stroke-width=\"1.1\"/></g><g class=\"fl-out\"><path d=\"M28.6 13.2 C31.2 16.6 34.6 18 35.6 22.6 C34.2 21.4 32.6 20.8 31 20.8\" fill=\"#E5484D\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 3.5 C23.6 11 33.5 16.4 33.8 28.6 C34 38.4 27.8 45 20 45 C12.2 45 6 38.8 6.2 30 C6.4 23.6 9.6 19.2 13 15.2 C12.6 20.4 14.6 24 17.6 25.2 C16.4 17.6 16.6 9.8 20 3.5 Z\" fill=\"#E5484D\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></g><g class=\"fl-in\"><path d=\"M20.2 13.6 C24 20 30.4 23.4 30.2 31.8 C30 39.2 25.6 43.4 20 43.4 C14.4 43.4 10 39.6 10.2 33.2 C10.4 28.6 13 25.8 15.2 22.6 C15.6 26 17 27.8 18.8 28.4 C17.8 23.2 18.2 18 20.2 13.6 Z\" fill=\"#F59A1E\"/><path d=\"M20.4 21.6 C23.4 26.6 27.6 29.8 27.4 35.2 C27.2 40 24 42.6 20.2 42.6 C16.2 42.6 13 40 13.2 35.6 C13.4 31.6 15.8 29.6 17.4 26.6 C18 29.2 19.2 30.4 20.6 30.6 C19.6 27.6 19.6 24.6 20.4 21.6 Z\" fill=\"#FFE27A\"/></g><path d=\"M10.4 30.6 C10.6 26.8 12.2 23.6 14 21.4\" stroke=\"#fff\" stroke-width=\"1.8\" stroke-linecap=\"round\" fill=\"none\" opacity=\".7\"/>","4":"<g class=\"fl-spark\"><path d=\"M5 12 l1.2 2.8 2.8 1.2 -2.8 1.2 -1.2 2.8 -1.2 -2.8 -2.8 -1.2 2.8 -1.2 Z\" fill=\"#BFEAFF\" stroke=\"#3B2E3A\" stroke-width=\"1.2\" stroke-linejoin=\"round\"/><circle cx=\"35\" cy=\"9\" r=\"1.8\" fill=\"#57C2F2\" stroke=\"#3B2E3A\" stroke-width=\"1.1\"/></g><g class=\"fl-out\"><path d=\"M28.6 13.2 C31.2 16.6 34.6 18 35.6 22.6 C34.2 21.4 32.6 20.8 31 20.8\" fill=\"#2D7FE0\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 3.5 C23.6 11 33.5 16.4 33.8 28.6 C34 38.4 27.8 45 20 45 C12.2 45 6 38.8 6.2 30 C6.4 23.6 9.6 19.2 13 15.2 C12.6 20.4 14.6 24 17.6 25.2 C16.4 17.6 16.6 9.8 20 3.5 Z\" fill=\"#2D7FE0\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></g><g class=\"fl-in\"><path d=\"M20.2 13.6 C24 20 30.4 23.4 30.2 31.8 C30 39.2 25.6 43.4 20 43.4 C14.4 43.4 10 39.6 10.2 33.2 C10.4 28.6 13 25.8 15.2 22.6 C15.6 26 17 27.8 18.8 28.4 C17.8 23.2 18.2 18 20.2 13.6 Z\" fill=\"#57C2F2\"/><path d=\"M20.4 21.6 C23.4 26.6 27.6 29.8 27.4 35.2 C27.2 40 24 42.6 20.2 42.6 C16.2 42.6 13 40 13.2 35.6 C13.4 31.6 15.8 29.6 17.4 26.6 C18 29.2 19.2 30.4 20.6 30.6 C19.6 27.6 19.6 24.6 20.4 21.6 Z\" fill=\"#E4F8FF\"/></g><path d=\"M10.4 30.6 C10.6 26.8 12.2 23.6 14 21.4\" stroke=\"#fff\" stroke-width=\"1.8\" stroke-linecap=\"round\" fill=\"none\" opacity=\".7\"/>","5":"<g class=\"fl-spark\"><path d=\"M5 12 l1.2 2.8 2.8 1.2 -2.8 1.2 -1.2 2.8 -1.2 -2.8 -2.8 -1.2 2.8 -1.2 Z\" fill=\"#7FF0D2\" stroke=\"#3B2E3A\" stroke-width=\"1.2\" stroke-linejoin=\"round\"/><circle cx=\"35\" cy=\"9\" r=\"1.8\" fill=\"#B57BFF\" stroke=\"#3B2E3A\" stroke-width=\"1.1\"/></g><g class=\"fl-out\"><path d=\"M28.6 13.2 C31.2 16.6 34.6 18 35.6 22.6 C34.2 21.4 32.6 20.8 31 20.8\" fill=\"#2A0F5C\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 3.5 C23.6 11 33.5 16.4 33.8 28.6 C34 38.4 27.8 45 20 45 C12.2 45 6 38.8 6.2 30 C6.4 23.6 9.6 19.2 13 15.2 C12.6 20.4 14.6 24 17.6 25.2 C16.4 17.6 16.6 9.8 20 3.5 Z\" fill=\"#2A0F5C\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></g><g class=\"fl-in\"><path d=\"M20.2 13.6 C24 20 30.4 23.4 30.2 31.8 C30 39.2 25.6 43.4 20 43.4 C14.4 43.4 10 39.6 10.2 33.2 C10.4 28.6 13 25.8 15.2 22.6 C15.6 26 17 27.8 18.8 28.4 C17.8 23.2 18.2 18 20.2 13.6 Z\" fill=\"#7A3CFF\"/><path d=\"M20.4 21.6 C23.4 26.6 27.6 29.8 27.4 35.2 C27.2 40 24 42.6 20.2 42.6 C16.2 42.6 13 40 13.2 35.6 C13.4 31.6 15.8 29.6 17.4 26.6 C18 29.2 19.2 30.4 20.6 30.6 C19.6 27.6 19.6 24.6 20.4 21.6 Z\" fill=\"#7FF0D2\"/><path d=\"M15.6 34.199999999999996 l0.66 1.54 1.54 0.66 -1.54 0.66 -0.66 1.54 -0.66 -1.54 -1.54 -0.66 1.54 -0.66 Z\" fill=\"#fff\"/><path d=\"M24.4 29 l0.48 1.1199999999999999 1.1199999999999999 0.48 -1.1199999999999999 0.48 -0.48 1.1199999999999999 -0.48 -1.1199999999999999 -1.1199999999999999 -0.48 1.1199999999999999 -0.48 Z\" fill=\"#fff\"/><circle cx=\"21.4\" cy=\"38.8\" r=\".9\" fill=\"#fff\"/></g><path d=\"M10.4 30.6 C10.6 26.8 12.2 23.6 14 21.4\" stroke=\"#fff\" stroke-width=\"1.8\" stroke-linecap=\"round\" fill=\"none\" opacity=\".7\"/><g class=\"fl-spark\"><path d=\"M33.4 31.4 l0.78 1.8199999999999998 1.8199999999999998 0.78 -1.8199999999999998 0.78 -0.78 1.8199999999999998 -0.78 -1.8199999999999998 -1.8199999999999998 -0.78 1.8199999999999998 -0.78 Z\" fill=\"#B57BFF\" stroke=\"#3B2E3A\" stroke-width=\"1.1\" stroke-linejoin=\"round\"/></g>"},"xp":"<path d=\"M12 1.8 C12.9 7.6 15.6 10.6 22.2 12 C15.6 13.4 12.9 16.4 12 22.2 C11.1 16.4 8.4 13.4 1.8 12 C8.4 10.6 11.1 7.6 12 1.8 Z\" fill=\"#F2C94C\" stroke=\"#3B2E3A\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/><path d=\"M10.2 8.4 C10.8 7.4 11.2 6.4 11.5 5.4\" stroke=\"#fff\" stroke-width=\"1.3\" stroke-linecap=\"round\" fill=\"none\" opacity=\".8\"/>","spots":{"timmyTime":{"vb":"0 -30 200 262","body":"<defs><linearGradient id=\"shxtt-en\" x1=\".15\" y1=\"0\" x2=\".85\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFFFFF\"/><stop offset=\".5\" stop-color=\"#FBF7EE\"/><stop offset=\"1\" stop-color=\"#E6DCC8\"/></linearGradient><radialGradient id=\"shxtt-hi\" cx=\".33\" cy=\".25\" r=\".45\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".95\"/><stop offset=\"1\" stop-color=\"#fff\" stop-opacity=\"0\"/></radialGradient><linearGradient id=\"shxtt-de\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#F7E6BE\"/><stop offset=\"1\" stop-color=\"#DDBB7E\"/></linearGradient><linearGradient id=\"shxtt-gum\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\"><stop offset=\"0\" stop-color=\"#FFC0CD\"/><stop offset=\".45\" stop-color=\"#F78FA8\"/><stop offset=\"1\" stop-color=\"#E07090\"/></linearGradient><radialGradient id=\"shxtt-pl\" cx=\".5\" cy=\".5\" r=\".5\"><stop offset=\"0\" stop-color=\"#E4CF5C\" stop-opacity=\".85\"/><stop offset=\".7\" stop-color=\"#E9D97A\" stop-opacity=\".55\"/><stop offset=\"1\" stop-color=\"#EEE09A\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"shxtt-st\" cx=\".5\" cy=\".5\" r=\".5\"><stop offset=\"0\" stop-color=\"#8A5527\" stop-opacity=\".55\"/><stop offset=\"1\" stop-color=\"#9B6634\" stop-opacity=\"0\"/></radialGradient><radialGradient id=\"shxtt-ca\" cx=\".45\" cy=\".42\" r=\".55\"><stop offset=\"0\" stop-color=\"#140B06\"/><stop offset=\".55\" stop-color=\"#3A2010\"/><stop offset=\".8\" stop-color=\"#6E4219\"/><stop offset=\"1\" stop-color=\"#9A6A33\" stop-opacity=\"0\"/></radialGradient><clipPath id=\"shxtt-cl\"><path d=\"M48 86 C42 56 56 34 78 34 C90 34 94 44 100 44 C106 44 110 34 122 34 C144 34 158 56 152 86 C149 106 146 122 144 140 C142 166 138 192 130 210 C126 218 116 218 114 208 C111 190 108 172 100 168 C92 172 89 190 86 208 C84 218 74 218 70 210 C62 192 58 166 56 140 C54 122 51 106 48 86 Z\"/></clipPath><clipPath id=\"shxtt-root\"><path d=\"M0 154 C60 166 140 166 200 154 L200 260 L0 260 Z\"/></clipPath></defs><g class=\"shpet-bob\"><g class=\"shpet-wobble\"><ellipse cx=\"100\" cy=\"226\" rx=\"78\" ry=\"7\" fill=\"#000\" opacity=\".13\"/><g class=\"shpet-arm shpet-arm-l\"><path d=\"M56 104 C44 101 33 106 29 115 C26 122 31 128 38 125 C43 122 48 118 56 118\" fill=\"url(#shxtt-en)\" stroke=\"#3B2E3A\" stroke-width=\"4.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></g><g class=\"shpet-arm shpet-arm-r\"><path d=\"M144 104 C156 101 167 106 171 115 C174 122 169 128 162 125 C157 122 152 118 144 118\" fill=\"url(#shxtt-en)\" stroke=\"#3B2E3A\" stroke-width=\"4.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/></g><g><path d=\"M48 86 C42 56 56 34 78 34 C90 34 94 44 100 44 C106 44 110 34 122 34 C144 34 158 56 152 86 C149 106 146 122 144 140 C142 166 138 192 130 210 C126 218 116 218 114 208 C111 190 108 172 100 168 C92 172 89 190 86 208 C84 218 74 218 70 210 C62 192 58 166 56 140 C54 122 51 106 48 86 Z\" fill=\"url(#shxtt-en)\"/><g clip-path=\"url(#shxtt-cl)\"><path d=\"M48 86 C42 56 56 34 78 34 C90 34 94 44 100 44 C106 44 110 34 122 34 C144 34 158 56 152 86 C149 106 146 122 144 140 C142 166 138 192 130 210 C126 218 116 218 114 208 C111 190 108 172 100 168 C92 172 89 190 86 208 C84 218 74 218 70 210 C62 192 58 166 56 140 C54 122 51 106 48 86 Z\" fill=\"url(#shxtt-de)\" clip-path=\"url(#shxtt-root)\"/><path d=\"M50 155 C80 164 120 164 150 155\" fill=\"none\" stroke=\"#C9A86A\" stroke-width=\"1.6\" opacity=\".7\"/><ellipse cx=\"160\" cy=\"96\" rx=\"40\" ry=\"70\" fill=\"#B7A68A\" opacity=\".2\"/><ellipse cx=\"100\" cy=\"46\" rx=\"14\" ry=\"5\" fill=\"#C9B998\" opacity=\".35\"/><rect x=\"20\" y=\"20\" width=\"160\" height=\"130\" fill=\"url(#shxtt-hi)\"/></g><path d=\"M48 86 C42 56 56 34 78 34 C90 34 94 44 100 44 C106 44 110 34 122 34 C144 34 158 56 152 86 C149 106 146 122 144 140 C142 166 138 192 130 210 C126 218 116 218 114 208 C111 190 108 172 100 168 C92 172 89 190 86 208 C84 218 74 218 70 210 C62 192 58 166 56 140 C54 122 51 106 48 86 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"4.5\" stroke-linejoin=\"round\"/><path d=\"M60 60 C61 50 68 43 77 42\" stroke=\"#fff\" stroke-width=\"6\" fill=\"none\" stroke-linecap=\"round\" opacity=\".95\"/><circle cx=\"58\" cy=\"70\" r=\"3\" fill=\"#fff\" opacity=\".95\"/></g><g class=\"shpet-face\"><ellipse cx=\"66\" cy=\"101\" rx=\"8.5\" ry=\"4.8\" fill=\"#FF8FA3\" opacity=\".55\"/><ellipse cx=\"134\" cy=\"101\" rx=\"8.5\" ry=\"4.8\" fill=\"#FF8FA3\" opacity=\".55\"/><g class=\"shpet-eyes\"><g class=\"shpet-eye\"><ellipse cx=\"80\" cy=\"84\" rx=\"7.6\" ry=\"10\" fill=\"#2B2230\"/><circle cx=\"82.6\" cy=\"79.6\" r=\"3.1\" fill=\"#fff\"/><circle cx=\"77.6\" cy=\"89\" r=\"1.4\" fill=\"#fff\" opacity=\".9\"/></g><g class=\"shpet-eye\"><ellipse cx=\"120\" cy=\"84\" rx=\"7.6\" ry=\"10\" fill=\"#2B2230\"/><circle cx=\"122.6\" cy=\"79.6\" r=\"3.1\" fill=\"#fff\"/><circle cx=\"117.6\" cy=\"89\" r=\"1.4\" fill=\"#fff\" opacity=\".9\"/></g></g><path d=\"M86 101 Q100 121 114 101 Z\" fill=\"#6B2B3A\" stroke=\"#3B2E3A\" stroke-width=\"3\" stroke-linejoin=\"round\"/><path d=\"M93 111 Q100 106 107 111 Q104 116 100 116 Q96 116 93 111 Z\" fill=\"#FF7A8E\"/></g></g><path d=\"M12 202 C10 168 28 142.0 48 133.0 C56 129.0 63 137.0 66 146.0 C77 156.0 89 159.0 100 159.0 C111 159.0 123 156.0 134 146.0 C137 137.0 144 129.0 152 133.0 C172 142.0 190 168 188 202 C187 220 160 226 100 226 C40 226 13 220 12 202 Z\" fill=\"url(#shxtt-gum)\" stroke=\"#A8384F\" stroke-width=\"4\" stroke-linejoin=\"round\"/><path d=\"M24 196 C24 162 32 148 44 139\" stroke=\"#fff\" stroke-width=\"3.4\" fill=\"none\" opacity=\".5\" stroke-linecap=\"round\"/><path d=\"M40 214 C70 222 130 222 160 214\" stroke=\"#000\" stroke-width=\"5\" fill=\"none\" opacity=\".08\" stroke-linecap=\"round\"/><g fill=\"#fff\" opacity=\".25\"><circle cx=\"36\" cy=\"196\" r=\"1.6\"/><circle cx=\"52\" cy=\"208\" r=\"1.3\"/><circle cx=\"148\" cy=\"200\" r=\"1.6\"/><circle cx=\"164\" cy=\"190\" r=\"1.3\"/><circle cx=\"100\" cy=\"212\" r=\"1.4\"/><circle cx=\"76\" cy=\"200\" r=\"1.2\"/><circle cx=\"126\" cy=\"206\" r=\"1.2\"/></g><g class=\"shpet-sparkles\" fill=\"#fff\" stroke=\"#E8C45A\" stroke-width=\"1.4\" stroke-linejoin=\"round\"><path class=\"shpet-sp shpet-sp1\" d=\"M36 40 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z\"/><path class=\"shpet-sp shpet-sp2\" d=\"M168 58 l2.4 5.6 5.6 2.4 -5.6 2.4 -2.4 5.6 -2.4 -5.6 -5.6 -2.4 5.6 -2.4z\"/><path class=\"shpet-sp shpet-sp3\" d=\"M152 18 l2 4.6 4.6 2 -4.6 2 -2 4.6 -2 -4.6 -4.6 -2 4.6 -2z\"/></g></g><path d=\"M38 104 C30 52 60 16 98 15 C138 14 168 50 158 104\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"11\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M38 104 C30 52 60 16 98 15 C138 14 168 50 158 104\" fill=\"none\" class=\"sp-tint-line\" stroke-width=\"5\" stroke-linecap=\"round\"/><path d=\"M60 34 C70 26 82 22 94 21\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M24 86 C24 76 30 72 38 72 L44 72 C48 72 50 75 50 79 L50 113 C50 117 48 120 44 120 L38 120 C30 120 24 116 24 106 Z\" class=\"sp-tint\" stroke=\"#3B2E3A\" stroke-width=\"4.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M30 84 C30 80 32 78 35 78\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M44 76 L50 76 L50 116 L44 116 Z\" fill=\"#6B5A68\" stroke=\"#3B2E3A\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M172 86 C172 76 166 72 158 72 L152 72 C148 72 146 75 146 79 L146 113 C146 117 148 120 152 120 L158 120 C166 120 172 116 172 106 Z\" class=\"sp-tint\" stroke=\"#3B2E3A\" stroke-width=\"4.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M152 76 L146 76 L146 116 L152 116 Z\" fill=\"#6B5A68\" stroke=\"#3B2E3A\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M166 84 C166 80 164 78 161 78\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/>"},"notes":{"vb":"0 0 120 110","body":"<path d=\"M30 40 C30 40 30 78 30 80\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"3.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M62 32 L62 72\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"3.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M30 40 C40 36 52 34 62 32 L62 42 C52 44 40 46 30 50 Z\" fill=\"#F2C94C\" stroke=\"#3B2E3A\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M18 84 C18 77 24 74 30 76 C34 77 35 82 33 86 C30 91 18 92 18 84 Z\" fill=\"#F2C94C\" stroke=\"#3B2E3A\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M50 76 C50 69 56 66 62 68 C66 69 67 74 65 78 C62 83 50 84 50 76 Z\" fill=\"#F2C94C\" stroke=\"#3B2E3A\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M22 82 C22 80 24 79 26 79\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M94 62 L94 92\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"3.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M94 62 C100 64 104 68 106 74\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"3.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M82 96 C82 89 88 86 94 88 C98 89 99 94 97 98 C94 103 82 104 82 96 Z\" class=\"sp-tint-light\" stroke=\"#3B2E3A\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M80 30 C86 24 86 16 80 10\" fill=\"none\" class=\"sp-tint-line\" stroke-width=\"3.5\" stroke-linecap=\"round\"/><path d=\"M90 36 C100 26 100 12 90 2\" fill=\"none\" class=\"sp-tint-line\" stroke-width=\"3.5\" stroke-linecap=\"round\" opacity=\".6\"/>"},"today":{"vb":"0 0 96 96","body":"<path d=\"M14 24 C14 18 18 15 24 15 L72 15 C78 15 82 18 82 24 L82 80 C82 86 78 89 72 89 L24 89 C18 89 14 86 14 80 Z\" fill=\"#FFFFFF\" stroke=\"#3B2E3A\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M74 22 L74 82 C74 85 72 86 70 86 L78 86 C80 85 82 83 82 80 L82 24 C82 21 80 19 78 18 Z\" fill=\"#ECE6EA\"/><path d=\"M14 24 C14 18 18 15 24 15 L72 15 C78 15 82 18 82 24 L82 36 L14 36 Z\" class=\"sp-tint\" stroke=\"#3B2E3A\" stroke-width=\"3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M22 22 C24 20 26 19 30 19\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M30 8 L30 22 M48 8 L48 22 M66 8 L66 22\" fill=\"none\" stroke=\"#8E98A3\" stroke-width=\"6\" stroke-linecap=\"round\"/><path d=\"M30 8 L30 22 M48 8 L48 22 M66 8 L66 22\" fill=\"none\" stroke=\"#D5DBE1\" stroke-width=\"3\" stroke-linecap=\"round\"/><path d=\"M30 60 C35 65 39 69 42 72 C50 60 58 52 68 46\" fill=\"none\" class=\"sp-tint-line\" stroke-width=\"7\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>"}}};
 ;
 /* ---- widget/hub-art/dash.js ---- */
-window.SH_DASH_ART = {"tints":{"occlusion":{"name":"Occlusion","ink":"#2747a3","mid":"#6F86CF","light":"#DCE3F6","dark":"#8FA6EC"},"perio":{"name":"Perio","ink":"#b4466f","mid":"#D97FA0","light":"#F6DDE6","dark":"#EC93B5"},"pcd-implants-exam1":{"name":"PCD Implants","ink":"#2f6f84","mid":"#6FA9BB","light":"#D7E9EF","dark":"#7CC0D6"},"heme-endo-exam2":{"name":"Heme & Endo 2","ink":"#a83232","mid":"#D86F6F","light":"#F5DADA","dark":"#EE8A8A"},"special-patient-care":{"name":"Special Patient Care","ink":"#2e7d4f","mid":"#6DB58A","light":"#D7EEDF","dark":"#76CB98"},"generic":{"name":"A new hub","ink":"#6B5A68","mid":"#A897A4","light":"#ECE6EA","dark":"#C4B3C0"}},"emblems":{"occlusion":{"label":"An articulator with two casts meeting in front","body":"<path d=\"M6 50 Q6 47.6 8.4 47.6 L56.4 47.6 Q58.6 47.6 58.6 50 L58.6 55 Q58.6 57.6 56 57.6 L8.6 57.6 Q6 57.6 6 55 Z\" fill=\"#6F86CF\"/><path d=\"M7 54 L57.6 54 L57.6 55 Q57.6 56.6 56 56.6 L8.6 56.6 Q7 56.6 7 55 Z\" fill=\"#2747a3\"/><path d=\"M6 50 Q6 47.6 8.4 47.6 L56.4 47.6 Q58.6 47.6 58.6 50 L58.6 55 Q58.6 57.6 56 57.6 L8.6 57.6 Q6 57.6 6 55 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M8.6 48 L8.6 15.4 C8.6 13.4 10 12.6 11 13.6 C12 15.6 13.6 15.6 14.6 13.6 C15.6 12.6 17 13.4 17 15.4 L17 48 Z\" fill=\"#6F86CF\"/><path d=\"M14.4 17 L16.2 16.4 L16.2 47.6 L14.4 47.6 Z\" fill=\"#2747a3\"/><path d=\"M8.6 48 L8.6 15.4 C8.6 13.4 10 12.6 11 13.6 C12 15.6 13.6 15.6 14.6 13.6 C15.6 12.6 17 13.4 17 15.4 L17 48 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M48.6 47.8 L49.6 44.4 L58.6 45.8 L58.6 48 Z\" fill=\"#D5DBE1\"/><path d=\"M50 46.6 L58 47.2 L58 47.8 L49.6 47.8 Z\" fill=\"#8E98A3\"/><path d=\"M48.6 47.8 L49.6 44.4 L58.6 45.8 L58.6 48 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M52.4 9 L55.6 9 L55.6 45.6 L52.4 45.2 Z\" fill=\"#D5DBE1\"/><path d=\"M54.4 10 L55 10 L55 45 L54.4 45 Z\" fill=\"#8E98A3\"/><path d=\"M52.4 9 L55.6 9 L55.6 45.6 L52.4 45.2 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M10.6 9 Q10.6 7 12.6 7 L55 7 Q59.4 7 59.4 11.4 Q59.4 15.6 55 15.6 L12.6 15.6 Q10.6 15.6 10.6 13.6 Z\" fill=\"#6F86CF\"/><path d=\"M11.6 12.8 L58.2 12.8 C57.6 14.2 56.6 14.7 55 14.7 L12.6 14.7 Q11.6 14.7 11.6 13.6 Z\" fill=\"#2747a3\"/><path d=\"M10.6 9 Q10.6 7 12.6 7 L55 7 Q59.4 7 59.4 11.4 Q59.4 15.6 55 15.6 L12.6 15.6 Q10.6 15.6 10.6 13.6 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M15 9.4 L42 9.4\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M12.8 10.4 a4.4 4.4 0 1 0 .01 0 Z\" fill=\"#D5DBE1\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M54 2.4 a2.7 2.7 0 1 0 .01 0 Z\" fill=\"#D5DBE1\" stroke=\"#3B2E3A\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 15.4 L48.6 15.4 L47.6 22.6 L21 22.6 Z\" fill=\"#FFFFFF\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20.6 22.2 L48 22.2 L47.6 26.4 L21 26.4 Z\" fill=\"#F78FA8\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M21.4 26 C21.4 31.6 26.599999999999998 31.6 26.599999999999998 26 M26.599999999999998 26 C26.599999999999998 31.6 31.799999999999997 31.6 31.799999999999997 26 M31.799999999999997 26 C31.799999999999997 31.6 37 31.6 37 26 M37 26 C37 31.6 42.2 31.6 42.2 26 M42.2 26 C42.2 31.6 47.400000000000006 31.6 47.400000000000006 26 \" fill=\"#FFFDF6\" stroke=\"#3B2E3A\" stroke-width=\"1.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M21 41 L47.6 41 L48.6 47.8 L20 47.8 Z\" fill=\"#FFFFFF\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M21 36.8 L47.6 36.8 L48 41.2 L20.6 41.2 Z\" fill=\"#F78FA8\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M21.4 37.2 C21.4 31.6 26.599999999999998 31.6 26.599999999999998 37.2 M26.599999999999998 37.2 C26.599999999999998 31.6 31.799999999999997 31.6 31.799999999999997 37.2 M31.799999999999997 37.2 C31.799999999999997 31.6 37 31.6 37 37.2 M37 37.2 C37 31.6 42.2 31.6 42.2 37.2 M42.2 37.2 C42.2 31.6 47.400000000000006 31.6 47.400000000000006 37.2 \" fill=\"#FFFDF6\" stroke=\"#3B2E3A\" stroke-width=\"1.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>"},"perio":{"label":"A periodontal probe in the pocket at a molar's gumline","body":"<path d=\"M10.4 25.6 C8.6 18.2 11.6 11 17.8 10.4 C21 10.1 22.4 13 24.4 13 C26.4 13 27.8 10.1 31 10.4 C37.2 11 40.2 18.2 38.4 25.6 C37.4 29.8 35.9 33 35.6 37.4 L35 56 L14 56 L13.2 37.4 C12.9 33 11.4 29.8 10.4 25.6 Z\" fill=\"#FFFDF6\"/><path d=\"M31.4 11.4 C36.6 12.6 39 18.8 37.4 25.4 C36.4 29.6 34.9 33 34.6 37.4 L34.2 54 L30.6 54 C32.4 41 35.4 24 31.4 11.4 Z\" fill=\"#E9DFCC\"/><path d=\"M10.4 25.6 C8.6 18.2 11.6 11 17.8 10.4 C21 10.1 22.4 13 24.4 13 C26.4 13 27.8 10.1 31 10.4 C37.2 11 40.2 18.2 38.4 25.6 C37.4 29.8 35.9 33 35.6 37.4 L35 56 L14 56 L13.2 37.4 C12.9 33 11.4 29.8 10.4 25.6 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M24.4 13.4 V17.4\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M13.2 22.6 C12.9 18.4 14.6 14.9 17.4 13.6\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M60 4.5 L48.5 16\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"7.800000000000001\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M60 4.5 L48.5 16\" fill=\"none\" stroke=\"#b4466f\" stroke-width=\"5.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M57.2 5.9 L50.6 12.4\" stroke=\"#fff\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M48.5 16 L42.2 22.2 L39.4 45\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"4.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M48.5 16 L42.2 22.2 L39.4 45\" fill=\"none\" stroke=\"#D5DBE1\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M41.4 27.6 L41.1 30.2 M40.8 32.6 L40.5 35.2 M40.2 37.6 L39.9 40.2\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M4.5 41 C5 36.5 8 33.4 10.8 33.6 C13.5 37.2 18.5 39.6 24.4 39.6 C30.4 39.6 35.2 37.2 38 33.6 C41 33.4 44.4 36.4 45 41 C46 49 41 57.5 24.6 57.5 C8.5 57.5 3.6 49 4.5 41 Z\" fill=\"#F78FA8\"/><path d=\"M9 52 C16 55.6 33 55.8 41 51 C39 55 33 57 24.6 57 C15 57 10.4 54.8 9 52 Z\" fill=\"#E07090\"/><path d=\"M4.5 41 C5 36.5 8 33.4 10.8 33.6 C13.5 37.2 18.5 39.6 24.4 39.6 C30.4 39.6 35.2 37.2 38 33.6 C41 33.4 44.4 36.4 45 41 C46 49 41 57.5 24.6 57.5 C8.5 57.5 3.6 49 4.5 41 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M8 41 C8.6 38.6 9.6 37 10.8 36.6\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M40.6 33 C41.4 34.6 42.4 35.6 42.4 36.6 C42.4 37.6 41.6 38.3 40.6 38.3 C39.6 38.3 38.8 37.6 38.8 36.6 C38.8 35.6 39.8 34.6 40.6 33 Z\" fill=\"#E5484D\" stroke=\"#3B2E3A\" stroke-width=\"1.3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>"},"pcd-implants-exam1":{"label":"An implant: crown, abutment and threaded fixture in gum and bone","body":"<path d=\"M6 36 C14 33.5 50 33.5 58 36 L58 52 C58 56 55.5 58 51.5 58 L12.5 58 C8.5 58 6 56 6 52 Z\" fill=\"#E9DFCC\"/><path d=\"M7 51 L57 51 L57 52 C57 55.4 55 57 51.5 57 L12.5 57 C9 57 7 55.4 7 52 Z\" fill=\"#D7C8AA\"/><path d=\"M6 36 C14 33.5 50 33.5 58 36 L58 52 C58 56 55.5 58 51.5 58 L12.5 58 C8.5 58 6 56 6 52 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><g fill=\"#8A5A3A\" opacity=\".35\"><circle cx=\"12\" cy=\"42\" r=\"1.3\"/><circle cx=\"17\" cy=\"48\" r=\"1\"/><circle cx=\"11\" cy=\"52\" r=\".9\"/><circle cx=\"48\" cy=\"41.5\" r=\"1.1\"/><circle cx=\"53\" cy=\"47\" r=\"1.3\"/><circle cx=\"46\" cy=\"52\" r=\".9\"/><circle cx=\"19.5\" cy=\"39.5\" r=\".8\"/><circle cx=\"44\" cy=\"46\" r=\".8\"/></g><path d=\"M25 34.6 L39 34.6 L38 50 C37.6 54 35.2 56.6 32 56.6 C28.8 56.6 26.4 54 26 50 Z\" fill=\"#6FA9BB\"/><path d=\"M35.6 35.4 L38.2 35.4 L37.3 50 C37 53.4 35.4 55.4 33.6 55.8 C35.4 52 35.8 44 35.6 35.4 Z\" fill=\"#2f6f84\"/><path d=\"M25 34.6 L39 34.6 L38 50 C37.6 54 35.2 56.6 32 56.6 C28.8 56.6 26.4 54 26 50 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M24.1 39.3 L39.9 37.5 M24.4 42.6 L39.6 40.8 M24.6 45.9 L39.4 44.1 M24.9 49.2 L39.1 47.4 M25.1 52.5 L38.9 50.7\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M28 37.2 L28.4 47\" stroke=\"#fff\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M6 34.6 C10 28.6 18 28 24 31.4 C28 33.2 36 33.2 40 31.4 C46 28 54 28.6 58 34.6 C58 37 55 38.2 50 37.6 C40 36.4 24 36.4 14 37.6 C9 38.2 6 37 6 34.6 Z\" fill=\"#F78FA8\"/><path d=\"M10 36.2 C20 35 44 35 54 36.2 C50 37.2 44 36.6 32 36.4 C20 36.6 14 37.2 10 36.2 Z\" fill=\"#E07090\"/><path d=\"M6 34.6 C10 28.6 18 28 24 31.4 C28 33.2 36 33.2 40 31.4 C46 28 54 28.6 58 34.6 C58 37 55 38.2 50 37.6 C40 36.4 24 36.4 14 37.6 C9 38.2 6 37 6 34.6 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M27.4 23.5 L36.6 23.5 L37.6 35.2 L26.4 35.2 Z\" fill=\"#D5DBE1\"/><path d=\"M34.6 24.2 L35.9 24.2 L36.8 34.6 L35.4 34.6 Z\" fill=\"#8E98A3\"/><path d=\"M27.4 23.5 L36.6 23.5 L37.6 35.2 L26.4 35.2 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M21 19.5 C19 12 22 6 27 5.5 C29.6 5.2 30.6 7.6 32 7.6 C33.4 7.6 34.4 5.2 37 5.5 C42 6 45 12 43 19.5 C42.2 23 39.6 25 36.4 25 L27.6 25 C24.4 25 21.8 23 21 19.5 Z\" fill=\"#FFFDF6\"/><path d=\"M37.6 6.6 C42 7.6 44 13 42.2 19.4 C41.4 22.4 39.4 24 36.6 24.2 C39.4 19 40 12 37.6 6.6 Z\" fill=\"#E9DFCC\"/><path d=\"M21 19.5 C19 12 22 6 27 5.5 C29.6 5.2 30.6 7.6 32 7.6 C33.4 7.6 34.4 5.2 37 5.5 C42 6 45 12 43 19.5 C42.2 23 39.6 25 36.4 25 L27.6 25 C24.4 25 21.8 23 21 19.5 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M23.6 16 C23.4 11.4 24.8 8.6 27.2 8\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/>"},"heme-endo-exam2":{"label":"The thyroid gland on the trachea, with a drop of blood","body":"<path d=\"M26 6.5 Q26 5 27.5 5 L36.5 5 Q38 5 38 6.5 L38 58 Q38 59.5 36.5 59.5 L27.5 59.5 Q26 59.5 26 58 Z\" fill=\"#FFFFFF\"/><path d=\"M35 6 L37 6 L37 58.5 L35 58.5 Z\" fill=\"#ECE6EA\"/><path d=\"M26 6.5 Q26 5 27.5 5 L36.5 5 Q38 5 38 6.5 L38 58 Q38 59.5 36.5 59.5 L27.5 59.5 Q26 59.5 26 58 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M26.4 10.0 C29 11.6 35 11.6 37.6 10.0 M26.4 15.2 C29 16.8 35 16.8 37.6 15.2 M26.4 20.4 C29 22.0 35 22.0 37.6 20.4 M26.4 25.6 C29 27.2 35 27.2 37.6 25.6 M26.4 30.8 C29 32.4 35 32.4 37.6 30.8 M26.4 36.0 C29 37.6 35 37.6 37.6 36.0 M26.4 41.2 C29 42.8 35 42.8 37.6 41.2 M26.4 46.4 C29 48.0 35 48.0 37.6 46.4 M26.4 51.6 C29 53.2 35 53.2 37.6 51.6\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"0.55\"/><path d=\"M32 37.4 C28 37.4 25.6 35 24 31 C22 25 20 15.6 16 16 C11 16.5 8 27 8 37 C8 46 9.6 53 14 53.5 C19 54 23 48 25.5 45 C27.5 44 30 45.4 32 45.4 C34 45.4 36.5 44 38.5 45 C41 48 45 54 50 53.5 C54.4 53 56 46 56 37 C56 27 53 16.5 48 16 C44 15.6 42 25 40 31 C38.4 35 36 37.4 32 37.4 Z\" fill=\"#D86F6F\"/><path d=\"M44.6 30 C46 38 49 48 53.6 50.2 C52.4 52.6 51.2 53.4 50 53.5 C45 54 41 48 38.5 45 C37.8 44.6 37 44.6 36.4 44.8 C41.4 41 44 36 44.6 30 Z M13.6 50.6 C17.6 50 22 46 25.4 41.6 C26.2 43 26 44.2 25.5 45 C23 48 19 54 14 53.5 C13 53.4 12.2 52.6 11.6 51.6 Z\" fill=\"#a83232\"/><path d=\"M32 37.4 C28 37.4 25.6 35 24 31 C22 25 20 15.6 16 16 C11 16.5 8 27 8 37 C8 46 9.6 53 14 53.5 C19 54 23 48 25.5 45 C27.5 44 30 45.4 32 45.4 C34 45.4 36.5 44 38.5 45 C41 48 45 54 50 53.5 C54.4 53 56 46 56 37 C56 27 53 16.5 48 16 C44 15.6 42 25 40 31 C38.4 35 36 37.4 32 37.4 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M11.6 36 C11.6 29 13.2 22 15.6 19.8\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M44.8 22.4 C46 20 47 19.4 48 19.6\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M27 41.2 C30 42.4 34 42.4 37 41.2\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"0.4\"/><path d=\"M54.5 3.5 C56.6 7.4 59.6 10 59.6 12.8 C59.6 15.7 57.4 17.6 54.5 17.6 C51.6 17.6 49.4 15.7 49.4 12.8 C49.4 10 52.4 7.4 54.5 3.5 Z\" fill=\"#E5484D\"/><path d=\"M57.2 9.8 C58.6 11 59 12 59 12.8 C59 15.3 57.2 17 54.8 17 C57 15.4 57.8 12.8 57.2 9.8 Z\" fill=\"#a83232\"/><path d=\"M54.5 3.5 C56.6 7.4 59.6 10 59.6 12.8 C59.6 15.7 57.4 17.6 54.5 17.6 C51.6 17.6 49.4 15.7 49.4 12.8 C49.4 10 52.4 7.4 54.5 3.5 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M51.6 12.6 C51.6 11.2 52.2 10.2 53 9.4\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/>"},"special-patient-care":{"label":"A molar cradled in a gloved hand","body":"<g transform=\"translate(0 -2.4)\"><path d=\"M27 18.8 C25.8 12.8 28.6 8.4 33 8.4 C35.4 8.4 36.2 10.4 37.4 10.4 C38.6 10.4 39.4 8.4 41.8 8.4 C46.2 8.4 49 12.8 47.8 18.8 C47.2 22.8 46.6 26 46.2 29.6 C45.8 34.8 45 40 43.4 43.6 C42.6 45.2 40.6 45.2 40.2 43.2 C39.6 39.6 39 36 37.4 35.2 C35.8 36 35.2 39.6 34.6 43.2 C34.2 45.2 32.2 45.2 31.4 43.6 C29.8 40 29 34.8 28.6 29.6 C28.2 26 27.6 22.8 27 18.8 Z\" fill=\"#FFFDF6\"/><path d=\"M43.8 9.6 C46.6 10.8 48.2 14.0 47.8 18.8 C47.2 22.8 46.6 26.0 46.2 29.6 C45.8 34.8 45.0 40.0 43.4 43.6 C42.6 45.2 41.0 44.8 40.6 42.8 C43.4 37.6 44.6 29.6 45.0 22.4 C45.4 16.8 45.0 12.4 43.8 9.6 Z\" fill=\"#E9DFCC\"/><path d=\"M27 18.8 C25.8 12.8 28.6 8.4 33 8.4 C35.4 8.4 36.2 10.4 37.4 10.4 C38.6 10.4 39.4 8.4 41.8 8.4 C46.2 8.4 49 12.8 47.8 18.8 C47.2 22.8 46.6 26 46.2 29.6 C45.8 34.8 45 40 43.4 43.6 C42.6 45.2 40.6 45.2 40.2 43.2 C39.6 39.6 39 36 37.4 35.2 C35.8 36 35.2 39.6 34.6 43.2 C34.2 45.2 32.2 45.2 31.4 43.6 C29.8 40 29 34.8 28.6 29.6 C28.2 26 27.6 22.8 27 18.8 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M29.8 16.0 C29.8 12.8 31.4 10.8 33.4 10.6\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M12 42.4 C20 44.8 30 45.2 40 44.8 C48 44.4 53.6 43 56.8 40.6 C59.4 38.8 61.2 40.8 60.4 43.6 C59.6 48.6 55.4 53.4 48 55.6 C40 57.8 28 58 20 56.8 L12.2 57.2 Z\" fill=\"#6DB58A\"/><path d=\"M60.2 45.4 C59 49.4 54.8 53.6 48 55.6 C40 57.8 28 58 20 56.8 L19.6 54.6 C28 55.8 40 55.6 47.4 53.6 C53.4 52 58 48.8 60.2 45.4 Z\" fill=\"#2e7d4f\"/><path d=\"M12 42.4 C20 44.8 30 45.2 40 44.8 C48 44.4 53.6 43 56.8 40.6 C59.4 38.8 61.2 40.8 60.4 43.6 C59.6 48.6 55.4 53.4 48 55.6 C40 57.8 28 58 20 56.8 L12.2 57.2 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M58.6 45.8 C54.8 48 49.4 49 44 49.2 M56.6 50.4 C52.6 52.2 47.4 53 42 53\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M14.8 47.4 C14 42.4 16 37.4 19.6 35.2 C22 33.8 24.8 35 24.6 37.6 C24.4 39.8 22.8 41.2 22.2 43.6 C21.8 45.4 22.2 46.6 22.8 47.8 Z\" fill=\"#6DB58A\"/><path d=\"M23.6 39.4 C22.6 40.8 22 42 21.6 43.6 C21.3 45 21.5 46.4 22 47.6 L22.8 47.8 C22.2 46.6 21.8 45.4 22.2 43.6 C22.6 41.8 23.4 40.6 23.6 39.4 Z\" fill=\"#2e7d4f\"/><path d=\"M14.8 47.4 C14 42.4 16 37.4 19.6 35.2 C22 33.8 24.8 35 24.6 37.6 C24.4 39.8 22.8 41.2 22.2 43.6 C21.8 45.4 22.2 46.6 22.8 47.8 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M17.4 43 C17.2 40.4 18 38.2 19.6 37\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M26 47.6 L38 47.8\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M5 40.6 L13.4 41.6 L13.4 58 L5 58.8 Z\" fill=\"#2e7d4f\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M8.6 44 L8.6 54.6\" stroke=\"#fff\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/></g>"},"generic":{"label":"A molar standing on an open book","body":"<path d=\"M3.5 42 L3.5 55 C14 52.4 25 52.6 32 57.4 C39 52.6 50 52.4 60.5 55 L60.5 42 C50 40 39 40.4 32 44 C25 40.4 14 40 3.5 42 Z\" fill=\"#6B5A68\"/><path d=\"M4.5 53.6 C14 51.2 25 51.4 32 56 L32 57 C25 52.6 14 52.4 4.5 54.6 Z\" fill=\"#4F424C\"/><path d=\"M3.5 42 L3.5 55 C14 52.4 25 52.6 32 57.4 C39 52.6 50 52.4 60.5 55 L60.5 42 C50 40 39 40.4 32 44 C25 40.4 14 40 3.5 42 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 41.6 C25.4 37.4 14 37 6 39.4 L6 52.4 C14 50 25.4 50.4 32 54.4 Z\" fill=\"#FFFFFF\"/><path d=\"M6 49.6 C14 47.4 25.4 47.8 32 51.6 L32 54.4 C25.4 50.4 14 50 6 52.4 Z\" fill=\"#ECE6EA\"/><path d=\"M32 41.6 C25.4 37.4 14 37 6 39.4 L6 52.4 C14 50 25.4 50.4 32 54.4 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 41.6 C38.6 37.4 50 37 58 39.4 L58 52.4 C50 50 38.6 50.4 32 54.4 Z\" fill=\"#FFFFFF\"/><path d=\"M58 49.6 C50 47.4 38.6 47.8 32 51.6 L32 54.4 C38.6 50.4 50 50 58 52.4 Z\" fill=\"#ECE6EA\"/><path d=\"M32 41.6 C38.6 37.4 50 37 58 39.4 L58 52.4 C50 50 38.6 50.4 32 54.4 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M10 43.4 C15 42.4 20 42.6 24.4 44 M10 47 C15 46 20 46.2 24.4 47.6 M39.6 44 C44 42.6 49 42.4 54 43.4 M39.6 47.6 C44 46.2 49 46 54 47\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"0.4\"/><path d=\"M20.82 13.78 C19.53 7.33 22.54 2.6 27.27 2.6 C29.85 2.6 30.71 4.75 32 4.75 C33.29 4.75 34.15 2.6 36.73 2.6 C41.46 2.6 44.47 7.33 43.18 13.78 C42.53 18.08 41.89 21.52 41.46 25.39 C41.03 30.98 40.17 36.57 38.45 40.44 C37.59 42.16 35.44 42.16 35.01 40.01 C34.37 36.14 33.72 32.27 32 31.41 C30.28 32.27 29.64 36.14 28.99 40.01 C28.56 42.16 26.41 42.16 25.55 40.44 C23.83 36.57 22.97 30.98 22.54 25.39 C22.11 21.52 21.46 18.08 20.82 13.78 Z\" fill=\"#FFFDF6\"/><path d=\"M38.9 3.9 C41.9 5.2 43.6 8.6 43.2 13.8 C42.5 18.1 41.9 21.5 41.5 25.4 C41.0 31.0 40.2 36.6 38.5 40.4 C37.6 42.2 35.9 41.7 35.4 39.6 C38.5 34.0 39.7 25.4 40.2 17.6 C40.6 11.6 40.2 6.9 38.9 3.9 Z\" fill=\"#E9DFCC\"/><path d=\"M20.82 13.78 C19.53 7.33 22.54 2.6 27.27 2.6 C29.85 2.6 30.71 4.75 32 4.75 C33.29 4.75 34.15 2.6 36.73 2.6 C41.46 2.6 44.47 7.33 43.18 13.78 C42.53 18.08 41.89 21.52 41.46 25.39 C41.03 30.98 40.17 36.57 38.45 40.44 C37.59 42.16 35.44 42.16 35.01 40.01 C34.37 36.14 33.72 32.27 32 31.41 C30.28 32.27 29.64 36.14 28.99 40.01 C28.56 42.16 26.41 42.16 25.55 40.44 C23.83 36.57 22.97 30.98 22.54 25.39 C22.11 21.52 21.46 18.08 20.82 13.78 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M23.8 10.8 C23.8 7.3 25.6 5.2 27.7 5.0\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M53 5.6 C53.6 9.2 54.4 10 58 10.6 C54.4 11.2 53.6 12 53 15.6 C52.4 12 51.6 11.2 48 10.6 C51.6 10 52.4 9.2 53 5.6 Z\" fill=\"#FFE27A\" stroke=\"#3B2E3A\" stroke-width=\"1.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>"}}};
+window.SH_DASH_ART = {"tints":{"occlusion":{"name":"Occlusion","ink":"#2747a3","mid":"#6F86CF","light":"#DCE3F6","dark":"#8FA6EC"},"perio":{"name":"Perio","ink":"#b4466f","mid":"#D97FA0","light":"#F6DDE6","dark":"#EC93B5"},"pcd-implants-exam1":{"name":"PCD Implants","ink":"#2f6f84","mid":"#6FA9BB","light":"#D7E9EF","dark":"#7CC0D6"},"heme-endo-exam2":{"name":"Heme & Endo 2","ink":"#a83232","mid":"#D86F6F","light":"#F5DADA","dark":"#EE8A8A"},"heme-endo-exam3":{"name":"Heme & Endo 3","ink":"#a83232","mid":"#D86F6F","light":"#F5DADA","dark":"#EE8A8A"},"special-patient-care":{"name":"Special Patient Care","ink":"#2e7d4f","mid":"#6DB58A","light":"#D7EEDF","dark":"#76CB98"},"generic":{"name":"A new hub","ink":"#6B5A68","mid":"#A897A4","light":"#ECE6EA","dark":"#C4B3C0"}},"emblems":{"occlusion":{"label":"An articulator with two casts meeting in front","body":"<path d=\"M6 50 Q6 47.6 8.4 47.6 L56.4 47.6 Q58.6 47.6 58.6 50 L58.6 55 Q58.6 57.6 56 57.6 L8.6 57.6 Q6 57.6 6 55 Z\" fill=\"#6F86CF\"/><path d=\"M7 54 L57.6 54 L57.6 55 Q57.6 56.6 56 56.6 L8.6 56.6 Q7 56.6 7 55 Z\" fill=\"#2747a3\"/><path d=\"M6 50 Q6 47.6 8.4 47.6 L56.4 47.6 Q58.6 47.6 58.6 50 L58.6 55 Q58.6 57.6 56 57.6 L8.6 57.6 Q6 57.6 6 55 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M8.6 48 L8.6 15.4 C8.6 13.4 10 12.6 11 13.6 C12 15.6 13.6 15.6 14.6 13.6 C15.6 12.6 17 13.4 17 15.4 L17 48 Z\" fill=\"#6F86CF\"/><path d=\"M14.4 17 L16.2 16.4 L16.2 47.6 L14.4 47.6 Z\" fill=\"#2747a3\"/><path d=\"M8.6 48 L8.6 15.4 C8.6 13.4 10 12.6 11 13.6 C12 15.6 13.6 15.6 14.6 13.6 C15.6 12.6 17 13.4 17 15.4 L17 48 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M48.6 47.8 L49.6 44.4 L58.6 45.8 L58.6 48 Z\" fill=\"#D5DBE1\"/><path d=\"M50 46.6 L58 47.2 L58 47.8 L49.6 47.8 Z\" fill=\"#8E98A3\"/><path d=\"M48.6 47.8 L49.6 44.4 L58.6 45.8 L58.6 48 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M52.4 9 L55.6 9 L55.6 45.6 L52.4 45.2 Z\" fill=\"#D5DBE1\"/><path d=\"M54.4 10 L55 10 L55 45 L54.4 45 Z\" fill=\"#8E98A3\"/><path d=\"M52.4 9 L55.6 9 L55.6 45.6 L52.4 45.2 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M10.6 9 Q10.6 7 12.6 7 L55 7 Q59.4 7 59.4 11.4 Q59.4 15.6 55 15.6 L12.6 15.6 Q10.6 15.6 10.6 13.6 Z\" fill=\"#6F86CF\"/><path d=\"M11.6 12.8 L58.2 12.8 C57.6 14.2 56.6 14.7 55 14.7 L12.6 14.7 Q11.6 14.7 11.6 13.6 Z\" fill=\"#2747a3\"/><path d=\"M10.6 9 Q10.6 7 12.6 7 L55 7 Q59.4 7 59.4 11.4 Q59.4 15.6 55 15.6 L12.6 15.6 Q10.6 15.6 10.6 13.6 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M15 9.4 L42 9.4\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M12.8 10.4 a4.4 4.4 0 1 0 .01 0 Z\" fill=\"#D5DBE1\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M54 2.4 a2.7 2.7 0 1 0 .01 0 Z\" fill=\"#D5DBE1\" stroke=\"#3B2E3A\" stroke-width=\"1.8\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20 15.4 L48.6 15.4 L47.6 22.6 L21 22.6 Z\" fill=\"#FFFFFF\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M20.6 22.2 L48 22.2 L47.6 26.4 L21 26.4 Z\" fill=\"#F78FA8\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M21.4 26 C21.4 31.6 26.599999999999998 31.6 26.599999999999998 26 M26.599999999999998 26 C26.599999999999998 31.6 31.799999999999997 31.6 31.799999999999997 26 M31.799999999999997 26 C31.799999999999997 31.6 37 31.6 37 26 M37 26 C37 31.6 42.2 31.6 42.2 26 M42.2 26 C42.2 31.6 47.400000000000006 31.6 47.400000000000006 26 \" fill=\"#FFFDF6\" stroke=\"#3B2E3A\" stroke-width=\"1.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M21 41 L47.6 41 L48.6 47.8 L20 47.8 Z\" fill=\"#FFFFFF\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M21 36.8 L47.6 36.8 L48 41.2 L20.6 41.2 Z\" fill=\"#F78FA8\" stroke=\"#3B2E3A\" stroke-width=\"2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M21.4 37.2 C21.4 31.6 26.599999999999998 31.6 26.599999999999998 37.2 M26.599999999999998 37.2 C26.599999999999998 31.6 31.799999999999997 31.6 31.799999999999997 37.2 M31.799999999999997 37.2 C31.799999999999997 31.6 37 31.6 37 37.2 M37 37.2 C37 31.6 42.2 31.6 42.2 37.2 M42.2 37.2 C42.2 31.6 47.400000000000006 31.6 47.400000000000006 37.2 \" fill=\"#FFFDF6\" stroke=\"#3B2E3A\" stroke-width=\"1.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>"},"perio":{"label":"A periodontal probe in the pocket at a molar's gumline","body":"<path d=\"M10.4 25.6 C8.6 18.2 11.6 11 17.8 10.4 C21 10.1 22.4 13 24.4 13 C26.4 13 27.8 10.1 31 10.4 C37.2 11 40.2 18.2 38.4 25.6 C37.4 29.8 35.9 33 35.6 37.4 L35 56 L14 56 L13.2 37.4 C12.9 33 11.4 29.8 10.4 25.6 Z\" fill=\"#FFFDF6\"/><path d=\"M31.4 11.4 C36.6 12.6 39 18.8 37.4 25.4 C36.4 29.6 34.9 33 34.6 37.4 L34.2 54 L30.6 54 C32.4 41 35.4 24 31.4 11.4 Z\" fill=\"#E9DFCC\"/><path d=\"M10.4 25.6 C8.6 18.2 11.6 11 17.8 10.4 C21 10.1 22.4 13 24.4 13 C26.4 13 27.8 10.1 31 10.4 C37.2 11 40.2 18.2 38.4 25.6 C37.4 29.8 35.9 33 35.6 37.4 L35 56 L14 56 L13.2 37.4 C12.9 33 11.4 29.8 10.4 25.6 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M24.4 13.4 V17.4\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M13.2 22.6 C12.9 18.4 14.6 14.9 17.4 13.6\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M60 4.5 L48.5 16\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"7.800000000000001\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M60 4.5 L48.5 16\" fill=\"none\" stroke=\"#b4466f\" stroke-width=\"5.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M57.2 5.9 L50.6 12.4\" stroke=\"#fff\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M48.5 16 L42.2 22.2 L39.4 45\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"4.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M48.5 16 L42.2 22.2 L39.4 45\" fill=\"none\" stroke=\"#D5DBE1\" stroke-width=\"1.9\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M41.4 27.6 L41.1 30.2 M40.8 32.6 L40.5 35.2 M40.2 37.6 L39.9 40.2\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M4.5 41 C5 36.5 8 33.4 10.8 33.6 C13.5 37.2 18.5 39.6 24.4 39.6 C30.4 39.6 35.2 37.2 38 33.6 C41 33.4 44.4 36.4 45 41 C46 49 41 57.5 24.6 57.5 C8.5 57.5 3.6 49 4.5 41 Z\" fill=\"#F78FA8\"/><path d=\"M9 52 C16 55.6 33 55.8 41 51 C39 55 33 57 24.6 57 C15 57 10.4 54.8 9 52 Z\" fill=\"#E07090\"/><path d=\"M4.5 41 C5 36.5 8 33.4 10.8 33.6 C13.5 37.2 18.5 39.6 24.4 39.6 C30.4 39.6 35.2 37.2 38 33.6 C41 33.4 44.4 36.4 45 41 C46 49 41 57.5 24.6 57.5 C8.5 57.5 3.6 49 4.5 41 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M8 41 C8.6 38.6 9.6 37 10.8 36.6\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M40.6 33 C41.4 34.6 42.4 35.6 42.4 36.6 C42.4 37.6 41.6 38.3 40.6 38.3 C39.6 38.3 38.8 37.6 38.8 36.6 C38.8 35.6 39.8 34.6 40.6 33 Z\" fill=\"#E5484D\" stroke=\"#3B2E3A\" stroke-width=\"1.3\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>"},"pcd-implants-exam1":{"label":"An implant: crown, abutment and threaded fixture in gum and bone","body":"<path d=\"M6 36 C14 33.5 50 33.5 58 36 L58 52 C58 56 55.5 58 51.5 58 L12.5 58 C8.5 58 6 56 6 52 Z\" fill=\"#E9DFCC\"/><path d=\"M7 51 L57 51 L57 52 C57 55.4 55 57 51.5 57 L12.5 57 C9 57 7 55.4 7 52 Z\" fill=\"#D7C8AA\"/><path d=\"M6 36 C14 33.5 50 33.5 58 36 L58 52 C58 56 55.5 58 51.5 58 L12.5 58 C8.5 58 6 56 6 52 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><g fill=\"#8A5A3A\" opacity=\".35\"><circle cx=\"12\" cy=\"42\" r=\"1.3\"/><circle cx=\"17\" cy=\"48\" r=\"1\"/><circle cx=\"11\" cy=\"52\" r=\".9\"/><circle cx=\"48\" cy=\"41.5\" r=\"1.1\"/><circle cx=\"53\" cy=\"47\" r=\"1.3\"/><circle cx=\"46\" cy=\"52\" r=\".9\"/><circle cx=\"19.5\" cy=\"39.5\" r=\".8\"/><circle cx=\"44\" cy=\"46\" r=\".8\"/></g><path d=\"M25 34.6 L39 34.6 L38 50 C37.6 54 35.2 56.6 32 56.6 C28.8 56.6 26.4 54 26 50 Z\" fill=\"#6FA9BB\"/><path d=\"M35.6 35.4 L38.2 35.4 L37.3 50 C37 53.4 35.4 55.4 33.6 55.8 C35.4 52 35.8 44 35.6 35.4 Z\" fill=\"#2f6f84\"/><path d=\"M25 34.6 L39 34.6 L38 50 C37.6 54 35.2 56.6 32 56.6 C28.8 56.6 26.4 54 26 50 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M24.1 39.3 L39.9 37.5 M24.4 42.6 L39.6 40.8 M24.6 45.9 L39.4 44.1 M24.9 49.2 L39.1 47.4 M25.1 52.5 L38.9 50.7\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M28 37.2 L28.4 47\" stroke=\"#fff\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M6 34.6 C10 28.6 18 28 24 31.4 C28 33.2 36 33.2 40 31.4 C46 28 54 28.6 58 34.6 C58 37 55 38.2 50 37.6 C40 36.4 24 36.4 14 37.6 C9 38.2 6 37 6 34.6 Z\" fill=\"#F78FA8\"/><path d=\"M10 36.2 C20 35 44 35 54 36.2 C50 37.2 44 36.6 32 36.4 C20 36.6 14 37.2 10 36.2 Z\" fill=\"#E07090\"/><path d=\"M6 34.6 C10 28.6 18 28 24 31.4 C28 33.2 36 33.2 40 31.4 C46 28 54 28.6 58 34.6 C58 37 55 38.2 50 37.6 C40 36.4 24 36.4 14 37.6 C9 38.2 6 37 6 34.6 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M27.4 23.5 L36.6 23.5 L37.6 35.2 L26.4 35.2 Z\" fill=\"#D5DBE1\"/><path d=\"M34.6 24.2 L35.9 24.2 L36.8 34.6 L35.4 34.6 Z\" fill=\"#8E98A3\"/><path d=\"M27.4 23.5 L36.6 23.5 L37.6 35.2 L26.4 35.2 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M21 19.5 C19 12 22 6 27 5.5 C29.6 5.2 30.6 7.6 32 7.6 C33.4 7.6 34.4 5.2 37 5.5 C42 6 45 12 43 19.5 C42.2 23 39.6 25 36.4 25 L27.6 25 C24.4 25 21.8 23 21 19.5 Z\" fill=\"#FFFDF6\"/><path d=\"M37.6 6.6 C42 7.6 44 13 42.2 19.4 C41.4 22.4 39.4 24 36.6 24.2 C39.4 19 40 12 37.6 6.6 Z\" fill=\"#E9DFCC\"/><path d=\"M21 19.5 C19 12 22 6 27 5.5 C29.6 5.2 30.6 7.6 32 7.6 C33.4 7.6 34.4 5.2 37 5.5 C42 6 45 12 43 19.5 C42.2 23 39.6 25 36.4 25 L27.6 25 C24.4 25 21.8 23 21 19.5 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M23.6 16 C23.4 11.4 24.8 8.6 27.2 8\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/>"},"heme-endo-exam2":{"label":"The thyroid gland on the trachea, with a drop of blood","body":"<path d=\"M26 6.5 Q26 5 27.5 5 L36.5 5 Q38 5 38 6.5 L38 58 Q38 59.5 36.5 59.5 L27.5 59.5 Q26 59.5 26 58 Z\" fill=\"#FFFFFF\"/><path d=\"M35 6 L37 6 L37 58.5 L35 58.5 Z\" fill=\"#ECE6EA\"/><path d=\"M26 6.5 Q26 5 27.5 5 L36.5 5 Q38 5 38 6.5 L38 58 Q38 59.5 36.5 59.5 L27.5 59.5 Q26 59.5 26 58 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M26.4 10.0 C29 11.6 35 11.6 37.6 10.0 M26.4 15.2 C29 16.8 35 16.8 37.6 15.2 M26.4 20.4 C29 22.0 35 22.0 37.6 20.4 M26.4 25.6 C29 27.2 35 27.2 37.6 25.6 M26.4 30.8 C29 32.4 35 32.4 37.6 30.8 M26.4 36.0 C29 37.6 35 37.6 37.6 36.0 M26.4 41.2 C29 42.8 35 42.8 37.6 41.2 M26.4 46.4 C29 48.0 35 48.0 37.6 46.4 M26.4 51.6 C29 53.2 35 53.2 37.6 51.6\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"0.55\"/><path d=\"M32 37.4 C28 37.4 25.6 35 24 31 C22 25 20 15.6 16 16 C11 16.5 8 27 8 37 C8 46 9.6 53 14 53.5 C19 54 23 48 25.5 45 C27.5 44 30 45.4 32 45.4 C34 45.4 36.5 44 38.5 45 C41 48 45 54 50 53.5 C54.4 53 56 46 56 37 C56 27 53 16.5 48 16 C44 15.6 42 25 40 31 C38.4 35 36 37.4 32 37.4 Z\" fill=\"#D86F6F\"/><path d=\"M44.6 30 C46 38 49 48 53.6 50.2 C52.4 52.6 51.2 53.4 50 53.5 C45 54 41 48 38.5 45 C37.8 44.6 37 44.6 36.4 44.8 C41.4 41 44 36 44.6 30 Z M13.6 50.6 C17.6 50 22 46 25.4 41.6 C26.2 43 26 44.2 25.5 45 C23 48 19 54 14 53.5 C13 53.4 12.2 52.6 11.6 51.6 Z\" fill=\"#a83232\"/><path d=\"M32 37.4 C28 37.4 25.6 35 24 31 C22 25 20 15.6 16 16 C11 16.5 8 27 8 37 C8 46 9.6 53 14 53.5 C19 54 23 48 25.5 45 C27.5 44 30 45.4 32 45.4 C34 45.4 36.5 44 38.5 45 C41 48 45 54 50 53.5 C54.4 53 56 46 56 37 C56 27 53 16.5 48 16 C44 15.6 42 25 40 31 C38.4 35 36 37.4 32 37.4 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M11.6 36 C11.6 29 13.2 22 15.6 19.8\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M44.8 22.4 C46 20 47 19.4 48 19.6\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M27 41.2 C30 42.4 34 42.4 37 41.2\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"0.4\"/><path d=\"M54.5 3.5 C56.6 7.4 59.6 10 59.6 12.8 C59.6 15.7 57.4 17.6 54.5 17.6 C51.6 17.6 49.4 15.7 49.4 12.8 C49.4 10 52.4 7.4 54.5 3.5 Z\" fill=\"#E5484D\"/><path d=\"M57.2 9.8 C58.6 11 59 12 59 12.8 C59 15.3 57.2 17 54.8 17 C57 15.4 57.8 12.8 57.2 9.8 Z\" fill=\"#a83232\"/><path d=\"M54.5 3.5 C56.6 7.4 59.6 10 59.6 12.8 C59.6 15.7 57.4 17.6 54.5 17.6 C51.6 17.6 49.4 15.7 49.4 12.8 C49.4 10 52.4 7.4 54.5 3.5 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M51.6 12.6 C51.6 11.2 52.2 10.2 53 9.4\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/>"},"heme-endo-exam3":{"label":"The thyroid gland on the trachea, with a drop of blood","body":"<path d=\"M26 6.5 Q26 5 27.5 5 L36.5 5 Q38 5 38 6.5 L38 58 Q38 59.5 36.5 59.5 L27.5 59.5 Q26 59.5 26 58 Z\" fill=\"#FFFFFF\"/><path d=\"M35 6 L37 6 L37 58.5 L35 58.5 Z\" fill=\"#ECE6EA\"/><path d=\"M26 6.5 Q26 5 27.5 5 L36.5 5 Q38 5 38 6.5 L38 58 Q38 59.5 36.5 59.5 L27.5 59.5 Q26 59.5 26 58 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M26.4 10.0 C29 11.6 35 11.6 37.6 10.0 M26.4 15.2 C29 16.8 35 16.8 37.6 15.2 M26.4 20.4 C29 22.0 35 22.0 37.6 20.4 M26.4 25.6 C29 27.2 35 27.2 37.6 25.6 M26.4 30.8 C29 32.4 35 32.4 37.6 30.8 M26.4 36.0 C29 37.6 35 37.6 37.6 36.0 M26.4 41.2 C29 42.8 35 42.8 37.6 41.2 M26.4 46.4 C29 48.0 35 48.0 37.6 46.4 M26.4 51.6 C29 53.2 35 53.2 37.6 51.6\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"0.55\"/><path d=\"M32 37.4 C28 37.4 25.6 35 24 31 C22 25 20 15.6 16 16 C11 16.5 8 27 8 37 C8 46 9.6 53 14 53.5 C19 54 23 48 25.5 45 C27.5 44 30 45.4 32 45.4 C34 45.4 36.5 44 38.5 45 C41 48 45 54 50 53.5 C54.4 53 56 46 56 37 C56 27 53 16.5 48 16 C44 15.6 42 25 40 31 C38.4 35 36 37.4 32 37.4 Z\" fill=\"#D86F6F\"/><path d=\"M44.6 30 C46 38 49 48 53.6 50.2 C52.4 52.6 51.2 53.4 50 53.5 C45 54 41 48 38.5 45 C37.8 44.6 37 44.6 36.4 44.8 C41.4 41 44 36 44.6 30 Z M13.6 50.6 C17.6 50 22 46 25.4 41.6 C26.2 43 26 44.2 25.5 45 C23 48 19 54 14 53.5 C13 53.4 12.2 52.6 11.6 51.6 Z\" fill=\"#a83232\"/><path d=\"M32 37.4 C28 37.4 25.6 35 24 31 C22 25 20 15.6 16 16 C11 16.5 8 27 8 37 C8 46 9.6 53 14 53.5 C19 54 23 48 25.5 45 C27.5 44 30 45.4 32 45.4 C34 45.4 36.5 44 38.5 45 C41 48 45 54 50 53.5 C54.4 53 56 46 56 37 C56 27 53 16.5 48 16 C44 15.6 42 25 40 31 C38.4 35 36 37.4 32 37.4 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M11.6 36 C11.6 29 13.2 22 15.6 19.8\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M44.8 22.4 C46 20 47 19.4 48 19.6\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M27 41.2 C30 42.4 34 42.4 37 41.2\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"0.4\"/><path d=\"M54.5 3.5 C56.6 7.4 59.6 10 59.6 12.8 C59.6 15.7 57.4 17.6 54.5 17.6 C51.6 17.6 49.4 15.7 49.4 12.8 C49.4 10 52.4 7.4 54.5 3.5 Z\" fill=\"#E5484D\"/><path d=\"M57.2 9.8 C58.6 11 59 12 59 12.8 C59 15.3 57.2 17 54.8 17 C57 15.4 57.8 12.8 57.2 9.8 Z\" fill=\"#a83232\"/><path d=\"M54.5 3.5 C56.6 7.4 59.6 10 59.6 12.8 C59.6 15.7 57.4 17.6 54.5 17.6 C51.6 17.6 49.4 15.7 49.4 12.8 C49.4 10 52.4 7.4 54.5 3.5 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M51.6 12.6 C51.6 11.2 52.2 10.2 53 9.4\" stroke=\"#fff\" stroke-width=\"1.5\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/>"},"special-patient-care":{"label":"A molar cradled in a gloved hand","body":"<g transform=\"translate(0 -2.4)\"><path d=\"M27 18.8 C25.8 12.8 28.6 8.4 33 8.4 C35.4 8.4 36.2 10.4 37.4 10.4 C38.6 10.4 39.4 8.4 41.8 8.4 C46.2 8.4 49 12.8 47.8 18.8 C47.2 22.8 46.6 26 46.2 29.6 C45.8 34.8 45 40 43.4 43.6 C42.6 45.2 40.6 45.2 40.2 43.2 C39.6 39.6 39 36 37.4 35.2 C35.8 36 35.2 39.6 34.6 43.2 C34.2 45.2 32.2 45.2 31.4 43.6 C29.8 40 29 34.8 28.6 29.6 C28.2 26 27.6 22.8 27 18.8 Z\" fill=\"#FFFDF6\"/><path d=\"M43.8 9.6 C46.6 10.8 48.2 14.0 47.8 18.8 C47.2 22.8 46.6 26.0 46.2 29.6 C45.8 34.8 45.0 40.0 43.4 43.6 C42.6 45.2 41.0 44.8 40.6 42.8 C43.4 37.6 44.6 29.6 45.0 22.4 C45.4 16.8 45.0 12.4 43.8 9.6 Z\" fill=\"#E9DFCC\"/><path d=\"M27 18.8 C25.8 12.8 28.6 8.4 33 8.4 C35.4 8.4 36.2 10.4 37.4 10.4 C38.6 10.4 39.4 8.4 41.8 8.4 C46.2 8.4 49 12.8 47.8 18.8 C47.2 22.8 46.6 26 46.2 29.6 C45.8 34.8 45 40 43.4 43.6 C42.6 45.2 40.6 45.2 40.2 43.2 C39.6 39.6 39 36 37.4 35.2 C35.8 36 35.2 39.6 34.6 43.2 C34.2 45.2 32.2 45.2 31.4 43.6 C29.8 40 29 34.8 28.6 29.6 C28.2 26 27.6 22.8 27 18.8 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M29.8 16.0 C29.8 12.8 31.4 10.8 33.4 10.6\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M12 42.4 C20 44.8 30 45.2 40 44.8 C48 44.4 53.6 43 56.8 40.6 C59.4 38.8 61.2 40.8 60.4 43.6 C59.6 48.6 55.4 53.4 48 55.6 C40 57.8 28 58 20 56.8 L12.2 57.2 Z\" fill=\"#6DB58A\"/><path d=\"M60.2 45.4 C59 49.4 54.8 53.6 48 55.6 C40 57.8 28 58 20 56.8 L19.6 54.6 C28 55.8 40 55.6 47.4 53.6 C53.4 52 58 48.8 60.2 45.4 Z\" fill=\"#2e7d4f\"/><path d=\"M12 42.4 C20 44.8 30 45.2 40 44.8 C48 44.4 53.6 43 56.8 40.6 C59.4 38.8 61.2 40.8 60.4 43.6 C59.6 48.6 55.4 53.4 48 55.6 C40 57.8 28 58 20 56.8 L12.2 57.2 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M58.6 45.8 C54.8 48 49.4 49 44 49.2 M56.6 50.4 C52.6 52.2 47.4 53 42 53\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.4\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><path d=\"M14.8 47.4 C14 42.4 16 37.4 19.6 35.2 C22 33.8 24.8 35 24.6 37.6 C24.4 39.8 22.8 41.2 22.2 43.6 C21.8 45.4 22.2 46.6 22.8 47.8 Z\" fill=\"#6DB58A\"/><path d=\"M23.6 39.4 C22.6 40.8 22 42 21.6 43.6 C21.3 45 21.5 46.4 22 47.6 L22.8 47.8 C22.2 46.6 21.8 45.4 22.2 43.6 C22.6 41.8 23.4 40.6 23.6 39.4 Z\" fill=\"#2e7d4f\"/><path d=\"M14.8 47.4 C14 42.4 16 37.4 19.6 35.2 C22 33.8 24.8 35 24.6 37.6 C24.4 39.8 22.8 41.2 22.2 43.6 C21.8 45.4 22.2 46.6 22.8 47.8 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M17.4 43 C17.2 40.4 18 38.2 19.6 37\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M26 47.6 L38 47.8\" stroke=\"#fff\" stroke-width=\"1.6\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M5 40.6 L13.4 41.6 L13.4 58 L5 58.8 Z\" fill=\"#2e7d4f\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M8.6 44 L8.6 54.6\" stroke=\"#fff\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/></g>"},"generic":{"label":"A molar standing on an open book","body":"<path d=\"M3.5 42 L3.5 55 C14 52.4 25 52.6 32 57.4 C39 52.6 50 52.4 60.5 55 L60.5 42 C50 40 39 40.4 32 44 C25 40.4 14 40 3.5 42 Z\" fill=\"#6B5A68\"/><path d=\"M4.5 53.6 C14 51.2 25 51.4 32 56 L32 57 C25 52.6 14 52.4 4.5 54.6 Z\" fill=\"#4F424C\"/><path d=\"M3.5 42 L3.5 55 C14 52.4 25 52.6 32 57.4 C39 52.6 50 52.4 60.5 55 L60.5 42 C50 40 39 40.4 32 44 C25 40.4 14 40 3.5 42 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.4\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 41.6 C25.4 37.4 14 37 6 39.4 L6 52.4 C14 50 25.4 50.4 32 54.4 Z\" fill=\"#FFFFFF\"/><path d=\"M6 49.6 C14 47.4 25.4 47.8 32 51.6 L32 54.4 C25.4 50.4 14 50 6 52.4 Z\" fill=\"#ECE6EA\"/><path d=\"M32 41.6 C25.4 37.4 14 37 6 39.4 L6 52.4 C14 50 25.4 50.4 32 54.4 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M32 41.6 C38.6 37.4 50 37 58 39.4 L58 52.4 C50 50 38.6 50.4 32 54.4 Z\" fill=\"#FFFFFF\"/><path d=\"M58 49.6 C50 47.4 38.6 47.8 32 51.6 L32 54.4 C38.6 50.4 50 50 58 52.4 Z\" fill=\"#ECE6EA\"/><path d=\"M32 41.6 C38.6 37.4 50 37 58 39.4 L58 52.4 C50 50 38.6 50.4 32 54.4 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.2\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M10 43.4 C15 42.4 20 42.6 24.4 44 M10 47 C15 46 20 46.2 24.4 47.6 M39.6 44 C44 42.6 49 42.4 54 43.4 M39.6 47.6 C44 46.2 49 46 54 47\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"1.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" opacity=\"0.4\"/><path d=\"M20.82 13.78 C19.53 7.33 22.54 2.6 27.27 2.6 C29.85 2.6 30.71 4.75 32 4.75 C33.29 4.75 34.15 2.6 36.73 2.6 C41.46 2.6 44.47 7.33 43.18 13.78 C42.53 18.08 41.89 21.52 41.46 25.39 C41.03 30.98 40.17 36.57 38.45 40.44 C37.59 42.16 35.44 42.16 35.01 40.01 C34.37 36.14 33.72 32.27 32 31.41 C30.28 32.27 29.64 36.14 28.99 40.01 C28.56 42.16 26.41 42.16 25.55 40.44 C23.83 36.57 22.97 30.98 22.54 25.39 C22.11 21.52 21.46 18.08 20.82 13.78 Z\" fill=\"#FFFDF6\"/><path d=\"M38.9 3.9 C41.9 5.2 43.6 8.6 43.2 13.8 C42.5 18.1 41.9 21.5 41.5 25.4 C41.0 31.0 40.2 36.6 38.5 40.4 C37.6 42.2 35.9 41.7 35.4 39.6 C38.5 34.0 39.7 25.4 40.2 17.6 C40.6 11.6 40.2 6.9 38.9 3.9 Z\" fill=\"#E9DFCC\"/><path d=\"M20.82 13.78 C19.53 7.33 22.54 2.6 27.27 2.6 C29.85 2.6 30.71 4.75 32 4.75 C33.29 4.75 34.15 2.6 36.73 2.6 C41.46 2.6 44.47 7.33 43.18 13.78 C42.53 18.08 41.89 21.52 41.46 25.39 C41.03 30.98 40.17 36.57 38.45 40.44 C37.59 42.16 35.44 42.16 35.01 40.01 C34.37 36.14 33.72 32.27 32 31.41 C30.28 32.27 29.64 36.14 28.99 40.01 C28.56 42.16 26.41 42.16 25.55 40.44 C23.83 36.57 22.97 30.98 22.54 25.39 C22.11 21.52 21.46 18.08 20.82 13.78 Z\" fill=\"none\" stroke=\"#3B2E3A\" stroke-width=\"2.5\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/><path d=\"M23.8 10.8 C23.8 7.3 25.6 5.2 27.7 5.0\" stroke=\"#fff\" stroke-width=\"2\" stroke-linecap=\"round\" fill=\"none\" opacity=\".6\"/><path d=\"M53 5.6 C53.6 9.2 54.4 10 58 10.6 C54.4 11.2 53.6 12 53 15.6 C52.4 12 51.6 11.2 48 10.6 C51.6 10 52.4 9.2 53 5.6 Z\" fill=\"#FFE27A\" stroke=\"#3B2E3A\" stroke-width=\"1.6\" stroke-linejoin=\"round\" stroke-linecap=\"round\"/>"}}};
 ;
 /* ---- widget/archive.js ---- */
 (function(root){
@@ -452,10 +452,11 @@ function paintStill(){ document.documentElement.classList.toggle("hx-still", sti
 paintStill(); document.addEventListener("sh:pref", paintStill);
 function roomReady(){ return !!(CA && CA.room && window.shPet && window.shPet.art && !focusOn()); }
 function hashOf(k){ var h = 0; k = String(k); for (var i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) | 0; return Math.abs(h); }
-var outfitsAsked = false;
-function wantOutfits(){
-if (outfitsAsked) return; outfitsAsked = true;
-var el = document.createElement("script"); el.src = WIDGET + "hub-art/outfits.js"; el.async = true;
+var outfitsAsked = {};
+function wantOutfits(set){
+var file = set ? "outfits/" + set + ".js" : "outfits.js";
+if (outfitsAsked[file]) return; outfitsAsked[file] = 1;
+var el = document.createElement("script"); el.src = WIDGET + "hub-art/" + file; el.async = true;
 el.onload = function(){ rm = null; syncRoom(); paintBoard(); };
 document.head.appendChild(el);
 }
@@ -466,6 +467,7 @@ svg = P.art({ hp: 100, mood: mood || "happy", hat: "" }, 200);
 if (fit && fit.indexOf(":") < 0) {
 if (O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
 else if (!O) wantOutfits();
+else if (O.where && O.where[fit] && !(O.got && O.got[O.where[fit]])) wantOutfits(O.where[fit]);
 }
 return String(svg).replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
 }
@@ -545,6 +547,7 @@ setTimeout(function(){ if (rm === my) doorOpen(-1); }, leaving ? total + 200 : 7
 el.animate(frames, { duration: total, easing: "linear", fill: "forwards" }).onfinish = function(){ el.remove(); if (done) done(); };
 }, (n || 0) * 450);
 }
+function roomResting(){ var n = $("now"); return !!n && (n.classList.contains("is-rest") || n.classList.contains("is-away")); }
 function arrive(p, i, quiet, n){
 function sit(){
 var el = seatEl(i); if (!rm || rm.at[p.key] !== i || !el) return;
@@ -553,13 +556,13 @@ q(".rm-tim", el).innerHTML = seated(p); q(".rm-desk", el).innerHTML = CA.room.de
 if (!quiet && q(".rm-tim", el).animate) q(".rm-tim", el).animate([{ transform: "translateY(-4px) scale(.96, 1.06)" }, { transform: "translateY(1px) scale(1.05, .94)" }, { transform: "none" }], { duration: 340, easing: "ease-out" });
 paintMe();
 }
-if (quiet) sit(); else walk(p.fit, i, false, n, sit);
+if (quiet || roomResting()) sit(); else walk(p.fit, i, false, n, sit);
 }
 function depart(i, quiet, n){
 var el = seatEl(i); if (!el) return;
 var tim = q(".rm-tim", el), was = !!tim.firstChild, fit = cleanFit(el.getAttribute("data-fit"));
 tim.innerHTML = ""; el.setAttribute("data-fit", ""); q(".rm-desk", el).innerHTML = CA.room.desk(null, null);
-if (!quiet && was) walk(fit, i, true, n, null);
+if (!quiet && was && !roomResting()) walk(fit, i, true, n, null);
 }
 function syncRoom(){
 var now = $("now"), host = $("room"); if (!now || !host) return;
@@ -645,7 +648,7 @@ trackHTML(hub, x, d) +
 '<div class="dx-card dx-about"><h3>' + esc(hub.title) + "</h3>" +
 (others.length ? '<ul class="dx-exams">' + others.map(function(e){ var dd = daysUntil(e.date); return "<li><b>" + esc(e.label || "Exam") + "</b> " + esc(shortDate(e.date)) + " · " + (dd < 0 ? "done" : esc(daysText(dd))) + "</li>"; }).join("") + "</ul>" : "") +
 '<p class="dx-desc clamp" id="hubDesc">' + esc(hub.desc || "") + '</p><button class="btn btn-text dx-more" type="button" data-more aria-expanded="false">Read more</button>' +
-'<p class="note updated" data-updated="' + esc(hub.updated || "") + '" data-hub="' + esc(hub.id) + '">' + (hub.updated ? "Updated " + esc(relDay(parseYmd(hub.updated))) : "") + "</p>" +
+'<details class="dx-news is-empty" data-news="' + esc(hub.id) + '"><summary tabindex="-1"><span class="note updated" data-updated="' + esc(hub.updated || "") + '" data-hub="' + esc(hub.id) + '">' + (hub.updated ? "Updated " + esc(relDay(parseYmd(hub.updated))) : "") + '</span><span class="dx-news-cta">What\'s new' + icon("chevron", 16) + '</span></summary><ul class="dx-news-list"></ul></details>' +
 "</div>" +
 "</div>" +
 (checks ? '<div class="dx-checks">' + checks + "</div>" : "");
@@ -710,6 +713,140 @@ localStorage.setItem("sh_visitor_id", VISITOR);
 }catch(e){}
 return VISITOR;
 }
+var FORM_XP = 1000, FORM_CROWNS = 1000;
+function coinSvg(px){ return '<svg class="survey-coin" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + SHOP_COIN + "</svg>"; }
+function starSvg(px){ return '<svg class="survey-star" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" aria-hidden="true" focusable="false"><path d="M12 2.6 L14.4 9.6 L21.4 12 L14.4 14.4 L12 21.4 L9.6 14.4 L2.6 12 L9.6 9.6 Z" fill="#F2C94C" stroke="#3B2E3A" stroke-width="2" stroke-linejoin="round"/></svg>'; }
+function lootHtml(lead, xp, crowns){
+return '<div class="survey-loot"><p class="survey-loot-lead">' + lead + '</p><p class="survey-tiles">' +
+'<span class="survey-tile is-xp">' + starSvg(30) + '<span><b class="num">+' + num(xp) + "</b><small>XP</small></span></span>" +
+'<span class="sr"> and </span><span class="survey-tile is-crowns">' + coinSvg(30) + '<span><b class="num">+' + num(crowns) + "</b><small>Shiny Gold Crowns</small></span></span></p></div>";
+}
+function thanksHtml(title, text){ return '<div class="survey-done" role="status"><h3>' + title + '</h3><p class="survey-thanks">' + text + "</p></div>"; }
+function celebrate(W, r, text, extra, sb){
+var calm = still(), bits = "", COLORS = ["#F2C94C", "#FF8FA3", "#7FD8A8", "#8FA6EC", "#C3A9F0", "#F7A83C"], flown = false;
+if (!calm) for (var i = 0; i < 28; i++) {
+var ang = (-90 + (Math.random() * 160 - 80)) * Math.PI / 180, dist = 150 + Math.random() * 190, art = i % 4 === 0 ? coinSvg(22) : i % 4 === 1 ? starSvg(18) : "";
+bits += '<i class="' + (art ? "is-art" : "is-bit") + '" style="--x:' + Math.round(Math.cos(ang) * dist) + "px;--up:" + Math.round(Math.sin(ang) * dist * .8) + "px;--fall:" +
+Math.round(240 + Math.random() * 260) + "px;--r:" + Math.round(Math.random() * 900 - 450) + "deg;--d:" + Math.round(80 + Math.random() * 380) + "ms;--t:" +
+Math.round(1500 + Math.random() * 900) + "ms;--c:" + COLORS[i % COLORS.length] + '">' + art + "</i>";
+}
+W.set('<div class="survey-done survey-cele" role="status"><span class="sr">You earned ' + num(r.xp) + " XP and " + num(r.crowns) + " Shiny Gold Crowns. Thank you!</span>" +
+'<span class="survey-raysbox" aria-hidden="true"><span class="survey-rays"></span></span>' +
+'<span class="survey-wave" aria-hidden="true"></span><span class="survey-confetti" aria-hidden="true">' + bits + "</span>" +
+'<h3 aria-hidden="true">Thank you!</h3><p class="survey-cele-lead" aria-hidden="true">You earned</p>' +
+'<div class="survey-bigs" aria-hidden="true">' +
+'<span class="survey-big is-xp">' + starSvg(46) + '<b class="num" data-to="' + r.xp + '">+' + num(r.xp) + "</b><small>XP</small></span>" +
+'<span class="survey-big is-crowns">' + coinSvg(46) + '<b class="num" data-to="' + r.crowns + '">+' + num(r.crowns) + "</b><small>Shiny Gold Crowns</small></span></div>" +
+'<p class="survey-thanks">' + text + "</p>" + (extra || "") +
+'<button type="button" class="btn btn-primary survey-collect">' + coinSvg(20) + "Collect</button></div>");
+W.say("Ka-ching! You earned it!"); W.cheer();
+var btn = q(".survey-collect", W.body);
+try { btn.focus({ preventScroll: true }); } catch (e) {}
+btn.addEventListener("click", function(){ W.close(); });
+if (!calm && window.requestAnimationFrame) Array.prototype.forEach.call(W.body.querySelectorAll(".survey-big b"), function(b, k){
+var to = +b.getAttribute("data-to") || 0, t0 = null, wait = 420 + k * 200, dur = 1200;
+b.textContent = "+0";
+function step(ts){
+if (!b.isConnected) return;
+if (t0 == null) t0 = ts;
+var x = Math.min(1, Math.max(0, (ts - t0 - wait) / dur)), e = 1 - Math.pow(1 - x, 3);
+b.textContent = "+" + num(Math.round(to * e));
+if (x < 1) requestAnimationFrame(step);
+}
+requestAnimationFrame(step);
+});
+W.closed = function(){
+if (flown) return; flown = true;
+var tgt = document.getElementById("dxRank"), tr = tgt && !tgt.hidden && tgt.getBoundingClientRect(), icons = W.body.querySelectorAll(".survey-big > svg"), land = 0;
+if (!calm && tr && tr.width && icons.length === 2 && document.body.animate) {
+for (var i = 0; i < 12; i++) (function(i){
+var src = icons[i % 2], sr = src.getBoundingClientRect(), f = document.createElement("span");
+f.className = "survey-flyer"; f.setAttribute("aria-hidden", "true"); f.innerHTML = src.outerHTML;
+f.style.left = sr.left + "px"; f.style.top = sr.top + "px"; f.style.width = sr.width + "px"; f.style.height = sr.height + "px";
+root.appendChild(f);
+var dx = tr.left + tr.width / 2 - (sr.left + sr.width / 2), dy = tr.top + tr.height / 2 - (sr.top + sr.height / 2),
+mx = dx * .35 + (Math.random() * 160 - 80), my = Math.min(0, dy) * .45 - 60 - Math.random() * 80, ms = 760 + i * 30, delay = i * 60;
+land = Math.max(land, ms + delay);
+f.animate([{ transform: "translate(0,0) scale(.6) rotate(0deg)", opacity: 0 }, { transform: "translate(" + mx + "px," + my + "px) scale(1.1) rotate(" + (i % 2 ? 200 : -200) + "deg)", opacity: 1, offset: .45 },
+{ transform: "translate(" + dx + "px," + dy + "px) scale(.3) rotate(" + (i % 2 ? 360 : -360) + "deg)", opacity: .9 }],
+{ duration: ms, delay: delay, easing: "cubic-bezier(.45,0,.6,1)", fill: "both" }).onfinish = function(){ f.remove(); };
+})(i);
+setTimeout(function(){ tgt.classList.remove("is-gain"); void tgt.offsetWidth; tgt.classList.add("is-gain"); setTimeout(function(){ tgt.classList.remove("is-gain"); }, 1300); }, Math.min(land, 900));
+}
+setTimeout(function(){ rewardPaid(sb, r); }, land + 150);
+};
+W.timer(function(){ W.close(); }, 12000);
+}
+var PEEK_HANDS = '<svg class="survey-hands" viewBox="0 -30 200 262" aria-hidden="true" focusable="false">' +
+'<g fill="#FBF7EE" stroke="#3B2E3A" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">' +
+'<path d="M19 124 C18 116 25 110 34 110 C43 110 50 116 49 124 C49 129 47 133 43 133 C41 135 37 135 35 133 C33 135 29 135 27 133 C23 133 19 129 19 124 Z"/>' +
+'<path d="M181 124 C182 116 175 110 166 110 C157 110 150 116 151 124 C151 129 153 133 157 133 C159 135 163 135 165 133 C167 135 171 135 173 133 C177 133 181 129 181 124 Z"/></g>' +
+'<g fill="none" stroke="#3B2E3A" stroke-width="2.6" stroke-linecap="round"><path d="M27.5 126 V132 M35 126 V132.5 M42.5 126 V132 M172.5 126 V132 M165 126 V132.5 M157.5 126 V132"/></g>' +
+'<g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".9"><path d="M26 117 C28 114 31 113 34 113 M174 117 C172 114 169 113 166 113"/></g></svg>';
+function peekHtml(){
+var P = window.shPet, t = "";
+if (!P || !P.art || focusOn() || ls("sh_pref_pet") === "off") return "";
+try { t = String(P.art({ hp: 100, mood: "happy" }, 200)); } catch (e) { return ""; }
+return '<div class="survey-peek" aria-hidden="true"><div class="survey-tim"><div class="survey-timin">' + t + "</div></div>" + PEEK_HANDS + "</div>" +
+'<p class="survey-say" aria-hidden="true"></p>';
+}
+var formNow = null;
+function whenUncovered(fn, n){
+n = n || 0;
+if (!lifeCovered()) { fn(); return; }
+if (n < 200) setTimeout(function(){ whenUncovered(fn, n + 1); }, 1500);
+}
+function formWindow(o){
+if (formNow) formNow.close(true);
+var back = document.activeElement, peek = peekHtml(), shut = false;
+var box = document.createElement("section");
+box.className = "survey" + (peek ? " has-peek" : "");
+box.innerHTML = '<div class="survey-win' + (o.hub ? " tinted" : " is-gold") + '" role="dialog" aria-modal="true" aria-label="' + esc(o.label) + '" tabindex="-1"' +
+(o.hub ? ' data-hub="' + esc(o.hub) + '" style="' + tintVars(o.hub) + '"' : "") + ">" + peek +
+'<div class="survey-bar">' + o.bar + '<button type="button" class="survey-x" aria-label="' + esc(o.closeLabel || "Close") + '">' + icon("close", 20) + "</button></div>" +
+'<div class="survey-body"></div></div>';
+root.appendChild(box);
+var win = q(".survey-win", box), body = q(".survey-body", box), bubble = q(".survey-say", box);
+function hold(){ if (!win.contains(document.activeElement)) try { win.focus({ preventScroll: true }); } catch (e) {} }
+function key(e){
+if (e.key === "Escape") { e.preventDefault(); o.dismiss(); return; }
+if (e.key !== "Tab") return;
+var f = Array.prototype.filter.call(win.querySelectorAll("button, textarea, input, select, a[href]"), function(el){ return !el.disabled && el.offsetParent !== null; });
+if (!f.length) { e.preventDefault(); return; }
+var at = document.activeElement;
+if (e.shiftKey && (at === f[0] || at === win || !win.contains(at))) { e.preventDefault(); f[f.length - 1].focus(); }
+else if (!e.shiftKey && (at === f[f.length - 1] || !win.contains(at))) { e.preventDefault(); f[0].focus(); }
+}
+document.addEventListener("keydown", key);
+box.addEventListener("click", function(e){ if (e.target === box || e.target.closest(".survey-x")) o.dismiss(); });
+requestAnimationFrame(function(){ box.classList.add("is-shown"); hold(); });
+var tmr = null;
+var W = {
+box: box, win: win, body: body, closed: null,
+timer: function(fn, ms){ clearTimeout(tmr); tmr = setTimeout(fn, ms); },
+set: function(html){ body.innerHTML = html; hold(); },
+say: function(t){
+if (!bubble || !t || bubble.textContent === t) return;
+var first = !bubble.textContent;
+bubble.textContent = t;
+if (first) return;
+bubble.classList.remove("is-new"); void bubble.offsetWidth; bubble.classList.add("is-new");
+},
+cheer: function(){ var p = q(".survey-peek", box); if (p) { p.classList.remove("is-cheer"); void p.offsetWidth; p.classList.add("is-cheer"); } },
+close: function(now){
+if (shut) return; shut = true;
+clearTimeout(tmr);
+if (formNow === W) formNow = null;
+if (W.closed) try { W.closed(); } catch (e) {}
+document.removeEventListener("keydown", key);
+if (now) box.remove();
+else { box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 320); }
+try { if (back && back.focus && back !== document.body && document.contains(back)) back.focus({ preventScroll: true }); } catch (e) {}
+}
+};
+formNow = W;
+return W;
+}
 var DEBRIEF_QS = [
 { id:"ready", kind:"scale", prompt:"How ready did you feel walking in?", ends:["Not ready","Very ready"] },
 { id:"went", kind:"choice", prompt:"How did it go?", options:["Better than I expected","About what I expected","Worse than I expected"] },
@@ -734,31 +871,45 @@ var best = null;
 HUBS.concat(ARCHIVED_HUBS).forEach(function(h){
 if (!readProgress(h)) return;
 pastExams(h, true).forEach(function(x){
-if (ls("sh_debrief_" + h.id + "_" + x.date)) return;
-if (!best || x.date > best.x.date) best = { h:h, x:x };
+var k = h.id + "_" + x.date, again = false;
+if (ls("sh_debrief_" + k)) {
+if (!x.askAgain || ls("sh_debrief_sent_" + k) || ls("sh_debrief_again_" + k + "_" + x.askAgain)) return;
+again = true;
+}
+if (!best || x.date > best.x.date) best = { h:h, x:x, again:again };
 });
 });
 if (!best) return false;
-openDebrief(best.h, best.x);
+if (best.again) lsSet("sh_debrief_again_" + best.h.id + "_" + best.x.date + "_" + best.x.askAgain, "1");
+openDebrief(best.h, best.x, best.again);
 return true;
 }
 function debriefQs(x){ var n = DEBRIEF_QS.length - 1; return DEBRIEF_QS.slice(0, n).concat(x.extraQs || [], DEBRIEF_QS.slice(n)); }
-function openDebrief(hub, x){
+function openDebrief(hub, x, again){
 var me = surveyVisitor();
 if (!me) return;
 lsSet("sh_debrief_" + hub.id + "_" + x.date, "1");
-var old = document.querySelector(".survey"); if (old) old.remove();
 var QS = debriefQs(x), answers = {}, examId = x.date + " " + (x.label || "Exam"), step = 0, last = QS.length - 1, timer = null;
+var pays = !ls("sh_debrief_sent_" + hub.id + "_" + x.date);
 var ideaTick = null, ideaPost = {};
-var box = document.createElement("section");
-box.className = "survey debrief"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Exam check-in");
-root.appendChild(box);
+var W = formWindow({ label: "Exam check-in", hub: hub.id, dismiss: function(){ close(); },
+bar: emblem(hub.id, "survey-emb") + '<span class="survey-title"><b>Exam check-in</b><small>' + esc(x.name || hub.title) + "</small></span>" });
+var box = W.box;
+function line(q){
+if (step === last) return pays ? "Last one! Send it and the crowns are yours." : "Last one. What could I do better?";
+if (step === 0) return pays ? (again ? "Me again! " : "Psst! ") + "A few quick taps and " + num(FORM_CROWNS) + " crowns are yours." : "Back again? I'm all ears.";
+if (q.id === "went") return "So? How did it go?";
+if (q.id === "match") return "Did my questions look like the real thing?";
+return pays ? "Almost there. The crowns are close!" : "Almost there!";
+}
 function render(){
-var q = QS[step], v = answers[q.id], h = '<button type="button" class="survey-x" aria-label="Close">×</button>' +
-'<div class="survey-eyebrow">Exam check-in · ' + (step + 1) + ' of ' + QS.length + '</div>' +
-'<div class="debrief-steps" aria-hidden="true">' + QS.map(function(_, i){ return '<i' + (i <= step ? ' class="on"' : '') + '></i>'; }).join("") + '</div>';
+var q = QS[step], v = answers[q.id];
+var h = '<div class="survey-prog"><span class="survey-count">Question ' + (step + 1) + " of " + QS.length + "</span>" +
+'<span class="survey-meter" aria-hidden="true">' + QS.map(function(_, i){ return "<i" + (i <= step ? ' class="on"' : "") + "></i>"; }).join("") + "</span>" +
+(pays ? '<span class="survey-prize' + (step === last ? " is-near" : "") + '" aria-hidden="true">' + coinSvg(20) + "</span>" : "") + "</div>";
 if (step === 0) h += '<h3>How did ' + esc(x.name || hub.title) + ' go?</h3>' +
-'<p class="survey-why">What you say here, along with how everyone used the hub, goes to the AI that builds these hubs, so the ones for your next exams come out better.</p>';
+'<p class="survey-why">What you say here, along with how everyone used the hub, goes to the AI that builds these hubs, so the ones for your next exams come out better.</p>' +
+(pays ? lootHtml("Send it and earn", FORM_XP, FORM_CROWNS) : "");
 h += '<div class="survey-q" data-sq="' + q.id + '" data-kind="' + q.kind + '"><p' + (step ? ' class="debrief-prompt"' : '') + '>' + esc(q.prompt) + '</p>';
 if (q.kind === "text") h += (q.note ? '<p class="survey-why">' + esc(q.note) + '</p>' : '') +
 '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '" placeholder="e.g. more on suture types, more EXCEPT questions">' + esc(v || "") + '</textarea>' +
@@ -773,7 +924,8 @@ else h += '<div class="survey-opts debrief-list">' + q.options.map(function(o){ 
 h += '</div><div class="survey-foot"><button type="button" class="survey-skip" data-act="' + (step ? 'back' : 'close') + '">' + (step ? 'Back' : 'Not now') + '</button>';
 if (step < last) h += '<button type="button" class="btn ' + (v != null ? 'btn-primary' : 'btn-quiet') + '" data-act="next">' + (v != null ? 'Next' : 'Skip') + '</button>';
 else h += '<button type="button" class="btn btn-primary survey-send" data-act="send">Send</button>';
-box.innerHTML = h + '</div>';
+W.set(h + '</div>');
+W.say(line(q));
 var th = box.querySelector("[data-idea-tick]");
 ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: LEGACY[hub.id] ? null : hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
 refresh();
@@ -785,9 +937,8 @@ if (t){ var v = t.value.trim(); if (v) answers.missed = v.slice(0, 600); else de
 if (send) send.disabled = !Object.keys(answers).length;
 }
 function go(n){ clearTimeout(timer); step = Math.max(0, Math.min(last, n)); render(); }
-function close(){ clearTimeout(timer); box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }
+function close(){ clearTimeout(timer); W.close(); }
 render();
-requestAnimationFrame(function(){ box.classList.add("is-shown"); });
 box.addEventListener("input", refresh);
 box.addEventListener("click", function(e){
 var opt = e.target.closest(".survey-opt");
@@ -810,7 +961,6 @@ clearTimeout(timer);
 if (on) timer = setTimeout(function(){ go(step + 1); }, 320); else render();
 return;
 }
-if (e.target.closest(".survey-x")) { close(); return; }
 var act = e.target.closest("[data-act]"); if (!act) return;
 var a = act.getAttribute("data-act");
 if (a === "close") close();
@@ -818,22 +968,31 @@ else if (a === "back") go(step - 1);
 else if (a === "next") go(step + 1);
 else if (a === "send" && !act.disabled){
 refresh();
-var thanks = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>Thank you!</b> Thought of something else? Check in again any time from the hub on this page.</p>';
-var failed = '<div class="survey-eyebrow">Exam check-in</div><p class="survey-thanks"><b>That didn\'t save.</b> Please try again in a minute from the hub on this page.</p>';
 var tk = ideaTick, toBoard = !!(tk && tk.on()), warn = box.querySelector(".debrief-warn");
 if (toBoard) { var bad = tk.check(); if (bad) { if (warn) warn.textContent = bad; return; } }
 else if (tk && tk.shown() && answers.missed) track("ideas:checkin-private");
 act.disabled = true;
-if (!debriefSb) { box.innerHTML = failed; setTimeout(close, 4000); return; }
-debriefSb.rpc("submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
-if (r.error || r.data !== true) { box.innerHTML = failed; setTimeout(close, 4000); return; }
+var failed = function(){
+W.set(thanksHtml("That didn't save.", "Please try again in a minute from the hub on this page."));
+W.say("Uh oh. Try me again in a minute?");
+setTimeout(close, 4000);
+};
+if (!debriefSb) { failed(); return; }
+sendForm(debriefSb, "submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
+if (!r.ok) { failed(); return; }
 lsSet("sh_debrief_sent_" + hub.id + "_" + x.date, "1"); renderCheckins();
-if (!toBoard) { box.innerHTML = thanks; setTimeout(close, 3600); return; }
+var text = "Thought of something else? Check in again any time from the hub on this page.";
+function done(more, ms){
+if (r.xp > 0) { celebrate(W, r, text, more, debriefSb); return; }
+W.set(thanksHtml("Thank you!", text) + (more || ""));
+W.say("Thank you! That helps a lot.");
+setTimeout(close, ms);
+}
+if (!toBoard) { done("", 3600); return; }
 tk.post().then(function(p){
-box.innerHTML = thanks + '<p class="survey-why">' + (p.ok ? "Your idea is on the idea board." : "Your check-in was sent, but the idea didn\'t post. " + esc(p.msg || "")) + "</p>";
-setTimeout(close, p.ok ? 3600 : 7000);
-}, function(){ box.innerHTML = thanks; setTimeout(close, 3600); });
-}, function(){ box.innerHTML = failed; setTimeout(close, 4000); });
+done('<p class="survey-why">' + (p.ok ? "Your idea is on the idea board." : "Your check-in was sent, but the idea didn\'t post. " + esc(p.msg || "")) + "</p>", p.ok ? 3600 : 7000);
+}, function(){ done("", 3600); });
+}, failed);
 }
 });
 }
@@ -845,17 +1004,25 @@ if (hub && x) openDebrief(hub, x);
 function startSurvey(sb, bootstrap){
 var me = surveyVisitor();
 if (!me) return;
-function show(rows){
+var AGAIN = D.surveyAgain || {};
+function again(list){
+var sv = (Array.isArray(list) ? list : []).filter(function(x){ return x && AGAIN[x.id] && !ls("sh_survey_again_" + x.id + "_" + AGAIN[x.id]); })[0];
+return sv ? [sv] : null;
+}
+function show(rows, re){
 var sv = rows && rows[0];
-if (!sv || ls("sh_survey_done_" + sv.id)) return;
+if (!sv || (!re && ls("sh_survey_done_" + sv.id))) return;
 var qs = Array.isArray(sv.questions) ? sv.questions.slice(0, 5) : [];
 if (!qs.length) return;
 if (document.querySelector(".survey")) return;
-var answers = {};
-var box = document.createElement("section");
-box.className = "survey"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Quick survey");
-var h = '<button type="button" class="survey-x" aria-label="Later">×</button><div class="survey-eyebrow">Quick survey · ' +
-(qs.length === 1 ? "1 question" : qs.length + " questions") + '</div><h3>' + esc(sv.title) + '</h3>';
+if (lifeCovered()) { whenUncovered(function(){ show(rows, re); }); return; }
+if (re) lsSet("sh_survey_again_" + sv.id + "_" + AGAIN[sv.id], "1");
+var answers = {}, sent = false;
+var W = formWindow({ label: "Quick survey", closeLabel: "Later", dismiss: function(){ if (sent) W.close(); else done(null, false); },
+bar: '<span class="survey-emb survey-emb-ic">' + icon("comment", 20) + '</span><span class="survey-title"><b>Quick survey</b><small>' +
+(qs.length === 1 ? "1 question" : qs.length + " questions") + "</small></span>" });
+var box = W.box;
+var h = '<h3>' + esc(sv.title) + '</h3>' + lootHtml("Send it and earn", FORM_XP, FORM_CROWNS);
 qs.forEach(function(q, qi){
 var id = String(q.id || ("q" + (qi + 1)));
 h += '<div class="survey-q" data-sq="' + esc(id) + '" data-kind="' + esc(q.kind || "choice") + '"><p>' + esc(q.prompt || "") + '</p>';
@@ -872,9 +1039,8 @@ if (q.other) h += '<textarea class="survey-other" maxlength="300" hidden aria-la
 h += '</div>';
 });
 h += '<div class="survey-foot"><button type="button" class="survey-skip">Later</button><button type="button" class="btn btn-primary survey-send" disabled>Send</button></div>';
-box.innerHTML = h;
-root.appendChild(box);
-requestAnimationFrame(function(){ box.classList.add("is-shown"); });
+W.set(h);
+W.say(re ? "Me again! There are still " + num(FORM_CROWNS) + " crowns in it for you." : "Got a minute? I pay in crowns.");
 var send = box.querySelector(".survey-send");
 function refresh(){
 box.querySelectorAll("textarea").forEach(function(t){
@@ -886,21 +1052,26 @@ if (v) answers[id] = v.slice(0, other ? 300 : 600); else delete answers[id];
 send.disabled = !Object.keys(answers).length;
 }
 function done(payload, thanks){
+sent = true;
 try{ localStorage.setItem("sh_survey_done_" + sv.id, "1"); }catch(e){}
-sb.rpc("submit_survey", { p_survey:sv.id, p_visitor:me, p_answers:payload }).then(function(){
+sendForm(sb, "submit_survey", { p_survey:sv.id, p_visitor:me, p_answers:payload }).then(function(r){
 if (window.shReplies && window.shReplies.refresh) window.shReplies.refresh();
+if (thanks && r.xp > 0 && box.isConnected) celebrate(W, r, "This goes straight into what gets built next.", "", sb);
+else rewardPaid(sb, r);
 }, function(){});
 if (!thanks){
-box.innerHTML = '<div class="survey-eyebrow">Quick survey</div><p class="survey-thanks"><b>Saved to your Inbox.</b> Answer it there anytime.</p>';
-setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 2200);
+W.set(thanksHtml("Saved to your Inbox.", "Answer it there anytime. The " + num(FORM_XP) + " XP and " + num(FORM_CROWNS) + " crowns wait with it."));
+W.say("No rush. It'll be in your Inbox.");
+W.timer(function(){ W.close(); }, 2600);
 return;
 }
-box.innerHTML = '<div class="survey-eyebrow">Quick survey</div><p class="survey-thanks"><b>Thank you!</b> This goes straight into what gets built next.</p>';
-setTimeout(function(){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }, 2600);
+W.set(thanksHtml("Thank you!", "This goes straight into what gets built next."));
+W.say("Thank you!");
+W.timer(function(){ W.close(); }, 5500);
 }
 box.addEventListener("input", refresh);
 document.addEventListener("sh:survey-done", function(e){
-if (e.detail && e.detail.id === sv.id && box.isConnected){ box.classList.remove("is-shown"); setTimeout(function(){ box.remove(); }, 350); }
+if (e.detail && e.detail.id === sv.id && box.isConnected) { sent = true; W.close(); }
 });
 box.addEventListener("click", function(e){
 var opt = e.target.closest(".survey-opt");
@@ -919,13 +1090,24 @@ if (!picked.length) delete answers[id];
 else answers[id] = multi ? picked : (q.getAttribute("data-kind") === "scale" ? +picked[0] : picked[0]);
 refresh(); return;
 }
-if (e.target.closest(".survey-x, .survey-skip")) done(null, false);
+if (sent) return;
+if (e.target.closest(".survey-skip")) done(null, false);
 else if (e.target.closest(".survey-send") && !send.disabled) done(answers, true);
 });
 }
-function remote(){ sb.rpc("get_active_survey", { p_visitor:me }).then(function(res){ show(res && !res.error ? res.data : null); }, function(){}); }
+function remote(){
+sb.rpc("get_active_survey", { p_visitor:me }).then(function(res){
+var rows = res && !res.error ? res.data : null;
+if (rows && rows.length) { show(rows); return; }
+if (Object.keys(AGAIN).length) sb.rpc("get_my_survey", { p_visitor:me }).then(function(r){ var a = again(r && !r.error ? r.data : null); if (a) show(a, true); }, function(){});
+}, function(){});
+}
 if (bootstrap && typeof bootstrap.then === "function") {
-bootstrap.then(function(data){ if (data && Array.isArray(data.survey_popup)) show(data.survey_popup); else remote(); }, remote);
+bootstrap.then(function(data){
+if (!data || !Array.isArray(data.survey_popup)) { remote(); return; }
+if (data.survey_popup.length) show(data.survey_popup);
+else { var a = again(data.survey); if (a) show(a, true); }
+}, remote);
 } else remote();
 }
 function dialog(labelId, html, back){
@@ -943,7 +1125,16 @@ var nameSb = null;
 function paintName(){
 var name = localName || randomName;
 $("youName").innerHTML = (name ? "<b>" + esc(name) + "</b>" : "<b>No name yet</b>") +
-' <button type="button" class="btn btn-text dx-rename" id="greetEdit" title="Change the name classmates see on the leaderboards">' + (localName ? "Change name" : "Pick your name") + "</button>";
+' <button type="button" class="btn btn-text dx-rename" id="greetEdit" title="Change the name classmates see on the leaderboards">' + (localName ? "Change name" : "Pick your name") + "</button>" +
+'<button type="button" class="btn btn-text dx-rename" id="greetLink" title="Share one rank, streak and progress with your phone, tablet or laptop">Link my devices</button>';
+}
+function openLink(back, from){
+var t0 = Date.now();
+(function go(){
+if (window.shLinkAsk && window.shLinkAsk.link) { window.shLinkAsk.link({ back: back, from: from }); return; }
+if (Date.now() - t0 > 8000) { toast("Couldn’t open Link my devices. Are you online?"); return; }
+setTimeout(go, 200);
+})();
 }
 function openNameEditor(){
 surveyVisitor();
@@ -952,10 +1143,12 @@ var dlg = dialog("nameH",
 (!localName && randomName ? " Right now you have a random one: <b>" + esc(randomName) + "</b>." : "") + "</p>" +
 '<form class="dx-nameform"><input type="text" maxlength="24" autocomplete="nickname" enterkeyhint="done" aria-label="Your name" placeholder="Pick a name" value="' + esc(localName) + '"><button class="btn btn-primary" type="submit">Save</button></form>' +
 '<p class="note dx-namemsg" aria-live="polite"></p>' +
-(localName ? '<button class="btn btn-text dx-namereset" type="button">Go back to a random name</button>' : '<p class="note">Up to 24 characters. You can change it any time.</p>'), $("greetEdit"));
+(localName ? '<button class="btn btn-text dx-namereset" type="button">Go back to a random name</button>' : '<p class="note">Up to 24 characters. You can change it any time.</p>') +
+'<p class="note dx-namelink">Using the hubs on another device too? <button class="btn btn-text" type="button" data-namelink>Link my devices</button></p>', $("greetEdit"));
 var d = dlg.el, input = q("input", d), msg = q(".dx-namemsg", d);
 setTimeout(function(){ try{ input.select(); }catch(e){} }, 40);
 d.addEventListener("click", function(e){
+if (e.target.closest("[data-namelink]")) { dlg.close(); openLink($("greetLink") || $("greetEdit"), "name"); return; }
 if (!e.target.closest(".dx-namereset")) return;
 localName = ""; lsSet("sh_display_name", null); track("name:reset"); nameChanged();
 if (nameSb) nameSb.rpc("clear_display_name", { p_visitor: VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; paintName(); } }, function(){});
@@ -974,7 +1167,10 @@ setTimeout(dlg.close, 700);
 });
 }
 paintName();
-$("youName").addEventListener("click", function(e){ if (e.target.closest("#greetEdit")) openNameEditor(); });
+$("youName").addEventListener("click", function(e){
+if (e.target.closest("#greetEdit")) openNameEditor();
+else if (e.target.closest("#greetLink")) openLink($("greetLink"), "you");
+});
 var nameTold = false;
 function nameChanged(){ nameTold = true; try { document.dispatchEvent(new CustomEvent("sh:name", { detail: { name: localName } })); } catch (e) {} nameTold = false; }
 document.addEventListener("sh:name", function(e){ if (nameTold) return; localName = String(e && e.detail && e.detail.name || "").slice(0, 24); paintName(); });
@@ -1020,7 +1216,8 @@ var dlg = dialog("setH", '<h2 id="setH">Settings</h2><p class="note">Saved on th
 '<section class="panel" aria-labelledby="stH"><h3 id="stH">Look</h3>' +
 '<div class="set-row"><div><b>Theme</b><small>Every hub and the dashboard follow it.</small></div>' + seg("theme", [["light", "Light"], ["dark", "Dark"], ["", "Match my device"]], themeNow()) + "</div>" +
 '<div class="set-row"><div><b>Text size</b><small>Makes everything bigger or smaller.</small></div>' + seg("size", SIZES, ls("sh_pref_size") || "default") + "</div>" +
-'<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (localName || randomName ? ": " + esc(localName || randomName) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div></section>' +
+'<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (localName || randomName ? ": " + esc(localName || randomName) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' +
+'<div class="set-row"><div><b>Link my devices</b><small>One rank, streak, trophy case and question progress on your phone, tablet and laptop.</small></div><button class="btn" type="button" data-link>Link my devices</button></div></section>' +
 '<section class="panel" aria-labelledby="sxH"><h3 id="sxH">Timmy and the extras</h3><p class="note">The fun stuff that isn\'t studying, in every hub.</p><div data-extras>' + extrasHTML() + "</div></section></div>", $("setBtn"));
 var body = dlg.el; body.classList.add("dx-dlg-wide");
 function paintFocus(){ var fp = q(".focus-panel", body); fp.classList.toggle("is-on", focusOn()); fp.innerHTML = focusRowHTML(); }
@@ -1032,6 +1229,7 @@ if (window.shPet) window.shPet.refresh();
 q("[data-focus]", body).focus(); return;
 }
 if (e.target.closest("[data-name]")) { dlg.close(); openNameEditor(); return; }
+if (e.target.closest("[data-link]")) { dlg.close(); openLink($("setBtn"), "settings"); return; }
 var b = e.target.closest(".seg [data-val]"); if (!b) return;
 var k = b.parentNode.getAttribute("data-key"), v = b.getAttribute("data-val");
 qa("[data-val]", b.parentNode).forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); });
@@ -1217,7 +1415,7 @@ window.shShop.open({ onClose: function(){ SHOP.open = false; var b = q(".dx-shop
 }).then(null, function(){ toast("The shop didn't open. Try again in a moment."); });
 }
 document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); } });
-var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
 function costumeOfDay(visitor, day, holiday){
 if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
 var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";
@@ -1288,6 +1486,22 @@ return fetch(SB_URL + "/rest/v1/" + path, { headers: { apikey: SB_KEY, Authoriza
 }
 var V2 = C.v2 === false ? false : null;
 function missing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
+function sendForm(sb, name, args){
+function old(){ return sb.rpc(name, args).then(function(r){ return { ok: !r.error && r.data === true, xp: 0, crowns: 0 }; }); }
+return sb.rpc(name + "_v2", args).then(function(r){
+if (missing(r)) return old();
+var d = !r.error && r.data && typeof r.data === "object" ? r.data : null;
+return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0 };
+});
+}
+function rewardPaid(sb, r){
+if (!r || !(r.xp > 0) || !sb || !VISITOR) return;
+loadMyRank(sb);
+sb.rpc("get_my_shop", { p_visitor: VISITOR }).then(function(x){
+if (x && !x.error && x.data && x.data.wallet) try { document.dispatchEvent(new CustomEvent("sh:shop", { detail: { shop: x.data } })); } catch (e) {}
+}, function(){});
+}
+document.addEventListener("sh:reward", function(e){ rewardPaid(debriefSb || boardSb, e.detail); });
 function rpc2(sb, name, args){
 if (V2 === false) return sb.rpc(name, args);
 return sb.rpc(name + "_v2", args).then(function(r){
@@ -1371,6 +1585,7 @@ $("board").innerHTML = '<div class="dx-arena' + (set ? " has-set" : "") + (still
 return ranks ? rowHTML(r, r.rnk, jName(r, r.level || R.levelFor(r.xp)), num(r.xp), "XP", (+r.xp || 0) / first)
 : rowHTML(r, i + (pod ? 4 : 1), "", r.streak, r.streak === 1 ? "day" : "days", (+r.streak || 0) / first);
 }).join("") + "</ol>" : "") + "</div>";
+lifeStage();
 if (d.say) visitSay(d.say.key, d.say.msg, true);
 $("visitRand").hidden = !visitList().length;
 }
@@ -1598,7 +1813,7 @@ if (cw >= 100) { var c = CA.recap.crowd({ n: Math.min(+d.people, 160), w: cw, ti
 }
 }
 function startRecaps(rows){
-var chips = $("rcChips"), body = $("rcBody"), wrap = $("rc"), cur = -1, seen = false;
+var chips = $("rcChips"), body = $("rcBody"), wrap = $("rc"), cur = -1, seen = false, playT = 0;
 chips.innerHTML = rows.map(function(r, i){
 return '<button type="button" role="tab" class="rc-chip tinted" style="' + tintVars(r.hub) + '" id="rc-tab-' + i + '" data-rc="' + i + '" aria-selected="false" aria-controls="rcBody" tabindex="-1">' +
 emblem(r.hub, "dx-emb") + "<span><b>" + esc(r.title) + "</b>" + (r.data.exam_day ? "<small>" + esc(recapDay(r.data.exam_day)) + "</small>" : "") + "</span></button>";
@@ -1613,6 +1828,7 @@ var t0 = null, ms = 900;
 (function step(t){ if (t0 === null) t0 = t; var k = Math.min(1, (t - t0) / ms), e = 1 - Math.pow(1 - k, 3); el.textContent = num(Math.round(to * e)) + suf; if (k < 1) requestAnimationFrame(step); })(performance.now());
 });
 body.classList.add("is-in");
+clearTimeout(playT); playT = setTimeout(function(){ body.classList.add("is-played"); }, 1600);
 }
 function show(i){
 i = (i + rows.length) % rows.length; if (i === cur) return; cur = i;
@@ -1626,7 +1842,7 @@ if (byHour.length) facts.push(["prime", '<b class="num">' + esc(hourLabel(ph)) +
 if (d.after_midnight) facts.push(["owls", '<b class="num">' + num(d.after_midnight) + "</b> night owl" + (d.after_midnight === 1 ? "" : "s"), "after midnight"]);
 if (d.regulars) facts.push(["regulars", '<b class="num">' + num(d.regulars) + "</b> regular" + (d.regulars === 1 ? "" : "s"), "3 or more days"]);
 var tq = (d.toughest || [])[0], qq = row.question, hrs = Math.round((d.minutes || 0) / 60);
-body.classList.remove("is-in"); body.setAttribute("style", tintVars(row.hub)); body.setAttribute("aria-labelledby", "rc-tab-" + i);
+clearTimeout(playT); body.classList.remove("is-in", "is-played"); body.setAttribute("style", tintVars(row.hub)); body.setAttribute("aria-labelledby", "rc-tab-" + i);
 body.innerHTML =
 '<div class="rc-head">' + emblem(row.hub, "dx-emb") + "<div><h3>" + esc(row.title) + '</h3><p class="note">' +
 (d.exam_day ? "Exam " + esc(recapDay(d.exam_day, true)) : "") + (d.first_day && (d.exam_day || d.last_day) ? " · studied " + esc(recapDay(d.first_day)) + " to " + esc(recapDay(d.exam_day || d.last_day)) : "") + "</p></div>" +
@@ -1679,7 +1895,8 @@ if (bootstrap && typeof bootstrap.then === "function") bootstrap.then(function(d
 else remote();
 }
 document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible" && ovSb && Date.now() - ovAt > 5 * 60 * 1000) loadOverrides(ovSb); });
-var latestBy = null;
+var latestBy = null, logRows = [];
+function logHubs(r){ var t = String(r.hub || "").toLowerCase().split(/[,\s]+/).filter(Boolean); return t.length ? t : ["all"]; }
 function applyUpdated(){
 if (!latestBy) return;
 qa(".updated[data-hub]").forEach(function(el){
@@ -1687,12 +1904,21 @@ var best = latestBy[el.getAttribute("data-hub")] || null;
 if (latestBy.all && (!best || latestBy.all > best)) best = latestBy.all;
 if (best) el.textContent = "Updated " + relDay(new Date(best));
 });
+qa("[data-news]").forEach(function(d){
+var id = d.getAttribute("data-news"), mine = logRows.filter(function(r){ var t = logHubs(r); return t.indexOf(id) > -1 || t.indexOf("all") > -1; }).slice(0, 5);
+d.classList.toggle("is-empty", !mine.length); q("summary", d).tabIndex = mine.length ? 0 : -1;
+q(".dx-news-list", d).innerHTML = mine.map(function(r){
+return "<li><p>" + esc(r.message) + '</p><small class="note">' + esc(relDay(new Date(r.created_at))) + (logHubs(r).indexOf("all") > -1 ? " · every hub" : "") + "</small></li>";
+}).join("");
+if (!d.getAttribute("data-wired")) { d.setAttribute("data-wired", "1"); d.addEventListener("toggle", function(){ if (d.open) track("news:open"); }); }
+});
 }
 function loadChangelog(){
-rest("changelog?select=hub,created_at&order=created_at.desc&limit=40").then(function(rows){
+rest("changelog?select=hub,message,created_at&order=created_at.desc&limit=40").then(function(rows){
 if (!rows || !rows.length) return;
 latestBy = {};
 rows.forEach(function(r){ String(r.hub || "").toLowerCase().split(/[,\s]+/).filter(Boolean).forEach(function(t){ if (!latestBy[t] || r.created_at > latestBy[t]) latestBy[t] = r.created_at; }); });
+logRows = rows.filter(function(r){ return r && typeof r.message === "string" && r.message.trim(); });
 applyUpdated();
 }).catch(function(){});
 }
@@ -1728,7 +1954,7 @@ S.push({ el: "#class", title: "The class", body: "<p>How many classmates have a 
 if (o.visible($("ideas"))) S.push({ el: "#ideas", title: "The idea board", body: "<p>Ideas for the hubs, from the class. Vote the ones you'd use up or down, or post your own: it shows right away under your name, with the hub it's for and what kind of idea it is.</p>" });
 if (o.visible($("past"))) S.push({ el: "#past", title: "Past hubs", body: "<p>How the class studied for each exam that's done: the hours, the people, the busiest day. <b>Save image</b> keeps a picture of it. A hub that just closed keeps its check-in here.</p>" });
 S.push({ el: "#inboxBtn", title: "Inbox", body: "<p>Replies to your reports and suggestions, notices to the whole class and the occasional short survey. A number on it means something new.</p>" });
-S.push({ el: "#setBtn", title: "Settings", body: "<p>Focus mode, the theme, text size, your name, Timmy and the extras. Set them once here and every hub follows.</p>" });
+S.push({ el: "#setBtn", title: "Settings", body: "<p>Focus mode, the theme, text size, your name, <b>Link my devices</b> (your phone and laptop count as one you), Timmy and the extras. Set them once here and every hub follows.</p>" });
 S.push({ el: "#menuBtn", title: "About and this tour", body: "<p>The full guide to every feature, trophy and easter egg, the light or dark switch, and this tour.</p>", last: true });
 return S;
 } };
@@ -1803,7 +2029,7 @@ if (window.shLinkAsk) window.shLinkAsk.start({ sb: sb, hub: "dashboard", bootstr
 var held = 0;
 function askNext(){
 if (q(".sh-reply") && held++ < 200) { setTimeout(askNext, 1500); return; }
-tourIdle(function(){ if (!autoDebrief()) startSurvey(sb, bootstrap.ready); });
+tourIdle(function(){ whenUncovered(function(){ if (!autoDebrief()) startSurvey(sb, bootstrap.ready); }); });
 }
 setTimeout(askNext, 4000);
 function showGolden(rows){
@@ -1832,7 +2058,59 @@ done();
 loadScriptOnce(WIDGET + "rest.bundle.js").then(one, one);
 loadScriptOnce(WIDGET + "hub-art/class.js").then(one, one);
 }
+var LIFE = 8000, life = { io: null, parts: [], scrolling: false, st: 0, tt: 0, stage: null };
+function lifeCovered(){ return !!q('dialog[open], [aria-modal="true"]'); }
+function lifeMark(p, rest){
+p.el.classList.toggle("is-rest", rest);
+if (p.el.id === "you") [].forEach.call(p.el.querySelectorAll(".tpc-live"), function(x){ x.classList.toggle("is-rest", rest); });
+}
+function lifeRest(p){ clearTimeout(p.t); p.t = 0; lifeMark(p, true); }
+function lifeWake(p){
+if (!p.on || life.scrolling || lifeCovered()) return;
+clearTimeout(p.t); lifeMark(p, false);
+p.t = setTimeout(function(){ lifeRest(p); }, LIFE);
+}
+function lifeHold(){ life.parts.forEach(function(p){ if (p.t) lifeRest(p); }); }
+function lifePart(el){
+var p = { el: el, on: false, t: 0 };
+el.classList.add("is-rest"); life.parts.push(p); life.io.observe(el);
+el.addEventListener("mouseenter", function(){ lifeWake(p); });
+return p;
+}
+function lifeWatch(){
+if (!window.IntersectionObserver) return;
+life.io = new IntersectionObserver(function(es){
+es.forEach(function(e){
+e.target.classList.toggle("is-away", !e.isIntersecting);
+var p = life.parts.filter(function(x){ return x.el === e.target; })[0]; if (!p) return;
+p.on = e.isIntersecting; if (p.on) lifeWake(p); else lifeRest(p);
+});
+});
+["you", "now", "road", "ideas", "past"].forEach(function(id){ var el = $(id); if (el) lifePart(el); });
+["hubs", "board"].forEach(function(id){ var el = $(id); if (el) life.io.observe(el); });
+lifeStage();
+window.addEventListener("scroll", function(){
+if (!life.scrolling) { life.scrolling = true; lifeHold(); }
+clearTimeout(life.st);
+life.st = setTimeout(function(){ life.scrolling = false; life.parts.forEach(lifeWake); }, 220);
+}, { passive: true });
+document.addEventListener("touchstart", lifeHold, { passive: true });
+document.addEventListener("touchend", function(){
+clearTimeout(life.tt); life.tt = setTimeout(function(){ if (!life.scrolling) life.parts.forEach(lifeWake); }, 500);
+}, { passive: true });
+document.addEventListener("click", function(){ setTimeout(function(){ if (lifeCovered()) lifeHold(); }, 80); }, true);
+if (window.MutationObserver) new MutationObserver(function(){ if (lifeCovered()) lifeHold(); }).observe(document.body, { childList: true });
+document.addEventListener("close", function(){ setTimeout(function(){ life.parts.forEach(lifeWake); }, 320); }, true);
+}
+function lifeStage(){
+if (!life.io) return;
+var el = q(".dx-set", $("board"));
+if (life.stage && life.stage.el === el) return;
+if (life.stage) { life.io.unobserve(life.stage.el); clearTimeout(life.stage.t); life.parts = life.parts.filter(function(x){ return x !== life.stage; }); }
+life.stage = el ? lifePart(el) : null;
+}
 function afterDraw(){
+lifeWatch();
 loadLate(function(){
 CA = window.SH_CLASS_ART || null;
 startClassData(); syncRoom();

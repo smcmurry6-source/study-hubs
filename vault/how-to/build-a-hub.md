@@ -29,7 +29,8 @@ Since the redesign's release (2026-11) every hub runs on the shared engine (`wid
   and the hub's own wording for Home, Notes, hints, the mock and the arcade), then `widget/hub-art/<hub-id>.js` and
   `widget/hub.bundle.js`. Nothing else goes in the page.
 - **The content**, `hubs/<hub-id>/content/`: `core.json` (lectures with `id`, `num`, `title`, `who`, `status` taught /
-  slides / upcoming, `tag`; `examInfo`, `courseDates`, `likelyTopics`, the mock blueprint, `examCounts` if counts per
+  slides / upcoming, `tag`; `examInfo`, `courseDates`, `likelyTopics`, the mock blueprint (and, if you want it, `mock.likelyShare`, 0-1:
+  about that share of each lecture's mock questions from its High likelihood ones; Occlusion's final uses 0.75), `examCounts` if counts per
   lecture were announced, the podcast), `questions.json` (every question, each with `src` and its `why`),
   `notes.json` (`full` and `plain`), `study.json` (hints quoted from the recordings, the cram sheet, the Side by side
   tables and processes, the arcade's sort sets), `figures.js/css` and `arcade.js/css`. **The JSON is the source**: edit
@@ -76,14 +77,16 @@ Since the redesign's release (2026-11) every hub runs on the shared engine (`wid
   ([about-page](../rules/about-page.md)); then `node tools/timmy/build.mjs` (Ask Timmy's site help).
 - Optional: `assets/og-<hub-id>.png`, the link-preview image.
 - Only for new arcade game ids: a migration adding them to the arcade's list of games (as `migration_v40.sql` did).
-- **After the merge, load the hub's answer keys** (below): until then its answers are recorded but earn no XP.
+- **After the merge, the hub's answer keys load by themselves** (below): until they do, its answers are recorded but earn no XP.
 
 ## The answer keys (after every merged change to a hub's questions)
 
 The server grades answers and pays XP from its own copy of each hub's keys ([game-server](../reference/game-server.md)).
-After a PR that adds, edits, retires or re-keys a question is merged, load that hub's keys again:
-`node tools/xp/keys.js <hub-id> --sql` prints one statement for the Supabase connector (put the admin secret in by
-hand, never in a file: [secrets](../rules/secrets.md)). Until it's loaded a new question is recorded but earns nothing,
+After a PR that adds, edits, retires or re-keys a question is merged, the **After merge** workflow loads that hub's keys
+again by itself ([after-a-merge](after-a-merge.md), since 2026-11-15); check its result on `main`. By hand (a failed run, a
+session that can't wait for it): **`node tools/xp/keys.js <hub-id> --load`** loads them (it needs `SB_KEY` and `ADMIN_SECRET` in the environment and
+prints the count, which should be the hub's question count); without them, `--sql` prints one statement for the
+Supabase connector (put the admin secret in by hand, never in a file: [secrets](../rules/secrets.md)). Until it's loaded a new question is recorded but earns nothing,
 and an edited one is graded against the key it had before, so do it in the same sitting as the merge. A page a
 student still has open from before the edit is graded against the key it showed.
 

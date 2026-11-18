@@ -1,4 +1,4 @@
-/* The inside of Timmy's podcast studio, for the launch trailer (vault/tasks/2026-11-13-launch-trailer.md).
+/* The inside of Timmy's podcast studio, for the launch trailer (vault/tasks/done/2026-11-13-launch-trailer.md).
 
    The studio is a yard piece at Timmy's place (tools/figures/site/place.mjs, YARD.studio): a padded purple booth with
    a cream-trimmed window, a red on-air lamp, the show's yellow poster (the tooth in red headphones) and his
