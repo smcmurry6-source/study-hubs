@@ -63,14 +63,17 @@ Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy" (the
   out of the front yard slot (it stood in it). Two kit bugs found and fixed on the way ([the bug log](../release/bug-log.md)):
   BUG-171, a set fetched late never brought its yard eggs' CSS, so seasonal eggs stayed hidden on the live site; BUG-172
   (CI), the kit's lists after `addPack` dropped `coll`, so the Collections tab came up empty. The build checks both now.
+- 2026-11-18: CI's performance suite: the dashboard at 358 KB of its 345 (all 88 outfits in `outfits.js`). Split it
+  (BUG-173): 340 KB in 10 requests.
 
 ## Outcome
 
 [#409](https://github.com/smcmurry6-source/study-hubs/pull/409). Six collections (48 pieces, `widget/hub-art/place/<k>.js`,
 45-55 KB each, fetched only where a place shows one), five costumes and six paints, the Collections tab, the shop's collection
 names and scenes, and `migration_v65.sql` (59 rows; applied after the merge). Two shared files grow and are still fetched on
-first use only: the kit (`widget/hub-art/place.js`, 269 to 302 KB, the costumes) and `widget/hub-art/outfits.js` (187 to 292 KB,
-88 outfits). Left for later, in [the inbox](inbox.md): a tall piece in the front yard slot covers Timmy at the door (as July 4's
+first use only: the kit (`widget/hub-art/place.js`, 269 to 302 KB, the costumes); the outfits are split (BUG-173): `outfits.js`
+has the everyday and rank outfits (50 KB, 9 over the wire; it was 187 KB with all of them), and `widget/hub-art/outfits/`
+has the costumes, the seasonal sets' and the collections' outfits, each file fetched only when someone drawn wears one. Left for later, in [the inbox](inbox.md): a tall piece in the front yard slot covers Timmy at the door (as July 4's
 fireworks and Thanksgiving's balloon already do), and kit niceties the drawers asked for (eggs that move the whole piece, a
 coral and a moon tree, no snow under the sea). Its status stays in-progress until Sam's "merge" and the migration.
 
