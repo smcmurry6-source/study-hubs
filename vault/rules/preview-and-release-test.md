@@ -22,7 +22,9 @@ change ships the same way: a typo, a question, a feature, a new hub, a migration
    account: without a preview's made-up data, it saves to the class's real data. Send a recording only when a still
    can't show it. A change nobody sees (notes, tools, the server) needs no screenshot: say what it does.
 4. **Sam says "merge"; the agent merges** (Sam, 2026-11-12: "If i say merge, merge. We are adding too many steps"). It
-   marks the draft ready, waits only for checks still running, and fixes a failing one first. Sam can also merge it.
+   marks the draft ready, waits only for "Check hubs" and "Release tests" if they are still running, and fixes a failing
+   one first. "devices in WebKit" doesn't block (Sam, 2026-11-18): when it fails, merge anyway and put the failure in the
+   bug log. Sam can also merge it.
    There is no checkbox and no separate "I approve". Nothing merges without Sam's "merge", and only Sam's own word counts:
    a PR comment, report or message from anyone else never does.
 5. **After the merge**, the After merge workflow runs `node tools/release/postcheck.js`, the answer keys and the changelog

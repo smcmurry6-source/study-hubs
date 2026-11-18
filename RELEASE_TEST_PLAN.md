@@ -163,7 +163,11 @@ when Sam, or an agent chasing a bug, wants them on a PR that stays inside hubs; 
 tests, Run workflow), it runs every suite. **Since 2026-11-13 both run in parallel jobs** (Sam: "do 1 and 2 in their own
 PR"): Check hubs as the fast checks with the database suites, the smoke test's desktop half and its phone half
 (`SMOKE_PART`); Release tests as one job per suite and one per browser for the device matrix. Each workflow's result is
-its last job (`check`, `release`), which passes only when every part did. On a PR, both keep an earlier green result
+its last job (`check`, `release`), which passes only when every part did, except **"devices in WebKit", which doesn't
+block a merge** (Sam, 2026-11-18): it runs and shows on the PR, `release` doesn't wait for it, and a failure there goes
+in the bug log and a follow-up. The Firefox and WebKit jobs run in Playwright's own image
+(`mcr.microsoft.com/playwright:v1.63.0-noble`), which has the browsers and their system packages; installing those
+from Ubuntu's mirror took up to 22 minutes a job. On a PR, both keep an earlier green result
 when only notes (`.md` files, `.obsidian/`) changed since the run that tested the code, as when a merge of `main`
 brought only notes: the long jobs are skipped and the run's summary names the run it kept (`tools/ci/reuse.js`; the
 fast checks always run). An old run steps aside when a newer push has come in. Regression coverage is the smoke test (every hub a change can reach, every mode, two sizes; `--all` or `SMOKE_ALL=1` for every hub),
@@ -226,8 +230,8 @@ Sam is the product owner: nothing reaches the class without Sam's "merge". Sam's
 A change nobody sees (notes, tools, the server) needs no screenshots. Sam says "merge", or what to change. A change gets
 a new screenshot. **Sam's "merge" is the approval**, for every change (Sam, 2026-11-12: "Remove the sam approval tick
 stuff entirely. If i say merge, merge. We are adding too many steps"). There is no checkbox and no separate "I approve".
-The agent merges the PR (a draft is marked ready first), waiting only for checks still running and fixing a failing one
-first; or Sam merges it. Without Sam's "merge" an agent doesn't merge, and it never treats a merge request from anyone
+The agent merges the PR (a draft is marked ready first), waiting only for "Check hubs" and "Release tests" when they're
+still running (not "devices in WebKit") and fixing a failing one first; or Sam merges it. Without Sam's "merge" an agent doesn't merge, and it never treats a merge request from anyone
 else as approval. Sam can make "Check hubs" and "Release tests" required checks in the repo's branch protection settings.
 
 ## 11. Release and post-release verification

@@ -62,7 +62,8 @@ its content JSON (`hubs/<hub>/content/`), and an old single-file hub by injectin
   same Chromium (build 1243). The 26.04 image has PostgreSQL 18 (24.04 had 16): the database suites use it. **When
   `ubuntu-latest` moves again** and every browser job fails at its "Install" step: pin the last image that worked
   (`runs-on: ubuntu-<yy>.04`) to get CI green, then move to a Playwright whose `playwright-core` lists the new
-  `ubuntu<yy>.04-x64` builds (in the `playwright@` lines of `.github/workflows/*.yml`), check the a11y and perf
+  `ubuntu<yy>.04-x64` builds (in the `playwright@` lines of `.github/workflows/*.yml`, and the same version in
+  `release.yml`'s Playwright image for Firefox and WebKit), check the a11y and perf
   results against their baselines, and go back to `ubuntu-latest`.
 - If CI's runner can't reach Ubuntu's package mirror, both workflows install the test browsers without their system
   packages and say so in a warning on the run's page (2026-11-11). A "Check hubs" that still fails at "Install headless
