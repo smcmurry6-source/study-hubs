@@ -51,7 +51,7 @@ Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy" (the
 - [x] `migration_v65.sql` tested on a throwaway copy (`tools/release/xp.js`), the preview sells the new rows
 - [x] CI's checks and the release suites pass; a test report in the PR
 - [ ] Contact sheets of all of it sent to Sam (sent 2026-11-18); Sam's look and "merge"
-- [ ] After the merge: `migration_v65.sql` applied through the connector, appended to `supabase/schema.sql`, its line out of `supabase/pending-migrations.txt` (a small follow-up PR)
+- [x] After the merge: `migration_v65.sql` applied through the connector, appended to `supabase/schema.sql`, its line out of `supabase/pending-migrations.txt` (its 59 rows were live on 2026-11-18; the schema record and the list were done in #408, with migration_v66)
 - [x] About page, Ask Timmy's site help, `DEPLOY_NOTES.md`, the changelog line, this note's Outcome
 
 ## Log
