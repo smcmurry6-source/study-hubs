@@ -347,6 +347,7 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .today-stats .ts-crowns .ic { width: 30px; height: 30px; }
 .today-stats b { display: block; font-size: 17px; font-weight: var(--w-head); line-height: 1.2; overflow-wrap: anywhere; }
 .today-stats small { display: block; font-size: var(--fs-meta); color: var(--muted); }
+.today-stats .ts-plus { color: var(--gold-ink); font-weight: var(--w-strong); }
 .today-pet { margin-top: 12px; display: flex; align-items: center; gap: 8px; font-size: var(--fs-label); color: var(--muted); }
 .today-pet .ic { color: var(--sun-ink); }
 .kv { display: grid; margin-top: 12px; }

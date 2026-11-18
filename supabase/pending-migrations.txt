@@ -18,3 +18,4 @@
 # migration_v68 (crowns that show as they're earned, prizes, every right answer paying, 5 crowns per 10 XP, 100 crowns an hour of hub time) was applied on 2026-11-18 (PR #403).
 # migration_v69 (sh_answer: v64's cached-page branch for matching items put back, which v68 had left out) was applied on 2026-11-18 (PR #403).
 # migration_v70 (the admin page's A/B versions page: get_ab_summary and the partial index question_events_ab) was applied on 2026-11-18 (through the connector).
+# migration_v71 (two indexes on personal_answers for saving an answer) was applied on 2026-11-18 (through the connector, create index concurrently, PR #423).

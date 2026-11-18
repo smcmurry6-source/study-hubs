@@ -1811,15 +1811,18 @@
      are [reached, pays]; medal is Bronze to Crown. The cards that offer a prize read it from here (window.shGame.prizes). */
   var PRIZES = { name: 500, ring: 5, boss: 500, nuke: 10000, alltime: 20000, notes: 50, trophy: 200, visit: 50, game: 100, pb: 50, top: 250, report: 100, streak: [[3, 100], [7, 300], [14, 700], [30, 1500], [60, 3000], [100, 5000]], row: [[10, 25], [25, 100], [50, 250]], medal: [250, 500, 750, 1000] };
   function fmtN(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
-  /* what a prize says when it's paid: "Daily goal done: +100 XP and 100 crowns" */
-  function prizeText(src, xp, d){
+  /* what a prize is called ("Daily goal done"), for the engine's reward card (widget/hub-rewards.js), and what it says
+     when it's paid: "Daily goal done: +100 XP and 100 crowns" */
+  function prizeName(src, d){
     d = d || {};
     var won = Array.isArray(d.won) ? d.won.length : 0;
-    var what = { name: "Your leaderboard name", ring: "Daily goal done", boss: "Your share of the Plaque Boss", nuke: "Tactical nuke launched",
+    return { name: "Your leaderboard name", ring: "Daily goal done", boss: "Your share of the Plaque Boss", nuke: "Tactical nuke launched",
       alltime: "New all-time record, " + (d.n || "") + " right in a row", notes: "Notes read to the end", trophy: won > 1 ? won + " new trophies" : "New trophy",
       visit: "Visiting a classmate's Timmy", game: "First game today", pb: "New personal best", top: "Top score in this hub", report: "Report fixed",
       row: (d.n || "") + " right in a row", streak: (d.n || "") + " days in a row", medal: "Hub medal", "pod-done": "Timmy Time finished" }[src] || "Bonus";
-    return what + ": +" + fmtN(xp) + " XP and " + fmtN(xp) + (xp === 1 ? " crown" : " crowns");
+  }
+  function prizeText(src, xp, d){
+    return prizeName(src, d) + ": +" + fmtN(xp) + " XP and " + fmtN(xp) + (xp === 1 ? " crown" : " crowns");
   }
   /* the crowns: every reply that pays carries the balance after it (migration_v68), which goes out as sh:crowns for
      whatever shows it (Home's Today card, More's shop tile, the shop) */
@@ -1852,7 +1855,7 @@
   /* for the engine: is the game layer there, the running boost, and a mock's session (the server pays a mock's
      answers and its +50 only inside one, and saves the mock's score itself when it is finished) */
   window.shGame = {
-    prizes: PRIZES, prizeText: prizeText, claim: claimPrize, setCrowns: setCrowns, crowns: function(){ return CROWNS; },
+    prizes: PRIZES, prizeText: prizeText, prizeName: prizeName, claim: claimPrize, setCrowns: setCrowns, crowns: function(){ return CROWNS; },
     /* whether to offer prizes on the page: the game layer is wanted and hasn't been found missing (before the bootstrap
        answers, v2() is still false; a card drawn then still says what it pays) */
     live: function(){ return GAME.want && GAME.on !== false; },
