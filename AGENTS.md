@@ -59,7 +59,9 @@ the engine that draws it is `widget/hub.js` and its parts, and an older hub is o
 In the same PR as the work: the task note's outcome and status, any decision Sam made (one line in
 `vault/decisions.md`), anything the next agent on that hub needs (its hub note), a new standing rule as its own note.
 **Anything still to do goes on the to-do list** (a task note, a line in the inbox, a box in a task's Done when), and what
-your PR finishes is **checked off** there ([to-dos-go-in-the-vault](vault/rules/to-dos-go-in-the-vault.md)).
+your PR finishes is **checked off** there ([to-dos-go-in-the-vault](vault/rules/to-dos-go-in-the-vault.md)): look at
+the list when you start (`node tools/todo/list.mjs --ref origin/main`), tick what's already done when you find it, and say
+in the PR's "To-do list" section what you ticked and added.
 Knowledge left only in your chat or memory is lost to the next agent.
 
 ## Hard limits

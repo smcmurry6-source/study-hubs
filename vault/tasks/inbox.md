@@ -69,7 +69,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   chromic gut, S3's "#14", S6's contained defect...). No question turns on any; a fix means narrating that session
   again (and Timmy Time if it covers it). Also there: the low-yield retirements Sam may want back.
   Decided (Sam, 2026-11-15): leave the eight spots as they are; the 27 retirements stand ([decisions](../decisions.md), #371).
-- [ ] **Sam's own look at the live site after the release** (2026-11-14, [the release](done/2026-11-06-redesign-release.md)).
+- [x] **Sam's own look at the live site after the release** (done: Sam, 2026-11-18, "i did my own look"; nothing reported) (2026-11-14, [the release](done/2026-11-06-redesign-release.md)).
   What an agent can't check without writing to the class's data as a made-up student: one Ask Timmy question from a
   phone (a "From the notes" link opens the paragraph; the admin page's Ask Timmy tab shows it with its cost); one Learn
   round and a flashcard; a random visit; the dashboard with a hub open in another tab (your Timmy walks into the
@@ -79,9 +79,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   class's old picks on Occlusion's reworded Bennett choice, "run once, right after the PR merges". The release session
   couldn't tell from a read-only look whether it ran, and didn't run it (it writes to the class's data). Run it, or say
   it was run.
-- [ ] **Ask Timmy's key is saved as `TIMMY_EVAL_KEY`** (2026-11-14, BUG-150). It works: the function reads that name
+- [x] ~~**Ask Timmy's key is saved as `TIMMY_EVAL_KEY`** (2026-11-14, BUG-150). It works: the function reads that name
   when there is no `ANTHROPIC_API_KEY`. If Sam saves the key again under `ANTHROPIC_API_KEY` (Supabase, Edge Functions,
-  Secrets), the fallback line in `supabase/functions/timmy/index.ts` can come out. The admin page's Ask Timmy tab also
+  Secrets), the fallback line in `supabase/functions/timmy/index.ts` can come out.~~ Not needed (Sam, 2026-11-18: "yes
+  strike it"): the fallback stays for good, and the eval reads the same name. The admin page's Ask Timmy tab also
   shows the release's test chat (visitor `release-check-2026-11-14`, one failed and one answered question, $0.60).
 - [x] **The redesign's other task notes are still open** (2026-11-14; done 2026-11-17, #401): [phase 2](done/2026-11-05-redesign-phase-2-live-hubs.md),
   [phase 3](done/2026-11-05-redesign-phase-3-dashboard.md), [phase 4](done/2026-11-05-redesign-phase-4-game-layer.md),
