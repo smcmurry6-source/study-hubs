@@ -234,8 +234,12 @@ without a pick), starts and finishes a mock's session, and hands the server's re
 (`widget/journeys.js`) and calls `mark_dark_unlock_seen` when an unlock ends or is skipped.
 
 **The arcade, Timmy Time and the admin page's "Fixed" have their pages since 2026-11-13** (phase 4, session 8,
-[the wiring](../tasks/done/2026-11-12-redesign-game-layer-wiring.md)). Each runs only where `shGame.v2()` is true, so a
-live page makes today's calls (the smoke test compares them with `main`'s files):
+[the wiring](../tasks/done/2026-11-12-redesign-game-layer-wiring.md)). Each runs only on a page that wants the game layer
+(`data-game="v2"`), so a page without it makes today's calls (the smoke test compares them with `main`'s files). The arcade
+and the engine's XP guess (`widget/hub-rewards.js` `v2()`) ask `shGame.live()` (wanted and not found missing), not
+`shGame.v2()` (confirmed by the bootstrap or an answer's reply): a bootstrap that timed out in a busy minute left `v2()`
+false until the first reply, and the card guessed by the old 600-a-day cap, "+0 XP" on paid right answers (BUG-183,
+2026-11-18). The card then shows what the server paid when that differs from the guess.
 - **The arcade** (`widget/games.js`): `shGames.played(game, name)` at a game's start calls
   `shGame.startSession("arcade", game)`; `shGames.over(game, score, today)` at its end calls `finishSession(id, score)`
   (the score whole, 0 to 200000) in place of `submit_arcade_score`, and falls back to `today()` when there is no session
