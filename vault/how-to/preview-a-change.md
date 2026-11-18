@@ -8,10 +8,9 @@ tags: [shipping, testing]
 A preview is the site from your branch, in a real browser, on made-up data: use it like a student before Sam does.
 Why and the safety layers: [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md) (sections 3-5).
 
-**Only on request** (Sam, 2026-11-06: "for the majority of cases i dont need it";
-[preview-and-release-test](../rules/preview-and-release-test.md)). For a tier 2 or 3 change, ask Sam once, in one line,
-when you hand it over: "Want a preview of this?" Make one only when Sam says yes, or asks. Tier 0 and 1: don't ask.
-Without a preview, take screenshots in a scripted browser with the class's data stubbed (as `tools/ci/smoke.js` does),
+**Only when Sam asks for one** (Sam, 2026-11-06: "for the majority of cases i dont need it";
+[preview-and-release-test](../rules/preview-and-release-test.md)). Don't offer one: there are no tiers since 2026-11-18,
+and every change ships the same way. Without a preview, take screenshots in a scripted browser with the class's data stubbed (as `tools/ci/smoke.js` does),
 never on the plain page as a test account: that saves to the class's real data.
 
 ## Open one
@@ -57,16 +56,18 @@ If the button turns red, something tried to reach production: that's an S1 bug, 
 
 ## Show Sam
 
-Sam looks at a substantial change before approving it and doesn't test it
-([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), section 10). Make that one easy look:
+Sam looks at a change students will see before saying "merge", and doesn't test it
+([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), section 10). Make that one quick look:
 
 - **When Sam asked for a preview, its link on its own line, first** (Sam, 2026-11-04): `Preview: https://pr-<n>.<project>.pages.dev`,
   copied from the PR's preview comment (or the Preview run's page), then the page and test account to open
   (`hubs/occlusion/?persona=missed`). Never send a session's own link instead: a cloud session's preview has no address
   outside it. If the PR has no link yet (the run hasn't finished, or the host isn't connected), say so.
-- **Screenshots** of what changed on a phone (390 px) and a laptop (1280 px), dark mode too when colors changed, at
-  `deviceScaleFactor: 2`. Send them in the chat (`SendUserFile` in Claude Code) and say what each one shows.
-- **A short recording** when it moves or takes several steps (Playwright's `recordVideo`), cut to the part that matters.
+- **A screenshot or two** of what changed on a phone (390 px), and a laptop (1280 px) when the layout changed, dark mode
+  too when colors changed, at `deviceScaleFactor: 2`. Send them in the chat (`SendUserFile` in Claude Code) and say what
+  each one shows.
+- **A short recording** only when a still can't show it (an animation; Playwright's `recordVideo`), cut to the part that
+  matters.
 
 Sam says yes, or what to change; a new round gets new screenshots.
 
@@ -77,10 +78,11 @@ server's own rules for XP, streaks and leaderboards (approximated). Those need a
 now (Sam, 2026-11-04; [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md), section 13). Real Safari needs a real
 iPhone, iPad or Mac.
 
-## Before the PR
+## Running the release suites yourself
 
-`node tools/release/run.js` runs every automated suite and writes a summary for the test report
-([template](../templates/release-test-report.md)). It needs Playwright and axe-core (`npm i --no-save playwright
+No change needs them before its PR: CI runs them when shared code changes. To reproduce a failure, run the one that failed
+(`node tools/release/a11y.js`, `perf.js`, `matrix.js`...); `node tools/release/run.js` runs them all and writes a summary
+(for a test report, [template](../templates/release-test-report.md), when Sam asked for a preview). They need Playwright and axe-core (`npm i --no-save playwright
 axe-core`) and PostgreSQL's server binaries; suites it can't run say "blocked", never "pass".
 
 Related: [verify-before-pushing](verify-before-pushing.md) · [uat-checklist](../release/uat-checklist.md) ·

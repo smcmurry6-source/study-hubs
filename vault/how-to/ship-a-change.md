@@ -10,9 +10,10 @@ tags: [shipping]
 2. Make the change on your branch. Cloud sessions can only push their own
    `claude/...` branch; that's fine — open a PR. When Sam says "merge", merge it (that publishes); or Sam merges it.
    In a local session, still prefer a branch + PR over pushing `main` directly.
-3. Verify before pushing ([verify-before-pushing](verify-before-pushing.md)). **A substantial change** (tier 2 or 3 in
-   [RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)) also gets the release suites, its bug-log rows and a test
-   report in the PR (and a preview with UAT in it only if Sam says yes when you ask once: [preview-a-change](preview-a-change.md)), and waits for Sam's "merge"
+3. Verify before pushing ([verify-before-pushing](verify-before-pushing.md)): the checks for what you touched; CI does
+   the rest. **Every change is the same** (no tiers since 2026-11-18): no local release suites, test report or bug-log
+   rows for the release, and a preview only when Sam asks ([preview-a-change](preview-a-change.md)). Show Sam a
+   screenshot when students will see a difference, and wait for Sam's "merge"
    ([preview-and-release-test](../rules/preview-and-release-test.md)). After the merge, the **After merge** workflow
    runs `node tools/release/postcheck.js` by itself ([after-a-merge](after-a-merge.md)).
 4. In the PR description, write what changed in plain, student-facing language, in

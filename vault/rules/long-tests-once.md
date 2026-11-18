@@ -12,8 +12,10 @@ same test CI runs on every push. Sam: "do these things need to take this long?"
 
 - **While building,** run what you touched: the fast checks, and the smoke test (it already checks only the hubs your
   change touches).
-- **When a change or a fix is finished,** run the long ones **once** on the final code: the smoke test on every hub when
-  shared files changed, `node tools/release/run.js` for a tier 2 or 3 change.
+- **When a change or a fix is finished,** run the smoke test **once** on the final code (on every hub when shared
+  files changed; it works that out itself). The release suites (`node tools/release/run.js`) are CI's: since there are no
+  tiers (Sam, 2026-11-18, [preview-and-release-test](preview-and-release-test.md)) no change needs them run locally,
+  except to reproduce a failure.
 - **Once that has passed, push, and CI is the check.** Don't run a long suite again on your own machine for something
   that changed nothing it tests: a rebase or merge of `main` with no conflict in code you changed, a vault note, a PR
   description. After bringing `main` in, run only the fast checks (`node tools/ci/syntax.js`, `node tools/ci/vault.js`,

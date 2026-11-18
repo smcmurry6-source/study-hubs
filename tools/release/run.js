@@ -5,6 +5,8 @@
 //   node tools/release/run.js --skip matrix    all but some
 // Writes $SH_RELEASE_OUT/summary.md (default: <tmp>/sh-release/summary.md) to paste into the PR's test report.
 // Suites that need something missing here (Playwright, axe-core, PostgreSQL) are reported as blocked, not passed.
+// In CI (the CI variable, which GitHub Actions sets) blocked counts as failed: every job installs what its suites need,
+// so a blocked one tested nothing (2026-11-18: the device matrix's WebKit and Firefox jobs had passed that way for days).
 'use strict';
 const { spawnSync } = require('child_process'), fs = require('fs'), path = require('path');
 const L = require('./lib');
@@ -40,7 +42,7 @@ for (const [key, name, file, args] of SUITES) {
   process.stdout.write(out);
   const secs = Math.round((Date.now() - t0) / 1000);
   const blocked = out.match(/Cannot find module '(playwright|axe-core[^']*)'|no PostgreSQL server binaries|Executable doesn't exist/);
-  const verdict = r.status === 0 ? 'pass' : blocked ? 'blocked' : 'FAIL';
+  const verdict = r.status === 0 ? 'pass' : blocked && !process.env.CI ? 'blocked' : 'FAIL';
   if (verdict === 'FAIL') failed++;
   const last = verdict === 'blocked' ? `needs ${blocked[1] ? blocked[1].split('/')[0] : blocked[0]}`
     : out.trim().split('\n').filter(l => /^[✓✗]|problem/.test(l.trim())).slice(-1)[0] || out.trim().split('\n').slice(-1)[0] || '';

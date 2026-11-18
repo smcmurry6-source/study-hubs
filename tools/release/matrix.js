@@ -36,7 +36,12 @@ const QUICK = process.argv.includes('--quick');
   for (const engine of engines) {
     let browser;
     try { browser = await pw[engine].launch(engine === 'chromium' && process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}); }
-    catch (e) { notes.push(`${engine}: not installed here, skipped (npx playwright install ${engine})`); continue; }
+    catch (e) {
+      /* on a computer a missing engine is skipped; in CI every job installs the one it runs, so one that won't start
+         is a problem (2026-11-18: a skip there would pass without testing anything) */
+      if (process.env.CI) { problems.push(`${engine}: wouldn't start: ${e.message.split('\n')[0]}`); continue; }
+      notes.push(`${engine}: not installed here, skipped (npx playwright install ${engine})`); continue;
+    }
     for (const [label, dev] of MATRIX) {
       const tag = `${engine} · ${label}`;
       const opts = Object.assign(strip(dev), { serviceWorkers: 'block' });
@@ -99,6 +104,14 @@ const QUICK = process.argv.includes('--quick');
   }
 
   /* ---------- resilience (Chromium) ---------- */
+  /* It uses Chromium's network emulation, so only a run with Chromium in SH_ENGINES checks it. CI's WebKit and Firefox
+     jobs have only their own browser: until 2026-11-18 they stopped here ("Executable doesn't exist", reported as
+     blocked, which passed), and every problem their devices had found was lost. */
+  if (!engines.includes('chromium')) {
+    notes.push('resilience: checked in the Chromium run');
+    srv.server.close();
+    process.exit(L.report('devices and resilience', problems, notes));
+  }
   const browser = await L.launch();
   for (const [label, dev] of [['phone', D['Pixel 7']], ['laptop', { viewport: { width: 1280, height: 800 } }]]) {
     const hub = live[0] || L.hubs()[0];
