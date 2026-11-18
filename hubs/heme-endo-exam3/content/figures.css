@@ -473,7 +473,7 @@
 .anima .follicle-svg .fo-epn{fill:color-mix(in srgb,var(--bx-nuc) 70%,var(--bx-eosin))}
 .anima .follicle-svg .fo-lum{fill:var(--bx-lumen);stroke:var(--bx-cyto-line);stroke-width:.8}
 .anima .follicle-svg .fo-tumn{fill:var(--bx-nuc)}
-@media (max-width:560px){.anima .follicle-svg .t.fo-zn{font-size:14.5px}.anima .follicle-svg .t.fo-ly{font-size:14px}.anima .follicle-svg .t.fo-h{font-size:12.5px}.anima .follicle-svg .t.fo-row,.anima .follicle-svg .t.fo-mn-t,.anima .follicle-svg .t.fo-ln{font-size:14px}.anima .follicle-svg .t.fo-title{font-size:16.5px}.anima .follicle-svg .t.fo-il{font-size:13px}}
+@media (max-width:560px){.anima .follicle-svg .t.fo-zn{font-size:14.5px}.anima .follicle-svg .t.fo-ly{font-size:14px}.anima .follicle-svg .t.fo-h{font-size:15px}.anima .follicle-svg .t.fo-row,.anima .follicle-svg .t.fo-mn-t,.anima .follicle-svg .t.fo-ln{font-size:14px}.anima .follicle-svg .t.fo-title{font-size:16.5px}.anima .follicle-svg .t.fo-il{font-size:13px}}
 
 .anima[data-anima="glandmap"] .am-svg{max-width:500px}
 .anima[data-anima="glandmap"] .am-summary{white-space:pre-line}
@@ -855,7 +855,7 @@
 .anima .ladder-svg .nl-ban{fill:var(--anatomy-shade-1);stroke:var(--anatomy-lo);stroke-width:1}
 .anima .ladder-svg .nl-ban.is-on{stroke:var(--anatomy-lit);stroke-width:1.4}
 .anima .ladder-svg .t.nl-v{font-size:12.5px;font-weight:600;fill:var(--anatomy-strong)}
-@media (max-width:560px){.anima .ladder-svg .t.nl-nm{font-size:15.5px}.anima .ladder-svg .t.nl-lk,.anima .ladder-svg .t.nl-sub,.anima .ladder-svg .t.nl-tag,.anima .ladder-svg .t.nl-v{font-size:14px}.anima .ladder-svg .t.nl-btag{font-size:14px}.anima .ladder-svg .t.nl-h{font-size:13.5px}.anima .ladder-svg .t.nl-bn{font-size:13px}}
+@media (max-width:560px){.anima .ladder-svg .t.nl-nm{font-size:15.5px}.anima .ladder-svg .t.nl-lk,.anima .ladder-svg .t.nl-sub,.anima .ladder-svg .t.nl-tag,.anima .ladder-svg .t.nl-v{font-size:14px}.anima .ladder-svg .t.nl-btag{font-size:14px}.anima .ladder-svg .t.nl-h{font-size:13.5px}.anima .ladder-svg .t.nl-bn{font-size:14.2px}}
 
 .anima[data-anima="laminadura"] .am-svg{max-width:500px}
 .anima .laminadura-svg{--lm-f0:#141414;--lm-f1:#202020;--lm-st:#2a2a2a;--lm-bone:#6b6b6b;--lm-mar:#505050;--lm-gl1:#747474;--lm-gl2:#606060;--lm-ldw:#d6d6d6;--lm-pdlc:#262626;
@@ -1029,6 +1029,64 @@
 .anima .letdown-svg .t.ld-lv.ld-q{fill:var(--anatomy-muted);font-weight:500}
 .anima .letdown-svg .ld-ring{fill:none;stroke:var(--anatomy-lit);stroke-width:2.4}
 
+.anima[data-anima="nkcheck"] .am-svg{max-width:560px}
+.anima .nkcheck-svg .t.xa-h{font-size:11px;font-weight:600;letter-spacing:.07em;fill:var(--anatomy-muted)}
+.anima .nkcheck-svg .t.xa-l{font-size:13px}
+.anima .nkcheck-svg .xa-tc{fill:color-mix(in srgb,var(--bx-cyto) 55%,var(--surface));stroke:var(--bx-cyto-line);stroke-width:1.3}
+.anima .nkcheck-svg .xa-tc.xa-die{fill:color-mix(in srgb,var(--bx-cyto) 25%,var(--surface));stroke:var(--bx-inhib);stroke-dasharray:6 4}
+.anima .nkcheck-svg .xa-tn{fill:color-mix(in srgb,var(--bx-nuc) 70%,var(--bx-cyto));stroke:var(--bx-nuc-line);stroke-width:.9}
+.anima .nkcheck-svg .xa-st{fill:none;stroke-width:3;stroke-linecap:round}
+.anima .nkcheck-svg .xa-cup{fill:none;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.anima .nkcheck-svg .xa-act{stroke:var(--bx-stim)}
+.anima .nkcheck-svg .xa-inh{stroke:var(--bx-inhib)}
+.anima .nkcheck-svg .xa-lig{stroke:color-mix(in srgb,var(--bx-stim) 55%,var(--anatomy-mid))}
+.anima .nkcheck-svg .xa-knob{fill:var(--bx-stim);stroke:color-mix(in srgb,var(--bx-stim) 60%,var(--anatomy-hi));stroke-width:.8}
+.anima .nkcheck-svg .xa-mhcs{stroke:var(--bx-violet)}
+.anima .nkcheck-svg .xa-mhc{fill:var(--bx-violet);stroke:color-mix(in srgb,var(--bx-violet) 60%,var(--anatomy-hi));stroke-width:.8}
+.anima .nkcheck-svg .xa-b2m{fill:var(--bx-violet-soft);stroke:var(--bx-violet);stroke-width:1}
+.anima .nkcheck-svg .xa-ghost{fill:none;stroke:var(--bx-violet);stroke-width:1.3;stroke-dasharray:3 2.5}
+.anima .nkcheck-svg .xa-gr{fill:var(--bx-gold);stroke:color-mix(in srgb,var(--bx-gold) 60%,var(--anatomy-hi));stroke-width:.6}
+.anima .nkcheck-svg .xa-pore{fill:var(--surface);stroke:var(--bx-inhib);stroke-width:1.2}
+.anima .nkcheck-svg .xa-ab{fill:none;stroke:var(--bx-blue);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.anima .nkcheck-svg .xa-fcr{fill:none;stroke:var(--bx-hot);stroke-width:2.6;stroke-linecap:round}
+.anima .nkcheck-svg .xa-fcr-c{fill:var(--bx-hot)}
+.anima .nkcheck-svg .xa-fulc{fill:var(--anatomy-lo);stroke:var(--anatomy-mid);stroke-width:1}
+.anima .nkcheck-svg .xa-beam{fill:none;stroke:var(--anatomy-mid);stroke-width:2.4;stroke-linecap:round}
+.anima .nkcheck-svg .xa-pan{fill:var(--anatomy-faint);stroke:var(--anatomy-mid);stroke-width:1.2}
+.anima .nkcheck-svg .xa-wi{fill:var(--bx-inhib)}
+.anima .nkcheck-svg .xa-wa{fill:var(--bx-stim)}
+@media (max-width:560px){.anima .nkcheck-svg .t.xa-h{font-size:15px}.anima .nkcheck-svg .t.xa-l{font-size:15px}}
+
+.anima .nkcheck-svg{--xa-baso:#2c2672;--xa-pallor:#fff4f2}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .anima .nkcheck-svg{--xa-baso:#6a62d6;--xa-pallor:#fbd3d4} }
+:root[data-theme="dark"] .anima .nkcheck-svg{--xa-baso:#6a62d6;--xa-pallor:#fbd3d4}
+.anima .nkcheck-svg .xa-cell{stroke:var(--bx-cyto-line);stroke-width:1.1}
+.anima .nkcheck-svg .xa-c-neu{fill:color-mix(in srgb,var(--bx-cyto) 45%,var(--surface))}
+.anima .nkcheck-svg .xa-c-eos{fill:color-mix(in srgb,var(--bx-cyto) 40%,var(--surface))}
+.anima .nkcheck-svg .xa-c-bas{fill:color-mix(in srgb,var(--bx-violet-soft) 70%,var(--surface))}
+.anima .nkcheck-svg .xa-c-mono{fill:color-mix(in srgb,var(--bx-blue-soft) 75%,var(--bx-cyto))}
+.anima .nkcheck-svg .xa-c-lym,.anima .nkcheck-svg .xa-c-nk{fill:var(--bx-blue-soft);stroke:var(--bx-blue)}
+.anima .nkcheck-svg .xa-c-mk{fill:color-mix(in srgb,var(--bx-cyto) 55%,var(--surface))}
+.anima .nkcheck-svg .xa-c-blast{fill:color-mix(in srgb,var(--bx-blue-soft) 60%,var(--surface));stroke:var(--bx-blue)}
+.anima .nkcheck-svg .xa-nu{fill:var(--bx-nuc);stroke:var(--bx-nuc-line);stroke-width:.9}
+.anima .nkcheck-svg .xa-nu-bas{fill:color-mix(in srgb,var(--bx-nuc) 80%,var(--bx-violet-soft))}
+.anima .nkcheck-svg .xa-nu-mono{fill:color-mix(in srgb,var(--bx-nuc) 78%,var(--bx-violet-soft))}
+.anima .nkcheck-svg .xa-nu-lym{fill:color-mix(in srgb,var(--bx-nuc) 72%,var(--bx-nuc-line))}
+.anima .nkcheck-svg .xa-nu-blast{fill:color-mix(in srgb,var(--bx-nuc) 55%,var(--bx-violet-soft))}
+.anima .nkcheck-svg .xa-strand{fill:none;stroke:var(--bx-nuc-line);stroke-linecap:round;stroke-linejoin:round}
+.anima .nkcheck-svg .xa-chrom{fill:var(--bx-nuc-line);opacity:.35}
+.anima .nkcheck-svg .xa-nucleo{fill:var(--bx-nuc-line);opacity:.8}
+.anima .nkcheck-svg .xa-g-neu1{fill:var(--bx-violet)}
+.anima .nkcheck-svg .xa-g-neu2{fill:color-mix(in srgb,var(--bx-eosin) 55%,var(--bx-violet));opacity:.7}
+.anima .nkcheck-svg .xa-g-eos{fill:color-mix(in srgb,var(--bx-blood) 62%,var(--bx-hot));stroke:color-mix(in srgb,var(--bx-blood) 80%,var(--anatomy-hi));stroke-width:.35}
+.anima .nkcheck-svg .xa-g-bas{fill:var(--xa-baso);stroke:color-mix(in srgb,var(--xa-baso) 70%,var(--anatomy-hi));stroke-width:.3}
+.anima .nkcheck-svg .xa-g-mono{fill:var(--bx-eosin);opacity:.85}
+.anima .nkcheck-svg .xa-g-mk{fill:var(--bx-violet);opacity:.55}
+.anima .nkcheck-svg .xa-rbc{fill:var(--bx-blood);stroke:color-mix(in srgb,var(--bx-blood) 70%,var(--anatomy-hi));stroke-width:.8}
+.anima .nkcheck-svg .xa-rbc-c{fill:var(--xa-pallor);opacity:.2}
+.anima .nkcheck-svg .xa-plt{fill:var(--bx-violet-soft);stroke:var(--bx-violet);stroke-width:.8}
+.anima .nkcheck-svg .xa-g-plt{fill:var(--bx-violet)}
+
 .anima[data-anima="node"] .am-svg{max-width:540px}
 .anima .node-svg .t.ln-l{font-size:13px}
 @media (max-width:560px){.anima .node-svg .t.ln-l{font-size:14.8px}}
@@ -1110,6 +1168,35 @@
 .anima .node-svg .ln-irbc2{fill:color-mix(in srgb,var(--bx-blood) 55%,var(--bx-blood-soft))}
 .anima .node-svg .ln-ixl{fill:var(--bx-gold);stroke:var(--anatomy-hi);stroke-width:.8}
 .anima .node-svg .ln-ixn{fill:var(--bx-nuc)}
+
+.anima[data-anima="nodespread"] .am-svg{max-width:540px}
+.anima .nodespread-svg .ya-body{fill:var(--anatomy-shade-2);stroke:var(--anatomy-mid);stroke-width:1.2}
+.anima .nodespread-svg .ya-dia{fill:none;stroke:var(--anatomy-mid);stroke-width:1.6;stroke-dasharray:5 4}
+.anima .nodespread-svg .ya-org{fill:color-mix(in srgb,var(--bx-eosin) 30%,var(--surface));stroke:var(--anatomy-lo);stroke-width:1}
+.anima .nodespread-svg .ya-org.is-on{fill:color-mix(in srgb,var(--bx-hot) 32%,var(--surface));stroke:var(--bx-hot);stroke-width:1.6}
+.anima .nodespread-svg .ya-spl{fill:color-mix(in srgb,var(--bx-violet) 18%,var(--surface))}
+.anima .nodespread-svg .ya-bone{fill:var(--bx-fat);stroke:var(--anatomy-lo);stroke-width:1}
+.anima .nodespread-svg .ya-bone.is-on{fill:color-mix(in srgb,var(--bx-hot) 32%,var(--surface));stroke:var(--bx-hot);stroke-width:1.6}
+.anima .nodespread-svg .ya-node{fill:var(--surface);stroke:var(--anatomy-mid);stroke-width:1.2}
+.anima .nodespread-svg .ya-node.is-on{fill:var(--bx-violet);stroke:var(--bx-nuc-line);stroke-width:1.4}
+.anima .nodespread-svg .ya-chain{fill:none;stroke:var(--bx-hot);stroke-width:2.2;stroke-linecap:round}
+.anima .nodespread-svg .ya-arw{fill:var(--bx-hot)}
+.anima .nodespread-svg .t.ya-note{font-size:12px;font-weight:600;fill:var(--bx-hot)}
+.anima .nodespread-svg .t.ya-ol{font-size:12px;font-weight:600;fill:var(--anatomy-strong)}
+.anima .nodespread-svg .t.ya-leg{font-size:12px;fill:var(--anatomy-muted)}
+.anima .nodespread-svg .t.ya-h{font-size:12px;font-weight:600;letter-spacing:.06em;fill:var(--anatomy-strong)}
+.anima .nodespread-svg .t.ya-lab{font-size:12px;fill:var(--anatomy-muted)}
+.anima .nodespread-svg .t.ya-val{font-size:13.5px;font-weight:600;fill:var(--anatomy-strong)}
+.anima .nodespread-svg .ya-sb{fill:var(--surface);stroke:var(--anatomy-lo);stroke-width:1.2}
+.anima .nodespread-svg .ya-sb.is-on{fill:var(--bx-violet);stroke:var(--bx-nuc-line)}
+.anima .nodespread-svg .t.ya-sn{font-size:12px;font-weight:700;fill:var(--anatomy-muted);stroke:none}
+.anima .nodespread-svg .t.ya-sn.is-on{fill:var(--surface)}
+.anima .nodespread-svg .t.ya-sv{font-size:13px;fill:var(--anatomy-muted)}
+.anima .nodespread-svg .t.ya-sv.is-on{fill:var(--anatomy-strong);font-weight:600}
+.anima .nodespread-svg .ya-ban{fill:var(--anatomy-shade-1);stroke:var(--anatomy-lit);stroke-width:1.4}
+.anima .nodespread-svg .t.ya-bt{font-size:12px;font-weight:600;letter-spacing:.06em;fill:var(--anatomy-muted)}
+.anima .nodespread-svg .t.ya-bv{font-size:13.5px;font-weight:600;fill:var(--anatomy-strong)}
+@media (max-width:560px){.anima .nodespread-svg .t.ya-val,.anima .nodespread-svg .t.ya-bv{font-size:15.5px}.anima .nodespread-svg .t.ya-lab,.anima .nodespread-svg .t.ya-leg,.anima .nodespread-svg .t.ya-note,.anima .nodespread-svg .t.ya-ol,.anima .nodespread-svg .t.ya-h,.anima .nodespread-svg .t.ya-bt,.anima .nodespread-svg .t.ya-sn{font-size:14.4px}.anima .nodespread-svg .t.ya-sv{font-size:15px}}
 
 .anima[data-anima="oocyte"] .am-svg{max-width:600px}
 .anima .oocyte-svg .oc-h{font:600 11px var(--anatomy-mono);letter-spacing:.06em;fill:var(--anatomy-muted)}
