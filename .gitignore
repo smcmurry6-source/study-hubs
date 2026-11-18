@@ -28,3 +28,8 @@ _preview/
 # npm i --no-save playwright axe-core (CI and the release tests): never committed
 node_modules/
 __pycache__/
+
+# The launch trailer (tools/trailer/): its working files and the video are never committed (the site publishes every
+# file in main), and neither is the list of leaderboard names its footage may show (learner-data-privacy)
+tools/trailer/out/
+tools/trailer/names.local.json

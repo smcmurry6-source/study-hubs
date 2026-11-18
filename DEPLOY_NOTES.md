@@ -32,6 +32,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (The launch trailer's tools, Claude Code, #415; nothing on the site changes)** — Sam: "you can merge
+  the tools and notes in case we ever make another trailer". `tools/trailer/` made the redesign's launch trailer, a
+  94 second, 16:9 video narrated by Timmy from a newly drawn Timmy Time studio
+  ([the task](vault/tasks/done/2026-11-13-launch-trailer.md), [README](tools/trailer/README.md)): `script.md` (his lines),
+  `voice.py` (the show's Kokoro voice and lexicon), `audio.py` (a new music cue and sound effects from the show's
+  instruments, the master, and the timeline everything is cut to), `studio.mjs` (the studio in the site's ink style,
+  in layers, with its light), `shots.mjs` + `record.mjs` (the feature shots and where the camera looks, recorded a
+  frame at a time from a preview on made-up data at 2560 x 1440), `compose.mjs` (every frame: the cold open, the
+  "Rebuilt." title card, a chapter card before each feature, the recorded page on a screen the camera pushes in on,
+  Timmy's booth cam with his line in a bar beside it, the end card) and `cut.mjs` (the mp4 with `.vtt`/`.srt`).
+  **The video is not in the repo and not on the site** (Sam: "A link/file only"): `tools/trailer/out/` and
+  `names.local.json` (the leaderboard names its boards show, with Sam's OK) are in `.gitignore`. Ask Timmy's answer
+  in the footage is staged from Occlusion's notes (the preview has no model), and the idea board's notes are the
+  preview's made-up ideas under made-up names. Built 2026-11-14 on the release branch as #360, which was closed
+  unmerged on 2026-11-18 (Sam: "im done with the trailer"); this PR lands the same files on `main`. **The tools were last run against
+  the site as it was on 2026-11-14**: a new trailer starts by checking `shots.mjs`'s selectors and `record.mjs`'s
+  patches of the preview against the pages as they are then.
 - **2026-11-18 (the to-do list as packages, `/backlog`, and the to-do rule tightened, Claude Code)** — Sam: "give me a list
   of all the open items on the to do and the inbox ... group them in packages that can be shipped in the same pr ... a really
   big item should go alone in its own session ... make this a skill". `node tools/todo/list.mjs` prints every open item (task

@@ -32,6 +32,12 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   beach, and the dog in the doghouse, who brushes twice a day.
 - **The podcast studio** is a yard piece: where it stands, that's where Timmy Time is recorded. Nothing in an episode
   says otherwise so far; don't place the studio anywhere else.
+  **Its inside** was first drawn for the redesign's launch trailer (`tools/trailer/studio.mjs`, 2026-11-14), so
+  keep to it: plum acoustic-foam walls, one window with sky in it (never the yard, so it fits wherever the studio
+  stands), an ON AIR lamp that comes on when he starts and goes off when he signs off, a framed Timmy Time poster,
+  a shelf, a desk with a small mixer, his mug, his pages, and a microphone on a boom arm with a pop filter. He wears
+  the headphones. The trailer is not an episode ("this is not Timmy Time"): it has no number, no likes and no
+  comments, and it adds no other lore.
 - **His health shows in how he moves** at his place (bouncing when sparkling, on the doorstep when he needs
   treatment), the same HP as everywhere else. A visitor never sees it: a visited Timmy is always drawn well.
 - **Number thirty-one**, the second molar who lives right behind him, is his neighbor (Heme & Endo Exam 1). A hypochondriac
