@@ -32,6 +32,24 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (A gold reward card for XP and crowns, and the Today card's crowns back, Claude Code)** — Sam: "the Today card in the
+  question bank is no longer showing how many crowns youve earned. also when you reach a goal or other things like that where you get
+  xp or crowns, a black box comes up from the bottom of the screen to tell you. i want it to look much cooler and communicate that you
+  just got xp and crowns better". **The reward card** (`prizeCard`/`drawPrize` in `widget/hub-rewards.js`, its styles inside it so
+  the dashboard, at 342 of 345 KB, carries none of it): what an answer's bonuses, a prize (`sh:prize`), a medal, a finished mock or
+  game and Timmy Time pay comes up as a gold card in place of the dark toast: a title ("10 right in a row!"), the XP and the crowns in
+  two pills counting up from 0, a turning sunburst behind the coin, confetti, and on closing the stars and coins fly to the rank pill.
+  Rewards from one reply share a card (260 ms). Crowns: as many as XP for a prize, XP + 50 for a medal, and for study XP (the 20th
+  answer, a mock, a game) 5 per 10 before a boost, shown only when that's exact (`studyCrowns`, the replies' `mult`). Today's goal
+  waits up to 5 s for the daily ring's prize and makes one card with it ("Today's goal met! 20 questions · 8 days in a row",
+  +100 XP, +100 crowns). Bottom center on a laptop, dropping in at the top on a phone (`.hx-prizes`, clear of Timmy, the tab bar
+  and the report button, BUG-126's spot); a tap closes it; still with reduced motion, Answer animations off or Focus mode
+  (`hx-still`). `widget/v3.js` adds `shGame.prizeName` (prizeText uses it). **The crowns tile (BUG-182)**: it came only from the
+  bootstrap, which timed out for up to one page in ten in the busy minutes ([#421](https://github.com/smcmurry6-source/study-hubs/pull/421)'s load);
+  `widget/hub-timmy.js` now takes the balance from the last paying reply and asks `get_my_shop` on its own (8-20 s later, once
+  more a minute after), and the tile says "+n today" (`t.c`, from `sh:crowns` gains). The smoke test reads the arcade's +50 from
+  the card. About page ("The reward card", the shop's balance line) and Ask Timmy's site help. An index for `sh_answer`'s
+  speed-limit reads was found and tested, and left to #421's database work ([inbox](vault/tasks/inbox.md)).
 - **2026-11-18 (the admin page's A/B versions page; answer saves that survive a busy database, Claude Code)** — Sam asked
   for the A/B results on the admin page and reported its loading errors ("canceling statement due to statement timeout").
   The Supabase logs showed the same timeouts failing students' answer saves in bursts of 1 to 5 minutes all day (242 of

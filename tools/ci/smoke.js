@@ -251,7 +251,9 @@ async function wiringCheck(context, hub, label){
     else {
       const from = calls.length, toasts = [];
       await page.exposeFunction('__toast', t => toasts.push(t));
-      await page.evaluate(() => { const host = document.getElementById('hxToast'); if (host) new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.classList && n.classList.contains('hx-toast')) window.__toast(n.textContent); }))).observe(host, { childList: true }); });
+      /* a reward shows on the reward card (widget/hub-rewards.js drawPrize, in .hx-prizes beside the toasts), whose
+         screen-reader line says what it paid; anything else is a toast */
+      await page.evaluate(() => { const host = document.getElementById('hxToast'); if (host) new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (!n.classList) return; if (n.classList.contains('hx-toast')) window.__toast(n.textContent); else if (n.classList.contains('hx-prize')) window.__toast((n.querySelector('.sr') || n).textContent); }))).observe(host.parentNode, { childList: true, subtree: true }); });
       const picks = await play(page, '.ar-grid [data-game="smile"]');
       for (let i = 0; i < 20 && calls.filter(c => c.fn === 'xp_session_finish').length < 2; i++) await page.waitForTimeout(250);
       await page.waitForTimeout(500);
@@ -270,7 +272,7 @@ async function wiringCheck(context, hub, label){
       const pill = await page.evaluate(() => Number(((document.querySelector('#hxRank [data-xp]') || {}).textContent || '').replace(/\D/g, '')));
       if (pill !== total) problems.push(`${name} (${label}): the rank pill reads ${pill} XP after the games, not the ${total} the server paid`);
       const gname = await page.evaluate(() => ((((window.SH_HUB || {}).arcade || {}).games || []).find(g => g.id === 'smile') || {}).name || '');
-      if (!toasts.includes(`${gname} finished: +50 XP.`)) problems.push(`${name} (${label}): the +50's toast should name the game as the lobby does ("${gname} finished: +50 XP."): ${JSON.stringify(toasts)}`);
+      if (!toasts.some(t => t.startsWith(`${gname} finished: +50 XP and 25 Shiny Gold Crowns`))) problems.push(`${name} (${label}): the +50's reward card should name the game as the lobby does, with its 25 crowns ("${gname} finished: +50 XP and 25 Shiny Gold Crowns."): ${JSON.stringify(toasts)}`);
       /* one of the hub's own games (Cusp Sort, Pocket Crusher): its session starts where its overlay comes off (the call
          to shGames.played in its arcade.js) */
       const AJ = fs.readFileSync(content(hub, 'arcade.js'), 'utf8');
