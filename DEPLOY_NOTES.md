@@ -44,7 +44,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 - **2026-11-18 (answer saves cost a quarter as much; the database is on the Free plan, Claude Code)** — Sam: "i am getting a
   bunch of errors for the database and things are getting really slow". From 19:35 UTC answer saves failed in bursts, then
   from 20:10 without letup (40-70% of every request for about 35 minutes), until even the connector couldn't connect; Sam
-  restarted the database from the dashboard and requests came back at 20:53. The cause: the project is on the **Free plan**,
+  restarted the database from the dashboard at about 20:50 (unreachable until 20:57; no failures from 21:03). The cause: the project is on the **Free plan**,
   whose shared CPU was starved (a one-row query took 442 ms to plan with everything in memory), and since `migration_v68`
   that morning every answer worked out the whole crown balance and the hub's medal count. `migration_v72.sql` makes both
   cheap with the same results: the awards summed by kind before `sh_is_prize` (13 → 2.9 ms for a student of 8,000

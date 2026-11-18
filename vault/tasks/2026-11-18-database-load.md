@@ -121,7 +121,9 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   the server's shared CPU was starved, not a slow query or a lock. **The project is on the Free plan** (the notes had
   assumed a paid Micro). On the throwaway copy the answer save's cost was two parts added or kept by `migration_v68`
   (`sh_wallet` for the balance in every reply, 13 ms; `sh_medal_check`, 5.7 ms), so `migration_v72.sql` makes both cheap.
-  Sam restarted the database from the dashboard at about 20:50 UTC ("Restart project"); requests came back at 20:53.
+  Sam restarted the database from the dashboard at about 20:50 UTC ("Restart project"): it was unreachable from about 20:45
+  to 20:57 (Cloudflare's 520-525), then at 20:56 the pages' held retries came at once (3,300 requests in a minute against
+  the usual 300-500); failures fell to a few a minute by 21:00 and stopped at 21:03, just after v72 went in.
   The restart doesn't give back CPU: it clears a jam (queued requests, retries) and let v72 in. Retries from the pages
   (four over three minutes, #421) kept a jam going once it started (the retries box above).
   Two corrections to the evening entry above, from the edge logs read later (they arrive about 5 minutes late): it did
