@@ -452,10 +452,11 @@ function paintStill(){ document.documentElement.classList.toggle("hx-still", sti
 paintStill(); document.addEventListener("sh:pref", paintStill);
 function roomReady(){ return !!(CA && CA.room && window.shPet && window.shPet.art && !focusOn()); }
 function hashOf(k){ var h = 0; k = String(k); for (var i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) | 0; return Math.abs(h); }
-var outfitsAsked = false;
-function wantOutfits(){
-if (outfitsAsked) return; outfitsAsked = true;
-var el = document.createElement("script"); el.src = WIDGET + "hub-art/outfits.js"; el.async = true;
+var outfitsAsked = {};
+function wantOutfits(set){
+var file = set ? "outfits/" + set + ".js" : "outfits.js";
+if (outfitsAsked[file]) return; outfitsAsked[file] = 1;
+var el = document.createElement("script"); el.src = WIDGET + "hub-art/" + file; el.async = true;
 el.onload = function(){ rm = null; syncRoom(); paintBoard(); };
 document.head.appendChild(el);
 }
@@ -466,6 +467,7 @@ svg = P.art({ hp: 100, mood: mood || "happy", hat: "" }, 200);
 if (fit && fit.indexOf(":") < 0) {
 if (O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
 else if (!O) wantOutfits();
+else if (O.where && O.where[fit] && !(O.got && O.got[O.where[fit]])) wantOutfits(O.where[fit]);
 }
 return String(svg).replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
 }
@@ -1413,7 +1415,7 @@ window.shShop.open({ onClose: function(){ SHOP.open = false; var b = q(".dx-shop
 }).then(null, function(){ toast("The shop didn't open. Try again in a moment."); });
 }
 document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); } });
-var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
 function costumeOfDay(visitor, day, holiday){
 if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
 var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";

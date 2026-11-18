@@ -17,7 +17,7 @@ tags: [map]
   `matrix.js`, `postcheck.js`, the database suites `admin-ops.js`, `retention.js` and `xp.js` (the game layer's server) on
   a throwaway copy built by `pg.js`; `run.js` runs them all). The bug log and UAT checklist are in `vault/release/`.
 - `tools/figures/site/` — the site's drawn art, built by `build.mjs`: emblems, mastheads, medals, the rewards art, and
-  Timmy's place (`place.mjs`, the kit; `sets.mjs`, the list of seasonal and rank sets; `packs/<set>.mjs`, one file per
+  Timmy's place (`place.mjs`, the kit; `sets.mjs`, the list of seasonal sets, year-round collections, rank sets and rare costumes; `packs/<set>.mjs`, one file per
   set; `pack-preview.mjs`, a contact sheet of one set: [draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md)), and
   the shop's own art (`shop.mjs`: the Shiny Gold Crown coin, the snack and boost thumbnails, the rarity frames, built
   into `widget/hub-art/shop.js`, `window.SH_SHOP_ART`; `shop-sheets.mjs`, its contact sheets:
@@ -35,7 +35,9 @@ tags: [map]
   The dashboard's drawn parts are kits the page draws at its own size: `widget/hub-art/class.js`
   (the studying-now classroom, the leaderboard's stage and the recap's bar graph and crowd, from `classroom.mjs`,
   `stage.mjs` and `recap.mjs` in `tools/figures/site/`)
-  and `widget/hub-art/outfits.js` (the shop's outfits and `dress()`, loaded only when someone on the page wears one).
+  and `widget/hub-art/outfits.js` (the everyday and rank outfits and `dress()`, loaded only when someone on the page wears one;
+  since 2026-11-18 the costumes, the seasonal sets' and the collections' outfits are `widget/hub-art/outfits/costumes.js`,
+  `seasons.js` and `collections.js`, each fetched only when someone drawn wears one of theirs: `where` in `outfits.js` says which).
   The three journeys (Handpiece, ModuPro, Loupes: [task](../tasks/done/2026-11-06-redesign-progression-journeys.md)):
   `widget/journeys.js` (the hand-off and the Dark Matter unlock, full-screen scenes, and the road ahead) and
   `widget/hub-art/journeys.js` (the ModuPro's and the loupes' shapes for `shRanks.art` and the three journey trophies,
