@@ -394,6 +394,8 @@ export function pack(T){
         var c = P(1.8, 1.82, .4), x = c[0], y = c[1], B = o.night ? ["#E3DCC8", "#C4B898", "#A0916E"] : BONE;
         var bone = function(d, w, col){ return L(d, w + 2.6) + L(d, w, col || B[0]); };
         var knob = function(px, py, r, col){ return circ(px, py, r, col || B[0], 1.1); };
+        /* the whole skeleton at three quarters of its drawn size, so it stands on its plinth */
+        s += '<g transform="translate(' + f(x + 3) + " " + f(y) + ') scale(.74) translate(' + f(-x) + " " + f(-y) + ')">';
         /* the far leg, in shade */
         var leg = function(dx, col){
           return bone("M" + f(x + 6 + dx) + " " + f(y - 31) + " L" + f(x - 1 + dx) + " " + f(y - 18) + " L" + f(x + 6 + dx) + " " + f(y - 7) + " L" + f(x + dx) + " " + f(y - .6), 3.4, col) + knob(x - 1 + dx, y - 18, 2.2, col) + knob(x + 6 + dx, y - 7, 1.8, col) +
@@ -420,14 +422,15 @@ export function pack(T){
         /* the skull */
         s += rexSkull(x - 14, y - 46, 0);
         if (o.snow) s += ell(x - 22, y - 60.6, 7, 1.6, "#FFFFFF", 0) + ell(x + 6, y - 44, 5, 1.4, "#FFFFFF", 0);
+        s += "</g>";
         /* the uplight */
         var ul = P(.6, 2.85, .4); s += FO("M" + f(ul[0] - 2.4) + " " + f(ul[1]) + " l.8 -3.4 h3.2 l.8 3.4 z", "#3B2E3A", .9) + ell(ul[0], ul[1] - 3.4, 1.6, .7, o.night ? K.litHot : "#FFF3C4", .6);
         return s;
       },
-      lights: function(){ var c = P(1.8, 1.82, .4), ul = P(.6, 2.85, .4); return T.glowAt(c[0] - 24, c[1] - 52, 14) + T.glowAt(ul[0], ul[1] - 4, 6); },
+      lights: function(){ var c = P(1.8, 1.82, .4), ul = P(.6, 2.85, .4); return T.glowAt(c[0] - 15, c[1] - 38, 10) + T.glowAt(ul[0], ul[1] - 4, 6); },
       bits: function(o){
         var c = P(1.8, 1.82, .4);
-        return rexSkull(c[0] - 14, c[1] - 46, -26);
+        return '<g transform="translate(' + f(c[0] + 3) + " " + f(c[1]) + ') scale(.74) translate(' + f(-c[0]) + " " + f(-c[1]) + ')">' + rexSkull(c[0] - 14, c[1] - 46, -26) + "</g>";
       }
     }
   };
