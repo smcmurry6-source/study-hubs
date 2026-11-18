@@ -66,10 +66,10 @@ export function wlAt(g, x) { return g[1] - g[0] < 1e-9 ? g[2] : g[2] + (g[3] - g
 export function wl3d(D, st) {
   var G = D.G, P = wlPar(D, st), C = D.C, out = [], cur = null;
   function put(cls, hot, d) { if (cur && cur.c === cls && cur.h === hot) cur.d += d; else { cur = { c: cls, h: hot, d: d }; out.push(cur); } }
-  var HOT = { b: "bone", r: "root", p: "wp", q: "wp", wb: "wb", wl: "wl", f: "floor" };
+  var HOT = { b: "bone", r: P.def ? "root" : "tooth", p: "wp", q: "wp", wb: "wb", wl: "wl", f: "floor" };
   var TOP = { b: "wl-b0", r: "wl-r0", p: "wl-w0", q: "wl-w3", wb: "wl-w0", wl: "wl-w0", f: "wl-fl" };
   var ys = [G.Y0, G.Y1, -G.YP, G.YP];
-  [G.N, G.T].forEach(function (R) { for (var i = 0; i <= 4; i++) { var e = R.hy - R.r + R.r * i / 4; ys.push(e, -e); } });
+  [G.N, G.T].forEach(function (R) { for (var i = 0; i <= 8; i++) { var e = R.hy - R.r + R.r * Math.sin(i * Math.PI / 16); ys.push(e, -e); } });
   ys = ys.filter(function (v, i, a) { return v >= G.Y0 && v <= G.Y1 && a.indexOf(v) === i; }).sort(function (a, b) { return b - a; });
   var rampOk = C.s * C.ce + P.ta * C.se > 0;
   for (var j = 0; j < ys.length - 1; j++) {
@@ -80,7 +80,7 @@ export function wl3d(D, st) {
       var g = s[i], k = g[4], hot = st.k === "h" && k === "b" ? "crest" : (k === "r" && g[0] < 0 ? "nbr" : HOT[k]);
       if (k !== "q" || rampOk) put(TOP[k], hot, wlPoly(D, [[g[0], y0, g[2]], [g[1], y0, g[3]], [g[1], y1, g[3]], [g[0], y1, g[2]]]));
       var hl = i ? s[i - 1][3] : G.ZB;
-      if (g[2] > hl + 1e-6) put(k === "r" ? (Math.abs(g[0] - G.T.x0) < 1e-6 || Math.abs(g[0] - G.N.x0) < 1e-6 ? "wl-r2" : "wl-r1") : (k === "b" || i === 0 ? "wl-b2" : "wl-w2"), k === "r" ? (g[0] < 0 ? "nbr" : "root") : hot, wlPoly(D, [[g[0], y0, hl], [g[0], y0, g[2]], [g[0], y1, g[2]], [g[0], y1, hl]]));
+      if (g[2] > hl + 1e-6) put(k === "r" ? (Math.abs(g[0] - G.T.x0) < 1e-6 || Math.abs(g[0] - G.N.x0) < 1e-6 ? "wl-r2" : "wl-r1") : (k === "b" || i === 0 ? "wl-b2" : "wl-w2"), k === "r" ? (g[0] < 0 ? "nbr" : HOT.r) : hot, wlPoly(D, [[g[0], y0, hl], [g[0], y0, g[2]], [g[0], y1, g[2]], [g[0], y1, hl]]));
     }
     /* the front face: only the part the next slab toward the buccal leaves bare */
     var nz = j + 2 < ys.length ? wlProf(D, st, P, (ys[j + 1] + ys[j + 2]) / 2) : null, bx = [];
@@ -93,7 +93,7 @@ export function wl3d(D, st) {
       if (da < 1e-4 && db < 1e-4) continue;
       if (da < 0 || db < 0) { var t = da / (da - db), xm = a + t * (b - a); if (da < 0) { a = xm; na = ta = wlAt(h, xm); } else { b = xm; nb = tb = wlAt(h, xm); } }
       k = h[4]; var wall = k === "wl" && Math.abs(y0 - G.YP) < 1e-6;
-      put(k === "r" ? "wl-r1" : (wall ? "wl-w1" : "wl-b1"), k === "r" ? (a < 0 ? "nbr" : "root") : (wall ? "wl" : (st.k === "h" ? "crest" : "bone")), wlPoly(D, [[a, y0, na], [b, y0, nb], [b, y0, tb], [a, y0, ta]]));
+      put(k === "r" ? "wl-r1" : (wall ? "wl-w1" : "wl-b1"), k === "r" ? (a < 0 ? "nbr" : HOT.r) : (wall ? "wl" : (st.k === "h" ? "crest" : "bone")), wlPoly(D, [[a, y0, na], [b, y0, nb], [b, y0, tb], [a, y0, ta]]));
     }
   }
   var yb = G.Y0, xr = G.T.x0;
@@ -163,7 +163,8 @@ export function wlLabels(D, st, P) {
       lines.forEach(function (t) { w = Math.max(w, t.length); });
       var ex = c[2] === "start" ? c[1] + w * 7.8 + 5 : c[1] - w * 7.8 - 5, ey = y + (lines.length - 1) * 7.5 - 4.5;
       var px = Math.round(l[1][0] * 10) / 10, py = Math.round(l[1][1] * 10) / 10;
-      o += '<path class="wl-lead" d="M' + px + " " + py + "L" + Math.round(ex) + " " + ey + '"/><circle class="wl-dot" cx="' + px + '" cy="' + py + '" r="2.3"/>';
+      var ld = "M" + px + " " + py + "L" + Math.round(ex) + " " + ey;
+      o += '<path class="wl-halo" d="' + ld + '"/><path class="wl-lead" d="' + ld + '"/><circle class="wl-dot" cx="' + px + '" cy="' + py + '" r="2.3"/>';
       o += '<text class="wl-t wl-lab" x="' + c[1] + '" y="' + y + '" text-anchor="' + c[2] + '">' + lines.map(function (t, q) { return '<tspan x="' + c[1] + '" dy="' + (q ? "1.15em" : "0") + '">' + t + "</tspan>"; }).join("") + "</text>";
     });
   });
@@ -219,7 +220,8 @@ export function wlBands(P) {
 }
 
 const S = 13;
-const C = { c: Math.cos(PHI), s: Math.sin(PHI), se: Math.sin(ELE), ce: Math.cos(ELE), k: S, ox: 0, oy: 0 };
+const r4 = (v) => Math.round(v * 1e4) / 1e4;
+const C = { c: r4(Math.cos(PHI)), s: r4(Math.sin(PHI)), se: r4(Math.sin(ELE)), ce: r4(Math.cos(ELE)), k: S, ox: 0, oy: 0 };
 /* fit the block and crowns into the drawing, leaving the label columns */
 (() => {
   const D0 = { C };
@@ -227,13 +229,13 @@ const C = { c: Math.cos(PHI), s: Math.sin(PHI), se: Math.sin(ELE), ce: Math.cos(
   for (const x of [G.X0, G.X1]) for (const y of [G.Y0, G.Y1]) for (const z of [G.ZB, 0]) pts.push(wlPt(D0, x, y, z));
   for (const R of [G.N, G.T]) for (const x of [R.x0, R.x1]) for (const y of [-R.hy, R.hy]) pts.push(wlPt(D0, x, y, G.CEJ));
   const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1]);
-  C.ox = 200 - (Math.min(...xs) + Math.max(...xs)) / 2; C.oy = 30 - Math.min(...ys);
+  C.ox = r4(200 - (Math.min(...xs) + Math.max(...xs)) / 2); C.oy = r4(30 - Math.min(...ys));
   C.H = Math.round(Math.max(...ys) - Math.min(...ys) + 42);
 })();
 const W3 = 400, H3 = C.H;
 const FW = 220, FH = 196;
 const F = { x0: 6, y0: 6, x1: 214, y1: 190, k: 9.5 };
-F.ox = 6 + 11.6 * F.k; F.oy = 6 + 6.9 * F.k;
+F.ox = r4(6 + 11.6 * F.k); F.oy = r4(6 + 6.9 * F.k);
 
 const D = {
   G, C, F, FW, FH, LX: 4, RX: 396, LY0: 20, LY1: H3 - 10, LGAP: 38,
@@ -280,7 +282,7 @@ const st0 = { k: "3", wide: false };
 const svg3 = figureSvg({ width: W3, height: H3, className: "wl-svg", label: "An intrabony defect against a root, drawn as a block of bone seen from the buccal, with the remaining bony walls tinted and labeled and any lost wall shown dashed.", body: '<g class="wl-dyn"></g>' });
 const svgF = figureSvg({ width: FW, height: FH, className: "wl-fsvg", label: "The periapical radiograph the same defect gives, with the defect angle marked.", body: '<g class="wl-fdyn"></g>' });
 const plate = plateHtml({ fig: "S6 · Fig 2", title: "Counting the walls", hint: "pick a defect · tap a wall", readout: "3-wall · narrow",
-  body: `<div class="wl-row"><div class="am-svg wl-box">${svg3}</div><div class="wl-fbox"><p class="wl-cap">The radiograph</p><div class="am-svg">${svgF}</div><div class="wl-meter" aria-hidden="true"></div></div></div>` });
+  body: `<div class="wl-row"><div class="am-svg wl-box">${svg3}</div><div class="wl-fbox"><p class="wl-cap">The radiograph</p><div class="am-svg">${svgF}</div><div class="wl-meter" aria-hidden="true"></div><p class="wl-note">A film is flat: it shows the depth and the angle, never which walls remain. They are confirmed at surgery, once the flap is raised and the defect debrided.</p></div></div>` });
 const controls = `<div class="am-controls" role="group" aria-label="Defect"><button type="button" class="am-btn" data-wlk="3" aria-pressed="true">3-wall</button><button type="button" class="am-btn" data-wlk="2" aria-pressed="false">2-wall</button><button type="button" class="am-btn" data-wlk="1" aria-pressed="false">1-wall</button><button type="button" class="am-btn" data-wlk="c" aria-pressed="false">The opening case</button><button type="button" class="am-btn" data-wlk="h" aria-pressed="false">Horizontal bone loss</button></div>
 <div class="am-controls" role="group" aria-label="Defect angle"><button type="button" class="am-btn" data-wla="0" aria-pressed="true">Narrow: 25° or less</button><button type="button" class="am-btn" data-wla="1" aria-pressed="false">Wide</button></div>
 <div class="am-stats"><span>Bony walls <b data-wl="0"></b></span><span>On the film <b data-wl="1"></b></span><span>Regeneration <b data-wl="2"></b></span></div>
@@ -288,12 +290,12 @@ const controls = `<div class="am-controls" role="group" aria-label="Defect"><but
 <p class="am-info">Tap a wall, the root surface or the film.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
 <li>From Dr. Geurs's class, his slides and the exam-review guide: defects classified by walls, width and depth (Reynolds, 2015); the opening case's about 3 mm of 3-wall, 4 to 6 mm of 2-wall and a 1-wall part; a 1-wall defect between two teeth as a hemiseptum; more than 50% of the mineral lost before bone loss is obvious on a film, which usually means the buccal or lingual wall is gone; depth over 3 mm and an angle of 25 degrees or less; and that the walls are confirmed at surgery.</li>
-<li>Outside sources: counting a defect by its remaining bony walls, with the root surface as one side and most defects a combination, follows Goldman and Cohen (J Periodontol, 1958); how intrabony defects and their depth and angle are read from radiographs, and why a film can't show the wall configuration, follow Papapanou and Tonetti (Periodontol 2000, 2000); the defect angle as the angle between the root surface and the defect's bony wall on the film follows Steffensen and Weber (J Periodontol, 1989). That a loss inside bone shows on a film only when the cortical bone in the beam's path is involved follows Bender and Seltzer (J Am Dent Assoc, 1961), who studied lesions in jaw bone generally.</li>
-<li>A schematic: the septum is drawn wider than life so a wide defect fits, the walls are tinted so they can be counted, the roots are simple shapes, and the drawn film is the same bone summed from buccal to lingual. How much of the beam's bone each setting removes, the drawn depths (the opening case's follow the notes) and the drawn angles (20 and 40 degrees) are illustrative. The 2-wall setting is the opening case's kind, without the buccal wall. Educational, not medical advice.</li></ul></details>`;
+<li>Outside sources: counting a defect by its remaining bony walls, with the root surface as one side and most defects a combination of parts, follows Goldman and Cohen (J Periodontol, 1958). How an intrabony defect's depth and angle are read on a radiograph, and why its walls are confirmed only at surgery, follow Papapanou and Tonetti (Periodontol 2000, 2000); the defect angle as the angle between the root surface and the defect's bony wall on the film follows Steffensen and Weber (J Periodontol, 1989). The drawn film's behavior, a loss inside the bone hidden until the bone's outer walls in the beam's path are involved, follows Bender and Seltzer's experimental lesions in jaw bone (J Am Dent Assoc, 1961).</li>
+<li>A schematic: the septum is drawn wider than life so a wide defect fits, the walls are tinted so they can be counted, the roots are simple shapes cut away at the CEJ so the bone shows (the film shows the teeth whole), and the drawn film is the same bone summed from buccal to lingual. How much of the beam's bone each setting removes, the drawn depths (the opening case's follow the notes) and the drawn angles (20 and 40 degrees) are illustrative. The 2-wall setting is the opening case's kind, without the buccal wall; a crater, which keeps the buccal and lingual walls, is a 2-wall defect too (Session 1). Educational, not medical advice.</li></ul></details>`;
 
 function wlLive(root, D) {
   var svg = root.querySelector(".wl-svg"), dyn = svg.querySelector(".wl-dyn"), fsvg = root.querySelector(".wl-fsvg"), fdyn = fsvg.querySelector(".wl-fdyn");
-  var sum = root.querySelector(".am-summary"), info = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]"), meter = root.querySelector(".wl-meter");
+  var sum = root.querySelector(".am-summary"), info = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]"), meter = root.querySelector(".wl-meter"), note = root.querySelector(".wl-note");
   var st = { k: "3", wide: false };
   function draw() {
     dyn.innerHTML = D.wl3d(D, st); fdyn.innerHTML = D.wlFilm(D, st);
@@ -303,11 +305,12 @@ function wlLive(root, D) {
     for (var i = 0; i < 3; i++) { var b = root.querySelector('[data-wl="' + i + '"]'); if (b) b.textContent = D.STAT[st.k][i]; }
     var P = D.wlPar(D, st), bands = D.wlBands(P).slice().reverse(), m = "";
     if (bands.length) {
-      m = '<p class="wl-mh">Bone lost along the beam</p>';
+      m = '<p class="wl-mh">Mineral lost along the beam</p>';
       bands.forEach(function (b) { var lv = b[2], pc = lv === 1 ? 44 : (lv === 2 ? 72 : 100); m += '<div class="wl-mr"><span class="wl-ml">' + (bands.length > 1 ? D.PART[lv] : "the defect") + '</span><span class="wl-mt"><span class="wl-mf wl-mf' + lv + '" style="width:' + pc + '%"></span><span class="wl-m50"></span></span><span class="wl-mv">' + (lv === 1 ? "faint" : "obvious") + "</span></div>"; });
       m += '<p class="wl-mk"><span class="wl-m50k"></span>50%: obvious to the eye</p>';
     } else m = '<p class="wl-mh">No defect: the crest is just lower</p>';
     meter.innerHTML = m;
+    if (note) note.hidden = !bands.length;
     root.querySelectorAll("[data-wlk]").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-wlk") === st.k)); });
     root.querySelectorAll("[data-wla]").forEach(function (x) { x.setAttribute("aria-pressed", String((x.getAttribute("data-wla") === "1") === st.wide)); x.disabled = !ang; });
   }
@@ -326,7 +329,8 @@ const CSS = `
 .anima .wl-svg .wl-t{fill:var(--anatomy-text);font:13px var(--anatomy-mono)}
 .anima .wl-svg .wl-pulp{fill:var(--wl-pulp);stroke:var(--wl-line);stroke-width:.6}
 .anima .wl-svg .wl-lab{fill:var(--anatomy-strong);font-weight:600;paint-order:stroke;stroke:var(--surface);stroke-width:3.5px;stroke-linejoin:round}
-.anima .wl-svg .wl-lead{fill:none;stroke:var(--anatomy-mid);stroke-width:.8}
+.anima .wl-svg .wl-lead{fill:none;stroke:var(--anatomy-strong);stroke-width:.8;opacity:.8}
+.anima .wl-svg .wl-halo{fill:none;stroke:var(--surface);stroke-width:3;opacity:.75}
 .anima .wl-svg .wl-dot{fill:var(--anatomy-strong);stroke:var(--surface);stroke-width:1}
 .anima .wl-svg path{stroke-linejoin:round}
 .anima .wl-svg .wl-b0{fill:var(--wl-b0);stroke:var(--wl-b0);stroke-width:.5}
@@ -371,9 +375,10 @@ const CSS = `
 .anima .wl-m50{position:absolute;left:50%;top:-2px;bottom:-2px;width:2px;background:var(--ink)}
 .anima .wl-mk{margin:4px 0 0;color:var(--ink-faint);display:flex;align-items:center;gap:6px}
 .anima .wl-m50k{display:inline-block;width:2px;height:11px;background:var(--ink)}
+.anima .wl-note{margin:6px 2px 0;font-size:.78rem;line-height:1.45;color:var(--ink-soft)}
 .anima .am-btn:disabled{opacity:.45;cursor:default}
 .anima[data-anima="walls"]{--wl-b0:#ebe3d5;--wl-b1:#d8ccb8;--wl-b2:#c3b59d;--wl-fl:#ab9b80;--wl-w0:#f4d391;--wl-w1:#d9a24a;--wl-w2:#bb8636;--wl-w3:#ecc276;
-  --wl-r0:#fbf2d9;--wl-r1:#efdcab;--wl-r2:#d9c185;--wl-c0:#ffffff;--wl-c1:#f2f3f0;--wl-line:#9d927d;--wl-rim:#8a5a16;--wl-pulp:#e9a3a9;--wl-ang:#f4c56a}
+  --wl-r0:#f4e2b2;--wl-r1:#e6cf98;--wl-r2:#cfb172;--wl-c0:#ffffff;--wl-c1:#f2f3f0;--wl-line:#9d927d;--wl-rim:#8a5a16;--wl-pulp:#e9a3a9;--wl-ang:#f4c56a}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .anima[data-anima="walls"]{--wl-b0:#5b5347;--wl-b1:#4a4339;--wl-b2:#3c362e;--wl-fl:#2f2a24;--wl-w0:#c99a52;--wl-w1:#99692f;--wl-w2:#7c5526;--wl-w3:#b58646;
   --wl-r0:#a99a74;--wl-r1:#958664;--wl-r2:#7e7053;--wl-c0:#d9d6cd;--wl-c1:#c2beb3;--wl-line:#857a66;--wl-rim:#f1c27a;--wl-pulp:#9c4654;--wl-ang:#f4c56a} }
 :root[data-theme="dark"] .anima[data-anima="walls"]{--wl-b0:#5b5347;--wl-b1:#4a4339;--wl-b2:#3c362e;--wl-fl:#2f2a24;--wl-w0:#c99a52;--wl-w1:#99692f;--wl-w2:#7c5526;--wl-w3:#b58646;

@@ -17,4 +17,10 @@ import { egd } from "./egd.mjs";
 import { excess } from "./excess.mjs";
 import { clsteps } from "./clsteps.mjs";
 import { smile } from "./smile.mjs";
-export const FIGURES = [pistates(), meffert(), bop(), xrays(), biofilm(), targets(), hostmod(), cairo(), palate(), grafts(), ape(), egd(), excess(), clsteps(), smile()];
+// S6 regeneration, approved by Sam 2026-11-18 ("yes to all diagrams")
+import { race } from "./race.mjs";
+import { walls } from "./walls.mjs";
+import { dtree } from "./dtree.mjs";
+import { vtoh } from "./vtoh.mjs";
+import { subtr } from "./subtr.mjs";
+export const FIGURES = [pistates(), meffert(), bop(), xrays(), biofilm(), targets(), hostmod(), cairo(), palate(), grafts(), ape(), egd(), excess(), clsteps(), smile(), race(), walls(), dtree(), vtoh(), subtr()];
