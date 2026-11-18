@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on: Sam, for the compute size
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/421
+pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429
 ---
 
 # Keep heavy queries from failing students' answer saves
