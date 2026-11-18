@@ -56,7 +56,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   suture materials from the midterm check-ins (`q2-F04`-`F06`; the final asks the materials, not the techniques), and
   `q4-F06`, `q8-F03`, `q8-F04`, `q9-F03`, `q9-F04` for hinted facts the bank didn't ask. 669 → 675. High yield recorded again
   for every session whose `hy` changed. **The dashboard:** a hub card's "Updated" opens What's new (its last few changelog
-  lines and the site's), and the hub recap plays its bars once, then stays still while you scroll.
+  lines and the site's), and the hub recap plays its bars once, then stays still while you scroll. **CI:** every workflow is pinned to `ubuntu-24.04`: `ubuntu-latest` became 26.04 on 2026-11-18 and Playwright 1.56.1
+  can't install a browser there (a to-do in the inbox moves it back).
 
 - **2026-11-17 (the dashboard at the large text sizes, BUG-076 and BUG-163, Claude Code, #401)** — `widget/dash.css` (and
   the rebuilt `widget/site.bundle.css`). On a 320 px phone at XX-Large the page scrolled 49 px sideways (10 px at X-Large):
