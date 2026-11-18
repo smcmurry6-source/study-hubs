@@ -146,7 +146,7 @@ export function pack(T){
   /* ------------------------------------------------------------------ the home: an adobe ranch house ------------- */
   var homes = {
     "adobe-ranch": {
-      note: "Thick round adobe walls, beams poking out under a flat roof, a shady porch and a tooth on the weathervane",
+      note: "Thick round adobe walls, beams poking out under a flat roof, a deep porch, red chiles and a tooth on the weathervane",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the roof", paint: "Trim paint: the door, the window frames, the shutters and the bench" },
       door: [5.5, 8.4], brush: [7.55, 9.15], statue: [3.15, 9.55], spots: { door: [6.45, 10.25] }, h: 7.8,
       eaves: [[2.8, 8.55, 3.1], [8.0, 8.55, 3.1]], foot: [2.6, 3.2, 9.6, 8.4], base: [[2.6, 8.4], [8.2, 8.4], [8.2, 7.95], [9.62, 7.95], [9.62, 3.6]], block: [2.4, 2.9, 9.8, 8.8],

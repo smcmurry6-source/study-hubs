@@ -82,134 +82,123 @@ export function pack(T){
   function grass(x, y, k, night){ var c = night ? NSEAGRASS : SEAGRASS; return blade(x - 2.4 * k, y, 13 * k, -5 * k, c[1]) + blade(x, y, 17 * k, 3 * k, c[0]) + blade(x + 2.6 * k, y, 11 * k, 6 * k, c[1]); }
 
   /* ------------------------------------------------------------------ the home: a conch shell ----------------------- */
-  /* the body whorl is round in plan, swelling a little at mid height; its shoulder (a ring of knobs) at z 3.9 carries
-     the spire, which leans up and back. The aperture and its flared pink lip open on the shaded side (+x). */
-  var CR = function(z){ return 2.7 + .45 * Math.sin(Math.PI * Math.min(z, 3.9) / 4.6); }, ZS = 3.9;
+  /* drawn as the shell is seen from the front, lying on its side: its axis runs from the siphonal canal, in the sand at
+     the front right, up to the spire's tip at the back left. ax(v, w) is a point on screen: v from 0 (the canal's tip) to
+     1 (the spire's tip), w across it (plus toward the knobby shoulder on top, minus down the flank that faces you, where
+     the door is). The flank swells low down so the round door at x 5.5 sits in it, on the sand. */
+  function cr(tab, v){
+    var i = 0; while (i < tab.length - 2 && v > tab[i + 1][0]) i++;
+    var a = tab[Math.max(0, i - 1)][1], b = tab[i][1], c = tab[i + 1][1], d = tab[Math.min(tab.length - 1, i + 2)][1], t = Math.max(0, Math.min(1, (v - tab[i][0]) / (tab[i + 1][0] - tab[i][0])));
+    return .5 * (2 * b + (c - a) * t + (2 * a - 5 * b + 4 * c - d) * t * t + (3 * b - a - 3 * c + d) * t * t * t);
+  }
+  var CTOP = [[0, 2], [.08, 9], [.18, 17], [.3, 25], [.42, 30], [.52, 31], [.6, 26], [.66, 21]];
+  var CBOT = [[0, 2], [.08, 12], [.18, 27], [.3, 41], [.42, 50], [.5, 52], [.57, 45], [.66, 22]];
   var homes = {
     "conch-house": {
-      note: "A giant conch shell on its side: a round door with a porthole, round windows, a pink lip and bubbles rising from its vent",
+      note: "A giant conch shell lying on its side: a round door with a porthole, round windows, a pink lip and bubbles rising from its vent",
       ups: ["windows", "porch", "flag", "paint"],
       upn: { windows: "More portholes, with sea-glass window boxes", porch: "A scallop-shell doorstep and a pot of coral", flag: "A Timmy flag on the spire", paint: "Shell color" },
-      door: [5.5, 8.25], brush: [8.75, 7.5], statue: [2.7, 9.2], spots: { door: [6.95, 9.5] }, h: 9.2,
-      eaves: [[3.45, 7.55, ZS], [7.3, 3.7, ZS], 18], round: [5.5, 5.5, 2.8], base: T.arcPts(5.5, 5.5, 2.75, -40, 135, 14), block: [2.5, 2.4, 8.9, 8.7],
+      door: [5.5, 8.6], brush: [8.75, 7.5], statue: [2.7, 9.2], spots: { door: [6.95, 9.55] }, h: 7.4,
+      eaves: [[5.9, 6, 5.2], [8.1, 6, 3.1], 5], foot: [3.4, 3.4, 8.4, 8.6], base: [[4.3, 8.9], [5.5, 8.75], [6.5, 8.15], [7.4, 7.25], [8.2, 6.05], [8.8, 4.75]], block: [2.6, 2.6, 9.1, 9.0],
       draw: function(o){
         var u = o.up, n = o.night, s = "", lights = "", i, pc = o.paint && o.paint !== "cream" && T.PAINTS[o.paint] ? T.PAINTS[o.paint] : null;
-        var shell = pc ? pc.c : "#FFF2DF", band = pc ? pc.s : "#FFD3B1", shade = pc ? pc.s : "#EBC5A2", line = "#C9A27E";
-        var lip = ["#FFB9C6", "#F58FA8", "#D9668A", "#FFE1E7"];
-        var c0 = P(5.5, 5.5, 0), cx = c0[0];
-        var ring = function(z){ var c = P(5.5, 5.5, z), r = CR(z); return { x: c[0], y: c[1], rx: RX(r), ry: RY(r) }; };
-        var front = function(r0, a0, a1, k){ var out = []; for (var j = 0; j <= (k || 16); j++){ var a = rad(a0 + (a1 - a0) * j / (k || 16)); out.push([r0.x + Math.cos(a) * r0.rx, r0.y + Math.sin(a) * r0.ry]); } return out; };
-        /* the body whorl's outline: up the left side, over the back of the shoulder, down the right, along the front */
-        var left = [], right = [];
-        for (i = 0; i <= 10; i++){ var r = ring(ZS * i / 10); left.push([r.x - r.rx, r.y]); right.push([r.x + r.rx, r.y]); }
-        var rs = ring(ZS), r0 = ring(0);
-        var body = left.concat(front(rs, 180, 360, 20).slice(1)).concat(right.slice().reverse().slice(1)).concat(front(r0, 0, 180, 20).slice(1));
-        s += F(D2(body), shell);
-        /* the spiral bands of color round the body, and the fine growth lines */
-        var bandAt = function(z0, z1, fill, o2){ var a = ring(z0), b = ring(z1); return F(D2(front(a, 180, 0, 18).concat(front(b, 0, 180, 18))), fill, o2); };
-        s += bandAt(.55, 1.15, band, pc ? .7 : 1) + bandAt(2.15, 2.85, band, pc ? .7 : 1);
-        [1.6, 3.3].forEach(function(z){ s += L(D2(front(ring(z), 180, 0, 18), true), .9, line, .7); });
-        /* the shaded side */
-        var shadeP = []; for (i = 0; i <= 10; i++){ var rr2 = ring(ZS * i / 10); shadeP.push([rr2.x + rr2.rx * .55, rr2.y + rr2.ry * .9]); }
-        s += F(D2(shadeP.concat(right.slice().reverse()).concat(front(r0, 0, 55, 8).slice(1))), shade, .85);
-        s += O(D2(body));
-        s += T.HI("M" + f(cx - 30) + " " + f(rs.y + 10) + " Q" + f(cx - 33) + " " + f(rs.y + 26) + " " + f(cx - 26) + " " + f(rs.y + 38), 2.4);
-        /* the shoulder's top, sloping up to the spire, with growth rings round it */
-        s += FO(D2(front(rs, 0, 360, 36)), pc ? pc.c : "#FFF7EA", 1.4);
-        [.78, .56].forEach(function(k){ var rk = { x: rs.x + 4 * (1 - k), y: rs.y - 6 * (1 - k), rx: rs.rx * k, ry: rs.ry * k }; s += L(D2(front(rk, 150, 390, 24), true), .8, line, .6); });
-        if (o.snow) s += F(D2(front({ x: rs.x, y: rs.y - 2, rx: rs.rx * .94, ry: rs.ry * .82 }, 0, 360, 30)), "#FFFFFF");
-        /* knobs along the back of the shoulder (behind the spire) */
-        var knob = function(a, k){ var b = [rs.x + Math.cos(rad(a)) * rs.rx, rs.y + Math.sin(rad(a)) * rs.ry], w = 4.6 * k, h = 9 * k, lean = Math.cos(rad(a)) * 2.6;
-          return FO("M" + f(b[0] - w) + " " + f(b[1] + 1) + " Q" + f(b[0] - w * .5 + lean) + " " + f(b[1] - h * .8) + " " + f(b[0] + lean * 1.4) + " " + f(b[1] - h) + " Q" + f(b[0] + w * .5 + lean) + " " + f(b[1] - h * .8) + " " + f(b[0] + w) + " " + f(b[1] + 1) + " Z", pc ? pc.c : "#FFF7EA", 1.3) +
-            (o.snow ? ell(b[0] + lean * 1.2, b[1] - h * .86, w * .5, 1.6, "#FFFFFF", 0) : ""); };
-        [200, 228, 312, 338].forEach(function(a){ s += knob(a, .9); });
-        /* the bubble vent: a brass pipe on the shoulder, bubbles rising like chimney smoke */
-        var vb = [cx - 25, rs.y - 6];
-        s += L("M" + f(vb[0]) + " " + f(vb[1]) + " v-12 q0 -3 3 -3 h3", 5.6) + L("M" + f(vb[0]) + " " + f(vb[1]) + " v-12 q0 -3 3 -3 h3", 3, "#E8BE45") + ell(vb[0], vb[1], 4, 1.8, "#C9971C", 1.1) + FO("M" + f(vb[0] + 5) + " " + f(vb[1] - 18.6) + " h2.6 v4.4 h-2.6 z", "#C9971C", 1);
-        s += bubbles([[vb[0] + 9, vb[1] - 22, 2.2], [vb[0] + 13, vb[1] - 32, 2.8], [vb[0] + 10, vb[1] - 43, 3.4]], n);
-        /* the spire: whorls stacked up to the tip, leaning up and back, each with its own knobs */
-        var sb = P(5.75, 5.25, ZS + .7), st = P(6.4, 4.6, 9.1), ts = [0, .27, .47, .62, .74, .83, .9];
-        var sr = function(t){ return 1.95 * Math.pow(1 - t, .85); };
-        var sring = function(t){ var r = sr(t); return { x: sb[0] + (st[0] - sb[0]) * t, y: sb[1] + (st[1] - sb[1]) * t, rx: RX(r), ry: RY(r) * .9 }; };
-        var tip = [st[0], st[1]], whorls = "";
-        /* from the tip down, each lower whorl over the one above it */
-        var top = sring(ts[ts.length - 1]);
-        whorls += FO("M" + f(top.x - top.rx) + " " + f(top.y) + " L" + f(tip[0]) + " " + f(tip[1]) + " L" + f(top.x + top.rx) + " " + f(top.y) + " A" + f(top.rx) + " " + f(top.ry) + " 0 0 1 " + f(top.x - top.rx) + " " + f(top.y) + " Z", pc ? pc.c : "#FFF2DF", 1.4);
-        for (i = ts.length - 2; i >= 0; i--){
-          var a = sring(ts[i + 1]), b = sring(ts[i]), mid = sring((ts[i] + ts[i + 1]) / 2), bulge = (b.rx - a.rx) * .6 + 1.6;
-          var d = "M" + f(a.x - a.rx) + " " + f(a.y) + " A" + f(a.rx) + " " + f(a.ry) + " 0 0 0 " + f(a.x + a.rx) + " " + f(a.y) +
-            " Q" + f(mid.x + mid.rx + bulge) + " " + f(mid.y) + " " + f(b.x + b.rx) + " " + f(b.y) + " A" + f(b.rx) + " " + f(b.ry) + " 0 0 1 " + f(b.x - b.rx) + " " + f(b.y) +
-            " Q" + f(mid.x - mid.rx - bulge) + " " + f(mid.y) + " " + f(a.x - a.rx) + " " + f(a.y) + " Z";
-          whorls += F(d, i % 2 ? (pc ? pc.c : "#FFF2DF") : (pc ? band : "#FFE2C8"));
-          /* its shaded side */
-          whorls += F("M" + f(a.x + a.rx * .35) + " " + f(a.y + a.ry * .94) + " A" + f(a.rx) + " " + f(a.ry) + " 0 0 0 " + f(a.x + a.rx) + " " + f(a.y) + " Q" + f(mid.x + mid.rx + bulge) + " " + f(mid.y) + " " + f(b.x + b.rx) + " " + f(b.y) + " A" + f(b.rx) + " " + f(b.ry) + " 0 0 1 " + f(b.x + b.rx * .4) + " " + f(b.y + b.ry * .92) + " Z", shade, .8);
-          whorls += O(d, 1.4);
-          /* knobs on its shoulder, on the front */
-          [205, 250, 300, 335].forEach(function(an, j){ if ((i + j) % 2) return; var kx = a.x + Math.cos(rad(an + 180)) * a.rx * .9, ky = a.y + Math.sin(rad(an + 180)) * a.ry * .9 + 1.2, kw = Math.max(1.6, a.rx * .2);
-            whorls += FO("M" + f(kx - kw) + " " + f(ky + .6) + " Q" + f(kx) + " " + f(ky - kw * 2.2) + " " + f(kx + kw) + " " + f(ky + .6) + " Z", pc ? pc.c : "#FFF7EA", 1); });
-          if (o.snow) whorls += F("M" + f(a.x - a.rx * .8) + " " + f(a.y + a.ry * .3) + " A" + f(a.rx * .8) + " " + f(a.ry * .7) + " 0 0 0 " + f(a.x + a.rx * .8) + " " + f(a.y + a.ry * .3) + " q" + f(-a.rx * .8) + " " + f(-a.ry * .6) + " " + f(-a.rx * 1.6) + " 0 z", "#FFFFFF");
-        }
-        s += whorls;
-        /* the attic porthole in the spire's first whorl */
-        var w3 = sring(.14), pw = port(w3.x - 2, w3.y + w3.ry * .55, 3.2, n, .8); s += pw.s; lights += pw.lights;
-        /* the tip: the flag, or a little gold tooth on a spike */
-        if (u.flag) s += T.flagOn(6.4, 4.6, 9.05, 2.0);
-        else s += L("M" + f(tip[0]) + " " + f(tip[1] + 1) + " v-7", 1.4) + T.tinyTooth(tip[0], tip[1] - 10, .5, K.gold);
-        /* knobs along the front of the shoulder, and its edge */
-        s += L(D2(front(rs, 0, 180, 20), true), 1.4);
-        [24, 52, 82, 112, 142, 168].forEach(function(a){ s += knob(a, 1); });
-        /* the flared lip and the glossy pink aperture, on the shaded side */
-        var lb = right[4], lt = [rs.x + rs.rx - 3, rs.y - 2];
-        var lipD = "M" + q2(lt) + " C" + f(lt[0] + 8) + " " + f(lt[1] - 14) + " " + f(lt[0] + 18) + " " + f(lt[1] - 22) + " " + f(lt[0] + 24) + " " + f(lt[1] - 18) +
-          " C" + f(lt[0] + 34) + " " + f(lt[1] - 6) + " " + f(lt[0] + 36) + " " + f(lt[1] + 20) + " " + f(lt[0] + 33) + " " + f(lt[1] + 34) +
-          " C" + f(lt[0] + 30) + " " + f(lt[1] + 48) + " " + f(lt[0] + 20) + " " + f(r0.y + 8) + " " + f(lt[0] + 10) + " " + f(r0.y + 14) +
-          " C" + f(lt[0] + 4) + " " + f(r0.y + 6) + " " + f(lb[0] - 2) + " " + f(lb[1] + 14) + " " + f(lb[0] - 3) + " " + f(lb[1]) + " C" + f(lb[0] - 3) + " " + f(lb[1] - 12) + " " + f(lt[0] - 2) + " " + f(lt[1] + 8) + " " + q2(lt) + " Z";
+        var shell = pc ? pc.c : "#FFF2DF", band = pc ? pc.s : "#FFD0AC", shade = pc ? pc.s : "#E9C4A2", knobC = pc ? pc.c : "#FFF8EE", line = "#C9A27E";
+        var lip = ["#FFB9C6", "#F590AA", "#DE6E90", "#FFE1E7"];
+        var o0 = P(5.5, 5.5, 0), C = [o0[0] + 40, o0[1] + 12.3], S = [o0[0] - 50, o0[1] - 65.7], len = Math.sqrt(90 * 90 + 78 * 78);
+        var A = [(S[0] - C[0]) / len, (S[1] - C[1]) / len], N = [-A[1], A[0]];
+        if (N[1] > 0) N = [-N[0], -N[1]];
+        var ax = function(v, w){ return [C[0] + A[0] * len * v + N[0] * w, C[1] + A[1] * len * v + N[1] * w]; };
+        var top = function(v){ return cr(CTOP, v); }, bot = function(v){ return cr(CBOT, v); };
+        /* a ring across the shell at v (the visible half of it bows toward the spire) */
+        var across = function(v, k){ var a = ax(v, top(v) * (k || 1)), b = ax(v, -bot(v) * (k || 1)), m = ax(v + .035, (top(v) - bot(v)) * .5 * (k || 1)); return "M" + q2(a) + " Q" + q2(m) + " " + q2(b); };
+        /* the flared lip, behind: it rises over the shoulder toward the spire, its glossy pink inside turned to you */
+        var lipD = "M" + q2(ax(.28, top(.28) - 3)) + " C" + q2(ax(.36, top(.36) + 12)) + " " + q2(ax(.46, top(.46) + 24)) + " " + q2(ax(.56, top(.56) + 25)) +
+          " C" + q2(ax(.62, top(.62) + 24)) + " " + q2(ax(.68, 34)) + " " + q2(ax(.71, 30)) + " C" + q2(ax(.7, 20)) + " " + q2(ax(.67, 16)) + " " + q2(ax(.64, 14)) + " Z";
         s += FO(lipD, lip[0], 1.8);
-        var ap = "M" + f(lt[0] + 4) + " " + f(lt[1] + 4) + " C" + f(lt[0] + 12) + " " + f(lt[1] - 8) + " " + f(lt[0] + 22) + " " + f(lt[1] - 8) + " " + f(lt[0] + 26) + " " + f(lt[1] + 4) +
-          " C" + f(lt[0] + 30) + " " + f(lt[1] + 20) + " " + f(lt[0] + 26) + " " + f(lt[1] + 40) + " " + f(lt[0] + 12) + " " + f(r0.y + 6) +
-          " C" + f(lt[0] + 6) + " " + f(lt[1] + 40) + " " + f(lt[0] + 3) + " " + f(lt[1] + 20) + " " + f(lt[0] + 4) + " " + f(lt[1] + 4) + " Z";
-        s += FO(ap, lip[1], 1.1);
-        s += F("M" + f(lt[0] + 4) + " " + f(lt[1] + 4) + " C" + f(lt[0] + 8) + " " + f(lt[1] - 2) + " " + f(lt[0] + 13) + " " + f(lt[1] - 4) + " " + f(lt[0] + 16) + " " + f(lt[1] - 3) +
-          " C" + f(lt[0] + 12) + " " + f(lt[1] + 10) + " " + f(lt[0] + 12) + " " + f(lt[1] + 30) + " " + f(lt[0] + 12) + " " + f(r0.y + 6) + " C" + f(lt[0] + 6) + " " + f(lt[1] + 40) + " " + f(lt[0] + 3) + " " + f(lt[1] + 20) + " " + f(lt[0] + 4) + " " + f(lt[1] + 4) + " Z", lip[2], .8);
-        s += L("M" + f(lt[0] + 24) + " " + f(lt[1] + 6) + " C" + f(lt[0] + 27) + " " + f(lt[1] + 16) + " " + f(lt[0] + 26) + " " + f(lt[1] + 28) + " " + f(lt[0] + 21) + " " + f(lt[1] + 38), 2.2, lip[3], .9);
-        s += L("M" + f(lt[0] + 9) + " " + f(lt[1] - 9) + " C" + f(lt[0] + 16) + " " + f(lt[1] - 18) + " " + f(lt[0] + 22) + " " + f(lt[1] - 17) + " " + f(lt[0] + 27) + " " + f(lt[1] - 10), 1.6, "#FFFFFF", .8);
-        if (o.snow) s += F("M" + f(lt[0] + 2) + " " + f(lt[1] - 4) + " C" + f(lt[0] + 10) + " " + f(lt[1] - 16) + " " + f(lt[0] + 18) + " " + f(lt[1] - 23) + " " + f(lt[0] + 24) + " " + f(lt[1] - 19) + " q-8 4 -22 15 z", "#FFFFFF");
-        if (n) lights += T.glowAt(lt[0] + 14, lt[1] + 26, 16);
-        /* portholes on the body */
-        [[cx - 29, ring(2.6).y + 3, 5.4, .82], [cx + 4, ring(2.2).y + 10, 4.8, .95]].concat(u.windows ? [[cx - 15, ring(3.2).y + 4, 3.8, .9]] : []).forEach(function(w){
-          var pw2 = port(w[0], w[1], w[2], n, w[3]); s += pw2.s; lights += pw2.lights;
-          if (u.windows){ var bx = w[0], by = w[1] + w[2] + 3.4, bw = w[2] * 1.5;
+        s += F("M" + q2(ax(.34, top(.34) + 2)) + " C" + q2(ax(.42, top(.42) + 14)) + " " + q2(ax(.52, top(.52) + 20)) + " " + q2(ax(.6, top(.6) + 19)) + " C" + q2(ax(.64, top(.64) + 15)) + " " + q2(ax(.66, 26)) + " " + q2(ax(.66, 20)) + " L" + q2(ax(.5, 26)) + " Z", lip[1]);
+        s += F("M" + q2(ax(.42, top(.42) + 1)) + " C" + q2(ax(.48, top(.48) + 9)) + " " + q2(ax(.56, top(.56) + 12)) + " " + q2(ax(.62, 32)) + " L" + q2(ax(.56, 26)) + " Z", lip[2], .8);
+        s += L("M" + q2(ax(.38, top(.38) + 11)) + " C" + q2(ax(.46, top(.46) + 21)) + " " + q2(ax(.54, top(.54) + 23)) + " " + q2(ax(.62, top(.62) + 22)), 2, lip[3], .9);
+        if (o.snow) s += F("M" + q2(ax(.36, top(.36) + 11)) + " C" + q2(ax(.46, top(.46) + 25)) + " " + q2(ax(.56, top(.56) + 26)) + " " + q2(ax(.66, top(.66) + 22)) + " L" + q2(ax(.64, top(.64) + 18)) + " C" + q2(ax(.56, top(.56) + 20)) + " " + q2(ax(.46, top(.46) + 18)) + " " + q2(ax(.38, top(.38) + 7)) + " Z", "#FFFFFF");
+        /* the spire: whorls from the tip down, each one over the one above it, a suture between them and knobs on top */
+        var VS = [.6, .7, .78, .85, .91, .96, 1], sr = function(v){ return 25 * Math.pow(Math.max(0, 1 - v) / .4, .95); };
+        var tipP = ax(1, 0), tw = VS[VS.length - 2], tr = sr(tw);
+        s += FO("M" + q2(ax(tw, tr)) + " L" + q2(tipP) + " L" + q2(ax(tw, -tr)) + " Q" + q2(ax(tw - .02, 0)) + " " + q2(ax(tw, tr)) + " Z", shell, 1.4);
+        for (i = VS.length - 3; i >= 0; i--){
+          var va = VS[i], vb = VS[i + 1], ra = sr(va), rb = sr(vb) * 1.04, vm = (va + vb) / 2, rm = (ra + rb) / 2 + 2.4;
+          var d = "M" + q2(ax(vb, rb)) + " Q" + q2(ax(vm, rm + 1.4)) + " " + q2(ax(va, ra)) + " L" + q2(ax(va, -ra)) + " Q" + q2(ax(vm, -rm - 1.4)) + " " + q2(ax(vb, -rb)) + " Q" + q2(ax(vb + .045, 0)) + " " + q2(ax(vb, rb)) + " Z";
+          s += F(d, i % 2 ? shell : (pc ? pc.c : "#FFE6CF"));
+          s += F("M" + q2(ax(vb, -rb * .35)) + " Q" + q2(ax(vb + .02, -rb * .7)) + " " + q2(ax(vb, -rb)) + " Q" + q2(ax(vm, -rm - 1.4)) + " " + q2(ax(va, -ra)) + " L" + q2(ax(va, -ra * .45)) + " Z", shade, .7);
+          s += O(d, 1.4);
+          var kp = ax(vm, rm + .6), kw = Math.max(1.8, ra * .16);
+          s += FO("M" + q2(ax(vm + .025, rm - .6)) + " Q" + q2([kp[0] + N[0] * kw * 2.4, kp[1] + N[1] * kw * 2.4]) + " " + q2(ax(vm - .025, rm - .6)) + " Z", knobC, 1.1);
+          if (o.snow) s += F("M" + q2(ax(vb, rb)) + " Q" + q2(ax(vm, rm + 2.4)) + " " + q2(ax(va, ra + .6)) + " L" + q2(ax(va, ra - 2.6)) + " Q" + q2(ax(vm, rm - 2)) + " " + q2(ax(vb, rb - 2)) + " Z", "#FFFFFF");
+        }
+        /* the attic porthole in the spire */
+        var aw = ax(.74, -2.4), pa = port(aw[0], aw[1], 3, n, .85); s += pa.s; lights += pa.lights;
+        /* the tip: the flag, or a little gold tooth on a spike */
+        var tipY = (o0[1] - tipP[1]) / 10.5, tipX = 5.5 + (tipP[0] - o0[0]) / 9.093 / 2 * 2;
+        if (u.flag) s += T.flagOn(5.5 + (tipP[0] - o0[0]) / 9.093, 5.5, tipY, 2.0);
+        else s += L("M" + q2(tipP) + " l-1.6 -6", 1.4) + T.tinyTooth(tipP[0] - 2.4, tipP[1] - 10, .5, K.gold);
+        /* the body whorl */
+        var outline = [], vend = .66;
+        for (i = 0; i <= 33; i++){ var v = vend * i / 33; outline.push(ax(v, top(v))); }
+        for (i = 33; i >= 0; i--){ v = vend * i / 33; outline.push(ax(v, -bot(v))); }
+        s += F(D2(outline), shell);
+        /* bands of color round it, and the growth lines */
+        var bandD = function(v0, v1){ var pts = []; for (var j = 0; j <= 8; j++){ var vv = v0 + (v1 - v0) * j / 8; pts.push(ax(vv + .03, top(vv) * .98)); } return pts; };
+        [[.12, .17], [.3, .37]].forEach(function(b){
+          var a0 = b[0], a1 = b[1], pts = [ax(a0, top(a0)), ax(a0 + .035, (top(a0) - bot(a0)) * .5), ax(a0, -bot(a0)), ax(a1, -bot(a1)), ax(a1 + .035, (top(a1) - bot(a1)) * .5), ax(a1, top(a1))];
+          s += F("M" + q2(pts[0]) + " Q" + q2(pts[1]) + " " + q2(pts[2]) + " L" + q2(pts[3]) + " Q" + q2(pts[4]) + " " + q2(pts[5]) + " Z", band, pc ? .75 : 1);
+        });
+        [.06, .22, .44, .54].forEach(function(v){ s += L(across(v), .9, line, .6); });
+        /* the shade toward the sand and round the canal, and the light along the top */
+        var sh = []; for (i = 0; i <= 20; i++){ v = .62 * i / 20; sh.push(ax(v, -bot(v))); }
+        for (i = 20; i >= 0; i--){ v = .62 * i / 20; sh.push(ax(v, -bot(v) * (.72 + .2 * (1 - v / .62)) + 2)); }
+        s += F(D2(sh), shade, .75);
+        s += O(D2(outline));
+        s += L("M" + q2(ax(.2, top(.2) - 4)) + " Q" + q2(ax(.36, top(.36) - 4)) + " " + q2(ax(.5, top(.5) - 5)), 2.4, "#FFFFFF", .65);
+        /* the knobs along the shoulder */
+        var knob = function(v, k){ var b0 = ax(v - .028 * k, top(v - .028 * k) - 1.6), b1 = ax(v + .028 * k, top(v + .028 * k) - 1.6), tp = ax(v + .006, top(v) + 10 * k);
+          return FO("M" + q2(b0) + " Q" + q2(ax(v - .018 * k, top(v) + 7 * k)) + " " + q2(tp) + " Q" + q2(ax(v + .022 * k, top(v) + 6 * k)) + " " + q2(b1) + " Z", knobC, 1.3) + (o.snow ? F("M" + q2(ax(v - .012 * k, top(v) + 6 * k)) + " Q" + q2(tp) + " " + q2(ax(v + .014 * k, top(v) + 5.4 * k)) + " Z", "#FFFFFF") : ""); };
+        [[.16, .6], [.23, .75], [.31, .95], [.39, 1.05], [.47, 1.1], [.55, 1]].forEach(function(q){ s += knob(q[0], q[1]); });
+        if (o.snow) s += F("M" + q2(ax(.1, top(.1) - .5)) + " Q" + q2(ax(.34, top(.34) + 3)) + " " + q2(ax(.62, top(.62) + 1)) + " L" + q2(ax(.62, top(.62) - 4)) + " Q" + q2(ax(.34, top(.34) - 3)) + " " + q2(ax(.1, top(.1) - 3)) + " Z", "#FFFFFF");
+        /* the bubble vent: a brass pipe on its back, bubbles rising like chimney smoke */
+        var vt = ax(.13, top(.13) - 2);
+        s += L("M" + f(vt[0]) + " " + f(vt[1]) + " v-12 q0 -3 3 -3 h2", 5.6) + L("M" + f(vt[0]) + " " + f(vt[1]) + " v-12 q0 -3 3 -3 h2", 3, "#E8BE45") + ell(vt[0], vt[1], 4, 1.8, "#C9971C", 1.1) + FO("M" + f(vt[0] + 4.4) + " " + f(vt[1] - 18.4) + " h2.6 v4.4 h-2.6 z", "#C9971C", 1);
+        s += bubbles([[vt[0] + 9, vt[1] - 22, 2.2], [vt[0] + 12, vt[1] - 32, 2.8], [vt[0] + 9, vt[1] - 43, 3.4]], n);
+        /* portholes along the flank */
+        [[ax(.6, -9), 5, .9], [ax(.32, -12), 4.8, .9]].concat(u.windows ? [[ax(.2, -12), 3.8, .9], [ax(.47, -2), 4, .9]] : []).forEach(function(w){
+          var pw = port(w[0][0], w[0][1], w[1], n, w[2]); s += pw.s; lights += pw.lights;
+          if (u.windows){ var bx = w[0][0], by = w[0][1] + w[1] + 3.4, bw = w[1] * 1.5;
             s += FO("M" + f(bx - bw) + " " + f(by) + " h" + f(2 * bw) + " l-1.2 3 h" + f(-2 * bw + 2.4) + " z", "#7FD0C8", 1.1) + L("M" + f(bx - bw * .6) + " " + f(by) + " q-1 -4 -3 -5 M" + f(bx) + " " + f(by) + " q1 -5 0 -7 M" + f(bx + bw * .6) + " " + f(by) + " q1 -4 3 -5", 1.3, n ? "#3E7A5A" : "#5FA35A") +
               circ(bx - bw * .3, by - 1.6, 1.2, "#F58FA8", .6) + circ(bx + bw * .35, by - 2, 1.2, "#FFD23F", .6); }
         });
-        /* the round door, on the lit face: a teal door in a brass ring, a porthole in it */
-        var Yd = 8.25, zc = 1.2, dRing = function(r, z){ var out = []; for (var j = 0; j < 24; j++){ var th = j / 24 * Math.PI * 2; out.push([5.5 + Math.cos(th) * r, Yd, (z || zc) + Math.sin(th) * r]); } return out; };
-        s += FO(D(dRing(1.16)), "#E8BE45", 1.6) + FO(D(dRing(.94)), "#2FA8A8", 1.3);
-        s += L(D([[5.15, Yd, .32], [5.15, Yd, 2.05]], true) + D([[5.85, Yd, .32], [5.85, Yd, 2.05]], true), .9, "#1F7F80");
-        s += FO(D(dRing(.36, 1.5)), "#E8BE45", 1.1) + FO(D(dRing(.26, 1.5)), n ? K.lit : K.glassDay, .9);
-        if (n){ var dc = P(5.5, Yd, 1.5); lights += T.glowAt(dc[0], dc[1], 8) + FO(D(dRing(.26, 1.5)), K.lit, .9); }
-        var kn = P(6.15, Yd, 1.05); s += circ(kn[0], kn[1], 1.5, K.gold, .9);
-        /* a little tooth sign over the door */
-        var sg = P(5.5, Yd + .02, 2.62); s += T.tinyTooth(sg[0], sg[1], .62, "#FFFFFF");
+        /* the round door: a teal door in a brass ring, a porthole in it, a little tooth over it */
+        var Yd = 8.6, zc = 1.2, dRing = function(r, z){ var out = []; for (var j = 0; j < 24; j++){ var th = j / 24 * Math.PI * 2; out.push([5.5 + Math.cos(th) * r, Yd, (z || zc) + Math.sin(th) * r]); } return out; };
+        s += FO(D(dRing(1.18)), "#E8BE45", 1.6) + FO(D(dRing(.96)), "#2FA8A8", 1.3);
+        s += L(D([[5.15, Yd, .3], [5.15, Yd, 2.08]], true) + D([[5.85, Yd, .3], [5.85, Yd, 2.08]], true), .9, "#1F7F80");
+        s += FO(D(dRing(.38, 1.5)), "#E8BE45", 1.1) + FO(D(dRing(.27, 1.5)), n ? K.lit : K.glassDay, .9);
+        if (n){ var dc = P(5.5, Yd, 1.5); lights += T.glowAt(dc[0], dc[1], 8) + FO(D(dRing(.27, 1.5)), K.lit, .9); }
+        var kn = P(6.17, Yd, 1.05); s += circ(kn[0], kn[1], 1.5, K.gold, .9);
+        var sg = P(5.5, Yd, 2.66); s += T.tinyTooth(sg[0], sg[1], .62, "#FFFFFF");
         /* the doorstep: a flat stone, or a scallop shell with the porch */
-        var ds = P(5.62, 8.72, 0);
+        var ds = P(5.62, 9.0, 0);
         if (u.porch){
-          s += '<g transform="translate(' + f(ds[0]) + " " + f(ds[1] - 3) + ') scale(1 .55)">' + scallop(0, 8, 20, ["#FFC9A8", "#E89A7A"], 180, 1.8) + "</g>";
-          var pp = P(4.25, 8.7, 0);
+          s += '<g transform="translate(' + f(ds[0]) + " " + f(ds[1] - 2) + ') scale(1 .5)">' + scallop(0, 8, 21, ["#FFC9A8", "#E89A7A"], 180, 1.8) + "</g>";
+          var pp = P(4.35, 9.05, 0);
           s += FO("M" + f(pp[0] - 4.4) + " " + f(pp[1] - 8) + " h8.8 l-1.4 8 q-3 1.2 -6 0 z", "#E07A5F", 1.2) + F("M" + f(pp[0] + 1.2) + " " + f(pp[1] - 8) + " h3.2 l-1.4 8 q-1 .4 -2 .2 z", "#B8553D") + ell(pp[0], pp[1] - 8, 4.4, 1.4, "#8A5A3A", 1);
           s += tube("M" + f(pp[0]) + " " + f(pp[1] - 8.4) + " v-6 M" + f(pp[0]) + " " + f(pp[1] - 12) + " l-4 -4 M" + f(pp[0]) + " " + f(pp[1] - 13) + " l3.4 -5", 1.8, "#F48BB0");
         } else s += ell(ds[0], ds[1], 9, 3.2, K.stone, 1.2) + ell(ds[0] + 1.4, ds[1] + .8, 5.4, 1.6, K.stoneShade, 0, .7);
-        /* sea grass round its base, and two small shells */
+        /* sea grass along its foot, and a small shell */
         if (!o.snow){
-          [[3.1, 6.9, .9], [3.6, 7.6, 1.1], [6.9, 7.95, .9], [7.7, 7.25, 1.1], [8.25, 6.3, .8]].forEach(function(g){ var q = P(g[0] + .2, g[1] + .2, 0); s += grass(q[0], q[1], g[2], n); });
-          var sh1 = P(7.3, 7.9, 0); s += scallop(sh1[0], sh1[1], 5.4, ["#FFC9D4", "#E58FA6"], -12, .8);
+          [[4.5, 8.9, .9], [6.8, 8.05, .8], [7.6, 7.1, 1.1], [8.35, 5.9, .9], [8.95, 4.95, .7]].forEach(function(g){ var q = P(g[0] + .2, g[1] + .2, 0); s += grass(q[0], q[1], g[2], n); });
+          var sh1 = P(7.25, 8.0, 0); s += scallop(sh1[0], sh1[1] + 1, 5.4, ["#FFC9D4", "#E58FA6"], -12, .8);
         }
-        if (n) lights += T.firefly(cx - 52, c0[1] - 40, .3) + T.firefly(cx + 58, c0[1] - 66, 1.4);
+        if (n) lights += T.firefly(o0[0] - 62, o0[1] - 40, .3) + T.firefly(o0[0] + 52, o0[1] - 70, 1.4);
         return { body: s, lights: lights };
       }
     }
   };
-
   /* ------------------------------------------------------------------ the scene: a sunlit reef --------------------- */
   /* the sea's surface seen from below, a light strip with a wavy edge */
   function surface(col){ var d = "M0 -80 H400 V13"; for (var x = 400; x > 0; x -= 25) d += " Q" + (x - 12.5) + " " + (x % 50 ? 18 : 8) + " " + (x - 25) + " 13"; return F(d + " Z", col); }
