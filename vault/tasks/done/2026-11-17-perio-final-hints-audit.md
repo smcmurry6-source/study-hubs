@@ -38,7 +38,7 @@ additions that need to be made that havent been doen already".
 - [x] High yield recorded again for every session whose `hy` changed (`node tools/ci/smoke.js` names any whose
       recording no longer matches: `python3 tools/narrate.py perio --level hy --lec <id> --force`, then
       `node tools/hub-next/build.mjs --hub perio`)
-- [ ] `node tools/hub-next/build.mjs --check`, the smoke test's lint for perio, CI green on the PR
+- [x] `node tools/hub-next/build.mjs --check`, the smoke test's lint for perio, CI green on the PR
 - [x] `DEPLOY_NOTES.md` entry and a `perio | ...` line in `tools/after-merge/changelog.txt`
 - [x] This note's Outcome, `status: done`, moved to `done/`
 
