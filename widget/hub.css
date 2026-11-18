@@ -801,12 +801,12 @@ html.shx .qc-after .sh-qrate:has(.sh-qrate-why:not([hidden])) { flex: 1 1 100%; 
   background: var(--primary); color: var(--on-primary); font-family: var(--font); font-size: var(--fs-label); font-weight: var(--w-head); pointer-events: none; box-shadow: var(--float-shadow); }
 .xpfly svg { width: 20px; height: 20px; }
 .xpfly .x2 { font-style: normal; margin-left: 3px; padding: 0 6px; border-radius: var(--r-pill); background: var(--gold); color: #2b1d00; }
-/* crowns gained after an answer or a prize (migration_v64): a coin with the gain, just under the rank pill */
+/* crowns gained after an answer or a prize (migration_v66): a coin with the gain, just under the rank pill */
 .crownpop { position: fixed; left: 0; top: 0; z-index: 50; display: flex; align-items: center; gap: 3px; padding: 2px 9px 2px 4px; border-radius: var(--r-pill);
   background: #fff4cf; color: #5c3d00; border: 1px solid var(--gold); font-family: var(--font); font-size: var(--fs-meta); font-weight: var(--w-head);
   font-variant-numeric: tabular-nums; pointer-events: none; box-shadow: var(--float-shadow); }
 .crownpop .ic { width: 18px; height: 18px; }
-/* what a card offers (migration_v64): "+50 XP and crowns" */
+/* what a card offers (migration_v66): "+50 XP and crowns" */
 .earn { display: inline-flex; align-items: center; gap: 4px; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--gold-ink); }
 .earn .ic { width: 16px; height: 16px; flex: none; }
 .ql-pod .pm-earn { color: #fff; font-size: var(--fs-meta); font-weight: var(--w-strong); }

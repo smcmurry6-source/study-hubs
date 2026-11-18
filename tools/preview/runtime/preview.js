@@ -467,7 +467,7 @@
     { scene: "snowy-mountain", "yard-left": "rank-silver-yard", outfit: "white-coat" }
   ];
   /* what each test account has earned in Shiny Gold Crowns before this preview (Sam's spec: new 0, returning about 300,
-     missed about 80 so a purchase is refused for its balance, high-XP about 20,000); answers here add 5 for every 10 XP (migration_v64) */
+     missed about 80 so a purchase is refused for its balance, high-XP about 20,000); answers here add 5 for every 10 XP (migration_v66) */
   var WALLET_START = { "new": 0, returning: 300, missed: 80, "high-xp": 20000, archived: 1500, admin: 5000 };
   function placeOwned(v){
     var own = {}, g = rank2(rpc("get_rank_profile", { p_visitor: v }).data.xp || 0).gtier;

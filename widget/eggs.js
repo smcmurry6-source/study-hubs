@@ -629,7 +629,7 @@
     boss.el.classList.toggle("is-shown", !bossHidden && feat("boss"));
     bossSpace();
   }
-  /* your share of a boss (migration_v64; Sam: "defeating a question boss prorated to how much damage you did"): the HP you
+  /* your share of a boss (migration_v66; Sam: "defeating a question boss prorated to how much damage you did"): the HP you
      took off it is kept on this device (sh_boss_dmg) and, once it's down, sent for 500 XP and crowns times your share of its
      HP. The server checks the damage against your right answers in that hub in the boss's 2 hours. */
   function myDmg(id){ var d = null; try { d = JSON.parse(ls("sh_boss_dmg") || "null"); } catch (e) {} return d && d.id === id ? d.d | 0 : 0; }

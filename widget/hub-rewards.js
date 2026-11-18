@@ -70,7 +70,7 @@
   /* XP as the server counts it. On the live rules (widget/ranks.js, "How XP works"): 10 the first time you get a
      question right, 2 for any other right answer, 1 for a miss, 20 for every day you study; answer XP is capped at 600
      a day. On the game layer: the same 10, 2 and 1 with no cap, a self-graded card a flat 2, every right answer paying
-     (migration_v64, Sam: "Every right answer should give xp") and a question's first three misses a day, all of it doubled
+     (migration_v66, Sam: "Every right answer should give xp") and a question's first three misses a day, all of it doubled
      while a boost runs. This is the
      page's guess, shown at once; the server's own figure follows and corrects it (sh:answer-paid, below). */
   function xpFor(qid, correct, self){
@@ -164,7 +164,7 @@
     var at = -1; PEND.some(function(x, i){ if (x.qid === d.qid) { at = i; return true; } return false; });
     var guess = at > -1 ? PEND.splice(at, 1)[0] : null, t = todayRec(), extra = 0, said = [];
     var G = window.shGame;
-    /* the day's bonuses (study XP) and the prizes an answer can win (migration_v64: right in a row, a streak of days, the
+    /* the day's bonuses (study XP) and the prizes an answer can win (migration_v66: right in a row, a streak of days, the
        class's record), which pay as many crowns as XP */
     (Array.isArray(r.bonus) ? r.bonus : []).forEach(function(b){ if (b && b.xp > 0) { extra += b.xp; if (BONUS[b.src]) said.push(BONUS[b.src] + ": +" + b.xp + " XP"); else if (G && G.prizeText) said.push(G.prizeText(b.src, b.xp, b)); } });
     var off = (r.xp | 0) - (guess ? guess.xp : r.xp | 0) + extra;
@@ -178,7 +178,7 @@
     if (off || extra || r.medal || boostShown !== !!boost()) paintMeters();
     ringClaim();
   });
-  /* ---------- prizes (migration_v64): what the server paid outside an answer ----------
+  /* ---------- prizes (migration_v66): what the server paid outside an answer ----------
      widget/v3.js sends sh:prize for a prize call's reply (the daily ring, a boss's share, a lecture read, the nuke, a name,
      trophies, a game's prizes): its XP joins today's and the rank's, and it's said. The crowns come as sh:crowns. */
   document.addEventListener("sh:prize", function(e){
@@ -389,7 +389,7 @@
   function todayPanel(){
     var t = todayRec(), g = goal(), n = streakDays(), dn = doneToday(t), left = Math.max(0, g - dn), hp = HX.petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" }, w = HX.wallet ? HX.wallet() : null;
     var cap = dn >= g ? "Goal met for today." : left === g ? "Your goal today: " + g + " questions or flashcards. One keeps your streak going." : left + " more meets today's goal.";
-    /* what filling the ring pays (migration_v64): 5 XP and crowns a question of the goal */
+    /* what filling the ring pays (migration_v66): 5 XP and crowns a question of the goal */
     var G = window.shGame, ringPay = G && G.live && G.live() && G.prizes ? G.prizes.ring * g : 0;
     if (ringPay) cap += dn >= g ? " +" + fmt(ringPay) + " XP and " + fmt(ringPay) + " crowns." : " Fill the ring for +" + fmt(ringPay) + " XP and " + fmt(ringPay) + " crowns.";
     return '<div class="panel today" data-today><div class="today-head"><div><h2>Today</h2><p class="today-date">' + esc(dateLabel(day(0), { weekday: "long", month: "long", day: "numeric" })) + "</p></div>" +

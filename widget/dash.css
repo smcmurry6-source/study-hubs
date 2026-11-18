@@ -227,7 +227,7 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-pod-go { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; height: 32px; margin-top: auto; padding: 0 14px 0 10px; border-radius: var(--r-pill);
   background: #fff; color: var(--hub); font-size: var(--fs-meta); font-weight: var(--w-strong); }
 .dx-pod-txt b { display: flex; align-items: center; gap: 8px; }
-.dx-pod-earn { font-size: var(--fs-meta); font-weight: var(--w-strong); color: #fff; }   /* what finishing the episode pays (migration_v64) */
+.dx-pod-earn { font-size: var(--fs-meta); font-weight: var(--w-strong); color: #fff; }   /* what finishing the episode pays (migration_v66) */
 .dx-pod-art { position: absolute; right: 6px; bottom: -12px; width: 88px; }
 .dx-pod-art .pm-timmy { width: 88px; }
 .dx-pod-art .pm-notes { left: -6px; top: -36px; width: 40px; }

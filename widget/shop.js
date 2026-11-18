@@ -242,7 +242,7 @@
     else svg = svg.replace(/(<svg[^>]*>)/, function(m){ return m + "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") + "</style>"; });
     return '<div class="tsh-poster">' + img(svg, "The whole " + se.n + " set at Timmy’s place") + "</div>";
   }
-  /* how crowns are earned: studying pays 5 for 10 XP, and every prize (migration_v64) pays as many crowns as XP. The
+  /* how crowns are earned: studying pays 5 for 10 XP, and every prize (migration_v66) pays as many crowns as XP. The
      amounts are the server's (the wallet's pays, sh_prizes()), or the page's copy of them (shGame.prizes) */
   function earnList(w){
     var G = window.shGame, P = w.pays || (G && G.prizes) || null;

@@ -38,7 +38,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Playwright is in the inbox ([verify-before-pushing](vault/how-to/verify-before-pushing.md)).
 - **2026-11-17 (Crowns go up as you earn them, and prizes that pay XP and crowns, Claude Code, #403)** —
   Sam: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp earn rates",
-  then a list of prizes. The crowns were paid but never redrawn (BUG-164): `migration_v64.sql` puts `crowns` (the balance
+  then a list of prizes. The crowns were paid but never redrawn (BUG-164): `migration_v66.sql` puts `crowns` (the balance
   after it) in every paying reply and `widget/v3.js` sends it as `sh:crowns` (the hub's meters, its shop, the dashboard's
   wallet; a gold "+n crowns" under the rank). No daily cap on either (the 600 cap is the old pages' only). Prizes, one
   `xp_awards` row each, paying as many crowns as XP (`sh_prizes()`, copied as `PRIZES` in `v3.js`): the name 500, the daily

@@ -497,7 +497,7 @@
   function podMiniHTML(pod){
     var min = pod.duration ? Math.round(pod.duration / 60) : 0;
     /* what a first listen pays (Sam, 2026-11-17: "visibly add crowns available to be earned on cards like timmy time"): 10 XP
-       a minute heard and 100 for finishing (migration_v54), in crowns 1 a minute and 100 for finishing (v64) */
+       a minute heard and 100 for finishing (migration_v54), in crowns 1 a minute and 100 for finishing (v66) */
     var G = window.shGame, mins = pod.duration ? Math.ceil(pod.duration / 60) : 0, earn = mins && G && G.live && G.live() ? '<span class="pm-earn">Up to +' + fmt(mins * 10 + 100) + " XP and " + fmt(mins * 5 + 100) + " crowns</span>" : "";
     return '<a class="ql ql-pod" href="#more/timmy">' +
       '<span class="pm-text"><b>Timmy Time <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(pod.title || "The audio review") + "</small>" + earn +
@@ -824,7 +824,7 @@
      its color, with a check, in the notes' list, on Home and in the headings. */
   var READ_AFTER = 60000;
   function readBtnHTML(lec){ var on = isRead(lec.id); return '<button class="btn btn-done' + (on ? " is-on" : "") + '" type="button" data-read aria-pressed="' + on + '">' + icon("check", 18) + "<span>" + (on ? "Notes done" : "Mark notes as done") + "</span></button>" + readEarnHTML(lec); }
-  /* reading a lecture through pays 50 XP and crowns once (migration_v64; Sam: "small bonus for completing a lecture in
+  /* reading a lecture through pays 50 XP and crowns once (migration_v66; Sam: "small bonus for completing a lecture in
      notes. immediately scrolling to the bottom doesnt count"). The page asks the server for a read id when the lecture
      opens and claims it when the notes are marked done, by the button or by reading to the end, once the page has been
      open and in view long enough for the lecture's length (a quick skim: 600 words a minute, at least a minute); the server
@@ -1147,7 +1147,7 @@
     });
   }
   var GAME_INFO = {};
-  /* what games pay (migration_v54, v64): each game finished 50 XP once a day; the day's first game, beating your best and the
+  /* what games pay (migration_v54, v66): each game finished 50 XP once a day; the day's first game, beating your best and the
      hub's top score pay as many crowns as XP */
   function arcadeEarnHTML(){
     var G = window.shGame, P = G && G.prizes; if (!P || !G.live || !G.live()) return "";
@@ -1312,7 +1312,7 @@
       (on ? "On: Timmy and every extra are off. Turn it off to bring back what you had." : "Turns Timmy and every extra off in one tap: just the notes and the questions.") + "</small></div>" +
       '<button class="btn' + (on ? " btn-primary" : "") + ' focus-btn" type="button" role="switch" aria-checked="' + on + '" data-focus>' + (on ? "On" : "Off") + "</button></div>";
   }
-  /* choosing a name pays 500 XP and crowns, once (migration_v64): said until the wallet says it's taken */
+  /* choosing a name pays 500 XP and crowns, once (migration_v66): said until the wallet says it's taken */
   function nameEarn(){
     var G = window.shGame, w = HX.wallet ? HX.wallet() : null;
     if (!G || !G.live || !G.live() || !G.prizes || !w || !w.got || w.got.name !== false) return "";

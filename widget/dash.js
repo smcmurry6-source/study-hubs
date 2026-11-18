@@ -635,7 +635,7 @@
         : "Your progress in this hub shows here") + "</span></div>";
   }
   /* Timmy Time: a hub's audio review episode (hub.podcast = { name, sub }), on the hub's color with the host in headphones */
-  /* what the episode pays (migration_v64): 10 XP and 5 crowns a minute heard, then 100 of each for finishing it; the
+  /* what the episode pays (migration_v66): 10 XP and 5 crowns a minute heard, then 100 of each for finishing it; the
      minutes come from the card's "48 min" */
   function podEarn(hub){
     var m = /(\d+)\s*min/.exec(hub.podcast.sub || ""), mins = m ? +m[1] : 0;
@@ -1268,7 +1268,7 @@
       e.preventDefault();
       var v = input.value.trim().slice(0, 24);
       if (!v){ msg.textContent = "Type a name first."; input.focus(); return; }
-      /* the first name chosen pays 500 XP and crowns (set_display_name_v2, migration_v64); the old call when it isn't there */
+      /* the first name chosen pays 500 XP and crowns (set_display_name_v2, migration_v66); the old call when it isn't there */
       if (nameSb) dashPrize(nameSb, "set_display_name_v2", { p_visitor: VISITOR, p_name: v }, "name").then(function(r){ if (!r || r.missing) nameSb.rpc("set_display_name", { p_visitor: VISITOR, p_name: v }).then(function(){}, function(){}); });
       track("name:set");
       localName = v; lsSet("sh_display_name", v); paintName(); nameChanged();
@@ -1566,7 +1566,7 @@
     }).then(null, function(){ toast("The shop didn't open. Try again in a moment."); });
   }
   document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); visitEarn(); } });
-  /* ---------- prizes (migration_v64): a reply that pays carries the balance after it, and the prize says what it paid
+  /* ---------- prizes (migration_v66): a reply that pays carries the balance after it, and the prize says what it paid
      (a visit, a name, trophies: widget/ranks.js sends theirs as sh:crowns and sh:prize) ---------- */
   function setCrowns(n){
     var w = SHOP.shop && SHOP.shop.wallet; if (!w || typeof n !== "number" || !isFinite(n)) return;
@@ -1648,7 +1648,7 @@
        played on the server, once ever) */
     var bot = false; try { bot = !!navigator.webdriver; } catch (e) {}
     if (window.shRanks && window.shRanks.track) window.shRanks.track(p, { seen: function(j){ if (boardSb && VISITOR && !bot) boardSb.rpc("mark_dark_unlock_seen", { p_visitor: VISITOR, p_journey: j }).then(function(){}, function(){}); },
-      /* a trophy won from now on pays 200 XP and crowns (migration_v64, widget/ranks.js asks when the profile shows a new one) */
+      /* a trophy won from now on pays 200 XP and crowns (migration_v66, widget/ranks.js asks when the profile shows a new one) */
       claim: boardSb && VISITOR && !bot ? function(fn, args){ return boardSb.rpc(fn, Object.assign({ p_visitor: VISITOR }, args)).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); } : null });
     else lsSet("sh_rank_tier", String(p.tier || 0));
     if (window.shRanks && window.shRanks.flairFromBadges){ lsSet("sh_rank_flair", window.shRanks.flairFromBadges(p.badges)); }

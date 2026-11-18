@@ -1096,7 +1096,7 @@
   function saveName(name){
     name = String(name || "").trim().slice(0, 24);
     if (!name) return false;
-    /* the first name chosen pays 500 XP and crowns (set_display_name_v2, migration_v64); the old call otherwise */
+    /* the first name chosen pays 500 XP and crowns (set_display_name_v2, migration_v66); the old call otherwise */
     if (GAME.want && GAME.on !== false) claimPrize("set_display_name_v2", { p_visitor: VISITOR_ID, p_name: name }, "name").then(function(r){ if (!r || r.missing) safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name }); });
     else safeRpc("set_display_name", { p_visitor: VISITOR_ID, p_name: name });
     shTrackSafe("name:set");
@@ -1683,7 +1683,7 @@
     var tries = 0;
     function paid(r){
       if (r.boost !== undefined) GAME.boost = r.boost || null;
-      if (!r.repeat) setCrowns(r.crowns);   /* the balance after this answer (migration_v64) */
+      if (!r.repeat) setCrowns(r.crowns);   /* the balance after this answer (migration_v66) */
       try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: qid, ctx: d.ctx || "", session: d.session || null, res: r } })); } catch (e) {}
     }
     function send(){
@@ -1720,7 +1720,7 @@
   }
   document.addEventListener("sh:bowl-trophy", sendBowlTrophy);
   setTimeout(sendBowlTrophy, 5000);
-  /* ---------- prizes (migration_v64, vault/reference/game-server.md) ----------
+  /* ---------- prizes (migration_v66, vault/reference/game-server.md) ----------
      What each prize pays in XP, with as many Shiny Gold Crowns (study XP pays 5 crowns per 10). The server's sh_prizes()
      says the same and tools/release/xp.js checks the two match. ring is per question of the daily goal; streak and row
      are [reached, pays]; medal is Bronze to Crown. The cards that offer a prize read it from here (window.shGame.prizes). */
@@ -1736,7 +1736,7 @@
       row: (d.n || "") + " right in a row", streak: (d.n || "") + " days in a row", medal: "Hub medal", "pod-done": "Timmy Time finished" }[src] || "Bonus";
     return what + ": +" + fmtN(xp) + " XP and " + fmtN(xp) + (xp === 1 ? " crown" : " crowns");
   }
-  /* the crowns: every reply that pays carries the balance after it (migration_v64), which goes out as sh:crowns for
+  /* the crowns: every reply that pays carries the balance after it (migration_v66), which goes out as sh:crowns for
      whatever shows it (Home's Today card, More's shop tile, the shop) */
   var CROWNS = null;
   function setCrowns(n){
@@ -1797,7 +1797,7 @@
       }).then(function(res){
         var r = res && !res.error && res.data && typeof res.data === "object" ? res.data : null;
         if (r && r.ok) try { document.dispatchEvent(new CustomEvent("sh:session-paid", { detail: { session: id, res: r } })); } catch (e) {}
-        /* a game's prizes (migration_v64): the day's first game, a personal best, the hub's top score */
+        /* a game's prizes (migration_v66): the day's first game, a personal best, the hub's top score */
         if (r && r.ok) { setCrowns(r.crowns); prizeWon("game", r.game, r); prizeWon("pb", r.pb, r); prizeWon("top", r.top, r); }
         return r;
       }, function(){ return null; });
@@ -2040,7 +2040,7 @@
     sessionCorrectStreak = 0;
     nukeReady = false;
     shNukeSfx.play("launch");
-    /* the launch pays 10,000 XP and crowns when the server's own run reached 100 (launch_nuke_v2, migration_v64; it logs
+    /* the launch pays 10,000 XP and crowns when the server's own run reached 100 (launch_nuke_v2, migration_v66; it logs
        the launch too), said once the strike has played; without it, the launch is logged as before */
     var reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     claimPrize("launch_nuke_v2", { p_visitor: VISITOR_ID, p_hub: HUB, p_name: name }, "nuke", reduce ? 5000 : 16000).then(function(r){

@@ -77,7 +77,7 @@
   function hasShop(){ return !!shopOf(); }
   /* the wallet ({ earned, spent, balance }), for Home's Today card (hub-rewards.js), or null before the bootstrap */
   function wallet(){ var sh = shopOf(); return sh && sh.wallet && typeof sh.wallet.balance === "number" ? sh.wallet : null; }
-  /* the balance after a reply that paid (migration_v64: every paying reply carries it; widget/hub-rewards.js passes it on):
+  /* the balance after a reply that paid (migration_v66: every paying reply carries it; widget/hub-rewards.js passes it on):
      the wallet takes it, its "earned in all" moves by the same, and an open shop shows it */
   function setWallet(n){
     var w = wallet(); if (!w || typeof n !== "number" || !isFinite(n)) return;

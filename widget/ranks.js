@@ -750,7 +750,7 @@
     if (NEW && fresh.length) trophyStats();
     fresh.forEach(function(tr){ playRankUp("trophy", trophyCard(tr, p.badges), busy); });
   }
-  /* a trophy won from now on pays 200 XP and crowns (migration_v64): when a v2 profile shows a trophy this device hasn't
+  /* a trophy won from now on pays 200 XP and crowns (migration_v66): when a v2 profile shows a trophy this device hasn't
      had settled (sh_trophy_paid), the page asks the server (claim_trophies_v2), which pays the new ones and lists every
      trophy it has settled. opt.claim(fn, args) is the page's call (the hub's and the dashboard's own client). */
   var trophyAsked = false;
