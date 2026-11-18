@@ -68,8 +68,8 @@ narrates a tour of what is new.
 - [x] Timmy's narration is rendered in the show's voice, with captions that match it word for word
 - [x] The video is cut (60 to 90 seconds), and Sam has watched it and said yes (Sam on the second cut: "looks great
       except the subtitles gradient takes up too much of the screen and you dont mention the ideas board"; the third
-      cut, 94 seconds with the idea board in it, went to Sam on 2026-11-14. Sam asked for nothing more, and on
-      2026-11-18 said "you can merge the tools and notes in case we ever make another trailer": taken as the yes)
+      cut, 94 seconds with the idea board in it, went to Sam on 2026-11-14. Sam, 2026-11-18: "im done with the
+      trailer")
 - [x] It is where Sam asked for it (a link: the file handed to Sam, the third cut)
 - [x] `DEPLOY_NOTES.md`, and this note's Outcome
 
@@ -102,9 +102,12 @@ narrates a tour of what is new.
   ideas on screen are the preview's made-up ones, under made-up names (not classmates': nobody posted them), without
   their "Fixture idea:" labels and with no answer from Sam on the top one (`record.mjs`). Only the dashboard was
   recorded again. The line adds 4 seconds: 94 seconds in all, 4 over the range, which Sam can have trimmed.
-- 2026-11-18 (Claude Code). #360 (into the release branch) was closed unmerged when that branch was retired after the
-  release. Sam: "you can merge the tools and notes in case we ever make another trailer". The same files, moved onto
-  `main` as it is now, go in a new PR; this note is closed with it.
+- 2026-11-18 (Claude Code, vetting the to-do list, #411): Sam: "there are several other things on here that have already
+  been done like the trailer", and "im done with the trailer". #360, which pointed at the release branch, was closed
+  unmerged and this note was closed on `main`, with the tools left on #360's branch.
+- 2026-11-18 (Claude Code, [#415](https://github.com/smcmurry6-source/study-hubs/pull/415)). Sam, the same day: "you can
+  merge the tools and notes in case we ever make another trailer". The same files as #360, moved onto `main` as it is
+  now; this note has that PR's full log again.
 
 ## Outcome
 

@@ -78,6 +78,8 @@ Hub building
 - [Draw a seasonal set or a rank set for Timmy's place](how-to/draw-a-seasonal-set.md): one list (`sets.mjs`), a pack per
   set, the catalog and the build that checks them.
 - [Narrate with Kokoro](how-to/narrate-with-kokoro.md)
+- [Package the to-do list into sessions](how-to/package-the-to-dos.md): every open item in numbered packages, one PR each
+  (a really big item alone), and the prompt that starts the one Sam picks (Claude Code: `/backlog`).
 - [Read usage data and run surveys](how-to/read-usage-data.md)
 - [Student reports, suggestions and notices](how-to/reply-to-reports.md)
 - Lessons audit and refresh: `tools/lessons-refresh.md` (Claude Code: `/lessons-audit`). A Timmy Time episode:

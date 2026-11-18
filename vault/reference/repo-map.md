@@ -110,6 +110,9 @@ tags: [map]
   ([the task](../tasks/done/2026-11-13-launch-trailer.md), its `README.md`): the script, the voice (the show's), a new music
   cue, the drawn studio, the feature shots recorded from a preview, and the cut. It makes a file to send the class;
   the video, its working files (`out/`) and the names its boards show (`names.local.json`) are never committed.
+- `tools/todo/list.mjs` — every open item on the to-do list in one printout (task notes, the inbox, pending migrations,
+  the bug log's open rows, leftovers in done tasks; `--ref origin/main` reads `main` without leaving your branch), for
+  [package-the-to-dos](../how-to/package-the-to-dos.md) and `/backlog` (`.claude/skills/backlog/`).
 - `tools/reddit-scout/` — `scout.py` reads the Claude subreddits' feeds into one digest for `/reddit-scout`
   (`.claude/skills/reddit-scout/`); `log.md` keeps every run's suggestions, Sam's answers and the posts judged.
 - `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new

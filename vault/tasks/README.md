@@ -15,7 +15,9 @@ Point the agent at the repo and the note, in any words. For example:
 > Work in the GitHub repo smcmurry6-source/study-hubs. Read `AGENTS.md` first, then do the task in
 > `vault/tasks/2026-11-03-occlusion-final-time-and-format.md`.
 
-Or "go through `vault/tasks/inbox.md`", or "do the open tasks for perio". An agent that can't read the repo directly
+Or "go through `vault/tasks/inbox.md`", or "do the open tasks for perio". To see everything that's open as numbered
+packages, each with the prompt that starts its session: [package-the-to-dos](../how-to/package-the-to-dos.md) (Claude
+Code: `/backlog`; `node tools/todo/list.mjs` prints the raw list). An agent that can't read the repo directly
 can be given the raw file URL: `https://raw.githubusercontent.com/smcmurry6-source/study-hubs/main/AGENTS.md`.
 
 ## A task note

@@ -46,9 +46,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `names.local.json` (the leaderboard names its boards show, with Sam's OK) are in `.gitignore`. Ask Timmy's answer
   in the footage is staged from Occlusion's notes (the preview has no model), and the idea board's notes are the
   preview's made-up ideas under made-up names. Built 2026-11-14 on the release branch as #360, which was closed
-  unmerged when that branch was retired; this PR lands the same files on `main`. **The tools were last run against
+  unmerged on 2026-11-18 (Sam: "im done with the trailer"); this PR lands the same files on `main`. **The tools were last run against
   the site as it was on 2026-11-14**: a new trailer starts by checking `shots.mjs`'s selectors and `record.mjs`'s
   patches of the preview against the pages as they are then.
+- **2026-11-18 (the to-do list as packages, `/backlog`, and the to-do rule tightened, Claude Code)** — Sam: "give me a list
+  of all the open items on the to do and the inbox ... group them in packages that can be shipped in the same pr ... a really
+  big item should go alone in its own session ... make this a skill". `node tools/todo/list.mjs` prints every open item (task
+  notes and their unticked boxes, the inbox, pending migrations, the bug log's open and awaiting-retest rows, leftovers in
+  done tasks; `--ref origin/main`, `--full`, `--json`); [package-the-to-dos](vault/how-to/package-the-to-dos.md) says how to
+  set aside what's in a PR, waiting, Sam's or parked, group the rest into one-PR packages (S, M, L; an L always alone) and
+  write each one's launch prompt; `.claude/skills/backlog/` runs it in Claude Code. Sam's second ask, "make it a rule that
+  any sessions from now on will add open items to the to do list and check things off that have been done", went into the
+  existing rule ([to-dos-go-in-the-vault](vault/rules/to-dos-go-in-the-vault.md): check the list at the start, tick and add
+  in the PR, tick what you find already done) and the PR template's new "To-do list" section. The first run's vetting closed the launch trailer (done in #360, never merged; Sam: done), struck the Ask Timmy key line (Sam: not needed) and updated BUG-002, -003 and -004 from today's accessibility baselines. Nothing on the site changed.
 - **2026-11-18 (Perio's questions as A/B versions, Claude Code)** — Sam: "They are A/B versions of questions", "Split the
   class". `abStart()` in `widget/hub.js` picks each question's first version by device (a mixed FNV hash of
   `sh_visitor_id` and the id: about half the class on each, every question), later tries alternate; a mock keeps each
