@@ -430,15 +430,13 @@ export function pack(T){
         for (i = 0; i < 7; i++){ var t = (8 + i * 27) * Math.PI / 180, a = P(rc[0], rc[1] + Math.cos(t) * .3, rc[2] + Math.sin(t) * .34), b = P.apply(null, rim[Math.round(i * 18 / 6.6)]); s += L(seg(a, b), .8, o.night ? "#8E887C" : "#BFB6A2"); }
         /* the near wheels */
         s += wagonWheel(W.fw[0], W.yn, W.fw[1], o) + wagonWheel(W.rw[0], W.yn, W.rw[1], o);
-        /* the water barrel, upright on a little shelf at its side, strapped on, a tin cup on a hook */
-        var bc = [1.74, W.y1 + .3], bz0 = .52, bz1 = 1.28, br = .25, bw = o.night ? ["#B9926A", "#8A6A4E", "#C9A57E"] : [K.woodLight, K.wood, "#EFCB9C"];
-        s += box(bc[0] - .34, W.y1, bz0 - .08, .68, .62, .08, WOOD, THIN);
-        s += cyl(bc[0], bc[1], bz0, br * .9, (bz0 + bz1) / 2, br, bw[0], bw[1], bw[0], { open: true, sw: 1.4 }) + cyl(bc[0], bc[1], (bz0 + bz1) / 2, br, bz1, br * .9, bw[0], bw[1], bw[2], { sw: 1.4, si: 1 });
-        [bz0 + .14, (bz0 + bz1) / 2, bz1 - .12].forEach(function(z, j){ var rr = j === 1 ? br : br * .93, pts = []; for (var q = 0; q <= 12; q++){ var t = (-50 + q * 190 / 12) * Math.PI / 180; pts.push([bc[0] + Math.cos(t) * rr, bc[1] + Math.sin(t) * rr, z]); } s += L(D(pts, true), 1.6, "#5A5560"); });
-        for (var q = 0; q < 3; q++){ var t = (60 + q * 40) * Math.PI / 180, a0 = P(bc[0] + Math.cos(t) * br * .9, bc[1] + Math.sin(t) * br * .9, bz0 + .05), a1 = P(bc[0] + Math.cos(t) * br, bc[1] + Math.sin(t) * br, (bz0 + bz1) / 2), a2 = P(bc[0] + Math.cos(t) * br * .9, bc[1] + Math.sin(t) * br * .9, bz1 - .03); s += L("M" + f(a0[0]) + " " + f(a0[1]) + " Q" + f(a1[0] + (a1[0] - (a0[0] + a2[0]) / 2)) + " " + f(a1[1]) + " " + f(a2[0]) + " " + f(a2[1]), .7, bw[1], .9); }
-        var lid = P(bc[0], bc[1], bz1); s += ell(lid[0] + .4, lid[1], 2.2, 1.2, bw[1], .8);
-        var cup = P(bc[0] + .26, bc[1] + .16, bz1 - .18); s += L("M" + f(cup[0]) + " " + f(cup[1] - 2) + " v1.6", 1) + FO("M" + f(cup[0] - 1.6) + " " + f(cup[1]) + " h3.2 l-.4 3 h-2.4 z", "#C9D1D9", .8);
-        s += L(D([[bc[0] - .1, W.y1, bz1 - .2], [bc[0] - .1, bc[1] - .12, bz1 - .2]], true), 1.4, "#5A5560");
+        /* the water barrel, upright on a little shelf at its side, strapped on */
+        var bc = [1.76, W.y1 + .32], bz0 = .46, bz1 = 1.34, br = .3, bw = o.night ? ["#B9926A", "#8A6A4E", "#C9A57E"] : ["#E2B887", "#C4915F", "#F2D3A8"];
+        s += box(bc[0] - .36, W.y1, bz0 - .07, .72, .7, .07, WOOD, { sw: 1.1, si: .7 });
+        s += cyl(bc[0], bc[1], bz0, br * .88, (bz0 + bz1) / 2, br, bw[0], bw[1], bw[0], { open: true, sw: 1.5 }) + cyl(bc[0], bc[1], (bz0 + bz1) / 2, br, bz1, br * .88, bw[0], bw[1], bw[2], { sw: 1.5, si: 1 });
+        [bz0 + .15, bz1 - .14].forEach(function(z){ var pts = []; for (var q = 0; q <= 12; q++){ var t = (-50 + q * 190 / 12) * Math.PI / 180; pts.push([bc[0] + Math.cos(t) * br * .95, bc[1] + Math.sin(t) * br * .95, z]); } s += L(D(pts, true), 1.2, "#6E6A74"); });
+        [70, 110].forEach(function(dg){ var t = dg * Math.PI / 180, a0 = P(bc[0] + Math.cos(t) * br * .88, bc[1] + Math.sin(t) * br * .88, bz0 + .04), a1 = P(bc[0] + Math.cos(t) * br * 1.08, bc[1] + Math.sin(t) * br * 1.08, (bz0 + bz1) / 2), a2 = P(bc[0] + Math.cos(t) * br * .88, bc[1] + Math.sin(t) * br * .88, bz1 - .03); s += L("M" + f(a0[0]) + " " + f(a0[1]) + " Q" + f(a1[0]) + " " + f(a1[1]) + " " + f(a2[0]) + " " + f(a2[1]), .7, bw[1]); });
+        var lid = P(bc[0], bc[1], bz1); s += circ(lid[0] + 1, lid[1], 1, bw[1], .7);
         if (o.snow) s += F(D2(hull(hoopX.map(function(x, i){ return hoop(i, 60, 120, 6); }).reduce(function(a, b){ return a.concat(b); }, []).map(function(q){ return P(q[0], q[1], q[2] + .04); }))), "#FFFFFF", .9);
         return s;
       },
