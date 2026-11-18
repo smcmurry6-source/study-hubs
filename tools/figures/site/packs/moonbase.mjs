@@ -79,16 +79,16 @@ export function pack(T){
   function beacon(x, y, r, c){ return circ(x, y, r, c || "#FF5A5A", 1.1).replace("/>", ' class="tp-twinkle"/>') + circ(x - r * .35, y - r * .35, r * .3, "#FFFFFF"); }
 
   /* ------------------------------------------------------------------ the home: a moon base dome ------------------- */
-  var DM = { cx: 5.0, cy: 5.3, r: 2.75, z0: .42, h: 2.7 }, AL = { x: 5.5, y0: 7.4, y1: 9.05, zc: 1.22, R: 1.15 }, MOD = { x: 8.95, y: 3.45, r: .9, h: 1.5 };
+  var DM = { cx: 5.0, cy: 5.3, r: 2.9, z0: .42, h: 3.0 }, AL = { x: 5.5, y0: 7.5, y1: 9.3, zc: 1.2, R: 1.1 }, MOD = { x: 8.95, y: 3.0, r: .85, h: 1.5 };
   var homes = {
     "moon-dome": {
       note: "A white habitat dome with an airlock, a tube to a little module, solar wings and a blinking antenna",
       ups: ["windows", "porch", "flag", "paint"],
-      upn: { windows: "A ring of portholes", porch: "Airlock steps and floodlights", flag: "A Timmy flag on the module", paint: "Dome color" },
-      door: [5.5, 9.05], brush: [8.0, 9.3], statue: [2.85, 9.85], spots: { door: [7.0, 10.5] }, h: 6.0,
-      eaves: [[2.9, 7.2, 2.2], [7.1, 3.6, 2.2], 6], round: [DM.cx, DM.cy, 2.9],
-      base: T.arcPts(MOD.x, MOD.y, MOD.r, -45, 150, 5).concat(T.arcPts(DM.cx, DM.cy, DM.r + .05, -40, 135, 14)), gap: [[4.0, 7.2, 7.1, 10.6]],
-      block: [2.0, 1.0, 9.8, 9.25],
+      upn: { windows: "A ring of portholes", porch: "Airlock steps and running lights", flag: "A Timmy flag on the module", paint: "Dome color" },
+      door: [5.5, 9.3], brush: [8.3, 9.35], statue: [2.85, 9.9], spots: { door: [7.1, 10.7] }, h: 6.0,
+      eaves: [[2.85, 7.45, 2.4], [7.15, 3.15, 2.4], 6], round: [DM.cx, DM.cy, 3.0],
+      base: T.arcPts(MOD.x, MOD.y, MOD.r, -45, 150, 5).concat(T.arcPts(DM.cx, DM.cy, DM.r + .05, -40, 135, 14)), gap: [[4.0, 7.2, 7.1, 10.8]],
+      block: [2.0, .8, 9.8, 9.5],
       draw: function(o){
         var u = o.up, pp = T.PAINTS[o.paint], bb = T.BOLD[o.paint], tint = o.paint && o.paint !== "cream";
         var dc = tint && pp ? [pp.c, pp.s] : [WHITE[0], WHITE[1]], tr = tint && bb ? [bb.c, bb.s] : ["#3FA7E0", "#2378B0"];

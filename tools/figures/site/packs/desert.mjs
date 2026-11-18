@@ -238,6 +238,8 @@ export function pack(T){
       far: function(o){
         var n = o.night, c = n ? { far: "#6E5878", m: "#8E5A62", ms: "#70444E", cap: "#A26E70", st: "#7A4A54" } : { far: "#F1B596", m: "#DE7A4E", ms: "#BE5C38", cap: "#EE9C6C", st: "#C4653F" }, s = "";
         var snowcap = function(d){ return o.snow ? F(d, "#FFFFFF") + L(d, 1, INK, .5) : ""; };
+        /* the farthest mesas, pale with distance, just over the crest of the hill */
+        s += FO("M150 96 L156 74 Q157.4 69 163 68.6 L232 68 Q237.6 68.4 239 73 L246 90 Q252 94 262 95 L262 100 Z", n ? "#5E4C6E" : "#EFC3AE", 1).replace('stroke-width="1"', 'stroke-width="1" stroke-opacity=".6"');
         /* a far pale mesa peeking between the near ones */
         s += FO("M112 130 L114 84 Q115 75.6 122 75 L170 74.4 Q176 75 177.4 80 L181 92 Q187 99 198 101 L198 140 Z", c.far, 1.2);
         s += L("M126 88 q-1 6 -2 10 M150 86 q1 6 0 12", .8, INK, .3) + snowcap("M114.4 80 Q115 75.6 122 75 L170 74.4 Q176 75 177 79 Q146 77 114.4 80 Z");
