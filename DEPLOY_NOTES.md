@@ -41,7 +41,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   write each one's launch prompt; `.claude/skills/backlog/` runs it in Claude Code. Sam's second ask, "make it a rule that
   any sessions from now on will add open items to the to do list and check things off that have been done", went into the
   existing rule ([to-dos-go-in-the-vault](vault/rules/to-dos-go-in-the-vault.md): check the list at the start, tick and add
-  in the PR, tick what you find already done) and the PR template's new "To-do list" section. Nothing on the site changed.
+  in the PR, tick what you find already done) and the PR template's new "To-do list" section. The first run's vetting closed the launch trailer (done in #360, never merged; Sam: done), struck the Ask Timmy key line (Sam: not needed) and updated BUG-002, -003 and -004 from today's accessibility baselines. Nothing on the site changed.
 - **2026-11-18 (CI back on the newest Ubuntu, Claude Code, #407)** — The inbox to-do from #402. Every workflow is back on
   `runs-on: ubuntu-latest` (Ubuntu 26.04 since 2026-11-18) with Playwright **1.63.0** in place of 1.56.1 (the
   `playwright@` lines in `check.yml`, `release.yml` and `after-merge.yml`): 1.63.0 has Chromium, WebKit and Firefox

@@ -79,9 +79,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   class's old picks on Occlusion's reworded Bennett choice, "run once, right after the PR merges". The release session
   couldn't tell from a read-only look whether it ran, and didn't run it (it writes to the class's data). Run it, or say
   it was run.
-- [ ] **Ask Timmy's key is saved as `TIMMY_EVAL_KEY`** (2026-11-14, BUG-150). It works: the function reads that name
+- [x] ~~**Ask Timmy's key is saved as `TIMMY_EVAL_KEY`** (2026-11-14, BUG-150). It works: the function reads that name
   when there is no `ANTHROPIC_API_KEY`. If Sam saves the key again under `ANTHROPIC_API_KEY` (Supabase, Edge Functions,
-  Secrets), the fallback line in `supabase/functions/timmy/index.ts` can come out. The admin page's Ask Timmy tab also
+  Secrets), the fallback line in `supabase/functions/timmy/index.ts` can come out.~~ Not needed (Sam, 2026-11-18: "yes
+  strike it"): the fallback stays for good, and the eval reads the same name. The admin page's Ask Timmy tab also
   shows the release's test chat (visitor `release-check-2026-11-14`, one failed and one answered question, $0.60).
 - [x] **The redesign's other task notes are still open** (2026-11-14; done 2026-11-17, #401): [phase 2](done/2026-11-05-redesign-phase-2-live-hubs.md),
   [phase 3](done/2026-11-05-redesign-phase-3-dashboard.md), [phase 4](done/2026-11-05-redesign-phase-4-game-layer.md),
