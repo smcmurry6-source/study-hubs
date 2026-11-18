@@ -129,9 +129,11 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   materials, `q2-F04`-`F06`: the final asks the materials, not the techniques or pictures), 675.
 
 - **Every question with choices has a second wording** (`content/variants.json`, since 2026-11-18,
-  [task](../tasks/2026-11-17-reworded-question-variants.md)): a later try shows it. **When you edit a question, edit its
+  [task](../tasks/done/2026-11-17-reworded-question-variants.md)): a later try shows it. **When you edit a question, edit its
   wording too** (same choices in the same order, a why for each); a new question can get one, or the build is fine without.
-  `node tools/hub-next/build.mjs` checks them.
+  `node tools/hub-next/build.mjs` checks them. They are **A/B versions** (Sam, 2026-11-18): about half the class starts each
+  question on B, and question health's `ab_gap` flags a pair whose first tries differ ([question-health](../reference/question-health.md)):
+  fix the version that's off, A in `questions.json`, B in `variants.json`.
 
 ## Diagram decisions
 
