@@ -224,7 +224,7 @@ export function pack(T){
     "red-rocks": T.hillScene({
       note: "Red mesas and saguaros under a sunset sky, and the whole Milky Way at night",
       path: "dirt", treeKind: "round", lamp: "lantern", skirt: "sand", grade: ["#FFB27A", .07], farLift: 0,
-      ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#8C7468", "#7E675E", "#6E5852", "#574541"] : ["#F5DCAE", "#ECCB97", "#DDB07C", "#B98A58"]; },
+      ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#8E7A7E", "#806C72", "#705C64", "#574650"] : ["#F5DCAE", "#ECCB97", "#DDB07C", "#B98A58"]; },
       sky: function(o){
         if (o.night){
           var mw = F("M120 -20 Q230 26 390 52 L390 92 Q230 62 120 14 Z", "#E9E2FF", .09) + F("M130 -10 Q230 32 390 64 L390 80 Q232 50 130 4 Z", "#F4F0FF", .09);
@@ -268,16 +268,20 @@ export function pack(T){
           T.scatter(143, 9, on, function(sx, sy, i){ return circ(sx, sy - 2, 1.6, o.night ? "#9C8FB0" : ["#F2C230", "#F28C28", "#FFFFFF"][i % 3], .6); }).join("");
       },
       props: function(o, on){
-        var g = cact(o);
-        return T.scatter(146, 13, on, function(sx, sy, i, R, x, y){
-          var k = [0, 1, 2, 0, 3, 4, 1, 0, 2, 3, 0, 1, 4][i], s;
-          if (k === 0) s = saguaro(sx, sy, 34 + R() * 10, 1, g, i % 2) + ell(sx, sy + 1, 6, 1.6, o.night ? "#6E5852" : "#D3A06B", 0, .6);
+        /* set by hand round the yard, so the saguaros stand apart: [x, y on the plot, what, size] */
+        var g = cact(o), out = [];
+        [[-3.2, 12.6, 0, 40], [17.4, 4.2, 0, 44], [12.4, 19.6, 0, 38], [19.6, 11.4, 0, 34], [13.6, -2.4, 0, 26], [-2.8, 8.6, 3], [16.4, 15.6, 3],
+          [3.2, 17.4, 1], [18.4, 8.4, 1], [8.2, 19.6, 2], [21, 6.4, 2], [16.4, .6, 4], [5.6, 19.4, 1]].forEach(function(q, i){
+          var a = P(q[0], q[1], 0), sx = a[0], sy = a[1], k = q[2], s;
+          if (!on(sx, sy, q[0], q[1])) return;
+          if (k === 0) s = ell(sx + 1, sy + .6, 7, 2, o.night ? "#6E5852" : o.snow ? "#D6E4F1" : "#DDB07C", 0, .7) + saguaro(sx, sy, q[3], q[3] > 30 ? 1 : .8, g, i % 2) + (o.snow ? ell(sx, sy - q[3] + 1, 2.6, 1.1, "#FFFFFF", 0) : "");
           else if (k === 1) s = sage(sx, sy, 1.1, o) + sage(sx + 9, sy + 2, .8, o);
           else if (k === 2) s = boulder(sx, sy, 7, 6, o) + boulder(sx + 8, sy + 2, 4, 3.6, o);
           else if (k === 3) s = o.snow ? sage(sx, sy, 1, o) : tumble(sx, sy, 5.4, o);
-          else s = barrel(sx, sy, 4.4, g, !o.snow) + sage(sx + 8, sy + 1, .7, o);
-          return { x: x, y: y, s: s };
+          else s = barrel(sx, sy, 4.4, g, !o.snow) + barrel(sx + 7, sy + 1.6, 3, g, false) + sage(sx - 8, sy + 1, .7, o);
+          out.push({ x: q[0], y: q[1], s: s });
         });
+        return out;
       }
     })
   };
@@ -471,13 +475,14 @@ export function pack(T){
     },
     "cowboy-hat": {
       note: "A tan hat with a curled brim and a braided band",
-      top: p("M22 26 C26 44 56 52 100 52 C144 52 174 44 178 26 C170 38 146 42 132 42 L68 42 C54 42 30 38 22 26 Z", "#C99A5E") +
+      top: p("M20 18 C22 40 52 54 100 54 C148 54 178 40 180 18 C170 34 150 42 132 42 L68 42 C50 42 30 34 20 18 Z", "#C99A5E") +
+        '<path d="M26 26 C36 40 60 47 100 47.6 C140 47 164 40 174 26" fill="none" stroke="#A87A44" stroke-width="2.2"/>' +
         p("M64 44 C60 22 66 2 82 -2 C90 -3 94 6 100 6 C106 6 110 -3 118 -2 C134 2 140 22 136 44 Q100 50 64 44 Z", "#DDB27A") +
-        '<path d="M100 8 Q98 22 100 36 M82 2 Q78 18 80 34" fill="none" stroke="#B98A4E" stroke-width="2.2"/>' +
-        '<path d="M120 2 Q126 20 124 40 Q132 26 128 6 Z" fill="#C99A5E"/>' +
+        '<path d="M120 2 Q127 20 125 40 Q133 26 129 7 Z" fill="#C99A5E"/><path d="M100 8 Q98 22 100 35" fill="none" stroke="#B98A4E" stroke-width="2.2"/>' +
+        '<path d="M80 6 Q86 14 84 24 M120 6 Q114 14 116 24" fill="none" stroke="#A87A44" stroke-width="2"/>' +
         p("M64.6 34 Q100 40 135.4 34 L136 43.6 Q100 50 64 43.6 Z", "#6B4A2B", O2) +
         (function(){ var s = ""; for (var i = 0; i < 12; i++){ var x = 68 + i * 5.6, y = 38.6 + Math.sin((x - 64) / 72 * Math.PI) * 2.8; s += '<path d="M' + f(x - 2) + " " + f(y + 2) + " l4 -4" + '" stroke="#C99A5E" stroke-width="1.8" stroke-linecap="round"/>'; } return s; })() +
-        '<path d="M30 30 Q60 46 100 47 Q140 46 170 30" fill="none" stroke="#A87A44" stroke-width="2.2"/>' + '<path d="M70 8 Q74 0 82 -1" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".6"/>',
+        '<path d="M73 14 Q75 6 81 3" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" opacity=".6"/>',
       say: ["Yeehaw! The fastest flosser in the West.", "Howdy! This hat's for shade. Enamel doesn't tan.", "Saddle up, partner. Ten questions before sundown."]
     },
     "sheriff-vest": {
@@ -485,12 +490,13 @@ export function pack(T){
       face: p("M50.6 108 Q62 103 76 109 L97 156.9 Q80 156 65 143 Q60 132 53.4 131 Q50.4 121 50.6 108 Z", "#8A5A3A", O3) +
         p("M149.4 108 Q138 103 124 109 L103 156.9 Q120 156 135 143 Q140 132 146.6 131 Q149.6 121 149.4 108 Z", "#8A5A3A", O3) +
         '<path d="M55 112 Q63 108 73 112 L91.6 151.6 M145 112 Q137 108 127 112 L108.4 151.6" fill="none" stroke="#E8C9A0" stroke-width="1.4" stroke-dasharray="3 2.4"/>' +
-        '<path d="M58 134 h12 M130 134 h12" stroke="#5E3A22" stroke-width="2" stroke-linecap="round"/>' +
-        '<path d="M55.4 119 Q62 116 68 119" fill="none" stroke="#6E4428" stroke-width="1.6"/>' +
-        (function(){ var cx = 127, cy = 126, s = "", d = ""; for (var i = 0; i < 10; i++){ var a = Math.PI / 5 * i - Math.PI / 2, q = i % 2 ? 4.6 : 11; d += (i ? " L" : "M") + f(cx + q * Math.cos(a)) + " " + f(cy + q * Math.sin(a)); }
+        p("M66 105.4 Q72 106 76 109 L81.6 121 Q73 117 66 105.4 Z", "#A87048", O2) + p("M134 105.4 Q128 106 124 109 L118.4 121 Q127 117 134 105.4 Z", "#A87048", O2) +
+        '<path d="M58 138 h12" stroke="#5E3A22" stroke-width="2" stroke-linecap="round"/>' +
+        '<circle cx="88.6" cy="131" r="2" fill="#E8C9A0" stroke="' + INK + '" stroke-width="1.2"/><circle cx="93.2" cy="141.4" r="2" fill="#E8C9A0" stroke="' + INK + '" stroke-width="1.2"/>' +
+        (function(){ var cx = 125, cy = 132, s = "", d = ""; for (var i = 0; i < 10; i++){ var a = Math.PI / 5 * i - Math.PI / 2, q = i % 2 ? 5.6 : 13; d += (i ? " L" : "M") + f(cx + q * Math.cos(a)) + " " + f(cy + q * Math.sin(a)); }
           s += '<path d="' + d + ' Z" fill="#F2C94C" stroke="' + INK + '" stroke-width="2"/>';
-          for (i = 0; i < 5; i++){ var b = Math.PI * 2 / 5 * i - Math.PI / 2; s += '<circle cx="' + f(cx + 11.6 * Math.cos(b)) + '" cy="' + f(cy + 11.6 * Math.sin(b)) + '" r="2.2" fill="#F2C94C" stroke="' + INK + '" stroke-width="1.4"/>'; }
-          s += '<circle cx="' + cx + '" cy="' + cy + '" r="4.6" fill="#FFF0B3" stroke="#C9971C" stroke-width="1.2"/>' + T.tinyTooth(cx, cy + .2, .6, "#FFFFFF");
+          for (i = 0; i < 5; i++){ var b = Math.PI * 2 / 5 * i - Math.PI / 2; s += '<circle cx="' + f(cx + 13.6 * Math.cos(b)) + '" cy="' + f(cy + 13.6 * Math.sin(b)) + '" r="2.4" fill="#F2C94C" stroke="' + INK + '" stroke-width="1.4"/>'; }
+          s += '<circle cx="' + cx + '" cy="' + cy + '" r="5.6" fill="#FFF0B3" stroke="#C9971C" stroke-width="1.2"/>' + T.tinyTooth(cx, cy + .3, .74, "#FFFFFF");
           return s + '<path d="M' + (cx - 6) + " " + (cy - 4) + ' l2 -2.4" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" opacity=".8"/>'; })(),
       say: ["There's a new sheriff in town. Plaque has till sundown to leave.", "Sheriff Timmy. This smile is under my protection.", "The star has a tooth on it. Law, order and floss."]
     }

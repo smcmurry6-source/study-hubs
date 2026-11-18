@@ -1,0 +1,563 @@
+/* The Retro arcade collection of Timmy's place (tools/figures/site/sets.mjs COLLECTIONS lists its eight pieces; the shop's
+   catalog has the same rows). One self-contained function: the build hands it the kit's tools (place.mjs, TOOLS) and
+   pastes its source into tools/preview/design/place.js, so it may use nothing from outside itself but T. Structure:
+   packs/thanksgiving.mjs.
+
+   The set: a boxy arcade hall (a marquee ringed with bulbs, a neon tooth on the roof, racing stripes, a checkerboard
+   step), pixel hills drawn in squares (the sun, the moon, the clouds and the stars too), an upright cabinet, a pinball
+   machine and a claw machine full of plush teeth for the yard, and a gamer headset, pixel shades and a high-score jacket
+   for Timmy. Every game look here is our own: no pipes, blocks, ghosts, invaders or anyone's characters, and no words
+   on any sign (shapes and a pixel tooth instead).
+   pix() draws pixel art from rows of letters (one color each), on the screen or laid on a wall, outlined round its
+   silhouette in ink. Never sugar (Timmy is a tooth). No ids, gradients, filters, text, images or emoji. */
+export function pack(T){
+  var K = T.K, P = T.P, D = T.D, D2 = T.D2, f = T.f, F = T.F, O = T.O, L = T.L, FO = T.FO, G = T.G, circ = T.circ, ell = T.ell, box = T.box, cyl = T.cyl, INK = T.INK;
+  var p = T.p, O2 = T.O2, O3 = T.O3, onY = T.onY, onX = T.onX, rectUV = T.rectUV;
+  var NEON = { pink: "#FF4FA3", cyan: "#3FE0F0", yellow: "#FFD84A", lime: "#8CF25C", violet: "#A98BFF", orange: "#FF9A3C", red: "#FF4F5E" };
+  var PALE = { "#FF4FA3": "#F7B3D3", "#3FE0F0": "#B8EEF3", "#FFD84A": "#F8E7A8", "#8CF25C": "#CDEFB8" };
+  var NAVY = "#2A2148", GOLD = ["#F2C94C", "#C9971C", "#FFF0B3"], STEEL = { top: "#EEF2F6", left: "#D9DFE5", right: "#A9B3BE" };
+
+  /* ------------------------------------------------------------------ pixel art ------------------------------------ */
+  /* rows of letters, one color each from map ("." is empty); pt(col, row) gives a cell corner on the screen. Runs of one
+     color merge, each run overlaps the next a hair (no seams), and the ink goes round the silhouette only */
+  function pix(rows, map, pt, o){
+    o = o || {};
+    var e = o.seam == null ? .08 : o.seam, fills = {}, edge = "", r, q;
+    var on = function(r, q){ var c = (rows[r] || "").charAt(q); return c !== "" && c !== "."; };
+    var M = function(a){ return "M" + f(a[0]) + " " + f(a[1]); }, Lt = function(a){ return " L" + f(a[0]) + " " + f(a[1]); };
+    for (r = 0; r < rows.length; r++) for (q = 0; q < rows[r].length; q++){
+      if (!on(r, q)) continue;
+      var ch = rows[r].charAt(q), q2 = q; while (rows[r].charAt(q2 + 1) === ch) q2++;
+      fills[ch] = (fills[ch] || "") + M(pt(q, r)) + Lt(pt(q2 + 1 + e, r)) + Lt(pt(q2 + 1 + e, r + 1 + e)) + Lt(pt(q, r + 1 + e)) + "Z";
+      q = q2;
+    }
+    if (o.sw !== 0) for (r = 0; r < rows.length; r++) for (q = 0; q < rows[r].length; q++){
+      if (!on(r, q)) continue;
+      if (!on(r - 1, q)) edge += M(pt(q, r)) + Lt(pt(q + 1, r));
+      if (!on(r + 1, q)) edge += M(pt(q, r + 1)) + Lt(pt(q + 1, r + 1));
+      if (!on(r, q - 1)) edge += M(pt(q, r)) + Lt(pt(q, r + 1));
+      if (!on(r, q + 1)) edge += M(pt(q + 1, r)) + Lt(pt(q + 1, r + 1));
+    }
+    var s = "", op = o.op != null && o.op < 1 ? ' opacity="' + o.op + '"' : "";
+    Object.keys(fills).forEach(function(k){ if (map[k]) s += '<path d="' + fills[k] + '" fill="' + map[k] + '"' + op + "/>"; });
+    if (edge) s += '<path d="' + edge + '" fill="none" stroke="' + (o.ink || INK) + '" stroke-width="' + (o.sw || 1.1) + '" stroke-linecap="round" stroke-linejoin="round"' + op + "/>";
+    return s;
+  }
+  /* where the cells go: square on the screen, laid on a wall turned left (y = Y), or on one turned right (x = X; its
+     columns run toward -y, so the picture reads the right way round) */
+  function grid(x, y, c, c2){ return function(q, r){ return [x + q * c, y + r * (c2 || c)]; }; }
+  function wallY(Y, u0, v0, cu, cv){ return function(q, r){ return P(u0 + q * cu, Y, v0 - r * cv); }; }
+  function wallX(X, u0, v0, cu, cv){ return function(q, r){ return P(X, u0 - q * cu, v0 - r * cv); }; }
+  var SPR = {
+    tooth: [".##.##.", "#######", "######s", ".####s.", ".##.#s.", ".#...s."],
+    face: [".###.###.", "#########", "##k###k##", "##k###k##", "#########", "###mmm##s", ".######s.", ".###.##s.", ".##...#s.", "..#...s.."],
+    star: ["..#..", ".###.", "#####", ".###.", ".#.#."],
+    plus: [".#.", "###", ".#."],
+    crown: ["#.#.#", "#####", "#####"]
+  };
+  function star(x, y, c, fill, o){ return pix(SPR.star, { "#": fill }, grid(x - 2.5 * c, y - 2.5 * c, c), o); }
+  function plus(x, y, c, fill, o){ return pix(SPR.plus, { "#": fill }, grid(x - 1.5 * c, y - 1.5 * c, c), o); }
+
+  /* a neon tube: ink casing, the glass (pale by day, the color when lit), a white core; its glow is wide and faint */
+  function tube(d, col, lit, w){ w = w || 1; return L(d, 3.6 * w) + L(d, 2 * w, lit ? col : PALE[col] || col) + L(d, .7 * w, "#FFFFFF", lit ? .95 : .7); }
+  function halo(d, col, w){ w = w || 1; return L(d, 9 * w, col, .16) + L(d, 5 * w, col, .26); }
+  function glowC(x, y, r, col){ return circ(x, y, r, col, 0).replace("/>", ' opacity=".2"/>') + circ(x, y, r * .55, col, 0).replace("/>", ' opacity=".22"/>'); }
+  /* a flat drawing laid on a wall turned left (y = const) */
+  function shY(x, y, z, s){ var q = P(x, y, z); return '<g transform="matrix(.866 .5 0 1 ' + f(q[0]) + " " + f(q[1]) + ')">' + s + "</g>"; }
+  /* a molar standing on its two roots: (0, 0) is between the root tips, the cusps top out at -30k */
+  function molarD(k, dx, dy){
+    var q = function(a, b){ return f((dx || 0) + a * k) + " " + f((dy || 0) + b * k); };
+    return "M" + q(-12, -16) + " C" + q(-13, -25) + " " + q(-9, -30) + " " + q(-5, -29) + " C" + q(-3, -28.5) + " " + q(-1.5, -27.2) + " " + q(0, -27.2) + " C" + q(1.5, -27.2) + " " + q(3, -28.5) + " " + q(5, -29) +
+      " C" + q(9, -30) + " " + q(13, -25) + " " + q(12, -16) + " C" + q(11.5, -11) + " " + q(10, -8) + " " + q(9.5, -2) + " C" + q(9.2, 1) + " " + q(6, 1.2) + " " + q(5.4, -2) + " L" + q(4, -9) + " C" + q(3, -12) + " " + q(-3, -12) + " " + q(-4, -9) +
+      " L" + q(-5.4, -2) + " C" + q(-6, 1.2) + " " + q(-9.2, 1) + " " + q(-9.5, -2) + " C" + q(-10, -8) + " " + q(-11.5, -11) + " " + q(-12, -16) + " Z";
+  }
+  /* a shape cut from its side view (points [y, z], counterclockwise with y to the right and z up) and pulled along x
+     from xa to xb: the faces you can see, back to front (on(i) adds what is drawn on face i), then its side at xb */
+  function slabX(pts, xa, xb, c, o){
+    o = o || {};
+    var n = pts.length, quads = [], s = "", i, area = 0, a, b;
+    for (i = 0; i < n; i++){ a = pts[i]; b = pts[(i + 1) % n]; area += a[0] * b[1] - b[0] * a[1]; }
+    var sg = area > 0 ? 1 : -1;
+    for (i = 0; i < n; i++){
+      a = pts[i]; b = pts[(i + 1) % n];
+      var ny = sg * (b[1] - a[1]), nz = -sg * (b[0] - a[0]);
+      if (ny + nz > .001) quads.push({ i: i, k: a[0] + b[0] + a[1] + b[1], d: D([[xa, a[0], a[1]], [xb, a[0], a[1]], [xb, b[0], b[1]], [xa, b[0], b[1]]]), top: nz > ny });
+    }
+    quads.sort(function(m, q){ return m.k - q.k; });
+    quads.forEach(function(q){ s += FO(q.d, q.top ? c.top : c.left, o.si || 1.2) + (o.on ? o.on(q.i) || "" : ""); });
+    return s + FO(D(pts.map(function(q){ return [xb, q[0], q[1]]; })), c.right, o.sw || 1.8);
+  }
+  /* a ring of round bulbs along a rectangle on a wall turned left; chase: each pulses a beat after the one before */
+  function bulbs(Y, u0, u1, v0, v1, nu, nv, fill, o){
+    o = o || {};
+    var pts = [], i, s = "";
+    for (i = 0; i < nu; i++) pts.push([u0 + (u1 - u0) * i / (nu - 1), v1]);
+    for (i = 1; i < nv - 1; i++) pts.push([u1, v1 - (v1 - v0) * i / (nv - 1)]);
+    for (i = nu - 1; i >= 0; i--) pts.push([u0 + (u1 - u0) * i / (nu - 1), v0]);
+    for (i = nv - 2; i > 0; i--) pts.push([u0, v1 - (v1 - v0) * i / (nv - 1)]);
+    pts.forEach(function(q, k){
+      var c = P(q[0], Y, q[1]), col = typeof fill === "function" ? fill(k) : fill;
+      if (o.chase) s += '<circle class="tp-twinkle" cx="' + f(c[0]) + '" cy="' + f(c[1]) + '" r="' + (o.r || 1.2) + '" fill="' + col + '" stroke="' + INK + '" stroke-width=".6" style="animation-duration:' + o.chase + "s;animation-delay:" + f(-(k % 3) * o.chase / 3) + 's"/>';
+      else s += circ(c[0], c[1], o.r || 1.2, col, .6);
+    });
+    return s;
+  }
+
+  /* ------------------------------------------------------------------ the home: an arcade hall --------------------- */
+  /* a shop window full of cabinets: their silhouettes, each with its lit screen */
+  function hallWin(face, plane, u0, u1, v0, v1, k, lit){
+    var on = face === "y" ? onY : onX, q = function(a, b, c, d){ return D(on(plane, rectUV(a, b, c, d))); }, scr = [NEON.cyan, NEON.pink, NEON.lime, NEON.yellow], s, i;
+    s = FO(q(u0, u1, v0, v1), lit ? "#7553C4" : NAVY, 1.6);
+    s += F(q(u0, u1, v0, v0 + .16), lit ? "#9A78E0" : "#3E3170");
+    var cw = .44, gap = (u1 - u0 - k * cw) / (k + 1);
+    for (i = 0; i < k; i++){
+      var a = u0 + gap + i * (cw + gap), h = v0 + (v1 - v0) * (i % 2 ? .78 : .84);
+      s += F(q(a, a + cw, v0, h), lit ? "#3A2A70" : "#463A7C") + F(q(a + .08, a + cw - .08, v0 + (v1 - v0) * .44, v0 + (v1 - v0) * .68), scr[i % 4]) + F(q(a + .04, a + cw - .04, h - .1, h), scr[(i + 1) % 4]);
+    }
+    s += L(D(on(plane, [[(u0 + u1) / 2, v0], [(u0 + u1) / 2, v1]]), true), 1.2) + O(q(u0, u1, v0, v1), 1.6);
+    return s;
+  }
+  var homes = {
+    "arcade-hall": {
+      note: "A boxy retro arcade: a marquee ringed with bulbs, a neon tooth on the roof, racing stripes and a checkerboard step",
+      ups: ["flag", "paint", "windows"], upn: { flag: "A Timmy flag on the roof", paint: "Wall paint", windows: "Neon tubes round the windows" },
+      door: [5.5, 8.6], brush: [7.55, 9.15], statue: [3.15, 9.55], spots: { door: [6.45, 10.25] }, h: 7.6,
+      eaves: [[2.42, 8.78, 4.66], [8.58, 8.78, 4.66]], foot: [2.6, 3.0, 8.4, 8.6], base: [[2.6, 8.6], [8.4, 8.6], [8.4, 3.0]], block: [2.4, 2.7, 8.8, 9.0],
+      draw: function(o){
+        var u = o.up || {}, bp = (o.paint && o.paint !== "cream" && T.BOLD[o.paint]) || { c: "#6A4FD6", s: "#5139B0" }, s = "", lights = "", i, n = o.night;
+        var x0 = 2.6, x1 = 8.4, y0 = 3.0, y1 = 8.6, zt = 4.4;
+        var roof = o.snow ? "#F4F8FC" : "#4E4470", trim = { top: o.snow ? "#FFFFFF" : "#FFFDF6", left: "#FFFDF6", right: "#DDD6E8" };
+        /* the checkerboard step at the door */
+        s += box(4.5, y1, 0, 2.0, 1.0, .14, { top: "#FFFDF6", left: "#59647A", right: "#3F4A5E" }, { sw: 1.4, si: .9 });
+        var cw = .5, cb = "";
+        for (var r = 0; r < 2; r++) for (var c = 0; c < 4; c++) if ((r + c) % 2) cb += D([[4.5 + c * cw, y1 + r * cw, .14], [4.5 + (c + 1) * cw, y1 + r * cw, .14], [4.5 + (c + 1) * cw, y1 + (r + 1) * cw, .14], [4.5 + c * cw, y1 + (r + 1) * cw, .14]]);
+        s += F(cb, "#2B2240") + O(D([[4.5, y1, .14], [6.5, y1, .14], [6.5, y1 + 1, .14], [4.5, y1 + 1, .14]]), 1.2);
+        if (o.snow) s += ell.apply(null, P(6.2, 9.4, .14).concat([5, 1.6, "#FFFFFF", 0]));
+        /* the walls, the kick band, three racing stripes round both of them */
+        s += box(x0, y0, 0, x1 - x0, y1 - y0, zt, { top: roof, left: bp.c, right: bp.s });
+        s += F(D(onY(y1, rectUV(x0, x1, 0, .26))), "#2B2240") + F(D(onX(x1, rectUV(y0, y1, 0, .26))), "#221A36");
+        [[.36, .5, "#FFFDF6", "#DCD3EA"], [.56, .7, NEON.yellow, "#DDB53A"], [.76, .9, NEON.pink, "#D93C88"]].forEach(function(st){
+          s += F(D(onY(y1, rectUV(x0, 4.62, st[0], st[1]))) + D(onY(y1, rectUV(6.38, x1, st[0], st[1]))), st[2]) + F(D(onX(x1, rectUV(y0, y1, st[0], st[1]))), st[3]);
+        });
+        /* a checkered band along the top of both walls */
+        var chk = function(face, plane, a0, a1, nc){
+          var on = face === "y" ? onY : onX, dA = "", ww = (a1 - a0) / nc, z0 = 3.98, zh = .16;
+          for (var rr = 0; rr < 2; rr++) for (var cc = 0; cc < nc; cc++) if ((cc + rr) % 2) dA += D(on(plane, rectUV(a0 + cc * ww, a0 + (cc + 1) * ww, z0 + rr * zh, z0 + (rr + 1) * zh)));
+          return F(D(on(plane, rectUV(a0, a1, z0, z0 + 2 * zh))), face === "y" ? "#FFFDF6" : "#DCD3EA") + F(dA, face === "y" ? "#2B2240" : "#1E1730") + L(D(on(plane, [[a0, z0], [a1, z0]]), true) + D(on(plane, [[a0, z0 + 2 * zh], [a1, z0 + 2 * zh]]), true), 1);
+        };
+        s += chk("y", y1, x0, x1, 20) + chk("x", x1, y0, y1, 20);
+        s += L(D([[x1, y1, 0], [x1, y1, zt]], true), 1.3) + O(D(onY(y1, rectUV(x0, x1, 0, zt)))) + O(D(onX(x1, rectUV(y0, y1, 0, zt))));
+        /* the side wall: a long window full of cabinets, a pixel tooth up above it between two pixel stars */
+        s += hallWin("x", x1, 3.85, 7.75, .98, 2.32, 5, n);
+        if (n){ var sw = P(x1, 5.8, 1.65); lights += glowC(sw[0], sw[1], 22, "#C9A8FF") + hallWin("x", x1, 3.85, 7.75, .98, 2.32, 5, true); }
+        s += pix(SPR.face, { "#": "#F4F0FA", s: "#CFC6E2", k: "#2B2230", m: "#C4587A" }, wallX(x1, 6.42, 3.86, .14, .12), { sw: 1 });
+        s += pix(SPR.star, { "#": NEON.yellow }, wallX(x1, 7.95, 3.5, .14, .12), { sw: 1 }) + pix(SPR.star, { "#": NEON.cyan }, wallX(x1, 4.35, 3.5, .14, .12), { sw: 1 });
+        /* the front: a window each side of the door, cabinets inside */
+        s += hallWin("y", y1, 2.95, 4.3, .98, 2.32, 2, n) + hallWin("y", y1, 6.7, 8.05, .98, 2.32, 2, n);
+        if (n){ var rw = P(7.4, y1, 1.65); lights += glowC(rw[0], rw[1], 12, "#C9A8FF"); }
+        if (u.windows){
+          [["y", y1, 2.95, 4.3, NEON.cyan], ["y", y1, 6.7, 8.05, NEON.cyan], ["x", x1, 3.85, 7.75, NEON.pink]].forEach(function(w){
+            var on = w[0] === "y" ? onY : onX, d = D(on(w[1], rectUV(w[2] - .1, w[3] + .1, .86, 2.44)));
+            s += tube(d, w[4], n, .9);
+            if (n && (w[0] === "x" || w[2] > 6)) lights += halo(d, w[4], .8) + tube(d, w[4], true, .9);
+          });
+        }
+        /* the glass doors in their frame, a cabinet glimpsed through the left one */
+        s += FO(D(onY(y1, rectUV(4.68, 6.32, 0, 2.5))), "#3B3355", 1.6);
+        [[4.82, 5.47], [5.53, 6.18]].forEach(function(lf, k){
+          s += FO(D(onY(y1, rectUV(lf[0], lf[1], .08, 2.36))), n ? "#7553C4" : NAVY, 1.2);
+          if (!k) s += F(D(onY(y1, rectUV(lf[0] + .12, lf[0] + .48, .08, 1.7))), n ? "#3A2A70" : "#463A7C") + F(D(onY(y1, rectUV(lf[0] + .18, lf[0] + .42, .9, 1.3))), NEON.cyan);
+          else s += F(D(onY(y1, rectUV(lf[1] - .3, lf[1], .08, 1.6))), n ? "#3A2A70" : "#463A7C") + F(D(onY(y1, rectUV(lf[1] - .24, lf[1], .85, 1.22))), NEON.pink);
+          s += L(D(onY(y1, [[lf[0] + .08, 1.15], [lf[1] - .08, 1.15]]), true), 2.6) + L(D(onY(y1, [[lf[0] + .08, 1.15], [lf[1] - .08, 1.15]]), true), 1.2, "#D9DFE5");
+          if (!n) s += T.HI(D(onY(y1, [[lf[0] + .12, 2.1], [lf[0] + .4, 1.6]]), true), 1.3);
+        });
+        /* the marquee over the door: a gold box, a dark panel with a pixel tooth between two stars, bulbs all round */
+        var ym = y1 + .62;
+        s += box(4.0, y1, 2.6, 3.0, .62, 1.05, { top: o.snow ? "#FFFFFF" : GOLD[2], left: GOLD[0], right: GOLD[1] }, { sw: 1.6, si: 1 });
+        s += FO(D(onY(ym, rectUV(4.24, 6.76, 2.8, 3.45))), n ? "#3A2E7A" : NAVY, 1.1);
+        s += pix(SPR.tooth, { "#": "#FFFFFF", s: "#CFD8F2" }, wallY(ym, 5.15, 3.36, .1, .078), { sw: .7 });
+        s += pix(SPR.star, { "#": NEON.pink }, wallY(ym, 4.42, 3.3, .085, .075), { sw: .6 }) + pix(SPR.star, { "#": NEON.cyan }, wallY(ym, 6.16, 3.3, .085, .075), { sw: .6 });
+        s += bulbs(ym, 4.12, 6.88, 2.7, 3.55, 13, 5, n ? "#FFFDE8" : "#FFF3C4", { r: 1.15, chase: n ? 1.4 : 0 });
+        if (n){ [4.6, 5.5, 6.4].forEach(function(xx){ var g = P(xx, ym, 3.72); lights += glowC(g[0], g[1], 7, K.glow); }); }
+        /* the roof: a white parapet, an air unit at the back, the flag */
+        s += box(x0, y0, zt, .16, y1 - y0, .24, trim, { sw: 1.3, si: .8 }) + box(x0, y0, zt, x1 - x0, .16, .24, trim, { sw: 1.3, si: .8 });
+        s += box(3.2, 3.5, zt, 1.1, .9, .5, STEEL, { sw: 1.4, si: .9 });
+        var fan = P(3.75, 3.95, zt + .5); s += ell(fan[0], fan[1], 4.4, 2.5, "#8E98A3", 1) + L("M" + f(fan[0] - 3) + " " + f(fan[1]) + " h6 M" + f(fan[0]) + " " + f(fan[1] - 1.8) + " v3.6", .8);
+        if (o.snow) s += ell(fan[0] - 1, fan[1] - .4, 5.4, 1.8, "#FFFFFF", 0);
+        if (u.flag) s += T.flagOn(7.9, 3.45, zt + .24, 2.0);
+        /* the neon tooth on its frame: a tooth in pink tubes with a cyan face, yellow sparks; it glows at night */
+        var ys = 7.55;
+        [4.62, 6.38].forEach(function(xx){ s += box(xx - .06, ys - .06, zt, .12, .12, .62, STEEL, { sw: 1.1, si: .7 }); });
+        var fr = D(onY(ys, rectUV(4.3, 6.7, 5.0, 7.5)));
+        s += L(fr, 2.6) + L(fr, 1.2, "#8E98A3") + L(D(onY(ys, [[4.3, 6.25], [6.7, 6.25]]), true) + D(onY(ys, [[5.5, 5.0], [5.5, 7.5]]), true), 1.6, INK, .55);
+        var nt = function(lit){
+          var k = .8, eye = "M" + f(-4.4 * k) + " " + f(-20 * k) + " v" + f(4.6 * k) + " M" + f(4.4 * k) + " " + f(-20 * k) + " v" + f(4.6 * k);
+          var smile = "M" + f(-5.6 * k) + " " + f(-11.6 * k) + " Q0 " + f(-5.4 * k) + " " + f(5.6 * k) + " " + f(-11.6 * k);
+          var sp = function(x, y, r){ return "M" + f(x) + " " + f(y - r) + " V" + f(y + r) + " M" + f(x - r) + " " + f(y) + " H" + f(x + r); };
+          var b = tube(molarD(k), NEON.pink, lit, 1.05) + tube(eye, NEON.cyan, lit, .9) + tube(smile, NEON.cyan, lit, .9) + tube(sp(15, -24, 3.4) + sp(-15, -7, 2.6), NEON.yellow, lit, .8);
+          var g = lit ? halo(molarD(k), NEON.pink) + halo(eye + smile, NEON.cyan, .7) : "";
+          return shY(5.5, ys, 5.12, g + b);
+        };
+        s += nt(n);
+        if (n){ var nc = P(5.5, ys, 6.2); lights += glowC(nc[0], nc[1], 26, NEON.pink) + nt(true); }
+        if (o.snow) s += F(D(onY(ys, [[4.3, 7.5], [6.7, 7.5], [6.6, 7.58], [4.4, 7.58]])), "#FFFFFF");
+        /* the front parapets last */
+        s += box(x1 - .16, y0, zt, .16, y1 - y0, .24, trim, { sw: 1.3, si: .8 }) + box(x0, y1 - .16, zt, x1 - x0, .16, .24, trim, { sw: 1.3, si: .8 });
+        return { body: s, lights: lights };
+      }
+    }
+  };
+
+  /* ------------------------------------------------------------------ the scene: pixel hills ------------------------ */
+  /* a sky in flat bands, each edge stepped with a row of squares, the way an old screen shades */
+  function pixSky(cols, y1){
+    var s = T.bands(cols, 0, y1), h = y1 / cols.length;
+    for (var i = 1; i < cols.length; i++){
+      var y = i * h, d = "", x;
+      for (x = 0; x < 400; x += 8) d += "M" + x + " " + f(y - 4) + "h4v4.3h-4z";
+      for (x = 4; x < 400; x += 16) d += "M" + x + " " + f(y - 8) + "h4v4.3h-4z";
+      s += F(d, cols[i]);
+    }
+    return s;
+  }
+  /* a hill built in steps: half-widths per step (in squares of c), from its flat top at y down to 170 */
+  function mound(cx, y, c, w, col, R){
+    var L1 = [], R1 = [], i, n = w.length, s = "", hi = "", sh = "", dots = "";
+    for (i = 0; i < n; i++){
+      var hw = w[i] * c, ya = y + i * c * 1.5, yb = i === n - 1 ? 170 : y + (i + 1) * c * 1.5;
+      R1.push([cx + hw, ya], [cx + hw, yb]); L1.push([cx - hw, ya], [cx - hw, yb]);
+      var prev = i ? w[i - 1] * c : 0;
+      hi += "M" + f(cx - hw) + " " + f(ya) + " H" + f(i ? cx - prev : cx + hw) + " v" + f(c * .5) + " H" + f(cx - hw) + " Z";
+      sh += "M" + f(cx + hw - c) + " " + f(ya + (i ? 0 : c * .5)) + " H" + f(cx + hw) + " V" + f(yb) + " H" + f(cx + hw - c) + " Z";
+      for (var k = 0; k < w[i] - 1; k += 2) if (R() > .45) dots += "M" + f(cx - hw + c * (k + 1 + (i % 2))) + " " + f(ya + c * .8) + " h" + f(c * .5) + " v" + f(c * .5) + " h" + f(-c * .5) + " Z";
+    }
+    var d = D2(R1.concat(L1.reverse()));
+    return F(d, col[0]) + F(sh, col[2]) + F(hi, col[1]) + F(dots, col[2], .7) + L(d, 1.4, INK, .55);
+  }
+  var TREE = ["..llgg..", ".llggggg", "llgggggs", "lggggggs", ".gggggs.", "..ggss..", "...tT...", "...tT...", "..ttTT.."];
+  var BUSH = ["..llgg..", ".lggggss", "lgggggss"];
+  var ROCK = [".rrr..", "rrrrrs", "rrrrss"];
+  function treeMap(o){ return o.snow ? { l: "#FFFFFF", g: "#DCEAF6", s: "#B9CCDD", t: "#9A6A3A", T: "#6E4A28" } : o.night ? { l: "#3E7A62", g: "#2E6450", s: "#224C3E", t: "#6A4E3A", T: "#4E3828" } : { l: "#8FE06A", g: "#5DB84A", s: "#3E9038", t: "#B07840", T: "#7E5228" }; }
+  var scenes = {
+    "pixel-hills": T.hillScene({
+      note: "Blocky stepped hills, square clouds and a pixel sun; pixel stars and a pixel moon at night",
+      farLift: 0, path: "stones", treeKind: "round", lamp: "post", grade: ["#FFF6C8", .03],
+      ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#2F6A5E", "#2A6056", "#24554D", "#1B443E"] : ["#96D86E", "#86CD5F", "#72BC50", "#539A3C"]; },
+      sky: function(o){
+        var s, R = T.rng(77), i;
+        if (o.night){
+          s = pixSky(["#141A44", "#192253", "#1F2B62", "#263570", "#2E407C"], 160);
+          for (i = 0; i < 30; i++){ var x = 50 + R() * 300, y = 6 + R() * 110, c = i % 5 ? 2 : 1.6; s += '<g class="tp-twinkle" style="animation-delay:' + f(i * .41 % 3) + 's">' + (i % 5 ? F("M" + f(x) + " " + f(y) + "h2v2h-2z", i % 3 ? "#FFFFFF" : "#FFF3B0") : plus(x, y, c, "#FFFFFF", { sw: 0 })) + "</g>"; }
+          s += T.starField(5, 0, 130);
+          /* the moon in squares; the cow still jumps it */
+          var moon = T.moon(322, 42), m = ["...mmmm.", ".mmmmd..", "mmmm....", "mmd.....", "mmm.....", "mmmm....", ".mmmmd..", "...mmmm."];
+          return s + moon.replace(/<g class="tp-moon">[\s\S]*?<\/g>/, function(){ return '<g class="tp-moon">' + pix(m, { m: "#FFF3C4", d: "#E6D28A" }, grid(322 - 9.6, 42 - 9.6, 2.4), { sw: 1.3 }) + "</g>"; });
+        }
+        s = pixSky(["#6CC2F4", "#82CCF6", "#99D6F8", "#B0E0FA", "#C6E9FB"], 160);
+        /* the sun in squares, its rays as blocks; tap it and it still puts on shades (pixel ones) */
+        var disc = [], q, r, cS = 2.3;
+        for (r = 0; r < 10; r++){ var row = ""; for (q = 0; q < 10; q++){ var dx = q - 4.5, dy = r - 4.5; row += dx * dx + dy * dy > 23 ? "." : q + r < 6 ? "l" : q + r > 12 ? "o" : "y"; } disc.push(row); }
+        var sx = 80, sy = 40, rays = "";
+        for (i = 0; i < 8; i++){ var a = i * Math.PI / 4, d0 = i % 2 ? 15.4 : 16.6; rays += plus(sx + Math.cos(a) * d0, sy + Math.sin(a) * d0, i % 2 ? 1.6 : 2, "#FFD24A", { sw: .8 }); }
+        var face = rays + pix(disc, { y: "#FFD84A", l: "#FFF0A0", o: "#F5B42E" }, grid(sx - 5 * cS, sy - 5 * cS, cS), { sw: 1.4 });
+        var shades = pix(["kkkkkkkkkk", ".kkkk.kkkk"].map(function(x, j){ return j ? ".kwk..kwk." : x; }).concat([".kkk..kkk."]), { k: "#2B2230", w: "#FFFFFF" }, grid(sx - 11.5, sy - 4, 2.3), { sw: 1 });
+        var sun = T.sun(sx, sy).replace(/<g class="tp-sun">[\s\S]*?<\/g>/, function(){ return '<g class="tp-sun">' + face + "</g>"; }).replace(/(<g class="tp-eb" opacity="0">)[\s\S]*(<\/g><\/g>)$/, function(m0, a0, b0){ return a0 + shades + b0; });
+        /* blocky clouds (two of them rain in squares when tapped) */
+        var cl = function(x, y, k, egg){
+          var c = 3 * k, rows = ["....####.....", "..########.##.", ".#############", "##############", ".wwwwwwwwwwww."], d = pix(rows, { "#": "#FFFFFF", w: "#D6EEFA" }, grid(x - 7 * c, y - 2.5 * c, c), { sw: 1.3 });
+          if (!egg) return G("tp-cloud", d);
+          var rain = ""; for (var j = 0; j < 4; j++) rain += F("M" + f(x - 10 * k + j * 7 * k) + " " + f(y + 10 + (j % 2) * 3) + "h2v4h-2z", K.blue);
+          return T.cloud(x, y, k).replace(/<g class="tp-cloud">[\s\S]*?<\/g>/, function(){ return '<g class="tp-cloud">' + d + "</g>"; }).replace(/(<g class="tp-rain">)[\s\S]*?(<\/g>)/, function(m0, a0, b0){ return a0 + rain + b0; });
+        };
+        return s + sun + cl(292, 34, 1, true) + cl(178, 22, .7, true) + cl(126, 64, .55, false);
+      },
+      far: function(o){
+        var R = T.rng(31), n = o.night, sn = o.snow, s = "";
+        var back = sn ? ["#E4EEF8", "#FFFFFF", "#C9DAEA"] : n ? ["#2C5A63", "#3A6C73", "#224A52"] : ["#A8E08C", "#C8F0AE", "#8ACB70"];
+        var front = sn ? ["#D6E4F1", "#FFFFFF", "#B6CBE0"] : n ? ["#23504D", "#2F625C", "#1A3F3D"] : ["#6CC257", "#8FDB74", "#4FA443"];
+        s += mound(208, 54, 6, [3, 6, 9, 12, 15, 18], back, R) + mound(76, 72, 6, [2, 4, 7, 10, 12], back, R) + mound(322, 66, 6, [3, 5, 8, 11, 14], back, R);
+        s += mound(50, 98, 6, [2, 4, 6, 8], front, R) + mound(112, 88, 6, [2, 4, 6], front, R) + mound(292, 86, 6, [2, 4, 7], front, R) + mound(352, 92, 6, [2, 4, 6, 9], front, R);
+        var tm = treeMap(o);
+        s += pix(TREE, tm, grid(54 - 12, 98 - 27 + 1, 3), { sw: 1.1 }) + pix(TREE, tm, grid(346 - 12, 92 - 27 + 1, 3), { sw: 1.1 }) + pix(TREE, tm, grid(298 - 8, 86 - 18 + 1, 2), { sw: 1 });
+        return s;
+      },
+      flat: function(o, on){
+        if (o.snow) return "";
+        var n = o.night, s = "", g = n ? "#24554D" : "#5FAE47";
+        s += T.scatter(161, 36, on, function(sx, sy){ return pix([".g.g.", "ggggg"], { g: g }, grid(sx - 3.2, sy - 2.6, 1.3), { sw: 0 }); }).join("");
+        s += T.scatter(162, 16, on, function(sx, sy, i){ var pc = n ? "#9C8FB0" : ["#FF6FA8", "#FFFFFF", "#B08CFF", "#FF9A3C"][i % 4]; return pix([".p.", "pyp", ".p.", ".g."], { p: pc, y: n ? "#B9A66A" : "#FFE04A", g: n ? "#2A6056" : "#3E9038" }, grid(sx - 2.1, sy - 5.6, 1.4), { sw: 0 }); }).join("");
+        return s;
+      },
+      props: function(o, on){
+        var n = o.night, tm = treeMap(o);
+        return T.scatter(163, 8, on, function(sx, sy, i, R, x, y){
+          var k = i % 4, s = ell(sx, sy + .5, 9, 2.4, "#000", 0, .12);
+          if (k === 0) s += pix(TREE, tm, grid(sx - 10.4, sy - 23.4, 2.6), { sw: 1.1 });
+          else if (k === 1) s += pix(BUSH, tm, grid(sx - 8.8, sy - 6.6, 2.2), { sw: 1 });
+          else if (k === 2) s += pix(ROCK, { r: n ? "#8E98A3" : o.snow ? "#EEF2F6" : "#C9C1B4", s: n ? "#6E7884" : "#A39A8C" }, grid(sx - 6, sy - 5.4, 2), { sw: 1 });
+          else {
+            /* a pixel tooth floating over the grass, like a prize waiting to be picked up */
+            s = ell(sx, sy + .5, 5, 1.6, "#000", 0, .14) + G("tp-float", pix(SPR.tooth, { "#": "#FFFFFF", s: "#CFD8F2" }, grid(sx - 4.9, sy - 19, 1.4), { sw: 1 })) +
+              '<g class="tp-twinkle">' + plus(sx + 7, sy - 20, 1.3, n ? "#FFF3B0" : "#FFFFFF", { sw: .6 }) + "</g>";
+          }
+          return { x: x, y: y, s: s };
+        });
+      }
+    })
+  };
+
+  /* ------------------------------------------------------------------ the yard -------------------------------------- */
+  /* the cabinet's side view: base, the control panel jutting out, the screen tipped back, the marquee hood */
+  var CAB = [[1.0, 0], [2.1, 0], [2.1, 1.3], [2.5, 1.42], [2.5, 1.66], [1.98, 1.84], [1.8, 2.86], [2.08, 2.98], [2.08, 3.5], [1.0, 3.5]];
+  var CXA = 1.05, CXB = 2.55, CABC = { top: "#9C86F5", left: "#7A5FE8", right: "#5A3FC4" };
+  function scr(u, t){ return [CXA + (CXB - CXA) * u, 1.98 - .18 * t, 1.84 + 1.02 * t]; }
+  function scrQ(u0, u1, t0, t1){ return D([scr(u0, t0), scr(u1, t0), scr(u1, t1), scr(u0, t1)]); }
+  function scrPix(rows, map, u0, t0, cu, ct, o){ return pix(rows, map, function(q, r){ return P.apply(null, scr(u0 + q * cu, t0 - r * ct)); }, o); }
+
+  /* the pinball machine's body in side view, sloping up to the backbox; its playfield, (u across, w from back to front) */
+  var PBODY = [[.8, 1.5], [3.3, 1.3], [3.3, 1.86], [.8, 2.1]], PBC = { top: "#8FEAF2", left: "#3FCFE0", right: "#22A3B6" };
+  function pf(u, w){ return [1.0 + 1.6 * u, .8 + 2.5 * w, 2.1 - .24 * w]; }
+  function pfP(u, w){ return P.apply(null, pf(u, w)); }
+
+  /* the claw machine: case corners, the claw's spot, where it rests */
+  var CM = { a: .75, b: 3.15, zb: 1.15, zg: 4.4, zt: 5.05, cx: 2.45, cy: 1.55, zr: 4.26 }, PINKC = { top: "#FFC2DF", left: "#FF85C2", right: "#E35DA2" };
+  var PANE = ["#3B2E7E", "#4D3D9A"], TINT = "#D8F6FF";
+  /* the claw from its hub: three prongs, open (at rest) or shut round a plush tooth */
+  function clawD(h, shut){
+    var x = h[0], y = h[1];
+    if (shut) return "M" + f(x - 1.4) + " " + f(y + 1) + " C" + f(x - 5.4) + " " + f(y + 2.6) + " " + f(x - 5.6) + " " + f(y + 8.4) + " " + f(x - 2) + " " + f(y + 10.4) +
+      " M" + f(x + 1.4) + " " + f(y + 1) + " C" + f(x + 5.4) + " " + f(y + 2.6) + " " + f(x + 5.6) + " " + f(y + 8.4) + " " + f(x + 2) + " " + f(y + 10.4) + " M" + f(x) + " " + f(y + 1.4) + " V" + f(y + 3);
+    return "M" + f(x - 1.4) + " " + f(y + 1) + " C" + f(x - 4.6) + " " + f(y + 2) + " " + f(x - 5.6) + " " + f(y + 5) + " " + f(x - 4.2) + " " + f(y + 7.6) +
+      " M" + f(x + 1.4) + " " + f(y + 1) + " C" + f(x + 4.6) + " " + f(y + 2) + " " + f(x + 5.6) + " " + f(y + 5) + " " + f(x + 4.2) + " " + f(y + 7.6) + " M" + f(x) + " " + f(y + 1.4) + " L" + f(x + .3) + " " + f(y + 7);
+  }
+  function claw(h, shut){ var d = clawD(h, shut); return L(d, 2.8) + L(d, 1.3, "#D9DFE5") + ell(h[0], h[1], 3.4, 1.8, "#A9B3BE", 1.1) + ell(h[0], h[1] - .8, 2.6, 1.2, "#EEF2F6", 0); }
+  function plush(x, y, k, fill, rot){
+    var s = T.tinyTooth(x, y - 5 * k, k, fill) + circ(x - 1.4 * k, y - 7 * k, .55 * k + .1, INK) + circ(x + 1.4 * k, y - 7 * k, .55 * k + .1, INK) + ell(x - 2.6 * k, y - 5.8 * k, .9 * k, .5 * k, "#FF8FA3", 0, .8) + ell(x + 2.6 * k, y - 5.8 * k, .9 * k, .5 * k, "#FF8FA3", 0, .8);
+    return rot ? '<g transform="rotate(' + rot + " " + f(x) + " " + f(y - 4 * k) + ')">' + s + "</g>" : s;
+  }
+  var PLUSH = ["#FFFFFF", "#FFC6DA", "#BFF2DC", "#DCCBFF", "#FFF0A8", "#BFE6FF"];
+
+  var yard = {
+    "arcade-cabinet": {
+      note: "An upright cabinet with bold side art, a joystick, two buttons and a little pixel tooth on its screen", spot: [3.25, 3.35],
+      egg: { n: "The arcade cabinet", does: "the screen flashes a victory pattern", say: "New high score! The prize: a lifetime of shiny enamel." }, anim: "tp-spout .5s 5",
+      draw: function(o){
+        var n = o.night, s = ell.apply(null, P(1.85, 1.85, 0).concat([25, 9, "#1B2A3A", 0, .1]));
+        s += slabX(CAB, CXA, CXB, CABC, { on: function(i){
+          if (i === 1) return F(D(onY(2.1, rectUV(CXA, CXB, 0, .14))), "#2B2240") + FO(D(onY(2.1, rectUV(1.45, 2.15, .45, 1.02))), "#2B2240", 1.1) +
+            FO(D(onY(2.1, rectUV(1.58, 1.72, .64, .86))), NEON.orange, .7) + FO(D(onY(2.1, rectUV(1.88, 2.02, .64, .86))), NEON.orange, .7);
+          if (i === 3) return F(D(onY(2.5, rectUV(CXA, CXB, 1.5, 1.57))), NEON.yellow);
+          if (i === 4){
+            var tp = function(uu, t){ return P(CXA + (CXB - CXA) * uu, 2.5 - .52 * t, 1.66 + .18 * t); }, b = tp(.28, .5), r = "";
+            r += FO("M" + [tp(.06, .14), tp(.94, .14), tp(.94, .86), tp(.06, .86)].map(function(q){ return f(q[0]) + " " + f(q[1]); }).join(" L") + " Z", "#2B2240", .9);
+            r += ell(b[0], b[1], 2.6, 1.3, "#59647A", .9) + L("M" + f(b[0]) + " " + f(b[1]) + " l.8 -5", 2.4) + L("M" + f(b[0]) + " " + f(b[1]) + " l.8 -5", 1.1, "#D9DFE5") + circ(b[0] + .8, b[1] - 5.6, 2.1, NEON.red, .9) + circ(b[0] + .1, b[1] - 6.3, .6, "#FFFFFF");
+            [[.6, NEON.cyan], [.8, NEON.yellow]].forEach(function(bt){ var c = tp(bt[0], .5); r += ell(c[0], c[1] + .5, 2, 1.1, "#1E1A2E", 0) + ell(c[0], c[1], 2, 1.1, bt[1], .8); });
+            return r;
+          }
+          if (i === 5){
+            var r5 = FO(scrQ(0, 1, 0, 1), "#1E1A2E", 1.2) + FO(scrQ(.12, .88, .1, .9), n ? "#3F62E0" : "#2E44A8", 1);
+            r5 += scrPix(["gggggggg"], { g: NEON.lime }, .2, .26, .075, .07, { sw: 0 }) + scrPix(SPR.tooth, { "#": "#FFFFFF", s: "#C9D8F2" }, .24, .82, .075, .1, { sw: .5 });
+            r5 += scrPix(["#"], { "#": NEON.yellow }, .76, .74, .06, .07, { sw: 0 }) + scrPix(["#"], { "#": NEON.pink }, .7, .56, .06, .07, { sw: 0 });
+            return r5 + L(D([scr(.16, .84), scr(.36, .84)], true), 1, "#FFFFFF", .45);
+          }
+          if (i === 7){
+            var mq = function(uu, t){ return [CXA + (CXB - CXA) * uu, 2.08, 2.98 + .52 * t]; };
+            return FO(D([mq(.08, .16), mq(.92, .16), mq(.92, .84), mq(.08, .84)]), n ? "#FFF3B0" : NEON.yellow, 1) +
+              pix(["p.c.p", ".p.p."], { p: NEON.pink, c: NEON.cyan }, wallY(2.08, CXA + (CXB - CXA) * .3, 3.34, (CXB - CXA) * .08, .09), { sw: 0 });
+          }
+          return "";
+        } });
+        /* the side art: a pink swoosh, a cyan one, a yellow bolt and a pixel tooth up top */
+        s += FO(D(onX(CXB, [[1.0, 1.85], [1.0, 2.35], [2.1, 1.0], [2.1, .5]])), "#E0398A", 1) + FO(D(onX(CXB, [[1.0, 2.55], [1.0, 2.8], [2.05, 1.5], [2.05, 1.25]])), "#2FB8C8", 1);
+        s += FO(D(onX(CXB, [[1.62, .95], [1.3, .5], [1.48, .5], [1.2, .12], [1.72, .62], [1.54, .62], [1.8, .95]])), "#E0B93A", .9);
+        s += pix(SPR.tooth, { "#": "#F4F0FA", s: "#CFC6E2" }, wallX(CXB, 1.72, 3.32, .1, .1), { sw: .7 });
+        if (o.snow) s += ell.apply(null, P(1.8, 1.55, 3.5).concat([9, 3, "#FFFFFF", 0]));
+        return s;
+      },
+      lights: function(){ var c = P.apply(null, scr(.5, .5)), m = P(1.8, 2.08, 3.24); return glowC(c[0], c[1], 12, "#7FD8FF") + glowC(m[0], m[1], 8, K.glow); },
+      bits: function(){
+        var s = FO(scrQ(.12, .88, .1, .9), NEON.yellow, 1), sp = "", i;
+        s += scrPix(["y.y.y", "yyyyy"], { y: NEON.orange }, .3, .92, .075, .08, { sw: .4 }) + scrPix(SPR.tooth, { "#": "#FFFFFF", s: "#C9D8F2" }, .24, .76, .075, .1, { sw: .5 });
+        [[.16, .3, NEON.pink], [.8, .3, NEON.cyan], [.78, .78, NEON.pink], [.18, .8, NEON.cyan]].forEach(function(q){ s += scrPix(["#"], { "#": q[2] }, q[0], q[1], .06, .07, { sw: 0 }); });
+        var top = P(1.8, 1.55, 3.6);
+        [[-14, -6, NEON.pink, 2], [13, -10, NEON.cyan, 2], [-4, -16, NEON.yellow, 2.4], [8, -2, "#FFFFFF", 1.6], [-20, 4, NEON.lime, 1.6], [18, 3, NEON.yellow, 1.6]].forEach(function(q, k){
+          sp += '<g class="tp-twinkle" style="animation-duration:.5s;animation-delay:' + f(-k * .17) + 's">' + plus(top[0] + q[0], top[1] + q[1], q[3], q[2], { sw: .7 }) + "</g>";
+        });
+        return s + sp;
+      }
+    },
+    "pinball": {
+      note: "A pinball machine on chrome legs: bumpers and flippers under the glass, and a lit backglass of shapes and stars", spot: [3.3, 3.45],
+      egg: { n: "The pinball machine", does: "its lights chase round", say: "Bumpers, flippers, lights! Keep the ball moving, like floss between teeth." }, anim: "tp-spout 1.3s 2",
+      draw: function(o){
+        var n = o.night, s = ell.apply(null, P(1.8, 1.95, 0).concat([27, 11, "#1B2A3A", 0, .1]));
+        /* the legs, back ones first */
+        [[1.15, .98], [2.45, .98], [1.15, 3.12], [2.45, 3.12]].forEach(function(q){
+          var zb = 1.5 - (q[1] - .8) / 2.5 * .2, a = P(q[0], q[1], 0), b = P(q[0], q[1], zb);
+          s += L(T.seg(a, b), 3.6) + L(T.seg(a, b), 1.7, "#C9D3DC") + ell(a[0], a[1], 2.2, 1, "#59647A", .9);
+        });
+        /* the backbox and its lit backglass: rays from a big tooth in a crown, stars at the corners, a strip of lights */
+        s += box(1.0, .42, 1.55, 1.6, .38, 2.25, PBC);
+        var bgx = function(u0, u1, v0, v1){ return D(onY(.8, rectUV(u0, u1, v0, v1))); }, bc = P(1.8, .8, 2.62), rays = "", cols = [NEON.pink, NEON.yellow, NEON.cyan, NEON.violet];
+        s += FO(bgx(1.12, 2.48, 2.36, 3.68), n ? "#3A2E7A" : NAVY, 1.2);
+        for (var i = 0; i < 7; i++){
+          var a0 = Math.PI * (1.08 + i * .12), a1 = a0 + .12;
+          rays += F("M" + f(bc[0]) + " " + f(bc[1]) + " L" + f(bc[0] + Math.cos(a0) * 15) + " " + f(bc[1] + Math.sin(a0) * 15 + Math.cos(a0) * 7.5) + " L" + f(bc[0] + Math.cos(a1) * 15) + " " + f(bc[1] + Math.sin(a1) * 15 + Math.cos(a1) * 7.5) + " Z", cols[i % 4], n ? 1 : .85);
+        }
+        s += rays + shY(1.8, .8, 2.5, FO(molarD(.36), "#FFFFFF", 1.2) + pix(SPR.crown, { "#": GOLD[0] }, grid(-3.6, -14.4, 1.44), { sw: .7 }));
+        s += T.star5.apply(null, P(1.24, .8, 3.5).concat([2.2, NEON.yellow])).replace('stroke-width="1.2"', 'stroke-width=".7"') + T.star5.apply(null, P(2.36, .8, 3.5).concat([2.2, NEON.cyan])).replace('stroke-width="1.2"', 'stroke-width=".7"');
+        s += FO(bgx(1.3, 2.3, 2.14, 2.3), "#1E1A2E", .9);
+        for (i = 0; i < 6; i++) s += F(bgx(1.36 + i * .155, 1.46 + i * .155, 2.17, 2.27), NEON.orange);
+        s += bulbs(.8, 1.08, 2.52, 2.33, 3.72, 8, 6, n ? "#FFF3C4" : "#F4E9C8", { r: 1 });
+        if (o.snow) s += ell.apply(null, P(1.8, .61, 3.8).concat([10, 2.6, "#FFFFFF", 0]));
+        /* the body and its playfield under the glass */
+        s += slabX(PBODY, 1.0, 2.6, PBC, { on: function(k){
+          if (k === 1){
+            var r = FO(D(onY(3.3, rectUV(1.55, 2.05, 1.38, 1.76))), "#2B2240", 1) + FO(D(onY(3.3, rectUV(1.66, 1.76, 1.5, 1.66))), NEON.orange, .6) + FO(D(onY(3.3, rectUV(1.84, 1.94, 1.5, 1.66))), NEON.orange, .6);
+            var pl = P(2.35, 3.3, 1.62), pe = P(2.35, 3.58, 1.62);
+            return r + L(T.seg(pl, pe), 2.6) + L(T.seg(pl, pe), 1.2, "#D9DFE5") + circ(pe[0], pe[1], 1.6, NEON.red, .8);
+          }
+          if (k !== 2) return "";
+          var q = function(u0, u1, w0, w1){ return D([pf(u0, w0), pf(u1, w0), pf(u1, w1), pf(u0, w1)]); }, r2 = FO(q(.07, .93, .03, .97), n ? "#4B3BA8" : "#3A2C8E", 1);
+          r2 += F(q(.07, .93, .86, .97), "#2B2240");
+          [.36, .5, .64].forEach(function(uu){ r2 += L(T.seg(pfP(uu, .07), pfP(uu, .17)), 1, "#FFFFFF", .85); });
+          [[.32, .3, NEON.pink], [.68, .3, NEON.yellow], [.5, .45, NEON.cyan]].forEach(function(bb){ var c = pfP(bb[0], bb[1]); r2 += ell(c[0], c[1] + .6, T.RX(.17), T.RY(.17), "#1E1A2E", 0) + ell(c[0], c[1] - .4, T.RX(.17), T.RY(.17), bb[2], .9) + ell(c[0], c[1] - .8, T.RX(.08), T.RY(.08), "#FFFFFF", 0); });
+          r2 += FO(D([pf(.13, .62), pf(.13, .8), pf(.3, .8)]), "#FFFFFF", .8) + FO(D([pf(.87, .62), pf(.87, .8), pf(.7, .8)]), "#FFFFFF", .8);
+          [[.3, .84, .46, .88], [.7, .84, .54, .88]].forEach(function(fl){ var a = pfP(fl[0], fl[1]), b = pfP(fl[2], fl[3]); r2 += L(T.seg(a, b), 2.6) + L(T.seg(a, b), 1.3, "#FFFFFF"); });
+          r2 += T.star5.apply(null, pfP(.5, .64).concat([1.8, NEON.yellow])).replace('stroke-width="1.2"', 'stroke-width=".6"');
+          var ball = pfP(.62, .55); r2 += circ(ball[0], ball[1] - 1, 1.5, "#E3E8EC", .8) + circ(ball[0] - .5, ball[1] - 1.5, .5, "#FFFFFF");
+          return r2 + L(T.seg(pfP(.2, .22), pfP(.42, .12)) + T.seg(pfP(.5, .74), pfP(.8, .6)), 1.2, "#FFFFFF", .4);
+        } });
+        s += FO(D(onX(2.6, [[.9, 1.6], [3.2, 1.42], [3.2, 1.58], [.9, 1.76]])), "#E0398A", .9) + circ.apply(null, P(2.6, 3.0, 1.66).concat([1.3, NEON.red, .8]));
+        return s;
+      },
+      lights: function(){ var c = P(1.8, .8, 3.0), q = pfP(.5, .45); return glowC(c[0], c[1], 16, NEON.pink) + glowC(q[0], q[1], 10, "#7FD8FF"); },
+      bits: function(){
+        var s = bulbs(.8, 1.08, 2.52, 2.33, 3.72, 8, 6, function(k){ return ["#FFF6C2", NEON.yellow, "#FFFFFF"][k % 3]; }, { r: 1.25, chase: .6 }), i;
+        for (i = 0; i < 8; i++){ [.04, .96].forEach(function(uu, j){ var c = pfP(uu, .1 + i * .11); s += '<circle class="tp-twinkle" cx="' + f(c[0]) + '" cy="' + f(c[1] - .6) + '" r="1.1" fill="' + (j ? NEON.cyan : NEON.pink) + '" stroke="' + INK + '" stroke-width=".5" style="animation-duration:.6s;animation-delay:' + f(-(i % 3) * .2) + 's"/>'; }); }
+        return s;
+      }
+    },
+    "claw-machine": {
+      note: "A tall glass claw machine full of plush teeth, the claw hanging ready, a prize chute and a ring of bulbs on top", spot: [3.4, 3.5],
+      egg: { n: "The giant claw machine", does: "the claw drops, grabs a plush tooth and lifts it", say: "Got one! A plush molar. Softest tooth I ever met." }, anim: "tp-peek 2.4s",
+      draw: function(o){
+        var n = o.night, a = CM.a, b = CM.b, zb = CM.zb, zg = CM.zg, s = ell.apply(null, P(1.95, 1.95, 0).concat([30, 11, "#1B2A3A", 0, .1])), i;
+        /* the base cabinet: a stripe, the prize door with its flap, a coin plate */
+        s += box(a, a, 0, b - a, b - a, zb, PINKC);
+        s += F(D(onY(b, rectUV(a, b, .7, .82))), "#FFFFFF") + F(D(onX(b, rectUV(a, b, .7, .82))), "#F3D6E6");
+        s += FO(D(onY(b, rectUV(.92, 1.62, .18, .86))), "#1E1A2E", 1.2) + FO(D([[.95, b + .02, .84], [1.59, b + .02, .84], [1.59, b + .22, .34], [.95, b + .22, .34]]), "#E9EEF3", 1) + L(D([[.95, b + .04, .84], [1.59, b + .04, .84]], true), 1.6, "#A9B3BE");
+        s += FO(D(onY(b, rectUV(2.3, 2.8, .3, .62))), "#59647A", 1) + FO(D(onY(b, rectUV(2.5, 2.6, .38, .54))), "#1E1A2E", .6);
+        s += T.star5.apply(null, P(b, 1.95, .42).concat([3, NEON.yellow])).replace('stroke-width="1.2"', 'stroke-width=".8"');
+        /* inside the glass: the back walls, the floor, the gantry and the claw at rest, then the plush and the chute */
+        s += F(D([[a, a, zb], [a, b, zb], [a, b, zg], [a, a, zg]]), n ? "#4A3C96" : PANE[0]) + F(D([[a, a, zb], [b, a, zb], [b, a, zg], [a, a, zg]]), n ? "#5D4CB2" : PANE[1]);
+        var dots = ""; [[a, 1.2, 3.6], [a, 2.2, 3.9], [a, 1.7, 2.9], [a, 2.7, 3.2], [1.2, a, 3.8], [1.6, a, 3.2], [1.1, a, 2.8]].forEach(function(q){ var c = P(q[0], q[1], q[2]); dots += T.star5(c[0], c[1], 1.8, "#8F7FD6").replace('stroke-width="1.2"', 'stroke-width=".5"'); });
+        s += dots + L(D([[a, a, zb], [a, a, zg]], true), 1, INK, .5) + F(D([[a, a, zb], [b, a, zb], [b, b, zb], [a, b, zb]]), "#5B4BB0");
+        s += L(D([[a + .05, a, zg - .1], [a + .05, b, zg - .1]], true) + D([[b - .05, a, zg - .1], [b - .05, b, zg - .1]], true), 2.2, "#59647A");
+        var rail = D([[a, CM.cy, zg - .14], [b, CM.cy, zg - .14]], true); s += L(rail, 3) + L(rail, 1.4, "#C9D3DC");
+        s += box(CM.cx - .14, CM.cy - .14, zg - .3, .28, .28, .14, STEEL, { sw: 1, si: .6 });
+        var hub = P(CM.cx, CM.cy, CM.zr), top = P(CM.cx, CM.cy, zg - .3);
+        s += L(T.seg(top, hub), 1.1) + claw(hub, false);
+        /* the plush teeth, back to front: a low pile under the claw, higher toward the back corner */
+        var R = T.rng(9), pile = [], x, y;
+        for (x = .95; x < b - .1; x += .42) for (y = .95; y < b - .1; y += .42){
+          if (x < 1.75 && y > 2.2) continue;
+          var hgt = Math.max(0, 1.1 - Math.hypot(x - a, y - a) * .42), under = Math.hypot(x - CM.cx, y - CM.cy) < .55;
+          pile.push({ x: x + (R() - .5) * .12, y: y + (R() - .5) * .12, z: zb + (under ? 0 : hgt * .7), c: PLUSH[Math.floor(R() * PLUSH.length)], r: (R() - .5) * 26 });
+          if (!under && hgt > .45) pile.push({ x: x + .2, y: y + .1, z: zb + hgt * .7 + .42, c: PLUSH[Math.floor(R() * PLUSH.length)], r: (R() - .5) * 30 });
+        }
+        pile.push({ chute: true, x: 1.3, y: 2.55, z: 0 });
+        pile.sort(function(m, q){ return m.x + m.y + m.z * .6 - (q.x + q.y + q.z * .6); });
+        pile.forEach(function(t){
+          if (t.chute){
+            var cq = function(x0, x1, y0, y1, z0, z1){ return D([[x0, y0, z0], [x1, y0, z0], [x1, y1, z1], [x0, y1, z1]]); };
+            s += F(D([[.82, 2.25, zb], [1.72, 2.25, zb], [1.72, 2.25, zb + .9], [.82, 2.25, zb + .9]]), "#FFFFFF", .4) + F(D([[1.72, 2.25, zb], [1.72, b, zb], [1.72, b, zb + .9], [1.72, 2.25, zb + .9]]), "#FFFFFF", .32) +
+              L(D([[.82, 2.25, zb + .9], [1.72, 2.25, zb + .9], [1.72, b, zb + .9]], true) + D([[1.72, 2.25, zb], [1.72, 2.25, zb + .9]], true), 1.1);
+            return;
+          }
+          var c = P(t.x, t.y, t.z); s += plush(c[0], c[1], .78, t.c, f(t.r));
+        });
+        /* the glass: a faint tint, a few glints away from the claw, the frame */
+        s += F(D([[a, b, zb], [b, b, zb], [b, b, zg], [a, b, zg]]), TINT, .16) + F(D([[b, a, zb], [b, b, zb], [b, b, zg], [b, a, zg]]), TINT, .2);
+        s += L(D([[1.0, b, 3.0], [1.35, b, 3.9]], true) + D([[1.2, b, 2.5], [1.45, b, 3.1]], true), 1.4, "#FFFFFF", .6) + L(D([[b, 1.05, 3.4], [b, .9, 4.0]], true), 1.4, "#FFFFFF", .5);
+        [[a, b], [b, b], [b, a]].forEach(function(q){ var d = D([[q[0], q[1], zb], [q[0], q[1], zg]], true); s += L(d, 3.4) + L(d, 1.6, "#FFE1EF"); });
+        s += L(D([[a, b, zg], [b, b, zg], [b, a, zg]], true) + D([[a, b, zb], [b, b, zb], [b, a, zb]], true), 1.8);
+        /* the controls on a ledge in front of the glass */
+        s += box(1.75, b, zb - .22, 1.2, .32, .22, PINKC, { sw: 1.3, si: .8 });
+        var js = P(2.05, b + .16, zb), bt = P(2.6, b + .16, zb);
+        s += ell(js[0], js[1], 2, 1, "#59647A", .8) + L("M" + f(js[0]) + " " + f(js[1]) + " v-4", 2.2) + L("M" + f(js[0]) + " " + f(js[1]) + " v-4", 1, "#D9DFE5") + circ(js[0], js[1] - 4.6, 1.8, NEON.red, .8) +
+          ell(bt[0], bt[1] + .4, 2.4, 1.3, "#1E1A2E", 0) + ell(bt[0], bt[1], 2.4, 1.3, NEON.yellow, .9);
+        /* the top: a sign with a plush tooth and stars, bulbs round it */
+        s += box(a - .1, a - .1, zg, b - a + .2, b - a + .2, CM.zt - zg, PINKC);
+        var yf = b + .1, xf = b + .1;
+        s += FO(D(onY(yf, rectUV(a + .2, b - .2, zg + .14, CM.zt - .14))), n ? "#3A2E7A" : NAVY, 1.1);
+        s += shY(1.95, yf, zg + .2, T.tinyTooth(0, -4.6, .82, "#FFFFFF").replace(/^/, "") + circ(-1.1, -6.2, .45, INK) + circ(1.1, -6.2, .45, INK));
+        s += T.star5.apply(null, P(1.25, yf, zg + .33).concat([2, NEON.yellow])).replace('stroke-width="1.2"', 'stroke-width=".6"') + T.star5.apply(null, P(2.65, yf, zg + .33).concat([2, NEON.cyan])).replace('stroke-width="1.2"', 'stroke-width=".6"');
+        s += bulbs(yf, a - .02, b + .02, zg + .08, CM.zt - .08, 9, 3, n ? "#FFFDE8" : "#FFF3C4", { r: 1.05, chase: n ? 1.4 : 0 });
+        for (i = 0; i < 9; i++){ var bq = P(xf, a - .02 + (b - a + .04) * i / 8, CM.zt - .08); s += circ(bq[0], bq[1], 1, n ? "#FFFDE8" : "#FFF3C4", .6); }
+        if (o.snow) s += F(D([[a - .1, a - .1, CM.zt], [b + .1, a - .1, CM.zt], [b + .1, b + .1, CM.zt], [a - .1, b + .1, CM.zt]]), "#FFFFFF");
+        return s;
+      },
+      lights: function(){ var c = P(1.95, 1.95, 3.4), t = P(1.95, CM.b + .1, CM.zt - .3); return glowC(c[0], c[1], 13, "#FFB3D6") + glowC(t[0], t[1], 9, K.glow); },
+      bits: function(){
+        /* the claw at rest is painted out in the glass's colors, and the claw comes up shut round a plush tooth */
+        var hub = P(CM.cx, CM.cy, CM.zr), d = clawD(hub, false), back = PANE[1];
+        var cover = '<path d="' + d + '" fill="none" stroke="' + back + '" stroke-width="4.4"/>' + ell(hub[0], hub[1], 4.2, 2.6, back, 0) + '<path d="' + d + '" fill="none" stroke="' + TINT + '" stroke-width="4.4" opacity=".2"/>' + ell(hub[0], hub[1], 4.2, 2.6, TINT, 0, .2);
+        return cover + plush(hub[0], hub[1] + 11, .78, "#FFC6DA", 0) + claw(hub, true);
+      }
+    }
+  };
+
+  /* ------------------------------------------------------------------ the outfits ----------------------------------- */
+  var ln = function(d, col, w, op){ return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"' + (op ? ' opacity="' + op + '"' : "") + "/>"; };
+  var HEM = "Q149.6 121 146.6 131 Q140 132 135 143 Q120 156 100 157 Q80 156 65 143 Q60 132 53.4 131 Q50.4 121 50.6 110";
+  var SATIN = "#7B4FE0", SATIN_S = "#5E37C2", RIB = "#2B2230";
+  /* ribbing: a band with fine lines across it and two gold stripes */
+  var ring = function(cx, cy){ return '<ellipse cx="' + cx + '" cy="' + cy + '" rx="8.4" ry="14" fill="none" stroke="#3FE0F0" stroke-width="8" opacity=".25"/>' + '<ellipse cx="' + cx + '" cy="' + cy + '" rx="8.4" ry="14" fill="#2B2230" stroke="' + INK + '" stroke-width="5.2"/>' +
+    '<ellipse cx="' + cx + '" cy="' + cy + '" rx="8.4" ry="14" fill="none" stroke="#3FE0F0" stroke-width="2.8"/>' + '<ellipse cx="' + cx + '" cy="' + cy + '" rx="8.4" ry="14" fill="none" stroke="#FFFFFF" stroke-width=".9" opacity=".8"/>' +
+    '<path d="M' + (cx - 2.6) + " " + (cy - 7) + ' q1.6 -2.4 4 -2.6" fill="none" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" opacity=".7"/>'; };
+  var outfits = {
+    "gamer-headset": {
+      note: "Over-ear headphones with a mic boom and a glowing ring on each ear cup",
+      top: ln("M40 96 C32 46 62 15 100 14 C138 15 168 46 160 96", INK, 12.4) + ln("M40 96 C32 46 62 15 100 14 C138 15 168 46 160 96", "#3A3346", 6.6) +
+        ln("M48 62 C55 37 76 22 100 21 C124 22 145 37 152 62", NEON.pink, 1.8, .9) + p("M80 11 Q100 5 120 11 L119 20 Q100 15 81 20 Z", "#5A5070", O2) +
+        p("M46 76 L55 76 L55 114 L46 114 Z", "#2B2230", O2) + p("M154 76 L145 76 L145 114 L154 114 Z", "#2B2230", O2) +
+        p("M27 84 C27 73 33 67 42 67 L46 67 C51 67 53 71 53 75 L53 115 C53 119 51 122 46 122 L42 122 C33 122 27 116 27 105 Z", "#3A3346", O3) +
+        p("M173 84 C173 73 167 67 158 67 L154 67 C149 67 147 71 147 75 L147 115 C147 119 149 122 154 122 L158 122 C167 122 173 116 173 105 Z", "#3A3346", O3) +
+        ring(39, 94) + ring(161, 94) +
+        ln("M38 117 C42 130 58 133 71 125", INK, 6.6) + ln("M38 117 C42 130 58 133 71 125", "#3A3346", 3) +
+        '<ellipse cx="75.6" cy="122.4" rx="5.6" ry="4.6" fill="#2B2230" ' + O2 + '/><circle cx="74" cy="120.8" r="1.4" fill="' + NEON.pink + '"/>',
+      say: ["Headset on. Player one, ready to brush.", "Two minutes on the clock: brushing speedrun!", "Mic check: one, two, plaque-free."]
+    },
+    "pixel-shades": {
+      note: "Blocky eight-bit sunglasses with white pixel glints", noLoupes: true,
+      face: pix(["kkkkkkkkkkkkkkkkkkkkkkkk", "..kkkkkkkkkkkkkkkkkkkk..", "..kkkwkkkkk..kkkwkkkkk..", "..kkwkkkkkk..kkwkkkkkk..", "...kkkkkkk....kkkkkkk...", "....kkkkk......kkkkk...."],
+        { k: "#221D2A", w: "#FFFFFF" }, grid(52, 70, 4), { sw: 3, seam: .02 }),
+      say: ["Pixel shades on. Too cool for plaque.", "Low resolution, high polish.", "Eight-bit shades, one-tooth smile. Still shining."]
+    },
+    "high-score-jacket": {
+      note: "A shiny satin bomber with a ribbed collar, cuffs and waistband, a joystick patch and a star patch",
+      face: /* the sleeves and their cuffs */
+        p("M57 101 C50 99 43 100 38.6 105 L43.6 123 C48 120 52 118 57 118 Z", SATIN, O3) + p("M143 101 C150 99 157 100 161.4 105 L156.4 123 C152 120 148 118 143 118 Z", SATIN_S, O3) +
+        p("M38.6 105 L43.6 123 L48.6 121 L43.8 103.4 Z", RIB, O2) + p("M161.4 105 L156.4 123 L151.4 121 L156.2 103.4 Z", RIB, O2) +
+        ln("M40.4 108.4 L45.4 106.8 M41.6 112.6 L46.6 111 M42.8 116.8 L47.8 115.2", GOLD[0], 1.2) + ln("M159.6 108.4 L154.6 106.8 M158.4 112.6 L153.4 111 M157.2 116.8 L152.2 115.2", GOLD[0], 1.2) +
+        /* the body in two panels, the right in shade */
+        p("M50.6 110 Q100 126 149.4 110 " + HEM + " Z", SATIN, O3) +
+        '<path d="M100 118 Q125 117 149.4 110 Q149.6 121 146.6 131 Q140 132 135 143 Q120 156 100 157 Z" fill="' + SATIN_S + '"/>' +
+        '<path d="M50.6 110 Q100 126 149.4 110 ' + HEM + ' Z" fill="none" ' + O3 + "/>" +
+        ln("M58 120 Q60 134 70 144", "#FFFFFF", 3, .45) + ln("M64 118 Q66 126 72 132", "#FFFFFF", 1.6, .35) + ln("M43 108 Q47 111 52 110", "#FFFFFF", 1.8, .5) +
+        /* the collar and the waistband, ribbed, with gold stripes */
+        p("M50.6 110 Q100 126 149.4 110 L148.4 116.4 Q100 133 51.6 116.4 Z", RIB, O3) + ln("M51.2 113.4 Q100 129.6 148.8 113.4", GOLD[0], 1.4) +
+        p("M67.6 138.6 Q82 150.6 100 151.4 Q118 150.6 132.4 138.6 L135 143 Q120 156 100 157 Q80 156 65 143 Z", RIB, O3) + ln("M66.4 140.8 Q81 153.4 100 154.2 Q119 153.4 133.6 140.8", GOLD[0], 1.4) +
+        /* the zipper */
+        ln("M100 125 V151", INK, 3.4) + ln("M100 125 V151", GOLD[0], 1.4) + p("M97.6 125 h4.8 v6 h-4.8 z", GOLD[0], O2.replace("2.2", "1.4")) +
+        /* the joystick patch and the star patch */
+        '<circle cx="73" cy="131" r="7.6" fill="' + RIB + '" ' + O2 + '/><circle cx="73" cy="131" r="5.8" fill="none" stroke="' + NEON.yellow + '" stroke-width="1.2"/>' +
+        '<ellipse cx="73" cy="134.4" rx="3.4" ry="1.4" fill="#59647A"/>' + ln("M73 134 L74.6 127.6", INK, 2.6) + ln("M73 134 L74.6 127.6", "#D9DFE5", 1.1) + '<circle cx="74.8" cy="126.8" r="2.2" fill="' + NEON.red + '" stroke="' + INK + '" stroke-width="1"/>' +
+        '<circle cx="127" cy="131" r="7.6" fill="' + NEON.cyan + '" ' + O2 + "/>" + T.star5(127, 131.4, 5.4, NEON.yellow),
+      say: ["High-score jacket! My record: zero cavities.", "Top of the leaderboard. Top of the gum line, too.", "Insert coin? I only take floss."]
+    }
+  };
+
+  return { k: "arcade", homes: homes, scenes: scenes, yard: yard, outfits: outfits };
+}

@@ -288,7 +288,7 @@ export function pack(T){
       bits: function(){
         var s = "", b = roverBeacon();
         /* dust off the wheels, two tracks behind it, the beacon bright */
-        [[.6, 2.7, 0], [.4, 2.9, 1], [.55, 1.0, 2], [3.15, 2.6, 3], [.3, 2.5, 4]].forEach(function(q, i){ var c = P(q[0], q[1], .3); s += circ(c[0], c[1] - 2, 3.2 + (i % 3), "#E3E1EA", 1).replace("/>", ' opacity=".9"/>'); });
+        [[.5, 2.85, .2, 4.6], [.2, 2.95, .55, 3.4], [.45, 1.0, .25, 3.8], [.1, 1.1, .6, 2.8], [-.15, 2.8, .9, 2.4]].forEach(function(q, i){ var c = P(q[0], q[1], q[2]), d = T.lumps(c[0], c[1], q[3], 60 + i, 6, .8); s += F(d, "#F1F0F5", .9) + L(d, 1, "#A9A5B8", .9); });
         s += L(D([[.62, 2.6, 0], [-.2, 2.6, 0]], true), 1.4, "#8E8AA1") + L(D([[.62, 1.05, 0], [-.2, 1.05, 0]], true), 1.4, "#8E8AA1");
         [.95, 1.82, 2.7].forEach(function(x){ var c = P(x, 2.75, .36); s += L("M" + f(c[0] - 3) + " " + f(c[1] - 5) + " a5 5 0 0 1 6 0", 1.3, "#FFFFFF"); });
         return s + circ(b[0], b[1] - 1.6, 6, "#FFE27A", 0).replace("/>", ' opacity=".55"/>') + circ(b[0], b[1] - 1.6, 2.4, "#FFF3C4", 1);
@@ -404,13 +404,13 @@ export function pack(T){
 
   /* ------------------------------------------------------------------ the outfits ----------------------------------- */
   /* a coil spring from (x0, y0) to (x1, y1): an ink coil with a colored one over it */
-  function spring(x0, y0, x1, y1, n, w, col){
+  function spring(x0, y0, x1, y1, n, w, col){ /* n loops of a coil, w wide */
     var dx = x1 - x0, dy = y1 - y0, l = Math.sqrt(dx * dx + dy * dy), ux = dx / l, uy = dy / l, d = "M" + f(x0) + " " + f(y0);
     for (var i = 0; i < n; i++){ var t0 = (i + .5) / n, t1 = (i + 1) / n, sg = i % 2 ? 1 : -1;
       d += " Q" + f(x0 + dx * t0 - uy * w * sg) + " " + f(y0 + dy * t0 + ux * w * sg) + " " + f(x0 + dx * t1) + " " + f(y0 + dy * t1); }
-    return '<path d="' + d + '" fill="none" stroke="' + INK + '" stroke-width="5.4" stroke-linecap="round"/><path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="2.6" stroke-linecap="round"/>';
+    return '<path d="' + d + '" fill="none" stroke="' + INK + '" stroke-width="6.4" stroke-linecap="round" stroke-linejoin="round"/><path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>';
   }
-  function bopper(x, y, c){ return '<circle cx="' + x + '" cy="' + y + '" r="14" fill="' + c[2] + '" opacity=".3"/><circle cx="' + x + '" cy="' + y + '" r="8.6" fill="' + c[0] + '" ' + O3 + '/><path d="M' + (x + 1) + " " + (y + 8.4) + " A8.6 8.6 0 0 0 " + (x + 8.4) + " " + (y + 1) + " A10 10 0 0 1 " + (x + 1) + " " + (y + 8.4) + ' Z" fill="' + c[1] + '"/><circle cx="' + (x - 3) + '" cy="' + (y - 3.2) + '" r="2.4" fill="#FFFFFF"/>'; }
+  function bopper(x, y, c){ return '<circle cx="' + x + '" cy="' + y + '" r="15" fill="' + c[2] + '" opacity=".45"/><circle cx="' + x + '" cy="' + y + '" r="9.4" fill="' + c[0] + '" ' + O3 + '/><path d="M' + (x + 1) + " " + (y + 9.2) + " A9.4 9.4 0 0 0 " + (x + 9.2) + " " + (y + 1) + " A11 11 0 0 1 " + (x + 1) + " " + (y + 9.2) + ' Z" fill="' + c[1] + '"/><circle cx="' + (x - 3) + '" cy="' + (y - 3.2) + '" r="2.4" fill="#FFFFFF"/>'; }
   var GLOW = ["#B6F06A", "#7CC43E", "#E4FFB0"];
   var tank = function(x, flip){
     var s = p("M" + x + " 54 C" + x + " 44 " + (x + 26) + " 44 " + (x + 26) + " 54 L" + (x + 26) + " 128 C" + (x + 26) + " 134 " + x + " 134 " + x + " 128 Z", "#D5DBE1", O3);
@@ -425,7 +425,7 @@ export function pack(T){
   var outfits = {
     "antenna-headband": {
       note: "A headband with two springy antennae, a glowing ball on each",
-      top: spring(80, 32, 64, 2, 7, 4, "#D5DBE1") + spring(120, 32, 136, 2, 7, 4, "#D5DBE1") + bopper(62, -4, GLOW) + bopper(138, -4, GLOW) +
+      top: spring(80, 32, 63, 4, 6, 6, "#D5DBE1") + spring(120, 32, 137, 4, 6, 6, "#D5DBE1") + bopper(61, -4, GLOW) + bopper(139, -4, GLOW) +
         p("M43 82 C36 52 54 27 78 27 C92 27 96 36 100 37 C104 36 108 27 122 27 C146 27 164 52 157 82 L150 82 C155 56 142 35 122 35 C110 35 106 44 100 45 C94 44 90 35 78 35 C58 35 45 56 50 82 Z", "#7A5CD6", O3) +
         '<path d="M52 66 C50 50 60 36 76 33" fill="none" stroke="#B9A6F2" stroke-width="2.6" stroke-linecap="round"/>' +
         '<circle cx="80" cy="31.6" r="4" fill="#D5DBE1" ' + O2 + '/><circle cx="120" cy="31.6" r="4" fill="#D5DBE1" ' + O2 + "/>",
@@ -436,7 +436,9 @@ export function pack(T){
       face: p("M40 74 C40 62 52 58 60 58 L140 58 C148 58 160 62 160 74 L160 80 L40 80 Z", "#D5DBE1", O3) +
         '<path d="M42 78 C42 64 64 62 100 62 C136 62 158 64 158 78 C158 92 150 99 136 99 Q118 100 107 94 Q100 90 93 94 Q82 100 64 99 C50 99 42 92 42 78 Z" fill="#F2C94C" opacity=".62"/>' +
         '<path d="M42 78 C42 64 64 62 100 62 C136 62 158 64 158 78 C158 92 150 99 136 99 Q118 100 107 94 Q100 90 93 94 Q82 100 64 99 C50 99 42 92 42 78 Z" fill="none" ' + O4 + "/>" +
-        '<path d="M56 70 Q66 66 78 66 M54 78 L62 72" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" opacity=".85"/><path d="M128 90 Q140 89 148 82" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>' +
+        '<path d="M56 70 Q66 66 78 66 M54 78 L62 72" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" opacity=".85"/><path d="M128 92 Q140 91 148 84" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" opacity=".6"/>' +
+        '<circle cx="140" cy="72" r="4.2" fill="#3E8EDC" stroke="' + INK + '" stroke-width="1.2"/><path d="M137.4 71 q2 -1.4 3.6 .2 M139 74 q2 .8 3.4 -.6" stroke="#63B35A" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+        '<path d="M118 70 l1 2.4 2.4 1 -2.4 1 -1 2.4 -1 -2.4 -2.4 -1 2.4 -1 z" fill="#FFFFFF"/>' +
         '<path d="M44 74 Q100 66 156 74" fill="none" stroke="#C9971C" stroke-width="2" opacity=".8"/>' +
         '<circle cx="40" cy="78" r="7" fill="#A9B3BE" ' + O3 + '/><circle cx="160" cy="78" r="7" fill="#A9B3BE" ' + O3 + '/><circle cx="160" cy="78" r="2.6" fill="#3ECF9E"/><circle cx="40" cy="78" r="2.6" fill="#E5484D"/>',
       say: ["Visor down. No air up here to soften the sun.", "Gold visor, like a gold crown: shiny and protective.", "I can see you smiling from here. Keep that smile clean."]

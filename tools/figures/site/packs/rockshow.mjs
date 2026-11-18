@@ -75,12 +75,13 @@ export function pack(T){
     return s;
   }
   /* a little dome tent in screen space, its door flap open */
-  function tent(x, y, w, col, night){
+  function tent(x, y, w, col, night, snow){
     var h = w * .62, c = night ? [col[2], col[3]] : [col[0], col[1]];
     var d = "M" + m(x - w / 2, y) + " Q" + m(x - w / 2, y - h * 1.3) + " " + m(x, y - h) + " Q" + m(x + w / 2, y - h * 1.3) + " " + m(x + w / 2, y) + " Z";
     return ell(x + 2, y + .6, w * .62, w * .16, "#1B2A3A", 0, .12) + FO(d, c[0], 1.2) + F("M" + m(x + w * .1, y - h * 1.02) + " Q" + m(x + w / 2, y - h * 1.3) + " " + m(x + w / 2, y) + " L" + m(x + w * .22, y) + " Z", c[1], .9) +
       FO("M" + m(x - w * .16, y) + " Q" + m(x - w * .06, y - h * .7) + " " + m(x + w * .02, y - h * .74) + " Q" + m(x + w * .1, y - h * .5) + " " + m(x + w * .16, y) + " Z", night ? "#FFD98A" : "#3B2E3A", .9) +
-      L("M" + m(x - w * .3, y - h * .52) + " Q" + m(x, y - h * 1.04) + " " + m(x + w * .3, y - h * .52), .7, INK, .45);
+      L("M" + m(x - w * .3, y - h * .52) + " Q" + m(x, y - h * 1.04) + " " + m(x + w * .3, y - h * .52), .7, INK, .45) +
+      (snow ? FO("M" + m(x - w * .34, y - h * .7) + " Q" + m(x, y - h * 1.32) + " " + m(x + w * .34, y - h * .7) + " q" + m(-w * .1, w * .06) + " " + m(-w * .2, 0) + " q" + m(-w * .14, w * .07) + " " + m(-w * .28, 0) + " q" + m(-w * .1, w * .06) + " " + m(-w * .2, 0) + " Z", "#FFFFFF", .8) : "");
   }
 
   /* ------------------------------------------------------------------ the home: a record shop ---------------------- */
@@ -182,7 +183,7 @@ export function pack(T){
         var ys = 7.55, gu = 9.05, arm = [[x1, ys, 6.42], [9.5, ys, 6.42]];
         s += rod(D(arm, true), 1.6, "#3B2E3A") + rod(D([[x1, ys, 5.75], [8.8, ys, 6.42]], true), 1, "#3B2E3A");
         q = P(gu, ys, 6.42); var q2 = P(gu, ys, 6.2); s += L("M" + m(q[0], q[1]) + " L" + m(q2[0], q2[1]), 1.1);
-        s += onWall("y", ys, gu, 5.0, upGuitar(YEL[0], RED[0]), .64);
+        s += onWall("y", ys, gu, 5.0, pk === "butter" || pk === "sand" ? upGuitar(RED[0], WHT) : upGuitar(YEL[0], RED[0]), .64);
         /* the giant record on the roof, on two struts */
         var rc = [5.5, 6.25, 9.15], R = 2.25;
         [4.55, 6.45].forEach(function(t){ s += box(t - .08, rc[1] - .3, zw + .3, .16, .16, 1.9, { top: "#8E98A3", left: CHROME[0], right: CHROME[1] }, { sw: 1.1, si: .6 }); });
@@ -212,6 +213,7 @@ export function pack(T){
     var blk = nt ? "#1E1B26" : "#2E2A36", blk2 = nt ? "#2E2A38" : "#45404F", tr = nt ? "#8E98A3" : "#C9D1D9";
     /* the canopy and the backdrop */
     s += FO("M286 56 Q326 30 366 56 Z", nt ? "#3A3448" : "#5E5566", 1.4) + L("M296 50 Q326 36 356 50", 1, "#FFFFFF", .3);
+    if (o.snow) s += FO("M290 52 Q326 28 362 52 q-4 2.6 -8 0 q-5 2.6 -10 0 q-4 3 -9 0 q-5 2.6 -10 0 q-4 3 -9 0 q-5 2.6 -10 0 q-4 2.6 -8 0 Z", "#FFFFFF", 1);
     s += FO("M306 60 H346 V96 H306 Z", nt ? "#7A4FC8" : "#7A4FC0", 1.2) + bolt(326, 76, 1.9, nt ? "#FFF3B0" : YEL[0], 1);
     if (nt) s += F("M300 62 L352 62 L366 98 L286 98 Z", "#FFE9A8", .16) + F("M326 62 L346 98 L306 98 Z", "#FFFFFF", .12);
     /* the truss: two towers and the beam across */
@@ -268,7 +270,7 @@ export function pack(T){
         s += F("M0 124 Q60 104 130 112 Q200 92 280 104 Q330 92 400 100 V300 H0 Z", c[0]) + L("M0 124 Q60 104 130 112 Q200 92 280 104 Q330 92 400 100", 1.4, INK, .5);
         /* tents on the far left, bunting to the stage */
         var tc = [[TEAL[0], TEAL[1], "#2E7C78", "#22605D"], ["#F28C28", "#C96A12", "#A86A3A", "#86522C"], [PINK[0], PINK[1], "#A04A78", "#7E3A5E"], [YEL[0], YEL[1], "#B59A3A", "#8E7A2C"]];
-        [[54, 118, 16, 0], [76, 114, 13, 2], [96, 110, 12, 3], [64, 124, 14, 1]].forEach(function(t){ s += tent(t[0], t[1], t[2], tc[t[3]], o.night); });
+        [[54, 118, 16, 0], [76, 114, 13, 2], [96, 110, 12, 3], [64, 124, 14, 1]].forEach(function(t){ s += tent(t[0], t[1], t[2], tc[t[3]], o.night, o.snow); });
         s += L("M48 112 V80 M118 104 V76", 2.4) + L("M48 112 V80 M118 104 V76", 1.1, WHT) + bunting(48, 81, 118, 77, 9, 7, o.night, .8);
         s += stage(o);
         s += crowd(o);
@@ -285,7 +287,7 @@ export function pack(T){
         var tc = [[TEAL[0], TEAL[1], "#2E7C78", "#22605D"], ["#F28C28", "#C96A12", "#A86A3A", "#86522C"], [PINK[0], PINK[1], "#A04A78", "#7E3A5E"], ["#9B7BE0", "#6E50B8", "#5E4A8A", "#4A3A6E"]];
         return T.scatter(164, 9, on, function(sx, sy, i, R, x, y){
           var k = i % 3, s;
-          if (k === 0) s = tent(sx, sy, 22, tc[(i / 3 | 0) % 4], o.night);
+          if (k === 0) s = tent(sx, sy, 22, tc[(i / 3 | 0) % 4], o.night, o.snow);
           else if (k === 1) s = L("M" + m(sx - 13, sy) + " v-17 M" + m(sx + 13, sy + 3) + " v-17", 2.6) + L("M" + m(sx - 13, sy) + " v-17 M" + m(sx + 13, sy + 3) + " v-17", 1.2, WHT) + bunting(sx - 13, sy - 16.4, sx + 13, sy - 13.4, 3, 5, o.night, .9);
           else {
             /* a feather flag on its pole */
@@ -349,7 +351,7 @@ export function pack(T){
         q = P(.82, 2.85, .2); s += circ(q[0], q[1], 1.5, CHROME[0], .8); q = P(.72, 2.6, .2); s += circ(q[0], q[1], .9, "#1E1A24", .5);
         return s;
       },
-      lights: function(){ var q = P(.89 + 2.0 - .28 - .22, 1.02 + .9 - .2 + .2, 1.7 + .72); return T.glowAt(q[0], q[1], 6); },
+      lights: function(){ var q = P(2.39, 1.92, 2.42); return T.glowAt(q[0], q[1], 6); },
       bits: function(){
         var s = "", i;
         /* rings of sound off the cabinet and the head, one after another */
