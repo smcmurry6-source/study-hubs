@@ -48,8 +48,8 @@ Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy" (the
 - [x] The five costumes drawn, with three lines each and their `LORE.md` entries
 - [x] `node tools/figures/site/build.mjs` (every walk, every combination) and `--check`; the generated files committed
 - [x] The client: the Collections tab, the shop's collection names and scenes, ten costumes; bundles rebuilt
-- [ ] `migration_v65.sql` tested on a throwaway copy (`tools/release/xp.js`), the preview sells the new rows
-- [ ] CI's checks and the release suites pass; a test report in the PR
+- [x] `migration_v65.sql` tested on a throwaway copy (`tools/release/xp.js`), the preview sells the new rows
+- [x] CI's checks and the release suites pass; a test report in the PR
 - [ ] Contact sheets of all of it sent to Sam (sent 2026-11-18); Sam's look and "merge"
 - [ ] After the merge: `migration_v65.sql` applied through the connector, appended to `supabase/schema.sql`, its line out of `supabase/pending-migrations.txt` (a small follow-up PR)
 - [x] About page, Ask Timmy's site help, `DEPLOY_NOTES.md`, the changelog line, this note's Outcome
@@ -67,6 +67,8 @@ Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy" (the
   (BUG-173): 340 KB in 10 requests.
 - 2026-11-18: the local smoke test on the final code: on a phone the customizer's four tabs ran 16 px past their panel (BUG-174, a
   phone rule widened them); fixed in `widget/place.css`, then the release suites run once on the final code.
+- 2026-11-18: `node tools/release/run.js` on the final code: every suite passed (accessibility needs `axe-core`, which this
+  container lacks; CI ran it). CI green on the head (Check hubs and Release tests); the test report is in the PR. Waiting on Sam.
 
 ## Outcome
 
