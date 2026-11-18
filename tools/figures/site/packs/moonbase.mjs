@@ -43,6 +43,12 @@ export function pack(T){
     var hd = D2(hull(all));
     return F(hd, c[0]) + F(D2(band), c[1]) + O(hd, c[2] || 1.8);
   }
+  /* a painted band round a lying cylinder, from a to b along its axis: only the strip we see */
+  function tubeBand(ax, a, b, o2, zc, R, c){
+    var arc = function(t, p0, p1){ var l = []; for (var ph = p0; p1 > p0 ? ph <= p1 : ph >= p1; ph += p1 > p0 ? 9 : -9){ var u = R * Math.cos(ph * DEG), w = zc + R * Math.sin(ph * DEG); l.push(ax === "y" ? [o2 + u, t, w] : [t, o2 + u, w]); } return l; };
+    var strip = arc(a, -45, 135).concat(arc(b, 135, -45)), sh = arc(a, -45, 27).concat(arc(b, 27, -45));
+    return F(D(strip), c[0]) + F(D(sh), c[1]) + L(D(arc(a, -45, 135), true) + D(arc(b, -45, 135), true), 1.2);
+  }
   /* the visible half of a ring round a lying cylinder (a seam, a band) */
   function tubeRing(ax, t, o2, zc, R){ var l = []; for (var ph = -45; ph <= 135; ph += 9){ var u = R * Math.cos(ph * DEG), w = zc + R * Math.sin(ph * DEG); l.push(ax === "y" ? [o2 + u, t, w] : [t, o2 + u, w]); } return D(l, true); }
   /* a point on a dome (half ellipsoid, rim radius r at z0, h tall) at angle a round it and height t (0 rim, 1 top),
@@ -87,7 +93,7 @@ export function pack(T){
       upn: { windows: "A ring of portholes", porch: "Airlock steps and running lights", flag: "A Timmy flag on the module", paint: "Dome color" },
       door: [5.5, 9.3], brush: [8.3, 9.35], statue: [2.85, 9.9], spots: { door: [7.1, 10.7] }, h: 6.0,
       eaves: [[2.85, 7.45, 2.4], [7.15, 3.15, 2.4], 6], round: [DM.cx, DM.cy, 3.0],
-      base: T.arcPts(MOD.x, MOD.y, MOD.r, -45, 150, 5).concat(T.arcPts(DM.cx, DM.cy, DM.r + .05, -40, 135, 14)), gap: [[4.0, 7.2, 7.1, 10.8]],
+      base: T.arcPts(MOD.x, MOD.y, MOD.r, -45, 150, 5).concat(T.arcPts(DM.cx, DM.cy, DM.r + .05, -40, 135, 14)), gap: [[1.9, 6.3, 7.1, 10.8]],
       block: [2.0, .8, 9.8, 9.5],
       draw: function(o){
         var u = o.up, pp = T.PAINTS[o.paint], bb = T.BOLD[o.paint], tint = o.paint && o.paint !== "cream";
@@ -110,9 +116,9 @@ export function pack(T){
           else s += circ(q[0], q[1], .9, "#FFFFFF", 0);
         }
         s += T.dome(cx, cy, z0, r, h, dc[0], dc[1]);
-        s += domeSeams(cx, cy, z0, r, h, INK, function(a){ return a > 96 && a < 112; });
+        s += domeSeams(cx, cy, z0, r, h, INK, function(a){ return a > 92 && a < 108; });
         /* the tooth on the dome, high on the side the sun lights */
-        var em = onDome(cx, cy, z0, r, h, 126, .66), ec = P(em.c[0], em.c[1], em.c[2]);
+        var em = onDome(cx, cy, z0, r, h, 100, .68), ec = P(em.c[0], em.c[1], em.c[2]);
         s += FO(D(ring(em.c, em.e1, em.e2, .66, 0, 360, 20)), tr[0], 1.4) + T.tinyTooth(ec[0], ec[1] + .4, 1.0, "#FFFFFF");
         /* portholes round it */
         var ports = [[150, .26, .3], [28, .3, .32]];
@@ -126,8 +132,8 @@ export function pack(T){
         if (o.night) lights += circ(at1[0], at1[1] - 2, 9, "#FF6B6B", 0).replace("/>", ' opacity=".3"/>');
         /* the tube to the little module, a collar where it leaves the dome */
         var ty = MOD.y + .05, tz = .95;
-        s += tube("x", 6.75, 8.25, ty, tz, .42, [METAL[0], METAL[1]]) + tube("x", 6.75, 6.92, ty, tz, .5, [METAL[1], METAL[2], 1.4]);
-        s += L(tubeRing("x", 7.5, ty, tz, .42), .9, INK, .5);
+        s += tube("x", 6.75, 8.25, ty, tz, .42, [METAL[0], METAL[1]]) + tubeBand("x", 7.0, 7.16, ty, tz, .42, tr);
+        s += L(tubeRing("x", 7.6, ty, tz, .42), .9, INK, .5);
         /* the little module: a can with a cap, a porthole, and a flag or a little dish on top */
         q = P(MOD.x, MOD.y, 0); s += ell(q[0] + 2, q[1] + 1, RX(MOD.r) + 2, RY(MOD.r) + 1, "#1B2A3A", 0, .12);
         s += cyl(MOD.x, MOD.y, 0, MOD.r, MOD.h, MOD.r, dc[0], dc[1], dc[0], { open: true }) + L(D(T.arcPts(MOD.x, MOD.y, MOD.r, -45, 135, 12).map(function(t){ return [t[0], t[1], .5]; }), true), 1, INK, .45);
@@ -146,7 +152,7 @@ export function pack(T){
         s += ell.apply(null, P(x + .3, y1 - .5, 0).concat([RX(1.3), 5, "#1B2A3A", 0, .14]));
         s += box(x - .85, 8.1, 0, .3, 1.0, .22, FR, { sw: 1.1, si: .7 }) + box(x + .55, 8.1, 0, .3, 1.0, .22, FR, { sw: 1.1, si: .7 });
         s += tube("y", AL.y0, AL.y0 + .22, x, zc, R + .12, [tr[0], tr[1], 1.4]) + tube("y", AL.y0 + .1, y1, x, zc, R, [METAL[0], METAL[1]]);
-        s += tube("y", 8.45, 8.68, x, zc, R + .03, [tr[0], tr[1], 1.3]);
+        s += tubeBand("y", 8.4, 8.66, x, zc, R, tr);
         var hp = function(rr, t0, t1, n){ return ring([x, y1, zc], [1, 0, 0], [0, 0, 1], rr, t0, t1, n || 28); };
         s += FO(D(hp(R, 0, 360)), "#E6EAEF", 1.6) + FO(D(hp(.96, 0, 360)), METAL[2], 1.3) + FO(D(hp(.8, 0, 360)), tr[0], 1.4);
         s += F(D(hp(.8, -70, 20, 8).concat(hp(.6, 20, -70, 8))), tr[1], .9);

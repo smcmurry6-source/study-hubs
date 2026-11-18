@@ -293,7 +293,7 @@ export function pack(T){
     var hubC = P(cx, y, r), s = "", i, rim = yRing(cx, y, r, r * .9, 24), tire = yRing(cx, y, r, r, 24);
     s += L(D(tire), 4.6) + L(D(tire), 2.6, "#5A5560") + L(D(rim), 2.6, o.night ? "#8A6A4E" : K.wood);
     var sp = ""; for (i = 0; i < 12; i++){ var a = (i * 30 + (spin || 0)) * Math.PI / 180, e = [cx + Math.cos(a) * r * .86, y, r + Math.sin(a) * r * .86], b = [cx + Math.cos(a) * r * .16, y, r + Math.sin(a) * r * .16]; sp += seg(P(b[0], b[1], b[2]), P(e[0], e[1], e[2])) + " "; }
-    s += L(sp, 2.4) + L(sp, 1.1, o.night ? "#B9926A" : K.woodLight);
+    s += L(sp, 1.9) + L(sp, .8, o.night ? "#B9926A" : K.woodLight);
     s += ell(hubC[0], hubC[1], 3, 3.2, o.night ? "#8A6A4E" : K.wood, 1.2) + circ(hubC[0] + .3, hubC[1], 1.1, "#5A5560");
     return s;
   }
@@ -434,7 +434,7 @@ export function pack(T){
         var bc = [1.76, W.y1 + .32], bz0 = .46, bz1 = 1.34, br = .3, bw = o.night ? ["#B9926A", "#8A6A4E", "#C9A57E"] : ["#E2B887", "#C4915F", "#F2D3A8"];
         s += box(bc[0] - .36, W.y1, bz0 - .07, .72, .7, .07, WOOD, { sw: 1.1, si: .7 });
         s += cyl(bc[0], bc[1], bz0, br * .88, (bz0 + bz1) / 2, br, bw[0], bw[1], bw[0], { open: true, sw: 1.5 }) + cyl(bc[0], bc[1], (bz0 + bz1) / 2, br, bz1, br * .88, bw[0], bw[1], bw[2], { sw: 1.5, si: 1 });
-        [bz0 + .15, bz1 - .14].forEach(function(z){ var pts = []; for (var q = 0; q <= 12; q++){ var t = (-50 + q * 190 / 12) * Math.PI / 180; pts.push([bc[0] + Math.cos(t) * br * .95, bc[1] + Math.sin(t) * br * .95, z]); } s += L(D(pts, true), 1.2, "#6E6A74"); });
+        [bz0 + .15, bz1 - .14].forEach(function(z){ var pts = [], rz = br * (.88 + .12 * .34) - .01; for (var q = 0; q <= 12; q++){ var t = (-45 + q * 180 / 12) * Math.PI / 180; pts.push([bc[0] + Math.cos(t) * rz, bc[1] + Math.sin(t) * rz, z]); } s += L(D(pts, true), 1.2, "#6E6A74"); });
         [70, 110].forEach(function(dg){ var t = dg * Math.PI / 180, a0 = P(bc[0] + Math.cos(t) * br * .88, bc[1] + Math.sin(t) * br * .88, bz0 + .04), a1 = P(bc[0] + Math.cos(t) * br * 1.08, bc[1] + Math.sin(t) * br * 1.08, (bz0 + bz1) / 2), a2 = P(bc[0] + Math.cos(t) * br * .88, bc[1] + Math.sin(t) * br * .88, bz1 - .03); s += L("M" + f(a0[0]) + " " + f(a0[1]) + " Q" + f(a1[0]) + " " + f(a1[1]) + " " + f(a2[0]) + " " + f(a2[1]), .7, bw[1]); });
         var lid = P(bc[0], bc[1], bz1); s += circ(lid[0] + 1, lid[1], 1, bw[1], .7);
         if (o.snow) s += F(D2(hull(hoopX.map(function(x, i){ return hoop(i, 60, 120, 6); }).reduce(function(a, b){ return a.concat(b); }, []).map(function(q){ return P(q[0], q[1], q[2] + .04); }))), "#FFFFFF", .9);
