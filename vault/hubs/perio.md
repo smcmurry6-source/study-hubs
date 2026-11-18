@@ -199,7 +199,8 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11
   one that fetched it.
 - **The page's weight budget** is `hubs/perio/` in `tools/release/budgets.json`: 850 KB since 2026-11-18 (BUG-176), when
   `node tools/release/perf.js --page hubs/perio/` measured 834 KB, most of it `questions.json` (190 KB gzipped) and
-  `notes.json` (167 KB). Check it after a big addition; raise it only with a reason in the PR that Sam approves.
+  `notes.json` (167 KB). 885 KB since S6 went taught (2026-11-18, BUG-180: 864 KB measured, S6's notes, questions, version Bs and
+  hints +28 KB gzipped). Check it after a big addition; raise it only with a reason in the PR that Sam approves.
 - Each session's Review tables sit under that session's notes (`core.noSide`: More's Side by side has nothing left, so
   it's hidden). The Patient Box cases are `core.json`'s `pcases`, checked by `node tools/ci/cases.js`.
 - **Progress carries over:** same hub id, state key `perio-d2-compendium-state-v1`, answered event `perio:answered`, every
