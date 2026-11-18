@@ -898,15 +898,16 @@
       tile("home", "Home", thumb("home", o.home, { scene: o.scene }), "Home: " + h.n) + tile("scene", "Scene", thumb("scene", o.scene), "Scene: " + sc.n) + tile("timmy", "Timmy", thumb("outfit", curOut ? curOut.k : ""), "Timmy: " + (curOut ? curOut.n : "no outfit")) + "</div>" +
       '<div class="tpv-dyard"><span class="tpv-dlab">The yard</span>' + TP.SLOTS.filter(function(q){ return !(q.k === "corner" && lane); }).map(function(q){ var it = byK(TP.YARD, o.yard[q.k] || "");
         return tile(q.k, DOCK_N[q.k] || q.n, it ? thumb("yard", it.k, { scene: o.scene }) : "", q.n + ": " + (it ? it.n : "empty"), true); }).join("") + "</div></div>";
-    /* the drawer: one kind of thing, what you own of it, in up to three tabs (the classics, the seasonal sets, the rank rewards) */
+    /* the drawer: one kind of thing, what you own of it, in up to four tabs (the classics, the year-round collections,
+       the seasonal sets, the rank rewards). A collection's piece carries coll (sets.mjs COLLECTIONS). */
     var kind = pick === "home" || pick === "scene" ? pick : pick === "timmy" ? "outfit" : "yard", sl = kind === "yard" ? byK(TP.SLOTS, pick) : null;
     var all = kind === "home" ? TP.HOMES : kind === "scene" ? TP.SCENES : kind === "outfit" ? TP.OUTFITS : TP.YARD.filter(function(y){ return !y.wide || pick === "side" || pick === "corner"; });
     var curK = kind === "home" ? o.home : kind === "scene" ? o.scene : kind === "outfit" ? (curOut ? curOut.k : "") : o.yard[pick] || "";
     var mineOf = all.filter(owned), cur = byK(all, curK);
     var lockedOf = S.locked.filter(function(x){ return x.kind === kind; }).map(function(x){ var q = byK(all, key(kind, x.id)) || { k: x.id, n: (TP.setInfo(x.id) || {}).n || x.name, rarity: "" }; return { x: q, tier: x.rank_tier }; });
-    var groups = [["classic", "Classics", mineOf.filter(function(x){ return !x.set; })], ["sets", "Seasonal", mineOf.filter(function(x){ return x.set && x.set !== "rank"; })], ["rank", "Rank", mineOf.filter(function(x){ return x.set === "rank"; })]]
+    var groups = [["classic", "Classics", mineOf.filter(function(x){ return !x.set; })], ["coll", "Collections", mineOf.filter(function(x){ return x.coll; })], ["sets", "Seasonal", mineOf.filter(function(x){ return x.set && x.set !== "rank" && !x.coll; })], ["rank", "Rank", mineOf.filter(function(x){ return x.set === "rank"; })]]
       .filter(function(g){ return g[2].length || g[0] === "classic" || (g[0] === "rank" && lockedOf.length); });
-    var src = V.src[kind]; if (!src || V.srcFor !== pick + ":" + curK) src = cur && cur.set && cur.set !== "rank" ? "sets" : cur && cur.set === "rank" ? "rank" : src || "classic";
+    var src = V.src[kind]; if (!src || V.srcFor !== pick + ":" + curK) src = cur && cur.coll ? "coll" : cur && cur.set && cur.set !== "rank" ? "sets" : cur && cur.set === "rank" ? "rank" : src || "classic";
     if (!groups.some(function(g){ return g[0] === src; })) src = groups[0][0];
     V.src[kind] = src; V.srcFor = pick + ":" + curK;
     var tabs = groups.length < 2 ? "" : '<div class="tpv-seg tpv-tabs" role="group" aria-label="Which pieces">' + groups.map(function(g){ return '<button type="button" data-tp="src-' + g[0] + '" data-src="' + g[0] + '" aria-pressed="' + (g[0] === src) + '">' + g[1] + ' <span class="num">' + (g[2].length + (g[0] === "rank" ? lockedOf.length : 0)) + "</span></button>"; }).join("") + "</div>";
@@ -924,7 +925,7 @@
       if (framed) return '<button type="button" class="tpv-card is-framed' + (on ? " on" : "") + '" data-tp="piece" data-item="" aria-pressed="' + on + '">' + face("", thumb("outfit", ""), "Just Timmy", rarTag(""), "") + "</button>";
       return '<button type="button" class="tpv-card' + (on ? " on" : "") + '" data-tp="piece" data-item="" aria-pressed="' + on + '"><span class="tpv-cpic">' + thumb("outfit", "") + '</span><span class="tpv-cname">Just Timmy</span>' + rarTag("") + "</button>"; };
     var shown = (groups.filter(function(g){ return g[0] === src; })[0] || groups[0])[2], cards;
-    if (src === "sets") cards = (TP.SETS ? TP.SETS.seasons : []).map(function(se){ var got = shown.filter(function(x){ return x.set === se.k; }); return got.length ? '<h4 class="tpv-seth">' + esc(se.n) + '</h4><div class="tpv-cards">' + got.map(function(x){ return cardOf(x, x.k === curK); }).join("") + "</div>" : ""; }).join("");
+    if (src === "sets" || src === "coll") cards = ((TP.SETS ? (src === "coll" ? TP.SETS.collections : TP.SETS.seasons) : null) || []).map(function(se){ var got = shown.filter(function(x){ return x.set === se.k; }); return got.length ? '<h4 class="tpv-seth">' + esc(se.n) + '</h4><div class="tpv-cards">' + got.map(function(x){ return cardOf(x, x.k === curK); }).join("") + "</div>" : ""; }).join("");
     else cards = '<div class="tpv-cards">' +
       (src === "classic" && kind === "outfit" ? bare() : "") +
       shown.map(function(x){ return cardOf(x, x.k === curK); }).join("") + (src === "rank" ? lockedOf.map(lockCard).join("") : "") + "</div>" +

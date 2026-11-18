@@ -195,8 +195,10 @@ dialog.tpv::backdrop { background: rgba(20, 14, 20, .72); }
 .tpv-dhead h3 { margin: 0; font-size: var(--fs-section); font-weight: var(--w-head); line-height: 1.2; color: var(--ar-gold); }
 .tpv-dhead p { margin: 3px 0 0; font-size: var(--fs-meta); color: var(--muted); }
 .tpv-dhead .tpv-btn { flex: none; min-height: 36px; padding: 0 12px; font-size: var(--fs-meta); }
-.tpv-tabs { margin: 12px 0 0; }
-.tpv-tabs button { min-height: 34px; padding: 0 12px; font-size: var(--fs-meta); }
+/* up to four tabs (Classics, Collections, Seasonal, Rank): snug enough for one row on a phone, a second row rather than
+   cut off on a narrower one */
+.tpv-tabs { margin: 12px 0 0; max-width: 100%; flex-wrap: wrap; border-radius: 21px; }
+.tpv-seg.tpv-tabs button { min-height: 34px; padding: 0 9px; gap: 5px; font-size: var(--fs-meta); }
 .tpv-seth { margin: 14px 0 0; font-size: var(--fs-label); font-weight: var(--w-head); }
 .tpv-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin: 12px 0 0; }
 .tpv-card { position: relative; display: grid; gap: 4px; justify-items: center; align-content: start; min-width: 0; padding: 8px 6px 10px; border: 2px solid var(--border); border-radius: var(--r-row);

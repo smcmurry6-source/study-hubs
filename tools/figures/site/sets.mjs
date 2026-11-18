@@ -1,6 +1,7 @@
 /* The seasonal sets and the rank sets of Timmy's place and shop (Sam, 2026-11-10; vault/tasks/2026-11-10-redesign-timmys-place-round-3.md).
    One list, three readers: the art (tools/figures/site/packs/<season>.mjs draws exactly these pieces, with these ids), the
-   catalog (migration_v54.sql's shop_items has exactly these rows) and the build (build.mjs checks both against this file).
+   catalog (migration_v54.sql's shop_items has exactly these rows; the collections' rows are migration_v65.sql's) and the
+   build (build.mjs checks both against this file).
 
    A season's full set: 1 home and 1 scene (both Legendary), and a Rare, an Epic and a Legendary outfit and yard thing.
    Limited time: on sale only in its window (sh_shop_seasons in migration_v54.sql; the short holidays for the 7 days ending
@@ -90,6 +91,63 @@ export const RANKS = [
   { gtier: 5, rank: "Diamond", outfit: ["rank-diamond-outfit", "Diamond shades and ice cape", L], yard: ["rank-diamond-yard", "Diamond geode", L] },
   { gtier: 6, rank: "Dark Matter", outfit: ["rank-dark-outfit", "Dark Matter cloak", L], yard: ["rank-dark-yard", "Dark Matter orb", L] }
 ];
+
+/* The year-round collections (Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy"): eight pieces
+   that belong together, like a season's set, but never limited: they join the everyday rotation (the daily and weekly
+   picks, season null in the catalog), so the rarer ones turn up less often. A home (Legendary), a scene (Epic), outfits
+   from Common to Rare and yard pieces from Uncommon to Epic. Drawn in packs/<k>.mjs, fetched only when a place shows one
+   (widget/hub-art/place/<k>.js), so the kit every page loads stays the size it was. */
+const C_ = "common", U = "uncommon";
+function collection(home, scene, outfits, yard){
+  return [
+    { id: home[0], n: home[1], kind: "home", rarity: L, price: home[2] },
+    { id: scene[0], n: scene[1], kind: "scene", rarity: E, price: scene[2] },
+    ...outfits.map((o, i) => ({ id: o[0], n: o[1], kind: "outfit", rarity: [C_, U, R][i], price: o[2] })),
+    ...yard.map((o, i) => ({ id: o[0], n: o[1], kind: "yard", rarity: [U, R, E][i], price: o[2] }))
+  ];
+}
+export const COLLECTIONS = [
+  { k: "dino", n: "Dino valley", note: "Giant ferns, a volcano smoking far off, and fossils with all their teeth", items: collection(
+    ["stone-den", "Stone-age den", 6000], ["volcano-valley", "Volcano valley", 2400],
+    [["field-hat", "Fossil hunter's hat", 150], ["fossil-vest", "Dig-site vest and brush", 350], ["stego-hood", "Stegosaurus hood", 900]],
+    [["dino-nest", "Dino egg nest", 400], ["fossil-dig", "Fossil dig", 900], ["trex-skeleton", "T. rex skeleton", 2200]]) },
+  { k: "moonbase", n: "Moon base", note: "Craters, a dome with an airlock, and the Earth hanging in a black sky", items: collection(
+    ["moon-dome", "Moon base dome", 6500], ["lunar-plains", "Lunar plains", 2600],
+    [["antenna-headband", "Antenna headband", 150], ["space-visor", "Space visor", 400], ["jetpack", "Jetpack", 1000]],
+    [["moon-rover", "Moon rover", 450], ["satellite-dish", "Satellite dish", 1000], ["rocket", "Rocket on its pad", 2400]]) },
+  { k: "reef", n: "Coral reef", note: "The bottom of a sunlit sea: kelp, coral, fish and a house in a shell", items: collection(
+    ["conch-house", "Conch shell house", 6000], ["sunlit-reef", "Sunlit reef", 2600],
+    [["starfish-clip", "Starfish clip", 120], ["octopus-hat", "Octopus hat", 400], ["mer-tail", "Mer-tail", 950]],
+    [["coral-garden", "Coral garden", 350], ["giant-clam", "Giant clam", 900], ["sunken-chest", "Sunken treasure chest", 2000]]) },
+  { k: "desert", n: "Desert ranch", note: "Red rock mesas, cactus, a windmill and the widest sky there is", items: collection(
+    ["adobe-ranch", "Adobe ranch house", 5500], ["red-rocks", "Red rock desert", 2200],
+    [["bandana", "Bandana", 120], ["cowboy-hat", "Cowboy hat", 350], ["sheriff-vest", "Sheriff's vest and star", 800]],
+    [["cactus-garden", "Cactus garden", 300], ["windmill-pump", "Windmill", 800], ["covered-wagon", "Covered wagon", 1900]]) },
+  { k: "arcade", n: "Retro arcade", note: "Pixel hills, a neon tooth over the door and a high score to beat", items: collection(
+    ["arcade-hall", "Arcade hall", 6500], ["pixel-hills", "Pixel hills", 2400],
+    [["gamer-headset", "Gamer headset", 180], ["pixel-shades", "Pixel shades", 300], ["high-score-jacket", "High-score jacket", 850]],
+    [["arcade-cabinet", "Arcade cabinet", 450], ["pinball", "Pinball machine", 1000], ["claw-machine", "Giant claw machine", 2200]]) },
+  { k: "rockshow", n: "Rock show", note: "A record shop, a festival field and a stage with the lights up", items: collection(
+    ["record-shop", "Record shop", 6000], ["festival-field", "Festival field", 2400],
+    [["band-tee", "Band tee", 120], ["leather-jacket", "Leather jacket", 450], ["electric-guitar", "Electric guitar", 1000]],
+    [["amp-stack", "Amp stack", 400], ["drum-kit", "Drum kit", 1000], ["tour-stage", "Little stage and lights", 2400]]) }
+];
+
+/* The rare costumes (Sam, 2026-11-12: five at the release; "Go crazy", 2026-11-18: five more). Drawn in place.mjs's
+   OUTFITS (costume: true, three lines each), on sale only to someone who has spotted one (record_costume_sighting).
+   widget/hub-timmy.js, widget/dash.js and widget/shop.js name the same ten in the same order (tools/release/xp.js checks). */
+export const COSTUMES = [
+  ["pirate", "Pirate", E, 2000], ["astronaut", "Astronaut", E, 2500], ["detective", "Detective", E, 1800], ["chef", "Chef", E, 1500],
+  ["captain-enamel", "Captain Enamel", L, 4000],
+  ["wizard", "Wizard", E, 2000], ["robot", "Robot", E, 2200], ["firefighter", "Firefighter", E, 1600], ["shark", "Shark", E, 2400],
+  ["dragon", "Dragon", L, 4500]
+];
+
+export function allCollectionItems(){
+  const out = [];
+  for (const c of COLLECTIONS) for (const it of c.items) out.push({ ...it, collection: c.k });
+  return out;
+}
 
 export function allSetItems(){
   const out = [];
