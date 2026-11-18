@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (The class's picks follow the version of a question's choices, Claude Code)** — the inbox's "class picks on
+  each choice ignore question versions" (BUG-023's general fix). `question_choices` was keyed by position only, so after an
+  edit the "% of the class picked it" beside a choice counted picks of the old choices: since the release, 169 Perio and
+  125 Occlusion questions had their choices rewritten (8 of Perio's only moved). `migration_v65.sql`: a one-choice or
+  select-all key carries `cv`, the version of its choices (`choiceVersion` in `tools/xp/keys.js`: the choices and the key;
+  the stem, the explanation and the whys don't count); `record_choice` / `record_choices` stamp each pick with the current
+  one (`question_choices.v`); when it changes, `admin_load_question_keys` moves the old picks to `question_choices_past`
+  (closed to the public, nothing deleted; an undone edit brings them back), with a backstop at the next pick
+  (`sh_choices_to`). The page, `sh_answer` and every reader of `question_choices` are unchanged. Picks from before versions
+  are kept as the current choices', except on the 294 questions whose choices changed since their content JSON shipped
+  (`tools/xp/choice-history.js`, from git), whose picks are set aside. Hubs without keys (the old pages) behave as before.
+  Takes effect when the After merge workflow reloads every engine hub's keys (it does for any change to `keys.js`). Tests:
+  `tools/release/xp.js` section 3b; `rls-expectations.json` closes the past table and the two helpers. About page entry.
+
 - **2026-11-18 (Perio's questions come back reworded, Claude Code, stacked on #402)** — Sam: "do one extra wording and only do it
   for perio". `hubs/perio/content/variants.json` holds a second wording of each of the 652 Perio questions with choices (stem,
   choices and whys; choice k is choice k reworded), written session by session from the notes and hints by 14 writers and

@@ -37,7 +37,11 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   with `admin_load_question_keys(secret, hub, keys, retire_missing)`. `node tools/xp/keys.js <hub>` builds the list from a hub's
   content JSON (`--sql` prints the call with the secret left out); retired ids come from `tools/question-ids/<hub>.txt`. A
   question's version is the same fingerprint `widget/qhealth.js` uses, so a page still showing an older version is graded
-  against its own key; an unknown version falls back to the current one.
+  against its own key; an unknown version falls back to the current one. Since migration_v65 a one-choice or select-all key
+  also carries `cv`, the version of its choices (a fingerprint of the choices and the key, `choiceVersion` in
+  `tools/xp/keys.js`): `record_choice` stamps the class's picks with it, and when it changes the old picks move to
+  `question_choices_past`, so the percentages beside each choice start again (an edit to the stem, the explanation or a why
+  keeps them). The loader's reply says how many questions' picks started again (`picks_restarted`).
 - **`record_answer_v2(visitor, hub, qid, choice, picks, self, v, ctx, request, session, claim)`** replaces five calls the page
   makes today (`record_answer`, `record_choice` or `record_choices`, `record_personal_answer`, `record_correct_streak`): the
   server grades the answer from the key and records all of it, then pays. Unknown and retired ids are recorded with the
