@@ -86,7 +86,9 @@
      itself, so the page doesn't call submit_arcade_score for that game. Anywhere else (the old single-file hubs) played() returns at
      once and nothing calls over(), so the games make exactly today's calls. */
   var RUN = null, RAN = {};
-  function gameOn(){ var G = window.shGame; return !!(G && G.v2 && G.v2() && G.startSession && G.finishSession); }
+  /* live(): the page wants the game layer and hasn't found it missing, so a game played while the bootstrap is still
+     answering (or timed out in a busy minute) is a session too; an older cached v3.js has only v2() */
+  function gameOn(){ var G = window.shGame; return !!(G && (G.live ? G.live() : G.v2 && G.v2()) && G.startSession && G.finishSession); }
   function played(game, name){
     RUN = null;
     if (!game || !gameOn()) return;

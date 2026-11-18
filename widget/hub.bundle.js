@@ -101,7 +101,7 @@ visible = HX.visible, toast = HX.toast, icon = HX.icon, artSvg = HX.artSvg, spot
 ring = HX.ring, ANSWERED = HX.ANSWERED, STATE = HX.STATE, ansOf = HX.ansOf, studyDayList = HX.studyDayList,
 achMap = HX.achMap, putAnswer = HX.putAnswer, saveNow = HX.saveNow, saveState = HX.saveState, QBL = HX.QBL,
 lecName = HX.lecName, lecDot = HX.lecDot, paintLive = HX.paintLive, go = HX.go, lecStat = HX.lecStat, QBY = HX.QBY;
-function v2(){ var G = window.shGame; return !!(G && G.v2 && G.v2()); }
+function v2(){ var G = window.shGame; return !!(G && (G.live ? G.live() : G.v2 && G.v2())); }
 function boost(){ var G = window.shGame; return v2() && G.boost ? G.boost() : null; }
 var KIND = { sequence: "order", match: "order", recall: "self" };
 var SESSION = { n: 0, r: 0, xp: 0, miss: {}, since: 0, recapAt: 0, hp0: null, k: 0, again: 0, kSince: 0, againAt: 0 };
@@ -210,6 +210,10 @@ function studyCrowns(xp, mult){
 var b = (xp | 0) / ((mult | 0) || 1);
 return b > 0 && b === Math.floor(b) && b % 2 === 0 ? b / 2 : 0;
 }
+function paidOnCard(qid, was, xp){
+var n = $$(".qcard .qc-result .verdict .xp").filter(function(x){ var c = x.closest(".qcard"); return c && c.getAttribute("data-qid") === qid; }).pop();
+if (n && n.textContent === "+" + was + " XP") n.textContent = "+" + xp + " XP";
+}
 document.addEventListener("sh:answer-paid", function(e){
 var d = e.detail || {}, r = d.res; if (!r || r.repeat) return;
 var at = -1; PEND.some(function(x, i){ if (x.qid === d.qid) { at = i; return true; } return false; });
@@ -221,6 +225,7 @@ if (BONUS[b.src]) won.push({ t: BONUS[b.src], xp: b.xp, c: studyCrowns(b.xp, r.m
 else won.push({ t: prizeName(b.src, b), xp: b.xp, c: b.xp, src: b.src });
 });
 var off = (r.xp | 0) - (guess ? guess.xp : r.xp | 0) + extra;
+if (guess && (r.xp | 0) !== guess.xp) paidOnCard(d.qid, guess.xp, r.xp | 0);
 if (off) { t.xp = Math.max(0, t.xp + off); if (d.ctx !== "mock" && d.ctx !== "arcade") SESSION.xp = Math.max(0, SESSION.xp + off); saveState(); }
 if (RANK.p && typeof r.total === "number") { RANK.p.xp = Math.max(RANK.p.xp || 0, r.total); RANK.local = pendSum(); }
 if (r.medal && r.medal.level) {

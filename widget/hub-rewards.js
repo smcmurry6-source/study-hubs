@@ -19,9 +19,11 @@
 
   /* ---------- the game layer (migration_v54, at the redesign's release; vault/reference/game-server.md) ----------
      widget/v3.js knows whether the database has it (window.shGame). When it does, an answer is one call the server
-     grades and pays, and this file shows XP by the new rules; until then, and whenever the call isn't there,
-     everything here counts XP the way the live hubs do. */
-  function v2(){ var G = window.shGame; return !!(G && G.v2 && G.v2()); }
+     grades and pays, and this file shows XP by the new rules; only when the call is found missing does everything here
+     count XP the old way (10, 2 and 1, capped at 600 a day). A page that wants it counts by the new rules while it is
+     still asking (shGame.live()): on 2026-11-18, with the bootstrap timed out in a busy minute, the page counted by the old
+     cap until the first answer's reply came back, and right answers the server paid 10 showed "+0 XP" on the card. */
+  function v2(){ var G = window.shGame; return !!(G && (G.live ? G.live() : G.v2 && G.v2())); }
   function boost(){ var G = window.shGame; return v2() && G.boost ? G.boost() : null; }
   /* how the server grades each kind of question (tools/xp/keys.js): one choice and select-all from the picks, a
      sequence from the order as placed, matching from each row's first pick (graded like an order since 2026-11-17),
@@ -171,6 +173,12 @@
     var b = (xp | 0) / ((mult | 0) || 1);
     return b > 0 && b === Math.floor(b) && b % 2 === 0 ? b / 2 : 0;
   }
+  /* the card shows the page's guess at once (widget/hub-bank.js result()); when the server paid something else, the
+     newest answered card of that question says what it paid */
+  function paidOnCard(qid, was, xp){
+    var n = $$(".qcard .qc-result .verdict .xp").filter(function(x){ var c = x.closest(".qcard"); return c && c.getAttribute("data-qid") === qid; }).pop();
+    if (n && n.textContent === "+" + was + " XP") n.textContent = "+" + xp + " XP";
+  }
   document.addEventListener("sh:answer-paid", function(e){
     var d = e.detail || {}, r = d.res; if (!r || r.repeat) return;
     /* the page's guess for this very answer (a reply can be missing: an answer recorded the old way, or lost offline) */
@@ -185,6 +193,7 @@
       else won.push({ t: prizeName(b.src, b), xp: b.xp, c: b.xp, src: b.src });
     });
     var off = (r.xp | 0) - (guess ? guess.xp : r.xp | 0) + extra;
+    if (guess && (r.xp | 0) !== guess.xp) paidOnCard(d.qid, guess.xp, r.xp | 0);
     if (off) { t.xp = Math.max(0, t.xp + off); if (d.ctx !== "mock" && d.ctx !== "arcade") SESSION.xp = Math.max(0, SESSION.xp + off); saveState(); }
     if (RANK.p && typeof r.total === "number") { RANK.p.xp = Math.max(RANK.p.xp || 0, r.total); RANK.local = pendSum(); }
     if (r.medal && r.medal.level) {

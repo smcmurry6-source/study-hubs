@@ -32,6 +32,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (right answers showed "+0 XP", Claude Code)** — Sam: "im getting 0xp for correct answers now ... it happened for 2
+  questions and then the third gave me 10". The server paid them; the card's number is the page's guess, which used the game
+  layer's rules only once the bootstrap or the first answer's reply confirmed it (`shGame.v2()`). With the bootstrap timed
+  out in a busy minute, it guessed by the old 600-a-day cap, so an active day showed +0 until a reply came back. Now
+  `widget/hub-rewards.js` `v2()` and `widget/games.js` `gameOn()` (the arcade's session and +50 had the same gap) ask
+  `shGame.live()`, and the card shows what the server paid when it differs from the guess (`paidOnCard`). Bundles rebuilt.
+  [BUG-183](vault/release/bug-log.md).
 - **2026-11-18 (Ask Timmy costs less after a merge, Claude Code)** — The 21 "When is the exam, and what is on it?" on
   Heme & Endo Exam 3 in the admin page's Ask Timmy tab ($12.31) were the After merge workflow's own check, not students:
   it asked one real question on the first live hub after every deploy, and a deploy follows nearly every About page change.
