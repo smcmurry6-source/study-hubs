@@ -35,8 +35,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 - **2026-11-18 (two indexes for saving an answer, Claude Code)** — `migration_v71.sql`: `personal_answers` gets
   `(visitor_id, answered_at desc, id desc)` and `(visitor_id, hub, qid, answered_at desc, id desc)`. Every answer's speed limit,
   double-tap check and per-question counts read all of the person's answers before (9,377 for the heaviest visitor; the
-  day's most frequent statement timeout). Built live `concurrently`, so saves go on while they build. Listed in
-  `supabase/pending-migrations.txt` until then ([the task](vault/tasks/2026-11-18-database-load.md)).
+  day's most frequent statement timeout). Built live with `create index concurrently` the same day (Sam: "Now, then
+  merge"), so saves went on while they built; the speed limit's read is now one row from an index
+  ([#423](https://github.com/smcmurry6-source/study-hubs/pull/423), [the task](vault/tasks/2026-11-18-database-load.md)).
 - **2026-11-18 (the admin page's A/B versions page; answer saves that survive a busy database, Claude Code)** — Sam asked
   for the A/B results on the admin page and reported its loading errors ("canceling statement due to statement timeout").
   The Supabase logs showed the same timeouts failing students' answer saves in bursts of 1 to 5 minutes all day (242 of

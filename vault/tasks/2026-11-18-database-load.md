@@ -50,7 +50,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   the boxes above are done; worth it for exam weeks.
 - [ ] A failed answer that's still unsent when the page closes is kept on the device and sent at the next load (today the
   retries stop when the tab closes).
-- [ ] `personal_answers`' two indexes (`migration_v71.sql`: the person's answers newest first, and one question's answers)
+- [x] `personal_answers`' two indexes (`migration_v71.sql`: the person's answers newest first, and one question's answers)
   built on the live database with `create index concurrently`, then the file appended to `supabase/schema.sql` and its line
   taken out of `supabase/pending-migrations.txt`. Each answer's speed limit, double-tap check and per-question counts read
   every answer the person ever gave without them (the day's most frequent timeout, BUG-182's trace).
@@ -61,5 +61,8 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   ([#421](https://github.com/smcmurry6-source/study-hubs/pull/421)).
 - 2026-11-18: #421 merged. `migration_v71.sql` (the two `personal_answers` indexes another session found while tracing
   BUG-182) written and tested (`tools/release/xp.js`), listed as pending until it's built live.
+- 2026-11-18: Sam: "Now, then merge". Both indexes built live with `create index concurrently` (valid, 15 and 20 MB);
+  the speed limit's read is now an index-only scan of one row. v71 appended to `supabase/schema.sql`
+  ([#423](https://github.com/smcmurry6-source/study-hubs/pull/423)).
 
 ## Outcome
