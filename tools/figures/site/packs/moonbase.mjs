@@ -118,11 +118,27 @@ export function pack(T){
         s += T.dome(cx, cy, z0, r, h, dc[0], dc[1]);
         s += domeSeams(cx, cy, z0, r, h, INK, function(a){ return a > 92 && a < 108; });
         /* the tooth on the dome, high on the side the sun lights */
-        var em = onDome(cx, cy, z0, r, h, 100, .68), ec = P(em.c[0], em.c[1], em.c[2]);
+        /* the greenhouse window low on the dome's front, a row of greens growing behind it */
+        var dp = function(a, t){ return onDome(cx, cy, z0, r, h, a, t).c; }, gl = [], ga, gt, G0 = -4, G1 = 34, T0 = .06, T1 = .36;
+        for (ga = G0; ga <= G1; ga += 4) gl.push(dp(ga, T0));
+        for (gt = 1; gt <= 6; gt++) gl.push(dp(G1, T0 + (T1 - T0) * gt / 6));
+        for (ga = G1 - 4; ga >= G0; ga -= 4) gl.push(dp(ga, T1));
+        for (gt = 5; gt >= 1; gt--) gl.push(dp(G0, T0 + (T1 - T0) * gt / 6));
+        var gd = D(gl), greens = function(night){
+          var out = F(D([dp(G0, T0), dp(G1, T0), dp(G1, T0 + .07), dp(G0, T0 + .07)]), night ? "#5A3A2A" : "#B07A4E");
+          [0, 8, 16, 24].forEach(function(a, i){ var q = dp(a + 3, T0 + .07); out += F(T.lumps(q[0], q[1] - 3.4, 3.6, 70 + i, 6, .9), night ? "#2F5A3A" : (i % 2 ? "#7CC46A" : "#5DA45A")) + (i % 2 ? "" : L("M" + f(q[0] - 1) + " " + f(q[1] - 3) + " q1.2 -2.6 3 -2.4", 1, night ? "#244A2E" : "#3E8E45")); });
+          return out;
+        };
+        s += FO(gd, o.night ? K.lit : "#34436A", 1.6) + greens(o.night);
+        [8, 21].forEach(function(a){ s += L(D([dp(a, T0), dp(a, T0 + .1), dp(a, T0 + .2), dp(a, T1)], true), 1.3, METAL[1]); });
+        s += L(D([dp(G0, .25), dp(8, .25), dp(21, .25), dp(G1, .25)], true), 1.3, METAL[1]) + O(gd, 1.6);
+        if (!o.night) s += L(D([dp(G0 + 4, T1 - .05), dp(G0 + 9, T0 + .1)], true), 1.6, "#BFE7FA", .9);
+        else { var gc = P.apply(null, dp(15, .22)); lights += T.glowAt(gc[0], gc[1], 16) + FO(gd, K.lit, 1.6) + greens(true); }
+        var em = onDome(cx, cy, z0, r, h, 100, .72), ec = P(em.c[0], em.c[1], em.c[2]);
         s += FO(D(ring(em.c, em.e1, em.e2, .74, 0, 360, 20)), tr[0], 1.4) + T.tinyTooth(ec[0], ec[1] + .6, .78, "#FFFFFF");
         /* portholes round it */
-        var ports = [[150, .26, .3], [28, .3, .32]];
-        if (u.windows) ports = ports.concat([[-14, .26, .27], [8, .66, .24], [52, .62, .25], [158, .62, .22]]);
+        var ports = [[130, .35, .3], [-5, .62, .28]];
+        if (u.windows) ports = ports.concat([[40, .6, .25], [110, .47, .24], [18, .86, .2]]);
         ports.forEach(function(pt){ var pw = port(onDome(cx, cy, z0, r, h, pt[0], pt[1]), pt[2], o.night); s += pw.s; lit(pw); });
         if (o.snow) s += T.snowDome(cx, cy, z0, r, h, .5);
         /* the antenna on top, its light blinking */
