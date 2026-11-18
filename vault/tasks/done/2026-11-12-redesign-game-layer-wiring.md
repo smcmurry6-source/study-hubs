@@ -20,9 +20,9 @@ Fixed (+100). Wire them before the release, in their own session, so the release
 
 ## Context
 
-- Session 8 of [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release". "For every session
+- Session 8 of [phase 4](2026-11-05-redesign-phase-4-game-layer.md)'s "From here to the release". "For every session
   above" there holds here. Sam, 2026-11-12 ([decisions](../../decisions.md)): its own session before the release.
-- What part A wired and left: [the journeys](../2026-11-06-redesign-progression-journeys.md) (its Log and "Open
+- What part A wired and left: [the journeys](2026-11-06-redesign-progression-journeys.md) (its Log and "Open
   calls") and [the release note](2026-11-06-redesign-release.md), "From phase 4, part A". The rules:
   [game-server](../../reference/game-server.md), "Answers and XP".
 - What part A built for this: `window.shGame` in `widget/v3.js` (`v2()`, `startSession(kind, game)`,
@@ -88,7 +88,7 @@ trophies in the case ([the trophy case](2026-11-12-redesign-trophy-case-and-card
 - [x] An arcade game on a new hub starts and finishes a session and pays its +50 through the server
 - [x] Timmy Time's minutes report, and what they pay shows on the pill
 - [x] The admin page resolves a report as Fixed or No change needed (the box in
-      [the journeys](../2026-11-06-redesign-progression-journeys.md))
+      [the journeys](2026-11-06-redesign-progression-journeys.md))
 - [x] The live hubs make exactly today's calls (the smoke test on every hub)
 - [x] The release note's box "The game layer's wiring left by phase 4, part A" ticked for the arcade and Timmy
       Time, with what is left for the release itself (episode lengths, `sw.js`) still listed
@@ -133,8 +133,8 @@ Built 2026-11-13 ([#357](https://github.com/smcmurry6-source/study-hubs/pull/357
 no episode), or the minutes pay nothing; `sw.js` (no new file from this session). The About page's XP entries are
 already drafted in the release note.
 
-Related: [the journeys](../2026-11-06-redesign-progression-journeys.md) · [game-server](../../reference/game-server.md) ·
-[the release](2026-11-06-redesign-release.md) · [phase 4](../2026-11-05-redesign-phase-4-game-layer.md)
+Related: [the journeys](2026-11-06-redesign-progression-journeys.md) · [game-server](../../reference/game-server.md) ·
+[the release](2026-11-06-redesign-release.md) · [phase 4](2026-11-05-redesign-phase-4-game-layer.md)
 
 ## Opening prompt
 

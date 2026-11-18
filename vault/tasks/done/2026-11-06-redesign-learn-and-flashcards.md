@@ -28,7 +28,7 @@ by side in the engine and **ships with the redesign's release**.
 
 - The redesign plan: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) (section 4.4, the question card and the
   core loop; section 4.10, the additions), [the release](2026-11-06-redesign-release.md) (the drafts for the rule and About
-  page edits), [phase 2](../2026-11-05-redesign-phase-2-live-hubs.md) (every hub that switches gets it from the engine).
+  page edits), [phase 2](2026-11-05-redesign-phase-2-live-hubs.md) (every hub that switches gets it from the engine).
 - The engine, four files since 2026-11-12 (the top of `widget/hub.js` says how they fit): `widget/hub-bank.js` (`card()`
   and `wireCard()`, the bank's `drawQuestions()` and `filtered()`, the sets in `SETS`), `widget/hub-rewards.js`
   (`recordAnswer()`) and `widget/hub.js` (`SH_SYNC`); the server: [game-server](../../reference/game-server.md) (`record_answer_v2`, its `ctx`
@@ -201,7 +201,7 @@ Proposed as the defaults above and confirmed by Sam, all six ("1, 2, 3, 4, 5, 6 
   they are; the calls above are proposals until Sam confirms them.
 - 2026-11-06: Sam confirmed all six calls; ready to build.
 - 2026-11-12 (Claude Code, planning the rest of phase 4): not built yet. It touches `widget/hub-bank.js` and can run
-  beside the phase 4 sessions ([phase 4](../2026-11-05-redesign-phase-4-game-layer.md), "From here to the release"). Its
+  beside the phase 4 sessions ([phase 4](2026-11-05-redesign-phase-4-game-layer.md), "From here to the release"). Its
   "server part in the pending migration" is a change to `migration_v54.sql`, which Sam has said not to change without
   his word: ask him at the start of the session (or build it with no server part).
 
@@ -254,7 +254,7 @@ rebuilt in the release's second round (full-screen sessions, Quizlet-style Learn
 applied. Left for Sam, in the [inbox](../inbox.md): one Learn round and a flashcard on the live site.
 
 Related: [the audit and plan](2026-11-05-redesign-audit-and-plan.md) · [the release](2026-11-06-redesign-release.md) ·
-[phase 2](../2026-11-05-redesign-phase-2-live-hubs.md) · [question-bank-filter-panel](../../rules/question-bank-filter-panel.md) ·
+[phase 2](2026-11-05-redesign-phase-2-live-hubs.md) · [question-bank-filter-panel](../../rules/question-bank-filter-panel.md) ·
 [game-server](../../reference/game-server.md)
 
 ## Opening prompt

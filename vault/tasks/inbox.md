@@ -30,7 +30,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   cards later should look clearly different from a new one (`widget/hub-bank.js`; see also the `bank:retry-shown` line below).
 - [x] **Refine what double XP boosts cost** (Sam, 2026-11-17; done: 150 and 400 crowns, from the class's earning rate, `migration_v62.sql`, #394): the shop's boosts were 600 crowns for 1 hour (`boost-1h`)
   and 1,500 for 3 hours (`boost-3h`), set in the shop's items (`supabase/schema.sql`); retune them against how fast crowns
-  are earned (1 per 10 XP, plus trophies, medals and rank-ups), in a migration ([the shop](2026-11-06-redesign-timmy-shop.md)).
+  are earned (1 per 10 XP, plus trophies, medals and rank-ups), in a migration ([the shop](done/2026-11-06-redesign-timmy-shop.md)).
 - [ ] **A Timmy Time episode for Heme & Endo Exam 3** (2026-11-16) Exam 2 had one; Exam 3's hub shipped without (`core.json` `podcast: null`). Sam, 2026-11-17: "wait for timmy time until we have all the lectures for exam 3": make it (`/podcast`) once every Exam 3 lecture is in the hub, not before ([the hub](../hubs/heme-endo-exam3.md)).
 - [x] **Deploy Ask Timmy's function again for the Occlusion final's episode** (2026-11-15, #366). `supabase/functions/timmy/site.json`
   gained the episode (rebuilt from the About page), but the live function is still version 4, from the Perio final's merge:
@@ -80,18 +80,24 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   when there is no `ANTHROPIC_API_KEY`. If Sam saves the key again under `ANTHROPIC_API_KEY` (Supabase, Edge Functions,
   Secrets), the fallback line in `supabase/functions/timmy/index.ts` can come out. The admin page's Ask Timmy tab also
   shows the release's test chat (visitor `release-check-2026-11-14`, one failed and one answered question, $0.60).
-- [ ] **The redesign's other task notes are still open** (2026-11-14): [phase 2](2026-11-05-redesign-phase-2-live-hubs.md),
-  [phase 3](2026-11-05-redesign-phase-3-dashboard.md), [phase 4](2026-11-05-redesign-phase-4-game-layer.md),
-  [the journeys](2026-11-06-redesign-progression-journeys.md), [the shop](2026-11-06-redesign-timmy-shop.md) and
-  [Timmy's place](2026-11-06-redesign-timmys-place.md). Go through each one's Done when now that the release has
-  merged, tick what it finished, close the ones with nothing left and write what is left as its own to-do.
-- [ ] **`supabase/schema.sql` against the live database's text** (2026-11-14, the release's look before the migrations).
-  Columns, policies and triggers matched. The text of 25 older functions differs (line endings, and the comments and
-  layout the file was tidied with; one was read through and differs only in comments), and the live database has an
-  index the file lacks, `question_flags_visitor_idx` (migration_v25). Nothing v54 to v58 touch. Confirm each difference
-  is only text, and add the index to the file. Compare by hash (`md5(prosrc)`), never by printing a function's body: a
-  secret-gated function's source must not land in a transcript or a note. The release's five migrations are also
-  missing from Supabase's own migration list (they went through the management API): only bookkeeping.
+- [x] **The redesign's other task notes are still open** (2026-11-14; done 2026-11-17, #401): [phase 2](done/2026-11-05-redesign-phase-2-live-hubs.md),
+  [phase 3](done/2026-11-05-redesign-phase-3-dashboard.md), [phase 4](done/2026-11-05-redesign-phase-4-game-layer.md),
+  [the journeys](done/2026-11-06-redesign-progression-journeys.md), [the shop](done/2026-11-06-redesign-timmy-shop.md) and
+  [Timmy's place](done/2026-11-06-redesign-timmys-place.md) are ticked, given their Outcome and moved to `done/`: all of
+  it shipped with the release. The one thing left, BUG-076, is the next line.
+- [x] **The dashboard at 320 px with the largest text: BUG-076, and the report-reply pop-up** (2026-11-17, from
+  [phase 3](done/2026-11-05-redesign-phase-3-dashboard.md); done the same day, #401). The week's dots shrink to fit and
+  "Start studying" wraps; the pop-up needed nothing (it was wider only because the page scrolled sideways). Looking at the
+  large sizes found BUG-163 too, fixed in the same PR: the rank card stacks its medallion above the words from X-Large up,
+  and the hub card's title fits at 320 px ([bug log](../release/bug-log.md)).
+- [x] **`supabase/schema.sql` against the live database's text** (2026-11-14, the release's look before the migrations;
+  done 2026-11-17, #401). Every difference was text only. With comments, line endings, layout and the secret left out,
+  all but three functions already matched. `get_display_name` was laid out on four lines live and one in the file.
+  `get_nuke_by_hub` and `get_nuke_recent` have column labels live (`as hub`, `as display_name`), which change nothing in
+  a `returns table` function. The file now has those, and `question_flags_visitor_idx` (migration_v25; its twin on
+  `hub_suggestions` was dropped by migration_v53). The same 210 functions and 114 indexes now hash the same on both sides.
+  Compared by hash only; the file's header says how to check again. Left as is: the release's five migrations missing from
+  Supabase's own migration list (bookkeeping only).
 - [ ] **After the redesign's release: what the old pages still hold up** (2026-11-13, [the release](done/2026-11-06-redesign-release.md)).
   When the last single-file hub's page comes down (the archived ones and Heme & Endo Exam 2): take out the `NEW` (`html.shx`)
   branches in `widget/ranks.js` and `widget/rankup.js` (the old cards, the 23-trophy list), the old house picture and
@@ -150,7 +156,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **Visiting from a hub's boards** (2026-11-13, [visiting](done/2026-11-12-redesign-visiting.md)): the leaderboards in a
   hub's own panel (`widget/v3.js`) don't open anyone's place yet (Sam, 2026-11-12: the dashboard's boards first).
 - [ ] **Sound for the hand-off and the Dark Matter unlock**, only if the redesign ever gets a sound setting (it has none; the
-  scenes are silent on purpose: [the journeys](2026-11-06-redesign-progression-journeys.md)).
+  scenes are silent on purpose: [the journeys](done/2026-11-06-redesign-progression-journeys.md)).
 - [x] **Special Patient Care's retrospective and audio** (2026-11-13, the lessons audit): ~~retrospective and recap~~ dropped (Sam,
   2026-11-14: "Dont worry about special patient care at all for a recap"); the whole hub, audio included, came off the site
   ([#361](https://github.com/smcmurry6-source/study-hubs/pull/361), [hub note](../hubs/special-patient-care.md)).
