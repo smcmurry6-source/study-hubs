@@ -19,13 +19,19 @@ tab). Built with the taste-skill's app-screen run (its "framed sheet" style, kep
 its ink and blue-grey, each hub's class color as a dot).
 
 - **Views, in a sidebar:** Overview, Live, Inbox; *Study data*: Insights, Time by section, Questions, Question health
-  ([question-health](question-health.md)), Clicks and features, Searches, Engagement; *Feedback*: Exam check-ins, Surveys; *Manage*: Hubs on the dashboard, Recap. Each is a
+  ([question-health](question-health.md)), A/B versions (the same note), Clicks and features, Searches, Engagement; *Feedback*: Exam check-ins, Surveys; *Manage*: Hubs on the dashboard, Recap. Each is a
   link (`#overview`, `#inbox`...), so the back button and bookmarks work, and the last one opens next time.
 - **One header per view:** its title, one line that says what matters (for example "2 reports waiting for a reply · 5
   people studying now"), and only the controls that apply there: the 7 / 30 / 90 day range on views that use it, the
   **Past hubs** switch on views that list hubs, when the numbers were loaded, and Refresh (which reloads that view only).
 - **Each view loads only its own data, once per range**, when it first opens (`VIEWS[...].needs` and `SRC` in the page).
   The sign-in check's `get_reports` fills the Inbox count. Overview asks Live once if its copy is over 2 minutes old.
+- **One read at a time** (2026-11-18): every read goes through one lane (`queued()` in the page), so the database runs one
+  admin query at once and the class's answer saves keep the other core. Before, the Overview sent nine reads at once and
+  Insights three, each 1 to 2 s, and students' saves timed out while the page loaded
+  ([shared-infrastructure](shared-infrastructure.md), the database's size). A read the database stopped for time (anon's 3 s
+  limit) is tried once more 5 s later, and its error says the database was busy, not that a migration is missing. Writes
+  don't wait in the lane.
 - **Overview** answers two questions: is anything waiting on Sam (reports to answer, podcast comments reported,
   check-ins this week, studying now; each links to its view) and is the class studying (time, people, visits, per hub,
   busiest sections, hardest questions).

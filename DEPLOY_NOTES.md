@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (the admin page's A/B versions page; answer saves that survive a busy database, Claude Code)** — Sam asked
+  for the A/B results on the admin page and reported its loading errors ("canceling statement due to statement timeout").
+  The Supabase logs showed the same timeouts failing students' answer saves in bursts of 1 to 5 minutes all day (242 of
+  about 3,900 `record_answer_v2` calls), each while something heavy ran on the small database: a migration, the lessons
+  audit's economy SQL, the admin page's reads sent all at once (BUG-181). Now: the admin page reads **one query at a time**
+  (`queued()` in `review/index.html`), tries a timed-out read once more after 5 s, and says "the database was busy" instead
+  of naming a migration; `widget/v3.js` retries a failed answer for about three minutes with the same request id (bundles
+  rebuilt); **A/B versions** (`#ab`) shows each hub's first tries on A against B with a z and a 95% range, by kind of
+  question, and the questions with 5+ people a side, biggest gap first, from `get_ab_summary` (`migration_v70.sql`, applied
+  through the connector; a partial index `question_events_ab`). Still to do: [the task](vault/tasks/2026-11-18-database-load.md)
+  (the heavy admin functions cached, the audits' queries short, migrations at night, Sam's call on a bigger database).
+
 - **2026-11-18 (Perio S6: Periodontal Regeneration taught, Claude Code)** — Sam: "take Perio Session 6 (Periodontal
   Regeneration) from slides only to taught", the day before the final. Source: the class recording's transcript in Drive
   (Periodontology/hubs, `en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt`; read, never committed), with the deck and the

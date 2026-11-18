@@ -87,6 +87,15 @@ tags: [widget, supabase]
   and the `log_changelog`/admin RPC secret live only in local ops scripts on
   Sam's machine (`deploy_rollout.ps1`, `check_leaderboard.ps1`) — **never**
   commit them here or hardcode them into a hub's client-side JS.
+  **The database is small** (1 GB of memory, two shared cores, 60 connections), and every student's answer is saved
+  through it (`record_answer_v2`, about 150 ms). Visitors' calls stop after 3 s (anon's `statement_timeout`; `lock_timeout`
+  8 s). **A heavy query takes the cores from the class:** on 2026-11-18, the day before the Perio final, answer saves
+  failed in bursts of 1 to 5 minutes, up to 1 in 2 of them, each time something heavy ran: a migration with a 43 s
+  transaction and a 17 s backfill, the lessons audit's 11-13 s economy queries through the connector (which have no time
+  limit), and the admin page sending its reads all at once. So: apply a migration with a backfill, and run long analysis
+  SQL, when the class is quiet (late at night), or keep each query short; the admin page reads one query at a time
+  ([admin-operations](admin-operations.md)); `widget/v3.js` retries a failed answer for about three minutes with the
+  same request id. What's still to do: [the task](../tasks/2026-11-18-database-load.md).
 - **GitHub Pages deploy** — `github.com/smcmurry6-source/study-hubs`, branch
   `main`, served at `smcmurry6-source.github.io/study-hubs/`. Deploy via the
   GitHub Git Data API (blob → tree → commit → ref update); a GitHub PAT is

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// The admin page's Live, Hubs and Ask Timmy tabs and the Surveys tab's order, used in a preview (fixture data, production
+// The admin page's Live, Hubs, A/B versions and Ask Timmy tabs and the Surveys tab's order, used in a preview (fixture data, production
 // blocked) the way Sam would use them, plus what students then see on the dashboard and a hub page. Fails if
 //   - check-in groups or surveys aren't newest first (the fixtures put the newest group last by name);
 //   - Live shows an id, doesn't poll every 30 s while open, or polls while another tab is open or the page is hidden;
@@ -337,6 +337,26 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     await a.close(); await b.close();
     notes.push('a change from a stale tab is refused and the tab reloads');
 
+    /* A/B versions (migration_v70's get_ab_summary, the preview's made-up Perio totals): the verdict, both versions, the
+       questions with 5+ a side with both stems, the planted gap flagged, nothing but totals */
+    {
+      const ab = await admin(ctx, `review/?persona=admin&now=${NOW}#ab`);
+      await ab.waitForSelector('[data-panel=ab] .ab-verdict', { timeout: 15000 });
+      const v = await ab.evaluate(() => {
+        const P = document.querySelector('[data-panel=ab]');
+        const row = [...P.querySelectorAll('td.ab-q')].find(td => /q2-14/.test(td.textContent));
+        return { verdict: P.querySelector('.ab-verdict').textContent, versions: P.querySelectorAll('.card')[0].querySelectorAll('tbody tr').length,
+          gap: row ? row.parentElement.textContent : '', stems: row ? row.querySelectorAll('.tag').length : 0, html: P.innerHTML };
+      });
+      ok(/No real difference so far\. B is 2\.5 points harder than A/.test(v.verdict), `A/B: the verdict on the made-up totals (${v.verdict})`);
+      ok(v.versions === 2, `A/B: a row for A and one for B (${v.versions})`);
+      ok(/Versions differ/.test(v.gap) && v.stems === 2, `A/B: the planted gap is flagged, with both stems (${v.gap.slice(0, 120)})`);
+      ok(!/visitor|fx-|sh_visitor/.test(v.html), 'A/B: no visitor id drawn');
+      ok(await ab.evaluate(() => window.__shPreview.log().filter(x => x.name === 'get_ab_summary').length) === 1, 'A/B: one call to get_ab_summary');
+      await ab.close();
+      notes.push('A/B versions: verdict, both versions, the gap flagged with both stems, one call, no ids');
+    }
+
     ok(G.leaks.length === 0, `requests to Supabase: ${G.leaks.join(', ')}`);
     ok(await page.evaluate(() => window.__shPreview.blocked()) === 0, 'the preview blocked a request to production');
     await ctx.close();
@@ -356,13 +376,14 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     ok(await m.evaluate(() => !document.querySelector('#sidebar').classList.contains('open') && document.activeElement && document.activeElement.id === 'menuBtn'), 'Escape closes the menu and returns focus to Menu');
     const barTaps = await m.$$eval('.mbar .btn', els => els.map(e => Math.round(e.getBoundingClientRect().height)));
     ok(barTaps.every(h => h >= 44), `the top bar's buttons are at least 44 px tall (${barTaps})`);
-    for (const tab of ['overview', 'live', 'checkins', 'inbox', 'hubs', 'health', 'timmy']) {
+    for (const tab of ['overview', 'live', 'checkins', 'inbox', 'hubs', 'health', 'ab', 'timmy']) {
       await go(m, tab);
       if (tab === 'live') await m.waitForFunction(() => (document.querySelector('#liveTotal') || {}).textContent === '5');
       if (tab === 'hubs') { await m.waitForSelector('[data-arch-hub="occlusion"] .state'); await m.waitForTimeout(400); await m.tap('[data-arch-edit="occlusion"]'); await m.tap('[data-arch-form="occlusion"] input[value=hidden]'); await m.tap('[data-arch-form="occlusion"] [type=submit]'); await m.waitForSelector('.arch-confirm'); }
       if (tab === 'checkins') await m.waitForSelector('[data-checkin-group]');
       if (tab === 'overview') await m.waitForSelector('[data-panel=overview] .card');
       if (tab === 'health') await m.waitForSelector('[data-panel=health] .qh-item', { timeout: 30000 });   /* Question health: the fixture flags on a live hub */
+      if (tab === 'ab') await m.waitForSelector('[data-panel=ab] td.ab-q');
       if (tab === 'timmy') { await m.waitForSelector('[data-panel=timmy] [data-tm-item]'); const r = m.locator('[data-panel=timmy] [data-tm-report-id="8811"]'); await r.locator('[data-tm-open]').tap(); await r.locator('.tm-msg.is-timmy').waitFor(); }
       await m.waitForTimeout(300);
       /* touch targets, measured while that tab is the one showing (hidden ones have no size) */
@@ -380,7 +401,7 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     }
     ok(G2.leaks.length === 0, `phone: requests to Supabase: ${G2.leaks.join(', ')}`);
     await phone.close();
-    notes.push('phone (390 px, dark-mode device): the page stays light; the menu (focus in, Escape out, 44 px bar); Overview, Live, Hubs with the form open, Check-ins, Inbox, Question health and Ask Timmy with a chat open fit with no sideways scroll');
+    notes.push('phone (390 px, dark-mode device): the page stays light; the menu (focus in, Escape out, 44 px bar); Overview, Live, Hubs with the form open, Check-ins, Inbox, Question health, A/B versions and Ask Timmy with a chat open fit with no sideways scroll');
 
     /* ---------- 3. before the release: the live database has no admin_timmy_* functions, and the tab says so ---------- */
     const pre = await browser.newContext({ viewport: { width: 1280, height: 900 }, colorScheme: 'light' });

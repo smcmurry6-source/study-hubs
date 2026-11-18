@@ -201,6 +201,14 @@ table.data tr.child td.lbl{padding-left:20px; font-weight:400;}
 .names li{padding:3px 10px; border-radius:999px; background:var(--raised); border:1px solid var(--border); overflow-wrap:anywhere; max-width:100%;}
 .msg-ok{color:var(--positive);} .msg-err{color:var(--negative);}
 ul.rules, ol.rules{margin:0; padding-left:18px; color:var(--muted); line-height:20px;}
+/* A/B versions */
+.ab-verdict{margin:0 0 16px; font-size:15px; line-height:22px; color:var(--muted);}
+.ab-verdict b{color:var(--text); font-weight:600;}
+.ab-ready{display:grid; grid-template-columns:auto 1fr; gap:8px 12px; align-items:baseline; margin:0 0 16px;}
+.ab-ready .num{font-size:var(--fs-section); font-weight:600; text-align:right;}
+.ab-ready span:not(.num){color:var(--muted);}
+table.data td.ab-q{min-width:220px; max-width:520px; white-space:normal;}
+table.data td.ab-q .tag{overflow-wrap:anywhere;}
 .rules li + li{margin-top:8px;}
 .rules b{color:var(--text); font-weight:500;}
 
@@ -424,6 +432,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       <a class="nav-item" href="#time" data-tab="time">Time by section</a>
       <a class="nav-item" href="#questions" data-tab="questions">Questions</a>
       <a class="nav-item" href="#health" data-tab="health">Question health<span class="count" id="healthCount" hidden>0</span></a>
+      <a class="nav-item" href="#ab" data-tab="ab">A/B versions</a>
       <a class="nav-item" href="#clicks" data-tab="clicks">Clicks and features</a>
       <a class="nav-item" href="#searches" data-tab="searches">Searches</a>
       <a class="nav-item" href="#engagement" data-tab="engagement">Engagement</a>
@@ -465,6 +474,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     <section class="view" data-panel="time" hidden></section>
     <section class="view" data-panel="questions" hidden></section>
     <section class="view" data-panel="health" hidden></section>
+    <section class="view" data-panel="ab" hidden></section>
     <section class="view" data-panel="clicks" hidden></section>
     <section class="view" data-panel="searches" hidden></section>
     <section class="view" data-panel="engagement" hidden></section>
@@ -521,6 +531,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     time:       { t: "Time by section", range: 1, past: 1, needs: ["byHub", "bySection"] },
     questions:  { t: "Questions", past: 1, needs: ["qstats", "choices"] },
     health:     { t: "Question health" },
+    ab:         { t: "A/B versions" },
     clicks:     { t: "Clicks and features", range: 1, past: 1, needs: ["features", "clicks"] },
     searches:   { t: "Searches", range: 1, past: 1, needs: ["searches"] },
     engagement: { t: "Engagement", range: 1, past: 1, needs: ["streaks", "nukeSum", "nukeHub", "nukeRecent", "nukeUnlocks", "modes"] },
@@ -596,27 +607,49 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     }).join("") + '</div>';
   }
   function empty(text){ return '<div class="empty">' + text + '</div>'; }
-  function errBox(text){ return '<div class="err" role="alert">' + text + '</div>'; }
+  /* a load's error, said plainly: a timeout is the database being busy (anon's 3 s limit while the class studies), not a
+     missing migration; the migration is named only when the database says the function isn't there */
+  function isTimeout(e){ return !!e && (e.code === "57014" || /statement timeout|canceling statement/i.test(String(e.message || ""))); }
+  function errBox(text, err, mig){
+    if (err && isTimeout(err)) text += ": the database was busy (the class is studying) and stopped it after 3 seconds. Try Refresh in a minute.";
+    else if (err && mig && needsMigration(err)) text += " (needs " + mig + ").";
+    else if (err) text += ". Try Refresh." + (err.message ? ' <span class="muted">(' + esc(String(err.message).slice(0, 160)) + ')</span>' : "");
+    return '<div class="err" role="alert">' + text + '</div>';
+  }
   function rangeText(){ return "last " + state.days + " days"; }
   function pctOf(v, total){ return total ? Math.round(v / total * 100) + "%" : "–"; }
   function needsMigration(e){ return /function|does not exist|PGRST202|404/i.test(String((e && (e.message || e.code)) || "")); }
 
-  /* ---------- data: each view loads only what it shows, cached per time range ---------- */
-  function rpc(fn, args){
-    return supabase.rpc(fn, args).then(function(r){ return r && r.error ? { error: r.error } : { data: (r && r.data) || [] }; }, function(e){ return { error: e }; });
+  /* ---------- data: each view loads only what it shows, cached per time range ----------
+     One read at a time (2026-11-18): the database is small (1 GB, two shared cores) and every student's answer is saved
+     through it. The Overview's nine reads, or Insights' three, sent at once took the cores from the class: answer saves
+     timed out while the page loaded, and the page's own reads passed anon's 3 s limit. In one lane, each read runs on its
+     own and the class keeps the other core. A read the database stopped for time is tried once more, 5 s later. Writes
+     (marking a report, a review, an override) don't wait in the lane. */
+  var lane = Promise.resolve();
+  function queued(run){
+    var p = lane.then(run, run);
+    lane = p.then(function(){}, function(){});
+    return p;
   }
-  function table(name, cols){
-    return supabase.from(name).select(cols).then(function(r){ return r && r.error ? { error: r.error } : { data: (r && r.data) || [] }; }, function(e){ return { error: e }; });
+  function settle(call){ return call.then(function(r){ return r && r.error ? { error: r.error } : { data: (r && r.data) || [] }; }, function(e){ return { error: e }; }); }
+  function onceMore(run){
+    return queued(run).then(function(res){
+      if (!res.error || !isTimeout(res.error)) return res;
+      return new Promise(function(ok){ setTimeout(ok, 5000); }).then(function(){ return queued(run); });
+    });
   }
+  function rpc(fn, args){ return onceMore(function(){ return settle(supabase.rpc(fn, args)); }); }
+  function table(name, cols){ return onceMore(function(){ return settle(supabase.from(name).select(cols)); }); }
   /* the Inbox's list: get_reports_v2 (migration_v54, at the redesign's release) adds each report's outcome and whether its
      +100 XP was paid, and the resolve control then offers Fixed and No change needed (admin_resolve_report_v2, which pays
      the sender for Fixed); until the database has it, today's get_reports and set_report_resolved. repV2 is null until the
      first answer, then true or false. */
   var repV2 = null;
   function reportsRpc(){
-    var plain = function(){ return supabase.rpc("get_reports", { p_secret: secret }); };
+    var plain = function(){ return queued(function(){ return supabase.rpc("get_reports", { p_secret: secret }); }); };
     if (repV2 === false) return plain();
-    return supabase.rpc("get_reports_v2", { p_secret: secret }).then(function(res){
+    return queued(function(){ return supabase.rpc("get_reports_v2", { p_secret: secret }); }).then(function(res){
       if (res && res.error && needsMigration(res.error)) { repV2 = false; return plain(); }
       if (res && !res.error) repV2 = true;
       return res;
@@ -798,7 +831,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   /* ---------- Time by section ---------- */
   function renderTime(){
     var el = $('[data-panel="time"]');
-    if (D("bySection").error || D("byHub").error) { el.innerHTML = errBox("Couldn’t load time data. Try Refresh."); return; }
+    if (D("bySection").error || D("byHub").error) { el.innerHTML = errBox("Couldn’t load time data", D("bySection").error || D("byHub").error); return; }
     var hubs = hubRows(), total = hubColumnMinutes();
     setHead(fmtMin(total) + " across " + plural(hubs.length, "hub") + " in the " + rangeText(), viewAt("time"));
     var maxH = hubs.length ? hubs[0].minutes : 0;
@@ -865,7 +898,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   }
   function featuresCard(){
     var f = D("features");
-    if (f.error) return card("Features", "", errBox("Couldn’t load feature events (migration_v37)."));
+    if (f.error) return card("Features", "", errBox("Couldn’t load feature events", f.error, "migration_v37"));
     var rows = (f.data || []).filter(function(r){ return (keepHub(r.hub) || r.hub === "dashboard" || r.hub === "about") && !/^zz-/.test(r.hub); });
     if (!rows.length) return card("Features", rangeText(), empty("No feature events yet. Tracking started 2026-10-20."));
     var by = {};
@@ -903,7 +936,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var total = hubs.reduce(function(s, h){ return s + h.total; }, 0);
     setHead(plural(total, "click") + " on " + plural(hubs.length, "page") + " in the " + rangeText(), viewAt("clicks"));
     var clicksCard;
-    if (c.error) clicksCard = card("Clicks", "", errBox("Couldn’t load click data (migration_v14)."));
+    if (c.error) clicksCard = card("Clicks", "", errBox("Couldn’t load click data", c.error, "migration_v14"));
     else if (!hubs.length) clicksCard = card("Clicks", rangeText(), empty("No clicks recorded yet. Tracking started 2026-09-25."));
     else {
       if (!byHub[state.clickHub]) state.clickHub = hubs[0].hub;
@@ -927,7 +960,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   /* ---------- Searches (migration_v23): content the hubs didn't have ---------- */
   function renderSearches(){
     var el = $('[data-panel="searches"]'), d = D("searches");
-    if (d.error) { el.innerHTML = errBox("Couldn’t load search terms (migration_v23)."); setHead("", 0); return; }
+    if (d.error) { el.innerHTML = errBox("Couldn’t load search terms", d.error, "migration_v23"); setHead("", 0); return; }
     var rows = (d.data || []).filter(function(r){ return keepHub(r.hub); });
     var none = rows.filter(function(r){ return !Number(r.hits); }), top = rows.slice(0, 30);
     setHead(none.length ? plural(none.length, "search", "searches") + " found nothing in the " + rangeText() : "Every search found something in the " + rangeText(), viewAt("searches"));
@@ -946,7 +979,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     changes: "Changes up to exam day" };
   function renderCheckins(){
     var el = $('[data-panel="checkins"]'), d = D("debriefs");
-    if (d.error) { el.innerHTML = errBox("Couldn’t load exam check-ins (migration_v23). Try Refresh."); setHead("", 0); return; }
+    if (d.error) { el.innerHTML = errBox("Couldn’t load exam check-ins", d.error, "migration_v23"); setHead("", 0); return; }
     /* newest first everywhere: the rows inside a group by created_at, and the groups by their newest check-in
        (never by hub name or exam label: those sort as text) */
     var groups = {};
@@ -1005,7 +1038,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var liveOnes = list.filter(function(s){ return s.active; });
     setHead(liveOnes.length ? "“" + liveOnes[0].title + "” is live on the dashboard" : "No survey is live on the dashboard", viewAt("surveys"));
     var out = "";
-    if (D("surveys").error) out += errBox("Couldn’t load surveys (migration_v14).");
+    if (D("surveys").error) out += errBox("Couldn’t load surveys", D("surveys").error, "migration_v14");
     list.forEach(function(sv){
       var qs = sv.questions || [], ans = sv.answers || [], body = "";
       qs.forEach(function(q, qi){
@@ -1138,7 +1171,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   }
   function renderQuestions(){
     var el = $('[data-panel="questions"]');
-    if (D("qstats").error) { el.innerHTML = errBox("Couldn’t load question data. Try Refresh."); setHead("", 0); return; }
+    if (D("qstats").error) { el.innerHTML = errBox("Couldn’t load question data", D("qstats").error); setHead("", 0); return; }
     var rows = questionRows(), byHub = {}, att = 0, cor = 0;
     rows.forEach(function(r){
       var h = byHub[r.hub] || (byHub[r.hub] = { hub: r.hub, att: 0, cor: 0, qs: 0 });
@@ -1181,7 +1214,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       { label: "Nukes unlocked", value: fmtNum(nuSum.unlocks), hint: fmtNum(nuSum.unused) + " never used · since Oct 3" }
     ]);
     var modesCard;
-    if (D("modes").error) modesCard = card("Most-opened modes", "", errBox("Couldn’t load mode data."));
+    if (D("modes").error) modesCard = card("Most-opened modes", "", errBox("Couldn’t load mode data", D("modes").error));
     else {
       var byHub = {};
       (D("modes").data || []).forEach(function(r){ if (!r.hub || !keepHub(r.hub)) return; (byHub[r.hub] = byHub[r.hub] || []).push(r); });
@@ -1214,7 +1247,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var el = $('[data-panel="inbox"]');
     var all = D("reports").data || [], open = all.filter(function(r){ return !r.resolved; });
     setHead(open.length ? plural(open.length, "report") + " waiting for a reply" : "Nothing waiting for a reply", viewAt("inbox"));
-    if (D("reports").error) { el.innerHTML = errBox("Couldn’t load reports. Try Refresh.") + podCommentsCard() + ideasCard(); return; }
+    if (D("reports").error) { el.innerHTML = errBox("Couldn’t load reports", D("reports").error) + podCommentsCard() + ideasCard(); return; }
     var rows = all.filter(function(r){ return state.inbox === "all" || (state.inbox === "open" ? !r.resolved : r.resolved); });
     var filter = '<div class="segmented" role="group" aria-label="Show">' + [["open", "Open " + open.length], ["resolved", "Resolved"], ["all", "All " + all.length]].map(function(o){
       return '<button type="button" data-inbox="' + o[0] + '" aria-pressed="' + (state.inbox === o[0]) + '">' + o[1] + '</button>'; }).join("") + '</div>';
@@ -1251,7 +1284,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   /* Timmy Time comments (widget/podcast.js, migration_v47): they post at once; three reports hide one; hide or restore any here */
   function podCommentsCard(){
     var pc = D("podComments");
-    if (pc.error) return card("Podcast comments", "", errBox("Couldn’t load podcast comments (is migration_v47 applied?)."));
+    if (pc.error) return card("Podcast comments", "", errBox("Couldn’t load podcast comments", pc.error, "migration_v47"));
     var rows = pc.data || [];
     var body = rows.length ? rows.map(function(c){
       var st = c.hidden ? (c.hidden_by === "self" ? "Deleted by its author" : c.hidden_by === "reports" ? "Hidden by reports" : "Hidden by you") : "Showing";
@@ -1272,7 +1305,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var src = D("ideas");
     if (src.error) return card("Idea board", "", needsMigration(src.error)
       ? empty("The idea board opens with the redesign: its part of the database (migration_v54) isn’t applied yet.")
-      : errBox("Couldn’t load the idea board. Try Refresh."));
+      : errBox("Couldn’t load the idea board", src.error));
     var all = src.data || [], watch = all.filter(function(i){ return i.hidden || Number(i.reports) > 0; });
     var rows = state.ideas === "watch" ? watch : all;
     var filter = '<div class="segmented" role="group" aria-label="Show ideas">' + [["all", "All " + all.length], ["watch", "Reported or hidden " + watch.length]].map(function(o){
@@ -1782,14 +1815,13 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var el = $('[data-panel="insights"]');
     el.innerHTML = empty("Loading… three queries over every hub’s data take a few seconds.");
     insights = { pending: true };
-    /* each takes ~1-1.5 s warm; the first call after a quiet spell can pass anon's 3 s limit while the tables load
-       into memory, and then the same call succeeds, so a failed one is tried once more */
-    function twice(fn, args){ return rpc(fn, args).then(function(r){ return r.error ? rpc(fn, args) : r; }); }
+    /* each takes ~1-2 s warm; they run one after another in the page's lane (rpc), and one the database stopped for time
+       is tried once more after a pause (onceMore), never right away */
     return loadDash().then(function(){
       return Promise.all([
-        twice("get_insights", { p_secret: secret, p_exams: examMap() }),
-        twice("get_insight_retries", { p_secret: secret }),
-        twice("get_data_quality", { p_secret: secret })
+        rpc("get_insights", { p_secret: secret, p_exams: examMap() }),
+        rpc("get_insight_retries", { p_secret: secret }),
+        rpc("get_data_quality", { p_secret: secret })
       ]);
     }).then(function(r){ insights = { main: r[0], retries: r[1], quality: r[2], at: Date.now() }; if (state.tab === "insights") renderInsights(); });
   }
@@ -1816,7 +1848,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
 
   function insightScorecard(){
     var m = insights.main, R = INSIGHT_RULES;
-    if (!m || m.error || !m.data) return card("Hub scorecard", "", '<div class="err">Couldn’t load insights (get_insights, migration_v49).</div>');
+    if (!m || m.error || !m.data) return card("Hub scorecard", "", errBox("Couldn’t load insights", (m && m.error) || { message: "no data" }, "migration_v49"));
     var first = {};
     var rr = insights.retries;
     if (rr && rr.data && rr.data.by_hub) rr.data.by_hub.forEach(function(h){ first[h.hub] = pctN(h.first_ok, h.first_tries); });
@@ -1883,7 +1915,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
 
   function insightSpacing(){
     var r = insights.retries, R = INSIGHT_RULES;
-    if (!r || r.error || !r.data) return card("Spacing: what a retry shows", "", '<div class="err">Couldn’t load retries (get_insight_retries, migration_v49).</div>');
+    if (!r || r.error || !r.data) return card("Spacing: what a retry shows", "", errBox("Couldn’t load retries", (r && r.error) || { message: "no data" }, "migration_v49"));
     var g = r.data.by_gap || [];
     function cell(gap, after){ var x = g.filter(function(y){ return y.gap === gap && y.after === after; })[0]; return x ? { pct: pctN(x.ok, x.n), n: x.n } : null; }
     var gaps = ["under 10 min", "10 min to 1 day", "1 to 3 days", "3+ days"];
@@ -1973,7 +2005,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
 
   function insightQuality(){
     var q = insights.quality, R = INSIGHT_RULES;
-    if (!q || q.error || !q.data) return card("Data quality", "", '<div class="err">Couldn’t load the checks (get_data_quality, migration_v49).</div>');
+    if (!q || q.error || !q.data) return card("Data quality", "", errBox("Couldn’t load the checks", (q && q.error) || { message: "no data" }, "migration_v49"));
     var d = q.data, rows = [], now = new Date();
     function row(check, finding, status, action){ rows.push('<tr><td class="lbl">' + check + '</td><td>' + finding + '</td><td><span class="pill ' + status + '">' + (status === "flag" ? "act" : status === "ok" ? "ok" : "note") + '</span></td><td>' + action + '</td></tr>'); }
     function daysAgo(t){ if (!t) return null; var x = new Date(String(t).length === 10 ? t + "T12:00:00" : t); return Math.floor((now - x) / 86400000); }
@@ -2432,7 +2464,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     }).then(function(res){
       if (QH.hub !== hub) return;
       QH.loading = false;
-      if (res.error) QH.err = res.error.message || "error"; else { QH.rows = Array.isArray(res.data) ? res.data : []; QH.at = Date.now(); }
+      if (res.error) QH.err = res.error; else { QH.rows = Array.isArray(res.data) ? res.data : []; QH.at = Date.now(); }
       renderHealth();
     });
   }
@@ -2529,7 +2561,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     if (QH.rows === null && !QH.loading && !QH.err) { qhLoad(QH.hub); return; }
     var body = '<div class="chips" role="group" aria-label="Hub">' + hubs.map(function(h){ return '<button type="button" data-qh-hub="' + esc(h) + '" aria-pressed="' + (QH.hub === h) + '">' + dot(h) + esc(hubLabel(h)) + '</button>'; }).join("") + '</div>';
     if (QH.loading) { qhHead("Loading…", 0); body += empty("Reading " + esc(hubLabel(QH.hub)) + "’s questions and class data…"); }
-    else if (QH.err) { qhHead("", 0); body += errBox("Couldn’t load question health: " + esc(QH.err)); }
+    else if (QH.err) { qhHead("", 0); body += errBox("Couldn’t load question health", QH.err, "migration_v51"); }
     else {
       var ex = QH.ex[QH.hub], rows = QH.rows || [], n = {};
       QH_FILTERS.forEach(function(f){ n[f[0]] = rows.filter(function(r){ return qhIn(r, f[0]); }).length; });
@@ -2604,9 +2636,129 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   });
 
 
+  /* ---------- A/B versions (migration_v70; vault/reference/question-health.md) ----------
+     Sam, 2026-11-18: "i want somewhere to see this in the admin page". For every hub whose questions come in two versions
+     (content/variants.json), the class's first tries on A and on B, from get_ab_summary: one small query, totals only.
+     The class is split by device (each device starts each question on A or B, about half each, and later tries take the
+     other), so each version's first tries come from a like half of the class and can be compared. A single question
+     needs 10 people on each version before question health's "Versions differ" flag can judge it. */
+  var AB = { res: null, loading: false, stems: {}, shown: 20, at: 0 };
+  var AB_MIN = 5;   /* a question's pair is listed from 5 people on each version; the flag needs 10 */
+  function abLoad(){
+    if (AB.loading) return;
+    AB.loading = true; AB.shown = 20; renderAB();
+    rpc("get_ab_summary", { p_secret: secret, p_days: 30 }).then(function(res){
+      AB.res = res; AB.at = Date.now();
+      var hubs = (res.data && res.data.hubs) || [];
+      return Promise.all(hubs.map(function(h){ return abStems(h.hub); }));
+    }).then(function(){ AB.loading = false; if (state.tab === "ab") renderAB(); });
+  }
+  /* each question's stem on A (content/questions.json) and on B (content/variants.json): the hub's own files, not the database */
+  function abStems(hub){
+    if (AB.stems[hub] !== undefined) return Promise.resolve(AB.stems[hub]);
+    var qs = fetch("../hubs/" + encodeURIComponent(hub) + "/content/questions.json", { cache: "no-cache" })
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; });
+    return Promise.all([qs, qhVariants(hub)]).then(function(x){
+      var m = {};
+      (Array.isArray(x[0]) ? x[0] : []).forEach(function(q){ if (q && q.id) m[q.id] = { a: q.stem || "", b: "" }; });
+      var v = x[1] || {};
+      Object.keys(v).forEach(function(id){ if (m[id] && v[id]) m[id].b = v[id].stem || ""; });
+      AB.stems[hub] = m; return m;
+    });
+  }
+  /* B against A on first tries: the gap in points (B minus A), a two-proportion z and a 95% range. Answers from one person
+     aren't independent, but the split puts every person on both versions, so this is a fair rough test. */
+  function abTest(a, b){
+    if (!a || !b || !a.n || !b.n) return null;
+    var pa = a.c / a.n, pb = b.c / b.n, p = (a.c + b.c) / (a.n + b.n);
+    var se = Math.sqrt(p * (1 - p) * (1 / a.n + 1 / b.n)), su = Math.sqrt(pa * (1 - pa) / a.n + pb * (1 - pb) / b.n);
+    return { d: (pb - pa) * 100, z: se ? (pb - pa) / se : 0, lo: (pb - pa - 1.96 * su) * 100, hi: (pb - pa + 1.96 * su) * 100 };
+  }
+  function abPts(d){ var r = Math.round(Math.abs(d) * 10) / 10; return r + (r === 1 ? " point" : " points"); }
+  function abSigned(d){ var r = Math.round(d * 10) / 10; return (r > 0 ? "+" : r < 0 ? "−" : "") + Math.abs(r); }
+  function abVerdict(t, a, b){
+    if (!t) return "No first tries on both versions yet.";
+    if (a.n < 100 || b.n < 100) return "<b>Too early to say:</b> fewer than 100 first tries on version " + (a.n < b.n ? "A" : "B") + " so far.";
+    var range = "the real gap is likely between " + abSigned(t.lo) + " and " + abSigned(t.hi) + " points (B minus A)";
+    if (Math.abs(t.d) < 0.05) return "<b>A and B are even so far</b>: " + range + ".";
+    var dir = t.d < 0 ? "harder" : "easier";
+    if (Math.abs(t.z) < 1.96) return "<b>No real difference so far.</b> B is " + abPts(t.d) + " " + dir + " than A, well within chance (z = " + t.z.toFixed(1) + "); " + range + ".";
+    return "<b>B is " + abPts(t.d) + " " + dir + " than A</b>, more than chance would give (z = " + t.z.toFixed(1) + "); " + range + ". The questions below with the biggest gaps are where to look.";
+  }
+  function abCell(c, n){ return n ? '<b>' + qhPct(c, n) + '</b> <span class="muted">' + fmtNum(c) + ' of ' + fmtNum(n) + '</span>' : '<span class="muted">—</span>'; }
+  function abCell2(c, n){ return n ? '<b>' + qhPct(c, n) + '</b><span class="tag">' + fmtNum(c) + ' of ' + fmtNum(n) + '</span>' : '<span class="muted">—</span>'; }
+  function abHub(h){
+    var a = (h.first || {})["0"] || { n: 0, c: 0, people: 0 }, b = (h.first || {})["1"] || { n: 0, c: 0, people: 0 }, t = abTest(a, b);
+    var la = (h.later || {})["0"] || { n: 0, c: 0 }, lb = (h.later || {})["1"] || { n: 0, c: 0 };
+    var pairs = h.pairs || [], stems = AB.stems[h.hub] || {};
+    var both = pairs.filter(function(p){ return p[1] && p[3]; }).length,
+        five = pairs.filter(function(p){ return p[1] >= AB_MIN && p[3] >= AB_MIN; }).length,
+        ten = pairs.filter(function(p){ return p[1] >= 10 && p[3] >= 10; }).length,
+        best = pairs.reduce(function(m, p){ return Math.max(m, Math.min(p[1], p[3])); }, 0);
+    function vrow(name, file, x, l){
+      return '<tr><td class="lbl">' + name + '<span class="tag">' + file + '</span></td><td class="n">' + fmtNum(x.people) + '</td><td class="n">' + abCell(x.c, x.n) +
+        '</td><td class="n">' + qhSec(x.med_ms) + '</td><td class="n">' + abCell(l.c, l.n) + '</td></tr>';
+    }
+    var main = card(hubCell(h.hub) + " · first try, A against B", "since " + esc(fmtDate(h.since)) + " · " + plural(h.people, "person", "people") + " · " + plural(h.answers, "answer"),
+      '<p class="ab-verdict">' + abVerdict(t, a, b) + '</p>' +
+      '<div class="table-wrap"><table class="data"><thead><tr><th>Version</th><th class="n">People</th><th class="n">First try right</th><th class="n">Median time</th><th class="n">Later tries right</th></tr></thead><tbody>' +
+      vrow("A", "questions.json", a, la) + vrow("B", "variants.json", b, lb) + '</tbody></table></div>' +
+      '<p class="note">A first try is each person’s first answer to a question, on whichever version their device drew. Later tries show the other version, so they are mostly people remembering the answer and say little about the wording. Median time leaves out the mock.</p>');
+    var side = card("Single questions", "first tries on the question’s current wording",
+      '<div class="ab-ready"><span class="num">' + fmtNum(both) + '</span><span>have first tries on both versions</span>' +
+      '<span class="num">' + fmtNum(five) + '</span><span>have ' + AB_MIN + ' or more people on each (listed below)</span>' +
+      '<span class="num">' + fmtNum(ten) + '</span><span>have 10 or more on each, which question health’s “Versions differ” flag needs</span></div>' +
+      '<ul class="rules"><li>Each device starts each question on A or B (a hash of the device and the question), so about half the class starts on each, and every later try shows the other one.</li>' +
+      '<li>A gap on one question means the harder version may be unclear, or the easier one may give the answer away. Fix the version that’s off: <b>A</b> in <code>questions.json</code>, <b>B</b> in <code>variants.json</code>.</li></ul>');
+    /* by kind of question: does B read harder for one kind? */
+    var kinds = Object.keys(h.kinds || {}).map(function(k){ var x = h.kinds[k] || {}; return { k: k, a: x["0"] || { n: 0, c: 0 }, b: x["1"] || { n: 0, c: 0 } }; })
+      .sort(function(x, y){ return (y.a.n + y.b.n) - (x.a.n + x.b.n); });
+    var kindBody = kinds.length ? '<div class="table-wrap"><table class="data"><thead><tr><th>Kind</th><th class="n">A</th><th class="n">B</th><th class="n">B − A</th></tr></thead><tbody>' +
+      kinds.map(function(x){
+        var kt = abTest(x.a, x.b), sure = kt && x.a.n >= 30 && x.b.n >= 30 && Math.abs(kt.z) >= 1.96;
+        return '<tr><td class="lbl">' + esc(QH_KIND[x.k] || x.k) + '</td><td class="n">' + abCell2(x.a.c, x.a.n) + '</td><td class="n">' + abCell2(x.b.c, x.b.n) + '</td><td class="n">' +
+          (kt ? abSigned(kt.d) + (sure ? ' <span class="pill warn">not chance</span>' : '') : '—') + '</td></tr>';
+      }).join("") + '</tbody></table></div><p class="note">“Not chance” needs 30 first tries on each version and z of 1.96 or more.</p>' : empty("No first tries yet.");
+    /* the questions with the biggest gaps, from AB_MIN people on each version */
+    var list = pairs.filter(function(p){ return p[1] >= AB_MIN && p[3] >= AB_MIN; }).map(function(p){
+      var tt = abTest({ n: p[1], c: p[2] }, { n: p[3], c: p[4] });
+      return { qid: p[0], an: p[1], ac: p[2], bn: p[3], bc: p[4], t: tt };
+    }).sort(function(x, y){ return Math.abs(y.t.d) - Math.abs(x.t.d) || x.qid.localeCompare(y.qid); });
+    var shown = list.slice(0, AB.shown);
+    var qBody = list.length ? '<div class="table-wrap"><table class="data"><thead><tr><th>Question</th><th class="n">A</th><th class="n">B</th><th class="n">B − A</th><th>Flag</th></tr></thead><tbody>' +
+      shown.map(function(x){
+        var st = stems[x.qid] || {}, ready = x.an >= 10 && x.bn >= 10, gap = ready && Math.abs(x.t.d) >= 20 && Math.abs(x.t.z) >= 1.96;
+        return '<tr><td class="ab-q"><code>' + esc(x.qid) + '</code>' + (st.a ? '<span class="tag">A: ' + esc(st.a.slice(0, 140)) + (st.a.length > 140 ? "…" : "") + '</span>' : '') +
+          (st.b ? '<span class="tag">B: ' + esc(st.b.slice(0, 140)) + (st.b.length > 140 ? "…" : "") + '</span>' : '') + '</td>' +
+          '<td class="n">' + abCell2(x.ac, x.an) + '</td><td class="n">' + abCell2(x.bc, x.bn) + '</td><td class="n">' + abSigned(x.t.d) + '</td><td>' +
+          (gap ? '<span class="pill neg">Versions differ</span>' : ready ? '<span class="pill">10+ a side</span>' : '') + '</td></tr>';
+      }).join("") + '</tbody></table></div>' +
+      (list.length > shown.length ? '<p class="note"><button type="button" class="btn" data-ab-more>Show ' + Math.min(20, list.length - shown.length) + ' more of ' + fmtNum(list.length - shown.length) + '</button></p>' : '')
+      : empty("No question has " + AB_MIN + " people on each version yet" + (best ? " (the most so far: " + plural(best, "person", "people") + " on the smaller side)" : "") + ".");
+    return '<div class="grid" style="margin-bottom:var(--gap)"><div class="s8">' + main + '</div><div class="s4">' + side + '</div>' +
+      '<div class="s5">' + card("By kind of question", "first tries", kindBody) + '</div>' +
+      '<div class="s7">' + card("Questions with the biggest gaps", AB_MIN + " or more people on each version, largest gap first", qBody) + '</div></div>';
+  }
+  function renderAB(){
+    var el = $('[data-panel="ab"]'); if (!el || !secret) return;
+    if (!AB.res || AB.loading) {
+      if (!AB.res && !AB.loading) { abLoad(); return; }
+      loadingView(el); if (state.tab === "ab") setHead("Loading…", 0); return;
+    }
+    var res = AB.res;
+    if (res.error) { if (state.tab === "ab") setHead("", 0); el.innerHTML = errBox("Couldn’t load the A/B versions", res.error, "migration_v70"); return; }
+    var hubs = ((res.data && res.data.hubs) || []).filter(function(h){ return h && h.hub && !/^zz-/.test(h.hub); });
+    if (state.tab === "ab") setHead(hubs.length ? plural(hubs.length, "hub") + " with A/B versions · last " + (res.data.days || 30) + " days" : "No hub has A/B versions yet", AB.at);
+    el.innerHTML = hubs.length ? hubs.map(abHub).join("")
+      : empty("No answers with a version yet. A hub gets versions from <code>content/variants.json</code> (Perio since 2026-11-18).");
+  }
+  document.addEventListener("click", function(e){
+    if (e.target.closest("[data-ab-more]")) { AB.shown += 20; renderAB(); }
+  });
+
   /* ---------- views and routing (#overview, #inbox, ...: the back button and links work) ---------- */
   var RENDER = { overview: renderOverview, inbox: renderInbox, time: renderTime, questions: renderQuestions, clicks: renderClicks, searches: renderSearches,
-    engagement: renderEngagement, checkins: renderCheckins, surveys: renderSurveys, live: renderLive, hubs: renderHubAdmin, recap: renderRecapPanel, insights: renderInsights, health: renderHealth, timmy: renderTimmy };
+    engagement: renderEngagement, checkins: renderCheckins, surveys: renderSurveys, live: renderLive, hubs: renderHubAdmin, recap: renderRecapPanel, insights: renderInsights, health: renderHealth, ab: renderAB, timmy: renderTimmy };
   function renderView(t){
     var v = VIEWS[t], el = $('[data-panel="' + t + '"]');
     $("#viewTitle").textContent = v.t;
@@ -2615,6 +2767,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     if (t === "hubs") { renderHubAdmin(); if (!hubAdm.loading && (!dash.src || !hubAdm.rows)) loadHubAdmin(); return; }
     if (t === "recap") { renderRecapPanel(); return; }
     if (t === "insights") { if (!insights) { setHead("Loading…", 0); loadInsights(); } else renderInsights(); return; }
+    if (t === "ab") { renderAB(); return; }
     /* Question health loads one hub at a time (qhLoad); it needs the dashboard's list first, to know which hubs are live */
     if (t === "health") { if (!dash.src && !dash.err) { loadingView(el); setHead("Loading…", 0); loadDash().then(function(){ if (state.tab === "health") renderHealth(); }); } else renderHealth(); return; }
     var keys = v.needs || [];
@@ -2661,6 +2814,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     if (t === "recap") { loadPublished(); return; }
     if (t === "insights") { insights = null; setHead("Updating…", 0); loadInsights(); return; }
     if (t === "health") { QH.ex = {}; if (QH.hub) { setHead("Updating…", 0); qhLoad(QH.hub); } else renderHealth(); return; }
+    if (t === "ab") { AB.res = null; AB.stems = {}; QH.vx = {}; setHead("Updating…", 0); abLoad(); return; }
     if (t === "timmy") tm.chats = {};
     var keys = VIEWS[t].needs || [];
     $("#viewStamp").textContent = "Updating…";

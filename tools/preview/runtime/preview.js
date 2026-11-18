@@ -790,6 +790,23 @@
     { code: "slow", sev: "low", why: "Slow: the median first try takes 71 s, 2.6 times the hub's median for this kind of question (27 s). Long or confusing stem?" },
     { code: "abandoned", sev: "low", why: "Often left unanswered: 6 of 14 people who read it for 8 s or more moved on without answering (hub: 9%)." },
     { code: "expl_skipped", sev: "low", why: "Explanation skipped: 9 of 11 who missed it left the explanation within 3 s. Too long, or not helpful?" }];
+  /* the A/B versions page (migration_v70): made-up totals for Perio, B a little harder overall but within chance, one
+     question with a real gap and a few with 10+ a side; the ids are Perio's, so the page finds both stems */
+  function abFixture(t){
+    var ids = ["q1-01", "q1-17", "q1-31", "q2-14", "q2-27", "q3-12", "q3-30", "q3-42", "q4-03", "q4-15", "q4-26", "q4-38", "q4-L03", "q4-L13",
+      "q4-L23", "q4-L36", "q3-P02", "q5-02", "q5-R03", "q5-R13", "q5-R22", "q5-L01", "q5-L10"];
+    var pairs = ids.map(function(q, i){
+      var h = hash("ab|" + q), an = i < 4 ? 11 + h % 4 : 2 + h % 8, bn = i < 4 ? 10 + (h >> 3) % 5 : 2 + (h >> 4) % 8;
+      var pa = q === "q2-14" ? 0.85 : 0.55 + (h % 30) / 100, pb = q === "q2-14" ? 0.3 : pa - 0.12 + ((h >> 5) % 24) / 100;
+      return [q, an, Math.round(an * Math.min(1, pa)), bn, Math.round(bn * Math.max(0, Math.min(1, pb)))];
+    }).sort(function(x, y){ return Math.min(y[1], y[3]) - Math.min(x[1], x[3]) || (x[0] < y[0] ? -1 : 1); });
+    return { days: 30, at: iso(t), hubs: [{ hub: "perio", answers: 1180, people: 31, since: iso(t - 5 * 36e5), last: iso(t - 6e4),
+      first: { "0": { n: 352, c: 266, people: 29, med_ms: 21400 }, "1": { n: 371, c: 271, people: 28, med_ms: 22800 } },
+      later: { "0": { n: 220, c: 211 }, "1": { n: 237, c: 224 } },
+      kinds: { mcq: { "0": { n: 241, c: 186 }, "1": { n: 259, c: 192 } }, "mcq:tf": { "0": { n: 52, c: 41 }, "1": { n: 49, c: 37 } },
+               "mcq:2stmt": { "0": { n: 31, c: 21 }, "1": { n: 36, c: 24 } }, multi: { "0": { n: 28, c: 18 }, "1": { n: 27, c: 18 } } },
+      pairs: pairs }] };
+  }
   function qhFixture(hub, cur){
     var reviews = db.qhReviews || {}, t = now(), out = [];
     var ids = Object.keys(cur && typeof cur === "object" ? cur : {}).sort(function(x, y){ return hash(hub + "|" + x) - hash(hub + "|" + y); });
@@ -830,7 +847,7 @@
   /* the arcade games submit_arcade_score (and so xp_session_start) takes */
   var ARC_GAMES = ["sort", "snake", "stack", "match", "hangman", "fact", "blaster", "search", "whack", "flappy", "crusher", "probe", "quadrants",
     "perdle", "planer", "smile", "sweeper", "cross", "board", "cloze", "escape"];
-  var ADMIN_FNS = /^(admin_|get_reports$|get_visitor_|get_nuke_(summary|by_hub|recent|unlocks)$|get_click_summary$|get_survey_results$|get_exam_debriefs$|get_search_terms$|get_feature_events$|set_report_resolved$|get_reports_v2$|get_hub_recap$|get_insights$|get_insight_retries$|get_data_quality$|get_question_health$)/;
+  var ADMIN_FNS = /^(admin_|get_reports$|get_visitor_|get_nuke_(summary|by_hub|recent|unlocks)$|get_click_summary$|get_survey_results$|get_exam_debriefs$|get_search_terms$|get_feature_events$|set_report_resolved$|get_reports_v2$|get_hub_recap$|get_insights$|get_insight_retries$|get_data_quality$|get_question_health$|get_ab_summary$)/;
   function unauthorized(){ return { error: { status: 401, code: "28000", message: "unauthorized" } }; }
   function synthAdmin(fn){
     var d = 864e5, t = now();
@@ -874,6 +891,7 @@
       case "get_nuke_unlocks": return [{ hub: "occlusion", unlocks: 15, unused: 6 }, { hub: "perio", unlocks: 7, unused: 3 }];
       case "get_nuke_recent": return FAKE_NAMES.slice(0, 4).map(function(n, i){ return { display_name: n, hub: i % 2 ? "perio" : "occlusion", launched_at: iso(t - (i + 1) * 5 * 36e5) }; });
       case "get_insights": case "get_insight_retries": case "get_data_quality": return synthInsights(fn, t, d);
+      case "get_ab_summary": return abFixture(t);
       default: return [];
     }
   }
