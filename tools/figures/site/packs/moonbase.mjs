@@ -119,7 +119,7 @@ export function pack(T){
         s += domeSeams(cx, cy, z0, r, h, INK, function(a){ return a > 92 && a < 108; });
         /* the tooth on the dome, high on the side the sun lights */
         var em = onDome(cx, cy, z0, r, h, 100, .68), ec = P(em.c[0], em.c[1], em.c[2]);
-        s += FO(D(ring(em.c, em.e1, em.e2, .66, 0, 360, 20)), tr[0], 1.4) + T.tinyTooth(ec[0], ec[1] + .4, 1.0, "#FFFFFF");
+        s += FO(D(ring(em.c, em.e1, em.e2, .74, 0, 360, 20)), tr[0], 1.4) + T.tinyTooth(ec[0], ec[1] + .6, .78, "#FFFFFF");
         /* portholes round it */
         var ports = [[150, .26, .3], [28, .3, .32]];
         if (u.windows) ports = ports.concat([[-14, .26, .27], [8, .66, .24], [52, .62, .25], [158, .62, .22]]);

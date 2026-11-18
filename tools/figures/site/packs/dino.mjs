@@ -83,19 +83,19 @@ export function pack(T){
       note: "A round den of big boulders under a roof of giant fern fronds: a door under an arch of two tusks, an ammonite in the wall and a tooth carved over the door",
       ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the roof's tip", paint: "Stone color" },
       door: [5.5, 7.8], brush: [9.0, 7.2], statue: [2.7, 9.4], spots: { door: [6.15, 9.95] }, h: 8.8,
-      eaves: [[3.48, 7.52, 3.35], [7.52, 3.48, 3.35], 20], round: [5.5, 5.5, 2.45], base: T.arcPts(5.5, 5.5, 2.42, -40, 135, 14), block: [2.4, 2.6, 8.6, 8.9],
+      eaves: [[3.53, 7.47, 3.7], [7.47, 3.53, 3.7], 20], round: [5.5, 5.5, 2.45], base: T.arcPts(5.5, 5.5, 2.42, -40, 135, 14), block: [2.4, 2.6, 8.6, 8.9],
       draw: function(o){
         var u = o.up, pt = o.paint && o.paint !== "cream" && T.PAINTS[o.paint] ? T.PAINTS[o.paint] : null, s = "", lights = "", i;
         var st = pt ? { c: mix(pt.c, "#CFC4B2", .3), s: mix(pt.s, "#9C8C78", .35) } : { c: "#DCD1BF", s: "#AE9E88" };
         var c0 = P(5.5, 5.5, 0), cx = c0[0], gy = c0[1], R = T.rng(31);
         var on = function(a, r, z){ var t = a * Math.PI / 180; return P(5.5 + Math.cos(t) * r, 5.5 + Math.sin(t) * r, z); };
-        var wallR = function(z){ return 2.42 - .08 * z; };
+        var wallR = function(z){ return 2.42 - .075 * z; };
         /* the wall behind the boulders: the dark between them */
-        var ax0 = T.RX(2.42), ay0 = T.RY(2.42), ax1 = T.RX(2.15), zt = 3.5 * 10.5;
+        var ax0 = T.RX(2.42), ay0 = T.RY(2.42), ax1 = T.RX(2.12), zt = 3.85 * 10.5;
         s += FO("M" + f(cx - ax0) + " " + f(gy) + " C" + f(cx - ax0 - 2) + " " + f(gy - 14) + " " + f(cx - ax1 - 2) + " " + f(gy - zt + 8) + " " + f(cx - ax1) + " " + f(gy - zt) + " L" + f(cx + ax1) + " " + f(gy - zt) +
           " C" + f(cx + ax1 + 2) + " " + f(gy - zt + 8) + " " + f(cx + ax0 + 2) + " " + f(gy - 14) + " " + f(cx + ax0) + " " + f(gy) + " A" + f(ax0) + " " + f(ay0) + " 0 0 1 " + f(cx - ax0) + " " + f(gy) + " Z", mix(st.s, "#5E5248", .45), 2);
         /* big rounded boulders, three rows, the biggest at the bottom; lit on the left, in shade on the right */
-        [[.62, 1.3, 7, .5], [1.82, 1.15, 8, 0], [2.92, 1.0, 9, .5]].forEach(function(rw, ri){
+        [[.64, 1.32, 7, .5], [1.9, 1.18, 8, 0], [3.05, 1.05, 9, .5]].forEach(function(rw, ri){
           var n = rw[2], da = 196 / n, row = [];
           for (var k = 0; k < n; k++){
             var a = -55 + da * (k + rw[3]) + (R() - .5) * 5, r = wallR(rw[0]) + .08, q = on(a, r, rw[0]), q0 = on(a - da / 2, r, rw[0]), q1 = on(a + da / 2, r, rw[0]);
@@ -118,10 +118,10 @@ export function pack(T){
         s += ell(wq[0], wq[1], 4.6, 6.2, K.wood, 1.5) + wg;
         if (o.night) lights += T.glowAt(wq[0], wq[1], 10) + wg;
         /* the roof: a low dome thatched with giant fern fronds, three rows of frond tips, the lowest over the wall */
-        var R0 = 2.85, z0 = 3.35, H = 3.0, bq = P(5.5, 5.5, z0), bx = bq[0], by = bq[1], rax = T.RX(R0), ray = T.RY(R0), hy = H * 10.5 + ray * .2;
+        var R0 = 2.78, z0 = 3.7, H = 2.5, bq = P(5.5, 5.5, z0), bx = bq[0], by = bq[1], rax = T.RX(R0), ray = T.RY(R0), hy = H * 10.5 + ray * .2;
         var fc = o.snow ? SNOWF : o.night ? NFERN : FERN;
         var lv = function(a, ph, dn){ var t = a * Math.PI / 180, r = R0 * Math.cos(ph), q = P(5.5 + Math.cos(t) * r, 5.5 + Math.sin(t) * r, z0 + H * Math.sin(ph)); return [q[0], q[1] - ray * .2 * Math.sin(ph) + (dn || 0)]; };
-        var tiers = [[0, 9, 7.4], [.5, 7, 6.4], [.98, 5, 5.4]].map(function(tr){
+        var tiers = [[0, 9, 6.4], [.55, 7, 5.6], [1.02, 5, 4.8]].map(function(tr){
           var ph = tr[0], n = tr[1], drop = tr[2], segs = [], tips = [];
           for (var k = 0; k < n; k++){
             var a0 = 135 - k * 180 / n, am2 = 135 - (k + .5) * 180 / n, a1 = 135 - (k + 1) * 180 / n, tp = lv(am2, ph, drop);
@@ -144,7 +144,7 @@ export function pack(T){
         tiers.forEach(function(t, k){
           var up = k < 2 ? tiers[k + 1].ph : 1.45;
           t.tips.forEach(function(tp){
-            var a = lv(tp.a, t.ph + (up - t.ph) * .12, 0), b = lv(tp.a, Math.min(1.5, t.ph + (up - t.ph) * .95), 0), mx = tp.p[0], my = tp.p[1], vx = b[0] - mx, vy = b[1] - my, ln = Math.sqrt(vx * vx + vy * vy) || 1, d = "M" + f(mx) + " " + f(my) + " L" + f(b[0]) + " " + f(b[1]);
+            var b = lv(tp.a, Math.min(1.5, t.ph + (up - t.ph) * .95), 0), mx = tp.p[0], my = tp.p[1], vx = b[0] - mx, vy = b[1] - my, ln = Math.sqrt(vx * vx + vy * vy) || 1, d = "M" + f(mx) + " " + f(my) + " L" + f(b[0]) + " " + f(b[1]);
             for (var j = 1; j < 4; j++){ var px = mx + vx * j / 4, py = my + vy * j / 4, sx = -vy / ln * 3.4, sy = vx / ln * 3.4; d += " M" + f(px + sx) + " " + f(py + sy + 1.6) + " L" + f(px) + " " + f(py) + " L" + f(px - sx) + " " + f(py - sy + 1.6); }
             s += L(d, .9, fc[3], .85);
           });
@@ -153,10 +153,10 @@ export function pack(T){
         s += O(tiers[0].cap, 2) + T.HI("M" + f(bx - rax * .7) + " " + f(by - hy * .42) + " A" + f(rax * .82) + " " + f(hy * .82) + " 0 0 1 " + f(bx - rax * .22) + " " + f(by - hy * .86), 2);
         if (o.snow) s += T.snowDome(5.5, 5.5, z0, R0, H, .45);
         /* the chimney: a short stack of round stones on the right slope, smoking */
-        var ch = P(6.75, 5.35, 5.95), cx2 = ch[0], cy2 = ch[1] - 2, cw = 5.4;
+        var ch = P(6.7, 5.35, 5.95), cx2 = ch[0], cy2 = ch[1] - 2, cw = 5.4;
         s += FO("M" + f(cx2 - cw) + " " + f(cy2 + 3) + " L" + f(cx2 - cw + .6) + " " + f(cy2 - 13) + " A" + f(cw - .6) + " 2.4 0 0 1 " + f(cx2 + cw - .6) + " " + f(cy2 - 13) + " L" + f(cx2 + cw) + " " + f(cy2 + 3) + " A" + f(cw) + " 2.6 0 0 1 " + f(cx2 - cw) + " " + f(cy2 + 3) + " Z", st.c, 1.6);
         s += F("M" + f(cx2 + 1.4) + " " + f(cy2 + 5.4) + " L" + f(cx2 + 1.4) + " " + f(cy2 - 10.6) + " L" + f(cx2 + cw - .6) + " " + f(cy2 - 13) + " L" + f(cx2 + cw) + " " + f(cy2 + 3) + " A" + f(cw) + " 2.6 0 0 1 " + f(cx2 + 1.4) + " " + f(cy2 + 5.4) + " Z", st.s, .8);
-        s += L("M" + f(cx2 - cw + .3) + " " + f(cy2 - 5) + " Q" + f(cx2) + " " + f(cy2 - 2.6) + " " + f(cx2 + cw - .3) + " " + f(cy2 - 5) + " M" + f(cx2 - 1) + " " + f(cy2 - 5) + " l-.4 -7.6 M" + f(cx2 + 2.6) + " " + f(cy2 + 3) + " l.2 -7.4", 1, INK, .55);
+        s += L("M" + f(cx2 - cw + .3) + " " + f(cy2 - 4.6) + " Q" + f(cx2) + " " + f(cy2 - 2) + " " + f(cx2 + cw - .3) + " " + f(cy2 - 4.6) + " M" + f(cx2 - cw + .5) + " " + f(cy2 - 9.6) + " Q" + f(cx2) + " " + f(cy2 - 7) + " " + f(cx2 + cw - .5) + " " + f(cy2 - 9.6) + " M" + f(cx2 - 1.6) + " " + f(cy2 - 4) + " q-.6 2.6 .2 5.6 M" + f(cx2 + 2.4) + " " + f(cy2 - 9) + " q-.4 2.4 .2 4.6 M" + f(cx2 - 2.4) + " " + f(cy2 - 13) + " q.6 1.8 0 3.6", 1.1, INK, .7);
         s += ell(cx2, cy2 - 13, cw - .6, 2.4, "#4A3A3A", 1.3) + (o.snow ? ell(cx2 - 1, cy2 - 14.6, cw - 1, 1.6, "#FFFFFF", 0) : "") + T.smoke(cx2 + 1, cy2 - 18);
         s += frond(cx2 - 7, cy2 + 6, 8, -20, 20, 2.2, [fc[0], fc[3]], 1, 4) + frond(cx2 + 7, cy2 + 6, 7, -160, -20, 2.2, [fc[2], fc[3]], 1, 4);
         /* the top: a tuft of young fronds, or the flag */
@@ -212,7 +212,7 @@ export function pack(T){
   var scenes = {
     "volcano-valley": T.hillScene({
       note: "Giant ferns and cycads on the valley floor, a long-neck browsing far off and a gentle volcano puffing on the skyline",
-      path: "stones", treeKind: "palm", lamp: "tiki", skirt: "moss", grade: ["#FFD9A0", .05],
+      path: "stones", treeKind: "palm", lamp: "tiki", skirt: "grass", grade: ["#FFD9A0", .05],
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5B9466", "#4F865B", "#43784F", "#356442"] : ["#A9D886", "#98CC76", "#84BD66", "#62A14F"]; },
       sky: function(o){
         if (o.night) return T.bands(["#1C2256", "#242C66", "#2D3874", "#374381", "#43508C", "#4D5A94"], 0, 150) + T.moon(84, 40) + T.starField(23, 26, 96);

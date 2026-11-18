@@ -419,7 +419,7 @@ export function pack(T){
         s += truss([X0 + .1, Y0 + .1, H], [X0 + .1, Y0 + .1, zt], e1, e2, 12, tr) + truss([X0 + W - .32, Y0 + .1, H], [X0 + W - .32, Y0 + .1, zt], e1, e2, 12, tr);
         s += FO(D(T.onY(Y0 + .4, T.rectUV(X0 + .5, X0 + W - .5, H + .9, zt - .05))), o.night ? "#B0407A" : PINK[0], 1.4);
         s += L(D(T.onY(Y0 + .4, [[X0 + .5, H + 1.05], [X0 + W - .5, H + 1.05]]), true), 1.2, PINK[1]);
-        q = P(X0 + W / 2, Y0 + .4, (H + .9 + zt) / 2 + .1); s += T.tinyTooth(q[0] - 3.4, q[1] + .6, 1.35, "#FFFFFF") + bolt(q[0] + 6.6, q[1] + .4, 1.3, YEL[0], .9);
+        s += onWall("y", Y0 + .4, X0 + W / 2 - .12, (H + .9 + zt) / 2 + .1, T.tinyTooth(-3, -2, 1.3, "#FFFFFF") + bolt(7.4, 3.4, 1.05, YEL[0], .9) + T.star5(-11.6, 6.4, 2.6, YEL[0]));
         s += truss([X0 + .1, Y0 + .1, zt], [X0 + W - .1, Y0 + .1, zt], [0, tw, 0], [0, 0, tw], 16, tr);
         /* the deck: a black skirt, a board floor, a row of bulbs along its edge */
         s += box(X0, Y0, 0, W, Dp, H, { top: o.snow ? "#FFFFFF" : "#8A6A52", left: JET[1], right: JET[2] });
@@ -443,19 +443,19 @@ export function pack(T){
         s += L(gd, .7, "#8A7A6E");
         /* the spotlights clamped to the beam, aimed at the mic */
         var spot = function(x){ var c = P(x, Y0 + .32, zt - .05), rot = aim(c); return L("M" + m(c[0], c[1] - 2) + " v3", 1.4) + '<g transform="translate(' + m(c[0], c[1] + 1.4) + ") rotate(" + rot + ')">' + L("M-3 -.6 q3 -2.8 6 0", 1.2) + FO("M-2.3 0 h4.6 l.7 6 h-6 z", "#2E2A36", 1.1) + ell(0, 6, 3, 1.2, o.night ? K.litHot : "#FFF0B3", .9) + "</g>"; };
-        s += spot(X0 + .55) + spot(X0 + W - .55);
+        s += spot(X0 + .4) + spot(X0 + W - .4);
         if (o.snow) s += F(D([[X0 + .1, Y0 + .1, zt + tw], [X0 + W - .1, Y0 + .1, zt + tw], [X0 + W - .1, Y0 + .1 + tw, zt + tw], [X0 + .1, Y0 + .1 + tw, zt + tw]]), "#FFFFFF");
         return s;
       },
       lights: function(){
         var s = "", i, q, X0 = .2, W = 2.9, Y0 = .25, zt = 3.4;
         for (i = 0; i < 9; i += 2){ q = P(X0 + .18 + i * (W - .36) / 8, Y0 + 2.4, .38); s += T.glowAt(q[0], q[1], 5); }
-        [X0 + .55, X0 + W - .55].forEach(function(x){ q = P(x, Y0 + .32, zt); s += T.glowAt(q[0], q[1] + 7, 6); });
+        [X0 + .4, X0 + W - .4].forEach(function(x){ q = P(x, Y0 + .32, zt); s += T.glowAt(q[0], q[1] + 7, 6); });
         return s;
       },
       bits: function(){
         var X0 = .2, W = 2.9, Y0 = .25, zt = 3.4, s = "", R = T.rng(31), i;
-        [[X0 + .55, 0, "#FFF3B0", 0], [X0 + W - .55, 0, "#FFB3DA", .5]].forEach(function(t){
+        [[X0 + .4, 0, "#FFF3B0", 0], [X0 + W - .4, 0, "#FFB3DA", .5]].forEach(function(t){
           var c = P(t[0], Y0 + .32, zt - .05), mk = P(1.7, 1.75, .55), len = Math.sqrt(Math.pow(mk[0] - c[0], 2) + Math.pow(mk[1] - c[1], 2)) + 2;
           s += '<g transform="translate(' + m(c[0], c[1] + 1.4) + ") rotate(" + f(aim(c)) + ')"><path d="M0 6 L-8 ' + f(len) + " L8 " + f(len) + ' Z" fill="' + t[2] + '" opacity=".45" style="transform-box:fill-box;transform-origin:50% 0;animation:tp-flutter 1.4s ease-in-out infinite;animation-delay:' + t[3] + 's"/></g>';
         });
