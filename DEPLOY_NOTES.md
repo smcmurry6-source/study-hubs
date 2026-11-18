@@ -32,6 +32,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (Link my devices beside every name button, BUG-164 and BUG-165, Claude Code)** — Sam: "link my device is
+  nowhere to be found. add it to the settings page next to where you change your name. anywhere else that you can change
+  your name, add another button to link device". Since the redesign it lived only in an old hub's Stats panel, which the
+  new pages never show (the redesign's plan said "folded under the name dialog"; it never was). `widget/linkask.js` has
+  the whole thing now as one card, `shLinkAsk.link({ back, from })`: get a code (and send or copy the link), or type the
+  other device's code (it links at the sixth character), tracked as `link:open=<where>`, `link:code`, `link:share`,
+  `link:linked`, `link:fail`. Buttons for it: the dashboard's Settings (a row under Your name), its You card and its name
+  window (`widget/dash.js`); a hub's More → Settings (`widget/hub.js`), its name window, Timmy Time's and the idea board's
+  "Posting as … change" (`widget/v3.js` opens any `[data-sh-link]` button; `widget/podcast.js`, `widget/ideas.js`); an
+  old hub's Stats and Settings name boxes and its rank card (`widget/v3.js`, `widget/ranks.js`, `widget/v3.css`). A
+  hub's Settings now draws Your name and Link my devices before the shared widget is in (a tap waits for it): opened
+  straight on `#more/settings`, both rows were missing. About page, the dashboard tour's Settings step, Ask Timmy's site
+  help and the event taxonomy updated; bundles rebuilt.
 - **2026-11-17 (the dashboard at the large text sizes, BUG-076 and BUG-163, Claude Code, #401)** — `widget/dash.css` (and
   the rebuilt `widget/site.bundle.css`). On a 320 px phone at XX-Large the page scrolled 49 px sideways (10 px at X-Large):
   the "You" card's week dots now shrink, still round, when the card is narrower than the week, and "Start studying" wraps
