@@ -42,8 +42,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   any sessions from now on will add open items to the to do list and check things off that have been done", went into the
   existing rule ([to-dos-go-in-the-vault](vault/rules/to-dos-go-in-the-vault.md): check the list at the start, tick and add
   in the PR, tick what you find already done) and the PR template's new "To-do list" section. Nothing on the site changed.
+- **2026-11-18 (CI back on the newest Ubuntu, Claude Code, #407)** — The inbox to-do from #402. Every workflow is back on
+  `runs-on: ubuntu-latest` (Ubuntu 26.04 since 2026-11-18) with Playwright **1.63.0** in place of 1.56.1 (the
+  `playwright@` lines in `check.yml`, `release.yml` and `after-merge.yml`): 1.63.0 has Chromium, WebKit and Firefox
+  builds for `ubuntu26.04-x64`, and it is the copy preinstalled in Claude Code cloud sessions, so a session's run and CI's
+  use the same Chromium (build 1243). The 26.04 image has PostgreSQL 18 (24.04 had 16): `tools/release/pg.js` takes the
+  newest it finds. Run here on 1.63.0, the accessibility suite passed with nothing new or better than its baseline;
+  `tools/release/baselines/a11y.json` was re-recorded (`--update`) only to drop the archived Occlusion's and Heme & Endo
+  Exam 2's screens and add Heme & Endo Exam 3's 14, all at zero. The performance budgets passed and are unchanged:
+  `perf.js --update` would have raised several (budgets go up only with Sam's OK), and bytes and requests don't depend on
+  the browser. The site itself doesn't change. What to do the next time `ubuntu-latest` moves:
+  [verify-before-pushing](vault/how-to/verify-before-pushing.md).
+
 - **2026-11-18 (more cosmetics: six year-round collections, five rare costumes, six paints, Claude Code)** — Sam: "Lets work on
-  timmy outfits and place cosmetics. Go crazy" ([the task](vault/tasks/2026-11-18-more-cosmetics.md)). **Six collections**
+  timmy outfits and place cosmetics. Go crazy" ([the task](vault/tasks/done/2026-11-18-more-cosmetics.md)). **Six collections**
   (`COLLECTIONS` in `tools/figures/site/sets.mjs`, one pack each in `tools/figures/site/packs/`: `dino`, `moonbase`, `reef`,
   `desert`, `arcade`, `rockshow`), eight pieces each like a season's set (a Legendary home, an Epic scene, outfits Common to
   Rare, yard pieces Uncommon to Epic), but everyday pieces in the daily and weekly picks all year: the rotation goes from 46

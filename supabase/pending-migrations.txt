@@ -12,4 +12,4 @@
 # migration_v62 (the boosts' prices; a boost bought during a medal's double XP waits its turn) was applied on 2026-11-17 (PR #394).
 # migration_v63 (a medal moves a bought boost after its 24 hours; the Bowling trophy on the server) was applied on 2026-11-17 (PR #395).
 # migration_v64 (matching items graded as an order; Perio's Stage & Grade in the arcade's lists) was applied on 2026-11-17.
-migration_v65.sql   # more cosmetics: six year-round collections, five rare costumes, six paints (Sam, 2026-11-18); apply once its PR is live
+# migration_v65 (more cosmetics: six year-round collections, five rare costumes, six paints) was applied on 2026-11-18 (PR #409).

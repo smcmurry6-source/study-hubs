@@ -20,12 +20,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [x] **Show the Shiny Gold Crowns you've earned on Home's Today card** (Sam, 2026-11-17). Done: a Crowns tile with the balance (what's left to spend; "earned in all" in its tooltip) that opens the shop (#391).
 - [x] **More cosmetics for Timmy and Timmy's place** (Sam, 2026-11-17): new outfits and place pieces
   ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`). Sam brought it back on 2026-11-18 ("Go
-  crazy"): now [its task](2026-11-18-more-cosmetics.md).
+  crazy"): now [its task](done/2026-11-18-more-cosmetics.md).
 - [ ] **A tall piece in the front yard slot covers Timmy at the door** (2026-11-18, seen on the collection sheets): the
   `front` slot (`SLOTS` in `tools/figures/site/place.mjs`, x 6.7, y 10.2) is in front of every home's `spots.door`, so a tall
   piece there (Desert ranch's windmill, July 4's fireworks stand, Thanksgiving's balloon) hides him on the card. Ideas: draw
   Timmy over a front-slot piece when he's at the door, or nudge the door spot when the front slot holds a tall piece. Ask Sam.
-- [ ] **Kit niceties the collection drawers asked for** (2026-11-18, [the task](2026-11-18-more-cosmetics.md)): a yard egg
+- [ ] **Kit niceties the collection drawers asked for** (2026-11-18, [the task](done/2026-11-18-more-cosmetics.md)): a yard egg
   can only animate its `.tp-eb` group, so the moon rover can't roll, the dish can't turn and the windmill's and wagon's wheels
   only blur (a hook that moves the whole piece while its egg plays, within [motion-cost](../reference/motion-cost.md)); a coral
   or kelp `treeKind` for the reef and a plain one for the moon (both use the crystal tree); no snow on an underwater scene.
@@ -244,7 +244,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   both wider than this: the tabs at XX-Large on any phone, the hand-off scene too): the hub's tab bar labels
   (Home, Notes, Questions, More) run into each other, and the Dark Matter unlock scene (`widget/journeys.js`) cuts off its "Rank 7 of 7"
   line and its sentence at the right edge. Neither scrolls the page; both only at that size.
-- [ ] **CI back on the newest Ubuntu** (2026-11-18, found on #402): the workflows are pinned to `runs-on: ubuntu-24.04` because
+- [x] **CI back on the newest Ubuntu** (2026-11-18, found on #402; done: #407, Playwright 1.63.0 on `ubuntu-latest`, the a11y
+  baseline re-recorded, the perf budgets unchanged because they pass): the workflows are pinned to `runs-on: ubuntu-24.04` because
   `ubuntu-latest` became Ubuntu 26.04, which Playwright 1.56.1 doesn't support. Before 24.04 is retired: upgrade Playwright in
   `.github/workflows/*.yml` (and `PLAYWRIGHT_PATH` setups) to one that supports 26.04, re-record the a11y and perf baselines
   (`node tools/release/a11y.js --update`, `perf.js`), check the smoke test and the device matrix, then go back to `ubuntu-latest`.
