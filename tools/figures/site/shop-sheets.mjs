@@ -23,11 +23,12 @@ const here = path.dirname(fileURLToPath(import.meta.url)), root = path.resolve(h
 const [outDir = ".", only = ""] = process.argv.slice(2);
 let chromium; try { ({ chromium } = createRequire(import.meta.url)("playwright")); } catch (e) { ({ chromium } = createRequire("/opt/node-tools/")("playwright")); }
 const bust = "?t=" + Date.now(), imp = (f) => import(pathToFileURL(path.join(here, f)).href + bust);
-const { INK, C } = await imp("style.mjs"), { placeKit } = await imp("place.mjs"), { SEASONS, RANKS } = await imp("sets.mjs");
+const { INK, C } = await imp("style.mjs"), { placeKit } = await imp("place.mjs"), { SEASONS, RANKS, COLLECTIONS } = await imp("sets.mjs");
 let shopKit = null; try { ({ shopKit } = await imp("shop.mjs")); } catch (e) { if (e.code !== "ERR_MODULE_NOT_FOUND") throw e; }
-const SETS = { seasons: SEASONS.map((s) => ({ k: s.k, n: s.n, when: s.when, gift: !!s.gift, items: s.items })), ranks: RANKS };
+const SETS = { seasons: SEASONS.map((s) => ({ k: s.k, n: s.n, when: s.when, gift: !!s.gift, items: s.items })), ranks: RANKS,
+  collections: COLLECTIONS.map((s) => ({ k: s.k, n: s.n, note: s.note, items: s.items })) };
 const PACKS = [];
-for (const k of SEASONS.map((s) => s.k).concat(["ranks"])) { const f = path.join(here, "packs", k + ".mjs"); if (fs.existsSync(f)) PACKS.push((await imp("packs/" + k + ".mjs")).pack); }
+for (const k of SEASONS.map((s) => s.k).concat(["ranks"], COLLECTIONS.map((s) => s.k))) { const f = path.join(here, "packs", k + ".mjs"); if (fs.existsSync(f)) PACKS.push((await imp("packs/" + k + ".mjs")).pack); }
 const K = placeKit(INK, C, PACKS, SETS), SHOP = shopKit ? shopKit(INK, C) : null;
 const art = JSON.parse(fs.readFileSync(path.join(root, "tools/preview/design/art.js"), "utf8").replace(/^[\s\S]*?window\.SH_ART = /, "").replace(/;\s*$/, ""));
 const timmy = (art.timmy.moods.find((m) => m.k === "happy") || art.timmy.moods[0]).svg;

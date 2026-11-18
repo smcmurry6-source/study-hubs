@@ -169,7 +169,14 @@ export function placeKit(INK, C, PACKS, SETS){
     sky:    { n: "Sky",    c: "#CFEAF8", s: "#9CCBE6" },
     butter: { n: "Butter", c: "#FFF0B3", s: "#E8CF73" },
     lilac:  { n: "Lilac",  c: "#E6DAF7", s: "#B9A6DD" },
-    peach:  { n: "Peach",  c: "#FFD9C2", s: "#EDAE8C" }
+    peach:  { n: "Peach",  c: "#FFD9C2", s: "#EDAE8C" },
+    /* six more (2026-11-18, "Go crazy") */
+    coral:  { n: "Coral",  c: "#FFCFC4", s: "#EFA392" },
+    sage:   { n: "Sage",   c: "#DCE9D2", s: "#AFC79E" },
+    sand:   { n: "Sand",   c: "#F3E3C6", s: "#D8BE92" },
+    rose:   { n: "Rose",   c: "#F9D6E3", s: "#E3A5BD" },
+    slate:  { n: "Slate",  c: "#D9E1EA", s: "#A9B7C8" },
+    teal:   { n: "Teal",   c: "#C9EEEC", s: "#8FD0CC" }
   };
   /* the mushroom's cap, the castle's roofs and the lighthouse's stripes take a bolder set */
   var BOLD = {
@@ -178,7 +185,13 @@ export function placeKit(INK, C, PACKS, SETS){
     sky:    { n: "Blue",        c: "#3FA7E0", s: "#2378B0" },
     butter: { n: "Gold",        c: "#F2C94C", s: "#C9971C" },
     lilac:  { n: "Purple",      c: "#9B7BE0", s: "#6E50B8" },
-    peach:  { n: "Orange",      c: "#F59A6E", s: "#C96A44" }
+    peach:  { n: "Orange",      c: "#F59A6E", s: "#C96A44" },
+    coral:  { n: "Coral red",   c: "#F2735E", s: "#C9503D" },
+    sage:   { n: "Moss",        c: "#7FA86A", s: "#5C8549" },
+    sand:   { n: "Tan",         c: "#C9A066", s: "#9E7A44" },
+    rose:   { n: "Pink",        c: "#E26A9A", s: "#B84874" },
+    slate:  { n: "Navy",        c: "#4F6A8F", s: "#37506F" },
+    teal:   { n: "Teal",        c: "#2FA8A8", s: "#1F7F80" }
   };
   var NIGHT = "#141A40";
 
@@ -2345,6 +2358,8 @@ export function placeKit(INK, C, PACKS, SETS){
     if (SETS){
       SETS.seasons.forEach(function(se){ se.items.forEach(function(it){ SET_INFO[it.id] = { n: it.n, rarity: cap(it.rarity), price: it.price, set: se.k, kind: it.kind }; }); });
       SETS.ranks.forEach(function(r){ [r.outfit, r.yard].forEach(function(q, i){ SET_INFO[q[0]] = { n: q[1], rarity: cap(q[2]), price: 0, set: "rank", rank: r.gtier, rankName: r.rank, kind: i ? "yard" : "outfit" }; }); });
+      /* the year-round collections (sets.mjs COLLECTIONS): a set like a season's, but in the everyday rotation */
+      (SETS.collections || []).forEach(function(co){ co.items.forEach(function(it){ SET_INFO[it.id] = { n: it.n, rarity: cap(it.rarity), price: it.price, set: co.k, coll: true, kind: it.kind }; }); });
     }
   })();
   /* one set's drawings join the kit. The design page's kit is built with every pack; the engine's (widget/hub-art/place.js)
@@ -2359,6 +2374,9 @@ export function placeKit(INK, C, PACKS, SETS){
         var x = list[id], m = SET_INFO[id] || {};
         x.k = id; x.id = id; x.set = m.set || got.k; x.theme = ""; x.n = m.n || x.n || id; x.rarity = m.rarity || x.rarity || "Legendary"; x.price = m.price != null ? m.price : x.price || 0;
         if (m.rank){ x.rank = m.rank; x.rankName = m.rankName; }
+        if (m.coll) x.coll = true;
+        /* an outfit with its own eyewear, or one that covers his face, says so (noLoupes) and the loupes stay off */
+        if (pair[0] === "outfits" && x.noLoupes && NO_LOUPES.indexOf(id) < 0) NO_LOUPES.push(id);
         pair[1][id] = x; SET_OF[id] = x.set;
         if (pair[0] === "yard"){ EGGS[id] = x.egg || { n: x.n, does: "a little wobble", say: "" }; if (x.bits) EGG_ANIM[id] = x.anim || "tp-pop 2.2s"; }
       });
@@ -2483,18 +2501,19 @@ export function placeKit(INK, C, PACKS, SETS){
     HEALTH: HEALTH, healthFor: healthFor,
     VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout,
     onLand: function(scene, x, y){ var q = P(x, y, 0); return sceneOn(SCENES[scene] || SCENES.hill, q[0], q[1]); }, unproject: unP, N: N, S: S, FIX: FIX, SLOT_AT: SLOTS,
-    HOMES: meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set"]),
-    SCENES: meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set"]),
-    YARD: meta(YARD, ["n", "note", "rarity", "theme", "price", "id", "wide", "set", "rank", "rankName"]),
+    HOMES: meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set", "coll"]),
+    SCENES: meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set", "coll"]),
+    YARD: meta(YARD, ["n", "note", "rarity", "theme", "price", "id", "wide", "set", "rank", "rankName", "coll"]),
     SLOTS: SLOT_ORDER.map(function(k){ return { k: k, n: SLOTS[k].n }; }),
     PAINTS: Object.keys(PAINTS).map(function(k){ return { k: k, n: PAINTS[k].n, c: PAINTS[k].c, bold: BOLD[k].c, boldName: BOLD[k].n, rarity: k === "cream" ? "" : "Common", price: k === "cream" ? 0 : 150, id: k === "cream" ? "" : "paint-" + k }; }),
     UPGRADES: UPGRADES, MATS: MATS.map(function(m){ return { k: m.k, n: m.n, c: m.c }; }),
-    OUTFITS: meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName", "costume"]), dress: dress, loupes: loupes, NO_LOUPES: NO_LOUPES, SETS: SETS || null,
+    OUTFITS: meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName", "costume", "coll"]), dress: dress, loupes: loupes, NO_LOUPES: NO_LOUPES, SETS: SETS || null,
     THEMES: THEMES, EGGS: EGGS, burst: burst, thumb: thumb,
     outfitParts: function(k){ var o = OUTFITS[k]; return o ? { back: o.back || "", face: o.face || "", top: o.top || "" } : null; },
     /* a set piece's set ("halloween", "rank"...) and kind, known from the list before its pack is loaded; whether a
        set's pack is here; and a pack joining late (the lists above are made again) */
     setOf: function(id){ return SET_INFO[id] ? SET_INFO[id].set : ""; }, setInfo: function(id){ return SET_INFO[id] || null; },
+    collOf: function(id){ return SET_INFO[id] && SET_INFO[id].coll ? SET_INFO[id].set : ""; },
     hasPack: function(k){ return !!PACKED[k]; },
     addPack: function(pack){ addPack(pack); lists(); }
   };

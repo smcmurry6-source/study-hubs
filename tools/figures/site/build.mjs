@@ -62,10 +62,11 @@ const { stageKit } = await import("./stage.mjs");
 const { recapKit } = await import("./recap.mjs");
 /* the sets of Timmy's place: sets.mjs lists every piece (the shop's catalog has the same rows), and each set's drawings
    are one pack in packs/<set>.mjs (a function handed the kit's tools). A set with no pack yet isn't drawn; --strict fails on one. */
-const { SEASONS, RANKS } = await import("./sets.mjs");
-const SETS = { seasons: SEASONS.map((s) => ({ k: s.k, n: s.n, when: s.when, gift: !!s.gift, items: s.items })), ranks: RANKS };
+const { SEASONS, RANKS, COLLECTIONS, COSTUMES } = await import("./sets.mjs");
+const SETS = { seasons: SEASONS.map((s) => ({ k: s.k, n: s.n, when: s.when, gift: !!s.gift, items: s.items })), ranks: RANKS,
+  collections: COLLECTIONS.map((s) => ({ k: s.k, n: s.n, note: s.note, items: s.items })) };
 const PACKS = [], onlyPack = process.argv.includes("--pack") ? process.argv[process.argv.indexOf("--pack") + 1] : "";   // --pack <set> --dry: check one set while drawing it, write nothing
-for (const k of SEASONS.map((s) => s.k).concat(["ranks"]).filter((k) => !onlyPack || k === onlyPack)) {
+for (const k of SEASONS.map((s) => s.k).concat(["ranks"], COLLECTIONS.map((s) => s.k)).filter((k) => !onlyPack || k === onlyPack)) {
   const file = path.join(path.dirname(fileURLToPath(import.meta.url)), "packs", k + ".mjs");
   if (fs.existsSync(file)) PACKS.push({ k, pack: (await import(pathToFileURL(file).href)).pack });
 }
@@ -171,6 +172,7 @@ if (placeKit) {
   const want = {}, kinds = { home: K.HOMES, scene: K.SCENES, yard: K.YARD, outfit: K.OUTFITS };
   for (const se of SEASONS) for (const it of se.items) want[it.id] = { kind: it.kind, set: se.k };
   for (const r of RANKS) { want[r.outfit[0]] = { kind: "outfit", set: "ranks" }; want[r.yard[0]] = { kind: "yard", set: "ranks" }; }
+  for (const co of COLLECTIONS) for (const it of co.items) want[it.id] = { kind: it.kind, set: co.k };
   const drawnSets = new Set(PACKS.map((x) => x.k)), missing = [...new Set(Object.values(want).map((w) => w.set))].filter((k) => !drawnSets.has(k));
   for (const [id, w] of Object.entries(want)) if (drawnSets.has(w.set) && !kinds[w.kind].some((x) => x.k === id)) bad.push("set " + w.set + ": " + w.kind + " " + id + " isn't drawn (packs/" + w.set + ".mjs)");
   for (const [kind, list] of Object.entries(kinds)) for (const x of list) if (x.set && !(want[x.k] && want[x.k].kind === kind)) bad.push("pack piece " + x.k + " (" + kind + ") isn't in sets.mjs");
@@ -222,12 +224,13 @@ if (placeKit) {
   /* the loupes go on him bare and with every outfit that has no eyewear of its own */
   { const t = pet({ hp: 85 }); if (!/shpet-loupes/.test(K.dress(t, "", { loupes: 3 }))) bad.push("loupes: dress() didn't put them on a bare Timmy");
     for (const o of K.OUTFITS) { const d = K.dress(t, o.k, { loupes: 5 }); if (/shpet-loupes/.test(d) !== (K.NO_LOUPES.indexOf(o.k) < 0)) bad.push("loupes with outfit " + o.k + ": wrong"); }
-    for (const k of K.NO_LOUPES) if (!K.OUTFITS.some((o) => o.k === k)) bad.push("NO_LOUPES names an outfit that isn't drawn: " + k); }
-  /* the shop's ten: the five everyday outfits and the five rare costumes are drawn, under the catalog's ids, and a
+    if (!onlyPack) for (const k of K.NO_LOUPES) if (!K.OUTFITS.some((o) => o.k === k)) bad.push("NO_LOUPES names an outfit that isn't drawn: " + k); }
+  /* the shop's everyday five and every rare costume in sets.mjs (COSTUMES) are drawn, under the catalog's ids, and a
      costume is marked as one and has three lines */
   for (const id of ["scrub-cap", "bow-tie", "safety-glasses", "white-coat", "graduation-cap"]) { const o = K.OUTFITS.find((x) => x.id === id); if (!o || o.costume || o.set) bad.push("everyday outfit " + id + ": not drawn as an outfit of the kit"); }
-  for (const id of ["pirate", "astronaut", "detective", "chef", "captain-enamel"]) { const o = K.OUTFITS.find((x) => x.id === id); if (!o || !o.costume || !(o.say && o.say.length === 3)) bad.push("rare costume " + id + ": not drawn, not marked costume, or without its three lines"); }
-  if (K.OUTFITS.filter((o) => o.costume).length !== 5) bad.push("the kit marks " + K.OUTFITS.filter((o) => o.costume).length + " costumes; the catalog has five");
+  /* (checked on the whole kit only: --pack <set> --dry is about that one pack) */
+  if (!onlyPack) for (const [id] of COSTUMES) { const o = K.OUTFITS.find((x) => x.id === id); if (!o || !o.costume || !(o.say && o.say.length === 3)) bad.push("rare costume " + id + ": not drawn, not marked costume, or without its three lines"); }
+  if (!onlyPack && K.OUTFITS.filter((o) => o.costume).map((o) => o.id).sort().join() !== COSTUMES.map((c) => c[0]).sort().join()) bad.push("the kit marks " + K.OUTFITS.filter((o) => o.costume).map((o) => o.id).join(", ") + " as costumes; sets.mjs's COSTUMES has " + COSTUMES.map((c) => c[0]).join(", "));
   /* Timmy's walks */
   for (const [h, sc] of pairs) for (const [yard, journey] of [[{}, 0], [fill(0), 0], [fill(3), 0], [Object.assign(fill(2), { side: "lane" }), 0], [fill(1), 1]]) {
     const o = { home: h.k, scene: sc.k, yard, up: ups(h), holiday: "halloween", journey }, L = K.layout(o);
