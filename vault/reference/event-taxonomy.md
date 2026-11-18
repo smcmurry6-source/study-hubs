@@ -24,6 +24,11 @@ Every analytics row the site writes, where it comes from, what one row means and
   the database. Convert `*_at` the same way before grouping by day.
 - **One activity ping = 25 seconds of active time**: sent while the tab is visible and someone has touched it in the
   last 15 minutes (the idle rule, from 2026-09-25; Listen and Timmy Time keep it awake). Minutes = pings × 25 / 60.
+  **From 2026-11-18, also while narration or a Timmy Time episode plays with the tab hidden or the phone locked**
+  (Sam's call), measured by the audio's own clock (how far it played, at its speed), so a late timer can't add time
+  nobody heard. Those pings can arrive in a burst when the page wakes up, stamped with the time they were sent, so an
+  hour's total can shift by a few minutes into the next hour. Before that date, listening with the screen off counted
+  nothing.
 - **Automated browsers send nothing** (`navigator.webdriver`: Playwright, Puppeteer) from 2026-10-15; before that, test
   runs against the live site inflated people and bounce counts.
 - **Writes never fail loudly**: every `record_*` function swallows errors so a student never sees analytics break. The

@@ -448,7 +448,11 @@
         var now = Date.now(); if (now - lastSave > 4000) { lastSave = now; savePos(audioUrl, audio.currentTime); }
       });
       audio.addEventListener("pause", function(){ savePos(audioUrl, audio.currentTime); if (activeAudioEl === audio && activeBtn === btn) setState(btn, "paused"); });
-      audio.addEventListener("play", function(){ if (activeAudioEl === audio && activeBtn === btn) setState(btn, "playing"); });
+      audio.addEventListener("play", function(){
+        if (activeAudioEl === audio && activeBtn === btn) setState(btn, "playing");
+        /* study time counts narration heard with the screen off: a play from the lock screen starts its clock again */
+        try { document.dispatchEvent(new CustomEvent("sh:audio-play")); } catch (e) {}
+      });
       seek.oninput = function(){ dragging = true; if (audio.duration) time.textContent = fmtTime(seek.value / 1000 * audio.duration) + " / " + fmtTime(audio.duration); };
       seek.onchange = function(){ dragging = false; if (audio.duration) { audio.currentTime = seek.value / 1000 * audio.duration; savePos(audioUrl, audio.currentTime); } };
       player.querySelectorAll("[data-skip]").forEach(function(b){ b.onclick = function(){ if (audio.duration) audio.currentTime = Math.min(audio.duration - 1, Math.max(0, audio.currentTime + (+b.getAttribute("data-skip")))); paint(); }; });
@@ -1591,8 +1595,9 @@
      is sent for a section only once it has actually banked a full 25s. The
      first ping still goes out on load (so a short visit is still counted as
      a visit) and is pre-credited against the starting section. Paused while
-     the tab is hidden; on hide, a section holding at least half a ping's
-     worth is rounded up so short stints aren't systematically dropped. */
+     the tab is hidden, unless narration or Timmy Time is playing (below); on
+     a pause, a section holding at least half a ping's worth is rounded up so
+     short stints aren't systematically dropped. */
   var TICK_MS = 1000;
   /* Idle rule: after 15 minutes with no input (tap, click, key, scroll) time stops counting until
      the next input, unless a lecture is playing in Listen or a Timmy Time episode is playing. A visible tab left open on a desk
@@ -1614,17 +1619,54 @@
   function pingActivity(section){
     safeRpc("record_activity_ping", { p_visitor: VISITOR_ID, p_visit: VISIT_ID, p_hub: HUB, p_section: section });
   }
-  function tick(){
-    var now = Date.now();
-    var dt = Math.min(now - lastTick, 5 * TICK_MS); /* cap so a frozen/sleeping tab can't dump minutes into one section */
-    lastTick = now;
-    if (isIdle(now)) return;
+  /* Listening with the screen off (Sam, 2026-11-18: "add that study time tracking"): a lecture's narration or a Timmy
+     Time episode that keeps playing while the tab is hidden or the phone is locked counts as study time, for as long as
+     it plays. Hidden, the time comes from the audio's own clock (how far it played, at its speed), not from the timer:
+     a hidden or locked page's timers run late or not at all, so a tick that comes minutes late still credits what was
+     heard, and nothing more. Nothing playing, the timer stops; something starting again from the lock screen or the
+     headphones ("sh:audio-play", sent by both players) starts it again. The device's voice has no clock to read, so
+     it counts the way a visible tab does, while it speaks. */
+  var bg = false, bgEl = null, bgT = 0;
+  function playingAudio(){
+    var a = null;
+    try { a = window.shTTS && window.shTTS.audio && window.shTTS.audio(); } catch (e) { a = null; }
+    if (a && !a.paused && !a.ended) return a;
+    try { a = window.shPodcast && window.shPodcast.audio && window.shPodcast.audio(); } catch (e) { a = null; }
+    return a && !a.paused && !a.ended ? a : null;
+  }
+  function listeningNow(){
+    try { if (window.shTTS && window.shTTS.listening && window.shTTS.listening()) return true; } catch (e) {}
+    try { if (window.shPodcast && window.shPodcast.playing && window.shPodcast.playing()) return true; } catch (e) {}
+    return false;
+  }
+  function follow(){ bgEl = playingAudio(); bgT = bgEl ? (bgEl.currentTime || 0) : 0; }
+  /* ms heard since the last look, by the clock of the audio followed then (even if it has since ended or paused) */
+  function heardMs(){
+    var ms = 0;
+    if (bgEl) { var t = bgEl.currentTime || 0; if (t > bgT) ms = (t - bgT) / (bgEl.playbackRate || 1) * 1000; }
+    follow();
+    return ms;
+  }
+  function credit(dt){
     var sec = currentSection();
     sectionBank[sec] = (sectionBank[sec] || 0) + dt;
-    if (sectionBank[sec] >= PING_INTERVAL_MS) {
+    while (sectionBank[sec] >= PING_INTERVAL_MS) {
       sectionBank[sec] -= PING_INTERVAL_MS;
       pingActivity(sec);
     }
+  }
+  function tick(){
+    var now = Date.now(), raw = now - lastTick;
+    lastTick = now;
+    if (bg) {
+      var ms = heardMs();
+      if (!bgEl && !ms && listeningNow()) ms = 5 * TICK_MS;   /* the device's voice */
+      if (ms > 0) credit(Math.min(raw, ms));
+      if (!bgEl && !listeningNow()) pauseBackground();
+      return;
+    }
+    if (isIdle(now)) return;
+    credit(Math.min(raw, 5 * TICK_MS)); /* cap so a frozen/sleeping tab can't dump minutes into one section */
   }
   function flushBank(){
     Object.keys(sectionBank).forEach(function(sec){
@@ -1646,8 +1688,12 @@
   }
   function stopActivityPing(){
     if (!tickTimer) return;
-    clearInterval(tickTimer); tickTimer = null;
     tick();
+    clearInterval(tickTimer); tickTimer = null;
+    flushBank();
+  }
+  function pauseBackground(){
+    if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
     flushBank();
   }
   /* start a moment after load so the hub's own scripts have rendered their
@@ -1659,8 +1705,20 @@
     if (document.visibilityState !== "hidden") startActivityPing();
   }, 1500);
   document.addEventListener("visibilitychange", function(){
-    if (document.visibilityState === "hidden") stopActivityPing();
-    else if (trackingArmed) startActivityPing();
+    if (document.visibilityState === "hidden") {
+      if (!trackingArmed || bg) return;
+      if (tickTimer) tick();   /* the last of the visible time */
+      bg = true; follow();
+      if (!bgEl && !listeningNow()) pauseBackground();
+      else if (!tickTimer) startActivityPing();
+    } else if (trackingArmed) {
+      if (bg && tickTimer) tick();   /* what was heard while hidden, before the visible rules take over */
+      bg = false; bgEl = null;
+      startActivityPing();
+    }
+  });
+  document.addEventListener("sh:audio-play", function(){
+    if (bg && !tickTimer) { follow(); startActivityPing(); }
   });
   window.addEventListener("pagehide", stopActivityPing);
 
