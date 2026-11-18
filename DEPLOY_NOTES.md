@@ -35,7 +35,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 - **2026-11-18 (The class's picks follow the version of a question's choices, Claude Code)** — the inbox's "class picks on
   each choice ignore question versions" (BUG-023's general fix). `question_choices` was keyed by position only, so after an
   edit the "% of the class picked it" beside a choice counted picks of the old choices: since the release, 169 Perio and
-  125 Occlusion questions had their choices rewritten (8 of Perio's only moved). `migration_v66.sql`: a one-choice or
+  125 Occlusion questions had their choices rewritten (8 of Perio's only moved), and #404 rewrote 7 of Heme & Endo Exam 3's. `migration_v66.sql`: a one-choice or
   select-all key carries `cv`, the version of its choices (`choiceVersion` in `tools/xp/keys.js`: the choices and the key;
   the stem, the explanation and the whys don't count); `record_choice` / `record_choices` stamp each pick with the current
   one (`question_choices.v`); when it changes, `admin_load_question_keys` moves the old picks to `question_choices_past`
@@ -58,7 +58,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   [verify-before-pushing](vault/how-to/verify-before-pushing.md).
 
 - **2026-11-18 (more cosmetics: six year-round collections, five rare costumes, six paints, Claude Code)** — Sam: "Lets work on
-  timmy outfits and place cosmetics. Go crazy" ([the task](vault/tasks/2026-11-18-more-cosmetics.md)). **Six collections**
+  timmy outfits and place cosmetics. Go crazy" ([the task](vault/tasks/done/2026-11-18-more-cosmetics.md)). **Six collections**
   (`COLLECTIONS` in `tools/figures/site/sets.mjs`, one pack each in `tools/figures/site/packs/`: `dino`, `moonbase`, `reef`,
   `desert`, `arcade`, `rockshow`), eight pieces each like a season's set (a Legendary home, an Epic scene, outfits Common to
   Rare, yard pieces Uncommon to Epic), but everyday pieces in the daily and weekly picks all year: the rotation goes from 46

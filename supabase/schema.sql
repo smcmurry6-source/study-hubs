@@ -8143,6 +8143,8 @@ $$;
 -- equip_item and get_my_shop already sell, equip and list any active row by its kind and slot. Written and tested on a
 -- throwaway copy of supabase/schema.sql (tools/release/xp.js). Apply after the pages that draw these pieces are live, so
 -- the daily picks never show a piece before its drawing has shipped.
+-- Applied to the live project on 2026-11-18 through the connector, right after #409 merged and its drawings were live
+-- (240 rows in shop_items: 48 in the six collections, ten rare costumes, eleven paints).
 
 insert into public.shop_items (id, name, kind, rarity, price, season, slot, hp, boost_minutes, boost_mult, shelf, rotates, sort) values
   ('stone-den', 'Stone-age den', 'home', 'legendary', 6000, null, null, null, null, null, false, true, 3001),
