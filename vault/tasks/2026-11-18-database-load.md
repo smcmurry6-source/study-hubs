@@ -117,7 +117,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   The restart doesn't give back CPU: it clears a jam (queued requests, retries) and let v72 in. Retries from the pages
   (four over three minutes, #421) kept a jam going once it started (the retries box above).
   Two corrections to the evening entry above, from the edge logs read later (they arrive about 5 minutes late): it did
-  not settle at 20:25, it went on at 40-70% of every request until the restart (20:25-20:50: about 3,000 of 5,900 failed),
+  not settle at 20:25, it went on at 40-70% of every request until the restart (20:25-20:50: about 3,500 of 7,000 failed),
   and the Management API queries around 20:00-20:10 were this session's diagnosis (`pg_stat_statements` reports and a few
   `explain analyze` runs of `sh_wallet`, the slowest 6.4 s on the starved CPU). Diagnose on a throwaway copy
   (`tools/release/pg.js`) and read the edge logs, which cost the database nothing, while the class is failing.
