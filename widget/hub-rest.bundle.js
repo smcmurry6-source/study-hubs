@@ -3966,7 +3966,7 @@ p_self: d.self ? isCorrect : null,
 p_v: (window.shQH && window.shQH.version && window.shQH.version(qid)) || null,
 p_ctx: d.ctx || null, p_request: gameId(), p_session: d.session || null, p_claim: isCorrect
 };
-var tries = 0;
+var tries = 0, waits = d.session ? [4000, 10000] : [4000, 15000, 45000, 120000];
 function paid(r){
 if (r.boost !== undefined) GAME.boost = r.boost || null;
 if (!r.repeat) setCrowns(r.crowns);
@@ -3978,7 +3978,10 @@ try { call = supabase.rpc("record_answer_v2", args); } catch (e) { return Promis
 return call.then(function(res){
 if (rpcMissing(res)) { GAME.on = false; answerToday(d, isCorrect); return; }
 if (res && res.error) {
-if (!tries++ && (!res.status || res.status >= 500)) return new Promise(function(ok){ setTimeout(ok, 4000); }).then(send);
+if (tries < waits.length && (!res.status || res.status >= 500)) {
+var ms = Math.round(waits[tries++] * (0.75 + Math.random() * 0.5));
+return new Promise(function(ok){ setTimeout(ok, ms); }).then(send);
+}
 return;
 }
 var r = res && res.data;

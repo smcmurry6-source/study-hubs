@@ -35,6 +35,13 @@ deletes a question**: a flag is a lead for a person to check against the hub's n
   and each row carries it (`question_events.w`, null for a hub without versions). The fingerprint is still the
   original's, so A and B are one question with one set of numbers, and `qh_report`'s `wordings` splits its first tries
   by version: `{ "0": { n, c }, "1": { n, c } }`. The admin page shows "First try by version" and version B's text.
+  **The A/B versions page** (the admin page's `#ab`, since 2026-11-18, `migration_v70.sql`; Sam: "i want somewhere to see
+  this in the admin page") answers "is B harder than A?" for the whole hub, from its own small query
+  (`get_ab_summary(secret, days)`, admin only, totals only, through the partial index `question_events_ab`): first tries on A
+  and on B (people, % right, median time) with a two-proportion z and a 95% range of the gap, later tries, first tries by
+  kind of question, how many questions have 5 and 10 people on each version, and the questions with 5+ a side, biggest gap
+  first, with both stems (read from the hub's own `questions.json` and `variants.json`, not the database). A question's
+  pair counts its latest wording only. Under 100 first tries a version, it says it's too early.
 - **"Good question?"**: under each explanation, once answered, a thumbs up / down; a thumbs down asks why (answer looks
   wrong, confusing wording, not in the notes, explanation didn't help, gives the answer away) and offers the Report form
   for anything else (`qh_vote`, `question_feedback`, one vote per person per question). Tracked as `qrate:up`,
