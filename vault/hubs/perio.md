@@ -128,6 +128,11 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   final's hints and the 28 midterm check-ins: 111 fixed in place, `q3-20` and `q1-E03` retired, 8 new (the suture
   materials, `q2-F04`-`F06`: the final asks the materials, not the techniques or pictures), 675.
 
+- **Every question with choices has a second wording** (`content/variants.json`, since 2026-11-18,
+  [task](../tasks/2026-11-17-reworded-question-variants.md)): a later try shows it. **When you edit a question, edit its
+  wording too** (same choices in the same order, a why for each); a new question can get one, or the build is fine without.
+  `node tools/hub-next/build.mjs` checks them.
+
 ## Diagram decisions
 
 - 2026-09-25: the Atlas mode's diagrams were removed for being inaccurate. Accuracy is the bar.

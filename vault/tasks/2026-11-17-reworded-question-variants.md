@@ -1,12 +1,12 @@
 ---
 type: task
 status: open
-hub: widget
+hub: perio
 created: 2026-11-17
 requested-by: Sam
 due: 
 waiting-on: 
-agent: 
+agent: Claude Code
 pr: 
 ---
 
@@ -69,20 +69,42 @@ question**: same id, same key, same class stats ([question-ids-are-permanent](..
 
 ## Done when
 
-- [ ] Sam has picked the first hub (a live hub before its exam, or the next hub as it is built) and one or two extra wordings
-- [ ] `variants.json` format, its build checks and the smoke lint on every wording
-- [ ] The engine shows the next wording on later tries (bank, drill, misses, weak spots, mock, arcade bank games, Learn, Flashcards)
-- [ ] Question health: the fingerprint ignores wordings; the wording shown is recorded (migration, its tests, the event taxonomy row)
-- [ ] The first hub's wordings written and checked against its notes and hints
-- [ ] About page entry ("Questions come back reworded")
+- [x] Sam has picked the first hub (a live hub before its exam, or the next hub as it is built) and one or two extra wordings (Perio, one: 2026-11-18)
+- [x] `variants.json` format, its build checks and the smoke lint on every wording
+- [x] The engine shows the next wording on later tries (bank, drill, misses, weak spots, mock, arcade bank games, Learn, Flashcards)
+- [x] Question health: the fingerprint ignores wordings (it fingerprints the original, SH_EXPORT, as before)
+- [ ] The wording shown is recorded on each answer (a migration, its tests, the event taxonomy row), then a question-health flag for a wording much harder or easier than its sibling. Left for after the final (Sam's scope, 2026-11-18)
+- [x] The first hub's wordings written and checked against its notes and hints
+- [x] About page entry ("Questions come back reworded")
 - [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`), release suites (a tier 2 change)
-- [ ] Vault written back (hub note, decisions, this note's Outcome)
+- [x] Vault written back (hub note, decisions, this note's Outcome)
 
 ## Log
 
 - 2026-11-17: written from Sam's request, with the estimate above (bank sizes measured from `hubs/*/content/questions.json`).
+- 2026-11-18: Sam settled the scope: "lets also do the reworded questions. do one extra wording and only do it for perio"
+  ([decisions](../decisions.md)). Built and shipped for Perio before its final (2026-11-19).
 
 ## Outcome
+
+Perio, 2026-11-18 (stacked on #402). `hubs/perio/content/variants.json`: one extra wording of each of the 652 questions with
+choices (`{ id: { stem, choices, why } }`; the format also takes a list of wordings, and `ex` when needed). Matching,
+ordering and recall keep their one wording. Written session by session from `notes.json` and the hints by 14 writer
+agents, then checked by 14 independent reviewers against the notes (same key and truth values, accurate, not giving the
+answer away): they changed 97. 447 KB raw, 134 KB gzipped.
+
+- **Engine:** `worded(q, n)` in `widget/hub.js`: try 1 the original, then the next wording (n = the tries so far; Flashcards
+  pass their review count). `card()` calls it (bank, drill, misses, weak spots, mock, Learn); so do Flashcards
+  (`widget/study-modes.js`), the shared games (`widget/games.js` through `window.shHub.worded`) and Perio's own
+  (`arcade.js` `dealMCQ`). A worded copy carries `_base` and `_w`; the card has `data-wording` and says "reworded" on its top line.
+  `variants.json` is fetched with the Questions view or the arcade (`needVariants`, only when `core.json` has `variants`),
+  never with Home or the notes, and isn't in `sw.js`'s precache.
+- **Kept on the original:** search, Find this in the notes, `SH_EXPORT`, question health's fingerprint, the answer keys.
+- **Reports** carry "reworded: wording 2" (`widget/v3.js`); **Ask Timmy** sends `ask.w`, and the function swaps the wording in
+  (`wordingOf`, `loadVariants`; test in `tools/timmy/test.mjs`). The function changed, so After merge deploys it.
+- **Checks:** `checkVariants` in `tools/hub-next/build.mjs` (choice and why counts, statement labels and counts, a changed
+  stem, the key-longest rate) and `lintWordings` in `tools/ci/smoke.js`. No High yield changed.
+- **Editing a Perio question from now on** means editing its wording in `variants.json` too (the hub note says so).
 
 Related: [question-health](../reference/question-health.md) · [build-a-hub](../how-to/build-a-hub.md) ·
 [question-ids-are-permanent](../rules/question-ids-are-permanent.md) · [how tasks work](README.md)

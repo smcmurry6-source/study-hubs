@@ -481,7 +481,7 @@ var text = q.type === "mcq" && q.choices && q.choices[q.answer] != null ? "Why i
 : q.type === "multi" ? "Why are those the right ones?" : q.type === "sequence" ? "Why does it go in that order?"
 : q.type === "match" ? "Can you explain these matches?" : "Can you explain this one?";
 var ask = { qid: q.id, right: q.type === "recall" ? null : !!right, picks: q.type === "mcq" || q.type === "multi" ? (picks || []).slice() : [],
-label: String(q.stem || "").replace(/\s+/g, " ").trim() };
+label: String(q.stem || "").replace(/\s+/g, " ").trim(), w: q._w || 0 };
 askReady().then(function(A){ if (A) A.open({ from: "card", text: text, ask: ask }); else HX.toast("The chat didn't load. Try again in a moment."); },
 function(){ HX.toast("The chat didn't load. Check your connection and try again."); });
 }
@@ -527,11 +527,12 @@ function figAfterHTML(q){ var f = HX.FIG && q.img && HX.FIG.FIGS[q.img]; return 
 function qNum(n, of, id){ return '<span class="qc-n num" id="' + id + '">Question&nbsp;' + n + (of ? " of&nbsp;" + of : "") + "</span>"; }
 function card(q, o){
 o = o || {};
+q = HX.worded ? HX.worded(q) : q;
 var id = "q" + (++uid), multi = q.type === "multi", tf = q.fmt === "tf";
 var seen = ansOf(q.id);
 var status = o.retry ? "" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
-seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + "</span>" : "";
-var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '" data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
+seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + (q._w ? " · reworded" : "") + "</span>" : "";
+var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '"' + (q._w ? ' data-wording="' + q._w + '"' : "") + ' data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
 var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
 var body = "", hide = !!o.hide && q.type === "mcq";
 if (q.type === "mcq" || multi) {
@@ -765,7 +766,7 @@ function renderQuestions(el, s){
 if (s === "missed") { STATE.ui.qset = ""; STATE.ui.qstatus = "missed"; STATE.ui.qlikely = ""; STATE.ui.qlec = "all"; saveState(); history.replaceState(null, "", "#questions"); s = ""; }
 if (HX.SESSION.hp0 === null) HX.SESSION.hp0 = HX.petHp();
 el.innerHTML = '<div class="hx-page bank"><p class="note loading">Loading the questions…</p></div>';
-needQuestions().then(function(){ if (HX.view === "questions") drawQuestions(el, s); }).catch(function(){ el.innerHTML = offlineHTML("the questions"); });
+Promise.all([needQuestions(), HX.needVariants ? HX.needVariants() : null]).then(function(){ if (HX.view === "questions") drawQuestions(el, s); }).catch(function(){ el.innerHTML = offlineHTML("the questions"); });
 }
 var LIST = null;
 var VIEWS = [["questions", "Questions", "questions"], ["learn", "Learn", "learn"], ["cards", "Flashcards", "cards"]];
@@ -1432,6 +1433,20 @@ exportQuestions();
 }
 return QS;
 });
+}
+var VARS = null;
+function needVariants(){
+if (!CORE || !CORE.variants) return Promise.resolve(null);
+return VARS ? Promise.resolve(VARS) : getJSON("variants.json").then(function(v){ VARS = v || {}; return VARS; }, function(){ return null; });
+}
+function worded(q, n){
+var base = q && q._base || q; if (!base || !VARS) return base;
+var vs = VARS[base.id]; if (!vs) return base; if (!Array.isArray(vs)) vs = [vs];
+if (n == null) { var a = ansOf(base.id); n = a ? a.n || 0 : 0; }
+var k = n % (vs.length + 1), v = vs[k - 1]; if (!k || !v || !v.stem) return base;
+var o = {}; for (var key in base) o[key] = base[key];
+o.stem = v.stem; if (v.choices) o.choices = v.choices; if (v.why) o.why = v.why; if (v.ex) o.ex = v.ex;
+o._base = base; o._w = k; return o;
 }
 function needNotes(){ return getJSON("notes.json").then(function(n){ NOTES = n; return n; }); }
 function needStudy(){ return getJSON("study.json").then(function(s){ STUDY = s; return s; }); }
@@ -2191,9 +2206,9 @@ if ($("[data-figs]", body)) needFigures().then(function(){ $$("[data-figs]", bod
 }
 function needArcade(){
 loadCss(WIDGET + "games.css"); loadCss(BASE + "arcade.css");
-return Promise.all([needQuestions(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
+return Promise.all([needQuestions(), needVariants(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
 if (!ARC && window.SH_ARCADE) ARC = window.SH_ARCADE({ esc: esc, state: STATE, save: saveState, toast: toast, questions: QS, lectures: LECS, lectureById: LBY, shuffled: shuffled,
-record: HX.recordAnswer, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [], figures: needFigures });
+record: HX.recordAnswer, worded: worded, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [], figures: needFigures });
 var A0 = ARC && ARC.arcade;
 if (A0 && !A0.startGame && A0.start) ARC.arcade = { startGame: A0.start, stopAll: A0.stop, current: A0.current };
 return ARC;
@@ -2534,7 +2549,7 @@ studyDayList: studyDayList, achMap: achMap, putAnswer: putAnswer, saveNow: saveN
 QBY: QBY, QBL: QBL, LBY: LBY, EXAM_LECS: EXAM_LECS, REVIEW: REVIEW, loadScript: loadScript, loadCss: loadCss,
 lecLabel: lecLabel, shortTitle: shortTitle, lecName: lecName, LCOL: LCOL, lc: lc, lecDot: lecDot,
 lecChip: lecChip, lecHead: lecHead, isRead: isRead, isExamLec: isExamLec, isReview: isReview,
-hasReview: hasReview, needQuestions: needQuestions, needNotes: needNotes, needStudy: needStudy,
+hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, needNotes: needNotes, needStudy: needStudy,
 needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
 go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
 offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget
@@ -2550,7 +2565,7 @@ var PARTS = window.SH_HUB_PARTS || {};
 if (!PARTS[k]) throw new Error("widget/hub-" + k + ".js is not loaded: the page loads it before widget/hub.js");
 PARTS[k](HX);
 });
-window.shHub = { go: go, state: function(){ return STATE; }, card: function(id){ var q = QBY[id]; return q ? HX.card(q, {}) : null; } };
+window.shHub = { go: go, state: function(){ return STATE; }, card: function(id){ var q = QBY[id]; return q ? HX.card(q, {}) : null; }, worded: worded };
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();
 ;

@@ -64,12 +64,18 @@ async function loadQuestions(hub: string) {
   return await cached("q:" + hub, async () => { const q = await getJson(at(hub, "questions.json")); return Array.isArray(q) ? q : q && q.questions; });
 }
 
+// a hub's reworded questions (content/variants.json): none is fine, the original is used
+async function loadVariants(hub: string) {
+  if (!HUB_RE.test(hub)) return null;
+  return await cached("v:" + hub, async () => { try { return await getJson(at(hub, "variants.json")); } catch { return null; } });
+}
+
 const deps = {
   db: { begin: (a: Record<string, unknown>) => rpc("timmy_begin", a), finish: (a: Record<string, unknown>) => rpc("timmy_finish", a) },
   // deno-lint-ignore no-explicit-any
   model: (params: any, options?: any) => client.beta.messages.create(params, options),
   lookup: (Deno.env.get("TIMMY_LOOKUP") ?? "") !== "off",
-  loadHub, loadQuestions, site, origins: ORIGINS,
+  loadHub, loadQuestions, loadVariants, site, origins: ORIGINS,
   now: () => Date.now(),
   log: (event: string, data: unknown) => console.log(JSON.stringify({ event, ...(data as object) }))
 };
