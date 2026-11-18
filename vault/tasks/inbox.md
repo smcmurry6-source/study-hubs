@@ -220,10 +220,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   student's own answers from the server there instead (their own rows, like the v2 bootstrap), or say "open a hub first" when every
   hub's state is empty (2026-11-12, [Ask Timmy](done/2026-11-12-redesign-ask-timmy.md) part 2).
 
-- [ ] Class picks on each choice ignore question versions: `question_choices` (and `question_stats`) are keyed by position, so when
+- [x] Class picks on each choice ignore question versions: `question_choices` (and `question_stats`) are keyed by position, so when
   an edit moves or rewrites choices, last week's percentages show beside a different choice until someone moves or clears the rows by
   hand (2026-11-04 evening lessons audit). Record the version with each pick (`record_choice`, `question_versions.v`) and read only the
-  current one, as question health already does.
+  current one, as question health already does. Done (#408, migration_v66): the picks follow the version of a question's choices (`question_keys.cv`, its choices and key), and old versions' picks move to `question_choices_past`; `question_stats` (% right per question, not per choice) stays as it is.
 
 - [ ] Anima figures on phones: at 390 px their in-drawing labels scale down to about 6-7 px. A plain bigger font for narrow screens clipped labels at the edges in about half the PCD Implants figures (tried 2026-11-04, reverted); it needs a per-figure phone layout (labels moved inside the drawing) or tap-to-zoom. Heme & Endo Exam 3's 22 (2026-11-17) mostly draw them at 10-15 px; its four L17 figures after the oocyte are the smallest (labels about 8 px on the timeline, implantation, estriol and breastfeeding figures). 
 - [x] The site is near GitHub Pages' 1 GB cap: 960 MB on 2026-11-12, most of it narration (430 MB of it from archived hubs:
