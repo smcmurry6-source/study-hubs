@@ -249,3 +249,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `ubuntu-latest` became Ubuntu 26.04, which Playwright 1.56.1 doesn't support. Before 24.04 is retired: upgrade Playwright in
   `.github/workflows/*.yml` (and `PLAYWRIGHT_PATH` setups) to one that supports 26.04, re-record the a11y and perf baselines
   (`node tools/release/a11y.js --update`, `perf.js`), check the smoke test and the device matrix, then go back to `ubuntu-latest`.
+- [ ] **The workflows' actions off Node.js 20** (2026-11-18, seen in #407's After merge run): every run warns "Node.js 20 is
+  deprecated" for `actions/checkout@v4` and `actions/setup-node@v4` (8 uses each in `.github/workflows/*.yml`) and runs them
+  on Node 24 for now; `actions/upload-artifact@v4` (3) and `actions/github-script@v7` (2) are likely the same. Before GitHub
+  drops Node 20 entirely: move each to the major version that runs on Node 24, and let CI run every job once ("Check hubs" and
+  "Release tests" both run when a workflow changes).
