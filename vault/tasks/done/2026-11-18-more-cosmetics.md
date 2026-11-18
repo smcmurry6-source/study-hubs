@@ -1,6 +1,6 @@
 ---
 type: task
-status: in-progress
+status: done
 hub: widget
 created: 2026-11-18
 requested-by: Sam
@@ -19,16 +19,16 @@ Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy" (the
 
 ## Context
 
-- How the place and the shop work: [Timmy's place](done/2026-11-06-redesign-timmys-place.md), [round 3](done/2026-11-10-redesign-timmys-place-round-3.md)
-  (the seasonal sets and packs), [the shop](done/2026-11-06-redesign-timmy-shop.md), [game-server](../reference/game-server.md)
-  ("Shiny Gold Crowns and the shop"), [draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md).
+- How the place and the shop work: [Timmy's place](2026-11-06-redesign-timmys-place.md), [round 3](2026-11-10-redesign-timmys-place-round-3.md)
+  (the seasonal sets and packs), [the shop](2026-11-06-redesign-timmy-shop.md), [game-server](../../reference/game-server.md)
+  ("Shiny Gold Crowns and the shop"), [draw-a-seasonal-set](../../how-to/draw-a-seasonal-set.md).
 - Before this, the daily and weekly picks drew from 46 everyday pieces (7 homes, 5 scenes, 12 outfits, 13 yard pieces,
   9 upgrades and paints); the 112 seasonal pieces are sold only in their season.
-- Rules: [every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md) (the house style), [podcast-reactions](../rules/podcast-reactions.md)
-  (the lore), [about-page](../rules/about-page.md), [preview-and-release-test](../rules/preview-and-release-test.md) (a tier 2 change: a
+- Rules: [every-hub-gets-its-own-art](../../rules/every-hub-gets-its-own-art.md) (the house style), [podcast-reactions](../../rules/podcast-reactions.md)
+  (the lore), [about-page](../../rules/about-page.md), [preview-and-release-test](../../rules/preview-and-release-test.md) (a tier 2 change: a
   migration and shared widget code).
 
-## The plan (the agent's, from "Go crazy"; [decisions](../decisions.md))
+## The plan (the agent's, from "Go crazy"; [decisions](../../decisions.md))
 
 - **Six year-round collections** (`COLLECTIONS` in `tools/figures/site/sets.mjs`), eight pieces each, like a season's set
   but in the everyday rotation all year (`season` null, `rotates`): a Legendary home, an Epic scene, outfits Common /
@@ -50,8 +50,8 @@ Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy" (the
 - [x] The client: the Collections tab, the shop's collection names and scenes, ten costumes; bundles rebuilt
 - [x] `migration_v65.sql` tested on a throwaway copy (`tools/release/xp.js`), the preview sells the new rows
 - [x] CI's checks and the release suites pass; a test report in the PR
-- [ ] Contact sheets of all of it sent to Sam (sent 2026-11-18); Sam's look and "merge"
-- [ ] After the merge: `migration_v65.sql` applied through the connector, appended to `supabase/schema.sql`, its line out of `supabase/pending-migrations.txt` (a small follow-up PR)
+- [x] Contact sheets of all of it sent to Sam (sent 2026-11-18); Sam's look and "merge" ("the art looks great. merge when ready")
+- [x] After the merge: `migration_v65.sql` applied through the connector, appended to `supabase/schema.sql`, its line out of `supabase/pending-migrations.txt` (a small follow-up PR)
 - [x] About page, Ask Timmy's site help, `DEPLOY_NOTES.md`, the changelog line, this note's Outcome
 
 ## Log
@@ -60,7 +60,7 @@ Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy" (the
   the kit's plumbing and the client first; the six packs and the costumes drawn in parallel, each by its own agent.
 - 2026-11-18: the drawers stopped at the usage limit partway (their files were kept) and were resumed after it reset. Each
   pack reviewed on its sheet, day and night: Rock show's night glows near the door made smaller, Moon base's door spot moved
-  out of the front yard slot (it stood in it). Two kit bugs found and fixed on the way ([the bug log](../release/bug-log.md)):
+  out of the front yard slot (it stood in it). Two kit bugs found and fixed on the way ([the bug log](../../release/bug-log.md)):
   BUG-171, a set fetched late never brought its yard eggs' CSS, so seasonal eggs stayed hidden on the live site; BUG-172
   (CI), the kit's lists after `addPack` dropped `coll`, so the Collections tab came up empty. The build checks both now.
 - 2026-11-18: CI's performance suite: the dashboard at 358 KB of its 345 (all 88 outfits in `outfits.js`). Split it
@@ -69,6 +69,9 @@ Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy" (the
   phone rule widened them); fixed in `widget/place.css`, then the release suites run once on the final code.
 - 2026-11-18: `node tools/release/run.js` on the final code: every suite passed (accessibility needs `axe-core`, which this
   container lacks; CI ran it). CI green on the head (Check hubs and Release tests); the test report is in the PR. Waiting on Sam.
+- 2026-11-18: Sam: "the art looks great. merge when ready". #409 merged; once the site had published the new drawings,
+  `migration_v65.sql` was applied through the connector (240 rows: 48 collection pieces, ten costumes, eleven paints) and
+  recorded in `supabase/schema.sql`. Done.
 
 ## Outcome
 
@@ -77,9 +80,11 @@ Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy" (the
 names and scenes, and `migration_v65.sql` (59 rows; applied after the merge). Two shared files grow and are still fetched on
 first use only: the kit (`widget/hub-art/place.js`, 269 to 302 KB, the costumes); the outfits are split (BUG-173): `outfits.js`
 has the everyday and rank outfits (50 KB, 9 over the wire; it was 187 KB with all of them), and `widget/hub-art/outfits/`
-has the costumes, the seasonal sets' and the collections' outfits, each file fetched only when someone drawn wears one. Left for later, in [the inbox](inbox.md): a tall piece in the front yard slot covers Timmy at the door (as July 4's
+has the costumes, the seasonal sets' and the collections' outfits, each file fetched only when someone drawn wears one. Left for later, in [the inbox](../inbox.md): a tall piece in the front yard slot covers Timmy at the door (as July 4's
 fireworks and Thanksgiving's balloon already do), and kit niceties the drawers asked for (eggs that move the whole piece, a
-coral and a moon tree, no snow under the sea). Its status stays in-progress until Sam's "merge" and the migration.
+coral and a moon tree, no snow under the sea). Sam: "the art looks great. merge when ready"; #409 merged 2026-11-18, and
+`migration_v65.sql` was applied through the connector once the drawings were live (240 rows in `shop_items`), then recorded in
+`supabase/schema.sql` and taken out of `supabase/pending-migrations.txt` in a small follow-up PR.
 
-Related: [the shop](done/2026-11-06-redesign-timmy-shop.md) · [Timmy's place](done/2026-11-06-redesign-timmys-place.md) ·
-[draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md) · [game-server](../reference/game-server.md) · [the inbox](inbox.md)
+Related: [the shop](2026-11-06-redesign-timmy-shop.md) · [Timmy's place](2026-11-06-redesign-timmys-place.md) ·
+[draw-a-seasonal-set](../../how-to/draw-a-seasonal-set.md) · [game-server](../../reference/game-server.md) · [the inbox](../inbox.md)
