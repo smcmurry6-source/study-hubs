@@ -288,7 +288,7 @@ export function pack(T){
   function wheelPt(u, v){ return [WM.hub[0] + u * WM.h[0], WM.hub[1] + u * WM.h[1], WM.hub[2] + v]; }
   function wheelRing(r, n, a0, a1){ var out = []; n = n || 28; a0 = a0 || 0; a1 = a1 == null ? 360 : a1; for (var i = 0; i <= n; i++){ var a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; out.push(wheelPt(Math.cos(a) * r, Math.sin(a) * r)); } return out; }
   /* the wagon: a bed along x, the bonnet on hoops, big wheels behind and small in front */
-  var WG = { x0: .38, x1: 3.12, y0: 1.15, y1: 2.45, zb: .7, zt: 1.32, yc: 1.8, rb: .72, rz: 1.08, fw: [.88, .52], rw: [2.58, .68], yn: 2.59, yf: 1.0 };
+  var WG = { x0: .38, x1: 3.12, y0: 1.15, y1: 2.45, zb: .7, zt: 1.32, yc: 1.8, rb: .72, rz: 1.08, fw: [.74, .5], rw: [2.72, .66], yn: 2.59, yf: 1.0 };
   function wagonWheel(cx, y, r, o, spin){
     var hubC = P(cx, y, r), s = "", i, rim = yRing(cx, y, r, r * .9, 24), tire = yRing(cx, y, r, r, 24);
     s += L(D(tire), 4.6) + L(D(tire), 2.6, "#5A5560") + L(D(rim), 2.6, o.night ? "#8A6A4E" : K.wood);
@@ -404,7 +404,7 @@ export function pack(T){
         var W = WG, s = ell.apply(null, P(1.85, 1.9, 0).concat([31, 11, "#1B2A3A", 0, .1])), i, cv = o.night ? ["#D9D3C6", "#B8B0A0"] : ["#FFFDF6", "#E8E0CE"];
         /* the far wheels and the tongue, under the bed */
         s += wagonWheel(W.fw[0], W.yf, W.fw[1], o) + wagonWheel(W.rw[0], W.yf, W.rw[1], o);
-        var tg0 = P(.95, W.yc, .45), tg1 = P(.06, W.yc, .1); s += L(seg(tg0, tg1), 4.4) + L(seg(tg0, tg1), 2.4, K.wood) + ell(tg1[0], tg1[1], 2.4, 1.6, "#5A5560", 1);
+        var tg0 = P(.8, W.yc, .45), tg1 = P(.06, W.yc, .1); s += L(seg(tg0, tg1), 4.4) + L(seg(tg0, tg1), 2.4, K.wood) + ell(tg1[0], tg1[1], 2.4, 1.6, "#5A5560", 1);
         var ax = function(x, z){ var a = P(x, W.yf, z), b = P(x, W.yn, z); return L(seg(a, b), 3.4) + L(seg(a, b), 1.6, K.woodShade); };
         s += ax(W.fw[0], W.fw[1]) + ax(W.rw[0], W.rw[1]);
         /* the wagon bed: boards, a brake lever */
@@ -431,7 +431,7 @@ export function pack(T){
         /* the near wheels */
         s += wagonWheel(W.fw[0], W.yn, W.fw[1], o) + wagonWheel(W.rw[0], W.yn, W.rw[1], o);
         /* the water barrel, upright on a little shelf at its side, strapped on, a tin cup on a hook */
-        var bc = [1.66, W.y1 + .3], bz0 = .52, bz1 = 1.28, br = .25, bw = o.night ? ["#B9926A", "#8A6A4E", "#C9A57E"] : [K.woodLight, K.wood, "#EFCB9C"];
+        var bc = [1.74, W.y1 + .3], bz0 = .52, bz1 = 1.28, br = .25, bw = o.night ? ["#B9926A", "#8A6A4E", "#C9A57E"] : [K.woodLight, K.wood, "#EFCB9C"];
         s += box(bc[0] - .34, W.y1, bz0 - .08, .68, .62, .08, WOOD, THIN);
         s += cyl(bc[0], bc[1], bz0, br * .9, (bz0 + bz1) / 2, br, bw[0], bw[1], bw[0], { open: true, sw: 1.4 }) + cyl(bc[0], bc[1], (bz0 + bz1) / 2, br, bz1, br * .9, bw[0], bw[1], bw[2], { sw: 1.4, si: 1 });
         [bz0 + .14, (bz0 + bz1) / 2, bz1 - .12].forEach(function(z, j){ var rr = j === 1 ? br : br * .93, pts = []; for (var q = 0; q <= 12; q++){ var t = (-50 + q * 190 / 12) * Math.PI / 180; pts.push([bc[0] + Math.cos(t) * rr, bc[1] + Math.sin(t) * rr, z]); } s += L(D(pts, true), 1.6, "#5A5560"); });
