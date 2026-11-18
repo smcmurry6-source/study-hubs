@@ -173,7 +173,8 @@ also how to set Ask Timmy up again on a new project.
 
 1. Sam saves `ANTHROPIC_API_KEY` in the Supabase dashboard (Edge Functions, Secrets) and sets the Console's spending limit (skipped for now, [decisions](../decisions.md)).
    **The key saved on 2026-11-14 is named `TIMMY_EVAL_KEY`** (found at the release, BUG-150), so `index.ts` reads that
-   name when there is no `ANTHROPIC_API_KEY`; a secret with the right name, once saved, is the one used.
+   name when there is no `ANTHROPIC_API_KEY`; a secret with the right name, once saved, is the one used. The fallback
+   stays: there is no need to save the key again under the other name (Sam, 2026-11-18).
    **Make the key inside a workspace** (the Console's workspace, then API keys). A key made outside one is refused
    ("This API key is not scoped to a workspace", found on 2026-11-12's first eval run) unless the workspace's id is also
    saved, as `ANTHROPIC_WORKSPACE_ID`.

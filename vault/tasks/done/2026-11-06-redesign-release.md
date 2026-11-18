@@ -1184,6 +1184,6 @@ deployed, the live permissions audit is clean and the post-release check passed.
 **Left**, all in the [inbox](../inbox.md): Sam's own look at the live site (an Ask Timmy question from a phone, Learn and a
 flashcard, a random visit, the classroom with a hub open beside it, scrolling on a real phone); #361's Bennett data fix,
 which this session couldn't confirm and didn't run; the redesign's other task notes, still open; `supabase/schema.sql`
-against the live database's text. The launch trailer is [its own task](../2026-11-13-launch-trailer.md).
+against the live database's text. The launch trailer is [its own task](2026-11-13-launch-trailer.md).
 
 **To roll back:** "The merge, step by step" above: revert #359 with a new PR, leave the database as it is.
