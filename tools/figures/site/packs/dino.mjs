@@ -35,19 +35,19 @@ export function pack(T){
     var th = a * Math.PI / 180, db = bend * Math.PI / 180 / n, st = len / n, px = x, py = y, lt = [], rt = [], rib = "M" + f(x) + " " + f(y);
     for (var i = 0; i < n; i++){
       var ux = -Math.sin(th), uy = Math.cos(th), ww = w * (1 - Math.pow((i + .5) / (n + .3), 1.5)), fx = px + Math.cos(th) * st * .9, fy = py + Math.sin(th) * st * .9;
-      lt.push([px + ux * ww * .28, py + uy * ww * .28], [fx + ux * ww, fy + uy * ww]);
-      rt.push([px - ux * ww * .28, py - uy * ww * .28], [fx - ux * ww, fy - uy * ww]);
+      lt.push([px + ux * ww * .5, py + uy * ww * .5], [fx + ux * ww, fy + uy * ww]);
+      rt.push([px - ux * ww * .5, py - uy * ww * .5], [fx - ux * ww, fy - uy * ww]);
       px += Math.cos(th) * st; py += Math.sin(th) * st; th += db;
       rib += " L" + f(px) + " " + f(py);
     }
     return { d: pts([[x, y]].concat(lt, [[px, py]], rt.reverse())), rib: rib };
   }
-  function frond(x, y, len, a, bend, w, c, sw, n){ var r = frondD(x, y, len, a, bend, w, n); return FO(r.d, c[0], sw || 1) + L(r.rib, (sw || 1) * .75, c[1]); }
+  function frond(x, y, len, a, bend, w, c, sw, n){ var r = frondD(x, y, len, a, bend, w, n); return FO(r.d, c[0], sw || .9) + L(r.rib, (sw || .9) * .8, c[1]); }
   /* a clump of giant fern: fronds arching out of one root, the far ones in shade */
   function giantFern(x, y, k, c){
     var s = "";
     [[-150, -50, 1], [-32, 50, 1], [-122, -60, 0], [-58, 60, 0], [-100, -42, 0], [-80, 40, 0]].forEach(function(q){
-      s += frond(x, y, 20 * k * (q[2] ? .9 : 1), q[0], q[1], 4.2 * k, q[2] ? [c[1], c[3]] : [c[0], c[2]], 1, 7);
+      s += frond(x, y, 24 * k * (q[2] ? .9 : 1), q[0], q[1], 5.4 * k, q[2] ? [c[1], c[3]] : [c[0], c[2]], .9, 6);
     });
     return s;
   }
@@ -57,7 +57,7 @@ export function pack(T){
     s += F("M" + f(x + tw * .2) + " " + f(y) + " L" + f(x + tw * .3) + " " + f(y - th) + " L" + f(x + tw * .7) + " " + f(y - th) + " Q" + f(x + tw + 1) + " " + f(y - th * .6) + " " + f(x + tw) + " " + f(y) + " Z", wood[1], .8);
     var d = ""; for (var i = 1; i < 4; i++) d += "M" + f(x - tw) + " " + f(y - th * i / 4) + " l" + f(tw) + " " + f(-th * .16) + " l" + f(tw) + " " + f(th * .16) + " ";
     s += L(d, .7, INK, .55);
-    [[-172, -10], [-145, -24], [-118, -18], [-62, 18], [-35, 24], [-8, 10], [-92, -6]].forEach(function(q, i){ s += frond(x, y - th, 15 * k, q[0], q[1], 2.6 * k, i < 3 ? [c[0], c[2]] : i < 6 ? [c[1], c[3]] : [c[0], c[2]], .9, 6); });
+    [[-172, -10], [-145, -24], [-118, -18], [-62, 18], [-35, 24], [-8, 10], [-92, -6]].forEach(function(q, i){ s += frond(x, y - th, 15 * k, q[0], q[1], 3.2 * k, i < 3 ? [c[0], c[2]] : i < 6 ? [c[1], c[3]] : [c[0], c[2]], .85, 5); });
     return s;
   }
   /* a tree fern: a thin trunk and a crown of drooping fronds (the far backdrop's, and the long-neck's lunch) */
@@ -229,10 +229,11 @@ export function pack(T){
         s += L("M295 77 q-7 22 -19 42 M305 75 q-3 26 -9 50 M319 76 q5 26 15 52 M328 78 q10 22 24 40", 1, vc[2], .75);
         s += F("M222 140 Q266 122 314 128 Q362 122 406 134 V172 H222 Z", sn ? "#FFFFFF" : n ? "#3C5E50" : "#A6C88C", .95) + L("M232 136 Q268 122 314 127 Q360 121 400 132", 1, INK, .35);
         s += ell(310, 71, 12, 3.2, n ? "#FFB24D" : "#7E6660", 1.3);
-        if (n) s += ell(310, 71.4, 7.6, 1.8, "#FFE08A", 0) + circ(310, 64, 12, "#FF9A3C", 0).replace("/>", ' opacity=".32"/>') + circ(310, 62, 22, "#FF8A3C", 0).replace("/>", ' opacity=".14"/>');
+        if (n) s += ell(310, 71.4, 7.6, 1.8, "#FFE08A", 0) + circ(310, 65, 10, "#FF9A3C", 0).replace("/>", ' opacity=".34"/>') + circ(310, 63, 17, "#FF8A3C", 0).replace("/>", ' opacity=".14"/>');
         var puff = sn ? ["#FFFFFF", "#E3ECF4"] : n ? ["#6E5E82", "#D98A5E"] : ["#F4F0EC", "#DDD4CD"];
-        s += G("tp-cloud", sil([[T.lumps(312, 61, 5.6, 3, 7), puff[0]], [T.lumps(318, 51, 7.4, 5, 8), puff[0]], [T.lumps(329, 41, 8.6, 7, 8), puff[0]], [T.lumps(343, 35, 7, 9, 7), puff[0]]], INK, .6) +
-          F("M306 64 q6 3 12 -1 q4 -6 9 -9 q8 2 12 -5 q6 0 9 -4 q1 6 -6 9 q-6 5 -12 4 q-4 8 -12 9 q-6 3 -12 -3 z", puff[1], n ? .85 : .7), ' opacity=".96"');
+        var pf = [[312, 61, 5.6, 3], [318, 51, 7.4, 5], [329, 41, 8.6, 7], [343, 35, 7, 9]];
+        s += G("tp-cloud", sil(pf.map(function(q){ return [T.lumps(q[0], q[1], q[2], q[3], 8), puff[0]]; }), INK, .6) +
+          pf.map(function(q){ return F(T.lumps(q[0] + q[2] * .2, q[1] + q[2] * .28, q[2] * .66, q[3] + 2, 7, .7), puff[1], n ? .8 : .75); }).join(""), ' opacity=".96"');
         /* the far ridge with its tree ferns and cycads, and a long-neck standing behind the hill, head up */
         s += F("M0 124 Q30 106 70 112 Q110 102 150 112 Q196 104 236 112 Q280 104 318 114 Q356 110 400 122 V300 H0 Z", ridge[0]) + L("M0 124 Q30 106 70 112 Q110 102 150 112 Q196 104 236 112 Q280 104 318 114 Q356 110 400 122", 1.3, INK, .45);
         var tf = sn ? ["#F7FBFF", "#DCEAF6", "#B9CCDD"] : haze, trunk = sn ? "#B9A88E" : n ? "#3A3F4A" : "#8E7A5E", cw = sn ? ["#C9B9A0", "#B09E84"] : n ? ["#3E3A44", "#33303A"] : ["#A08A68", "#8A7456"];
@@ -243,7 +244,7 @@ export function pack(T){
       },
       landExtra: function(o){
         if (o.snow) return [[284, 248], [300, 240], [318, 246], [334, 236]].map(function(q, i){ return print(q[0], q[1], 1, "#B9CCDD"); }).join("");
-        var c = o.night ? "#3A6446" : "#6E9E55";
+        var c = o.night ? "#335C40" : "#5E9248";
         return [[280, 250], [297, 241], [314, 247], [331, 237], [346, 243]].map(function(q, i){ return print(q[0], q[1], i % 2 ? .95 : 1, c); }).join("");
       },
       flat: function(o, on){
@@ -254,10 +255,11 @@ export function pack(T){
       },
       props: function(o, on){
         var fc = o.snow ? SNOWF : o.night ? NFERN : FERN, wood = o.snow ? ["#B9A88E", "#9C8C74"] : o.night ? ["#7A6A58", "#5E5044"] : ["#B08A5E", "#8E6A44"];
-        return T.scatter(163, 9, on, function(sx, sy, i, Rr, x, y){
+        return T.scatter(163, 10, on, function(sx, sy, i, Rr, x, y){
           var s;
-          if (i % 4 === 0) s = giantFern(sx, sy, 1.05 + Rr() * .3, fc);
-          else if (i % 4 === 1) s = cycad(sx, sy, 1 + Rr() * .25, fc, wood);
+          if (i % 5 === 4) s = treeFern(sx, sy, 34 + Rr() * 8, 1.05, [fc[0], fc[1], fc[3]], wood[1], 1) + T.tuft(sx, sy + 1, o.night ? "#3E714B" : "#6AA84C", 1.1);
+          else if (i % 4 === 0) s = giantFern(sx, sy, 1.05 + Rr() * .3, fc);
+          else if (i % 4 === 1) s = cycad(sx, sy, 1.25 + Rr() * .25, fc, wood);
           else if (i % 4 === 2) s = FO(T.lumps(sx, sy - 5, 8, 70 + i, 7, .7), o.night ? "#8E98A3" : "#CFC4B2", 1.4) + F(T.lumps(sx + 2.4, sy - 3.6, 5.4, 74 + i, 6, .7), o.night ? "#6E7882" : "#ADA08C", .8) + (o.snow ? ell(sx - 1, sy - 9, 6, 2, "#FFFFFF", 0) : ammonite(sx - 1.4, sy - 5.6, 2.6, ["#E2B477", "#B98245", "#8A5A2E"])) + frond(sx + 8, sy, 9, -70, 30, 2.2, [fc[1], fc[3]], .9, 5);
           else s = [-3, 0, 3.4].map(function(dx, j){ var h = 12 + j * 3; return L("M" + f(sx + dx) + " " + f(sy) + " v" + f(-h), 2.4) + L("M" + f(sx + dx) + " " + f(sy) + " v" + f(-h), 1.2, o.snow ? "#C9D9E6" : o.night ? "#4C8358" : "#7DB85A") + L("M" + f(sx + dx - 1.4) + " " + f(sy - h * .35) + " h2.8 M" + f(sx + dx - 1.4) + " " + f(sy - h * .65) + " h2.8", 1, o.night ? "#2F5C3C" : "#3B7333"); }).join("") + T.tuft(sx, sy + 1, o.night ? "#3E714B" : "#6AA84C", 1.1);
           return { x: x, y: y, s: s };
@@ -335,15 +337,15 @@ export function pack(T){
       draw: function(o){
         var s = T.ell.apply(null, P(1.8, 1.9, 0).concat([32, 12, "#1B2A3A", 0, .1])), D = T.D, dirt = o.night ? ["#8A6E56", "#6E5644", "#54402F"] : o.snow ? ["#E6E0D6", "#BFAE96", "#8E7A62"] : ["#C9A27A", "#A47E58", "#7E5C3E"], i;
         var x0 = .55, x1 = 2.95, y0 = .55, y1 = 2.8, d = .5, rope = o.night ? "#B9AA88" : "#E2D2A8";
-        var post = function(x, y){ return box(x - .08, y - .08, 0, .16, .16, .95, { top: K.woodLight, left: K.wood, right: K.woodShade }, { sw: 1.1, si: .7 }); };
-        var top = function(x, y){ return P(x, y, .82); };
-        var rp = function(a, b){ var m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + 2.4]; return "M" + f(a[0]) + " " + f(a[1]) + " Q" + f(m[0]) + " " + f(m[1]) + " " + f(b[0]) + " " + f(b[1]); };
+        var post = function(x, y){ return box(x - .08, y - .08, 0, .16, .16, .62, { top: K.woodLight, left: K.wood, right: K.woodShade }, { sw: 1.1, si: .7 }); };
+        var top = function(x, y){ return P(x, y, .52); };
+        var rp = function(a, b){ var m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + 1.6]; return "M" + f(a[0]) + " " + f(a[1]) + " Q" + f(m[0]) + " " + f(m[1]) + " " + f(b[0]) + " " + f(b[1]); };
         var c00 = [x0 - .25, y0 - .25], c10 = [x1 + .25, y0 - .25], c11 = [x1 + .25, y1 + .25], c01 = [x0 - .25, y1 + .25];
         /* the back posts and their rope */
         s += post(c00[0], c00[1]) + post(c10[0], c10[1]) + post(c01[0], c01[1]);
         s += L(rp(top(c01[0], c01[1]), top(c00[0], c00[1])) + " " + rp(top(c00[0], c00[1]), top(c10[0], c10[1])), 2.4) + L(rp(top(c01[0], c01[1]), top(c00[0], c00[1])) + " " + rp(top(c00[0], c00[1]), top(c10[0], c10[1])), 1.1, rope);
         /* the spoil heap behind */
-        var sp = P(2.9, .2, 0); s += FO("M" + f(sp[0] - 13) + " " + f(sp[1] + 2) + " Q" + f(sp[0] - 8) + " " + f(sp[1] - 10) + " " + f(sp[0]) + " " + f(sp[1] - 10) + " Q" + f(sp[0] + 9) + " " + f(sp[1] - 9) + " " + f(sp[0] + 13) + " " + f(sp[1] + 2) + " Z", dirt[0], 1.3) + L("M" + f(sp[0] - 4) + " " + f(sp[1] - 6) + " q3 -2 6 0", .8, dirt[2]);
+        var sp = P(3.05, .35, 0); s += FO("M" + f(sp[0] - 12) + " " + f(sp[1] + 2) + " Q" + f(sp[0] - 12) + " " + f(sp[1] - 4) + " " + f(sp[0] - 7) + " " + f(sp[1] - 5) + " Q" + f(sp[0] - 4) + " " + f(sp[1] - 10) + " " + f(sp[0] + 2) + " " + f(sp[1] - 8) + " Q" + f(sp[0] + 8) + " " + f(sp[1] - 8) + " " + f(sp[0] + 9) + " " + f(sp[1] - 3) + " Q" + f(sp[0] + 13) + " " + f(sp[1] - 2) + " " + f(sp[0] + 12) + " " + f(sp[1] + 2) + " Q" + f(sp[0]) + " " + f(sp[1] + 5) + " " + f(sp[0] - 12) + " " + f(sp[1] + 2) + " Z", dirt[0], 1.3) + F("M" + f(sp[0] + 2) + " " + f(sp[1] - 8) + " Q" + f(sp[0] + 8) + " " + f(sp[1] - 8) + " " + f(sp[0] + 9) + " " + f(sp[1] - 3) + " Q" + f(sp[0] + 13) + " " + f(sp[1] - 2) + " " + f(sp[0] + 12) + " " + f(sp[1] + 2) + " Q" + f(sp[0] + 6) + " " + f(sp[1] + 3.6) + " " + f(sp[0] + 1) + " " + f(sp[1] + 3.4) + " Q" + f(sp[0] + 5) + " " + f(sp[1] - 3) + " " + f(sp[0] + 2) + " " + f(sp[1] - 8) + " Z", dirt[1], .8) + circ(sp[0] - 5, sp[1] - 1, .9, dirt[2]) + circ(sp[0] + 4, sp[1] - 4, .8, dirt[2]);
         /* the pit: its rim, the floor, the two far walls */
         s += FO(D([[x0 - .12, y0 - .12, 0], [x1 + .12, y0 - .12, 0], [x1 + .12, y1 + .12, 0], [x0 - .12, y1 + .12, 0]]), dirt[1], 1.4);
         s += F(D([[x0, y0, 0], [x1, y0, 0], [x1, y1, 0], [x0, y1, 0]]), dirt[0]);
@@ -353,18 +355,18 @@ export function pack(T){
         s += L(D([[1.75, y0, .02], [1.75, y1, .02]], true) + D([[x0, 1.68, .02], [x1, 1.68, .02]], true), .8, "#FFFDF6", .8);
         /* the fossil skull lying in the floor, its back half still in the dirt */
         var sk = P(2.05, 1.95, -d);
-        s += '<g transform="translate(' + f(sk[0] + 7) + " " + f(sk[1] + 3) + ') scale(.62)">' + rexSkull(0, 0, 0) + "</g>";
+        s += '<g transform="translate(' + f(sk[0] + 8) + " " + f(sk[1] + 2) + ') scale(.8)">' + rexSkull(0, 0, 0) + "</g>";
         s += FO("M" + f(sk[0] + 1) + " " + f(sk[1] + 6) + " Q" + f(sk[0] + 4) + " " + f(sk[1] - 4) + " " + f(sk[0] + 10) + " " + f(sk[1] - 3) + " Q" + f(sk[0] + 16) + " " + f(sk[1] - 2) + " " + f(sk[0] + 17) + " " + f(sk[1] + 6) + " Z", dirt[0], 1.1) + L("M" + f(sk[0] + 6) + " " + f(sk[1] + 1) + " q3 -1.6 6 0", .7, dirt[2]);
         var bn = P(1.0, 2.2, -d); s += L("M" + f(bn[0] - 4) + " " + f(bn[1]) + " l8 -2", 3.4) + L("M" + f(bn[0] - 4) + " " + f(bn[1]) + " l8 -2", 1.8, BONE[0]) + circ(bn[0] - 4.4, bn[1] + .2, 1.6, BONE[0], .8) + circ(bn[0] + 4.4, bn[1] - 2.1, 1.6, BONE[0], .8);
         /* the front posts and their rope, with little pennants */
         s += post(c11[0], c11[1]);
         var fr = rp(top(c01[0], c01[1]), top(c11[0], c11[1])) + " " + rp(top(c11[0], c11[1]), top(c10[0], c10[1]));
         s += L(fr, 2.4) + L(fr, 1.1, rope);
-        [[.2, c01, c11], [.55, c01, c11], [.85, c01, c11], [.3, c11, c10], [.7, c11, c10]].forEach(function(q, k){ var a = top(q[1][0], q[1][1]), b = top(q[2][0], q[2][1]), t = q[0], px = a[0] + (b[0] - a[0]) * t, py = a[1] + (b[1] - a[1]) * t + 2.4 * 4 * t * (1 - t); s += FO("M" + f(px - 1.8) + " " + f(py) + " h3.6 l-1.8 3.6 z", k % 2 ? "#F2C94C" : "#E5484D", .7); });
+        [[.2, c01, c11], [.55, c01, c11], [.85, c01, c11], [.3, c11, c10], [.7, c11, c10]].forEach(function(q, k){ var a = top(q[1][0], q[1][1]), b = top(q[2][0], q[2][1]), t = q[0], px = a[0] + (b[0] - a[0]) * t, py = a[1] + (b[1] - a[1]) * t + 1.6 * 2 * t * (1 - t); s += FO("M" + f(px - 1.8) + " " + f(py) + " h3.6 l-1.8 3.6 z", k % 2 ? "#F2C94C" : "#E5484D", .7); });
         /* the tools: a bucket, a sieve leaning on the post, brushes by the edge */
         s += T.cyl(3.15, 1.0, 0, .36, .8, .44, o.night ? "#8E98A3" : "#C9D2DA", o.night ? "#6E7882" : "#A9B3BE", "#5A4A3E", { sw: 1.4, si: 1 });
         var bk = P(3.15, 1.0, .8); s += L("M" + f(bk[0] - 5.4) + " " + f(bk[1]) + " Q" + f(bk[0]) + " " + f(bk[1] - 7) + " " + f(bk[0] + 5.4) + " " + f(bk[1]), 1.1) + ell(bk[0], bk[1] + .4, 4.2, 1.6, dirt[1], 0);
-        var sv = P(.25, 3.25, 0); s += '<g transform="translate(' + f(sv[0]) + " " + f(sv[1] - 7) + ') rotate(-14)">' + ell(0, 0, 7.4, 7.8, "none", 0).replace('fill="none"', 'fill="#E9DDC4" fill-opacity=".55"') + L("M-5 -5 l10 10 M-6 0 l6 6 M0 -6 l6 6 M5 -5 l-10 10 M6 0 l-6 6 M0 -6 l-6 6", .6, INK, .5) + ell(0, 0, 7.4, 7.8, "none", 0).replace('fill="none"', 'fill="none" stroke="' + INK + '" stroke-width="3.6"') + ell(0, 0, 7.4, 7.8, "none", 0).replace('fill="none"', 'fill="none" stroke="' + K.woodLight + '" stroke-width="1.8"') + "</g>";
+        var sv = P(.45, 3.35, 0); s += ell(sv[0], sv[1] + 1, 8.6, 4.2, K.woodShade, 1.4) + ell(sv[0], sv[1], 8.6, 4.2, K.woodLight, 1.4) + ell(sv[0], sv[1] + .4, 6.6, 3, o.night ? "#7A6A5A" : "#B9A88E", .9) + L("M" + f(sv[0] - 4) + " " + f(sv[1] - 2) + " l8 4 M" + f(sv[0] - 6) + " " + f(sv[1]) + " l6 3 M" + f(sv[0]) + " " + f(sv[1] - 2.6) + " l5.4 2.6 M" + f(sv[0] + 4) + " " + f(sv[1] - 2) + " l-8 4 M" + f(sv[0] + 6) + " " + f(sv[1]) + " l-6 3 M" + f(sv[0]) + " " + f(sv[1] - 2.6) + " l-5.4 2.6", .6, INK, .55) + circ(sv[0] - 2, sv[1], 1, dirt[2]) + circ(sv[0] + 2.4, sv[1] + 1, .8, BONE[1]);
         var br = function(x, y, a, c){ return '<g transform="translate(' + f(x) + " " + f(y) + ") rotate(" + a + ')">' + FO("M-.9 0 h1.8 v-8 h-1.8 z", K.wood, .9) + FO("M-1.3 -8 h2.6 v-1.6 h-2.6 z", "#C9D2DA", .8) + FO("M-1.6 -9.6 q-.6 -3 0 -4.4 h3.2 q.6 1.4 0 4.4 z", c, .8) + "</g>"; };
         var b1 = P(3.25, 2.4, 0), b2 = P(2.3, 3.3, 0); s += br(b1[0], b1[1], 70, "#F2D9A6") + br(b2[0], b2[1], -78, "#3B2E3A");
         if (o.snow) s += ell.apply(null, P(1.75, 1.68, 0).concat([18, 3, "#FFFFFF", 0, .6]));

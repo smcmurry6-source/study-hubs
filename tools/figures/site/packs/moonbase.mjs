@@ -126,10 +126,10 @@ export function pack(T){
         for (gt = 5; gt >= 1; gt--) gl.push(dp(G0, T0 + (T1 - T0) * gt / 6));
         var gd = D(gl), greens = function(night){
           var out = F(D([dp(G0, T0), dp(G1, T0), dp(G1, T0 + .07), dp(G0, T0 + .07)]), night ? "#5A3A2A" : "#B07A4E");
-          [0, 8, 16, 24].forEach(function(a, i){ var q = dp(a + 3, T0 + .07); out += F(T.lumps(q[0], q[1] - 3.4, 3.6, 70 + i, 6, .9), night ? "#2F5A3A" : (i % 2 ? "#7CC46A" : "#5DA45A")) + (i % 2 ? "" : L("M" + f(q[0] - 1) + " " + f(q[1] - 3) + " q1.2 -2.6 3 -2.4", 1, night ? "#244A2E" : "#3E8E45")); });
+          [0, 8, 16, 24].forEach(function(a, i){ var q = dp(a + 3, T0 + .07); out += FO(T.lumps(q[0], q[1] - 3.8, 4.2, 70 + i, 6, .9), night ? "#2F5A3A" : (i % 2 ? "#8FD37A" : "#6CBF5E"), .9) + (i % 2 ? "" : L("M" + f(q[0] - 1) + " " + f(q[1] - 3) + " q1.2 -2.6 3 -2.4", 1, night ? "#244A2E" : "#3E8E45")); });
           return out;
         };
-        s += FO(gd, o.night ? K.lit : "#34436A", 1.6) + greens(o.night);
+        s += FO(gd, o.night ? K.lit : "#5A72A8", 1.6) + greens(o.night);
         [8, 21].forEach(function(a){ s += L(D([dp(a, T0), dp(a, T0 + .1), dp(a, T0 + .2), dp(a, T1)], true), 1.3, METAL[1]); });
         s += L(D([dp(G0, .25), dp(8, .25), dp(21, .25), dp(G1, .25)], true), 1.3, METAL[1]) + O(gd, 1.6);
         if (!o.night) s += L(D([dp(G0 + 4, T1 - .05), dp(G0 + 9, T0 + .1)], true), 1.6, "#BFE7FA", .9);

@@ -136,8 +136,8 @@ export function pack(T){
         /* the attic porthole in the spire */
         var aw = ax(.74, -2.4), pa = port(aw[0], aw[1], 3, n, .85); s += pa.s; lights += pa.lights;
         /* the tip: the flag, or a little gold tooth on a spike */
-        var tipY = (o0[1] - tipP[1]) / 10.5, tipX = 5.5 + (tipP[0] - o0[0]) / 9.093 / 2 * 2;
-        if (u.flag) s += T.flagOn(5.5 + (tipP[0] - o0[0]) / 9.093, 5.5, tipY, 2.0);
+        var O0 = P(0, 0, 0), ty = 5.0, tx = ty + (tipP[0] - O0[0]) / (T.U * .8660254), tz = (O0[1] + (tx + ty) * .5 * T.U - tipP[1]) / T.U;
+        if (u.flag) s += T.flagOn(tx, ty, tz - .1, 2.0);
         else s += L("M" + q2(tipP) + " l-1.6 -6", 1.4) + T.tinyTooth(tipP[0] - 2.4, tipP[1] - 10, .5, K.gold);
         /* the body whorl */
         var outline = [], vend = .66;
@@ -246,7 +246,7 @@ export function pack(T){
           s = T.bands(["#0F2C56", "#133565", "#183F73", "#1D4881"], 0, 300) + surface("#2A5A92") + G("tp-water", L("M64 22 q5 -2.4 10 0 q5 2.4 10 0 M150 28 q5 -2.4 10 0 M222 20 q5 -2.4 10 0 q5 2.4 10 0 M334 26 q5 -2.4 10 0", 1.2, "#8FB8E6", .5));
           /* moonlight from above the surface: a soft glow and a faint shaft */
           s += F("M286 10 L314 10 L270 160 L236 160 Z", "#CFE2FF", .07) + op(circ(300, 30, 34, "#FFF3C4", 0), .08) + op(circ(300, 30, 22, "#FFF3C4", 0), .14) + T.moon(300, 30);
-          s += jelly(80, 52, 1, ["#F5B8E6", "#F9D3F0"]) + jelly(146, 26, .8, ["#B9C8FF", "#D9E1FF"]) + jelly(252, 58, .9, ["#F5B8E6", "#F9D3F0"]);
+          s += jelly(80, 52, 1, ["#F5B8E6", "#F9D3F0"]) + jelly(228, 28, .8, ["#B9C8FF", "#D9E1FF"]) + jelly(122, 70, .85, ["#F5B8E6", "#F9D3F0"]);
           var R = T.rng(41); for (var i = 0; i < 22; i++) s += '<circle class="tp-twinkle" cx="' + f(56 + R() * 290) + '" cy="' + f(16 + R() * 96) + '" r="' + (i % 3 ? .8 : 1.3) + '" fill="#C9FFF4" style="animation-delay:' + f(i * .37 % 3) + 's"/>';
           return s;
         }
@@ -407,8 +407,8 @@ export function pack(T){
   }
   /* the sunken chest, lid ajar (bits false) or flung open (bits true) */
   function chest(o, open){
-    var n = o.night, s = "", i, x0 = .55, x1 = 2.85, y0 = 1.05, y1 = 2.45, zb = -.35, zt = .8, R = (y1 - y0) / 2, hl = .52;
-    var wood = n ? { top: "#8A6A52", left: "#7A5A44", right: "#5E4434" } : { top: "#C99263", left: "#B37A4A", right: "#8A5A36" }, iron = n ? "#3E3A48" : "#4E4A58", sand = n ? NSAND : SAND;
+    var n = o.night, s = "", i, x0 = .35, x1 = 3.0, y0 = .95, y1 = 2.5, zb = -.3, zt = 1.0, R = (y1 - y0) / 2, hl = .6;
+    var wood = n ? { top: "#8A6A52", left: "#7A5A44", right: "#5E4434" } : { top: "#D9A06A", left: "#C4864F", right: "#94603A" }, iron = n ? "#3E3A48" : "#4E4A58", sand = n ? NSAND : SAND;
     var lidPts = function(ang){ var a = rad(ang), out = []; for (var j = 0; j <= 10; j++){ var ph = Math.PI * j / 10, dy = R + R * Math.cos(ph), dz = hl * Math.sin(ph); out.push([dy * Math.cos(a) - dz * Math.sin(a), dy * Math.sin(a) + dz * Math.cos(a)]); } return out; };
     /* a lid: its curved top (the faces you can see) and its end cap, hinged on the back edge */
     var drawLid = function(ang){
@@ -428,9 +428,10 @@ export function pack(T){
       var g = P(1.7, 1.75, 0);
       s += ell(g[0] + 2, g[1] + 4, 33, 11, "#1B2A3A", 0, .12);
       /* seaweed behind it, and the anchor leaning on its far end */
-      var sw = P(.45, .7, 0), kc = n ? ["#2E5E4E", "#24503F"] : ["#7DB35A", "#557F3C"];
-      s += kelp(sw[0], sw[1], 30, 3, kc, 11) + kelp(sw[0] + 6, sw[1] + 2, 22, -3, kc, 13);
-      var an = P(3.25, .85, 0), at2 = P(3.0, 1.4, 1.95), ac = n ? "#4E5260" : "#6B6E7A";
+      var sw = P(.3, .55, 0), kc = n ? ["#2E5E4E", "#24503F"] : ["#7DB35A", "#557F3C"];
+      s += kelp(sw[0], sw[1], 26, 3, kc, 11) + kelp(sw[0] + 6, sw[1] + 2, 18, -3, kc, 13);
+      var an = P(3.35, .45, 0), at2 = P(3.35, .45, 3.0), ac = n ? "#4E5260" : "#6B6E7A";
+      an = [an[0] + 6, an[1]];
       s += tube("M" + f(an[0]) + " " + f(an[1] - 2) + " L" + f(at2[0]) + " " + f(at2[1]), 2.6, ac) + tube("M" + f(at2[0] - 7) + " " + f(at2[1] + 5) + " l14 -6", 2.2, ac) + circ(at2[0] - 1, at2[1] - 4.4, 3.2, "none", 0).replace('fill="none"', 'fill="none" stroke="' + INK + '" stroke-width="4.4"') + circ(at2[0] - 1, at2[1] - 4.4, 3.2, "none", 0).replace('fill="none"', 'fill="none" stroke="' + ac + '" stroke-width="2"') +
         tube("M" + f(an[0] - 10) + " " + f(an[1] - 8) + " q10 10 20 -1", 2.4, ac) + FO("M" + f(an[0] - 12) + " " + f(an[1] - 11) + " l-1 6 5 -2 z M" + f(an[0] + 12) + " " + f(an[1] - 12) + " l1 6 -5 -2 z", ac, 1);
       /* the chest, its bottom in the sand */
@@ -441,7 +442,7 @@ export function pack(T){
       /* the gap under the lid: the dark inside, gold in it */
       var L0 = drawLid(16), fe0 = L0.at(x0, L0.pr[0]), fe1 = L0.at(x1, L0.pr[0]);
       s += FO(D([[x0, y1, zt], [x1, y1, zt], fe1, fe0]), n ? "#2A1E18" : "#3B2A20", 1.2);
-      for (i = 0; i < 7; i++){ var gp = P(x0 + .3 + i * .3, y1 - .05, zt + .08); s += crown(gp[0], gp[1] - 1, .3, (i % 3 - 1) * 12); }
+      for (i = 0; i < 8; i++){ var gp = P(x0 + .3 + i * .29, y1 - .05, zt + .08); s += crown(gp[0], gp[1] - 1, .34, (i % 3 - 1) * 12); }
       s += L0.s;
       /* the hasp: a gold plate with a tooth on it */
       var hp = P((x0 + x1) / 2, y1 + .01, zt - .28); s += FO("M" + f(hp[0] - 3.4) + " " + f(hp[1] - 4) + " h6.8 v6.4 l-3.4 2.4 -3.4 -2.4 z", K.gold, 1.1) + T.tinyTooth(hp[0], hp[1] + .4, .42, "#FFF0B3");
@@ -454,7 +455,7 @@ export function pack(T){
       drift += " Q" + q2(bot) + " " + q2(bot2) + " Z";
       s += FO(drift, o.snow ? "#FFFFFF" : sand[1], 1.3) + L(D2([P(x0, y1 + .4, .08), P(1.6, y1 + .35, .1), P(2.6, y1 + .3, .08)], true), .9, sand[3], .7);
       /* spilled: crowns over the edge and on the sand, a few pearls */
-      [[1.25, y1 + .12, .62, 20], [1.95, y1 + .1, .7, -10], [1.0, y1 + .75, 0, 30], [1.55, y1 + .85, 0, -6], [2.15, y1 + .7, 0, 14], [2.6, y1 + .9, 0, -24], [1.85, y1 + 1.15, 0, 8]].forEach(function(q){ var cp = P(q[0], q[1], q[2]); s += crown(cp[0], cp[1] - 3, .36, q[3]); });
+      [[1.25, y1 + .12, .62, 20], [1.95, y1 + .1, .7, -10], [1.0, y1 + .75, 0, 30], [1.55, y1 + .85, 0, -6], [2.15, y1 + .7, 0, 14], [2.6, y1 + .9, 0, -24], [1.85, y1 + .98, 0, 8]].forEach(function(q){ var cp = P(q[0], q[1], q[2]); s += crown(cp[0], cp[1] - 3, .42, q[3]); });
       [[1.3, y1 + 1.0], [2.35, y1 + 1.05], [0.8, y1 + .55]].forEach(function(q){ var pp = P(q[0], q[1], 0); s += pearl(pp[0], pp[1] - 1.6, 1.8); });
       return s;
     }
