@@ -34,6 +34,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 - **2026-11-18 ("Release tests" faster, and WebKit doesn't block a merge, Claude Code, #416; nothing on the site changes)** — Sam: "do both". The device matrix's Firefox and WebKit jobs run in Playwright's own image (`mcr.microsoft.com/playwright:v1.63.0-noble`, `--user 1001`), which already has the browsers and their system packages: installing those from Ubuntu's mirror took 22 minutes for WebKit and 11 for Firefox on today's runs, for one to two minutes of tests. WebKit's job is out of `release` ("devices in WebKit (doesn't block a merge)", `continue-on-error`). Found on the way (BUG-178): since the per-browser split of 2026-11-13 those two jobs stopped at `matrix.js`'s Chromium-only resilience part, which `run.js` called blocked and passed, so neither had tested anything. Now the resilience part runs only with Chromium, a browser that won't start is a problem in CI, and `run.js` fails a blocked suite in CI. The Chromium jobs keep `--with-deps` (it brings the fonts the layout checks and baselines were measured with).
 - **2026-11-18 (No more tiers for merging, Claude Code; nothing on the site changes)** — Sam: "i want to take out all the tier change rules for merging. it takes too long. it didnt use to take so long". Every change now ships one way: the checks for what you touched, a draft PR, CI, a screenshot for Sam when students will see a difference, Sam's "merge". No local release suites, test report, bug-log rows or preview offer, and no tier 3 extras. CI and the After merge workflow are unchanged. Rewritten: [preview-and-release-test](vault/rules/preview-and-release-test.md), [RELEASE_TEST_PLAN.md](RELEASE_TEST_PLAN.md) sections 1, 2, 6, 7 and 10, `AGENTS.md`, ship-a-change, verify-before-pushing, long-tests-once, preview-a-change, package-the-to-dos and `/backlog`, the PR template (no Tier, UAT or Bugs sections) and the test report template (optional now).
+- **2026-11-18 (lessons refresh, and the game economy joins the audit, Claude Code, #414)** — Sam: "add to the lessons audit a review of xp
+  and crowns across the class to make sure earn rates are healthy. also include shop prices". A standing rule,
+  [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md) (on demand, for anything that changes a rate, a prize or a
+  price), with a yardstick in median study days per rarity; `tools/economy.sql` (E0-E7: the live rules, crowns and XP per study day
+  and hour, the class's rhythm, wallets and spending, the price ladder in study days, ranks, the leaderboards), step 1b of `/lessons-audit` and a line in
+  `tools/lessons-refresh.md`. First reading in `LESSONS.md` ("The game economy"): about 700 crowns a median study day since
+  the crown raise (#403's migration, live on the database), everything under Legendary two to three times cheaper than the yardstick, half the active class able to buy anything,
+  4% spent (7% by the afternoon); Sam: "lets keep all the prices for now". **Perio, the day before its final**: `q5-L14` retired (furcation
+  entrance widths, which the final won't ask; its High Likelihood topic reworded and S5's High yield recorded again), `pc-d3`'s stem
+  states its assumption, `q7-P01` asks about the case (report #54), `q4-L27`'s "re-check" pair reworded (report #59), `q7-01`'s
+  explanation gives both bone-loss limits (report #60), their `variants.json` wordings too. Occlusion's retrospective has its 22 check-ins.
 - **2026-11-18 (The launch trailer's tools, Claude Code, #415; nothing on the site changes)** — Sam: "you can merge
   the tools and notes in case we ever make another trailer". `tools/trailer/` made the redesign's launch trailer, a
   94 second, 16:9 video narrated by Timmy from a newly drawn Timmy Time studio
@@ -93,7 +104,38 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `perf.js --update` would have raised several (budgets go up only with Sam's OK), and bytes and requests don't depend on
   the browser. The site itself doesn't change. What to do the next time `ubuntu-latest` moves:
   [verify-before-pushing](vault/how-to/verify-before-pushing.md).
-
+- **2026-11-17 (Crowns go up as you earn them, and prizes that pay XP and crowns, Claude Code, #403)** —
+  Sam: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp earn rates",
+  then a list of prizes. The crowns were paid but never redrawn (BUG-177): `migration_v68.sql` puts `crowns` (the balance
+  after it) in every paying reply and `widget/v3.js` sends it as `sh:crowns` (the hub's meters, its shop, the dashboard's
+  wallet; a gold "+n crowns" under the rank). No daily cap on either (the 600 cap is the old pages' only). Prizes, one
+  `xp_awards` row each, paying as many crowns as XP (`sh_prizes()`, copied as `PRIZES` in `v3.js`): the name 500, the daily
+  ring 5 a question of the goal, a Plaque Boss's 500 by damage (`widget/eggs.js`), 10/25/50 in a row, day streaks
+  3-100, a nuke 10,000 (`launch_nuke_v2`), the all-time run record 20,000, a lecture read to the end 50 (timed on the
+  page, `widget/hub.js`), a new trophy 200 (`widget/ranks.js`), medals 250-1,000, the day's first game 100, a personal best
+  50 and a hub high score 250, a daily visit 50 (`widget/dash.js`), a fixed report's 100 crowns. Every card says what it
+  pays (Timmy Time, Mark as read, the arcade, the goal, the visit, the name, the nuke badge, the shop's list). About page,
+  [game-server](vault/reference/game-server.md), event taxonomy and retention updated; `xp.js` 519 checks.
+  Then Sam: "Every right answer should give xp": `sh_answer` pays every right answer graded from its key (a retired
+  question's too), with no speed limit and no limit a day (a double tap and the same question twice in a mock count once);
+  misses keep their limits, and the run toward the nuke still counts only answers at the speed limit. `sh_xp_replay` pays the
+  same, and the migration rebuilds every visitor from it, paying the right answers since the release that had paid nothing
+  (about 80 from about 25 people since the release, nearly all under 2 seconds after the one before). The page's guess
+  (`xpFor` in `widget/hub-rewards.js`), the About page's XP entry and More's note say the same.
+  Then "lets increase it to 5 crowns per 10xp": `sh_wallet` pays 5 crowns per 10 study XP (was 1), from all the XP so far
+  (the balance is worked out, so every balance went up); every card, the shop's list, the About page and the preview's
+  wallet say 5. The shop's prices weren't changed. And "also 100 crowns per hour of hub time": `sh_time_crowns` pays 100 an
+  hour from `activity_hourly` (all the time recorded, at most 144 pings in a clock hour), in the wallet's `from_time`;
+  the planned collapse of `activity_hourly` must keep it (inbox).
+  **Applied to the live project on 2026-11-18** through the connector (its confirmation answered by the new hook,
+  `.claude/hooks/supabase-confirm.js`), appended to `supabase/schema.sql`; every function's body matched the tested copy, and
+  the rebuild agreed with live XP for all 77 people with an answer since the release. Class-wide after it: 168 wallets, none
+  below zero, median about 1,200 crowns, about 300,000 of the 740,000 from hub time.
+  It was written and applied as "v64", but other sessions' v64 (matching items graded as an order), v65, v66 and v67 reached
+  `main` first (v66 and v67 while this PR waited to merge), so it is `migration_v68.sql`; applied after that v64, it had replaced `sh_answer` without
+  that v64's one branch (a cached page's matching answer, taken at its word), so `migration_v69.sql` puts it back (applied the
+  same day; no answer in between needed it). Bug BUG-177 (the numbers before it were taken). Before applying a migration, fetch `main` and
+  take the next free number, and fetch it again before merging ([repo map](vault/reference/repo-map.md)).
 - **2026-11-18 (more cosmetics: six year-round collections, five rare costumes, six paints, Claude Code)** — Sam: "Lets work on
   timmy outfits and place cosmetics. Go crazy" ([the task](vault/tasks/done/2026-11-18-more-cosmetics.md)). **Six collections**
   (`COLLECTIONS` in `tools/figures/site/sets.mjs`, one pack each in `tools/figures/site/packs/`: `dino`, `moonbase`, `reef`,

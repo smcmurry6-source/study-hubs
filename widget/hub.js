@@ -540,8 +540,11 @@
   var POD_COL = { tint: "#F2C94C", light: "#FFFFFF", line: "#F2C94C" };
   function podMiniHTML(pod){
     var min = pod.duration ? Math.round(pod.duration / 60) : 0;
+    /* what a first listen pays (Sam, 2026-11-17: "visibly add crowns available to be earned on cards like timmy time"): 10 XP
+       a minute heard and 100 for finishing (migration_v54), in crowns 1 a minute and 100 for finishing (v68) */
+    var G = window.shGame, mins = pod.duration ? Math.ceil(pod.duration / 60) : 0, earn = mins && G && G.live && G.live() ? '<span class="pm-earn">Up to +' + fmt(mins * 10 + 100) + " XP and " + fmt(mins * 5 + 100) + " crowns</span>" : "";
     return '<a class="ql ql-pod" href="#more/timmy">' +
-      '<span class="pm-text"><b>Timmy Time <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(pod.title || "The audio review") + "</small>" +
+      '<span class="pm-text"><b>Timmy Time <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(pod.title || "The audio review") + "</small>" + earn +
       '<span class="pm-play">' + icon("play", 16) + "Listen" + (min ? '<span class="pm-min"> · ' + min + " min</span>" : "") + "</span></span>" +
       '<span class="pm-art" aria-hidden="true">' + spot("notes", POD_COL, "pm-notes") + spot("timmyTime", POD_COL, "pm-timmy") + "</span></a>";
   }
@@ -864,11 +867,47 @@
      doesn't). Tapping the button again takes it back. Saved on this device, like highlights; the lecture's badge fills in
      its color, with a check, in the notes' list, on Home and in the headings. */
   var READ_AFTER = 60000;
-  function readBtnHTML(lec){ var on = isRead(lec.id); return '<button class="btn btn-done' + (on ? " is-on" : "") + '" type="button" data-read aria-pressed="' + on + '">' + icon("check", 18) + "<span>" + (on ? "Notes done" : "Mark notes as done") + "</span></button>"; }
+  function readBtnHTML(lec){ var on = isRead(lec.id); return '<button class="btn btn-done' + (on ? " is-on" : "") + '" type="button" data-read aria-pressed="' + on + '">' + icon("check", 18) + "<span>" + (on ? "Notes done" : "Mark notes as done") + "</span></button>" + readEarnHTML(lec); }
+  /* reading a lecture through pays 50 XP and crowns once (migration_v68; Sam: "small bonus for completing a lecture in
+     notes. immediately scrolling to the bottom doesnt count"). The page asks the server for a read id when the lecture
+     opens and claims it when the notes are marked done, by the button or by reading to the end, once the page has been
+     open and in view long enough for the lecture's length (a quick skim: 600 words a minute, at least a minute); the server
+     wants 60 seconds too. */
+  var READ = null;
+  function readEarnHTML(lec){
+    var G = window.shGame;
+    if (isRead(lec.id) || !G || !G.live || !G.live() || !G.prizes) return "";
+    return '<span class="earn read-earn">' + (HX.shopCoin ? HX.shopCoin(16) : "") + "Read it through: +" + G.prizes.notes + " XP and " + G.prizes.notes + " crowns</span>";
+  }
+  function readStart(el, lec){
+    var G = window.shGame;
+    if (READ && READ.lec === lec.id && READ.hub === HUB) return;
+    READ = null;
+    if (isRead(lec.id) || !G || !G.ask || !G.live || !G.live()) return;
+    var art = $(".reading", el), words = art ? (art.textContent.match(/\S+/g) || []).length : 0;
+    var r = READ = { hub: HUB, lec: lec.id, id: null, need: Math.min(15 * 60000, Math.max(60000, words / 600 * 60000)), active: 0, last: Date.now() };
+    G.ask("notes_start_v2", { p_visitor: ls("sh_visitor_id"), p_hub: HUB, p_lec: lec.id }).then(function(id){ if (READ === r && typeof id === "string") r.id = id; });
+  }
+  /* time with the notes in view: counted every few seconds while this lecture's notes are open and the page is visible */
+  setInterval(function(){
+    var r = READ, now = Date.now(); if (!r) return;
+    if (view === "notes" && STATE.ui.lec === r.lec && document.visibilityState === "visible") r.active += Math.min(now - r.last, 6000);
+    r.last = now;
+    /* marked done before its time: it pays once the reading has caught up, if it's still marked */
+    if (r.wait && r.active >= r.need && isRead(r.lec)) { if (LBY[r.lec]) readClaim(LBY[r.lec]); }
+  }, 5000);
+  function readClaim(lec){
+    var r = READ, G = window.shGame;
+    if (!r || r.lec !== lec.id || !r.id || !G || !G.claim) return;
+    if (r.active < r.need) { if (!r.wait) toast("Notes done. Keep reading: the +" + G.prizes.notes + " XP and crowns come once you've had time to read it through."); r.wait = true; return; }
+    READ = null;
+    G.claim("notes_done_v2", { p_visitor: ls("sh_visitor_id"), p_read: r.id }, "notes");
+  }
   function setRead(el, lec, on, how){
     STATE.read = STATE.read || {};
     if (on) STATE.read[lec.id] = day(0); else delete STATE.read[lec.id];
     saveState(); track("notes:" + (on ? "done" : "undone") + (how ? "-" + how : ""));
+    if (on) readClaim(lec);
     var b = $("[data-read]", el); if (b) b.outerHTML = readBtnHTML(lec);
     var nav = $(".lec-list", el); if (nav) { nav.outerHTML = lecListHTML(lec); wireLecPick(el); }
     var t = $(".rd-title .lb", el); if (t) t.outerHTML = lecBadge(lec, "lb-h");
@@ -877,6 +916,7 @@
   function wireReadBtn(el, lec){ var b = $("[data-read]", el); if (b) b.addEventListener("click", function(){ setRead(el, lec, !isRead(lec.id), ""); }); }
   function wireRead(el, lec, manual){
     wireReadBtn(el, lec);
+    if (!manual) readStart(el, lec);
     var end = $(".foot-acts", el), opened = Date.now(), seen = false, timer = null;
     if (manual || !end || isRead(lec.id) || !("IntersectionObserver" in window)) return;
     var auto = function(){ if (end.isConnected && seen && !isRead(lec.id) && view === "notes") setRead(el, lec, true, "auto"); };
@@ -1153,6 +1193,12 @@
     });
   }
   var GAME_INFO = {};
+  /* what games pay (migration_v54, v68): each game finished 50 XP once a day; the day's first game, beating your best and the
+     hub's top score pay as many crowns as XP */
+  function arcadeEarnHTML(){
+    var G = window.shGame, P = G && G.prizes; if (!P || !G.live || !G.live()) return "";
+    return '<p class="earn ar-earn">' + (HX.shopCoin ? HX.shopCoin(16) : "") + "First game today: +" + P.game + " XP and crowns. Beat your best: +" + P.pb + ". Top score in this hub: +" + P.top + ".</p>";
+  }
   function moreArcade(body, open){
     body.innerHTML = '<p class="note loading">Loading the arcade…</p>';
     needArcade().then(function(){
@@ -1165,7 +1211,7 @@
       var art = function(g){ return GA[g.id] ? '<span class="game-pic">' + img(GA[g.id].body, "", "", AH.gamesViewBox) + "</span>" : '<span class="game-art" aria-hidden="true">' + icon(g.icon || "arcade", 30) + "</span>"; };
       var tile = function(g, k){ return '<li class="game c' + (k % 4) + (g.id === first ? " is-first" : "") + (GA[g.id] ? " has-pic" : "") + '">' + art(g) + '<div><h2>' + esc(g.name) + "</h2><p>" + esc(g.desc) + '</p><p class="note num">Your best: ' + fmt(best[g.id] || 0) + " · played " + pl(plays[g.id] || 0, "time") + '</p></div><button class="btn' + (g.id === first ? " btn-primary" : "") + '" type="button" data-game="' + esc(g.id) + '">' + icon("play", 18) + "Play</button></li>"; };
       body.innerHTML = '<div class="arcade-lobby"><ul class="ar-grid">' + games.map(tile).join("") + "</ul>" +
-        '<p class="note">' + esc(X.how || "") + "</p></div>" +
+        '<p class="note">' + esc(X.how || "") + "</p>" + arcadeEarnHTML() + "</div>" +
         '<div id="panel-arcade" class="arcade-stage" hidden></div>';
       var stage = $("#panel-arcade", body), lobby = $(".arcade-lobby", body);
       function back(){ try { ARC.arcade.stopAll(); } catch (e) {} stage.hidden = true; stage.innerHTML = ""; lobby.hidden = false; }
@@ -1189,7 +1235,7 @@
     var R = window.shRanks, useCase = !!(R && R.trophyCase), host = $("[data-trophies]", body);
     var rankPanel = useCase ? "" :
       '<section class="panel" aria-labelledby="srH"><h2 id="srH">Your rank</h2><div class="rank-big"><span class="hp" data-rankart="64" aria-hidden="true">' + HX.rankArt(64) + "</span><div><p class=\"rank-name\">" + esc(HX.rankName()) + '</p><p class="num">' + (x === null ? "+" + fmt(HX.todayRec().xp) + " XP today" : fmt(x) + " XP" + (p && p.next_at && p.next_at > x ? " · " + fmt(p.next_at - x) + " to the next level" : "")) + "</p></div></div>" +
-        (game ? '<div data-road></div><p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study. A question pays its first three right and its first three wrong answers a day. More comes from the day\'s 20th answer, fixing a miss, a finished mock exam and every mastery medal, which also starts 24 hours of double XP.</p>'
+        (game ? '<div data-road></div><p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study. Every right answer pays; a question pays its first three misses a day. More comes from the day\'s 20th answer, fixing a miss, a finished mock exam and every mastery medal, which also starts 24 hours of double XP.</p>'
           : '<p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study (answer XP tops out at 600 a day).</p>') +
         '<button class="btn" type="button" data-open-stats>' + icon("trophy", 18) + "Trophies and leaderboards</button></section>";
     var grid = '<div class="stats-grid">' + rankPanel +
@@ -1314,6 +1360,12 @@
       (on ? "On: Timmy and every extra are off. Turn it off to bring back what you had." : "Turns Timmy and every extra off in one tap: just the notes and the questions.") + "</small></div>" +
       '<button class="btn' + (on ? " btn-primary" : "") + ' focus-btn" type="button" role="switch" aria-checked="' + on + '" data-focus>' + (on ? "On" : "Off") + "</button></div>";
   }
+  /* choosing a name pays 500 XP and crowns, once (migration_v68): said until the wallet says it's taken */
+  function nameEarn(){
+    var G = window.shGame, w = HX.wallet ? HX.wallet() : null;
+    if (!G || !G.live || !G.live() || !G.prizes || !w || !w.got || w.got.name !== false) return "";
+    return ' <span class="earn">Choosing one pays +' + fmt(G.prizes.name) + " XP and " + fmt(G.prizes.name) + " crowns, once.</span>";
+  }
   function moreSettings(body){
     var theme = ls("sh_theme") || "", size = ls("sh_pref_size") || "default";
     var extrasHTML = function(){ return EXTRAS.map(function(x){ return '<div class="set-row"><div><b>' + esc(x[1]) + "</b><small>" + esc(x[2]) + "</small></div>" + seg(x[0], x[3] || [["on", "On"], ["off", "Off"]], ls(x[0]) || "on") + "</div>"; }).join(""); };
@@ -1325,7 +1377,7 @@
       '<section class="panel" aria-labelledby="sgH"><h2 id="sgH">Your daily goal</h2>' +
         '<div class="set-row"><div><b>Questions a day</b><small>The ring in the bar fills as you answer, right or wrong. Your streak counts any day you answer a question.</small></div>' + seg("goal", [["10", "10"], ["20", "20"], ["30", "30"], ["40", "40"], ["50", "50"]], String(HX.goal())) + "</div>" +
         /* drawn even before the shared widget is in (a page opened straight on Settings): a tap waits for it */
-        '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' +
+        '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + "." + nameEarn() + '</small></div><button class="btn" type="button" data-name>Change your name</button></div>' +
         '<div class="set-row"><div><b>Link my devices</b><small>One rank, streak, trophy case and question progress on your phone, tablet and laptop.</small></div><button class="btn" type="button" data-link>Link my devices</button></div></section>' +
       '<section class="panel" aria-labelledby="sxH"><h2 id="sxH">Timmy and the extras</h2><p class="note">The fun stuff that isn\'t studying. None of it shows during a mock exam.</p><div data-extras>' +
         extrasHTML() + "</div></section></div>";

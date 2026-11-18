@@ -182,6 +182,9 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11
 `hubs/perio/` at the [release](../tasks/done/2026-11-06-redesign-release.md).
 - It is in `sw.js`'s `HUBS`, so its page, art and content are precached; a content edit shows on the page load after the
   one that fetched it.
+- **The page's weight budget** is `hubs/perio/` in `tools/release/budgets.json`: 850 KB since 2026-11-18 (BUG-176), when
+  `node tools/release/perf.js --page hubs/perio/` measured 834 KB, most of it `questions.json` (190 KB gzipped) and
+  `notes.json` (167 KB). Check it after a big addition; raise it only with a reason in the PR that Sam approves.
 - Each session's Review tables sit under that session's notes (`core.noSide`: More's Side by side has nothing left, so
   it's hidden). The Patient Box cases are `core.json`'s `pcases`, checked by `node tools/ci/cases.js`.
 - **Progress carries over:** same hub id, state key `perio-d2-compendium-state-v1`, answered event `perio:answered`, every
@@ -215,6 +218,9 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11
 
 ## Pending
 
+- After the final, read question health again (the 2026-11-18 audit checked and left `q7-T08`, `q6-L38`, `q9-L09`, `q9-L26`,
+  `q5-S04`, `q8-03`, `q9-S07`, `q9-L41`, `q7-L27`, `q7-L43`, `q8-P02`, `q9-L38`: their keys match the notes), and reports #55/#56
+  (statements reordered on a retry: Sam said yes 2026-11-18, [inbox](../tasks/inbox.md)).
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
 - [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md): its transcript has been in Drive since 2026-10-25 as

@@ -10,6 +10,20 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [x] **Re-price the middle of the shop, if Sam agrees** (decided: Sam, 2026-11-18, "lets keep all the prices for now"; the next audit reads it again, [decisions](../decisions.md)) (the 2026-11-18 lessons audit, [earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md)):
+  since studying pays 5 crowns per 10 XP and 100 an hour (#403's crowns migration, live since 11-18), the median study day earns about 700 crowns, so a Rare
+  costs 1-2 study days, an Epic 2-4 and a Legendary 6-12, and half the class could buy anything today (4% of crowns spent). Proposed:
+  Rare 1,500-2,500, Epic 3,500-6,000, Legendary 7,000-12,000, the boosts 300 and 800, the rest as they are (a migration: the rarity
+  bands are checked in the database). Or wait and read `tools/economy.sql` again at the next audit, with the prizes in and the back
+  pay out. Sam's call.
+- [ ] **A statement item reorders its statements on a retry** (Perio reports #55, #56, 2026-11-17: "the order of the statements as
+  well as the order of the question answers should change so you dont just remember the answer was 1, 2 and 4"). The new wordings
+  (`variants.json`) reword but keep the order. A wording could renumber the statements and relabel each choice to the same set
+  (choice k still means the same statements, so the keys and the class's picks hold), but `numbered-statements`' canonical order and
+  `two-statement`'s fixed choices would need an exception for a reordered wording. **Sam said yes, 2026-11-18** ("yes to the two ideas"): being built.
+- [ ] **A High likelihood chip says why** (Perio report #57, 2026-11-17: "what is the rationale for this being high likelihood"):
+  the chip on a card could name its topic and basis (the hint, the review, the check-ins), the way Exam Hints' "Most likely
+  questions" list already does (`widget/hub.js`). **Sam said yes, 2026-11-18**: being built.
 - [x] **Tap a word in the notes to jump the narration there** (Sam, 2026-11-17; done, on phones too, with the Highlight button's phone fix, BUG-157: #391): in Listen / Follow along, clicking a word
   skips the recording to that word (each recording's `.words.json` has the timings).
 - [x] **Let Ask Timmy use outside sources** (Sam, 2026-11-17; done: when the notes don't cover it, he looks it up on trusted
@@ -18,6 +32,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   answer for ... just to fill in the gaps", then "we can do web search, the sites and others like them are good to go on
   the list, no limit on gap answers".
 - [x] **Show the Shiny Gold Crowns you've earned on Home's Today card** (Sam, 2026-11-17). Done: a Crowns tile with the balance (what's left to spend; "earned in all" in its tooltip) that opens the shop (#391).
+- [ ] **More ways to earn crowns, if Sam wants them** (2026-11-17; Sam, with the prizes of `migration_v68.sql`: "im open to
+  other ways too"). Ideas offered, none built: catching the Tooth Fairy or the Golden Probe, a perfect mock, Yesterday's
+  misses all right, an idea of yours marked done on the idea board, the first day back after a week away. Each would be one
+  `xp_awards` row with a key that pays once and an amount in `sh_prizes()` ([game-server](../reference/game-server.md)).
+  (Studying's rate was raised to 5 crowns per 10 XP the same day, Sam: "lets increase it to 5 crowns per 10xp".)
 - [x] **More cosmetics for Timmy and Timmy's place** (Sam, 2026-11-17): new outfits and place pieces
   ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`). Sam brought it back on 2026-11-18 ("Go
   crazy"): now [its task](done/2026-11-18-more-cosmetics.md).
@@ -234,7 +253,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   11-06 and 11-10. Done 2026-11-12 ([#328](https://github.com/smcmurry6-source/study-hubs/pull/328)): Sam kept the bitrates and had the five archived hubs' audio
   taken off (958 → 589 MB), and every hub's at its archiving ([rule](../rules/archived-hubs-drop-their-audio.md),
   [next ones](2026-11-12-audio-off-at-archiving.md)). The publishes take 1-3 minutes at 958 MB; 11-10's timeout was a one-off.
-- [ ] Retention, the part not built yet (approved 2026-11-04, [analytics-retention](../reference/analytics-retention.md)): before the school year ends (spring 2027), collapse `activity_hourly` / `activity_visits` older than the school year to hub × section × day with people counts and no ids, as one more step in `sh_retention_run`. Also ask Sam about the two rows the question-health work proposed (`question_events`, `question_feedback`).
+- [ ] Retention, the part not built yet (approved 2026-11-04, [analytics-retention](../reference/analytics-retention.md)): before the school year ends (spring 2027), collapse `activity_hourly` / `activity_visits` older than the school year to hub × section × day with people counts and no ids, as one more step in `sh_retention_run`. **Since migration_v68 the wallet pays 100 crowns per hour of hub time from `activity_hourly`** (`sh_time_crowns`): before the collapse deletes a visitor's hours, keep what they paid (each visitor's capped ping total in a small table `sh_time_crowns` reads, or the crowns as a row), or balances drop. Also ask Sam about the two rows the question-health work proposed (`question_events`, `question_feedback`).
 - [x] A hub's Home on a 320px-wide phone at the XX-Large text size scrolls sideways by about 40px (fixed in #391: the ring's caption drops under the ring when there's no room, the timeline's words wrap): the course timeline's rows (`.tl-what`) and the goal ring's caption (`.ring-cap`) don't wrap that narrow. Found 2026-11-13 while fixing BUG-143; not one of the sizes the smoke test checks (320px at the default size and 390px at the largest both fit).
 - [x] **A medal won during a shop boost runs over the rest of it** (2026-11-17, seen in #394; done: `sh_boost_bump`, `migration_v63.sql`, #395): since `migration_v62.sql` a boost
   bought during a medal's 24 hours waits for them, but a medal won while a shop boost is running starts its 24 hours on top of

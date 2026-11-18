@@ -9,5 +9,19 @@
       "mcp__Supabase__create_branch"
     ]
   },
-  "autoCompactWindow": 500000
+  "autoCompactWindow": 500000,
+  "hooks": {
+    "Elicitation": [
+      {
+        "matcher": "Supabase|supabase",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/supabase-confirm.js\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
 }

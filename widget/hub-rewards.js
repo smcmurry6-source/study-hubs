@@ -70,14 +70,15 @@
   }
   /* XP as the server counts it. On the live rules (widget/ranks.js, "How XP works"): 10 the first time you get a
      question right, 2 for any other right answer, 1 for a miss, 20 for every day you study; answer XP is capped at 600
-     a day. On the game layer: the same 10, 2 and 1 with no cap, a self-graded card a flat 2, each question paying
-     its first three right and its first three wrong answers a day, all of it doubled while a boost runs. This is the
+     a day. On the game layer: the same 10, 2 and 1 with no cap, a self-graded card a flat 2, every right answer paying
+     (migration_v68, Sam: "Every right answer should give xp") and a question's first three misses a day, all of it doubled
+     while a boost runs. This is the
      page's guess, shown at once; the server's own figure follows and corrects it (sh:answer-paid, below). */
   function xpFor(qid, correct, self){
     var s = ansOf(qid), t = todayRec();
     if (!v2()) { var x = correct ? (s && s.c > 0 ? 2 : 10) : 1; return Math.max(0, Math.min(x, 600 - t.xp)); }
     var q = (t.q || {})[qid] || [0, 0], b = boost();
-    var base = self ? (q[0] + q[1] < 3 ? 2 : 0) : correct ? (q[0] < 3 ? (s && s.c > 0 ? 2 : 10) : 0) : (q[1] < 3 ? 1 : 0);
+    var base = self ? (correct || q[0] + q[1] < 3 ? 2 : 0) : correct ? (s && s.c > 0 ? 2 : 10) : (q[1] < 3 ? 1 : 0);
     return base * (b ? b.mult || 2 : 1);
   }
   /* the arcade game being played: its session on the game layer (widget/games.js), which its answers carry */
@@ -163,17 +164,66 @@
     /* the page's guess for this very answer (a reply can be missing: an answer recorded the old way, or lost offline) */
     var at = -1; PEND.some(function(x, i){ if (x.qid === d.qid) { at = i; return true; } return false; });
     var guess = at > -1 ? PEND.splice(at, 1)[0] : null, t = todayRec(), extra = 0, said = [];
-    (Array.isArray(r.bonus) ? r.bonus : []).forEach(function(b){ if (b && b.xp > 0) { extra += b.xp; if (BONUS[b.src]) said.push(BONUS[b.src] + ": +" + b.xp + " XP"); } });
+    var G = window.shGame;
+    /* the day's bonuses (study XP) and the prizes an answer can win (migration_v68: right in a row, a streak of days, the
+       class's record), which pay as many crowns as XP */
+    (Array.isArray(r.bonus) ? r.bonus : []).forEach(function(b){ if (b && b.xp > 0) { extra += b.xp; if (BONUS[b.src]) said.push(BONUS[b.src] + ": +" + b.xp + " XP"); else if (G && G.prizeText) said.push(G.prizeText(b.src, b.xp, b)); } });
     var off = (r.xp | 0) - (guess ? guess.xp : r.xp | 0) + extra;
     if (off) { t.xp = Math.max(0, t.xp + off); if (d.ctx !== "mock" && d.ctx !== "arcade") SESSION.xp = Math.max(0, SESSION.xp + off); saveState(); }
     if (RANK.p && typeof r.total === "number") { RANK.p.xp = Math.max(RANK.p.xp || 0, r.total); RANK.local = pendSum(); }
     if (r.medal && r.medal.level) {
-      said.push((MEDAL[r.medal.level] || "A medal") + " medal: +" + fmt(r.medal.xp | 0) + " XP, and double XP for 24 hours");
+      said.push((MEDAL[r.medal.level] || "A medal") + " medal: +" + fmt(r.medal.xp | 0) + " XP and " + fmt((r.medal.xp | 0) + 50) + " crowns, and double XP for 24 hours");
       HX.say("Double XP for a day. Go!", "do-hop");
     }
     if (said.length && d.ctx !== "mock") toast(said.join(". ") + ".");
     if (off || extra || r.medal || boostShown !== !!boost()) paintMeters();
+    ringClaim();
   });
+  /* ---------- prizes (migration_v68): what the server paid outside an answer ----------
+     widget/v3.js sends sh:prize for a prize call's reply (the daily ring, a boss's share, a lecture read, the nuke, a name,
+     trophies, a game's prizes): its XP joins today's and the rank's, and it's said. The crowns come as sh:crowns. */
+  document.addEventListener("sh:prize", function(e){
+    var d = e.detail || {}; if (!(d.xp > 0)) return;
+    var w = HX.wallet ? HX.wallet() : null; if (d.src === "name" && w && w.got) w.got.name = true;   /* Settings stops offering it */
+    todayRec().xp += d.xp; RANK.local += d.xp; saveState();
+    toast(d.text || ("+" + fmt(d.xp) + " XP and crowns"));
+    if (d.src === "nuke" || d.src === "boss" || d.src === "top") HX.say(d.src === "nuke" ? "Ten thousand! Go spend it." : "Nice hit!", "do-hop");
+    paintMeters();
+  });
+  /* the daily ring (your goal of 10 to 50 a day, Settings): filled, the server pays 5 XP and crowns a question of it, once
+     per hub a day, after checking the day's answers there. Asked after an answer's reply, so that answer is counted. */
+  var ringAsked = "";
+  function ringClaim(){
+    var G = window.shGame, t = todayRec(), d = day(0), key = "sh_ring_" + HX.HUB;
+    if (!v2() || !G || !G.claim || !t.met || ringAsked === d || ls(key) === d) return;
+    ringAsked = d;
+    G.claim("claim_ring_v2", { p_visitor: ls("sh_visitor_id"), p_hub: HX.HUB, p_goal: goal() }, "ring").then(function(r){
+      if (r && r.ok && (r.xp > 0 || r.repeat) && r.why !== "short") ls(key, d);
+      else ringAsked = "";   /* the server counted fewer (another device's answers still on their way): ask after the next */
+    });
+  }
+  /* the crowns after a reply (sh:crowns from widget/v3.js): the shop's wallet takes them (widget/hub-timmy.js), and a gain
+     pops up a coin by the rank pill, so they're seen going up while you answer */
+  document.addEventListener("sh:crowns", function(e){
+    var d = e.detail || {}, was = HX.wallet ? HX.wallet() : null, before = was ? was.balance : d.was;
+    if (HX.setWallet) HX.setWallet(d.balance);
+    if (typeof before === "number" && d.balance > before) crownPop(d.balance - before);
+    paintMeters();
+  });
+  function crownPop(n){
+    var to = [$("#hxRank"), $("#hxXp")].filter(visible)[0];
+    if (!to || reduced || !HX.shopCoin) return;
+    var b = to.getBoundingClientRect(), el = h('<span class="crownpop" aria-hidden="true">' + HX.shopCoin(18) + "+" + fmt(n) + "</span>");
+    document.body.appendChild(el);
+    var x = b.left + b.width / 2 - el.offsetWidth / 2, y = b.bottom + 6;
+    var anim = el.animate([
+      { transform: "translate(" + x + "px," + y + "px) scale(.6)", opacity: 0 },
+      { transform: "translate(" + x + "px," + (y + 4) + "px) scale(1.08)", opacity: 1, offset: .2 },
+      { transform: "translate(" + x + "px," + (y + 6) + "px) scale(1)", opacity: 1, offset: .75 },
+      { transform: "translate(" + x + "px," + (y + 16) + "px) scale(.9)", opacity: 0 }
+    ], { duration: 1600, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "forwards" });
+    anim.onfinish = function(){ el.remove(); };
+  }
   /* a finished mock's +50 (the server pays it once per hub per day, with 10 or more answers), and a finished arcade
      game's (each game once a day, 20 seconds or more after it started; widget/games.js knows which sessions are games) */
   document.addEventListener("sh:session-paid", function(e){
@@ -188,9 +238,10 @@
      and the +100 for finishing the episode, as the server counted them. The pill takes them at once; finishing is said. */
   document.addEventListener("sh:pod-paid", function(e){
     var r = (e.detail || {}).res; if (!r || r.ok === false || r.repeat) return;
+    var G = window.shGame; if (G && G.setCrowns) G.setCrowns(r.crowns);
     var x = (r.xp | 0) + (r.done | 0); if (!(x > 0)) return;
     todayRec().xp += x; RANK.local += x; saveState();
-    if (r.done > 0) toast("Timmy Time finished: +" + r.done + " XP.");
+    if (r.done > 0) toast(G && G.prizeText ? G.prizeText("pod-done", r.done) : "Timmy Time finished: +" + r.done + " XP.");
     paintMeters();
   });
 
@@ -339,6 +390,9 @@
   function todayPanel(){
     var t = todayRec(), g = goal(), n = streakDays(), dn = doneToday(t), left = Math.max(0, g - dn), hp = HX.petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" }, w = HX.wallet ? HX.wallet() : null;
     var cap = dn >= g ? "Goal met for today." : left === g ? "Your goal today: " + g + " questions or flashcards. One keeps your streak going." : left + " more meets today's goal.";
+    /* what filling the ring pays (migration_v68): 5 XP and crowns a question of the goal */
+    var G = window.shGame, ringPay = G && G.live && G.live() && G.prizes ? G.prizes.ring * g : 0;
+    if (ringPay) cap += dn >= g ? " +" + fmt(ringPay) + " XP and " + fmt(ringPay) + " crowns." : " Fill the ring for +" + fmt(ringPay) + " XP and " + fmt(ringPay) + " crowns.";
     return '<div class="panel today" data-today><div class="today-head"><div><h2>Today</h2><p class="today-date">' + esc(dateLabel(day(0), { weekday: "long", month: "long", day: "numeric" })) + "</p></div>" +
         spot("today", { tint: T.ink, light: T.light, line: T.ink }, "today-art") + "</div>" +
       '<div class="big-ring"><div class="teeth-wrap">' + teethRing(dn, g) + '<p class="ring-num"><b class="num">' + fmt(dn) + '</b><span>of ' + g + '</span><span class="sr">' + (t.k ? " questions and flashcards today" : " questions today") + '</span></p></div><p class="ring-cap">' + esc(cap) + "</p></div>" +

@@ -47,7 +47,9 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   server grades the answer from the key and records all of it, then pays. Unknown and retired ids are recorded with the
   page's own verdict (`claim`) and earn nothing.
 - **What pays** (no daily cap): 10 for a question's first right answer ever, 2 for a later right one, 1 for a wrong one,
-  self-graded cards a flat 2; a question pays its first three right and its first three wrong answers each Central day; +20
+  self-graded cards a flat 2; **every right answer pays** (migration_v68, Sam 2026-11-17: "Every right answer should give
+  xp"; graded from its key, a retired question's too, never past the guardrails below), and a question pays its first three
+  wrong answers each Central day (a self-graded miss: its first three answers); +20
   for a day studied (as today); +30 at the day's 20th answer; +5 for a question missed the last time before today and right
   today (once per question); +50 for a mock with 10 or more answers (once per hub per day); +50 for an arcade game finished 20
   seconds or more after it started (once per game per day); 10 a minute of a Timmy Time episode heard for the first time
@@ -56,9 +58,14 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   (migration_v60, Sam 2026-11-17: `survey:<id>` and `checkin:<hub>:<exam>`, paid to the linked id, never for a check-in sent
   before by any of the person's linked ids; back pay only for survey 4 and Occlusion's final check-ins, by `tools/data-fixes/2026-11-17-reward-backpay.sql`; `submit_survey_v2` and `submit_exam_debrief_v2` say what was paid, which the dashboard's window advertises before and celebrates after: `celebrate` in `widget/dash.js`); +100 / 200 / 300 / 500 for a hub's Bronze, Silver, Gold and Crown, which also start **24 hours of
   double XP**.
-- **The guardrails**: an answer under 2 seconds after the last, or the 31st in a minute, still counts in your answers and the
-  class stats but earns nothing. A mock's answers arrive together at the end, so they need 2 seconds of mock time each instead
-  (the session from `xp_session_start`, one answer per question per mock). A podcast minute needs 25 seconds since the last
+- **The guardrails** (since migration_v68, for misses only; a right answer always pays): a miss under 2 seconds after the
+  last, or the 31st in a minute, still counts in your answers and the class stats but earns nothing. A mock's answers arrive
+  together at the end, so its misses need 2 seconds of mock time each instead (the session from `xp_session_start`). Two
+  things are one answer, not two, and pay once: a double tap (the same question again within 2 seconds) and the same
+  question twice in one mock. The run of right answers in a row (`xp_runs`: its prizes, the nuke and the class record) still
+  counts only right answers at the speed limit and a question's first three right of the day. `sh_xp_replay` pays the same,
+  and migration_v68 rebuilt every visitor from it, which paid the right answers given since the release that had paid
+  nothing (about 80, mostly under 2 seconds after the one before). A podcast minute needs 25 seconds since the last
   paid one.
 - **Boosts** (`xp_boosts`): never more than 2x at once, whatever is running; a new medal restarts its 24 hours; a shop boost's
   time goes after every boost running or waiting (`migration_v62.sql`): it extends the last one when that's a shop boost, and
@@ -85,9 +92,9 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
 
 ## Shiny Gold Crowns and the shop
 
-- **The balance** (`sh_wallet`, never stored): 1 per 10 XP of base XP (a boost's extra earns none; nor does a survey's or
+- **The balance** (`sh_wallet`, never stored): 5 per 10 XP of base XP (1 until migration_v68; Sam, 2026-11-17: "lets increase it to 5 crowns per 10xp") (a boost's extra earns none; nor does a survey's or
   check-in's 1,000 XP), +1,000 a survey or check-in reward (migration_v60: counted from its award row's `src`), +25 a trophy, +50 a medal,
-  +20 a rank-up (a tier) since the switch, minus what was spent. Spending never lowers XP or rank. The XP from before the
+  +20 a rank-up (a tier) since the switch, **+ every prize's XP again as crowns** (migration_v68, next to last section), minus what was spent. Spending never lowers XP or rank. The XP from before the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
 - **The catalog** (`shop_items`): each item's kind, rarity, price (checked against its rarity's band), season, slot, HP or
   boost, `wide` for a yard item that takes two spots (the bowling lane), `gift` (everyone owns it) and `rank_tier` (owned
@@ -104,6 +111,9 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   (`COSTUMES` in `sets.mjs`, ten in all) and six more **paints**. No function changed: the rotation, `buy_item`,
   `equip_item` and `get_my_shop` already handle any active row by its kind and slot. It is applied once its PR is live
   (`supabase/pending-migrations.txt` until then), so the daily picks never show a piece before its drawing ships.
+- **Whether the rates and prices are healthy**: every lessons audit reads them in study days (`tools/economy.sql`)
+  against [earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md), Sam's standing rule (2026-11-18); read it
+  before changing a rate, a prize or a price.
 - **A season's set** (Sam, 2026-11-10): 1 home and 1 scene (both Legendary) and a Rare, an Epic and a Legendary outfit and
   yard thing, 8 pieces, for each of fourteen seasons. `sh_shop_seasons(date)` gives every season whose set is on sale that
   Central day (several can be at once): Halloween in October; Thanksgiving from November 1 to the day after the fourth
@@ -279,7 +289,9 @@ Each is one line in `migration_v54.sql` to change.
 - A question's wrong answers also pay only their first three a day (as its right ones do).
 - Medal and fixed-report awards aren't doubled by a boost; answers, the day's bonuses, mocks and games are.
 - A rank-up, for the +20 gold crowns, is a new tier (seven a journey), not a level.
-- Match questions are self-graded (a flat 2): the server can't check a drag-and-drop pairing from one index.
+- Matching items are graded as an order since migration_v64 (2026-11-17): each row's first pick, row k's own being k, so
+  10 XP the first time. A page cached before it sends no order and is taken at its word as a self-graded answer (a flat 2);
+  migration_v68 had dropped that branch and migration_v69 put it back.
 - A mock pays its +50 only with 10 or more answers; an arcade game only when finished 20 seconds or more after it started,
   and a very fast game's answers can fall under the speed limit.
 - Timmy Time: a minute pays when 25 seconds have passed since the last paid one (so 2x speed still pays); "finished" is 90%
@@ -372,10 +384,45 @@ Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sq
   device, the ratings wait in `STATE.cardq` (up to 3,000), and the first call that finds the functions missing stops
   trying until the next page load. Test browsers (`navigator.webdriver`) send nothing.
 
+## Prizes (migration_v68)
+
+Sam, 2026-11-17: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp
+earn rates", then a list of prizes. **There is no daily cap** on XP or crowns (the 600-a-day cap is the old pages' only;
+the per-question limits, three a day each way and the speed limit, stay as anti-farming). The crowns *were* being earned;
+the page just never redrew the balance after an answer (bug log). Now every paying reply (`record_answer_v2`,
+`finish_session_v2`, `pod_minute_v2` and every prize call) carries `crowns`, the balance after it, and `widget/v3.js` sends
+it as `sh:crowns` (the hub's meters and a gold "+n crowns" pop, the dashboard's wallet).
+
+- **Hub time pays 100 crowns an hour** (Sam, 2026-11-17: "also 100 crowns per hour of hub time"): `sh_time_crowns` counts `activity_hourly`'s pings (25 seconds each, only while a hub is open and touched in the last 15 minutes), at most 144 in any clock hour, so two tabs or a script can't pay more than 100 an hour; the dashboard and `zz-test` rows don't count. All the time recorded since tracking began counts (the wallet's `from_time`).
+- **Studying pays 5 crowns per 10 XP** (Sam, 2026-11-17: "lets increase it to 5 crowns per 10xp"; it was 1, and since the balance is worked out from all the XP so far, every balance went up five times for its study XP; the shop's prices, set in v62 against the old rate, weren't changed); **a prize pays as many crowns as XP**
+  (`sh_is_prize(src)`: the survey and check-in keep their fixed 1,000; report, medal and pod-done now pay theirs too, also
+  for the ones already won since the release). One table, `sh_prizes()`, holds every amount; `PRIZES` in `widget/v3.js` is
+  its copy (xp.js fails if they differ) and every card's "+n XP and crowns" reads it. The wallet also returns `pays` and
+  `got` (`name`, today's `visit` and `game`) so a page offers only what's still to win.
+- **Each prize is one `xp_awards` row** with a key that pays once: `name` 500 (`set_display_name_v2`, and the old
+  `set_display_name` pays too); `ring:<hub>:<day>` 5 a question of a goal of 10-50 (`claim_ring_v2`, which counts the day's
+  answers in the hub itself); `boss:<hub>:<day>|<window>` round(500 × damage / hp), damage capped at the visitor's right
+  answers in the boss's two hours plus a fifth (`claim_boss_v2`, 2 h 15 min grace); `notes:<hub>:<lec>` 50
+  (`notes_start_v2` then `notes_done_v2` at least 60 s later, no more than 6 h; the page asks after the words ÷ 600 a
+  minute of time on the page); `visit:<day>` 50 for opening someone else's place by its key (`claim_visit_v2`; not your own
+  or a linked device's); `trophy:<kind>` 200 for a trophy not held at the switch (`prize_seen`, a snapshot of everyone's
+  badges when the migration ran, plus `game_baseline`), asked by `widget/ranks.js` when the profile shows a new one
+  (`claim_trophies_v2`); medals 250/500/750/1,000; `game:<day>` 100 for the first arcade game of 20 s or more, `pb:` 50 and
+  `top:` 250 (src `record`) for a personal best and a new hub high score, once a day per game (`finish_session_v2`);
+  `report` 100 crowns with its XP.
+- **Runs and streaks are the server's own** (`xp_runs`, one row a visitor): a right answer that pays base XP adds to the
+  run (a fourth try that day, a self-graded card or a too-fast answer doesn't; a wrong one ends it). `row` pays 25/100/250 at
+  10/25/50; at 100 since the last nuke the run is `ready`, and `launch_nuke_v2` (which also logs the launch) pays
+  `nuke:<run>:<n>` 10,000 once. `alltime` pays 20,000 once per run when it passes the class's record (`game_records`
+  `run`, seeded from `correct_streaks`) and the record is over 100. `streak:<start>:<days>` pays 100/300/700/1,500/3,000/
+  5,000 at 3/7/14/30/60/100 days of `xp_days`, on the day's first answer.
+- **The rebuild keeps them**: `sh_xp_rebuild` replays only answers, goals and fixes; prize rows stay. Link my devices
+  copies them like any award row (a key already paid on the other device is skipped).
+
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (416 checks, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (529 checks, the prizes of migration_v68 in section 14c, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, a place opened from a board row, and a random visit going through the whole class, in 14a). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;
