@@ -70,7 +70,7 @@ function layout(name, d){
 }
 
 /* A question's other wordings (content/variants.json: { id: { stem, choices, why[, ex] } or a list of them; Perio since
-   2026-11-18, vault/tasks/2026-11-17-reworded-question-variants.md). A later try shows the next wording, so each must be
+   2026-11-18, vault/tasks/done/2026-11-17-reworded-question-variants.md). A later try shows the next wording, so each must be
    the same question: choice k is choice k reworded (the key, the server's answer keys, XP and the mock's scoring are the
    original's), a why for every choice, a statement question keeps its labels and its statements, and the reworded key may
    not be the longest choice in more than 40% of the hub's wordings. Nothing in it feeds High yield. Returns the problems. */
