@@ -216,29 +216,28 @@ export function pack(T){
       ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#5B9466", "#4F865B", "#43784F", "#356442"] : ["#A9D886", "#98CC76", "#84BD66", "#62A14F"]; },
       sky: function(o){
         if (o.night) return T.bands(["#1C2256", "#242C66", "#2D3874", "#374381", "#43508C", "#4D5A94"], 0, 150) + T.moon(84, 40) + T.starField(23, 26, 96);
-        return T.bands(["#B6E0F2", "#C2E6F1", "#CFEBEE", "#DCEFE8", "#E9F1DE", "#F4F0D2"], 0, 150) + T.sun(80, 38) + T.cloud(206, 20, .6) +
-          pterosaur(150, 30, 1.05, "#A88A8E", "#6E5862") + pterosaur(112, 64, .55, "#B39A9C", "#7E6A72");
+        return T.bands(["#B6E0F2", "#C2E6F1", "#CFEBEE", "#DCEFE8", "#E9F1DE", "#F4F0D2"], 0, 150) + T.sun(80, 38) + T.cloud(206, 20, .6) + pterosaur(152, 30, 1.05, "#A88A8E", "#6E5862");
       },
       far: function(o){
         var n = o.night, sn = o.snow, s = "";
         var vc = sn ? ["#F2F6FA", "#D6E2EE", "#B9C9DA"] : n ? ["#4C4468", "#3E3858", "#2E2A46"] : ["#C2A89C", "#A68C84", "#8C7470"];
         var ridge = sn ? ["#EEF5FB", "#DCEAF6"] : n ? ["#3D6A58", "#335C4C"] : ["#A2D08E", "#8CC27C"];
         var haze = sn ? ["#E6EFF7", "#C9D9E6", "#B9CCDD"] : n ? ["#33585A", "#2B4C4E", "#22403F"] : ["#8DBE88", "#76AA74", "#5E9460"];
-        /* the volcano: a rounded cone with a shallow crater, a soft puff drifting off to the right */
-        var cone = "M244 150 C266 138 290 102 302 88 Q316 78 330 86 C344 100 372 136 402 148 V170 H244 Z";
-        s += FO(cone, vc[0], 1.5) + F("M318 82 Q326 81 330 86 C344 100 372 136 402 148 V170 H330 C334 150 330 112 318 82 Z", vc[1], .8);
-        s += L("M306 92 q-6 18 -16 34 M314 90 q-2 22 -10 44 M324 88 q4 24 12 46", 1, vc[2], .7);
-        s += F("M262 140 Q300 128 340 134 Q372 130 402 140 V160 H262 Z", sn ? "#FFFFFF" : n ? "#3C5E50" : "#A8C98E", .9);
-        s += ell(316, 85, 12, 3.4, n ? "#E0773A" : vc[2], 1.3);
-        if (n) s += ell(316, 85, 8.6, 2.2, "#FFC861", 0) + circ(316, 80, 18, "#FF9A3C", 0).replace("/>", ' opacity=".3"/>') + circ(316, 78, 30, "#FF8A3C", 0).replace("/>", ' opacity=".14"/>');
-        var puff = n ? ["#7A6A8C", "#C88A6A"] : ["#F3EFEA", "#DCD3CC"];
-        s += G("tp-cloud", circ(322, 70, 6.4, puff[0], 1.2) + circ(331, 61, 8, puff[0], 1.2) + circ(343, 52, 9, puff[0], 1.2) + circ(326, 66, 5, puff[0], 0) + F("M318 72 q8 4 16 -2 q6 4 14 -6 q2 6 -6 10 q-12 6 -24 -2 z", puff[1], .9), ' opacity=".95"');
-        /* the far ridge, its tree ferns and cycads, the long-neck browsing one by the hill's shoulder */
+        /* the volcano: a broad rounded cone, a shallow crater, a soft puff rising and drifting right */
+        var cone = "M222 140 C250 128 276 94 287 78 Q291 71 298 70 Q310 67 322 70 Q329 71 333 78 C346 96 374 128 406 138 V172 H222 Z";
+        s += FO(cone, vc[0], 1.5) + F("M316 69 Q326 70 333 78 C346 96 374 128 406 138 V172 H334 C340 140 334 100 316 69 Z", vc[1], .85);
+        s += L("M295 77 q-7 22 -19 42 M305 75 q-3 26 -9 50 M319 76 q5 26 15 52 M328 78 q10 22 24 40", 1, vc[2], .75);
+        s += F("M222 140 Q266 122 314 128 Q362 122 406 134 V172 H222 Z", sn ? "#FFFFFF" : n ? "#3C5E50" : "#A6C88C", .95) + L("M232 136 Q268 122 314 127 Q360 121 400 132", 1, INK, .35);
+        s += ell(310, 71, 12, 3.2, n ? "#FFB24D" : "#7E6660", 1.3);
+        if (n) s += ell(310, 71.4, 7.6, 1.8, "#FFE08A", 0) + circ(310, 64, 12, "#FF9A3C", 0).replace("/>", ' opacity=".32"/>') + circ(310, 62, 22, "#FF8A3C", 0).replace("/>", ' opacity=".14"/>');
+        var puff = sn ? ["#FFFFFF", "#E3ECF4"] : n ? ["#6E5E82", "#D98A5E"] : ["#F4F0EC", "#DDD4CD"];
+        s += G("tp-cloud", sil([[T.lumps(312, 61, 5.6, 3, 7), puff[0]], [T.lumps(318, 51, 7.4, 5, 8), puff[0]], [T.lumps(329, 41, 8.6, 7, 8), puff[0]], [T.lumps(343, 35, 7, 9, 7), puff[0]]], INK, .6) +
+          F("M306 64 q6 3 12 -1 q4 -6 9 -9 q8 2 12 -5 q6 0 9 -4 q1 6 -6 9 q-6 5 -12 4 q-4 8 -12 9 q-6 3 -12 -3 z", puff[1], n ? .85 : .7), ' opacity=".96"');
+        /* the far ridge with its tree ferns and cycads, and a long-neck standing behind the hill, head up */
         s += F("M0 124 Q30 106 70 112 Q110 102 150 112 Q196 104 236 112 Q280 104 318 114 Q356 110 400 122 V300 H0 Z", ridge[0]) + L("M0 124 Q30 106 70 112 Q110 102 150 112 Q196 104 236 112 Q280 104 318 114 Q356 110 400 122", 1.3, INK, .45);
-        var tf = sn ? ["#F7FBFF", "#DCEAF6", "#B9CCDD"] : n ? [haze[0], haze[1], haze[2]] : [haze[0], haze[1], haze[2]], trunk = sn ? "#B9A88E" : n ? "#3A3F4A" : "#8E7A5E";
-        s += '<g opacity="' + (n ? ".95" : ".9") + '">' + treeFern(52, 116, 30, .9, tf, trunk, .9) + treeFern(74, 112, 22, .7, tf, trunk, .9) + cycad(98, 110, .8, tf, sn ? ["#C9B9A0", "#B09E84"] : n ? ["#3E3A44", "#33303A"] : ["#A08A68", "#8A7456"]) +
-          treeFern(148, 112, 26, .8, tf, trunk, .9) + treeFern(250, 112, 40, .95, tf, trunk, .9) + cycad(352, 116, .8, tf, sn ? ["#C9B9A0", "#B09E84"] : n ? ["#3E3A44", "#33303A"] : ["#A08A68", "#8A7456"]) + treeFern(372, 120, 24, .75, tf, trunk, .9) + "</g>";
-        s += longNeck(282, 114, .95, sn ? "#E3ECF4" : n ? "#161A36" : "#7FA29A", sn ? "#9FB4C8" : n ? "#0E1126" : "#4F6E68", .8);
+        var tf = sn ? ["#F7FBFF", "#DCEAF6", "#B9CCDD"] : haze, trunk = sn ? "#B9A88E" : n ? "#3A3F4A" : "#8E7A5E", cw = sn ? ["#C9B9A0", "#B09E84"] : n ? ["#3E3A44", "#33303A"] : ["#A08A68", "#8A7456"];
+        s += '<g opacity="' + (n ? ".95" : ".9") + '">' + treeFern(52, 116, 30, .9, tf, trunk, .9) + treeFern(74, 112, 22, .7, tf, trunk, .9) + cycad(98, 110, .8, tf, cw) + treeFern(148, 112, 26, .8, tf, trunk, .9) + cycad(346, 116, .8, tf, cw) + "</g>";
+        s += longNeck(264, 112, .72, sn ? "#E3ECF4" : n ? "#161A36" : "#86A8A0", sn ? "#9FB4C8" : n ? "#0E1126" : "#58776F", .8);
         s += F("M0 162 Q70 144 140 154 Q230 142 300 158 Q360 148 400 156 V300 H0 Z", ridge[1]);
         return s;
       },

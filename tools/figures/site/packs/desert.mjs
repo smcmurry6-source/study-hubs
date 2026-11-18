@@ -147,8 +147,8 @@ export function pack(T){
   var homes = {
     "adobe-ranch": {
       note: "Thick round adobe walls, beams poking out under a flat roof, a shady porch and a tooth on the weathervane",
-      ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the roof", paint: "Trim paint: window frames, shutters and the bench" },
-      door: [5.5, 8.4], brush: [7.55, 9.15], statue: [3.15, 9.55], spots: { door: [6.45, 10.25] }, h: 6.6,
+      ups: ["flag", "paint"], upn: { flag: "A Timmy flag on the roof", paint: "Trim paint: the door, the window frames, the shutters and the bench" },
+      door: [5.5, 8.4], brush: [7.55, 9.15], statue: [3.15, 9.55], spots: { door: [6.45, 10.25] }, h: 7.8,
       eaves: [[2.8, 8.55, 3.1], [8.0, 8.55, 3.1]], foot: [2.6, 3.2, 9.6, 8.4], base: [[2.6, 8.4], [8.2, 8.4], [8.2, 7.95], [9.62, 7.95], [9.62, 3.6]], block: [2.4, 2.9, 9.8, 8.8],
       draw: function(o){
         var u = o.up, tr = (o.paint !== "cream" && T.BOLD[o.paint]) || { c: "#3FA9B5", s: "#2A808C" }, s = "", lights = "", w, i;
@@ -180,8 +180,8 @@ export function pack(T){
         s += box(4.62, y1, 0, 1.76, .34, .1, { top: "#D9C7AE", left: "#BFA98C", right: "#A89276" }, THIN);
         s += FO(D(T.onY(y1 - .02, T.rectUV(4.92, 6.08, .1, 2.3))), "#B07A4E", 1.6);
         var dy = y1 - .24, dq = T.rectUV(4.92, 5.84, .1, 2.18), dw = function(pts){ return D(T.onY(dy, pts)); };
-        s += FO(dw(dq), "#7A4A2C", 1.5);
-        s += L(dw([[5.15, .14], [5.15, 2.14]]) .replace(" Z", "") + " " + dw([[5.38, .14], [5.38, 2.14]]).replace(" Z", "") + " " + dw([[5.61, .14], [5.61, 2.14]]).replace(" Z", ""), .9, "#5A3420");
+        s += FO(dw(dq), tr.c, 1.5);
+        s += L(dw([[5.15, .14], [5.15, 2.14]]) .replace(" Z", "") + " " + dw([[5.38, .14], [5.38, 2.14]]).replace(" Z", "") + " " + dw([[5.61, .14], [5.61, 2.14]]).replace(" Z", ""), .9, tr.s);
         s += L(dw([[4.94, .62], [5.82, .62]]).replace(" Z", "") + " " + dw([[4.94, 1.72], [5.82, 1.72]]).replace(" Z", ""), 2.2, "#4A3E46");
         [[5.04, .62], [5.27, .62], [5.5, .62], [5.73, .62], [5.04, 1.72], [5.27, 1.72], [5.5, 1.72], [5.73, 1.72]].forEach(function(q){ var c = P(q[0], dy, q[1]); s += circ(c[0], c[1], .9, "#C9D1D9"); });
         var rg = P(5.66, dy, 1.15); s += '<circle cx="' + f(rg[0]) + '" cy="' + f(rg[1] + 2) + '" r="2" fill="none" stroke="' + INK + '" stroke-width="1.4"/>' + circ(rg[0], rg[1], .9, INK);
