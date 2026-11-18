@@ -85,7 +85,7 @@
     return el;
   }
   function wireCard(el, q, o){
-    var multi = q.type === "multi", picked = [], seqP = [], match = { sel: null, done: 0, err: 0 }, self = false;
+    var multi = q.type === "multi", picked = [], seqP = [], match = { sel: null, done: 0, err: 0, first: [] }, self = false;
     el.addEventListener("click", function(e){
       var b = e.target.closest("button"); if (!b || !el.contains(b) || el.classList.contains("is-answered")) return;
       if (b.hasAttribute("data-i")) {
@@ -118,7 +118,11 @@
         if (b.getAttribute("data-side") === "l") { $$('[data-side="l"]', el).forEach(function(x){ x.setAttribute("aria-pressed", "false"); }); b.setAttribute("aria-pressed", "true"); match.sel = p; return; }
         if (match.sel === null) return;
         var left = $('[data-side="l"][data-pair="' + match.sel + '"]', el);
-        if (p === match.sel) { [b, left].forEach(function(x){ x.classList.add("is-matched"); x.disabled = true; x.setAttribute("aria-pressed", "false"); }); match.done++; match.sel = null; if (match.done === q.pairs.length) answer(b); }
+        /* a partner with the same words as the row's own is right too (two rows can share an answer); each row's first
+           partner tapped is what the server grades */
+        var same = p === match.sel || q.pairs[p][1] === q.pairs[match.sel][1];
+        if (match.first[match.sel] == null) match.first[match.sel] = same ? match.sel : p;
+        if (same) { [b, left].forEach(function(x){ x.classList.add("is-matched"); x.disabled = true; x.setAttribute("aria-pressed", "false"); }); match.done++; match.sel = null; if (match.done === q.pairs.length) answer(b); }
         else { match.err++; b.classList.remove("is-shake"); void b.offsetWidth; b.classList.add("is-shake"); }
       }
     });
@@ -147,7 +151,9 @@
         rec = HX.recordAnswer(q.id, q.lec, right, o.ctx);
       } else {
         right = match.err === 0; if (!right) partial = "Matched, with " + pl(match.err, "wrong try", "wrong tries");
-        rec = HX.recordAnswer(q.id, q.lec, right, o.ctx);
+        /* the server grades a matching item by each row's first pick, as it grades an order (2026-11-17: it was paid as a
+           self-graded card, a flat 2 XP) */
+        rec = HX.recordAnswer(q.id, q.lec, right, o.ctx, null, null, { order: q.pairs.map(function(x, k){ return match.first[k] == null ? k : match.first[k]; }) });
       }
       result(el, q, right, partial, rec.xp, picked, o);
       if (o.onAnswer) o.onAnswer(el, q, right);
@@ -797,9 +803,11 @@
         m.ids.forEach(function(id){
           var q = QBY[id]; if (!q) return;
           if (q.type === "match") {
-            /* the server takes the page's word for a matching item, as it does in the bank */
+            /* the server grades a matching item row by row, as it grades an order: each row sends its own number when it
+               was matched and another row's when it wasn't (an empty row, the next row's) */
             pts[id] = q.pairs.filter(function(x, k){ return matched(q, k); }).length / q.pairs.length; m.res[id] = pts[id] === 1;
-            if (has(id)) HX.recordAnswer(q.id, q.lec, m.res[id], "mock", null, null, { session: sid });
+            var rowsSent = q.pairs.map(function(x, k){ var v = (Array.isArray(m.picks[id]) ? m.picks[id] : [])[k]; return matched(q, k) ? k : set(v) && q.pairs[v] ? v : (k + 1) % q.pairs.length; });
+            if (has(id)) HX.recordAnswer(q.id, q.lec, m.res[id], "mock", null, null, { session: sid, order: rowsSent });
             return;
           }
           if (q.type === "multi") {

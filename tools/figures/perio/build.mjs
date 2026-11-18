@@ -1,6 +1,6 @@
 // Builds the Periodontology hub's anima figures into its content: hubs/perio/content/figures.js (between its anima:js
 // markers; the rest of that file is the engine's wrapper and the suture pictures, edited there) and
-// hubs/perio/content/figures.css (all of it).
+// hubs/perio/content/figures.css (all of it), and the Stage & Grade game (stagegame.js/.css) between its stage:js markers.
 //   node tools/figures/perio/build.mjs            rebuild them from the files here
 //   node tools/figures/perio/build.mjs --check    exit 1 if they are out of date
 //   node tools/figures/perio/build.mjs --preview  also write standalone pages to dist/ for anima's checks
@@ -18,6 +18,9 @@ const HERE = dirname(fileURLToPath(import.meta.url));
 const JS = join(HERE, "../../../hubs/perio/content/figures.js"), CSS = join(HERE, "../../../hubs/perio/content/figures.css");
 const read = (f) => readFileSync(join(HERE, f), "utf8").trimEnd() + "\n";
 const AJB = "/* anima:js begin (built from tools/figures/perio; edit there) */\n", AJE = "/* anima:js end */\n";
+/* Stage & Grade (stagegame.js + stagegame.css): the staging and grading game, mounted at the top of the Question Bank
+   (CUSP_GAME, the engine's hook), from Home and in the arcade */
+const SJB = "/* stage:js begin (built from tools/figures/perio/stagegame.js; edit there) */\n", SJE = "/* stage:js end */\n";
 /* the stylesheet is built whole. No label under 11px on the engine (the taste skill's floor); the last two rules are
    the suture pictures': labels that give a picture's answer away hide while it sits above its question (.sd-hint). */
 const CSS_HEAD = "/* Built by tools/figures/perio/build.mjs from the anima figures in tools/figures/perio/. Do not edit: change those and rebuild. */\n";
@@ -57,8 +60,8 @@ function between(src, b, e, body){
   return src.slice(0, i) + b + body + src.slice(j);
 }
 const js = readFileSync(JS, "utf8"), css = readFileSync(CSS, "utf8");
-const out = between(js, AJB, AJE, animaJs());
-const outCss = CSS_HEAD + floor("\n" + animaCss() + CSS_TAIL);
+const out = between(between(js, AJB, AJE, animaJs()), SJB, SJE, read("stagegame.js"));
+const outCss = CSS_HEAD + floor("\n" + animaCss() + read("stagegame.css") + CSS_TAIL);
 if (process.argv.includes("--check")) {
   if (out !== js || outCss !== css) { console.error("hubs/perio/content/figures." + (out !== js ? "js" : "css") + " is stale; run node tools/figures/perio/build.mjs"); process.exit(1); }
   console.log("perio's figures are up to date");
