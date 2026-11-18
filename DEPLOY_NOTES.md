@@ -40,7 +40,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   regeneration decision tree walked step by step or along a case, the canine case's vertical-to-horizontal fill with its
   H-shaped root and the brush, and subtraction radiography in five steps. `figures.js` 121 → 157 KB gzipped; it loads with
   Notes, so the Perio budget (864 of 885 KB on a Home visit) is unchanged. About page's Diagrams entry: twenty for Perio.
-  [The task](vault/tasks/done/2026-11-18-perio-s6-diagrams.md).
+  [The task](vault/tasks/done/2026-11-18-perio-s6-diagrams.md), [#420](https://github.com/smcmurry6-source/study-hubs/pull/420).
 - **2026-11-18 (Perio S6: Periodontal Regeneration taught, Claude Code)** — Sam: "take Perio Session 6 (Periodontal
   Regeneration) from slides only to taught", the day before the final. Source: the class recording's transcript in Drive
   (Periodontology/hubs, `en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt`; read, never committed), with the deck and the

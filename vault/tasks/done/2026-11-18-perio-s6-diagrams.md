@@ -6,7 +6,7 @@ created: 2026-11-18
 requested-by: Sam
 due: 2026-11-19
 agent: Claude Code
-pr:
+pr: https://github.com/smcmurry6-source/study-hubs/pull/420
 ---
 
 # Perio Session 6: the diagram candidates
@@ -99,4 +99,4 @@ Not in Review: the candidates named Review sections too, but a Review `figs` sec
 figure is placed once, in the notes. `figures.js` is fetched only with the notes, so Perio's page-weight budget (885 KB, a
 Home visit) didn't change. Checked: the five on the S6 notes page at 390 px in light and dark, both reading levels, no
 console errors or sideways scroll; `node tools/figures/perio/build.mjs --check`, `node tools/hub-next/build.mjs --check`,
-the fast checks and the Perio smoke test. PR: see `pr:` above.
+the fast checks and the Perio smoke test. PR: [#420](https://github.com/smcmurry6-source/study-hubs/pull/420).
