@@ -92,68 +92,76 @@ export function pack(T){
       draw: function(o){
         var u = o.up, pp = T.PAINTS[o.paint], bb = T.BOLD[o.paint], tint = o.paint && o.paint !== "cream";
         var dc = tint && pp ? [pp.c, pp.s] : [WHITE[0], WHITE[1]], tr = tint && bb ? [bb.c, bb.s] : ["#3FA7E0", "#2378B0"];
-        var s = "", lights = "", cx = DM.cx, cy = DM.cy, r = DM.r, z0 = DM.z0, h = DM.h, w, q, i, a, b;
+        var s = "", lights = "", cx = DM.cx, cy = DM.cy, r = DM.r, z0 = DM.z0, h = DM.h, w, q, a;
+        /* nothing glows where Timmy stands at the door (the lights are drawn over him) */
+        var lit = function(pw){ var c = pw.at; if (!(c[0] > 144 && c[0] < 192 && c[1] > 126 && c[1] < 182)) lights += pw.lights; };
         /* the solar wings, behind everything: a mast, a boom and two panels turned up to the sun */
-        var mf = P(8.5, 1.25, 0), mt = P(8.5, 1.25, 3.55);
-        s += ell(mf[0] + 2, mf[1] + 1, 9, 3, "#1B2A3A", 0, .12) + L(T.seg(mf, mt), 4.4) + L(T.seg(mf, mt), 2.2, METAL[1]);
-        var vU = norm([0, -.5, .87]);
-        s += L(D([[6.5, 1.25, 3.3], [10.5, 1.25, 3.3]], true), 3.6) + L(D([[6.5, 1.25, 3.3], [10.5, 1.25, 3.3]], true), 1.6, METAL[0]);
-        s += solar([7.3, 1.25, 3.3], [1, 0, 0], vU, .85, .6, 4, 2) + solar([9.7, 1.25, 3.3], [1, 0, 0], vU, .85, .6, 4, 2);
-        s += box(8.35, 1.1, 3.15, .3, .3, .35, { top: METAL[0], left: METAL[0], right: METAL[1] }, { sw: 1.2, si: .8 });
-        /* the main dome on its trim band */
+        var mx = 8.5, my = 1.05, mz = 3.3, mf = P(mx, my, 0), mt = P(mx, my, mz + .2), vU = norm([0, -.5, .87]);
+        s += ell(mf[0] + 2, mf[1] + 1, 9, 3, "#1B2A3A", 0, .12) + box(mx - .25, my - .25, 0, .5, .5, .25, { top: METAL[0], left: METAL[1], right: METAL[2] }, { sw: 1.2, si: .8 });
+        s += L(T.seg(mf, mt), 4.4) + L(T.seg(mf, mt), 2.2, METAL[1]);
+        s += L(D([[mx - 1.65, my, mz], [mx + 1.65, my, mz]], true), 3.6) + L(D([[mx - 1.65, my, mz], [mx + 1.65, my, mz]], true), 1.6, METAL[0]);
+        s += solar([mx - .95, my, mz], [1, 0, 0], vU, .7, .62, 4, 2) + solar([mx + .95, my, mz], [1, 0, 0], vU, .7, .62, 4, 2);
+        s += box(mx - .14, my - .14, mz - .16, .28, .28, .34, { top: METAL[0], left: METAL[0], right: METAL[1] }, { sw: 1.2, si: .8 });
+        /* the main dome on its trim band; the band's little lights come on with the porch */
         s += cyl(cx, cy, 0, r + .06, z0, r + .06, tr[0], tr[1], tr[0], { open: true });
-        for (a = -36; a <= 132; a += 12){ q = P(cx + (r + .06) * Math.cos(a * DEG), cy + (r + .06) * Math.sin(a * DEG), z0 * .5); s += circ(q[0], q[1], .9, "#FFFFFF", 0); }
+        for (a = -36; a <= 132; a += 12){
+          q = P(cx + (r + .06) * Math.cos(a * DEG), cy + (r + .06) * Math.sin(a * DEG), z0 * .5);
+          if (u.porch){ s += circ(q[0], q[1], 1.3, o.night ? K.litHot : "#FFF3C4", .7); lit({ at: q, lights: circ(q[0], q[1], 4, K.glow, 0).replace("/>", ' opacity=".35"/>') + circ(q[0], q[1], 1.3, K.litHot, .7) }); }
+          else s += circ(q[0], q[1], .9, "#FFFFFF", 0);
+        }
         s += T.dome(cx, cy, z0, r, h, dc[0], dc[1]);
-        s += domeSeams(cx, cy, z0, r, h, INK, function(a){ return a > 60 && a < 100; });
-        /* the tooth on the dome, on the side the sun lights */
-        var em = onDome(cx, cy, z0, r, h, 122, .5), ec = P(em.c[0], em.c[1], em.c[2]);
-        s += FO(D(ring(em.c, em.e1, em.e2, .62, 0, 360, 20)), tr[0], 1.4) + T.tinyTooth(ec[0], ec[1] + .4, .95, "#FFFFFF");
+        s += domeSeams(cx, cy, z0, r, h, INK, function(a){ return a > 96 && a < 112; });
+        /* the tooth on the dome, high on the side the sun lights */
+        var em = onDome(cx, cy, z0, r, h, 126, .66), ec = P(em.c[0], em.c[1], em.c[2]);
+        s += FO(D(ring(em.c, em.e1, em.e2, .66, 0, 360, 20)), tr[0], 1.4) + T.tinyTooth(ec[0], ec[1] + .4, 1.0, "#FFFFFF");
         /* portholes round it */
-        var ports = [[150 - 18, .22, .3], [28, .3, .32]];
-        if (u.windows) ports = ports.concat([[-14, .26, .28], [8, .64, .24], [48, .62, .24], [100, .7, .24]]);
-        ports.forEach(function(pt){ var pw = port(onDome(cx, cy, z0, r, h, pt[0], pt[1]), pt[2], o.night); s += pw.s; lights += pw.lights; });
+        var ports = [[150, .26, .3], [28, .3, .32]];
+        if (u.windows) ports = ports.concat([[-14, .26, .27], [8, .66, .24], [52, .62, .25], [158, .62, .22]]);
+        ports.forEach(function(pt){ var pw = port(onDome(cx, cy, z0, r, h, pt[0], pt[1]), pt[2], o.night); s += pw.s; lit(pw); });
         if (o.snow) s += T.snowDome(cx, cy, z0, r, h, .5);
         /* the antenna on top, its light blinking */
-        var at0 = P(cx - .1, cy - .1, z0 + h), at1 = [at0[0], at0[1] - 27];
+        var at0 = P(cx - .1, cy - .1, z0 + h), at1 = [at0[0], at0[1] - 26];
         s += L(T.seg(at0, at1), 4) + L(T.seg(at0, at1), 2, METAL[0]) + L("M" + f(at1[0] - 6) + " " + f(at1[1] + 9) + " h12 M" + f(at1[0] - 4) + " " + f(at1[1] + 15) + " h8", 3.2) + L("M" + f(at1[0] - 6) + " " + f(at1[1] + 9) + " h12 M" + f(at1[0] - 4) + " " + f(at1[1] + 15) + " h8", 1.4, METAL[0]);
         s += beacon(at1[0], at1[1] - 2, 2.8);
         if (o.night) lights += circ(at1[0], at1[1] - 2, 9, "#FF6B6B", 0).replace("/>", ' opacity=".3"/>');
-        /* the tube to the little module, with a collar where it leaves the dome */
-        var tc = [METAL[0], METAL[1]];
-        s += tube("x", 6.9, 8.2, MOD.y + .08, .95, .44, tc) + tube("x", 6.9, 7.1, MOD.y + .08, .95, .54, [tr[0], tr[1], 1.4]);
-        s += L(tubeRing("x", 7.6, MOD.y + .08, .95, .44), .9, INK, .5);
+        /* the tube to the little module, a collar where it leaves the dome */
+        var ty = MOD.y + .05, tz = .95;
+        s += tube("x", 6.75, 8.25, ty, tz, .42, [METAL[0], METAL[1]]) + tube("x", 6.75, 6.92, ty, tz, .5, [METAL[1], METAL[2], 1.4]);
+        s += L(tubeRing("x", 7.5, ty, tz, .42), .9, INK, .5);
         /* the little module: a can with a cap, a porthole, and a flag or a little dish on top */
         q = P(MOD.x, MOD.y, 0); s += ell(q[0] + 2, q[1] + 1, RX(MOD.r) + 2, RY(MOD.r) + 1, "#1B2A3A", 0, .12);
-        s += cyl(MOD.x, MOD.y, 0, MOD.r, MOD.h, MOD.r, dc[0], dc[1], dc[0], { open: true }) + L(D(T.arcPts(MOD.x, MOD.y, MOD.r, -45, 135, 12).map(function(t){ return [t[0], t[1], .55]; }), true), 1, INK, .45);
+        s += cyl(MOD.x, MOD.y, 0, MOD.r, MOD.h, MOD.r, dc[0], dc[1], dc[0], { open: true }) + L(D(T.arcPts(MOD.x, MOD.y, MOD.r, -45, 135, 12).map(function(t){ return [t[0], t[1], .5]; }), true), 1, INK, .45);
         s += cyl(MOD.x, MOD.y, MOD.h - .2, MOD.r + .05, MOD.h, MOD.r + .05, tr[0], tr[1], tr[0], { open: true }) + T.dome(MOD.x, MOD.y, MOD.h, MOD.r, .55, dc[0], dc[1]);
         if (o.snow) s += T.snowDome(MOD.x, MOD.y, MOD.h, MOD.r, .55, .5);
-        w = port({ c: [MOD.x + MOD.r * Math.cos(115 * DEG), MOD.y + MOD.r * Math.sin(115 * DEG), .95], e1: [-Math.sin(115 * DEG), Math.cos(115 * DEG), 0], e2: [0, 0, 1] }, .28, o.night); s += w.s; lights += w.lights;
-        if (u.windows){ w = port({ c: [MOD.x + MOD.r * Math.cos(40 * DEG), MOD.y + MOD.r * Math.sin(40 * DEG), .95], e1: [-Math.sin(40 * DEG), Math.cos(40 * DEG), 0], e2: [0, 0, 1] }, .24, o.night); s += w.s; lights += w.lights; }
+        var mp = function(an, rr){ var c = an * DEG; return port({ c: [MOD.x + MOD.r * Math.cos(c), MOD.y + MOD.r * Math.sin(c), .95], e1: [-Math.sin(c), Math.cos(c), 0], e2: [0, 0, 1] }, rr, o.night); };
+        w = mp(112, .27); s += w.s; lit(w);
+        if (u.windows){ w = mp(30, .23); s += w.s; lit(w); }
         if (u.flag) s += T.flagOn(MOD.x, MOD.y, MOD.h + .5, 1.9);
         else {
           q = P(MOD.x, MOD.y, MOD.h + .52); s += L("M" + f(q[0]) + " " + f(q[1]) + " v-7", 2.6) + L("M" + f(q[0]) + " " + f(q[1]) + " v-7", 1.2, METAL[0]);
           s += '<g transform="translate(' + f(q[0]) + " " + f(q[1] - 8) + ') rotate(-28)">' + FO("M-6 -1 Q0 7 6 -1 Z", METAL[0], 1.3) + L("M0 2 l0 -6", 1.1) + circ(0, -4.4, 1, INK) + "</g>";
         }
-        /* the airlock: a short drum out of the dome, its round hatch the front door */
-        var x = AL.x, zc = AL.zc, R = AL.R, y1 = AL.y1;
-        s += ell.apply(null, P(x + .3, y1 - .4, 0).concat([RX(1.3), 5, "#1B2A3A", 0, .14]));
-        s += box(x - .85, 8.0, 0, .3, .9, .2, { top: METAL[1], left: METAL[1], right: METAL[2] }, { sw: 1.1, si: .7 }) + box(x + .55, 8.0, 0, .3, .9, .2, { top: METAL[1], left: METAL[1], right: METAL[2] }, { sw: 1.1, si: .7 });
-        s += tube("y", AL.y0, y1, x, zc, R, [dc[0], dc[1]]) + tube("y", AL.y0, AL.y0 + .2, x, zc, R + .1, [tr[0], tr[1], 1.4]);
-        s += L(tubeRing("y", 8.25, x, zc, R), 1, INK, .45);
-        var face = ring([x, y1, zc], [1, 0, 0], [0, 0, 1], R, 0, 360, 28), frame = ring([x, y1, zc], [1, 0, 0], [0, 0, 1], .92, 0, 360, 28), hatch = ring([x, y1, zc], [1, 0, 0], [0, 0, 1], .8, 0, 360, 28);
-        s += FO(D(face), dc[0], 1.6) + FO(D(frame), METAL[1], 1.3) + FO(D(hatch), tr[0], 1.4);
-        s += F(D(ring([x, y1, zc], [1, 0, 0], [0, 0, 1], .8, -60, 30, 8).concat(ring([x, y1, zc], [1, 0, 0], [0, 0, 1], .58, 30, -60, 8))), tr[1], .9);
+        /* the airlock: a short metal drum out of the dome on two feet, its round hatch the front door */
+        var x = AL.x, zc = AL.zc, R = AL.R, y1 = AL.y1, FR = { top: METAL[1], left: METAL[1], right: METAL[2] };
+        s += ell.apply(null, P(x + .3, y1 - .5, 0).concat([RX(1.3), 5, "#1B2A3A", 0, .14]));
+        s += box(x - .85, 8.1, 0, .3, 1.0, .22, FR, { sw: 1.1, si: .7 }) + box(x + .55, 8.1, 0, .3, 1.0, .22, FR, { sw: 1.1, si: .7 });
+        s += tube("y", AL.y0, AL.y0 + .22, x, zc, R + .12, [tr[0], tr[1], 1.4]) + tube("y", AL.y0 + .1, y1, x, zc, R, [METAL[0], METAL[1]]);
+        s += tube("y", 8.45, 8.68, x, zc, R + .03, [tr[0], tr[1], 1.3]);
+        var hp = function(rr, t0, t1, n){ return ring([x, y1, zc], [1, 0, 0], [0, 0, 1], rr, t0, t1, n || 28); };
+        s += FO(D(hp(R, 0, 360)), "#E6EAEF", 1.6) + FO(D(hp(.96, 0, 360)), METAL[2], 1.3) + FO(D(hp(.8, 0, 360)), tr[0], 1.4);
+        s += F(D(hp(.8, -70, 20, 8).concat(hp(.6, 20, -70, 8))), tr[1], .9);
         for (a = 0; a < 360; a += 45){ q = P(x + Math.cos(a * DEG) * 1.03, y1, zc + Math.sin(a * DEG) * 1.03); s += circ(q[0], q[1], .9, INK); }
-        w = port({ c: [x, y1 + .01, zc + .25], e1: [1, 0, 0], e2: [0, 0, 1] }, .28, o.night, METAL[0]); s += w.s; lights += w.lights;
-        q = P(x, y1, zc - .4); s += L("M" + f(q[0] - 3.4) + " " + f(q[1] - 1.9) + " l6.8 3.8", 2.6) + L("M" + f(q[0] - 3.4) + " " + f(q[1] - 1.9) + " l6.8 3.8", 1.2, GOLD[0]) + circ(q[0], q[1], 1.3, GOLD[0], .8);
-        /* the step under the hatch, or the steps and the floodlights */
+        /* the hatch's porthole (lit inside at night, no glow: Timmy stands in front of it) and its wheel */
+        w = port({ c: [x, y1 + .01, zc + .3], e1: [1, 0, 0], e2: [0, 0, 1] }, .27, o.night, METAL[0]); s += w.s;
+        var wh = ring([x, y1 + .02, zc - .3], [1, 0, 0], [0, 0, 1], .26, 0, 360, 16), wc = P(x, y1 + .02, zc - .3);
+        s += L(D(wh), 2.8) + L(D(wh), 1.3, GOLD[0]) + L("M" + f(wc[0] - 2.4) + " " + f(wc[1] - 1.4) + " l4.8 2.8 M" + f(wc[0]) + " " + f(wc[1] - 2.8) + " v5.6", 1.2, INK) + circ(wc[0], wc[1], .9, GOLD[1]);
+        /* the step under the hatch, or steps with handrails */
+        var ST = { top: METAL[0], left: METAL[1], right: METAL[2] };
         if (u.porch){
-          s += box(x - .7, y1, 0, 1.4, .6, .38, { top: METAL[0], left: METAL[1], right: METAL[2] }, { sw: 1.3, si: .8 }) + box(x - .7, y1 + .6, 0, 1.4, .45, .19, { top: METAL[0], left: METAL[1], right: METAL[2] }, { sw: 1.3, si: .8 });
-          [x - .8, x + .8].forEach(function(xx){ var r0 = P(xx, y1 + 1.0, .2), r1 = P(xx, y1 + .05, .95), r2 = P(xx, y1 + 1.0, 1.0); s += L(T.seg(r0, r2) + " " + T.seg(r2, r1), 2.6) + L(T.seg(r0, r2) + " " + T.seg(r2, r1), 1.2, METAL[0]); });
-          [x - .75, x + .75].forEach(function(xx){ var l0 = P(xx, y1 - .3, zc + R * .92); s += FO("M" + f(l0[0] - 3) + " " + f(l0[1]) + " h6 l-1 -4 h-4 z", METAL[1], 1.1) + F("M" + f(l0[0] - 2.4) + " " + f(l0[1] - .4) + " h4.8", o.night ? K.litHot : "#FFF3C4") + L("M" + f(l0[0] - 2.6) + " " + f(l0[1] + .4) + " h5.2", 1.2, o.night ? K.litHot : "#FFE9A8");
-            if (o.night) lights += F("M" + f(l0[0] - 3) + " " + f(l0[1]) + " L" + f(l0[0] - 9) + " " + f(l0[1] + 22) + " L" + f(l0[0] + 9) + " " + f(l0[1] + 22) + " L" + f(l0[0] + 3) + " " + f(l0[1]) + " Z", K.glow, .16); });
-        } else s += box(x - .55, y1, 0, 1.1, .42, .3, { top: METAL[0], left: METAL[1], right: METAL[2] }, { sw: 1.3, si: .8 });
-        if (o.snow) s += ell.apply(null, P(x, y1 - .6, zc + R + .02).concat([9, 2.4, "#FFFFFF", 1]));
+          s += box(x - .7, y1, 0, 1.4, .55, .4, ST, { sw: 1.3, si: .8 }) + box(x - .7, y1 + .55, 0, 1.4, .45, .2, ST, { sw: 1.3, si: .8 });
+          [x - .78, x + .78].forEach(function(xx){ var r0 = P(xx, y1 + 1.0, .2), r1 = P(xx, y1 + .05, 1.0), r2 = P(xx, y1 + 1.0, .95); s += L(T.seg(r0, r2) + " " + T.seg(r2, r1), 2.6) + L(T.seg(r0, r2) + " " + T.seg(r2, r1), 1.2, GOLD[0]); });
+        } else s += box(x - .55, y1, 0, 1.1, .42, .3, ST, { sw: 1.3, si: .8 });
+        if (o.snow) s += ell.apply(null, P(x, y1 - .7, zc + R + .02).concat([9, 2.4, "#FFFFFF", 1]));
         if (o.night) lights += T.dmStar(150, 58, 2.6, "#FFFFFF", "tp-twinkle", .3);
         return { body: s, lights: lights };
       }
