@@ -10464,3 +10464,273 @@ $$;
 revoke all on function public.sh_wallet(text) from public, anon, authenticated;
 revoke all on function public.sh_medal_check(text, text, timestamptz) from public, anon, authenticated;
 revoke all on function public.sh_answer(timestamptz, text, text, text, integer, integer[], boolean, text, text, text, uuid, boolean) from public, anon, authenticated;
+
+-- ====================================================================== migration_v73.sql
+-- migration_v73: the answer catch-up after the evening outage of 2026-11-18.
+-- Sam, 2026-11-18: "we can do fixes for 1 and 2" (this is 2, the answers; 1 is the time, tools/data-fixes/2026-11-18-outage-time.sql;
+-- vault/tasks/2026-11-18-database-load.md). From 19:35 to 21:03 UTC about 1,300 answers never reached the database (about 2,500
+-- tried, the edge logs), with the XP and crowns they paid. Each device kept them: a hub's page keeps the day's answers, right
+-- answers and XP (STATE.nx.days['2026-11-18']: n, r, xp, met), and it keeps them after the day, but not which choice was picked, so
+-- the answers can't be graded or saved again. What comes back is what they paid, once, on the next visit (widget/hub-rewards.js):
+--
+-- restore_outage_v2(p_visitor, p_hub, p_n, p_r, p_xp, p_goal, p_met), until 2026-11-22 (Central), once per person and hub:
+--   * Only for someone who was studying in that hub during the outage (a ping there between 19:35 and 21:06 UTC), and for no
+--     more answers than 3 a minute from their first to their last ping in that window, at most 250 (the class averaged about
+--     half a minute's answer).
+--   * The missing answers: the device's count for 2026-11-18 in that hub minus the database's (the right ones likewise).
+--   * Their XP: the device's XP for the day minus everything the database paid that person that day in that hub (or in no hub),
+--     never more than the answer rules would pay them (10 a right one, 1 a miss, times a boost running at 20:20 UTC); plus the
+--     day's 20th answer (30, goal20) and the day's first answer (20) when the missing answers are what would have reached them.
+--     One award, src 'restore', key 'outage:2026-11-18:<hub>': answer XP, so it pays crowns as answers do (one for 2 XP,
+--     sh_wallet), and it survives a rebuild (sh_xp_rebuild redoes only 'answer', 'goal20' and 'fix').
+--   * The daily ring (5 XP and crowns a question of the goal) when the device met its goal and the restored answers reach it
+--     and it wasn't paid: the live key ('ring:<hub>:2026-11-18'), so never twice.
+--   * The day counts for the streak: xp_days gets the missing answers (a new day when none was saved), xp_visitors' days and best
+--     run of days follow, and the streak step runs for that day and each day studied since, as the day's first answer would have
+--     (its prizes' keys make it pay once).
+-- The answers themselves are not added: medals, the class's numbers on each question and another device's progress don't count
+-- them (the device that answered still has them).
+-- Safe to run twice (create or replace; the award's key). Quick to apply: the new kind of award is checked against the awards
+-- already there with `validate constraint`, which doesn't stop answers being saved while it reads them.
+
+alter table public.xp_awards drop constraint if exists xp_awards_src_check;
+alter table public.xp_awards add constraint xp_awards_src_check
+  check (src in ('answer', 'goal20', 'fix', 'mock', 'medal', 'pod-min', 'pod-done', 'arcade', 'report', 'card', 'survey', 'checkin',
+                 'name', 'ring', 'boss', 'streak', 'row', 'nuke', 'alltime', 'notes', 'trophy', 'visit', 'game', 'record', 'restore'))
+  not valid;
+-- checked against the rows already there without holding up the answers being saved meanwhile (validate takes a lighter lock)
+alter table public.xp_awards validate constraint xp_awards_src_check;
+
+create or replace function public.restore_outage_v2(p_visitor text, p_hub text, p_n integer, p_r integer, p_xp integer,
+  p_goal integer, p_met boolean)
+returns jsonb language plpgsql volatile security definer set search_path = public as $$
+declare
+  dd constant date := date '2026-11-18';
+  w0 constant timestamptz := timestamptz '2026-11-18 19:35:00+00';
+  w1 constant timestamptz := timestamptz '2026-11-18 21:06:00+00';
+  v_at constant timestamptz := timestamptz '2026-11-18 20:20:00+00';
+  t0 timestamptz := dd::timestamp at time zone 'America/Chicago';
+  t1 timestamptz := (dd + 1)::timestamp at time zone 'America/Chicago';
+  v_key text; first_at timestamptz; last_at timestamptz; cap int; n_s int; r_s int; xp_s int; miss_n int; miss_r int;
+  v_mult int; want int; day_n int; new_day boolean := false; g20 int := 0; paid int := 0; ring int := 0; cards int;
+  bonus jsonb := '[]'::jsonb; sd date;
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 or p_hub is null or p_hub !~ '^[a-z0-9][a-z0-9-]{0,39}$'
+     or p_n is null or p_n not between 0 and 5000 or p_r is null or p_r not between 0 and p_n
+     or p_xp is null or p_xp not between 0 and 100000 then
+    return jsonb_build_object('ok', false, 'error', 'bad');
+  end if;
+  if now() >= timestamptz '2026-11-22 06:00:00+00' then return jsonb_build_object('ok', false, 'error', 'closed'); end if;
+  perform pg_advisory_xact_lock(hashtext('xp|' || p_visitor));
+  v_key := 'outage:' || dd || ':' || p_hub;
+  if exists (select 1 from xp_awards w where w.visitor_id = p_visitor and w.key = v_key) then
+    return sh_prize_reply(p_visitor, 'restore', 0, jsonb_build_object('why', 'done'));
+  end if;
+
+  -- studying in that hub during the outage, and for how long
+  select min(a.pinged_at), max(a.pinged_at) into first_at, last_at from activity_pings a
+    where a.visitor_id = p_visitor and a.hub = p_hub and a.pinged_at >= w0 and a.pinged_at < w1;
+  if first_at is null then return sh_prize_reply(p_visitor, 'restore', 0, jsonb_build_object('why', 'none')); end if;
+  cap := least(250, 3 * ceil(greatest(1, extract(epoch from last_at - first_at) / 60.0))::int);
+
+  -- what the database has for that day in that hub
+  select count(*), count(*) filter (where a.correct) into n_s, r_s from personal_answers a
+    where a.visitor_id = p_visitor and a.hub = p_hub and a.answered_at >= t0 and a.answered_at < t1;
+  select coalesce(sum(w.xp), 0) into xp_s from xp_awards w
+    where w.visitor_id = p_visitor and w.d = dd and w.hub in (p_hub, '');
+  miss_n := least(cap, greatest(0, p_n - n_s));
+  miss_r := least(miss_n, greatest(0, p_r - r_s));
+  if miss_n = 0 then return sh_prize_reply(p_visitor, 'restore', 0, jsonb_build_object('why', 'none')); end if;
+  v_mult := sh_xp_mult(p_visitor, v_at);
+  want := least(greatest(0, p_xp - xp_s), (10 * miss_r + (miss_n - miss_r)) * v_mult);
+
+  -- the day's count, for the streak and the 20th answer
+  select x.n into day_n from xp_days x where x.visitor_id = p_visitor and x.d = dd;
+  if day_n is null then
+    insert into xp_days (visitor_id, d, n, c, raw) values (p_visitor, dd, miss_n, miss_r, 0);
+    new_day := true; day_n := 0;
+  else
+    update xp_days x set n = x.n + miss_n, c = x.c + miss_r where x.visitor_id = p_visitor and x.d = dd;
+  end if;
+  if day_n < 20 and day_n + miss_n >= 20 and not exists (select 1 from xp_awards w where w.visitor_id = p_visitor and w.key = 'g20:' || dd) then
+    g20 := 30 * v_mult;
+  end if;
+  paid := sh_award(p_visitor, v_key, 'restore', p_hub, want + g20 + case when new_day then 20 else 0 end, 1, v_at);
+  update xp_visitors x set answers = x.answers + miss_n, correct = x.correct + miss_r,
+    days = (select count(*) from xp_days z where z.visitor_id = p_visitor),
+    best_days = greatest(x.best_days, (select coalesce(max(len), 0)::int from (select count(*) as len from (
+      select z.d, z.d - (row_number() over (order by z.d))::int as grp from xp_days z where z.visitor_id = p_visitor) i group by grp) r))
+    where x.visitor_id = p_visitor;
+
+  -- the daily ring, as sh_claim_ring counts it (the hub's answers and paying flashcards that day), with the missing answers
+  if coalesce(p_met, false) and p_goal in (10, 20, 30, 40, 50) then
+    select count(*) into cards from xp_awards w where w.visitor_id = p_visitor and w.src = 'card' and w.hub = p_hub and w.d = dd;
+    if n_s + cards + miss_n >= p_goal then
+      ring := sh_award(p_visitor, 'ring:' || p_hub || ':' || dd, 'ring', p_hub, 5 * p_goal, 1, v_at);
+    end if;
+  end if;
+
+  -- the streak of days, for that day and each one studied since (its prizes pay once, by their keys)
+  if new_day then
+    for sd in select z.d from xp_days z where z.visitor_id = p_visitor and z.d >= dd order by z.d loop
+      bonus := bonus || sh_streak_step(p_visitor, p_hub, sd, v_at);
+    end loop;
+  end if;
+
+  return sh_prize_reply(p_visitor, 'restore', (paid + ring + coalesce((select sum((b->>'xp')::int) from jsonb_array_elements(bonus) b), 0))::int,
+    jsonb_build_object('n', miss_n, 'right', miss_r, 'answers', paid, 'ring', ring, 'bonus', bonus, 'day', new_day));
+end;
+$$;
+
+revoke all on function public.restore_outage_v2(text, text, integer, integer, integer, integer, boolean) from public;
+grant execute on function public.restore_outage_v2(text, text, integer, integer, integer, integer, boolean) to anon, authenticated;
+
+-- ====================================================================== migration_v74.sql
+-- migration_v74: raw activity pings are kept 3 days instead of 30, and the retention job runs every night instead of Sundays.
+-- Sam, 2026-11-18, asked whether pings need keeping even 14 days ("could we do 1 day? what would that affect"), then: "do 3
+-- days". Every reader of study time uses the hourly rollup (activity_hourly, activity_visits: the admin page's time views, the
+-- lessons audit, retrospectives, recaps, time crowns, check-ins against study time), kept the school year. The raw pings are
+-- read only for who is studying right now (the last 15 minutes, admin_live_presence), the admin page's newest-write check, and
+-- repairs such as the evening outage's (tools/data-fixes/2026-11-18-outage-time.sql); 3 days still covers a repair found after
+-- a weekend. activity_pings was 166 MB of the 419 MB database (500 MB is the Free plan's read-only line); 3 days is about 10 to
+-- 40 MB once the table is rewritten (VACUUM FULL or CLUSTER, at night, after the first run: deleted rows' space is reused, not
+-- given back). vault/reference/analytics-retention.md.
+--   1. sh_retention_run: the pings' cutoff is 3 days; everything else it does is unchanged (v58's body otherwise).
+--   2. The job is sh-retention-nightly, every night at 3:23 am Central ('23 9 * * *' UTC); sh-retention-weekly is removed.
+--      The other deletes keep their ages (90 days, 180 days...): run nightly they only happen in smaller steps.
+--   3. sh_retention_status reads the nightly job (or the weekly one, on a database v74 hasn't reached).
+-- The first nightly run deletes about 27 days of pings at once (about 250,000 rows): at 3:23 am, with the rollups kept
+-- (sh.keep_rollups), as every run does.
+
+create or replace function public.sh_retention_run(p_apply boolean default false)
+returns jsonb language plpgsql set search_path = public as $$
+declare
+  c jsonb := '{}'::jsonb;
+  k bigint;
+  cut_pings timestamptz := now() - interval '3 days';   -- v74: 3 days (Sam, 2026-11-18), was 30
+  cut_reach date := current_date - 90;
+  cut_events date := current_date - 180;
+begin
+  -- raw pings older than 3 days, and test or blank-hub pings; their hours stay in activity_hourly / activity_visits
+  if p_apply then
+    perform set_config('sh.keep_rollups', 'on', true);
+    delete from activity_pings where pinged_at < cut_pings or hub = '' or hub ~ '^zz-';
+    get diagnostics k = row_count;
+    perform set_config('sh.keep_rollups', 'off', true);
+  else
+    select count(*) into k from activity_pings where pinged_at < cut_pings or hub = '' or hub ~ '^zz-';
+  end if;
+  c := c || jsonb_build_object('activity_pings', k);
+
+  -- who tapped what, older than 90 days (ui_clicks keeps the counts, with no ids)
+  if p_apply then delete from ui_click_reach where day < cut_reach or hub = '' or hub ~ '^zz-'; get diagnostics k = row_count;
+  else select count(*) into k from ui_click_reach where day < cut_reach or hub = '' or hub ~ '^zz-'; end if;
+  c := c || jsonb_build_object('ui_click_reach', k);
+
+  -- feature events older than 180 days: day x page x kind with people counts, then the per-person rows go
+  if p_apply then
+    insert into feature_daily (day, hub, kind, people, n)
+      select day, hub, kind, count(distinct visitor_id), sum(n) from feature_events
+      where day < cut_events and hub <> '' and hub !~ '^zz-' group by 1, 2, 3
+      on conflict (day, hub, kind) do update set people = feature_daily.people + excluded.people, n = feature_daily.n + excluded.n;
+    delete from feature_events where day < cut_events or hub = '' or hub ~ '^zz-'; get diagnostics k = row_count;
+  else select count(*) into k from feature_events where day < cut_events or hub = '' or hub ~ '^zz-'; end if;
+  c := c || jsonb_build_object('feature_events', k);
+
+  -- the other rollups and counters: test hubs and blank hubs only
+  if p_apply then
+    delete from activity_hourly where hub = '' or hub ~ '^zz-'; get diagnostics k = row_count; c := c || jsonb_build_object('activity_hourly_test', k);
+    delete from ui_clicks where hub = '' or hub ~ '^zz-'; get diagnostics k = row_count; c := c || jsonb_build_object('ui_clicks_test', k);
+  else
+    c := c || jsonb_build_object('activity_hourly_test', (select count(*) from activity_hourly where hub = '' or hub ~ '^zz-'),
+                                 'ui_clicks_test', (select count(*) from ui_clicks where hub = '' or hub ~ '^zz-'));
+  end if;
+
+  -- reports and suggestions: the sender's id goes 120 days after the reply (the reply has reached their Inbox by then)
+  if p_apply then
+    update question_flags set visitor_id = null where visitor_id is not null and resolved and resolved_at < now() - interval '120 days';
+    get diagnostics k = row_count; c := c || jsonb_build_object('question_flags_ids', k);
+    update hub_suggestions set visitor_id = null where visitor_id is not null and resolved and resolved_at < now() - interval '120 days';
+    get diagnostics k = row_count; c := c || jsonb_build_object('hub_suggestions_ids', k);
+  else
+    c := c || jsonb_build_object(
+      'question_flags_ids', (select count(*) from question_flags where visitor_id is not null and resolved and resolved_at < now() - interval '120 days'),
+      'hub_suggestions_ids', (select count(*) from hub_suggestions where visitor_id is not null and resolved and resolved_at < now() - interval '120 days'));
+  end if;
+
+  -- exam check-ins: compared with the person's own use only in that hub's retrospective; the id goes after a year
+  if p_apply then
+    update exam_debriefs set visitor_id = 'anon-' || id where visitor_id !~ '^anon-' and created_at < now() - interval '1 year';
+    get diagnostics k = row_count;
+  else select count(*) into k from exam_debriefs where visitor_id !~ '^anon-' and created_at < now() - interval '1 year'; end if;
+  c := c || jsonb_build_object('exam_debriefs_ids', k);
+
+  -- surveys: "No thanks" rows only stop a live survey asking twice; answers lose their id 90 days after it closed
+  -- (closed = not active, or past ends_at; when it closed = ends_at, else its last response)
+  if p_apply then
+    delete from survey_responses r using surveys s where s.id = r.survey_id and r.answers is null
+      and (not s.active or s.ends_at < now());
+    get diagnostics k = row_count; c := c || jsonb_build_object('survey_declines', k);
+    update survey_responses r set visitor_id = 'anon-' || r.id from surveys s
+      where s.id = r.survey_id and r.answers is not null and r.visitor_id !~ '^anon-' and (not s.active or s.ends_at < now())
+        and coalesce(s.ends_at, (select max(x.created_at) from survey_responses x where x.survey_id = s.id)) < now() - interval '90 days';
+    get diagnostics k = row_count; c := c || jsonb_build_object('survey_answer_ids', k);
+  else
+    c := c || jsonb_build_object(
+      'survey_declines', (select count(*) from survey_responses r join surveys s on s.id = r.survey_id
+                          where r.answers is null and (not s.active or s.ends_at < now())),
+      'survey_answer_ids', (select count(*) from survey_responses r join surveys s on s.id = r.survey_id
+                            where r.answers is not null and r.visitor_id !~ '^anon-' and (not s.active or s.ends_at < now())
+                              and coalesce(s.ends_at, (select max(x.created_at) from survey_responses x where x.survey_id = s.id)) < now() - interval '90 days'));
+  end if;
+
+  -- the idea board: an idea hidden (by three reports, or by Sam) and not restored for 90 days goes, with its votes,
+  -- reports and Inbox notes (they go with their idea: on delete cascade). Sam, 2026-11-11.
+  if p_apply then delete from ideas where hidden and hidden_at < now() - interval '90 days'; get diagnostics k = row_count;
+  else select count(*) into k from ideas where hidden and hidden_at < now() - interval '90 days'; end if;
+  c := c || jsonb_build_object('ideas_hidden', k);
+
+  -- device-link attempts: only the last hour is read (the rate limit)
+  if p_apply then delete from link_attempts where tried_at < now() - interval '7 days'; get diagnostics k = row_count;
+  else select count(*) into k from link_attempts where tried_at < now() - interval '7 days'; end if;
+  c := c || jsonb_build_object('link_attempts', k);
+
+  if p_apply then
+    analyze activity_pings;
+    insert into retention_runs (database_mb, counts) values (round(pg_database_size(current_database()) / 1048576.0, 1), c);
+  end if;
+  return jsonb_build_object('applied', p_apply, 'counts', c,
+    'cutoffs', jsonb_build_object('activity_pings', cut_pings, 'ui_click_reach', cut_reach, 'feature_events', cut_events));
+end;
+$$;
+revoke all on function public.sh_retention_run(boolean) from public, anon, authenticated;
+
+create or replace function public.sh_retention_status()
+returns jsonb language plpgsql set search_path = public as $$
+declare sched text;
+begin
+  if to_regclass('cron.job') is not null then
+    execute $q$select schedule from cron.job where jobname in ('sh-retention-nightly', 'sh-retention-weekly')
+               order by jobname = 'sh-retention-nightly' desc limit 1$q$ into sched;
+  end if;
+  return jsonb_build_object(
+    'schedule', sched,
+    'runs', coalesce((select jsonb_agg(jsonb_build_object('ran_at', x.ran_at, 'database_mb', x.database_mb, 'counts', x.counts) order by x.ran_at desc)
+                      from (select * from retention_runs order by ran_at desc limit 8) x), '[]'::jsonb));
+end;
+$$;
+revoke all on function public.sh_retention_status() from public, anon, authenticated;
+
+do $do$
+begin
+  if exists (select 1 from pg_available_extensions where name = 'pg_cron') then
+    begin
+      create extension if not exists pg_cron;
+      perform cron.unschedule(jobid) from cron.job where jobname in ('sh-retention-weekly', 'sh-retention-nightly');
+      perform cron.schedule('sh-retention-nightly', '23 9 * * *', 'select public.sh_retention_run(true)');
+    exception when others then
+      raise notice 'pg_cron not set up (%): run select sh_retention_run(true); by hand', sqlerrm;
+    end;
+  end if;
+end
+$do$;

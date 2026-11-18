@@ -16,7 +16,7 @@ page's Insights tab (`review/`); the local checks are in `tools/analytics-qualit
 | Check | What it catches | 2026-11-04 | If it fires |
 |---|---|---|---|
 | Tracking alive | answers, clicks or events stopped while pings keep arriving: writes fail silently by design | all writing today | Find the widget code or grant that broke; nothing tells a student |
-| Test data | rows from hubs starting `zz-` or with no hub | 3 rows in `feature_events` (`zz-test`, 10-20) | Already left out of every read; the weekly retention job deletes them (the 3 went on 2026-11-05) |
+| Test data | rows from hubs starting `zz-` or with no hub | 3 rows in `feature_events` (`zz-test`, 10-20) | Already left out of every read; the nightly retention job deletes them (the 3 went on 2026-11-05) |
 | Sections `sh_surface()` can't place | a new mode or sub-view, or a hub that sends no section | historical only: `hepatobiliary` 28,775 pings and `gi-exam1` 7 with none, `compendium` with no sub-view (perio, MSK 3, genetics) | Recent ones: add the name to `sh_surface()` in a migration |
 | New event families | an `shTrack` family nobody documented | none new | Add its row to [event-taxonomy](event-taxonomy.md) |
 | Families gone quiet | a family that stopped firing | (watch after a feature changes) | Retired feature, or tracking that broke |
@@ -25,7 +25,7 @@ page's Insights tab (`review/`); the local checks are in `tools/analytics-qualit
 | Answers with no recorded pick | questions answered 20+ times with no `question_choices` rows | `hepatobiliary` 238 of 238 (before `record_choice`), perio 22, PCD 3 20, MSK 4 17, MSK 3 14, live hubs 2-3 each | On a live hub: the question type isn't sending `choice`/`picks` |
 | Class counters vs personal rows | `question_stats` and `personal_answers` disagree | agree within 3 per hub | One of the two answer calls is failing |
 | Storage | database size and weekly growth against the free plan's 500 MB | 217 MB; ~39 MB a week in exam weeks; ~7 weeks of headroom (200 MB after the first retention run, 2026-11-05) | [analytics-retention](analytics-retention.md). Growth comes from the last two retention runs' sizes once there are two; before that it's last week's writes, an upper bound now that old raw pings are deleted weekly |
-| Retention | the weekly job's last run, what it removed, its schedule (`sh_retention_status()`) | (from 2026-11-05) | Flagged when the job is missing or skipped a week: check `cron.job_run_details`, run `select sh_retention_run(true);` by hand |
+| Retention | the nightly job's last run, what it removed, its schedule (`sh_retention_status()`) | (from 2026-11-05) | Flagged when the job is missing or skipped a week: check `cron.job_run_details`, run `select sh_retention_run(true);` by hand |
 
 ## Standing caveats (read before quoting a number)
 

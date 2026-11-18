@@ -48,3 +48,5 @@ perio | When you earn a bonus (today's goal, right in a row, a streak, a medal, 
 heme-endo-exam3 | When you earn a bonus (today's goal, right in a row, a streak, a medal, a finished mock or game, Timmy Time), a gold reward card now shows the XP and crowns you got, counting up with confetti, and they fly into your rank. The Today card's crowns are back, with what you earned today.
 perio | The XP on a question card is always what the answer earned: right answers no longer show +0 XP when the site is busy.
 heme-endo-exam3 | The XP on a question card is always what the answer earned: right answers no longer show +0 XP when the site is busy.
+perio | Answers that didn't save during Wednesday afternoon's outage come back as XP and crowns on your next visit (with the day's goal and your streak), and the study time it missed is back in your totals.
+heme-endo-exam3 | Answers that didn't save during Wednesday afternoon's outage come back as XP and crowns on your next visit (with the day's goal and your streak), and the study time it missed is back in your totals.

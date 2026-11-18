@@ -5,9 +5,9 @@ hub: all
 created: 2026-11-18
 requested-by: Sam
 due:
-waiting-on: Sam, for the compute size
+waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429
+pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429 (and the outage repairs' PR)
 ---
 
 # Keep heavy queries from failing students' answer saves
@@ -68,15 +68,31 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   20.5 ms an answer, 19 ms of it those two; after v72, 5.1 ms (a wrong answer) to 6.8 ms (a right one that can reach a
   medal), the same balances and medals. Applied live on 2026-11-18 at about 21:00 UTC, once the restart had finished
   (Sam: "Apply it now"); the three live bodies' md5 match the file.
-- [ ] **The ping table's indexes rebuilt** (no data deleted): `activity_pings` was 166 MB of the 414 MB database, 117 MB of
-  it three bloated indexes. `reindex index concurrently` on `activity_pings_time_idx`, `_visitor_idx` and `_hub_idx`, one
-  at a time, **late at night only** (it reads the whole table; Sam asked "could we do it now", and in the afternoon it would
-  have taken the CPU from the class). Scheduled for 2026-11-19 about 3 am Central from this session.
-- [ ] **Sam's call: the Free plan's 500 MB limit.** The project is on the **Free plan** (not a paid Micro: `get_organization`,
+- [ ] **The ping table rewritten after the first 3-day cleanup** (no data deleted by the rewrite): `activity_pings` was 166 MB of
+  the 414 MB database, 117 MB of it three bloated indexes. Since `migration_v74.sql` the nightly job keeps 3 days of raw pings
+  (below), and deleted rows' space is only reused, so once its first run (3:23 am Central, 2026-11-19, about 27 days of pings)
+  is done, `vacuum full public.activity_pings` (or `cluster ... using activity_pings_time_idx`) at night gives it back and
+  rebuilds the indexes, in place of the index rebuild planned first (Sam asked "could we do it now"; in the afternoon it would
+  have taken the CPU from the class). Scheduled for about 3:45 am Central on 2026-11-19 from this session.
+- [x] **Sam's call: the Free plan's 500 MB limit.** The project is on the **Free plan** (not a paid Micro: `get_organization`,
   2026-11-18), whose database goes **read-only at 500 MB** of database size, and every save then fails. 414 MB on
-  2026-11-18; a busy exam day adds about 15 MB of pings alone (30 days of raw pings were about 300,000 rows). Options: keep
-  raw pings 14 days instead of 30 (every reader uses `activity_hourly`; the admin page's 30-day visitor views would
-  read 14), or the Pro plan (8 GB).
+  2026-11-18; a busy exam day adds about 15 MB of pings alone. Sam: "i dont want to upgrade the plan. stay free", and to
+  "do we need to even save pings for 14 days? ... could we do 1 day?": **"do 3 days"** (`migration_v74.sql`, applied live:
+  raw pings kept 3 days, the retention job nightly; every reader of study time uses `activity_hourly`). About 280 MB once
+  the table is rewritten (the box above).
+- [ ] **The outage's study time restored** (Sam: "we can do fixes for 1 and 2"): `tools/data-fixes/2026-11-18-outage-time.sql`
+  fills the window's 40 s to 10 minute gaps between saved pings, 2,691 pings (18.7 hours) for 52 people, under the ~2,900
+  lost; the After merge workflow runs it after the merge (or the 3:45 am session does, if it's still open). Tick it with
+  what it restored.
+- [x] **The outage's answers caught up** (Sam's fix 2): `migration_v73.sql` (applied live 2026-11-18, md5-checked):
+  `restore_outage_v2` pays what a device's kept day says didn't save (XP, crowns as answers pay, the 20th answer, the day's
+  first answer, the ring, the streak), once a person and hub, only for someone studying in that hub during the outage, 3
+  answers a minute at most, until 11-21; `widget/hub-rewards.js` asks once on the next visit ("Saved from Wednesday's
+  outage"). The answers themselves aren't re-added (no choice kept): medals and the class's numbers don't count them.
+- [ ] **A second free Supabase project for the analytics, when it's needed** (Sam, 2026-11-18: "i think adding the second
+  database may be necessary at some point"): pings, clicks, feature events and question health (about a third of the
+  requests, over half the storage) move to their own free project; answers, XP and the shop stay. Not now.
+- [ ] [The optimization pass](2026-11-18-database-optimization-pass.md): the answer save is still 55% of the database's time.
 - [x] `personal_answers`' two indexes (`migration_v71.sql`: the person's answers newest first, and one question's answers)
   built on the live database with `create index concurrently`, then the file appended to `supabase/schema.sql` and its line
   taken out of `supabase/pending-migrations.txt`. Each answer's speed limit, double-tap check and per-question counts read
@@ -131,5 +147,12 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   and the Management API queries around 20:00-20:10 were this session's diagnosis (`pg_stat_statements` reports and a few
   `explain analyze` runs of `sh_wallet`, the slowest 6.4 s on the starved CPU). Diagnose on a throwaway copy
   (`tools/release/pg.js`) and read the edge logs, which cost the database nothing, while the class is failing.
+
+- 2026-11-18, after #429 merged: what the outage lost, from the edge logs and the pings that saved (totals; 53 people were
+  studying then, in Perio and Heme & Endo Exam 3): about 1,300 answer saves of about 2,500 tried (each device still has them),
+  their XP and crowns (about 100-150 XP a person on average), about 2,900 pings (about 20 hours, with the crowns time pays),
+  about 25 lecture reads' rewards, a few flashcard ratings and trophies, and half the window's analytics (not repaired).
+  Since the restart the answer save is 55% of the database's time (360 ms mean on the shared CPU, 12% of requests), the
+  pings 8%, question health 7%. Sam: "we can do fixes for 1 and 2. do 3 days. dont cut anything for now" (the boxes above).
 
 ## Outcome

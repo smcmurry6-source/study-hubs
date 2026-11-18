@@ -44,7 +44,7 @@ privacy rule). Written by = the RPC and the client file that calls it.
 
 | Table | Grain | Visitor | Written by | Since | Notes |
 |---|---|---|---|---|---|
-| `activity_pings` | one 25 s ping: visitor, visit, hub, section | yes | `record_activity_ping`, `widget/v3.js` | 2026-09-12 | Raw, **kept 30 days** ([analytics-retention](analytics-retention.md)); read only for the last few minutes (Live) and the data-quality checks. `section` is `<mode>/<sub-view>` (below); `hepatobiliary` and `gi-exam1` sent none |
+| `activity_pings` | one 25 s ping: visitor, visit, hub, section | yes | `record_activity_ping`, `widget/v3.js` | 2026-09-12 | Raw, **kept 3 days** since 2026-11-18, 30 before ([analytics-retention](analytics-retention.md)); read only for the last few minutes (Live), the data-quality checks and a repair after an outage. `section` is `<mode>/<sub-view>` (below); `hepatobiliary` and `gi-exam1` sent none |
 | `activity_hourly` | visitor × hub × section × hour, `n` pings | yes | trigger on `activity_pings` (v45) | 2026-09-12 (rebuilt from all pings in v45) | What the admin RPCs and `sh_insights()` read. The source of time for everything else since migration_v52 (recap, retro, lessons audit); a retention delete keeps it, an ordinary ping delete rebuilds it. Since migration_v68 it also pays 100 Shiny Gold Crowns an hour (`sh_time_crowns`, at most 144 pings a clock hour) |
 | `activity_visits` | one visit: first and last ping | yes | same trigger | same | Visit length for `get_visitor_summary` |
 | `presence_hourly` | hub × hour of day, ping count | no | `record_presence_ping` | early | "Who's studying now" on the dashboard |
