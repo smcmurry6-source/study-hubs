@@ -2374,7 +2374,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
      version} worked out here from the hub's own SH_EXPORT (shQH.fp, widget/qhealth.js), so the numbers are for the question
      as it reads now and ids with data that the hub no longer has show up. Flags are leads, not verdicts: Sam marks each
      Looks fine / Needs a fix / Fixed (admin_review_question), which only stores the call. Nothing here changes a question. */
-  var QH = { hub: null, rows: null, ex: {}, filter: "review", loading: false, err: null, shown: 40, saving: {}, at: 0 };
+  var QH = { hub: null, rows: null, ex: {}, vx: {}, filter: "review", loading: false, err: null, shown: 40, saving: {}, at: 0 };
   var QH_FILTERS = [["review", "To review"], ["todo", "Needs a fix"], ["reviewed", "Reviewed"], ["all", "All with data"]];
   var QH_STATE = { "new": "To review", changed: "Changed since “Needs a fix”: check it", todo: "Needs a fix", reviewed: "Reviewed", clear: "No flags" };
   var QH_SRC = { version: "this version", all: "all answers ever", feedback: "students", ids: "ids" };
@@ -2414,9 +2414,16 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       }, 20000);
     });
   }
+  /* a hub's A/B versions (content/variants.json on a hub on the engine); none is fine */
+  function qhVariants(hub){
+    if (QH.vx[hub] !== undefined) return Promise.resolve(QH.vx[hub]);
+    return fetch("../hubs/" + encodeURIComponent(hub) + "/content/variants.json", { cache: "no-cache" })
+      .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })
+      .then(function(v){ QH.vx[hub] = v && typeof v === "object" ? v : null; return QH.vx[hub]; });
+  }
   function qhLoad(hub){
     QH.hub = hub; QH.rows = null; QH.err = null; QH.loading = true; QH.shown = 40; renderHealth();
-    qhExport(hub).then(function(ex){
+    Promise.all([qhExport(hub), qhVariants(hub)]).then(function(all){ return all[0]; }).then(function(ex){
       var cur = null;
       /* the live version's fingerprint, key, choice count and kind: the miskey and chance checks work before any version row exists */
       if (ex) { cur = {}; ex.questions.forEach(function(q){ cur[q.id] = { v: q.fp, key: typeof q.answer === "number" ? q.answer : null,
@@ -2452,10 +2459,23 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var lab = !tot ? "No picks recorded yet" : useV ? "First tries on this version (" + tot + ")" : "Every pick, all versions and tries (" + tot + ")";
     return '<ol class="qh-chs">' + rows + '</ol><div class="qh-small muted">' + lab + '</div>';
   }
+  /* the question's other versions (B, C...) from the hub's content/variants.json, folded under the original (version A) */
+  function qhVersions(r){
+    var vs = QH.vx[QH.hub] && QH.vx[QH.hub][r.qid]; if (!vs) return "";
+    if (!Array.isArray(vs)) vs = [vs];
+    return vs.map(function(v, i){
+      if (!v || !v.stem) return "";
+      return '<details class="qh-reps"><summary>Version ' + String.fromCharCode(66 + i) + ' (variants.json)</summary><div class="qh-stem">' + esc(v.stem) + '</div>' +
+        (Array.isArray(v.choices) ? '<ol class="qh-chs">' + v.choices.map(function(c){ return '<li class="qh-ch"><span class="qh-ch-t">' + esc(c) + '</span></li>'; }).join("") + '</ol>' : '') + '</details>';
+    }).join("");
+  }
   function qhStats(r){
     var s = [];
     if (r.n1) s.push("First try (this version): <b>" + qhPct(r.c1, r.n1) + "</b> of " + r.n1);
     if (r.a_n1) s.push("First try (all ever): <b>" + qhPct(r.a_c1, r.a_n1) + "</b> of " + r.a_n1);
+    /* A/B (migration_v65): first tries by the version shown; the class is split by device, so the halves are alike */
+    var wk = r.wordings ? Object.keys(r.wordings).sort() : [];
+    if (wk.length) s.push("First try by version: " + wk.map(function(k){ var x = r.wordings[k] || {}; return String.fromCharCode(65 + +k) + " <b>" + qhPct(x.c, x.n) + "</b> of " + x.n; }).join(" · "));
     if (r.a_attempts) s.push("Every answer: " + qhPct(r.a_correct, r.a_attempts) + " of " + fmtNum(r.a_attempts));
     if (r.nrm) s.push("Right after a miss: " + r.crm + " of " + r.nrm);
     else if (r.a_nrm) s.push("Right after a miss (all ever): " + r.a_crm + " of " + r.a_nrm);
@@ -2491,7 +2511,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     return '<article class="qh-item" data-qh-qid="' + esc(r.qid) + '">' +
       '<div class="qh-top"><code class="qh-id">' + esc(r.qid) + '</code>' + (lec ? '<span class="muted qh-lec">' + lec + '</span>' : '') + pills + '</div>' +
       (q ? '<div class="qh-stem">' + esc(q.text) + '</div>' + qhChoices(r, q) : '<div class="qh-stem muted">This id isn’t in the hub’s current bank.</div>') +
-      (flags ? '<ul class="qh-flags">' + flags + '</ul>' : '') + qhStats(r) +
+      qhVersions(r) + (flags ? '<ul class="qh-flags">' + flags + '</ul>' : '') + qhStats(r) +
       (reps ? '<details class="qh-reps"><summary>' + (r.reports || []).length + ' report' + ((r.reports || []).length === 1 ? '' : 's') + ' from students</summary>' + reps + '</details>' : '') +
       rev +
       '<div class="qh-act"><input type="text" class="input qh-note" maxlength="1000" aria-label="Note on ' + esc(r.qid) + '" placeholder="Note: what you checked, what to change (optional)" value="' + esc(r.review_note || "") + '">' +
