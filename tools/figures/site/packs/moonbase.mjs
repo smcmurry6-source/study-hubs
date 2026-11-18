@@ -62,7 +62,7 @@ export function pack(T){
     var outer = D(ring(q.c, q.e1, q.e2, r + .1, 0, 360, 20)), glass = D(ring(q.c, q.e1, q.e2, r, 0, 360, 20)), c = P(q.c[0], q.c[1], q.c[2]);
     var s = FO(outer, rim || "#E8BE45", 1.3) + FO(glass, night ? K.lit : "#2E3A5C", 1.1);
     if (!night) s += L("M" + f(c[0] - r * 4) + " " + f(c[1] - r * 1.4) + " l" + f(r * 3) + " " + f(-r * 3), 1.3, "#BFE7FA");
-    return { s: s, lights: night ? T.glowAt(c[0], c[1], 8 + r * 6) + FO(glass, K.lit, 1.1) : "" };
+    return { s: s, at: c, lights: night ? T.glowAt(c[0], c[1], 6 + r * 6) + FO(glass, K.lit, 1.1) : "" };
   }
   /* a flat quad in 3D: center, half-sizes along u and v */
   function quad(c, u, v, a, b){ return [[c[0] - u[0] * a - v[0] * b, c[1] - u[1] * a - v[1] * b, c[2] - u[2] * a - v[2] * b], [c[0] + u[0] * a - v[0] * b, c[1] + u[1] * a - v[1] * b, c[2] + u[2] * a - v[2] * b],
@@ -202,7 +202,7 @@ export function pack(T){
         var s = T.bands(o.night ? ["#05060F", "#080A18", "#0C0F21", "#11152B"] : ["#07080F", "#0B0D17", "#10121F", "#161928"], 0, 300);
         if (o.night) s += F("M-10 150 Q80 96 170 70 Q260 44 410 -10 L410 26 Q260 74 180 98 Q90 126 -10 176 Z", "#BFC9F5", .06);
         s += T.starField(73, o.night ? 46 : 22, 150);
-        if (!o.night) s += circ(72, 42, 32, "#FFF6D6", 0).replace("/>", ' opacity=".06"/>') + circ(72, 42, 24, "#FFF6D6", 0).replace("/>", ' opacity=".1"/>') + T.sun(72, 42);
+        if (!o.night) s += T.sun(72, 42);
         return s + earth(316, 50, 19, o.night);
       },
       far: function(o){
@@ -328,32 +328,32 @@ export function pack(T){
   };
   /* the dish: a bowl on a tripod, turned up and a little toward the light, a feed on three struts over it */
   function dishGeo(){
-    var c = [1.8, 1.85, 2.05], n = norm([-.32, .42, .85]), a = norm(cross(n, [0, 0, 1])), b = cross(n, a), R = 1.3;
+    var c = [1.75, 1.8, 2.45], n = norm([-.34, .44, .83]), a = norm(cross(n, [0, 0, 1])), b = cross(n, a), R = 1.32;
     var fz = [c[0] + n[0] * .95, c[1] + n[1] * .95, c[2] + n[2] * .95], fq = P(fz[0], fz[1], fz[2]), c2 = P(c[0], c[1], c[2]), up = [fq[0] - c2[0], fq[1] - c2[1]];
     return { c: c, n: n, a: a, b: b, R: R, fz: fz, fq: fq, up: up };
   }
   function dish(o){
-    var g = dishGeo(), s = ell.apply(null, P(1.85, 1.9, 0).concat([24, 8, "#141824", 0, .16])), hub = [1.8, 1.85, 1.35];
-    /* the tripod and the mount */
-    [[90, 1], [210, 0], [330, 0]].forEach(function(l){ var ft = [1.8 + Math.cos(l[0] * DEG) * 1.15, 1.85 + Math.sin(l[0] * DEG) * 1.15, 0]; if (!l[1]){ s += L(D([ft, hub], true), 3.6) + L(D([ft, hub], true), 1.8, METAL[1]); } });
-    /* a little receiver box by its foot, its cable up the leg */
-    s += box(2.55, .45, 0, .6, .45, .42, { top: METAL[0], left: METAL[0], right: METAL[1] }, { sw: 1.3, si: .8 }) + L(D([[2.6, .9, .2], [2.0, 1.4, .9], hub], true), 1.1, "#2B2F3A");
-    var bq = P(2.85, .9, .25); s += circ(bq[0], bq[1], 1.1, o.night ? "#7FF0D2" : "#3ECF9E", .7);
-    s += cyl(1.8, 1.85, 1.15, .22, 1.55, .22, METAL[1], METAL[2], METAL[0], { sw: 1.4, si: .9 });
-    s += L(D([hub, [g.c[0], g.c[1], g.c[2] - .15]], true), 4.4) + L(D([hub, [g.c[0], g.c[1], g.c[2] - .15]], true), 2.4, METAL[0]);
-    /* the bowl: its back shell, then the dish face, with the shade the rim throws in it */
-    var rim = ring(g.c, g.a, g.b, g.R, 0, 360, 32), back = [g.c[0] - g.n[0] * .5, g.c[1] - g.n[1] * .5, g.c[2] - g.n[2] * .5];
+    var g = dishGeo(), s = ell.apply(null, P(1.85, 1.9, 0).concat([26, 9, "#141824", 0, .16])), hub = [1.8, 1.85, .85], leg = function(an){ var ft = [1.8 + Math.cos(an * DEG) * 1.2, 1.85 + Math.sin(an * DEG) * 1.2, 0]; return L(D([ft, hub], true), 4) + L(D([ft, hub], true), 2, METAL[1]) + ell.apply(null, P(ft[0], ft[1], 0).concat([3, 1.4, METAL[2], 1])); };
+    /* the tripod's back legs, a little receiver box by them with its cable, the front leg, the pedestal */
+    s += leg(210) + leg(330);
+    s += box(2.6, .3, 0, .62, .46, .44, { top: METAL[0], left: METAL[0], right: METAL[1] }, { sw: 1.3, si: .8 }) + L(D([[2.65, .76, .22], [2.2, 1.3, .3], [1.85, 1.75, .7]], true), 1.2, "#2B2F3A");
+    var bq = P(2.95, .76, .26); s += circ(bq[0], bq[1], 1.1, o.night ? "#7FF0D2" : "#3ECF9E", .7);
+    s += leg(90);
+    s += cyl(1.8, 1.85, .7, .24, 1.75, .2, METAL[0], METAL[1], METAL[0], { sw: 1.5, si: .9 });
+    s += box(1.6, 1.65, 1.72, .4, .4, .3, { top: METAL[0], left: METAL[1], right: METAL[2] }, { sw: 1.3, si: .8 });
+    s += L(D([[1.8, 1.85, 1.95], [g.c[0], g.c[1], g.c[2] - .1]], true), 4.4) + L(D([[1.8, 1.85, 1.95], [g.c[0], g.c[1], g.c[2] - .1]], true), 2.4, METAL[0]);
+    /* the bowl: its back shell, then the dish face, with the shade its rim throws inside */
+    var rim = ring(g.c, g.a, g.b, g.R, 0, 360, 32), back = [g.c[0] - g.n[0] * .55, g.c[1] - g.n[1] * .55, g.c[2] - g.n[2] * .55];
     var shell = hull(rim.map(function(q){ return P(q[0], q[1], q[2]); }).concat([P(back[0], back[1], back[2])]));
     s += FO(D2(shell), METAL[1], 1.8) + FO(D(rim), "#F1F3F7", 1.6);
-    var inner = ring([g.c[0] - g.n[0] * .12, g.c[1] - g.n[1] * .12, g.c[2] - g.n[2] * .12], g.a, g.b, g.R * .86, 0, 360, 28);
-    s += F(D(inner), "#E2E6ED") + F(D(ring(g.c, g.a, g.b, g.R * .9, 120, 300, 14).concat(ring([g.c[0] - g.n[0] * .2, g.c[1] - g.n[1] * .2, g.c[2] - g.n[2] * .2], g.a, g.b, g.R * .55, 300, 120, 14))), "#C4CBD6", .9);
-    [.5, .78].forEach(function(k){ s += L(D(ring([g.c[0] - g.n[0] * .2 * (1 - k), g.c[1] - g.n[1] * .2 * (1 - k), g.c[2] - g.n[2] * .2 * (1 - k)], g.a, g.b, g.R * k, 0, 360, 24)), .8, INK, .3); });
-    if (o.snow) s += F(D(ring([g.c[0] - g.n[0] * .2, g.c[1] - g.n[1] * .2, g.c[2] - g.n[2] * .2], g.a, g.b, g.R * .5, 0, 360, 18)), "#FFFFFF");
+    var dip = function(k){ return [g.c[0] - g.n[0] * .2 * (1 - k * k), g.c[1] - g.n[1] * .2 * (1 - k * k), g.c[2] - g.n[2] * .2 * (1 - k * k)]; };
+    s += F(D(ring(g.c, g.a, g.b, g.R * .92, 110, 290, 14).concat(ring(dip(.5), g.a, g.b, g.R * .5, 290, 110, 14))), "#CDD3DD", .95);
+    [.45, .75].forEach(function(k){ s += L(D(ring(dip(k), g.a, g.b, g.R * k, 0, 360, 24)), .8, INK, .3); });
+    if (o.snow) s += F(D(ring(dip(.4), g.a, g.b, g.R * .45, 0, 360, 18)), "#FFFFFF");
+    s += L(D(rim), 2.2, "#FFFFFF", .5).replace(/ opacity="[^"]*"/, ' opacity=".5"') + O(D(rim), 1.6);
     /* the feed on its three struts, a light on its tip */
-    [0, 120, 240].forEach(function(t){ var q = [g.c[0] + (Math.cos(t * DEG) * g.a[0] + Math.sin(t * DEG) * g.b[0]) * g.R * .92, g.c[1] + (Math.cos(t * DEG) * g.a[1] + Math.sin(t * DEG) * g.b[1]) * g.R * .92, g.c[2] + (Math.cos(t * DEG) * g.a[2] + Math.sin(t * DEG) * g.b[2]) * g.R * .92]; s += L(D([q, g.fz], true), 2.2) + L(D([q, g.fz], true), .9, METAL[0]); });
-    s += circ(g.fq[0], g.fq[1] + 1, 2.6, METAL[1], 1.2) + beacon(g.fq[0], g.fq[1] - 2.2, 1.9);
-    /* the front leg, in front of the bowl's mount */
-    var ft = [1.8, 1.85 + 1.15, 0]; s += L(D([ft, hub], true), 3.6) + L(D([ft, hub], true), 1.8, METAL[0]);
+    [30, 150, 270].forEach(function(t){ var ca = Math.cos(t * DEG) * g.R * .9, sa = Math.sin(t * DEG) * g.R * .9, q = [g.c[0] + ca * g.a[0] + sa * g.b[0], g.c[1] + ca * g.a[1] + sa * g.b[1], g.c[2] + ca * g.a[2] + sa * g.b[2]]; s += L(D([q, g.fz], true), 2.4) + L(D([q, g.fz], true), 1, METAL[0]); });
+    s += circ(g.fq[0], g.fq[1] + 1, 2.8, METAL[1], 1.2) + beacon(g.fq[0], g.fq[1] - 2.4, 2);
     return s;
   }
   /* the rocket on its pad, and the gantry beside it */
@@ -363,8 +363,9 @@ export function pack(T){
     /* its four legs (the far one hidden), braces on the two faces we see */
     var legs = [[x0, y0 + w], [x0 + w, y0 + w], [x0 + w, y0]];
     legs.forEach(function(q){ s += L(D([[q[0], q[1], 0], [q[0], q[1], h]], true), 3.4) + L(D([[q[0], q[1], 0], [q[0], q[1], h]], true), 1.6, red); });
-    for (z = 0; z < h - .1; z += .8){
-      s += L(D([[x0, y0 + w, z], [x0 + w, y0 + w, z + .8]], true) + D([[x0 + w, y0 + w, z], [x0, y0 + w, z + .8]], true) + D([[x0 + w, y0 + w, z], [x0 + w, y0, z + .8]], true) + D([[x0 + w, y0, z], [x0 + w, y0 + w, z + .8]], true), 1, red, .9);
+    for (var k = 0, dz = h / 6; k < 6; k++){
+      z = k * dz;
+      s += L(D([[x0, y0 + w, z], [x0 + w, y0 + w, z + dz]], true) + D([[x0 + w, y0 + w, z], [x0, y0 + w, z + dz]], true) + D([[x0 + w, y0 + w, z], [x0 + w, y0, z + dz]], true) + D([[x0 + w, y0, z], [x0 + w, y0 + w, z + dz]], true), 1, red, .9);
       s += L(D([[x0, y0 + w, z], [x0 + w, y0 + w, z], [x0 + w, y0, z]], true), 1.2, INK, .8);
     }
     s += FO(D([[x0 - .08, y0 - .08, h], [x0 + w + .08, y0 - .08, h], [x0 + w + .08, y0 + w + .08, h], [x0 - .08, y0 + w + .08, h]]), "#B8323A", 1.4);
