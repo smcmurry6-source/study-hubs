@@ -122,9 +122,11 @@ tags: [map]
   from 10 pm and still reaches first visits up to 60 days after (`debriefDays`). The hub's page itself stays up until
   someone removes it, so the retrospective and cleanup are still manual; its narration and Timmy Time come off the site then
   ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)); moving the entry into `archived` in `hubs.js` then is optional. Read the check-ins as late as you can.
-- `migration_v*.sql` — Supabase schema history (project `thytmzsgymydbzcqdnix`). **Fetch `main` before you number one, and again
-  before you apply it**: two sessions both wrote a v64 on 2026-11-17, and the second, applied later, undid part of the first
-  (`migration_v66.sql`, `migration_v67.sql`). A function a migration replaces is copied from `main`'s newest copy of it.
+- `migration_v*.sql` — Supabase schema history (project `thytmzsgymydbzcqdnix`). **Fetch `main` before you number one, before you
+  apply it and before you merge**, and take the next free number if it was used meanwhile: two sessions both wrote a v64 on
+  2026-11-17, and the second, applied later, undid part of the first; the next day the same PR's v66 and v67 were taken
+  while it waited to merge (they became `migration_v68.sql`, `migration_v69.sql`). A function a migration replaces is copied
+  from `main`'s newest copy of it.
   New migrations are run once, by hand, in the Supabase SQL editor, or by a Claude Code session through the
   Supabase connector (every Supabase tool is pre-approved in `.claude/settings.json`). Commit the `.sql` file and
   refresh `supabase/schema.sql` either way. A migration written ahead of its release is listed in

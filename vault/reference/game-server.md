@@ -43,7 +43,7 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   server grades the answer from the key and records all of it, then pays. Unknown and retired ids are recorded with the
   page's own verdict (`claim`) and earn nothing.
 - **What pays** (no daily cap): 10 for a question's first right answer ever, 2 for a later right one, 1 for a wrong one,
-  self-graded cards a flat 2; **every right answer pays** (migration_v66, Sam 2026-11-17: "Every right answer should give
+  self-graded cards a flat 2; **every right answer pays** (migration_v68, Sam 2026-11-17: "Every right answer should give
   xp"; graded from its key, a retired question's too, never past the guardrails below), and a question pays its first three
   wrong answers each Central day (a self-graded miss: its first three answers); +20
   for a day studied (as today); +30 at the day's 20th answer; +5 for a question missed the last time before today and right
@@ -54,13 +54,13 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   (migration_v60, Sam 2026-11-17: `survey:<id>` and `checkin:<hub>:<exam>`, paid to the linked id, never for a check-in sent
   before by any of the person's linked ids; back pay only for survey 4 and Occlusion's final check-ins, by `tools/data-fixes/2026-11-17-reward-backpay.sql`; `submit_survey_v2` and `submit_exam_debrief_v2` say what was paid, which the dashboard's window advertises before and celebrates after: `celebrate` in `widget/dash.js`); +100 / 200 / 300 / 500 for a hub's Bronze, Silver, Gold and Crown, which also start **24 hours of
   double XP**.
-- **The guardrails** (since migration_v66, for misses only; a right answer always pays): a miss under 2 seconds after the
+- **The guardrails** (since migration_v68, for misses only; a right answer always pays): a miss under 2 seconds after the
   last, or the 31st in a minute, still counts in your answers and the class stats but earns nothing. A mock's answers arrive
   together at the end, so its misses need 2 seconds of mock time each instead (the session from `xp_session_start`). Two
   things are one answer, not two, and pay once: a double tap (the same question again within 2 seconds) and the same
   question twice in one mock. The run of right answers in a row (`xp_runs`: its prizes, the nuke and the class record) still
   counts only right answers at the speed limit and a question's first three right of the day. `sh_xp_replay` pays the same,
-  and migration_v66 rebuilt every visitor from it, which paid the right answers given since the release that had paid
+  and migration_v68 rebuilt every visitor from it, which paid the right answers given since the release that had paid
   nothing (about 80, mostly under 2 seconds after the one before). A podcast minute needs 25 seconds since the last
   paid one.
 - **Boosts** (`xp_boosts`): never more than 2x at once, whatever is running; a new medal restarts its 24 hours; a shop boost's
@@ -88,9 +88,9 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
 
 ## Shiny Gold Crowns and the shop
 
-- **The balance** (`sh_wallet`, never stored): 5 per 10 XP of base XP (1 until migration_v66; Sam, 2026-11-17: "lets increase it to 5 crowns per 10xp") (a boost's extra earns none; nor does a survey's or
+- **The balance** (`sh_wallet`, never stored): 5 per 10 XP of base XP (1 until migration_v68; Sam, 2026-11-17: "lets increase it to 5 crowns per 10xp") (a boost's extra earns none; nor does a survey's or
   check-in's 1,000 XP), +1,000 a survey or check-in reward (migration_v60: counted from its award row's `src`), +25 a trophy, +50 a medal,
-  +20 a rank-up (a tier) since the switch, **+ every prize's XP again as crowns** (migration_v66, next to last section), minus what was spent. Spending never lowers XP or rank. The XP from before the
+  +20 a rank-up (a tier) since the switch, **+ every prize's XP again as crowns** (migration_v68, next to last section), minus what was spent. Spending never lowers XP or rank. The XP from before the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
 - **The catalog** (`shop_items`): each item's kind, rarity, price (checked against its rarity's band), season, slot, HP or
   boost, `wide` for a yard item that takes two spots (the bowling lane), `gift` (everyone owns it) and `rank_tier` (owned
@@ -284,7 +284,7 @@ Each is one line in `migration_v54.sql` to change.
 - A rank-up, for the +20 gold crowns, is a new tier (seven a journey), not a level.
 - Matching items are graded as an order since migration_v64 (2026-11-17): each row's first pick, row k's own being k, so
   10 XP the first time. A page cached before it sends no order and is taken at its word as a self-graded answer (a flat 2);
-  migration_v66 had dropped that branch and migration_v67 put it back.
+  migration_v68 had dropped that branch and migration_v69 put it back.
 - A mock pays its +50 only with 10 or more answers; an arcade game only when finished 20 seconds or more after it started,
   and a very fast game's answers can fall under the speed limit.
 - Timmy Time: a minute pays when 25 seconds have passed since the last paid one (so 2x speed still pays); "finished" is 90%
@@ -377,7 +377,7 @@ Good or Easy, on a schedule like Anki's that ends on exam eve. `migration_v56.sq
   device, the ratings wait in `STATE.cardq` (up to 3,000), and the first call that finds the functions missing stops
   trying until the next page load. Test browsers (`navigator.webdriver`) send nothing.
 
-## Prizes (migration_v66)
+## Prizes (migration_v68)
 
 Sam, 2026-11-17: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp
 earn rates", then a list of prizes. **There is no daily cap** on XP or crowns (the 600-a-day cap is the old pages' only;
@@ -415,7 +415,7 @@ it as `sh:crowns` (the hub's meters and a gold "+n crowns" pop, the dashboard's 
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (529 checks, the prizes of migration_v66 in section 14c, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (529 checks, the prizes of migration_v68 in section 14c, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, a place opened from a board row, and a random visit going through the whole class, in 14a). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;

@@ -1,6 +1,8 @@
--- migration_v66, written and applied as "v64" (its comments below still say v64): another session's migration_v64 (matching
--- items graded as an order; Perio's Stage & Grade) reached main first, and v65 (more cosmetics) was next, so this one is v66.
--- It was applied after that v64 and replaced its sh_answer without its one change; migration_v67 puts that change back.
+-- migration_v68, written and applied as "v64" (its comments below still say v64), then numbered v66 for a few hours: other
+-- sessions' migrations took v64 (matching items graded as an order; Perio's Stage & Grade), v65 (more cosmetics), v66 (the
+-- class's picks follow a question's choices) and v67 (question health's A/B versions) on main first, so this one is v68. None
+-- of theirs replaces a function this one does, except that v64's sh_answer was replaced here without its one change;
+-- migration_v69 puts that change back.
 -- v64 (2026-11-17): crowns that show as they're earned, every prize paying as many crowns as XP, and new prizes.
 -- Sam, 2026-11-17: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp
 -- earn rates", then "crowns and xp for selecting a custom name, add crowns for having a report fixed along with the xp you

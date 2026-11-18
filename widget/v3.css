@@ -201,7 +201,7 @@
 }
 #sh-nuke-badge.is-shown{transform:translateY(-50%) translateX(0);}
 #sh-nuke-badge.is-armed{background:linear-gradient(135deg, rgba(90,20,8,.97), rgba(50,8,4,.97)); border-color:#f0806b; color:#ffd8cc;}
-/* what launching pays (migration_v66): a gold pill after the label; on a phone just the number */
+/* what launching pays (migration_v68): a gold pill after the label; on a phone just the number */
 #sh-nuke-badge .sh-nuke-badge-prize{font-size:11px; font-weight:800; color:#2a1c02; background:#F2C94C; border-radius:999px; padding:2px 8px; white-space:nowrap; font-variant-numeric:tabular-nums;}
 @media (prefers-reduced-motion: no-preference){
   #sh-nuke-badge{animation:sh-nuke-badge-pulse 2.4s ease-in-out infinite;}

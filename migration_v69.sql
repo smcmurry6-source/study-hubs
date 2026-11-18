@@ -1,9 +1,11 @@
--- v67 (2026-11-18): sh_answer with both of yesterday's changes to it.
+-- v69 (2026-11-18): sh_answer with both of yesterday's changes to it. Written and applied as "v67", when the crowns migration
+-- was "v66"; both were renumbered when other sessions' v66 and v67 reached main first. Inside the function (kept exactly as
+-- applied), "v66" means migration_v68 and "v67" this one.
 -- Two sessions changed sh_answer on 2026-11-17 and both called their migration v64. The first (migration_v64, matching items
 -- graded as an order) added one branch: an 'order' answer that comes with no order, from a page cached before matching
 -- items were graded that way, is graded by the student's word and paid as a self-graded answer (a flat 2), not recorded as
--- wrong. The second (migration_v66, crowns and prizes; "Every right answer should give xp") was applied after it, on
--- 2026-11-18, and replaced the function from an older copy without that branch. This puts the branch back into v66's
+-- wrong. The second (migration_v68, crowns and prizes; "Every right answer should give xp") was applied after it, on
+-- 2026-11-18, and replaced the function from an older copy without that branch. This puts the branch back into v68's
 -- sh_answer; nothing else changes. Answers recorded in between: a cached page's matching answer was recorded as wrong and
 -- paid nothing (none expected: those pages refresh themselves).
 -- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js). Applied to the live project on

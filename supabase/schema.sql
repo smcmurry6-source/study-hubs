@@ -8208,10 +8208,12 @@ insert into public.shop_items (id, name, kind, rarity, price, season, slot, hp, 
   ('paint-teal', 'Teal paint', 'upgrade', 'common', 150, null, 'paint', null, null, null, false, true, 515)
 on conflict (id) do nothing;
 
--- ====================================================================== migration_v66.sql
--- migration_v66, written and applied as "v64" (its comments below still say v64): another session's migration_v64 (matching
--- items graded as an order; Perio's Stage & Grade) reached main first, and v65 (more cosmetics) was next, so this one is v66.
--- It was applied after that v64 and replaced its sh_answer without its one change; migration_v67 puts that change back.
+-- ====================================================================== migration_v68.sql
+-- migration_v68, written and applied as "v64" (its comments below still say v64), then numbered v66 for a few hours: other
+-- sessions' migrations took v64 (matching items graded as an order; Perio's Stage & Grade), v65 (more cosmetics), v66 (the
+-- class's picks follow a question's choices) and v67 (question health's A/B versions) on main first, so this one is v68. None
+-- of theirs replaces a function this one does, except that v64's sh_answer was replaced here without its one change;
+-- migration_v69 puts that change back.
 -- v64 (2026-11-17): crowns that show as they're earned, every prize paying as many crowns as XP, and new prizes.
 -- Sam, 2026-11-17: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp
 -- earn rates", then "crowns and xp for selecting a custom name, add crowns for having a report fixed along with the xp you
@@ -9057,13 +9059,15 @@ grant execute on function public.claim_visit_v2(text, text) to anon, authenticat
 grant execute on function public.claim_trophies_v2(text) to anon, authenticated;
 grant execute on function public.set_display_name(text, text) to anon, authenticated;
 
--- ====================================================================== migration_v67.sql
--- v67 (2026-11-18): sh_answer with both of yesterday's changes to it.
+-- ====================================================================== migration_v69.sql
+-- v69 (2026-11-18): sh_answer with both of yesterday's changes to it. Written and applied as "v67", when the crowns migration
+-- was "v66"; both were renumbered when other sessions' v66 and v67 reached main first. Inside the function (kept exactly as
+-- applied), "v66" means migration_v68 and "v67" this one.
 -- Two sessions changed sh_answer on 2026-11-17 and both called their migration v64. The first (migration_v64, matching items
 -- graded as an order) added one branch: an 'order' answer that comes with no order, from a page cached before matching
 -- items were graded that way, is graded by the student's word and paid as a self-graded answer (a flat 2), not recorded as
--- wrong. The second (migration_v66, crowns and prizes; "Every right answer should give xp") was applied after it, on
--- 2026-11-18, and replaced the function from an older copy without that branch. This puts the branch back into v66's
+-- wrong. The second (migration_v68, crowns and prizes; "Every right answer should give xp") was applied after it, on
+-- 2026-11-18, and replaced the function from an older copy without that branch. This puts the branch back into v68's
 -- sh_answer; nothing else changes. Answers recorded in between: a cached page's matching answer was recorded as wrong and
 -- paid nothing (none expected: those pages refresh themselves).
 -- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js). Applied to the live project on

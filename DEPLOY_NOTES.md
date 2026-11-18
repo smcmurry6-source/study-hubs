@@ -45,7 +45,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   [verify-before-pushing](vault/how-to/verify-before-pushing.md).
 - **2026-11-17 (Crowns go up as you earn them, and prizes that pay XP and crowns, Claude Code, #403)** —
   Sam: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp earn rates",
-  then a list of prizes. The crowns were paid but never redrawn (BUG-175): `migration_v66.sql` puts `crowns` (the balance
+  then a list of prizes. The crowns were paid but never redrawn (BUG-175): `migration_v68.sql` puts `crowns` (the balance
   after it) in every paying reply and `widget/v3.js` sends it as `sh:crowns` (the hub's meters, its shop, the dashboard's
   wallet; a gold "+n crowns" under the rank). No daily cap on either (the 600 cap is the old pages' only). Prizes, one
   `xp_awards` row each, paying as many crowns as XP (`sh_prizes()`, copied as `PRIZES` in `v3.js`): the name 500, the daily
@@ -70,11 +70,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `.claude/hooks/supabase-confirm.js`), appended to `supabase/schema.sql`; every function's body matched the tested copy, and
   the rebuild agreed with live XP for all 77 people with an answer since the release. Class-wide after it: 168 wallets, none
   below zero, median about 1,200 crowns, about 300,000 of the 740,000 from hub time.
-  It was written and applied as "v64", but another session's `migration_v64.sql` (matching items graded as an order) reached
-  `main` first and v65 was taken, so it is `migration_v66.sql`; applied after that v64, it had replaced `sh_answer` without
-  that v64's one branch (a cached page's matching answer, taken at its word), so `migration_v67.sql` puts it back (applied the
+  It was written and applied as "v64", but other sessions' v64 (matching items graded as an order), v65, v66 and v67 reached
+  `main` first (v66 and v67 while this PR waited to merge), so it is `migration_v68.sql`; applied after that v64, it had replaced `sh_answer` without
+  that v64's one branch (a cached page's matching answer, taken at its word), so `migration_v69.sql` puts it back (applied the
   same day; no answer in between needed it). Bug BUG-175 (main had used 164-174). Before applying a migration, fetch `main` and
-  take the next free number ([repo map](vault/reference/repo-map.md)).
+  take the next free number, and fetch it again before merging ([repo map](vault/reference/repo-map.md)).
 - **2026-11-18 (more cosmetics: six year-round collections, five rare costumes, six paints, Claude Code)** — Sam: "Lets work on
   timmy outfits and place cosmetics. Go crazy" ([the task](vault/tasks/done/2026-11-18-more-cosmetics.md)). **Six collections**
   (`COLLECTIONS` in `tools/figures/site/sets.mjs`, one pack each in `tools/figures/site/packs/`: `dino`, `moonbase`, `reef`,
