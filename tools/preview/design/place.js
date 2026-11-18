@@ -2645,17 +2645,25 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     return HEALTH[HEALTH.length - 1];
   }
 
+  /* what the page reads of each piece, in one place: the lists are made again after each addPack (lists()), and a field
+     missing there drops from every piece once a set's file arrives (coll did, 2026-11-18) */
+  var FIELDS = {
+    homes: ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set", "coll"],
+    scenes: ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set", "coll"],
+    yard: ["n", "note", "rarity", "theme", "price", "id", "wide", "set", "rank", "rankName", "coll"],
+    outfits: ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName", "costume", "coll"]
+  };
   var API = {
     HEALTH: HEALTH, healthFor: healthFor,
     VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout,
     onLand: function(scene, x, y){ var q = P(x, y, 0); return sceneOn(SCENES[scene] || SCENES.hill, q[0], q[1]); }, unproject: unP, N: N, S: S, FIX: FIX, SLOT_AT: SLOTS,
-    HOMES: meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set", "coll"]),
-    SCENES: meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set", "coll"]),
-    YARD: meta(YARD, ["n", "note", "rarity", "theme", "price", "id", "wide", "set", "rank", "rankName", "coll"]),
+    HOMES: meta(HOMES, FIELDS.homes),
+    SCENES: meta(SCENES, FIELDS.scenes),
+    YARD: meta(YARD, FIELDS.yard),
     SLOTS: SLOT_ORDER.map(function(k){ return { k: k, n: SLOTS[k].n }; }),
     PAINTS: Object.keys(PAINTS).map(function(k){ return { k: k, n: PAINTS[k].n, c: PAINTS[k].c, bold: BOLD[k].c, boldName: BOLD[k].n, rarity: k === "cream" ? "" : "Common", price: k === "cream" ? 0 : 150, id: k === "cream" ? "" : "paint-" + k }; }),
     UPGRADES: UPGRADES, MATS: MATS.map(function(m){ return { k: m.k, n: m.n, c: m.c }; }),
-    OUTFITS: meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName", "costume", "coll"]), dress: dress, loupes: loupes, NO_LOUPES: NO_LOUPES, SETS: SETS || null,
+    OUTFITS: meta(OUTFITS, FIELDS.outfits), dress: dress, loupes: loupes, NO_LOUPES: NO_LOUPES, SETS: SETS || null,
     THEMES: THEMES, EGGS: EGGS, burst: burst, thumb: thumb,
     outfitParts: function(k){ var o = OUTFITS[k]; return o ? { back: o.back || "", face: o.face || "", top: o.top || "" } : null; },
     /* a set piece's set ("halloween", "rank"...) and kind, known from the list before its pack is loaded; whether a
@@ -2671,10 +2679,8 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     }
   };
   function lists(){
-    API.HOMES = meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set"]);
-    API.SCENES = meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set"]);
-    API.YARD = meta(YARD, ["n", "note", "rarity", "theme", "price", "id", "wide", "set", "rank", "rankName"]);
-    API.OUTFITS = meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName", "costume"]);
+    API.HOMES = meta(HOMES, FIELDS.homes); API.SCENES = meta(SCENES, FIELDS.scenes);
+    API.YARD = meta(YARD, FIELDS.yard); API.OUTFITS = meta(OUTFITS, FIELDS.outfits);
   }
   return API;
 })("#3B2E3A", {"enamel":"#FFFDF6","enamelShade":"#E9DFCC","gum":"#F78FA8","gumShade":"#E07090","gumLight":"#FFC0CD","pink":"#F7A3BA","metal":"#D5DBE1","metalShade":"#8E98A3","metalLight":"#EEF2F5","gold":"#F2C94C","goldShade":"#C9971C","goldLight":"#FFF0B3","bronze":"#D08A52","bronzeShade":"#9A5A2A","bronzeLight":"#F2C49A","silver":"#D9DFE5","silverShade":"#8E98A3","silverLight":"#F6F8FA","paper":"#FFFFFF","paperShade":"#ECE6EA","wood":"#C4915F","woodShade":"#8A5A3A","sky":"#CFEAF8","grass":"#A7DE93","grassShade":"#6CBB68","red":"#E5484D","blue":"#3FA7E0","yellow":"#FFE27A","green":"#3ECF7E","orange":"#F59A1E","plum":"#6B5A68","plumLight":"#ECE6EA"}, [

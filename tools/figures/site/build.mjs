@@ -403,7 +403,11 @@ if (placeKit) {
     /* a set fetched late brings its eggs' rules with it (they were missing before 2026-11-18, so a set's eggs never showed) */
     const rules = (css) => new Set(css.match(/\[data-egg='[^']+'\]\.tp-on \.tp-eb\{[^}]*\}/g) || []), lateRules = rules(late.CSS);
     const lost = [...rules(whole.CSS)].filter((r) => !lateRules.has(r));
-    if (lost.length) { console.error("place.mjs: a kit that gets its packs late has no rule for " + lost.length + " eggs, e.g. " + lost[0]); process.exit(1); } }
+    if (lost.length) { console.error("place.mjs: a kit that gets its packs late has no rule for " + lost.length + " eggs, e.g. " + lost[0]); process.exit(1); }
+    /* and lists its pieces the same, every field (a collection's coll was lost in addPack's lists() until 2026-11-18) */
+    for (const kind of ["HOMES", "SCENES", "YARD", "OUTFITS"]) if (JSON.stringify(late[kind]) !== JSON.stringify(whole[kind])) {
+      const a = whole[kind].find((x, i) => JSON.stringify(x) !== JSON.stringify(late[kind][i])) || {};
+      console.error("place.mjs: a kit that gets its packs late lists its " + kind.toLowerCase() + " differently, e.g. " + (a.k || "their count")); process.exit(1); } }
 }
 /* the bowling egg: the kit for the design page, and the same kit for widget/bowling.js, which fetches it the first time a
    clip plays (never with a page) */
