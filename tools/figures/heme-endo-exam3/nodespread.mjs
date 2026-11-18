@@ -1,4 +1,4 @@
-// Fig 25: Hodgkin versus non-Hodgkin, and staging (L20 Lymphomas and Leukemias, Dr. Borak, from the recorded lecture
+// Fig 24: Hodgkin versus non-Hodgkin, and staging (L20 Lymphomas and Leukemias, Dr. Borak, from the recorded lecture
 // and slides). A schematic body outline with its node groups (neck, above the collarbone, armpits, chest, abdomen,
 // pelvis, groin), the diaphragm, the liver, stomach and spleen, and the pelvic bones for the marrow. Pick Hodgkin to see
 // it start in the chest and climb node to node; pick non-Hodgkin to see nodes lit above and below the diaphragm with the
@@ -126,7 +126,7 @@ export default function nodespread() {
   const XY = {}; NODES.forEach((n) => { XY[n[0]] = [n[1], n[2]]; });
   const btn = (v, s) => `<button type="button" class="am-btn" data-amk="v" data-amv="${v}">${s}</button>`;
   return makeFig({
-    id: "nodespread", lec: "lymleuk", fig: "Fig 25", short: "How lymphoma spreads", hint: "pick · hover",
+    id: "nodespread", lec: "lymleuk", fig: "Fig 24", short: "How lymphoma spreads", hint: "pick · hover",
     title: "How lymphoma spreads",
     caption: "Hodgkin versus non-Hodgkin lymphoma on a body map, and the four stages. Pick Hodgkin or non-Hodgkin to see how each spreads, or step through the stages.",
     W, H,
