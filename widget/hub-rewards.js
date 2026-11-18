@@ -24,8 +24,9 @@
   function v2(){ var G = window.shGame; return !!(G && G.v2 && G.v2()); }
   function boost(){ var G = window.shGame; return v2() && G.boost ? G.boost() : null; }
   /* how the server grades each kind of question (tools/xp/keys.js): one choice and select-all from the picks, a
-     sequence from the order as placed, recall cards and matching by the student's own grade */
-  var KIND = { sequence: "order", recall: "self", match: "self" };
+     sequence from the order as placed, matching from each row's first pick (graded like an order since 2026-11-17),
+     recall cards by the student's own grade */
+  var KIND = { sequence: "order", match: "order", recall: "self" };
 
   /* ---------- the one answer path: the live hub's recordAnswer, plus the daily goal and the rewards ---------- */
   var SESSION = { n: 0, r: 0, xp: 0, miss: {}, since: 0, recapAt: 0, hp0: null, k: 0, again: 0, kSince: 0, againAt: 0 };

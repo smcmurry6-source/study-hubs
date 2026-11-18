@@ -250,6 +250,27 @@
       return QS;
     });
   }
+  /* a question's other wordings (content/variants.json, { id: { stem, choices, why[, ex] } or a list of them), fetched the
+     first time the bank, the mock, the drill or a bank game opens, never with Home or the notes (CORE.variants says the hub
+     has them). It never fails a view: without it every try shows the original. Choice k of a wording is choice k reworded,
+     so the key, the answer keys on the server, XP and the mock's scoring don't change (vault/tasks/2026-11-17-reworded-question-variants.md). */
+  var VARS = null;
+  function needVariants(){
+    if (!CORE || !CORE.variants) return Promise.resolve(null);
+    return VARS ? Promise.resolve(VARS) : getJSON("variants.json").then(function(v){ VARS = v || {}; return VARS; }, function(){ return null; });
+  }
+  /* the wording a question shows: the first try the original, each later try the next wording (n, the tries so far: the
+     answers by default, a flashcard's reviews in Flashcards). A worded copy keeps the original as _base and its number as
+     _w (1 = the first extra wording); search, Find this in the notes, question health and SH_EXPORT read the original. */
+  function worded(q, n){
+    var base = q && q._base || q; if (!base || !VARS) return base;
+    var vs = VARS[base.id]; if (!vs) return base; if (!Array.isArray(vs)) vs = [vs];
+    if (n == null) { var a = ansOf(base.id); n = a ? a.n || 0 : 0; }
+    var k = n % (vs.length + 1), v = vs[k - 1]; if (!k || !v || !v.stem) return base;
+    var o = {}; for (var key in base) o[key] = base[key];
+    o.stem = v.stem; if (v.choices) o.choices = v.choices; if (v.why) o.why = v.why; if (v.ex) o.ex = v.ex;
+    o._base = base; o._w = k; return o;
+  }
   function needNotes(){ return getJSON("notes.json").then(function(n){ NOTES = n; return n; }); }
   function needStudy(){ return getJSON("study.json").then(function(s){ STUDY = s; return s; }); }
   function needFigures(){
@@ -325,7 +346,7 @@
     var r = parse(), v = r[0], s = r[1];
     if (window.shTTS && view === "notes" && (v !== "notes" || s !== sub)) { try { window.shTTS.stop(); } catch (e) {} }
     if (view === "questions" && v !== "questions") leaving = HX.recapDue();
-    if (view === "more" && sub === "arcade" && ARC && (v !== "more" || s !== "arcade")) { try { ARC.arcade.stopAll(); } catch (e) {} }
+    if (view === "more" && /^arcade(\/|$)/.test(sub) && ARC && (v !== "more" || s !== sub)) { try { ARC.arcade.stopAll(); } catch (e) {} }
     var was = view, wasSub = sub;
     view = v; sub = s;
     var setOn = v === "more" && s === "settings", gear = $(".hx-set");
@@ -365,7 +386,7 @@
       return "compendium/" + (p === "mock" ? "mock" : p === "weak" ? "weak" : p === "drill" ? "drill" : p === "misses" ? "misses" : "bank");
     }
     if (view === "more") {
-      if (sub === "arcade") return "arcade/" + (ARC && ARC.arcade.current() || "lobby");
+      if (/^arcade(\/|$)/.test(sub)) return "arcade/" + (ARC && ARC.arcade.current() || "lobby");
       if (sub === "side") return "review/side";
       if (sub === "hints" || sub === "cram") return "compendium/" + sub;
       return "more/" + (sub || "menu");
@@ -431,6 +452,9 @@
           q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
           (pod ? podMiniHTML(pod) : "") +
         "</nav>" +
+        /* a hub's own links under the quick starts (SH_HUB.home.links: { href, icon, title, sub }), a row of their own so
+           the grid above keeps its shape; Perio's Stage & Grade game (2026-11-17) */
+        (X.links && X.links.length ? '<nav class="quick-more" aria-label="More to do">' + X.links.map(function(l){ return q(l.href, l.icon || "arcade", l.title, l.sub || "", "ql-wide"); }).join("") + "</nav>" : "") +
       "</div>" +
       (X.notice ? '<p class="notice">' + icon("notes", 20) + "<span><b>" + esc(X.notice[0]) + "</b> " + esc(X.notice[1]) + "</span></p>" : "") +
       '<div class="home-grid">' +
@@ -979,12 +1003,14 @@
   /* pages in More that aren't tiles: the idea board is a row under "Talk to us" */
   var MORE_ROWS = [["ideas", "thumbup", "Idea board", "Ideas for the hubs from the class: vote on them, or post your own"]];
   function renderMore(el, s){
+    /* #more/<page>/<what>: the arcade opens a game straight away (#more/arcade/stage: Perio's Home link) */
+    var bits = String(s || "").split("/"), what = bits.slice(1).join("/"); s = bits[0];
     var page = MORE.concat(MORE_ROWS).filter(function(m){ return m[0] === s; })[0];
     if (!page) { drawMoreMenu(el); return; }
     var back = '<a class="btn btn-text back" href="#more">' + icon("chevron", 18, "flip") + "More</a>";
     el.innerHTML = '<div class="hx-page more-page">' + back + "<h1>" + esc(page[2]) + '</h1><div class="more-body"><p class="note loading">Loading…</p></div></div>';
     var body = $(".more-body", el);
-    ({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, shop: HX.moreShop, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body);
+    ({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, shop: HX.moreShop, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body, what);
   }
   /* More (Sam, 2026-11-06: "can use a spice up"): one tile per part, each on its own field of color with its drawing and
      a line of what's in it; Timmy Time is the big one, its host in headphones. Talk to us stays a list. */
@@ -1137,9 +1163,9 @@
      their skin are the hub's own (arcade.js, from the live hub), so only the lobby is drawn here */
   function needArcade(){
     loadCss(WIDGET + "games.css"); loadCss(BASE + "arcade.css");
-    return Promise.all([needQuestions(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
+    return Promise.all([needQuestions(), needVariants(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
       if (!ARC && window.SH_ARCADE) ARC = window.SH_ARCADE({ esc: esc, state: STATE, save: saveState, toast: toast, questions: QS, lectures: LECS, lectureById: LBY, shuffled: shuffled,
-        record: HX.recordAnswer, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [] });
+        record: HX.recordAnswer, worded: worded, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [], figures: needFigures });
       /* Perio's arcade names them start / stop (Occlusion's and Heme & Endo's: startGame / stopAll) */
       var A0 = ARC && ARC.arcade;
       if (A0 && !A0.startGame && A0.start) ARC.arcade = { startGame: A0.start, stopAll: A0.stop, current: A0.current };
@@ -1153,7 +1179,7 @@
     var G = window.shGame, P = G && G.prizes; if (!P || !G.live || !G.live()) return "";
     return '<p class="earn ar-earn">' + (HX.shopCoin ? HX.shopCoin(16) : "") + "First game today: +" + P.game + " XP and crowns. Beat your best: +" + P.pb + ". Top score in this hub: +" + P.top + ".</p>";
   }
-  function moreArcade(body){
+  function moreArcade(body, open){
     body.innerHTML = '<p class="note loading">Loading the arcade…</p>';
     needArcade().then(function(){
       var X = C.arcade || {}, first = X.first || "sort", games = (X.games || []).slice();
@@ -1172,6 +1198,8 @@
       $$("[data-game]", body).forEach(function(b){ b.addEventListener("click", function(){ lobby.hidden = true; stage.hidden = false; track("arcade:open=" + b.getAttribute("data-game")); ARC.arcade.startGame(b.getAttribute("data-game")); stage.scrollIntoView({ block: "start" }); }); });
       /* the games' own Back buttons go to this lobby, not the live hub's */
       stage.addEventListener("click", function(e){ if (e.target.closest("[data-back]")) { e.stopPropagation(); e.preventDefault(); back(); } }, true);
+      /* #more/arcade/<game>: straight into it; its Back still goes to this lobby */
+      var deep = open && by[open] && $('[data-game="' + open + '"]', body); if (deep) deep.click();
     }).catch(function(e){ body.innerHTML = "<p>Couldn't load the arcade. Check your connection.</p>"; if (window.console) console.error(e); });
   }
   /* the rank comes from the server after the page is up, and again as you answer: Stats shows it as it changes */
@@ -1328,7 +1356,9 @@
         '<div class="set-row"><div><b>Text size</b><small>Makes everything bigger or smaller.</small></div>' + seg("size", SIZES, size) + "</div></section>" +
       '<section class="panel" aria-labelledby="sgH"><h2 id="sgH">Your daily goal</h2>' +
         '<div class="set-row"><div><b>Questions a day</b><small>The ring in the bar fills as you answer, right or wrong. Your streak counts any day you answer a question.</small></div>' + seg("goal", [["10", "10"], ["20", "20"], ["30", "30"], ["40", "40"], ["50", "50"]], String(HX.goal())) + "</div>" +
-        (window.shEditName ? '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + "." + nameEarn() + '</small></div><button class="btn" type="button" data-name>Change your name</button></div>' : "") + "</section>" +
+        /* drawn even before the shared widget is in (a page opened straight on Settings): a tap waits for it */
+        '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + "." + nameEarn() + '</small></div><button class="btn" type="button" data-name>Change your name</button></div>' +
+        '<div class="set-row"><div><b>Link my devices</b><small>One rank, streak, trophy case and question progress on your phone, tablet and laptop.</small></div><button class="btn" type="button" data-link>Link my devices</button></div></section>' +
       '<section class="panel" aria-labelledby="sxH"><h2 id="sxH">Timmy and the extras</h2><p class="note">The fun stuff that isn\'t studying. None of it shows during a mock exam.</p><div data-extras>' +
         extrasHTML() + "</div></section></div>";
     function paintFocus(){ var fp = $(".focus-panel", body); fp.classList.toggle("is-on", focusOn()); fp.innerHTML = focusRowHTML(); }
@@ -1352,7 +1382,10 @@
         track("settings:" + k + "=" + v);
         return;
       }
-      if (e.target.closest("[data-name]") && window.shEditName) window.shEditName();
+      if (e.target.closest("[data-name]")) whenWidget("shEditName", function(f){ if (f) f(); else toast("Couldn’t open your name. Are you online?"); });
+      /* Link my devices (widget/linkask.js, which widget/v3.js loads): beside the name, as everywhere a name is changed */
+      var lk = e.target.closest("[data-link]");
+      if (lk) whenWidget("shLinkAsk", function(L){ if (L && L.link) L.link({ back: lk, from: "settings" }); else toast("Couldn’t open Link my devices. Are you online?"); });
     });
   }
   function applyTheme(t){ if (t === "light" || t === "dark") docEl.setAttribute("data-theme", t); else docEl.removeAttribute("data-theme"); }
@@ -1548,7 +1581,7 @@
     QBY: QBY, QBL: QBL, LBY: LBY, EXAM_LECS: EXAM_LECS, REVIEW: REVIEW, loadScript: loadScript, loadCss: loadCss,
     lecLabel: lecLabel, shortTitle: shortTitle, lecName: lecName, LCOL: LCOL, lc: lc, lecDot: lecDot,
     lecChip: lecChip, lecHead: lecHead, isRead: isRead, isExamLec: isExamLec, isReview: isReview,
-    hasReview: hasReview, needQuestions: needQuestions, needNotes: needNotes, needStudy: needStudy,
+    hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, needNotes: needNotes, needStudy: needStudy,
     needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
     go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
     offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget
@@ -1564,6 +1597,6 @@
     if (!PARTS[k]) throw new Error("widget/hub-" + k + ".js is not loaded: the page loads it before widget/hub.js");
     PARTS[k](HX);
   });
-  window.shHub = { go: go, state: function(){ return STATE; }, card: function(id){ var q = QBY[id]; return q ? HX.card(q, {}) : null; } };
+  window.shHub = { go: go, state: function(){ return STATE; }, card: function(id){ var q = QBY[id]; return q ? HX.card(q, {}) : null; }, worded: worded };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();

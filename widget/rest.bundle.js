@@ -490,8 +490,9 @@ function visitor(){ return ls("sh_visitor_id") || ""; }
 function norm(n){ return String(n || "").trim().toLowerCase(); }
 function noList(){ try { return JSON.parse(ls(NO_KEY) || "[]") || []; } catch (e) { return []; } }
 function rpc(fn, args){
-if (!C.sb) return Promise.resolve(null);
-try { return C.sb.rpc(fn, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); }
+var sb = C.sb || window.shSupabase || null;
+if (!sb) return Promise.resolve(null);
+try { return sb.rpc(fn, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); }
 catch (e) { return Promise.resolve(null); }
 }
 function blocked(){
@@ -505,6 +506,7 @@ var CSS =
 "--la-bg2:var(--surface-2,rgba(127,127,127,.08));--la-accent:var(--accent,var(--focus,#2F6FD6));color:var(--la-ink);animation:shLaFade .2s ease-out;}" +
 "@keyframes shLaFade{from{opacity:0;}to{opacity:1;}}" +
 ".sh-la *{box-sizing:border-box;}" +
+".sh-la [hidden]{display:none !important;}" +
 ".sh-la-card{position:relative;width:min(440px,100%);max-height:100%;overflow:auto;padding:20px 20px 16px;border-radius:18px;background:var(--la-bg);" +
 "border:1px solid var(--la-line);box-shadow:0 18px 50px -12px rgba(0,0,0,.45);}" +
 ".sh-la-card h3{margin:0 30px 8px 0;font-size:18px;font-weight:700;font-family:inherit;color:var(--la-ink);}" +
@@ -530,17 +532,24 @@ function css(){
 if (document.getElementById("sh-la-css")) return;
 var st = document.createElement("style"); st.id = "sh-la-css"; st.textContent = CSS; document.head.appendChild(st);
 }
-function close(){ if (card) { card.remove(); card = null; } }
-function redeem(code, msg){
+var back = null, escKey = null;
+function close(){
+if (card) { card.remove(); card = null; }
+if (escKey) { document.removeEventListener("keydown", escKey, true); escKey = null; }
+var b = back; back = null;
+try { if (b && b.isConnected) b.focus(); } catch (e) {}
+}
+function redeem(code, msg, tr){
+tr = tr || track;
 code = String(code || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
 if (code.length !== 6) { msg.textContent = "Codes are 6 letters and numbers."; return; }
 if (redeem.busy) return;
 redeem.busy = true; msg.textContent = "Linking…";
 rpc("redeem_link_code", { p_code: code, p_visitor: visitor() }).then(function(id){
 redeem.busy = false;
-if (!id) { track("fail"); msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
+if (!id) { tr("fail"); msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
 if (id === visitor()) { msg.textContent = "This device is already linked to that one."; return; }
-track("linked");
+tr("linked");
 try { if (window.shClicks && window.shClicks.flush) window.shClicks.flush(); } catch (e) {}
 ls("sh_visitor_id", id); ls("sh_display_name", null); ls("sh_rank_tier", null); ls("sh_trophy_seen", null);
 rpc("get_display_name", { p_visitor: id }).then(function(n){
@@ -559,9 +568,9 @@ card.innerHTML = '<div class="sh-la-card" role="dialog" aria-modal="true" aria-l
 document.body.appendChild(card);
 return card.querySelector(".sh-la-body");
 }
-function wireEnter(){
-var inp = card.querySelector(".sh-la-enter input"), msg = card.querySelector(".sh-la-step .sh-la-msg");
-if (inp) inp.addEventListener("input", function(){ if (inp.value.replace(/[^A-Za-z0-9]/g, "").length === 6) redeem(inp.value, msg); });
+function wireEnter(tr){
+var inp = card.querySelector(".sh-la-enter input"), msg = inp && inp.closest(".sh-la-step").querySelector(".sh-la-msg");
+if (inp) inp.addEventListener("input", function(){ if (inp.value.replace(/[^A-Za-z0-9]/g, "").length === 6) redeem(inp.value, msg, tr); });
 }
 function fromUrl(){
 var m = /[?&]link=([A-Za-z0-9]{6})(?:&|$)/.exec(location.search);
@@ -580,9 +589,9 @@ if (e.target === card || e.target.closest(".sh-la-x") || a === "url-no") { close
 if (a === "url-go") redeem(code, body.querySelector(".sh-la-msg"));
 });
 }
-function share(code, out){
+function share(code, out, fromCard){
 var url = ROOT + "?link=" + code;
-track("share");
+if (fromCard) linkTrack("share"); else track("share");
 if (navigator.share) {
 navigator.share({ title: "Link my study hubs", text: "Open this on my other device to link it", url: url }).catch(function(){});
 return;
@@ -654,7 +663,57 @@ if (window.shTour && window.shTour.whenIdle) window.shTour.whenIdle(function(){ 
 });
 }, fromSave ? 1200 : 0);
 }
+function linkTrack(k){ try { if (window.shTrack) window.shTrack("link:" + k); } catch (e) {} }
+var FROM = /^[a-z-]{1,16}$/;
+function link(opts){
+opts = opts || {};
+if (card) close();
+back = opts.back || document.activeElement || null;
+linkTrack("open" + (FROM.test(String(opts.from || "")) ? "=" + opts.from : ""));
+var body = shell("Link my devices",
+'<p>Use one rank, streak, trophy case and question progress on your phone, tablet and laptop. Whatever each one has done so far comes along, and your name follows.</p>' +
+'<div class="sh-la-step"><b>1. On the device you use most</b>' +
+'<div class="sh-la-row" data-la-ask><button type="button" class="sh-la-btn is-main" data-la="make">Get a code</button></div>' +
+'<div data-la-made hidden><div class="sh-la-codebox"><span class="sh-la-big">…</span><small>Good for 10 minutes</small></div>' +
+'<div class="sh-la-row"><button type="button" class="sh-la-btn is-main" data-la="share" disabled>' + (navigator.share ? "Send the link" : "Copy the link") + '</button></div>' +
+'<small>Open the link on your other device, or type the code there.</small></div>' +
+'<div class="sh-la-msg sh-la-out" aria-live="polite"></div></div>' +
+'<div class="sh-la-step"><b>2. On your other device</b>' +
+'<div class="sh-la-enter"><input type="text" maxlength="7" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="Type the code" aria-label="Link code">' +
+'<button type="button" class="sh-la-btn" data-la="go">Link</button></div>' +
+'<small>On that device it’s in Settings, next to your name, the same as here. It links as soon as the sixth character is in.</small>' +
+'<div class="sh-la-msg" aria-live="polite"></div></div>');
+card.classList.add("sh-la-link");
+wireEnter(linkTrack);
+var enterMsg = body.querySelector(".sh-la-enter").parentNode.querySelector(".sh-la-msg"), out = body.querySelector(".sh-la-out");
+escKey = function(e){ if (e.key === "Escape") { e.stopPropagation(); close(); } };
+document.addEventListener("keydown", escKey, true);
+card.addEventListener("click", function(e){
+var b = e.target.closest("[data-la]"), a = b && b.getAttribute("data-la");
+if (e.target === card || e.target.closest(".sh-la-x")) { close(); return; }
+if (a === "make") {
+b.disabled = true; out.textContent = "Making a code…";
+rpc("create_link_code", { p_visitor: visitor() }).then(function(c){
+if (!card || !body.isConnected) return;
+if (!c) { b.disabled = false; out.textContent = "Couldn’t make a code. Are you online?"; return; }
+linkTrack("code");
+out.textContent = "";
+body.querySelector("[data-la-ask]").hidden = true;
+var made = body.querySelector("[data-la-made]"), btn = made.querySelector('[data-la="share"]');
+made.hidden = false;
+made.querySelector(".sh-la-big").textContent = c.slice(0, 3) + " " + c.slice(3);
+btn.disabled = false; btn.setAttribute("data-code", c);
+try { btn.focus(); } catch (err) {}
+});
+return;
+}
+if (a === "share") { share(b.getAttribute("data-code") || "", out, true); return; }
+if (a === "go") redeem(body.querySelector(".sh-la-enter input").value, enterMsg, linkTrack);
+});
+setTimeout(function(){ try { var f = card && card.querySelector('[data-la="make"]'); if (f) f.focus(); } catch (e) {} }, 30);
+}
 window.shLinkAsk = {
+link: link,
 start: function(opts){
 C.sb = opts.sb || null; C.hub = opts.hub || "";
 C.bootstrap = opts.bootstrap || (window.shBootstrap && window.shBootstrap.ready) || null;
@@ -1502,7 +1561,8 @@ var h = '<div class="sh-rank-card sh-tier-' + TIERS[t].key + '">' +
 '<div class="sh-rank-xp"><b>' + fmt(xp) + '</b> XP' + (profile.position ? ' · #' + profile.position + ' of ' + profile.of : '') + '</div>' +
 '<div class="sh-rank-bar"><i style="width:' + (pct * 100).toFixed(1) + '%"></i></div>' +
 '<div class="sh-rank-next">' + (next ? fmt(next - xp) + ' XP to ' + nextName : 'The highest rank there is.') + '</div>' +
-(window.shEditName ? '<button type="button" class="sh-rank-rename">' + (window.shNameNow && window.shNameNow() ? 'Shown as ' + esc(window.shNameNow()) + ' · change' : 'Change your name') + '</button>' : '') +
+(window.shEditName ? '<div class="sh-rank-namerow"><button type="button" class="sh-rank-rename">' + (window.shNameNow && window.shNameNow() ? 'Shown as ' + esc(window.shNameNow()) + ' · change' : 'Change your name') + '</button>' +
+'<button type="button" class="sh-rank-linkbtn" data-sh-link="rank">Link my devices</button></div>' : '') +
 '</div></div>';
 if (m.bank) {
 h += '<div class="sh-mastery"><div class="sh-mastery-top"><span>Mastery in this hub</span><b>' + Math.round(m.pct * 100) + '%' + (m.lvl >= 0 ? ' · ' + MASTERY[m.lvl].n : '') + '</b></div>' +
@@ -1921,7 +1981,7 @@ P.panel.setAttribute("aria-modal", String(phone()));
 P.root.hidden = false;
 docEl.classList.add("ska-open");
 requestAnimationFrame(function(){ P.root.classList.add("is-on"); });
-if (o.ask && o.ask.qid) { S.attach = { qid: String(o.ask.qid), right: o.ask.right === true ? true : o.ask.right === false ? false : null, picks: Array.isArray(o.ask.picks) ? o.ask.picks.slice(0, 12) : [], label: o.ask.label || "" }; }
+if (o.ask && o.ask.qid) { S.attach = { qid: String(o.ask.qid), right: o.ask.right === true ? true : o.ask.right === false ? false : null, picks: Array.isArray(o.ask.picks) ? o.ask.picks.slice(0, 12) : [], label: o.ask.label || "", w: +o.ask.w > 0 ? +o.ask.w : 0 }; }
 dress(); drawAttach(); hidePast();
 if (o.text != null) { P.input.value = String(o.text).slice(0, MAX); grow(); counter(); }
 if (!was) track("open=" + (o.from || "other"));
@@ -2014,7 +2074,7 @@ if (text.length > MAX) { counter(); P.count.hidden = false; return; }
 build();
 var body = { visitor: visitor(), hub: hubId(), text: text, chat: S.chat, request: rid(), voice: voice(), context: context() };
 if (isDash()) body.hubs = (opt("hubs") || []).map(function(h){ return h.id; });
-var ask = S.attach && !isDash() ? { qid: S.attach.qid, right: S.attach.right, picks: S.attach.picks } : null;
+var ask = S.attach && !isDash() ? { qid: S.attach.qid, right: S.attach.right, picks: S.attach.picks, w: S.attach.w || undefined } : null;
 if (ask) body.ask = ask;
 var wantProgress = x.progress || TONIGHT.test(text);
 S.busy = true; setBusy(true);
@@ -2657,23 +2717,26 @@ var on = function(){ woke = true; WAKE_ON.forEach(function(n){ window.removeEven
 WAKE_ON.forEach(function(n){ window.addEventListener(n, on, { capture: true, passive: true }); });
 }
 function afterWake(fn){ if (woke) fn(); else { wakeQ.push(fn); watchWake(); } }
-var outfitsLoad = null;
-function loadOutfits(){
-if (window.SH_OUTFITS) return Promise.resolve(window.SH_OUTFITS);
-if (outfitsLoad) return outfitsLoad;
-outfitsLoad = new Promise(function(res, rej){
-var el = document.querySelector('script[src$="hub-art/outfits.js"]');
-if (!el) {
-var b = BASE; if (!b) { var me = document.querySelector('script[src*="widget/pet.js"]'); b = me ? me.src.replace(/[^\/]*(\?.*)?$/, "") : "widget/"; }
-el = document.createElement("script"); el.src = b + "hub-art/outfits.js"; el.async = true; document.head.appendChild(el);
-}
+var outfitsLoad = null, setLoad = {};
+function artBase(){ var b = BASE; if (!b) { var me = document.querySelector('script[src*="widget/pet.js"]'); b = me ? me.src.replace(/[^\/]*(\?.*)?$/, "") : "widget/"; } return b; }
+function fetchArt(file){
+return new Promise(function(res, rej){
+var el = document.querySelector('script[src$="hub-art/' + file + '"]');
+if (!el) { el = document.createElement("script"); el.src = artBase() + "hub-art/" + file; el.async = true; document.head.appendChild(el); }
 el.addEventListener("load", function(){ res(window.SH_OUTFITS); });
-el.addEventListener("error", function(){ outfitsLoad = null; rej(new Error("outfits")); });
+el.addEventListener("error", function(){ rej(new Error(file)); });
 });
-return outfitsLoad;
+}
+function loadOutfits(id){
+var core = window.SH_OUTFITS ? Promise.resolve(window.SH_OUTFITS) : outfitsLoad || (outfitsLoad = fetchArt("outfits.js").then(null, function(e){ outfitsLoad = null; throw e; }));
+return core.then(function(O){
+var set = O && id && !Object.prototype.hasOwnProperty.call(O.parts, id) && O.where && O.where[id];
+if (!set || (O.got && O.got[set])) return O;
+return setLoad[set] || (setLoad[set] = fetchArt("outfits/" + set + ".js").then(null, function(e){ setLoad[set] = null; throw e; }));
+});
 }
 function wantOutfits(id){
-afterWake(function(){ loadOutfits().then(function(){ if (WORN.id === id && !WORN.layer) wear(id); }, function(){}); });
+afterWake(function(){ loadOutfits(id).then(function(){ if (WORN.id === id && !WORN.layer) wear(id); }, function(){}); });
 }
 function wornTalk(){ var l = WORN.layer; return l && l.say && l.say.length ? { k: WORN.id, say: l.say } : null; }
 function houseDeco(){
@@ -4593,8 +4656,10 @@ var name = nameNow(), hubs = liveHubs();
 if (here && !hubs.some(function(h){ return h.id === here; })) hubs = [{ id: here, name: label(here) }].concat(hubs);
 return "<" + HN + ' class="shi-formh">Post an idea</' + HN + ">" +
 '<p class="note">It shows to the class right away, under your name. ' + RULES + "</p>" +
-(name ? '<p class="shi-as">Posting as <b>' + esc(name) + "</b>" + (o.editName ? ' · <button type="button" class="shi-act" data-shi="rename">change</button>' : "") + "</p>"
-: '<label class="shi-f"><span>Your name</span><input type="text" data-shi-f="name" maxlength="24" autocomplete="nickname" placeholder="Pick a name" value="' + esc(nameHint(o)) + '"><small>Ideas show under your leaderboard name, the one classmates see on the boards. Keep it or change it.</small></label>') +
+(name ? '<p class="shi-as">Posting as <b>' + esc(name) + "</b>" + (o.editName ? ' · <button type="button" class="shi-act" data-shi="rename">change</button>' : "") +
+(window.shLinkAsk && window.shLinkAsk.link ? ' · <button type="button" class="shi-act" data-shi="link">link a device</button>' : "") + "</p>"
+: '<label class="shi-f"><span>Your name</span><input type="text" data-shi-f="name" maxlength="24" autocomplete="nickname" placeholder="Pick a name" value="' + esc(nameHint(o)) + '"><small>Ideas show under your leaderboard name, the one classmates see on the boards. Keep it or change it.</small></label>' +
+(window.shLinkAsk && window.shLinkAsk.link ? '<p class="shi-as">Already have a name on another device? <button type="button" class="shi-act" data-shi="link">Link my devices</button></p>' : "")) +
 '<label class="shi-f"><span>Title</span><input type="text" data-shi-f="title" maxlength="80" placeholder="The idea in a few words" required></label>' +
 '<label class="shi-f"><span>Details <i>(optional)</i></span><textarea data-shi-f="body" maxlength="280" rows="3" placeholder="What it would do, and why it would help"></textarea><small class="shi-left num" aria-live="polite"></small></label>' +
 '<label class="shi-f"><span>For</span><select data-shi-f="hub">' +
@@ -4661,6 +4726,7 @@ var a = b.getAttribute("data-shi"), li = b.closest("[data-idea]"), it = li ? fin
 if (a === "new") openForm(true);
 else if (a === "cancel") openForm(false);
 else if (a === "rename") { try { o.editName(); } catch (err) {} }
+else if (a === "link") { try { window.shLinkAsk.link({ back: b, from: "ideas" }); } catch (err) {} }
 else if (a === "more") { S.shown += PAGE; var n = list.children.length; paint(); var nx = list.children[n]; if (nx) { var fb = nx.querySelector("button"); try { fb.focus(); } catch (err) {} } }
 else if (!it) return;
 else if (a === "up" || a === "down") vote(li, it, a === "up" ? 1 : -1);

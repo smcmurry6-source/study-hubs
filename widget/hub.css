@@ -292,6 +292,10 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 .ql.is-primary small { opacity: .85; }
 .ql.is-primary:hover { background: var(--primary); opacity: .92; }
 .quick:not(:has(.ql:nth-child(7))) .ql.is-primary { grid-column: span 3; }
+/* a hub's own links under the quick starts (SH_HUB.home.links; Perio's Stage & Grade): a row of their own, in the hub's tint */
+.quick-more { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 8px; margin-top: calc(8px - var(--gap)); }
+.ql.ql-wide { background: var(--hub-soft); }
+.ql.ql-wide:hover { background: var(--active); }
 /* Timmy Time among the quick starts (hub.js podMiniHTML): the last column, both rows; Practice questions takes one cell */
 .quick.has-pod .ql.is-primary { grid-column: auto; }
 .quick.has-pod .ql-pod { grid-column: 4; grid-row: 1 / span 2; }

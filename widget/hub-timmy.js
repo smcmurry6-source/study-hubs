@@ -92,9 +92,9 @@
   function dayCT(){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()); } catch (e) { return ""; } }
   /* the rare costume of the day, the same on every reload and every linked device: from the visitor id and the Central
      day, on about one day in twelve among the days with no holiday (holiday: widget/pet.js's holidayId() that day) and
-     outside the fall weeks (September 22 to November 30), one of the five. widget/dash.js has the same function, and
+     outside the fall weeks (September 22 to November 30), one of the ten (tools/figures/site/sets.mjs COSTUMES, in its order). widget/dash.js has the same function, and
      tools/release/xp.js checks both against the server's sh_season and sh_is_fall for every day of three years. */
-  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
   function costumeOfDay(visitor, day, holiday){
     if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
     var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";
@@ -228,7 +228,7 @@
       : q.type === "multi" ? "Why are those the right ones?" : q.type === "sequence" ? "Why does it go in that order?"
       : q.type === "match" ? "Can you explain these matches?" : "Can you explain this one?";
     var ask = { qid: q.id, right: q.type === "recall" ? null : !!right, picks: q.type === "mcq" || q.type === "multi" ? (picks || []).slice() : [],
-      label: String(q.stem || "").replace(/\s+/g, " ").trim() };
+      label: String(q.stem || "").replace(/\s+/g, " ").trim(), w: q._w || 0 };   /* w: the wording on screen (widget/hub.js worded()) */
     askReady().then(function(A){ if (A) A.open({ from: "card", text: text, ask: ask }); else HX.toast("The chat didn't load. Try again in a moment."); },
       function(){ HX.toast("The chat didn't load. Check your connection and try again."); });
   }

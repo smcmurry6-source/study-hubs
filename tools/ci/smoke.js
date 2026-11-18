@@ -384,6 +384,30 @@ function checkIds(hub, qids){
   fs.appendFileSync(file, head + fresh.join('\n') + '\n');
   notes.push(`${hub}: added ${fresh.length} new question id(s) to ${rel} (commit it)`);
 }
+/* each wording of a question, as the card would show it: the original with the wording's stem, choices, whys and ex */
+function lintWordings(hub, Q, V, core){
+  const by = new Map(Q.map(q => [q.id, q])), W = [];
+  if (core.variants !== Object.keys(V).length) problems.push(`${hub}: core.json's "variants" (${core.variants}) doesn't count variants.json's ${Object.keys(V).length} questions (run: node tools/hub-next/build.mjs)`);
+  Object.entries(V).forEach(([id, raw]) => (Array.isArray(raw) ? raw : [raw]).forEach((v, k) => {
+    const q = by.get(id); if (!q) { problems.push(`${hub}: variants.json has ${id}, which isn't a question`); return; }
+    W.push(Object.assign({}, q, { stem: v.stem, choices: v.choices || q.choices, why: v.why || q.why, ex: v.ex || q.ex, _at: `${id} (wording ${k + 2})` }));
+  }));
+  W.forEach(q => {
+    const at = q._at, ch = q.choices || [];
+    if (q.type === 'mcq' || q.type === 'multi') {
+      const low = ch.map(c => String(c).trim().toLowerCase()); if (new Set(low).size !== low.length) problems.push(`${hub}: ${at} has duplicate choices`);
+      if (!Array.isArray(q.why) || q.why.length !== ch.length || q.why.some(w => !String(w || '').trim())) problems.push(`${hub}: ${at} needs a "why" for every choice`);
+    }
+    if (q.type === 'mcq' && !(q.answer >= 0 && q.answer < ch.length)) problems.push(`${hub}: ${at} answer index out of range`);
+    if (q.type === 'multi' && !(Array.isArray(q.correct) && q.correct.every(i => i >= 0 && i < ch.length))) problems.push(`${hub}: ${at} has a key outside its choices`);
+    if (!String(q.stem || '').trim()) problems.push(`${hub}: ${at} has no stem`);
+  });
+  const mc = W.filter(q => q.type === 'mcq' && (q.choices || []).length >= 3);
+  const longest = mc.filter(q => { const len = q.choices.map(c => String(c).length), a = len[q.answer]; return a > Math.max(...len.filter((_, i) => i !== q.answer)); }).length;
+  const pct = mc.length ? Math.round(100 * longest / mc.length) : 0;
+  notes.push(`${hub}: ${W.length} reworded questions; correct answer is the longest choice in ${pct}% of their MCQs`);
+  if (pct > 40) problems.push(`${hub}: in the reworded questions the correct answer is the longest choice in ${pct}% of MCQs (keep it under 40%)`);
+}
 function lint(hub, A){
   const Q = A.QUESTIONS || [], L = A.LECTURES || [], ids = new Set(), lecIds = new Set(L.map(l => l.id)), longItems = [];
   checkIds(hub, Q.map(q => String(q.id)));
@@ -707,6 +731,9 @@ function lint(hub, A){
         try {
           const rd = f => JSON.parse(fs.readFileSync(content(hub, f), 'utf8')), core = rd('core.json'), nts = rd('notes.json');
           lint(hub, { QUESTIONS: rd('questions.json'), LECTURES: core.lectures || [], READINGS: nts.full || {}, READINGS_PLAIN: nts.plain || {}, LIKELY_TOPICS: core.likelyTopics, CORE: core, NOTES: nts });
+          /* a hub's other wordings (content/variants.json, shown on later tries): the build checks their shape
+             (tools/hub-next/build.mjs checkVariants); here each wording gets the bank's own per-question lint */
+          if (fs.existsSync(content(hub, 'variants.json'))) lintWordings(hub, rd('questions.json'), rd('variants.json'), core);
         } catch (e) { problems.push(`${hub}: could not read its content (hubs/${hub}/content/): ${e.message}`); }
       }
       const page = await context.newPage(); const errs = [], name = `${hub}`;
@@ -895,7 +922,7 @@ function lint(hub, A){
       const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
       const equipped = { 'yard-left': 'garden' };
       const shop = () => ({ day: '2026-11-12', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], costumes: [], snacks_today: 0, boost: null,
-        inventory: ['garden', 'mailbox', 'bowling-lane', 'castle'].map(id => ({ id, at: '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
+        inventory: ['garden', 'mailbox', 'bowling-lane', 'castle', 'cowboy-hat', 'floss-mummy'].map(id => ({ id, at: '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
         locked: [{ id: 'rank-bronze-outfit', name: 'Bronze outfit', kind: 'outfit', rarity: 'rare', rank_tier: 2 }], equipped: Object.assign({}, equipped) });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rank, mastery: [], shop: shop() }) }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(shop()) }));
@@ -954,6 +981,15 @@ function lint(hub, A){
             if (after.corner) problems.push(`${name} (${label}): with the bowling lane in the side yard, the front corner should not be offered`);
             if (after.w > 1) problems.push(`${name} (${label}): Customize scrolls sideways by ${after.w}px`);
             await page.click('dialog.tpv .tpv-tile[data-pick="timmy"]'); await page.waitForTimeout(400);
+            /* a year-round collection's piece (the desert's cowboy hat, migration_v65) is under its own tab, Collections,
+               headed by its collection, and its drawings (hub-art/place/desert.js) are fetched only because it's owned */
+            const co = await page.$('dialog.tpv [data-src="coll"]'); if (co) { await co.click(); await page.waitForTimeout(600); }
+            const coll = await page.evaluate(() => ({ cards: [...document.querySelectorAll('dialog.tpv .tpv-card[data-item]')].map(e => e.dataset.item), head: [...document.querySelectorAll('dialog.tpv .tpv-seth')].map(e => e.textContent),
+              tabs: (() => { const t = document.querySelector('dialog.tpv .tpv-tabs'); return t ? Math.round(t.getBoundingClientRect().right - t.parentElement.getBoundingClientRect().right) : 0; })(), w: (() => { const d = document.querySelector('dialog.tpv'); return d.scrollWidth - d.clientWidth; })() }));
+            if (!co || !coll.cards.includes('cowboy-hat') || coll.head.join() !== 'Desert ranch') problems.push(`${name} (${label}): an owned collection piece should be under Collections, headed by its collection (${JSON.stringify(coll)})`);
+            /* four tabs now (Classics, Collections, Seasonal, Rank): they fit the panel on a phone */
+            if (coll.tabs > 1 || coll.w > 1) problems.push(`${name} (${label}): the outfit tabs run ${coll.tabs}px past their panel (the view scrolls sideways by ${coll.w}px)`);
+            if (!asked.includes('hub-art/place/desert.js') || asked.some(u => /hub-art\/place\/(dino|moonbase|reef|arcade|rockshow)\.js/.test(u))) problems.push(`${name} (${label}): only the owned collection's drawings should load (${asked.join(', ')})`);
             const rk = await page.$('dialog.tpv [data-src="rank"]'); if (rk) { await rk.click(); await page.waitForTimeout(300); }
             const lk = await page.evaluate(() => { const l = document.querySelector('dialog.tpv .tpv-card.is-locked'); return l ? l.textContent : ''; });
             if (!/Reach Bronze/.test(lk)) problems.push(`${name} (${label}): a rank outfit not reached yet should show locked, with the rank that gives it (${lk})`);
@@ -1185,9 +1221,9 @@ function lint(hub, A){
             w: document.documentElement.scrollWidth - innerWidth };
         });
         if (s.bal !== '300') problems.push(`${name} (${label}): the shop's balance reads "${s.bal}", not 300`);
-        if (s.shelves.join() !== 'today,week,spotted,always') problems.push(`${name} (${label}): the shop's shelves are ${s.shelves.join(', ')}, not Today's picks, This week, Spotted (the five costumes as shapes) and Always here (an empty shelf is left out)`);
+        if (s.shelves.join() !== 'today,week,spotted,always') problems.push(`${name} (${label}): the shop's shelves are ${s.shelves.join(', ')}, not Today's picks, This week, Spotted (the ten costumes as shapes) and Always here (an empty shelf is left out)`);
         const spot = await page.evaluate(() => ({ shapes: document.querySelectorAll('.tsh-shelf-spotted .tsh-unseen').length, cards: document.querySelectorAll('.tsh-shelf-spotted .tsh-card[data-item]').length }));
-        if (spot.shapes !== 5 || spot.cards) problems.push(`${name} (${label}): with no costume spotted yet, the Spotted shelf shows the five as shapes and nothing to buy (${JSON.stringify(spot)})`);
+        if (spot.shapes !== 10 || spot.cards) problems.push(`${name} (${label}): with no costume spotted yet, the Spotted shelf shows the ten as shapes and nothing to buy (${JSON.stringify(spot)})`);
         if (s.state.sandcastle !== 'buy' || s.state.igloo !== 'short' || s.state.apple !== 'full' || s.state['boost-1h'] !== 'short') problems.push(`${name} (${label}): the cards' states are ${JSON.stringify(s.state)}`);
         if (s.x) problems.push(`${name} (${label}): an item's name was drawn as markup`);
         else if (!/<img/.test(s.nameTxt)) problems.push(`${name} (${label}): an item's name should show as text (${s.nameTxt})`);

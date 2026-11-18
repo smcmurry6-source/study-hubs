@@ -95,7 +95,7 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   the shop's seasonal sets now (a floss mummy and a bedsheet ghost at Halloween, a holiday sweater and an elf suit in the
   winter), and the old "he can't pick one" can be a joke about the past ("I used to dress myself. You saw how that went.").
 - **Rare costumes** (the redesign's shop, [released 2026-11](../../vault/tasks/done/2026-11-06-redesign-release.md)):
-  five costumes that turn up at Timmy's shop now and then, about one ordinary day in twelve, never on a holiday or in the
+  ten costumes (five at the release, five more on 2026-11-18) that turn up at Timmy's shop now and then, about one ordinary day in twelve, never on a holiday or in the
   fall weeks, a different day for each student. When one turns up he says so once ("Something rare came in at the shop
   today: the pirate costume"), and it waits on the shop's Spotted shelf until it's bought. Each student spots them in
   their own order, so an episode never says which one is out, and never that he owns one. What he says in each (the
@@ -112,6 +112,16 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   - **Captain Enamel** (Legendary, 4,000): a red cape, a blue mask, a gold shield with a tooth on it. "The hardest
     substance in the human body, at your service." "My one weakness? Acid. Don't tell the plaque." "Fear not, citizen.
     I'll guard your smile. You do the flossing."
+  - **The wizard** (Epic, 2,000): a tall starry hat with a floppy tip, a robe of stars and moons, a staff topped with a
+    glowing crystal tooth. "Abracadabra! The plaque vanishes. The trick? Two minutes, twice a day."
+  - **The robot** (Epic, 2,200): a square silver helmet with two antennae and a visor his face shows through, a chest
+    panel of buttons and lights, a dial. "Beep boop. Scanning for plaque. Scan complete: you missed a spot."
+  - **The firefighter** (Epic, 1,600): a red helmet with a tooth on its shield, a tan turnout coat with reflective
+    stripes, a hose nozzle with a little spray. "I fight fires and inflammation. Gingivitis doesn't stand a chance."
+  - **The shark** (Epic, 2,400): a gray hood with a dorsal fin, its mouth open round his face with two rows of soft teeth,
+    fins and a tail. "Sharks grow new teeth all their lives. I'm not jealous. Okay, I'm a little jealous."
+  - **The dragon** (Legendary, 4,500): a green-scaled hood with horns, a frill and its own friendly eyes, bat wings, a
+    golden belly plate, a tail curled round the front. "Dragons guard treasure. I guard enamel. Same thing, really."
 - **The shop** itself (same release): he runs it, in a bow tie, behind the counter. Its money is **Shiny Gold Crowns**
   (said in full the first time, "gold crowns" after, never just "crowns"): five for every 10 XP, more for trophies,
   medals and rank-ups; spending never lowers XP or rank. Snacks (an apple, a cheese cube, floss, a fluoride rinse) give

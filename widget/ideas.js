@@ -314,8 +314,11 @@
       if (here && !hubs.some(function(h){ return h.id === here; })) hubs = [{ id: here, name: label(here) }].concat(hubs);
       return "<" + HN + ' class="shi-formh">Post an idea</' + HN + ">" +
         '<p class="note">It shows to the class right away, under your name. ' + RULES + "</p>" +
-        (name ? '<p class="shi-as">Posting as <b>' + esc(name) + "</b>" + (o.editName ? ' · <button type="button" class="shi-act" data-shi="rename">change</button>' : "") + "</p>"
-          : '<label class="shi-f"><span>Your name</span><input type="text" data-shi-f="name" maxlength="24" autocomplete="nickname" placeholder="Pick a name" value="' + esc(nameHint(o)) + '"><small>Ideas show under your leaderboard name, the one classmates see on the boards. Keep it or change it.</small></label>') +
+        /* Link my devices (widget/linkask.js) beside the name, as everywhere a name is changed */
+        (name ? '<p class="shi-as">Posting as <b>' + esc(name) + "</b>" + (o.editName ? ' · <button type="button" class="shi-act" data-shi="rename">change</button>' : "") +
+            (window.shLinkAsk && window.shLinkAsk.link ? ' · <button type="button" class="shi-act" data-shi="link">link a device</button>' : "") + "</p>"
+          : '<label class="shi-f"><span>Your name</span><input type="text" data-shi-f="name" maxlength="24" autocomplete="nickname" placeholder="Pick a name" value="' + esc(nameHint(o)) + '"><small>Ideas show under your leaderboard name, the one classmates see on the boards. Keep it or change it.</small></label>' +
+            (window.shLinkAsk && window.shLinkAsk.link ? '<p class="shi-as">Already have a name on another device? <button type="button" class="shi-act" data-shi="link">Link my devices</button></p>' : "")) +
         '<label class="shi-f"><span>Title</span><input type="text" data-shi-f="title" maxlength="80" placeholder="The idea in a few words" required></label>' +
         '<label class="shi-f"><span>Details <i>(optional)</i></span><textarea data-shi-f="body" maxlength="280" rows="3" placeholder="What it would do, and why it would help"></textarea><small class="shi-left num" aria-live="polite"></small></label>' +
         '<label class="shi-f"><span>For</span><select data-shi-f="hub">' +
@@ -386,6 +389,7 @@
       if (a === "new") openForm(true);
       else if (a === "cancel") openForm(false);
       else if (a === "rename") { try { o.editName(); } catch (err) {} }
+      else if (a === "link") { try { window.shLinkAsk.link({ back: b, from: "ideas" }); } catch (err) {} }
       else if (a === "more") { S.shown += PAGE; var n = list.children.length; paint(); var nx = list.children[n]; if (nx) { var fb = nx.querySelector("button"); try { fb.focus(); } catch (err) {} } }
       else if (!it) return;
       else if (a === "up" || a === "down") vote(li, it, a === "up" ? 1 : -1);

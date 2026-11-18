@@ -38,7 +38,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Playwright is in the inbox ([verify-before-pushing](vault/how-to/verify-before-pushing.md)).
 - **2026-11-17 (Crowns go up as you earn them, and prizes that pay XP and crowns, Claude Code, #403)** —
   Sam: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp earn rates",
-  then a list of prizes. The crowns were paid but never redrawn (BUG-164): `migration_v66.sql` puts `crowns` (the balance
+  then a list of prizes. The crowns were paid but never redrawn (BUG-175): `migration_v66.sql` puts `crowns` (the balance
   after it) in every paying reply and `widget/v3.js` sends it as `sh:crowns` (the hub's meters, its shop, the dashboard's
   wallet; a gold "+n crowns" under the rank). No daily cap on either (the 600 cap is the old pages' only). Prizes, one
   `xp_awards` row each, paying as many crowns as XP (`sh_prizes()`, copied as `PRIZES` in `v3.js`): the name 500, the daily
@@ -63,6 +63,85 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `.claude/hooks/supabase-confirm.js`), appended to `supabase/schema.sql`; every function's body matched the tested copy, and
   the rebuild agreed with live XP for all 77 people with an answer since the release. Class-wide after it: 168 wallets, none
   below zero, median about 1,200 crowns, about 300,000 of the 740,000 from hub time.
+- **2026-11-18 (more cosmetics: six year-round collections, five rare costumes, six paints, Claude Code)** — Sam: "Lets work on
+  timmy outfits and place cosmetics. Go crazy" ([the task](vault/tasks/2026-11-18-more-cosmetics.md)). **Six collections**
+  (`COLLECTIONS` in `tools/figures/site/sets.mjs`, one pack each in `tools/figures/site/packs/`: `dino`, `moonbase`, `reef`,
+  `desert`, `arcade`, `rockshow`), eight pieces each like a season's set (a Legendary home, an Epic scene, outfits Common to
+  Rare, yard pieces Uncommon to Epic), but everyday pieces in the daily and weekly picks all year: the rotation goes from 46
+  pieces to 100. Each is its own file (`widget/hub-art/place/<k>.js`), fetched only where a place shows one of its pieces, so
+  no page loads more. **Five more rare costumes** (the wizard, the robot, the firefighter, the shark, the legendary dragon;
+  `COSTUMES` in `sets.mjs`, drawn in `place.mjs`, lines in `tools/podcast/LORE.md`) and **six more paints** (coral, sage,
+  sand, rose, slate, teal). The kit marks a collection's piece `coll` (`SH_PLACE.collOf`); a pack outfit can say
+  `noLoupes`. Client: the customizer's Collections tab (`widget/place.js`), the shop names a piece's collection and stands
+  it in its own scene (`widget/shop.js`), ten costumes in `widget/hub-timmy.js`, `widget/dash.js` and `widget/shop.js`.
+  Server: `migration_v65.sql`, 59 rows into `shop_items` (240 in all) and nothing else, applied once the pages are live.
+  Tests: `tools/release/xp.js` (the collection rows are exactly `allCollectionItems()`, the ten costumes are `COSTUMES`, the
+  three client lists follow it), `tools/ci/smoke.js` (Collections in the customizer, only the owned collection's file
+  loads; ten costume shapes), the preview's catalog reads a later migration's inserts (`tools/preview/transform.js`). The
+  design page has a "year-round collections" gallery. About page (the shop's entry) and Ask Timmy's site help.
+  **A bug from before, fixed:** a set fetched late (`addPack`, which is how every page gets one) never added its yard eggs'
+  animation rules to the kit's CSS, so tapping a seasonal yard piece said its line but its egg stayed hidden; `addPack`
+  appends them now, and `tools/figures/site/build.mjs` fails if a late kit lacks any. Moon base's door spot moved out of the
+  front yard slot. Found by CI and fixed: the kit's lists after `addPack` dropped `coll` (BUG-172: an empty Collections tab),
+  and one `outfits.js` of all 88 outfits put the dashboard over its budget (BUG-173): it now holds the everyday and rank
+  outfits (9 KB), and `widget/hub-art/outfits/costumes.js`, `seasons.js` and `collections.js` are fetched only when someone
+  drawn wears one of theirs (`where`; `widget/pet.js`, `widget/dash.js`). Found by the local smoke test: on a phone the
+  customizer's four tabs ran past their panel (BUG-174, a phone rule in `widget/place.css` widened them). To do from it (the inbox): a tall front-slot piece
+  covers Timmy at the door; kit niceties the drawers asked for.
+- **2026-11-18 (Heme & Endo Exam 3: L19 and L20 taught, and every High Likelihood question marked, Claude Code, #404)** — `hubs/heme-endo-exam3/content/`, `tools/figures/heme-endo-exam3/`, `audio/hemeintro-*` and `audio/lymleuk-*`, `tools/hub-next/build.mjs`. L19 (Dr. Herr) and L20 (Dr. Borak) were checked against their 11/17 recordings: notes at both levels follow what was said, every key reread, L19 57 to 72 questions and L20 57 to 65 (`ll-hl-case`, `ll-2s-scatter` and `ll-specimen` retired: Hodgkin subtypes and flow cytometry, said not needed), 16 and 18 Exam Hints, topics re-ranked with the study guide's first, their ten figures corrected, and two new figures (Fig 23 `nkcheck`, Fig 24 `nodespread`); all three narration levels recorded again. BUG-164: the study guide's re-ranking (#393) had left 77 questions in a topic without their `likely` flag (the bank's toggle, the mock's share and the drill missed them); the content build now sets `likely` from `likelyTopics` on every engine hub (Occlusion and Perio unchanged). Flags: [the hub note](vault/hubs/heme-endo-exam3.md).
+- **2026-11-18 (Link my devices beside every name button, BUG-169 and BUG-170, Claude Code)** — Sam: "link my device is
+  nowhere to be found. add it to the settings page next to where you change your name. anywhere else that you can change
+  your name, add another button to link device". Since the redesign it lived only in an old hub's Stats panel, which the
+  new pages never show (the redesign's plan said "folded under the name dialog"; it never was). `widget/linkask.js` has
+  the whole thing now as one card, `shLinkAsk.link({ back, from })`: get a code (and send or copy the link), or type the
+  other device's code (it links at the sixth character), tracked as `link:open=<where>`, `link:code`, `link:share`,
+  `link:linked`, `link:fail`. Buttons for it: the dashboard's Settings (a row under Your name), its You card and its name
+  window (`widget/dash.js`); a hub's More → Settings (`widget/hub.js`), its name window, Timmy Time's and the idea board's
+  "Posting as … change" (`widget/v3.js` opens any `[data-sh-link]` button; `widget/podcast.js`, `widget/ideas.js`); an
+  old hub's Stats and Settings name boxes and its rank card (`widget/v3.js`, `widget/ranks.js`, `widget/v3.css`). A
+  hub's Settings now draws Your name and Link my devices before the shared widget is in (a tap waits for it): opened
+  straight on `#more/settings`, both rows were missing. About page, the dashboard tour's Settings step, Ask Timmy's site
+  help and the event taxonomy updated; bundles rebuilt.
+- **2026-11-18 (Perio's questions come back reworded, Claude Code, stacked on #402)** — Sam: "do one extra wording and only do it
+  for perio". `hubs/perio/content/variants.json` holds a second wording of each of the 652 Perio questions with choices (stem,
+  choices and whys; choice k is choice k reworded), written session by session from the notes and hints by 14 writers and
+  checked by 14 independent reviewers, who changed about 100. The engine (`worded()` in `widget/hub.js`) shows the original
+  on the first try and the next wording after (by the try count; Flashcards by its reviews): `card()` in `widget/hub-bank.js`
+  covers the bank, drill, misses, weak spots, the mock and Learn; Flashcards (`widget/study-modes.js`) and the arcade
+  (`widget/games.js`, `hubs/perio/content/arcade.js` `dealMCQ`) call it too. The file is fetched with the bank or the arcade,
+  not with Home or the notes, and isn't precached. Search, Find this in the notes, SH_EXPORT and question health keep the
+  original (the fingerprint is unchanged). A report says "reworded: wording 2"; Ask Timmy gets `ask.w` and the server swaps in
+  the wording (`wordingOf` in `supabase/functions/timmy/core.js`, `loadVariants` in `index.ts`). `tools/hub-next/build.mjs`
+  checks every wording (`checkVariants`) and counts it in `core.json`'s `variants`; `tools/ci/smoke.js` lints each one.
+  No High yield changed. Not done: recording which wording was shown on each answer (a migration; task note).
+
+- **2026-11-17 (Perio's Stage & Grade game, its bank audited against the final's hints, matching pays 10 XP, What's new on the
+  dashboard, the recap stays still, Claude Code, #402)** — Sam: "add an interactive visualization/game for staging and grading
+  using all of the criteria ... accessible on the home of perio hub, top of the question bank, and in the arcade", "using the
+  final exam hints dr abou arraj gave ... vet the whole question bank", "using all of the perio midterm check ins, see if there
+  are any additions", "matching questions are only giving 2xp instead of 10", "add the recent change log back".
+  **Stage & Grade** (`tools/figures/perio/stagegame.js` + `.css`, built into `hubs/perio/content/figures.js`/`.css` between
+  `stage:js`/`stage:css` markers by `tools/figures/perio/build.mjs`, `--check` in CI): ten made-up patients, each drawn as a
+  mouth chart (each tooth's own facial outline at its average size: incisal edges, canine cusps, premolars, molars with their roots; Sam: "make the mouth chart use teeth shapes instead of arbitrary rectangles") and a radiograph of its worst site, with their findings; call the stage, the extent and the grade, and the
+  finding that decided each call lights up gold. Explore sets every criterion by hand and the diagnosis follows, with why.
+  The rules follow Session 1's notes (CAL first, the bone-loss bands, the Stage 3 triggers, Stage 4 by teeth lost or
+  complexity, the grade by direct evidence or the bone-loss/age ratio, smoking and HbA1c lifting it); 20,000 dealt cases
+  checked against them. It sits at the top of the Question Bank (`bank.cuspGame`, the slot Occlusion's cusp game uses), on
+  Home as a wide quick link (`SH_HUB.home.links`, new in `widget/hub.js`: any hub can list extra links there) and in the
+  arcade as its seventh game (`#more/arcade/stage` opens it straight away; `GAME_IMPL.stage` in `content/arcade.js`, lobby art
+  `pStage` in `tools/figures/site/arcade.mjs`). Arcade plays earn the usual +50; it doesn't count in class stats.
+  **migration_v64.sql (applied live 2026-11-17):** `sh_answer` pays a matching question (an `order` key whose picks
+  arrive empty) as a self-graded one, 10 XP the first time right, instead of the flat 2; `submit_arcade_score` and
+  `sh_session_start` accept `stage`. `tools/release/xp.js` tests both. **The audit**
+  ([task](vault/tasks/done/2026-11-17-perio-final-hints-audit.md)): six reviewers read the bank session by session against the
+  notes and the Nov 12 hints; 111 questions fixed in place (ids kept: wrong or thin whys, unclear stems, one second
+  defensible answer, a sickle "toe"), 2 retired (`q3-20`, a third ask of one fact; `q1-E03`, a near-duplicate), 8 added:
+  suture materials from the midterm check-ins (`q2-F04`-`F06`; the final asks the materials, not the techniques), and
+  `q4-F06`, `q8-F03`, `q8-F04`, `q9-F03`, `q9-F04` for hinted facts the bank didn't ask. 669 → 675. High yield recorded again
+  for every session whose `hy` changed. **The dashboard:** a hub card's "Updated" opens What's new (its last few changelog
+  lines and the site's), and the hub recap plays its bars once, then stays still while you scroll. **CI:** every workflow is pinned to `ubuntu-24.04`: `ubuntu-latest` became 26.04 on 2026-11-18 and Playwright 1.56.1
+  can't install a browser there (a to-do in the inbox moves it back).
+
 - **2026-11-17 (the dashboard at the large text sizes, BUG-076 and BUG-163, Claude Code, #401)** — `widget/dash.css` (and
   the rebuilt `widget/site.bundle.css`). On a 320 px phone at XX-Large the page scrolled 49 px sideways (10 px at X-Large):
   the "You" card's week dots now shrink, still round, when the card is narrower than the week, and "Start studying" wraps

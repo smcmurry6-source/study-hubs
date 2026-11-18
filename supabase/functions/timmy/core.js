@@ -354,6 +354,8 @@ export function readInput(b){
   if (a && typeof a === "object" && typeof a.qid === "string" && a.qid.length && a.qid.length <= 80 && hub !== "dashboard") {
     input.ask = { qid: a.qid, right: a.right === true ? true : a.right === false ? false : null,
       picks: Array.isArray(a.picks) ? a.picks.filter(p => Number.isInteger(p) && p >= 0 && p < 40).slice(0, 12) : [] };
+    // the wording the card showed (1 = the hub's first extra wording, content/variants.json); 0 or none, the original
+    if (Number.isInteger(a.w) && a.w > 0 && a.w < 10) input.ask.w = a.w;
   }
   const p = b.progress;
   if (p && typeof p === "object") {
@@ -368,8 +370,21 @@ export function readInput(b){
 export function savedContext(input, corpora){
   return { view: input.context.view || null, lec: input.context.lec || null, k: input.context.k, voice: input.voice,
     hubs: input.hub === "dashboard" ? corpora.map(c => c.hub) : undefined,
-    ask: input.ask ? { qid: input.ask.qid, right: input.ask.right, picks: input.ask.picks } : undefined,
+    ask: input.ask ? { qid: input.ask.qid, right: input.ask.right, picks: input.ask.picks, w: input.ask.w || undefined } : undefined,
     progress: input.progress ? { lectures: input.progress.lectures.length } : undefined };
+}
+/* the wording the student saw: the hub's variants.json ({ id: { stem, choices, why[, ex] } or a list}), w = 1 the first
+   extra wording; choice k is choice k reworded, so the key and the picks are the original's. Anything missing: the original */
+export function wordingOf(q, variants, w){
+  let vs = variants && typeof variants === "object" ? variants[q.id] : null;
+  if (vs && !Array.isArray(vs)) vs = [vs];
+  const v = vs && vs[w - 1];
+  if (!v || typeof v.stem !== "string") return q;
+  const o = { ...q, stem: v.stem };
+  if (Array.isArray(v.choices) && Array.isArray(q.choices) && v.choices.length === q.choices.length) o.choices = v.choices;
+  if (Array.isArray(v.why)) o.why = v.why;
+  if (typeof v.ex === "string") o.ex = v.ex;
+  return o;
 }
 /* the answered question, from the hub's own questions.json (never from the browser): stem, choices, key, whys, picks */
 export function questionText(q, ask){
@@ -675,7 +690,7 @@ export async function handle(body, deps){
   // the answered question, only if the database has this visitor's answer to it
   let question = null, qUnits = null;
   if (input.ask && b.answered) {
-    try { const qs = await deps.loadQuestions(input.hub); const q = (qs || []).find(x => x && x.id === input.ask.qid); if (q) question = questionText(q, input.ask).replace(/<(?=[A-Za-z\/!?])/g, "< "); }
+    try { const qs = await deps.loadQuestions(input.hub); let q = (qs || []).find(x => x && x.id === input.ask.qid); if (q && input.ask.w && deps.loadVariants) q = wordingOf(q, await deps.loadVariants(input.hub), input.ask.w); if (q) question = questionText(q, input.ask).replace(/<(?=[A-Za-z\/!?])/g, "< "); }
     catch (e) { log("questions", { error: String(e && e.message || e) }); }
     if (question) qUnits = { id: "Q", hub: input.hub, kind: "question", lec: "", text: question, go: { v: "bank", q: input.ask.qid }, label: "This question" };
   }

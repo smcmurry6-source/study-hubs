@@ -59,7 +59,7 @@
 
   /* ---------- what the shop knows ---------- */
   var S = { sb: null, visitor: null, shop: null, profile: null, onBought: null, roots: [], tick: 0 };
-  var SPOTS = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+  var SPOTS = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
   function take(sh){
     if (!sh || typeof sh !== "object" || !Array.isArray(sh.items) || !sh.wallet) return false;
     S.shop = sh;
@@ -108,8 +108,12 @@
   }
   function rarityOf(it){ return cap(String(it.rarity || "common").toLowerCase()); }
   function seasonOf(it){ var k = it.season || (TP.setOf(it.id) !== "rank" ? TP.setOf(it.id) : ""); return k && TP.SETS ? TP.SETS.seasons.filter(function(q){ return q.k === k; })[0] || null : null; }
-  /* a set's piece stands in its own set's scene; anything else on the hill */
-  function sceneFor(it){ var se = seasonOf(it), sc = se ? TP.SCENES.filter(function(q){ return q.set === se.k; })[0] : null; return sc ? sc.k : "hill"; }
+  /* a year-round collection's piece (sets.mjs COLLECTIONS: in the everyday rotation, never limited) */
+  function collOf(it){ var k = TP.collOf ? TP.collOf(it.id) : ""; return k && TP.SETS && TP.SETS.collections ? TP.SETS.collections.filter(function(q){ return q.k === k; })[0] || null : null; }
+  /* "· Halloween set" or "· Dino valley collection" after a piece's kind */
+  function setTag(it){ var se = seasonOf(it), co = se ? null : collOf(it); return se ? " · " + se.n + " set" : co ? " · " + co.n + " collection" : ""; }
+  /* a set's or a collection's piece stands in its own scene; anything else on the hill */
+  function sceneFor(it){ var se = seasonOf(it), co = se ? null : collOf(it), k = se ? se.k : co ? co.k : "", sc = k ? TP.SCENES.filter(function(q){ return q.set === k; })[0] : null; return sc ? sc.k : "hill"; }
   function img(svg, alt, cls){
     if (!svg) return "";
     if (!/xmlns=/.test(svg)) svg = svg.replace("<svg", '<svg xmlns="http://www.w3.org/2000/svg"');
@@ -287,7 +291,7 @@
         '<span class="tsh-showpiece k-' + star.kind + '">' + img(pic(star), "") + '</span><span class="tsh-showstand">' + img(SA.stand(r), "") + "</span>" +
         '<i class="tsh-showtw a"></i><i class="tsh-showtw b"></i><i class="tsh-showtw c"></i></div>' +
         '<div class="tsh-showinfo"><h' + lvl + ' class="tsh-showkick">Today’s showcase</h' + lvl + '><p class="tsh-showname">' + esc(ws.name) + "</p>" +
-        '<p class="tsh-itags">' + rarTag(r) + "<span>" + esc(ws.kind) + (se ? " · " + esc(se.n) + " set" : "") + "</span></p>" + (ws.note ? '<p class="tsh-showdesc">' + esc(ws.note) + ".</p>" : "") +
+        '<p class="tsh-itags">' + rarTag(r) + "<span>" + esc(ws.kind) + esc(setTag(star)) + "</span></p>" + (ws.note ? '<p class="tsh-showdesc">' + esc(ws.note) + ".</p>" : "") +
         '<div class="tsh-showbuy"><span class="tsh-big">' + coin() + '<b class="num">' + num(star.price) + '</b></span><button type="button" class="tsh-buy" data-shop="showcase" data-item="' + esc(star.id) + '" data-shelf="' + esc(star.shelf) + '">Take a closer look</button></div>' +
         '<p class="tsh-showwhen">' + IC.clock + esc(whenOf(star.shelf)) + "</p></div></section>";
     }
@@ -422,7 +426,7 @@
   function drawSheet(msg){
     if (!SH) return;
     var it = SH.it, r = rarityOf(it), w = words(it), se = seasonOf(it), st = stateOf(it), bal = balance(), d = does(it), done = SH.done;
-    var kind = w.kind + (se ? " · " + se.n + " set" : "") + (it.shelf === "throwback" ? " · Back for today" : "");
+    var kind = w.kind + setTag(it) + (it.shelf === "throwback" ? " · Back for today" : "");
     var buy;
     if (done) buy = doneHtml(it);
     else if (st.k === "owned") buy = '<p class="tsh-iown">' + IC.check + (it.gift ? "Yours: everyone has this set." : "Yours. It’s in your things at Timmy’s place for good.") + "</p>" + placeBtn(it);

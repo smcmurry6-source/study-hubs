@@ -93,6 +93,16 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   comes off with the narration ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)).
 - **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
   (`img/clinic-escape.webp`).
+- **Stage & Grade** (2026-11-17; Sam: "add an interactive visualization/game for staging and grading using all of the
+  criteria ... accessible on the home of perio hub, top of the question bank, and in the arcade"): one game in three places.
+  Its source is `tools/figures/perio/stagegame.js` + `stagegame.css`, built into `content/figures.js` (between the `stage:js`
+  markers) and `figures.css` by `node tools/figures/perio/build.mjs`; never edit the built copy. The bank shows it through
+  `SH_HUB.bank.cuspGame` (the hook Occlusion's cusp game uses: `CUSP_GAME` is `STAGE_GAME` here), Home through
+  `SH_HUB.home.links` (`#more/arcade/stage`), the arcade through `GAME_IMPL.stage` in `content/arcade.js` (game id `stage`,
+  whitelisted by migration_v64; its lobby drawing is `pStage()` in `tools/figures/site/arcade.mjs`). Its rules (`rules()`)
+  follow Session 1's notes and Review tables word for word; the generator avoids the class-vs-2018 disagreements (exactly
+  10 cigarettes, a light modifier on a Grade A ratio, a 6 mm pocket in a Stage 2 mouth) and cases on a cutoff; Explore
+  follows the 2018 table there and says so. A rule change in S1's notes means a change in `rules()` too.
 - **Kept as taught** after an outside fact check (2026-10-21), so don't "fix" them: molar-area CTG harvest, Kwok & Caton
   whole-dentition prognosis, stage regression only by regenerating the defect, clinic piezo can't root plane, lingual
   furcation entrance wider, Hamp as under 3 / over 3 mm / through (in class it was called "three millimeter increments").
@@ -114,6 +124,14 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   `pc-c2`), S9 the palate's layers, S4 the Glickman definitions and S5 reading one on a case, S5 the re-evaluation
   timing (`q5-R02`) with S4 the reason for it (`q4-L28`). New ids since the audit use `q<session>-F01`, `-F02`...
   Every emphasize hint has a question on its own point; the audit's note lists, by hint, which ones.
+  A second audit on 2026-11-17 ([its note](../tasks/done/2026-11-17-perio-final-hints-audit.md)) read the bank against the
+  final's hints and the 28 midterm check-ins: 111 fixed in place, `q3-20` and `q1-E03` retired, 8 new (the suture
+  materials, `q2-F04`-`F06`: the final asks the materials, not the techniques or pictures), 675.
+
+- **Every question with choices has a second wording** (`content/variants.json`, since 2026-11-18,
+  [task](../tasks/2026-11-17-reworded-question-variants.md)): a later try shows it. **When you edit a question, edit its
+  wording too** (same choices in the same order, a why for each); a new question can get one, or the build is fine without.
+  `node tools/hub-next/build.mjs` checks them.
 
 ## Diagram decisions
 

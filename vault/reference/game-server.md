@@ -100,6 +100,13 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   `tools/figures/site/sets.mjs` (generated from it; `xp.js` fails if they differ). The outfits that aren't drawn yet, the
   snacks are still drafts (`admin_upsert_shop_item` edits them); the boosts' prices were set from the class's earning rate
   in `migration_v62.sql`.
+  **`migration_v65.sql` adds 59 rows** (Sam, 2026-11-18: "Go crazy"; [the task](../tasks/2026-11-18-more-cosmetics.md)), to 240:
+  the six **year-round collections** (48 rows, `COLLECTIONS` in `sets.mjs`, exactly `allCollectionItems()`): eight pieces
+  each like a season's set (a Legendary home, an Epic scene, outfits Common to Rare, yard pieces Uncommon to Epic), but
+  with `season` null and `rotates`, so they are everyday pieces in the daily and weekly picks; five more **rare costumes**
+  (`COSTUMES` in `sets.mjs`, ten in all) and six more **paints**. No function changed: the rotation, `buy_item`,
+  `equip_item` and `get_my_shop` already handle any active row by its kind and slot. It is applied once its PR is live
+  (`supabase/pending-migrations.txt` until then), so the daily picks never show a piece before its drawing ships.
 - **A season's set** (Sam, 2026-11-10): 1 home and 1 scene (both Legendary) and a Rare, an Epic and a Legendary outfit and
   yard thing, 8 pieces, for each of fourteen seasons. `sh_shop_seasons(date)` gives every season whose set is on sale that
   Central day (several can be at once): Halloween in October; Thanksgiving from November 1 to the day after the fourth

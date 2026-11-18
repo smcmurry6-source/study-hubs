@@ -273,7 +273,8 @@ adoption, the introduction, "Tap me!", the dashboard's perch and his holiday out
 - **No request for it at page load**: the outfit's drawing is kept on the device, `sh_pet_outfit` = `{ id, back, face,
   top, say }` (`say`: its lines, when the place handed them over). When the server's id isn't the kept one (another
   device changed it, or this is a new device), `widget/hub-art/outfits.js` is fetched after the first scroll, wheel, tap
-  or key (never with the page: the request budgets), and until then he wears nothing rather than the wrong thing. The
+  or key (never with the page: the request budgets), and with it, for a costume or a set's outfit, the file `where` names
+  (`widget/hub-art/outfits/costumes.js`, `seasons.js` or `collections.js`, since 2026-11-18), and until then he wears nothing rather than the wrong thing. The
   shop's outfits and the place's kit are used first when they're on the page, so a piece redrawn later reaches the kept
   copy.
 - **Changing it**: `shPet.setOutfit(id, parts)` puts it on at once. `widget/place.js` calls it whenever its outfit slot

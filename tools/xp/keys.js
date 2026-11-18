@@ -7,8 +7,9 @@
 //                                                  environment, never printed: vault/rules/secrets.md); prints the count
 //   node tools/xp/keys.js <hub> --file <questions.json>   another content file (default hubs/<hub>/content/questions.json)
 // Each key: { id, v, kind, answer, counted }. kind: "one" (mcq: the right choice's authored index), "all" (multi: the
-// right choices), "order" (sequence: the steps 0..n-1 in their right order), "self" (match and recall cards, graded by the
-// student). v is the question's version as the page reports it (question health's fingerprint of the exported question,
+// right choices), "order" (sequence: the steps 0..n-1 in their right order; match since 2026-11-17: row k's partner is
+// row k's own, so the page sends each row's first pick and a right answer reads 0..n-1), "self" (recall cards, graded
+// by the student). v is the question's version as the page reports it (question health's fingerprint of the exported question,
 // widget/qhealth.js fp() over widget/hub.js exportQuestions()), so a page cached before an edit is graded against the key
 // it showed. counted: false for a question kept out of the hub's mastery (a content field `counted: false`). Ids marked
 // "retired" in tools/question-ids/<hub>.txt come last as { id, retired: true }.
@@ -40,6 +41,7 @@ function keyFor(q){
   if (q.type === 'mcq') Object.assign(k, { kind: 'one', answer: [q.answer] });
   else if (q.type === 'multi') Object.assign(k, { kind: 'all', answer: q.correct.slice().sort((a, b) => a - b) });
   else if (q.type === 'sequence') Object.assign(k, { kind: 'order', answer: q.steps.map((s, i) => i) });
+  else if (q.type === 'match' && Array.isArray(q.pairs) && q.pairs.length >= 2 && q.pairs.length <= 20) Object.assign(k, { kind: 'order', answer: q.pairs.map((p, i) => i) });
   else Object.assign(k, { kind: 'self', answer: [] });
   k.counted = q.counted !== false;
   return k;

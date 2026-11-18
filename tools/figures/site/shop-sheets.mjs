@@ -5,7 +5,7 @@
    Writes each sheet twice, on the light page and on the dark one (deviceScaleFactor 2):
      shop-shelf-{light,dark}.png     the Shiny Gold Crown at 16, 24 and 48 px, the four snacks and two boosts, and one
                                      sample card in each of the five rarity frames (shop.mjs);
-     shop-outfits-{light,dark}.png   the five everyday outfits and the five rare costumes on Timmy, large, and each
+     shop-outfits-{light,dark}.png   the five everyday outfits and every rare costume on Timmy, large, and each
                                      again with the Loupes journey's loupes (place.mjs: OUTFITS, NO_LOUPES);
      shop-homes-{light,dark}.png     every home (the everyday ones and each set's) as the card draws it: Timmy at the
                                      door, the statue at Dark Matter on three steps and again as the ModuPro on its
@@ -23,11 +23,12 @@ const here = path.dirname(fileURLToPath(import.meta.url)), root = path.resolve(h
 const [outDir = ".", only = ""] = process.argv.slice(2);
 let chromium; try { ({ chromium } = createRequire(import.meta.url)("playwright")); } catch (e) { ({ chromium } = createRequire("/opt/node-tools/")("playwright")); }
 const bust = "?t=" + Date.now(), imp = (f) => import(pathToFileURL(path.join(here, f)).href + bust);
-const { INK, C } = await imp("style.mjs"), { placeKit } = await imp("place.mjs"), { SEASONS, RANKS } = await imp("sets.mjs");
+const { INK, C } = await imp("style.mjs"), { placeKit } = await imp("place.mjs"), { SEASONS, RANKS, COLLECTIONS } = await imp("sets.mjs");
 let shopKit = null; try { ({ shopKit } = await imp("shop.mjs")); } catch (e) { if (e.code !== "ERR_MODULE_NOT_FOUND") throw e; }
-const SETS = { seasons: SEASONS.map((s) => ({ k: s.k, n: s.n, when: s.when, gift: !!s.gift, items: s.items })), ranks: RANKS };
+const SETS = { seasons: SEASONS.map((s) => ({ k: s.k, n: s.n, when: s.when, gift: !!s.gift, items: s.items })), ranks: RANKS,
+  collections: COLLECTIONS.map((s) => ({ k: s.k, n: s.n, note: s.note, items: s.items })) };
 const PACKS = [];
-for (const k of SEASONS.map((s) => s.k).concat(["ranks"])) { const f = path.join(here, "packs", k + ".mjs"); if (fs.existsSync(f)) PACKS.push((await imp("packs/" + k + ".mjs")).pack); }
+for (const k of SEASONS.map((s) => s.k).concat(["ranks"], COLLECTIONS.map((s) => s.k))) { const f = path.join(here, "packs", k + ".mjs"); if (fs.existsSync(f)) PACKS.push((await imp("packs/" + k + ".mjs")).pack); }
 const K = placeKit(INK, C, PACKS, SETS), SHOP = shopKit ? shopKit(INK, C) : null;
 const art = JSON.parse(fs.readFileSync(path.join(root, "tools/preview/design/art.js"), "utf8").replace(/^[\s\S]*?window\.SH_ART = /, "").replace(/;\s*$/, ""));
 const timmy = (art.timmy.moods.find((m) => m.k === "happy") || art.timmy.moods[0]).svg;
@@ -52,14 +53,15 @@ if (SHOP) sheets.shelf = () => {
   }).join("");
   return `<h1>The shop's shelf art</h1><h2>The Shiny Gold Crown, beside a number</h2><div class="row coins">${coins}</div><h2>Always on the shelf: four snacks, two boosts</h2><div class="row items">${items}</div><h2>A card in each rarity's frame</h2><div class="row cards">${cards}</div>`;
 };
-/* (b) the ten outfits, large, and each again with loupes */
+/* (b) the five everyday outfits and every rare costume, large, and each again with loupes */
 sheets.outfits = () => {
-  const want = ["scrub-cap", "bow-tie", "safety-glasses", "white-coat", "graduation-cap", "pirate", "astronaut", "detective", "chef", "captain-enamel"];
+  const want = ["scrub-cap", "bow-tie", "safety-glasses", "white-coat", "graduation-cap"].concat(K.OUTFITS.filter((o) => o.costume).map((o) => o.k));
   const list = want.map((k) => K.OUTFITS.find((o) => o.k === k)).filter(Boolean);
-  if (!list.length) return "<h1>The ten outfits</h1><p>None drawn yet.</p>";
+  if (!list.length) return "<h1>The outfits</h1><p>None drawn yet.</p>";
   const cell = (o, lp) => `<figure><div class="tim">${big(o.k, lp ? { loupes: 4 } : null)}</div><figcaption><b>${esc(o.n)}</b><span>${o.costume ? "Rare costume" : "Everyday outfit"} · ${esc(o.rarity)} · ${price(o.price)}</span>${lp ? `<span>${K.NO_LOUPES.indexOf(o.k) < 0 ? "with the loupes (Gold)" : "its own eyewear: no loupes"}</span>` : ""}</figcaption></figure>`;
   const half = (a, title) => `<h2>${title}</h2><div class="row tims">${a.map((o) => cell(o, false)).join("")}</div><div class="row tims">${a.map((o) => cell(o, true)).join("")}</div>`;
-  return "<h1>Ten outfits on Timmy</h1>" + half(list.filter((o) => !o.costume), "Five everyday outfits, then the same in the Loupes journey") + half(list.filter((o) => o.costume), "Five rare costumes, then the same in the Loupes journey");
+  const rare = list.filter((o) => o.costume);
+  return "<h1>" + list.length + " outfits on Timmy</h1>" + half(list.filter((o) => !o.costume), "Five everyday outfits, then the same in the Loupes journey") + half(rare, rare.length + " rare costumes, then the same in the Loupes journey");
 };
 /* (c) every home as the card draws it, Timmy at the door, each beside a close-up of the door */
 sheets.homes = () => {
