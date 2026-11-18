@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on: Sam, for the compute size
 agent:
-pr:
+pr: https://github.com/smcmurry6-source/study-hubs/pull/421
 ---
 
 # Keep heavy queries from failing students' answer saves
@@ -53,6 +53,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
 
 ## Log
 
-- 2026-11-18: written, with the admin page's one-lane loading, the answer retries and the A/B versions page.
+- 2026-11-18: written, with the admin page's one-lane loading, the answer retries and the A/B versions page
+  ([#421](https://github.com/smcmurry6-source/study-hubs/pull/421)).
 
 ## Outcome
