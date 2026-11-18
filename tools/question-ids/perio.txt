@@ -295,7 +295,7 @@ q5-L10
 q5-L11
 q5-L12
 q5-L13
-q5-L14
+q5-L14 retired
 q5-L15
 q5-L16
 q5-L17

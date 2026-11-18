@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-11-17** (data read 8:40 am Central; Occlusion archived after its final on 11-16: its retrospective is below). Sam
+**Last refreshed: 2026-11-18** (data read 9:15 am Central; Perio's final is tomorrow; the game economy is read too, Sam's rule since today). Sam
 runs the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and suggestions
 and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -90,40 +90,73 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-11-17 (data read 8:40 am Central).** "Since" = the 11-15 audit (data read 6 pm, the eve of the Occlusion final). **Occlusion
-archived** at 10 pm on 11-16, after its final: its retrospective is below, its recap went on the dashboard this morning, and its
-narration and Timmy Time came off the site (the site went from about 640 MB to 427 MB). Live hubs: **Perio** (final Thu 11-19,
-cumulative) and **Heme & Endo Exam 3** (exam Fri 11-20; opened 11-16, 6 people so far, nothing to read yet). Data quality
-(`sh_data_quality()`): no test rows; 103 overcounted minutes over 14 visitor-hours; the usual counter drift (Occlusion 49,515 stats vs
-49,613 answers). Closed since the last audit: `sh_surface()` now places the redesign's sections, Learn and Flashcards included
-(`migration_v59.sql`, #381). Still open on the [inbox](vault/tasks/inbox.md): the redesign's bank doesn't send `bank:retry-shown`
-(the 11-14 to 11-16 rows, 20 people and then 2-3, come from cached old pages).
+**2026-11-18 (data read 9:15 am Central).** "Since" = the 11-17 audit (8:40 am). Live hubs: **Perio** (final Thu 11-19, cumulative:
+tomorrow) and **Heme & Endo Exam 3** (exam Fri 11-20, 8 am). Nothing archived since. Data quality (`sh_data_quality()`): no test rows;
+103 overcounted minutes over 15 visitor-hours; the usual counter drift (PCD Implants 24,912 stats vs 25,392 answers, Occlusion 49,515 vs
+49,613). Shipped since the last audit: Perio's questions come back reworded from a question's second try (#405, 651 wordings), Perio's
+bank audit against the final's hints and its Stage & Grade game (#402), Link my devices beside every name (#406), Heme & Endo Exam 3's
+L19 and L20 as taught (#404), the cosmetics (#409; `migration_v65` is live, 240 shop rows), and on the database, ahead of its still-open
+PR #403, its crowns migration (written as v64, renamed v66 on its branch; `main`'s `migration_v66.sql` is #408's choice versions): studying pays 5 crowns per 10 XP (was 1), 100 crowns an hour of hub time, and a list of new prizes
+("The game economy", below).
 
-**Student voice since the last audit:** 8 reports, all on 11-15/16: Perio #44 (fixed: `q7-07` retired, #380); Occlusion #45-#48
-(fixed and answered on 11-16, #382: the figures' letter pins were black dots in dark mode, `mo-orth-occ` had two choices that were
-the same words swapped, `nc-tf-4` reworded); Occlusion **#49-#52 left open by Sam's call** ("dont worry about any of occclusions open
-reports since the exam is over", [decisions](vault/decisions.md)). For the record: #49 (`fig-hor-d`, "nothing is labelled D") came in
-before #382 restored the pins, so it is the same bug, already fixed; #50 and #51 are the two Miller scales Sam settled on 11-15 (the L7
-handout's grading for `mo-miller2`); #52 (a Timmy-drafted report) asks where N8.25's "most of the time patients have their teeth
-apart" comes from, which this audit couldn't check without the slides. Check-ins: 3 for the Occlusion final (its retrospective), 7
-more for Heme & Endo Exam 2 (n = 21 now: About right 17), 1 late one for the Occlusion midterm (n = 19). No survey answers; 3 searches.
+**Student voice since the last audit:** 8 reports and 1 suggestion, all Perio. Fixed in this audit: #54 (`q7-P01` asked what Dr. Kaur
+decided in class; it now asks which category fits the case) and #59 (`q4-L27`'s "re-check" read as the 4-6 week Phase I evaluation; the
+item now says it is the next evaluation after calculus found there is removed). Answered: #57 (`q4-39` is High likelihood because of the
+S4 deck's "Don't Forget!!! ... Finger Rest" slide, though in class she deferred finger rests to PCD). For Sam: #55 and #56 ask that a
+statement item reorder its statements on a retry, so "1, 2 and 4" can't be remembered (the new wordings reword but keep the order).
+Also fixed: #60 (`q7-01`, after the audit: the key was right, but its explanation now gives both of Albrektsson's bone-loss limits,
+1.5 mm or less in the first year, then under 0.2 mm a year). Sam said yes to #55/#56's reorder and #57's "why" chip (2026-11-18).
+Already closed: #53, #58 (#406), suggestion #16. **The check-in reward works**: 30 check-ins since the last audit (the day before, 8),
+after the 1,000 XP and 1,000 crowns reward went up on 11-17. The Occlusion final went from 3 to 22 (below, its retrospective), Heme &
+Endo Exam 2 to 23, the Occlusion midterm to 24. They still speak for heavy users (median 775 minutes in the hub for the Occlusion final's).
+The survey "How's the new look?" has 14 answers: 4.5 of 5 on average; most liked Timmy's place and the shop (8), Ask Timmy (7), the daily
+ring and XP (6); Ask Timmy "somewhat helpful" 6, "very helpful" 3, not tried 3. Two searches.
 
-**Did the last refresh work?** It changed nothing (the eve of the Occlusion final), so there is nothing to measure. The fixes from
-Sam's 11-16 report session (#382) went live the day of the final: too late and too few tries to read.
+**Did the last refresh work?** It changed nothing (nothing to measure). Perio's #402 audit and #405 wordings went live on 11-17/18, too
+late to read before the final.
 
 **Per hub:**
-- **Perio** (final Thu 11-19): picking up as Occlusion ended: **11-16 30 people, 1,076 min** (its most since the midterm; 11-15 15
-  people, 673 min), 11-17 13 people by 8:40 am. Since the last audit, notes 758 min (20 people) and the bank 747 (16): the notes lead
-  three days out, as they did in PCD Implants and Heme & Endo Exam 2. Practice is lopsided toward the latest sessions so far (S5 586
-  answers from 10 people, S9 462 from 7; S1-S4 under 100 each): the class reviewed the early sessions for the midterm, so expect the
-  lag to close by the eve. First tries since the bank audit 83% (S8 and S9 74-75%, the newest). Question health's leads, each checked
-  against the notes: `q9-L09` (6 of 10 first tries picked "Trauma"; the lecture's "the key word here is inflammation", and the why
-  addresses trauma), `q9-L26` (7 of 10 picked "A CTG has no connective tissue to induce keratinization", a keyword trap; its why says a
-  CTG is all connective tissue), `q5-S04`, `q8-S01` and `q8-03` (all match the notes, read 11-15). Ten first tries is too few to act
-  on two days out: **nothing changed**. Read them again after the final.
-- **Heme & Endo Exam 3** (exam Fri 11-20, 8 am): 6 people, 7 minutes since it opened on 11-16. Its figures and L17-L20's High yield
-  narration wait in [their task](vault/tasks/done/2026-11-16-heme-endo-exam3-figures.md), and L19-L22 in
-  [theirs](vault/tasks/2026-11-16-heme-endo-exam3-l19-l22.md). Exam 2's curve says the class arrives three to four days out (11-16/17).
+- **Perio** (final Thu 11-19): **11-17 68 people, 6,114 minutes**, its biggest day ever (the midterm eve had 57 people, about 91 h); 11-18
+  25 people by 9:15 am. Since the last audit: bank 3,414 min (47 people), notes 2,196 (46), Exam Hints 226, the drill 210, the cram 144
+  (5 people), the mock 58 (2 people, 80%). 6,868 answers from 51 people, first tries 77%. **S1-S4 are still the least practiced and the
+  least right** (S2 130 answers from 10 people, 57% on first tries; S3 101 from 8, 59%; S5 2,089 from 38, 80%): the final takes about
+  15% from them (the mock's `midShare`), so it matters less than it looks, but the eve's crowd should get the hint. Fixed here, from
+  question health and the notes: **`q5-L14` retired** (the share of furcation entrances under 1 mm: S5's note says entrance width won't
+  be on the final, from Dr. Abou-Arraj's email; its High Likelihood topic now reads "narrower than a curette's blade, so hard to
+  instrument", with `q5-L13`, and S5's High yield was recorded again); **`pc-d3`'s stem states its assumption** ("which does her history
+  rule out?" for "least suited": 22% on 23 first tries, 8% of the stronger half, most of them picking extraction, defensible for a
+  savable Class II). Checked and left as they are (keys match the notes): `q7-T08` (71% said mobility is common from peri-implantitis;
+  the notes say rare), `q6-L38` (79% picked walls over depth in Nibali 2021), `q9-L09`, `q9-L26`, `q5-S04`, `q8-03`, `q9-S07`, `q9-L41`,
+  `q7-L27`, `q7-L43`, `q8-P02`, `q9-L38`. Read them again after the final.
+- **Heme & Endo Exam 3** (exam Fri 11-20, 8 am): 11-17 20 people, 98 minutes (13 under 5 minutes): the class arrives 3-4 days out, so
+  11-17 to 11-19 decide it. 121 answers, 83%. Nothing to fix yet; L21-L22 wait in [their task](vault/tasks/2026-11-16-heme-endo-exam3-l19-l22.md).
+
+**The game economy** (Sam's standing rule since 2026-11-18, [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md);
+`tools/economy.sql`, read over 11-15 to 11-18 with today's rules). Skews: the rate rose on 11-17/18 and was **back-paid from all past XP
+and hub time**, and the new prizes started today, so read it again next audit before acting.
+- **Earning:** the median study day earns **about 700 crowns** (25th percentile 290, 75th 1,350, 90th 2,000; 186 study days from 80
+  people): about 500 from study XP, 180 from hub time; the new prizes add little yet. At the old rate (1 per 10 XP) the same day paid
+  about 100. Per hour of study: about 370 crowns and 650 XP. The class's rhythm: the median student has 6 study days in four weeks (75th
+  percentile 13, 90th 16).
+- **The ladder in median study days:** Common (100-180) 0.1-0.3, Uncommon (250-450) 0.4-0.6, Rare (700-1,200) 1.0-1.7, Epic
+  (1,500-2,800) 2.1-4.0, Legendary (4,000-8,000) 5.7-11.5. Against the yardstick (Rare 2-4, Epic 5-10, Legendary 10-20) everything under
+  Legendary is two to three times too cheap, and Legendary sits at its low edge. **Before the raise it was the other way round**: at 100
+  a day an Epic took 15-28 study days and a Legendary 40-80 (most of a year for the median student).
+- **Wallets** (76 people who studied since the release): median **7,900 crowns**; half (38) could buy the shop's priciest piece today,
+  53 hold 4,000+, 71 hold 1,500+, 2 hold under 500. Only 13 have ever bought anything, and **4% of all crowns earned has been spent**
+  (27 people opened the shop since 11-14; 32 opened their place, 24 customized it). Signs seen: **too fast** (the median wallet buys
+  anything) and **hoarding**; not "nothing to want" (the catalog is 506,000 crowns, the everyday rotation alone 148,000).
+- **XP and ranks look healthy:** a median study day earns about 1,120 XP; 34 of the 76 moved up a rank since the release, most stand at
+  ranks 2-4 of the Handpiece, none past rank 5; at the median pace the Handpiece's end is more than a year away. Watch the big one-time
+  prizes (a nuke 10,000 XP and crowns, the all-time streak 20,000, a 100-day streak 5,000): each is weeks of a median student's earning.
+- **The leaderboards** (E7a, totals): 50 names on the boards. The rank board's top ten hold 19,900-29,000 XP against its
+  middle half's 9,800-19,100 (median 14,700); the leaders stand at rank 5 of the Handpiece, whose end is 125,000 XP: about 45 study
+  days away at a heavy studier's pace. 42 of the 50 keep a study streak of 3+ days, 8 of 7+. Arcade boards with 5+ players: seven,
+  MSK 3's Sort the busiest (9 people).
+- **Read again at 15:50 (11-18):** 77 people, median wallet 7,700; 15 have bought something, 36 purchases, 49,440 crowns: **7% of
+  everything earned** (this morning 4%), most of it today on a few Legendary homes and scenes, the back pay being spent.
+- **Sam's call (2026-11-18): "lets keep all the prices for now".** No re-pricing; the earning rate stays too. The next audit reads
+  it again with the back pay spent and the prizes in, and says whether the too-fast and hoarding signs still hold.
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order
@@ -238,7 +271,8 @@ Sam's 11-16 report session (#382) went live the day of the final: too late and t
   Hub was harder a couple, none "different"; the Occlusion midterm stood at 18 check-ins by 11-11 (About right 9, different 7, easier 2). Statement formats are the hardest in its
   bank (two-statement 73%, numbered 75%, true/false 84%, plain MCQ 83%): keep them, they are where the practice is.
 - **The exam is harder than the hub, and case questions matter.** GI Exam 2 check-ins: 2 of 4 said the hub was
-  easier than the exam, and one said it missed "patient box style questions". Every new hub gets case-based
+  easier than the exam, and one said it missed "patient box style questions". The Occlusion final (n = 22): **10 said the hub was
+  easier**, 7 that it went worse than expected, though nobody said the formats were missing any more. Every new hub gets case-based
   (Patient Box) questions from the start and some harder two-step items, not only one-fact recall.
 
 - **Draw a figure the way the professor's slide draws it.** A view can be correct and still the opposite of the slide:
@@ -301,6 +335,9 @@ Sam's 11-16 report session (#382) went live the day of the final: too late and t
 - **Check-ins and surveys speak for the heavy users.** Every check-in group so far studied several times its hub's median
   (GI 2: respondents' median 177 minutes against 29 for everyone; PCD Implants: 361 against 199, n = 5; Heme & Endo Exam 2: 475 against 169, n = 14), and 169 of 190 people shown a survey said "No thanks"
   (to 11-04). Read "About right" next to the use data, never as the class's verdict; the people who bounced aren't in it.
+  **A reward brings many more, from the same people**: after the check-in and survey reward went up (1,000 XP and 1,000 crowns,
+  11-17), 30 check-ins came in a day against 8 the day before (the Occlusion final 3 -> 22), and their median was still 775 minutes in
+  the hub. Advertise the reward; still read the answers as the heavy users'.
 - **People decline a tour offered on arrival, but finish one they choose.** Dashboard tour: 12 of 97 shown the prompt
   started it, 8 finished; hub tours 11 of 118, 9 finished (10-21 to 11-04). Teach a feature where it's used (a one-line
   tip), and keep the full tour in the menu.
@@ -485,9 +522,12 @@ started, 9 finished a round; Flashcards 4; **Ask Timmy** opened by 31, 17 sent a
 Plain English 9; Listen 8 people (about 420 min); "Find this in the notes" shown to 70 after a miss, opened by about 20. Figures: the
 mounting-error, Sci-Rec and Bennett figures were each seen by 41-45 people. Plaque bosses: 83 met one.
 
-Check-ins for the final, **n = 3** by the morning after (later ones go into the next audit), all heavy users (507-798 min, 260-1,570
-answers): About right 1, Hub was easier 1, Exam asked different things 1; went better 1, **worse 2**; readiness 2-3. Nothing written.
-Too few to read; the midterm's took weeks to reach 19. Reports during the final: 12 (#39-#52), no suggestions; the last four, on exam day
+Check-ins for the final, **n = 22** by 11-18 (3 the morning after; the 1,000 XP and crowns reward brought the rest within a day):
+**Hub was easier 10**, About right 8, Exam asked different things 4; went worse than expected 7, about as expected 12, better 2;
+readiness 3.5 of 5 on average (Heme & Endo Exam 2's: 3.9). Still heavy users (median 775 minutes; the "easier" group 618, "different"
+1,005). One wrote "nothing! the questions were very comparable." **The most "Hub was easier" answers of any hub so far**: Dr. Givan's
+final asked harder than the bank, even after the midterm's formats gap was closed (no one said the formats were missing). Later
+check-ins go into the next audit. Reports during the final: 12 (#39-#52), no suggestions; the last four, on exam day
 (#49-#52), were left open by Sam's call once the exam was over.
 
 What changes because of it: (1) **for an evening exam, exam day is the eve**: Home's exam-day view, the drill and the cram sheet are

@@ -111,6 +111,9 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   (`COSTUMES` in `sets.mjs`, ten in all) and six more **paints**. No function changed: the rotation, `buy_item`,
   `equip_item` and `get_my_shop` already handle any active row by its kind and slot. It is applied once its PR is live
   (`supabase/pending-migrations.txt` until then), so the daily picks never show a piece before its drawing ships.
+- **Whether the rates and prices are healthy**: every lessons audit reads them in study days (`tools/economy.sql`)
+  against [earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md), Sam's standing rule (2026-11-18); read it
+  before changing a rate, a prize or a price.
 - **A season's set** (Sam, 2026-11-10): 1 home and 1 scene (both Legendary) and a Rare, an Epic and a Legendary outfit and
   yard thing, 8 pieces, for each of fourteen seasons. `sh_shop_seasons(date)` gives every season whose set is on sale that
   Central day (several can be at once): Halloween in October; Thanksgiving from November 1 to the day after the fourth
