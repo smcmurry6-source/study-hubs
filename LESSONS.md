@@ -95,8 +95,8 @@ tomorrow) and **Heme & Endo Exam 3** (exam Fri 11-20, 8 am). Nothing archived si
 103 overcounted minutes over 15 visitor-hours; the usual counter drift (PCD Implants 24,912 stats vs 25,392 answers, Occlusion 49,515 vs
 49,613). Shipped since the last audit: Perio's questions come back reworded from a question's second try (#405, 651 wordings), Perio's
 bank audit against the final's hints and its Stage & Grade game (#402), Link my devices beside every name (#406), Heme & Endo Exam 3's
-L19 and L20 as taught (#404), the cosmetics (#409; `migration_v65` is live, 240 shop rows), and on the database, ahead of its still-open
-PR #403, its crowns migration (written as v64, renamed v66 on its branch; `main`'s `migration_v66.sql` is #408's choice versions): studying pays 5 crowns per 10 XP (was 1), 100 crowns an hour of hub time, and a list of new prizes
+L19 and L20 as taught (#404), the cosmetics (#409; `migration_v65` is live, 240 shop rows), and #403's crowns migration (live on the
+database first, merged 11-18 as `migration_v68.sql` and `v69`): studying pays 5 crowns per 10 XP (was 1), 100 crowns an hour of hub time, and a list of new prizes
 ("The game economy", below).
 
 **Student voice since the last audit:** 8 reports and 1 suggestion, all Perio. Fixed in this audit: #54 (`q7-P01` asked what Dr. Kaur

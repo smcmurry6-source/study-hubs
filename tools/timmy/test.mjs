@@ -398,6 +398,26 @@ notes.forEach(n => console.log("  " + n));
   eq(T.wordingOf(q, null, 1).stem, "Original?", "wordingOf: no file, the original");
   eq(T.wordingOf(q, { x1: { stem: "R", choices: ["only one"] } }, 1).choices, ["A", "B"], "wordingOf: choices of another length are ignored");
 }
+/* a statement item in the order the student saw it (widget/statements.js renumbers it on a later try; the card sends the
+   order as ask.o; tools/ci/statements.js checks inOrder() against the page's copy on every item of every hub) */
+{
+  const q = { id: "n1", type: "mcq", fmt: "numbered", stem: "Which are true?\n1. A\n2. B\n3. C\n4. D", choices: ["1 and 2 only", "1, 2 and 3", "1, 3 and 4", "2 and 4 only"], answer: 2,
+    why: ["It leaves out 3, which is true: c.", "It includes 2, which is false: b.", "Statements 1, 3 and 4 are true. Statement 2 is false: b.", "It includes 2, which is false: b. It leaves out 1, which is true: a."], ex: "Statement 2 is false." };
+  const r = T.inOrder(q, "4123");   /* shown 1 is D, 2 is A, 3 is B, 4 is C */
+  eq(r.stem, "Which are true?\n1. D\n2. A\n3. B\n4. C", "inOrder: the statements in the order shown, renumbered");
+  eq(r.choices, ["2 and 3 only", "2, 3 and 4", "1, 2 and 4", "1 and 3 only"], "inOrder: each choice names the same statements by their new numbers");
+  eq(r.answer, 2, "inOrder: the key is the same choice");
+  eq(r.why[2], "Statements 1, 2 and 4 are true. Statement 3 is false: b.", "inOrder: the whys renumbered");
+  eq(r.why[3], "It includes 3, which is false: b. It leaves out 2, which is true: a.", "inOrder: 'It includes' and 'It leaves out' renumbered");
+  eq(r.ex, "Statement 3 is false.", "inOrder: the explanation renumbered");
+  ok(T.inOrder(q, "1234") === q && T.inOrder(q, "123") === q && T.inOrder(q, "1123") === q, "inOrder: its own order, a short one or one that repeats leaves the item as it is");
+  ok(T.inOrder({ ...q, fmt: "except" }, "4123").stem === q.stem, "inOrder: not a statement item, as it is");
+  const two = { id: "t1", type: "mcq", fmt: "2stmt", stem: "Read the two statements.\n1. X\n2. Y", choices: ["Both statements are true", "Both statements are false", "Statement 1 is true; statement 2 is false", "Statement 1 is false; statement 2 is true"], answer: 2, why: ["Statement 2 is false.", "Statement 1 is true.", "Right.", "Statement 1 is true, not false."] };
+  const t = T.inOrder(two, "21");
+  eq([t.stem, t.choices[2], t.choices[3], t.why[0]], ["Read the two statements.\n1. Y\n2. X", "Statement 1 is false; statement 2 is true", "Statement 1 is true; statement 2 is false", "Statement 1 is false."], "inOrder: a two-statement item swapped, its choices relabeled");
+  eq(T.readInput(Object.assign({}, base, { ask: { qid: "q", o: "4123" } })).ask.o, "4123", "the order on screen is read");
+  eq(T.readInput(Object.assign({}, base, { ask: { qid: "q", o: "41a3" } })).ask.o, undefined, "an order that isn't digits 1-5 is dropped");
+}
 console.log(`  ${checks} checks`);
 if (problems.length) { console.error(`\n✗ Ask Timmy's function: ${problems.length} problem(s):\n` + problems.map(p => "  - " + p).join("\n")); process.exit(1); }
 console.log(pw ? "\n✓ Ask Timmy's function (core.js with a fake model and database) passed" : "\n✓ Ask Timmy's function passed (paragraph addresses against Chromium blocked: no Playwright)");

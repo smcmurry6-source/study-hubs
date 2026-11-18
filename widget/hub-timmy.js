@@ -228,7 +228,9 @@
       : q.type === "multi" ? "Why are those the right ones?" : q.type === "sequence" ? "Why does it go in that order?"
       : q.type === "match" ? "Can you explain these matches?" : "Can you explain this one?";
     var ask = { qid: q.id, right: q.type === "recall" ? null : !!right, picks: q.type === "mcq" || q.type === "multi" ? (picks || []).slice() : [],
-      label: String(q.stem || "").replace(/\s+/g, " ").trim(), w: q._w || 0 };   /* w: the wording on screen (widget/hub.js worded()) */
+      label: String(q.stem || "").replace(/\s+/g, " ").trim(), w: q._w || 0, o: q._perm ? q._perm.join("") : "" };
+    /* w: the wording on screen (widget/hub.js worded()); o: a statement item's order on screen (widget/statements.js),
+       shown statement j being the item's statement o[j - 1], so Timmy numbers the statements the way the student saw them */
     askReady().then(function(A){ if (A) A.open({ from: "card", text: text, ask: ask }); else HX.toast("The chat didn't load. Try again in a moment."); },
       function(){ HX.toast("The chat didn't load. Check your connection and try again."); });
   }

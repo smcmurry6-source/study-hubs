@@ -32,7 +32,10 @@ there and in [decisions](../decisions.md)); **deployed and applied at [the redes
    - `context`: `{ view: SH_SECTION(), lec, k }` (a view with `mock` in it gets "paused" without calling anything);
    - `ask` (Ask Timmy on a question card, after answering): `{ qid, right, picks }`, picks in **authored** order. The
      question's stem, key and whys are read from the hub's own `questions.json`, and only if the database has this
-     visitor's answer to it (`personal_answers`), so the browser can't fish for a key;
+     visitor's answer to it (`personal_answers`), so the browser can't fish for a key. `w` is the version on screen
+     (`variants.json`), and `o` (since 2026-11-18) a statement item's order on screen, "3142" for shown statements 3, 1, 4,
+     2 (`widget/statements.js`): `inOrder()` renumbers the stem, choices, whys and explanation the same way, so Timmy calls a
+     statement by the student's number (`tools/ci/statements.js` checks it matches the page's on every item);
    - `progress` ("What should I study tonight?"): `{ lectures: [{ hub, lec, questions, answered, right, missed,
      notes_done }], answered_today, drill_today }`, worked out in the browser from the student's own answers.
 2. `timmy_begin` checks the limits, stores the question and returns the last 10 messages (the exact turn sent and the

@@ -356,6 +356,8 @@ export function readInput(b){
       picks: Array.isArray(a.picks) ? a.picks.filter(p => Number.isInteger(p) && p >= 0 && p < 40).slice(0, 12) : [] };
     // the wording the card showed (1 = the hub's first extra wording, content/variants.json); 0 or none, the original
     if (Number.isInteger(a.w) && a.w > 0 && a.w < 10) input.ask.w = a.w;
+    // a statement item's order on screen ("3142": shown statement j is the item's statement 3, 1, 4, 2), checked by inOrder()
+    if (typeof a.o === "string" && /^[1-5]{2,5}$/.test(a.o)) input.ask.o = a.o;
   }
   const p = b.progress;
   if (p && typeof p === "object") {
@@ -370,7 +372,7 @@ export function readInput(b){
 export function savedContext(input, corpora){
   return { view: input.context.view || null, lec: input.context.lec || null, k: input.context.k, voice: input.voice,
     hubs: input.hub === "dashboard" ? corpora.map(c => c.hub) : undefined,
-    ask: input.ask ? { qid: input.ask.qid, right: input.ask.right, picks: input.ask.picks, w: input.ask.w || undefined } : undefined,
+    ask: input.ask ? { qid: input.ask.qid, right: input.ask.right, picks: input.ask.picks, w: input.ask.w || undefined, o: input.ask.o || undefined } : undefined,
     progress: input.progress ? { lectures: input.progress.lectures.length } : undefined };
 }
 /* the wording the student saw: the hub's variants.json ({ id: { stem, choices, why[, ex] } or a list}), w = 1 the first
@@ -385,6 +387,57 @@ export function wordingOf(q, variants, w){
   if (Array.isArray(v.why)) o.why = v.why;
   if (typeof v.ex === "string") o.ex = v.ex;
   return o;
+}
+/* a statement item in the order the student saw it (Sam, 2026-11-18: statement items come back renumbered on a later try,
+   widget/statements.js): o "3142" means shown statement j is the item's statement o[j - 1]. The stem, the choices, the whys
+   and the explanation are renumbered the same way, so Timmy calls a statement by the number on the student's screen.
+   tools/ci/statements.js checks it gives exactly what widget/statements.js gives, for every item and every order. */
+const ST_LIST = "\\d(?:\\s*,\\s*\\d)*(?:,?\\s+(?:and|or)\\s+\\d)?";
+const ST_REF = new RegExp("\\b([Ss]tatements?\\s+)(" + ST_LIST + ")\\b", "g");
+const ST_VERB = new RegExp("\\b([Ii]t\\s+(?:also\\s+)?(?:includes|leaves out|misses|takes in|adds|drops|omits|skips|keeps)\\s+)(" + ST_LIST + ")(?=[,:;.\\s]|$)", "g");
+const ST_BARE = new RegExp("(^|[.;:!?]\\s+|\\b(?:Right|Wrong|Yes|No):\\s+|\\bso\\s+)(" + ST_LIST + ")(?=\\s+(?:is|are)\\s+(?:true|false|right|wrong)\\b)", "g");
+const ST_TWO = ["Both statements are true", "Both statements are false", "Statement 1 is true; statement 2 is false", "Statement 1 is false; statement 2 is true"];
+const ST_TWO_T = [[1, 1], [0, 0], [1, 0], [0, 1]];
+const ST_RISK = /\b(?:first|second|third|fourth|fifth|last|other) statement\b|\b(?:goals?|items?|numbers?|points?|lines?|options?)\s+\d\b|#\s?\d\b|\(\d\)/i;
+const ST_CONTENT = [/\d+(?:[.,:/×x-]\d+)+|\d+\s*[%°⁹]|[#×]\s*\d+|\d{2,}|[A-Za-zµ]+-?\d+[A-Za-z]*|\b\d+-?[A-Za-z]+/g,
+  new RegExp("\\b(?:Stages?|Class(?:es)?|Grades?|Types?|Phases?|Sessions?|Lectures?|Divisions?|Figures?|Tables?|Steps?|Levels?|Tiers?|Zones?|Generations?|Visits?|Weeks?|Days?|Years?|Months?|Hours?|Lines?|Roots?|Walls?|Teeth|Molars?|Premolars?|of|out of)\\s+" + ST_LIST, "gi"),
+  new RegExp(ST_LIST + "\\s*(?:mm|µm|um|cm|m|ml|mL|mg|g|kg|lb|lbs|inches|in|feet|ft|%|percent|weeks?|days?|months?|years?|yrs?|hours?|hrs?|minutes?|min|seconds?|sec|s|times|x|×|of|to|out of|per|walls?|roots?|teeth|surfaces?|sites?|visits?|people|patients?|doses?|units?|cases?|canals?|bid|tid|qd)\\b", "gi")];
+const stDigits = s => (String(s).match(/\d/g) || []).map(Number);
+const stList = (a, or) => a.length === 1 ? String(a[0]) : a.slice(0, -1).join(", ") + (or ? " or " : " and ") + a[a.length - 1];
+const stLabel = a => a.length === 1 ? a[0] + " only" : a.length === 2 ? a[0] + " and " + a[1] + " only" : stList(a);
+const stUp = a => a.slice().sort((x, y) => x - y);
+/* every statement number in the whys must be in a form above; a lone 1 to n left over (past the content numbers) keeps the order */
+function stFollowable(texts, n){
+  let ok = true;
+  for (let t of texts) {
+    t = String(t);
+    if (ST_RISK.test(t)) return false;
+    const blank = (m, a, l) => { if (stDigits(l).some(d => d < 1 || d > n)) ok = false; return m.replace(/[^]/g, " "); };
+    const u = t.replace(ST_REF, blank).replace(ST_VERB, blank).replace(ST_BARE, blank), cover = [];
+    for (const re of ST_CONTENT) { re.lastIndex = 0; let m; while ((m = re.exec(u))) { for (let i = m.index; i < m.index + m[0].length; i++) cover[i] = 1; if (!m[0].length) re.lastIndex++; } }
+    for (let i = 0; i < u.length; i++) { const d = u.charCodeAt(i) - 48; if (d >= 1 && d <= n && !cover[i]) ok = false; }
+  }
+  return ok;
+}
+export function inOrder(q, o){
+  const perm = String(o || "").split("").map(Number);
+  if (!q || q.type !== "mcq" || (q.fmt !== "numbered" && q.fmt !== "2stmt") || !Array.isArray(q.choices)) return q;
+  const lines = String(q.stem || "").split("\n"), lead = [], st = [];
+  for (const L of lines) { const m = /^\s*(\d+)\.\s+(.*)$/.exec(L); if (m) { if (+m[1] !== st.length + 1) return q; st.push(m[2]); } else if (st.length) return q; else lead.push(L); }
+  const n = st.length, two = q.fmt === "2stmt";
+  if (n < 2 || n > 5 || perm.length !== n || new Set(perm).size !== n || perm.some(v => v < 1 || v > n) || perm.every((v, i) => v === i + 1)) return q;
+  if (two ? n !== 2 || q.choices.length !== 4 || q.choices.some((c, i) => c !== ST_TWO[i])
+          : q.choices.some(c => { const d = stDigits(c); return !d.length || stLabel(d) !== c || d.some((x, i) => x < 1 || x > n || (i && x <= d[i - 1])); })) return q;
+  if (!stFollowable([q.ex || ""].concat(q.why || []), n)) return q;
+  const inv = {}; perm.forEach((v, j) => { inv[v] = j + 1; });
+  const f = (m, a, l) => a + stList(stUp(stDigits(l).map(d => inv[d])), /\bor\b/.test(l));
+  const re = t => String(t).replace(ST_REF, f).replace(ST_VERB, f).replace(ST_BARE, f);
+  const c = { ...q, stem: lead.concat(perm.map((v, j) => (j + 1) + ". " + st[v - 1])).join("\n") };
+  if (two) c.choices = q.choices.map((x, i) => { const t = ST_TWO_T[i], nv = [t[perm[0] - 1], t[perm[1] - 1]]; const m = ST_TWO_T.findIndex(y => y[0] === nv[0] && y[1] === nv[1]); return m > -1 ? ST_TWO[m] : x; });
+  else c.choices = q.choices.map(x => stLabel(stUp(stDigits(x).map(d => inv[d]))));
+  if (q.why) c.why = q.why.map(re);
+  if (q.ex) c.ex = re(q.ex);
+  return c;
 }
 /* the answered question, from the hub's own questions.json (never from the browser): stem, choices, key, whys, picks */
 export function questionText(q, ask){
@@ -690,7 +743,7 @@ export async function handle(body, deps){
   // the answered question, only if the database has this visitor's answer to it
   let question = null, qUnits = null;
   if (input.ask && b.answered) {
-    try { const qs = await deps.loadQuestions(input.hub); let q = (qs || []).find(x => x && x.id === input.ask.qid); if (q && input.ask.w && deps.loadVariants) q = wordingOf(q, await deps.loadVariants(input.hub), input.ask.w); if (q) question = questionText(q, input.ask).replace(/<(?=[A-Za-z\/!?])/g, "< "); }
+    try { const qs = await deps.loadQuestions(input.hub); let q = (qs || []).find(x => x && x.id === input.ask.qid); if (q && input.ask.w && deps.loadVariants) q = wordingOf(q, await deps.loadVariants(input.hub), input.ask.w); if (q && input.ask.o) q = inOrder(q, input.ask.o); if (q) question = questionText(q, input.ask).replace(/<(?=[A-Za-z\/!?])/g, "< "); }
     catch (e) { log("questions", { error: String(e && e.message || e) }); }
     if (question) qUnits = { id: "Q", hub: input.hub, kind: "question", lec: "", text: question, go: { v: "bank", q: input.ask.qid }, label: "This question" };
   }

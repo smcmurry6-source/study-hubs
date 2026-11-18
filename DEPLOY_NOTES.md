@@ -32,6 +32,21 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (statements in a new order on a later try, and the High likelihood tag says why, Claude Code, #417)** — Sam: "yes to
+  the two ideas" (Perio reports #55/#56 and #57). A numbered-statement or two-statement item that comes back (a second try, a
+  retry of a miss, Learn and Flashcards) shows its statements shuffled and renumbered, never in its own order on the second
+  try, and each choice relabeled to the same statements in canonical order: choice k still means what it meant, so the key,
+  grading, XP, class picks and question health are unchanged. The why lines and the explanation are renumbered with it
+  ("Statement 3 is false", "It leaves out 2, which is true", the B versions' bare "1 and 2 are true"); an item whose words
+  the kit can't follow keeps its own order (5 of 244). The kit is `widget/statements.js` (`window.shStatements`, in
+  `hub.bundle.js`); `hub-bank.js` calls it from `card()` and `HX.qParts.later` (Learn and Flashcards), the card carries
+  `data-order`, a report names the order it was shown in, and Ask Timmy gets the order (`o`) and renumbers the item the same
+  way on the server (`inOrder()` in `supabase/functions/timmy/core.js`), so he calls a statement by the number on the screen.
+  `node tools/ci/statements.js` (in "Check hubs") checks every order of every item and version against its key, and that
+  Ask Timmy's copy renumbers it exactly as the page does. The High likelihood tag on a card is a button: it opens why (the
+  predicted topic, its place in the lecture's list and what it rests on: the professor's hint, the review, the check-ins) and
+  links to Exam Hints. BUG-178 (bare numbers in the B versions' whys weren't renumbered) found and fixed before release.
+  The About page and the three rule notes say so.
 - **2026-11-18 (lessons refresh, and the game economy joins the audit, Claude Code, #414)** — Sam: "add to the lessons audit a review of xp
   and crowns across the class to make sure earn rates are healthy. also include shop prices". A standing rule,
   [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md) (on demand, for anything that changes a rate, a prize or a

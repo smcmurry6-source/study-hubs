@@ -558,6 +558,8 @@
         var C = cards(), c = C[q.id], now = Date.now(), state = !c ? "New" : isAhead ? "Ahead of schedule" : c.s === "R" ? "Due for review" : "Learning";
         /* a card seen before comes back reworded (widget/hub.js worded(): the next wording each review) */
         if (HX.worded) q = HX.worded(q, c ? c.n || 0 : 0);
+        /* and a statement item in a new order (widget/statements.js, through hub-bank.js's later()) */
+        if (P.later) q = P.later(q, c ? c.n || 0 : 0);
         var hide = hideable(q), uid = "fc" + Math.floor(Math.random() * 1e9);
         var el = h('<article class="qc fcard' + lc(q.lec) + '" data-fqid="' + esc(q.id) + '" aria-labelledby="' + uid + 'h"></article>');
         var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + uid + 'h">' + lecChip(q.lec) + "</span>" + P.likelyTag(q) + '<span class="fc-state">' + esc(state) + '</span></span><span class="qc-tools fc-tools"></span></header>';
@@ -567,6 +569,7 @@
           '<div class="fc-rate" data-raterow hidden role="group" aria-label="How well did you know it?"><p class="fc-rate-q">How well did you know it?</p><div class="fc-rate-btns">' +
           KEYS.map(function(r, i){ return '<button class="btn fc-r r-' + r + '" type="button" data-sm="' + r + '"><b>' + NAMES[r] + '</b><small class="num">' + esc(inWords(sched(c, r, now).d, now)) + '</small><kbd class="fc-key" aria-hidden="true">' + (i + 1) + "</kbd></button>"; }).join("") + "</div></div>";
         tools(el, q);
+        if (P.likelyWire) P.likelyWire(el, q);
         stage.innerHTML = ""; stage.appendChild(el);
         if (HX.FIG && HX.FIG.ANIMA) { try { HX.FIG.ANIMA.mount(el); } catch (e) {} }
         current = { el: el, q: q, ahead: isAhead, flipped: false, at: now };

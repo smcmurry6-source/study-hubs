@@ -56,7 +56,9 @@ tags: [map]
   ([build-a-hub](../how-to/build-a-hub.md)). `audio/` holds its Kokoro narration (`<lecture>-full.mp3`, `-plain.mp3`,
   `-hy.mp3`, each with its `.words.json` for Follow along). The engine is four scripts, with `widget/hub.css`:
   `widget/hub-rewards.js` (the answer path, XP, rank, the recap), `widget/hub-timmy.js` (Timmy), `widget/hub-bank.js`
-  (the question card, the bank, the mock), then the core, `widget/hub.js` (its top says how they fit together). The
+  (the question card, the bank, the mock), then the core, `widget/hub.js` (its top says how they fit together), with
+  `widget/statements.js` ahead of them (`window.shStatements`: a numbered-statement or two-statement item renumbered on a
+  later try; `tools/ci/statements.js` checks it on every item, and Ask Timmy's `inOrder()` matches it). The
   page loads them as one built file, `widget/hub.bundle.js`, and the stylesheet as `widget/site.bundle.css` (the next
   entry).
 - `hubs/<hub-id>/index.html` alone — **an old single-file hub** (the ones archived before the release, listed under
