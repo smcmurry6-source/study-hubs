@@ -29,6 +29,12 @@ Preview: <!-- only when Sam asked for one (the `preview` label): the link from t
 
 <!-- Bug-log rows added, fixed or accepted (vault/release/bug-log.md). Never describe an unfixed security hole here. -->
 
+## To-do list
+
+<!-- What this PR ticked off and what it added, with where (vault/rules/to-dos-go-in-the-vault.md): the inbox line, the task
+     note's boxes, the bug row; the step left for after the merge. "Nothing to tick or add" is an answer; an empty section
+     isn't. -->
+
 ## Not covered or unsure
 
 ## Release

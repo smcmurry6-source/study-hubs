@@ -1,11 +1,11 @@
 ---
 type: task
-status: blocked
+status: open
 hub: perio
 created: 2026-11-03
 requested-by: Sam
 due: 2026-11-19
-waiting-on: the Session 6 class recording or capture (Drive, Periodontology/hubs)
+waiting-on: 
 agent: 
 pr: 
 ---
@@ -21,6 +21,10 @@ When the class recording or capture is in the Drive folder, make it a taught ses
 ## Context
 
 - Hub note: [perio](../hubs/perio.md)
+- **The recording's transcript** (Drive, Periodontology → hubs): `en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt`,
+  uploaded 2026-10-25. It opens "Good morning, so you've had a day of occlusion, and we're going to do a little bit of
+  biology and therapy combined, and this is a day that I circle". The name doesn't say which session it is, which is why
+  it was missed: search Drive for its first words. Read it; never commit it.
 - Change log: "2026-10-21 (perio S6: Periodontal Regeneration slide deck" in `DEPLOY_NOTES.md`
 - Going from slides-only to taught brings in the rules a taught lecture must meet:
   [two-statement-and-true-false](../rules/two-statement-and-true-false.md) (about 5 and 8; CI minimum 3 and 5),
@@ -42,6 +46,8 @@ When the class recording or capture is in the Drive folder, make it a taught ses
 ## Log
 
 - 2026-11-03: written; waiting on the recording.
+- 2026-11-18: Sam: "i did upload the session 6 transcript a long time ago". Found (Context, above): it had been in the
+  folder since 2026-10-25 under a lecture-capture file name. Unblocked, the day before the final.
 
 ## Outcome
 

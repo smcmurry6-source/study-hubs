@@ -17,6 +17,8 @@ for (const t of ['tools/preview/runtime/preview.js', 'tools/preview/transform.js
   'supabase/functions/timmy/core.js', 'tools/timmy/test.mjs', 'tools/timmy/build.mjs', 'tools/timmy/eval.mjs', 'tools/release/timmy.js',
   /* the engine hubs' content step */
   'tools/hub-next/build.mjs', 'tools/hub-next/high-yield.mjs',
+  /* the to-do list's printout (vault/how-to/package-the-to-dos.md) */
+  'tools/todo/list.mjs',
   /* the bundles: the build, and the slim database client's own build and wire check */
   'tools/bundle/build.mjs', 'tools/bundle/client/entry.mjs', 'tools/bundle/client/build.mjs', 'tools/bundle/client/wire-check.mjs']) check(path.join(root, t), t);
 /* a hub on the engine: the scripts beside its page (its drawings and its arcade) */
