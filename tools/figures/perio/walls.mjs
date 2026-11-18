@@ -60,6 +60,8 @@ export function wlProf(D, st, P, y) {
 }
 export function wlPt(D, x, y, z) { var C = D.C; return [C.ox + C.k * (x * C.c + y * C.s), C.oy + C.k * ((x * C.s - y * C.c) * C.se - z * C.ce)]; }
 export function wlPoly(D, pts) { var o = ""; for (var i = 0; i < pts.length; i++) { var p = wlPt(D, pts[i][0], pts[i][1], pts[i][2]); o += (i ? "L" : "M") + Math.round(p[0] * 10) / 10 + " " + Math.round(p[1] * 10) / 10; } return o + "Z"; }
+export function wlSeg(s, x) { for (var i = 0; i < s.length; i++) if (x >= s[i][0] - 1e-9 && x <= s[i][1] + 1e-9) return s[i]; return s[s.length - 1]; }
+export function wlAt(g, x) { return g[1] - g[0] < 1e-9 ? g[2] : g[2] + (g[3] - g[2]) * (x - g[0]) / (g[1] - g[0]); }
 /* the drawing: slabs from lingual to buccal, then the crowns, the tinted faces on the buccal surface, the lost walls */
 export function wl3d(D, st) {
   var G = D.G, P = wlPar(D, st), C = D.C, out = [], cur = null;
@@ -80,15 +82,37 @@ export function wl3d(D, st) {
       var hl = i ? s[i - 1][3] : G.ZB;
       if (g[2] > hl + 1e-6) put(k === "r" ? "wl-r2" : (k === "b" || i === 0 ? "wl-b2" : "wl-w2"), k === "r" ? "root" : hot, wlPoly(D, [[g[0], y0, hl], [g[0], y0, g[2]], [g[0], y1, g[2]], [g[0], y1, hl]]));
     }
-    for (i = 0; i < s.length; i++) {
-      g = s[i]; k = g[4];
-      var wall = k === "wl" && Math.abs(y0 - G.YP) < 1e-6;
-      put(k === "r" ? "wl-r1" : (wall ? "wl-w1" : "wl-b1"), k === "r" ? "root" : (wall ? "wl" : (st.k === "h" ? "crest" : "bone")), wlPoly(D, [[g[0], y0, G.ZB], [g[1], y0, G.ZB], [g[1], y0, g[3]], [g[0], y0, g[2]]]));
+    /* the front face: only the part the next slab toward the buccal leaves bare */
+    var nz = j + 2 < ys.length ? wlProf(D, st, P, (ys[j + 1] + ys[j + 2]) / 2) : null, bx = [];
+    s.concat(nz || []).forEach(function (q) { bx.push(q[0], q[1]); });
+    bx = bx.sort(function (a, b) { return a - b; }).filter(function (v, q, a) { return !q || v - a[q - 1] > 1e-6; });
+    for (i = 0; i < bx.length - 1; i++) {
+      var a = bx[i], b = bx[i + 1], m = (a + b) / 2, h = wlSeg(s, m), ta = wlAt(h, a), tb = wlAt(h, b), na = G.ZB, nb = G.ZB;
+      if (nz) { var hn = wlSeg(nz, m); na = wlAt(hn, a); nb = wlAt(hn, b); }
+      var da = ta - na, db = tb - nb;
+      if (da < 1e-4 && db < 1e-4) continue;
+      if (da < 0 || db < 0) { var t = da / (da - db), xm = a + t * (b - a); if (da < 0) { a = xm; na = ta = wlAt(h, xm); } else { b = xm; nb = tb = wlAt(h, xm); } }
+      k = h[4]; var wall = k === "wl" && Math.abs(y0 - G.YP) < 1e-6;
+      put(k === "r" ? "wl-r1" : (wall ? "wl-w1" : "wl-b1"), k === "r" ? "root" : (wall ? "wl" : (st.k === "h" ? "crest" : "bone")), wlPoly(D, [[a, y0, na], [b, y0, nb], [b, y0, tb], [a, y0, ta]]));
     }
   }
   var yb = G.Y0, xr = G.T.x0;
   var o = "";
   out.forEach(function (c) { var p = '<path class="' + c.c + '" d="' + c.d + '"/>'; o += c.h ? '<g class="hot" data-info="' + D.HOT[c.h] + '">' + p + "</g>" : p; });
+  /* edges: the block's outline, the buccal surface's top (with the defect's notch when the buccal wall is gone), the
+     defect's rims */
+  function line(pts) { var d = ""; pts.forEach(function (q, i) { var p = wlPt(D, q[0], q[1], q[2]); d += (i ? "L" : "M") + Math.round(p[0] * 10) / 10 + " " + Math.round(p[1] * 10) / 10; }); return d; }
+  var zc = P.zc, fr = wlProf(D, st, P, G.Y0 + .01), fp = [];
+  fr.forEach(function (g) { fp.push([g[0], yb, g[2]], [g[1], yb, g[3]]); });
+  o += '<path class="wl-edge" d="' + line([[G.X0, yb, zc], [G.X0, yb, G.ZB], [G.X1, yb, G.ZB], [G.X1, yb, zc], [G.X1, G.Y1, zc], [G.X0, G.Y1, zc], [G.X0, G.Y1, G.ZB], [G.X0, yb, G.ZB]]) + line([[G.X0, G.Y1, zc], [G.X0, yb, zc]]) + line(fp) + '"/>';
+  if (P.def) {
+    var xt = wlXw(P, zc), rim = line([[xt, P.hb >= zc ? -G.YP : yb, zc], [xt, P.hl >= zc ? G.YP : G.Y1, zc]]);
+    if (P.hb >= zc) rim += line([[xt, -G.YP, zc], [xr, -G.YP, zc]]);
+    if (P.hl >= zc) rim += line([[xt, G.YP, zc], [xr, G.YP, zc]]);
+    if (P.hb > P.zf && P.hb < zc) rim += line([[wlXw(P, P.hb), -G.YP, P.hb], [xr, -G.YP, P.hb]]);
+    if (P.hl > P.zf && P.hl < zc) rim += line([[wlXw(P, P.hl), G.YP, P.hl], [xr, G.YP, P.hl]]);
+    o += '<path class="wl-rim" d="' + rim + '"/>';
+  }
   /* the crowns: the root's outline at the CEJ, out to the height of contour, in to the occlusal table */
   [G.N, G.T].forEach(function (R, n) {
     function ring(z, e) { var pts = [], cx = (R.x0 + R.x1) / 2, hx = (R.x1 - R.x0) / 2 + e, hy = R.hy + e, r = R.r + e; for (var q = 0; q < 4; q++) for (var t = 0; t <= 6; t++) { var a = (q * 90 + t * 15) * Math.PI / 180, sx = q === 0 || q === 3 ? 1 : -1, sy = q < 2 ? 1 : -1; pts.push([cx + sx * (hx - r) + r * Math.cos(a), sy * (hy - r) + r * Math.sin(a), z]); } return pts; }
@@ -107,29 +131,34 @@ export function wl3d(D, st) {
   if (P.def && P.hl < P.zc) { var l0 = Math.max(P.hl, P.zf); o += '<path class="wl-ghost" d="' + wlPoly(D, [[wlXw(P, P.zc), G.YP, P.zc], [xr, G.YP, P.zc], [xr, G.Y1, P.zc], [wlXw(P, P.zc), G.Y1, P.zc]]) + wlPoly(D, [[wlXw(P, l0), G.YP, l0], [xr, G.YP, l0], [xr, G.YP, P.zc], [wlXw(P, P.zc), G.YP, P.zc]]) + '"/>'; }
   return o + wlLabels(D, st, P);
 }
-/* labels: a dot on each part, leaders out to a column on each side, sorted so no leaders cross */
+/* labels: a dot on each part, leaders out to a column at each edge, sorted top to bottom so no leaders cross */
 export function wlLabels(D, st, P) {
   var G = D.G, L = [], R = [], T = D.TXT, xr = G.T.x0, zc = P.zc, xt = wlXw(P, zc);
   function at(x, y, z) { return wlPt(D, x, y, z); }
   if (!P.def) {
-    L.push([T.crest, at(-1, -1, zc)]);
-    R.push([T.rootx, at(xr + .3, -4.05, (zc + G.CEJ) / 2)]);
+    L.push([T.crest, at(-1.5, -2, zc)]);
+    R.push([T.rootx, at(xr + .25, -4.1, (zc + G.CEJ) / 2)]);
   } else {
-    L.push([T.wp, at((G.N.x1 + xt) / 2, st.k === "3" ? 0 : -1, zc)]);
-    R.push([T.root, at(xr, 1.2, Math.max(P.zf + 1.5, -2.2))]);
+    var ya = P.hb >= zc ? -G.YP : G.Y0, yz = P.hl >= zc ? G.YP : G.Y1;
+    L.push([T.wp, at(xt - .65, (ya + yz) / 2, zc)]);
+    R.push([T.root, st.k === "3" ? at(xr, 1, -1.6) : at(xr, .5, (P.zf + zc) / 2)]);
     if (P.hl > P.zf) R.push([P.hl < zc ? T.wlc : T.wl, at((wlXw(P, P.hl) + xr) / 2, (G.YP + G.Y1) / 2, P.hl)]);
     else R.push([T.wlx, at((xt + xr) / 2, (G.YP + G.Y1) / 2, zc)]);
-    if (P.hb > P.zf) { var zm = (P.zf + P.hb) / 2; L.push([P.hb < zc ? T.wbc : T.wb, at((wlXw(P, zm) + xr) / 2, G.Y0, zm)]); }
-    if (P.hb < zc) { var zg = (Math.max(P.hb, P.zf) + zc) / 2; L.push([T.wbx, at((wlXw(P, zg) + xr) / 2, G.Y0, zg)]); }
+    if (P.hb > P.zf) L.push([P.hb < zc ? T.wbc : T.wb, at((wlXw(P, P.hb) + xr) / 2, (G.Y0 - G.YP) / 2, P.hb)]);
+    if (P.hb < zc) { var zg = (Math.max(P.hb, P.zf) + zc) / 2; (P.hb > P.zf ? R : L).push([T.wbx, at((wlXw(P, zg) + xr) / 2, G.Y0, zg)]); }
   }
   var o = "";
-  [[L, D.LX, "end"], [R, D.RX, "start"]].forEach(function (c) {
-    var list = c[0].sort(function (a, b) { return a[1][1] - b[1][1]; }), n = list.length, y0 = D.LY0, gap = D.LGAP;
+  [[L, D.LX, "start"], [R, D.RX, "end"]].forEach(function (c) {
+    var list = c[0].sort(function (a, b) { return a[1][1] - b[1][1]; }), ty = [], prev = -1e9;
+    list.forEach(function (l) { var n = l[0].split("|").length; var y = Math.max(l[1][1] - (n - 1) * 7, prev + D.LGAP); ty.push(y); prev = y + (n - 1) * 14; });
+    var over = prev - D.LY1; if (over > 0) ty = ty.map(function (y) { return y - over; });
     list.forEach(function (l, i) {
-      var lines = l[0].split("|"), ty = Math.max(y0 + i * gap, Math.min(l[1][1], D.LY1 - (n - 1 - i) * gap)), ex = c[1] + (c[2] === "end" ? 5 : -5);
-      y0 = ty + gap * .1; if (i < n - 1) y0 = Math.max(y0, ty);
-      o += '<path class="wl-lead" d="M' + Math.round(l[1][0] * 10) / 10 + " " + Math.round(l[1][1] * 10) / 10 + "L" + ex + " " + Math.round(ty - 4) + '"/><circle class="wl-dot" cx="' + Math.round(l[1][0] * 10) / 10 + '" cy="' + Math.round(l[1][1] * 10) / 10 + '" r="2.3"/>';
-      o += '<text class="wl-t wl-lab" x="' + c[1] + '" y="' + Math.round(ty) + '" text-anchor="' + c[2] + '">' + lines.map(function (t, q) { return '<tspan x="' + c[1] + '" dy="' + (q ? "1.15em" : "0") + '">' + t + "</tspan>"; }).join("") + "</text>";
+      var lines = l[0].split("|"), w = 0, y = Math.round(ty[i]);
+      lines.forEach(function (t) { w = Math.max(w, t.length); });
+      var ex = c[2] === "start" ? c[1] + w * 7.2 + 5 : c[1] - w * 7.2 - 5, ey = y + (lines.length - 1) * 7 - 4;
+      var px = Math.round(l[1][0] * 10) / 10, py = Math.round(l[1][1] * 10) / 10;
+      o += '<path class="wl-lead" d="M' + px + " " + py + "L" + Math.round(ex) + " " + ey + '"/><circle class="wl-dot" cx="' + px + '" cy="' + py + '" r="2.3"/>';
+      o += '<text class="wl-t wl-lab" x="' + c[1] + '" y="' + y + '" text-anchor="' + c[2] + '">' + lines.map(function (t, q) { return '<tspan x="' + c[1] + '" dy="' + (q ? "1.15em" : "0") + '">' + t + "</tspan>"; }).join("") + "</text>";
     });
   });
   return o;
@@ -178,7 +207,7 @@ export function wlBands(P) {
   return o;
 }
 
-const S = 15;
+const S = 13;
 const C = { c: Math.cos(PHI), s: Math.sin(PHI), se: Math.sin(ELE), ce: Math.cos(ELE), k: S, ox: 0, oy: 0 };
 /* fit the block and crowns into the drawing, leaving the label columns */
 (() => {
@@ -196,7 +225,7 @@ const F = { x0: 6, y0: 6, x1: 214, y1: 190, k: 9.5 };
 F.ox = 6 + 11.6 * F.k; F.oy = 6 + 6.9 * F.k;
 
 const D = {
-  G, C, F, FW, FH, LX: 92, RX: 308, LY0: 24, LY1: H3 - 14, LGAP: 30,
+  G, C, F, FW, FH, LX: 4, RX: 396, LY0: 24, LY1: H3 - 8, LGAP: 34,
   TXT: {
     wb: "buccal|wall", wbc: "buccal wall,|base only", wbx: "buccal wall,|lost",
     wl: "lingual|wall", wlc: "lingual wall,|to here", wlx: "lingual wall,|lost",
@@ -283,7 +312,7 @@ const CSS = `
 .anima .wl-fbox{flex:0 1 230px;min-width:0;max-width:250px}
 .anima .wl-cap{margin:0 0 4px;font:600 .78rem var(--anatomy-mono);color:var(--anatomy-muted);text-align:center}
 .anima .wl-svg .wl-t{fill:var(--anatomy-text);font:12px var(--anatomy-mono)}
-.anima .wl-svg .wl-lab{fill:var(--anatomy-strong);font-weight:600}
+.anima .wl-svg .wl-lab{fill:var(--anatomy-strong);font-weight:600;paint-order:stroke;stroke:var(--surface);stroke-width:3.5px;stroke-linejoin:round}
 .anima .wl-svg .wl-lead{fill:none;stroke:var(--anatomy-mid);stroke-width:.8}
 .anima .wl-svg .wl-dot{fill:var(--anatomy-strong);stroke:var(--surface);stroke-width:1}
 .anima .wl-svg path{stroke-linejoin:round}
@@ -297,8 +326,10 @@ const CSS = `
 .anima .wl-svg .wl-r0{fill:var(--wl-r0);stroke:var(--wl-r0);stroke-width:.5}
 .anima .wl-svg .wl-r1{fill:var(--wl-r1);stroke:var(--wl-r1);stroke-width:.5}
 .anima .wl-svg .wl-r2{fill:var(--wl-r2);stroke:var(--wl-r2);stroke-width:.5}
-.anima .wl-svg .wl-c1{fill:var(--wl-c1);stroke:var(--wl-line);stroke-width:1}
-.anima .wl-svg .wl-c0{fill:var(--wl-c0);stroke:var(--wl-line);stroke-width:.8}
+.anima .wl-svg .wl-c1{fill:var(--wl-c1);fill-opacity:.5;stroke:var(--wl-line);stroke-width:1}
+.anima .wl-svg .wl-c0{fill:var(--wl-c0);fill-opacity:.55;stroke:var(--wl-line);stroke-width:.8}
+.anima .wl-svg .wl-edge{fill:none;stroke:var(--wl-line);stroke-width:1}
+.anima .wl-svg .wl-rim{fill:none;stroke:var(--wl-rim);stroke-width:1.4;stroke-linecap:round}
 .anima .wl-svg .wl-ghost{fill:color-mix(in srgb, var(--wl-w0) 18%, transparent);stroke:var(--anatomy-strong);stroke-width:1.1;stroke-dasharray:3.5 3}
 .anima .wl-fsvg .wl-f-air{fill:var(--pd-xray)}
 .anima .wl-fsvg .wl-f-bone{fill:var(--pd-xbone)}
@@ -326,16 +357,16 @@ const CSS = `
 .anima .wl-m50k{display:inline-block;width:2px;height:11px;background:var(--ink)}
 .anima .am-btn:disabled{opacity:.45;cursor:default}
 .anima[data-anima="walls"]{--wl-b0:#ebe3d5;--wl-b1:#d8ccb8;--wl-b2:#c3b59d;--wl-fl:#ab9b80;--wl-w0:#f2cd84;--wl-w1:#dcaa52;--wl-w2:#c18d3a;
-  --wl-r0:#fbf2d9;--wl-r1:#efdcab;--wl-r2:#d9c185;--wl-c0:#ffffff;--wl-c1:#f2f3f0;--wl-line:#9d927d;--wl-ang:#f4c56a}
+  --wl-r0:#fbf2d9;--wl-r1:#efdcab;--wl-r2:#d9c185;--wl-c0:#ffffff;--wl-c1:#f2f3f0;--wl-line:#9d927d;--wl-rim:#8a5a16;--wl-ang:#f4c56a}
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .anima[data-anima="walls"]{--wl-b0:#5b5347;--wl-b1:#4a4339;--wl-b2:#3c362e;--wl-fl:#2f2a24;--wl-w0:#c0904a;--wl-w1:#a1743a;--wl-w2:#835d2d;
-  --wl-r0:#a99a74;--wl-r1:#958664;--wl-r2:#7e7053;--wl-c0:#d9d6cd;--wl-c1:#c2beb3;--wl-line:#6f6656;--wl-ang:#f4c56a} }
+  --wl-r0:#a99a74;--wl-r1:#958664;--wl-r2:#7e7053;--wl-c0:#d9d6cd;--wl-c1:#c2beb3;--wl-line:#857a66;--wl-rim:#f1c27a;--wl-ang:#f4c56a} }
 :root[data-theme="dark"] .anima[data-anima="walls"]{--wl-b0:#5b5347;--wl-b1:#4a4339;--wl-b2:#3c362e;--wl-fl:#2f2a24;--wl-w0:#c0904a;--wl-w1:#a1743a;--wl-w2:#835d2d;
-  --wl-r0:#a99a74;--wl-r1:#958664;--wl-r2:#7e7053;--wl-c0:#d9d6cd;--wl-c1:#c2beb3;--wl-line:#6f6656;--wl-ang:#f4c56a}
+  --wl-r0:#a99a74;--wl-r1:#958664;--wl-r2:#7e7053;--wl-c0:#d9d6cd;--wl-c1:#c2beb3;--wl-line:#857a66;--wl-rim:#f1c27a;--wl-ang:#f4c56a}
 `;
 
 export function walls() {
   return { id: "walls", lec: "periodontal-regeneration", title: "Counting the walls",
     caption: "One intrabony defect beside a root, set to three, two or one bony wall, the opening case's combination or horizontal bone loss, with the radiograph each one gives: the walls that remain lie over the defect and hide it on the film. From Dr. Geurs's class and slides.",
     html: `<div class="anima" data-anima="walls">${plate}${controls}${SOURCES}</div>`, css: CSS, live: wlLive.toString(),
-    helpers: [wlPar, wlXw, wlRx, wlProf, wlPt, wlPoly, wl3d, wlLabels, wlFilm, wlBands], data: D };
+    helpers: [wlPar, wlXw, wlRx, wlProf, wlPt, wlPoly, wlSeg, wlAt, wl3d, wlLabels, wlFilm, wlBands], data: D };
 }
