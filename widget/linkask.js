@@ -1,16 +1,21 @@
 /* study-hubs "Is this your other device?" When the name someone saves is already used by another device that isn't
    linked to theirs (name_shared, migration_v41), they keep the name, and a card asks whether that other device is
-   theirs and offers to link the two right there (create_link_code / redeem_link_code, the same as Stats → Link my
-   devices). A device whose saved name is shared is also asked once a day on page load, so people who set the same name
+   theirs and offers to link the two right there (create_link_code / redeem_link_code, the same as Link my devices,
+   below). A device whose saved name is shared is also asked once a day on page load, so people who set the same name
    on two devices before this existed get asked too.
    "No, that's someone else" is remembered per name (sh_link_ask_no); "Not now" waits 3 days for the load check
    (sh_link_ask_later; saving the name again still asks). Never in automated browsers, during a mock or the tour.
    "Yes" makes a code at once and offers a link to send to the other device (share sheet or copy): opening
    <site>/?link=CODE there asks "Link this device?" and links in one tap. Typing the code (it links at 6 characters)
-   still works, from this card on the other device or Stats → Link my devices.
+   still works, from this card on the other device or Link my devices (Settings, beside the name).
+   Link my devices itself is here too, as one card (shLinkAsk.link): every place a name can be changed has a button
+   for it beside the name one (Sam, 2026-11-18: "link my device is nowhere to be found"): the dashboard's You card,
+   name window and Settings; a hub's More → Settings, its name window, the idea board's and Timmy Time's "Posting as";
+   an old hub's Stats and Settings name boxes and its rank card.
    Used by widget/v3.js (hubs) and the dashboard:
      shLinkAsk.start({ sb: supabaseClient, hub: "perio" | "dashboard", section: fn })   // the once-a-day check
-     shLinkAsk.check(name)                                                              // right after a name is saved */
+     shLinkAsk.check(name)                                                              // right after a name is saved
+     shLinkAsk.link({ back: el, from: "settings" })                                     // the Link my devices card */
 (function(){
   "use strict";
   if (window.shLinkAsk) return;
@@ -30,8 +35,10 @@
   function norm(n){ return String(n || "").trim().toLowerCase(); }
   function noList(){ try { return JSON.parse(ls(NO_KEY) || "[]") || []; } catch (e) { return []; } }
   function rpc(fn, args){
-    if (!C.sb) return Promise.resolve(null);
-    try { return C.sb.rpc(fn, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); }
+    /* before start() (a button tapped as the page loads), a hub's client is already on the page */
+    var sb = C.sb || window.shSupabase || null;
+    if (!sb) return Promise.resolve(null);
+    try { return sb.rpc(fn, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); }
     catch (e) { return Promise.resolve(null); }
   }
   function blocked(){
@@ -46,6 +53,7 @@
     "--la-bg2:var(--surface-2,rgba(127,127,127,.08));--la-accent:var(--accent,var(--focus,#2F6FD6));color:var(--la-ink);animation:shLaFade .2s ease-out;}" +
     "@keyframes shLaFade{from{opacity:0;}to{opacity:1;}}" +
     ".sh-la *{box-sizing:border-box;}" +
+    ".sh-la [hidden]{display:none !important;}" +
     ".sh-la-card{position:relative;width:min(440px,100%);max-height:100%;overflow:auto;padding:20px 20px 16px;border-radius:18px;background:var(--la-bg);" +
     "border:1px solid var(--la-line);box-shadow:0 18px 50px -12px rgba(0,0,0,.45);}" +
     ".sh-la-card h3{margin:0 30px 8px 0;font-size:18px;font-weight:700;font-family:inherit;color:var(--la-ink);}" +
@@ -72,18 +80,25 @@
     var st = document.createElement("style"); st.id = "sh-la-css"; st.textContent = CSS; document.head.appendChild(st);
   }
 
-  function close(){ if (card) { card.remove(); card = null; } }
-  /* redeem a code on this device: same as Stats → Link my devices (widget/ranks.js) */
-  function redeem(code, msg){
+  var back = null, escKey = null;   /* where focus goes when the Link my devices card closes; its Escape key */
+  function close(){
+    if (card) { card.remove(); card = null; }
+    if (escKey) { document.removeEventListener("keydown", escKey, true); escKey = null; }
+    var b = back; back = null;
+    try { if (b && b.isConnected) b.focus(); } catch (e) {}
+  }
+  /* redeem a code on this device: the same as an old hub's Stats → Link my devices (widget/ranks.js) */
+  function redeem(code, msg, tr){
+    tr = tr || track;
     code = String(code || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
     if (code.length !== 6) { msg.textContent = "Codes are 6 letters and numbers."; return; }
     if (redeem.busy) return;
     redeem.busy = true; msg.textContent = "Linking…";
     rpc("redeem_link_code", { p_code: code, p_visitor: visitor() }).then(function(id){
       redeem.busy = false;
-      if (!id) { track("fail"); msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
+      if (!id) { tr("fail"); msg.textContent = "That code didn’t work. Codes last 10 minutes; make a fresh one and try again."; return; }
       if (id === visitor()) { msg.textContent = "This device is already linked to that one."; return; }
-      track("linked");
+      tr("linked");
       try { if (window.shClicks && window.shClicks.flush) window.shClicks.flush(); } catch (e) {}
       ls("sh_visitor_id", id); ls("sh_display_name", null); ls("sh_rank_tier", null); ls("sh_trophy_seen", null);
       rpc("get_display_name", { p_visitor: id }).then(function(n){
@@ -103,9 +118,9 @@
     return card.querySelector(".sh-la-body");
   }
   /* typing a code links as soon as it has 6 characters */
-  function wireEnter(){
-    var inp = card.querySelector(".sh-la-enter input"), msg = card.querySelector(".sh-la-step .sh-la-msg");
-    if (inp) inp.addEventListener("input", function(){ if (inp.value.replace(/[^A-Za-z0-9]/g, "").length === 6) redeem(inp.value, msg); });
+  function wireEnter(tr){
+    var inp = card.querySelector(".sh-la-enter input"), msg = inp && inp.closest(".sh-la-step").querySelector(".sh-la-msg");
+    if (inp) inp.addEventListener("input", function(){ if (inp.value.replace(/[^A-Za-z0-9]/g, "").length === 6) redeem(inp.value, msg, tr); });
   }
   /* opened from a link another device sent: <root>?link=CODE */
   function fromUrl(){
@@ -125,9 +140,9 @@
       if (a === "url-go") redeem(code, body.querySelector(".sh-la-msg"));
     });
   }
-  function share(code, out){
+  function share(code, out, fromCard){
     var url = ROOT + "?link=" + code;
-    track("share");
+    if (fromCard) linkTrack("share"); else track("share");
     if (navigator.share) {
       navigator.share({ title: "Link my study hubs", text: "Open this on my other device to link it", url: url }).catch(function(){});
       return;
@@ -204,7 +219,60 @@
     }, fromSave ? 1200 : 0);
   }
 
+  /* ---------- Link my devices: one card, from every place a name can be changed ---------- */
+  function linkTrack(k){ try { if (window.shTrack) window.shTrack("link:" + k); } catch (e) {} }
+  var FROM = /^[a-z-]{1,16}$/;
+  function link(opts){
+    opts = opts || {};
+    if (card) close();
+    back = opts.back || document.activeElement || null;
+    linkTrack("open" + (FROM.test(String(opts.from || "")) ? "=" + opts.from : ""));
+    var body = shell("Link my devices",
+      '<p>Use one rank, streak, trophy case and question progress on your phone, tablet and laptop. Whatever each one has done so far comes along, and your name follows.</p>' +
+      '<div class="sh-la-step"><b>1. On the device you use most</b>' +
+        '<div class="sh-la-row" data-la-ask><button type="button" class="sh-la-btn is-main" data-la="make">Get a code</button></div>' +
+        '<div data-la-made hidden><div class="sh-la-codebox"><span class="sh-la-big">…</span><small>Good for 10 minutes</small></div>' +
+          '<div class="sh-la-row"><button type="button" class="sh-la-btn is-main" data-la="share" disabled>' + (navigator.share ? "Send the link" : "Copy the link") + '</button></div>' +
+          '<small>Open the link on your other device, or type the code there.</small></div>' +
+        '<div class="sh-la-msg sh-la-out" aria-live="polite"></div></div>' +
+      '<div class="sh-la-step"><b>2. On your other device</b>' +
+        '<div class="sh-la-enter"><input type="text" maxlength="7" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false" placeholder="Type the code" aria-label="Link code">' +
+        '<button type="button" class="sh-la-btn" data-la="go">Link</button></div>' +
+        '<small>On that device it’s in Settings, next to your name, the same as here. It links as soon as the sixth character is in.</small>' +
+        '<div class="sh-la-msg" aria-live="polite"></div></div>');
+    card.classList.add("sh-la-link");
+    wireEnter(linkTrack);
+    var enterMsg = body.querySelector(".sh-la-enter").parentNode.querySelector(".sh-la-msg"), out = body.querySelector(".sh-la-out");
+    /* on the page, not the card: focus can leave it (the Get a code button turns off while the code is made) */
+    escKey = function(e){ if (e.key === "Escape") { e.stopPropagation(); close(); } };
+    document.addEventListener("keydown", escKey, true);
+    card.addEventListener("click", function(e){
+      var b = e.target.closest("[data-la]"), a = b && b.getAttribute("data-la");
+      if (e.target === card || e.target.closest(".sh-la-x")) { close(); return; }
+      if (a === "make") {
+        b.disabled = true; out.textContent = "Making a code…";
+        rpc("create_link_code", { p_visitor: visitor() }).then(function(c){
+          if (!card || !body.isConnected) return;
+          if (!c) { b.disabled = false; out.textContent = "Couldn’t make a code. Are you online?"; return; }
+          linkTrack("code");
+          out.textContent = "";
+          body.querySelector("[data-la-ask]").hidden = true;
+          var made = body.querySelector("[data-la-made]"), btn = made.querySelector('[data-la="share"]');
+          made.hidden = false;
+          made.querySelector(".sh-la-big").textContent = c.slice(0, 3) + " " + c.slice(3);
+          btn.disabled = false; btn.setAttribute("data-code", c);
+          try { btn.focus(); } catch (err) {}
+        });
+        return;
+      }
+      if (a === "share") { share(b.getAttribute("data-code") || "", out, true); return; }
+      if (a === "go") redeem(body.querySelector(".sh-la-enter input").value, enterMsg, linkTrack);
+    });
+    setTimeout(function(){ try { var f = card && card.querySelector('[data-la="make"]'); if (f) f.focus(); } catch (e) {} }, 30);
+  }
+
   window.shLinkAsk = {
+    link: link,
     start: function(opts){
       C.sb = opts.sb || null; C.hub = opts.hub || "";
       C.bootstrap = opts.bootstrap || (window.shBootstrap && window.shBootstrap.ready) || null;

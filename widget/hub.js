@@ -1304,7 +1304,9 @@
         '<div class="set-row"><div><b>Text size</b><small>Makes everything bigger or smaller.</small></div>' + seg("size", SIZES, size) + "</div></section>" +
       '<section class="panel" aria-labelledby="sgH"><h2 id="sgH">Your daily goal</h2>' +
         '<div class="set-row"><div><b>Questions a day</b><small>The ring in the bar fills as you answer, right or wrong. Your streak counts any day you answer a question.</small></div>' + seg("goal", [["10", "10"], ["20", "20"], ["30", "30"], ["40", "40"], ["50", "50"]], String(HX.goal())) + "</div>" +
-        (window.shEditName ? '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' : "") + "</section>" +
+        /* drawn even before the shared widget is in (a page opened straight on Settings): a tap waits for it */
+        '<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' +
+        '<div class="set-row"><div><b>Link my devices</b><small>One rank, streak, trophy case and question progress on your phone, tablet and laptop.</small></div><button class="btn" type="button" data-link>Link my devices</button></div></section>' +
       '<section class="panel" aria-labelledby="sxH"><h2 id="sxH">Timmy and the extras</h2><p class="note">The fun stuff that isn\'t studying. None of it shows during a mock exam.</p><div data-extras>' +
         extrasHTML() + "</div></section></div>";
     function paintFocus(){ var fp = $(".focus-panel", body); fp.classList.toggle("is-on", focusOn()); fp.innerHTML = focusRowHTML(); }
@@ -1328,7 +1330,10 @@
         track("settings:" + k + "=" + v);
         return;
       }
-      if (e.target.closest("[data-name]") && window.shEditName) window.shEditName();
+      if (e.target.closest("[data-name]")) whenWidget("shEditName", function(f){ if (f) f(); else toast("Couldn’t open your name. Are you online?"); });
+      /* Link my devices (widget/linkask.js, which widget/v3.js loads): beside the name, as everywhere a name is changed */
+      var lk = e.target.closest("[data-link]");
+      if (lk) whenWidget("shLinkAsk", function(L){ if (L && L.link) L.link({ back: lk, from: "settings" }); else toast("Couldn’t open Link my devices. Are you online?"); });
     });
   }
   function applyTheme(t){ if (t === "light" || t === "dark") docEl.setAttribute("data-theme", t); else docEl.removeAttribute("data-theme"); }
