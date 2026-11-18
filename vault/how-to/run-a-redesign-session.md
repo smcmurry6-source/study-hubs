@@ -25,9 +25,9 @@ and the phase notes it links.
    (`widget/hub-bank.js`, the question card and the bank; `widget/hub-rewards.js`, the answer path, XP, rank and recap;
    `widget/hub-timmy.js`, Timmy) and leave the core, `widget/hub.js`, alone unless the change is its own. How the four
    share names is at the top and the end of `hub.js`.
-5. **Test what you touched while building; everything once at the end.** `node tools/release/xp.js` (and `rls.js`) only when
-   SQL changed; `node tools/ci/smoke.js` already checks only the touched hubs; `node tools/release/run.js` once before the PR,
-   and let CI's "Release tests" do the rest ([long-tests-once](../rules/long-tests-once.md)). Screenshots only the agent looks at: `deviceScaleFactor: 1`, as few as answer
+5. **Test what you touched while building; the smoke test once at the end.** `node tools/release/xp.js` (and `rls.js`) only when
+   SQL changed; `node tools/ci/smoke.js` already checks only the touched hubs; and let CI's "Release tests" run the release suites
+   (no local `node tools/release/run.js` since 2026-11-18) ([long-tests-once](../rules/long-tests-once.md)). Screenshots only the agent looks at: `deviceScaleFactor: 1`, as few as answer
    the question (images cost far more than text). Screenshots for Sam stay at 2.
 6. **Match the model to the work.** The engine, Perio's port, the SQL and the art need the strongest model. Copying
    content into a new hub's `content/`, vault write-backs and rerunning checks don't: a lighter model or effort does them.

@@ -49,7 +49,7 @@ never sold. Fourteen ranks (seven in the ModuPro, seven in the Loupes), 28 drawi
 
 Not one of the sessions before the release ([phase 4](done/2026-11-05-redesign-phase-4-game-layer.md), "From here to the
 release"); "For every session above" there still holds, except that the redesign is live by then, so this is an
-ordinary tier 2 change to the live site ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)).
+ordinary change to the live site ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)).
 
 **Files to touch**: `tools/figures/site/sets.mjs` (`RANKS`: tiers 7 to 20), a pack file beside
 `tools/figures/site/packs/ranks.mjs` (or that file), the generated kit files (`node tools/figures/site/build.mjs`:
@@ -110,4 +110,4 @@ After the redesign's release:
 > `vault/tasks/2026-11-12-redesign-later-journeys-rank-sets.md` (its "Build spec"). The redesign is live, so this is
 > a change to the live site: its rows go in a new migration, never into `migration_v54.sql`, and nothing is applied
 > before I say "merge". Grep the big files, never read them whole. No subagents. Send me the two contact sheets,
-> light and dark, and wait for my yes before the kit files are final. Open a draft PR with the test report.
+> light and dark, and wait for my yes before the kit files are final. Open a draft PR.

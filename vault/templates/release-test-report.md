@@ -5,12 +5,12 @@ tags: [testing, release]
 
 # Release test: {{title}}
 
-<!-- The test report for a tier 2 or 3 change (RELEASE_TEST_PLAN.md). Paste it into the PR description, or save it as
+<!-- Optional since 2026-11-18 (no tiers, RELEASE_TEST_PLAN.md): for when Sam asked for a preview and you did UAT in it,
+     or a change needs a written record. Paste it into the PR description, or save it as
      vault/release/reports/<yyyy-mm-dd>-<what>.md when it's long, and link it from the PR. Say what was exercised and
      what was not: "blocked" and "not tested" are fine answers; "passed" for something not run is not. -->
 
 - **Change:** what students will see, in a sentence. PR:
-- **Tier:** 2 or 3, and why.
 - **Preview:** none (Sam didn't ask for one), or how to open it (the PR's link, a cloud session's live preview, the
   `preview-site` artifact of run …), branch and commit; what Sam was shown (screenshots, a recording).
 - **Data:** fixtures / staging. No request reached production (the Preview button's status at the end):

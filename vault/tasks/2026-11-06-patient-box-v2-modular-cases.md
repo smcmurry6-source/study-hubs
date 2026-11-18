@@ -88,8 +88,9 @@ ideas, this one has the strongest evidence ([the audit](done/2026-11-05-redesign
 
 **Its own track** (Sam, 2026-11-06), not tied to the redesign's release. The kit is content the live hubs use, and
 [ship-it-now](../rules/ship-it-now.md) holds, so each step ships to the live hubs when it's ready, with `cases.css` styled for
-today's hubs and for the redesign's tokens. Each step is a substantial change (tier 2): preview, the release suites,
-screenshots on a phone and in both themes, Sam's look. A new module goes to Sam with its first case, the way a figure does
+today's hubs and for the redesign's tokens. Each step ships like any change
+([preview-and-release-test](../rules/preview-and-release-test.md)): CI, screenshots on a phone and in both themes, Sam's
+"merge". A new module goes to Sam with its first case, the way a figure does
 ([diagram-review](../rules/diagram-review.md)).
 
 ## Sam's calls (2026-11-06, [decisions](../decisions.md))
@@ -105,7 +106,7 @@ Patient Box v2 is done by itself, on its own track. Figures pull from the tooth 
 - [ ] Perio's cases on modules with the same ids and keys (`node tools/ci/smoke.js`, `node tools/ci/cases.js`)
 - [ ] The how-to rewritten ([draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md)); the About page if a new kind
       of picture shows ([about-page](../rules/about-page.md))
-- [ ] CI and the release suites pass; screenshots on a phone and in both themes; Sam's look
+- [ ] CI passes; screenshots on a phone and in both themes; Sam's "merge"
 - [ ] Vault written back (decisions, hub notes, `DEPLOY_NOTES.md`, this note's Outcome)
 
 ## Log

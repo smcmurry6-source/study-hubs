@@ -2,38 +2,24 @@
 
 <!-- In plain, student-facing words (American English). Which hubs, which pages. -->
 
-## Tier
-
-<!-- 0 notes, 1 small content, 2 substantial, 3 high risk (RELEASE_TEST_PLAN.md, section 1). Tiers 0 and 1 can skip the
-     rest down to "Checks run". -->
-
-## Preview
-
-Preview: <!-- only when Sam asked for one (the `preview` label): the link from this PR's preview comment, on its own
-     line. Otherwise write "none, not asked for" (vault/rules/preview-and-release-test.md). -->
-
-<!-- What Sam was shown (screenshots, a recording, the cloud session's live preview) and, with a preview, how to open it
-     (the PR's link, a cloud session, or the Preview run's preview-site artifact) and the Preview button's status at the
-     end: "No request has reached production". -->
+<!-- Every change ships the same way, with no tiers (RELEASE_TEST_PLAN.md, vault/rules/preview-and-release-test.md):
+     CI, a screenshot for Sam when students will see a difference, and Sam's "merge". -->
 
 ## Checks run
 
-<!-- What you ran and what passed: the "Check hubs" checks, `node tools/release/run.js` (paste its summary), anything
-     blocked and why. -->
+<!-- What you ran locally and what passed (the fast checks, the smoke test), anything blocked and why. CI runs the rest. -->
 
-## UAT
+## What Sam was shown
 
-<!-- The vault/release/uat-checklist.md sections you used, devices and browsers, test accounts, what you saw. -->
-
-## Bugs
-
-<!-- Bug-log rows added, fixed or accepted (vault/release/bug-log.md). Never describe an unfixed security hole here. -->
+<!-- The screenshots sent in the chat, or "nothing to show" for a change nobody sees. Only when Sam asked for a preview
+     (the `preview` label): "Preview: <the link from this PR's preview comment>" on its own line, and what you checked in
+     it. -->
 
 ## To-do list
 
 <!-- What this PR ticked off and what it added, with where (vault/rules/to-dos-go-in-the-vault.md): the inbox line, the task
-     note's boxes, the bug row; the step left for after the merge. "Nothing to tick or add" is an answer; an empty section
-     isn't. -->
+     note's boxes, a bug-log row for a bug you found and didn't fix; the step left for after the merge. "Nothing to tick or
+     add" is an answer; an empty section isn't. Never describe an unfixed security hole here. -->
 
 ## Not covered or unsure
 

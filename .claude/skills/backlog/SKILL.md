@@ -1,6 +1,6 @@
 ---
 name: backlog
-description: Sam's to-do list for the study hubs as numbered packages, each one session and one PR. Collects every open item (task notes in vault/tasks/, the inbox, pending migrations, open bug-log rows, leftovers in done tasks) and the open PRs, sets aside what is in a PR, waiting, Sam's own, parked or probably done, groups the rest by shared files and tier (a really big item alone), and when Sam replies with a number, gives him the prompt that launches that package in a new session. Use when Sam says "/backlog", "the to-do list", "what's open", "what's left", "what should I do next", or asks for packages or a session prompt. Read-only: changes nothing, opens no PR.
+description: Sam's to-do list for the study hubs as numbered packages, each one session and one PR. Collects every open item (task notes in vault/tasks/, the inbox, pending migrations, open bug-log rows, leftovers in done tasks) and the open PRs, sets aside what is in a PR, waiting, Sam's own, parked or probably done, groups the rest by shared files and size (a really big item alone), and when Sam replies with a number, gives him the prompt that launches that package in a new session. Use when Sam says "/backlog", "the to-do list", "what's open", "what's left", "what should I do next", or asks for packages or a session prompt. Read-only: changes nothing, opens no PR.
 argument-hint: "[package number(s), for their prompts]"
 ---
 
