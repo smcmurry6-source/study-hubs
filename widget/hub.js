@@ -498,7 +498,7 @@
     var min = pod.duration ? Math.round(pod.duration / 60) : 0;
     /* what a first listen pays (Sam, 2026-11-17: "visibly add crowns available to be earned on cards like timmy time"): 10 XP
        a minute heard and 100 for finishing (migration_v54), in crowns 1 a minute and 100 for finishing (v64) */
-    var G = window.shGame, mins = pod.duration ? Math.ceil(pod.duration / 60) : 0, earn = mins && G && G.live && G.live() ? '<span class="pm-earn">Up to +' + fmt(mins * 10 + 100) + " XP and " + fmt(mins + 100) + " crowns</span>" : "";
+    var G = window.shGame, mins = pod.duration ? Math.ceil(pod.duration / 60) : 0, earn = mins && G && G.live && G.live() ? '<span class="pm-earn">Up to +' + fmt(mins * 10 + 100) + " XP and " + fmt(mins * 5 + 100) + " crowns</span>" : "";
     return '<a class="ql ql-pod" href="#more/timmy">' +
       '<span class="pm-text"><b>Timmy Time <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(pod.title || "The audio review") + "</small>" + earn +
       '<span class="pm-play">' + icon("play", 16) + "Listen" + (min ? '<span class="pm-min"> · ' + min + " min</span>" : "") + "</span></span>" +

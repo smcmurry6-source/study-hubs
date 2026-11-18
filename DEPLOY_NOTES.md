@@ -50,6 +50,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   same, and the migration rebuilds every visitor from it, paying the right answers since the release that had paid nothing
   (about 80 from about 25 people since the release, nearly all under 2 seconds after the one before). The page's guess
   (`xpFor` in `widget/hub-rewards.js`), the About page's XP entry and More's note say the same.
+  Then "lets increase it to 5 crowns per 10xp": `sh_wallet` pays 5 crowns per 10 study XP (was 1), from all the XP so far
+  (the balance is worked out, so every balance went up); every card, the shop's list, the About page and the preview's
+  wallet say 5. The shop's prices weren't changed. And "also 100 crowns per hour of hub time": `sh_time_crowns` pays 100 an
+  hour from `activity_hourly` (all the time recorded, at most 144 pings in a clock hour), in the wallet's `from_time`;
+  the planned collapse of `activity_hourly` must keep it (inbox).
 - **2026-11-17 (the dashboard at the large text sizes, BUG-076 and BUG-163, Claude Code, #401)** — `widget/dash.css` (and
   the rebuilt `widget/site.bundle.css`). On a 320 px phone at XX-Large the page scrolled 49 px sideways (10 px at X-Large):
   the "You" card's week dots now shrink, still round, when the card is narrower than the week, and "Start studying" wraps

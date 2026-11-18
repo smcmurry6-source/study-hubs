@@ -1702,7 +1702,7 @@ return '<li class="tl-' + when + (e.kind ? " tl-" + e.kind : "") + '"><span clas
 var POD_COL = { tint: "#F2C94C", light: "#FFFFFF", line: "#F2C94C" };
 function podMiniHTML(pod){
 var min = pod.duration ? Math.round(pod.duration / 60) : 0;
-var G = window.shGame, mins = pod.duration ? Math.ceil(pod.duration / 60) : 0, earn = mins && G && G.live && G.live() ? '<span class="pm-earn">Up to +' + fmt(mins * 10 + 100) + " XP and " + fmt(mins + 100) + " crowns</span>" : "";
+var G = window.shGame, mins = pod.duration ? Math.ceil(pod.duration / 60) : 0, earn = mins && G && G.live && G.live() ? '<span class="pm-earn">Up to +' + fmt(mins * 10 + 100) + " XP and " + fmt(mins * 5 + 100) + " crowns</span>" : "";
 return '<a class="ql ql-pod" href="#more/timmy">' +
 '<span class="pm-text"><b>Timmy Time <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(pod.title || "The audio review") + "</small>" + earn +
 '<span class="pm-play">' + icon("play", 16) + "Listen" + (min ? '<span class="pm-min"> · ' + min + " min</span>" : "") + "</span></span>" +

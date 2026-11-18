@@ -375,15 +375,25 @@ try {
   /* ---------- 9. Shiny Gold Crowns ---------- */
   const dw = json(`sh_wallet('xp-D')`), dExtra = num(`select sum(xp - base) from xp_awards where visitor_id = 'xp-D'`);
   const dPrize = num(`select coalesce(sum(base), 0) from xp_awards where visitor_id = 'xp-D' and sh_is_prize(src)`);
-  ok(dExtra > 0 && dPrize === 2525 && dw.from_xp === Math.floor((xpOf('xp-D') - dExtra - dPrize) / 10), `gold crowns from study XP only: a boost's extra earns none, and a prize (the four medals' 2,500, ten right in a row's 25) pays its own (${dw.from_xp}, extra ${dExtra}, prizes ${dPrize})`);
+  ok(dExtra > 0 && dPrize === 2525 && dw.from_xp === Math.floor((xpOf('xp-D') - dExtra - dPrize) / 2), `gold crowns from study XP only: a boost's extra earns none, and a prize (the four medals' 2,500, ten right in a row's 25) pays its own (${dw.from_xp}, extra ${dExtra}, prizes ${dPrize})`);
   eq([dw.medals, dw.trophies], [4, 0], 'four medals since the switch');
-  eq([dw.prizes, dw.earned], [2525, dw.from_xp + 2525 + 4 * 50 + 20 * dw.rankups], 'earned = study XP / 10 + a prize\'s XP in crowns (migration_v64) + 50 a medal + 20 a rank-up');
+  eq([dw.prizes, dw.earned], [2525, dw.from_xp + dw.from_time + 2525 + 4 * 50 + 20 * dw.rankups], 'earned = 5 crowns per 10 study XP + hub time + a prize\'s XP in crowns (migration_v64) + 50 a medal + 20 a rank-up');
   const lw = json(`sh_wallet('xp-L1')`);
-  ok(lw.from_xp === Math.floor(xpOf('xp-L1') / 10) && lw.medals === 0 && lw.trophies === 0 && lw.rankups === 0, `back pay: L1's XP from before the switch counts, its old medal and trophy don't (${JSON.stringify(lw)})`);
+  ok(lw.from_xp === Math.floor(xpOf('xp-L1') / 2) && lw.medals === 0 && lw.trophies === 0 && lw.rankups === 0, `back pay: L1's XP from before the switch counts, its old medal and trophy don't (${JSON.stringify(lw)})`);
   award('xp-U', 'rep:flag:9002', 1300);
   anon(`select record_achievement('xp-U', 'owl', '')`);
   const uw = json(`sh_wallet('xp-U')`);
-  ok(uw.rankups === 2 && uw.trophies === 1 && uw.earned === Math.floor((xpOf('xp-U') - 1300) / 10) + 1300 + 2 * 20 + 25, `rank-ups and trophies since the switch: +20 and +25 each, a fixed report's XP in crowns (${JSON.stringify(uw)})`);
+  ok(uw.rankups === 2 && uw.trophies === 1 && uw.earned === Math.floor((xpOf('xp-U') - 1300) / 2) + uw.from_time + 1300 + 2 * 20 + 25, `rank-ups and trophies since the switch: +20 and +25 each, a fixed report's XP in crowns (${JSON.stringify(uw)})`);
+  // hub time (migration_v64, Sam: "also 100 crowns per hour of hub time"): 25 seconds a ping, at most 100 crowns in a clock
+  // hour (two tabs, or a script, can't pay more), the dashboard's and test rows never
+  sql(`insert into activity_hourly (h, hub, section, visitor_id, n) values
+    ('2026-11-10 14:00+00', 'xh', 'notes', 'xp-HT', 144), ('2026-11-10 15:00+00', 'xh', 'questions', 'xp-HT', 72),
+    ('2026-11-10 16:00+00', 'xh', 'notes', 'xp-HT', 100), ('2026-11-10 16:00+00', 'xm', 'notes', 'xp-HT', 100),
+    ('2026-11-10 17:00+00', '', 'home', 'xp-HT', 144), ('2026-11-10 17:00+00', 'zz-test', 'notes', 'xp-HT', 144)`);
+  const tw = json(`sh_wallet('xp-HT')`);
+  eq([tw.from_time, tw.earned, tw.balance], [250, 250, 250], 'hub time: an hour 100, half an hour 50, two hubs at once in one hour 100, the dashboard and test rows nothing');
+  raises(() => anon(`select sh_time_crowns('xp-HT')`), null, 'anon can\'t run sh_time_crowns');
+  notes.push('Shiny Gold Crowns: 5 per 10 study XP, 100 an hour of hub time (at most 100 in a clock hour), prizes 1:1, medals, trophies, rank-ups');
 
   /* ---------- 10. the shop ---------- */
   // seasons: in step with holidayId() and isFall() in widget/pet.js, every day of three years

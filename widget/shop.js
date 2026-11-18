@@ -242,12 +242,12 @@
     else svg = svg.replace(/(<svg[^>]*>)/, function(m){ return m + "<style>" + TP.CSS.replace(/\.tp-still[^\n]*/, "") + "</style>"; });
     return '<div class="tsh-poster">' + img(svg, "The whole " + se.n + " set at Timmy’s place") + "</div>";
   }
-  /* how crowns are earned: studying pays 1 for 10 XP, and every prize (migration_v64) pays as many crowns as XP. The
+  /* how crowns are earned: studying pays 5 for 10 XP, and every prize (migration_v64) pays as many crowns as XP. The
      amounts are the server's (the wallet's pays, sh_prizes()), or the page's copy of them (shGame.prizes) */
   function earnList(w){
     var G = window.shGame, P = w.pays || (G && G.prizes) || null;
     var li = function(n, what){ return "<li><b>" + n + "</b> " + what + "</li>"; };
-    var html = li("1", "for every 10 XP you earn studying (a boost’s extra XP doesn’t count)");
+    var html = li("5", "for every 10 XP you earn studying (a boost’s extra XP doesn’t count)") + li("100", "for every hour you spend in a hub");
     if (P) {
       var top = function(list){ return list && list.length ? num(list[list.length - 1][1]) : ""; };
       html += li("+ the XP", "on top for every bonus: a bonus pays as many crowns as XP") +

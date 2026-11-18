@@ -12,8 +12,10 @@
 -- the balance once, in its bootstrap, and nothing updated it, so crowns only moved on a reload. Every paid reply now carries
 -- the balance (`crowns`), and the page shows it at once (widget/v3.js sends it on as sh:crowns).
 --
--- 1. Crowns (sh_wallet). Study XP (answers, the day's bonuses, mocks, games, Timmy Time's minutes, flashcards) still pays 1 crown
---    per 10 XP: the shop's prices are set against it (migration_v62). Every *prize* now pays as many crowns as its XP
+-- 1. Crowns (sh_wallet). Study XP (answers, the day's bonuses, mocks, games, Timmy Time's minutes, flashcards) pays 5 crowns
+--    per 10 XP (Sam, 2026-11-17: "lets increase it to 5 crowns per 10xp"; it was 1, and a balance is worked out from all the
+--    XP so far, so every balance goes up with it), and 100 crowns per hour of hub time (Sam: "also 100 crowns per hour of
+--    hub time"; from all the time recorded, at most 100 in a clock hour: sh_time_crowns). Every *prize* now pays as many crowns as its XP
 --    (sh_is_prize): the survey and check-in rewards (as since v60), a fixed report (100 XP, now 100 crowns, was 10), a hub
 --    medal, finishing a Timmy Time episode, and every prize below. A prize is never boosted, so its XP and crowns are equal.
 --    The trophy (+25), medal (+50) and rank-up (+20) grants stay. Fixed reports, medals and finished episodes already paid
@@ -72,14 +74,26 @@ returns jsonb language sql immutable set search_path = public as $$
 $$;
 
 -- ====================================================================== 1. the wallet
--- the wallet (migration_v54): 1 crown per 10 XP of study XP (a boost's extra earns none), as many crowns as XP for every prize
+-- the wallet (migration_v54): 5 crowns per 10 XP of study XP (was 1) (a boost's extra earns none), as many crowns as XP for every prize
 -- (v64), 1,000 a survey or check-in reward (as since v60, whatever its XP), +25 a trophy, +50 a medal and +20 a rank-up since the switch, minus what
 -- was spent. `got` says which once-only prizes are taken (the name ever; the visit and the first game today), and `pays` what
 -- every prize pays (sh_prizes), for the page.
+-- v64 also pays 100 crowns per hour of hub time (Sam, 2026-11-17: "also 100 crowns per hour of hub time"), from the time the
+-- hubs record (activity_hourly: a ping is 25 seconds, sent only while a hub is open and someone has touched it in the last
+-- 15 minutes), all of it since tracking began, at most 100 in any clock hour (144 pings): pings come straight from the page,
+-- so two tabs, or a script, never pay more than an hour's worth an hour. The dashboard sends none.
+create or replace function public.sh_time_crowns(p_visitor text)
+returns integer language sql stable security definer set search_path = public as $$
+  select coalesce((sum(least(t.n, 144)) * 100 / 144)::integer, 0)
+  from (select h.h, sum(h.n) as n from activity_hourly h
+        where h.visitor_id = p_visitor and h.hub <> '' and h.hub <> 'zz-test' group by h.h) t;
+$$;
+
 create or replace function public.sh_wallet(p_visitor text)
 returns jsonb language plpgsql stable security definer set search_path = public as $$
 declare v_xp int; extra int; prize_xp int; prize_c int; n_f int; base_xp int; bl public.game_baseline; badges text[]; t_now text[]; t_was text[];
   m_now text[]; m_was text[]; n_t int; n_m int; n_r int; earned int; spent int; dd date := (now() at time zone 'America/Chicago')::date;
+  t_c int := sh_time_crowns(p_visitor);
 begin
   select coalesce(max(x.xp), 0) into v_xp from xp_visitors x where x.visitor_id = p_visitor;
   select coalesce(sum(a.xp - a.base), 0), coalesce(sum(a.base) filter (where sh_is_prize(a.src)), 0),
@@ -98,9 +112,9 @@ begin
   n_t := (select count(*) from unnest(t_now) z where not (z = any(t_was)));
   n_m := (select count(*) from unnest(m_now) z where not (z = any(m_was)));
   n_r := greatest(0, (select gtier from sh_rank(v_xp)) - (select gtier from sh_rank(coalesce(bl.xp, 0))));
-  earned := base_xp / 10 + prize_c + 1000 * n_f + 25 * n_t + 50 * n_m + 20 * n_r;
+  earned := base_xp / 2 + t_c + prize_c + 1000 * n_f + 25 * n_t + 50 * n_m + 20 * n_r;
   select coalesce(sum(price), 0) into spent from pet_purchases where visitor_id = p_visitor;
-  return jsonb_build_object('earned', earned, 'spent', spent, 'balance', earned - spent, 'from_xp', base_xp / 10,
+  return jsonb_build_object('earned', earned, 'spent', spent, 'balance', earned - spent, 'from_xp', base_xp / 2, 'from_time', t_c,
     'prizes', prize_c + 1000 * n_f, 'trophies', n_t, 'medals', n_m, 'rankups', n_r, 'rewards', n_f, 'pays', sh_prizes(),
     'got', jsonb_build_object(
       'name', exists (select 1 from xp_awards w where w.visitor_id = p_visitor and w.key = 'name'),
@@ -792,6 +806,7 @@ select public.sh_xp_rebuild(array(select distinct a.visitor_id from personal_ans
 revoke all on table public.xp_runs, public.game_records, public.notes_reads, public.prize_seen from public, anon, authenticated;
 revoke all on function public.sh_is_prize(text) from public, anon, authenticated;
 revoke all on function public.sh_wallet(text) from public, anon, authenticated;
+revoke all on function public.sh_time_crowns(text) from public, anon, authenticated;
 revoke all on function public.sh_crowns(text) from public, anon, authenticated;
 revoke all on function public.sh_prize_reply(text, text, integer, jsonb) from public, anon, authenticated;
 revoke all on function public.sh_medal_check(text, text, timestamptz) from public, anon, authenticated;

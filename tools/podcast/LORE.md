@@ -113,7 +113,7 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
     substance in the human body, at your service." "My one weakness? Acid. Don't tell the plaque." "Fear not, citizen.
     I'll guard your smile. You do the flossing."
 - **The shop** itself (same release): he runs it, in a bow tie, behind the counter. Its money is **Shiny Gold Crowns**
-  (said in full the first time, "gold crowns" after, never just "crowns"): one for every 10 XP, more for trophies,
+  (said in full the first time, "gold crowns" after, never just "crowns"): five for every 10 XP, more for trophies,
   medals and rank-ups; spending never lowers XP or rank. Snacks (an apple, a cheese cube, floss, a fluoride rinse) give
   him HP back, one of each a day; a boost doubles XP for an hour or three.
 - Occlusion (Oct 21): "it's October, so yes, I'm in costume. I'm not going to tell you which one."

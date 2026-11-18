@@ -88,7 +88,7 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
 
 ## Shiny Gold Crowns and the shop
 
-- **The balance** (`sh_wallet`, never stored): 1 per 10 XP of base XP (a boost's extra earns none; nor does a survey's or
+- **The balance** (`sh_wallet`, never stored): 5 per 10 XP of base XP (1 until migration_v64; Sam, 2026-11-17: "lets increase it to 5 crowns per 10xp") (a boost's extra earns none; nor does a survey's or
   check-in's 1,000 XP), +1,000 a survey or check-in reward (migration_v60: counted from its award row's `src`), +25 a trophy, +50 a medal,
   +20 a rank-up (a tier) since the switch, **+ every prize's XP again as crowns** (migration_v64, next to last section), minus what was spent. Spending never lowers XP or rank. The XP from before the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
@@ -377,7 +377,8 @@ the page just never redrew the balance after an answer (bug log). Now every payi
 `finish_session_v2`, `pod_minute_v2` and every prize call) carries `crowns`, the balance after it, and `widget/v3.js` sends
 it as `sh:crowns` (the hub's meters and a gold "+n crowns" pop, the dashboard's wallet).
 
-- **The rate stays 1 crown per 10 XP of studying** (v62 priced the shop on it); **a prize pays as many crowns as XP**
+- **Hub time pays 100 crowns an hour** (Sam, 2026-11-17: "also 100 crowns per hour of hub time"): `sh_time_crowns` counts `activity_hourly`'s pings (25 seconds each, only while a hub is open and touched in the last 15 minutes), at most 144 in any clock hour, so two tabs or a script can't pay more than 100 an hour; the dashboard and `zz-test` rows don't count. All the time recorded since tracking began counts (the wallet's `from_time`).
+- **Studying pays 5 crowns per 10 XP** (Sam, 2026-11-17: "lets increase it to 5 crowns per 10xp"; it was 1, and since the balance is worked out from all the XP so far, every balance went up five times for its study XP; the shop's prices, set in v62 against the old rate, weren't changed); **a prize pays as many crowns as XP**
   (`sh_is_prize(src)`: the survey and check-in keep their fixed 1,000; report, medal and pod-done now pay theirs too, also
   for the ones already won since the release). One table, `sh_prizes()`, holds every amount; `PRIZES` in `widget/v3.js` is
   its copy (xp.js fails if they differ) and every card's "+n XP and crowns" reads it. The wallet also returns `pays` and

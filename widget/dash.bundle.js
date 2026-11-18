@@ -605,7 +605,7 @@ return '<div class="dx-ring" role="img" aria-label="' + (p ? pct + "% " + esc(p.
 }
 function podEarn(hub){
 var m = /(\d+)\s*min/.exec(hub.podcast.sub || ""), mins = m ? +m[1] : 0;
-return '<span class="dx-pod-earn">' + (mins ? "Up to +" + num(mins * 10 + 100) + " XP and " + num(mins + 100) + " crowns" : "Earns XP and crowns as you listen") + "</span>";
+return '<span class="dx-pod-earn">' + (mins ? "Up to +" + num(mins * 10 + 100) + " XP and " + num(mins * 5 + 100) + " crowns" : "Earns XP and crowns as you listen") + "</span>";
 }
 function podHTML(hub){
 if (!hub.podcast) return "";

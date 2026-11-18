@@ -467,7 +467,7 @@
     { scene: "snowy-mountain", "yard-left": "rank-silver-yard", outfit: "white-coat" }
   ];
   /* what each test account has earned in Shiny Gold Crowns before this preview (Sam's spec: new 0, returning about 300,
-     missed about 80 so a purchase is refused for its balance, high-XP about 20,000); answers here add 1 for every 10 XP */
+     missed about 80 so a purchase is refused for its balance, high-XP about 20,000); answers here add 5 for every 10 XP (migration_v64) */
   var WALLET_START = { "new": 0, returning: 300, missed: 80, "high-xp": 20000, archived: 1500, admin: 5000 };
   function placeOwned(v){
     var own = {}, g = rank2(rpc("get_rank_profile", { p_visitor: v }).data.xp || 0).gtier;
@@ -493,7 +493,7 @@
   function wallet2(v){
     if (!v || v !== db.visitor) return null;
     var forms = (db.forms || []).length;
-    var earned = (WALLET_START[db.persona] || 0) + Math.floor(Math.max(0, (db.xp2 || 0) - 1000 * forms) / 10) + 1000 * forms, spent = 0;
+    var earned = (WALLET_START[db.persona] || 0) + Math.floor(Math.max(0, (db.xp2 || 0) - 1000 * forms) / 2) + 1000 * forms, spent = 0;
     (db.buys || []).forEach(function(b){ spent += b.price || 0; });
     return { earned: earned, spent: spent, balance: earned - spent, from_xp: earned, trophies: 0, medals: 0, rankups: 0 };
   }

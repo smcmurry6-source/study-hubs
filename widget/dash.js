@@ -635,11 +635,11 @@
         : "Your progress in this hub shows here") + "</span></div>";
   }
   /* Timmy Time: a hub's audio review episode (hub.podcast = { name, sub }), on the hub's color with the host in headphones */
-  /* what the episode pays (migration_v64): 10 XP and 1 crown a minute heard, then 100 of each for finishing it; the
+  /* what the episode pays (migration_v64): 10 XP and 5 crowns a minute heard, then 100 of each for finishing it; the
      minutes come from the card's "48 min" */
   function podEarn(hub){
     var m = /(\d+)\s*min/.exec(hub.podcast.sub || ""), mins = m ? +m[1] : 0;
-    return '<span class="dx-pod-earn">' + (mins ? "Up to +" + num(mins * 10 + 100) + " XP and " + num(mins + 100) + " crowns" : "Earns XP and crowns as you listen") + "</span>";
+    return '<span class="dx-pod-earn">' + (mins ? "Up to +" + num(mins * 10 + 100) + " XP and " + num(mins * 5 + 100) + " crowns" : "Earns XP and crowns as you listen") + "</span>";
   }
   function podHTML(hub){
     if (!hub.podcast) return "";

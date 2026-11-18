@@ -1721,7 +1721,7 @@
   document.addEventListener("sh:bowl-trophy", sendBowlTrophy);
   setTimeout(sendBowlTrophy, 5000);
   /* ---------- prizes (migration_v64, vault/reference/game-server.md) ----------
-     What each prize pays in XP, with as many Shiny Gold Crowns (study XP pays 1 crown per 10). The server's sh_prizes()
+     What each prize pays in XP, with as many Shiny Gold Crowns (study XP pays 5 crowns per 10). The server's sh_prizes()
      says the same and tools/release/xp.js checks the two match. ring is per question of the daily goal; streak and row
      are [reached, pays]; medal is Bronze to Crown. The cards that offer a prize read it from here (window.shGame.prizes). */
   var PRIZES = { name: 500, ring: 5, boss: 500, nuke: 10000, alltime: 20000, notes: 50, trophy: 200, visit: 50, game: 100, pb: 50, top: 250, report: 100, streak: [[3, 100], [7, 300], [14, 700], [30, 1500], [60, 3000], [100, 5000]], row: [[10, 25], [25, 100], [50, 250]], medal: [250, 500, 750, 1000] };
