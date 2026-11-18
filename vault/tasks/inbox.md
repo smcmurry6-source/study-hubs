@@ -236,7 +236,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   both wider than this: the tabs at XX-Large on any phone, the hand-off scene too): the hub's tab bar labels
   (Home, Notes, Questions, More) run into each other, and the Dark Matter unlock scene (`widget/journeys.js`) cuts off its "Rank 7 of 7"
   line and its sentence at the right edge. Neither scrolls the page; both only at that size.
-- [ ] **CI back on the newest Ubuntu** (2026-11-18, found on #402): the workflows are pinned to `runs-on: ubuntu-24.04` because
+- [x] **CI back on the newest Ubuntu** (2026-11-18, found on #402; done: #407, Playwright 1.63.0 on `ubuntu-latest`, the a11y
+  baseline re-recorded, the perf budgets unchanged because they pass): the workflows are pinned to `runs-on: ubuntu-24.04` because
   `ubuntu-latest` became Ubuntu 26.04, which Playwright 1.56.1 doesn't support. Before 24.04 is retired: upgrade Playwright in
   `.github/workflows/*.yml` (and `PLAYWRIGHT_PATH` setups) to one that supports 26.04, re-record the a11y and perf baselines
   (`node tools/release/a11y.js --update`, `perf.js`), check the smoke test and the device matrix, then go back to `ubuntu-latest`.
