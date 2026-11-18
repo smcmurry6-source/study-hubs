@@ -3332,7 +3332,7 @@ cpPaint(card);
 }, 0);
 });
 var FLAG_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/></svg>';
-var pendingFlagQid = null, pendingFlagLec = null, pendingFlagW = 0, pendingFlagOrd = "";
+var pendingFlagQid = null, pendingFlagLec = null, pendingFlagW = -1, pendingFlagOrd = "";
 function addFlagButton(card){
 if (card.__shFlagBtn) return; card.__shFlagBtn = true;
 var qid = card.getAttribute("data-qid"); if (!qid) return;
@@ -3340,7 +3340,7 @@ var top = card.querySelector(".qcard-top") || card;
 var b = document.createElement("button");
 b.type = "button"; b.className = "sh-qflag"; b.innerHTML = FLAG_ICON_SM + "Report";
 b.setAttribute("aria-label", "Report a problem with this question");
-b.addEventListener("click", function(ev){ ev.stopPropagation(); if (window.shOpenFlag) window.shOpenFlag(qid, +card.getAttribute("data-wording") || 0, card.getAttribute("data-order") || ""); });
+b.addEventListener("click", function(ev){ ev.stopPropagation(); if (window.shOpenFlag) window.shOpenFlag(qid, card.hasAttribute("data-wording") ? +card.getAttribute("data-wording") || 0 : -1, card.getAttribute("data-order") || ""); });
 if (window.SH_PINS) addPinButton(card, top, qid);
 top.appendChild(b);
 }
@@ -4941,16 +4941,17 @@ updateSheetState();
 function setFlagContext(qid, w, ord){
 pendingFlagLec = qid && typeof qid === "object" ? qid : null;
 pendingFlagQid = pendingFlagLec ? null : (qid || null);
-pendingFlagW = pendingFlagQid && w > 0 ? w : 0;
+pendingFlagW = pendingFlagQid && w >= 0 ? w : -1;
 pendingFlagOrd = pendingFlagQid && /^[1-5]{2,5}$/.test(ord || "") ? ord : "";
 var ctx = document.getElementById("shstat-flag-ctx");
 if (!ctx) return;
 if (pendingFlagLec) { ctx.textContent = "About the notes for " + (pendingFlagLec.label || pendingFlagLec.lec); return; }
 if (!qid) { ctx.textContent = ""; return; }
 var meta = findQuestionMeta(qid), t = meta.text || "";
-if (pendingFlagW || pendingFlagOrd) { var cs = document.querySelector('.qcard[data-qid="' + String(qid).replace(/"/g, "") + '"]' + (pendingFlagOrd ? "[data-order]" : "[data-wording]") + " .qc-stem"); t = cs ? cs.textContent : t; }
-ctx.textContent = "About question " + qid + (pendingFlagW ? " (reworded)" : "") + (t ? ": " + (t.length > 110 ? t.slice(0, 108) + "…" : t) : "");
+if (pendingFlagW > 0 || pendingFlagOrd) { var cs = document.querySelector('.qcard[data-qid="' + String(qid).replace(/"/g, "") + '"]' + (pendingFlagOrd ? "[data-order]" : "[data-wording]") + " .qc-stem"); t = cs ? cs.textContent : t; }
+ctx.textContent = "About question " + qid + flagVersion() + (t ? ": " + (t.length > 110 ? t.slice(0, 108) + "…" : t) : "");
 }
+function flagVersion(){ return pendingFlagW >= 0 ? " (version " + ("ABCDEF".charAt(pendingFlagW) || "A") + ")" : ""; }
 window.shOpenFlag = function(qid, w, ord){
 closeOtherPanels(flagPanel);
 setFlagContext(qid, w, ord);
@@ -4979,7 +4980,7 @@ if (!supabase) { msg.textContent = "Couldn't send — try again later."; return;
 btn.disabled = true;
 msg.textContent = "Sending…";
 var where = [];
-if (pendingFlagQid) where.push("question " + pendingFlagQid + (pendingFlagW ? " (reworded: wording " + (pendingFlagW + 1) + ")" : "") + (pendingFlagOrd ? " (statements shown in the order " + pendingFlagOrd.split("").join(", ") + ")" : ""));
+if (pendingFlagQid) where.push("question " + pendingFlagQid + flagVersion() + (pendingFlagOrd ? " (statements shown in the order " + pendingFlagOrd.split("").join(", ") + ")" : ""));
 if (pendingFlagLec) where.push("lecture notes " + (pendingFlagLec.label ? pendingFlagLec.label + " (" + pendingFlagLec.lec + ")" : pendingFlagLec.lec));
 var sec = currentSection(); if (sec) where.push(sec);
 var note = (text + (where.length ? "  — " + where.join(" · ") : "")).slice(0, 700);

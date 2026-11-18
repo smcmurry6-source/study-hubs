@@ -30,6 +30,14 @@
   /* the High likelihood tag says why (Sam, 2026-11-18: "yes to the two ideas"; Perio report #57: "what is the rationale for
      this being high likelihood"): a tap opens the predicted topic, where it ranks in its lecture and what it rests on
      (core.json's likelyTopics: t, basis), the way Exam Hints' "Most likely questions" lists them. likelyWire() wires it. */
+  /* A/B: a question that comes in versions shows the letter of the one on screen, and nothing else marks it (Sam,
+     2026-11-18: "instead of saying reworded on the question cards, just display A or B and have that be the
+     differentiator"). q._base is set by HX.worded (widget/hub.js) only for a question with versions; q._w 0 = A */
+  function verTag(q){
+    if (!q || !q._base) return "";
+    var L = "ABCDEF".charAt(q._w || 0) || "A";
+    return '<span class="qc-ver num" title="Version ' + L + ' of this question"><span class="sr">Version </span>' + L + "</span>";
+  }
   function likelyTag(q){ return q.likely ? '<button class="likely" type="button" data-lkwhy aria-expanded="false">' + icon("hints", 14) + 'High likelihood<span class="sr">: why?</span><span class="chev" aria-hidden="true">' + icon("chevron", 14) + "</span></button>" : ""; }
   var BASIS = [[/^hints?$/i, "a hint from the professor"], [/^final review$/i, "the final's review"], [/^final focus$/i, "the final's focus list"],
     [/^(class )?review guide$/i, "the class's review guide"], [/^exam[- ]review$/i, "the class's exam review"], [/^live class$/i, "what was said in class"],
@@ -91,18 +99,19 @@
 
   function card(q, o){
     o = o || {};
-    /* the version for this try (HX.worded, widget/hub.js: A/B, the first by device, then alternating); choice k is choice k
-       reworded, so the key and the server's grading are the original's. data-wording (0 = A, 1 = B) goes to question health */
+    /* the version for this try (HX.worded, widget/hub.js: A/B, the first by device, then alternating), its letter in the
+       card's top line (verTag); choice k is choice k reworded, so the key and the server's grading are the original's.
+       data-wording (0 = A, 1 = B) goes to question health and a report */
     q = HX.worded ? HX.worded(q) : q;
     var seen = ansOf(q.id);
     q = later(q, seen ? seen.n || 0 : o.retry ? 1 : 0);
     var id = "q" + (++uid), multi = q.type === "multi", tf = q.fmt === "tf";
     var status = o.retry ? "" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
-      seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + (q._base ? " · reworded" : "") + (q._perm ? " · new order" : "") + "</span>" : "";
+      seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + (q._perm ? " · new order" : "") + "</span>" : "";
     var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '"' + (q._base ? ' data-wording="' + (q._w || 0) + '"' : "") + (q._perm ? ' data-order="' + q._perm.join("") + '"' : "") + ' data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
     /* o.num, o.of: the card's place in the set ("Question 12 of 84"), so you can see how many are left (a classmate's
        ask, from the idea board, 2026-11-15) */
-    var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
+    var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + verTag(q) + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
     var body = "", hide = !!o.hide && q.type === "mcq";
     if (q.type === "mcq" || multi) {
       var order = multi ? shuffled(q.choices.map(function(c, i){ return i; })) : choiceOrder(q);
@@ -826,7 +835,7 @@
       var pick = id in m.picks ? m.picks[id] : null, picks = multi ? (pick || []) : [], order = (m.order && m.order[id]) || choices.map(function(c, k){ return k; });
       var none = multi ? !picks.length : pick === null, pp = pts[id] || 0;
       var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '"' + (q._base ? ' data-wording="' + (q._w || 0) + '"' : "") + ' data-qtype="' + (multi ? "multi" : "mcq") + '" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
-      el2.innerHTML = '<header class="qc-head"><span class="qc-meta">' + qNum(i + 1, m.ids.length, "mk" + i + "n") + '<span class="qc-lec" id="mk' + i + '">' + lecChip(q.lec) + "</span>" + (multi ? '<span class="qc-flag">Select all that apply · partial credit</span>' : o2 ? '<span class="qc-flag">Ordering</span>' : "") + '</span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(o2 ? { stem: o2.stem } : q) +
+      el2.innerHTML = '<header class="qc-head"><span class="qc-meta">' + qNum(i + 1, m.ids.length, "mk" + i + "n") + verTag(q) + '<span class="qc-lec" id="mk' + i + '">' + lecChip(q.lec) + "</span>" + (multi ? '<span class="qc-flag">Select all that apply · partial credit</span>' : o2 ? '<span class="qc-flag">Ordering</span>' : "") + '</span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(o2 ? { stem: o2.stem } : q) +
         '<ul class="qc-choices' + (q.fmt === "tf" ? " qc-tf" : "") + '">' + order.map(function(k){
           var on = multi ? picks.indexOf(k) > -1 : k === pick, good = multi ? q.correct.indexOf(k) > -1 : k === ans;
           var st = m.submitted ? (good && (on || !multi) ? "right" : on ? "wrong" : good ? "missed" : "") : "";
@@ -898,7 +907,7 @@
   /* what the other files call from here */
   HX.figKeyHTML = figKeyHTML; HX.card = card; HX.bankReset = bankReset; HX.presetOf = presetOf;
   /* for Learn and Flashcards (widget/study-modes.js): the card's parts, the bank's order and the bank to redraw */
-  HX.qParts = { choiceOrder: choiceOrder, stemHTML: stemHTML, pboxHTML: pboxHTML, figHTML: figHTML, figAfterHTML: figAfterHTML, whyHTML: whyHTML, likelyTag: likelyTag, likelyWire: likelyWire, later: later, emptyHTML: emptyHTML };
+  HX.qParts = { choiceOrder: choiceOrder, stemHTML: stemHTML, pboxHTML: pboxHTML, figHTML: figHTML, figAfterHTML: figAfterHTML, whyHTML: whyHTML, likelyTag: likelyTag, verTag: verTag, likelyWire: likelyWire, later: later, emptyHTML: emptyHTML };
   HX.drawQuestions = drawQuestions; HX.qview = qview;
   HX.lecValue = lecValue; HX.filtered = filtered; HX.renderQuestions = renderQuestions; HX.mockTotal = mockTotal;
   Object.defineProperty(HX, "bankSearch", { get: function(){ return bankSearch; }, set: function(v){ bankSearch = v; }, enumerable: true });
