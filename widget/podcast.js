@@ -132,6 +132,8 @@
     audio.className = "sh-pod-audio";
     document.body.appendChild(audio);
     ["play", "pause", "ended", "ratechange"].forEach(function(ev){ audio.addEventListener(ev, refresh); });
+    /* study time counts an episode heard with the screen off (widget/v3.js): a play from the lock screen starts its clock again */
+    audio.addEventListener("play", function(){ try { document.dispatchEvent(new CustomEvent("sh:audio-play")); } catch (e) {} });
     audio.addEventListener("pause", function(){ tick(true); });
     audio.addEventListener("timeupdate", function(){ tick(); heard(); });
     audio.addEventListener("seeking", function(){ lastT = null; });
@@ -545,6 +547,7 @@
   window.shPodcast = {
     mount: mount,
     playing: function(){ return isPlaying(); },
+    audio: function(){ return audio; },   /* the episode's <audio> (read-only: widget/v3.js reads its clock for study time) */
     id: function(){ return P && P.id; },
     play: function(){ if (P) play(); },
     pause: pause

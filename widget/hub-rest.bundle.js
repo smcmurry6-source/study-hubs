@@ -1542,6 +1542,7 @@ audio.preload = "none";
 audio.className = "sh-pod-audio";
 document.body.appendChild(audio);
 ["play", "pause", "ended", "ratechange"].forEach(function(ev){ audio.addEventListener(ev, refresh); });
+audio.addEventListener("play", function(){ try { document.dispatchEvent(new CustomEvent("sh:audio-play")); } catch (e) {} });
 audio.addEventListener("pause", function(){ tick(true); });
 audio.addEventListener("timeupdate", function(){ tick(); heard(); });
 audio.addEventListener("seeking", function(){ lastT = null; });
@@ -1931,6 +1932,7 @@ document.addEventListener("sh:name", paintSocial);
 window.shPodcast = {
 mount: mount,
 playing: function(){ return isPlaying(); },
+audio: function(){ return audio; },
 id: function(){ return P && P.id; },
 play: function(){ if (P) play(); },
 pause: pause
@@ -2954,7 +2956,10 @@ if (activeAudioEl === audio && audio.duration) dockProgress(audio.currentTime / 
 var now = Date.now(); if (now - lastSave > 4000) { lastSave = now; savePos(audioUrl, audio.currentTime); }
 });
 audio.addEventListener("pause", function(){ savePos(audioUrl, audio.currentTime); if (activeAudioEl === audio && activeBtn === btn) setState(btn, "paused"); });
-audio.addEventListener("play", function(){ if (activeAudioEl === audio && activeBtn === btn) setState(btn, "playing"); });
+audio.addEventListener("play", function(){
+if (activeAudioEl === audio && activeBtn === btn) setState(btn, "playing");
+try { document.dispatchEvent(new CustomEvent("sh:audio-play")); } catch (e) {}
+});
 seek.oninput = function(){ dragging = true; if (audio.duration) time.textContent = fmtTime(seek.value / 1000 * audio.duration) + " / " + fmtTime(audio.duration); };
 seek.onchange = function(){ dragging = false; if (audio.duration) { audio.currentTime = seek.value / 1000 * audio.duration; savePos(audioUrl, audio.currentTime); } };
 player.querySelectorAll("[data-skip]").forEach(function(b){ b.onclick = function(){ if (audio.duration) audio.currentTime = Math.min(audio.duration - 1, Math.max(0, audio.currentTime + (+b.getAttribute("data-skip")))); paint(); }; });
@@ -3895,17 +3900,46 @@ var lastTick = 0;
 function pingActivity(section){
 safeRpc("record_activity_ping", { p_visitor: VISITOR_ID, p_visit: VISIT_ID, p_hub: HUB, p_section: section });
 }
-function tick(){
-var now = Date.now();
-var dt = Math.min(now - lastTick, 5 * TICK_MS);
-lastTick = now;
-if (isIdle(now)) return;
+var bg = false, bgEl = null, bgT = 0;
+function playingAudio(){
+var a = null;
+try { a = window.shTTS && window.shTTS.audio && window.shTTS.audio(); } catch (e) { a = null; }
+if (a && !a.paused && !a.ended) return a;
+try { a = window.shPodcast && window.shPodcast.audio && window.shPodcast.audio(); } catch (e) { a = null; }
+return a && !a.paused && !a.ended ? a : null;
+}
+function listeningNow(){
+try { if (window.shTTS && window.shTTS.listening && window.shTTS.listening()) return true; } catch (e) {}
+try { if (window.shPodcast && window.shPodcast.playing && window.shPodcast.playing()) return true; } catch (e) {}
+return false;
+}
+function follow(){ bgEl = playingAudio(); bgT = bgEl ? (bgEl.currentTime || 0) : 0; }
+function heardMs(){
+var ms = 0;
+if (bgEl) { var t = bgEl.currentTime || 0; if (t > bgT) ms = (t - bgT) / (bgEl.playbackRate || 1) * 1000; }
+follow();
+return ms;
+}
+function credit(dt){
 var sec = currentSection();
 sectionBank[sec] = (sectionBank[sec] || 0) + dt;
-if (sectionBank[sec] >= PING_INTERVAL_MS) {
+while (sectionBank[sec] >= PING_INTERVAL_MS) {
 sectionBank[sec] -= PING_INTERVAL_MS;
 pingActivity(sec);
 }
+}
+function tick(){
+var now = Date.now(), raw = now - lastTick;
+lastTick = now;
+if (bg) {
+var ms = heardMs();
+if (!bgEl && !ms && listeningNow()) ms = 5 * TICK_MS;
+if (ms > 0) credit(Math.min(raw, ms));
+if (!bgEl && !listeningNow()) pauseBackground();
+return;
+}
+if (isIdle(now)) return;
+credit(Math.min(raw, 5 * TICK_MS));
 }
 function flushBank(){
 Object.keys(sectionBank).forEach(function(sec){
@@ -3927,8 +3961,12 @@ tickTimer = setInterval(tick, TICK_MS);
 }
 function stopActivityPing(){
 if (!tickTimer) return;
-clearInterval(tickTimer); tickTimer = null;
 tick();
+clearInterval(tickTimer); tickTimer = null;
+flushBank();
+}
+function pauseBackground(){
+if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
 flushBank();
 }
 var trackingArmed = false;
@@ -3937,8 +3975,20 @@ trackingArmed = true;
 if (document.visibilityState !== "hidden") startActivityPing();
 }, 1500);
 document.addEventListener("visibilitychange", function(){
-if (document.visibilityState === "hidden") stopActivityPing();
-else if (trackingArmed) startActivityPing();
+if (document.visibilityState === "hidden") {
+if (!trackingArmed || bg) return;
+if (tickTimer) tick();
+bg = true; follow();
+if (!bgEl && !listeningNow()) pauseBackground();
+else if (!tickTimer) startActivityPing();
+} else if (trackingArmed) {
+if (bg && tickTimer) tick();
+bg = false; bgEl = null;
+startActivityPing();
+}
+});
+document.addEventListener("sh:audio-play", function(){
+if (bg && !tickTimer) { follow(); startActivityPing(); }
 });
 window.addEventListener("pagehide", stopActivityPing);
 function answerToday(d, isCorrect){
