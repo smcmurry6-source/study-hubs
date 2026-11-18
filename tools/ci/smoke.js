@@ -185,7 +185,12 @@ async function askCheck(page, name, o){
    (Until the redesign's release this also played an old hub with this branch's widget/games.js and podcast.js and with
    main's, to prove the live pages' calls hadn't changed; those pages were replaced at the release.) */
 async function wiringCheck(context, hub, label){
-  const QS = JSON.parse(fs.readFileSync(content(hub, 'questions.json'), 'utf8'));
+  const QS0 = JSON.parse(fs.readFileSync(content(hub, 'questions.json'), 'utf8'));
+  /* a hub with A/B versions (content/variants.json): a question may be shown in either, the first one picked by device;
+     choice k of a version is choice k of the original, so a version is matched like the original and answered by index */
+  const VF = content(hub, 'variants.json'), VS = fs.existsSync(VF) ? JSON.parse(fs.readFileSync(VF, 'utf8')) : {};
+  const QS = QS0.concat(...QS0.map(q => [].concat(VS[q.id] || []).filter(v => v && v.stem && Array.isArray(v.choices))
+    .map(v => Object.assign({}, q, { stem: v.stem, choices: v.choices }))));
   const CORE0 = JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8'));
   const EP = CORE0.audio === 'off' ? null : (CORE0.podcast || {}).id || null;   /* an archived hub's episode came off the site */
   const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
