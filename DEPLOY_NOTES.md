@@ -32,6 +32,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (Perio S6: five diagrams, Claude Code)** — Sam: "yes to all diagrams. merge when ready", to the five S6
+  candidates. Built as anima figures in `tools/figures/perio/` (`race.mjs`, `walls.mjs`, `dtree.mjs`, `vtoh.mjs`, `subtr.mjs`,
+  S6 · Figs 1-5) and placed at the end of their sections in the S6 notes, in As taught and Plain English (`FIG_PLACE` in
+  `content/figures.js`, `figByLec` in `core.json`): the race for the space (no barrier, a GTR membrane or a graft, over
+  time), counting the walls (3-, 2-, 1-wall, the opening case and horizontal loss, with the film each gives), the
+  regeneration decision tree walked step by step or along a case, the canine case's vertical-to-horizontal fill with its
+  H-shaped root and the brush, and subtraction radiography in five steps. `figures.js` 121 → 157 KB gzipped; it loads with
+  Notes, so the Perio budget (864 of 885 KB on a Home visit) is unchanged. About page's Diagrams entry: twenty for Perio.
+  [The task](vault/tasks/done/2026-11-18-perio-s6-diagrams.md), [#420](https://github.com/smcmurry6-source/study-hubs/pull/420).
 - **2026-11-18 (Perio S6: Periodontal Regeneration taught, Claude Code)** — Sam: "take Perio Session 6 (Periodontal
   Regeneration) from slides only to taught", the day before the final. Source: the class recording's transcript in Drive
   (Periodontology/hubs, `en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt`; read, never committed), with the deck and the
@@ -42,7 +51,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   questions (8 true/false, 2 two-statement, 4 numbered, 2 which, 2 which-false, 6 multiple choice, `q6-T*`, `S05`-`S06`,
   `N*`, `W*`, `F02`-`F07`), each with a why per choice and its version B in `content/variants.json`; S6 56 → 79, the bank
   674 → 697 (after #414 retired `q5-L14`). Timmy Time's section 6 rewritten from the class (it said "what we have is his slides") with a new lightning
-  round line, and the episode rebuilt. Five diagram candidates put to Sam: [the task](vault/tasks/2026-11-18-perio-s6-diagrams.md).
+  round line, and the episode rebuilt. Five diagram candidates put to Sam, all approved and built the same day (next entry up): [the task](vault/tasks/done/2026-11-18-perio-s6-diagrams.md).
   [The task](vault/tasks/done/2026-11-03-perio-s6-regeneration-taught.md).
 - **2026-11-18 (A or B on the question cards, and the two-sided perio charts say they are one visit, Claude Code)** — Sam:
   "address the reports. also instead of saying \"reworded\" on the question cards, just display A or B and have that be the

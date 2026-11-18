@@ -43,7 +43,7 @@ When the class recording or capture is in the Drive folder, make it a taught ses
 - [x] Two-statement, true/false and numbered items meet the minimums; every choice has its why (and the which / which-false
   minimum, which applies to a session taught after 2026-11-10)
 - [x] Diagram candidates put to Sam (in one message, as Sam asked); a follow-up task written:
-  [2026-11-18-perio-s6-diagrams](../2026-11-18-perio-s6-diagrams.md)
+  [2026-11-18-perio-s6-diagrams](2026-11-18-perio-s6-diagrams.md)
 - [x] CI passes; hub note and Outcome written; "Recent major changes" line added
 
 ## Log
@@ -88,7 +88,7 @@ edited or added question, Timmy Time's section 6, and the diagram candidates. "D
 - **Timmy Time**: section 6 rewritten from the class (it said "What we have is his slides"), with his hints in his words, and a
   lightning-round line on the root canal; the episode rebuilt (49 → 52 min; its length on the dashboard card,
   the About page and `LORE.md` too).
-- **Diagrams**: five candidates put to Sam; [the follow-up task](../2026-11-18-perio-s6-diagrams.md) builds the approved ones.
+- **Diagrams**: five candidates put to Sam; [the follow-up task](2026-11-18-perio-s6-diagrams.md) built all five, which Sam approved the same day.
 - Verified: `node tools/hub-next/build.mjs --check`, the bank lint (format minimums, key spreads, the id registry, every
   wording), `node tools/ci/syntax.js`, `node tools/ci/vault.js`, and CI on the PR.
 

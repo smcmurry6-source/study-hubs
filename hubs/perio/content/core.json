@@ -155,6 +155,7 @@
   "fans": [{"who":"Number thirty-one","tag":"Timmy's neighbor","text":"Update: I bought a real Nabers probe. It turns out I have a furcation too, two entrances, and I'm told that's normal. I am not reassured. Also, for the record, that implant case was a different number thirty-one."},{"who":"The toothbrush by the door","tag":"Timmy's world","text":"Finally, a segment of my own. Phase one starts with oral hygiene, every patient, every time. About the recession part: that's hard bristles and aggressive brushing. I'm soft. Be gentle with me and I'll be gentle with your gingiva."}]
  },
  "figByLec": {
+  "periodontal-regeneration": ["race","walls","dtree","vtoh","subtr"],
   "implants-perio": ["pistates","meffert","bop","xrays"],
   "antibiotics-host-mod": ["biofilm","targets","hostmod"],
   "perio-plastic-esthetics": ["cairo","palate","grafts","ape","egd","excess","clsteps","smile"]
