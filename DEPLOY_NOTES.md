@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-18 (The launch trailer's tools, Claude Code, #PRNUM; nothing on the site changes)** — Sam: "you can merge
+- **2026-11-18 (The launch trailer's tools, Claude Code, #415; nothing on the site changes)** — Sam: "you can merge
   the tools and notes in case we ever make another trailer". `tools/trailer/` made the redesign's launch trailer, a
   94 second, 16:9 video narrated by Timmy from a newly drawn Timmy Time studio
   ([the task](vault/tasks/done/2026-11-13-launch-trailer.md), [README](tools/trailer/README.md)): `script.md` (his lines),

@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent: Claude Code
-pr: PRURL
+pr: https://github.com/smcmurry6-source/study-hubs/pull/415
 ---
 
 # A launch trailer for the redesign, narrated by Timmy
