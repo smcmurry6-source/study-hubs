@@ -65,6 +65,8 @@ Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy" (the
   (CI), the kit's lists after `addPack` dropped `coll`, so the Collections tab came up empty. The build checks both now.
 - 2026-11-18: CI's performance suite: the dashboard at 358 KB of its 345 (all 88 outfits in `outfits.js`). Split it
   (BUG-173): 340 KB in 10 requests.
+- 2026-11-18: the local smoke test on the final code: on a phone the customizer's four tabs ran 16 px past their panel (BUG-174, a
+  phone rule widened them); fixed in `widget/place.css`, then the release suites run once on the final code.
 
 ## Outcome
 
