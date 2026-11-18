@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (the to-do list as packages, `/backlog`, and the to-do rule tightened, Claude Code)** — Sam: "give me a list
+  of all the open items on the to do and the inbox ... group them in packages that can be shipped in the same pr ... a really
+  big item should go alone in its own session ... make this a skill". `node tools/todo/list.mjs` prints every open item (task
+  notes and their unticked boxes, the inbox, pending migrations, the bug log's open and awaiting-retest rows, leftovers in
+  done tasks; `--ref origin/main`, `--full`, `--json`); [package-the-to-dos](vault/how-to/package-the-to-dos.md) says how to
+  set aside what's in a PR, waiting, Sam's or parked, group the rest into one-PR packages (S, M, L; an L always alone) and
+  write each one's launch prompt; `.claude/skills/backlog/` runs it in Claude Code. Sam's second ask, "make it a rule that
+  any sessions from now on will add open items to the to do list and check things off that have been done", went into the
+  existing rule ([to-dos-go-in-the-vault](vault/rules/to-dos-go-in-the-vault.md): check the list at the start, tick and add
+  in the PR, tick what you find already done) and the PR template's new "To-do list" section. Nothing on the site changed.
 - **2026-11-18 (more cosmetics: six year-round collections, five rare costumes, six paints, Claude Code)** — Sam: "Lets work on
   timmy outfits and place cosmetics. Go crazy" ([the task](vault/tasks/2026-11-18-more-cosmetics.md)). **Six collections**
   (`COLLECTIONS` in `tools/figures/site/sets.mjs`, one pack each in `tools/figures/site/packs/`: `dino`, `moonbase`, `reef`,
