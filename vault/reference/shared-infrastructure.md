@@ -93,7 +93,8 @@ tags: [widget, supabase]
   failed in bursts of 1 to 5 minutes, up to 1 in 2 of them, each time something heavy ran: a migration with a 43 s
   transaction and a 17 s backfill, the lessons audit's 11-13 s economy queries through the connector (which have no time
   limit), and the admin page sending its reads all at once. So: apply a migration with a backfill, and run long analysis
-  SQL, when the class is quiet (late at night), or keep each query short; the admin page reads one query at a time
+  SQL, when the class is quiet (late at night), or keep each query short (benchmark a function on a throwaway copy,
+  `tools/release/pg.js`, never in a loop on the live database); the admin page reads one query at a time
   ([admin-operations](admin-operations.md)); `widget/v3.js` retries a failed answer for about three minutes with the
   same request id. What's still to do: [the task](../tasks/2026-11-18-database-load.md).
 - **GitHub Pages deploy** — `github.com/smcmurry6-source/study-hubs`, branch

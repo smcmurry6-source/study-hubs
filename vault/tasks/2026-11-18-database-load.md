@@ -27,7 +27,9 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   14:51 a migration's 43 s transaction and a 17 s backfill; 16:22 and 16:28 the lessons audit's economy queries (11 and
   13 s, through the connector, no time limit); 17:53 and 18:06-18:11 the admin page loading Insights, Clicks, Question health
   and Time all at once. A few bursts (16:53, 17:14) had nothing in the logs over 10 s: probably several shorter queries
-  through the connector. In a burst, answers from one device also waited on its own advisory lock
+  through the connector. At 18:27 and 18:30 another session timed `get_widget_bootstrap_v2` in a loop over the top
+  visitors through the connector, and the admin page loaded at 18:31: 26 of 63 saves failed in those minutes. Benchmarks
+  belong on a throwaway copy (`tools/release/pg.js`), not the live database. In a burst, answers from one device also waited on its own advisory lock
   (`pg_advisory_xact_lock('xp|' || visitor)`) behind its slower calls.
 - The database: 1 GB, two shared cores, 60 connections; anon's `statement_timeout` is 3 s
   ([shared-infrastructure](../reference/shared-infrastructure.md)).
