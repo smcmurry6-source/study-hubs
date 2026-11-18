@@ -58,7 +58,7 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   in October: the hints quote only his teaching words, never the quiz. New ids: `q6-T01`-`T08` (true/false), `q6-S05`,
   `S06`, `q6-N01`-`N04`, `q6-W01`-`W04` (which / which-false), `q6-F02`-`F07`; 79 questions, every one with its version B.
   Not in the hub on purpose: his asides (peak bone mass and diet soda, the witch scale, Gouda, fluoride and the
-  congressional visit). His diagram candidates wait on Sam: [the task](../tasks/2026-11-18-perio-s6-diagrams.md).
+  congressional visit). His five diagrams were approved and built the same day (S6 · Figs 1-5, "Diagram decisions" below).
 - **Dr. Kaur's focus for her part of the final** (Sam passed it on 2026-11-11): "really know" peri-implant health,
   peri-implant mucositis and peri-implantitis; her clinical questions are based on them. In the hub: an S7 Exam Hint
   (`src:'relay'`, labeled "Paraphrased": not her exact words), the S7 `note` at the top of its notes, S7's
@@ -192,6 +192,11 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   `egd`). `excess` and `clsteps` import Fig 4's section helpers from `ape.mjs` (exported for them). Patient 1's numbers
   come from the notes (#7 the reference, laterals 1 mm apical before and 1 mm coronal after, 2 mm for 2 mm on the
   centrals); how far #6 and #11 sat, the papillae and the lips are illustrative.
+- 2026-11-18: S6's five candidates approved ("yes to all diagrams. merge when ready") and built as S6 · Figs 1-5:
+  the race for the space (`race.mjs`), counting the walls (`walls.mjs`), the decision tree step by step (`dtree.mjs`),
+  vertical to horizontal (`vtoh.mjs`) and subtraction radiography (`subtr.mjs`), each at the end of its section in the S6
+  notes (`FIG_PLACE`, both reading levels) and not in Review (a Review `figs` section draws under the notes too, so it would
+  show twice). Sources and what's simplified: [the task](../tasks/done/2026-11-18-perio-s6-diagrams.md).
 
 ## On the engine (since the redesign's release)
 
@@ -243,7 +248,6 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11
   (statements reordered on a retry: Sam said yes 2026-11-18, [inbox](../tasks/inbox.md)).
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
-- [S6's diagram candidates](../tasks/2026-11-18-perio-s6-diagrams.md): five, put to Sam on 2026-11-18; build the approved ones.
 - S9's two sources differ on recession prevalence (the recording vs the slide's 88% / 50%) and on ADM (a slide says
   comparable or superior to autografts, the exam-review guide says it doesn't work as well): the notes give both and
   no question turns on either. S9's drawn cases, modeled on two of his recorded cases, are `no-kg-24` and
