@@ -404,10 +404,17 @@
     }
     return '<div class="pchart-wrap">' + h + '</tbody></table></div>';
   }
+  /* a chart with both surfaces says so above each strip and at the top: the two strips look alike, and with the label only
+     in the table's caption under each one, a student read them as two charts from two visits (Perio report #61, 2026-11-18) */
+  function sideHead(sf, up){
+    return '<p class="dc-side dc-side-' + sf + '"><b>' + (sf === 'f' ? 'Facial' : up ? 'Lingual (palatal)' : 'Lingual') + '</b> · the ' +
+      (sf === 'f' ? 'cheek and lip' : up ? 'palate' : 'tongue') + ' side</p>';
+  }
   I.chart = function(spec, o){
     o = o || {}; var ts = teethOf(spec), hide = o.hide || {}, s = '';
-    var surfaces = o.lingual === false ? ['f'] : (spec.lingual === false ? ['f'] : ['f', 'l']);
-    surfaces.forEach(function(sf){ s += chartStrip(spec, ts, sf, o) + chartTable(spec, ts, sf, o); });
+    var surfaces = o.lingual === false ? ['f'] : (spec.lingual === false ? ['f'] : ['f', 'l']), two = surfaces.length > 1, up = isUpper(ts[0].n);
+    if(two) s += '<p class="dc-sides">One chart from one visit: the facial side of these teeth, then the lingual side of the same teeth.</p>';
+    surfaces.forEach(function(sf){ s += (two ? '<div class="dc-surf">' + sideHead(sf, up) : '') + chartStrip(spec, ts, sf, o) + chartTable(spec, ts, sf, o) + (two ? '</div>' : ''); });
     s += '<div class="pchart-key">Blue line: the gingival margin. Red line: the base of the pocket (probing depth below the margin). <span class="bop">Red dot</span>: bleeding on probing; yellow dot: suppuration. Recession is the CEJ to the margin, in mm; a negative number means the margin sits coronal to the CEJ.' +
       (hide.cal ? '' : ' CAL = probing depth + recession.') + ' M = mobility (0-3).' + (hide.furc ? '' : ' Furcation triangles: open = Class I, half filled = II, filled = III.') + '</div>';
     return s;

@@ -98,11 +98,11 @@ answer away): they changed 97. 447 KB raw, 134 KB gzipped.
 - **Engine:** `worded(q, n)` in `widget/hub.js`: try 1 the original, then the next wording (n = the tries so far; Flashcards
   pass their review count). `card()` calls it (bank, drill, misses, weak spots, mock, Learn); so do Flashcards
   (`widget/study-modes.js`), the shared games (`widget/games.js` through `window.shHub.worded`) and Perio's own
-  (`arcade.js` `dealMCQ`). A worded copy carries `_base` and `_w`; the card has `data-wording` and says "reworded" on its top line.
+  (`arcade.js` `dealMCQ`). A worded copy carries `_base` and `_w`; the card has `data-wording` and shows the version's letter, A or B, beside its number (since 2026-11-18, Sam: "instead of saying reworded on the question cards, just display A or B").
   `variants.json` is fetched with the Questions view or the arcade (`needVariants`, only when `core.json` has `variants`),
   never with Home or the notes, and isn't in `sw.js`'s precache.
 - **Kept on the original:** search, Find this in the notes, `SH_EXPORT`, question health's fingerprint, the answer keys.
-- **Reports** carry "reworded: wording 2" (`widget/v3.js`); **Ask Timmy** sends `ask.w`, and the function swaps the wording in
+- **Reports** carry "(version A)" or "(version B)" (until 2026-11-18, "reworded: wording 2") (`widget/v3.js`); **Ask Timmy** sends `ask.w`, and the function swaps the wording in
   (`wordingOf`, `loadVariants`; test in `tools/timmy/test.mjs`). The function changed, so After merge deploys it.
 - **Checks:** `checkVariants` in `tools/hub-next/build.mjs` (choice and why counts, statement labels and counts, a changed
   stem, the key-longest rate) and `lintWordings` in `tools/ci/smoke.js`. No High yield changed.
