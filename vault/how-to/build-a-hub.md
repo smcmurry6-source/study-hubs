@@ -29,7 +29,8 @@ Since the redesign's release (2026-11) every hub runs on the shared engine (`wid
   and the hub's own wording for Home, Notes, hints, the mock and the arcade), then `widget/hub-art/<hub-id>.js` and
   `widget/hub.bundle.js`. Nothing else goes in the page.
 - **The content**, `hubs/<hub-id>/content/`: `core.json` (lectures with `id`, `num`, `title`, `who`, `status` taught /
-  slides / upcoming, `tag`; `examInfo`, `courseDates`, `likelyTopics`, the mock blueprint (and, if you want it, `mock.likelyShare`, 0-1:
+  slides / upcoming, `tag`, and `from` when the lecture's line under its title shouldn't read "recording and slides" or
+  "slides only", e.g. "recording only" for a lecture whose slides couldn't be read; `examInfo`, `courseDates`, `likelyTopics`, the mock blueprint (and, if you want it, `mock.likelyShare`, 0-1:
   about that share of each lecture's mock questions from its High likelihood ones; Occlusion's final uses 0.75), `examCounts` if counts per
   lecture were announced, the podcast), `questions.json` (every question, each with `src` and its `why`),
   `notes.json` (`full` and `plain`), `study.json` (hints quoted from the recordings, the cram sheet, the Side by side

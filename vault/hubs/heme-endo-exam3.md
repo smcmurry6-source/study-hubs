@@ -36,17 +36,20 @@ entry in `hubs.js`.
 - **L17 and L18** were written from their slides and recordings (Drive transcripts `GMT20261110-195437`, 1:54 pm, and
   `GMT20261111-190049`, 1 pm; every caption is labeled "Michael Herr", the room's Zoom account). **L19 and L20** were written
   from their slides, then taken to taught on 2026-11-18 from their recordings (Drive, Exam 3 folder: `GMT20261117-190158`, Dr.
-  Herr, 1 pm, and `GMT20261117-194905`, Dr. Borak, the 2 pm lecture; the captions name no speaker). **L21 and L22 aren't in the hub
-  yet**: their slides weren't posted when it was built, or by 11/18 at 4 am UTC. Both are
-  [a task](../tasks/2026-11-16-heme-endo-exam3-l19-l22.md).
+  Herr, 1 pm, and `GMT20261117-194905`, Dr. Borak, the 2 pm lecture; the captions name no speaker). **L21 and L22** (Dr. Dal Zotto, 11/18) went in the same evening, written from
+  their recordings (Drive, Exam 3 folder: `GMT20261118-190020`, 1 pm, male, and `GMT20261118-200153`, 2 pm, female; the
+  captions say "Michael Herr" throughout). Their slides are in that folder too, but the connector couldn't read them (over its
+  10 MB limit, and no text came back), so **the notes haven't been checked against the slides**: a detail only on a slide
+  isn't in them, and each lecture says so in a reading-note and in its `note`. When the decks can be read (Sam opens them as
+  Google Slides, or a smaller copy), check them: [the inbox](../tasks/inbox.md).
 - **Dr. Herr's Exam 3 study guide** (Sam, 2026-11-17: no in-class review; the guide is "very indicative" and "everything on the study
   guide should be high likelihood questions"; Drive, Exam 3 folder, `Exam 3 Study Guide (1).docx`): a focus list and key terms for
   each of L17-L22, nothing for Lecture A. Each lecture's Exam Hints open with its list (a `focus` hint, the guide's words, then the
   hub's take), and every question on a guide item is in a `likelyTopics` entry with basis "study guide + ...", ranked first;
   topics from a recorded hint that the guide doesn't list (L17's fertilization, implantation, capacitation, the maternal hormones)
   stay High Likelihood, ranked after. Five questions were written for the thinner items (`hi-sg-platelets`, `hi-tf-sg-neut`,
-  `ll-sg-classify`, `ll-num-sg-leuk`, `ea-sg-pop`). L21 and L22's lists are in [their task](../tasks/2026-11-16-heme-endo-exam3-l19-l22.md):
-  they become those lectures' focus hints and topics when the lectures go in. Lecture A's topics weren't changed, and stay that way (Sam: "lecture a shouldnt be ranked lower").
+  `ll-sg-classify`, `ll-num-sg-leuk`, `ea-sg-pop`). L21 and L22's lists (in [their task](../tasks/done/2026-11-16-heme-endo-exam3-l19-l22.md))
+  are those lectures' focus hints and first topics (basis "study guide + recording"), since 2026-11-18. Lecture A's topics weren't changed, and stay that way (Sam: "lecture a shouldnt be ranked lower").
 - **Sources:** Drive, "Hematology and Endocrinology" → "Hubs" → "Exam 3" (L17-L20's slides and the two transcripts), and the
   course's learning objectives ("Exam 1" folder). **Not used**, by the [graded-coursework](../rules/graded-coursework.md) rule:
   the Exam 3 Anki deck in that folder (a previous year's practice questions), everything in "Resources from D3s", Quiz 4 (open
@@ -55,8 +58,8 @@ entry in `hubs.js`.
   androgens (L18) 6, Introduction to hematology (L19) 8, Lymphomas and leukemias (L20) 6, Male reproductive pathology (L21) 4,
   Female reproductive pathology (L22) 4: 35. `core.json` `examCounts` has all seven ("n on the exam" beside each lecture under
   Most likely questions; Ask Timmy reads the exam facts), and the mock's `blueprint` has the lectures in the hub, at the exam's
-  pace (35 in 90 minutes): 27 questions in 69 minutes now. When L21 and L22 go in, add `mpath: 4` and `fpath: 4` to the
-  blueprint and set its `limit` to 5400 (35 in 90 minutes), and fix the mock's wording in `index.html`. **The counts never trim
+  pace: since L21 and L22 went in (2026-11-18) it is the exam's 35 in 90 minutes (`mpath: 4`, `fpath: 4`, `limit` 5400),
+  and `index.html`'s mock blurb lists all seven counts. **The counts never trim
   High Likelihood** ([high-likelihood-topics](../rules/high-likelihood-topics.md)).
 - **Figures:** 22 anima figures (Sam said yes to every candidate, 2026-11-16), two for A and five for each of L17-L20, numbered
   Fig 1-22 in lecture order; shipped 2026-11-17, after the hub ([the figures task](../tasks/done/2026-11-16-heme-endo-exam3-figures.md)
@@ -68,18 +71,22 @@ entry in `hubs.js`.
   (`shared.mjs`, `makeFig`); each figure's CSS classes carry its own prefix (`lm-` is the lamina dura's, `ld-` the letdown's).
   L19's and L20's were checked against the recordings on 2026-11-18, and each lecture got one more, built under Sam's "yes to
   all diagrams" (2026-11-18): **Fig 23** `nkcheck` (L19, how an NK cell decides to kill, prefix `xa-`) and **Fig 24**
-  `nodespread` (L20, how lymphoma spreads and its stages, prefix `ya-`). L21 and L22 get a diagram review when they go in
-  ([diagram-review](../rules/diagram-review.md)); new figures number on from Fig 25.
+  `nodespread` (L20, how lymphoma spreads and its stages, prefix `ya-`). **L21 and L22 have no figures**: Sam, 2026-11-18,
+  "no to all diagrams" ([decisions](../decisions.md)), which replaces the 11-16 yes for those two, so they got no diagram
+  review. A figure added later numbers on from Fig 25.
 - **Narration:** `hubs/heme-endo-exam3/audio/<lecture>-full|plain|hy.mp3` with their words files
   (`python3 tools/narrate.py heme-endo-exam3 --lec <id> --level <level> --force`). Every lecture has all three levels (High
-  yield for L17-L20 recorded 2026-11-17, after the study guide's rebuild; L19 and L20's three levels again 2026-11-18, taught). High yield again after any change to a lecture's
-  notes, topics, hints or questions, then the content build. No Timmy Time episode yet: Sam, 2026-11-17, "wait for timmy time until we have all the lectures for exam 3" ([inbox](../tasks/inbox.md)).
+  yield for L17-L20 recorded 2026-11-17, after the study guide's rebuild; L19 and L20's three levels again 2026-11-18, taught; L21 and L22's the same day). High yield again after any change to a lecture's
+  notes, topics, hints or questions, then the content build. L21 and L22 added 29 words to `tools/podcast/lexicon.json`
+  (cryptorchidism, leiomyoma, urothelial, botryoides, Trichomonas, PeIN...) and `tools/narrate.py` reads "WHO" as W H O.
+  **Timmy Time:** none yet. Sam, 2026-11-17: "wait for timmy time until we have all the lectures for exam 3"; with L21 and L22
+  in, Sam, 2026-11-18: "after you finish, start a new session for timmy time" ([inbox](../tasks/inbox.md)).
 - **Quirks:** `SH_HUB` has no `exam` key on purpose: with one, the engine counts only lectures whose `exam` matches, so
   nothing would count. Lecture A's id is `dental` and its label "A".
 
 ## Content flags (kept as taught; check when a recording or review lands)
 
-No question's key depends on any of these.
+No question's key depends on any of these, except L22's LCIS (below).
 
 - **A:** in [the carry-over task](../tasks/done/2026-11-10-heme-endo-exam3-carry-lecture-a.md).
 - **L17 (Dr. Madison):** she ties meiosis II to ZP2 binding (textbooks: sperm entry); estrogen "raises" vaginal pH (slide:
@@ -114,15 +121,32 @@ No question's key depends on any of these.
   key depends on it) and put Hodgkin's start in the chest's central nodes (22:08; the slide says the neck). He grouped
   mantle cell with the indolent lymphomas once (46:16; textbooks: aggressive; no key on its grade). Its 10 Patient Box cases
   are written for the hub.
+- **L21 (Dr. Dal Zotto, from the recording):** bladder cancer "the fourth cause of death in men" right after "it doesn't cause
+  many deaths" (the questions use the incidence rank: fourth most common cancer in men); Leydig cells "secrete testosterone and
+  dihydrotestosterone" (most DHT is made in target tissues, L18) and the vas deferens "ends up in the ureter" (the urethra),
+  both in reading-notes; cryptorchidism in "1 in 10" newborns, corrected at about 2 years (texts: about 3 percent, by 18
+  months; no key on either number); the periurethral zone called the "central zone" and the "transitional zone" in one breath
+  (questions say "around the urethra" or "transition zone"). Said not needed (hints, no key on them): retroperitoneal
+  fibrosis, the WHO classifications, FGFR3 and TP53, the testicular tumor classification, the seminoma's histology and the
+  nonseminomas' details ("general information").
+- **L22 (Dr. Dal Zotto, from the recording):** the paramesonephric ducts "about the first week of gestation" and the
+  mesonephros "the future kidney" (texts: about the sixth week; a temporary kidney); leiomyomas' age not keyed. **LCIS** called
+  benign, with no treatment needed (the WHO's wording, as taught): unlike the flags above, the questions follow the lecture
+  here (`fr-dcis` and the breast numbered and except items key it), since the lecture's points are what the exam tests; texts
+  also call LCIS a marker of higher breast cancer risk, followed with surveillance (a reading-note says so). Said not needed:
+  the new cervical screening's details (know it's risk-based), the ovarian tumor classification, DCIS vs LCIS under the
+  microscope.
 
 ## Pending
 
-Open tasks for this hub: `vault/tasks/` notes with `hub: heme-endo-exam3`:
-[L19 and L20 to taught, L21 and L22 in](../tasks/2026-11-16-heme-endo-exam3-l19-l22.md). Shipped with 285 questions
+Open tasks for this hub: `vault/tasks/` notes with `hub: heme-endo-exam3` (none open since 2026-11-18;
+[L19 and L20 to taught, L21 and L22 in](../tasks/done/2026-11-16-heme-endo-exam3-l19-l22.md) is done). Shipped with 285 questions
 (A 58, L17 58, L18 59, L19 55, L20 55) and 53 High Likelihood topics; after the study guide (2026-11-17), 290 questions
 (L17 58, L18 60, L19 57, L20 57) and 62 topics, 260 questions High Likelihood; 22 figures since 2026-11-17. After L19 and L20
 went taught (2026-11-18), 313 questions (L19 72, L20 65), 64 topics, 285 High Likelihood, 83 hints, 24 figures; three L20
 questions retired (`ll-hl-case`, `ll-2s-scatter`, `ll-specimen`: Hodgkin subtypes and flow cytometry, said not needed).
+With L21 and L22 (2026-11-18): 437 questions (L21 64, L22 60, 13 of them Patient Box cases), 86 topics, 387 High
+Likelihood, 122 hints, 24 figures. Left open: checking L21 and L22 against their slides ([inbox](../tasks/inbox.md)).
 
 ## History
 

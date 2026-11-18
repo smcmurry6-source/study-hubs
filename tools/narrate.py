@@ -52,6 +52,8 @@ SAY = [
     (r"\b1\s*mg\b", "1 milligram"), (r"(?<=\d)\s*mg\b", " milligrams"), (r"\bq(\d+)h\b", r"every \1 hours"),
     (r"\bpo\b", "P O"), (r"\bqd\b", "Q D"), (r"\bbid\b", "B I D"), (r"\btid\b", "T I D"), (r"\bqid\b", "Q I D"),
     (r"\bIL-1\b", "I L one"),
+    # the World Health Organization (case-sensitive, so "who" stays a word)
+    (r"\bWHO\b", "W H O"),
 ]
 
 

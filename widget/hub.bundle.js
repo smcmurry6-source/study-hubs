@@ -2111,7 +2111,7 @@ var sub = String(lec.title).split(":").slice(1).join(":").trim();
 var group = (STUDY.review || []).filter(function(g){ return g.lec === lec.id; })[0];
 var art = '<article class="reading' + lc(lec.id) + '" id="lec-' + esc(lec.id) + '">' +
 '<h1 class="rd-title">' + lecBadge(lec, "lb-h") + '<span class="sr">' + esc(lecLabel(lec)) + " · </span><span>" + esc(shortTitle(lec)) + "</span></h1>" + (sub ? '<p class="sub">' + esc(sub) + "</p>" : "") +
-'<p class="note">' + esc(lec.who) + " · " + (lec.status === "taught" ? "recording and slides" : "slides only") + " · " + pl(nq, "question") + "</p>" +
+'<p class="note">' + esc(lec.who) + " · " + (lec.from ? esc(lec.from) : lec.status === "taught" ? "recording and slides" : "slides only") + " · " + pl(nq, "question") + "</p>" +
 (lec.note ? '<p class="note lec-note">' + lec.note + "</p>" : "") +
 '<div class="toolbar" role="toolbar" aria-label="Notes tools">' +
 (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn"' + (mp3 ? ' data-sh-tts-audio="1"' : ' title="Read aloud in your device\'s voice"') + ' aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
