@@ -253,22 +253,42 @@
   /* a question's other wordings (content/variants.json, { id: { stem, choices, why[, ex] } or a list of them), fetched the
      first time the bank, the mock, the drill or a bank game opens, never with Home or the notes (CORE.variants says the hub
      has them). It never fails a view: without it every try shows the original. Choice k of a wording is choice k reworded,
-     so the key, the answer keys on the server, XP and the mock's scoring don't change (vault/tasks/2026-11-17-reworded-question-variants.md). */
+     so the key, the answer keys on the server, XP and the mock's scoring don't change (vault/tasks/done/2026-11-17-reworded-question-variants.md). */
   var VARS = null;
   function needVariants(){
     if (!CORE || !CORE.variants) return Promise.resolve(null);
     return VARS ? Promise.resolve(VARS) : getJSON("variants.json").then(function(v){ VARS = v || {}; return VARS; }, function(){ return null; });
   }
-  /* the wording a question shows: the first try the original, each later try the next wording (n, the tries so far: the
-     answers by default, a flashcard's reviews in Flashcards). A worded copy keeps the original as _base and its number as
-     _w (1 = the first extra wording); search, Find this in the notes, question health and SH_EXPORT read the original. */
-  function worded(q, n){
+  /* A/B: which version a question starts on, by device (Sam, 2026-11-18: "They are A/B versions of questions", "Split the
+     class"): a hash of the device id (sh_visitor_id, widget/v3.js) and the question id, so about half the class starts each
+     question on A (the original) and half on B, and a person's questions are mixed. Without a device id, A. */
+  var VID = "";
+  function abStart(id, n){
+    if (!VID) try { VID = localStorage.getItem("sh_visitor_id") || ""; } catch (e) {}
+    if (!VID) return 0;
+    var s = VID + "|" + id, x = 2166136261;
+    for (var i = 0; i < s.length; i++) x = Math.imul(x ^ s.charCodeAt(i), 16777619);
+    /* mixed (murmur3's finish): FNV-1a's low bit is only the parity of the characters, so every device would get one of
+       two patterns */
+    x ^= x >>> 16; x = Math.imul(x, 0x85ebca6b); x ^= x >>> 13; x = Math.imul(x, 0xc2b2ae35); x ^= x >>> 16;
+    return (x >>> 0) % n;
+  }
+  /* does this question come in versions (false until variants.json has come)? */
+  function hasVersions(id){ return !!(VARS && VARS[id]); }
+  /* the version a question shows: the device's first version on the first try, then the next one each try (n, the tries
+     so far: the answers by default, a flashcard's reviews in Flashcards). A copy keeps the original as _base and the
+     version shown as _w (0 = A, the original; 1 = B, the first of variants.json); question health records _w with each
+     answer (migration_v67). Search, Find this in the notes, question health's fingerprint and SH_EXPORT read the original. */
+  function worded(q, n, k){
     var base = q && q._base || q; if (!base || !VARS) return base;
     var vs = VARS[base.id]; if (!vs) return base; if (!Array.isArray(vs)) vs = [vs];
     if (n == null) { var a = ansOf(base.id); n = a ? a.n || 0 : 0; }
-    var k = n % (vs.length + 1), v = vs[k - 1]; if (!k || !v || !v.stem) return base;
+    /* k: a version already picked (the mock keeps the one each question was drawn in until it's submitted) */
+    if (k == null || k < 0 || k > vs.length) k = (n + abStart(base.id, vs.length + 1)) % (vs.length + 1);
+    var v = vs[k - 1];
     var o = {}; for (var key in base) o[key] = base[key];
-    o.stem = v.stem; if (v.choices) o.choices = v.choices; if (v.why) o.why = v.why; if (v.ex) o.ex = v.ex;
+    if (k && v && v.stem) { o.stem = v.stem; if (v.choices) o.choices = v.choices; if (v.why) o.why = v.why; if (v.ex) o.ex = v.ex; }
+    else k = 0;
     o._base = base; o._w = k; return o;
   }
   function needNotes(){ return getJSON("notes.json").then(function(n){ NOTES = n; return n; }); }
@@ -1581,7 +1601,7 @@
     QBY: QBY, QBL: QBL, LBY: LBY, EXAM_LECS: EXAM_LECS, REVIEW: REVIEW, loadScript: loadScript, loadCss: loadCss,
     lecLabel: lecLabel, shortTitle: shortTitle, lecName: lecName, LCOL: LCOL, lc: lc, lecDot: lecDot,
     lecChip: lecChip, lecHead: lecHead, isRead: isRead, isExamLec: isExamLec, isReview: isReview,
-    hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, needNotes: needNotes, needStudy: needStudy,
+    hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, hasVersions: hasVersions, needNotes: needNotes, needStudy: needStudy,
     needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
     go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
     offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget

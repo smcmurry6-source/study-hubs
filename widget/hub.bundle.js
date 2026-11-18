@@ -580,8 +580,8 @@ q = HX.worded ? HX.worded(q) : q;
 var id = "q" + (++uid), multi = q.type === "multi", tf = q.fmt === "tf";
 var seen = ansOf(q.id);
 var status = o.retry ? "" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
-seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + (q._w ? " · reworded" : "") + "</span>" : "";
-var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '"' + (q._w ? ' data-wording="' + q._w + '"' : "") + ' data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
+seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + (q._base ? " · reworded" : "") + "</span>" : "";
+var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '"' + (q._base ? ' data-wording="' + (q._w || 0) + '"' : "") + ' data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
 var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
 var body = "", hide = !!o.hide && q.type === "mcq";
 if (q.type === "mcq" || multi) {
@@ -1212,6 +1212,7 @@ host.innerHTML = top + byLec;
 m.ids.forEach(function(id, i){
 var q = QBY[id]; if (!q) return;
 if (m.submitted && m.onlyMissed && m.res[id]) return;
+if (HX.hasVersions && HX.hasVersions(id)) { m.wv = m.wv || {}; if (m.wv[id] == null) m.wv[id] = HX.worded(q)._w || 0; q = HX.worded(q, null, m.wv[id]); }
 if (q.type === "match") {
 var mp = Array.isArray(m.picks[id]) ? m.picks[id] : [], ix = q.pairs.map(function(x, k){ return k; }), rows = (m.order && m.order[id]) || ix, opts = (m.ro && m.ro[id]) || ix, mpp = pts[id] || 0, mnone = !has(id);
 var em = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="match" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
@@ -1228,7 +1229,7 @@ return;
 var o2 = oc[id], multi = q.type === "multi", choices = o2 ? o2.choices : q.choices, ans = o2 ? o2.answer : q.answer;
 var pick = id in m.picks ? m.picks[id] : null, picks = multi ? (pick || []) : [], order = (m.order && m.order[id]) || choices.map(function(c, k){ return k; });
 var none = multi ? !picks.length : pick === null, pp = pts[id] || 0;
-var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + (multi ? "multi" : "mcq") + '" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
+var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '"' + (q._base ? ' data-wording="' + (q._w || 0) + '"' : "") + ' data-qtype="' + (multi ? "multi" : "mcq") + '" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
 el2.innerHTML = '<header class="qc-head"><span class="qc-meta">' + qNum(i + 1, m.ids.length, "mk" + i + "n") + '<span class="qc-lec" id="mk' + i + '">' + lecChip(q.lec) + "</span>" + (multi ? '<span class="qc-flag">Select all that apply · partial credit</span>' : o2 ? '<span class="qc-flag">Ordering</span>' : "") + '</span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(o2 ? { stem: o2.stem } : q) +
 '<ul class="qc-choices' + (q.fmt === "tf" ? " qc-tf" : "") + '">' + order.map(function(k){
 var on = multi ? picks.indexOf(k) > -1 : k === pick, good = multi ? q.correct.indexOf(k) > -1 : k === ans;
@@ -1488,13 +1489,25 @@ function needVariants(){
 if (!CORE || !CORE.variants) return Promise.resolve(null);
 return VARS ? Promise.resolve(VARS) : getJSON("variants.json").then(function(v){ VARS = v || {}; return VARS; }, function(){ return null; });
 }
-function worded(q, n){
+var VID = "";
+function abStart(id, n){
+if (!VID) try { VID = localStorage.getItem("sh_visitor_id") || ""; } catch (e) {}
+if (!VID) return 0;
+var s = VID + "|" + id, x = 2166136261;
+for (var i = 0; i < s.length; i++) x = Math.imul(x ^ s.charCodeAt(i), 16777619);
+x ^= x >>> 16; x = Math.imul(x, 0x85ebca6b); x ^= x >>> 13; x = Math.imul(x, 0xc2b2ae35); x ^= x >>> 16;
+return (x >>> 0) % n;
+}
+function hasVersions(id){ return !!(VARS && VARS[id]); }
+function worded(q, n, k){
 var base = q && q._base || q; if (!base || !VARS) return base;
 var vs = VARS[base.id]; if (!vs) return base; if (!Array.isArray(vs)) vs = [vs];
 if (n == null) { var a = ansOf(base.id); n = a ? a.n || 0 : 0; }
-var k = n % (vs.length + 1), v = vs[k - 1]; if (!k || !v || !v.stem) return base;
+if (k == null || k < 0 || k > vs.length) k = (n + abStart(base.id, vs.length + 1)) % (vs.length + 1);
+var v = vs[k - 1];
 var o = {}; for (var key in base) o[key] = base[key];
-o.stem = v.stem; if (v.choices) o.choices = v.choices; if (v.why) o.why = v.why; if (v.ex) o.ex = v.ex;
+if (k && v && v.stem) { o.stem = v.stem; if (v.choices) o.choices = v.choices; if (v.why) o.why = v.why; if (v.ex) o.ex = v.ex; }
+else k = 0;
 o._base = base; o._w = k; return o;
 }
 function needNotes(){ return getJSON("notes.json").then(function(n){ NOTES = n; return n; }); }
@@ -2641,7 +2654,7 @@ studyDayList: studyDayList, achMap: achMap, putAnswer: putAnswer, saveNow: saveN
 QBY: QBY, QBL: QBL, LBY: LBY, EXAM_LECS: EXAM_LECS, REVIEW: REVIEW, loadScript: loadScript, loadCss: loadCss,
 lecLabel: lecLabel, shortTitle: shortTitle, lecName: lecName, LCOL: LCOL, lc: lc, lecDot: lecDot,
 lecChip: lecChip, lecHead: lecHead, isRead: isRead, isExamLec: isExamLec, isReview: isReview,
-hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, needNotes: needNotes, needStudy: needStudy,
+hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, hasVersions: hasVersions, needNotes: needNotes, needStudy: needStudy,
 needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
 go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
 offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget

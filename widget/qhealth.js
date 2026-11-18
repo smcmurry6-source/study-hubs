@@ -13,6 +13,7 @@
      - the explanation: active time on the card after answering, and taps inside the explanation;
      - feedback: "Good question?" thumbs under the explanation, with a reason on a thumbs down (qh_vote). "Something
        else" opens the Report panel, as before.
+   A question in A/B versions (content/variants.json) adds the version on screen to each row (w: 0 = A, 1 = B).
    Every row carries the question's version: a fingerprint of what the hub exports for it (SH_EXPORT.questions: stem,
    choices, key, explanation), so an edited question starts fresh numbers. fp() is also used by review/.
    Rows go out in batches to record_qh (migration_v51): every 30 s, at 20 rows, and when the tab is hidden. Automated
@@ -153,9 +154,16 @@
   /* the reader moved off a card: an unanswered stretch of 3 s or more is a 'view' row */
   function leave(card, gone){
     var s = card.__shQh; if (!s) return;
-    if (!s.answered && s.seg >= VIEW_MIN) push({ q: s.qid, v: verOf(s.qid), k: "v", c: s.ctx, t: kindOf(qOf(s.qid), s.type), ms: Math.round(s.seg) });
+    if (!s.answered && s.seg >= VIEW_MIN) push(ab({ q: s.qid, v: verOf(s.qid), k: "v", c: s.ctx, t: kindOf(qOf(s.qid), s.type), ms: Math.round(s.seg) }, card));
     s.seg = 0;
     if (gone && s.rec) finish(card);
+  }
+  /* A/B: the version on screen, from a card of a question that comes in versions (data-wording: 0 = A, the original;
+     1 = B; widget/hub.js worded()). The fingerprint stays the original's, so both are one question (migration_v67) */
+  function ab(rec, card){
+    var w = card && card.getAttribute("data-wording");
+    if (w != null && /^\d$/.test(w)) rec.w = +w;
+    return rec;
   }
   function qOf(qid){ var m = metaOf(qid); return m ? m.q : null; }
   function verOf(qid){ var m = metaOf(qid); return m ? m.v : ""; }
@@ -175,7 +183,7 @@
       card = cands.indexOf(focus) >= 0 ? focus : cands.sort(function(a, b){ return st(b).pre - st(a).pre; })[0] || null;
       var s = card ? st(card) : null, q = qOf(qid);
       var ctx = String(d.ctx || (s && s.ctx) || "").toLowerCase();
-      var rec = { q: qid, v: verOf(qid), k: "a", c: ctx, t: kindOf(q, (s && s.type) || ""), ok: d.correct ? 1 : 0 };
+      var rec = ab({ q: qid, v: verOf(qid), k: "a", c: ctx, t: kindOf(q, (s && s.type) || ""), ok: d.correct ? 1 : 0 }, card);
       if (prior) { rec.n = prior.n + 1; if (prior.n) { rec.p = prior.last ? 1 : 0; rec.g = Math.round((t - prior.t) / 60000); } }
       if (typeof d.choice === "number") rec.ch = d.choice;
       if (q && Array.isArray(q.choices)) rec.nch = q.choices.length;

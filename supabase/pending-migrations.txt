@@ -13,5 +13,7 @@
 # migration_v63 (a medal moves a bought boost after its 24 hours; the Bowling trophy on the server) was applied on 2026-11-17 (PR #395).
 # migration_v64 (matching items graded as an order; Perio's Stage & Grade in the arcade's lists) was applied on 2026-11-17.
 # migration_v65 (more cosmetics: six year-round collections, five rare costumes, six paints) was applied on 2026-11-18 (PR #409).
+# migration_v66 (the class's picks follow the version of a question's choices) was applied on 2026-11-18 (PR #408).
+# migration_v67 (question health's A/B versions) was applied on 2026-11-18 (through the connector, as v65a-c).
 # migration_v68 (crowns that show as they're earned, prizes, every right answer paying, 5 crowns per 10 XP, 100 crowns an hour of hub time) was applied on 2026-11-18 (PR #403).
 # migration_v69 (sh_answer: v64's cached-page branch for matching items put back, which v68 had left out) was applied on 2026-11-18 (PR #403).

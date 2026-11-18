@@ -167,6 +167,67 @@ try {
   ok(mOld.correct === true && mOld.kind === 'self' && mOld.xp === 2, `a page cached before v64 (no rows sent) is taken at its word and paid as self graded (${JSON.stringify(mOld)})`);
   notes.push(`keys: ${loaded.loaded} Occlusion keys from tools/xp/keys.js, versions, retired ids, matching graded by its rows`);
 
+  /* ---------- 3b. the class's picks follow the version of the choices (migration_v66) ---------- */
+  const picksOf = (hub, qid) => rows(`select choice, picks, v from question_choices where hub = ${q(hub)} and qid = ${q(qid)} order by choice`).map(r => [r.choice, r.picks, r.v]);
+  const pastOf = (hub, qid) => rows(`select v, choice, picks from question_choices_past where hub = ${q(hub)} and qid = ${q(qid)} order by v, choice`).map(r => [r.v, r.choice, r.picks]);
+  const loadXc = list => anonJson(`admin_load_question_keys(${S}, 'xc', ${q(JSON.stringify(list))}::jsonb)`);
+  // picks counted before versions existed: c1 and c5 as the old pages counted them, c3's set aside as migration_v66 does
+  sql(`insert into question_choices (hub, qid, choice, picks) values ('xc', 'c1', 0, 4), ('xc', 'c1', 1, 6), ('xc', 'c3', 2, 5), ('xc', 'c5', 0, 3), ('xc', 'c5', 2, 2);
+       update question_choices set v = 'before' where hub = 'xc' and qid = 'c3';`);
+  eq(picksOf('xc', 'c1'), [[0, 4, ''], [1, 6, '']], 'picks counted before versions have none');
+  // keys loaded without a version (a keys.js before this change): nothing moves, a pick counts as it always did
+  loadXc([{ id: 'c1', v: 'f1', kind: 'one', answer: [1] }]);
+  ans('xp-CP', 'c1', { hub: 'xc', choice: 0, at: 0 });
+  eq(picksOf('xc', 'c1'), [[0, 5, ''], [1, 6, '']], 'without a version a pick counts as before');
+  const first = loadXc([{ id: 'c1', v: 'f1', kind: 'one', answer: [1], cv: 'a1' }, { id: 'c3', v: 'f3', kind: 'one', answer: [0], cv: 'c1' },
+    { id: 'c4', v: 'f4', kind: 'one', answer: [2], cv: 'd1' }, { id: 'c5', v: 'f5', kind: 'all', answer: [0, 2], cv: 'e1' },
+    { id: 'c6', v: 'f6', kind: 'order', answer: [0, 1], cv: 'zz' }]);
+  eq(picksOf('xc', 'c1'), [[0, 5, 'a1'], [1, 6, 'a1']], 'the first version a question gets takes the picks counted before it');
+  eq([picksOf('xc', 'c3'), pastOf('xc', 'c3')], [[], [['before', 2, 5]]], 'picks set aside by the migration move out when its keys load, kept in question_choices_past');
+  eq(first.picks_restarted, 1, `the loader says how many questions' picks start again (${JSON.stringify(first)})`);
+  eq(one(`select (cv = '')::text from question_keys where hub = 'xc' and qid = 'c6' and is_current`), 'true', 'only one-choice and select-all questions have a choice version');
+  ans('xp-CP', 'c1', { hub: 'xc', choice: 1, v: 'f1', at: 10 });
+  ans('xp-CP', 'c5', { hub: 'xc', picks: [0, 1], at: 20 });
+  ans('xp-CP', 'c4', { hub: 'xc', choice: 2, at: 30 });
+  eq([picksOf('xc', 'c1'), picksOf('xc', 'c5'), picksOf('xc', 'c4')],
+    [[[0, 5, 'a1'], [1, 7, 'a1']], [[0, 4, 'e1'], [1, 1, 'e1'], [2, 2, 'e1']], [[2, 1, 'd1']]], 'answers through sh_answer stamp their picks with the current version (one choice, select all, a new question)');
+  // an edit to the choices: the old version's picks move out and the new one starts from nothing
+  const edit = loadXc([{ id: 'c1', v: 'f1b', kind: 'one', answer: [0], cv: 'a2' }]);
+  eq([picksOf('xc', 'c1'), pastOf('xc', 'c1'), edit.picks_restarted], [[], [['a1', 0, 5], ['a1', 1, 7]], 1], 'new choices: the old picks move to question_choices_past');
+  ans('xp-CP2', 'c1', { hub: 'xc', choice: 0, v: 'f1b', at: 0 });
+  eq(picksOf('xc', 'c1'), [[0, 1, 'a2']], 'the new choices count from their first pick');
+  // reloading the same keys moves nothing; a reload from an older keys.js (no cv) keeps the version
+  eq(loadXc([{ id: 'c1', v: 'f1b', kind: 'one', answer: [0], cv: 'a2' }]).picks_restarted, 0, 'the same keys again: nothing moves');
+  loadXc([{ id: 'c1', v: 'f1b', kind: 'one', answer: [0] }]);
+  eq([one(`select cv from question_keys where hub = 'xc' and qid = 'c1' and is_current`), picksOf('xc', 'c1')], ['a2', [[0, 1, 'a2']]], 'a key loaded again without a version keeps its version and its picks');
+  // the edit undone: its picks come back, the other version's go out
+  loadXc([{ id: 'c1', v: 'f1', kind: 'one', answer: [1], cv: 'a1' }]);
+  eq([picksOf('xc', 'c1'), pastOf('xc', 'c1')], [[[0, 5, 'a1'], [1, 7, 'a1']], [['a2', 0, 1]]], 'an edit undone: the old picks come back, the other version\'s are kept');
+  // the backstop: picks of another version still in the table (a key changed outside the loader) move at the next pick
+  sql(`update question_keys set cv = 'a3' where hub = 'xc' and qid = 'c1' and is_current`);
+  anon(`select record_choice('xc', 'c1', 3)`);
+  eq(picksOf('xc', 'c1'), [[3, 1, 'a3']], 'record_choice moves another version\'s picks before it counts its own');
+  ok(num(`select coalesce(sum(picks), 0) from question_choices_past where hub = 'xc' and qid = 'c1' and v = 'a1'`) === 12, 'and keeps them');
+  // a hub without keys (an old single-file page): no versions, as before
+  anon(`select record_choice('xold', 'o1', 2); select record_choice('xold', 'o1', 2); select record_choices('xold', 'o2', array[0, 3])`);
+  eq([picksOf('xold', 'o1'), picksOf('xold', 'o2')], [[[2, 2, '']], [[0, 1, ''], [3, 1, '']]], 'an old page\'s picks count as before');
+  // the past and the helpers are closed to the public; the current picks stay open, as the cards read them
+  raises(() => anon(`select * from question_choices_past`), '42501', 'anon can\'t read question_choices_past');
+  raises(() => anon(`select sh_choices_to('xc', 'c1', 'zz')`), '42501', 'anon can\'t move a question\'s picks');
+  raises(() => anon(`select sh_choice_version('xc', 'c1')`), '42501', 'anon can\'t run sh_choice_version');
+  ok(anon(`select count(*) from question_choices where hub = 'xc'`)[0][0] > 0, 'anon still reads question_choices');
+  raises(() => loadXc([{ id: 'c1', v: 'f1', kind: 'one', answer: [1], cv: 'Bad One' }]), null, 'a bad choice version is refused');
+  // tools/xp/keys.js: the version changes with a choice, the order or the key, and not with the stem or the explanation
+  const base = { id: 't', type: 'mcq', stem: 'S', choices: ['a', 'b', 'c'], answer: 1, ex: 'E', why: ['x', 'y', 'z'] }, CV = KEYS.choiceVersion;
+  ok(CV(base) && CV(base) === CV({ ...base, stem: 'S2', ex: 'E2', why: ['p', 'q', 'r'] }), 'keys.js: a new stem, explanation or why keeps the version');
+  ok(new Set([CV(base), CV({ ...base, choices: ['a', 'b', 'd'] }), CV({ ...base, choices: ['b', 'a', 'c'], answer: 0 }), CV({ ...base, answer: 2 })]).size === 4,
+    'keys.js: a new choice, a new order or a new key changes the version');
+  ok(CV({ ...base, type: 'multi', correct: [2, 0] }) === CV({ ...base, type: 'multi', correct: [0, 2] }) && CV({ id: 's', type: 'sequence', steps: ['a', 'b'] }) === '',
+    'keys.js: a select-all\'s version doesn\'t depend on the order of its key; other kinds have none');
+  ok(occ.filter(k => k.kind === 'one' || k.kind === 'all').every(k => /^[a-z0-9]{1,40}$/.test(k.cv)) && occ.filter(k => k.kind === 'order' || k.kind === 'self').every(k => !k.cv),
+    'keys.js gives every Occlusion one-choice and select-all key a version, and no other');
+  notes.push('class picks: stamped with the version of the choices, moved out (and back) when it changes, set aside from before versions, closed past');
+
   /* ---------- 4. answers, the per-question limit and the speed limit ---------- */
   const seq = [];
   const A = (qid, o, want, label) => { const r = ans('xp-A', qid, o); seq.push(r); eq(r.xp, want, label); return r; };
