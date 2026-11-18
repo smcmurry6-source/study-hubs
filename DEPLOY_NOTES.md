@@ -43,7 +43,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   entrance widths, which the final won't ask; its High Likelihood topic reworded and S5's High yield recorded again), `pc-d3`'s stem
   states its assumption, `q7-P01` asks about the case (report #54), `q4-L27`'s "re-check" pair reworded (report #59), their
   `variants.json` wordings too. Occlusion's retrospective has its 22 check-ins.
-
+- **2026-11-18 (Perio's questions as A/B versions, Claude Code)** — Sam: "They are A/B versions of questions", "Split the
+  class". `abStart()` in `widget/hub.js` picks each question's first version by device (a mixed FNV hash of
+  `sh_visitor_id` and the id: about half the class on each, every question), later tries alternate; a mock keeps each
+  question's version (`STATE.mock.wv`) until it's submitted. Every Perio card says its version (`data-wording`, 0 = A, 1 = B),
+  `widget/qhealth.js` sends it (`w`), and `migration_v67.sql` (applied through the connector) keeps it on
+  `question_events.w`, splits first tries by version (`qh_report`'s `wordings`; the old function renamed `qh_report_v51`)
+  and adds the medium flag `ab_gap` (20+ points apart, z ≥ 1.96, 10+ people a version). The admin page shows "First try
+  by version" and version B's text. Tests: `tools/release/admin-ops.js` section 5. About page updated.
 - **2026-11-18 (The class's picks follow the version of a question's choices, Claude Code)** — the inbox's "class picks on
   each choice ignore question versions" (BUG-023's general fix). `question_choices` was keyed by position only, so after an
   edit the "% of the class picked it" beside a choice counted picks of the old choices: since the release, 169 Perio and

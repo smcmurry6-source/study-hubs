@@ -47,14 +47,14 @@
 
   function card(q, o){
     o = o || {};
-    /* the wording for this try (HX.worded, widget/hub.js): the original the first time, the next wording after; choice k is
-       choice k reworded, so the key and the server's grading are the original's */
+    /* the version for this try (HX.worded, widget/hub.js: A/B, the first by device, then alternating); choice k is choice k
+       reworded, so the key and the server's grading are the original's. data-wording (0 = A, 1 = B) goes to question health */
     q = HX.worded ? HX.worded(q) : q;
     var id = "q" + (++uid), multi = q.type === "multi", tf = q.fmt === "tf";
     var seen = ansOf(q.id);
     var status = o.retry ? "" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
-      seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + (q._w ? " · reworded" : "") + "</span>" : "";
-    var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '"' + (q._w ? ' data-wording="' + q._w + '"' : "") + ' data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
+      seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + (q._base ? " · reworded" : "") + "</span>" : "";
+    var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '"' + (q._base ? ' data-wording="' + (q._w || 0) + '"' : "") + ' data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
     /* o.num, o.of: the card's place in the set ("Question 12 of 84"), so you can see how many are left (a classmate's
        ask, from the idea board, 2026-11-15) */
     var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
@@ -760,6 +760,8 @@
     m.ids.forEach(function(id, i){
       var q = QBY[id]; if (!q) return;
       if (m.submitted && m.onlyMissed && m.res[id]) return;
+      /* A/B: the version this question was first drawn in, kept until the mock is submitted (answers are recorded then) */
+      if (HX.hasVersions && HX.hasVersions(id)) { m.wv = m.wv || {}; if (m.wv[id] == null) m.wv[id] = HX.worded(q)._w || 0; q = HX.worded(q, null, m.wv[id]); }
       if (q.type === "match") {
         /* the format mock's matching item: a list to choose from beside each row, every pair scored by itself */
         var mp = Array.isArray(m.picks[id]) ? m.picks[id] : [], ix = q.pairs.map(function(x, k){ return k; }), rows = (m.order && m.order[id]) || ix, opts = (m.ro && m.ro[id]) || ix, mpp = pts[id] || 0, mnone = !has(id);
@@ -777,7 +779,7 @@
       var o2 = oc[id], multi = q.type === "multi", choices = o2 ? o2.choices : q.choices, ans = o2 ? o2.answer : q.answer;
       var pick = id in m.picks ? m.picks[id] : null, picks = multi ? (pick || []) : [], order = (m.order && m.order[id]) || choices.map(function(c, k){ return k; });
       var none = multi ? !picks.length : pick === null, pp = pts[id] || 0;
-      var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '" data-qtype="' + (multi ? "multi" : "mcq") + '" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
+      var el2 = h('<article class="qcard qc' + lc(q.lec) + (m.submitted ? " is-answered" : "") + '" data-qid="' + esc(q.id) + '"' + (q._base ? ' data-wording="' + (q._w || 0) + '"' : "") + ' data-qtype="' + (multi ? "multi" : "mcq") + '" data-ctx="mock" aria-labelledby="mk' + i + 'n mk' + i + '"></article>');
       el2.innerHTML = '<header class="qc-head"><span class="qc-meta">' + qNum(i + 1, m.ids.length, "mk" + i + "n") + '<span class="qc-lec" id="mk' + i + '">' + lecChip(q.lec) + "</span>" + (multi ? '<span class="qc-flag">Select all that apply · partial credit</span>' : o2 ? '<span class="qc-flag">Ordering</span>' : "") + '</span><span class="qcard-top qc-tools"></span></header>' + figHTML(q) + pboxHTML(q) + stemHTML(o2 ? { stem: o2.stem } : q) +
         '<ul class="qc-choices' + (q.fmt === "tf" ? " qc-tf" : "") + '">' + order.map(function(k){
           var on = multi ? picks.indexOf(k) > -1 : k === pick, good = multi ? q.correct.indexOf(k) > -1 : k === ans;
