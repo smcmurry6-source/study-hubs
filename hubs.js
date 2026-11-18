@@ -416,7 +416,7 @@ window.SH_DASH_DATA = {
    "stateKey": "perio-d2-compendium-state-v1",
    "podcast": {
     "name": "Timmy Time",
-    "sub": "The last-minute review, 49 min"
+    "sub": "The last-minute review, 52 min"
    }
   }
  ],

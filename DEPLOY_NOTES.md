@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (Perio S6: Periodontal Regeneration taught, Claude Code)** — Sam: "take Perio Session 6 (Periodontal
+  Regeneration) from slides only to taught", the day before the final. Source: the class recording's transcript in Drive
+  (Periodontology/hubs, `en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt`; read, never committed), with the deck and the
+  exam-review guide. S6 `preview` → `taught`; both reading levels rewritten from the class and all three narrations
+  (`periodontal-regeneration-full`, `-plain`, `-hy`) recorded again; 21 Exam Hints quoted (he said to study the decision
+  tree; the defect-morphology slide's studies are "not there for you to read", so `q6-L38` was retired and `q6-L06`,
+  `q6-L08` lost their study names); 14 High Likelihood topics re-ranked from what he stressed; cram rewritten; 24 new
+  questions (8 true/false, 2 two-statement, 4 numbered, 2 which, 2 which-false, 6 multiple choice, `q6-T*`, `S05`-`S06`,
+  `N*`, `W*`, `F02`-`F07`), each with a why per choice and its version B in `content/variants.json`; S6 56 → 79, the bank
+  674 → 697 (after #414 retired `q5-L14`). Timmy Time's section 6 rewritten from the class (it said "what we have is his slides") with a new lightning
+  round line, and the episode rebuilt. Five diagram candidates put to Sam: [the task](vault/tasks/2026-11-18-perio-s6-diagrams.md).
+  [The task](vault/tasks/done/2026-11-03-perio-s6-regeneration-taught.md).
 - **2026-11-18 (A or B on the question cards, and the two-sided perio charts say they are one visit, Claude Code)** — Sam:
   "address the reports. also instead of saying \"reworded\" on the question cards, just display A or B and have that be the
   differentiator". A question that comes in versions (Perio's `variants.json`) shows the letter of the one on screen beside its

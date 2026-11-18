@@ -204,6 +204,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   what the anima blocks repeat (each figure's static SVG is drawn again by its live code), or ask Sam before raising the budget.
   **On the engine (the release, #359) it is the same story with other numbers:** 812 KB of its 830 KB budget with Figs 6-8
   in `content/figures.js` (178 KB by the load event; the figures load with Notes), first paint inside its budget.
+  **2026-11-18:** 834 of 850 after the final's bank audit (BUG-176), then 864 of 885 with S6 taught (BUG-180, [#419](https://github.com/smcmurry6-source/study-hubs/pull/419));
+  the [S6 diagram candidates](2026-11-18-perio-s6-diagrams.md) need room too, so trim before building them or ask Sam.
 
 - [ ] **A new hub's blocking time after the bundles** (2026-11-13, [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md), [#358](https://github.com/smcmurry6-source/study-hubs/pull/358)):
   on `perf.js`'s slow phone a new hub's total blocking time was 230-365 ms on `main` and is 310-540 ms with the bundles

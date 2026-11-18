@@ -21,15 +21,17 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   `EXAM_HINTS`, `PCASES`, `two()`, `STATE.ui.qbank`...) are history: the same data is in the JSON (a session's `review`
   sections, `hints`, `pcases`, a question's `fmt`). The old Perio Claude Project's split sources were retired earlier (Sam,
   2026-11-03).
-- **Sessions** (`status`): S1-S5 taught (exempt from the format minimums, taught before the rules), S6 `preview`
-  (slides only), S7 taught (Dr. Kaur), S8 taught (antibiotics from Dr. Litz's 2024 recording; host modulation and his
+- **Sessions** (`status`): S1-S5 taught (exempt from the format minimums, taught before the rules), S6 taught (since
+  2026-11-18, from the class recording: below), S7 taught (Dr. Kaur), S8 taught (antibiotics from Dr. Litz's 2024 recording; host modulation and his
   dosing chart from the Nov 5 class, [task](../tasks/done/2026-11-03-perio-s8-host-modulation-class.md)), S9 taught (2026-11-10)
   from Dr. Abou-Arraj's recorded first part (posted Nov 9), and since 2026-11-14 from the Nov 12 live class too: gingival
   excess, altered passive eruption and crown lengthening, the esthetic evaluation and the tattoo ([task](../tasks/done/2026-11-03-perio-s9-plastic-esthetics.md)). Any session going
   to taught needs the full set: [two-statement-and-true-false](../rules/two-statement-and-true-false.md),
   [numbered-statements](../rules/numbered-statements.md), [high-likelihood-topics](../rules/high-likelihood-topics.md).
 - **Sources:** Drive, Periodontology/hubs (class captures, sometimes as base64 `.txt`; slide PDFs; recordings). The Drive
-  connector can't download over 10 MB, so a big PDF may be text only.
+  connector can't download over 10 MB, so a big PDF may be text only. **Lecture-capture transcripts have generic names**
+  (`en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt` is S6): search Drive for a session's words, not its title, before
+  calling one missing.
 - **Quiz card:** `NEXT_QUIZ` shows on Home until its date passes; set the next one there.
 - **Figures:** `tools/figures/perio/` (`build.mjs` writes the anima figures into `hubs/perio/content/figures.js` and
   `figures.css`; `--check`, `--preview`),
@@ -45,6 +47,18 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   unrealistic or its `expect` disagrees with them. A question names its case in `pcase`, picks its pictures with
   `pfig` (and hides a row that would give its answer away: `hide.cal`, `hide.furc`, `hide.mob`) and lists its `ref`
   links ("In the notes"). Write every new Patient Box item this way: [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md).
+- **Session 6, Dr. Geurs** (taught since 2026-11-18, [task](../tasks/done/2026-11-03-perio-s6-regeneration-taught.md)): the
+  notes follow the class recording (Drive: `en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt`, uploaded 2026-10-25, found
+  2026-11-18; it opens "Good morning, so you've had a day of occlusion") with his deck
+  (`Periodontal_regeneration_Dr. Geurs.pdf`) and the exam-review guide. 21 Exam Hints, quoted: he said to **study the
+  decision tree** in the handout, and that the studies on the defect-morphology slide (deck slide 11: Klein, Tonetti,
+  Cortellini, Garrett, Cosyn) are "not there for you to read" (the one `deemphasize` hint), so `q6-L38` (which feature of the
+  2021 meta-analysis had the strongest evidence) was retired and `q6-L06`, `q6-L08` lost their study names (same ids). Three
+  of his points (the three tissues, 3-wall defects, no root canal needed) he made while looking at the S6 quiz, which closed
+  in October: the hints quote only his teaching words, never the quiz. New ids: `q6-T01`-`T08` (true/false), `q6-S05`,
+  `S06`, `q6-N01`-`N04`, `q6-W01`-`W04` (which / which-false), `q6-F02`-`F07`; 79 questions, every one with its version B.
+  Not in the hub on purpose: his asides (peak bone mass and diet soda, the witch scale, Gouda, fluoride and the
+  congressional visit). His diagram candidates wait on Sam: [the task](../tasks/2026-11-18-perio-s6-diagrams.md).
 - **Dr. Kaur's focus for her part of the final** (Sam passed it on 2026-11-11): "really know" peri-implant health,
   peri-implant mucositis and peri-implantitis; her clinical questions are based on them. In the hub: an S7 Exam Hint
   (`src:'relay'`, labeled "Paraphrased": not her exact words), the S7 `note` at the top of its notes, S7's
@@ -90,7 +104,8 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   so **a change to the notes or hints it covers means fixing the script and rebuilding the episode in the same PR**
   (`/podcast`, [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)). After its merge the server needs
   `admin_set_podcast_episode('<admin secret>', 'perio', 'final-review', <seconds>)` for listening to earn XP. At archiving it
-  comes off with the narration ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)).
+  comes off with the narration ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)). Rebuilt
+  2026-11-18 with section 6 from S6's class recording: 52 min (3130.7 s, was 49); the After merge workflow registers the length.
 - **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
   (`img/clinic-escape.webp`).
 - **Stage & Grade** (2026-11-17; Sam: "add an interactive visualization/game for staging and grading using all of the
@@ -186,7 +201,8 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11
   one that fetched it.
 - **The page's weight budget** is `hubs/perio/` in `tools/release/budgets.json`: 850 KB since 2026-11-18 (BUG-176), when
   `node tools/release/perf.js --page hubs/perio/` measured 834 KB, most of it `questions.json` (190 KB gzipped) and
-  `notes.json` (167 KB). Check it after a big addition; raise it only with a reason in the PR that Sam approves.
+  `notes.json` (167 KB). 885 KB since S6 went taught (2026-11-18, BUG-180: 864 KB measured, S6's notes, questions, version Bs and
+  hints +28 KB gzipped). Check it after a big addition; raise it only with a reason in the PR that Sam approves.
 - Each session's Review tables sit under that session's notes (`core.noSide`: More's Side by side has nothing left, so
   it's hidden). The Patient Box cases are `core.json`'s `pcases`, checked by `node tools/ci/cases.js`. A chart that
   draws both surfaces labels each one above its strip and says they are one visit (report #61, 2026-11-18); a figure's
@@ -227,9 +243,7 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11
   (statements reordered on a retry: Sam said yes 2026-11-18, [inbox](../tasks/inbox.md)).
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
-- [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md): its transcript has been in Drive since 2026-10-25 as
-  `en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt` (Periodontology → hubs), found 2026-11-18. **Lecture-capture
-  transcripts have generic names: search Drive for a session's words, not its title, before calling one missing.**
+- [S6's diagram candidates](../tasks/2026-11-18-perio-s6-diagrams.md): five, put to Sam on 2026-11-18; build the approved ones.
 - S9's two sources differ on recession prevalence (the recording vs the slide's 88% / 50%) and on ADM (a slide says
   comparable or superior to autografts, the exam-review guide says it doesn't work as well): the notes give both and
   no question turns on either. S9's drawn cases, modeled on two of his recorded cases, are `no-kg-24` and

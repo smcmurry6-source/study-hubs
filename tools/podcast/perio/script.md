@@ -11,7 +11,7 @@ NOT SPOKEN. Notes for whoever renders this with Kokoro (see tools/podcast/README
   Numbers, units and symbols are spelled out.
 - Content source: hubs/perio lecture notes (As taught), Exam Hints (the professors' quotes from the recordings and live
   classes, Dr. Abou-Arraj's Nov 12 review for the final and his email after it, Dr. Kaur's final focus passed on by the
-  class, quoted as a paraphrase), the cram sheet and the High Likelihood topics, S1 to S9, plus LESSONS.md's live signals
+  class, quoted as a paraphrase), the cram sheet and the High Likelihood topics, S1 to S9 (S6 from its class recording since 2026-11-18), plus LESSONS.md's live signals
   (the select-all on what S-R-P aims for; the closest furcation entrance mixed up with the narrowest).
   No graded quiz, take-home or previous years' content. The hints that mention a quiz are used only for what the
   professor said in class, never as "this was on the quiz".
@@ -144,21 +144,31 @@ On behalf of my furcation: thank you, Doctor Litz.
 
 ## 6. Regeneration
 
-Session six, Doctor Geurs. What we have is his slides and the class review guide.
+Session six, Doctor Geurs, and his favorite lecture. His two goals: recognize the defects that can be regenerated, and know what to expect from the treatment. You won't be doing this surgery straight out of school. Spotting the defect, and referring it, is your part.
 
-Regeneration means new bone, new cementum and new periodontal ligament, over a root that disease exposed. All three. Bone fill alone isn't regeneration. When a root heals with a long junctional epithelium instead, that's repair, which is what root planing and a plain flap usually give you.
+Regeneration means new bone, new cementum and new periodontal ligament, over a root that disease exposed. In his words: Three different tissues that have to all regenerate in harmony with each other. It can't just be bone alone. When a root heals with a long junctional epithelium instead, that's repair, which is what root planing and a plain flap usually give you. And a pocket lined with epithelium is a pocket again.
 
-It takes four things: cells, a scaffold, growth factors, and a blood supply.
+First, a clean root. Calculus holds bacteria, and the red and orange complexes can sit right on it. In his words: If you want to answer a question right in perio, the answer is scaling and root planing. Then the granulomatous tissue in the defect comes out. It won't turn into bone, and taking it out exposes the bony walls that help the defect heal.
 
-Case selection is about the defect. The review guide puts it simply: three-wall defects are the best candidates. Deeper, narrower, more walls: more attachment gain and more bone. On the slides, a defect deeper than three millimeters, with a radiographic angle of twenty-five degrees or less, does best. A one-wall defect is a risk factor for failure. And a radiograph is a flat picture of a three dimensional defect, so the walls are confirmed at surgery, with the flap up.
+Then the race. In his words: Whatever tissue is the fastest in migrating into that defect will win the race to the space. That's the flap's epithelium. Bone is slow, but predictable, as long as it's kept still. So a mobile tooth gets splinted first. In his words: Mobility is not a good thing during healing. It takes four things: cells, a scaffold, growth factors, and a blood supply.
 
-The toolbox. Bone grafts are named by where they come from. An autograft comes from the patient. An allograft comes from another human, like D-F-D-B-A, demineralized freeze dried bone allograft. A xenograft comes from another species, like bovine bone. And an alloplast is synthetic, like beta tricalcium phosphate. Guided tissue regeneration puts a membrane over the defect, under the flap, to keep the fast gingival epithelium and connective tissue off the root, so the ligament and bone cells get there first. Put a bone graft under the membrane, and it holds the space.
+Case selection is about the defect. In his words: Potentially the most amenable to regeneration are the three wall defects, the most contained ones. More walls, a steeper angle, and more depth. On the slides, a defect deeper than three millimeters, with a radiographic angle of twenty-five degrees or less, does best, and a one-wall defect is a risk factor for failure. The studies listed on that slide, he said, are not there for you to read. Know what they show. Flat, horizontal bone loss doesn't regenerate: there's no defect to fill. And furcations are harder, because the root surface never contributes cells.
 
-The biologics. Enamel matrix derivative is mostly amelogenins, the proteins of enamel formation and attachment formation, and it gives results similar to guided tissue regeneration. R-H P-D-G-F B-B, recombinant human platelet derived growth factor, is chemotactic and mitogenic for bone and ligament cells, and angiogenic. The review guide pairs it with beta T-C-P, an osteoconductive scaffold that holds the clot.
+Finding the defect. For bone loss to be obvious on a radiograph, more than half the mineral is gone, usually with the buccal or lingual wall. In his words: By the time we see it on the radiograph, it likely is not a three-wall defect. The best candidates probe deep, say eight millimeters, with only a faint shadow on the film. The walls are confirmed at surgery, with the flap up.
 
-The decision tree starts with the patient. Uncontrolled systemic disease, tobacco and poor hygiene get fixed first. A defect under three millimeters isn't a regeneration case. A narrow three-wall defect: a bone graft, a membrane or a biologic. A wide one, or a two-wall defect: a reinforced membrane, or a graft with a membrane or with a biologic. A one-wall defect: combination therapy. High esthetic risk: avoid the membrane.
+And the one he called confusing. In his words: You don't need a root canal to do regeneration. A root canal comes in only when the tooth's vitality is compromised. Otherwise, all you need is clean roots.
 
-The baseline to beat is open flap debridement: pockets from about seven millimeters down to four, with about a millimeter and a half of attachment gain. The rest of that pocket reduction is recession. And only histology proves regeneration. A probe can't tell new attachment from a long junctional epithelium, and a radiograph shows bone fill, not attachment.
+The toolbox. Bone grafts are named by where they come from. An autograft comes from the patient. An allograft comes from another human, like D-F-D-B-A, demineralized freeze dried bone allograft. A xenograft comes from another species, like bovine bone. And an alloplast is synthetic, like beta tricalcium phosphate. D-F-D-B-A is demineralized to expose its bone morphogenetic protein, so it's a scaffold and a growth factor at once, and it doesn't show on a film until bone forms around it. Your own bone or donor bone? In his words: It's a toss-up.
+
+Guided tissue regeneration puts a membrane over the defect, under the flap, to keep the fast gingival epithelium and connective tissue off the root, so the ligament and bone cells get there first. The first membranes had to come back out. Today's collagen ones absorb. Put a bone graft under the membrane, and it holds the space.
+
+The biologics. Enamel matrix derivative is mostly amelogenins, the proteins of enamel formation and attachment formation, and it gives results similar to guided tissue regeneration. It comes from the developing teeth of miniature pigs, so tell the patient, and get consent. R-H P-D-G-F B-B, recombinant human platelet derived growth factor, is chemotactic and mitogenic for bone and ligament cells, and angiogenic. The review guide pairs it with beta T-C-P, an osteoconductive scaffold that holds the clot.
+
+The decision tree. In his words: This decision matrix is in your handout, and I think you should study it. It starts with the patient. Uncontrolled systemic disease, tobacco and poor hygiene get fixed first. A defect under three millimeters isn't a regeneration case. A narrow three-wall defect: a bone graft, a membrane or a biologic. A wide one, or a two-wall defect: a reinforced membrane, or a graft with a membrane or with a biologic. A one-wall defect: combination therapy. High esthetic risk: avoid the membrane.
+
+The baseline to beat is open flap debridement. In his words: We're almost guaranteed by just cleaning it out to get a millimeter. On the slide, pockets go from about seven millimeters down to four, with about a millimeter and a half of attachment gain, and the rest of that pocket reduction is recession. Whatever you add has to beat it. The goal is to fill the defect, turning a vertical defect into a horizontal one the patient can keep clean. And only histology proves regeneration. A probe can't tell new attachment from a long junctional epithelium, and a radiograph shows bone fill, not attachment.
+
+One more, in his words: A natural tooth is almost always better than an implant, unless you can't keep the tooth. I'd like that framed, please. Over my furcation.
 
 [pause 1]
 
@@ -317,6 +327,8 @@ In osseous surgery, the one bone you never take down? [pause 2.5] The bone in th
 The best defect for regeneration? [pause 2.5] A deep, narrow, three-wall defect.
 
 The only way to prove regeneration? [pause 2.5] Histology.
+
+Does a tooth need a root canal before its defect is regenerated? [pause 2.5] No. Clean roots.
 
 An implant probes five millimeters, the same as its baseline, with no bleeding and the bone where it was. [pause 2.5] Peri-implant health. There is no three millimeter cutoff.
 
