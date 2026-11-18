@@ -26,7 +26,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   after-merge:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 40
     environment: after-merge
     steps:
@@ -38,7 +38,7 @@ jobs:
           node-version: 22
       - name: Install headless Chromium (for the post-release check)
         run: |
-          npm i --no-save playwright@1.56.1
+          npm i --no-save playwright@1.63.0
           npx playwright install --with-deps chromium || {
             echo "::warning::Ubuntu's package mirror was unreachable: Chromium installed without its system packages (the runner image has the ones it needs)"
             npx playwright install chromium
