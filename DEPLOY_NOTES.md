@@ -32,6 +32,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (CI on Ubuntu 24.04, Claude Code, #403)** — GitHub's `ubuntu-latest` became Ubuntu 26.04, where
+  Playwright 1.56.1 can't install Chromium, so every browser job (smoke, devices, accessibility, performance, the admin
+  page, the preview check) failed on every PR. The four workflows now name `ubuntu-24.04`; moving on with a newer
+  Playwright is in the inbox ([verify-before-pushing](vault/how-to/verify-before-pushing.md)).
 - **2026-11-17 (Crowns go up as you earn them, and prizes that pay XP and crowns, Claude Code, #403)** —
   Sam: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp earn rates",
   then a list of prizes. The crowns were paid but never redrawn (BUG-164): `migration_v64.sql` puts `crowns` (the balance

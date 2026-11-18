@@ -57,5 +57,9 @@ its content JSON (`hubs/<hub>/content/`), and an old single-file hub by injectin
 - If CI's runner can't reach Ubuntu's package mirror, both workflows install the test browsers without their system
   packages and say so in a warning on the run's page (2026-11-11). A "Check hubs" that still fails at "Install headless
   Chromium" is the browser download itself: re-run it once, then say so in the PR.
+- **Every workflow runs on `ubuntu-24.04`, not `ubuntu-latest`** (2026-11-18): `ubuntu-latest` became Ubuntu 26.04 that
+  night, and Playwright 1.56.1 can't install Chromium there ("Playwright does not support chromium on ubuntu26.04-x64"),
+  so every browser job failed on every PR. Move to a newer runner together with a Playwright that supports it
+  ([inbox](../tasks/inbox.md)).
 - The long suites (the smoke test on every hub, `node tools/release/run.js`) run once on the finished code; after
   that, and after bringing `main` in, CI is the check ([long-tests-once](../rules/long-tests-once.md)).
