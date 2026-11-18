@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (Ask Timmy costs less after a merge, Claude Code)** — The 21 "When is the exam, and what is on it?" on
+  Heme & Endo Exam 3 in the admin page's Ask Timmy tab ($12.31) were the After merge workflow's own check, not students:
+  it asked one real question on the first live hub after every deploy, and a deploy follows nearly every About page change.
+  Now `tools/after-merge/run.js` asks a real question only when the function's code changed, on the live hub with the
+  soonest exam (where its cache write is read by students); an About-page-only deploy gets a free check (a question from a
+  mock exam, answered "paused" with no model call). And `buildRequest` in `supabase/functions/timmy/core.js` puts the site
+  help after the hub's content, each block with its own 1-hour cache mark, so an About page change no longer sends every
+  hub's 130-160k tokens to the cache again ([ask-timmy](vault/reference/ask-timmy.md), "Limits and money").
 - **2026-11-18 (two indexes for saving an answer, Claude Code)** — `migration_v71.sql`: `personal_answers` gets
   `(visitor_id, answered_at desc, id desc)` and `(visitor_id, hub, qid, answered_at desc, id desc)`. Every answer's speed limit,
   double-tap check and per-question counts read all of the person's answers before (9,377 for the heaviest visitor; the
