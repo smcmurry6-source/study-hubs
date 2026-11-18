@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (the backlog board, Claude Code)** — Sam: "would it be effective to make the backlog into a trello board
+  artifact that i can initiate sessions from?", then "yes build it". `/backlog` now also redraws a private claude.ai
+  artifact, "Study Hubs Backlog": the packages in four columns (This week, Next, Later, Set aside; tabs on a phone), each
+  card with its items and where they're written, its prompt, Copy prompt, and Start session, which opens a cloud session
+  through the Claude Code Remote connector (the first time, claude.ai asks Sam to allow it; without it, Copy prompt).
+  `tools/todo/board.mjs` builds the page (`tools/todo/board.html`) from a packages file the agent writes in its scratch
+  space, filling every prompt from the template in `vault/how-to/package-the-to-dos.md`. A view only: the vault stays the
+  to-do list. Nothing on the site changes.
 - **2026-11-18 (the outage repairs and raw pings kept 3 days, Claude Code)** — Sam: "we can do fixes for 1 and 2. do 3 days.
   dont cut anything for now". The evening outage (19:35-21:03 UTC) lost about 1,300 answer saves and about 2,900 activity
   pings (about 20 hours of the class's time, with the crowns it pays) for the 53 people studying then, in Perio and Heme &

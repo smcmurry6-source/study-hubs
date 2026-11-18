@@ -73,6 +73,16 @@ Most urgent first: an exam this week, then what students would notice, then the 
 Then the short lists from step 2: In a PR · Waiting · For Sam · Parked · Probably done or moot. End with how to pick:
 "Reply with a number (or a few) and I'll give you the prompt for each." Keep it short enough to read on a phone.
 
+**The board** (Sam, 2026-11-18: "yes build it", [decisions](../decisions.md)). The same list is also a page Sam can start
+sessions from: the private claude.ai artifact "Study Hubs Backlog", four columns (This week, Next, Later, Set aside), each
+package a card with its prompt, Copy prompt and Start session, which opens a cloud session through the Claude Code
+Remote connector. **It is a view, never a second to-do list:** nothing on it changes the vault, and each run redraws it.
+An agent that can publish claude.ai artifacts writes the packages as JSON (`node tools/todo/board.mjs --example` shows
+the shape; it can carry the session's environment id, so it lives in the agent's scratch space, never the repo), builds
+the page with `node tools/todo/board.mjs <packages.json> --out <board.html>` (the page is `tools/todo/board.html`) and
+republishes it to the same link, then gives Sam the link with the list. Claude Code: the skill says how. Other agents:
+the list in the chat is enough.
+
 ## 5. Write the prompt for the package Sam picks
 
 One prompt per package, in a code block Sam can copy whole, in plain words and American English:
@@ -95,6 +105,10 @@ Outcome and status, the bug row's status), and put anything left over on the to-
 Quote Sam's calls word for word, and give the paths an agent needs to start (the task note, the hub note, a file named in
 the inbox line), but not a summary of the note: the session reads it. A task note with its own "Opening prompt" section:
 use that prompt, with the package's other items added.
+
+The board fills this template for every package (`promptFor()` in `tools/todo/board.mjs` reads it from this note), so
+when you change it, keep its shape: the `<title>`, the `1. <item>` line, the two `<... | ...>` lines and the
+`Out of scope:` line. The script stops with a message if one goes missing.
 
 ## 6. Write back what Sam decides while picking
 

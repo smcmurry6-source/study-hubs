@@ -114,7 +114,9 @@ tags: [map]
   the video, its working files (`out/`) and the names its boards show (`names.local.json`) are never committed.
 - `tools/todo/list.mjs` — every open item on the to-do list in one printout (task notes, the inbox, pending migrations,
   the bug log's open rows, leftovers in done tasks; `--ref origin/main` reads `main` without leaving your branch), for
-  [package-the-to-dos](../how-to/package-the-to-dos.md) and `/backlog` (`.claude/skills/backlog/`).
+  [package-the-to-dos](../how-to/package-the-to-dos.md) and `/backlog` (`.claude/skills/backlog/`). `board.mjs` turns
+  `/backlog`'s packages into the backlog board (`board.html`, a private claude.ai artifact with a Start session button per
+  package; the packages file stays out of the repo).
 - `tools/reddit-scout/` — `scout.py` reads the Claude subreddits' feeds into one digest for `/reddit-scout`
   (`.claude/skills/reddit-scout/`); `log.md` keeps every run's suggestions, Sam's answers and the posts judged.
 - `LESSONS.md` — what archived hubs taught us. Read it before building or restructuring a hub; **before building a new
