@@ -10,6 +10,7 @@
 //   - check-ins and surveys come back newest first by created_at, with id breaking ties;
 //   - question health's A/B versions (migration_v67): the version shown is kept on each answer, first tries are split
 //     by version, and a gap of 20 points with 10+ people a version is flagged (ab_gap);
+//   - the A/B versions page (migration_v70): get_ab_summary needs the secret and returns totals only;
 //   - sh_surface() (the Insights tab's "Where time goes") places every section the engine sends (widget/hub.js
 //     section()), Learn and Flashcards apart from the bank (migration_v59).
 // Nothing here touches the live database.   node tools/release/admin-ops.js   (PostgreSQL 14+ server binaries)
@@ -197,6 +198,29 @@ try {
     ok(fx.flags.some(f => f.code === 'ab_gap' && f.harder === 0), 'ab_gap: A can be the harder one');
     raises(() => anon(`select qh_report('perio')`), '42501', 'qh_report: anon runs it');
     notes.push('question health A/B: the version shown kept on each answer, first tries by version, ab_gap at 20 points with 10+ people a version');
+
+    /* ---------- 6. the admin page's A/B versions page (migration_v70), on the same answers ---------- */
+    raises(() => anon(`select get_ab_summary('wrong')`), '28000', 'get_ab_summary with a wrong secret');
+    raises(() => anon(`select get_ab_summary(null)`), '28000', 'get_ab_summary with no secret');
+    const AB = anonJson(`get_ab_summary(${S})`), P = (AB.hubs || []).find(h => h.hub === 'perio');
+    ok(AB.days === 30 && Array.isArray(AB.hubs) && AB.hubs.length === 1 && P, `get_ab_summary: one hub with versions, 30 days (${JSON.stringify(AB).slice(0, 160)})`);
+    const f0 = P && P.first && P.first['0'], f1 = P && P.first && P.first['1'];
+    /* A: qa 10 of 12, qb 8 of 12, qc 6 of 6; B: qa 3 of 12, qb 7 of 12, qc 1 of 6; the old page's and the bad w's answers left out */
+    ok(f0 && f0.n === 30 && f0.c === 24 && f0.people === 12 && f1 && f1.n === 30 && f1.c === 11 && f1.people === 12,
+      `get_ab_summary: first tries by version, one per person and question (${JSON.stringify(P && P.first)})`);
+    ok(P && P.later && P.later['1'] && P.later['1'].n === 12 && P.later['1'].c === 0 && !P.later['0'],
+      `get_ab_summary: later tries apart from first tries (${JSON.stringify(P && P.later)})`);
+    ok(P && P.people === 24 && P.answers === 72, `get_ab_summary: people and answers with a version (${P && P.people}, ${P && P.answers})`);
+    const pr = {}; (P && P.pairs || []).forEach(x => { pr[x[0]] = x.slice(1).join(','); });
+    ok(pr.qa === '12,10,12,3' && pr.qb === '12,8,12,7' && pr.qc === '6,6,6,1' && Object.keys(pr).length === 3,
+      `get_ab_summary: each question's pair [A n, A right, B n, B right] (${JSON.stringify(pr)})`);
+    ok(P && P.kinds && P.kinds.mcq && P.kinds.mcq['0'].n === 30 && P.kinds.mcq['1'].c === 11, `get_ab_summary: first tries by kind (${JSON.stringify(P && P.kinds)})`);
+    /* an edited question: its pair starts again on the new wording, the hub's totals keep both */
+    send('fx-qh-new1', [{ q: 'qb', v: 'v2', k: 'a', c: 'bank', t: 'mcq', n: 1, ok: 1, w: 0 }]);
+    const AB2 = anonJson(`get_ab_summary(${S})`), P2 = AB2.hubs[0], qb2 = (P2.pairs || []).find(x => x[0] === 'qb');
+    ok(qb2 && qb2.slice(1).join(',') === '1,1,0,0' && P2.first['0'].n === 31, `get_ab_summary: an edited question's pair is its new wording's (${JSON.stringify(qb2)}, A n ${P2.first['0'].n})`);
+    ok(JSON.stringify(AB2).indexOf('fx-qh-') < 0, 'get_ab_summary: no visitor id in the response');
+    notes.push('A/B versions page: admin secret, first tries by version (one per person), later tries, kinds, pairs on the latest wording, no ids');
   }
 } catch (e) {
   problems.push(`test run failed: ${e.message.split('\n')[0]}`);
@@ -204,4 +228,4 @@ try {
 db.stop();
 notes.forEach(n => console.log('  ' + n));
 if (problems.length) { console.error(`\n✗ admin operations: ${problems.length} problem(s) in ${checks} checks:\n` + problems.map(p => '  - ' + p).join('\n')); process.exit(1); }
-console.log(`\n✓ admin operations (live presence, archive overrides, order, surfaces, question health A/B): ${checks} checks passed`);
+console.log(`\n✓ admin operations (live presence, archive overrides, order, surfaces, question health A/B, the A/B page): ${checks} checks passed`);

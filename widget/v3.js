@@ -1700,7 +1700,11 @@
       p_v: (window.shQH && window.shQH.version && window.shQH.version(qid)) || null,
       p_ctx: d.ctx || null, p_request: gameId(), p_session: d.session || null, p_claim: isCorrect
     };
-    var tries = 0;
+    /* a failed call is sent again with the same id, which can't record or pay twice. The database can stay busy for a few
+       minutes (2026-11-18: answers failed in bursts of 1 to 5 minutes while heavy queries ran), so outside a mock the tries
+       spread out over about three minutes, each a little early or late so a class's retries don't land together; a
+       mock's answers hold up its results, so they try twice, soon */
+    var tries = 0, waits = d.session ? [4000, 10000] : [4000, 15000, 45000, 120000];
     function paid(r){
       if (r.boost !== undefined) GAME.boost = r.boost || null;
       if (!r.repeat) setCrowns(r.crowns);   /* the balance after this answer (migration_v68) */
@@ -1712,8 +1716,11 @@
       return call.then(function(res){
         if (rpcMissing(res)) { GAME.on = false; answerToday(d, isCorrect); return; }
         if (res && res.error) {
-          /* the network or the server hiccuped: once more with the same id, which can't record or pay twice */
-          if (!tries++ && (!res.status || res.status >= 500)) return new Promise(function(ok){ setTimeout(ok, 4000); }).then(send);
+          /* the network or the server hiccuped: again, later (waits, above) */
+          if (tries < waits.length && (!res.status || res.status >= 500)) {
+            var ms = Math.round(waits[tries++] * (0.75 + Math.random() * 0.5));
+            return new Promise(function(ok){ setTimeout(ok, ms); }).then(send);
+          }
           return;
         }
         var r = res && res.data;
