@@ -28,7 +28,7 @@ its narration and Timmy Time off the site ([archived-hubs-drop-their-audio](../v
   ([question-health-flags-are-leads](../vault/rules/question-health-flags-are-leads.md)): check each against the notes,
   fix only what step 4 allows, and list the rest for Sam with what you found. Never write to `question_reviews`.
 - Run `tools/economy.sql` (Sam's standing rule, 2026-11-18, [earn-rates-stay-enjoyable](../vault/rules/earn-rates-stay-enjoyable.md)):
-  XP and crowns per study day, wallets, spending and ranks across the class, and every shop price in study days. Read it
+  XP and crowns per study day, wallets, spending, ranks and the leaderboards across the class, and every shop price in study days. Read it
   against that note's yardstick and write it under "The game economy" in Live signals; a price or rate change is a
   proposal for Sam, never part of the audit's PR.
 - For question ids that come up, read the question in the hub's bank (`hubs/<id>/content/questions.json`; an old single-file hub: `hubs/<id>/index.html`) so you judge the

@@ -35,14 +35,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 - **2026-11-18 (lessons refresh, and the game economy joins the audit, Claude Code, #414)** — Sam: "add to the lessons audit a review of xp
   and crowns across the class to make sure earn rates are healthy. also include shop prices". A standing rule,
   [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md) (on demand, for anything that changes a rate, a prize or a
-  price), with a yardstick in median study days per rarity; `tools/economy.sql` (E0-E6: the live rules, crowns and XP per study day
-  and hour, the class's rhythm, wallets and spending, the price ladder in study days, ranks), step 1b of `/lessons-audit` and a line in
+  price), with a yardstick in median study days per rarity; `tools/economy.sql` (E0-E7: the live rules, crowns and XP per study day
+  and hour, the class's rhythm, wallets and spending, the price ladder in study days, ranks, the leaderboards), step 1b of `/lessons-audit` and a line in
   `tools/lessons-refresh.md`. First reading in `LESSONS.md` ("The game economy"): about 700 crowns a median study day since
   the crown raise (#403's migration, live on the database), everything under Legendary two to three times cheaper than the yardstick, half the active class able to buy anything,
-  4% spent; a re-pricing is proposed to Sam (inbox), nothing changed. **Perio, the day before its final**: `q5-L14` retired (furcation
+  4% spent (7% by the afternoon); Sam: "lets keep all the prices for now". **Perio, the day before its final**: `q5-L14` retired (furcation
   entrance widths, which the final won't ask; its High Likelihood topic reworded and S5's High yield recorded again), `pc-d3`'s stem
-  states its assumption, `q7-P01` asks about the case (report #54), `q4-L27`'s "re-check" pair reworded (report #59), their
-  `variants.json` wordings too. Occlusion's retrospective has its 22 check-ins.
+  states its assumption, `q7-P01` asks about the case (report #54), `q4-L27`'s "re-check" pair reworded (report #59), `q7-01`'s
+  explanation gives both bone-loss limits (report #60), their `variants.json` wordings too. Occlusion's retrospective has its 22 check-ins.
 - **2026-11-18 (Perio's questions as A/B versions, Claude Code)** — Sam: "They are A/B versions of questions", "Split the
   class". `abStart()` in `widget/hub.js` picks each question's first version by device (a mixed FNV hash of
   `sh_visitor_id` and the id: about half the class on each, every question), later tries alternate; a mock keeps each

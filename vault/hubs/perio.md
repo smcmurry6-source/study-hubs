@@ -216,8 +216,8 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11
 ## Pending
 
 - After the final, read question health again (the 2026-11-18 audit checked and left `q7-T08`, `q6-L38`, `q9-L09`, `q9-L26`,
-  `q5-S04`, `q8-03`, `q9-S07`, `q9-L41`, `q7-L27`, `q7-L43`, `q8-P02`, `q9-L38`: their keys match the notes), and Sam's answer on
-  reports #55/#56 (statements reordered on a retry, [inbox](../tasks/inbox.md)).
+  `q5-S04`, `q8-03`, `q9-S07`, `q9-L41`, `q7-L27`, `q7-L43`, `q8-P02`, `q9-L38`: their keys match the notes), and reports #55/#56
+  (statements reordered on a retry: Sam said yes 2026-11-18, [inbox](../tasks/inbox.md)).
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
 - [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md) (still no recording in Drive, 2026-11-14).

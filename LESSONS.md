@@ -99,11 +99,13 @@ L19 and L20 as taught (#404), the cosmetics (#409; `migration_v65` is live, 240 
 PR #403, its crowns migration (written as v64, renamed v66 on its branch; `main`'s `migration_v66.sql` is #408's choice versions): studying pays 5 crowns per 10 XP (was 1), 100 crowns an hour of hub time, and a list of new prizes
 ("The game economy", below).
 
-**Student voice since the last audit:** 7 reports and 1 suggestion, all Perio. Fixed in this audit: #54 (`q7-P01` asked what Dr. Kaur
+**Student voice since the last audit:** 8 reports and 1 suggestion, all Perio. Fixed in this audit: #54 (`q7-P01` asked what Dr. Kaur
 decided in class; it now asks which category fits the case) and #59 (`q4-L27`'s "re-check" read as the 4-6 week Phase I evaluation; the
 item now says it is the next evaluation after calculus found there is removed). Answered: #57 (`q4-39` is High likelihood because of the
 S4 deck's "Don't Forget!!! ... Finger Rest" slide, though in class she deferred finger rests to PCD). For Sam: #55 and #56 ask that a
 statement item reorder its statements on a retry, so "1, 2 and 4" can't be remembered (the new wordings reword but keep the order).
+Also fixed: #60 (`q7-01`, after the audit: the key was right, but its explanation now gives both of Albrektsson's bone-loss limits,
+1.5 mm or less in the first year, then under 0.2 mm a year). Sam said yes to #55/#56's reorder and #57's "why" chip (2026-11-18).
 Already closed: #53, #58 (#406), suggestion #16. **The check-in reward works**: 30 check-ins since the last audit (the day before, 8),
 after the 1,000 XP and 1,000 crowns reward went up on 11-17. The Occlusion final went from 3 to 22 (below, its retrospective), Heme &
 Endo Exam 2 to 23, the Occlusion midterm to 24. They still speak for heavy users (median 775 minutes in the hub for the Occlusion final's).
@@ -147,10 +149,14 @@ and hub time**, and the new prizes started today, so read it again next audit be
 - **XP and ranks look healthy:** a median study day earns about 1,120 XP; 34 of the 76 moved up a rank since the release, most stand at
   ranks 2-4 of the Handpiece, none past rank 5; at the median pace the Handpiece's end is more than a year away. Watch the big one-time
   prizes (a nuke 10,000 XP and crowns, the all-time streak 20,000, a 100-day streak 5,000): each is weeks of a median student's earning.
-- **For Sam** (no change made): keep the new earning rate (lowering it would take crowns out of every balance, and push anyone who
-  spent below zero), and re-price the middle of the shop instead: Rare 1,500-2,500, Epic 3,500-6,000, Legendary 7,000-12,000 (2, 5-9
-  and 10-17 median study days), snacks and Commons as they are, the boosts 300 and 800. The windfall then buys about one big piece, which
-  is a good first purchase. Or wait one more audit to see the rate with the prizes and without the back pay.
+- **The leaderboards** (E7a, totals): 50 names on the boards. The rank board's top ten hold 19,900-29,000 XP against its
+  middle half's 9,800-19,100 (median 14,700); the leaders stand at rank 5 of the Handpiece, whose end is 125,000 XP: about 45 study
+  days away at a heavy studier's pace. 42 of the 50 keep a study streak of 3+ days, 8 of 7+. Arcade boards with 5+ players: seven,
+  MSK 3's Sort the busiest (9 people).
+- **Read again at 15:50 (11-18):** 77 people, median wallet 7,700; 15 have bought something, 36 purchases, 49,440 crowns: **7% of
+  everything earned** (this morning 4%), most of it today on a few Legendary homes and scenes, the back pay being spent.
+- **Sam's call (2026-11-18): "lets keep all the prices for now".** No re-pricing; the earning rate stays too. The next audit reads
+  it again with the back pay spent and the prizes in, and says whether the too-fast and hoarding signs still hold.
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order

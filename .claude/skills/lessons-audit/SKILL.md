@@ -78,7 +78,7 @@ first): every audit checks that the class isn't earning too fast or too slow for
 some accomplishment in earning crowns and buying things you want but i dont want people to feel like they are never able
 to afford the things they want for their timmy."
 
-- Run `tools/economy.sql` (E0-E6). Set `:since` to the window with **today's rules**: the last two weeks, or the day of the
+- Run `tools/economy.sql` (E0-E7). Set `:since` to the window with **today's rules**: the last two weeks, or the day of the
   last change to a rate, a prize or a price if that's later (`vault/decisions.md`, `git log -- migration_v*.sql`). E0 prints
   the live wallet formula: if it no longer pays study XP at 5 crowns per 10, change E1's `study / 2` to match.
 - Paste E1's median and 75th-percentile day into E4, and read every band in **study days** against the rule's yardstick,
@@ -89,6 +89,9 @@ to afford the things they want for their timmy."
   change in the PR's "For Sam" as numbers to pick from. Never change one in the audit's PR, and never propose taking crowns
   back (a balance is computed: a lower rate lowers everyone's at once).
 - Totals over 5 or more people only: no single balance, purchase or name.
+- **The leaderboards** (E7; Sam, 2026-11-18: "give me the current crowns economy stats, leaderboards, and such"): E7a's totals
+  go in `LESSONS.md` with the economy; E7b, the boards as the dashboard shows them, goes only in your summary to Sam in the
+  chat (the names people chose to show, nothing private beside them), never in the PR, a note or `LESSONS.md`.
 
 ## 2. Check the last refresh first
 
@@ -176,6 +179,6 @@ For each item under ~45% with 12+ tries, read the stem, choices, key and explana
 ## Finish with
 
 A short summary for Sam: what changed for students, whether the last fixes worked (numbers), what the check-ins say,
-how the earn rates sit against the prices (and which signs of drift you saw),
+how the earn rates sit against the prices (and which signs of drift you saw), the economy's numbers and the boards (E7b, in the chat only),
 any retrospective written and recap published, new lessons, and the decisions only Sam can make (report replies,
 restructures, anything over the exam).

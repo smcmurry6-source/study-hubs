@@ -91,3 +91,22 @@ with act as (select distinct visitor_id from xp_awards where d >= :since::date a
            from act a join xp_visitors x using (visitor_id) left join game_baseline b using (visitor_id))
 select gtier, count(*) people, min(xp) min_xp, max(xp) max_xp, sum((gtier > gtier0)::int) moved_up_since_release
 from r group by 1 order by 1;
+
+-- E7. The leaderboards (Sam, 2026-11-18: "as a part of the audit, give me the current crowns economy stats, leaderboards, and
+--     such"). E7a is the boards in totals, for LESSONS.md and the PR: how many names are on them, how far the top ten sit from
+--     the board's middle, how many keep a study streak going, which arcade boards have 5+ players. E7b is the boards as the
+--     dashboard shows them, the names people chose to show: for the chat with Sam only, never the PR, a note or LESSONS.md.
+select json_build_object(
+  'on_the_boards', (select count(*) from get_rank_board_v2('', 1000)),
+  'rank_board_xp', (select json_build_object('top10', percentile_cont(array[0, 0.5, 1]) within group (order by xp) filter (where rnk <= 10),
+      'everyone', percentile_cont(array[0.25, 0.5, 0.75]) within group (order by xp)) from get_rank_board_v2('', 1000)),
+  'study_streaks', (select json_build_object('3_plus', count(*) filter (where streak >= 3), '7_plus', count(*) filter (where streak >= 7),
+      'median', percentile_cont(0.5) within group (order by streak)) from get_leaderboard_v2(1000)),
+  'handpiece_end_xp', 125000,
+  'arcade', (select json_agg(x) from (select hub, game, count(distinct visitor_id) people, count(*) plays from arcade_scores
+      group by 1, 2 having count(distinct visitor_id) >= 5 order by 3 desc) x));
+-- E7b (chat only): the top ten of the rank and study-streak boards, and the answer streaks' active best and record
+select 'rank' board, rnk::int pos, display_name, xp val from get_rank_board_v2('', 10)
+union all select 'streak', (row_number() over ())::int, display_name, streak from get_leaderboard_v2(10)
+union all select 'answers-' || kind, 1, display_name, streak from get_correct_streak_stats_v2()
+order by 1, 2;
