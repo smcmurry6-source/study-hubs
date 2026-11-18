@@ -27,7 +27,7 @@ jobs:
   # A few seconds: does this pull request need the release suites? (Adding any other label does nothing.)
   scope:
     if: github.event_name == 'pull_request' && (github.event.action != 'labeled' || github.event.label.name == 'full-tests')
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       run: ${{ steps.final.outputs.run }}
@@ -84,7 +84,7 @@ jobs:
     concurrency:
       group: release-${{ github.event.pull_request.number || github.ref }}-${{ matrix.key }}
       cancel-in-progress: true
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
@@ -111,7 +111,7 @@ jobs:
       - name: Install Playwright's ${{ matrix.browsers }} and axe-core
         if: env.SKIP_ENGINE != 'true'
         run: |
-          npm i --no-save playwright@1.56.1 axe-core@4.14.0
+          npm i --no-save playwright@1.63.0 axe-core@4.14.0
           # when Ubuntu's mirror is unreachable, the browser alone (see check.yml); an engine that then can't start is
           # reported as skipped by the device matrix, with this warning on the run's page
           npx playwright install --with-deps ${{ matrix.browsers }} || {
@@ -136,7 +136,7 @@ jobs:
   others:
     if: github.event_name == 'workflow_dispatch'
     name: by hand (the other suites)   # not "suite ...": tools/ci/reuse.js counts only the jobs a pull request runs
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
       - name: Results folder outside the checkout
@@ -149,7 +149,7 @@ jobs:
           node-version: 22
       - name: Install Playwright's Chromium and PostgreSQL
         run: |
-          npm i --no-save playwright@1.56.1
+          npm i --no-save playwright@1.63.0
           npx playwright install --with-deps chromium || npx playwright install chromium
           ls /usr/lib/postgresql/*/bin/initdb >/dev/null 2>&1 || (sudo apt-get update -q && sudo apt-get install -y -q postgresql)
       - name: Run the other suites
@@ -170,7 +170,7 @@ jobs:
   release:
     needs: [scope, suite, others]
     if: ${{ !cancelled() && (github.event.action != 'labeled' || github.event.label.name == 'full-tests') }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
       - name: Every suite passed?
