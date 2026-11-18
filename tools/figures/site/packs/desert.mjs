@@ -269,8 +269,8 @@ export function pack(T){
       },
       props: function(o, on){
         var g = cact(o);
-        return T.scatter(146, 10, on, function(sx, sy, i, R, x, y){
-          var k = i % 5, s;
+        return T.scatter(146, 13, on, function(sx, sy, i, R, x, y){
+          var k = [0, 1, 2, 0, 3, 4, 1, 0, 2, 3, 0, 1, 4][i], s;
           if (k === 0) s = saguaro(sx, sy, 34 + R() * 10, 1, g, i % 2) + ell(sx, sy + 1, 6, 1.6, o.night ? "#6E5852" : "#D3A06B", 0, .6);
           else if (k === 1) s = sage(sx, sy, 1.1, o) + sage(sx + 9, sy + 2, .8, o);
           else if (k === 2) s = boulder(sx, sy, 7, 6, o) + boulder(sx + 8, sy + 2, 4, 3.6, o);
@@ -284,11 +284,11 @@ export function pack(T){
 
   /* ------------------------------------------------------------------ the yard ---------------------------------- */
   /* the windmill: its wheel faces down and to the left, the tail vane points back to the right */
-  var WM = { c: [1.25, 1.2], top: 4.0, hub: [1.25 - .087 * .4, 1.2 + .996 * .4, 4.45], h: [.996, .087], d: [-.087, .996], r: 1.02 };
+  var WM = { c: [1.25, 1.2], top: 3.8, hub: [1.25 - .087 * .4, 1.2 + .996 * .4, 4.25], h: [.996, .087], d: [-.087, .996], r: 1.02 };
   function wheelPt(u, v){ return [WM.hub[0] + u * WM.h[0], WM.hub[1] + u * WM.h[1], WM.hub[2] + v]; }
   function wheelRing(r, n, a0, a1){ var out = []; n = n || 28; a0 = a0 || 0; a1 = a1 == null ? 360 : a1; for (var i = 0; i <= n; i++){ var a = (a0 + (a1 - a0) * i / n) * Math.PI / 180; out.push(wheelPt(Math.cos(a) * r, Math.sin(a) * r)); } return out; }
   /* the wagon: a bed along x, the bonnet on hoops, big wheels behind and small in front */
-  var WG = { x0: .55, x1: 3.05, y0: 1.25, y1: 2.4, zb: .62, zt: 1.2, yc: 1.825, rb: .64, rz: .98, fw: [.98, .46], rw: [2.6, .6], yn: 2.53, yf: 1.12 };
+  var WG = { x0: .38, x1: 3.12, y0: 1.15, y1: 2.45, zb: .7, zt: 1.32, yc: 1.8, rb: .72, rz: 1.08, fw: [.88, .52], rw: [2.58, .68], yn: 2.59, yf: 1.0 };
   function wagonWheel(cx, y, r, o, spin){
     var hubC = P(cx, y, r), s = "", i, rim = yRing(cx, y, r, r * .9, 24), tire = yRing(cx, y, r, r, 24);
     s += L(D(tire), 4.6) + L(D(tire), 2.6, "#5A5560") + L(D(rim), 2.6, o.night ? "#8A6A4E" : K.wood);
@@ -323,8 +323,8 @@ export function pack(T){
       },
       bits: function(){
         var br = P(1.95, 2.55, 0), x = br[0], y = br[1] - 10.6, s = "", i;
-        for (i = 0; i < 8; i++){ var a = i / 8 * Math.PI * 2; s += ell(x + Math.cos(a) * 3.6, y - 1 + Math.sin(a) * 2.2, 2.8, 2, i % 2 ? "#F27BAA" : "#F48FB8", .9); }
-        s += circ(x, y - 1, 2.2, "#FFD5E4", .8) + circ(x - .8, y - 1.6, .6, "#F2C230") + circ(x + .8, y - .6, .6, "#F2C230") + circ(x + .4, y - 2, .5, "#F2C230");
+        for (i = 0; i < 9; i++){ var a = i / 9 * Math.PI * 2 - Math.PI / 2; s += '<ellipse cx="' + f(x + Math.cos(a) * 4.6) + '" cy="' + f(y - 3 + Math.sin(a) * 3.2) + '" rx="3.6" ry="2.2" transform="rotate(' + f(a * 180 / Math.PI) + " " + f(x + Math.cos(a) * 4.6) + " " + f(y - 3 + Math.sin(a) * 3.2) + ')" fill="' + (i % 2 ? "#F27BAA" : "#F79CC0") + '" stroke="' + INK + '" stroke-width="1"/>'; }
+        s += circ(x, y - 3, 2.8, "#FFD5E4", .9) + circ(x - 1, y - 3.6, .7, "#F2C230") + circ(x + 1, y - 2.6, .7, "#F2C230") + circ(x + .5, y - 4.2, .6, "#F2C230") + circ(x - .6, y - 2, .6, "#F2C230");
         return s + T.dmStar(x + 9, y - 6, 2.6, "#FFFFFF", "") + T.dmStar(x - 8, y - 9, 2, "#F48FB8", "");
       }
     },
@@ -334,7 +334,7 @@ export function pack(T){
       draw: function(o){
         var s = ell.apply(null, P(1.9, 1.95, 0).concat([30, 11, "#1B2A3A", 0, .1])), cx = WM.c[0], cy = WM.c[1], zt = WM.top, i;
         var hw = function(z){ return .86 - (.86 - .2) * z / zt; }, leg = function(sx, sy, z){ var k = hw(z); return [cx + sx * k, cy + sy * k, z]; };
-        var metal = o.night ? "#8E98A3" : "#C9D1D9", lv = [0, 1.35, 2.7, zt];
+        var metal = o.night ? "#8E98A3" : "#C9D1D9", lv = [0, 1.3, 2.55, zt];
         var strut = function(a, b, w, c){ return L(D([a, b], true), w + 1.8) + L(D([a, b], true), w, c || metal); };
         var face = function(s0, s1, front){
           var out = "";
@@ -404,15 +404,15 @@ export function pack(T){
         var W = WG, s = ell.apply(null, P(1.85, 1.9, 0).concat([31, 11, "#1B2A3A", 0, .1])), i, cv = o.night ? ["#D9D3C6", "#B8B0A0"] : ["#FFFDF6", "#E8E0CE"];
         /* the far wheels and the tongue, under the bed */
         s += wagonWheel(W.fw[0], W.yf, W.fw[1], o) + wagonWheel(W.rw[0], W.yf, W.rw[1], o);
-        var tg0 = P(1.05, W.yc, .42), tg1 = P(.08, W.yc, .1); s += L(seg(tg0, tg1), 4.4) + L(seg(tg0, tg1), 2.4, K.wood) + ell(tg1[0], tg1[1], 2.4, 1.6, "#5A5560", 1);
+        var tg0 = P(.95, W.yc, .45), tg1 = P(.06, W.yc, .1); s += L(seg(tg0, tg1), 4.4) + L(seg(tg0, tg1), 2.4, K.wood) + ell(tg1[0], tg1[1], 2.4, 1.6, "#5A5560", 1);
         var ax = function(x, z){ var a = P(x, W.yf, z), b = P(x, W.yn, z); return L(seg(a, b), 3.4) + L(seg(a, b), 1.6, K.woodShade); };
         s += ax(W.fw[0], W.fw[1]) + ax(W.rw[0], W.rw[1]);
         /* the wagon bed: boards, a brake lever */
         s += box(W.x0, W.y0, W.zb, W.x1 - W.x0, W.y1 - W.y0, W.zt - W.zb, { top: K.woodShade, left: K.wood, right: K.woodShade });
-        s += L(D([[W.x0, W.y1, .82], [W.x1, W.y1, .82]], true) + D([[W.x0, W.y1, 1.01], [W.x1, W.y1, 1.01]], true) + D([[W.x1, W.y0, .82], [W.x1, W.y1, .82]], true) + D([[W.x1, W.y0, 1.01], [W.x1, W.y1, 1.01]], true), .8, K.woodShade, .9);
-        [W.x0 + .5, 1.8, W.x1 - .5].forEach(function(x){ s += L(D([[x, W.y1, W.zb + .04], [x, W.y1, W.zt - .04]], true), 1.2, "#5A5560"); });
+        s += L(D([[W.x0, W.y1, .91], [W.x1, W.y1, .91]], true) + D([[W.x0, W.y1, 1.12], [W.x1, W.y1, 1.12]], true) + D([[W.x1, W.y0, .91], [W.x1, W.y1, .91]], true) + D([[W.x1, W.y0, 1.12], [W.x1, W.y1, 1.12]], true), .8, K.woodShade, .9);
+        [W.x0 + .55, 1.75, W.x1 - .55].forEach(function(x){ s += L(D([[x, W.y1, W.zb + .04], [x, W.y1, W.zt - .04]], true), 1.2, "#5A5560"); });
         /* the bonnet over its hoops, the ends flared out */
-        var hoopX = [.45, 1.0, 1.55, 2.1, 2.65, 3.18], hoop = function(i, t0, t1, n){ var out = [], e = i === 0 ? -1 : i === hoopX.length - 1 ? 1 : 0; n = n || 14;
+        var hoopX = [.3, .86, 1.42, 1.98, 2.54, 3.2], hoop = function(i, t0, t1, n){ var out = [], e = i === 0 ? -1 : i === hoopX.length - 1 ? 1 : 0; n = n || 14;
           for (var j = 0; j <= n; j++){ var t = (t0 + (t1 - t0) * j / n) * Math.PI / 180; out.push([hoopX[i] + e * .16 * Math.sin(t), W.yc + Math.cos(t) * W.rb, W.zt + Math.sin(t) * W.rz * (e ? 1.05 : 1)]); } return out; };
         var pts = []; hoopX.forEach(function(x, i){ hoop(i, 0, 180, 16).forEach(function(q){ pts.push(P(q[0], q[1], q[2])); }); });
         var hl = D2(hull(pts));
@@ -428,15 +428,16 @@ export function pack(T){
         var op = []; for (i = 0; i <= 16; i++){ var t = i / 16 * Math.PI * 2; op.push([rc[0], rc[1] + Math.cos(t) * .26, rc[2] + Math.sin(t) * .3]); }
         s += FO(D(op), "#4A3550", 1.2);
         for (i = 0; i < 7; i++){ var t = (8 + i * 27) * Math.PI / 180, a = P(rc[0], rc[1] + Math.cos(t) * .3, rc[2] + Math.sin(t) * .34), b = P.apply(null, rim[Math.round(i * 18 / 6.6)]); s += L(seg(a, b), .8, o.night ? "#8E887C" : "#BFB6A2"); }
+        /* the near wheels */
+        s += wagonWheel(W.fw[0], W.yn, W.fw[1], o) + wagonWheel(W.rw[0], W.yn, W.rw[1], o);
         /* the water barrel lying at its side, strapped on */
-        var bx0 = 1.48, bx1 = 2.02, by = W.yn + .1, bz = .82, br = .25, bp = [];
+        var bx0 = 1.42, bx1 = 1.9, by = W.y1 + .27, bz = 1.0, br = .25, bp = [];
         xRing(bx0, by, bz, br, 16).concat(xRing(bx1, by, bz, br, 16)).forEach(function(q){ bp.push(P(q[0], q[1], q[2])); });
         var bd = D2(hull(bp));
         s += F(bd, o.night ? "#9C7A58" : "#C98F5A") + F(D(xRing((bx0 + bx1) / 2, by, bz, br * .98, 12, 200, 340).concat(xRing(bx1, by, bz, br * .98, 12, 340, 200))), o.night ? "#7E5E42" : "#A86E40", .9) + O(bd, 1.4);
         [bx0 + .1, (bx0 + bx1) / 2, bx1 - .1].forEach(function(x){ s += L(D(xRing(x, by, bz, br * 1.01, 12, -80, 120), true), 1.5, "#5A5560"); });
         s += FO(D(xRing(bx1, by, bz, br, 18)), o.night ? "#B9926A" : K.woodLight, 1.2) + circ.apply(null, P(bx1, by, bz).concat([1, "#5A3420"]));
-        /* the near wheels */
-        s += wagonWheel(W.fw[0], W.yn, W.fw[1], o) + wagonWheel(W.rw[0], W.yn, W.rw[1], o);
+        s += L(D([[bx0 + .12, W.y1, bz + .26], [bx0 + .12, by, bz + .26]], true) + D([[bx1 - .12, W.y1, bz + .26], [bx1 - .12, by, bz + .26]], true), 1.4, "#5A5560");
         if (o.snow) s += F(D2(hull(hoopX.map(function(x, i){ return hoop(i, 60, 120, 6); }).reduce(function(a, b){ return a.concat(b); }, []).map(function(q){ return P(q[0], q[1], q[2] + .04); }))), "#FFFFFF", .9);
         return s;
       },
@@ -446,7 +447,7 @@ export function pack(T){
         s += F(D(yRing(W.rw[0], W.yn, W.rw[1], W.rw[1] * .86, 24)), "#E2B887", .75) + wagonWheel(W.rw[0], W.yn, W.rw[1], o || {}, 15);
         s += L(D(yRing(W.rw[0], W.yn, W.rw[1], W.rw[1] * 1.25, 10, 100, 160), true) + D(yRing(W.rw[0], W.yn, W.rw[1], W.rw[1] * 1.25, 10, 280, 340), true), 1.6, INK, .8);
         /* the canvas flaps at the back, and the wind blows past */
-        var top = P(3.34, W.yc, W.zt + W.rz * .95), lw = P(3.3, W.yc + .5, W.zt + .35);
+        var top = P(3.36, W.yc, W.zt + W.rz * .95), lw = P(3.32, W.yc + .55, W.zt + .4);
         s += FO("M" + f(top[0]) + " " + f(top[1]) + " q8 -3 14 1 q5 3 10 0 q-3 6 -8 8 q-6 2 -10 -1 q-4 3 -" + f(top[0] + 6 - lw[0]) + " " + f(lw[1] - top[1] - 6) + " z", "#FFFDF6", 1.3);
         s += L("M" + f(top[0] + 4) + " " + f(top[1] + 3) + " q6 -2 10 1", .9, "#BFB6A2");
         s += L("M" + f(c[0] - 46) + " " + f(c[1] - 34) + " q10 -4 20 0 M" + f(c[0] - 40) + " " + f(c[1] - 24) + " q8 -3 16 0 M" + f(c[0] + 18) + " " + f(c[1] - 42) + " q8 -3 16 0", 1.3, "#FFFFFF", .9);
