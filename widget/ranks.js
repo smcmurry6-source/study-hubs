@@ -750,11 +750,33 @@
     if (NEW && fresh.length) trophyStats();
     fresh.forEach(function(tr){ playRankUp("trophy", trophyCard(tr, p.badges), busy); });
   }
+  /* a trophy won from now on pays 200 XP and crowns (migration_v68): when a v2 profile shows a trophy this device hasn't
+     had settled (sh_trophy_paid), the page asks the server (claim_trophies_v2), which pays the new ones and lists every
+     trophy it has settled. opt.claim(fn, args) is the page's call (the hub's and the dashboard's own client). */
+  var trophyAsked = false;
+  function claimTrophies(p, claim){
+    var kinds = {}, have = {};
+    (p.badges || []).forEach(function(b){ var k = String(b).split(":")[0]; if (!/^(mastery-|dark-seen-)/.test(k) && k !== "pet-adopt") kinds[k] = 1; });
+    String(ls("sh_trophy_paid") || "").split(",").forEach(function(k){ if (k) have[k] = 1; });
+    if (trophyAsked || !Object.keys(kinds).some(function(k){ return !have[k]; })) return;
+    trophyAsked = true;
+    claim("claim_trophies_v2", {}).then(function(r){
+      trophyAsked = false;
+      if (!r || typeof r !== "object" || r.ok === false) return;
+      if (Array.isArray(r.have)) ls("sh_trophy_paid", r.have.join(","));
+      var G = window.shGame, xp = r.xp | 0, n = Array.isArray(r.won) ? r.won.length : 0;
+      if (G && G.setCrowns) G.setCrowns(r.crowns);
+      else try { document.dispatchEvent(new CustomEvent("sh:crowns", { detail: { balance: r.crowns } })); } catch (e) {}
+      if (xp > 0) try { document.dispatchEvent(new CustomEvent("sh:prize", { detail: { src: "trophy", xp: xp, res: r,
+        text: G && G.prizeText ? G.prizeText("trophy", xp, r) : (n > 1 ? n + " new trophies" : "New trophy") + ": +" + xp + " XP and " + xp + " crowns" } })); } catch (e) {}
+    }, function(){ trophyAsked = false; });
+  }
   function track(p, opt){
     if (!p) return;
     opt = opt || {};
     var raw = p, v2 = isV2(raw); p = legacy(p);
     trackTrophies(p, opt.busy);
+    if (v2 && opt.claim) claimTrophies(raw, opt.claim);
     var t = p.tier || 0, step = p.step != null ? p.step : t * 3, pt = ls("sh_rank_tier"), ps = ls("sh_rank_step");
     ls("sh_rank_tier", String(t)); ls("sh_rank_step", String(step));
     var on = (ls("sh_pref_celebrate") || "on") !== "off";
@@ -1062,7 +1084,8 @@
       /* the redesigned hubs' rank pill (widget/hub-rewards.js) listens; nothing on the live pages does */
       try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: raw, mastery: masteryFor() } })); } catch (e) {}
       if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
-      track(raw, { busy: mockBusy, seen: function(j){ if (!window.shAutomated) rpc("mark_dark_unlock_seen", { p_visitor: H.visitor, p_journey: j }); } });
+      track(raw, { busy: mockBusy, seen: function(j){ if (!window.shAutomated) rpc("mark_dark_unlock_seen", { p_visitor: H.visitor, p_journey: j }); },
+        claim: window.shAutomated ? null : function(fn, args){ return rpc(fn, Object.assign({ p_visitor: H.visitor }, args)); } });
       badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_accent"));
     }
     function loadOwn(){

@@ -91,7 +91,38 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `perf.js --update` would have raised several (budgets go up only with Sam's OK), and bytes and requests don't depend on
   the browser. The site itself doesn't change. What to do the next time `ubuntu-latest` moves:
   [verify-before-pushing](vault/how-to/verify-before-pushing.md).
-
+- **2026-11-17 (Crowns go up as you earn them, and prizes that pay XP and crowns, Claude Code, #403)** —
+  Sam: "my crowns are not increasing after i answer questions. make sure there is no cap on daily crown or xp earn rates",
+  then a list of prizes. The crowns were paid but never redrawn (BUG-177): `migration_v68.sql` puts `crowns` (the balance
+  after it) in every paying reply and `widget/v3.js` sends it as `sh:crowns` (the hub's meters, its shop, the dashboard's
+  wallet; a gold "+n crowns" under the rank). No daily cap on either (the 600 cap is the old pages' only). Prizes, one
+  `xp_awards` row each, paying as many crowns as XP (`sh_prizes()`, copied as `PRIZES` in `v3.js`): the name 500, the daily
+  ring 5 a question of the goal, a Plaque Boss's 500 by damage (`widget/eggs.js`), 10/25/50 in a row, day streaks
+  3-100, a nuke 10,000 (`launch_nuke_v2`), the all-time run record 20,000, a lecture read to the end 50 (timed on the
+  page, `widget/hub.js`), a new trophy 200 (`widget/ranks.js`), medals 250-1,000, the day's first game 100, a personal best
+  50 and a hub high score 250, a daily visit 50 (`widget/dash.js`), a fixed report's 100 crowns. Every card says what it
+  pays (Timmy Time, Mark as read, the arcade, the goal, the visit, the name, the nuke badge, the shop's list). About page,
+  [game-server](vault/reference/game-server.md), event taxonomy and retention updated; `xp.js` 519 checks.
+  Then Sam: "Every right answer should give xp": `sh_answer` pays every right answer graded from its key (a retired
+  question's too), with no speed limit and no limit a day (a double tap and the same question twice in a mock count once);
+  misses keep their limits, and the run toward the nuke still counts only answers at the speed limit. `sh_xp_replay` pays the
+  same, and the migration rebuilds every visitor from it, paying the right answers since the release that had paid nothing
+  (about 80 from about 25 people since the release, nearly all under 2 seconds after the one before). The page's guess
+  (`xpFor` in `widget/hub-rewards.js`), the About page's XP entry and More's note say the same.
+  Then "lets increase it to 5 crowns per 10xp": `sh_wallet` pays 5 crowns per 10 study XP (was 1), from all the XP so far
+  (the balance is worked out, so every balance went up); every card, the shop's list, the About page and the preview's
+  wallet say 5. The shop's prices weren't changed. And "also 100 crowns per hour of hub time": `sh_time_crowns` pays 100 an
+  hour from `activity_hourly` (all the time recorded, at most 144 pings in a clock hour), in the wallet's `from_time`;
+  the planned collapse of `activity_hourly` must keep it (inbox).
+  **Applied to the live project on 2026-11-18** through the connector (its confirmation answered by the new hook,
+  `.claude/hooks/supabase-confirm.js`), appended to `supabase/schema.sql`; every function's body matched the tested copy, and
+  the rebuild agreed with live XP for all 77 people with an answer since the release. Class-wide after it: 168 wallets, none
+  below zero, median about 1,200 crowns, about 300,000 of the 740,000 from hub time.
+  It was written and applied as "v64", but other sessions' v64 (matching items graded as an order), v65, v66 and v67 reached
+  `main` first (v66 and v67 while this PR waited to merge), so it is `migration_v68.sql`; applied after that v64, it had replaced `sh_answer` without
+  that v64's one branch (a cached page's matching answer, taken at its word), so `migration_v69.sql` puts it back (applied the
+  same day; no answer in between needed it). Bug BUG-177 (the numbers before it were taken). Before applying a migration, fetch `main` and
+  take the next free number, and fetch it again before merging ([repo map](vault/reference/repo-map.md)).
 - **2026-11-18 (more cosmetics: six year-round collections, five rare costumes, six paints, Claude Code)** — Sam: "Lets work on
   timmy outfits and place cosmetics. Go crazy" ([the task](vault/tasks/done/2026-11-18-more-cosmetics.md)). **Six collections**
   (`COLLECTIONS` in `tools/figures/site/sets.mjs`, one pack each in `tools/figures/site/packs/`: `dino`, `moonbase`, `reef`,

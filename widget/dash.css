@@ -227,6 +227,7 @@ html.shx[data-theme="dark"] .dx-now { --now-bg: #2d2a2d; }
 .dx-pod-go { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; height: 32px; margin-top: auto; padding: 0 14px 0 10px; border-radius: var(--r-pill);
   background: #fff; color: var(--hub); font-size: var(--fs-meta); font-weight: var(--w-strong); }
 .dx-pod-txt b { display: flex; align-items: center; gap: 8px; }
+.dx-pod-earn { font-size: var(--fs-meta); font-weight: var(--w-strong); color: #fff; }   /* what finishing the episode pays (migration_v68) */
 .dx-pod-art { position: absolute; right: 6px; bottom: -12px; width: 88px; }
 .dx-pod-art .pm-timmy { width: 88px; }
 .dx-pod-art .pm-notes { left: -6px; top: -36px; width: 40px; }
@@ -503,6 +504,8 @@ html.shx .dx .shpet-scene.has-place .shpet-say.is-on { pointer-events: auto; }
 .dx-rand { margin: 12px 0 0; }
 .dx-rmsg { display: block; margin-top: 6px; font-size: var(--fs-meta); color: var(--muted); }
 .dx-rmsg:empty { display: none; }
+.dx-vearn { display: block; margin-top: 6px; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--text); }   /* the once-a-day visit prize */
+.dx-vearn[hidden] { display: none; }
 .dx-rand button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px 0 12px; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFE9A3; color: #3B2E3A;
   box-shadow: 0 3px 0 #3B2E3A; font: inherit; font-size: var(--fs-label); font-weight: 800; cursor: pointer; transition: transform var(--t-press) var(--ease-out), box-shadow var(--t-press) var(--ease-out); }
 .dx-rand button svg { transition: transform 420ms var(--ease-out); }

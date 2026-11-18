@@ -67,7 +67,7 @@
    "tbt": 500
   },
   "hubs/perio/": {
-   "kb": 830,
+   "kb": 850,
    "requests": 12,
    "fcp": 3000,
    "lcp": 3000,

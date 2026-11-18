@@ -18,6 +18,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   answer for ... just to fill in the gaps", then "we can do web search, the sites and others like them are good to go on
   the list, no limit on gap answers".
 - [x] **Show the Shiny Gold Crowns you've earned on Home's Today card** (Sam, 2026-11-17). Done: a Crowns tile with the balance (what's left to spend; "earned in all" in its tooltip) that opens the shop (#391).
+- [ ] **More ways to earn crowns, if Sam wants them** (2026-11-17; Sam, with the prizes of `migration_v68.sql`: "im open to
+  other ways too"). Ideas offered, none built: catching the Tooth Fairy or the Golden Probe, a perfect mock, Yesterday's
+  misses all right, an idea of yours marked done on the idea board, the first day back after a week away. Each would be one
+  `xp_awards` row with a key that pays once and an amount in `sh_prizes()` ([game-server](../reference/game-server.md)).
+  (Studying's rate was raised to 5 crowns per 10 XP the same day, Sam: "lets increase it to 5 crowns per 10xp".)
 - [x] **More cosmetics for Timmy and Timmy's place** (Sam, 2026-11-17): new outfits and place pieces
   ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`). Sam brought it back on 2026-11-18 ("Go
   crazy"): now [its task](done/2026-11-18-more-cosmetics.md).
@@ -234,7 +239,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   11-06 and 11-10. Done 2026-11-12 ([#328](https://github.com/smcmurry6-source/study-hubs/pull/328)): Sam kept the bitrates and had the five archived hubs' audio
   taken off (958 → 589 MB), and every hub's at its archiving ([rule](../rules/archived-hubs-drop-their-audio.md),
   [next ones](2026-11-12-audio-off-at-archiving.md)). The publishes take 1-3 minutes at 958 MB; 11-10's timeout was a one-off.
-- [ ] Retention, the part not built yet (approved 2026-11-04, [analytics-retention](../reference/analytics-retention.md)): before the school year ends (spring 2027), collapse `activity_hourly` / `activity_visits` older than the school year to hub × section × day with people counts and no ids, as one more step in `sh_retention_run`. Also ask Sam about the two rows the question-health work proposed (`question_events`, `question_feedback`).
+- [ ] Retention, the part not built yet (approved 2026-11-04, [analytics-retention](../reference/analytics-retention.md)): before the school year ends (spring 2027), collapse `activity_hourly` / `activity_visits` older than the school year to hub × section × day with people counts and no ids, as one more step in `sh_retention_run`. **Since migration_v68 the wallet pays 100 crowns per hour of hub time from `activity_hourly`** (`sh_time_crowns`): before the collapse deletes a visitor's hours, keep what they paid (each visitor's capped ping total in a small table `sh_time_crowns` reads, or the crowns as a row), or balances drop. Also ask Sam about the two rows the question-health work proposed (`question_events`, `question_feedback`).
 - [x] A hub's Home on a 320px-wide phone at the XX-Large text size scrolls sideways by about 40px (fixed in #391: the ring's caption drops under the ring when there's no room, the timeline's words wrap): the course timeline's rows (`.tl-what`) and the goal ring's caption (`.ring-cap`) don't wrap that narrow. Found 2026-11-13 while fixing BUG-143; not one of the sizes the smoke test checks (320px at the default size and 390px at the largest both fit).
 - [x] **A medal won during a shop boost runs over the rest of it** (2026-11-17, seen in #394; done: `sh_boost_bump`, `migration_v63.sql`, #395): since `migration_v62.sql` a boost
   bought during a medal's 24 hours waits for them, but a medal won while a shop boost is running starts its 24 hours on top of

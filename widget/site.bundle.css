@@ -726,6 +726,13 @@ html.shx .qc-after .sh-qrate:has(.sh-qrate-why:not([hidden])) { flex: 1 1 100%; 
 background: var(--primary); color: var(--on-primary); font-family: var(--font); font-size: var(--fs-label); font-weight: var(--w-head); pointer-events: none; box-shadow: var(--float-shadow); }
 .xpfly svg { width: 20px; height: 20px; }
 .xpfly .x2 { font-style: normal; margin-left: 3px; padding: 0 6px; border-radius: var(--r-pill); background: var(--gold); color: #2b1d00; }
+.crownpop { position: fixed; left: 0; top: 0; z-index: 50; display: flex; align-items: center; gap: 3px; padding: 2px 9px 2px 4px; border-radius: var(--r-pill);
+background: #fff4cf; color: #5c3d00; border: 1px solid var(--gold); font-family: var(--font); font-size: var(--fs-meta); font-weight: var(--w-head);
+font-variant-numeric: tabular-nums; pointer-events: none; box-shadow: var(--float-shadow); }
+.crownpop .ic { width: 18px; height: 18px; }
+.earn { display: inline-flex; align-items: center; gap: 4px; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--gold-ink); }
+.earn .ic { width: 16px; height: 16px; flex: none; }
+.ql-pod .pm-earn { color: #fff; font-size: var(--fs-meta); font-weight: var(--w-strong); }
 html.shx .shpet-btn.hx-cheer svg { animation: hx-hop 700ms var(--ease-out) 2; transform-origin: 50% 90%; }
 html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1; transform-origin: 50% 90%; }
 @keyframes hx-hop { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-14%) scale(1.03, .97); } }
@@ -1383,6 +1390,7 @@ text-align: left; transition: background var(--t-hover) var(--ease-out), transfo
 .dx-pod-go { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; height: 32px; margin-top: auto; padding: 0 14px 0 10px; border-radius: var(--r-pill);
 background: #fff; color: var(--hub); font-size: var(--fs-meta); font-weight: var(--w-strong); }
 .dx-pod-txt b { display: flex; align-items: center; gap: 8px; }
+.dx-pod-earn { font-size: var(--fs-meta); font-weight: var(--w-strong); color: #fff; }
 .dx-pod-art { position: absolute; right: 6px; bottom: -12px; width: 88px; }
 .dx-pod-art .pm-timmy { width: 88px; }
 .dx-pod-art .pm-notes { left: -6px; top: -36px; width: 40px; }
@@ -1619,6 +1627,8 @@ letter-spacing: inherit; text-align: inherit; cursor: pointer; }
 .dx-rand { margin: 12px 0 0; }
 .dx-rmsg { display: block; margin-top: 6px; font-size: var(--fs-meta); color: var(--muted); }
 .dx-rmsg:empty { display: none; }
+.dx-vearn { display: block; margin-top: 6px; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--text); }
+.dx-vearn[hidden] { display: none; }
 .dx-rand button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 16px 0 12px; border-radius: 999px; border: 2px solid #3B2E3A; background: #FFE9A3; color: #3B2E3A;
 box-shadow: 0 3px 0 #3B2E3A; font: inherit; font-size: var(--fs-label); font-weight: 800; cursor: pointer; transition: transform var(--t-press) var(--ease-out), box-shadow var(--t-press) var(--ease-out); }
 .dx-rand button svg { transition: transform 420ms var(--ease-out); }

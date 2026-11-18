@@ -27,7 +27,9 @@ applies here too, except where a note says how a Claude Code session does it dif
 - Cloud sessions can only push their own `claude/...` branch: push it and open a draft PR. When Sam says "merge", merge it
   (mark it ready, wait for checks still running, fix a failing one first); Sam can also merge it.
 - Connectors: Supabase (project `thytmzsgymydbzcqdnix`; read-only SQL for data; every Supabase tool pre-approved in `.claude/settings.json`
-  except pausing the project and creating a project or branch) and, when connected, Google Drive for lecture sources (read them, never commit them).
+  except pausing the project and creating a project or branch; the connector's own "are you sure?" questions, such as
+  `apply_migration`'s for destructive SQL, are answered yes by the Elicitation hook `.claude/hooks/supabase-confirm.js`,
+  Sam's standing OK of 2026-11-18, because the Claude app may never show them) and, when connected, Google Drive for lecture sources (read them, never commit them).
 - Skills in `.claude/skills/`: `/lessons-audit` (the lessons refresh), `/podcast` (a Timmy Time episode), `anima` (diagrams),
   `taste-skill` (art direction for pages and app screens, vendored from Leonxlnx/taste-skill: used in full when Sam asks for a redesign),
   `/reddit-scout` (ideas from the Claude subreddits, checked against the repo; runs only when Sam calls it; log in `tools/reddit-scout/log.md`),

@@ -50,7 +50,7 @@ function xpFor(qid, correct, self){
 var s = ansOf(qid), t = todayRec();
 if (!v2()) { var x = correct ? (s && s.c > 0 ? 2 : 10) : 1; return Math.max(0, Math.min(x, 600 - t.xp)); }
 var q = (t.q || {})[qid] || [0, 0], b = boost();
-var base = self ? (q[0] + q[1] < 3 ? 2 : 0) : correct ? (q[0] < 3 ? (s && s.c > 0 ? 2 : 10) : 0) : (q[1] < 3 ? 1 : 0);
+var base = self ? (correct || q[0] + q[1] < 3 ? 2 : 0) : correct ? (s && s.c > 0 ? 2 : 10) : (q[1] < 3 ? 1 : 0);
 return base * (b ? b.mult || 2 : 1);
 }
 function arcSession(){ var G = window.shGames; return G && G.session ? G.session() : null; }
@@ -116,17 +116,57 @@ document.addEventListener("sh:answer-paid", function(e){
 var d = e.detail || {}, r = d.res; if (!r || r.repeat) return;
 var at = -1; PEND.some(function(x, i){ if (x.qid === d.qid) { at = i; return true; } return false; });
 var guess = at > -1 ? PEND.splice(at, 1)[0] : null, t = todayRec(), extra = 0, said = [];
-(Array.isArray(r.bonus) ? r.bonus : []).forEach(function(b){ if (b && b.xp > 0) { extra += b.xp; if (BONUS[b.src]) said.push(BONUS[b.src] + ": +" + b.xp + " XP"); } });
+var G = window.shGame;
+(Array.isArray(r.bonus) ? r.bonus : []).forEach(function(b){ if (b && b.xp > 0) { extra += b.xp; if (BONUS[b.src]) said.push(BONUS[b.src] + ": +" + b.xp + " XP"); else if (G && G.prizeText) said.push(G.prizeText(b.src, b.xp, b)); } });
 var off = (r.xp | 0) - (guess ? guess.xp : r.xp | 0) + extra;
 if (off) { t.xp = Math.max(0, t.xp + off); if (d.ctx !== "mock" && d.ctx !== "arcade") SESSION.xp = Math.max(0, SESSION.xp + off); saveState(); }
 if (RANK.p && typeof r.total === "number") { RANK.p.xp = Math.max(RANK.p.xp || 0, r.total); RANK.local = pendSum(); }
 if (r.medal && r.medal.level) {
-said.push((MEDAL[r.medal.level] || "A medal") + " medal: +" + fmt(r.medal.xp | 0) + " XP, and double XP for 24 hours");
+said.push((MEDAL[r.medal.level] || "A medal") + " medal: +" + fmt(r.medal.xp | 0) + " XP and " + fmt((r.medal.xp | 0) + 50) + " crowns, and double XP for 24 hours");
 HX.say("Double XP for a day. Go!", "do-hop");
 }
 if (said.length && d.ctx !== "mock") toast(said.join(". ") + ".");
 if (off || extra || r.medal || boostShown !== !!boost()) paintMeters();
+ringClaim();
 });
+document.addEventListener("sh:prize", function(e){
+var d = e.detail || {}; if (!(d.xp > 0)) return;
+var w = HX.wallet ? HX.wallet() : null; if (d.src === "name" && w && w.got) w.got.name = true;
+todayRec().xp += d.xp; RANK.local += d.xp; saveState();
+toast(d.text || ("+" + fmt(d.xp) + " XP and crowns"));
+if (d.src === "nuke" || d.src === "boss" || d.src === "top") HX.say(d.src === "nuke" ? "Ten thousand! Go spend it." : "Nice hit!", "do-hop");
+paintMeters();
+});
+var ringAsked = "";
+function ringClaim(){
+var G = window.shGame, t = todayRec(), d = day(0), key = "sh_ring_" + HX.HUB;
+if (!v2() || !G || !G.claim || !t.met || ringAsked === d || ls(key) === d) return;
+ringAsked = d;
+G.claim("claim_ring_v2", { p_visitor: ls("sh_visitor_id"), p_hub: HX.HUB, p_goal: goal() }, "ring").then(function(r){
+if (r && r.ok && (r.xp > 0 || r.repeat) && r.why !== "short") ls(key, d);
+else ringAsked = "";
+});
+}
+document.addEventListener("sh:crowns", function(e){
+var d = e.detail || {}, was = HX.wallet ? HX.wallet() : null, before = was ? was.balance : d.was;
+if (HX.setWallet) HX.setWallet(d.balance);
+if (typeof before === "number" && d.balance > before) crownPop(d.balance - before);
+paintMeters();
+});
+function crownPop(n){
+var to = [$("#hxRank"), $("#hxXp")].filter(visible)[0];
+if (!to || reduced || !HX.shopCoin) return;
+var b = to.getBoundingClientRect(), el = h('<span class="crownpop" aria-hidden="true">' + HX.shopCoin(18) + "+" + fmt(n) + "</span>");
+document.body.appendChild(el);
+var x = b.left + b.width / 2 - el.offsetWidth / 2, y = b.bottom + 6;
+var anim = el.animate([
+{ transform: "translate(" + x + "px," + y + "px) scale(.6)", opacity: 0 },
+{ transform: "translate(" + x + "px," + (y + 4) + "px) scale(1.08)", opacity: 1, offset: .2 },
+{ transform: "translate(" + x + "px," + (y + 6) + "px) scale(1)", opacity: 1, offset: .75 },
+{ transform: "translate(" + x + "px," + (y + 16) + "px) scale(.9)", opacity: 0 }
+], { duration: 1600, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "forwards" });
+anim.onfinish = function(){ el.remove(); };
+}
 document.addEventListener("sh:session-paid", function(e){
 var d = e.detail || {}, r = d.res; if (!r || !(r.xp > 0)) return;
 var G = window.shGames, run = G && G.ran ? G.ran(d.session) : null;
@@ -136,9 +176,10 @@ toast((run ? (mine && mine.name) || run.name || "Arcade game" : "Mock exam") + "
 });
 document.addEventListener("sh:pod-paid", function(e){
 var r = (e.detail || {}).res; if (!r || r.ok === false || r.repeat) return;
+var G = window.shGame; if (G && G.setCrowns) G.setCrowns(r.crowns);
 var x = (r.xp | 0) + (r.done | 0); if (!(x > 0)) return;
 todayRec().xp += x; RANK.local += x; saveState();
-if (r.done > 0) toast("Timmy Time finished: +" + r.done + " XP.");
+if (r.done > 0) toast(G && G.prizeText ? G.prizeText("pod-done", r.done) : "Timmy Time finished: +" + r.done + " XP.");
 paintMeters();
 });
 var RANK = { p: null, local: 0, mastery: null };
@@ -265,6 +306,8 @@ out + "</svg>";
 function todayPanel(){
 var t = todayRec(), g = goal(), n = streakDays(), dn = doneToday(t), left = Math.max(0, g - dn), hp = HX.petHp(), T = AH.tint || { ink: "#6B5A68", light: "#ECE6EA" }, w = HX.wallet ? HX.wallet() : null;
 var cap = dn >= g ? "Goal met for today." : left === g ? "Your goal today: " + g + " questions or flashcards. One keeps your streak going." : left + " more meets today's goal.";
+var G = window.shGame, ringPay = G && G.live && G.live() && G.prizes ? G.prizes.ring * g : 0;
+if (ringPay) cap += dn >= g ? " +" + fmt(ringPay) + " XP and " + fmt(ringPay) + " crowns." : " Fill the ring for +" + fmt(ringPay) + " XP and " + fmt(ringPay) + " crowns.";
 return '<div class="panel today" data-today><div class="today-head"><div><h2>Today</h2><p class="today-date">' + esc(dateLabel(day(0), { weekday: "long", month: "long", day: "numeric" })) + "</p></div>" +
 spot("today", { tint: T.ink, light: T.light, line: T.ink }, "today-art") + "</div>" +
 '<div class="big-ring"><div class="teeth-wrap">' + teethRing(dn, g) + '<p class="ring-num"><b class="num">' + fmt(dn) + '</b><span>of ' + g + '</span><span class="sr">' + (t.k ? " questions and flashcards today" : " questions today") + '</span></p></div><p class="ring-cap">' + esc(cap) + "</p></div>" +
@@ -355,6 +398,12 @@ var SHOP = null;
 function shopOf(){ var b = window.shBootstrap, d = b && b.data; return SHOP || (d && d.shop && d.shop.wallet ? d.shop : null); }
 function hasShop(){ return !!shopOf(); }
 function wallet(){ var sh = shopOf(); return sh && sh.wallet && typeof sh.wallet.balance === "number" ? sh.wallet : null; }
+function setWallet(n){
+var w = wallet(); if (!w || typeof n !== "number" || !isFinite(n)) return;
+if (n > w.balance) w.earned = (w.earned || 0) + (n - w.balance);
+w.balance = n;
+[].forEach.call(document.querySelectorAll("[data-shop-bal]"), function(b){ b.textContent = String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); });
+}
 function shopMeta(){
 var sh = shopOf(), bal = sh && sh.wallet ? sh.wallet.balance : null;
 return (ls("sh_shop_dot") === dayCT() ? "● A rare costume came in · " : "") + (bal == null ? "" : String(bal).replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " gold crowns");
@@ -486,7 +535,7 @@ askReady().then(function(A){ if (A) A.open({ from: "card", text: text, ask: ask 
 function(){ HX.toast("The chat didn't load. Check your connection and try again."); });
 }
 HX.say = say; HX.petHp = petHp; HX.timmyReact = timmyReact; HX.petFromBadges = petFromBadges; HX.morePlace = morePlace;
-HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.wallet = wallet; HX.costumeOfDay = costumeOfDay;
+HX.moreShop = moreShop; HX.hasShop = hasShop; HX.shopMeta = shopMeta; HX.shopCoin = shopCoin; HX.shopStart = shopStart; HX.wallet = wallet; HX.setWallet = setWallet; HX.costumeOfDay = costumeOfDay;
 HX.askStart = askStart; HX.askOn = askOn; HX.askLabel = askLabel; HX.askAbout = askAbout;
 };
 ;
@@ -1685,8 +1734,9 @@ return '<li class="tl-' + when + (e.kind ? " tl-" + e.kind : "") + '"><span clas
 var POD_COL = { tint: "#F2C94C", light: "#FFFFFF", line: "#F2C94C" };
 function podMiniHTML(pod){
 var min = pod.duration ? Math.round(pod.duration / 60) : 0;
+var G = window.shGame, mins = pod.duration ? Math.ceil(pod.duration / 60) : 0, earn = mins && G && G.live && G.live() ? '<span class="pm-earn">Up to +' + fmt(mins * 10 + 100) + " XP and " + fmt(mins * 5 + 100) + " crowns</span>" : "";
 return '<a class="ql ql-pod" href="#more/timmy">' +
-'<span class="pm-text"><b>Timmy Time <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(pod.title || "The audio review") + "</small>" +
+'<span class="pm-text"><b>Timmy Time <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(pod.title || "The audio review") + "</small>" + earn +
 '<span class="pm-play">' + icon("play", 16) + "Listen" + (min ? '<span class="pm-min"> · ' + min + " min</span>" : "") + "</span></span>" +
 '<span class="pm-art" aria-hidden="true">' + spot("notes", POD_COL, "pm-notes") + spot("timmyTime", POD_COL, "pm-timmy") + "</span></a>";
 }
@@ -1963,11 +2013,40 @@ reattach: function(root, mp3){ var a = window.shTTS && window.shTTS.audio && win
 })();
 function wireLecPick(el){ var pick = $("[data-lecpick]", el); if (pick) pick.addEventListener("click", function(){ var on = pick.getAttribute("aria-expanded") !== "true"; pick.setAttribute("aria-expanded", String(on)); }); }
 var READ_AFTER = 60000;
-function readBtnHTML(lec){ var on = isRead(lec.id); return '<button class="btn btn-done' + (on ? " is-on" : "") + '" type="button" data-read aria-pressed="' + on + '">' + icon("check", 18) + "<span>" + (on ? "Notes done" : "Mark notes as done") + "</span></button>"; }
+function readBtnHTML(lec){ var on = isRead(lec.id); return '<button class="btn btn-done' + (on ? " is-on" : "") + '" type="button" data-read aria-pressed="' + on + '">' + icon("check", 18) + "<span>" + (on ? "Notes done" : "Mark notes as done") + "</span></button>" + readEarnHTML(lec); }
+var READ = null;
+function readEarnHTML(lec){
+var G = window.shGame;
+if (isRead(lec.id) || !G || !G.live || !G.live() || !G.prizes) return "";
+return '<span class="earn read-earn">' + (HX.shopCoin ? HX.shopCoin(16) : "") + "Read it through: +" + G.prizes.notes + " XP and " + G.prizes.notes + " crowns</span>";
+}
+function readStart(el, lec){
+var G = window.shGame;
+if (READ && READ.lec === lec.id && READ.hub === HUB) return;
+READ = null;
+if (isRead(lec.id) || !G || !G.ask || !G.live || !G.live()) return;
+var art = $(".reading", el), words = art ? (art.textContent.match(/\S+/g) || []).length : 0;
+var r = READ = { hub: HUB, lec: lec.id, id: null, need: Math.min(15 * 60000, Math.max(60000, words / 600 * 60000)), active: 0, last: Date.now() };
+G.ask("notes_start_v2", { p_visitor: ls("sh_visitor_id"), p_hub: HUB, p_lec: lec.id }).then(function(id){ if (READ === r && typeof id === "string") r.id = id; });
+}
+setInterval(function(){
+var r = READ, now = Date.now(); if (!r) return;
+if (view === "notes" && STATE.ui.lec === r.lec && document.visibilityState === "visible") r.active += Math.min(now - r.last, 6000);
+r.last = now;
+if (r.wait && r.active >= r.need && isRead(r.lec)) { if (LBY[r.lec]) readClaim(LBY[r.lec]); }
+}, 5000);
+function readClaim(lec){
+var r = READ, G = window.shGame;
+if (!r || r.lec !== lec.id || !r.id || !G || !G.claim) return;
+if (r.active < r.need) { if (!r.wait) toast("Notes done. Keep reading: the +" + G.prizes.notes + " XP and crowns come once you've had time to read it through."); r.wait = true; return; }
+READ = null;
+G.claim("notes_done_v2", { p_visitor: ls("sh_visitor_id"), p_read: r.id }, "notes");
+}
 function setRead(el, lec, on, how){
 STATE.read = STATE.read || {};
 if (on) STATE.read[lec.id] = day(0); else delete STATE.read[lec.id];
 saveState(); track("notes:" + (on ? "done" : "undone") + (how ? "-" + how : ""));
+if (on) readClaim(lec);
 var b = $("[data-read]", el); if (b) b.outerHTML = readBtnHTML(lec);
 var nav = $(".lec-list", el); if (nav) { nav.outerHTML = lecListHTML(lec); wireLecPick(el); }
 var t = $(".rd-title .lb", el); if (t) t.outerHTML = lecBadge(lec, "lb-h");
@@ -1976,6 +2055,7 @@ wireReadBtn(el, lec);
 function wireReadBtn(el, lec){ var b = $("[data-read]", el); if (b) b.addEventListener("click", function(){ setRead(el, lec, !isRead(lec.id), ""); }); }
 function wireRead(el, lec, manual){
 wireReadBtn(el, lec);
+if (!manual) readStart(el, lec);
 var end = $(".foot-acts", el), opened = Date.now(), seen = false, timer = null;
 if (manual || !end || isRead(lec.id) || !("IntersectionObserver" in window)) return;
 var auto = function(){ if (end.isConnected && seen && !isRead(lec.id) && view === "notes") setRead(el, lec, true, "auto"); };
@@ -2228,6 +2308,10 @@ return ARC;
 });
 }
 var GAME_INFO = {};
+function arcadeEarnHTML(){
+var G = window.shGame, P = G && G.prizes; if (!P || !G.live || !G.live()) return "";
+return '<p class="earn ar-earn">' + (HX.shopCoin ? HX.shopCoin(16) : "") + "First game today: +" + P.game + " XP and crowns. Beat your best: +" + P.pb + ". Top score in this hub: +" + P.top + ".</p>";
+}
 function moreArcade(body, open){
 body.innerHTML = '<p class="note loading">Loading the arcade…</p>';
 needArcade().then(function(){
@@ -2239,7 +2323,7 @@ var GA = AH.games || {};
 var art = function(g){ return GA[g.id] ? '<span class="game-pic">' + img(GA[g.id].body, "", "", AH.gamesViewBox) + "</span>" : '<span class="game-art" aria-hidden="true">' + icon(g.icon || "arcade", 30) + "</span>"; };
 var tile = function(g, k){ return '<li class="game c' + (k % 4) + (g.id === first ? " is-first" : "") + (GA[g.id] ? " has-pic" : "") + '">' + art(g) + '<div><h2>' + esc(g.name) + "</h2><p>" + esc(g.desc) + '</p><p class="note num">Your best: ' + fmt(best[g.id] || 0) + " · played " + pl(plays[g.id] || 0, "time") + '</p></div><button class="btn' + (g.id === first ? " btn-primary" : "") + '" type="button" data-game="' + esc(g.id) + '">' + icon("play", 18) + "Play</button></li>"; };
 body.innerHTML = '<div class="arcade-lobby"><ul class="ar-grid">' + games.map(tile).join("") + "</ul>" +
-'<p class="note">' + esc(X.how || "") + "</p></div>" +
+'<p class="note">' + esc(X.how || "") + "</p>" + arcadeEarnHTML() + "</div>" +
 '<div id="panel-arcade" class="arcade-stage" hidden></div>';
 var stage = $("#panel-arcade", body), lobby = $(".arcade-lobby", body);
 function back(){ try { ARC.arcade.stopAll(); } catch (e) {} stage.hidden = true; stage.innerHTML = ""; lobby.hidden = false; }
@@ -2256,7 +2340,7 @@ var x = HX.rankXp(), p = HX.RANK.p, days = Object.keys(HX.goalDays()).length, ga
 var R = window.shRanks, useCase = !!(R && R.trophyCase), host = $("[data-trophies]", body);
 var rankPanel = useCase ? "" :
 '<section class="panel" aria-labelledby="srH"><h2 id="srH">Your rank</h2><div class="rank-big"><span class="hp" data-rankart="64" aria-hidden="true">' + HX.rankArt(64) + "</span><div><p class=\"rank-name\">" + esc(HX.rankName()) + '</p><p class="num">' + (x === null ? "+" + fmt(HX.todayRec().xp) + " XP today" : fmt(x) + " XP" + (p && p.next_at && p.next_at > x ? " · " + fmt(p.next_at - x) + " to the next level" : "")) + "</p></div></div>" +
-(game ? '<div data-road></div><p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study. A question pays its first three right and its first three wrong answers a day. More comes from the day\'s 20th answer, fixing a miss, a finished mock exam and every mastery medal, which also starts 24 hours of double XP.</p>'
+(game ? '<div data-road></div><p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study. Every right answer pays; a question pays its first three misses a day. More comes from the day\'s 20th answer, fixing a miss, a finished mock exam and every mastery medal, which also starts 24 hours of double XP.</p>'
 : '<p class="note">10 XP the first time you get a question right, 2 for any other right answer, 1 for a miss and 20 for every day you study (answer XP tops out at 600 a day).</p>') +
 '<button class="btn" type="button" data-open-stats>' + icon("trophy", 18) + "Trophies and leaderboards</button></section>";
 var grid = '<div class="stats-grid">' + rankPanel +
@@ -2368,6 +2452,11 @@ return '<div class="focus-row"><span class="focus-art" aria-hidden="true">' + ic
 (on ? "On: Timmy and every extra are off. Turn it off to bring back what you had." : "Turns Timmy and every extra off in one tap: just the notes and the questions.") + "</small></div>" +
 '<button class="btn' + (on ? " btn-primary" : "") + ' focus-btn" type="button" role="switch" aria-checked="' + on + '" data-focus>' + (on ? "On" : "Off") + "</button></div>";
 }
+function nameEarn(){
+var G = window.shGame, w = HX.wallet ? HX.wallet() : null;
+if (!G || !G.live || !G.live() || !G.prizes || !w || !w.got || w.got.name !== false) return "";
+return ' <span class="earn">Choosing one pays +' + fmt(G.prizes.name) + " XP and " + fmt(G.prizes.name) + " crowns, once.</span>";
+}
 function moreSettings(body){
 var theme = ls("sh_theme") || "", size = ls("sh_pref_size") || "default";
 var extrasHTML = function(){ return EXTRAS.map(function(x){ return '<div class="set-row"><div><b>' + esc(x[1]) + "</b><small>" + esc(x[2]) + "</small></div>" + seg(x[0], x[3] || [["on", "On"], ["off", "Off"]], ls(x[0]) || "on") + "</div>"; }).join(""); };
@@ -2378,7 +2467,7 @@ body.innerHTML = '<div class="settings">' +
 '<div class="set-row"><div><b>Text size</b><small>Makes everything bigger or smaller.</small></div>' + seg("size", SIZES, size) + "</div></section>" +
 '<section class="panel" aria-labelledby="sgH"><h2 id="sgH">Your daily goal</h2>' +
 '<div class="set-row"><div><b>Questions a day</b><small>The ring in the bar fills as you answer, right or wrong. Your streak counts any day you answer a question.</small></div>' + seg("goal", [["10", "10"], ["20", "20"], ["30", "30"], ["40", "40"], ["50", "50"]], String(HX.goal())) + "</div>" +
-'<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' +
+'<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (window.shNameNow && window.shNameNow() ? ": " + esc(window.shNameNow()) : "") + "." + nameEarn() + '</small></div><button class="btn" type="button" data-name>Change your name</button></div>' +
 '<div class="set-row"><div><b>Link my devices</b><small>One rank, streak, trophy case and question progress on your phone, tablet and laptop.</small></div><button class="btn" type="button" data-link>Link my devices</button></div></section>' +
 '<section class="panel" aria-labelledby="sxH"><h2 id="sxH">Timmy and the extras</h2><p class="note">The fun stuff that isn\'t studying. None of it shows during a mock exam.</p><div data-extras>' +
 extrasHTML() + "</div></section></div>";
