@@ -1,4 +1,4 @@
-// Fig 20: smear look-alikes (L20 Lymphomas and Leukemias, Dr. Borak, from the slides). Six cells from the blood smears
+// Fig 20: smear look-alikes (L20 Lymphomas and Leukemias, Dr. Borak, from the recorded lecture and slides). Six cells from the blood smears
 // the lecture describes, drawn anew as schematic cells at one scale, each with a red cell beside it for size: a lymphoblast,
 // a myeloblast with an Auer rod, an APL promyelocyte with a bundle of Auer rods, a Sézary cell with its cerebriform
 // nucleus, a CLL lymphocyte with soccer-ball chromatin beside a smudge cell, and rouleaux. Pick a cell (A to F) to enlarge
@@ -73,7 +73,7 @@ function myeloblast() {
     { shapes: gr, q: "A few fine purple dots in the cytoplasm.", n: "Granules: a myeloblast's moderate cytoplasm has granules; a lymphoblast's scant cytoplasm has none.", lab: ["granules"], p: near(gr, 5, 5) },
     { shapes: [nuc].concat(dots), q: "A large, round nucleus with fine, even chromatin.", n: "Fine chromatin: a blast's chromatin is fine and even, not clumped like a mature lymphocyte's.", lab: ["fine chromatin"], p: [nc[0] + 2.6, nc[1] + 2.8] },
     { shapes: nl.map((q) => C(q[0], q[1], q[2], "sr-nl")), q: "Pale round spots inside the nucleus.", n: "Distinct nucleoli: easy to see in a myeloblast, indistinct in a lymphoblast.", lab: ["distinct nucleoli"], p: [nl[1][0], nl[1][1]] },
-    { shapes: [N(rod[0], rod[1], 0.5, "sr-ar")], q: "A thin red-blue needle in the cytoplasm.", n: "Auer rod: a red-blue, needle-like inclusion made of abnormal granules that fused (his slide: lysosomal and acid phosphatase-positive). It marks the blast as myeloid: Auer rods exclude ALL.", lab: ["Auer rod"], p: [6.05, -0.4] },
+    { shapes: [N(rod[0], rod[1], 0.5, "sr-ar")], q: "A thin red-blue needle in the cytoplasm.", n: "Auer rod: a red-blue, needle-like inclusion in the cytoplasm, made of abnormal granules that fused. He said if you see one, you are looking at a myeloid blast: lymphoid blasts never have Auer rods.", lab: ["Auer rod"], p: [6.05, -0.4] },
   ] };
 }
 function lymphoblast() {
@@ -106,7 +106,7 @@ function promyelocyte() {
   return { k: "pro", R, layers: [
     { shapes: [cyto], q: "The biggest cell here, its cytoplasm crowded with coarse granules.", n: "An abnormal promyelocyte: APL's cell, where maturation stops (t(15;17), PML::RARA)." },
     { shapes: [nuc].concat(ndots), q: "The nucleus, partly hidden under the granules.", n: "The nucleus, partly hidden under the granules." },
-    { shapes: gr, q: "Coarse pink-purple granules packed through the cytoplasm.", n: "Large, dense granules staining pink, red or purple, packed in the cytoplasm. On flow cytometry they give APL its high side scatter.", lab: ["dense granules"], p: near(gr, 7.5, 4.5) },
+    { shapes: gr, q: "Coarse pink-purple granules packed through the cytoplasm.", n: "Large, dense granules staining pink, red or purple, packed in the cytoplasm.", lab: ["dense granules"], p: near(gr, 7.5, 4.5) },
     { shapes: rods, q: "A bundle of thin red-blue needles.", n: "A bundle of Auer rods: APL's distinctive cells hold bundles of them, where a myeloblast's Auer rod comes alone.", lab: ["Auer rod bundle"], p: [bc[0] + dir[0] * 1.2, bc[1] + dir[1] * 1.2] },
   ] };
 }
@@ -148,7 +148,7 @@ function cll() {
   return { k: "cll", R: 11.2, layers: [
     { shapes: [cyto], q: "A small, round cell, not much bigger than a red cell, with a thin rim of pale cytoplasm.", n: "A small, mature lymphocyte: CLL/SLL is a lymphoma of small, mature B cells.", lab: ["small, mature cell"], p: [cc[0] + 4.55 * Math.cos(-0.85), cc[1] + 4.55 * Math.sin(-0.85)] },
     { shapes: [nuc].concat(cl), q: "Dark chromatin in blocks, split by pale cracks.", n: "Clumped chromatin in a cracked-mud or soccer-ball pattern.", lab: ["soccer-ball", "chromatin"], p: [cc[0] + 0.15, cc[1] + 0.1] },
-    { shapes: [smudge].concat(st), q: "A ragged, smeared purple patch, with no cell around it.", n: "Smudge cell: a fragile lymphocyte crushed flat as the smear was made, common on CLL smears.", lab: ["smudge cell"], p: [sc[0] + 1.6, sc[1] + 0.5] },
+    { shapes: [smudge].concat(st), q: "A ragged, smeared purple patch, with no cell around it.", n: "Smudge cell: a fragile lymphocyte that burst apart as the smear was made, common on CLL smears.", lab: ["smudge cell"], p: [sc[0] + 1.6, sc[1] + 0.5] },
   ] };
 }
 function rouleaux() {
@@ -170,16 +170,16 @@ const NM = {
     tell: "it is medium to large, with moderate cytoplasm holding granules, fine chromatin and distinct nucleoli, and it has an Auer rod, the red-blue needle that marks the blast as myeloid (Auer rods exclude ALL). Most AML needs 20 percent blasts.",
     look: "a myeloblast is a large blast with moderate, granular cytoplasm and distinct nucleoli, and may hold a single Auer rod." },
   lb: { sh: "lymphoblast", nm: "Lymphoblast", dz: "ALL", a: "a lymphoblast, the blast of ALL",
-    tell: "it is small to medium, with a thin rim of scant cytoplasm and no granules, fine chromatin and indistinct nucleoli, and no Auer rod. ALL is the acute leukemia of young children (peak 2 to 3 years).",
+    tell: "it is small to medium, with a thin rim of scant cytoplasm and no granules, fine chromatin and indistinct nucleoli, and no Auer rod. ALL is the acute leukemia of young children, usually 1 to 5 years old.",
     look: "a lymphoblast is small to medium, with a thin rim of cytoplasm, no granules, indistinct nucleoli and never an Auer rod." },
   pro: { sh: "promyelocyte", nm: "APL promyelocyte", dz: "APL · t(15;17)", a: "an abnormal promyelocyte of acute promyelocytic leukemia (APL)",
-    tell: "its cytoplasm is packed with large, dense granules staining pink, red or purple, and it holds a bundle of Auer rods. In APL, maturation stops at the promyelocyte (t(15;17), PML::RARA), and the danger is DIC.",
+    tell: "its cytoplasm is packed with large, dense granules staining pink, red or purple, and it holds a bundle of Auer rods. In APL, maturation stops at the promyelocyte (t(15;17), PML::RARA), and the danger is DIC, clotting and bleeding at once.",
     look: "an APL promyelocyte is packed with large, dense granules and can hold a bundle of Auer rods." },
   sz: { sh: "Sézary cell", nm: "Sézary cell", dz: "Sézary syndrome", a: "a Sézary cell",
     tell: "it is a T cell whose dark nucleus is folded on itself by deep grooves, cerebriform, like the surface of a brain, with scant cytoplasm. In the blood, with erythroderma and generalized lymphadenopathy, these cells complete Sézary syndrome's triad.",
     look: "a Sézary cell has a dark nucleus folded in grooves (cerebriform)." },
   cll: { sh: "CLL + smudge", nm: "CLL cell + smudge cell", dz: "CLL/SLL", a: "a CLL lymphocyte with a smudge cell beside it",
-    tell: "the lymphocyte is small and mature, not much bigger than a red cell, its chromatin clumped in blocks like a soccer ball or cracked mud, and the smudge cell is a fragile lymphocyte crushed flat as the smear was made. His objective stresses this look in the blood.",
+    tell: "the lymphocyte is small and mature, not much bigger than a red cell, its chromatin clumped in blocks like a soccer ball or cracked mud, and the smudge cell is a fragile lymphocyte that burst apart as the smear was made. He said this look tells him right away he is thinking CLL.",
     look: "a CLL cell is a small, mature lymphocyte with clumped, soccer-ball chromatin, with smudge cells around it." },
   rl: { sh: "rouleaux", nm: "Rouleaux", dz: "plasma cell myeloma", a: "rouleaux, red cells stacked like coins",
     tell: "there is no white cell here at all. The red cells stack like coins because the large amount of monoclonal immunoglobulin protein in myeloma makes them stick together. Look for the M-spike and CRAB with it.",
@@ -268,8 +268,8 @@ export default function smears() {
       `<div class="am-controls" role="group" aria-label="Name it"><span class="sr-lab">It is</span>${GUESS.map(([k, s]) => btn("g", k, s)).join("")}</div>` +
       `<div class="am-controls"><button type="button" class="am-btn" data-amt="all" aria-pressed="false">Show every name</button>${btn("z", 1, "Start over")}</div>`,
     sources: [
-      "From the L20 notes (Dr. Borak's slides): the AML and ALL blasts (AML medium to large, moderate cytoplasm with granules, fine chromatin, distinct nucleoli, Auer rods; ALL small to medium, scant cytoplasm with no granules, indistinct nucleoli; Auer rods exclude ALL); the Auer rod as a red-blue, needle-like inclusion of fused abnormal granules; CLL's small mature lymphocytes with clumped cracked-mud or soccer-ball chromatin and its smudge cells; APL's abnormal promyelocytes with large, dense pink, red or purple granules and bundles of Auer rods; Sézary cells with cerebriform nuclei (hyperchromatic and hyperconvoluted, as in mycosis fungoides); rouleaux, red cells stacked like coins by myeloma's excess immunoglobulin. Every label and card uses those words.",
-      "Auer rods: the figure follows his slide, which calls them lysosomal and acid phosphatase-positive. Textbooks (Robbins and Cotran Pathologic Basis of Disease; the WHO classification) stress that they are myeloperoxidase-positive; the notes mention both, and nothing here depends on the stain.",
+      "From the L20 notes (Dr. Borak's recorded lecture and slides): the AML and ALL blasts (AML medium to large, moderate cytoplasm with granules, fine chromatin, distinct nucleoli, Auer rods; ALL small to medium, scant cytoplasm with no granules, indistinct nucleoli; Auer rods exclude ALL); the Auer rod as a red-blue, needle-like inclusion of fused abnormal granules; CLL's small mature lymphocytes with clumped cracked-mud or soccer-ball chromatin and its smudge cells; APL's abnormal promyelocytes with large, dense pink, red or purple granules and bundles of Auer rods; Sézary cells with cerebriform nuclei (hyperchromatic and hyperconvoluted, as in mycosis fungoides); rouleaux, red cells stacked like coins by myeloma's excess immunoglobulin. Every label and card uses those words.",
+      "Auer rods: aloud he called them cytoplasmic inclusions of a myeloid blast, never seen in lymphoid blasts. His slide adds that they are lysosomal and acid phosphatase-positive; textbooks (Robbins and Cotran Pathologic Basis of Disease; the WHO classification) stress that they are myeloperoxidase-positive. The notes mention both, and nothing here names or depends on the stain.",
       "Bain BJ, Blood Cells: A Practical Guide, and Rodak's Hematology: Clinical Principles and Applications (Keohane, Otto and Walenga): the sizes that set the one scale (a red cell about 7.5 micrometers; a small mature lymphocyte about 7 to 10; a lymphoblast up to about twice that; a myeloblast about 15 to 20; a promyelocyte up to about 25; a Sézary cell drawn at about 12, in the middle of its small-to-large range) and each cell's look on a Romanowsky stain: the blast's fine chromatin and nucleoli, the hypergranular APL promyelocyte with its folded nucleus and bundled Auer rods, the grooved Sézary nucleus, the crushed smudge cell, rouleaux. The sizes set the drawing only; no size is labeled.",
       "Schematic: the cells are drawn anew in code, not traced from microscope images, in the hub's palette rather than true stain colors. Granule, chromatin and groove counts are illustrative, and one cell of each kind can't show the range a real smear has. The lecture's objectives say the individual CD markers aren't needed, so none are shown.",
     ],

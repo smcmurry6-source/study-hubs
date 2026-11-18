@@ -1,4 +1,4 @@
-// Fig 18: the neutrophil ladder (L20 Lymphomas and Leukemias, Dr. Borak, from the slides: how blood cells mature,
+// Fig 18: the neutrophil ladder (L20 Lymphomas and Leukemias, Dr. Borak, from the recorded lecture and slides: how blood cells mature,
 // acute versus chronic leukemia, blasts and Auer rods, acute promyelocytic leukemia, chronic myeloid leukemia). The six
 // stages of the neutrophil line on a vertical ladder, youngest at the top: myeloblast, promyelocyte, myelocyte,
 // metamyelocyte, band, segmented neutrophil (PMN), each cell drawn in code at its relative size, as on a stained smear.
@@ -59,7 +59,7 @@ function cell(kind, r, seed, mini) {
       o += '<path class="nl-auer' + (mini ? " nl-auer-m" : "") + '" d="' + b + '"/>';
     }
   } else {
-    if (kind === "myelo") { nuc = oval(-0.3 * r, 0.08 * r, 0.44 * r, 0.42 * r, R, 0.06, 0, 16); o += '<path class="nl-nd" d="' + sm(nuc) + '"/>'; }
+    if (kind === "myelo") { nuc = oval(-0.3 * r, 0.08 * r, 0.44 * r, 0.42 * r, R, 0.06, 0.12, 16); o += '<path class="nl-nd" d="' + sm(nuc) + '"/>'; }
     else if (kind === "meta") { nuc = oval(-0.2 * r, 0.04 * r, 0.5 * r, 0.36 * r, R, 0.04, 0.42, 20); o += '<path class="nl-nd" d="' + sm(nuc) + '"/>'; }
     else if (kind === "band") {
       /* a curved band of even width: outer and inner arcs joined by round ends */
@@ -140,37 +140,37 @@ const ST = {
   normal: { name: "Normal", comp: "blood", sub: "blasts stay in the marrow", pile: [0, 0, 0, 0, 1, 6], block: -1, ab: -1,
     tag: ["none", "", "", "", "", ""], tagc: "",
     verdict: "Only the last stages leave the marrow: no blasts",
-    say: "Normal: a neutrophil matures in a fixed order, myeloblast, promyelocyte, myelocyte, metamyelocyte, band, then the segmented neutrophil (PMN). The blast is the youngest cell, and it stays in the marrow: outside the newborn period, blasts in the peripheral blood are always abnormal.",
+    say: "Normal: a neutrophil matures in a fixed order, myeloblast, promyelocyte, myelocyte, metamyelocyte, band, then the segmented neutrophil (PMN), acquiring its function as it goes. The blast is the youngest cell, and it stays in the marrow; the neutrophils, at their last stages, are what is released into the blood. As he put it, you should not have blasts in your blood, except in newborns.",
     ro: "normal · blood" },
   aml: { name: "Acute myeloid leukemia", comp: "marrow", sub: "most AML: over 20% blasts", pile: [8, 0, 0, 0, 1, 1], block: 0, ab: 0, blabel: "blasts don't mature",
     note: ["Here they fill the marrow; this one carries an Auer rod, a red-blue needle in its cytoplasm, which marks it as myeloid and excludes ALL.", "", "", "", "", ""],
     verdict: "Blasts that don't mature fill the marrow",
-    say: "Acute myeloid leukemia: blasts that don't mature fill the marrow fast, crowding out normal blood-making, so the other lines fail (anemia, low platelets, too few working neutrophils). Most AML needs blasts over 20 percent of the marrow (the WHO writes 20 percent or more); an AML with one of its defining genetic abnormalities is diagnosed whatever the blast count. An Auer rod, a red-blue needle in a myeloblast's cytoplasm, marks the blast as myeloid: Auer rods exclude ALL.",
+    say: "Acute myeloid leukemia: maturation doesn't happen, so the cells get stuck as blasts that fill the marrow fast, crowding out normal blood-making, and the other lines fail (anemia, low platelets, too few working neutrophils). He said more than 20 percent blasts, in the blood or the marrow, is the threshold for the diagnosis (the WHO writes 20 percent or more); an AML with one of its defining genetic abnormalities is diagnosed whatever the blast count. An Auer rod, a red-blue needle in the cytoplasm, means a myeloid blast: lymphoid blasts never have them.",
     ro: "AML · over 20% blasts" },
   apl: { name: "Acute promyelocytic leukemia", comp: "marrow", sub: "t(15;17), PML::RARA", pile: [1, 8, 0, 0, 0, 1], block: 1, ab: 1, blabel: "maturation stops here",
     note: ["", "In APL these abnormal promyelocytes predominate: large, dense granules and bundles of Auer rods.", "", "", "", ""],
     verdict: "Maturation stops at the promyelocyte",
-    say: "Acute promyelocytic leukemia, a type of AML: t(15;17) fuses PML with RARA, and the PML::RARA protein impairs myeloid differentiation, so maturation stops at the promyelocyte. Abnormal promyelocytes predominate, their cytoplasm packed with large, dense granules, some holding bundles of Auer rods. The danger is a coagulopathy with DIC (bleeding gums, petechiae), which can cause early death.",
+    say: "Acute promyelocytic leukemia, a type of AML: t(15;17) fuses PML with RARA, and the PML::RARA protein impairs myeloid differentiation, so maturation stops at the promyelocyte. Abnormal promyelocytes predominate, their cytoplasm packed with large, dense granules, some holding bundles of Auer rods. The danger is a coagulopathy with DIC, clotting and bleeding at once (bleeding gums, petechiae), which can cause early death.",
     ro: "APL · stops at 2" },
   atra: { name: "APL on ATRA plus arsenic", comp: "marrow", sub: "maturing again", pile: [1, 2, 2, 2, 2, 3], block: 1, ab: 1, lift: true, blabel: "retinoic acid: matures",
     note: ["", "All-trans retinoic acid lets them mature again.", "", "", "", ""],
     verdict: "Retinoic acid lets the promyelocytes mature",
-    say: "APL treated with all-trans retinoic acid and arsenic trioxide (ATRA plus ATO), without conventional chemotherapy: the retinoic acid lets the blocked promyelocytes mature again, down the rest of the ladder. For low- and intermediate-risk APL it is highly effective and largely curative.",
+    say: "APL treated with all-trans retinoic acid and arsenic trioxide (ATRA plus ATO), without conventional chemotherapy: the retinoic acid lets the blocked promyelocytes mature again, down the rest of the ladder. He said the treatment is excellent compared with other acute leukemias: it cures most cases.",
     ro: "ATRA · maturing" },
   cml: { name: "Chronic myeloid leukemia", comp: "blood", sub: "every stage, few blasts", pile: [1, 1, 6, 3, 3, 7], block: -1, ab: -1,
     tag: ["under 20%", "", "peak", "", "", "peak"], tagc: "nl-tag-hot",
     note: ["In CML's chronic phase blasts stay under 20 percent of the blood and marrow.", "", "One of the two peaks in CML's blood.", "", "", "The other peak in CML's blood."],
     verdict: "Maturing cells fill the blood, not blasts",
-    say: "Chronic myeloid leukemia, chronic phase: the cells still mature, so the blood fills with neutrophils at every stage of maturation, with peaks at the myelocytes and the segmented neutrophils, not blasts (fewer than 20 percent). The white count runs 12,000 to 1,000,000 per microliter, median about 80,000. Its cause is t(9;22), the Philadelphia chromosome, and its BCR::ABL1 kinase, which imatinib blocks.",
+    say: "Chronic myeloid leukemia, chronic phase: the cells still mature, so the blood and marrow fill with every stage, from blasts all the way to neutrophils, with peaks at the myelocytes and the segmented neutrophils, and blasts stay under 20 percent, usually much less. The white count runs 12,000 to 1,000,000 per microliter, median about 80,000. Its cause is t(9;22), the Philadelphia chromosome, and its BCR::ABL1 kinase, which imatinib blocks.",
     ro: "CML · every stage" },
 };
 const INFO = [
-  "Myeloblast (stage 1): the youngest cell, with a large nucleus (a high nuclear-to-cytoplasmic ratio), fine chromatin and distinct nucleoli. Acute leukemia is a disease of blasts.",
-  "Promyelocyte (stage 2): its cytoplasm holds large granules. In acute promyelocytic leukemia, maturation stops here.",
-  "Myelocyte (stage 3): the cell right after the promyelocyte.",
-  "Metamyelocyte (stage 4): after the myelocyte, before the band.",
-  "Band (stage 5): the last stage before the segmented neutrophil.",
-  "Segmented neutrophil, or PMN (stage 6): the mature cell, the end of the line.",
+  "Myeloblast (stage 1): the youngest cell, with a large nucleus (a high nuclear-to-cytoplasmic ratio), very fine chromatin, prominent nucleoli and darker blue cytoplasm. Acute leukemia is a disease of blasts.",
+  "Promyelocyte (stage 2): the chromatin is still fine, the cytoplasm a little less dark, and granules appear in it. In acute promyelocytic leukemia, maturation stops here.",
+  "Myelocyte (stage 3): he said the chromatin turns clumped and coarse, the nucleus starts to indent, and the cytoplasm gets less blue.",
+  "Metamyelocyte (stage 4): on his slide between the myelocyte and the band, its nucleus indented like a kidney. Aloud he went from the myelocyte straight to the band.",
+  "Band (stage 5): the nucleus is indented even more, into a curved band, and the cytoplasm turns pink.",
+  "Segmented neutrophil, or PMN (stage 6): the nucleus is pinched into lobes. The mature cell, the one released into the blood.",
 ];
 
 export default function ladder() {
@@ -194,8 +194,8 @@ export default function ladder() {
     render: nlRender, say: nlSay, helpers: [nlBlock],
     controls: `<div class="am-controls" role="group" aria-label="State">` + [["normal", "Normal"], ["aml", "AML"], ["apl", "APL"], ["atra", "APL on ATRA"], ["cml", "CML"]].map((b) => `<button type="button" class="am-btn" data-amk="ds" data-amv="${b[0]}">${b[1]}</button>`).join("") + `</div>`,
     sources: [
-      "From the L20 notes (Dr. Borak's slides): the order myeloblast, promyelocyte, myelocyte, metamyelocyte, band, segmented neutrophil (PMN); the blast as the youngest cell, with a high nuclear-to-cytoplasmic ratio, fine chromatin and distinct nucleoli; Auer rods in myeloblasts, red-blue needles that exclude ALL; most AML needing 20 percent blasts (his slide writes it \"greater than 20 percent\"; the WHO says 20 percent or more), except the AML types defined by a genetic abnormality; APL's abnormal promyelocytes with large, dense granules and bundles of Auer rods, t(15;17) and PML::RARA stopping maturation at the promyelocyte, DIC, and ATRA with arsenic trioxide letting them mature; CML's blood with neutrophils at every stage, peaks at the myelocytes and segmented neutrophils, fewer than 20 percent blasts, and its white count; no blasts in normal blood after the newborn period.",
-      "Rodak's Hematology: Clinical Principles and Applications (Keohane, Otto and Walenga), the chapter on leukocyte development, and Bain's Blood Cells: A Practical Guide set how each stage is drawn: the relative sizes (the promyelocyte the largest, the cells shrinking from the myelocyte on), the blue cytoplasm of the early cells turning pink, the promyelocyte's eccentric nucleus with its pale area beside it, and the nucleus going from round to indented to a band to lobes. The lecture names stages 3 to 6 without describing them, so their nuclei (round, indented, a band, lobes) are drawn as Rodak's describes them but not labeled. No size is labeled, since the lecture gives none.",
+      "From the L20 notes (Dr. Borak's recorded lecture and slides): the order myeloblast, promyelocyte, myelocyte, metamyelocyte, band, segmented neutrophil (PMN); the blast as the youngest cell, with a high nuclear-to-cytoplasmic ratio, very fine chromatin, prominent nucleoli and darker cytoplasm, and how each later stage looks as he described it aloud (granules appearing in the promyelocyte, coarser chromatin and the start of an indent in the myelocyte, a deeper indent and pink cytoplasm in the band, lobes in the PMN, the only stage released into the blood); Auer rods in myeloblasts, red-blue needles that exclude ALL; most AML needing 20 percent blasts (he and his slide say \"greater than 20 percent\"; the WHO says 20 percent or more), except the AML types defined by a genetic abnormality; APL's abnormal promyelocytes with large, dense granules and bundles of Auer rods, t(15;17) and PML::RARA stopping maturation at the promyelocyte, DIC, and ATRA with arsenic trioxide letting them mature; CML's blood with neutrophils at every stage, peaks at the myelocytes and segmented neutrophils, fewer than 20 percent blasts, and its white count; no blasts in normal blood after the newborn period.",
+      "Rodak's Hematology: Clinical Principles and Applications (Keohane, Otto and Walenga), the chapter on leukocyte development, and Bain's Blood Cells: A Practical Guide set how each stage is drawn: the relative sizes (the promyelocyte the largest, the cells shrinking from the myelocyte on), the blue cytoplasm of the early cells turning pink, the promyelocyte's eccentric nucleus with its pale area beside it, and the nucleus going from round to indented to a band to lobes. Aloud he skipped the metamyelocyte (his slide lists it), so its kidney-shaped nucleus is drawn as Rodak's describes it; the myelocyte's nucleus is drawn round with the first slight indent he described (Rodak's: round to oval, sometimes flattened on one side). No size is labeled, since the lecture gives none.",
       "Schematic: the cells are drawn in code as on a stained smear, not traced from any image. The rows of small cells are not counts; they only say which stages are many or few, in the blood for normal and CML and in the marrow for AML and APL (where his numbers for those diseases are). The only number shown is his 20 percent. CD markers are left out, as his objectives say they aren't needed. Educational, not medical advice.",
     ],
     css: `
@@ -242,7 +242,7 @@ export default function ladder() {
 .anima .ladder-svg .nl-ban{fill:var(--anatomy-shade-1);stroke:var(--anatomy-lo);stroke-width:1}
 .anima .ladder-svg .nl-ban.is-on{stroke:var(--anatomy-lit);stroke-width:1.4}
 .anima .ladder-svg .t.nl-v{font-size:12.5px;font-weight:600;fill:var(--anatomy-strong)}
-@media (max-width:560px){.anima .ladder-svg .t.nl-nm{font-size:15.5px}.anima .ladder-svg .t.nl-lk,.anima .ladder-svg .t.nl-sub,.anima .ladder-svg .t.nl-tag,.anima .ladder-svg .t.nl-v{font-size:14px}.anima .ladder-svg .t.nl-btag{font-size:14px}.anima .ladder-svg .t.nl-h{font-size:13.5px}.anima .ladder-svg .t.nl-bn{font-size:13px}}
+@media (max-width:560px){.anima .ladder-svg .t.nl-nm{font-size:15.5px}.anima .ladder-svg .t.nl-lk,.anima .ladder-svg .t.nl-sub,.anima .ladder-svg .t.nl-tag,.anima .ladder-svg .t.nl-v{font-size:14px}.anima .ladder-svg .t.nl-btag{font-size:14px}.anima .ladder-svg .t.nl-h{font-size:13.5px}.anima .ladder-svg .t.nl-bn{font-size:14.2px}}
 `,
   });
 }
