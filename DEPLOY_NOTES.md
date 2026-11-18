@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-18 (statements in a new order on a later try, and the High likelihood tag says why, Claude Code)** — Sam: "yes to
+- **2026-11-18 (statements in a new order on a later try, and the High likelihood tag says why, Claude Code, #417)** — Sam: "yes to
   the two ideas" (Perio reports #55/#56 and #57). A numbered-statement or two-statement item that comes back (a second try, a
   retry of a miss, Learn and Flashcards) shows its statements shuffled and renumbered, never in its own order on the second
   try, and each choice relabeled to the same statements in canonical order: choice k still means what it meant, so the key,
