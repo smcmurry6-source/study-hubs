@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (Perio S6: Periodontal Regeneration taught, Claude Code)** — Sam: "take Perio Session 6 (Periodontal
+  Regeneration) from slides only to taught", the day before the final. Source: the class recording's transcript in Drive
+  (Periodontology/hubs, `en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt`; read, never committed), with the deck and the
+  exam-review guide. S6 `preview` → `taught`; both reading levels rewritten from the class and all three narrations
+  (`periodontal-regeneration-full`, `-plain`, `-hy`) recorded again; 21 Exam Hints quoted (he said to study the decision
+  tree; the defect-morphology slide's studies are "not there for you to read", so `q6-L38` was retired and `q6-L06`,
+  `q6-L08` lost their study names); 14 High Likelihood topics re-ranked from what he stressed; cram rewritten; 24 new
+  questions (8 true/false, 2 two-statement, 4 numbered, 2 which, 2 which-false, 6 multiple choice, `q6-T*`, `S05`-`S06`,
+  `N*`, `W*`, `F02`-`F07`), each with a why per choice and its version B in `content/variants.json`; S6 56 → 79, the bank
+  674 → 697 (after #414 retired `q5-L14`). Timmy Time's section 6 rewritten from the class (it said "what we have is his slides") with a new lightning
+  round line, and the episode rebuilt. Five diagram candidates put to Sam: [the task](vault/tasks/2026-11-18-perio-s6-diagrams.md).
+  [The task](vault/tasks/done/2026-11-03-perio-s6-regeneration-taught.md).
 - **2026-11-18 ("Release tests" faster, and WebKit doesn't block a merge, Claude Code, #416; nothing on the site changes)** — Sam: "do both". The device matrix's Firefox and WebKit jobs run in Playwright's own image (`mcr.microsoft.com/playwright:v1.63.0-noble`, `--user 1001`), which already has the browsers and their system packages: installing those from Ubuntu's mirror took 22 minutes for WebKit and 11 for Firefox on today's runs, for one to two minutes of tests. WebKit's job is out of `release` ("devices in WebKit (doesn't block a merge)", `continue-on-error`). Found on the way (BUG-179): since the per-browser split of 2026-11-13 those two jobs stopped at `matrix.js`'s Chromium-only resilience part, which `run.js` called blocked and passed, so neither had tested anything. Now the resilience part runs only with Chromium, a browser that won't start is a problem in CI, and `run.js` fails a blocked suite in CI. The Chromium jobs keep `--with-deps` (it brings the fonts the layout checks and baselines were measured with).
 - **2026-11-18 (No more tiers for merging, Claude Code; nothing on the site changes)** — Sam: "i want to take out all the tier change rules for merging. it takes too long. it didnt use to take so long". Every change now ships one way: the checks for what you touched, a draft PR, CI, a screenshot for Sam when students will see a difference, Sam's "merge". No local release suites, test report, bug-log rows or preview offer, and no tier 3 extras. CI and the After merge workflow are unchanged. Rewritten: [preview-and-release-test](vault/rules/preview-and-release-test.md), [RELEASE_TEST_PLAN.md](RELEASE_TEST_PLAN.md) sections 1, 2, 6, 7 and 10, `AGENTS.md`, ship-a-change, verify-before-pushing, long-tests-once, preview-a-change, package-the-to-dos and `/backlog`, the PR template (no Tier, UAT or Bugs sections) and the test report template (optional now).
 - **2026-11-18 (statements in a new order on a later try, and the High likelihood tag says why, Claude Code, #417)** — Sam: "yes to

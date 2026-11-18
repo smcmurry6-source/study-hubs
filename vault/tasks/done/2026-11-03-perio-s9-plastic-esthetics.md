@@ -21,7 +21,7 @@ slides (then the recording) are in the Drive folder, build it out before the fin
 
 - Hub note: [perio](../../hubs/perio.md); S6 (slides first, then taught) and S7/S8 (taught from recordings) are the
   worked examples in `DEPLOY_NOTES.md`.
-- A taught session needs everything in [perio-s6](../2026-11-03-perio-s6-regeneration-taught.md)'s "Done when" list:
+- A taught session needs everything in [perio-s6](2026-11-03-perio-s6-regeneration-taught.md)'s "Done when" list:
   both reading levels and both mp3s, exam hints, `LIKELY_TOPICS`, the three question formats with their minimums,
   a why for every choice, and a diagram review put to Sam one candidate at a time.
 - [LESSONS.md](../../../LESSONS.md): read it first (it's a new lecture); [graded-coursework](../../rules/graded-coursework.md).
