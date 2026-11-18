@@ -14,7 +14,7 @@ achMap = HX.achMap, putAnswer = HX.putAnswer, saveNow = HX.saveNow, saveState = 
 lecName = HX.lecName, lecDot = HX.lecDot, paintLive = HX.paintLive, go = HX.go, lecStat = HX.lecStat, QBY = HX.QBY;
 function v2(){ var G = window.shGame; return !!(G && G.v2 && G.v2()); }
 function boost(){ var G = window.shGame; return v2() && G.boost ? G.boost() : null; }
-var KIND = { sequence: "order", recall: "self", match: "self" };
+var KIND = { sequence: "order", match: "order", recall: "self" };
 var SESSION = { n: 0, r: 0, xp: 0, miss: {}, since: 0, recapAt: 0, hp0: null, k: 0, again: 0, kSince: 0, againAt: 0 };
 function todayRec(){
 var d = day(0), x = STATE.nx.days[d];
@@ -559,7 +559,7 @@ wireCard(el, q, o);
 return el;
 }
 function wireCard(el, q, o){
-var multi = q.type === "multi", picked = [], seqP = [], match = { sel: null, done: 0, err: 0 }, self = false;
+var multi = q.type === "multi", picked = [], seqP = [], match = { sel: null, done: 0, err: 0, first: [] }, self = false;
 el.addEventListener("click", function(e){
 var b = e.target.closest("button"); if (!b || !el.contains(b) || el.classList.contains("is-answered")) return;
 if (b.hasAttribute("data-i")) {
@@ -592,7 +592,9 @@ var p = +b.getAttribute("data-pair");
 if (b.getAttribute("data-side") === "l") { $$('[data-side="l"]', el).forEach(function(x){ x.setAttribute("aria-pressed", "false"); }); b.setAttribute("aria-pressed", "true"); match.sel = p; return; }
 if (match.sel === null) return;
 var left = $('[data-side="l"][data-pair="' + match.sel + '"]', el);
-if (p === match.sel) { [b, left].forEach(function(x){ x.classList.add("is-matched"); x.disabled = true; x.setAttribute("aria-pressed", "false"); }); match.done++; match.sel = null; if (match.done === q.pairs.length) answer(b); }
+var same = p === match.sel || q.pairs[p][1] === q.pairs[match.sel][1];
+if (match.first[match.sel] == null) match.first[match.sel] = same ? match.sel : p;
+if (same) { [b, left].forEach(function(x){ x.classList.add("is-matched"); x.disabled = true; x.setAttribute("aria-pressed", "false"); }); match.done++; match.sel = null; if (match.done === q.pairs.length) answer(b); }
 else { match.err++; b.classList.remove("is-shake"); void b.offsetWidth; b.classList.add("is-shake"); }
 }
 });
@@ -621,7 +623,7 @@ right = self; if (!right) partial = "You marked it missed";
 rec = HX.recordAnswer(q.id, q.lec, right, o.ctx);
 } else {
 right = match.err === 0; if (!right) partial = "Matched, with " + pl(match.err, "wrong try", "wrong tries");
-rec = HX.recordAnswer(q.id, q.lec, right, o.ctx);
+rec = HX.recordAnswer(q.id, q.lec, right, o.ctx, null, null, { order: q.pairs.map(function(x, k){ return match.first[k] == null ? k : match.first[k]; }) });
 }
 result(el, q, right, partial, rec.xp, picked, o);
 if (o.onAnswer) o.onAnswer(el, q, right);
@@ -1206,7 +1208,8 @@ m.ids.forEach(function(id){
 var q = QBY[id]; if (!q) return;
 if (q.type === "match") {
 pts[id] = q.pairs.filter(function(x, k){ return matched(q, k); }).length / q.pairs.length; m.res[id] = pts[id] === 1;
-if (has(id)) HX.recordAnswer(q.id, q.lec, m.res[id], "mock", null, null, { session: sid });
+var rowsSent = q.pairs.map(function(x, k){ var v = (Array.isArray(m.picks[id]) ? m.picks[id] : [])[k]; return matched(q, k) ? k : set(v) && q.pairs[v] ? v : (k + 1) % q.pairs.length; });
+if (has(id)) HX.recordAnswer(q.id, q.lec, m.res[id], "mock", null, null, { session: sid, order: rowsSent });
 return;
 }
 if (q.type === "multi") {
@@ -1496,7 +1499,7 @@ function route(){
 var r = parse(), v = r[0], s = r[1];
 if (window.shTTS && view === "notes" && (v !== "notes" || s !== sub)) { try { window.shTTS.stop(); } catch (e) {} }
 if (view === "questions" && v !== "questions") leaving = HX.recapDue();
-if (view === "more" && sub === "arcade" && ARC && (v !== "more" || s !== "arcade")) { try { ARC.arcade.stopAll(); } catch (e) {} }
+if (view === "more" && /^arcade(\/|$)/.test(sub) && ARC && (v !== "more" || s !== sub)) { try { ARC.arcade.stopAll(); } catch (e) {} }
 var was = view, wasSub = sub;
 view = v; sub = s;
 var setOn = v === "more" && s === "settings", gear = $(".hx-set");
@@ -1532,7 +1535,7 @@ if (how === "learn" || how === "cards") return "compendium/" + how;
 return "compendium/" + (p === "mock" ? "mock" : p === "weak" ? "weak" : p === "drill" ? "drill" : p === "misses" ? "misses" : "bank");
 }
 if (view === "more") {
-if (sub === "arcade") return "arcade/" + (ARC && ARC.arcade.current() || "lobby");
+if (/^arcade(\/|$)/.test(sub)) return "arcade/" + (ARC && ARC.arcade.current() || "lobby");
 if (sub === "side") return "review/side";
 if (sub === "hints" || sub === "cram") return "compendium/" + sub;
 return "more/" + (sub || "menu");
@@ -1595,6 +1598,7 @@ q("#more/hints", "hints", "Exam hints", "What " + (X.prof || "the professor") + 
 q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
 (pod ? podMiniHTML(pod) : "") +
 "</nav>" +
+(X.links && X.links.length ? '<nav class="quick-more" aria-label="More to do">' + X.links.map(function(l){ return q(l.href, l.icon || "arcade", l.title, l.sub || "", "ql-wide"); }).join("") + "</nav>" : "") +
 "</div>" +
 (X.notice ? '<p class="notice">' + icon("notes", 20) + "<span><b>" + esc(X.notice[0]) + "</b> " + esc(X.notice[1]) + "</span></p>" : "") +
 '<div class="home-grid">' +
@@ -2043,12 +2047,13 @@ var MORE = [
 ];
 var MORE_ROWS = [["ideas", "thumbup", "Idea board", "Ideas for the hubs from the class: vote on them, or post your own"]];
 function renderMore(el, s){
+var bits = String(s || "").split("/"), what = bits.slice(1).join("/"); s = bits[0];
 var page = MORE.concat(MORE_ROWS).filter(function(m){ return m[0] === s; })[0];
 if (!page) { drawMoreMenu(el); return; }
 var back = '<a class="btn btn-text back" href="#more">' + icon("chevron", 18, "flip") + "More</a>";
 el.innerHTML = '<div class="hx-page more-page">' + back + "<h1>" + esc(page[2]) + '</h1><div class="more-body"><p class="note loading">Loading…</p></div></div>';
 var body = $(".more-body", el);
-({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, shop: HX.moreShop, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body);
+({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, shop: HX.moreShop, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body, what);
 }
 var MORE_FIELD = { timmy: "hub", hints: "sun", cram: "mint", side: "lilac", arcade: "peach", place: "mint", shop: "sun", stats: "sun", settings: "plain" };
 function moreMeta(k){
@@ -2188,14 +2193,14 @@ function needArcade(){
 loadCss(WIDGET + "games.css"); loadCss(BASE + "arcade.css");
 return Promise.all([needQuestions(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
 if (!ARC && window.SH_ARCADE) ARC = window.SH_ARCADE({ esc: esc, state: STATE, save: saveState, toast: toast, questions: QS, lectures: LECS, lectureById: LBY, shuffled: shuffled,
-record: HX.recordAnswer, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [] });
+record: HX.recordAnswer, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [], figures: needFigures });
 var A0 = ARC && ARC.arcade;
 if (A0 && !A0.startGame && A0.start) ARC.arcade = { startGame: A0.start, stopAll: A0.stop, current: A0.current };
 return ARC;
 });
 }
 var GAME_INFO = {};
-function moreArcade(body){
+function moreArcade(body, open){
 body.innerHTML = '<p class="note loading">Loading the arcade…</p>';
 needArcade().then(function(){
 var X = C.arcade || {}, first = X.first || "sort", games = (X.games || []).slice();
@@ -2212,6 +2217,7 @@ var stage = $("#panel-arcade", body), lobby = $(".arcade-lobby", body);
 function back(){ try { ARC.arcade.stopAll(); } catch (e) {} stage.hidden = true; stage.innerHTML = ""; lobby.hidden = false; }
 $$("[data-game]", body).forEach(function(b){ b.addEventListener("click", function(){ lobby.hidden = true; stage.hidden = false; track("arcade:open=" + b.getAttribute("data-game")); ARC.arcade.startGame(b.getAttribute("data-game")); stage.scrollIntoView({ block: "start" }); }); });
 stage.addEventListener("click", function(e){ if (e.target.closest("[data-back]")) { e.stopPropagation(); e.preventDefault(); back(); } }, true);
+var deep = open && by[open] && $('[data-game="' + open + '"]', body); if (deep) deep.click();
 }).catch(function(e){ body.innerHTML = "<p>Couldn't load the arcade. Check your connection.</p>"; if (window.console) console.error(e); });
 }
 document.addEventListener("sh:rank-profile", function(){ setTimeout(function(){ var g = $(".more-body .stats-grid"); if (g && g.parentNode) moreStats(g.parentNode); }, 0); });

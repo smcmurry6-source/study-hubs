@@ -44,8 +44,34 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   old hub's Stats and Settings name boxes and its rank card (`widget/v3.js`, `widget/ranks.js`, `widget/v3.css`). A
   hub's Settings now draws Your name and Link my devices before the shared widget is in (a tap waits for it): opened
   straight on `#more/settings`, both rows were missing. About page, the dashboard tour's Settings step, Ask Timmy's site
-  help and the event taxonomy updated; bundles rebuilt. CI: carries #402's pin of every workflow to `ubuntu-24.04`
-  (`ubuntu-latest` became Ubuntu 26.04, where Playwright 1.56.1 can't install a browser), so its browser jobs run.
+  help and the event taxonomy updated; bundles rebuilt.
+- **2026-11-17 (Perio's Stage & Grade game, its bank audited against the final's hints, matching pays 10 XP, What's new on the
+  dashboard, the recap stays still, Claude Code, #402)** — Sam: "add an interactive visualization/game for staging and grading
+  using all of the criteria ... accessible on the home of perio hub, top of the question bank, and in the arcade", "using the
+  final exam hints dr abou arraj gave ... vet the whole question bank", "using all of the perio midterm check ins, see if there
+  are any additions", "matching questions are only giving 2xp instead of 10", "add the recent change log back".
+  **Stage & Grade** (`tools/figures/perio/stagegame.js` + `.css`, built into `hubs/perio/content/figures.js`/`.css` between
+  `stage:js`/`stage:css` markers by `tools/figures/perio/build.mjs`, `--check` in CI): ten made-up patients, each drawn as a
+  mouth chart (each tooth's own facial outline at its average size: incisal edges, canine cusps, premolars, molars with their roots; Sam: "make the mouth chart use teeth shapes instead of arbitrary rectangles") and a radiograph of its worst site, with their findings; call the stage, the extent and the grade, and the
+  finding that decided each call lights up gold. Explore sets every criterion by hand and the diagnosis follows, with why.
+  The rules follow Session 1's notes (CAL first, the bone-loss bands, the Stage 3 triggers, Stage 4 by teeth lost or
+  complexity, the grade by direct evidence or the bone-loss/age ratio, smoking and HbA1c lifting it); 20,000 dealt cases
+  checked against them. It sits at the top of the Question Bank (`bank.cuspGame`, the slot Occlusion's cusp game uses), on
+  Home as a wide quick link (`SH_HUB.home.links`, new in `widget/hub.js`: any hub can list extra links there) and in the
+  arcade as its seventh game (`#more/arcade/stage` opens it straight away; `GAME_IMPL.stage` in `content/arcade.js`, lobby art
+  `pStage` in `tools/figures/site/arcade.mjs`). Arcade plays earn the usual +50; it doesn't count in class stats.
+  **migration_v64.sql (applied live 2026-11-17):** `sh_answer` pays a matching question (an `order` key whose picks
+  arrive empty) as a self-graded one, 10 XP the first time right, instead of the flat 2; `submit_arcade_score` and
+  `sh_session_start` accept `stage`. `tools/release/xp.js` tests both. **The audit**
+  ([task](vault/tasks/done/2026-11-17-perio-final-hints-audit.md)): six reviewers read the bank session by session against the
+  notes and the Nov 12 hints; 111 questions fixed in place (ids kept: wrong or thin whys, unclear stems, one second
+  defensible answer, a sickle "toe"), 2 retired (`q3-20`, a third ask of one fact; `q1-E03`, a near-duplicate), 8 added:
+  suture materials from the midterm check-ins (`q2-F04`-`F06`; the final asks the materials, not the techniques), and
+  `q4-F06`, `q8-F03`, `q8-F04`, `q9-F03`, `q9-F04` for hinted facts the bank didn't ask. 669 → 675. High yield recorded again
+  for every session whose `hy` changed. **The dashboard:** a hub card's "Updated" opens What's new (its last few changelog
+  lines and the site's), and the hub recap plays its bars once, then stays still while you scroll. **CI:** every workflow is pinned to `ubuntu-24.04`: `ubuntu-latest` became 26.04 on 2026-11-18 and Playwright 1.56.1
+  can't install a browser there (a to-do in the inbox moves it back).
+
 - **2026-11-17 (the dashboard at the large text sizes, BUG-076 and BUG-163, Claude Code, #401)** — `widget/dash.css` (and
   the rebuilt `widget/site.bundle.css`). On a 320 px phone at XX-Large the page scrolled 49 px sideways (10 px at X-Large):
   the "You" card's week dots now shrink, still round, when the card is narrower than the week, and "Start studying" wraps

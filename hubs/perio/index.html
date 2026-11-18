@@ -18,7 +18,7 @@
 <meta property="og:url" content="https://smcmurry6-source.github.io/study-hubs/hubs/perio/">
 <meta property="og:image" content="https://smcmurry6-source.github.io/study-hubs/assets/og-perio.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="description" content="Periodontology D2 study hub: lecture notes for all nine sessions, a question bank and mock exam, grouped review tables, and the Pocket Arcade of nine mini games with class leaderboards.">
+<meta name="description" content="Periodontology D2 study hub: lecture notes for all nine sessions, a question bank and mock exam, grouped review tables, and the Pocket Arcade of seven games with class leaderboards.">
 <link rel="preload" href="../../assets/fonts/nunito-sans-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="content/core.json" as="fetch" type="application/json" crossorigin>
 <link rel="stylesheet" href="../../widget/site.bundle.css">
@@ -44,8 +44,10 @@ window.SH_HUB = {
     when: "Thursday, November 19 · comprehensive: all 9 sessions",
     chips: ["Cumulative", "S1-S9", "60-65 questions, about 15% from S1-S4", "An hour and a half (he said it can be two)"],
     prof: "the professors",
-    onExam: "On the final"
+    onExam: "On the final",
+    links: [{ href: "#more/arcade/stage", icon: "goal", title: "Stage & Grade", sub: "A game: stage and grade ten patients, or build a case and watch the diagnosis follow" }]
   },
+  bank: { cuspGame: true },
   notes: { onExam: "On the final" },
   hints: {
     prof: "the professors",
@@ -59,14 +61,15 @@ window.SH_HUB = {
   },
   arcade: {
     first: "board",
-    how: "Pocket Showdown, Perio Clinic Escape, Million-Dollar Smile and Calculus Crusher run the real question bank, and those answers count toward your Weak Spots and the class-wide stats; pick Questions I missed to replay only what you got wrong. Mind the Pocket pulls sentences straight from the session notes and blanks out the key terms. Cross-Section drills the terms from each session. Every game ends with what you missed and posts your score to the class board.",
+    how: "Pocket Showdown, Perio Clinic Escape, Million-Dollar Smile and Calculus Crusher run the real question bank, and those answers count toward your Weak Spots and the class-wide stats; pick Questions I missed to replay only what you got wrong. Mind the Pocket pulls sentences straight from the session notes and blanks out the key terms. Cross-Section drills the terms from each session. Stage & Grade draws made-up patients from Session 1's staging and grading rules, so it doesn't count in class stats. Every game ends with what you missed and posts your score to the class board.",
     games: [
       { id: "board", icon: "questions", name: "Pocket Showdown", desc: "A quiz board drawn like a perio chart: miss and the tooth bleeds. Two Deep Pockets to wager on, then the Final Probe." },
       { id: "escape", icon: "tour", name: "Perio Clinic Escape", desc: "Locked in the perio clinic after hours. Answer what seals the film viewer, the chart and the cassette to find the door code." },
       { id: "cloze", icon: "highlight", name: "Mind the Pocket", desc: "Type the key term missing from a line of the notes before the probe runs out of millimeters. Anki cloze style." },
       { id: "smile", icon: "trophy", name: "Million-Dollar Smile", desc: "Climb twelve rungs to $125,000 with three lifelines. Miss once and you fall to your safe haven." },
       { id: "cross", icon: "cram", name: "Cross-Section", desc: "A fresh mini crossword built from the course terms every game." },
-      { id: "crusher", icon: "arcade", name: "Calculus Crusher", desc: "Breakout on a wall of calculus. Bounce the ball into the brick with the right answer." }
+      { id: "crusher", icon: "arcade", name: "Calculus Crusher", desc: "Breakout on a wall of calculus. Bounce the ball into the brick with the right answer." },
+      { id: "stage", icon: "goal", name: "Stage & Grade", desc: "Ten made-up patients, drawn: call the stage, the extent and the grade, and see which finding decided each one." }
     ]
   }
 };

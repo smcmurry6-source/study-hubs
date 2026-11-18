@@ -19,6 +19,8 @@ p = plan({ ...base, changes: ch('D hubs/perio/content/questions.json') });
 eq('no keys for a deleted bank', p.keys, []);
 p = plan({ ...base, changes: ch('M hubs/heme-endo-exam2/index.html') });
 eq('no keys for an old single-file hub', p.keys, []);
+p = plan({ ...base, changes: ch('M tools/xp/keys.js') });
+eq('every engine hub\'s keys after a change to how keys are built', p.keys, ['occlusion', 'perio']);
 
 // Ask Timmy deploys when its function changes, not for the About page alone (its site.json changes with it)
 eq('timmy', plan({ ...base, changes: ch('M supabase/functions/timmy/site.json') }).timmy, true);

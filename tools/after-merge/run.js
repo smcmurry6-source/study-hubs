@@ -47,7 +47,8 @@ function plan({ changes, podcast, added, extraFixes, engineHubs }){
   const out = { keys: [], timmy: false, podcast: [], site: [], fixes: [], changelog: [], warnings: [] };
   for (const hub of engineHubs) {
     const qf = `hubs/${hub}/content/questions.json`;
-    if (changes.some(c => c.path === qf && c.status !== 'D') || touched(`tools/question-ids/${hub}.txt`)) out.keys.push(hub);
+    /* a change to how keys are built (tools/xp/keys.js) reloads every engine hub's */
+    if (changes.some(c => c.path === qf && c.status !== 'D') || touched(`tools/question-ids/${hub}.txt`) || touched('tools/xp/keys.js')) out.keys.push(hub);
     if (touched(`hubs/${hub}/content/core.json`)) {
       const p = podcast(hub);
       if (p.after && p.after.id && !(p.before && p.before.id === p.after.id && p.before.seconds === p.after.seconds)) out.podcast.push({ hub, ...p.after });

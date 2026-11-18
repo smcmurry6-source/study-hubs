@@ -325,7 +325,7 @@
     var r = parse(), v = r[0], s = r[1];
     if (window.shTTS && view === "notes" && (v !== "notes" || s !== sub)) { try { window.shTTS.stop(); } catch (e) {} }
     if (view === "questions" && v !== "questions") leaving = HX.recapDue();
-    if (view === "more" && sub === "arcade" && ARC && (v !== "more" || s !== "arcade")) { try { ARC.arcade.stopAll(); } catch (e) {} }
+    if (view === "more" && /^arcade(\/|$)/.test(sub) && ARC && (v !== "more" || s !== sub)) { try { ARC.arcade.stopAll(); } catch (e) {} }
     var was = view, wasSub = sub;
     view = v; sub = s;
     var setOn = v === "more" && s === "settings", gear = $(".hx-set");
@@ -365,7 +365,7 @@
       return "compendium/" + (p === "mock" ? "mock" : p === "weak" ? "weak" : p === "drill" ? "drill" : p === "misses" ? "misses" : "bank");
     }
     if (view === "more") {
-      if (sub === "arcade") return "arcade/" + (ARC && ARC.arcade.current() || "lobby");
+      if (/^arcade(\/|$)/.test(sub)) return "arcade/" + (ARC && ARC.arcade.current() || "lobby");
       if (sub === "side") return "review/side";
       if (sub === "hints" || sub === "cram") return "compendium/" + sub;
       return "more/" + (sub || "menu");
@@ -431,6 +431,9 @@
           q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
           (pod ? podMiniHTML(pod) : "") +
         "</nav>" +
+        /* a hub's own links under the quick starts (SH_HUB.home.links: { href, icon, title, sub }), a row of their own so
+           the grid above keeps its shape; Perio's Stage & Grade game (2026-11-17) */
+        (X.links && X.links.length ? '<nav class="quick-more" aria-label="More to do">' + X.links.map(function(l){ return q(l.href, l.icon || "arcade", l.title, l.sub || "", "ql-wide"); }).join("") + "</nav>" : "") +
       "</div>" +
       (X.notice ? '<p class="notice">' + icon("notes", 20) + "<span><b>" + esc(X.notice[0]) + "</b> " + esc(X.notice[1]) + "</span></p>" : "") +
       '<div class="home-grid">' +
@@ -939,12 +942,14 @@
   /* pages in More that aren't tiles: the idea board is a row under "Talk to us" */
   var MORE_ROWS = [["ideas", "thumbup", "Idea board", "Ideas for the hubs from the class: vote on them, or post your own"]];
   function renderMore(el, s){
+    /* #more/<page>/<what>: the arcade opens a game straight away (#more/arcade/stage: Perio's Home link) */
+    var bits = String(s || "").split("/"), what = bits.slice(1).join("/"); s = bits[0];
     var page = MORE.concat(MORE_ROWS).filter(function(m){ return m[0] === s; })[0];
     if (!page) { drawMoreMenu(el); return; }
     var back = '<a class="btn btn-text back" href="#more">' + icon("chevron", 18, "flip") + "More</a>";
     el.innerHTML = '<div class="hx-page more-page">' + back + "<h1>" + esc(page[2]) + '</h1><div class="more-body"><p class="note loading">Loading…</p></div></div>';
     var body = $(".more-body", el);
-    ({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, shop: HX.moreShop, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body);
+    ({ timmy: moreTimmy, hints: moreHints, cram: moreCram, side: moreSide, arcade: moreArcade, place: HX.morePlace, shop: HX.moreShop, stats: moreStats, settings: moreSettings, ideas: moreIdeas })[s](body, what);
   }
   /* More (Sam, 2026-11-06: "can use a spice up"): one tile per part, each on its own field of color with its drawing and
      a line of what's in it; Timmy Time is the big one, its host in headphones. Talk to us stays a list. */
@@ -1099,7 +1104,7 @@
     loadCss(WIDGET + "games.css"); loadCss(BASE + "arcade.css");
     return Promise.all([needQuestions(), needNotes(), needStudy(), loadScript(WIDGET + "games.js"), loadScript(BASE + "arcade.js")]).then(function(){
       if (!ARC && window.SH_ARCADE) ARC = window.SH_ARCADE({ esc: esc, state: STATE, save: saveState, toast: toast, questions: QS, lectures: LECS, lectureById: LBY, shuffled: shuffled,
-        record: HX.recordAnswer, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [] });
+        record: HX.recordAnswer, lecLabel: lecLabel, lc: lc, sortSets: STUDY.sortSets || [], readings: NOTES.full, review: STUDY.review || [], figures: needFigures });
       /* Perio's arcade names them start / stop (Occlusion's and Heme & Endo's: startGame / stopAll) */
       var A0 = ARC && ARC.arcade;
       if (A0 && !A0.startGame && A0.start) ARC.arcade = { startGame: A0.start, stopAll: A0.stop, current: A0.current };
@@ -1107,7 +1112,7 @@
     });
   }
   var GAME_INFO = {};
-  function moreArcade(body){
+  function moreArcade(body, open){
     body.innerHTML = '<p class="note loading">Loading the arcade…</p>';
     needArcade().then(function(){
       var X = C.arcade || {}, first = X.first || "sort", games = (X.games || []).slice();
@@ -1126,6 +1131,8 @@
       $$("[data-game]", body).forEach(function(b){ b.addEventListener("click", function(){ lobby.hidden = true; stage.hidden = false; track("arcade:open=" + b.getAttribute("data-game")); ARC.arcade.startGame(b.getAttribute("data-game")); stage.scrollIntoView({ block: "start" }); }); });
       /* the games' own Back buttons go to this lobby, not the live hub's */
       stage.addEventListener("click", function(e){ if (e.target.closest("[data-back]")) { e.stopPropagation(); e.preventDefault(); back(); } }, true);
+      /* #more/arcade/<game>: straight into it; its Back still goes to this lobby */
+      var deep = open && by[open] && $('[data-game="' + open + '"]', body); if (deep) deep.click();
     }).catch(function(e){ body.innerHTML = "<p>Couldn't load the arcade. Check your connection.</p>"; if (window.console) console.error(e); });
   }
   /* the rank comes from the server after the page is up, and again as you answer: Stats shows it as it changes */
