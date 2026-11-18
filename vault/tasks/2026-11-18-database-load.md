@@ -48,6 +48,10 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   studies.
 - [ ] Sam's call: a larger compute size for the Supabase project (more memory and CPU, at a monthly cost). Not needed if
   the boxes above are done; worth it for exam weeks.
+- [ ] **The answer retries don't pile onto a struggling database.** In the 19:40-20:25 outage (Log) the failed saves were sent
+  again up to four times each (#421), which doubled `record_answer_v2`'s calls while 9 in 10 failed and kept PostgREST's
+  connection pool full. For example: one page sends one answer at a time while saves fail (a queue, the oldest first),
+  and backs off further when every recent try failed. Sam's call against a larger compute size (above).
 - [ ] A failed answer that's still unsent when the page closes is kept on the device and sent at the next load (today the
   retries stop when the tab closes).
 - [x] `personal_answers`' two indexes (`migration_v71.sql`: the person's answers newest first, and one question's answers)
@@ -73,5 +77,18 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   API don't show in the edge logs, so the next look is `pg_stat_statements` for roles other than `authenticator`, or the
   Supabase dashboard's CPU graph for those minutes. The answer retries (#421) cover a burst that short. BUG-181 stays
   "fixed, awaiting retest" until a busy day passes without one.
+- 2026-11-18, **the evening outage, 19:40-20:25 UTC** (edge and Postgres logs; found while reading #427's After merge,
+  whose Perio changelog line failed with "fetch failed" and a 522): from 19:40 about 9 in 10 `record_answer_v2` calls
+  failed (1,896 of 2,108 between 19:40 and 20:10, against 1,023 calls in the half hour before), as 504s (gateway
+  timeouts), 522s (the database's server unreachable), 500s (statement timeouts) and a few 503s, with PostgREST's
+  "Timed out acquiring connection from connection pool" (PGRST003) every minute; the class's reads (`question_stats`,
+  `question_choices`, the activity ping) failed about 1 in 3. The other paths' counts stayed level, so no new caller
+  (#424's screen-off study time included) added load: the doubling of answer calls was the retries. Heavy queries in the
+  slow log: three `pg_stat_statements` reports at 19:40 (10-14 s; the Supabase dashboard's query performance page or a
+  session following the line above) and two Management API queries at 20:00 (11 and 17 s). #427's own diagnostic
+  queries ran at 19:41-19:43 (one stopped by its 8 s limit); none is in the slow log and none was running at 20:27. It
+  settled by itself from 20:25, with the class's traffic far below the evening's (about 40 requests a minute against
+  300-500). Nothing was changed on the database. The live check at 20:27: nothing heavy running, only the realtime
+  replication. BUG-181's retest failed.
 
 ## Outcome
