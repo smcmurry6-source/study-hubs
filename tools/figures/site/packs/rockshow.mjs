@@ -143,12 +143,12 @@ export function pack(T){
         s += shop(3.0, 4.7, .35, 2.35, [[3.34, 1.66, 6.4, "#9B7BE0", "stripe"], [3.95, 1.62, 6.4, PINK[0], "dot", RED[0]], [4.48, 1.66, 4.4, TEAL[0], "wave"],
           [3.28, .98, 6.4, YEL[0], "bolt"], [3.92, .98, 6.4, RED[0], "tooth"], [4.48, .98, 6.4, "#3FA7E0", "star"]]);
         s += shop(6.4, 7.9, .9, 2.35, [[6.72, 1.84, 6, TEAL[0], "tri", YEL[0]], [7.4, 1.86, 5.6, PINK[0], "star"], [6.75, 1.46, 6.2, YEL[0], "dot"], [7.42, 1.48, 6.2, "#3ECF9E", "wave"]]);
-        if (o.night){ q = P(3.6, y1, 1.4); lights += T.glowAt(q[0], q[1], 11); q = P(7.3, y1, 1.7); lights += T.glowAt(q[0], q[1], 9); }
+        if (o.night){ q = P(3.6, y1, 1.4); lights += T.glowAt(q[0], q[1], 11); q = P(7.55, y1, 1.8); lights += T.glowAt(q[0], q[1], 6.5); }
         /* the door, a round window in it, its step and a lamp over it */
         s += FO(onY(4.95, 6.05, 0, 2.62), WHT, 1.5) + FO(onY(5.05, 5.95, 0, 2.52), ac.s, 1.4);
         s += L(onY(5.2, 5.8, .25, 1.05), .8, INK, .4);
         var pw = T.porthole("y", y1, 5.5, 1.72, .27, { night: o.night }); s += pw.s;
-        if (o.night){ q = P(5.5, y1, 1.72); lights += T.glowAt(q[0], q[1], 4.6); }
+        if (o.night){ q = P(5.5, y1, 1.72); lights += T.glowAt(q[0], q[1], 3.4); }
         q = P(5.82, y1, 1.12); s += circ(q[0], q[1], 1, CHROME[0], .8);
         s += box(4.85, y1, 0, 1.3, .42, .14, { top: "#E6E1EA", left: K.stone, right: K.stoneShade }, { sw: 1.3, si: .8 });
         q = P(5.5, y1 + .05, 3.02); s += L("M" + m(q[0], q[1] - 1) + " v2.4", 1.1) + FO("M" + m(q[0] - 2.4, q[1] + 1.4) + " h4.8 l-1 3 h-2.8 z", o.night ? K.lit : "#FFE9A8", .9);
