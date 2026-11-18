@@ -278,7 +278,7 @@
   /* the version a question shows: the device's first version on the first try, then the next one each try (n, the tries
      so far: the answers by default, a flashcard's reviews in Flashcards). A copy keeps the original as _base and the
      version shown as _w (0 = A, the original; 1 = B, the first of variants.json); question health records _w with each
-     answer (migration_v66). Search, Find this in the notes, question health's fingerprint and SH_EXPORT read the original. */
+     answer (migration_v67). Search, Find this in the notes, question health's fingerprint and SH_EXPORT read the original. */
   function worded(q, n, k){
     var base = q && q._base || q; if (!base || !VARS) return base;
     var vs = VARS[base.id]; if (!vs) return base; if (!Array.isArray(vs)) vs = [vs];

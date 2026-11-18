@@ -11,8 +11,10 @@
 // row k's own, so the page sends each row's first pick and a right answer reads 0..n-1), "self" (recall cards, graded
 // by the student). v is the question's version as the page reports it (question health's fingerprint of the exported question,
 // widget/qhealth.js fp() over widget/hub.js exportQuestions()), so a page cached before an edit is graded against the key
-// it showed. counted: false for a question kept out of the hub's mastery (a content field `counted: false`). Ids marked
-// "retired" in tools/question-ids/<hub>.txt come last as { id, retired: true }.
+// it showed. counted: false for a question kept out of the hub's mastery (a content field `counted: false`). cv (one
+// choice and select all only, migration_v66): the version of the question's choices, a fingerprint of its choices and its
+// key, so the class's picks on each choice start again when a choice or the key changes, and not when only the stem, the
+// explanation or a why does. Ids marked "retired" in tools/question-ids/<hub>.txt come last as { id, retired: true }.
 'use strict';
 const fs = require('fs'), path = require('path');
 const ROOT = path.resolve(__dirname, '../..');
@@ -36,10 +38,16 @@ function exported(q){
   if (q.ex) hint += ' — ' + q.ex;
   return { id: q.id, lec: q.lec, text: q.stem, hint, choices: q.choices || null, answer: q.type === 'mcq' ? q.answer : null };
 }
+/* the version of a question's choices (migration_v66): what the class's picks on each choice are counted against */
+function choiceVersion(q){
+  if (q.type === 'mcq') return hash(JSON.stringify(['one', q.choices, q.answer]));
+  if (q.type === 'multi') return hash(JSON.stringify(['all', q.choices, q.correct.slice().sort((a, b) => a - b)]));
+  return '';
+}
 function keyFor(q){
   const k = { id: q.id, v: fp(exported(q)) };
-  if (q.type === 'mcq') Object.assign(k, { kind: 'one', answer: [q.answer] });
-  else if (q.type === 'multi') Object.assign(k, { kind: 'all', answer: q.correct.slice().sort((a, b) => a - b) });
+  if (q.type === 'mcq') Object.assign(k, { kind: 'one', answer: [q.answer], cv: choiceVersion(q) });
+  else if (q.type === 'multi') Object.assign(k, { kind: 'all', answer: q.correct.slice().sort((a, b) => a - b), cv: choiceVersion(q) });
   else if (q.type === 'sequence') Object.assign(k, { kind: 'order', answer: q.steps.map((s, i) => i) });
   else if (q.type === 'match' && Array.isArray(q.pairs) && q.pairs.length >= 2 && q.pairs.length <= 20) Object.assign(k, { kind: 'order', answer: q.pairs.map((p, i) => i) });
   else Object.assign(k, { kind: 'self', answer: [] });
@@ -55,7 +63,7 @@ function keys(hub, file){
   return out;
 }
 
-module.exports = { keys, keyFor, fp, exported };
+module.exports = { keys, keyFor, fp, exported, choiceVersion };
 
 if (require.main === module) {
   const a = process.argv.slice(2), hub = a[0], fi = a.indexOf('--file');

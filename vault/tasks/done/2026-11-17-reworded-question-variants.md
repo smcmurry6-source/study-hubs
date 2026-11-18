@@ -85,7 +85,7 @@ question**: same id, same key, same class stats ([question-ids-are-permanent](..
 - 2026-11-18: Sam settled the scope: "lets also do the reworded questions. do one extra wording and only do it for perio"
   ([decisions](../../decisions.md)). Built and shipped for Perio before its final (2026-11-19) (#405).
 - 2026-11-18: Sam: "Do the database change. They are A/B versions of questions", and "Split the class": the A/B split,
-  `migration_v66.sql` and the `ab_gap` flag.
+  `migration_v67.sql` and the `ab_gap` flag.
 
 ## Outcome
 
@@ -106,7 +106,7 @@ answer away): they changed 97. 447 KB raw, 134 KB gzipped.
   (`wordingOf`, `loadVariants`; test in `tools/timmy/test.mjs`). The function changed, so After merge deploys it.
 - **Checks:** `checkVariants` in `tools/hub-next/build.mjs` (choice and why counts, statement labels and counts, a changed
   stem, the key-longest rate) and `lintWordings` in `tools/ci/smoke.js`. No High yield changed.
-- **A/B** (the second PR, `migration_v66.sql`): each device starts each question on A or B (`abStart()`), later tries
+- **A/B** (the second PR, `migration_v67.sql`): each device starts each question on A or B (`abStart()`), later tries
   alternate, and a mock keeps its versions until submitted. The card's `data-wording` (0 = A, 1 = B) goes with each
   question-health row (`question_events.w`); `qh_report`'s `wordings` splits first tries by version, and `ab_gap` flags a
   pair 20+ points apart (z ≥ 1.96, 10+ people a version). The admin page shows both versions' numbers and B's text.

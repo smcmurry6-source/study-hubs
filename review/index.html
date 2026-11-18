@@ -2473,7 +2473,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var s = [];
     if (r.n1) s.push("First try (this version): <b>" + qhPct(r.c1, r.n1) + "</b> of " + r.n1);
     if (r.a_n1) s.push("First try (all ever): <b>" + qhPct(r.a_c1, r.a_n1) + "</b> of " + r.a_n1);
-    /* A/B (migration_v66): first tries by the version shown; the class is split by device, so the halves are alike */
+    /* A/B (migration_v67): first tries by the version shown; the class is split by device, so the halves are alike */
     var wk = r.wordings ? Object.keys(r.wordings).sort() : [];
     if (wk.length) s.push("First try by version: " + wk.map(function(k){ var x = r.wordings[k] || {}; return String.fromCharCode(65 + +k) + " <b>" + qhPct(x.c, x.n) + "</b> of " + x.n; }).join(" · "));
     if (r.a_attempts) s.push("Every answer: " + qhPct(r.a_correct, r.a_attempts) + " of " + fmtNum(r.a_attempts));

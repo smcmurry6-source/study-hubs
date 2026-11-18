@@ -36,10 +36,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   class". `abStart()` in `widget/hub.js` picks each question's first version by device (a mixed FNV hash of
   `sh_visitor_id` and the id: about half the class on each, every question), later tries alternate; a mock keeps each
   question's version (`STATE.mock.wv`) until it's submitted. Every Perio card says its version (`data-wording`, 0 = A, 1 = B),
-  `widget/qhealth.js` sends it (`w`), and `migration_v66.sql` (applied through the connector) keeps it on
+  `widget/qhealth.js` sends it (`w`), and `migration_v67.sql` (applied through the connector) keeps it on
   `question_events.w`, splits first tries by version (`qh_report`'s `wordings`; the old function renamed `qh_report_v51`)
   and adds the medium flag `ab_gap` (20+ points apart, z ≥ 1.96, 10+ people a version). The admin page shows "First try
   by version" and version B's text. Tests: `tools/release/admin-ops.js` section 5. About page updated.
+- **2026-11-18 (The class's picks follow the version of a question's choices, Claude Code)** — the inbox's "class picks on
+  each choice ignore question versions" (BUG-023's general fix). `question_choices` was keyed by position only, so after an
+  edit the "% of the class picked it" beside a choice counted picks of the old choices: since the release, 169 Perio and
+  125 Occlusion questions had their choices rewritten (8 of Perio's only moved), and #404 rewrote 7 of Heme & Endo Exam 3's. `migration_v66.sql`: a one-choice or
+  select-all key carries `cv`, the version of its choices (`choiceVersion` in `tools/xp/keys.js`: the choices and the key;
+  the stem, the explanation and the whys don't count); `record_choice` / `record_choices` stamp each pick with the current
+  one (`question_choices.v`); when it changes, `admin_load_question_keys` moves the old picks to `question_choices_past`
+  (closed to the public, nothing deleted; an undone edit brings them back), with a backstop at the next pick
+  (`sh_choices_to`). The page, `sh_answer` and every reader of `question_choices` are unchanged. Picks from before versions
+  are kept as the current choices', except on the 301 questions whose choices changed since their content JSON shipped
+  (`tools/xp/choice-history.js`, from git), whose picks are set aside. Hubs without keys (the old pages) behave as before.
+  Takes effect when the After merge workflow reloads every engine hub's keys (it does for any change to `keys.js`). Tests:
+  `tools/release/xp.js` section 3b; `rls-expectations.json` closes the past table and the two helpers. About page entry.
 - **2026-11-18 (CI back on the newest Ubuntu, Claude Code, #407)** — The inbox to-do from #402. Every workflow is back on
   `runs-on: ubuntu-latest` (Ubuntu 26.04 since 2026-11-18) with Playwright **1.63.0** in place of 1.56.1 (the
   `playwright@` lines in `check.yml`, `release.yml` and `after-merge.yml`): 1.63.0 has Chromium, WebKit and Firefox
