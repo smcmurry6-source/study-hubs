@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (Perio's questions as A/B versions, Claude Code)** — Sam: "They are A/B versions of questions", "Split the
+  class". `abStart()` in `widget/hub.js` picks each question's first version by device (a mixed FNV hash of
+  `sh_visitor_id` and the id: about half the class on each, every question), later tries alternate; a mock keeps each
+  question's version (`STATE.mock.wv`) until it's submitted. Every Perio card says its version (`data-wording`, 0 = A, 1 = B),
+  `widget/qhealth.js` sends it (`w`), and `migration_v65.sql` (applied through the connector) keeps it on
+  `question_events.w`, splits first tries by version (`qh_report`'s `wordings`; the old function renamed `qh_report_v51`)
+  and adds the medium flag `ab_gap` (20+ points apart, z ≥ 1.96, 10+ people a version). The admin page shows "First try
+  by version" and version B's text. Tests: `tools/release/admin-ops.js` section 5. About page updated.
 - **2026-11-18 (Perio's questions come back reworded, Claude Code, stacked on #402)** — Sam: "do one extra wording and only do it
   for perio". `hubs/perio/content/variants.json` holds a second wording of each of the 652 Perio questions with choices (stem,
   choices and whys; choice k is choice k reworded), written session by session from the notes and hints by 14 writers and

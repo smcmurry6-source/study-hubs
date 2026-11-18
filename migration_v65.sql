@@ -9,12 +9,15 @@
 --    The answer's fingerprint (v) stays the original's, so the two versions are one question with one set of numbers.
 -- 2. record_qh takes it as the item's 'w' (0 to 9). Otherwise exactly as migration_v51 wrote it.
 -- 3. qh_report gets one more column, wordings: { "<w>": { n: people, c: right } } over first tries on this version.
---    Its return type changes, so it is dropped and created again (nothing depends on it but get_question_health, whose
---    plpgsql body names it at run time). Otherwise exactly as v51 wrote it.
+--    Its return type changes, so the old one is renamed qh_report_v51 (kept, unused, locked like the rest) and the new one
+--    created (nothing depends on it but get_question_health, whose plpgsql body names it at run time). A rename, not a
+--    drop, so the connector applies it without asking. Otherwise exactly as v51 wrote it.
 -- 4. qh_flags: a new flag, ab_gap ("Versions differ"), when the hardest and the easiest version (10+ people each) are 20
 --    points or more apart and that is unlikely to be chance (z >= 1.96). Medium, like very_hard; a new code brings a
 --    reviewed question back, as every new flag does. Otherwise exactly as v51 wrote it.
 -- Nothing here changes grading, XP or what a student sees; it is read only on the admin page (behind the admin secret).
+-- Applied to the live project on 2026-11-18 through the connector, in three parts (v65a_question_ab_record, v65b_question_ab_flag,
+-- v65c_question_ab_report), before its PR merged: a page before this change sends no 'w', which records as null.
 -- Tested on a throwaway copy of supabase/schema.sql (tools/release/admin-ops.js, section 5; rls.js).
 
 alter table public.question_events add column if not exists w smallint;
@@ -212,8 +215,8 @@ end;
 $$;
 
 
-drop function if exists public.qh_report(text, integer, jsonb);
-create or replace function public.qh_report(p_hub text, p_days integer default 120, p_current jsonb default null)
+alter function public.qh_report(text, integer, jsonb) rename to qh_report_v51;
+create function public.qh_report(p_hub text, p_days integer default 120, p_current jsonb default null)
 returns table(
   hub text, qid text, in_hub boolean, v text, versions integer, v_since timestamptz, qt text, nch integer, key integer,
   n1 integer, c1 integer, choices jsonb, nr integer, cr integer, nrm integer, crm integer,
@@ -378,6 +381,7 @@ $$;
 
 revoke all on function public.qh_flags(jsonb) from public, anon, authenticated;
 revoke all on function public.qh_report(text, integer, jsonb) from public, anon, authenticated;
+revoke all on function public.qh_report_v51(text, integer, jsonb) from public, anon, authenticated;
 revoke all on function public.record_qh(text, text, text, jsonb) from public;
 grant execute on function public.record_qh(text, text, text, jsonb) to anon, authenticated;
 alter function public.qh_flags(jsonb) set search_path = public;

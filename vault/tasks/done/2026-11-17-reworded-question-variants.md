@@ -1,6 +1,6 @@
 ---
 type: task
-status: open
+status: done
 hub: perio
 created: 2026-11-17
 requested-by: Sam
@@ -20,7 +20,7 @@ extra size, processing, token usage, etc would this use?"
 
 Each question gets one or two extra wordings of its stem and choices (with their whys). A student sees a different
 wording on a later try, so a remembered sentence or choice shape stops giving the answer away. It stays **the same
-question**: same id, same key, same class stats ([question-ids-are-permanent](../rules/question-ids-are-permanent.md)).
+question**: same id, same key, same class stats ([question-ids-are-permanent](../../rules/question-ids-are-permanent.md)).
 
 ## What it costs (worked out 2026-11-17, from the live banks)
 
@@ -31,7 +31,7 @@ question**: same id, same key, same class stats ([question-ids-are-permanent](..
 | Heme & Endo Exam 3 | 290 | 347 KB (77 KB gzipped) | 184 KB | about 370 KB raw, about 80 KB gzipped |
 
 - **Size:** a bank roughly doubles (one extra wording: +50-60%). Next to the site's 1 GB limit it is nothing (the mp3s are
-  nearly all of it: [archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)). What students feel is
+  nearly all of it: [archived-hubs-drop-their-audio](../../rules/archived-hubs-drop-their-audio.md)). What students feel is
   the download: put the wordings in their own file (`content/variants.json`), fetched the first time the bank, the mock or
   a bank game opens, so Home and the notes don't pay for it, and keep it out of the service worker's first precache.
 - **Processing on the page:** none to speak of. Picking a wording is a lookup (the try count, or a seed of the id and the
@@ -54,7 +54,7 @@ question**: same id, same key, same class stats ([question-ids-are-permanent](..
   truth values (a reworded statement says the same thing). Smoke's lint runs on each wording.
 - **Which wording:** the first try uses the original; each later try (the drill, misses, weak spots, the mock, the arcade's
   bank games, Learn and Flashcards) takes the next wording. Search and Find-this-in-the-notes use the original.
-- **Question health** ([question-health](../reference/question-health.md)) fingerprints what a question shows, so as it
+- **Question health** ([question-health](../../reference/question-health.md)) fingerprints what a question shows, so as it
   stands each wording would count as a new version and split its numbers three ways (each needs 10 people before a
   flag). Fingerprint the original wording plus the list of wordings instead, and record which wording was shown on each
   answer (a small column on the answer row: a migration). That also gives a free check: a wording much harder or easier
@@ -62,10 +62,10 @@ question**: same id, same key, same class stats ([question-ids-are-permanent](..
 - **Reports:** a report says which wording the student saw.
 - **Which questions first:** the ones students answer most and get right on repeat tries fastest (the ones most likely
   memorized: `question_stats`), then the rest. Matching, ordering and recall items can wait (their items are short terms).
-- **Rules that apply to each wording:** [every-choice-gets-a-why](../rules/every-choice-gets-a-why.md),
-  [two-statement-and-true-false](../rules/two-statement-and-true-false.md),
-  [numbered-statements](../rules/numbered-statements.md), [graded-coursework](../rules/graded-coursework.md) (never a
-  graded item's wording), [american-english](../rules/american-english.md).
+- **Rules that apply to each wording:** [every-choice-gets-a-why](../../rules/every-choice-gets-a-why.md),
+  [two-statement-and-true-false](../../rules/two-statement-and-true-false.md),
+  [numbered-statements](../../rules/numbered-statements.md), [graded-coursework](../../rules/graded-coursework.md) (never a
+  graded item's wording), [american-english](../../rules/american-english.md).
 
 ## Done when
 
@@ -73,17 +73,19 @@ question**: same id, same key, same class stats ([question-ids-are-permanent](..
 - [x] `variants.json` format, its build checks and the smoke lint on every wording
 - [x] The engine shows the next wording on later tries (bank, drill, misses, weak spots, mock, arcade bank games, Learn, Flashcards)
 - [x] Question health: the fingerprint ignores wordings (it fingerprints the original, SH_EXPORT, as before)
-- [ ] The wording shown is recorded on each answer (a migration, its tests, the event taxonomy row), then a question-health flag for a wording much harder or easier than its sibling. Left for after the final (Sam's scope, 2026-11-18)
+- [x] The wording shown is recorded on each answer (a migration, its tests, the event taxonomy row), then a question-health flag for a wording much harder or easier than its sibling (`migration_v65.sql`, 2026-11-18: A/B, the class split by device)
 - [x] The first hub's wordings written and checked against its notes and hints
 - [x] About page entry ("Questions come back reworded")
-- [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`), release suites (a tier 2 change)
+- [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`), release suites (a tier 2 change)
 - [x] Vault written back (hub note, decisions, this note's Outcome)
 
 ## Log
 
 - 2026-11-17: written from Sam's request, with the estimate above (bank sizes measured from `hubs/*/content/questions.json`).
 - 2026-11-18: Sam settled the scope: "lets also do the reworded questions. do one extra wording and only do it for perio"
-  ([decisions](../decisions.md)). Built and shipped for Perio before its final (2026-11-19).
+  ([decisions](../../decisions.md)). Built and shipped for Perio before its final (2026-11-19) (#405).
+- 2026-11-18: Sam: "Do the database change. They are A/B versions of questions", and "Split the class": the A/B split,
+  `migration_v65.sql` and the `ab_gap` flag.
 
 ## Outcome
 
@@ -104,7 +106,11 @@ answer away): they changed 97. 447 KB raw, 134 KB gzipped.
   (`wordingOf`, `loadVariants`; test in `tools/timmy/test.mjs`). The function changed, so After merge deploys it.
 - **Checks:** `checkVariants` in `tools/hub-next/build.mjs` (choice and why counts, statement labels and counts, a changed
   stem, the key-longest rate) and `lintWordings` in `tools/ci/smoke.js`. No High yield changed.
+- **A/B** (the second PR, `migration_v65.sql`): each device starts each question on A or B (`abStart()`), later tries
+  alternate, and a mock keeps its versions until submitted. The card's `data-wording` (0 = A, 1 = B) goes with each
+  question-health row (`question_events.w`); `qh_report`'s `wordings` splits first tries by version, and `ab_gap` flags a
+  pair 20+ points apart (z ≥ 1.96, 10+ people a version). The admin page shows both versions' numbers and B's text.
 - **Editing a Perio question from now on** means editing its wording in `variants.json` too (the hub note says so).
 
-Related: [question-health](../reference/question-health.md) · [build-a-hub](../how-to/build-a-hub.md) ·
-[question-ids-are-permanent](../rules/question-ids-are-permanent.md) · [how tasks work](README.md)
+Related: [question-health](../../reference/question-health.md) · [build-a-hub](../../how-to/build-a-hub.md) ·
+[question-ids-are-permanent](../../rules/question-ids-are-permanent.md) · [how tasks work](../README.md)

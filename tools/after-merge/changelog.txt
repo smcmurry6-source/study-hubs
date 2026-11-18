@@ -29,3 +29,4 @@ all | Tap "Updated" on a hub's card on the dashboard to see what's new: the last
 all | The dashboard's hub recap now plays its bar graph once and then stays still while you scroll, until you open another hub's recap.
 perio | The question bank was checked against Dr. Abou-Arraj's final exam hints: 111 questions got clearer stems or better explanations, two repeats came out, and eight are new, three of them on suture materials (what the final asks about sutures).
 perio | Questions now come back reworded: the second time you see a Periodontology question, it asks the same thing in different words, so you have to think it through instead of recognizing the sentence. Same question, same answer, same credit.
+perio | Each Periodontology question now comes in two versions, A and B: about half the class starts each question on one and half on the other, and every later try switches, so you can't memorize the sentence.

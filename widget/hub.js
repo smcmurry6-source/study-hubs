@@ -253,7 +253,7 @@
   /* a question's other wordings (content/variants.json, { id: { stem, choices, why[, ex] } or a list of them), fetched the
      first time the bank, the mock, the drill or a bank game opens, never with Home or the notes (CORE.variants says the hub
      has them). It never fails a view: without it every try shows the original. Choice k of a wording is choice k reworded,
-     so the key, the answer keys on the server, XP and the mock's scoring don't change (vault/tasks/2026-11-17-reworded-question-variants.md). */
+     so the key, the answer keys on the server, XP and the mock's scoring don't change (vault/tasks/done/2026-11-17-reworded-question-variants.md). */
   var VARS = null;
   function needVariants(){
     if (!CORE || !CORE.variants) return Promise.resolve(null);
