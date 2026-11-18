@@ -5,7 +5,7 @@ hub: heme-endo-exam3
 created: 2026-11-16
 requested-by: Sam
 due: 2026-11-20
-waiting-on: L19 and L20's recordings (taught Tue 11/17), L21 and L22's slides and recordings (Wed 11/18), in the Drive folder
+waiting-on: L21 and L22's slides and recordings (Wed 11/18), in the Drive folder
 agent: 
 pr: 
 ---
@@ -58,8 +58,8 @@ add the recording's hints beside them.
 
 ## Done when
 
-- [ ] L19 taught: checked against its recording, hints, topics re-ranked, narration redone (all three levels), and its five figures checked against it too (the node's size, slide 40's "(PALS)", open vs closed circulation)
-- [ ] L20 taught: the same, its five figures included
+- [x] L19 taught: checked against its recording, hints, topics re-ranked, narration redone (all three levels), and its five figures checked against it too (the node's size, slide 40's "(PALS)", open vs closed circulation)
+- [x] L20 taught: the same, its five figures included ([#404](https://github.com/smcmurry6-source/study-hubs/pull/404), with L19)
 - [ ] L21 in the hub (slides, then taught once its recording is posted): notes at both levels and three recordings,
       questions in every format with every why, topics, hints, tables, cram, sequences, a sort set, its figures
 - [ ] L22 the same
@@ -77,5 +77,10 @@ add the recording's hints beside them.
   ([the figures task](done/2026-11-16-heme-endo-exam3-figures.md)): check both when they go taught.
 - 2026-11-17: Sam gave the exam's count per lecture (A 3, L17 4, L18 6, L19 8, L20 6, L21 4, L22 4); the mock follows it
   for the lectures in the hub ([the hub note](../hubs/heme-endo-exam3.md)).
+- 2026-11-18: L19 and L20 taken to taught from their 11/17 recordings ([#404](https://github.com/smcmurry6-source/study-hubs/pull/404)):
+  notes at both levels, every question checked (L19 72, L20 65; three L20 questions retired on "you don't need" remarks),
+  hints, topics re-ranked with the study guide's first, their ten figures checked, Fig 23 and Fig 24 added (Sam: "yes to all
+  diagrams"), all three levels narrated again. The flags and what the recordings said are in [the hub note](../hubs/heme-endo-exam3.md).
+  L21 and L22's slides still weren't in the Drive folder at 4 am UTC on 11/18.
 
 ## Outcome
