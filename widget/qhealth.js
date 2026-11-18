@@ -214,10 +214,13 @@
 
   function push(rec){
     queue.push(rec);
+    if (queue.length > 300) queue.splice(0, queue.length - 300);
     if (queue.length >= 20) flush(false);
   }
   function flush(leaving){
     if (!queue.length || !ON) return;
+    /* in the database's quiet spell (widget/v3.js safeRpc) the rows wait, unless the tab is going away */
+    if (!leaving && window.shDb && window.shDb.busy()) return;
     var items = queue.splice(0, 60);
     var body = JSON.stringify({ p_hub: HUB, p_visitor: H.visitor, p_visit: H.visit, p_items: items });
     try {

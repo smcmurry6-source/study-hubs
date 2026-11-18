@@ -798,7 +798,8 @@
     var qids = classStatsPending, cbs = classStatsCallbacks, want = uniq(classChoicesPending);
     classStatsPending = []; classStatsCallbacks = []; classChoicesPending = [];
     var unique = uniq(qids);
-    if (!supabase || !unique.length) { cbs.forEach(function(cb){ cb({}); }); return; }
+    /* in a quiet spell (safeRpc, above) the cards go without the class's numbers */
+    if (!supabase || !unique.length || dbBusy()) { cbs.forEach(function(cb){ cb({}); }); return; }
     /* question_stats(hub,qid,attempts,correct) already exists and is already
        read anonymously elsewhere (the "Toughest questions" panel above) --
        reuse it rather than adding a new table/RPC for the same data. */
@@ -1501,10 +1502,32 @@
      test or screenshot the live site made a new visitor per page and inflated people and bounce counts (LESSONS.md). */
   var AUTOMATED = (function(){ try { return !!navigator.webdriver; } catch (e) { return false; } })();
   window.shAutomated = AUTOMATED;
+  /* ---------- a struggling database: a quiet spell (2026-11-18) ----------
+     That afternoon the database (the Free plan's shared CPU) stopped keeping up for over an hour, and every page kept
+     sending: each failed answer was tried again on its own timer, which doubled the answer calls while 9 in 10 failed,
+     with the page's analytics on top. Now a call the server fails (a 5xx, or no answer at all) starts a quiet spell on
+     this page: 30 s, doubling to 5 minutes while failures go on, each page a little early or late so a class doesn't
+     come back at once. A saved answer ends it; otherwise it runs out. In a quiet spell answers wait in one line and go
+     one at a time (answerV2 below), clicks, events and question health keep their batches for later (clicks.js,
+     qhealth.js), mode opens, presence and searches are skipped, and cards don't fetch the class's numbers. Study time
+     and what a student does on purpose (a name, a pin, a purchase) still go. window.shDb, for the other files. */
+  var DB = { until: 0, n: 0 };
+  function dbBusy(){ return !!DB && Date.now() < DB.until; }
+  function dbFail(){
+    DB.n = Math.min(DB.n + 1, 5);
+    var ms = Math.min(300000, 30000 * Math.pow(2, DB.n - 1));
+    DB.until = Date.now() + Math.round(ms * (0.75 + Math.random() * 0.5));
+  }
+  function dbOk(){ DB.n = 0; DB.until = 0; }
+  /* a reply the server failed: an error with a 5xx status or none (the network, a timeout) */
+  function dbFailed(res){ return !res || (!!res.error && (!res.status || res.status >= 500)); }
+  window.shDb = { busy: dbBusy, fail: dbFail, ok: dbOk, failed: dbFailed };
+  var QUIET = { record_mode_open: 1, record_presence_ping: 1, record_search: 1 };
   function safeRpc(fn, args){
     if (!supabase) return;
     if (AUTOMATED && /^record_/.test(fn)) return;
-    try { supabase.rpc(fn, args).then(function(){}, function(){}); } catch (e) {}
+    if (QUIET[fn] && dbBusy()) return;
+    try { supabase.rpc(fn, args).then(function(res){ if (dbFailed(res)) dbFail(); }, function(){ dbFail(); }); } catch (e) {}
   }
 
   /* ---------- visit/section time tracking (best-effort analytics for the
@@ -1758,39 +1781,63 @@
       p_v: (window.shQH && window.shQH.version && window.shQH.version(qid)) || null,
       p_ctx: d.ctx || null, p_request: gameId(), p_session: d.session || null, p_claim: isCorrect
     };
-    /* a failed call is sent again with the same id, which can't record or pay twice. The database can stay busy for a few
-       minutes (2026-11-18: answers failed in bursts of 1 to 5 minutes while heavy queries ran), so outside a mock the tries
-       spread out over about three minutes, each a little early or late so a class's retries don't land together; a
-       mock's answers hold up its results, so they try twice, soon */
-    var tries = 0, waits = d.session ? [4000, 10000] : [4000, 15000, 45000, 120000];
     function paid(r){
       if (r.boost !== undefined) GAME.boost = r.boost || null;
       if (!r.repeat) setCrowns(r.crowns);   /* the balance after this answer (migration_v68) */
       try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: qid, ctx: d.ctx || "", session: d.session || null, res: r } })); } catch (e) {}
     }
+    /* one try; true when the server failed it and it should go again (the same id, which can't record or pay twice) */
     function send(){
       var call;
-      try { call = supabase.rpc("record_answer_v2", args); } catch (e) { return Promise.resolve(); }
+      try { call = supabase.rpc("record_answer_v2", args); } catch (e) { return Promise.resolve(false); }
       return call.then(function(res){
-        if (rpcMissing(res)) { GAME.on = false; answerToday(d, isCorrect); return; }
+        if (rpcMissing(res)) { GAME.on = false; answerToday(d, isCorrect); return false; }
         if (res && res.error) {
-          /* the network or the server hiccuped: again, later (waits, above) */
-          if (tries < waits.length && (!res.status || res.status >= 500)) {
-            var ms = Math.round(waits[tries++] * (0.75 + Math.random() * 0.5));
-            return new Promise(function(ok){ setTimeout(ok, ms); }).then(send);
-          }
-          return;
+          if (dbFailed(res)) { dbFail(); return true; }
+          return false;
         }
+        dbOk();
         var r = res && res.data;
-        if (!r || typeof r !== "object") return;
-        if (r.ok === false) { if (r.error === "bad") answerToday(d, isCorrect); return; }
+        if (!r || typeof r !== "object") return false;
+        if (r.ok === false) { if (r.error === "bad") answerToday(d, isCorrect); return false; }
         GAME.on = true;
         paid(r);
-      }, function(){});
+        return false;
+      }, function(){ dbFail(); return true; });
     }
-    var p = send();
-    /* a mock's answers go out together; its session is finished only once they have all arrived (finishSession) */
-    if (d.session) (gamePending[d.session] = gamePending[d.session] || []).push(p);
+    /* a mock's or a game's answers hold up its results, so they go at once and try twice, soon; its session is finished
+       only once they have all arrived (finishSession) */
+    if (d.session) {
+      var tries = 0, waits = [4000, 10000];
+      var go = function(){
+        return send().then(function(again){
+          if (!again || tries >= waits.length) return;
+          var ms = Math.round(waits[tries++] * (0.75 + Math.random() * 0.5));
+          return new Promise(function(ok){ setTimeout(ok, ms); }).then(go);
+        });
+      };
+      (gamePending[d.session] = gamePending[d.session] || []).push(go());
+      return;
+    }
+    /* every other answer joins the line (below) */
+    answerLine.push({ send: send, tries: 0 });
+    lineNext();
+  }
+  /* the answers waiting to be saved, oldest first, one at a time. A failed one stays at the front and goes again when
+     the quiet spell ends (safeRpc's note: 30 s, doubling to 5 minutes), up to 8 tries (about 20 minutes); the answers
+     behind it wait their turn, so a struggling database gets one call at a time from this page, not one per answer.
+     (Until 2026-11-18 each answer retried on its own timer, four times in three minutes.) */
+  var answerLine = [], lineOn = false;
+  function lineNext(){
+    if (lineOn || !answerLine.length) return;
+    lineOn = true;
+    var wait = DB.until - Date.now();
+    if (wait > 0) { setTimeout(function(){ lineOn = false; lineNext(); }, wait + 50); return; }
+    var job = answerLine[0];
+    job.send().then(function(again){
+      if (again && ++job.tries < 8) { /* it stays at the front */ } else answerLine.shift();
+      lineOn = false; lineNext();
+    }, function(){ answerLine.shift(); lineOn = false; lineNext(); });
   }
   /* the bowling egg's secret trophy: widget/bowling.js keeps it on the device that saw all eight clips (sh_bowl_trophy);
      the server takes the kind since migration_v63, so it is sent once, when it is won or at the next page load (the

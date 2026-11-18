@@ -92,6 +92,9 @@ tags: [widget, supabase]
   each answer's work small ([migration_v72](../../migration_v72.sql) cut it to a quarter for the most active students) and
   watch the size ([the task](../tasks/2026-11-18-database-load.md)). If the database jams (even the connector can't
   connect), Sam restarts it from the dashboard (Settings, General, Restart project); that clears the jam, not the CPU.
+  A page backs off by itself: a call the server fails starts a **quiet spell** (`window.shDb` in `widget/v3.js`: 30 s,
+  doubling to 5 minutes), in which answers go one at a time and the analytics wait; a new caller of the database that
+  isn't something the student did on purpose should check `shDb.busy()` too.
   **The database is small** (1 GB of memory, two shared cores, 60 connections), and every student's answer is saved
   through it (`record_answer_v2`, about 150 ms). Visitors' calls stop after 3 s (anon's `statement_timeout`; `lock_timeout`
   8 s). **A heavy query takes the cores from the class:** on 2026-11-18, the day before the Perio final, answer saves

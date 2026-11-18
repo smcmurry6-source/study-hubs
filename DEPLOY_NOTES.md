@@ -32,6 +32,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (pages back off when the database fails: a quiet spell, Claude Code)** — In the evening outage each failed
+  answer retried on its own timer (#421), which doubled the answer calls while 9 in 10 failed, with every page's analytics
+  on top. Now (Sam: "Stay free, keep fixing") a call the server fails (a 5xx, or no answer) starts a quiet spell on that
+  page, `window.shDb` in `widget/v3.js`: 30 s, doubling to 5 minutes while failures go on, jittered; a saved answer ends
+  it. Answers wait in one line and go one at a time, a failed one again at the spell's end (up to 8 tries, about 20
+  minutes, the same request id, so nothing counts twice); clicks, events (`widget/clicks.js`) and question health
+  (`widget/qhealth.js`) keep their batches; mode opens, presence and searches are skipped; cards skip the class's
+  numbers. Study time and what a student does on purpose still go; mocks and games keep their two quick tries. Bundles
+  rebuilt. `tools/ci/quiet.js`, in CI's desktop smoke half, fails the first save on a fake database and checks it all.
 - **2026-11-18 (answer saves cost a quarter as much; the database is on the Free plan, Claude Code)** — Sam: "i am getting a
   bunch of errors for the database and things are getting really slow". From 19:35 UTC answer saves failed in bursts, then
   from 20:10 without letup (40-70% of every request for about 35 minutes), until even the connector couldn't connect; Sam

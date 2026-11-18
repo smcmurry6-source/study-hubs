@@ -47,19 +47,27 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
 - [ ] `vault/how-to/` says to apply a migration with a backfill late at night (or in small batches), not while the class
   studies.
 - [ ] Sam's call: a larger compute size for the Supabase project (more memory and CPU, at a monthly cost). Not needed if
-  the boxes above are done; worth it for exam weeks.
-- [ ] **The answer retries don't pile onto a struggling database.** In the 19:40-20:25 outage (Log) the failed saves were sent
+  the boxes above are done; worth it for exam weeks. Asked 2026-11-18 during the outage (Pro, $25 a month with Micro, or
+  about $30 with Small): **"Stay free, keep fixing"** ([decisions](../decisions.md)). Open again if it happens after v72.
+- [x] **The answer retries don't pile onto a struggling database.** In the 19:40-20:25 outage (Log) the failed saves were sent
   again up to four times each (#421), which doubled `record_answer_v2`'s calls while 9 in 10 failed and kept PostgREST's
   connection pool full. For example: one page sends one answer at a time while saves fail (a queue, the oldest first),
   and backs off further when every recent try failed. Sam's call against a larger compute size (above).
   The page's telemetry (clicks, events, question health) could pause for a few minutes after a failed call too.
+  **Done** (`widget/v3.js`, "a quiet spell"): a call the server fails starts a quiet spell on that page (30 s, doubling
+  to 5 minutes while failures go on, jittered; a saved answer ends it). Answers wait in one line and go one at a time,
+  a failed one again at the spell's end (up to 8 tries, about 20 minutes, the same request id); clicks, events and
+  question health keep their batches, mode opens, presence and searches are skipped, cards skip the class's numbers.
+  Mocks and games keep their two quick tries. `tools/ci/quiet.js` (CI, the desktop smoke half) fails the first save on
+  a fake database and checks it all.
 - [ ] A failed answer that's still unsent when the page closes is kept on the device and sent at the next load (today the
   retries stop when the tab closes).
-- [ ] **The answer save's own cost** (`migration_v72.sql`): every answer worked out the whole crown balance (`sh_wallet`,
+- [x] **The answer save's own cost** (`migration_v72.sql`): every answer worked out the whole crown balance (`sh_wallet`,
   summing the person's awards with `sh_is_prize` called once an award) and the hub's medal count (`sh_medal_check`, every
   answer the person ever gave in the hub), on every answer. On a throwaway copy with a made-up student of 8,000 answers:
   20.5 ms an answer, 19 ms of it those two; after v72, 5.1 ms (a wrong answer) to 6.8 ms (a right one that can reach a
-  medal), the same balances and medals. Applied live on 2026-11-18 right after Sam restarted the database.
+  medal), the same balances and medals. Applied live on 2026-11-18 at about 21:00 UTC, once the restart had finished
+  (Sam: "Apply it now"); the three live bodies' md5 match the file.
 - [ ] **The ping table's indexes rebuilt** (no data deleted): `activity_pings` was 166 MB of the 414 MB database, 117 MB of
   it three bloated indexes. `reindex index concurrently` on `activity_pings_time_idx`, `_visitor_idx` and `_hub_idx`, one
   at a time, **late at night only** (it reads the whole table; Sam asked "could we do it now", and in the afternoon it would

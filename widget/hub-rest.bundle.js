@@ -2113,10 +2113,12 @@ return { n: n, last: last, t: lt };
 }
 function push(rec){
 queue.push(rec);
+if (queue.length > 300) queue.splice(0, queue.length - 300);
 if (queue.length >= 20) flush(false);
 }
 function flush(leaving){
 if (!queue.length || !ON) return;
+if (!leaving && window.shDb && window.shDb.busy()) return;
 var items = queue.splice(0, 60);
 var body = JSON.stringify({ p_hub: HUB, p_visitor: H.visitor, p_visit: H.visit, p_items: items });
 try {
@@ -3244,7 +3246,7 @@ function flushClassStats(){
 var qids = classStatsPending, cbs = classStatsCallbacks, want = uniq(classChoicesPending);
 classStatsPending = []; classStatsCallbacks = []; classChoicesPending = [];
 var unique = uniq(qids);
-if (!supabase || !unique.length) { cbs.forEach(function(cb){ cb({}); }); return; }
+if (!supabase || !unique.length || dbBusy()) { cbs.forEach(function(cb){ cb({}); }); return; }
 var jobs = [settle(supabase.from("question_stats").select("qid,attempts,correct").eq("hub", HUB).in("qid", unique))];
 for (var i = 0; i < want.length; i += 100) jobs.push(settle(supabase.from("question_choices").select("qid,choice,picks").eq("hub", HUB).in("qid", want.slice(i, i + 100))));
 Promise.all(jobs).then(function(all){
@@ -3817,10 +3819,22 @@ document.addEventListener("sh:pref", function(){ setTimeout(trackPresence, 50); 
 document.addEventListener("sh:pet-fit", function(){ setTimeout(trackPresence, 50); });
 var AUTOMATED = (function(){ try { return !!navigator.webdriver; } catch (e) { return false; } })();
 window.shAutomated = AUTOMATED;
+var DB = { until: 0, n: 0 };
+function dbBusy(){ return !!DB && Date.now() < DB.until; }
+function dbFail(){
+DB.n = Math.min(DB.n + 1, 5);
+var ms = Math.min(300000, 30000 * Math.pow(2, DB.n - 1));
+DB.until = Date.now() + Math.round(ms * (0.75 + Math.random() * 0.5));
+}
+function dbOk(){ DB.n = 0; DB.until = 0; }
+function dbFailed(res){ return !res || (!!res.error && (!res.status || res.status >= 500)); }
+window.shDb = { busy: dbBusy, fail: dbFail, ok: dbOk, failed: dbFailed };
+var QUIET = { record_mode_open: 1, record_presence_ping: 1, record_search: 1 };
 function safeRpc(fn, args){
 if (!supabase) return;
 if (AUTOMATED && /^record_/.test(fn)) return;
-try { supabase.rpc(fn, args).then(function(){}, function(){}); } catch (e) {}
+if (QUIET[fn] && dbBusy()) return;
+try { supabase.rpc(fn, args).then(function(res){ if (dbFailed(res)) dbFail(); }, function(){ dbFail(); }); } catch (e) {}
 }
 var VISIT_ID = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ("visit-" + Date.now() + "-" + Math.random().toString(16).slice(2));
 var PING_INTERVAL_MS = 25000;
@@ -4016,7 +4030,6 @@ p_self: d.self ? isCorrect : null,
 p_v: (window.shQH && window.shQH.version && window.shQH.version(qid)) || null,
 p_ctx: d.ctx || null, p_request: gameId(), p_session: d.session || null, p_claim: isCorrect
 };
-var tries = 0, waits = d.session ? [4000, 10000] : [4000, 15000, 45000, 120000];
 function paid(r){
 if (r.boost !== undefined) GAME.boost = r.boost || null;
 if (!r.repeat) setCrowns(r.crowns);
@@ -4024,25 +4037,48 @@ try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: 
 }
 function send(){
 var call;
-try { call = supabase.rpc("record_answer_v2", args); } catch (e) { return Promise.resolve(); }
+try { call = supabase.rpc("record_answer_v2", args); } catch (e) { return Promise.resolve(false); }
 return call.then(function(res){
-if (rpcMissing(res)) { GAME.on = false; answerToday(d, isCorrect); return; }
+if (rpcMissing(res)) { GAME.on = false; answerToday(d, isCorrect); return false; }
 if (res && res.error) {
-if (tries < waits.length && (!res.status || res.status >= 500)) {
-var ms = Math.round(waits[tries++] * (0.75 + Math.random() * 0.5));
-return new Promise(function(ok){ setTimeout(ok, ms); }).then(send);
+if (dbFailed(res)) { dbFail(); return true; }
+return false;
 }
-return;
-}
+dbOk();
 var r = res && res.data;
-if (!r || typeof r !== "object") return;
-if (r.ok === false) { if (r.error === "bad") answerToday(d, isCorrect); return; }
+if (!r || typeof r !== "object") return false;
+if (r.ok === false) { if (r.error === "bad") answerToday(d, isCorrect); return false; }
 GAME.on = true;
 paid(r);
-}, function(){});
+return false;
+}, function(){ dbFail(); return true; });
 }
-var p = send();
-if (d.session) (gamePending[d.session] = gamePending[d.session] || []).push(p);
+if (d.session) {
+var tries = 0, waits = [4000, 10000];
+var go = function(){
+return send().then(function(again){
+if (!again || tries >= waits.length) return;
+var ms = Math.round(waits[tries++] * (0.75 + Math.random() * 0.5));
+return new Promise(function(ok){ setTimeout(ok, ms); }).then(go);
+});
+};
+(gamePending[d.session] = gamePending[d.session] || []).push(go());
+return;
+}
+answerLine.push({ send: send, tries: 0 });
+lineNext();
+}
+var answerLine = [], lineOn = false;
+function lineNext(){
+if (lineOn || !answerLine.length) return;
+lineOn = true;
+var wait = DB.until - Date.now();
+if (wait > 0) { setTimeout(function(){ lineOn = false; lineNext(); }, wait + 50); return; }
+var job = answerLine[0];
+job.send().then(function(again){
+if (again && ++job.tries < 8) {   } else answerLine.shift();
+lineOn = false; lineNext();
+}, function(){ answerLine.shift(); lineOn = false; lineNext(); });
 }
 function sendBowlTrophy(){
 try { if (!supabase || !localStorage.getItem("sh_bowl_trophy") || localStorage.getItem("sh_bowl_trophy_sent")) return; } catch (e) { return; }

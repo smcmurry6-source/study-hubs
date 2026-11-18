@@ -25,7 +25,9 @@ weekly retention job's deletes on the same kind of copy: the hourly totals, devi
 (the game layer's server, [game-server](../reference/game-server.md): XP, a replayed call, a double tap, a linked device, the
 shop and the idea board; all four database suites apply `supabase/pending-migrations.txt` on top of the schema), `node tools/ci/archive.js` (the hub archive
 rules against the old date logic), `node tools/ci/size.js` (the published site against GitHub Pages' 1 GB limit: warns
-from 750 MB, fails from 900 MB, and lists the hubs still carrying audio; [archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)), `node tools/ci/preview.js` (the preview never reaches production; needs Playwright) and
+from 750 MB, fails from 900 MB, and lists the hubs still carrying audio; [archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)), `node tools/ci/preview.js` (the preview never reaches production; needs Playwright), `node tools/ci/quiet.js` (since
+2026-11-18: a fake database fails an answer save, and the page must hold its answers and analytics for the quiet spell,
+then save them one at a time in order with the same request ids; needs Playwright, about a minute) and
 `node tools/ci/statements.js` (every numbered-statement and two-statement item, renumbered in every order on a later
 try, still agrees with its key, and Ask Timmy's copy renumbers it the same way) and
 `node tools/ci/cases.js` (every drawn Patient Box case, in an engine hub's `core.json` or an old hub's page, has realistic numbers that agree with its key,

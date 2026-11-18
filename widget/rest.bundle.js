@@ -97,6 +97,7 @@ evPending = {}; evCount = 0;
 if (items.length && o.visitor) try { o.sb.rpc("record_events", { p_hub: o.hub, p_visitor: o.visitor, p_items: items }).then(function(){}, function(){}); } catch (e) {}
 };
 function flush(){
+if (window.shDb && window.shDb.busy()) return;
 if (evCount) evSend();
 if (!count) return;
 var items = Object.keys(pending).slice(0, 80).map(function(k){ var p = k.split("\u0001"); return { s: p[0], t: p[1], n: pending[k] }; });
