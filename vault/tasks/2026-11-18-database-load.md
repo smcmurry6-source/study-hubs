@@ -80,10 +80,11 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   "do we need to even save pings for 14 days? ... could we do 1 day?": **"do 3 days"** (`migration_v74.sql`, applied live:
   raw pings kept 3 days, the retention job nightly; every reader of study time uses `activity_hourly`). About 280 MB once
   the table is rewritten (the box above).
-- [ ] **The outage's study time restored** (Sam: "we can do fixes for 1 and 2"): `tools/data-fixes/2026-11-18-outage-time.sql`
+- [x] **The outage's study time restored** (Sam: "we can do fixes for 1 and 2"): `tools/data-fixes/2026-11-18-outage-time.sql`
   fills the window's 40 s to 10 minute gaps between saved pings, 2,691 pings (18.7 hours) for 52 people, under the ~2,900
-  lost; the After merge workflow runs it after the merge (or the 3:45 am session does, if it's still open). Tick it with
-  what it restored.
+  lost. The After merge workflow ran it at 22:33 UTC after [#430](https://github.com/smcmurry6-source/study-hubs/pull/430)
+  merged: the window (19:35-21:06 UTC) now holds 4,922 pings for 53 people and no 40 s to 10 minute gap is left; the
+  hourly totals and time crowns followed through the insert trigger.
 - [x] **The outage's answers caught up** (Sam's fix 2): `migration_v73.sql` (applied live 2026-11-18, md5-checked):
   `restore_outage_v2` pays what a device's kept day says didn't save (XP, crowns as answers pay, the 20th answer, the day's
   first answer, the ring, the streak), once a person and hub, only for someone studying in that hub during the outage, 3
@@ -154,5 +155,10 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   about 25 lecture reads' rewards, a few flashcard ratings and trophies, and half the window's analytics (not repaired).
   Since the restart the answer save is 55% of the database's time (360 ms mean on the shared CPU, 12% of requests), the
   pings 8%, question health 7%. Sam: "we can do fixes for 1 and 2. do 3 days. dont cut anything for now" (the boxes above).
+- 2026-11-18, 22:31 UTC: [#430](https://github.com/smcmurry6-source/study-hubs/pull/430) merged (the catch-up's page side,
+  the study-time repair, the 3-day retention's docs). Its After merge run passed: the repair ran once, the Perio and Heme &
+  Endo Exam 3 changelog lines went out, the live copy matched `main`. CI's performance suite failed once on PCD Implants
+  Exam 1's LCP (3772 ms against 2500; an old hub that loads none of the changed files, 1652 ms locally) and passed on its
+  one re-run.
 
 ## Outcome
