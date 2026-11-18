@@ -698,7 +698,7 @@
   /* names for the big view: the live hubs' own, then made-up ones for the hubs still to come */
   var MORE_HUBS = ["Oral Pathology", "Endodontics", "Pharmacology", "Oral Surgery", "Pediatric Dentistry", "Orthodontics", "Dental Materials", "Radiology", "Head and Neck Anatomy", "Operative Dentistry", "Prosthodontics", "Cariology", "Local Anesthesia", "Oral Medicine", "Ethics", "Biochemistry"];
   function hubLabel(h){ var t = A.tints && A.tints[h], m = /^hub-(\d+)$/.exec(h); return h === "generic" ? MORE_HUBS[15] : t && t.name ? t.name : m ? MORE_HUBS[(+m[1] - 7 + MORE_HUBS.length) % MORE_HUBS.length] : h; }
-  var builtIn = function(x){ return !x.set; }, inSets = function(x){ return x.set && x.set !== "rank"; }, byRank = function(x){ return x.set === "rank"; };
+  var builtIn = function(x){ return !x.set; }, inSets = function(x){ return x.set && x.set !== "rank" && !x.coll; }, inColl = function(x){ return !!x.coll; }, byRank = function(x){ return x.set === "rank"; };
   var PS = { home: "cottage", scene: "hill", time: "clock", yard: { left: "garden", front: "mailbox", corner: "doghouse", right: "fountain" }, up: { chimney: true }, paint: "cream",
     tier: 3, level: 2, flair: 3, holiday: "", season: "", hp: 82, outfit: "", mode: "play", pick: "home", still: false, found: {} };
   function byK(list, k){ for (var i = 0; i < list.length; i++) if (list[i].k === k) return list[i]; return null; }
@@ -823,6 +823,7 @@
       galleryPanel("tpJourneys", "Past the Handpiece: the ModuPro and the loupes", "New for phase 4, part C, for Sam’s look. At 125,000 XP the ModuPro journey starts: the pedestal by the door gets a wider base and carries a ModuPro (the two jaws of teeth on their hinge) in the rank’s material, on one step for each level, and the finished handpiece stands planted at its corner in Dark Matter. At 250,000 XP the loupes journey starts: the ModuPro is finished too, and Timmy wears loupes with a headlight in the rank’s material, under any hat. An outfit with its own eyewear, or one that covers his face, wins over the loupes.") +
       galleryPanel("tpHealth", "Timmy’s health at home", "His HP shows at his place the way it does in the pet: the drawing (sparkles, then plaque, stains, a cavity, receding gums, a cracked cusp), how he moves (how high and fast he hops, how far he goes) and what he does (how much he wanders, how big his wave is, whether he’ll flip, what he says). At 0 HP he stays on the doorstep. Try it live in Build it, above. A visitor never sees it: a visited Timmy always looks well.") +
       galleryPanel("tpRankSets", "Rank sets: earned, never sold", "Every full rank-up (not the I, II, III levels) gives Timmy an outfit and the yard a decoration in that rank’s material. These are the Handpiece’s six; the later journeys get theirs before anyone reaches them.") +
+      galleryPanel("tpColls", "The year-round collections", "New (2026-11-18, for Sam’s look): six more sets that belong together, drawn like a season’s, but never limited. Each is a Legendary home, an Epic scene, three outfits (Common, Uncommon, Rare) and three yard pieces (Uncommon, Rare, Epic), sold one by one in the daily and weekly picks all year. Tap a piece to try its collection at the place above.") +
       galleryPanel("tpSets", "The seasonal sets", "Every season and holiday has a full set: a home and a scene (both Legendary), and a Rare, an Epic and a Legendary outfit and yard piece. A set is on sale only in its season (a short holiday for the seven days ending on its last day). Halloween’s is everyone’s from the start.") +
       '<div class="panel s12"><h3>The shop</h3><p>A wooden shop: plank walls, a hanging sign, Timmy behind the counter and the pieces in wooden cabinets. Its shelves: daily picks, weekly picks, a seasonal shelf while a season is on, and on two days a month a “Back for today” shelf of three out-of-season pieces at their usual price, each marked with a small “Today only” stamp. <b>Tap any piece</b> and its window opens: the piece in its rarity’s display case, your place with it in, its set, the price against your crowns, Buy and Try. <b>Buying</b> plays out by rarity, with sound: coins fly in, the piece pops, and the party grows from a Common’s little pop to a Legendary’s charge-up, gold flash, confetti and fanfare (the speaker button turns sound off; reduced motion skips the animation). A design: the crowns here are made up, so buy away, and the real shop is part B.</p><div class="panel-body" id="tpShop"></div></div>' +
       '<div class="panel s12"><h3>The rank board and visiting</h3><p>Every name has its rank’s handpiece beside it, and your own row carries your board name (never “You”) on a gold nameplate with your Timmy peeking over it. Everyone can be visited, with no switch to turn it off: tap <b>Visit</b> on a row, or <b>Visit someone random</b>, and clouds drift in from every side, cover the screen and scatter again over that person’s place. While you’re there, the arrows take you to the next or the last place, and <b>Back to mine</b> brings you home. A visitor sees the place under the board name and nothing else.</p><div class="panel-body tp-visiting" id="tpVisit"></div></div>' +
@@ -848,6 +849,23 @@
     return y;
   }
   var THEME_HOME = { hilltop: "cottage", seaside: "lighthouse", woodland: "treehouse", snowy: "igloo", starlight: "observatory", clouds: "castle" };
+  /* a gallery of sets (the seasons' or the collections'): each set's home in its scene with its yard and an outfit on
+     Timmy, then a card per piece; a tap tries the set at the builder's place (data-set-try) */
+  function setGallery(list, whenOf){
+    if (!list) return "";
+    return list.map(function(se){
+      var of = function(list){ return list.filter(function(x){ return x.set === se.k; }); }, homes = of(TP.HOMES), scenes = of(TP.SCENES), yard = of(TP.YARD), outfits = of(TP.OUTFITS);
+      var head = '<div class="tp-sethead"><b>' + esc(se.n) + "</b><span>" + esc(whenOf(se)) + "</span></div>";
+      if (!homes.length || !scenes.length) return '<div class="tp-set">' + head + '<p class="tp-note">Not drawn yet.</p></div>';
+      var yd = {}; yard.forEach(function(y, i){ yd[["left", "front", "right"][i]] = y.k; });
+      var pic = placeFig({ home: homes[0].k, scene: scenes[0].k, tier: 3, level: 2, yard: yd, up: { flag: true } }, "", "", "door", "tp-setpic", outfits.length ? outfits[outfits.length - 1].k : "");
+      var cards = homes.map(function(x){ return rcard(x, thumbImg("home", x.k, { scene: scenes[0].k }), false, 'data-set-try="' + se.k + '"'); })
+        .concat(scenes.map(function(x){ return rcard(x, thumbImg("scene", x.k), false, 'data-set-try="' + se.k + '"'); }),
+          outfits.map(function(x){ return rcard(x, thumbImg("outfit", x.k), false, 'data-set-try="' + se.k + '" data-set-outfit="' + x.k + '"'); }),
+          yard.map(function(x){ return rcard(x, thumbImg("yard", x.k, { scene: scenes[0].k }), false, 'data-set-try="' + se.k + '"'); }));
+      return '<div class="tp-set">' + head + '<div class="tp-setbody">' + pic + '<div class="tp-rcards">' + cards.join("") + "</div></div></div>";
+    }).join("");
+  }
   var GALLERIES = {
     tpThemes: function(){
       return TP.THEMES.map(function(t){
@@ -915,21 +933,9 @@
         return '<div class="tp-rankset"><div class="tp-sethead"><b>' + esc(r.rank) + '</b><span>Reach ' + esc(r.rank) + " I</span></div>" + '<div class="tp-rcards">' +
           scard(o, thumbImg("outfit", o.k)) + scard(y, thumbImg("yard", y.k, {})) + "</div></div>"; }).join("");
     },
-    tpSets: function(){
-      if (!TP.SETS) return "";
-      return TP.SETS.seasons.map(function(se){
-        var of = function(list){ return list.filter(function(x){ return x.set === se.k; }); }, homes = of(TP.HOMES), scenes = of(TP.SCENES), yard = of(TP.YARD), outfits = of(TP.OUTFITS);
-        var head = '<div class="tp-sethead"><b>' + esc(se.n) + "</b><span>" + esc(se.when) + (se.gift ? " · everyone’s from the start" : "") + "</span></div>";
-        if (!homes.length || !scenes.length) return '<div class="tp-set">' + head + '<p class="tp-note">Not drawn yet.</p></div>';
-        var yd = {}; yard.forEach(function(y, i){ yd[["left", "front", "right"][i]] = y.k; });
-        var pic = placeFig({ home: homes[0].k, scene: scenes[0].k, tier: 3, level: 2, yard: yd, up: { flag: true } }, "", "", "door", "tp-setpic", outfits.length ? outfits[outfits.length - 1].k : "");
-        var cards = homes.map(function(x){ return rcard(x, thumbImg("home", x.k, { scene: scenes[0].k }), false, 'data-set-try="' + se.k + '"'); })
-          .concat(scenes.map(function(x){ return rcard(x, thumbImg("scene", x.k), false, 'data-set-try="' + se.k + '"'); }),
-            outfits.map(function(x){ return rcard(x, thumbImg("outfit", x.k), false, 'data-set-try="' + se.k + '" data-set-outfit="' + x.k + '"'); }),
-            yard.map(function(x){ return rcard(x, thumbImg("yard", x.k, { scene: scenes[0].k }), false, 'data-set-try="' + se.k + '"'); }));
-        return '<div class="tp-set">' + head + '<div class="tp-setbody">' + pic + '<div class="tp-rcards">' + cards.join("") + "</div></div></div>";
-      }).join("");
-    },
+    tpSets: function(){ return setGallery(TP.SETS ? TP.SETS.seasons : null, function(se){ return se.when + (se.gift ? " · everyone’s from the start" : ""); }); },
+    /* the year-round collections (sets.mjs COLLECTIONS, 2026-11-18): drawn the same way, in the everyday rotation */
+    tpColls: function(){ return setGallery(TP.SETS ? TP.SETS.collections : null, function(se){ return se.note + " · all year"; }); },
     tpFrames: function(){
       var sample = { Common: ["yard", "mailbox"], Uncommon: ["yard", "campfire"], Rare: ["yard", "telescope"], Epic: ["home", "igloo"], Legendary: ["home", "lighthouse"] };
       return SA.RARITIES.map(function(r){ var s = sample[r.k], x = s[0] === "home" ? byK(TP.HOMES, s[1]) : byK(TP.YARD, s[1]);
@@ -1329,13 +1335,13 @@
     var list = kind === "home" ? TP.HOMES : kind === "scene" ? TP.SCENES : kind === "timmy" ? TP.OUTFITS : TP.YARD.filter(function(y){ return !y.wide || pick === "side" || pick === "corner"; });
     var data = kind === "home" ? "data-home" : kind === "scene" ? "data-scene" : kind === "timmy" ? "data-outfit" : "data-item";
     var card = function(x){ return rcard(x, kind === "timmy" ? thumbImg("outfit", x.k) : kind === "scene" ? thumbImg("scene", x.k) : thumbImg(kind, x.k, { scene: PS.scene }), x.k === curK, data + '="' + x.k + '"'); };
-    var cur = byK(list, curK || ""), groups = [["classic", "Classics", list.filter(builtIn)], ["sets", "Seasonal", list.filter(inSets)], ["rank", "Rank", list.filter(byRank)]].filter(function(g){ return g[2].length; });
-    var src = side.src[kind]; if (!src || side.last !== pick + ":" + (curK || "")) src = cur && inSets(cur) ? "sets" : cur && byRank(cur) ? "rank" : src || "classic";
+    var cur = byK(list, curK || ""), groups = [["classic", "Classics", list.filter(builtIn)], ["coll", "Collections", list.filter(inColl)], ["sets", "Seasonal", list.filter(inSets)], ["rank", "Rank", list.filter(byRank)]].filter(function(g){ return g[2].length; });
+    var src = side.src[kind]; if (!src || side.last !== pick + ":" + (curK || "")) src = cur && inColl(cur) ? "coll" : cur && inSets(cur) ? "sets" : cur && byRank(cur) ? "rank" : src || "classic";
     if (!groups.some(function(g){ return g[0] === src; })) src = groups[0][0];
     side.src[kind] = src; side.last = pick + ":" + (curK || "");
     var tabs = groups.length < 2 ? "" : '<div class="seg tp-dsrc" role="group" aria-label="Which pieces">' + groups.map(function(g){ return '<button type="button" data-src="' + g[0] + '" aria-pressed="' + (g[0] === src) + '">' + g[1] + ' <span class="num">' + g[2].length + "</span></button>"; }).join("") + "</div>";
     var shown = groups.filter(function(g){ return g[0] === src; })[0][2], rack = kind === "timmy" ? "tp-rail" : "tp-plank", cards;
-    if (src === "sets") cards = TP.SETS.seasons.map(function(se){ var mine = shown.filter(function(x){ return x.set === se.k; }); return mine.length ? '<h5 class="tp-seth">' + esc(se.n) + (se.gift ? " <small>yours already</small>" : "") + '</h5><div class="tp-rcards ' + rack + '">' + mine.map(card).join("") + "</div>" : ""; }).join("");
+    if (src === "sets" || src === "coll") cards = (src === "coll" ? TP.SETS.collections || [] : TP.SETS.seasons).map(function(se){ var mine = shown.filter(function(x){ return x.set === se.k; }); return mine.length ? '<h5 class="tp-seth">' + esc(se.n) + (se.gift ? " <small>yours already</small>" : "") + '</h5><div class="tp-rcards ' + rack + '">' + mine.map(card).join("") + "</div>" : ""; }).join("");
     else cards = '<div class="tp-rcards ' + rack + '">' + (kind === "timmy" && src === "classic" ? rcard({ n: "Just Timmy", rarity: "", price: 0 }, thumbImg("outfit", ""), !PS.outfit, 'data-outfit=""') : "") + shown.map(card).join("") + "</div>" +
       (src === "rank" ? '<p class="tp-note">Rank pieces are earned, never sold: one outfit and one yard piece at every full rank-up.</p>' : "");
     var head = sl ? [sl.n, cur ? "Here now: " + lowerFirst(cur.n) + "." : "Nothing here yet. Pick something for it."] : [DRAWER[kind][0], kind === "timmy" ? (cur ? "Wearing " + lowerFirst(cur.n) + "." : DRAWER.timmy[1]) : (cur ? "Now: " + lowerFirst(cur.n) + ". " : "") + DRAWER[kind][1]];

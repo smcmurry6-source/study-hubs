@@ -1413,7 +1413,7 @@ window.shShop.open({ onClose: function(){ SHOP.open = false; var b = q(".dx-shop
 }).then(null, function(){ toast("The shop didn't open. Try again in a moment."); });
 }
 document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); } });
-var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
 function costumeOfDay(visitor, day, holiday){
 if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
 var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";

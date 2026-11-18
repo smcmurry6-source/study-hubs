@@ -18,9 +18,9 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   answer for ... just to fill in the gaps", then "we can do web search, the sites and others like them are good to go on
   the list, no limit on gap answers".
 - [x] **Show the Shiny Gold Crowns you've earned on Home's Today card** (Sam, 2026-11-17). Done: a Crowns tile with the balance (what's left to spend; "earned in all" in its tooltip) that opens the shop (#391).
-- [ ] **More cosmetics for Timmy and Timmy's place** (Sam, 2026-11-17): new outfits and place pieces
-  ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`). **On hold** (Sam, 2026-11-17: "lets
-  leave the more cosmetics for later"): don't start it until Sam brings it up again.
+- [x] **More cosmetics for Timmy and Timmy's place** (Sam, 2026-11-17): new outfits and place pieces
+  ([draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md), `tools/figures/site/`). Sam brought it back on 2026-11-18 ("Go
+  crazy"): now [its task](2026-11-18-more-cosmetics.md).
 - [x] **A different way to mark retries in the Question Bank** (Sam, 2026-11-17; done: a tinted card with a dashed edge and a "Second try" / "Third try" band, #391): a missed question that comes back a few
   cards later should look clearly different from a new one (`widget/hub-bank.js`; see also the `bank:retry-shown` line below).
 - [x] **Refine what double XP boosts cost** (Sam, 2026-11-17; done: 150 and 400 crowns, from the class's earning rate, `migration_v62.sql`, #394): the shop's boosts were 600 crowns for 1 hour (`boost-1h`)

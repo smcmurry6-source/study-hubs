@@ -17,7 +17,7 @@ tags: [map]
   `matrix.js`, `postcheck.js`, the database suites `admin-ops.js`, `retention.js` and `xp.js` (the game layer's server) on
   a throwaway copy built by `pg.js`; `run.js` runs them all). The bug log and UAT checklist are in `vault/release/`.
 - `tools/figures/site/` — the site's drawn art, built by `build.mjs`: emblems, mastheads, medals, the rewards art, and
-  Timmy's place (`place.mjs`, the kit; `sets.mjs`, the list of seasonal and rank sets; `packs/<set>.mjs`, one file per
+  Timmy's place (`place.mjs`, the kit; `sets.mjs`, the list of seasonal sets, year-round collections, rank sets and rare costumes; `packs/<set>.mjs`, one file per
   set; `pack-preview.mjs`, a contact sheet of one set: [draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md)), and
   the shop's own art (`shop.mjs`: the Shiny Gold Crown coin, the snack and boost thumbnails, the rarity frames, built
   into `widget/hub-art/shop.js`, `window.SH_SHOP_ART`; `shop-sheets.mjs`, its contact sheets:
