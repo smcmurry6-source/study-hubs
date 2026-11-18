@@ -910,7 +910,7 @@
   /* a small Report button on every question card; it opens the flag panel already
      tagged with that question's id, so reports arrive with context */
   var FLAG_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/></svg>';
-  var pendingFlagQid = null, pendingFlagLec = null, pendingFlagW = 0;
+  var pendingFlagQid = null, pendingFlagLec = null, pendingFlagW = 0, pendingFlagOrd = "";
   function addFlagButton(card){
     if (card.__shFlagBtn) return; card.__shFlagBtn = true;
     var qid = card.getAttribute("data-qid"); if (!qid) return;
@@ -919,7 +919,9 @@
     b.type = "button"; b.className = "sh-qflag"; b.innerHTML = FLAG_ICON_SM + "Report";
     b.setAttribute("aria-label", "Report a problem with this question");
     /* a reworded try (the engine's data-wording, 1 = the first extra wording) goes with the report, so it can be found */
-    b.addEventListener("click", function(ev){ ev.stopPropagation(); if (window.shOpenFlag) window.shOpenFlag(qid, +card.getAttribute("data-wording") || 0); });
+    /* and a statement item's order on screen (data-order "3142": shown statement j is the item's statement 3, 1, 4, 2;
+       widget/statements.js), so "statement 3" in the report can be read against the bank */
+    b.addEventListener("click", function(ev){ ev.stopPropagation(); if (window.shOpenFlag) window.shOpenFlag(qid, +card.getAttribute("data-wording") || 0, card.getAttribute("data-order") || ""); });
     if (window.SH_PINS) addPinButton(card, top, qid);
     top.appendChild(b);
   }
@@ -2820,21 +2822,22 @@
   });
 
   /* qid is a question id, or { lec, label } for a lecture's notes (the Report button under each lecture's notes) */
-  function setFlagContext(qid, w){
+  function setFlagContext(qid, w, ord){
     pendingFlagLec = qid && typeof qid === "object" ? qid : null;
     pendingFlagQid = pendingFlagLec ? null : (qid || null);
     pendingFlagW = pendingFlagQid && w > 0 ? w : 0;
+    pendingFlagOrd = pendingFlagQid && /^[1-5]{2,5}$/.test(ord || "") ? ord : "";
     var ctx = document.getElementById("shstat-flag-ctx");
     if (!ctx) return;
     if (pendingFlagLec) { ctx.textContent = "About the notes for " + (pendingFlagLec.label || pendingFlagLec.lec); return; }
     if (!qid) { ctx.textContent = ""; return; }
     var meta = findQuestionMeta(qid), t = meta.text || "";
-    if (pendingFlagW) { var cs = document.querySelector('.qcard[data-qid="' + String(qid).replace(/"/g, "") + '"][data-wording] .qc-stem'); t = cs ? cs.textContent : ""; }
+    if (pendingFlagW || pendingFlagOrd) { var cs = document.querySelector('.qcard[data-qid="' + String(qid).replace(/"/g, "") + '"]' + (pendingFlagOrd ? "[data-order]" : "[data-wording]") + " .qc-stem"); t = cs ? cs.textContent : t; }
     ctx.textContent = "About question " + qid + (pendingFlagW ? " (reworded)" : "") + (t ? ": " + (t.length > 110 ? t.slice(0, 108) + "…" : t) : "");
   }
-  window.shOpenFlag = function(qid, w){
+  window.shOpenFlag = function(qid, w, ord){
     closeOtherPanels(flagPanel);
-    setFlagContext(qid, w);
+    setFlagContext(qid, w, ord);
     document.getElementById("shstat-flag-msg").textContent = "";
     flagPanel.classList.add("is-open");
     updateSheetState();
@@ -2861,7 +2864,7 @@
     msg.textContent = "Sending…";
     /* where the student was, so the report can be found: [question id] and the current section */
     var where = [];
-    if (pendingFlagQid) where.push("question " + pendingFlagQid + (pendingFlagW ? " (reworded: wording " + (pendingFlagW + 1) + ")" : ""));
+    if (pendingFlagQid) where.push("question " + pendingFlagQid + (pendingFlagW ? " (reworded: wording " + (pendingFlagW + 1) + ")" : "") + (pendingFlagOrd ? " (statements shown in the order " + pendingFlagOrd.split("").join(", ") + ")" : ""));
     if (pendingFlagLec) where.push("lecture notes " + (pendingFlagLec.label ? pendingFlagLec.label + " (" + pendingFlagLec.lec + ")" : pendingFlagLec.lec));
     var sec = currentSection(); if (sec) where.push(sec);
     var note = (text + (where.length ? "  — " + where.join(" · ") : "")).slice(0, 700);

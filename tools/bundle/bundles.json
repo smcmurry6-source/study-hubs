@@ -3,7 +3,7 @@
  "scripts": {
   "hub.bundle.js": {
    "what": "a hub's engine: with the page",
-   "run": ["hub-art.js", "hub-rewards.js", "hub-timmy.js", "hub-bank.js", "hub.js"]
+   "run": ["hub-art.js", "statements.js", "hub-rewards.js", "hub-timmy.js", "hub-bank.js", "hub.js"]
   },
   "dash.bundle.js": {
    "what": "the dashboard's engine: with the page",

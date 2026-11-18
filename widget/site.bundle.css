@@ -598,6 +598,17 @@ html.shx .qc-tools .sh-qflag, html.shx .qc-tools .sh-qpin { margin-left: 0; }
 .qc-n { font-weight: var(--w-strong); color: var(--text); }
 .likely { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px; border-radius: var(--r-pill); background: var(--hub-soft); color: var(--hub-text);
 font-weight: var(--w-strong); font-size: var(--fs-meta); }
+button.likely { border: 0; font-family: inherit; cursor: pointer; padding-right: 6px; }
+button.likely .chev { display: flex; opacity: .8; }
+button.likely .chev .ic { transition: transform .15s; }
+button.likely[aria-expanded="true"] .chev .ic { transform: rotate(90deg); }
+@media (hover: hover) { button.likely:hover { background: color-mix(in srgb, var(--hub-soft) 70%, var(--hub-text) 12%); } }
+@media (prefers-reduced-motion: reduce) { button.likely .chev .ic { transition: none; } }
+.qc-lkwhy { margin: 10px 0 0; padding: 10px 12px; border-radius: var(--r-row); background: var(--hub-soft); font-size: var(--fs-label); line-height: 1.45; display: grid; gap: 4px; }
+.qc-lkwhy[hidden] { display: none; }
+.qc-lkwhy b { font-weight: var(--w-head); }
+.qc-lkwhy i { font-style: normal; font-weight: var(--w-strong); }
+.qc-lkwhy .lk { color: var(--hub-text); font-weight: var(--w-strong); text-decoration: underline; text-underline-offset: 2px; }
 .qc-flag { display: inline-flex; align-items: center; gap: 5px; color: var(--hub-text); font-weight: var(--w-strong); }
 .qc-last.ok { color: var(--right); } .qc-last.no { color: var(--wrong); }
 .qc-stem { margin-top: 12px; font-size: var(--fs-stem); line-height: 1.45; font-weight: var(--w-strong); white-space: pre-line; }

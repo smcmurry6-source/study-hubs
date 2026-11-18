@@ -12,7 +12,11 @@ tags: [questions]
 slides / lecture / module / reading. When the exam's count per lecture is announced, put it in `EXAM_COUNTS` (shown beside each lecture,
 and the mock's blueprint), but **never trim topics to it**: every topic a professor hinted at stays High Likelihood (Sam,
 2026-11-10: "Dont remove any high likelihood questions. If they were hinted to be exam questions, they need to be high
-likelihood"; before that, a lecture got as many topics as exam questions). The listed questions get `q.likely` (on a hub on the engine, `node tools/hub-next/build.mjs` sets it from `likelyTopics`, since 2026-11-18, BUG-164: never by hand): `likelyChip()` tags them in the bank and the drill (not the mock); the bank's
+likelihood"; before that, a lecture got as many topics as exam questions). The listed questions get `q.likely` (on a hub on the engine, `node tools/hub-next/build.mjs` sets it from `likelyTopics`, since 2026-11-18, BUG-164: never by hand): `likelyChip()` tags them in the bank and the drill (not the mock), and since 2026-11-18 the tag says why (Sam: "yes to the two
+ideas", Perio report #57: "what is the rationale for this being high likelihood"): a tap opens the topic, its rank in its
+lecture and what it rests on, its `basis` in words (`basisWords()` in `widget/hub-bank.js`), so write `basis` with the usual
+words joined by " + " (hint, final review, final focus, review guide, live class, midterm check-ins, study guide, recording,
+objectives, slides, lecture); the bank's
 **High likelihood** toggle shows only those, on top of any Show chip (Missed last time, Not answered yet, Pinned; since 2026-11-06;
 no "Likely first" order since 2026-11-03); Exam Hints opens with `likelyHTML()` ("Most likely questions", a
 Practice these button per lecture). Never base a topic on a graded quiz or a previous year's exam ([graded-coursework](graded-coursework.md)).
