@@ -91,7 +91,7 @@ export function pack(T){
       note: "A white habitat dome with an airlock, a tube to a little module, solar wings and a blinking antenna",
       ups: ["windows", "porch", "flag", "paint"],
       upn: { windows: "A ring of portholes", porch: "Airlock steps and running lights", flag: "A Timmy flag on the module", paint: "Dome color" },
-      door: [5.5, 9.3], brush: [8.3, 9.35], statue: [2.85, 9.9], spots: { door: [7.1, 10.7] }, h: 6.0,
+      door: [5.5, 9.3], brush: [8.3, 9.35], statue: [2.85, 9.9], spots: { door: [6.45, 10.0] }, h: 6.0,
       eaves: [[2.85, 7.45, 2.4], [7.15, 3.15, 2.4], 6], round: [DM.cx, DM.cy, 3.0],
       base: T.arcPts(MOD.x, MOD.y, MOD.r, -45, 150, 5).concat(T.arcPts(DM.cx, DM.cy, DM.r + .05, -40, 135, 14)), gap: [[1.9, 6.3, 7.1, 10.8]],
       block: [2.0, .8, 9.8, 9.5],
