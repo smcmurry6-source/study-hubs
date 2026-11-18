@@ -39,7 +39,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   are any additions", "matching questions are only giving 2xp instead of 10", "add the recent change log back".
   **Stage & Grade** (`tools/figures/perio/stagegame.js` + `.css`, built into `hubs/perio/content/figures.js`/`.css` between
   `stage:js`/`stage:css` markers by `tools/figures/perio/build.mjs`, `--check` in CI): ten made-up patients, each drawn as a
-  mouth chart and a radiograph of its worst site, with their findings; call the stage, the extent and the grade, and the
+  mouth chart (each tooth's own facial outline at its average size: incisal edges, canine cusps, premolars, molars with their roots; Sam: "make the mouth chart use teeth shapes instead of arbitrary rectangles") and a radiograph of its worst site, with their findings; call the stage, the extent and the grade, and the
   finding that decided each call lights up gold. Explore sets every criterion by hand and the diagnosis follows, with why.
   The rules follow Session 1's notes (CAL first, the bone-loss bands, the Stage 3 triggers, Stage 4 by teeth lost or
   complexity, the grade by direct evidence or the bone-loss/age ratio, smoking and HbA1c lifting it); 20,000 dealt cases

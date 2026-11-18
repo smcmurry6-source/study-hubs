@@ -14,7 +14,10 @@
    Sources for the drawings: the 2017 World Workshop staging and grading tables (Tonetti, Greenwell & Kornman, J Periodontol
    2018) for what each stage looks like on a film (bone loss as a share of the root, in thirds from the CEJ; the crest sits
    about 1 mm below the CEJ in health) and Glickman's furcation classes (a Class II lesion partway between the roots, a Class
-   III through and through). The mouth is a schematic chart (Universal numbers, as seen facing the patient), not to scale.
+   III through and through). The mouth is a chart of #2-#15 and #31-#18 (Universal numbers, as seen facing the patient), each
+   tooth's facial outline drawn to its average crown width, crown height and root length (Wheeler's Dental Anatomy,
+   Physiology and Occlusion, its table of measurements) with its own crown and roots (an incisor's edge, a canine's cusp,
+   the molars' cusps and roots); the outlines are schematic, unlabeled, and only mark which teeth are involved.
    The cases are generated, not bank questions: they don't count in class stats, your answers or XP (in the arcade a
    finished game posts its score and gets the arcade's +50, like every game there). The generator never makes a case
    whose answer turns on something the class and the 2018 table state differently (exactly 10 cigarettes a day; a light
@@ -29,7 +32,15 @@ var STAGE_GAME = (function(){
   var UP = [2,3,4,5,6,7,8,9,10,11,12,13,14,15], LO = [31,30,29,28,27,26,25,24,23,22,21,20,19,18], ALL = UP.concat(LO);
   var MOLAR = [2,3,14,15,18,19,30,31], FIRST = [3,14,19,30], INC = [7,8,9,10,23,24,25,26], CAN = [6,11,22,27];
   function type(n){ return MOLAR.indexOf(n) > -1 ? "m" : INC.indexOf(n) > -1 ? "i" : CAN.indexOf(n) > -1 ? "c" : "p"; }
-  function width(n){ var t = type(n); return t === "m" ? 30 : t === "p" ? 24 : t === "c" ? 22 : 20; }
+  /* each tooth's facial outline at its average size (Wheeler's Dental Anatomy's table of measurements, in mm): crown width,
+     crown height, root length, and the cervical width as a share of the crown's; drawn at S px a mm. Only the chart uses it. */
+  var S = 3.3, DIMS = {
+    up: [null, ["inc", 8.5, 10.5, 13, .82], ["inc2", 6.5, 9, 13, .77], ["can", 7.5, 10, 17, .73], ["pm1", 7, 8.5, 14, .71], ["pm", 6.5, 8.5, 14, .77], ["um", 10, 7.5, 13, .8], ["um", 9, 7, 12, .78]],
+    lo: [null, ["inc", 5, 9, 12.5, .7], ["inc", 5.5, 9.5, 14, .73], ["can", 7, 11, 16, .79], ["pm", 7, 8.5, 14, .71], ["pm", 7, 8, 14.5, .71], ["lm1", 11, 7.5, 14, .82], ["lm", 10.5, 7, 13, .76]]
+  };
+  function dims(n){ var up = n <= 16, pos = up ? (n <= 8 ? 9 - n : n - 8) : (n <= 24 ? 25 - n : n - 24), d = DIMS[up ? "up" : "lo"][pos];
+    return { kind: d[0], w: d[1] * S, cr: d[2] * S, rt: d[3] * S, cv: d[4], up: up }; }
+  function width(n){ return dims(n).w; }
   var ROMAN = ["", "I", "II", "III", "IV"];
   var CX = { mast: "masticatory dysfunction", mob: "secondary occlusal trauma (mobility degree 2 or more)", bite: "bite collapse, drifting and flaring",
     ridge: "a severe ridge defect", teeth: "fewer than 20 remaining teeth (10 opposing pairs)" };
@@ -191,25 +202,82 @@ var STAGE_GAME = (function(){
 
   /* ---------- the drawings ---------- */
   function keyed(keys){ return function(k){ return keys && keys.indexOf(k) > -1 ? " is-key" : ""; }; }
+  /* a tooth's facial outline in its own frame: x 0 (distal) to w (mesial), y 0 at the CEJ, the crown toward +y (the
+     biting edge) and the root toward -y. Incisors have a straight incisal edge (the central's mesial corner sharp, the
+     lateral's rounder), a canine one pointed cusp with the shorter slope mesial, a premolar one buccal cusp (the upper first
+     premolar's root splits near its tip), an upper molar two buccal cusps and roots with the palatal root showing between
+     them, a lower first molar three buccal cusps (mesiobuccal, distobuccal, distal) and a lower molar two roots, mesial and
+     distal. The facial CEJ curves toward the root. */
+  var OCC = {
+    inc: [0, .72, "Q", .01, .97, .17, 1, "L", .9, 1, "Q", 1, 1, 1, .8],
+    inc2: [0, .68, "Q", .02, .98, .25, 1, "L", .82, 1, "Q", 1, 1, 1, .76],
+    can: [0, .55, "Q", .14, .86, .55, 1, "Q", .88, .9, 1, .68],
+    pm1: [0, .6, "Q", .14, .9, .46, 1, "Q", .84, .92, 1, .64],
+    pm: [0, .6, "Q", .15, .9, .5, 1, "Q", .86, .9, 1, .64],
+    um: [0, .55, "Q", .02, .93, .26, .98, "Q", .42, .98, .5, .86, "Q", .57, .99, .74, 1, "Q", .97, .99, 1, .62],
+    lm1: [0, .58, "Q", .01, .88, .13, .92, "Q", .21, .92, .26, .83, "Q", .31, .98, .45, .98, "Q", .56, .98, .6, .86, "Q", .65, 1, .79, 1, "Q", .98, 1, 1, .64],
+    lm: [0, .56, "Q", .02, .94, .27, .98, "Q", .43, .98, .5, .87, "Q", .57, .99, .74, 1, "Q", .97, .99, 1, .62]
+  };
+  function toothShape(d){
+    var W = d.w, C = d.cr, R = d.rt, xd = W * (1 - d.cv) / 2, xm = W - xd, o = OCC[d.kind], i = 2;
+    function p(x, y){ return (Math.round(x * 10) / 10) + " " + (Math.round(y * 10) / 10); }
+    var s = "M" + p(xd, 0) + " C" + p(xd - .06 * W, .3 * C) + " " + p(0, (o[1] - .3) * C) + " " + p(0, o[1] * C);
+    while (i < o.length) {
+      if (o[i] === "L") { s += " L" + p(o[i + 1] * W, o[i + 2] * C); i += 3; }
+      else { s += " Q" + p(o[i + 1] * W, o[i + 2] * C) + " " + p(o[i + 3] * W, o[i + 4] * C); i += 5; }
+    }
+    var mc = o[o.length - 1];
+    s += " C" + p(W, (mc - .3) * C) + " " + p(xm + .06 * W, .3 * C) + " " + p(xm, 0);
+    /* the roots, from the mesial cervix round to the distal one. A root runs up its mesial side from (sx, sy), rounds its
+       apex (ax, ay) and comes down its distal side to (ex, ey); a side that starts or ends at a furcation (fur) meets it
+       level, so the furcation is a dome, not a spike */
+    function root(sx, sy, ax, ay, ex, ey, rad, furS, furE){
+      return " C" + (furS ? p(sx - furS, sy) : p(sx + .02 * W, sy + (ay - sy) * .4)) + " " + p(ax + rad + (sx - ax - rad) * .35, ay + rad + (sy - ay) * .22) + " " + p(ax + rad, ay + rad) +
+        " C" + p(ax + rad, ay - rad * .45) + " " + p(ax - rad, ay - rad * .45) + " " + p(ax - rad, ay + rad) +
+        " C" + p(ax - rad - (ax - rad - ex) * .35, ay + rad + (ey - ay) * .22) + " " + (furE ? p(ex + furE, ey) : p(ex - .02 * W, ey + (ay - ey) * .4)) + " " + p(ex, ey);
+    }
+    var back = "", k = d.kind, rad;
+    if (k === "um") {
+      rad = .07 * W;
+      s += root(xm, 0, .75 * W, -.95 * R, .5 * W, -.3 * R, rad, 0, .1 * W) + root(.5 * W, -.3 * R, .25 * W, -.86 * R, xd, 0, rad, .1 * W, 0);
+      back = "M" + p(.33 * W, -.2 * R) + " C" + p(.31 * W, -.65 * R) + " " + p(.4 * W, -.98 * R) + " " + p(.46 * W, -1.03 * R) +
+        " Q" + p(.5 * W, -1.07 * R) + " " + p(.54 * W, -1.03 * R) + " C" + p(.6 * W, -.98 * R) + " " + p(.69 * W, -.65 * R) + " " + p(.67 * W, -.2 * R) + " Z";
+    } else if (k === "lm" || k === "lm1") {
+      rad = .07 * W;
+      s += root(xm, 0, .7 * W, -R, .47 * W, -.27 * R, rad, 0, .1 * W) + root(.47 * W, -.27 * R, .21 * W, -.95 * R, xd, 0, rad, .1 * W, 0);
+    } else if (k === "pm1") {
+      rad = .07 * W;
+      s += root(xm, 0, .63 * W, -R, .5 * W, -.64 * R, rad, 0, .05 * W) + root(.5 * W, -.64 * R, .37 * W, -.97 * R, xd, 0, rad, .05 * W, 0);
+    } else s += root(xm, 0, .46 * W, -R, xd, 0, Math.max(1.6, .1 * W), 0, 0);
+    var dip = (k === "inc" || k === "inc2" ? 1.5 : k === "can" ? 1.3 : k === "pm" || k === "pm1" ? 1 : .6) * S;
+    return { d: s + " Z", back: back, cej: "M" + p(xd, 0) + " Q" + p(W / 2, -2 * dip) + " " + p(xm, 0) };
+  }
   function mouthSVG(c, keys){
-    var on = keyed(keys), gap = 3, w0 = UP.reduce(function(s, n){ return s + width(n) + gap; }, -gap), x0 = (440 - w0) / 2, s = "";
-    function row(nums, y, top){
-      var x = x0;
+    /* the biting edges meet the middle band (upper at YU, lower at YL), the roots run out to the edges */
+    var on = keyed(keys), gap = 2, YU = 105, YL = 141, H = 248, s = "";
+    function r1(v){ return Math.round(v * 10) / 10; }
+    function row(nums, top){
+      var x = (440 - nums.reduce(function(a, n){ return a + width(n) + gap; }, -gap)) / 2;
       nums.forEach(function(n){
-        var w = width(n), st = c.chart[n], h = type(n) === "m" ? 30 : 34, yy = top ? y : y + 34 - h;
+        var d = dims(n), w = d.w, st = c.chart[n], flip = top ? n >= 9 : n <= 24, sh = toothShape(d);
+        var cej = top ? YU - d.cr : YL + d.cr, apex = top ? cej - d.rt : cej + d.rt, occ = top ? YU : YL;
         var cls = "stg-t stg-" + st + (st === "lost" ? on("lost") : st === "other" ? on("teeth") : st === "inv" || st === "worst" ? on("ext") : "");
         s += '<g class="' + cls + '"><title>#' + n + (st === "lost" ? ", lost to periodontitis" : st === "other" ? ", missing for another reason" : st === "inv" ? ", attachment loss" : st === "worst" ? ", the worst tooth" : "") + "</title>" +
-          '<rect x="' + x + '" y="' + yy + '" width="' + w + '" height="' + h + '" rx="' + (type(n) === "m" ? 7 : 9) + '"/>';
-        if (st === "lost") s += '<path class="stg-x" d="M' + (x + 5) + " " + (yy + 7) + "L" + (x + w - 5) + " " + (yy + h - 7) + "M" + (x + w - 5) + " " + (yy + 7) + "L" + (x + 5) + " " + (yy + h - 7) + '"/>';
-        if (st === "worst") s += '<path class="stg-pin' + on("cal") + '" d="M' + (x + w / 2 - 6) + " " + (top ? yy - 12 : yy + h + 12) + "L" + (x + w / 2 + 6) + " " + (top ? yy - 12 : yy + h + 12) + "L" + (x + w / 2) + " " + (top ? yy - 3 : yy + h + 3) + 'Z"/>';
-        if (st === "worst" || st === "lost") s += '<text class="stg-num" x="' + (x + w / 2) + '" y="' + (top ? 76 : 88) + '" text-anchor="middle">' + n + "</text>";
+          '<g transform="translate(' + r1(flip ? x + w : x) + " " + r1(cej) + ") scale(" + (flip ? -1 : 1) + " " + (top ? 1 : -1) + ')">' +
+          (sh.back ? '<path class="stg-tt" d="' + sh.back + '"/>' : "") + '<path class="stg-tt" d="' + sh.d + '"/>' +
+          (st === "lost" || st === "other" ? "" : '<path class="stg-cejl" d="' + sh.cej + '"/>') + "</g>";
+        var y1 = Math.min(apex, occ) + 6, y2 = Math.max(apex, occ) - 6;
+        if (st === "lost") s += '<path class="stg-x" d="M' + r1(x + 3) + " " + r1(y1) + "L" + r1(x + w - 3) + " " + r1(y2) + "M" + r1(x + w - 3) + " " + r1(y1) + "L" + r1(x + 3) + " " + r1(y2) + '"/>';
+        if (st === "worst") { var py = top ? apex - 13 : apex + 13, tip = top ? apex - 4 : apex + 4;
+          s += '<path class="stg-pin' + on("cal") + '" d="M' + r1(x + w / 2 - 6) + " " + r1(py) + "L" + r1(x + w / 2 + 6) + " " + r1(py) + "L" + r1(x + w / 2) + " " + r1(tip) + 'Z"/>'; }
+        if (st === "worst" || st === "lost") s += '<text class="stg-num" x="' + r1(x + w / 2) + '" y="' + (top ? YU + 16 : YL - 6) + '" text-anchor="middle">' + n + "</text>";
         s += "</g>";
         x += w + gap;
       });
     }
-    row(UP, 22, true); row(LO, 92, false);
-    s += '<text class="stg-lab" x="10" y="87">R</text><text class="stg-lab" x="430" y="87" text-anchor="end">L</text>';
-    return '<svg class="stg-mouth' + on("ext") + '" viewBox="0 0 440 140" role="img" aria-label="' + esc(mouthLabel(c)) + '">' + s + "</svg>";
+    row(UP, true); row(LO, false);
+    s += '<text class="stg-lab" x="10" y="128">R</text><text class="stg-lab" x="430" y="128" text-anchor="end">L</text>';
+    return '<svg class="stg-mouth' + on("ext") + '" viewBox="0 0 440 ' + H + '" role="img" aria-label="' + esc(mouthLabel(c)) + '">' + s + "</svg>";
   }
   function mouthLabel(c){
     var a = "The mouth, upper teeth on top, as seen facing the patient: " + c.teeth + " teeth present";
