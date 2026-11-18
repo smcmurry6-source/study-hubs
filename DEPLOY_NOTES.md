@@ -32,6 +32,12 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (two indexes for saving an answer, Claude Code)** — `migration_v71.sql`: `personal_answers` gets
+  `(visitor_id, answered_at desc, id desc)` and `(visitor_id, hub, qid, answered_at desc, id desc)`. Every answer's speed limit,
+  double-tap check and per-question counts read all of the person's answers before (9,377 for the heaviest visitor; the
+  day's most frequent statement timeout). Built live with `create index concurrently` the same day (Sam: "Now, then
+  merge"), so saves went on while they built; the speed limit's read is now one row from an index
+  ([#423](https://github.com/smcmurry6-source/study-hubs/pull/423), [the task](vault/tasks/2026-11-18-database-load.md)).
 - **2026-11-18 (A gold reward card for XP and crowns, and the Today card's crowns back, Claude Code)** — Sam: "the Today card in the
   question bank is no longer showing how many crowns youve earned. also when you reach a goal or other things like that where you get
   xp or crowns, a black box comes up from the bottom of the screen to tell you. i want it to look much cooler and communicate that you

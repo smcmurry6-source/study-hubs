@@ -16,7 +16,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `toast()` in `widget/dash.js`) are still the dark toast. The dashboard measured 342 of its 345 KB budget on 2026-11-18, so
   the card would go in a file the dashboard fetches when a prize first pays (not `dash.bundle.js`), or with Sam's OK to raise
   the budget.
-- [ ] **An index for recording an answer, if the database-load work doesn't already cover it** (2026-11-18, found while
+- [x] **An index for recording an answer, if the database-load work doesn't already cover it** (done: `migration_v71.sql`, both indexes built live 2026-11-18, [#423](https://github.com/smcmurry6-source/study-hubs/pull/423)) (2026-11-18, found while
   tracing the Today card's missing crowns, BUG-182). The most frequent statement timeout in that day's `postgres_logs` (103 of
   about 436) was `sh_answer`'s speed limit, `select max(a.answered_at) from personal_answers a where a.visitor_id = ... and
   a.id <> aid and a.answered_at <= v_at`, with its neighbors (the answers in the last 60 seconds, the latest one for a double
