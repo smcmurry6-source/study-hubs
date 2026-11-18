@@ -19,9 +19,53 @@
 
   /* ======================= the question card ======================= */
   var RETRY_GAP = 5, uid = 0;
-  function choiceOrder(q){ var idx = q.choices.map(function(c, i){ return i; }); return q.fmt === "2stmt" || q.fmt === "tf" || q.fmt === "numbered" ? idx : shuffled(idx); }
+  /* a statement item in a new order (later(), below) brings its own canonical order: _ord */
+  function choiceOrder(q){ if (q._ord) return q._ord.slice(); var idx = q.choices.map(function(c, i){ return i; }); return q.fmt === "2stmt" || q.fmt === "tf" || q.fmt === "numbered" ? idx : shuffled(idx); }
+  /* a numbered-statement or two-statement item on a later try (Sam, 2026-11-18: "yes to the two ideas"; Perio reports
+     #55/#56): its statements shuffled and renumbered, each choice relabeled to the same statements (widget/statements.js),
+     so "the answer was 1, 2 and 4" can't be remembered. n: the tries so far. The first try after the first always shows a
+     new order; later ones any order. Choice k still means what it meant: the key, the grading and the class's picks hold. */
+  function later(q, n){ return n > 0 && window.shStatements ? window.shStatements.reorder(q, { fresh: n === 1 }) : q; }
   function srcLabel(q){ return (HX.CORE.srcLabel || {})[q.src] || q.src || ""; }
-  function likelyTag(q){ return q.likely ? '<span class="likely" title="' + esc(q.likely.t ? "Predicted topic: " + q.likely.t : "") + '">' + icon("hints", 14) + "High likelihood</span>" : ""; }
+  /* the High likelihood tag says why (Sam, 2026-11-18: "yes to the two ideas"; Perio report #57: "what is the rationale for
+     this being high likelihood"): a tap opens the predicted topic, where it ranks in its lecture and what it rests on
+     (core.json's likelyTopics: t, basis), the way Exam Hints' "Most likely questions" lists them. likelyWire() wires it. */
+  function likelyTag(q){ return q.likely ? '<button class="likely" type="button" data-lkwhy aria-expanded="false">' + icon("hints", 14) + 'High likelihood<span class="sr">: why?</span><span class="chev" aria-hidden="true">' + icon("chevron", 14) + "</span></button>" : ""; }
+  var BASIS = [[/^hints?$/i, "a hint from the professor"], [/^final review$/i, "the final's review"], [/^final focus$/i, "the final's focus list"],
+    [/^(class )?review guide$/i, "the class's review guide"], [/^exam[- ]review$/i, "the class's exam review"], [/^live class$/i, "what was said in class"],
+    [/^(\w+) check-?ins?$/i, "the $1's exam check-ins"], [/^check-?ins?$/i, "exam check-ins"], [/^study guide$/i, "the study guide"],
+    [/^recording$/i, "the lecture recording"], [/^objectives?$/i, "the lecture's objectives"], [/^slides$/i, "the slides"], [/^lecture$/i, "the lecture"],
+    [/^focus( list)?$/i, "a focus list"], [/^(in-class )?review$/i, "an in-class review"]];
+  function basisWords(b){
+    var parts = String(b || "").split(/\s*\+\s*/).map(function(p){
+      var t = p.replace(/\([^)]*\)/g, "").trim(); if (!t) return "";
+      for (var i = 0; i < BASIS.length; i++) if (BASIS[i][0].test(t)) return t.replace(BASIS[i][0], BASIS[i][1]);
+      return t;
+    }).filter(Boolean);
+    return parts.length > 1 ? parts.slice(0, -1).join(", ") + " and " + parts[parts.length - 1] : parts[0] || "";
+  }
+  function likelyWhyHTML(q, id){
+    var L = q.likely, lec = L.lec || q.lec, T = (HX.CORE.likelyTopics || []).filter(function(t){ return t.lec === lec; });
+    var k = T.map(function(t){ return t.t; }).indexOf(L.t) + 1, rests = basisWords(L.basis);
+    return '<div class="qc-lkwhy" id="' + id + '" data-lkbox><p><b>Why it\u2019s High likelihood:</b> it tests a predicted exam topic' + (L.t ? ", <i>" + esc(L.t) + "</i>" : "") +
+      (k ? " (number " + k + " of " + T.length + " for " + esc(lecName(lec)) + ", strongest evidence first)" : " for " + esc(lecName(lec))) + ".</p>" +
+      (rests ? '<p class="note">What it rests on: ' + esc(rests) + ".</p>" : "") +
+      '<p><a class="lk" href="#more/hints" data-lkall>Every predicted topic, in Exam hints</a></p></div>';
+  }
+  function likelyWire(el, q){
+    var b = $("[data-lkwhy]", el); if (!b || !q.likely) return;
+    b.addEventListener("click", function(e){
+      e.stopPropagation();
+      var box = $("[data-lkbox]", el), open = b.getAttribute("aria-expanded") !== "true";
+      if (!box) {
+        var id = "lk" + (++uid); box = h(likelyWhyHTML(q, id)); b.setAttribute("aria-controls", id);
+        var hd = $(".qc-head", el); if (hd) hd.insertAdjacentElement("afterend", box); else b.insertAdjacentElement("afterend", box);
+        var all = $("[data-lkall]", box); if (all) all.addEventListener("click", function(ev){ ev.stopPropagation(); track("bank:likely-all"); });
+      }
+      box.hidden = !open; b.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) track("bank:likely-why");
+    });
+  }
   function stemHTML(q){
     var s = String(q.stem || "");
     if (q.fmt === "2stmt" || q.fmt === "numbered") {
@@ -50,11 +94,12 @@
     /* the version for this try (HX.worded, widget/hub.js: A/B, the first by device, then alternating); choice k is choice k
        reworded, so the key and the server's grading are the original's. data-wording (0 = A, 1 = B) goes to question health */
     q = HX.worded ? HX.worded(q) : q;
-    var id = "q" + (++uid), multi = q.type === "multi", tf = q.fmt === "tf";
     var seen = ansOf(q.id);
+    q = later(q, seen ? seen.n || 0 : o.retry ? 1 : 0);
+    var id = "q" + (++uid), multi = q.type === "multi", tf = q.fmt === "tf";
     var status = o.retry ? "" : o.note ? '<span class="qc-flag">' + esc(o.note) + "</span>" :
-      seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + (q._base ? " · reworded" : "") + "</span>" : "";
-    var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '"' + (q._base ? ' data-wording="' + (q._w || 0) + '"' : "") + ' data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
+      seen ? '<span class="qc-last ' + (seen.last ? "ok" : "no") + '">Last time: ' + (seen.last ? "right" : "missed") + (q._base ? " · reworded" : "") + (q._perm ? " · new order" : "") + "</span>" : "";
+    var el = h('<article class="qcard qc' + lc(q.lec) + (o.retry ? " is-retry" : "") + '"' + (o.retry ? ' data-try="' + (+o.retry || 2) + '"' : "") + ' data-qid="' + esc(q.id) + '"' + (q._base ? ' data-wording="' + (q._w || 0) + '"' : "") + (q._perm ? ' data-order="' + q._perm.join("") + '"' : "") + ' data-qtype="' + q.type + '" data-fmt="' + esc(q.fmt || q.type) + '" data-ctx="' + esc(o.ctx || "bank") + '" aria-labelledby="' + (o.num ? id + "n " : "") + id + 'h"></article>');
     /* o.num, o.of: the card's place in the set ("Question 12 of 84"), so you can see how many are left (a classmate's
        ask, from the idea board, 2026-11-15) */
     var head = '<header class="qc-head"><span class="qc-meta">' + (o.num ? qNum(o.num, o.of, id + "n") : "") + '<span class="qc-lec" id="' + id + 'h">' + lecChip(q.lec) + "</span>" + likelyTag(q) + status + '</span><span class="qcard-top qc-tools"></span></header>';
@@ -85,6 +130,7 @@
     if (o.retry) { var tryN = +o.retry || 2; head = '<p class="qc-retry">' + icon("retry", 18) + "<span><b>" + (tryN === 2 ? "Second try" : tryN === 3 ? "Third try" : "Try " + tryN) + "</b> · You missed this " + (tryN === 2 ? "a few questions ago" : "again") + ". Take another shot.</span></p>" + head; }
     el.innerHTML = head + figHTML(q) + pboxHTML(q) + stemHTML(q) + body + '<section class="qc-result qcard-explain" data-role="explain" hidden aria-live="polite"></section>';
     wireCard(el, q, o);
+    likelyWire(el, q);
     return el;
   }
   function wireCard(el, q, o){
@@ -852,7 +898,7 @@
   /* what the other files call from here */
   HX.figKeyHTML = figKeyHTML; HX.card = card; HX.bankReset = bankReset; HX.presetOf = presetOf;
   /* for Learn and Flashcards (widget/study-modes.js): the card's parts, the bank's order and the bank to redraw */
-  HX.qParts = { choiceOrder: choiceOrder, stemHTML: stemHTML, pboxHTML: pboxHTML, figHTML: figHTML, figAfterHTML: figAfterHTML, whyHTML: whyHTML, likelyTag: likelyTag, emptyHTML: emptyHTML };
+  HX.qParts = { choiceOrder: choiceOrder, stemHTML: stemHTML, pboxHTML: pboxHTML, figHTML: figHTML, figAfterHTML: figAfterHTML, whyHTML: whyHTML, likelyTag: likelyTag, likelyWire: likelyWire, later: later, emptyHTML: emptyHTML };
   HX.drawQuestions = drawQuestions; HX.qview = qview;
   HX.lecValue = lecValue; HX.filtered = filtered; HX.renderQuestions = renderQuestions; HX.mockTotal = mockTotal;
   Object.defineProperty(HX, "bankSearch", { get: function(){ return bankSearch; }, set: function(v){ bankSearch = v; }, enumerable: true });

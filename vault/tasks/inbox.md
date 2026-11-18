@@ -16,14 +16,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   Rare 1,500-2,500, Epic 3,500-6,000, Legendary 7,000-12,000, the boosts 300 and 800, the rest as they are (a migration: the rarity
   bands are checked in the database). Or wait and read `tools/economy.sql` again at the next audit, with the prizes in and the back
   pay out. Sam's call.
-- [ ] **A statement item reorders its statements on a retry** (Perio reports #55, #56, 2026-11-17: "the order of the statements as
+- [x] **A statement item reorders its statements on a retry** (Perio reports #55, #56, 2026-11-17: "the order of the statements as
   well as the order of the question answers should change so you dont just remember the answer was 1, 2 and 4"). The new wordings
   (`variants.json`) reword but keep the order. A wording could renumber the statements and relabel each choice to the same set
   (choice k still means the same statements, so the keys and the class's picks hold), but `numbered-statements`' canonical order and
-  `two-statement`'s fixed choices would need an exception for a reordered wording. **Sam said yes, 2026-11-18** ("yes to the two ideas"): being built.
-- [ ] **A High likelihood chip says why** (Perio report #57, 2026-11-17: "what is the rationale for this being high likelihood"):
+  `two-statement`'s fixed choices would need an exception for a reordered wording. **Sam said yes, 2026-11-18** ("yes to the two ideas"): done, in this PR (`widget/statements.js`).
+- [x] **A High likelihood chip says why** (Perio report #57, 2026-11-17: "what is the rationale for this being high likelihood"):
   the chip on a card could name its topic and basis (the hint, the review, the check-ins), the way Exam Hints' "Most likely
-  questions" list already does (`widget/hub.js`). **Sam said yes, 2026-11-18**: being built.
+  questions" list already does (`widget/hub.js`). **Sam said yes, 2026-11-18**: done, in this PR (the tag opens why).
 - [x] **Tap a word in the notes to jump the narration there** (Sam, 2026-11-17; done, on phones too, with the Highlight button's phone fix, BUG-157: #391): in Listen / Follow along, clicking a word
   skips the recording to that word (each recording's `.words.json` has the timings).
 - [x] **Let Ask Timmy use outside sources** (Sam, 2026-11-17; done: when the notes don't cover it, he looks it up on trusted
