@@ -32,6 +32,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (Ask Timmy costs less after a merge, Claude Code)** — The 21 "When is the exam, and what is on it?" on
+  Heme & Endo Exam 3 in the admin page's Ask Timmy tab ($12.31) were the After merge workflow's own check, not students:
+  it asked one real question on the first live hub after every deploy, and a deploy follows nearly every About page change.
+  Now `tools/after-merge/run.js` asks a real question only when the function's code changed, on the live hub with the
+  soonest exam (where its cache write is read by students); an About-page-only deploy gets a free check (a question from a
+  mock exam, answered "paused" with no model call). And `buildRequest` in `supabase/functions/timmy/core.js` puts the site
+  help after the hub's content, each block with its own 1-hour cache mark, so an About page change no longer sends every
+  hub's 130-160k tokens to the cache again ([ask-timmy](vault/reference/ask-timmy.md), "Limits and money").
 - **2026-11-18 (study time counts listening with the screen off, Claude Code)** — Sam asked whether Perio's study time
   was right on the day before the final, with so many people on it. It was: about 64 hours by 1 pm from 59 people, more than
   twice the same time the day before, and the study-time saves nearly all reached the database (about 15 errors in 10,000).

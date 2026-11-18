@@ -40,8 +40,9 @@ there and in [decisions](../decisions.md)); **deployed and applied at [the redes
      notes_done }], answered_today, drill_today }`, worked out in the browser from the student's own answers.
 2. `timmy_begin` checks the limits, stores the question and returns the last 10 messages (the exact turn sent and the
    exact JSON answered, so the API's prompt cache hits on follow-ups).
-3. The request: the rules, then the site help and the hub's content (on the dashboard, every live hub's, in a fixed
-   order) with a 1-hour cache mark; then the earlier turns; then this turn: `<page>` (hub, voice, today in Central time,
+3. The request: the rules, then the hub's content (on the dashboard, every live hub's, in a fixed order), then the site
+   help, the content and the site help each with a 1-hour cache mark (the site help last since 2026-11-18, so an About
+   page change rewrites only its ~40k tokens, not the hub's 130-160k: "Limits and money" below); then the earlier turns; then this turn: `<page>` (hub, voice, today in Central time,
    view, lecture, paragraph), `<answered_question>` (its choices without letters, the student's pick by its words: the card
    shuffles the choices and shows no letters), `<progress>`, `<student>` (escaped: what a student types is data).
    Model `claude-sonnet-5-5` (Sam, 2026-11-14; built and first tested on `claude-opus-5-5`), effort `medium`, structured output (the schema in `core.js`), the refusal fallback on.
@@ -120,6 +121,15 @@ list, no limit on gap answers. they are uncommon" ([decisions](../decisions.md))
   content is 130-165k tokens (about 420k on the dashboard), cached for an hour that every question starts again, so the
   first question on a hub after an idle hour also writes the cache: about $0.60 ($1.70 on the dashboard). Opus 5.5, as
   first built, cost about twice all of that (measured on 2026-11-12: about $1.10 a hub's cache, 4 cents a question).
+- **Writing the cache is most of the bill.** From 2026-11-14 to 11-18, about $33 in all: $13.50 was the After merge
+  workflow's check (below), and of the students' $20, about $14 was writing a hub's content to the cache, mostly the
+  first question after an idle hour. Two things made it worse, both fixed on 2026-11-18: the After merge workflow asked a
+  real question (about $0.60) after **every** deploy, and a deploy follows nearly every About page change (19 of 23 that
+  week changed only `site.json`), each on the first live hub (Heme & Endo Exam 3, where no student had asked Timmy
+  anything, so every one of its 21 cache writes expired unread; the admin page showed them as the most asked question);
+  and the site help came first in the cached prompt, so each of those deploys sent every hub's whole content to the cache
+  again. Reusing answers wouldn't help: students almost never ask the same thing (a handful of repeats in their first 148
+  questions, all "why is it ..." on a question card, whose answer depends on what they picked).
 
 ## The database (migration_v55)
 
@@ -188,8 +198,11 @@ also how to set Ask Timmy up again on a new project.
    it). `TIMMY_CONTENT_BASE` needs no setting: its default is the released content address
    (`https://smcmurry6-source.github.io/study-hubs/hubs/{hub}/content/`). **After a merge that changes
    `supabase/functions/timmy/`** (`site.json` changes whenever the About page does), the After merge workflow deploys it
-   again by itself and does step 4 ([after-a-merge](../how-to/after-a-merge.md), since 2026-11-15; its chat's visitor id is
-   `after-merge-<commit>`).
+   again by itself ([after-a-merge](../how-to/after-a-merge.md), since 2026-11-15; its chat's visitor id is
+   `after-merge-<commit>`). Since 2026-11-18 it does step 4 only when the function's code changed (`core.js`,
+   `index.ts`), on the live hub whose exam is soonest, where the cache it writes is read by the next students' questions;
+   when only `site.json` changed it sends a question from a mock exam, which the new version answers "paused" without the
+   database, the content or the model: free, and nothing is stored. A deploy can't change the key, so that is enough.
 4. **One real question after every deploy.** The tests use a fake model and a preview answers with made-up replies, so a
    missing or refused key shows only here (at the release every answer was "I nodded off" until step 1's name was
    found). From the live site on a phone; the admin page's Ask Timmy tab shows it, with its cost, and opens its chat.

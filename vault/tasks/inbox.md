@@ -292,3 +292,9 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   on Node 24 for now; `actions/upload-artifact@v4` (3) and `actions/github-script@v7` (2) are likely the same. Before GitHub
   drops Node 20 entirely: move each to the major version that runs on Node 24, and let CI run every job once ("Check hubs" and
   "Release tests" both run when a workflow changes).
+- [ ] **Sam's call: Ask Timmy's first question after an idle hour** (2026-11-18, found while answering why Heme & Endo Exam 3 had 21
+  identical questions): writing a hub's content to the API's cache is most of what students' questions cost (about $14 of their
+  $20 from 11-14 to 11-18), and most of it is the first question on a hub after nobody asked for an hour (about $0.60 each; the
+  cache lasts an hour). The deploys that broke the cache are fixed ([ask-timmy](../reference/ask-timmy.md), "Limits and money").
+  What's left would mean sending less: for example only the exam facts, Exam Hints and the lecture the student is on, with the
+  rest of the notes only when the question needs them. That changes what Timmy can answer, so it needs the eval ($6) and Sam's OK.

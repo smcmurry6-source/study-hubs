@@ -13,7 +13,7 @@ job is to put the right files in its PR and, after the merge, read the workflow'
 | When the push... | It does | Put in your PR |
 |---|---|---|
 | changes a hub's `content/questions.json` (or `tools/question-ids/<hub>.txt`) | loads that hub's answer keys (`node tools/xp/keys.js <hub> --load`) | nothing more |
-| changes `supabase/functions/timmy/` (the About page changes `site.json`) | deploys Ask Timmy (`node tools/timmy/deploy.mjs`), then asks it one real question and fails on a nap ([ask-timmy](../reference/ask-timmy.md), step 4) | nothing more |
+| changes `supabase/functions/timmy/` (the About page changes `site.json`) | deploys Ask Timmy (`node tools/timmy/deploy.mjs`), then, when its code changed (`core.js`, `index.ts`), asks it one real question on the live hub with the soonest exam and fails on a nap ([ask-timmy](../reference/ask-timmy.md), step 4); when only `site.json` changed, a free check that calls no model (since 2026-11-18: a real question cost about $0.60 every time) | nothing more |
 | changes a hub's Timmy Time episode (`podcast` in `content/core.json`: a new id or length) | registers it (`admin_set_podcast_episode`), so listening earns XP | nothing more |
 | changes any site file | waits until GitHub Pages serves it (up to 15 minutes), then runs `node tools/release/postcheck.js` on it | nothing more |
 | adds a file to `tools/data-fixes/` | runs it once on the live database, after the pages are live | the fix, **safe to run twice** (a recount, not an increment), its header saying why |

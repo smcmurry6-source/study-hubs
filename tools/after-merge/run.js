@@ -3,8 +3,10 @@
 // that automatic"). .github/workflows/after-merge.yml runs it on every push to main. It works out from git what the
 // push changed and does only what that needs, in this order (vault/how-to/after-a-merge.md):
 //   keys       a hub's questions changed → load its answer keys (tools/xp/keys.js <hub> --load)
-//   timmy      supabase/functions/timmy/ changed → deploy the function (tools/timmy/deploy.mjs), then ask it one real
-//              question and check it answers (vault/reference/ask-timmy.md, "At the release", step 4)
+//   timmy      supabase/functions/timmy/ changed → deploy the function (tools/timmy/deploy.mjs), then check it serves:
+//              when its code changed (core.js, index.ts), one real question on the live hub with the soonest exam
+//              (vault/reference/ask-timmy.md, "At the release", step 4); when only site.json changed (the About page),
+//              a free check that calls no model (a question asked from a mock exam gets the "paused" answer)
 //   podcast    a hub's Timmy Time episode changed (content/core.json's podcast: its id or length) → tell the server, so
 //              listening earns XP (admin_set_podcast_episode)
 //   live       wait until GitHub Pages serves the push (up to 15 minutes), so what follows meets the new pages
@@ -44,7 +46,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
    to the changelog file. Exported for tools/after-merge/test.js. */
 function plan({ changes, podcast, added, extraFixes, engineHubs }){
   const files = changes.map(c => c.path), touched = p => files.some(f => f === p || f.startsWith(p));
-  const out = { keys: [], timmy: false, podcast: [], site: [], fixes: [], changelog: [], warnings: [] };
+  const out = { keys: [], timmy: false, timmyCode: false, podcast: [], site: [], fixes: [], changelog: [], warnings: [] };
   for (const hub of engineHubs) {
     const qf = `hubs/${hub}/content/questions.json`;
     /* a change to how keys are built (tools/xp/keys.js) reloads every engine hub's */
@@ -55,6 +57,8 @@ function plan({ changes, podcast, added, extraFixes, engineHubs }){
     }
   }
   out.timmy = touched('supabase/functions/timmy/');
+  /* the function's code, not only its site help (site.json changes with every About page edit, several times a day) */
+  out.timmyCode = files.some(f => f.startsWith('supabase/functions/timmy/') && f !== 'supabase/functions/timmy/site.json');
   out.site = changes.filter(c => c.status !== 'D' && isSite(c.path)).map(c => c.path);
   out.fixes = changes.filter(c => c.status === 'A' && /^tools\/data-fixes\/[^/]+\.sql$/.test(c.path)).map(c => c.path).sort();
   for (const f of extraFixes || []) if (!out.fixes.includes(f)) out.fixes.push(f);
@@ -108,8 +112,31 @@ async function sql(query){
   // the rows a fix selects at its end are class data: never printed (the logs are public), only whether it ran
   if (!r.ok) { let msg = text; try { msg = JSON.parse(text).message || text; } catch (e) {} throw new Error(`the database answered ${r.status}: ${scrub(String(msg)).slice(0, 200)}`); }
 }
+/* The hub for the real question: the live one whose next exam is soonest, where students are asking now, so the cache
+   the question writes (about $0.60 of a hub's content) is read by their next questions instead of expiring unused.
+   Pure, for tools/after-merge/test.js: data is hubs.js's SH_DASH_DATA, today a yyyy-mm-dd. */
+function checkHub(liveHubs, data, today){
+  const next = id => {
+    const h = ((data && data.hubs) || []).find(x => x.id === id);
+    const days = ((h && h.exams) || []).map(e => e.date).filter(d => d && d >= today).sort();
+    return days[0] || '9999-12-31';
+  };
+  return liveHubs.slice().sort((a, b) => (next(a) < next(b) ? -1 : next(a) > next(b) ? 1 : liveHubs.indexOf(a) - liveHubs.indexOf(b)))[0] || 'dashboard';
+}
+/* Only site.json changed: check the new version starts and answers, without a model call (free, and nothing is stored).
+   A question asked from a mock exam is answered "paused" before any content, database or model is touched. */
+async function pingTimmy(to){
+  const body = { visitor: 'after-merge-' + to.slice(0, 7), hub: 'dashboard', text: 'Are you there?', chat: null,
+    request: 'am' + to.slice(0, 7) + crypto.randomBytes(6).toString('hex'), voice: 'timmy', context: { view: 'questions/mock' } };
+  const r = await fetch(`${API}/functions/v1/timmy`, { method: 'POST', body: JSON.stringify(body),
+    headers: { 'content-type': 'application/json', origin: ORIGIN, ...(process.env.SB_KEY ? { apikey: process.env.SB_KEY } : {}) } });
+  let d = null; try { d = await r.json(); } catch (e) {}
+  if (!r.ok || !d || !d.ok || d.kind !== 'paused') throw new Error(`the function answered ${r.status}${d && (d.error || d.kind) ? ' (' + (d.error || d.kind) + ')' : ''}, not its "paused" answer: read the function's log (vault/reference/ask-timmy.md)`);
+  return 'only the site help changed: the new version answers (a free check, no model call)';
+}
 async function askTimmy(to, liveHubs){
-  const hub = liveHubs[0] || 'dashboard';
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Chicago' });
+  const hub = checkHub(liveHubs, (() => { try { return require(path.join(ROOT, 'tools', 'release', 'lib.js')).hubData(); } catch (e) { return null; } })(), today);
   const body = { visitor: 'after-merge-' + to.slice(0, 7), hub, text: hub === 'dashboard' ? 'What can the hubs do?' : 'When is the exam, and what is on it?',
     chat: null, request: 'am' + to.slice(0, 7) + crypto.randomBytes(6).toString('hex'), voice: 'timmy', context: { view: 'home' } };
   if (hub === 'dashboard') body.hubs = liveHubs;
@@ -167,11 +194,11 @@ async function main(){
   for (const hub of P.keys) await step('keys', `load ${hub}'s answer keys`, ['SB_KEY', 'ADMIN_SECRET'], async () => {
     const r = node(['tools/xp/keys.js', hub, '--load']); if (!r.ok) throw new Error(r.out.slice(-300)); return `${hub}: ${r.out.split('\n').filter(Boolean).join('; ')}`;
   });
-  if (P.timmy) await step('timmy', 'deploy Ask Timmy and ask it one question', ['SUPABASE_ACCESS_TOKEN'], async () => {
+  if (P.timmy) await step('timmy', P.timmyCode ? 'deploy Ask Timmy and ask it one question' : 'deploy Ask Timmy and check it answers', ['SUPABASE_ACCESS_TOKEN'], async () => {
     const r = node(['tools/timmy/deploy.mjs']); if (!r.ok) throw new Error(r.out.slice(-300));
     const v = (r.out.match(/version \d+/) || ['deployed'])[0];
     await sleep(10000);   // the new version takes a few seconds to serve
-    return `${v}; ${await askTimmy(to, liveHubs)}`;
+    return `${v}; ${P.timmyCode ? await askTimmy(to, liveHubs) : await pingTimmy(to)}`;
   });
   for (const e of P.podcast) await step('podcast', `register ${e.hub}'s episode ${e.id}`, ['SB_KEY', 'ADMIN_SECRET'], async () => {
     if (!(e.seconds >= 60 && e.seconds <= 14400)) throw new Error(`its duration (${e.seconds} s) is outside 60-14400`);
@@ -209,5 +236,5 @@ async function main(){
   console.log('\n✓ after-merge steps done');
 }
 
-module.exports = { plan, isSite };
+module.exports = { plan, isSite, checkHub };
 if (require.main === module) main().catch(e => { console.error(scrub(String(e && e.stack || e))); process.exit(1); });

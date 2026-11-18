@@ -151,12 +151,15 @@ const base = { visitor: "visitor-1", hub: HUB, text: "What does this paragraph m
   eq([p.model, p.output_config.effort, p.output_config.format.type, p.fallbacks, p.betas], [T.MODEL, "medium", "json_schema", "default", ["server-side-fallback-2026-07-01"]], "the request: model, effort, structured output, the refusal fallback");
   ok(!("temperature" in p) && !("top_p" in p) && !("top_k" in p) && !("thinking" in p) && !("tool_choice" in p), "nothing this model rejects (sampling, a thinking setting, forced tools)");
   ok(p.messages[p.messages.length - 1].role === "user", "no prefill: the last message is the student's");
-  eq(p.system.map(s => s.cache_control || null), [null, { type: "ephemeral", ttl: "1h" }], "the rules, then the content with a 1-hour cache mark");
+  eq(p.system.map(s => s.cache_control || null), [null, { type: "ephemeral", ttl: "1h" }, { type: "ephemeral", ttl: "1h" }], "the rules, then the content and the site help, each with a 1-hour cache mark");
   eq(p.cache_control, { type: "ephemeral" }, "the conversation tail is cached for 5 minutes");
-  ok(p.system[0].text === T.RULES && p.system[1].text.includes(`<hub id="${HUB}"`) && p.system[1].text.startsWith("<site_help>"), "the system prompt is the rules, the site help and the hub's content");
+  ok(p.system[0].text === T.RULES && p.system[1].text.startsWith(`<hub id="${HUB}"`) && !p.system[1].text.includes("<site_help>") && p.system[2].text.startsWith("<site_help>"), "the system prompt is the rules, the hub's content, then the site help");
+  const SITE2 = { sections: (SITE.sections || []).concat([{ id: "new", title: "A new feature", items: ["Something new on the About page."] }]) };
+  const later = T.buildRequest([C], SITE2, [], "x");
+  ok(later.system[1].text === p.system[1].text && later.system[2].text !== p.system[2].text, "an About page change leaves the hub's content block as it was (its cache entry holds)");
   const twice = T.buildRequest([C], SITE, [], "x");
   ok(JSON.stringify(twice.system) === JSON.stringify(p.system), "the system prompt is the same for every question on a hub (the cache holds)");
-  ok(!/2026-11-12/.test(p.system[1].text.slice(0, 50000).replace(/\[X\d+\][^\n]*/g, "")) && /"today":"2026-11-12 \(Thursday\)"/.test(p.messages[0].content), "today's date is in the student's turn, not the cached prompt");
+  ok(!/2026-11-12/.test(p.system.slice(1).map(b => b.text).join("\n").replace(/\[X\d+\][^\n]*/g, "")) && /"today":"2026-11-12 \(Thursday\)"/.test(p.messages[0].content), "today's date is in the student's turn, not the cached prompt");
   ok(p.messages[0].content.includes(`"paragraph":"${realUnit.id}"`), `the page tells Timmy which paragraph the student is on (${p.messages[0].content.slice(0, 200)})`);
   const s = JSON.stringify(T.SCHEMA);
   (function every(n){ if (n && typeof n === "object") { if (n.type === "object") ok(n.additionalProperties === false && JSON.stringify(Object.keys(n.properties).sort()) === JSON.stringify([...n.required].sort()), "every object in the schema is closed and requires every property"); Object.values(n).forEach(every); } })(T.SCHEMA);
@@ -228,7 +231,7 @@ ok(!T.quoteIn("Final: 2026", "Final: 2026-11-19") && !T.quoteIn("Final", "Final:
   const out = await T.handle(Object.assign({}, base, { hub: "dashboard", hubs: [...HUBS].reverse().concat(["not-a-hub", "BAD!"]), context: { view: "dashboard" } }), deps(m, db));
   const sys = m.calls[0].system[1].text;
   const order = HUBS.map(h => sys.indexOf(`<hub id="${h}"`));
-  ok(order.every((x, i) => x > 0 && (i === 0 || x > order[i - 1])), "every hub's content, sorted by id, whatever order the page sent");
+  ok(order.every((x, i) => x >= 0 && (i === 0 || x > order[i - 1])), "every hub's content, sorted by id, whatever order the page sent");
   eq(db.calls.begin[0].p_context.hubs, HUBS, "unknown and malformed hubs are left out");
   eq(out.body.paragraphs[0].cites.map(c => [c.id, c.hub]), [[`${HUB}:${realUnit.id}`, HUB]], "dashboard citations carry their hub");
   const m2 = fakeModel(answer([{ text: "x", cites: [] }]));

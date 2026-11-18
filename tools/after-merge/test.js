@@ -2,7 +2,7 @@
 // Checks tools/after-merge/run.js's plan (what a push needs after it merges) on made-up pushes, with nothing sent
 // anywhere. Run by "Check hubs" (the fast job).   node tools/after-merge/test.js
 'use strict';
-const { plan } = require('./run.js');
+const { plan, checkHub } = require('./run.js');
 const fails = [];
 const eq = (name, got, want) => { const g = JSON.stringify(got), w = JSON.stringify(want); if (g !== w) fails.push(`${name}: got ${g}, want ${w}`); };
 const ch = (...a) => a.map(s => ({ status: s[0], path: s.slice(2) }));
@@ -25,6 +25,16 @@ eq('every engine hub\'s keys after a change to how keys are built', p.keys, ['oc
 // Ask Timmy deploys when its function changes, not for the About page alone (its site.json changes with it)
 eq('timmy', plan({ ...base, changes: ch('M supabase/functions/timmy/site.json') }).timmy, true);
 eq('no timmy', plan({ ...base, changes: ch('M about/index.html') }).timmy, false);
+// a real question (about $0.60) only when the function's code changed; the About page alone gets the free check
+eq('site help only: no real question', plan({ ...base, changes: ch('M about/index.html', 'M supabase/functions/timmy/site.json') }).timmyCode, false);
+eq('code: a real question', plan({ ...base, changes: ch('M supabase/functions/timmy/core.js', 'M supabase/functions/timmy/site.json') }).timmyCode, true);
+eq('the wrapper: a real question', plan({ ...base, changes: ch('M supabase/functions/timmy/index.ts') }).timmyCode, true);
+// the real question goes to the live hub whose next exam is soonest (where students are asking), not the first listed
+const dash = { hubs: [{ id: 'heme-endo-exam3', exams: [{ date: '2026-11-20' }] }, { id: 'perio', exams: [{ date: '2026-11-10' }, { date: '2026-11-19' }] }, { id: 'occlusion', exams: [] }] };
+eq('soonest exam', checkHub(['heme-endo-exam3', 'perio', 'occlusion'], dash, '2026-11-18'), 'perio');
+eq('a past exam doesn\'t count', checkHub(['heme-endo-exam3', 'perio'], dash, '2026-11-20'), 'heme-endo-exam3');
+eq('no dates: the first listed', checkHub(['occlusion', 'perio'], { hubs: [] }, '2026-11-18'), 'occlusion');
+eq('no live hub: the dashboard', checkHub([], dash, '2026-11-18'), 'dashboard');
 
 // a data fix runs when it's added, never when it's edited or renamed; --fix adds one by hand
 p = plan({ ...base, changes: ch('A tools/data-fixes/2026-11-20-b.sql', 'A tools/data-fixes/2026-11-20-a.sql', 'M tools/data-fixes/old.sql', 'R tools/data-fixes/moved.sql', 'A tools/data-fixes/notes.md') });

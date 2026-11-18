@@ -693,8 +693,12 @@ function corpusOf(hub, data, prefix){
 let siteCache = null;
 function siteOf(site){ if (!siteCache || siteCache.src !== site) siteCache = { src: site, built: buildSite(site) }; return siteCache.built; }
 
+/* The system prompt is three blocks, each a cache entry of its own: the rules, the hub's content (on the dashboard every
+   live hub's), then the site help. The site help changes with the About page, several times a day, and comes last, so a
+   change to it rewrites only its own ~40k tokens: the hub's content (130-160k tokens, where the cost is) stays cached.
+   With the site help first, as before 2026-11-18, every About page change sent every hub's content to the cache again. */
 export function buildRequest(corpora, site, history, sent){
-  const content = [siteOf(site).text, ...corpora.map(c => c.text)].join("\n\n");
+  const content = corpora.map(c => c.text).join("\n\n");
   const messages = [];
   /* earlier turns, as they were sent and answered; a turn with no stored answer (it failed) is left out */
   for (let i = 0; i < history.length; i++) {
@@ -707,7 +711,8 @@ export function buildRequest(corpora, site, history, sent){
   messages.push({ role: "user", content: sent });
   return withModel({
     model: MODEL, max_tokens: MAX_TOKENS, betas: BETAS, fallbacks: "default",
-    system: [{ type: "text", text: RULES }, { type: "text", text: content, cache_control: { type: "ephemeral", ttl: "1h" } }],
+    system: [{ type: "text", text: RULES }, { type: "text", text: content, cache_control: { type: "ephemeral", ttl: "1h" } },
+      { type: "text", text: siteOf(site).text, cache_control: { type: "ephemeral", ttl: "1h" } }],
     messages,
     cache_control: { type: "ephemeral" },
     output_config: { effort: EFFORT, format: { type: "json_schema", schema: SCHEMA } }
