@@ -93,7 +93,7 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   `tools/figures/site/sets.mjs` (generated from it; `xp.js` fails if they differ). The outfits that aren't drawn yet, the
   snacks are still drafts (`admin_upsert_shop_item` edits them); the boosts' prices were set from the class's earning rate
   in `migration_v62.sql`.
-  **`migration_v65.sql` adds 59 rows** (Sam, 2026-11-18: "Go crazy"; [the task](../tasks/2026-11-18-more-cosmetics.md)), to 240:
+  **`migration_v65.sql` adds 59 rows** (Sam, 2026-11-18: "Go crazy"; [the task](../tasks/done/2026-11-18-more-cosmetics.md)), to 240:
   the six **year-round collections** (48 rows, `COLLECTIONS` in `sets.mjs`, exactly `allCollectionItems()`): eight pieces
   each like a season's set (a Legendary home, an Epic scene, outfits Common to Rare, yard pieces Uncommon to Epic), but
   with `season` null and `rotates`, so they are everyday pieces in the daily and weekly picks; five more **rare costumes**
