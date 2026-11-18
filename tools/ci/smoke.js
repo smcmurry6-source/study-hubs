@@ -922,7 +922,7 @@ function lint(hub, A){
       const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
       const equipped = { 'yard-left': 'garden' };
       const shop = () => ({ day: '2026-11-12', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], costumes: [], snacks_today: 0, boost: null,
-        inventory: ['garden', 'mailbox', 'bowling-lane', 'castle', 'cowboy-hat'].map(id => ({ id, at: '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
+        inventory: ['garden', 'mailbox', 'bowling-lane', 'castle', 'cowboy-hat', 'floss-mummy'].map(id => ({ id, at: '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
         locked: [{ id: 'rank-bronze-outfit', name: 'Bronze outfit', kind: 'outfit', rarity: 'rare', rank_tier: 2 }], equipped: Object.assign({}, equipped) });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rank, mastery: [], shop: shop() }) }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(shop()) }));
@@ -984,8 +984,11 @@ function lint(hub, A){
             /* a year-round collection's piece (the desert's cowboy hat, migration_v65) is under its own tab, Collections,
                headed by its collection, and its drawings (hub-art/place/desert.js) are fetched only because it's owned */
             const co = await page.$('dialog.tpv [data-src="coll"]'); if (co) { await co.click(); await page.waitForTimeout(600); }
-            const coll = await page.evaluate(() => ({ cards: [...document.querySelectorAll('dialog.tpv .tpv-card[data-item]')].map(e => e.dataset.item), head: [...document.querySelectorAll('dialog.tpv .tpv-seth')].map(e => e.textContent) }));
+            const coll = await page.evaluate(() => ({ cards: [...document.querySelectorAll('dialog.tpv .tpv-card[data-item]')].map(e => e.dataset.item), head: [...document.querySelectorAll('dialog.tpv .tpv-seth')].map(e => e.textContent),
+              tabs: (() => { const t = document.querySelector('dialog.tpv .tpv-tabs'); return t ? Math.round(t.getBoundingClientRect().right - t.parentElement.getBoundingClientRect().right) : 0; })(), w: (() => { const d = document.querySelector('dialog.tpv'); return d.scrollWidth - d.clientWidth; })() }));
             if (!co || !coll.cards.includes('cowboy-hat') || coll.head.join() !== 'Desert ranch') problems.push(`${name} (${label}): an owned collection piece should be under Collections, headed by its collection (${JSON.stringify(coll)})`);
+            /* four tabs now (Classics, Collections, Seasonal, Rank): they fit the panel on a phone */
+            if (coll.tabs > 1 || coll.w > 1) problems.push(`${name} (${label}): the outfit tabs run ${coll.tabs}px past their panel (the view scrolls sideways by ${coll.w}px)`);
             if (!asked.includes('hub-art/place/desert.js') || asked.some(u => /hub-art\/place\/(dino|moonbase|reef|arcade|rockshow)\.js/.test(u))) problems.push(`${name} (${label}): only the owned collection's drawings should load (${asked.join(', ')})`);
             const rk = await page.$('dialog.tpv [data-src="rank"]'); if (rk) { await rk.click(); await page.waitForTimeout(300); }
             const lk = await page.evaluate(() => { const l = document.querySelector('dialog.tpv .tpv-card.is-locked'); return l ? l.textContent : ''; });
