@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent: Claude Code
-pr:
+pr: https://github.com/smcmurry6-source/study-hubs/pull/409
 ---
 
 # More cosmetics for Timmy and Timmy's place: six year-round collections, five rare costumes, six paints
@@ -44,24 +44,35 @@ Sam, 2026-11-18: "Lets work on timmy outfits and place cosmetics. Go crazy" (the
 
 ## Done when
 
-- [ ] The six packs drawn, each checked (`node tools/figures/site/build.mjs --pack <k> --dry`) and looked at on its contact sheet, light and dark
-- [ ] The five costumes drawn, with three lines each and their `LORE.md` entries
-- [ ] `node tools/figures/site/build.mjs` (every walk, every combination) and `--check`; the generated files committed
-- [ ] The client: the Collections tab, the shop's collection names and scenes, ten costumes; bundles rebuilt
+- [x] The six packs drawn, each checked (`node tools/figures/site/build.mjs --pack <k> --dry`) and looked at on its contact sheet, light and dark
+- [x] The five costumes drawn, with three lines each and their `LORE.md` entries
+- [x] `node tools/figures/site/build.mjs` (every walk, every combination) and `--check`; the generated files committed
+- [x] The client: the Collections tab, the shop's collection names and scenes, ten costumes; bundles rebuilt
 - [ ] `migration_v65.sql` tested on a throwaway copy (`tools/release/xp.js`), the preview sells the new rows
 - [ ] CI's checks and the release suites pass; a test report in the PR
-- [ ] Contact sheets of all of it sent to Sam; Sam's look and "merge"
+- [ ] Contact sheets of all of it sent to Sam (sent 2026-11-18); Sam's look and "merge"
 - [ ] After the merge: `migration_v65.sql` applied through the connector, appended to `supabase/schema.sql`, its line out of `supabase/pending-migrations.txt` (a small follow-up PR)
-- [ ] About page, Ask Timmy's site help, `DEPLOY_NOTES.md`, the changelog line, this note's Outcome
+- [x] About page, Ask Timmy's site help, `DEPLOY_NOTES.md`, the changelog line, this note's Outcome
 
 ## Log
 
 - 2026-11-18: Sam: "Lets work on timmy outfits and place cosmetics. Go crazy". Planned and started (Claude Code): the lists,
   the kit's plumbing and the client first; the six packs and the costumes drawn in parallel, each by its own agent.
+- 2026-11-18: the drawers stopped at the usage limit partway (their files were kept) and were resumed after it reset. Each
+  pack reviewed on its sheet, day and night: Rock show's night glows near the door made smaller, Moon base's door spot moved
+  out of the front yard slot (it stood in it). Two kit bugs found and fixed on the way ([the bug log](../release/bug-log.md)):
+  BUG-171, a set fetched late never brought its yard eggs' CSS, so seasonal eggs stayed hidden on the live site; BUG-172
+  (CI), the kit's lists after `addPack` dropped `coll`, so the Collections tab came up empty. The build checks both now.
 
 ## Outcome
 
-(Filled in when the PR is ready.)
+[#409](https://github.com/smcmurry6-source/study-hubs/pull/409). Six collections (48 pieces, `widget/hub-art/place/<k>.js`,
+45-55 KB each, fetched only where a place shows one), five costumes and six paints, the Collections tab, the shop's collection
+names and scenes, and `migration_v65.sql` (59 rows; applied after the merge). Two shared files grow and are still fetched on
+first use only: the kit (`widget/hub-art/place.js`, 269 to 302 KB, the costumes) and `widget/hub-art/outfits.js` (187 to 292 KB,
+88 outfits). Left for later, in [the inbox](inbox.md): a tall piece in the front yard slot covers Timmy at the door (as July 4's
+fireworks and Thanksgiving's balloon already do), and kit niceties the drawers asked for (eggs that move the whole piece, a
+coral and a moon tree, no snow under the sea). Its status stays in-progress until Sam's "merge" and the migration.
 
 Related: [the shop](done/2026-11-06-redesign-timmy-shop.md) · [Timmy's place](done/2026-11-06-redesign-timmys-place.md) ·
 [draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md) · [game-server](../reference/game-server.md) · [the inbox](inbox.md)
