@@ -48,7 +48,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   three client lists follow it), `tools/ci/smoke.js` (Collections in the customizer, only the owned collection's file
   loads; ten costume shapes), the preview's catalog reads a later migration's inserts (`tools/preview/transform.js`). The
   design page has a "year-round collections" gallery. About page (the shop's entry) and Ask Timmy's site help.
-
+  **A bug from before, fixed:** a set fetched late (`addPack`, which is how every page gets one) never added its yard eggs'
+  animation rules to the kit's CSS, so tapping a seasonal yard piece said its line but its egg stayed hidden; `addPack`
+  appends them now, and `tools/figures/site/build.mjs` fails if a late kit lacks any. Moon base's door spot moved out of the
+  front yard slot. To do from it (the inbox): a tall front-slot piece covers Timmy at the door; kit niceties the drawers asked for.
+- **2026-11-18 (Heme & Endo Exam 3: L19 and L20 taught, and every High Likelihood question marked, Claude Code, #404)** — `hubs/heme-endo-exam3/content/`, `tools/figures/heme-endo-exam3/`, `audio/hemeintro-*` and `audio/lymleuk-*`, `tools/hub-next/build.mjs`. L19 (Dr. Herr) and L20 (Dr. Borak) were checked against their 11/17 recordings: notes at both levels follow what was said, every key reread, L19 57 to 72 questions and L20 57 to 65 (`ll-hl-case`, `ll-2s-scatter` and `ll-specimen` retired: Hodgkin subtypes and flow cytometry, said not needed), 16 and 18 Exam Hints, topics re-ranked with the study guide's first, their ten figures corrected, and two new figures (Fig 23 `nkcheck`, Fig 24 `nodespread`); all three narration levels recorded again. BUG-164: the study guide's re-ranking (#393) had left 77 questions in a topic without their `likely` flag (the bank's toggle, the mock's share and the drill missed them); the content build now sets `likely` from `likelyTopics` on every engine hub (Occlusion and Perio unchanged). Flags: [the hub note](vault/hubs/heme-endo-exam3.md).
 - **2026-11-18 (Link my devices beside every name button, BUG-169 and BUG-170, Claude Code)** — Sam: "link my device is
   nowhere to be found. add it to the settings page next to where you change your name. anywhere else that you can change
   your name, add another button to link device". Since the redesign it lived only in an old hub's Stats panel, which the
