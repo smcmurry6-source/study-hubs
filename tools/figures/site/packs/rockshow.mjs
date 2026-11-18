@@ -28,6 +28,24 @@ export function pack(T){
     for (var i = 0; i <= k; i++){ if (i === k && s1 - s0 >= 360) break; var t = (s0 + (s1 - s0) * i / k) * Math.PI / 180, u = uc + Math.cos(t) * r, v = vc + Math.sin(t) * r; out.push(face === "y" ? [u, pl, v] : [pl, u, v]); }
     return out;
   }
+  /* a drawing made in screen units on a wall: face "y" (the wall turned left, the plane y = pl) or "x" (turned right,
+     x = pl), its local origin at (u, v) on that wall, local x along the wall, local y down it */
+  function onWall(face, pl, u, v, svg, k){
+    var c = face === "y" ? P(u, pl, v) : P(pl, u, v);
+    return '<g transform="matrix(' + (face === "y" ? ".866 .5" : ".866 -.5") + " 0 1 " + m(c[0], c[1]) + ')"' + ">" + (k ? '<g transform="scale(' + k + ')">' + svg + "</g>" : svg) + "</g>";
+  }
+  /* a small electric guitar standing up, neck to the top, about 44 tall (a sign, a guitar on a stand) */
+  function upGuitar(body, guard){
+    var s = '<path d="M-1.7 -1 V-23 H1.7 V-1 Z" fill="#C98E58" stroke="' + INK + '" stroke-width="1.6"/><path d="M-1 -2 V-22.4 H1 V-2 Z" fill="#6B4128"/>' +
+      '<path d="M-2.4 -22.4 L-3.2 -29.6 Q0 -31.6 3.2 -29.6 L2.4 -22.4 Z" fill="#2B2630" stroke="' + INK + '" stroke-width="1.5"/>' +
+      '<path d="M-3.4 -24.4 h-1.6 M-3.6 -27.4 h-1.6 M3.4 -24.4 h1.6 M3.6 -27.4 h1.6" stroke="' + INK + '" stroke-width="1.6" stroke-linecap="round"/>' +
+      '<path d="M-2.6 -1.6 C-3 -6 -5.6 -8.4 -7.2 -6.2 C-9.8 -2.6 -9.4 1.8 -7.6 4.4 C-10.6 7.6 -10 13.6 -5.6 15.4 C-2 16.8 2 16.8 5.6 15.4 C10 13.6 10.6 7.6 7.6 4.4 C9.4 1.8 9.6 -2.4 8 -5 C6.6 -7.4 3.6 -6.2 2.6 -1.6 Z" fill="' + body + '" stroke="' + INK + '" stroke-width="1.8"/>' +
+      '<path d="M1 3 C4 3 7.4 5 7.4 9 C7.4 12.4 4 14 1 12.6 Z" fill="' + (guard || WHT) + '" stroke="' + INK + '" stroke-width="1"/>' +
+      '<path d="M-2.6 3.4 h5.2 M-2.6 7 h5.2" stroke="' + INK + '" stroke-width="1.8" stroke-linecap="round"/><path d="M-2 10.8 h4" stroke="#D5DBE1" stroke-width="1.6" stroke-linecap="round"/>' +
+      '<path d="M-.5 -21 V10.4 M.5 -21 V10.4" stroke="#F4F4F4" stroke-width=".35" opacity=".9"/>' +
+      '<path d="M-6.4 -3 C-6.4 -5 -5.4 -6 -4.6 -6" fill="none" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>';
+    return s;
+  }
   /* the convex hull of screen points, as a closed path */
   function hull(pts){
     pts = pts.slice().sort(function(a, b){ return a[0] - b[0] || a[1] - b[1]; });
@@ -66,6 +84,20 @@ export function pack(T){
   }
 
   /* ------------------------------------------------------------------ the home: a record shop ---------------------- */
+  /* a record sleeve, s px square, its art in white on its color; rec: a record peeking out of it, its label that color */
+  function sleeve(sz, col, art, rec){
+    var h = sz / 2, s = "";
+    if (rec) s += circ(h * .55, -h * .1, h * .92, "#1E1A24", .8) + circ(h * .55, -h * .1, h * .3, rec, 0);
+    s += '<path d="M' + m(-h, -h) + " h" + f(sz) + " v" + f(sz) + " h" + f(-sz) + ' z" fill="' + col + '" stroke="' + INK + '" stroke-width=".9"/>';
+    if (art === "dot") s += circ(0, 0, h * .56, "#FFFFFF", .7) + circ(0, 0, h * .18, col, 0);
+    else if (art === "bolt") s += bolt(0, 0, h * .17, YEL[0], .7);
+    else if (art === "stripe") s += L("M" + m(-h, -h * .3) + " h" + f(sz) + " M" + m(-h, h * .3) + " h" + f(sz), 1.3, "#FFFFFF", .9);
+    else if (art === "tooth") s += T.tinyTooth(0, .3, h * .19, "#FFFFFF");
+    else if (art === "star") s += T.star5(0, 0, h * .62, "#FFFFFF");
+    else if (art === "tri") s += FO("M" + m(-h * .55, h * .45) + " L" + m(0, -h * .55) + " L" + m(h * .55, h * .45) + " Z", "#FFFFFF", .7);
+    else if (art === "wave") s += L("M" + m(-h * .7, 0) + " q" + m(h * .35, -h * .6) + " " + m(h * .7, 0) + " q" + m(h * .35, h * .6) + " " + m(h * .7, 0), 1.3, "#FFFFFF");
+    return s;
+  }
   var homes = {
     "record-shop": {
       note: "A two-story record shop: a giant record on the roof, striped awnings, sleeves in the window and a guitar sign",
@@ -84,75 +116,61 @@ export function pack(T){
         s += FO(D([[x0, y1, 0], [x1, y1, 0], [x1, y1, zw], [x0, y1, zw]]), wp.c);
         for (z = .36; z < zw - .1; z += .36) s += L(D([[x0, y1, z], [x1, y1, z]], true), .6, INK, .11);
         s += L(D([[x1, y1, .05], [x1, y1, zw]], true), 1.4, "#FFFFFF", .35);
-        /* the side wall: gig posters, a window upstairs */
-        [[3.95, 4.95, .55, 1.9, PINK[0], 0], [5.2, 6.05, .75, 2.15, YEL[0], 1], [6.3, 7.3, .5, 1.75, "#9B7BE0", 2], [7.45, 8.2, 1.05, 2.3, WHT, 3]].forEach(function(t){
-          s += FO(onX(t[0], t[1], t[2], t[3]), t[4], 1.1);
-          var c = P(x1, (t[0] + t[1]) / 2, (t[2] + t[3]) / 2);
-          if (t[5] === 0) s += circ(c[0], c[1] - 1.4, 3, YEL[0], .8) + L("M" + m(c[0] - 3, c[1] + 4.6) + " l6 3.4", 1.4, INK, .8);
-          else if (t[5] === 1) s += bolt(c[0], c[1], 1.15, RED[0], .8);
-          else if (t[5] === 2) s += T.star5(c[0], c[1] - .6, 4, YEL[0]);
-          else s += T.tinyTooth(c[0], c[1], .7, "#FFFFFF") + L("M" + m(c[0] - 3.4, c[1] + 6) + " l6.4 3.6", 1.2, RED[0]);
-        });
-        var w = T.win("x", x1, 4.4, 5.6, 4.5, 5.85, { night: o.night }); s += w.s; lights += w.lights;
+        /* the side wall: gig posters, pasted up a little crooked, and a window upstairs */
+        var poster = function(w, h, col, art, tilt){
+          var g = '<g transform="rotate(' + tilt + ')"><path d="M' + m(-w / 2, -h / 2) + " h" + f(w) + " v" + f(h) + " h" + f(-w) + ' z" fill="' + col + '" stroke="' + INK + '" stroke-width="1.2"/>';
+          if (art === 0) g += circ(0, -h * .14, w * .26, YEL[0], .8) + L("M" + m(-w * .3, h * .26) + " h" + f(w * .6) + " M" + m(-w * .3, h * .38) + " h" + f(w * .4), 1.1, "#FFFFFF", .9);
+          else if (art === 1) g += bolt(0, -h * .04, w * .12, RED[0], .8);
+          else if (art === 2) g += T.star5(0, -h * .08, w * .34, YEL[0]) + L("M" + m(-w * .3, h * .32) + " h" + f(w * .6), 1.1, "#FFFFFF", .9);
+          else g += T.tinyTooth(0, -h * .1, w * .065, "#FFFFFF") + L("M" + m(-w * .3, h * .3) + " h" + f(w * .6), 1.4, RED[0]);
+          return g + '<circle cx="0" cy="' + f(-h / 2 + 1.2) + '" r=".7" fill="' + INK + '"/></g>';
+        };
+        [[4.45, 1.25, 10, 14, PINK[0], 0, -3], [5.55, 1.45, 9, 15, YEL[0], 1, 2], [6.6, 1.15, 10, 13, "#9B7BE0", 2, -2], [7.65, 1.5, 9, 13, "#3B3644", 3, 3]].forEach(function(t){ s += onWall("x", x1, t[0], t[1], poster(t[2], t[3], t[4], t[5], t[6])); });
+        var w = T.win("x", x1, 4.35, 5.55, 4.5, 5.85, { night: o.night }); s += w.s; lights += w.lights;
         /* the fascia over the shopfront, round the corner: a tooth between two notes */
         s += FO(onX(y0, y1 + .04, zf0, zf1, x1 + .03), ac.s, 1.3) + FO(onY(x0 - .04, x1 + .03, zf0, zf1, y1 + .04), ac.c, 1.4);
-        q = P(5.5, y1 + .04, (zf0 + zf1) / 2); s += T.tinyTooth(q[0], q[1] + .3, .62, "#FFFFFF");
-        [[3.7, 0], [7.25, 1]].forEach(function(t){ var c = P(t[0], y1 + .04, (zf0 + zf1) / 2 - .12); s += note(c[0] - 1.5, c[1] + 2.4, !!t[1], "#FFFFFF"); });
-        [3.15, 4.3, 6.75, 7.9].forEach(function(t){ var c = P(t, y1 + .04, (zf0 + zf1) / 2); s += circ(c[0], c[1], .9, YEL[0], .5); });
-        /* the shop windows: record sleeves on a dark shelf, lit at night */
-        var shop = function(a, b, night, list){
-          var g = FO(onY(a - .1, b + .1, .3, 2.75), WHT, 1.5) + FO(onY(a, b, .4, 2.65), night ? K.lit : "#463C55", 1.1);
-          list.forEach(function(t){
-            var u0 = t[0], v0 = t[1], sz = t[2], c = P(u0 + sz / 2, y1, v0 + sz / 2);
-            if (t[5]){ var rc = P(u0 + sz * .82, y1, v0 + sz * .62); g += circ(rc[0], rc[1], sz * 4.1, "#1E1A24", .8) + circ(rc[0], rc[1], sz * 1.4, t[5], 0); }
-            g += FO(onY(u0, u0 + sz, v0, v0 + sz), t[3], .9);
-            if (t[4] === "dot") g += circ(c[0], c[1], sz * 2.9, "#FFFFFF", .6) + circ(c[0], c[1], sz * 1, t[3], 0);
-            else if (t[4] === "bolt") g += bolt(c[0], c[1], sz * .9, YEL[0], .7);
-            else if (t[4] === "stripe") g += L(D(T.onY(y1, [[u0, v0 + sz * .35], [u0 + sz, v0 + sz * .35]]), true) + D(T.onY(y1, [[u0, v0 + sz * .65], [u0 + sz, v0 + sz * .65]]), true), 1.4, "#FFFFFF", .9);
-            else if (t[4] === "tooth") g += T.tinyTooth(c[0], c[1] + .3, sz * .95, "#FFFFFF");
-            else if (t[4] === "star") g += T.star5(c[0], c[1], sz * 5.4, "#FFFFFF");
-            else if (t[4] === "tri") g += FO("M" + m(c[0] - sz * 4.6, c[1] + sz * 3.2) + " l" + m(sz * 4.6, -sz * 7) + " l" + m(sz * 4.6, sz * 7) + " z", "#FFFFFF", .6);
-          });
-          g += L(D(T.onY(y1, [[a, .78], [b, .78]]), true), 1.6, "#8A6A4A");
-          if (!night) g += T.HI(D(T.onY(y1, [[a + .15, 2.45], [a + .55, 2.05]]), true), 1.4);
+        s += onWall("y", y1 + .04, 5.5, (zf0 + zf1) / 2, T.tinyTooth(0, .4, .66, "#FFFFFF") + note(-11, 2.4, true, "#FFFFFF") + note(9, 2.6, false, "#FFFFFF") + circ(-26, 0, .9, YEL[0], .5) + circ(24, 0, .9, YEL[0], .5));
+        s += onWall("x", x1 + .03, 6.0, (zf0 + zf1) / 2, note(-6, 2.4, true, "#FFFFFF") + circ(8, 0, .9, YEL[0], .5) + circ(-16, 0, .9, YEL[0], .5));
+        /* the shop windows: record sleeves on a shelf, lit at night */
+        var shop = function(a, b, v0, v1, list){
+          var g = FO(onY(a - .1, b + .1, v0 - .1, v1 + .1), WHT, 1.5) + FO(onY(a, b, v0, v1), o.night ? K.lit : "#463C55", 1.1);
+          g += L(D(T.onY(y1, [[a, v0 + .32], [b, v0 + .32]]), true), 1.6, "#8A6A4A");
+          list.forEach(function(t){ g += onWall("y", y1, t[0], t[1], sleeve(t[2], t[3], t[4], t[5])); });
+          if (!o.night) g += T.HI(D(T.onY(y1, [[a + .12, v1 - .25], [a + .5, v1 - .62]]), true), 1.4);
           return g;
         };
-        var big = [[3.05, 1.55, .62, PINK[0], "dot", "#E5484D"], [3.8, 1.62, .62, YEL[0], "bolt"], [4.5, 1.5, .3, TEAL[0], ""],
-          [3.12, .82, .62, "#9B7BE0", "stripe"], [3.88, .82, .62, RED[0], "tooth"], [4.55, .82, .62, "#3FA7E0", "star", YEL[0]]];
-        var small = [[6.3, .82, .62, YEL[0], "tri"], [6.95, .82, .62, "#3ECF9E", "dot"], [6.4, 1.6, .62, RED[0], "star", TEAL[0]], [7.25, 1.58, .46, PINK[0], ""]];
-        s += shop(3.0, 4.95, o.night, big) + shop(6.25, 7.95, o.night, small);
-        if (o.night){
-          q = P(4.0, y1, 1.6); lights += T.glowAt(q[0], q[1], 14) + shop(3.0, 4.95, true, big);
-          q = P(7.1, y1, 1.6); lights += T.glowAt(q[0], q[1], 12) + shop(6.25, 7.95, true, small);
-        }
+        s += shop(3.0, 4.7, .35, 2.35, [[3.34, 1.66, 6.4, "#9B7BE0", "stripe"], [3.95, 1.62, 6.4, PINK[0], "dot", RED[0]], [4.48, 1.66, 4.4, TEAL[0], "wave"],
+          [3.28, .98, 6.4, YEL[0], "bolt"], [3.92, .98, 6.4, RED[0], "tooth"], [4.48, .98, 6.4, "#3FA7E0", "star"]]);
+        s += shop(6.4, 7.9, .9, 2.35, [[6.72, 1.84, 6, TEAL[0], "tri", YEL[0]], [7.4, 1.86, 5.6, PINK[0], "star"], [6.75, 1.46, 6.2, YEL[0], "dot"], [7.42, 1.48, 6.2, "#3ECF9E", "wave"]]);
+        if (o.night){ q = P(3.85, y1, 1.35); lights += T.glowAt(q[0], q[1], 14); q = P(7.15, y1, 1.6); lights += T.glowAt(q[0], q[1], 11); }
         /* the door, a round window in it, its step and a lamp over it */
-        s += FO(onY(5.0, 6.0, 0, 2.62), WHT, 1.5) + FO(onY(5.1, 5.9, 0, 2.52), ac.s, 1.4);
-        s += L(D(T.onY(y1, T.rectUV(5.22, 5.78, .25, 1.1))), .8, INK, .4);
-        var pw = T.porthole("y", y1, 5.5, 1.78, .27, { night: o.night }); s += pw.s; lights += pw.lights;
-        q = P(5.82, y1, 1.15); s += circ(q[0], q[1], 1, CHROME[0], .8);
+        s += FO(onY(4.95, 6.05, 0, 2.62), WHT, 1.5) + FO(onY(5.05, 5.95, 0, 2.52), ac.s, 1.4);
+        s += L(onY(5.2, 5.8, .25, 1.05), .8, INK, .4);
+        var pw = T.porthole("y", y1, 5.5, 1.72, .27, { night: o.night }); s += pw.s;
+        if (o.night){ q = P(5.5, y1, 1.72); lights += T.glowAt(q[0], q[1], 6); }
+        q = P(5.82, y1, 1.12); s += circ(q[0], q[1], 1, CHROME[0], .8);
         s += box(4.85, y1, 0, 1.3, .42, .14, { top: "#E6E1EA", left: K.stone, right: K.stoneShade }, { sw: 1.3, si: .8 });
-        q = P(5.5, y1 + .05, 3.05); s += L("M" + m(q[0], q[1] - 1) + " v2.4", 1.1) + FO("M" + m(q[0] - 2.6, q[1] + 1.4) + " h5.2 l-1 3.4 h-3.2 z", o.night ? K.lit : "#FFE9A8", .9);
-        if (o.night) lights += T.glowAt(q[0], q[1] + 3.4, 8);
+        q = P(5.5, y1 + .05, 3.02); s += L("M" + m(q[0], q[1] - 1) + " v2.4", 1.1) + FO("M" + m(q[0] - 2.4, q[1] + 1.4) + " h4.8 l-1 3 h-2.8 z", o.night ? K.lit : "#FFE9A8", .9);
+        if (o.night) lights += T.glowAt(q[0], q[1] + 3, 6);
         /* striped awnings over both windows, scalloped along the front */
         var awning = function(a, b){
-          var zt = 3.2, zb = 2.86, yo = y1 + .66, n = Math.max(3, Math.round((b - a) / .3)), ww = (b - a) / n, g = "", k;
+          var zt = 3.26, zb = 3.0, yo = y1 + .52, n = Math.max(3, Math.round((b - a) / .3)), ww = (b - a) / n, g = "", k;
           for (k = 0; k < n; k++) g += F(D([[a + k * ww, y1, zt], [a + (k + 1) * ww, y1, zt], [a + (k + 1) * ww, yo, zb], [a + k * ww, yo, zb]]), k % 2 ? WHT : ac.c);
-          if (o.snow) g += F(D([[a, y1, zt], [b, y1, zt], [b, y1 + .4, zt - .2], [a, y1 + .4, zt - .2]]), "#FFFFFF");
+          if (o.snow) g += F(D([[a, y1, zt], [b, y1, zt], [b, y1 + .34, zt - .17], [a, y1 + .34, zt - .17]]), "#FFFFFF");
           g += O(D([[a, y1, zt], [b, y1, zt], [b, yo, zb], [a, yo, zb]]), 1.4);
-          g += FO(D([[b, y1, zt], [b, yo, zb], [b, yo, zb - .3], [b, y1, zb - .1]]), ac.s, 1.2);
+          g += FO(D([[b, y1, zt], [b, yo, zb], [b, yo, zb - .26], [b, y1, zb - .05]]), ac.s, 1.2);
           for (k = 0; k < n; k++){
             var A = P(a + k * ww, yo, zb), B = P(a + (k + 1) * ww, yo, zb);
-            g += FO("M" + m(A[0], A[1]) + " L" + m(B[0], B[1]) + " L" + m(B[0], B[1] + 2.8) + " Q" + m((A[0] + B[0]) / 2, (A[1] + B[1]) / 2 + 6.6) + " " + m(A[0], A[1] + 2.8) + " Z", k % 2 ? WHT : ac.c, 1);
+            g += FO("M" + m(A[0], A[1]) + " L" + m(B[0], B[1]) + " L" + m(B[0], B[1] + 2.4) + " Q" + m((A[0] + B[0]) / 2, (A[1] + B[1]) / 2 + 5.8) + " " + m(A[0], A[1] + 2.4) + " Z", k % 2 ? WHT : ac.c, 1);
           }
           return g;
         };
-        s += awning(2.92, 5.0) + awning(6.15, 8.08);
-        /* upstairs: two windows with sills */
+        s += awning(2.9, 4.82) + awning(6.28, 8.04);
+        /* upstairs: two windows with sills, a round record sign between them */
         [[3.55, 4.75], [6.25, 7.45]].forEach(function(t){
           var ww = T.win("y", y1, t[0], t[1], 4.5, 5.95, { night: o.night }); s += ww.s; lights += ww.lights;
           s += box(t[0] - .12, y1, 4.32, t[1] - t[0] + .24, .18, .12, { top: WHT, left: WHT, right: "#E3DCCB" }, { sw: 1.1, si: .7 });
         });
-        /* between them, a round sign: a record */
         q = P(5.5, y1, 5.2); s += circ(q[0], q[1], 6.4, "#1E1A24", 1.3) + circ(q[0], q[1], 4.3, "none", 0).replace('fill="none"', 'fill="none" stroke="#4E4858" stroke-width=".8"') + circ(q[0], q[1], 2.2, RED[0], .7) + circ(q[0], q[1], .5, INK);
         /* the cornice and the flat roof */
         s += box(x0 - .15, y0 - .15, zw, x1 - x0 + .3, y1 - y0 + .3, .3, { top: o.snow ? "#FFFFFF" : "#5E5566", left: WHT, right: "#E3DCCB" }, { sw: 1.6, si: 1 });
@@ -161,15 +179,10 @@ export function pack(T){
         if (u.flag) s += T.flagOn(7.8, 4.0, zw + .3, 2.0);
         else s += cyl(7.7, 4.1, zw + .3, .2, zw + .85, .2, CHROME[0], CHROME[1], "#8E98A3", { sw: 1.3, si: .8 });
         /* the guitar sign on its bracket off the side wall, hung in the plane y = ys */
-        var ys = 7.55, gu = 9.0, gb = [[gu, 4.25, .5, .46], [gu, 4.98, .38, .34]], arm = [[x1, ys, 6.42], [9.45, ys, 6.42]];
-        s += rod(D(arm, true), 1.6, "#3B2E3A") + rod(D([[x1, ys, 5.9], [8.75, ys, 6.42]], true), 1, "#3B2E3A");
-        q = P(gu, ys, 6.42); var q2 = P(gu, ys, 6.12); s += L("M" + m(q[0], q[1]) + " L" + m(q2[0], q2[1]), 1.1);
-        var lobes = gb.map(function(e){ var pts = []; for (var k = 0; k < 20; k++){ var t = k / 20 * Math.PI * 2; pts.push([e[0] + Math.cos(t) * e[2], ys, e[1] + Math.sin(t) * e[3]]); } return D(pts); });
-        s += FO(lobes[0], YEL[0], 1.5) + FO(lobes[1], YEL[0], 1.5) + F(lobes[0], YEL[0]) + F(lobes[1], YEL[0]);
-        s += F(D(T.onY(ys, [[gu - .05, 3.9], [gu + .38, 4.05], [gu + .3, 4.6], [gu - .05, 4.5]])), RED[0], .9);
-        s += FO(D(T.onY(ys, T.rectUV(gu - .09, gu + .09, 5.2, 6.0))), "#C98E58", 1.1) + FO(D(T.onY(ys, [[gu - .14, 5.95], [gu + .14, 5.95], [gu + .17, 6.14], [gu - .17, 6.14]])), "#3B2E3A", 1.1);
-        s += FO(D(T.onY(ys, T.rectUV(gu - .2, gu + .2, 4.55, 4.66))), INK, .6) + FO(D(T.onY(ys, T.rectUV(gu - .2, gu + .2, 4.2, 4.31))), INK, .6);
-        for (i = 0; i < 3; i++) s += L(D(T.onY(ys, [[gu - .09, 5.4 + i * .2], [gu + .09, 5.4 + i * .2]]), true), .5, INK, .6);
+        var ys = 7.55, gu = 9.05, arm = [[x1, ys, 6.42], [9.5, ys, 6.42]];
+        s += rod(D(arm, true), 1.6, "#3B2E3A") + rod(D([[x1, ys, 5.75], [8.8, ys, 6.42]], true), 1, "#3B2E3A");
+        q = P(gu, ys, 6.42); var q2 = P(gu, ys, 6.2); s += L("M" + m(q[0], q[1]) + " L" + m(q2[0], q2[1]), 1.1);
+        s += onWall("y", ys, gu, 5.0, upGuitar(YEL[0], RED[0]), .64);
         /* the giant record on the roof, on two struts */
         var rc = [5.5, 6.25, 9.15], R = 2.25;
         [4.55, 6.45].forEach(function(t){ s += box(t - .08, rc[1] - .3, zw + .3, .16, .16, 1.9, { top: "#8E98A3", left: CHROME[0], right: CHROME[1] }, { sw: 1.1, si: .6 }); });
@@ -178,7 +191,7 @@ export function pack(T){
         s += FO(D(ring("y", rc[1], rc[0], rc[2], R, 36)), "#25212B", 1.8);
         [1.95, 1.7, 1.45, 1.2].forEach(function(r, k){ s += L(D(ring("y", rc[1], rc[0], rc[2], r, 30)), .7, k % 2 ? "#3E3946" : "#4E4858"); });
         s += L(D(ring("y", rc[1], rc[0], rc[2], 1.85, 12, 110, 170), true), 2.2, "#FFFFFF", .32) + L(D(ring("y", rc[1], rc[0], rc[2], 1.45, 8, 120, 160), true), 1.6, "#FFFFFF", .22);
-        s += FO(D(ring("y", rc[1], rc[0], rc[2], .82, 24)), o.night ? "#FF7A9C" : RED[0], 1.2) + FO(D(ring("y", rc[1], rc[0], rc[2], .58, 20)), o.night ? "#FFC2D2" : "#FF8F93", 0) ;
+        s += FO(D(ring("y", rc[1], rc[0], rc[2], .82, 24)), o.night ? "#FF7A9C" : RED[0], 1.2) + F(D(ring("y", rc[1], rc[0], rc[2], .58, 20)), o.night ? "#FFC2D2" : "#FF8F93");
         q = P(rc[0], rc[1], rc[2]); s += T.tinyTooth(q[0], q[1] - 1.6, .62, "#FFFFFF") + circ(q[0], q[1] + 4.2, .9, "#141118");
         if (o.snow){ var top = ring("y", rc[1] + .02, rc[0], rc[2], R + .06, 14, 32, 148), bot = ring("y", rc[1] + .02, rc[0], rc[2], R - .34, 14, 148, 32); s += FO(D(top.concat(bot)), "#FFFFFF", 1.1); }
         if (o.night){
@@ -192,8 +205,9 @@ export function pack(T){
   };
 
   /* ------------------------------------------------------------------ the scene: a festival field ------------------ */
-  var HT = T.HILL_TOP;
-  function stage(o){
+  var HT = T.HILL_TOP, SDX = -22, SDY = -10;     // the stage is drawn round x 326 and moved here, clear of the picture's edge
+  function stage(o){ return T.T(SDX, SDY, stageAt(o)); }
+  function stageAt(o){
     var nt = o.night, s = "", i, x;
     var blk = nt ? "#1E1B26" : "#2E2A36", blk2 = nt ? "#2E2A38" : "#45404F", tr = nt ? "#8E98A3" : "#C9D1D9";
     /* the canopy and the backdrop */
@@ -222,9 +236,9 @@ export function pack(T){
   }
   function crowd(o){
     var R = T.rng(77), s = "", cols = o.night ? ["#B9A0D8", "#8FC9C6", "#D9A0B8", "#C9C08E", "#E6E0EA"] : ["#F2735E", "#FFD23F", TEAL[0], "#9B7BE0", "#FFFFFF", PINK[0]];
-    for (var row = 0; row < 6; row++) for (var x = 268 + (row % 2) * 1.8; x < 372; x += 3.4){
-      var y = 108 + row * 3.4 + R() * 1.4, xx = x + R() * 1.2;
-      if (y > HT(xx) - 1.4 || (xx > 288 && xx < 364 && y < 108)) continue;
+    for (var row = 0; row < 7; row++) for (var x = 246 + (row % 2) * 1.8; x < 372; x += 3.4){
+      var y = 98 + row * 3.4 + R() * 1.4, xx = x + R() * 1.2;
+      if (y > HT(xx) - 1.4) continue;
       s += circ(xx, y, 1.3, cols[(row * 7 + Math.round(x)) % cols.length], 0);
       if (R() < .16) s += L("M" + m(xx, y - 1) + " l" + (R() < .5 ? -1.4 : 1.4) + " -3", .8, cols[(row + 2) % cols.length]);
       if (o.night && R() < .1) s += circ(xx, y - 3.4, 1.8, "#FFE9A8", 0).replace("/>", ' opacity=".5"/>');
@@ -240,13 +254,13 @@ export function pack(T){
         if (o.night){
           var s = T.bands(["#170F3A", "#21164E", "#2E1F64", "#41297A"], 0, 300) + T.starField(17, 20, 110);
           /* the stage lights fan up into the sky */
-          [[300, -38, "#FF6FB5"], [312, -18, "#FFE9A8"], [326, 4, "#7FF0E4"], [340, 20, "#FFE9A8"], [352, 40, "#FF6FB5"]].forEach(function(b){
-            var a = b[1] * Math.PI / 180, len = 120, w = .1, x1 = b[0] + Math.sin(a - w) * len, y1 = 58 - Math.cos(a - w) * len, x2 = b[0] + Math.sin(a + w) * len, y2 = 58 - Math.cos(a + w) * len;
-            s += F("M" + m(b[0] - 1.5, 58) + " L" + m(x1, y1) + " L" + m(x2, y2) + " L" + m(b[0] + 1.5, 58) + " Z", b[2], .2);
+          [[298, -40, "#FF6FB5"], [309, -20, "#FFE9A8"], [320, -4, "#7FF0E4"], [331, 12, "#FFE9A8"], [342, 28, "#7FF0E4"], [353, 44, "#FF6FB5"]].forEach(function(b){
+            var a = b[1] * Math.PI / 180, len = 130, w = .09, bx = b[0] + SDX, by = 58 + SDY, x1 = bx + Math.sin(a - w) * len, y1 = by - Math.cos(a - w) * len, x2 = bx + Math.sin(a + w) * len, y2 = by - Math.cos(a + w) * len;
+            s += F("M" + m(bx - 1.5, by) + " L" + m(x1, y1) + " L" + m(x2, y2) + " L" + m(bx + 1.5, by) + " Z", b[2], .2);
           });
           return s + T.moon(78, 40);
         }
-        return T.bands(["#A9DCF7", "#BDE5F9", "#D2EEFB", "#E7F6FC"], 0, 300) + T.sun(76, 42) + T.cloud(256, 22, .7) + T.cloud(146, 16, .55);
+        return T.bands(["#A9DCF7", "#BDE5F9", "#D2EEFB", "#E7F6FC"], 0, 300) + T.sun(76, 42) + T.cloud(242, 16, .66) + T.cloud(146, 18, .55);
       },
       far: function(o){
         var c = o.snow ? ["#EEF5FB", "#DCEAF6"] : o.night ? ["#3D6A52", "#345C47"] : ["#C4E6A8", "#B0DA92"], s = "";
@@ -256,7 +270,7 @@ export function pack(T){
         [[54, 118, 16, 0], [76, 114, 13, 2], [96, 110, 12, 3], [64, 124, 14, 1]].forEach(function(t){ s += tent(t[0], t[1], t[2], tc[t[3]], o.night); });
         s += L("M48 112 V80 M118 104 V76", 2.4) + L("M48 112 V80 M118 104 V76", 1.1, WHT) + bunting(48, 81, 118, 77, 9, 7, o.night, .8);
         s += stage(o);
-        s += bunting(362, 56, 392, 70, 6, 3, o.night, .8);
+        s += L("M372 96 V58", 2.4) + L("M372 96 V58", 1.1, WHT) + bunting(372 + SDX, 46 + SDY, 372, 59, 5, 3, o.night, .8);
         s += crowd(o);
         return s;
       },
@@ -327,8 +341,8 @@ export function pack(T){
         if (o.snow) s += F(D([[hx, hy, hz + hh], [hx + hw, hy, hz + hh], [hx + hw, yh, hz + hh], [hx, yh, hz + hh]]), "#FFFFFF");
         /* the cable from the jack to a pedal on the grass, coiled */
         var j = P(X0 + W - .28, yf + .02, H1 - .3), g0 = P(X0 + W - .1, yf + .45, 0), ped = P(.95, 2.75, .2);
-        s += L("M" + m(j[0], j[1]) + " Q" + m(j[0] + 4, j[1] + 8) + " " + m(g0[0], g0[1]), 3) + L("M" + m(j[0], j[1]) + " Q" + m(j[0] + 4, j[1] + 8) + " " + m(g0[0], g0[1]), 1.4, RED[0]);
-        var cd = coil(g0, [ped[0] + 6, ped[1] + 1], 3, 2.6); s += L(cd, 3) + L(cd, 1.4, RED[0]);
+        s += L("M" + m(j[0], j[1]) + " Q" + m(j[0] + 4, j[1] + 8) + " " + m(g0[0], g0[1]), 2.4) + L("M" + m(j[0], j[1]) + " Q" + m(j[0] + 4, j[1] + 8) + " " + m(g0[0], g0[1]), 1, RED[0]);
+        var cd = coil(g0, [ped[0] + 6, ped[1] + 1], 4, 1.7); s += L(cd, 2.4) + L(cd, 1, RED[0]);
         s += box(.55, 2.45, 0, .55, .62, .2, { top: "#9DE36A", left: "#7CC74A", right: "#5A9A32" }, { sw: 1.3, si: .8 });
         q = P(.82, 2.85, .2); s += circ(q[0], q[1], 1.5, CHROME[0], .8); q = P(.72, 2.6, .2); s += circ(q[0], q[1], .9, "#1E1A24", .5);
         return s;
@@ -405,6 +419,9 @@ export function pack(T){
         for (i = 0; i < 9; i++){ q = P(X0 + .18 + i * (W - .36) / 8, yf, H - .17); s += circ(q[0], q[1], 1.15, o.night ? K.litHot : "#FFF3C4", .5); }
         /* steps up the side */
         s += box(X0 + W, 1.45, 0, .44, .8, .19, { top: K.woodLight, left: K.wood, right: K.woodShade }, { sw: 1.2, si: .8 }) + box(X0 + W, 1.45, .19, .22, .8, .18, { top: K.woodLight, left: K.wood, right: K.woodShade }, { sw: 1.2, si: .8 });
+        /* a guitar on its stand, stage left */
+        q = P(.72, 1.25, H); s += L("M" + m(q[0] - 3, q[1] + 1) + " L" + m(q[0], q[1] - 7) + " L" + m(q[0] + 3, q[1] + 1), 1.2);
+        s += onWall("y", 1.25, .72, H + .82, upGuitar(RED[0]), .5);
         /* the mic stand and its cable */
         var mb = P(1.7, 1.75, H), mt = P(1.7, 1.75, H + 1.7);
         s += L("M" + m(mb[0] - 3.4, mb[1] + 1.2) + " L" + m(mb[0], mb[1] - 2.4) + " L" + m(mb[0] + 3.4, mb[1] + 1.2), 1.3) + rod("M" + m(mb[0], mb[1] - 2) + " L" + m(mt[0], mt[1]), 1, CHROME[1]);
@@ -417,7 +434,7 @@ export function pack(T){
         var gd = ""; for (i = 1; i < 6; i++) gd += D([[a + .08, w0 + (w1 - w0) * i / 6, zl + (zh - zl) * i / 6], [b - .08, w0 + (w1 - w0) * i / 6, zl + (zh - zl) * i / 6]], true);
         s += L(gd, .7, "#8A7A6E");
         /* the spotlights clamped to the beam, aimed at the mic */
-        var spot = function(x, rot){ var c = P(x, Y0 + .32, zt - .05); return L("M" + m(c[0], c[1] - 3) + " v4", 1.6) + '<g transform="translate(' + m(c[0], c[1] + 2) + ") rotate(" + rot + ')">' + L("M-4.4 -1 q4.4 -4 8.8 0", 1.4) + FO("M-3.4 0 h6.8 l1 9 h-8.8 z", "#2E2A36", 1.2) + ell(0, 9, 4.4, 1.7, o.night ? K.litHot : "#FFF0B3", 1) + "</g>"; };
+        var spot = function(x, rot){ var c = P(x, Y0 + .32, zt - .05); return L("M" + m(c[0], c[1] - 2) + " v3", 1.4) + '<g transform="translate(' + m(c[0], c[1] + 1.4) + ") rotate(" + rot + ')">' + L("M-3 -.6 q3 -2.8 6 0", 1.2) + FO("M-2.3 0 h4.6 l.7 6 h-6 z", "#2E2A36", 1.1) + ell(0, 6, 3, 1.2, o.night ? K.litHot : "#FFF0B3", .9) + "</g>"; };
         s += spot(X0 + .55, 32) + spot(X0 + W - .55, -32);
         if (o.snow) s += F(D([[X0 + .1, Y0 + .1, zt + tw], [X0 + W - .1, Y0 + .1, zt + tw], [X0 + W - .1, Y0 + .1 + tw, zt + tw], [X0 + .1, Y0 + .1 + tw, zt + tw]]), "#FFFFFF");
         return s;
@@ -425,14 +442,14 @@ export function pack(T){
       lights: function(){
         var s = "", i, q, X0 = .2, W = 2.9, Y0 = .25, zt = 3.4;
         for (i = 0; i < 9; i += 2){ q = P(X0 + .18 + i * (W - .36) / 8, Y0 + 2.4, .38); s += T.glowAt(q[0], q[1], 5); }
-        [X0 + .55, X0 + W - .55].forEach(function(x){ q = P(x, Y0 + .32, zt); s += T.glowAt(q[0], q[1] + 10, 8); });
+        [X0 + .55, X0 + W - .55].forEach(function(x){ q = P(x, Y0 + .32, zt); s += T.glowAt(q[0], q[1] + 7, 6); });
         return s;
       },
       bits: function(){
         var X0 = .2, W = 2.9, Y0 = .25, zt = 3.4, s = "", R = T.rng(31), i;
         [[X0 + .55, 32, "#FFF3B0", 0], [X0 + W - .55, -32, "#FFB3DA", .5]].forEach(function(t){
           var c = P(t[0], Y0 + .32, zt - .05);
-          s += '<g transform="translate(' + m(c[0], c[1] + 2) + ") rotate(" + t[1] + ')"><path d="M0 9 L-9 52 L9 52 Z" fill="' + t[2] + '" opacity=".45" style="transform-box:fill-box;transform-origin:50% 0;animation:tp-flutter 1.4s ease-in-out infinite;animation-delay:' + t[3] + 's"/></g>';
+          s += '<g transform="translate(' + m(c[0], c[1] + 1.4) + ") rotate(" + t[1] + ')"><path d="M0 6 L-9 50 L9 50 Z" fill="' + t[2] + '" opacity=".45" style="transform-box:fill-box;transform-origin:50% 0;animation:tp-flutter 1.4s ease-in-out infinite;animation-delay:' + t[3] + 's"/></g>';
         });
         var top = P(1.7, 1.4, zt + .4), cols = [PINK[0], YEL[0], TEAL[0], "#FFFFFF", RED[0], "#9B7BE0"];
         for (i = 0; i < 16; i++){ var x = top[0] - 30 + R() * 60, y = top[1] - 6 + R() * 26; s += '<path class="tp-flake" style="animation-delay:' + f(i * .17) + 's" d="M' + m(x, y) + ' l2.6 1 -1 2.6 -2.6 -1 z" fill="' + cols[i % cols.length] + '"/>'; }
@@ -444,48 +461,55 @@ export function pack(T){
   /* ------------------------------------------------------------------ the outfits ----------------------------------- */
   var HEM = "Q149.6 121 146.6 131 Q140 132 135 143 Q120 156 100 157 Q80 156 65 143 Q60 132 53.4 131 Q50.4 121 50.6 110";
   var ln = function(d, col, w, op){ return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"' + (op ? ' opacity="' + op + '"' : "") + "/>"; };
-  var sleeves = function(col, trim){ return p("M57 101 C50 99 43 100 38.6 105 L43.6 123 C48 120 52 118 57 118 Z", col, O3) + p("M143 101 C150 99 157 100 161.4 105 L156.4 123 C152 120 148 118 143 118 Z", col, O3) + (trim ? ln("M41.6 108.6 L45.6 121.4 M158.4 108.6 L154.4 121.4", trim, 1.8) : ""); };
-  var TEE = "#2B2630", LEA = "#2A2530", LEAH = "#57506A";
-  var pinBolt = function(x, y, k){ return bolt(x, y, k, YEL[0], 1.4); };
+  var sleeves = function(col){ return p("M57 101 C50 99 43 100 38.6 105 L43.6 123 C48 120 52 118 57 118 Z", col, O3) + p("M143 101 C150 99 157 100 161.4 105 L156.4 123 C152 120 148 118 143 118 Z", col, O3); };
+  var TEE = "#2B2630", TEEL = "#4A4452", LEA = "#2A2530", LAP = "#3B3545", LEAH = "#6E6680";
+  /* the guitar, drawn with its neck along +x from a body at the origin */
+  var guitar = function(col, shade){
+    return p("M14 -4 H86 V4 H14 Z", "#C98E58", O2) + '<path d="M16 -3 H86 V3 H16 Z" fill="#6B4128"/>' + ln("M26 -3 V3 M36 -3 V3 M45 -3 V3 M53 -3 V3 M61 -3 V3 M68 -3 V3 M75 -3 V3 M81 -3 V3", "#D9DFE5", .9) +
+      '<circle cx="40.6" cy="0" r="1.1" fill="#FFFDF6"/><circle cx="57" cy="0" r="1.1" fill="#FFFDF6"/><circle cx="71.6" cy="0" r="1.1" fill="#FFFDF6"/>' +
+      p("M85 -5 L104 -9 Q110 -9 109 -3 L106 6 Q105 8 102 7.6 L85 5 Z", "#2B2630", O2) + T.tinyTooth(98, -.4, .5, "#FFFFFF") +
+      [[90, -7.6], [96, -8.8], [102, -9.8]].map(function(t){ return '<circle cx="' + t[0] + '" cy="' + (t[1] - 2) + '" r="2" fill="' + CHROME[0] + '" stroke="' + INK + '" stroke-width="1.2"/>'; }).join("") +
+      p("M-28 -2 C-30 -16 -16 -22 -6 -15 C0 -11 6 -12 10 -17 C14 -22 25 -21 22 -12 C19 -7 15 -4 15 1 C15 6 19 9 22 13 C25 19 15 23 8 18 C2 14 -6 15 -12 18 C-24 23 -30 12 -28 -2 Z", col, O3) +
+      '<path d="M-12 18 C-6 15 2 14 8 18 C11 20 15 21 18 19.6 C14 23 8 21 4 19 C-1 17 -7 18 -12 20 Z" fill="' + shade + '"/>' +
+      p("M-20 6 C-14 10 -4 8 4 11 C8 13 12 10 10 6 L8 -6 L-6 -6 Q-12 -1 -20 6 Z", WHT, O2) +
+      '<path d="M-24 -6 C-22 -12 -16 -15 -10 -13" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>' +
+      p("M-2 -4.6 h4 v9.2 h-4 z", "#2B2630", O2.replace("2.2", "1.4")) + p("M6 -4.6 h4 v9.2 h-4 z", "#2B2630", O2.replace("2.2", "1.4")) + p("M-12 -4 h3.4 v8 h-3.4 z", CHROME[0], O2.replace("2.2", "1.4")) +
+      ln("M-10 -2 H86 M-10 0 H86 M-10 2 H86", "#F4F4F4", .5, .85) +
+      '<circle cx="-14" cy="11" r="2.1" fill="' + CHROME[0] + '" stroke="' + INK + '" stroke-width="1.2"/><circle cx="-7.6" cy="13" r="2.1" fill="' + CHROME[0] + '" stroke="' + INK + '" stroke-width="1.2"/>';
+  };
   var outfits = {
     "band-tee": {
       note: "A black band tee with a tooth-and-lightning-bolt print",
-      face: sleeves(TEE, "#4A4452") + p("M50.6 110 Q100 124 149.4 110 " + HEM + " Z", TEE, O3) +
-        ln("M64 113.6 Q100 129.4 136 113.6", "#4A4452", 2.6) + ln("M57 126 Q62 134 70 140", "#4A4452", 2.2) +
-        '<circle cx="100" cy="140" r="12.6" fill="' + RED[0] + '" ' + O2 + "/>" + T.tinyTooth(100, 139.6, 1.8, "#FFFFFF") + bolt(101, 140.4, 1.75, YEL[0], 1.5),
+      face: sleeves(TEE) + ln("M41.6 108.6 L45.6 121.4 M158.4 108.6 L154.4 121.4", TEEL, 1.8) + p("M50.6 110 Q100 124 149.4 110 " + HEM + " Z", TEE, O3) +
+        ln("M66 114.8 Q100 129 134 114.8", TEEL, 2.6) + ln("M57 126 Q62 134 70 140", TEEL, 2.2) + ln("M131 147 Q137 141 140 134", TEEL, 1.8, .8) +
+        '<circle cx="100" cy="139.6" r="14.4" fill="' + RED[0] + '" ' + O2 + '/><circle cx="100" cy="139.6" r="11.4" fill="none" stroke="#FFFFFF" stroke-width="1.2" opacity=".7"/>' +
+        T.tinyTooth(100, 139.4, 1.92, "#FFFFFF") + '<g transform="translate(101 140) rotate(14)">' + bolt(0, 0, 2.5, YEL[0], 1.6) + "</g>",
       say: ["My favorite band? The Wisdom Teeth. They always show up late.", "Tooth and lightning. It's a whole look.", "Front row, every show. Earplugs in: look after your ears too."]
     },
     "leather-jacket": {
       note: "A black leather jacket with silver zips, a big collar and two enamel pins, one a tiny tooth",
-      face: sleeves(LEA) + ln("M40.6 112 L44.4 121 M159.4 112 L155.6 121", CHROME[1], 1.6) +
-        p("M84 114 Q100 124 116 114 L104 150 L96 150 Z", "#F4F1EC", O2) +
+      face: sleeves(LEA) + ln("M40.6 112 L44.4 121 M159.4 112 L155.6 121", CHROME[0], 1.8) + ln("M44 104.4 Q49 102.6 54 103.6 M156 104.4 Q151 102.6 146 103.6", LEAH, 2, .9) +
+        p("M84 114 Q100 124 116 114 L104 150 L96 150 Z", "#F4F1EC", O2) + ln("M90 119 Q100 125 110 119", "#D9D2C6", 1.6) +
         p("M50.6 110 Q66 107 84 114 L97 157 Q80 156 65 143 Q60 132 53.4 131 Q50.4 121 50.6 110 Z", LEA, O3) +
         p("M149.4 110 Q134 107 116 114 L103 157 Q120 156 135 143 Q140 132 146.6 131 Q149.6 121 149.4 110 Z", LEA, O3) +
-        p("M84 114 L66 116 L77 132 L90 134 Z", "#3A3442", O2) + p("M116 114 L134 116 L123 132 L110 134 Z", "#3A3442", O2) +
-        ln("M90.6 135 L97 156 M109.4 135 L103 156", CHROME[0], 1.6) +
-        ln("M59 135 L73 128 M141 135 L127 128", CHROME[0], 2) + '<circle cx="73.6" cy="127.6" r="1.8" fill="' + CHROME[0] + '" stroke="' + INK + '" stroke-width="1"/><circle cx="126.4" cy="127.6" r="1.8" fill="' + CHROME[0] + '" stroke="' + INK + '" stroke-width="1"/>' +
-        ln("M56 120 Q60 114 68 113 M144 120 Q140 114 132 113", LEAH, 2.2, .9) + ln("M66 146 Q72 150 80 151", LEAH, 2, .8) +
-        '<circle cx="74" cy="121.4" r="5" fill="' + RED[0] + '" ' + O2 + "/>" + T.tinyTooth(74, 121.6, .82, "#FFFFFF") + pinBolt(126, 122, 1),
+        /* the big collar folded back, its edges catching the light */
+        p("M52 109 Q66 105.6 84 113 L90.4 133 L80 135 L64 119 Z", LAP, O3) + p("M148 109 Q134 105.6 116 113 L109.6 133 L120 135 L136 119 Z", LAP, O3) +
+        ln("M56 110.4 Q68 107.6 82 113.6", LEAH, 2) + ln("M144 110.4 Q132 107.6 118 113.6", LEAH, 2) +
+        /* the zips: down the front edges, across the pockets, at the cuffs */
+        ln("M91.6 136 L97 155.4 M108.4 136 L103 155.4", CHROME[0], 1.8) + ln("M91.6 136 L97 155.4 M108.4 136 L103 155.4", INK, .6, .5) +
+        ln("M58 137 L73 129.6 M142 137 L127 129.6", INK, 3.6) + ln("M58 137 L73 129.6 M142 137 L127 129.6", CHROME[0], 1.8) +
+        p("M72.4 128.4 l3.4 -1 1.2 4.4 -3.4 1 z", CHROME[0], 'stroke="' + INK + '" stroke-width="1.1"') + p("M127.6 128.4 l-3.4 -1 -1.2 4.4 3.4 1 z", CHROME[0], 'stroke="' + INK + '" stroke-width="1.1"') +
+        ln("M62 147 Q70 152 80 153", LEAH, 2, .8) + ln("M146 125 Q147 131 145 136", LEAH, 2, .7) +
+        /* the enamel pins on the collar: a tooth, a lightning bolt */
+        '<circle cx="71" cy="118.4" r="6.2" fill="' + RED[0] + '" ' + O2 + "/>" + T.tinyTooth(71, 118.8, 1.0, "#FFFFFF") +
+        '<g transform="translate(129 119) rotate(10)">' + bolt(0, 0, 1.45, YEL[0], 1.6) + "</g>",
       say: ["Leather jacket on. Too cool for cavities.", "These pins? One for every checkup I aced.", "Zip it up. Like the cap on your toothpaste."]
     },
     "electric-guitar": {
       note: "A red electric guitar on a strap across his body, a white pickguard, a pick in his hand",
       back: ln("M47 156 Q40 132 52 106", INK, 8) + ln("M47 156 Q40 132 52 106", "#3B2E3A", 4.4),
       face: ln("M86 133 Q118 122 152 104", INK, 8.4) + ln("M86 133 Q118 122 152 104", "#3B2E3A", 4.8) + ln("M92 130.6 l4 -1.4 M104 126.4 l4 -1.4 M116 122 l4 -1.6 M128 117 l4 -1.8 M140 111 l4 -2", YEL[0], 1.6) +
-        '<g transform="translate(72 146) rotate(-24)">' +
-          /* the neck and the headstock */
-          p("M14 -4 H86 V4 H14 Z", "#C98E58", O2) + p("M16 -3 H86 V3 H16 Z", "#6B4128", "") + ln("M26 -3 V3 M36 -3 V3 M45 -3 V3 M53 -3 V3 M61 -3 V3 M68 -3 V3 M75 -3 V3 M81 -3 V3", "#D9DFE5", .9) +
-          '<circle cx="40.6" cy="0" r="1.1" fill="#FFFDF6"/><circle cx="57" cy="0" r="1.1" fill="#FFFDF6"/><circle cx="71.6" cy="0" r="1.1" fill="#FFFDF6"/>' +
-          p("M85 -5 L104 -9 Q110 -9 109 -3 L106 6 Q105 8 102 7.6 L85 5 Z", "#2B2630", O2) + T.tinyTooth(98, -.4, .5, "#FFFFFF") +
-          [[90, -7.6], [96, -8.8], [102, -9.8]].map(function(t){ return '<circle cx="' + t[0] + '" cy="' + (t[1] - 2) + '" r="2" fill="' + CHROME[0] + '" stroke="' + INK + '" stroke-width="1.2"/>'; }).join("") +
-          /* the body: two horns toward the neck, a pickguard, pickups, a bridge, knobs */
-          p("M-28 -2 C-30 -16 -16 -22 -6 -15 C0 -11 6 -12 10 -17 C14 -22 25 -21 22 -12 C19 -7 15 -4 15 1 C15 6 19 9 22 13 C25 19 15 23 8 18 C2 14 -6 15 -12 18 C-24 23 -30 12 -28 -2 Z", RED[0], O3) +
-          p("M-20 6 C-14 10 -4 8 4 11 C8 13 12 10 10 6 L8 -6 L-6 -6 Q-12 -1 -20 6 Z", WHT, O2) +
-          '<path d="M-24 -6 C-22 -12 -16 -15 -10 -13" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>' +
-          p("M-2 -4.6 h4 v9.2 h-4 z", "#2B2630", O2.replace("2.2", "1.4")) + p("M6 -4.6 h4 v9.2 h-4 z", "#2B2630", O2.replace("2.2", "1.4")) + p("M-12 -4 h3.4 v8 h-3.4 z", CHROME[0], O2.replace("2.2", "1.4")) +
-          ln("M-10 -2 H86 M-10 0 H86 M-10 2 H86", "#F4F4F4", .5, .85) +
-          '<circle cx="-14" cy="11" r="2.1" fill="' + CHROME[0] + '" stroke="' + INK + '" stroke-width="1.2"/><circle cx="-7.6" cy="13" r="2.1" fill="' + CHROME[0] + '" stroke="' + INK + '" stroke-width="1.2"/>' +
-        "</g>" +
+        '<g transform="translate(72 146) rotate(-24)">' + guitar(RED[0], RED[1]) + "</g>" +
         /* the pick, in his other hand */
         p("M30 116 Q36 112 40 117 Q37 124 33 125 Q29 121 30 116 Z", TEAL[0], O2) + T.tinyTooth(35, 118.6, .36, "#FFFFFF"),
       say: ["Two minutes of brushing, two minutes of shredding.", "I only know three chords: brush, floss, rinse.", "Rock on. Then rinse."]
