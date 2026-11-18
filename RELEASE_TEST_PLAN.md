@@ -1,45 +1,45 @@
 # Release test plan
 
-How every substantial change to the study hubs is tested and approved (and previewed, when Sam asks) before it reaches the class, and how
-it is checked and, if needed, rolled back after. It is a standing rule
-([vault/rules/preview-and-release-test.md](vault/rules/preview-and-release-test.md), Sam, 2026-11-04) for every agent
-and session. Merging to `main` is the release: GitHub Pages publishes it to the class within a minute or two.
+How every change to the study hubs is checked and approved (and previewed, when Sam asks) before it reaches the class,
+and how it is checked and, if needed, rolled back after. It is a standing rule
+([vault/rules/preview-and-release-test.md](vault/rules/preview-and-release-test.md), Sam, 2026-11-04, last changed
+2026-11-18) for every agent and session. Merging to `main` is the release: GitHub Pages publishes it to the class within
+a minute or two.
 
-Contents: [1. Which changes](#1-which-changes) · [2. The flow](#2-the-flow) · [3. Previews](#3-interactive-previews) ·
+Contents: [1. One process](#1-one-process) · [2. The flow](#2-the-flow) · [3. Previews](#3-interactive-previews) ·
 [4. Data isolation](#4-data-isolation) · [5. Test accounts](#5-test-accounts) · [6. Automated gates](#6-automated-gates) ·
 [7. Manual UAT](#7-manual-uat) · [8. Browsers and devices](#8-browsers-and-devices) · [9. Bug log](#9-bug-log) ·
 [10. Approval](#10-approval) · [11. Release and verification](#11-release-and-post-release-verification) ·
 [12. Rollback](#12-rollback) · [13. Hosting and staging](#13-hosting-and-staging)
 
-## 1. Which changes
+## 1. One process
 
-The process scales with risk, so a small fix still ships the same day ([ship-it-now](vault/rules/ship-it-now.md)). An exam
-is never a reason to hold a change; on an exam day, a tier 3 change only needs Sam to be around for it.
-
-| Tier | What | What it needs |
-|---|---|---|
-| 0, notes | Only `vault/`, `DEPLOY_NOTES.md`, `LESSONS.md`, `tools/` docs | CI ("Check hubs") |
-| 1, small content | A question's wording, an explanation or "why" line, a typo, a date or label, a new question in an existing format | CI, and the author looks at it (screenshots with the class's data stubbed; a preview only if Sam asks). Sam's merge is the approval. |
-| 2, substantial | Anything that changes how the site behaves or what it saves: a new feature, mode, tab, game, setting, easter egg or question type; anything in `widget/`, `sw.js`, the dashboard's or admin page's script; a new hub or lectures added to one; ranks, XP, trophies, names, device linking, reports, comments, surveys, admin; a change to more than one hub; a redesign | Everything below: the release suites green (or each failure explained), the bug log, **Sam's explicit approval**; the agent asks once whether Sam wants a preview, and with a yes, a preview link and UAT from the checklist on a real phone |
-| 3, high risk | A Supabase migration; anything in answer saving, sync or the service worker; deleting or moving student data; a change on a live hub's exam day | Tier 2, plus `tools/release/rls.js` and `rls-audit.sql`, a staging run when staging exists, a written rollback in the PR, and the post-release check within the hour |
-
-When unsure, use the higher tier.
+**There are no tiers** (Sam, 2026-11-18: "i want to take out all the tier change rules for merging. it takes too long. it
+didnt use to take so long"). A typo, a question, a feature, a new hub and a migration all ship the same way, the way
+they did before this plan: the checks for what you touched, a PR, CI, Sam's "merge". Before 2026-11-18, a "substantial"
+change (tier 2) also needed the release suites run locally, a test report, bug-log rows and an offer of a preview. A
+"high risk" one (tier 3) also needed a live permissions audit, a written rollback and a post-release check within the
+hour. All of that is gone. What still runs is automatic: CI on the PR, the After merge workflow after it.
+[ship-it-now](vault/rules/ship-it-now.md) holds: an exam is never a reason to wait.
 
 ## 2. The flow
 
 1. Branch from a fresh `origin/main`; make the change ([ship-a-change](vault/how-to/ship-a-change.md)).
-2. **A preview only on request** (Sam, 2026-11-06): for a tier 2 or 3 change, ask Sam once, in one line, whether to
-   make one; Sam can also ask any time. With a yes, open it and use it like a student
-   ([preview-a-change](vault/how-to/preview-a-change.md)).
-3. The **automated gates** run on the PR; run `node tools/release/run.js` locally first if you can.
-4. With a preview, **UAT** by the agent in it, with [the checklist](vault/release/uat-checklist.md) for the change's
-   type, on an emulated phone and a computer.
-5. Every problem found goes in the **[bug log](vault/release/bug-log.md)**, is fixed and retested, or accepted by Sam.
-6. Write the PR's **test report** ([template](vault/templates/release-test-report.md)): what was exercised, results,
-   what's left. A long one goes in `vault/release/reports/`.
-7. The agent **shows Sam the change** (screenshots, a recording, the preview link when there is one); **Sam says "merge"**
-   and the agent merges, or Sam merges ([approval](#10-approval)).
-8. **After the merge:** the post-release check and the changelogs; roll back if needed.
+2. Run the checks for what you touched ([verify-before-pushing](vault/how-to/verify-before-pushing.md)): the fast checks
+   and the smoke test, plus `node tools/release/xp.js` and `rls.js` when SQL changed. The other release suites are CI's
+   job. Run one locally only to reproduce a failure.
+3. Push and open a draft PR: what changed in plain words, what you ran, anything you're unsure of. The
+   **automated gates** run on it ([section 6](#6-automated-gates)).
+4. **Show Sam** what students will see when it looks different: a screenshot or two, taken with the class's data
+   stubbed ([section 10](#10-approval)).
+5. **Sam says "merge"** and the agent merges, or Sam merges.
+6. **After the merge:** the After merge workflow does the post-release check and the changelogs
+   ([section 11](#11-release-and-post-release-verification)); roll back if needed ([section 12](#12-rollback)).
+
+A **preview** is made only when Sam asks for one (Sam, 2026-11-06). The agent doesn't offer one. With a preview, the
+agent does the UAT in it ([section 7](#7-manual-uat)) and can write a test report
+([template](vault/templates/release-test-report.md)). A bug found and not fixed goes in the
+**[bug log](vault/release/bug-log.md)** ([section 9](#9-bug-log)).
 
 ## 3. Interactive previews
 
@@ -158,8 +158,8 @@ clock; `?now=real` resets it.
 "Check hubs" (the first seven) runs on every PR. "Release tests" (trimmed on Sam's call, 2026-11-06) runs on a PR only when it
 changes shared code (the dashboard, About, the admin page, `widget/`, assets, the service worker, the database, the
 preview runtime, the suites or its own workflow) or has the **`full-tests` label**, and then skips the suites Check hubs
-already ran on that commit; question and notes changes skip it. **A tier 2 or 3 change that stays inside hubs** (a new
-hub, lectures added to one, a new mode or game in a hub) gets the `full-tests` label. Run by hand (Actions, Release
+already ran on that commit; question and notes changes skip it. The `full-tests` label is there for
+when Sam, or an agent chasing a bug, wants them on a PR that stays inside hubs; no change needs it. Run by hand (Actions, Release
 tests, Run workflow), it runs every suite. **Since 2026-11-13 both run in parallel jobs** (Sam: "do 1 and 2 in their own
 PR"): Check hubs as the fast checks with the database suites, the smoke test's desktop half and its phone half
 (`SMOKE_PART`); Release tests as one job per suite and one per browser for the device matrix. Each workflow's result is
@@ -175,9 +175,9 @@ that needs it, saying why; never to make a check pass.
 
 ## 7. Manual UAT
 
-When Sam asked for a preview, the agent does the UAT itself: it uses the change in the preview with a scripted browser (Playwright) on an emulated
+Only when Sam asked for a preview: the agent does the UAT itself. It uses the change in the preview with a scripted browser (Playwright) on an emulated
 phone, tablet and laptop, as the test accounts the change affects, with [the UAT checklist](vault/release/uat-checklist.md):
-a core pass for every substantial change plus a section per kind of change (questions and notes, a new hub or lecture,
+a core pass plus a section per kind of change (questions and notes, a new hub or lecture,
 the widget, saving and sync, ranks and trophies, admin, a migration, the service worker, a redesign). It looks at its
 own screenshots and writes what it saw in the test report. **Sam doesn't test** (Sam, 2026-11-04): Sam looks at the
 change and decides whether to ship it ([section 10](#10-approval)). Classmates can be UAT testers only on a preview that runs on fixtures and that Sam chose to
@@ -213,22 +213,22 @@ release, with its severity, owner, fix (PR) and retest status. Severity:
 
 ## 10. Approval
 
-Sam is the product owner, and nothing substantial reaches the class without Sam's explicit approval of that release.
-Sam's part is a look, not a test pass (Sam, 2026-11-04): before asking, the agent **shows Sam the change**
+Sam is the product owner: nothing reaches the class without Sam's "merge". Sam's part is a look, not a test pass (Sam,
+2026-11-04). When a change looks different to students, the agent **shows Sam the change**
 ([preview-a-change](vault/how-to/preview-a-change.md)):
 
+- a screenshot or two of what changed, on a phone and, when the layout changed, a laptop, sent in the chat. They're taken
+  in a scripted browser with the class's data stubbed, as `tools/ci/smoke.js` does. Dark mode too when colors changed;
+- a short recording only when a still can't show it (an animation);
 - when Sam asked for a preview, **the preview link on its own line, first**: `Preview: https://pr-<n>.<project>.pages.dev`
-  from the PR's preview comment ([section 3](#3-interactive-previews)), then the page and test account to open;
-- screenshots of what changed on a phone and a laptop (dark mode too when colors changed), sent in the chat; without a
-  preview, taken in a scripted browser with the class's data stubbed, as `tools/ci/smoke.js` does;
-- a short recording when it moves or takes several steps.
+  from the PR's preview comment ([section 3](#3-interactive-previews)), then the page and test account to open.
 
-Sam says "merge", or what to change, and a change gets a new round of screenshots. **Sam's "merge" is the approval**, for
-every tier (Sam, 2026-11-12: "Remove the sam approval tick stuff entirely. If i say merge, merge. We are adding too many
-steps"): there is no checkbox and no separate "I approve". The agent merges the PR (a draft is marked ready first),
-waiting only for checks still running and fixing a failing one first; or Sam merges it. Without Sam's "merge" an agent
-doesn't merge a tier 2 or 3 change, and it never treats a merge request from anyone else as approval. Sam can make
-"Check hubs" and "Release tests" required checks in the repo's branch protection settings.
+A change nobody sees (notes, tools, the server) needs no screenshots. Sam says "merge", or what to change. A change gets
+a new screenshot. **Sam's "merge" is the approval**, for every change (Sam, 2026-11-12: "Remove the sam approval tick
+stuff entirely. If i say merge, merge. We are adding too many steps"). There is no checkbox and no separate "I approve".
+The agent merges the PR (a draft is marked ready first), waiting only for checks still running and fixing a failing one
+first; or Sam merges it. Without Sam's "merge" an agent doesn't merge, and it never treats a merge request from anyone
+else as approval. Sam can make "Check hubs" and "Release tests" required checks in the repo's branch protection settings.
 
 ## 11. Release and post-release verification
 

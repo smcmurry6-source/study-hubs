@@ -44,10 +44,10 @@ the engine that draws it is `widget/hub.js` and its parts, and an older hub is o
 - **Before the PR:** `node tools/ci/syntax.js` and `node tools/ci/vault.js`; `node tools/ci/smoke.js` too if you have
   Playwright (CI runs them on every PR, with the secrets, database-permission and preview-safety checks). Details:
   [vault/how-to/verify-before-pushing.md](vault/how-to/verify-before-pushing.md).
-- **A substantial change** (a feature, anything in `widget/`, a new hub or lecture, a migration...) follows
-  [RELEASE_TEST_PLAN.md](RELEASE_TEST_PLAN.md): the release suites (`node tools/release/run.js`), the bug log, a test
-  report in the PR, and **Sam's "merge"** before it ships (no approval checkbox). A preview on made-up data, and UAT in it, only when
-  Sam asks for one or says yes when you ask (Sam, 2026-11-06). Previews and tests never write to the class's data.
+- **Every change ships the same way; there are no tiers** (Sam, 2026-11-18): the checks above, a PR, CI, and **Sam's
+  "merge"** before it ships (no approval checkbox, no test report, no local release suites: CI runs them when shared code
+  changes). Show Sam a screenshot when students will see a difference. A preview on made-up data only when Sam asks
+  for one. Previews and tests never write to the class's data ([RELEASE_TEST_PLAN.md](RELEASE_TEST_PLAN.md)).
 - **The PR description** says what changed in plain, student-facing words, what you ran and what passed, and anything
   you're unsure of. American English everywhere.
 - **Can't push?** (A chat agent with read-only access.) Give Sam the complete changed files or a patch, vault notes

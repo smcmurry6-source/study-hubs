@@ -69,7 +69,7 @@ the change into the PR's test report, tick what you did, and write what you saw.
       notice; hide and restore a comment; publish a survey draft.
 - [ ] A wrong secret is refused. The real admin secret was never typed into the preview.
 
-## A Supabase migration (tier 3)
+## A Supabase migration
 
 - [ ] `node tools/release/rls.js` passes on the new `supabase/schema.sql`; `rls-expectations.json` changed only if the
       PR says why.

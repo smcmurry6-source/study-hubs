@@ -46,16 +46,15 @@ A package is **one session and one PR**. Put items together when:
 
 - they touch the **same files or feature** (the place kit, the Question Bank, Ask Timmy, one hub's content, the bug log),
   so one set of checks covers them all;
-- they sit in the **same tier** ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md)): a tier 0 or 1 fix doesn't wait in
-  a tier 2 PR for Sam's "merge" unless it is in the same files;
+- they're about the **same size**: a quick fix doesn't wait in a big feature's PR unless it is in the same files;
 - one needs the other: say the order in the prompt. If the other is in an open PR, the package waits for that merge.
 
 Never put anything next to an item with an exam this week: it ships alone and first.
 
 **Size every package:**
 
-- **S**: an hour or so, tier 0 or 1, a few files.
-- **M**: one feature or a handful of fixes in one area, tier 2 with its release suites; most packages.
+- **S**: an hour or so, a few files.
+- **M**: one feature or a handful of fixes in one area; most packages.
 - **L, always alone:** a lecture or more added to a hub; a set of drawings for Sam to look at; a feature with a migration,
   client code and tests; a Timmy Time episode; a lessons audit or an archiving; merging a long-diverged branch; any task
   note with several phases (the package is its next phase, and says so); anything that needs more than about three hours
@@ -89,8 +88,7 @@ It covers (each is written down in the vault; read it first):
 <Order: ... | Deadline: ... | It needs <PR> merged first.>
 Out of scope: anything else on the to-do list. Put what you find on the list instead.
 
-This is tier <n> (RELEASE_TEST_PLAN.md)<: the release suites, a test report in the PR, and wait for my "merge">.
-In the same PR, tick each item off where it's written (the inbox line as `- [x] ... (#PR)`, the task note's boxes,
+Wait for my "merge". In the same PR, tick each item off where it's written (the inbox line as `- [x] ... (#PR)`, the task note's boxes,
 Outcome and status, the bug row's status), and put anything left over on the to-do list. Open a draft PR.
 ```
 

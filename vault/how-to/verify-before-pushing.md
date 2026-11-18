@@ -30,8 +30,9 @@ from 750 MB, fails from 900 MB, and lists the hubs still carrying audio; [archiv
 [how-to](draw-a-patient-box-case.md)), and
 a second workflow, "Release tests", runs accessibility, performance and the device matrix when a PR changes shared code
 (the dashboard, `widget/`, the service worker, the admin page, the database...) or has the `full-tests` label (since
-2026-11-06: hub content and notes skip it; a tier 2 or 3 change inside hubs gets the label)
-([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md); `node tools/release/run.js` runs everything). Both run in
+2026-11-06: hub content and notes skip it; the label is only for when someone wants them anyway, and no change needs it
+since 2026-11-18) ([RELEASE_TEST_PLAN.md](../../RELEASE_TEST_PLAN.md); `node tools/release/run.js` runs everything, for
+reproducing a failure). Both run in
 parallel jobs since 2026-11-13, each read as one result (`check`, `release`), and on a PR both keep an earlier green
 result when only notes changed since it (`tools/ci/reuse.js`; `node tools/ci/reuse.js --diff <sha>` says whether a
 change would). Run them locally before pushing; the smoke test needs Playwright
@@ -66,5 +67,5 @@ its content JSON (`hubs/<hub>/content/`), and an old single-file hub by injectin
 - If CI's runner can't reach Ubuntu's package mirror, both workflows install the test browsers without their system
   packages and say so in a warning on the run's page (2026-11-11). A "Check hubs" that still fails at "Install headless
   Chromium" is the browser download itself: re-run it once, then say so in the PR.
-- The long suites (the smoke test on every hub, `node tools/release/run.js`) run once on the finished code; after
-  that, and after bringing `main` in, CI is the check ([long-tests-once](../rules/long-tests-once.md)).
+- The smoke test runs once on the finished code (on every hub when shared files changed); the release suites are CI's.
+  After that, and after bringing `main` in, CI is the check ([long-tests-once](../rules/long-tests-once.md)).
