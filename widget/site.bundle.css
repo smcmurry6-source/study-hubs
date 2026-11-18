@@ -248,6 +248,9 @@ transition: background var(--t-hover) var(--ease-out), transform var(--t-press) 
 .ql.is-primary small { opacity: .85; }
 .ql.is-primary:hover { background: var(--primary); opacity: .92; }
 .quick:not(:has(.ql:nth-child(7))) .ql.is-primary { grid-column: span 3; }
+.quick-more { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 8px; margin-top: calc(8px - var(--gap)); }
+.ql.ql-wide { background: var(--hub-soft); }
+.ql.ql-wide:hover { background: var(--active); }
 .quick.has-pod .ql.is-primary { grid-column: auto; }
 .quick.has-pod .ql-pod { grid-column: 4; grid-row: 1 / span 2; }
 .hx .ql-pod { position: relative; overflow: hidden; align-items: stretch; padding: 14px 16px; background: var(--hub); color: #fff; }
@@ -1390,8 +1393,19 @@ background: #fff; color: var(--hub); font-size: var(--fs-meta); font-weight: var
 .dx-desc { max-width: 78ch; font-size: var(--fs-label); color: var(--muted); }
 .dx-desc.clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .dx .dx-more { align-self: flex-start; min-height: 32px; margin: -2px 0 0 -10px; }
-.dx-about .updated { margin-top: auto; }
 .dx-about .updated:empty { display: none; }
+.dx-news { margin-top: auto; }
+.dx-news > summary { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; list-style: none; cursor: pointer; min-height: 32px; }
+.dx-news > summary::-webkit-details-marker { display: none; }
+.dx-news-cta { display: inline-flex; align-items: center; gap: 2px; font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--hub-text, var(--hub)); }
+.dx-news-cta svg { transform: rotate(90deg); transition: transform 200ms ease; }
+.dx-news[open] .dx-news-cta svg { transform: rotate(-90deg); }
+.dx-news > summary:focus-visible { outline: 2px solid var(--hub); outline-offset: 2px; border-radius: 6px; }
+.dx-news.is-empty > summary { cursor: default; pointer-events: none; }
+.dx-news.is-empty .dx-news-cta, .dx-news.is-empty .dx-news-list { display: none; }
+.dx-news-list { display: grid; gap: 10px; margin: 6px 0 0; padding: 10px 0 0; border-top: 1px solid var(--line); list-style: none; }
+.dx-news-list p { max-width: 78ch; font-size: var(--fs-label); line-height: 1.45; }
+.dx-news-list small { display: block; margin-top: 2px; font-size: var(--fs-meta); }
 .dx-checks { display: flex; flex-wrap: wrap; gap: 8px; }
 .dx .dx-checkin { background: var(--peach); color: var(--peach-ink); border-color: transparent; white-space: normal; text-align: left; padding: 8px 18px; }
 .dx .dx-checkin:hover { background: var(--peach); filter: brightness(.97); }
@@ -1401,7 +1415,7 @@ background: #fff; color: var(--hub); font-size: var(--fs-meta); font-weight: var
 .dx-you { container: dxyou / inline-size; grid-column: span 5; display: flex; flex-direction: column; gap: 14px; }
 .dx-class { grid-column: span 7; display: grid; gap: 12px; align-content: start; }
 .dx-youhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
-.dx-name { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: var(--fs-body); }
+.dx-name { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; min-width: 0; font-size: var(--fs-body); }
 .dx-name b { overflow-wrap: anywhere; }
 .dx .dx-rename { min-height: 32px; color: var(--muted); }
 .dx-rankcard { --ar-bg: #2a2233; --ar-row: #372c44; --ar-soft: #cfc3d6; --ar-gold: #ffe08a; position: relative; overflow: hidden; display: grid;
@@ -1740,9 +1754,9 @@ html.shx:not([data-theme="light"]) .rc-crowd b { color: var(--hub); }
 html.shx:not([data-theme="light"]) .dx .rc-chart h4 { color: #3b2e3a; }
 }
 .rk-bar { transform-box: fill-box; transform-origin: 50% 100%; }
-.rc-body.is-in:not(.is-redraw) .rk-bar { animation: rk-grow 700ms var(--ease-expo) both; }
-.rc-body.is-in:not(.is-redraw) .rk-face, .rc-body.is-in:not(.is-redraw) .rk-tim, .rc-body.is-in:not(.is-redraw) .rc-peak { animation: rk-in 500ms ease both; }
-.rc-body.is-in:not(.is-redraw) .rk-tim, .rc-body.is-in:not(.is-redraw) .rc-peak { animation-delay: 900ms; }
+.rc-body.is-in:not(.is-redraw):not(.is-played) .rk-bar { animation: rk-grow 700ms var(--ease-expo) both; }
+.rc-body.is-in:not(.is-redraw):not(.is-played) .rk-face, .rc-body.is-in:not(.is-redraw):not(.is-played) .rk-tim, .rc-body.is-in:not(.is-redraw):not(.is-played) .rc-peak { animation: rk-in 500ms ease both; }
+.rc-body.is-in:not(.is-redraw):not(.is-played) .rk-tim, .rc-body.is-in:not(.is-redraw):not(.is-played) .rc-peak { animation-delay: 900ms; }
 @keyframes rk-grow { from { transform: scaleY(0); } }
 @keyframes rk-in { from { opacity: 0; } }
 @container rc (max-width: 620px) {

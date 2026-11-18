@@ -910,7 +910,7 @@
   /* a small Report button on every question card; it opens the flag panel already
      tagged with that question's id, so reports arrive with context */
   var FLAG_ICON_SM = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4.5c3.5-2 6.5 2 10 0v8c-3.5 2-6.5-2-10 0"/></svg>';
-  var pendingFlagQid = null, pendingFlagLec = null;
+  var pendingFlagQid = null, pendingFlagLec = null, pendingFlagW = 0;
   function addFlagButton(card){
     if (card.__shFlagBtn) return; card.__shFlagBtn = true;
     var qid = card.getAttribute("data-qid"); if (!qid) return;
@@ -918,7 +918,8 @@
     var b = document.createElement("button");
     b.type = "button"; b.className = "sh-qflag"; b.innerHTML = FLAG_ICON_SM + "Report";
     b.setAttribute("aria-label", "Report a problem with this question");
-    b.addEventListener("click", function(ev){ ev.stopPropagation(); if (window.shOpenFlag) window.shOpenFlag(qid); });
+    /* a reworded try (the engine's data-wording, 1 = the first extra wording) goes with the report, so it can be found */
+    b.addEventListener("click", function(ev){ ev.stopPropagation(); if (window.shOpenFlag) window.shOpenFlag(qid, +card.getAttribute("data-wording") || 0); });
     if (window.SH_PINS) addPinButton(card, top, qid);
     top.appendChild(b);
   }
@@ -1116,10 +1117,11 @@
     renderNameBadge(); syncNameInputs();
     try { document.dispatchEvent(new CustomEvent("sh:name", { detail: { name: "" } })); } catch (e) {}
   }
-  var nameDlg = null;
+  var nameDlg = null, nameBack = null;
   function closeNameEditor(){ if (nameDlg) { nameDlg.remove(); nameDlg = null; } }
   function openNameEditor(){
     closeNameEditor();
+    nameBack = document.activeElement;
     var custom = currentName();
     nameDlg = document.createElement("div");
     nameDlg.className = "sh-name-dlg";
@@ -1132,6 +1134,7 @@
       '<button type="submit">Save</button></form>' +
       '<div class="sh-name-msg" aria-live="polite"></div>' +
       (custom ? '<button class="sh-name-reset" type="button">Go back to a random name</button>' : '<div class="sh-name-hint">Up to 24 characters. You can change it any time.</div>') +
+      '<div class="sh-name-link">Using the hubs on another device too? <button type="button" class="sh-name-linkbtn" data-sh-link="name">Link my devices</button></div>' +
       '</div>';
     document.body.appendChild(nameDlg);
     var input = nameDlg.querySelector("input"), msg = nameDlg.querySelector(".sh-name-msg");
@@ -1152,6 +1155,20 @@
   }
   window.shEditName = openNameEditor;
   window.shNameNow = function(){ return currentName() || resolvedAnonName || ""; };
+  /* Link my devices (widget/linkask.js, loaded below), beside every place a name is changed (Sam, 2026-11-18: "link my
+     device is nowhere to be found"): any [data-sh-link="<where>"] button opens it. From the name window, that closes
+     first and focus goes back to what opened it. */
+  document.addEventListener("click", function(e){
+    var b = e.target && e.target.closest && e.target.closest("[data-sh-link]"); if (!b) return;
+    var from = b.getAttribute("data-sh-link") || "", back = b;
+    if (nameDlg && nameDlg.contains(b)) { back = (nameBack && nameBack.isConnected) ? nameBack : nameBadge; closeNameEditor(); }
+    var t0 = Date.now();
+    (function go(){
+      if (window.shLinkAsk && window.shLinkAsk.link) { window.shLinkAsk.link({ back: back, from: from }); return; }
+      if (Date.now() - t0 > 8000) { showStreakToast("Couldn’t open Link my devices. Are you online?"); return; }
+      setTimeout(go, 200);
+    })();
+  });
   renderNameBadge();
   nameBadge.addEventListener("click", openNameEditor);
 
@@ -2268,7 +2285,8 @@
     '<div id="shstat-panel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
     '<div class="shstat-sec"><h5>Your stats (this device)</h5><div id="shstat-mine"><div class="shstat-empty">Loading…</div></div>' +
     '<div class="shstat-name-row"><input type="text" id="shstat-name-input" maxlength="24" placeholder="Leaderboard name (optional)"><button id="shstat-name-save" type="button">Save</button></div>' +
-    '<div class="shstat-namemsg" id="shstat-name-msg"></div></div>' +
+    '<div class="shstat-namemsg" id="shstat-name-msg"></div>' +
+    '<button type="button" class="sh-name-linkbtn shstat-linkbtn" data-sh-link="stats">Link my devices</button></div>' +
     '<div class="shstat-sec"><h5>Toughest questions (class-wide)</h5><div id="shstat-tough"><div class="shstat-empty">Loading…</div></div></div>' +
     '<div class="shstat-sec"><h5>Most opened</h5><div id="shstat-modes"><div class="shstat-empty">Loading…</div></div></div>' +
     '<div class="shstat-sec"><h5>Busiest times</h5><div id="shstat-hist-wrap"><div class="shstat-empty">Loading…</div></div></div>' +
@@ -2277,7 +2295,8 @@
     '<h5>Settings</h5>' +
     '<div class="shset-row"><label>Screen name</label>' +
     '<div class="shstat-name-row"><input type="text" id="shset-name-input" maxlength="24" placeholder="What should we call you?"><button id="shset-name-save" type="button">Save</button></div>' +
-    '<div class="shstat-namemsg" id="shset-name-msg"></div></div>' +
+    '<div class="shstat-namemsg" id="shset-name-msg"></div>' +
+    '<button type="button" class="sh-name-linkbtn shstat-linkbtn" data-sh-link="settings">Link my devices</button></div>' +
     '<div class="shset-row"><label>Reading font</label>' +
     '<div class="shset-seg" data-pref="font">' +
     '<button type="button" data-val="default">Default</button>' +
@@ -2736,19 +2755,21 @@
   });
 
   /* qid is a question id, or { lec, label } for a lecture's notes (the Report button under each lecture's notes) */
-  function setFlagContext(qid){
+  function setFlagContext(qid, w){
     pendingFlagLec = qid && typeof qid === "object" ? qid : null;
     pendingFlagQid = pendingFlagLec ? null : (qid || null);
+    pendingFlagW = pendingFlagQid && w > 0 ? w : 0;
     var ctx = document.getElementById("shstat-flag-ctx");
     if (!ctx) return;
     if (pendingFlagLec) { ctx.textContent = "About the notes for " + (pendingFlagLec.label || pendingFlagLec.lec); return; }
     if (!qid) { ctx.textContent = ""; return; }
     var meta = findQuestionMeta(qid), t = meta.text || "";
-    ctx.textContent = "About question " + qid + (t ? ": " + (t.length > 110 ? t.slice(0, 108) + "…" : t) : "");
+    if (pendingFlagW) { var cs = document.querySelector('.qcard[data-qid="' + String(qid).replace(/"/g, "") + '"][data-wording] .qc-stem'); t = cs ? cs.textContent : ""; }
+    ctx.textContent = "About question " + qid + (pendingFlagW ? " (reworded)" : "") + (t ? ": " + (t.length > 110 ? t.slice(0, 108) + "…" : t) : "");
   }
-  window.shOpenFlag = function(qid){
+  window.shOpenFlag = function(qid, w){
     closeOtherPanels(flagPanel);
-    setFlagContext(qid);
+    setFlagContext(qid, w);
     document.getElementById("shstat-flag-msg").textContent = "";
     flagPanel.classList.add("is-open");
     updateSheetState();
@@ -2775,7 +2796,7 @@
     msg.textContent = "Sending…";
     /* where the student was, so the report can be found: [question id] and the current section */
     var where = [];
-    if (pendingFlagQid) where.push("question " + pendingFlagQid);
+    if (pendingFlagQid) where.push("question " + pendingFlagQid + (pendingFlagW ? " (reworded: wording " + (pendingFlagW + 1) + ")" : ""));
     if (pendingFlagLec) where.push("lecture notes " + (pendingFlagLec.label ? pendingFlagLec.label + " (" + pendingFlagLec.lec + ")" : pendingFlagLec.lec));
     var sec = currentSection(); if (sec) where.push(sec);
     var note = (text + (where.length ? "  — " + where.join(" · ") : "")).slice(0, 700);

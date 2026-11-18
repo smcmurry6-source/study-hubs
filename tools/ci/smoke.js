@@ -384,6 +384,30 @@ function checkIds(hub, qids){
   fs.appendFileSync(file, head + fresh.join('\n') + '\n');
   notes.push(`${hub}: added ${fresh.length} new question id(s) to ${rel} (commit it)`);
 }
+/* each wording of a question, as the card would show it: the original with the wording's stem, choices, whys and ex */
+function lintWordings(hub, Q, V, core){
+  const by = new Map(Q.map(q => [q.id, q])), W = [];
+  if (core.variants !== Object.keys(V).length) problems.push(`${hub}: core.json's "variants" (${core.variants}) doesn't count variants.json's ${Object.keys(V).length} questions (run: node tools/hub-next/build.mjs)`);
+  Object.entries(V).forEach(([id, raw]) => (Array.isArray(raw) ? raw : [raw]).forEach((v, k) => {
+    const q = by.get(id); if (!q) { problems.push(`${hub}: variants.json has ${id}, which isn't a question`); return; }
+    W.push(Object.assign({}, q, { stem: v.stem, choices: v.choices || q.choices, why: v.why || q.why, ex: v.ex || q.ex, _at: `${id} (wording ${k + 2})` }));
+  }));
+  W.forEach(q => {
+    const at = q._at, ch = q.choices || [];
+    if (q.type === 'mcq' || q.type === 'multi') {
+      const low = ch.map(c => String(c).trim().toLowerCase()); if (new Set(low).size !== low.length) problems.push(`${hub}: ${at} has duplicate choices`);
+      if (!Array.isArray(q.why) || q.why.length !== ch.length || q.why.some(w => !String(w || '').trim())) problems.push(`${hub}: ${at} needs a "why" for every choice`);
+    }
+    if (q.type === 'mcq' && !(q.answer >= 0 && q.answer < ch.length)) problems.push(`${hub}: ${at} answer index out of range`);
+    if (q.type === 'multi' && !(Array.isArray(q.correct) && q.correct.every(i => i >= 0 && i < ch.length))) problems.push(`${hub}: ${at} has a key outside its choices`);
+    if (!String(q.stem || '').trim()) problems.push(`${hub}: ${at} has no stem`);
+  });
+  const mc = W.filter(q => q.type === 'mcq' && (q.choices || []).length >= 3);
+  const longest = mc.filter(q => { const len = q.choices.map(c => String(c).length), a = len[q.answer]; return a > Math.max(...len.filter((_, i) => i !== q.answer)); }).length;
+  const pct = mc.length ? Math.round(100 * longest / mc.length) : 0;
+  notes.push(`${hub}: ${W.length} reworded questions; correct answer is the longest choice in ${pct}% of their MCQs`);
+  if (pct > 40) problems.push(`${hub}: in the reworded questions the correct answer is the longest choice in ${pct}% of MCQs (keep it under 40%)`);
+}
 function lint(hub, A){
   const Q = A.QUESTIONS || [], L = A.LECTURES || [], ids = new Set(), lecIds = new Set(L.map(l => l.id)), longItems = [];
   checkIds(hub, Q.map(q => String(q.id)));
@@ -707,6 +731,9 @@ function lint(hub, A){
         try {
           const rd = f => JSON.parse(fs.readFileSync(content(hub, f), 'utf8')), core = rd('core.json'), nts = rd('notes.json');
           lint(hub, { QUESTIONS: rd('questions.json'), LECTURES: core.lectures || [], READINGS: nts.full || {}, READINGS_PLAIN: nts.plain || {}, LIKELY_TOPICS: core.likelyTopics, CORE: core, NOTES: nts });
+          /* a hub's other wordings (content/variants.json, shown on later tries): the build checks their shape
+             (tools/hub-next/build.mjs checkVariants); here each wording gets the bank's own per-question lint */
+          if (fs.existsSync(content(hub, 'variants.json'))) lintWordings(hub, rd('questions.json'), rd('variants.json'), core);
         } catch (e) { problems.push(`${hub}: could not read its content (hubs/${hub}/content/): ${e.message}`); }
       }
       const page = await context.newPage(); const errs = [], name = `${hub}`;

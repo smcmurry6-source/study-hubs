@@ -15,6 +15,8 @@
  *   study.json      hints, the cram sheet, the Review tables and processes (Side by side), the arcade's sort sets
  *   figures.js/.css the hub's drawings (built by its figure build, tools/figures/<hub>/build.mjs, where it has one)
  *   arcade.js/.css  the hub's arcade (its games list and skin)
+ *   variants.json   (optional) a question's other wordings, shown on later tries: checked here (checkVariants) and
+ *                   counted in core.json's "variants"
  *
  * This script rebuilds the two parts that are worked out from the rest, so nobody edits them by hand:
  *
@@ -67,6 +69,37 @@ function layout(name, d){
   return "{\n" + Object.keys(d).map((k) => " " + one(k) + ": " + val(k, d[k])).join(",\n") + "\n}\n";
 }
 
+/* A question's other wordings (content/variants.json: { id: { stem, choices, why[, ex] } or a list of them; Perio since
+   2026-11-18, vault/tasks/2026-11-17-reworded-question-variants.md). A later try shows the next wording, so each must be
+   the same question: choice k is choice k reworded (the key, the server's answer keys, XP and the mock's scoring are the
+   original's), a why for every choice, a statement question keeps its labels and its statements, and the reworded key may
+   not be the longest choice in more than 40% of the hub's wordings. Nothing in it feeds High yield. Returns the problems. */
+export function checkVariants(questions, V){
+  const by = new Map(questions.map((q) => [q.id, q])), bad = [], LABELS = new Set(["2stmt", "tf", "numbered"]);
+  const stm = (s) => String(s).split("\n").filter((l) => /^\s*\d+\.\s+/.test(l)).length;
+  let mc = 0, longest = 0;
+  for (const [id, raw] of Object.entries(V)) {
+    const q = by.get(id); if (!q) { bad.push(`${id}: no such question`); continue; }
+    for (const [k, v] of (Array.isArray(raw) ? raw : [raw]).entries()) {
+      const at = `${id} (wording ${k + 2})`;
+      if (!v || typeof v.stem !== "string" || !v.stem.trim()) { bad.push(`${at}: no stem`); continue; }
+      if (v.stem.trim() === String(q.stem).trim()) bad.push(`${at}: the stem is the original's`);
+      if (q.fmt === "2stmt" && !/^read the two statements/i.test(v.stem)) bad.push(`${at}: a two-statement stem starts "Read the two statements."`);
+      if (q.fmt === "tf" && !/^true or false/i.test(v.stem)) bad.push(`${at}: a true/false stem starts "True or false:"`);
+      if ((q.fmt === "2stmt" || q.fmt === "numbered") && stm(v.stem) !== stm(q.stem)) bad.push(`${at}: ${stm(v.stem)} statements, the original has ${stm(q.stem)}`);
+      if (!Array.isArray(q.choices)) { if (v.choices || v.why) bad.push(`${at}: the question has no choices to reword`); continue; }
+      if (!Array.isArray(v.choices) || v.choices.length !== q.choices.length) { bad.push(`${at}: ${(v.choices || []).length} choices, the original has ${q.choices.length}`); continue; }
+      if (v.choices.some((c) => !String(c).trim())) bad.push(`${at}: an empty choice`);
+      const low = v.choices.map((c) => String(c).trim().toLowerCase()); if (new Set(low).size !== low.length) bad.push(`${at}: duplicate choices`);
+      if (LABELS.has(q.fmt) && JSON.stringify(v.choices) !== JSON.stringify(q.choices)) bad.push(`${at}: a ${q.fmt} question keeps its choice labels`);
+      if (!Array.isArray(v.why) || v.why.length !== q.choices.length || v.why.some((w) => !String(w || "").trim())) bad.push(`${at}: needs a why for every choice`);
+      if (q.type === "mcq" && q.choices.length >= 3) { mc++; const len = v.choices.map((c) => String(c).length); if (len[q.answer] > Math.max(...len.filter((_, i) => i !== q.answer))) longest++; }
+    }
+  }
+  if (mc && longest / mc > 0.4) bad.push(`the reworded key is the longest choice in ${Math.round(100 * longest / mc)}% of MCQ wordings (keep it under 40%)`);
+  return bad;
+}
+
 const FILES = ["core.json", "questions.json", "notes.json", "study.json"];
 function build(hub){
   const dir = join(ROOT, "hubs", hub, "content");
@@ -86,6 +119,16 @@ function build(hub){
   const firstTopic = {};
   (core.likelyTopics || []).forEach((t) => (t.ids || []).forEach((id) => { if (!firstTopic[id]) firstTopic[id] = t; }));
   questions.forEach((q) => { if (firstTopic[q.id]) q.likely = firstTopic[q.id]; else delete q.likely; });
+  /* the other wordings: checked, laid out a question to a line, and counted in core.json (the engine fetches the file only
+     when the count is there) */
+  const vPath = join(dir, "variants.json");
+  if (existsSync(vPath)) {
+    cur["variants.json"] = readFileSync(vPath, "utf8");
+    try { D["variants.json"] = JSON.parse(cur["variants.json"]); } catch (e) { throw new Error(`hubs/${hub}/content/variants.json is not valid JSON: ${e.message}`); }
+    const bad = checkVariants(questions, D["variants.json"]);
+    if (bad.length) throw new Error(`hubs/${hub}/content/variants.json:\n  ` + bad.join("\n  "));
+    core.variants = Object.keys(D["variants.json"]).length;
+  } else delete core.variants;
   /* the question index: [id, lecture, High likelihood, source] */
   core.index = questions.map((q) => [q.id, q.lec, q.likely ? 1 : 0, q.src || ""]);
   /* High yield, the third reading level: each lecture's predicted topics with the paragraphs of its notes that teach them */
@@ -96,8 +139,9 @@ function build(hub){
     "notes.json": layout("notes.json", Object.assign({}, notes, { hy, hyAudio: Object.keys(hy).filter((lec) => hyRecorded(hub, lec, hy[lec])) })),
     "study.json": layout("study.json", study)
   };
+  if (D["variants.json"]) { const V = D["variants.json"]; out["variants.json"] = "{\n" + Object.keys(V).map((id) => one(id) + ": " + one(V[id])).join(",\n") + "\n}\n"; }
   /* the layout never changes what a file says */
-  for (const f of ["core.json", "questions.json", "study.json"]) if (one(JSON.parse(out[f])) !== one(D[f])) throw new Error(`hubs/${hub}/content/${f}: the layout changed its data (tools/hub-next/build.mjs, layout)`);
+  for (const f of ["core.json", "questions.json", "study.json", "variants.json"]) if (out[f] && one(JSON.parse(out[f])) !== one(D[f])) throw new Error(`hubs/${hub}/content/${f}: the layout changed its data (tools/hub-next/build.mjs, layout)`);
   /* the hub's scripts parse */
   for (const f of ["figures.js", "arcade.js"]) if (existsSync(join(dir, f))) new vm.Script(readFileSync(join(dir, f), "utf8"), { filename: `hubs/${hub}/content/${f}` });
   return { dir, cur, out, n: questions.length };
