@@ -38,12 +38,25 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   price), with a yardstick in median study days per rarity; `tools/economy.sql` (E0-E6: the live rules, crowns and XP per study day
   and hour, the class's rhythm, wallets and spending, the price ladder in study days, ranks), step 1b of `/lessons-audit` and a line in
   `tools/lessons-refresh.md`. First reading in `LESSONS.md` ("The game economy"): about 700 crowns a median study day since
-  `migration_v66`, everything under Legendary two to three times cheaper than the yardstick, half the active class able to buy anything,
+  the crown raise (#403's migration, live on the database), everything under Legendary two to three times cheaper than the yardstick, half the active class able to buy anything,
   4% spent; a re-pricing is proposed to Sam (inbox), nothing changed. **Perio, the day before its final**: `q5-L14` retired (furcation
   entrance widths, which the final won't ask; its High Likelihood topic reworded and S5's High yield recorded again), `pc-d3`'s stem
   states its assumption, `q7-P01` asks about the case (report #54), `q4-L27`'s "re-check" pair reworded (report #59), their
   `variants.json` wordings too. Occlusion's retrospective has its 22 check-ins.
 
+- **2026-11-18 (The class's picks follow the version of a question's choices, Claude Code)** — the inbox's "class picks on
+  each choice ignore question versions" (BUG-023's general fix). `question_choices` was keyed by position only, so after an
+  edit the "% of the class picked it" beside a choice counted picks of the old choices: since the release, 169 Perio and
+  125 Occlusion questions had their choices rewritten (8 of Perio's only moved), and #404 rewrote 7 of Heme & Endo Exam 3's. `migration_v66.sql`: a one-choice or
+  select-all key carries `cv`, the version of its choices (`choiceVersion` in `tools/xp/keys.js`: the choices and the key;
+  the stem, the explanation and the whys don't count); `record_choice` / `record_choices` stamp each pick with the current
+  one (`question_choices.v`); when it changes, `admin_load_question_keys` moves the old picks to `question_choices_past`
+  (closed to the public, nothing deleted; an undone edit brings them back), with a backstop at the next pick
+  (`sh_choices_to`). The page, `sh_answer` and every reader of `question_choices` are unchanged. Picks from before versions
+  are kept as the current choices', except on the 301 questions whose choices changed since their content JSON shipped
+  (`tools/xp/choice-history.js`, from git), whose picks are set aside. Hubs without keys (the old pages) behave as before.
+  Takes effect when the After merge workflow reloads every engine hub's keys (it does for any change to `keys.js`). Tests:
+  `tools/release/xp.js` section 3b; `rls-expectations.json` closes the past table and the two helpers. About page entry.
 - **2026-11-18 (CI back on the newest Ubuntu, Claude Code, #407)** — The inbox to-do from #402. Every workflow is back on
   `runs-on: ubuntu-latest` (Ubuntu 26.04 since 2026-11-18) with Playwright **1.63.0** in place of 1.56.1 (the
   `playwright@` lines in `check.yml`, `release.yml` and `after-merge.yml`): 1.63.0 has Chromium, WebKit and Firefox

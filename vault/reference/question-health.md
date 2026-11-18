@@ -45,7 +45,8 @@ deletes a question**: a flag is a lead for a person to check against the hub's n
 
 Accuracy, the miskey check, retries and the top-vs-bottom check use the live version's first tries once 10 people have
 answered it (8 for the choice and top/bottom checks). Until then they use every answer ever (`personal_answers`, the
-synced history, all versions; picks from `question_choices`), but only while Sam hasn't made a call, and the admin page tags them "all answers
+synced history, all versions; picks from `question_choices`, which since migration_v66 holds only the current version of the
+choices, so a choice's picks are always that choice's), but only while Sam hasn't made a call, and the admin page tags them "all answers
 ever". Time, abandonment, the explanation and the thumbs exist from 2026-11-04, for the live version only.
 
 | Flag | Severity | When |

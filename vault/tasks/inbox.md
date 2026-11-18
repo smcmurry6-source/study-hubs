@@ -11,7 +11,7 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
 - [ ] **Re-price the middle of the shop, if Sam agrees** (the 2026-11-18 lessons audit, [earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md)):
-  since studying pays 5 crowns per 10 XP and 100 an hour (`migration_v66`), the median study day earns about 700 crowns, so a Rare
+  since studying pays 5 crowns per 10 XP and 100 an hour (#403's crowns migration, live since 11-18), the median study day earns about 700 crowns, so a Rare
   costs 1-2 study days, an Epic 2-4 and a Legendary 6-12, and half the class could buy anything today (4% of crowns spent). Proposed:
   Rare 1,500-2,500, Epic 3,500-6,000, Legendary 7,000-12,000, the boosts 300 and 800, the rest as they are (a migration: the rarity
   bands are checked in the database). Or wait and read `tools/economy.sql` again at the next audit, with the prizes in and the back
@@ -234,10 +234,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   student's own answers from the server there instead (their own rows, like the v2 bootstrap), or say "open a hub first" when every
   hub's state is empty (2026-11-12, [Ask Timmy](done/2026-11-12-redesign-ask-timmy.md) part 2).
 
-- [ ] Class picks on each choice ignore question versions: `question_choices` (and `question_stats`) are keyed by position, so when
+- [x] Class picks on each choice ignore question versions: `question_choices` (and `question_stats`) are keyed by position, so when
   an edit moves or rewrites choices, last week's percentages show beside a different choice until someone moves or clears the rows by
   hand (2026-11-04 evening lessons audit). Record the version with each pick (`record_choice`, `question_versions.v`) and read only the
-  current one, as question health already does.
+  current one, as question health already does. Done (#408, migration_v66): the picks follow the version of a question's choices (`question_keys.cv`, its choices and key), and old versions' picks move to `question_choices_past`; `question_stats` (% right per question, not per choice) stays as it is.
 
 - [ ] Anima figures on phones: at 390 px their in-drawing labels scale down to about 6-7 px. A plain bigger font for narrow screens clipped labels at the edges in about half the PCD Implants figures (tried 2026-11-04, reverted); it needs a per-figure phone layout (labels moved inside the drawing) or tap-to-zoom. Heme & Endo Exam 3's 22 (2026-11-17) mostly draw them at 10-15 px; its four L17 figures after the oocyte are the smallest (labels about 8 px on the timeline, implantation, estriol and breastfeeding figures). 
 - [x] The site is near GitHub Pages' 1 GB cap: 960 MB on 2026-11-12, most of it narration (430 MB of it from archived hubs:
@@ -263,3 +263,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `ubuntu-latest` became Ubuntu 26.04, which Playwright 1.56.1 doesn't support. Before 24.04 is retired: upgrade Playwright in
   `.github/workflows/*.yml` (and `PLAYWRIGHT_PATH` setups) to one that supports 26.04, re-record the a11y and perf baselines
   (`node tools/release/a11y.js --update`, `perf.js`), check the smoke test and the device matrix, then go back to `ubuntu-latest`.
+- [ ] **The workflows' actions off Node.js 20** (2026-11-18, seen in #407's After merge run): every run warns "Node.js 20 is
+  deprecated" for `actions/checkout@v4` and `actions/setup-node@v4` (8 uses each in `.github/workflows/*.yml`) and runs them
+  on Node 24 for now; `actions/upload-artifact@v4` (3) and `actions/github-script@v7` (2) are likely the same. Before GitHub
+  drops Node 20 entirely: move each to the major version that runs on Node 24, and let CI run every job once ("Check hubs" and
+  "Release tests" both run when a workflow changes).
