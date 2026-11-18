@@ -10,6 +10,21 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **The reward card on the dashboard too** (2026-11-18, from the hubs' reward card: Sam, "i want it to look much cooler and
+  communicate that you just got xp and crowns better"). A hub shows what a bonus paid on a gold card (`drawPrize` in
+  `widget/hub-rewards.js`, its styles inside it); the dashboard's prizes (the daily visit, the leaderboard name, trophies:
+  `toast()` in `widget/dash.js`) are still the dark toast. The dashboard measured 342 of its 345 KB budget on 2026-11-18, so
+  the card would go in a file the dashboard fetches when a prize first pays (not `dash.bundle.js`), or with Sam's OK to raise
+  the budget.
+- [x] **An index for recording an answer, if the database-load work doesn't already cover it** (done: `migration_v71.sql`, both indexes built live 2026-11-18, [#423](https://github.com/smcmurry6-source/study-hubs/pull/423)) (2026-11-18, found while
+  tracing the Today card's missing crowns, BUG-182). The most frequent statement timeout in that day's `postgres_logs` (103 of
+  about 436) was `sh_answer`'s speed limit, `select max(a.answered_at) from personal_answers a where a.visitor_id = ... and
+  a.id <> aid and a.answered_at <= v_at`, with its neighbors (the answers in the last 60 seconds, the latest one for a double
+  tap). `personal_answers` has only `(visitor_id, hub)`, so each reads every answer the person ever gave: about 0.4 s for the
+  heaviest visitor on a quiet database, three times an answer. Candidates: `(visitor_id, answered_at desc, id desc)`, and
+  `(visitor_id, hub, qid, answered_at desc, id desc)` for the per-question reads and `sh_medal_check`. Written and tested
+  (`tools/release/xp.js` passed), then left out of the reward-card PR because #421 took v70 and owns the database work; check
+  its task note (`vault/tasks/2026-11-18-database-load.md`) first, and measure on a throwaway copy, never the live database.
 - [x] **Re-price the middle of the shop, if Sam agrees** (decided: Sam, 2026-11-18, "lets keep all the prices for now"; the next audit reads it again, [decisions](../decisions.md)) (the 2026-11-18 lessons audit, [earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md)):
   since studying pays 5 crowns per 10 XP and 100 an hour (#403's crowns migration, live since 11-18), the median study day earns about 700 crowns, so a Rare
   costs 1-2 study days, an Epic 2-4 and a Legendary 6-12, and half the class could buy anything today (4% of crowns spent). Proposed:

@@ -75,12 +75,18 @@
   function shopOf(){ var b = window.shBootstrap, d = b && b.data; return SHOP || (d && d.shop && d.shop.wallet ? d.shop : null); }
   /* the shop is there for everyone once the page's bootstrap carries one (everyone has Timmy, so he's there to draw) */
   function hasShop(){ return !!shopOf(); }
-  /* the wallet ({ earned, spent, balance }), for Home's Today card (hub-rewards.js), or null before the bootstrap */
-  function wallet(){ var sh = shopOf(); return sh && sh.wallet && typeof sh.wallet.balance === "number" ? sh.wallet : null; }
+  /* the wallet ({ earned, spent, balance }), for the Today card (hub-rewards.js), or null before the bootstrap. Without the
+     shop (its bootstrap timed out, and get_my_shop hasn't answered yet), the balance the last paying reply carried
+     (window.shGame.crowns(), migration_v68), so the crowns still show (2026-11-18) */
+  function wallet(){
+    var sh = shopOf(); if (sh && sh.wallet && typeof sh.wallet.balance === "number") return sh.wallet;
+    var G = window.shGame, c = G && G.crowns ? G.crowns() : null;
+    return typeof c === "number" && isFinite(c) ? { balance: c } : null;
+  }
   /* the balance after a reply that paid (migration_v68: every paying reply carries it; widget/hub-rewards.js passes it on):
      the wallet takes it, its "earned in all" moves by the same, and an open shop shows it */
   function setWallet(n){
-    var w = wallet(); if (!w || typeof n !== "number" || !isFinite(n)) return;
+    var sh = shopOf(), w = sh && sh.wallet; if (!w || typeof n !== "number" || !isFinite(n)) return;
     if (n > w.balance) w.earned = (w.earned || 0) + (n - w.balance);
     w.balance = n;
     [].forEach.call(document.querySelectorAll("[data-shop-bal]"), function(b){ b.textContent = String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); });
@@ -103,11 +109,32 @@
     h = h >>> 0;
     return h % 12 === 0 ? COSTUMES[Math.floor(h / 12) % COSTUMES.length] : "";
   }
+  /* the shop on its own (get_my_shop, a small read), when the page's bootstrap came back without it: on 2026-11-18 about
+     one bootstrap in ten timed out in the busy minutes, and the Today card lost its crowns. It waits 8 to 20 seconds first
+     (a busy minute is usually over by then, and the class's pages don't all ask at once), and asks once more a minute
+     later at most. An answer's reply carries the balance anyway (wallet() above), so most people see it sooner. */
+  function shopAlone(tries){
+    setTimeout(function(){
+      whenWidget("shSupabase", function(sb){
+        var v = ls("sh_visitor_id");
+        if (!sb || !v || SHOP) return;
+        var again = function(){ if (tries > 1) shopAlone(tries - 1); };
+        sb.rpc("get_my_shop", { p_visitor: v }).then(function(r){
+          var sh = r && !r.error && r.data;
+          if (!sh || !sh.wallet || typeof sh.wallet.balance !== "number") { again(); return; }
+          if (SHOP) return;
+          SHOP = sh;
+          if (HX.view === "more" && !HX.sub) HX.go("more", true);
+          HX.paintMeters();
+        }, again);
+      });
+    }, tries > 1 ? 8000 + Math.random() * 12000 : 45000 + Math.random() * 30000);
+  }
   function shopStart(){
     var boot = window.shBootstrap && window.shBootstrap.ready;
     if (!boot || !boot.then) return;
     boot.then(function(d){
-      if (!d || !d.shop || !d.shop.wallet) return;
+      if (!d || !d.shop || !d.shop.wallet) { if (window.shGame && window.shGame.want && !window.shAutomated) shopAlone(2); return; }
       SHOP = d.shop;
       if (HX.view === "more" && !HX.sub) HX.go("more", true);
       HX.paintMeters();   // the Today card's crowns

@@ -201,20 +201,33 @@ if (off || boostShown !== !!boost()) paintMeters();
 });
 var PEND = [], BONUS = { goal20: "20 answers today", fix: "A miss fixed" }, MEDAL = ["", "Bronze", "Silver", "Gold", "Crown"];
 function pendSum(){ var cut = Date.now() - 20000; PEND = PEND.filter(function(x){ return x.at > cut; }); return PEND.reduce(function(n, x){ return n + x.xp; }, 0); }
+function prizeName(src, d){
+var G = window.shGame;
+if (G && G.prizeName) return G.prizeName(src, d);
+return G && G.prizeText ? String(G.prizeText(src, 1, d)).split(": +")[0] : "Bonus";
+}
+function studyCrowns(xp, mult){
+var b = (xp | 0) / ((mult | 0) || 1);
+return b > 0 && b === Math.floor(b) && b % 2 === 0 ? b / 2 : 0;
+}
 document.addEventListener("sh:answer-paid", function(e){
 var d = e.detail || {}, r = d.res; if (!r || r.repeat) return;
 var at = -1; PEND.some(function(x, i){ if (x.qid === d.qid) { at = i; return true; } return false; });
-var guess = at > -1 ? PEND.splice(at, 1)[0] : null, t = todayRec(), extra = 0, said = [];
-var G = window.shGame;
-(Array.isArray(r.bonus) ? r.bonus : []).forEach(function(b){ if (b && b.xp > 0) { extra += b.xp; if (BONUS[b.src]) said.push(BONUS[b.src] + ": +" + b.xp + " XP"); else if (G && G.prizeText) said.push(G.prizeText(b.src, b.xp, b)); } });
+var guess = at > -1 ? PEND.splice(at, 1)[0] : null, t = todayRec(), extra = 0, won = [];
+(Array.isArray(r.bonus) ? r.bonus : []).forEach(function(b){
+if (!b || !(b.xp > 0)) return;
+extra += b.xp;
+if (BONUS[b.src]) won.push({ t: BONUS[b.src], xp: b.xp, c: studyCrowns(b.xp, r.mult) });
+else won.push({ t: prizeName(b.src, b), xp: b.xp, c: b.xp, src: b.src });
+});
 var off = (r.xp | 0) - (guess ? guess.xp : r.xp | 0) + extra;
 if (off) { t.xp = Math.max(0, t.xp + off); if (d.ctx !== "mock" && d.ctx !== "arcade") SESSION.xp = Math.max(0, SESSION.xp + off); saveState(); }
 if (RANK.p && typeof r.total === "number") { RANK.p.xp = Math.max(RANK.p.xp || 0, r.total); RANK.local = pendSum(); }
 if (r.medal && r.medal.level) {
-said.push((MEDAL[r.medal.level] || "A medal") + " medal: +" + fmt(r.medal.xp | 0) + " XP and " + fmt((r.medal.xp | 0) + 50) + " crowns, and double XP for 24 hours");
+won.unshift({ t: (MEDAL[r.medal.level] || "A") + " medal", xp: r.medal.xp | 0, c: (r.medal.xp | 0) + 50, src: "medal", sub: "And double XP for 24 hours" });
 HX.say("Double XP for a day. Go!", "do-hop");
 }
-if (said.length && d.ctx !== "mock") toast(said.join(". ") + ".");
+if (won.length && d.ctx !== "mock") prizeCard(won);
 if (off || extra || r.medal || boostShown !== !!boost()) paintMeters();
 ringClaim();
 });
@@ -222,10 +235,153 @@ document.addEventListener("sh:prize", function(e){
 var d = e.detail || {}; if (!(d.xp > 0)) return;
 var w = HX.wallet ? HX.wallet() : null; if (d.src === "name" && w && w.got) w.got.name = true;
 todayRec().xp += d.xp; RANK.local += d.xp; saveState();
-toast(d.text || ("+" + fmt(d.xp) + " XP and crowns"));
+if (d.src === "ring") {
+ringShown = Date.now();
+if (goalWait) { clearTimeout(goalWait); goalWait = 0; }
+prizeCard([{ t: "Today's goal met", xp: d.xp, c: d.xp, src: "ring" }], { sub: goalSub(), kind: "goal" });
+} else prizeCard([{ t: prizeName(d.src, d.res || {}), xp: d.xp, c: d.xp, src: d.src }]);
 if (d.src === "nuke" || d.src === "boss" || d.src === "top") HX.say(d.src === "nuke" ? "Ten thousand! Go spend it." : "Nice hit!", "do-hop");
 paintMeters();
 });
+var PRIZE_CSS =
+".hx-prizes{--hxp-y:46px;position:fixed;z-index:45;left:50%;bottom:24px;transform:translateX(-50%);display:grid;gap:10px;width:min(420px,calc(100% - 32px));pointer-events:none}" +
+".hx-prize{position:relative;pointer-events:auto;cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent}" +
+".hxp-card{position:relative;overflow:hidden;display:grid;grid-template-columns:58px minmax(0,1fr);column-gap:12px;align-items:center;padding:12px 14px 15px 12px;" +
+"border-radius:18px;color:#3b2e3a;border:2px solid #3b2e3a;background:radial-gradient(130% 150% at 0% 0%,#fffbea 0%,#ffeeb3 46%,#ffd45e 100%);" +
+"box-shadow:0 4px 0 #3b2e3a,0 16px 36px rgba(201,151,28,.4);animation:hxp-in 560ms cubic-bezier(.34,1.56,.64,1) both}" +
+".hxp-card::after{content:'';position:absolute;top:-30%;bottom:-30%;left:-45%;width:38%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.8),transparent);" +
+"transform:skewX(-18deg);animation:hxp-shine 1000ms 300ms ease-out both;pointer-events:none}" +
+".hxp-badge{position:relative;width:58px;height:58px;display:grid;place-items:center;align-self:start}" +
+".hxp-rays{position:absolute;inset:-16px;border-radius:50%;background:repeating-conic-gradient(rgba(255,255,255,.95) 0 9deg,transparent 9deg 22.5deg);" +
+"-webkit-mask:radial-gradient(circle,#000 28%,transparent 68%);mask:radial-gradient(circle,#000 28%,transparent 68%);animation:hxp-spin 10s linear infinite}" +
+".hxp-badge::before{content:'';position:absolute;inset:3px;border-radius:50%;border:2px solid #3b2e3a;background:radial-gradient(circle at 34% 28%,#fffdf2,#f7d774 55%,#d9a62c)}" +
+".hxp-badge svg{position:relative;width:38px;height:38px;animation:hxp-pop 640ms 120ms cubic-bezier(.34,1.8,.64,1) both}" +
+".hxp-head{min-width:0}" +
+".hxp-kick{display:block;font-size:11px;line-height:1.3;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#8a5d00}" +
+".hxp-title{display:block;font-size:17px;line-height:1.2;font-weight:900;overflow-wrap:anywhere}" +
+".hxp-sub{display:block;margin-top:1px;font-size:13px;line-height:1.3;font-weight:700;color:#5a4858}" +
+".hxp-loot{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}" +
+".hxp-pill{display:inline-flex;align-items:center;gap:5px;padding:2px 11px 2px 4px;border-radius:999px;background:#fff;border:2px solid #3b2e3a;box-shadow:0 2px 0 #3b2e3a;" +
+"animation:hxp-pop 520ms 200ms cubic-bezier(.34,1.8,.64,1) both}" +
+".hxp-pill+.hxp-pill{animation-delay:360ms}" +
+".hxp-pill svg{width:26px;height:26px;flex:none}" +
+".hxp-pill b{font-size:19px;line-height:1.15;font-weight:900;font-variant-numeric:tabular-nums}" +
+".hxp-pill small{font-size:13px;font-weight:800}" +
+".hxp-pill.is-c b{color:#8a5d00}" +
+".hxp-timer{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(59,46,58,.3);transform-origin:left;animation:hxp-time var(--hxp-ms,4500ms) linear both}" +
+".hx-prize.out .hxp-card{animation:hxp-out 280ms ease-in both}.hx-prize.out .hxp-burst{display:none}" +
+".hxp-burst{position:absolute;left:36px;top:34px;width:0;height:0;z-index:1;pointer-events:none}" +
+".hxp-burst i{position:absolute;left:-4px;top:-6px;width:8px;height:12px;border-radius:2px;background:var(--c);opacity:0;animation:hxp-bit var(--t) var(--d) cubic-bezier(.2,.7,.4,1) both}" +
+".hxp-burst i.is-art{left:-9px;top:-9px;width:18px;height:18px;background:none}.hxp-burst i svg{display:block;width:100%;height:100%}" +
+".hxp-fly{position:fixed;z-index:60;left:0;top:0;width:24px;height:24px;pointer-events:none}.hxp-fly svg{display:block;width:100%;height:100%}" +
+"html.shx[data-theme=dark] .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}" +
+"@media (prefers-color-scheme:dark){html.shx:not([data-theme=light]) .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}}" +
+"@keyframes hxp-in{0%{opacity:0;transform:translateY(var(--hxp-y)) scale(.86) rotate(-2deg)}100%{opacity:1;transform:none}}" +
+"@keyframes hxp-out{to{opacity:0;transform:translateY(calc(var(--hxp-y) * .4)) scale(.95)}}" +
+"@keyframes hxp-shine{to{left:130%}}" +
+"@keyframes hxp-spin{to{transform:rotate(360deg)}}" +
+"@keyframes hxp-pop{0%{opacity:0;transform:scale(.2)}100%{opacity:1;transform:none}}" +
+"@keyframes hxp-time{from{transform:scaleX(1)}to{transform:scaleX(0)}}" +
+"@keyframes hxp-bit{0%{opacity:1;transform:translate(0,0) rotate(0) scale(.4)}35%{opacity:1;transform:translate(var(--x),var(--up)) rotate(calc(var(--r)*.4)) scale(1)}" +
+"100%{opacity:0;transform:translate(calc(var(--x)*1.25),calc(var(--up) + var(--fall))) rotate(var(--r)) scale(.85)}}" +
+"@media (prefers-reduced-motion:reduce){.hx-prize *,.hx-prize *::after{animation:none!important}}" +
+".hx-prize.is-calm .hxp-card{animation:hxp-fade 240ms ease-out both}.hx-prize.is-calm .hxp-card *,.hx-prize.is-calm .hxp-card::after{animation:none}" +
+".hx-prize.is-calm.out .hxp-card{animation:hxp-fadeout 240ms ease-in both}" +
+"@keyframes hxp-fade{from{opacity:0}to{opacity:1}}@keyframes hxp-fadeout{to{opacity:0}}" +
+"@media (max-width:640px){.hx-prizes{--hxp-y:-46px;bottom:auto;top:calc(env(safe-area-inset-top,0px) + var(--boss-h,0px) + 10px);width:calc(100% - 24px)}" +
+".hxp-card{grid-template-columns:48px minmax(0,1fr);column-gap:10px;padding:10px 12px 13px 10px}.hxp-badge{width:48px;height:48px}.hxp-badge svg{width:32px;height:32px}" +
+".hxp-title{font-size:16px}.hxp-pill{padding-right:9px}.hxp-pill svg{width:22px;height:22px}.hxp-pill b{font-size:17px}.hxp-pill small{font-size:12px}.hxp-burst{left:30px;top:30px}}";
+function prizeStyles(){
+if (document.getElementById("hxPrizeCss")) return;
+var s = document.createElement("style"); s.id = "hxPrizeCss"; s.textContent = PRIZE_CSS; document.head.appendChild(s);
+}
+function calmNow(){ return reduced || document.documentElement.classList.contains("hx-still"); }
+function starSvg(){ return artSvg(A.xp || "", "0 0 24 24", "", ""); }
+function coinSvg(){ return HX.shopCoin ? HX.shopCoin(26) : starSvg(); }
+function badgeArt(kind, c){
+if (kind === "streak") return flame(Math.max(3, streakDays()), "");
+return c > 0 ? coinSvg() : starSvg();
+}
+var prizeBatch = null, ringShown = 0, goalWait = 0;
+function prizeCard(lines, opts){
+opts = opts || {};
+if (!prizeBatch) { prizeBatch = { lines: [], opts: opts }; setTimeout(function(){ var b = prizeBatch; prizeBatch = null; whenFree(function(){ drawPrize(b.lines, b.opts); }); }, 260); }
+else if (opts.sub || opts.kind) prizeBatch.opts = opts;
+Array.prototype.push.apply(prizeBatch.lines, lines);
+}
+function whenFree(run, tries){
+if (document.querySelector(".mock-bar [data-submit]") && (tries | 0) < 900) { setTimeout(function(){ whenFree(run, (tries | 0) + 1); }, 2000); return; }
+run();
+}
+function drawPrize(lines, opts){
+var toasts = $("#hxToast"); if (!lines.length || !toasts) return;
+prizeStyles();
+var host = $(".hx-prizes");
+if (!host) { host = h('<div class="hx-prizes"></div>'); toasts.parentNode.insertBefore(host, toasts.nextSibling); }
+var xp = 0, c = 0, calm = calmNow();
+lines.forEach(function(l){ xp += l.xp | 0; c += l.c | 0; });
+var first = lines[0], kind = opts.kind || first.src || "", title = first.t + (/[.!?]$/.test(first.t) ? "" : "!");
+var sub = opts.sub || first.sub || lines.slice(1).map(function(l){ return l.t; }).join(" · ");
+var big = xp >= 1000 || kind === "medal" || kind === "nuke" || kind === "alltime", ms = big ? 6500 : 4800;
+var said = lines.map(function(l){ return l.t + (l.xp ? ": +" + fmt(l.xp) + " XP" + (l.c ? " and " + fmt(l.c) + " Shiny Gold Crowns" : "") : "") + (l.sub ? ". " + l.sub : ""); }).join(". ") + (opts.sub ? ". " + opts.sub : "") + ".";
+var bits = "";
+if (!calm) {
+var COLORS = ["#F2C94C", "#FF8FA3", "#7FD8A8", "#8FA6EC", "#C3A9F0", "#F7A83C"], N = big ? 26 : 16;
+for (var i = 0; i < N; i++) {
+var ang = (-90 + (Math.random() * 150 - 75)) * Math.PI / 180, dist = 70 + Math.random() * (big ? 170 : 110), art = i % 5 === 0 ? coinSvg() : i % 5 === 1 ? starSvg() : "";
+bits += '<i class="' + (art ? "is-art" : "") + '" style="--x:' + Math.round(Math.cos(ang) * dist * 1.3) + "px;--up:" + Math.round(Math.sin(ang) * dist) + "px;--fall:" +
+Math.round(120 + Math.random() * 160) + "px;--r:" + Math.round(Math.random() * 720 - 360) + "deg;--d:" + Math.round(120 + Math.random() * 260) + "ms;--t:" +
+Math.round(1100 + Math.random() * 700) + "ms;--c:" + COLORS[i % COLORS.length] + '">' + art + "</i>";
+}
+}
+var pill = function(cls, art, n, unit){ return '<span class="hxp-pill ' + cls + '">' + art + '<b data-to="' + n + '">+' + fmt(n) + "</b><small>" + unit + "</small></span>"; };
+var el = h('<div class="hx-prize' + (calm ? " is-calm" : "") + (big ? " is-big" : "") + '" role="status" data-kind="' + esc(kind) + '" style="--hxp-ms:' + ms + 'ms"><span class="sr">' + esc(said) + "</span>" +
+'<div class="hxp-card" aria-hidden="true"><span class="hxp-badge"><span class="hxp-rays"></span>' + badgeArt(kind, c) + "</span>" +
+'<span class="hxp-head"><span class="hxp-kick">' + (xp || c ? "You earned" : "Nice work") + '</span><b class="hxp-title">' + esc(title) + "</b>" + (sub ? '<span class="hxp-sub">' + esc(sub) + "</span>" : "") +
+(xp || c ? '<span class="hxp-loot">' + (xp ? pill("is-xp", starSvg(), xp, "XP") : "") + (c ? pill("is-c", coinSvg(), c, c === 1 ? "crown" : "crowns") : "") + "</span>" : "") + "</span>" +
+'<i class="hxp-timer"></i></div>' + (bits ? '<span class="hxp-burst" aria-hidden="true">' + bits + "</span>" : "") + "</div>");
+var cards = $$(".hx-prize:not(.out)", host); if (cards.length >= 2) shut(cards[0], true);
+host.appendChild(el);
+var done = false;
+function shut(node, quick){
+if (node.classList.contains("out")) return;
+node.classList.add("out");
+if (node === el) { done = true; if (!quick) fly(el); }
+setTimeout(function(){ node.remove(); }, 300);
+}
+el.addEventListener("click", function(){ shut(el); });
+if (!calm) $$(".hxp-pill b", el).forEach(function(b, k){
+var to = +b.getAttribute("data-to") || 0, t0 = null, wait = 260 + k * 160, dur = Math.min(1100, 500 + to / 4);
+b.textContent = "+0";
+(function step(ts){
+if (!b.isConnected) return;
+if (ts !== undefined) { if (t0 === null) t0 = ts; var x = Math.min(1, Math.max(0, (ts - t0 - wait) / dur)), e = 1 - Math.pow(1 - x, 3); b.textContent = "+" + fmt(Math.round(to * e)); if (x >= 1) return; }
+requestAnimationFrame(step);
+})();
+});
+setTimeout(function(){ if (!done) shut(el); }, ms);
+}
+function fly(el){
+var tgt = [$("#hxRank"), $("#hxXp")].filter(visible)[0], pills = $$(".hxp-pill svg", el);
+if (!tgt || !pills.length || calmNow() || !document.body.animate) return;
+var tr = tgt.getBoundingClientRect(), land = 0;
+for (var i = 0; i < 6; i++) (function(i){
+var src = pills[i % pills.length], sr = src.getBoundingClientRect();
+if (!sr.width) return;
+var f = h('<span class="hxp-fly" aria-hidden="true">' + src.outerHTML + "</span>");
+document.body.appendChild(f);
+var x0 = sr.left, y0 = sr.top, dx = tr.left + tr.width / 2 - 12 - x0, dy = tr.top + tr.height / 2 - 12 - y0,
+mx = dx * .3 + (Math.random() * 120 - 60), my = Math.min(0, dy) * .4 - 40 - Math.random() * 60, dur = 700 + i * 40, delay = i * 55;
+land = Math.max(land, dur + delay);
+f.animate([{ transform: "translate(" + x0 + "px," + y0 + "px) scale(.7)", opacity: 0 },
+{ transform: "translate(" + (x0 + mx) + "px," + (y0 + my) + "px) scale(1.15) rotate(" + (i % 2 ? 160 : -160) + "deg)", opacity: 1, offset: .45 },
+{ transform: "translate(" + (x0 + dx) + "px," + (y0 + dy) + "px) scale(.35) rotate(" + (i % 2 ? 340 : -340) + "deg)", opacity: .9 }],
+{ duration: dur, delay: delay, easing: "cubic-bezier(.45,0,.6,1)", fill: "both" }).onfinish = function(){ f.remove(); };
+})(i);
+setTimeout(function(){ tgt.classList.remove("bump"); void tgt.offsetWidth; tgt.classList.add("bump"); }, Math.min(land, 900));
+}
+function goalSub(){ var n = streakDays(), what = todayRec().k ? " questions and flashcards" : " questions"; return goal() + what + (n > 1 ? " · " + pl(n, "day") + " in a row" : ""); }
+function ringDue(){ var G = window.shGame; return v2() && !!(G && G.claim) && ls("sh_ring_" + HX.HUB) !== day(0); }
 var ringAsked = "";
 function ringClaim(){
 var G = window.shGame, t = todayRec(), d = day(0), key = "sh_ring_" + HX.HUB;
@@ -237,9 +393,12 @@ else ringAsked = "";
 });
 }
 document.addEventListener("sh:crowns", function(e){
-var d = e.detail || {}, was = HX.wallet ? HX.wallet() : null, before = was ? was.balance : d.was;
+var d = e.detail || {}, was = HX.hasShop && HX.hasShop() && HX.wallet ? HX.wallet() : null, before = was ? was.balance : d.was;
 if (HX.setWallet) HX.setWallet(d.balance);
-if (typeof before === "number" && d.balance > before) crownPop(d.balance - before);
+if (typeof before === "number" && d.balance > before) {
+crownPop(d.balance - before);
+var t = todayRec(); t.c = (t.c || 0) + (d.balance - before); saveState();
+}
 paintMeters();
 });
 function crownPop(n){
@@ -261,14 +420,15 @@ var d = e.detail || {}, r = d.res; if (!r || !(r.xp > 0)) return;
 var G = window.shGames, run = G && G.ran ? G.ran(d.session) : null;
 var mine = run ? (((HX.C || {}).arcade || {}).games || []).filter(function(g){ return g.id === run.game; })[0] : null;
 todayRec().xp += r.xp; RANK.local += r.xp; saveState();
-toast((run ? (mine && mine.name) || run.name || "Arcade game" : "Mock exam") + " finished: +" + r.xp + " XP."); paintMeters();
+prizeCard([{ t: (run ? (mine && mine.name) || run.name || "Arcade game" : "Mock exam") + " finished", xp: r.xp, c: studyCrowns(r.xp, r.mult), src: run ? "arcade" : "mock" }]);
+paintMeters();
 });
 document.addEventListener("sh:pod-paid", function(e){
 var r = (e.detail || {}).res; if (!r || r.ok === false || r.repeat) return;
 var G = window.shGame; if (G && G.setCrowns) G.setCrowns(r.crowns);
 var x = (r.xp | 0) + (r.done | 0); if (!(x > 0)) return;
 todayRec().xp += x; RANK.local += x; saveState();
-if (r.done > 0) toast(G && G.prizeText ? G.prizeText("pod-done", r.done) : "Timmy Time finished: +" + r.done + " XP.");
+if (r.done > 0) prizeCard([{ t: prizeName("pod-done", {}), xp: r.done, c: r.done, src: "pod-done" }]);
 paintMeters();
 });
 var RANK = { p: null, local: 0, mastery: null };
@@ -349,10 +509,12 @@ if (right !== null) HX.timmyReact(right);
 setTimeout(function(){
 paintMeters();
 if (rec.met) {
-var n = streakDays(), what = todayRec().k ? "" : " questions";
+var what = todayRec().k ? "" : " questions";
 $$("[data-streakm] .flame").forEach(function(f){ f.classList.add("grow-in"); });
 HX.say("Goal met! " + goal() + (what || " today") + (what ? " today." : "."), "do-hop");
-toast("Today's goal is met: " + goal() + (what || " questions and flashcards") + "." + (n > 1 ? " Your streak is " + pl(n, "day") + "." : ""));
+var plain = function(){ goalWait = 0; if (Date.now() - ringShown > 8000) prizeCard([{ t: "Today's goal met", xp: 0, c: 0, src: "goal" }], { sub: goalSub(), kind: "goal" }); };
+if (ringDue()) { if (goalWait) clearTimeout(goalWait); goalWait = setTimeout(plain, 5000); }
+else plain();
 }
 }, reduced ? 0 : 650);
 }
@@ -405,7 +567,8 @@ spot("today", { tint: T.ink, light: T.light, line: T.ink }, "today-art") + "</di
 '<li class="ts-xp">' + artSvg(A.xp, "0 0 24 24", "ts-art", "") + '<span><b class="num">+' + fmt(t.xp) + "</b><small>XP today</small></span></li>" +
 '<li class="ts-right">' + icon("check", 26) + '<span><b class="num">' + fmt(t.r || 0) + " of " + fmt(t.n) + "</b><small>Right today</small></span></li>" +
 (t.k ? '<li class="ts-cards">' + icon("cards", 26) + '<span><b class="num">' + fmt(t.k) + "</b><small>" + (t.k === 1 ? "Flashcard" : "Flashcards") + " today</small></span></li>" : "") +
-(w ? '<li class="ts-crowns"><a href="#more/shop" title="' + fmt(w.earned || w.balance) + ' Shiny Gold Crowns earned in all">' + HX.shopCoin(30) + '<span><b class="num">' + fmt(w.balance) + "</b><small>" + (w.balance === 1 ? "Gold crown" : "Gold crowns") + '<span class="sr"> to spend in Timmy’s shop</span></small></span></a></li>' : "") +
+(w ? '<li class="ts-crowns"><a href="#more/shop"' + (w.earned ? ' title="' + fmt(w.earned) + ' Shiny Gold Crowns earned in all"' : "") + ">" + HX.shopCoin(30) + '<span><b class="num">' + fmt(w.balance) + "</b><small>" + (w.balance === 1 ? "Gold crown" : "Gold crowns") + '<span class="sr"> to spend in Timmy’s shop</span></small>' +
+(t.c > 0 ? '<small class="ts-plus">+' + fmt(t.c) + " today</small>" : "") + "</span></a></li>" : "") +
 "</ul>" +
 (hp !== null ? '<p class="today-pet">' + icon("tooth", 18) + "<span>Timmy has <b class=\"num\">" + hp + " HP</b></span></p>" : "") + "</div>";
 }
@@ -486,9 +649,13 @@ function shopCoin(px){ return '<svg class="ic" viewBox="0 0 24 24" width="' + px
 var SHOP = null;
 function shopOf(){ var b = window.shBootstrap, d = b && b.data; return SHOP || (d && d.shop && d.shop.wallet ? d.shop : null); }
 function hasShop(){ return !!shopOf(); }
-function wallet(){ var sh = shopOf(); return sh && sh.wallet && typeof sh.wallet.balance === "number" ? sh.wallet : null; }
+function wallet(){
+var sh = shopOf(); if (sh && sh.wallet && typeof sh.wallet.balance === "number") return sh.wallet;
+var G = window.shGame, c = G && G.crowns ? G.crowns() : null;
+return typeof c === "number" && isFinite(c) ? { balance: c } : null;
+}
 function setWallet(n){
-var w = wallet(); if (!w || typeof n !== "number" || !isFinite(n)) return;
+var sh = shopOf(), w = sh && sh.wallet; if (!w || typeof n !== "number" || !isFinite(n)) return;
 if (n > w.balance) w.earned = (w.earned || 0) + (n - w.balance);
 w.balance = n;
 [].forEach.call(document.querySelectorAll("[data-shop-bal]"), function(b){ b.textContent = String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); });
@@ -507,11 +674,28 @@ for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 1677
 h = h >>> 0;
 return h % 12 === 0 ? COSTUMES[Math.floor(h / 12) % COSTUMES.length] : "";
 }
+function shopAlone(tries){
+setTimeout(function(){
+whenWidget("shSupabase", function(sb){
+var v = ls("sh_visitor_id");
+if (!sb || !v || SHOP) return;
+var again = function(){ if (tries > 1) shopAlone(tries - 1); };
+sb.rpc("get_my_shop", { p_visitor: v }).then(function(r){
+var sh = r && !r.error && r.data;
+if (!sh || !sh.wallet || typeof sh.wallet.balance !== "number") { again(); return; }
+if (SHOP) return;
+SHOP = sh;
+if (HX.view === "more" && !HX.sub) HX.go("more", true);
+HX.paintMeters();
+}, again);
+});
+}, tries > 1 ? 8000 + Math.random() * 12000 : 45000 + Math.random() * 30000);
+}
 function shopStart(){
 var boot = window.shBootstrap && window.shBootstrap.ready;
 if (!boot || !boot.then) return;
 boot.then(function(d){
-if (!d || !d.shop || !d.shop.wallet) return;
+if (!d || !d.shop || !d.shop.wallet) { if (window.shGame && window.shGame.want && !window.shAutomated) shopAlone(2); return; }
 SHOP = d.shop;
 if (HX.view === "more" && !HX.sub) HX.go("more", true);
 HX.paintMeters();
