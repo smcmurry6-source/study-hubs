@@ -69,7 +69,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   chromic gut, S3's "#14", S6's contained defect...). No question turns on any; a fix means narrating that session
   again (and Timmy Time if it covers it). Also there: the low-yield retirements Sam may want back.
   Decided (Sam, 2026-11-15): leave the eight spots as they are; the 27 retirements stand ([decisions](../decisions.md), #371).
-- [ ] **Sam's own look at the live site after the release** (2026-11-14, [the release](done/2026-11-06-redesign-release.md)).
+- [x] **Sam's own look at the live site after the release** (done: Sam, 2026-11-18, "i did my own look"; nothing reported) (2026-11-14, [the release](done/2026-11-06-redesign-release.md)).
   What an agent can't check without writing to the class's data as a made-up student: one Ask Timmy question from a
   phone (a "From the notes" link opens the paragraph; the admin page's Ask Timmy tab shows it with its cost); one Learn
   round and a flashcard; a random visit; the dashboard with a hub open in another tab (your Timmy walks into the

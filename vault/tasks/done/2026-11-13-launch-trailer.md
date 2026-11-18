@@ -85,4 +85,4 @@ Done (Sam, 2026-11-18). The trailer was made in [#360](https://github.com/smcmur
 made-up data, in the show's voice with new music and captions, as a file for Sam (nothing on the site). The video isn't
 in the repo (`tools/trailer/out/` is ignored). **The tools that make it (`tools/trailer/`: the studio, the recorder, the
 cut, the voice and the music) and that PR's full log are on its branch, `claude/dreamy-curie-6xjcg0`, not on `main`.**
-To make another trailer, start from that branch, or merge #360 into `main` first (it needs its base changed to `main`).
+Sam, 2026-11-18: "im done with the trailer", so #360 was closed unmerged; the branch stays, and another trailer would start from it.

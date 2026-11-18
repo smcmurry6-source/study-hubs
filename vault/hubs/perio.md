@@ -215,7 +215,9 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11
 
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
-- [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md) (still no recording in Drive, 2026-11-14).
+- [S6 to taught](../tasks/2026-11-03-perio-s6-regeneration-taught.md): its transcript has been in Drive since 2026-10-25 as
+  `en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt` (Periodontology → hubs), found 2026-11-18. **Lecture-capture
+  transcripts have generic names: search Drive for a session's words, not its title, before calling one missing.**
 - S9's two sources differ on recession prevalence (the recording vs the slide's 88% / 50%) and on ADM (a slide says
   comparable or superior to autografts, the exam-review guide says it doesn't work as well): the notes give both and
   no question turns on either. S9's drawn cases, modeled on two of his recorded cases, are `no-kg-24` and
