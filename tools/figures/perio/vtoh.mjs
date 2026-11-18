@@ -55,27 +55,27 @@ const hwR = (T, y) => { const u = uOf(T, y); return T.wJ / 2 * Math.sqrt(Math.ma
 const sh = (T, y) => T.bend * uOf(T, y) ** 3;
 const xL = (T, y) => T.cx + sh(T, y) - hwR(T, y), xR = (T, y) => T.cx + sh(T, y) + hwR(T, y);
 const apexYs = (T) => [.94, .975, .995].map((u) => T.yj + u * (T.ya - T.yj));
-function rootYs(T, from) { const ys = []; for (let y = from; y < T.ya - 1.4; y += .8) ys.push(y); return ys.concat(apexYs(T)); }
+function rootYs(T, from) { const ys = []; for (let y = from; y < T.ya - 1.4; y += 1) ys.push(y); return ys.concat(apexYs(T)); }
 function outline(T) {
   const top = T.L[0][0], o = [];
-  for (let y = top; y < T.yj; y += .5) o.push([T.cx - lerp(T.L, y), y]);
+  for (let y = top; y < T.yj; y += .6) o.push([T.cx - lerp(T.L, y), y]);
   for (const y of rootYs(T, T.yj + .3)) o.push([xL(T, y), y]);
   o.push([T.cx + T.bend, T.ya]);
   for (const y of rootYs(T, T.yj + .3).reverse()) o.push([xR(T, y), y]);
-  for (let y = T.yj; y > top; y -= .5) o.push([T.cx + lerp(T.R, y), y]);
+  for (let y = T.yj; y > top; y -= .6) o.push([T.cx + lerp(T.R, y), y]);
   o.push([T.cx + lerp(T.R, top), top]);
   return P(pxs(o), true);
 }
 /* the enamel cap: the crown's outline and an inner line that thins to nothing at the CEJ */
 function enamel(T) {
   const top = T.L[0][0], cusp = T.L[0][1] < 1, thick = cusp ? 1.5 : 1.05, o = [], inn = [];
-  for (let y = T.yj; y > top; y -= .5) o.push([T.cx - lerp(T.L, y), y]);
-  for (let y = top; y < T.yj; y += .5) o.push([T.cx + lerp(T.R, y), y]);
+  for (let y = T.yj; y > top; y -= .7) o.push([T.cx - lerp(T.L, y), y]);
+  for (let y = top; y < T.yj; y += .7) o.push([T.cx + lerp(T.R, y), y]);
   o.push([T.cx + T.wJ / 2, T.yj]);
   const t = (y) => .06 + (thick - .06) * Math.pow(1 - (y - top) / (T.yj - top), 1.3);
-  for (let y = T.yj; y > top + thick; y -= .5) inn.push([T.cx + lerp(T.R, y) - t(y), y]);
+  for (let y = T.yj; y > top + thick; y -= .7) inn.push([T.cx + lerp(T.R, y) - t(y), y]);
   if (cusp) inn.push([T.cx, top + thick]); else inn.push([T.cx + lerp(T.R, top + thick) - thick, top + thick], [T.cx - lerp(T.L, top + thick) + thick, top + thick]);
-  for (let y = top + thick + .5; y < T.yj; y += .5) inn.push([T.cx - lerp(T.L, y) + t(y), y]);
+  for (let y = top + thick + .7; y < T.yj; y += .7) inn.push([T.cx - lerp(T.L, y) + t(y), y]);
   inn.push([T.cx - T.wJ / 2, T.yj]);
   return P(pxs(o), true) + P(pxs(inn), true);
 }
@@ -83,7 +83,7 @@ function enamel(T) {
 function pulp(T) {
   const top = T.L[0][0], yc = top + .45 * (T.yj - top), a = [], b = [];
   const w = (y) => y < T.yj ? .2 + .5 * Math.min(1, (y - yc) / 1.6) : .7 - .5 * Math.min(1, (y - T.yj) / 4) - .1 * uOf(T, y);
-  for (let y = yc; y < T.ya - .6; y += .9) { const c = T.cx + sh(T, y); a.push([c - w(y), y]); b.push([c + w(y), y]); }
+  for (let y = yc; y < T.ya - .6; y += 1.2) { const c = T.cx + sh(T, y); a.push([c - w(y), y]); b.push([c + w(y), y]); }
   return P(pxs(a.concat(b.reverse())), true);
 }
 /* the lamina dura from the crest at y1 on the mesial side, round the apex, to the crest at y2 on the distal side */
@@ -96,11 +96,13 @@ function ld(T, y1, y2) {
 const { central: TC, lateral: TL, canine: TK, premolar: TP } = TEETH;
 const CR = { cl: 13.85, lat: 14.0, canA: 14.5, base: 19.8, cp: 14.05 };
 /* the defect's edge before: from the crest on the lateral's root down obliquely to its base on the canine's mesial root */
-const EDGE = sample([[xR(TL, CR.lat), CR.lat], [7.15, 14.3], [7.6, 14.85], [8, 15.8], [8.5, 17.3], [8.9, 18.6], [9.2, 19.4], [xL(TK, CR.base), CR.base]], 3);
-const BONE = [[-3, CR.cl], [xR(TC, CR.cl), CR.cl], [xL(TL, CR.cl), CR.cl]].concat(EDGE, [[xR(TK, CR.cp), CR.cp], [xL(TP, CR.cp), CR.cp], [24, CR.cp], [24, 33], [-3, 33]]);
+const EDGE = sample([[xR(TL, CR.lat), CR.lat], [6.95, 14.4], [7.2, 15], [7.5, 15.9], [7.95, 17.3], [8.45, 18.6], [8.95, 19.4], [xL(TK, CR.base), CR.base]], 3);
+/* the bone's own edge there is ragged (moth-eaten); the ghost line after treatment follows the smooth one */
+const EDGEJ = EDGE.map((p, i) => { if (!i || i === EDGE.length - 1) return p; const a = EDGE[i - 1], b = EDGE[i + 1], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy), d = (rnd() - .5) * .3; return [p[0] - dy / l * d, p[1] + dx / l * d]; });
+const BONE = [[-3, CR.cl], [xR(TC, CR.cl), CR.cl], [xL(TL, CR.cl), CR.cl]].concat(EDGEJ, [[xR(TK, CR.cp), CR.cp], [xL(TP, CR.cp), CR.cp], [FWm + 1, CR.cp], [FWm + 1, 33], [-3, 33]]);
 const FILL = [[xR(TL, CR.lat), CR.lat], [xL(TK, CR.canA), CR.canA]];
 for (let y = CR.canA + .5; y < CR.base; y += .5) FILL.push([xL(TK, y), y]);
-const FILLP = FILL.concat(EDGE.slice().reverse());
+const FILLP = FILL.concat(EDGEJ.slice().reverse());
 const inRoot = (p) => Object.values(TEETH).some((T) => p[1] > T.yj - .2 && p[1] < T.ya + .4 && p[0] > xL(T, p[1]) - .4 && p[0] < xR(T, p[1]) + .4);
 /* marrow spaces: short round-capped dashes in two sizes, kept off the crest and the defect's edge */
 function marrow(poly, n, gap) {
@@ -121,11 +123,11 @@ function specks() {
 }
 /* a canal filled at the root canal treatment: a tapering band from the access to near the apex */
 function canal(pts) {
-  const c = sample(pts, 3), a = [], b = [];
-  c.forEach((p, i) => { const q = c[Math.min(c.length - 1, i + 1)], r = c[Math.max(0, i - 1)], dx = q[0] - r[0], dy = q[1] - r[1], l = Math.hypot(dx, dy) || 1, w = .36 - .22 * i / (c.length - 1); a.push([p[0] + dy / l * w, p[1] - dx / l * w]); b.push([p[0] - dy / l * w, p[1] + dx / l * w]); });
+  const c = sample(pts, 2), a = [], b = [];
+  c.forEach((p, i) => { const q = c[Math.min(c.length - 1, i + 1)], r = c[Math.max(0, i - 1)], dx = q[0] - r[0], dy = q[1] - r[1], l = Math.hypot(dx, dy) || 1, w = .27 - .15 * i / (c.length - 1); a.push([p[0] + dy / l * w, p[1] - dx / l * w]); b.push([p[0] - dy / l * w, p[1] + dx / l * w]); });
   return P(pxs(a.concat(b.reverse())), true);
 }
-const GP = canal([[TK.cx - .3, 9.6], [TK.cx - .5, 13.5], [TK.cx - .4, 19], [TK.cx + .15, 24], [TK.cx + .3, 26.2]]) + canal([[TK.cx + .35, 9.6], [TK.cx + .55, 13.5], [TK.cx + .5, 19], [TK.cx + .55, 24], [TK.cx + .4, 26.2]]);
+const GP = canal([[TK.cx - .35, 9.7], [TK.cx - .75, 13.5], [TK.cx - .7, 19], [TK.cx - .2, 24], [TK.cx + .3, 26.3]]) + canal([[TK.cx + .35, 9.7], [TK.cx + .8, 13.5], [TK.cx + .85, 19], [TK.cx + .75, 24], [TK.cx + .45, 26.3]]);
 const ACCESS = P(pxs(sample([[TK.cx - .85, 6.6], [TK.cx, 6.1], [TK.cx + .85, 6.6], [TK.cx + .75, 9.7], [TK.cx, 10.1], [TK.cx - .75, 9.7], [TK.cx - .85, 6.6]], 2)), true);
 const cejY = (x) => TL.yj + 1.5 + (TK.yj - TL.yj) * (x - TL.cx) / (TK.cx - TL.cx);
 const CEJ15 = [[2.8, cejY(2.8)], [14.4, cejY(14.4)]];
@@ -158,14 +160,14 @@ function filmSvg() {
   const edge = P(pxs(EDGE), false), dense = P(pxs(FILL.slice(0, 2)), false), cej = P(pxs(CEJ15), false);
   const fx = X(0), fy = Y(Y0), fw = K * FWm, fh = K * FHm, r = 9;
   const film = `<rect class="vh-film" x="${fx}" y="${fy}" width="${fw}" height="${fh}" rx="${r}"/>`
-    + `<path class="vh-bone" d="${P(pxs(BONE), true)}"/>${marrow(BONE, 40, .55)}`
+    + `<path class="vh-bone" d="${P(pxs(BONE), true)}"/>${marrow(BONE, 32, .55)}`
     /* after: the fill, its marrow, the canine's mesial lamina dura up to the new crest, the dense crest */
     + `<g class="vh-s vh-after"><g class="hot" data-info="${HOT.fill}"><path class="vh-bone" d="${P(pxs(FILLP), true)}"/>${marrow(FILLP, 5, .3)}</g>`
     + `<path class="vh-ldl" d="${P(pxs(FILL.slice(1).concat([[xL(TK, CR.base), CR.base]])), false)}"/>`
     + `<g class="hot" data-info="${HOT.dense}"><path class="vh-dense" d="${dense}"/><path class="vh-hit" d="${dense}"/></g></g>`
     /* before: the fuzzy edge (soft dark strokes into the bone) and erosion specks */
-    + `<g class="vh-s vh-before"><g class="hot" data-info="${HOT.fuzzy}"><path class="vh-fz1" d="${edge}"/><path class="vh-fz2" d="${edge}"/><path class="vh-fz3" d="${edge}"/><path class="vh-speck" d="${specks()}"/></g>`
-    + `<g class="hot" data-info="${HOT.defect}"><path class="vh-hitf" d="${P(pxs(FILLP), true)}"/></g></g>`
+    + `<g class="vh-s vh-before"><g class="hot" data-info="${HOT.defect}"><path class="vh-hitf" d="${P(pxs(FILLP), true)}"/></g>`
+    + `<g class="hot" data-info="${HOT.fuzzy}"><path class="vh-fz1" d="${edge}"/><path class="vh-fz2" d="${edge}"/><path class="vh-fz3" d="${edge}"/><path class="vh-speck" d="${specks()}"/><path class="vh-hit vh-hite" d="${edge}"/></g></g>`
     /* the lamina dura on every root where there is bone, and the neighbors' crests */
     + `<path class="vh-ldl" d="${ld(TC, CR.cl, CR.cl)}${ld(TL, CR.cl, CR.lat)}${ld(TK, CR.base, CR.cp)}${ld(TP, CR.cp, CR.cp)}"/>`
     + `<path class="vh-crest" d="${crest(CR.cl, TC, TL)}${crest(CR.cp, TK, TP)}"/>`
@@ -174,7 +176,7 @@ function filmSvg() {
     + `<g class="hot" data-info="${HOT.cej}"><path class="vh-cej" d="${cej}"/><path class="vh-hit" d="${cej}"/></g>`
     + `<g class="vh-s vh-after hot" data-info="${HOT.ghost}"><path class="vh-ghost" d="${edge}"/></g>`
     /* a mat in the paper's color hides what runs past the film's edge (no clip path: copies of a figure repeat ids) */
-    + `<path class="vh-mat" fill-rule="evenodd" d="M${fx - 30} ${fy - 30}h${fw + 60}v${fh + 60}h${-fw - 60}Z M${fx + r} ${fy}h${fw - 2 * r}q${r} 0 ${r} ${r}v${fh - 2 * r}q0 ${r}-${r} ${r}h${2 * r - fw}q-${r} 0-${r}-${r}v${2 * r - fh}q0-${r} ${r}-${r}Z"/>`
+    + `<path class="vh-mat" fill-rule="evenodd" d="M${fx - 30} ${fy - 30}H${W + 30}V${fy + fh + 30}H${fx - 30}Z M${fx + r} ${fy}h${fw - 2 * r}q${r} 0 ${r} ${r}v${fh - 2 * r}q0 ${r}-${r} ${r}h${2 * r - fw}q-${r} 0-${r}-${r}v${2 * r - fh}q0-${r} ${r}-${r}Z"/>`
     + `<rect class="vh-frame" x="${fx}" y="${fy}" width="${fw}" height="${fh}" rx="${r}"/>`;
   const labels = lab([7.75, cejY(7.75)], 104, "1.5 mm from the CEJ:|where bone belongs")
     + lab([TK.cx - .45, 21.5], 240, "root canal:|two canals")
@@ -196,7 +198,7 @@ const cM = (v) => XC - Math.max(0, env(v) - dip(v, 1.2)) * K2, cD = (v) => XC + 
 const envL = (v) => 1.9 * Math.sqrt(Math.max(0, 1 - Math.pow(Math.abs(v) / 2.9, 2.4))) * (1 + .05 * v / 2.9);
 const wLt = (v) => Math.max(0, envL(v) - .22 * Math.exp(-((v / 1.1) ** 2))) * K2, lD = (v) => XLt + wLt(v), lM = (v) => XLt - wLt(v);
 const vy = (v) => CY + v * K2;
-function ring(fl, fr, vmax) { const a = [], b = []; for (let v = -vmax; v <= vmax + 1e-9; v += vmax / 22) { a.push([fl(v), vy(v)]); b.push([fr(v), vy(v)]); } return P(a.concat(b.reverse()), true); }
+function ring(fl, fr, vmax) { const a = [], b = []; for (let v = -vmax; v <= vmax + 1e-9; v += vmax / 17) { a.push([fl(v), vy(v)]); b.push([fr(v), vy(v)]); } return P(a.concat(b.reverse()), true); }
 function cutSvg() {
   /* the floss: tangent to the two lobes, wrapped round them, its ends out labially and lingually */
   let vLab = 1, vLin = -1;
@@ -211,11 +213,11 @@ function cutSvg() {
   const bio = [];
   for (let v = -2.4; v <= 2.41; v += .27) { const x = cM(v), deep = x - chord; if (deep > 4) bio.push([x - 2.6, vy(v)]); if (deep > 12) bio.push([x - 7, vy(v + .13)]); }
   /* the brush: a wire core through the embrasure, bristles out to the surfaces, longer into the concavity */
-  let br = "";
-  for (let y = 70; y <= 230; y += 3.2) {
+  let br = ""; const ends = [], ends2 = [];
+  for (let y = 70; y <= 230; y += 3.4) {
     const v = (y - CY) / K2, R = 34 * Math.min(1, (4.5 - Math.abs(v)) / .9);
     const right = Math.abs(v) < 3.35 ? Math.min(R, cM(v) - .8 - XB) : R, left = Math.abs(v) < 2.85 ? Math.min(R * .8, XB - lD(v) - .8) : R * .8;
-    br += "M" + r1(XB - left) + " " + r1(y) + "h" + r1(left + right);
+    br += "M" + r1(XB - left) + " " + r1(y) + "h" + r1(left + right); if (!(ends.length % 4) || y > 226) { ends.push([XB - left, y]); ends2.unshift([XB + right, y]); }
   }
   const L = (p, q, text, x, cls = "") => `<g${cls ? ` class="${cls}"` : ""}><path class="vh-lead" d="M${r1(p[0])} ${r1(p[1])}L${q[0]} ${q[1]}"/><circle class="vh-dot" cx="${r1(p[0])}" cy="${r1(p[1])}" r="2.3"/><text class="vh-t vh-lab" x="${x}" y="${q[2]}">${text.split("|").map((s, i) => `<tspan x="${x}" dy="${i ? "1.15em" : 0}">${s}</tspan>`).join("")}</text></g>`;
   const body = `<g class="hot" data-info="${HOT.latroot}"><path class="vh-dent" d="${ring(lM, lD, 2.9)}"/><ellipse class="vh-pulp2" cx="${XLt}" cy="${vy(.1)}" rx="5.6" ry="18"/></g>`
@@ -224,7 +226,7 @@ function cutSvg() {
     + `<text class="vh-t vh-tool" x="118" y="45" text-anchor="middle">floss</text>`
     + L([chord + 11, vy(.3)], [64, 254, 266], "floss bridges the concavity:|biofilm left in its depth", 10)
     + `<path class="vh-biok" d="M238 262h0"/><text class="vh-t vh-small" x="246" y="266">biofilm</text></g>`
-    + `<g class="vh-s vh-brush"><g class="hot" data-info="${HOT.brush}"><path class="vh-bri" d="${br}"/><path class="vh-wire" d="M${XB} 62V246"/><rect class="vh-handle" x="${XB - 5}" y="240" width="10" height="16" rx="3"/></g>`
+    + `<g class="vh-s vh-brush"><g class="hot" data-info="${HOT.brush}"><path class="vh-hitf" d="${P(ends.concat(ends2), true)}"/><path class="vh-bri" d="${br}"/><path class="vh-wire" d="M${XB} 62V246"/><rect class="vh-handle" x="${XB - 5}" y="240" width="10" height="16" rx="3"/></g>`
     + `<text class="vh-t vh-tool" x="${XB}" y="52" text-anchor="middle">interdental brush</text>`
     + L([cM(0) - 1.5, CY], [64, 254, 266], "bristles spread out into|the concavity", 10) + `</g>`
     + L([XLt - 4, vy(-2.35)], [40, 28, 22], "lateral incisor", 10)
@@ -308,7 +310,7 @@ const CSS = `
 .anima .vh-svg .vh-fz2{fill:none;stroke:var(--pd-xray);stroke-width:7.5;opacity:.3}
 .anima .vh-svg .vh-fz3{fill:none;stroke:var(--pd-xray);stroke-width:3;opacity:.45}
 .anima .vh-svg .vh-speck{fill:none;stroke:color-mix(in srgb, var(--pd-xray) 70%, var(--pd-xbone));stroke-width:2.6;stroke-linecap:round}
-.anima .vh-svg .vh-tooth{fill:color-mix(in srgb, var(--pd-xti) 38%, var(--pd-xbone));stroke:var(--pd-xray);stroke-width:2}
+.anima .vh-svg .vh-tooth{fill:color-mix(in srgb, var(--pd-xti) 38%, var(--pd-xbone));stroke:color-mix(in srgb, var(--pd-xray) 80%, var(--pd-xbone));stroke-width:1.3}
 .anima .vh-svg .vh-enam{fill:color-mix(in srgb, var(--pd-xti) 80%, var(--pd-xbone));fill-rule:evenodd}
 .anima .vh-svg .vh-pulp{fill:color-mix(in srgb, var(--pd-xray) 68%, var(--pd-xbone))}
 .anima .vh-svg .vh-acc{fill:color-mix(in srgb, var(--pd-xti) 85%, var(--pd-xbone))}
@@ -317,6 +319,9 @@ const CSS = `
 .anima .vh-svg .vh-ghost{fill:none;stroke:var(--pd-pus);stroke-width:1.8;stroke-dasharray:4 3}
 .anima .vh-svg .vh-hit{fill:none;stroke:transparent;stroke-width:11}
 .anima .vh-svg .vh-hitf{fill:transparent}
+.anima .vh-svg .vh-lin,.anima .vh-svg .vh-lead,.anima .vh-svg .vh-dot,.anima .vh-svg .vh-dotf,.anima .vh-svg .vh-t,.anima .vh-svg .vh-ftag{pointer-events:none}
+.anima .vh-svg .vh-hite{stroke-width:5}
+.anima .vh-svg .vh-fz1,.anima .vh-svg .vh-fz2{pointer-events:none}
 .anima .vh-svg .vh-dent{fill:var(--vh-dentin);stroke:var(--vh-line);stroke-width:1.4}
 .anima .vh-svg .vh-pulp2{fill:color-mix(in srgb, var(--pd-red) 45%, var(--vh-dentin));stroke:var(--pd-red-line);stroke-width:.8}
 .anima .vh-svg .vh-gp2{fill:var(--vh-gp);stroke:var(--vh-gp-line);stroke-width:1}

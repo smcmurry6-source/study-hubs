@@ -128,7 +128,7 @@ export function rsDyn(st, D) {
   lab.push([T.wall, rsW(6.9) + .75, 6.9]);
   if (!k) lab.push([T.root, rsXr(4.6) - .3, 4.6]);
   if (m === 2) { if (k < 3) lab.push([T.graft, D.GRL[0], D.GRL[1]]); }
-  else if (k < 2) lab.push([T.clot, cx(6.9), 6.9]);
+  else if (k < 2) lab.push([T.clot, cx(5.7), 5.7]);
   if (m) { var pm = rsOff(C.slice(D.MEMLAB - 1, D.MEMLAB + 2), .17)[1]; lab.push([[T.mem0, m === 1 ? T.mem1 : T.mem2, m === 1 ? T.mem1 : T.mem2, T.mem3][k], pm[0], pm[1]]); }
   if (!m || k < 2) lab.push([T.pdl0, rsXr(10.6) + .15, 10.6]);
   if (m && k >= 2) { d = k === 3 ? 6.4 : Math.min(7.7, Pf + 1); lab.push([k === 3 ? T.npdl : T.npdl2, rsXr(d) + .16, d]); if (k === 3) lab.push([T.cem, rsXr(4.7) + .04, 4.7]); }
@@ -162,17 +162,17 @@ const D = {
   },
   HOT: {
     tooth: "The tooth, cut through. The root beside the defect was scaled and root planed: it has to be clean before anything goes in.",
-    bone: "The defect's bony wall. With the granulomatous tissue removed, the walls contribute to healing: more walls, a more contained defect and more bony surface to heal from.",
+    bone: "The defect's bony wall. Once the granulomatous tissue is removed, the walls contribute to healing: more walls, a more contained defect, more bony surface.",
     pdl: "The ligament left at the base of the defect: a little ligament space, one of the slow tissues. Its cells can form new attachment.",
-    clot: "The blood clot in the cleaned defect, protected by the flap. Whatever tissue is fastest in migrating into the defect wins the race for the space.",
+    clot: "The blood clot in the cleaned defect, protected by the flap. Whatever tissue migrates into it fastest wins the race for the space.",
     ct: "The flap's connective tissue (gingival connective tissue): slower than its epithelium, faster than bone. Without a barrier it grows into the defect; it doesn't form attached ligament.",
     epi: "The flap's epithelium: without a barrier it migrates straight down the root toward the bone, faster than anything else.",
     lje: "A long junctional epithelium against the root instead of new cementum with inserting ligament fibers: repair. A pocket lined by epithelium is a pocket again.",
     estop: "The flap's epithelium runs down the root only as far as the membrane's edge; below it the membrane keeps it off the root.",
-    mem: "The GTR barrier membrane, between the flap and the defect: it keeps out the flap's epithelium and connective tissue, so bone and ligament can fill the space. Today's are collagen, bioabsorbed.",
+    mem: "The GTR barrier membrane, between the flap and the defect: it keeps out the flap's epithelium and connective tissue so bone and ligament can fill the space. Today's are collagen, bioabsorbed.",
     memSag: "With nothing under it, the membrane can collapse into the defect, leaving less space to fill. This defect is about 3 mm wide at its crest, where the decision tree adds a graft or uses a reinforced membrane.",
     memGone: "The collagen membrane is bioabsorbed: it stayed a while, influenced the healing and went away.",
-    graft: "A bone graft (the patient's own bone, or a processed donor graft such as DFDBA): a scaffold for bone to grow over, holding the space so the membrane can't collapse into the defect.",
+    graft: "A bone graft (the patient's own bone, or a donor graft such as DFDBA): a scaffold for bone, holding the space so the membrane can't collapse into the defect.",
     grafted: "The graft, remodeled: the body recognizes it and remodels it as bone.",
     nb: "New bone: slow, but very predictable while the site is still. It grows in from the base and the bony walls.",
     lb: "A little bone fill at the base (most likely in the 3-wall part at the bottom). On the slide's studies, open flap debridement gained 0.7 to 1.2 mm of bone and 1.3 to 1.5 mm of CAL.",
@@ -185,15 +185,15 @@ const D = {
   ROOT: [["a clean surface", "epithelium, moving down", "epithelium", "long junctional epithelium"], ["a clean surface", "a clean surface, protected", "new cementum, climbing", "new cementum, inserting fibers"]],
   RES: [["the race starts", "epithelium ahead", "epithelium winning", "repair"], ["the race starts", "slow tissues protected", "regenerating", "regeneration"]],
   SUM: [
-    ["No barrier, at surgery: the granulomatous tissue is out, the root is planed clean, and the flap is sutured back over the defect, which fills with a blood clot. Whatever tissue migrates in fastest will win the race for the space.",
-      "About a week: the flap's epithelium migrates straight down the root, faster than anything else, with the flap's connective tissue behind it. A cut in the skin is gone in about a week; bone has barely started.",
+    ["No barrier, at surgery: the granulomatous tissue is out, the root planed clean, and the flap sutured back over the defect, which fills with a blood clot. Whatever tissue migrates in fastest will win the race for the space.",
+      "About a week: the flap's epithelium migrates straight down the root, faster than anything else, with the flap's connective tissue behind it. A cut in the skin heals in about a week; bone has barely started.",
       "About six weeks: the epithelium is nearly at the base and the flap's connective tissue fills the defect. Bone heals slowly but predictably, like a broken leg in a cast, and has only begun at the base.",
       "Months later, repair: a long junctional epithelium lies against the root instead of new cementum with inserting fibers, with a little bone fill at the base. A pocket lined by epithelium is a pocket again. This is open flap debridement, the baseline (about 1.5 mm of CAL, 1 mm of bone) every regenerative therapy must beat."],
-    ["GTR, at surgery: a barrier membrane goes between the flap and the cleaned defect, keeping out the flap's epithelium and connective tissue. Under it, in the clot, the slow tissues (bone and the bit of ligament at the base) have the space to themselves.",
+    ["GTR, at surgery: a barrier membrane between the flap and the cleaned defect keeps out the flap's epithelium and connective tissue. Under it, the slow tissues (bone and the bit of ligament at the base) have the clot to themselves.",
       "About a week: the epithelium runs down the root only as far as the membrane's edge. With nothing under it, the membrane sags a little into this wide defect. Ligament cells from the base start up the root.",
-      "About six weeks: new ligament climbs the root, laying down new cementum, and bone grows in slowly from the base and the walls. Collagen membranes stay a while, influence the healing and are bioabsorbed.",
+      "About six weeks: new ligament climbs the root, laying down new cementum, and bone grows in slowly from the base and the walls. The collagen membrane stays a while, influences the healing and is bioabsorbed.",
       "Months later, regeneration: new bone, new PDL and new cementum with inserting fibers, a new functional attachment apparatus. The membrane is absorbed. The fill stops where the membrane sagged; a graft under it would have held the space."],
-    ["Combination therapy, at surgery: a bone graft is packed into the defect and the membrane goes over it. The graft is a scaffold for bone, and it holds the space so the membrane can't collapse into the defect.",
+    ["Combination therapy, at surgery: a bone graft packed into the defect, the membrane over it. The graft is a scaffold for bone, and it holds the space so the membrane can't collapse into the defect.",
       "About a week: the epithelium stops at the membrane's edge, and the graft keeps the membrane up. Like a broken bone, a defect heals when it is still.",
       "About six weeks: new bone forms around the graft particles from the base and the walls, new ligament and cementum climb the root, and the body remodels the graft as bone.",
       "Months later, regeneration across the whole defect, up to the membrane: new bone, new PDL and new cementum with inserting fibers. The membrane is absorbed and the graft remodeled as bone: the defect filled and leveled out."],
@@ -262,15 +262,15 @@ const controls = `<div class="am-controls" role="group" aria-label="Setting"><bu
 <p class="am-summary" aria-live="polite"></p>
 <p class="am-info">Tap a tissue (the flap, the clot, the bone, the root) to read what it is.</p>`;
 const SOURCES = `<details class="am-sources"><summary>What this shows, and what's simplified</summary><ul>
-<li>From Dr. Geurs's class, his slides and the exam-review guide: the race for the space (the flap's epithelium fastest, its connective tissue faster than bone, bone slow but predictable), repair as a long junctional epithelium, regeneration as new bone, new cementum and new PDL (the 1996 World Workshop's definition), the membrane between the flap and the defect, the graft that holds the space, collagen membranes that are bioabsorbed, and open flap debridement's numbers.</li>
-<li>Outside sources: the four tissues competing to repopulate the root, and the idea that whichever gets there decides the attachment, are Melcher's (J Periodontol 1976;47:256-60). Healing by a long junctional epithelium after flap surgery without a barrier follows Caton, Nyman and Zander (J Clin Periodontol 1980;7:224-31). The barrier between the flap and the root, covering the defect and resting on the bone around it, and the new cementum with inserting fibers under it, follow Nyman, Lindhe, Karring and Rylander (J Clin Periodontol 1982;9:290-6), the first human case, with a laboratory filter, and Gottlow, Nyman, Lindhe, Karring and Wennstr&ouml;m (J Clin Periodontol 1986;13:604-16). The order of healing (epithelium first, bone and cementum over weeks to months) and why a membrane needs space under it follow Polimeni, Xiropaidis and Wikesj&ouml; (Periodontol 2000 2006;41:30-47).</li>
-<li>A schematic, drawn to one scale (the 2 mm bar), with the epithelium, ligament and cementum drawn thicker than true so they show. The timing is schematic: "about a week" and "about six weeks" are the class's comparisons (a cut in the skin, a broken leg in a cast), not times measured in a defect. How far each tissue gets, how much the membrane sags and the graft particles are illustrative, and the little recession a flap leaves isn't drawn. Educational, not medical advice.</li></ul></details>`;
+<li>From Dr. Geurs's class, his slides and the exam-review guide: the race for the space (the flap's epithelium fastest, its connective tissue faster than bone, bone slow but predictable), repair as a long junctional epithelium, regeneration as new bone, new cementum and new PDL (the 1996 World Workshop), the membrane between the flap and the defect, the graft that holds the space, bioabsorbed collagen membranes, and open flap debridement's numbers.</li>
+<li>Outside sources: the four tissues competing to repopulate the root, whichever gets there deciding the attachment, are Melcher's (J Periodontol 1976;47:256-60). Healing by a long junctional epithelium after flap surgery follows Caton, Nyman and Zander (J Clin Periodontol 1980;7:224-31). The barrier between the flap and the root, covering the defect and resting on the bone around it, with new cementum and inserting fibers under it, follows Nyman, Lindhe, Karring and Rylander (J Clin Periodontol 1982;9:290-6; the first human case, with a laboratory filter) and Gottlow, Nyman, Lindhe, Karring and Wennstr&ouml;m (J Clin Periodontol 1986;13:604-16). The order of healing (epithelium first, bone and cementum over weeks to months) and why a membrane needs space under it follow Polimeni, Xiropaidis and Wikesj&ouml; (Periodontol 2000 2006;41:30-47).</li>
+<li>A schematic, drawn to one scale (the 2 mm bar); the epithelium, ligament and cementum are drawn thicker than true. The timing is schematic: "about a week" and "about six weeks" are the class's comparisons (a cut in the skin, a broken leg in a cast), not times measured in a defect. How far each tissue gets, the membrane's sag and the graft particles are illustrative; the little recession a flap leaves isn't drawn. Educational, not medical advice.</li></ul></details>`;
 
 function rsLive(root, D) {
   var svg = root.querySelector(".rs-svg"), gFill = svg.querySelector(".rs-fill"), gMid = svg.querySelector(".rs-mid"), gLab = svg.querySelector(".rs-lab");
   var sum = root.querySelector(".am-summary"), info = root.querySelector(".am-info"), readout = root.querySelector("[data-readout]");
   var range = root.querySelector("[data-rst]"), val = root.querySelector("[data-rsv]"), play = root.querySelector("[data-rsplay]");
-  var st = { m: 0, s: 0 }, raf = 0, lastK = -1, lastM = -1;
+  var st = { m: 0, s: 0 }, raf = 0, lastK = -1, lastM = -1, info0 = info.textContent;
   function draw() {
     var k = D.rsStage(st.s), o = D.rsDyn(st, D), t = D.TIME[k];
     gFill.innerHTML = o.fill; gMid.innerHTML = o.mid; gLab.innerHTML = o.lab;
@@ -285,7 +285,7 @@ function rsLive(root, D) {
     root.querySelectorAll("[data-rsm]").forEach(function (x) { x.setAttribute("aria-pressed", String(x.getAttribute("data-rsm") === String(st.m))); });
   }
   function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; play.setAttribute("aria-pressed", "false"); }
-  root.querySelectorAll("[data-rsm]").forEach(function (x) { x.addEventListener("click", function () { st.m = +x.getAttribute("data-rsm"); draw(); }); });
+  root.querySelectorAll("[data-rsm]").forEach(function (x) { x.addEventListener("click", function () { st.m = +x.getAttribute("data-rsm"); info.textContent = info0; draw(); }); });
   range.addEventListener("input", function () { stop(); st.s = +range.value / 100; draw(); });
   play.addEventListener("click", function () {
     if (raf) { stop(); return; }
@@ -300,7 +300,7 @@ function rsLive(root, D) {
   draw();
 }
 
-const DARK = "--rs-enamel:#e4ddd0;--rs-dentin:#b9a27c;--rs-line:#8a7552;--rs-cem:#e0bd82;--rs-epi:#cf9bd2;--rs-clot:#c0384b;--rs-pdl:#6a4b3e;--rs-pdl-line:#d6a888;--rs-nb:#62584a;--rs-mem:#2c3e57;--rs-mem-line:#8ab2e6;--rs-graft:#a39780";
+const DARK = "--rs-enamel:#e4ddd0;--rs-dentin:#b9a27c;--rs-line:#8a7552;--rs-cem:#e0bd82;--rs-epi:#cf9bd2;--rs-clot:#c0384b;--rs-pdl:#6a4b3e;--rs-pdl-line:#d6a888;--rs-nb:#62584a;--rs-mem:#3a5476;--rs-mem-line:#8ab2e6;--rs-graft:#a39780";
 const CSS = `
 .anima .rs-box{max-width:540px;margin:0 auto}
 .anima .rs-svg .rs-t{fill:var(--anatomy-strong);font:600 11px var(--anatomy-mono)}
@@ -330,7 +330,7 @@ const CSS = `
 
 export function race() {
   return { id: "race", lec: "periodontal-regeneration", title: "The race for the space",
-    caption: "What reaches the cleaned root first decides how an intrabony defect heals: the flap's epithelium is fastest, bone slowest. With no barrier, a GTR membrane, or a graft under the membrane. From Dr. Geurs's class and slides.",
+    caption: "Whatever tissue migrates into a cleaned intrabony defect fastest wins the race for the space: the flap's epithelium is fastest, bone slowest. With no barrier, a GTR membrane, or a graft under the membrane. From Dr. Geurs's class and slides.",
     html: `<div class="anima" data-anima="race">${plate}${controls}${SOURCES}</div>`, css: CSS, live: rsLive.toString(),
     helpers: [rsXr, rsW, rsBo, rsSm, rsEz, rsP, rsCover, rsOff, rsPdl, rsCem, rsBlob, rsLab, rsStage, rsDyn], data: D };
 }
