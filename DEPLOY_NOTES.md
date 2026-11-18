@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-18 (lessons refresh, and the game economy joins the audit, Claude Code)** — Sam: "add to the lessons audit a review of xp
+- **2026-11-18 (lessons refresh, and the game economy joins the audit, Claude Code, #414)** — Sam: "add to the lessons audit a review of xp
   and crowns across the class to make sure earn rates are healthy. also include shop prices". A standing rule,
   [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md) (on demand, for anything that changes a rate, a prize or a
   price), with a yardstick in median study days per rarity; `tools/economy.sql` (E0-E6: the live rules, crowns and XP per study day
