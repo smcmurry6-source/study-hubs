@@ -861,7 +861,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     el.innerHTML = '<div class="grid">' +
       '<div class="s5">' + card("By hub", rangeText(), hubTbl) + '</div>' +
       '<div class="s7">' + card("By section" + (h ? " in " + esc(hubLabel(h.hub)) : ""), h ? fmtMin(h.minutes) + " · " + rangeText() : "", secBody) + '</div>' +
-      '</div><p class="note">Time comes from a heartbeat: every 25 seconds a hub is open and in view counts toward the section on screen. Since 2026-09-25 it stops after 15 minutes with no taps, clicks, keys or scrolling (unless Listen is playing). Per-view detail starts 2026-09-23; older time only knows the top-level mode.</p>';
+      '</div><p class="note">Time comes from a heartbeat: every 25 seconds a hub is open and in view counts toward the section on screen. Since 2026-09-25 it stops after 15 minutes with no taps, clicks, keys or scrolling (unless Listen or Timmy Time is playing). Since 2026-11-18 narration or Timmy Time playing with the tab hidden or the phone locked counts too, by how far the audio played. Per-view detail starts 2026-09-23; older time only knows the top-level mode.</p>';
     el.dataset.ready = "1";
   }
 
@@ -2124,7 +2124,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
           '<div class="live-total"><span class="value num" id="liveTotal">–</span><span class="unit" id="liveUnit">people</span></div>' +
           '<p class="note" id="liveStatus" role="status" aria-live="polite"></p><h3 class="sub-h">By hub</h3><div id="liveHubs"></div>') + '</div>' +
         '<div class="s4">' + card("What this counts", "",
-          '<ul class="rules"><li><b>Live</b> means a study ping in the last ' + LIVE_MINUTES + ' minutes. A hub sends one for every 25 seconds it is on screen and in use, and stops when the tab is hidden or after 15 minutes with no taps, clicks, keys or scrolling. The dashboard sends none.</li>' +
+          '<ul class="rules"><li><b>Live</b> means a study ping in the last ' + LIVE_MINUTES + ' minutes. A hub sends one for every 25 seconds it is on screen and in use, and stops when the tab is hidden (unless narration or Timmy Time is playing) or after 15 minutes with no taps, clicks, keys or scrolling. The dashboard sends none.</li>' +
           '<li><b>Names</b> are the leaderboard names: a name the student chose, otherwise their random class name. The page never gets a visitor id, an email or which section someone is on. Two linked devices count once; someone in two hubs shows in both and counts once in the total.</li>' +
           '<li>The green “studying now” pill in the hubs counts open hub tabs, idle ones too, so it can read higher.</li>' +
           '<li>This view checks every 30 seconds while it is open and on screen, and not at all otherwise.</li></ul>') + '</div></div>';

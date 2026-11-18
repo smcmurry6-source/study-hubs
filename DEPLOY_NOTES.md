@@ -40,6 +40,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   mock exam, answered "paused" with no model call). And `buildRequest` in `supabase/functions/timmy/core.js` puts the site
   help after the hub's content, each block with its own 1-hour cache mark, so an About page change no longer sends every
   hub's 130-160k tokens to the cache again ([ask-timmy](vault/reference/ask-timmy.md), "Limits and money").
+- **2026-11-18 (study time counts listening with the screen off, Claude Code)** — Sam asked whether Perio's study time
+  was right on the day before the final, with so many people on it. It was: about 64 hours by 1 pm from 59 people, more than
+  twice the same time the day before, and the study-time saves nearly all reached the database (about 15 errors in 10,000).
+  It looked slow because people come and go: 45 people opened Perio in the noon hour, but about 16 were studying at any one
+  time. The one gap: the clock stopped when the tab was hidden or the phone locked, even with a lecture's narration or
+  Timmy Time still playing. Now (Sam: "add that study time tracking") `widget/v3.js` keeps counting while either one
+  plays hidden, by how far the audio played at its speed, so a locked phone's late timer credits what was heard and
+  nothing more. A pause stops it, and a play from the lock screen starts it again (`sh:audio-play`, from both players;
+  `shPodcast.audio()`). Bundles rebuilt. The admin page's notes, [event-taxonomy](vault/reference/event-taxonomy.md)
+  and the About page's "What the hubs record" say so (Ask Timmy's site help rebuilt).
 - **2026-11-18 (two indexes for saving an answer, Claude Code)** — `migration_v71.sql`: `personal_answers` gets
   `(visitor_id, answered_at desc, id desc)` and `(visitor_id, hub, qid, answered_at desc, id desc)`. Every answer's speed limit,
   double-tap check and per-question counts read all of the person's answers before (9,377 for the heaviest visitor; the
