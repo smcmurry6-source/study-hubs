@@ -282,7 +282,9 @@ Each is one line in `migration_v54.sql` to change.
 - A question's wrong answers also pay only their first three a day (as its right ones do).
 - Medal and fixed-report awards aren't doubled by a boost; answers, the day's bonuses, mocks and games are.
 - A rank-up, for the +20 gold crowns, is a new tier (seven a journey), not a level.
-- Match questions are self-graded (a flat 2): the server can't check a drag-and-drop pairing from one index.
+- Matching items are graded as an order since migration_v64 (2026-11-17): each row's first pick, row k's own being k, so
+  10 XP the first time. A page cached before it sends no order and is taken at its word as a self-graded answer (a flat 2);
+  migration_v66 had dropped that branch and migration_v67 put it back.
 - A mock pays its +50 only with 10 or more answers; an arcade game only when finished 20 seconds or more after it started,
   and a very fast game's answers can fall under the speed limit.
 - Timmy Time: a minute pays when 25 seconds have passed since the last paid one (so 2x speed still pays); "finished" is 90%
@@ -413,7 +415,7 @@ it as `sh:crowns` (the hub's meters and a gold "+n crowns" pop, the dashboard's 
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (519 checks, the prizes of migration_v66 in section 14c, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (529 checks, the prizes of migration_v66 in section 14c, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, a place opened from a board row, and a random visit going through the whole class, in 14a). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;

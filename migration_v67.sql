@@ -5,8 +5,10 @@
 -- wrong. The second (migration_v66, crowns and prizes; "Every right answer should give xp") was applied after it, on
 -- 2026-11-18, and replaced the function from an older copy without that branch. This puts the branch back into v66's
 -- sh_answer; nothing else changes. Answers recorded in between: a cached page's matching answer was recorded as wrong and
--- paid nothing (none expected: those pages refresh themselves; the check under "Applied" below counted them).
--- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js).
+-- paid nothing (none expected: those pages refresh themselves).
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js). Applied to the live project on
+-- 2026-11-18 through the Supabase connector (PR #403); the live body's md5 matched this file's. In between, every
+-- matching or ordering answer came with its order (none from a cached page), so no answer needed fixing.
 
 create or replace function public.sh_answer(p_at timestamptz, p_visitor text, p_hub text, p_qid text, p_choice integer,
   p_picks integer[], p_self boolean, p_v text, p_ctx text, p_request text, p_session uuid, p_claim boolean)

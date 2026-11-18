@@ -63,6 +63,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   `.claude/hooks/supabase-confirm.js`), appended to `supabase/schema.sql`; every function's body matched the tested copy, and
   the rebuild agreed with live XP for all 77 people with an answer since the release. Class-wide after it: 168 wallets, none
   below zero, median about 1,200 crowns, about 300,000 of the 740,000 from hub time.
+  It was written and applied as "v64", but another session's `migration_v64.sql` (matching items graded as an order) reached
+  `main` first and v65 was taken, so it is `migration_v66.sql`; applied after that v64, it had replaced `sh_answer` without
+  that v64's one branch (a cached page's matching answer, taken at its word), so `migration_v67.sql` puts it back (applied the
+  same day; no answer in between needed it). Bug BUG-175 (main had used 164-174). Before applying a migration, fetch `main` and
+  take the next free number ([repo map](vault/reference/repo-map.md)).
 - **2026-11-18 (more cosmetics: six year-round collections, five rare costumes, six paints, Claude Code)** — Sam: "Lets work on
   timmy outfits and place cosmetics. Go crazy" ([the task](vault/tasks/2026-11-18-more-cosmetics.md)). **Six collections**
   (`COLLECTIONS` in `tools/figures/site/sets.mjs`, one pack each in `tools/figures/site/packs/`: `dino`, `moonbase`, `reef`,
