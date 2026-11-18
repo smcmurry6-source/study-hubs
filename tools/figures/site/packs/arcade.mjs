@@ -321,7 +321,7 @@ export function pack(T){
   function pfP(u, w){ return P.apply(null, pf(u, w)); }
 
   /* the claw machine: case corners, the claw's spot, where it rests */
-  var CM = { a: .75, b: 3.15, zb: 1.15, zg: 4.4, zt: 5.05, cx: 2.45, cy: 1.55, zr: 4.26 }, PINKC = { top: "#FFC2DF", left: "#FF85C2", right: "#E35DA2" };
+  var CM = { a: .75, b: 3.15, zb: 1.15, zg: 4.4, zt: 5.05, cx: 2.45, cy: 1.55, zr: 3.2 }, PINKC = { top: "#FFC2DF", left: "#FF85C2", right: "#E35DA2" };
   var PANE = ["#3B2E7E", "#4D3D9A"], TINT = "#D8F6FF";
   /* the claw from its hub: three prongs, open (at rest) or shut round a plush tooth */
   function clawD(h, shut){
@@ -448,15 +448,13 @@ export function pack(T){
         s += FO(D(onY(b, rectUV(.92, 1.62, .18, .86))), "#1E1A2E", 1.2) + FO(D([[.95, b + .02, .84], [1.59, b + .02, .84], [1.59, b + .22, .34], [.95, b + .22, .34]]), "#E9EEF3", 1) + L(D([[.95, b + .04, .84], [1.59, b + .04, .84]], true), 1.6, "#A9B3BE");
         s += FO(D(onY(b, rectUV(2.3, 2.8, .3, .62))), "#59647A", 1) + FO(D(onY(b, rectUV(2.5, 2.6, .38, .54))), "#1E1A2E", .6);
         s += T.star5.apply(null, P(b, 1.95, .42).concat([3, NEON.yellow])).replace('stroke-width="1.2"', 'stroke-width=".8"');
-        /* inside the glass: the back walls, the floor, the gantry and the claw at rest, then the plush and the chute */
+        /* inside the glass: the back walls, the floor and the gantry, then the plush and the chute */
         s += F(D([[a, a, zb], [a, b, zb], [a, b, zg], [a, a, zg]]), n ? "#4A3C96" : PANE[0]) + F(D([[a, a, zb], [b, a, zb], [b, a, zg], [a, a, zg]]), n ? "#5D4CB2" : PANE[1]);
         var dots = ""; [[a, 1.2, 3.6], [a, 2.2, 3.9], [a, 1.7, 2.9], [a, 2.7, 3.2], [1.2, a, 3.8], [1.6, a, 3.2], [1.1, a, 2.8]].forEach(function(q){ var c = P(q[0], q[1], q[2]); dots += T.star5(c[0], c[1], 1.8, "#8F7FD6").replace('stroke-width="1.2"', 'stroke-width=".5"'); });
         s += dots + L(D([[a, a, zb], [a, a, zg]], true), 1, INK, .5) + F(D([[a, a, zb], [b, a, zb], [b, b, zb], [a, b, zb]]), "#5B4BB0");
         s += L(D([[a + .05, a, zg - .1], [a + .05, b, zg - .1]], true) + D([[b - .05, a, zg - .1], [b - .05, b, zg - .1]], true), 2.2, "#59647A");
         var rail = D([[a, CM.cy, zg - .14], [b, CM.cy, zg - .14]], true); s += L(rail, 3) + L(rail, 1.4, "#C9D3DC");
         s += box(CM.cx - .14, CM.cy - .14, zg - .3, .28, .28, .14, STEEL, { sw: 1, si: .6 });
-        var hub = P(CM.cx, CM.cy, CM.zr), top = P(CM.cx, CM.cy, zg - .3);
-        s += L(T.seg(top, hub), 1.1) + claw(hub, false);
         /* the plush teeth, back to front: a low pile under the claw, higher toward the back corner */
         var R = T.rng(9), pile = [], x, y;
         for (x = .95; x < b - .1; x += .42) for (y = .95; y < b - .1; y += .42){
@@ -476,6 +474,9 @@ export function pack(T){
           }
           var c = P(t.x, t.y, t.z); s += plush(c[0], c[1], .78, t.c, f(t.r));
         });
+        /* the claw hangs below the sign, in front of the pile's back corner */
+        var hub = P(CM.cx, CM.cy, CM.zr), top = P(CM.cx, CM.cy, zg - .3);
+        s += L(T.seg(top, hub), 1.1) + claw(hub, false);
         /* the glass: a faint tint, a few glints away from the claw, the frame */
         s += F(D([[a, b, zb], [b, b, zb], [b, b, zg], [a, b, zg]]), TINT, .16) + F(D([[b, a, zb], [b, b, zb], [b, b, zg], [b, a, zg]]), TINT, .2);
         s += L(D([[1.0, b, 3.0], [1.35, b, 3.9]], true) + D([[1.2, b, 2.5], [1.45, b, 3.1]], true), 1.4, "#FFFFFF", .6) + L(D([[b, 1.05, 3.4], [b, .9, 4.0]], true), 1.4, "#FFFFFF", .5);
@@ -499,10 +500,9 @@ export function pack(T){
       },
       lights: function(){ var c = P(1.95, 1.95, 3.4), t = P(1.95, CM.b + .1, CM.zt - .3); return glowC(c[0], c[1], 13, "#FFB3D6") + glowC(t[0], t[1], 9, K.glow); },
       bits: function(){
-        /* the claw at rest is painted out in the glass's colors, and the claw comes up shut round a plush tooth */
-        var hub = P(CM.cx, CM.cy, CM.zr), d = clawD(hub, false), back = PANE[1];
-        var cover = '<path d="' + d + '" fill="none" stroke="' + back + '" stroke-width="4.4"/>' + ell(hub[0], hub[1], 4.2, 2.6, back, 0) + '<path d="' + d + '" fill="none" stroke="' + TINT + '" stroke-width="4.4" opacity=".2"/>' + ell(hub[0], hub[1], 4.2, 2.6, TINT, 0, .2);
-        return cover + plush(hub[0], hub[1] + 11, .78, "#FFC6DA", 0) + claw(hub, true);
+        /* the claw comes up out of the pile shut round a plush tooth, its shut prongs over the open ones */
+        var hub = P(CM.cx, CM.cy, CM.zr);
+        return plush(hub[0], hub[1] + 11, .78, "#FFC6DA", 0) + claw(hub, true);
       }
     }
   };

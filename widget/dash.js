@@ -461,7 +461,7 @@
   function roomReady(){ return !!(CA && CA.room && window.shPet && window.shPet.art && !focusOn()); }
   function hashOf(k){ var h = 0; k = String(k); for (var i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) | 0; return Math.abs(h); }
   var outfitsAsked = false;
-  /* the shop's outfits (widget/hub-art/outfits.js, 55 of them) load only when someone is wearing one */
+  /* the shop's outfits (widget/hub-art/outfits.js, every one of them) load only when someone is wearing one */
   function wantOutfits(){
     if (outfitsAsked) return; outfitsAsked = true;
     var el = document.createElement("script"); el.src = WIDGET + "hub-art/outfits.js"; el.async = true;

@@ -2558,6 +2558,8 @@ export function placeKit(INK, C, PACKS, SETS){
 
   /* the motion: smoke rises, water shimmers, leaves fall, flags wave, stars twinkle, eggs play. Reduced motion: still,
      and an egg shows its bits without moving. */
+  /* an egg's bits play by its own rule: a set fetched late (addPack) adds its rules to CSS, or its eggs would stay hidden */
+  function eggRule(k){ return "[data-egg='" + k + "'].tp-on .tp-eb{animation:" + EGG_ANIM[k] + " both}"; }
   var CSS = [
     ".tp-scene{display:block;width:100%;height:auto}.tp-thumb,.tp-burst{display:block;width:100%;height:100%}",
     ".tp-grade,.tp-night,.tp-lights,.tp-eb,.tp-mark{pointer-events:none}.tp-egg{cursor:pointer;transform-box:fill-box;transform-origin:50% 100%}.tp-eb{opacity:0}",
@@ -2601,7 +2603,7 @@ export function placeKit(INK, C, PACKS, SETS){
     "@keyframes tp-swing{0%,100%{transform:none}25%{transform:translateX(4px)}75%{transform:translateX(-4px)}}",
     "@keyframes tp-flutter{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(16deg)}}",
     BOING.map(function(k){ return "[data-egg='" + k + "'].tp-on"; }).join(",") + "{animation:tp-boing .8s ease}",
-    Object.keys(EGG_ANIM).map(function(k){ return "[data-egg='" + k + "'].tp-on .tp-eb{animation:" + EGG_ANIM[k] + " both}"; }).join(""),
+    Object.keys(EGG_ANIM).map(eggRule).join(""),
     "[data-egg='rabbit'].tp-on .tp-eo{transform-box:fill-box;transform-origin:50% 100%;animation:tp-burrow 1.8s ease}[data-egg='crab'].tp-on .tp-eo{animation:tp-scuttle 1.6s ease}",
     "[data-egg='owl'].tp-on .tp-owlhead{transform-box:fill-box;transform-origin:50% 100%;animation:tp-turn 1.6s ease}[data-egg='owl'].tp-on .tp-owlhead .tp-eb{animation:tp-blink 1.6s}[data-egg='balloon'].tp-on .tp-eo{animation:tp-rise2 3s ease-in-out}",
     "[data-egg='brush'].tp-on{animation:tp-wiggle .9s ease}[data-egg='tree'].tp-on{transform-origin:50% 100%;animation:tp-shake .8s ease}[data-egg='lane'].tp-on .tp-ball{animation:tp-roll 1.4s ease-in both}[data-egg='lane'].tp-on .tp-pins{transform-box:fill-box;transform-origin:50% 100%;animation:tp-tip 1.4s ease both}",
@@ -2686,7 +2688,12 @@ export function placeKit(INK, C, PACKS, SETS){
     setOf: function(id){ return SET_INFO[id] ? SET_INFO[id].set : ""; }, setInfo: function(id){ return SET_INFO[id] || null; },
     collOf: function(id){ return SET_INFO[id] && SET_INFO[id].coll ? SET_INFO[id].set : ""; },
     hasPack: function(k){ return !!PACKED[k]; },
-    addPack: function(pack){ addPack(pack); lists(); }
+    addPack: function(pack){
+      var had = {}, k; for (k in EGG_ANIM) had[k] = 1;
+      addPack(pack); lists();
+      var more = Object.keys(EGG_ANIM).filter(function(id){ return !had[id]; });
+      if (more.length) API.CSS += "\n" + more.map(eggRule).join("");
+    }
   };
   function lists(){
     API.HOMES = meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set"]);

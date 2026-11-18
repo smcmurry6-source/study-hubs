@@ -399,7 +399,11 @@ if (placeKit) {
   { const whole = placeKit(INK, C, PACKS.map((x) => x.pack), SETS), late = placeKit(INK, C, [], SETS); PACKS.forEach((x) => late.addPack(x.pack));
     for (const c of [{ home: "haunted-manor", scene: "pumpkin-patch", yard: { left: "haunted-tree", side: "lane" }, tier: 4 }, { home: "cottage", scene: "hill", yard: { right: "rank-gold-yard" }, journey: 1, tier: 2 }])
       if (whole.render(c).svg !== late.render(c).svg) { console.error("place.mjs: a kit that gets its packs late draws " + JSON.stringify(c) + " differently"); process.exit(1); }
-    if (late.OUTFITS.length !== whole.OUTFITS.length || late.setOf("haunted-manor") !== "halloween" || late.setOf("rank-gold-yard") !== "rank") { console.error("place.mjs: addPack or setOf is off"); process.exit(1); } }
+    if (late.OUTFITS.length !== whole.OUTFITS.length || late.setOf("haunted-manor") !== "halloween" || late.setOf("rank-gold-yard") !== "rank") { console.error("place.mjs: addPack or setOf is off"); process.exit(1); }
+    /* a set fetched late brings its eggs' rules with it (they were missing before 2026-11-18, so a set's eggs never showed) */
+    const rules = (css) => new Set(css.match(/\[data-egg='[^']+'\]\.tp-on \.tp-eb\{[^}]*\}/g) || []), lateRules = rules(late.CSS);
+    const lost = [...rules(whole.CSS)].filter((r) => !lateRules.has(r));
+    if (lost.length) { console.error("place.mjs: a kit that gets its packs late has no rule for " + lost.length + " eggs, e.g. " + lost[0]); process.exit(1); } }
 }
 /* the bowling egg: the kit for the design page, and the same kit for widget/bowling.js, which fetches it the first time a
    clip plays (never with a page) */
