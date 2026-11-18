@@ -64,5 +64,14 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
 - 2026-11-18: Sam: "Now, then merge". Both indexes built live with `create index concurrently` (valid, 15 and 20 MB);
   the speed limit's read is now an index-only scan of one row. v71 appended to `supabase/schema.sql`
   ([#423](https://github.com/smcmurry6-source/study-hubs/pull/423)).
+- 2026-11-18, readout after #421 and v71 (edge logs, `record_answer_v2`, times UTC): 19:10-19:20, 0 of 264 saves failed;
+  19:23-19:30, 2 of 274. **One burst still came, 19:20-19:22: 28 of 115 failed** (HTTP 500, statement timeouts spread
+  over cheap statements: a count of `question_keys`, `sh_rank`, an insert into `answer_xp`, the sign of the CPU taken by
+  something else). Not found in the logs: the REST calls in those minutes were the usual mix (no surge of page loads or
+  admin reads), the post-release check blocks every call to the database, and the checkpoints were routine (about 1,000
+  buffers over 100 s). It began a minute after #422 merged (19:19); queries sent through the connector or the Management
+  API don't show in the edge logs, so the next look is `pg_stat_statements` for roles other than `authenticator`, or the
+  Supabase dashboard's CPU graph for those minutes. The answer retries (#421) cover a burst that short. BUG-181 stays
+  "fixed, awaiting retest" until a busy day passes without one.
 
 ## Outcome
