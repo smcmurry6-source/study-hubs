@@ -37,7 +37,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   differentiator". A question that comes in versions (Perio's `variants.json`) shows the letter of the one on screen beside its
   number on every card (`verTag` in `widget/hub-bank.js`, `HX.qParts.verTag`: the bank, the drill, misses, weak spots, the mock,
   Learn and Flashcards; `.qc-ver` in `widget/hub.css`), on the first try too, and "Last time: right · reworded" is just "Last
-  time: right". A report says "(version A)" or "(version B)" in the form and in its note (`widget/v3.js` `flagVersion()`; was
+  time: right". A report says "(version A)" or "(version B)" in the form and in its note (`widget/v3.js` `flagVersion()`; a small muted badge, at Sam's "smaller/less noticeable"; was
   "(reworded: wording 2)" and nothing on A); Flashcards' Report now passes its version and statement order too. Perio report #61
   (`pc-e3`, "two perio charts over the course of time?"): the case kit's chart (`widget/cases.js` `I.chart`) now heads each
   surface FACIAL / LINGUAL above its strip, with a line at the top saying both are one chart from one visit and a rule between
