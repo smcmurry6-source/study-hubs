@@ -220,7 +220,7 @@
       : q.type === "multi" ? "Why are those the right ones?" : q.type === "sequence" ? "Why does it go in that order?"
       : q.type === "match" ? "Can you explain these matches?" : "Can you explain this one?";
     var ask = { qid: q.id, right: q.type === "recall" ? null : !!right, picks: q.type === "mcq" || q.type === "multi" ? (picks || []).slice() : [],
-      label: String(q.stem || "").replace(/\s+/g, " ").trim() };
+      label: String(q.stem || "").replace(/\s+/g, " ").trim(), w: q._w || 0 };   /* w: the wording on screen (widget/hub.js worded()) */
     askReady().then(function(A){ if (A) A.open({ from: "card", text: text, ask: ask }); else HX.toast("The chat didn't load. Try again in a moment."); },
       function(){ HX.toast("The chat didn't load. Check your connection and try again."); });
   }

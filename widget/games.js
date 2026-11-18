@@ -67,6 +67,9 @@
   function dealer(items){ var deck = []; return function(){ if (!deck.length) deck = shuffled(items); return deck.pop(); }; }
   /* MCQ with its choices shuffled into lettered options: { q, opts:[{ text, idx }], right } */
   function dealMCQ(q, n){
+    /* on a hub on the engine with reworded questions, a question already answered comes back in its next wording
+       (widget/hub.js worded(); choice k is choice k reworded, so the key is the same) */
+    if (window.shHub && window.shHub.worded) q = window.shHub.worded(q);
     var wrong = shuffled(q.choices.map(function(c, i){ return i; }).filter(function(i){ return i !== q.answer; })).slice(0, (n || 4) - 1);
     var order = shuffled([q.answer].concat(wrong));
     return { q:q, opts:order.map(function(i){ return { text:q.choices[i], idx:i }; }), right:order.indexOf(q.answer) };

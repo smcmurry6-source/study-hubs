@@ -252,7 +252,7 @@
     P.root.hidden = false;
     docEl.classList.add("ska-open");
     requestAnimationFrame(function(){ P.root.classList.add("is-on"); });
-    if (o.ask && o.ask.qid) { S.attach = { qid: String(o.ask.qid), right: o.ask.right === true ? true : o.ask.right === false ? false : null, picks: Array.isArray(o.ask.picks) ? o.ask.picks.slice(0, 12) : [], label: o.ask.label || "" }; }
+    if (o.ask && o.ask.qid) { S.attach = { qid: String(o.ask.qid), right: o.ask.right === true ? true : o.ask.right === false ? false : null, picks: Array.isArray(o.ask.picks) ? o.ask.picks.slice(0, 12) : [], label: o.ask.label || "", w: +o.ask.w > 0 ? +o.ask.w : 0 }; }
     dress(); drawAttach(); hidePast();
     if (o.text != null) { P.input.value = String(o.text).slice(0, MAX); grow(); counter(); }
     if (!was) track("open=" + (o.from || "other"));
@@ -354,7 +354,7 @@
     build();
     var body = { visitor: visitor(), hub: hubId(), text: text, chat: S.chat, request: rid(), voice: voice(), context: context() };
     if (isDash()) body.hubs = (opt("hubs") || []).map(function(h){ return h.id; });
-    var ask = S.attach && !isDash() ? { qid: S.attach.qid, right: S.attach.right, picks: S.attach.picks } : null;
+    var ask = S.attach && !isDash() ? { qid: S.attach.qid, right: S.attach.right, picks: S.attach.picks, w: S.attach.w || undefined } : null;
     if (ask) body.ask = ask;
     var wantProgress = x.progress || TONIGHT.test(text);
     S.busy = true; setBusy(true);
