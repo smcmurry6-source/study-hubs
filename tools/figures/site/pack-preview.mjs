@@ -2,7 +2,7 @@
 
      node tools/figures/site/pack-preview.mjs <set> <out.png> [dark] [only]
 
-   <set> is a season's key in sets.mjs or "ranks". The sheet: the set's home in its scene by day and by night (every
+   <set> is a season's or a collection's key in sets.mjs, or "ranks". The sheet: the set's home in its scene by day and by night (every
    upgrade on, Timmy at the door in the first outfit), the home alone, each yard piece (its thumbnail, and placed in the
    yard), and each outfit on Timmy, large. [only] narrows it: "scene", "home", "yard" or "outfits". */
 import { createRequire } from "node:module";
@@ -14,9 +14,10 @@ const [set, out = "pack.png", dark = "", only = ""] = process.argv.slice(2);
 if (!set) { console.error("usage: node pack-preview.mjs <set> <out.png> [dark] [scene|home|yard|outfits]"); process.exit(1); }
 let chromium; try { ({ chromium } = createRequire(import.meta.url)("playwright")); } catch (e) { ({ chromium } = createRequire("/opt/node-tools/")("playwright")); }
 const bust = "?t=" + Date.now(), imp = (f) => import(pathToFileURL(path.join(here, f)).href + bust);
-const { INK, C } = await imp("style.mjs"), { placeKit } = await imp("place.mjs"), { SEASONS, RANKS } = await imp("sets.mjs");
+const { INK, C } = await imp("style.mjs"), { placeKit } = await imp("place.mjs"), { SEASONS, RANKS, COLLECTIONS } = await imp("sets.mjs");
 const { pack } = await imp("packs/" + set + ".mjs");
-const SETS = { seasons: SEASONS.map((s) => ({ k: s.k, n: s.n, when: s.when, gift: !!s.gift, items: s.items })), ranks: RANKS };
+const SETS = { seasons: SEASONS.map((s) => ({ k: s.k, n: s.n, when: s.when, gift: !!s.gift, items: s.items })), ranks: RANKS,
+  collections: COLLECTIONS.map((s) => ({ k: s.k, n: s.n, note: s.note, items: s.items })) };
 const K = placeKit(INK, C, [pack], SETS);
 const art = JSON.parse(fs.readFileSync(path.join(root, "tools/preview/design/art.js"), "utf8").replace(/^[\s\S]*?window\.SH_ART = /, "").replace(/;\s*$/, ""));
 const timmy = (art.timmy.moods.find((m) => m.k === "happy") || art.timmy.moods[0]).svg;

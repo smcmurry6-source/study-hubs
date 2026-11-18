@@ -12,7 +12,7 @@
 // by the student). v is the question's version as the page reports it (question health's fingerprint of the exported question,
 // widget/qhealth.js fp() over widget/hub.js exportQuestions()), so a page cached before an edit is graded against the key
 // it showed. counted: false for a question kept out of the hub's mastery (a content field `counted: false`). cv (one
-// choice and select all only, migration_v65): the version of the question's choices, a fingerprint of its choices and its
+// choice and select all only, migration_v66): the version of the question's choices, a fingerprint of its choices and its
 // key, so the class's picks on each choice start again when a choice or the key changes, and not when only the stem, the
 // explanation or a why does. Ids marked "retired" in tools/question-ids/<hub>.txt come last as { id, retired: true }.
 'use strict';
@@ -38,7 +38,7 @@ function exported(q){
   if (q.ex) hint += ' — ' + q.ex;
   return { id: q.id, lec: q.lec, text: q.stem, hint, choices: q.choices || null, answer: q.type === 'mcq' ? q.answer : null };
 }
-/* the version of a question's choices (migration_v65): what the class's picks on each choice are counted against */
+/* the version of a question's choices (migration_v66): what the class's picks on each choice are counted against */
 function choiceVersion(q){
   if (q.type === 'mcq') return hash(JSON.stringify(['one', q.choices, q.answer]));
   if (q.type === 'multi') return hash(JSON.stringify(['all', q.choices, q.correct.slice().sort((a, b) => a - b)]));

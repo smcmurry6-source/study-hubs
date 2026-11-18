@@ -3,7 +3,7 @@ type: how-to
 tags: [how-to, art, timmys-place, shop, redesign]
 ---
 
-# Draw a seasonal set or a rank set for Timmy's place
+# Draw a seasonal set, a collection or a rank set for Timmy's place
 
 Since 2026-11-10 (Sam's third round on Timmy's place) every season and holiday has a **full set** in the shop, and every
 full rank-up gives a **rank set**. A season's set is eight pieces: 1 home and 1 scene (both Legendary) and a Rare, an
@@ -20,6 +20,15 @@ Epic and a Legendary outfit and yard piece. A rank set is an outfit and a yard p
 
 To add a season: add it to `SEASONS`, its window to `sh_shop_seasons` and its rows to `shop_items` (the server), and
 draw its pack. The dates people read (`when`) are in `sets.mjs`; the dates that count are the server's.
+
+**A year-round collection** (since 2026-11-18, `COLLECTIONS`) is drawn the same way, as a pack, but sold all year:
+its rows have `season` null and `rotates`, so its pieces come up in the daily and weekly picks like any everyday piece
+(a Legendary home, an Epic scene, outfits Common, Uncommon and Rare, yard pieces Uncommon, Rare and Epic). The kit marks
+its pieces `coll` (`SH_PLACE.collOf(id)`), the customizer lists them under a Collections tab, and the shop names the
+collection on a card. To add one: add it to `COLLECTIONS`, its rows to a migration (exactly `allCollectionItems()`;
+`tools/release/xp.js` checks), and draw its pack. A pack outfit that covers Timmy's eyes says `noLoupes: true`.
+**A rare costume** is in `COSTUMES` (`sets.mjs`), drawn in `place.mjs`'s `OUTFITS` (`costume: true`, three lines), and named
+in the same order in `widget/hub-timmy.js`, `widget/dash.js` (`COSTUMES`) and `widget/shop.js` (`SPOTS`).
 
 ## A pack
 

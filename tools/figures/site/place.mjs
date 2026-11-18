@@ -169,7 +169,14 @@ export function placeKit(INK, C, PACKS, SETS){
     sky:    { n: "Sky",    c: "#CFEAF8", s: "#9CCBE6" },
     butter: { n: "Butter", c: "#FFF0B3", s: "#E8CF73" },
     lilac:  { n: "Lilac",  c: "#E6DAF7", s: "#B9A6DD" },
-    peach:  { n: "Peach",  c: "#FFD9C2", s: "#EDAE8C" }
+    peach:  { n: "Peach",  c: "#FFD9C2", s: "#EDAE8C" },
+    /* six more (2026-11-18, "Go crazy") */
+    coral:  { n: "Coral",  c: "#FFCFC4", s: "#EFA392" },
+    sage:   { n: "Sage",   c: "#DCE9D2", s: "#AFC79E" },
+    sand:   { n: "Sand",   c: "#F3E3C6", s: "#D8BE92" },
+    rose:   { n: "Rose",   c: "#F9D6E3", s: "#E3A5BD" },
+    slate:  { n: "Slate",  c: "#D9E1EA", s: "#A9B7C8" },
+    teal:   { n: "Teal",   c: "#C9EEEC", s: "#8FD0CC" }
   };
   /* the mushroom's cap, the castle's roofs and the lighthouse's stripes take a bolder set */
   var BOLD = {
@@ -178,7 +185,13 @@ export function placeKit(INK, C, PACKS, SETS){
     sky:    { n: "Blue",        c: "#3FA7E0", s: "#2378B0" },
     butter: { n: "Gold",        c: "#F2C94C", s: "#C9971C" },
     lilac:  { n: "Purple",      c: "#9B7BE0", s: "#6E50B8" },
-    peach:  { n: "Orange",      c: "#F59A6E", s: "#C96A44" }
+    peach:  { n: "Orange",      c: "#F59A6E", s: "#C96A44" },
+    coral:  { n: "Coral red",   c: "#F2735E", s: "#C9503D" },
+    sage:   { n: "Moss",        c: "#7FA86A", s: "#5C8549" },
+    sand:   { n: "Tan",         c: "#C9A066", s: "#9E7A44" },
+    rose:   { n: "Pink",        c: "#E26A9A", s: "#B84874" },
+    slate:  { n: "Navy",        c: "#4F6A8F", s: "#37506F" },
+    teal:   { n: "Teal",        c: "#2FA8A8", s: "#1F7F80" }
   };
   var NIGHT = "#141A40";
 
@@ -2071,6 +2084,23 @@ export function placeKit(INK, C, PACKS, SETS){
   /* the hem of anything worn on his body: down his sides and along the gum line, from 149.4 110 round to 50.6 110 */
   var HEM = "Q149.6 121 146.6 131 Q140 132 135 143 Q120 156 100 157 Q80 156 65 143 Q60 132 53.4 131 Q50.4 121 50.6 110";
   function star5(x, y, r, fill){ var d = ""; for (var i = 0; i < 10; i++){ var a = Math.PI / 5 * i - Math.PI / 2, q = i % 2 ? r * .45 : r; d += (i ? " L" : "M") + f(x + q * Math.cos(a)) + " " + f(y + q * Math.sin(a)); } return '<path d="' + d + ' Z" fill="' + fill + '" ' + O2.replace("2.2", "1.2") + "/>"; }
+  /* the rare costumes' small parts: a crescent moon (horns to the right), a four-point twinkle, a bolt head, a stroke
+     with an ink edge (ink under the color), and a ring of soft teeth round an ellipse, pointing in (the shark's mouth) */
+  function crescent(x, y, r, fill){ var a = f(x + r * .5), t = f(y - r * .866), b = f(y + r * .866); return '<path d="M' + a + " " + t + " A" + f(r) + " " + f(r) + " 0 1 0 " + a + " " + b + " A" + f(r * .9) + " " + f(r * .9) + " 0 1 1 " + a + " " + t + ' Z" fill="' + fill + '" ' + O2.replace("2.2", "1.2") + "/>"; }
+  function twinkle(x, y, r, fill){ var q = r * .2, P2 = function(a, b){ return f(x + a) + " " + f(y + b); };
+    return '<path d="M' + P2(0, -r) + " Q" + P2(q, -q) + " " + P2(r, 0) + " Q" + P2(q, q) + " " + P2(0, r) + " Q" + P2(-q, q) + " " + P2(-r, 0) + " Q" + P2(-q, -q) + " " + P2(0, -r) + ' Z" fill="' + fill + '" stroke="' + INK + '" stroke-width="1"/>'; }
+  function bolt(x, y, r){ return '<circle cx="' + f(x) + '" cy="' + f(y) + '" r="' + f(r) + '" fill="#AEB8C3" stroke="' + INK + '" stroke-width="1.4"/>' + ln("M" + f(x - r * .5) + " " + f(y + r * .3) + " L" + f(x + r * .5) + " " + f(y - r * .3), "#5E6B78", 1.2); }
+  function inked(d, color, w){ return ln(d, INK, w + 3.4) + ln(d, color, w); }
+  function teethRing(cx, cy, rx, ry, n, w, h, fill, off){
+    var s = "";
+    for (var i = 0; i < n; i++){
+      var a = (i + (off || 0)) / n * Math.PI * 2, bx = cx + rx * Math.cos(a), by = cy + ry * Math.sin(a), dx = cx - bx, dy = cy - by, d = Math.sqrt(dx * dx + dy * dy), ux = dx / d, uy = dy / d, tx = -uy, ty = ux;
+      var tipx = bx + ux * h, tipy = by + uy * h, q = function(px, py, k){ return f(px + (tipx - px) * k) + " " + f(py + (tipy - py) * k); };
+      var l = [bx + tx * w, by + ty * w], r = [bx - tx * w, by - ty * w];
+      s += '<path d="M' + f(l[0]) + " " + f(l[1]) + " L" + q(l[0], l[1], .72) + " Q" + f(tipx) + " " + f(tipy) + " " + q(r[0], r[1], .72) + " L" + f(r[0]) + " " + f(r[1]) + ' Z" fill="' + fill + '" stroke="' + INK + '" stroke-width="1.3"/>';
+    }
+    return s;
+  }
   var OUTFITS = {
     sunhat: { n: "A straw sun hat", note: "With a daisy in the band", rarity: "Common", theme: "hilltop", price: 150, id: "sun-hat",
       top: '<ellipse cx="100" cy="40" rx="68" ry="12" fill="#EBC77A" ' + O4 + "/>" + p("M66 40 C64 10 82 2 100 2 C118 2 136 10 134 40 Q100 50 66 40 Z", "#F2D58E") +
@@ -2232,7 +2262,161 @@ export function placeKit(INK, C, PACKS, SETS){
         /* the mask, with his own eyes looking through it */
         '<path fill-rule="evenodd" d="M52 80 C50 70 60 65.6 76 66.6 C88 67.4 94 72 100 72 C106 72 112 67.4 124 66.6 C140 65.6 150 70 148 80 C146 94 136 101.6 123 101.6 C112 101.6 105 96 100 90.6 C95 96 88 101.6 77 101.6 C64 101.6 54 94 52 80 Z M80 71.6 C73.6 71.6 69.4 77 69.4 84 C69.4 91 73.6 96.4 80 96.4 C86.4 96.4 90.6 91 90.6 84 C90.6 77 86.4 71.6 80 71.6 Z M120 71.6 C113.6 71.6 109.4 77 109.4 84 C109.4 91 113.6 96.4 120 96.4 C126.4 96.4 130.6 91 130.6 84 C130.6 77 126.4 71.6 120 71.6 Z" fill="#2747A3" ' + O3 + "/>" +
         ln("M58 74 Q64 69.6 73 69.6 M142 74 Q136 69.6 127 69.6", "#6F86CF", 2.2),
-      say: ["Captain Enamel! The hardest substance in the human body, at your service.", "My one weakness? Acid. Don't tell the plaque.", "Fear not, citizen. I'll guard your smile. You do the flossing."] }
+      say: ["Captain Enamel! The hardest substance in the human body, at your service.", "My one weakness? Acid. Don't tell the plaque.", "Fear not, citizen. I'll guard your smile. You do the flossing."] },
+
+    /* ---- five more rare costumes ("Go crazy", Sam, 2026-11-18), the dragon the legendary one */
+    wizard: { n: "The wizard", note: "A tall starry hat with a floppy tip, a robe of stars and moons, and a staff with a glowing crystal tooth", rarity: "Epic", theme: "", price: 2000, id: "wizard", costume: true,
+      face: /* the staff and its crystal tooth, the bell sleeves, the robe of stars and moons, then his hand round the staff */
+        '<circle cx="25" cy="18" r="16" fill="#B8F5EF" opacity=".5"/>' +
+        [0, 1, 2, 3, 5, 6, 7].map(function(i){ var a = i / 8 * Math.PI * 2 - Math.PI / 2, c = Math.cos(a), s = Math.sin(a); return ln("M" + f(25 + c * 19) + " " + f(18 + s * 19) + " L" + f(25 + c * 24.6) + " " + f(18 + s * 24.6), "#5FD8CF", 2.4); }).join("") +
+        inked("M40 216 L27 44", "#9A6A3C", 5.6) + ln("M38.8 200 Q36.4 196 37.8 190 M34.8 152 Q32.8 148 34.2 143", "#7A4F2A", 1.8) +
+        tinyTooth(25, 19, 3, "#B5F1EE") + ln("M16.6 8.6 Q17.4 4 21.6 3", "#FFFFFF", 2.6) + ln("M30.4 7.6 Q34.4 12 32.6 21", "#7FD8DA", 2.2) + ln("M20 14 L24 19", "#FFFFFF", 1.6, .8) +
+        inked("M27.4 46 C20 41 15 35 15.4 27", "#9A6A3C", 3.4) + inked("M27.4 46 C34 41 38 35 35.6 27", "#9A6A3C", 3.4) +
+        twinkle(6, 4, 4.6, "#FFFFFF") + twinkle(46, 2, 3.4, "#FFFFFF") + twinkle(46, 34, 2.6, "#FFFFFF") +
+        p("M57 100 C50 97 44 96 39 97 C37 106 36 118 37 131 C44 130 51 125 57 120 Z", "#4A3C9E", O3) + p("M39 97 C37 106 36 118 37 131 L42.4 129.4 C41.6 118 42.2 107 43.8 96.8 Z", "#F2C94C", O2) +
+        p("M143 100 C150 97 156 96 161 97 C163 106 164 118 163 131 C156 130 149 125 143 120 Z", "#4A3C9E", O3) + p("M161 97 C163 106 164 118 163 131 L157.6 129.4 C158.4 118 157.8 107 156.2 96.8 Z", "#F2C94C", O2) +
+        p("M50.6 110 Q100 124 149.4 110 " + HEM + " Z", "#4A3C9E", O3) +
+        '<path d="M149.4 110 Q149.6 121 146.6 131 Q140 132 135 143 Q131 147 127 149.6 Q136 134 139.6 114 Z" fill="#382C7E"/>' +
+        star5(64, 129, 4.2, "#FFE27A") + star5(88, 146, 4, "#FFE27A") + star5(116, 149, 3.4, "#FFE27A") + star5(137, 126, 4, "#FFE27A") + crescent(75, 136, 4.6, "#FFE08A") + crescent(125, 137, 4.2, "#FFE08A") +
+        '<circle cx="101" cy="139" r="1.4" fill="#FFE27A"/><circle cx="70" cy="141" r="1.2" fill="#FFE27A"/><circle cx="131" cy="140" r="1.2" fill="#FFE27A"/>' +
+        '<path d="M50.6 110 Q100 124 149.4 110 ' + HEM + ' Z" fill="none" ' + O3 + "/>" +
+        p("M50.6 110 Q100 124 149.4 110 L149.6 117.6 Q100 131.6 50.4 117.6 Z", "#F2C94C", O2) +
+        '<circle cx="100" cy="125.4" r="4.4" fill="#7FE3C4" ' + O2 + '/><circle cx="98.6" cy="124" r="1.3" fill="#FFFFFF"/>' +
+        p("M42.6 113 C40 106.6 29 107.6 26.4 113.4 C24.4 119.6 29.4 125 36.4 124.2 C41.6 123.4 44.4 118 42.6 113 Z", "#FBF7EE", O3) + ln("M37 110.6 Q33 109.6 29.6 111.6", "#D9CDB6", 1.6),
+      top: '<ellipse cx="100" cy="47" rx="64" ry="11.5" fill="#4A3C9E" ' + O4 + "/>" + ln("M42 51 Q100 64 158 51", "#382C7E", 2.4) +
+        p("M64 46 C70 26 82 6 96 -8 C104 -16 116 -22 130 -21 C142 -20 152 -12 156 0 C150 -4 142 -6 134 -4 C126 -2 120 4 118 12 C122 24 130 34 136 46 Q100 56 64 46 Z", "#4A3C9E") +
+        '<path d="M118 12 C122 24 130 34 136 46 Q131 48 125 49.6 C124 36 120 24 118 12 Z M156 0 C150 -4 142 -6 134 -4 C126 -2 120 4 118 12 C123 5 130 1 138 0 C145 -1 151 -1 156 0 Z" fill="#382C7E"/>' +
+        '<path d="M64 46 C70 26 82 6 96 -8 C104 -16 116 -22 130 -21 C142 -20 152 -12 156 0 C150 -4 142 -6 134 -4 C126 -2 120 4 118 12 C122 24 130 34 136 46 Q100 56 64 46 Z" fill="none" ' + O4 + "/>" +
+        ln("M73 37 C77 24 85 10 95 -1", "#6E61C9", 3.4) +
+        p("M66 40 Q100 50 133.2 40.6 L136 46 Q100 56 64 46 Z", "#F2C94C", O3) + ln("M70 44 Q100 52 130 44.4", "#FFF0B3", 1.6) +
+        star5(84, 26, 5.2, "#FFE27A") + crescent(104, 20, 6.4, "#FFE08A") + star5(118, 33, 3.6, "#FFE27A") + star5(100, 2, 4, "#FFE27A") + star5(127, -11, 3.6, "#FFE27A") +
+        '<circle cx="92" cy="36" r="1.4" fill="#FFE27A"/><circle cx="111" cy="8" r="1.2" fill="#FFE27A"/><circle cx="143" cy="-9" r="1.2" fill="#FFE27A"/>' +
+        star5(158, 3, 6.6, "#F2C94C"),
+      say: ["Abracadabra! The plaque vanishes. The trick? Two minutes, twice a day.", "Hocus focus. Twenty more questions, then we brush.", "The crystal on my staff is a tooth, naturally. Pure enamel magic."] },
+    robot: { n: "The robot", note: "A square silver helmet with antennae and a visor, a chest panel of buttons and lights, bolts and a dial", rarity: "Epic", theme: "", price: 2200, id: "robot", costume: true,
+      face: /* silver arms, the chest plate and its panel: three buttons, a row of lights and a dial */
+        p("M56 104 C44 101 33 106 29 115 C26 122 31 128 38 125 C43 122 48 118 56 118 Z", "#D5DBE1", O3) + ln("M34.6 107.4 Q31 116 35.6 125.6", "#9AA6B2", 2) +
+        p("M144 104 C156 101 167 106 171 115 C174 122 169 128 162 125 C157 122 152 118 144 118 Z", "#C3CCD5", O3) + ln("M165.4 107.4 Q169 116 164.4 125.6", "#8E9AA7", 2) +
+        p("M49 124 H151 L146.6 131 Q140 132 135 143 Q120 156 100 157 Q80 156 65 143 Q60 132 53.4 131 Z", "#D5DBE1", O3) +
+        p("M78 132 H122 Q125 132 125 135 V148 Q116 154 100 155 Q84 154 75 148 V135 Q75 132 78 132 Z", "#3B4756", O2) +
+        '<circle cx="84" cy="139.4" r="3" fill="#E5484D" stroke="' + INK + '" stroke-width="1.2"/><circle cx="92.6" cy="139.4" r="3" fill="#F2C94C" stroke="' + INK + '" stroke-width="1.2"/><circle cx="101.2" cy="139.4" r="3" fill="#3ECF7E" stroke="' + INK + '" stroke-width="1.2"/>' +
+        [80, 86, 92, 98, 104].map(function(x, i){ return '<rect x="' + x + '" y="145.4" width="4.2" height="2.8" rx="1" fill="' + (i % 2 ? "#2E6B7A" : "#5FD3F3") + '"/>'; }).join("") +
+        '<circle cx="115.6" cy="142" r="6" fill="#F4F6F8" stroke="' + INK + '" stroke-width="1.4"/>' + ln("M115.6 142 L118.6 138.4", "#E5484D", 1.8) + '<circle cx="115.6" cy="142" r="1.2" fill="' + INK + '"/>' +
+        bolt(67, 138, 2.6) + bolt(133, 138, 2.6),
+      top: /* the antennae, the box with the visor cut out of it so his face shows, the frame, the vents, the bolts and the dial */
+        p("M64 6 h12 v5.6 h-12 z", "#9AA6B2", O2) + inked("M70 8 L63 -12", "#C3CCD5", 2.4) + '<circle cx="62" cy="-15" r="5.6" fill="#E5484D" ' + O2 + '/><circle cx="60.4" cy="-16.8" r="1.6" fill="#FFFFFF"/>' +
+        p("M124 6 h12 v5.6 h-12 z", "#9AA6B2", O2) + inked("M130 9 L137 6 L129 2.6 L137 -0.8 L129 -4.2 L137 -7.6 L132 -10", "#C3CCD5", 2) + '<circle cx="132" cy="-14" r="5" fill="#3ECF7E" ' + O2 + '/><circle cx="130.6" cy="-15.6" r="1.4" fill="#FFFFFF"/>' +
+        '<path fill-rule="evenodd" d="M48 10 H152 Q164 10 164 22 V116 Q164 130 150 130 H50 Q36 130 36 116 V22 Q36 10 48 10 Z M62 62 H138 Q148 62 148 72 V110 Q148 121 137 121 H63 Q52 121 52 110 V72 Q52 62 62 62 Z" fill="#D5DBE1"/>' +
+        '<path d="M48 10 H152 Q164 10 164 22 V25 H36 V22 Q36 10 48 10 Z" fill="#EEF2F5"/><path d="M153 25 H164 V116 Q164 130 150 130 H146 Q153 127 153 116 Z" fill="#B4BEC9"/>' +
+        '<path fill-rule="evenodd" d="M60 57 H140 Q153 57 153 70 V112 Q153 126 139 126 H61 Q47 126 47 112 V70 Q47 57 60 57 Z M62 62 H138 Q148 62 148 72 V110 Q148 121 137 121 H63 Q52 121 52 110 V72 Q52 62 62 62 Z" fill="#8E9AA7" ' + O2 + "/>" +
+        '<path d="M62 62 H138 Q148 62 148 72 V110 Q148 121 137 121 H63 Q52 121 52 110 V72 Q52 62 62 62 Z" fill="#BFE7FA" opacity=".2"/>' + ln("M58 74 L66 66 M58 84 L60 82", "#FFFFFF", 3.2, .85) +
+        '<path d="M48 10 H152 Q164 10 164 22 V116 Q164 130 150 130 H50 Q36 130 36 116 V22 Q36 10 48 10 Z" fill="none" ' + O4 + "/>" + ln("M38 25 H162", "#9AA6B2", 1.6) +
+        p("M82 31 H118 Q120.6 31 120.6 33.6 V47.4 Q120.6 50 118 50 H82 Q79.4 50 79.4 47.4 V33.6 Q79.4 31 82 31 Z", "#AEB8C3", O2) + ln("M84 36 H116 M84 40.6 H116 M84 45.2 H116", "#4A5563", 2.4) +
+        bolt(46, 18, 3) + bolt(154, 18, 3) + bolt(41.6, 70, 2.8) + bolt(41.6, 110, 2.8) + bolt(158.4, 70, 2.8) + bolt(158.4, 110, 2.8) +
+        '<circle cx="62" cy="41" r="4" fill="#5FD3F3" ' + O2.replace("2.2", "1.6") + '/><circle cx="138" cy="41" r="4" fill="#E5484D" ' + O2.replace("2.2", "1.6") + "/>" +
+        '<circle cx="32" cy="90" r="11" fill="#C3CCD5" ' + O3 + '/><circle cx="32" cy="90" r="7.4" fill="#F4F6F8" ' + O2.replace("2.2", "1.6") + "/>" + ln("M32 84 V85.6 M26 90 H27.6 M36.4 85.6 L35.3 86.7", INK, 1.4) + ln("M32 90 L35.6 86", "#E5484D", 2) + '<circle cx="32" cy="90" r="1.4" fill="' + INK + '"/>' +
+        '<circle cx="168" cy="90" r="11" fill="#AEB8C3" ' + O3 + "/>" + ln("M162.6 86 H173.4 M161.6 90 H174.4 M162.6 94 H173.4", "#4A5563", 2),
+      say: ["Beep boop. Scanning for plaque. Scan complete: you missed a spot.", "Does not compute: skipping the floss. Rebooting your routine.", "My circuits say two minutes of brushing. My circuits are never wrong."] },
+    firefighter: { n: "The firefighter", note: "A red helmet with a tooth on its shield, a tan turnout coat with reflective stripes and a hose nozzle", rarity: "Epic", theme: "", price: 1600, id: "firefighter", costume: true,
+      face: /* the coat and its stripes, the collar and clasps, then the hose, the nozzle with a little spray, his hand on it */
+        p("M57 101 C50 99 43 100 38.6 105 L43.6 123 C48 120 52 118 57 118 Z", "#D4AE62", O3) + p("M143 101 C150 99 157 100 161.4 105 L156.4 123 C152 120 148 118 143 118 Z", "#C49A50", O3) +
+        inked("M44.4 101.4 L48.8 120.8", "#DDEB4E", 4.4) + ln("M44.4 101.4 L48.8 120.8", "#EEF3F6", 1.4) + inked("M155.6 101.4 L151.2 120.8", "#DDEB4E", 4.4) + ln("M155.6 101.4 L151.2 120.8", "#EEF3F6", 1.4) +
+        p("M57 101 C50 99 43 100 38.6 105 L43.6 123 C48 120 52 118 57 118 Z", "none", O3) + p("M143 101 C150 99 157 100 161.4 105 L156.4 123 C152 120 148 118 143 118 Z", "none", O3) +
+        p("M50.6 110 Q100 124 149.4 110 " + HEM + " Z", "#D4AE62", O3) +
+        '<path d="M149.4 110 Q149.6 121 146.6 131 Q140 132 135 143 Q131 147 127 149.6 Q136 134 139.6 114 Z" fill="#B8924A"/>' +
+        inked("M61.6 137 Q100 156 138.4 137", "#DDEB4E", 6.4) + ln("M61.6 137 Q100 156 138.4 137", "#EEF3F6", 2) +
+        '<path d="M50.6 110 Q100 124 149.4 110 ' + HEM + ' Z" fill="none" ' + O3 + "/>" + ln("M100 125 V156.6", "#9C7A3A", 2) +
+        p("M50.6 110 Q100 124 149.4 110 L149.6 117 Q100 131 50.4 117 Z", "#A8823F", O2) +
+        [128.6, 138, 152.6].map(function(y){ return p("M95 " + (y - 1.4) + " h10 v4.8 h-10 z", "#3B3236", O2.replace("2.2", "1.6")) + ln("M97 " + (y + 1) + " h6", "#8E8A86", 1.2); }).join("") +
+        inked("M161 124 C164 146 184 152 186 174 C188 194 176 206 184 218", "#F1E7C9", 8) + ln("M162.6 132 C167 147 182.6 154 184.4 172", "#D9C9A0", 1.6) +
+        '<g transform="translate(186.4 221) rotate(-24)">' + p("M-6.6 -7 H6.6 V3 H-6.6 Z", "#D9A93A", O2) + p("M-8 3 H8 V8 H-8 Z", "#C9971C", O2) + ln("M-3.4 -7 V3 M0 -7 V3 M3.4 -7 V3", "#A8822A", 1.2) + "</g>" +
+        '<g transform="translate(165.5 116) rotate(20) scale(1.2)">' +
+          inked("M0 -37 Q-5 -44 -8 -51 M0 -37 V-53 M0 -37 Q5 -44 8 -51", "#9FDDF5", 2.4) + '<circle cx="-11" cy="-44" r="2" fill="#9FDDF5" stroke="' + INK + '" stroke-width="1.1"/><circle cx="10.6" cy="-43" r="1.8" fill="#9FDDF5" stroke="' + INK + '" stroke-width="1.1"/><circle cx="-3.4" cy="-58" r="1.8" fill="#9FDDF5" stroke="' + INK + '" stroke-width="1.1"/><circle cx="4.6" cy="-59" r="1.4" fill="#9FDDF5" stroke="' + INK + '" stroke-width="1"/>' +
+          p("M-5.6 0 L-4.4 -24 L-3 -35 H3 L4.4 -24 L5.6 0 Z", "#D5DBE1", O2) + ln("M-2.6 -4 L-2 -22", "#FFFFFF", 1.6) + p("M-5.2 -28 H5.2 V-21.6 H-5.2 Z", "#2B2230", O2) +
+          inked("M4.6 -6 Q15 -12 8.4 -21", "#E5484D", 2.6) + p("M-7.6 0 H7.6 V9 H-7.6 Z", "#D9A93A", O2) + ln("M-7.6 4.5 H7.6", "#A8822A", 1.4) +
+        "</g>" +
+        p("M157.4 113 C160 106.6 171 107.6 173.6 113.4 C175.6 119.6 170.6 125 163.6 124.2 C158.4 123.4 155.6 118 157.4 113 Z", "#FBF7EE", O3) + ln("M163 110.6 Q167 109.6 170.4 111.6", "#D9CDB6", 1.6),
+      top: /* the brim, the ribbed dome, then the shield on the front with a tooth on it */
+        p("M20 64 C22 48 56 38 100 38 C144 38 178 48 180 64 C178 71 170 71 162 65 C146 56 124 52 100 52 C76 52 54 56 38 65 C30 71 22 71 20 64 Z", "#D9382E", O4) + ln("M30 62 C46 52 70 46 100 45", "#F27A6E", 2.4) +
+        p("M58 48 C54 16 76 0 100 0 C124 0 146 16 142 48 Q100 38 58 48 Z", "#E0402F") +
+        '<path d="M126.3 7.7 C137.4 15.4 144.4 28.8 142 48 Q137 46.6 132 45.8 C134 30 131.6 18 126.3 7.7 Z" fill="#B32A20"/>' +
+        ln("M78 6 Q67 22 68 44 M89 2 Q82 22 83 41 M111 2 Q118 22 117 41 M122 6 Q133 22 132 44", "#B32A20", 2.2) +
+        '<path d="M58 48 C54 16 76 0 100 0 C124 0 146 16 142 48 Q100 38 58 48 Z" fill="none" ' + O4 + "/>" + ln("M66 36 C66 22 76 12 88 7", "#FF8A7A", 3.4, .9) +
+        '<circle cx="100" cy="-10" r="4" fill="#F2C94C" ' + O2 + "/>" +
+        p("M82 14 Q82 4 92 2 Q96 -5 100 -7 Q104 -5 108 2 Q118 4 118 14 V36 Q118 46 100 51 Q82 46 82 36 Z", "#F2C94C", O3) +
+        p("M86.4 16 Q86.4 8 94 6.6 Q97.4 0.6 100 -1.2 Q102.6 0.6 106 6.6 Q113.6 8 113.6 16 V35 Q113.6 42.6 100 46.6 Q86.4 42.6 86.4 35 Z", "#2B2230", O2) + tinyTooth(100, 26.6, 2, "#FFFFFF"),
+      say: ["Stop, drop and floss.", "I fight fires and inflammation. Gingivitis doesn't stand a chance.", "Five-alarm plaque on the lower molars! Hose ready."] },
+    shark: { n: "The shark", note: "A gray shark hood with a dorsal fin, a friendly open mouth of soft teeth round his face, fins and a tail", rarity: "Epic", theme: "", price: 2400, id: "shark", costume: true,
+      back: p("M146 120 C156 118 166 112 172 104 C178 90 184 74 191 58 C193 78 189 94 184 106 C189 111 194 120 197 132 C188 127 181 123 176 120 C166 126 156 132 146 136 Z", "#6F869A", O3) + ln("M186 66 C186 80 182 94 178 104", "#8FA4B6", 2),
+      face: /* the onesie, its white belly, the fins over his arms */
+        p("M50.6 110 Q100 124 149.4 110 " + HEM + " Z", "#7F95A8", O3) + '<path d="M70 126 Q100 136 130 126 C130 143 119 155 100 156.4 C81 155 70 143 70 126 Z" fill="#F2F5F8"/>' +
+        '<path d="M50.6 110 Q100 124 149.4 110 ' + HEM + ' Z" fill="none" ' + O3 + "/>" +
+        p("M56 104 C44 100 32 104 24 114 C18 122 12 132 6 144 C20 141 34 135 44 128 C49 125 53 121 56 118 Z", "#7F95A8", O3) + ln("M50 103.4 C40 102.6 31 107 25 115", "#A9BCCB", 2.4) +
+        p("M144 104 C156 100 168 104 176 114 C182 122 188 132 194 144 C180 141 166 135 156 128 C151 125 147 121 144 118 Z", "#6F869A", O3),
+      top: /* the dorsal fin, the hood with its mouth open round his face, the white jaw, the pink gums and two rows of soft teeth */
+        p("M86 16 C92 -2 104 -18 124 -27 C119 -14 119 0 125 14 Z", "#7F95A8") + ln("M92 7 C96 -3 104 -12 115 -19", "#A9BCCB", 2.6) +
+        '<path fill-rule="evenodd" d="M42 122 C31 104 30 64 42 40 C54 16 76 6 100 6 C124 6 146 16 158 40 C170 64 169 104 158 122 C144 138 122 144 100 144 C78 144 56 138 42 122 Z M49 92 A51 41 0 1 0 151 92 A51 41 0 1 0 49 92 Z" fill="#7F95A8"/>' +
+        '<path d="M136.5 15.7 C145.2 21.2 152.6 29.2 158 40 C167.6 59.2 168.9 88.6 163.4 108.9 L155 104 C158 84 157 60 151 45 C146 34 141 24 136.5 15.7 Z" fill="#6F869A"/>' +
+        '<path d="M35.7 105 C36.6 111 39 117 42 122 C56 138 78 144 100 144 C122 144 144 138 158 122 C161 117 163.4 111 164.3 105 L150.45 98 A51 41 0 0 1 49.55 98 Z" fill="#F2F5F8"/>' +
+        '<path d="M42 122 C31 104 30 64 42 40 C54 16 76 6 100 6 C124 6 146 16 158 40 C170 64 169 104 158 122 C144 138 122 144 100 144 C78 144 56 138 42 122 Z" fill="none" ' + O4 + "/>" +
+        '<path fill-rule="evenodd" d="M49 92 A51 41 0 1 0 151 92 A51 41 0 1 0 49 92 Z M55 92 A45 35 0 1 0 145 92 A45 35 0 1 0 55 92 Z" fill="#F28FA6" ' + O3 + "/>" +
+        teethRing(100, 92, 49.4, 39.4, 18, 3.6, 6.8, "#EFEADC", .5) + teethRing(100, 92, 47.2, 37.2, 18, 5.4, 9.4, "#FFFFFF", 0) +
+        ln("M58 26 C66 18 78 13 90 11", "#A9BCCB", 3, .9) +
+        '<circle cx="62" cy="42" r="6.4" fill="#2B2230"/><circle cx="64" cy="39.8" r="2.2" fill="#FFFFFF"/><circle cx="138" cy="42" r="6.4" fill="#2B2230"/><circle cx="140" cy="39.8" r="2.2" fill="#FFFFFF"/>' +
+        ln("M38.4 70 Q35.4 78 38.4 86 M44 68 Q41 77 44 86", "#5E7488", 2.2) + ln("M161.6 70 Q164.6 78 161.6 86 M156 68 Q159 77 156 86", "#4E6276", 2.2),
+      say: ["Sharks grow new teeth all their lives. I'm not jealous. Okay, I'm a little jealous.", "Fin-tastic! Now let's sink our teeth into some questions.", "So many teeth in this hood, and every one of them brushed."] },
+    dragon: { n: "The dragon", note: "A green-scaled hood with horns and a frill, bat wings, a golden belly plate and a tail curled round", rarity: "Legendary", theme: "", price: 4500, id: "dragon", costume: true,
+      back: /* the bat wings: the left one in the light, the right one (mirrored) in its shade */
+        (function(){
+          var wing = function(skin, bone, fin){ return p("M64 104 C54 78 42 46 28 22 L4 -4 Q20 18 2 42 Q20 62 6 88 Q26 96 44 130 L64 124 Z", skin, O3) +
+            inked("M28 22 L2 42 M28 22 L6 88", fin, 1.8) + inked("M64 104 C54 78 42 46 28 22 L4 -4", bone, 4) + p("M25 21 Q23 12 29 6 Q30.4 14 33 20 Z", "#FBF2DC", O2); };
+          return wing("#F6A27C", "#43A866", "#2D8150") + '<g transform="matrix(-1 0 0 1 200 0)">' + wing("#E58C66", "#2D8150", "#24693F") + "</g>";
+        })(),
+      face: /* green sleeves with claws, the scaled onesie, the belly plate, then the tail curled round the front with its spikes and its spade */
+        p("M56 104 C44 101 33 106 29 115 C26 122 31 128 38 125 C43 122 48 118 56 118 Z", "#43A866", O3) + p("M144 104 C156 101 167 106 171 115 C174 122 169 128 162 125 C157 122 152 118 144 118 Z", "#2D8150", O3) +
+        p("M29.6 112.6 L23 112 L27.4 117 Z M27.6 119.4 L21.6 121.6 L27.6 123.6 Z M32 125.4 L28 130.6 L34.6 128 Z", "#FBF2DC", O2.replace("2.2", "1.4")) +
+        p("M170.4 112.6 L177 112 L172.6 117 Z M172.4 119.4 L178.4 121.6 L172.4 123.6 Z M168 125.4 L172 130.6 L165.4 128 Z", "#FBF2DC", O2.replace("2.2", "1.4")) +
+        p("M50.6 110 Q100 124 149.4 110 " + HEM + " Z", "#43A866", O3) +
+        '<path d="M149.4 110 Q149.6 121 146.6 131 Q140 132 135 143 Q131 147 127 149.6 Q136 134 139.6 114 Z" fill="#2D8150"/>' +
+        ln("M58 122 q3.5 4.5 7 0 M60 132 q3.5 4.5 7 0 M133 122 q3.5 4.5 7 0 M131 132 q3.5 4.5 7 0", "#2D8150", 1.8) +
+        p("M76 121 Q100 130 124 121 C126 136 118 150 100 157 C82 150 74 136 76 121 Z", "#F4CF6E", O2) + ln("M77.4 131 Q100 139 122.6 131 M80.6 140.4 Q100 147 119.4 140.4 M87 149 Q100 153.6 113 149", "#D9A94A", 1.8) +
+        '<path d="M50.6 110 Q100 124 149.4 110 ' + HEM + ' Z" fill="none" ' + O3 + "/>" +
+        (function(){
+          /* the tail comes out from behind his gum on the right (the gum's own edge is drawn again over its root), swings
+             round the front and curls up at the left, its spade pointing up */
+          var G = [[152, 133], [172, 142], [190, 168], [188, 202]], at = function(t, d){ var u = 1 - t; return [0, 1].map(function(i){ return d ? 3 * (u * u * (G[1][i] - G[0][i]) + 2 * u * t * (G[2][i] - G[1][i]) + t * t * (G[3][i] - G[2][i])) : u * u * u * G[0][i] + 3 * u * u * t * G[1][i] + 3 * u * t * t * G[2][i] + t * t * t * G[3][i]; }); };
+          var t0 = .7, t1 = .93, A = at(t0), B = at(t1), dA = at(t0, 1), dB = at(t1, 1), h = (t1 - t0) / 3, pt = function(q){ return f(q[0]) + " " + f(q[1]); };
+          var cA = [A[0] + dA[0] * h, A[1] + dA[1] * h], cB = [B[0] - dB[0] * h, B[1] - dB[1] * h];
+          var outer = "M" + pt(A) + " C194 180 199.6 194 196.6 206 C192.6 221 170 228.4 140 228.4 C110 228.4 80 225.4 57 217.4 C41 211.4 31 198 33 184",
+            inner = "M43.4 182.4 C43.4 192 50 201 64 205 C84 211 112 214 140 214 C165 214 180 209.6 184.6 202.6 C187 199 " + pt([B[0] + .1, B[1] + 3]) + " " + pt(B);
+          return [[171, 209.6], [150, 213.6], [126, 214], [102, 213], [80, 209]].map(function(q){ return p("M" + (q[0] - 5.4) + " " + (q[1] + 3) + " L" + q[0] + " " + (q[1] - 10) + " L" + (q[0] + 5.4) + " " + (q[1] + 3) + " Z", "#F0785A", O2); }).join("") +
+            '<path d="' + outer + " L" + inner.slice(1) + " C" + pt(cB) + " " + pt(cA) + " " + pt(A) + ' Z" fill="#43A866"/>' +
+            ln("M192.8 206 C189 219 168 224.6 140 224.6 C110 224.6 82 221.6 59.4 213.6 C45.6 208 37.6 197.6 37.4 186", "#F4CF6E", 3) +
+            ln(outer, INK, 3) + ln(inner, INK, 3) + ln("M" + pt(A) + " C" + pt(cA) + " " + pt(cB) + " " + pt(B), "#A8384F", 4) +
+            p("M38.2 154 C42.6 162 51 167 51 176 C47 174 42 175 38.2 184.4 C34.4 175 29.4 174 25.4 176 C25.4 167 33.8 162 38.2 154 Z", "#F0785A", O3) + ln("M36 162 Q31 167 29.6 171.6", "#FFB59E", 2);
+        })(),
+      top: /* the frill and the crest behind, the horns, the scaled hood round his face with a golden rim, and its own friendly eyes */
+        (function(){
+          var frill = p("M42 56 L18 46 Q25 58 15 69 Q26 77 19 91 L42 86 Z", "#8FDBA4", O3) + inked("M42 64 L18 46 M42 70 L15 69 M42 77 L19 91", "#2D8150", 1.4);
+          var horn = p("M60 30 C50 10 42 -6 34 -22 C48 -12 66 2 80 18 Z", "#FBF2DC", O3) + ln("M52 14 L60 8 M46 2 L53 -3 M41 -9 L46 -12", "#DCCBA6", 2);
+          var scales = "";
+          for (var y = 18; y < 134; y += 10.5) for (var x = 40 + (Math.round(y / 10.5) % 2 ? 5.25 : 0); x < 160; x += 10.5){
+            var ox = (x - 100) / 64, oy = (y - 74) / 64, ix = (x - 100) / 52, iy = (y - 90) / 38;
+            if (ox * ox + oy * oy < .78 && ix * ix + iy * iy > 1.05 && !((x - 70) * (x - 70) + (y - 36) * (y - 36) < 170) && !((x - 130) * (x - 130) + (y - 36) * (y - 36) < 170)) scales += "M" + f(x - 3.5) + " " + f(y) + " q3.5 4.5 7 0 ";
+          }
+          return frill + '<g transform="matrix(-1 0 0 1 200 0)">' + frill + "</g>" +
+            p("M80 14 Q84 4 88 -4 Q92 4 94 8 Q97 -2 100 -12 Q103 -2 106 8 Q108 4 112 -4 Q116 4 120 14 Z", "#F0785A", O3) +
+            horn + '<g transform="matrix(-1 0 0 1 200 0)">' + horn + "</g>" +
+            '<path fill-rule="evenodd" d="M42 112 C30 92 30 58 42 36 C54 14 76 6 100 6 C124 6 146 14 158 36 C170 58 170 92 158 112 C144 124 124 128 100 128 C76 128 56 124 42 112 Z M55 90 A45 31 0 1 0 145 90 A45 31 0 1 0 55 90 Z" fill="#43A866" ' + O4 + "/>" +
+            '<path d="M136.5 14.3 C145.2 19 152.6 26.1 158 36 C168.2 54.7 169.7 82.1 162.6 102.1 L155 98 C158.6 82 158.6 62 153 46 C149 34 143 24 136.5 14.3 Z" fill="#2D8150"/>' +
+            ln(scales, "#2D8150", 1.6) + ln("M56 26 C64 17 76 12 88 10", "#7FD49A", 3, .9) +
+            '<path d="M42 112 C30 92 30 58 42 36 C54 14 76 6 100 6 C124 6 146 14 158 36 C170 58 170 92 158 112 C144 124 124 128 100 128 C76 128 56 124 42 112 Z" fill="none" ' + O4 + "/>" +
+            '<path fill-rule="evenodd" d="M50 90 A50 36 0 1 0 150 90 A50 36 0 1 0 50 90 Z M55 90 A45 31 0 1 0 145 90 A45 31 0 1 0 55 90 Z" fill="#F4CF6E" ' + O3 + "/>" +
+            '<ellipse cx="70" cy="36" rx="8" ry="9" fill="#FFFFFF" ' + O2 + '/><circle cx="71" cy="37" r="5" fill="#F2C94C" stroke="' + INK + '" stroke-width="1.2"/><circle cx="71.4" cy="37.4" r="2.6" fill="#2B2230"/><circle cx="72.6" cy="35.6" r="1.2" fill="#FFFFFF"/>' +
+            '<ellipse cx="130" cy="36" rx="8" ry="9" fill="#FFFFFF" ' + O2 + '/><circle cx="129" cy="37" r="5" fill="#F2C94C" stroke="' + INK + '" stroke-width="1.2"/><circle cx="128.6" cy="37.4" r="2.6" fill="#2B2230"/><circle cx="129.8" cy="35.6" r="1.2" fill="#FFFFFF"/>' +
+            ln("M60 26 Q70 22 79 26 M121 26 Q130 22 140 26", "#2D8150", 2.4);
+        })(),
+      say: ["Rawr! That's dragon for 'brush before bed'.", "No fire breath here. Just minty fresh breath.", "Dragons guard treasure. I guard enamel. Same thing, really."] }
   };
   /* put a theme outfit on a Timmy drawing from widget/pet.js art() (a string): back after his shadow, the rest on top */
   /* the Loupes journey's object is worn (redesign phase 4, part C): through-the-lens loupes with a headlight, the frame
@@ -2241,7 +2425,7 @@ export function placeKit(INK, C, PACKS, SETS){
      face, wins over them (NO_LOUPES). */
   var NO_LOUPES = ["sunnies", "aviator", "tweed-professor", "floss-mummy", "bedsheet-ghost", "rank-antique-outfit", "rank-bronze-outfit", "rank-silver-outfit", "rank-diamond-outfit",
     "beekeeper", "snorkel", "deep-sea-diver", "football-helmet", "knight-of-hearts", "masquerade",
-    "safety-glasses", "pirate", "astronaut", "captain-enamel"];
+    "safety-glasses", "pirate", "astronaut", "captain-enamel", "robot"];
   function loupes(tier){
     var m = MATS[Math.max(0, Math.min(6, tier | 0))], s = "", ink = 'stroke="' + INK + '" stroke-linecap="round" stroke-linejoin="round"';
     function tube(d, w){ return '<path d="' + d + '" fill="none" ' + ink + ' stroke-width="' + (w + 3.2) + '"/><path d="' + d + '" fill="none" stroke="' + m.c + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"/>'; }
@@ -2345,6 +2529,8 @@ export function placeKit(INK, C, PACKS, SETS){
     if (SETS){
       SETS.seasons.forEach(function(se){ se.items.forEach(function(it){ SET_INFO[it.id] = { n: it.n, rarity: cap(it.rarity), price: it.price, set: se.k, kind: it.kind }; }); });
       SETS.ranks.forEach(function(r){ [r.outfit, r.yard].forEach(function(q, i){ SET_INFO[q[0]] = { n: q[1], rarity: cap(q[2]), price: 0, set: "rank", rank: r.gtier, rankName: r.rank, kind: i ? "yard" : "outfit" }; }); });
+      /* the year-round collections (sets.mjs COLLECTIONS): a set like a season's, but in the everyday rotation */
+      (SETS.collections || []).forEach(function(co){ co.items.forEach(function(it){ SET_INFO[it.id] = { n: it.n, rarity: cap(it.rarity), price: it.price, set: co.k, coll: true, kind: it.kind }; }); });
     }
   })();
   /* one set's drawings join the kit. The design page's kit is built with every pack; the engine's (widget/hub-art/place.js)
@@ -2359,6 +2545,9 @@ export function placeKit(INK, C, PACKS, SETS){
         var x = list[id], m = SET_INFO[id] || {};
         x.k = id; x.id = id; x.set = m.set || got.k; x.theme = ""; x.n = m.n || x.n || id; x.rarity = m.rarity || x.rarity || "Legendary"; x.price = m.price != null ? m.price : x.price || 0;
         if (m.rank){ x.rank = m.rank; x.rankName = m.rankName; }
+        if (m.coll) x.coll = true;
+        /* an outfit with its own eyewear, or one that covers his face, says so (noLoupes) and the loupes stay off */
+        if (pair[0] === "outfits" && x.noLoupes && NO_LOUPES.indexOf(id) < 0) NO_LOUPES.push(id);
         pair[1][id] = x; SET_OF[id] = x.set;
         if (pair[0] === "yard"){ EGGS[id] = x.egg || { n: x.n, does: "a little wobble", say: "" }; if (x.bits) EGG_ANIM[id] = x.anim || "tp-pop 2.2s"; }
       });
@@ -2369,6 +2558,8 @@ export function placeKit(INK, C, PACKS, SETS){
 
   /* the motion: smoke rises, water shimmers, leaves fall, flags wave, stars twinkle, eggs play. Reduced motion: still,
      and an egg shows its bits without moving. */
+  /* an egg's bits play by its own rule: a set fetched late (addPack) adds its rules to CSS, or its eggs would stay hidden */
+  function eggRule(k){ return "[data-egg='" + k + "'].tp-on .tp-eb{animation:" + EGG_ANIM[k] + " both}"; }
   var CSS = [
     ".tp-scene{display:block;width:100%;height:auto}.tp-thumb,.tp-burst{display:block;width:100%;height:100%}",
     ".tp-grade,.tp-night,.tp-lights,.tp-eb,.tp-mark{pointer-events:none}.tp-egg{cursor:pointer;transform-box:fill-box;transform-origin:50% 100%}.tp-eb{opacity:0}",
@@ -2412,7 +2603,7 @@ export function placeKit(INK, C, PACKS, SETS){
     "@keyframes tp-swing{0%,100%{transform:none}25%{transform:translateX(4px)}75%{transform:translateX(-4px)}}",
     "@keyframes tp-flutter{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(16deg)}}",
     BOING.map(function(k){ return "[data-egg='" + k + "'].tp-on"; }).join(",") + "{animation:tp-boing .8s ease}",
-    Object.keys(EGG_ANIM).map(function(k){ return "[data-egg='" + k + "'].tp-on .tp-eb{animation:" + EGG_ANIM[k] + " both}"; }).join(""),
+    Object.keys(EGG_ANIM).map(eggRule).join(""),
     "[data-egg='rabbit'].tp-on .tp-eo{transform-box:fill-box;transform-origin:50% 100%;animation:tp-burrow 1.8s ease}[data-egg='crab'].tp-on .tp-eo{animation:tp-scuttle 1.6s ease}",
     "[data-egg='owl'].tp-on .tp-owlhead{transform-box:fill-box;transform-origin:50% 100%;animation:tp-turn 1.6s ease}[data-egg='owl'].tp-on .tp-owlhead .tp-eb{animation:tp-blink 1.6s}[data-egg='balloon'].tp-on .tp-eo{animation:tp-rise2 3s ease-in-out}",
     "[data-egg='brush'].tp-on{animation:tp-wiggle .9s ease}[data-egg='tree'].tp-on{transform-origin:50% 100%;animation:tp-shake .8s ease}[data-egg='lane'].tp-on .tp-ball{animation:tp-roll 1.4s ease-in both}[data-egg='lane'].tp-on .tp-pins{transform-box:fill-box;transform-origin:50% 100%;animation:tp-tip 1.4s ease both}",
@@ -2479,30 +2670,42 @@ export function placeKit(INK, C, PACKS, SETS){
     return HEALTH[HEALTH.length - 1];
   }
 
+  /* what the page reads of each piece, in one place: the lists are made again after each addPack (lists()), and a field
+     missing there drops from every piece once a set's file arrives (coll did, 2026-11-18) */
+  var FIELDS = {
+    homes: ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set", "coll"],
+    scenes: ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set", "coll"],
+    yard: ["n", "note", "rarity", "theme", "price", "id", "wide", "set", "rank", "rankName", "coll"],
+    outfits: ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName", "costume", "coll"]
+  };
   var API = {
     HEALTH: HEALTH, healthFor: healthFor,
     VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout,
     onLand: function(scene, x, y){ var q = P(x, y, 0); return sceneOn(SCENES[scene] || SCENES.hill, q[0], q[1]); }, unproject: unP, N: N, S: S, FIX: FIX, SLOT_AT: SLOTS,
-    HOMES: meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set"]),
-    SCENES: meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set"]),
-    YARD: meta(YARD, ["n", "note", "rarity", "theme", "price", "id", "wide", "set", "rank", "rankName"]),
+    HOMES: meta(HOMES, FIELDS.homes),
+    SCENES: meta(SCENES, FIELDS.scenes),
+    YARD: meta(YARD, FIELDS.yard),
     SLOTS: SLOT_ORDER.map(function(k){ return { k: k, n: SLOTS[k].n }; }),
     PAINTS: Object.keys(PAINTS).map(function(k){ return { k: k, n: PAINTS[k].n, c: PAINTS[k].c, bold: BOLD[k].c, boldName: BOLD[k].n, rarity: k === "cream" ? "" : "Common", price: k === "cream" ? 0 : 150, id: k === "cream" ? "" : "paint-" + k }; }),
     UPGRADES: UPGRADES, MATS: MATS.map(function(m){ return { k: m.k, n: m.n, c: m.c }; }),
-    OUTFITS: meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName", "costume"]), dress: dress, loupes: loupes, NO_LOUPES: NO_LOUPES, SETS: SETS || null,
+    OUTFITS: meta(OUTFITS, FIELDS.outfits), dress: dress, loupes: loupes, NO_LOUPES: NO_LOUPES, SETS: SETS || null,
     THEMES: THEMES, EGGS: EGGS, burst: burst, thumb: thumb,
     outfitParts: function(k){ var o = OUTFITS[k]; return o ? { back: o.back || "", face: o.face || "", top: o.top || "" } : null; },
     /* a set piece's set ("halloween", "rank"...) and kind, known from the list before its pack is loaded; whether a
        set's pack is here; and a pack joining late (the lists above are made again) */
     setOf: function(id){ return SET_INFO[id] ? SET_INFO[id].set : ""; }, setInfo: function(id){ return SET_INFO[id] || null; },
+    collOf: function(id){ return SET_INFO[id] && SET_INFO[id].coll ? SET_INFO[id].set : ""; },
     hasPack: function(k){ return !!PACKED[k]; },
-    addPack: function(pack){ addPack(pack); lists(); }
+    addPack: function(pack){
+      var had = {}, k; for (k in EGG_ANIM) had[k] = 1;
+      addPack(pack); lists();
+      var more = Object.keys(EGG_ANIM).filter(function(id){ return !had[id]; });
+      if (more.length) API.CSS += "\n" + more.map(eggRule).join("");
+    }
   };
   function lists(){
-    API.HOMES = meta(HOMES, ["n", "note", "rarity", "theme", "price", "id", "ups", "upn", "climbs", "set"]);
-    API.SCENES = meta(SCENES, ["n", "note", "rarity", "theme", "price", "id", "alwaysNight", "set"]);
-    API.YARD = meta(YARD, ["n", "note", "rarity", "theme", "price", "id", "wide", "set", "rank", "rankName"]);
-    API.OUTFITS = meta(OUTFITS, ["n", "note", "rarity", "theme", "price", "id", "say", "set", "rank", "rankName", "costume"]);
+    API.HOMES = meta(HOMES, FIELDS.homes); API.SCENES = meta(SCENES, FIELDS.scenes);
+    API.YARD = meta(YARD, FIELDS.yard); API.OUTFITS = meta(OUTFITS, FIELDS.outfits);
   }
   return API;
 }

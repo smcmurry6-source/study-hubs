@@ -460,11 +460,13 @@
   paintStill(); document.addEventListener("sh:pref", paintStill);
   function roomReady(){ return !!(CA && CA.room && window.shPet && window.shPet.art && !focusOn()); }
   function hashOf(k){ var h = 0; k = String(k); for (var i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) | 0; return Math.abs(h); }
-  var outfitsAsked = false;
-  /* the shop's outfits (widget/hub-art/outfits.js, 55 of them) load only when someone is wearing one */
-  function wantOutfits(){
-    if (outfitsAsked) return; outfitsAsked = true;
-    var el = document.createElement("script"); el.src = WIDGET + "hub-art/outfits.js"; el.async = true;
+  var outfitsAsked = {};
+  /* the shop's outfits load only when someone is wearing one: widget/hub-art/outfits.js (the everyday ones and the
+     rank outfits), then hub-art/outfits/costumes.js, seasons.js or collections.js for the rest */
+  function wantOutfits(set){
+    var file = set ? "outfits/" + set + ".js" : "outfits.js";
+    if (outfitsAsked[file]) return; outfitsAsked[file] = 1;
+    var el = document.createElement("script"); el.src = WIDGET + "hub-art/" + file; el.async = true;
     el.onload = function(){ rm = null; syncRoom(); paintBoard(); };
     document.head.appendChild(el);
   }
@@ -478,6 +480,7 @@
     if (fit && fit.indexOf(":") < 0) {
       if (O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
       else if (!O) wantOutfits();
+      else if (O.where && O.where[fit] && !(O.got && O.got[O.where[fit]])) wantOutfits(O.where[fit]);
     }
     return String(svg).replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
   }
@@ -1581,7 +1584,7 @@
   document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); } });
   /* the rare costume of the day: from the visitor id and the Central day, on about one day in twelve with no holiday
      (widget/pet.js's holidayId()) outside the fall weeks (September 22 to November 30). The same as hub-timmy.js's. */
-  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
   function costumeOfDay(visitor, day, holiday){
     if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
     var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";

@@ -138,10 +138,23 @@ function shopCatalog(){
     }
   }
   (sql.match(/update public\.shop_items set wide = true where id = '([a-z0-9-]+)'/g) || []).forEach(s => { wide[/'([a-z0-9-]+)'/.exec(s)[1]] = true; });
-  /* a later migration's change to a row (migration_v62: the boosts' rarity and price), in the migrations' order */
+  /* a later migration's new rows (migration_v65: the collections, five costumes, six paints) and its change to a row
+     (migration_v62: the boosts' rarity and price), in the migrations' order */
   const lit = v => v[0] === "'" ? v.slice(1, -1).replace(/''/g, "'") : v === 'null' ? null : v === 'true' ? true : v === 'false' ? false : Number(v);
   fs.readdirSync(ROOT).map(f => /^migration_v(\d+)\.sql$/.exec(f)).filter(f => f && +f[1] > 54).sort((x, y) => x[1] - y[1]).forEach(f => {
     const text = fs.readFileSync(path.join(ROOT, f[0]), 'utf8').replace(/--[^\n]*/g, '');
+    const ins = /insert into public\.shop_items \(([^)]*)\) values\s*([\s\S]*?)\n(?:on conflict[^;]*)?;/g;
+    let n;
+    while ((n = ins.exec(text))) {
+      const cols = n[1].split(',').map(x => x.trim());
+      const tuple = /\(((?:'(?:[^']|'')*'|[^()'])*)\)/g; let t;
+      while ((t = tuple.exec(n[2]))) {
+        const vals = [], cell = /\s*('(?:[^']|'')*'|[^,]+)\s*(?:,|$)/g; let c;
+        while ((c = cell.exec(t[1])) && c[0]) vals.push(lit(c[1].trim()));
+        const r = {}; cols.forEach((k, i) => { r[k] = vals[i]; });
+        if (!rows.some(x => x.id === r.id)) rows.push(r);
+      }
+    }
     const up = /update public\.shop_items set ((?:\s*[a-z_]+ = (?:'(?:[^']|'')*'|-?[0-9]+|true|false|null)\s*,?)+) where id = '([a-z0-9-]+)';/g;
     let u;
     while ((u = up.exec(text))) {

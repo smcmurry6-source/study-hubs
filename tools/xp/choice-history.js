@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Which questions' choices have changed since a hub's content first shipped, from git (migration_v65). Their class picks
+// Which questions' choices have changed since a hub's content first shipped, from git (migration_v66). Their class picks
 // recorded before the picks had versions mix the old choices with the new, so the migration sets those picks aside
 // instead of keeping them as the current choices' (question_choices.v = 'before', moved to question_choices_past when
 // the keys are loaded with their versions). A question counts as changed when its choice version (tools/xp/keys.js
