@@ -148,7 +148,9 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   wording too** (same choices in the same order, a why for each); a new question can get one, or the build is fine without.
   `node tools/hub-next/build.mjs` checks them. They are **A/B versions** (Sam, 2026-11-18): about half the class starts each
   question on B, and question health's `ab_gap` flags a pair whose first tries differ ([question-health](../reference/question-health.md)):
-  fix the version that's off, A in `questions.json`, B in `variants.json`.
+  fix the version that's off, A in `questions.json`, B in `variants.json`. A card shows the letter of the version on screen
+  beside its number (`verTag` in `widget/hub-bank.js`; Sam, 2026-11-18: the letter, not "reworded"), and a report says
+  "(version A)" or "(version B)".
 
 ## Diagram decisions
 
@@ -202,7 +204,9 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11
   `notes.json` (167 KB). 885 KB since S6 went taught (2026-11-18, BUG-180: 864 KB measured, S6's notes, questions, version Bs and
   hints +28 KB gzipped). Check it after a big addition; raise it only with a reason in the PR that Sam approves.
 - Each session's Review tables sit under that session's notes (`core.noSide`: More's Side by side has nothing left, so
-  it's hidden). The Patient Box cases are `core.json`'s `pcases`, checked by `node tools/ci/cases.js`.
+  it's hidden). The Patient Box cases are `core.json`'s `pcases`, checked by `node tools/ci/cases.js`. A chart that
+  draws both surfaces labels each one above its strip and says they are one visit (report #61, 2026-11-18); a figure's
+  `title` should say which visit it is ("today", "at the baseline") when the case has more than one.
 - **Progress carries over:** same hub id, state key `perio-d2-compendium-state-v1`, answered event `perio:answered`, every
   question id (`tools/question-ids/perio.txt`), and **Perio's own saved shape** (`SH_HUB.stateShape: "answered"`:
   `answered`, `totalSeen`, `activeDates`, `achievements` as `true`), which the dashboard reads as it is. The engine reads and

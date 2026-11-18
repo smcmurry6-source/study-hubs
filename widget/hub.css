@@ -668,6 +668,10 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 html.shx .qc-tools .sh-qflag, html.shx .qc-tools .sh-qpin { margin-left: 0; }
 .qc-lec { font-weight: var(--w-strong); }
 .qc-n { font-weight: var(--w-strong); color: var(--text); }   /* "Question 12 of 84": the card's place in its set */
+/* A/B: the letter of the version on screen, for a question that comes in versions (widget/hub-bank.js verTag) */
+/* small and quiet on purpose (Sam, 2026-11-18: "smaller/less noticeable"): the muted ink, a hairline, no hub color */
+.qc-ver { display: inline-flex; align-items: center; justify-content: center; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 4px;
+  border: 1px solid var(--border); color: var(--muted); font-weight: var(--w-strong); font-size: 11px; line-height: 1; }
 .likely { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px; border-radius: var(--r-pill); background: var(--hub-soft); color: var(--hub-text);
   font-weight: var(--w-strong); font-size: var(--fs-meta); }
 /* the tag is a button that says why (widget/hub-bank.js likelyWire(); Sam, 2026-11-18, Perio report #57): its chevron turns

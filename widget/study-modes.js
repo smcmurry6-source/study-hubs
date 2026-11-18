@@ -562,7 +562,7 @@
         if (P.later) q = P.later(q, c ? c.n || 0 : 0);
         var hide = hideable(q), uid = "fc" + Math.floor(Math.random() * 1e9);
         var el = h('<article class="qc fcard' + lc(q.lec) + '" data-fqid="' + esc(q.id) + '" aria-labelledby="' + uid + 'h"></article>');
-        var head = '<header class="qc-head"><span class="qc-meta"><span class="qc-lec" id="' + uid + 'h">' + lecChip(q.lec) + "</span>" + P.likelyTag(q) + '<span class="fc-state">' + esc(state) + '</span></span><span class="qc-tools fc-tools"></span></header>';
+        var head = '<header class="qc-head"><span class="qc-meta">' + (P.verTag ? P.verTag(q) : "") + '<span class="qc-lec" id="' + uid + 'h">' + lecChip(q.lec) + "</span>" + P.likelyTag(q) + '<span class="fc-state">' + esc(state) + '</span></span><span class="qc-tools fc-tools"></span></header>';
         var body = '<div class="fc-front" data-face>' + P.figHTML(q) + P.pboxHTML(q) + P.stemHTML(q) + frontChoices(q, hide) + "</div>";
         el.innerHTML = head + '<div class="fc-turn">' + body + '<div class="fc-back" data-back hidden></div></div>' +
           '<div class="qc-go fc-flip" data-fliprow><button class="btn btn-primary" type="button" data-sm="flip">' + icon("retry", 18) + 'Flip the card</button><span class="note fc-key">Space flips it. Then 1 to 4 rate it, or \u2190 Again and \u2192 Good.</span><span class="note fc-tap">Tap the card to flip it. Then swipe left for Again, right for Good.</span></div>' +
@@ -653,7 +653,8 @@
         }
         if (window.shOpenFlag) {
           var rb = h('<button type="button" class="sh-qflag" data-sm="report" aria-label="Report a problem with this question">' + icon("report", 16) + "Report</button>");
-          rb.addEventListener("click", function(ev){ ev.stopPropagation(); window.shOpenFlag(q.id); });
+          /* the version on screen (A/B) and a statement item's order go with the report, as from a bank card */
+          rb.addEventListener("click", function(ev){ ev.stopPropagation(); window.shOpenFlag(q.id, q._base ? q._w || 0 : -1, q._perm ? q._perm.join("") : ""); });
           host.appendChild(rb);
         }
       }
