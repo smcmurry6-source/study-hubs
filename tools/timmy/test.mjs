@@ -387,6 +387,17 @@ ok(!T.quoteIn("Final: 2026", "Final: 2026-11-19") && !T.quoteIn("Final", "Final:
 notes.push("one turn with a fake model and database: the request, quotes, offers, go, Ask Timmy, the dashboard, history, naps, errors, cost, a gap looked up, HTTP");
 
 notes.forEach(n => console.log("  " + n));
+/* the wording the student saw (a hub's variants.json): swapped in by its number, the original when it's missing */
+{
+  const q = { id: "x1", type: "mcq", stem: "Original?", choices: ["A", "B"], answer: 0, why: ["a", "b"], ex: "E" };
+  const V = { x1: { stem: "Reworded?", choices: ["A2", "B2"], why: ["a2", "b2"] } };
+  eq(T.wordingOf(q, V, 1).stem, "Reworded?", "wordingOf: wording 1 is the file's first");
+  eq(T.wordingOf(q, V, 1).choices, ["A2", "B2"], "wordingOf: its choices, in the same order");
+  eq(T.wordingOf(q, V, 1).answer, 0, "wordingOf: the key stays the original's");
+  eq(T.wordingOf(q, V, 2).stem, "Original?", "wordingOf: a wording the file doesn't have is the original");
+  eq(T.wordingOf(q, null, 1).stem, "Original?", "wordingOf: no file, the original");
+  eq(T.wordingOf(q, { x1: { stem: "R", choices: ["only one"] } }, 1).choices, ["A", "B"], "wordingOf: choices of another length are ignored");
+}
 console.log(`  ${checks} checks`);
 if (problems.length) { console.error(`\n✗ Ask Timmy's function: ${problems.length} problem(s):\n` + problems.map(p => "  - " + p).join("\n")); process.exit(1); }
 console.log(pw ? "\n✓ Ask Timmy's function (core.js with a fake model and database) passed" : "\n✓ Ask Timmy's function passed (paragraph addresses against Chromium blocked: no Playwright)");
