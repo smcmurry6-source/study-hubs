@@ -86,7 +86,8 @@ edited or added question, Timmy Time's section 6, and the diagram candidates. "D
   (`q6-W01`-`W04`), 6 multiple choice (`q6-F02`-`F07`), every choice with its why, every one with its version B in
   `content/variants.json`. New facts only, none asked more than twice (the bank audit's bar).
 - **Timmy Time**: section 6 rewritten from the class (it said "What we have is his slides"), with his hints in his words, and a
-  lightning-round line on the root canal; the episode rebuilt.
+  lightning-round line on the root canal; the episode rebuilt (49 → 52 min; its length on the dashboard card,
+  the About page and `LORE.md` too).
 - **Diagrams**: five candidates put to Sam; [the follow-up task](../2026-11-18-perio-s6-diagrams.md) builds the approved ones.
 - Verified: `node tools/hub-next/build.mjs --check`, the bank lint (format minimums, key spreads, the id registry, every
   wording), `node tools/ci/syntax.js`, `node tools/ci/vault.js`, and CI on the PR.

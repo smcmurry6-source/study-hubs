@@ -104,7 +104,8 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   so **a change to the notes or hints it covers means fixing the script and rebuilding the episode in the same PR**
   (`/podcast`, [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)). After its merge the server needs
   `admin_set_podcast_episode('<admin secret>', 'perio', 'final-review', <seconds>)` for listening to earn XP. At archiving it
-  comes off with the narration ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)).
+  comes off with the narration ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)). Rebuilt
+  2026-11-18 with section 6 from S6's class recording: 52 min (3130.7 s, was 49); the After merge workflow registers the length.
 - **Arcade:** the Pocket Arcade, skin `PERIO_SKIN`, painted Clinic Escape
   (`img/clinic-escape.webp`).
 - **Stage & Grade** (2026-11-17; Sam: "add an interactive visualization/game for staging and grading using all of the
