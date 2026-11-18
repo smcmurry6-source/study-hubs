@@ -101,6 +101,9 @@ and the `/podcast` and `anima` skills point at them.
   [outside-sources-for-figures](vault/rules/outside-sources-for-figures.md).
 - **A new hub's art** (emblem, masthead scene, medals, tint; `tools/figures/site/`):
   [every-hub-gets-its-own-art](vault/rules/every-hub-gets-its-own-art.md).
+- **How fast XP and crowns are earned, and what the shop charges** (`sh_wallet`, `sh_prizes`, an award's amount, a price
+  or rarity band, the snacks and boosts; and every lessons audit's step 1b, `tools/economy.sql`):
+  [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md).
 
 ## How-tos and reference
 

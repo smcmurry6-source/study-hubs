@@ -1,6 +1,6 @@
 ---
 name: lessons-audit
-description: Run the study-hubs lessons audit (a.k.a. lessons refresh) on demand. Reads every tracked signal in Supabase (time, clicks, questions, wrong-answer picks, mocks, drill, reports, suggestions, check-ins against each person's study time, surveys, searches), checks whether the last refresh's fixes worked, rewrites LESSONS.md's Live signals and standing lessons, ships small data-backed fixes to the live hubs in a draft PR, and lists bigger ideas and report replies for Sam. When a hub's exam has passed, it also writes that hub's full retrospective and publishes its recap to the dashboard. Use when Sam says "lessons audit", "run the lessons refresh", "/lessons-audit", or before building a new hub.
+description: Run the study-hubs lessons audit (a.k.a. lessons refresh) on demand. Reads every tracked signal in Supabase (time, clicks, questions, wrong-answer picks, mocks, drill, reports, suggestions, check-ins against each person's study time, surveys, searches), checks whether the last refresh's fixes worked, reviews the game economy (XP and crowns earned across the class against the shop's prices, in study days), rewrites LESSONS.md's Live signals and standing lessons, ships small data-backed fixes to the live hubs in a draft PR, and lists bigger ideas and report replies for Sam. When a hub's exam has passed, it also writes that hub's full retrospective and publishes its recap to the dashboard. Use when Sam says "lessons audit", "run the lessons refresh", "/lessons-audit", or before building a new hub.
 ---
 
 # Lessons audit
@@ -70,6 +70,25 @@ Also pull, for the live hubs: people/minutes/bounce (< 5 min) all-time and since
 targets and reach for anything the last refresh changed (e.g. `practice=midterm`, `sh-drill=quick`); mocks
 (`mock_scores`) and drill (`drill/%` sections) per day. Time comes from `activity_hourly` (`sum(n) * 25 / 60` minutes):
 raw `activity_pings` are kept 30 days only (`vault/reference/analytics-retention.md`).
+
+## 1b. The game economy: XP, crowns and the shop's prices
+
+Sam's standing rule, 2026-11-18 ([earn-rates-stay-enjoyable](../../../vault/rules/earn-rates-stay-enjoyable.md): read it
+first): every audit checks that the class isn't earning too fast or too slow for what the shop charges. "I want there to be
+some accomplishment in earning crowns and buying things you want but i dont want people to feel like they are never able
+to afford the things they want for their timmy."
+
+- Run `tools/economy.sql` (E0-E6). Set `:since` to the window with **today's rules**: the last two weeks, or the day of the
+  last change to a rate, a prize or a price if that's later (`vault/decisions.md`, `git log -- migration_v*.sql`). E0 prints
+  the live wallet formula: if it no longer pays study XP at 5 crowns per 10, change E1's `study / 2` to match.
+- Paste E1's median and 75th-percentile day into E4, and read every band in **study days** against the rule's yardstick,
+  and E2's rhythm (study days a typical student has in four weeks) to say what that is in weeks.
+- Name each sign the rule lists that you see (too fast, too slow, nothing to want, hoarding), with its numbers; say what
+  skews the reading (a rate changed days ago, a back pay, exam week).
+- Write it in `LESSONS.md` Live signals under **The game economy** (replace last audit's), and put any price, rate or prize
+  change in the PR's "For Sam" as numbers to pick from. Never change one in the audit's PR, and never propose taking crowns
+  back (a balance is computed: a lower rate lowers everyone's at once).
+- Totals over 5 or more people only: no single balance, purchase or name.
 
 ## 2. Check the last refresh first
 
@@ -157,5 +176,6 @@ For each item under ~45% with 12+ tries, read the stem, choices, key and explana
 ## Finish with
 
 A short summary for Sam: what changed for students, whether the last fixes worked (numbers), what the check-ins say,
+how the earn rates sit against the prices (and which signs of drift you saw),
 any retrospective written and recap published, new lessons, and the decisions only Sam can make (report replies,
 restructures, anything over the exam).
