@@ -5,7 +5,8 @@
 -- reaching streaks. 10,000 xp and crowns for launching a nuke. small bonus for completing a lecture in notes. immediately
 -- scrolling to the bottom doesnt count. bonus for getting achievements and hub medals. once daily bonus for visiting someone
 -- elses timmy, bonus for games and setting a game record. 20,000 xp and crown bonus for breaking the all time streak."
--- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js).
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js). Applied to the live project on
+-- 2026-11-18 through the Supabase connector, at Sam's "merge when ready" (PR #403).
 --
 -- What was wrong: nothing on the server. Answers pay XP with no daily cap (migration_v54; the 600-a-day cap is only on the
 -- old single-file pages' record_personal_answer), and crowns are worked out from XP whenever they're read. But the page read

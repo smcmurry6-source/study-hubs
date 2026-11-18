@@ -59,6 +59,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   wallet say 5. The shop's prices weren't changed. And "also 100 crowns per hour of hub time": `sh_time_crowns` pays 100 an
   hour from `activity_hourly` (all the time recorded, at most 144 pings in a clock hour), in the wallet's `from_time`;
   the planned collapse of `activity_hourly` must keep it (inbox).
+  **Applied to the live project on 2026-11-18** through the connector (its confirmation answered by the new hook,
+  `.claude/hooks/supabase-confirm.js`), appended to `supabase/schema.sql`; every function's body matched the tested copy, and
+  the rebuild agreed with live XP for all 77 people with an answer since the release. Class-wide after it: 168 wallets, none
+  below zero, median about 1,200 crowns, about 300,000 of the 740,000 from hub time.
 - **2026-11-17 (the dashboard at the large text sizes, BUG-076 and BUG-163, Claude Code, #401)** — `widget/dash.css` (and
   the rebuilt `widget/site.bundle.css`). On a 320 px phone at XX-Large the page scrolled 49 px sideways (10 px at X-Large):
   the "You" card's week dots now shrink, still round, when the card is narrower than the week, and "Start studying" wraps
