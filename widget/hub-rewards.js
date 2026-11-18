@@ -159,37 +159,219 @@
      said out loud: the day's 20th answer, a miss fixed, a medal with its double XP */
   var PEND = [], BONUS = { goal20: "20 answers today", fix: "A miss fixed" }, MEDAL = ["", "Bronze", "Silver", "Gold", "Crown"];
   function pendSum(){ var cut = Date.now() - 20000; PEND = PEND.filter(function(x){ return x.at > cut; }); return PEND.reduce(function(n, x){ return n + x.xp; }, 0); }
+  /* a prize's name (widget/v3.js prizeName), for the reward card; an older cached v3.js has only prizeText */
+  function prizeName(src, d){
+    var G = window.shGame;
+    if (G && G.prizeName) return G.prizeName(src, d);
+    return G && G.prizeText ? String(G.prizeText(src, 1, d)).split(": +")[0] : "Bonus";
+  }
+  /* the crowns study XP pays (sh_wallet: 5 for every 10, from the XP before a boost doubles it, counted on the total), shown
+     only when that is exact: an even XP before the boost */
+  function studyCrowns(xp, mult){
+    var b = (xp | 0) / ((mult | 0) || 1);
+    return b > 0 && b === Math.floor(b) && b % 2 === 0 ? b / 2 : 0;
+  }
   document.addEventListener("sh:answer-paid", function(e){
     var d = e.detail || {}, r = d.res; if (!r || r.repeat) return;
     /* the page's guess for this very answer (a reply can be missing: an answer recorded the old way, or lost offline) */
     var at = -1; PEND.some(function(x, i){ if (x.qid === d.qid) { at = i; return true; } return false; });
-    var guess = at > -1 ? PEND.splice(at, 1)[0] : null, t = todayRec(), extra = 0, said = [];
-    var G = window.shGame;
-    /* the day's bonuses (study XP) and the prizes an answer can win (migration_v68: right in a row, a streak of days, the
-       class's record), which pay as many crowns as XP */
-    (Array.isArray(r.bonus) ? r.bonus : []).forEach(function(b){ if (b && b.xp > 0) { extra += b.xp; if (BONUS[b.src]) said.push(BONUS[b.src] + ": +" + b.xp + " XP"); else if (G && G.prizeText) said.push(G.prizeText(b.src, b.xp, b)); } });
+    var guess = at > -1 ? PEND.splice(at, 1)[0] : null, t = todayRec(), extra = 0, won = [];
+    /* the day's bonuses (study XP, boosted like the answer) and the prizes an answer can win (migration_v68: right in a row,
+       a streak of days, the class's record), which pay as many crowns as XP */
+    (Array.isArray(r.bonus) ? r.bonus : []).forEach(function(b){
+      if (!b || !(b.xp > 0)) return;
+      extra += b.xp;
+      if (BONUS[b.src]) won.push({ t: BONUS[b.src], xp: b.xp, c: studyCrowns(b.xp, r.mult) });
+      else won.push({ t: prizeName(b.src, b), xp: b.xp, c: b.xp, src: b.src });
+    });
     var off = (r.xp | 0) - (guess ? guess.xp : r.xp | 0) + extra;
     if (off) { t.xp = Math.max(0, t.xp + off); if (d.ctx !== "mock" && d.ctx !== "arcade") SESSION.xp = Math.max(0, SESSION.xp + off); saveState(); }
     if (RANK.p && typeof r.total === "number") { RANK.p.xp = Math.max(RANK.p.xp || 0, r.total); RANK.local = pendSum(); }
     if (r.medal && r.medal.level) {
-      said.push((MEDAL[r.medal.level] || "A medal") + " medal: +" + fmt(r.medal.xp | 0) + " XP and " + fmt((r.medal.xp | 0) + 50) + " crowns, and double XP for 24 hours");
+      /* a medal pays its XP as a prize, and 50 crowns more for the medal itself (sh_wallet) */
+      won.unshift({ t: (MEDAL[r.medal.level] || "A") + " medal", xp: r.medal.xp | 0, c: (r.medal.xp | 0) + 50, src: "medal", sub: "And double XP for 24 hours" });
       HX.say("Double XP for a day. Go!", "do-hop");
     }
-    if (said.length && d.ctx !== "mock") toast(said.join(". ") + ".");
+    if (won.length && d.ctx !== "mock") prizeCard(won);
     if (off || extra || r.medal || boostShown !== !!boost()) paintMeters();
     ringClaim();
   });
   /* ---------- prizes (migration_v68): what the server paid outside an answer ----------
      widget/v3.js sends sh:prize for a prize call's reply (the daily ring, a boss's share, a lecture read, the nuke, a name,
-     trophies, a game's prizes): its XP joins today's and the rank's, and it's said. The crowns come as sh:crowns. */
+     trophies, a game's prizes): its XP joins today's and the rank's, and it's shown on the reward card. The crowns come as
+     sh:crowns. */
   document.addEventListener("sh:prize", function(e){
     var d = e.detail || {}; if (!(d.xp > 0)) return;
     var w = HX.wallet ? HX.wallet() : null; if (d.src === "name" && w && w.got) w.got.name = true;   /* Settings stops offering it */
     todayRec().xp += d.xp; RANK.local += d.xp; saveState();
-    toast(d.text || ("+" + fmt(d.xp) + " XP and crowns"));
+    if (d.src === "ring") {
+      /* the daily ring is today's goal: one card for both, with what it paid (reward() waits for it) */
+      ringShown = Date.now();
+      if (goalWait) { clearTimeout(goalWait); goalWait = 0; }
+      prizeCard([{ t: "Today's goal met", xp: d.xp, c: d.xp, src: "ring" }], { sub: goalSub(), kind: "goal" });
+    } else prizeCard([{ t: prizeName(d.src, d.res || {}), xp: d.xp, c: d.xp, src: d.src }]);
     if (d.src === "nuke" || d.src === "boss" || d.src === "top") HX.say(d.src === "nuke" ? "Ten thousand! Go spend it." : "Nice hit!", "do-hop");
     paintMeters();
   });
+
+  /* ---------- the reward card (Sam, 2026-11-18: "i want it to look much cooler and communicate that you just got xp and
+     crowns better"): what an answer's bonuses, a prize, today's goal, a finished mock or game and Timmy Time pay comes up
+     as a gold card over the bottom of the page, in place of the dark toast: what you did, then the XP and the crowns,
+     counting up from 0, with a burst of confetti; the stars and coins then fly to the rank in the bar. A tap closes it.
+     Rewards that arrive together (a game's +50, its first-game prize and a new best) make one card with their totals.
+     With reduced motion it only fades in and out. Its styles come with it (the dashboard shares hub.css, and is at its
+     size budget). ---------- */
+  var PRIZE_CSS =
+    ".hx-prizes{--hxp-y:46px;position:fixed;z-index:45;left:50%;bottom:24px;transform:translateX(-50%);display:grid;gap:10px;width:min(420px,calc(100% - 32px));pointer-events:none}" +
+    ".hx-prize{position:relative;pointer-events:auto;cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent}" +
+    ".hxp-card{position:relative;overflow:hidden;display:grid;grid-template-columns:58px minmax(0,1fr);column-gap:12px;align-items:center;padding:12px 14px 15px 12px;" +
+      "border-radius:18px;color:#3b2e3a;border:2px solid #3b2e3a;background:radial-gradient(130% 150% at 0% 0%,#fffbea 0%,#ffeeb3 46%,#ffd45e 100%);" +
+      "box-shadow:0 4px 0 #3b2e3a,0 16px 36px rgba(201,151,28,.4);animation:hxp-in 560ms cubic-bezier(.34,1.56,.64,1) both}" +
+    ".hxp-card::after{content:'';position:absolute;top:-30%;bottom:-30%;left:-45%;width:38%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.8),transparent);" +
+      "transform:skewX(-18deg);animation:hxp-shine 1000ms 300ms ease-out both;pointer-events:none}" +
+    ".hxp-badge{position:relative;width:58px;height:58px;display:grid;place-items:center;align-self:start}" +
+    ".hxp-rays{position:absolute;inset:-16px;border-radius:50%;background:repeating-conic-gradient(rgba(255,255,255,.95) 0 9deg,transparent 9deg 22.5deg);" +
+      "-webkit-mask:radial-gradient(circle,#000 28%,transparent 68%);mask:radial-gradient(circle,#000 28%,transparent 68%);animation:hxp-spin 10s linear infinite}" +
+    ".hxp-badge::before{content:'';position:absolute;inset:3px;border-radius:50%;border:2px solid #3b2e3a;background:radial-gradient(circle at 34% 28%,#fffdf2,#f7d774 55%,#d9a62c)}" +
+    ".hxp-badge svg{position:relative;width:38px;height:38px;animation:hxp-pop 640ms 120ms cubic-bezier(.34,1.8,.64,1) both}" +
+    ".hxp-head{min-width:0}" +
+    ".hxp-kick{display:block;font-size:11px;line-height:1.3;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#8a5d00}" +
+    ".hxp-title{display:block;font-size:17px;line-height:1.2;font-weight:900;overflow-wrap:anywhere}" +
+    ".hxp-sub{display:block;margin-top:1px;font-size:13px;line-height:1.3;font-weight:700;color:#5a4858}" +
+    ".hxp-loot{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}" +
+    ".hxp-pill{display:inline-flex;align-items:center;gap:5px;padding:2px 11px 2px 4px;border-radius:999px;background:#fff;border:2px solid #3b2e3a;box-shadow:0 2px 0 #3b2e3a;" +
+      "animation:hxp-pop 520ms 200ms cubic-bezier(.34,1.8,.64,1) both}" +
+    ".hxp-pill+.hxp-pill{animation-delay:360ms}" +
+    ".hxp-pill svg{width:26px;height:26px;flex:none}" +
+    ".hxp-pill b{font-size:19px;line-height:1.15;font-weight:900;font-variant-numeric:tabular-nums}" +
+    ".hxp-pill small{font-size:13px;font-weight:800}" +
+    ".hxp-pill.is-c b{color:#8a5d00}" +
+    ".hxp-timer{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(59,46,58,.3);transform-origin:left;animation:hxp-time var(--hxp-ms,4500ms) linear both}" +
+    ".hx-prize.out .hxp-card{animation:hxp-out 280ms ease-in both}.hx-prize.out .hxp-burst{display:none}" +
+    ".hxp-burst{position:absolute;left:36px;top:34px;width:0;height:0;z-index:1;pointer-events:none}" +
+    ".hxp-burst i{position:absolute;left:-4px;top:-6px;width:8px;height:12px;border-radius:2px;background:var(--c);opacity:0;animation:hxp-bit var(--t) var(--d) cubic-bezier(.2,.7,.4,1) both}" +
+    ".hxp-burst i.is-art{left:-9px;top:-9px;width:18px;height:18px;background:none}.hxp-burst i svg{display:block;width:100%;height:100%}" +
+    ".hxp-fly{position:fixed;z-index:60;left:0;top:0;width:24px;height:24px;pointer-events:none}.hxp-fly svg{display:block;width:100%;height:100%}" +
+    "html.shx[data-theme=dark] .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}" +
+    "@media (prefers-color-scheme:dark){html.shx:not([data-theme=light]) .hxp-card{box-shadow:0 4px 0 #120d12,0 0 0 1px rgba(242,193,78,.5),0 16px 44px rgba(242,193,78,.28)}}" +
+    "@keyframes hxp-in{0%{opacity:0;transform:translateY(var(--hxp-y)) scale(.86) rotate(-2deg)}100%{opacity:1;transform:none}}" +
+    "@keyframes hxp-out{to{opacity:0;transform:translateY(calc(var(--hxp-y) * .4)) scale(.95)}}" +
+    "@keyframes hxp-shine{to{left:130%}}" +
+    "@keyframes hxp-spin{to{transform:rotate(360deg)}}" +
+    "@keyframes hxp-pop{0%{opacity:0;transform:scale(.2)}100%{opacity:1;transform:none}}" +
+    "@keyframes hxp-time{from{transform:scaleX(1)}to{transform:scaleX(0)}}" +
+    "@keyframes hxp-bit{0%{opacity:1;transform:translate(0,0) rotate(0) scale(.4)}35%{opacity:1;transform:translate(var(--x),var(--up)) rotate(calc(var(--r)*.4)) scale(1)}" +
+      "100%{opacity:0;transform:translate(calc(var(--x)*1.25),calc(var(--up) + var(--fall))) rotate(var(--r)) scale(.85)}}" +
+        "@media (prefers-reduced-motion:reduce){.hx-prize *,.hx-prize *::after{animation:none!important}}" +
+    ".hx-prize.is-calm .hxp-card{animation:hxp-fade 240ms ease-out both}.hx-prize.is-calm .hxp-card *,.hx-prize.is-calm .hxp-card::after{animation:none}" +
+    ".hx-prize.is-calm.out .hxp-card{animation:hxp-fadeout 240ms ease-in both}" +
+    "@keyframes hxp-fade{from{opacity:0}to{opacity:1}}@keyframes hxp-fadeout{to{opacity:0}}" +
+    "@media (max-width:640px){.hx-prizes{--hxp-y:-46px;bottom:auto;top:calc(env(safe-area-inset-top,0px) + var(--boss-h,0px) + 10px);width:calc(100% - 24px)}" +
+      ".hxp-card{grid-template-columns:48px minmax(0,1fr);column-gap:10px;padding:10px 12px 13px 10px}.hxp-badge{width:48px;height:48px}.hxp-badge svg{width:32px;height:32px}" +
+      ".hxp-title{font-size:16px}.hxp-pill{padding-right:9px}.hxp-pill svg{width:22px;height:22px}.hxp-pill b{font-size:17px}.hxp-pill small{font-size:12px}.hxp-burst{left:30px;top:30px}}";
+  function prizeStyles(){
+    if (document.getElementById("hxPrizeCss")) return;
+    var s = document.createElement("style"); s.id = "hxPrizeCss"; s.textContent = PRIZE_CSS; document.head.appendChild(s);
+  }
+  /* still: reduced motion, Answer animations off or Focus mode (hub.js sets hx-still) */
+  function calmNow(){ return reduced || document.documentElement.classList.contains("hx-still"); }
+  function starSvg(){ return artSvg(A.xp || "", "0 0 24 24", "", ""); }
+  function coinSvg(){ return HX.shopCoin ? HX.shopCoin(26) : starSvg(); }
+  /* what fills the badge: a streak's flame, else the coin (it paid crowns) or the star */
+  function badgeArt(kind, c){
+    if (kind === "streak") return flame(Math.max(3, streakDays()), "");
+    return c > 0 ? coinSvg() : starSvg();
+  }
+  var prizeBatch = null, ringShown = 0, goalWait = 0;
+  /* the card takes a list of what was won ([{ t, xp, c, src, sub }]) and draws it after a moment, so rewards that come
+     from the same reply share one card */
+  function prizeCard(lines, opts){
+    opts = opts || {};
+    if (!prizeBatch) { prizeBatch = { lines: [], opts: opts }; setTimeout(function(){ var b = prizeBatch; prizeBatch = null; whenFree(function(){ drawPrize(b.lines, b.opts); }); }, 260); }
+    else if (opts.sub || opts.kind) prizeBatch.opts = opts;
+    Array.prototype.push.apply(prizeBatch.lines, lines);
+  }
+  /* a card waits while a mock exam is being taken (its Submit button is up), as the rank-up and trophy cards do */
+  function whenFree(run, tries){
+    if (document.querySelector(".mock-bar [data-submit]") && (tries | 0) < 900) { setTimeout(function(){ whenFree(run, (tries | 0) + 1); }, 2000); return; }
+    run();
+  }
+  function drawPrize(lines, opts){
+    var toasts = $("#hxToast"); if (!lines.length || !toasts) return;
+    prizeStyles();
+    /* its own place, beside the toasts in the shell: over the bottom of the page on a laptop, dropping in at the top on a
+       phone (the tab bar, Timmy and the report button are at the bottom there) */
+    var host = $(".hx-prizes");
+    if (!host) { host = h('<div class="hx-prizes"></div>'); toasts.parentNode.insertBefore(host, toasts.nextSibling); }
+    var xp = 0, c = 0, calm = calmNow();
+    lines.forEach(function(l){ xp += l.xp | 0; c += l.c | 0; });
+    var first = lines[0], kind = opts.kind || first.src || "", title = first.t + (/[.!?]$/.test(first.t) ? "" : "!");
+    var sub = opts.sub || first.sub || lines.slice(1).map(function(l){ return l.t; }).join(" · ");
+    var big = xp >= 1000 || kind === "medal" || kind === "nuke" || kind === "alltime", ms = big ? 6500 : 4800;
+    var said = lines.map(function(l){ return l.t + (l.xp ? ": +" + fmt(l.xp) + " XP" + (l.c ? " and " + fmt(l.c) + " Shiny Gold Crowns" : "") : "") + (l.sub ? ". " + l.sub : ""); }).join(". ") + (opts.sub ? ". " + opts.sub : "") + ".";
+    var bits = "";
+    if (!calm) {
+      var COLORS = ["#F2C94C", "#FF8FA3", "#7FD8A8", "#8FA6EC", "#C3A9F0", "#F7A83C"], N = big ? 26 : 16;
+      for (var i = 0; i < N; i++) {
+        var ang = (-90 + (Math.random() * 150 - 75)) * Math.PI / 180, dist = 70 + Math.random() * (big ? 170 : 110), art = i % 5 === 0 ? coinSvg() : i % 5 === 1 ? starSvg() : "";
+        bits += '<i class="' + (art ? "is-art" : "") + '" style="--x:' + Math.round(Math.cos(ang) * dist * 1.3) + "px;--up:" + Math.round(Math.sin(ang) * dist) + "px;--fall:" +
+          Math.round(120 + Math.random() * 160) + "px;--r:" + Math.round(Math.random() * 720 - 360) + "deg;--d:" + Math.round(120 + Math.random() * 260) + "ms;--t:" +
+          Math.round(1100 + Math.random() * 700) + "ms;--c:" + COLORS[i % COLORS.length] + '">' + art + "</i>";
+      }
+    }
+    var pill = function(cls, art, n, unit){ return '<span class="hxp-pill ' + cls + '">' + art + '<b data-to="' + n + '">+' + fmt(n) + "</b><small>" + unit + "</small></span>"; };
+    var el = h('<div class="hx-prize' + (calm ? " is-calm" : "") + (big ? " is-big" : "") + '" role="status" data-kind="' + esc(kind) + '" style="--hxp-ms:' + ms + 'ms"><span class="sr">' + esc(said) + "</span>" +
+      '<div class="hxp-card" aria-hidden="true"><span class="hxp-badge"><span class="hxp-rays"></span>' + badgeArt(kind, c) + "</span>" +
+        '<span class="hxp-head"><span class="hxp-kick">' + (xp || c ? "You earned" : "Nice work") + '</span><b class="hxp-title">' + esc(title) + "</b>" + (sub ? '<span class="hxp-sub">' + esc(sub) + "</span>" : "") +
+          (xp || c ? '<span class="hxp-loot">' + (xp ? pill("is-xp", starSvg(), xp, "XP") : "") + (c ? pill("is-c", coinSvg(), c, c === 1 ? "crown" : "crowns") : "") + "</span>" : "") + "</span>" +
+        '<i class="hxp-timer"></i></div>' + (bits ? '<span class="hxp-burst" aria-hidden="true">' + bits + "</span>" : "") + "</div>");
+    /* at most two cards at a time: an older one makes room */
+    var cards = $$(".hx-prize:not(.out)", host); if (cards.length >= 2) shut(cards[0], true);
+    host.appendChild(el);
+    var done = false;
+    function shut(node, quick){
+      if (node.classList.contains("out")) return;
+      node.classList.add("out");
+      if (node === el) { done = true; if (!quick) fly(el); }
+      setTimeout(function(){ node.remove(); }, 300);
+    }
+    el.addEventListener("click", function(){ shut(el); });
+    /* the numbers count up from 0, the crowns a beat after the XP */
+    if (!calm) $$(".hxp-pill b", el).forEach(function(b, k){
+      var to = +b.getAttribute("data-to") || 0, t0 = null, wait = 260 + k * 160, dur = Math.min(1100, 500 + to / 4);
+      b.textContent = "+0";
+      (function step(ts){
+        if (!b.isConnected) return;
+        if (ts !== undefined) { if (t0 === null) t0 = ts; var x = Math.min(1, Math.max(0, (ts - t0 - wait) / dur)), e = 1 - Math.pow(1 - x, 3); b.textContent = "+" + fmt(Math.round(to * e)); if (x >= 1) return; }
+        requestAnimationFrame(step);
+      })();
+    });
+    setTimeout(function(){ if (!done) shut(el); }, ms);
+  }
+  /* the stars and coins fly from the card's pills to the rank in the bar, which bumps when they land */
+  function fly(el){
+    var tgt = [$("#hxRank"), $("#hxXp")].filter(visible)[0], pills = $$(".hxp-pill svg", el);
+    if (!tgt || !pills.length || calmNow() || !document.body.animate) return;
+    var tr = tgt.getBoundingClientRect(), land = 0;
+    for (var i = 0; i < 6; i++) (function(i){
+      var src = pills[i % pills.length], sr = src.getBoundingClientRect();
+      if (!sr.width) return;
+      var f = h('<span class="hxp-fly" aria-hidden="true">' + src.outerHTML + "</span>");
+      document.body.appendChild(f);
+      var x0 = sr.left, y0 = sr.top, dx = tr.left + tr.width / 2 - 12 - x0, dy = tr.top + tr.height / 2 - 12 - y0,
+        mx = dx * .3 + (Math.random() * 120 - 60), my = Math.min(0, dy) * .4 - 40 - Math.random() * 60, dur = 700 + i * 40, delay = i * 55;
+      land = Math.max(land, dur + delay);
+      f.animate([{ transform: "translate(" + x0 + "px," + y0 + "px) scale(.7)", opacity: 0 },
+        { transform: "translate(" + (x0 + mx) + "px," + (y0 + my) + "px) scale(1.15) rotate(" + (i % 2 ? 160 : -160) + "deg)", opacity: 1, offset: .45 },
+        { transform: "translate(" + (x0 + dx) + "px," + (y0 + dy) + "px) scale(.35) rotate(" + (i % 2 ? 340 : -340) + "deg)", opacity: .9 }],
+        { duration: dur, delay: delay, easing: "cubic-bezier(.45,0,.6,1)", fill: "both" }).onfinish = function(){ f.remove(); };
+    })(i);
+    setTimeout(function(){ tgt.classList.remove("bump"); void tgt.offsetWidth; tgt.classList.add("bump"); }, Math.min(land, 900));
+  }
+  /* today's goal, as the goal card says it: "20 questions · 8 days in a row" */
+  function goalSub(){ var n = streakDays(), what = todayRec().k ? " questions and flashcards" : " questions"; return goal() + what + (n > 1 ? " · " + pl(n, "day") + " in a row" : ""); }
+  /* is the daily ring's prize on its way (the game layer is there and it hasn't paid today)? */
+  function ringDue(){ var G = window.shGame; return v2() && !!(G && G.claim) && ls("sh_ring_" + HX.HUB) !== day(0); }
   /* the daily ring (your goal of 10 to 50 a day, Settings): filled, the server pays 5 XP and crowns a question of it, once
      per hub a day, after checking the day's answers there. Asked after an answer's reply, so that answer is counted. */
   var ringAsked = "";
@@ -205,9 +387,14 @@
   /* the crowns after a reply (sh:crowns from widget/v3.js): the shop's wallet takes them (widget/hub-timmy.js), and a gain
      pops up a coin by the rank pill, so they're seen going up while you answer */
   document.addEventListener("sh:crowns", function(e){
-    var d = e.detail || {}, was = HX.wallet ? HX.wallet() : null, before = was ? was.balance : d.was;
+    /* the balance before: the shop's wallet, or (no shop: its bootstrap timed out) the last reply's, which v3.js sends */
+    var d = e.detail || {}, was = HX.hasShop && HX.hasShop() && HX.wallet ? HX.wallet() : null, before = was ? was.balance : d.was;
     if (HX.setWallet) HX.setWallet(d.balance);
-    if (typeof before === "number" && d.balance > before) crownPop(d.balance - before);
+    if (typeof before === "number" && d.balance > before) {
+      crownPop(d.balance - before);
+      /* the crowns earned today on this page, for the Today card's crowns tile */
+      var t = todayRec(); t.c = (t.c || 0) + (d.balance - before); saveState();
+    }
     paintMeters();
   });
   function crownPop(n){
@@ -232,7 +419,9 @@
     /* the game's name as this page's lobby shows it (SH_HUB.arcade.games), not the live hub's skin ("THE YELLOW BODY") */
     var mine = run ? (((HX.C || {}).arcade || {}).games || []).filter(function(g){ return g.id === run.game; })[0] : null;
     todayRec().xp += r.xp; RANK.local += r.xp; saveState();
-    toast((run ? (mine && mine.name) || run.name || "Arcade game" : "Mock exam") + " finished: +" + r.xp + " XP."); paintMeters();
+    /* study XP: 5 crowns for every 10 before a boost (the reply says the multiplier) */
+    prizeCard([{ t: (run ? (mine && mine.name) || run.name || "Arcade game" : "Mock exam") + " finished", xp: r.xp, c: studyCrowns(r.xp, r.mult), src: run ? "arcade" : "mock" }]);
+    paintMeters();
   });
   /* Timmy Time (widget/podcast.js): what a minute heard paid (10, or nothing: heard before, too soon, a boost doubles it)
      and the +100 for finishing the episode, as the server counted them. The pill takes them at once; finishing is said. */
@@ -241,7 +430,7 @@
     var G = window.shGame; if (G && G.setCrowns) G.setCrowns(r.crowns);
     var x = (r.xp | 0) + (r.done | 0); if (!(x > 0)) return;
     todayRec().xp += x; RANK.local += x; saveState();
-    if (r.done > 0) toast(G && G.prizeText ? G.prizeText("pod-done", r.done) : "Timmy Time finished: +" + r.done + " XP.");
+    if (r.done > 0) prizeCard([{ t: prizeName("pod-done", {}), xp: r.done, c: r.done, src: "pod-done" }]);
     paintMeters();
   });
 
@@ -341,10 +530,14 @@
     setTimeout(function(){
       paintMeters();
       if (rec.met) {
-        var n = streakDays(), what = todayRec().k ? "" : " questions";
+        var what = todayRec().k ? "" : " questions";
         $$("[data-streakm] .flame").forEach(function(f){ f.classList.add("grow-in"); });
         HX.say("Goal met! " + goal() + (what || " today") + (what ? " today." : "."), "do-hop");
-        toast("Today's goal is met: " + goal() + (what || " questions and flashcards") + "." + (n > 1 ? " Your streak is " + pl(n, "day") + "." : ""));
+        /* the reward card: when the daily ring's prize is on its way, it waits for it (up to 5 seconds) so the card says
+           what the goal paid; a card the ring already brought isn't drawn twice */
+        var plain = function(){ goalWait = 0; if (Date.now() - ringShown > 8000) prizeCard([{ t: "Today's goal met", xp: 0, c: 0, src: "goal" }], { sub: goalSub(), kind: "goal" }); };
+        if (ringDue()) { if (goalWait) clearTimeout(goalWait); goalWait = setTimeout(plain, 5000); }
+        else plain();
       }
     }, reduced ? 0 : 650);
   }
@@ -401,8 +594,10 @@
         '<li class="ts-xp">' + artSvg(A.xp, "0 0 24 24", "ts-art", "") + '<span><b class="num">+' + fmt(t.xp) + "</b><small>XP today</small></span></li>" +
         '<li class="ts-right">' + icon("check", 26) + '<span><b class="num">' + fmt(t.r || 0) + " of " + fmt(t.n) + "</b><small>Right today</small></span></li>" +
         (t.k ? '<li class="ts-cards">' + icon("cards", 26) + '<span><b class="num">' + fmt(t.k) + "</b><small>" + (t.k === 1 ? "Flashcard" : "Flashcards") + " today</small></span></li>" : "") +
-        /* the Shiny Gold Crowns you have (Sam, 2026-11-17), from the page's bootstrap and the shop's replies: a tap opens the shop */
-        (w ? '<li class="ts-crowns"><a href="#more/shop" title="' + fmt(w.earned || w.balance) + ' Shiny Gold Crowns earned in all">' + HX.shopCoin(30) + '<span><b class="num">' + fmt(w.balance) + "</b><small>" + (w.balance === 1 ? "Gold crown" : "Gold crowns") + '<span class="sr"> to spend in Timmy’s shop</span></small></span></a></li>' : "") +
+        /* the Shiny Gold Crowns you have (Sam, 2026-11-17), from the page's bootstrap, the shop's replies and every paying
+           reply (migration_v68), and what this page saw you earn today: a tap opens the shop */
+        (w ? '<li class="ts-crowns"><a href="#more/shop"' + (w.earned ? ' title="' + fmt(w.earned) + ' Shiny Gold Crowns earned in all"' : "") + ">" + HX.shopCoin(30) + '<span><b class="num">' + fmt(w.balance) + "</b><small>" + (w.balance === 1 ? "Gold crown" : "Gold crowns") + '<span class="sr"> to spend in Timmy’s shop</span></small>' +
+          (t.c > 0 ? '<small class="ts-plus">+' + fmt(t.c) + " today</small>" : "") + "</span></a></li>" : "") +
       "</ul>" +
       (hp !== null ? '<p class="today-pet">' + icon("tooth", 18) + "<span>Timmy has <b class=\"num\">" + hp + " HP</b></span></p>" : "") + "</div>";
   }
