@@ -1117,10 +1117,11 @@
     renderNameBadge(); syncNameInputs();
     try { document.dispatchEvent(new CustomEvent("sh:name", { detail: { name: "" } })); } catch (e) {}
   }
-  var nameDlg = null;
+  var nameDlg = null, nameBack = null;
   function closeNameEditor(){ if (nameDlg) { nameDlg.remove(); nameDlg = null; } }
   function openNameEditor(){
     closeNameEditor();
+    nameBack = document.activeElement;
     var custom = currentName();
     nameDlg = document.createElement("div");
     nameDlg.className = "sh-name-dlg";
@@ -1133,6 +1134,7 @@
       '<button type="submit">Save</button></form>' +
       '<div class="sh-name-msg" aria-live="polite"></div>' +
       (custom ? '<button class="sh-name-reset" type="button">Go back to a random name</button>' : '<div class="sh-name-hint">Up to 24 characters. You can change it any time.</div>') +
+      '<div class="sh-name-link">Using the hubs on another device too? <button type="button" class="sh-name-linkbtn" data-sh-link="name">Link my devices</button></div>' +
       '</div>';
     document.body.appendChild(nameDlg);
     var input = nameDlg.querySelector("input"), msg = nameDlg.querySelector(".sh-name-msg");
@@ -1153,6 +1155,20 @@
   }
   window.shEditName = openNameEditor;
   window.shNameNow = function(){ return currentName() || resolvedAnonName || ""; };
+  /* Link my devices (widget/linkask.js, loaded below), beside every place a name is changed (Sam, 2026-11-18: "link my
+     device is nowhere to be found"): any [data-sh-link="<where>"] button opens it. From the name window, that closes
+     first and focus goes back to what opened it. */
+  document.addEventListener("click", function(e){
+    var b = e.target && e.target.closest && e.target.closest("[data-sh-link]"); if (!b) return;
+    var from = b.getAttribute("data-sh-link") || "", back = b;
+    if (nameDlg && nameDlg.contains(b)) { back = (nameBack && nameBack.isConnected) ? nameBack : nameBadge; closeNameEditor(); }
+    var t0 = Date.now();
+    (function go(){
+      if (window.shLinkAsk && window.shLinkAsk.link) { window.shLinkAsk.link({ back: back, from: from }); return; }
+      if (Date.now() - t0 > 8000) { showStreakToast("Couldn’t open Link my devices. Are you online?"); return; }
+      setTimeout(go, 200);
+    })();
+  });
   renderNameBadge();
   nameBadge.addEventListener("click", openNameEditor);
 
@@ -2269,7 +2285,8 @@
     '<div id="shstat-panel"><button class="shstat-close" type="button" aria-label="Close">&times;</button>' +
     '<div class="shstat-sec"><h5>Your stats (this device)</h5><div id="shstat-mine"><div class="shstat-empty">Loading…</div></div>' +
     '<div class="shstat-name-row"><input type="text" id="shstat-name-input" maxlength="24" placeholder="Leaderboard name (optional)"><button id="shstat-name-save" type="button">Save</button></div>' +
-    '<div class="shstat-namemsg" id="shstat-name-msg"></div></div>' +
+    '<div class="shstat-namemsg" id="shstat-name-msg"></div>' +
+    '<button type="button" class="sh-name-linkbtn shstat-linkbtn" data-sh-link="stats">Link my devices</button></div>' +
     '<div class="shstat-sec"><h5>Toughest questions (class-wide)</h5><div id="shstat-tough"><div class="shstat-empty">Loading…</div></div></div>' +
     '<div class="shstat-sec"><h5>Most opened</h5><div id="shstat-modes"><div class="shstat-empty">Loading…</div></div></div>' +
     '<div class="shstat-sec"><h5>Busiest times</h5><div id="shstat-hist-wrap"><div class="shstat-empty">Loading…</div></div></div>' +
@@ -2278,7 +2295,8 @@
     '<h5>Settings</h5>' +
     '<div class="shset-row"><label>Screen name</label>' +
     '<div class="shstat-name-row"><input type="text" id="shset-name-input" maxlength="24" placeholder="What should we call you?"><button id="shset-name-save" type="button">Save</button></div>' +
-    '<div class="shstat-namemsg" id="shset-name-msg"></div></div>' +
+    '<div class="shstat-namemsg" id="shset-name-msg"></div>' +
+    '<button type="button" class="sh-name-linkbtn shstat-linkbtn" data-sh-link="settings">Link my devices</button></div>' +
     '<div class="shset-row"><label>Reading font</label>' +
     '<div class="shset-seg" data-pref="font">' +
     '<button type="button" data-val="default">Default</button>' +

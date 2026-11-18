@@ -27,7 +27,7 @@ for (const w of ['widget/v3.js', 'widget/archive.js', 'widget/eggs.js', 'widget/
   /* Timmy's place: the renderer, its kit and one file per set (all on first use) */
   /* the bundles the dashboard and the engine's hubs load, and the slim database client inside one (tools/bundle/build.mjs) */
   'widget/hub.bundle.js', 'widget/dash.bundle.js', 'widget/rest.bundle.js', 'widget/hub-rest.bundle.js', 'widget/vendor/supabase-lite-2.117.2.js',
-  'widget/place.js', 'widget/shop.js', 'widget/bowling.js', 'widget/hub-art/place.js', 'widget/hub-art/bowling.js', ...(fs.existsSync(path.join(root, 'widget/hub-art/place')) ? fs.readdirSync(path.join(root, 'widget/hub-art/place')).filter(f => /\.js$/.test(f)).sort().map(f => 'widget/hub-art/place/' + f) : [])].filter(w => fs.existsSync(path.join(root, w)))) check(path.join(root, w), w);
+  'widget/place.js', 'widget/shop.js', 'widget/bowling.js', 'widget/hub-art/place.js', 'widget/hub-art/bowling.js', ...(fs.existsSync(path.join(root, 'widget/hub-art/place')) ? fs.readdirSync(path.join(root, 'widget/hub-art/place')).filter(f => /\.js$/.test(f)).sort().map(f => 'widget/hub-art/place/' + f) : []), ...(fs.existsSync(path.join(root, 'widget/hub-art/outfits')) ? fs.readdirSync(path.join(root, 'widget/hub-art/outfits')).filter(f => /\.js$/.test(f)).sort().map(f => 'widget/hub-art/outfits/' + f) : [])].filter(w => fs.existsSync(path.join(root, w)))) check(path.join(root, w), w);
 /* the service worker: it parses, every file its PRECACHE names exists, and every live hub on the engine is in it */
 check(path.join(root, 'sw.js'), 'sw.js');
 try {

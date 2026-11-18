@@ -1,6 +1,6 @@
 {
  "about": "Known accessibility issues per screen, so tools/release/a11y.js can fail only on new ones. Lower these numbers; never raise them to make a check pass (fix the page instead), except for a deliberate change Sam approved.",
- "updated": "2026-11-13",
+ "updated": "2026-11-18",
  "pages": {
   "about": {
    "axe": {
@@ -68,7 +68,7 @@
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam2 · home": {
+  "heme-endo-exam3 · home": {
    "axe": {},
    "focus": {
     "invisible": 0,
@@ -78,22 +78,37 @@
    },
    "motion": 0
   },
-  "heme-endo-exam2 · compendium": {
+  "heme-endo-exam3 · notes": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam2 · review": {
+  "heme-endo-exam3 · questions": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam2 · arcade": {
+  "heme-endo-exam3 · more": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "occlusion · home": {
+  "heme-endo-exam3 · place": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "heme-endo-exam3 · place, full view": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "heme-endo-exam3 · place, customize": {
+   "axe": {},
+   "focus": null,
+   "motion": 0
+  },
+  "heme-endo-exam3 · shop": {
    "axe": {},
    "focus": {
     "invisible": 0,
@@ -103,37 +118,17 @@
    },
    "motion": 0
   },
-  "occlusion · notes": {
+  "heme-endo-exam3 · shop, an item's sheet": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "occlusion · questions": {
+  "heme-endo-exam3 · bowling clip": {
    "axe": {},
    "focus": null,
    "motion": 0
   },
-  "occlusion · more": {
-   "axe": {},
-   "focus": null,
-   "motion": 0
-  },
-  "occlusion · place": {
-   "axe": {},
-   "focus": null,
-   "motion": 0
-  },
-  "occlusion · place, full view": {
-   "axe": {},
-   "focus": null,
-   "motion": 0
-  },
-  "occlusion · place, customize": {
-   "axe": {},
-   "focus": null,
-   "motion": 0
-  },
-  "occlusion · shop": {
+  "heme-endo-exam3 · trophy case": {
    "axe": {},
    "focus": {
     "invisible": 0,
@@ -143,27 +138,7 @@
    },
    "motion": 0
   },
-  "occlusion · shop, an item's sheet": {
-   "axe": {},
-   "focus": null,
-   "motion": 0
-  },
-  "occlusion · bowling clip": {
-   "axe": {},
-   "focus": null,
-   "motion": 0
-  },
-  "occlusion · trophy case": {
-   "axe": {},
-   "focus": {
-    "invisible": 0,
-    "stuck": 0,
-    "where": [],
-    "why": []
-   },
-   "motion": 0
-  },
-  "occlusion · trophy card": {
+  "heme-endo-exam3 · trophy card": {
    "axe": {},
    "focus": null,
    "motion": 0
@@ -198,12 +173,7 @@
    "focus": null,
    "motion": 0
   },
-  "heme-endo-exam2 (dark)": {
-   "axe": {},
-   "focus": null,
-   "motion": 0
-  },
-  "occlusion (dark)": {
+  "heme-endo-exam3 (dark)": {
    "axe": {},
    "focus": null,
    "motion": 0
@@ -218,7 +188,7 @@
    "focus": null,
    "motion": 0
   },
-  "occlusion · shop (dark)": {
+  "heme-endo-exam3 · shop (dark)": {
    "axe": {},
    "focus": null,
    "motion": 0

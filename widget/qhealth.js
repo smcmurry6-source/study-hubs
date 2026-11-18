@@ -159,7 +159,7 @@
     if (gone && s.rec) finish(card);
   }
   /* A/B: the version on screen, from a card of a question that comes in versions (data-wording: 0 = A, the original;
-     1 = B; widget/hub.js worded()). The fingerprint stays the original's, so both are one question (migration_v65) */
+     1 = B; widget/hub.js worded()). The fingerprint stays the original's, so both are one question (migration_v66) */
   function ab(rec, card){
     var w = card && card.getAttribute("data-wording");
     if (w != null && /^\d$/.test(w)) rec.w = +w;

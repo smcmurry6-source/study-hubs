@@ -1415,7 +1415,7 @@ background: #fff; color: var(--hub); font-size: var(--fs-meta); font-weight: var
 .dx-you { container: dxyou / inline-size; grid-column: span 5; display: flex; flex-direction: column; gap: 14px; }
 .dx-class { grid-column: span 7; display: grid; gap: 12px; align-content: start; }
 .dx-youhead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
-.dx-name { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: var(--fs-body); }
+.dx-name { display: flex; flex-wrap: wrap; align-items: center; gap: 0 4px; min-width: 0; font-size: var(--fs-body); }
 .dx-name b { overflow-wrap: anywhere; }
 .dx .dx-rename { min-height: 32px; color: var(--muted); }
 .dx-rankcard { --ar-bg: #2a2233; --ar-row: #372c44; --ar-soft: #cfc3d6; --ar-gold: #ffe08a; position: relative; overflow: hidden; display: grid;

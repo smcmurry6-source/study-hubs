@@ -21,7 +21,7 @@ jobs:
   # A few seconds: can the smoke test keep an earlier green result? (pull requests only)
   scope:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
       reuse: ${{ steps.reuse.outputs.reuse }}
@@ -44,7 +44,7 @@ jobs:
         run: node tools/ci/reuse.js check.yml smoke
 
   fast:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -102,7 +102,7 @@ jobs:
     # runs on main too, where there is no scope job (it's skipped)
     if: ${{ !cancelled() && needs.scope.outputs.reuse != 'yes' }}
     name: smoke (${{ matrix.part }})
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
       fail-fast: false
@@ -120,7 +120,7 @@ jobs:
         # couldn't resolve azure.archive.ubuntu.com, and every package that failed was an optional font), install the
         # browser alone: the runner image already has the libraries Chromium needs.
         run: |
-          npm i --no-save playwright@1.56.1
+          npm i --no-save playwright@1.63.0
           npx playwright install --with-deps chromium || {
             echo "::warning::Ubuntu's package mirror was unreachable: Chromium installed without its system packages (the runner image has the ones it needs)"
             npx playwright install chromium
@@ -139,7 +139,7 @@ jobs:
   check:
     needs: [scope, fast, smoke]
     if: ${{ !cancelled() }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
       - name: Every part passed?

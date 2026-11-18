@@ -266,7 +266,9 @@
       ta.disabled = !online || SOC.busy;
       el.querySelector(".sh-pod-post").disabled = !online || SOC.busy;
       el.querySelector(".sh-pod-as").innerHTML = !online ? "Comments need a connection." :
-        name ? "Posting as <b>" + esc(name) + "</b>" + (window.shEditName ? ' · <button type="button" class="sh-pod-cact" data-pod="rename">change</button>' : "") : "";
+        name ? "Posting as <b>" + esc(name) + "</b>" + (window.shEditName ? ' · <button type="button" class="sh-pod-cact" data-pod="rename">change</button>' +
+          /* Link my devices beside the name, as everywhere a name is changed (widget/v3.js opens widget/linkask.js's card) */
+          ' · <button type="button" class="sh-pod-cact" data-sh-link="podcast">link a device</button>' : "") : "";
       var left = MAX_LEN - SOC.draft.length;
       el.querySelector(".sh-pod-left").textContent = SOC.draft.length ? String(left) : "";
       var note = el.querySelector(".sh-pod-formnote"); note.textContent = SOC.note; note.hidden = !SOC.note;

@@ -632,13 +632,20 @@ try {
   // the catalog is exactly tools/figures/site/sets.mjs (an ES module, and this file is CommonJS: read it in a child process)
   const setsUrl = require('url').pathToFileURL(path.join(ROOT, 'tools/figures/site/sets.mjs')).href;
   const SETS = JSON.parse(execFileSync(process.execPath, ['--input-type=module', '-e',
-    `import { SEASONS, RANKS, allSetItems } from ${JSON.stringify(setsUrl)}; process.stdout.write(JSON.stringify({ seasons: SEASONS.map(s => s.k), gifts: SEASONS.filter(s => s.gift).map(s => s.k), ranks: RANKS.map(r => r.gtier), items: allSetItems() }));`], { encoding: 'utf8' }));
+    `import { SEASONS, RANKS, COLLECTIONS, COSTUMES, allSetItems, allCollectionItems } from ${JSON.stringify(setsUrl)}; process.stdout.write(JSON.stringify({ seasons: SEASONS.map(s => s.k), gifts: SEASONS.filter(s => s.gift).map(s => s.k), ranks: RANKS.map(r => r.gtier), items: allSetItems(), colls: COLLECTIONS.map(c => c.k), coll: allCollectionItems(), costumes: COSTUMES.map(c => ({ id: c[0], name: c[1], rarity: c[2], price: c[3] })) }));`], { encoding: 'utf8' }));
   const byId = a => Object.fromEntries(a.map(r => [r.id, JSON.stringify(r)]));
   const wantSets = byId(SETS.items.map(i => ({ id: i.id, name: i.n, kind: i.kind, rarity: i.rarity, price: i.price, season: i.season || null, gift: !!i.gift, rank_tier: i.rank == null ? null : i.rank })));
   const gotSets = byId(rows(`select id, name, kind, rarity, price, season, gift, rank_tier from shop_items where season is not null or gift or rank_tier is not null`));
   const setDiff = [...new Set([...Object.keys(wantSets), ...Object.keys(gotSets)])].filter(id => wantSets[id] !== gotSets[id]).sort();
   ok(setDiff.length === 0 && SETS.items.length === 124, `the catalog's seasonal and rank rows are exactly allSetItems() of tools/figures/site/sets.mjs (${SETS.items.length} items; ${setDiff.length} differ${setDiff.length ? ': ' + setDiff.slice(0, 5).map(id => `${id} ${gotSets[id] || 'missing'} vs ${wantSets[id] || 'not in sets.mjs'}`).join('; ') : ''})`);
-  eq(num(`select count(*) from shop_items where id <> 'lab-goggles'`), 57 + SETS.items.length, 'the catalog has 181 rows: 57 everyday ones (the rotation, the always-shelf, the rare costumes), 112 seasonal and 12 rank');
+  // the year-round collections (migration_v65; Sam, 2026-11-18: "Go crazy"): exactly allCollectionItems(), every one in
+  // the everyday rotation (season null, rotates), none a gift or a rank piece; and the ten rare costumes, as COSTUMES says
+  const wantColl = byId(SETS.coll.map(i => ({ id: i.id, name: i.n, kind: i.kind, rarity: i.rarity, price: i.price, season: null, gift: false, rank_tier: null, rotates: true, shelf: false })));
+  const gotColl = byId(rows(`select id, name, kind, rarity, price, season, gift, rank_tier, rotates, shelf from shop_items where id in (${SETS.coll.map(i => "'" + i.id + "'").join(', ')})`));
+  const collDiff = Object.keys(wantColl).filter(id => wantColl[id] !== gotColl[id]).sort();
+  ok(collDiff.length === 0 && SETS.coll.length === 48 && SETS.colls.length === 6, `the catalog's collection rows are exactly allCollectionItems() of sets.mjs, all in the rotation (${SETS.coll.length} items in ${SETS.colls.length} collections; ${collDiff.length} differ${collDiff.length ? ': ' + collDiff.slice(0, 5).map(id => `${id} ${gotColl[id] || 'missing'} vs ${wantColl[id]}`).join('; ') : ''})`);
+  eq(rows(`select id, name, rarity, price from shop_items where kind = 'costume' order by id`), SETS.costumes.slice().sort((a, b) => a.id < b.id ? -1 : 1), 'the catalog\'s rare costumes are exactly COSTUMES of sets.mjs (ten, with their names, rarities and prices)');
+  eq(num(`select count(*) from shop_items where id <> 'lab-goggles'`), 68 + SETS.coll.length + SETS.items.length, 'the catalog has 240 rows: 68 everyday ones (the rotation, the always-shelf, the ten rare costumes), 48 in the six collections, 112 seasonal and 12 rank');
   const perSeason = rows(`select season, count(*)::int as n, count(*) filter (where kind = 'home' and rarity = 'legendary')::int as h, count(*) filter (where kind = 'scene' and rarity = 'legendary')::int as s,
       string_agg(rarity, ',' order by price) filter (where kind = 'outfit') as o, string_agg(rarity, ',' order by price) filter (where kind = 'yard') as y, bool_or(rotates or shelf) as r, bool_and(gift) as g
     from shop_items where season is not null group by 1 order by 1`);
@@ -663,7 +670,7 @@ try {
   // the rare costumes: each catalog row of kind costume is a kit outfit marked as a costume, with its three lines, and
   // the kit marks no other outfit as one
   const costumeRows = rows(`select id, rarity, price from shop_items where kind = 'costume' order by id`), kitOutfit = Object.fromEntries(KIT.OUTFITS.filter(o => o.id).map(o => [o.id, o]));
-  eq(costumeRows.map(r => r.id), ['astronaut', 'captain-enamel', 'chef', 'detective', 'pirate'], 'the catalog has the five rare costumes');
+  eq(costumeRows.map(r => r.id), SETS.costumes.map(c => c.id).sort(), 'the catalog has the ten rare costumes');
   eq(costumeRows.filter(r => { const o = kitOutfit[r.id]; return !(o && o.costume && Array.isArray(o.say) && o.say.length === 3 && o.say.every(t => t && typeof t === 'string')); }).map(r => r.id), [], 'every rare costume is drawn, marked as a costume, and has its three lines');
   eq(KIT.OUTFITS.filter(o => o.costume).map(o => o.id).sort(), costumeRows.map(r => r.id), 'the kit marks only the catalog\'s costumes as costumes');
   // what the kit says an outfit or costume costs is what the catalog charges (the ten of the shop's art session)
@@ -874,8 +881,8 @@ try {
   const bst = rows(`select ends_at - starts_at as len from xp_boosts where visitor_id = 'xp-PV' and src = 'shop'`);
   ok(bst.length === 1 && /02:00:00/.test(JSON.stringify(bst[0].len)), `two one-hour boosts make one boost of two hours (${JSON.stringify(bst)})`);
 
-  // the rare costume of the day: widget/hub-timmy.js and widget/dash.js pick it the same way, only the catalog's five
-  // costumes, never on a holiday (sh_season, which section 10 checks against pet.js's holidayId) or in the fall weeks
+  // the rare costume of the day: widget/hub-timmy.js and widget/dash.js pick it the same way, from COSTUMES in sets.mjs's
+  // order (widget/shop.js's SPOTS too), only the catalog's ten costumes, never on a holiday (sh_season, which section 10 checks against pet.js's holidayId) or in the fall weeks
   // (sh_is_fall), on about one day in twelve of the rest; every day of three years, for 60 made-up visitors
   const costumeFn = f => { const src = fs.readFileSync(path.join(ROOT, f), 'utf8'), m = /var COSTUMES = \[[^\]]*\];/.exec(src); return m && grabIn(src, 'costumeOfDay') ? new Function(m[0] + '\n' + grabIn(src, 'costumeOfDay') + '\nreturn costumeOfDay;')() : null; };
   const cHub = costumeFn('widget/hub-timmy.js'), cDash = costumeFn('widget/dash.js');
@@ -892,8 +899,10 @@ try {
       if (a && !five.includes(a)) cOff.push(`${v} ${r.d}: ${a} isn't a costume in the catalog`);
       if (!r.s && !r.f) { open++; if (a) { hits++; seenC.add(a); } }
     }
-    ok(five.length === 5 && cOff.length === 0, `the costume of the day: the hub's and the dashboard's agree, only the catalog's costumes, never on a holiday or a fall day (${days3.length} days x ${vis.length} visitors; ${cOff.length} wrong${cOff.length ? ': ' + cOff.slice(0, 3).join(' | ') : ''})`);
-    ok(hits / open > 1 / 15 && hits / open < 1 / 10 && seenC.size === 5, `about one open day in twelve (${hits} of ${open}, 1 in ${(open / hits).toFixed(1)}), all five turn up (${[...seenC].sort().join(', ')})`);
+    const listOf = f => { const m = new RegExp('var ' + (f === 'widget/shop.js' ? 'SPOTS' : 'COSTUMES') + ' = (\\[[^\\]]*\\]);').exec(fs.readFileSync(path.join(ROOT, f), 'utf8')); return m ? JSON.parse(m[1]) : null; };
+    eq(['widget/hub-timmy.js', 'widget/dash.js', 'widget/shop.js'].map(listOf), [0, 1, 2].map(() => SETS.costumes.map(c => c.id)), 'the hub, the dashboard and the shop name the ten costumes in sets.mjs\'s order');
+    ok(five.length === 10 && cOff.length === 0, `the costume of the day: the hub's and the dashboard's agree, only the catalog's costumes, never on a holiday or a fall day (${days3.length} days x ${vis.length} visitors; ${cOff.length} wrong${cOff.length ? ': ' + cOff.slice(0, 3).join(' | ') : ''})`);
+    ok(hits / open > 1 / 15 && hits / open < 1 / 10 && seenC.size === 10, `about one open day in twelve (${hits} of ${open}, 1 in ${(open / hits).toFixed(1)}), all ten turn up (${[...seenC].sort().join(', ')})`);
     ok(cHub('', '2027-07-10', '') === '' && cHub('xp-A', 'not-a-day', '') === '', 'no costume without a visitor or a day');
   }
   notes.push(`the shop's client: ${LIST.length} purchases through the preview's buyCore and sh_buy, the costume of the day over three years`);

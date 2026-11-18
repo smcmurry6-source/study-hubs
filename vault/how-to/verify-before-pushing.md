@@ -54,10 +54,15 @@ its content JSON (`hubs/<hub>/content/`), and an old single-file hub by injectin
 - Look at the page in a scripted browser with the class's data stubbed (the way `tools/ci/smoke.js` and
   `node tools/preview/serve.js` do it), clicking through Home, Notes, Questions and More. Never use the plain page as a
   test account: it saves to the class's real data.
-- **The workflows run on `ubuntu-24.04`, not `ubuntu-latest`** (2026-11-18): GitHub moved `ubuntu-latest` to Ubuntu 26.04,
-  where the pinned Playwright (1.56.1) refuses to install a browser ("Playwright does not support chromium on
-  ubuntu26.04-x64"), so every browser job failed before it ran a test. Moving to 26.04 means a newer Playwright and
-  fresh a11y and perf baselines ([the to-do](../tasks/inbox.md)).
+- **The workflows run on `ubuntu-latest` (Ubuntu 26.04) with Playwright 1.63.0** (2026-11-18). That day GitHub moved
+  `ubuntu-latest` to 26.04, where the Playwright pinned then (1.56.1) refused to install a browser ("Playwright does not
+  support chromium on ubuntu26.04-x64"), so for a few hours every workflow was pinned to `ubuntu-24.04`. 1.63.0 has all
+  three browsers for 26.04, and it is the copy preinstalled in Claude Code cloud sessions, so a run there and CI use the
+  same Chromium (build 1243). The 26.04 image has PostgreSQL 18 (24.04 had 16): the database suites use it. **When
+  `ubuntu-latest` moves again** and every browser job fails at its "Install" step: pin the last image that worked
+  (`runs-on: ubuntu-<yy>.04`) to get CI green, then move to a Playwright whose `playwright-core` lists the new
+  `ubuntu<yy>.04-x64` builds (in the `playwright@` lines of `.github/workflows/*.yml`), check the a11y and perf
+  results against their baselines, and go back to `ubuntu-latest`.
 - If CI's runner can't reach Ubuntu's package mirror, both workflows install the test browsers without their system
   packages and say so in a warning on the run's page (2026-11-11). A "Check hubs" that still fails at "Install headless
   Chromium" is the browser download itself: re-run it once, then say so in the PR.

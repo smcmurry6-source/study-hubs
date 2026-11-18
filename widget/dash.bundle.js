@@ -452,10 +452,11 @@ function paintStill(){ document.documentElement.classList.toggle("hx-still", sti
 paintStill(); document.addEventListener("sh:pref", paintStill);
 function roomReady(){ return !!(CA && CA.room && window.shPet && window.shPet.art && !focusOn()); }
 function hashOf(k){ var h = 0; k = String(k); for (var i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) | 0; return Math.abs(h); }
-var outfitsAsked = false;
-function wantOutfits(){
-if (outfitsAsked) return; outfitsAsked = true;
-var el = document.createElement("script"); el.src = WIDGET + "hub-art/outfits.js"; el.async = true;
+var outfitsAsked = {};
+function wantOutfits(set){
+var file = set ? "outfits/" + set + ".js" : "outfits.js";
+if (outfitsAsked[file]) return; outfitsAsked[file] = 1;
+var el = document.createElement("script"); el.src = WIDGET + "hub-art/" + file; el.async = true;
 el.onload = function(){ rm = null; syncRoom(); paintBoard(); };
 document.head.appendChild(el);
 }
@@ -466,6 +467,7 @@ svg = P.art({ hp: 100, mood: mood || "happy", hat: "" }, 200);
 if (fit && fit.indexOf(":") < 0) {
 if (O && Object.prototype.hasOwnProperty.call(O.parts, fit)) svg = O.dress(svg, fit);
 else if (!O) wantOutfits();
+else if (O.where && O.where[fit] && !(O.got && O.got[O.where[fit]])) wantOutfits(O.where[fit]);
 }
 return String(svg).replace(/^<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
 }
@@ -1123,7 +1125,16 @@ var nameSb = null;
 function paintName(){
 var name = localName || randomName;
 $("youName").innerHTML = (name ? "<b>" + esc(name) + "</b>" : "<b>No name yet</b>") +
-' <button type="button" class="btn btn-text dx-rename" id="greetEdit" title="Change the name classmates see on the leaderboards">' + (localName ? "Change name" : "Pick your name") + "</button>";
+' <button type="button" class="btn btn-text dx-rename" id="greetEdit" title="Change the name classmates see on the leaderboards">' + (localName ? "Change name" : "Pick your name") + "</button>" +
+'<button type="button" class="btn btn-text dx-rename" id="greetLink" title="Share one rank, streak and progress with your phone, tablet or laptop">Link my devices</button>';
+}
+function openLink(back, from){
+var t0 = Date.now();
+(function go(){
+if (window.shLinkAsk && window.shLinkAsk.link) { window.shLinkAsk.link({ back: back, from: from }); return; }
+if (Date.now() - t0 > 8000) { toast("Couldn’t open Link my devices. Are you online?"); return; }
+setTimeout(go, 200);
+})();
 }
 function openNameEditor(){
 surveyVisitor();
@@ -1132,10 +1143,12 @@ var dlg = dialog("nameH",
 (!localName && randomName ? " Right now you have a random one: <b>" + esc(randomName) + "</b>." : "") + "</p>" +
 '<form class="dx-nameform"><input type="text" maxlength="24" autocomplete="nickname" enterkeyhint="done" aria-label="Your name" placeholder="Pick a name" value="' + esc(localName) + '"><button class="btn btn-primary" type="submit">Save</button></form>' +
 '<p class="note dx-namemsg" aria-live="polite"></p>' +
-(localName ? '<button class="btn btn-text dx-namereset" type="button">Go back to a random name</button>' : '<p class="note">Up to 24 characters. You can change it any time.</p>'), $("greetEdit"));
+(localName ? '<button class="btn btn-text dx-namereset" type="button">Go back to a random name</button>' : '<p class="note">Up to 24 characters. You can change it any time.</p>') +
+'<p class="note dx-namelink">Using the hubs on another device too? <button class="btn btn-text" type="button" data-namelink>Link my devices</button></p>', $("greetEdit"));
 var d = dlg.el, input = q("input", d), msg = q(".dx-namemsg", d);
 setTimeout(function(){ try{ input.select(); }catch(e){} }, 40);
 d.addEventListener("click", function(e){
+if (e.target.closest("[data-namelink]")) { dlg.close(); openLink($("greetLink") || $("greetEdit"), "name"); return; }
 if (!e.target.closest(".dx-namereset")) return;
 localName = ""; lsSet("sh_display_name", null); track("name:reset"); nameChanged();
 if (nameSb) nameSb.rpc("clear_display_name", { p_visitor: VISITOR }).then(function(r){ if (r && r.data){ randomName = r.data; paintName(); } }, function(){});
@@ -1154,7 +1167,10 @@ setTimeout(dlg.close, 700);
 });
 }
 paintName();
-$("youName").addEventListener("click", function(e){ if (e.target.closest("#greetEdit")) openNameEditor(); });
+$("youName").addEventListener("click", function(e){
+if (e.target.closest("#greetEdit")) openNameEditor();
+else if (e.target.closest("#greetLink")) openLink($("greetLink"), "you");
+});
 var nameTold = false;
 function nameChanged(){ nameTold = true; try { document.dispatchEvent(new CustomEvent("sh:name", { detail: { name: localName } })); } catch (e) {} nameTold = false; }
 document.addEventListener("sh:name", function(e){ if (nameTold) return; localName = String(e && e.detail && e.detail.name || "").slice(0, 24); paintName(); });
@@ -1200,7 +1216,8 @@ var dlg = dialog("setH", '<h2 id="setH">Settings</h2><p class="note">Saved on th
 '<section class="panel" aria-labelledby="stH"><h3 id="stH">Look</h3>' +
 '<div class="set-row"><div><b>Theme</b><small>Every hub and the dashboard follow it.</small></div>' + seg("theme", [["light", "Light"], ["dark", "Dark"], ["", "Match my device"]], themeNow()) + "</div>" +
 '<div class="set-row"><div><b>Text size</b><small>Makes everything bigger or smaller.</small></div>' + seg("size", SIZES, ls("sh_pref_size") || "default") + "</div>" +
-'<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (localName || randomName ? ": " + esc(localName || randomName) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div></section>' +
+'<div class="set-row"><div><b>Your name</b><small>What classmates see on the leaderboards' + (localName || randomName ? ": " + esc(localName || randomName) : "") + '.</small></div><button class="btn" type="button" data-name>Change your name</button></div>' +
+'<div class="set-row"><div><b>Link my devices</b><small>One rank, streak, trophy case and question progress on your phone, tablet and laptop.</small></div><button class="btn" type="button" data-link>Link my devices</button></div></section>' +
 '<section class="panel" aria-labelledby="sxH"><h3 id="sxH">Timmy and the extras</h3><p class="note">The fun stuff that isn\'t studying, in every hub.</p><div data-extras>' + extrasHTML() + "</div></section></div>", $("setBtn"));
 var body = dlg.el; body.classList.add("dx-dlg-wide");
 function paintFocus(){ var fp = q(".focus-panel", body); fp.classList.toggle("is-on", focusOn()); fp.innerHTML = focusRowHTML(); }
@@ -1212,6 +1229,7 @@ if (window.shPet) window.shPet.refresh();
 q("[data-focus]", body).focus(); return;
 }
 if (e.target.closest("[data-name]")) { dlg.close(); openNameEditor(); return; }
+if (e.target.closest("[data-link]")) { dlg.close(); openLink($("setBtn"), "settings"); return; }
 var b = e.target.closest(".seg [data-val]"); if (!b) return;
 var k = b.parentNode.getAttribute("data-key"), v = b.getAttribute("data-val");
 qa("[data-val]", b.parentNode).forEach(function(x){ x.setAttribute("aria-pressed", String(x === b)); });
@@ -1397,7 +1415,7 @@ window.shShop.open({ onClose: function(){ SHOP.open = false; var b = q(".dx-shop
 }).then(null, function(){ toast("The shop didn't open. Try again in a moment."); });
 }
 document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); } });
-var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
 function costumeOfDay(visitor, day, holiday){
 if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
 var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";
@@ -1936,7 +1954,7 @@ S.push({ el: "#class", title: "The class", body: "<p>How many classmates have a 
 if (o.visible($("ideas"))) S.push({ el: "#ideas", title: "The idea board", body: "<p>Ideas for the hubs, from the class. Vote the ones you'd use up or down, or post your own: it shows right away under your name, with the hub it's for and what kind of idea it is.</p>" });
 if (o.visible($("past"))) S.push({ el: "#past", title: "Past hubs", body: "<p>How the class studied for each exam that's done: the hours, the people, the busiest day. <b>Save image</b> keeps a picture of it. A hub that just closed keeps its check-in here.</p>" });
 S.push({ el: "#inboxBtn", title: "Inbox", body: "<p>Replies to your reports and suggestions, notices to the whole class and the occasional short survey. A number on it means something new.</p>" });
-S.push({ el: "#setBtn", title: "Settings", body: "<p>Focus mode, the theme, text size, your name, Timmy and the extras. Set them once here and every hub follows.</p>" });
+S.push({ el: "#setBtn", title: "Settings", body: "<p>Focus mode, the theme, text size, your name, <b>Link my devices</b> (your phone and laptop count as one you), Timmy and the extras. Set them once here and every hub follows.</p>" });
 S.push({ el: "#menuBtn", title: "About and this tour", body: "<p>The full guide to every feature, trophy and easter egg, the light or dark switch, and this tour.</p>", last: true });
 return S;
 } };

@@ -8,7 +8,7 @@
 //     a change needs the secret, checks the version the page saw, ignores a repeat, refuses a bad state, hub, end time
 //     or note, writes one log row per change, ends at its end time, and can be reversed back to automatic;
 //   - check-ins and surveys come back newest first by created_at, with id breaking ties;
-//   - question health's A/B versions (migration_v65): the version shown is kept on each answer, first tries are split
+//   - question health's A/B versions (migration_v66): the version shown is kept on each answer, first tries are split
 //     by version, and a gap of 20 points with 10+ people a version is flagged (ab_gap);
 //   - sh_surface() (the Insights tab's "Where time goes") places every section the engine sends (widget/hub.js
 //     section()), Learn and Flashcards apart from the bank (migration_v59).
@@ -158,7 +158,7 @@ try {
   ok(!wrong.length, `sh_surface: ${wrong.map(k => `"${k}" is ${got[k]}, expected ${SURF[k]}`).join('; ')}`);
   notes.push(`sh_surface: ${Object.keys(SURF).length} section names placed (Learn and Flashcards apart from the bank, Drill and Misses as the drill, More)`);
 
-  /* ---------- 5. question health: A/B versions (migration_v65) ---------- */
+  /* ---------- 5. question health: A/B versions (migration_v66) ---------- */
   {
     const items = [];
     const send = (vis, its) => anon(`select record_qh('perio', ${q(vis)}, ${q(vis + '-visit')}, ${q(JSON.stringify(its))}::jsonb)`);

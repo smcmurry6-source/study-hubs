@@ -84,9 +84,9 @@
   function dayCT(){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()); } catch (e) { return ""; } }
   /* the rare costume of the day, the same on every reload and every linked device: from the visitor id and the Central
      day, on about one day in twelve among the days with no holiday (holiday: widget/pet.js's holidayId() that day) and
-     outside the fall weeks (September 22 to November 30), one of the five. widget/dash.js has the same function, and
+     outside the fall weeks (September 22 to November 30), one of the ten (tools/figures/site/sets.mjs COSTUMES, in its order). widget/dash.js has the same function, and
      tools/release/xp.js checks both against the server's sh_season and sh_is_fall for every day of three years. */
-  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel"];
+  var COSTUMES = ["pirate", "astronaut", "detective", "chef", "captain-enamel", "wizard", "robot", "firefighter", "shark", "dragon"];
   function costumeOfDay(visitor, day, holiday){
     if (!visitor || !/^\d{4}-\d{2}-\d{2}$/.test(day || "") || holiday) return "";
     var x = +day.slice(5, 7) * 100 + +day.slice(8, 10); if (x >= 922 && x <= 1130) return "";

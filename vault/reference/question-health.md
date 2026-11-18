@@ -27,7 +27,7 @@ deletes a question**: a flag is a lead for a person to check against the hub's n
   more without an answer is a `view` (abandonment). Active time stops when the tab is hidden, the card leaves the
   reading line, or nobody has touched anything for two minutes. Rows go in batches to `record_qh` (`question_events`).
   The context (`bank`, `drill`, `mock`, ...) is stored too. Off for automated browsers and without Supabase.
-- **A/B versions** (since 2026-11-18, `migration_v65.sql`; Sam: "They are A/B versions of questions", "Split the class"):
+- **A/B versions** (since 2026-11-18, `migration_v66.sql`; Sam: "They are A/B versions of questions", "Split the class"):
   a hub with `content/variants.json` (Perio) shows each question as version A (`questions.json`) or B (the reworded
   one). The first version is picked per device and question (a hash of `sh_visitor_id` and the id, `abStart()` in
   `widget/hub.js`), so about half the class starts each question on A, and each later try takes the other one; a mock
@@ -46,7 +46,7 @@ deletes a question**: a flag is a lead for a person to check against the hub's n
   `get_question_health` (admin secret), passing every live question's version, key, choice count and type worked out
   from the hub's SH_EXPORT. Sam's call on a question goes in `question_reviews` through `admin_review_question`:
   **Looks fine**, **Needs a fix** or **Fixed**, with a note. That is metadata only.
-- Schema and functions: `migration_v65.sql` (A/B, above) on top of `migration_v51.sql` (applied 2026-11-04 through the connector as `v49_question_health` and three
+- Schema and functions: `migration_v66.sql` (A/B, above) on top of `migration_v51.sql` (applied 2026-11-04 through the connector as `v49_question_health` and three
   follow-ups; the file was renumbered twice as the analytics change took v49 and the admin page change v50 on `main`).
 
 ## The flags

@@ -8128,9 +8128,9 @@ end;
 $$;
 
 -- ======================================================================
--- migration_v65 (2026-11-18): A/B versions of a question in question health
+-- migration_v66 (2026-11-18): A/B versions of a question in question health
 -- ======================================================================
--- v65 (2026-11-18): A/B versions of a question, recorded on every answer, and a question-health flag when they differ.
+-- v66 (2026-11-18): A/B versions of a question, recorded on every answer, and a question-health flag when they differ.
 -- Sam, 2026-11-18: "Do the database change. They are A/B versions of questions", and, asked whether to split the class so
 -- half see version B first: "Split the class". A hub with content/variants.json (Perio, #405) shows each question in two
 -- versions, A (questions.json) and B (the reworded one). The page now picks the first version by device (a hash of the
@@ -8150,6 +8150,8 @@ $$;
 -- Nothing here changes grading, XP or what a student sees; it is read only on the admin page (behind the admin secret).
 -- Applied to the live project on 2026-11-18 through the connector, in three parts (v65a_question_ab_record, v65b_question_ab_flag,
 -- v65c_question_ab_report), before its PR merged: a page before this change sends no 'w', which records as null.
+-- It was written as v65; main's v65 (the shop's cosmetics, #409) took the number first, so the file is v66 and the
+-- live functions' comments still say migration_v65.
 -- Tested on a throwaway copy of supabase/schema.sql (tools/release/admin-ops.js, section 5; rls.js).
 
 alter table public.question_events add column if not exists w smallint;
@@ -8307,7 +8309,7 @@ begin
   end if;
 
   -- 8. A/B: the question's versions (A, questions.json; B, content/variants.json) compared on first tries. The class is
-  -- split by device, so each version's first tries come from a like group (migration_v65): the hardest and the easiest
+  -- split by device, so each version's first tries come from a like group (migration_v66): the hardest and the easiest
   -- with 10+ people each, 20 points apart or more and unlikely to be chance (two-sided 5%, z >= 1.96)
   if jsonb_typeof(r->'wordings') = 'object' then
     select wv.key, (wv.value->>'n')::int, (wv.value->>'c')::int into wl, wln, wlc from jsonb_each(r->'wordings') wv
@@ -8413,7 +8415,7 @@ ft_agg as (
 ),
 ft_ch as (select x.qid, jsonb_object_agg(x.choice::text, x.n) choices
           from (select ft.qid, ft.choice, count(*)::int n from ft where ft.choice is not null group by 1, 2) x group by x.qid),
--- A/B: each person's first try at the question, by the version they were shown (null w: a page before migration_v65)
+-- A/B: each person's first try at the question, by the version they were shown (null w: a page before migration_v66)
 ft_w as (
   select y.qid, jsonb_object_agg(y.w::text, jsonb_build_object('n', y.n, 'c', y.c)) wordings
   from (select z.qid, z.w, count(*)::int n, count(*) filter (where z.correct)::int c
