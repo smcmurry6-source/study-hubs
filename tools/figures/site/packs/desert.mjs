@@ -10,7 +10,7 @@ export function pack(T){
   var seg = T.seg, lumps = T.lumps, rng = T.rng;
   var p = T.p, O2 = T.O2, O3 = T.O3;
   /* adobe: the lit wall, its shade, the parapet's top, the roof inside it */
-  var ADB = { c: "#F0C49A", s: "#D29A69", t: "#F9DDB8", r: "#D6A372" };
+  var ADB = { c: "#EBAE84", s: "#C98458", t: "#F6CFA8", r: "#D39A6C" };
   var VIGA = ["#8E5E3B", "#E2B887", "#A8744A"], WOOD = { top: K.woodLight, left: K.wood, right: K.woodShade }, THIN = { sw: 1.3, si: .8 };
   var CHILE = ["#D8322A", "#A8221F"], CACT = ["#6FAE5E", "#4F8C48", "#94CB7E"], CACTN = ["#3E6A50", "#2E5240", "#527E62"];
   function cact(o){ return o.night ? CACTN : CACT; }
@@ -44,11 +44,13 @@ export function pack(T){
     var poly = function(ix){ return D(ix.map(function(i){ return [tp[i][0], tp[i][1], z1]; }).concat(ix.slice().reverse().map(function(i){ return [bo[i][0], bo[i][1], z0]; }))); };
     s += F(poly(lit), ADB.c) + F(poly(sh), ADB.s);
     /* a little weathering on the plaster: darker patches low down where the rain splashes */
-    s += F(D(lit.map(function(i){ return [bo[i][0], bo[i][1], z0 + .32]; }).concat(lit.slice().reverse().map(function(i){ return [bo[i][0], bo[i][1], z0]; }))), "#D9A67A", .35);
+    s += F(D(lit.map(function(i){ return [bo[i][0], bo[i][1], z0 + .32]; }).concat(lit.slice().reverse().map(function(i){ return [bo[i][0], bo[i][1], z0]; }))), "#C98A62", .3);
     s += O(poly(all));
     s += FO(D(at3(ringPts(top.b, top.r), z1)), o.snow ? "#FFFFFF" : ADB.t, 1.8);
     var inn = inset(top.b, top.r, .28);
     s += FO(D(at3(ringPts(inn.b, inn.r), z1 - .1)), o.snow ? "#EAF2FA" : ADB.r, 1.1);
+    /* the mud roof's trowel marks */
+    if (!o.snow && o.marks !== false){ var R = rng(Math.round(b[0] * 13 + b[1] * 7)), ib = inn.b; for (var i = 0; i < 5; i++){ var mx = ib[0] + .4 + R() * (ib[2] - ib[0] - 1.2), my = ib[1] + .3 + R() * (ib[3] - ib[1] - .6); s += L(D([[mx, my, z1 - .1], [mx + .5, my + .05, z1 - .1]], true), .9, "#B9805A", .6); } }
     return s;
   }
   /* a viga: a round roof beam's end poking out of a wall, along +y ("y") or +x ("x") */
@@ -154,9 +156,8 @@ export function pack(T){
         /* the main house */
         s += mass([x0, y0, x1, y1], 0, zA, R, { snow: o.snow });
         /* the kiva chimney at the back, round, its smoke curling up */
-        var cc = [7.35, 4.15];
-        s += cyl(cc[0], cc[1], zA - .1, .46, zA + 1.5, .38, ADB.c, ADB.s, o.snow ? "#FFFFFF" : ADB.t, {});
-        var ct = P(cc[0], cc[1], zA + 1.5); s += ell(ct[0], ct[1], 3.2, 1.8, "#5A4048", 1) + T.smoke(ct[0] + 1, ct[1] - 7);
+        s += mass([6.95, 3.75, 7.75, 4.55], zA - .1, zA + 1.45, [.26, .26, .26, .26], { snow: o.snow, marks: false });
+        var ct = P(7.35, 4.15, zA + 1.35); s += T.smoke(ct[0] + 1, ct[1] - 8);
         /* the upper room, set back on the roof */
         var cb = [3.0, 3.45, 5.65, 5.95], zC = 5.1;
         s += mass(cb, zA - .1, zC, [.36, .36, .36, .36], { snow: o.snow });
@@ -185,10 +186,8 @@ export function pack(T){
         [[5.04, .62], [5.27, .62], [5.5, .62], [5.73, .62], [5.04, 1.72], [5.27, 1.72], [5.5, 1.72], [5.73, 1.72]].forEach(function(q){ var c = P(q[0], dy, q[1]); s += circ(c[0], c[1], .9, "#C9D1D9"); });
         var rg = P(5.66, dy, 1.15); s += '<circle cx="' + f(rg[0]) + '" cy="' + f(rg[1] + 2) + '" r="2" fill="none" stroke="' + INK + '" stroke-width="1.4"/>' + circ(rg[0], rg[1], .9, INK);
         s += box(4.66, y1 - .06, 2.3, 1.7, .26, .24, WOOD, THIN);
-        /* the ristra by the door, hung from a peg */
-        var rp = P(6.32, y1 + .02, 2.55); s += ristra(rp[0], rp[1], 17, 1.05);
         /* a clay pot with a little cactus by the door */
-        var pt = P(4.25, y1 + .32, 0);
+        var pt = P(6.45, y1 + .32, 0);
         s += FO("M" + f(pt[0] - 4.4) + " " + f(pt[1] - 7) + " h8.8 l-1.2 6.4 q-3.2 1.4 -6.4 0 z", "#C9603E", 1.2) + L("M" + f(pt[0] - 4.2) + " " + f(pt[1] - 5.6) + " h8.4", 1, "#9E4630") + barrel(pt[0], pt[1] - 7, 3.2, cact(o));
         /* the side: vigas, a window and a canal (the rain spout) */
         [3.85, 4.6, 5.35, 6.1, 6.85].forEach(function(y){ s += viga(x1 - .08, y, zA - .36, "x"); });
@@ -207,9 +206,11 @@ export function pack(T){
         s += box(px0, py0 - .15, pz + .02, px1 - px0 + .12, py1 - py0 + .3, .16, { top: o.snow ? "#FFFFFF" : ADB.r, left: K.wood, right: VIGA[0] }, { sw: 1.6, si: 1 });
         [4.1, 4.85, 5.6, 6.35, 7.1].forEach(function(y){ s += viga(9.7, y, pz - .02, "x", .26); });
         /* a lantern hangs under the porch roof */
-        var ln = P(9.4, 6.9, pz - .2);
+        var ln = P(9.4, 5.0, pz - .2);
         s += L("M" + f(ln[0]) + " " + f(ln[1]) + " v3", 1.1) + FO("M" + f(ln[0] - 2.4) + " " + f(ln[1] + 3) + " h4.8 l-.6 6 h-3.6 z", o.night ? K.lit : "#FFF3C4", 1.1) + FO("M" + f(ln[0] - 3) + " " + f(ln[1] + 3.4) + " l3 -2.4 3 2.4 z", "#8E98A3", .9);
         if (o.night) lights += T.glowAt(ln[0], ln[1] + 6, 13) + FO("M" + f(ln[0] - 2.4) + " " + f(ln[1] + 3) + " h4.8 l-.6 6 h-3.6 z", K.litHot, 1.1);
+        /* a ristra of dried red chiles on the front post */
+        var rp = P(9.42, 7.98, pz - .3); s += ristra(rp[0], rp[1], 19, 1.05);
         /* the Timmy flag on the front corner of the roof */
         if (u.flag) s += T.flagOn(7.75, 7.95, zA - .05, 2.0);
         if (o.night) lights += T.firefly(132, 118, .4);
@@ -223,7 +224,7 @@ export function pack(T){
     "red-rocks": T.hillScene({
       note: "Red mesas and saguaros under a sunset sky, and the whole Milky Way at night",
       path: "dirt", treeKind: "round", lamp: "lantern", skirt: "sand", grade: ["#FFB27A", .07], farLift: 0,
-      ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#8C7468", "#7E675E", "#6E5852", "#574541"] : ["#F0C996", "#E5B781", "#D3A06B", "#AF7A4C"]; },
+      ground: function(o){ return o.snow ? ["#F7FBFF", "#E8F0F8", "#D6E4F1", "#BCD2E6"] : o.night ? ["#8C7468", "#7E675E", "#6E5852", "#574541"] : ["#F5DCAE", "#ECCB97", "#DDB07C", "#B98A58"]; },
       sky: function(o){
         if (o.night){
           var mw = F("M120 -20 Q230 26 390 52 L390 92 Q230 62 120 14 Z", "#E9E2FF", .09) + F("M130 -10 Q230 32 390 64 L390 80 Q232 50 130 4 Z", "#F4F0FF", .09);
@@ -247,7 +248,7 @@ export function pack(T){
         s += F("M44 85 Q45.4 79.4 51 79 L104 78.4 Q110 78.8 111.4 84 Z", c.cap);
         s += L("M58 86 q-1 7 -3 13 M74 87 q1 7 -1 15 M90 86 q-1 6 0 14 M100 88 q1 6 0 10", .9, INK, .35) + O(big, 1.6) + snowcap("M44.4 84 Q45.4 79.4 51 79 L104 78.4 Q110 78.8 111 82.6 Q96 81 76 83.6 Q58 81 44.4 84 Z");
         /* a coyote on the mesa top at night, singing to the moon */
-        if (n) s += FO("M60 79 l.8 -4.6 q.4 -3 3 -3.6 l1.6 -4.2 q1 -2 2.6 -1.4 l1 -3 1.2 2.8 q2 .8 1 3 l-1 3.4 q1.4 1.6 .8 5.6 h2.6 q-.6 -3 1.4 -4 q2 1 1 4 v2 z", "#2B2034", 1) + L("M66.6 71 q2.6 -1.4 3.2 -5", .8, "#D9D2F0", .8);
+        if (n) s += '<g transform="translate(62 79.4) scale(1.5) translate(-62 -79.4)">' + FO("M60 79 l.8 -4.6 q.4 -3 3 -3.6 l1.6 -4.2 q1 -2 2.6 -1.4 l1 -3 1.2 2.8 q2 .8 1 3 l-1 3.4 q1.4 1.6 .8 5.6 h2.6 q-.6 -3 1.4 -4 q2 1 1 4 v2 z", "#2B2034", .8) + L("M65 71.6 q2.6 -1.4 3.6 -5.4 M61.6 76 q.4 -3 2.6 -4", .7, "#D9D2F0", .9) + "</g>";
         /* on the right: a tall butte and a long low mesa */
         var bt = "M280 150 Q287 118 292 106 L294.6 67 Q295.6 61 301 60.6 L318 60.4 Q323.6 61 324.4 67 L327 104 Q333 118 346 128 L346 150 Z";
         s += F(bt, c.m) + F("M318 60.4 Q323.6 61 324.4 67 L327 104 Q333 118 346 128 L346 150 L318 150 Q316 112 316.4 70 Z", c.ms);
