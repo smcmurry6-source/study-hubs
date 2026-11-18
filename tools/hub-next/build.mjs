@@ -80,6 +80,12 @@ function build(hub){
   const core = D["core.json"], questions = D["questions.json"], notes = D["notes.json"], study = D["study.json"];
   if (!Array.isArray(questions) || !questions.length) throw new Error(`hubs/${hub}/content/questions.json has no questions`);
   if (core.hub !== hub) throw new Error(`hubs/${hub}/content/core.json says its hub is "${core.hub}"`);
+  /* a question's High likelihood flag (likely: the first predicted topic that lists it, which the bank's filter and tag,
+     the mock's share and the drill read) is worked out from core.json's likelyTopics, so it can't fall behind them
+     (BUG-164: re-ranking Exam 3's topics left 77 questions in a topic unflagged). Set in place, so its key keeps its spot. */
+  const firstTopic = {};
+  (core.likelyTopics || []).forEach((t) => (t.ids || []).forEach((id) => { if (!firstTopic[id]) firstTopic[id] = t; }));
+  questions.forEach((q) => { if (firstTopic[q.id]) q.likely = firstTopic[q.id]; else delete q.likely; });
   /* the question index: [id, lecture, High likelihood, source] */
   core.index = questions.map((q) => [q.id, q.lec, q.likely ? 1 : 0, q.src || ""]);
   /* High yield, the third reading level: each lecture's predicted topics with the paragraphs of its notes that teach them */
