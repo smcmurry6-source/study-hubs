@@ -4,11 +4,17 @@
 -- Results are about the class: only totals over 5+ people go into the repo (vault/rules/learner-data-privacy.md).
 -- Running them (vault/how-to/run-sql-on-the-live-database.md): each query is its own execute_sql call, starting with
 -- `set local statement_timeout = '5s';`, one call at a time, never several at once. sh_data_quality, sh_insights and
--- sh_insight_retries are the admin page's heavy reads: about 0.7 s each on a throwaway copy at 1.5 times the class's size
--- (2026-11-18), 1 to 2 s on the live database. One that stops at the limit waits for the quiet hours (1 to 5 am Central).
+-- sh_insight_retries are the admin page's heavy reads: 0.4 to 0.8 s each on a throwaway copy at the class's size
+-- (2026-11-19, after migration_v83), 1 to 2 s on the live database. One that stops at the limit waits for the quiet hours
+-- (1 to 5 am Central). The admin page keeps a copy of each (admin_cache, worked out every 15 minutes while the page is in
+-- use, hourly while the class is busy, nightly for a week after: vault/reference/admin-operations.md): read that first,
+-- at any hour, and call the function only when the copy is missing or too old for the question.
 
 -- 1. Data quality: tracking alive, test rows, unmapped sections, new or quiet event families, double-counted time,
 --    linked devices, answers with no recorded pick, class counters vs personal rows, storage against 500 MB.
+--    The kept copy (its storage figures are as old as computed_at):
+select computed_at, body from admin_cache where key = 'quality';
+--    Worked out now (a quiet hour):
 select sh_data_quality();
 
 -- 2. Every hub side by side. Pass each hub's most recent exam date from HUBS / ARCHIVED_HUBS in index.html
