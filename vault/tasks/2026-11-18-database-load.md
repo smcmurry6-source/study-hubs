@@ -212,5 +212,8 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   every index valid, no failed request or database error in those minutes. The biggest tables now: `personal_answers` 76 MB,
   `xp_seen` 52 MB, `question_events` 34 MB, `ui_click_reach` 23 MB, `xp_awards` 22 MB, `answer_xp` 21 MB (for the
   [optimization pass](2026-11-18-database-optimization-pass.md); `xp_seen` is worth a look).
+- 2026-11-19, 4:10 am Central ([#444](https://github.com/smcmurry6-source/study-hubs/pull/444)): the rewrite read back from the catalog before
+  the optimization pass's phase 1 went in: the ping table 31 MB (the table 12 MB, its five indexes 19 MB), the database
+  318 MB. `migration_v76.sql` and `migration_v77.sql` applied the same hour: [its note](2026-11-18-database-optimization-pass.md).
 
 ## Outcome

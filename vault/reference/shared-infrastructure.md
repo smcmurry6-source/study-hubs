@@ -89,7 +89,7 @@ tags: [widget, supabase]
   Sam's machine (`deploy_rollout.ps1`, `check_leaderboard.ps1`) — **never**
   commit them here or hardcode them into a hub's client-side JS.
   **The project is on Supabase's Free plan** (checked 2026-11-18): a shared CPU that slows to a crawl once a busy day has
-  used up its burst, and a database that goes **read-only at 500 MB** (414 MB on 2026-11-18; then every save fails). Keep
+  used up its burst, and a database that goes **read-only at 500 MB** (318 MB on 2026-11-19, after the ping table's rewrite; 465 MB just before it; then every save fails). Keep
   each answer's work small ([migration_v72](../../migration_v72.sql) cut it to a quarter for the most active students) and
   watch the size ([the task](../tasks/2026-11-18-database-load.md)). If the database jams (even the connector can't
   connect), Sam restarts it from the dashboard (Settings, General, Restart project); that clears the jam, not the CPU.
@@ -107,7 +107,12 @@ tags: [widget, supabase]
   backfill, and run long analysis SQL, when the class is quiet (1 to 5 am Central) or in small batches; send every query
   alone, one at a time, under `set local statement_timeout = '5s'`; benchmark a function on a throwaway copy
   (`tools/release/pg.js`), never in a loop on the live database
-  ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)). The admin page reads one query at a time
+  ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)). **A function that a page calls often, or
+  that such a function calls, is written in PL/pgSQL, not SQL** (2026-11-19, `migration_v76.sql`): a SQL-language function
+  with `security definer` or its own `search_path` (all of ours) can't be inlined, so it is parsed and planned again on
+  every call, while a PL/pgSQL one keeps its plans for the life of the connection; that planning was about a third of every
+  answer save. `pg_stat_statements` with `track = all` on a throwaway copy shows it
+  ([the optimization pass](../tasks/2026-11-18-database-optimization-pass.md)). The admin page reads one query at a time
   ([admin-operations](admin-operations.md)), and `widget/v3.js` holds a failed answer and sends it again with the same
   request id (the quiet spell above). What's still to do: [the task](../tasks/2026-11-18-database-load.md).
 - **GitHub Pages deploy** — `github.com/smcmurry6-source/study-hubs`, branch

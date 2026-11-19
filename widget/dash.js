@@ -2328,12 +2328,20 @@
     rest("changelog?select=hub,message,created_at&order=created_at.desc&limit=40").then(function(rows){
       if (!rows || !rows.length) return;
       /* the freshest entry per hub drives its "Updated" (a row's hub can be "all" or a comma list) */
+      keepLatest(rows[0].created_at);
       latestBy = {};
       rows.forEach(function(r){ String(r.hub || "").toLowerCase().split(/[,\s]+/).filter(Boolean).forEach(function(t){ if (!latestBy[t] || r.created_at > latestBy[t]) latestBy[t] = r.created_at; }); });
       logRows = rows.filter(function(r){ return r && typeof r.message === "string" && r.message.trim(); });
       applyUpdated();
     }).catch(function(){});
   }
+  /* The newest changelog row's time, kept on the device for half an hour and shared with every hub's page
+     (widget/v3.js reads and writes the same key; 2026-11-19, the database optimization pass): the watcher below still
+     looks every four minutes, but asks the database only when what the device has is older than that. Its first look
+     waits for loadChangelog's answer, which is kept the same way, so a dashboard load reads the changelog once. */
+  var KEEP_KEY = "sh_changelog_seen";
+  function keepLatest(at){ try { localStorage.setItem(KEEP_KEY, JSON.stringify({ t: Date.now(), at: at })); } catch (e) {} }
+  function keptLatest(){ try { var k = JSON.parse(localStorage.getItem(KEEP_KEY)), d = Date.now() - k.t; return d >= 0 && d < 18e5 && typeof k.at === "string" ? k.at : null; } catch (e) { return null; } }
   /* "this page was updated", for tabs left open */
   function watchUpdates(){
     var baseline = null, shown = false;
@@ -2345,14 +2353,20 @@
       q("[data-reload]", t).addEventListener("click", function(){ location.reload(); });
       q("[data-dismiss]", t).addEventListener("click", function(){ t.remove(); });
     }
+    function take(latest){
+      if (baseline === null){ baseline = latest; return; }
+      if (new Date(latest) > new Date(baseline)) show();
+    }
     function check(){
+      var have = keptLatest();
+      if (have) { take(have); return; }
       rest("changelog?select=created_at&order=created_at.desc&limit=1").then(function(rows){
         if (!rows || !rows.length) return;
-        if (baseline === null){ baseline = rows[0].created_at; return; }
-        if (new Date(rows[0].created_at) > new Date(baseline)) show();
+        keepLatest(rows[0].created_at);
+        take(rows[0].created_at);
       }).catch(function(){});
     }
-    check(); setInterval(check, 4 * 60 * 1000);
+    setTimeout(check, 9000); setInterval(check, 4 * 60 * 1000);
   }
 
   /* ---------- the tour (widget/tour.js): no question on arrival; "Take the tour" in the menu runs it, with this page's own steps ---------- */

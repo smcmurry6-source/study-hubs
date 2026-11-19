@@ -32,6 +32,29 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (the database optimization pass, phase 1, Claude Code, [#444](https://github.com/smcmurry6-source/study-hubs/pull/444))** — Sam's package: measure the optimization
+  pass's ideas 1-5 on a throwaway copy and ship the ones worth it; nothing students see or earn changes. Measured with a
+  made-up class of 200 (188,000 answers) and `pg_stat_statements` timing every statement inside a call
+  ([the task](vault/tasks/2026-11-18-database-optimization-pass.md) has the table). **`migration_v76.sql`**: 60-66% of
+  every answer save was the crown balance in its reply, most of it planning: a SQL-language function with its own
+  `search_path` is planned again on every call, and the balance called six of them. 18 small functions (`sh_rank`,
+  `sh_tier`, `sh_step`, `sh_key`, `sh_xp_mult`, `sh_boost_json`, `sh_time_crowns`, `sh_crowns`, `qh_int`, the
+  `record_answer_v2` and `record_card_v2` wrappers and others) are PL/pgSQL with the same bodies; the medal check is
+  skipped while under half the hub's bank was ever answered right; `get_hub_mastery` looks up each question's latest
+  answer. On the copy an answer goes from 6.9 / 5.7 / 4.8 ms (heavy / middling / light student) to 4.4 / 3.6 / 2.4, a
+  question-health batch from 1.9 to 0.75 ms, `get_hub_mastery` from 7.9 to 3.4 ms. **`migration_v77.sql` and
+  `widget/v3.js`**: a page's study-time pings go out together once a minute (`record_activity_pings`, each ping saved at
+  the time it was counted: the same rows and totals), 58% fewer ping calls; they were 18% of every request. **The
+  changelog read** (`widget/v3.js`, `widget/dash.js`): the newest row's time is kept on the device for half an hour and
+  shared by every tab, so the "updated" banner asks the database twice an hour a device, not every four minutes a page
+  (5% of requests); it now comes up to half an hour after a deploy. Fillfactor wasn't worth it (the hot tables already
+  update in place), but `activity_visits` can't, because every ping moves an indexed column: on the to-do list with the
+  awards' running totals and the rest of phase 2. `tools/ci/quiet.js` checks the pings and the changelog read on a fake
+  database. BUG-181's retest: the evening before the Perio final, 20 of about 11,900 answer saves failed their first try
+  (no burst; the page sends each again), against 9 in 10 the afternoon before. **Both migrations applied live** on
+  2026-11-19 at about 4:15 am Central, before the merge (through the connector, md5-checked before and after; in
+  `supabase/schema.sql`). The ping table's rewrite had run half an hour before (#445: `activity_pings` 179 MB to 31 MB, the
+  database 465 MB to 318 MB), and the live `pg_stat_statements` and same-page update numbers are in the task's Log.
 - **2026-11-19 (Perio: the implant cases' films read in words, Claude Code)** — a student report on `pc-h1` ("need more info
   from the radiograph, it's just a sketch"). The four implant Patient Box cases (`implant-5`, `-19`, `-30`, `-14` in
   `hubs/perio/content/core.json`, and the folded copies in their 15 questions' `pbox`) gain a row, "Today's film, in words",

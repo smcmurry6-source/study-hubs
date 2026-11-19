@@ -2040,12 +2040,16 @@ qa("[data-news]").forEach(drawNews);
 function loadChangelog(){
 rest("changelog?select=hub,message,created_at&order=created_at.desc&limit=40").then(function(rows){
 if (!rows || !rows.length) return;
+keepLatest(rows[0].created_at);
 latestBy = {};
 rows.forEach(function(r){ String(r.hub || "").toLowerCase().split(/[,\s]+/).filter(Boolean).forEach(function(t){ if (!latestBy[t] || r.created_at > latestBy[t]) latestBy[t] = r.created_at; }); });
 logRows = rows.filter(function(r){ return r && typeof r.message === "string" && r.message.trim(); });
 applyUpdated();
 }).catch(function(){});
 }
+var KEEP_KEY = "sh_changelog_seen";
+function keepLatest(at){ try { localStorage.setItem(KEEP_KEY, JSON.stringify({ t: Date.now(), at: at })); } catch (e) {} }
+function keptLatest(){ try { var k = JSON.parse(localStorage.getItem(KEEP_KEY)), d = Date.now() - k.t; return d >= 0 && d < 18e5 && typeof k.at === "string" ? k.at : null; } catch (e) { return null; } }
 function watchUpdates(){
 var baseline = null, shown = false;
 function show(){
@@ -2056,14 +2060,20 @@ root.appendChild(t);
 q("[data-reload]", t).addEventListener("click", function(){ location.reload(); });
 q("[data-dismiss]", t).addEventListener("click", function(){ t.remove(); });
 }
+function take(latest){
+if (baseline === null){ baseline = latest; return; }
+if (new Date(latest) > new Date(baseline)) show();
+}
 function check(){
+var have = keptLatest();
+if (have) { take(have); return; }
 rest("changelog?select=created_at&order=created_at.desc&limit=1").then(function(rows){
 if (!rows || !rows.length) return;
-if (baseline === null){ baseline = rows[0].created_at; return; }
-if (new Date(rows[0].created_at) > new Date(baseline)) show();
+keepLatest(rows[0].created_at);
+take(rows[0].created_at);
 }).catch(function(){});
 }
-check(); setInterval(check, 4 * 60 * 1000);
+setTimeout(check, 9000); setInterval(check, 4 * 60 * 1000);
 }
 function petOn(){ return (ls("sh_pref_pet") || "on") !== "off"; }
 window.SH_TOUR = { prompt: false, steps: function(o){

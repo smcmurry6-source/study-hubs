@@ -1285,6 +1285,11 @@
      "an update was pushed" — piggybacks on that instead of a separate version file. ---------- */
   (function(){
     var POLL_MS = 4 * 60 * 1000;
+    /* The newest row's time is kept on the device for half an hour (2026-11-19, the database optimization pass), shared
+       by every tab, hub and the dashboard (widget/dash.js reads and writes the same key): the page still looks every
+       four minutes, but asks the database only when what the device has is older than that. This read was 5% of every
+       request the class made. The banner comes at most half an hour after a deploy instead of four minutes. */
+    var KEEP_MS = 30 * 60 * 1000, KEEP_KEY = "sh_changelog_seen";
     var baseline = null, toastEl = null;
     function ensureToast(){
       if (toastEl) return toastEl;
@@ -1296,7 +1301,19 @@
       toastEl.querySelector(".sh-update-dismiss").addEventListener("click", function(){ toastEl.classList.remove("is-shown"); });
       return toastEl;
     }
+    function kept(){
+      try {
+        var k = JSON.parse(localStorage.getItem(KEEP_KEY) || "null"), now = Date.now();
+        return k && typeof k.at === "string" && typeof k.t === "number" && k.t <= now && now - k.t < KEEP_MS ? k.at : null;
+      } catch (e) { return null; }
+    }
+    function take(latest){
+      if (baseline === null) { baseline = latest; return; }
+      if (new Date(latest) > new Date(baseline)) { ensureToast().classList.add("is-shown"); }
+    }
     function check(){
+      var have = kept();
+      if (have) { take(have); return; }
       fetch(SB_URL + "/rest/v1/changelog?select=created_at&order=created_at.desc&limit=1", {
         headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }
       })
@@ -1304,8 +1321,8 @@
       .then(function(rows){
         if (!rows || !rows.length) return;
         var latest = rows[0].created_at;
-        if (baseline === null) { baseline = latest; return; }
-        if (new Date(latest) > new Date(baseline)) { ensureToast().classList.add("is-shown"); }
+        try { localStorage.setItem(KEEP_KEY, JSON.stringify({ t: Date.now(), at: latest })); } catch (e) {}
+        take(latest);
       })
       .catch(function(){ /* best-effort — never break the hub */ });
     }
@@ -1639,8 +1656,45 @@
   var sectionBank = {};
   var tickTimer = null;
   var lastTick = 0;
-  function pingActivity(section){
+  /* The pings go out together (2026-11-19, the database optimization pass): each is still 25 s of one section, counted
+     as before, but a page holds them and sends what it has once a minute in one call (record_activity_pings,
+     migration_v77), each with how long ago it was counted, so the server saves it at that time. One call every 25 s
+     was 18% of every request the class made. A visit's first ping goes at once (a short visit still counts, and the
+     admin page's "studying now" sees it), and so does whatever is held when the page is hidden or closed. A database
+     without the new call (or a page that can't tell) gets one call a ping, as before. */
+  var PING_SEND_MS = 60000, pingHeld = [], pingTimer = null, pingsTogether = true;
+  function pingOne(section){
     safeRpc("record_activity_ping", { p_visitor: VISITOR_ID, p_visit: VISIT_ID, p_hub: HUB, p_section: section });
+  }
+  /* leaving: true when the page is being hidden or closed, when a call may not outlive the page: it goes with
+     keepalive, which the browser finishes after the page is gone */
+  function sendPings(leaving){
+    if (pingTimer) { clearTimeout(pingTimer); pingTimer = null; }
+    if (!pingHeld.length) return;
+    var now = Date.now(), held = pingHeld.splice(0, pingHeld.length);
+    if (!supabase || AUTOMATED) return;
+    if (!pingsTogether) { held.forEach(function(p){ pingOne(p.s); }); return; }
+    for (var i = 0; i < held.length; i += 12) (function(part){   /* 12 a call: the server takes no more */
+      var args = { p_visitor: VISITOR_ID, p_visit: VISIT_ID, p_hub: HUB,
+        p_items: part.map(function(p){ return { s: p.s, a: Math.max(0, Math.min(300, Math.round((now - p.t) / 1000))) }; }) };
+      try {
+        if (leaving && window.fetch) {
+          fetch(SB_URL + "/rest/v1/rpc/record_activity_pings", { method: "POST", keepalive: true, body: JSON.stringify(args),
+            headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" } }).catch(function(){});
+          return;
+        }
+        supabase.rpc("record_activity_pings", args).then(function(res){
+          if (rpcMissing(res)) { pingsTogether = false; part.forEach(function(p){ pingOne(p.s); }); }
+          else if (dbFailed(res)) dbFail();
+        }, function(){ dbFail(); });
+      } catch (e) {}
+    })(held.slice(i, i + 12));
+  }
+  function pingActivity(section, now){
+    if (!pingsTogether) { pingOne(section); return; }
+    pingHeld.push({ s: section, t: Date.now() });
+    if (now) sendPings();
+    else if (!pingTimer) pingTimer = setTimeout(sendPings, PING_SEND_MS);
   }
   /* Listening with the screen off (Sam, 2026-11-18: "add that study time tracking"): a lecture's narration or a Timmy
      Time episode that keeps playing while the tab is hidden or the phone is locked counts as study time, for as long as
@@ -1696,6 +1750,7 @@
       if (sectionBank[sec] >= PING_INTERVAL_MS / 2) pingActivity(sec);
       sectionBank[sec] = 0;
     });
+    sendPings(true);   /* the page is being hidden or closed: whatever is held goes now */
   }
   var firstPingSent = false;
   function startActivityPing(){
@@ -1703,7 +1758,7 @@
     if (!firstPingSent) {
       firstPingSent = true;
       var startSec = currentSection();
-      pingActivity(startSec);
+      pingActivity(startSec, true);
       sectionBank[startSec] = -PING_INTERVAL_MS;
     }
     lastTick = Date.now();
