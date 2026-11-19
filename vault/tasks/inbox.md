@@ -27,6 +27,9 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **Read Perio's data quality and question-health lists with its retrospective** (2026-11-18, the evening lessons refresh):
   `select sh_data_quality();` stopped at the 5 s limit with 80 people in Perio on its final's eve, so neither it nor
   `qh_report('perio')` was read after S6 went taught. Read both, early in the day or in the quiet hours, when the retrospective runs.
+  Once `migration_v83.sql` is live, read the admin page's kept copies instead, at any hour (`admin_cache`'s `quality` and
+  `qh:perio`; the queries in `tools/lessons-refresh.md` step 1). The night v83 is applied fills both, Perio's from its
+  latest versions (Perio is archived by then, so the admin page no longer lists it), and they're refreshed nightly for a week.
 - [ ] **The other `shGame.v2()` checks while the bootstrap times out** (2026-11-19, found with the rank pill's fix). Three more
   places wait for `v2()` (true only once the bootstrap or an answer's reply came back) where `shGame.live()` would do: Timmy
   Time's minutes (`minOn()` in `widget/podcast.js`: an episode heard then pays nothing for those minutes), Timmy's HP days

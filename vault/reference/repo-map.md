@@ -90,7 +90,8 @@ tags: [map]
   are live, archived or hidden: the dates and Sam's overrides, loaded by the dashboard and `review/`) — shared cross-hub layer (search, class stats,
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
-- `review/` — admin analytics page. Its **Insights** tab puts every hub (live and archived) side by side and pairs each
+- `review/` — admin analytics page. Its heavy reads come worked out ahead from `admin_cache`, which pg_cron's
+  `sh-admin-cache` job refreshes while the page is in use (`migration_v83.sql`, [admin-operations](admin-operations.md)). Its **Insights** tab puts every hub (live and archived) side by side and pairs each
   number with the decision it drives ([insights-dashboard](insights-dashboard.md), data from `migration_v49.sql`;
   [analytics governance](analytics-governance.md)). Its **Live** view shows who is studying now and its **Hubs** view sets a
   hub live, archived or hidden by hand, with an audit log ([admin-operations](admin-operations.md), `migration_v50.sql`;

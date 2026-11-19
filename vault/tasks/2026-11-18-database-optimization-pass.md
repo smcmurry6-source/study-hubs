@@ -153,7 +153,9 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   table once at night (`vacuum full public.activity_visits`), since it will have grown.
   **Done: checked and `migration_v81.sql`** (phase 2's table above: the summary's numbers the same, 0.4 to 2.1 ms at most).
   The rewrite is `cluster ... using activity_visits_pkey` (unlike `vacuum full`, it runs inside the connector's call). Applied
-  live and rewritten: the box below.
+  live and rewritten: the box below. Since `migration_v83.sql` that summary is worked out ahead
+  (`sh_visitor_summary`, at most every 15 minutes while the admin page is in use), so a slower scan without the index costs
+  little ([database-load](2026-11-18-database-load.md)).
 - [x] **The class's numbers on each card** (`question_stats` and `question_choices`, `widget/v3.js`): 20.6% of every
   request and another 14.6% of preflights, two reads a card. (Only 0.5% of the database's time, live: the gain is in
   requests, so it matters when the request limit or the connection count is what's tight.) The answer's reply could carry them (the save has just
