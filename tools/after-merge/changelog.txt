@@ -72,3 +72,4 @@ all | At the larger text sizes, Timmy's Shop, Ask Timmy, the guided tour and the
 perio | In the arcade, tap a classmate's name on a class board to visit their Timmy's place.
 heme-endo-exam3 | In the arcade, tap a classmate's name on a class board to visit their Timmy's place.
 heme-endo-exam3 | High likelihood now marks fewer questions (284 instead of 410): only the ones on what Dr. Herr's study guide or a professor's hint points at. Every other question is still in the bank. High yield is shorter to match, with its recordings made again.
+all | When the database is busy, a mock exam's or an arcade game's answers now wait on your device like the rest, so its score and its bonus XP still count once they arrive.

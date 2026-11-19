@@ -263,9 +263,12 @@ return items;
 }
 function loadRemote(){
 function rowsOf(res){ return res && !res.error && Array.isArray(res.data) ? res.data : []; }
+function missingFn(res){ var e = res && res.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
 var none = Promise.resolve(null);
 return Promise.all([
-sb.rpc(typeof o.v2 === "function" && o.v2() ? "get_my_inbox_v2" : "get_my_inbox", { p_visitor: visitor }).then(rowsOf, function(){ return null; }),
+(typeof o.v2 === "function" && o.v2() ? sb.rpc("get_my_inbox_v2", { p_visitor: visitor }).then(function(res){
+return missingFn(res) ? sb.rpc("get_my_inbox", { p_visitor: visitor }) : res;
+}) : sb.rpc("get_my_inbox", { p_visitor: visitor })).then(rowsOf, function(){ return null; }),
 visitor ? sb.rpc("get_my_survey", { p_visitor: visitor }).then(rowsOf, function(){ return []; }) : none
 ]).then(function(r){
 if (!r[0]) return items;
@@ -3452,7 +3455,8 @@ where: where, H: H, sb: opt.sb || (H && H.supabase) || null, visitor: opt.visito
 name: opt.name || (H ? H.name : function(){ return ls("sh_display_name") || ""; }), home: opt.home || null,
 el: null, btn: null, say: null, st: simulate(null), rows: null, sayT: null, run: 0, wrongRun: 0, lastSection: "", lastInput: Date.now(),
 sessionStart: Date.now(), longNudges: 0, idleSaid: false, taps: 0, tapT: 0, lastHp: null, lastTalk: 0,
-bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false
+bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false,
+live: typeof opt.live === "function" ? opt.live : H && typeof H.live === "function" ? H.live : null
 };
 if (firstMeet) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }
 load();
@@ -3488,12 +3492,15 @@ return;
 }
 loadRemote();
 }
+function missingFn(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
 function loadRemote(){
 if (!M || !M.sb || !M.visitor) return;
-var v2 = false; try { var bd = window.shBootstrap && window.shBootstrap.data; v2 = !!((window.shGame && window.shGame.v2 && window.shGame.v2()) || (bd && bd.shop && bd.rank && bd.rank.journey != null)); } catch (e) {}
+var v2 = false; try { var bd = window.shBootstrap && window.shBootstrap.data; v2 = !!((M.live && M.live()) || (window.shGame && window.shGame.v2 && window.shGame.v2()) || (bd && bd.shop && bd.rank && bd.rank.journey != null)); } catch (e) {}
+function got(r){ if (r && !r.error && Array.isArray(r.data)) { M.rows = r.data; update(true); } }
 M.sb.rpc(v2 ? "get_pet_days_v2" : "get_pet_days", { p_visitor: M.visitor }).then(function(r){
-if (r && !r.error && Array.isArray(r.data)) { M.rows = r.data; update(true); }
-}, function(){});
+if (v2 && missingFn(r)) return M.sb.rpc("get_pet_days", { p_visitor: M.visitor }).then(got);
+got(r);
+}).then(null, function(){});
 }
 function update(quiet){
 var prev = M.st ? M.st.hp : null;

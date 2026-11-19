@@ -463,9 +463,10 @@ anim.onfinish = function(){ el.remove(); };
 document.addEventListener("sh:session-paid", function(e){
 var d = e.detail || {}, r = d.res; if (!r || !(r.xp > 0)) return;
 var G = window.shGames, run = G && G.ran ? G.ran(d.session) : null;
-var mine = run ? (((HX.C || {}).arcade || {}).games || []).filter(function(g){ return g.id === run.game; })[0] : null;
+var arc = !!run || d.kind === "arcade", gid = run ? run.game : arc ? d.game : null;
+var mine = gid ? (((HX.C || {}).arcade || {}).games || []).filter(function(g){ return g.id === gid; })[0] : null;
 todayRec().xp += r.xp; RANK.local += r.xp; saveState();
-prizeCard([{ t: (run ? (mine && mine.name) || run.name || "Arcade game" : "Mock exam") + " finished", xp: r.xp, c: studyCrowns(r.xp, r.mult), src: run ? "arcade" : "mock" }]);
+prizeCard([{ t: (arc ? (mine && mine.name) || (run && run.name) || "Arcade game" : "Mock exam") + " finished", xp: r.xp, c: studyCrowns(r.xp, r.mult), src: arc ? "arcade" : "mock" }]);
 paintMeters();
 });
 document.addEventListener("sh:pod-paid", function(e){
