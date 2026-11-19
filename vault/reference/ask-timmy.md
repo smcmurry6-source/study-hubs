@@ -37,11 +37,13 @@ there and in [decisions](../decisions.md)); **deployed and applied at [the redes
      2 (`widget/statements.js`): `inOrder()` renumbers the stem, choices, whys and explanation the same way, so Timmy calls a
      statement by the student's number (`tools/ci/statements.js` checks it matches the page's on every item);
    - `progress` ("What should I study tonight?"): `{ lectures: [{ hub, lec, questions, answered, right, missed,
-     notes_done }], answered_today, drill_today }`, worked out in the browser from the student's own answers.
+     notes_done }], answered_today, drill_today }`, worked out in the browser from the student's own answers (on the
+     dashboard, the device's merged with the server's: "The chat in the new pages" below).
 2. `timmy_begin` checks the limits, stores the question and returns the last 10 messages (the exact turn sent and the
    exact JSON answered, so the API's prompt cache hits on follow-ups).
 3. The request: the rules, then the hub's content (on the dashboard, every live hub's, in a fixed order), then the site
-   help, the content and the site help each with a 1-hour cache mark (the site help last since 2026-11-18, so an About
+   help (or, on the first question after an idle hour, the rules, the site help, then a part of the content: "Limits and
+   money" below), the content and the site help each with a 1-hour cache mark (the site help last since 2026-11-18, so an About
    page change rewrites only its ~40k tokens, not the hub's 130-160k: "Limits and money" below); then the earlier turns; then this turn: `<page>` (hub, voice, today in Central time,
    view, lecture, paragraph), `<answered_question>` (its choices without letters, the student's pick by its words: the card
    shuffles the choices and shows no letters), `<progress>`, `<student>` (escaped: what a student types is data).
@@ -130,6 +132,24 @@ list, no limit on gap answers. they are uncommon" ([decisions](../decisions.md))
   and the site help came first in the cached prompt, so each of those deploys sent every hub's whole content to the cache
   again. Reusing answers wouldn't help: students almost never ask the same thing (a handful of repeats in their first 148
   questions, all "why is it ..." on a question card, whose answer depends on what they picked).
+- **The first question after an idle hour gets a part of the content** (Sam, 2026-11-19: yes, with the eval;
+  [decisions](../decisions.md)). Before the model, the function asks `timmy_cache(key)` (`migration_v85.sql`; the key is the
+  hub, or `dashboard`, and a hash of the model, the rules and the content, `cacheKey()` in `core.js`) when the whole content
+  was last read. Read within 55 minutes (`WARM_MS`): the whole content, as before. Otherwise **a part** (`buildCorpus().part()`):
+  `PART_NOTE` (what's left out, and to answer "not_covered" when the answer needs it), the exam facts, the cram sheet, Exam
+  Hints and High likelihood topics, and the notes and review tables of the lecture on screen (`context.lec`) or of the
+  answered question; every other lecture is one line with its title and `notes="not sent"`. On the dashboard, no lecture's
+  notes. The system prompt is then the rules, the site help (1-hour cache, the same for every hub, so it stays warm), then the
+  part (a 5-minute cache: a follow-up reads it, and a write is 1.25x, not 2x). Unit ids are the full content's, so cites check
+  the same way. If the part's answer is "not_covered" (or doesn't parse), the function asks again with the whole content
+  (both calls' tokens and cost are stored) and marks it (`timmy_cache(key, true)`, at most every 5 minutes), so the rest of
+  the hour reads it whole. Declined, off topic, support and refusals from the part aren't asked again. Without the call (not
+  applied, or an error) it sends the whole content, as before. The edge log's `turn` line says which: `content` is `part`,
+  `part+full` or `full`. The part is a quarter to a third of the content (Perio's about 25k of about 99k tokens, by the
+  function's 3.6 characters a token; Heme & Endo Exam 3's about 30k of 113k). The eval in this mode, `--part` (2026-11-19,
+  $5.28 for all 50 cases, inflated by three cases writing the whole content at once): 49 passed; 34 turns answered from the
+  part, 16 asked again (the six "not covered" cases among them, as they should); a part answer about 1-3 cents, a part written
+  about 7-10 cents, the whole content written about $0.68 on Perio and $1.44 on the dashboard.
 
 ## The database (migration_v55)
 
@@ -159,6 +179,8 @@ he says they're his own mnemonic or analogy), an answer choice named by a letter
 no letters, so he names a choice by its words). Warnings (over 170 words, a British spelling, a missing "closest") are for a
 person to read. The full report (every question and answer) is written as markdown beside the run's summary.
 
+- `--part`: every question as the first after an idle hour (a part of the content first, the whole content only when the
+  part doesn't have it); the summary counts each. Run it after changing `PART_NOTE` or `part()`.
 - `node tools/timmy/eval.mjs --dry`: free; checks the test set (every "covered" case's terms are in its lecture, every
   "not covered" case's terms are in no hub content) and the grading. CI and `tools/release/run.js` run it.
 - The real run cost $11.71 for all 134 cases on 2026-11-12 (`--only <hub or case ids>` for fewer, `--max-usd` to stop
@@ -231,7 +253,10 @@ download it, which keeps the new dashboard inside its request budget (`tools/rel
   the level is As taught. `ask` waits for the answer to be recorded (`sh:answer-paid`, up to 2.5 s) so the server sees it
   answered. `progress` goes only with "What should I study tonight?" (the starter or a question like it), worked out in the
   browser from the hub's `core.json` and the student's own saved state (`shAsk.progressFrom`); on the dashboard, for each
-  live hub with a new version. The "chat" id continues the newest chat under 6 hours old; "New chat" starts another.
+  live hub with a new version, the device's saved state merged with the student's own answers from the server
+  (`get_my_answers`, every linked device's; `serverSeen` and `withServer`, a question keeping whichever copy has more tries,
+  as `SH_SYNC.merge` does on a hub page), so a new or linked device sees them without opening a hub first. The call is
+  skipped in a quiet spell (`shDb.busy()`) and given 4 seconds; without it, the device's copy alone (2026-11-19). The "chat" id continues the newest chat under 6 hours old; "New chat" starts another.
 - **What it draws**: every word with `textContent`. Each checked quote is a "From the notes" button (the hub's name in
   front on the dashboard), a `go` is a button ("Practice L8", "Open the notes"), `not_covered` gets "Closest:", a nap
   gets "Open the notes". Thumbs (`timmy_thumb`), Report (`timmy_report`, its note box; on a nap or an error too, with

@@ -9,7 +9,7 @@
 /* ---------- the panel ---------- */
 .ska { position: fixed; inset: 0; z-index: 9990; pointer-events: none; font-family: var(--font, system-ui, sans-serif); color: var(--text, #3b2e3a); }
 .ska-scrim { display: none; }
-.ska-panel { pointer-events: auto; position: absolute; right: 16px; bottom: 16px; top: calc(var(--bar-h, 64px) + var(--boss-h, 0px) + 12px); width: min(420px, calc(100vw - 32px));
+.ska-panel { pointer-events: auto; position: absolute; right: 16px; bottom: 16px; top: calc(var(--bar-h, 64px) + var(--boss-h, 0px) + 12px); width: min(420px, calc(100% - 32px));   /* % of .ska (the screen), not vw, which the text-size zoom enlarges (BUG-190) */
   display: flex; flex-direction: column; min-height: 0; border: 1px solid var(--border, #e8e0e6); border-radius: var(--r-panel, 16px); background: var(--ground, #fff);
   box-shadow: 0 10px 40px rgba(30, 20, 30, .18); outline: none; overflow: hidden;
   transform: translateY(12px); opacity: 0; transition: transform var(--t-ui, 240ms) var(--ease-out, ease), opacity var(--t-ui, 240ms) var(--ease-out, ease); }
@@ -22,6 +22,9 @@ html.sh-dash .ska-panel { top: 76px; }
 .ska-av.is-icon { color: var(--hub, #6b5a68); }
 .ska-av.is-icon svg { width: 26px; height: 26px; }
 .ska-tt { flex: 1; min-width: 0; }
+/* a panel under 260 px (a phone at X-Large or XX-Large text): the title needs the avatar's room beside the three buttons (BUG-190) */
+.ska-panel { container-type: inline-size; }
+@container (max-width: 260px) { .ska-av { display: none; } .ska-head { padding-left: 12px; gap: 4px; } }
 .ska-tt h2 { margin: 0; font-size: 18px; font-weight: var(--w-head, 800); line-height: 1.2; color: var(--text, #3b2e3a); }
 .ska-sub { margin: 2px 0 0; font-size: var(--fs-meta, 13px); color: var(--muted, #685c66); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ska-ib { flex: none; display: inline-grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--text, #3b2e3a); cursor: pointer; }
@@ -30,7 +33,7 @@ html.sh-dash .ska-panel { top: 76px; }
 .ska-ib:focus-visible, .ska-btn:focus-visible, .ska-chip:focus-visible, .ska-cite:focus-visible, .ska-src:focus-visible, .ska-link:focus-visible, .ska-send:focus-visible, .ska-fab:focus-visible, .ska-pastb:focus-visible, .ska-x:focus-visible,
 .ska textarea:focus-visible, .ska input:focus-visible, .ska select:focus-visible { outline: 3px solid var(--hub, #6b5a68); outline-offset: 2px; }
 
-.ska-note { margin: 0; padding: 8px 14px; font-size: 12.5px; line-height: 1.4; color: var(--muted, #685c66); border-bottom: 1px solid var(--rule, #efe9ed); }
+.ska-note { flex: none; max-height: 22%; overflow-y: auto; margin: 0; padding: 8px 14px; font-size: 12.5px; line-height: 1.4; color: var(--muted, #685c66); border-bottom: 1px solid var(--rule, #efe9ed); }   /* on a short or zoomed screen it scrolls instead of pushing the head off the top (BUG-190) */
 
 /* ---------- the messages ---------- */
 .ska-log { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 14px 14px 6px; display: flex; flex-direction: column; gap: 12px; }
@@ -107,10 +110,10 @@ html.sh-dash .ska-av { border-color: var(--primary, #3b2e3a); }
 .ska-pastb small { font-size: 12.5px; color: var(--muted, #685c66); }
 
 /* ---------- the box ---------- */
-.ska-foot { display: grid; gap: 8px; padding: 8px 12px 12px; border-top: 1px solid var(--rule, #efe9ed); background: var(--ground, #fff); }
+.ska-foot { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; padding: 8px 12px 12px; border-top: 1px solid var(--rule, #efe9ed); background: var(--ground, #fff); }
 .ska-starters { display: flex; flex-wrap: wrap; gap: 6px; }
 .ska-chip { min-height: 36px; padding: 0 14px; border: 1px solid var(--hub-mid, #a897a4); border-radius: var(--r-pill, 999px); background: var(--hub-light, #ece6ea); color: var(--text, #3b2e3a);
-  font: inherit; font-size: 13.5px; font-weight: var(--w-strong, 700); cursor: pointer; }
+  max-width: 100%; padding-block: 6px; text-align: left; font: inherit; font-size: 13.5px; line-height: 1.25; font-weight: var(--w-strong, 700); cursor: pointer; }
 .ska-chip:hover { filter: brightness(.97); }
 .ska-attach { display: flex; align-items: center; gap: 8px; padding: 6px 6px 6px 12px; border-radius: 12px; background: var(--hub-light, #ece6ea); font-size: 13px; }
 .ska-attach-l { flex: none; font-weight: var(--w-strong, 700); }
@@ -147,7 +150,7 @@ html.sh-mock-on .ska-fab, html.ska-open .ska-fab { display: none; }
   .ska { pointer-events: auto; z-index: 10002; }
   .ska-scrim { display: block; position: absolute; inset: 0; background: rgba(20, 14, 20, .42); opacity: 0; transition: opacity var(--t-ui, 240ms); }
   .ska.is-on .ska-scrim { opacity: 1; }
-  .ska-panel, html.sh-dash .ska-panel { left: 0; right: 0; bottom: 0; top: auto; width: auto; height: 88vh; height: 88dvh; max-height: calc(100% - 24px);
+  .ska-panel, html.sh-dash .ska-panel { left: 0; right: 0; bottom: 0; top: auto; width: auto; height: max(88%, min(100% - 24px, 480px)); max-height: calc(100% - 24px);   /* a short screen (or large text) gets all but 24 px */
     border-radius: 20px 20px 0 0; border-bottom: 0; transform: translateY(40px); padding-bottom: env(safe-area-inset-bottom, 0px); }
   .ska-fab { left: 8px; width: 50px; height: 50px; bottom: calc(var(--sh-tabbar-h, 60px) + 8px + env(safe-area-inset-bottom, 0px)); }
   html.ska-open body { overflow: hidden; }

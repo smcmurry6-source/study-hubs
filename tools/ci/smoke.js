@@ -171,6 +171,24 @@ async function askCheck(page, name, o){
     const h = await page.evaluate(() => location.hash);
     if (h !== '#notes/' + o.lec) problems.push(`${name}: the answer's "From the notes" link opened ${h}, not #notes/${o.lec}`);
   }
+  /* the dashboard's "What should I study tonight?" reads the student's own answers from the server (get_my_answers), so a
+     new or linked device sees what was answered elsewhere: every question answered right there must reach the progress sent */
+  if (o.hubId === 'dashboard' && b && Array.isArray(b.hubs)) {
+    const hub = b.hubs.find(h => fs.existsSync(content(h, 'core.json')));
+    const idx = hub ? (JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8')).index || []) : [];
+    if (idx.length) {
+      const asked = [], rows = idx.map((r, i) => [r[0], 1763500000 + i, 1]);
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_answers/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
+        asked.push(a.p_hub); return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(a.p_hub === hub ? rows : []) }); });
+      const n0 = sent.length;
+      await page.fill('#skaIn', 'What should I study tonight?'); await page.click('.ska-send');
+      await page.waitForFunction(n => document.querySelectorAll('.ska-m.is-tim:not(.is-wait)').length >= n, n0 + 1, { timeout: 8000 }).catch(() => {});
+      const t = sent[n0], row = t && t.progress && (t.progress.lectures || []).find(x => x.hub === hub && x.answered > 0);
+      if (!asked.includes(hub)) problems.push(`${name}: "What should I study tonight?" didn't read the student's answers from the server (get_my_answers for ${hub})`);
+      else if (!row || row.answered < 1 || row.right < 1) problems.push(`${name}: the answers from the server didn't reach "What should I study tonight?"'s progress (${JSON.stringify(row || (t && t.progress) || null)})`);
+      await page.unroute(/supabase\.co\/rest\/v1\/rpc\/get_my_answers/);
+    }
+  }
   if (await page.$('.ska.is-on')) { await page.click('[data-ska="close"]'); await page.waitForTimeout(300); }
   return sent;
 }
@@ -2092,7 +2110,7 @@ function lint(hub, A){
       if (r.top < -1 || r.bottom > H + 1) out.push(`${what} is taller than the screen (${Math.round(r.top)} to ${Math.round(r.bottom)} of ${H}px)`);
       if (el.scrollWidth > el.clientWidth + 1) out.push(`${what} scrolls sideways by ${el.scrollWidth - el.clientWidth}px`);
       for (const c of el.querySelectorAll('button, a')) {
-        const cs = getComputedStyle(c), b = c.getBoundingClientRect(); if (cs.display === 'none' || cs.visibility === 'hidden' || !b.width || c.closest('[hidden]')) continue;
+        const cs = getComputedStyle(c), b = c.getBoundingClientRect(); if (cs.display === 'none' || cs.visibility === 'hidden' || !b.width || c.closest('[hidden]') || c.closest('.tsh-rcards')) continue;   /* a shop shelf scrolls sideways on a phone */
         if (b.left < Math.max(0, r.left) - 1 || b.right > Math.min(W, r.right) + 1) { out.push(`${what}: "${(c.getAttribute('aria-label') || c.textContent).trim().replace(/\s+/g, ' ').slice(0, 30)}" runs past its edge`); break; }
       }
       return out;
@@ -2124,8 +2142,31 @@ function lint(hub, A){
       const dlg = await page.waitForSelector('dialog.tpv[open]', { timeout: 10000 }).catch(() => null);
       if (!dlg) problems.push(`index.html (${label}): tapping Timmy's place didn't open its full view`);
       else { await page.waitForTimeout(600); report(await onScreen('dialog.tpv[open]', "Timmy's place")); }
+      await page.keyboard.press('Escape'); await page.waitForTimeout(200);
+      await page.evaluate(() => document.querySelectorAll('dialog[open]').forEach(d => { try { d.close(); } catch (e) {} }));
     }
-    notes.push(`the dashboard's More menu, Settings, Timmy's checkup and his place fit the screen at ${label}`);
+    // Timmy's Shop and an item's sheet, and Ask Timmy's panel (BUG-190): sized in % of the screen, not vw and dvh
+    const shopBtn = await page.$('.dx-shopbtn');
+    if (shopBtn) {
+      await page.evaluate(() => document.querySelector('.dx-shopbtn').click());
+      const card = await page.waitForSelector('dialog.tsh-dlg[open] [data-shop="item"]', { timeout: 8000 }).catch(() => null);
+      if (!card) problems.push(`index.html (${label}): Timmy's Shop didn't open with its items`);
+      else {
+        await page.waitForTimeout(300); report(await onScreen('dialog.tsh-dlg[open] .tsh-dlgin', "Timmy's Shop"));
+        await page.evaluate(() => document.querySelector('dialog.tsh-dlg[open] [data-shop="item"]').click());
+        const sheet = await page.waitForSelector('dialog.tsh-sheet[open] .tsh-item', { timeout: 4000 }).catch(() => null);
+        if (!sheet) problems.push(`index.html (${label}): an item in Timmy's Shop didn't open its sheet`);
+        else { await page.waitForTimeout(300); report(await onScreen('dialog.tsh-sheet[open] .tsh-item', "a shop item's sheet")); }
+      }
+      await page.evaluate(() => document.querySelectorAll('dialog[open]').forEach(d => { try { d.close(); } catch (e) {} }));
+    }
+    if (await page.evaluate(() => !!(window.shAsk && window.shAsk.available && window.shAsk.available()))) {
+      await page.evaluate(() => window.shAsk.open()); await page.waitForTimeout(600);
+      report(await onScreen('.ska.is-on .ska-panel', "Ask Timmy's panel"));
+      if (await page.evaluate(() => { const p = document.querySelector('.ska.is-on .ska-panel'); return !!p && p.scrollTop > 1; })) problems.push(`index.html (${label}): Ask Timmy's panel is taller than its box (its header scrolled off the top)`);
+      await page.evaluate(() => window.shAsk.close());
+    }
+    notes.push(`the dashboard's More menu, Settings, Timmy's checkup, his place, the shop and Ask Timmy fit the screen at ${label}`);
     await context.close();
   }
   // every view of a hub on the engine fits a 320px phone at the largest text (BUG-168, 2026-11-19): the check above opens
