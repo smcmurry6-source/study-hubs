@@ -32,6 +32,43 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (the dashboard's hub card and What's new, Claude Code)** — Sam: "Make the timmy time card a part of the hub
+  blast on home dashboard. Make the whats new box take up that space between the hub card and the you and leaderboard
+  cards and look super cool, reformat and rework send luck to make space". `widget/dash.js` + `widget/dash.css` (bundles
+  rebuilt). **The stage** (the open hub's card) gets a foot, `.dx-dock`: the Timmy Time card is now a strip there (Timmy on
+  the air at the left, still animated, Listen at the right), and exam-day luck is a tile beside it (clover, count and
+  latest names, Send luck; the exam's name is the title just above, so it isn't repeated); either one alone spans the
+  foot. The hub's other exams moved under the countdown. **What's new** (`.dx-wn`, `newsHTML`/`drawNews`) replaces the
+  row under the stage (Timmy Time + the About card with its one-line What's new): a box on a night field of the hub's color
+  (dark in both themes) with a drawn megaphone, the hub's and the site's latest six changelog lines as paper cards on a
+  timeline, newest first (a gold ring on it), each with its time and hub tag on the timeline's line (gold for every hub),
+  the first clause bold when it is short, three lines and More for a long one; it scrolls sideways a card at a time
+  (arrows on a laptop, swipe on a phone). Then Sam: "make it a bit thinner. its taking up a lot of space": one-line
+  header, tags on the line, three-line cards, about 230 px tall on a laptop (it was about 400 in the first draft).
+  Then **"redo the send luck button"**: Send luck is a chunky game button (an ink outline, pressed into its shadow when
+  tapped, a shine across it, the clover on a gold coin that wiggles now and then), gold with "Luck sent!" once sent, and
+  the tile's separate clover circle is gone; on a phone the button takes its own full-width row. And **"do the art too"**:
+  exam-day luck's clover is drawn as a sticker (`CLOVER` in `widget/dash.js`: one heart-shaped leaf four times, the ink
+  outline under the green, a vein and a shine on each), on the coin, in the burst when you send it, as two small clovers
+  and a sparkle bobbing around the button, and as a big faint one in the tile's corner. One drawing reused, so it costs
+  about 0.5 KB: the dashboard is at 353,341 of the 353,791 bytes its 345 KB budget allows.
+  Changes since this device last saw that hub's box say New, with a count ("3 new since your last visit", "3 new" on a
+  phone; `sh_news_seen` in localStorage, per hub; a first visit counts the last day's). The hub's description opens
+  from "About this hub" in the box's header.
+  Event `news:more` (the arrows) replaces `news:open` ([event-taxonomy](vault/reference/event-taxonomy.md)). The About
+  page, the tour's steps and the preview's fixture changelog (five entries now) follow.
+  The shared stylesheet's growth (about 1.7 KB gzipped) put Occlusion's archived page at 801 KB of its 800 KB budget on
+  CI (800 on `main`); Sam: "occlusion can be retired since the exam has already happened", so `tools/release/perf.js` now
+  measures only live hubs, as a11y and the device matrix already did (`--page` still measures an archived one).
+  Then Sam: **"we can take the page down"**: **Occlusion's page is off the site** (`hubs/occlusion/`: the page, its content
+  JSON and 10 images, 3.5 MB; and `assets/og-occlusion.png`). Its retrospective and recap were done 2026-11-17 and its audio
+  was already off. With it: its About page entries (What cusp hits where?, its drawn and interactive diagrams, its arcade
+  column, its filters, formats and mock), its budget line, its figure build in "Check hubs" (`tools/figures/occlusion/`
+  stays, with nothing to write to), the smoke test's cusp-game checks, and Ask Timmy's 43 eval cases for it (two dashboard
+  cases now ask about Heme & Endo Exam 3). `tools/release/xp.js` grades Perio's real bank and `tools/release/admin-ui.js`
+  archives Perio by hand instead. Its `hubs.js` entry stays for its check-ins, and its id list, art and podcast scripts stay
+  ([hub note](vault/hubs/occlusion.md)).
+
 - **2026-11-19 (Collections, Claude Code)** — Sam: "in the timmy card i want there to be a button where you can view your
   collections of items bought in the shop. holiday collections and other things. you can see your progress and all and
   completing a collection gives 1000 xp and 1000 crowns as a bonus". A **Collections** button in Timmy's place (under

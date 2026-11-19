@@ -5,7 +5,7 @@ tags: [how-to, hubs]
 
 # Build a hub, or add a lecture to one
 
-The checklist for a new hub on the engine (Occlusion and Perio are the ones to read: `hubs/occlusion/`). Every note in `vault/rules/` applies; this note says
+The checklist for a new hub on the engine (Perio and Heme & Endo Exam 3 are the ones to read: `hubs/perio/`). Every note in `vault/rules/` applies; this note says
 where each piece goes. Adding a lecture to a live hub: the last section.
 
 ## Before you start
@@ -24,14 +24,14 @@ where each piece goes. Adding a lecture to a live hub: the last section.
 Since the redesign's release (2026-11) every hub runs on the shared engine (`widget/hub.js` and its three parts,
 `widget/hub.css`); nobody copies a hub file any more. A hub is **a small page of settings and its content as JSON**.
 
-- **The page**, `hubs/<hub-id>/index.html`: copy `hubs/occlusion/index.html` and change its words. It holds the head
+- **The page**, `hubs/<hub-id>/index.html`: copy `hubs/perio/index.html` and change its words. It holds the head
   tags, `window.SH_HUB` (hub id, name, a new state key `<slug>-state-v1` and answered event `<slug>:answered`, the exam,
   and the hub's own wording for Home, Notes, hints, the mock and the arcade), then `widget/hub-art/<hub-id>.js` and
   `widget/hub.bundle.js`. Nothing else goes in the page.
 - **The content**, `hubs/<hub-id>/content/`: `core.json` (lectures with `id`, `num`, `title`, `who`, `status` taught /
   slides / upcoming, `tag`, and `from` when the lecture's line under its title shouldn't read "recording and slides" or
   "slides only", e.g. "recording only" for a lecture whose slides couldn't be read; `examInfo`, `courseDates`, `likelyTopics`, the mock blueprint (and, if you want it, `mock.likelyShare`, 0-1:
-  about that share of each lecture's mock questions from its High likelihood ones; Occlusion's final uses 0.75), `examCounts` if counts per
+  about that share of each lecture's mock questions from its High likelihood ones; Occlusion's final used 0.75), `examCounts` if counts per
   lecture were announced, the podcast), `questions.json` (every question, each with `src` and its `why`),
   `notes.json` (`full` and `plain`), `study.json` (hints quoted from the recordings, the cram sheet, the Side by side
   tables and processes, the arcade's sort sets), `figures.js/css` and `arcade.js/css`. **The JSON is the source**: edit
