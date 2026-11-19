@@ -547,7 +547,7 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .lb.gd-lb { background: var(--hub-soft); color: var(--hub-text); border-color: transparent; }
 .lec-list li:has(> .lec-guide) { padding-bottom: 8px; margin-bottom: 2px; border-bottom: 1px solid var(--border); }
 .gd-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 8px; }
-.hx .gd-chip.lc { background: var(--lc-soft); color: var(--lc-ink); font-weight: var(--w-strong); }
+.hx .gd-chip.lc { background: var(--lc-soft); color: var(--lc-ink); font-weight: var(--w-strong); max-width: 100%; white-space: normal; text-align: left; height: auto; padding-top: 6px; padding-bottom: 6px; line-height: 1.3; }   /* a long title wraps on a phone */
 .hx .gd-chip.lc:hover { background: var(--lc-soft); box-shadow: inset 0 0 0 2px var(--lc); }
 .gd-chip .ld { margin: 0; }
 .gd-lec, .gd-lec h3 { scroll-margin-top: calc(var(--bar-h, 64px) + 16px); }
