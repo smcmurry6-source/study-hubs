@@ -213,7 +213,7 @@
   /* where the student is in the notes: the lecture, and (in the notes as taught) the paragraph at the top of the screen,
      counted the way exportSections and SH_GOTO count them, so it is the same address the server's quotes use */
   function askPlace(){
-    if (HX.view !== "notes") return null;
+    if (HX.view !== "notes" || HX.sub === "guide") return null;   // the study guide is no one lecture's notes
     var lec = HX.LBY[HX.sub] ? HX.sub : STATE.ui.lec; if (!HX.LBY[lec]) return null;
     var out = { lec: lec };
     if ((STATE.ui.level || "full") !== "full") return out;
