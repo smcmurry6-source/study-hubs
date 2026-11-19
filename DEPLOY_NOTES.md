@@ -45,6 +45,13 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   table; an answer save 3.81 → 2.19 ms for a heavy student, 2.86 → 2.12 middling, 2.53 → 2.01 light. Nothing students see
   or earn changes. `tools/release/xp.js` checks the totals against the sums; `pg.js` takes extra server settings.
   [The task note](vault/tasks/2026-11-18-database-optimization-pass.md) has the numbers; tonight's readout goes there too.
+- **2026-11-19 (The check-in's last question, Claude Code)** — Sam: "Lets change the free response question to just asking what the hub could
+  have done better". The exam check-in's text step (`DEBRIEF_QS` in `widget/dash.js`) now asks "What could the hub have done better?" and its box
+  has no placeholder (it was "e.g. more on suture types, more EXCEPT questions", from the 2026-10-02 version that asked for topics the hub
+  missed). Timmy's line on that step is "What could I have done better?" when the check-in no longer pays. The honor-code note stays, and the
+  answer key is still `missed`, so the admin page (its heading now "What the hub could have done better"), `/lessons-audit` and the idea board's tick
+  read it as before. About page, Ask Timmy's site help and the lessons-audit skill updated.
+
 - **2026-11-19 (About page accessibility, Claude Code, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453))** — the last three accessibility bugs from
   the release dry run, all on `about/index.html`: BUG-007, the nine contents links at the top turned their focus outline off
   (`nav.toc a:focus-visible{outline:none}`), so a keyboard user couldn't see where they were; they now get the page's ring.

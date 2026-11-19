@@ -1042,7 +1042,7 @@
     { id:"ready", kind:"scale", prompt:"How ready did you feel walking in?", ends:["Not ready","Very ready"] },
     { id:"went", kind:"choice", prompt:"How did it go?", options:["Better than I expected","About what I expected","Worse than I expected"] },
     { id:"match", kind:"choice", prompt:"How did the hub's questions compare with the real exam?", options:["Hub was harder","About right","Hub was easier","Exam asked different things"] },
-    { id:"missed", kind:"text", prompt:"Anything the hub could do better?",
+    { id:"missed", kind:"text", prompt:"What could the hub have done better?",
       note:"Please don't write out exam questions or answers: the honor code keeps exam content private." }
   ];
   var debriefSb = null;
@@ -1094,7 +1094,7 @@
     var QS = debriefQs(x), answers = {}, examId = x.date + " " + (x.label || "Exam"), step = 0, last = QS.length - 1, timer = null;
     /* the server pays for the first check-in for this exam; one already sent from this device had it, so it isn't offered */
     var pays = !ls("sh_debrief_sent_" + hub.id + "_" + x.date);
-    /* the idea board's tick under "Anything the hub could do better?" (widget/ideas.js, Sam 2026-11-06): ticked to
+    /* the idea board's tick under "What could the hub have done better?" (widget/ideas.js, Sam 2026-11-06): ticked to
        start, it shows the answer as the post it would make (a title, the text cut to 280, its kind) and posts it under
        the writer's leaderboard name when the check-in is sent. Unticked, the answer stays private, as before. The tick
        draws nothing until the board is up, and what it holds (ideaPost) outlives a Back and Next. */
@@ -1104,7 +1104,7 @@
     var box = W.box;
     /* what Timmy says over the window, step by step */
     function line(q){
-      if (step === last) return pays ? "Last one! Send it and the crowns are yours." : "Last one. What could I do better?";
+      if (step === last) return pays ? "Last one! Send it and the crowns are yours." : "Last one. What could I have done better?";
       if (step === 0) return pays ? (again ? "Me again! " : "Psst! ") + "A few quick taps and " + num(FORM_CROWNS) + " crowns are yours." : "Back again? I'm all ears.";
       if (q.id === "went") return "So? How did it go?";
       if (q.id === "match") return "Did my questions look like the real thing?";
@@ -1120,7 +1120,7 @@
         (pays ? lootHtml("Send it and earn", FORM_XP, FORM_CROWNS) : "");
       h += '<div class="survey-q" data-sq="' + q.id + '" data-kind="' + q.kind + '"><p' + (step ? ' class="debrief-prompt"' : '') + '>' + esc(q.prompt) + '</p>';
       if (q.kind === "text") h += (q.note ? '<p class="survey-why">' + esc(q.note) + '</p>' : '') +
-        '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '" placeholder="e.g. more on suture types, more EXCEPT questions">' + esc(v || "") + '</textarea>' +
+        '<textarea maxlength="600" aria-label="' + esc(q.prompt) + '">' + esc(v || "") + '</textarea>' +
         (q.id === "missed" ? '<div data-idea-tick></div><p class="survey-why debrief-warn" role="alert"></p>' : '');
       else if (q.kind === "scale") {
         h += '<div class="survey-opts survey-scale">';
