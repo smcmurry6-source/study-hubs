@@ -15,7 +15,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `qh_report('perio')` was read after S6 went taught. Read both, early in the day or in the quiet hours, when the retrospective runs.
 - [ ] **Sam's call: the shop's prices against the faster earning** (2026-11-18, the evening lessons refresh): an hour of study now
   pays about 630 crowns (370 before #403's prizes), the median wallet holds 9,600 and an Epic takes under 3 median study days.
-  The options are in that refresh's PR ("For Sam"); decide on a normal week's reading after the exams, not on an exam eve.
+  The options are in [#440](https://github.com/smcmurry6-source/study-hubs/pull/440) ("For Sam"); decide on a normal week's reading after the exams, not on an exam eve.
 - [x] **The rank pill while the bootstrap times out** (done: it drew the wrong thing, no double-XP chip and from 50,000 XP the
   wrong rank or journey; `widget/ranks.js` asks the v2 profile when `shGame.live()`,
   [#435](https://github.com/smcmurry6-source/study-hubs/pull/435)) (2026-11-18, found with BUG-183, #427). `widget/ranks.js` asks
