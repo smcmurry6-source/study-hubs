@@ -64,6 +64,12 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   own mobility** between two mirror handles (Miller's index), decided he's a Class three, and pressed down on himself for
   vertical movement: nothing. He moved about a tenth of a millimeter, physiologic ("You have a ligament. It's supposed to
   give.").
+  After the lymphoma lecture (Heme & Endo Exam 3) he wrote Timmy a letter about **a bump**: firm, painless, "there as long as
+  I can remember", with night sweats, and asked whether he should be staged. It's his cusp ("You've had it since you
+  erupted. You don't have lymph nodes. You're a tooth."), and the night sweats are the tiny scarf he's slept in since Exam
+  One ("The tissue makes the diagnosis, and your tissue is enamel."). He accepted it, still wants it biopsied, and asks that
+  it be sent fresh, not in formalin. In the comments he found more bumps: he has four cusps (true: a lower second molar has
+  four, two buccal and two lingual).
 - **The rabbit down the hill** (new in the implants episode's comments): offended that Timmy called rabbits "showy" for
   teeth that never stop growing (true: rabbit teeth grow all their lives and are worn down by chewing). Proud that
   osseointegration was found in rabbit bone (Brånemark, 1952).
@@ -163,6 +169,12 @@ Where the widgets already do something (`widget/pet.js`, `widget/timmy.js`), the
   follicle, the sac of tissue around the developing tooth, and his made his cementum, his periodontal ligament and the bone
   around his roots (true: the dental follicle forms the cementum, the ligament and the alveolar bone proper). "You know
   how I feel about my ligament. Turns out it runs in the family."
+- **He has blood too** (Heme & Endo Exam 3, the hematology lecture): his pulp has blood vessels and nerves running up
+  through his roots, "so technically, this lecture is about me." Keep it to vessels and nerves (no lymph nodes, no marrow).
+- **"A tooth for every baby" is an old saying, not physiology** (Heme & Endo Exam 3, with pregnancy): a pregnancy doesn't
+  pull calcium out of the mother's teeth; the baby's calcium comes from her diet and her bone ("The bank is bone,
+  remember."). What pregnancy does do is the gums: pregnancy gingivitis and the pyogenic granuloma (Dr. Taylor's Lecture
+  A). "The saying gets the mouth right and the reason wrong."
 - **His own furcation** (Perio final): as a lower first molar he has two furcation entrances, buccal and lingual, on a
   short root trunk, about 2.4 and 2.5 mm from the CEJ (Bower, the S5 notes): "about two and a half millimeters of
   attachment loss, and you're in my furcation. Please be gentle with the Nabers probe." His mesial root has the concavity
@@ -187,7 +199,8 @@ number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a n
 - Opens: "Hey. It's Timmy, and this is Timmy Time." Closes: "This has been Timmy Time. I'm Timmy. Brush, floss, and ..."
   with a new ending each time (MSK: "go get it"; Occlusion: "bite down with confidence"; Heme & Endo: "keep your feedback
   negative"; PCD Implants: "torque responsibly"; Heme & Endo Exam 2: "surge when it counts", the L-H surge; Perio final: "mind the furcation"; the Occlusion
-  final: "stay balanced", the denture's bilateral balance).
+  final: "stay balanced", the denture's bilateral balance; Heme & Endo Exam 3: "keep your blasts under twenty", acute
+  leukemia's threshold).
 - Lightning round intro: answer out loud, "nobody can hear you. Except me." (Heme & Endo added "And, apparently, number
   thirty-one.")
 - Warm, dry, a little vain. Jokes are short and come after the fact, never instead of it. He quotes the professors
@@ -204,3 +217,4 @@ number thirty-one, the rabbit down the hill, the toothbrush by the door. Add a n
 | `heme-endo-exam2` | `heme-endo-exam2/script.md` | 52 min | Thirty-one's glucose meter ("You don't have a pancreas"); Timmy came from a dental follicle; the pie is a postprandial event. Comments: thirty-one, the toothbrush by the door |
 | `perio` | `perio/script.md` | 52 min | Timmy's own furcation (two entrances, about 2.5 mm down; the mesial root concavity); thirty-one stages himself with a toothpick ("You're not staged. You're anxious."), may have an enamel projection, and wasn't Dr. Kaur's thirty-one; wants "a natural tooth is almost always better than an implant" framed over his furcation (S6, rewritten from the class 2026-11-18); the toothbrush's big episode (Phase one starts with oral hygiene); the pie, still decorative, after the release. Comments: thirty-one, the toothbrush by the door |
 | `occlusion` (final) | `occlusion/script.md` | 48 min | The first exam after the release: "whatever you put me in"; thirty-one's one-tooth night guard ("You don't have a brainstem") and his self-checked mobility ("You have a ligament. It's supposed to give."); the toothbrush vindicated by L9, with no pressure sensor; denture teeth are not teeth; two roots move less. Comment: the toothbrush by the door |
+| `heme-endo-exam3` | `heme-endo-exam3/script.md` | 52 min | Thirty-one's letter about a bump ("That's your cusp"; the night sweats are the tiny scarf; send it fresh, not in formalin); "a tooth for every baby" is a saying, not physiology; Timmy has blood too (his pulp). Comment: thirty-one, who has four cusps |
