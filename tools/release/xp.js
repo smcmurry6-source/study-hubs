@@ -8,7 +8,7 @@
 //   - question keys: loading needs the secret; the server decides right or wrong (one choice, select all, order, self
 //     graded, a page's older version), and unknown or retired ids earn nothing;
 //   - XP with no daily cap: 10 / 2 / 1, three paying right (and wrong) answers per question a day, the speed limit
-//     (2 seconds, 30 a minute), and every source: a day studied, the 20th answer, a fixed miss, a finished mock, the
+//     (2 seconds, 30 a minute), and every source: a day studied, the 20th answer, a finished mock, the
 //     mastery medals and their double XP, Timmy Time minutes, a finished arcade game, a fixed report;
 //   - a replayed call, a double tap and a linked device pay once, and the rebuild gives exactly what the live calls paid;
 //   - Shiny Gold Crowns (from base XP, the grants since the switch, minus spending), the shop's rotation and seasons,
@@ -291,13 +291,17 @@ try {
   const g = [];
   for (let i = 0; i < 25; i++) g.push(ans('xp-G', 'x' + (1 + (i % 16)), { choice: 1, at: i * 5 }));
   ok(g[19].bonus.some(b => b.src === 'goal20' && b.xp === 30 * g[19].mult) && g.filter(r => r.bonus.some(b => b.src === 'goal20')).length === 1, 'the day\'s 20th answer pays +30 once');
-  // a fixed miss
+  // no "A miss fixed" bonus any more (v78, Sam 2026-11-19): a miss from an earlier day, right today, pays the answer alone
   ans('xp-F', 'x5', { choice: 0, at: 0 });
-  ok(ans('xp-F', 'x5', { choice: 1, at: DAY }).bonus.some(b => b.src === 'fix' && b.xp === 5), 'missed yesterday, right today: +5');
+  const fx = ans('xp-F', 'x5', { choice: 1, at: DAY });
+  ok(fx.xp === 10 && !fx.bonus.some(b => b.src === 'fix'), `missed yesterday, right today: the answer's 10 XP and no "A miss fixed" bonus (${fx.xp}, ${JSON.stringify(fx.bonus)})`);
   ans('xp-F', 'x5', { choice: 0, at: 2 * DAY });
-  ok(!ans('xp-F', 'x5', { choice: 1, at: 3 * DAY }).bonus.length, 'the same question fixed again: once per question');
+  ok(!ans('xp-F', 'x5', { choice: 1, at: 3 * DAY }).bonus.length, 'missed again, right again: no bonus');
   ans('xp-F', 'x6', { choice: 0, at: 3 * DAY + 10 });
-  ok(!ans('xp-F', 'x6', { choice: 1, at: 3 * DAY + 20 }).bonus.length, 'missed and fixed the same day: no fix bonus');
+  ok(!ans('xp-F', 'x6', { choice: 1, at: 3 * DAY + 20 }).bonus.length, 'missed and right the same day: no bonus');
+  eq(num(`select count(*) from xp_awards where visitor_id = 'xp-F' and src = 'fix'`), 0, 'no fix award is written');
+  // one paid before v78 (made here the way sh_answer paid it) stays through the rebuild below
+  eq(num(`select sh_award('xp-F', 'fix:xh:x9', 'fix', 'xh', 5, 1, now() - interval '3 days')`), 5, 'a fix award from before v78');
   // a mock: its answers come in at the end, so each needs 2 seconds of mock time
   const m1 = one(`select sh_session_start(${T(0)}, 'xp-M', 'xh', 'mock', null)`);
   const mk = []; for (let i = 0; i < 12; i++) mk.push(ans('xp-M', 'x' + (i + 1), { choice: i % 4 ? 1 : 0, ctx: 'mock', session: m1, at: 30 + i * 0.1 }).xp);
@@ -403,17 +407,18 @@ try {
   const rep = anonJson(`(select json_agg(x) from get_reports_v2(${S}) x)`);
   ok(rep.some(r => r.kind === 'flag' && r.id === fid && r.outcome === 'fixed' && r.xp_paid) && rep.some(r => r.kind === 'suggestion' && r.outcome === 'no-change' && !r.xp_paid), 'get_reports_v2 shows each outcome and whether it paid');
   ok(anonJson(`(select json_agg(x) from get_my_inbox_v2('xp-S2') x)`).some(r => r.kind === 'flag' && r.outcome === 'fixed'), 'the sender\'s Inbox says Fixed');
-  notes.push('sources: the 20th answer, a fixed miss, mocks, medals with double XP (no back pay), Timmy Time, the arcade, fixed reports');
+  notes.push('sources: the 20th answer (no fixed-miss bonus since v78), mocks, medals with double XP (no back pay), Timmy Time, the arcade, fixed reports');
 
   /* ---------- 7. the rebuild gives what the live calls paid ---------- */
   const ids = ['xp-A', 'xp-W', 'xp-R', 'xp-G', 'xp-F', 'xp-M', 'xp-M3', 'xp-M4', 'xp-D', 'xp-D2', 'xp-P', 'xp-Q', 'xp-V', 'xp-O', 'xp-L1'];
   const arr = `array[${ids.map(q).join(',')}]`;
-  const live = rows(`select visitor_id, key, xp, base from xp_awards where visitor_id = any(${arr}) and src in ('answer','goal20','fix') order by 1, 2`);
+  const live = rows(`select visitor_id, key, xp, base from xp_awards where visitor_id = any(${arr}) and src in ('answer','goal20') order by 1, 2`);
   const replay = rows(`select visitor_id, key, xp, base from sh_xp_replay(${arr}) order by 1, 2`);
-  eq(replay, live, `the replay matches every live answer, goal and fix award (${live.length} rows)`);
+  eq(replay, live, `the replay matches every live answer and goal award (${live.length} rows)`);
   const xpLive = rows(`select visitor_id, xp, days, answers, correct from xp_visitors where visitor_id = any(${arr}) order by 1`);
   sql(`select sh_xp_rebuild(${arr})`);
   eq(rows(`select visitor_id, xp, days, answers, correct from xp_visitors where visitor_id = any(${arr}) order by 1`), xpLive, 'the rebuild gives every total the live calls gave');
+  eq(num(`select count(*) from xp_awards where visitor_id = 'xp-F' and key = 'fix:xh:x9' and xp = 5`), 1, 'the rebuild keeps a fix award paid before v78 (nobody\'s XP or crowns go down)');
   notes.push(`rebuild = live: ${live.length} replayed awards over ${ids.length} visitors`);
 
   /* ---------- 8. Link my devices ---------- */
