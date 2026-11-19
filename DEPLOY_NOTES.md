@@ -53,8 +53,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   database. BUG-181's retest: the evening before the Perio final, 20 of about 11,900 answer saves failed their first try
   (no burst; the page sends each again), against 9 in 10 the afternoon before. **Both migrations applied live** on
   2026-11-19 at about 4:15 am Central, before the merge (through the connector, md5-checked before and after; in
-  `supabase/schema.sql`). The same hour: the ping table's rewrite had run (`activity_pings` 166 MB to 31 MB, the database
-  414 MB to 318 MB), and the live `pg_stat_statements` and same-page update numbers are in the task's Log.
+  `supabase/schema.sql`). The ping table's rewrite had run half an hour before (#445: `activity_pings` 179 MB to 31 MB, the
+  database 465 MB to 318 MB), and the live `pg_stat_statements` and same-page update numbers are in the task's Log.
 - **2026-11-19 (Heme & Endo Exam 3: the study guide narrated with Kokoro, Claude Code)** — Sam: "add kokoro". Dr. Herr's
   study guide page (`#notes/guide`) has its own recording, `hubs/heme-endo-exam3/audio/guide.mp3` with its words file, so Listen
   plays it in the notes' narrator's voice with Follow along and tap-a-word-to-jump. It is spoken from the page's readable part,
