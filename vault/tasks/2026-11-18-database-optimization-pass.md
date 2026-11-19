@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr:
+pr: https://github.com/smcmurry6-source/study-hubs/pull/444
 ---
 
 # The database optimization pass: the same site for less of the Free plan's CPU
@@ -141,7 +141,8 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
 
 - 2026-11-18: written after the evening outage, with the numbers above.
 - 2026-11-19, phase 1 (Claude Code): ideas 1-5 measured on a throwaway copy (the table above); `migration_v76.sql`,
-  `migration_v77.sql`, the pings sent together and the changelog kept on the device written and tested.
+  `migration_v77.sql`, the pings sent together and the changelog kept on the device written and tested
+  ([#444](https://github.com/smcmurry6-source/study-hubs/pull/444)).
 
 ## Outcome
 

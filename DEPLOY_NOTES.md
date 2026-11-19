@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-19 (the database optimization pass, phase 1, Claude Code)** — Sam's package: measure the optimization
+- **2026-11-19 (the database optimization pass, phase 1, Claude Code, [#444](https://github.com/smcmurry6-source/study-hubs/pull/444))** — Sam's package: measure the optimization
   pass's ideas 1-5 on a throwaway copy and ship the ones worth it; nothing students see or earn changes. Measured with a
   made-up class of 200 (188,000 answers) and `pg_stat_statements` timing every statement inside a call
   ([the task](vault/tasks/2026-11-18-database-optimization-pass.md) has the table). **`migration_v76.sql`**: 60-66% of
