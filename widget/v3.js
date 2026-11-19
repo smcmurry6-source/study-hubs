@@ -2897,7 +2897,7 @@
   /* Searches everything a hub publishes in SH_EXPORT: note paragraphs, review rows, exam hints,
      cram lines (SH_EXPORT.sections) and questions. Every word typed must appear. A result
      jumps to its place in the hub through window.SH_GOTO. */
-  var SEARCH_GROUPS = ["Notes", "Review", "Exam hints", "Cram sheet", "Questions"];
+  var SEARCH_GROUPS = ["Study guide", "Notes", "Review", "Exam hints", "Cram sheet", "Questions"];   // "Study guide": a hub on the engine with one (widget/hub.js, drawGuide)
   var searchHits = [];
   function reEsc(w){ return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
   function snippet(text, terms){

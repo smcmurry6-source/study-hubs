@@ -32,6 +32,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (Heme & Endo Exam 3: Dr. Herr's study guide in Notes, Claude Code)** — Sam: "under notes, make a section for dr
+  herrs study guide. have each item as a heading and have [high] yield explainer of everything we need to know about that topic.
+  since it skips dr taylors lecture, dont include it". The engine (`widget/hub.js` `drawGuide`, `widget/hub.css` `.gd-*`) draws a
+  **study guide page** at `#notes/guide` for any hub whose `content/study.json` has a `guide` (one entry per lecture: the guide's
+  items as headings with their explainers, then its key terms), first in the notes' lecture list, with jump buttons per lecture,
+  Listen (the device's voice), Report, the highlighter, and each lecture's notes and High likelihood questions at the end of its
+  part; search finds it under its own "Study guide" group (`widget/v3.js` `SEARCH_GROUPS`), and Ask Timmy's place is none while
+  it's open (`widget/hub-timmy.js`). Exam 3's: 31 items and 35 key terms for L17 to L22, written from the hub's notes and keys; no
+  Lecture A. About page entry; bundles and Ask Timmy's site help rebuilt.
 - **2026-11-19 (Collections, Claude Code)** — Sam: "in the timmy card i want there to be a button where you can view your
   collections of items bought in the shop. holiday collections and other things. you can see your progress and all and
   completing a collection gives 1000 xp and 1000 crowns as a bonus". A **Collections** button in Timmy's place (under

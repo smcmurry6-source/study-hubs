@@ -50,6 +50,12 @@ entry in `hubs.js`.
   stay High Likelihood, ranked after. Five questions were written for the thinner items (`hi-sg-platelets`, `hi-tf-sg-neut`,
   `ll-sg-classify`, `ll-num-sg-leuk`, `ea-sg-pop`). L21 and L22's lists (in [their task](../tasks/done/2026-11-16-heme-endo-exam3-l19-l22.md))
   are those lectures' focus hints and first topics (basis "study guide + recording"), since 2026-11-18. Lecture A's topics weren't changed, and stay that way (Sam: "lecture a shouldnt be ranked lower").
+  **The guide's own page in Notes** (Sam, 2026-11-19, [decisions](../decisions.md)): `study.json`'s `guide`, one entry per
+  lecture (`{ lec, items: [{ h, body }], terms: [{ t, d }] }`), each `h` the guide's words exactly, each `body` an explainer
+  written from this hub's notes and keys (a lead, a `hy-know` "Know this" list, an optional table and a `gd-trap` "Watch for");
+  `index.html`'s `SH_HUB.notes.guide` names it. No Lecture A (the guide skips it). It's hand-written, not built: **when a lecture's
+  notes or a key changes, check its guide entry too**. It has no narration (Listen uses the device's voice), so the
+  [text-and-audio](../rules/text-and-audio-never-drift.md) rule doesn't bind it; a Kokoro recording would.
 - **Sources:** Drive, "Hematology and Endocrinology" → "Hubs" → "Exam 3" (L17-L20's slides and the two transcripts), and the
   course's learning objectives ("Exam 1" folder). **Not used**, by the [graded-coursework](../rules/graded-coursework.md) rule:
   the Exam 3 Anki deck in that folder (a previous year's practice questions), everything in "Resources from D3s", Quiz 4 (open
