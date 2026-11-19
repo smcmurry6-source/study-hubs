@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (Heme & Endo Exam 3: Timmy Time, Claude Code)** — Sam (11-18): "after you finish, start a new session for
+  timmy time". A 52-minute episode (`exam3-review`, 14 chapters): Dr. Taylor's Lecture A, then L17-L22 in order, each of
+  L17-L22 opening on Dr. Herr's study guide list word for word, the professors' hints quoted, the "you don't need" remarks,
+  then a 29-question lightning round. Written from the hub's own notes, hints, cram and High Likelihood topics only; it steers
+  around every content flag in the hub note (the script's header lists them). Lore (Sam's picks): number thirty-one's letter
+  about a bump ("That's your cusp"), "a tooth for every baby" is a saying, not physiology, and Timmy has blood too; one lore
+  comment (thirty-one's four cusps). 31 words added to `tools/podcast/lexicon.json` (finasteride, dutasteride, tamoxifen,
+  raloxifene, ulipristal, levonorgestrel, Sézary, Sjögren, the trophoblasts...). Wired in `content/core.json` `podcast`
+  (Home's quick link and More's tile), `hubs.js` (the dashboard) and the About page's episode list. Script
+  `tools/podcast/heme-endo-exam3/script.md`; the After merge workflow registers the episode for XP.
 - **2026-11-19 (pages that ride out a busy database: answers kept on the device, and the rank pill, Claude Code)** — (1) An
   answer still unsaved when its tab closed was lost (the line's retries lived in the page). Now `widget/v3.js` writes the
   answers still in the line to the device when the page is hidden (`sh_answers_kept:<hub>`), takes them back when it shows
