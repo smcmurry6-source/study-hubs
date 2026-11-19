@@ -55,6 +55,10 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   2026-11-19 at about 4:15 am Central, before the merge (through the connector, md5-checked before and after; in
   `supabase/schema.sql`). The ping table's rewrite had run half an hour before (#445: `activity_pings` 179 MB to 31 MB, the
   database 465 MB to 318 MB), and the live `pg_stat_statements` and same-page update numbers are in the task's Log.
+- **2026-11-19 (Perio: the implant cases' films read in words, Claude Code)** — a student report on `pc-h1` ("need more info
+  from the radiograph, it's just a sketch"). The four implant Patient Box cases (`implant-5`, `-19`, `-30`, `-14` in
+  `hubs/perio/content/core.json`, and the folded copies in their 15 questions' `pbox`) gain a row, "Today's film, in words",
+  with the bone level below the platform at the mesial and the distal, from each case's `spec`. Keys, ids and High yield unchanged.
 - **2026-11-19 (Heme & Endo Exam 3: the study guide narrated with Kokoro, Claude Code)** — Sam: "add kokoro". Dr. Herr's
   study guide page (`#notes/guide`) has its own recording, `hubs/heme-endo-exam3/audio/guide.mp3` with its words file, so Listen
   plays it in the notes' narrator's voice with Follow along and tap-a-word-to-jump. It is spoken from the page's readable part,
