@@ -5,7 +5,7 @@ hub: site
 created: 2026-11-19
 requested-by: Sam
 due: 
-waiting-on: Sam's "merge", then migration_v75 applied
+waiting-on: Sam's OK on the calls in decisions (2026-11-19)
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/437
 ---
@@ -39,7 +39,7 @@ and 1000 crowns as a bonus".
   piece or a Claim button; Halloween's gift set pays nothing
 - [x] `node tools/release/xp.js`, `rls.js`, the fast checks and the smoke test pass; screenshots to Sam
 - [x] About page, game-server, decisions, event-taxonomy, analytics-retention, DEPLOY_NOTES, changelog line
-- [ ] After the merge: apply `migration_v75.sql` through the Supabase connector (a column, 48 one-row updates of the catalog,
+- [x] After the merge: apply `migration_v75.sql` through the Supabase connector (a column, 48 one-row updates of the catalog,
   five functions and xp_awards' list of kinds widened under a 3 s lock limit, left `not valid`: no backfill and no table
   scan, so any hour, [run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md); if the lock limit trips,
   apply it again); then, in a small PR, append it to `supabase/schema.sql` and take
@@ -51,7 +51,14 @@ and 1000 crowns as a bonus".
 ## Log
 
 - 2026-11-19: written and built (Claude Code); [#437](https://github.com/smcmurry6-source/study-hubs/pull/437) opened.
+- 2026-11-19: Sam said "merge"; #437 merged with CI green. `migration_v75.sql` applied through the connector right after
+  (the six function bodies md5-checked against the file; 48 catalog rows in six collections of 8; 21 collections for a
+  made-up visitor id, Halloween's not paying), then appended to `supabase/schema.sql` and taken off the pending list in
+  a small PR.
 
 ## Outcome
 
-Built and tested on a branch; waiting on Sam's "merge" and the migration. See the PR.
+Shipped in [#437](https://github.com/smcmurry6-source/study-hubs/pull/437) and live with `migration_v75.sql` (2026-11-19):
+the Collections button in Timmy's place, on the dashboard's You card and in a hub's More; the view of all 21
+collections; 1,000 XP and 1,000 crowns once for each finished one, from the shop or a Claim button. Left: Sam's OK on
+the calls in [decisions](../decisions.md) (the last box); then this note moves to `done/`.
