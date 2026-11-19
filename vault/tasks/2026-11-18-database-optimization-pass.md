@@ -136,6 +136,10 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
 - [ ] **`answer_xp` is written twice an answer** (the row, then its reply onto it): one insert at the end would halve
   that table's writes and dead rows. It moves the insert past the speed limit's count, which reads the row, so it needs
   care.
+- [ ] **`xp_seen`'s size**: 52 MB for about 177,000 rows (2026-11-19; the second biggest table after
+  `personal_answers`, 76 MB), found by the ping table's rewrite ([database-load](2026-11-18-database-load.md), its Log). Its
+  rows are four short columns, so most of it is likely the primary key's index and space left by Link my devices'
+  rebuilds: look at the table's and the index's sizes apart before deciding on a rewrite.
 - [ ] **The rank and mastery after every tenth answer** (`widget/ranks.js`): on the game layer the answer's reply
   already carries the XP total; the page could work out the hub's mastery from the answers it holds.
 
