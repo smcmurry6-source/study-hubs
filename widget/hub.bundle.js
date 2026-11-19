@@ -2087,70 +2087,22 @@ function renderNotes(el, s){
 var lec = LBY[s] || LBY[STATE.ui.lec] || LECS[0];
 if (s !== "guide") { STATE.ui.lec = lec.id; saveState(); }
 el.innerHTML = '<div class="hx-page notes"><p class="note loading">Loading the notes…</p></div>';
-Promise.all([needNotes(), needStudy(), needQuestions()]).then(function(){ if (s === "guide" && hasGuide()) drawGuide(el); else drawNotes(el, lec); }).catch(function(){ el.innerHTML = offlineHTML("the notes"); });
+Promise.all([needNotes(), needStudy(), needQuestions()]).then(needGuide).then(function(){ if (s === "guide" && GD) GD.draw(el); else drawNotes(el, lec); }).catch(function(){ el.innerHTML = offlineHTML("the notes"); });
 }
+var GD = null;
+function needGuide(){ return GD || !(STUDY.guide || []).length ? 0 : loadScript(WIDGET + "guide.js").then(function(){ GD = window.SH_GUIDE(HX); return GD.ready; }).catch(function(){}); }
 function offlineHTML(what){ return '<div class="hx-page"><h1>Not loaded yet</h1><p>Couldn\'t load ' + esc(what) + '. Check your connection, then <a href="">reload</a>.</p></div>'; }
 function lecListHTML(lec, onGuide){
-var X = C.notes || {}, gd = hasGuide();
+var X = C.notes || {};
 var groups = [["on", LECS.filter(function(l){ return isExamLec(l.id); })], ["off", LECS.filter(function(l){ return !isExamLec(l.id); })]].filter(function(g){ return g[1].length; });
-var pick = onGuide ? guideBadge() + '<span class="lp-t"><b>' + esc(guideInfo().title) + "</b><small>Change to a lecture</small></span>" :
-lecBadge(lec) + '<span class="lp-t"><b>' + esc(shortTitle(lec)) + "</b><small>" + esc(lecLabel(lec)) + " · change lecture</small></span>";
+var pick = onGuide ? GD.pick() : lecBadge(lec) + '<span class="lp-t"><b>' + esc(shortTitle(lec)) + "</b><small>" + esc(lecLabel(lec)) + " · change lecture</small></span>";
 return '<nav class="lec-list" aria-label="Lectures"><button class="lec-pick btn" type="button" aria-expanded="false" data-lecpick>' + pick + icon("chevron", 18, "rot") + "</button><ul>" +
-(gd ? guideEntryHTML(onGuide) : "") +
+(GD ? GD.entry(onGuide) : "") +
 groups.map(function(g){
 var on = g[0] === "on";
 return '<li class="grp grp-' + g[0] + '"><b>' + esc(on ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures")) + "</b><span>" +
 esc(on ? (EXAM ? (EXAM.label || "The exam") + ", " + dateLabel(EXAM.date, { weekday: "long", month: "long", day: "numeric" }) : "") : (X.offNote || "For review")) + "</span></li>" + g[1].map(function(l){ return lecItemHTML(l, !onGuide && l.id === lec.id); }).join("");
 }).join("") + "</ul></nav>";
-}
-function hasGuide(){ return !!(STUDY && (STUDY.guide || []).some(function(g){ return LBY[g.lec]; })); }
-function guideInfo(){ var G = (C.notes || {}).guide || {}; return { title: G.title || "Study guide", sub: G.sub || "", note: G.note || "" }; }
-function guideSecs(){ return (STUDY.guide || []).filter(function(g){ return LBY[g.lec]; }).sort(function(a, b){ return LECS.indexOf(LBY[a.lec]) - LECS.indexOf(LBY[b.lec]); }); }
-function guideBadge(){ return '<span class="lb gd-lb" aria-hidden="true">' + icon("hints", 20) + "</span>"; }
-function guideEntryHTML(cur){
-var secs = guideSecs(), n = secs.reduce(function(s, g){ return s + (g.items || []).length; }, 0);
-var span = secs.length > 1 ? lecLabel(LBY[secs[0].lec]) + " to " + lecLabel(LBY[secs[secs.length - 1].lec]) : lecLabel(LBY[secs[0].lec]);
-return '<li><a class="lec-item lec-guide" href="#notes/guide"' + (cur ? ' aria-current="page"' : "") + ">" + guideBadge() +
-'<span class="lt"><b>' + esc(guideInfo().title) + '</b><small class="num">' + esc(pl(n, "item") + " · " + span) + "</small></span>" +
-(cur ? '<span class="sr">, open now</span>' : "") + "</a></li>";
-}
-function drawGuide(el){
-if (view !== "notes") return;
-var I = guideInfo(), secs = guideSecs(), counts = CORE.examCounts || {};
-var body = secs.map(function(g){
-var l = LBY[g.lec], n = counts[l.id], nLikely = (QBL[l.id] || []).filter(function(r){ return r.likely; }).length;
-return '<section class="gd-lec' + lc(l.id) + '" id="gd-' + esc(l.id) + '" aria-labelledby="gdh-' + esc(l.id) + '">' +
-'<h2 class="gd-h" id="gdh-' + esc(l.id) + '"><span data-sh-noread>' + lecBadge(l) + "</span><span>" + esc(lecLabel(l) + " · " + shortTitle(l)) + "</span></h2>" +
-'<p class="note gd-meta" data-sh-noread>' + esc(l.who) + (n ? " · " + pl(n, "question") + " on the exam" : "") + "</p>" +
-(g.items || []).map(function(it){ return '<h3 class="gd-item">' + esc(it.h) + "</h3>" + (it.body || ""); }).join("") +
-((g.terms || []).length ? '<h3 class="gd-item">Key terms</h3><dl class="gd-terms">' + g.terms.map(function(t){ return "<div><dt>" + esc(t.t) + "</dt><dd>" + t.d + "</dd></div>"; }).join("") + "</dl>" : "") +
-'<p class="gd-acts" data-sh-noread><a class="btn" href="#notes/' + esc(l.id) + '" data-gdnotes>' + icon("notes", 18) + esc(lecLabel(l)) + "'s notes</a>" +
-'<a class="btn" href="#questions" data-lecq="' + esc(l.id) + '"' + (nLikely ? " data-lqlk" : "") + ">" + icon("questions", 18) + (nLikely ? "Practice its " + fmt(nLikely) + " High likelihood questions" : "Practice " + esc(lecLabel(l)) + " questions") + "</a></p>" +
-"</section>";
-}).join("");
-var art = '<article class="reading guide" id="guide">' +
-'<h1 class="rd-title">' + guideBadge() + "<span>" + esc(I.title) + "</span></h1>" + (I.sub ? '<p class="sub">' + esc(I.sub) + "</p>" : "") +
-(I.note ? '<p class="note lec-note">' + esc(I.note) + "</p>" : "") +
-'<div class="toolbar" role="toolbar" aria-label="Study guide tools">' +
-'<button type="button" class="btn sh-tts-btn" id="sh-tts-btn" title="Read aloud in your device\'s voice" aria-label="Listen to the study guide">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
-'<button type="button" class="btn btn-text" data-report-notes>' + icon("report", 18) + "Report a mistake</button>" +
-'<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
-"</div>" +
-'<nav class="gd-jump" aria-label="Lectures on the guide">' + secs.map(function(g){ var l = LBY[g.lec]; return '<button type="button" class="chip gd-chip' + lc(l.id) + '" data-gdjump="' + esc(l.id) + '"><span class="ld" aria-hidden="true"></span>' + esc(lecLabel(l) + " " + shortTitle(l)) + "</button>"; }).join("") + "</nav>" +
-'<div class="reading-prose gd">' + body + "</div>" +
-'<p class="foot-report"><button class="btn btn-text" type="button" data-report-notes>' + icon("report", 18) + "Report a mistake in the study guide</button></p>" +
-"</article>";
-el.innerHTML = '<div class="hx-page notes"><div class="notes-grid">' + lecListHTML(LBY[STATE.ui.lec] || LECS[0], true) + art + "</div></div>";
-var prose = $(".reading-prose", el);
-wireLecPick(el);
-$$("[data-gdjump]", el).forEach(function(b){ b.addEventListener("click", function(){ var s = document.getElementById("gd-" + b.getAttribute("data-gdjump")); if (s) s.scrollIntoView({ block: "start", behavior: reduced ? "auto" : "smooth" }); track("notes:guide-jump"); }); });
-var tts = $("#sh-tts-btn", el);
-if (tts) tts.addEventListener("click", function(){ if (window.shTTS) window.shTTS.speak(prose, tts, ""); });
-$$("[data-report-notes]", el).forEach(function(b){ b.addEventListener("click", function(){
-track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: "guide", label: I.title }); else toast("The report form is still loading. Try again in a moment.");
-}); });
-wireLecLinks(el);
-track("notes:guide");
 }
 function drawNotes(el, lec){
 if (view !== "notes") return;
@@ -2916,8 +2868,8 @@ var where = lecLabel(l) + " " + l.title;
 Array.prototype.forEach.call(frag(NOTES.full[l.id]).querySelectorAll("p, li, h3, h4"), function(el, k){ var t = clean(el.textContent); if (t.length > 2) out.push({ kind: "Notes", where: where, text: t, lec: l.id, go: { v: "notes", lec: l.id, k: k } }); });
 if (STUDY) ((STUDY.cram || {})[l.id] || []).forEach(function(b){ out.push({ kind: "Cram sheet", where: where, text: b, lec: l.id, go: { v: "cram", lec: l.id } }); });
 });
-if (STUDY && hasGuide()) guideSecs().forEach(function(g){
-var l = LBY[g.lec], where = guideInfo().title + " · " + lecLabel(l);
+if (STUDY) (STUDY.guide || []).forEach(function(g){
+var l = LBY[g.lec]; if (!l) return; var where = (((C.notes || {}).guide || {}).title || "Study guide") + " · " + lecLabel(l);
 (g.items || []).forEach(function(it, k){ out.push({ kind: "Study guide", where: where, title: it.h, text: clean(frag(it.body).textContent), lec: l.id, go: { v: "guide", lec: l.id, k: k } }); });
 (g.terms || []).forEach(function(t){ out.push({ kind: "Study guide", where: where + " · Key terms", text: clean(t.t + ": " + frag(t.d).textContent), lec: l.id, go: { v: "guide", lec: l.id, k: (g.items || []).length } }); });
 });
@@ -3058,7 +3010,7 @@ lecChip: lecChip, lecHead: lecHead, isRead: isRead, isExamLec: isExamLec, isRevi
 hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, hasVersions: hasVersions, needNotes: needNotes, needStudy: needStudy,
 needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
 go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
-offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget
+offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget, lecBadge: lecBadge, lecListHTML: lecListHTML, wireLecPick: wireLecPick, wireLecLinks: wireLecLinks
 };
 [["CORE", function(){ return CORE; }], ["QS", function(){ return QS; }], ["LECS", function(){ return LECS; }],
 ["IDX", function(){ return IDX; }], ["NOTES", function(){ return NOTES; }],

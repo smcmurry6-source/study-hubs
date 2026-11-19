@@ -71,6 +71,9 @@ tags: [map]
   the slim database client `widget/vendor/supabase-lite-2.117.2.js`. The old single-file hub pages don't load any of it. The Question Bank's Learn and Flashcards are
   `widget/study-modes.js` + `widget/study-modes.css`, fetched by `hub-bank.js` the first time either is opened
   ([the task](../tasks/done/2026-11-06-redesign-learn-and-flashcards.md); their server part is `migration_v56.sql`).
+  A professor's study guide (`#notes/guide`, first in the notes' list) is `widget/guide.js` + `widget/guide.css`
+  (`window.SH_GUIDE`), fetched by `hub.js` the first time Notes opens on a hub whose `content/study.json` has a `guide`, so
+  no other hub downloads it (its search entries stay in `hub.js`; Heme & Endo Exam 3's: [the hub note](../hubs/heme-endo-exam3.md)).
   The bowling egg ([the task](../tasks/done/2026-11-06-redesign-bowling-egg.md)) is `widget/bowling.js` (`window.shBowl`, its
   styles inside), with its eight clips in `widget/hub-art/bowling.js` (`window.SH_BOWL`, built from
   `tools/figures/site/bowling.mjs`): `hub-rewards.js` counts the run and fetches it at a strike, and the place's bowling
