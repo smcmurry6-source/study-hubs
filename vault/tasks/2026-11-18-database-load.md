@@ -31,7 +31,8 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   visitors through the connector, and the admin page loaded at 18:31: 26 of 63 saves failed in those minutes. Benchmarks
   belong on a throwaway copy (`tools/release/pg.js`), not the live database. In a burst, answers from one device also waited on its own advisory lock
   (`pg_advisory_xact_lock('xp|' || visitor)`) behind its slower calls.
-- The database: 1 GB, two shared cores, 60 connections; anon's `statement_timeout` is 3 s
+- The database: the Free plan's Nano size (a shared CPU, up to 0.5 GB of memory; this note first said 1 GB and two cores,
+  the paid Micro), 60 connections; anon's `statement_timeout` is 3 s
   ([shared-infrastructure](../reference/shared-infrastructure.md)).
 - Done in the PR that wrote this note (its link is in the Log): the admin page reads one query at a time and says "the database was
   busy" on a timeout; failed answer saves retry for about three minutes (same request id, so nothing counts twice); the A/B
@@ -123,6 +124,12 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
 - [ ] **A second free Supabase project for the analytics, when it's needed** (Sam, 2026-11-18: "i think adding the second
   database may be necessary at some point"): pings, clicks, feature events and question health (about a third of the
   requests, over half the storage) move to their own free project; answers, XP and the shop stay. Not now.
+- [ ] **The lessons audit reads the database's size every run** (found 2026-11-19, when Sam saw the dashboard still at about
+  400 MB after the rewrite: Log). Add one catalog query to `tools/lessons-refresh.md` step 1
+  (`select pg_size_pretty(sum(pg_database_size(datname))) from pg_database`, plus the five biggest tables) and a line in
+  `LESSONS.md`'s Live signals, so nobody has to go by the dashboard's once-a-day figure. Outside the 3-day pings, the
+  tables grew about 38 MB in the 14 busiest hours of the term (the evening before the Perio final), so with several live
+  hubs a busy week can add 150 MB or more: from about 420 MB, the analytics move (the box above) or a trim is due.
 - [ ] [The optimization pass](2026-11-18-database-optimization-pass.md): the answer save is still 55% of the database's time.
 - [x] `personal_answers`' two indexes (`migration_v71.sql`: the person's answers newest first, and one question's answers)
   built on the live database with `create index concurrently`, then the file appended to `supabase/schema.sql` and its line
@@ -215,5 +222,23 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
 - 2026-11-19, 4:10 am Central ([#444](https://github.com/smcmurry6-source/study-hubs/pull/444)): the rewrite read back from the catalog before
   the optimization pass's phase 1 went in: the ping table 31 MB (the table 12 MB, its five indexes 19 MB), the database
   318 MB. `migration_v76.sql` and `migration_v77.sql` applied the same hour: [its note](2026-11-18-database-optimization-pass.md).
+- 2026-11-19, 5 am Central (Claude Code, read-only through the connector): Sam: "supabase is still saying its at like 400 mb
+  and the memory commitment is at severe". The database read **318 MB** (332 MB with the two template databases, the sum
+  the 500 MB limit counts). Supabase refreshes the dashboard's size once a day, so it still showed the figure from before
+  the 3:46 am rewrite. about 20 connections, all idle but the connector's and Realtime's replication (5 PostgREST, 2 Realtime, 1 Storage, the pooler, the
+  exporter); Realtime's replication slot holds 63 kB of WAL and publishes none of our tables (the site's presence channels
+  don't touch the database). Settings: `shared_buffers` 224 MB, `work_mem` 2 MB, `effective_cache_size` 384 MB, PostgreSQL
+  17.6. The Free plan is Nano (up to 0.5 GB, a shared CPU: Supabase's compute docs), not the 1 GB these notes said, so Postgres's cache alone is
+  close to half the server. The Memory commitment chart compares memory promised to every process (Postgres and Supabase's
+  own API, Storage, Auth, pooler, metrics and logging) with the most the kernel will promise; it's a warning, not memory
+  used. The Postgres logs of the last 24 hours have no out-of-memory kill, crash or unplanned restart (only Sam's restart
+  at about 3 pm Central the day before). They have 2,754 statement timeouts, 2,669 of them between 10 am and 4 pm Central
+  on 11-18 (the outage) and at most 20 an hour since. Growth over the 14 hours since that restart, from the insert and
+  delete counts (Postgres reset its table statistics at the restart) times each table's size a row: about 38 MB outside
+  the pings, the most in `personal_answers`, `answer_xp`, `question_events`, `xp_awards`, `ui_click_reach` and `xp_seen`
+  (4-7 MB each). With Perio's final today and Heme & Endo Exam 3 tomorrow, about 390-400 MB by the weekend; then no live
+  hub until the next one goes up. The Free plan has no setting for PostgREST's pool (Database Settings' pool size is the
+  pooler's, which the site doesn't use), so the levers are fewer, shorter queries (v72, v76, v77 and the changelog read,
+  all live since this morning) and, past that, the analytics move or a larger compute size (Sam: stay free).
 
 ## Outcome
