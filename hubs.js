@@ -60,8 +60,8 @@ window.SH_DASH_DATA = {
      "promptHour": 10
     }
    ],
-   "updated": "2026-11-17",
-   "desc": "Dr. Taylor's Lecture A (dental endocrinology, moved here from Exam 2), L17 Pregnancy and lactation, L18 Estrogens and androgens, L19 Introduction to hematology and L20 Lymphomas and leukemias; L21 and L22, the pathology of the male and female reproductive systems, join when their slides are posted. The exam is Fri Nov 20, 8:00-9:30 am (35 questions, new material only). Its own home page with your countdown and progress, notes in three reading levels with narration, 22 interactive diagrams, Patient Box cases, two-statement, true/false, numbered and which-statement questions with every choice explained, High Likelihood Exam Questions, exam hints from the recordings, review tables with side-by-side look-alikes, a mock exam and the Cycle Arcade.",
+   "updated": "2026-11-18",
+   "desc": "Dr. Taylor's Lecture A (dental endocrinology, moved here from Exam 2), L17 Pregnancy and lactation, L18 Estrogens and androgens, L19 Introduction to hematology, L20 Lymphomas and leukemias, and Dr. Dal Zotto's L21 and L22, the pathology of the male and female reproductive systems. The exam is Fri Nov 20, 8:00-9:30 am (35 questions, new material only). Its own home page with your countdown and progress, notes in three reading levels with narration, 24 interactive diagrams, Patient Box cases, two-statement, true/false, numbered and which-statement questions with every choice explained, High Likelihood Exam Questions, exam hints from the recordings, review tables with side-by-side look-alikes, a mock exam and the Cycle Arcade.",
    "modes": [
     "Home",
     "Compendium",

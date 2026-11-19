@@ -19,9 +19,12 @@
 --    Collections view in Timmy's place); claim_collections_v2(visitor) pays every finished collection not paid yet and
 --    answers the same list. The page asks after buying a piece of a collection, and the view offers the bonus for one
 --    finished before this (a button), so a collection finished earlier is paid too.
--- Additive: nothing that exists changes what it does. Quick to apply: 48 rows get their collection; the new kind of award
--- is checked against the awards already there with `validate constraint` (as migration_v73), which doesn't hold up the
--- answers being saved meanwhile. Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js).
+-- Additive: nothing that exists changes what it does. Quick to apply at any hour (vault/how-to/run-sql-on-the-live-database.md):
+-- 48 one-row updates of the catalog (240 rows), new functions, and xp_awards' list of kinds widened under a 3 s lock_timeout
+-- (every answer writes that table: if a query holds it, this gives up instead of making the answers wait; apply it again).
+-- The widened check is left `not valid`, with no `validate constraint`: every new award is checked by it, and the awards
+-- already there all passed the old, narrower list, so validating would only scan the whole table for nothing.
+-- Written and tested on a throwaway copy of supabase/schema.sql (tools/release/xp.js, rls.js).
 
 -- ====================================================================== the year-round collections in the catalog
 alter table public.shop_items add column if not exists collection text
@@ -82,13 +85,13 @@ alter table public.shop_items add constraint shop_items_one_collection
   check (collection is null or (season is null and rank_tier is null and kind not in ('snack', 'boost', 'costume')));
 
 -- ====================================================================== 1. the prize
+set local lock_timeout = '3s';
 alter table public.xp_awards drop constraint if exists xp_awards_src_check;
 alter table public.xp_awards add constraint xp_awards_src_check
   check (src in ('answer', 'goal20', 'fix', 'mock', 'medal', 'pod-min', 'pod-done', 'arcade', 'report', 'card', 'survey', 'checkin',
                  'name', 'ring', 'boss', 'streak', 'row', 'nuke', 'alltime', 'notes', 'trophy', 'visit', 'game', 'record', 'restore',
                  'collection'))
   not valid;
-alter table public.xp_awards validate constraint xp_awards_src_check;
 
 -- the kinds whose XP pays as many crowns (migration_v68's list, and `collection`)
 create or replace function public.sh_is_prize(p_src text)

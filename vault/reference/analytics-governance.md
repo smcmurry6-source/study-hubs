@@ -60,6 +60,8 @@ people get stuck, which questions mislead, whether a change worked. **Never** to
 - **Every hub archive** (`tools/retro.sql`): add the hub's scorecard line from `sh_insights()` to its retrospective.
 - **Every new tracked thing**: the checklist at the end of [event-taxonomy](event-taxonomy.md).
 - **Every schema change**: refresh `supabase/schema.sql`, and keep each admin function under the API's 3-second limit for
-  the anon role (measure with `explain analyze` on the connector; the first call after a quiet spell is slower).
+  the anon role (measure it on a throwaway copy at the class's size, or with `explain analyze` on the connector in the
+  quiet hours: [run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md); the first call after an idle
+  spell is slower).
 
 Related: [shared-infrastructure](shared-infrastructure.md) · [repo-map](repo-map.md) · [secrets](../rules/secrets.md)

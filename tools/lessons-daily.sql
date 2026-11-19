@@ -2,6 +2,10 @@
 -- Replace every :since with the "Last refreshed" date from LESSONS.md in quotes, e.g. '2026-09-29'.
 -- Read with tools/lessons-refresh.md. For a full per-hub retrospective use tools/retro.sql instead.
 -- Time: each activity ping = 25 s of active time. Dates are Central time.
+-- Running them (vault/how-to/run-sql-on-the-live-database.md): each query is its own execute_sql call, starting with
+-- `set local statement_timeout = '5s';` (the connector itself allows 2 minutes, and a call returns only its last result),
+-- one call at a time, never several at once. On a throwaway copy at 1.5 times the class's size (2026-11-18) each takes
+-- under 0.1 s. One that stops at the limit waits for the quiet hours (1 to 5 am Central), never re-sent at once.
 
 -- 1. Student voice first: every report, suggestion, check-in and survey answer since the last refresh (all of them)
 select 'flag' kind, hub, note text, resolved, created_at from question_flags where created_at >= :since::date

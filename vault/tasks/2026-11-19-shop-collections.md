@@ -39,8 +39,10 @@ and 1000 crowns as a bonus".
   piece or a Claim button; Halloween's gift set pays nothing
 - [x] `node tools/release/xp.js`, `rls.js`, the fast checks and the smoke test pass; screenshots to Sam
 - [x] About page, game-server, decisions, event-taxonomy, analytics-retention, DEPLOY_NOTES, changelog line
-- [ ] After the merge: apply `migration_v75.sql` through the Supabase connector (it adds a column, 48 one-row updates and
-  five functions, no backfill: seconds, safe in the day); then, in a small PR, append it to `supabase/schema.sql` and take
+- [ ] After the merge: apply `migration_v75.sql` through the Supabase connector (a column, 48 one-row updates of the catalog,
+  five functions and xp_awards' list of kinds widened under a 3 s lock limit, left `not valid`: no backfill and no table
+  scan, so any hour, [run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md); if the lock limit trips,
+  apply it again); then, in a small PR, append it to `supabase/schema.sql` and take
   its line out of `supabase/pending-migrations.txt`. Until it's applied the buttons show progress only (no Claim, no
   bonus), and the shop's banner doesn't appear
 - [ ] Sam confirms the calls in [decisions](../decisions.md) (rank sets out, Halloween's gift pays nothing, the costumes
