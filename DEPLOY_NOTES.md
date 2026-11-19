@@ -43,8 +43,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   the badges' words break. `tools/ci/smoke.js` opens 12 views of each hub on the engine at 320 px with the largest text
   (it opened only Home before). **Toasts on a phone drop in at the top**, under the strip, as the reward card and the
   reply pop-up do (BUG-126): at the bottom they sat under Timmy, his bubble, the streak flame and the Listen player; the
-  smoke test checks one is clear. **Small controls** (BUG-009): none since the redesign (the four were on the old
-  single-file pages); `tools/release/matrix.js` now checks every screen and fails a control under 24x24 px, naming it.
+  smoke test checks one is clear. **Small controls** (BUG-009): the four of 11-04 were on the old single-file pages;
+  `tools/release/matrix.js` now checks every screen and fails a control under 24x24 px, naming it, and its first run found
+  the mastery-medal button beside a name on the dashboard's boards (22x20 at 1920 px), now 24x24 (`widget/ranks.js`).
   Bundles rebuilt. **The dashboard's budget is 346 KB** (was 345, BUG-189): `main` measured 345.40 KB and these rules add
   about 150 bytes gzipped to `widget/site.bundle.css`, which the dashboard loads too; it's the page with the least room.
 - **2026-11-19 (About page accessibility, Claude Code, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453))** — the last three accessibility bugs from
