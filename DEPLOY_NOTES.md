@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (Phone and large-text fixes on the hubs: BUG-168, BUG-126, BUG-009, Claude Code, #PRNUM)** — Sam's package of
+  three bugs. **Nothing on a hub scrolls sideways on a phone at the largest text** (BUG-168): the text sizes zoom the page,
+  so XX-Large on a 320 px phone lays out in 220 px, and the arcade lobby, the Question Bank, Notes, Exam Hints, the cram
+  sheet, Stats and Settings all ran past the screen there (Exam Hints and the cram sheet at 320 px at every size). In
+  `widget/hub.css` every grid's column minimum is `min(Npx, 100%)` (the lobby's beats each hub's own `arcade.css`), the
+  bank's filter panel is one column, a long word in a lecture title or anywhere in `.hx` breaks instead of running off, and
+  on a phone a button or chip too long for the screen wraps its words; the Study as buttons drop their icons under 300 px
+  and stack under 240 px. In `widget/trophies.css` the Stats gauge's turning rays stop at the board on a narrow phone and
+  the badges' words break. `tools/ci/smoke.js` opens 12 views of each hub on the engine at 320 px with the largest text
+  (it opened only Home before). **Toasts on a phone drop in at the top**, under the strip, as the reward card and the
+  reply pop-up do (BUG-126): at the bottom they sat under Timmy, his bubble, the streak flame and the Listen player; the
+  smoke test checks one is clear. **Small controls** (BUG-009): none since the redesign (the four were on the old
+  single-file pages); `tools/release/matrix.js` now checks every screen and fails a control under 24x24 px, naming it.
+  Bundles rebuilt.
 - **2026-11-19 (About page accessibility, Claude Code, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453))** — the last three accessibility bugs from
   the release dry run, all on `about/index.html`: BUG-007, the nine contents links at the top turned their focus outline off
   (`nav.toc a:focus-visible{outline:none}`), so a keyboard user couldn't see where they were; they now get the page's ring.
