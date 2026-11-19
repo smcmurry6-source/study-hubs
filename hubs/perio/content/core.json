@@ -2,6 +2,7 @@
  "hub": "perio",
  "title": "Periodontology D2 Compendium",
  "stateKey": "perio-d2-compendium-state-v1",
+ "audio": "off",
  "exams": [
   {"id":"midterm","label":"Midterm","date":"2026-10-01"},
   {"id":"final","label":"Final","date":"2026-11-19"}

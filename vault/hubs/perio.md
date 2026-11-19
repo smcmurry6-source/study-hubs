@@ -1,14 +1,25 @@
 ---
 type: hub
-tags: [hub, live]
+tags: [hub, archived]
 hub: perio
-status: live
+status: archived
 ---
 
 # Periodontology (perio)
 
 The D2 Periodontology course (DENT 2145), nine sessions with different professors. Midterm Oct 1 (S1-S4, done, check-in
-closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `exams` in `content/core.json`).
+closed); **final Thu Nov 19, cumulative: done** (the class sat it that morning). Dates: its entry in `hubs.js` (and `exams` in
+`content/core.json`).
+
+**Archived** (the dashboard does it at 10 pm on 2026-11-19). The retrospective of both exams is in
+[LESSONS.md](../../LESSONS.md) ("Periodontology" under Hub retrospectives, written 2026-11-19 by the lessons audit), and the recap is
+on the dashboard since that afternoon (featured: `q3-S02`). **Its narration and Timmy Time came off the site** with that audit
+([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)): the 28 mp3s and their words files (289 MB),
+`"audio": "off"` in `content/core.json` (the build emptied `hyAudio`), and the `podcast`, Listen and Timmy Time out of its `hubs.js`
+entry. The page and everything else stay up. **Still to do:** take `perio` out of `HUBS` in `sw.js` and bump `VERSION` once the hub is
+archived (`node tools/ci/syntax.js` fails it while it's live, before 10 pm that night;
+[the audio task](../tasks/2026-11-12-audio-off-at-archiving.md)); read its later check-ins in the next audit (the pop-up goes out
+from 10 pm). To bring the audio back: the rule's last section (the commit before it came off).
 
 ## Before you work on it
 
@@ -247,9 +258,9 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11
 
 ## Pending
 
-- After the final, read question health again (the 2026-11-18 audit checked and left `q7-T08`, `q6-L38`, `q9-L09`, `q9-L26`,
-  `q5-S04`, `q8-03`, `q9-S07`, `q9-L41`, `q7-L27`, `q7-L43`, `q8-P02`, `q9-L38`: their keys match the notes), and reports #55/#56
-  (statements reordered on a retry: Sam said yes 2026-11-18, [inbox](../tasks/inbox.md)).
+- Question health was read after the final (2026-11-19, the retrospective): every possible miskey it flags matches the notes
+  (`q6-L37`, `q5-L43`, `q3-S02`, `q6-N01`, `q6-N03`, `q7-T08`, `q8-T07`, `q9-L38` and the twelve the 11-18 audit read). Reports
+  #55/#56 (statements reordered on a retry) were done in #417.
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
 - S9's two sources differ on recession prevalence (the recording vs the slide's 88% / 50%) and on ADM (a slide says
