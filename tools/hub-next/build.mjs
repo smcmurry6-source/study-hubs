@@ -29,7 +29,7 @@
  *
  *   node tools/hub-next/build.mjs              rebuild every hub on the engine
  *   node tools/hub-next/build.mjs --check      fail if a file isn't what this would write (CI runs this)
- *   node tools/hub-next/build.mjs --hub occlusion
+ *   node tools/hub-next/build.mjs --hub perio
  */
 import { readFileSync, writeFileSync, existsSync, statSync, readdirSync } from "node:fs";
 import { createHash } from "node:crypto";
