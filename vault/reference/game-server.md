@@ -132,7 +132,9 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   already passed are theirs with no rows written. Never on a shelf; `buy_item` says `rank`.
 - **Who owns what** is decided in one place, `sh_owned(visitor)` (and `sh_owns(visitor, item)`): what was bought, every
   gift, and every rank item reached. `equip_item`, `buy_item` and `get_my_shop` all use it.
-- **The rotation** (`sh_shop_day(date)`, Central time, the same for everyone): 4 daily items seeded by the date, 3 weekly ones
+- **The rotation** (`sh_shop_day(date)`, Central time, the same for everyone; since `migration_v79` worked out once a day for
+  everyone and kept in `shop_days`, today and tomorrow, filled by pg_cron every hour and cleared by any change to
+  `shop_items`, with `sh_shop_day_make(date)` the working-out itself): 4 daily items seeded by the date, 3 weekly ones
   seeded by Monday's date (rarer items come up less often: weights 10, 6, 3, 1.5, 0.6; never a seasonal, gift or rank
   item), the sets of the seasons on sale (`season`), a throwback day's three (`throwback`), and the always-shelf (snacks,
   floss, boosts). A rare costume Timmy was seen in (`record_costume_sighting`, one new one a day) joins that visitor's shop

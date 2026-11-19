@@ -91,18 +91,38 @@ start: function(o){
 if (!o || !o.sb || !o.hub) return;
 try { if (navigator.webdriver) return; } catch (e) {}
 var pending = {}, count = 0;
-evSend = function(){
+var A = function(){ return window.shAnalytics && typeof window.shAnalytics.send === "function" ? window.shAnalytics : null; };
+var together = null;
+try { if (localStorage.getItem("sh_rpc_analytics") === "1") together = true; } catch (e) {}
+function apart(clicks, events){
+if (events.length && o.visitor) try { o.sb.rpc("record_events", { p_hub: o.hub, p_visitor: o.visitor, p_items: events }).then(function(){}, function(){}); } catch (e) {}
+if (clicks.length) try { o.sb.rpc("record_clicks", { p_hub: o.hub, p_visitor: o.visitor || null, p_items: clicks }).then(function(){}, function(){}); } catch (e) {}
+}
+function post(clicks, events){
+if (!o.visitor) events = [];
+if (!clicks.length && !events.length) return;
+var a = A(); if (a) { a.send("events", events); a.send("clicks", clicks); return; }
+if (together === false) { apart(clicks, events); return; }
+try {
+o.sb.rpc("record_analytics", { p_hub: o.hub, p_visitor: o.visitor || null, p_clicks: clicks, p_events: events }).then(function(r){
+var e = r && r.error;
+if (e && (e.code === "PGRST202" || r.status === 404)) { together = false; try { localStorage.removeItem("sh_rpc_analytics"); } catch (x) {} apart(clicks, events); }
+else if (r && !e && together !== true) { together = true; try { localStorage.setItem("sh_rpc_analytics", "1"); } catch (x) {} }
+}, function(){});
+} catch (e) {}
+}
+function takeEvents(){
 var items = Object.keys(evPending).map(function(k){ return { k: k, n: Math.round(evPending[k]) }; }).filter(function(x){ return x.n > 0; }).slice(0, 40);
 evPending = {}; evCount = 0;
-if (items.length && o.visitor) try { o.sb.rpc("record_events", { p_hub: o.hub, p_visitor: o.visitor, p_items: items }).then(function(){}, function(){}); } catch (e) {}
-};
+return items;
+}
+evSend = function(){ post([], takeEvents()); };
 function flush(){
 if (window.shDb && window.shDb.busy()) return;
-if (evCount) evSend();
-if (!count) return;
-var items = Object.keys(pending).slice(0, 80).map(function(k){ var p = k.split("\u0001"); return { s: p[0], t: p[1], n: pending[k] }; });
-pending = {}; count = 0;
-try { o.sb.rpc("record_clicks", { p_hub: o.hub, p_visitor: o.visitor || null, p_items: items }).then(function(){}, function(){}); } catch (e) {}
+var events = evCount ? takeEvents() : [];
+var items = !count ? [] : Object.keys(pending).slice(0, 80).map(function(k){ var p = k.split("\u0001"); return { s: p[0], t: p[1], n: pending[k] }; });
+if (count) { pending = {}; count = 0; }
+post(items, events);
 }
 window.shClicks.flush = flush;
 document.addEventListener("click", function(e){
@@ -1591,17 +1611,18 @@ for (var i = 0; i <= m.lvl; i++) {
 var key = MASTERY[i].k;
 if (badges.indexOf(key + ":" + H.hub) < 0) {
 fresh = i; badges.push(key + ":" + H.hub);
-rpc("record_achievement", { p_visitor: H.visitor, p_kind: key, p_hub: H.hub });
+rpc("record_achievement", { p_visitor: H.visitor, p_kind: key, p_hub: H.hub }).then(trophySent);
 }
 }
 if (fresh >= 0) masteryToast(fresh);
 var srow = (mastery || []).filter(function(r){ return r.hub === H.hub; })[0];
 if (m.bank && srow && srow.seen >= m.bank && badges.indexOf("seen-all:" + H.hub) < 0) {
 badges.push("seen-all:" + H.hub);
-rpc("record_achievement", { p_visitor: H.visitor, p_kind: "seen-all", p_hub: H.hub });
+rpc("record_achievement", { p_visitor: H.visitor, p_kind: "seen-all", p_hub: H.hub }).then(trophySent);
 hubTrophyCard("seen-all");
 }
 }
+function trophySent(d){ if (d === true) try { document.dispatchEvent(new CustomEvent("sh:trophy-sent")); } catch (e) {} }
 function hubTrophyCard(k){
 if (H.prefGet("sh_pref_celebrate", "on") === "off") return;
 var t = HUB_TROPHIES.filter(function(x){ return x.k === k; })[0]; if (!t) return;
@@ -1665,9 +1686,10 @@ sec.querySelector(".sh-trophy-detail").innerHTML = (got ? '<b>' + esc(tr.n) + '.
 : tr.secret ? '<b>Secret.</b> ' + esc(tr.clue) : '<b>' + esc(tr.n) + '.</b> ' + esc(tr.d) + '.') + share;
 });
 var loading = false, ownRaw = null;
-function applyOwn(p, m){
+function applyOwn(p, m, base){
 var raw = p; p = legacy(p);
 profile = p; mastery = m || []; ownRaw = raw;
+if (base !== undefined) rebase(raw, m, base);
 if (raw.journey > 0 && !window.SH_JOURNEY_ART) needJourneyArt(function(K){ if (K) render(); });
 try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: raw, mastery: masteryFor() } })); } catch (e) {}
 if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
@@ -1677,19 +1699,44 @@ badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_a
 }
 function loadOwn(){
 if (loading) return; loading = true;
-var v2 = H.live ? H.live() : H.v2 && H.v2();
+var v2 = H.live ? H.live() : H.v2 && H.v2(), p0 = LOC.paid;
 Promise.all([rpc(v2 ? "get_rank_profile_v2" : "get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
 loading = false;
 if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
-applyOwn(r[0], r[1]);
+applyOwn(r[0], r[1], LOC.paid === p0);
 });
 }
+var LOC = { hist: null, full: false, row: null, base: null, n: 0, right: 0, miss: false, run: 0, paid: 0, dirty: true, total: 0, boost: undefined, day: "" };
+function cday(){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()); } catch (e) { return new Date().toDateString(); } }
+function rebase(raw, m, clean){
+var row = Array.isArray(m) ? m.filter(function(r){ return r.hub === H.hub; })[0] : null;
+if (Array.isArray(m)) LOC.row = { hub: H.hub, latest_correct: row ? row.latest_correct | 0 : 0, seen: row ? row.seen | 0 : 0 };
+LOC.base = { answers: raw.answers | 0, correct: raw.correct | 0, best_run: raw.best_run | 0 };
+LOC.total = raw.xp | 0; LOC.boost = undefined; LOC.n = 0; LOC.right = 0; LOC.miss = false; LOC.run = 0; LOC.day = cday();
+LOC.dirty = !clean || !Array.isArray(m);
+}
+function localTick(){
+if (!ownRaw || !isV2(ownRaw) || !LOC.hist || !LOC.row || !LOC.base || !(H.v2 && H.v2())) return false;
+if (LOC.dirty || LOC.n >= 50 || LOC.day !== cday()) return false;
+var B = LOC.base, a = B.answers + LOC.n, can = LOC.miss ? LOC.run : B.best_run + LOC.run;
+if ((B.answers < 100 && a >= 100) || (B.answers < 1000 && a >= 1000)) return false;
+if ((B.best_run < 25 && can >= 25) || (B.best_run < 100 && can >= 100)) return false;
+var p = Object.assign({}, ownRaw, { xp: Math.max(ownRaw.xp | 0, LOC.total), answers: a, correct: B.correct + LOC.right });
+if (LOC.boost !== undefined) p.boost = LOC.boost;
+applyOwn(p, (mastery || []).filter(function(r){ return r.hub !== H.hub; }).concat([{ hub: H.hub, latest_correct: LOC.row.latest_correct, seen: LOC.row.seen }]));
+return true;
+}
+document.addEventListener("sh:trophy-sent", function(){ LOC.dirty = true; });
 function load(){ loadTrophyStats(); loadOwn(); }
 function panelOpen(){ return !!(panel && panel.classList.contains("is-open")); }
 var boot = H.bootstrap || (window.shBootstrap && window.shBootstrap.ready) || null;
 if (boot && typeof boot.then === "function") {
 boot.then(function(data){
-if (data && data.rank && typeof data.rank === "object") applyOwn(data.rank, Array.isArray(data.mastery) ? data.mastery : []);
+if (data && Array.isArray(data.answers)) {
+LOC.hist = {}; data.answers.forEach(function(a){ if (Array.isArray(a)) LOC.hist[String(a[0])] = !!a[2]; });
+LOC.full = data.answers.length < 5000;
+}
+if (data && data.rank && typeof data.rank === "object") applyOwn(data.rank, Array.isArray(data.mastery) ? data.mastery : null, LOC.paid === 0);
 else loadOwn();
 }, loadOwn);
 } else loadOwn();
@@ -1697,12 +1744,25 @@ var sinceLoad = 0;
 document.addEventListener(H.answeredEvent, function(){
 if (++sinceLoad >= 10) {
 sinceLoad = 0;
-setTimeout(panelOpen() ? load : loadOwn, 1500);
+setTimeout(function(){ if (panelOpen()) load(); else if (!localTick()) loadOwn(); }, 1500);
 }
 });
 document.addEventListener("sh:answer-paid", function(e){
-var r = e.detail && e.detail.res;
+var d = e.detail || {}, r = d.res;
 if (r && typeof r.total === "number" && ownRaw && ownRaw.next_at != null && r.total >= ownRaw.next_at) { sinceLoad = 0; setTimeout(loadOwn, 900); }
+if (!r || r.repeat || r.ok === false) return;
+LOC.paid++;
+if (typeof r.total === "number") LOC.total = Math.max(LOC.total, r.total);
+if (r.boost !== undefined) LOC.boost = r.boost;
+var c = r.correct === true, q = String(d.qid || "");
+LOC.n++; if (c) { LOC.right++; LOC.run++; } else { LOC.miss = true; LOC.run = 0; }
+if (r.medal || d.session || d.ctx === "mock" || d.ctx === "arcade" ||
+(Array.isArray(r.bonus) && r.bonus.some(function(b){ return b && b.src === "streak"; }))) LOC.dirty = true;
+if (!LOC.hist || !LOC.row || !q) { LOC.dirty = true; return; }
+var was = LOC.hist[q];
+if (was === undefined) { if (!LOC.full) LOC.dirty = true; else { LOC.row.seen++; if (c) LOC.row.latest_correct++; } }
+else if (was !== c) LOC.row.latest_correct += c ? 1 : -1;
+LOC.hist[q] = c;
 });
 document.addEventListener("click", function(e){
 if (e.target.closest && e.target.closest("#shstat-stats-pill")) setTimeout(function(){ if (panelOpen()) load(); }, 50);
@@ -3777,7 +3837,7 @@ a.forEach(function(k){ if (b.indexOf(k) < 0 && CONDITION_INFO[k]) talk("My " + C
 }
 function award(kind, hub){
 if (!M.sb || !M.visitor) return;
-M.sb.rpc("record_achievement", { p_visitor: M.visitor, p_kind: kind, p_hub: hub || "" }).then(function(){}, function(){});
+M.sb.rpc("record_achievement", { p_visitor: M.visitor, p_kind: kind, p_hub: hub || "" }).then(function(r){ if (r && r.data === true) try { document.dispatchEvent(new CustomEvent("sh:trophy-sent")); } catch (e) {} }, function(){});
 }
 function render(){
 var home = M.where === "dashboard" && M.home ? M.home() : null;

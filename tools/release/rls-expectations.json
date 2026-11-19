@@ -1,5 +1,5 @@
 {
-  "about": "What the anonymous role (every visitor, using the public publishable key) may do to each table directly, without going through a function. Everything else goes through security-definer functions that check their own inputs. tools/release/rls.js fails if the schema allows more than this, or less. Change this file only together with the migration that changes the policy, and say why in the PR. anonNone lists tables that must be closed to anon altogether (no privilege and no policy, tried by hand), and anonNoRun the helper functions anon must never run: what's behind the visit keys of migration_v54 (the secret, and the function that turns a visitor id into a key), and Timmy's chats and the two calls only the timmy Edge Function makes with the service role (migration_v55), and Learn and Flashcards' log of ratings with its helper and Link my devices' trigger (migration_v56), and the class's picks of earlier versions of a question's choices with the two helpers that move them (migration_v66). The prizes' tables (migration_v68: the runs of right answers, the class's records, lecture reads and the trophies seen at the switch) are closed too; their functions are tested in xp.js.",
+  "about": "What the anonymous role (every visitor, using the public publishable key) may do to each table directly, without going through a function. Everything else goes through security-definer functions that check their own inputs. tools/release/rls.js fails if the schema allows more than this, or less. Change this file only together with the migration that changes the policy, and say why in the PR. anonNone lists tables that must be closed to anon altogether (no privilege and no policy, tried by hand), and anonNoRun the helper functions anon must never run: what's behind the visit keys of migration_v54 (the secret, and the function that turns a visitor id into a key), and Timmy's chats and the two calls only the timmy Edge Function makes with the service role (migration_v55), and Learn and Flashcards' log of ratings with its helper and Link my devices' trigger (migration_v56), and the class's picks of earlier versions of a question's choices with the two helpers that move them (migration_v66), and the shop's picks of the day stored once for everyone (shop_days) with the three helpers that work them out, store them and clear them (migration_v79). The prizes' tables (migration_v68: the runs of right answers, the class's records, lecture reads and the trophies seen at the switch) are closed too; their functions are tested in xp.js.",
   "anonSelect": [
     "changelog",
     "mode_stats",
@@ -23,7 +23,8 @@
     "game_records",
     "notes_reads",
     "prize_seen",
-    "question_choices_past"
+    "question_choices_past",
+    "shop_days"
   ],
   "anonNoRun": [
     "sh_visit_key(text)",
@@ -33,6 +34,9 @@
     "sh_card(timestamptz, text, text, text, text, boolean, text, bigint)",
     "sh_cards_on_link()",
     "sh_choice_version(text, text)",
-    "sh_choices_to(text, text, text)"
+    "sh_choices_to(text, text, text)",
+    "sh_shop_day_make(date)",
+    "sh_shop_days_fill()",
+    "sh_shop_days_clear()"
   ]
 }

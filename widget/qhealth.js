@@ -16,8 +16,9 @@
    A question in A/B versions (content/variants.json) adds the version on screen to each row (w: 0 = A, 1 = B).
    Every row carries the question's version: a fingerprint of what the hub exports for it (SH_EXPORT.questions: stem,
    choices, key, explanation), so an edited question starts fresh numbers. fp() is also used by review/.
-   Rows go out in batches to record_qh (migration_v51): every 30 s, at 20 rows, and when the tab is hidden. Automated
-   browsers send nothing. ============ */
+   Rows go out in batches to record_qh (migration_v51): every 30 s, at 20 rows, and when the tab is hidden; since
+   migration_v79 (2026-11-19) in one call with the page's clicks and events (record_analytics, widget/v3.js
+   shAnalytics.send). Automated browsers send nothing. ============ */
 (function(){
   if (window.shQH) return;
 
@@ -221,6 +222,9 @@
     if (!queue.length || !ON) return;
     /* in the database's quiet spell (widget/v3.js safeRpc) the rows wait, unless the tab is going away */
     if (!leaving && window.shDb && window.shDb.busy()) return;
+    /* with the clicks and events, in one call (widget/v3.js shAnalytics.send, migration_v79); an older v3.js: on its own */
+    var A = window.shAnalytics;
+    if (A && typeof A.send === "function") { A.send("qh", queue.splice(0, queue.length), !!leaving); return; }
     var items = queue.splice(0, 60);
     var body = JSON.stringify({ p_hub: HUB, p_visitor: H.visitor, p_visit: H.visit, p_items: items });
     try {
@@ -332,7 +336,8 @@
     window.addEventListener("scroll", input, { passive: true, capture: true });
     lastTick = now();
     setInterval(tick, TICK);
-    if (window.shAnalytics && typeof window.shAnalytics.register === "function") window.shAnalytics.register("qhealth", function(){ flush(false); }, 30000);
+    /* on the page's analytics clock; when the page is leaving, the open cards' rows are finished first (closeAll) */
+    if (window.shAnalytics && typeof window.shAnalytics.register === "function") window.shAnalytics.register("qhealth", function(){ flush(false); }, 30000, closeAll);
     else setInterval(function(){ flush(false); }, 30000); /* standalone fallback */
     document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") closeAll(); else lastTick = now(); });
     window.addEventListener("pagehide", closeAll);

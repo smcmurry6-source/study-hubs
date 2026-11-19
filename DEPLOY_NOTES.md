@@ -32,6 +32,22 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (the database optimization pass, phase 2: fewer calls from the page, Claude Code)** — nothing students see
+  or earn changes; the pages make fewer requests and the bootstrap does less. `migration_v79.sql` (**pending: apply at
+  night after Fri 2026-11-20, 9:30 am**, `supabase/pending-migrations.txt`): `get_class_numbers` (a card's class numbers,
+  `question_stats` and `question_choices`, in one call instead of two REST reads: they were a fifth of every request),
+  `record_analytics` (question health's rows, the clicks and the events in one call instead of three), the shop's picks of
+  the day stored once for everyone (`shop_days`, filled by pg_cron hourly, cleared by a trigger on `shop_items`),
+  `get_widget_bootstrap_v2` built once (it worked out v1's rank, Timmy's days and Inbox and threw them away),
+  `get_my_answers` in PL/pgSQL, and `anon_name` by an index on the name's base. The bootstrap 38.7 / 26.9 / 19.4 → 22.5 /
+  13.8 / 10.2 ms on a throwaway copy, every value the same. Page side, working with or without the migration (the old
+  calls when it's missing): `widget/v3.js` (`classNumbers`, `shAnalytics.send`), `widget/qhealth.js` and
+  `widget/clicks.js` hand their batches to it (the dashboard sends its clicks and events together), and `widget/ranks.js`
+  works out the rank and this hub's mastery after every tenth answer from the replies and the answers it holds, reading
+  the server only when something it can't count changed (`sh:trophy-sent` from `widget/eggs.js`, `widget/pet.js` and the
+  bowling egg, a medal, a new day, the 100/1,000 answers and 25/100 runs, mocks and games, at least every 50 answers).
+  Tested by `tools/release/xp.js` (a new section), `rls.js` (`shop_days` and its helpers closed to anon) and
+  `tools/ci/quiet.js` (both ways). [The task](vault/tasks/2026-11-18-database-optimization-pass.md).
 - **2026-11-19 (About page accessibility, Claude Code, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453))** — the last three accessibility bugs from
   the release dry run, all on `about/index.html`: BUG-007, the nine contents links at the top turned their focus outline off
   (`nav.toc a:focus-visible{outline:none}`), so a keyboard user couldn't see where they were; they now get the page's ring.

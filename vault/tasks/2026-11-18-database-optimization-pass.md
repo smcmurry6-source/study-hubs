@@ -123,16 +123,38 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
 - [ ] **Drop `activity_visits_last_idx`** (idea 5's finding): every ping's update of the visit then stays on its page.
   Check the admin page's visitor summary (`where v.last_at >= since`) on a copy without it first; then rewrite the
   table once at night (`vacuum full public.activity_visits`), since it will have grown.
-- [ ] **The class's numbers on each card** (`question_stats` and `question_choices`, `widget/v3.js`): 20.6% of every
+- [x] **The class's numbers on each card** (`question_stats` and `question_choices`, `widget/v3.js`): 20.6% of every
   request and another 14.6% of preflights, two reads a card. (Only 0.5% of the database's time, live: the gain is in
   requests, so it matters when the request limit or the connection count is what's tight.) The answer's reply could carry them (the save has just
-  written both rows), or one call could read both.
-- [ ] **The page's three analytics batches as one call** (`record_qh`, `record_clicks`, `record_events`: 14.8% of
-  requests together): one flush, one call.
-- [ ] **The bootstrap** (31 / 18 / 12 ms on the copy after v76, 445 ms at the median live): the shop's picks of the day
+  written both rows), or one call could read both. **Done, one call for both** (2026-11-19, phase 2, `migration_v79.sql`'s
+  `get_class_numbers` with `widget/v3.js`): one request a card where there were two, the same rows, the same database
+  time (0.08 ms either way for a card). Not in the answer's reply, which package 4 (the answer save) was working on at
+  the same time (Sam's order). A database without the call gets the two reads, and the page doesn't ask again.
+- [x] **The page's three analytics batches as one call** (`record_qh`, `record_clicks`, `record_events`: 14.8% of
+  requests together): one flush, one call. **Done** (phase 2: `migration_v79.sql`'s `record_analytics`, `widget/v3.js`'s
+  `shAnalytics.send`, `widget/qhealth.js`, `widget/clicks.js`): when one batch is due, the others go with it, in one call
+  that hands each to its own function (the same rows: `tools/release/xp.js`); 1.6 ms of database time either way. On
+  the dashboard the clicks and the events go together. A page that is leaving sends with keepalive, the three calls until
+  the device has seen the new one work.
+- [x] **The bootstrap** (31 / 18 / 12 ms on the copy after v76, 445 ms at the median live): the shop's picks of the day
   are worked out again for every visitor (about 5 ms; the same for everyone all day), `get_my_answers` builds up to
   5,000 rows of JSON (4-11 ms), and a visitor without a chosen name has their class name checked against everyone's
-  (3.6 ms).
+  (3.6 ms). **Done** (phase 2, `migration_v79.sql`): 38.7 / 26.9 / 19.4 → **22.5 / 13.8 / 10.2 ms** (heavy / middling /
+  light, on phase 2's copy), the dashboard's 22.0 → 10.8 ms. The shop's day is kept in `shop_days` (2.1 → 0.04 ms;
+  `get_my_shop` 11.3 / 5.9 / 5.7 → 4.7 / 3.7 / 4.7 ms), the v2 bootstrap no longer works out v1's rank, Timmy's days and
+  Inbox only to replace them, the class name is a lookup on an index of its base (5-6.5 → 0.03-0.14 ms; 50 names on a
+  board 15.9 → 11.1 ms) and `get_my_answers` is PL/pgSQL with its JSON built once (11.7 → 8.8 ms for 8,000 answers).
+  Every value is what it was (below). Left: the answers themselves, the next box.
+- [ ] **Apply `migration_v79.sql`** (phase 2: the class's numbers, the analytics, the bootstrap): at night (1 to 5 am
+  Central), not before Heme & Endo Exam 3 is over (Fri 2026-11-20, 9:30 am; Sam). Fetch `main` first and check that
+  nothing since has replaced `sh_shop_day`, `get_widget_bootstrap_v2`, `get_my_answers` or `anon_name`; md5-check their
+  live bodies against `supabase/schema.sql`'s before, and the migration's after; check that pg_cron took the
+  `sh-shop-days` job and `shop_days` holds today and tomorrow; then `get_class_numbers` and `record_analytics` through the
+  API as a visitor. Append it to `supabase/schema.sql`, take its line out of `supabase/pending-migrations.txt`. Until it
+  is applied, the pages ask for the two new calls once a page load and use the old ones (a 404 each).
+- [ ] **The bootstrap's answers** (left by phase 2): `get_my_answers` is still most of a heavy student's bootstrap (8.8 of
+  22.5 ms at 8,000 answers; 0.6 ms at 500) and is read again every 3 minutes a hub is open. The device could send the time
+  of the newest answer it holds and get only those after it. `get_pet_days_v2` is the next (about 3 ms for the heaviest).
 - [ ] **`answer_xp` is written twice an answer** (the row, then its reply onto it): one insert at the end would halve
   that table's writes and dead rows. It moves the insert past the speed limit's count, which reads the row, so it needs
   care.
@@ -140,8 +162,14 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
   `personal_answers`, 76 MB), found by the ping table's rewrite ([database-load](2026-11-18-database-load.md), its Log). Its
   rows are four short columns, so most of it is likely the primary key's index and space left by Link my devices'
   rebuilds: look at the table's and the index's sizes apart before deciding on a rewrite.
-- [ ] **The rank and mastery after every tenth answer** (`widget/ranks.js`): on the game layer the answer's reply
-  already carries the XP total; the page could work out the hub's mastery from the answers it holds.
+- [x] **The rank and mastery after every tenth answer** (`widget/ranks.js`): on the game layer the answer's reply
+  already carries the XP total; the page could work out the hub's mastery from the answers it holds. **Done** (phase 2,
+  `widget/ranks.js`, no server part): the XP comes from the replies and this hub's mastery from each question's last
+  try (the bootstrap's answers, then every reply), so ten answers make no read. It still reads both when something it can't
+  count may have changed: a new trophy sent from the page (`sh:trophy-sent`: the eggs, Timmy, the bowling egg, a medal), a
+  medal in a reply, the day's first answer or a new day, 100 or 1,000 answers, a run that could reach 25 or 100, a mock's
+  or a game's answers, a question it has no last try for, and at least every 50 answers; with Stats open, on the old
+  pages and without the bootstrap, as before. `tools/ci/quiet.js` checks both ways.
 
 ## Log
 
@@ -171,7 +199,21 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
     was). Nobody was answering at that hour (a few pings every five minutes), so the saves themselves are the next
     evening's readout (the open box).
 
+- 2026-11-19, phase 2, fewer calls from the page (Claude Code, Sam's package): `migration_v79.sql` with `widget/v3.js`,
+  `widget/qhealth.js`, `widget/clicks.js`, `widget/ranks.js` (and the trophy signal in `widget/eggs.js`, `widget/pet.js`).
+  Measured on a new throwaway copy of `supabase/schema.sql` with a made-up class (2,123 visitors, 2,246 visitor-hub
+  answer histories), the medians of many calls: the numbers in the four boxes above. Checked identical, old against new,
+  on that copy: the shop over every day of 2026-2027, the class name of every visitor, every answer history, the
+  bootstrap for 508 visitor and hub pairs, the class's numbers against the two reads, the analytics rows from one call
+  against three, and the stored shop cleared by a change to `shop_items`; the expression index keeps the name's updates
+  on their page (300 of 300). `tools/release/xp.js` (627 checks), `rls.js`, `admin-ops.js`, `retention.js` and `timmy.js`
+  pass with v79 pending; `tools/ci/quiet.js` checks the page side. Not applied live: the box above.
+
 ## Outcome
+
+So far (the task stays open for the boxes still unticked): phase 1's `migration_v76.sql` and `migration_v77.sql` are live;
+phase 2's fewer calls from the page (the four boxes ticked 2026-11-19) are `migration_v79.sql`, waiting to be applied at
+night after Fri 2026-11-20, 9:30 am, and page changes that work with or without it.
 
 Related: [database-load](2026-11-18-database-load.md) · [shared-infrastructure](../reference/shared-infrastructure.md) ·
 [game-server](../reference/game-server.md) · [decisions](../decisions.md) ·

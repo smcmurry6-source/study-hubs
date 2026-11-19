@@ -41,9 +41,13 @@ function inMock(){ try { return /(^|\/)mock/.test(String(H.section() || "")); } 
 function ok(){ return on() && !inMock(); }
 function feat(k){ return H.prefGet("sh_pref_" + k, "on") !== "off" && !inMock(); }
 function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+var TROPHY_NEW = { record_achievement: function(d){ return d === true; }, record_fairy: function(d){ return d === 1 || d === 5; }, claim_golden_probe: function(d){ return d === true; } };
 function rpc(name, args){
 if (!SB) return Promise.resolve(null);
-return SB.rpc(name, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; });
+return SB.rpc(name, args).then(function(r){
+if (r && !r.error && TROPHY_NEW[name] && TROPHY_NEW[name](r.data)) try { document.dispatchEvent(new CustomEvent("sh:trophy-sent")); } catch (e) {}
+return r && !r.error ? r.data : null;
+}, function(){ return null; });
 }
 function initialCavityRows(){
 var boot = H.bootstrap || (window.shBootstrap && window.shBootstrap.ready);
@@ -2119,6 +2123,8 @@ if (queue.length >= 20) flush(false);
 function flush(leaving){
 if (!queue.length || !ON) return;
 if (!leaving && window.shDb && window.shDb.busy()) return;
+var A = window.shAnalytics;
+if (A && typeof A.send === "function") { A.send("qh", queue.splice(0, queue.length), !!leaving); return; }
 var items = queue.splice(0, 60);
 var body = JSON.stringify({ p_hub: HUB, p_visitor: H.visitor, p_visit: H.visit, p_items: items });
 try {
@@ -2224,7 +2230,7 @@ if (c && e.type === "click" && c.__shQh && c.__shQh.rec && e.target.closest('[da
 window.addEventListener("scroll", input, { passive: true, capture: true });
 lastTick = now();
 setInterval(tick, TICK);
-if (window.shAnalytics && typeof window.shAnalytics.register === "function") window.shAnalytics.register("qhealth", function(){ flush(false); }, 30000);
+if (window.shAnalytics && typeof window.shAnalytics.register === "function") window.shAnalytics.register("qhealth", function(){ flush(false); }, 30000, closeAll);
 else setInterval(function(){ flush(false); }, 30000);
 document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") closeAll(); else lastTick = now(); });
 window.addEventListener("pagehide", closeAll);
@@ -3242,11 +3248,33 @@ var classChoicesPending = [];
 var classStatsTimer = null;
 function uniq(a){ return a.filter(function(v, i){ return a.indexOf(v) === i; }); }
 function settle(q){ return new Promise(function(res){ try { q.then(res, function(){ res(null); }); } catch (e) { res(null); } }); }
+var classOne = true;
 function flushClassStats(){
 var qids = classStatsPending, cbs = classStatsCallbacks, want = uniq(classChoicesPending);
 classStatsPending = []; classStatsCallbacks = []; classChoicesPending = [];
 var unique = uniq(qids);
 if (!supabase || !unique.length || dbBusy()) { cbs.forEach(function(cb){ cb({}); }); return; }
+if (classOne) { classNumbers(unique, want, cbs); return; }
+classReads(unique, want, cbs);
+}
+function classNumbers(unique, want, cbs){
+var parts = [];
+for (var i = 0; i < unique.length; i += 1000) (function(qs){
+var set = {}; qs.forEach(function(q){ set[q] = 1; });
+parts.push(settle(supabase.rpc("get_class_numbers", { p_hub: HUB, p_qids: qs, p_choices: want.filter(function(q){ return set[q]; }) })));
+})(unique.slice(i, i + 1000));
+Promise.all(parts).then(function(all){
+if (all.some(rpcMissing)) { classOne = false; classReads(unique, want, cbs); return; }
+var byQid = {}, ok = all.every(function(r){ return r && !r.error && r.data && typeof r.data === "object"; });
+if (ok) {
+all.forEach(function(r){ (r.data.stats || []).forEach(function(s){ byQid[s.qid] = { total: s.attempts, correct: s.correct }; }); });
+want.forEach(function(q){ (byQid[q] = byQid[q] || { total: 0, correct: 0 }).choices = {}; });
+all.forEach(function(r){ (r.data.choices || []).forEach(function(c){ var b = byQid[c.qid]; if (b && b.choices) b.choices[c.choice] = c.picks; }); });
+}
+cbs.forEach(function(cb){ try { cb(byQid); } catch (e) {} });
+});
+}
+function classReads(unique, want, cbs){
 var jobs = [settle(supabase.from("question_stats").select("qid,attempts,correct").eq("hub", HUB).in("qid", unique))];
 for (var i = 0; i < want.length; i += 100) jobs.push(settle(supabase.from("question_choices").select("qid,choice,picks").eq("hub", HUB).in("qid", want.slice(i, i + 100))));
 Promise.all(jobs).then(function(all){
@@ -3749,29 +3777,75 @@ return bootstrap.data;
 }
 window.shBootstrap = bootstrap;
 (function(){
-var jobs = {}, timer = null;
+var jobs = {}, timer = null, out = { qh: [], clicks: [], events: [] }, postT = null, gathering = false, one = null;
+try { if (localStorage.getItem("sh_rpc_analytics") === "1") one = true; } catch (e) {}
 function now(){ return Date.now(); }
-function run(force){
-var t = now();
-Object.keys(jobs).forEach(function(k){
-var j = jobs[k];
-if (!j || (!force && t < j.next)) return;
-j.next = t + j.every;
-try { j.flush(); } catch (e) {}
+function run(force, leaving){
+var t = now(), due = [];
+Object.keys(jobs).forEach(function(k){ var j = jobs[k]; if (j && (force || t >= j.next)) due.push(j); });
+if (!due.length && !held()) return;
+if (due.length) due = Object.keys(jobs).map(function(k){ return jobs[k]; });
+gathering = true;
+due.forEach(function(j){ j.next = t + j.every; try { (leaving && j.leave ? j.leave : j.flush)(); } catch (e) {} });
+gathering = false;
+post(!!leaving);
+}
+function held(){ return out.qh.length + out.clicks.length + out.events.length > 0; }
+function send(kind, items, leaving){
+if (!out[kind] || !items || !items.length) return;
+Array.prototype.push.apply(out[kind], items);
+if (gathering) return;
+if (leaving) { run(true, true); return; }
+if (!postT) postT = setTimeout(function(){ postT = null; run(true, false); }, 0);
+}
+function headers(){ return { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }; }
+function beacon(fn, args){
+var body = JSON.stringify(args);
+try { fetch(SB_URL + "/rest/v1/rpc/" + fn, { method: "POST", keepalive: body.length < 60000, headers: headers(), body: body }).catch(function(){}); } catch (e) {}
+}
+function apart(a, leaving){
+var calls = [];
+if (a.p_qh.length) calls.push(["record_qh", { p_hub: a.p_hub, p_visitor: a.p_visitor, p_visit: a.p_visit, p_items: a.p_qh }]);
+if (a.p_events.length) calls.push(["record_events", { p_hub: a.p_hub, p_visitor: a.p_visitor, p_items: a.p_events }]);
+if (a.p_clicks.length) calls.push(["record_clicks", { p_hub: a.p_hub, p_visitor: a.p_visitor, p_items: a.p_clicks }]);
+calls.forEach(function(c){
+if (leaving && window.fetch) { beacon(c[0], c[1]); return; }
+try { supabase.rpc(c[0], c[1]).then(function(){}, function(){}); } catch (e) {}
 });
+}
+function post(leaving){
+if (postT && leaving) { clearTimeout(postT); postT = null; }
+if (!held()) return;
+if (!supabase || AUTOMATED) { out = { qh: [], clicks: [], events: [] }; return; }
+if (!leaving && dbBusy()) return;
+while (held()) {
+var a = { p_hub: HUB, p_visitor: VISITOR_ID, p_visit: VISIT_ID, p_qh: out.qh.splice(0, 60), p_clicks: out.clicks.splice(0, 80), p_events: out.events.splice(0, 40) };
+if (one === false || (one === null && leaving)) { apart(a, leaving); continue; }
+if (leaving && window.fetch) { beacon("record_analytics", a); continue; }
+(function(a){
+try {
+supabase.rpc("record_analytics", a).then(function(res){
+if (rpcMissing(res)) { one = false; try { localStorage.removeItem("sh_rpc_analytics"); } catch (e) {} apart(a, false); return; }
+if (res && !res.error) { if (one !== true) { one = true; try { localStorage.setItem("sh_rpc_analytics", "1"); } catch (e) {} } }
+else if (dbFailed(res)) dbFail();
+}, function(){ dbFail(); });
+} catch (e) {}
+})(a);
+}
 }
 function arm(){ if (!timer) timer = setInterval(function(){ run(false); }, 15000); }
 window.shAnalytics = {
-register: function(key, flush, every){
+register: function(key, flush, every, leave){
 if (!key || typeof flush !== "function") return function(){};
-jobs[String(key)] = { flush: flush, every: Math.max(1000, Number(every) || 30000), next: now() + Math.max(1000, Number(every) || 30000) };
+jobs[String(key)] = { flush: flush, leave: typeof leave === "function" ? leave : null, every: Math.max(1000, Number(every) || 30000), next: now() + Math.max(1000, Number(every) || 30000) };
 arm();
 return function(){ delete jobs[String(key)]; };
 },
-flush: function(){ run(true); }
+flush: function(){ run(true); },
+send: send
 };
-document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") run(true); });
-window.addEventListener("pagehide", function(){ run(true); });
+document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") run(true, true); });
+window.addEventListener("pagehide", function(){ run(true, true); });
 })();
 var resolvedAnonName = "";
 bootstrap.ready.then(function(data){
@@ -4200,7 +4274,7 @@ function sendBowlTrophy(){
 try { if (!supabase || !localStorage.getItem("sh_bowl_trophy") || localStorage.getItem("sh_bowl_trophy_sent")) return; } catch (e) { return; }
 try {
 supabase.rpc("record_achievement", { p_visitor: VISITOR_ID, p_kind: "bowling", p_hub: HUB || "" }).then(function(res){
-if (res && !res.error) try { localStorage.setItem("sh_bowl_trophy_sent", "1"); } catch (e) {}
+if (res && !res.error) try { localStorage.setItem("sh_bowl_trophy_sent", "1"); if (res.data === true) document.dispatchEvent(new CustomEvent("sh:trophy-sent")); } catch (e) {}
 }, function(){});
 } catch (e) {}
 }
