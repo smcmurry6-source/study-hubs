@@ -10,6 +10,13 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **Resolve Perio report 65 (`q4-L27`, "the re-eval is 4-6 months, not 2 weeks") once its fix is live** (2026-11-19):
+  after the PR that rewords the item's fourth pair merges, `update question_flags set resolved = true, resolved_at = now(),
+  reply = 'Thanks for flagging it. The Phase I re-evaluation is at 4-6 weeks after SRP (weeks, not months: that is when
+  connective tissue has reattached and the pockets stop shrinking). The 2 weeks row is a different visit: if that
+  evaluation still finds calculus, it is removed and the sites are evaluated again 2 weeks later. The row now says "A
+  second Phase I evaluation" so it reads that way. (4-6 months is the moderate-risk recall from the risk assessment
+  lecture.)' where id = 65`.
 - [x] **Resolve Perio report 64 (`pc-h1`, the film is only a sketch) once its fix is live** (2026-11-19, done after [#443](https://github.com/smcmurry6-source/study-hubs/pull/443) merged): after the PR
   that adds "Today's film, in words" to the implant cases merges, `update question_flags set resolved = true, resolved_at = now(),
   reply = 'Thanks! You were right: the drawn film was hard to read. Every implant case now has a "Today''s film, in words" line
