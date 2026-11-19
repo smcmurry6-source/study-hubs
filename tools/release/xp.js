@@ -1491,7 +1491,16 @@ try {
     notes.push('collections (migration_v75): 21 (14 sets, 6 year-round, the costumes), a finished one 1,000 XP and crowns once, Halloween\'s gift never, two at once, the rebuild and Link my devices');
   }
 
-  /* ---------- 14b. fewer calls from the page (migration_v79, the database optimization pass, phase 2) ---------- */
+  /* ---------- 14b. the awards' running totals (migration_v79): after everything above (answers, mocks, medals, cards,
+     boosts, the rebuilds, Link my devices, deleted awards), each student's totals by kind are the sums of their awards ---------- */
+  eq(rows(`select coalesce(a.visitor_id, t.visitor_id) as v, coalesce(a.src, t.src) as src, a.n as an, t.n as tn, a.base as ab, t.base as tb, a.xp as ax, t.xp as tx
+           from (select visitor_id, src, count(*)::int n, sum(base)::int base, sum(xp)::int xp from xp_awards group by 1, 2) a
+           full join (select * from xp_award_totals where n <> 0 or base <> 0 or xp <> 0) t using (visitor_id, src)
+           where a.n is distinct from t.n or a.base is distinct from t.base or a.xp is distinct from t.xp`), [],
+     'every running total equals the sum of its awards');
+  notes.push(`the awards' running totals (migration_v79): ${num(`select count(*) from xp_award_totals`)} totals for ${num(`select count(*) from xp_awards`)} awards, all equal to the sums`);
+
+  /* ---------- 14c. fewer calls from the page (migration_v82, the database optimization pass, phase 2) ---------- */
   if (one(`select to_regproc('public.get_class_numbers')`)) {
     // a card's class numbers in one call: the rows the two REST reads returned
     const cq = rows(`select distinct qid from question_stats where hub = 'xh' order by qid`).map(r => r.qid);
@@ -1555,11 +1564,11 @@ try {
     ok(nm.length > 20 && nm.every(r => r.a === r.b) && tw.length === 2 && tw.find(r => r.v === twin[1]).a.split(' ').length === 2 && tw.find(r => r.v === twin[0]).a.split(' ').length === 3,
       `anon_name gives the names it gave (${nm.length} visitors, ${nm.filter(r => r.a !== r.b).length} differ; two sharing a name: the first keeps it plain, the later gets a number)`);
     sql(`drop function public.zz_anon_name_old(text)`);
-    notes.push('fewer calls (migration_v79): class numbers in one call, the analytics in one call, the shop\'s day stored, the bootstrap built once, the answers, the class name by lookup');
+    notes.push('fewer calls (migration_v82): class numbers in one call, the analytics in one call, the shop\'s day stored, the bootstrap built once, the answers, the class name by lookup');
   }
 
   /* ---------- 15. the private parts stay private ---------- */
-  for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
+  for (const t of ['xp_awards', 'xp_award_totals', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);
   raises(() => anon(`update public.visit_secret set secret = 'x'`), '42501', 'anon writes visit_secret directly');
   for (const f of [`sh_answer(null, 'x', 'xh', 'x1', 1, null, null, null, null, null, null, null)`, `sh_award('x', 'k', 'report', 'xh', 100, 1, now())`,

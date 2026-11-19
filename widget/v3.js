@@ -794,7 +794,7 @@
   function uniq(a){ return a.filter(function(v, i){ return a.indexOf(v) === i; }); }
   /* a Supabase query as a promise that never rejects (null on failure) */
   function settle(q){ return new Promise(function(res){ try { q.then(res, function(){ res(null); }); } catch (e) { res(null); } }); }
-  /* One call for both (2026-11-19, the database optimization pass, phase 2): get_class_numbers (migration_v79) returns
+  /* One call for both (2026-11-19, the database optimization pass, phase 2): get_class_numbers (migration_v82) returns
      the question_stats and question_choices rows the two reads below return, so a card costs one request (and one
      preflight) instead of two; the two reads were a fifth of every request the class made. A database without it gets
      the two reads, as before. */
@@ -1441,7 +1441,7 @@
      foreground time; it is not a network flush timer.
      One call for the three batches (2026-11-19, the database optimization pass, phase 2): question health
      (widget/qhealth.js), clicks and feature events (widget/clicks.js) hand their batches to send() instead of each
-     calling its own function, and they go out together in one record_analytics call (migration_v79). When one of them is
+     calling its own function, and they go out together in one record_analytics call (migration_v82). When one of them is
      due (its timer, its size, the page being hidden), the others hand over what they hold too, so a page makes one call
      where it made up to three (the three were 14.8% of every request). The rows are the same. The quiet spell holds them
      as before. A database without record_analytics gets the three calls; a page that is leaving (hidden or closed) sends
@@ -3784,7 +3784,7 @@
     if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
   })();
   /* click analytics (widget/clicks.js): what people use, for improving each hub */
-  /* the clicks and events go with question health's rows in one call (shAnalytics.send, migration_v79): widget/clicks.js
+  /* the clicks and events go with question health's rows in one call (shAnalytics.send, migration_v82): widget/clicks.js
      sends through the client it is given, and here that client hands its two calls to the batch. (clicks.js itself is
      unchanged: it goes to the dashboard too, which still makes its two calls; its page budget had no room.) */
   var clicksSb = !supabase ? null : { rpc: function(fn, a){

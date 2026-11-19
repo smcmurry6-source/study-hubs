@@ -4,7 +4,7 @@
 // And the answers kept on the device (2026-11-19): a page whose saves fail is hidden, shown, hidden again; a second page
 // of the hub opens on a working database and sends them, in order, spaced as answered, with the same ids; the first page,
 // shown again, finds them taken and sends nothing more.
-// And fewer calls from the page (2026-11-19, the database optimization pass, phase 2, migration_v79): phase2() below.
+// And fewer calls from the page (2026-11-19, the database optimization pass, phase 2, migration_v82): phase2() below.
 // Nothing reaches the real database: every request off 127.0.0.1 is answered here, and every WebSocket is closed (the
 // pages aren't marked automated, so a live realtime connection would put them in the class's "studying now" count).
 'use strict';
@@ -226,14 +226,14 @@ async function pings(browser, missing){
   await context.close();
 }
 
-// Fewer calls from the page (2026-11-19, the database optimization pass, phase 2, migration_v79): a card's class numbers in
+// Fewer calls from the page (2026-11-19, the database optimization pass, phase 2, migration_v82): a card's class numbers in
 // one get_class_numbers call (not the question_stats and question_choices reads); question health's rows, the clicks and the
 // events in one record_analytics call (not three); and on the game layer the tenth answer worked out on the page, with no
 // get_rank_profile_v2 or get_hub_mastery, its XP from the replies and this hub's mastery from each question's last try, until
 // something the page can't count happens (a trophy sent: the next tenth answer reads both). A database without
-// migration_v79 gets the old reads and calls, and isn't asked for the missing ones again.
+// migration_v82 gets the old reads and calls, and isn't asked for the missing ones again.
 async function phase2(browser, missing){
-  const what = missing ? 'phase 2, a database without migration_v79' : 'phase 2';
+  const what = missing ? 'phase 2, a database without migration_v82' : 'phase 2';
   const context = await browser.newContext();
   if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
   const log = []; let n = 0;

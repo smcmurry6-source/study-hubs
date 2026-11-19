@@ -33,8 +33,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-11-19 (the database optimization pass, phase 2: fewer calls from the page, Claude Code, [#459](https://github.com/smcmurry6-source/study-hubs/pull/459))** — nothing students see
-  or earn changes; the pages make fewer requests and the bootstrap does less. `migration_v79.sql` (**pending: apply at
-  night after Fri 2026-11-20, 9:30 am**, `supabase/pending-migrations.txt`): `get_class_numbers` (a card's class numbers,
+  or earn changes; the pages make fewer requests and the bootstrap does less. `migration_v82.sql` (**pending: apply at
+  night after Fri 2026-11-20, 9:30 am**, after #457's v79 to v81, `supabase/pending-migrations.txt`; written as v79, renumbered at the merge): `get_class_numbers` (a card's class numbers,
   `question_stats` and `question_choices`, in one call instead of two REST reads: they were a fifth of every request),
   `record_analytics` (question health's rows, the clicks and the events in one call instead of three), the shop's picks of
   the day stored once for everyone (`shop_days`, filled by pg_cron hourly, cleared by a trigger on `shop_items`),
@@ -49,6 +49,26 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   100/1,000 answers and 25/100 runs, mocks and games, at least every 50 answers).
   Tested by `tools/release/xp.js` (a new section), `rls.js` (`shop_days` and its helpers closed to anon) and
   `tools/ci/quiet.js` (both ways). [The task](vault/tasks/2026-11-18-database-optimization-pass.md).
+- **2026-11-19 (the database optimization pass, phase 2: the answer save and its tables, Claude Code, [#457](https://github.com/smcmurry6-source/study-hubs/pull/457))** —
+  three migrations, written and tested, **not applied yet** (Sam: nothing live before Heme & Endo Exam 3, the rewrites at night;
+  set for Sat 11-21, 1:30 am Central, and listed in `supabase/pending-migrations.txt` until then). `migration_v79.sql`:
+  `xp_award_totals`, each student's awards summed by kind, kept by statement-level triggers on `xp_awards`, so the crown
+  balance in every answer's reply (`sh_wallet`) reads a row a kind instead of every award; filled in the same transaction
+  (63,000 awards live). `migration_v80.sql`: `sh_answer` inserts its `answer_xp` row once, with the reply, instead of an
+  insert and an update. `migration_v81.sql`: `activity_visits_last_idx` dropped (every ping's update of its visit was a new
+  row and three index entries; the admin page's visitor summary gives the same numbers without it). Then `cluster` of
+  `activity_visits` and of `xp_seen` (54.7 MB, about twice what its rows need). On two throwaway copies
+  (`tools/release/bench-answers.js`, new, for the next phase): the same replies to 37,630 calls, wallets and rows in every
+  table; an answer save 3.81 → 2.19 ms for a heavy student, 2.86 → 2.12 middling, 2.53 → 2.01 light. Nothing students see
+  or earn changes. `tools/release/xp.js` checks the totals against the sums; `pg.js` takes extra server settings.
+  [The task note](vault/tasks/2026-11-18-database-optimization-pass.md) has the numbers; tonight's readout goes there too.
+- **2026-11-19 (The check-in's last question, Claude Code)** — Sam: "Lets change the free response question to just asking what the hub could
+  have done better". The exam check-in's text step (`DEBRIEF_QS` in `widget/dash.js`) now asks "What could the hub have done better?" and its box
+  has no placeholder (it was "e.g. more on suture types, more EXCEPT questions", from the 2026-10-02 version that asked for topics the hub
+  missed). Timmy's line on that step is "What could I have done better?" when the check-in no longer pays. The honor-code note stays, and the
+  answer key is still `missed`, so the admin page (its heading now "What the hub could have done better"), `/lessons-audit` and the idea board's tick
+  read it as before. About page, Ask Timmy's site help and the lessons-audit skill updated.
+
 - **2026-11-19 (About page accessibility, Claude Code, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453))** — the last three accessibility bugs from
   the release dry run, all on `about/index.html`: BUG-007, the nine contents links at the top turned their focus outline off
   (`nav.toc a:focus-visible{outline:none}`), so a keyboard user couldn't see where they were; they now get the page's ring.

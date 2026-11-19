@@ -17,7 +17,7 @@
    Every row carries the question's version: a fingerprint of what the hub exports for it (SH_EXPORT.questions: stem,
    choices, key, explanation), so an edited question starts fresh numbers. fp() is also used by review/.
    Rows go out in batches to record_qh (migration_v51): every 30 s, at 20 rows, and when the tab is hidden; since
-   migration_v79 (2026-11-19) in one call with the page's clicks and events (record_analytics, widget/v3.js
+   migration_v82 (2026-11-19) in one call with the page's clicks and events (record_analytics, widget/v3.js
    shAnalytics.send). Automated browsers send nothing. ============ */
 (function(){
   if (window.shQH) return;
@@ -222,7 +222,7 @@
     if (!queue.length || !ON) return;
     /* in the database's quiet spell (widget/v3.js safeRpc) the rows wait, unless the tab is going away */
     if (!leaving && window.shDb && window.shDb.busy()) return;
-    /* with the clicks and events, in one call (widget/v3.js shAnalytics.send, migration_v79); an older v3.js: on its own */
+    /* with the clicks and events, in one call (widget/v3.js shAnalytics.send, migration_v82); an older v3.js: on its own */
     var A = window.shAnalytics;
     if (A && typeof A.send === "function") { A.send("qh", queue.splice(0, queue.length), !!leaving); return; }
     var items = queue.splice(0, 60);

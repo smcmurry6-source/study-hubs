@@ -27,3 +27,6 @@
 # migration_v77 (record_activity_pings: a page's pings in one call a minute) was applied on 2026-11-19 (through the connector, md5-checked, PR #444).
 # migration_v78 (no "A miss fixed" bonus; the rebuild keeps the ones already paid) was applied on 2026-11-19 (through the connector, md5-checked, PR #451).
 migration_v79.sql
+migration_v80.sql
+migration_v81.sql
+migration_v82.sql
