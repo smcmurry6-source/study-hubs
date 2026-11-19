@@ -37,10 +37,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   so XX-Large on a 320 px phone lays out in 220 px, and the arcade lobby, the Question Bank, Notes, Exam Hints, the cram
   sheet, Stats and Settings all ran past the screen there (Exam Hints and the cram sheet at 320 px at every size). In
   `widget/hub.css` every grid's column minimum is `min(Npx, 100%)` (the lobby's beats each hub's own `arcade.css`), the
-  bank's filter panel is one column, a long word in a lecture title or anywhere in `.hx` breaks instead of running off, and
-  on a phone a button or chip too long for the screen wraps its words; the Study as buttons drop their icons under 300 px
+  bank's filter panel is one column, a long word breaks instead of running off in a lecture title, Exam Hints' quotes and the
+  hint, cram and flow lists (only there: a word a hair too wide elsewhere stays whole), Exam Hints' "Notes" goes under a
+  long title, and on a phone a button or chip too long for the screen wraps its words; the Study as buttons drop their icons under 300 px
   and stack under 240 px. In `widget/trophies.css` the Stats gauge's turning rays stop at the board on a narrow phone and
-  the badges' words break. `tools/ci/smoke.js` opens 12 views of each hub on the engine at 320 px with the largest text
+  the badges' words break, and the rank's medal goes above its name in a narrow card. `tools/ci/smoke.js` opens 12 views of each hub on the engine at 320 px with the largest text
   (it opened only Home before). **Toasts on a phone drop in at the top**, under the strip, as the reward card and the
   reply pop-up do (BUG-126): at the bottom they sat under Timmy, his bubble, the streak flame and the Listen player; the
   smoke test checks one is clear. **Small controls** (BUG-009): the four of 11-04 were on the old single-file pages;

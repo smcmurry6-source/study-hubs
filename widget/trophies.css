@@ -143,6 +143,10 @@ html.shx[data-theme="dark"] .sht, html.shx .sh-ru-lv, html.shx .sh-mk, html.shx 
   .sht .sht-shelf-h { padding: 0 12px; }
   .sht-tro { padding: 18px 2px 8px; }
 }
+/* a phone at the largest text: the medal goes above the name, so "Bronze" isn't squeezed to a few letters (BUG-168) */
+@container sht (max-width: 300px) {
+  .sht-me { flex-direction: column; align-items: stretch; }
+}
 @media (prefers-reduced-motion: reduce) { .sht-rays, .sht-show-obj, html.shx .sh-ru-lv-medal::before, html.shx .sh-mk-ring::before { animation: none !important; } }
 
 /* the case in the dark (the theme picked, or the device's) */

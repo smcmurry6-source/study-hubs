@@ -158,7 +158,7 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 .hx .badge { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: var(--r-pill); background: var(--hub-soft); color: var(--hub-text); font-size: var(--fs-meta); }
 
 /* ---------- the frame: the bar, the strip, the page ---------- */
-.hx { min-height: 100vh; overflow-wrap: break-word; }   /* a word longer than its line ("pain/infection/paresthesia/neuropathy") breaks instead of running off a phone (BUG-168) */
+.hx { min-height: 100vh; }
 .hx-bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; height: var(--bar-h); padding: 0 16px 0 12px;
   background: var(--ground); border-bottom: 1px solid var(--border); border-top: 4px solid var(--hub); }
 /* back to the dashboard, with its name on it (Sam, 2026-11-13: "a convenient back to dashboard button"): a labeled pill
@@ -893,10 +893,11 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 /* More > Timmy's place: the card (widget/place.js draws it; its own styles come with it) */
 .place-card { max-width: 520px; min-height: 120px; }
 .hint-group { margin-top: 20px; }
-.hint-group h3 { display: flex; align-items: center; gap: 8px; }
-.hint { margin-top: 10px; padding: 14px 16px; border-radius: var(--r-row); background: var(--row); }
+.hint-group h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.hint-group h3 > span:not(.sr) { max-width: calc(100% - 38px); }   /* the title keeps its row beside the badge; "Notes" goes under it when both don't fit (BUG-168) */
+.hint { margin-top: 10px; padding: 14px 16px; border-radius: var(--r-row); background: var(--row); overflow-wrap: anywhere; }
 .hint blockquote { font-size: var(--fs-body); line-height: 1.55; }
-.hint figcaption { margin-top: 8px; font-size: var(--fs-label); color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; overflow-wrap: anywhere; }
+.hint figcaption { margin-top: 8px; font-size: var(--fs-label); color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
 .hint .kind { display: inline-flex; height: 24px; align-items: center; padding: 0 10px; border-radius: var(--r-pill); background: var(--hub-soft); color: var(--hub-text); font-weight: var(--w-strong); font-size: var(--fs-meta); }
 .hint .kind.deemphasize { background: var(--active); color: var(--muted); }
 .likely-grid { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 10px; }
@@ -914,7 +915,7 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .cram ul { margin-top: 10px; padding-left: 20px !important; list-style: disc !important; display: grid; gap: 6px; font-size: var(--fs-label); line-height: 1.5; }
 .cram li::marker { color: var(--hub-text); }
 /* these lists are grids: one column the list's width, so a long word breaks in it (BUG-168) */
-.likely-lec ol, .cram ul, .flow ol { grid-template-columns: minmax(0, 1fr); }
+.likely-lec ol, .cram ul, .flow ol { grid-template-columns: minmax(0, 1fr); overflow-wrap: anywhere; }
 .charts.panel .rv-section:first-of-type { margin-top: 12px; }
 /* the lobby: every game, Sam's pick first and two wide, each on a field of its own */
 /* the column minimum gives way to a narrower screen (a 320px phone, or the largest text, which zooms the page: BUG-168);
@@ -1286,8 +1287,7 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
   /* a button or chip too long for the screen wraps its words instead of pushing the page sideways: the large text sizes
      zoom the page, so at XX-Large a 320px phone lays out in 220px ("Report a mistake in these notes", "High likelihood",
      BUG-168). One that fits stays on one line. */
-  .hx .btn, .hx .chip { white-space: normal; text-align: center; }
-  .hx .chip { flex-wrap: wrap; }   /* "High likelihood 410": the count goes under the words when both don't fit */
+  .hx .btn, .hx .chip { white-space: normal; max-width: 100%; } .hx .btn { text-align: center; }
   /* one row for both on a phone: Try it again says Retry */
   .qc-after .l-long { display: none; }
   .qc-after .l-short { display: inline; }
