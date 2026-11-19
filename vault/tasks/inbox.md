@@ -39,6 +39,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `toast()` in `widget/dash.js`) are still the dark toast. The dashboard measured 342 of its 345 KB budget on 2026-11-18, so
   the card would go in a file the dashboard fetches when a prize first pays (not `dash.bundle.js`), or with Sam's OK to raise
   the budget.
+- [ ] **Ask Timmy's eval has no Heme & Endo Exam 3 cases** (2026-11-19, [#436](https://github.com/smcmurry6-source/study-hubs/pull/436)): Occlusion's 43 came out of `tools/timmy/test-set.json` with its page, leaving Perio's 42 and the dashboard's 10 (two of those ask about Heme & Endo Exam 3 now). Write Heme & Endo Exam 3's set the way Perio's was written (covered, not covered, practice, paste) and run `node tools/timmy/eval.mjs --dry`; the real run costs money, so ask Sam first.
+- [ ] **The dashboard is at its 345 KB budget** (2026-11-19: 353,341 bytes of the 353,791 the budget allows, after the What's
+  new box, the stage's foot and Send luck's art added about 3.3 KB gzipped; `node tools/release/perf.js --page index.html`). The next change that adds to `dash.bundle.js` or
+  `site.bundle.css` won't fit: move something the first screen doesn't need into a file fetched on first use (as Timmy's
+  place and the trophy case are), or ask Sam to raise the budget in `tools/release/budgets.json`.
 - [x] **An index for recording an answer, if the database-load work doesn't already cover it** (done: `migration_v71.sql`, both indexes built live 2026-11-18, [#423](https://github.com/smcmurry6-source/study-hubs/pull/423)) (2026-11-18, found while
   tracing the Today card's missing crowns, BUG-182). The most frequent statement timeout in that day's `postgres_logs` (103 of
   about 436) was `sh_answer`'s speed limit, `select max(a.answered_at) from personal_answers a where a.visitor_id = ... and
