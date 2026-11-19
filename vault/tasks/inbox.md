@@ -61,6 +61,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `rpc2` fallbacks in `widget/dash.js` for a database without the game layer, `legacy` and the unused `modes` in `hubs.js`,
   and any separate widget file or the full client (`widget/vendor/supabase-2.117.2.js`) that `grep` finds no page loading
   by name (`review/` keeps the full client). The sources of a bundle are never deleted.
+- [ ] **The hubs' own arcade lobby, never shown on the engine** (2026-11-19, found retesting BUG-012): More's Arcade on a hub on
+  the engine draws its own lobby (`moreArcade()` in `widget/hub.js`) and opens a game on its stage, so the lobby inside a hub's
+  `content/arcade.js` (`lobby()` in Perio's, with the `.ar-board-tabs` boards; Heme & Endo Exam 3's has `.ar-board-grid`) looks
+  unreachable. Check whether anything still calls it (its mute button redraws it) and whether its per-game boards are shown
+  anywhere else; if not, take it out of the next hub built from these files ([build-a-hub](../how-to/build-a-hub.md)).
 - [ ] **Learn: a typed answer** (2026-11-13, idea from making Learn "more like quizlet"): Quizlet's Learn ends on written
   questions. Ours ends on recall before the choices show (Sam's call 5, 2026-11-06), because a typed answer can't be
   graded against a bank question's choice. Only if Sam asks for it.
