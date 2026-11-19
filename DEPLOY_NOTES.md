@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-19 (the admin page's heavy reads worked out ahead, Claude Code, PR_LINK)** — the database-load task's first
+- **2026-11-19 (the admin page's heavy reads worked out ahead, Claude Code, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456))** — the database-load task's first
   box. `migration_v79.sql`: the admin page's slow reads (Insights' three, Question health, the visitor totals, check-ins,
   clicks and features) come from a small table, `admin_cache`, that pg_cron's `sh-admin-cache` job fills one read at a time:
   every 15 minutes while the page is in use, every hour while 20 or more people are studying, at once after an edit or

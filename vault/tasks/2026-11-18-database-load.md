@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430, https://github.com/smcmurry6-source/study-hubs/pull/434, https://github.com/smcmurry6-source/study-hubs/pull/435
+pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430, https://github.com/smcmurry6-source/study-hubs/pull/434, https://github.com/smcmurry6-source/study-hubs/pull/435, https://github.com/smcmurry6-source/study-hubs/pull/456
 ---
 
 # Keep heavy queries from failing students' answer saves
@@ -43,7 +43,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
 - [x] The admin page's heavy reads are fast or cached: `get_insights`, `get_insight_retries`, `get_data_quality` (1 to 2 s
   each), `get_question_health` (`qh_report`, 1 to 3 s), `get_visitor_summary` / `_by_hub` / `_by_section` and
   `get_exam_debriefs` (about 1 s). For example worked out every 15 minutes by `pg_cron` into a small table the page reads.
-  **Done, both** (`migration_v79.sql`, PR_LINK; how it works: [admin-operations](../reference/admin-operations.md)).
+  **Done, both** (`migration_v79.sql`, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456); how it works: [admin-operations](../reference/admin-operations.md)).
   Measured on a throwaway copy at the live size (222,000 answers, 114,000 question events, 310 visitors) with the live
   settings. *Faster:* `sh_surface()` ran once per hourly row instead of once per section in Insights and the data-quality
   report (the planner folded the lookup into the join, or tested it before the distinct): insights 1.05 → 0.43 s, data
@@ -259,7 +259,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
 - 2026-11-19 (the housekeeping package): the compute-size box ticked: Sam's call was made on 11-18 ("Stay free, keep
   fixing", [decisions](../decisions.md)); it opens again only if the saves fail in bursts after v72.
 
-- 2026-11-19 (Claude Code, PR_LINK): the first box. Everything measured on a throwaway copy
+- 2026-11-19 (Claude Code, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456)): the first box. Everything measured on a throwaway copy
   (live only: catalog reads, `pg_stats`, settings, the cron table). `migration_v79.sql` written and tested
   (`tools/release/admin-ops.js`: 116 checks, the cache's among them; `rls.js`, `retention.js`, `xp.js`, `timmy.js` pass with
   it pending); the admin page reads its time from `get_admin_cache_status`. Applied live at night (the box below).
