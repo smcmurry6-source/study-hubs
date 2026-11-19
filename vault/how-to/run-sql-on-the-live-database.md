@@ -5,7 +5,7 @@ tags: [database, supabase, migrations, analytics]
 
 # Run SQL on the live database without slowing the class
 
-Every student's answer is saved through one small database on Supabase's Free plan (two shared cores:
+Every student's answer is saved through one small database on Supabase's Free plan (a shared CPU, up to 0.5 GB of memory:
 [shared-infrastructure](../reference/shared-infrastructure.md)). Whatever else runs there takes that CPU from the saves. On
 2026-11-18, the day before the Perio final, saves failed in bursts of 1 to 5 minutes each time something heavy ran: a
 migration's 43 s transaction and 17 s backfill, the lessons audit's 11 and 13 s economy queries, the admin page's reads sent
