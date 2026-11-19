@@ -1513,7 +1513,14 @@ w.balance = n; drawWallet();
 var PRIZE_SAYS = { visit: "Visiting a classmate's Timmy", name: "Your leaderboard name", trophy: "New trophy" };
 function prizeLine(src, xp){ return (PRIZE_SAYS[src] || "Bonus") + ": +" + num(xp) + " XP and " + num(xp) + " crowns"; }
 document.addEventListener("sh:crowns", function(e){ var d = e.detail || {}; setCrowns(d.balance); });
-document.addEventListener("sh:prize", function(e){ var d = e.detail || {}; if (d.xp > 0) toast(d.text || prizeLine(d.src, d.xp)); });
+function prizeShow(d){
+var text = d.text || prizeLine(d.src, d.xp), P = window.shPrize;
+if (!P) { loadScriptOnce(WIDGET + "prize.js").then(function(){ if (window.shPrize) prizeShow(d); else toast(text); }, function(){ toast(text); }); return; }
+var open = document.querySelectorAll("dialog[open]"), dlg = open.length ? open[open.length - 1] : null;
+P.show([{ t: String(text).split(": +")[0], xp: d.xp, c: d.xp, src: d.src }], {}, { star: function(){ return starSvg(26); }, coin: function(){ return coinSvg(26); },
+calm: reduced, within: dlg, top: dlg ? 0 : 56, target: function(){ var w = q(".dx-coinnum svg"), r = w && w.getBoundingClientRect(); return !dlg && r && r.width && r.bottom > 0 && r.top < innerHeight ? w : null; } });
+}
+document.addEventListener("sh:prize", function(e){ var d = e.detail || {}; if (d.xp > 0) prizeShow(d); });
 function dashPrize(sb, fn, args, src){
 var bot = false; try { bot = !!navigator.webdriver; } catch (e) {}
 if (!sb || bot) return Promise.resolve(null);
@@ -2157,7 +2164,20 @@ ch.subscribe();
 }catch(e){}
 });
 setTimeout(function(){ if ($("liveCount").textContent === "–") paintNow(); }, 6000);
-if (window.shClicks) window.shClicks.start({ sb: sb, hub: "dashboard", visitor: VISITOR, section: function(){ return "dashboard"; } });
+var anOut = null, anOne = true;
+function anSend(a){
+function no(){}
+if (!anOne) { if (a.p_events) sb.rpc("record_events", { p_hub: a.p_hub, p_visitor: a.p_visitor, p_items: a.p_events }).then(no, no); if (a.p_clicks) sb.rpc("record_clicks", { p_hub: a.p_hub, p_visitor: a.p_visitor, p_items: a.p_clicks }).then(no, no); return; }
+sb.rpc("record_analytics", a).then(function(r){ var e = r && r.error; if (e && (e.code === "PGRST202" || /could not find the function/i.test(e.message || ""))) { anOne = false; anSend(a); } }, no);
+}
+var anSb = { rpc: function(fn, a){
+var k = fn === "record_clicks" ? "p_clicks" : fn === "record_events" ? "p_events" : "";
+if (!k) return sb.rpc(fn, a);
+if (!anOut) { anOut = { p_hub: a.p_hub, p_visitor: a.p_visitor || VISITOR || null }; Promise.resolve().then(function(){ var x = anOut; anOut = null; anSend(x); }); }
+anOut[k] = a.p_items;
+return Promise.resolve({ data: null, error: null });
+} };
+if (window.shClicks) window.shClicks.start({ sb: anSb, hub: "dashboard", visitor: VISITOR, section: function(){ return "dashboard"; } });
 if (window.shReplies) window.shReplies.start({ sb: sb, visitor: VISITOR || null, hub: "dashboard", bootstrap: bootstrap.ready, v2: function(){ return V2 !== false; } });
 if (window.shLinkAsk) window.shLinkAsk.start({ sb: sb, hub: "dashboard", bootstrap: bootstrap.ready, bootstrapName: bootstrap.linkName });
 var held = 0;

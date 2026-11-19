@@ -17,10 +17,10 @@ right. The site has no build step on GitHub Pages, so **the built files are comm
 
 | File | Holds | Loads |
 |---|---|---|
-| `widget/hub.bundle.js` | a hub's engine: `hub-art.js`, `hub-rewards.js`, `hub-timmy.js`, `hub-bank.js`, `hub.js` | with the page (`defer`) |
+| `widget/hub.bundle.js` | a hub's engine: `hub-art.js`, `statements.js`, `prize.js` (the reward card, which the dashboard fetches for itself when a prize first pays), `hub-rewards.js`, `hub-timmy.js`, `hub-bank.js`, `hub.js` | with the page (`defer`) |
 | `widget/dash.bundle.js` | the dashboard: `hub-art.js`, `hub-art/dash.js`, `archive.js`, `dash.js` | with the page (`defer`) |
-| `widget/rest.bundle.js` | the slim database client, and `clicks.js`, `replies.js`, `linkask.js`, `ranks.js`, `ask.js`, `pet.js`, `timmy.js`, `ideas.js` | once the page is drawn; the same file on a hub and on the dashboard, so going from one to the other downloads it once |
-| `widget/hub-rest.bundle.js` | a hub's own widget layer: `v3.css`, `v3.js`, and `eggs.js`, `fx.js`, `highlight.js`, `podcast.js`, `qhealth.js`, `drill.js` | on a hub, right after `rest.bundle.js` |
+| `widget/rest.bundle.js` | the slim database client, and `clicks.js`, `replies.js`, `linkask.js`, `ranks.js` (the art and lists; its hub widget, `mount()`, is `ranks-hub.js`, since 2026-11-19), `ask.js`, `pet.js`, `timmy.js`, `ideas.js` | once the page is drawn; the same file on a hub and on the dashboard, so going from one to the other downloads it once |
+| `widget/hub-rest.bundle.js` | a hub's own widget layer: `v3.css`, `v3.js`, and `ranks-hub.js` (the rank card, trophy case, accents and Link my devices in Stats: a hub's only, so the dashboard doesn't carry them), `eggs.js`, `fx.js`, `highlight.js`, `podcast.js`, `qhealth.js`, `drill.js` | on a hub, right after `rest.bundle.js` |
 | `widget/site.bundle.css` | `hub.css`, `dash.css`, `ask.css`, `ideas.css`, in that order | the page's one stylesheet |
 
 Everything fetched on first use stays its own file (the place, the shop, the trophy case, Learn and Flashcards, the
