@@ -7,7 +7,7 @@ requested-by: Sam
 due: 2026-11-20
 waiting-on: 
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/433
 ---
 
 # Heme & Endo Exam 3: take L19 and L20 to taught, and add L21 and L22
@@ -89,7 +89,7 @@ add the recording's hints beside them.
 
 ## Outcome
 
-Done 2026-11-18 ([the PR](https://github.com/smcmurry6-source/study-hubs/pulls?q=head%3Aclaude%2Ffocused-bohr-hakj8i)).
+Done 2026-11-18 ([#433](https://github.com/smcmurry6-source/study-hubs/pull/433)).
 L21 (`mpath`, 64 questions, `mr-`) and L22 (`fpath`, 60 questions, `fr-`) are in, taught, written from their recordings:
 notes at both levels with their reading-notes, every format with every why (13 new Patient Box cases), 20 and 19 Exam Hints
 (the study guide's focus first, then what was stressed and what was said not to need), 10 and 12 High Likelihood topics
