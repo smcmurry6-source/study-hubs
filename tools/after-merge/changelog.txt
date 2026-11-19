@@ -60,3 +60,4 @@ heme-endo-exam3 | New in Notes: Dr. Herr's study guide, at the top of the lectur
 heme-endo-exam3 | Dr. Herr's study guide now has a recording: Listen plays it in the notes' narrator's voice, with Follow along. Tap any word to jump there.
 perio | Session 7: the four implant cases now say what today's radiograph shows in words (where the bone sits below the implant), so you don't have to read it off the drawing.
 perio | Session 4: the matching question on healing after SRP now says plainly that its "2 weeks" row is a second evaluation, after leftover calculus is removed. The Phase I evaluation itself is at 4-6 weeks.
+heme-endo-exam3 | L21 and L22 now match Dr. Dal Zotto's slides too: the notes add what only the slides say, with 23 new questions from them and a fresh recording of both lectures, the study guide and Timmy Time.

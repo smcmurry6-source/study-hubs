@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (Heme & Endo Exam 3: L21 and L22 checked against their slides, Claude Code, [#449](https://github.com/smcmurry6-source/study-hubs/pull/449))** — the inbox's last item for the
+  hub: Sam put smaller copies of Dr. Dal Zotto's two decks in the Drive folder, so both lectures, written from their recordings
+  on 11-18, were compared with every slide. The notes (both levels) gained what only the slides say, marked "the slide":
+  bladder cancer's eighth place among deaths, urothelial carcinoma's sites and the low- and high-grade papillary behavior,
+  PeIN's 30 vs 2-8 percent, penile carcinoma's numbers, hydrocele, epididymitis and orchitis (mumps), torsion's hemorrhagic
+  infarct and the hernia's bowel sounds, cryptorchidism's 3 and 30 percent and its complications, germ cell tumors' risk
+  factors and peak, PSA after treatment; CIN1-3, the cervical cancer numbers, serous and clear cell carcinoma, leiomyoma vs
+  leiomyosarcoma, vaginal clear cell adenocarcinoma, lichen planus's look and histology, the breast lesions' risk scale and the
+  male breast. 23 new questions (`src: "slides"`, L21 75 and L22 72, 460 in the hub), two fixed: `mr-tf-pein30` says
+  "HPV-associated", and `fr-tf-ls-only` now asks about lichen simplex chronicus (keyed False), because the slide lists lichen
+  planus beside lichen sclerosus for the HPV-independent vulvar carcinoma. Topics, hints, cram, review tables and the study
+  guide page follow; the reading-notes and `core.json` notes saying "not checked against the slides" are gone. Narration of
+  both lectures (three levels) and the guide recorded again, seven words added to `tools/podcast/lexicon.json`, and Timmy
+  Time's lichen lines reworded and the episode rebuilt.
 - **2026-11-19 (Perio report #65, Claude Code)** — `q4-L27`'s fourth pair, the one #59 reworded the day before, was read
   as the Phase I re-evaluation itself by a second student ("the re-eval is 4-6 months, not 2 weeks"). The item was right as
   taught (Dr. Kaur: re-evaluate at 4-6 weeks; calculus left then is removed and evaluated again 2 weeks later), so the key

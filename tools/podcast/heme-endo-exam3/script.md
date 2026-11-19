@@ -20,7 +20,7 @@ NOT SPOKEN. Notes for whoever renders this with Kokoro (see tools/podcast/README
   AML or Hodgkin subtypes, no grade for mantle cell lymphoma, no Burkitt EBV split, no site for Hodgkin's first nodes;
   AML's threshold is quoted as Dr. Borak said it; bladder cancer is the fourth most common cancer in men (incidence);
   no cryptorchidism rates; BPH is "around the urethra, the transition zone"; no week for the paramesonephric ducts;
-  LCIS is benign as taught, with the texts' caution said too; Lecture A's PTH is "osteoclasts resorb bone" (no
+  LCIS is benign as taught, with the texts' caution said too; lichen sclerosus is the lichen she stressed for carcinoma, and her slide's lichen planus is said beside it (2026-11-19, after the slides were read); Lecture A's PTH is "osteoclasts resorb bone" (no
   osteoblast detail), and metformin with a skipped breakfast is "Doctor Taylor's example".
 - Sam, 2026-11-04: the cold open leaves out minutiae (no question counts, no exact exam time, no LockDown Browser).
 - Timmy lore so far: tools/podcast/LORE.md. New here (Sam picked them, 2026-11-19): number thirty-one's letter about a
@@ -298,7 +298,7 @@ Condyloma acuminatum, the same as in men: H-P-V six and eleven. In the lecture's
 
 Vaginitis. Infectious: Candida, with pseudohyphae, quote, little sticks, and a lot of inflammation. And Trichomonas vaginalis, a sexually transmitted protozoan that looks like a squamous cell with prolongations. Non-infectious: atrophic vaginitis, in older women.
 
-The vulva has three lichens. Lichen simplex chronicus: thick and leathery, from scratching. Lichen sclerosus, where the lecture stopped. Word for word: I want to pause here because this is important. A thin epithelium, a parchment-like vulva. And in the lecture's words: Note that lichen sclerosus is the single non-infectious inflammatory disorder that can lead to carcinomas. The H-P-V independent vulvar squamous cell carcinoma of older women. And lichen planus, for you. Quote: You must know about this, because you're going to be dentists. Vulvar lesions and oral lesions together mean lichen planus. Biopsy it fresh, not in formalin, for immunofluorescence, and treat with steroids.
+The vulva has three lichens. Lichen simplex chronicus: thick and leathery, from scratching. Lichen sclerosus, where the lecture stopped. Word for word: I want to pause here because this is important. A thin epithelium, a parchment-like vulva. And in the lecture's words: Note that lichen sclerosus is the single non-infectious inflammatory disorder that can lead to carcinomas. The H-P-V independent vulvar squamous cell carcinoma of older women. Her slide on that carcinoma lists lichen planus right beside it, so lichen planus isn't off the hook. And lichen planus, for you. Quote: You must know about this, because you're going to be dentists. Vulvar lesions and oral lesions together mean lichen planus. Biopsy it fresh, not in formalin, for immunofluorescence, and treat with steroids.
 
 So neoplastic versus not: the three lichens are inflammatory. The squamous intraepithelial lesions, squamous cell carcinoma, and sarcoma botryoides are neoplastic.
 
@@ -372,7 +372,7 @@ B-P-H or carcinoma: which one is in the peripheral zone? [pause 2.5] Carcinoma. 
 
 Where does cervical cancer start? [pause 2.5] The transformation zone.
 
-The only vulvar lichen that leads to carcinoma? [pause 2.5] Lichen sclerosus.
+The vulvar lichen the lecture stopped on, because it leads to carcinoma? [pause 2.5] Lichen sclerosus.
 
 A grape-like vaginal tumor in a girl under five? [pause 2.5] Sarcoma botryoides.
 

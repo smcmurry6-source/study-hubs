@@ -95,6 +95,5 @@ notes at both levels with their reading-notes, every format with every why (13 n
 (the study guide's focus first, then what was stressed and what was said not to need), 10 and 12 High Likelihood topics
 (the study guide's first), Side by side tables, cram lines, four and five processes, four and five sort sets, and all three
 narration levels. No figures, by Sam's call. The mock is the exam's 35 in 90 minutes and the "join later" wording is gone
-(`index.html`, `examInfo`, `hubs.js`). The hub: 437 questions, 86 topics. What's left: checking both against their slides
-when they can be read ([inbox](../inbox.md)); the content flags are in [the hub note](../../hubs/heme-endo-exam3.md). Timmy Time
+(`index.html`, `examInfo`, `hubs.js`). The hub: 437 questions, 86 topics. Checked against their slides on 2026-11-19, once Sam put smaller copies in Drive ([the hub note](../../hubs/heme-endo-exam3.md)); the content flags are in [the hub note](../../hubs/heme-endo-exam3.md). Timmy Time
 went to a session of its own once this was pushed ([inbox](../inbox.md)).
