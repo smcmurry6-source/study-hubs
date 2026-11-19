@@ -18,6 +18,16 @@ its narration and Timmy Time off the site ([archived-hubs-drop-their-audio](../v
 ## 1. Pull the data
 
 - Read `LESSONS.md` and note its **Last refreshed** date (`:since`). Read the live hubs from `hubs.js`.
+- **Send the queries so the class's answers keep saving** (2026-11-18, the day before the Perio final: the audit's 11 and
+  13 s economy queries failed students' saves). Every query is its own `execute_sql` call starting with
+  `set local statement_timeout = '5s';` (the connector itself allows 2 minutes), sent one at a time, never several in
+  parallel ([run-sql-on-the-live-database](../vault/how-to/run-sql-on-the-live-database.md)). On a throwaway copy at 1.5
+  times the class's size, every query in `tools/lessons-daily.sql`, `tools/economy.sql` and `tools/retro.sql` takes 0.5 s
+  or less, so the audit runs at any hour, the morning before an exam included. The slowest calls are the admin page's
+  functions below (`qh_report` about 3 s on the copy, `sh_data_quality()` and `sh_insights` under 1 s). A query that stops
+  at the limit means the database is busy: never send it again at once or raise the limit; split it (one hub, a shorter
+  `:since`), keep it for the quiet hours (1 to 5 am Central), or go on without it and say so in the PR. A query of your
+  own beyond these files is timed on a copy first.
 - Run `select sh_data_quality();` first (`tools/analytics-quality.sql`): if tracking stopped, a test hub or a new event
   family shows up, fix or note it before trusting the rest ([analytics-data-quality](../vault/reference/analytics-data-quality.md)).
 - Run every query in `tools/lessons-daily.sql` with the Supabase connector (`execute_sql`, project
