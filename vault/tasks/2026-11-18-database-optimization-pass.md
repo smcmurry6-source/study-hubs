@@ -89,7 +89,7 @@ light (500). Milliseconds a call; the copy is many times faster than the live sh
 | **2. Page-load reads** | `get_rank_profile_v2` 1.4 ms; `get_hub_mastery` 7.9 / 2.5 / 0.8 ms; bootstrap 40 / 21 / 16 ms; `get_my_shop` 10 / 9 / 9 ms | 0.43 ms; 3.4 / 2.1 / 1.2 ms; 31 / 18 / 12 ms; 7 / 7 / 5 ms | **Shipped in v76.** The reads are already one call (the bootstrap carries the rank, mastery, shop, Timmy's days, answers and pins). What repeats is the rank and mastery, read again after every tenth answer (`widget/ranks.js`: 725 calls each in four hours, against 309 bootstraps): `get_hub_mastery` now looks up each question's latest answer instead of sorting every answer. Not done: the bootstrap is still 5 to 8 answers' worth (below) |
 | **3. Pings** | 3 pings as 3 calls: 1.0 ms | as 1 call: 0.47 ms | **Shipped: `migration_v77.sql` and `widget/v3.js`.** A page holds its pings and sends them once a minute in one call (`record_activity_pings`), each with its age, so every row, hour and total is what it was: 58% fewer ping calls (pings were 18% of every request). A visit's first ping and a hidden page's last ones go at once |
 | **4. The changelog read** | one read every 4 minutes a page (5% of requests) | one every 30 minutes a device | **Shipped: `widget/v3.js`, `widget/dash.js`.** The newest row's time is kept on the device and shared by every tab, hub and the dashboard; the "updated" banner comes at most half an hour after a deploy, not four minutes. Half an hour, not the hour first written here: it costs 80 more requests an hour for the whole class |
-| **5. Fillfactor** | same-page (HOT) updates on the copy: 100% for `question_stats`, `question_choices`, `xp_visitors`, `xp_days`, `xp_runs`, `correct_streaks`, `activity_hourly`; 77% for `answer_xp` | 100% for `answer_xp` at fillfactor 80; no change in time or WAL | **Not worth it** (the live HOT numbers go in the Log when they are read at a quiet hour). The pages already leave room: a dead row's space is reused on the next visit to its page. **But `activity_visits` was 0%**: every ping moves `last_at`, which has its own index (`activity_visits_last_idx`), so no update can stay on its page, and the table grows to 30 times its rows (7.5 MB for 320 visits on the copy). Without that index: 100%, 24% less WAL and 17% less time for the pings. Its one reader is the admin page's visitor summary. Dropping an index is not a `create or replace`, so it waits (below) |
+| **5. Fillfactor** | same-page (HOT) updates on the copy: 100% for `question_stats`, `question_choices`, `xp_visitors`, `xp_days`, `xp_runs`, `correct_streaks`, `activity_hourly`; 77% for `answer_xp` | 100% for `answer_xp` at fillfactor 80; no change in time or WAL | **Not worth it** (the live numbers agree: the Log). The pages already leave room: a dead row's space is reused on the next visit to its page. **But `activity_visits` was 0%**: every ping moves `last_at`, which has its own index (`activity_visits_last_idx`), so no update can stay on its page, and the table grows to 30 times its rows (7.5 MB for 320 visits on the copy). Without that index: 100%, 24% less WAL and 17% less time for the pings. Its one reader is the admin page's visitor summary. Dropping an index is not a `create or replace`, so it waits (below) |
 
 Every answer-path change was checked the same way: 2,400 answers and 343 card ratings by six made-up students (three new
 ones winning and losing medals in a small bank, boosts running, double taps, replayed requests) on two copies, one with
@@ -111,7 +111,8 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
   do is the next boxes.
 - [ ] A readout from a busy evening after: the share of database time per call again, and whether any saves failed.
   The first evening after the merge with a class studying (Heme & Endo Exam 3's eve, Thu 2026-11-19, if it is merged by
-  then): the edge logs any time, `pg_stat_statements` at a quiet hour.
+  then): the edge logs any time, `pg_stat_statements` at a quiet hour. The "before" to compare with is in the Log
+  (2026-11-19, 4:10 am).
 
 **Phase 2: found by the measuring, each needs more than a `create or replace` (apply after Fri 2026-11-20, 9:30 am, at night):**
 
@@ -123,7 +124,8 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
   Check the admin page's visitor summary (`where v.last_at >= since`) on a copy without it first; then rewrite the
   table once at night (`vacuum full public.activity_visits`), since it will have grown.
 - [ ] **The class's numbers on each card** (`question_stats` and `question_choices`, `widget/v3.js`): 20.6% of every
-  request and another 14.6% of preflights, two reads a card. The answer's reply could carry them (the save has just
+  request and another 14.6% of preflights, two reads a card. (Only 0.5% of the database's time, live: the gain is in
+  requests, so it matters when the request limit or the connection count is what's tight.) The answer's reply could carry them (the save has just
   written both rows), or one call could read both.
 - [ ] **The page's three analytics batches as one call** (`record_qh`, `record_clicks`, `record_events`: 14.8% of
   requests together): one flush, one call.
@@ -143,10 +145,27 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
 - 2026-11-19, phase 1 (Claude Code): ideas 1-5 measured on a throwaway copy (the table above); `migration_v76.sql`,
   `migration_v77.sql`, the pings sent together and the changelog kept on the device written and tested
   ([#444](https://github.com/smcmurry6-source/study-hubs/pull/444)).
-- 2026-11-19, 10:40 pm Central: Sam: "Merge". #444 merged with both migrations still pending
-  (`supabase/pending-migrations.txt`): they go in at the quiet hour (about 4:10 am Central, with the check of the ping
-  table's rewrite and the `pg_stat_statements` read), then a small PR moves them into `supabase/schema.sql`. Until v77 is
-  in, a page's first ping finds no `record_activity_pings` and it sends one call a ping, as before.
+- 2026-11-19, about 4:10 am Central (the quiet hour): Sam: "Merge". Before merging, the live steps this PR still owed,
+  one call at a time:
+  - **`pg_stat_statements`, read once** (since the restart of 2026-11-18, 20:57 UTC: 13 hours with the evening before
+    the Perio final in them, 3,795 s of statements; this is the "before"): `record_answer_v2` 47.4% of the database's
+    time (16,964 calls, 106 ms each on average), `get_hub_mastery` 9.6% (1,546 calls, 236 ms), `get_widget_bootstrap_v2`
+    6.3% (559, 425 ms), `record_qh` 6.2% (9,863, 24 ms), `record_activity_ping` 6.0% (27,521, 8 ms), `record_clicks` 3.8%,
+    `record_card_v2` 3.1% (2,100, 56 ms), `record_events` 2.1%, `get_my_answers` 1.5%, `get_rank_profile_v2` 1.4%. The
+    class's numbers on each card (`question_stats`, `question_choices`) are 0.5% of the database's time together (0.6 ms a
+    read) though they are a fifth of the requests: what they cost is the request, not the query.
+  - **Same-page (HOT) updates live, since the restart:** 100% for `xp_visitors`, `xp_days`, `xp_runs`, `correct_streaks`
+    and `question_stats`, 99.6% `question_choices`, 99.4% `activity_hourly`, 93.4% `answer_xp`, and **8.6% for
+    `activity_visits`** (29,797 updates): the copy's picture, so idea 5 stays "not worth it" and the index stays on the
+    Phase 2 list.
+  - **`migration_v76.sql` and `migration_v77.sql` applied** through the connector (`create or replace` only). The 19 live
+    bodies matched `supabase/schema.sql`'s (md5) before, and the migrations' after; grants, `security definer` and
+    `search_path` unchanged; `record_activity_pings` answers through the API as a visitor (204). Both are in
+    `supabase/schema.sql` now. Read back on the class's most active students (six together): balances, time crowns,
+    boosts, rank profiles and hub mastery all answer. The mastery read for the longest answer history: 395 ms the old
+    way, 113 ms the new (both with the pages in memory; the first read after a quiet night was slower, as the old one
+    was). Nobody was answering at that hour (a few pings every five minutes), so the saves themselves are the next
+    evening's readout (the open box).
 
 ## Outcome
 

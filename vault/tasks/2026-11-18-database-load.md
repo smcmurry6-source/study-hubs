@@ -97,12 +97,15 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   20.5 ms an answer, 19 ms of it those two; after v72, 5.1 ms (a wrong answer) to 6.8 ms (a right one that can reach a
   medal), the same balances and medals. Applied live on 2026-11-18 at about 21:00 UTC, once the restart had finished
   (Sam: "Apply it now"); the three live bodies' md5 match the file.
-- [ ] **The ping table rewritten after the first 3-day cleanup** (no data deleted by the rewrite): `activity_pings` was 166 MB of
+- [x] **The ping table rewritten after the first 3-day cleanup** (no data deleted by the rewrite): `activity_pings` was 166 MB of
   the 414 MB database, 117 MB of it three bloated indexes. Since `migration_v74.sql` the nightly job keeps 3 days of raw pings
   (below), and deleted rows' space is only reused, so once its first run (3:23 am Central, 2026-11-19, about 27 days of pings)
   is done, `vacuum full public.activity_pings` (or `cluster ... using activity_pings_time_idx`) at night gives it back and
   rebuilds the indexes, in place of the index rebuild planned first (Sam asked "could we do it now"; in the afternoon it would
   have taken the CPU from the class). Scheduled for about 3:45 am Central on 2026-11-19 from this session.
+  **Done, checked 2026-11-19 at 4:10 am Central** ([#444](https://github.com/smcmurry6-source/study-hubs/pull/444)): the
+  cleanup and the rewrite both ran. `activity_pings` is 31 MB (the table 12 MB, its five indexes 19 MB, about 86,000
+  rows), down from 166 MB, and the database is 318 MB, down from 414 MB.
 - [x] **Sam's call: the Free plan's 500 MB limit.** The project is on the **Free plan** (not a paid Micro: `get_organization`,
   2026-11-18), whose database goes **read-only at 500 MB** of database size, and every save then fails. 414 MB on
   2026-11-18; a busy exam day adds about 15 MB of pings alone. Sam: "i dont want to upgrade the plan. stay free", and to
@@ -200,5 +203,8 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   hidden again, and a second page on a working database sends its two answers with the same ids, 2.5 s apart; the first
   page, shown again, sends nothing more. Nobody was past 50,000 XP (165 on the ladder), so the wrong rank had shown no one
   yet; the missing double-XP chip had.
+- 2026-11-19, 4:10 am Central ([#444](https://github.com/smcmurry6-source/study-hubs/pull/444)): the ping table's rewrite checked and ticked
+  (166 MB to 31 MB; the database 414 MB to 318 MB). The optimization pass's phase 1 (`migration_v76.sql`, `migration_v77.sql`)
+  applied the same hour: [its note](2026-11-18-database-optimization-pass.md).
 
 ## Outcome

@@ -89,7 +89,7 @@ tags: [widget, supabase]
   Sam's machine (`deploy_rollout.ps1`, `check_leaderboard.ps1`) — **never**
   commit them here or hardcode them into a hub's client-side JS.
   **The project is on Supabase's Free plan** (checked 2026-11-18): a shared CPU that slows to a crawl once a busy day has
-  used up its burst, and a database that goes **read-only at 500 MB** (414 MB on 2026-11-18; then every save fails). Keep
+  used up its burst, and a database that goes **read-only at 500 MB** (318 MB on 2026-11-19, after the ping table's rewrite; 414 MB the day before; then every save fails). Keep
   each answer's work small ([migration_v72](../../migration_v72.sql) cut it to a quarter for the most active students) and
   watch the size ([the task](../tasks/2026-11-18-database-load.md)). If the database jams (even the connector can't
   connect), Sam restarts it from the dashboard (Settings, General, Restart project); that clears the jam, not the CPU.
