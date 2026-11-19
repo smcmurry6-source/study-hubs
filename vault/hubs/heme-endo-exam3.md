@@ -54,8 +54,12 @@ entry in `hubs.js`.
   lecture (`{ lec, items: [{ h, body }], terms: [{ t, d }] }`), each `h` the guide's words exactly, each `body` an explainer
   written from this hub's notes and keys (a lead, a `hy-know` "Know this" list, an optional table and a `gd-trap` "Watch for");
   `index.html`'s `SH_HUB.notes.guide` names it. No Lecture A (the guide skips it). It's hand-written, not built: **when a lecture's
-  notes or a key changes, check its guide entry too**. It has no narration (Listen uses the device's voice), so the
-  [text-and-audio](../rules/text-and-audio-never-drift.md) rule doesn't bind it; a Kokoro recording would.
+  notes or a key changes, check its guide entry too**. **Its narration** (Sam, 2026-11-19: "add kokoro") is `audio/guide.mp3`
+  with its words file, spoken from the page's readable part (`tools/hub-next/guide.mjs`), so the
+  [text-and-audio](../rules/text-and-audio-never-drift.md) rule binds it: **a change to `study.json`'s `guide` (or to the title of
+  a lecture on it) is recorded again in the same PR**, `python3 tools/narrate.py heme-endo-exam3 --level guide --force` (26
+  minutes on 4 cores; the recording is 112 minutes, 54 MB), then `node tools/hub-next/build.mjs --hub heme-endo-exam3`. Until then the build sets `guideAudio`
+  false, Listen reads the page in the device's voice, and the smoke test fails naming it.
 - **Sources:** Drive, "Hematology and Endocrinology" → "Hubs" → "Exam 3" (L17-L20's slides and the two transcripts), and the
   course's learning objectives ("Exam 1" folder). **Not used**, by the [graded-coursework](../rules/graded-coursework.md) rule:
   the Exam 3 Anki deck in that folder (a previous year's practice questions), everything in "Resources from D3s", Quiz 4 (open

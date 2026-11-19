@@ -519,6 +519,7 @@ function lint(hub, A){
     const left = fs.existsSync(audioDir) ? fs.readdirSync(audioDir).filter(f => /\.(mp3|words\.json)$/.test(f)) : [];
     if (left.length) problems.push(`${hub}: its ${A.CORE ? 'core.json says "audio": "off"' : 'widget tag says data-audio="off"'} but audio/ still holds ${left.length} file(s) (${left.slice(0, 3).join(', ')}): take them out, or drop the switch`);
     if (A.NOTES && (A.NOTES.hyAudio || []).length) problems.push(`${hub}: audio is off but notes.json's hyAudio still lists ${A.NOTES.hyAudio.join(', ')} (node tools/hub-next/build.mjs --hub ${hub})`);
+    if (A.NOTES && A.NOTES.guideAudio) problems.push(`${hub}: audio is off but notes.json's guideAudio is still true (node tools/hub-next/build.mjs --hub ${hub})`);
     notes.push(`${hub}: audio off (archived; Listen uses the device's voice, no Timmy Time)`);
   } else if (fs.existsSync(audioDir)) L.forEach(l => {
     if (A.READINGS[l.id] && !fs.existsSync(path.join(audioDir, `${l.id}-full.mp3`))) problems.push(`${hub}: missing narration audio/${l.id}-full.mp3`);
@@ -547,6 +548,21 @@ function lint(hub, A){
     if (unrecorded.length) notes.push(`${hub}: High yield not narrated for ${unrecorded.join(', ')} (Listen uses the device's voice there)`);
     const offered = (NN.hyAudio || []).filter(id => !fs.existsSync(path.join(audioDir, `${id}-hy.mp3`)));
     if (offered.length) problems.push(`${hub}: notes.json's hyAudio lists ${offered.join(', ')} with no audio/<lecture>-hy.mp3 (node tools/hub-next/build.mjs --hub ${hub})`);
+    /* a professor's study guide (widget/guide.js): its recording, audio/guide.mp3, says which text it was spoken from, the page's
+       readable part as tools/hub-next/guide.mjs writes it, and must still match it, like High yield's */
+    const gmp3 = path.join(audioDir, 'guide.mp3'), gwf = gmp3.replace(/\.mp3$/, '.words.json'), again = `python3 tools/narrate.py ${hub} --level guide --force, then node tools/hub-next/build.mjs --hub ${hub}`;
+    const ghtml = require('child_process').execFileSync('node', [path.join(root, 'tools', 'hub-next', 'guide.mjs'), hub], { cwd: root, encoding: 'utf8' });
+    if (!ghtml) { if (fs.existsSync(gmp3)) problems.push(`${hub}: audio/guide.mp3 is there but study.json has no guide (git rm it, then node tools/hub-next/build.mjs --hub ${hub})`); }
+    else if (!fs.existsSync(gmp3)) { notes.push(`${hub}: the study guide isn't narrated (Listen uses the device's voice there)`); if (NN.guideAudio) problems.push(`${hub}: notes.json's guideAudio is true with no audio/guide.mp3 (node tools/hub-next/build.mjs --hub ${hub})`); }
+    else {
+      let d = null; try { d = JSON.parse(fs.readFileSync(gwf, 'utf8')); } catch (e) {}
+      if (!d || d.v !== 1) problems.push(`${hub}: audio/guide.mp3 has no readable words file beside it (${again})`);
+      else if (d.bytes !== fs.statSync(gmp3).size) problems.push(`${hub}: audio/guide.words.json was made from another recording of it (${again})`);
+      else if (!d.w || !Array.isArray(d.t) || 2 * d.w.split(' ').length !== d.t.length) problems.push(`${hub}: audio/guide.words.json has ${d.w ? d.w.split(' ').length : 0} words but ${(d.t || []).length / 2} times (${again})`);
+      else if (d.h !== crypto.createHash('sha1').update(ghtml, 'utf8').digest('hex').slice(0, 12)) problems.push(`${hub}: audio/guide.mp3 was spoken from another version of the study guide: record it again (${again})`);
+      else if (NN.guideAudio !== true) problems.push(`${hub}: audio/guide.mp3 matches the study guide but notes.json's guideAudio isn't true (node tools/hub-next/build.mjs --hub ${hub})`);
+      else notes.push(`${hub}: the study guide is narrated (audio/guide.mp3, ${Math.round(d.dur / 60)} min)`);
+    }
   }
 }
 
@@ -794,6 +810,31 @@ function lint(hub, A){
           if (offers !== rec) problems.push(`${name} (${label}): High yield for ${hyLec}: Listen ${offers ? 'offers' : 'does not offer'} its recording, but notes.json's hyAudio ${rec ? 'lists' : "doesn't list"} it`);
           if (st.w > 1) problems.push(`${name} (${label}): High yield for ${hyLec} scrolls sideways by ${st.w}px`);
           const back = await page.$('[data-level="full"]'); if (back) { await back.click(); await page.waitForTimeout(300); }
+        }
+      }
+      /* a professor's study guide (#notes/guide, widget/guide.js): it draws every lecture on it, its readable part says exactly
+         what its recording was spoken from (tools/hub-next/guide.mjs: change one and the other changes with it, or Follow
+         along loses its place), and Listen offers the recording exactly when the build says it matches (notes.json's guideAudio) */
+      const nGuide = (() => { try { return (JSON.parse(fs.readFileSync(content(hub, 'study.json'), 'utf8')).guide || []).length; } catch (e) { return 0; } })();
+      if (nGuide) {
+        await page.evaluate(() => { location.hash = 'notes/guide'; }); await page.waitForTimeout(1500); screens++;
+        const ghtml = require('child_process').execFileSync('node', [path.join(root, 'tools', 'hub-next', 'guide.mjs'), hub], { cwd: root, encoding: 'utf8' });
+        const gs = await page.evaluate(html => {
+          const prose = document.querySelector('.reading.guide .reading-prose.gd'); if (!prose) return null;
+          const read = [];
+          (function walk(n){ for (let c = n.firstChild; c; c = c.nextSibling) { if (c.nodeType === 3) read.push(c.data); else if (c.nodeType === 1 && !/^(SCRIPT|STYLE|SVG|BUTTON|TEMPLATE|NOSCRIPT)$/i.test(c.tagName) && !c.hasAttribute('data-sh-noread')) walk(c); } })(prose);
+          const d = document.createElement('div'); d.innerHTML = html;
+          const k = s => s.toLowerCase().replace(/[^0-9a-z]/g, ''), b = document.querySelector('.reading.guide #sh-tts-btn');
+          return { secs: prose.querySelectorAll('.gd-lec').length, page: k(read.join(' ')), said: k(d.textContent), offers: b ? b.getAttribute('data-sh-tts-audio') === '1' : null, follow: !!document.querySelector('.reading.guide [data-follow]'), w: document.documentElement.scrollWidth - innerWidth };
+        }, ghtml);
+        const grec = (() => { try { return JSON.parse(fs.readFileSync(content(hub, 'notes.json'), 'utf8')).guideAudio === true; } catch (e) { return false; } })();
+        if (!gs) problems.push(`${name} (${label}): notes/guide draws no study guide`);
+        else {
+          if (gs.secs !== nGuide) problems.push(`${name} (${label}): the study guide draws ${gs.secs} of its ${nGuide} lectures`);
+          if (gs.page !== gs.said) { let i = 0; while (i < gs.page.length && gs.page[i] === gs.said[i]) i++; problems.push(`${name} (${label}): the study guide's page and its narration text differ (widget/guide.js vs tools/hub-next/guide.mjs) from "...${gs.page.slice(Math.max(0, i - 30), i + 30)}" vs "...${gs.said.slice(Math.max(0, i - 30), i + 30)}"`); }
+          if (gs.offers !== grec) problems.push(`${name} (${label}): the study guide's Listen ${gs.offers ? 'offers' : 'does not offer'} its recording, but notes.json's guideAudio is ${grec}`);
+          if (!gs.follow) problems.push(`${name} (${label}): the study guide has no Follow along toggle`);
+          if (gs.w > 1) problems.push(`${name} (${label}): the study guide scrolls sideways by ${gs.w}px`);
         }
       }
       /* Ask Timmy (widget/ask.js): everyone has Timmy, so the Ask icon is in his corner only while he's turned off (Settings;

@@ -14,6 +14,8 @@ A hub on the engine (its notes are hubs/<hub>/content/notes.json: full, plain an
   python3 tools/narrate.py <hub> --jobs 4                              lectures in parallel processes
   python3 tools/narrate.py <hub> --level hy --lec dmpharm --force      High yield again, after it changed;
                                                                       then node tools/hub-next/build.mjs --hub <hub>
+  python3 tools/narrate.py <hub> --level guide --force                 a professor's study guide (study.json's guide):
+                                                                      audio/guide.mp3, then the build again
 An old single-file hub (its notes are in its page): the same, with hubs/<hub>/index.html in place of <hub>.
 
 It reads notes.json (full, plain and hy), or an old hub's `var READINGS = {...};` and `var READINGS_PLAIN = {...};`
@@ -38,6 +40,7 @@ SAY = [
     (r"(?<=\d)\s*-\s*(?=\d)", " to "), (r"(?<=\d)\s*–\s*(?=\d)", " to "), (r"±", " plus or minus "),
     (r"×", " times "), (r"~\s*(?=\d)", "about "), (r"≈", " about "), (r"(?<=\d)\s*%", " percent"),
     (r"\bmg/dL\b", "milligrams per deciliter"), (r"\bmmol/L\b", "millimoles per liter"), (r"\bmEq/L\b", "milliequivalents per liter"),
+    (r"\b(third|sixth|ninth|twelfth|to the \d+)\s*/\s*L\b", r"\1 per liter"), (r"(?<=\d)\s*/\s*µL\b", " per microliter"),
     (r"\bmIU/L\b", "milli-international units per liter"), (r"\bpg/mL\b", "picograms per milliliter"), (r"\bng/dL\b", "nanograms per deciliter"),
     (r"\bvs\.?(?=\s)", "versus"), (r"\be\.g\.", "for example"), (r"\bi\.e\.", "that is"), (r"\betc\.", "and so on"),
     (r"\bHbA1c\b", "H b A one c"), (r"\bA1c\b", "A one c"), (r"\bCa2\+", "calcium"), (r"\bK\+", "potassium"), (r"\bNa\+", "sodium"),
@@ -55,6 +58,9 @@ SAY = [
     # the World Health Organization (case-sensitive, so "who" stays a word)
     (r"\bWHO\b", "W H O"),
 ]
+
+
+POWER = {"3": "third", "6": "sixth", "9": "ninth", "12": "twelfth"}
 
 
 class Spoken(HTMLParser):
@@ -80,15 +86,17 @@ class Spoken(HTMLParser):
     def handle_starttag(self, tag, attrs):
         a = dict(attrs)
         if tag == "div" and "tested" in (a.get("class") or ""): self.in_tested = True
-        if tag in ("p", "li", "h4", "h3", "h5", "blockquote") and self.table is None: self.flush()
+        if tag in ("p", "li", "h2", "h4", "h3", "h5", "blockquote", "dt", "dd") and self.table is None: self.flush()
         if tag == "table": self.flush(); self.table, self.head = [], []
         elif tag == "tr" and self.table is not None: self.row = []
         elif tag in ("td", "th") and self.table is not None: self.cell = []
         elif tag == "br": self.buf.append(" "); self.sbuf.append(" ")
+        # <span data-say="Lecture 17">L17</span>: the attribute is spoken, the text inside is what the page shows (the study guide's headings)
+        if tag == "span" and a.get("data-say") and self.table is None: self.buf.append(a["data-say"]); self.stack.append("say"); return
         self.stack.append(tag if not (tag == "span" and "hy-n" in (a.get("class") or "")) else "hy-n")
 
     def handle_endtag(self, tag):
-        if self.stack and (self.stack[-1] == tag or (tag == "span" and self.stack[-1] == "hy-n")): self.stack.pop()
+        if self.stack and (self.stack[-1] == tag or (tag == "span" and self.stack[-1] in ("hy-n", "say"))): self.stack.pop()
         if self.table is not None:
             if tag in ("td", "th") and self.cell is not None:
                 self.row.append(" ".join("".join(self.cell).split())); self.cell = None
@@ -110,8 +118,10 @@ class Spoken(HTMLParser):
                     self.items.append(("pause", 0.35))
                 self.table = None
             return
-        if tag in ("h4", "h3", "h5"): self.flush(0.7)
-        elif tag in ("p", "li", "blockquote"): self.flush()
+        if tag == "h2": self.flush(0.9)
+        elif tag in ("h4", "h3", "h5"): self.flush(0.7)
+        elif tag == "dt": self.buf.append(":"); self.flush(0.2)   # a key term, then its definition (the study guide's)
+        elif tag in ("p", "li", "blockquote", "dd"): self.flush()
         elif tag == "b" and self.in_tested and not self.items: self.flush(0.3)
         elif tag == "div" and self.in_tested: self.flush(0.8); self.in_tested = False
 
@@ -122,6 +132,10 @@ class Spoken(HTMLParser):
             if self.cell is not None: self.cell.append(d)
             if self.stack and self.stack[-1] == "th": self._row_is_head = True
             return
+        if self.stack and self.stack[-1] == "say": self.sbuf.append(d); return   # shown, not spoken (data-say is)
+        # a power of ten in a count, 10<sup>9</sup>/L: "10 to the ninth per liter", not "109"
+        if self.stack and self.stack[-1] == "sup" and d.strip().isdigit() and re.search(r"\b10\s*$", "".join(self.buf)):
+            self.buf.append(" to the " + POWER.get(d.strip(), d.strip()) + " "); self.sbuf.append(d); return
         # High yield's topic number (<span class="hy-n">2</span>): "Topic 2." aloud, the number alone on the page
         self.buf.append("Topic " + d.strip() + ". " if self.stack and self.stack[-1] == "hy-n" and d.strip() else d)
         self.sbuf.append(d)
@@ -159,7 +173,12 @@ def load(path):
     if path.endswith(".json"):
         notes = json.load(open(path, encoding="utf-8"))
         hub_dir = os.path.dirname(os.path.dirname(os.path.abspath(path)))
-        return {lv: notes[lv] for lv in ("full", "plain", "hy") if isinstance(notes.get(lv), dict)}, os.path.join(hub_dir, "audio")
+        R = {lv: notes[lv] for lv in ("full", "plain", "hy") if isinstance(notes.get(lv), dict)}
+        # a professor's study guide (study.json's guide, the page #notes/guide): one recording, audio/guide.mp3, spoken from
+        # the page's readable part as tools/hub-next/guide.mjs writes it (the same HTML build.mjs and the smoke lint hash)
+        g = subprocess.run(["node", os.path.join(HERE, "hub-next", "guide.mjs"), os.path.dirname(os.path.abspath(path))], check=True, capture_output=True, text=True).stdout
+        if g: R["guide"] = {"guide": g}
+        return R, os.path.join(hub_dir, "audio")
     return readings(open(path, encoding="utf-8").read()), os.path.join(os.path.dirname(os.path.abspath(path)), "audio")
 
 
@@ -195,6 +214,11 @@ def render(items, out_mp3, voice, speed, h=None):
     nw.write_file(out_mp3, timed, len(audio) / SR, h)
 
 
+def out_path(audio_dir, lec, level):
+    """audio/<lecture>-<level>.mp3; the study guide's is audio/guide.mp3"""
+    return os.path.join(audio_dir, "guide.mp3" if level == "guide" else "%s-%s.mp3" % (lec, level))
+
+
 def split_ph(ph, n=400):
     if len(ph) <= n: return [ph]
     out, cur = [], ""
@@ -215,7 +239,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("hub")
     ap.add_argument("--lec", action="append")
-    ap.add_argument("--level", choices=["full", "plain", "hy"], action="append")
+    ap.add_argument("--level", choices=["full", "plain", "hy", "guide"], action="append")
     ap.add_argument("--voice", default="af_heart")
     ap.add_argument("--speed", type=float, default=1.0)
     ap.add_argument("--force", action="store_true")
@@ -229,7 +253,7 @@ def main():
         if level not in R: sys.exit("no %s level in %s" % (level, a.hub))
         for lec in R[level]:
             if a.lec and lec not in a.lec: continue
-            out = os.path.join(audio_dir, "%s-%s.mp3" % (lec, level))
+            out = out_path(audio_dir, lec, level)
             if a.text:
                 print("=== %s %s" % (lec, level)); print("\n".join(v for k, v in spoken(R[level][lec]) if k == "text")); continue
             if os.path.exists(out) and not a.force: print("skip", out); continue
@@ -264,7 +288,7 @@ if __name__ == "__main__":
         R, audio_dir = load(hub)
         for p in pairs:
             lec, level = p.split(":")
-            out = os.path.join(audio_dir, "%s-%s.mp3" % (lec, level))
+            out = out_path(audio_dir, lec, level)
             render(spoken(R[level][lec], shown=True), out, voice, speed, text_hash(R[level][lec])); print("wrote", out, flush=True)
     else:
         main()

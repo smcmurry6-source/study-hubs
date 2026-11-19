@@ -11,7 +11,8 @@
  *                   no Timmy Time and Listen reads in the device's voice; vault/rules/archived-hubs-drop-their-audio.md)
  *   questions.json  every question in its final shape, its whys on it
  *   notes.json      the notes at both reading levels (full, plain), the High yield level built from them (hy), and
- *                   hyAudio: the lectures whose High yield narration matches it (hyRecorded below)
+ *                   hyAudio: the lectures whose High yield narration matches it (hyRecorded below), and on a hub with
+ *                   a professor's study guide, guideAudio: whether audio/guide.mp3 was spoken from today's guide
  *   study.json      hints, the cram sheet, the Review tables and processes (Side by side), the arcade's sort sets
  *   figures.js/.css the hub's drawings (built by its figure build, tools/figures/<hub>/build.mjs, where it has one)
  *   arcade.js/.css  the hub's arcade (its games list and skin)
@@ -23,6 +24,7 @@
  *   core.json's index   from questions.json
  *   notes.json's hy     from the As taught notes, core.json's likelyTopics, study.json's hints and the questions
  *                       (tools/hub-next/high-yield.mjs; Sam, 2026-11-12), and hyAudio from the recordings on disk
+ *   notes.json's guideAudio  from audio/guide.mp3's words file and study.json's guide (tools/hub-next/guide.mjs)
  *
  * and writes the four JSON files in one layout (a question, a lecture, a hint, a topic to a line), so a change shows up
  * in a diff as the lines it touched. Edit the JSON (by hand or with a script), then run this.
@@ -36,6 +38,7 @@ import { createHash } from "node:crypto";
 import { dirname, resolve, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import vm from "node:vm";
+import { guideSpoken } from "./guide.mjs";
 import { highYield } from "./high-yield.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
@@ -49,8 +52,10 @@ export const engineHubs = () => readdirSync(join(ROOT, "hubs")).filter((h) => ex
    otherwise Listen reads it in the device's voice, and tools/ci/smoke.js fails until it's recorded again
    (vault/rules/text-and-audio-never-drift.md). Record or re-record it, then run this build again. */
 const textHash = (html) => createHash("sha1").update(html, "utf8").digest("hex").slice(0, 12);
-function hyRecorded(hub, lec, html){
-  const mp3 = join(ROOT, "hubs", hub, "audio", lec + "-hy.mp3"), wf = mp3.replace(/\.mp3$/, ".words.json");
+function hyRecorded(hub, lec, html){ return recorded(hub, lec + "-hy.mp3", html); }
+/* the same for a professor's study guide: audio/guide.mp3, spoken from tools/hub-next/guide.mjs's text of the page */
+function recorded(hub, file, html){
+  const mp3 = join(ROOT, "hubs", hub, "audio", file), wf = mp3.replace(/\.mp3$/, ".words.json");
   if (!existsSync(mp3) || !existsSync(wf)) return false;
   try { const d = JSON.parse(readFileSync(wf, "utf8")); return d.v === 1 && d.h === textHash(html) && d.bytes === statSync(mp3).size; } catch (e) { return false; }
 }
@@ -133,10 +138,14 @@ function build(hub){
   core.index = questions.map((q) => [q.id, q.lec, q.likely ? 1 : 0, q.src || ""]);
   /* High yield, the third reading level: each lecture's predicted topics with the paragraphs of its notes that teach them */
   const hy = highYield({ notes: notes.full, topics: core.likelyTopics, hints: study.hints, questions });
+  const notesOut = Object.assign({}, notes, { hy, hyAudio: Object.keys(hy).filter((lec) => hyRecorded(hub, lec, hy[lec])) });
+  /* the study guide's recording, offered only while it was spoken from today's guide (widget/guide.js) */
+  delete notesOut.guideAudio;
+  if ((study.guide || []).length) notesOut.guideAudio = recorded(hub, "guide.mp3", guideSpoken(core.lectures, study.guide));
   const out = {
     "core.json": layout("core.json", core),
     "questions.json": layout("questions.json", questions),
-    "notes.json": layout("notes.json", Object.assign({}, notes, { hy, hyAudio: Object.keys(hy).filter((lec) => hyRecorded(hub, lec, hy[lec])) })),
+    "notes.json": layout("notes.json", notesOut),
     "study.json": layout("study.json", study)
   };
   if (D["variants.json"]) { const V = D["variants.json"]; out["variants.json"] = "{\n" + Object.keys(V).map((id) => one(id) + ": " + one(V[id])).join(",\n") + "\n}\n"; }
@@ -165,5 +174,5 @@ if (isMain) {
     }
     console.log(`${hub}: ${n} questions${CHECK ? "" : ", content up to date"}`);
   }
-  if (stale) { console.error(`${stale} file(s) stale: the content changed since its High yield and question index were built (or a lecture's High yield narration was recorded since, or a file was saved in another layout).`); process.exit(1); }
+  if (stale) { console.error(`${stale} file(s) stale: the content changed since its High yield and question index were built (or a lecture's High yield or the study guide's narration was recorded since, or a file was saved in another layout).`); process.exit(1); }
 }
