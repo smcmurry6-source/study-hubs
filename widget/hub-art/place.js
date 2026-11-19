@@ -27,6 +27,15 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   function seg(a, b){ return "M" + f(a[0]) + " " + f(a[1]) + " L" + f(b[0]) + " " + f(b[1]); }
   /* shift a drawing made at the yard's origin to (x, y, z) on it (the projection is linear, so a move is a translate) */
   function at(x, y, z, s){ var a = P(x, y, z), o = P(0, 0, 0); return T(a[0] - o[0], a[1] - o[1], s); }
+  /* a part that turns in its own plane (a wheel, a windmill's blades): inner is drawn round 0 0 in that plane's units,
+     symmetric about it, with c the center on the yard and u, v the plane's two unit axes. A matrix maps it onto the
+     picture, so a CSS rotate of .tp-spin turns it as a real wheel turns, and its strokes keep their width. A piece's
+     move (below) plays it. */
+  function spinner(c, u, v, inner){
+    var o = P(c[0], c[1], c[2] || 0), a = P(c[0] + u[0], c[1] + u[1], (c[2] || 0) + u[2]), b = P(c[0] + v[0], c[1] + v[1], (c[2] || 0) + v[2]);
+    return '<g transform="matrix(' + [a[0] - o[0], a[1] - o[1], b[0] - o[0], b[1] - o[1], o[0], o[1]].map(f).join(" ") + ')"><g class="tp-spin">' +
+      inner.replace(/<(path|circle|ellipse)\b/g, '<$1 vector-effect="non-scaling-stroke"') + "</g></g>";
+  }
   /* an easter egg: something you can tap. Its hidden bits (.tp-eb) show while it plays (.tp-on, set by the page). */
   var EGGS_SEEN = [];
   function egg(k, inner, bits, extra){ if (EGGS_SEEN.indexOf(k) < 0) EGGS_SEEN.push(k); return '<g class="tp-egg" data-egg="' + k + '"' + (extra || "") + ">" + inner + (bits ? '<g class="tp-eb" opacity="0">' + bits + "</g>" : "") + "</g>"; }
@@ -321,13 +330,14 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   /* a set's scene on the hill's own landform (so the yard, the path and Timmy's walks work as on the hill): the pack gives
      its sky, its backdrop, the ground's four greens (or snows, or sands) and what grows and stands on it.
      spec: { sky(o), far(o), ground(o) -> [top, light slope, far slope, line], flat(o, on), props(o, on) -> [{x, y, s}],
-     landExtra(o), fg(o), skirt, path, treeKind, lamp, grade, snowy, alwaysNight, farLift }
+     landExtra(o), fg(o), skirt, path, treeKind, tree(b, o) -> { s, bits } (its own tree at b, the tree spot on the
+     picture, in place of treeKind's), lamp, grade, snowy, noSnow (it never snows there: under the sea), alwaysNight, farLift }
      farLift (22 unless given) raises the backdrop: draw far(o) as if the land's edge stood near y 150 at the picture's
      sides, and keep the sun and the moon clear of whatever the backdrop lifts into the sky. */
   function hillScene(spec){
     return {
       top: HILL_TOP, farLift: spec.farLift == null ? 22 : spec.farLift, skirt: spec.skirt || "grass", path: spec.path || "stones", treeKind: spec.treeKind || "round", lamp: spec.lamp || "post", grade: spec.grade || ["#FFE7B0", .05],
-      snowy: !!spec.snowy, alwaysNight: !!spec.alwaysNight,
+      snowy: !!spec.snowy, noSnow: !!spec.noSnow, alwaysNight: !!spec.alwaysNight, tree: spec.tree,
       chip: function(o){ var g = spec.ground(o); return [g[0], g[3]]; },
       sky: spec.sky, far: spec.far || function(){ return ""; },
       land: function(o){
@@ -716,7 +726,8 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   }
   function sceneTree(sc, o){
     var b = P(FIX.tree[0], FIX.tree[1], 0), sh = ell(b[0] + 2, b[1] + 1, 12, 4.4, "#000", 0, .12), t;
-    if (sc.treeKind === "palm") t = palmTree(b, o);
+    if (sc.tree) t = sc.tree(b, o);                         // a set's own tree (the reef's coral, the moon base's dome)
+    else if (sc.treeKind === "palm") t = palmTree(b, o);
     else if (sc.treeKind === "pine") t = { s: pine(b[0], b[1] + 2, 52, o.night ? ["#2F5A4A", "#244A3D"] : ["#4A9164", "#357A50"], o.snow), bits: "" };
     else if (sc.treeKind === "crystal") t = crystalTree(b, o);
     else if (sc.treeKind === "cloud") t = cloudTree(b, o);
@@ -1902,8 +1913,18 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     var sw = o.journey > 0 ? .76 : .55;                    // past the Handpiece the pedestal has a wider base
     if (!st[2]) obs.push([st[0] - sw, st[1] - sw, st[0] + sw, st[1] + sw]);
     obs.push([br[0] - .25, br[1] - .25, br[0] + .25, br[1] + .25], [FIX.lamp[0] - .3, FIX.lamp[1] - .3, FIX.lamp[0] + .3, FIX.lamp[1] + .3], [FIX.tree[0] - .5, FIX.tree[1] - .5, FIX.tree[0] + .5, FIX.tree[1] + .5]);
-    if (o.holiday) obs.push([FIX.holiday[0] - .5, FIX.holiday[1] - .5, FIX.holiday[0] + .5, FIX.holiday[1] + .5]);
-    return { home: home, sc: sc, yard: yard, spots: spots, obs: obs };
+    if (o.holiday && !(o.holiday === "winter" && sc.noSnow)) obs.push([FIX.holiday[0] - .5, FIX.holiday[1] - .5, FIX.holiday[0] + .5, FIX.holiday[1] + .5]);
+    /* the front slot stands in front of every home's door spot, so a tall piece there (a windmill, a balloon) would hide
+       Timmy at the door: near the door he is drawn over it (Sam, 2026-11-19: "draw Timmy on top") */
+    var fr = yard.front && YARD[yard.front], frontZ = fr ? SLOTS.front.x + SLOTS.front.y + S + (fr.wide ? 2.4 : 0) + .05 : 0;
+    return { home: home, sc: sc, yard: yard, spots: spots, obs: obs, frontZ: frontZ };
+  }
+  /* where Timmy stands in the depth order at yard point p ([x, y, z]): in front of what's behind him, behind what's in
+     front, except over the front slot's piece while he's on the ground by the door */
+  function timmyZ(Lo, p){
+    var z = p[0] + p[1] + .3, d = Lo && Lo.spots && Lo.spots.door;
+    if (Lo && Lo.frontZ && d && !(p[2] > .05)){ var dx = p[0] - d[0], dy = p[1] - d[1]; if (dx * dx + dy * dy < 1.69) z = Math.max(z, Lo.frontZ); }
+    return z;
   }
   var RING = [[5.5, 10.8], [5.5, 12.3], [5.5, 14.4], [8.6, 14.5], [12.1, 14.8], [14.8, 12.2], [14.7, 8.4], [14.6, 5.0], [14.4, 1.4], [9.95, 4.8], [9.95, 7.6], [8.5, 10.05], [3.0, 10.1], [2.0, 14.4], [-.4, 12.0], [-.3, 9.4],
     [10.3, 10.2], [10.3, 14.5], [12.1, 5.4], [10.1, 1.2]];
@@ -1953,8 +1974,9 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     EGGS_SEEN = [];
     var Lo = layout(o), home = Lo.home, sc = Lo.sc, yard = Lo.yard;
     var night = !!(o.night || sc.alwaysNight), H = o.holiday || "", tier = Math.max(0, Math.min(6, o.tier | 0)), journey = Math.max(0, Math.min(2, o.journey | 0)), flair = o.flair || [];
-    var season = o.season || (H === "winter" ? "winter" : "");
-    var snow = !!(sc.snowy || H === "winter");
+    /* a scene where it never snows (under the sea) keeps the winter holiday's lights but no snow, snowfall or snowman */
+    var wet = !!sc.noSnow, season = o.season || (H === "winter" && !wet ? "winter" : "");
+    var snow = !!(sc.snowy || (H === "winter" && !wet));
     var up = {}; (home.ups || []).forEach(function(k){ if (o.up && o.up[k]) up[k] = true; });
     var so = { night: night, snow: snow, season: season, fall: season === "fall", spring: season === "spring", journey: journey };
     var s = sc.sky(so);
@@ -1981,7 +2003,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       var br = home.brush || FIX.brush; items.push({ z: br[0] + br[1], s: toothbrush(br[0], br[1], up.porch && home.porchZ ? home.porchZ.brush : br[2] || 0) });
       var lamp = lampFor(snow && sc.lamp === "post" ? "iron" : sc.lamp, so); items.push({ z: FIX.lamp[0] + FIX.lamp[1], s: lamp.s }); lights += lamp.lights;
       if (H && H !== "winter") items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: holidayGround(H) });
-      if (H === "winter") items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: snowman(FIX.holiday[0], FIX.holiday[1]) });
+      if (H === "winter" && !wet) items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: snowman(FIX.holiday[0], FIX.holiday[1]) });
       sc.props(so).forEach(function(p){ items.push({ z: p.x + p.y, s: p.s }); });
     }
     var spots = {}, plot = Lo.spots;
@@ -1993,11 +2015,11 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       items.push({ z: sl.x + sl.y + S + (it.wide ? 2.4 : 0), s: '<g class="tp-item" data-slot="' + k + '">' + egg(id, at(sl.x, sl.y, 0, it.draw(so)), it.bits ? at(sl.x, sl.y, 0, it.bits(so)) : "") + "</g>" });
       if (it.lights && night) lights += at(sl.x, sl.y, 0, it.lights(so));
     });
-    if (o.timmy && o.timmy.g){ var tp = plot[o.timmy.at] || plot.door, tq = P(tp[0], tp[1], tp[2] || 0); items.push({ z: tp[0] + tp[1] + .3, s: '<g class="tp-timmy" transform="translate(' + f(tq[0]) + " " + f(tq[1]) + ')">' + o.timmy.g + "</g>" }); }
+    if (o.timmy && o.timmy.g){ var tp = plot[o.timmy.at] || plot.door, tq = P(tp[0], tp[1], tp[2] || 0); items.push({ z: timmyZ(Lo, tp), s: '<g class="tp-timmy" transform="translate(' + f(tq[0]) + " " + f(tq[1]) + ')">' + o.timmy.g + "</g>" }); }
     items.sort(function(a, b){ return a.z - b.z; });
     s += '<g class="tp-depth">' + items.map(function(x){ return '<g class="tp-d" data-z="' + f(x.z) + '">' + x.s + "</g>"; }).join("") + "</g>";
     s += sc.fg(so);
-    if (H === "winter") s += holidaySky("winter");
+    if (H === "winter" && !wet) s += holidaySky("winter");
     s += '<rect class="tp-grade" x="0" y="0" width="400" height="300" fill="' + sc.grade[0] + '" opacity="' + sc.grade[1] + '"/>';
     if (night) s += '<rect class="tp-night" x="0" y="0" width="400" height="300" fill="' + NIGHT + '" opacity=".26"/>' + G("tp-lights", lights);
     var slots = {};
@@ -2492,7 +2514,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
      { k, homes, scenes, yard, outfits }, each keyed by the piece's shop id. Its name, rarity and price come from SETS
      (tools/figures/site/sets.mjs, the one list the catalog and the art share), so they can't drift. */
   var TOOLS = { INK: INK, K: K, U: U, SW: SW, P: P, D: D, D2: D2, f: f, RX: RX, RY: RY, rng: rng, F: F, O: O, L: L, FO: FO, HI: HI, G: G, T: T, circ: circ, ell: ell, seg: seg, at: at,
-    box: box, cyl: cyl, cone: cone, dome: dome, lumps: lumps, canopy: canopy, onY: onY, onX: onX, rectUV: rectUV, archUV: archUV, arcPts: arcPts, bands: bands, sun: sun, moon: moon, cloud: cloud,
+    box: box, cyl: cyl, cone: cone, spinner: spinner, dome: dome, lumps: lumps, canopy: canopy, onY: onY, onX: onX, rectUV: rectUV, archUV: archUV, arcPts: arcPts, bands: bands, sun: sun, moon: moon, cloud: cloud,
     starField: starField, dmStar: dmStar, pine: pine, scatter: scatter, trace: trace, landD: landD, win: win, porthole: porthole, doorArch: doorArch, roundDoor: roundDoor, flagOn: flagOn,
     tinyTooth: tinyTooth, glowAt: glowAt, smoke: smoke, tuft: tuft, flower: flower, stemLeaf: stemLeaf, daisyOn: daisyOn, tulip: tulip, sunflower: sunflower, mintBall: mintBall,
     snowSlope: snowSlope, snowDome: snowDome, backSlope: backSlope, firefly: firefly, crystal: crystal, fern: fern, PAINTS: PAINTS, BOLD: BOLD, HILL_TOP: HILL_TOP, hillScene: hillScene,
@@ -2511,6 +2533,9 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
      starts with none and each set's file (widget/hub-art/place/<set>.js) calls addPack when it is fetched, so a place
      only loads the sets it shows. SET_INFO names every set piece before its drawing is here (setOf, below). */
   var PACKED = {};
+  /* a yard piece's move: what moves while its egg plays, beyond its bits (.tp-eb): { "": the whole piece's animation,
+     ".tp-spin": its turning parts' (spinner), any other class inside it: that part's }. A rover rolls, a wheel turns. */
+  var EGG_MOVE = {};
   function addPack(pack){
     var got = pack(TOOLS); PACKED[got.k] = true;
     [["homes", HOMES], ["scenes", SCENES], ["yard", YARD], ["outfits", OUTFITS]].forEach(function(pair){
@@ -2523,7 +2548,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
         /* an outfit with its own eyewear, or one that covers his face, says so (noLoupes) and the loupes stay off */
         if (pair[0] === "outfits" && x.noLoupes && NO_LOUPES.indexOf(id) < 0) NO_LOUPES.push(id);
         pair[1][id] = x; SET_OF[id] = x.set;
-        if (pair[0] === "yard"){ EGGS[id] = x.egg || { n: x.n, does: "a little wobble", say: "" }; if (x.bits) EGG_ANIM[id] = x.anim || "tp-pop 2.2s"; }
+        if (pair[0] === "yard"){ EGGS[id] = x.egg || { n: x.n, does: "a little wobble", say: "" }; if (x.bits) EGG_ANIM[id] = x.anim || "tp-pop 2.2s"; if (x.move) EGG_MOVE[id] = x.move; }
       });
     });
   }
@@ -2534,6 +2559,10 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
      and an egg shows its bits without moving. */
   /* an egg's bits play by its own rule: a set fetched late (addPack) adds its rules to CSS, or its eggs would stay hidden */
   function eggRule(k){ return "[data-egg='" + k + "'].tp-on .tp-eb{animation:" + EGG_ANIM[k] + " both}"; }
+  function moveRule(k){ var m = EGG_MOVE[k]; return Object.keys(m).map(function(sel){ return "[data-egg='" + k + "'].tp-on" + (sel ? " " + sel : "") + "{animation:" + m[sel] + "}"; }).join(""); }
+  /* the yard's +x on the picture, for a piece that rolls along it (tp-rove) */
+  var XA = (function(){ var a = P(1, 0, 0), o = P(0, 0, 0); return [a[0] - o[0], a[1] - o[1]]; })();
+  function along(k){ return "translate(" + f(XA[0] * k) + "px," + f(XA[1] * k) + "px)"; }
   var CSS = [
     ".tp-scene{display:block;width:100%;height:auto}.tp-thumb,.tp-burst{display:block;width:100%;height:100%}",
     ".tp-grade,.tp-night,.tp-lights,.tp-eb,.tp-mark{pointer-events:none}.tp-egg{cursor:pointer;transform-box:fill-box;transform-origin:50% 100%}.tp-eb{opacity:0}",
@@ -2578,6 +2607,10 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     "@keyframes tp-flutter{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(16deg)}}",
     BOING.map(function(k){ return "[data-egg='" + k + "'].tp-on"; }).join(",") + "{animation:tp-boing .8s ease}",
     Object.keys(EGG_ANIM).map(eggRule).join(""),
+    ".tp-spin{transform-box:fill-box;transform-origin:50% 50%}",
+    "@keyframes tp-rove{0%,100%{transform:none}40%,52%{transform:" + along(.9) + "}86%{transform:" + along(-.25) + "}}",
+    "@keyframes tp-aim{0%,60%,100%{transform:none}20%{transform:rotate(-13deg)}42%{transform:rotate(7deg)}}",
+    Object.keys(EGG_MOVE).map(moveRule).join(""),
     "[data-egg='rabbit'].tp-on .tp-eo{transform-box:fill-box;transform-origin:50% 100%;animation:tp-burrow 1.8s ease}[data-egg='crab'].tp-on .tp-eo{animation:tp-scuttle 1.6s ease}",
     "[data-egg='owl'].tp-on .tp-owlhead{transform-box:fill-box;transform-origin:50% 100%;animation:tp-turn 1.6s ease}[data-egg='owl'].tp-on .tp-owlhead .tp-eb{animation:tp-blink 1.6s}[data-egg='balloon'].tp-on .tp-eo{animation:tp-rise2 3s ease-in-out}",
     "[data-egg='brush'].tp-on{animation:tp-wiggle .9s ease}[data-egg='tree'].tp-on{transform-origin:50% 100%;animation:tp-shake .8s ease}[data-egg='lane'].tp-on .tp-ball{animation:tp-roll 1.4s ease-in both}[data-egg='lane'].tp-on .tp-pins{transform-box:fill-box;transform-origin:50% 100%;animation:tp-tip 1.4s ease both}",
@@ -2654,7 +2687,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   };
   var API = {
     HEALTH: HEALTH, healthFor: healthFor,
-    VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout,
+    VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout, timmyZ: timmyZ,
     onLand: function(scene, x, y){ var q = P(x, y, 0); return sceneOn(SCENES[scene] || SCENES.hill, q[0], q[1]); }, unproject: unP, N: N, S: S, FIX: FIX, SLOT_AT: SLOTS,
     HOMES: meta(HOMES, FIELDS.homes),
     SCENES: meta(SCENES, FIELDS.scenes),
@@ -2671,10 +2704,11 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     collOf: function(id){ return SET_INFO[id] && SET_INFO[id].coll ? SET_INFO[id].set : ""; },
     hasPack: function(k){ return !!PACKED[k]; },
     addPack: function(pack){
-      var had = {}, k; for (k in EGG_ANIM) had[k] = 1;
+      var had = {}, hadM = {}, k; for (k in EGG_ANIM) had[k] = 1; for (k in EGG_MOVE) hadM[k] = 1;
       addPack(pack); lists();
-      var more = Object.keys(EGG_ANIM).filter(function(id){ return !had[id]; });
+      var more = Object.keys(EGG_ANIM).filter(function(id){ return !had[id]; }), moves = Object.keys(EGG_MOVE).filter(function(id){ return !hadM[id]; });
       if (more.length) API.CSS += "\n" + more.map(eggRule).join("");
+      if (moves.length) API.CSS += "\n" + moves.map(moveRule).join("");
     }
   };
   function lists(){

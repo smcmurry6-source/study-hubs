@@ -69,6 +69,63 @@
     }, shut);
   }
 
+  /* ---------- visiting from a hub's boards (the inbox's "Visiting from a hub's boards", 2026-11-19): a board row's visit
+     key (the _v2 boards' `visit`, 24 hex characters; get_arcade_leaderboard_v2 for a hub's arcade) opens that person's
+     place, as a row on the dashboard's boards does (widget/dash.js, visit()): get_place, then shPlace.open({ place }), the
+     name in the title, no HP and no Customize. The day's first visit pays (claim_visit_v2, the same "sh_visit_paid" day
+     the dashboard keeps). window.shVisitPlace(key, { onClose }) answers true once the place is open, false when it couldn't
+     be (the row then says so), null while another visit is on its way; a hub's arcade (content/arcade.js) calls it. Only the name, the slots, the rank and the
+     medals are kept, as text and numbers. ---------- */
+  var VISIT_RE = /^[0-9a-f]{24}$/, visiting = false;
+  function placeOf(d){
+    if (!d || typeof d !== "object" || Array.isArray(d)) return null;
+    var eq = {}, e = d.equipped && typeof d.equipped === "object" ? d.equipped : {}, rk = d.rank && typeof d.rank === "object" ? d.rank : null;
+    Object.keys(e).forEach(function(k){ if (typeof e[k] === "string" && /^[a-z0-9-]{1,40}$/.test(k)) eq[k] = e[k]; });
+    return { name: String(d.name == null ? "" : d.name), equipped: eq, flair: typeof d.flair === "string" ? d.flair : "",
+      rank: rk ? { journey: +rk.journey || 0, tier: +rk.tier || 0, level: +rk.level || 1 } : null };
+  }
+  function visitPlace(key, opt){
+    opt = opt || {};
+    if (visiting) return Promise.resolve(null);              // a second tap while the first is on its way: nothing to say
+    if (!VISIT_RE.test(key || "")) return Promise.resolve(false);
+    visiting = true;
+    var sb = window.shSupabase;
+    if (!sb) { visiting = false; return Promise.resolve(false); }
+    var place = sb.rpc("get_place", { p_key: key }).then(function(res){ return res && !res.error ? placeOf(res.data) : null; }, function(){ return null; });
+    var code = loadScript(WIDGET + "place.js").then(function(){ return true; }, function(){ return false; });
+    /* his drawing is widget/pet.js's (as for your own place): wait a moment for it if it isn't on the page yet */
+    var pet = window.shPet ? null : new Promise(function(ok){ if (window.shLoadPet) window.shLoadPet(); whenWidget("shPet", ok); setTimeout(ok, 4000); });
+    return Promise.all([place, code, pet]).then(function(a){
+      visiting = false;
+      var P = window.shPlace, boot = window.shBootstrap, d = boot && boot.data;
+      if (!a[0] || !a[1] || !P) return false;
+      P.setup({ sb: sb, visitor: ls("sh_visitor_id"), shop: d && d.shop, profile: HX.RANK && HX.RANK.p });
+      P.open({ place: a[0], onClose: opt.onClose });
+      visitPaid(key);
+      return true;
+    });
+  }
+  function visitPaid(key){
+    var G = window.shGame, me = ls("sh_visitor_id"), w = shopOf() && shopOf().wallet, day = dayCT();
+    if (!G || !G.claim || !me || !day || ls("sh_visit_paid") === day || (w && w.got && w.got.visit) || (w && w.pays && !w.pays.visit)) return;
+    ls("sh_visit_paid", day);
+    G.claim("claim_visit_v2", { p_visitor: me, p_key: key }, "visit").then(function(r){ if (!r || r.missing || r.ok === false) ls("sh_visit_paid", null); }, function(){ ls("sh_visit_paid", null); });
+  }
+  window.shVisitPlace = visitPlace;
+  /* every [data-sh-visit] button on the page (a hub's board rows) opens its data-key's place; closing gives focus back */
+  document.addEventListener("click", function(e){
+    var b = e.target.closest && e.target.closest("button[data-sh-visit]"); if (!b) return;
+    var key = b.getAttribute("data-key") || "", row = b.closest("li") || b.parentNode, old = row && row.querySelector(".sh-visit-msg");
+    if (old) old.parentNode.removeChild(old);
+    b.setAttribute("aria-busy", "true");
+    visitPlace(key, { onClose: function(){ if (b.isConnected) try { b.focus(); } catch (x) {} } }).then(function(ok){
+      b.removeAttribute("aria-busy");
+      if (ok !== false || !row || !b.isConnected) return;
+      var line = document.createElement("span"); line.className = "sh-visit-msg"; line.setAttribute("role", "status"); row.appendChild(line);
+      setTimeout(function(){ line.textContent = "That place couldn’t be opened just now."; }, 60);
+    });
+  });
+
   /* ---------- Timmy's shop (phase 4, part B): its page in More, the balance on its tile, the costume of the day.
      widget/shop.js (window.shShop) draws the shop and fetches its art and the place's kit itself; none of it loads with
      the page. The shop is there once the page's bootstrap carries one (the game layer, migration_v54). ---------- */
