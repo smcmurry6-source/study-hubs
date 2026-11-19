@@ -60,14 +60,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   misses all right, an idea of yours marked done on the idea board, the first day back after a week away. Each would be one
   `xp_awards` row with a key that pays once and an amount in `sh_prizes()` ([game-server](../reference/game-server.md)).
   (Studying's rate was raised to 5 crowns per 10 XP the same day, Sam: "lets increase it to 5 crowns per 10xp".)
-- [ ] **A tall piece in the front yard slot covers Timmy at the door** (2026-11-18, seen on the collection sheets): the
+- [x] **A tall piece in the front yard slot covers Timmy at the door** (2026-11-18, seen on the collection sheets): the
   `front` slot (`SLOTS` in `tools/figures/site/place.mjs`, x 6.7, y 10.2) is in front of every home's `spots.door`, so a tall
   piece there (Desert ranch's windmill, July 4's fireworks stand, Thanksgiving's balloon) hides him on the card. Ideas: draw
-  Timmy over a front-slot piece when he's at the door, or nudge the door spot when the front slot holds a tall piece. Ask Sam.
-- [ ] **Kit niceties the collection drawers asked for** (2026-11-18, [the task](done/2026-11-18-more-cosmetics.md)): a yard egg
+  Timmy over a front-slot piece when he's at the door, or nudge the door spot when the front slot holds a tall piece. Ask Sam. Done: Timmy is drawn on top (Sam, 2026-11-19), `timmyZ()` ([#467](https://github.com/smcmurry6-source/study-hubs/pull/467)).
+- [x] **Kit niceties the collection drawers asked for** (2026-11-18, [the task](done/2026-11-18-more-cosmetics.md)): a yard egg
   can only animate its `.tp-eb` group, so the moon rover can't roll, the dish can't turn and the windmill's and wagon's wheels
   only blur (a hook that moves the whole piece while its egg plays, within [motion-cost](../reference/motion-cost.md)); a coral
-  or kelp `treeKind` for the reef and a plain one for the moon (both use the crystal tree); no snow on an underwater scene.
+  or kelp `treeKind` for the reef and a plain one for the moon (both use the crystal tree); no snow on an underwater scene. Done: a piece's `move` and `T.spinner`, a scene's own `tree`, `noSnow` ([#467](https://github.com/smcmurry6-source/study-hubs/pull/467)).
 - [ ] **After the redesign's release: what the old pages still hold up** (2026-11-13, [the release](done/2026-11-06-redesign-release.md)).
   When the last single-file hub's page comes down (the archived ones and Heme & Endo Exam 2): take out the `NEW` (`html.shx`)
   branches in `widget/ranks.js` and `widget/rankup.js` (the old cards, the 23-trophy list), the old house picture and
@@ -85,8 +85,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   graded against a bank question's choice. Only if Sam asks for it.
 - [ ] **Flashcards: undo the last rating** (2026-11-13, same): not built, because a rating is paid and sent to the server
   at once; it needs the rating held back a few seconds first. Only if Sam asks for it.
-- [ ] **Visiting from a hub's boards** (2026-11-13, [visiting](done/2026-11-12-redesign-visiting.md)): the leaderboards in a
-  hub's own panel (`widget/v3.js`) don't open anyone's place yet (Sam, 2026-11-12: the dashboard's boards first).
+- [ ] **A smoke check for visiting from a hub's arcade board** (2026-11-19, from #467): `tools/ci/smoke.js` checks the
+  dashboard's visit but not a hub's. Stub `get_arcade_leaderboard_v2` and `get_place`, finish a game, tap a name on the
+  game-over board: the place opens as a visit, Escape gives focus back, a key that opens nothing says so on the row.
+- [x] **Visiting from a hub's boards** (2026-11-13, [visiting](done/2026-11-12-redesign-visiting.md)): the leaderboards in a
+  hub's own panel (`widget/v3.js`) don't open anyone's place yet (Sam, 2026-11-12: the dashboard's boards first). Done: the hubs' boards are their arcades' (`v3.js`'s panel has none now); `window.shVisitPlace` in `widget/hub-timmy.js`, Perio's and Heme & Endo Exam 3's arcades ([#467](https://github.com/smcmurry6-source/study-hubs/pull/467)).
 - [ ] **Sound for the hand-off and the Dark Matter unlock**, only if the redesign ever gets a sound setting (it has none; the
   scenes are silent on purpose: [the journeys](done/2026-11-06-redesign-progression-journeys.md)).
 - [ ] **Perio's page weight is near its budget** (2026-11-14, [#362](https://github.com/smcmurry6-source/study-hubs/pull/362)): `perf.js`
