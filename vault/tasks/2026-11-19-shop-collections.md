@@ -7,7 +7,7 @@ requested-by: Sam
 due: 
 waiting-on: Sam's "merge", then migration_v75 applied
 agent: Claude Code
-pr: 
+pr: https://github.com/smcmurry6-source/study-hubs/pull/437
 ---
 
 # Collections: your progress on every shop set, and a bonus for finishing one
@@ -50,7 +50,7 @@ and 1000 crowns as a bonus".
 
 ## Log
 
-- 2026-11-19: written and built (Claude Code).
+- 2026-11-19: written and built (Claude Code); [#437](https://github.com/smcmurry6-source/study-hubs/pull/437) opened.
 
 ## Outcome
 
