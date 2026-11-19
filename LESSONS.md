@@ -154,8 +154,9 @@ Collections prize is an hour old.
 - **The leaderboards** (E7a, totals): 50 names. The rank board's top ten hold 23,600-34,700 XP (median 28,200) against its middle half's
   12,200-21,900 (median 16,600). 47 of the 50 keep a study streak of 3+ days, 9 of 7+ (median 4). Arcade boards with 5+ players: eight,
   Perio's Crusher (9) and Cross (8) beside MSK 3's Sort (9).
-- **Sam's call (2026-11-18) stands: "lets keep all the prices for now."** The too-fast sign still holds, so this audit's PR puts numbers
-  to Sam, to decide on a normal week's reading after the exams (an exam-eve day overstates the pay).
+- **Sam's call, twice on 2026-11-18: "lets keep all the prices for now", then, shown this reading and the options (keep, double
+  the prices, halve study XP's crowns from a date on), "prices are good for now".** No change. The next audit reads it on a normal
+  week (an exam-eve day overstates the pay) and proposes again only if the too-fast sign still holds.
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order
