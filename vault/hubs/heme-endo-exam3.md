@@ -188,8 +188,8 @@ With L21 and L22 (2026-11-18): 437 questions (L21 64, L22 60, 13 of them Patient
 Likelihood, 122 hints, 24 figures. After the slides (2026-11-19): 460 questions (L21 75, L22 72), 86 topics, 410 High
 Likelihood. Nothing left open from the slides. After the High Likelihood review (2026-11-19): 81 topics, 284 High Likelihood
 (A 42 unchanged, L17 33, L18 42, L19 39, L20 45, L21 43, L22 40), High yield recorded again for L17-L22. The evening lessons audit (2026-11-19)
-fixed four explanations (`ea-tf-ratio`, `pg-no-milk`, `ea-tf-proscar`, `dc-acro` for report #67) and left `ea-tf-proscar`'s stem
-to Sam ([the inbox](../tasks/inbox.md)). **For the retrospective:** on 11-19 every arcade click in this hub, 67 of Timmy Time's
+fixed four explanations (`ea-tf-ratio`, `pg-no-milk`, `ea-tf-proscar`, `dc-acro` for report #67) and, with Sam's yes, reworded `ea-tf-proscar`'s
+stem ("have different active ingredients", not "two different drugs"; [decisions](../decisions.md)). **For the retrospective:** on 11-19 every arcade click in this hub, 67 of Timmy Time's
 69 plays from More and 134 question-health answers were the smoke test's (BUG-192 in [the bug log](../release/bug-log.md)), not
 students; `tools/data-fixes/2026-11-19-test-runs.sql` takes them out after its PR merges, so check it ran before reading them.
 

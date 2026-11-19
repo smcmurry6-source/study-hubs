@@ -21,7 +21,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   to hide the answers in the charts"): a hub's review tables and Side by side charts (`study.json`'s `review`) show every cell. A "Cover" button on a table that
   blanks every column but the first until a cell is tapped (and a "Show all") would make each table a self-test, like
   Flashcards. A feature: Sam's call, then a task note (drawn in `widget/hub.js`, the Review groups' tables; the About page).
-- [ ] **`ea-tf-proscar`'s stem, Sam's call** (2026-11-19, the evening lessons audit; moot once Heme & Endo Exam 3 archives,
+- [x] **`ea-tf-proscar`'s stem, Sam's call** (#476: Sam said yes, reworded) (2026-11-19, the evening lessons audit; moot once Heme & Endo Exam 3 archives,
   11-20 at 10 pm): "Proscar and Propecia are two different drugs, one for BPH and one for hair loss" (keyed False: both are
   finasteride) had 30% of 10 first tries right, below chance, and a careful reader can call it true (two products). Reworded as
   "have different active ingredients", it asks what the lecture means; the key, the choices and the whys stay. A wording

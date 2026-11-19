@@ -143,9 +143,9 @@ question A 11.5, L17 14.4, L18 8.3, L19 3.0, L20 0.2, L21 0.1, L22 0.0, while L2
 - **Question health** (`qh_report`, 12 flagged, all on 8 to 13 first tries): `pg-tf-myoepi`, `ea-tf-proscar`, `pg-no-milk`,
   `pg-syncytio`, `pg-polyspermy`, `dc-2s-brown`, `dc-medulla-dental`, `pg-2s-aromatase`, `ea-tf-ratio`, `pg-tf-40wk`, `ea-avoid-t`
   (a six-choice select-all, low by design: liver disease is the one missed) and `dc-ws-calcium` (often left unanswered). Every
-  "possible miskey" and "below chance" key was read against the notes and is right. One is a wording call for Sam: `ea-tf-proscar`
-  (30% of 10 first tries, below chance) asks whether Proscar and Propecia are "two different drugs", which a careful reader can call
-  true (two products); "different active ingredients" would ask what the lecture means.
+  "possible miskey" and "below chance" key was read against the notes and is right. One was a wording call, and Sam said yes: `ea-tf-proscar`
+  (30% of 10 first tries, below chance) asked whether Proscar and Propecia are "two different drugs", which a careful reader can call
+  true (two products); it now asks whether they "have different active ingredients" (the key, choices and whys unchanged).
 
 **The game economy** (Sam's standing rule since 2026-11-18, [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md);
 `tools/economy.sql` over 11-18 and 11-19 again, four hours after the afternoon's reading, the same rules). **Skews:** both are exam
