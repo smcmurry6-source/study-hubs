@@ -4,7 +4,7 @@ Sam's standing rule (2026-09-29): **every time a hub is archived, use all the da
 next hubs.** This file is where that lands. It is shared by every session (Claude Code, Cowork, each hub's Claude
 Project): read it before building or restructuring a hub, and add to it whenever one is archived.
 
-**Last refreshed: 2026-11-19** (1:30 pm Central, after the Perio final: its retrospective below; the game economy is read too, Sam's rule since 11-18). Sam
+**Last refreshed: 2026-11-19** (6 pm Central, the eve of Heme & Endo Exam 3; the Perio retrospective that afternoon; the game economy is read too, Sam's rule since 11-18). Sam
 runs the lessons refresh by hand (`tools/lessons-refresh.md`): it updates this file from all tracked data, reports and suggestions
 and ships small fixes to the live hubs. **Before building a new hub, if this date isn't today, run steps 1-3 of
 `tools/lessons-refresh.md` first.**
@@ -73,7 +73,10 @@ What each signal tells an author, and what to do with it in the next hub (and in
 - **A flag on 8-10 recent first tries**: read it beside the all-time numbers before acting. The night before the PCD
   Implants exam, most of its "possible miskey" flags were small recent groups on keys the notes confirm (`ev-pic-sub` 2 of
   8 since 11-04, 21 of 32 ever).
-- **By source**: what the professor put in class quizzes and polls is what students practise most and what exams
+- **Say why the patient fits** (Heme & Endo Exam 3, report #67): a student read `dc-acro`'s 47-year-old man as the wrong patient
+  for growth hormone excess, though it is when acromegaly is usually found. When a case's age or sex is part of the answer (GH
+  excess after puberty, a disease of children or of older adults), the explanation says so in one line.
+- **By source**: what the professor put in class quizzes and polls is what students practice most and what exams
   echo. Mine those first; tag `src`.
 - **Exam check-ins** ("Hub was harder/easier", "Exam asked different things", and what it missed): calibrate
   difficulty and question style to the exam, and add the missed topics to the next hub for the same course/professor.
@@ -94,65 +97,76 @@ What each signal tells an author, and what to do with it in the next hub (and in
 
 ## Live signals (rewritten by each refresh)
 
-**2026-11-19, afternoon (data read 12:40 to 1:30 pm Central, after the Perio final).** "Since" = last night's audit (7:30 pm). Live
-hubs: **Heme & Endo Exam 3** (exam Fri 11-20, 8 am) and **Perio**, whose final was this morning (studying stopped at 10 am) and which the
-dashboard archives at 10 pm tonight. **Perio's retrospective is below** (Hub retrospectives), its recap is on the dashboard, and its
-narration and Timmy Time came off the site with this audit (the site 656 -> 367 MB). **Data quality wasn't read again**:
-`sh_data_quality()` stopped at the 5 s limit at 12:40 pm, with the class between the Perio final and the Heme & Endo eve; `qh_report`
-returned for both hubs. **The database is 323 MB** of the Free plan's 500 MB (read with
-`select pg_size_pretty(sum(pg_database_size(datname))) from pg_database`, the sum Supabase counts; the biggest tables:
-`personal_answers` 79 MB, `activity_pings` 36, `question_events` 35, `xp_seen` 31, `ui_click_reach` 24), the same as after
-#463's rewrites this noon.
+**2026-11-19, evening (data read 4:40 to 6 pm Central, the eve of Heme & Endo Exam 3).** "Since" = this afternoon's audit (1:30
+pm). Live hub: **Heme & Endo Exam 3** (exam Fri 11-20, 8 am). Perio is archived; its retrospective below now has the final's
+check-ins through 4:30 pm. **The database is 329 MB** of the Free plan's 500 MB (`personal_answers` 80 MB, `activity_pings` 38,
+`question_events` 35, `xp_seen` 31, `ui_click_reach` 24), 6 MB more than at noon. **Data quality:** the admin page's kept copy
+doesn't exist yet (`admin_cache` comes with `migration_v83.sql`, still pending) and `sh_data_quality()` wasn't run on an exam eve;
+this audit found one problem by itself, below.
 
-**Student voice since last night:** 4 reports, all Perio, no suggestions. **#64** (`pc-h1`: the implant film is a sketch, so say the bone
-loss in words) and **#65** (`q4-L27`: the Phase I re-evaluation is at 4-6 weeks, not 2 weeks) were right, and fixed overnight (#443:
-every implant case now has "Today's film, in words"; #448: the 2-week row says it's a second evaluation after leftover calculus).
-**#66** (`q6-L13`, exam morning: "worded weird, not really a testable concept"): partly right. Open flap debridement as the baseline
-every regenerative therapy must beat is one of Dr. Geurs' hints, so the point is fair, but the stem ("What role does open flap
-debridement play in the regeneration studies on the slides?") leans on "the studies on the slides", which he said weren't there to be
-read. Sam resolved it after the exam; no change (the hub is archived tonight). Check-ins: 7, from 7 people: **the Perio final's first**
-(About right, went better than expected) and 6 more for the Occlusion final (its retrospective has the new total). The survey "How's
-the new look?": 4 more answers (4, 4, 5, 5), **25 in all**. Searches: 13, none a missing fact (the only ones with no results were Timmy's own words).
+**Test runs in the class's data (fixed in this audit's PR).** Heme & Endo Exam 3's clicks today showed 67 people in the arcade
+and 69 pressing play on Timmy Time, more people than studied in the hub at all. Every one was the smoke test: `tools/ci/smoke.js`'s
+game-layer check (Million-Dollar Smile twice, Walk away, the Sort game, Timmy Time from More) hides `navigator.webdriver` so the
+widget records, and since the morning's database pass (#459) a closing page sends its held clicks, events and question-health rows
+with keepalive, which Playwright's routing never sees (a request sent as a page goes away skips every route). So each CI run and
+local run since 10:25 am wrote 9 clicks, the settings snapshot, two arcade and two podcast events and **two answers in
+`question_events`** (one right, one wrong, at most 4 on any one question) under a made-up visitor: 68 by 5 pm, nothing else (no
+study time, no saved answers, no XP). No student played the arcade in this hub today; 2 people pressed play on Timmy Time.
+`tools/ci/no-leaks.js` now answers, inside the test page, what it sends once it is really leaving (`smoke.js` and `quiet.js`), and
+`tools/data-fixes/2026-11-19-test-runs.sql` takes the rows out after the merge. **Until it runs, read today's arcade and Timmy Time
+numbers for this hub as test runs**, and the question-health first tries with 134 too many.
 
-**Did the last refresh work?** Can't tell; too few first tries before the final. Since last night's fixes went live (9 pm): `q6-L35` 17
-of 38 first tries before -> 4 of 11 since, against **40% -> 48%** (1,282 -> 522 first tries) for the 44 unfixed items under 50%; the #31
-case (`q7-P01`, `q7-P02`, the box says where the loss is) 75% (60) -> 73% (22); the implant cases with the film in words (#443, from
-4:20 am) 79% (427) -> 80% (90). `q6-T02`'s retirement held. Nothing moved, which is what the standing lesson on explanation fixes predicts.
+**Student voice since 1:30 pm:** 1 report, no suggestions. **#67** (`dc-acro`: "the patient demographics don't make sense"): the
+case is right (a 47-year-old man is when acromegaly is usually found, and the notes say an adult shows it in the jaw: Class I to
+Class III, diastemas, a large tongue; 14 of 18 right), but neither the explanation nor the box said why his age fits; fixed (it's
+GH excess after puberty, when the long bones are fused, so the jaw grows instead). Check-ins: 9: 8 more for the Perio final (9 in
+all, in its retrospective) and 1 for the Occlusion final (36 in all). The survey
+"How's the new look?": 5 more answers (5, 5, 4, 3, and one with only a comment), **30 in all**; one asked to **hide the answers in
+the review tables** to test yourself, which the hubs can't do (the inbox). Searches: 5, all with results ("study guide" twice).
 
-**Per hub:**
-- **Perio** (final this morning, archived tonight): the retrospective below. Question health (`qh_report`) lists the hardest items of the
-  final; every key it flags as a possible miskey was checked against the notes (`q6-L37`, `q5-L43`, `q3-S02`, `q6-N01`, `q6-N03`,
-  `q7-T08`, `q8-T07`, `q9-L38` and the rest the 11-18 audits read) and matches them. No change: the course is over.
-- **Heme & Endo Exam 3** (exam Fri 11-20, 8 am): 37 people ever; today 19 people and 236 minutes by 1 pm, last night 14 and 455. Since
-  last night 464 answers from 20 people, 72% (first tries 64% of 311), most of the time in the notes (259 min) before the bank (181).
-  **Its eve starts now**, the shortest lead of any hub (the class sat the Perio final this morning): Home's quick start, the drill,
-  the cram, Dr. Herr's study guide and Timmy Time carry it. No reports, no question-health flags yet (too few answers); nothing to fix.
+**Did the last refresh work?** Nothing to check: this afternoon's audit changed no live question (Perio's course was over).
+
+**Heme & Endo Exam 3** (exam tomorrow, 8 am): 60 people ever, 42 hours; **today 54 people and 33 hours by 4:40 pm** (yesterday 14
+and 7.6), 47 people and 27 hours since 1 pm, the busiest hour 2 to 3 pm (31 people). Where since 1 pm: Notes 895 minutes (34 people),
+the Question Bank 640 (25), the drill 45 (3), Home 30, Timmy Time 21 (1), Exam Hints 11 (6), the cram 1. In Notes: Lecture A (19
+people), Dr. Herr's study guide page (17) and the High yield level (18). **The bank is reached in lecture order**: tries per
+question A 11.5, L17 14.4, L18 8.3, L19 3.0, L20 0.2, L21 0.1, L22 0.0, while L20 to L22 are 14 of the exam's 35 questions; Home's
+"Where to next" already offers a lecture not started, so nothing to change tonight. All tries so far 2,242, about 75% right; two-statement
+62% (39 items), select-all 48% (10), the rest 73-79%.
+- **The hardest items** (12+ tries, under 45%): `ea-tf-ratio` 5 of 14 (9 said cypionate is more anabolic than testosterone),
+  `pg-2s-aromatase` 8 of 19 (8 thought the fetal kidney adds the 16-hydroxyl; the explanation says the liver) and `dc-2s-brown` 10 of
+  23 (a brown tumor is radiolucent; the lamina dura is lost). Every key agrees with the notes. **Explanations fixed** where the class's
+  favorite wrong answer wasn't answered: `ea-tf-ratio` (cypionate is the slow-release depot: it changes how long testosterone lasts,
+  not its ratio), `pg-no-milk` (13 first tries, 54% picked "dopamine from the placenta": dopamine comes from the hypothalamus, and
+  prolactin is already rising, so what progesterone blocks is its action in the breast), `ea-tf-proscar` (two brand names, one drug)
+  and `dc-acro` (#67). An explanation fix shows in retries, not first tries (the standing lesson), so the next audit reads them there.
+- **Question health** (`qh_report`, 12 flagged, all on 8 to 13 first tries): `pg-tf-myoepi`, `ea-tf-proscar`, `pg-no-milk`,
+  `pg-syncytio`, `pg-polyspermy`, `dc-2s-brown`, `dc-medulla-dental`, `pg-2s-aromatase`, `ea-tf-ratio`, `pg-tf-40wk`, `ea-avoid-t`
+  (a six-choice select-all, low by design: liver disease is the one missed) and `dc-ws-calcium` (often left unanswered). Every
+  "possible miskey" and "below chance" key was read against the notes and is right. One is a wording call for Sam: `ea-tf-proscar`
+  (30% of 10 first tries, below chance) asks whether Proscar and Propecia are "two different drugs", which a careful reader can call
+  true (two products); "different active ingredients" would ask what the lecture means.
 
 **The game economy** (Sam's standing rule since 2026-11-18, [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md);
-`tools/economy.sql` over 11-18 and 11-19, the days with today's rules: #403's rates and prizes from 11-18, "A miss fixed" gone since 9:50
-am today, #451). **Skews:** both days are exam days (the Perio eve was the biggest day any hub has had, and the median study day was 129
-minutes), the back pay is still being spent, and Collections is a day old.
-- **Earning:** the median study day earned **about 1,400 crowns** (25th percentile 740, 75th 2,560, 90th 4,060; 130 study days from 85
-  people): 580 from study XP, 210 from hub time, prizes 980 at the 75th percentile. **Per hour of study: 720 crowns and 1,130 XP** (last
-  night's reading of 11-18 alone: 630 and 970). The class's rhythm: the median student has 8 study days in four weeks (75th percentile
-  14, 90th 16; 110 people), about two a week.
-- **The ladder in median study days** (at 1,400; a heavy day of 2,560 in brackets): Common 0.1 (0.1), Uncommon 0.2-0.3 (0.1-0.2), Rare
-  0.5-0.9 (0.3-0.5), Epic 1.1-2.0 (0.6-1.1), Legendary 2.8-5.7 (1.6-3.1). For the median student that is an Epic in about a week and a
-  Legendary in two to three. Against the yardstick (Rare 2-4, Epic 5-10, Legendary 10-20) every band is still under its range, as in
-  both readings on 11-18.
-- **Wallets** (82 who answered on 11-18 or 11-19): median **9,300 crowns** (10th percentile 1,800, 25th 4,700, 75th 14,000, 90th
-  22,300); 47 could buy the shop's priciest piece (8,000), 58 a Legendary, 78 a Rare; 1 holds under a Common. 21 have ever bought
-  something, and **11% of all crowns earned has been spent** (13% last night, over a smaller group). Since 11-18: about 95,000
-  crowns in 40 purchases, most of it on Legendary homes, scenes and yards; 21 people opened their place and 18 the shop; 24 have
-  customized it. **Signs seen: too fast** (the median wallet buys anything; an Epic under 3 days) and **hoarding at the line** (11%,
-  just over the 10% mark, with balances still climbing); not "too slow", not "nothing to want".
-- **XP and ranks:** a median study day earned 2,130 XP (75th percentile 4,360). Of the 82, 67 moved up a rank since the release (10 at
-  rank 2 of the Handpiece, 21 at 3, 28 at 4, 16 at 5); the top stands near 43,000 XP of the Handpiece's 125,000.
-- **The leaderboards** (E7a, totals): 50 names. The rank board's top ten hold 29,100-42,900 XP (median 33,400) against everyone's
-  middle half 15,000-26,800 (median 19,300). 48 of the 50 keep a study streak of 3+ days, 10 of 7+ (median 5). Arcade boards with 5+
-  players: eight, the most-played MSK 3's Sort (9 people) and Perio's Crusher (9) and Cross (8).
-- **Sam's call stands** ("prices are good for now", twice on 2026-11-18): no proposal this time, since these are exam days again. The
-  first reading on a normal week (after Heme & Endo Exam 3) proposes again only if the too-fast sign still holds then.
+`tools/economy.sql` over 11-18 and 11-19 again, four hours after the afternoon's reading, the same rules). **Skews:** both are exam
+days (the median study day was 149 minutes), the back pay is still being spent, and Collections is a day old.
+- **Earning:** the median study day earned **about 1,440 crowns** (25th percentile 760, 75th 2,590, 90th 4,120; 137 study days from
+  85 people): 590 from study XP, 250 from hub time, prizes 990 at the 75th percentile. **Per hour of study: 700 crowns and 1,125 XP.**
+  The class's rhythm (the afternoon's E2): the median student has 8 study days in four weeks, about two a week.
+- **The ladder in median study days** (at 1,440; a heavy day of 2,590 in brackets): Common 0.1 (0.0-0.1), Uncommon 0.2-0.3
+  (0.1-0.2), Rare 0.5-0.8 (0.3-0.5), Epic 1.0-1.9 (0.6-1.1), Legendary 2.8-5.6 (1.5-3.1). Every band is still under the yardstick
+  (Rare 2-4, Epic 5-10, Legendary 10-20), as in every reading since 11-18.
+- **Wallets** (82 who answered on 11-18 or 11-19): median **9,500 crowns** (10th percentile 1,240, 25th 5,200, 75th 14,800, 90th
+  23,100); 46 could buy the priciest piece (8,000), 62 a Legendary, 77 a Rare; 1 holds under a Common. 21 have ever bought something,
+  and **11% of all crowns earned has been spent**. Since 11-18: 42 purchases, about 102,600 crowns (36 on 11-18, 6 today, the Perio
+  final and the Heme & Endo eve), most of it on Legendary homes, scenes and yards; 25 opened their place, 18 the shop, 24 have
+  customized it. **Signs seen: too fast** (the median wallet buys anything; an Epic in under 2 median days) and **hoarding at the
+  line** (11%); not "too slow", not "nothing to want".
+- **The leaderboards** (E7a, totals): 50 names. The rank board's top ten hold 30,400-45,000 XP (median 35,100) against everyone's
+  middle half 15,000-27,500 (median 19,800). 48 of the 50 keep a study streak of 3+ days, 10 of 7+ (median 5). Arcade boards with
+  5+ players: the same eight as this afternoon.
+- **Sam's call stands** ("prices are good for now", twice on 2026-11-18): no proposal on exam days; the first reading on a normal
+  week (after Heme & Endo Exam 3) proposes again only if the too-fast sign still holds then.
 
 **Older feature readings (kept for reference; the standing lessons carry what they mean):**
 - Heme & Endo (10-27 to 10-30): "Try it again" reached 63 of its 67 answerers (4,258 retries shown, 79% right); High likelihood order
@@ -195,7 +209,7 @@ minutes), the back pay is still being spent, and Collections is a day old.
   minutes each inside 191-631 total). Of 18 arcade games, the most-played had 9 people and 50 runs (MSK Sort Storm);
   only 3 people saved a score in the same game on two different days.
 - **Matching and sequence questions score ~30 points lower than MCQ** (GI2: 53% vs 84% MCQ, 74% recall) and are
-  over-practised because people retry them. Grade them per pair/step (perio does since 2026-09-26), keep them short
+  over-practiced because people retry them. Grade them per pair/step (perio does since 2026-09-26), keep them short
   (4-5 pairs), and check any item under ~15% with 20+ attempts for a grading or wording bug before assuming it is
   just hard (GI2 `gp26`/`mt10`, Crohn vs UC matching, 5-7% over 39 and 67 attempts). **Ordering questions longer than 4-5 steps
   barely work:** MSK's six-step sequences sat at 16-23% over 17-30 attempts each (09-30) even with per-step feedback,
@@ -226,7 +240,7 @@ minutes), the back pay is still being spent, and Collections is a day old.
   question to 23-26 on the eve. **What the default bank leaves out doesn't catch up**: its Exam 1 Refresher (review only, ticked by
   hand) reached 13 of 59 answerers by the eve and 18 of 64 in the end (3.2 tries per question), for 5 of the exam's 50 questions;
   none of its 9 check-ins named it, so whether that cost anything can't be told.
-- **Questions from class quizzes/polls are practised most.** GI2's exam-2 quiz and PollEv items averaged 32-38
+- **Questions from class quizzes/polls are practiced most.** GI2's exam-2 quiz and PollEv items averaged 32-38
   attempts per question vs 22 for hub-written ones. Tag the source (`src`) and label them. The same goes for the
   professors' own hints: PCD 3's `hint` items (from the course's exam-hint email) got 49 tries per question vs 35-40, and
   a check-in said "the exam followed the hints a lot". When a course sends hints, build the blueprint and questions on them.
@@ -550,8 +564,13 @@ highlighter 17; "Find this in the notes" shown after a miss to 82 and opened by 
 Weak spots 14, the mock set 13, the drill set 11, Yesterday's misses 8. **Ask Timmy**: opened by about 35, 18 sent a question (60
 messages). Plaque bosses: 89 met one.
 
-Check-ins for the final: **n = 1** by 1:30 pm (About right, better than expected); the pop-up goes out from 10 pm, so the rest go into
-the next audit (with the 1,000 XP and crowns reward, the Occlusion final had 22 within a day). Reports during the final: 16, all
+Check-ins for the final: **n = 9** by 4:30 pm (the pop-up went out from 1 pm, `promptHour`; later ones go into the next audit).
+**About right 7**, Hub was easier and Hub was harder one each; it went better than expected for 4, as expected for 4, worse for
+none (one left it blank); ready 3 or 4 out of 5 for all nine. They studied a median 16.5 hours in the hub (the middle half 8 to
+19), with a median 1,051 answers (the middle half 76-86% right), and the two who said easier or harder studied about as much as the
+rest. One asked for **more application: which
+flap for which surgery**, a format for the next perio course (a case that names the procedure and asks the flap, the incision or
+the healing to expect). Reports during the final: 16, all
 fixed (most within hours), 1 suggestion. **What the late reports had in common**: the drawn cases. #61 (two-visit charts that didn't
 say which visit), #63 (the case box didn't say the loss was at the margin, which the explanation leaned on) and #64 (the implant film is
 a sketch, so say the bone level in words) all asked for the finding the key rests on to be written in the box.
@@ -630,8 +649,8 @@ readiness 3.5 of 5 on average (Heme & Endo Exam 2's: 3.9). Still heavy users (me
 1,005). One wrote "nothing! the questions were very comparable." **The most "Hub was easier" answers of any hub so far**: Dr. Givan's
 final asked harder than the bank, even after the midterm's formats gap was closed (no one said the formats were missing). Later
 check-ins go into the next audit. Reports during the final: 12 (#39-#52), no suggestions; the last four, on exam day
-(#49-#52), were left open by Sam's call once the exam was over. **Later check-ins** (to 11-18 evening): **n = 26 people**, Hub was
-easier 10, About right 8, **Exam asked different things 8** (4 of the 5 who checked in on 11-18, at 196-1,150 minutes in the hub). Written:
+(#49-#52), were left open by Sam's call once the exam was over. **Later check-ins** (to 11-19 evening): **n = 36**, About right 13,
+**Exam asked different things 12**, Hub was easier 11; the later ones leaned to "different things" (4 of the 5 on 11-18). Written:
 that the exam's questions couldn't be predicted and were poorly worded, and "more detailed questions". So the final's verdict is a
 harder, differently worded exam than the bank, not a missing format: for Dr. Givan's next course, more two-step application items.
 

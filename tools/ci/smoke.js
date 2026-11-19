@@ -1,8 +1,10 @@
 // Browser smoke test + question-bank lint for every hub and the dashboard.
-// Class data (Supabase) is stubbed with empty results; nothing is written anywhere.
+// Class data (Supabase) is stubbed with empty results; nothing is written anywhere (tools/ci/no-leaks.js answers what a
+// closing page sends, which routing misses).
 //   npm i --no-save playwright && npx playwright install chromium && node tools/ci/smoke.js
 const http = require('http'), fs = require('fs'), path = require('path'), crypto = require('crypto');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
+const noLeaks = require('./no-leaks.js');
 const root = path.resolve(__dirname, '../..');
 const TYPES = { '.html':'text/html', '.js':'application/javascript', '.css':'text/css', '.mp3':'audio/mpeg', '.svg':'image/svg+xml', '.png':'image/png', '.webp':'image/webp', '.mp4':'video/mp4', '.webm':'video/webm', '.json':'application/json' };
 const server = http.createServer((req, res) => {
@@ -333,6 +335,7 @@ async function wiringCheck(context, hub, label){
   }
 }
 async function stub(context){
+  await noLeaks(context);   /* a closing page's last requests skip routing: answered in the page instead */
   await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, route => {
     const u = route.request().url();
     if (/supabase\.co\/rest\/v1\/rpc\/get_ideas/.test(u)) return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(IDEAS) });

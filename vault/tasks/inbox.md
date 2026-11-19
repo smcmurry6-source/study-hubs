@@ -10,6 +10,22 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **Run the test-runs data fix once more on 2026-11-21** (2026-11-19, the evening lessons audit): the PR that adds
+  `tools/ci/no-leaks.js` runs `tools/data-fixes/2026-11-19-test-runs.sql` after its merge, but a smoke test run locally from a
+  branch older than the fix (another session's) still writes its game-layer check into the live hub until that branch takes
+  `main`. Two days later, run it again (`node tools/after-merge/run.js ... --fix tools/data-fixes/2026-11-19-test-runs.sql`, or
+  the connector with Sam's OK; it is safe to run twice), first counting what it would select (its first statement as a `select
+  count(*)`), and tick BUG-192's retest. Until then, a Heme & Endo Exam 3 retrospective reads that hub's arcade and Timmy Time
+  clicks of 11-19 as test runs.
+- [ ] **Hide the answers in a review table to test yourself** (2026-11-19, a "How's the new look?" survey answer: "being able
+  to hide the answers in the charts"): a hub's review tables and Side by side charts (`study.json`'s `review`) show every cell. A "Cover" button on a table that
+  blanks every column but the first until a cell is tapped (and a "Show all") would make each table a self-test, like
+  Flashcards. A feature: Sam's call, then a task note (drawn in `widget/hub.js`, the Review groups' tables; the About page).
+- [ ] **`ea-tf-proscar`'s stem, Sam's call** (2026-11-19, the evening lessons audit; moot once Heme & Endo Exam 3 archives,
+  11-20 at 10 pm): "Proscar and Propecia are two different drugs, one for BPH and one for hair loss" (keyed False: both are
+  finasteride) had 30% of 10 first tries right, below chance, and a careful reader can call it true (two products). Reworded as
+  "have different active ingredients", it asks what the lecture means; the key, the choices and the whys stay. A wording
+  judgment, so not changed in the audit ([question-health-flags-are-leads](../rules/question-health-flags-are-leads.md)).
 - [ ] **The arcade games themselves at 320 px with the largest text** (2026-11-19, left from BUG-168's fix): the lobby and
   every view of a hub now fit a 320 px phone at XX-Large (220 px of layout), and the smoke test checks them, but a game once
   it's started (each hub's own `content/arcade.css` and `widget/games.css`) wasn't swept. Open each in a scripted browser at
@@ -33,7 +49,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   the next day, between the Perio final and the Heme & Endo Exam 3 eve). `qh_report('perio')` was read with the retrospective
   (2026-11-19: no miskeys). Once `migration_v83.sql` is live, read the admin page's kept copy instead, at any hour (`admin_cache`'s
   `quality`; the query in `tools/lessons-refresh.md` step 1; the night v83 is applied fills it, and it's refreshed nightly for a
-  week); until then, once between 1 and 5 am Central. Tick this when it's read.
+  week); until then, once between 1 and 5 am Central. Tick this when it's read. (Not run again on 2026-11-19 at 5 pm either, the
+  Heme & Endo Exam 3 eve; that audit found test runs in the data by reading the clicks, BUG-192.)
 - [x] **The other `shGame.v2()` checks while the bootstrap times out** (#468) (2026-11-19, found with the rank pill's fix). Three more
   places wait for `v2()` (true only once the bootstrap or an answer's reply came back) where `shGame.live()` would do: Timmy
   Time's minutes (`minOn()` in `widget/podcast.js`: an episode heard then pays nothing for those minutes), Timmy's HP days
