@@ -57,6 +57,10 @@ note on what it costs), a look at the data, a check after a migration.
 - **Watch for a function in an inlined CTE.** PostgreSQL copies a CTE that is read once into the query that reads it, so
   a `stable` function there runs again for every column that uses its result. `as materialized` runs it once a row
   (`tools/economy.sql`'s E3: 4.7 s to 0.5 s on a copy, the same numbers).
+- **The admin page's heavy reads are kept worked out** (`admin_cache`, `migration_v79.sql`): the data-quality report,
+  Insights, each live hub's question health, the visitor totals, check-ins, clicks and features. Read the kept copy
+  (`select computed_at, body from admin_cache where key = '<key>';`, the keys and the question-health query in
+  [admin-operations](../reference/admin-operations.md)) instead of working one out again.
 - **While saves are failing, read only the edge logs** (`query_logs`), which cost the database nothing.
   `pg_stat_statements` reports (10 to 14 s each on 2026-11-18) and `explain analyze` wait until it has recovered.
 

@@ -621,11 +621,12 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   function needsMigration(e){ return /function|does not exist|PGRST202|404/i.test(String((e && (e.message || e.code)) || "")); }
 
   /* ---------- data: each view loads only what it shows, cached per time range ----------
-     One read at a time (2026-11-18): the database is small (1 GB, two shared cores) and every student's answer is saved
-     through it. The Overview's nine reads, or Insights' three, sent at once took the cores from the class: answer saves
-     timed out while the page loaded, and the page's own reads passed anon's 3 s limit. In one lane, each read runs on its
-     own and the class keeps the other core. A read the database stopped for time is tried once more, 5 s later. Writes
-     (marking a report, a review, an override) don't wait in the lane. */
+     One read at a time (2026-11-18): the database is small (Supabase's Free plan, a shared CPU) and every student's answer
+     is saved through it. The Overview's nine reads, or Insights' three, sent at once took the CPU from the class: answer
+     saves timed out while the page loaded, and the page's own reads passed anon's 3 s limit. In one lane, each read runs
+     on its own. A read the database stopped for time is tried once more, 5 s later. Writes (marking a report, a review, an
+     override) don't wait in the lane. The heavy reads are worked out ahead by the database itself (migration_v79, the
+     "worked out ahead" section below), so reading them costs the class almost nothing. */
   var lane = Promise.resolve();
   function queued(run){
     var p = lane.then(run, run);
@@ -656,9 +657,9 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     });
   }
   var SRC = {
-    summary:     { r: 1, f: function(d){ return rpc("get_visitor_summary", { p_secret: secret, p_days: d }); } },
-    byHub:       { r: 1, f: function(d){ return rpc("get_visitor_by_hub", { p_secret: secret, p_days: d }); } },
-    bySection:   { r: 1, f: function(d){ return rpc("get_visitor_by_section", { p_secret: secret, p_days: d }); } },
+    summary:     { r: 1, ahead: function(d){ return "visitors:" + d; }, f: function(d){ return rpc("get_visitor_summary", { p_secret: secret, p_days: d }); } },
+    byHub:       { r: 1, ahead: function(d){ return "visitors:" + d; }, f: function(d){ return rpc("get_visitor_by_hub", { p_secret: secret, p_days: d }); } },
+    bySection:   { r: 1, ahead: function(d){ return "visitors:" + d; }, f: function(d){ return rpc("get_visitor_by_section", { p_secret: secret, p_days: d }); } },
     qstats:      { f: function(){ return table("question_stats", "hub,qid,attempts,correct"); } },
     choices:     { f: function(){ return table("question_choices", "hub,qid,choice,picks"); } },
     modes:       { f: function(){ return table("mode_stats", "hub,mode,opens"); } },
@@ -668,11 +669,11 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     nukeRecent:  { f: function(){ return rpc("get_nuke_recent", { p_secret: secret, p_limit: 10 }); } },
     nukeUnlocks: { r: 1, f: function(d){ return rpc("get_nuke_unlocks", { p_secret: secret, p_days: d }); } },
     reports:     { f: function(){ return reportsRpc().then(function(r){ return r && r.error ? { error: r.error } : { data: (r && r.data) || [] }; }, function(e){ return { error: e }; }); } },
-    clicks:      { r: 1, f: function(d){ return rpc("get_click_summary", { p_secret: secret, p_days: d }); } },
-    features:    { r: 1, f: function(d){ return rpc("get_feature_events", { p_secret: secret, p_days: d }); } },
+    clicks:      { r: 1, ahead: function(d){ return "clicks:" + d; }, f: function(d){ return rpc("get_click_summary", { p_secret: secret, p_days: d }); } },
+    features:    { r: 1, ahead: function(d){ return "features:" + d; }, f: function(d){ return rpc("get_feature_events", { p_secret: secret, p_days: d }); } },
     searches:    { r: 1, f: function(d){ return rpc("get_search_terms", { p_secret: secret, p_days: d }); } },
     surveys:     { f: function(){ return rpc("get_survey_results", { p_secret: secret }); } },
-    debriefs:    { f: function(){ return rpc("get_exam_debriefs", { p_secret: secret }); } },
+    debriefs:    { ahead: function(){ return "debriefs"; }, f: function(){ return rpc("get_exam_debriefs", { p_secret: secret }); } },
     podComments: { f: function(){ return rpc("admin_pod_comments", { p_secret: secret, p_days: 60 }); } },
     ideas:       { f: function(){ return rpc("admin_ideas", { p_secret: secret, p_days: 90 }); } },
     /* Ask Timmy (migration_v55, applied at the redesign's release): none of these returns a visitor id */
@@ -686,6 +687,16 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   var data = {}, inflight = {};
   function fresh(k){ var x = data[k]; return !!x && (!SRC[k].r || x.days === state.days); }
   function need(keys, force){
+    return needRaw(keys, force).then(function(all){
+      var mine = (keys || []).filter(function(k){ return SRC[k].ahead && data[k] && !data[k].error; });
+      if (!mine.length) return all;
+      return aheadRead().then(function(){
+        mine.forEach(function(k){ var at = aheadAt(SRC[k].ahead(data[k].days)); if (at) data[k].at = at; });
+        return all;
+      });
+    });
+  }
+  function needRaw(keys, force){
     return Promise.all((keys || []).map(function(k){
       if (!force && fresh(k)) return data[k];
       var days = state.days, key = k + "@" + (SRC[k].r ? days : "all");
@@ -700,6 +711,57 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   }
   function D(k){ return data[k] || { data: [] }; }
   function viewAt(t){ return (VIEWS[t].needs || []).reduce(function(m, k){ return data[k] && data[k].at ? Math.min(m, data[k].at) : m; }, Infinity); }
+
+  /* ---------- the heavy reads, worked out ahead (migration_v79; vault/reference/admin-operations.md) ----------
+     The visitor totals, check-ins, clicks and features, Insights' three reads and question health come from a small table
+     the database fills by itself (sh_admin_cache_tick, every minute): a read this page used in the last 2 hours is worked
+     out again every 15 minutes, or every hour while 20 or more people are studying, and every read used in the last week
+     once a night. get_admin_cache_status says when each was worked out (the view's "Updated" time) and whether a newer one
+     is on its way: new arguments (a question edited since, new exam dates) or Refresh, which asks for new ones. The page
+     then looks again every 30 seconds, for up to 10 minutes, and redraws the view when they've come. Until the database
+     has v79 there is no status, and every read is worked out when it's asked, as before. */
+  var ahead = { st: null, watch: null, missing: false };
+  function aheadRead(ask){
+    if (ahead.missing) return Promise.resolve(null);
+    return queued(function(){ return settle(supabase.rpc("get_admin_cache_status", ask && ask.length ? { p_secret: secret, p_ask: ask } : { p_secret: secret })); })
+      .then(function(r){
+        if (r.error) { if (needsMigration(r.error)) ahead.missing = true; return ahead.st; }
+        if (r.data && typeof r.data === "object" && !Array.isArray(r.data)) ahead.st = r.data;
+        return ahead.st;
+      });
+  }
+  function aheadAt(key){ var x = ahead.st && ahead.st[key], t = x && x.at ? Date.parse(x.at) : NaN; return isNaN(t) ? 0 : t; }
+  function aheadWaiting(keys){ return (keys || []).filter(function(c){ var x = ahead.st && ahead.st[c]; return !!(x && x.waiting); }); }
+  /* the keys a view reads that are worked out ahead */
+  function tabAhead(t){
+    if (t === "insights") return ["insights", "retries", "quality"];
+    if (t === "health") return QH.hub ? ["qh:" + QH.hub] : [];
+    var out = [];
+    ((VIEWS[t] && VIEWS[t].needs) || []).forEach(function(k){ var c = SRC[k] && SRC[k].ahead ? SRC[k].ahead(state.days) : null; if (c && out.indexOf(c) < 0) out.push(c); });
+    return out;
+  }
+  /* while newer copies are on their way, look again every 30 s (one small read); reload() once they've come */
+  function aheadWatch(t, reload, still){
+    if (ahead.watch) { clearTimeout(ahead.watch); ahead.watch = null; }
+    var keys = aheadWaiting(tabAhead(t)), tries = 0;
+    if (!keys.length) return;
+    (function look(){
+      ahead.watch = setTimeout(function(){
+        ahead.watch = null;
+        if (state.tab !== t || (still && !still())) return;
+        aheadRead().then(function(){
+          if (state.tab !== t || (still && !still())) return;
+          if (aheadWaiting(keys).length && ++tries < 20) { look(); return; }
+          reload();
+        });
+      }, 30000);
+    })();
+  }
+  /* a view on the plain data reads: its reads again, then drawn */
+  function reloadView(t){
+    var keys = VIEWS[t].needs || [];
+    return function(){ need(keys, true).then(function(){ if (state.tab === t) { RENDER[t](); aheadWatch(t, reloadView(t)); } }); };
+  }
 
   /* the dashboard's own hub list (hubs.js), read once: which hubs are live now, and their titles. The Hubs view uses it too. */
   var dash = { live: null, titles: {}, src: null, p: null };
@@ -757,7 +819,10 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   /* ---------- the view's title row ---------- */
   function setHead(sub, stamp){
     $("#viewSub").textContent = sub || "";
-    $("#viewStamp").textContent = stamp ? "Updated " + clockShort(stamp) : "";
+    var day = stamp && new Date(stamp).toDateString() !== new Date().toDateString()
+      ? new Date(stamp).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) + ", " : "";
+    var on = stamp && aheadWaiting(tabAhead(state.tab)).length ? " · newer numbers on the way" : "";
+    $("#viewStamp").textContent = stamp && isFinite(stamp) ? "Updated " + day + clockShort(stamp) + on : "";
   }
   function loadingView(el){
     if (el.dataset.ready) return;
@@ -1811,10 +1876,9 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     if (dash.src) dash.src.hubs.concat(dash.src.archived).forEach(function(h){ var e = hubExam(h.id); if (e) m[h.id] = e; });
     return m;
   }
-  function loadInsights(){
+  function loadInsights(quiet){
     var el = $('[data-panel="insights"]');
-    el.innerHTML = empty("Loading… three queries over every hub’s data take a few seconds.");
-    insights = { pending: true };
+    if (!quiet) { el.innerHTML = empty("Loading…"); insights = { pending: true }; }
     /* each takes ~1-2 s warm; they run one after another in the page's lane (rpc), and one the database stopped for time
        is tried once more after a pause (onceMore), never right away */
     return loadDash().then(function(){
@@ -1823,7 +1887,14 @@ table.data.tm-table td.lbl{white-space:nowrap;}
         rpc("get_insight_retries", { p_secret: secret }),
         rpc("get_data_quality", { p_secret: secret })
       ]);
-    }).then(function(r){ insights = { main: r[0], retries: r[1], quality: r[2], at: Date.now() }; if (state.tab === "insights") renderInsights(); });
+    }).then(function(r){
+      /* worked out ahead: "Updated" is when the oldest of the three was worked out */
+      return aheadRead().then(function(){
+        var at = ["insights", "retries", "quality"].reduce(function(m, k){ var x = aheadAt(k); return x ? Math.min(m, x) : m; }, Infinity);
+        insights = { main: r[0], retries: r[1], quality: r[2], at: isFinite(at) ? at : Date.now() };
+        if (state.tab === "insights") { renderInsights(); aheadWatch("insights", function(){ loadInsights(true); }); }
+      });
+    });
   }
   function isHubId(h){ return !!h && !/^zz-/.test(h) && h !== "dashboard" && h !== "about" && !!(HUB_LABEL[h] || dash.titles[h]); }
   /* hubs with fewer than minPeople people: left out of every insight table, named once under the scorecard */
@@ -2455,8 +2526,9 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       .then(function(r){ return r.ok ? r.json() : null; }).catch(function(){ return null; })
       .then(function(v){ QH.vx[hub] = v && typeof v === "object" ? v : null; return QH.vx[hub]; });
   }
-  function qhLoad(hub){
-    QH.hub = hub; QH.rows = null; QH.err = null; QH.loading = true; QH.shown = 40; renderHealth();
+  function qhLoad(hub, quiet){
+    /* quiet: a newer copy that has come (aheadWatch); the list stays as it is until it's here */
+    if (!quiet) { QH.hub = hub; QH.rows = null; QH.err = null; QH.loading = true; QH.shown = 40; renderHealth(); }
     Promise.all([qhExport(hub), qhVariants(hub)]).then(function(all){ return all[0]; }).then(function(ex){
       var cur = null;
       /* the live version's fingerprint, key, choice count and kind: the miskey and chance checks work before any version row exists */
@@ -2466,8 +2538,15 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     }).then(function(res){
       if (QH.hub !== hub) return;
       QH.loading = false;
-      if (res.error) QH.err = res.error; else { QH.rows = Array.isArray(res.data) ? res.data : []; QH.at = Date.now(); }
-      renderHealth();
+      if (res.error) { if (!quiet) { QH.err = res.error; renderHealth(); } return; }
+      QH.rows = Array.isArray(res.data) ? res.data : [];
+      /* worked out ahead: "Updated" is when; a newer copy after an edit or Refresh is fetched when it's ready */
+      return aheadRead().then(function(){
+        if (QH.hub !== hub) return;
+        QH.at = aheadAt("qh:" + hub) || Date.now();
+        renderHealth();
+        aheadWatch("health", function(){ qhLoad(hub, true); }, function(){ return QH.hub === hub && !QH.loading; });
+      });
     });
   }
   function qhCodes(r){ return (r.flags || []).map(function(f){ return f.code; }); }
@@ -2774,9 +2853,9 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     if (t === "health") { if (!dash.src && !dash.err) { loadingView(el); setHead("Loading…", 0); loadDash().then(function(){ if (state.tab === "health") renderHealth(); }); } else renderHealth(); return; }
     var keys = v.needs || [];
     var ready = keys.every(fresh) && (!v.past || dash.src || dash.err);
-    if (ready) { RENDER[t](); return; }
+    if (ready) { RENDER[t](); aheadWatch(t, reloadView(t)); return; }
     loadingView(el); setHead("Loading…", 0);
-    Promise.all([need(keys), v.past ? loadDash() : null]).then(function(){ if (state.tab === t) RENDER[t](); });
+    Promise.all([need(keys), v.past ? loadDash() : null]).then(function(){ if (state.tab === t) { RENDER[t](); aheadWatch(t, reloadView(t)); } });
   }
   function showTab(t, fromHash){
     if (!VIEWS[t]) t = "overview";
@@ -2814,13 +2893,17 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     if (t === "live") { pollLive(true); return; }
     if (t === "hubs") { hubAdm.pages = {}; loadHubAdmin(true); return; }
     if (t === "recap") { loadPublished(); return; }
+    /* the reads worked out ahead: ask for new copies (the database works them out within a minute or two; this page looks
+       again and redraws), then show what there is now */
+    var ask = tabAhead(t);
+    if (ask.length) aheadRead(ask);
     if (t === "insights") { insights = null; setHead("Updating…", 0); loadInsights(); return; }
     if (t === "health") { QH.ex = {}; if (QH.hub) { setHead("Updating…", 0); qhLoad(QH.hub); } else renderHealth(); return; }
     if (t === "ab") { AB.res = null; AB.stems = {}; QH.vx = {}; setHead("Updating…", 0); abLoad(); return; }
     if (t === "timmy") tm.chats = {};
     var keys = VIEWS[t].needs || [];
     $("#viewStamp").textContent = "Updating…";
-    need(keys, true).then(function(){ if (state.tab === t) RENDER[t](); });
+    need(keys, true).then(function(){ if (state.tab === t) { RENDER[t](); aheadWatch(t, reloadView(t)); } });
   });
   function syncControls(){
     $$("#rangeSeg [data-days]").forEach(function(b){ b.setAttribute("aria-pressed", String(Number(b.dataset.days) === state.days)); });

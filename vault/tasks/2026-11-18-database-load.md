@@ -40,9 +40,25 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
 
 ## Done when
 
-- [ ] The admin page's heavy reads are fast or cached: `get_insights`, `get_insight_retries`, `get_data_quality` (1 to 2 s
+- [x] The admin page's heavy reads are fast or cached: `get_insights`, `get_insight_retries`, `get_data_quality` (1 to 2 s
   each), `get_question_health` (`qh_report`, 1 to 3 s), `get_visitor_summary` / `_by_hub` / `_by_section` and
   `get_exam_debriefs` (about 1 s). For example worked out every 15 minutes by `pg_cron` into a small table the page reads.
+  **Done, both** (`migration_v79.sql`, PR_LINK; how it works: [admin-operations](../reference/admin-operations.md)).
+  Measured on a throwaway copy at the live size (222,000 answers, 114,000 question events, 310 visitors) with the live
+  settings. *Faster:* `sh_surface()` ran once per hourly row instead of once per section in Insights and the data-quality
+  report (the planner folded the lookup into the join, or tested it before the distinct): insights 1.05 → 0.43 s, data
+  quality 0.98 → 0.37 s, the same results. (The 3 s first measured for `qh_report` was the copy's JIT compiler, 4.3 of
+  4.4 s; the live database has JIT off: 0.5 s for a big hub.) *Cached:* all nine reads, plus Clicks and features (0.16 s
+  over 90 days on the copy, among the 11-18 errors), are worked out ahead into `admin_cache` by pg_cron's `sh-admin-cache`
+  (every minute, one read at a time, 10 s limit): every 15 minutes while the page is in use, **every hour while 20 or more
+  people are studying**, at once for new arguments or Refresh, nightly for a week after; nothing at all while nobody uses
+  the page. Read from the table: under 3 ms each, question health 42 ms (today's reviews and reports laid over the copy)
+  against 0.5 s. Same results as the old functions on all 22 reads compared (exact JSON); the page shows when each was
+  worked out and "newer numbers on the way" after Refresh. The lessons audit reads the kept copies too
+  (`tools/lessons-refresh.md`), so its two heaviest calls no longer touch the class's CPU.
+- [ ] `migration_v79.sql` applied live at night (1 to 5 am Central, one statement a call, after fetching `main` for the
+  number), the tables filled one read a call, `supabase/schema.sql` appended and the pending line taken out; the first
+  ticks read back (`select key, computed_at, took_ms, fails, error from admin_cache order by key;`).
 - [x] The lessons audit's queries (`tools/economy.sql`, `tools/lessons-daily.sql`, `tools/retro.sql`) stay short, or the
   runbook says to run them when the class is quiet; the connector's queries have no time limit.
   **Done, both** ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md), [#434](https://github.com/smcmurry6-source/study-hubs/pull/434)). Timed on a throwaway copy at
@@ -242,5 +258,10 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   all live since this morning) and, past that, the analytics move or a larger compute size (Sam: stay free).
 - 2026-11-19 (the housekeeping package): the compute-size box ticked: Sam's call was made on 11-18 ("Stay free, keep
   fixing", [decisions](../decisions.md)); it opens again only if the saves fail in bursts after v72.
+
+- 2026-11-19 (Claude Code, PR_LINK): the first box. Everything measured on a throwaway copy
+  (live only: catalog reads, `pg_stats`, settings, the cron table). `migration_v79.sql` written and tested
+  (`tools/release/admin-ops.js`: 116 checks, the cache's among them; `rls.js`, `retention.js`, `xp.js`, `timmy.js` pass with
+  it pending); the admin page reads its time from `get_admin_cache_status`. Applied live at night (the box below).
 
 ## Outcome

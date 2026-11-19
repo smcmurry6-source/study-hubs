@@ -869,8 +869,24 @@
   /* the arcade games submit_arcade_score (and so xp_session_start) takes */
   var ARC_GAMES = ["sort", "snake", "stack", "match", "hangman", "fact", "blaster", "search", "whack", "flappy", "crusher", "probe", "quadrants",
     "perdle", "planer", "smile", "sweeper", "cross", "board", "cloze", "escape"];
-  var ADMIN_FNS = /^(admin_|get_reports$|get_visitor_|get_nuke_(summary|by_hub|recent|unlocks)$|get_click_summary$|get_survey_results$|get_exam_debriefs$|get_search_terms$|get_feature_events$|set_report_resolved$|get_reports_v2$|get_hub_recap$|get_insights$|get_insight_retries$|get_data_quality$|get_question_health$|get_ab_summary$)/;
+  var ADMIN_FNS = /^(admin_|get_reports$|get_visitor_|get_nuke_(summary|by_hub|recent|unlocks)$|get_click_summary$|get_survey_results$|get_exam_debriefs$|get_search_terms$|get_feature_events$|set_report_resolved$|get_reports_v2$|get_hub_recap$|get_insights$|get_insight_retries$|get_data_quality$|get_question_health$|get_ab_summary$|get_admin_cache_status$)/;
   function unauthorized(){ return { error: { status: 401, code: "28000", message: "unauthorized" } }; }
+  /* the admin page's reads worked out ahead (migration_v79): each worked out 7 minutes ago; one asked for again (Refresh)
+     is on its way for 45 seconds, then worked out, as the database's job does within a minute or two */
+  function aheadStatus(a){
+    var t = now(), asked = db.ahead || (db.ahead = {}), ask = Array.isArray(a.p_ask) ? a.p_ask : [];
+    ask.forEach(function(k){ if (typeof k === "string" && (!asked[k] || t - asked[k] > 45000)) asked[k] = t; });
+    if (ask.length) save();
+    var keys = ["insights", "retries", "quality", "debriefs", "qh:perio", "qh:heme-endo-exam3", "qh:occlusion"];
+    [7, 30, 90].forEach(function(d){ keys.push("visitors:" + d, "clicks:" + d, "features:" + d); });
+    Object.keys(asked).forEach(function(k){ if (keys.indexOf(k) < 0) keys.push(k); });
+    var out = {};
+    keys.forEach(function(k){
+      var on = !!asked[k] && t - asked[k] < 45000;
+      out[k] = { at: iso(asked[k] && !on ? asked[k] + 45000 : t - 7 * 60000), ms: 420, failed_at: null, waiting: on };
+    });
+    return out;
+  }
   function synthAdmin(fn){
     var d = 864e5, t = now();
     switch (fn) {
@@ -1444,6 +1460,7 @@
       return { error: { status: 404, code: "PGRST202", message: "Could not find the function public." + fn + " in the schema cache" } };
     if (ADMIN_FNS.test(fn)) {
       if (a.p_secret !== C.adminSecret) return unauthorized();
+      if (fn === "get_admin_cache_status") return { data: aheadStatus(a), write: Array.isArray(a.p_ask) && a.p_ask.length > 0 };
       var ideaOp = ideaAdmin(fn, a, now());
       if (ideaOp) return ideaOp;
       var ops = adminOps(fn, a);

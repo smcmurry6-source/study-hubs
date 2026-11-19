@@ -11,6 +11,9 @@
 //   - question health's A/B versions (migration_v67): the version shown is kept on each answer, first tries are split
 //     by version, and a gap of 20 points with 10+ people a version is flagged (ab_gap);
 //   - the A/B versions page (migration_v70): get_ab_summary needs the secret and returns totals only;
+//   - the heavy reads worked out ahead (migration_v79): each the same as its function, kept and worked out again by
+//     sh_admin_cache_tick when due (sooner for new arguments or Refresh, later while the class is busy), reviews and
+//     reports laid over question health at once, a failed or timed-out refresh waits, the table closed to anon;
 //   - sh_surface() (the Insights tab's "Where time goes") places every section the engine sends (widget/hub.js
 //     section()), Learn and Flashcards apart from the bank (migration_v59).
 // Nothing here touches the live database.   node tools/release/admin-ops.js   (PostgreSQL 14+ server binaries)
@@ -222,10 +225,104 @@ try {
     ok(JSON.stringify(AB2).indexOf('fx-qh-') < 0, 'get_ab_summary: no visitor id in the response');
     notes.push('A/B versions page: admin secret, first tries by version (one per person), later tries, kinds, pairs on the latest wording, no ids');
   }
+
+  /* ---------- 7. the admin page's heavy reads worked out ahead (migration_v79) ---------- */
+  if (sql(`select to_regclass('public.admin_cache') is not null`)[0][0] !== 't') notes.push('admin_cache: not in this schema (migration_v79 not loaded)');
+  else {
+    const tick = (pre) => Number(sql(`${pre || ''} select sh_admin_cache_tick();`).pop()[0]);
+    const status = (ask) => anonJson(`get_admin_cache_status(${S}${ask ? `, array[${ask.map(q).join(', ')}]` : ''})`);
+    const row = k => { const r = sql(`select coalesce(fails, 0), coalesce(error, ''), body is not null, computed_at is not null from admin_cache where key = ${q(k)}`)[0]; return r ? { fails: Number(r[0]), error: r[1], body: r[2] === 't', at: r[3] === 't' } : null; };
+    const age = (k, mins) => sql(`update admin_cache set computed_at = now() - make_interval(mins => ${mins}) where key = ${q(k)}`);
+    const byHub = () => anonJson(`(select coalesce(json_agg(x), '[]') from get_visitor_by_hub(${S}, 30) x)`);
+    raises(() => anon(`select get_admin_cache_status('wrong')`), '28000', 'cache status with a wrong secret');
+    raises(() => anon(`select count(*) from admin_cache`), '42501', 'admin_cache: anon reads it');
+    raises(() => anon(`select sh_admin_cache_tick()`), '42501', 'the tick: anon runs it');
+    raises(() => anon(`select sh_admin_cached('insights', '{}')`), '42501', 'sh_admin_cached: anon runs it');
+    sql(`delete from admin_cache`);
+
+    /* each read is what its function works out, the first time (at once) and from the copy after */
+    /* key order aside (a table function's rows and a JSON object list their fields in different orders) */
+    const canon = v => Array.isArray(v) ? v.map(canon) : v && typeof v === 'object' ? Object.keys(v).sort().reduce((o, k) => { o[k] = canon(v[k]); return o; }, {}) : v;
+    const same = (what, a, b) => ok(JSON.stringify(canon(a)) === JSON.stringify(canon(b)), `${what}: the admin read and the read worked out directly differ (${JSON.stringify(canon(a)).slice(0, 120)} / ${JSON.stringify(canon(b)).slice(0, 120)})`);
+    const ins = () => anonJson(`get_insights(${S}, '{"perio":"2026-11-19"}'::jsonb) - 'generated_at'`);
+    same('get_insights', ins(), JSON.parse(sql(`select (sh_insights('{"perio":"2026-11-19"}'::jsonb) - 'generated_at')::text`)[0][0]));
+    same('get_insights from the copy', ins(), JSON.parse(sql(`select (sh_insights('{"perio":"2026-11-19"}'::jsonb) - 'generated_at')::text`)[0][0]));
+    same('get_insight_retries', anonJson(`get_insight_retries(${S}) - 'generated_at'`), JSON.parse(sql(`select sh_insight_retries()::text`)[0][0]));
+    same('get_data_quality', anonJson(`get_data_quality(${S}) - 'generated_at' - 'storage'`),
+      JSON.parse(sql(`select ((sh_data_quality() || jsonb_build_object('retention', sh_retention_status())) - 'generated_at' - 'storage')::text`)[0][0]));
+    same('get_exam_debriefs', anonJson(`(select coalesce(json_agg(x), '[]') from get_exam_debriefs(${S}) x)`), JSON.parse(sql(`select sh_exam_debriefs()::text`)[0][0]));
+    same('get_feature_events', anonJson(`(select coalesce(json_agg(x), '[]') from get_feature_events(${S}, 30) x)`), JSON.parse(sql(`select sh_feature_events(30, null)::text`)[0][0]));
+    same('get_click_summary', anonJson(`(select coalesce(json_agg(x), '[]') from get_click_summary(${S}, 30) x)`), JSON.parse(sql(`select sh_click_summary(30, null)::text`)[0][0]));
+    anonJson(`(select coalesce(json_agg(x), '[]') from get_click_summary(${S}, 30, 'perio') x)`);
+    ok(!row('clicks:30:perio') && sql(`select count(*) from admin_cache where key like 'clicks%'`)[0][0] === '1', 'get_click_summary with a hub: worked out at once, not kept');
+    const before = byHub();
+    ok(row('visitors:30') && row('visitors:30').body, 'get_visitor_by_hub: kept under visitors:30');
+    same('get_visitor_summary', anonJson(`(select coalesce(json_agg(x), '[]') from get_visitor_summary(${S}, 30) x)`), JSON.parse(sql(`select sh_visitor_summary(30)::text`)[0][0]));
+    same('get_visitor_by_section', anonJson(`(select coalesce(json_agg(x), '[]') from get_visitor_by_section(${S}, 30) x)`), JSON.parse(sql(`select sh_visitor_by_section(30)::text`)[0][0]));
+    ok(tick() === 0, 'the tick: nothing due right after the reads');
+
+    /* new study time: the copy keeps the old numbers until it's due, then the tick works it out again */
+    sql(`insert into activity_hourly (h, hub, section, visitor_id, n) values (date_trunc('hour', now()), 'fx-cache', 'home', 'fx-c1', 24)`);
+    ok(JSON.stringify(byHub()) === JSON.stringify(before), 'the copy: new study time not in it yet');
+    age('visitors:30', 20);
+    ok(tick() >= 1 && byHub().some(r => r.hub === 'fx-cache'), 'the tick: a copy 20 minutes old, read in the last 2 hours, worked out again (quiet: every 15 minutes)');
+
+    /* busy (20+ people pinged in 5 minutes): every hour, one read a minute */
+    sql(`insert into activity_pings (visitor_id, visit_id, hub, section, pinged_at)
+         select 'fx-busy-' || g, 'fx-busy-v' || g, 'zz-busy', 'home', now() - interval '1 minute' from generate_series(1, 25) g`);
+    age('visitors:30', 20); age('debriefs', 20);
+    ok(tick() === 0, 'the tick: busy, a copy 20 minutes old waits');
+    age('visitors:30', 70); age('debriefs', 70);
+    ok(tick() === 1, 'the tick: busy, one read a minute');
+    ok(tick() === 1 && tick() === 0, 'the tick: busy, the second read the next minute, then nothing due');
+    sql(`delete from activity_pings where hub = 'zz-busy'`);
+
+    /* new arguments (an edited question's fingerprint): the copy now, a new one at the next tick */
+    const qh = cur => anonJson(`get_question_health(${S}, 'perio', 120, ${q(JSON.stringify(cur))}::jsonb)`);
+    const inHub = (rows, id) => (rows.find(r => r.qid === id) || {}).in_hub;
+    const q1 = qh({ qa: 'v1' });
+    ok(inHub(q1, 'qa') === true && inHub(q1, 'qb') === false, 'question health: worked out at once from the page\'s fingerprints');
+    const q2 = qh({ qa: 'v1', qb: 'v1' });
+    ok(inHub(q2, 'qb') === false && status()['qh:perio'].waiting === true, 'question health: new fingerprints get the copy, and a new one is on its way');
+    ok(tick() >= 1 && status()['qh:perio'].waiting === false && inHub(qh({ qa: 'v1', qb: 'v1' }), 'qb') === true, 'the tick: new fingerprints worked out first, at once');
+    /* a review (Looks fine / Needs a fix) and a report show at once, without waiting for a new copy */
+    sql(`insert into question_flags (hub, note) values ('perio', 'made-up report  — question qc (fx)')`);
+    anon(`select admin_review_question(${S}, 'perio', 'qa', 'v1', 'fix', array['ab_gap'], 'made-up note')`);
+    const q3 = qh({ qa: 'v1', qb: 'v1' }), fresh = JSON.parse(sql(`select coalesce(jsonb_agg(to_jsonb(r)), '[]')::text from qh_report('perio', 120, '{"qa":"v1","qb":"v1"}'::jsonb) r`)[0][0]);
+    const qa3 = q3.find(r => r.qid === 'qa') || {}, qc3 = q3.find(r => r.qid === 'qc') || {};
+    ok(qa3.review_status === 'fix' && qa3.state === 'todo' && qc3.reports_open === 1, `question health: a review and a report show at once (${qa3.review_status}, ${qa3.state}, ${qc3.reports_open})`);
+    same('question health with a review laid over the copy', q3, fresh);
+
+    /* Refresh: asks for a new copy (not one under 2 minutes old) */
+    ok(status(['visitors:30'])['visitors:30'].waiting === false, 'Refresh: a copy under 2 minutes old isn\'t asked for again');
+    age('visitors:30', 5);
+    ok(status(['visitors:30'])['visitors:30'].waiting === true && tick() >= 1 && status()['visitors:30'].waiting === false, 'Refresh: asked for, worked out at the next tick');
+    ok(JSON.stringify(status()).indexOf('fx-') < 0, 'cache status: no visitor id in it');
+
+    /* a read that fails waits before it's tried again; one that stops at the limit too */
+    sql(`insert into admin_cache (key, args) values ('nope', '{}')`);
+    tick();
+    ok(row('nope').fails === 1 && /unknown key/.test(row('nope').error), `the tick: a failed read is noted (${JSON.stringify(row('nope'))})`);
+    tick();
+    ok(row('nope').fails === 1, 'the tick: a failed read waits 10 minutes before the next try');
+    sql(`delete from admin_cache where key = 'nope'`);
+    sql(`alter function public.sh_insight_retries() rename to sh_insight_retries_real;
+         create function public.sh_insight_retries() returns jsonb language sql as $$ select pg_sleep(3); select '{}'::jsonb $$;`);
+    age('retries', 20);
+    tick(`set statement_timeout = '600ms';`);
+    ok(row('retries').fails === 1 && /statement timeout/.test(row('retries').error) && row('retries').body, `the tick: a read stopped at the job's time limit is noted and its copy kept (${JSON.stringify(row('retries'))})`);
+    sql(`drop function public.sh_insight_retries(); alter function public.sh_insight_retries_real() rename to sh_insight_retries;`);
+
+    /* nobody has read it in 30 days: deleted */
+    sql(`update admin_cache set wanted_at = now() - interval '31 days' where key = 'debriefs'`);
+    tick();
+    ok(!row('debriefs'), 'the tick: a read nobody used in 30 days is deleted');
+    notes.push('admin reads worked out ahead: each the same as its function, a copy until due (15 min, an hour while busy), new arguments first, reviews and reports laid over at once, Refresh, failures and the time limit wait, 30-day cleanup');
+  }
 } catch (e) {
   problems.push(`test run failed: ${e.message.split('\n')[0]}`);
 }
 db.stop();
 notes.forEach(n => console.log('  ' + n));
 if (problems.length) { console.error(`\n✗ admin operations: ${problems.length} problem(s) in ${checks} checks:\n` + problems.map(p => '  - ' + p).join('\n')); process.exit(1); }
-console.log(`\n✓ admin operations (live presence, archive overrides, order, surfaces, question health A/B, the A/B page): ${checks} checks passed`);
+console.log(`\n✓ admin operations (live presence, archive overrides, order, surfaces, question health A/B, the A/B page, the reads worked out ahead): ${checks} checks passed`);

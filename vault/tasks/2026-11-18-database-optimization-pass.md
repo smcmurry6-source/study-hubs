@@ -122,7 +122,9 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
   makes it one row. A new table and a backfill of about 300,000 rows.
 - [ ] **Drop `activity_visits_last_idx`** (idea 5's finding): every ping's update of the visit then stays on its page.
   Check the admin page's visitor summary (`where v.last_at >= since`) on a copy without it first; then rewrite the
-  table once at night (`vacuum full public.activity_visits`), since it will have grown.
+  table once at night (`vacuum full public.activity_visits`), since it will have grown. Since `migration_v79.sql` that
+  summary is worked out ahead (`sh_visitor_summary`, at most every 15 minutes while the admin page is in use), so a slower
+  scan without the index costs little ([database-load](2026-11-18-database-load.md)).
 - [ ] **The class's numbers on each card** (`question_stats` and `question_choices`, `widget/v3.js`): 20.6% of every
   request and another 14.6% of preflights, two reads a card. (Only 0.5% of the database's time, live: the gain is in
   requests, so it matters when the request limit or the connection count is what's tight.) The answer's reply could carry them (the save has just

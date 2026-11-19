@@ -32,6 +32,28 @@ its ink and blue-grey, each hub's class color as a dot).
   ([shared-infrastructure](shared-infrastructure.md), the database's size). A read the database stopped for time (anon's 3 s
   limit) is tried once more 5 s later, and its error says the database was busy, not that a migration is missing. Writes
   don't wait in the lane.
+- **The heavy reads are worked out ahead** (2026-11-19, `migration_v79.sql`): Insights' three reads, Question health, the
+  visitor totals (Overview, Time by section), the check-ins and Clicks and features (without a hub) come from
+  `admin_cache`, one row a read (`insights`, `retries`, `quality`, `qh:<hub>`, `visitors:<days>`, `debriefs`,
+  `clicks:<days>`, `features:<days>`), closed to anon. The admin functions keep their arguments, results and shape; a read
+  the table doesn't have yet is worked out at once and kept. pg_cron's `sh-admin-cache` runs `sh_admin_cache_tick()` every
+  minute (10 s limit): a read asked with new arguments (an edited question's fingerprint, new exam dates) or by Refresh
+  at once; a read the page used in the last 2 hours every 15 minutes, **every hour while 20 or more people are studying**
+  (a ping in the last 5 minutes); any read used in the last week once a night (1 to 5 am Central) if over 12 hours old.
+  One read a minute while the class is busy, up to three (2 s) otherwise; a failed or timed-out one waits 10, 20, 40
+  minutes... (6 hours at most); rows nobody read in 30 days are deleted, and the job's run log is kept 2 days. With nobody
+  on the admin page it does nothing but the nightly refresh for a week. Question health lays the reviews and the reports'
+  state over the kept copy at every read (`sh_qh_overlay`), so a review shows at once; `get_data_quality`'s retention part
+  is read fresh. The page's "Updated" is when the copy was worked out (`get_admin_cache_status`); Refresh asks for new
+  copies (not one under 2 minutes old), the header says "newer numbers on the way", and the page looks again every 30 s
+  and redraws when they've come. Two lookups also got cheaper (`sh_surface` once a section, not once an hourly row).
+  On a throwaway copy at the live size: insights 1.05 → 0.43 s to work out, data quality 0.98 → 0.37 s; read from the
+  table, each read under 3 ms, question health 42 ms (the overlay) against 0.5 s.
+  **To read a kept copy through the connector** (cheap at any hour): `select computed_at, body from admin_cache where key =
+  'quality';`; Question health with today's reviews: `select r->>'qid' qid, r->>'state' state, (r->>'score')::int score,
+  r->'flags' flags from admin_cache c, jsonb_array_elements(sh_qh_overlay('<hub>', c.body)) r where c.key = 'qh:<hub>' and
+  r->>'state' in ('new', 'changed') order by score desc;`. `select key, computed_at, took_ms, fails, error from
+  admin_cache order by key;` shows what's kept and how long each took.
 - **Overview** answers two questions: is anything waiting on Sam (reports to answer, podcast comments reported,
   check-ins this week, studying now; each links to its view) and is the class studying (time, people, visits, per hub,
   busiest sections, hardest questions).

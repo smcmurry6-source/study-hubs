@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (the admin page's heavy reads worked out ahead, Claude Code, PR_LINK)** — the database-load task's first
+  box. `migration_v79.sql`: the admin page's slow reads (Insights' three, Question health, the visitor totals, check-ins,
+  clicks and features) come from a small table, `admin_cache`, that pg_cron's `sh-admin-cache` job fills one read at a time:
+  every 15 minutes while the page is in use, every hour while 20 or more people are studying, at once after an edit or
+  Refresh, nightly for a week after, nothing while nobody looks. The functions keep their arguments and results (all 22 reads
+  compared exactly on a copy); question health lays today's reviews and reports over the copy. Two lookups got cheaper too
+  (`sh_surface` once a section, not once a row: insights 1.05 → 0.43 s, data quality 0.98 → 0.37 s on the copy). The page
+  shows when each read was worked out and "newer numbers on the way" after Refresh, and looks again until they come. The
+  lessons audit and agents read the kept copies (`tools/lessons-refresh.md`, [admin-operations](vault/reference/admin-operations.md)).
+  Applied live at night (the task note's Log).
 - **2026-11-19 (About page accessibility, Claude Code, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453))** — the last three accessibility bugs from
   the release dry run, all on `about/index.html`: BUG-007, the nine contents links at the top turned their focus outline off
   (`nav.toc a:focus-visible{outline:none}`), so a keyboard user couldn't see where they were; they now get the page's ring.

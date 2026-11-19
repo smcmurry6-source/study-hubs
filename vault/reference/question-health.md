@@ -51,7 +51,10 @@ deletes a question**: a flag is a lead for a person to check against the hub's n
 - **Reports** (`question_flags`) are joined to their question through the "— question <id>" tag the widget writes.
 - **The report**, `qh_report(hub, days, current)`: per question, its numbers and flags. The admin page calls it through
   `get_question_health` (admin secret), passing every live question's version, key, choice count and type worked out
-  from the hub's SH_EXPORT. Sam's call on a question goes in `question_reviews` through `admin_review_question`:
+  from the hub's SH_EXPORT. Since `migration_v79.sql` (2026-11-19) the report is **worked out ahead** into `admin_cache`
+  (`qh:<hub>`, refreshed every 15 minutes while the admin page uses it, hourly while the class is busy, at once after an
+  edit changes a fingerprint or after Refresh), and the reviews and reports are laid over the kept copy at every read
+  (`sh_qh_overlay`): [admin-operations](admin-operations.md). Sam's call on a question goes in `question_reviews` through `admin_review_question`:
   **Looks fine**, **Needs a fix** or **Fixed**, with a note. That is metadata only.
 - Schema and functions: `migration_v67.sql` (A/B, above) on top of `migration_v51.sql` (applied 2026-11-04 through the connector as `v49_question_health` and three
   follow-ups; the file was renumbered twice as the analytics change took v49 and the admin page change v50 on `main`).
@@ -95,7 +98,10 @@ has since been edited, so check the fix), **Reviewed** (Looks fine or Fixed, on 
    hub's source in a PR like any content change: same id, every choice's why, the
    [graded-coursework](../rules/graded-coursework.md) and [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)
    rules. Then mark **Fixed**. Removing a question is Sam's call, and its id is then retired, not reused.
-3. Agents read the same report with the Supabase connector (read-only SQL):
+3. Agents read the same report with the Supabase connector (read-only SQL), from the copy the admin page keeps (cheap at
+   any hour; `computed_at` says how old):
+   `select r->>'qid' qid, r->>'state' state, (r->>'score')::int score, r->'flags' flags from admin_cache c, jsonb_array_elements(sh_qh_overlay('<hub>', c.body)) r where c.key = 'qh:<hub>' and r->>'state' in ('new', 'changed') order by score desc;`
+   With no copy for the hub (nobody opened it on the admin page this month), work it out at a quiet hour:
    `select qid, state, score, flags from qh_report('<hub>') where state in ('new', 'changed') order by score desc;`
    and bring Sam the list (the admin page's **Copy list** gives the same in plain text, with no report text and groups
    under 5 people written as "a few": [learner-data-privacy](../rules/learner-data-privacy.md)). The lessons refresh does this
