@@ -30,3 +30,4 @@
 # migration_v80 (sh_answer writes its answer_xp row once) was applied on 2026-11-19 (through the connector, md5-checked, PR #457).
 # migration_v81 (activity_visits_last_idx dropped) was applied on 2026-11-19 (drop index concurrently, alone; then activity_visits and xp_seen rewritten with cluster, PR #457).
 # migration_v82 (get_class_numbers, record_analytics, shop_days with its pg_cron job, the v2 bootstrap built once, get_my_answers, anon_name by an index) was applied on 2026-11-19 (through the connector, md5-checked, PR #459).
+migration_v83.sql

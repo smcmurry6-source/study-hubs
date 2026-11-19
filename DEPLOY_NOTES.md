@@ -44,6 +44,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   answer's reply: they ask `shGame.live()` now (a hub passes the Inbox its `v2`, it passed none; the dashboard passes `V2 !==
   false` to both), and the last two fall back to today's call when the v2 one is missing. `tools/ci/quiet.js` checks both
   (`mock()`, `timedOut()`). About page ("What the hubs record") and Ask Timmy's site help updated; bundles rebuilt.
+- **2026-11-19 (the admin page's heavy reads worked out ahead, Claude Code, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456))** — the database-load task's first
+  box. `migration_v83.sql`: the admin page's slow reads (Insights' three, Question health, the visitor totals, check-ins,
+  clicks and features) come from a small table, `admin_cache`, that pg_cron's `sh-admin-cache` job fills one read at a time:
+  every 15 minutes while the page is in use, every hour while 20 or more people are studying, at once after an edit or
+  Refresh, nightly for a week after, nothing while nobody looks. The functions keep their arguments and results (all 22 reads
+  compared exactly on a copy); question health lays today's reviews and reports over the copy. Two lookups got cheaper too
+  (`sh_surface` once a section, not once a row: insights 1.05 → 0.43 s, data quality 0.98 → 0.37 s on the copy). The page
+  shows when each read was worked out and "newer numbers on the way" after Refresh, and looks again until they come. The
+  lessons audit and agents read the kept copies (`tools/lessons-refresh.md`, [admin-operations](vault/reference/admin-operations.md)).
+  Applied live at night (the task note's Log).
 - **2026-11-19 (The database pass's phase 2 applied live, Claude Code)** — Sam, at noon the day before Heme & Endo Exam 3: "the hubs are quiet right now. go ahead and run the migrations you were waiting on" (4 people on, 2 answers in 10 minutes). Through the connector, one call at a time, 12:10-12:13 pm Central: `migration_v79.sql` (the awards' running totals; no total off from its sum, the three most active students' balances the same), `migration_v80.sql` (`answer_xp` once an answer), `migration_v81.sql` (`drop index concurrently`, then `cluster` of `activity_visits` and `xp_seen`: **the database 349 → 323 MB**, `xp_seen` 53 → 31 MB) and `migration_v82.sql` (`get_class_numbers`, `record_analytics`, `shop_days` with its hourly pg_cron job, the lighter bootstrap, `get_my_answers`, `anon_name`). Every live body md5-checked against its file before and after; no request failed in the edge logs, and the pages took the two new calls within a minute. All four are in `supabase/schema.sql`; `supabase/pending-migrations.txt` lists none. Nothing students see changes. [The task note](vault/tasks/2026-11-18-database-optimization-pass.md) has the numbers.
 - **2026-11-19 (Large text on a phone: BUG-184 to BUG-188, Claude Code)** — The text-size setting zooms `<html>`, and inside a zoomed page
   `100vw` and `100vh` are bigger than the screen, so four pop-ups sized that way ran off it at X-Large and XX-Large. The dashboard's More menu is
