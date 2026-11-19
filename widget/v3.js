@@ -1404,6 +1404,37 @@
      rolled out or the network is unavailable; individual modules retain their
      one-shot fallback so an offline hub never breaks. */
   var bootstrap = { data: null, ready: Promise.resolve(null), linkName: currentName() };
+  /* this hub's answer history kept on the device (migration_v84): {v: visitor, id: the newest answer's id, n: how many the
+     server had, a: [[qid, seconds, 1 or 0], ...], the newest 5,000, oldest first}. Written only from a reply that carries
+     answers_id, so a database without v84 is never sent the cursor. The device sends id and n and gets only the answers
+     after id (answers_part); when the count doesn't add up (Link my devices moved older answers in), the whole history. */
+  var ANS_KEY = "sh_answers_hist:" + HUB, ansOff = false;
+  function ansLoad(){
+    if (ansOff) return null;
+    try {
+      var r = JSON.parse(localStorage.getItem(ANS_KEY) || "null");
+      if (r && r.v === VISITOR_ID && Array.isArray(r.a) && isFinite(r.id) && isFinite(r.n) && r.id >= 0 && r.n >= 0) return r;
+    } catch (e) {}
+    return null;
+  }
+  function ansDrop(){ try { localStorage.removeItem(ANS_KEY); } catch (e) {} }
+  /* data: a bootstrap or get_my_answers_since reply; sent: the copy whose cursor was sent (or null). Leaves data.answers as
+     the whole history (the device's copy with the new answers after it), or takes it away when it can't be trusted. */
+  function ansAbsorb(data, sent){
+    if (!data || typeof data !== "object" || !Array.isArray(data.answers)) return data;
+    if (data.answers_part === true) {
+      if (!sent) { delete data.answers; ansDrop(); return data; }
+      /* every new answer has a larger id than the copy's, so at the same second it goes after them: the server's order */
+      var all = sent.a.concat(data.answers), idx = all.map(function(r, i){ return i; });
+      idx.sort(function(x, y){ return ((all[x] && all[x][1]) - (all[y] && all[y][1])) || x - y; });
+      data.answers = idx.map(function(i){ return all[i]; }).slice(-5000);
+    }
+    if (data.answers_id != null && isFinite(data.answers_id) && isFinite(data.answers_n)) {
+      try { localStorage.setItem(ANS_KEY, JSON.stringify({ v: VISITOR_ID, id: Number(data.answers_id), n: Number(data.answers_n), a: data.answers })); }
+      catch (e) { ansDrop(); }
+    }
+    return data;
+  }
   if (supabase && !EXPORT_ONLY) {
     try {
       var bootArgs = {
@@ -1416,14 +1447,20 @@
       };
       /* a page on the game layer asks for the v2 bootstrap (today's, with the journeys' rank) and falls back to
          today's when the database doesn't have it yet */
-      var bootCall = !GAME.want ? supabase.rpc("get_widget_bootstrap", bootArgs)
-        : supabase.rpc("get_widget_bootstrap_v2", bootArgs).then(function(res){
-            if (rpcMissing(res)) { GAME.on = false; return supabase.rpc("get_widget_bootstrap", bootArgs); }
-            return res;
-          });
+      var ansSent = GAME.want ? ansLoad() : null, v2Args = bootArgs;
+      if (ansSent) v2Args = Object.assign({ p_answers_after: ansSent.id, p_answers_n: ansSent.n }, bootArgs);
+      function bootV2(args){
+        return supabase.rpc("get_widget_bootstrap_v2", args).then(function(res){
+          /* a database without v84 doesn't know the cursor: ask again without it, then today's */
+          if (rpcMissing(res) && args !== bootArgs) { ansSent = null; ansOff = true; ansDrop(); return bootV2(bootArgs); }
+          if (rpcMissing(res)) { GAME.on = false; return supabase.rpc("get_widget_bootstrap", bootArgs); }
+          return res;
+        });
+      }
+      var bootCall = !GAME.want ? supabase.rpc("get_widget_bootstrap", bootArgs) : bootV2(v2Args);
       bootstrap.ready = bootCall.then(function(res){
         if (!res || res.error || !res.data || typeof res.data !== "object") return null;
-        bootstrap.data = res.data;
+        bootstrap.data = ansAbsorb(res.data, ansSent);
         if (GAME.want && GAME.on === null) {
           var rk = res.data.rank;
           GAME.on = !!(rk && rk.journey != null);
@@ -2262,6 +2299,21 @@
   }
   function syncProgressRemote(){
     window.shPins.sync();
+    var kept = ansLoad();
+    if (kept) {
+      /* only the answers after the device's newest (migration_v84); the old read if the database doesn't have it */
+      try {
+        supabase.rpc("get_my_answers_since", { p_visitor: VISITOR_ID, p_hub: HUB, p_after: kept.id, p_n: kept.n }).then(function(res){
+          if (rpcMissing(res)) { ansOff = true; ansDrop(); return syncAllAnswers(); }
+          var d = res && !res.error ? ansAbsorb(res.data, kept) : null;
+          finishProgressSync(d && Array.isArray(d.answers) ? d.answers : null);
+        }, function(){ finishProgressSync(null); });
+      } catch (e) { finishProgressSync(null); }
+      return;
+    }
+    syncAllAnswers();
+  }
+  function syncAllAnswers(){
     try {
       supabase.rpc("get_my_answers", { p_visitor: VISITOR_ID, p_hub: HUB }).then(function(res){
         finishProgressSync(res && !res.error ? res.data : null);
@@ -3550,8 +3602,11 @@
     document.head.appendChild(s);
   }
   if (!EXPORT_ONLY) widgetFile("eggs.js");
-  /* handpiece ranks, trophies, accent unlocks, link my devices (widget/ranks.js) */
-  if (!EXPORT_ONLY) widgetFile("ranks.js", function(){ if (window.shRanks) window.shRanks.mount(window.shEggHooks); });
+  /* handpiece ranks, trophies, accent unlocks, link my devices: widget/ranks.js (the art and lists, shared with the
+     dashboard) and widget/ranks-hub.js (the hub widget, shRanks.mount: a hub's only, 2026-11-19) */
+  if (!EXPORT_ONLY) widgetFile("ranks.js", function(){
+    if (window.shRanks) widgetFile("ranks-hub.js", function(){ if (window.shRanks.mount) window.shRanks.mount(window.shEggHooks); });
+  });
   /* tooth buddy (widget/pet.js): Timmy Tooth, in the bottom-left corner. Everyone has Timmy (the redesign's release):
      he loads for everyone, with no adoption, and wears what's on at his place (the v2 bootstrap's shop; on an old
      single-file hub, which has no shop, the outfit kept on the device). */

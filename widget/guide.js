@@ -1,8 +1,11 @@
 /* ============ THE HUB ENGINE, on first use: a professor's study guide (widget/guide.js + guide.css) ============
    A professor's study guide, item by item (Sam, 2026-11-19, Heme & Endo Exam 3: "under notes, make a section for dr herrs
    study guide. have each item as a heading and have high yield explainer of everything we need to know about that topic"):
-   study.json's guide, one entry per lecture on it ({ lec, items: [{ h, body }], terms: [{ t, d }] }), each heading the guide's
-   own words with its explainer under it, then the lecture's key terms. SH_HUB.notes.guide names it ({ title, sub, note }).
+   study.json's guide, one entry per lecture on it ({ lec, items: [{ h, body }], more: [{ h, body }], terms: [{ t, d }] }), each
+   heading the guide's own words with its explainer under it, then the lecture's sections that aren't on the guide (more:
+   "Also stressed in class", "Said not needed"), then its key terms. Since the same day each explainer is short and opens with
+   what the professor said in class (Sam: "the study guide is really long. can we combine the study guide with in class exam
+   hints to make it much higher yield"): .gd-said, the quotes, from study.json's hints; .hy-know; .gd-trap. SH_HUB.notes.guide names it ({ title, sub, note }).
    It is #notes/guide, first in the notes' lecture list. widget/hub.js fetches this file the first time Notes opens on a hub
    whose study.json has a guide, so no other hub downloads it (Sam, 2026-11-19: "the study guide is only for this particular
    heme test"); the core keeps only the loader, the route, the search entries (exportSections) and their jump (SH_GOTO).
@@ -43,6 +46,7 @@
           '<h2 class="gd-h" id="gdh-' + esc(l.id) + '"><span data-sh-noread>' + HX.lecBadge(l) + "</span><span>" + esc(lecLabel(l) + " · " + shortTitle(l)) + "</span></h2>" +
           '<p class="note gd-meta" data-sh-noread>' + esc(l.who) + (n ? " · " + pl(n, "question") + " on the exam" : "") + "</p>" +
           (g.items || []).map(function(it){ return '<h3 class="gd-item">' + esc(it.h) + "</h3>" + (it.body || ""); }).join("") +
+          (g.more || []).map(function(it){ return '<h3 class="gd-item gd-more">' + esc(it.h) + "</h3>" + (it.body || ""); }).join("") +   // not on the guide: what else was said in class
           ((g.terms || []).length ? '<h3 class="gd-item">Key terms</h3><dl class="gd-terms">' + g.terms.map(function(t){ return "<div><dt>" + esc(t.t) + "</dt><dd>" + t.d + "</dd></div>"; }).join("") + "</dl>" : "") +
           '<p class="gd-acts" data-sh-noread><a class="btn" href="#notes/' + esc(l.id) + '">' + icon("notes", 18) + esc(lecLabel(l)) + "'s notes</a>" +
             '<a class="btn" href="#questions" data-lecq="' + esc(l.id) + '"' + (nLikely ? " data-lqlk" : "") + ">" + icon("questions", 18) + (nLikely ? "Practice its " + fmt(nLikely) + " High likelihood questions" : "Practice " + esc(lecLabel(l)) + " questions") + "</a></p>" +

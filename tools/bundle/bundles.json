@@ -3,7 +3,7 @@
  "scripts": {
   "hub.bundle.js": {
    "what": "a hub's engine: with the page",
-   "run": ["hub-art.js", "statements.js", "hub-rewards.js", "hub-timmy.js", "hub-bank.js", "hub.js"]
+   "run": ["hub-art.js", "statements.js", "prize.js", "hub-rewards.js", "hub-timmy.js", "hub-bank.js", "hub.js"]
   },
   "dash.bundle.js": {
    "what": "the dashboard's engine: with the page",
@@ -18,7 +18,7 @@
    "what": "a hub's own widget layer (widget/v3.js and what it loads): after rest.bundle.js",
    "css": ["v3.css"],
    "run": ["v3.js"],
-   "hold": ["eggs.js", "fx.js", "highlight.js", "podcast.js", "qhealth.js", "drill.js"]
+   "hold": ["ranks-hub.js", "eggs.js", "fx.js", "highlight.js", "podcast.js", "qhealth.js", "drill.js"]
   }
  },
  "styles": {

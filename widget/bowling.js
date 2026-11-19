@@ -71,7 +71,7 @@
 
   /* ---------- the card ---------- */
   var CSS = [
-    ".shb{position:fixed;z-index:10020;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));width:min(340px,calc(100vw - 32px));transform:translate(-50%,0);",
+    ".shb{position:fixed;z-index:10020;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));width:min(340px,calc(100% - 32px));transform:translate(-50%,0);",
     "  opacity:1;transition:opacity .24s ease-out,transform .24s ease-out;cursor:pointer;-webkit-tap-highlight-color:transparent}",
     ".shb.shb-in-host{position:absolute;bottom:14px;width:min(320px,calc(100% - 28px))}",
     ".shb.is-off{opacity:0;transform:translate(-50%,16px)}",

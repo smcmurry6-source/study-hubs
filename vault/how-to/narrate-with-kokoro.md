@@ -67,8 +67,8 @@ python3 tools/narrate.py heme-endo-exam3 --level guide --force
 node tools/hub-next/build.mjs --hub heme-endo-exam3        # then always this (notes.json's guideAudio)
 ```
 
-Its words file says which text it was spoken from (`h`), as High yield's does. Exam 3's 90,000 characters took 26 minutes on 4 cores and
-made a 112-minute recording (54 MB). A change to how `widget/guide.js` draws the readable part needs the same change in
+Its words file says which text it was spoken from (`h`), as High yield's does. Exam 3's first guide (90,000 characters) took 26 minutes on 4 cores and
+made a 112-minute recording (54 MB); the short one that replaced it the same evening, 43,000 characters, took 12 minutes (56 minutes, 27 MB). A change to how `widget/guide.js` draws the readable part needs the same change in
 `guide.mjs`: the smoke test compares the page's text with it.
 
 **Word timings for Follow along** (since 2026-11-12). The engine highlights each word as Listen reads it
