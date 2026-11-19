@@ -637,7 +637,7 @@
     V.tg.setAttribute("transform", "translate(" + q[0].toFixed(1) + " " + (q[1] - arc).toFixed(1) + ")");
     V.face.setAttribute("transform", "scale(" + (V.dir * kx).toFixed(3) + " " + ky.toFixed(3) + ")");
     /* drawn in the scene's depth order: in front of what's behind him, behind what's in front */
-    var z = p[0] + p[1] + .3, c = V.depth.firstChild;
+    var z = TP.timmyZ ? TP.timmyZ(V.layout, p) : p[0] + p[1] + .3, c = V.depth.firstChild;
     while (c && (c === V.tw || +c.getAttribute("data-z") <= z)) c = c.nextSibling;
     if (c !== V.tw.nextSibling) V.depth.insertBefore(V.tw, c);
     if (V.bub) { var keep = V.pos; V.pos = p; bubbleAt(); V.pos = keep; }

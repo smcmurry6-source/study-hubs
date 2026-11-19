@@ -60,14 +60,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   misses all right, an idea of yours marked done on the idea board, the first day back after a week away. Each would be one
   `xp_awards` row with a key that pays once and an amount in `sh_prizes()` ([game-server](../reference/game-server.md)).
   (Studying's rate was raised to 5 crowns per 10 XP the same day, Sam: "lets increase it to 5 crowns per 10xp".)
-- [ ] **A tall piece in the front yard slot covers Timmy at the door** (2026-11-18, seen on the collection sheets): the
+- [x] **A tall piece in the front yard slot covers Timmy at the door** (2026-11-18, seen on the collection sheets): the
   `front` slot (`SLOTS` in `tools/figures/site/place.mjs`, x 6.7, y 10.2) is in front of every home's `spots.door`, so a tall
   piece there (Desert ranch's windmill, July 4's fireworks stand, Thanksgiving's balloon) hides him on the card. Ideas: draw
-  Timmy over a front-slot piece when he's at the door, or nudge the door spot when the front slot holds a tall piece. Ask Sam.
-- [ ] **Kit niceties the collection drawers asked for** (2026-11-18, [the task](done/2026-11-18-more-cosmetics.md)): a yard egg
+  Timmy over a front-slot piece when he's at the door, or nudge the door spot when the front slot holds a tall piece. Ask Sam. Done: Timmy is drawn on top (Sam, 2026-11-19), `timmyZ()` ([#467](https://github.com/smcmurry6-source/study-hubs/pull/467)).
+- [x] **Kit niceties the collection drawers asked for** (2026-11-18, [the task](done/2026-11-18-more-cosmetics.md)): a yard egg
   can only animate its `.tp-eb` group, so the moon rover can't roll, the dish can't turn and the windmill's and wagon's wheels
   only blur (a hook that moves the whole piece while its egg plays, within [motion-cost](../reference/motion-cost.md)); a coral
-  or kelp `treeKind` for the reef and a plain one for the moon (both use the crystal tree); no snow on an underwater scene.
+  or kelp `treeKind` for the reef and a plain one for the moon (both use the crystal tree); no snow on an underwater scene. Done: a piece's `move` and `T.spinner`, a scene's own `tree`, `noSnow` ([#467](https://github.com/smcmurry6-source/study-hubs/pull/467)).
 - [ ] **After the redesign's release: what the old pages still hold up** (2026-11-13, [the release](done/2026-11-06-redesign-release.md)).
   When the last single-file hub's page comes down (the archived ones and Heme & Endo Exam 2): take out the `NEW` (`html.shx`)
   branches in `widget/ranks.js` and `widget/rankup.js` (the old cards, the 23-trophy list), the old house picture and
@@ -85,8 +85,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   graded against a bank question's choice. Only if Sam asks for it.
 - [ ] **Flashcards: undo the last rating** (2026-11-13, same): not built, because a rating is paid and sent to the server
   at once; it needs the rating held back a few seconds first. Only if Sam asks for it.
-- [ ] **Visiting from a hub's boards** (2026-11-13, [visiting](done/2026-11-12-redesign-visiting.md)): the leaderboards in a
-  hub's own panel (`widget/v3.js`) don't open anyone's place yet (Sam, 2026-11-12: the dashboard's boards first).
+- [ ] **A smoke check for visiting from a hub's arcade board** (2026-11-19, from #467): `tools/ci/smoke.js` checks the
+  dashboard's visit but not a hub's. Stub `get_arcade_leaderboard_v2` and `get_place`, finish a game, tap a name on the
+  game-over board: the place opens as a visit, Escape gives focus back, a key that opens nothing says so on the row.
+- [x] **Visiting from a hub's boards** (2026-11-13, [visiting](done/2026-11-12-redesign-visiting.md)): the leaderboards in a
+  hub's own panel (`widget/v3.js`) don't open anyone's place yet (Sam, 2026-11-12: the dashboard's boards first). Done: the hubs' boards are their arcades' (`v3.js`'s panel has none now); `window.shVisitPlace` in `widget/hub-timmy.js`, Perio's and Heme & Endo Exam 3's arcades ([#467](https://github.com/smcmurry6-source/study-hubs/pull/467)).
 - [ ] **Sound for the hand-off and the Dark Matter unlock**, only if the redesign ever gets a sound setting (it has none; the
   scenes are silent on purpose: [the journeys](done/2026-11-06-redesign-progression-journeys.md)).
 - [x] ~~**Perio's page weight is near its budget**~~ (moot: Perio's page came down 2026-11-19, [#464](https://github.com/smcmurry6-source/study-hubs/pull/464)) (2026-11-14, [#362](https://github.com/smcmurry6-source/study-hubs/pull/362)): `perf.js`
@@ -103,10 +106,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   across runs (350-385 in the final run; budget 500, fails past 750). The same scripts run, in fewer and longer tasks.
   Not looked into: a trace of the first seconds to see which tasks are long (the engine's start, or `widget/v3.js`'s,
   which is shared with the live hubs). Worth a look at the release, when v3.js no longer has to stay as it is for the old pages.
-- [ ] Ask Timmy's "What should I study tonight?" on the new dashboard reads each hub's progress from this device's saved state
+- [x] Ask Timmy's "What should I study tonight?" on the new dashboard reads each hub's progress from this device's saved state
   (`progressFrom` in `widget/ask.js`), so on a new or linked device it sees nothing until a hub page has synced the answers. Read the
   student's own answers from the server there instead (their own rows, like the v2 bootstrap), or say "open a hub first" when every
-  hub's state is empty (2026-11-12, [Ask Timmy](done/2026-11-12-redesign-ask-timmy.md) part 2).
+  hub's state is empty (2026-11-12, [Ask Timmy](done/2026-11-12-redesign-ask-timmy.md) part 2). Done: the dashboard merges `get_my_answers` with the device's (#469).
 - [ ] Anima figures on phones: at 390 px their in-drawing labels scale down to about 6-7 px. A plain bigger font for narrow screens clipped labels at the edges in about half the PCD Implants figures (tried 2026-11-04, reverted); it needs a per-figure phone layout (labels moved inside the drawing) or tap-to-zoom. Heme & Endo Exam 3's 22 (2026-11-17) mostly draw them at 10-15 px; its four L17 figures after the oocyte are the smallest (labels about 8 px on the timeline, implantation, estriol and breastfeeding figures). 
 - [ ] Retention, the part not built yet (approved 2026-11-04, [analytics-retention](../reference/analytics-retention.md)): before the school year ends (spring 2027), collapse `activity_hourly` / `activity_visits` older than the school year to hub × section × day with people counts and no ids, as one more step in `sh_retention_run`. **Since migration_v68 the wallet pays 100 crowns per hour of hub time from `activity_hourly`** (`sh_time_crowns`): before the collapse deletes a visitor's hours, keep what they paid (each visitor's capped ping total in a small table `sh_time_crowns` reads, or the crowns as a row), or balances drop. Also ask Sam about the two rows the question-health work proposed (`question_events`, `question_feedback`).
 - [ ] **The workflows' actions off Node.js 20** (2026-11-18, seen in #407's After merge run): every run warns "Node.js 20 is
@@ -114,12 +117,25 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   on Node 24 for now; `actions/upload-artifact@v4` (3) and `actions/github-script@v7` (2) are likely the same. Before GitHub
   drops Node 20 entirely: move each to the major version that runs on Node 24, and let CI run every job once ("Check hubs" and
   "Release tests" both run when a workflow changes).
-- [ ] **Sam's call: Ask Timmy's first question after an idle hour** (2026-11-18, found while answering why Heme & Endo Exam 3 had 21
+- [x] **Sam's call: Ask Timmy's first question after an idle hour** (2026-11-18, found while answering why Heme & Endo Exam 3 had 21
   identical questions): writing a hub's content to the API's cache is most of what students' questions cost (about $14 of their
   $20 from 11-14 to 11-18), and most of it is the first question on a hub after nobody asked for an hour (about $0.60 each; the
   cache lasts an hour). The deploys that broke the cache are fixed ([ask-timmy](../reference/ask-timmy.md), "Limits and money").
   What's left would mean sending less: for example only the exam facts, Exam Hints and the lecture the student is on, with the
-  rest of the notes only when the question needs them. That changes what Timmy can answer, so it needs the eval ($6) and Sam's OK.
+  rest of the notes only when the question needs them. That changes what Timmy can answer, so it needs the eval ($6) and Sam's OK. Done: Sam said yes; built with the eval in `--part` mode (#469).
+- [ ] **Apply `migration_v85.sql` (Ask Timmy's `timmy_cache`) once its PR merges** (2026-11-19): one small table and one
+  service-role function, no backfill, safe at any hour. Until it's applied the function gets an error from the call and sends
+  the whole content as before, so the cheaper first question starts only then. Through the connector, md5-checked; then append
+  it to `supabase/schema.sql` and take its line out of `supabase/pending-migrations.txt`
+  ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)).
+- [ ] **A week after `migration_v85` is applied, check what the part saved** (2026-11-19): the admin page's Ask Timmy tab (cost by
+  day against 11-14 to 11-18's) and the edge logs' `turn` lines (`content`: `part`, `part+full`, `full`). In the eval, 16 of 50
+  first questions were asked again with the whole content; if real students' share is much higher, the part costs more than it
+  saves: send more with it (another lecture, the review tables) or turn it off (`WARM_MS` in `supabase/functions/timmy/core.js`).
+- [ ] **Ask Timmy's quote check fails a table cell under three words** (2026-11-19, the eval's pe-02 on the whole content):
+  he cited R1.3 with "≥10 cigarettes/day", which is in the table, but `quoteIn` wants at least three words or the whole unit, so
+  the link was dropped and the eval failed. Either accept a whole table cell (the text between two ` · `) as a quote, or say in
+  `RULES` that a table quote takes the row's label with it.
 - [ ] **a11y.js checks the About page in light mode on a laptop only** (2026-11-19, found fixing BUG-002, BUG-006 and BUG-007):
   `check('about', 'about/')` in `tools/release/a11y.js` runs at 1280 px in light mode, so a phone-only problem (four of the five
   tables that scroll sideways were only too wide at 390 px) or a dark-mode one would never be counted. Add the About page in dark

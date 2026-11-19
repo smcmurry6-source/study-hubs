@@ -110,7 +110,11 @@ var ARCADE = (function(){
   function fetchBoard(game, limit){
     var c = client();
     if(!c) return Promise.resolve(null);
-    return c.rpc('get_arcade_leaderboard', { p_hub:HUB_ID, p_game:game, p_visitor:visitorId(), p_limit:limit||10 }).then(function(r){ return (r && !r.error) ? (r.data || []) : null; }, function(){ return null; });
+    /* the _v2 board carries each row's visit key (a tap on a name opens that classmate's place: window.shVisitPlace in
+       widget/hub-timmy.js); the old call when the database doesn't have it */
+    var args = { p_hub:HUB_ID, p_game:game, p_visitor:visitorId(), p_limit:limit||10 };
+    var old = function(){ return c.rpc('get_arcade_leaderboard', args).then(function(r){ return (r && !r.error) ? (r.data || []) : null; }, function(){ return null; }); };
+    return c.rpc('get_arcade_leaderboard_v2', args).then(function(r){ return (r && !r.error) ? (r.data || []) : old(); }, old);
   }
   function submitScore(game, score){
     var v2 = window.shGames && window.shGames.over ? window.shGames.over(game, score, function(){ return submitToday(game, score); }) : null;
@@ -123,12 +127,20 @@ var ARCADE = (function(){
     return c.rpc('submit_arcade_score', { p_visitor:v, p_hub:HUB_ID, p_game:game, p_score:score }).then(function(){}, function(){});
   }
   function fmtScore(g, n){ return g && g.id === 'smile' ? '$' + Number(n).toLocaleString() : String(n).padStart(5,'0'); }
+  /* a classmate's name opens their place when the row has a visit key (shared: widget/hub-timmy.js handles every
+     [data-sh-visit] button); the name is text, never markup */
+  function lbName(r){
+    var nm = escHtml(r.display_name || 'Classmate');
+    if(!r.is_me && window.shVisitPlace && typeof r.visit === 'string' && /^[0-9a-f]{24}$/.test(r.visit))
+      return '<button type="button" class="lb-nm" data-sh-visit="board" data-key="'+r.visit+'" aria-label="Visit '+nm+'&#8217;s place">'+nm+'</button>';
+    return '<span class="lb-nm">'+nm+(r.is_me?' (you)':'')+'</span>';
+  }
   function boardRows(rows, limit, g){
     if(rows === null) return '<div class="lb-empty">Class leaderboard is warming up. Your scores will post here soon.</div>';
     if(!rows.length) return '<div class="lb-empty">No scores yet. Be the first on the board.</div>';
     var top = rows.filter(function(r){ return r.rnk <= limit; });
     var me = rows.filter(function(r){ return r.is_me && r.rnk > limit; })[0];
-    function row(r){ return '<li class="'+(r.is_me?'me':'')+'"><span class="lb-rk">'+r.rnk+'</span><span class="lb-nm">'+escHtml(r.display_name || 'Classmate')+(r.is_me?' (you)':'')+'</span>'+(window.shRanks&&window.shRanks.flair?window.shRanks.flair(r.flair, { who: r.display_name }):'')+'<span class="lb-sc">'+fmtScore(g, r.best)+'</span></li>'; }
+    function row(r){ return '<li class="'+(r.is_me?'me':'')+'"><span class="lb-rk">'+r.rnk+'</span>'+lbName(r)+''+(window.shRanks&&window.shRanks.flair?window.shRanks.flair(r.flair, { who: r.display_name }):'')+'<span class="lb-sc">'+fmtScore(g, r.best)+'</span></li>'; }
     return '<ol class="lb-list">' + top.map(row).join('') + (me ? '<li class="lb-gap">…</li>' + row(me) : '') + '</ol>';
   }
   function renderBoards(){
