@@ -33,6 +33,23 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-11-19 (The hub bar fits on every laptop, BUG-083, Claude Code)** — Sam: "do the heme and endo bug fix". On Heme & Endo Exam 3 (and Perio) the top bar ran 26-95 px past the screen between 1,101 and about 1,190 px wide, with Search half off and Settings gone, even with the rank pill down to its medallion. `fitPill()` in `widget/hub-rewards.js` now takes two more steps: the hub name folds to its emblem (`.hx-bar.is-cramped`; still read out as the link's name) and the pill gets its XP back if that leaves room; past that, at Large text and up on a laptop (the setting zooms the page, which the 1,100 px breakpoint can't see), the meters move to the strip under the bar as on a tablet (`.hx-bar.no-meters`, `.hx.is-strip` in `widget/hub.css`). It also measures again when the live count changes and when the fonts arrive. Scripted on the preview's made-up data at 1,101-1,920 px and every text size: nothing runs past the screen; below 1,101 px nothing changed. Bundles rebuilt.
+- **2026-11-19 (the database optimization pass, phase 2: fewer calls from the page, Claude Code, [#459](https://github.com/smcmurry6-source/study-hubs/pull/459))** — nothing students see
+  or earn changes; the pages make fewer requests and the bootstrap does less. `migration_v82.sql` (**pending: apply at
+  night after Fri 2026-11-20, 9:30 am**, after #457's v79 to v81, `supabase/pending-migrations.txt`; written as v79, renumbered at the merge): `get_class_numbers` (a card's class numbers,
+  `question_stats` and `question_choices`, in one call instead of two REST reads: they were a fifth of every request),
+  `record_analytics` (question health's rows, the clicks and the events in one call instead of three), the shop's picks of
+  the day stored once for everyone (`shop_days`, filled by pg_cron hourly, cleared by a trigger on `shop_items`),
+  `get_widget_bootstrap_v2` built once (it worked out v1's rank, Timmy's days and Inbox and threw them away),
+  `get_my_answers` in PL/pgSQL, and `anon_name` by an index on the name's base. The bootstrap 38.7 / 26.9 / 19.4 → 22.5 /
+  13.8 / 10.2 ms on a throwaway copy, every value the same. Page side, working with or without the migration (the old
+  calls when it's missing): `widget/v3.js` (`classNumbers`, `shAnalytics.send`; `widget/qhealth.js` hands its rows to it,
+  and `widget/clicks.js`, unchanged, sends through a client v3.js gives it; the dashboard keeps its two calls, its 345 KB
+  page budget had no room), and `shRankLocal` in `widget/v3.js`, which `widget/ranks.js` asks first: the rank and this
+  hub's mastery after every tenth answer from the replies and the answers the page holds, reading the server only when
+  something it can't count changed (`sh:trophy-sent` from `widget/eggs.js` and the bowling egg, a medal, a new day, the
+  100/1,000 answers and 25/100 runs, mocks and games, at least every 50 answers).
+  Tested by `tools/release/xp.js` (a new section), `rls.js` (`shop_days` and its helpers closed to anon) and
+  `tools/ci/quiet.js` (both ways). [The task](vault/tasks/2026-11-18-database-optimization-pass.md).
 - **2026-11-19 (Phone and large-text fixes on the hubs: BUG-168, BUG-126, BUG-009, Claude Code, [#458](https://github.com/smcmurry6-source/study-hubs/pull/458))** — Sam's package of
   three bugs. **Nothing on a hub scrolls sideways on a phone at the largest text** (BUG-168): the text sizes zoom the page,
   so XX-Large on a 320 px phone lays out in 220 px, and the arcade lobby, the Question Bank, Notes, Exam Hints, the cram

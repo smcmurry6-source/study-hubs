@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/444, https://github.com/smcmurry6-source/study-hubs/pull/457
+pr: https://github.com/smcmurry6-source/study-hubs/pull/444, https://github.com/smcmurry6-source/study-hubs/pull/457, https://github.com/smcmurry6-source/study-hubs/pull/459
 ---
 
 # The database optimization pass: the same site for less of the Free plan's CPU
@@ -153,16 +153,41 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   **Done: checked and `migration_v81.sql`** (phase 2's table above: the summary's numbers the same, 0.4 to 2.1 ms at most).
   The rewrite is `cluster ... using activity_visits_pkey` (unlike `vacuum full`, it runs inside the connector's call). Applied
   live and rewritten: the box below.
-- [ ] **The class's numbers on each card** (`question_stats` and `question_choices`, `widget/v3.js`): 20.6% of every
+- [x] **The class's numbers on each card** (`question_stats` and `question_choices`, `widget/v3.js`): 20.6% of every
   request and another 14.6% of preflights, two reads a card. (Only 0.5% of the database's time, live: the gain is in
   requests, so it matters when the request limit or the connection count is what's tight.) The answer's reply could carry them (the save has just
-  written both rows), or one call could read both.
-- [ ] **The page's three analytics batches as one call** (`record_qh`, `record_clicks`, `record_events`: 14.8% of
-  requests together): one flush, one call.
-- [ ] **The bootstrap** (31 / 18 / 12 ms on the copy after v76, 445 ms at the median live): the shop's picks of the day
+  written both rows), or one call could read both. **Done, one call for both** (2026-11-19, phase 2, `migration_v82.sql`'s
+  `get_class_numbers` with `widget/v3.js`): one request a card where there were two, the same rows, the same database
+  time (0.08 ms either way for a card). Not in the answer's reply, which package 4 (the answer save) was working on at
+  the same time (Sam's order). A database without the call gets the two reads, and the page doesn't ask again.
+- [x] **The page's three analytics batches as one call** (`record_qh`, `record_clicks`, `record_events`: 14.8% of
+  requests together): one flush, one call. **Done in the hubs** (phase 2: `migration_v82.sql`'s `record_analytics`,
+  `widget/v3.js`'s `shAnalytics.send`, `widget/qhealth.js`; `widget/clicks.js` is unchanged and sends through a client
+  `v3.js` gives it that hands its two calls to the batch): when one batch is due, the others go with it, in one call that
+  hands each to its own function (the same rows: `tools/release/xp.js`); 1.6 ms of database time either way. A page
+  that is leaving sends with keepalive, the three calls until the device has seen the new one work. **The dashboard still
+  makes its two calls** (clicks, events): its page budget (`tools/release/budgets.json`, 345 KB) was at 345.4 KB on `main`,
+  with no room for the code (the next box but one).
+- [x] **The bootstrap** (31 / 18 / 12 ms on the copy after v76, 445 ms at the median live): the shop's picks of the day
   are worked out again for every visitor (about 5 ms; the same for everyone all day), `get_my_answers` builds up to
   5,000 rows of JSON (4-11 ms), and a visitor without a chosen name has their class name checked against everyone's
-  (3.6 ms).
+  (3.6 ms). **Done** (phase 2, `migration_v82.sql`): 38.7 / 26.9 / 19.4 → **22.5 / 13.8 / 10.2 ms** (heavy / middling /
+  light, on phase 2's copy), the dashboard's 22.0 → 10.8 ms. The shop's day is kept in `shop_days` (2.1 → 0.04 ms;
+  `get_my_shop` 11.3 / 5.9 / 5.7 → 4.7 / 3.7 / 4.7 ms), the v2 bootstrap no longer works out v1's rank, Timmy's days and
+  Inbox only to replace them, the class name is a lookup on an index of its base (5-6.5 → 0.03-0.14 ms; 50 names on a
+  board 15.9 → 11.1 ms) and `get_my_answers` is PL/pgSQL with its JSON built once (11.7 → 8.8 ms for 8,000 answers).
+  Every value is what it was (below). Left: the answers themselves, the next box.
+- [ ] **Apply `migration_v82.sql`** (phase 2: the class's numbers, the analytics, the bootstrap): at night (1 to 5 am
+  Central), not before Heme & Endo Exam 3 is over (Fri 2026-11-20, 9:30 am; Sam), after #457's v79 to v81 (the box
+  "Phase 2 applied live" below; the same night is fine, one call at a time, or a later one). Fetch `main` first and check that
+  nothing since has replaced `sh_shop_day`, `get_widget_bootstrap_v2`, `get_my_answers` or `anon_name`; md5-check their
+  live bodies against `supabase/schema.sql`'s before, and the migration's after; check that pg_cron took the
+  `sh-shop-days` job and `shop_days` holds today and tomorrow; then `get_class_numbers` and `record_analytics` through the
+  API as a visitor. Append it to `supabase/schema.sql`, take its line out of `supabase/pending-migrations.txt`. Until it
+  is applied, the pages ask for the two new calls once a page load and use the old ones (a 404 each).
+- [ ] **The bootstrap's answers** (left by phase 2): `get_my_answers` is still most of a heavy student's bootstrap (8.8 of
+  22.5 ms at 8,000 answers; 0.6 ms at 500) and is read again every 3 minutes a hub is open. The device could send the time
+  of the newest answer it holds and get only those after it. `get_pet_days_v2` is the next (about 3 ms for the heaviest).
 - [x] **`answer_xp` is written twice an answer** (the row, then its reply onto it): one insert at the end would halve
   that table's writes and dead rows. It moves the insert past the speed limit's count, which reads the row, so it needs
   care. **Done: `migration_v80.sql`.** The count joins the row only to leave out mock answers and runs only outside a mock,
@@ -173,8 +198,17 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   rebuilds: look at the table's and the index's sizes apart before deciding on a rewrite.
   **Looked at:** the table 29.9 MB and the index 24.8 MB, both about twice what the rows need. **Decided: rewrite it once at
   night** (`cluster public.xp_seen using xp_seen_pkey`), about 24 MB back (phase 2's table above). Done: the box below.
-- [ ] **The rank and mastery after every tenth answer** (`widget/ranks.js`): on the game layer the answer's reply
-  already carries the XP total; the page could work out the hub's mastery from the answers it holds.
+- [x] **The rank and mastery after every tenth answer** (`widget/ranks.js`): on the game layer the answer's reply
+  already carries the XP total; the page could work out the hub's mastery from the answers it holds. **Done** (phase 2,
+  no server part: `widget/v3.js`'s `shRankLocal`, which `widget/ranks.js` asks first; in `v3.js` because `ranks.js` also
+  goes to the dashboard, whose page budget has no room): the XP comes from the replies and this hub's mastery from each
+  question's last try (the bootstrap's answers, then every reply), so ten answers make no read. It still reads both when
+  something it can't count may have changed: a new trophy sent from the page (`sh:trophy-sent`: the eggs, the bowling
+  egg), a medal in a reply, the streak of days paying or a new day, 100 or 1,000 answers, a run that could reach 25 or
+  100, a mock's or a game's answers, a question it has no last try for, a read short of the answers paid, and at least
+  every 50 answers; with Stats open, on the old pages and without the bootstrap, as before. Timmy's three trophies and
+  the arcade's 25 games send no signal: they show at the next read (at most 50 answers, Stats, or the next page).
+  `tools/ci/quiet.js` checks both ways.
 - [ ] **Phase 2 applied live, at night after Heme & Endo Exam 3** (set for Sat 2026-11-21, 1:30 am Central, by the session of
   [#457](https://github.com/smcmurry6-source/study-hubs/pull/457)). First fetch `main`: if another migration took 79-81,
   renumber; a newer `sh_answer` than `migration_v78.sql`'s (applied 2026-11-19, which v80 is built on) means v80 is rebuilt on
@@ -183,6 +217,12 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   activity_visits_pkey;` and `cluster public.xp_seen using xp_seen_pkey;`, each under `set local lock_timeout = '3s'`, then
   `analyze` of both; the live bodies md5-checked against the files; the sizes after. Then v79-v81 appended to
   `supabase/schema.sql` and out of `supabase/pending-migrations.txt`, in the same PR.
+- [ ] **Room in the dashboard's page budget** (found by phase 2): the dashboard was at 345.4 of its 345 KB on `main`
+  (2026-11-19, `tools/release/perf.js`), so a few hundred bytes more in `widget/rest.bundle.js` fail "Release tests".
+  `widget/ranks.js`'s hub widget (`mount()`, about 360 lines: the rank card, the trophy case in Stats, Link my devices)
+  goes to the dashboard in that bundle and never runs there; moving it to a file only hubs load (`hub-rest.bundle.js`)
+  would free several KB. Then the dashboard's clicks and events can go in one `record_analytics` call too (phase 2
+  left them as two calls for that reason).
 
 ## Log
 
@@ -221,7 +261,24 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   phase; `tools/release/xp.js` checks the totals against the sums after all its scenarios. The readout is set for 1:30 am
   tonight and the live steps for Saturday night (the boxes).
 
+- 2026-11-19, phase 2, fewer calls from the page (Claude Code, Sam's package, [#459](https://github.com/smcmurry6-source/study-hubs/pull/459)): `migration_v82.sql` (written as v79, renumbered at the merge: #457 took v79 to v81) with `widget/v3.js`,
+  `widget/qhealth.js`, a two-line hook in `widget/ranks.js` and the trophy signal in `widget/eggs.js`. (A first version
+  changed `widget/clicks.js`, `widget/pet.js` and more of `ranks.js`, 1.2 KB more for the dashboard: "Release tests"
+  failed its 345 KB budget at 347 KB, so that code moved to `v3.js`, which only hubs load: 40 bytes more for the dashboard.)
+  Measured on a new throwaway copy of `supabase/schema.sql` with a made-up class (2,123 visitors, 2,246 visitor-hub
+  answer histories), the medians of many calls: the numbers in the four boxes above. Checked identical, old against new,
+  on that copy: the shop over every day of 2026-2027, the class name of every visitor, every answer history, the
+  bootstrap for 508 visitor and hub pairs, the class's numbers against the two reads, the analytics rows from one call
+  against three, and the stored shop cleared by a change to `shop_items`; the expression index keeps the name's updates
+  on their page (300 of 300). `tools/release/xp.js` (627 checks), `rls.js`, `admin-ops.js`, `retention.js` and `timmy.js`
+  pass with it pending (and again with #457's v79 to v81 ahead of it after the merge); `tools/ci/quiet.js` checks the page side. Not applied live: the box above
+  ([#459](https://github.com/smcmurry6-source/study-hubs/pull/459); phase 1 was #444).
+
 ## Outcome
+
+So far (the task stays open for the boxes still unticked): phase 1's `migration_v76.sql` and `migration_v77.sql` are live;
+phase 2's fewer calls from the page (the four boxes ticked 2026-11-19) are `migration_v82.sql`, waiting to be applied at
+night after Fri 2026-11-20, 9:30 am, and page changes that work with or without it.
 
 Related: [database-load](2026-11-18-database-load.md) · [shared-infrastructure](../reference/shared-infrastructure.md) ·
 [game-server](../reference/game-server.md) · [decisions](../decisions.md) ·

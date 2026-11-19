@@ -29,3 +29,4 @@
 migration_v79.sql
 migration_v80.sql
 migration_v81.sql
+migration_v82.sql
