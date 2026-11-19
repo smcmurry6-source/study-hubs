@@ -45,6 +45,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   shows when each read was worked out and "newer numbers on the way" after Refresh, and looks again until they come. The
   lessons audit and agents read the kept copies (`tools/lessons-refresh.md`, [admin-operations](vault/reference/admin-operations.md)).
   Applied live at night (the task note's Log).
+- **2026-11-19 (Large text: the shop, Ask Timmy, the tour, bowling, and Home's Timmy Time card; BUG-190, BUG-191, Claude Code)** —
+  The rest of #462's sweep. Timmy's Shop and an item's sheet (`widget/shop.css`) are sized in % of the screen with a flex
+  column that shrinks and scrolls (at 1280 px XX-Large the shop was 1,537 px wide and its Close button off the top). Ask
+  Timmy's panel (`widget/ask.css`): % of its fixed box, a one-column footer whose starters wrap (it scrolled 50 px sideways
+  at 320 px XX-Large), an intro note that scrolls inside 22% of the panel, no avatar under 260 px. The tour (`widget/tour.js`):
+  cards in %, and **positions worked out in screen px and divided by the zoom** (`getBoundingClientRect` is in screen px,
+  `style.left` and `offsetWidth` in the zoomed page's px; at a laptop's X-Large the cards landed off the screen). The bowling
+  card (`widget/bowling.js`) in %; the update prompt, the reply pop-up's cap, the survey's margin and the notes' lecture list
+  off `vw`/`vh`. Home's Timmy Time card (`widget/hub.css`) is a container: a narrow card drops the minutes from "Listen ·
+  52 min", gives the title the full width, and shrinks Timmy at X-Large and XX-Large. `tools/ci/smoke.js` opens the shop, an
+  item and Ask Timmy at 320 px XX-Large and 375 px X-Large. Also retested BUG-184 to BUG-188, BUG-168, BUG-126 and BUG-009 (done).
 - **2026-11-19 (The database pass's phase 2 applied live, Claude Code)** — Sam, at noon the day before Heme & Endo Exam 3: "the hubs are quiet right now. go ahead and run the migrations you were waiting on" (4 people on, 2 answers in 10 minutes). Through the connector, one call at a time, 12:10-12:13 pm Central: `migration_v79.sql` (the awards' running totals; no total off from its sum, the three most active students' balances the same), `migration_v80.sql` (`answer_xp` once an answer), `migration_v81.sql` (`drop index concurrently`, then `cluster` of `activity_visits` and `xp_seen`: **the database 349 → 323 MB**, `xp_seen` 53 → 31 MB) and `migration_v82.sql` (`get_class_numbers`, `record_analytics`, `shop_days` with its hourly pg_cron job, the lighter bootstrap, `get_my_answers`, `anon_name`). Every live body md5-checked against its file before and after; no request failed in the edge logs, and the pages took the two new calls within a minute. All four are in `supabase/schema.sql`; `supabase/pending-migrations.txt` lists none. Nothing students see changes. [The task note](vault/tasks/2026-11-18-database-optimization-pass.md) has the numbers.
 - **2026-11-19 (Large text on a phone: BUG-184 to BUG-188, Claude Code)** — The text-size setting zooms `<html>`, and inside a zoomed page
   `100vw` and `100vh` are bigger than the screen, so four pop-ups sized that way ran off it at X-Large and XX-Large. The dashboard's More menu is
