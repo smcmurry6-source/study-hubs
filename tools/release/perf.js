@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // Performance budgets (RELEASE_TEST_PLAN.md, "Performance"), on a preview served gzipped like GitHub Pages, as a
 // mid-range phone on a slow 4G connection (Lighthouse's mobile profile: 150 ms round trip, 1.6 Mbps down, 750 kbps
-// up, CPU slowed 4x). For the dashboard, About and every hub it measures what a student waits for:
+// up, CPU slowed 4x). For the dashboard, About and every live hub it measures what a student waits for (an archived hub
+// isn't measured since 2026-11-19, as the accessibility and device suites skip it: Sam, of Occlusion after its final,
+// "occlusion can be retired since the exam has already happened"; --page still measures one):
 //   bytes over the wire (narration and video excluded: they stream on demand), requests, first contentful paint,
 //   largest contentful paint, total blocking time (long tasks past 50 ms) and JavaScript heap.
 // Bytes and requests are the whole visit's, without a tap: everything the page fetches by itself, to the moment the
@@ -70,8 +72,11 @@ async function measure(browser, url){
   const budgets = fs.existsSync(BUDGET_FILE) ? JSON.parse(fs.readFileSync(BUDGET_FILE, 'utf8')) : { pages: {} };
   const srv = await start({});
   const browser = await L.launch();
-  const pages = ['index.html', 'about/', ...L.hubs().map(h => `hubs/${h}/`)].filter(p => !ONLY || p === ONLY);
+  const status = L.hubStatus(), live = L.hubs().filter(h => status[h] === 'live' || ONLY === `hubs/${h}/`);
+  const pages = ['index.html', 'about/', ...live.map(h => `hubs/${h}/`)].filter(p => !ONLY || p === ONLY);
   const results = {}, problems = [], notes = [];
+  const archived = L.hubs().filter(h => !live.includes(h));
+  if (!ONLY && archived.length) notes.push(`archived, not measured: ${archived.join(', ')}`);
   for (const p of pages) {
     results[p] = await measure(browser, srv.url + p + (p.startsWith('hubs/') || p === 'index.html' ? '?persona=returning' : ''));
     const r = results[p];

@@ -57,6 +57,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   from "About this hub" in the box's header.
   Event `news:more` (the arrows) replaces `news:open` ([event-taxonomy](vault/reference/event-taxonomy.md)). The About
   page, the tour's steps and the preview's fixture changelog (five entries now) follow.
+  The shared stylesheet's growth (about 1.7 KB gzipped) put Occlusion's archived page at 801 KB of its 800 KB budget on
+  CI (800 on `main`); Sam: "occlusion can be retired since the exam has already happened", so `tools/release/perf.js` now
+  measures only live hubs, as a11y and the device matrix already did (`--page` still measures an archived one).
 
 - **2026-11-19 (pages that ride out a busy database: answers kept on the device, and the rank pill, Claude Code)** — (1) An
   answer still unsaved when its tab closed was lost (the line's retries lived in the page). Now `widget/v3.js` writes the
