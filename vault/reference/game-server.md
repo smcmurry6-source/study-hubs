@@ -423,10 +423,38 @@ it as `sh:crowns` (the hub's meters and a gold "+n crowns" pop, the dashboard's 
 - **The rebuild keeps them**: `sh_xp_rebuild` replays only answers, goals and fixes; prize rows stay. Link my devices
   copies them like any award row (a key already paid on the other device is skipped).
 
+## Collections (migration_v75)
+
+Sam, 2026-11-19: "in the timmy card i want there to be a button where you can view your collections of items bought in the
+shop. holiday collections and other things. you can see your progress and all and completing a collection gives 1000 xp and
+1000 crowns as a bonus". The view is `widget/place.js`'s (`openCollections`, over the place like the medal board); the
+server says what's finished and pays the bonus.
+
+- **What a collection is** (the calls are in [decisions](../decisions.md)): each season's set (`shop_items.season`, 14),
+  each year-round collection (the new `shop_items.collection`, 6: `dino`, `moonbase`, `reef`, `desert`, `arcade`,
+  `rockshow`, the same 48 rows as `COLLECTIONS` in `sets.mjs`; a check keeps it off snacks, boosts, costumes, rank pieces
+  and seasonal rows) and the ten rare costumes as one (`costumes`): 21. Only active rows count, and rank pieces are never
+  one (earned, not bought). A collection whose every piece is a gift (Halloween 2026's) is finished for everyone and pays
+  nothing (`pays` false).
+- **`sh_collections(visitor)`** (internal): each collection's pieces and how many the visitor owns (`sh_owned`, so a
+  gift and a linked device's buys count); `get_my_collections(p_visitor)` returns them as `{k, kind, n, have, done, pays,
+  paid}`, seasons first, then the year-round ones, then the costumes.
+- **`claim_collections_v2(p_visitor)`** pays every finished, paying, unpaid collection: one `xp_awards` row each, key
+  `collection:<k>`, src `collection`, 1,000 (`sh_prizes()`'s `collection`; `PRIZES` in `widget/v3.js` has the same), and
+  as a prize (`sh_is_prize`) it pays as many crowns. Not boosted. It returns `sh_prize_reply` with `won` (the keys paid
+  now) and `collections`. The shop asks after a piece of a collection is bought (`widget/shop.js` `collCheck`, a
+  banner on the "Got it" sheet); the view shows a **Claim** button for one finished before (or when the shop's call
+  didn't go through). The key pays once: a second claim, a second device, Link my devices (copied like any award row)
+  and the rebuild (prize rows stay) never pay it again. Selling a piece is impossible, so a finished collection stays
+  finished; a piece added to a collection later makes it unfinished again, and its bonus stays paid.
+- **The economy** ([earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md)): a season's set costs about 25,000
+  crowns, a year-round collection 12,000-14,500 and the costumes 24,500, so the bonus gives back 4-8% of what it took.
+  All 20 that pay make 20,000 XP and crowns at most.
+
 ## Tests
 
 `node tools/release/xp.js` builds a throwaway database from `supabase/schema.sql` with made-up history, applies the pending
-migrations as the release will, and checks all of the above (529 checks, the prizes of migration_v68 in section 14c, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
+migrations as the release will, and checks all of the above (596 checks, the prizes of migration_v68 in section 14c, the collections of migration_v75 in 14d, the shop's client in section 13b and Learn and Flashcards' in 14b: a replayed call, a double tap and a linked device
 among them, the rebuild against the live calls, the catalog against `tools/figures/site/sets.mjs`, three years of shelves
 day by day, a place opened from a board row, and a random visit going through the whole class, in 14a). `node tools/release/rls.js` applies the pending migrations too, seeds
 the new tables and calls every function a visitor can run with one visitor's id, failing if another visitor's id comes back;

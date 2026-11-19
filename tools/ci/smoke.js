@@ -929,7 +929,9 @@ function lint(hub, A){
       const rank = { xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges: [], dark_seen: [], boost: null };
       const equipped = { 'yard-left': 'garden' };
       const shop = () => ({ day: '2026-11-12', seasons: [], throwback: false, wallet: { balance: 0 }, items: [], costumes: [], snacks_today: 0, boost: null,
-        inventory: ['garden', 'mailbox', 'bowling-lane', 'castle', 'cowboy-hat', 'floss-mummy'].map(id => ({ id, at: '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
+        /* all of Desert ranch (migration_v65's collection), for the Collections view below */
+        inventory: ['garden', 'mailbox', 'bowling-lane', 'castle', 'cowboy-hat', 'floss-mummy', 'adobe-ranch', 'red-rocks', 'bandana', 'sheriff-vest', 'cactus-garden', 'windmill-pump', 'covered-wagon']
+          .map(id => ({ id, at: '2026-11-01', how: 'bought' })).concat([{ id: 'rank-antique-outfit', at: '2026-11-02', how: 'rank' }]),
         locked: [{ id: 'rank-bronze-outfit', name: 'Bronze outfit', kind: 'outfit', rarity: 'rare', rank_tier: 2 }], equipped: Object.assign({}, equipped) });
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_widget_bootstrap_v2/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ rank, mastery: [], shop: shop() }) }));
       await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_shop/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(shop()) }));
@@ -941,6 +943,12 @@ function lint(hub, A){
         else delete equipped[a.p_slot];
         return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, equipped }) });
       });
+      /* Collections (migration_v75): Desert ranch is finished and its bonus not taken yet; claiming it pays (stubbed) */
+      const desert = paid => ({ k: 'desert', kind: 'collection', n: 8, have: 8, done: true, pays: true, paid });
+      let claimed = 0;
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_collections/, route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, pays: 1000, collections: [desert(claimed > 0)] }) }));
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/claim_collections_v2/, route => { claimed++;
+        return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, src: 'collection', xp: claimed > 1 ? 0 : 1000, won: claimed > 1 ? [] : ['desert'], crowns: 1000, pays: 1000, collections: [desert(true)] }) }); });
       await page.goto(BASE() + `hubs/${hub}/index.html#more`); await page.waitForTimeout(2500);
       if (!(await page.$('a[href="#more/place"], [data-more="place"]')) && !(await page.evaluate(() => [...document.querySelectorAll('.menu .rows a, .menu .rows button')].some(x => /Timmy’s place/.test(x.textContent))))) problems.push(`${name} (${label}): More has no "Timmy's place" tile for an adopted Timmy`);
       if (asked.length) problems.push(`${name} (${label}): the place's files loaded with the page, before it was opened (${asked.join(', ')}): they load on first use`);
@@ -1005,6 +1013,38 @@ function lint(hub, A){
           }
           await page.keyboard.press('Escape'); await page.waitForTimeout(500);
           if (await page.$('dialog.tpv[open]')) problems.push(`${name} (${label}): Escape didn't close the place's full view`);
+          /* Collections (migration_v75): More's "Your collections" opens the place on every season's set, year-round
+             collection and the rare costumes, with what's owned of each; only the drawings of the cards near the screen
+             are fetched; a finished collection offers its bonus and claiming it says it's paid; Escape closes it all */
+          const cb = await page.$('[data-place-coll]');
+          if (!cb) problems.push(`${name} (${label}): More's Timmy's place has no "Your collections" button`);
+          else {
+            const packsBefore = asked.filter(u => /hub-art\/place\//.test(u)).length;
+            await cb.click();
+            const co = await page.waitForSelector('dialog.tpv .tpv-over:not([hidden]) .tco', { timeout: 10000 }).catch(() => null);
+            if (!co) problems.push(`${name} (${label}): "Your collections" didn't open the collections`);
+            else {
+              await page.waitForTimeout(1200);
+              const cv = await page.evaluate(() => { const ov = document.querySelector('dialog.tpv .tpv-over'), box = ov.querySelector('.tpv-overin'), d = ov.querySelector('.tco[data-k="desert"]');
+                return { n: ov.querySelectorAll('.tco').length, kinds: [...ov.querySelectorAll('.tco-gh')].map(h => h.textContent.replace(/\s*\d+ of \d+$/, '')),
+                  desert: d ? d.querySelector('.tco-prog').textContent : '', own: d ? d.querySelectorAll('.tco-p.is-own').length : 0, claim: !!(d && d.querySelector('[data-tp="coll-claim"]')),
+                  art: !!(d && d.querySelector('.tco-pic img')), w: box.scrollWidth - box.clientWidth, x: (document.querySelector('[data-tp="over-close"]') || {}).getAttribute && document.querySelector('[data-tp="over-close"]').getAttribute('aria-label'),
+                  names: [...ov.querySelectorAll('button')].filter(b => !(b.getAttribute('aria-label') || b.textContent || '').trim()).length }; });
+              if (cv.n !== 21 || cv.kinds.join('|') !== 'Holidays and seasons|Year-round collections|Rare costumes') problems.push(`${name} (${label}): Collections should list 21 (14 sets, 6 year-round, the costumes) under three headings (${JSON.stringify(cv)})`);
+              if (!/8 of 8/.test(cv.desert) || cv.own !== 8 || !cv.claim) problems.push(`${name} (${label}): a finished collection should show 8 of 8 and offer its bonus (${JSON.stringify(cv)})`);
+              if (cv.w > 1) problems.push(`${name} (${label}): Collections scrolls sideways by ${cv.w}px`);
+              if (cv.names) problems.push(`${name} (${label}): ${cv.names} button(s) in Collections have no name`);
+              const packs = asked.filter(u => /hub-art\/place\//.test(u));
+              if (packs.length >= 20 || packs.some(u => /hub-art\/place\/(summer|july4|spring)\.js/.test(u))) problems.push(`${name} (${label}): Collections fetched the drawings of cards far off the screen (${packs.slice(packsBefore).join(', ')})`);
+              /* claiming: a test browser asks nothing, so this one says it isn't one (every call is answered here) */
+              await page.evaluate(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
+              await page.click('dialog.tpv .tco[data-k="desert"] [data-tp="coll-claim"]'); await page.waitForTimeout(900);
+              const cl = await page.evaluate(() => ({ st: (document.querySelector('dialog.tpv .tco[data-k="desert"] .tco-foot') || {}).textContent || '', s: window.shPlace.state() }));
+              if (claimed !== 1 || !/Desert ranch finished!/.test(cl.st) || cl.s.collPaid !== 1) problems.push(`${name} (${label}): claiming the bonus should pay once and say so (${claimed} calls, ${JSON.stringify(cl)})`);
+              await page.keyboard.press('Escape'); await page.waitForTimeout(500);
+              if (await page.$('dialog.tpv[open]')) problems.push(`${name} (${label}): Escape didn't close Collections (opened on its own, it closes the place too)`);
+            }
+          }
         }
       }
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));

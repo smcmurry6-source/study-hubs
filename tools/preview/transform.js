@@ -116,8 +116,9 @@ function transformFile(rel, buf, o){
 
 /* the shop's catalog, read from the migration that writes it (migration_v54's two inserts into shop_items, then any later
    migration's `update public.shop_items set ... where id = '...'`), so the preview's shelves sell exactly what the server will: one row each, [id, name, kind, rarity, price, season, slot, hp,
-   boost_minutes, boost_mult, shelf, rotates, gift, rank_tier, wide, sort] */
-const SHOP_COLS = ['id', 'name', 'kind', 'rarity', 'price', 'season', 'slot', 'hp', 'boost_minutes', 'boost_mult', 'shelf', 'rotates', 'gift', 'rank_tier', 'wide', 'sort'];
+   boost_minutes, boost_mult, shelf, rotates, gift, rank_tier, wide, sort, collection] (collection: migration_v75's year-round
+   collections, one `update ... set collection = '<k>' where id = '<id>'` a row) */
+const SHOP_COLS = ['id', 'name', 'kind', 'rarity', 'price', 'season', 'slot', 'hp', 'boost_minutes', 'boost_mult', 'shelf', 'rotates', 'gift', 'rank_tier', 'wide', 'sort', 'collection'];
 function shopCatalog(){
   let sql = '';
   try { sql = fs.readFileSync(path.join(ROOT, 'migration_v54.sql'), 'utf8'); } catch (e) { return null; }
