@@ -1048,7 +1048,7 @@ function lint(hub, A){
         }
       }
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
-      notes.push(`${name} (${label}): Timmy's place, its full view and the customizer`);
+      notes.push(`${name} (${label}): Timmy's place, its full view, the customizer and Collections (a bonus claimed)`);
       await page.close();
     }
     /* The bowling egg (phase 4, part D: widget/bowling.js and its drawings widget/hub-art/bowling.js, both fetched on first
