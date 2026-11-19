@@ -17,11 +17,12 @@
   if (localStorage.getItem("sh_about_spoilers") !== "1") document.documentElement.classList.add("hide-spoilers"); }catch(e){ document.documentElement.classList.add("hide-spoilers"); } })();
 </script>
 <style>
-/* the dashboard's tokens (index.html), so this page reads as part of the site */
+/* the dashboard's tokens (index.html), so this page reads as part of the site; light mode's --ink-3 and --gold are a
+   shade darker, so the hints on the gold notes and the trophy tags pass WCAG AA (4.5:1) */
 :root{
-  --bg:#E9EDF0; --surface:#FFFFFF; --surface-2:#F3F6F7; --ink:#15202A; --ink-2:#4A5864; --ink-3:#5F6D78;
+  --bg:#E9EDF0; --surface:#FFFFFF; --surface-2:#F3F6F7; --ink:#15202A; --ink-2:#4A5864; --ink-3:#56636E;
   --line:#D3DADF; --line-2:#BCC6CD; --focus:#2F6FD6; --good:#1F8A5B; --good-ink:#156B45; --good-soft:#DDF1E7;
-  --accent:#A23F5E; --accent-soft:#F5E1E7; --gold:#8A6417; --gold-soft:#F3E6CB;
+  --accent:#A23F5E; --accent-soft:#F5E1E7; --gold:#7D5A13; --gold-soft:#F3E6CB;
   --serif:'Instrument Serif', 'Iowan Old Style', Georgia, serif;
   --sans:'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --mono:ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -54,7 +55,7 @@ p{margin:0; max-width:70ch}
 html:not(.hide-spoilers) .spoil-ph{display:none !important}
 nav.toc{display:flex; flex-wrap:wrap; gap:8px; margin-top:20px}
 nav.toc a{font-size:14px; font-weight:600; color:var(--ink); text-decoration:none; padding:6px 12px; border:1px solid var(--line); border-radius:999px; background:var(--surface)}
-nav.toc a:hover, nav.toc a:focus-visible{border-color:var(--accent); outline:none}
+nav.toc a:hover, nav.toc a:focus-visible{border-color:var(--accent)}
 section{margin-top:56px; display:grid; gap:16px}
 section > header{display:grid; gap:6px}
 .items{display:grid; border:1px solid var(--line); border-radius:16px; background:var(--surface); overflow:hidden}
@@ -182,7 +183,7 @@ td .spoil-ph{font-style:italic}
 
   <section id="arcade">
     <header><div class="eyebrow">Part 4</div><h2>Arcade games</h2><p>Every game has a class-wide high-score board. In Perio and Heme &amp; Endo Exam 3 the arcade is under <b>More</b>, and its lobby shows every game on its own color with its own drawing. <span class="tag new">new</span> Perio's arcade has seven games (Stage &amp; Grade is its seventh), drawn on a perio chart and set in a perio clinic; the other hubs' arcades share the same rules, each with its own look. <span class="tag new">new</span> The Heme &amp; Endo Exam 1 hub's Feedback Loop Arcade has the same six kinds of game, stained like a histology slide and set in an endocrine lab. <span class="tag new">new</span> The PCD Implants hub's Osseo Arcade has them too, in titanium blue, set in the implant lab at night. <span class="tag new">new</span> The Heme &amp; Endo Exam 2 hub's Cycle Arcade has the same six in aubergine and gold, set in the endocrine pathology lab after hours. <span class="tag new">new</span> The Heme &amp; Endo Exam 3 hub has the Cycle Arcade too, with Exam 2's art, set in the pathology lab the week of Exam 3, and its Lab Sort sorts each new lecture's look-alikes. The action games almost nobody played (snake, flappy, whack-a-mole and the rest) are gone, and three new quiz games came out of your survey answers. In every game built on the question bank, <b>Questions from</b> picks a lecture or <b>Questions I missed</b>, which replays only the ones you got wrong last time.</p></header>
-    <div class="tablebox"><table>
+    <div class="tablebox" data-label="Arcade games in each hub"><table>
       <thead><tr><th>Perio: Pocket Arcade</th><th>Heme &amp; Endo: Feedback Loop Arcade <span class="tag new">new</span></th><th>PCD Implants: Osseo Arcade <span class="tag new">new</span></th><th>Heme &amp; Endo 2 and 3: Cycle Arcade <span class="tag new">new</span></th><th>What it is</th></tr></thead>
       <tbody>
         <tr><td><b>Pocket Showdown</b> <span class="tag new">new</span></td><td><b>Axis Showdown</b></td><td><b>Platform Showdown</b></td><td><b>Surge Showdown</b></td><td>A Jeopardy-style board: one column per lecture, $100 (the question the class gets right most) to $500 (the toughest). Right adds the value, wrong takes it away. Two tiles hide a wager round, and a final question lets you bet it all. In Perio the tiles are teeth on a perio chart that bleed when you miss (Deep Pocket, Final Probe); in Heme &amp; Endo they are glass slides that stain purple or pink (Hormone Surge, Final Feedback); in PCD Implants they are healing abutments (Torque Check, Final Torque); in Heme &amp; Endo Exam 2 they are capped sample tubes in a rack (LH Surge, Final Surge).</td></tr>
@@ -265,7 +266,7 @@ td .spoil-ph{font-style:italic}
 
   <section id="seasons">
     <header><div class="eyebrow">Part 8</div><h2>Holidays and seasons</h2><p>Dates are Central time and switch on by themselves. During a holiday the confetti changes, every boss wears a costume and takes a seasonal name, Timmy has a whole set of holiday greetings, cheers and jokes (never the same one twice in a row), his place puts out its holiday props, and the magic word works. In the fall weeks between holidays he has autumn lines too. <span class="tag new">new</span> Timmy no longer dresses himself for a holiday: he wears what you put on him, and the holiday looks are in the shop's seasonal sets. Dates shown for this school year.</p></header>
-    <div class="tablebox"><table>
+    <div class="tablebox" data-label="Holidays, their dates and words"><table>
       <thead><tr><th>When</th><th>Dates</th><th>Word</th><th>Plaque Boss (seasonal)</th></tr></thead>
       <tbody>
         <tr><td><b>Fall</b> (season)</td><td class="num">Sep 22 – Nov 30</td><td>—</td><td>—</td></tr>
@@ -282,7 +283,7 @@ td .spoil-ph{font-style:italic}
 
     <h3 style="margin-top:22px">Every boss has a seasonal version <span class="tag new">new</span></h3>
     <p>Outside a holiday the eight bosses go by their regular names. During one, each takes its seasonal name, with an opening line for the season, and dresses to match it: Strep Mummy-tans is wrapped in bandages, Tartar the Snowman gets a top hat and carrot nose, the Red-Nosed Complex grows antlers. <span class="tag new">new</span></p>
-    <div class="tablebox"><table style="min-width:1200px">
+    <div class="tablebox" data-label="Every boss's seasonal version"><table style="min-width:1200px">
       <thead><tr><th>Holiday</th><th>Plaque Boss</th><th>Tartar Titan</th><th>Biofilm Blob</th><th>Strep Mutans Swarm</th><th>Cavity Creep</th><th>Gingivitis Goblin</th><th>Halitosis Haze</th><th>The Red Complex</th></tr></thead>
       <tbody><tr><td><b>Halloween</b></td><td>Count Plaqula</td><td>Tartar-stein</td><td>The Biofilm Ghoul</td><td>Strep Mummy-tans</td><td>The Crypt Cavity</td><td>The Gingi-witch</td><td>The Halitosis Haunt</td><td>The Red Complex Coven</td></tr><tr><td><b>Thanksgiving</b></td><td>Pilgrim Plaque</td><td>Tartar Turkey</td><td>Gravy Biofilm</td><td>The Stuffing Swarm</td><td>Cranberry Cavity</td><td>The Gingi-gobbler</td><td>Green Bean Halitosis</td><td>The Red Complex Cornucopia</td></tr><tr><td><b>Christmas</b></td><td>Plaque Claus</td><td>Tartar the Snowman</td><td>Biofilm Frost</td><td>The Mutans Elves</td><td>Candy Cane Cavity</td><td>The Grinch-ivitis</td><td>The Halitosis Blizzard</td><td>The Red-Nosed Complex</td></tr><tr><td><b>New Year</b></td><td>Party Plaque</td><td>Auld Lang Tartar</td><td>Bubbly Biofilm</td><td>The Confetti Swarm</td><td>Midnight Cavity</td><td>Gingivitis Hangover</td><td>New Year's Halitosis</td><td>The Red Complex Ball Drop</td></tr><tr><td><b>Valentine's Day</b></td><td>Plaque-entine</td><td>Tartar Sweetheart</td><td>Biofilm, Be Mine</td><td>The Mutans Cupids</td><td>Candy Heart Cavity</td><td>Gingi-love-itis</td><td>The Halitosis Kiss</td><td>The Red Rose Complex</td></tr><tr><td><b>Dentist's Day</b></td><td>Plaque Boss (very nervous)</td><td>Tartar Titan (dreading the scaler)</td><td>Biofilm Blob (hiding from the floss)</td><td>Strep Mutans Swarm (out of sugar)</td><td>Cavity Creep (hears the drill)</td><td>Gingivitis Goblin (bleeding nervously)</td><td>Halitosis Haze (mouthwash panic)</td><td>The Red Complex (on probation)</td></tr><tr><td><b>St. Patrick's</b></td><td>Plaquerechaun</td><td>Tartar o' Gold</td><td>Shamrock Biofilm</td><td>The Clover Swarm</td><td>Cavity at the End of the Rainbow</td><td>Gingi-green-itis</td><td>Halitosis O'Haze</td><td>The Green Complex (in disguise)</td></tr><tr><td><b>Easter</b></td><td>Plaque Bunny</td><td>Tartar Egg</td><td>Biofilm Basket</td><td>The Mutans Peeps</td><td>Chocolate Bunny Cavity</td><td>Gingivitis Hare</td><td>Jellybean Halitosis</td><td>The Red Complex Egg Hunt</td></tr></tbody>
     </table></div>
@@ -290,7 +291,7 @@ td .spoil-ph{font-style:italic}
 
   <section id="trophies">
     <header><div class="eyebrow">Part 9</div><h2>All 27 trophies</h2><p>"Have it" is the share of everyone who has answered at least one question<span id="pctAsOf">, as of Oct 2</span>. It updates live here and in the trophy case.</p></header>
-    <div class="tablebox"><table>
+    <div class="tablebox" data-label="Trophies"><table>
       <thead><tr><th>Trophy</th><th>How to earn it</th><th>Secret?</th><th>Clue while locked</th><th>Have it</th></tr></thead>
       <tbody>
         <tr data-k="answers-100"><td><b>First Hundred</b></td><td>Answer 100 questions</td><td>No</td><td></td><td class="num" data-pct>61%</td></tr>
@@ -324,7 +325,7 @@ td .spoil-ph{font-style:italic}
     </table></div>
     <h3 id="hub-trophies" style="margin-top:22px">Hub trophies: 8 in every hub</h3>
     <p>Each hub has its own set, on its own shelf in the trophy case. Final Blow is also in the list above (earned in any hub). <b>Full Arch</b> (fill a 32-tooth chart) was retired with the redesign: the chart is gone, and anyone who won it keeps it on a "Retired" shelf in their case.</p>
-    <div class="tablebox"><table>
+    <div class="tablebox" data-label="Hub trophies"><table>
       <thead><tr><th>Trophy</th><th>How to earn it, in that hub</th><th>Secret?</th></tr></thead>
       <tbody>
         <tr><td><b>Bronze Mastery</b></td><td>50% of the hub's questions right on your latest try</td><td>No</td></tr>
@@ -350,6 +351,19 @@ td .spoil-ph{font-style:italic}
     root.classList.toggle("hide-spoilers", !box.checked);
     try { localStorage.setItem("sh_about_spoilers", box.checked ? "1" : "0"); } catch (e) {}
   });
+  /* a table wider than its box scrolls sideways (the seasonal bosses' on a laptop, most of them on a phone): while it does,
+     it is a named region you can Tab to and scroll with the arrow keys; one that fits stays out of the Tab order */
+  var boxes = document.querySelectorAll(".tablebox[data-label]");
+  function region(b, on){
+    if (on) { b.tabIndex = 0; b.setAttribute("role", "region"); b.setAttribute("aria-label", b.getAttribute("data-label")); }
+    else { b.removeAttribute("tabindex"); b.removeAttribute("role"); b.removeAttribute("aria-label"); }
+  }
+  function fit(b){ var on = b.scrollWidth > b.clientWidth + 1; if (on !== b.hasAttribute("tabindex")) region(b, on); }
+  if (window.ResizeObserver) {
+    /* the box changes with the window, the table with the fonts and the spoilers */
+    var ro = new ResizeObserver(function(es){ es.forEach(function(e){ fit(e.target.closest(".tablebox")); }); });
+    boxes.forEach(function(b){ ro.observe(b); if (b.firstElementChild) ro.observe(b.firstElementChild); });
+  } else boxes.forEach(function(b){ region(b, true); });
   /* live trophy unlock rates (get_trophy_stats, migration_v32); the numbers in the page are the fallback */
   var SB_URL = "https://thytmzsgymydbzcqdnix.supabase.co", SB_KEY = "sb_publishable_6s_2KEdBVkEfEZH3qn8ouw_w7b8WcMS";
   fetch(SB_URL + "/rest/v1/rpc/get_trophy_stats", { method: "POST", headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }, body: "{}" })
