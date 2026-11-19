@@ -1574,11 +1574,20 @@
     if (bal == null) { el.hidden = true; return; }
     var dot = ls("sh_shop_dot") === ctDay(), had = el.contains(document.activeElement);
     el.innerHTML = '<p class="dx-coinnum"><svg viewBox="0 0 24 24" width="22" height="22" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + SHOP_COIN + '</svg><span class="dx-cointx"><b class="num">' + num(bal) + "</b><span>Shiny Gold Crowns</span></span></p>" +
-      '<button type="button" class="btn dx-shopbtn" data-dash="shop">Timmy’s shop' + (dot ? '<i class="dx-dot dx-shopdot" aria-hidden="true"></i><span class="sr"> (a rare costume came in)</span>' : "") + "</button>";
+      '<span class="dx-walletbtns"><button type="button" class="btn dx-collbtn" data-dash="collections">Collections</button>' +
+      '<button type="button" class="btn dx-shopbtn" data-dash="shop">Timmy’s shop' + (dot ? '<i class="dx-dot dx-shopdot" aria-hidden="true"></i><span class="sr"> (a rare costume came in)</span>' : "") + "</button></span>";
     el.hidden = false;
     var btn = q(".dx-shopbtn", el); btn.addEventListener("click", openShop);
+    q(".dx-collbtn", el).addEventListener("click", openCollections);
     /* a purchase redraws the row while the shop is open: the shop hands focus back to this button when it closes */
     if (had || SHOP.open) btn.focus({ preventScroll: true });
+  }
+  /* Collections (migration_v75): every holiday set, year-round collection and rare costume with what you have of each,
+     drawn by Timmy's place (widget/place.js) over itself; closing it comes back here */
+  function openCollections(){
+    var back = function(){ var b = q(".dx-collbtn"); if (b) b.focus({ preventScroll: true }); };
+    placeLoad().then(function(){ if (!window.shPlace) throw new Error("no place"); window.shPlace.open({ collections: true, onClose: back }); })
+      .then(null, function(){ toast("Your collections didn't open. Try again in a moment."); });
   }
   function openShop(){
     loadScriptOnce(WIDGET + "shop.js").then(function(){

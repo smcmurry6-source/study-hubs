@@ -22,3 +22,4 @@
 # migration_v72 (the answer save a quarter as costly: sh_wallet, sh_medal_check, sh_answer) was applied on 2026-11-18 (through the connector, md5-checked).
 # migration_v73 (the answer catch-up after the evening outage: restore_outage_v2, the 'restore' award) was applied on 2026-11-18 (through the connector, md5-checked; the constraint validated in its own step).
 # migration_v74 (raw pings kept 3 days, the retention job nightly) was applied on 2026-11-18 (through the connector, md5-checked).
+migration_v75.sql

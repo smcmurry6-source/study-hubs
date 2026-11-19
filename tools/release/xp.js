@@ -1429,6 +1429,63 @@ try {
     }
   }
 
+  /* ---------- 14d. collections (migration_v75; Sam, 2026-11-19: "completing a collection gives 1000 xp and 1000 crowns as a
+     bonus"): each season's set, each year-round collection and the rare costumes; a finished one pays 1,000 XP and 1,000
+     crowns once; one whose every piece is a gift (Halloween 2026's) pays nothing ---------- */
+  if (one(`select to_regprocedure('claim_collections_v2(text)') is not null`) === 't') {
+    // the catalog's collection column is exactly allCollectionItems() of sets.mjs
+    const wantC = Object.fromEntries(SETS.coll.map(i => [i.id, i.collection]));
+    const gotC = Object.fromEntries(rows(`select id, collection from shop_items where collection is not null`).map(r => [r.id, r.collection]));
+    const cDiff = [...new Set([...Object.keys(wantC), ...Object.keys(gotC)])].filter(id => wantC[id] !== gotC[id]);
+    ok(cDiff.length === 0 && Object.keys(gotC).length === 48, `shop_items.collection is exactly allCollectionItems() of sets.mjs (${Object.keys(gotC).length} rows; ${cDiff.length} differ${cDiff.length ? ': ' + cDiff.slice(0, 5).join(', ') : ''})`);
+    raises(() => sql(`update shop_items set collection = 'dino' where id = 'pirate'`), '23514', 'a costume can\'t also be in a year-round collection');
+    raises(() => sql(`update shop_items set collection = 'dino' where id = 'haunted-manor'`), '23514', 'a season\'s piece can\'t also be in a year-round collection');
+    const C = v => anonJson(`get_my_collections(${q(v)})`), claim = v => anonJson(`claim_collections_v2(${q(v)})`);
+    const of = (r, k) => (r.collections || []).find(c => c.k === k) || {};
+    const c0 = C('xp-CL');
+    eq([c0.ok, c0.pays, c0.collections.length], [true, 1000, SETS.seasons.length + SETS.colls.length + 1], 'every collection: the fourteen seasons\' sets, the six year-round collections and the rare costumes');
+    eq(c0.collections.map(c => c.kind).filter((x, i, a) => a.indexOf(x) === i), ['season', 'collection', 'costumes'], 'the seasons first, then the year-round collections, then the costumes');
+    eq([of(c0, 'costumes').n, of(c0, 'dino').n, of(c0, 'thanksgiving').n], [10, 8, 8], 'the costumes are ten, a set or a collection eight');
+    eq([of(c0, 'halloween').have, of(c0, 'halloween').done, of(c0, 'halloween').pays], [8, true, false], 'Halloween 2026\'s set: everyone\'s, complete, and it pays nothing');
+    ok(c0.collections.every(c => c.k === 'halloween' || (c.pays && c.have === 0 && !c.done && !c.paid)), 'a new visitor has nothing else, and every other collection pays');
+    // seven of Dino valley's eight: nothing yet; the eighth: 1,000 XP and 1,000 crowns, once
+    const dino = SETS.coll.filter(i => i.collection === 'dino').map(i => i.id);
+    sql(`insert into pet_inventory (visitor_id, item_id) values ${dino.slice(0, 7).map(id => `('xp-CL', ${q(id)})`).join(', ')}`);
+    eq([of(C('xp-CL'), 'dino').have, of(C('xp-CL'), 'dino').done], [7, false], 'seven of eight');
+    const x0 = xpOf('xp-CL'), cl0 = claim('xp-CL');
+    eq([cl0.ok, cl0.xp, cl0.won], [true, 0, []], 'a collection not finished pays nothing');
+    sql(`insert into pet_inventory (visitor_id, item_id) values ('xp-CL', ${q(dino[7])})`);
+    eq([of(C('xp-CL'), 'dino').done, of(C('xp-CL'), 'dino').paid], [true, false], 'the eighth piece: finished, not paid yet');
+    const w0 = json(`sh_wallet('xp-CL')`), cl1 = claim('xp-CL'), w1 = json(`sh_wallet('xp-CL')`);
+    eq([cl1.xp, cl1.won, cl1.src, of(cl1, 'dino').paid], [1000, ['dino'], 'collection', true], 'claiming it: 1,000 XP, and the list says it\'s paid');
+    eq([xpOf('xp-CL') - x0, w1.balance - w0.balance - 20 * (w1.rankups - w0.rankups), w1.prizes - w0.prizes, cl1.crowns], [1000, 1000, 1000, w1.balance], '1,000 XP and 1,000 crowns (and a rank-up\'s 20 if the XP reaches one), and the reply carries the balance');
+    eq(json(`get_rank_profile_v2('xp-CL')`).xp, xpOf('xp-CL'), 'the XP counts for the rank');
+    eq([claim('xp-CL').xp, xpOf('xp-CL') - x0], [0, 1000], 'claiming again pays nothing');
+    eq(num(`select count(*) from xp_awards where visitor_id = 'xp-CL' and key = 'collection:dino' and src = 'collection' and base = 1000 and xp = 1000`), 1, 'one prize row, never boosted');
+    // the rare costumes: all ten, bought, is a collection too; two finished at once pay twice in one call
+    const costumes = SETS.costumes.map(c => c.id), reef = SETS.coll.filter(i => i.collection === 'reef').map(i => i.id);
+    sql(`insert into pet_inventory (visitor_id, item_id) values ${costumes.concat(reef).map(id => `('xp-CL', ${q(id)})`).join(', ')}`);
+    const cl2 = claim('xp-CL');
+    eq([cl2.xp, cl2.won.slice().sort()], [2000, ['costumes', 'reef']], 'two finished at once: both paid in one call');
+    // a season's set: the eight pieces bought (Thanksgiving's)
+    const tg = SETS.items.filter(i => i.season === 'thanksgiving').map(i => i.id);
+    sql(`insert into pet_inventory (visitor_id, item_id) values ${tg.map(id => `('xp-CL', ${q(id)})`).join(', ')}`);
+    eq(claim('xp-CL').won, ['thanksgiving'], 'a season\'s set, finished, pays');
+    eq(num(`select count(*) from xp_awards where visitor_id = 'xp-CL' and src = 'collection'`), 4, 'four collections paid: never Halloween\'s gift');
+    // the rebuild keeps them; Link my devices pays a collection once
+    const kx = xpOf('xp-CL'); sql(`select sh_xp_rebuild(array['xp-CL'])`); eq(xpOf('xp-CL'), kx, 'the rebuild keeps the collection prizes');
+    sql(`insert into pet_inventory (visitor_id, item_id) values ${dino.map(id => `('xp-CL2', ${q(id)})`).join(', ')}`);
+    eq(claim('xp-CL2').xp, 1000, 'another device finishes Dino valley too, and is paid');
+    const lc = anon(`select create_link_code('xp-CL')`)[0][0];
+    eq(anon(`select redeem_link_code(${q(lc)}, 'xp-CL2')`)[0][0], 'xp-CL', 'the two devices link');
+    eq([xpOf('xp-CL'), num(`select count(*) from xp_awards where visitor_id = 'xp-CL' and key = 'collection:dino'`), claim('xp-CL').xp], [kx, 1, 0], 'linked: Dino valley is paid once');
+    // refusals and privileges
+    eq([C('').error, claim('x'.repeat(81)).error], ['bad', 'bad'], 'a bad visitor id is refused');
+    for (const f of [`sh_collections('xp-CL')`, `sh_collections_json('xp-CL')`]) raises(() => anon(`select ${f}`), '42501', `anon runs ${f.split('(')[0]}`);
+    ok(!/xp-/.test(JSON.stringify(C('xp-CL'))) && !/xp-/.test(JSON.stringify(claim('xp-CL'))), 'neither reply carries a visitor id');
+    notes.push('collections (migration_v75): 21 (14 sets, 6 year-round, the costumes), a finished one 1,000 XP and crowns once, Halloween\'s gift never, two at once, the rebuild and Link my devices');
+  }
+
   /* ---------- 15. the private parts stay private ---------- */
   for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);

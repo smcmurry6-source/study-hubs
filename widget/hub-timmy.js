@@ -54,8 +54,12 @@
           var draw = function(d){
             if (!body.isConnected) return;
             P.setup({ sb: sb, visitor: ls("sh_visitor_id"), shop: d && d.shop, profile: HX.RANK.p });
-            body.innerHTML = '<div class="place-card"></div><p class="note">Tap the picture to step in. Timmy hops over to what you tap, and his health shows in how he moves.</p>';
+            body.innerHTML = '<div class="place-card"></div><p class="note">Tap the picture to step in. Timmy hops over to what you tap, and his health shows in how he moves.</p>' +
+              (d && d.shop ? '<p><button type="button" class="btn" data-place-coll>Your collections</button></p>' : "");
             P.card(body.firstChild, { onFail: shut });
+            /* Collections (migration_v75): the place opens on it, and closing it comes back here */
+            var cb = body.querySelector("[data-place-coll]");
+            if (cb) cb.addEventListener("click", function(){ P.open({ collections: true, onClose: function(){ if (cb.isConnected) cb.focus(); } }); });
           };
           if (boot && boot.ready && boot.ready.then) boot.ready.then(draw, function(){ draw(null); }); else draw(boot && boot.data);
         };

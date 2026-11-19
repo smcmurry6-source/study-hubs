@@ -459,7 +459,9 @@
     if (it.kind === "snack") line = "Timmy ate it. +" + (R.hp || it.hp || 0) + " HP.";
     else if (it.kind === "boost") line = "Double XP is on" + (R.boost_until ? " until " + new Date(R.boost_until).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "") + ".";
     else line = "It’s yours! It stays in your things at Timmy’s place for good.";
+    var won = SH.won && SH.won.length ? SH.won : null;
     return '<p class="tsh-iown is-new" role="status">' + IC.check + esc(line) + "</p>" +
+      (won ? '<p class="tsh-icoll" role="status"><b>' + esc(won.join(" and ")) + (won.length > 1 ? " collections" : "") + " finished!</b> Bonus: +" + num(SH.wonXp) + " XP and " + num(SH.wonXp) + " crowns</p>" : "") +
       '<p class="tsh-ihave">You have ' + num(balance()) + " gold crowns left.</p>" +
       (placeable(it) ? placeBtn(it) : '<div class="tsh-iacts"><button type="button" class="tsh-buy" data-shop="back">Back to the shop</button></div>');
   }
@@ -514,11 +516,27 @@
       read().then(function(){
         if (W.shPlace) { W.shPlace.setup({ sb: S.sb, visitor: S.visitor, shop: S.shop }); W.shPlace.repaint(); }
         redraw();
+        /* after the read, so the balance the bonus leaves is the last word */
+        if (!consumable(it) && !d.repeat && inColl(it)) collCheck(s);
       });
       if (it.kind === "snack") heal(it, d);
       if (S.onBought) try { S.onBought(d, { id: it.id, kind: it.kind }); } catch (e) {}
     };
     fx(s, rarityOf(it), after);
+  }
+  /* a piece of a collection (a season's set, a year-round collection, a rare costume) may finish it: the place asks the
+     server, which pays 1,000 XP and 1,000 crowns once (migration_v75), and the sheet says so */
+  function inColl(it){ var k = TP && TP.setOf ? TP.setOf(it.id) : ""; return it.kind === "costume" || !!it.season || (!!k && k !== "rank"); }
+  function collCheck(s){
+    var P = W.shPlace; if (!P || !P.claimCollections) return;
+    P.claimCollections({ sb: S.sb, visitor: S.visitor }).then(function(d){
+      if (!d || !(d.xp > 0) || !Array.isArray(d.won) || !d.won.length) return;
+      s.won = d.won.map(function(k){ return (P.collName && P.collName(k)) || k; }); s.wonXp = d.xp;
+      if (typeof d.crowns === "number" && S.shop && S.shop.wallet) S.shop.wallet.balance = d.crowns;
+      track("shop:collection");
+      if (SH === s) drawSheet();
+      redraw();
+    });
   }
   var EAT = { apple: "Crunch! An apple a day.", "cheese-cube": "Cheese! Good for my enamel.", floss: "Ahh, between every contact.", "fluoride-rinse": "Swish, don’t swallow. I feel stronger already." };
   function heal(it, d){
