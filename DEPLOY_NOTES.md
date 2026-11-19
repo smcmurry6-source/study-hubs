@@ -43,6 +43,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   the first day of #403's rates: 630 crowns an hour, 13% of crowns spent), the later check-ins in the Occlusion and Heme & Endo
   Exam 2 retrospectives, a reports lesson on exception items. Every query under the 5 s limit; `sh_data_quality()` stopped there,
   so it and `qh_report` weren't read (`tools/lessons-refresh.md` step 1, the database-load task, the inbox).
+- **2026-11-19 (Heme & Endo Exam 3: Dr. Herr's study guide in Notes, Claude Code)** — Sam: "under notes, make a section for dr
+  herrs study guide. have each item as a heading and have [high] yield explainer of everything we need to know about that topic.
+  since it skips dr taylors lecture, dont include it". A **study guide page** at `#notes/guide`, first in the notes' lecture list,
+  for any hub whose `content/study.json` has a `guide` (one entry per lecture: the guide's items as headings with their
+  explainers, then its key terms), with jump buttons per lecture, Listen (the device's voice), Report, the highlighter, and each
+  lecture's notes and High likelihood questions at the end of its part. It is drawn by `widget/guide.js` + `widget/guide.css`,
+  which `widget/hub.js` fetches the first time Notes opens on a hub with a guide (Sam: "the study guide is only for this
+  particular heme test. why is it at the 805 limit": in the shared bundle it had put Occlusion 1 KB over its 800 KB budget; now
+  the bundle carries only the loader, about 0.4 KB, and no budget changed; both are precached, `sw.js` sh-v63). Search finds it
+  under its own "Study guide" group (`widget/v3.js` `SEARCH_GROUPS`), and Ask Timmy's place is none while it's open
+  (`widget/hub-timmy.js`). Exam 3's: 31 items and 35 key terms for L17 to L22, written from the hub's notes and keys; no
+  Lecture A. About page entry; bundles and Ask Timmy's site help rebuilt.
 - **2026-11-19 (Heme & Endo Exam 3: Timmy Time, Claude Code)** — Sam (11-18): "after you finish, start a new session for
   timmy time". A 52-minute episode (`exam3-review`, 14 chapters): Dr. Taylor's Lecture A, then L17-L22 in order, each of
   L17-L22 opening on Dr. Herr's study guide list word for word, the professors' hints quoted, the "you don't need" remarks,

@@ -4976,7 +4976,7 @@ wrap.innerHTML = '<div class="shstat-hist">' + bars + '</div><div class="shstat-
 }
 var searchInput = document.getElementById("shstat-search-input");
 var searchResults = document.getElementById("shstat-search-results");
-var SEARCH_GROUPS = ["Notes", "Review", "Exam hints", "Cram sheet", "Questions"];
+var SEARCH_GROUPS = ["Study guide", "Notes", "Review", "Exam hints", "Cram sheet", "Questions"];
 var searchHits = [];
 function reEsc(w){ return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 function snippet(text, terms){
