@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-19 (the database optimization pass, phase 2: the answer save and its tables, Claude Code, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453))** —
+- **2026-11-19 (the database optimization pass, phase 2: the answer save and its tables, Claude Code, [#457](https://github.com/smcmurry6-source/study-hubs/pull/457))** —
   three migrations, written and tested, **not applied yet** (Sam: nothing live before Heme & Endo Exam 3, the rewrites at night;
   set for Sat 11-21, 1:30 am Central, and listed in `supabase/pending-migrations.txt` until then). `migration_v79.sql`:
   `xp_award_totals`, each student's awards summed by kind, kept by statement-level triggers on `xp_awards`, so the crown

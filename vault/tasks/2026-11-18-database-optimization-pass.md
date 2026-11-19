@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/444, https://github.com/smcmurry6-source/study-hubs/pull/453
+pr: https://github.com/smcmurry6-source/study-hubs/pull/444, https://github.com/smcmurry6-source/study-hubs/pull/457
 ---
 
 # The database optimization pass: the same site for less of the Free plan's CPU
@@ -176,7 +176,7 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
 - [ ] **The rank and mastery after every tenth answer** (`widget/ranks.js`): on the game layer the answer's reply
   already carries the XP total; the page could work out the hub's mastery from the answers it holds.
 - [ ] **Phase 2 applied live, at night after Heme & Endo Exam 3** (set for Sat 2026-11-21, 1:30 am Central, by the session of
-  [#453](https://github.com/smcmurry6-source/study-hubs/pull/453)). First fetch `main`: if another migration took 79-81,
+  [#457](https://github.com/smcmurry6-source/study-hubs/pull/457)). First fetch `main`: if another migration took 79-81,
   renumber; a newer `sh_answer` than `migration_v78.sql`'s (applied 2026-11-19, which v80 is built on) means v80 is rebuilt on
   it (the same two changes, marked "v80") and tested again. Then one call at a time, nothing in parallel: `migration_v79.sql` (apply_migration) and the check at its end (no rows); v80;
   `drop index concurrently if exists public.activity_visits_last_idx;` alone; `cluster public.activity_visits using
@@ -211,7 +211,7 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
     way, 113 ms the new (both with the pages in memory; the first read after a quiet night was slower, as the old one
     was). Nobody was answering at that hour (a few pings every five minutes), so the saves themselves are the next
     evening's readout (the open box).
-- 2026-11-19, morning (Claude Code, phase 2, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453)): Sam: "Apply
+- 2026-11-19, morning (Claude Code, phase 2, [#457](https://github.com/smcmurry6-source/study-hubs/pull/457)): Sam: "Apply
   nothing live before Heme & Endo Exam 3 is over (Fri Nov 20, 9:30 am); the backfill and the table rewrite at night (1 to 5
   am Central), one statement at a time." Read live only the catalog (the sizes in phase 2's table) and the edge logs (8:00 to
   9:30 am Central, Perio's final day: 2,045 answer saves, 8 failed, a median of 133 ms and a 95th percentile of 1,168 ms;
