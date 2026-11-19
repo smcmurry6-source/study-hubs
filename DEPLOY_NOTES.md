@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-19 (the database optimization pass, phase 2: fewer calls from the page, Claude Code)** — nothing students see
+- **2026-11-19 (the database optimization pass, phase 2: fewer calls from the page, Claude Code, [#459](https://github.com/smcmurry6-source/study-hubs/pull/459))** — nothing students see
   or earn changes; the pages make fewer requests and the bootstrap does less. `migration_v79.sql` (**pending: apply at
   night after Fri 2026-11-20, 9:30 am**, `supabase/pending-migrations.txt`): `get_class_numbers` (a card's class numbers,
   `question_stats` and `question_choices`, in one call instead of two REST reads: they were a fifth of every request),

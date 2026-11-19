@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/444
+pr: https://github.com/smcmurry6-source/study-hubs/pull/459
 ---
 
 # The database optimization pass: the same site for less of the Free plan's CPU
@@ -199,7 +199,7 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
     was). Nobody was answering at that hour (a few pings every five minutes), so the saves themselves are the next
     evening's readout (the open box).
 
-- 2026-11-19, phase 2, fewer calls from the page (Claude Code, Sam's package): `migration_v79.sql` with `widget/v3.js`,
+- 2026-11-19, phase 2, fewer calls from the page (Claude Code, Sam's package, [#459](https://github.com/smcmurry6-source/study-hubs/pull/459)): `migration_v79.sql` with `widget/v3.js`,
   `widget/qhealth.js`, `widget/clicks.js`, `widget/ranks.js` (and the trophy signal in `widget/eggs.js`, `widget/pet.js`).
   Measured on a new throwaway copy of `supabase/schema.sql` with a made-up class (2,123 visitors, 2,246 visitor-hub
   answer histories), the medians of many calls: the numbers in the four boxes above. Checked identical, old against new,
@@ -207,7 +207,8 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
   bootstrap for 508 visitor and hub pairs, the class's numbers against the two reads, the analytics rows from one call
   against three, and the stored shop cleared by a change to `shop_items`; the expression index keeps the name's updates
   on their page (300 of 300). `tools/release/xp.js` (627 checks), `rls.js`, `admin-ops.js`, `retention.js` and `timmy.js`
-  pass with v79 pending; `tools/ci/quiet.js` checks the page side. Not applied live: the box above.
+  pass with v79 pending; `tools/ci/quiet.js` checks the page side. Not applied live: the box above
+  ([#459](https://github.com/smcmurry6-source/study-hubs/pull/459); phase 1 was #444).
 
 ## Outcome
 
