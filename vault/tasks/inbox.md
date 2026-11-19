@@ -10,10 +10,23 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
-- [ ] **The rank pill while the bootstrap times out** (2026-11-18, found with BUG-183, #427). `widget/ranks.js` asks
+- [x] **The rank pill while the bootstrap times out** (done: it drew the wrong thing, no double-XP chip and from 50,000 XP the
+  wrong rank or journey; `widget/ranks.js` asks the v2 profile when `shGame.live()`,
+  [#435](https://github.com/smcmurry6-source/study-hubs/pull/435)) (2026-11-18, found with BUG-183, #427). `widget/ranks.js` asks
   `get_rank_profile_v2` only when `shGame.v2()` is true, so on a page whose bootstrap timed out in a busy minute it reads the
   old `get_rank_profile` until the first answer's reply. Check whether that draws the wrong rank or journey, and if so ask
   `shGame.live()` there too, as `widget/hub-rewards.js` and `widget/games.js` do since #427.
+- [ ] **The other `shGame.v2()` checks while the bootstrap times out** (2026-11-19, found with the rank pill's fix). Three more
+  places wait for `v2()` (true only once the bootstrap or an answer's reply came back) where `shGame.live()` would do: Timmy
+  Time's minutes (`minOn()` in `widget/podcast.js`: an episode heard then pays nothing for those minutes), Timmy's HP days
+  (`loadRemote()` in `widget/pet.js` reads `get_pet_days` without the snacks' HP) and the Inbox (`widget/replies.js` reads
+  `get_my_inbox` without the idea board's notes; its `v2` comes from the page). Check each the way #427 and the rank pill did.
+- [ ] **A mock's or a game's answers that fail both quick tries are lost** (2026-11-19, found while keeping the line's answers
+  on the device). `answerV2` in `widget/v3.js` sends an answer with a session at once and tries twice more (4 and 10 s), and
+  `finishSession` waits for them, so in a busy minute a mock's answers can miss the server: its score, its +50 (10 answers
+  needed) and their XP. Not kept on the device like the rest, because the session is finished on the page. Perhaps: keep
+  them like the line's and finish the session from the next page (a session takes answers for 6 hours, and 10 minutes after
+  it's finished), or hold the finish until the line is clear.
 - [ ] **The reward card on the dashboard too** (2026-11-18, from the hubs' reward card: Sam, "i want it to look much cooler and
   communicate that you just got xp and crowns better"). A hub shows what a bonus paid on a gold card (`drawPrize` in
   `widget/hub-rewards.js`, its styles inside it); the dashboard's prizes (the daily visit, the leaderboard name, trophies:

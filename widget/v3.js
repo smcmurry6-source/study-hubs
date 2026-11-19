@@ -1781,36 +1781,12 @@
       p_v: (window.shQH && window.shQH.version && window.shQH.version(qid)) || null,
       p_ctx: d.ctx || null, p_request: gameId(), p_session: d.session || null, p_claim: isCorrect
     };
-    function paid(r){
-      if (r.boost !== undefined) GAME.boost = r.boost || null;
-      if (!r.repeat) setCrowns(r.crowns);   /* the balance after this answer (migration_v68) */
-      try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: qid, ctx: d.ctx || "", session: d.session || null, res: r } })); } catch (e) {}
-    }
-    /* one try; true when the server failed it and it should go again (the same id, which can't record or pay twice) */
-    function send(){
-      var call;
-      try { call = supabase.rpc("record_answer_v2", args); } catch (e) { return Promise.resolve(false); }
-      return call.then(function(res){
-        if (rpcMissing(res)) { GAME.on = false; answerToday(d, isCorrect); return false; }
-        if (res && res.error) {
-          if (dbFailed(res)) { dbFail(); return true; }
-          return false;
-        }
-        dbOk();
-        var r = res && res.data;
-        if (!r || typeof r !== "object") return false;
-        if (r.ok === false) { if (r.error === "bad") answerToday(d, isCorrect); return false; }
-        GAME.on = true;
-        paid(r);
-        return false;
-      }, function(){ dbFail(); return true; });
-    }
     /* a mock's or a game's answers hold up its results, so they go at once and try twice, soon; its session is finished
        only once they have all arrived (finishSession) */
     if (d.session) {
-      var tries = 0, waits = [4000, 10000];
+      var tries = 0, waits = [4000, 10000], job = { args: args, d: d, c: isCorrect };
       var go = function(){
-        return send().then(function(again){
+        return sendAnswer(job).then(function(again){
           if (!again || tries >= waits.length) return;
           var ms = Math.round(waits[tries++] * (0.75 + Math.random() * 0.5));
           return new Promise(function(ok){ setTimeout(ok, ms); }).then(go);
@@ -1820,25 +1796,146 @@
       return;
     }
     /* every other answer joins the line (below) */
-    answerLine.push({ send: send, tries: 0 });
+    answerLine.push({ args: args, d: { qid: qid, ctx: d.ctx || "", choice: args.p_choice, picks: Array.isArray(d.picks) && d.picks.length ? d.picks : null },
+      c: isCorrect, at: Date.now(), tries: 0, n: 0 });
     lineNext();
+  }
+  /* what came back for an answer goes out as sh:answer-paid for the engine */
+  function answerPaid(job, r){
+    if (r.boost !== undefined) GAME.boost = r.boost || null;
+    if (!r.repeat) setCrowns(r.crowns);   /* the balance after this answer (migration_v68) */
+    try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: String(job.d.qid || ""), ctx: job.d.ctx || "", session: job.d.session || null, res: r } })); } catch (e) {}
+  }
+  /* one try of an answer ({ args, d, c }); true when the server failed it and it should go again (the same id, which
+     can't record or pay twice) */
+  function sendAnswer(job){
+    var call;
+    try { call = supabase.rpc("record_answer_v2", job.args); } catch (e) { return Promise.resolve(false); }
+    return call.then(function(res){
+      if (rpcMissing(res)) { GAME.on = false; answerToday(job.d, job.c); return false; }
+      if (res && res.error) {
+        if (dbFailed(res)) { dbFail(); return true; }
+        return false;
+      }
+      dbOk();
+      var r = res && res.data;
+      if (!r || typeof r !== "object") return false;
+      if (r.ok === false) { if (r.error === "bad") answerToday(job.d, job.c); return false; }
+      GAME.on = true;
+      answerPaid(job, r);
+      return false;
+    }, function(){ dbFail(); return true; });
   }
   /* the answers waiting to be saved, oldest first, one at a time. A failed one stays at the front and goes again when
      the quiet spell ends (safeRpc's note: 30 s, doubling to 5 minutes), up to 8 tries (about 20 minutes); the answers
      behind it wait their turn, so a struggling database gets one call at a time from this page, not one per answer.
-     (Until 2026-11-18 each answer retried on its own timer, four times in three minutes.) */
-  var answerLine = [], lineOn = false;
+     (Until 2026-11-18 each answer retried on its own timer, four times in three minutes.)
+     A backlog goes out spaced as it was answered, up to 2.1 s apart: the server stamps an answer when it arrives, and a
+     miss within 2 s of the answer before it pays nothing and doesn't count toward a run of right answers in a row
+     (sh_answer's speed limit). Answered 2 s apart or more, as nearly every answer is, it goes at once. */
+  /* lineSent: the answer on its way to the server; lineLast: the last try's { at: when it was answered, done: when it came back } */
+  var answerLine = [], lineOn = false, lineSent = null, lineLast = null;
   function lineNext(){
-    if (lineOn || !answerLine.length) return;
+    if (lineOn) return;
+    while (answerLine.length && lineTaken(answerLine[0])) answerLine.shift();
+    if (!answerLine.length) return;
     lineOn = true;
-    var wait = DB.until - Date.now();
+    var job = answerLine[0], wait = DB.until - Date.now();
+    if (lineLast) wait = Math.max(wait, Math.min(2100, job.at >= lineLast.at ? job.at - lineLast.at : 2100) - (Date.now() - lineLast.done));
     if (wait > 0) { setTimeout(function(){ lineOn = false; lineNext(); }, wait + 50); return; }
-    var job = answerLine[0];
-    job.send().then(function(again){
-      if (again && ++job.tries < 8) { /* it stays at the front */ } else answerLine.shift();
+    lineSent = job;
+    sendAnswer(job).then(function(again){
+      lineSent = null; lineLast = { at: job.at, done: Date.now() };
+      if (again) job.n++;
+      if (again && ++job.tries < 8 && !job.gone) { /* it stays at the front */ }
+      else {
+        answerLine.shift();
+        if (again && !job.gone) keepPark(job);    /* out of tries: kept on the device for the next page (below) */
+        else if (job.kept) keepDrop(job);          /* saved while kept: no page needs to send it again */
+      }
       lineOn = false; lineNext();
-    }, function(){ answerLine.shift(); lineOn = false; lineNext(); });
+    }, function(){ lineSent = null; answerLine.shift(); lineOn = false; lineNext(); });
   }
+  /* ---------- answers kept on the device (2026-11-19; vault/tasks/2026-11-18-database-load.md) ----------
+     The line lives in the page, so until now an answer still waiting in it was lost when the tab closed. Now, when the
+     page is hidden (a tab or app switched away from, the screen locked, the tab closed: the last moment a page can count
+     on), the answers still waiting are written to the device (sh_answers_kept:<hub>), and when it shows again it takes
+     back the ones still there. A page of the same hub that opens meanwhile, or later, takes them all: it sends them in
+     its own line, oldest first, with the same request ids, so an answer that did reach the server (the reply lost as the
+     tab closed) records and pays nothing new. A page that finds its answers taken drops them: the other page sends them.
+     Two pages can still send one now and then (a race of milliseconds), which the request id makes harmless. An answer
+     out of its 8 tries is kept the same way, for the next page. Kept answers wait 3 days at most and get 24 tries in all;
+     the server stamps each when it arrives (that day's goal, streak and medals; it pays as it would have). Mocks' and
+     games' answers are not kept: their session finishes on the page. Nothing is kept on a page off the game layer. */
+  var KEEP_KEY = "sh_answers_kept:" + HUB, KEEP_MS = 3 * 864e5, KEEP_TRIES = 24, KEEP_MAX = 300;
+  function keepOn(){ return !!supabase && !AUTOMATED && GAME.want && GAME.on !== false && !!HUB; }
+  function keepRead(){
+    var a = null;
+    try { a = JSON.parse(localStorage.getItem(KEEP_KEY) || "null"); } catch (e) {}
+    var cut = Date.now() - KEEP_MS;
+    return (Array.isArray(a) ? a : []).filter(function(e){
+      return e && e.a && typeof e.a === "object" && typeof e.a.p_request === "string" && e.d && typeof e.at === "number" && e.at > cut && (e.n | 0) < KEEP_TRIES;
+    });
+  }
+  function keepWrite(list){
+    try {
+      if (!list.length) localStorage.removeItem(KEEP_KEY);
+      else localStorage.setItem(KEEP_KEY, JSON.stringify(list.slice(-KEEP_MAX)));
+      return true;
+    } catch (e) { return false; }
+  }
+  function keepEntry(job){ return { a: job.args, d: job.d, c: !!job.c, at: job.at, n: job.n | 0 }; }
+  function keepIn(list, job){ return list.some(function(e){ return e.a.p_request === job.args.p_request; }); }
+  function keepOut(list, job){ return list.filter(function(e){ return e.a.p_request !== job.args.p_request; }); }
+  /* kept while this page was hidden, and taken since by another page of this hub (it sends it) */
+  function lineTaken(job){
+    if (!job.gone && job.kept && !keepIn(keepRead(), job)) job.gone = true;
+    return !!job.gone;
+  }
+  function keepDrop(job){ job.kept = false; var list = keepRead(); if (keepIn(list, job)) keepWrite(keepOut(list, job)); }
+  /* out of this page's tries: onto the device for the next page, or off it for good after 24 in all */
+  function keepPark(job){
+    if (!keepOn()) return;
+    var list = keepOut(keepRead(), job);
+    if (job.n < KEEP_TRIES) list.push(keepEntry(job));
+    keepWrite(list.sort(function(x, y){ return x.at - y.at; }));
+    job.kept = false;
+  }
+  /* the page goes out of sight: the answers still waiting, onto the device */
+  function keepLine(){
+    if (!keepOn()) return;
+    var jobs = answerLine.filter(function(j){ return !j.gone; });
+    if (!jobs.length) return;
+    var list = keptOthers(keepRead(), jobs).concat(jobs.map(keepEntry)).sort(function(x, y){ return x.at - y.at; });
+    if (keepWrite(list)) jobs.forEach(function(j){ j.kept = true; });
+  }
+  function keptOthers(list, jobs){ return list.filter(function(e){ return !jobs.some(function(j){ return j.args.p_request === e.a.p_request; }); }); }
+  /* the page is in sight (it opened, or it shows again): its own kept answers back from the device, and every other kept
+     answer of this hub into its line */
+  function keepClaim(){
+    if (!keepOn() || document.visibilityState === "hidden") return;
+    var list = keepRead(), mine = {}, add = [];
+    answerLine.forEach(function(j){ mine[j.args.p_request] = j; });
+    list.forEach(function(e){
+      var j = mine[e.a.p_request];
+      if (j) { j.kept = false; return; }
+      e.a.p_visitor = VISITOR_ID;   /* the device's id now (a linked device takes the id it was linked to) */
+      add.push({ args: e.a, d: e.d, c: !!e.c, at: e.at, tries: 0, n: e.n | 0 });
+    });
+    answerLine.forEach(function(j){ if (j.kept) { j.kept = false; j.gone = true; } });
+    if (!list.length && !add.length) return;
+    keepWrite([]);
+    if (add.length) {
+      /* older than anything answered on this page: they go first, after the one being sent */
+      answerLine.splice.apply(answerLine, [lineSent && answerLine[0] === lineSent ? 1 : 0, 0].concat(add.sort(function(x, y){ return x.at - y.at; })));
+    }
+    lineNext();
+  }
+  document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") keepLine(); else keepClaim(); });
+  window.addEventListener("pagehide", keepLine);
+  window.addEventListener("pageshow", function(e){ if (e && e.persisted) keepClaim(); });
+  /* a new page: once its bootstrap has answered (or not), it sends what an earlier page kept */
+  if (supabase && !AUTOMATED && GAME.want && HUB) bootstrap.ready.then(function(){ setTimeout(keepClaim, 2500); }, function(){ setTimeout(keepClaim, 2500); });
   /* the bowling egg's secret trophy: widget/bowling.js keeps it on the device that saw all eight clips (sh_bowl_trophy);
      the server takes the kind since migration_v63, so it is sent once, when it is won or at the next page load (the
      trophy then pays its 25 crowns and counts in the class's share). sh_bowl_trophy_sent marks it sent. */
@@ -3230,6 +3327,9 @@
   window.shEggHooks = {
     hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase, bootstrap: bootstrap.ready,
     v2: function(){ return GAME.on === true; },
+    /* the game layer is wanted and hasn't been found missing (shGame.live): true before the page knows, as when its
+       bootstrap timed out in a busy minute */
+    live: function(){ return GAME.want && GAME.on !== false; },
     send: function(payload){ try { if (channel) channel.send({ type: "broadcast", event: "egg", payload: payload }); } catch (e) {} },
     name: displayName, section: currentSection, online: function(){ return onlineCount; },
     toast: showStreakToast, confetti: fireConfetti, prefGet: prefGet, prefSet: prefSet, esc: esc,

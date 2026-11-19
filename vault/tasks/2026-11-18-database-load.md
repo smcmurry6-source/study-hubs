@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430, https://github.com/smcmurry6-source/study-hubs/pull/434
+pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430, https://github.com/smcmurry6-source/study-hubs/pull/434, https://github.com/smcmurry6-source/study-hubs/pull/435
 ---
 
 # Keep heavy queries from failing students' answer saves
@@ -77,8 +77,15 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   question health keep their batches, mode opens, presence and searches are skipped, cards skip the class's numbers.
   Mocks and games keep their two quick tries. `tools/ci/quiet.js` (CI, the desktop smoke half) fails the first save on
   a fake database and checks it all.
-- [ ] A failed answer that's still unsent when the page closes is kept on the device and sent at the next load (today the
-  retries stop when the tab closes).
+- [x] A failed answer that's still unsent when the page closes is kept on the device and sent at the next load (today the
+  retries stop when the tab closes). **Done** (`widget/v3.js`, "answers kept on the device"): when the page is hidden (a
+  tab or app switched away from, the screen locked, the tab closed), the answers still in its line are written to the device
+  (`sh_answers_kept:<hub>`); shown again, it takes back the ones still there. The hub's next page (or another open one, when
+  it opens or shows) takes them all and sends them first in its own line, with the same request ids, so one that did reach
+  the server pays nothing new; a page that finds its answers taken drops them. An answer out of its 8 tries is kept the same
+  way. At most 3 days old and 24 tries in all; the server stamps each when it arrives. A backlog now goes out spaced as it
+  was answered, up to 2.1 s apart (a miss within 2 s of the answer before paid nothing and broke no run, the speed limit).
+  Mocks' and games' answers aren't kept (their session finishes on the page: the inbox). `tools/ci/quiet.js` checks it.
 - [x] **The answer save's own cost** (`migration_v72.sql`): every answer worked out the whole crown balance (`sh_wallet`,
   summing the person's awards with `sh_is_prize` called once an award) and the hub's medal count (`sh_medal_check`, every
   answer the person ever gave in the hub), on every answer. On a throwaway copy with a made-up student of 8,000 answers:
@@ -182,5 +189,11 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   `presence_hourly` and two probes of the connector's time limit (a `pg_sleep`, which uses no CPU); everything else on a
   throwaway copy. For the first box, the admin page's reads that the audit also calls, on that copy: `qh_report('perio')`
   3.3-3.5 s (the slowest call of an audit), `sh_data_quality()`, `sh_insights` and `sh_insight_retries` about 0.7 s each.
+- 2026-11-19 ([#435](https://github.com/smcmurry6-source/study-hubs/pull/435)): the box "A failed answer that's still unsent" done (`widget/v3.js`, answers kept on the device; a backlog
+  spaced as it was answered), with the rank pill while the bootstrap times out (`widget/ranks.js` asks the game layer's
+  profile when `shGame.live()`, the inbox line). `tools/ci/quiet.js` gained a run: a page whose saves fail is hidden, shown,
+  hidden again, and a second page on a working database sends its two answers with the same ids, 2.5 s apart; the first
+  page, shown again, sends nothing more. Nobody was past 50,000 XP (165 on the ladder), so the wrong rank had shown no one
+  yet; the missing double-XP chip had.
 
 ## Outcome

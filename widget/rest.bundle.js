@@ -1677,7 +1677,8 @@ badgeIcon(profile.tier || 0); render(); drawAccents(); applyAccent(ls("sh_pref_a
 }
 function loadOwn(){
 if (loading) return; loading = true;
-Promise.all([rpc(H.v2 && H.v2() ? "get_rank_profile_v2" : "get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
+var v2 = H.live ? H.live() : H.v2 && H.v2();
+Promise.all([rpc(v2 ? "get_rank_profile_v2" : "get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
 loading = false;
 if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
 applyOwn(r[0], r[1]);
