@@ -11,7 +11,7 @@
 //   - question health's A/B versions (migration_v67): the version shown is kept on each answer, first tries are split
 //     by version, and a gap of 20 points with 10+ people a version is flagged (ab_gap);
 //   - the A/B versions page (migration_v70): get_ab_summary needs the secret and returns totals only;
-//   - the heavy reads worked out ahead (migration_v79): each the same as its function, kept and worked out again by
+//   - the heavy reads worked out ahead (migration_v83): each the same as its function, kept and worked out again by
 //     sh_admin_cache_tick when due (sooner for new arguments or Refresh, later while the class is busy), reviews and
 //     reports laid over question health at once, a failed or timed-out refresh waits, the table closed to anon;
 //   - sh_surface() (the Insights tab's "Where time goes") places every section the engine sends (widget/hub.js
@@ -226,8 +226,8 @@ try {
     notes.push('A/B versions page: admin secret, first tries by version (one per person), later tries, kinds, pairs on the latest wording, no ids');
   }
 
-  /* ---------- 7. the admin page's heavy reads worked out ahead (migration_v79) ---------- */
-  if (sql(`select to_regclass('public.admin_cache') is not null`)[0][0] !== 't') notes.push('admin_cache: not in this schema (migration_v79 not loaded)');
+  /* ---------- 7. the admin page's heavy reads worked out ahead (migration_v83) ---------- */
+  if (sql(`select to_regclass('public.admin_cache') is not null`)[0][0] !== 't') notes.push('admin_cache: not in this schema (migration_v83 not loaded)');
   else {
     const tick = (pre) => Number(sql(`${pre || ''} select sh_admin_cache_tick();`).pop()[0]);
     const status = (ask) => anonJson(`get_admin_cache_status(${S}${ask ? `, array[${ask.map(q).join(', ')}]` : ''})`);

@@ -32,7 +32,7 @@ its ink and blue-grey, each hub's class color as a dot).
   ([shared-infrastructure](shared-infrastructure.md), the database's size). A read the database stopped for time (anon's 3 s
   limit) is tried once more 5 s later, and its error says the database was busy, not that a migration is missing. Writes
   don't wait in the lane.
-- **The heavy reads are worked out ahead** (2026-11-19, `migration_v79.sql`): Insights' three reads, Question health, the
+- **The heavy reads are worked out ahead** (2026-11-19, `migration_v83.sql`): Insights' three reads, Question health, the
   visitor totals (Overview, Time by section), the check-ins and Clicks and features (without a hub) come from
   `admin_cache`, one row a read (`insights`, `retries`, `quality`, `qh:<hub>`, `visitors:<days>`, `debriefs`,
   `clicks:<days>`, `features:<days>`), closed to anon. The admin functions keep their arguments, results and shape; a read

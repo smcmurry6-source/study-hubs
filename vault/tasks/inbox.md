@@ -10,11 +10,25 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **The arcade games themselves at 320 px with the largest text** (2026-11-19, left from BUG-168's fix): the lobby and
+  every view of a hub now fit a 320 px phone at XX-Large (220 px of layout), and the smoke test checks them, but a game once
+  it's started (each hub's own `content/arcade.css` and `widget/games.css`) wasn't swept. Open each in a scripted browser at
+  that size, the way `tools/ci/smoke.js`'s 320 px check does, and fix any that scroll sideways or cut off a control.
+- [ ] **The dashboard's toast on a phone** (2026-11-19, left from BUG-126's fix): a hub's toasts now drop in at the top on a
+  phone, clear of Timmy, the streak flame and the Listen player; the dashboard's own (`toast()` in `widget/dash.js`) still
+  comes up at the bottom and wasn't checked against what sits there. Check it on a phone and move it if anything covers it.
+- [ ] **`xp_seen` grows back with every full rebuild** (2026-11-19, the optimization pass's phase 2,
+  [its note](2026-11-18-database-optimization-pass.md)). `sh_xp_rebuild` (Link my devices, an edited or deleted answer) deletes
+  and copies all of a student's `xp_seen` rows, `xp_days` and answer awards, whatever changed: 65,125 `xp_seen` rows went and
+  came back in the 18 hours after the 2026-11-18 restart, and on a copy 60 such rebuilds grew its index 16 → 23 MB. Phase 2
+  rewrites the table once at night (about 24 MB back). If it passes about 40 MB again, look at rebuilding only what changed
+  (an `xp_seen` row is one per question and right-or-wrong: inserting the missing ones would do for a link), or another
+  `cluster` at night. Measure on a copy first (`tools/release/bench-answers.js`).
 - [ ] **Read Perio's data quality and question-health lists with its retrospective** (2026-11-18, the evening lessons refresh):
   `select sh_data_quality();` stopped at the 5 s limit with 80 people in Perio on its final's eve, so neither it nor
   `qh_report('perio')` was read after S6 went taught. Read both, early in the day or in the quiet hours, when the retrospective runs.
-  Once `migration_v79.sql` is live, read the admin page's kept copies instead, at any hour (`admin_cache`'s `quality` and
-  `qh:perio`; the queries in `tools/lessons-refresh.md` step 1). The night v79 is applied fills both, Perio's from its
+  Once `migration_v83.sql` is live, read the admin page's kept copies instead, at any hour (`admin_cache`'s `quality` and
+  `qh:perio`; the queries in `tools/lessons-refresh.md` step 1). The night v83 is applied fills both, Perio's from its
   latest versions (Perio is archived by then, so the admin page no longer lists it), and they're refreshed nightly for a week.
 - [ ] **The other `shGame.v2()` checks while the bootstrap times out** (2026-11-19, found with the rank pill's fix). Three more
   places wait for `v2()` (true only once the bootstrap or an answer's reply came back) where `shGame.live()` would do: Timmy
@@ -57,6 +71,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `rpc2` fallbacks in `widget/dash.js` for a database without the game layer, `legacy` and the unused `modes` in `hubs.js`,
   and any separate widget file or the full client (`widget/vendor/supabase-2.117.2.js`) that `grep` finds no page loading
   by name (`review/` keeps the full client). The sources of a bundle are never deleted.
+- [ ] **The hubs' own arcade lobby, never shown on the engine** (2026-11-19, found retesting BUG-012): More's Arcade on a hub on
+  the engine draws its own lobby (`moreArcade()` in `widget/hub.js`) and opens a game on its stage, so the lobby inside a hub's
+  `content/arcade.js` (`lobby()` in Perio's, with the `.ar-board-tabs` boards; Heme & Endo Exam 3's has `.ar-board-grid`) looks
+  unreachable. Check whether anything still calls it (its mute button redraws it) and whether its per-game boards are shown
+  anywhere else; if not, take it out of the next hub built from these files ([build-a-hub](../how-to/build-a-hub.md)).
 - [ ] **Learn: a typed answer** (2026-11-13, idea from making Learn "more like quizlet"): Quizlet's Learn ends on written
   questions. Ours ends on recall before the choices show (Sam's call 5, 2026-11-06), because a typed answer can't be
   graded against a bank question's choice. Only if Sam asks for it.

@@ -26,4 +26,8 @@
 # migration_v76 (the answer's helper functions as PL/pgSQL, the medal check's early exit, get_hub_mastery by lookup) was applied on 2026-11-19 (through the connector, md5-checked, PR #444).
 # migration_v77 (record_activity_pings: a page's pings in one call a minute) was applied on 2026-11-19 (through the connector, md5-checked, PR #444).
 # migration_v78 (no "A miss fixed" bonus; the rebuild keeps the ones already paid) was applied on 2026-11-19 (through the connector, md5-checked, PR #451).
-migration_v79.sql
+# migration_v79 (the awards summed once: xp_award_totals, kept by triggers on xp_awards; sh_wallet reads it) was applied on 2026-11-19 (through the connector, md5-checked, the totals checked against the sums, PR #457).
+# migration_v80 (sh_answer writes its answer_xp row once) was applied on 2026-11-19 (through the connector, md5-checked, PR #457).
+# migration_v81 (activity_visits_last_idx dropped) was applied on 2026-11-19 (drop index concurrently, alone; then activity_visits and xp_seen rewritten with cluster, PR #457).
+# migration_v82 (get_class_numbers, record_analytics, shop_days with its pg_cron job, the v2 bootstrap built once, get_my_answers, anon_name by an index) was applied on 2026-11-19 (through the connector, md5-checked, PR #459).
+migration_v83.sql

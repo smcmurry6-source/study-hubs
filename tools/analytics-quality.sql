@@ -5,7 +5,7 @@
 -- Running them (vault/how-to/run-sql-on-the-live-database.md): each query is its own execute_sql call, starting with
 -- `set local statement_timeout = '5s';`, one call at a time, never several at once. sh_data_quality, sh_insights and
 -- sh_insight_retries are the admin page's heavy reads: 0.4 to 0.8 s each on a throwaway copy at the class's size
--- (2026-11-19, after migration_v79), 1 to 2 s on the live database. One that stops at the limit waits for the quiet hours
+-- (2026-11-19, after migration_v83), 1 to 2 s on the live database. One that stops at the limit waits for the quiet hours
 -- (1 to 5 am Central). The admin page keeps a copy of each (admin_cache, worked out every 15 minutes while the page is in
 -- use, hourly while the class is busy, nightly for a week after: vault/reference/admin-operations.md): read that first,
 -- at any hour, and call the function only when the copy is missing or too old for the question.

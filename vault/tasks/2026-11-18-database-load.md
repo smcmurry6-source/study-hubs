@@ -43,7 +43,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
 - [x] The admin page's heavy reads are fast or cached: `get_insights`, `get_insight_retries`, `get_data_quality` (1 to 2 s
   each), `get_question_health` (`qh_report`, 1 to 3 s), `get_visitor_summary` / `_by_hub` / `_by_section` and
   `get_exam_debriefs` (about 1 s). For example worked out every 15 minutes by `pg_cron` into a small table the page reads.
-  **Done, both** (`migration_v79.sql`, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456); how it works: [admin-operations](../reference/admin-operations.md)).
+  **Done, both** (`migration_v83.sql`, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456); how it works: [admin-operations](../reference/admin-operations.md)).
   Measured on a throwaway copy at the live size (222,000 answers, 114,000 question events, 310 visitors) with the live
   settings. *Faster:* `sh_surface()` ran once per hourly row instead of once per section in Insights and the data-quality
   report (the planner folded the lookup into the join, or tested it before the distinct): insights 1.05 → 0.43 s, data
@@ -56,7 +56,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   against 0.5 s. Same results as the old functions on all 22 reads compared (exact JSON); the page shows when each was
   worked out and "newer numbers on the way" after Refresh. The lessons audit reads the kept copies too
   (`tools/lessons-refresh.md`), so its two heaviest calls no longer touch the class's CPU.
-- [ ] `migration_v79.sql` applied live at night (1 to 5 am Central, one statement a call, after fetching `main` for the
+- [ ] `migration_v83.sql` applied live at night (1 to 5 am Central, one statement a call, after fetching `main` for the
   number), the tables filled one read a call, `supabase/schema.sql` appended and the pending line taken out; the first
   ticks read back (`select key, computed_at, took_ms, fails, error from admin_cache order by key;`).
 - [x] The lessons audit's queries (`tools/economy.sql`, `tools/lessons-daily.sql`, `tools/retro.sql`) stay short, or the
@@ -258,9 +258,12 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   all live since this morning) and, past that, the analytics move or a larger compute size (Sam: stay free).
 - 2026-11-19 (the housekeeping package): the compute-size box ticked: Sam's call was made on 11-18 ("Stay free, keep
   fixing", [decisions](../decisions.md)); it opens again only if the saves fail in bursts after v72.
+- 2026-11-19, noon Central (Claude Code): the optimization pass's phase 2 applied live at Sam's word, with the rewrites of
+  `xp_seen` and `activity_visits`: **the database 349 → 323 MB** (it had grown 31 MB since the morning's 318 MB, Perio's final
+  day). No request failed ([the optimization pass](2026-11-18-database-optimization-pass.md), its Log).
 
 - 2026-11-19 (Claude Code, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456)): the first box. Everything measured on a throwaway copy
-  (live only: catalog reads, `pg_stats`, settings, the cron table). `migration_v79.sql` written and tested
+  (live only: catalog reads, `pg_stats`, settings, the cron table). `migration_v83.sql` written and tested
   (`tools/release/admin-ops.js`: 116 checks, the cache's among them; `rls.js`, `retention.js`, `xp.js`, `timmy.js` pass with
   it pending); the admin page reads its time from `get_admin_cache_status`. Applied live at night (the box below).
 

@@ -54,10 +54,14 @@ note on what it costs), a look at the data, a check after a migration.
   'public'::regnamespace and relkind = 'r' order by 3 desc;`. The copy is several times faster than the live server (an
   answer save: 5 to 7 ms there, about 150 ms live), so a query over a second there is a heavy one live.
   `explain` alone only plans the query (cheap); `explain analyze` runs it.
+  For a change to the answer save, `node tools/release/bench-answers.js` does the whole comparison: the same made-up class
+  on a copy with and without the pending migrations, every reply, wallet and table compared, then the answers timed
+  (`--statements` adds the statements inside them). Run `vacuum analyze` after loading made-up rows into a copy of your own:
+  plans made on empty tables' statistics can be many times slower.
 - **Watch for a function in an inlined CTE.** PostgreSQL copies a CTE that is read once into the query that reads it, so
   a `stable` function there runs again for every column that uses its result. `as materialized` runs it once a row
   (`tools/economy.sql`'s E3: 4.7 s to 0.5 s on a copy, the same numbers).
-- **The admin page's heavy reads are kept worked out** (`admin_cache`, `migration_v79.sql`): the data-quality report,
+- **The admin page's heavy reads are kept worked out** (`admin_cache`, `migration_v83.sql`): the data-quality report,
   Insights, each live hub's question health, the visitor totals, check-ins, clicks and features. Read the kept copy
   (`select computed_at, body from admin_cache where key = '<key>';`, the keys and the question-health query in
   [admin-operations](../reference/admin-operations.md)) instead of working one out again.

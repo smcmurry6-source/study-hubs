@@ -222,6 +222,14 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 /* and where the bar still has no room (widget/hub-rewards.js, fitPill): the name goes, then the number */
 .hx-rank.is-tight b, .hx-rank.is-tighter .xpn { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .hx-rank.is-tighter { padding-right: 6px; }
+/* and last, the hub's name: its emblem stays, and the link is still read out by name (BUG-083) */
+.hx-bar.is-cramped .hx-name span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* and past that (a larger text size on a laptop), the meters move to the strip, as on a tablet (the 1,100 px rules below) */
+.hx-bar.no-meters .hx-meters { display: none; }
+.hx-bar.no-meters .hx-tabs { margin-left: 4px; }
+.hx-bar.no-meters .hx-search { margin-left: auto; }
+.hx.is-strip .hx-strip { display: flex; }
+.hx.is-strip .mock-bar { top: calc(var(--bar-h) + var(--boss-h, 0px) + 52px); }
 @media (max-width: 1600px) {
   .hx-rank .jn, .hx-rank .xb-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .hx-rank .xboost { position: absolute; left: 22px; top: -3px; height: 16px; margin: 0; padding: 0; gap: 0; background: none; }
@@ -456,6 +464,9 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .reading { max-width: 760px; min-width: 0; }
 .reading > .sub { margin-top: 6px; font-size: 18px; color: var(--text); }
 .rd-title { display: flex; align-items: center; gap: 12px; }
+/* a lecture's title beside its badge: a word too long for a narrow screen breaks rather than push the page sideways
+   ("Pharmacotherapy", "Endocrinology" at the largest text on a 320px phone, BUG-168) */
+.rd-title > span, .hint-group h3 > span, .likely-lec h3 > span, .cram h2 > span { min-width: 0; overflow-wrap: anywhere; }
 .reading.lc .reading-prose h3 { color: var(--lc-ink); }
 .hx .btn-done[aria-pressed="true"] { background: var(--right-bg); color: var(--right-ink); border-color: transparent; }
 .reading > .note { margin-top: 6px; }
@@ -522,7 +533,7 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .lec-figs > h2, .charts > h2, .check > h2 { font-size: var(--fs-section); }
 .charts > .note, .check > .note { margin-top: 4px; }
 .charts .part { margin-top: 24px; color: var(--hub-text); }
-.fig-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: var(--gap); margin-top: 12px; }
+.fig-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: var(--gap); margin-top: 12px; }
 .fig-card { padding: 16px; border-radius: var(--r-panel); background: var(--panel); }
 .fig-card h4 { font-size: var(--fs-card); font-weight: var(--w-head); }
 .fig-card svg { width: 100%; height: auto; margin-top: 10px; }
@@ -542,7 +553,7 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .rv-html ul { list-style: disc; }
 .rv-html ol { list-style: decimal; }
 .lec-note { margin-top: 6px; max-width: 72ch; }
-.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); gap: 10px; }
 .rv-card { padding: 14px 16px; border-radius: var(--r-row); background: var(--panel); }
 .panel .rv-card { background: var(--row); }
 .rv-card h4 { font-size: var(--fs-card); font-weight: var(--w-head); color: var(--hub-text); }
@@ -559,7 +570,7 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .tbl-wrap tbody th { font-weight: var(--w-strong); }
 .hx .r { text-align: right; }
 .rv-list { padding-left: 20px !important; list-style: disc !important; display: grid; gap: 6px; font-size: var(--fs-body); }
-.flows { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 10px; }
+.flows { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 10px; }
 .flow { padding: 14px 16px; border-radius: var(--r-row); background: var(--panel); }
 .flow ol { margin-top: 8px; padding-left: 22px !important; list-style: decimal !important; display: grid; gap: 4px; font-size: var(--fs-label); }
 .check .qlist { margin-top: 16px; }
@@ -582,7 +593,7 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 /* ---------- Questions ---------- */
 .bank-grid { margin-top: 20px; display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: start; }
 .bank-side { position: sticky; top: calc(var(--bar-h) + var(--boss-h, 0px) + 24px); }
-.qbar { display: grid; gap: 12px; }
+.qbar { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }   /* its rows never grow past the panel (BUG-168) */
 .qbar-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
 .qbar .lab, .morefil .lab { font-size: var(--fs-label); font-weight: var(--w-head); color: var(--muted); min-width: 64px; }
 .qbar-row.chips { align-items: flex-start; }
@@ -601,7 +612,7 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .lp-pop label:hover { background: var(--panel); }
 .lp-pop input { width: 18px; height: 18px; accent-color: var(--hub); }
 .lp-pop label .ld { margin: 0; }
-.search { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 8px; height: var(--control-h); padding: 0 14px; border-radius: var(--r-pill); background: var(--row);
+.search { flex: 1; min-width: min(220px, 100%); display: flex; align-items: center; gap: 8px; height: var(--control-h); padding: 0 14px; border-radius: var(--r-pill); background: var(--row);
   border: 1px solid var(--control); color: var(--muted); }
 .search input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; color: var(--text); font-size: var(--fs-label); }
 .search:focus-within { outline: 3px solid var(--hub-text); outline-offset: 2px; }
@@ -890,13 +901,14 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 /* More > Timmy's place: the card (widget/place.js draws it; its own styles come with it) */
 .place-card { max-width: 520px; min-height: 120px; }
 .hint-group { margin-top: 20px; }
-.hint-group h3 { display: flex; align-items: center; gap: 8px; }
-.hint { margin-top: 10px; padding: 14px 16px; border-radius: var(--r-row); background: var(--row); }
+.hint-group h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.hint-group h3 > span:not(.sr) { max-width: calc(100% - 38px); }   /* the title keeps its row beside the badge; "Notes" goes under it when both don't fit (BUG-168) */
+.hint { margin-top: 10px; padding: 14px 16px; border-radius: var(--r-row); background: var(--row); overflow-wrap: anywhere; }
 .hint blockquote { font-size: var(--fs-body); line-height: 1.55; }
 .hint figcaption { margin-top: 8px; font-size: var(--fs-label); color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; }
 .hint .kind { display: inline-flex; height: 24px; align-items: center; padding: 0 10px; border-radius: var(--r-pill); background: var(--hub-soft); color: var(--hub-text); font-weight: var(--w-strong); font-size: var(--fs-meta); }
 .hint .kind.deemphasize { background: var(--active); color: var(--muted); }
-.likely-grid { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 10px; }
+.likely-grid { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 10px; }
 .likely-lec { padding: 16px; border-radius: var(--r-row); background: var(--row); display: flex; flex-direction: column; gap: 10px; }
 .likely-lec h3 { display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
 .likely-lec.lc { box-shadow: inset 4px 0 0 var(--lc); }
@@ -907,14 +919,18 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .likely-lec ol { padding-left: 22px !important; list-style: decimal !important; display: grid; gap: 6px; font-size: var(--fs-label); flex: 1; }
 .likely-lec ol .note { display: block; }
 .likely-lec .btn { align-self: flex-start; }
-.cram-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--gap); }
+.cram-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: var(--gap); }
 .cram ul { margin-top: 10px; padding-left: 20px !important; list-style: disc !important; display: grid; gap: 6px; font-size: var(--fs-label); line-height: 1.5; }
 .cram li::marker { color: var(--hub-text); }
+/* these lists are grids: one column the list's width, so a long word breaks in it (BUG-168) */
+.likely-lec ol, .cram ul, .flow ol { grid-template-columns: minmax(0, 1fr); overflow-wrap: anywhere; }
 .charts.panel .rv-section:first-of-type { margin-top: 12px; }
 /* the lobby: every game, Sam's pick first and two wide, each on a field of its own */
-.ar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+/* the column minimum gives way to a narrower screen (a 320px phone, or the largest text, which zooms the page: BUG-168);
+   .arcade-lobby, because each hub's own arcade.css (its games' skin) sets .ar-grid at 300px too, and comes later */
+.arcade-lobby .ar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 12px; }
 .game { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 16px; padding: 18px 20px; border-radius: var(--r-panel); background: var(--panel); }
-.game > div { flex: 1; min-width: 200px; }
+.game > div { flex: 1; min-width: min(200px, 100%); }
 .game h2 { font-size: 18px; }
 .game p { margin-top: 4px; }
 .game .btn { align-self: center; }
@@ -953,7 +969,7 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .stats-grid .panel > .note { margin-top: 12px; }
 .stats-grid .panel > .btn { margin-top: 14px; }
 .stats-grid .tbl-wrap { margin-top: 12px; }
-.ach { margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.ach { margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr)); gap: 8px; }
 .ach li { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--r-row); background: var(--row); color: var(--muted); }
 .ach li.got { color: var(--text); }
 .ach li.got .ic { color: var(--right); }
@@ -962,7 +978,7 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .settings { display: grid; gap: var(--gap); max-width: 860px; }
 /* focus mode: one switch, at the top */
 .focus-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
-.focus-row > div { flex: 1; min-width: 200px; }
+.focus-row > div { flex: 1; min-width: min(200px, 100%); }
 .focus-row b { display: block; font-size: 18px; font-weight: var(--w-head); }
 .focus-row small { display: block; font-size: var(--fs-label); color: var(--muted); }
 .focus-art { flex: none; color: var(--mint-ink); }
@@ -971,9 +987,10 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .set-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding: 14px 0; }
 .set-row + .set-row, .panel > h2 + .set-row, .panel > .note + .set-row { border-top: 1px solid var(--rule); }
 .panel > h2 + .set-row { margin-top: 8px; }
-.set-row > div { flex: 1; min-width: 220px; }
+.set-row > div { flex: 1; min-width: min(220px, 100%); }   /* never wider than the row: at XX-Large on a 320px phone the dialog is under 200px */
 .set-row b { display: block; font-weight: var(--w-strong); }
 .set-row small { display: block; font-size: var(--fs-meta); color: var(--muted); }
+.set-row > .btn { max-width: 100%; white-space: normal; text-align: center; }   /* "Change your name" wraps rather than run past a narrow dialog */
 .pod-slot { min-height: 120px; }
 
 /* the drawn figures (content/figures.css, from the live hub): flat plates, labels in the hub's type */
@@ -1209,6 +1226,11 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
   .studyas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .hx .seg-study { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .hx .seg-study button { justify-content: center; padding: 0 6px; gap: 5px; }
+  /* the large text sizes zoom the page: with under 300px the three lose their icons, and with under 240px they stack,
+     since "Flashcards" alone is wider than a third (BUG-168) */
+  .studyas { container: studyas / inline-size; }
+  @container studyas (max-width: 300px) { .hx .seg-study .ic { display: none; } }
+  @container studyas (max-width: 240px) { .hx .seg-study { grid-template-columns: minmax(0, 1fr); } }
   .hx { padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px)); }
   .hx-bar { position: fixed; left: 0; right: 0; top: auto; bottom: 0; height: auto; padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)); gap: 4px;
     border-top: 1px solid var(--border); border-bottom: 0; }
@@ -1264,13 +1286,17 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
   .qbar-row.only .lab { flex-basis: auto; padding-top: 8px; }
   .lp { flex-wrap: wrap; width: 100%; gap: 6px; }
   .hx .lp-btn { max-width: none; width: 100%; justify-content: space-between; }
-  .lp-pop { left: 0; }
+  .lp-pop { left: 0; right: 0; width: auto; }
   .search { min-width: 0; flex-basis: 100%; }
   .morefil { margin-left: 0; }
   .mock-bar { top: 52px; }
   .hx .more-tiles, .hx .talk .rows { grid-template-columns: minmax(0, 1fr); }
   .mt.is-big { grid-column: auto; }
   .game.is-first.has-pic { flex-wrap: wrap; padding: 0 20px 20px; }
+  /* a button or chip too long for the screen wraps its words instead of pushing the page sideways: the large text sizes
+     zoom the page, so at XX-Large a 320px phone lays out in 220px ("Report a mistake in these notes", "High likelihood",
+     BUG-168). One that fits stays on one line. */
+  .hx .btn, .hx .chip { white-space: normal; max-width: 100%; } .hx .btn { text-align: center; }
   /* one row for both on a phone: Try it again says Retry */
   .qc-after .l-long { display: none; }
   .qc-after .l-short { display: inline; }
@@ -1289,7 +1315,7 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
   .hx .ql-pod { padding: 12px; }
   .pm-text { padding-right: 0; }
   .hx .ql-pod { min-height: 0; }
-  .ql-pod .pm-text small { padding-right: 64px; }
+  .ql-pod .pm-text small, .ql-pod .pm-earn { padding-right: 64px; }   /* Timmy and his music notes keep that column (BUG-188: the XP line ran under the notes) */
   .pm-art, .pm-timmy { width: 62px; }
   .pm-art { right: 2px; bottom: -10px; }
   .pm-notes { left: 6px; top: -26px; width: 28px; }
@@ -1299,12 +1325,16 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
   .toolbar .tool-tip { display: none; }
   html.shx #shstat-root { right: 0; bottom: 0; }
   html.shx .sh-tts-dock { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
-  .hx-toasts { bottom: calc(88px + env(safe-area-inset-bottom, 0px)); }
+  /* on a phone a toast drops in at the top, under the strip, where the reward card and the reply pop-up come in: the
+     bottom has Timmy and his bubble on the left, the streak flame on the right and the Listen player across it, which
+     hid a long toast's start and end (BUG-126). Above the reply pop-up, so it's never hidden; taps go through it. */
+  .hx-toasts { top: calc(64px + env(safe-area-inset-top, 0px) + var(--boss-h, 0px)); bottom: auto; z-index: 10005; }
   .game { flex-wrap: wrap; }
   .game .btn { width: 100%; }
 }
 @media (max-width: 380px) {
   .ql-pod .pm-text small { display: none; }   /* the episode's title would run under Timmy; the card still says Timmy Time */
+  .ql-pod .pm-earn { padding-right: 0; }   /* no notes at this width, and the smaller Timmy clears the line */
   .pm-art, .pm-timmy { width: 48px; }
   .pm-art { right: 0; bottom: -8px; }
   .pm-notes { display: none; }

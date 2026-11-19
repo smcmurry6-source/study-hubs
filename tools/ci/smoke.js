@@ -2073,6 +2073,110 @@ function lint(hub, A){
     notes.push(`top bars and tab rows checked at ${label}${tb.size ? ', with the Settings sheet' : ''}`);
     await context.close();
   }
+  // the dashboard's pop-ups at X-Large and XX-Large text on a small phone (BUG-184 to BUG-187, 2026-11-19): the text size zooms
+  // <html>, which makes 100vw and 100vh bigger than the screen, so each is sized by its own box or a container instead.
+  // The More menu, Settings, Timmy's checkup and his place's full view each stay on the screen, don't scroll sideways
+  // and keep every button inside them
+  for (const lt of PART === 'desktop' ? [] : [{ width: 320, height: 640, size: 'xxlarge' }, { width: 375, height: 667, size: 'xlarge' }]) {
+    const context = await browser.newContext({ viewport: { width: lt.width, height: lt.height }, serviceWorkers: 'block' });
+    await stub(context);
+    await context.addInitScript(size => { try { localStorage.setItem('sh_pref_size', size); } catch (e) {} }, lt.size);
+    const label = `${lt.width}px, ${lt.size === 'xxlarge' ? 'XX-Large' : 'X-Large'} text`;
+    const page = await context.newPage();
+    await page.goto(BASE() + 'index.html'); await page.waitForTimeout(700);
+    /* a box on the screen: inside it on all four sides, no sideways scroll, and each of its controls inside it */
+    const onScreen = (sel, what) => page.evaluate(([sel, what]) => {
+      const el = document.querySelector(sel); if (!el) return [`${what} didn't open`];
+      const out = [], r = el.getBoundingClientRect(), W = innerWidth, H = innerHeight;
+      if (r.left < -1 || r.right > W + 1) out.push(`${what} runs past the screen's side (${Math.round(r.left)} to ${Math.round(r.right)} of ${W}px)`);
+      if (r.top < -1 || r.bottom > H + 1) out.push(`${what} is taller than the screen (${Math.round(r.top)} to ${Math.round(r.bottom)} of ${H}px)`);
+      if (el.scrollWidth > el.clientWidth + 1) out.push(`${what} scrolls sideways by ${el.scrollWidth - el.clientWidth}px`);
+      for (const c of el.querySelectorAll('button, a')) {
+        const cs = getComputedStyle(c), b = c.getBoundingClientRect(); if (cs.display === 'none' || cs.visibility === 'hidden' || !b.width || c.closest('[hidden]')) continue;
+        if (b.left < Math.max(0, r.left) - 1 || b.right > Math.min(W, r.right) + 1) { out.push(`${what}: "${(c.getAttribute('aria-label') || c.textContent).trim().replace(/\s+/g, ' ').slice(0, 30)}" runs past its edge`); break; }
+      }
+      return out;
+    }, [sel, what]);
+    const report = list => list.forEach(b => problems.push(`index.html (${label}): ${b}`));
+    // the More menu (BUG-184)
+    await page.click('#menuBtn'); await page.waitForTimeout(150);
+    report(await onScreen('#dxMenu:not([hidden])', 'the More menu'));
+    await page.click('#menuBtn'); await page.waitForTimeout(100);
+    // Settings (BUG-186)
+    await page.click('#setBtn'); await page.waitForTimeout(300);
+    report(await onScreen('.dx-dlg .dx-dlgcard', 'Settings'));
+    await page.keyboard.press('Escape'); await page.waitForTimeout(150);
+    await page.evaluate(() => { const d = document.querySelector('.dx-dlg'); if (d) d.remove(); });
+    // Timmy's checkup card (BUG-187): his house draws on the first scroll, tap or key
+    await page.evaluate(() => window.scrollTo(0, 300)); await page.keyboard.press('Shift');
+    const check = await page.waitForSelector('[data-check]', { timeout: 8000 }).catch(() => null);
+    if (!check) problems.push(`index.html (${label}): Timmy's house has no Checkup button`);
+    else {
+      await page.evaluate(() => document.querySelector('[data-check]').click()); await page.waitForTimeout(400);
+      report(await onScreen('.shpet-dlg .shpet-card', "Timmy's checkup"));
+      await page.evaluate(() => { const d = document.querySelector('.shpet-dlg'); if (d) d.remove(); });
+    }
+    // Timmy's place's full view (BUG-185)
+    const tpc = await page.waitForSelector('.tpc', { timeout: 8000 }).catch(() => null);
+    if (!tpc) problems.push(`index.html (${label}): the "you" card has no Timmy's place`);
+    else {
+      await tpc.click();
+      const dlg = await page.waitForSelector('dialog.tpv[open]', { timeout: 10000 }).catch(() => null);
+      if (!dlg) problems.push(`index.html (${label}): tapping Timmy's place didn't open its full view`);
+      else { await page.waitForTimeout(600); report(await onScreen('dialog.tpv[open]', "Timmy's place")); }
+    }
+    notes.push(`the dashboard's More menu, Settings, Timmy's checkup and his place fit the screen at ${label}`);
+    await context.close();
+  }
+  // every view of a hub on the engine fits a 320px phone at the largest text (BUG-168, 2026-11-19): the check above opens
+  // only Home, and the arcade lobby, the Question Bank, Notes, Exam Hints, the cram sheet, Stats and Settings all scrolled
+  // sideways there. The largest text zooms the page 1.45x, so it lays out in 220px: if it fits here, it fits on any phone.
+  for (const hub of PART === 'desktop' ? [] : engineHubs) {
+    const context = await browser.newContext({ viewport: { width: 320, height: 640 }, serviceWorkers: 'block', isMobile: true, hasTouch: true });
+    await stub(context);
+    await context.addInitScript(() => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); localStorage.setItem('sh_pref_size', 'xxlarge'); } catch (e) {} });
+    const page = await context.newPage(); const errs = [];
+    page.on('pageerror', e => errs.push(e.message));
+    await page.goto(BASE() + `hubs/${hub}/index.html#home`); await page.waitForTimeout(900);
+    await page.click('.sh-archived-stay', { timeout: 500 }).catch(() => {});
+    const views = ['home', 'notes', 'questions', 'questions/mock', 'more', 'more/arcade', 'more/hints', 'more/cram', 'more/side', 'more/stats', 'more/settings', 'more/timmy'];
+    for (const v of views) {
+      await page.evaluate(v => { location.hash = v; }, v); await page.waitForTimeout(v === 'more/arcade' ? 1500 : 700);
+      /* measured against the layout width, naming the element that reaches furthest past it, or the one whose words or
+         drawing spill past its own box (a long word, a decoration): fixed parts (the bar, Timmy) can't scroll the page */
+      const r = await page.evaluate(() => {
+        const cw = document.documentElement.clientWidth, w = document.documentElement.scrollWidth - cw;
+        if (w <= 1) return null;
+        const hidden = e => { for (let p = e; p && p !== document.documentElement; p = p.parentElement) { const cs = getComputedStyle(p); if (cs.position === 'fixed' || (p !== e && cs.overflowX !== 'visible')) return true; } return false; };
+        let worst = null, spill = null;
+        for (const e of document.querySelectorAll('.hx-view *')) {
+          const b = e.getBoundingClientRect(); if (!b.width || hidden(e)) continue;
+          if (b.right > cw + 1 && (!worst || b.right > worst.b.right)) worst = { e, b };
+          if (e.scrollWidth > e.clientWidth + 1 && e.clientWidth && getComputedStyle(e).overflowX === 'visible' && !e.querySelector('*:not(br)')) spill = spill || { e, b };
+        }
+        const hit = worst || spill; if (!hit) return { w, who: 'no element named' };
+        const e = hit.e, cls = typeof e.className === 'string' ? e.className.trim().split(/\s+/).filter(Boolean).slice(0, 2) : [];
+        return { w, who: e.tagName.toLowerCase() + cls.map(c => '.' + c).join('') + ` "${(e.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 30)}"` };
+      });
+      if (r) problems.push(`${hub} #${v} (320px, largest text): the page scrolls sideways by ${r.w}px (furthest out: ${r.who})`);
+    }
+    /* BUG-126: a toast is never under Timmy, the streak flame or the Listen player at the bottom of a phone */
+    const under = await page.evaluate(() => {
+      const host = document.getElementById('hxToast'); if (!host) return 'no toast host (#hxToast)';
+      host.insertAdjacentHTML('beforeend', '<div class="hx-toast" role="status" data-smoke>The Yellow Body finished: +50 XP. Synced 12 questions from your other devices</div>');
+      const t = host.lastElementChild.getBoundingClientRect(), out = [];
+      for (const sel of ['.shpet-home', '#sh-flame', '.sh-tts-dock', '.sh-pod-dock', '#hxBar']) {
+        const e = document.querySelector(sel); if (!e || getComputedStyle(e).display === 'none') continue;
+        const b = e.getBoundingClientRect(); if (b.width && b.height && b.left < t.right && b.right > t.left && b.top < t.bottom && b.bottom > t.top) out.push(sel);
+      }
+      host.lastElementChild.remove();
+      return out.join(', ');
+    });
+    if (under) problems.push(`${hub} (320px, largest text): a toast sits under ${under} (BUG-126)`);
+    errs.forEach(e => problems.push(`${hub} (320px, largest text): JavaScript error: ${e}`));
+    notes.push(`${hub}: ${views.length} views fit a 320px phone at the largest text, and a toast is clear of Timmy and the bar`);
+    await context.close();
+  }
   await browser.close(); server.close();
   notes.forEach(n => console.log('  ' + n));
   if (problems.length) { console.error('\n✗ ' + problems.length + ' problem(s):\n' + problems.map(p => '  - ' + p).join('\n')); process.exit(1); }

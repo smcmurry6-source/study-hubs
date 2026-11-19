@@ -512,17 +512,30 @@
     HX.petFromBadges(d.profile.badges || []);
   });
   /* The rank pill gives way when the bar has no room for it (a long hub name, a six-digit XP, a narrow laptop): it
-     drops its name first, then its number, down to the medallion alone. Both stay in its spoken name. Checked on
-     every paint and when the window changes size. */
+     drops its name first, then its number, down to the medallion alone. Both stay in its spoken name. If the bar is
+     still too wide (a hub name as long as "Heme & Endo Exam 3" between 1,101 and about 1,200 px, BUG-083), the hub's
+     name folds to its emblem, still read out, and the pill gets its number back when there's room for it again.
+     Past that (a larger text size on a laptop: the setting zooms the page, which hub.css's 1,100 px breakpoint can't
+     see), the meters move to the strip under the bar, as they do on a tablet. Checked on every paint, when the window
+     changes size, when the live count changes and when the fonts arrive. The strip itself is only switched once the
+     answer is known (it is below the bar, so the bar measures the same without it), so the page never jumps. */
   function fitPill(){
-    var rk = $("#hxRank"), bar = $("#hxBar"); if (!rk || !bar) return;
-    rk.classList.remove("is-tight", "is-tighter");
-    if (!visible(rk) || bar.scrollWidth <= bar.clientWidth + 1) return;
-    rk.classList.add("is-tight");
-    if (bar.scrollWidth > bar.clientWidth + 1) rk.classList.add("is-tighter");
+    var rk = $("#hxRank"), bar = $("#hxBar"), hx = HX.shell; if (!rk || !bar || !hx) return;
+    var over = function(){ return bar.scrollWidth > bar.clientWidth + 1; }, strip = false;
+    rk.classList.remove("is-tight", "is-tighter"); bar.classList.remove("is-cramped", "no-meters");
+    if (visible(rk) && over()) {
+      rk.classList.add("is-tight");
+      if (over()) rk.classList.add("is-tighter");
+      if (over()) { bar.classList.add("is-cramped"); rk.classList.remove("is-tighter"); if (over()) rk.classList.add("is-tighter"); }
+      if (over()) { bar.classList.add("no-meters"); strip = true; }
+    }
+    if (hx.classList.contains("is-strip") !== strip) hx.classList.toggle("is-strip", strip);
   }
   var fitAsked = false;
-  window.addEventListener("resize", function(){ if (fitAsked) return; fitAsked = true; requestAnimationFrame(function(){ fitAsked = false; fitPill(); }); });
+  function fitSoon(){ if (fitAsked) return; fitAsked = true; requestAnimationFrame(function(){ fitAsked = false; fitPill(); }); }
+  window.addEventListener("resize", fitSoon);
+  document.addEventListener("sh:online", fitSoon);   /* hub.js repaints the live count first; this measures after it */
+  try { document.fonts.ready.then(fitSoon); } catch (e) {}
   /* a journey's scene has closed (widget/journeys.js): Timmy has the last word, and the pill shows the new rank */
   document.addEventListener("sh:journey-scene-end", function(e){
     var d = e.detail || {}, R = window.shRanks, name = R && R.JOURNEYS ? R.JOURNEYS[d.journey | 0] : "";

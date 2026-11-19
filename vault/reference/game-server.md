@@ -79,6 +79,12 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   refused. `sh_xp_replay` works out the answer and 20th-answer awards from the answers alone, so `sh_xp_rebuild` (Link my
   devices) pays exactly what the live calls paid; the "A miss fixed" rows paid before migration_v78 stay as they are; mocks, medals, minutes, games and reports keep their rows and are deduped by
   key when two devices merge.
+  Since migration_v79 (the optimization pass, phase 2) **`xp_award_totals`** keeps each visitor's awards summed by `src`
+  (how many, their base and paid XP), added by statement-level triggers on `xp_awards` as rows are inserted, deleted or
+  updated (a rebuild's thousands of rows in one statement are one change), so `sh_wallet` reads a row a kind instead of
+  every award. Every writer of `xp_awards` keeps it right by itself; `tools/release/xp.js` checks the totals against the
+  sums after all its scenarios, and the query at the end of `migration_v79.sql` does the same on the live database.
+  Since migration_v80 an answer's `answer_xp` row is inserted once, at the end of `sh_answer`, with its reply.
 - XP itself (`xp_visitors.xp`) is today's capped XP for the answers recorded the old way plus the sum of the award rows.
 
 ## The ladder
@@ -92,7 +98,7 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
 
 ## Shiny Gold Crowns and the shop
 
-- **The balance** (`sh_wallet`, never stored): 5 per 10 XP of base XP (1 until migration_v68; Sam, 2026-11-17: "lets increase it to 5 crowns per 10xp") (a boost's extra earns none; nor does a survey's or
+- **The balance** (`sh_wallet`, never stored; its sums of the awards are `xp_award_totals`, above): 5 per 10 XP of base XP (1 until migration_v68; Sam, 2026-11-17: "lets increase it to 5 crowns per 10xp") (a boost's extra earns none; nor does a survey's or
   check-in's 1,000 XP), +1,000 a survey or check-in reward (migration_v60: counted from its award row's `src`), +25 a trophy, +50 a medal,
   +20 a rank-up (a tier) since the switch, **+ every prize's XP again as crowns** (migration_v68, next to last section), minus what was spent. Spending never lowers XP or rank. The XP from before the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
@@ -132,7 +138,9 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   already passed are theirs with no rows written. Never on a shelf; `buy_item` says `rank`.
 - **Who owns what** is decided in one place, `sh_owned(visitor)` (and `sh_owns(visitor, item)`): what was bought, every
   gift, and every rank item reached. `equip_item`, `buy_item` and `get_my_shop` all use it.
-- **The rotation** (`sh_shop_day(date)`, Central time, the same for everyone): 4 daily items seeded by the date, 3 weekly ones
+- **The rotation** (`sh_shop_day(date)`, Central time, the same for everyone; since `migration_v82` worked out once a day for
+  everyone and kept in `shop_days`, today and tomorrow, filled by pg_cron every hour and cleared by any change to
+  `shop_items`, with `sh_shop_day_make(date)` the working-out itself): 4 daily items seeded by the date, 3 weekly ones
   seeded by Monday's date (rarer items come up less often: weights 10, 6, 3, 1.5, 0.6; never a seasonal, gift or rank
   item), the sets of the seasons on sale (`season`), a throwback day's three (`throwback`), and the always-shelf (snacks,
   floss, boosts). A rare costume Timmy was seen in (`record_costume_sighting`, one new one a day) joins that visitor's shop

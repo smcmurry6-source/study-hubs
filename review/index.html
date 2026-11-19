@@ -625,7 +625,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
      is saved through it. The Overview's nine reads, or Insights' three, sent at once took the CPU from the class: answer
      saves timed out while the page loaded, and the page's own reads passed anon's 3 s limit. In one lane, each read runs
      on its own. A read the database stopped for time is tried once more, 5 s later. Writes (marking a report, a review, an
-     override) don't wait in the lane. The heavy reads are worked out ahead by the database itself (migration_v79, the
+     override) don't wait in the lane. The heavy reads are worked out ahead by the database itself (migration_v83, the
      "worked out ahead" section below), so reading them costs the class almost nothing. */
   var lane = Promise.resolve();
   function queued(run){
@@ -712,14 +712,14 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   function D(k){ return data[k] || { data: [] }; }
   function viewAt(t){ return (VIEWS[t].needs || []).reduce(function(m, k){ return data[k] && data[k].at ? Math.min(m, data[k].at) : m; }, Infinity); }
 
-  /* ---------- the heavy reads, worked out ahead (migration_v79; vault/reference/admin-operations.md) ----------
+  /* ---------- the heavy reads, worked out ahead (migration_v83; vault/reference/admin-operations.md) ----------
      The visitor totals, check-ins, clicks and features, Insights' three reads and question health come from a small table
      the database fills by itself (sh_admin_cache_tick, every minute): a read this page used in the last 2 hours is worked
      out again every 15 minutes, or every hour while 20 or more people are studying, and every read used in the last week
      once a night. get_admin_cache_status says when each was worked out (the view's "Updated" time) and whether a newer one
      is on its way: new arguments (a question edited since, new exam dates) or Refresh, which asks for new ones. The page
      then looks again every 30 seconds, for up to 10 minutes, and redraws the view when they've come. Until the database
-     has v79 there is no status, and every read is worked out when it's asked, as before. */
+     has v83 there is no status, and every read is worked out when it's asked, as before. */
   var ahead = { st: null, watch: null, missing: false };
   function aheadRead(ask){
     if (ahead.missing) return Promise.resolve(null);
@@ -1085,7 +1085,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
         } else body += '<p class="note"><b>' + label + ':</b> ' + tally(id) + '</p>';
       });
       var notes = ans.filter(function(r){ return r.answers.missed; });
-      body += '<h3 class="sub-h">What the hub could do better</h3>' + (notes.length ? notes.map(function(r){ return '<div class="sv-text">' + esc(r.answers.missed) + '</div>'; }).join("") : '<p class="muted">No written answers.</p>');
+      body += '<h3 class="sub-h">What the hub could have done better</h3>' + (notes.length ? notes.map(function(r){ return '<div class="sv-text">' + esc(r.answers.missed) + '</div>'; }).join("") : '<p class="muted">No written answers.</p>');
       var trs = ans.map(function(r){ return '<tr><td class="n">' + esc(r.answers.ready || "–") + '</td><td>' + esc(r.answers.went || "–") + '</td><td class="n">' + fmtMin(r.minutes) + '</td><td class="n">' + fmtNum(r.answered) + '</td><td class="n">' + (r.accuracy == null ? "–" : r.accuracy + "%") + '</td><td class="n">' + esc(fmtDate(r.created_at)) + '</td></tr>'; }).join("");
       body += '<details class="more"' + (gi === 0 ? ' open' : '') + '><summary>Each check-in next to that person’s use of the hub</summary><div class="table-wrap"><table class="data"><thead><tr><th class="n">Ready</th><th>How it went</th><th class="n">Time in hub</th><th class="n">Answers</th><th class="n">Accuracy</th><th class="n">Sent</th></tr></thead><tbody>' + trs + '</tbody></table></div></details>';
       var who = {}; ans.forEach(function(r){ who[r.visitor_id] = 1; });

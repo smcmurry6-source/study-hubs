@@ -51,7 +51,7 @@ deletes a question**: a flag is a lead for a person to check against the hub's n
 - **Reports** (`question_flags`) are joined to their question through the "— question <id>" tag the widget writes.
 - **The report**, `qh_report(hub, days, current)`: per question, its numbers and flags. The admin page calls it through
   `get_question_health` (admin secret), passing every live question's version, key, choice count and type worked out
-  from the hub's SH_EXPORT. Since `migration_v79.sql` (2026-11-19) the report is **worked out ahead** into `admin_cache`
+  from the hub's SH_EXPORT. Since `migration_v83.sql` (2026-11-19) the report is **worked out ahead** into `admin_cache`
   (`qh:<hub>`, refreshed every 15 minutes while the admin page uses it, hourly while the class is busy, at once after an
   edit changes a fingerprint or after Refresh), and the reviews and reports are laid over the kept copy at every read
   (`sh_qh_overlay`): [admin-operations](admin-operations.md). Sam's call on a question goes in `question_reviews` through `admin_review_question`:

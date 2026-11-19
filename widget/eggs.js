@@ -29,9 +29,16 @@
   /* the eggs with their own switch in Settings → Extras (bosses, fairy, Golden Probe) don't follow "Hidden secrets" */
   function feat(k){ return H.prefGet("sh_pref_" + k, "on") !== "off" && !inMock(); }
   function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
+  /* a new trophy on the server's profile (an achievement the server says is new, the 1st or 5th fairy, a Golden Probe won):
+     the rank is read again at the next tenth answer instead of worked out on the page (sh:trophy-sent, widget/v3.js's
+     shRankLocal, 2026-11-19) */
+  var TROPHY_NEW = { record_achievement: function(d){ return d === true; }, record_fairy: function(d){ return d === 1 || d === 5; }, claim_golden_probe: function(d){ return d === true; } };
   function rpc(name, args){
     if (!SB) return Promise.resolve(null);
-    return SB.rpc(name, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; });
+    return SB.rpc(name, args).then(function(r){
+      if (r && !r.error && TROPHY_NEW[name] && TROPHY_NEW[name](r.data)) try { document.dispatchEvent(new CustomEvent("sh:trophy-sent")); } catch (e) {}
+      return r && !r.error ? r.data : null;
+    }, function(){ return null; });
   }
   function initialCavityRows(){
     var boot = H.bootstrap || (window.shBootstrap && window.shBootstrap.ready);

@@ -25,14 +25,14 @@ its narration and Timmy Time off the site ([archived-hubs-drop-their-audio](../v
   times the class's size, every query in `tools/lessons-daily.sql`, `tools/economy.sql` and `tools/retro.sql` takes 0.5 s
   or less, so the audit runs at any hour, the morning before an exam included. The slowest calls are the admin page's
   functions below (`qh_report` about 0.5 s for a big hub on a copy with the live settings, `sh_data_quality()` 0.4 s and
-  `sh_insights` 0.4 s since migration_v79; the 3 s measured on 2026-11-18 was mostly the copy's JIT compiler, which the
-  live database has off), and since v79 the admin page keeps a copy of each, read at any hour for nothing. A query that stops
+  `sh_insights` 0.4 s since migration_v83; the 3 s measured on 2026-11-18 was mostly the copy's JIT compiler, which the
+  live database has off), and since v83 the admin page keeps a copy of each, read at any hour for nothing. A query that stops
   at the limit means the database is busy: never send it again at once or raise the limit; split it (one hub, a shorter
   `:since`), keep it for the quiet hours (1 to 5 am Central), or go on without it and say so in the PR. A query of your
   own beyond these files is timed on a copy first.
 - Read the data-quality report first (`tools/analytics-quality.sql`): if tracking stopped, a test hub or a new event
   family shows up, fix or note it before trusting the rest ([analytics-data-quality](../vault/reference/analytics-data-quality.md)).
-  Read the admin page's kept copy, `select computed_at, body from admin_cache where key = 'quality';` (migration_v79:
+  Read the admin page's kept copy, `select computed_at, body from admin_cache where key = 'quality';` (migration_v83:
   worked out by the database every 15 minutes while the admin page is in use, hourly while the class is busy, nightly for
   a week after; [admin-operations](../vault/reference/admin-operations.md)). Only when there is none, or it is too old for
   the question, run `select sh_data_quality();`, and on a busy evening not at all: on 2026-11-18 at 7:30 pm, with 80 people

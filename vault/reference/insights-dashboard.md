@@ -10,7 +10,7 @@ and pairs each number with the decision it drives. A number past its threshold t
 Part of [analytics governance](analytics-governance.md).
 
 - **Data**: `get_insights(p_secret, p_exams)`, `get_insight_retries(p_secret)`, `get_data_quality(p_secret)`
-  (`migration_v49.sql`), **worked out ahead** since `migration_v79.sql` (2026-11-19): the page reads the copies in
+  (`migration_v49.sql`), **worked out ahead** since `migration_v83.sql` (2026-11-19): the page reads the copies in
   `admin_cache` (`insights`, `retries`, `quality`), refreshed by the database every 15 minutes while the page is in use,
   hourly while the class is busy ([admin-operations](admin-operations.md)). Agents on the Supabase connector read the
   kept copy (`select computed_at, body from admin_cache where key = 'insights';`, cheap at any hour) or call the same logic

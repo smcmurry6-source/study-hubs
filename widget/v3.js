@@ -794,12 +794,38 @@
   function uniq(a){ return a.filter(function(v, i){ return a.indexOf(v) === i; }); }
   /* a Supabase query as a promise that never rejects (null on failure) */
   function settle(q){ return new Promise(function(res){ try { q.then(res, function(){ res(null); }); } catch (e) { res(null); } }); }
+  /* One call for both (2026-11-19, the database optimization pass, phase 2): get_class_numbers (migration_v82) returns
+     the question_stats and question_choices rows the two reads below return, so a card costs one request (and one
+     preflight) instead of two; the two reads were a fifth of every request the class made. A database without it gets
+     the two reads, as before. */
+  var classOne = true;
   function flushClassStats(){
     var qids = classStatsPending, cbs = classStatsCallbacks, want = uniq(classChoicesPending);
     classStatsPending = []; classStatsCallbacks = []; classChoicesPending = [];
     var unique = uniq(qids);
     /* in a quiet spell (safeRpc, above) the cards go without the class's numbers */
     if (!supabase || !unique.length || dbBusy()) { cbs.forEach(function(cb){ cb({}); }); return; }
+    if (classOne) { classNumbers(unique, want, cbs); return; }
+    classReads(unique, want, cbs);
+  }
+  function classNumbers(unique, want, cbs){
+    var parts = [];
+    for (var i = 0; i < unique.length; i += 1000) (function(qs){   /* the server takes up to 1,000 a call */
+      var set = {}; qs.forEach(function(q){ set[q] = 1; });
+      parts.push(settle(supabase.rpc("get_class_numbers", { p_hub: HUB, p_qids: qs, p_choices: want.filter(function(q){ return set[q]; }) })));
+    })(unique.slice(i, i + 1000));
+    Promise.all(parts).then(function(all){
+      if (all.some(rpcMissing)) { classOne = false; classReads(unique, want, cbs); return; }
+      var byQid = {}, ok = all.every(function(r){ return r && !r.error && r.data && typeof r.data === "object"; });
+      if (ok) {
+        all.forEach(function(r){ (r.data.stats || []).forEach(function(s){ byQid[s.qid] = { total: s.attempts, correct: s.correct }; }); });
+        want.forEach(function(q){ (byQid[q] = byQid[q] || { total: 0, correct: 0 }).choices = {}; });
+        all.forEach(function(r){ (r.data.choices || []).forEach(function(c){ var b = byQid[c.qid]; if (b && b.choices) b.choices[c.choice] = c.picks; }); });
+      }
+      cbs.forEach(function(cb){ try { cb(byQid); } catch (e) {} });
+    });
+  }
+  function classReads(unique, want, cbs){
     /* question_stats(hub,qid,attempts,correct) already exists and is already
        read anonymously elsewhere (the "Toughest questions" panel above) --
        reuse it rather than adding a new table/RPC for the same data. */
@@ -1412,31 +1438,90 @@
   /* ---------- shared analytics flush ----------
      Click and question-health batches register with this one clock instead of
      each creating a page-level interval. The activity ticker below measures
-     foreground time; it is not a network flush timer. */
+     foreground time; it is not a network flush timer.
+     One call for the three batches (2026-11-19, the database optimization pass, phase 2): question health
+     (widget/qhealth.js), clicks and feature events (widget/clicks.js) hand their batches to send() instead of each
+     calling its own function, and they go out together in one record_analytics call (migration_v82). When one of them is
+     due (its timer, its size, the page being hidden), the others hand over what they hold too, so a page makes one call
+     where it made up to three (the three were 14.8% of every request). The rows are the same. The quiet spell holds them
+     as before. A database without record_analytics gets the three calls; a page that is leaving (hidden or closed) sends
+     with keepalive, the three calls until this device has seen record_analytics work (sh_rpc_analytics). */
   (function(){
-    var jobs = {}, timer = null;
+    var jobs = {}, timer = null, out = { qh: [], clicks: [], events: [] }, postT = null, gathering = false, one = null;
+    try { if (localStorage.getItem("sh_rpc_analytics") === "1") one = true; } catch (e) {}
     function now(){ return Date.now(); }
-    function run(force){
-      var t = now();
-      Object.keys(jobs).forEach(function(k){
-        var j = jobs[k];
-        if (!j || (!force && t < j.next)) return;
-        j.next = t + j.every;
-        try { j.flush(); } catch (e) {}
+    /* leaving: the page is being hidden or closed (each job's leave(), when it has one, then one call with keepalive) */
+    function run(force, leaving){
+      var t = now(), due = [];
+      Object.keys(jobs).forEach(function(k){ var j = jobs[k]; if (j && (force || t >= j.next)) due.push(j); });
+      if (!due.length && !held()) return;
+      /* one is due: the others go with it */
+      if (due.length) due = Object.keys(jobs).map(function(k){ return jobs[k]; });
+      gathering = true;
+      due.forEach(function(j){ j.next = t + j.every; try { (leaving && j.leave ? j.leave : j.flush)(); } catch (e) {} });
+      gathering = false;
+      post(!!leaving);
+    }
+    function held(){ return out.qh.length + out.clicks.length + out.events.length > 0; }
+    function send(kind, items, leaving){
+      if (!out[kind] || !items || !items.length) return;
+      Array.prototype.push.apply(out[kind], items);
+      if (gathering) return;
+      if (leaving) { run(true, true); return; }
+      if (!postT) postT = setTimeout(function(){ postT = null; run(true, false); }, 0);
+    }
+    function headers(){ return { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" }; }
+    function beacon(fn, args){
+      var body = JSON.stringify(args);
+      try { fetch(SB_URL + "/rest/v1/rpc/" + fn, { method: "POST", keepalive: body.length < 60000, headers: headers(), body: body }).catch(function(){}); } catch (e) {}
+    }
+    /* the three calls of before (a database without record_analytics, or a page leaving before it knows) */
+    function apart(a, leaving){
+      var calls = [];
+      if (a.p_qh.length) calls.push(["record_qh", { p_hub: a.p_hub, p_visitor: a.p_visitor, p_visit: a.p_visit, p_items: a.p_qh }]);
+      if (a.p_events.length) calls.push(["record_events", { p_hub: a.p_hub, p_visitor: a.p_visitor, p_items: a.p_events }]);
+      if (a.p_clicks.length) calls.push(["record_clicks", { p_hub: a.p_hub, p_visitor: a.p_visitor, p_items: a.p_clicks }]);
+      calls.forEach(function(c){
+        if (leaving && window.fetch) { beacon(c[0], c[1]); return; }
+        try { supabase.rpc(c[0], c[1]).then(function(){}, function(){}); } catch (e) {}
       });
+    }
+    function post(leaving){
+      if (postT && leaving) { clearTimeout(postT); postT = null; }
+      if (!held()) return;
+      if (!supabase || AUTOMATED) { out = { qh: [], clicks: [], events: [] }; return; }
+      if (!leaving && dbBusy()) return;   /* held until the spell is over; a page leaving sends what it was handed (question health's rows, as before) */
+      while (held()) {
+        /* each part as much as its function takes in one call */
+        var a = { p_hub: HUB, p_visitor: VISITOR_ID, p_visit: VISIT_ID, p_qh: out.qh.splice(0, 60), p_clicks: out.clicks.splice(0, 80), p_events: out.events.splice(0, 40) };
+        if (one === false || (one === null && leaving)) { apart(a, leaving); continue; }
+        if (leaving && window.fetch) { beacon("record_analytics", a); continue; }
+        (function(a){
+          try {
+            supabase.rpc("record_analytics", a).then(function(res){
+              if (rpcMissing(res)) { one = false; try { localStorage.removeItem("sh_rpc_analytics"); } catch (e) {} apart(a, false); return; }
+              if (res && !res.error) { if (one !== true) { one = true; try { localStorage.setItem("sh_rpc_analytics", "1"); } catch (e) {} } }
+              else if (dbFailed(res)) dbFail();
+            }, function(){ dbFail(); });
+          } catch (e) {}
+        })(a);
+      }
     }
     function arm(){ if (!timer) timer = setInterval(function(){ run(false); }, 15000); }
     window.shAnalytics = {
-      register: function(key, flush, every){
+      /* leave (optional): what the job does when the page is leaving, in place of flush */
+      register: function(key, flush, every, leave){
         if (!key || typeof flush !== "function") return function(){};
-        jobs[String(key)] = { flush: flush, every: Math.max(1000, Number(every) || 30000), next: now() + Math.max(1000, Number(every) || 30000) };
+        jobs[String(key)] = { flush: flush, leave: typeof leave === "function" ? leave : null, every: Math.max(1000, Number(every) || 30000), next: now() + Math.max(1000, Number(every) || 30000) };
         arm();
         return function(){ delete jobs[String(key)]; };
       },
-      flush: function(){ run(true); }
+      flush: function(){ run(true); },
+      /* a batch for the one call: kind "qh" (record_qh's items), "clicks" (record_clicks's) or "events" (record_events's) */
+      send: send
     };
-    document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") run(true); });
-    window.addEventListener("pagehide", function(){ run(true); });
+    document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") run(true, true); });
+    window.addEventListener("pagehide", function(){ run(true, true); });
   })();
 
   /* ---------- resolved display name: the same deterministic dentistry-
@@ -1859,6 +1944,7 @@
   function answerPaid(job, r){
     if (r.boost !== undefined) GAME.boost = r.boost || null;
     if (!r.repeat) setCrowns(r.crowns);   /* the balance after this answer (migration_v68) */
+    rlPaid(job.d, r);
     try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: String(job.d.qid || ""), ctx: job.d.ctx || "", session: job.d.session || null, res: r } })); } catch (e) {}
   }
   /* one try of an answer ({ args, d, c }); true when the server failed it and it should go again (the same id, which
@@ -1998,7 +2084,7 @@
     try { if (!supabase || !localStorage.getItem("sh_bowl_trophy") || localStorage.getItem("sh_bowl_trophy_sent")) return; } catch (e) { return; }
     try {
       supabase.rpc("record_achievement", { p_visitor: VISITOR_ID, p_kind: "bowling", p_hub: HUB || "" }).then(function(res){
-        if (res && !res.error) try { localStorage.setItem("sh_bowl_trophy_sent", "1"); } catch (e) {}
+        if (res && !res.error) try { localStorage.setItem("sh_bowl_trophy_sent", "1"); if (res.data === true) document.dispatchEvent(new CustomEvent("sh:trophy-sent")); } catch (e) {}
       }, function(){});
     } catch (e) {}
   }
@@ -3379,6 +3465,66 @@
       nameMsg.textContent = "Saved. Hi, " + name + "!";
     });
   }
+  /* ---------- the rank and mastery after every tenth answer, worked out on the page (2026-11-19) ----------
+     The database optimization pass, phase 2. widget/ranks.js read get_rank_profile_v2 and get_hub_mastery again after
+     every tenth answer: two reads every ten answers, from every student. On the game layer each answer's reply carries
+     the XP total, and the page knows each question's last try (the bootstrap's answers, then every reply), so
+     shRankLocal(profile, rows) works out what those reads would say: the profile with the new XP, double XP, answers and
+     right answers, and this hub's mastery row. It says null, and ranks.js reads as before, when something it can't count
+     may have changed: a new trophy sent from this page (sh:trophy-sent: widget/eggs.js, the bowling egg), a medal in a
+     reply, the streak of days paying, a new Central day, 100 or 1,000 answers, a run of right answers that could reach 25
+     or 100, a mock's or a game's answers, a question with no known last try (more than the bootstrap's 5,000 answers), a
+     read short of the answers paid, and at least every 50 answers. Every read (sh:rank-profile with its rows) is the new
+     base. It lives here, not in ranks.js, because ranks.js goes to the dashboard too, whose page budget has no room. */
+  var RL = { hist: null, full: false, row: null, base: null, n: 0, right: 0, miss: false, run: 0, paid: 0, dirty: true, total: 0, boost: undefined, day: "", mine: false };
+  function rlDay(){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()); } catch (e) { return ""; } }
+  bootstrap.ready.then(function(data){
+    if (!data || !Array.isArray(data.answers) || !Array.isArray(data.mastery)) return;
+    RL.hist = {}; data.answers.forEach(function(a){ if (Array.isArray(a)) RL.hist[String(a[0])] = !!a[2]; });
+    RL.full = data.answers.length < 5000;
+  }, function(){});
+  document.addEventListener("sh:rank-profile", function(e){
+    var d = e.detail || {}, p = d.profile;
+    if (RL.mine) { RL.mine = false; return; }   /* shRankLocal's own answer, not a read */
+    if (!p || p.journey == null) return;
+    var rows = Array.isArray(d.rows) ? d.rows : null, row = rows && rows.filter(function(r){ return r.hub === HUB; })[0];
+    /* a read whose count of answers is short of what this page has seen paid may have missed one: the next tenth reads */
+    var missed = RL.base ? (p.answers | 0) < RL.base.answers + RL.n : RL.paid > 0;
+    if (rows) RL.row = { latest_correct: row ? row.latest_correct | 0 : 0, seen: row ? row.seen | 0 : 0 };
+    RL.base = { answers: p.answers | 0, correct: p.correct | 0, best_run: p.best_run | 0 };
+    RL.total = p.xp | 0; RL.boost = undefined; RL.n = 0; RL.right = 0; RL.miss = false; RL.run = 0; RL.day = rlDay();
+    RL.dirty = missed || !rows;
+  });
+  document.addEventListener("sh:trophy-sent", function(){ RL.dirty = true; });
+  /* an answer's reply: the XP total, the double XP, the answers and runs, the question's last try */
+  function rlPaid(d, r){
+    if (!r || r.repeat || r.ok === false) return;
+    RL.paid++;
+    if (typeof r.total === "number") RL.total = Math.max(RL.total, r.total);
+    if (r.boost !== undefined) RL.boost = r.boost;
+    var c = r.correct === true, q = String((d && d.qid) || "");
+    RL.n++; if (c) { RL.right++; RL.run++; } else { RL.miss = true; RL.run = 0; }
+    if (r.medal || d.session || d.ctx === "mock" || d.ctx === "arcade" ||
+        (Array.isArray(r.bonus) && r.bonus.some(function(b){ return b && b.src === "streak"; }))) RL.dirty = true;
+    if (!RL.hist || !RL.row || !q) { RL.dirty = true; return; }
+    var was = RL.hist[q];
+    if (was === undefined) { if (!RL.full) RL.dirty = true; else { RL.row.seen++; if (c) RL.row.latest_correct++; } }
+    else if (was !== c) RL.row.latest_correct += c ? 1 : -1;
+    RL.hist[q] = c;
+  }
+  window.shRankLocal = function(p, rows){
+    if (GAME.on !== true || !p || p.journey == null || !RL.hist || !RL.row || !RL.base) return null;
+    if (RL.dirty || RL.n >= 50 || RL.day !== rlDay()) return null;
+    var B = RL.base, a = B.answers + RL.n, can = RL.miss ? RL.run : B.best_run + RL.run;
+    if ((B.answers < 100 && a >= 100) || (B.answers < 1000 && a >= 1000)) return null;
+    if ((B.best_run < 25 && can >= 25) || (B.best_run < 100 && can >= 100)) return null;
+    var q = {}, k; for (k in p) q[k] = p[k];
+    q.xp = Math.max(p.xp | 0, RL.total); q.answers = a; q.correct = B.correct + RL.right;
+    if (RL.boost !== undefined) q.boost = RL.boost;
+    RL.mine = true;
+    return [q, (rows || []).filter(function(r){ return r.hub !== HUB; }).concat([{ hub: HUB, latest_correct: RL.row.latest_correct, seen: RL.row.seen }])];
+  };
+
   /* ---------- easter eggs live in widget/eggs.js; these are the hooks they use ---------- */
   window.shEggHooks = {
     hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase, bootstrap: bootstrap.ready,
@@ -3638,7 +3784,14 @@
     if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
   })();
   /* click analytics (widget/clicks.js): what people use, for improving each hub */
-  if (!EXPORT_ONLY && supabase) widgetFile("clicks.js", function(){ if (window.shClicks) window.shClicks.start({ sb: supabase, hub: HUB, visitor: VISITOR_ID, section: currentSection }); });
+  /* the clicks and events go with question health's rows in one call (shAnalytics.send, migration_v82): widget/clicks.js
+     sends through the client it is given, and here that client hands its two calls to the batch. (clicks.js itself is
+     unchanged: it goes to the dashboard too, which still makes its two calls; its page budget had no room.) */
+  var clicksSb = !supabase ? null : { rpc: function(fn, a){
+    if ((fn === "record_clicks" || fn === "record_events") && a && Array.isArray(a.p_items)) { window.shAnalytics.send(fn === "record_clicks" ? "clicks" : "events", a.p_items); return Promise.resolve({ data: null, error: null }); }
+    return supabase.rpc(fn, a);
+  } };
+  if (!EXPORT_ONLY && supabase) widgetFile("clicks.js", function(){ if (window.shClicks) window.shClicks.start({ sb: clicksSb, hub: HUB, visitor: VISITOR_ID, section: currentSection }); });
   /* replies (widget/replies.js): tells someone once when their report or suggestion has been dealt with, plus notices to everyone */
   if (!EXPORT_ONLY && supabase) widgetFile("replies.js", function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB, bootstrap: bootstrap.ready }); });
   /* "Is this your other device?" (widget/linkask.js): offers to link devices that use the same name */

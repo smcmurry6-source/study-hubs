@@ -871,7 +871,7 @@
     "perdle", "planer", "smile", "sweeper", "cross", "board", "cloze", "escape"];
   var ADMIN_FNS = /^(admin_|get_reports$|get_visitor_|get_nuke_(summary|by_hub|recent|unlocks)$|get_click_summary$|get_survey_results$|get_exam_debriefs$|get_search_terms$|get_feature_events$|set_report_resolved$|get_reports_v2$|get_hub_recap$|get_insights$|get_insight_retries$|get_data_quality$|get_question_health$|get_ab_summary$|get_admin_cache_status$)/;
   function unauthorized(){ return { error: { status: 401, code: "28000", message: "unauthorized" } }; }
-  /* the admin page's reads worked out ahead (migration_v79): each worked out 7 minutes ago; one asked for again (Refresh)
+  /* the admin page's reads worked out ahead (migration_v83): each worked out 7 minutes ago; one asked for again (Refresh)
      is on its way for 45 seconds, then worked out, as the database's job does within a minute or two */
   function aheadStatus(a){
     var t = now(), asked = db.ahead || (db.ahead = {}), ask = Array.isArray(a.p_ask) ? a.p_ask : [];

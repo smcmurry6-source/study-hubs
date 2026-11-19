@@ -33,7 +33,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-11-19 (the admin page's heavy reads worked out ahead, Claude Code, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456))** — the database-load task's first
-  box. `migration_v79.sql`: the admin page's slow reads (Insights' three, Question health, the visitor totals, check-ins,
+  box. `migration_v83.sql`: the admin page's slow reads (Insights' three, Question health, the visitor totals, check-ins,
   clicks and features) come from a small table, `admin_cache`, that pg_cron's `sh-admin-cache` job fills one read at a time:
   every 15 minutes while the page is in use, every hour while 20 or more people are studying, at once after an edit or
   Refresh, nightly for a week after, nothing while nobody looks. The functions keep their arguments and results (all 22 reads
@@ -42,6 +42,73 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   shows when each read was worked out and "newer numbers on the way" after Refresh, and looks again until they come. The
   lessons audit and agents read the kept copies (`tools/lessons-refresh.md`, [admin-operations](vault/reference/admin-operations.md)).
   Applied live at night (the task note's Log).
+- **2026-11-19 (The database pass's phase 2 applied live, Claude Code)** — Sam, at noon the day before Heme & Endo Exam 3: "the hubs are quiet right now. go ahead and run the migrations you were waiting on" (4 people on, 2 answers in 10 minutes). Through the connector, one call at a time, 12:10-12:13 pm Central: `migration_v79.sql` (the awards' running totals; no total off from its sum, the three most active students' balances the same), `migration_v80.sql` (`answer_xp` once an answer), `migration_v81.sql` (`drop index concurrently`, then `cluster` of `activity_visits` and `xp_seen`: **the database 349 → 323 MB**, `xp_seen` 53 → 31 MB) and `migration_v82.sql` (`get_class_numbers`, `record_analytics`, `shop_days` with its hourly pg_cron job, the lighter bootstrap, `get_my_answers`, `anon_name`). Every live body md5-checked against its file before and after; no request failed in the edge logs, and the pages took the two new calls within a minute. All four are in `supabase/schema.sql`; `supabase/pending-migrations.txt` lists none. Nothing students see changes. [The task note](vault/tasks/2026-11-18-database-optimization-pass.md) has the numbers.
+- **2026-11-19 (Large text on a phone: BUG-184 to BUG-188, Claude Code)** — The text-size setting zooms `<html>`, and inside a zoomed page
+  `100vw` and `100vh` are bigger than the screen, so four pop-ups sized that way ran off it at X-Large and XX-Large. The dashboard's More menu is
+  at most the top bar's content wide (`100cqw - 4px`, the bar is a container: `widget/dash.css`); Timmy's place's full view is sized in % of the
+  screen and its stage in `cqh` of the dialog, now a container, with a two-row header and a smaller "Timmy today" card under 310 px
+  (`widget/place.css`), and his speech bubble stays inside the picture (`widget/place.js`); Settings' rows can be
+  narrower than 220 px and its button wraps (`widget/hub.css`, Focus mode on a hub's Settings too); the dashboard's dialogs and Timmy's cards
+  (`widget/pet.js`) take `max-height: 100%` in place of `calc(100vh - 32px)`, so their Close button is on the screen; the checkup's Show me row
+  wraps. Home's Timmy Time card on a phone keeps the XP line out of the notes' column (`.pm-earn`). Default text is unchanged to the pixel.
+  `tools/ci/smoke.js` opens the four pop-ups at 320 px XX-Large and 375 px X-Large. Found doing it, logged: BUG-190 (Timmy's Shop and the
+  other `vw`/`vh` sizes) and BUG-191 (Home's Timmy Time card at about 900 px puts its Listen button over Timmy).
+- **2026-11-19 (The hub bar fits on every laptop, BUG-083, Claude Code)** — Sam: "do the heme and endo bug fix". On Heme & Endo Exam 3 (and Perio) the top bar ran 26-95 px past the screen between 1,101 and about 1,190 px wide, with Search half off and Settings gone, even with the rank pill down to its medallion. `fitPill()` in `widget/hub-rewards.js` now takes two more steps: the hub name folds to its emblem (`.hx-bar.is-cramped`; still read out as the link's name) and the pill gets its XP back if that leaves room; past that, at Large text and up on a laptop (the setting zooms the page, which the 1,100 px breakpoint can't see), the meters move to the strip under the bar as on a tablet (`.hx-bar.no-meters`, `.hx.is-strip` in `widget/hub.css`). It also measures again when the live count changes and when the fonts arrive. Scripted on the preview's made-up data at 1,101-1,920 px and every text size: nothing runs past the screen; below 1,101 px nothing changed. Bundles rebuilt.
+- **2026-11-19 (the database optimization pass, phase 2: fewer calls from the page, Claude Code, [#459](https://github.com/smcmurry6-source/study-hubs/pull/459))** — nothing students see
+  or earn changes; the pages make fewer requests and the bootstrap does less. `migration_v82.sql` (**pending: apply at
+  night after Fri 2026-11-20, 9:30 am**, after #457's v79 to v81, `supabase/pending-migrations.txt`; written as v79, renumbered at the merge): `get_class_numbers` (a card's class numbers,
+  `question_stats` and `question_choices`, in one call instead of two REST reads: they were a fifth of every request),
+  `record_analytics` (question health's rows, the clicks and the events in one call instead of three), the shop's picks of
+  the day stored once for everyone (`shop_days`, filled by pg_cron hourly, cleared by a trigger on `shop_items`),
+  `get_widget_bootstrap_v2` built once (it worked out v1's rank, Timmy's days and Inbox and threw them away),
+  `get_my_answers` in PL/pgSQL, and `anon_name` by an index on the name's base. The bootstrap 38.7 / 26.9 / 19.4 → 22.5 /
+  13.8 / 10.2 ms on a throwaway copy, every value the same. Page side, working with or without the migration (the old
+  calls when it's missing): `widget/v3.js` (`classNumbers`, `shAnalytics.send`; `widget/qhealth.js` hands its rows to it,
+  and `widget/clicks.js`, unchanged, sends through a client v3.js gives it; the dashboard keeps its two calls, its 345 KB
+  page budget had no room), and `shRankLocal` in `widget/v3.js`, which `widget/ranks.js` asks first: the rank and this
+  hub's mastery after every tenth answer from the replies and the answers the page holds, reading the server only when
+  something it can't count changed (`sh:trophy-sent` from `widget/eggs.js` and the bowling egg, a medal, a new day, the
+  100/1,000 answers and 25/100 runs, mocks and games, at least every 50 answers).
+  Tested by `tools/release/xp.js` (a new section), `rls.js` (`shop_days` and its helpers closed to anon) and
+  `tools/ci/quiet.js` (both ways). [The task](vault/tasks/2026-11-18-database-optimization-pass.md).
+- **2026-11-19 (Phone and large-text fixes on the hubs: BUG-168, BUG-126, BUG-009, Claude Code, [#458](https://github.com/smcmurry6-source/study-hubs/pull/458))** — Sam's package of
+  three bugs. **Nothing on a hub scrolls sideways on a phone at the largest text** (BUG-168): the text sizes zoom the page,
+  so XX-Large on a 320 px phone lays out in 220 px, and the arcade lobby, the Question Bank, Notes, Exam Hints, the cram
+  sheet, Stats and Settings all ran past the screen there (Exam Hints and the cram sheet at 320 px at every size). In
+  `widget/hub.css` every grid's column minimum is `min(Npx, 100%)` (the lobby's beats each hub's own `arcade.css`), the
+  bank's filter panel is one column, a long word breaks instead of running off in a lecture title, Exam Hints' quotes and the
+  hint, cram and flow lists (only there: a word a hair too wide elsewhere stays whole), Exam Hints' "Notes" goes under a
+  long title, and on a phone a button or chip too long for the screen wraps its words; the Study as buttons drop their icons under 300 px
+  and stack under 240 px. In `widget/trophies.css` the Stats gauge's turning rays stop at the board on a narrow phone and
+  the badges' words break, and the rank's medal goes above its name in a narrow card. `tools/ci/smoke.js` opens 12 views of each hub on the engine at 320 px with the largest text
+  (it opened only Home before). **Toasts on a phone drop in at the top**, under the strip, as the reward card and the
+  reply pop-up do (BUG-126): at the bottom they sat under Timmy, his bubble, the streak flame and the Listen player; the
+  smoke test checks one is clear. **Small controls** (BUG-009): the four of 11-04 were on the old single-file pages;
+  `tools/release/matrix.js` now checks every screen and fails a control under 24x24 px, naming it, and its first run found
+  the mastery-medal button beside a name on the dashboard's boards (22x20 at 1920 px), now 24x24 (`widget/ranks.js`).
+  Bundles rebuilt. **The dashboard's budget is 346 KB** (was 345, BUG-189): `main` measured 345.40 KB and these rules add
+  about 150 bytes gzipped to `widget/site.bundle.css`, which the dashboard loads too; it's the page with the least room.
+
+- **2026-11-19 (the database optimization pass, phase 2: the answer save and its tables, Claude Code, [#457](https://github.com/smcmurry6-source/study-hubs/pull/457))** —
+  three migrations, written and tested, **not applied yet** (Sam: nothing live before Heme & Endo Exam 3, the rewrites at night;
+  set for Sat 11-21, 1:30 am Central, and listed in `supabase/pending-migrations.txt` until then). `migration_v79.sql`:
+  `xp_award_totals`, each student's awards summed by kind, kept by statement-level triggers on `xp_awards`, so the crown
+  balance in every answer's reply (`sh_wallet`) reads a row a kind instead of every award; filled in the same transaction
+  (63,000 awards live). `migration_v80.sql`: `sh_answer` inserts its `answer_xp` row once, with the reply, instead of an
+  insert and an update. `migration_v81.sql`: `activity_visits_last_idx` dropped (every ping's update of its visit was a new
+  row and three index entries; the admin page's visitor summary gives the same numbers without it). Then `cluster` of
+  `activity_visits` and of `xp_seen` (54.7 MB, about twice what its rows need). On two throwaway copies
+  (`tools/release/bench-answers.js`, new, for the next phase): the same replies to 37,630 calls, wallets and rows in every
+  table; an answer save 3.81 → 2.19 ms for a heavy student, 2.86 → 2.12 middling, 2.53 → 2.01 light. Nothing students see
+  or earn changes. `tools/release/xp.js` checks the totals against the sums; `pg.js` takes extra server settings.
+  [The task note](vault/tasks/2026-11-18-database-optimization-pass.md) has the numbers; tonight's readout goes there too.
+- **2026-11-19 (The check-in's last question, Claude Code)** — Sam: "Lets change the free response question to just asking what the hub could
+  have done better". The exam check-in's text step (`DEBRIEF_QS` in `widget/dash.js`) now asks "What could the hub have done better?" and its box
+  has no placeholder (it was "e.g. more on suture types, more EXCEPT questions", from the 2026-10-02 version that asked for topics the hub
+  missed). Timmy's line on that step is "What could I have done better?" when the check-in no longer pays. The honor-code note stays, and the
+  answer key is still `missed`, so the admin page (its heading now "What the hub could have done better"), `/lessons-audit` and the idea board's tick
+  read it as before. About page, Ask Timmy's site help and the lessons-audit skill updated.
+
 - **2026-11-19 (About page accessibility, Claude Code, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453))** — the last three accessibility bugs from
   the release dry run, all on `about/index.html`: BUG-007, the nine contents links at the top turned their focus outline off
   (`nav.toc a:focus-visible{outline:none}`), so a keyboard user couldn't see where they were; they now get the page's ring.

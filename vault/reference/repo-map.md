@@ -15,7 +15,8 @@ tags: [map]
   serves at `/tools/preview/design/`, its art built from `tools/figures/site/` by `build.mjs`) and `tools/release/` (the suites: `secrets.js`, `rls.js` with
   `rls-expectations.json` and the live `rls-audit.sql`, `a11y.js` and `perf.js` with their `baselines/` and `budgets.json`,
   `matrix.js`, `postcheck.js`, the database suites `admin-ops.js`, `retention.js` and `xp.js` (the game layer's server) on
-  a throwaway copy built by `pg.js`; `run.js` runs them all). The bug log and UAT checklist are in `vault/release/`.
+  a throwaway copy built by `pg.js`; `run.js` runs them all; `bench-answers.js`, not a suite, times the answer save on two
+  copies, with and without the pending migrations, and checks they answer alike). The bug log and UAT checklist are in `vault/release/`.
 - `tools/figures/site/` — the site's drawn art, built by `build.mjs`: emblems, mastheads, medals, the rewards art, and
   Timmy's place (`place.mjs`, the kit; `sets.mjs`, the list of seasonal sets, year-round collections, rank sets and rare costumes; `packs/<set>.mjs`, one file per
   set; `pack-preview.mjs`, a contact sheet of one set: [draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md)), and
@@ -90,7 +91,7 @@ tags: [map]
   streaks, leaderboard, analytics, `shTTS`, `shMindMap`). Cross-hub features go
   here, never hand-patched into one hub.
 - `review/` — admin analytics page. Its heavy reads come worked out ahead from `admin_cache`, which pg_cron's
-  `sh-admin-cache` job refreshes while the page is in use (`migration_v79.sql`, [admin-operations](admin-operations.md)). Its **Insights** tab puts every hub (live and archived) side by side and pairs each
+  `sh-admin-cache` job refreshes while the page is in use (`migration_v83.sql`, [admin-operations](admin-operations.md)). Its **Insights** tab puts every hub (live and archived) side by side and pairs each
   number with the decision it drives ([insights-dashboard](insights-dashboard.md), data from `migration_v49.sql`;
   [analytics governance](analytics-governance.md)). Its **Live** view shows who is studying now and its **Hubs** view sets a
   hub live, archived or hidden by hand, with an audit log ([admin-operations](admin-operations.md), `migration_v50.sql`;
