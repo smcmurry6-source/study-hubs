@@ -1445,8 +1445,7 @@ html.hx-still .dx-luck *, html.hx-still .dx-luck *::after { animation: none !imp
 .dx-wn { --wn-bg: color-mix(in srgb, var(--hub) 40%, #1b1420); --wn-gold: #ffe08a; position: relative; isolation: isolate; display: grid; gap: 16px; min-width: 0;
 overflow: hidden; gap: 12px; padding: 14px 0 4px; border-radius: var(--r-panel); background: var(--wn-bg); color: #fff; }
 .dx-wn::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
-background: radial-gradient(55% 140% at 0 0, color-mix(in srgb, var(--hub-mid) 50%, transparent), transparent 70%),
-radial-gradient(circle at 12px 12px, rgba(255, 255, 255, .16) 1.4px, transparent 2px) 0 0 / 24px 24px; }
+background: radial-gradient(55% 140% at 0 0, color-mix(in srgb, var(--hub-mid) 50%, transparent), transparent 70%), radial-gradient(circle at 12px 12px, rgba(255, 255, 255, .16) 1.4px, transparent 2px) 0 0 / 24px 24px; }
 .dx-wn-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 0 20px; }
 .dx-wn-art { flex: none; width: 40px; height: 40px; transform: rotate(-10deg); }
 .dx-wn-waves path { transform-box: fill-box; animation: dx-wn-wave 1.8s ease-out infinite; }
