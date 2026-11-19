@@ -1143,7 +1143,7 @@ function flairCss(){
 if (document.getElementById("sh-flair-css")) return;
 var st = document.createElement("style"); st.id = "sh-flair-css";
 st.textContent = '.sh-flair{display:inline-flex;align-items:center;gap:1px;vertical-align:-4px;margin:0 3px;white-space:nowrap;flex:none}' +
-'button.sh-flair{appearance:none;-webkit-appearance:none;background:none;border:0;padding:1px 2px;border-radius:999px;font:inherit;color:inherit;cursor:pointer;line-height:1}' +
+'button.sh-flair{appearance:none;-webkit-appearance:none;background:none;border:0;padding:1px 2px;min-width:24px;min-height:24px;justify-content:center;margin:-2px 1px;border-radius:999px;font:inherit;color:inherit;cursor:pointer;line-height:1}' +
 'button.sh-flair:hover,button.sh-flair:focus-visible{background:rgba(127,127,127,.16)}' +
 'button.sh-flair:focus-visible{outline:2px solid currentColor;outline-offset:1px}' +
 '.sh-flair-m{display:inline-flex;width:18px;height:18px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +

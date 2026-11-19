@@ -49,6 +49,24 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   100/1,000 answers and 25/100 runs, mocks and games, at least every 50 answers).
   Tested by `tools/release/xp.js` (a new section), `rls.js` (`shop_days` and its helpers closed to anon) and
   `tools/ci/quiet.js` (both ways). [The task](vault/tasks/2026-11-18-database-optimization-pass.md).
+- **2026-11-19 (Phone and large-text fixes on the hubs: BUG-168, BUG-126, BUG-009, Claude Code, [#458](https://github.com/smcmurry6-source/study-hubs/pull/458))** — Sam's package of
+  three bugs. **Nothing on a hub scrolls sideways on a phone at the largest text** (BUG-168): the text sizes zoom the page,
+  so XX-Large on a 320 px phone lays out in 220 px, and the arcade lobby, the Question Bank, Notes, Exam Hints, the cram
+  sheet, Stats and Settings all ran past the screen there (Exam Hints and the cram sheet at 320 px at every size). In
+  `widget/hub.css` every grid's column minimum is `min(Npx, 100%)` (the lobby's beats each hub's own `arcade.css`), the
+  bank's filter panel is one column, a long word breaks instead of running off in a lecture title, Exam Hints' quotes and the
+  hint, cram and flow lists (only there: a word a hair too wide elsewhere stays whole), Exam Hints' "Notes" goes under a
+  long title, and on a phone a button or chip too long for the screen wraps its words; the Study as buttons drop their icons under 300 px
+  and stack under 240 px. In `widget/trophies.css` the Stats gauge's turning rays stop at the board on a narrow phone and
+  the badges' words break, and the rank's medal goes above its name in a narrow card. `tools/ci/smoke.js` opens 12 views of each hub on the engine at 320 px with the largest text
+  (it opened only Home before). **Toasts on a phone drop in at the top**, under the strip, as the reward card and the
+  reply pop-up do (BUG-126): at the bottom they sat under Timmy, his bubble, the streak flame and the Listen player; the
+  smoke test checks one is clear. **Small controls** (BUG-009): the four of 11-04 were on the old single-file pages;
+  `tools/release/matrix.js` now checks every screen and fails a control under 24x24 px, naming it, and its first run found
+  the mastery-medal button beside a name on the dashboard's boards (22x20 at 1920 px), now 24x24 (`widget/ranks.js`).
+  Bundles rebuilt. **The dashboard's budget is 346 KB** (was 345, BUG-189): `main` measured 345.40 KB and these rules add
+  about 150 bytes gzipped to `widget/site.bundle.css`, which the dashboard loads too; it's the page with the least room.
+
 - **2026-11-19 (the database optimization pass, phase 2: the answer save and its tables, Claude Code, [#457](https://github.com/smcmurry6-source/study-hubs/pull/457))** —
   three migrations, written and tested, **not applied yet** (Sam: nothing live before Heme & Endo Exam 3, the rewrites at night;
   set for Sat 11-21, 1:30 am Central, and listed in `supabase/pending-migrations.txt` until then). `migration_v79.sql`:

@@ -2073,6 +2073,55 @@ function lint(hub, A){
     notes.push(`top bars and tab rows checked at ${label}${tb.size ? ', with the Settings sheet' : ''}`);
     await context.close();
   }
+  // every view of a hub on the engine fits a 320px phone at the largest text (BUG-168, 2026-11-19): the check above opens
+  // only Home, and the arcade lobby, the Question Bank, Notes, Exam Hints, the cram sheet, Stats and Settings all scrolled
+  // sideways there. The largest text zooms the page 1.45x, so it lays out in 220px: if it fits here, it fits on any phone.
+  for (const hub of PART === 'desktop' ? [] : engineHubs) {
+    const context = await browser.newContext({ viewport: { width: 320, height: 640 }, serviceWorkers: 'block', isMobile: true, hasTouch: true });
+    await stub(context);
+    await context.addInitScript(() => { try { localStorage.setItem('sh_tour', 'no'); localStorage.setItem('sh_tour_hub', 'no'); localStorage.setItem('sh_pref_size', 'xxlarge'); } catch (e) {} });
+    const page = await context.newPage(); const errs = [];
+    page.on('pageerror', e => errs.push(e.message));
+    await page.goto(BASE() + `hubs/${hub}/index.html#home`); await page.waitForTimeout(900);
+    await page.click('.sh-archived-stay', { timeout: 500 }).catch(() => {});
+    const views = ['home', 'notes', 'questions', 'questions/mock', 'more', 'more/arcade', 'more/hints', 'more/cram', 'more/side', 'more/stats', 'more/settings', 'more/timmy'];
+    for (const v of views) {
+      await page.evaluate(v => { location.hash = v; }, v); await page.waitForTimeout(v === 'more/arcade' ? 1500 : 700);
+      /* measured against the layout width, naming the element that reaches furthest past it, or the one whose words or
+         drawing spill past its own box (a long word, a decoration): fixed parts (the bar, Timmy) can't scroll the page */
+      const r = await page.evaluate(() => {
+        const cw = document.documentElement.clientWidth, w = document.documentElement.scrollWidth - cw;
+        if (w <= 1) return null;
+        const hidden = e => { for (let p = e; p && p !== document.documentElement; p = p.parentElement) { const cs = getComputedStyle(p); if (cs.position === 'fixed' || (p !== e && cs.overflowX !== 'visible')) return true; } return false; };
+        let worst = null, spill = null;
+        for (const e of document.querySelectorAll('.hx-view *')) {
+          const b = e.getBoundingClientRect(); if (!b.width || hidden(e)) continue;
+          if (b.right > cw + 1 && (!worst || b.right > worst.b.right)) worst = { e, b };
+          if (e.scrollWidth > e.clientWidth + 1 && e.clientWidth && getComputedStyle(e).overflowX === 'visible' && !e.querySelector('*:not(br)')) spill = spill || { e, b };
+        }
+        const hit = worst || spill; if (!hit) return { w, who: 'no element named' };
+        const e = hit.e, cls = typeof e.className === 'string' ? e.className.trim().split(/\s+/).filter(Boolean).slice(0, 2) : [];
+        return { w, who: e.tagName.toLowerCase() + cls.map(c => '.' + c).join('') + ` "${(e.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 30)}"` };
+      });
+      if (r) problems.push(`${hub} #${v} (320px, largest text): the page scrolls sideways by ${r.w}px (furthest out: ${r.who})`);
+    }
+    /* BUG-126: a toast is never under Timmy, the streak flame or the Listen player at the bottom of a phone */
+    const under = await page.evaluate(() => {
+      const host = document.getElementById('hxToast'); if (!host) return 'no toast host (#hxToast)';
+      host.insertAdjacentHTML('beforeend', '<div class="hx-toast" role="status" data-smoke>The Yellow Body finished: +50 XP. Synced 12 questions from your other devices</div>');
+      const t = host.lastElementChild.getBoundingClientRect(), out = [];
+      for (const sel of ['.shpet-home', '#sh-flame', '.sh-tts-dock', '.sh-pod-dock', '#hxBar']) {
+        const e = document.querySelector(sel); if (!e || getComputedStyle(e).display === 'none') continue;
+        const b = e.getBoundingClientRect(); if (b.width && b.height && b.left < t.right && b.right > t.left && b.top < t.bottom && b.bottom > t.top) out.push(sel);
+      }
+      host.lastElementChild.remove();
+      return out.join(', ');
+    });
+    if (under) problems.push(`${hub} (320px, largest text): a toast sits under ${under} (BUG-126)`);
+    errs.forEach(e => problems.push(`${hub} (320px, largest text): JavaScript error: ${e}`));
+    notes.push(`${hub}: ${views.length} views fit a 320px phone at the largest text, and a toast is clear of Timmy and the bar`);
+    await context.close();
+  }
   await browser.close(); server.close();
   notes.forEach(n => console.log('  ' + n));
   if (problems.length) { console.error('\n✗ ' + problems.length + ' problem(s):\n' + problems.map(p => '  - ' + p).join('\n')); process.exit(1); }
