@@ -136,7 +136,17 @@ var S = (A.spots || {})[k]; if (!S) return "";
 var b = S.body.replace(/class="sp-tint"/g, 'fill="' + col.tint + '"').replace(/class="sp-tint-light"/g, 'fill="' + col.light + '"').replace(/class="sp-tint-line"/g, 'stroke="' + col.line + '"');
 return img(b, "", cls, S.vb);
 }
-var CLOVER = '<svg class="ic" viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true" focusable="false"><path d="M12 11c-1.5-3-5.5-3.5-5.5-.5S10 13 12 11zM12 11c3-1.5 3.5-5.5.5-5.5S10 9 12 11zM12 11c1.5 3 5.5 3.5 5.5.5S14 9 12 11zM12 11c-3 1.5-3.5 5.5-.5 5.5S14 13 12 11z"/><path d="M12 11c0 4 1 7 3 10" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>';
+var CLOVER = (function(){
+var LF = "M16 15.5C12.6 13.4 10.2 10.4 11.6 7.6C12.8 5.4 15.4 5.6 16 8.2C16.6 5.6 19.2 5.4 20.4 7.6C21.8 10.4 19.4 13.4 16 15.5Z";
+function each(f){ return [0, 90, 180, 270].map(function(r){ return f(' transform="rotate(' + r + ' 16 16)"'); }).join(""); }
+function leaf(t){ return '<path d="' + LF + '"' + t + "/>"; }
+var STEM = '<path d="M17 17Q19 24 25 28" fill="none" stroke-linecap="round" stroke=';
+return '<svg class="ic" viewBox="0 0 32 32" width="22" height="22" aria-hidden="true" focusable="false">' + STEM + '"#3b2e3a" stroke-width="3.4"/>' + STEM + '"#2f9e5f" stroke-width="1.4"/>' +
+'<g stroke="#3b2e3a" stroke-width="3" stroke-linejoin="round">' + each(leaf) + '</g><g fill="#4cc27f">' + each(leaf) + '<circle cx="16" cy="16" r="2"/></g>' +
+'<g fill="none" stroke="#25804f" stroke-linecap="round">' + each(function(t){ return '<path d="M16 14.6V9.6"' + t + "/>"; }) + "</g>" +
+'<g fill="#fff" opacity=".75">' + each(function(t){ return '<ellipse cx="13.4" cy="9" rx="1.1" ry=".7"' + t + "/>"; }) + "</g></svg>";
+})();
+var SPARK = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path d="M8 1L9.6 6.4L15 8L9.6 9.6L8 15L6.4 9.6L1 8L6.4 6.4Z" fill="#ffe08a" stroke="#3b2e3a" stroke-width="1.2" stroke-linejoin="round"/></svg>';
 var MASTS = {};
 function loadScriptOnce(src){
 return new Promise(function(resolve, reject){
@@ -372,11 +382,11 @@ var r = luckData[luckKey()] || { count: 0, mine: false, recent: [] }, n = r.coun
 var names = (r.recent || []).slice(0, 3).map(esc).join(", ");
 el.setAttribute("aria-label", "Exam-day luck for " + luckFor.name);
 el.setAttribute("role", "group");
-el.innerHTML = '<div class="dx-luck-in"><p class="dx-luck-txt">' +
+el.innerHTML = '<span class="dx-luck-bg" aria-hidden="true">' + CLOVER + '</span><div class="dx-luck-in"><p class="dx-luck-txt">' +
 (n ? '<b><span class="num">' + num(n) + "</span>" + (n === 1 ? " classmate" : " classmates") + " sent luck</b><small>" + (names ? "Latest: " + names + (n > 3 ? " and more" : "") : "for " + esc(luckFor.name)) + "</small>"
 : "<b>" + (luckFor.d === 0 ? "Exam day!" : "Exam tomorrow!") + "</b><small>Be the first to send the class some luck</small>") + "</p>" +
-'<button type="button" class="hero-luck-btn' + (r.mine ? " is-sent" : "") + '"' + (r.mine ? " disabled" : "") + '><span class="dx-luck-coin">' + CLOVER + "</span>" +
-(r.mine ? "Luck sent!" : "Send luck") + "</button></div>";
+'<span class="dx-luck-go"><button type="button" class="hero-luck-btn' + (r.mine ? " is-sent" : "") + '"' + (r.mine ? " disabled" : "") + '><span class="dx-luck-coin">' + CLOVER + "</span>" +
+(r.mine ? "Luck sent!" : "Send luck") + '</button><i class="dx-lf dx-lf1">' + CLOVER + '</i><i class="dx-lf dx-lf2">' + CLOVER + '</i><i class="dx-lf dx-lf3">' + SPARK + "</i></span></div>";
 }
 function loadLuck(){
 if (!luckSb || !luckFor) return;

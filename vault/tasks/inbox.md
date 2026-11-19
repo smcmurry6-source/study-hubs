@@ -20,8 +20,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `toast()` in `widget/dash.js`) are still the dark toast. The dashboard measured 342 of its 345 KB budget on 2026-11-18, so
   the card would go in a file the dashboard fetches when a prize first pays (not `dash.bundle.js`), or with Sam's OK to raise
   the budget.
-- [ ] **The dashboard is at 344 of its 345 KB** (2026-11-19, after the What's new box and the stage's foot added about 2.7 KB
-  gzipped; `node tools/release/perf.js --page index.html`). The next change that adds to `dash.bundle.js` or
+- [ ] **The dashboard is at its 345 KB budget** (2026-11-19: 353,341 bytes of the 353,791 the budget allows, after the What's
+  new box, the stage's foot and Send luck's art added about 3.3 KB gzipped; `node tools/release/perf.js --page index.html`). The next change that adds to `dash.bundle.js` or
   `site.bundle.css` won't fit: move something the first screen doesn't need into a file fetched on first use (as Timmy's
   place and the trophy case are), or ask Sam to raise the budget in `tools/release/budgets.json`.
 - [x] **An index for recording an answer, if the database-load work doesn't already cover it** (done: `migration_v71.sql`, both indexes built live 2026-11-18, [#423](https://github.com/smcmurry6-source/study-hubs/pull/423)) (2026-11-18, found while

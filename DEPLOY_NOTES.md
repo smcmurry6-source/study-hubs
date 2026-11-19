@@ -47,7 +47,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   header, tags on the line, three-line cards, about 230 px tall on a laptop (it was about 400 in the first draft).
   Then **"redo the send luck button"**: Send luck is a chunky game button (an ink outline, pressed into its shadow when
   tapped, a shine across it, the clover on a gold coin that wiggles now and then), gold with "Luck sent!" once sent, and
-  the tile's separate clover circle is gone; on a phone the button takes its own full-width row.
+  the tile's separate clover circle is gone; on a phone the button takes its own full-width row. And **"do the art too"**:
+  exam-day luck's clover is drawn as a sticker (`CLOVER` in `widget/dash.js`: one heart-shaped leaf four times, the ink
+  outline under the green, a vein and a shine on each), on the coin, in the burst when you send it, as two small clovers
+  and a sparkle bobbing around the button, and as a big faint one in the tile's corner. One drawing reused, so it costs
+  about 0.5 KB: the dashboard is at 353,341 of the 353,791 bytes its 345 KB budget allows.
   Changes since this device last saw that hub's box say New, with a count ("3 new since your last visit", "3 new" on a
   phone; `sh_news_seen` in localStorage, per hub; a first visit counts the last day's). The hub's description opens
   from "About this hub" in the box's header.
