@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Device matrix and resilience (RELEASE_TEST_PLAN.md, "Browsers and devices", "Resilience"), on a preview.
 // Matrix: small and large phones, a tablet both ways, a laptop and a wide desktop. On each: the dashboard and every
-// mode of every live hub open without a JavaScript error and without scrolling sideways; tiny tap targets are counted.
+// mode of every live hub open without a JavaScript error, without scrolling sideways and without a control under 24x24 px.
 // Engines: Chromium by default; SH_ENGINES=chromium,webkit,firefox adds Safari's engine and Firefox where Playwright
 // has them installed (CI's release workflow does). Real iPhones and Android phones are still checked by hand (UAT).
 // Resilience, on a phone and a laptop:
@@ -73,13 +73,24 @@ const QUICK = process.argv.includes('--quick');
         });
         if (r) problems.push(`${tag}: ${where} scrolls sideways by ${r.w}px (furthest out: ${r.who})`);
       };
-      await sideways('dashboard');
-      let screens = 1, tiny = 0;
+      /* WCAG 2.2 target size (minimum): every button, tab, box and menu at least 24x24 CSS px. Counted on each screen and,
+         since 2026-11-19 (BUG-009: the 4 on 11-04 were on the old single-file hub pages, all archived; the redesign's
+         pages had none), a problem that names them. Links in text are exempt, so links aren't counted. */
+      const tinySeen = new Set();
+      const small = async where => {
+        for (const t of await page.evaluate(() => [...document.querySelectorAll('button, [role="button"], [role="tab"], input[type="checkbox"], input[type="radio"], select')]
+          .filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.width < 24 || r.height < 24) && getComputedStyle(e).visibility !== 'hidden' && !e.closest('#shpv-pill, #shpv-panel'); })
+          .map(e => { const r = e.getBoundingClientRect(), cls = typeof e.className === 'string' ? e.className.trim().split(/\s+/).filter(Boolean).slice(0, 2) : [];
+            return `${e.tagName.toLowerCase()}${e.id ? '#' + e.id : ''}${cls.map(c => '.' + c).join('')} "${(e.getAttribute('aria-label') || e.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 24)}" ${Math.round(r.width)}x${Math.round(r.height)}`; })))
+          if (!tinySeen.has(t)) { tinySeen.add(t); problems.push(`${tag}: ${where}: a control under 24x24 px: ${t}`); }
+      };
+      await sideways('dashboard'); await small('dashboard');
+      let screens = 1;
       /* the dashboard (widget/dash.js): each hub's tab and the class board's two lists */
       {
         const tabs = await page.$$eval('#hubTabs [data-tab]', ts => ts.map(t => t.getAttribute('data-tab')));
         if (!tabs.length) problems.push(`${tag}: dashboard shows no hub tabs`);
-        for (const t of tabs) { await page.click(`#hubTabs [data-tab="${t}"]`).catch(() => {}); await page.waitForTimeout(250); await sideways(`dashboard · ${t}`); screens++; }
+        for (const t of tabs) { await page.click(`#hubTabs [data-tab="${t}"]`).catch(() => {}); await page.waitForTimeout(250); await sideways(`dashboard · ${t}`); await small(`dashboard · ${t}`); screens++; }
         for (const bn of await page.$$('#boardSeg button')) { await bn.click().catch(() => {}); await page.waitForTimeout(350); }
         await sideways('dashboard · class board');
       }
@@ -90,14 +101,11 @@ const QUICK = process.argv.includes('--quick');
         for (const m of modes) {
           await page.click(`#modeSwitch [data-mode="${m}"]`, { timeout: 5000 }).catch(e => problems.push(`${tag}: ${hub} can't open ${m}: ${e.message.split('\n')[0]}`));
           await page.waitForTimeout(250); screens++;
-          await sideways(`${hub} · ${m}`);
+          await sideways(`${hub} · ${m}`); await small(`${hub} · ${m}`);
         }
-        /* WCAG 2.2 target size (minimum): 24x24 CSS px; counted, not failed (inline links in text are exempt anyway) */
-        tiny += await page.evaluate(() => [...document.querySelectorAll('button, [role="button"], [role="tab"], input[type="checkbox"], input[type="radio"], select')]
-          .filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.width < 24 || r.height < 24) && !e.closest('#shpv-pill, #shpv-panel'); }).length);
       }
       errs.forEach(e => problems.push(`${tag}: JavaScript error: ${e}`));
-      notes.push(`${tag}: ${screens} screens, ${errs.length} errors, ${tiny} controls under 24x24 px`);
+      notes.push(`${tag}: ${screens} screens, ${errs.length} errors, ${tinySeen.size} controls under 24x24 px`);
       await ctx.close();
     }
     await browser.close();
