@@ -25,4 +25,4 @@
 # migration_v75 (collections: shop_items.collection, get_my_collections, claim_collections_v2, the 'collection' award) was applied on 2026-11-19 (through the connector, md5-checked, after PR #437).
 # migration_v76 (the answer's helper functions as PL/pgSQL, the medal check's early exit, get_hub_mastery by lookup) was applied on 2026-11-19 (through the connector, md5-checked, PR #444).
 # migration_v77 (record_activity_pings: a page's pings in one call a minute) was applied on 2026-11-19 (through the connector, md5-checked, PR #444).
-migration_v78.sql
+# migration_v78 (no "A miss fixed" bonus; the rebuild keeps the ones already paid) was applied on 2026-11-19 (through the connector, md5-checked, PR #451).
