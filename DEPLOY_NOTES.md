@@ -46,6 +46,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   updated; bundles rebuilt; `tools/ci/quiet.js` checks the kept answers. It also closes every WebSocket now: since #429 its
   pages (not marked automated, so they act as visitors) opened the real realtime connection and showed in Perio's
   "studying now" count for about a minute each CI run (nothing saved; the smoke test always closed them).
+- **2026-11-18 (rules for heavy queries, Claude Code)** — From the database-load task's second and third boxes: on
+  2026-11-18 the lessons audit's economy queries (11 and 13 s) and a migration's 43 s transaction failed students' answer
+  saves. Timed on a throwaway copy at 1.5 times the class's size: `tools/economy.sql`'s E3 worked every wallet out about ten
+  times (an inlined CTE), 4.7 s, now 0.5 s with `as materialized` and the same numbers; `tools/retro.sql`'s click list
+  counted people once a row, now in one pass (0.3 s to 0.03 s); every other audit query under 0.1 s. The connector runs as
+  `postgres` with a 2-minute limit, so every audit query is now its own call under `set local statement_timeout = '5s'`,
+  one at a time (`tools/lessons-refresh.md`, the `lessons-audit` skill, the SQL files' headers). New how-to:
+  [run-sql-on-the-live-database](vault/how-to/run-sql-on-the-live-database.md) (the class's quiet hours, 1 to 5 am Central;
+  a backfill at night or in batches; `create index concurrently`; `lock_timeout`; small data fixes). Nothing on the site
+  changes.
 - **2026-11-18 (Heme & Endo Exam 3: L21 and L22 in, Claude Code)** — Sam: "i just added the last endo lectures. update the hub.
   no to all diagrams". Dr. Dal Zotto's **L21** Male reproductive and lower urinary tract pathology (`mpath`, 64 questions,
   `mr-`) and **L22** Female reproductive pathology (`fpath`, 60, `fr-`), both taught 11/18, written from their recordings (the

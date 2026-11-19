@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430, https://github.com/smcmurry6-source/study-hubs/pull/435
+pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430, https://github.com/smcmurry6-source/study-hubs/pull/434, https://github.com/smcmurry6-source/study-hubs/pull/435
 ---
 
 # Keep heavy queries from failing students' answer saves
@@ -42,10 +42,27 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
 - [ ] The admin page's heavy reads are fast or cached: `get_insights`, `get_insight_retries`, `get_data_quality` (1 to 2 s
   each), `get_question_health` (`qh_report`, 1 to 3 s), `get_visitor_summary` / `_by_hub` / `_by_section` and
   `get_exam_debriefs` (about 1 s). For example worked out every 15 minutes by `pg_cron` into a small table the page reads.
-- [ ] The lessons audit's queries (`tools/economy.sql`, `tools/lessons-daily.sql`, `tools/retro.sql`) stay short, or the
+- [x] The lessons audit's queries (`tools/economy.sql`, `tools/lessons-daily.sql`, `tools/retro.sql`) stay short, or the
   runbook says to run them when the class is quiet; the connector's queries have no time limit.
-- [ ] `vault/how-to/` says to apply a migration with a backfill late at night (or in small batches), not while the class
-  studies.
+  **Done, both** ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md), [#434](https://github.com/smcmurry6-source/study-hubs/pull/434)). Timed on a throwaway copy at
+  1.5 times the class's size: E3 (the wallets) took 4.7 s, because PostgreSQL inlined its CTE and worked each wallet out
+  again for every column that reads it (most likely the audit's 11 and 13 s queries live); `as materialized` makes it 0.5 s,
+  the same numbers. The retrospective's click list counted people once a row (0.3 s, 4.5 s without its `limit`), now in one
+  pass (0.03 s, the same list); E7 works the rank board out once. Every other query in the three files: under 0.1 s. The
+  connector runs as `postgres` with a 2-minute limit (not none), so every call starts with
+  `set local statement_timeout = '5s';` (checked live: it stops the call and doesn't carry over to the next), one query a
+  call (a call returns only its last result), one call at a time: the files' headers (and `tools/analytics-quality.sql`'s),
+  `tools/lessons-refresh.md` step 1 and the `lessons-audit` skill say so. One that stops at the limit is split or waits for
+  the quiet hours (1 to 5 am Central).
+- [ ] The next lessons audit sends every query under that 5 s limit: its PR says whether any stopped there (live, not on a
+  copy), and one that did is made shorter.
+- [x] `vault/how-to/` says to apply a migration with a backfill late at night (or in small batches), not while the class
+  studies. **Done:** [run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md): the quiet hours (1 to 5 am
+  Central, from `presence_hourly`, clear of the 3:23 am retention job), functions any time, a backfill kept out of the
+  migration's transaction and run at night or a few thousand rows a call, `create index concurrently` alone in a call,
+  `lock_timeout` before an `alter table` on a table the pages write, and data fixes kept small (they run at the merge,
+  whatever the hour). Linked from the repo map, after-a-merge, shared-infrastructure, analytics-governance and
+  read-usage-data.
 - [ ] Sam's call: a larger compute size for the Supabase project (more memory and CPU, at a monthly cost). Not needed if
   the boxes above are done; worth it for exam weeks. Asked 2026-11-18 during the outage (Pro, $25 a month with Micro, or
   about $30 with Small): **"Stay free, keep fixing"** ([decisions](../decisions.md)). Open again if it happens after v72.
@@ -168,6 +185,10 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   Exam 1's LCP (3772 ms against 2500; an old hub that loads none of the changed files, 1652 ms locally) and passed on its
   one re-run.
 
+- 2026-11-18, evening (the second and third boxes, [#434](https://github.com/smcmurry6-source/study-hubs/pull/434)): read live only the catalog's table sizes,
+  `presence_hourly` and two probes of the connector's time limit (a `pg_sleep`, which uses no CPU); everything else on a
+  throwaway copy. For the first box, the admin page's reads that the audit also calls, on that copy: `qh_report('perio')`
+  3.3-3.5 s (the slowest call of an audit), `sh_data_quality()`, `sh_insights` and `sh_insight_retries` about 0.7 s each.
 - 2026-11-19 ([#435](https://github.com/smcmurry6-source/study-hubs/pull/435)): the box "A failed answer that's still unsent" done (`widget/v3.js`, answers kept on the device; a backlog
   spaced as it was answered), with the rank pill while the bootstrap times out (`widget/ranks.js` asks the game layer's
   profile when `shGame.live()`, the inbox line). `tools/ci/quiet.js` gained a run: a page whose saves fail is hidden, shown,
