@@ -4,6 +4,7 @@
 // And the answers kept on the device (2026-11-19): a page whose saves fail is hidden, shown, hidden again; a second page
 // of the hub opens on a working database and sends them, in order, spaced as answered, with the same ids; the first page,
 // shown again, finds them taken and sends nothing more.
+// And fewer calls from the page (2026-11-19, the database optimization pass, phase 2, migration_v82): phase2() below.
 // Nothing reaches the real database: every request off 127.0.0.1 is answered here, and every WebSocket is closed (the
 // pages aren't marked automated, so a live realtime connection would put them in the class's "studying now" count).
 'use strict';
@@ -70,7 +71,7 @@ async function run(browser, failFirst){
     if (early.length !== 1) problems.push(`failing database: during the quiet spell only the first (failed) save should have gone, got ${early.length}`);
     // a click in the spell: its batch should wait
     await page.mouse.click(10, 10); await page.evaluate(() => window.shClicks && window.shClicks.flush && window.shClicks.flush());
-    const clicksInSpell = log.slice(from).filter(c => c.fn === 'record_clicks' || c.fn === 'record_events').length;
+    const clicksInSpell = log.slice(from).filter(c => c.fn === 'record_clicks' || c.fn === 'record_events' || c.fn === 'record_analytics').length;
     for (let i = 0; i < 100 && ans().length < 4; i++) await page.waitForTimeout(500);
     const a = ans();
     console.log('failing database:', a.map(c => `${c.qid}@${Math.round(c.t / 1000)}s`).join(', '), '| most in flight at once:', maxInflight, '| clicks sent in the spell:', clicksInSpell);
@@ -225,9 +226,114 @@ async function pings(browser, missing){
   await context.close();
 }
 
+// Fewer calls from the page (2026-11-19, the database optimization pass, phase 2, migration_v82): a card's class numbers in
+// one get_class_numbers call (not the question_stats and question_choices reads); question health's rows, the clicks and the
+// events in one record_analytics call (not three); and on the game layer the tenth answer worked out on the page, with no
+// get_rank_profile_v2 or get_hub_mastery, its XP from the replies and this hub's mastery from each question's last try, until
+// something the page can't count happens (a trophy sent: the next tenth answer reads both). A database without
+// migration_v82 gets the old reads and calls, and isn't asked for the missing ones again.
+async function phase2(browser, missing){
+  const what = missing ? 'phase 2, a database without migration_v82' : 'phase 2';
+  const context = await browser.newContext();
+  if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
+  const log = []; let n = 0;
+  const gone = { code: 'PGRST202', message: 'Could not find the function public.get_class_numbers' };
+  await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, async route => {
+    const u = route.request().url(), fn = (/\/rpc\/([a-z0-9_]+)/.exec(u) || [])[1] || (/\/rest\/v1\/([a-z_]+)/.exec(u) || [])[1] || '';
+    if (!/supabase\.co/.test(u)) return route.fulfill({ status: 204, body: '' });
+    let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
+    log.push({ fn, a });
+    const json = (b, s) => route.fulfill({ status: s || 200, contentType: 'application/json', body: JSON.stringify(b) });
+    if (fn === 'get_widget_bootstrap_v2') return json({ rank: Object.assign({}, rank, { best_run: 30 }), mastery: [{ hub: 'perio', latest_correct: 5, seen: 8 }],
+      answers: [['pq-1', 1763500000, 0], ['pq-2', 1763500100, 1]] });
+    if (fn === 'get_rank_profile_v2') return json(Object.assign({}, rank, { best_run: 30 }));
+    if (fn === 'get_hub_mastery') return json([{ hub: 'perio', latest_correct: 5, seen: 8 }]);
+    if (missing && (fn === 'get_class_numbers' || fn === 'record_analytics')) return json(gone, 404);
+    if (fn === 'get_class_numbers') return json({ stats: [{ qid: 'pq-1', attempts: 9, correct: 4 }], choices: [{ qid: 'pq-1', choice: 2, picks: 3 }] });
+    if (fn === 'question_stats') return json([{ qid: 'pq-1', attempts: 9, correct: 4 }]);
+    if (fn === 'question_choices') return json([{ qid: 'pq-1', choice: 2, picks: 3 }]);
+    if (fn === 'record_answer_v2') { n++; return json({ ok: true, correct: true, kind: 'one', xp: 10, base: 10, mult: 1, why: null, bonus: [], boost: null, total: 2400 + n * 10, crowns: 100 + n }); }
+    return json(fn ? null : []);
+  });
+  await context.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
+  const page = await context.newPage(), errs = [];
+  page.on('pageerror', e => errs.push(e.message));
+  await page.goto(BASE() + 'hubs/perio/index.html#questions');
+  if (!(await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb && window.shAnalytics && window.shClicks, null, { timeout: 20000 }).catch(() => null))) {
+    problems.push(`${what}: the page didn't come up on the game layer`); await context.close(); return;
+  }
+  await page.waitForTimeout(1500);
+  const count = (from, name) => log.slice(from).filter(c => c.fn === name).length;
+  // the class's numbers on a card
+  let from = log.length;
+  const by = await page.evaluate(() => new Promise(ok => { window.shGetClassStats(['pq-1', 'pq-2'], b => ok(b), true); setTimeout(() => ok(null), 8000); }));
+  const p1 = by && by['pq-1'], p2 = by && by['pq-2'];
+  if (!p1 || p1.total !== 9 || p1.correct !== 4 || !p1.choices || p1.choices[2] !== 3 || !p2 || p2.total !== 0 || !p2.choices)
+    problems.push(`${what}: the class's numbers came back wrong: ${JSON.stringify(by)}`);
+  if (count(from, 'get_class_numbers') !== 1) problems.push(`${what}: ${count(from, 'get_class_numbers')} get_class_numbers calls for one card (1)`);
+  if (missing) {
+    if (count(from, 'question_stats') !== 1 || count(from, 'question_choices') !== 1) problems.push(`${what}: the old two reads should follow the missing call (${count(from, 'question_stats')}, ${count(from, 'question_choices')})`);
+    from = log.length;
+    await page.evaluate(() => new Promise(ok => { window.shGetClassStats(['pq-3'], () => ok(), true); setTimeout(ok, 8000); }));
+    if (count(from, 'get_class_numbers')) problems.push(`${what}: asked for the missing get_class_numbers again`);
+    if (count(from, 'question_stats') !== 1) problems.push(`${what}: the next card should read the old way (${count(from, 'question_stats')} question_stats reads)`);
+  } else if (count(from, 'question_stats') || count(from, 'question_choices')) problems.push(`${what}: ${count(from, 'question_stats') + count(from, 'question_choices')} old reads beside get_class_numbers`);
+  // the analytics: a click, a feature event and a row of question health go out together
+  const flushOnce = () => page.evaluate(() => {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = 'Phase two check'; document.body.appendChild(b); b.click(); b.remove();
+    window.shTrack('ci:phase2');
+    window.shAnalytics.send('qh', [{ q: 'pq-1', v: 'ci' }]);
+  }).then(() => page.waitForTimeout(1500));
+  from = log.length; await flushOnce();
+  const one = log.slice(from).filter(c => c.fn === 'record_analytics'), old = ['record_qh', 'record_clicks', 'record_events'].map(f => count(from, f));
+  if (!missing) {
+    const a = one[0] && one[0].a;
+    if (one.length !== 1 || !a || !(a.p_qh || []).length || !(a.p_clicks || []).length || !(a.p_events || []).some(e => e.k === 'ci:phase2'))
+      problems.push(`${what}: a click, an event and a question-health row should go in one record_analytics call (${one.length} calls: ${JSON.stringify(one.map(c => c.a))})`);
+    if (old.some(x => x)) problems.push(`${what}: old analytics calls beside record_analytics (record_qh ${old[0]}, record_clicks ${old[1]}, record_events ${old[2]})`);
+  } else {
+    if (one.length > 1) problems.push(`${what}: ${one.length} record_analytics calls (the missing one should be asked once)`);
+    if (old.some(x => x !== 1)) problems.push(`${what}: the three old calls should follow (record_qh ${old[0]}, record_clicks ${old[1]}, record_events ${old[2]})`);
+    from = log.length; await flushOnce();
+    if (count(from, 'record_analytics')) problems.push(`${what}: asked for the missing record_analytics again`);
+    if (['record_qh', 'record_clicks', 'record_events'].some(f => count(from, f) !== 1)) problems.push(`${what}: the next batches should go the old way`);
+  }
+  if (!missing) {
+    // the tenth answer, on the page: nine quick answers, then a tenth once they are saved
+    await page.evaluate(() => { window.__p2 = []; document.addEventListener('sh:rank-profile', e => window.__p2.push(e.detail)); });
+    const ev = await page.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'perio:answered'; });
+    const answer = async qs => {
+      const saved = count(0, 'record_answer_v2') + qs.length;
+      for (const q of qs) await page.evaluate(([e, qid]) => document.dispatchEvent(new CustomEvent(e, { detail: { qid, choice: 0, correct: true, ctx: 'bank' } })), [ev, q]);
+      for (let i = 0; i < 60 && count(0, 'record_answer_v2') < saved; i++) await page.waitForTimeout(500);
+    };
+    const qs = Array.from({ length: 20 }, (_, i) => 'pq-' + (i + 1));
+    from = log.length;
+    await answer(qs.slice(0, 9)); await page.waitForTimeout(800); await answer(qs.slice(9, 10)); await page.waitForTimeout(2500);
+    const reads = count(from, 'get_rank_profile_v2') + count(from, 'get_hub_mastery');
+    const last = await page.evaluate(() => window.__p2[window.__p2.length - 1] || null);
+    if (reads) problems.push(`${what}: the tenth answer read the rank or mastery ${reads} times (worked out on the page: none)`);
+    if (!last) problems.push(`${what}: the tenth answer didn't redraw the rank (no sh:rank-profile)`);
+    else {
+      if (last.profile.xp !== 2500) problems.push(`${what}: after ten answers the XP should be the last reply's total, 2500 (${last.profile.xp})`);
+      // 5 right of 8 seen, then pq-1 (wrong before) right, pq-2 (right before) right again, and eight new ones right: 14
+      if (!last.mastery || last.mastery.got !== 14) problems.push(`${what}: after ten answers this hub's mastery should count 14 right on the latest try (${JSON.stringify(last.mastery)})`);
+    }
+    // a trophy sent from the page: the next tenth answer reads both again
+    await page.evaluate(() => document.dispatchEvent(new CustomEvent('sh:trophy-sent')));
+    from = log.length;
+    await answer(qs.slice(10, 19)); await page.waitForTimeout(800); await answer(qs.slice(19)); await page.waitForTimeout(2500);
+    if (count(from, 'get_rank_profile_v2') !== 1 || count(from, 'get_hub_mastery') !== 1)
+      problems.push(`${what}: after a trophy, the next tenth answer should read the rank and mastery once each (${count(from, 'get_rank_profile_v2')}, ${count(from, 'get_hub_mastery')})`);
+    console.log(`${what}: ten answers, ${reads} reads; after a trophy, ${count(from, 'get_rank_profile_v2') + count(from, 'get_hub_mastery')} reads`);
+  }
+  if (errs.length) problems.push(`${what}, page errors: ${errs.join(' | ')}`);
+  await context.close();
+}
+
 (async () => {
   const browser = await chromium.launch();
-  try { await run(browser, false); await Promise.all([run(browser, true), kept(browser), pings(browser, false), pings(browser, true)]); } finally { await browser.close(); server.close(); }
+  try { await run(browser, false); await Promise.all([run(browser, true), kept(browser), pings(browser, false), pings(browser, true), phase2(browser, false), phase2(browser, true)]); } finally { await browser.close(); server.close(); }
   if (problems.length) { console.log('✗', problems.join('\n✗ ')); process.exit(1); }
-  console.log('✓ the quiet spell: one line, nothing sent in the spell, the same ids, in order; a working database saves at once; answers kept on the device go from the next page; pings go together once a minute, and the changelog is read once');
+  console.log('✓ the quiet spell: one line, nothing sent in the spell, the same ids, in order; a working database saves at once; answers kept on the device go from the next page; pings go together once a minute, and the changelog is read once; a card\'s class numbers, the analytics and the tenth answer take one call or none');
 })();

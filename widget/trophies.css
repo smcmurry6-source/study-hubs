@@ -143,6 +143,10 @@ html.shx[data-theme="dark"] .sht, html.shx .sh-ru-lv, html.shx .sh-mk, html.shx 
   .sht .sht-shelf-h { padding: 0 12px; }
   .sht-tro { padding: 18px 2px 8px; }
 }
+/* a phone at the largest text: the medal goes above the name, so "Bronze" isn't squeezed to a few letters (BUG-168) */
+@container sht (max-width: 300px) {
+  .sht-me { flex-direction: column; align-items: stretch; }
+}
 @media (prefers-reduced-motion: reduce) { .sht-rays, .sht-show-obj, html.shx .sh-ru-lv-medal::before, html.shx .sh-mk-ring::before { animation: none !important; } }
 
 /* the case in the dark (the theme picked, or the device's) */
@@ -306,7 +310,7 @@ html.shx[data-theme="dark"] .sh-mk-lecs { border-top-color: rgba(255, 255, 255, 
 .stx-lecs { background: var(--ground); box-shadow: inset 0 0 0 6px var(--hub), inset 0 0 0 8.5px #3B2E3A; }
 .stx-lec-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
 .stx-lec { min-width: 0; padding: 12px 14px 11px; border: 2.5px solid #3B2E3A; border-radius: 14px; background: var(--lc-soft); }
-.stx-lec-h { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.stx-lec-h { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; min-width: 0; }   /* "Needs work" goes under the title on a narrow phone */
 .stx-lec-n { flex: none; padding: 1px 7px 2px; border: 2px solid #3B2E3A; border-radius: 7px; background: var(--lc); color: var(--lc-on); font-size: 12px; font-weight: 800; }
 .stx-lec-h b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--fs-label); font-weight: 800; }
 .stx-flag { flex: none; padding: 1px 8px 2px; border: 2px solid #3B2E3A; border-radius: 999px; font-size: 11px; font-weight: 800; color: #3B2E3A; }
@@ -325,6 +329,7 @@ html.shx[data-theme="dark"] .sh-mk-lecs { border-top-color: rgba(255, 255, 255, 
 .stx-badge { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 10px 12px; border: 2.5px dashed #9C8A98; border-radius: 14px; background: #F4F0F3; }
 .stx-badge.is-got { border: 2.5px solid #3B2E3A; background-color: #FFF8E6; background-image: repeating-conic-gradient(from 0deg at 40px 50%, rgba(246, 205, 85, .42) 0deg 9deg, transparent 9deg 22deg); }
 .stx-badge svg { flex: none; width: 56px; height: 56px; }
+.stx-badge > span { min-width: 0; overflow-wrap: anywhere; }
 .stx-badge b { display: block; font-size: var(--fs-label); font-weight: 800; }
 .stx-badge small { display: block; margin-top: 2px; font-size: var(--fs-meta); line-height: 1.35; }
 .stx-badge:not(.is-got) small { color: #6E5F6B; }
@@ -341,6 +346,13 @@ html.shx[data-theme="dark"] .sh-mk-lecs { border-top-color: rgba(255, 255, 255, 
   .stx-tiles { width: 100%; }
   .stx-tile { padding: 12px; } .stx-tile dd { font-size: 28px; }
   .stx-badges { grid-template-columns: minmax(0, 1fr); }
+  /* the gauge's rays reach 37px past it: on a narrow phone they stop at the board's edge instead of pushing the page
+     sideways (the largest text, which zooms the page, BUG-168) */
+  .stx-board-in { overflow-x: clip; }
+}
+@container stx (max-width: 260px) {
+  .stx-tile dd { font-size: 24px; }
+  .stx-badge { gap: 8px; } .stx-badge svg { width: 44px; height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) { .stx-gauge::before { animation: none !important; } }
 html.shx[data-theme="dark"] .stx-ach { background: #262426; color: #F5F2F4; box-shadow: inset 0 0 0 6px #C9971C, inset 0 0 0 8.5px #3B2E3A; }

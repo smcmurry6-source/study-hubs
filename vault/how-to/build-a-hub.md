@@ -133,7 +133,7 @@ Adding a lecture to a live hub, or taking one from slides-only to taught, needs 
   `min-width:0`, or a fixed minimum (`minmax(300px, 1fr)`, `min-width: 220px`): write `min(300px, 100%)`. Don't size
   anything with `vw`, `vh` or `dvh` (an overlay, a dialog, a menu): the text-size setting zooms `<html>`, and they come out
   up to 45% bigger than the screen. Use `%` for a fixed box or a modal dialog (its box is the screen) and a container's
-  `cqw`/`cqh` inside one, then check at 320 px with XX-Large text (BUG-184 to BUG-191 in the
+  `cqw`/`cqh` inside one, then check at 320 px with XX-Large text (BUG-168 and BUG-184 to BUG-188 in the
   [bug log](../release/bug-log.md)).
 - **Controls of a figure inside the notes** never use `data-go`, `data-view`, `data-tab`, `data-sub`, `data-mode`,
   `data-lec` or `data-group`: the notes and the widget read those as navigation.

@@ -10,6 +10,20 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **The arcade games themselves at 320 px with the largest text** (2026-11-19, left from BUG-168's fix): the lobby and
+  every view of a hub now fit a 320 px phone at XX-Large (220 px of layout), and the smoke test checks them, but a game once
+  it's started (each hub's own `content/arcade.css` and `widget/games.css`) wasn't swept. Open each in a scripted browser at
+  that size, the way `tools/ci/smoke.js`'s 320 px check does, and fix any that scroll sideways or cut off a control.
+- [ ] **The dashboard's toast on a phone** (2026-11-19, left from BUG-126's fix): a hub's toasts now drop in at the top on a
+  phone, clear of Timmy, the streak flame and the Listen player; the dashboard's own (`toast()` in `widget/dash.js`) still
+  comes up at the bottom and wasn't checked against what sits there. Check it on a phone and move it if anything covers it.
+- [ ] **`xp_seen` grows back with every full rebuild** (2026-11-19, the optimization pass's phase 2,
+  [its note](2026-11-18-database-optimization-pass.md)). `sh_xp_rebuild` (Link my devices, an edited or deleted answer) deletes
+  and copies all of a student's `xp_seen` rows, `xp_days` and answer awards, whatever changed: 65,125 `xp_seen` rows went and
+  came back in the 18 hours after the 2026-11-18 restart, and on a copy 60 such rebuilds grew its index 16 → 23 MB. Phase 2
+  rewrites the table once at night (about 24 MB back). If it passes about 40 MB again, look at rebuilding only what changed
+  (an `xp_seen` row is one per question and right-or-wrong: inserting the missing ones would do for a link), or another
+  `cluster` at night. Measure on a copy first (`tools/release/bench-answers.js`).
 - [ ] **Read Perio's data quality and question-health lists with its retrospective** (2026-11-18, the evening lessons refresh):
   `select sh_data_quality();` stopped at the 5 s limit with 80 people in Perio on its final's eve, so neither it nor
   `qh_report('perio')` was read after S6 went taught. Read both, early in the day or in the quiet hours, when the retrospective runs.

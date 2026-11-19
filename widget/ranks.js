@@ -473,7 +473,9 @@
     if (document.getElementById("sh-flair-css")) return;
     var st = document.createElement("style"); st.id = "sh-flair-css";
     st.textContent = '.sh-flair{display:inline-flex;align-items:center;gap:1px;vertical-align:-4px;margin:0 3px;white-space:nowrap;flex:none}' +
-      'button.sh-flair{appearance:none;-webkit-appearance:none;background:none;border:0;padding:1px 2px;border-radius:999px;font:inherit;color:inherit;cursor:pointer;line-height:1}' +
+      /* at least 24x24, the WCAG 2.2 target size (BUG-009: the 18px medal made it 22x20 on the dashboard's boards); the
+         negative margins keep the row as tall as before */
+      'button.sh-flair{appearance:none;-webkit-appearance:none;background:none;border:0;padding:1px 2px;min-width:24px;min-height:24px;justify-content:center;margin:-2px 1px;border-radius:999px;font:inherit;color:inherit;cursor:pointer;line-height:1}' +
       'button.sh-flair:hover,button.sh-flair:focus-visible{background:rgba(127,127,127,.16)}' +
       'button.sh-flair:focus-visible{outline:2px solid currentColor;outline-offset:1px}' +
       '.sh-flair-m{display:inline-flex;width:18px;height:18px;filter:drop-shadow(0 1px .5px rgba(0,0,0,.25))}' +
@@ -1082,7 +1084,7 @@
       profile = p; mastery = m || []; ownRaw = raw;
       if (raw.journey > 0 && !window.SH_JOURNEY_ART) needJourneyArt(function(K){ if (K) render(); });
       /* the redesigned hubs' rank pill (widget/hub-rewards.js) listens; nothing on the live pages does */
-      try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: raw, mastery: masteryFor() } })); } catch (e) {}
+      try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: raw, mastery: masteryFor(), rows: m } })); } catch (e) {}
       if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
       track(raw, { busy: mockBusy, seen: function(j){ if (!window.shAutomated) rpc("mark_dark_unlock_seen", { p_visitor: H.visitor, p_journey: j }); },
         claim: window.shAutomated ? null : function(fn, args){ return rpc(fn, Object.assign({ p_visitor: H.visitor }, args)); } });
@@ -1118,7 +1120,8 @@
     document.addEventListener(H.answeredEvent, function(){
       if (++sinceLoad >= 10) {
         sinceLoad = 0;
-        setTimeout(panelOpen() ? load : loadOwn, 1500);
+        /* on the game layer widget/v3.js may already know them (shRankLocal, 2026-11-19): no read */
+        setTimeout(function(){ var t = !panelOpen() && window.shRankLocal && window.shRankLocal(ownRaw, mastery); if (t) applyOwn(t[0], t[1]); else (panelOpen() ? load : loadOwn)(); }, 1500);
       }
     });
     /* the game layer (the redesign): the server's answer carries your new total, so a rank-up, a hand-off or a Dark
