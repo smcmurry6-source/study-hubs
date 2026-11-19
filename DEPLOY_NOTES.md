@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-19 (Heme & Endo Exam 3: L21 and L22 checked against their slides, Claude Code)** — the inbox's last item for the
+- **2026-11-19 (Heme & Endo Exam 3: L21 and L22 checked against their slides, Claude Code, [#449](https://github.com/smcmurry6-source/study-hubs/pull/449))** — the inbox's last item for the
   hub: Sam put smaller copies of Dr. Dal Zotto's two decks in the Drive folder, so both lectures, written from their recordings
   on 11-18, were compared with every slide. The notes (both levels) gained what only the slides say, marked "the slide":
   bladder cancer's eighth place among deaths, urothelial carcinoma's sites and the low- and high-grade papillary behavior,
