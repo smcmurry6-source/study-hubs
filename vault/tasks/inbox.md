@@ -10,6 +10,10 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **Resolve Perio report 64 (`pc-h1`, the film is only a sketch) once its fix is live** (2026-11-19): after the PR
+  that adds "Today's film, in words" to the implant cases merges, `update question_flags set resolved = true, resolved_at = now(),
+  reply = 'Thanks! You were right: the drawn film was hard to read. Every implant case now has a "Today''s film, in words" line
+  saying where the bone sits below the implant (for #5, 1.5 mm, the same as at the crown seating).' where id = 64`.
 - [ ] **Read Perio's data quality and question-health lists with its retrospective** (2026-11-18, the evening lessons refresh):
   `select sh_data_quality();` stopped at the 5 s limit with 80 people in Perio on its final's eve, so neither it nor
   `qh_report('perio')` was read after S6 went taught. Read both, early in the day or in the quiet hours, when the retrospective runs.

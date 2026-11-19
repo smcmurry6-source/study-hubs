@@ -58,3 +58,4 @@ perio | Session 6: the true/false question on skipping initial therapy is gone (
 perio | Session 7: the #31 implant case now says where the tissue was lost (at the margin, not the apex), so its questions can be answered from the case.
 heme-endo-exam3 | New in Notes: Dr. Herr's study guide, at the top of the lecture list. Every item on the Exam 3 study guide (L17 to L22) is a heading with what you need to know about it, then its key terms, with buttons to each lecture's notes and High likelihood questions.
 heme-endo-exam3 | Dr. Herr's study guide now has a recording: Listen plays it in the notes' narrator's voice, with Follow along. Tap any word to jump there.
+perio | Session 7: the four implant cases now say what today's radiograph shows in words (where the bone sits below the implant), so you don't have to read it off the drawing.
