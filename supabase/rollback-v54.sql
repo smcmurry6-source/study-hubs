@@ -337,6 +337,9 @@ drop function if exists mark_idea_note_seen(text,bigint);
 drop function if exists admin_set_podcast_episode(text,text,text,integer);
 
 drop function if exists get_widget_bootstrap_v2(text,text,text,text,boolean,boolean,text,date,text);
+drop function if exists get_widget_bootstrap_v2(text,text,text,text,boolean,boolean,text,date,text,bigint,bigint);
+drop function if exists get_my_answers_since(text,text,bigint,bigint);
+drop function if exists sh_answers_since(text,text,bigint,bigint);
 
 drop function if exists admin_load_question_keys(text,text,jsonb,boolean);
 
