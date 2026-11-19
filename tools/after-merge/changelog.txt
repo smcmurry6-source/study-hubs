@@ -63,3 +63,4 @@ perio | Session 4: the matching question on healing after SRP now says plainly t
 heme-endo-exam3 | L21 and L22 now match Dr. Dal Zotto's slides too: the notes add what only the slides say, with 23 new questions from them and a fresh recording of both lectures, the study guide and Timmy Time.
 all | The "A miss fixed" bonus is gone, so getting a question right that you missed on an earlier day no longer pops up a gold card every time. It still pays the answer's usual XP, and the bonus XP you already earned stays.
 all | The exam check-in's last question now simply asks what the hub could have done better.
+all | At the larger text sizes on a phone, the dashboard's More menu, Settings, Timmy's checkup and Timmy's place now fit on the screen, with their Close and Customize buttons in reach. And on most phones, the music notes on Home's Timmy Time card no longer sit on the XP line.

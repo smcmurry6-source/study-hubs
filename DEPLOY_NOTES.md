@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (Large text on a phone: BUG-184 to BUG-188, Claude Code)** — The text-size setting zooms `<html>`, and inside a zoomed page
+  `100vw` and `100vh` are bigger than the screen, so four pop-ups sized that way ran off it at X-Large and XX-Large. The dashboard's More menu is
+  at most the top bar's content wide (`100cqw - 4px`, the bar is a container: `widget/dash.css`); Timmy's place's full view is sized in % of the
+  screen and its stage in `cqh` of the dialog, now a container, with a two-row header and a smaller "Timmy today" card under 310 px
+  (`widget/place.css`), and his speech bubble stays inside the picture (`widget/place.js`); Settings' rows can be
+  narrower than 220 px and its button wraps (`widget/hub.css`, Focus mode on a hub's Settings too); the dashboard's dialogs and Timmy's cards
+  (`widget/pet.js`) take `max-height: 100%` in place of `calc(100vh - 32px)`, so their Close button is on the screen; the checkup's Show me row
+  wraps. Home's Timmy Time card on a phone keeps the XP line out of the notes' column (`.pm-earn`). Default text is unchanged to the pixel.
+  `tools/ci/smoke.js` opens the four pop-ups at 320 px XX-Large and 375 px X-Large. Found doing it, logged: BUG-189 (hub pages scroll sideways
+  at 320 px, the cram sheet and Exam Hints at Default text), BUG-190 (Timmy's Shop and the other `vw`/`vh` sizes), BUG-191.
 - **2026-11-19 (The check-in's last question, Claude Code)** — Sam: "Lets change the free response question to just asking what the hub could
   have done better". The exam check-in's text step (`DEBRIEF_QS` in `widget/dash.js`) now asks "What could the hub have done better?" and its box
   has no placeholder (it was "e.g. more on suture types, more EXCEPT questions", from the 2026-10-02 version that asked for topics the hub

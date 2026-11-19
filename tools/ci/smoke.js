@@ -2073,6 +2073,61 @@ function lint(hub, A){
     notes.push(`top bars and tab rows checked at ${label}${tb.size ? ', with the Settings sheet' : ''}`);
     await context.close();
   }
+  // the dashboard's pop-ups at X-Large and XX-Large text on a small phone (BUG-184 to BUG-187, 2026-11-19): the text size zooms
+  // <html>, which makes 100vw and 100vh bigger than the screen, so each is sized by its own box or a container instead.
+  // The More menu, Settings, Timmy's checkup and his place's full view each stay on the screen, don't scroll sideways
+  // and keep every button inside them
+  for (const lt of PART === 'desktop' ? [] : [{ width: 320, height: 640, size: 'xxlarge' }, { width: 375, height: 667, size: 'xlarge' }]) {
+    const context = await browser.newContext({ viewport: { width: lt.width, height: lt.height }, serviceWorkers: 'block' });
+    await stub(context);
+    await context.addInitScript(size => { try { localStorage.setItem('sh_pref_size', size); } catch (e) {} }, lt.size);
+    const label = `${lt.width}px, ${lt.size === 'xxlarge' ? 'XX-Large' : 'X-Large'} text`;
+    const page = await context.newPage();
+    await page.goto(BASE() + 'index.html'); await page.waitForTimeout(700);
+    /* a box on the screen: inside it on all four sides, no sideways scroll, and each of its controls inside it */
+    const onScreen = (sel, what) => page.evaluate(([sel, what]) => {
+      const el = document.querySelector(sel); if (!el) return [`${what} didn't open`];
+      const out = [], r = el.getBoundingClientRect(), W = innerWidth, H = innerHeight;
+      if (r.left < -1 || r.right > W + 1) out.push(`${what} runs past the screen's side (${Math.round(r.left)} to ${Math.round(r.right)} of ${W}px)`);
+      if (r.top < -1 || r.bottom > H + 1) out.push(`${what} is taller than the screen (${Math.round(r.top)} to ${Math.round(r.bottom)} of ${H}px)`);
+      if (el.scrollWidth > el.clientWidth + 1) out.push(`${what} scrolls sideways by ${el.scrollWidth - el.clientWidth}px`);
+      for (const c of el.querySelectorAll('button, a')) {
+        const cs = getComputedStyle(c), b = c.getBoundingClientRect(); if (cs.display === 'none' || cs.visibility === 'hidden' || !b.width || c.closest('[hidden]')) continue;
+        if (b.left < Math.max(0, r.left) - 1 || b.right > Math.min(W, r.right) + 1) { out.push(`${what}: "${(c.getAttribute('aria-label') || c.textContent).trim().replace(/\s+/g, ' ').slice(0, 30)}" runs past its edge`); break; }
+      }
+      return out;
+    }, [sel, what]);
+    const report = list => list.forEach(b => problems.push(`index.html (${label}): ${b}`));
+    // the More menu (BUG-184)
+    await page.click('#menuBtn'); await page.waitForTimeout(150);
+    report(await onScreen('#dxMenu:not([hidden])', 'the More menu'));
+    await page.click('#menuBtn'); await page.waitForTimeout(100);
+    // Settings (BUG-186)
+    await page.click('#setBtn'); await page.waitForTimeout(300);
+    report(await onScreen('.dx-dlg .dx-dlgcard', 'Settings'));
+    await page.keyboard.press('Escape'); await page.waitForTimeout(150);
+    await page.evaluate(() => { const d = document.querySelector('.dx-dlg'); if (d) d.remove(); });
+    // Timmy's checkup card (BUG-187): his house draws on the first scroll, tap or key
+    await page.evaluate(() => window.scrollTo(0, 300)); await page.keyboard.press('Shift');
+    const check = await page.waitForSelector('[data-check]', { timeout: 8000 }).catch(() => null);
+    if (!check) problems.push(`index.html (${label}): Timmy's house has no Checkup button`);
+    else {
+      await page.evaluate(() => document.querySelector('[data-check]').click()); await page.waitForTimeout(400);
+      report(await onScreen('.shpet-dlg .shpet-card', "Timmy's checkup"));
+      await page.evaluate(() => { const d = document.querySelector('.shpet-dlg'); if (d) d.remove(); });
+    }
+    // Timmy's place's full view (BUG-185)
+    const tpc = await page.waitForSelector('.tpc', { timeout: 8000 }).catch(() => null);
+    if (!tpc) problems.push(`index.html (${label}): the "you" card has no Timmy's place`);
+    else {
+      await tpc.click();
+      const dlg = await page.waitForSelector('dialog.tpv[open]', { timeout: 10000 }).catch(() => null);
+      if (!dlg) problems.push(`index.html (${label}): tapping Timmy's place didn't open its full view`);
+      else { await page.waitForTimeout(600); report(await onScreen('dialog.tpv[open]', "Timmy's place")); }
+    }
+    notes.push(`the dashboard's More menu, Settings, Timmy's checkup and his place fit the screen at ${label}`);
+    await context.close();
+  }
   await browser.close(); server.close();
   notes.forEach(n => console.log('  ' + n));
   if (problems.length) { console.error('\n✗ ' + problems.length + ' problem(s):\n' + problems.map(p => '  - ' + p).join('\n')); process.exit(1); }
