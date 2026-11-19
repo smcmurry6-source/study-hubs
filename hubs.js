@@ -2,7 +2,7 @@
    classes     each class's name and the line its drawn scene says when tapped
    hubs        every hub with a card: its class, title, exams (name, label, date, the check-in's hours and extra questions,
                and askAgain: a round, "yyyy-mm-dd", that shows the check-in pop-up once more to every device that showed it
-               and never sent it), its "updated" date, what it covers, and any archiveOn / hideCardOn override
+               and never sent it; seeing it after the round is set counts as that round's showing), its "updated" date, what it covers, and any archiveOn / hideCardOn override
    archived    hubs kept only for their recaps
    checkinHour, archiveHour, cardDays, debriefDays   when "Check in" shows on exam day, when a hub archives itself (10 pm
                on its last exam day), how many days it then counts as archived before hidden (the dashboard draws no card for
@@ -174,7 +174,8 @@ window.SH_DASH_DATA = {
      "date": "2026-11-13",
      "code": "Heme & Endo · Exam 2",
      "checkinHour": 12,
-     "promptHour": 12
+     "promptHour": 12,
+     "checkinClosed": true
     }
    ],
    "archiveOn": {
@@ -213,6 +214,7 @@ window.SH_DASH_DATA = {
      "code": "Heme & Endo · Exam 1",
      "checkinHour": 9,
      "promptHour": 9,
+     "checkinClosed": true,
      "checkinUntil": {
       "date": "2026-11-06",
       "hour": 22
@@ -315,6 +317,7 @@ window.SH_DASH_DATA = {
      "code": "Occlusion · Midterm",
      "checkinHour": 19,
      "promptHour": 19,
+     "checkinClosed": true,
      "extraQs": [
       {
        "id": "diagrams",
@@ -405,7 +408,8 @@ window.SH_DASH_DATA = {
      "label": "Final",
      "date": "2026-11-19",
      "code": "Periodontology · Final",
-     "promptHour": 13
+     "promptHour": 13,
+     "askAgain": "2026-11-19"
     }
    ],
    "archiveOn": {

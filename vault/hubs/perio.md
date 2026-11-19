@@ -18,7 +18,8 @@ twenty diagrams, its redesign entry and its arcade column), Ask Timmy's 41 test 
 the dashboard case that pointed at Perio points at Heme & Endo Exam 3), its budget line in `tools/release/budgets.json` and
 its figure build in "Check hubs". So the dashboard doesn't link to a missing page before 10 pm, `hubs.js` archives it at
 1 pm that day (`archiveOn`), and the final's check-in pop-up goes out from 1 pm (`promptHour: 13`: the exam was that
-morning). What stays: its entry in `hubs.js` (no card; its exam check-ins under Past hubs until `debriefDays` runs out),
+morning). Then, once more to anyone who had opened it and not sent it (Sam, 2026-11-19: "repush the perio check in pop up
+for everyone"; `askAgain: "2026-11-19"`). What stays: its entry in `hubs.js` (no card; its exam check-ins under Past hubs until `debriefDays` runs out),
 `tools/question-ids/perio.txt` so its ids are never reused, its drawn art (`widget/hub-art/perio.js`, `tools/figures/site/`),
 the figure kit in `tools/figures/perio/` (its `build.mjs` has nothing to write to now; `tools/figures/heme-endo-exam3/` was
 copied from it), `tools/podcast/perio/` and the class's data in Supabase. The last version of the page is in git:

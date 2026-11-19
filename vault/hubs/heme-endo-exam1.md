@@ -9,7 +9,8 @@ status: archived
 
 DENT 2160 Hematology & Endocrinology Exam 1 (lectures 1-10), Fri Oct 30. Sam reopened it for a late exam: it archived
 2026-11-03 at 10 pm (`archiveOn`), but its card and Check in button stay on the dashboard until Fri 11-06 10 pm
-(`hideCardOn`, `checkinUntil`). Retrospective: `LESSONS.md` → Hub retrospectives (written 2026-11-03).
+(`hideCardOn`, `checkinUntil`). Its check-in is closed (`checkinClosed:true` since 2026-11-19, refused by the server since
+`migration_v86.sql`). Retrospective: `LESSONS.md` → Hub retrospectives (written 2026-11-03).
 
 ## Worth knowing (it's the model for other hubs)
 

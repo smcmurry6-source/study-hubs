@@ -1078,7 +1078,6 @@
       });
     });
     if (!best) return false;
-    if (best.again) lsSet("sh_debrief_again_" + best.h.id + "_" + best.x.date + "_" + best.x.askAgain, "1");
     openDebrief(best.h, best.x, best.again);
     return true;
   }
@@ -1091,6 +1090,9 @@
     var me = surveyVisitor();
     if (!me) return;
     lsSet("sh_debrief_" + hub.id + "_" + x.date, "1");   /* shown = seen; the card button stays for later */
+    /* seen now, by the pop-up or the button, counts as this askAgain round's showing too, so a device that first sees it
+       after the round was set isn't asked a second time on its next visit */
+    if (x.askAgain) lsSet("sh_debrief_again_" + hub.id + "_" + x.date + "_" + x.askAgain, "1");
     var QS = debriefQs(x), answers = {}, examId = x.date + " " + (x.label || "Exam"), step = 0, last = QS.length - 1, timer = null;
     /* the server pays for the first check-in for this exam; one already sent from this device had it, so it isn't offered */
     var pays = !ls("sh_debrief_sent_" + hub.id + "_" + x.date);
@@ -1191,6 +1193,12 @@
         };
         if (!debriefSb) { failed(); return; }
         sendForm(debriefSb, "submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
+          /* closed on the server (migration_v86) after this page loaded its hubs.js */
+          if (!r.ok && r.closed) {
+            W.set(thanksHtml("This check-in is closed.", "Thanks for wanting to help! It isn't taking answers any more."));
+            W.say("This one's closed. Thanks anyway!");
+            setTimeout(close, 4000); return;
+          }
           if (!r.ok) { failed(); return; }
           lsSet("sh_debrief_sent_" + hub.id + "_" + x.date, "1"); renderCheckins();
           var text = "Thought of something else? Check in again any time from the hub on this page.";
@@ -1848,7 +1856,7 @@
     return sb.rpc(name + "_v2", args).then(function(r){
       if (missing(r)) return old();
       var d = !r.error && r.data && typeof r.data === "object" ? r.data : null;
-      return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0 };
+      return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0, closed: !!(d && d.closed) };
     });
   }
   /* a reward was paid (the window celebrates it: celebrate): the "you" card's XP and crowns read again from the server */

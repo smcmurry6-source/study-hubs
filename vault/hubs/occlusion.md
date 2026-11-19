@@ -12,7 +12,8 @@ take the page down"; [decisions](../decisions.md)): `hubs/occlusion/` (the page,
 `assets/og-occlusion.png` are gone, with its About page entries (What cusp hits where?, its diagrams, its arcade column,
 its filters and question formats), Ask Timmy's 43 test cases for it (`tools/timmy/test-set.json`) and its figure build in
 "Check hubs". Its retrospective and recap were done first (2026-11-17). What stays: its entry in `hubs.js` (no card since
-it archived; its exam check-ins under Past hubs, the final's until `debriefDays` runs out), `tools/question-ids/occlusion.txt`
+it archived; the final's exam check-in under Past hubs until `debriefDays` runs out; the midterm's closed 2026-11-19, Sam: `checkinClosed:true`,
+refused by the server since `migration_v86.sql`), `tools/question-ids/occlusion.txt`
 so its ids are never reused, its drawn art (`widget/hub-art/occlusion.js`, `tools/figures/site/`), the figure kit in
 `tools/figures/occlusion/` (its `build.mjs` has nothing to write to now), `tools/podcast/occlusion/` and the class's data in
 Supabase. The admin page sees the 404 and won't set it Live. The last version of the page is in git:

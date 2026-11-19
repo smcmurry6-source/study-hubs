@@ -15,6 +15,7 @@ job is to put the right files in its PR and, after the merge, read the workflow'
 | changes a hub's `content/questions.json` (or `tools/question-ids/<hub>.txt`) | loads that hub's answer keys (`node tools/xp/keys.js <hub> --load`) | nothing more |
 | changes `supabase/functions/timmy/` (the About page changes `site.json`) | deploys Ask Timmy (`node tools/timmy/deploy.mjs`), then, when its code changed (`core.js`, `index.ts`), asks it one real question on the live hub with the soonest exam and fails on a nap ([ask-timmy](../reference/ask-timmy.md), step 4); when only `site.json` changed, a free check that calls no model (since 2026-11-18: a real question cost about $0.60 every time) | nothing more |
 | changes a hub's Timmy Time episode (`podcast` in `content/core.json`: a new id or length) | registers it (`admin_set_podcast_episode`), so listening earns XP | nothing more |
+| changes `hubs.js` | sets the server's closed check-ins (`exam_checkins_closed`, `migration_v86.sql`) to every exam with `checkinClosed: true` there, so a closed check-in can't be sent and a reopened one can (`--only checkins` runs it by hand) | nothing more: closing or reopening a check-in is only `checkinClosed` in `hubs.js` |
 | changes any site file | waits until GitHub Pages serves it (up to 15 minutes), then runs `node tools/release/postcheck.js` on it | nothing more |
 | adds a file to `tools/data-fixes/` | runs it once on the live database, after the pages are live | the fix, **safe to run twice** (a recount, not an increment), its header saying why |
 | adds a line to `tools/after-merge/changelog.txt` | `log_changelog` for that hub (the dashboard's "Updated" label) | `<hub> \| <one student-facing sentence>` when students would notice the change |
@@ -30,7 +31,7 @@ read them:
 
 - `SB_KEY`: the Supabase publishable key (the site's own).
 - `ADMIN_SECRET`: the admin secret (keys, episodes, the changelog).
-- `SUPABASE_ACCESS_TOKEN`: a Supabase access token (Ask Timmy's deploy and the data fixes through the management API).
+- `SUPABASE_ACCESS_TOKEN`: a Supabase access token (Ask Timmy's deploy, the closed check-ins and the data fixes through the management API).
 
 Never put them anywhere else ([secrets](../rules/secrets.md)). The workflow's logs are public, so the script prints no
 secret and no row of the class's data: a data fix's final `select` stays in the database

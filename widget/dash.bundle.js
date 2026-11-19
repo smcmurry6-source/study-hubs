@@ -963,7 +963,6 @@ if (!best || x.date > best.x.date) best = { h:h, x:x, again:again };
 });
 });
 if (!best) return false;
-if (best.again) lsSet("sh_debrief_again_" + best.h.id + "_" + best.x.date + "_" + best.x.askAgain, "1");
 openDebrief(best.h, best.x, best.again);
 return true;
 }
@@ -972,6 +971,7 @@ function openDebrief(hub, x, again){
 var me = surveyVisitor();
 if (!me) return;
 lsSet("sh_debrief_" + hub.id + "_" + x.date, "1");
+if (x.askAgain) lsSet("sh_debrief_again_" + hub.id + "_" + x.date + "_" + x.askAgain, "1");
 var QS = debriefQs(x), answers = {}, examId = x.date + " " + (x.label || "Exam"), step = 0, last = QS.length - 1, timer = null;
 var pays = !ls("sh_debrief_sent_" + hub.id + "_" + x.date);
 var ideaTick = null, ideaPost = {};
@@ -1062,6 +1062,11 @@ setTimeout(close, 4000);
 };
 if (!debriefSb) { failed(); return; }
 sendForm(debriefSb, "submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
+if (!r.ok && r.closed) {
+W.set(thanksHtml("This check-in is closed.", "Thanks for wanting to help! It isn't taking answers any more."));
+W.say("This one's closed. Thanks anyway!");
+setTimeout(close, 4000); return;
+}
 if (!r.ok) { failed(); return; }
 lsSet("sh_debrief_sent_" + hub.id + "_" + x.date, "1"); renderCheckins();
 var text = "Thought of something else? Check in again any time from the hub on this page.";
@@ -1628,7 +1633,7 @@ function old(){ return sb.rpc(name, args).then(function(r){ return { ok: !r.erro
 return sb.rpc(name + "_v2", args).then(function(r){
 if (missing(r)) return old();
 var d = !r.error && r.data && typeof r.data === "object" ? r.data : null;
-return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0 };
+return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0, closed: !!(d && d.closed) };
 });
 }
 function rewardPaid(sb, r){
