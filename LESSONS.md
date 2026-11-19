@@ -102,8 +102,8 @@ taught from Dr. Geurs' class, with five diagrams (#419, #420), A or B on every c
 day. **#62, "Contradicts other lectures" (`q6-T02`, sent just before this audit): right, and fixed here.** The item asked, as a bare
 true/false, whether Dr. Geurs sometimes regenerates without initial therapy first (true: he said so in class), while S4, S5 and his own
 decision tree put initial therapy first, and S5 lists wanting to skip Phase I as a reason not to operate. The class split on it: 9 of 18
-answers "False". Its stem (both versions) now gives the rule first and his exception second, and the explanation and whys say the order
-still stands; same id, key True. 10 check-ins from 9 people (Occlusion final 5 more, Heme & Endo Exam 2 3 more, the Occlusion midterm 1;
+answers "False". The audit first reworded it (the rule first, his exception second); then **Sam retired it** ("it can go": it tested an
+aside), and S6's High yield was recorded again. 10 check-ins from 9 people (Occlusion final 5 more, Heme & Endo Exam 2 3 more, the Occlusion midterm 1;
 their retrospectives below have the new totals). The survey "How's the new look?": 7 more answers, **21 in all, 4.3 of 5**; one said the
 notes are wordier than before the redesign and too long to get through (for Sam, below). 7 searches, none a missing fact.
 
@@ -119,7 +119,7 @@ smoker, and smoking counts against an implant without ruling it out (its why say
   reached S1-S4**: 19-22 people each, 75-81% on first tries (this morning S2 57% and S3 59%, from 8-10 people); S5-S9 42-54 people each,
   78-83%; S6, taught this morning, 54 people and 2,094 answers at 78%. Time since 9 am: the bank 6,685 min (68 people), notes 3,513 (45),
   Learn 675 (7), the cram 265 (7), the mock 194 (8; 5 finished at 80% on average), Home 222 (56), Stage & Grade 46 (6); the drill and
-  Timmy Time a few people each. Fixed here: `q6-T02` (report #62, above) and **`q6-L35`'s explanation** (half of 30 first tries read "3
+  Timmy Time a few people each. Fixed here: `q6-T02` retired (report #62, above) and **`q6-L35`'s explanation** (half of 30 first tries read "3
   or more sides of the root" as "3 walls" and called it contained; the explanation and why now separate the root's sides from the bony
   walls, both from S6's notes). Checked and left as they are (keys match the notes): `q8-F04` (a five-option select-all, 2 of 22 first
   tries right: clindamycin and azithromycin get ticked), `q8-M03` (the dosing chart's under-16 note, kept on purpose 11-14), `q8-T07`
@@ -468,8 +468,8 @@ each one is usually a pattern, not a one-off, so fix the pattern across the bank
 - **A professor's exception, asked as a bare true/false, reads as contradicting the course.** Perio report #62 (2026-11-18, the
   final's eve): `q6-T02` asked whether Dr. Geurs sometimes regenerates without initial therapy first (he said so in class), while S4,
   S5 and his own decision tree put initial therapy first; the report said it contradicted other lectures, and 9 of 18 answers were
-  "False". When an item tests an exception, put the rule in the stem beside it ("normally X, but he sometimes Y") and say in the
-  explanation that the rule still stands.
+  "False" (Sam retired it: it tested an aside). Ask about the rule, not a professor's aside from it; if an exception is worth an
+  item, put the rule in the stem beside it ("normally X, but he sometimes Y") and say in the explanation that the rule still stands.
 
 ## Hub retrospectives
 
