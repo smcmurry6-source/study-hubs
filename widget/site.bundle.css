@@ -887,6 +887,7 @@ background: var(--row); text-align: left; text-decoration: none; transition: bac
 .set-row > div { flex: 1; min-width: min(220px, 100%); }
 .set-row b { display: block; font-weight: var(--w-strong); }
 .set-row small { display: block; font-size: var(--fs-meta); color: var(--muted); }
+.set-row > .btn { max-width: 100%; white-space: normal; text-align: center; }
 .pod-slot { min-height: 120px; }
 html.shx .anima .iso-plate { box-shadow: none; border: 1px solid var(--border); background: var(--row); }
 html.shx .anima > figure.sh-fig-pin { top: calc(var(--bar-h) + var(--boss-h, 0px) + 6px); box-shadow: none; background: var(--ground); }
@@ -1177,7 +1178,7 @@ html.shx .sh-reply { top: calc(64px + env(safe-area-inset-top, 0px)); bottom: au
 .hx .ql-pod { padding: 12px; }
 .pm-text { padding-right: 0; }
 .hx .ql-pod { min-height: 0; }
-.ql-pod .pm-text small { padding-right: 64px; }
+.ql-pod .pm-text small, .ql-pod .pm-earn { padding-right: 64px; }
 .pm-art, .pm-timmy { width: 62px; }
 .pm-art { right: 2px; bottom: -10px; }
 .pm-notes { left: 6px; top: -26px; width: 28px; }
@@ -1193,6 +1194,7 @@ html.shx .sh-tts-dock { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); }
 }
 @media (max-width: 380px) {
 .ql-pod .pm-text small { display: none; }
+.ql-pod .pm-earn { padding-right: 0; }
 .pm-art, .pm-timmy { width: 48px; }
 .pm-art { right: 0; bottom: -8px; }
 .pm-notes { display: none; }
@@ -1250,7 +1252,7 @@ color: var(--text); transition: background var(--t-hover) var(--ease-out), trans
 .dx-ib:hover { background: var(--panel); }
 .dx-ib:active { transform: scale(.94); }
 .dx-menuwrap { position: relative; }
-.dx-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: min(300px, calc(100vw - 24px)); padding: 6px; border-radius: var(--r-panel);
+.dx-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 30; width: min(300px, calc(100cqw - 4px)); padding: 6px; border-radius: var(--r-panel);
 background: var(--row); box-shadow: var(--float-shadow); }
 .dx-menu a, .dx-menu button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px 12px; border: 0; border-radius: var(--r-row);
 background: transparent; text-align: left; text-decoration: none; }
@@ -1895,7 +1897,7 @@ html.shx:not([data-theme="light"]) .dx .rc-chart h4 { color: #3b2e3a; }
 @media (prefers-reduced-motion: reduce) { .rc-body .rk-bar, .rc-body .rk-face, .rc-body .rk-tim, .rc-body .rc-peak { animation: none !important; } }
 .dx-foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px; padding-top: 8px; font-size: var(--fs-meta); color: var(--muted); }
 .dx-dlg { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 16px; background: rgba(30, 20, 30, .45); overflow-y: auto; }
-.dx-dlgcard { position: relative; display: grid; gap: 10px; width: min(460px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; padding: 24px; border-radius: var(--r-panel);
+.dx-dlgcard { position: relative; display: grid; gap: 10px; width: min(460px, 100%); max-height: 100%; overflow-y: auto; padding: 24px; border-radius: var(--r-panel);
 background: var(--ground); box-shadow: var(--float-shadow); }
 .dx-dlg-wide .dx-dlgcard { width: min(720px, 100%); }
 .dx-dlgcard > h2 { padding-right: 44px; }

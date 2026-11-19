@@ -242,7 +242,7 @@
     ".tp-bubble.on{opacity:1;transform:none}",
     ".tp-bubble::before,.tp-bubble::after{content:'';position:absolute;left:var(--tail,50%);top:100%;transform:translateX(-50%);border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid #3B2E3A}",
     ".tp-bubble::after{border-left-width:5px;border-right-width:5px;border-top:7px solid #fff;margin-top:-.5px}",
-    ".tp-bubble.below{transform-origin:var(--tail,50%) 0}.tp-bubble.below::before,.tp-bubble.below::after{top:auto;bottom:100%;border-top:0;border-bottom:9px solid #3B2E3A}.tp-bubble.below::after{border-bottom:7px solid #fff;margin:0 0 -.5px}.tp-bubble.small{font-size:12px;padding:5px 9px;max-width:min(66%,220px)}",
+    ".tp-bubble.below{transform-origin:var(--tail,50%) 0}.tp-bubble.below::before,.tp-bubble.below::after{top:auto;bottom:100%;border-top:0;border-bottom:9px solid #3B2E3A}.tp-bubble.below::after{border-bottom:7px solid #fff;margin:0 0 -.5px}.tp-bubble.small{font-size:12px;padding:5px 9px;max-width:min(66%,220px)}.tp-bubble.tiny{box-sizing:border-box;max-width:calc(100% - 12px)}",
     ".tp-burstpos{position:absolute;width:26%;aspect-ratio:1;transform:translate(-50%,-50%);pointer-events:none;line-height:0}",
     /* Timmy waves with his right arm (the same move as the pet's do-wave) */
     ".tp-timmy .shpet-arm-r{transform-box:fill-box;transform-origin:0% 40%}.tp-timmy.do-wave .shpet-arm-r{animation:tp-wave .38s ease-in-out var(--wn,6) alternate}@keyframes tp-wave{from{transform:rotate(0)}to{transform:rotate(var(--wa,-58deg))}}",
@@ -560,15 +560,17 @@
      page's stage, tools/preview/design/design.js) ---------- */
   function say(text){
     var b = V && V.sr && $(".tp-bubble", V.sr); if (!b || !text) return;
-    b.textContent = text; b.classList.toggle("small", b.parentNode.clientWidth < 440); V.bub = { el: b, w: b.offsetWidth, h: b.offsetHeight }; bubbleAt();
+    b.textContent = text; b.classList.toggle("small", b.parentNode.clientWidth < 440); b.classList.toggle("tiny", b.parentNode.clientWidth < 260); V.bub = { el: b, w: b.offsetWidth, h: b.offsetHeight }; bubbleAt();
     b.classList.add("on"); clearTimeout(V.sayT); V.sayT = setTimeout(function(){ b.classList.remove("on"); if (V) V.bub = null; }, Math.max(3200, Math.min(7000, text.length * 62)));
   }
-  /* the bubble sits over Timmy's head (under him when there's no room above), kept inside the picture, its tail on him */
+  /* the bubble sits over Timmy's head (under him when there's no room above and more below), kept inside the picture, its
+     tail on him. On a small stage (a phone at the largest text) it can be taller than either side: then it stays in the
+     picture over him rather than run off its edge (BUG-185) */
   function bubbleAt(){
     var u = V && V.bub; if (!u || !V.pos) return;
     var box = u.el.parentNode, Wd = box.clientWidth, Ht = box.clientHeight, vb = V.cam || TP.VIEWBOX, q = TP.project(V.pos[0], V.pos[1], V.pos[2] || 0);
     var x = (q[0] - vb[0]) / vb[2] * Wd, head = (q[1] - ((V.m.eq || {}).outfit ? 60 : 50) - vb[1]) / vb[3] * Ht, feet = (q[1] + 4 - vb[1]) / vb[3] * Ht;
-    var left = Math.max(6, Math.min(Wd - u.w - 6, x - u.w / 2)), below = head - u.h - 11 < 4, top = below ? feet + 11 : head - u.h - 11;
+    var left = Math.max(6, Math.min(Wd - u.w - 6, x - u.w / 2)), below = head - u.h - 11 < 4 && Ht - feet > head, top = Math.max(4, Math.min(Ht - u.h - 4, below ? feet + 11 : head - u.h - 11));
     u.el.style.left = left.toFixed(1) + "px"; u.el.style.top = top.toFixed(1) + "px"; u.el.style.setProperty("--tail", Math.max(16, Math.min(u.w - 16, x - left)).toFixed(1) + "px"); u.el.classList.toggle("below", below);
   }
   function rankName(m){

@@ -19,13 +19,15 @@
    of bulbs under the name, the stage in a gold frame under two spotlights, and the panel beside it. Your own place and
    a visit share the look (Sam, 2026-11-14: "way more epic and better buttons/ui"); a visit adds the trip through the
    clouds and the guest card. The design tokens are set on the dialog for everything inside it, so the customizer is
-   drawn on the same dark surfaces in light and dark. ---------- */
+   drawn on the same dark surfaces in light and dark.
+   Sized in % of the screen and in cqw/cqh of the dialog (a container), never vw/dvh: the text-size setting zooms <html>,
+   which enlarges 100vw and 100dvh, and the view ran past the screen at X-Large and up (BUG-185). ---------- */
 html.tpv-open { overflow: hidden; }
 dialog.tpv { --ar-bg: #2a2233; --ar-deep: #1d1724; --ar-row: #372c44; --ar-soft: #cfc3d6; --ar-gold: #ffe08a; --ar-gold2: #f2c94c; --ar-ink: #3b2e3a;
   --ground: var(--ar-bg); --panel: var(--ar-deep); --row: var(--ar-row); --active: #4a3c5b; --text: #fff; --muted: var(--ar-soft); --rule: rgba(255, 255, 255, .14);
   --border: rgba(255, 255, 255, .2); --control: rgba(255, 255, 255, .45); --primary: var(--ar-gold); --on-primary: var(--ar-ink);
   --sun: #ffe8a3; --sun-ink: #7a5300; --mint: #def4e6; --mint-ink: #1d6a42; --lilac: #ece6f8; --lilac-ink: #58408a;
-  width: min(1240px, calc(100vw - 32px)); height: min(820px, calc(100dvh - 32px)); max-width: none; max-height: none; margin: auto; padding: 0; border: 0;
+  width: min(1240px, calc(100% - 32px)); height: min(820px, calc(100% - 32px)); max-width: none; max-height: none; margin: auto; padding: 0; border: 0; container: tpv / size;
   border-radius: 22px; background: var(--ar-bg); color: #fff; font-family: var(--font); font-size: var(--fs-body); line-height: 1.45; overflow: hidden;
   box-shadow: 0 0 0 2px rgba(255, 224, 138, .55), 0 24px 70px rgba(10, 6, 14, .6); }
 dialog.tpv::backdrop { background: rgba(20, 14, 20, .72); }
@@ -91,7 +93,7 @@ dialog.tpv::backdrop { background: rgba(20, 14, 20, .72); }
 .tpv-stagewrap::before { left: 2%; transform-origin: 50% 0; transform: rotate(-16deg); }
 .tpv-stagewrap::after { right: 2%; transform-origin: 50% 0; transform: rotate(16deg); animation-delay: -3s; }
 @keyframes tpv-sway { from { opacity: .7; } to { opacity: 1; } }
-.tpv-frame { position: relative; z-index: 1; width: min(100%, calc((min(820px, 100dvh - 32px) - 164px) * 1.13)); }
+.tpv-frame { position: relative; z-index: 1; width: min(100%, calc((100cqh - 164px) * 1.13)); }
 .tpv-stage { border-radius: var(--r-panel); overflow: hidden; background: #cfe9f7;
   box-shadow: 0 0 0 4px var(--ar-gold), 0 0 0 7px rgba(42, 34, 51, .9), 0 0 0 9px var(--ar-gold2), 0 18px 40px rgba(0, 0, 0, .5), 0 0 60px rgba(255, 214, 102, .22); }
 .tpv-stage.is-night { background: #1c1f3f; }
@@ -366,7 +368,7 @@ dialog.tpv.is-trip::backdrop { background: transparent; }
 .tpv-clouds.out .tpv-cloud { animation: tpv-cloud-out 780ms cubic-bezier(.5, 0, .85, .55) var(--d2) both; }
 @keyframes tpv-cloud-in { from { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(.62) rotate(var(--r)); } to { opacity: 1; transform: none; } }
 @keyframes tpv-cloud-out { from { opacity: 1; transform: none; } to { opacity: 1; transform: translate(var(--dx), var(--dy)) scale(1.3) rotate(calc(var(--r) * -1)); } }
-.tpv-clmsg { position: absolute; z-index: 2; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 8px; max-width: 80vw; text-align: center; color: #3B2E3A; opacity: 0; }
+.tpv-clmsg { position: absolute; z-index: 2; left: 50%; top: 50%; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 8px; max-width: 80cqw; text-align: center; color: #3B2E3A; opacity: 0; }
 .tpv-clhp { display: block; width: 72px; height: 72px; }
 .tpv-clhp svg { display: block; width: 100%; height: 100%; }
 .tpv-clmsg b { font-size: 22px; font-weight: var(--w-head); line-height: 1.2; overflow-wrap: anywhere; }
@@ -386,7 +388,7 @@ html.hx-still .tpv-host > *, html.hx-still .tpv-guest > * { animation: none; }
 
 /* a phone: the whole screen, the stage on top and the panel scrolling under it */
 @media (max-width: 760px) {
-  dialog.tpv { width: 100vw; height: 100dvh; border-radius: 0; box-shadow: none; }
+  dialog.tpv { width: 100%; height: 100%; border-radius: 0; box-shadow: none; }
   .tpv-clmsg b { font-size: 19px; }
   .tpv-home { width: 44px; padding: 0; justify-content: center; } .tpv-home span { display: none; }   /* its name stays "Back to mine" */
   .tpv-vnav { width: 40px; height: 40px; margin-top: -20px; }
@@ -399,8 +401,8 @@ html.hx-still .tpv-host > *, html.hx-still .tpv-guest > * { animation: none; }
   .tpv-acts .tpv-seg .tpv-ic { display: none; }
   .tpv-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
   .tpv-stagewrap { padding: 14px 12px; }
-  .tpv-frame { width: min(100%, calc(44dvh * 1.13)); }
-  .tpv.is-custom .tpv-frame { width: min(100%, calc(36dvh * 1.13)); }
+  .tpv-frame { width: min(100%, calc(44cqh * 1.13)); }
+  .tpv.is-custom .tpv-frame { width: min(100%, calc(36cqh * 1.13)); }
   .tpv-zoom { right: 8px; top: 8px; }
   .tpv-side { padding: 14px 16px 24px; box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); }
   .is-visit .tpv-title h2 { font-size: 22px; }
@@ -413,12 +415,26 @@ html.hx-still .tpv-host > *, html.hx-still .tpv-guest > * { animation: none; }
   .tpv-foot .tpv-btn { flex: 1 1 auto; }
   .tpv-foot .tpv-done { margin-left: 0; }
 }
+/* a narrow dialog (a phone at X-Large or XX-Large text, which zooms the page): the name and Close on the first row, Visit /
+   Customize and Back to mine under them, so the name isn't squeezed to a letter a line and Close stays on the screen */
+@container tpv (max-width: 310px) {
+  .tpv-top { flex-wrap: wrap; row-gap: 6px; }
+  .tpv-acts { display: contents; }
+  .tpv-title { flex: 1 1 calc(100% - 60px); }
+  .tpv-x { order: 1; }
+  .tpv-seg, .tpv-home { order: 2; }
+  .tpv-seg button { padding: 0 10px; }
+  .tpv-me { gap: 10px; padding: 12px; }   /* Timmy today: a smaller face, and his HP under his state when they don't fit side by side */
+  .tpv-meface { width: 52px; height: 52px; }
+  .tpv-meface img { width: 40px; margin-bottom: 3px; }
+  .tpv-hp { flex-wrap: wrap; row-gap: 2px; }
+}
 /* a tablet held upright: the stage on top at the window's width, the panel under it, as on a phone */
 @media (min-width: 761px) and (max-width: 1000px) and (min-height: 900px) {
-  dialog.tpv { height: calc(100dvh - 32px); }
+  dialog.tpv { height: calc(100% - 32px); }
   .tpv-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
-  .tpv-frame { width: min(100%, calc(46dvh * 1.13)); }
-  .tpv.is-custom .tpv-frame { width: min(100%, calc(38dvh * 1.13)); }
+  .tpv-frame { width: min(100%, calc((100cqh + 32px) * .46 * 1.13)); }
+  .tpv.is-custom .tpv-frame { width: min(100%, calc((100cqh + 32px) * .38 * 1.13)); }
   .tpv-side { box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08); }
   .tpv-host, .tpv-guest { max-width: 640px; margin: 0 auto; }
 }
