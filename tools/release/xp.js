@@ -1210,6 +1210,13 @@ try {
     eq(ci('xp-CI0', 'xh', ex), { ok: true, xp: 0, crowns: 0 }, 'someone who checked in before the reward existed gets nothing for checking in again');
     eq(anon(`select submit_exam_debrief('xh', '2099-01-01 Final', 'xp-CI', '{"ready":4}'::jsonb)`)[0][0], 'f', 'a check-in for an exam that hasn\'t happened is refused, as before');
     eq(json(`sh_wallet('xp-CI')`).rewards, 2, 'the wallet counts two rewards');
+    // migration_v85: a closed check-in (checkinClosed in hubs.js, kept in exam_checkins_closed) is refused before anything is saved or paid
+    sql(`insert into exam_checkins_closed (hub, exam_date) values ('xh3', ${q(ex.slice(0, 10))})`);
+    eq(ci('xp-CI4', 'xh3', ex), { ok: false, closed: true }, 'a check-in for a closed exam is refused, and says so');
+    eq(anon(`select submit_exam_debrief('xh3', ${q(ex)}, 'xp-CI4', '{"ready":4}'::jsonb)`)[0][0], 'f', 'the old name answers false for it');
+    eq([num(`select count(*) from exam_debriefs where hub = 'xh3'`), xpOf('xp-CI4')], [0, 0], 'nothing saved, nothing paid');
+    eq(ci('xp-CI4', 'xh', ex).xp, 1000, 'an open check-in still pays, for the same person on the same day');
+    raises(() => anon(`select count(*) from exam_checkins_closed`), '42501', 'anon reads the closed check-ins');
     // a linked device: the reward was paid on one id, so the other's first check-in for that exam pays nothing
     const lc = anon(`select create_link_code('xp-CI')`)[0][0];
     eq(anon(`select redeem_link_code(${q(lc)}, 'xp-CI3')`)[0][0], 'xp-CI', 'a second device links');
@@ -1227,7 +1234,7 @@ try {
     sql('begin;\n' + v61 + '\ncommit;');
     eq(xpOf('xp-TU') - t0, 500, 'running the top-up again changes nothing');
     sql(`select sh_xp_rebuild(array['xp-TU'])`); eq(xpOf('xp-TU') - t0, 500, 'the rebuild agrees with the top-up');
-    notes.push('a survey or check-in: 1,000 XP and 1,000 crowns once each, nothing for "Later", a second check-in, an earlier one or a linked device');
+    notes.push('a survey or check-in: 1,000 XP and 1,000 crowns once each, nothing for "Later", a second check-in, an earlier one, a linked device or a closed check-in');
   }
 
   /* ---------- 14c. migration_v68: the crowns in every reply, and the prizes ---------- */

@@ -9,6 +9,9 @@
 //              a free check that calls no model (a question asked from a mock exam gets the "paused" answer)
 //   podcast    a hub's Timmy Time episode changed (content/core.json's podcast: its id or length) → tell the server, so
 //              listening earns XP (admin_set_podcast_episode)
+//   checkins   hubs.js changed → the server's closed check-ins (exam_checkins_closed, migration_v85) set to every exam with
+//              checkinClosed in hubs.js, so a closed check-in can't be sent and a reopened one can (Sam, 2026-11-19: "no
+//              one should be able to submit for any older exams")
 //   live       wait until GitHub Pages serves the push (up to 15 minutes), so what follows meets the new pages
 //   fixes      a data fix added under tools/data-fixes/ → run it once on the live database (Supabase's management API)
 //   changelog  a line added to tools/after-merge/changelog.txt → log_changelog for its hub (the hub's "Updated" label)
@@ -17,19 +20,20 @@
 //   node tools/after-merge/run.js --from <sha> --to <sha>       what a push from <from> to <to> needs (default: HEAD^1..HEAD)
 //   node tools/after-merge/run.js ... --dry                     only print the plan; nothing is sent anywhere
 //   node tools/after-merge/run.js ... --fix tools/data-fixes/<file>.sql   also run that data fix (added earlier, by hand)
-//   node tools/after-merge/run.js ... --only keys,changelog     only some steps
+//   node tools/after-merge/run.js ... --only keys,changelog     only some steps (--only checkins runs that step even
+//                                                               when hubs.js didn't change)
 //
 // Secrets come from the environment and are never printed (vault/rules/secrets.md): SB_KEY and ADMIN_SECRET for keys,
-// podcast and changelog; SUPABASE_ACCESS_TOKEN for timmy and fixes. A step whose secret is missing is "blocked", and the
+// podcast and changelog; SUPABASE_ACCESS_TOKEN for timmy, checkins and fixes. A step whose secret is missing is "blocked", and the
 // run fails so it shows on main's checks. The workflow's logs are public: nothing here prints a row of the class's data
 // (a data fix's result is never printed) or anything about a person (vault/rules/learner-data-privacy.md).
 'use strict';
-const fs = require('fs'), path = require('path'), crypto = require('crypto'), { execFileSync, spawnSync } = require('child_process');
+const fs = require('fs'), path = require('path'), crypto = require('crypto'), vm = require('vm'), { execFileSync, spawnSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '../..');
 const REF = 'thytmzsgymydbzcqdnix', API = `https://${REF}.supabase.co`, LIVE = 'https://smcmurry6-source.github.io/study-hubs/';
 const ORIGIN = 'https://smcmurry6-source.github.io';
-const STEPS = ['keys', 'timmy', 'podcast', 'live', 'fixes', 'changelog', 'postcheck'];
+const STEPS = ['keys', 'timmy', 'podcast', 'checkins', 'live', 'fixes', 'changelog', 'postcheck'];
 const CHANGELOG = 'tools/after-merge/changelog.txt';
 const SITE = ['index.html', 'hubs.js', 'about', 'review', 'hubs', 'widget', 'assets', 'manifest.webmanifest', 'sw.js'];   // tools/preview/transform.js SITE_ENTRIES
 const HUB_RE = /^[a-z0-9][a-z0-9-]{0,39}$/;
@@ -46,7 +50,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
    to the changelog file. Exported for tools/after-merge/test.js. */
 function plan({ changes, podcast, added, extraFixes, engineHubs }){
   const files = changes.map(c => c.path), touched = p => files.some(f => f === p || f.startsWith(p));
-  const out = { keys: [], timmy: false, timmyCode: false, podcast: [], site: [], fixes: [], changelog: [], warnings: [] };
+  const out = { keys: [], timmy: false, timmyCode: false, podcast: [], checkins: false, site: [], fixes: [], changelog: [], warnings: [] };
   for (const hub of engineHubs) {
     const qf = `hubs/${hub}/content/questions.json`;
     /* a change to how keys are built (tools/xp/keys.js) reloads every engine hub's */
@@ -59,6 +63,7 @@ function plan({ changes, podcast, added, extraFixes, engineHubs }){
   out.timmy = touched('supabase/functions/timmy/');
   /* the function's code, not only its site help (site.json changes with every About page edit, several times a day) */
   out.timmyCode = files.some(f => f.startsWith('supabase/functions/timmy/') && f !== 'supabase/functions/timmy/site.json');
+  out.checkins = files.includes('hubs.js');
   out.site = changes.filter(c => c.status !== 'D' && isSite(c.path)).map(c => c.path);
   out.fixes = changes.filter(c => c.status === 'A' && /^tools\/data-fixes\/[^/]+\.sql$/.test(c.path)).map(c => c.path).sort();
   for (const f of extraFixes || []) if (!out.fixes.includes(f)) out.fixes.push(f);
@@ -111,6 +116,32 @@ async function sql(query){
   const text = await r.text();
   // the rows a fix selects at its end are class data: never printed (the logs are public), only whether it ran
   if (!r.ok) { let msg = text; try { msg = JSON.parse(text).message || text; } catch (e) {} throw new Error(`the database answered ${r.status}: ${scrub(String(msg)).slice(0, 200)}`); }
+}
+/* The closed check-ins: every exam with checkinClosed in hubs.js (live and archived hubs), as the server keys them (the
+   hub and the exam's date: widget/dash.js sends "<date> <label>"). Pure, for tools/after-merge/test.js: data is hubs.js's
+   SH_DASH_DATA. Throws on anything that isn't a hub id or a date, so nothing odd reaches the SQL. */
+function closedCheckins(data){
+  if (!data || !Array.isArray(data.hubs)) throw new Error('hubs.js has no SH_DASH_DATA.hubs');
+  const out = [], seen = new Set();
+  for (const h of data.hubs.concat(data.archived || [])) for (const x of h.exams || []) {
+    if (!x.checkinClosed) continue;
+    if (!HUB_RE.test(h.id || '') || !/^\d{4}-\d{2}-\d{2}$/.test(x.date || '')) throw new Error(`hubs.js: a closed check-in that isn't a hub id and a date (${String(h.id).slice(0, 40)} ${String(x.date).slice(0, 20)})`);
+    const k = h.id + ' ' + x.date; if (!seen.has(k)) { seen.add(k); out.push({ hub: h.id, date: x.date }); }
+  }
+  return out.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.hub < b.hub ? -1 : 1));
+}
+/* One statement: the rows hubs.js doesn't list come out (a reopened check-in), the ones it lists go in. */
+function closedCheckinsSql(list){
+  if (!list.length) return 'delete from exam_checkins_closed';
+  const want = list.map(c => `('${c.hub}', '${c.date}'::date)`).join(', ');
+  return `with want(hub, exam_date) as (values ${want}),
+gone as (delete from exam_checkins_closed c where not exists (select 1 from want w where w.hub = c.hub and w.exam_date = c.exam_date))
+insert into exam_checkins_closed (hub, exam_date) select hub, exam_date from want on conflict do nothing`;
+}
+function dashData(sha){
+  const src = show(sha, 'hubs.js'); if (!src) throw new Error(`no hubs.js at ${sha.slice(0, 7)}`);
+  const box = { window: {} }; vm.runInNewContext(src.toString(), box, { timeout: 2000 });
+  return box.window.SH_DASH_DATA;
 }
 /* The hub for the real question: the live one whose next exam is soonest, where students are asking now, so the cache
    the question writes (about $0.60 of a hub's content) is read by their next questions instead of expiring unused.
@@ -205,6 +236,11 @@ async function main(){
     await rpc('admin_set_podcast_episode', { p_secret: process.env.ADMIN_SECRET, p_hub: e.hub, p_ep: e.id, p_seconds: e.seconds });
     return `${e.hub}: ${e.id}, ${e.seconds} s (listening now earns XP)`;
   });
+  if (P.checkins || (arg('only') && ONLY.includes('checkins'))) await step('checkins', 'close the closed check-ins on the server', ['SUPABASE_ACCESS_TOKEN'], async () => {
+    const list = closedCheckins(dashData(to));
+    await sql(closedCheckinsSql(list));
+    return `${list.length} closed (hubs.js's checkinClosed): ${list.map(c => c.hub + ' ' + c.date).join(', ') || 'none'}`;
+  });
 
   let live = !P.site.length;
   if (P.site.length && (P.fixes.length || P.changelog.length || ONLY.includes('postcheck'))) await step('live', 'wait for GitHub Pages to serve the push', [], async () => { const m = await waitLive(to, P.site); live = true; return m; });
@@ -236,5 +272,5 @@ async function main(){
   console.log('\n✓ after-merge steps done');
 }
 
-module.exports = { plan, isSite, checkHub };
+module.exports = { plan, isSite, checkHub, closedCheckins, closedCheckinsSql };
 if (require.main === module) main().catch(e => { console.error(scrub(String(e && e.stack || e))); process.exit(1); });

@@ -30,5 +30,6 @@
 # migration_v80 (sh_answer writes its answer_xp row once) was applied on 2026-11-19 (through the connector, md5-checked, PR #457).
 # migration_v81 (activity_visits_last_idx dropped) was applied on 2026-11-19 (drop index concurrently, alone; then activity_visits and xp_seen rewritten with cluster, PR #457).
 # migration_v82 (get_class_numbers, record_analytics, shop_days with its pg_cron job, the v2 bootstrap built once, get_my_answers, anon_name by an index) was applied on 2026-11-19 (through the connector, md5-checked, PR #459).
+# migration_v85 (closed check-ins closed on the server: exam_checkins_closed, sh_submit_exam_debrief) was applied on 2026-11-19 at about 2 pm Central (through the connector, ahead of v83 and v84; it touches nothing they do), and is in supabase/schema.sql.
 migration_v83.sql
 migration_v84.sql

@@ -174,7 +174,8 @@ window.SH_DASH_DATA = {
      "date": "2026-11-13",
      "code": "Heme & Endo · Exam 2",
      "checkinHour": 12,
-     "promptHour": 12
+     "promptHour": 12,
+     "checkinClosed": true
     }
    ],
    "archiveOn": {
@@ -213,6 +214,7 @@ window.SH_DASH_DATA = {
      "code": "Heme & Endo · Exam 1",
      "checkinHour": 9,
      "promptHour": 9,
+     "checkinClosed": true,
      "checkinUntil": {
       "date": "2026-11-06",
       "hour": 22
@@ -315,6 +317,7 @@ window.SH_DASH_DATA = {
      "code": "Occlusion · Midterm",
      "checkinHour": 19,
      "promptHour": 19,
+     "checkinClosed": true,
      "extraQs": [
       {
        "id": "diagrams",

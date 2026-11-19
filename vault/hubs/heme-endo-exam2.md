@@ -12,6 +12,8 @@ by the 11-13 lessons audit from 9 check-ins: later ones go into the next audit),
 High yield recordings and Timmy Time came off the site** the same night ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md):
 `data-audio="off"` on its widget tag; `next/content/notes.json`'s `hyAudio` is empty). The page stays up; its card leaves the
 dashboard 11-23. Still by hand: remove `hubs/heme-endo-exam2/` when nothing needs it, and optionally move its entry into `ARCHIVED_HUBS`.
+**Its exam check-in is closed** (Sam, 2026-11-19; `checkinClosed:true` on the exam in `hubs.js`, and refused by the server since
+`migration_v85.sql`). Answers already sent stay on `review/`.
 
 DENT 2160 Hematology & Endocrinology Exam 2: 50 questions, **5 on Exam 1 material, 8 on L11, 9 on L12 (both hours), 7 each on
 L13-L16** (Sam, 2026-11-10, from Dr. Herr: `EXAM_COUNTS`). **L16 is the last lecture on it**, so L17 and L18 aren't either
