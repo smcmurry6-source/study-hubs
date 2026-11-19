@@ -55,8 +55,9 @@ people get stuck, which questions mislead, whether a change worked. **Never** to
 
 ## Routines
 
-- **Every lessons audit** (`/lessons-audit`, `tools/lessons-refresh.md`): run `select sh_data_quality();` first and act
-  on anything flagged; read the Insights tab's numbers for the live hubs.
+- **Every lessons audit** (`/lessons-audit`, `tools/lessons-refresh.md`): read the data-quality report first (the admin
+  page's kept copy, `select computed_at, body from admin_cache where key = 'quality';`, or `select sh_data_quality();` at
+  a quiet hour) and act on anything flagged; read the Insights tab's numbers for the live hubs.
 - **Every hub archive** (`tools/retro.sql`): add the hub's scorecard line from `sh_insights()` to its retrospective.
 - **Every new tracked thing**: the checklist at the end of [event-taxonomy](event-taxonomy.md).
 - **Every schema change**: refresh `supabase/schema.sql`, and keep each admin function under the API's 3-second limit for

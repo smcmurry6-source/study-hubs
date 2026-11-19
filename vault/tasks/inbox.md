@@ -24,11 +24,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   rewrites the table once at night (about 24 MB back). If it passes about 40 MB again, look at rebuilding only what changed
   (an `xp_seen` row is one per question and right-or-wrong: inserting the missing ones would do for a link), or another
   `cluster` at night. Measure on a copy first (`tools/release/bench-answers.js`).
-- [ ] **Read `sh_data_quality()` in the quiet hours** (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
-  it stopped at the audit's 5 s limit both times (80 people in Perio on its final's eve; then at 12:40 pm the next day, between the
-  Perio final and the Heme & Endo Exam 3 eve). `qh_report('perio')` was read with the retrospective (2026-11-19: no miskeys). Run it
-  once between 1 and 5 am Central; if it still stops at 5 s with the class asleep, it is too heavy for an audit and belongs with the
-  admin page's slow reads in [the database-load task](2026-11-18-database-load.md) (its first box: `get_data_quality`).
+- [ ] **Read the data-quality report** (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
+  `select sh_data_quality();` stopped at the audit's 5 s limit both times (80 people in Perio on its final's eve; then at 12:40 pm
+  the next day, between the Perio final and the Heme & Endo Exam 3 eve). `qh_report('perio')` was read with the retrospective
+  (2026-11-19: no miskeys). Once `migration_v83.sql` is live, read the admin page's kept copy instead, at any hour (`admin_cache`'s
+  `quality`; the query in `tools/lessons-refresh.md` step 1; the night v83 is applied fills it, and it's refreshed nightly for a
+  week); until then, once between 1 and 5 am Central. Tick this when it's read.
 - [ ] **The other `shGame.v2()` checks while the bootstrap times out** (2026-11-19, found with the rank pill's fix). Three more
   places wait for `v2()` (true only once the bootstrap or an answer's reply came back) where `shGame.live()` would do: Timmy
   Time's minutes (`minOn()` in `widget/podcast.js`: an episode heard then pays nothing for those minutes), Timmy's HP days
