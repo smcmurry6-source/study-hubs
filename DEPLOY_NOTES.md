@@ -32,6 +32,25 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (the dashboard's hub card and What's new, Claude Code)** — Sam: "Make the timmy time card a part of the hub
+  blast on home dashboard. Make the whats new box take up that space between the hub card and the you and leaderboard
+  cards and look super cool, reformat and rework send luck to make space". `widget/dash.js` + `widget/dash.css` (bundles
+  rebuilt). **The stage** (the open hub's card) gets a foot, `.dx-dock`: the Timmy Time card is now a strip there (Timmy on
+  the air at the left, still animated, Listen at the right), and exam-day luck is a tile beside it (clover, count and
+  latest names, Send luck; the exam's name is the title just above, so it isn't repeated); either one alone spans the
+  foot. The hub's other exams moved under the countdown. **What's new** (`.dx-wn`, `newsHTML`/`drawNews`) replaces the
+  row under the stage (Timmy Time + the About card with its one-line What's new): a box on a night field of the hub's color
+  (dark in both themes) with a drawn megaphone, the hub's and the site's latest six changelog lines as paper cards on a
+  timeline, newest first (a gold ring on it), each with its time and hub tag on the timeline's line (gold for every hub),
+  the first clause bold when it is short, three lines and More for a long one; it scrolls sideways a card at a time
+  (arrows on a laptop, swipe on a phone). Then Sam: "make it a bit thinner. its taking up a lot of space": one-line
+  header, tags on the line, three-line cards, about 230 px tall on a laptop (it was about 400 in the first draft).
+  Changes since this device last saw that hub's box say New, with a count ("3 new since your last visit", "3 new" on a
+  phone; `sh_news_seen` in localStorage, per hub; a first visit counts the last day's). The hub's description opens
+  from "About this hub" in the box's header.
+  Event `news:more` (the arrows) replaces `news:open` ([event-taxonomy](vault/reference/event-taxonomy.md)). The About
+  page, the tour's steps and the preview's fixture changelog (five entries now) follow.
+
 - **2026-11-18 (the backlog board, Claude Code)** — Sam: "would it be effective to make the backlog into a trello board
   artifact that i can initiate sessions from?", then "yes build it". `/backlog` now also redraws a private claude.ai
   artifact, "Study Hubs Backlog": the packages in four columns (This week, Next, Later, Set aside; tabs on a phone), each

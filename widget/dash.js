@@ -4,7 +4,8 @@
    What it draws, on the hub engine's design system (widget/hub.css, with widget/dash.css for the layout):
    - the hubs as tabs (emblem, tint, days to the exam), the next exam's first, and under them that hub's stage: its
      masthead scene, the countdown on a tile with a bead for each day left, your progress ring, Start studying, the
-     Daily drill, exam-day luck; then Timmy Time, what the hub covers and its check-ins;
+     Daily drill, and along its foot Timmy Time and exam-day luck; then its check-ins and What's new (the hub's and the
+     site's latest changes as cards on a timeline, with what the hub covers behind "About this hub");
    - one "you" card: your name, Timmy's house (widget/pet.js draws it; Timmy's place takes that spot in phase 4), your
      handpiece rank, mastery medals, day streak and the week as dots. Ask Timmy (widget/ask.js) is "Ask me" in his house,
      or an "Ask the hub" button in #askSpot when he isn't there; on the dashboard he answers from every live hub;
@@ -14,7 +15,8 @@
    - the idea board (widget/ideas.js draws it in #ideas once the board's server is there), then past hubs: each
      finished exam's recap as a live infographic, with the closed hubs' open exam check-ins above it (a closed hub has
      no card of its own: Sam, 2026-11-14).
-   No What's new list, no arcade scores and no "When people study" chart (Sam, 2026-11-11); a hub's "Updated" label still reads the changelog.
+   No arcade scores and no "When people study" chart (Sam, 2026-11-11). What's new went with them and came back on
+   2026-11-17 (one line) and 2026-11-19 (its own box under the stage); it and a hub's "Updated" label read the changelog.
    The check-in, survey, name, luck and archive logic is the live dashboard's own, moved here unchanged.
 
    Its data is hubs.js (window.SH_DASH_DATA), where a hub is added, dated or archived.
@@ -362,10 +364,14 @@
     var el = $("heroLuck"); if (!el || !luckFor) return;
     var r = luckData[luckKey()] || { count: 0, mine: false, recent: [] }, n = r.count || 0;
     var names = (r.recent || []).slice(0, 3).map(esc).join(", ");
-    el.innerHTML = CLOVER + '<div class="dx-luck-txt">' +
-      (n ? "<b>" + n + (n === 1 ? " classmate" : " classmates") + "</b> sent luck for " + esc(luckFor.name) + (names ? "<small>Latest: " + names + (n > 3 ? " and more" : "") + "</small>" : "")
-         : "<b>" + (luckFor.d === 0 ? "Exam day." : "Exam tomorrow.") + "</b> Send the class some luck for " + esc(luckFor.name) + ".") + "</div>" +
-      '<button type="button" class="btn hero-luck-btn"' + (r.mine ? " disabled>Luck sent" : ">Send luck") + "</button>";
+    /* a tile at the foot of the stage, beside Timmy Time (2026-11-19: it was a full-width row); the exam's name is the
+       stage's title just above it, so the tile doesn't repeat it */
+    el.setAttribute("aria-label", "Exam-day luck for " + luckFor.name);
+    el.setAttribute("role", "group");
+    el.innerHTML = '<div class="dx-luck-in"><span class="dx-luck-ic">' + CLOVER + "</span>" + '<p class="dx-luck-txt">' +
+      (n ? '<b><span class="num">' + num(n) + "</span>" + (n === 1 ? " classmate" : " classmates") + " sent luck</b><small>" + (names ? "Latest: " + names + (n > 3 ? " and more" : "") : "for " + esc(luckFor.name)) + "</small>"
+         : "<b>" + (luckFor.d === 0 ? "Exam day!" : "Exam tomorrow!") + "</b><small>Be the first to send the class some luck</small>") + "</p>" +
+      '<button type="button" class="btn hero-luck-btn"' + (r.mine ? " disabled>" + icon("check", 16) + "Luck sent" : ">" + CLOVER + "Send luck") + "</button></div>";
   }
   function loadLuck(){
     if (!luckSb || !luckFor) return;
@@ -649,10 +655,98 @@
     /* animated as on a hub's Home (Sam, 2026-11-13: "animated like i had it before"): Timmy bobs in his headphones,
        notes float over him and a little equalizer plays; still when motion is off */
     var col = { tint: "#F2C94C", light: "#FFFFFF", line: "#F2C94C" };
-    return '<a class="dx-card dx-pod' + (still() || focusOn() ? " is-still" : "") + '" href="' + esc(hubHref(hub, "timmy")) + '" data-hub="' + esc(hub.id) + '" data-pod="dash">' +
-      '<span class="dx-pod-txt"><b>' + esc(hub.podcast.name) + ' <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(hub.podcast.sub) + '</small>' + podEarn(hub) + '<span class="dx-pod-go">' + icon("play", 16) + "Listen</span></span>" +
-      '<span class="dx-pod-art" aria-hidden="true">' + spot("notes", col, "pm-notes") + spot("timmyTime", col, "pm-timmy") + "</span></a>";
+    /* part of the hub's stage since 2026-11-19 (Sam: "make the timmy time card a part of the hub blast"): a strip along
+       its foot, Timmy on the air at the left, Listen at the right */
+    return '<a class="dx-pod' + (still() || focusOn() ? " is-still" : "") + '" href="' + esc(hubHref(hub, "timmy")) + '" data-hub="' + esc(hub.id) + '" data-pod="dash">' +
+      '<span class="dx-pod-art" aria-hidden="true">' + spot("notes", col, "pm-notes") + spot("timmyTime", col, "pm-timmy") + "</span>" +
+      '<span class="dx-pod-txt"><b>' + esc(hub.podcast.name) + ' <span class="pm-eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span></b><small>' + esc(hub.podcast.sub) + '</small>' + podEarn(hub) + "</span>" +
+      '<span class="dx-pod-go">' + icon("play", 16) + "Listen</span></a>";
   }
+  /* the foot of the stage: Timmy Time and, the day before an exam and its morning, exam-day luck beside it */
+  function dockHTML(hub, x, d){
+    var pod = podHTML(hub), luck = x && luckTime(d) ? '<div class="dx-luck" id="heroLuck"></div>' : "";
+    return pod || luck ? '<div class="dx-dock' + (pod && luck ? " has-both" : "") + '">' + pod + luck + "</div>" : "";
+  }
+
+  /* What's new (Sam, 2026-11-19: "make the whats new box take up that space between the hub card and the you and
+     leaderboard cards and look super cool"): the open hub's and the whole site's latest changes as cards on a timeline,
+     newest first, on a night field of the hub's color. Changes since this device last saw the hub's box wear "New"
+     (sh_news_seen, kept on the device: the newest change seen, per hub; on a first visit, the last day's). The hub's
+     description opens from "About this hub" in its header. applyUpdated fills the cards from the changelog. */
+  var MEGAPHONE = '<svg class="dx-wn-art" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g stroke="#3B2E3A" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">' +
+    '<path d="M25 41 L29 53 Q30 56 33 55 L36 54 Q38 53 37 50 L34 42" fill="#fff"/>' +
+    '<path d="M15 27 L40 15 Q45 13 45 19 L45 45 Q45 51 40 49 L15 37 Z" fill="#F2C94C"/>' +
+    '<ellipse cx="45" cy="32" rx="5" ry="15" fill="#FFE08A"/><rect x="8" y="27" width="8" height="10" rx="2.5" fill="#fff"/></g>' +
+    '<g class="dx-wn-waves" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round"><path d="M54 24 Q57 32 54 40"/><path d="M59 18 Q64 32 59 46"/></g>' +
+    '<path class="dx-wn-spark" d="M10 8 L11.5 12.5 L16 14 L11.5 15.5 L10 20 L8.5 15.5 L4 14 L8.5 12.5 Z" fill="#FFE08A"/></svg>';
+  function newsHTML(hub){
+    return '<section class="dx-wn tinted is-empty" data-news="' + esc(hub.id) + '" aria-labelledby="wnH" style="' + tintVars(hub.id) + '">' +
+      '<div class="dx-wn-head">' + MEGAPHONE +
+        '<div class="dx-wn-tx"><h3 id="wnH">What\'s new</h3><p><span class="updated" data-updated="' + esc(hub.updated || "") + '" data-hub="' + esc(hub.id) + '">' + (hub.updated ? "Updated " + esc(relDay(parseYmd(hub.updated))) : "") + "</span>" +
+          "<span>" + esc(hubName(hub)) + " and every hub</span></p></div>" +
+        (hub.desc ? '<details class="dx-wn-about"><summary>' + icon("about", 18) + "<span>About this hub</span>" + icon("chevron", 16) + '</summary><p class="dx-desc"><b>' + esc(hub.title) + ".</b> " + esc(hub.desc) + "</p></details>" : "") +
+        '<p class="dx-wn-n" hidden></p>' +
+        '<p class="dx-wn-nav"><button type="button" class="dx-wn-btn" data-wn="-1" aria-label="Newer changes" disabled>' + icon("chevron", 20) + '</button><button type="button" class="dx-wn-btn" data-wn="1" aria-label="Older changes">' + icon("chevron", 20) + "</button></p>" +
+      "</div>" +
+      '<div class="dx-wn-rail" tabindex="0" role="region" aria-label="The latest changes"><ol></ol></div>' +
+    "</section>";
+  }
+  /* a change's first clause in bold, when it has a short one ("Five new diagrams in the Session 6 notes: ...") */
+  function lede(s){
+    s = String(s); var i = s.indexOf(": "), j = s.indexOf(". "), k = i > 0 && i <= 90 ? i + 1 : j > 0 && j <= 90 ? j + 1 : 0;
+    return k ? "<b>" + esc(s.slice(0, k)) + "</b>" + esc(s.slice(k)) : esc(s);
+  }
+  function agoText(t){
+    var m = Math.round((Date.now() - t) / 6e4);
+    if (m < 2) return "Just now"; if (m < 60) return m + " minutes ago";
+    var h = Math.round(m / 60); if (h < 24) return h === 1 ? "An hour ago" : h + " hours ago";
+    var r = relDay(new Date(t)); return r.charAt(0).toUpperCase() + r.slice(1);
+  }
+  var NEWS_SEEN = (function(){ try { return JSON.parse(ls("sh_news_seen") || "{}") || {}; } catch (e) { return {}; } })();
+  function drawNews(box){
+    var id = box.getAttribute("data-news"), hub = HUBS.filter(function(h){ return h.id === id; })[0] || { id: id, title: "" };
+    var mine = logRows.filter(function(r){ var t = logHubs(r); return t.indexOf(id) > -1 || t.indexOf("all") > -1; }).slice(0, 6);
+    box.classList.toggle("is-empty", !mine.length);
+    if (!mine.length) return;
+    var prev = Date.parse(NEWS_SEEN[id] || ""), cut = isFinite(prev) ? prev : Date.now() - 864e5, fresh = 0;
+    q(".dx-wn-rail ol", box).innerHTML = mine.map(function(r, i){
+      var t = Date.parse(r.created_at), isNew = t > cut, all = logHubs(r).indexOf("all") > -1; if (isNew) fresh++;
+      /* the time, New and the hub's tag sit on the timeline's line, so a card is only its words (Sam, 2026-11-19: "make
+         it a bit thinner"); a long one shows three lines and a More button */
+      return '<li class="dx-wn-item' + (i === 0 ? " is-lead" : "") + (isNew ? " is-new" : "") + (all ? " is-all" : "") + '" style="--i:' + i + '">' +
+        '<p class="dx-wn-when"><i aria-hidden="true"></i><span>' + (isNew ? "<b>New</b> · " : "") + esc(agoText(t)) + "</span>" +
+          '<span class="dx-wn-tag">' + (all ? icon("tooth", 14) + "Every hub" : emblem(id, "dx-emb") + esc(hubName(hub))) + "</span></p>" +
+        '<div class="dx-wn-card"><p class="dx-wn-msg">' + lede(r.message) + "</p></div></li>";
+    }).join("");
+    qa(".dx-wn-msg", box).forEach(function(m){
+      if (m.scrollHeight > m.clientHeight + 2) m.insertAdjacentHTML("afterend", '<button type="button" class="dx-wn-more" aria-expanded="false">More</button>');
+    });
+    var n = q(".dx-wn-n", box); n.hidden = !fresh;
+    n.innerHTML = fresh ? '<b class="num">' + fresh + "</b> new<span> since your last visit</span>" : "";
+    /* the newest change this device has now seen, for next time */
+    var seen = {}; try { seen = JSON.parse(ls("sh_news_seen") || "{}") || {}; } catch (e) {}
+    seen[id] = mine[0].created_at; lsSet("sh_news_seen", JSON.stringify(seen));
+    newsNav(box);
+  }
+  /* the arrows move the timeline a card at a time and grey out at either end */
+  function newsNav(box){
+    var rail = q(".dx-wn-rail", box), btns = qa("[data-wn]", box);
+    function ends(){ var mx = rail.scrollWidth - rail.clientWidth - 2; btns[0].disabled = rail.scrollLeft <= 2; btns[1].disabled = rail.scrollLeft >= mx; q(".dx-wn-nav", box).hidden = mx <= 0; }
+    if (!box._ends) {
+      var raf = 0; rail.addEventListener("scroll", function(){ if (!raf) raf = requestAnimationFrame(function(){ raf = 0; ends(); }); }, { passive: true });
+      rail.addEventListener("click", function(e){
+        var b = e.target.closest(".dx-wn-more"); if (!b) return;
+        var open = b.closest(".dx-wn-card").classList.toggle("is-open");
+        b.textContent = open ? "Less" : "More"; b.setAttribute("aria-expanded", String(open));
+      });
+      btns.forEach(function(b){ b.addEventListener("click", function(){
+        var li = q(".dx-wn-item", rail), w = li ? li.getBoundingClientRect().width + 16 : rail.clientWidth * .8;
+        rail.scrollBy({ left: Number(b.getAttribute("data-wn")) * w, behavior: still() ? "auto" : "smooth" }); track("news:more");
+      }); });
+    }
+    box._ends = ends; ends();
+  }
+  window.addEventListener("resize", function(){ qa("[data-news]").forEach(function(b){ if (b._ends) b._ends(); }); });
   function checkinButtonsHTML(hub){
     return pastExams(hub, false).map(function(x){
       return '<button type="button" class="btn dx-checkin" data-checkin="' + esc(hub.id) + '" data-exam="' + esc(x.date) + '">' + icon("comment", 18) + "Check in on " + esc(x.name || hub.title) + "</button>";
@@ -678,31 +772,22 @@
               trackHTML(hub, x, d) +
             "</div>" +
             '<p class="dx-livehub" id="hubLive">' + liveLine(hub) + "</p>" +
+            /* the hub's other exams, under the countdown (they were on the card under the stage until 2026-11-19) */
+            (others.length ? '<ul class="dx-exams">' + others.map(function(e){ var dd = daysUntil(e.date); return "<li><b>" + esc(e.label || "Exam") + "</b> " + esc(shortDate(e.date)) + " · " + (dd < 0 ? "done" : esc(daysText(dd))) + "</li>"; }).join("") + "</ul>" : "") +
           "</div>" +
           '<div class="dx-go">' + ringHTML(hub) +
             '<div class="dx-actions"><a class="btn btn-primary dx-start" href="' + esc(hubHref(hub)) + '" data-hub="' + esc(hub.id) + '">' + (p ? "Continue studying" : "Start studying") + icon("chevron", 18) + "</a>" + drillHTML(hub) + "</div>" +
           "</div>" +
         "</div>" +
-        (x && luckTime(d) ? '<div class="dx-luck" id="heroLuck"></div>' : "") +
+        dockHTML(hub, x, d) +
       "</div>" +
-      '<div class="dx-hubrow">' + podHTML(hub) +
-        '<div class="dx-card dx-about"><h3>' + esc(hub.title) + "</h3>" +
-          (others.length ? '<ul class="dx-exams">' + others.map(function(e){ var dd = daysUntil(e.date); return "<li><b>" + esc(e.label || "Exam") + "</b> " + esc(shortDate(e.date)) + " · " + (dd < 0 ? "done" : esc(daysText(dd))) + "</li>"; }).join("") + "</ul>" : "") +
-          '<p class="dx-desc clamp" id="hubDesc">' + esc(hub.desc || "") + '</p><button class="btn btn-text dx-more" type="button" data-more aria-expanded="false">Read more</button>' +
-          /* the changelog, back in one line (Sam, 2026-11-17: "I dont want it to take up much space"): "Updated ..." opens
-             this hub's and the whole site's last few changes (applyUpdated fills it from the changelog) */
-          '<details class="dx-news is-empty" data-news="' + esc(hub.id) + '"><summary tabindex="-1"><span class="note updated" data-updated="' + esc(hub.updated || "") + '" data-hub="' + esc(hub.id) + '">' + (hub.updated ? "Updated " + esc(relDay(parseYmd(hub.updated))) : "") + '</span><span class="dx-news-cta">What\'s new' + icon("chevron", 16) + '</span></summary><ul class="dx-news-list"></ul></details>' +
-        "</div>" +
-      "</div>" +
-      (checks ? '<div class="dx-checks">' + checks + "</div>" : "");
+      (checks ? '<div class="dx-checks">' + checks + "</div>" : "") +
+      newsHTML(hub);
     /* the scene: the hub's masthead, drawn once its art file is in */
     masthead(hub.id).then(function(M){
       var s = $("hubScene"); if (!s || selected !== hub.id || !M) return;
       s.innerHTML = img(M.body, M.label || "", "dx-mast", "0 0 600 200");
     });
-    var desc = $("hubDesc"), more = q("[data-more]", el);
-    if (desc.scrollHeight <= desc.clientHeight + 2) more.remove();
-    else more.addEventListener("click", function(){ var c = desc.classList.toggle("clamp"); more.textContent = c ? "Read more" : "Show less"; more.setAttribute("aria-expanded", String(!c)); });
     if (x) heroFlap(hub, x);
     luckFor = x && luckTime(d) ? { hub: hub.id, date: x.date, name: x.name, d: d } : null;
     drawLuck(); loadLuck();
@@ -2201,7 +2286,7 @@
   document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "visible" && ovSb && Date.now() - ovAt > 5 * 60 * 1000) loadOverrides(ovSb); });
 
   /* ---------- each hub's "Updated", from the changelog every deploy logs to, and its What's new (the long list went on
-     2026-11-11; Sam brought it back as one line on 2026-11-17) ---------- */
+     2026-11-11; Sam brought it back as one line on 2026-11-17, then as its own box under the stage on 2026-11-19) ---------- */
   var latestBy = null, logRows = [];
   /* a changelog row's hubs ("all", one hub, or a comma list; empty is the whole site) */
   function logHubs(r){ var t = String(r.hub || "").toLowerCase().split(/[,\s]+/).filter(Boolean); return t.length ? t : ["all"]; }
@@ -2212,15 +2297,8 @@
       if (latestBy.all && (!best || latestBy.all > best)) best = latestBy.all;
       if (best) el.textContent = "Updated " + relDay(new Date(best));
     });
-    /* What's new: the hub's and the whole site's five latest changes, newest first, a line each with its day */
-    qa("[data-news]").forEach(function(d){
-      var id = d.getAttribute("data-news"), mine = logRows.filter(function(r){ var t = logHubs(r); return t.indexOf(id) > -1 || t.indexOf("all") > -1; }).slice(0, 5);
-      d.classList.toggle("is-empty", !mine.length); q("summary", d).tabIndex = mine.length ? 0 : -1;
-      q(".dx-news-list", d).innerHTML = mine.map(function(r){
-        return "<li><p>" + esc(r.message) + '</p><small class="note">' + esc(relDay(new Date(r.created_at))) + (logHubs(r).indexOf("all") > -1 ? " · every hub" : "") + "</small></li>";
-      }).join("");
-      if (!d.getAttribute("data-wired")) { d.setAttribute("data-wired", "1"); d.addEventListener("toggle", function(){ if (d.open) track("news:open"); }); }
-    });
+    /* What's new: the hub's and the whole site's latest changes (drawNews) */
+    qa("[data-news]").forEach(drawNews);
   }
   function loadChangelog(){
     rest("changelog?select=hub,message,created_at&order=created_at.desc&limit=40").then(function(rows){
@@ -2259,8 +2337,8 @@
     var S = [{ title: "Welcome to Study Hubs", body: "<p>A quick look at this page, on the real buttons. It takes under a minute, and each hub has its own tour inside it.</p><p>Use <b>Next</b> and <b>Back</b> (or the arrow keys). Start it again any time from the menu at the top.</p>" }];
     if (HUBS.length) {
       S.push({ el: ".dx-tabs", title: "Your hubs", body: "<p>One tab per hub, the next exam's first. Each shows how many days are left.</p>" });
-      S.push({ el: ".dx-stage", title: "The next exam", body: "<p>The countdown with a bead for each day left, <b>Start studying</b>, the <b>Daily drill</b> and a ring for how far you've got in this hub. The day before an exam you can send the class some luck from here.</p>" });
-      S.push({ el: ".dx-hubrow", title: "What's in this hub", body: "<p>What the hub covers, its other exams and its Timmy Time episode when it has one. After an exam, <b>Check in</b> shows up under it.</p>" });
+      S.push({ el: ".dx-stage", title: "The next exam", body: "<p>The countdown with a bead for each day left, <b>Start studying</b>, the <b>Daily drill</b> and a ring for how far you've got in this hub. Along the bottom: the hub's <b>Timmy Time</b> episode when it has one, and the day before an exam, <b>Send luck</b> to the class. After an exam, <b>Check in</b> shows up under it.</p>" });
+      S.push({ el: ".dx-wn", title: "What's new", body: "<p>The latest changes to this hub and to every hub, newest first. The ones since your last visit say <b>New</b>. <b>About this hub</b> opens what the hub covers.</p>" });
     }
     S.push({ el: "#you", title: "You", body: "<p>The name classmates see, your handpiece rank and XP from every hub, your mastery medals and your study streak." + (petOn() ? " Timmy Tooth lives here once you've met him: study and he stays healthy." : "") + "</p>" });
     S.push({ el: "#class", title: "The class", body: "<p>How many classmates have a hub open this minute and which hubs they're in. Under it, the top ten by XP or the longest study streaks, the first three on the podium, with every rank from Stone to Dark Matter folded underneath.</p>" });
