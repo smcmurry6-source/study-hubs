@@ -4054,6 +4054,30 @@ var ex = window.SH_EXPORT || {}, taught = {};
 return (ex.sections || []).some(function(s){ return /^notes$/i.test(s.kind || "") && taught[s.lec] && String(s.text || "").replace(/\s+/g, " ").trim().length >= 140; }) ? week : null;
 }
 var bootstrap = { data: null, ready: Promise.resolve(null), linkName: currentName() };
+var ANS_KEY = "sh_answers_hist:" + HUB, ansOff = false;
+function ansLoad(){
+if (ansOff) return null;
+try {
+var r = JSON.parse(localStorage.getItem(ANS_KEY) || "null");
+if (r && r.v === VISITOR_ID && Array.isArray(r.a) && isFinite(r.id) && isFinite(r.n) && r.id >= 0 && r.n >= 0) return r;
+} catch (e) {}
+return null;
+}
+function ansDrop(){ try { localStorage.removeItem(ANS_KEY); } catch (e) {} }
+function ansAbsorb(data, sent){
+if (!data || typeof data !== "object" || !Array.isArray(data.answers)) return data;
+if (data.answers_part === true) {
+if (!sent) { delete data.answers; ansDrop(); return data; }
+var all = sent.a.concat(data.answers), idx = all.map(function(r, i){ return i; });
+idx.sort(function(x, y){ return ((all[x] && all[x][1]) - (all[y] && all[y][1])) || x - y; });
+data.answers = idx.map(function(i){ return all[i]; }).slice(-5000);
+}
+if (data.answers_id != null && isFinite(data.answers_id) && isFinite(data.answers_n)) {
+try { localStorage.setItem(ANS_KEY, JSON.stringify({ v: VISITOR_ID, id: Number(data.answers_id), n: Number(data.answers_n), a: data.answers })); }
+catch (e) { ansDrop(); }
+}
+return data;
+}
 if (supabase && !EXPORT_ONLY) {
 try {
 var bootArgs = {
@@ -4064,14 +4088,19 @@ p_episode: !AUDIO_OFF && window.SH_PODCAST && window.SH_PODCAST.id ? window.SH_P
 p_include_pins: !!window.SH_PINS,
 p_link_name: bootstrap.linkName || null
 };
-var bootCall = !GAME.want ? supabase.rpc("get_widget_bootstrap", bootArgs)
-: supabase.rpc("get_widget_bootstrap_v2", bootArgs).then(function(res){
+var ansSent = GAME.want ? ansLoad() : null, v2Args = bootArgs;
+if (ansSent) v2Args = Object.assign({ p_answers_after: ansSent.id, p_answers_n: ansSent.n }, bootArgs);
+function bootV2(args){
+return supabase.rpc("get_widget_bootstrap_v2", args).then(function(res){
+if (rpcMissing(res) && args !== bootArgs) { ansSent = null; ansOff = true; ansDrop(); return bootV2(bootArgs); }
 if (rpcMissing(res)) { GAME.on = false; return supabase.rpc("get_widget_bootstrap", bootArgs); }
 return res;
 });
+}
+var bootCall = !GAME.want ? supabase.rpc("get_widget_bootstrap", bootArgs) : bootV2(v2Args);
 bootstrap.ready = bootCall.then(function(res){
 if (!res || res.error || !res.data || typeof res.data !== "object") return null;
-bootstrap.data = res.data;
+bootstrap.data = ansAbsorb(res.data, ansSent);
 if (GAME.want && GAME.on === null) {
 var rk = res.data.rank;
 GAME.on = !!(rk && rk.journey != null);
@@ -4728,6 +4757,20 @@ if (Array.isArray(rows)) { if (rows.length) applySync(rows); else if (!qhHist) q
 }
 function syncProgressRemote(){
 window.shPins.sync();
+var kept = ansLoad();
+if (kept) {
+try {
+supabase.rpc("get_my_answers_since", { p_visitor: VISITOR_ID, p_hub: HUB, p_after: kept.id, p_n: kept.n }).then(function(res){
+if (rpcMissing(res)) { ansOff = true; ansDrop(); return syncAllAnswers(); }
+var d = res && !res.error ? ansAbsorb(res.data, kept) : null;
+finishProgressSync(d && Array.isArray(d.answers) ? d.answers : null);
+}, function(){ finishProgressSync(null); });
+} catch (e) { finishProgressSync(null); }
+return;
+}
+syncAllAnswers();
+}
+function syncAllAnswers(){
 try {
 supabase.rpc("get_my_answers", { p_visitor: VISITOR_ID, p_hub: HUB }).then(function(res){
 finishProgressSync(res && !res.error ? res.data : null);

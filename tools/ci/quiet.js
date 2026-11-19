@@ -5,6 +5,7 @@
 // of the hub opens on a working database and sends them, in order, spaced as answered, with the same ids; the first page,
 // shown again, finds them taken and sends nothing more.
 // And fewer calls from the page (2026-11-19, the database optimization pass, phase 2, migration_v82): phase2() below.
+// And the answer history kept on the device (phase 3, migration_v84): history() below.
 // Nothing reaches the real database: every request off 127.0.0.1 is answered here, and every WebSocket is closed (the
 // pages aren't marked automated, so a live realtime connection would put them in the class's "studying now" count).
 'use strict';
@@ -331,9 +332,70 @@ async function phase2(browser, missing){
   await context.close();
 }
 
+/* phase 3 (migration_v84): the first page gets the whole history with its id and count, and keeps it; the second sends the
+   cursor and gets two answers, and holds all of them; a database without v84 (missing) gets asked again without it. */
+async function history(browser, missing){
+  const context = await browser.newContext();
+  if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
+  const boots = [], since = [];
+  const T = 1763500000, old = Array.from({ length: 30 }, (_, i) => ['pq-' + (i % 9), T + i * 10, i % 3 ? 1 : 0]);
+  const fresh = [['pq-1', T + 295, 1], ['pq-2', T + 500, 0]];
+  await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, async route => {
+    const u = route.request().url(), fn = (/\/rpc\/([a-z0-9_]+)/.exec(u) || [])[1] || '';
+    if (!/supabase\.co/.test(u)) return route.fulfill({ status: 204, body: '' });
+    let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
+    const json = (b, s) => route.fulfill({ status: s || 200, contentType: 'application/json', body: JSON.stringify(b) });
+    if (fn === 'get_widget_bootstrap_v2') {
+      boots.push(a);
+      if (a.p_answers_after != null) {
+        if (missing) return json({ code: 'PGRST202', message: 'Could not find the function' }, 404);
+        return json({ rank, mastery: [], answers: fresh, answers_id: 132, answers_n: 32, answers_part: true });
+      }
+      return json(Object.assign({ rank, mastery: [], answers: old }, boots.length === 1 || !missing ? { answers_id: 130, answers_n: 30, answers_part: false } : {}));
+    }
+    if (fn === 'get_my_answers_since') { since.push(a); return json({ answers: [], answers_id: 132, answers_n: 32, answers_part: true }); }
+    if (fn === 'get_rank_profile_v2') return json(rank);
+    return json(fn ? null : []);
+  });
+  await context.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
+  const what = `the answer history on the device (${missing ? 'a database without v84' : 'v84'})`, errs = [];
+  const open = async () => {
+    const page = await context.newPage(); page.on('pageerror', e => errs.push(e.message));
+    await page.goto(BASE() + 'hubs/perio/index.html#questions');
+    await page.waitForFunction(() => window.shBootstrap && window.shBootstrap.data, null, { timeout: 20000 }).catch(() => null);
+    await page.waitForTimeout(800);
+    return page;
+  };
+  const a = await open();
+  const kept = await a.evaluate(() => { try { return JSON.parse(localStorage.getItem('sh_answers_hist:perio')); } catch (e) { return null; } });
+  if (!kept || kept.id !== 130 || kept.n !== 30 || !Array.isArray(kept.a) || kept.a.length !== 30) problems.push(`${what}: the first page didn't keep the history with its id and count (${JSON.stringify(kept && { id: kept.id, n: kept.n })})`);
+  if (boots[0] && boots[0].p_answers_after != null) problems.push(`${what}: the first page sent a cursor it didn't have`);
+  await a.close();
+  const b = await open();
+  const second = boots.slice(1);
+  if (!second[0] || second[0].p_answers_after !== 130 || second[0].p_answers_n !== 30) problems.push(`${what}: the second page didn't send the device's id and count (${JSON.stringify(second[0])})`);
+  const got = await b.evaluate(() => window.shBootstrap.data && window.shBootstrap.data.answers);
+  const stored = await b.evaluate(() => { try { return JSON.parse(localStorage.getItem('sh_answers_hist:perio')); } catch (e) { return null; } });
+  if (!missing) {
+    const want = JSON.stringify(old.concat(fresh).map((r, i) => [r, i]).sort((x, y) => x[0][1] - y[0][1] || x[1] - y[1]).map(x => x[0]));
+    if (JSON.stringify(got) !== want) problems.push(`${what}: the second page's history isn't the copy with the two new answers in place (${got && got.length})`);
+    if (!stored || stored.id !== 132 || stored.n !== 32 || stored.a.length !== 32) problems.push(`${what}: the second page didn't keep the longer history`);
+    if (second.length !== 1) problems.push(`${what}: ${second.length} bootstraps from the second page, not 1`);
+    await b.evaluate(() => window.shSyncProgress && window.shSyncProgress());
+    await b.waitForTimeout(600);
+    if (since.length && (since[0].p_after !== 132 || since[0].p_n !== 32)) problems.push(`${what}: a later sync sent ${JSON.stringify(since[0])}`);
+  } else {
+    if (second.length !== 2 || second[1].p_answers_after != null) problems.push(`${what}: the page didn't ask again without the cursor (${second.length} calls)`);
+    if (JSON.stringify(got) !== JSON.stringify(old)) problems.push(`${what}: the page didn't take the whole history from the second ask`);
+    if (stored) problems.push(`${what}: the page kept a copy for a database that doesn't send its id`);
+  }
+  if (errs.length) problems.push(`${what}, page errors: ${errs.join(' | ')}`);
+  await context.close();
+}
+
 (async () => {
   const browser = await chromium.launch();
-  try { await run(browser, false); await Promise.all([run(browser, true), kept(browser), pings(browser, false), pings(browser, true), phase2(browser, false), phase2(browser, true)]); } finally { await browser.close(); server.close(); }
+  try { await run(browser, false); await Promise.all([run(browser, true), kept(browser), pings(browser, false), pings(browser, true), phase2(browser, false), phase2(browser, true), history(browser, false), history(browser, true)]); } finally { await browser.close(); server.close(); }
   if (problems.length) { console.log('✗', problems.join('\n✗ ')); process.exit(1); }
-  console.log('✓ the quiet spell: one line, nothing sent in the spell, the same ids, in order; a working database saves at once; answers kept on the device go from the next page; pings go together once a minute, and the changelog is read once; a card\'s class numbers, the analytics and the tenth answer take one call or none');
+  console.log('✓ the quiet spell: one line, nothing sent in the spell, the same ids, in order; a working database saves at once; answers kept on the device go from the next page; pings go together once a minute, and the changelog is read once; a card\'s class numbers, the analytics and the tenth answer take one call or none; the answer history is kept on the device and only what is newer is read');
 })();

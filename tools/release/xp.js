@@ -1540,10 +1540,22 @@ try {
     const drop = (o, ks) => { const c = Object.assign({}, o); ks.forEach(k => delete c[k]); return c; };
     for (const [v, h] of [['xp-B', 'xh'], ['xp-L1', 'xm'], ['xp-none', 'xh']]) {
       const b1 = json(`get_widget_bootstrap(${q(v)}, ${q(h)})`), b2 = json(`get_widget_bootstrap_v2(${q(v)}, ${q(h)})`);
-      eq(Object.keys(b2).sort(), Object.keys(b1).concat(['shop']).filter((k, i, a) => a.indexOf(k) === i).sort(), `the bootstrap v2 for ${v} has v1's keys and the shop`);
-      eq(JSON.stringify(drop(b2, ['rank', 'pet_days', 'inbox', 'shop'])), JSON.stringify(drop(b1, ['rank', 'pet_days', 'inbox'])), `the bootstrap v2 for ${v}: v1's parts, the same values`);
+      eq(Object.keys(b2).sort(), Object.keys(b1).concat(['shop', 'answers_id', 'answers_n', 'answers_part']).filter((k, i, a) => a.indexOf(k) === i).sort(), `the bootstrap v2 for ${v} has v1's keys and the shop`);
+      eq(JSON.stringify(drop(b2, ['rank', 'pet_days', 'inbox', 'shop', 'answers_id', 'answers_n', 'answers_part'])), JSON.stringify(drop(b1, ['rank', 'pet_days', 'inbox'])), `the bootstrap v2 for ${v}: v1's parts, the same values`);
       eq([b2.rank, b2.pet_days, b2.inbox], [json(`get_rank_profile_v2(${q(v)})`), json(`coalesce((select jsonb_agg(to_jsonb(pd) order by pd.d) from get_pet_days_v2(${q(v)}) pd), '[]'::jsonb)`),
         json(`coalesce((select jsonb_agg(to_jsonb(i) order by i.at desc) from get_my_inbox_v2(${q(v)}) i), '[]'::jsonb)`)], `the bootstrap v2 for ${v}: the v2 rank, Timmy's days and Inbox`);
+    }
+    // v84: the answers after the device's newest, and the bootstrap with the device's cursor
+    {
+      const all = json(`get_my_answers_since('xp-B', 'xh')`), cut = Math.max(0, all.answers.length - 3);
+      eq([all.answers_part, JSON.stringify(all.answers)], [false, JSON.stringify(json(`get_my_answers('xp-B', 'xh')`))], 'get_my_answers_since without a cursor: get_my_answers, with the newest id and the count');
+      const idCut = num(`select coalesce(max(id), 0) from (select id from personal_answers where visitor_id = 'xp-B' and hub = 'xh' order by id limit ${cut}) x`);
+      const part = json(`get_my_answers_since('xp-B', 'xh', ${idCut}, ${cut})`);
+      ok(part.answers_part === true && part.answers.length === all.answers_n - cut && part.answers_id === all.answers_id, `get_my_answers_since after the device's newest: only the ${all.answers_n - cut} after it`);
+      eq(json(`get_my_answers_since('xp-B', 'xh', ${idCut}, ${cut + 1})`).answers_part, false, 'get_my_answers_since when the count doesn\'t add up (a link moved answers in): the whole history');
+      const bc = json(`get_widget_bootstrap_v2('xp-B', 'xh', p_answers_after => ${all.answers_id}, p_answers_n => ${all.answers_n})`);
+      eq([bc.answers_part, bc.answers.length, bc.answers_id], [true, 0, all.answers_id], 'the bootstrap with the device\'s cursor: no answers, the same id');
+      raises(() => anon(`select sh_answers_since('xp-B', 'xh', 0, 0)`), '42501', 'anon runs sh_answers_since');
     }
     // get_my_answers: each answer as [question, seconds, right], oldest first, the newest 5,000
     const ga = json(`get_my_answers('xp-B', 'xh')`), want = json(`(select coalesce(json_agg(json_build_array(qid, t, c) order by t, id), '[]') from (select a.id, a.qid, floor(extract(epoch from a.answered_at))::bigint as t, case when a.correct then 1 else 0 end as c from personal_answers a where a.visitor_id = 'xp-B' and a.hub = 'xh' order by a.answered_at desc, a.id desc limit 5000) x)`);
