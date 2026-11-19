@@ -987,9 +987,10 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 .set-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px; padding: 14px 0; }
 .set-row + .set-row, .panel > h2 + .set-row, .panel > .note + .set-row { border-top: 1px solid var(--rule); }
 .panel > h2 + .set-row { margin-top: 8px; }
-.set-row > div { flex: 1; min-width: min(220px, 100%); }
+.set-row > div { flex: 1; min-width: min(220px, 100%); }   /* never wider than the row: at XX-Large on a 320px phone the dialog is under 200px */
 .set-row b { display: block; font-weight: var(--w-strong); }
 .set-row small { display: block; font-size: var(--fs-meta); color: var(--muted); }
+.set-row > .btn { max-width: 100%; white-space: normal; text-align: center; }   /* "Change your name" wraps rather than run past a narrow dialog */
 .pod-slot { min-height: 120px; }
 
 /* the drawn figures (content/figures.css, from the live hub): flat plates, labels in the hub's type */
@@ -1314,7 +1315,7 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
   .hx .ql-pod { padding: 12px; }
   .pm-text { padding-right: 0; }
   .hx .ql-pod { min-height: 0; }
-  .ql-pod .pm-text small { padding-right: 64px; }
+  .ql-pod .pm-text small, .ql-pod .pm-earn { padding-right: 64px; }   /* Timmy and his music notes keep that column (BUG-188: the XP line ran under the notes) */
   .pm-art, .pm-timmy { width: 62px; }
   .pm-art { right: 2px; bottom: -10px; }
   .pm-notes { left: 6px; top: -26px; width: 28px; }
@@ -1333,6 +1334,7 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
 }
 @media (max-width: 380px) {
   .ql-pod .pm-text small { display: none; }   /* the episode's title would run under Timmy; the card still says Timmy Time */
+  .ql-pod .pm-earn { padding-right: 0; }   /* no notes at this width, and the smaller Timmy clears the line */
   .pm-art, .pm-timmy { width: 48px; }
   .pm-art { right: 0; bottom: -8px; }
   .pm-notes { display: none; }
