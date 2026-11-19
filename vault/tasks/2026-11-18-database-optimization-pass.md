@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/444
+pr: https://github.com/smcmurry6-source/study-hubs/pull/444, https://github.com/smcmurry6-source/study-hubs/pull/453
 ---
 
 # The database optimization pass: the same site for less of the Free plan's CPU
@@ -102,6 +102,29 @@ with 7.3% each of preflights, `record_qh` 6.8%, the changelog 5.1%, `record_clic
 `get_rank_profile_v2` and `get_hub_mastery` 1% each. A call that does nothing takes about 95 ms end to end at the median;
 an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstrap 445 ms.
 
+## What was measured (2026-11-19, phase 2)
+
+Live first, from the catalog (cheap, any hour; 9:40 am Central): `xp_awards` 62,894 rows for 91 students, the most 2,753
+(the next seven 2,335 to 1,682), 696 student-and-kind pairs, not the 300,000 this note guessed; `answer_xp` 22,227 inserts
+and 22,006 updates since the restart of 2026-11-18; `activity_visits` 8,788 visits, a 1.4 MB table with 6.1 MB of indexes
+(4.7 MB of it `activity_visits_last_idx`), 39,443 updates, 6.6% in place; `xp_seen` 180,099 rows, a 29.9 MB table and a
+24.8 MB primary key, 18 dead rows.
+Then on two throwaway copies, **`node tools/release/bench-answers.js --statements`**: the same made-up class (37,630 calls:
+a heavy student with 8,300 awards, a middling one, a light one and 40 more, with mocks, arcade games, cards, replays and
+double taps) on `supabase/schema.sql` (A) and with the pending migrations (B). Identical replies to all 37,630 calls,
+identical wallets, identical rows in all 75 tables, every running total equal to its awards; then 200 more answers by each
+of the three, A and B in turn, three rounds (ms an answer, its own transaction, psql included):
+
+| Idea | Before (A) | After (B) | What was done |
+|---|---|---|---|
+| **The awards summed once** | heavy 3.96, middling 3.06, light 2.33; the wallet's sum 0.86 ms of every answer | 2.37, 2.11, 2.21; the sum 0.03 ms | **`migration_v79.sql`**: `xp_award_totals`, kept by statement-level triggers on `xp_awards` (an award insert 0.035 → 0.061 ms, about 60 bytes more log); the fill and the triggers in one transaction under a lock on `xp_awards`, so no award falls between them. The light student's answer is the same within the rounds' spread (2.25-2.40 against 1.95-2.39). Link my devices' rebuild of the heavy student: 280-350 ms either way, the totals exact after |
+| **`answer_xp` once an answer** | an insert and an update: 0.085 ms, 1,219 kB of log for 1,800 answers | one insert: 0.048 ms, 964 kB | **`migration_v80.sql`**: the row is inserted at the end with the reply. One row version an answer instead of two (no dead row left for vacuum) |
+| **`activity_visits_last_idx`** | 300 visits pinged 60 times, a ping a transaction: 0% of the updates in place; the table 512 kB, its indexes 576 kB; 21 MB of log | 99.9% in place; 24 kB and 48 kB; 16 MB of log | **`migration_v81.sql`** drops it. The admin page's visitor summary without it, at the live size (9,000 visits): 30 days 3.4 ms either way (it reads by the visitor index), 1 day 0.4 → 2.1 ms (a scan of 1.4 MB), the same numbers |
+| **`xp_seen`'s 52 MB** | live: 29.9 MB table + 24.8 MB index for 180,099 rows | the same rows fresh at the live widths: about 16 + 15 MB; `cluster` 0.35 s for 197,000 on the copy | **Rewrite it once, at night**: about 24 MB back. The table is twice what its rows need, most likely from the rebuilds of everyone that migrations ran (`sh_xp_rebuild` over every visitor, in v54 and v68: each deletes and copies every row). Link my devices' rebuilds bring some back, mostly to the index (60 rebuilds of a student on the copy: the table 17 → 19 MB, the index 16 → 23 MB; live, 65,125 rows deleted and added again in the 18 hours after the restart) |
+
+On the copy, analyze after loading made-up rows: until the first `vacuum analyze` the medal check's plan read 30 times as
+much (29 ms a check, not 1), which made the first timings meaningless. Live tables are analyzed by autovacuum.
+
 ## Done when
 
 - [x] Each of 1-5 measured on a throwaway copy, with the before and after in the PR. **Done** (the table above).
@@ -116,13 +139,19 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
 
 **Phase 2: found by the measuring, each needs more than a `create or replace` (apply after Fri 2026-11-20, 9:30 am, at night):**
 
-- [ ] **The awards summed once, not on every answer.** After v76 the largest part of a heavy student's answer is
+- [x] **The awards summed once, not on every answer.** After v76 the largest part of a heavy student's answer is
   `sh_wallet` summing all their awards for the balance (1.7 of 4.4 ms at 9,000 awards; 0.6 ms at 3,000). A small table
   of running totals per visitor and kind, kept by a trigger on `xp_awards` (inserts, Link my devices' rebuild, deletes),
   makes it one row. A new table and a backfill of about 300,000 rows.
-- [ ] **Drop `activity_visits_last_idx`** (idea 5's finding): every ping's update of the visit then stays on its page.
+  **Done: `migration_v79.sql`** (phase 2's table above). The backfill is 63,000 awards (about 700 totals), so it is part of
+  the migration: one transaction, under a 3 s `lock_timeout`, that fills the totals and adds the triggers while
+  `xp_awards` takes no writes. Applied live: the box below.
+- [x] **Drop `activity_visits_last_idx`** (idea 5's finding): every ping's update of the visit then stays on its page.
   Check the admin page's visitor summary (`where v.last_at >= since`) on a copy without it first; then rewrite the
   table once at night (`vacuum full public.activity_visits`), since it will have grown.
+  **Done: checked and `migration_v81.sql`** (phase 2's table above: the summary's numbers the same, 0.4 to 2.1 ms at most).
+  The rewrite is `cluster ... using activity_visits_pkey` (unlike `vacuum full`, it runs inside the connector's call). Applied
+  live and rewritten: the box below.
 - [ ] **The class's numbers on each card** (`question_stats` and `question_choices`, `widget/v3.js`): 20.6% of every
   request and another 14.6% of preflights, two reads a card. (Only 0.5% of the database's time, live: the gain is in
   requests, so it matters when the request limit or the connection count is what's tight.) The answer's reply could carry them (the save has just
@@ -133,15 +162,26 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
   are worked out again for every visitor (about 5 ms; the same for everyone all day), `get_my_answers` builds up to
   5,000 rows of JSON (4-11 ms), and a visitor without a chosen name has their class name checked against everyone's
   (3.6 ms).
-- [ ] **`answer_xp` is written twice an answer** (the row, then its reply onto it): one insert at the end would halve
+- [x] **`answer_xp` is written twice an answer** (the row, then its reply onto it): one insert at the end would halve
   that table's writes and dead rows. It moves the insert past the speed limit's count, which reads the row, so it needs
-  care.
-- [ ] **`xp_seen`'s size**: 52 MB for about 177,000 rows (2026-11-19; the second biggest table after
+  care. **Done: `migration_v80.sql`.** The count joins the row only to leave out mock answers and runs only outside a mock,
+  so it counts the answer either way (the file's header); the same replies and rows on the copy. Applied live: the box below.
+- [x] **`xp_seen`'s size**: 52 MB for about 177,000 rows (2026-11-19; the second biggest table after
   `personal_answers`, 76 MB), found by the ping table's rewrite ([database-load](2026-11-18-database-load.md), its Log). Its
   rows are four short columns, so most of it is likely the primary key's index and space left by Link my devices'
   rebuilds: look at the table's and the index's sizes apart before deciding on a rewrite.
+  **Looked at:** the table 29.9 MB and the index 24.8 MB, both about twice what the rows need. **Decided: rewrite it once at
+  night** (`cluster public.xp_seen using xp_seen_pkey`), about 24 MB back (phase 2's table above). Done: the box below.
 - [ ] **The rank and mastery after every tenth answer** (`widget/ranks.js`): on the game layer the answer's reply
   already carries the XP total; the page could work out the hub's mastery from the answers it holds.
+- [ ] **Phase 2 applied live, at night after Heme & Endo Exam 3** (set for Sat 2026-11-21, 1:30 am Central, by the session of
+  [#453](https://github.com/smcmurry6-source/study-hubs/pull/453)). First fetch `main`: if another migration took 79-81,
+  renumber; a newer `sh_answer` than `migration_v78.sql`'s (applied 2026-11-19, which v80 is built on) means v80 is rebuilt on
+  it (the same two changes, marked "v80") and tested again. Then one call at a time, nothing in parallel: `migration_v79.sql` (apply_migration) and the check at its end (no rows); v80;
+  `drop index concurrently if exists public.activity_visits_last_idx;` alone; `cluster public.activity_visits using
+  activity_visits_pkey;` and `cluster public.xp_seen using xp_seen_pkey;`, each under `set local lock_timeout = '3s'`, then
+  `analyze` of both; the live bodies md5-checked against the files; the sizes after. Then v79-v81 appended to
+  `supabase/schema.sql` and out of `supabase/pending-migrations.txt`, in the same PR.
 
 ## Log
 
@@ -170,6 +210,15 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
     way, 113 ms the new (both with the pages in memory; the first read after a quiet night was slower, as the old one
     was). Nobody was answering at that hour (a few pings every five minutes), so the saves themselves are the next
     evening's readout (the open box).
+- 2026-11-19, morning (Claude Code, phase 2, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453)): Sam: "Apply
+  nothing live before Heme & Endo Exam 3 is over (Fri Nov 20, 9:30 am); the backfill and the table rewrite at night (1 to 5
+  am Central), one statement at a time." Read live only the catalog (the sizes in phase 2's table) and the edge logs (8:00 to
+  9:30 am Central, Perio's final day: 2,045 answer saves, 8 failed, a median of 133 ms and a 95th percentile of 1,168 ms;
+  the page's pings now arrive as `record_activity_pings`, 1,682 calls, v77's). Everything else on throwaway copies:
+  `migration_v79.sql` (the running totals), `migration_v80.sql` (`answer_xp` once), `migration_v81.sql` (the index), listed
+  in `supabase/pending-migrations.txt`; `tools/release/bench-answers.js`, the A/B run of phase 2's table, for the next
+  phase; `tools/release/xp.js` checks the totals against the sums after all its scenarios. The readout is set for 1:30 am
+  tonight and the live steps for Saturday night (the boxes).
 
 ## Outcome
 

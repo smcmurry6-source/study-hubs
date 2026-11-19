@@ -1491,8 +1491,17 @@ try {
     notes.push('collections (migration_v75): 21 (14 sets, 6 year-round, the costumes), a finished one 1,000 XP and crowns once, Halloween\'s gift never, two at once, the rebuild and Link my devices');
   }
 
+  /* ---------- 14b. the awards' running totals (migration_v79): after everything above (answers, mocks, medals, cards,
+     boosts, the rebuilds, Link my devices, deleted awards), each student's totals by kind are the sums of their awards ---------- */
+  eq(rows(`select coalesce(a.visitor_id, t.visitor_id) as v, coalesce(a.src, t.src) as src, a.n as an, t.n as tn, a.base as ab, t.base as tb, a.xp as ax, t.xp as tx
+           from (select visitor_id, src, count(*)::int n, sum(base)::int base, sum(xp)::int xp from xp_awards group by 1, 2) a
+           full join (select * from xp_award_totals where n <> 0 or base <> 0 or xp <> 0) t using (visitor_id, src)
+           where a.n is distinct from t.n or a.base is distinct from t.base or a.xp is distinct from t.xp`), [],
+     'every running total equals the sum of its awards');
+  notes.push(`the awards' running totals (migration_v79): ${num(`select count(*) from xp_award_totals`)} totals for ${num(`select count(*) from xp_awards`)} awards, all equal to the sums`);
+
   /* ---------- 15. the private parts stay private ---------- */
-  for (const t of ['xp_awards', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
+  for (const t of ['xp_awards', 'xp_award_totals', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);
   raises(() => anon(`update public.visit_secret set secret = 'x'`), '42501', 'anon writes visit_secret directly');
   for (const f of [`sh_answer(null, 'x', 'xh', 'x1', 1, null, null, null, null, null, null, null)`, `sh_award('x', 'k', 'report', 'xh', 100, 1, now())`,
