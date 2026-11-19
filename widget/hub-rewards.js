@@ -158,8 +158,8 @@
   });
   /* what the server paid for an answer (widget/v3.js sends it on): the total it holds replaces the page's sum, an
      answer that paid something other than the guess corrects today's figure, and what the page can't know by itself is
-     said out loud: the day's 20th answer, a miss fixed, a medal with its double XP */
-  var PEND = [], BONUS = { goal20: "20 answers today", fix: "A miss fixed" }, MEDAL = ["", "Bronze", "Silver", "Gold", "Crown"];
+     said out loud: the day's 20th answer, a medal with its double XP ("A miss fixed" was taken out, Sam 2026-11-19, migration_v78) */
+  var PEND = [], BONUS = { goal20: "20 answers today" }, MEDAL = ["", "Bronze", "Silver", "Gold", "Crown"];
   function pendSum(){ var cut = Date.now() - 20000; PEND = PEND.filter(function(x){ return x.at > cut; }); return PEND.reduce(function(n, x){ return n + x.xp; }, 0); }
   /* a prize's name (widget/v3.js prizeName), for the reward card; an older cached v3.js has only prizeText */
   function prizeName(src, d){

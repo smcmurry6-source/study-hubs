@@ -199,7 +199,7 @@ if (off) { t.xp = Math.max(0, t.xp + off); SESSION.xp = Math.max(0, SESSION.xp +
 if (RANK.p && typeof r.total === "number") { RANK.p.xp = Math.max(RANK.p.xp || 0, r.total); RANK.local = pendSum() + Object.keys(CPEND).reduce(function(n, k){ return Date.now() - CPEND[k].at < 20000 ? n + CPEND[k].xp : n; }, 0); }
 if (off || boostShown !== !!boost()) paintMeters();
 });
-var PEND = [], BONUS = { goal20: "20 answers today", fix: "A miss fixed" }, MEDAL = ["", "Bronze", "Silver", "Gold", "Crown"];
+var PEND = [], BONUS = { goal20: "20 answers today" }, MEDAL = ["", "Bronze", "Silver", "Gold", "Crown"];
 function pendSum(){ var cut = Date.now() - 20000; PEND = PEND.filter(function(x){ return x.at > cut; }); return PEND.reduce(function(n, x){ return n + x.xp; }, 0); }
 function prizeName(src, d){
 var G = window.shGame;
