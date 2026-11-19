@@ -368,10 +368,13 @@
        stage's title just above it, so the tile doesn't repeat it */
     el.setAttribute("aria-label", "Exam-day luck for " + luckFor.name);
     el.setAttribute("role", "group");
-    el.innerHTML = '<div class="dx-luck-in"><span class="dx-luck-ic">' + CLOVER + "</span>" + '<p class="dx-luck-txt">' +
+    el.innerHTML = '<div class="dx-luck-in"><p class="dx-luck-txt">' +
       (n ? '<b><span class="num">' + num(n) + "</span>" + (n === 1 ? " classmate" : " classmates") + " sent luck</b><small>" + (names ? "Latest: " + names + (n > 3 ? " and more" : "") : "for " + esc(luckFor.name)) + "</small>"
          : "<b>" + (luckFor.d === 0 ? "Exam day!" : "Exam tomorrow!") + "</b><small>Be the first to send the class some luck</small>") + "</p>" +
-      '<button type="button" class="btn hero-luck-btn"' + (r.mine ? " disabled>" + icon("check", 16) + "Luck sent" : ">" + CLOVER + "Send luck") + "</button></div>";
+      /* a chunky game button (Sam, 2026-11-19: "redo the send luck button"): the clover on a gold coin, a shine across
+         it, pressed into its shadow when tapped; gold once your luck is sent */
+      '<button type="button" class="hero-luck-btn' + (r.mine ? " is-sent" : "") + '"' + (r.mine ? " disabled" : "") + '><span class="dx-luck-coin">' + CLOVER + "</span>" +
+        (r.mine ? "Luck sent!" : "Send luck") + "</button></div>";
   }
   function loadLuck(){
     if (!luckSb || !luckFor) return;
@@ -394,7 +397,7 @@
     var btn = e.target.closest(".hero-luck-btn"); if (!btn || btn.disabled || !luckFor) return;
     var k = luckKey(), r = luckData[k] || { count: 0, mine: false, recent: [] };
     luckData[k] = { count: (r.count || 0) + 1, mine: true, recent: r.recent || [] };
-    var el = $("heroLuck"); drawLuck(); if (el) luckBurst(el);
+    var el = $("heroLuck"); drawLuck(); if (el) { luckBurst(el); var nb = q(".hero-luck-btn", el); if (nb && !still()) nb.classList.add("is-pop"); }
     if (luckSb) luckSb.rpc("send_exam_luck", { p_visitor: surveyVisitor(), p_hub: luckFor.hub, p_date: luckFor.date }).then(function(res){
       if (res && res.data && luckKey() === k){ luckData[k] = res.data; drawLuck(); }
     }, function(){});

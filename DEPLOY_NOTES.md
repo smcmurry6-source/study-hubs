@@ -45,6 +45,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   the first clause bold when it is short, three lines and More for a long one; it scrolls sideways a card at a time
   (arrows on a laptop, swipe on a phone). Then Sam: "make it a bit thinner. its taking up a lot of space": one-line
   header, tags on the line, three-line cards, about 230 px tall on a laptop (it was about 400 in the first draft).
+  Then **"redo the send luck button"**: Send luck is a chunky game button (an ink outline, pressed into its shadow when
+  tapped, a shine across it, the clover on a gold coin that wiggles now and then), gold with "Luck sent!" once sent, and
+  the tile's separate clover circle is gone; on a phone the button takes its own full-width row.
   Changes since this device last saw that hub's box say New, with a count ("3 new since your last visit", "3 new" on a
   phone; `sh_news_seen` in localStorage, per hub; a first visit counts the last day's). The hub's description opens
   from "About this hub" in the box's header.
