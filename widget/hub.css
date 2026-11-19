@@ -222,6 +222,14 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 /* and where the bar still has no room (widget/hub-rewards.js, fitPill): the name goes, then the number */
 .hx-rank.is-tight b, .hx-rank.is-tighter .xpn { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .hx-rank.is-tighter { padding-right: 6px; }
+/* and last, the hub's name: its emblem stays, and the link is still read out by name (BUG-083) */
+.hx-bar.is-cramped .hx-name span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* and past that (a larger text size on a laptop), the meters move to the strip, as on a tablet (the 1,100 px rules below) */
+.hx-bar.no-meters .hx-meters { display: none; }
+.hx-bar.no-meters .hx-tabs { margin-left: 4px; }
+.hx-bar.no-meters .hx-search { margin-left: auto; }
+.hx.is-strip .hx-strip { display: flex; }
+.hx.is-strip .mock-bar { top: calc(var(--bar-h) + var(--boss-h, 0px) + 52px); }
 @media (max-width: 1600px) {
   .hx-rank .jn, .hx-rank .xb-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .hx-rank .xboost { position: absolute; left: 22px; top: -3px; height: 16px; margin: 0; padding: 0; gap: 0; background: none; }

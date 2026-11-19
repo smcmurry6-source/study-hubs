@@ -183,6 +183,12 @@ background: color-mix(in srgb, var(--gold) 26%, var(--row)); color: var(--gold-i
 .hx-rank { position: relative; }
 .hx-rank.is-tight b, .hx-rank.is-tighter .xpn { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .hx-rank.is-tighter { padding-right: 6px; }
+.hx-bar.is-cramped .hx-name span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.hx-bar.no-meters .hx-meters { display: none; }
+.hx-bar.no-meters .hx-tabs { margin-left: 4px; }
+.hx-bar.no-meters .hx-search { margin-left: auto; }
+.hx.is-strip .hx-strip { display: flex; }
+.hx.is-strip .mock-bar { top: calc(var(--bar-h) + var(--boss-h, 0px) + 52px); }
 @media (max-width: 1600px) {
 .hx-rank .jn, .hx-rank .xb-t { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .hx-rank .xboost { position: absolute; left: 22px; top: -3px; height: 16px; margin: 0; padding: 0; gap: 0; background: none; }
