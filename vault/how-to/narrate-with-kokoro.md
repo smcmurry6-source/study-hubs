@@ -56,6 +56,21 @@ longer matches. One lecture on a 4-core machine speaks about 50 characters a sec
 minutes); `--jobs 4` manages about 40 a second in all, and the 21 lectures of 2026-11-12 (270,000 characters, 148 MB) took
 106 minutes.
 
+**A professor's study guide** (since 2026-11-19, Heme & Endo Exam 3's) is one recording, `audio/guide.mp3`, spoken from the
+page's readable part: `node tools/hub-next/guide.mjs <hub>` prints it (each lecture's heading, its items and its key terms;
+not the badges, the question counts or the buttons, so a new question doesn't change it). "L17" is said "Lecture 17"
+(`data-say` in that HTML: the attribute is spoken, the text inside is what the page shows). Record it, then build:
+
+```bash
+python3 tools/narrate.py heme-endo-exam3 --level guide --text   # what it will say
+python3 tools/narrate.py heme-endo-exam3 --level guide --force
+node tools/hub-next/build.mjs --hub heme-endo-exam3        # then always this (notes.json's guideAudio)
+```
+
+Its words file says which text it was spoken from (`h`), as High yield's does. 90,000 characters took about 40 minutes and
+made a recording of about 105 minutes. A change to how `widget/guide.js` draws the readable part needs the same change in
+`guide.mjs`: the smoke test compares the page's text with it.
+
 **Word timings for Follow along** (since 2026-11-12). The engine highlights each word as Listen reads it
 (`widget/hub.js`), from a `<lecture>-<level>.words.json` beside each mp3: the words as the page shows them and when each is
 spoken. `narrate.py` writes it with every mp3 it renders, from Kokoro's own timings (`create_timed`, kokoro-onnx 0.6.1 or

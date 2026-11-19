@@ -2121,7 +2121,7 @@ var art = '<article class="reading' + lc(lec.id) + '" id="lec-' + esc(lec.id) + 
 (lec.note ? '<p class="note lec-note">' + lec.note + "</p>" : "") +
 '<div class="toolbar" role="toolbar" aria-label="Notes tools">' +
 (text ? '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn"' + (mp3 ? ' data-sh-tts-audio="1"' : ' title="Read aloud in your device\'s voice"') + ' aria-label="Listen to these notes">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
-'<button type="button" class="btn btn-text follow-btn" data-follow hidden aria-pressed="' + followOn() + '" title="Highlight each word as it is read. Tap a word to jump there.">' + icon("highlight", 18) + "Follow along</button>" : "") +
+followBtn() : "") +
 (hasPlain || hasHy ? '<span class="seg" role="group" aria-label="Reading level"><button type="button" data-level="full" aria-pressed="' + (level === "full") + '">As taught</button>' +
 (hasPlain ? '<button type="button" data-level="plain" aria-pressed="' + (level === "plain") + '">Plain English</button>' : "") +
 (hasHy ? '<button type="button" data-level="hy" aria-pressed="' + hy + '">High yield</button>' : "") + "</span>" : "") +
@@ -2154,8 +2154,7 @@ c.hidden = open; mm.setAttribute("aria-expanded", String(!open)); track("notes:m
 });
 var tts = $("#sh-tts-btn", el);
 if (tts) tts.addEventListener("click", function(){ if (window.shTTS) window.shTTS.speak(prose, tts, mp3); });
-var fb = $("[data-follow]", el);
-if (fb) { fb.addEventListener("click", function(){ var on = !followOn(); ls("sh_pref_follow", on ? null : "off"); fb.setAttribute("aria-pressed", String(on)); track("notes:follow=" + (on ? "on" : "off")); follow.pref(); }); if (mp3) follow.reattach(prose, mp3); }
+wireFollow(el, prose, mp3);
 $$("[data-report-notes]", el).forEach(function(b){ b.addEventListener("click", function(){
 track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: lec.id, label: lecLabel(lec) + " " + shortTitle(lec) }); else toast("The report form is still loading. Try again in a moment.");
 }); });
@@ -2165,6 +2164,11 @@ wireRead(el, lec, hy);
 tip(el, "notes", "Select any words in the notes to highlight them; they stay on this device.", $(".reading > .toolbar", el));
 }
 function followOn(){ return ls("sh_pref_follow") !== "off"; }
+function followBtn(){ return '<button type="button" class="btn btn-text follow-btn" data-follow hidden aria-pressed="' + followOn() + '" title="Highlight each word as it is read. Tap a word to jump there.">' + icon("highlight", 18) + "Follow along</button>"; }
+function wireFollow(el, prose, mp3){
+var fb = $("[data-follow]", el);
+if (fb) { fb.addEventListener("click", function(){ var on = !followOn(); ls("sh_pref_follow", on ? null : "off"); fb.setAttribute("aria-pressed", String(on)); track("notes:follow=" + (on ? "on" : "off")); follow.pref(); }); if (mp3) follow.reattach(prose, mp3); }
+}
 var follow = (function(){
 var OK = !!(window.CSS && CSS.highlights && typeof window.Highlight === "function");
 var BLOCK = /^(P|LI|H1|H2|H3|H4|H5|H6|DIV|TD|TH|TR|TABLE|THEAD|TBODY|UL|OL|DL|DT|DD|BLOCKQUOTE|SECTION|ARTICLE|ASIDE|FIGURE|FIGCAPTION|DETAILS|SUMMARY|BR|HR)$/;
@@ -3010,10 +3014,11 @@ lecChip: lecChip, lecHead: lecHead, isRead: isRead, isExamLec: isExamLec, isRevi
 hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, hasVersions: hasVersions, needNotes: needNotes, needStudy: needStudy,
 needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
 go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
-offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget, lecBadge: lecBadge, lecListHTML: lecListHTML, wireLecPick: wireLecPick, wireLecLinks: wireLecLinks
+offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget, lecBadge: lecBadge, lecListHTML: lecListHTML, wireLecPick: wireLecPick, wireLecLinks: wireLecLinks,
+followBtn: followBtn, wireFollow: wireFollow
 };
 [["CORE", function(){ return CORE; }], ["QS", function(){ return QS; }], ["LECS", function(){ return LECS; }],
-["IDX", function(){ return IDX; }], ["NOTES", function(){ return NOTES; }],
+["IDX", function(){ return IDX; }], ["NOTES", function(){ return NOTES; }], ["AUDIO_OFF", function(){ return AUDIO_OFF; }],
 ["STUDY", function(){ return STUDY; }], ["FIG", function(){ return FIG; }], ["ARC", function(){ return ARC; }],
 ["EXAM", function(){ return EXAM; }], ["shell", function(){ return shell; }],
 ["view", function(){ return view; }], ["sub", function(){ return sub; }]

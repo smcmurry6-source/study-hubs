@@ -23,6 +23,16 @@ node tools/hub-next/build.mjs --hub <hub>
 recorded again the page doesn't offer the recording (Listen reads High yield in the device's voice), so a stale one never
 plays.
 
+**A professor's study guide** (`#notes/guide`, since 2026-11-19) has one recording, `audio/guide.mp3`, spoken from the page's
+readable part as `tools/hub-next/guide.mjs` writes it. It works like High yield: its words file says which text it was spoken
+from, the build offers it to the page only while that matches (`notes.json`'s `guideAudio`), and the smoke test fails when
+it doesn't. Editing the guide in `study.json` means recording it again in the same PR:
+
+```bash
+python3 tools/narrate.py <hub> --level guide --force
+node tools/hub-next/build.mjs --hub <hub>
+```
+
 If you can't regenerate the audio (no Kokoro, no time), don't edit the text: say so in the PR or the task note instead.
 How: [narrate-with-kokoro](../how-to/narrate-with-kokoro.md). The same goes for a hub's Timmy Time episode: when the
 notes change, fix the script and rebuild the episode in the same PR (`tools/podcast/README.md`).

@@ -6,8 +6,10 @@
    It is #notes/guide, first in the notes' lecture list. widget/hub.js fetches this file the first time Notes opens on a hub
    whose study.json has a guide, so no other hub downloads it (Sam, 2026-11-19: "the study guide is only for this particular
    heme test"); the core keeps only the loader, the route, the search entries (exportSections) and their jump (SH_GOTO).
-   Listen reads the page in the device's voice (it has no recording, so nothing can drift); the highlighter works on it as on
-   any notes. ============ */
+   Listen plays its Kokoro recording, audio/guide.mp3 (Sam, 2026-11-19: "add kokoro"), with Follow along, while notes.json's
+   guideAudio says it was spoken from today's guide (tools/hub-next/build.mjs; the text is tools/hub-next/guide.mjs, the
+   readable part of this page: what is marked data-sh-noread isn't in it); otherwise it reads the page in the device's
+   voice, so it never drifts from the text. The highlighter works on it as on any notes. ============ */
 (function(){
   "use strict";
   window.SH_GUIDE = function(HX){
@@ -34,6 +36,7 @@
     function draw(el){
       if (HX.view !== "notes") return;
       var I = info(), S = secs(), counts = HX.CORE.examCounts || {};
+      var mp3 = !HX.AUDIO_OFF && (HX.NOTES || {}).guideAudio ? HX.ASSETS + "audio/guide.mp3" : "";
       var body = S.map(function(g){
         var l = LBY[g.lec], n = counts[l.id], nLikely = (QBL[l.id] || []).filter(function(r){ return r.likely; }).length;
         return '<section class="gd-lec' + lc(l.id) + '" id="gd-' + esc(l.id) + '" aria-labelledby="gdh-' + esc(l.id) + '">' +
@@ -49,7 +52,8 @@
         '<h1 class="rd-title">' + badge() + "<span>" + esc(I.title) + "</span></h1>" + (I.sub ? '<p class="sub">' + esc(I.sub) + "</p>" : "") +
         (I.note ? '<p class="note lec-note">' + esc(I.note) + "</p>" : "") +
         '<div class="toolbar" role="toolbar" aria-label="Study guide tools">' +
-          '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn" title="Read aloud in your device\'s voice" aria-label="Listen to the study guide">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
+          '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn"' + (mp3 ? ' data-sh-tts-audio="1"' : ' title="Read aloud in your device\'s voice"') + ' aria-label="Listen to the study guide">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
+          HX.followBtn() +
           '<button type="button" class="btn btn-text" data-report-notes>' + icon("report", 18) + "Report a mistake</button>" +
           '<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
         "</div>" +
@@ -62,7 +66,8 @@
       HX.wireLecPick(el);
       $$("[data-gdjump]", el).forEach(function(b){ b.addEventListener("click", function(){ var s = document.getElementById("gd-" + b.getAttribute("data-gdjump")); if (s) s.scrollIntoView({ block: "start", behavior: HX.reduced ? "auto" : "smooth" }); track("notes:guide-jump"); }); });
       var tts = $("#sh-tts-btn", el);
-      if (tts) tts.addEventListener("click", function(){ if (window.shTTS) window.shTTS.speak(prose, tts, ""); });
+      if (tts) tts.addEventListener("click", function(){ if (window.shTTS) window.shTTS.speak(prose, tts, mp3); });
+      HX.wireFollow(el, prose, mp3);
       $$("[data-report-notes]", el).forEach(function(b){ b.addEventListener("click", function(){
         track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: "guide", label: I.title }); else toast("The report form is still loading. Try again in a moment.");
       }); });

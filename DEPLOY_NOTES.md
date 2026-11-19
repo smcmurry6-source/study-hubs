@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (Heme & Endo Exam 3: the study guide narrated with Kokoro, Claude Code)** — Sam: "add kokoro". Dr. Herr's
+  study guide page (`#notes/guide`) has its own recording, `hubs/heme-endo-exam3/audio/guide.mp3` with its words file, so Listen
+  plays it in the notes' narrator's voice with Follow along and tap-a-word-to-jump. It is spoken from the page's readable part,
+  which `tools/hub-next/guide.mjs` writes (each lecture's heading, said "Lecture 17", its items and its key terms; not the badges,
+  question counts or buttons). `tools/narrate.py` has a `--level guide` (and reads `data-say`, `<h2>`, `<dt>`/`<dd>`, a power of
+  ten, 10<sup>9</sup>/L, as "10 to the ninth per liter", and /µL as "per microliter"). `tools/hub-next/build.mjs` writes
+  `notes.json`'s `guideAudio`, true only while the recording was spoken from today's guide (its words file's `h`, as for High
+  yield), and `widget/guide.js` offers the recording only then. The smoke test checks the recording against the text and
+  compares the page's readable text with `guide.mjs`'s. Follow along's button and wiring are shared helpers in `widget/hub.js`
+  (`followBtn`, `wireFollow`). `sw.js` sh-v64. The text-and-audio rule, the narration how-to, the hub note and the About page
+  say so.
 - **2026-11-19 (Heme & Endo Exam 3: Dr. Herr's study guide in Notes, Claude Code)** — Sam: "under notes, make a section for dr
   herrs study guide. have each item as a heading and have [high] yield explainer of everything we need to know about that topic.
   since it skips dr taylors lecture, dont include it". A **study guide page** at `#notes/guide`, first in the notes' lecture list,

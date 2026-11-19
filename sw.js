@@ -13,7 +13,7 @@
    single-file hubs' pages and the separate widget files they load by name are cached as they are used.
    Not here on purpose: widget/hub-art/outfits.js and the set files in widget/hub-art/place/ (fetched
    only when that outfit or set is drawn). */
-var VERSION = 'sh-v63';
+var VERSION = 'sh-v64';
 var HUBS = ['perio', 'heme-endo-exam3'];
 var PRECACHE = ['./', 'index.html', 'hubs.js', 'manifest.webmanifest', 'assets/icon.svg',
   'widget/site.bundle.css', 'widget/dash.bundle.js', 'widget/hub.bundle.js', 'widget/rest.bundle.js', 'widget/hub-rest.bundle.js',
