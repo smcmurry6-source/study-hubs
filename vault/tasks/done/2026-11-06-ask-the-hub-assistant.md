@@ -87,12 +87,12 @@ the release up. A pilot on one hub for one exam; then Sam decides from the numbe
 
 ## Done when
 
-- [ ] Sam's calls are in [decisions](../../decisions.md) and this note
-- [ ] The key saved by Sam in Supabase; the `ask-hub` function deployed with its limits and the spending limit set
-- [ ] The test set passes in the preview: every answer's quotes check out, "not covered" when it should be, no bank answers
-- [ ] The About page's entry and "What the hubs record" updated; event taxonomy and retention rows
-- [ ] CI and the release suites pass; Sam's look on the preview
-- [ ] After the pilot exam: the numbers in this note, and Sam's call to keep, change or drop it
+- [ ] ~~Sam's calls are in [decisions](../../decisions.md) and this note~~ dropped: Ask Timmy replaced it
+- [ ] ~~The key saved by Sam in Supabase; the `ask-hub` function deployed with its limits and the spending limit set~~ dropped: Ask Timmy replaced it
+- [ ] ~~The test set passes in the preview: every answer's quotes check out, "not covered" when it should be, no bank answers~~ dropped: Ask Timmy replaced it
+- [ ] ~~The About page's entry and "What the hubs record" updated; event taxonomy and retention rows~~ dropped: Ask Timmy replaced it
+- [ ] ~~CI and the release suites pass; Sam's look on the preview~~ dropped: Ask Timmy replaced it
+- [ ] ~~After the pilot exam: the numbers in this note, and Sam's call to keep, change or drop it~~ dropped: Ask Timmy replaced it
 
 ## Log
 
@@ -100,11 +100,15 @@ the release up. A pilot on one hub for one exam; then Sam decides from the numbe
 - 2026-11-06: Sam, in chat: "i think we ditch the ask the hub idea". Dropped.
 - 2026-11-12: Sam brought it back as part of the redesign, in Timmy's voice: [Ask Timmy](2026-11-12-redesign-ask-timmy.md).
   The design below is its starting point; where the two differ, that note wins.
+- 2026-11-19 (the housekeeping package): the Done when boxes struck as dropped: [Ask Timmy](2026-11-12-redesign-ask-timmy.md)
+  shipped with the redesign's release (2026-11-14) in this one's place, with its own boxes.
 
 ## Outcome
 
 **Dropped** (Sam, 2026-11-06, [decisions](../../decisions.md)): not built, now or after the redesign. The design above
 stays here in case it comes back; don't propose it again unless Sam asks.
+It came back in Timmy's voice: [Ask Timmy](2026-11-12-redesign-ask-timmy.md) (Sam, 2026-11-12), live since the
+redesign's release (2026-11-14), so this note's boxes are dropped, not open.
 
 Related: [secrets](../../rules/secrets.md) · [learner-data-privacy](../../rules/learner-data-privacy.md) ·
 [graded-coursework](../../rules/graded-coursework.md) · [the audit and plan](2026-11-05-redesign-audit-and-plan.md)

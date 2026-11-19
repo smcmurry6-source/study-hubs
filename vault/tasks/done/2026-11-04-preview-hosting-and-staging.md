@@ -47,7 +47,9 @@ Give every PR a preview link that opens on a phone, without touching the class's
 - [x] The secret and variable are in GitHub, and a run posts a working link (the dashboard and one hub load,
       the Preview button says no request reached production).
 - [x] `RELEASE_TEST_PLAN.md` section 13 says what was chosen; `vault/decisions.md` has the line.
-- [ ] CI passes.
+- [x] CI passes. #233's "Check hubs" and `preview` jobs passed (2026-11-04); since then the Preview workflow has
+      deployed labeled PRs (the release's, #359, last on 2026-11-15) and `node tools/ci/preview.js` passes in "Check hubs"
+      on every PR and on `main` (2026-11-19). Ticked 2026-11-19 (the housekeeping package).
 
 ## Log
 
