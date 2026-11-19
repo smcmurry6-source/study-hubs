@@ -1090,8 +1090,13 @@
     }
     function loadOwn(){
       if (loading) return; loading = true;
-      /* the redesign's pages read the game layer's profile once the database has it (H.v2, set by widget/v3.js) */
-      Promise.all([rpc(H.v2 && H.v2() ? "get_rank_profile_v2" : "get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
+      /* the redesign's pages read the game layer's profile (H.live, set by widget/v3.js: the page wants it and hasn't
+         found it missing; H.v2 on an older cached v3.js). Until 2026-11-19 it waited for H.v2, which is true only once the
+         bootstrap or an answer's reply has come back, so with the bootstrap timed out in a busy minute the page read the
+         old profile: no double-XP chip until the first answer's reply, and from 50,000 XP no climb to the ModuPro (past
+         it, the Handpiece's Dark Matter in place of the journey's rank) until the tenth answer */
+      var v2 = H.live ? H.live() : H.v2 && H.v2();
+      Promise.all([rpc(v2 ? "get_rank_profile_v2" : "get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
         loading = false;
         if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
         applyOwn(r[0], r[1]);

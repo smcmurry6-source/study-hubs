@@ -45,6 +45,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   pays nothing; rank sets aren't collections ([decisions](vault/decisions.md)). Tests: `tools/release/xp.js` 14d (596
   checks), the smoke test's place section. **The migration is applied after the merge** (pending list;
   [the task](vault/tasks/2026-11-19-shop-collections.md)).
+- **2026-11-19 (pages that ride out a busy database: answers kept on the device, and the rank pill, Claude Code)** — (1) An
+  answer still unsaved when its tab closed was lost (the line's retries lived in the page). Now `widget/v3.js` writes the
+  answers still in the line to the device when the page is hidden (`sh_answers_kept:<hub>`), takes them back when it shows
+  again, and the hub's next page sends them first, oldest first, with the same request ids (an answer that did reach the
+  server pays nothing new); a page that finds its answers taken by another drops them. An answer out of its 8 tries is kept
+  too. At most 3 days and 24 tries; the server stamps each when it arrives. A backlog (after a quiet spell, or kept) now goes
+  out spaced as it was answered, up to 2.1 s apart, so its misses pay and count toward a run as they would have (the speed
+  limit); live answers go at once as before. Mocks' and games' answers aren't kept (inbox). (2) With the bootstrap timed
+  out, `widget/ranks.js` read the old rank profile until the first answer: no double-XP chip, and from 50,000 XP the wrong
+  rank or journey (nobody is there yet). It asks `get_rank_profile_v2` when `shGame.live()` (a new `live` hook in
+  `shEggHooks`). The dashboard already asked v2 first. About page ("What the hubs record") and Ask Timmy's site help
+  updated; bundles rebuilt; `tools/ci/quiet.js` checks the kept answers. It also closes every WebSocket now: since #429 its
+  pages (not marked automated, so they act as visitors) opened the real realtime connection and showed in Perio's
+  "studying now" count for about a minute each CI run (nothing saved; the smoke test always closed them).
 - **2026-11-18 (rules for heavy queries, Claude Code)** — From the database-load task's second and third boxes: on
   2026-11-18 the lessons audit's economy queries (11 and 13 s) and a migration's 43 s transaction failed students' answer
   saves. Timed on a throwaway copy at 1.5 times the class's size: `tools/economy.sql`'s E3 worked every wallet out about ten

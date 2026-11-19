@@ -4030,33 +4030,10 @@ p_self: d.self ? isCorrect : null,
 p_v: (window.shQH && window.shQH.version && window.shQH.version(qid)) || null,
 p_ctx: d.ctx || null, p_request: gameId(), p_session: d.session || null, p_claim: isCorrect
 };
-function paid(r){
-if (r.boost !== undefined) GAME.boost = r.boost || null;
-if (!r.repeat) setCrowns(r.crowns);
-try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: qid, ctx: d.ctx || "", session: d.session || null, res: r } })); } catch (e) {}
-}
-function send(){
-var call;
-try { call = supabase.rpc("record_answer_v2", args); } catch (e) { return Promise.resolve(false); }
-return call.then(function(res){
-if (rpcMissing(res)) { GAME.on = false; answerToday(d, isCorrect); return false; }
-if (res && res.error) {
-if (dbFailed(res)) { dbFail(); return true; }
-return false;
-}
-dbOk();
-var r = res && res.data;
-if (!r || typeof r !== "object") return false;
-if (r.ok === false) { if (r.error === "bad") answerToday(d, isCorrect); return false; }
-GAME.on = true;
-paid(r);
-return false;
-}, function(){ dbFail(); return true; });
-}
 if (d.session) {
-var tries = 0, waits = [4000, 10000];
+var tries = 0, waits = [4000, 10000], job = { args: args, d: d, c: isCorrect };
 var go = function(){
-return send().then(function(again){
+return sendAnswer(job).then(function(again){
 if (!again || tries >= waits.length) return;
 var ms = Math.round(waits[tries++] * (0.75 + Math.random() * 0.5));
 return new Promise(function(ok){ setTimeout(ok, ms); }).then(go);
@@ -4065,21 +4042,117 @@ return new Promise(function(ok){ setTimeout(ok, ms); }).then(go);
 (gamePending[d.session] = gamePending[d.session] || []).push(go());
 return;
 }
-answerLine.push({ send: send, tries: 0 });
+answerLine.push({ args: args, d: { qid: qid, ctx: d.ctx || "", choice: args.p_choice, picks: Array.isArray(d.picks) && d.picks.length ? d.picks : null },
+c: isCorrect, at: Date.now(), tries: 0, n: 0 });
 lineNext();
 }
-var answerLine = [], lineOn = false;
-function lineNext(){
-if (lineOn || !answerLine.length) return;
-lineOn = true;
-var wait = DB.until - Date.now();
-if (wait > 0) { setTimeout(function(){ lineOn = false; lineNext(); }, wait + 50); return; }
-var job = answerLine[0];
-job.send().then(function(again){
-if (again && ++job.tries < 8) {   } else answerLine.shift();
-lineOn = false; lineNext();
-}, function(){ answerLine.shift(); lineOn = false; lineNext(); });
+function answerPaid(job, r){
+if (r.boost !== undefined) GAME.boost = r.boost || null;
+if (!r.repeat) setCrowns(r.crowns);
+try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: String(job.d.qid || ""), ctx: job.d.ctx || "", session: job.d.session || null, res: r } })); } catch (e) {}
 }
+function sendAnswer(job){
+var call;
+try { call = supabase.rpc("record_answer_v2", job.args); } catch (e) { return Promise.resolve(false); }
+return call.then(function(res){
+if (rpcMissing(res)) { GAME.on = false; answerToday(job.d, job.c); return false; }
+if (res && res.error) {
+if (dbFailed(res)) { dbFail(); return true; }
+return false;
+}
+dbOk();
+var r = res && res.data;
+if (!r || typeof r !== "object") return false;
+if (r.ok === false) { if (r.error === "bad") answerToday(job.d, job.c); return false; }
+GAME.on = true;
+answerPaid(job, r);
+return false;
+}, function(){ dbFail(); return true; });
+}
+var answerLine = [], lineOn = false, lineSent = null, lineLast = null;
+function lineNext(){
+if (lineOn) return;
+while (answerLine.length && lineTaken(answerLine[0])) answerLine.shift();
+if (!answerLine.length) return;
+lineOn = true;
+var job = answerLine[0], wait = DB.until - Date.now();
+if (lineLast) wait = Math.max(wait, Math.min(2100, job.at >= lineLast.at ? job.at - lineLast.at : 2100) - (Date.now() - lineLast.done));
+if (wait > 0) { setTimeout(function(){ lineOn = false; lineNext(); }, wait + 50); return; }
+lineSent = job;
+sendAnswer(job).then(function(again){
+lineSent = null; lineLast = { at: job.at, done: Date.now() };
+if (again) job.n++;
+if (again && ++job.tries < 8 && !job.gone) {   }
+else {
+answerLine.shift();
+if (again && !job.gone) keepPark(job);
+else if (job.kept) keepDrop(job);
+}
+lineOn = false; lineNext();
+}, function(){ lineSent = null; answerLine.shift(); lineOn = false; lineNext(); });
+}
+var KEEP_KEY = "sh_answers_kept:" + HUB, KEEP_MS = 3 * 864e5, KEEP_TRIES = 24, KEEP_MAX = 300;
+function keepOn(){ return !!supabase && !AUTOMATED && GAME.want && GAME.on !== false && !!HUB; }
+function keepRead(){
+var a = null;
+try { a = JSON.parse(localStorage.getItem(KEEP_KEY) || "null"); } catch (e) {}
+var cut = Date.now() - KEEP_MS;
+return (Array.isArray(a) ? a : []).filter(function(e){
+return e && e.a && typeof e.a === "object" && typeof e.a.p_request === "string" && e.d && typeof e.at === "number" && e.at > cut && (e.n | 0) < KEEP_TRIES;
+});
+}
+function keepWrite(list){
+try {
+if (!list.length) localStorage.removeItem(KEEP_KEY);
+else localStorage.setItem(KEEP_KEY, JSON.stringify(list.slice(-KEEP_MAX)));
+return true;
+} catch (e) { return false; }
+}
+function keepEntry(job){ return { a: job.args, d: job.d, c: !!job.c, at: job.at, n: job.n | 0 }; }
+function keepIn(list, job){ return list.some(function(e){ return e.a.p_request === job.args.p_request; }); }
+function keepOut(list, job){ return list.filter(function(e){ return e.a.p_request !== job.args.p_request; }); }
+function lineTaken(job){
+if (!job.gone && job.kept && !keepIn(keepRead(), job)) job.gone = true;
+return !!job.gone;
+}
+function keepDrop(job){ job.kept = false; var list = keepRead(); if (keepIn(list, job)) keepWrite(keepOut(list, job)); }
+function keepPark(job){
+if (!keepOn()) return;
+var list = keepOut(keepRead(), job);
+if (job.n < KEEP_TRIES) list.push(keepEntry(job));
+keepWrite(list.sort(function(x, y){ return x.at - y.at; }));
+job.kept = false;
+}
+function keepLine(){
+if (!keepOn()) return;
+var jobs = answerLine.filter(function(j){ return !j.gone; });
+if (!jobs.length) return;
+var list = keptOthers(keepRead(), jobs).concat(jobs.map(keepEntry)).sort(function(x, y){ return x.at - y.at; });
+if (keepWrite(list)) jobs.forEach(function(j){ j.kept = true; });
+}
+function keptOthers(list, jobs){ return list.filter(function(e){ return !jobs.some(function(j){ return j.args.p_request === e.a.p_request; }); }); }
+function keepClaim(){
+if (!keepOn() || document.visibilityState === "hidden") return;
+var list = keepRead(), mine = {}, add = [];
+answerLine.forEach(function(j){ mine[j.args.p_request] = j; });
+list.forEach(function(e){
+var j = mine[e.a.p_request];
+if (j) { j.kept = false; return; }
+e.a.p_visitor = VISITOR_ID;
+add.push({ args: e.a, d: e.d, c: !!e.c, at: e.at, tries: 0, n: e.n | 0 });
+});
+answerLine.forEach(function(j){ if (j.kept) { j.kept = false; j.gone = true; } });
+if (!list.length && !add.length) return;
+keepWrite([]);
+if (add.length) {
+answerLine.splice.apply(answerLine, [lineSent && answerLine[0] === lineSent ? 1 : 0, 0].concat(add.sort(function(x, y){ return x.at - y.at; })));
+}
+lineNext();
+}
+document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") keepLine(); else keepClaim(); });
+window.addEventListener("pagehide", keepLine);
+window.addEventListener("pageshow", function(e){ if (e && e.persisted) keepClaim(); });
+if (supabase && !AUTOMATED && GAME.want && HUB) bootstrap.ready.then(function(){ setTimeout(keepClaim, 2500); }, function(){ setTimeout(keepClaim, 2500); });
 function sendBowlTrophy(){
 try { if (!supabase || !localStorage.getItem("sh_bowl_trophy") || localStorage.getItem("sh_bowl_trophy_sent")) return; } catch (e) { return; }
 try {
@@ -5286,6 +5359,7 @@ nameMsg.textContent = "Saved. Hi, " + name + "!";
 window.shEggHooks = {
 hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase, bootstrap: bootstrap.ready,
 v2: function(){ return GAME.on === true; },
+live: function(){ return GAME.want && GAME.on !== false; },
 send: function(payload){ try { if (channel) channel.send({ type: "broadcast", event: "egg", payload: payload }); } catch (e) {} },
 name: displayName, section: currentSection, online: function(){ return onlineCount; },
 toast: showStreakToast, confetti: fireConfetti, prefGet: prefGet, prefSet: prefSet, esc: esc,
