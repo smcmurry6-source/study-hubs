@@ -54,8 +54,13 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   call (a call returns only its last result), one call at a time: the files' headers (and `tools/analytics-quality.sql`'s),
   `tools/lessons-refresh.md` step 1 and the `lessons-audit` skill say so. One that stops at the limit is split or waits for
   the quiet hours (1 to 5 am Central).
-- [ ] The next lessons audit sends every query under that 5 s limit: its PR says whether any stopped there (live, not on a
-  copy), and one that did is made shorter.
+- [x] The next lessons audit sends every query under that 5 s limit: its PR says whether any stopped there (live, not on a
+  copy), and one that did is made shorter. **Done** (the 2026-11-18 evening audit, 7:30 pm, 80 people in Perio on its final's
+  eve): about 30 queries, one at a time, each under `set local statement_timeout = '5s'`. **One stopped at the limit:
+  `select sh_data_quality();`** (under 1 s on the copy), and the audit didn't send `qh_report` (about 3 s on the copy) for the
+  same reason; every query in `tools/lessons-daily.sql` and `tools/economy.sql` returned, E3 (the wallets) and E7 included.
+  Making them shorter is the first box's work (`get_data_quality` and `get_question_health` are the same functions); until then
+  `tools/lessons-refresh.md` step 1 says to read both early in the day or in the quiet hours, never on a busy evening.
 - [x] `vault/how-to/` says to apply a migration with a backfill late at night (or in small batches), not while the class
   studies. **Done:** [run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md): the quiet hours (1 to 5 am
   Central, from `presence_hourly`, clear of the 3:23 am retention job), functions any time, a backfill kept out of the
