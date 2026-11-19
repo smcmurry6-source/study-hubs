@@ -30,8 +30,8 @@
   function feat(k){ return H.prefGet("sh_pref_" + k, "on") !== "off" && !inMock(); }
   function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } }
   /* a new trophy on the server's profile (an achievement the server says is new, the 1st or 5th fairy, a Golden Probe won):
-     widget/ranks.js reads the rank again at the next tenth answer instead of working it out on the page (sh:trophy-sent,
-     2026-11-19) */
+     the rank is read again at the next tenth answer instead of worked out on the page (sh:trophy-sent, widget/v3.js's
+     shRankLocal, 2026-11-19) */
   var TROPHY_NEW = { record_achievement: function(d){ return d === true; }, record_fairy: function(d){ return d === 1 || d === 5; }, claim_golden_probe: function(d){ return d === true; } };
   function rpc(name, args){
     if (!SB) return Promise.resolve(null);

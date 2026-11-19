@@ -995,18 +995,17 @@
         var key = MASTERY[i].k;
         if (badges.indexOf(key + ":" + H.hub) < 0) {
           fresh = i; badges.push(key + ":" + H.hub);
-          rpc("record_achievement", { p_visitor: H.visitor, p_kind: key, p_hub: H.hub }).then(trophySent);
+          rpc("record_achievement", { p_visitor: H.visitor, p_kind: key, p_hub: H.hub });
         }
       }
       if (fresh >= 0) masteryToast(fresh);
       var srow = (mastery || []).filter(function(r){ return r.hub === H.hub; })[0];
       if (m.bank && srow && srow.seen >= m.bank && badges.indexOf("seen-all:" + H.hub) < 0) {
         badges.push("seen-all:" + H.hub);
-        rpc("record_achievement", { p_visitor: H.visitor, p_kind: "seen-all", p_hub: H.hub }).then(trophySent);
+        rpc("record_achievement", { p_visitor: H.visitor, p_kind: "seen-all", p_hub: H.hub });
         hubTrophyCard("seen-all");
       }
     }
-    function trophySent(d){ if (d === true) try { document.dispatchEvent(new CustomEvent("sh:trophy-sent")); } catch (e) {} }
     function hubTrophyCard(k){
       if (H.prefGet("sh_pref_celebrate", "on") === "off") return;
       var t = HUB_TROPHIES.filter(function(x){ return x.k === k; })[0]; if (!t) return;
@@ -1077,15 +1076,13 @@
     var loading = false, ownRaw = null;
     /* your own rank and mastery: the badge by your name, the rank-up, level-up, trophy and mastery cards, and the
        medals recorded in render(). Cheap per-visitor reads since migration_v53's XP cache, so they still come on load
-       (in the page bootstrap) and every 10 answers (Sam, 2026-11-06; on the game layer worked out on the page since
-       2026-11-19, localTick() below). The class-wide trophy rarity waits for Stats. */
-    function applyOwn(p, m, base){
+       (in the page bootstrap) and every 10 answers (Sam, 2026-11-06). The class-wide trophy rarity waits for Stats. */
+    function applyOwn(p, m){
       var raw = p; p = legacy(p);   // a v2 profile (the redesign): this panel, the accents and Timmy's house read the Handpiece's rank
       profile = p; mastery = m || []; ownRaw = raw;
-      if (base !== undefined) rebase(raw, m, base);
       if (raw.journey > 0 && !window.SH_JOURNEY_ART) needJourneyArt(function(K){ if (K) render(); });
       /* the redesigned hubs' rank pill (widget/hub-rewards.js) listens; nothing on the live pages does */
-      try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: raw, mastery: masteryFor() } })); } catch (e) {}
+      try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: raw, mastery: masteryFor(), rows: m } })); } catch (e) {}
       if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
       track(raw, { busy: mockBusy, seen: function(j){ if (!window.shAutomated) rpc("mark_dark_unlock_seen", { p_visitor: H.visitor, p_journey: j }); },
         claim: window.shAutomated ? null : function(fn, args){ return rpc(fn, Object.assign({ p_visitor: H.visitor }, args)); } });
@@ -1098,45 +1095,13 @@
          bootstrap or an answer's reply has come back, so with the bootstrap timed out in a busy minute the page read the
          old profile: no double-XP chip until the first answer's reply, and from 50,000 XP no climb to the ModuPro (past
          it, the Handpiece's Dark Matter in place of the journey's rank) until the tenth answer */
-      var v2 = H.live ? H.live() : H.v2 && H.v2(), p0 = LOC.paid;
+      var v2 = H.live ? H.live() : H.v2 && H.v2();
       Promise.all([rpc(v2 ? "get_rank_profile_v2" : "get_rank_profile", { p_visitor: H.visitor }), rpc("get_hub_mastery", { p_visitor: H.visitor })]).then(function(r){
         loading = false;
         if (!r[0]) { if (!profile) sec.innerHTML = '<div class="shstat-empty">Ranks load when you are online.</div>'; return; }
-        /* an answer paid while the reads were out may or may not be in them: the next tenth answer reads again */
-        applyOwn(r[0], r[1], LOC.paid === p0);
+        applyOwn(r[0], r[1]);
       });
     }
-    /* The tenth answer on the game layer (2026-11-19, the database optimization pass, phase 2): every answer's reply
-       already carries the XP total, and the page knows each question's last try (the bootstrap's answers, then every
-       reply), so it works out the new XP and this hub's mastery itself instead of reading get_rank_profile_v2 and
-       get_hub_mastery again (two reads every ten answers, from every student). It reads them again, as before, when
-       something it can't count may have changed: a new trophy sent from this page (sh:trophy-sent: the eggs, Timmy, the
-       bowling egg, a medal recorded here), a medal in a reply, the day's first answer (the streak of days) or a new
-       Central day, 100 or 1,000 answers, a run of right answers that could reach 25 or 100, a mock's or a game's answers,
-       a question whose last try it doesn't know (more than the bootstrap's 5,000 answers), and at least every 50 answers.
-       Stats open, the old pages (no game layer) and a page without the bootstrap read as before. The class position
-       (#n of N) updates on those reads and when Stats opens. */
-    var LOC = { hist: null, full: false, row: null, base: null, n: 0, right: 0, miss: false, run: 0, paid: 0, dirty: true, total: 0, boost: undefined, day: "" };
-    function cday(){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()); } catch (e) { return new Date().toDateString(); } }
-    function rebase(raw, m, clean){
-      var row = Array.isArray(m) ? m.filter(function(r){ return r.hub === H.hub; })[0] : null;
-      if (Array.isArray(m)) LOC.row = { hub: H.hub, latest_correct: row ? row.latest_correct | 0 : 0, seen: row ? row.seen | 0 : 0 };
-      LOC.base = { answers: raw.answers | 0, correct: raw.correct | 0, best_run: raw.best_run | 0 };
-      LOC.total = raw.xp | 0; LOC.boost = undefined; LOC.n = 0; LOC.right = 0; LOC.miss = false; LOC.run = 0; LOC.day = cday();
-      LOC.dirty = !clean || !Array.isArray(m);
-    }
-    function localTick(){
-      if (!ownRaw || !isV2(ownRaw) || !LOC.hist || !LOC.row || !LOC.base || !(H.v2 && H.v2())) return false;
-      if (LOC.dirty || LOC.n >= 50 || LOC.day !== cday()) return false;
-      var B = LOC.base, a = B.answers + LOC.n, can = LOC.miss ? LOC.run : B.best_run + LOC.run;
-      if ((B.answers < 100 && a >= 100) || (B.answers < 1000 && a >= 1000)) return false;
-      if ((B.best_run < 25 && can >= 25) || (B.best_run < 100 && can >= 100)) return false;
-      var p = Object.assign({}, ownRaw, { xp: Math.max(ownRaw.xp | 0, LOC.total), answers: a, correct: B.correct + LOC.right });
-      if (LOC.boost !== undefined) p.boost = LOC.boost;
-      applyOwn(p, (mastery || []).filter(function(r){ return r.hub !== H.hub; }).concat([{ hub: H.hub, latest_correct: LOC.row.latest_correct, seen: LOC.row.seen }]));
-      return true;
-    }
-    document.addEventListener("sh:trophy-sent", function(){ LOC.dirty = true; });
     function load(){ loadTrophyStats(); loadOwn(); }
     /* On load: your own rank and mastery from the page bootstrap (one request for the whole widget); the old
        separate reads only while migration_v53 isn't applied or the bootstrap failed. The class-wide trophy rarity
@@ -1145,12 +1110,7 @@
     var boot = H.bootstrap || (window.shBootstrap && window.shBootstrap.ready) || null;
     if (boot && typeof boot.then === "function") {
       boot.then(function(data){
-        if (data && Array.isArray(data.answers)) {
-          /* each question's last try in this hub (oldest first, up to 5,000), for localTick() */
-          LOC.hist = {}; data.answers.forEach(function(a){ if (Array.isArray(a)) LOC.hist[String(a[0])] = !!a[2]; });
-          LOC.full = data.answers.length < 5000;
-        }
-        if (data && data.rank && typeof data.rank === "object") applyOwn(data.rank, Array.isArray(data.mastery) ? data.mastery : null, LOC.paid === 0);
+        if (data && data.rank && typeof data.rank === "object") applyOwn(data.rank, Array.isArray(data.mastery) ? data.mastery : []);
         else loadOwn();
       }, loadOwn);
     } else loadOwn();
@@ -1158,28 +1118,15 @@
     document.addEventListener(H.answeredEvent, function(){
       if (++sinceLoad >= 10) {
         sinceLoad = 0;
-        setTimeout(function(){ if (panelOpen()) load(); else if (!localTick()) loadOwn(); }, 1500);
+        /* on the game layer widget/v3.js may already know them (shRankLocal, 2026-11-19): no read */
+        setTimeout(function(){ var t = !panelOpen() && window.shRankLocal && window.shRankLocal(ownRaw, mastery); if (t) applyOwn(t[0], t[1]); else (panelOpen() ? load : loadOwn)(); }, 1500);
       }
     });
     /* the game layer (the redesign): the server's answer carries your new total, so a rank-up, a hand-off or a Dark
        Matter unlock plays on the answer that earned it instead of up to ten answers later */
     document.addEventListener("sh:answer-paid", function(e){
-      var d = e.detail || {}, r = d.res;
+      var r = e.detail && e.detail.res;
       if (r && typeof r.total === "number" && ownRaw && ownRaw.next_at != null && r.total >= ownRaw.next_at) { sinceLoad = 0; setTimeout(loadOwn, 900); }
-      /* what localTick() counts: the XP total, the double XP, the answers and runs, each question's last try */
-      if (!r || r.repeat || r.ok === false) return;
-      LOC.paid++;
-      if (typeof r.total === "number") LOC.total = Math.max(LOC.total, r.total);
-      if (r.boost !== undefined) LOC.boost = r.boost;
-      var c = r.correct === true, q = String(d.qid || "");
-      LOC.n++; if (c) { LOC.right++; LOC.run++; } else { LOC.miss = true; LOC.run = 0; }
-      if (r.medal || d.session || d.ctx === "mock" || d.ctx === "arcade" ||
-          (Array.isArray(r.bonus) && r.bonus.some(function(b){ return b && b.src === "streak"; }))) LOC.dirty = true;
-      if (!LOC.hist || !LOC.row || !q) { LOC.dirty = true; return; }
-      var was = LOC.hist[q];
-      if (was === undefined) { if (!LOC.full) LOC.dirty = true; else { LOC.row.seen++; if (c) LOC.row.latest_correct++; } }
-      else if (was !== c) LOC.row.latest_correct += c ? 1 : -1;
-      LOC.hist[q] = c;
     });
     document.addEventListener("click", function(e){
       if (e.target.closest && e.target.closest("#shstat-stats-pill")) setTimeout(function(){ if (panelOpen()) load(); }, 50);

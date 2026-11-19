@@ -1944,6 +1944,7 @@
   function answerPaid(job, r){
     if (r.boost !== undefined) GAME.boost = r.boost || null;
     if (!r.repeat) setCrowns(r.crowns);   /* the balance after this answer (migration_v68) */
+    rlPaid(job.d, r);
     try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: String(job.d.qid || ""), ctx: job.d.ctx || "", session: job.d.session || null, res: r } })); } catch (e) {}
   }
   /* one try of an answer ({ args, d, c }); true when the server failed it and it should go again (the same id, which
@@ -3464,6 +3465,66 @@
       nameMsg.textContent = "Saved. Hi, " + name + "!";
     });
   }
+  /* ---------- the rank and mastery after every tenth answer, worked out on the page (2026-11-19) ----------
+     The database optimization pass, phase 2. widget/ranks.js read get_rank_profile_v2 and get_hub_mastery again after
+     every tenth answer: two reads every ten answers, from every student. On the game layer each answer's reply carries
+     the XP total, and the page knows each question's last try (the bootstrap's answers, then every reply), so
+     shRankLocal(profile, rows) works out what those reads would say: the profile with the new XP, double XP, answers and
+     right answers, and this hub's mastery row. It says null, and ranks.js reads as before, when something it can't count
+     may have changed: a new trophy sent from this page (sh:trophy-sent: widget/eggs.js, the bowling egg), a medal in a
+     reply, the streak of days paying, a new Central day, 100 or 1,000 answers, a run of right answers that could reach 25
+     or 100, a mock's or a game's answers, a question with no known last try (more than the bootstrap's 5,000 answers), a
+     read short of the answers paid, and at least every 50 answers. Every read (sh:rank-profile with its rows) is the new
+     base. It lives here, not in ranks.js, because ranks.js goes to the dashboard too, whose page budget has no room. */
+  var RL = { hist: null, full: false, row: null, base: null, n: 0, right: 0, miss: false, run: 0, paid: 0, dirty: true, total: 0, boost: undefined, day: "", mine: false };
+  function rlDay(){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()); } catch (e) { return ""; } }
+  bootstrap.ready.then(function(data){
+    if (!data || !Array.isArray(data.answers) || !Array.isArray(data.mastery)) return;
+    RL.hist = {}; data.answers.forEach(function(a){ if (Array.isArray(a)) RL.hist[String(a[0])] = !!a[2]; });
+    RL.full = data.answers.length < 5000;
+  }, function(){});
+  document.addEventListener("sh:rank-profile", function(e){
+    var d = e.detail || {}, p = d.profile;
+    if (RL.mine) { RL.mine = false; return; }   /* shRankLocal's own answer, not a read */
+    if (!p || p.journey == null) return;
+    var rows = Array.isArray(d.rows) ? d.rows : null, row = rows && rows.filter(function(r){ return r.hub === HUB; })[0];
+    /* a read whose count of answers is short of what this page has seen paid may have missed one: the next tenth reads */
+    var missed = RL.base ? (p.answers | 0) < RL.base.answers + RL.n : RL.paid > 0;
+    if (rows) RL.row = { latest_correct: row ? row.latest_correct | 0 : 0, seen: row ? row.seen | 0 : 0 };
+    RL.base = { answers: p.answers | 0, correct: p.correct | 0, best_run: p.best_run | 0 };
+    RL.total = p.xp | 0; RL.boost = undefined; RL.n = 0; RL.right = 0; RL.miss = false; RL.run = 0; RL.day = rlDay();
+    RL.dirty = missed || !rows;
+  });
+  document.addEventListener("sh:trophy-sent", function(){ RL.dirty = true; });
+  /* an answer's reply: the XP total, the double XP, the answers and runs, the question's last try */
+  function rlPaid(d, r){
+    if (!r || r.repeat || r.ok === false) return;
+    RL.paid++;
+    if (typeof r.total === "number") RL.total = Math.max(RL.total, r.total);
+    if (r.boost !== undefined) RL.boost = r.boost;
+    var c = r.correct === true, q = String((d && d.qid) || "");
+    RL.n++; if (c) { RL.right++; RL.run++; } else { RL.miss = true; RL.run = 0; }
+    if (r.medal || d.session || d.ctx === "mock" || d.ctx === "arcade" ||
+        (Array.isArray(r.bonus) && r.bonus.some(function(b){ return b && b.src === "streak"; }))) RL.dirty = true;
+    if (!RL.hist || !RL.row || !q) { RL.dirty = true; return; }
+    var was = RL.hist[q];
+    if (was === undefined) { if (!RL.full) RL.dirty = true; else { RL.row.seen++; if (c) RL.row.latest_correct++; } }
+    else if (was !== c) RL.row.latest_correct += c ? 1 : -1;
+    RL.hist[q] = c;
+  }
+  window.shRankLocal = function(p, rows){
+    if (GAME.on !== true || !p || p.journey == null || !RL.hist || !RL.row || !RL.base) return null;
+    if (RL.dirty || RL.n >= 50 || RL.day !== rlDay()) return null;
+    var B = RL.base, a = B.answers + RL.n, can = RL.miss ? RL.run : B.best_run + RL.run;
+    if ((B.answers < 100 && a >= 100) || (B.answers < 1000 && a >= 1000)) return null;
+    if ((B.best_run < 25 && can >= 25) || (B.best_run < 100 && can >= 100)) return null;
+    var q = {}, k; for (k in p) q[k] = p[k];
+    q.xp = Math.max(p.xp | 0, RL.total); q.answers = a; q.correct = B.correct + RL.right;
+    if (RL.boost !== undefined) q.boost = RL.boost;
+    RL.mine = true;
+    return [q, (rows || []).filter(function(r){ return r.hub !== HUB; }).concat([{ hub: HUB, latest_correct: RL.row.latest_correct, seen: RL.row.seen }])];
+  };
+
   /* ---------- easter eggs live in widget/eggs.js; these are the hooks they use ---------- */
   window.shEggHooks = {
     hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase, bootstrap: bootstrap.ready,
@@ -3723,7 +3784,14 @@
     if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
   })();
   /* click analytics (widget/clicks.js): what people use, for improving each hub */
-  if (!EXPORT_ONLY && supabase) widgetFile("clicks.js", function(){ if (window.shClicks) window.shClicks.start({ sb: supabase, hub: HUB, visitor: VISITOR_ID, section: currentSection }); });
+  /* the clicks and events go with question health's rows in one call (shAnalytics.send, migration_v79): widget/clicks.js
+     sends through the client it is given, and here that client hands its two calls to the batch. (clicks.js itself is
+     unchanged: it goes to the dashboard too, which still makes its two calls; its page budget had no room.) */
+  var clicksSb = !supabase ? null : { rpc: function(fn, a){
+    if ((fn === "record_clicks" || fn === "record_events") && a && Array.isArray(a.p_items)) { window.shAnalytics.send(fn === "record_clicks" ? "clicks" : "events", a.p_items); return Promise.resolve({ data: null, error: null }); }
+    return supabase.rpc(fn, a);
+  } };
+  if (!EXPORT_ONLY && supabase) widgetFile("clicks.js", function(){ if (window.shClicks) window.shClicks.start({ sb: clicksSb, hub: HUB, visitor: VISITOR_ID, section: currentSection }); });
   /* replies (widget/replies.js): tells someone once when their report or suggestion has been dealt with, plus notices to everyone */
   if (!EXPORT_ONLY && supabase) widgetFile("replies.js", function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB, bootstrap: bootstrap.ready }); });
   /* "Is this your other device?" (widget/linkask.js): offers to link devices that use the same name */

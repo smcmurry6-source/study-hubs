@@ -4166,6 +4166,7 @@ lineNext();
 function answerPaid(job, r){
 if (r.boost !== undefined) GAME.boost = r.boost || null;
 if (!r.repeat) setCrowns(r.crowns);
+rlPaid(job.d, r);
 try { document.dispatchEvent(new CustomEvent("sh:answer-paid", { detail: { qid: String(job.d.qid || ""), ctx: job.d.ctx || "", session: job.d.session || null, res: r } })); } catch (e) {}
 }
 function sendAnswer(job){
@@ -5473,6 +5474,52 @@ if (!saveName(name)) { nameMsg.textContent = "Type a name first."; return; }
 nameMsg.textContent = "Saved. Hi, " + name + "!";
 });
 }
+var RL = { hist: null, full: false, row: null, base: null, n: 0, right: 0, miss: false, run: 0, paid: 0, dirty: true, total: 0, boost: undefined, day: "", mine: false };
+function rlDay(){ try { return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Chicago" }).format(new Date()); } catch (e) { return ""; } }
+bootstrap.ready.then(function(data){
+if (!data || !Array.isArray(data.answers) || !Array.isArray(data.mastery)) return;
+RL.hist = {}; data.answers.forEach(function(a){ if (Array.isArray(a)) RL.hist[String(a[0])] = !!a[2]; });
+RL.full = data.answers.length < 5000;
+}, function(){});
+document.addEventListener("sh:rank-profile", function(e){
+var d = e.detail || {}, p = d.profile;
+if (RL.mine) { RL.mine = false; return; }
+if (!p || p.journey == null) return;
+var rows = Array.isArray(d.rows) ? d.rows : null, row = rows && rows.filter(function(r){ return r.hub === HUB; })[0];
+var missed = RL.base ? (p.answers | 0) < RL.base.answers + RL.n : RL.paid > 0;
+if (rows) RL.row = { latest_correct: row ? row.latest_correct | 0 : 0, seen: row ? row.seen | 0 : 0 };
+RL.base = { answers: p.answers | 0, correct: p.correct | 0, best_run: p.best_run | 0 };
+RL.total = p.xp | 0; RL.boost = undefined; RL.n = 0; RL.right = 0; RL.miss = false; RL.run = 0; RL.day = rlDay();
+RL.dirty = missed || !rows;
+});
+document.addEventListener("sh:trophy-sent", function(){ RL.dirty = true; });
+function rlPaid(d, r){
+if (!r || r.repeat || r.ok === false) return;
+RL.paid++;
+if (typeof r.total === "number") RL.total = Math.max(RL.total, r.total);
+if (r.boost !== undefined) RL.boost = r.boost;
+var c = r.correct === true, q = String((d && d.qid) || "");
+RL.n++; if (c) { RL.right++; RL.run++; } else { RL.miss = true; RL.run = 0; }
+if (r.medal || d.session || d.ctx === "mock" || d.ctx === "arcade" ||
+(Array.isArray(r.bonus) && r.bonus.some(function(b){ return b && b.src === "streak"; }))) RL.dirty = true;
+if (!RL.hist || !RL.row || !q) { RL.dirty = true; return; }
+var was = RL.hist[q];
+if (was === undefined) { if (!RL.full) RL.dirty = true; else { RL.row.seen++; if (c) RL.row.latest_correct++; } }
+else if (was !== c) RL.row.latest_correct += c ? 1 : -1;
+RL.hist[q] = c;
+}
+window.shRankLocal = function(p, rows){
+if (GAME.on !== true || !p || p.journey == null || !RL.hist || !RL.row || !RL.base) return null;
+if (RL.dirty || RL.n >= 50 || RL.day !== rlDay()) return null;
+var B = RL.base, a = B.answers + RL.n, can = RL.miss ? RL.run : B.best_run + RL.run;
+if ((B.answers < 100 && a >= 100) || (B.answers < 1000 && a >= 1000)) return null;
+if ((B.best_run < 25 && can >= 25) || (B.best_run < 100 && can >= 100)) return null;
+var q = {}, k; for (k in p) q[k] = p[k];
+q.xp = Math.max(p.xp | 0, RL.total); q.answers = a; q.correct = B.correct + RL.right;
+if (RL.boost !== undefined) q.boost = RL.boost;
+RL.mine = true;
+return [q, (rows || []).filter(function(r){ return r.hub !== HUB; }).concat([{ hub: HUB, latest_correct: RL.row.latest_correct, seen: RL.row.seen }])];
+};
 window.shEggHooks = {
 hub: HUB, answeredEvent: ANSWERED_EVENT, visitor: VISITOR_ID, supabase: supabase, bootstrap: bootstrap.ready,
 v2: function(){ return GAME.on === true; },
@@ -5692,7 +5739,11 @@ document.addEventListener("sh:pref", function(){ setTimeout(fit, 30); });
 }
 if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
 })();
-if (!EXPORT_ONLY && supabase) widgetFile("clicks.js", function(){ if (window.shClicks) window.shClicks.start({ sb: supabase, hub: HUB, visitor: VISITOR_ID, section: currentSection }); });
+var clicksSb = !supabase ? null : { rpc: function(fn, a){
+if ((fn === "record_clicks" || fn === "record_events") && a && Array.isArray(a.p_items)) { window.shAnalytics.send(fn === "record_clicks" ? "clicks" : "events", a.p_items); return Promise.resolve({ data: null, error: null }); }
+return supabase.rpc(fn, a);
+} };
+if (!EXPORT_ONLY && supabase) widgetFile("clicks.js", function(){ if (window.shClicks) window.shClicks.start({ sb: clicksSb, hub: HUB, visitor: VISITOR_ID, section: currentSection }); });
 if (!EXPORT_ONLY && supabase) widgetFile("replies.js", function(){ if (window.shReplies) window.shReplies.start({ sb: supabase, visitor: VISITOR_ID, hub: HUB, bootstrap: bootstrap.ready }); });
 if (!EXPORT_ONLY && supabase) widgetFile("linkask.js", function(){ if (window.shLinkAsk) window.shLinkAsk.start({ sb: supabase, hub: HUB, section: currentSection, bootstrap: bootstrap.ready, bootstrapName: bootstrap.linkName }); });
 })();

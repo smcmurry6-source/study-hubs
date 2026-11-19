@@ -1,6 +1,5 @@
 /* study-hubs click analytics: counts clicks on buttons, tabs and links, and sends the counts
-   once a minute (and when the tab is hidden) to record_clicks (since migration_v79, 2026-11-19: in one record_analytics
-   call with the events and, in a hub, question health). Anonymous: it sends the visitor id
+   once a minute (and when the tab is hidden) to record_clicks. Anonymous: it sends the visitor id
    the rest of the widget already uses, the section (e.g. "compendium/notes") and a short target
    name, never what anyone typed. Used by widget/v3.js (hubs) and the dashboard:
      shClicks.start({ sb: supabaseClient, hub: "perio", visitor: "...", section: function(){ return "..."; } })
@@ -86,43 +85,19 @@
       if (!o || !o.sb || !o.hub) return;
       try { if (navigator.webdriver) return; } catch (e) {} /* automated browsers are not counted */
       var pending = {}, count = 0;
-      /* One call for the batches (2026-11-19, the database optimization pass, phase 2: migration_v79's record_analytics).
-         In a hub they go to widget/v3.js's shAnalytics.send, which sends them with question health's; on the dashboard
-         the clicks and the events go together. A database without record_analytics gets record_clicks and record_events,
-         as before. */
-      var A = function(){ return window.shAnalytics && typeof window.shAnalytics.send === "function" ? window.shAnalytics : null; };
-      var together = null;
-      try { if (localStorage.getItem("sh_rpc_analytics") === "1") together = true; } catch (e) {}
-      function apart(clicks, events){
-        if (events.length && o.visitor) try { o.sb.rpc("record_events", { p_hub: o.hub, p_visitor: o.visitor, p_items: events }).then(function(){}, function(){}); } catch (e) {}
-        if (clicks.length) try { o.sb.rpc("record_clicks", { p_hub: o.hub, p_visitor: o.visitor || null, p_items: clicks }).then(function(){}, function(){}); } catch (e) {}
-      }
-      function post(clicks, events){
-        if (!o.visitor) events = [];
-        if (!clicks.length && !events.length) return;
-        var a = A(); if (a) { a.send("events", events); a.send("clicks", clicks); return; }
-        if (together === false) { apart(clicks, events); return; }
-        try {
-          o.sb.rpc("record_analytics", { p_hub: o.hub, p_visitor: o.visitor || null, p_clicks: clicks, p_events: events }).then(function(r){
-            var e = r && r.error;
-            if (e && (e.code === "PGRST202" || r.status === 404)) { together = false; try { localStorage.removeItem("sh_rpc_analytics"); } catch (x) {} apart(clicks, events); }
-            else if (r && !e && together !== true) { together = true; try { localStorage.setItem("sh_rpc_analytics", "1"); } catch (x) {} }
-          }, function(){});
-        } catch (e) {}
-      }
-      function takeEvents(){
+      evSend = function(){
         var items = Object.keys(evPending).map(function(k){ return { k: k, n: Math.round(evPending[k]) }; }).filter(function(x){ return x.n > 0; }).slice(0, 40);
         evPending = {}; evCount = 0;
-        return items;
-      }
-      evSend = function(){ post([], takeEvents()); };
+        if (items.length && o.visitor) try { o.sb.rpc("record_events", { p_hub: o.hub, p_visitor: o.visitor, p_items: items }).then(function(){}, function(){}); } catch (e) {}
+      };
       function flush(){
         /* in the database's quiet spell (widget/v3.js safeRpc) the batches wait for the next flush */
         if (window.shDb && window.shDb.busy()) return;
-        var events = evCount ? takeEvents() : [];
-        var items = !count ? [] : Object.keys(pending).slice(0, 80).map(function(k){ var p = k.split("\u0001"); return { s: p[0], t: p[1], n: pending[k] }; });
-        if (count) { pending = {}; count = 0; }
-        post(items, events);
+        if (evCount) evSend();
+        if (!count) return;
+        var items = Object.keys(pending).slice(0, 80).map(function(k){ var p = k.split("\u0001"); return { s: p[0], t: p[1], n: pending[k] }; });
+        pending = {}; count = 0;
+        try { o.sb.rpc("record_clicks", { p_hub: o.hub, p_visitor: o.visitor || null, p_items: items }).then(function(){}, function(){}); } catch (e) {}
       }
       /* send now, before a reload would drop the batch (e.g. right after linking devices) */
       window.shClicks.flush = flush;

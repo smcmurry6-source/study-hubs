@@ -131,11 +131,13 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
   time (0.08 ms either way for a card). Not in the answer's reply, which package 4 (the answer save) was working on at
   the same time (Sam's order). A database without the call gets the two reads, and the page doesn't ask again.
 - [x] **The page's three analytics batches as one call** (`record_qh`, `record_clicks`, `record_events`: 14.8% of
-  requests together): one flush, one call. **Done** (phase 2: `migration_v79.sql`'s `record_analytics`, `widget/v3.js`'s
-  `shAnalytics.send`, `widget/qhealth.js`, `widget/clicks.js`): when one batch is due, the others go with it, in one call
-  that hands each to its own function (the same rows: `tools/release/xp.js`); 1.6 ms of database time either way. On
-  the dashboard the clicks and the events go together. A page that is leaving sends with keepalive, the three calls until
-  the device has seen the new one work.
+  requests together): one flush, one call. **Done in the hubs** (phase 2: `migration_v79.sql`'s `record_analytics`,
+  `widget/v3.js`'s `shAnalytics.send`, `widget/qhealth.js`; `widget/clicks.js` is unchanged and sends through a client
+  `v3.js` gives it that hands its two calls to the batch): when one batch is due, the others go with it, in one call that
+  hands each to its own function (the same rows: `tools/release/xp.js`); 1.6 ms of database time either way. A page
+  that is leaving sends with keepalive, the three calls until the device has seen the new one work. **The dashboard still
+  makes its two calls** (clicks, events): its page budget (`tools/release/budgets.json`, 345 KB) was at 345.4 KB on `main`,
+  with no room for the code (the next box but one).
 - [x] **The bootstrap** (31 / 18 / 12 ms on the copy after v76, 445 ms at the median live): the shop's picks of the day
   are worked out again for every visitor (about 5 ms; the same for everyone all day), `get_my_answers` builds up to
   5,000 rows of JSON (4-11 ms), and a visitor without a chosen name has their class name checked against everyone's
@@ -164,12 +166,21 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
   rebuilds: look at the table's and the index's sizes apart before deciding on a rewrite.
 - [x] **The rank and mastery after every tenth answer** (`widget/ranks.js`): on the game layer the answer's reply
   already carries the XP total; the page could work out the hub's mastery from the answers it holds. **Done** (phase 2,
-  `widget/ranks.js`, no server part): the XP comes from the replies and this hub's mastery from each question's last
-  try (the bootstrap's answers, then every reply), so ten answers make no read. It still reads both when something it can't
-  count may have changed: a new trophy sent from the page (`sh:trophy-sent`: the eggs, Timmy, the bowling egg, a medal), a
-  medal in a reply, the day's first answer or a new day, 100 or 1,000 answers, a run that could reach 25 or 100, a mock's
-  or a game's answers, a question it has no last try for, and at least every 50 answers; with Stats open, on the old
-  pages and without the bootstrap, as before. `tools/ci/quiet.js` checks both ways.
+  no server part: `widget/v3.js`'s `shRankLocal`, which `widget/ranks.js` asks first; in `v3.js` because `ranks.js` also
+  goes to the dashboard, whose page budget has no room): the XP comes from the replies and this hub's mastery from each
+  question's last try (the bootstrap's answers, then every reply), so ten answers make no read. It still reads both when
+  something it can't count may have changed: a new trophy sent from the page (`sh:trophy-sent`: the eggs, the bowling
+  egg), a medal in a reply, the streak of days paying or a new day, 100 or 1,000 answers, a run that could reach 25 or
+  100, a mock's or a game's answers, a question it has no last try for, a read short of the answers paid, and at least
+  every 50 answers; with Stats open, on the old pages and without the bootstrap, as before. Timmy's three trophies and
+  the arcade's 25 games send no signal: they show at the next read (at most 50 answers, Stats, or the next page).
+  `tools/ci/quiet.js` checks both ways.
+- [ ] **Room in the dashboard's page budget** (found by phase 2): the dashboard was at 345.4 of its 345 KB on `main`
+  (2026-11-19, `tools/release/perf.js`), so a few hundred bytes more in `widget/rest.bundle.js` fail "Release tests".
+  `widget/ranks.js`'s hub widget (`mount()`, about 360 lines: the rank card, the trophy case in Stats, Link my devices)
+  goes to the dashboard in that bundle and never runs there; moving it to a file only hubs load (`hub-rest.bundle.js`)
+  would free several KB. Then the dashboard's clicks and events can go in one `record_analytics` call too (phase 2
+  left them as two calls for that reason).
 
 ## Log
 
@@ -200,7 +211,9 @@ an answer 125 ms (95th percentile 870 ms), `get_hub_mastery` 242 ms, the bootstr
     evening's readout (the open box).
 
 - 2026-11-19, phase 2, fewer calls from the page (Claude Code, Sam's package, [#459](https://github.com/smcmurry6-source/study-hubs/pull/459)): `migration_v79.sql` with `widget/v3.js`,
-  `widget/qhealth.js`, `widget/clicks.js`, `widget/ranks.js` (and the trophy signal in `widget/eggs.js`, `widget/pet.js`).
+  `widget/qhealth.js`, a two-line hook in `widget/ranks.js` and the trophy signal in `widget/eggs.js`. (A first version
+  changed `widget/clicks.js`, `widget/pet.js` and more of `ranks.js`, 1.2 KB more for the dashboard: "Release tests"
+  failed its 345 KB budget at 347 KB, so that code moved to `v3.js`, which only hubs load: 40 bytes more for the dashboard.)
   Measured on a new throwaway copy of `supabase/schema.sql` with a made-up class (2,123 visitors, 2,246 visitor-hub
   answer histories), the medians of many calls: the numbers in the four boxes above. Checked identical, old against new,
   on that copy: the shop over every day of 2026-2027, the class name of every visitor, every answer history, the

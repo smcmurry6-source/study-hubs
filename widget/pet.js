@@ -1464,8 +1464,7 @@
   }
   function award(kind, hub){
     if (!M.sb || !M.visitor) return;
-    /* a new one (the server says so): widget/ranks.js reads the rank again at the next tenth answer (sh:trophy-sent) */
-    M.sb.rpc("record_achievement", { p_visitor: M.visitor, p_kind: kind, p_hub: hub || "" }).then(function(r){ if (r && r.data === true) try { document.dispatchEvent(new CustomEvent("sh:trophy-sent")); } catch (e) {} }, function(){});
+    M.sb.rpc("record_achievement", { p_visitor: M.visitor, p_kind: kind, p_hub: hub || "" }).then(function(){}, function(){});
   }
   function render(){
     var home = M.where === "dashboard" && M.home ? M.home() : null;
