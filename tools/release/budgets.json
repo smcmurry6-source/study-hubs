@@ -45,13 +45,6 @@
    "lcp": 2500,
    "tbt": 500
   },
-  "hubs/occlusion/": {
-   "kb": 800,
-   "requests": 12,
-   "fcp": 3000,
-   "lcp": 3000,
-   "tbt": 500
-  },
   "hubs/pcd-exam3/": {
    "kb": 850,
    "requests": 30,

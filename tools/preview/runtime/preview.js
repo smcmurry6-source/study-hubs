@@ -1706,8 +1706,12 @@
       case "changelog":
         var built = C.builtAt || iso(t);
         if (u.searchParams.get("limit") === "1") return [{ created_at: built }];
+        /* enough made-up entries to fill the dashboard's What's new timeline (every hub's, so they show on any hub's tab) */
         return [{ hub: null, message: "Preview of " + (C.label || "this branch") + " (fixture changelog: the live site's entries aren't loaded).", created_at: built },
-                { hub: "occlusion", message: "Fixture entry: a sample change to show how the list looks.", created_at: iso(t - 3 * 864e5) }];
+                { hub: "all", message: "Fixture entry: a new feature, described the way a changelog line describes it, a sentence or two long.", created_at: iso(t - 5 * 36e5) },
+                { hub: "all", message: "Fixture entry with a lede: the part before the colon shows in bold on the What's new cards.", created_at: iso(t - 26 * 36e5) },
+                { hub: "occlusion", message: "Fixture entry: a sample change to show how the list looks.", created_at: iso(t - 3 * 864e5) },
+                { hub: "all", message: "Fixture entry: an older change, past what the New tag counts on a first visit.", created_at: iso(t - 4 * 864e5) }];
       default: return [];
     }
   }

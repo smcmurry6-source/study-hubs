@@ -2,8 +2,8 @@
 // Ask Timmy's eval (vault/reference/ask-timmy.md): runs tools/timmy/test-set.json through the function's own code
 // (supabase/functions/timmy/core.js, with an in-memory database and this checkout's content) and grades every answer.
 //   node tools/timmy/eval.mjs --dry                checks the test set and the grading with a fake model; free, no key
-//   node tools/timmy/eval.mjs                      the real API: costs money ($11.71 for the whole set; about $1 a hub for a few). Ask Sam first.
-//   node tools/timmy/eval.mjs --only perio,db-03   some hubs (occlusion, perio, dashboard) or case ids
+//   node tools/timmy/eval.mjs                      the real API: costs money (about $3 for the whole set since Occlusion's 43 cases came out with its page, 2026-11-19; about $1 a hub for a few). Ask Sam first.
+//   node tools/timmy/eval.mjs --only perio,db-03   some hubs (perio, dashboard) or case ids
 //   --effort low|medium|high   try another effort level      --concurrency 4   requests at a time within a hub
 //   --max-usd 15               stops starting new cases past this estimated spend
 //   --model claude-haiku-5-5   try another model (the function's is core.js's MODEL; Haiku goes without the fallback)

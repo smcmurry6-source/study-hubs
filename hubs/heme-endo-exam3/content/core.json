@@ -149,7 +149,16 @@
   {"id":"lymleuk","name":"Clean Smear","icon":"cell","desc":"80% on L20 lymphomas and leukemias (20+ answered)","cond":{"type":"lecPct","lec":"lymleuk","pct":80,"min":20}},
   {"id":"all","name":"Corpus Luteum","icon":"medal","desc":"Answer every question in the bank at least once","cond":{"type":"allSeen"}}
  ],
- "podcast": null,
+ "podcast": {
+  "id": "exam3-review",
+  "show": "Timmy Time",
+  "title": "Heme & Endo Exam 3: the last-minute review",
+  "src": "audio/timmy-time.mp3",
+  "duration": 3112.8,
+  "blurb": "52 min with Timmy Tooth: Dr. Taylor's Lecture A and L17-L22, each lecture opening on Dr. Herr's study guide, what the professors said to know and to skip, the leukemias on their two axes and the five translocations, and a lightning round to finish.",
+  "chapters": [{"t":0,"title":"Cold open"},{"t":106.33,"title":"Lecture A: endocrinology in the dental chair"},{"t":331.2,"title":"L17: the hormones that hold a pregnancy"},{"t":564.85,"title":"L17: delivery, milk and suckling"},{"t":731.29,"title":"L18: the androgens and the drugs that block them"},{"t":949.93,"title":"L18: estrogens, SERMs and contraceptives"},{"t":1158.33,"title":"L19: the blood cells and immunity"},{"t":1411.52,"title":"L19: thymus, lymph node and spleen"},{"t":1605.22,"title":"L20: the leukemias"},{"t":1851.57,"title":"L20: the lymphomas"},{"t":2117.84,"title":"L21: male reproductive and urinary tract pathology"},{"t":2413.17,"title":"L22: female reproductive and breast pathology"},{"t":2729.47,"title":"Lightning round"},{"t":3019.09,"title":"Sign-off"}],
+  "fans": [{"who":"Number thirty-one","tag":"Timmy's world","text":"Update: it is a cusp. I have since found three more bumps. Timmy says those are also cusps and that a lower second molar has four. I would still like all four sent fresh, not in formalin."}]
+ },
  "figByLec": {
   "dental": ["glandmap","laminadura"],
   "sexster": ["tfates","gnrh","clots","sermmap","ecwindow"],

@@ -150,7 +150,7 @@ clock; `?now=real` resets it.
 | Smoke and question lint | `node tools/ci/smoke.js` | every PR | A JavaScript error or sideways scroll on any screen of the hubs a PR touches (every hub when a shared file changes); the question rules (formats, whys, likely topics, answer length) |
 | Preview safety | `node tools/ci/preview.js` | every PR | Any request reaching Supabase; a page without noindex or the runtime; a write path not reaching the fixtures; the admin page answering a wrong secret |
 | Accessibility | `node tools/release/a11y.js` | Release tests | A new or worse axe (WCAG 2.2 AA) issue than `tools/release/baselines/a11y.json`; focus you can't see; a keyboard trap; endless animation with reduced motion on |
-| Performance | `node tools/release/perf.js` | Release tests | Bytes or requests over `tools/release/budgets.json` on a slow-4G phone; FCP, LCP or blocking time past 1.5x budget |
+| Performance | `node tools/release/perf.js` | Release tests | Bytes or requests over `tools/release/budgets.json` on a slow-4G phone (the dashboard, About and the live hubs; an archived hub isn't measured since 2026-11-19); FCP, LCP or blocking time past 1.5x budget |
 | Devices and resilience | `node tools/release/matrix.js` | Release tests | An error or sideways scroll on 7 device sizes in Chromium, WebKit and Firefox; state lost on refresh; Back/Forward broken; no offline copy; a hub that breaks when class data is slow or down; slower than 45 s to usable on slow 3G |
 | All of the above | `node tools/release/run.js` | by hand, Release tests | Writes one summary to paste into the test report |
 | After the merge | `node tools/release/postcheck.js` | after each release | The live files differ from `main`; a live page throws |
