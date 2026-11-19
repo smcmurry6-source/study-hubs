@@ -53,7 +53,7 @@
         (I.note ? '<p class="note lec-note">' + esc(I.note) + "</p>" : "") +
         '<div class="toolbar" role="toolbar" aria-label="Study guide tools">' +
           '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn"' + (mp3 ? ' data-sh-tts-audio="1"' : ' title="Read aloud in your device\'s voice"') + ' aria-label="Listen to the study guide">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
-          HX.followBtn() +
+          (HX.followBtn ? HX.followBtn() : "") +   // an engine from before it had one: no toggle
           '<button type="button" class="btn btn-text" data-report-notes>' + icon("report", 18) + "Report a mistake</button>" +
           '<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
         "</div>" +
@@ -67,7 +67,7 @@
       $$("[data-gdjump]", el).forEach(function(b){ b.addEventListener("click", function(){ var s = document.getElementById("gd-" + b.getAttribute("data-gdjump")); if (s) s.scrollIntoView({ block: "start", behavior: HX.reduced ? "auto" : "smooth" }); track("notes:guide-jump"); }); });
       var tts = $("#sh-tts-btn", el);
       if (tts) tts.addEventListener("click", function(){ if (window.shTTS) window.shTTS.speak(prose, tts, mp3); });
-      HX.wireFollow(el, prose, mp3);
+      if (HX.wireFollow) HX.wireFollow(el, prose, mp3);
       $$("[data-report-notes]", el).forEach(function(b){ b.addEventListener("click", function(){
         track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: "guide", label: I.title }); else toast("The report form is still loading. Try again in a moment.");
       }); });
