@@ -311,19 +311,23 @@ const FIX = 'https://fixtures.preview.invalid/rest/v1/rpc/';
     await hp2.close();
     notes.push('Hubs: archive by hand -> dashboard card and hub notice; back to automatic -> open again');
 
-    /* an end time: Heme & Endo (gone by its dates) reopened until 6 pm, then its dates again */
-    await setState(page, 'heme-endo-exam1', 'live', '2026-11-10T09:00');
-    await page.waitForSelector('[data-arch-hub="heme-endo-exam1"] .arch-msg.msg-err');
+    /* an end time: Heme & Endo Exam 3 (live by its dates) archived by hand until 6 pm, then its dates again. Until
+       2026-11-19 this reopened Heme & Endo Exam 1 (gone by its dates); its page came down with the other old pages, and a
+       hub whose page is removed can't be set to Live (checked above), so the one hub with a page left takes the end time. */
+    await setState(page, 'heme-endo-exam3', 'archived', '2026-11-10T09:00');
+    await page.waitForSelector('[data-arch-hub="heme-endo-exam3"] .arch-msg.msg-err');
     ok(await writes(page) === 2, 'an end time in the past is refused before saving');
-    await page.fill('[data-arch-form="heme-endo-exam1"] [name=until]', '2026-11-10T18:00');
-    await page.click('[data-arch-form="heme-endo-exam1"] [type=submit]');
-    ok(/until .*Nov.* 10/.test(await page.textContent('[data-arch-form="heme-endo-exam1"] .arch-confirm')), 'the confirmation names the end time');
-    await confirm(page, 'heme-endo-exam1');
+    await page.fill('[data-arch-form="heme-endo-exam3"] [name=until]', '2026-11-10T18:00');
+    await page.click('[data-arch-form="heme-endo-exam3"] [type=submit]');
+    ok(/until .*Nov.* 10/.test(await page.textContent('[data-arch-form="heme-endo-exam3"] .arch-confirm')), 'the confirmation names the end time');
+    await confirm(page, 'heme-endo-exam3');
     cards = await dashboard(ctx);
-    ok((card(cards, 'heme-endo-exam1') || {}).open, `reopened: the dashboard shows Heme & Endo open before its end time (${JSON.stringify(cards)})`);
+    ok(!card(cards, 'heme-endo-exam3') && cards.length, `archived until 6 pm: the dashboard has no tab for Heme & Endo Exam 3 before its end time (${JSON.stringify(cards)})`);
     cards = await dashboard(ctx, '&now=2026-11-10T19:00');
-    ok(!card(cards, 'heme-endo-exam1'), 'after its end time Heme & Endo goes back to its dates (no card)');
-    notes.push('end time: reopened until 6 pm, its dates again at 7 pm');
+    ok((card(cards, 'heme-endo-exam3') || {}).open, `after its end time Heme & Endo Exam 3 goes back to its dates (open again: ${JSON.stringify(cards)})`);
+    await page.bringToFront();
+    await page.click('[data-arch-auto="heme-endo-exam3"]'); await confirm(page, 'heme-endo-exam3');   /* the stale-tab check below starts from Automatic */
+    notes.push('end time: archived by hand until 6 pm, its dates again at 7 pm');
 
     /* a change from a stale page is refused, not overwritten */
     const a = await admin(ctx, `review/?persona=admin&now=${NOW}`), b = await admin(ctx, `review/?persona=admin&now=${NOW}`);
