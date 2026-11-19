@@ -1084,7 +1084,7 @@
       profile = p; mastery = m || []; ownRaw = raw;
       if (raw.journey > 0 && !window.SH_JOURNEY_ART) needJourneyArt(function(K){ if (K) render(); });
       /* the redesigned hubs' rank pill (widget/hub-rewards.js) listens; nothing on the live pages does */
-      try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: raw, mastery: masteryFor() } })); } catch (e) {}
+      try { document.dispatchEvent(new CustomEvent("sh:rank-profile", { detail: { profile: raw, mastery: masteryFor(), rows: m } })); } catch (e) {}
       if (window.shPet && window.shPet.syncBadges) window.shPet.syncBadges(profile.badges);
       track(raw, { busy: mockBusy, seen: function(j){ if (!window.shAutomated) rpc("mark_dark_unlock_seen", { p_visitor: H.visitor, p_journey: j }); },
         claim: window.shAutomated ? null : function(fn, args){ return rpc(fn, Object.assign({ p_visitor: H.visitor }, args)); } });
@@ -1120,7 +1120,8 @@
     document.addEventListener(H.answeredEvent, function(){
       if (++sinceLoad >= 10) {
         sinceLoad = 0;
-        setTimeout(panelOpen() ? load : loadOwn, 1500);
+        /* on the game layer widget/v3.js may already know them (shRankLocal, 2026-11-19): no read */
+        setTimeout(function(){ var t = !panelOpen() && window.shRankLocal && window.shRankLocal(ownRaw, mastery); if (t) applyOwn(t[0], t[1]); else (panelOpen() ? load : loadOwn)(); }, 1500);
       }
     });
     /* the game layer (the redesign): the server's answer carries your new total, so a rank-up, a hand-off or a Dark

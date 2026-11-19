@@ -1500,6 +1500,73 @@ try {
      'every running total equals the sum of its awards');
   notes.push(`the awards' running totals (migration_v79): ${num(`select count(*) from xp_award_totals`)} totals for ${num(`select count(*) from xp_awards`)} awards, all equal to the sums`);
 
+  /* ---------- 14c. fewer calls from the page (migration_v82, the database optimization pass, phase 2) ---------- */
+  if (one(`select to_regproc('public.get_class_numbers')`)) {
+    // a card's class numbers in one call: the rows the two REST reads returned
+    const cq = rows(`select distinct qid from question_stats where hub = 'xh' order by qid`).map(r => r.qid);
+    const qa = `array[${cq.map(q).join(',') || "''"}]::text[]`;
+    const cn = anonJson(`get_class_numbers('xh', ${qa}, ${qa})`);
+    const byQ = a => JSON.stringify((a || []).map(r => 'choice' in r ? [r.qid, r.choice, r.picks] : [r.qid, r.attempts, r.correct]).sort((x, y) => (JSON.stringify(x) < JSON.stringify(y) ? -1 : 1)));
+    ok(cq.length > 2 && byQ(cn.stats) === byQ(anonJson(`(select coalesce(json_agg(x), '[]') from (select qid, attempts, correct from question_stats where hub = 'xh' and qid = any(${qa})) x)`))
+      && byQ(cn.choices) === byQ(anonJson(`(select coalesce(json_agg(x), '[]') from (select qid, choice, picks from question_choices where hub = 'xh' and qid = any(${qa})) x)`)),
+      `get_class_numbers gives the rows question_stats and question_choices give (${cq.length} questions, ${(cn.choices || []).length} choice rows)`);
+    eq(anonJson(`get_class_numbers('xh', ${qa}, null)`).choices, [], 'no choice questions asked, no choice rows');
+    eq([anonJson(`get_class_numbers('Bad Hub', ${qa}, ${qa})`), anonJson(`get_class_numbers('xh', array(select 'q' || g from generate_series(1, 1001) g), null)`)].map(r => [r.stats, r.choices]),
+      [[[], []], [[], []]], 'a bad hub or more than 1,000 questions gets nothing');
+    // the three analytics batches in one call: the same rows as the three calls
+    const QH = `'[{"q":"x1","v":"a1","k":"a","ms":4200,"ok":"1","n":1},{"q":"x2","k":"v","ms":900}]'::jsonb`, CL = `'[{"s":"bank","t":"#next","n":3},{"s":"notes","t":"tab=hy","n":1}]'::jsonb`, EV = `'[{"k":"view","n":1},{"k":"egg:timmy","n":2}]'::jsonb`;
+    const tally = h => [`select count(*) from question_events where hub = '${h}'`, `select coalesce(sum(clicks), 0) from ui_clicks where hub = '${h}'`, `select coalesce(sum(n), 0) from feature_events where hub = '${h}'`, `select count(*) from ui_click_reach where hub = '${h}'`].map(num);
+    anon(`select record_analytics('xa-one', 'xp-analytics-1', 'visit-an-1', ${QH}, ${CL}, ${EV})`);
+    anon(`select record_qh('xa-three', 'xp-analytics-1', 'visit-an-1', ${QH}); select record_clicks('xa-three', 'xp-analytics-1', ${CL}); select record_events('xa-three', 'xp-analytics-1', ${EV})`);
+    const t1 = tally('xa-one'), t3 = tally('xa-three');
+    ok(t1.every(x => x > 0) && JSON.stringify(t1) === JSON.stringify(t3), `record_analytics writes what record_qh, record_clicks and record_events write (${JSON.stringify(t1)} / ${JSON.stringify(t3)})`);
+    anon(`select record_analytics('xa-one', 'xp-analytics-1', null, null, ${CL}, '[]'::jsonb)`);
+    ok(num(`select coalesce(sum(clicks), 0) from ui_clicks where hub = 'xa-one'`) === 8 && num(`select coalesce(sum(n), 0) from feature_events where hub = 'xa-one'`) === 3, 'one part alone (the dashboard: clicks and events, no question health)');
+    anon(`select record_analytics('xa-one', 'xp-analytics-1', 'visit-an-1', '{"bad":1}'::jsonb, '"x"'::jsonb, null)`);
+    ok(true, 'parts that aren\'t arrays are skipped without an error');
+    // the shop's day, stored once for everyone: the same as working it out, cleared when the items change
+    const TODAY = `(now() at time zone 'America/Chicago')::date`;
+    one(`select sh_shop_days_fill()`);
+    const same = d => one(`select (select coalesce(json_agg(x), '[]') from (select * from sh_shop_day(${d})) x)::text = (select coalesce(json_agg(x), '[]') from (select * from sh_shop_day_make(${d})) x)::text`) === 't';
+    ok(num(`select count(distinct day) from shop_days`) === 2 && same(TODAY) && same(`${TODAY} + 1`), 'today and tomorrow are stored, the same picks in the same order as worked out');
+    ok(same(`'2030-06-02'`), 'a day not stored is worked out as before');
+    sql(`update shop_items set price = price where id = 'apple'`);
+    eq(num(`select count(*) from shop_days`), 0, 'a change to the shop\'s items clears what is stored');
+    eq(num(`select sh_shop_days_fill()`), 2, 'and the next fill stores today and tomorrow again');
+    eq(num(`select sh_shop_days_fill()`), 0, 'a fill with both stored stores nothing');
+    raises(() => anon(`select count(*) from public.shop_days`), '42501', 'anon reads shop_days directly');
+    for (const f of [`sh_shop_day_make(current_date)`, `sh_shop_days_fill()`, `sh_shop_day(current_date)`]) raises(() => anon(`select ${f}`), '42501', `anon runs ${f.split('(')[0]}`);
+    // the bootstrap: v1's keys with v1's values, then v2's own parts
+    const drop = (o, ks) => { const c = Object.assign({}, o); ks.forEach(k => delete c[k]); return c; };
+    for (const [v, h] of [['xp-B', 'xh'], ['xp-L1', 'xm'], ['xp-none', 'xh']]) {
+      const b1 = json(`get_widget_bootstrap(${q(v)}, ${q(h)})`), b2 = json(`get_widget_bootstrap_v2(${q(v)}, ${q(h)})`);
+      eq(Object.keys(b2).sort(), Object.keys(b1).concat(['shop']).filter((k, i, a) => a.indexOf(k) === i).sort(), `the bootstrap v2 for ${v} has v1's keys and the shop`);
+      eq(JSON.stringify(drop(b2, ['rank', 'pet_days', 'inbox', 'shop'])), JSON.stringify(drop(b1, ['rank', 'pet_days', 'inbox'])), `the bootstrap v2 for ${v}: v1's parts, the same values`);
+      eq([b2.rank, b2.pet_days, b2.inbox], [json(`get_rank_profile_v2(${q(v)})`), json(`coalesce((select jsonb_agg(to_jsonb(pd) order by pd.d) from get_pet_days_v2(${q(v)}) pd), '[]'::jsonb)`),
+        json(`coalesce((select jsonb_agg(to_jsonb(i) order by i.at desc) from get_my_inbox_v2(${q(v)}) i), '[]'::jsonb)`)], `the bootstrap v2 for ${v}: the v2 rank, Timmy's days and Inbox`);
+    }
+    // get_my_answers: each answer as [question, seconds, right], oldest first, the newest 5,000
+    const ga = json(`get_my_answers('xp-B', 'xh')`), want = json(`(select coalesce(json_agg(json_build_array(qid, t, c) order by t, id), '[]') from (select a.id, a.qid, floor(extract(epoch from a.answered_at))::bigint as t, case when a.correct then 1 else 0 end as c from personal_answers a where a.visitor_id = 'xp-B' and a.hub = 'xh' order by a.answered_at desc, a.id desc limit 5000) x)`);
+    ok(ga.length > 0 && JSON.stringify(ga) === JSON.stringify(want), `get_my_answers: ${ga.length} answers as [question, seconds, right]`);
+    eq([json(`get_my_answers(null, 'xh')`), json(`get_my_answers('xp-B', '')`)], [[], []], 'get_my_answers without a visitor or a hub: nothing');
+    // the class name: an index on its base, the same name everywhere it's shown
+    eq(num(`select count(*) from pg_indexes where indexname = 'correct_streaks_anon_base'`), 1, 'correct_streaks_anon_base is there');
+    sql(`create function public.zz_anon_name_old(p_visitor_id text) returns text language sql stable set search_path = public as $f$
+      with me as (select anon_name_base(p_visitor_id) as base, first_seen(p_visitor_id) as since)
+      select me.base || case when exists (select 1 from correct_streaks c where c.visitor_id <> p_visitor_id and anon_name_base(c.visitor_id) = me.base
+        and first_seen(c.visitor_id) is not null and (me.since is null or first_seen(c.visitor_id) < me.since
+        or (first_seen(c.visitor_id) = me.since and c.visitor_id < p_visitor_id))) then ' ' || (10 + abs(hashtext(p_visitor_id || ':n')) % 90)::text else '' end from me; $f$`);
+    const twin = sql(`with g as (select 'xp-NC-' || i as v, anon_name_base('xp-NC-' || i) as b from generate_series(1, 3000) i) select x.v, y.v from g x join g y on x.b = y.b and x.v < y.v order by 1, 2 limit 1`)[0];
+    sql(`insert into correct_streaks (visitor_id) values (${q(twin[0])}), (${q(twin[1])}) on conflict do nothing;
+         insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values (${q(twin[1])}, 'xn', 'n1', true, ${T(-DAY)}), (${q(twin[0])}, 'xn', 'n1', true, ${T(-DAY + 60)})`);
+    const nm = rows(`select v, anon_name(v) as a, zz_anon_name_old(v) as b from (select visitor_id as v from correct_streaks union select 'xp-nobody') x`);
+    const tw = nm.filter(r => r.v === twin[0] || r.v === twin[1]);
+    ok(nm.length > 20 && nm.every(r => r.a === r.b) && tw.length === 2 && tw.find(r => r.v === twin[1]).a.split(' ').length === 2 && tw.find(r => r.v === twin[0]).a.split(' ').length === 3,
+      `anon_name gives the names it gave (${nm.length} visitors, ${nm.filter(r => r.a !== r.b).length} differ; two sharing a name: the first keeps it plain, the later gets a number)`);
+    sql(`drop function public.zz_anon_name_old(text)`);
+    notes.push('fewer calls (migration_v82): class numbers in one call, the analytics in one call, the shop\'s day stored, the bootstrap built once, the answers, the class name by lookup');
+  }
+
   /* ---------- 15. the private parts stay private ---------- */
   for (const t of ['xp_awards', 'xp_award_totals', 'xp_boosts', 'xp_sessions', 'answer_xp', 'question_keys', 'game_baseline', 'pet_purchases', 'pet_inventory', 'pet_equipped', 'ideas', 'idea_votes', 'shop_items', 'visit_secret', 'card_reviews'])
     raises(() => anon(`select count(*) from public.${t}`), '42501', `anon reads ${t} directly`);
