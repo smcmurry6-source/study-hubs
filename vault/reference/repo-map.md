@@ -15,7 +15,8 @@ tags: [map]
   serves at `/tools/preview/design/`, its art built from `tools/figures/site/` by `build.mjs`) and `tools/release/` (the suites: `secrets.js`, `rls.js` with
   `rls-expectations.json` and the live `rls-audit.sql`, `a11y.js` and `perf.js` with their `baselines/` and `budgets.json`,
   `matrix.js`, `postcheck.js`, the database suites `admin-ops.js`, `retention.js` and `xp.js` (the game layer's server) on
-  a throwaway copy built by `pg.js`; `run.js` runs them all). The bug log and UAT checklist are in `vault/release/`.
+  a throwaway copy built by `pg.js`; `run.js` runs them all; `bench-answers.js`, not a suite, times the answer save on two
+  copies, with and without the pending migrations, and checks they answer alike). The bug log and UAT checklist are in `vault/release/`.
 - `tools/figures/site/` — the site's drawn art, built by `build.mjs`: emblems, mastheads, medals, the rewards art, and
   Timmy's place (`place.mjs`, the kit; `sets.mjs`, the list of seasonal sets, year-round collections, rank sets and rare costumes; `packs/<set>.mjs`, one file per
   set; `pack-preview.mjs`, a contact sheet of one set: [draw-a-seasonal-set](../how-to/draw-a-seasonal-set.md)), and

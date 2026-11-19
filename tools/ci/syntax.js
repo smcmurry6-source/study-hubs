@@ -12,7 +12,7 @@ for (const p of pages) {
 }
 /* the preview runtime (injected into previews only) and the preview and release tools */
 for (const t of ['tools/preview/runtime/preview.js', 'tools/preview/transform.js', 'tools/preview/serve.js', 'tools/preview/build.js', 'tools/ci/preview.js',
-  'tools/release/lib.js', 'tools/release/run.js', 'tools/release/secrets.js', 'tools/release/rls.js', 'tools/release/pg.js', 'tools/release/admin-ops.js', 'tools/release/admin-ui.js', 'tools/ci/archive.js', 'tools/release/a11y.js', 'tools/release/perf.js', 'tools/release/matrix.js', 'tools/release/postcheck.js',
+  'tools/release/lib.js', 'tools/release/run.js', 'tools/release/secrets.js', 'tools/release/rls.js', 'tools/release/pg.js', 'tools/release/bench-answers.js', 'tools/release/admin-ops.js', 'tools/release/admin-ui.js', 'tools/ci/archive.js', 'tools/release/a11y.js', 'tools/release/perf.js', 'tools/release/matrix.js', 'tools/release/postcheck.js',
   /* Ask Timmy: the Edge Function's logic (index.ts is Deno's; tools/timmy/test.mjs runs the logic), its tests, its site-help build and its eval */
   'supabase/functions/timmy/core.js', 'tools/timmy/test.mjs', 'tools/timmy/build.mjs', 'tools/timmy/eval.mjs', 'tools/release/timmy.js',
   /* the engine hubs' content step */
