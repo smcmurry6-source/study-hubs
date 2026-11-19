@@ -44,6 +44,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   answer's reply: they ask `shGame.live()` now (a hub passes the Inbox its `v2`, it passed none; the dashboard passes `V2 !==
   false` to both), and the last two fall back to today's call when the v2 one is missing. `tools/ci/quiet.js` checks both
   (`mock()`, `timedOut()`). About page ("What the hubs record") and Ask Timmy's site help updated; bundles rebuilt.
+- **2026-11-19 (Heme & Endo Exam 3: High Likelihood made higher yield, Claude Code)** — Sam: "There are a lot of high
+  likelihood questions ... make sure that those need to be high likelihood and see if we can make it a little bit higher
+  yield." 410 of 460 questions were tagged, so the tag no longer picked anything out. Every topic was read against Dr.
+  Herr's study guide and the recorded hints: each guide item and each hint keeps its topic, and a question stays tagged only
+  when it tests what the item or hint names. 108 questions on details neither names came off the tag (a slide's number or
+  name, a side fact, a second question on the same point, a key that rests on a content flag), and five topics resting on
+  neither came off whole (L17 capacitation and maternal hormones, L19 splenic sinuses and MALT and tonsils, L20 plasma cell
+  neoplasms): 410 → 284 High Likelihood, 86 → 81 topics, 42 topic titles trimmed to what stays. No question was edited or
+  retired; Lecture A is unchanged (Sam: "lecture a shouldnt be ranked lower"). The mock (no `likelyShare` here) is
+  unchanged. High yield, built from the topics, is shorter for L17-L22 and was recorded again (`<lec>-hy.mp3`). Decision
+  and the rule for new questions: `vault/decisions.md`, `vault/hubs/heme-endo-exam3.md`.
 - **2026-11-19 (Ask Timmy: "What should I study tonight?" from the server, and a cheaper first question, Claude Code)** —
   On the dashboard, "What should I study tonight?" now also reads the student's own answers from the server
   (`get_my_answers`, one call a live hub, skipped in a quiet spell, 4 s at most), merged with this device's (a question
