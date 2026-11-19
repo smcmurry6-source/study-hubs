@@ -385,7 +385,7 @@
   /* ---------- the game layer's answers, ladder and sessions (migration_v54), as the server does them, on the fixtures.
      The 63 steps' floors are sh_rank's own list; an answer is graded where the page's export has its key (one choice),
      paid by the same rules (10, 2, 1; a self-graded card 2; three right and three wrong a question a day; the day's 20th
-     answer; a miss fixed; a medal and its 24 hours of double XP) and its award kept in db.xp2. ---------- */
+     answer; a medal and its 24 hours of double XP) and its award kept in db.xp2. ---------- */
   var F2 = [0, 100, 200, 300, 700, 1100, 1500, 2666, 3833, 5000, 7333, 9666, 12000, 16333, 20666, 25000, 33333, 41666, 50000, 75000, 100000,
     125000, 130952, 136904, 142857, 148809, 154761, 160714, 166666, 172618, 178571, 184523, 190475, 196428, 202380, 208332, 214285, 220237, 226189,
     232142, 238094, 244047, 250000, 255952, 261904, 267857, 273809, 279761, 285714, 291666, 297618, 303571, 309523, 315475, 321428, 327380, 333332,
@@ -683,8 +683,7 @@
     var rows = db.answers[hub] = db.answers[hub] || [], dd = day(t), sess = a.p_session && db.sess && db.sess[a.p_session], sOk = !!(sess && sess.hub === hub && !sess.done && t - sess.t0 < 6 * 3600e3);
     if (db.medals == null) db.medals = {};
     if (db.medals[hub] == null) db.medals[hub] = medalLevel(hub);   // reached before the switch: no XP, no boost
-    var today = allAnswers().filter(function(r){ return day(r[2] * 1000) === dd; }).length, lastT = db.lastAns || 0, before = null;
-    rows.forEach(function(r){ if (r[0] === qid && day(r[1] * 1000) < dd) before = r[2]; });
+    var today = allAnswers().filter(function(r){ return day(r[2] * 1000) === dd; }).length, lastT = db.lastAns || 0;
     /* recorded as the four calls of today */
     rows.push([qid, Math.floor(t / 1000), correct ? 1 : 0, 2]);   /* 4th = paid by its award, not by myXp's 3 or 1 */
     var ck = hub + "|" + qid, c = db.cls[ck] || (db.cls[ck] = [0, 0]); c[0]++; if (correct) c[1]++;
@@ -708,8 +707,6 @@
       mult = boost2(t) ? 2 : 1; paid = base * mult; db.xp2 += paid;
       db.g20 = db.g20 || {};
       if (today + 1 >= 20 && !db.g20[dd]) { db.g20[dd] = 1; db.xp2 += 30 * mult; bonus.push({ src: "goal20", xp: 30 * mult }); }
-      db.fix = db.fix || {};
-      if (correct && kind !== "self" && before === 0 && !db.fix[ck]) { db.fix[ck] = 1; db.xp2 += 5 * mult; bonus.push({ src: "fix", xp: 5 * mult }); }
     }
     if (kind !== "unknown") {
       var lvl = medalLevel(hub), pays = [0, 100, 200, 300, 500], got = 0;
