@@ -7,11 +7,13 @@
 // And fewer calls from the page (2026-11-19, the database optimization pass, phase 2, migration_v82): phase2() below.
 // And the answer history kept on the device (phase 3, migration_v84): history() below.
 // And a mock's answers in a busy minute, and the game layer's reads with the bootstrap timed out (2026-11-19): mock(), timedOut().
-// Nothing reaches the real database: every request off 127.0.0.1 is answered here, and every WebSocket is closed (the
+// Nothing reaches the real database: every request off 127.0.0.1 is answered here (and what a closing page sends, which
+// routing misses, by tools/ci/no-leaks.js), and every WebSocket is closed (the
 // pages aren't marked automated, so a live realtime connection would put them in the class's "studying now" count).
 'use strict';
 const http = require('http'), fs = require('fs'), path = require('path');
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
+const noLeaks = require('./no-leaks.js');
 const root = path.resolve(__dirname, '../..');
 const TYPES = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.png': 'image/png', '.mp3': 'audio/mpeg' };
 const server = http.createServer((req, res) => {
@@ -507,6 +509,9 @@ async function timedOut(browser){
 
 (async () => {
   const browser = await chromium.launch();
+  /* every context: a closing page's last requests skip routing, so tools/ci/no-leaks.js answers them in the page */
+  const newContext = browser.newContext.bind(browser);
+  browser.newContext = async o => { const c = await newContext(o); await noLeaks(c); return c; };
   try { await run(browser, false); await Promise.all([run(browser, true), kept(browser), pings(browser, false), pings(browser, true), phase2(browser, false), phase2(browser, true), history(browser, false), history(browser, true), mock(browser, false), mock(browser, true), timedOut(browser)]); } finally { await browser.close(); server.close(); }
   if (problems.length) { console.log('✗', problems.join('\n✗ ')); process.exit(1); }
   console.log('✓ the quiet spell: one line, nothing sent in the spell, the same ids, in order; a working database saves at once; answers kept on the device go from the next page; pings go together once a minute, and the changelog is read once; a card\'s class numbers, the analytics and the tenth answer take one call or none; the answer history is kept on the device and only what is newer is read; a mock\'s answers ride out a busy minute and its finish waits behind them; with the bootstrap timed out, Timmy\'s days and the Inbox read the game layer\'s calls');

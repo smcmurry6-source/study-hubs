@@ -59,6 +59,12 @@ its content JSON (`hubs/<hub>/content/`), and an old single-file hub by injectin
 - Look at the page in a scripted browser with the class's data stubbed (the way `tools/ci/smoke.js` and
   `node tools/preview/serve.js` do it), clicking through Home, Notes, Questions and More. Never use the plain page as a
   test account: it saves to the class's real data.
+- **A test that hides `navigator.webdriver`** (so the widget records, as `tools/ci/smoke.js` and `tools/ci/quiet.js` do)
+  **puts `tools/ci/no-leaks.js` on every browser context** (2026-11-19). Routing answers what a page sends while it's open,
+  but not a request it sends as it goes away (on `pagehide` or the browser's own `visibilitychange`), which the widget's
+  closing flush does: without it every run wrote its clicks, events and question-health rows into the live hub
+  (`tools/data-fixes/2026-11-19-test-runs.sql`). A test that leaves `navigator.webdriver` alone needs nothing: the widget
+  sends nothing from an automated browser.
 - **The workflows run on `ubuntu-latest` (Ubuntu 26.04) with Playwright 1.63.0** (2026-11-18). That day GitHub moved
   `ubuntu-latest` to 26.04, where the Playwright pinned then (1.56.1) refused to install a browser ("Playwright does not
   support chromium on ubuntu26.04-x64"), so for a few hours every workflow was pinned to `ubuntu-24.04`. 1.63.0 has all
