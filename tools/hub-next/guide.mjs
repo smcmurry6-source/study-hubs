@@ -2,7 +2,7 @@
 
    widget/guide.js draws the guide's page (#notes/guide) from study.json's guide; this is the same page's readable part,
    as HTML, in the same order: each lecture's heading ("L17 · Pregnancy and Lactation"), its items (the heading, then the
-   explainer), then its key terms. What the page marks data-sh-noread (the lecture's badge, "Dr. Herr · 9 questions on the
+   explainer), the sections that aren't on the guide (more: "Also stressed in class", "Said not needed"), then its key terms. What the page marks data-sh-noread (the lecture's badge, "Dr. Herr · 9 questions on the
    exam", the buttons) isn't in it, so a new question never changes the recording. tools/narrate.py speaks it
    (python3 tools/narrate.py <hub> --level guide), Follow along matches its words to the page's, and
    tools/hub-next/build.mjs offers the recording to the page (notes.json's guideAudio) only while its words file says it
@@ -26,7 +26,7 @@ export function guideSpoken(lectures, guide){
     /* "L17" is said "Lecture 17" (narrate.py: data-say is spoken, the text inside is what the page shows) */
     const label = l.label ? esc(l.label) : '<span data-say="Lecture ' + esc(l.num) + '">L' + esc(l.num) + "</span>";
     return "<h2>" + label + " · " + esc(title) + "</h2>" +
-      (g.items || []).map((it) => "<h3>" + esc(it.h) + "</h3>" + (it.body || "")).join("") +
+      (g.items || []).concat(g.more || []).map((it) => "<h3>" + esc(it.h) + "</h3>" + (it.body || "")).join("") +
       ((g.terms || []).length ? "<h3>Key terms</h3><dl>" + g.terms.map((t) => "<div><dt>" + esc(t.t) + "</dt><dd>" + t.d + "</dd></div>").join("") + "</dl>" : "");
   }).join("");
 }
