@@ -91,6 +91,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **A smoke check for visiting from a hub's arcade board** (2026-11-19, from #467): `tools/ci/smoke.js` checks the
   dashboard's visit but not a hub's. Stub `get_arcade_leaderboard_v2` and `get_place`, finish a game, tap a name on the
   game-over board: the place opens as a visit, Escape gives focus back, a key that opens nothing says so on the row.
+- [ ] **After merge drops a queued push's steps** (2026-11-19): GitHub's `concurrency` keeps one run going and one
+  waiting, so when three merges land close together the waiting one is canceled by the next (#467's run was, behind
+  #469's, when #472 merged), and each run only covers its own push (`github.event.before`), so the canceled push's steps
+  never run. #467's were run by hand (`run.js --from 894c21a --to 35671c1 --only timmy,changelog`). Fix: have a run
+  cover everything since the last After merge run that succeeded on `main`, or flag a canceled run so its range is redone.
 - [x] **Visiting from a hub's boards** (2026-11-13, [visiting](done/2026-11-12-redesign-visiting.md)): the leaderboards in a
   hub's own panel (`widget/v3.js`) don't open anyone's place yet (Sam, 2026-11-12: the dashboard's boards first). Done: the hubs' boards are their arcades' (`v3.js`'s panel has none now); `window.shVisitPlace` in `widget/hub-timmy.js`, Perio's and Heme & Endo Exam 3's arcades ([#467](https://github.com/smcmurry6-source/study-hubs/pull/467)).
 - [ ] **Sound for the hand-off and the Dark Matter unlock**, only if the redesign ever gets a sound setting (it has none; the
