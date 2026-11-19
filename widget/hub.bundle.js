@@ -493,14 +493,22 @@ paintMeters();
 HX.petFromBadges(d.profile.badges || []);
 });
 function fitPill(){
-var rk = $("#hxRank"), bar = $("#hxBar"); if (!rk || !bar) return;
-rk.classList.remove("is-tight", "is-tighter");
-if (!visible(rk) || bar.scrollWidth <= bar.clientWidth + 1) return;
+var rk = $("#hxRank"), bar = $("#hxBar"), hx = HX.shell; if (!rk || !bar || !hx) return;
+var over = function(){ return bar.scrollWidth > bar.clientWidth + 1; }, strip = false;
+rk.classList.remove("is-tight", "is-tighter"); bar.classList.remove("is-cramped", "no-meters");
+if (visible(rk) && over()) {
 rk.classList.add("is-tight");
-if (bar.scrollWidth > bar.clientWidth + 1) rk.classList.add("is-tighter");
+if (over()) rk.classList.add("is-tighter");
+if (over()) { bar.classList.add("is-cramped"); rk.classList.remove("is-tighter"); if (over()) rk.classList.add("is-tighter"); }
+if (over()) { bar.classList.add("no-meters"); strip = true; }
+}
+if (hx.classList.contains("is-strip") !== strip) hx.classList.toggle("is-strip", strip);
 }
 var fitAsked = false;
-window.addEventListener("resize", function(){ if (fitAsked) return; fitAsked = true; requestAnimationFrame(function(){ fitAsked = false; fitPill(); }); });
+function fitSoon(){ if (fitAsked) return; fitAsked = true; requestAnimationFrame(function(){ fitAsked = false; fitPill(); }); }
+window.addEventListener("resize", fitSoon);
+document.addEventListener("sh:online", fitSoon);
+try { document.fonts.ready.then(fitSoon); } catch (e) {}
 document.addEventListener("sh:journey-scene-end", function(e){
 var d = e.detail || {}, R = window.shRanks, name = R && R.JOURNEYS ? R.JOURNEYS[d.journey | 0] : "";
 paintMeters();
