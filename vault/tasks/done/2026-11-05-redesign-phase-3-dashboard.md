@@ -42,9 +42,10 @@ Rebuild `index.html` on the design system: the next exam and Start studying firs
 - [x] About page lists every changed feature, counts true (drafted in [the release note](2026-11-06-redesign-release.md), "From phase 3"; it landed with the release, [#359](https://github.com/smcmurry6-source/study-hubs/pull/359))
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`, `node tools/release/run.js`) (#318)
 - [x] Preview link, phone and laptop screenshots, and Sam's look, then Sam's "merge": the preview on 2026-11-11 ("All that looks good"), "merge" on 2026-11-12 (#318)
-- [ ] BUG-076 ([bug log](../../release/bug-log.md)): at 320 px wide with the largest text, "Start studying" is 2 px past
+- [x] BUG-076 ([bug log](../../release/bug-log.md)): at 320 px wide with the largest text, "Start studying" is 2 px past
   the screen's edge and the "You" card's seven day dots run off its side
   **Moved to its own to-do in the [inbox](../inbox.md)** (2026-11-17), so this note could close: still on the live dashboard.
+  Fixed the same day ([#401](https://github.com/smcmurry6-source/study-hubs/pull/401)); ticked 2026-11-19 (the housekeeping package).
 - [x] Vault written back (hub notes, decisions, `DEPLOY_NOTES.md`, the About page, this note's Outcome)
 
 ## Log

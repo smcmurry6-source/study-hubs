@@ -69,7 +69,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   `lock_timeout` before an `alter table` on a table the pages write, and data fixes kept small (they run at the merge,
   whatever the hour). Linked from the repo map, after-a-merge, shared-infrastructure, analytics-governance and
   read-usage-data.
-- [ ] Sam's call: a larger compute size for the Supabase project (more memory and CPU, at a monthly cost). Not needed if
+- [x] Sam's call: a larger compute size for the Supabase project (more memory and CPU, at a monthly cost). Not needed if
   the boxes above are done; worth it for exam weeks. Asked 2026-11-18 during the outage (Pro, $25 a month with Micro, or
   about $30 with Small): **"Stay free, keep fixing"** ([decisions](../decisions.md)). Open again if it happens after v72.
 - [x] **The answer retries don't pile onto a struggling database.** In the 19:40-20:25 outage (Log) the failed saves were sent
@@ -240,5 +240,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   hub until the next one goes up. The Free plan has no setting for PostgREST's pool (Database Settings' pool size is the
   pooler's, which the site doesn't use), so the levers are fewer, shorter queries (v72, v76, v77 and the changelog read,
   all live since this morning) and, past that, the analytics move or a larger compute size (Sam: stay free).
+- 2026-11-19 (the housekeeping package): the compute-size box ticked: Sam's call was made on 11-18 ("Stay free, keep
+  fixing", [decisions](../decisions.md)); it opens again only if the saves fail in bursts after v72.
 
 ## Outcome

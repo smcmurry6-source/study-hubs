@@ -100,7 +100,8 @@ Patient Box v2 is done by itself, on its own track. Figures pull from the tooth 
 
 ## Done when
 
-- [ ] Sam's calls are in [decisions](../decisions.md) and this note
+- [x] Sam's calls are in [decisions](../decisions.md) and this note (decisions, 2026-11-06: its own track, figures pull
+      from the catalogue; this note's "Sam's calls")
 - [ ] v2.0 built: the library, the modules, the new views, the new checks in `validate()` and `tools/ci/cases.js`
 - [ ] The figure builds read the same library (one existing tooth figure redrawn from it to prove the path); `--check` still passes
 - [ ] Perio's cases on modules with the same ids and keys (`node tools/ci/smoke.js`, `node tools/ci/cases.js`)
@@ -113,6 +114,7 @@ Patient Box v2 is done by itself, on its own track. Figures pull from the tooth 
 
 - 2026-11-06: workshop of Sam's idea.
 - 2026-11-06: Sam's calls (above): its own track; figures pull from the catalogue. Ready for an agent.
+- 2026-11-19: the first box ticked (the housekeeping package): the calls were already in decisions (2026-11-06) and above.
 
 ## Outcome
 
