@@ -139,8 +139,9 @@ tags: [map]
   while it waited to merge (they became `migration_v68.sql`, `migration_v69.sql`). A function a migration replaces is copied
   from `main`'s newest copy of it.
   New migrations are run once, by hand, in the Supabase SQL editor, or by a Claude Code session through the
-  Supabase connector (every Supabase tool is pre-approved in `.claude/settings.json`). Commit the `.sql` file and
-  refresh `supabase/schema.sql` either way. A migration written ahead of its release is listed in
+  Supabase connector (every Supabase tool is pre-approved in `.claude/settings.json`); one with a backfill, an index or a
+  table rewrite goes in late at night or in small batches ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)).
+  Commit the `.sql` file and refresh `supabase/schema.sql` either way. A migration written ahead of its release is listed in
   `supabase/pending-migrations.txt` until it's applied (none waiting since the redesign's release, which applied
   `migration_v54.sql` to `v58`: the game layer's server, [game-server](game-server.md)); the database suites apply the
   listed ones on top of `supabase/schema.sql`. When it's applied: append it to `supabase/schema.sql` and take its line

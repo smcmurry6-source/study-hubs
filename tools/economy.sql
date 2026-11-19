@@ -11,6 +11,11 @@
 -- study XP (answers, the day's bonuses, mocks, games, Timmy Time's minutes, cards: an award that isn't a prize) at the
 -- wallet's rate per XP, prizes 1:1 (sh_is_prize), hub time at sh_time_crowns' rate (at most 100 a clock hour), a
 -- survey's or check-in's reward apart (one-time). If sh_wallet's formula changes, change E1's "study / 2" to match.
+-- Running them (vault/how-to/run-sql-on-the-live-database.md): each query is its own execute_sql call, starting with
+-- `set local statement_timeout = '5s';` (the connector itself allows 2 minutes, and a call returns only its last result),
+-- one call at a time, never several at once. On a throwaway copy at 1.5 times the class's size (2026-11-18) each takes
+-- 0.5 s or less; E3 is the heaviest (a wallet a person). One that stops at the limit is never sent again at once or given a
+-- longer limit: it waits for the quiet hours (1 to 5 am Central), or runs for a shorter :since.
 
 -- E0. The rules as they are live: what every prize pays, the price bands, and the wallet's own formula (read its
 --     "earned :=" line: the share of study XP that becomes crowns)
@@ -51,9 +56,12 @@ select count(distinct visitor_id) people,
 from (select visitor_id, count(*) days, sum(mins) mins from d group by 1) p;
 
 -- E3. Wallets of everyone who studied since :since: what they hold, where it came from, what they could buy today, and
---     how much of what was earned has been spent (sh_wallet per person; a few seconds)
+--     how much of what was earned has been spent (sh_wallet per person, the heaviest query here). `materialized` works out
+--     each wallet once: inlined, the CTE ran sh_wallet again for every column below that reads it (on a throwaway copy,
+--     4.7 s against 0.5 s, the same numbers; most likely the 11 and 13 s economy queries of the 2026-11-18 audit, which
+--     failed students' answer saves)
 with act as (select distinct visitor_id from xp_awards where d >= :since::date and src = 'answer'),
-     w as (select visitor_id, sh_wallet(visitor_id) w from act)
+     w as materialized (select visitor_id, sh_wallet(visitor_id) w from act)
 select count(*) people,
   percentile_cont(array[0.1, 0.25, 0.5, 0.75, 0.9]) within group (order by (w->>'balance')::int) balance,
   percentile_cont(0.5) within group (order by (w->>'from_xp')::int) median_from_xp,
@@ -96,10 +104,12 @@ from r group by 1 order by 1;
 --     such"). E7a is the boards in totals, for LESSONS.md and the PR: how many names are on them, how far the top ten sit from
 --     the board's middle, how many keep a study streak going, which arcade boards have 5+ players. E7b is the boards as the
 --     dashboard shows them, the names people chose to show: for the chat with Sam only, never the PR, a note or LESSONS.md.
+--     (The rank board is worked out once, in rb, and read twice.)
+with rb as materialized (select rnk, xp from get_rank_board_v2('', 1000))
 select json_build_object(
-  'on_the_boards', (select count(*) from get_rank_board_v2('', 1000)),
+  'on_the_boards', (select count(*) from rb),
   'rank_board_xp', (select json_build_object('top10', percentile_cont(array[0, 0.5, 1]) within group (order by xp) filter (where rnk <= 10),
-      'everyone', percentile_cont(array[0.25, 0.5, 0.75]) within group (order by xp)) from get_rank_board_v2('', 1000)),
+      'everyone', percentile_cont(array[0.25, 0.5, 0.75]) within group (order by xp)) from rb),
   'study_streaks', (select json_build_object('3_plus', count(*) filter (where streak >= 3), '7_plus', count(*) filter (where streak >= 7),
       'median', percentile_cont(0.5) within group (order by streak)) from get_leaderboard_v2(1000)),
   'handpiece_end_xp', 125000,
