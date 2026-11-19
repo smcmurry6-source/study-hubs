@@ -322,6 +322,14 @@ html.shx body { margin: 0; background: var(--ground); color: var(--text); font-f
 .pm-art { position: absolute; right: 8px; bottom: -12px; width: 80px; }
 .pm-timmy { display: block; width: 80px; height: auto; transform-origin: 50% 100%; animation: pm-bob 1600ms ease-in-out infinite; }
 .pm-notes { position: absolute; left: 2px; top: -34px; width: 36px; height: auto; animation: pm-float 3200ms ease-in-out infinite; }
+/* a narrow card (four quick links a row from 861 to about 1,100 px, or larger text): "Listen · 52 min" ran over Timmy, so
+   the minutes go, and on the narrowest a smaller Timmy keeps the button clear of him (BUG-191). A phone has its own rules */
+.hx .ql-pod { container: pod / inline-size; }
+@media (min-width: 641px) {
+  @container pod (max-width: 224px) { .pm-play .pm-min { display: none; } .pm-text { padding-right: 0; } .ql-pod .pm-text small, .ql-pod .pm-earn { padding-right: 76px; } }   /* the title takes the full width (it broke mid-word at X-Large); the lines beside his notes and him keep his column */
+  @container pod (max-width: 140px) { .ql-pod .pm-text small, .ql-pod .pm-earn { padding-right: 58px; } .pm-art, .pm-timmy { width: 60px; } .pm-art { right: 4px; bottom: -9px; } .pm-notes { left: 4px; top: -26px; width: 27px; } .pm-play { gap: 4px; padding: 0 9px 0 6px; } }
+  @container pod (max-width: 110px) { .ql-pod .pm-text small, .ql-pod .pm-earn { padding-right: 48px; } .pm-art, .pm-timmy { width: 46px; } .pm-art { right: 2px; bottom: -8px; } .pm-notes { display: none; } }   /* XX-Large: the 380 px phone's Timmy */
+}
 @keyframes pm-eq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
 @keyframes pm-bob { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-3px) rotate(3deg); } }
 @keyframes pm-float { 0%, 100% { transform: translate(0, 2px) rotate(-5deg); } 50% { transform: translate(-3px, -5px) rotate(5deg); } }
@@ -420,7 +428,7 @@ html.shx[data-theme="dark"] .teeth .t-track { stroke: rgba(242, 193, 78, .18); }
 .lec-list { position: sticky; top: calc(var(--bar-h) + var(--boss-h, 0px) + 24px); }
 .hx .lec-pick { display: none; }
 .lec-list > ul { display: grid; gap: 4px; padding: 10px; border-radius: var(--r-panel); background: var(--panel);
-  max-height: calc(100vh - var(--bar-h) - var(--boss-h, 0px) - 48px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  max-height: calc(var(--sh-vh, 100vh) - var(--bar-h) - var(--boss-h, 0px) - 48px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .lec-list .grp { display: grid; gap: 1px; padding: 8px 10px 6px; }
 .lec-list .grp b { font-size: var(--fs-label); font-weight: var(--w-head); }
 .lec-list .grp span { font-size: var(--fs-meta); color: var(--muted); }
@@ -1303,7 +1311,7 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
   html.shx .qc-after .btn, html.shx .qc-after .sh-nj-btn { padding: 0 14px; }
   .game.is-first .game-pic { flex: 1 1 100%; margin: 0 -20px 4px; }
   /* the reply pop-up comes in at the top, under the strip: Timmy has the bottom-left corner */
-  html.shx .sh-reply { top: calc(64px + env(safe-area-inset-top, 0px)); bottom: auto; max-height: calc(100vh - 160px); }
+  html.shx .sh-reply { top: calc(64px + env(safe-area-inset-top, 0px)); bottom: auto; max-height: calc(100% - 160px); }   /* % of the screen: 100vh grows with the text size (BUG-190) */
   .mt > a { min-height: 0; }
   .mt.f-hub > a { padding-right: 128px; min-height: 150px; }
   .mt.is-big .mt-art, .mt.is-big .mt-timmy { width: 108px; }

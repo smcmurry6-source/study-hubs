@@ -14,9 +14,13 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   every view of a hub now fit a 320 px phone at XX-Large (220 px of layout), and the smoke test checks them, but a game once
   it's started (each hub's own `content/arcade.css` and `widget/games.css`) wasn't swept. Open each in a scripted browser at
   that size, the way `tools/ci/smoke.js`'s 320 px check does, and fix any that scroll sideways or cut off a control.
-- [ ] **The dashboard's toast on a phone** (2026-11-19, left from BUG-126's fix): a hub's toasts now drop in at the top on a
+- [ ] **A hub's report-reply pop-up covers the reward card on a phone** (2026-11-19, seen while moving the card to
+  `widget/prize.js`): on an emulated iPhone 13 (Perio, the preview's made-up data) a reply pop-up open at the top of the
+  screen sits over the gold card (`.hx-prizes`, z-index 45) so only its first line shows. On `main` too. Perhaps lift the
+  card above the pop-up for its few seconds, or drop it in under the pop-up.
+- [x] **The dashboard's toast on a phone** (2026-11-19, left from BUG-126's fix): a hub's toasts now drop in at the top on a
   phone, clear of Timmy, the streak flame and the Listen player; the dashboard's own (`toast()` in `widget/dash.js`) still
-  comes up at the bottom and wasn't checked against what sits there. Check it on a phone and move it if anything covers it.
+  comes up at the bottom and wasn't checked against what sits there. Check it on a phone and move it if anything covers it. Checked 2026-11-19 on an emulated iPhone 13 with the preview's made-up data: since #458 the rule in `widget/hub.css` drops the dashboard's toasts in at the top too (64 px, under its 56 px bar), clear of the report-reply pop-up and the bottom corners; nothing covers a long one, so nothing to move. And its prizes are on the gold card now (the next line). (#466)
 - [ ] **`xp_seen` grows back with every full rebuild** (2026-11-19, the optimization pass's phase 2,
   [its note](2026-11-18-database-optimization-pass.md)). `sh_xp_rebuild` (Link my devices, an edited or deleted answer) deletes
   and copies all of a student's `xp_seen` rows, `xp_days` and answer awards, whatever changed: 65,125 `xp_seen` rows went and
@@ -41,16 +45,16 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   needed) and their XP. Not kept on the device like the rest, because the session is finished on the page. Perhaps: keep
   them like the line's and finish the session from the next page (a session takes answers for 6 hours, and 10 minutes after
   it's finished), or hold the finish until the line is clear.
-- [ ] **The reward card on the dashboard too** (2026-11-18, from the hubs' reward card: Sam, "i want it to look much cooler and
+- [x] **The reward card on the dashboard too** (2026-11-18, from the hubs' reward card: Sam, "i want it to look much cooler and
   communicate that you just got xp and crowns better"). A hub shows what a bonus paid on a gold card (`drawPrize` in
   `widget/hub-rewards.js`, its styles inside it); the dashboard's prizes (the daily visit, the leaderboard name, trophies:
   `toast()` in `widget/dash.js`) are still the dark toast. The dashboard measured 342 of its 345 KB budget on 2026-11-18, so
   the card would go in a file the dashboard fetches when a prize first pays (not `dash.bundle.js`), or with Sam's OK to raise
-  the budget.
-- [ ] **The dashboard is at its 345 KB budget** (2026-11-19: 353,341 bytes of the 353,791 the budget allows, after the What's
+  the budget. Done 2026-11-19: the card is `widget/prize.js` (`window.shPrize`), run in `hub.bundle.js` for a hub and fetched by the dashboard when a prize first pays; over Timmy's place when the prize is a visit, under the bar on a phone, the stars flying into the crowns. (#466)
+- [x] **The dashboard is at its 345 KB budget** (2026-11-19: 353,341 bytes of the 353,791 the budget allows, after the What's
   new box, the stage's foot and Send luck's art added about 3.3 KB gzipped; `node tools/release/perf.js --page index.html`). The next change that adds to `dash.bundle.js` or
   `site.bundle.css` won't fit: move something the first screen doesn't need into a file fetched on first use (as Timmy's
-  place and the trophy case are), or ask Sam to raise the budget in `tools/release/budgets.json`.
+  place and the trophy case are), or ask Sam to raise the budget in `tools/release/budgets.json`. Done 2026-11-19: `widget/ranks.js`'s hub widget moved to `widget/ranks-hub.js` (a hub's only): the dashboard measures 340 of its 346 KB, with the reward card and the one analytics call in, the budget unchanged. (#466)
 - [ ] **More ways to earn crowns, if Sam wants them** (2026-11-17; Sam, with the prizes of `migration_v68.sql`: "im open to
   other ways too"). Ideas offered, none built: catching the Tooth Fairy or the Golden Probe, a perfect mock, Yesterday's
   misses all right, an idea of yours marked done on the idea board, the first day back after a week away. Each would be one

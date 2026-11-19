@@ -33,7 +33,7 @@ retrospectives, written 2026-11-19 by the lessons audit), and the recap is on th
 `q3-S02`). **Its narration and Timmy Time came off the site** with that audit
 ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)): the 28 mp3s and their words files (289 MB),
 and the `podcast`, Listen and Timmy Time out of its `hubs.js` entry; it left `HUBS` in `sw.js` with the page (`VERSION`
-sh-v65). Its later check-ins go into the next audit.
+sh-v66). Its later check-ins go into the next audit.
 
 ## Before you work on it
 
