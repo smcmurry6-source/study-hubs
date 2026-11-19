@@ -49,9 +49,13 @@ entry in `hubs.js`.
 - **Dr. Herr's Exam 3 study guide** (Sam, 2026-11-17: no in-class review; the guide is "very indicative" and "everything on the study
   guide should be high likelihood questions"; Drive, Exam 3 folder, `Exam 3 Study Guide (1).docx`): a focus list and key terms for
   each of L17-L22, nothing for Lecture A. Each lecture's Exam Hints open with its list (a `focus` hint, the guide's words, then the
-  hub's take), and every question on a guide item is in a `likelyTopics` entry with basis "study guide + ...", ranked first;
-  topics from a recorded hint that the guide doesn't list (L17's fertilization, implantation, capacitation, the maternal hormones)
-  stay High Likelihood, ranked after. Five questions were written for the thinner items (`hi-sg-platelets`, `hi-tf-sg-neut`,
+  hub's take), and each guide item has a `likelyTopics` entry with basis "study guide + ...", ranked first;
+  topics from a recorded hint that the guide doesn't list (L17's fertilization and implantation, L21's urothelial carcinoma,
+  L22's lichen planus and breast) stay High Likelihood, ranked after. **Since 2026-11-19 only the questions on what a guide
+  item or a hint names are High Likelihood** (Sam: "make sure that those need to be high likelihood ... a little bit higher
+  yield", [decisions](../decisions.md)): a question on a detail neither names stays in the bank without the tag, and a topic
+  that rests on neither (L17's capacitation and maternal hormones, L19's splenic sinuses and MALT and tonsils, L20's plasma
+  cell neoplasms) is gone. Hold new questions to that when adding them to a topic. Five questions were written for the thinner items (`hi-sg-platelets`, `hi-tf-sg-neut`,
   `ll-sg-classify`, `ll-num-sg-leuk`, `ea-sg-pop`). L21 and L22's lists (in [their task](../tasks/done/2026-11-16-heme-endo-exam3-l19-l22.md))
   are those lectures' focus hints and first topics (basis "study guide + recording"), since 2026-11-18. Lecture A's topics weren't changed, and stay that way (Sam: "lecture a shouldnt be ranked lower").
   **The guide's own page in Notes** (Sam, 2026-11-19, [decisions](../decisions.md)): `study.json`'s `guide`, one entry per
@@ -176,7 +180,8 @@ went taught (2026-11-18), 313 questions (L19 72, L20 65), 64 topics, 285 High Li
 questions retired (`ll-hl-case`, `ll-2s-scatter`, `ll-specimen`: Hodgkin subtypes and flow cytometry, said not needed).
 With L21 and L22 (2026-11-18): 437 questions (L21 64, L22 60, 13 of them Patient Box cases), 86 topics, 387 High
 Likelihood, 122 hints, 24 figures. After the slides (2026-11-19): 460 questions (L21 75, L22 72), 86 topics, 410 High
-Likelihood. Nothing left open from the slides.
+Likelihood. Nothing left open from the slides. After the High Likelihood review (2026-11-19): 81 topics, 284 High Likelihood
+(A 42 unchanged, L17 33, L18 42, L19 39, L20 45, L21 43, L22 40), High yield recorded again for L17-L22.
 
 ## History
 

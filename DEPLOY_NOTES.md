@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (Heme & Endo Exam 3: High Likelihood made higher yield, Claude Code)** — Sam: "There are a lot of high
+  likelihood questions ... make sure that those need to be high likelihood and see if we can make it a little bit higher
+  yield." 410 of 460 questions were tagged, so the tag no longer picked anything out. Every topic was read against Dr.
+  Herr's study guide and the recorded hints: each guide item and each hint keeps its topic, and a question stays tagged only
+  when it tests what the item or hint names. 108 questions on details neither names came off the tag (a slide's number or
+  name, a side fact, a second question on the same point, a key that rests on a content flag), and five topics resting on
+  neither came off whole (L17 capacitation and maternal hormones, L19 splenic sinuses and MALT and tonsils, L20 plasma cell
+  neoplasms): 410 → 284 High Likelihood, 86 → 81 topics, 42 topic titles trimmed to what stays. No question was edited or
+  retired; Lecture A is unchanged (Sam: "lecture a shouldnt be ranked lower"). The mock (no `likelyShare` here) is
+  unchanged. High yield, built from the topics, is shorter for L17-L22 and was recorded again (`<lec>-hy.mp3`). Decision
+  and the rule for new questions: `vault/decisions.md`, `vault/hubs/heme-endo-exam3.md`.
 - **2026-11-19 (the admin page's heavy reads worked out ahead, Claude Code, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456))** — the database-load task's first
   box. `migration_v83.sql`: the admin page's slow reads (Insights' three, Question health, the visitor totals, check-ins,
   clicks and features) come from a small table, `admin_cache`, that pg_cron's `sh-admin-cache` job fills one read at a time:
