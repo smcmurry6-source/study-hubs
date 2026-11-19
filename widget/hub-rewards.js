@@ -331,11 +331,14 @@
   document.addEventListener("sh:session-paid", function(e){
     var d = e.detail || {}, r = d.res; if (!r || !(r.xp > 0)) return;
     var G = window.shGames, run = G && G.ran ? G.ran(d.session) : null;
+    /* a game's finish held in a busy minute and sent by a later page (widget/v3.js, sessionHold) comes with its kind and
+       game, but that page never ran it */
+    var arc = !!run || d.kind === "arcade", gid = run ? run.game : arc ? d.game : null;
     /* the game's name as this page's lobby shows it (SH_HUB.arcade.games), not the live hub's skin ("THE YELLOW BODY") */
-    var mine = run ? (((HX.C || {}).arcade || {}).games || []).filter(function(g){ return g.id === run.game; })[0] : null;
+    var mine = gid ? (((HX.C || {}).arcade || {}).games || []).filter(function(g){ return g.id === gid; })[0] : null;
     todayRec().xp += r.xp; RANK.local += r.xp; saveState();
     /* study XP: 5 crowns for every 10 before a boost (the reply says the multiplier) */
-    prizeCard([{ t: (run ? (mine && mine.name) || run.name || "Arcade game" : "Mock exam") + " finished", xp: r.xp, c: studyCrowns(r.xp, r.mult), src: run ? "arcade" : "mock" }]);
+    prizeCard([{ t: (arc ? (mine && mine.name) || (run && run.name) || "Arcade game" : "Mock exam") + " finished", xp: r.xp, c: studyCrowns(r.xp, r.mult), src: arc ? "arcade" : "mock" }]);
     paintMeters();
   });
   /* Timmy Time (widget/podcast.js): what a minute heard paid (10, or nothing: heard before, too soon, a boost doubles it)

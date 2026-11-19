@@ -1400,7 +1400,8 @@
       name: opt.name || (H ? H.name : function(){ return ls("sh_display_name") || ""; }), home: opt.home || null,
       el: null, btn: null, say: null, st: simulate(null), rows: null, sayT: null, run: 0, wrongRun: 0, lastSection: "", lastInput: Date.now(),
       sessionStart: Date.now(), longNudges: 0, idleSaid: false, taps: 0, tapT: 0, lastHp: null, lastTalk: 0,
-      bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false
+      bootstrap: opt.bootstrap || (H && H.bootstrap) || (window.shBootstrap && window.shBootstrap.ready) || null, loaded: false,
+      live: typeof opt.live === "function" ? opt.live : H && typeof H.live === "function" ? H.live : null
     };
     if (firstMeet) { ls("sh_pet_adopt_sent", "1"); award("pet-adopt", ls("sh_pet_born")); }   /* once: syncBadges won't send it again */
     load();
@@ -1437,14 +1438,20 @@
     }
     loadRemote();
   }
+  function missingFn(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
   function loadRemote(){
     if (!M || !M.sb || !M.visitor) return;
     /* a page on the game layer asks for the days with the snacks' HP (migration_v54): a new hub says so through
        shGame.v2(), the new dashboard by its v2 bootstrap (only that one carries `shop`); every other page as before */
-    var v2 = false; try { var bd = window.shBootstrap && window.shBootstrap.data; v2 = !!((window.shGame && window.shGame.v2 && window.shGame.v2()) || (bd && bd.shop && bd.rank && bd.rank.journey != null)); } catch (e) {}
+    /* since 2026-11-19 a page also says so by M.live (a hub's shEggHooks.live, the dashboard's own): the game layer is
+       wanted and hasn't been found missing. Until then this waited for v2() or the bootstrap, so with the bootstrap timed
+       out in a busy minute his HP left out the snacks'. A database without the v2 call gets today's. */
+    var v2 = false; try { var bd = window.shBootstrap && window.shBootstrap.data; v2 = !!((M.live && M.live()) || (window.shGame && window.shGame.v2 && window.shGame.v2()) || (bd && bd.shop && bd.rank && bd.rank.journey != null)); } catch (e) {}
+    function got(r){ if (r && !r.error && Array.isArray(r.data)) { M.rows = r.data; update(true); } }
     M.sb.rpc(v2 ? "get_pet_days_v2" : "get_pet_days", { p_visitor: M.visitor }).then(function(r){
-      if (r && !r.error && Array.isArray(r.data)) { M.rows = r.data; update(true); }
-    }, function(){});
+      if (v2 && missingFn(r)) return M.sb.rpc("get_pet_days", { p_visitor: M.visitor }).then(got);
+      got(r);
+    }).then(null, function(){});
   }
   function update(quiet){
     var prev = M.st ? M.st.hp : null;
