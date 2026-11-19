@@ -195,6 +195,12 @@ try {
   if (Number(stats) !== 3) fail(`get_personal_stats for visitor A counted ${stats} answers, expected A's 3`);
   const none = JSON.parse(sql(`begin; set local role anon; select public.get_my_answers(null, 'rls-hub')::text; rollback;`)[0][0]);
   if (none.length) fail('get_my_answers with no visitor returned rows');
+  if (sql(`select count(*) from pg_proc where proname = 'get_my_answers_since'`)[0][0] !== '0') {
+    const since = JSON.parse(sql(`begin; set local role anon; select public.get_my_answers_since('rls-A', 'rls-hub', 0, 0)::text; rollback;`)[0][0]);
+    if ((since.answers || []).length !== 3 || Number(since.answers_n) !== 3) fail(`get_my_answers_since for visitor A returned ${(since.answers || []).length} answers, expected A's 3`);
+    const sinceNone = JSON.parse(sql(`begin; set local role anon; select public.get_my_answers_since(null, 'rls-hub', 0, 0)::text; rollback;`)[0][0]);
+    if ((sinceNone.answers || []).length || Number(sinceNone.answers_n)) fail('get_my_answers_since with no visitor returned rows');
+  }
   const bootstrap = JSON.parse(sql(`begin; set local role anon; select public.get_widget_bootstrap('rls-A', 'rls-hub', null, 'ep')::text; rollback;`)[0][0]);
   if (!Array.isArray(bootstrap.answers) || bootstrap.answers.length !== 3) fail(`get_widget_bootstrap for visitor A returned ${bootstrap.answers && bootstrap.answers.length} answers, expected A's 3`);
   if (!bootstrap.rank || Number(bootstrap.rank.xp) !== 41 || Number(bootstrap.rank.answers) !== 3) fail(`get_widget_bootstrap's rank for visitor A is ${JSON.stringify(bootstrap.rank)}, expected A's 41 XP over 3 answers`);
