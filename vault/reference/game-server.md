@@ -247,7 +247,16 @@ without a pick), starts and finishes a mock's session, and hands the server's re
 and the engine's XP guess (`widget/hub-rewards.js` `v2()`) ask `shGame.live()` (wanted and not found missing), not
 `shGame.v2()` (confirmed by the bootstrap or an answer's reply): a bootstrap that timed out in a busy minute left `v2()`
 false until the first reply, and the card guessed by the old 600-a-day cap, "+0 XP" on paid right answers (BUG-183,
-2026-11-18). The card then shows what the server paid when that differs from the guess.
+2026-11-18). The card then shows what the server paid when that differs from the guess. Since 2026-11-19 the rank pill
+(`widget/ranks.js`), Timmy Time's minutes (`widget/podcast.js`), Timmy's HP days (`widget/pet.js`, `get_pet_days_v2`) and
+the Inbox (`widget/replies.js`, `get_my_inbox_v2`; a hub passes it `v2`, the dashboard its own) ask the same, and the last two
+fall back to today's call when the database doesn't have the v2 one.
+**A mock's or a game's answers in a busy minute** (2026-11-19): they go at once and try twice more (4 and 10 s); one that
+fails all three joins the answer line with its session (8 tries, kept on the device like any other), and `finishSession`
+then answers `{ ok: true, held: true }` and puts the finish in the line behind them (`sessionHold` in `widget/v3.js`), kept
+with them, so `xp_session_finish` counts every answer (the score, the mock's +50 from 10). The page that sends it says what
+it paid (`sh:session-paid`, with `kind` and `game` for a page that never ran the game). The server takes a session's
+answers and its finish for 6 hours after it started. `tools/ci/quiet.js` checks it.
 - **The arcade** (`widget/games.js`): `shGames.played(game, name)` at a game's start calls
   `shGame.startSession("arcade", game)`; `shGames.over(game, score, today)` at its end calls `finishSession(id, score)`
   (the score whole, 0 to 200000) in place of `submit_arcade_score`, and falls back to `today()` when there is no session

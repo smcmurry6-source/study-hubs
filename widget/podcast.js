@@ -78,7 +78,10 @@
   var MIN = { off: false, busy: false, last: 0, timer: 0 };
   function minOn(){
     var G = window.shGame;
-    if (MIN.off || !P || !G || !G.v2 || !G.v2()) return false;
+    /* shGame.live(): the page wants the game layer and hasn't found it missing. Until 2026-11-19 this waited for v2(),
+       true only once the bootstrap or an answer's reply had come back, so with the bootstrap timed out in a busy minute
+       the minutes heard before the first answer were never counted (MIN.off still catches a database without them) */
+    if (MIN.off || !P || !G || !(G.live ? G.live() : G.v2 && G.v2())) return false;
     try { if (navigator.webdriver) return false; } catch (e) {}
     return true;
   }

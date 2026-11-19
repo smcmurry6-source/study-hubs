@@ -2111,7 +2111,7 @@ spot: function(){ return $("askSpot"); } });
 if (window.shPet) {
 window.shPet.mount({ where: "dashboard", sb: sb, visitor: VISITOR,
 name: function(){ return localName || randomName; },
-home: function(){ return $("petHome"); }, bootstrap: bootstrap.ready });
+home: function(){ return $("petHome"); }, bootstrap: bootstrap.ready, live: function(){ return V2 !== false; } });
 }
 placeStart(sb, bootstrap.ready);
 shopStart(sb, bootstrap.ready);
@@ -2158,7 +2158,7 @@ ch.subscribe();
 });
 setTimeout(function(){ if ($("liveCount").textContent === "–") paintNow(); }, 6000);
 if (window.shClicks) window.shClicks.start({ sb: sb, hub: "dashboard", visitor: VISITOR, section: function(){ return "dashboard"; } });
-if (window.shReplies) window.shReplies.start({ sb: sb, visitor: VISITOR || null, hub: "dashboard", bootstrap: bootstrap.ready, v2: function(){ return V2 === true; } });
+if (window.shReplies) window.shReplies.start({ sb: sb, visitor: VISITOR || null, hub: "dashboard", bootstrap: bootstrap.ready, v2: function(){ return V2 !== false; } });
 if (window.shLinkAsk) window.shLinkAsk.start({ sb: sb, hub: "dashboard", bootstrap: bootstrap.ready, bootstrapName: bootstrap.linkName });
 var held = 0;
 function askNext(){

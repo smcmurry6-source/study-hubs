@@ -92,6 +92,8 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   way. At most 3 days old and 24 tries in all; the server stamps each when it arrives. A backlog now goes out spaced as it
   was answered, up to 2.1 s apart (a miss within 2 s of the answer before paid nothing and broke no run, the speed limit).
   Mocks' and games' answers aren't kept (their session finishes on the page: the inbox). `tools/ci/quiet.js` checks it.
+  Since 2026-11-19 they are: one out of its three quick tries joins the line with its session, and the finish waits
+  behind it (`sessionHold`), kept with it on the device.
 - [x] **The answer save's own cost** (`migration_v72.sql`): every answer worked out the whole crown balance (`sh_wallet`,
   summing the person's awards with `sh_is_prize` called once an award) and the hub's medal count (`sh_medal_check`, every
   answer the person ever gave in the hub), on every answer. On a throwaway copy with a made-up student of 8,000 answers:

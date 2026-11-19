@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (Mock and game answers that ride out a busy database, Claude Code)** — (1) A mock's or an arcade game's
+  answers go at once and try twice more (4 and 10 s); when all three failed in a busy minute they were lost, and with them
+  the mock's score, its +50 and their XP. Now `widget/v3.js` puts such an answer in the answer line with its session (8 tries,
+  kept on the device when the page is hidden or they run out), and `finishSession` holds the finish behind it in the same
+  line (`sessionHold`; it answers `{ ok: true, held: true }`, so `widget/games.js` doesn't also send the score the old way),
+  kept on the device with the answers, so the hub's next page sends the answers, then the finish. The page that sends it says
+  what it paid (`sh:session-paid` now carries `kind` and `game`; `widget/hub-rewards.js` names a game it never ran).
+  (2) With the bootstrap timed out, Timmy Time's minutes (`widget/podcast.js`) weren't counted, Timmy's HP days
+  (`widget/pet.js`) left out the snacks' HP and the Inbox (`widget/replies.js`) the idea board's notes until the first
+  answer's reply: they ask `shGame.live()` now (a hub passes the Inbox its `v2`, it passed none; the dashboard passes `V2 !==
+  false` to both), and the last two fall back to today's call when the v2 one is missing. `tools/ci/quiet.js` checks both
+  (`mock()`, `timedOut()`). About page ("What the hubs record") and Ask Timmy's site help updated; bundles rebuilt.
 - **2026-11-19 (The database pass's phase 2 applied live, Claude Code)** — Sam, at noon the day before Heme & Endo Exam 3: "the hubs are quiet right now. go ahead and run the migrations you were waiting on" (4 people on, 2 answers in 10 minutes). Through the connector, one call at a time, 12:10-12:13 pm Central: `migration_v79.sql` (the awards' running totals; no total off from its sum, the three most active students' balances the same), `migration_v80.sql` (`answer_xp` once an answer), `migration_v81.sql` (`drop index concurrently`, then `cluster` of `activity_visits` and `xp_seen`: **the database 349 → 323 MB**, `xp_seen` 53 → 31 MB) and `migration_v82.sql` (`get_class_numbers`, `record_analytics`, `shop_days` with its hourly pg_cron job, the lighter bootstrap, `get_my_answers`, `anon_name`). Every live body md5-checked against its file before and after; no request failed in the edge logs, and the pages took the two new calls within a minute. All four are in `supabase/schema.sql`; `supabase/pending-migrations.txt` lists none. Nothing students see changes. [The task note](vault/tasks/2026-11-18-database-optimization-pass.md) has the numbers.
 - **2026-11-19 (Large text on a phone: BUG-184 to BUG-188, Claude Code)** — The text-size setting zooms `<html>`, and inside a zoomed page
   `100vw` and `100vh` are bigger than the screen, so four pop-ups sized that way ran off it at X-Large and XX-Large. The dashboard's More menu is

@@ -103,7 +103,8 @@ tags: [widget, supabase]
   doubling to 5 minutes), in which answers go one at a time and the analytics wait; a new caller of the database that
   isn't something the student did on purpose should check `shDb.busy()` too. An answer still waiting when the page is hidden
   or closed is kept on the device (`sh_answers_kept:<hub>`, up to 3 days) and sent by the hub's next page with the same
-  request id, so it records and pays once (2026-11-19).
+  request id, so it records and pays once (2026-11-19). A mock's or a game's answer joins that line once its three quick tries
+  fail, and the session's finish waits behind it in the line (kept with it), so the server scores the mock with every answer in.
   **The database is small** (the Free plan's Nano size: a shared CPU and up to 0.5 GB of memory, of which Postgres's own
   cache, `shared_buffers`, takes 224 MB; 60 connections; earlier notes said 1 GB, which is the paid Micro), and every student's answer is saved
   through it (`record_answer_v2`, about 150 ms). Visitors' calls stop after 3 s (anon's `statement_timeout`; `lock_timeout`
