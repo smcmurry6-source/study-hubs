@@ -7,6 +7,13 @@ status: archived
 
 # Heme & Endo Exam 1
 
+**Its page came down 2026-11-19**, with the other five old single-file hub pages (Sam: "lets go ahead and take down all
+old pages", [decisions](../decisions.md)). Its `hubs.js` entry (the check-ins, the recap),
+`tools/question-ids/heme-endo-exam1.txt`, its art, its figure kit (`tools/figures/heme-endo-exam1/`), its Timmy Time
+script (`tools/podcast/heme-endo-exam1/`) and the class's data in Supabase stay. The page is still in git:
+`git show a897c0c:hubs/heme-endo-exam1/index.html` (the last `main` commit with it); its questions and lectures as JSON:
+`tools/dump-banks.js` on a copy of that commit ([repo map](../reference/repo-map.md)).
+
 DENT 2160 Hematology & Endocrinology Exam 1 (lectures 1-10), Fri Oct 30. Sam reopened it for a late exam: it archived
 2026-11-03 at 10 pm (`archiveOn`), but its card and Check in button stay on the dashboard until Fri 11-06 10 pm
 (`hideCardOn`, `checkinUntil`). Its check-in is closed (`checkinClosed:true` since 2026-11-19, refused by the server since

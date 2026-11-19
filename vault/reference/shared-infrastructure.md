@@ -36,7 +36,7 @@ tags: [widget, supabase]
   fetches `widget/trophies.js` + `.css` and `widget/hub-art/trophies.js` on first use. An old page keeps the old cards
   (the smoke test compares their markup) and lists 23 trophies. **Full Arch is retired on every page** (the release):
   the chart and its switch are gone from `widget/eggs.js`, and someone who won it keeps it as a retired trophy. The
-  `NEW` gates can go when the last old page comes down ([inbox](../tasks/inbox.md)).
+  `NEW` gates can go now that the last old page has come down (2026-11-19, [inbox](../tasks/inbox.md)).
   ([the task](../tasks/done/2026-11-12-redesign-trophy-case-and-cards.md))
 - **Everyone has Timmy** (the release): `widget/pet.js` has no adoption, introduction or holiday outfits any more. He is
   on every page from the first visit and wears only what is on at his place (`fit()`; on an old hub's page, the outfit
@@ -51,7 +51,7 @@ tags: [widget, supabase]
 - **`widget/cases.js` + `widget/cases.css`** (`window.shCases`): the dental case kit. A Patient Box question in any
   hub names a case (`pcase`) in that hub's `PCASES`, and the kit draws its periodontal chart, periapical radiograph
   and buccal view from the case's numbers, works out the diagnosis from them and validates that every number is
-  realistic (`node tools/ci/cases.js` in CI). Loaded by the hubs that have cases (PCD Implants; Perio and Occlusion until their pages came down, 2026-11-19); on the engine a hub's cases are `pcases` in
+  realistic (`node tools/ci/cases.js` in CI). Loaded by the hubs that have cases (PCD Implants, Perio and Occlusion until their pages came down, 2026-11-19: none on the site now); on the engine a hub's cases are `pcases` in
   its `content/core.json`. How to add a case or a hub: [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md).
 - **`widget/ideas.js` + `widget/ideas.css`** (`window.shIdeas`): the idea board, part of the redesign.
   `shIdeas.mount(el, options)` draws the board (the dashboard's `#ideas`, a hub's
