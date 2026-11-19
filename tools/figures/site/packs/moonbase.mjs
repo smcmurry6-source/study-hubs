@@ -218,7 +218,18 @@ export function pack(T){
   var scenes = {
     "lunar-plains": T.hillScene({
       note: "Gray regolith and craters under a black sky, the Earth hanging over the far crater rims",
-      path: "crystal", treeKind: "crystal", lamp: "post", skirt: "space", grade: ["#B6C3F0", .05],
+      path: "crystal", lamp: "post", skirt: "space", grade: ["#B6C3F0", .05],
+      /* the tree spot: a plain little tree growing under a glass dome on a metal ring (nothing grows outside on the
+         moon); tapped, it shakes and a leaf comes down inside the glass */
+      tree: function(b, o){
+        var n = o.night, x = b[0], y = b[1], s = "", lf = n ? ["#4F8E58", "#3A6E46"] : [K.leaf, K.leafShade];
+        s += ell(x, y, 17, 6, METAL[1], 1.4) + ell(x, y - 1.2, 15, 4.8, n ? "#6F7695" : "#BCB8C8", 1);
+        s += FO("M" + f(x - 2) + " " + f(y - 1) + " q1 -9 -1 -18 l5 0 q-2 9 -1 18 q-1.6 1 -3 0 z", K.wood, 1.3);
+        s += T.canopy(x - 5, y - 22, 8, lf, 61) + T.canopy(x + 5, y - 23, 7.5, lf, 62) + T.canopy(x, y - 30, 8.5, lf, 63);
+        s += F("M" + f(x - 15) + " " + f(y - 1) + " a15 40 0 0 1 30 0 a15 4.8 0 0 1 -30 0 z", "#CFE8FF", .22);
+        s += L("M" + f(x - 15) + " " + f(y - 1) + " a15 40 0 0 1 30 0", 1.4, INK, .85) + L("M" + f(x - 9) + " " + f(y - 22) + " q2 -12 9 -15", 1.6, "#FFFFFF", .7);
+        return { s: s, bits: G("tp-drop", '<path d="M' + f(x + 4) + " " + f(y - 22) + ' q2.6 -3.2 5.2 0 q-2.6 3.2 -5.2 0z" fill="' + lf[0] + '" stroke="' + INK + '" stroke-width=".6"/>') };
+      },
       ground: function(o){ return o.snow ? ["#F4F6FA", "#E6EBF2", "#D3DCE8", "#B4C2D6"] : o.night ? ["#9DA4C0", "#9098B5", "#8088A6", "#636B8B"] : ["#DEDCE3", "#D1CED9", "#BCB8C8", "#9591A8"]; },
       sky: function(o){
         var s = T.bands(o.night ? ["#05060F", "#080A18", "#0C0F21", "#11152B"] : ["#07080F", "#0B0D17", "#10121F", "#161928"], 0, 300);
@@ -268,7 +279,10 @@ export function pack(T){
   function wheel(x, y, zc, R, wd){
     var rim = ring([x, y + wd, zc], [1, 0, 0], [0, 0, 1], R, 0, 360, 20), hub = ring([x, y + wd + .01, zc], [1, 0, 0], [0, 0, 1], R * .42, 0, 360, 14), s = tube("y", y, y + wd, x, zc, R, ["#4A5060", "#363B48", 1.4]);
     s += FO(D(rim), "#5E6575", 1.3);
-    for (var a = 0; a < 360; a += 30){ var q0 = P(x + Math.cos(a * DEG) * R * .78, y + wd, zc + Math.sin(a * DEG) * R * .78), q1 = P(x + Math.cos(a * DEG) * R, y + wd, zc + Math.sin(a * DEG) * R); s += L(T.seg(q0, q1), 1, "#2B2F3A", .8); }
+    /* the tread marks turn with the wheel while the egg plays (T.spinner) */
+    var tr = "";
+    for (var a = 0; a < 360; a += 30){ var ca = Math.cos(a * DEG) * R, sa = Math.sin(a * DEG) * R; tr += "M" + f(ca * .78) + " " + f(sa * .78) + " L" + f(ca) + " " + f(sa) + " "; }
+    s += T.spinner([x, y + wd, zc], [1, 0, 0], [0, 0, 1], L(tr, 1, "#2B2F3A", .8));
     return s + FO(D(hub), METAL[0], 1.1);
   }
   var ROVER = { x0: .7, x1: 2.95, y0: 1.2, y1: 2.45, z0: .78, z1: 1.22 };
@@ -276,7 +290,8 @@ export function pack(T){
   var yard = {
     "moon-rover": {
       note: "A six-wheeled rover with a camera mast, a solar deck and a little dish", spot: [3.3, 3.45],
-      egg: { n: "The moon rover", does: "its wheels spin up moon dust and its beacon blinks", say: "Beep beep! Six wheels, zero cavities. It's out collecting samples, like a good checkup." }, anim: "tp-pop 2.4s",
+      egg: { n: "The moon rover", does: "it rolls out and back, its wheels spinning up moon dust, and its beacon blinks", say: "Beep beep! Six wheels, zero cavities. It's out collecting samples, like a good checkup." }, anim: "tp-pop 2.4s",
+      move: { "": "tp-rove 2.4s ease-in-out", ".tp-spin": "tp-spin .8s linear 3" },
       draw: function(o){
         var V = ROVER, s = ell.apply(null, P(1.85, 1.95, 0).concat([30, 10, "#141824", 0, .16])), i;
         /* the far wheels, then the body, then the near wheels and their rocker arms */
@@ -312,7 +327,8 @@ export function pack(T){
     },
     "satellite-dish": {
       note: "A radio dish on a tripod, pointed up at the stars", spot: [3.35, 3.4],
-      egg: { n: "The satellite dish", does: "it beams a signal up: rings pulse out of the dish", say: "Calling Earth! Message: brush twice a day. Over." }, anim: "tp-pop 2.6s",
+      egg: { n: "The satellite dish", does: "it swings round to aim and beams a signal up: rings pulse out of the dish", say: "Calling Earth! Message: brush twice a day. Over." }, anim: "tp-pop 2.6s",
+      move: { ".tp-aim": "tp-aim 2.6s ease-in-out" },
       draw: function(o){ return dish(o, false); },
       lights: function(){ var fq = dishGeo().fq; return circ(fq[0], fq[1], 8, "#FF6B6B", 0).replace("/>", ' opacity=".3"/>'); },
       bits: function(){
@@ -363,6 +379,8 @@ export function pack(T){
     s += leg(90);
     s += cyl(1.8, 1.85, .7, .24, 1.75, .2, METAL[0], METAL[1], METAL[0], { sw: 1.5, si: .9 });
     s += box(1.6, 1.65, 1.72, .4, .4, .3, { top: METAL[0], left: METAL[1], right: METAL[2] }, { sw: 1.3, si: .8 });
+    /* from the mount up turns together while the egg plays (.tp-aim): the dish swings round to aim */
+    var pre = s; s = "";
     s += L(D([[1.8, 1.85, 1.95], [g.c[0], g.c[1], g.c[2] - .1]], true), 4.4) + L(D([[1.8, 1.85, 1.95], [g.c[0], g.c[1], g.c[2] - .1]], true), 2.4, METAL[0]);
     /* the bowl: its back shell, then the dish face, with the shade its rim throws inside */
     var rim = ring(g.c, g.a, g.b, g.R, 0, 360, 32), back = [g.c[0] - g.n[0] * .55, g.c[1] - g.n[1] * .55, g.c[2] - g.n[2] * .55];
@@ -376,7 +394,8 @@ export function pack(T){
     /* the feed on its three struts, a light on its tip */
     [30, 150, 270].forEach(function(t){ var ca = Math.cos(t * DEG) * g.R * .9, sa = Math.sin(t * DEG) * g.R * .9, q = [g.c[0] + ca * g.a[0] + sa * g.b[0], g.c[1] + ca * g.a[1] + sa * g.b[1], g.c[2] + ca * g.a[2] + sa * g.b[2]]; s += L(D([q, g.fz], true), 2.4) + L(D([q, g.fz], true), 1, METAL[0]); });
     s += circ(g.fq[0], g.fq[1] + 1, 2.8, METAL[1], 1.2) + beacon(g.fq[0], g.fq[1] - 2.4, 2);
-    return s;
+    var mt = P(1.8, 1.85, 1.95);
+    return pre + '<g class="tp-aim" style="transform-origin:' + f(mt[0]) + "px " + f(mt[1]) + 'px">' + s + "</g>";
   }
   /* the rocket on its pad, and the gantry beside it */
   var RK = { x: 1.95, y: 2.0, r: .5, z0: 1.05, z1: 4.0, z2: 5.6 }, GT = { x: 1.65, y: .1, w: .62, h: 5.0 };

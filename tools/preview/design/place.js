@@ -28,6 +28,15 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   function seg(a, b){ return "M" + f(a[0]) + " " + f(a[1]) + " L" + f(b[0]) + " " + f(b[1]); }
   /* shift a drawing made at the yard's origin to (x, y, z) on it (the projection is linear, so a move is a translate) */
   function at(x, y, z, s){ var a = P(x, y, z), o = P(0, 0, 0); return T(a[0] - o[0], a[1] - o[1], s); }
+  /* a part that turns in its own plane (a wheel, a windmill's blades): inner is drawn round 0 0 in that plane's units,
+     symmetric about it, with c the center on the yard and u, v the plane's two unit axes. A matrix maps it onto the
+     picture, so a CSS rotate of .tp-spin turns it as a real wheel turns, and its strokes keep their width. A piece's
+     move (below) plays it. */
+  function spinner(c, u, v, inner){
+    var o = P(c[0], c[1], c[2] || 0), a = P(c[0] + u[0], c[1] + u[1], (c[2] || 0) + u[2]), b = P(c[0] + v[0], c[1] + v[1], (c[2] || 0) + v[2]);
+    return '<g transform="matrix(' + [a[0] - o[0], a[1] - o[1], b[0] - o[0], b[1] - o[1], o[0], o[1]].map(f).join(" ") + ')"><g class="tp-spin">' +
+      inner.replace(/<(path|circle|ellipse)\b/g, '<$1 vector-effect="non-scaling-stroke"') + "</g></g>";
+  }
   /* an easter egg: something you can tap. Its hidden bits (.tp-eb) show while it plays (.tp-on, set by the page). */
   var EGGS_SEEN = [];
   function egg(k, inner, bits, extra){ if (EGGS_SEEN.indexOf(k) < 0) EGGS_SEEN.push(k); return '<g class="tp-egg" data-egg="' + k + '"' + (extra || "") + ">" + inner + (bits ? '<g class="tp-eb" opacity="0">' + bits + "</g>" : "") + "</g>"; }
@@ -322,13 +331,14 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   /* a set's scene on the hill's own landform (so the yard, the path and Timmy's walks work as on the hill): the pack gives
      its sky, its backdrop, the ground's four greens (or snows, or sands) and what grows and stands on it.
      spec: { sky(o), far(o), ground(o) -> [top, light slope, far slope, line], flat(o, on), props(o, on) -> [{x, y, s}],
-     landExtra(o), fg(o), skirt, path, treeKind, lamp, grade, snowy, alwaysNight, farLift }
+     landExtra(o), fg(o), skirt, path, treeKind, tree(b, o) -> { s, bits } (its own tree at b, the tree spot on the
+     picture, in place of treeKind's), lamp, grade, snowy, noSnow (it never snows there: under the sea), alwaysNight, farLift }
      farLift (22 unless given) raises the backdrop: draw far(o) as if the land's edge stood near y 150 at the picture's
      sides, and keep the sun and the moon clear of whatever the backdrop lifts into the sky. */
   function hillScene(spec){
     return {
       top: HILL_TOP, farLift: spec.farLift == null ? 22 : spec.farLift, skirt: spec.skirt || "grass", path: spec.path || "stones", treeKind: spec.treeKind || "round", lamp: spec.lamp || "post", grade: spec.grade || ["#FFE7B0", .05],
-      snowy: !!spec.snowy, alwaysNight: !!spec.alwaysNight,
+      snowy: !!spec.snowy, noSnow: !!spec.noSnow, alwaysNight: !!spec.alwaysNight, tree: spec.tree,
       chip: function(o){ var g = spec.ground(o); return [g[0], g[3]]; },
       sky: spec.sky, far: spec.far || function(){ return ""; },
       land: function(o){
@@ -717,7 +727,8 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   }
   function sceneTree(sc, o){
     var b = P(FIX.tree[0], FIX.tree[1], 0), sh = ell(b[0] + 2, b[1] + 1, 12, 4.4, "#000", 0, .12), t;
-    if (sc.treeKind === "palm") t = palmTree(b, o);
+    if (sc.tree) t = sc.tree(b, o);                         // a set's own tree (the reef's coral, the moon base's dome)
+    else if (sc.treeKind === "palm") t = palmTree(b, o);
     else if (sc.treeKind === "pine") t = { s: pine(b[0], b[1] + 2, 52, o.night ? ["#2F5A4A", "#244A3D"] : ["#4A9164", "#357A50"], o.snow), bits: "" };
     else if (sc.treeKind === "crystal") t = crystalTree(b, o);
     else if (sc.treeKind === "cloud") t = cloudTree(b, o);
@@ -1903,8 +1914,18 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     var sw = o.journey > 0 ? .76 : .55;                    // past the Handpiece the pedestal has a wider base
     if (!st[2]) obs.push([st[0] - sw, st[1] - sw, st[0] + sw, st[1] + sw]);
     obs.push([br[0] - .25, br[1] - .25, br[0] + .25, br[1] + .25], [FIX.lamp[0] - .3, FIX.lamp[1] - .3, FIX.lamp[0] + .3, FIX.lamp[1] + .3], [FIX.tree[0] - .5, FIX.tree[1] - .5, FIX.tree[0] + .5, FIX.tree[1] + .5]);
-    if (o.holiday) obs.push([FIX.holiday[0] - .5, FIX.holiday[1] - .5, FIX.holiday[0] + .5, FIX.holiday[1] + .5]);
-    return { home: home, sc: sc, yard: yard, spots: spots, obs: obs };
+    if (o.holiday && !(o.holiday === "winter" && sc.noSnow)) obs.push([FIX.holiday[0] - .5, FIX.holiday[1] - .5, FIX.holiday[0] + .5, FIX.holiday[1] + .5]);
+    /* the front slot stands in front of every home's door spot, so a tall piece there (a windmill, a balloon) would hide
+       Timmy at the door: near the door he is drawn over it (Sam, 2026-11-19: "draw Timmy on top") */
+    var fr = yard.front && YARD[yard.front], frontZ = fr ? SLOTS.front.x + SLOTS.front.y + S + (fr.wide ? 2.4 : 0) + .05 : 0;
+    return { home: home, sc: sc, yard: yard, spots: spots, obs: obs, frontZ: frontZ };
+  }
+  /* where Timmy stands in the depth order at yard point p ([x, y, z]): in front of what's behind him, behind what's in
+     front, except over the front slot's piece while he's on the ground by the door */
+  function timmyZ(Lo, p){
+    var z = p[0] + p[1] + .3, d = Lo && Lo.spots && Lo.spots.door;
+    if (Lo && Lo.frontZ && d && !(p[2] > .05)){ var dx = p[0] - d[0], dy = p[1] - d[1]; if (dx * dx + dy * dy < 1.69) z = Math.max(z, Lo.frontZ); }
+    return z;
   }
   var RING = [[5.5, 10.8], [5.5, 12.3], [5.5, 14.4], [8.6, 14.5], [12.1, 14.8], [14.8, 12.2], [14.7, 8.4], [14.6, 5.0], [14.4, 1.4], [9.95, 4.8], [9.95, 7.6], [8.5, 10.05], [3.0, 10.1], [2.0, 14.4], [-.4, 12.0], [-.3, 9.4],
     [10.3, 10.2], [10.3, 14.5], [12.1, 5.4], [10.1, 1.2]];
@@ -1954,8 +1975,9 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     EGGS_SEEN = [];
     var Lo = layout(o), home = Lo.home, sc = Lo.sc, yard = Lo.yard;
     var night = !!(o.night || sc.alwaysNight), H = o.holiday || "", tier = Math.max(0, Math.min(6, o.tier | 0)), journey = Math.max(0, Math.min(2, o.journey | 0)), flair = o.flair || [];
-    var season = o.season || (H === "winter" ? "winter" : "");
-    var snow = !!(sc.snowy || H === "winter");
+    /* a scene where it never snows (under the sea) keeps the winter holiday's lights but no snow, snowfall or snowman */
+    var wet = !!sc.noSnow, season = o.season || (H === "winter" && !wet ? "winter" : "");
+    var snow = !!(sc.snowy || (H === "winter" && !wet));
     var up = {}; (home.ups || []).forEach(function(k){ if (o.up && o.up[k]) up[k] = true; });
     var so = { night: night, snow: snow, season: season, fall: season === "fall", spring: season === "spring", journey: journey };
     var s = sc.sky(so);
@@ -1982,7 +2004,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       var br = home.brush || FIX.brush; items.push({ z: br[0] + br[1], s: toothbrush(br[0], br[1], up.porch && home.porchZ ? home.porchZ.brush : br[2] || 0) });
       var lamp = lampFor(snow && sc.lamp === "post" ? "iron" : sc.lamp, so); items.push({ z: FIX.lamp[0] + FIX.lamp[1], s: lamp.s }); lights += lamp.lights;
       if (H && H !== "winter") items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: holidayGround(H) });
-      if (H === "winter") items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: snowman(FIX.holiday[0], FIX.holiday[1]) });
+      if (H === "winter" && !wet) items.push({ z: FIX.holiday[0] + FIX.holiday[1], s: snowman(FIX.holiday[0], FIX.holiday[1]) });
       sc.props(so).forEach(function(p){ items.push({ z: p.x + p.y, s: p.s }); });
     }
     var spots = {}, plot = Lo.spots;
@@ -1994,11 +2016,11 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
       items.push({ z: sl.x + sl.y + S + (it.wide ? 2.4 : 0), s: '<g class="tp-item" data-slot="' + k + '">' + egg(id, at(sl.x, sl.y, 0, it.draw(so)), it.bits ? at(sl.x, sl.y, 0, it.bits(so)) : "") + "</g>" });
       if (it.lights && night) lights += at(sl.x, sl.y, 0, it.lights(so));
     });
-    if (o.timmy && o.timmy.g){ var tp = plot[o.timmy.at] || plot.door, tq = P(tp[0], tp[1], tp[2] || 0); items.push({ z: tp[0] + tp[1] + .3, s: '<g class="tp-timmy" transform="translate(' + f(tq[0]) + " " + f(tq[1]) + ')">' + o.timmy.g + "</g>" }); }
+    if (o.timmy && o.timmy.g){ var tp = plot[o.timmy.at] || plot.door, tq = P(tp[0], tp[1], tp[2] || 0); items.push({ z: timmyZ(Lo, tp), s: '<g class="tp-timmy" transform="translate(' + f(tq[0]) + " " + f(tq[1]) + ')">' + o.timmy.g + "</g>" }); }
     items.sort(function(a, b){ return a.z - b.z; });
     s += '<g class="tp-depth">' + items.map(function(x){ return '<g class="tp-d" data-z="' + f(x.z) + '">' + x.s + "</g>"; }).join("") + "</g>";
     s += sc.fg(so);
-    if (H === "winter") s += holidaySky("winter");
+    if (H === "winter" && !wet) s += holidaySky("winter");
     s += '<rect class="tp-grade" x="0" y="0" width="400" height="300" fill="' + sc.grade[0] + '" opacity="' + sc.grade[1] + '"/>';
     if (night) s += '<rect class="tp-night" x="0" y="0" width="400" height="300" fill="' + NIGHT + '" opacity=".26"/>' + G("tp-lights", lights);
     var slots = {};
@@ -2493,7 +2515,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
      { k, homes, scenes, yard, outfits }, each keyed by the piece's shop id. Its name, rarity and price come from SETS
      (tools/figures/site/sets.mjs, the one list the catalog and the art share), so they can't drift. */
   var TOOLS = { INK: INK, K: K, U: U, SW: SW, P: P, D: D, D2: D2, f: f, RX: RX, RY: RY, rng: rng, F: F, O: O, L: L, FO: FO, HI: HI, G: G, T: T, circ: circ, ell: ell, seg: seg, at: at,
-    box: box, cyl: cyl, cone: cone, dome: dome, lumps: lumps, canopy: canopy, onY: onY, onX: onX, rectUV: rectUV, archUV: archUV, arcPts: arcPts, bands: bands, sun: sun, moon: moon, cloud: cloud,
+    box: box, cyl: cyl, cone: cone, spinner: spinner, dome: dome, lumps: lumps, canopy: canopy, onY: onY, onX: onX, rectUV: rectUV, archUV: archUV, arcPts: arcPts, bands: bands, sun: sun, moon: moon, cloud: cloud,
     starField: starField, dmStar: dmStar, pine: pine, scatter: scatter, trace: trace, landD: landD, win: win, porthole: porthole, doorArch: doorArch, roundDoor: roundDoor, flagOn: flagOn,
     tinyTooth: tinyTooth, glowAt: glowAt, smoke: smoke, tuft: tuft, flower: flower, stemLeaf: stemLeaf, daisyOn: daisyOn, tulip: tulip, sunflower: sunflower, mintBall: mintBall,
     snowSlope: snowSlope, snowDome: snowDome, backSlope: backSlope, firefly: firefly, crystal: crystal, fern: fern, PAINTS: PAINTS, BOLD: BOLD, HILL_TOP: HILL_TOP, hillScene: hillScene,
@@ -2512,6 +2534,9 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
      starts with none and each set's file (widget/hub-art/place/<set>.js) calls addPack when it is fetched, so a place
      only loads the sets it shows. SET_INFO names every set piece before its drawing is here (setOf, below). */
   var PACKED = {};
+  /* a yard piece's move: what moves while its egg plays, beyond its bits (.tp-eb): { "": the whole piece's animation,
+     ".tp-spin": its turning parts' (spinner), any other class inside it: that part's }. A rover rolls, a wheel turns. */
+  var EGG_MOVE = {};
   function addPack(pack){
     var got = pack(TOOLS); PACKED[got.k] = true;
     [["homes", HOMES], ["scenes", SCENES], ["yard", YARD], ["outfits", OUTFITS]].forEach(function(pair){
@@ -2524,7 +2549,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
         /* an outfit with its own eyewear, or one that covers his face, says so (noLoupes) and the loupes stay off */
         if (pair[0] === "outfits" && x.noLoupes && NO_LOUPES.indexOf(id) < 0) NO_LOUPES.push(id);
         pair[1][id] = x; SET_OF[id] = x.set;
-        if (pair[0] === "yard"){ EGGS[id] = x.egg || { n: x.n, does: "a little wobble", say: "" }; if (x.bits) EGG_ANIM[id] = x.anim || "tp-pop 2.2s"; }
+        if (pair[0] === "yard"){ EGGS[id] = x.egg || { n: x.n, does: "a little wobble", say: "" }; if (x.bits) EGG_ANIM[id] = x.anim || "tp-pop 2.2s"; if (x.move) EGG_MOVE[id] = x.move; }
       });
     });
   }
@@ -2535,6 +2560,10 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
      and an egg shows its bits without moving. */
   /* an egg's bits play by its own rule: a set fetched late (addPack) adds its rules to CSS, or its eggs would stay hidden */
   function eggRule(k){ return "[data-egg='" + k + "'].tp-on .tp-eb{animation:" + EGG_ANIM[k] + " both}"; }
+  function moveRule(k){ var m = EGG_MOVE[k]; return Object.keys(m).map(function(sel){ return "[data-egg='" + k + "'].tp-on" + (sel ? " " + sel : "") + "{animation:" + m[sel] + "}"; }).join(""); }
+  /* the yard's +x on the picture, for a piece that rolls along it (tp-rove) */
+  var XA = (function(){ var a = P(1, 0, 0), o = P(0, 0, 0); return [a[0] - o[0], a[1] - o[1]]; })();
+  function along(k){ return "translate(" + f(XA[0] * k) + "px," + f(XA[1] * k) + "px)"; }
   var CSS = [
     ".tp-scene{display:block;width:100%;height:auto}.tp-thumb,.tp-burst{display:block;width:100%;height:100%}",
     ".tp-grade,.tp-night,.tp-lights,.tp-eb,.tp-mark{pointer-events:none}.tp-egg{cursor:pointer;transform-box:fill-box;transform-origin:50% 100%}.tp-eb{opacity:0}",
@@ -2579,6 +2608,10 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     "@keyframes tp-flutter{0%,100%{transform:rotate(-14deg)}50%{transform:rotate(16deg)}}",
     BOING.map(function(k){ return "[data-egg='" + k + "'].tp-on"; }).join(",") + "{animation:tp-boing .8s ease}",
     Object.keys(EGG_ANIM).map(eggRule).join(""),
+    ".tp-spin{transform-box:fill-box;transform-origin:50% 50%}",
+    "@keyframes tp-rove{0%,100%{transform:none}40%,52%{transform:" + along(.9) + "}86%{transform:" + along(-.25) + "}}",
+    "@keyframes tp-aim{0%,60%,100%{transform:none}20%{transform:rotate(-13deg)}42%{transform:rotate(7deg)}}",
+    Object.keys(EGG_MOVE).map(moveRule).join(""),
     "[data-egg='rabbit'].tp-on .tp-eo{transform-box:fill-box;transform-origin:50% 100%;animation:tp-burrow 1.8s ease}[data-egg='crab'].tp-on .tp-eo{animation:tp-scuttle 1.6s ease}",
     "[data-egg='owl'].tp-on .tp-owlhead{transform-box:fill-box;transform-origin:50% 100%;animation:tp-turn 1.6s ease}[data-egg='owl'].tp-on .tp-owlhead .tp-eb{animation:tp-blink 1.6s}[data-egg='balloon'].tp-on .tp-eo{animation:tp-rise2 3s ease-in-out}",
     "[data-egg='brush'].tp-on{animation:tp-wiggle .9s ease}[data-egg='tree'].tp-on{transform-origin:50% 100%;animation:tp-shake .8s ease}[data-egg='lane'].tp-on .tp-ball{animation:tp-roll 1.4s ease-in both}[data-egg='lane'].tp-on .tp-pins{transform-box:fill-box;transform-origin:50% 100%;animation:tp-tip 1.4s ease both}",
@@ -2655,7 +2688,7 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
   };
   var API = {
     HEALTH: HEALTH, healthFor: healthFor,
-    VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout,
+    VIEWBOX: VB, CARD: CARD, CSS: CSS, render: render, MEDALS: ["", "Bronze", "Silver", "Gold", "Crown"], route: route, project: P, layout: layout, timmyZ: timmyZ,
     onLand: function(scene, x, y){ var q = P(x, y, 0); return sceneOn(SCENES[scene] || SCENES.hill, q[0], q[1]); }, unproject: unP, N: N, S: S, FIX: FIX, SLOT_AT: SLOTS,
     HOMES: meta(HOMES, FIELDS.homes),
     SCENES: meta(SCENES, FIELDS.scenes),
@@ -2672,10 +2705,11 @@ window.SH_PLACE = (function placeKit(INK, C, PACKS, SETS){
     collOf: function(id){ return SET_INFO[id] && SET_INFO[id].coll ? SET_INFO[id].set : ""; },
     hasPack: function(k){ return !!PACKED[k]; },
     addPack: function(pack){
-      var had = {}, k; for (k in EGG_ANIM) had[k] = 1;
+      var had = {}, hadM = {}, k; for (k in EGG_ANIM) had[k] = 1; for (k in EGG_MOVE) hadM[k] = 1;
       addPack(pack); lists();
-      var more = Object.keys(EGG_ANIM).filter(function(id){ return !had[id]; });
+      var more = Object.keys(EGG_ANIM).filter(function(id){ return !had[id]; }), moves = Object.keys(EGG_MOVE).filter(function(id){ return !hadM[id]; });
       if (more.length) API.CSS += "\n" + more.map(eggRule).join("");
+      if (moves.length) API.CSS += "\n" + moves.map(moveRule).join("");
     }
   };
   function lists(){
@@ -8063,7 +8097,18 @@ function pack(T){
   var scenes = {
     "lunar-plains": T.hillScene({
       note: "Gray regolith and craters under a black sky, the Earth hanging over the far crater rims",
-      path: "crystal", treeKind: "crystal", lamp: "post", skirt: "space", grade: ["#B6C3F0", .05],
+      path: "crystal", lamp: "post", skirt: "space", grade: ["#B6C3F0", .05],
+      /* the tree spot: a plain little tree growing under a glass dome on a metal ring (nothing grows outside on the
+         moon); tapped, it shakes and a leaf comes down inside the glass */
+      tree: function(b, o){
+        var n = o.night, x = b[0], y = b[1], s = "", lf = n ? ["#4F8E58", "#3A6E46"] : [K.leaf, K.leafShade];
+        s += ell(x, y, 17, 6, METAL[1], 1.4) + ell(x, y - 1.2, 15, 4.8, n ? "#6F7695" : "#BCB8C8", 1);
+        s += FO("M" + f(x - 2) + " " + f(y - 1) + " q1 -9 -1 -18 l5 0 q-2 9 -1 18 q-1.6 1 -3 0 z", K.wood, 1.3);
+        s += T.canopy(x - 5, y - 22, 8, lf, 61) + T.canopy(x + 5, y - 23, 7.5, lf, 62) + T.canopy(x, y - 30, 8.5, lf, 63);
+        s += F("M" + f(x - 15) + " " + f(y - 1) + " a15 40 0 0 1 30 0 a15 4.8 0 0 1 -30 0 z", "#CFE8FF", .22);
+        s += L("M" + f(x - 15) + " " + f(y - 1) + " a15 40 0 0 1 30 0", 1.4, INK, .85) + L("M" + f(x - 9) + " " + f(y - 22) + " q2 -12 9 -15", 1.6, "#FFFFFF", .7);
+        return { s: s, bits: G("tp-drop", '<path d="M' + f(x + 4) + " " + f(y - 22) + ' q2.6 -3.2 5.2 0 q-2.6 3.2 -5.2 0z" fill="' + lf[0] + '" stroke="' + INK + '" stroke-width=".6"/>') };
+      },
       ground: function(o){ return o.snow ? ["#F4F6FA", "#E6EBF2", "#D3DCE8", "#B4C2D6"] : o.night ? ["#9DA4C0", "#9098B5", "#8088A6", "#636B8B"] : ["#DEDCE3", "#D1CED9", "#BCB8C8", "#9591A8"]; },
       sky: function(o){
         var s = T.bands(o.night ? ["#05060F", "#080A18", "#0C0F21", "#11152B"] : ["#07080F", "#0B0D17", "#10121F", "#161928"], 0, 300);
@@ -8113,7 +8158,10 @@ function pack(T){
   function wheel(x, y, zc, R, wd){
     var rim = ring([x, y + wd, zc], [1, 0, 0], [0, 0, 1], R, 0, 360, 20), hub = ring([x, y + wd + .01, zc], [1, 0, 0], [0, 0, 1], R * .42, 0, 360, 14), s = tube("y", y, y + wd, x, zc, R, ["#4A5060", "#363B48", 1.4]);
     s += FO(D(rim), "#5E6575", 1.3);
-    for (var a = 0; a < 360; a += 30){ var q0 = P(x + Math.cos(a * DEG) * R * .78, y + wd, zc + Math.sin(a * DEG) * R * .78), q1 = P(x + Math.cos(a * DEG) * R, y + wd, zc + Math.sin(a * DEG) * R); s += L(T.seg(q0, q1), 1, "#2B2F3A", .8); }
+    /* the tread marks turn with the wheel while the egg plays (T.spinner) */
+    var tr = "";
+    for (var a = 0; a < 360; a += 30){ var ca = Math.cos(a * DEG) * R, sa = Math.sin(a * DEG) * R; tr += "M" + f(ca * .78) + " " + f(sa * .78) + " L" + f(ca) + " " + f(sa) + " "; }
+    s += T.spinner([x, y + wd, zc], [1, 0, 0], [0, 0, 1], L(tr, 1, "#2B2F3A", .8));
     return s + FO(D(hub), METAL[0], 1.1);
   }
   var ROVER = { x0: .7, x1: 2.95, y0: 1.2, y1: 2.45, z0: .78, z1: 1.22 };
@@ -8121,7 +8169,8 @@ function pack(T){
   var yard = {
     "moon-rover": {
       note: "A six-wheeled rover with a camera mast, a solar deck and a little dish", spot: [3.3, 3.45],
-      egg: { n: "The moon rover", does: "its wheels spin up moon dust and its beacon blinks", say: "Beep beep! Six wheels, zero cavities. It's out collecting samples, like a good checkup." }, anim: "tp-pop 2.4s",
+      egg: { n: "The moon rover", does: "it rolls out and back, its wheels spinning up moon dust, and its beacon blinks", say: "Beep beep! Six wheels, zero cavities. It's out collecting samples, like a good checkup." }, anim: "tp-pop 2.4s",
+      move: { "": "tp-rove 2.4s ease-in-out", ".tp-spin": "tp-spin .8s linear 3" },
       draw: function(o){
         var V = ROVER, s = ell.apply(null, P(1.85, 1.95, 0).concat([30, 10, "#141824", 0, .16])), i;
         /* the far wheels, then the body, then the near wheels and their rocker arms */
@@ -8157,7 +8206,8 @@ function pack(T){
     },
     "satellite-dish": {
       note: "A radio dish on a tripod, pointed up at the stars", spot: [3.35, 3.4],
-      egg: { n: "The satellite dish", does: "it beams a signal up: rings pulse out of the dish", say: "Calling Earth! Message: brush twice a day. Over." }, anim: "tp-pop 2.6s",
+      egg: { n: "The satellite dish", does: "it swings round to aim and beams a signal up: rings pulse out of the dish", say: "Calling Earth! Message: brush twice a day. Over." }, anim: "tp-pop 2.6s",
+      move: { ".tp-aim": "tp-aim 2.6s ease-in-out" },
       draw: function(o){ return dish(o, false); },
       lights: function(){ var fq = dishGeo().fq; return circ(fq[0], fq[1], 8, "#FF6B6B", 0).replace("/>", ' opacity=".3"/>'); },
       bits: function(){
@@ -8208,6 +8258,8 @@ function pack(T){
     s += leg(90);
     s += cyl(1.8, 1.85, .7, .24, 1.75, .2, METAL[0], METAL[1], METAL[0], { sw: 1.5, si: .9 });
     s += box(1.6, 1.65, 1.72, .4, .4, .3, { top: METAL[0], left: METAL[1], right: METAL[2] }, { sw: 1.3, si: .8 });
+    /* from the mount up turns together while the egg plays (.tp-aim): the dish swings round to aim */
+    var pre = s; s = "";
     s += L(D([[1.8, 1.85, 1.95], [g.c[0], g.c[1], g.c[2] - .1]], true), 4.4) + L(D([[1.8, 1.85, 1.95], [g.c[0], g.c[1], g.c[2] - .1]], true), 2.4, METAL[0]);
     /* the bowl: its back shell, then the dish face, with the shade its rim throws inside */
     var rim = ring(g.c, g.a, g.b, g.R, 0, 360, 32), back = [g.c[0] - g.n[0] * .55, g.c[1] - g.n[1] * .55, g.c[2] - g.n[2] * .55];
@@ -8221,7 +8273,8 @@ function pack(T){
     /* the feed on its three struts, a light on its tip */
     [30, 150, 270].forEach(function(t){ var ca = Math.cos(t * DEG) * g.R * .9, sa = Math.sin(t * DEG) * g.R * .9, q = [g.c[0] + ca * g.a[0] + sa * g.b[0], g.c[1] + ca * g.a[1] + sa * g.b[1], g.c[2] + ca * g.a[2] + sa * g.b[2]]; s += L(D([q, g.fz], true), 2.4) + L(D([q, g.fz], true), 1, METAL[0]); });
     s += circ(g.fq[0], g.fq[1] + 1, 2.8, METAL[1], 1.2) + beacon(g.fq[0], g.fq[1] - 2.4, 2);
-    return s;
+    var mt = P(1.8, 1.85, 1.95);
+    return pre + '<g class="tp-aim" style="transform-origin:' + f(mt[0]) + "px " + f(mt[1]) + 'px">' + s + "</g>";
   }
   /* the rocket on its pad, and the gantry beside it */
   var RK = { x: 1.95, y: 2.0, r: .5, z0: 1.05, z1: 4.0, z2: 5.6 }, GT = { x: 1.65, y: .1, w: .62, h: 5.0 };
@@ -8548,7 +8601,19 @@ function pack(T){
   var scenes = {
     "sunlit-reef": T.hillScene({
       note: "The sunlit seafloor: rippled sand, coral heads and kelp, a turtle far off and light slanting down from the surface",
-      path: "stones", treeKind: "crystal", lamp: "lantern", skirt: "sand", grade: ["#3FC4D8", .07],
+      path: "stones", lamp: "lantern", skirt: "sand", grade: ["#3FC4D8", .07], noSnow: true,
+      /* the tree spot: a tall branching coral with a sea fan behind it and kelp at its foot; tapped, it shakes and a
+         little starfish tumbles off */
+      tree: function(b, o){
+        var n = o.night, x = b[0], y = b[1], s = "";
+        s += seafan(x + 7, y - 2, 1.25, n ? ["#7A4E86", "#5E3A6A"] : ["#B98AE0", "#8E5EC0"]);
+        s += kelp(x - 9, y + 1, 40, 4, n ? ["#2E5E4E", "#24503F"] : ["#86B86A", "#5E9444"], 11);
+        var c = n ? "#B0607A" : "#F27A8A";
+        s += tube("M" + f(x) + " " + f(y) + " q1 -14 -2 -26 M" + f(x - 1) + " " + f(y - 12) + " q-9 -4 -12 -16 M" + f(x - 2) + " " + f(y - 24) + " q-6 -6 -5 -16 M" + f(x - 1) + " " + f(y - 22) + " q7 -8 13 -10 M" + f(x + 11) + " " + f(y - 32) + " q2 -6 0 -11 M" + f(x - 11) + " " + f(y - 27) + " q-3 -5 -2 -10", 3.4, c);
+        [[0, -27], [-5, -40], [13, -43], [-13, -37], [-12, -28]].forEach(function(q){ s += circ(x + q[0], y + q[1], 1.9, n ? "#D98AA0" : "#FFC2C9", .9); });
+        s += brain(x + 4, y + 2, .7, n);
+        return { s: s, bits: G("tp-drop", starfish(x - 8, y - 30, 3, 20, n ? "#B07A6A" : "#F59A3A", null, .7)) };
+      },
       ground: function(o){ return o.snow ? SNOW : o.night ? NSAND : SAND; },
       sky: function(o){
         var s;
@@ -9139,8 +9204,9 @@ function pack(T){
   function wagonWheel(cx, y, r, o, spin){
     var hubC = P(cx, y, r), s = "", i, rim = yRing(cx, y, r, r * .9, 24), tire = yRing(cx, y, r, r, 24);
     s += L(D(tire), 4.6) + L(D(tire), 2.6, "#5A5560") + L(D(rim), 2.6, o.night ? "#8A6A4E" : K.wood);
-    var sp = ""; for (i = 0; i < 12; i++){ var a = (i * 30 + (spin || 0)) * Math.PI / 180, e = [cx + Math.cos(a) * r * .86, y, r + Math.sin(a) * r * .86], b = [cx + Math.cos(a) * r * .16, y, r + Math.sin(a) * r * .16]; sp += seg(P(b[0], b[1], b[2]), P(e[0], e[1], e[2])) + " "; }
-    s += L(sp, 1.9) + L(sp, .8, o.night ? "#B9926A" : K.woodLight);
+    /* the spokes, drawn in the wheel's own plane so they turn while the egg plays (T.spinner) */
+    var sp = ""; for (i = 0; i < 12; i++){ var a = (i * 30 + (spin || 0)) * Math.PI / 180, ca = Math.cos(a) * r, sa = Math.sin(a) * r; sp += "M" + f(ca * .16) + " " + f(sa * .16) + " L" + f(ca * .86) + " " + f(sa * .86) + " "; }
+    s += T.spinner([cx, y, r], [1, 0, 0], [0, 0, 1], L(sp, 1.9) + L(sp, .8, o.night ? "#B9926A" : K.woodLight));
     s += ell(hubC[0], hubC[1], 3, 3.2, o.night ? "#8A6A4E" : K.wood, 1.2) + circ(hubC[0] + .3, hubC[1], 1.1, "#5A5560");
     return s;
   }
@@ -9178,6 +9244,7 @@ function pack(T){
     "windmill-pump": {
       note: "A farm windmill on its lattice tower, pumping water into a round stock tank", spot: [3.4, 3.45],
       egg: { n: "The windmill", does: "the wind picks up: the wheel spins and water splashes into the tank", say: "Whoosh! Wind brings the water up from deep underground. Best drink there is for teeth." }, anim: "tp-pop 2.2s",
+      move: { ".tp-spin": "tp-spin .55s linear 4" },
       draw: function(o){
         var s = ell.apply(null, P(1.9, 1.95, 0).concat([30, 11, "#1B2A3A", 0, .1])), cx = WM.c[0], cy = WM.c[1], zt = WM.top, i;
         var hw = function(z){ return .86 - (.86 - .2) * z / zt; }, leg = function(sx, sy, z){ var k = hw(z); return [cx + sx * k, cy + sy * k, z]; };
@@ -9213,12 +9280,13 @@ function pack(T){
         s += box(cx - .32, cy - .32, zt, .64, .64, .08, WOOD, { sw: 1.2, si: .7 });
         s += box(cx - .2, cy - .26, zt + .08, .4, .52, .3, { top: "#B6BEC7", left: "#8E98A3", right: "#6E7884" }, { sw: 1.2, si: .7 });
         s += L(D([[cx, cy, hb[2]], hb], true), 3) + L(D([[cx, cy, hb[2]], hb], true), 1.4, "#8E98A3");
-        var R0 = WM.r, ri = .36, bl = "";
+        /* the blades and their rings, drawn in the wheel's own plane so the wheel turns while the egg plays (T.spinner) */
+        var R0 = WM.r, ri = .36, bl = "", lc = function(r, n){ var d = ""; for (var j = 0; j <= n; j++){ var t = j / n * Math.PI * 2; d += (j ? " L" : "M") + f(Math.cos(t) * r) + " " + f(Math.sin(t) * r); } return d; };
         for (i = 0; i < 16; i++){
-          var a = i * 22.5, q = function(r, da){ var t = (a + da) * Math.PI / 180; return wheelPt(Math.cos(t) * r, Math.sin(t) * r); };
-          bl += FO(D([q(ri, -7), q(R0, -9.5), q(R0, 9.5), q(ri, 7)]), i % 2 ? (o.night ? "#9AA4AF" : "#DCE2E8") : (o.night ? "#7E8893" : "#B9C2CC"), .8);
+          var a = i * 22.5, q = function(r, da){ var t = (a + da) * Math.PI / 180; return f(Math.cos(t) * r) + " " + f(Math.sin(t) * r); };
+          bl += FO("M" + q(ri, -7) + " L" + q(R0, -9.5) + " L" + q(R0, 9.5) + " L" + q(ri, 7) + " Z", i % 2 ? (o.night ? "#9AA4AF" : "#DCE2E8") : (o.night ? "#7E8893" : "#B9C2CC"), .8);
         }
-        s += bl + L(D(wheelRing(R0, 32)), 2.8) + L(D(wheelRing(R0, 32)), 1.2, metal) + L(D(wheelRing(ri, 16)), 1.4) + L(D(wheelRing(R0 * .68, 24)), .8, INK, .7);
+        s += T.spinner(WM.hub, [WM.h[0], WM.h[1], 0], [0, 0, 1], bl + L(lc(R0, 32), 2.8) + L(lc(R0, 32), 1.2, metal) + L(lc(ri, 16), 1.4) + L(lc(R0 * .68, 24), .8, INK, .7));
         var hc = P.apply(null, hb); s += circ(hc[0], hc[1], 2.6, "#5E6A76", 1.1) + circ(hc[0] - .6, hc[1] - .6, .8, "#C9D1D9");
         /* the stock tank, galvanized, full of water */
         var tk = [2.78, 2.72], tr = .74, tz = .62, tt = P(tk[0], tk[1], tz);
@@ -9231,11 +9299,8 @@ function pack(T){
       },
       bits: function(){
         var s = "", i;
-        /* the wheel a blur, with speed arcs round it */
-        s += F(D(wheelRing(WM.r * 1.06, 32)), "#EEF2F5", .8) + L(D(wheelRing(WM.r * 1.06, 32)), 1.4, INK, .6);
-        for (i = 0; i < 4; i++) s += L(D(wheelRing(WM.r * (.42 + i * .17), 20, i * 40, i * 40 + 120), true), 1.1, INK, .5);
+        /* the wheel itself turns (move); speed arcs round it */
         s += L(D(wheelRing(WM.r * 1.3, 10, 200, 260), true) + D(wheelRing(WM.r * 1.3, 10, 20, 80), true), 1.6, INK, .8);
-        var hc = P.apply(null, WM.hub); s += circ(hc[0], hc[1], 2.6, "#5E6A76", 1.1);
         /* water pours from the spout and splashes up out of the tank */
         var sp = P(2.34, 2.29, .68), wt = P(2.55, 2.5, .6), tt = P(2.78, 2.72, .62);
         s += L("M" + f(sp[0]) + " " + f(sp[1]) + " Q" + f(sp[0] + 1) + " " + f(sp[1] + 2) + " " + f(wt[0]) + " " + f(wt[1]), 3.4) + L("M" + f(sp[0]) + " " + f(sp[1]) + " Q" + f(sp[0] + 1) + " " + f(sp[1] + 2) + " " + f(wt[0]) + " " + f(wt[1]), 1.8, K.water);
@@ -9246,7 +9311,8 @@ function pack(T){
     },
     "covered-wagon": {
       note: "A wooden wagon with big spoked wheels, a canvas bonnet on its hoops and a water barrel at its side", spot: [3.4, 3.45],
-      egg: { n: "The covered wagon", does: "a wheel turns and the canvas flaps in the wind", say: "Wagons, roll! Pack water and pack floss. That's all you need on the trail." }, anim: "tp-pop 2.2s",
+      egg: { n: "The covered wagon", does: "its wheels turn and the canvas flaps in the wind", say: "Wagons, roll! Pack water and pack floss. That's all you need on the trail." }, anim: "tp-pop 2.2s",
+      move: { ".tp-spin": "tp-spin 1.1s linear 2" },
       draw: function(o){
         var W = WG, s = ell.apply(null, P(1.85, 1.9, 0).concat([31, 11, "#1B2A3A", 0, .1])), i, cv = o.night ? ["#D9D3C6", "#B8B0A0"] : ["#FFFDF6", "#E8E0CE"];
         /* the far wheels and the tongue, under the bed */
@@ -9289,8 +9355,7 @@ function pack(T){
       },
       bits: function(o){
         var W = WG, c = P(W.rw[0], W.yn, W.rw[1]), s = "", i;
-        /* the back wheel turns: a blur of spokes and two arcs to show which way */
-        s += F(D(yRing(W.rw[0], W.yn, W.rw[1], W.rw[1] * .86, 24)), "#E2B887", .75) + wagonWheel(W.rw[0], W.yn, W.rw[1], o || {}, 15);
+        /* the wheels turn (move): two arcs by the back one to show which way */
         s += L(D(yRing(W.rw[0], W.yn, W.rw[1], W.rw[1] * 1.25, 10, 100, 160), true) + D(yRing(W.rw[0], W.yn, W.rw[1], W.rw[1] * 1.25, 10, 280, 340), true), 1.6, INK, .8);
         /* the canvas flaps at the back, and the wind blows past */
         var top = P(3.36, W.yc, W.zt + W.rz * .95), lw = P(3.32, W.yc + .55, W.zt + .4);

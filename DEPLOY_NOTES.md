@@ -81,6 +81,21 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   off `vw`/`vh`. Home's Timmy Time card (`widget/hub.css`) is a container: a narrow card drops the minutes from "Listen ·
   52 min", gives the title the full width, and shrinks Timmy at X-Large and XX-Large. `tools/ci/smoke.js` opens the shop, an
   item and Ask Timmy at 320 px XX-Large and 375 px X-Large. Also retested BUG-184 to BUG-188, BUG-168, BUG-126 and BUG-009 (done).
+- **2026-11-19 (Timmy's place fixes: the front yard, the kit niceties, visiting from a hub's boards, Claude Code)** — Three
+  inbox lines. **Front yard**: Timmy at the door is drawn over a tall piece in the front slot (Sam: "draw Timmy on top"):
+  `layout()` in `tools/figures/site/place.mjs` keeps the front piece's depth (`frontZ`) and `timmyZ(layout, p)`, used by
+  `render()` and by `widget/place.js`'s hops, lifts him over it within 1.3 of the door spot on the ground. **Kit
+  niceties**: a yard piece's `move` ({ "": the whole piece, ".tp-spin" or another class: a part }) plays while its egg
+  does, and `T.spinner(c, u, v, inner)` draws a part in its own plane under a matrix so a CSS rotate turns it like a real
+  wheel (`vector-effect` keeps the strokes): the moon rover rolls out and back with its wheels turning, the satellite dish
+  swings to aim, the windmill's wheel and the wagon's wheels turn (their blurs are gone). A scene's own `tree(b, o)`
+  replaces `treeKind`: the reef has a coral tree, the lunar plains a plain tree under a glass dome (the night sky keeps its
+  crystal tree). `noSnow` on the reef: no snow, snowfall or snowman there in the winter holidays (the lights stay).
+  **Visiting from a hub**: `window.shVisitPlace(key)` in `widget/hub-timmy.js` (get_place, then `shPlace.open({ place })`,
+  the day's visit bonus through `claim_visit_v2`), and every `button[data-sh-visit]` on a hub's page opens its `data-key`'s
+  place; Perio's and Heme & Endo Exam 3's arcades (`content/arcade.js`) read `get_arcade_leaderboard_v2` (the old call when
+  it's missing) and draw a classmate's name as that button. The inbox line said the boards were in `widget/v3.js`'s panel;
+  that panel has no leaderboards any more, and a hub's own boards are its arcade's.
 - **2026-11-19 (The database pass's phase 2 applied live, Claude Code)** — Sam, at noon the day before Heme & Endo Exam 3: "the hubs are quiet right now. go ahead and run the migrations you were waiting on" (4 people on, 2 answers in 10 minutes). Through the connector, one call at a time, 12:10-12:13 pm Central: `migration_v79.sql` (the awards' running totals; no total off from its sum, the three most active students' balances the same), `migration_v80.sql` (`answer_xp` once an answer), `migration_v81.sql` (`drop index concurrently`, then `cluster` of `activity_visits` and `xp_seen`: **the database 349 → 323 MB**, `xp_seen` 53 → 31 MB) and `migration_v82.sql` (`get_class_numbers`, `record_analytics`, `shop_days` with its hourly pg_cron job, the lighter bootstrap, `get_my_answers`, `anon_name`). Every live body md5-checked against its file before and after; no request failed in the edge logs, and the pages took the two new calls within a minute. All four are in `supabase/schema.sql`; `supabase/pending-migrations.txt` lists none. Nothing students see changes. [The task note](vault/tasks/2026-11-18-database-optimization-pass.md) has the numbers.
 - **2026-11-19 (Large text on a phone: BUG-184 to BUG-188, Claude Code)** — The text-size setting zooms `<html>`, and inside a zoomed page
   `100vw` and `100vh` are bigger than the screen, so four pop-ups sized that way ran off it at X-Large and XX-Large. The dashboard's More menu is

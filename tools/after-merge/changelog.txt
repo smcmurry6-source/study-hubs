@@ -69,4 +69,6 @@ all | At the larger text sizes on a phone, the dashboard's More menu, Settings, 
 all | Bonuses on the dashboard (visiting a classmate's Timmy, your leaderboard name, a new trophy) now come up on the same gold reward card as in the hubs, with the XP and crowns counting up.
 heme-endo-exam3 | Dr. Herr's study guide is now less than half as long and higher yield: under each item, what the professor said about it in class, a short Know this list and one line of traps; each lecture adds what else was stressed in class and what was said not to be needed. A fresh recording goes with it.
 all | At the larger text sizes, Timmy's Shop, Ask Timmy, the guided tour and the bowling card now fit on the screen with their Close buttons in reach. And on a laptop, the Listen button on Home's Timmy Time card no longer covers Timmy.
+perio | In the arcade, tap a classmate's name on a class board to visit their Timmy's place.
+heme-endo-exam3 | In the arcade, tap a classmate's name on a class board to visit their Timmy's place.
 heme-endo-exam3 | High likelihood now marks fewer questions (284 instead of 410): only the ones on what Dr. Herr's study guide or a professor's hint points at. Every other question is still in the bank. High yield is shorter to match, with its recordings made again.
