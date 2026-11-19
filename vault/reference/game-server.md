@@ -50,8 +50,8 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   self-graded cards a flat 2; **every right answer pays** (migration_v68, Sam 2026-11-17: "Every right answer should give
   xp"; graded from its key, a retired question's too, never past the guardrails below), and a question pays its first three
   wrong answers each Central day (a self-graded miss: its first three answers); +20
-  for a day studied (as today); +30 at the day's 20th answer; +5 for a question missed the last time before today and right
-  today (once per question); +50 for a mock with 10 or more answers (once per hub per day); +50 for an arcade game finished 20
+  for a day studied (as today); +30 at the day's 20th answer (the +5 for a question missed the last time before today and
+  right today, "A miss fixed", was taken out by migration_v78, Sam 2026-11-19; those already paid stay); +50 for a mock with 10 or more answers (once per hub per day); +50 for an arcade game finished 20
   seconds or more after it started (once per game per day); 10 a minute of a Timmy Time episode heard for the first time
   and +100 at 90% of its minutes; +100 to the sender when Sam resolves a report as Fixed (`admin_resolve_report_v2`; "No change
   needed" pays nothing); +1,000 for a survey answered (500 until migration_v61 raised it, with a top-up for those paid 500) (once per survey) and for the first exam check-in for each hub and exam
@@ -76,8 +76,8 @@ the home of the details: read `migration_v54.sql` (its sections are numbered as 
   crowns (3 hours, Uncommon) since v62, priced against how fast crowns come (a median study day, about 95). Medal, report, survey and check-in awards aren't boosted; answers, the day's bonuses, mocks and games are.
 - **Every award is a row** (`xp_awards`, unique per visitor and key), and `answer_xp` keeps each v2 answer's request id and
   result, so a replayed call returns the first result and pays nothing, and another visitor reusing the request id is
-  refused. `sh_xp_replay` works out the answer, 20th-answer and fix awards from the answers alone, so `sh_xp_rebuild` (Link my
-  devices) pays exactly what the live calls paid; mocks, medals, minutes, games and reports keep their rows and are deduped by
+  refused. `sh_xp_replay` works out the answer and 20th-answer awards from the answers alone, so `sh_xp_rebuild` (Link my
+  devices) pays exactly what the live calls paid; the "A miss fixed" rows paid before migration_v78 stay as they are; mocks, medals, minutes, games and reports keep their rows and are deduped by
   key when two devices merge.
 - XP itself (`xp_visitors.xp`) is today's capped XP for the answers recorded the old way plus the sum of the award rows.
 
@@ -420,7 +420,7 @@ it as `sh:crowns` (the hub's meters and a gold "+n crowns" pop, the dashboard's 
   `nuke:<run>:<n>` 10,000 once. `alltime` pays 20,000 once per run when it passes the class's record (`game_records`
   `run`, seeded from `correct_streaks`) and the record is over 100. `streak:<start>:<days>` pays 100/300/700/1,500/3,000/
   5,000 at 3/7/14/30/60/100 days of `xp_days`, on the day's first answer.
-- **The rebuild keeps them**: `sh_xp_rebuild` replays only answers, goals and fixes; prize rows stay. Link my devices
+- **The rebuild keeps them**: `sh_xp_rebuild` replays only answers and goals; prize rows (and the old fix rows) stay. Link my devices
   copies them like any award row (a key already paid on the other device is skipped).
 
 ## Collections (migration_v75)
