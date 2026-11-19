@@ -486,7 +486,7 @@ function lint(hub, A){
   });
   if (!LIKELY_EXEMPT.has(hub)) {
     const T = A.LIKELY_TOPICS;
-    if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from perio)`);
+    if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from heme-endo-exam3)`);
     else {
       const byId = new Map(Q.map(q => [q.id, q]));
       T.forEach(t => (t.ids || []).forEach(id => { const q = byId.get(id);

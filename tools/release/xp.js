@@ -146,26 +146,35 @@ try {
   eq(ans('xp-V', 'v1', { hub: 'xv', choice: 3, v: 'unknown-v', at: 20 }).correct, true, 'an unknown version falls back to the current key');
   const ret = ans('xp-V', 'v2', { hub: 'xv', choice: 0, at: 30, claim: false });
   ok(ret.kind === 'one' && ret.correct === true && ret.xp > 0, `a retired id that still has its key is graded from it and pays (migration_v68; ${JSON.stringify(ret)})`);
-  // the real Perio bank through tools/xp/keys.js (Occlusion's until its page came down, 2026-11-19)
-  const occ = KEYS.keys('perio');
-  const loaded = anonJson(`admin_load_question_keys(${S}, 'perio', ${q(JSON.stringify(occ))}::jsonb, true)`);
-  ok(loaded.loaded === occ.filter(k => !k.retired).length && loaded.keys === loaded.loaded, `Perio's ${loaded.loaded} keys load from its content JSON (${JSON.stringify(loaded)})`);
-  const oq = JSON.parse(fs.readFileSync(path.join(ROOT, 'hubs/perio/content/questions.json'), 'utf8'));
+  // a real bank through tools/xp/keys.js: the first hub on the engine that has one (Heme & Endo Exam 3's in 2026-11; Occlusion's,
+  // then Perio's, until their pages came down, 2026-11-19), so the suite outlives any one hub's page. Its multiple choice and
+  // select-all come from the bank; an ordering and a matching item are made up here (Heme & Endo Exam 3 has neither), through
+  // the same keyFor()
+  const BANK_HUB = fs.readdirSync(path.join(ROOT, 'hubs')).sort().reverse().find(h => fs.existsSync(path.join(ROOT, 'hubs', h, 'content/questions.json')));
+  if (!BANK_HUB) throw new Error('no hub on the engine has a content/questions.json for the keys test');
+  const madeUp = [
+    { id: 'xp-seq', lec: 'x', type: 'sequence', stem: 'Put these in order.', steps: ['First', 'Second', 'Third', 'Fourth'], ex: 'E' },
+    { id: 'xp-match', lec: 'x', type: 'match', stem: 'Match each.', pairs: [['a', '1'], ['b', '2'], ['c', '3'], ['d', '4']], ex: 'E' },
+  ];
+  const occ = KEYS.keys(BANK_HUB).concat(madeUp.map(KEYS.keyFor));
+  const loaded = anonJson(`admin_load_question_keys(${S}, ${q(BANK_HUB)}, ${q(JSON.stringify(occ))}::jsonb, true)`);
+  ok(loaded.loaded === occ.filter(k => !k.retired).length && loaded.keys === loaded.loaded, `${BANK_HUB}'s ${loaded.loaded} keys load from its content JSON (${JSON.stringify(loaded)})`);
+  const oq = JSON.parse(fs.readFileSync(path.join(ROOT, 'hubs', BANK_HUB, 'content/questions.json'), 'utf8')).concat(madeUp);
   const om = oq.find(x => x.type === 'mcq'), omu = oq.find(x => x.type === 'multi'), os = oq.find(x => x.type === 'sequence');
-  eq(ans('xp-O', om.id, { hub: 'perio', choice: om.answer, v: KEYS.fp(KEYS.exported(om)), at: 0 }).xp, 10, 'an Perio question answered right with its version: 10 XP');
-  eq(ans('xp-O', omu.id, { hub: 'perio', picks: omu.correct.slice().reverse(), at: 10 }).correct, true, 'an Perio select-all answered right in any order');
-  eq(ans('xp-O', os.id, { hub: 'perio', picks: os.steps.map((s, i) => i), at: 20 }).correct, true, 'an Perio sequence in its right order');
-  eq(ans('xp-O', os.id, { hub: 'perio', picks: os.steps.map((s, i) => i).reverse(), at: 30 }).correct, false, 'an Perio sequence out of order');
+  eq(ans('xp-O', om.id, { hub: BANK_HUB, choice: om.answer, v: KEYS.fp(KEYS.exported(om)), at: 0 }).xp, 10, 'a real bank\'s question answered right with its version: 10 XP');
+  eq(ans('xp-O', omu.id, { hub: BANK_HUB, picks: omu.correct.slice().reverse(), at: 10 }).correct, true, 'a real bank\'s select-all answered right in any order');
+  eq(ans('xp-O', os.id, { hub: BANK_HUB, picks: os.steps.map((s, i) => i), at: 20 }).correct, true, 'a sequence in its right order');
+  eq(ans('xp-O', os.id, { hub: BANK_HUB, picks: os.steps.map((s, i) => i).reverse(), at: 30 }).correct, false, 'a sequence out of order');
   // a matching item is graded like an order (v64): each row's first pick, row k's own being k
   const omt = oq.find(x => x.type === 'match');
   eq(occ.find(k => k.id === omt.id).kind, 'order', 'tools/xp/keys.js lists a matching item as an order');
   const rowsRight = omt.pairs.map((p, i) => i), rowsWrong = rowsRight.map((v, i) => i === 0 ? 1 : i === 1 ? 0 : v);
-  eq(ans('xp-O', omt.id, { hub: 'perio', picks: rowsRight, at: 40 }).xp, 10, 'an Perio matching item with every row right: 10 XP, not a self-graded 2');
-  const mWrong = ans('xp-O2', omt.id, { hub: 'perio', picks: rowsWrong, claim: true, at: 0 });
+  eq(ans('xp-O', omt.id, { hub: BANK_HUB, picks: rowsRight, at: 40 }).xp, 10, 'a matching item with every row right: 10 XP, not a self-graded 2');
+  const mWrong = ans('xp-O2', omt.id, { hub: BANK_HUB, picks: rowsWrong, claim: true, at: 0 });
   ok(mWrong.correct === false && mWrong.xp === 1, `a matching item with two rows swapped is wrong, whatever the page claims (${JSON.stringify(mWrong)})`);
-  const mOld = ans('xp-O3', omt.id, { hub: 'perio', self: true, claim: true, at: 0 });
+  const mOld = ans('xp-O3', omt.id, { hub: BANK_HUB, self: true, claim: true, at: 0 });
   ok(mOld.correct === true && mOld.kind === 'self' && mOld.xp === 2, `a page cached before v64 (no rows sent) is taken at its word and paid as self graded (${JSON.stringify(mOld)})`);
-  notes.push(`keys: ${loaded.loaded} Perio keys from tools/xp/keys.js, versions, retired ids, matching graded by its rows`);
+  notes.push(`keys: ${loaded.loaded} ${BANK_HUB} keys from tools/xp/keys.js (with a made-up ordering and matching item), versions, retired ids, matching graded by its rows`);
 
   /* ---------- 3b. the class's picks follow the version of the choices (migration_v66) ---------- */
   const picksOf = (hub, qid) => rows(`select choice, picks, v from question_choices where hub = ${q(hub)} and qid = ${q(qid)} order by choice`).map(r => [r.choice, r.picks, r.v]);
@@ -225,7 +234,7 @@ try {
   ok(CV({ ...base, type: 'multi', correct: [2, 0] }) === CV({ ...base, type: 'multi', correct: [0, 2] }) && CV({ id: 's', type: 'sequence', steps: ['a', 'b'] }) === '',
     'keys.js: a select-all\'s version doesn\'t depend on the order of its key; other kinds have none');
   ok(occ.filter(k => k.kind === 'one' || k.kind === 'all').every(k => /^[a-z0-9]{1,40}$/.test(k.cv)) && occ.filter(k => k.kind === 'order' || k.kind === 'self').every(k => !k.cv),
-    'keys.js gives every Perio one-choice and select-all key a version, and no other');
+    'keys.js gives every one-choice and select-all key in the bank a version, and no other');
   notes.push('class picks: stamped with the version of the choices, moved out (and back) when it changes, set aside from before versions, closed past');
 
   /* ---------- 4. answers, the per-question limit and the speed limit ---------- */

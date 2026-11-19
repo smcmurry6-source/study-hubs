@@ -246,7 +246,7 @@ grouped mock counts (`mock.groups`, `mock.likelyOnly`) and a color per lecture.
 
 On its old page since the release: everyone has Timmy (no adoption; he wears the outfit kept on the device or nothing),
 Full Arch is retired, and the dashboard opens it from Past hubs once it archives. No game layer, Ask Timmy, place or shop
-there. **Its audio comes off at its archiving** ([the to-do](../tasks/2026-11-12-audio-off-at-archiving.md)).
+there. **Its audio comes off at its archiving** ([the to-do](../tasks/done/2026-11-12-audio-off-at-archiving.md)).
 
 ## Pending
 

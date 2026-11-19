@@ -5,7 +5,7 @@ tags: [how-to, hubs]
 
 # Build a hub, or add a lecture to one
 
-The checklist for a new hub on the engine (Perio and Heme & Endo Exam 3 are the ones to read: `hubs/perio/`). Every note in `vault/rules/` applies; this note says
+The checklist for a new hub on the engine (Heme & Endo Exam 3 is the one to read: `hubs/heme-endo-exam3/`; Perio's, the first, came down 2026-11-19 and is in git: [its note](../hubs/perio.md)). Every note in `vault/rules/` applies; this note says
 where each piece goes. Adding a lecture to a live hub: the last section.
 
 ## Before you start
@@ -24,7 +24,7 @@ where each piece goes. Adding a lecture to a live hub: the last section.
 Since the redesign's release (2026-11) every hub runs on the shared engine (`widget/hub.js` and its three parts,
 `widget/hub.css`); nobody copies a hub file any more. A hub is **a small page of settings and its content as JSON**.
 
-- **The page**, `hubs/<hub-id>/index.html`: copy `hubs/perio/index.html` and change its words. It holds the head
+- **The page**, `hubs/<hub-id>/index.html`: copy `hubs/heme-endo-exam3/index.html` and change its words. It holds the head
   tags, `window.SH_HUB` (hub id, name, a new state key `<slug>-state-v1` and answered event `<slug>:answered`, the exam,
   and the hub's own wording for Home, Notes, hints, the mock and the arcade), then `widget/hub-art/<hub-id>.js` and
   `widget/hub.bundle.js`. Nothing else goes in the page.

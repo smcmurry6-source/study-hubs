@@ -42,4 +42,4 @@ that sees an archived hub in `size.js`'s list does it too. No need to ask Sam.
 
 Related: [archiving-is-a-retrospective](archiving-is-a-retrospective.md) · [repo map](../reference/repo-map.md) ·
 [shared-infrastructure](../reference/shared-infrastructure.md) · [narrate-with-kokoro](../how-to/narrate-with-kokoro.md) ·
-[the to-do for the next archivings](../tasks/2026-11-12-audio-off-at-archiving.md)
+[the to-do for the archivings through Perio (done)](../tasks/done/2026-11-12-audio-off-at-archiving.md)

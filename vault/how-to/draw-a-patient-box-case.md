@@ -24,8 +24,7 @@ or disagree with each other, and CI runs it on every hub (`node tools/ci/cases.j
    `function refHTML(q){ return window.shCases ? window.shCases.refHTML(q) : ''; }`.
 5. If the case's own box rows should come first, after `QUESTIONS` is built: `window.shCases.foldBox(QUESTIONS, PCASES)`.
 
-Perio, PCD Implants and Occlusion have all of this (Occlusion's `PCASES` is empty: its own case pictures stay in
-`CASE_IMG`). Medical cases with no teeth (Special Patient Care, Heme & Endo) don't use the kit.
+PCD Implants has all of this (Perio and Occlusion did until their pages came down, 2026-11-19: in git, [perio](../hubs/perio.md)). Medical cases with no teeth (Special Patient Care, Heme & Endo) don't use the kit.
 
 ## Writing a case
 

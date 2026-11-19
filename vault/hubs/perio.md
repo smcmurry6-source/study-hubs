@@ -1,14 +1,39 @@
 ---
 type: hub
-tags: [hub, live]
+tags: [hub, archived, removed]
 hub: perio
-status: live
+status: archived
 ---
 
 # Periodontology (perio)
 
 The D2 Periodontology course (DENT 2145), nine sessions with different professors. Midterm Oct 1 (S1-S4, done, check-in
-closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `exams` in `content/core.json`).
+closed); **final Thu Nov 19, cumulative: done** (the class sat it that morning). Dates: its entry in `hubs.js` (and `exams` in
+`content/core.json`).
+
+**Its page came down 2026-11-19**, the afternoon of its final (Sam: "you can take perio down now. merge when ready";
+[decisions](../decisions.md)): `hubs/perio/` (the page, its content JSON, `variants.json` and its images) and
+`assets/og-perio.png` are gone, with its About page entries (its mock's format, Stage & Grade, the A/B wordings, its
+twenty diagrams, its redesign entry and its arcade column), Ask Timmy's 41 test cases for it (`tools/timmy/test-set.json`;
+the dashboard case that pointed at Perio points at Heme & Endo Exam 3), its budget line in `tools/release/budgets.json` and
+its figure build in "Check hubs". So the dashboard doesn't link to a missing page before 10 pm, `hubs.js` archives it at
+1 pm that day (`archiveOn`), and the final's check-in pop-up goes out from 1 pm (`promptHour: 13`: the exam was that
+morning). What stays: its entry in `hubs.js` (no card; its exam check-ins under Past hubs until `debriefDays` runs out),
+`tools/question-ids/perio.txt` so its ids are never reused, its drawn art (`widget/hub-art/perio.js`, `tools/figures/site/`),
+the figure kit in `tools/figures/perio/` (its `build.mjs` has nothing to write to now; `tools/figures/heme-endo-exam3/` was
+copied from it), `tools/podcast/perio/` and the class's data in Supabase. The last version of the page is in git:
+`git log --diff-filter=D -- hubs/perio/index.html` names the commit that removed it, and its parent has everything. The
+tests that used its bank or page use Heme & Endo Exam 3's now (`tools/release/xp.js` grades the newest engine hub's real
+bank, with a made-up ordering and matching item; `tools/release/admin-ui.js`; `tools/ci/quiet.js`). The A/B wordings
+(`variants.json`) were Perio's alone: the engine and the smoke test still handle them, so a hub that gets them again puts
+its entry back on the About page. The notes below describe the hub as it was.
+
+**Archived 2026-11-19.** The retrospective of both exams is in [LESSONS.md](../../LESSONS.md) ("Periodontology" under Hub
+retrospectives, written 2026-11-19 by the lessons audit), and the recap is on the dashboard since that afternoon (featured:
+`q3-S02`). **Its narration and Timmy Time came off the site** with that audit
+([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)): the 28 mp3s and their words files (289 MB),
+and the `podcast`, Listen and Timmy Time out of its `hubs.js` entry; it left `HUBS` in `sw.js` with the page (`VERSION`
+sh-v66). Its later check-ins go into the next audit.
 
 ## Before you work on it
 
@@ -247,9 +272,11 @@ Built as `hubs/perio/next/` beside the old page ([phase 2](../tasks/done/2026-11
 
 ## Pending
 
-- After the final, read question health again (the 2026-11-18 audit checked and left `q7-T08`, `q6-L38`, `q9-L09`, `q9-L26`,
-  `q5-S04`, `q8-03`, `q9-S07`, `q9-L41`, `q7-L27`, `q7-L43`, `q8-P02`, `q9-L38`: their keys match the notes), and reports #55/#56
-  (statements reordered on a retry: Sam said yes 2026-11-18, [inbox](../tasks/inbox.md)).
+Nothing: the page came down 2026-11-19. What follows was pending when it did, kept for the next Perio hub.
+
+- Question health was read after the final (2026-11-19, the retrospective): every possible miskey it flags matches the notes
+  (`q6-L37`, `q5-L43`, `q3-S02`, `q6-N01`, `q6-N03`, `q7-T08`, `q8-T07`, `q9-L38` and the twelve the 11-18 audit read). Reports
+  #55/#56 (statements reordered on a retry) were done in #417.
 - [The visual case engine](../tasks/done/2026-11-04-perio-visual-case-engine.md): the first six cases are in for Sam's
   look; the expansion (every session's Patient Box items as drawn cases, S3 and S4 cases) waits for approval.
 - S9's two sources differ on recession prevalence (the recording vs the slide's 88% / 50%) and on ADM (a slide says

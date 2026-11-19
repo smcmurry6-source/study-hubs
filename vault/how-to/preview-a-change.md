@@ -61,7 +61,7 @@ Sam looks at a change students will see before saying "merge", and doesn't test 
 
 - **When Sam asked for a preview, its link on its own line, first** (Sam, 2026-11-04): `Preview: https://pr-<n>.<project>.pages.dev`,
   copied from the PR's preview comment (or the Preview run's page), then the page and test account to open
-  (`hubs/perio/?persona=missed`). Never send a session's own link instead: a cloud session's preview has no address
+  (`hubs/heme-endo-exam3/?persona=missed`). Never send a session's own link instead: a cloud session's preview has no address
   outside it. If the PR has no link yet (the run hasn't finished, or the host isn't connected), say so.
 - **A screenshot or two** of what changed on a phone (390 px), and a laptop (1280 px) when the layout changed, dark mode
   too when colors changed, at `deviceScaleFactor: 2`. Send them in the chat (`SendUserFile` in Claude Code) and say what

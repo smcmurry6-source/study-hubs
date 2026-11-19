@@ -6,7 +6,7 @@
 //   node tools/preview/serve.js --latency 400        add 400 ms to every response (a slow connection, besides
 //                                                   Chrome DevTools' throttling)
 //   SH_STAGING_URL=https://<ref>.supabase.co SH_STAGING_KEY=sb_publishable_... node tools/preview/serve.js --data staging
-// Open a test account directly: /?persona=missed, /hubs/perio/?persona=high-xp&now=2026-11-19T21:00
+// Open a test account directly: /?persona=missed, /hubs/heme-endo-exam3/?persona=high-xp&now=2026-11-19T21:00
 // Claude Code cloud sessions: run it in the background and call report_preview_port with the port it prints.
 'use strict';
 const http = require('http'), fs = require('fs'), path = require('path'), zlib = require('zlib');
