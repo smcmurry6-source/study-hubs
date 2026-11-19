@@ -1,20 +1,20 @@
 ---
 type: task
-status: open
+status: done
 hub: site
 created: 2026-11-12
 requested-by: Sam
 due: 2026-11-20
-waiting-on: each hub's archiving (dates below)
-agent:
-pr:
+waiting-on: 
+agent: Claude Code
+pr: https://github.com/smcmurry6-source/study-hubs/pull/464
 ---
 
 # Take the audio off the next hubs to be archived
 
 ## Goal
 
-Sam's rule from 2026-11-12, [archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md): an archived hub's
+Sam's rule from 2026-11-12, [archived-hubs-drop-their-audio](../../rules/archived-hubs-drop-their-audio.md): an archived hub's
 narration and Timmy Time come off the site so it stays under GitHub Pages' 1 GB limit. The first five came off on
 2026-11-12 (MSK Exam 3 and 4, PCD Fixed Pros Exam 3, Heme & Endo Exam 1, PCD Implants Exam 1). These four are next, each
 after its date. Do each one on its own (a small PR), with the steps in the rule.
@@ -40,7 +40,7 @@ after its date. Do each one on its own (a small PR), with the steps in the rule.
 
 - 2026-11-12: written with the first five's removal ([#328](https://github.com/smcmurry6-source/study-hubs/pull/328)); sizes are their audio at 64 kbps (narration) and 96 kbps (Timmy Time).
 - 2026-11-12: the three redesigned hubs gained High yield narration (`<lecture>-hy.mp3`,
-  [task](done/2026-11-12-high-yield-narration.md)): Heme & Endo Exam 2, Occlusion and Perio each carry more than the sizes
+  [task](2026-11-12-high-yield-narration.md)): Heme & Endo Exam 2, Occlusion and Perio each carry more than the sizes
   above (`node tools/ci/size.js` lists them). Step 1's `git rm hubs/<hub>/audio/*.mp3` takes those too.
 
 - 2026-11-13: Heme & Endo Exam 2's audio came off with its retrospective (the lessons audit's PR): the narration, High yield and
@@ -55,5 +55,13 @@ after its date. Do each one on its own (a small PR), with the steps in the rule.
 
 ## Outcome
 
-Related: [archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md) ·
-[the High yield narration](done/2026-11-12-high-yield-narration.md), which was waiting for room on the site
+Done 2026-11-19 ([#464](https://github.com/smcmurry6-source/study-hubs/pull/464)): all four hubs named here have their
+narration, High yield recordings and Timmy Time off the site, and the two on the engine are out of `HUBS` in `sw.js` (Occlusion
+`sh-v62`, Perio `sh-v66`). Special Patient Care, Occlusion and Perio have no page at all now. `node tools/ci/size.js` lists
+only Heme & Endo Exam 3, the live hub, among those carrying audio. The site went from 958 MB (2026-11-12) to under 370 MB.
+The next one needs no task: Heme & Endo Exam 3's audio comes off after its exam (2026-11-20) under the standing rule,
+with the lessons audit's retrospective (its skill's step 2b), and so does every hub after it.
+
+
+Related: [archived-hubs-drop-their-audio](../../rules/archived-hubs-drop-their-audio.md) ·
+[the High yield narration](2026-11-12-high-yield-narration.md), which was waiting for room on the site

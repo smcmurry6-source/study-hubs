@@ -77,7 +77,7 @@ task is the one PR that then switches the site over. If something goes wrong, re
       2026-11-12): a `core.json` switch that `widget/hub.js` passes to v3.js as `data-audio="off"` (`startWidget`), and that
       hides the engine's own Timmy Time page and Home card and sends Listen to the device's voice without requesting the
       missing mp3s or word files. Needed before Heme & Endo Exam 2, Occlusion or Perio is archived on the engine
-      ([to-do](../2026-11-12-audio-off-at-archiving.md)). High yield's recordings (`<lecture>-hy.mp3`) come off with the rest;
+      ([to-do](2026-11-12-audio-off-at-archiving.md)). High yield's recordings (`<lecture>-hy.mp3`) come off with the rest;
       the build's `hyAudio` then lists none by itself (`tools/hub-next/build.mjs` checks the files)
       **`"audio": "off"` in `core.json`; the steps are in the rule.**
 - [x] The game layer's wiring left by phase 4, part A (2026-11-12, "From phase 4, part A" below): the arcade's
@@ -1003,7 +1003,7 @@ sitting; the admin secret is typed into the connector by hand and never into a f
    Without it everything else can still go; Ask Timmy answers "can't reach" until it's there. **The key was saved
    2026-11-14, and Sam said no Console limit for now ([decisions](../../decisions.md)), so this step is done.**
 2. Bring `main` in if it moved, and the fast checks. If a hub that is on the engine archived since the PR was opened,
-   nothing changes for it here (its audio comes off in [its own to-do](../2026-11-12-audio-off-at-archiving.md)); 
+   nothing changes for it here (its audio comes off in [its own to-do](2026-11-12-audio-off-at-archiving.md)); 
    **Heme & Endo Exam 2** is already archived and its audio already off in this PR (Sam, 2026-11-13). `main` was
    brought in on 2026-11-14 (#361, #362, #363: the Log); anything merged after that is brought in the same way: a hub
    change made on `main` to an old page or to `next/` goes into `hubs/<hub>/content/` and the page's settings here.
