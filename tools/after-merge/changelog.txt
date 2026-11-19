@@ -55,3 +55,4 @@ heme-endo-exam3 | Timmy Time is here: a 52-minute last-minute review of all seve
 all | On the dashboard, Timmy Time and Send luck now sit along the bottom of the hub's card, and What's new has a box of its own under it: the latest changes as cards on a timeline, with the ones since your last visit marked New.
 all | New: Collections, on your You card and at Timmy's place. See every holiday set, year-round collection and rare costume in Timmy's shop and how much of each you have. Finish one for a bonus of +1,000 XP and 1,000 Shiny Gold Crowns.
 perio | Session 6: the true/false question on skipping initial therapy is gone (initial therapy still comes before surgery), and the "contained" defect question explains how a root's sides differ from a defect's walls.
+perio | Session 7: the #31 implant case now says where the tissue was lost (at the margin, not the apex), so its questions can be answered from the case.

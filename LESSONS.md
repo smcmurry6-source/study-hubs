@@ -103,7 +103,10 @@ day. **#62, "Contradicts other lectures" (`q6-T02`, sent just before this audit)
 true/false, whether Dr. Geurs sometimes regenerates without initial therapy first (true: he said so in class), while S4, S5 and his own
 decision tree put initial therapy first, and S5 lists wanting to skip Phase I as a reason not to operate. The class split on it: 9 of 18
 answers "False". The audit first reworded it (the rule first, his exception second); then **Sam retired it** ("it can go": it tested an
-aside), and S6's High yield was recorded again. 10 check-ins from 9 people (Occlusion final 5 more, Heme & Endo Exam 2 3 more, the Occlusion midterm 1;
+aside), and S6's High yield was recorded again. **#63 (`q7-P01`, after the audit): "not enough info in the question unless you go look
+at the slides": right.** Its explanation ruled out retrograde peri-implantitis because "this loss is at the margin", which the case
+box didn't say, and 7 of 18 first tries since the morning's fix picked retrograde. The box (and `q7-P02`'s, the same case) now says the
+mucosa and bone are lost at #31's margin and the apex isn't involved. 10 check-ins from 9 people (Occlusion final 5 more, Heme & Endo Exam 2 3 more, the Occlusion midterm 1;
 their retrospectives below have the new totals). The survey "How's the new look?": 7 more answers, **21 in all, 4.3 of 5**; one said the
 notes are wordier than before the redesign and too long to get through (for Sam, below). 7 searches, none a missing fact.
 

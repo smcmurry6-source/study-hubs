@@ -37,7 +37,9 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   therapy before regeneration (9 of 18 answers had said False) is **retired** (Sam: "it can go"; `q6-T02 retired` in
   `tools/question-ids/perio.txt`, out of `questions.json`, `variants.json` and its High Likelihood topic), so S6's High yield
   changed and was recorded again (`periodontal-regeneration-hy.mp3` and its words file). `q6-L35`'s explanation and why separate the root's sides from a defect's bony walls (15 of
-  30 first tries took "3 or more sides" for contained). `LESSONS.md`: Live signals rewritten (Perio's biggest day, 80 people and 205 h by 7:30 pm; the economy over 11-18,
+  30 first tries took "3 or more sides" for contained). Report #63 (`q7-P01`, "not enough info in the question"): the case box
+  (and `q7-P02`'s, the same #31 case) says the loss is at #31's margin with the apex not involved, which its explanation relied on.
+  `LESSONS.md`: Live signals rewritten (Perio's biggest day, 80 people and 205 h by 7:30 pm; the economy over 11-18,
   the first day of #403's rates: 630 crowns an hour, 13% of crowns spent), the later check-ins in the Occlusion and Heme & Endo
   Exam 2 retrospectives, a reports lesson on exception items. Every query under the 5 s limit; `sh_data_quality()` stopped there,
   so it and `qh_report` weren't read (`tools/lessons-refresh.md` step 1, the database-load task, the inbox).
