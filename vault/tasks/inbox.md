@@ -17,7 +17,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   the connector with Sam's OK; it is safe to run twice), first counting what it would select (its first statement as a `select
   count(*)`), and tick BUG-192's retest. Until then, a Heme & Endo Exam 3 retrospective reads that hub's arcade and Timmy Time
   clicks of 11-19 as test runs.
-- [ ] **Hide the answers in a review table to test yourself** (2026-11-19, a "How's the new look?" survey answer: "being able
+- [x] **Hide the answers in a review table to test yourself** (Sam said yes; built as Cover the answers, the PR after #476) (2026-11-19, a "How's the new look?" survey answer: "being able
   to hide the answers in the charts"): a hub's review tables and Side by side charts (`study.json`'s `review`) show every cell. A "Cover" button on a table that
   blanks every column but the first until a cell is tapped (and a "Show all") would make each table a self-test, like
   Flashcards. A feature: Sam's call, then a task note (drawn in `widget/hub.js`, the Review groups' tables; the About page).
