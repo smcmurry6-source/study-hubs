@@ -2,7 +2,7 @@
    classes     each class's name and the line its drawn scene says when tapped
    hubs        every hub with a card: its class, title, exams (name, label, date, the check-in's hours and extra questions,
                and askAgain: a round, "yyyy-mm-dd", that shows the check-in pop-up once more to every device that showed it
-               and never sent it), its "updated" date, what it covers, and any archiveOn / hideCardOn override
+               and never sent it; seeing it after the round is set counts as that round's showing), its "updated" date, what it covers, and any archiveOn / hideCardOn override
    archived    hubs kept only for their recaps
    checkinHour, archiveHour, cardDays, debriefDays   when "Check in" shows on exam day, when a hub archives itself (10 pm
                on its last exam day), how many days it then counts as archived before hidden (the dashboard draws no card for
@@ -407,7 +407,9 @@ window.SH_DASH_DATA = {
      "name": "Periodontology final",
      "label": "Final",
      "date": "2026-11-19",
-     "code": "Periodontology · Final"
+     "code": "Periodontology · Final",
+     "promptHour": 14,
+     "askAgain": "2026-11-19"
     }
    ],
    "updated": "2026-09-25",

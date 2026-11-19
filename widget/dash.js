@@ -1078,7 +1078,6 @@
       });
     });
     if (!best) return false;
-    if (best.again) lsSet("sh_debrief_again_" + best.h.id + "_" + best.x.date + "_" + best.x.askAgain, "1");
     openDebrief(best.h, best.x, best.again);
     return true;
   }
@@ -1091,6 +1090,9 @@
     var me = surveyVisitor();
     if (!me) return;
     lsSet("sh_debrief_" + hub.id + "_" + x.date, "1");   /* shown = seen; the card button stays for later */
+    /* seen now, by the pop-up or the button, counts as this askAgain round's showing too, so a device that first sees it
+       after the round was set isn't asked a second time on its next visit */
+    if (x.askAgain) lsSet("sh_debrief_again_" + hub.id + "_" + x.date + "_" + x.askAgain, "1");
     var QS = debriefQs(x), answers = {}, examId = x.date + " " + (x.label || "Exam"), step = 0, last = QS.length - 1, timer = null;
     /* the server pays for the first check-in for this exam; one already sent from this device had it, so it isn't offered */
     var pays = !ls("sh_debrief_sent_" + hub.id + "_" + x.date);

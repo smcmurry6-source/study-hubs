@@ -8,7 +8,9 @@ status: live
 # Periodontology (perio)
 
 The D2 Periodontology course (DENT 2145), nine sessions with different professors. Midterm Oct 1 (S1-S4, done, check-in
-closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `exams` in `content/core.json`).
+closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `exams` in `content/core.json`). The final's
+check-in pop-up goes out from 2 pm on exam day, and once more to anyone who opened it and didn't send it (Sam, 2026-11-19:
+"repush the perio check in pop up for everyone"; `promptHour: 14`, `askAgain: "2026-11-19"` in `hubs.js`).
 
 ## Before you work on it
 

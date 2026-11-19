@@ -963,7 +963,6 @@ if (!best || x.date > best.x.date) best = { h:h, x:x, again:again };
 });
 });
 if (!best) return false;
-if (best.again) lsSet("sh_debrief_again_" + best.h.id + "_" + best.x.date + "_" + best.x.askAgain, "1");
 openDebrief(best.h, best.x, best.again);
 return true;
 }
@@ -972,6 +971,7 @@ function openDebrief(hub, x, again){
 var me = surveyVisitor();
 if (!me) return;
 lsSet("sh_debrief_" + hub.id + "_" + x.date, "1");
+if (x.askAgain) lsSet("sh_debrief_again_" + hub.id + "_" + x.date + "_" + x.askAgain, "1");
 var QS = debriefQs(x), answers = {}, examId = x.date + " " + (x.label || "Exam"), step = 0, last = QS.length - 1, timer = null;
 var pays = !ls("sh_debrief_sent_" + hub.id + "_" + x.date);
 var ideaTick = null, ideaPost = {};
