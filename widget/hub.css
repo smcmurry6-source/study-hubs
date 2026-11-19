@@ -820,7 +820,6 @@ html.shx .qc-after .sh-qrate:has(.sh-qrate-why:not([hidden])) { flex: 1 1 100%; 
 .recap .qc-go { margin-top: 16px; }
 .recap.enter { animation: hx-rise 600ms var(--ease-expo) both; }
 @keyframes hx-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
-@keyframes hx-drop { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: none; } }
 
 /* XP flight and Timmy's reactions (his drawing is widget/pet.js's; these are the moves) */
 .xpfly { position: fixed; left: 0; top: 0; z-index: 50; display: flex; align-items: center; gap: 4px; padding: 4px 10px 4px 6px; border-radius: var(--r-pill);
@@ -920,7 +919,7 @@ html.shx .shpet-btn.hx-flinch svg { animation: hx-flinch 500ms var(--ease-out) 1
 /* the lobby: every game, Sam's pick first and two wide, each on a field of its own */
 /* the column minimum gives way to a narrower screen (a 320px phone, or the largest text, which zooms the page: BUG-168);
    .arcade-lobby, because each hub's own arcade.css (its games' skin) sets .ar-grid at 300px too, and comes later */
-.ar-grid, .arcade-lobby .ar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 12px; }
+.arcade-lobby .ar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); gap: 12px; }
 .game { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 16px; padding: 18px 20px; border-radius: var(--r-panel); background: var(--panel); }
 .game > div { flex: 1; min-width: min(200px, 100%); }
 .game h2 { font-size: 18px; }
@@ -1321,7 +1320,6 @@ html.shx #shstat-panel, html.shx #shstat-flagpanel, html.shx #shstat-suggestpane
      bottom has Timmy and his bubble on the left, the streak flame on the right and the Listen player across it, which
      hid a long toast's start and end (BUG-126). Above the reply pop-up, so it's never hidden; taps go through it. */
   .hx-toasts { top: calc(64px + env(safe-area-inset-top, 0px) + var(--boss-h, 0px)); bottom: auto; z-index: 10005; }
-  .hx-toast { animation-name: hx-drop; }
   .game { flex-wrap: wrap; }
   .game .btn { width: 100%; }
 }

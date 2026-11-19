@@ -45,7 +45,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   reply pop-up do (BUG-126): at the bottom they sat under Timmy, his bubble, the streak flame and the Listen player; the
   smoke test checks one is clear. **Small controls** (BUG-009): none since the redesign (the four were on the old
   single-file pages); `tools/release/matrix.js` now checks every screen and fails a control under 24x24 px, naming it.
-  Bundles rebuilt.
+  Bundles rebuilt. **The dashboard's budget is 346 KB** (was 345, BUG-189): `main` measured 345.40 KB and these rules add
+  about 150 bytes gzipped to `widget/site.bundle.css`, which the dashboard loads too; it's the page with the least room.
 - **2026-11-19 (About page accessibility, Claude Code, [#453](https://github.com/smcmurry6-source/study-hubs/pull/453))** — the last three accessibility bugs from
   the release dry run, all on `about/index.html`: BUG-007, the nine contents links at the top turned their focus outline off
   (`nav.toc a:focus-visible{outline:none}`), so a keyboard user couldn't see where they were; they now get the page's ring.
