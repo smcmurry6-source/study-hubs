@@ -55,9 +55,15 @@ entry in `hubs.js`.
   `ll-sg-classify`, `ll-num-sg-leuk`, `ea-sg-pop`). L21 and L22's lists (in [their task](../tasks/done/2026-11-16-heme-endo-exam3-l19-l22.md))
   are those lectures' focus hints and first topics (basis "study guide + recording"), since 2026-11-18. Lecture A's topics weren't changed, and stay that way (Sam: "lecture a shouldnt be ranked lower").
   **The guide's own page in Notes** (Sam, 2026-11-19, [decisions](../decisions.md)): `study.json`'s `guide`, one entry per
-  lecture (`{ lec, items: [{ h, body }], terms: [{ t, d }] }`), each `h` the guide's words exactly, each `body` an explainer
-  written from this hub's notes and keys (a lead, a `hy-know` "Know this" list, an optional table and a `gd-trap` "Watch for");
-  `index.html`'s `SH_HUB.notes.guide` names it. No Lecture A (the guide skips it). It's hand-written, not built: **when a lecture's
+  lecture (`{ lec, items: [{ h, body }], more: [{ h, body }], terms: [{ t, d }] }`), each `h` the guide's words exactly, each `body`
+  written from this hub's notes and keys. **Since the evening of 2026-11-19 it is short and carries the in-class hints** (Sam: "the
+  study guide is really long. can we combine the study guide with in class exam hints to make it much higher yield"; 14,000 words
+  to about 6,500): each item is a `gd-said` "Said in class" box (short quotes, trimmed with "...", from `study.json`'s hints for that
+  item), a `hy-know` "Know this" of 3 to 7 bullets, a table only where it is the shortest way (L19's organs, L20's translocations,
+  L22's lichens) and a one-line `gd-trap` "Watch for"; then each lecture's `more`: "Also stressed in class" (emphasize hints the
+  guide doesn't list: L17's ZP3 and ZP2, L21's urothelial carcinoma and smoking, L22's ovary, breast receptors and Paget) and
+  "Said not needed" (its deemphasize hints); key terms are one line each. A new hint on a guide topic goes into that item's
+  quotes, one not on the guide into "Also stressed in class". `index.html`'s `SH_HUB.notes.guide` names it. No Lecture A (the guide skips it). It's hand-written, not built: **when a lecture's
   notes or a key changes, check its guide entry too**. **Its narration** (Sam, 2026-11-19: "add kokoro") is `audio/guide.mp3`
   with its words file, spoken from the page's readable part (`tools/hub-next/guide.mjs`), so the
   [text-and-audio](../rules/text-and-audio-never-drift.md) rule binds it: **a change to `study.json`'s `guide` (or to the title of

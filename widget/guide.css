@@ -1,7 +1,8 @@
 /* ============ A professor's study guide (#notes/guide): widget/guide.js draws it; this sheet comes with it, fetched the
    first time Notes opens on a hub whose study.json has a guide. On the engine's design system (widget/hub.css). Its entry
    heads the notes' lecture list; each lecture on the guide is a section in its color, each item of the guide a heading with
-   its explainer (.hy-know "Know this", a table, .gd-trap "Watch for"), then the lecture's key terms. ============ */
+   its explainer (.gd-said "Said in class", .hy-know "Know this", a table, .gd-trap "Watch for"), then the lecture's sections
+   that aren't on the guide (.gd-more: "Also stressed in class", "Said not needed"), then its key terms. ============ */
 .lb.gd-lb { background: var(--hub-soft); color: var(--hub-text); border-color: transparent; }
 .lec-list li:has(> .lec-guide) { padding-bottom: 8px; margin-bottom: 2px; border-bottom: 1px solid var(--border); }
 .gd-jump { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 8px; }
@@ -18,6 +19,14 @@
 .gd-lec.lc .hy-know { background: var(--lc-soft); box-shadow: inset 4px 0 0 var(--lc); }
 .gd-lec.lc .hy-know > b { color: var(--lc-ink); }
 .gd-lec.lc .hy-know li::marker { color: var(--lc); }
+/* what the professor said in class, quoted from the hub's Exam Hints: the hint cards' look (widget/hub.css .hint) */
+.reading-prose .gd-said { padding: 10px 14px; border-radius: var(--r-row); background: var(--row); font-size: var(--fs-label); line-height: 1.45; }
+.reading-prose .gd-said > b { display: block; font-size: var(--fs-meta); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.reading-prose .gd-said ul { margin-top: 2px; padding-left: 0; list-style: none; display: grid; gap: 4px; }
+.reading-prose .gd-said li { font-style: italic; }
+.gd-lec.lc h3.gd-more { padding-top: 12px; border-top: 1px dashed var(--rule); }
+.reading-prose .gd-lead { color: var(--muted); font-size: var(--fs-label); }
+.reading-prose .gd-skip { padding: 10px 14px; border-radius: var(--r-row); background: var(--active); color: var(--muted); font-size: 16px; line-height: 1.55; }
 .reading-prose .gd-trap { padding: 10px 14px; border-radius: var(--r-row); background: var(--panel); font-size: 16px; line-height: 1.55; }
 .gd-terms > div { padding: 10px 0; }
 .gd-terms > div + div { border-top: 1px solid var(--rule); }
