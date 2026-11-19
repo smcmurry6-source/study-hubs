@@ -32,6 +32,11 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (Perio report #65, Claude Code)** — `q4-L27`'s fourth pair, the one #59 reworded the day before, was read
+  as the Phase I re-evaluation itself by a second student ("the re-eval is 4-6 months, not 2 weeks"). The item was right as
+  taught (Dr. Kaur: re-evaluate at 4-6 weeks; calculus left then is removed and evaluated again 2 weeks later), so the key
+  stays; the row now reads "A second Phase I evaluation, after calculus left at the first one is removed", and the
+  explanation and cue say the evaluation itself is at 4-6 weeks, not months. Same id, same key; High yield unchanged.
 - **2026-11-19 (the database optimization pass, phase 1, Claude Code, [#444](https://github.com/smcmurry6-source/study-hubs/pull/444))** — Sam's package: measure the optimization
   pass's ideas 1-5 on a throwaway copy and ship the ones worth it; nothing students see or earn changes. Measured with a
   made-up class of 200 (188,000 answers) and `pg_stat_statements` timing every statement inside a call
