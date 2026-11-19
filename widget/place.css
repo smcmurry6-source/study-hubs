@@ -282,6 +282,72 @@ button.tpv-card.is-framed:hover { background: none; transform: translateY(-3px) 
 .tpv-overin { box-shadow: 0 0 0 2px rgba(255, 224, 138, .45), 0 24px 60px rgba(0, 0, 0, .5); }
 .tpv-mhead h3 { color: var(--ar-gold); }
 
+/* Collections (migration_v75): every season's set, year-round collection and the rare costumes, with what you own of
+   each, over the place like the medal board. Its button sits under Customize and Shop with its count */
+.tpv-cta .tpv-collb { grid-column: 1 / -1; justify-content: flex-start; }
+.tpv-collc { margin-left: auto; padding: 2px 11px; border-radius: 999px; background: rgba(0, 0, 0, .34); color: var(--ar-gold); font-size: var(--fs-meta); font-weight: var(--w-head); }
+.tpv-overin.is-coll { width: min(940px, 100%); }
+.tco-sum { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; }
+.tco-sum span { padding: 5px 12px; border-radius: var(--r-pill); background: var(--panel); font-size: var(--fs-meta); color: var(--muted); }
+.tco-sum b { color: #fff; font-weight: var(--w-head); }
+.tco-lede { margin: 10px 0 0; padding: 10px 14px; border-radius: var(--r-row); font-size: var(--fs-label);
+  background: linear-gradient(90deg, rgba(255, 224, 138, .2), rgba(255, 224, 138, .05)); box-shadow: inset 0 0 0 1px rgba(255, 224, 138, .38); }
+.tco-lede b { color: var(--ar-gold); font-weight: var(--w-head); }
+.tco-gh { display: flex; align-items: baseline; gap: 8px; margin: 26px 0 0; font-size: var(--fs-card); font-weight: var(--w-head); color: #fff; }
+.tco-gh .num { font-size: var(--fs-meta); font-weight: var(--w-strong); color: var(--muted); }
+.tco-gn { margin: 2px 0 0; font-size: var(--fs-meta); color: var(--muted); }
+.tco-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); gap: 12px; margin: 12px 0 0; }
+.tco { position: relative; display: grid; gap: 10px; align-content: start; min-width: 0; padding: 12px; border-radius: var(--r-panel); background: var(--panel);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08); }
+.tco.is-done { box-shadow: inset 0 0 0 2px rgba(255, 224, 138, .62), 0 0 24px rgba(255, 214, 102, .12); }
+.tco-top { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: center; }
+.tco-cover { display: block; position: relative; width: 64px; height: 64px; border-radius: 14px; background: var(--row); overflow: hidden; }
+.tco-cover img { position: absolute; inset: 4px; width: calc(100% - 8px); height: calc(100% - 8px); object-fit: contain; }
+.tco-txt { min-width: 0; }
+.tco-txt h5 { margin: 0; font-size: var(--fs-card); font-weight: var(--w-head); line-height: 1.2; overflow-wrap: anywhere; }
+.tco-chip { display: inline-block; vertical-align: .12em; margin-left: 4px; padding: 1px 8px; border-radius: 999px; background: var(--mint); color: var(--mint-ink); font-size: 11.5px; font-weight: var(--w-strong); white-space: nowrap; }
+.tco-about { margin: 2px 0 0; font-size: var(--fs-meta); line-height: 1.35; color: var(--muted); }
+.tco-prog { display: flex; align-items: center; gap: 8px; margin: 7px 0 0; font-size: var(--fs-meta); font-weight: var(--w-strong); }
+.tco-bar { flex: 1 1 auto; height: 9px; border-radius: 999px; background: rgba(0, 0, 0, .4); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12); overflow: hidden; }
+.tco-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--ar-gold2), var(--ar-gold)); box-shadow: inset 0 2px 0 rgba(255, 255, 255, .35); }
+.tco-pieces { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin: 0; padding: 0; list-style: none; }
+.tco-p { --rar: rgba(255, 255, 255, .3); position: relative; display: grid; gap: 3px; justify-items: center; align-content: start; min-width: 0; padding: 6px 4px;
+  border: 2px dashed rgba(255, 255, 255, .16); border-radius: 12px; background: transparent; text-align: center; }
+.tco-p.r-common { --rar: #b9b2aa; } .tco-p.r-uncommon { --rar: #5fcf9d; } .tco-p.r-rare { --rar: #6fb4ea; } .tco-p.r-epic { --rar: #b39af4; } .tco-p.r-legendary { --rar: #f2c230; }
+.tco-p.is-own { border-style: solid; border-color: var(--rar); background: var(--row); }
+.tco-p.is-own::after { content: ""; position: absolute; right: -5px; top: -5px; width: 18px; height: 18px; border-radius: 50%; box-shadow: 0 0 0 2px var(--panel);
+  background: #3fb37a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.5l3.2 3.2 6.6-7.2' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 14px no-repeat; }
+.tco-pic { position: relative; display: block; width: 100%; aspect-ratio: 1; }
+.tco-pic:empty::before { content: ""; position: absolute; inset: 22%; border-radius: 50%; background: rgba(255, 255, 255, .07); }   /* until its drawing is here */
+.tco-pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.tco-p:not(.is-own) .tco-pic img { filter: grayscale(1) brightness(.8); opacity: .42; }
+.tco-pn { display: -webkit-box; max-width: 100%; overflow: hidden; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-size: 11.5px; line-height: 1.2; color: var(--muted); overflow-wrap: anywhere; }
+.tco-p.is-own .tco-pn { color: #fff; }
+.tco-foot { min-height: 22px; }
+.tco-st { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 7px; margin: 0; font-size: var(--fs-meta); line-height: 1.4; color: var(--muted); }
+.tco-st b { color: #fff; font-weight: var(--w-head); }
+.tco-where { flex-basis: 100%; }
+.tco-st.is-paid, .tco-st.is-gift { flex-wrap: nowrap; align-items: flex-start; color: var(--ar-gold); font-weight: var(--w-strong); }
+.tco-st.is-paid b { color: var(--ar-gold); }
+.tco-st .tpv-ic { margin-top: 1px; }
+.tco-st:focus { outline: none; }
+.tco-st.is-new { animation: tco-new 520ms cubic-bezier(.34, 1.56, .64, 1) both; }
+@keyframes tco-new { from { opacity: 0; transform: scale(.86); } to { opacity: 1; transform: none; } }
+.tco-claim { width: 100%; animation: tco-glow 1.8s ease-in-out infinite; }
+@keyframes tco-glow { 0%, 100% { box-shadow: 0 3px 0 #b98a1c, 0 0 0 rgba(255, 214, 102, 0); } 50% { box-shadow: 0 3px 0 #b98a1c, 0 0 22px rgba(255, 214, 102, .7); } }
+.tco-claim:disabled { animation: none; opacity: .8; cursor: progress; }
+.tco.is-claimed { animation: tco-pop 640ms cubic-bezier(.34, 1.56, .64, 1); }
+@keyframes tco-pop { 0% { transform: scale(1); } 35% { transform: scale(1.03); } 100% { transform: scale(1); } }
+.tco-burst { position: absolute; left: 50%; top: 45%; width: min(90%, 300px); aspect-ratio: 1; transform: translate(-50%, -50%); pointer-events: none; line-height: 0; }
+@media (prefers-reduced-motion: reduce) { .tco-claim, .tco.is-claimed, .tco-st.is-new { animation: none; } .tco-burst { display: none; } }
+html.hx-still .tco-claim, html.hx-still .tco.is-claimed, html.hx-still .tco-st.is-new { animation: none; }
+@media (max-width: 760px) {
+  .tpv-over:has(.is-coll) { padding: 0; }
+  .tpv-overin.is-coll { height: 100%; max-height: none; border-radius: 0; padding: 18px 14px 24px; box-shadow: none; }
+  .tco-top { grid-template-columns: 52px minmax(0, 1fr); gap: 10px; }
+  .tco-cover { width: 52px; height: 52px; border-radius: 12px; }
+}
+
 /* the trip (widget/place.js, tripIn and tripOut): the design page's clouds, as Sam approved them (2026-11-10). Separate
    soft clouds drift in from every side and pile up over the whole screen, the window shows behind them, and they scatter
    outward again. Until they cover the page the window and its backdrop are hidden (is-trip). Fixed inside the dialog, so

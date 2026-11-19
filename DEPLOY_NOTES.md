@@ -42,6 +42,19 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   raloxifene, ulipristal, levonorgestrel, Sézary, Sjögren, the trophoblasts...). Wired in `content/core.json` `podcast`
   (Home's quick link and More's tile), `hubs.js` (the dashboard) and the About page's episode list. Script
   `tools/podcast/heme-endo-exam3/script.md`; the After merge workflow registers the episode for XP.
+- **2026-11-19 (Collections, Claude Code)** — Sam: "in the timmy card i want there to be a button where you can view your
+  collections of items bought in the shop. holiday collections and other things. you can see your progress and all and
+  completing a collection gives 1000 xp and 1000 crowns as a bonus". A **Collections** button in Timmy's place (under
+  Customize and Shop, with "2/21"), on the dashboard's You card (beside Timmy's shop) and in a hub's More → Timmy's place
+  opens `widget/place.js`'s `openCollections` over the place: the 14 season sets (on sale now first), the 6 year-round
+  collections and the 10 rare costumes, each a card with a bar, its 8 (or 10) pieces in their rarity colors (owned with a
+  tick, the rest gray) and when it's in the shop; each card's drawings are fetched when it nears the screen. Finishing
+  one pays **1,000 XP and 1,000 crowns once** (`migration_v75.sql`: `shop_items.collection`, `get_my_collections`,
+  `claim_collections_v2`, key `collection:<k>`, `sh_prizes()`'s `collection`): the shop pays it when a purchase finishes one
+  (a gold banner on its "Got it" sheet), and a collection finished before shows a Claim button. Halloween 2026's gift set
+  pays nothing; rank sets aren't collections ([decisions](vault/decisions.md)). Tests: `tools/release/xp.js` 14d (596
+  checks), the smoke test's place section. **The migration is applied after the merge** (pending list;
+  [the task](vault/tasks/2026-11-19-shop-collections.md)).
 - **2026-11-19 (pages that ride out a busy database: answers kept on the device, and the rank pill, Claude Code)** — (1) An
   answer still unsaved when its tab closed was lost (the line's retries lived in the page). Now `widget/v3.js` writes the
   answers still in the line to the device when the page is hidden (`sh_answers_kept:<hub>`), takes them back when it shows

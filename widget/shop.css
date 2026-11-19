@@ -220,6 +220,10 @@ dialog.tsh-sheet::backdrop { background: rgba(20, 14, 20, .55); }
 .tsh-iown { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 12px; background: #BFEBCF; border: 2px solid #3B2E3A; font-size: var(--fs-label, 15px); font-weight: 700; }
 .tsh-iown svg { flex: none; }
 .tsh-iown.is-new { animation: tsh-in 320ms var(--ease-out, ease-out) both; }
+/* the bonus for finishing a collection with this piece (migration_v75) */
+.tsh-icoll { margin: 8px 0 0; padding: 10px 12px; border-radius: 12px; border: 2px solid #3B2E3A; background: linear-gradient(135deg, #FFF4CC, #FFD45E); color: #3B2E3A;
+  font-size: var(--fs-label, 15px); line-height: 1.35; box-shadow: 0 3px 0 #3B2E3A; animation: tsh-in 420ms var(--ease-out, ease-out) both; }
+.tsh-icoll b { font-weight: 800; }
 @keyframes tsh-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 /* buying: coins fly into the piece, it pops, and the rarity sets the size of the party */
@@ -277,7 +281,7 @@ dialog.tsh-sheet::backdrop { background: rgba(20, 14, 20, .55); }
   .tsh-ibuy { position: sticky; bottom: 0; z-index: 2; margin: 6px -16px -16px; padding: 12px 16px 14px; background: #FFF9EE; gap: 8px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tsh-irays, .tsh-ipiece, .tsh-keeper, .tsh-showpiece, .tsh-showtw, .tsh-iown.is-new { animation: none !important; }
+  .tsh-irays, .tsh-ipiece, .tsh-keeper, .tsh-showpiece, .tsh-showtw, .tsh-iown.is-new, .tsh-icoll { animation: none !important; }
   .tsh-plank button.tsh-card:hover, .tsh-plank button.tsh-card:hover::before, .tsh-card:active { transform: none; }
 }
 .tsh-still .tsh-keeper, .tsh-still .tsh-showpiece, .tsh-still .tsh-showtw, .tsh-still .tsh-irays { animation: none !important; }

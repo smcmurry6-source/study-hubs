@@ -492,8 +492,8 @@
   }
   function wallet2(v){
     if (!v || v !== db.visitor) return null;
-    var forms = (db.forms || []).length;
-    var earned = (WALLET_START[db.persona] || 0) + Math.floor(Math.max(0, (db.xp2 || 0) - 1000 * forms) / 2) + 1000 * forms, spent = 0;
+    var forms = (db.forms || []).length, colls = (db.collPaid || []).length;   /* a finished collection's prize: its 1,000 XP pays 1,000 crowns (migration_v75) */
+    var earned = (WALLET_START[db.persona] || 0) + Math.floor(Math.max(0, (db.xp2 || 0) - 1000 * forms - 1000 * colls) / 2) + 1000 * forms + 1000 * colls, spent = 0;
     (db.buys || []).forEach(function(b){ spent += b.price || 0; });
     return { earned: earned, spent: spent, balance: earned - spent, from_xp: earned, trophies: 0, medals: 0, rankups: 0 };
   }
@@ -592,6 +592,31 @@
       balance: function(){ return wallet2(v).balance; }, boost: function(){ return boostEnd(t); }, setBoost: function(ms){ db.sboost = iso(ms); }, day: day(t), now: t }, v, item, req);
     save();
     return res;
+  }
+  /* Collections (migration_v75: sh_collections, claim_collections_v2): each season's set, each year-round collection and
+     the rare costumes, with what this account owns of each; a finished one pays 1,000 XP and 1,000 crowns once, and one
+     whose every piece is a gift (Halloween 2026's) pays nothing */
+  function colls2(v){
+    var own = v ? placeOwned(v) : {}, by = {}, paid = v && v === db.visitor ? db.collPaid || [] : [], KO = { season: 0, collection: 1, costumes: 2 };
+    Object.keys(PLACE_CAT).forEach(function(id){
+      var c = PLACE_CAT[id]; if (c.rank || c.active === false) return;
+      var k = c.season || c.collection || (c.kind === "costume" ? "costumes" : ""); if (!k) return;
+      var g = by[k] || (by[k] = { k: k, kind: c.season ? "season" : c.collection ? "collection" : "costumes", n: 0, have: 0, gift: true, sort: c.sort || 0 });
+      g.n++; if (own[id]) g.have++; if (!c.gift) g.gift = false; g.sort = Math.min(g.sort, c.sort || 0);
+    });
+    return Object.keys(by).map(function(k){ return by[k]; }).sort(function(a, b){ return KO[a.kind] - KO[b.kind] || a.sort - b.sort || (a.k < b.k ? -1 : 1); })
+      .map(function(g){ return { k: g.k, kind: g.kind, n: g.n, have: g.have, done: g.have >= g.n, pays: !g.gift, paid: paid.indexOf(g.k) >= 0 }; });
+  }
+  function claimColls2(v){
+    if (!v || String(v).length > 80) return { ok: false, error: "bad" };
+    var won = [];
+    if (v === db.visitor) {
+      db.collPaid = db.collPaid || [];
+      colls2(v).forEach(function(c){ if (c.done && c.pays && !c.paid) { db.collPaid.push(c.k); won.push(c.k); db.xp2 = (db.xp2 || 0) + 1000; } });
+      save();
+    }
+    var w = wallet2(v);
+    return { ok: true, src: "collection", xp: 1000 * won.length, won: won, repeat: !won.length, pays: 1000, crowns: w ? w.balance : 0, collections: colls2(v) };
   }
   /* record_costume_sighting: one new costume a day, logged once, and it joins that visitor's shop until bought */
   function sight2(v, c){
@@ -1471,6 +1496,8 @@
     /* the shop (phase 4, part B): buying and the rare costumes' log */
     if (fn === "buy_item") return { write: v === db.visitor, data: buy2(v, a.p_item, a.p_request) };
     if (fn === "record_costume_sighting") return { write: v === db.visitor, data: sight2(v, a.p_costume) };
+    if (fn === "get_my_collections") return { data: !v || String(v).length > 80 ? { ok: false, error: "bad" } : { ok: true, pays: 1000, collections: colls2(v) } };
+    if (fn === "claim_collections_v2") return { write: v === db.visitor, data: claimColls2(v) };
     if (fn === "record_answer_v2") return { write: true, data: answer2(a, t) };
     /* Learn and Flashcards (migration_v56) */
     if (fn === "record_card_v2") return { write: true, data: card2(a, t) };
