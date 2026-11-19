@@ -30,6 +30,11 @@ its narration and Timmy Time off the site ([archived-hubs-drop-their-audio](../v
   at the limit means the database is busy: never send it again at once or raise the limit; split it (one hub, a shorter
   `:since`), keep it for the quiet hours (1 to 5 am Central), or go on without it and say so in the PR. A query of your
   own beyond these files is timed on a copy first.
+- **Read the database's size** (2026-11-19: the dashboard refreshes its figure once a day, so it can lag a cleanup by hours), and
+  write it in `LESSONS.md`'s Live signals beside the 500 MB the Free plan allows
+  ([shared-infrastructure](../vault/reference/shared-infrastructure.md)):
+  `select pg_size_pretty(sum(pg_database_size(datname))) total, (select json_agg(x) from (select relname, pg_size_pretty(pg_total_relation_size(c.oid)) sz from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = 'public' and c.relkind = 'r' order by pg_total_relation_size(c.oid) desc limit 5) x) biggest from pg_database;`
+  (catalog reads only: well under a second).
 - Read the data-quality report first (`tools/analytics-quality.sql`): if tracking stopped, a test hub or a new event
   family shows up, fix or note it before trusting the rest ([analytics-data-quality](../vault/reference/analytics-data-quality.md)).
   Read the admin page's kept copy, `select computed_at, body from admin_cache where key = 'quality';` (migration_v83:

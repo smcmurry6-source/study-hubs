@@ -104,7 +104,8 @@ Patient Box v2 is done by itself, on its own track. Figures pull from the tooth 
       from the catalogue; this note's "Sam's calls")
 - [ ] v2.0 built: the library, the modules, the new views, the new checks in `validate()` and `tools/ci/cases.js`
 - [ ] The figure builds read the same library (one existing tooth figure redrawn from it to prove the path); `--check` still passes
-- [ ] Perio's cases on modules with the same ids and keys (`node tools/ci/smoke.js`, `node tools/ci/cases.js`)
+- [x] ~~Perio's cases on modules with the same ids and keys (`node tools/ci/smoke.js`, `node tools/ci/cases.js`)~~ (moot: Perio's
+  page came down 2026-11-19, [#464](https://github.com/smcmurry6-source/study-hubs/pull/464); v2's first cases are the next hub's)
 - [ ] The how-to rewritten ([draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md)); the About page if a new kind
       of picture shows ([about-page](../rules/about-page.md))
 - [ ] CI passes; screenshots on a phone and in both themes; Sam's "merge"

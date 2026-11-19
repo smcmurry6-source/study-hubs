@@ -97,7 +97,7 @@ redesign's release.
   whenever a lecture's notes, predicted topics, hints or questions change, so an edit there on these hubs can mean
   recording that lecture's High yield again in the same PR (the rule has the two commands).
 - **Left:** Heme & Endo Exam 2's audio, High yield included, comes off at its archiving on Nov 13
-  ([to-do](../2026-11-12-audio-off-at-archiving.md)); for a hub on the engine, the release's audio-off box comes first.
+  ([to-do](2026-11-12-audio-off-at-archiving.md)); for a hub on the engine, the release's audio-off box comes first.
 
 Related: [the redesign release](2026-11-06-redesign-release.md) · [narrate-with-kokoro](../../how-to/narrate-with-kokoro.md) ·
 [text-and-audio-never-drift](../../rules/text-and-audio-never-drift.md) · [shared-infrastructure](../../reference/shared-infrastructure.md)

@@ -408,10 +408,14 @@ window.SH_DASH_DATA = {
      "label": "Final",
      "date": "2026-11-19",
      "code": "Periodontology · Final",
-     "promptHour": 14,
+     "promptHour": 13,
      "askAgain": "2026-11-19"
     }
    ],
+   "archiveOn": {
+    "date": "2026-11-19",
+    "hour": 13
+   },
    "updated": "2026-09-25",
    "desc": "Diagnosis and classification, incisions, flaps and sutures, risk assessment and prognosis, Phase I therapy and instrumentation, resective surgery and furcations, regeneration, implants, host modulation, and plastic surgery. Review tables, a timed mock exam and the Pocket Arcade.",
    "modes": [
@@ -419,15 +423,9 @@ window.SH_DASH_DATA = {
     "Plain-English notes",
     "Review tables",
     "Mock exam",
-    "Arcade",
-    "Listen",
-    "Timmy Time"
+    "Arcade"
    ],
-   "stateKey": "perio-d2-compendium-state-v1",
-   "podcast": {
-    "name": "Timmy Time",
-    "sub": "The last-minute review, 52 min"
-   }
+   "stateKey": "perio-d2-compendium-state-v1"
   }
  ],
  "archived": [

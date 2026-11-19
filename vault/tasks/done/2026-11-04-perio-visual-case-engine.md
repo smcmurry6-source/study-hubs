@@ -67,9 +67,10 @@ chart or radiograph finding, not only describe it."
       notes references; `LIKELY_TOPICS` updated; About page entry
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
 - [x] Sam approves the proposal and the case set (in the session, 2026-11-04: "Merge when ready")
-- [ ] Then: the question expansion (every session's Patient Box items rebuilt as cases; S3 risk and S4 re-evaluation
+- [x] ~~Then: the question expansion (every session's Patient Box items rebuilt as cases; S3 risk and S4 re-evaluation
       cases; two-statement and numbered items on cases), the phone layouts polished on a real device, visual QA of
-      every case in both themes, the full UAT pass, a test report
+      every case in both themes, the full UAT pass, a test report~~ (moot: Perio's page came down 2026-11-19,
+      [#464](https://github.com/smcmurry6-source/study-hubs/pull/464))
 - [x] Vault written back (hub notes, decisions, the how-to, this note's Outcome)
 
 ## Open questions for Sam

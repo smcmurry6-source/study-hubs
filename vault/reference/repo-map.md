@@ -49,7 +49,7 @@ tags: [map]
   one file per set in `widget/hub-art/place/` (`<season>.js` and `ranks.js`, each fetched only when a piece of that set
   is drawn). None of it loads with a page: a hub fetches it from More, Timmy's place, and the dashboard on the
   first scroll, tap or key (until then its "you" card shows a still kept on the device). [Phase 3](../tasks/done/2026-11-05-redesign-phase-3-dashboard.md) says what is on it.
-- `hubs/<hub-id>/` — **a hub on the engine** (Perio and every hub built since the redesign's release; Occlusion was one until its page came down, 2026-11-19):
+- `hubs/<hub-id>/` — **a hub on the engine** (every hub built since the redesign's release, Heme & Endo Exam 3 today; Occlusion and Perio were ones until their pages came down, 2026-11-19):
   `index.html`, a small page of settings (`window.SH_HUB`), and `content/`, its content as JSON, **which is where the
   hub is edited** (`core.json`, `questions.json`, `notes.json`, `study.json`, plus `figures.js/css` and
   `arcade.js/css`). `node tools/hub-next/build.mjs` rebuilds what is worked out from the rest (the question index, each
