@@ -32,6 +32,18 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (Mock and game answers that ride out a busy database, Claude Code)** — (1) A mock's or an arcade game's
+  answers go at once and try twice more (4 and 10 s); when all three failed in a busy minute they were lost, and with them
+  the mock's score, its +50 and their XP. Now `widget/v3.js` puts such an answer in the answer line with its session (8 tries,
+  kept on the device when the page is hidden or they run out), and `finishSession` holds the finish behind it in the same
+  line (`sessionHold`; it answers `{ ok: true, held: true }`, so `widget/games.js` doesn't also send the score the old way),
+  kept on the device with the answers, so the hub's next page sends the answers, then the finish. The page that sends it says
+  what it paid (`sh:session-paid` now carries `kind` and `game`; `widget/hub-rewards.js` names a game it never ran).
+  (2) With the bootstrap timed out, Timmy Time's minutes (`widget/podcast.js`) weren't counted, Timmy's HP days
+  (`widget/pet.js`) left out the snacks' HP and the Inbox (`widget/replies.js`) the idea board's notes until the first
+  answer's reply: they ask `shGame.live()` now (a hub passes the Inbox its `v2`, it passed none; the dashboard passes `V2 !==
+  false` to both), and the last two fall back to today's call when the v2 one is missing. `tools/ci/quiet.js` checks both
+  (`mock()`, `timedOut()`). About page ("What the hubs record") and Ask Timmy's site help updated; bundles rebuilt.
 - **2026-11-19 (Heme & Endo Exam 3: High Likelihood made higher yield, Claude Code)** — Sam: "There are a lot of high
   likelihood questions ... make sure that those need to be high likelihood and see if we can make it a little bit higher
   yield." 410 of 460 questions were tagged, so the tag no longer picked anything out. Every topic was read against Dr.

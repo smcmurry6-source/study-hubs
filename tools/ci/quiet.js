@@ -6,6 +6,7 @@
 // shown again, finds them taken and sends nothing more.
 // And fewer calls from the page (2026-11-19, the database optimization pass, phase 2, migration_v82): phase2() below.
 // And the answer history kept on the device (phase 3, migration_v84): history() below.
+// And a mock's answers in a busy minute, and the game layer's reads with the bootstrap timed out (2026-11-19): mock(), timedOut().
 // Nothing reaches the real database: every request off 127.0.0.1 is answered here, and every WebSocket is closed (the
 // pages aren't marked automated, so a live realtime connection would put them in the class's "studying now" count).
 'use strict';
@@ -393,9 +394,120 @@ async function history(browser, missing){
   await context.close();
 }
 
+// A mock's answers in a busy minute (2026-11-19): answers with a session go at once and try twice more (4 and 10 s); when all
+// three fail they join the line with their session, and the finish waits behind them (finishSession answers { held: true }),
+// so the server counts them before it scores the mock. (1) The database comes back while the page is open: the answers go,
+// in order, with the same ids, then the finish. (2) The page is hidden first: the answers and the finish are kept on the
+// device, and the hub's next page sends the answers, then the finish, and says what it paid (sh:session-paid, kind mock).
+async function mock(browser, closeFirst){
+  const what = closeFirst ? 'a mock kept for the next page' : 'a mock held in the page';
+  const context = await browser.newContext(), t0 = Date.now(), log = [], SID = '11111111-2222-4333-8444-555555555555';
+  if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
+  let failing = true;
+  await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, async route => {
+    const u = route.request().url(), fn = (/\/rpc\/([a-z0-9_]+)/.exec(u) || [])[1] || '';
+    if (!/supabase\.co/.test(u)) return route.fulfill({ status: 204, body: '' });
+    let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
+    const json = (b, s) => route.fulfill({ status: s || 200, contentType: 'application/json', body: JSON.stringify(b) });
+    if (fn === 'get_widget_bootstrap_v2') return json({ rank, mastery: [] });
+    if (fn === 'get_rank_profile_v2') return json(rank);
+    if (fn === 'xp_session_start') return json(SID);
+    if (fn === 'record_answer_v2' || fn === 'xp_session_finish') {
+      const c = { t: Date.now() - t0, fn, req: a.p_request, qid: a.p_qid, session: a.p_session, keys: Object.keys(a), failed: failing };
+      log.push(c);
+      await new Promise(r => setTimeout(r, 200));
+      if (c.failed) return json({ code: '57014', message: 'canceling statement due to statement timeout' }, 500);
+      if (fn === 'xp_session_finish') return json({ ok: true, xp: 50, mult: 1, answers: 2, correct: 2, crowns: 150 });
+      return json({ ok: true, correct: true, kind: 'one', xp: 10, base: 10, mult: 1, why: null, bonus: [], boost: null, total: 2410, crowns: 101 });
+    }
+    return json(fn ? null : []);
+  });
+  await context.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
+  // held in the page, the quiet spell after six failures is 5 minutes: the page's clock is run by hand
+  const errs = [], open = async clock => {
+    const page = await context.newPage(); page.on('pageerror', e => errs.push(e.message));
+    if (clock) await page.clock.install();
+    await page.goto(BASE() + 'hubs/perio/index.html#questions');
+    if (clock) for (let i = 0; i < 40 && !(await page.evaluate(() => !!(window.shGame && window.shGame.v2() && window.shDb))); i++) { await page.clock.runFor(500); await page.waitForTimeout(100); }
+    if (!(await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb, null, { timeout: 20000 }).catch(() => null))) return null;
+    await page.evaluate(() => { window.__paid = []; document.addEventListener('sh:session-paid', e => window.__paid.push(e.detail)); });
+    return page;
+  };
+  const clocked = !closeFirst;
+  const tick = async (pg, ms) => { if (!clocked || pg !== a) return pg.waitForTimeout(ms); for (let t = 0; t < ms; t += 1000) { await pg.clock.runFor(1000); await pg.waitForTimeout(40); } };
+  const a = await open(clocked);
+  if (!a) { problems.push(`${what}: the page didn't come up on the game layer`); await context.close(); return; }
+  const ev = await a.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'perio:answered'; });
+  const sid = await a.evaluate(() => window.shGame.startSession('mock'));
+  if (sid !== SID) { problems.push(`${what}: no session (${sid})`); await context.close(); return; }
+  for (const q of ['pq-1', 'pq-2']) await a.evaluate(([e, qid, s]) => document.dispatchEvent(new CustomEvent(e, { detail: { qid, choice: 0, correct: true, ctx: 'mock', session: s } })), [ev, q, SID]);
+  await a.evaluate(s => { window.__fin = undefined; window.shGame.finishSession(s, 2, 2).then(r => { window.__fin = r; }); }, SID);
+  for (let i = 0; i < 40 && (await a.evaluate(() => window.__fin === undefined)); i++) await tick(a, 1000);
+  const fin = await a.evaluate(() => window.__fin);
+  const quick = log.slice();
+  if (!fin || !fin.ok || !fin.held) problems.push(`${what}: with its answers unsaved, finishSession should answer { ok: true, held: true } (${JSON.stringify(fin)})`);
+  if (quick.some(c => c.fn === 'xp_session_finish')) problems.push(`${what}: the finish was sent while its answers were unsaved`);
+  if (quick.length !== 6) problems.push(`${what}: 2 answers should try 3 times each before the finish answers (${quick.length} tries)`);
+  const ids = { 'pq-1': (quick.find(c => c.qid === 'pq-1') || {}).req, 'pq-2': (quick.find(c => c.qid === 'pq-2') || {}).req };
+  let page = a, from = log.length;
+  if (closeFirst) {
+    await a.evaluate(() => { Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' }); document.dispatchEvent(new Event('visibilitychange')); });
+    const k = await a.evaluate(() => { try { return JSON.parse(localStorage.getItem('sh_answers_kept:perio') || 'null'); } catch (e) { return null; } });
+    const kinds = Array.isArray(k) ? k.map(e => e.f ? 'finish' : e.a.p_qid) : null;
+    if (JSON.stringify(kinds) !== '["pq-1","pq-2","finish"]') problems.push(`${what}: hidden, the device should keep pq-1, pq-2, then the finish (${JSON.stringify(kinds)})`);
+    await a.close();
+    failing = false; from = log.length;
+    page = await open();
+    if (!page) { problems.push(`${what}: the second page didn't come up`); await context.close(); return; }
+  } else failing = false;
+  for (let i = 0; i < (clocked ? 400 : 120) && !log.slice(from).some(c => c.fn === 'xp_session_finish' && !c.failed); i++) await tick(page, clocked ? 1000 : 500);
+  await page.waitForTimeout(800); await tick(page, 1000); await page.waitForTimeout(300);
+  const sent = log.slice(from).filter(c => !c.failed);
+  console.log(`${what}:`, sent.map(c => `${c.qid || 'finish'}@${Math.round(c.t / 1000)}s`).join(', '));
+  if (JSON.stringify(sent.map(c => c.qid || c.fn)) !== '["pq-1","pq-2","xp_session_finish"]') problems.push(`${what}: expected pq-1, pq-2, then the finish (${sent.map(c => c.qid || c.fn)})`);
+  else {
+    if (sent[0].req !== ids['pq-1'] || sent[1].req !== ids['pq-2']) problems.push(`${what}: the answers went with new request ids`);
+    if (sent.some(c => c.session !== SID)) problems.push(`${what}: an answer or the finish lost its session`);
+    if (sent[2].keys.includes('p_request')) problems.push(`${what}: the finish was sent with the line's own id (p_request)`);
+  }
+  const paid = await page.evaluate(() => window.__paid);
+  if (!paid.length || paid[0].session !== SID || paid[0].kind !== 'mock' || !paid[0].res || paid[0].res.xp !== 50) problems.push(`${what}: no sh:session-paid for the mock's +50 (${JSON.stringify(paid)})`);
+  if (await page.evaluate(() => localStorage.getItem('sh_answers_kept:perio'))) problems.push(`${what}: still kept on the device after they were sent`);
+  if (errs.length) problems.push(`${what}, page errors: ${errs.join(' | ')}`);
+  await context.close();
+}
+
+// The bootstrap timed out (2026-11-19): shGame.v2() is false until an answer's reply, but the page wants the game layer
+// (shGame.live()), so Timmy's HP days and the Inbox read the game layer's calls (the snacks' HP, the idea board's notes).
+async function timedOut(browser){
+  const what = 'the bootstrap timed out', context = await browser.newContext(), log = [];
+  if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
+  await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, async route => {
+    const u = route.request().url(), fn = (/\/rpc\/([a-z0-9_]+)/.exec(u) || [])[1] || '';
+    if (!/supabase\.co/.test(u)) return route.fulfill({ status: 204, body: '' });
+    log.push(fn);
+    const json = (b, s) => route.fulfill({ status: s || 200, contentType: 'application/json', body: JSON.stringify(b) });
+    if (fn === 'get_widget_bootstrap_v2') return json({ code: '57014', message: 'canceling statement due to statement timeout' }, 500);
+    return json(fn ? null : []);
+  });
+  await context.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
+  const page = await context.newPage(), errs = [];
+  page.on('pageerror', e => errs.push(e.message));
+  await page.goto(BASE() + 'hubs/perio/index.html#home');
+  if (!(await page.waitForFunction(() => window.shGame && window.shGame.live(), null, { timeout: 20000 }).catch(() => null))) { problems.push(`${what}: no shGame`); await context.close(); return; }
+  for (let i = 0; i < 30 && !(log.some(f => /^get_pet_days/.test(f)) && log.some(f => /^get_my_inbox/.test(f))); i++) await page.waitForTimeout(500);
+  if (await page.evaluate(() => window.shGame.v2())) problems.push(`${what}: shGame.v2() should still be false (the check is pointless otherwise)`);
+  const got = log.filter(f => /^get_pet_days|^get_my_inbox/.test(f));
+  console.log(`${what}:`, got.join(', '));
+  if (!got.includes('get_pet_days_v2') || got.includes('get_pet_days')) problems.push(`${what}: Timmy's HP days should be read with get_pet_days_v2 (${got})`);
+  if (!got.includes('get_my_inbox_v2') || got.includes('get_my_inbox')) problems.push(`${what}: the Inbox should be read with get_my_inbox_v2 (${got})`);
+  if (errs.length) problems.push(`${what}, page errors: ${errs.join(' | ')}`);
+  await context.close();
+}
+
 (async () => {
   const browser = await chromium.launch();
-  try { await run(browser, false); await Promise.all([run(browser, true), kept(browser), pings(browser, false), pings(browser, true), phase2(browser, false), phase2(browser, true), history(browser, false), history(browser, true)]); } finally { await browser.close(); server.close(); }
+  try { await run(browser, false); await Promise.all([run(browser, true), kept(browser), pings(browser, false), pings(browser, true), phase2(browser, false), phase2(browser, true), history(browser, false), history(browser, true), mock(browser, false), mock(browser, true), timedOut(browser)]); } finally { await browser.close(); server.close(); }
   if (problems.length) { console.log('✗', problems.join('\n✗ ')); process.exit(1); }
-  console.log('✓ the quiet spell: one line, nothing sent in the spell, the same ids, in order; a working database saves at once; answers kept on the device go from the next page; pings go together once a minute, and the changelog is read once; a card\'s class numbers, the analytics and the tenth answer take one call or none; the answer history is kept on the device and only what is newer is read');
+  console.log('✓ the quiet spell: one line, nothing sent in the spell, the same ids, in order; a working database saves at once; answers kept on the device go from the next page; pings go together once a minute, and the changelog is read once; a card\'s class numbers, the analytics and the tenth answer take one call or none; the answer history is kept on the device and only what is newer is read; a mock\'s answers ride out a busy minute and its finish waits behind them; with the bootstrap timed out, Timmy\'s days and the Inbox read the game layer\'s calls');
 })();

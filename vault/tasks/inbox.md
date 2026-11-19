@@ -34,17 +34,20 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   Once `migration_v83.sql` is live, read the admin page's kept copies instead, at any hour (`admin_cache`'s `quality` and
   `qh:perio`; the queries in `tools/lessons-refresh.md` step 1). The night v83 is applied fills both, Perio's from its
   latest versions (Perio is archived by then, so the admin page no longer lists it), and they're refreshed nightly for a week.
-- [ ] **The other `shGame.v2()` checks while the bootstrap times out** (2026-11-19, found with the rank pill's fix). Three more
+- [x] **The other `shGame.v2()` checks while the bootstrap times out** (#468) (2026-11-19, found with the rank pill's fix). Three more
   places wait for `v2()` (true only once the bootstrap or an answer's reply came back) where `shGame.live()` would do: Timmy
   Time's minutes (`minOn()` in `widget/podcast.js`: an episode heard then pays nothing for those minutes), Timmy's HP days
   (`loadRemote()` in `widget/pet.js` reads `get_pet_days` without the snacks' HP) and the Inbox (`widget/replies.js` reads
   `get_my_inbox` without the idea board's notes; its `v2` comes from the page). Check each the way #427 and the rank pill did.
-- [ ] **A mock's or a game's answers that fail both quick tries are lost** (2026-11-19, found while keeping the line's answers
+  **Done** (#468): all three ask `shGame.live()` (the Inbox's `v2` now passed by a hub too), with today's call when the v2 one is missing.
+- [x] **A mock's or a game's answers that fail both quick tries are lost** (#468) (2026-11-19, found while keeping the line's answers
   on the device). `answerV2` in `widget/v3.js` sends an answer with a session at once and tries twice more (4 and 10 s), and
   `finishSession` waits for them, so in a busy minute a mock's answers can miss the server: its score, its +50 (10 answers
   needed) and their XP. Not kept on the device like the rest, because the session is finished on the page. Perhaps: keep
   them like the line's and finish the session from the next page (a session takes answers for 6 hours, and 10 minutes after
   it's finished), or hold the finish until the line is clear.
+  **Done** (#468): both: out of its quick tries an answer joins the line with its session, and the finish waits behind it
+  there (kept on the device with it), so the next page sends the answers, then the finish.
 - [x] **The reward card on the dashboard too** (2026-11-18, from the hubs' reward card: Sam, "i want it to look much cooler and
   communicate that you just got xp and crowns better"). A hub shows what a bonus paid on a gold card (`drawPrize` in
   `widget/hub-rewards.js`, its styles inside it); the dashboard's prizes (the daily visit, the leaderboard name, trophies:

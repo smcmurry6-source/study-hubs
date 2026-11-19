@@ -144,10 +144,16 @@
     }
     function loadRemote(){
       function rowsOf(res){ return res && !res.error && Array.isArray(res.data) ? res.data : []; }
+      function missingFn(res){ var e = res && res.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || res.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
       var none = Promise.resolve(null);
       return Promise.all([
-        /* o.v2() says the game layer's Inbox is there (migration_v54: the idea board's status notes ride in it) */
-        sb.rpc(typeof o.v2 === "function" && o.v2() ? "get_my_inbox_v2" : "get_my_inbox", { p_visitor: visitor }).then(rowsOf, function(){ return null; }),
+        /* o.v2() says the game layer's Inbox is wanted (migration_v54: the idea board's status notes ride in it). Since
+           2026-11-19 it's true on a page that wants the game layer and hasn't found it missing (it was true only once a
+           reply had confirmed it, so with the bootstrap timed out the Inbox left out the idea board's notes; a hub didn't
+           pass it at all); a database without the v2 call gets today's */
+        (typeof o.v2 === "function" && o.v2() ? sb.rpc("get_my_inbox_v2", { p_visitor: visitor }).then(function(res){
+          return missingFn(res) ? sb.rpc("get_my_inbox", { p_visitor: visitor }) : res;
+        }) : sb.rpc("get_my_inbox", { p_visitor: visitor })).then(rowsOf, function(){ return null; }),
         visitor ? sb.rpc("get_my_survey", { p_visitor: visitor }).then(rowsOf, function(){ return []; }) : none
       ]).then(function(r){
         if (!r[0]) return items;
