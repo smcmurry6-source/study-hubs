@@ -1,11 +1,24 @@
 ---
 type: hub
-tags: [hub, archived]
+tags: [hub, archived, removed]
 hub: occlusion
 status: archived
 ---
 
 # Occlusion
+
+**Its page came down 2026-11-19** (Sam: "occlusion can be retired since the exam has already happened", then "we can
+take the page down"; [decisions](../decisions.md)): `hubs/occlusion/` (the page, its content JSON and its images) and
+`assets/og-occlusion.png` are gone, with its About page entries (What cusp hits where?, its diagrams, its arcade column,
+its filters and question formats), Ask Timmy's 43 test cases for it (`tools/timmy/test-set.json`) and its figure build in
+"Check hubs". Its retrospective and recap were done first (2026-11-17). What stays: its entry in `hubs.js` (no card since
+it archived; its exam check-ins under Past hubs, the final's until `debriefDays` runs out), `tools/question-ids/occlusion.txt`
+so its ids are never reused, its drawn art (`widget/hub-art/occlusion.js`, `tools/figures/site/`), the figure kit in
+`tools/figures/occlusion/` (its `build.mjs` has nothing to write to now), `tools/podcast/occlusion/` and the class's data in
+Supabase. The admin page sees the 404 and won't set it Live. The last version of the page is in git:
+`git log --diff-filter=D -- hubs/occlusion/index.html` names the commit that removed it, and its parent has everything.
+The tests that used its bank or page use Perio's now (`tools/release/xp.js`, `tools/release/admin-ui.js`). The notes below
+describe the hub as it was.
 
 **Archived 2026-11-16 at 10 pm**, after its final that evening. Its retrospective is in `LESSONS.md` ("Hub retrospectives",
 written by the 11-17 lessons audit from the first 3 check-ins: later ones go into the next audit), its recap is on the dashboard
@@ -79,10 +92,9 @@ Dates and check-in hours: its entry in `hubs.js`.
 - **The page's weight budget** is `hubs/occlusion/` in `tools/release/budgets.json` (800 KB since the engine's bundles,
   2026-11-13; the old single-file page was at 1480 KB, its limit). On 2026-11-15 `node tools/release/perf.js --page
   hubs/occlusion/` measured 771 KB: room for content, but check it after a big addition, and raise the budget only with a
-  reason in the PR that Sam approves (as BUG-087 did). **Since 2026-11-19 it isn't measured** (Sam: "occlusion can be
-  retired since the exam has already happened"): `perf.js` measures only live hubs, as a11y and the device matrix do,
-  and an archived hub's budget line is used only by `--page`. It was at 800 KB on `main` that day, the shared bundles'
-  growth since 11-15.
+  reason in the PR that Sam approves (as BUG-087 did). It was at 800 KB on `main` on 2026-11-19, the shared bundles'
+  growth since 11-15, when the dashboard's What's new box took it to 801; then `perf.js` stopped measuring archived hubs
+  and the page came down (above), so its budget line is gone too.
 - **The final's format** isn't announced (question count, Canvas or not): `FINAL_TIME` / `FINAL_CLOSES` are `'18:30'` /
   `'19:45'`, and the dashboard's check-in button and pop-up go out at 8 pm (`checkinHour:20, promptHour:20`), after the
   window closes ([task](../tasks/done/2026-11-03-occlusion-final-time-and-format.md)).

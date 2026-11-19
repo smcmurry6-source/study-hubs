@@ -12,7 +12,7 @@
 // Bytes and requests are exact, so they fail at their budget; timings wobble on shared CI machines, so they fail only
 // past 1.5x their budget and warn before that. Budgets: tools/release/budgets.json (--update sets them from this run
 // with headroom: use it when a deliberate change, approved in its PR, moves a number).
-//   node tools/release/perf.js [--update] [--page hubs/occlusion/]
+//   node tools/release/perf.js [--update] [--page hubs/perio/]
 'use strict';
 const fs = require('fs'), path = require('path');
 const L = require('./lib');

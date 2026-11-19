@@ -60,6 +60,14 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   The shared stylesheet's growth (about 1.7 KB gzipped) put Occlusion's archived page at 801 KB of its 800 KB budget on
   CI (800 on `main`); Sam: "occlusion can be retired since the exam has already happened", so `tools/release/perf.js` now
   measures only live hubs, as a11y and the device matrix already did (`--page` still measures an archived one).
+  Then Sam: **"we can take the page down"**: **Occlusion's page is off the site** (`hubs/occlusion/`: the page, its content
+  JSON and 10 images, 3.5 MB; and `assets/og-occlusion.png`). Its retrospective and recap were done 2026-11-17 and its audio
+  was already off. With it: its About page entries (What cusp hits where?, its drawn and interactive diagrams, its arcade
+  column, its filters, formats and mock), its budget line, its figure build in "Check hubs" (`tools/figures/occlusion/`
+  stays, with nothing to write to), the smoke test's cusp-game checks, and Ask Timmy's 43 eval cases for it (two dashboard
+  cases now ask about Heme & Endo Exam 3). `tools/release/xp.js` grades Perio's real bank and `tools/release/admin-ui.js`
+  archives Perio by hand instead. Its `hubs.js` entry stays for its check-ins, and its id list, art and podcast scripts stay
+  ([hub note](vault/hubs/occlusion.md)).
 
 - **2026-11-19 (Collections, Claude Code)** — Sam: "in the timmy card i want there to be a button where you can view your
   collections of items bought in the shop. holiday collections and other things. you can see your progress and all and

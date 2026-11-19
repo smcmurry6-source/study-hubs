@@ -468,7 +468,7 @@ function lint(hub, A){
   });
   if (!LIKELY_EXEMPT.has(hub)) {
     const T = A.LIKELY_TOPICS;
-    if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from occlusion)`);
+    if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from perio)`);
     else {
       const byId = new Map(Q.map(q => [q.id, q]));
       T.forEach(t => (t.ids || []).forEach(id => { const q = byId.get(id);
@@ -774,21 +774,6 @@ function lint(hub, A){
         const st = await page.evaluate(() => { const v = document.querySelector('.hx-view:not([hidden])'); return { h1: !!(v && v.querySelector('h1')), w: document.documentElement.scrollWidth - innerWidth }; });
         if (!st.h1) problems.push(`${name} (${label}): ${r} has no page title`);
         if (st.w > 1) problems.push(`${name} (${label}): ${r} scrolls sideways by ${st.w}px`);
-        if (hub === 'occlusion' && r === 'questions') {
-          /* The generated CUSP game is intentionally only on the base Question Bank, ahead of its filters. It is lazy
-             loaded with figures.js, so wait for its launcher rather than only testing the question cards below it. */
-          await page.waitForSelector('[data-cusp-game] .cg-launch', { timeout: 15000 }).catch(() => {});
-          const cusp = await page.evaluate(() => { const host = document.querySelector('[data-cusp-game]'); return host && {
-            launch: !!host.querySelector('.cg-launch'), title: (host.querySelector('.cg-launch-t b') || {}).textContent || '',
-            contacts: !!host.querySelector('[data-cg="contacts"]'), moves: !!host.querySelector('[data-cg="moves"]'),
-            w: document.documentElement.scrollWidth - innerWidth
-          }; });
-          if (!cusp || !cusp.launch || cusp.title.trim() !== 'What cusp hits where?' || !cusp.contacts || !cusp.moves)
-            problems.push(`${name} (${label}): the base Question Bank has no working What cusp hits where? launcher`);
-          else if (cusp.w > 1) problems.push(`${name} (${label}): the What cusp hits where? launcher scrolls sideways by ${cusp.w}px`);
-        }
-        if (hub === 'occlusion' && /^questions\/(drill|misses|weak|mock)$/.test(r) && await page.$('[data-cusp-game]'))
-          problems.push(`${name} (${label}): ${r} should not show the base Question Bank's What cusp hits where? game`);
         if (r === 'questions') { const c = await page.$('#qlist .qcard .ch'); if (c) { await c.click(); await page.waitForTimeout(300); if (!(await page.$('#qlist .qcard.is-answered'))) problems.push(`${name} (${label}): answering a question didn't mark the card answered`); } }
         if (r === 'more/arcade') { const g = await page.$('.ar-grid [data-game]'); if (g) { await g.click(); await page.waitForTimeout(400); const back = await page.$('#panel-arcade [data-back]'); if (back) await back.click().catch(() => {}); } }
       }
