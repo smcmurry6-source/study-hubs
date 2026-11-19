@@ -1,35 +1,14 @@
 {
  "about": "Known accessibility issues per screen, so tools/release/a11y.js can fail only on new ones. Lower these numbers; never raise them to make a check pass (fix the page instead), except for a deliberate change Sam approved.",
- "updated": "2026-11-18",
+ "updated": "2026-11-19",
  "pages": {
   "about": {
-   "axe": {
-    "color-contrast": {
-     "n": 3,
-     "impact": "serious",
-     "help": "Elements must meet minimum color contrast ratio thresholds",
-     "sample": ".lede > .trophy.tag"
-    },
-    "scrollable-region-focusable": {
-     "n": 1,
-     "impact": "serious",
-     "help": "Scrollable region must have keyboard access",
-     "sample": "#seasons > .tablebox:nth-child(5)"
-    }
-   },
+   "axe": {},
    "focus": {
-    "invisible": 18,
+    "invisible": 0,
     "stuck": 0,
-    "where": [
-     "a",
-     "a",
-     "a"
-    ],
-    "why": [
-     "a (focus=true focus-visible=true page-focused=true outline=none 3px html=hide-spoilers in-hx=false later: active=true outline=none 3px)",
-     "a (focus=true focus-visible=true page-focused=true outline=none 3px html=hide-spoilers in-hx=false later: active=true outline=none 3px)",
-     "a (focus=true focus-visible=true page-focused=true outline=none 3px html=hide-spoilers in-hx=false later: active=true outline=none 3px)"
-    ]
+    "where": [],
+    "why": []
    },
    "motion": 0
   },

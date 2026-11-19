@@ -337,3 +337,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   cache lasts an hour). The deploys that broke the cache are fixed ([ask-timmy](../reference/ask-timmy.md), "Limits and money").
   What's left would mean sending less: for example only the exam facts, Exam Hints and the lecture the student is on, with the
   rest of the notes only when the question needs them. That changes what Timmy can answer, so it needs the eval ($6) and Sam's OK.
+- [ ] **a11y.js checks the About page in light mode on a laptop only** (2026-11-19, found fixing BUG-002, BUG-006 and BUG-007):
+  `check('about', 'about/')` in `tools/release/a11y.js` runs at 1280 px in light mode, so a phone-only problem (four of the five
+  tables that scroll sideways were only too wide at 390 px) or a dark-mode one would never be counted. Add the About page in dark
+  mode and at a phone width (with spoilers shown, since the hidden hints are styled apart), each with its baseline entry at 0.

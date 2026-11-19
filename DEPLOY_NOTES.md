@@ -32,6 +32,15 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (About page accessibility, Claude Code, PR (About page accessibility))** — the last three accessibility bugs from
+  the release dry run, all on `about/index.html`: BUG-007, the nine contents links at the top turned their focus outline off
+  (`nav.toc a:focus-visible{outline:none}`), so a keyboard user couldn't see where they were; they now get the page's ring.
+  BUG-006, a table wider than its box (the seasonal bosses' on a laptop, all five on a phone) couldn't be scrolled from the
+  keyboard: while it scrolls it is now a named region in the Tab order (`tabindex`, `role="region"`, its `data-label`), set by
+  a `ResizeObserver` in the page's script, and one that fits stays out of the Tab order. BUG-002's last part, light mode's
+  `--gold` (#8A6417 → #7D5A13) and `--ink-3` (#5F6D78 → #56636E) a shade darker, so the trophy tags and the hidden-spoiler hint on
+  the gold note pass AA. The About entry in `tools/release/baselines/a11y.json` is now 0 everywhere. Found while doing it
+  (inbox): a11y.js checks the About page only in light mode at 1280 px.
 - **2026-11-19 (Heme & Endo Exam 3: L21 and L22 checked against their slides, Claude Code, [#449](https://github.com/smcmurry6-source/study-hubs/pull/449))** — the inbox's last item for the
   hub: Sam put smaller copies of Dr. Dal Zotto's two decks in the Drive folder, so both lectures, written from their recordings
   on 11-18, were compared with every slide. The notes (both levels) gained what only the slides say, marked "the slide":
