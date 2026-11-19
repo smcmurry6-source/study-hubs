@@ -11,6 +11,7 @@
 //     (2 seconds, 30 a minute), and every source: a day studied, the 20th answer, a finished mock, the
 //     mastery medals and their double XP, Timmy Time minutes, a finished arcade game, a fixed report;
 //   - a replayed call, a double tap and a linked device pay once, and the rebuild gives exactly what the live calls paid;
+//   - "Is this your other device?" (name_shared, migration_v87) asks only about another device used in the last 21 days;
 //   - Shiny Gold Crowns (from base XP, the grants since the switch, minus spending), the shop's rotation and seasons,
 //     buy_item (a double tap, a replayed call, a balance too low, not on sale today, owned, one snack a day, boosts that
 //     extend or wait for a medal's to end), equip_item, snack HP in Timmy's days, rare-costume sightings; the preview's purchases (buyCore) answer as
@@ -458,6 +459,29 @@ try {
   eq(kw.spent, 100, 'the linked wallet counts the spending');
   ok(rows(`select costume from costume_log where visitor_id = 'xp-K'`).length === 1, 'the costume log moves');
   notes.push('Link my devices: awards, the inventory, what\'s equipped, spending and the costume log merge; the rebuild is stable');
+
+  /* ---------- 8a. "Is this your other device?" asks only about a device used in the last 3 weeks (migration_v87) ---------- */
+  sql(`insert into visitor_names (visitor_id, display_name) values
+         ('xp-NS1', 'Same Name'), ('xp-NS2', '  same NAME '), ('xp-NS3', 'Old Name'), ('xp-NS4', 'Old Name'),
+         ('xp-NS5', 'Linked Name'), ('xp-NS6', 'Linked Name'), ('xp-NS7', 'Ghost Name'), ('xp-NS8', 'Ghost Name');
+       insert into visitor_links (alias_id, primary_id) values ('xp-NS6', 'xp-NS6P');
+       insert into activity_visits (visit_id, visitor_id, first_at, last_at) values
+         ('ns-v1', 'xp-NS1', now() - interval '1 day', now() - interval '1 day'),
+         ('ns-v2', 'xp-NS2', now() - interval '20 days', now() - interval '20 days'),
+         ('ns-v3', 'xp-NS3', now() - interval '1 hour', now() - interval '1 hour'),
+         ('ns-v4', 'xp-NS4', now() - interval '40 days', now() - interval '22 days'),
+         ('ns-v6', 'xp-NS6P', now() - interval '1 hour', now() - interval '1 hour'),
+         ('ns-v8', 'xp-NS8', now() - interval '1 hour', now() - interval '1 hour');`);
+  const shared = (v, n) => anon(`select name_shared(${v === null ? 'null' : q(v)}, ${n === null ? 'null' : q(n)})`)[0][0] === 't';
+  eq([shared('xp-NS1', 'Same Name'), shared('xp-NS2', 'same name')], [true, true], 'two devices with one name, both used lately, are asked about each other (case and spaces ignored)');
+  eq([shared('xp-NS4', 'Old Name'), shared('xp-NS3', 'Old Name')], [true, false], 'the device in use is no longer asked about one last used 22 days ago; that one, if it is opened again, is asked about the one in use');
+  eq(shared('xp-NS5', 'Linked Name'), true, 'a device linked to someone else counts by its person\'s visits (kept under the id it links to)');
+  sql(`insert into visitor_links (alias_id, primary_id) values ('xp-NS5', 'xp-NS6P')`);
+  eq(shared('xp-NS5', 'Linked Name'), false, 'once the two are linked, never');
+  eq([shared('xp-NS8', 'Ghost Name'), shared('xp-NS7', 'Ghost Name')], [false, true], 'a device with no visits at all is never asked about');
+  eq([shared(null, 'Same Name'), shared('xp-NS1', ''), shared('xp-NS1', null), shared('xp-NS1', 'x'.repeat(25)), shared('xp-NS9', 'Nobody Has This')],
+    [false, false, false, false, false], 'no id, no name, a name over 24 characters or a name nobody else has: false');
+  notes.push('"Is this your other device?" (name_shared): only about another device used in the last 21 days, never a linked one');
 
   /* ---------- 9. Shiny Gold Crowns ---------- */
   const dw = json(`sh_wallet('xp-D')`), dExtra = num(`select sum(xp - base) from xp_awards where visitor_id = 'xp-D'`);
