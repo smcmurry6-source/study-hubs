@@ -32,6 +32,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (Heme & Endo Exam 3: L21 and L22 in, Claude Code)** — Sam: "i just added the last endo lectures. update the hub.
+  no to all diagrams". Dr. Dal Zotto's **L21** Male reproductive and lower urinary tract pathology (`mpath`, 64 questions,
+  `mr-`) and **L22** Female reproductive pathology (`fpath`, 60, `fr-`), both taught 11/18, written from their recordings (the
+  slides were in Drive but too big for the connector to read: checking them is an inbox line). Notes at both levels, every
+  question format with every why (13 Patient Box cases), the study guide's focus hints and topics first, the "you don't need"
+  remarks as hints with no question keyed on them, tables, cram, processes, sort sets, all three narration levels. **No
+  figures** (Sam's call, replacing the 11-16 yes for these two). The mock is the exam's 35 in 90 minutes; the "join later"
+  wording is gone (`index.html`, `examInfo`, `hubs.js`). 437 questions, 86 topics. Shared: 29 words in
+  `tools/podcast/lexicon.json` and "WHO" read as W H O in `tools/narrate.py` (only new recordings change). Content flags
+  in `vault/hubs/heme-endo-exam3.md`; the task is done.
 - **2026-11-18 (the backlog board, Claude Code)** — Sam: "would it be effective to make the backlog into a trello board
   artifact that i can initiate sessions from?", then "yes build it". `/backlog` now also redraws a private claude.ai
   artifact, "Study Hubs Backlog": the packages in four columns (This week, Next, Later, Set aside; tabs on a phone), each
@@ -546,7 +556,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   **Not done, merged early because Sam was running out of usage** ("merge before i run out of usage, we can finish the rest
   when it resets"): the 22 figures Sam approved (drafts in `tools/figures/heme-endo-exam3/drafts/`) and High yield
   narration for L17-L20 (`vault/tasks/2026-11-16-heme-endo-exam3-figures.md`); L19 and L20 to taught and L21 and L22, whose
-  slides weren't posted (`vault/tasks/2026-11-16-heme-endo-exam3-l19-l22.md`). Not used (graded-coursework): the Exam 3 Anki
+  slides weren't posted (`vault/tasks/done/2026-11-16-heme-endo-exam3-l19-l22.md`). Not used (graded-coursework): the Exam 3 Anki
   deck in Drive, "Resources from D3s", Quiz 4 (open until 11/19). Hub note: `vault/hubs/heme-endo-exam3.md`.
 - **2026-11-16 (Time in Learn and in Flashcards, told apart from the Question Bank, Claude Code, [#381](https://github.com/smcmurry6-source/study-hubs/pull/381))** — Sam asked
   "do we have tracking for how people do questions between the bank, learn, and flashcards", then "i want to see where people
