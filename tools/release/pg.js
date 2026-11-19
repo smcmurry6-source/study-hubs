@@ -1,6 +1,7 @@
 // A throwaway PostgreSQL for the database tests (tools/release/admin-ops.js, xp.js): initdb in a temp folder, Supabase's
 // roles and default grants, then supabase/schema.sql with a test admin secret, then the migrations waiting for their
 // release (supabase/pending-migrations.txt; { pending: false } leaves them for applyPending()). Never the live database.
+// { settings: ['-c name=value', ...] } adds server settings (tools/release/bench-answers.js loads pg_stat_statements).
 // { beforeRelease: true } stops at schema.sql's "the redesign's release" marker (migration_v54 to v58 come after it):
 // the database as it was before the release, for tools/release/xp.js to put made-up history in; applyRelease() then
 // loads the rest, the way the live project met those migrations.
@@ -34,7 +35,7 @@ function throwaway(secret, opts){
   process.on('exit', stop);
   /* rows as arrays of strings; throws with the server's message (and SQLSTATE in e.code) on an error */
   function sql(text, db){
-    const r = spawnSync(path.join(BIN, 'psql'), ['-X', '-q', '-v', 'ON_ERROR_STOP=1', '-tA', '-F', '\x1f', '-R', '\x1e', '-h', dir, '-p', PORT, '-U', 'postgres', '-d', db || 'ops'], { input: '\\set VERBOSITY verbose\n' + text, encoding: 'utf8' });
+    const r = spawnSync(path.join(BIN, 'psql'), ['-X', '-q', '-v', 'ON_ERROR_STOP=1', '-tA', '-F', '\x1f', '-R', '\x1e', '-h', dir, '-p', PORT, '-U', 'postgres', '-d', db || 'ops'], { input: '\\set VERBOSITY verbose\n' + text, encoding: 'utf8', maxBuffer: 1 << 28 });
     if (r.status !== 0) {
       const msg = (r.stderr || '').replace(/^psql:[^:]*:\d+: /gm, '').trim(), m = /ERROR:\s+([0-9A-Z]{5}):/.exec(msg);
       const e = new Error(msg); e.code = m ? m[1] : null; throw e;
@@ -42,7 +43,7 @@ function throwaway(secret, opts){
     return r.stdout.split('\x1e').map(l => l.replace(/^\n+|\n+$/g, '')).filter(l => l.length).map(l => l.split('\x1f'));   /* rows end in \x1e: a value may hold newlines */
   }
   run('initdb', ['-D', path.join(dir, 'data'), '-U', 'postgres', '-A', 'trust', '--no-sync']);
-  run('pg_ctl', ['-D', path.join(dir, 'data'), '-o', `-k ${dir} -p ${PORT} -c listen_addresses='' -c fsync=off`, '-l', path.join(dir, 'log'), '-w', 'start']);
+  run('pg_ctl', ['-D', path.join(dir, 'data'), '-o', `-k ${dir} -p ${PORT} -c listen_addresses='' -c fsync=off ${(opts.settings || []).join(' ')}`, '-l', path.join(dir, 'log'), '-w', 'start']);
   started = true;
   sql('create database ops', 'postgres');
   sql(`create role anon nologin noinherit; create role authenticated nologin noinherit; create role service_role nologin noinherit bypassrls;
@@ -60,7 +61,7 @@ function throwaway(secret, opts){
   const waiting = pending(secret);
   function applyPending(){ waiting.forEach(m => { try { sql('begin;\n' + m.text + '\ncommit;'); } catch (e) { e.message = `${m.file}: ${e.message}`; throw e; } }); return waiting.map(m => m.file); }
   if (opts.pending !== false) applyPending();
-  return { sql, stop, applyPending, applyRelease, pending: waiting.map(m => m.file), q: s => "'" + String(s).replace(/'/g, "''") + "'" };
+  return { dir, port: PORT, bin: BIN, sql, stop, applyPending, applyRelease, pending: waiting.map(m => m.file), q: s => "'" + String(s).replace(/'/g, "''") + "'" };
 }
 
 module.exports = { throwaway, pgBin };
