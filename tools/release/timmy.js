@@ -12,7 +12,8 @@
 //   - the students' calls read and change only their own rows (history, thumbs, offers, reports); a report from the chat
 //     is a usual report (the admin Inbox shows it, the reply goes back), once an answer, ten a person a day;
 //   - anon can't run the function's two calls or read the tables; the admin reads need the secret and carry no visitor id;
-//   - Link my devices moves the chats.
+//   - Link my devices moves the chats;
+//   - timmy_cache (migration_v85): when a hub's whole content was last read, the service role only.
 //   node tools/release/timmy.js     (PostgreSQL 14+ server binaries: initdb, pg_ctl, psql)
 'use strict';
 const { throwaway } = require('./pg');
@@ -237,6 +238,21 @@ try {
   eq(k3.chat, k2.chat, 'the linked device\'s chat can be continued');
   finish(k3.message);
   notes.push('Link my devices moves the chats');
+
+  /* ---------- 9. timmy_cache (migration_v85): when a hub's whole content was last read ---------- */
+  const cache = (k, m) => one(`select timmy_cache(${q(k)}, ${m ? 'true' : 'false'})::text`);
+  ok(!cache('th:abc', false), 'timmy_cache: an entry never marked has no time');
+  ok(!cache('th:abc', true), 'timmy_cache: marking returns nothing');
+  const tc = cache('th:abc', false);
+  ok(tc && Math.abs(Date.parse(tc) - Date.now()) < 60000, `timmy_cache: a marked entry has the time it was marked (${tc})`);
+  sql(`update timmy_cache_marks set at = now() - interval '8 days' where key = 'th:abc'; insert into timmy_cache_marks values ('th:old', now() - interval '8 days')`);
+  cache('th:new', true);
+  eq(one(`select string_agg(key, ',' order by key) from timmy_cache_marks`), 'th:new', 'timmy_cache: marking clears entries over a week old');
+  raises(() => cache('x'.repeat(121), true), null, 'timmy_cache refuses a key over 120 characters');
+  raises(() => as('anon', `select timmy_cache('th:new', true)`), '42501', 'anon runs timmy_cache');
+  raises(() => as('authenticated', `select timmy_cache('th:new')`), '42501', 'authenticated runs timmy_cache');
+  raises(() => as('anon', `select count(*) from public.timmy_cache_marks`), '42501', 'anon reads timmy_cache_marks');
+  notes.push('timmy_cache: marks and reads a cache entry\'s time, clears week-old ones, the service role only');
 } catch (e) {
   problems.push(`test run failed: ${e.message.split('\n').slice(0, 3).join(' | ')} (${(e.stack || '').split('\n').filter(l => /timmy\.js:\d+/.test(l)).map(l => l.replace(/.*timmy\.js:(\d+).*/, 'line $1')).join(' < ')})`);
 }

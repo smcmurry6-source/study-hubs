@@ -171,6 +171,24 @@ async function askCheck(page, name, o){
     const h = await page.evaluate(() => location.hash);
     if (h !== '#notes/' + o.lec) problems.push(`${name}: the answer's "From the notes" link opened ${h}, not #notes/${o.lec}`);
   }
+  /* the dashboard's "What should I study tonight?" reads the student's own answers from the server (get_my_answers), so a
+     new or linked device sees what was answered elsewhere: every question answered right there must reach the progress sent */
+  if (o.hubId === 'dashboard' && b && Array.isArray(b.hubs)) {
+    const hub = b.hubs.find(h => fs.existsSync(content(h, 'core.json')));
+    const idx = hub ? (JSON.parse(fs.readFileSync(content(hub, 'core.json'), 'utf8')).index || []) : [];
+    if (idx.length) {
+      const asked = [], rows = idx.map((r, i) => [r[0], 1763500000 + i, 1]);
+      await page.route(/supabase\.co\/rest\/v1\/rpc\/get_my_answers/, route => { let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
+        asked.push(a.p_hub); return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(a.p_hub === hub ? rows : []) }); });
+      const n0 = sent.length;
+      await page.fill('#skaIn', 'What should I study tonight?'); await page.click('.ska-send');
+      await page.waitForFunction(n => document.querySelectorAll('.ska-m.is-tim:not(.is-wait)').length >= n, n0 + 1, { timeout: 8000 }).catch(() => {});
+      const t = sent[n0], row = t && t.progress && (t.progress.lectures || []).find(x => x.hub === hub && x.answered > 0);
+      if (!asked.includes(hub)) problems.push(`${name}: "What should I study tonight?" didn't read the student's answers from the server (get_my_answers for ${hub})`);
+      else if (!row || row.answered < 1 || row.right < 1) problems.push(`${name}: the answers from the server didn't reach "What should I study tonight?"'s progress (${JSON.stringify(row || (t && t.progress) || null)})`);
+      await page.unroute(/supabase\.co\/rest\/v1\/rpc\/get_my_answers/);
+    }
+  }
   if (await page.$('.ska.is-on')) { await page.click('[data-ska="close"]'); await page.waitForTimeout(300); }
   return sent;
 }
