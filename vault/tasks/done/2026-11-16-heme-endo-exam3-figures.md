@@ -37,7 +37,7 @@ resets"). Finish both before Exam 3 (Fri 11/20, 8 am): [ship-it-now](../../rules
   `node tools/timmy/build.mjs`.
 - **High yield narration:** Lecture A's is recorded. For L17-L20, after the content is final:
   `python3 tools/narrate.py heme-endo-exam3 --level hy --lec <id> --force`, then the content build (it fills `hyAudio`).
-  L19 and L20 will change when their recordings land ([that task](../2026-11-16-heme-endo-exam3-l19-l22.md)): record theirs
+  L19 and L20 will change when their recordings land ([that task](2026-11-16-heme-endo-exam3-l19-l22.md)): record theirs
   then, at all three levels.
 
 ## The figures (each one's plan)
@@ -83,7 +83,7 @@ resets"). Finish both before Exam 3 (Fri 11/20, 8 am): [ship-it-now](../../rules
 
 - [x] Every figure above built, checked and placed (notes, Review), and the About page lists them
 - [x] High yield narration for L17 and L18 (L19 and L20 recorded too, from their slides; they are recorded again with the
-      rest of their narration when they go taught: [that task](../2026-11-16-heme-endo-exam3-l19-l22.md))
+      rest of their narration when they go taught: [that task](2026-11-16-heme-endo-exam3-l19-l22.md))
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
 - [x] Vault written back (hub note, this note's Outcome)
 
@@ -111,7 +111,7 @@ flare; `ecwindow` leaves out mifepristone (not an option he taught); `node` give
 `spleen` draws both the open and the closed route (the slides contradict each other) and names slide 40's "(PALS)" slip;
 `letdown` cites Sarhadi et al. 1996 for the oxytocin release, a citation not checked against the paper. L19's and L20's
 figures follow their slides, and are checked against the recordings when those lectures go taught
-([that task](../2026-11-16-heme-endo-exam3-l19-l22.md)).
+([that task](2026-11-16-heme-endo-exam3-l19-l22.md)).
 
 `content/figures.js` is 2.3 MB (580 KB gzipped), fetched only when the notes open, like Occlusion's 1.5 MB. A
 figure's place is written three times: `FIG_PLACE` in `content/figures.js`, `figByLec` in `core.json` and the `figs` section
