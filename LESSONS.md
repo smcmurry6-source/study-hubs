@@ -566,9 +566,9 @@ morning exam, Home's exam-day view should lead with Timmy Time and the cram; (5)
 on** (the film's bone level, the visit, where the loss is), since a sketch can't be read the way a radiograph is; (6) **a second
 wording doesn't change difficulty**, so A/B versions can stay in every hub where there's time to write them; label every number in a
 choice that pairs two of them; (7) numbered items again trap on the extra statement: make the false statement's detail plain (one
-number or name), as the standing lesson says. Cleanup still to do by hand: take `perio` out of `HUBS` in `sw.js` (and bump `VERSION`)
-once it's archived (`node tools/ci/syntax.js` fails it while the hub is live, before 10 pm tonight); the hub page stays up for now, and
-moving its entry into `archived` in `hubs.js` is optional.
+number or name), as the standing lesson says. Cleanup: done the same afternoon. Sam had the page taken down ("you can take perio
+down now"), so `hubs.js` archives it at 1 pm (`archiveOn`), it left `HUBS` in `sw.js`, and its About entries and tests went with it
+([the hub note](vault/hubs/perio.md)); moving its entry into `archived` in `hubs.js` is optional.
 
 ### Occlusion (`occlusion`), midterm 2026-10-21, final 2026-11-16 (6:30-7:45 pm), archived 2026-11-16 (written 2026-11-17)
 

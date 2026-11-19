@@ -32,8 +32,8 @@ after its date. Do each one on its own (a small PR), with the steps in the rule.
 - [x] **Perio** (`perio`, 289 MB with High yield and the final's Timmy Time): its final was the morning of Thu Nov 19; done that
   afternoon by the lessons audit (Sam: "perio is over"): the 55 files, `"audio": "off"` in `content/core.json`, the content build,
   and the `podcast`, Listen and Timmy Time out of its `hubs.js` entry (the site 656 -> 367 MB).
-- [ ] **Perio out of `HUBS` in `sw.js`** (and `VERSION` bumped) once the dashboard has archived it (10 pm on 11-19): before then
-  `node tools/ci/syntax.js` fails it as a live hub on the engine missing from `HUBS`, so it couldn't go in the audit's PR.
+- [x] **Perio out of `HUBS` in `sw.js`** (and `VERSION` bumped) once the dashboard has archived it: done the same afternoon
+  (`sh-v65`, [#464](https://github.com/smcmurry6-source/study-hubs/pull/464)), when Sam had its page taken down and `hubs.js` archived it at 1 pm.
 - [x] `node tools/ci/size.js` lists no archived hub among those with audio (2026-11-19: only Heme & Endo Exam 3, live, carries any).
 
 ## Log
@@ -51,7 +51,7 @@ after its date. Do each one on its own (a small PR), with the steps in the rule.
   live page wasn't on the redesign, so the engine's box didn't apply. Special Patient Care waits for Canvas to close (Sat 11-14, 11:59 pm).
 - 2026-11-14: Special Patient Care's page came off with its audio (Sam: "remove everything for it"), in the same PR.
 - 2026-11-17: Occlusion's audio came off with its retrospective (the lessons audit): the 51 files, `"audio": "off"` in its `core.json`, the content build, and out of `HUBS` in `sw.js` (`sh-v62`).
-- 2026-11-19: Perio's audio came off with its retrospective (the lessons audit, the afternoon of its final): the 55 files, `"audio": "off"`, the build and its `hubs.js` entry's podcast. `sw.js` waits for the archiving hour (the box above).
+- 2026-11-19: Perio's audio came off with its retrospective (the lessons audit, the afternoon of its final): the 55 files, `"audio": "off"`, the build and its `hubs.js` entry's podcast. Later that day its page came down (Sam: "you can take perio down now"), and it left `HUBS` in `sw.js` (`sh-v65`).
 
 ## Outcome
 

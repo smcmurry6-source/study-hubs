@@ -47,10 +47,10 @@ async function run(browser, failFirst){
   const page = await context.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message));
   await page.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
-  await page.goto(BASE() + 'hubs/perio/index.html#questions');
+  await page.goto(BASE() + 'hubs/heme-endo-exam3/index.html#questions');
   const on = await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb, null, { timeout: 20000 }).catch(() => null);
   if (!on) { problems.push(`${failFirst ? 'failing' : 'working'} database: the page didn't come up on the game layer with window.shDb`); await context.close(); return; }
-  const ev = await page.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'perio:answered'; });
+  const ev = await page.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'hee3:answered'; });
   const from = log.length;
   for (const q of ['pq-1', 'pq-2', 'pq-3']) {
     await page.evaluate(([e, qid]) => document.dispatchEvent(new CustomEvent(e, { detail: { qid, choice: 0, correct: true, ctx: 'bank' } })), [ev, q]);
@@ -90,7 +90,7 @@ async function run(browser, failFirst){
 }
 
 async function kept(browser){
-  const context = await browser.newContext(), t0 = Date.now(), log = [], KEY = 'sh_answers_kept:perio';
+  const context = await browser.newContext(), t0 = Date.now(), log = [], KEY = 'sh_answers_kept:heme-endo-exam3';
   if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
   let failing = true;
   await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, async route => {
@@ -113,14 +113,14 @@ async function kept(browser){
   await context.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
   const errs = [], open = async () => {
     const page = await context.newPage(); page.on('pageerror', e => errs.push(e.message));
-    await page.goto(BASE() + 'hubs/perio/index.html#questions');
+    await page.goto(BASE() + 'hubs/heme-endo-exam3/index.html#questions');
     return (await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb, null, { timeout: 20000 }).catch(() => null)) ? page : null;
   };
   const show = (page, hidden) => page.evaluate(h => { Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => h ? 'hidden' : 'visible' }); document.dispatchEvent(new Event('visibilitychange')); }, hidden);
   const stored = page => page.evaluate(k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return 'unreadable'; } }, KEY);
   const a = await open();
   if (!a) { problems.push("kept answers: the page didn't come up on the game layer"); await context.close(); return; }
-  const ev = await a.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'perio:answered'; });
+  const ev = await a.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'hee3:answered'; });
   for (const q of ['pq-1', 'pq-2']) {
     await a.evaluate(([e, qid]) => document.dispatchEvent(new CustomEvent(e, { detail: { qid, choice: 0, correct: true, ctx: 'bank' } })), [ev, q]);
     await a.waitForTimeout(2500);
@@ -185,7 +185,7 @@ async function pings(browser, missing){
   const page = await context.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message));
   await page.clock.install();
-  await page.goto(BASE() + 'hubs/perio/index.html#questions');
+  await page.goto(BASE() + 'hubs/heme-endo-exam3/index.html#questions');
   if (!(await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb, null, { timeout: 20000 }).catch(() => null))) {
     problems.push(`${what}: the page didn't come up on the game layer`); await context.close(); return;
   }
@@ -244,10 +244,10 @@ async function phase2(browser, missing){
     let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
     log.push({ fn, a });
     const json = (b, s) => route.fulfill({ status: s || 200, contentType: 'application/json', body: JSON.stringify(b) });
-    if (fn === 'get_widget_bootstrap_v2') return json({ rank: Object.assign({}, rank, { best_run: 30 }), mastery: [{ hub: 'perio', latest_correct: 5, seen: 8 }],
+    if (fn === 'get_widget_bootstrap_v2') return json({ rank: Object.assign({}, rank, { best_run: 30 }), mastery: [{ hub: 'heme-endo-exam3', latest_correct: 5, seen: 8 }],
       answers: [['pq-1', 1763500000, 0], ['pq-2', 1763500100, 1]] });
     if (fn === 'get_rank_profile_v2') return json(Object.assign({}, rank, { best_run: 30 }));
-    if (fn === 'get_hub_mastery') return json([{ hub: 'perio', latest_correct: 5, seen: 8 }]);
+    if (fn === 'get_hub_mastery') return json([{ hub: 'heme-endo-exam3', latest_correct: 5, seen: 8 }]);
     if (missing && (fn === 'get_class_numbers' || fn === 'record_analytics')) return json(gone, 404);
     if (fn === 'get_class_numbers') return json({ stats: [{ qid: 'pq-1', attempts: 9, correct: 4 }], choices: [{ qid: 'pq-1', choice: 2, picks: 3 }] });
     if (fn === 'question_stats') return json([{ qid: 'pq-1', attempts: 9, correct: 4 }]);
@@ -258,7 +258,7 @@ async function phase2(browser, missing){
   await context.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
   const page = await context.newPage(), errs = [];
   page.on('pageerror', e => errs.push(e.message));
-  await page.goto(BASE() + 'hubs/perio/index.html#questions');
+  await page.goto(BASE() + 'hubs/heme-endo-exam3/index.html#questions');
   if (!(await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb && window.shAnalytics && window.shClicks, null, { timeout: 20000 }).catch(() => null))) {
     problems.push(`${what}: the page didn't come up on the game layer`); await context.close(); return;
   }
@@ -301,7 +301,7 @@ async function phase2(browser, missing){
   if (!missing) {
     // the tenth answer, on the page: nine quick answers, then a tenth once they are saved
     await page.evaluate(() => { window.__p2 = []; document.addEventListener('sh:rank-profile', e => window.__p2.push(e.detail)); });
-    const ev = await page.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'perio:answered'; });
+    const ev = await page.evaluate(() => { const s = [...document.scripts].find(x => x.dataset && x.dataset.answeredEvent); return s ? s.dataset.answeredEvent : 'hee3:answered'; });
     const answer = async qs => {
       const saved = count(0, 'record_answer_v2') + qs.length;
       for (const q of qs) await page.evaluate(([e, qid]) => document.dispatchEvent(new CustomEvent(e, { detail: { qid, choice: 0, correct: true, ctx: 'bank' } })), [ev, q]);

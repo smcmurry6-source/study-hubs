@@ -84,7 +84,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   hub's own panel (`widget/v3.js`) don't open anyone's place yet (Sam, 2026-11-12: the dashboard's boards first).
 - [ ] **Sound for the hand-off and the Dark Matter unlock**, only if the redesign ever gets a sound setting (it has none; the
   scenes are silent on purpose: [the journeys](done/2026-11-06-redesign-progression-journeys.md)).
-- [ ] **Perio's page weight is near its budget** (2026-11-14, [#362](https://github.com/smcmurry6-source/study-hubs/pull/362)): `perf.js`
+- [x] ~~**Perio's page weight is near its budget**~~ (moot: Perio's page came down 2026-11-19, [#464](https://github.com/smcmurry6-source/study-hubs/pull/464)) (2026-11-14, [#362](https://github.com/smcmurry6-source/study-hubs/pull/362)): `perf.js`
   measured the live Perio page at 1167 KB of its 1180 KB budget (`tools/release/budgets.json`) after Figs 6-8 (+38 KB gzipped), and its
   first paint warns at 1.6 s on the slow phone (budget 1.5 s; CI passed). The next figure or big content change needs room: trim
   what the anima blocks repeat (each figure's static SVG is drawn again by its live code), or ask Sam before raising the budget.

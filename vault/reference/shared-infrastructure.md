@@ -51,7 +51,7 @@ tags: [widget, supabase]
 - **`widget/cases.js` + `widget/cases.css`** (`window.shCases`): the dental case kit. A Patient Box question in any
   hub names a case (`pcase`) in that hub's `PCASES`, and the kit draws its periodontal chart, periapical radiograph
   and buccal view from the case's numbers, works out the diagnosis from them and validates that every number is
-  realistic (`node tools/ci/cases.js` in CI). Loaded by the hubs that have cases (Perio, PCD Implants, Occlusion); on the engine a hub's cases are `pcases` in
+  realistic (`node tools/ci/cases.js` in CI). Loaded by the hubs that have cases (PCD Implants; Perio and Occlusion until their pages came down, 2026-11-19); on the engine a hub's cases are `pcases` in
   its `content/core.json`. How to add a case or a hub: [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md).
 - **`widget/ideas.js` + `widget/ideas.css`** (`window.shIdeas`): the idea board, part of the redesign.
   `shIdeas.mount(el, options)` draws the board (the dashboard's `#ideas`, a hub's

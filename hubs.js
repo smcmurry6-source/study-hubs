@@ -404,9 +404,14 @@ window.SH_DASH_DATA = {
      "name": "Periodontology final",
      "label": "Final",
      "date": "2026-11-19",
-     "code": "Periodontology · Final"
+     "code": "Periodontology · Final",
+     "promptHour": 13
     }
    ],
+   "archiveOn": {
+    "date": "2026-11-19",
+    "hour": 13
+   },
    "updated": "2026-09-25",
    "desc": "Diagnosis and classification, incisions, flaps and sutures, risk assessment and prognosis, Phase I therapy and instrumentation, resective surgery and furcations, regeneration, implants, host modulation, and plastic surgery. Review tables, a timed mock exam and the Pocket Arcade.",
    "modes": [
