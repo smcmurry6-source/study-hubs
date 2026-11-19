@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430
+pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430, https://github.com/smcmurry6-source/study-hubs/pull/435
 ---
 
 # Keep heavy queries from failing students' answer saves
@@ -168,7 +168,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   Exam 1's LCP (3772 ms against 2500; an old hub that loads none of the changed files, 1652 ms locally) and passed on its
   one re-run.
 
-- 2026-11-19: the box "A failed answer that's still unsent" done (`widget/v3.js`, answers kept on the device; a backlog
+- 2026-11-19 ([#435](https://github.com/smcmurry6-source/study-hubs/pull/435)): the box "A failed answer that's still unsent" done (`widget/v3.js`, answers kept on the device; a backlog
   spaced as it was answered), with the rank pill while the bootstrap times out (`widget/ranks.js` asks the game layer's
   profile when `shGame.live()`, the inbox line). `tools/ci/quiet.js` gained a run: a page whose saves fail is hidden, shown,
   hidden again, and a second page on a working database sends its two answers with the same ids, 2.5 s apart; the first

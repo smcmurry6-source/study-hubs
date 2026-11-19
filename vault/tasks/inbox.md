@@ -10,7 +10,9 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
-- [ ] **The rank pill while the bootstrap times out** (2026-11-18, found with BUG-183, #427). `widget/ranks.js` asks
+- [x] **The rank pill while the bootstrap times out** (done: it drew the wrong thing, no double-XP chip and from 50,000 XP the
+  wrong rank or journey; `widget/ranks.js` asks the v2 profile when `shGame.live()`,
+  [#435](https://github.com/smcmurry6-source/study-hubs/pull/435)) (2026-11-18, found with BUG-183, #427). `widget/ranks.js` asks
   `get_rank_profile_v2` only when `shGame.v2()` is true, so on a page whose bootstrap timed out in a busy minute it reads the
   old `get_rank_profile` until the first answer's reply. Check whether that draws the wrong rank or journey, and if so ask
   `shGame.live()` there too, as `widget/hub-rewards.js` and `widget/games.js` do since #427.
