@@ -190,9 +190,23 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   is applied, the pages ask for the two new calls once a page load and use the old ones (a 404 each).
   **Done** 2026-11-19, 12:13 pm Central, ahead of the exam at Sam's word ("the hubs are quiet right now. go ahead and run the
   migrations you were waiting on"): the Log.
-- [ ] **The bootstrap's answers** (left by phase 2): `get_my_answers` is still most of a heavy student's bootstrap (8.8 of
+- [x] **The bootstrap's answers** (left by phase 2): `get_my_answers` is still most of a heavy student's bootstrap (8.8 of
   22.5 ms at 8,000 answers; 0.6 ms at 500) and is read again every 3 minutes a hub is open. The device could send the time
   of the newest answer it holds and get only those after it. `get_pet_days_v2` is the next (about 3 ms for the heaviest).
+  **Done** (phase 3, `migration_v84.sql` with `widget/v3.js`): the device keeps the hub's history (`sh_answers_hist:<hub>`,
+  the newest 5,000) and sends the **id** of its newest answer, not its time (a kept answer sent by the next page arrives
+  with its old time but a new id), with the count the server had; it gets only the answers after it. Answers are only ever
+  added, except by Link my devices, which moves older ones in: then the count doesn't add up and the whole history comes
+  back. `get_pet_days` read every answer of the last 70 days to find the one boundary day's; it is bounded by that day's
+  end now. Measured: phase 3's Log. Applied live: the next box.
+- [ ] **Apply `migration_v84.sql`** (phase 3) at night (1 to 5 am Central), after #456's `migration_v83.sql` if that goes in
+  the same night (not at the same time). Fetch `main` first: if v84 was taken, renumber; if `get_widget_bootstrap_v2`,
+  `get_my_answers`, `get_pet_days` or `get_pet_days_v2` changed since v82, rebuild on the newer copy. md5-check the four
+  live bodies against `supabase/schema.sql` first; then the file through `apply_migration` (one transaction: the
+  bootstrap's old signature is dropped and the new one created in it), the bodies against the file after, one bootstrap
+  in `pg_proc`, `get_my_answers_since` and the bootstrap through the API as a visitor (200), the edge logs for a minute
+  after. Then append it to `supabase/schema.sql` and take its line out of `supabase/pending-migrations.txt`. Until it is
+  applied the pages ask as before (they keep no copy: the reply has no `answers_id`).
 - [x] **`answer_xp` is written twice an answer** (the row, then its reply onto it): one insert at the end would halve
   that table's writes and dead rows. It moves the insert past the speed limit's count, which reads the row, so it needs
   care. **Done: `migration_v80.sql`.** The count joins the row only to leave out mock answers and runs only outside a mock,
@@ -305,6 +319,20 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
     after it a median of 146 ms; the pages switched to `get_class_numbers` and `record_analytics` within a minute.
   - The scheduled run for Saturday 1:30 am (phase 2's live steps) was turned off; tonight's 1:30 am readout still runs.
   - `supabase/schema.sql` has v79-v82 appended; `supabase/pending-migrations.txt` lists none.
+
+- 2026-11-19, afternoon (Claude Code, phase 3, Sam's package): `migration_v84.sql` with `widget/v3.js` (the box "The
+  bootstrap's answers"). On a throwaway copy of `supabase/schema.sql` with a heavy (8,000 answers), a middling (3,300) and a
+  light (500) student, ms a call timed inside the server (40 calls, after a first): the bootstrap 14.3 / 11.4 / 6.6 →
+  **6.9 / 6.0 / 5.3** with the device's copy (15.0 / 13.9 / 6.0 without one, the first page load: the count and newest id
+  add a scan); the sync every 3 minutes 6.6 / 5.1 / 0.9 (`get_my_answers`) → **1.3 / 0.5 / 0.15**
+  (`get_my_answers_since`, nothing new); Timmy's days 2.1 / 1.1 / 0.5 → **0.1 / 0.1 / 0.1**. The count, the newest id and
+  how many are new come from one index-only scan of `personal_answers_visitor_q` (v71); two scans were 2.35 ms. Checked
+  old against new on that copy: Timmy's days and the bootstrap (every key but the three new ones) for each student and
+  hub, and an empty one; the device's copy with 41 new answers (one of them two days old, as a kept answer arrives) merged
+  the page's way equals the full read; a link that moves another student's answers in gives the whole history; a cursor
+  past the newest, no visitor, the grants. `tools/release/xp.js` (+5 checks), `rls.js`, `admin-ops.js`, `retention.js`,
+  `timmy.js` pass with it pending; `tools/ci/quiet.js`'s `history()` checks the page both ways (with v84: the copy kept,
+  the cursor sent, the two new answers in place; without: asked again without the cursor, no copy kept).
 
 ## Outcome
 
