@@ -238,7 +238,19 @@ export function pack(T){
   var scenes = {
     "sunlit-reef": T.hillScene({
       note: "The sunlit seafloor: rippled sand, coral heads and kelp, a turtle far off and light slanting down from the surface",
-      path: "stones", treeKind: "crystal", lamp: "lantern", skirt: "sand", grade: ["#3FC4D8", .07],
+      path: "stones", lamp: "lantern", skirt: "sand", grade: ["#3FC4D8", .07], noSnow: true,
+      /* the tree spot: a tall branching coral with a sea fan behind it and kelp at its foot; tapped, it shakes and a
+         little starfish tumbles off */
+      tree: function(b, o){
+        var n = o.night, x = b[0], y = b[1], s = "";
+        s += seafan(x + 7, y - 2, 1.25, n ? ["#7A4E86", "#5E3A6A"] : ["#B98AE0", "#8E5EC0"]);
+        s += kelp(x - 9, y + 1, 40, 4, n ? ["#2E5E4E", "#24503F"] : ["#86B86A", "#5E9444"], 11);
+        var c = n ? "#B0607A" : "#F27A8A";
+        s += tube("M" + f(x) + " " + f(y) + " q1 -14 -2 -26 M" + f(x - 1) + " " + f(y - 12) + " q-9 -4 -12 -16 M" + f(x - 2) + " " + f(y - 24) + " q-6 -6 -5 -16 M" + f(x - 1) + " " + f(y - 22) + " q7 -8 13 -10 M" + f(x + 11) + " " + f(y - 32) + " q2 -6 0 -11 M" + f(x - 11) + " " + f(y - 27) + " q-3 -5 -2 -10", 3.4, c);
+        [[0, -27], [-5, -40], [13, -43], [-13, -37], [-12, -28]].forEach(function(q){ s += circ(x + q[0], y + q[1], 1.9, n ? "#D98AA0" : "#FFC2C9", .9); });
+        s += brain(x + 4, y + 2, .7, n);
+        return { s: s, bits: G("tp-drop", starfish(x - 8, y - 30, 3, 20, n ? "#B07A6A" : "#F59A3A", null, .7)) };
+      },
       ground: function(o){ return o.snow ? SNOW : o.night ? NSAND : SAND; },
       sky: function(o){
         var s;

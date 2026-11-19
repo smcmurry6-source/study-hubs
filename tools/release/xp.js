@@ -1210,7 +1210,7 @@ try {
     eq(ci('xp-CI0', 'xh', ex), { ok: true, xp: 0, crowns: 0 }, 'someone who checked in before the reward existed gets nothing for checking in again');
     eq(anon(`select submit_exam_debrief('xh', '2099-01-01 Final', 'xp-CI', '{"ready":4}'::jsonb)`)[0][0], 'f', 'a check-in for an exam that hasn\'t happened is refused, as before');
     eq(json(`sh_wallet('xp-CI')`).rewards, 2, 'the wallet counts two rewards');
-    // migration_v85: a closed check-in (checkinClosed in hubs.js, kept in exam_checkins_closed) is refused before anything is saved or paid
+    // migration_v86: a closed check-in (checkinClosed in hubs.js, kept in exam_checkins_closed) is refused before anything is saved or paid
     sql(`insert into exam_checkins_closed (hub, exam_date) values ('xh3', ${q(ex.slice(0, 10))})`);
     eq(ci('xp-CI4', 'xh3', ex), { ok: false, closed: true }, 'a check-in for a closed exam is refused, and says so');
     eq(anon(`select submit_exam_debrief('xh3', ${q(ex)}, 'xp-CI4', '{"ready":4}'::jsonb)`)[0][0], 'f', 'the old name answers false for it');

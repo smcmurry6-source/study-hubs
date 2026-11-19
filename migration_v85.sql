@@ -1,65 +1,40 @@
--- v85 (2026-11-19): a closed exam check-in is closed on the server too.
--- Sam: "close all current check ins except for perio and occlusion final. no one should be able to submit for any older
--- exams". Closing a check-in was only `checkinClosed: true` in hubs.js, which takes away its button and its pop-up on the
--- dashboard; the server still took a check-in for any exam up to 90 days old (sh_submit_exam_debrief, v60), and paid its
--- first one 1,000 XP and 1,000 crowns. A page loaded before the change, or anyone calling the function, could still send one.
---   1. exam_checkins_closed (hub, exam date): the check-ins that are closed. Closed to anon altogether (RLS on, no policy, no
---      privilege; tools/release/rls-expectations.json's anonNone). It holds what hubs.js says: the After merge workflow's
---      "checkins" step (tools/after-merge/run.js) sets it to every exam with checkinClosed in hubs.js whenever a push to main
---      changes hubs.js, so reopening one (taking checkinClosed out) reopens it here too. The rows below are hubs.js's
---      closed exams on 2026-11-19, so it's right from the moment it's applied.
---   2. sh_submit_exam_debrief refuses a check-in for a closed exam ({ok: false, closed: true}; submit_exam_debrief, the old
---      name, answers false), before anything is saved or paid. Everything else is as it was: the 90-day window, the ten a
---      person, the reward once. Check-ins already sent stay on the admin page.
--- A small new table and one function replaced: a moment, any time of day (vault/how-to/run-sql-on-the-live-database.md).
--- sh_submit_exam_debrief is copied from main's newest copy (migration_v60.sql, as in supabase/schema.sql).
+-- v85 (2026-11-19): Ask Timmy's first question after an idle hour gets a part of the hub's content (Sam, 2026-11-19: yes,
+-- with the eval; vault/reference/ask-timmy.md, "Limits and money"). Writing a hub's whole content to the API's prompt cache
+-- (130-165k tokens, cached for an hour that every read starts again) was most of what students' questions cost, mostly on
+-- the first question after nobody had asked for an hour. The function now asks this table whether the whole content was
+-- read in the last 55 minutes: if not, it sends the lecture the student is on with the exam facts, the cram sheet, the Exam
+-- Hints and the High likelihood topics, and only asks again with the whole content when that part doesn't have the answer.
+--
+-- What it adds:
+--   timmy_cache_marks: one row per cache entry ("<hub>:<hash of the model, the rules and the content>"), when the whole
+--     content was last read or written. No visitor, no text. Rows for content that changed are left behind (a few a day,
+--     a few dozen bytes each) and cleared after a week by the function itself.
+--   timmy_cache(p_key, p_mark): with p_mark false, the time the entry was last marked (null for never); with p_mark true,
+--     marks it now and returns null. The service role only (the function); no browser can call it.
+-- Small and additive: a new table and a new function, no backfill, nothing else changed. Until it's applied the function
+-- gets an error from the call and sends the whole content, as before.
 
-create table if not exists public.exam_checkins_closed (
-  hub text not null,
-  exam_date date not null,
-  closed_at timestamptz not null default now(),
-  primary key (hub, exam_date)
+create table if not exists public.timmy_cache_marks (
+  key text primary key check (length(key) between 1 and 120),
+  at timestamptz not null default now()
 );
-alter table public.exam_checkins_closed enable row level security;
-revoke all on table public.exam_checkins_closed from public, anon, authenticated;
+alter table public.timmy_cache_marks enable row level security;
+revoke all on table public.timmy_cache_marks from public, anon, authenticated;
+grant all on table public.timmy_cache_marks to service_role;
 
-insert into public.exam_checkins_closed (hub, exam_date) values
-  ('hepatobiliary', '2026-09-18'),
-  ('perio', '2026-10-01'),
-  ('msk-exam3', '2026-10-02'),
-  ('pcd-exam3', '2026-10-15'),
-  ('msk-exam4', '2026-10-16'),
-  ('occlusion', '2026-10-21'),
-  ('heme-endo-exam1', '2026-10-30'),
-  ('pcd-implants-exam1', '2026-11-06'),
-  ('heme-endo-exam2', '2026-11-13'),
-  ('special-patient-care', '2026-11-13')
-on conflict do nothing;
-
-create or replace function public.sh_submit_exam_debrief(p_hub text, p_exam text, p_visitor text, p_answers jsonb)
-returns jsonb language plpgsql security definer set search_path = public as $$
-declare me text; first boolean; paid int := 0;
+create or replace function public.timmy_cache(p_key text, p_mark boolean default false)
+returns timestamptz language plpgsql security definer set search_path = public as $$
+declare t timestamptz;
 begin
-  if p_hub is null or length(p_hub) not between 1 and 40 then return jsonb_build_object('ok', false); end if;
-  if p_exam is null or p_exam !~ '^\d{4}-\d{2}-\d{2}' or length(p_exam) > 60 then return jsonb_build_object('ok', false); end if;
-  if p_visitor is null or length(p_visitor) not between 1 and 80 then return jsonb_build_object('ok', false); end if;
-  if p_answers is null or jsonb_typeof(p_answers) <> 'object' or p_answers = '{}'::jsonb or length(p_answers::text) > 3000 then return jsonb_build_object('ok', false); end if;
-  -- only for an exam that has happened (exam day counts), and not forever after
-  if left(p_exam, 10)::date > (now() at time zone 'America/Chicago')::date
-     or left(p_exam, 10)::date < (now() at time zone 'America/Chicago')::date - 90 then return jsonb_build_object('ok', false); end if;
-  -- and not once its check-in is closed (v85: checkinClosed in hubs.js)
-  if exists (select 1 from exam_checkins_closed c where c.hub = p_hub and c.exam_date = left(p_exam, 10)::date) then
-    return jsonb_build_object('ok', false, 'closed', true);
+  if p_key is null or length(p_key) not between 1 and 120 then raise exception 'bad key'; end if;
+  if not coalesce(p_mark, false) then
+    select at into t from timmy_cache_marks where key = p_key;
+    return t;
   end if;
-  if (select count(*) from exam_debriefs where hub = p_hub and exam = p_exam and visitor_id = p_visitor) >= 10 then return jsonb_build_object('ok', false); end if;
-  -- the first check-in for this hub and exam from any of this person's linked ids
-  me := coalesce((select primary_id from visitor_links where alias_id = p_visitor), p_visitor);
-  first := not exists (select 1 from exam_debriefs d where d.hub = p_hub and d.exam = p_exam
-    and (d.visitor_id = me or d.visitor_id in (select alias_id from visitor_links where primary_id = me)));
-  insert into exam_debriefs (hub, exam, visitor_id, answers) values (p_hub, p_exam, p_visitor, p_answers);
-  if first then paid := sh_form_reward(p_visitor, 'checkin:' || p_hub || ':' || p_exam, 'checkin', p_hub); end if;
-  return jsonb_build_object('ok', true, 'xp', paid, 'crowns', case when paid > 0 then 1000 else 0 end);
-exception when others then return jsonb_build_object('ok', false);
+  insert into timmy_cache_marks (key, at) values (p_key, now()) on conflict (key) do update set at = excluded.at;
+  delete from timmy_cache_marks where at < now() - interval '7 days';
+  return null;
 end;
 $$;
-revoke all on function public.sh_submit_exam_debrief(text, text, text, jsonb) from public, anon, authenticated;
+revoke all on function public.timmy_cache(text, boolean) from public, anon, authenticated;
+grant execute on function public.timmy_cache(text, boolean) to service_role;

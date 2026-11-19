@@ -1193,7 +1193,7 @@
         };
         if (!debriefSb) { failed(); return; }
         sendForm(debriefSb, "submit_exam_debrief", { p_hub:hub.id, p_exam:examId, p_visitor:me, p_answers:answers }).then(function(r){
-          /* closed on the server (migration_v85) after this page loaded its hubs.js */
+          /* closed on the server (migration_v86) after this page loaded its hubs.js */
           if (!r.ok && r.closed) {
             W.set(thanksHtml("This check-in is closed.", "Thanks for wanting to help! It isn't taking answers any more."));
             W.say("This one's closed. Thanks anyway!");

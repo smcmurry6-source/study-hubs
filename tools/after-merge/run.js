@@ -9,7 +9,7 @@
 //              a free check that calls no model (a question asked from a mock exam gets the "paused" answer)
 //   podcast    a hub's Timmy Time episode changed (content/core.json's podcast: its id or length) → tell the server, so
 //              listening earns XP (admin_set_podcast_episode)
-//   checkins   hubs.js changed → the server's closed check-ins (exam_checkins_closed, migration_v85) set to every exam with
+//   checkins   hubs.js changed → the server's closed check-ins (exam_checkins_closed, migration_v86) set to every exam with
 //              checkinClosed in hubs.js, so a closed check-in can't be sent and a reopened one can (Sam, 2026-11-19: "no
 //              one should be able to submit for any older exams")
 //   live       wait until GitHub Pages serves the push (up to 15 minutes), so what follows meets the new pages

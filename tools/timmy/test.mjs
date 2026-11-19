@@ -57,7 +57,7 @@ else {
     ok(!bad, `${h}: every lecture's paragraphs match Chromium`);
     /* the engine's own exportSections, run on the same content */
     const sections = await page.evaluate(({ fn, core, notes, study }) => {
-      const LECS = core.lectures, NOTES = notes, STUDY = study, LBY = {}; LECS.forEach(l => { LBY[l.id] = l; });
+      const LECS = core.lectures, NOTES = notes, STUDY = study, C = { core, notes, study }, LBY = {}; LECS.forEach(l => { LBY[l.id] = l; });
       const lecLabel = l => l ? (l.label || ("L" + l.num)) : "";
       window.SH_EXPORT = {};
       eval("(" + fn.replace(/^function exportSections\(\)/, "function()") + ")")();
@@ -301,6 +301,55 @@ ok(!T.quoteIn("Final: 2026", "Final: 2026-11-19") && !T.quoteIn("Final", "Final:
   const out = await T.handle(Object.assign({}, base, { text: "What should I study tonight?", progress: { lectures: [{ lec: C.lectures[2].id, questions: 40, answered: 20, right: 9, missed: 11 }], answered_today: 4 } }), deps(m, fakeDb()));
   ok(m.calls[0].messages[0].content.includes(`<progress>{"lectures":[{"lecture":"L3","questions":40,"answered":20,"right":9,"missed":11,"notes_done":false}]`), "the student's progress goes in the turn with lecture ids Timmy knows");
   eq(out.body.go, { v: "drill", hub: HUB }, "go drill");
+}
+// the first question after an idle hour: a part of the content (timmy_cache, migration_v85)
+{
+  const cacheDb = (at, o) => { const d = fakeDb(o), marks = []; d.cache = async a => { marks.push(a); if (at === "throws") throw new Error("no function"); return a.p_mark ? null : at; }; d.marks = marks; return d; };
+  const lecId = realUnit.lec, other = C.lectures.find(l => l.id !== lecId);
+  const nc = answer([{ text: "The notes don't cover that.", cites: [] }], { kind: "not_covered", closest: "L1" });
+  const good = answer([{ text: "It means the thing.", cites: [{ id: realUnit.id, quote: realQuote }] }]);
+  // cold (never marked): the part, the lecture on screen, no other lecture's notes; answered from it, nothing marked
+  let db = cacheDb(null), m = fakeModel(good);
+  let out = await T.handle(base, deps(m, db));
+  const sys = m.calls[0].system;
+  ok(m.calls.length === 1 && sys[0].text === T.RULES && sys[1].text.startsWith("<site_help>") && sys[2].text.startsWith(T.PART_NOTE), "cold: the rules, the site help, then the part");
+  eq([sys[1].cache_control.ttl, sys[2].cache_control.ttl], ["1h", "5m"], "cold: the site help cached an hour, the part 5 minutes");
+  ok(sys[2].text.includes(`[${realUnit.id}]`) && sys[2].text.includes("<exam_hints>") && sys[2].text.includes("<cram_sheet>") && sys[2].text.length < T.buildCorpus(HUB, DATA[HUB], "").text.length / 2, "cold: the part has the lecture on screen, the Exam Hints and the cram sheet, and is under half the content");
+  ok(!sys[2].text.includes(`[N${other.n}.0]`) && sys[2].text.includes(`<lecture id="L${other.n}" title=`) && sys[2].text.includes(`notes="not sent"/>`), "cold: another lecture is one line with its title, no notes");
+  ok(out.body.kind === "answer" && out.body.paragraphs[0].cites.length === 1 && db.marks.length === 1 && db.marks[0].p_mark === false, "cold, answered from the part: its quote checks out, and the whole content isn't marked as cached");
+  // the part doesn't have it: asked again with the whole content, both calls paid, the whole content marked
+  db = cacheDb(null); m = fakeModel(nc); let n = 0;
+  const two = async p => { n++; return n === 1 ? m(p) : fakeModel(good)(p); };
+  out = await T.handle(base, deps(two, db));
+  const f = db.calls.finish[0];
+  ok(n === 2 && out.body.kind === "answer" && db.marks.length === 2 && db.marks[1].p_mark === true && db.marks[1].p_key === db.marks[0].p_key, "not in the part: asked again with the whole content, which is then marked as cached");
+  ok(f.p_input === 2400 && f.p_output === 600 && Math.abs(f.p_cost - 2 * T.estimateCost({ input_tokens: 1200, output_tokens: 300, cache_read_input_tokens: 76000 }, T.MODEL)) < 1e-6, "both calls' tokens and cost are counted");
+  // warm (marked 10 minutes ago): the whole content, as before, and marked again (it's marked at most every 5 minutes)
+  db = cacheDb(new Date(NOW - 10 * 60000).toISOString()); m = fakeModel(good);
+  await T.handle(base, deps(m, db));
+  ok(m.calls[0].system[1].text.startsWith(`<hub id="${HUB}"`) && db.marks.length === 2 && db.marks[1].p_mark === true, "warm: the whole content, and its time marked again");
+  db = cacheDb(new Date(NOW - 2 * 60000).toISOString()); m = fakeModel(good);
+  await T.handle(base, deps(m, db));
+  ok(m.calls[0].system[1].text.startsWith(`<hub id="${HUB}"`) && db.marks.length === 1, "warm, marked 2 minutes ago: the whole content, no new mark");
+  db = cacheDb(new Date(NOW - 56 * 60000).toISOString()); m = fakeModel(good);
+  await T.handle(base, deps(m, db));
+  ok(m.calls[0].system[2].text.startsWith(T.PART_NOTE), "read 56 minutes ago: taken as gone, the part");
+  // the check fails (migration_v85 not applied yet): the whole content, nothing marked
+  db = cacheDb("throws"); m = fakeModel(good);
+  await T.handle(base, deps(m, db));
+  ok(m.calls[0].system[1].text.startsWith(`<hub id="${HUB}"`) && db.marks.length === 1, "no timmy_cache: the whole content, as before");
+  // declined or off topic from the part: not asked again
+  db = cacheDb(null); m = fakeModel(answer([{ text: "Not that one.", cites: [] }], { kind: "quiz_declined" }));
+  out = await T.handle(base, deps(m, db));
+  ok(m.calls.length === 1 && out.body.kind === "quiz_declined", "a quiz declined from the part isn't asked again");
+  // Ask Timmy on a question card: the question's lecture is in the part
+  db = cacheDb(null, { answered: true }); m = fakeModel(good);
+  await T.handle(Object.assign({}, base, { context: { view: "compendium/questions" }, ask: { qid: Q1.id, right: false, picks: [0] } }), deps(m, db));
+  const ql = C.lectures.find(l => l.id === Q1.lec);
+  ok(ql && m.calls[0].system[2].text.includes(`<lecture id="L${ql.n}" title=`) && !m.calls[0].system[2].text.includes(`<lecture id="L${ql.n}" title="${T.safe(ql.label + " " + ql.title)}"${ql.who ? ` by="${T.safe(ql.who)}"` : ""}${ql.status && ql.status !== "taught" ? ` status="${T.safe(ql.status)}"` : ""} notes="not sent"/>`), "Ask Timmy on a card: the question's lecture's notes are in the part");
+  // the key follows the content: another hub's, or a change to the content, is another entry
+  const k1 = T.cacheKey(HUB, [T.buildCorpus(HUB, DATA[HUB], "")]), k2 = T.cacheKey(HUB, [T.buildCorpus(HUB, JSON.parse(JSON.stringify(Object.assign({}, DATA[HUB], { core: Object.assign({}, DATA[HUB].core, { title: "Changed" }) }))), "")]);
+  ok(k1 !== k2 && k1 === T.cacheKey(HUB, [T.buildCorpus(HUB, DATA[HUB], "")]) && k1.length < 60, "the cache key follows the content and is short");
 }
 // cost
 {

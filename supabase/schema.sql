@@ -12114,9 +12114,10 @@ grant execute on function public.get_class_numbers(text, text[], text[]) to anon
 revoke all on function public.record_analytics(text, text, text, jsonb, jsonb, jsonb) from public;
 grant execute on function public.record_analytics(text, text, text, jsonb, jsonb, jsonb) to anon, authenticated;
 
--- ====================================================================== migration_v85.sql
--- (applied live on 2026-11-19 at about 2 pm Central, through the connector, ahead of the pending v83 and v84, which don't touch the check-ins)
--- v85 (2026-11-19): a closed exam check-in is closed on the server too.
+-- ====================================================================== migration_v86.sql
+-- (applied live on 2026-11-19 at about 2 pm Central, through the connector, ahead of the pending v83, v84 and v85, which don't touch the check-ins)
+-- v86 (2026-11-19, written as v85; renumbered at the merge: #469's Ask Timmy cache took v85): a closed exam check-in is
+-- closed on the server too. Applied live before the renumbering, through the connector, as "v85_closed_checkins".
 -- Sam: "close all current check ins except for perio and occlusion final. no one should be able to submit for any older
 -- exams". Closing a check-in was only `checkinClosed: true` in hubs.js, which takes away its button and its pop-up on the
 -- dashboard; the server still took a check-in for any exam up to 90 days old (sh_submit_exam_debrief, v60), and paid its
@@ -12165,7 +12166,7 @@ begin
   -- only for an exam that has happened (exam day counts), and not forever after
   if left(p_exam, 10)::date > (now() at time zone 'America/Chicago')::date
      or left(p_exam, 10)::date < (now() at time zone 'America/Chicago')::date - 90 then return jsonb_build_object('ok', false); end if;
-  -- and not once its check-in is closed (v85: checkinClosed in hubs.js)
+  -- and not once its check-in is closed (v86: checkinClosed in hubs.js)
   if exists (select 1 from exam_checkins_closed c where c.hub = p_hub and c.exam_date = left(p_exam, 10)::date) then
     return jsonb_build_object('ok', false, 'closed', true);
   end if;

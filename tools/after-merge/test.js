@@ -55,7 +55,7 @@ p = plan({ ...base, changes: [], added: ['# a comment', '', 'occlusion | Four qu
 eq('changelog', p.changelog, [{ hub: 'occlusion', message: 'Four questions fixed.' }, { hub: 'all', message: 'The bank shows more at a time.' }]);
 eq('changelog warnings', p.warnings.length, 2);
 
-// the closed check-ins follow hubs.js whenever it changes (migration_v85); its every closed exam, live hubs and archived
+// the closed check-ins follow hubs.js whenever it changes (migration_v86); its every closed exam, live hubs and archived
 eq('checkins when hubs.js changes', plan({ ...base, changes: ch('M hubs.js') }).checkins, true);
 eq('no checkins otherwise', plan({ ...base, changes: ch('M widget/dash.js') }).checkins, false);
 const hd = { hubs: [{ id: 'occlusion', exams: [{ date: '2026-10-21', checkinClosed: true }, { date: '2026-11-16' }] }, { id: 'perio', exams: [{ date: '2026-11-19' }] }],
