@@ -700,6 +700,53 @@ if (window.shPet) go(); else { if (window.shLoadPet) window.shLoadPet(); whenWid
 });
 }, shut);
 }
+var VISIT_RE = /^[0-9a-f]{24}$/, visiting = false;
+function placeOf(d){
+if (!d || typeof d !== "object" || Array.isArray(d)) return null;
+var eq = {}, e = d.equipped && typeof d.equipped === "object" ? d.equipped : {}, rk = d.rank && typeof d.rank === "object" ? d.rank : null;
+Object.keys(e).forEach(function(k){ if (typeof e[k] === "string" && /^[a-z0-9-]{1,40}$/.test(k)) eq[k] = e[k]; });
+return { name: String(d.name == null ? "" : d.name), equipped: eq, flair: typeof d.flair === "string" ? d.flair : "",
+rank: rk ? { journey: +rk.journey || 0, tier: +rk.tier || 0, level: +rk.level || 1 } : null };
+}
+function visitPlace(key, opt){
+opt = opt || {};
+if (visiting) return Promise.resolve(null);
+if (!VISIT_RE.test(key || "")) return Promise.resolve(false);
+visiting = true;
+var sb = window.shSupabase;
+if (!sb) { visiting = false; return Promise.resolve(false); }
+var place = sb.rpc("get_place", { p_key: key }).then(function(res){ return res && !res.error ? placeOf(res.data) : null; }, function(){ return null; });
+var code = loadScript(WIDGET + "place.js").then(function(){ return true; }, function(){ return false; });
+var pet = window.shPet ? null : new Promise(function(ok){ if (window.shLoadPet) window.shLoadPet(); whenWidget("shPet", ok); setTimeout(ok, 4000); });
+return Promise.all([place, code, pet]).then(function(a){
+visiting = false;
+var P = window.shPlace, boot = window.shBootstrap, d = boot && boot.data;
+if (!a[0] || !a[1] || !P) return false;
+P.setup({ sb: sb, visitor: ls("sh_visitor_id"), shop: d && d.shop, profile: HX.RANK && HX.RANK.p });
+P.open({ place: a[0], onClose: opt.onClose });
+visitPaid(key);
+return true;
+});
+}
+function visitPaid(key){
+var G = window.shGame, me = ls("sh_visitor_id"), w = shopOf() && shopOf().wallet, day = dayCT();
+if (!G || !G.claim || !me || !day || ls("sh_visit_paid") === day || (w && w.got && w.got.visit) || (w && w.pays && !w.pays.visit)) return;
+ls("sh_visit_paid", day);
+G.claim("claim_visit_v2", { p_visitor: me, p_key: key }, "visit").then(function(r){ if (!r || r.missing || r.ok === false) ls("sh_visit_paid", null); }, function(){ ls("sh_visit_paid", null); });
+}
+window.shVisitPlace = visitPlace;
+document.addEventListener("click", function(e){
+var b = e.target.closest && e.target.closest("button[data-sh-visit]"); if (!b) return;
+var key = b.getAttribute("data-key") || "", row = b.closest("li") || b.parentNode, old = row && row.querySelector(".sh-visit-msg");
+if (old) old.parentNode.removeChild(old);
+b.setAttribute("aria-busy", "true");
+visitPlace(key, { onClose: function(){ if (b.isConnected) try { b.focus(); } catch (x) {} } }).then(function(ok){
+b.removeAttribute("aria-busy");
+if (ok !== false || !row || !b.isConnected) return;
+var line = document.createElement("span"); line.className = "sh-visit-msg"; line.setAttribute("role", "status"); row.appendChild(line);
+setTimeout(function(){ line.textContent = "That place couldn’t be opened just now."; }, 60);
+});
+});
 var COIN = '<path d="M6.2 17.4 C4.5 14.3 3.5 10.9 4.3 8.1 C4.9 5.9 6.5 4.4 8.4 4.5 C10 4.6 10.8 6.1 12 6.1 C13.2 6.1 14 4.6 15.6 4.5 C17.5 4.4 19.1 5.9 19.7 8.1 C20.5 10.9 19.5 14.3 17.8 17.4 Z" fill="#F2C94C" stroke="#3B2E3A" stroke-width="1.6"/><path d="M15.7 5.3 C17.4 5.5 18.6 6.7 19 8.4 C19.6 11 18.8 14.2 17.4 16.8 L14.9 16.4 C16.6 12.6 17.1 8.8 15.7 5.3 Z" fill="#C9971C"/><path d="M12 6.4 V9.6 M9.4 9 Q12 10.5 14.6 9" fill="none" stroke="#9C7414" stroke-width="1.1"/><ellipse cx="12" cy="17.5" rx="5.8" ry="2.3" fill="#8A6410" stroke="#3B2E3A" stroke-width="1.6"/><path d="M7.4 18.3 Q12 20.3 16.6 18.3 Q12 21 7.4 18.3 Z" fill="#C9971C"/><path d="M6.3 9.4 C6.5 7.8 7.2 6.8 8.1 6.3" stroke="#fff" stroke-width="1.3" fill="none" opacity=".6"/><path d="M8.6 9.6 Q9 11.2 10.6 11.6 Q9 12 8.6 13.6 Q8.2 12 6.6 11.6 Q8.2 11.2 8.6 9.6 Z" fill="#FFFFFF"/>';
 function shopCoin(px){ return '<svg class="ic" viewBox="0 0 24 24" width="' + px + '" height="' + px + '" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true" focusable="false">' + COIN + "</svg>"; }
 var SHOP = null;

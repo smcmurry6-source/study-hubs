@@ -296,8 +296,9 @@ export function pack(T){
   function wagonWheel(cx, y, r, o, spin){
     var hubC = P(cx, y, r), s = "", i, rim = yRing(cx, y, r, r * .9, 24), tire = yRing(cx, y, r, r, 24);
     s += L(D(tire), 4.6) + L(D(tire), 2.6, "#5A5560") + L(D(rim), 2.6, o.night ? "#8A6A4E" : K.wood);
-    var sp = ""; for (i = 0; i < 12; i++){ var a = (i * 30 + (spin || 0)) * Math.PI / 180, e = [cx + Math.cos(a) * r * .86, y, r + Math.sin(a) * r * .86], b = [cx + Math.cos(a) * r * .16, y, r + Math.sin(a) * r * .16]; sp += seg(P(b[0], b[1], b[2]), P(e[0], e[1], e[2])) + " "; }
-    s += L(sp, 1.9) + L(sp, .8, o.night ? "#B9926A" : K.woodLight);
+    /* the spokes, drawn in the wheel's own plane so they turn while the egg plays (T.spinner) */
+    var sp = ""; for (i = 0; i < 12; i++){ var a = (i * 30 + (spin || 0)) * Math.PI / 180, ca = Math.cos(a) * r, sa = Math.sin(a) * r; sp += "M" + f(ca * .16) + " " + f(sa * .16) + " L" + f(ca * .86) + " " + f(sa * .86) + " "; }
+    s += T.spinner([cx, y, r], [1, 0, 0], [0, 0, 1], L(sp, 1.9) + L(sp, .8, o.night ? "#B9926A" : K.woodLight));
     s += ell(hubC[0], hubC[1], 3, 3.2, o.night ? "#8A6A4E" : K.wood, 1.2) + circ(hubC[0] + .3, hubC[1], 1.1, "#5A5560");
     return s;
   }
@@ -335,6 +336,7 @@ export function pack(T){
     "windmill-pump": {
       note: "A farm windmill on its lattice tower, pumping water into a round stock tank", spot: [3.4, 3.45],
       egg: { n: "The windmill", does: "the wind picks up: the wheel spins and water splashes into the tank", say: "Whoosh! Wind brings the water up from deep underground. Best drink there is for teeth." }, anim: "tp-pop 2.2s",
+      move: { ".tp-spin": "tp-spin .55s linear 4" },
       draw: function(o){
         var s = ell.apply(null, P(1.9, 1.95, 0).concat([30, 11, "#1B2A3A", 0, .1])), cx = WM.c[0], cy = WM.c[1], zt = WM.top, i;
         var hw = function(z){ return .86 - (.86 - .2) * z / zt; }, leg = function(sx, sy, z){ var k = hw(z); return [cx + sx * k, cy + sy * k, z]; };
@@ -370,12 +372,13 @@ export function pack(T){
         s += box(cx - .32, cy - .32, zt, .64, .64, .08, WOOD, { sw: 1.2, si: .7 });
         s += box(cx - .2, cy - .26, zt + .08, .4, .52, .3, { top: "#B6BEC7", left: "#8E98A3", right: "#6E7884" }, { sw: 1.2, si: .7 });
         s += L(D([[cx, cy, hb[2]], hb], true), 3) + L(D([[cx, cy, hb[2]], hb], true), 1.4, "#8E98A3");
-        var R0 = WM.r, ri = .36, bl = "";
+        /* the blades and their rings, drawn in the wheel's own plane so the wheel turns while the egg plays (T.spinner) */
+        var R0 = WM.r, ri = .36, bl = "", lc = function(r, n){ var d = ""; for (var j = 0; j <= n; j++){ var t = j / n * Math.PI * 2; d += (j ? " L" : "M") + f(Math.cos(t) * r) + " " + f(Math.sin(t) * r); } return d; };
         for (i = 0; i < 16; i++){
-          var a = i * 22.5, q = function(r, da){ var t = (a + da) * Math.PI / 180; return wheelPt(Math.cos(t) * r, Math.sin(t) * r); };
-          bl += FO(D([q(ri, -7), q(R0, -9.5), q(R0, 9.5), q(ri, 7)]), i % 2 ? (o.night ? "#9AA4AF" : "#DCE2E8") : (o.night ? "#7E8893" : "#B9C2CC"), .8);
+          var a = i * 22.5, q = function(r, da){ var t = (a + da) * Math.PI / 180; return f(Math.cos(t) * r) + " " + f(Math.sin(t) * r); };
+          bl += FO("M" + q(ri, -7) + " L" + q(R0, -9.5) + " L" + q(R0, 9.5) + " L" + q(ri, 7) + " Z", i % 2 ? (o.night ? "#9AA4AF" : "#DCE2E8") : (o.night ? "#7E8893" : "#B9C2CC"), .8);
         }
-        s += bl + L(D(wheelRing(R0, 32)), 2.8) + L(D(wheelRing(R0, 32)), 1.2, metal) + L(D(wheelRing(ri, 16)), 1.4) + L(D(wheelRing(R0 * .68, 24)), .8, INK, .7);
+        s += T.spinner(WM.hub, [WM.h[0], WM.h[1], 0], [0, 0, 1], bl + L(lc(R0, 32), 2.8) + L(lc(R0, 32), 1.2, metal) + L(lc(ri, 16), 1.4) + L(lc(R0 * .68, 24), .8, INK, .7));
         var hc = P.apply(null, hb); s += circ(hc[0], hc[1], 2.6, "#5E6A76", 1.1) + circ(hc[0] - .6, hc[1] - .6, .8, "#C9D1D9");
         /* the stock tank, galvanized, full of water */
         var tk = [2.78, 2.72], tr = .74, tz = .62, tt = P(tk[0], tk[1], tz);
@@ -388,11 +391,8 @@ export function pack(T){
       },
       bits: function(){
         var s = "", i;
-        /* the wheel a blur, with speed arcs round it */
-        s += F(D(wheelRing(WM.r * 1.06, 32)), "#EEF2F5", .8) + L(D(wheelRing(WM.r * 1.06, 32)), 1.4, INK, .6);
-        for (i = 0; i < 4; i++) s += L(D(wheelRing(WM.r * (.42 + i * .17), 20, i * 40, i * 40 + 120), true), 1.1, INK, .5);
+        /* the wheel itself turns (move); speed arcs round it */
         s += L(D(wheelRing(WM.r * 1.3, 10, 200, 260), true) + D(wheelRing(WM.r * 1.3, 10, 20, 80), true), 1.6, INK, .8);
-        var hc = P.apply(null, WM.hub); s += circ(hc[0], hc[1], 2.6, "#5E6A76", 1.1);
         /* water pours from the spout and splashes up out of the tank */
         var sp = P(2.34, 2.29, .68), wt = P(2.55, 2.5, .6), tt = P(2.78, 2.72, .62);
         s += L("M" + f(sp[0]) + " " + f(sp[1]) + " Q" + f(sp[0] + 1) + " " + f(sp[1] + 2) + " " + f(wt[0]) + " " + f(wt[1]), 3.4) + L("M" + f(sp[0]) + " " + f(sp[1]) + " Q" + f(sp[0] + 1) + " " + f(sp[1] + 2) + " " + f(wt[0]) + " " + f(wt[1]), 1.8, K.water);
@@ -403,7 +403,8 @@ export function pack(T){
     },
     "covered-wagon": {
       note: "A wooden wagon with big spoked wheels, a canvas bonnet on its hoops and a water barrel at its side", spot: [3.4, 3.45],
-      egg: { n: "The covered wagon", does: "a wheel turns and the canvas flaps in the wind", say: "Wagons, roll! Pack water and pack floss. That's all you need on the trail." }, anim: "tp-pop 2.2s",
+      egg: { n: "The covered wagon", does: "its wheels turn and the canvas flaps in the wind", say: "Wagons, roll! Pack water and pack floss. That's all you need on the trail." }, anim: "tp-pop 2.2s",
+      move: { ".tp-spin": "tp-spin 1.1s linear 2" },
       draw: function(o){
         var W = WG, s = ell.apply(null, P(1.85, 1.9, 0).concat([31, 11, "#1B2A3A", 0, .1])), i, cv = o.night ? ["#D9D3C6", "#B8B0A0"] : ["#FFFDF6", "#E8E0CE"];
         /* the far wheels and the tongue, under the bed */
@@ -446,8 +447,7 @@ export function pack(T){
       },
       bits: function(o){
         var W = WG, c = P(W.rw[0], W.yn, W.rw[1]), s = "", i;
-        /* the back wheel turns: a blur of spokes and two arcs to show which way */
-        s += F(D(yRing(W.rw[0], W.yn, W.rw[1], W.rw[1] * .86, 24)), "#E2B887", .75) + wagonWheel(W.rw[0], W.yn, W.rw[1], o || {}, 15);
+        /* the wheels turn (move): two arcs by the back one to show which way */
         s += L(D(yRing(W.rw[0], W.yn, W.rw[1], W.rw[1] * 1.25, 10, 100, 160), true) + D(yRing(W.rw[0], W.yn, W.rw[1], W.rw[1] * 1.25, 10, 280, 340), true), 1.6, INK, .8);
         /* the canvas flaps at the back, and the wind blows past */
         var top = P(3.36, W.yc, W.zt + W.rz * .95), lw = P(3.32, W.yc + .55, W.zt + .4);

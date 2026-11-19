@@ -1381,3 +1381,10 @@ html.hx-still dialog[open]::backdrop { animation: none; }
     .sh-archived, .lp-pop, dialog[open], .is-entering, .hx-tab.is-active .ic, .dx-tab[aria-selected="true"] .dx-emb) { animation: none; }
   :where(html.shx) :where(dialog[open])::backdrop { animation: none; }
 }
+/* a classmate's name on a hub's board that opens their place (window.shVisitPlace, widget/hub-timmy.js): drawn as the
+   name it replaces, with a dotted underline to say it's a button; the plain line under it when the place can't open */
+button[data-sh-visit]{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;text-align:inherit;cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+button[data-sh-visit]:hover{text-decoration-style:solid}
+button[data-sh-visit][aria-busy="true"]{opacity:.6;cursor:progress}
+.sh-visit-msg{display:block;flex-basis:100%;font-size:.85em;opacity:.85;margin-top:2px}
+li:has(> .sh-visit-msg){flex-wrap:wrap}
