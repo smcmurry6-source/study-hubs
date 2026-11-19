@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430
+pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430, https://github.com/smcmurry6-source/study-hubs/pull/434
 ---
 
 # Keep heavy queries from failing students' answer saves
@@ -44,7 +44,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   `get_exam_debriefs` (about 1 s). For example worked out every 15 minutes by `pg_cron` into a small table the page reads.
 - [x] The lessons audit's queries (`tools/economy.sql`, `tools/lessons-daily.sql`, `tools/retro.sql`) stay short, or the
   runbook says to run them when the class is quiet; the connector's queries have no time limit.
-  **Done, both** ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)). Timed on a throwaway copy at
+  **Done, both** ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md), [#434](https://github.com/smcmurry6-source/study-hubs/pull/434)). Timed on a throwaway copy at
   1.5 times the class's size: E3 (the wallets) took 4.7 s, because PostgreSQL inlined its CTE and worked each wallet out
   again for every column that reads it (most likely the audit's 11 and 13 s queries live); `as materialized` makes it 0.5 s,
   the same numbers. The retrospective's click list counted people once a row (0.3 s, 4.5 s without its `limit`), now in one
@@ -178,7 +178,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   Exam 1's LCP (3772 ms against 2500; an old hub that loads none of the changed files, 1652 ms locally) and passed on its
   one re-run.
 
-- 2026-11-18, evening (the second and third boxes, PR in the frontmatter): read live only the catalog's table sizes,
+- 2026-11-18, evening (the second and third boxes, [#434](https://github.com/smcmurry6-source/study-hubs/pull/434)): read live only the catalog's table sizes,
   `presence_hourly` and two probes of the connector's time limit (a `pg_sleep`, which uses no CPU); everything else on a
   throwaway copy. For the first box, the admin page's reads that the audit also calls, on that copy: `qh_report('perio')`
   3.3-3.5 s (the slowest call of an audit), `sh_data_quality()`, `sh_insights` and `sh_insight_retries` about 0.7 s each.
