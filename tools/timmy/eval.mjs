@@ -8,6 +8,8 @@
 //   --max-usd 15               stops starting new cases past this estimated spend
 //   --model claude-haiku-5-5   try another model (the function's is core.js's MODEL; Haiku goes without the fallback)
 //   --regrade <report.json>    grades a saved run again with this checkout's grader and quote check; free, no key
+//   --part                     every question as the first after an idle hour: a part of the content first, the whole
+//                              content only when the part doesn't have it (core.js PART_NOTE; migration_v85's timmy_cache)
 // The real run needs @anthropic-ai/sdk@1.3.0 (the function's version): npm i --prefix <dir> @anthropic-ai/sdk@1.3.0, then
 // TIMMY_SDK_DIR=<dir>. The key: TIMMY_EVAL_KEY (in a Claude Code cloud session, an environment variable Sam adds in the
 // environment's settings; not ANTHROPIC_API_KEY, which Claude Code itself reads), or ANTHROPIC_API_KEY on a computer
@@ -34,7 +36,7 @@ const flag = n => argv.includes("--" + n);
 const opt = (n, d) => { const i = argv.indexOf("--" + n); return i >= 0 && argv[i + 1] ? argv[i + 1] : d; };
 const REGRADE = opt("regrade", ""), DRY = flag("dry") || !!REGRADE, ONLY = opt("only", "") ? opt("only").split(",") : null;
 const CONC = Math.max(1, Number(opt("concurrency", 4))), MAX_USD = Number(opt("max-usd", 15)), EFFORT = opt("effort", "");
-const MODEL = opt("model", T.MODEL);
+const MODEL = opt("model", T.MODEL), PART = flag("part");
 const OUT = path.join(process.env.SH_RELEASE_OUT || path.join(os.tmpdir(), "sh-release"), "timmy-eval");
 
 const SET = JSON.parse(fs.readFileSync(path.join(ROOT, "tools/timmy/test-set.json"), "utf8"));
@@ -240,7 +242,9 @@ async function runCase(c, model, db, cached){
       request: "eval" + Math.random().toString(36).slice(2, 12) };
     let called = false, usage = null, ms = 0;
     const m = model || fakeModel(c, turn, cached);
-    const deps = { db: { begin: a => db.begin(a), finish: a => db.finish(a) }, site: SITE, now: () => Date.now(), log: () => {},
+    let mode = null;
+    const deps = { db: Object.assign({ begin: a => db.begin(a), finish: a => db.finish(a) }, PART ? { cache: async () => null } : {}), site: SITE, now: () => Date.now(),
+      log: (ev, d) => { if (ev === "turn") mode = d.content; },
       loadHub: async h => DATA.get(h) || null, loadQuestions: async h => QUESTIONS.get(h) || null,
       model: async p => { called = true; const t0 = Date.now(); const r = await m(p); ms = Date.now() - t0; usage = r.usage; return r; } };
     const r = await T.handle(body, deps);
@@ -249,7 +253,7 @@ async function runCase(c, model, db, cached){
     const cost = row ? Number(row.p_cost) : 0; spent += cost;
     const res = { status: r.status, body: r.body, called, db: row, ms, usage, model: row && row.p_model };
     const g = grade(c, Object.assign({}, turn, { keyText, sent: text }), res);
-    out.push({ text, reply: r.body, kind: r.body.kind, cost, ms, usage, model: res.model, unchecked: row && row.p_unchecked, ...g });
+    out.push({ text, reply: r.body, kind: r.body.kind, cost, ms, usage, model: res.model, unchecked: row && row.p_unchecked, content: mode, ...g });
   }
   return out;
 }
@@ -296,13 +300,14 @@ const unchecked = turns.reduce((a, t) => a + ((t.unchecked && t.unchecked.length
 const ms = turns.filter(t => t.ms).map(t => t.ms).sort((a, b) => a - b), pct = p => ms.length ? (ms[Math.min(ms.length - 1, Math.floor(ms.length * p))] / 1000).toFixed(1) + " s" : "-";
 const summary = [`${done.length} cases (${turns.length} turns), ${failed.length} failed, ${warned} turn(s) with warnings${stopped ? `; stopped at the $${MAX_USD} limit` : ""}`,
   `kinds: ${Object.entries(byKind).map(([k, n]) => `${k} ${n}`).join(", ")}; ${cites} checked cites, ${unchecked} quotes that didn't check out`,
+  ...(PART ? [`content: ${turns.filter(t => t.content === "part").length} turn(s) answered from a part, ${turns.filter(t => t.content === "part+full").length} asked again with the whole content, ${turns.filter(t => t.content === "full").length} whole`] : []),
   `${DRY ? "estimated" : "estimated from the usage the API reported"} cost $${spent.toFixed(2)}; wait: median ${pct(0.5)}, 90th percentile ${pct(0.9)}; ${((Date.now() - t0) / 1000).toFixed(0)} s in all`];
 
 fs.mkdirSync(OUT, { recursive: true });
-const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 16), file = path.join(OUT, `${stamp}${MODEL !== T.MODEL ? "-" + MODEL : ""}${DRY ? "-dry" : ""}`);
-const md = [`# Ask Timmy eval, ${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC, ${MODEL}${DRY ? " (fake model)" : ""}${EFFORT ? `, effort ${EFFORT}` : ""}`, "", ...summary.map(s => "- " + s), ""];
+const stamp = new Date().toISOString().replace(/[:T]/g, "-").slice(0, 16), file = path.join(OUT, `${stamp}${MODEL !== T.MODEL ? "-" + MODEL : ""}${PART ? "-part" : ""}${DRY ? "-dry" : ""}`);
+const md = [`# Ask Timmy eval, ${new Date().toISOString().slice(0, 16).replace("T", " ")} UTC, ${MODEL}${DRY ? " (fake model)" : ""}${EFFORT ? `, effort ${EFFORT}` : ""}${PART ? ", a part of the content first (--part)" : ""}`, "", ...summary.map(s => "- " + s), ""];
 for (const c of done) for (const [i, t] of results.get(c.id).entries()) {
-  md.push(`## ${t.fails.length ? "✗" : "✓"} ${c.id}${i ? ` (turn ${i + 1})` : ""} · ${c.type} · ${t.kind}${t.reply && t.reply.limited ? " " + t.reply.limited : ""} · $${t.cost.toFixed(3)} · ${((t.ms || 0) / 1000).toFixed(1)} s`, "",
+  md.push(`## ${t.fails.length ? "✗" : "✓"} ${c.id}${i ? ` (turn ${i + 1})` : ""} · ${c.type} · ${t.kind}${t.reply && t.reply.limited ? " " + t.reply.limited : ""}${PART && t.content ? " · " + t.content : ""} · $${t.cost.toFixed(3)} · ${((t.ms || 0) / 1000).toFixed(1)} s`, "",
     "**Asked:** " + String(t.text).replace(/\n/g, " / "), "");
   for (const p of (t.reply && t.reply.paragraphs) || []) md.push("> " + p.text, ...(p.cites || []).map(x => `>   · [${x.id}] "${x.quote}"`), ">");
   if (t.reply && t.reply.offer) md.push(`Offer: ${JSON.stringify(t.reply.offer)}`, "");

@@ -32,3 +32,4 @@
 # migration_v82 (get_class_numbers, record_analytics, shop_days with its pg_cron job, the v2 bootstrap built once, get_my_answers, anon_name by an index) was applied on 2026-11-19 (through the connector, md5-checked, PR #459).
 migration_v83.sql
 migration_v84.sql
+migration_v85.sql

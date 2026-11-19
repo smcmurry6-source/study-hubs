@@ -186,9 +186,12 @@ export function buildCorpus(hub, data, prefix){
   const core = data.core || {}, notes = (data.notes || {}).full || {}, study = data.study || {};
   const lectures = (core.lectures || []).map((l, i) => ({ n: i + 1, id: l.id, label: lecLabel(l), title: l.title, who: l.who || "", status: l.status || "" }));
   const byId = new Map(lectures.map(l => [l.id, l]));
-  const units = new Map(), lines = [];
+  const units = new Map();
   const unit = (id, u) => { units.set(prefix + id, Object.assign({ id: prefix + id, hub }, u)); return prefix + id; };
   const lname = l => l ? `${l.label} ${l.title}` : "";
+  /* every line is kept with the lecture it belongs to ("" for none), so part() can send a part of the content (below) */
+  const parts = []; let at = "";
+  const lines = { push: (...xs) => { for (const t of xs) parts.push([at, t]); } };
   lines.push(`<hub id="${safe(hub)}" title="${safe(core.title || hub)}">`);
 
   // the exam facts
@@ -202,6 +205,7 @@ export function buildCorpus(hub, data, prefix){
   // the notes, lecture by lecture
   for (const l of lectures) {
     const html = notes[l.id];
+    at = "notes:" + l.id;
     lines.push(`<lecture id="${prefix}L${l.n}" title="${safe(lname(l))}"${l.who ? ` by="${safe(l.who)}"` : ""}${l.status && l.status !== "taught" ? ` status="${safe(l.status)}"` : ""}>`);
     if (html) {
       let tn = 0;
@@ -217,6 +221,7 @@ export function buildCorpus(hub, data, prefix){
     }
     lines.push("</lecture>");
   }
+  at = "";
 
   // the review tables (each lecture's charts; titles as exportSections gives them, so a link finds its chart)
   lines.push("<review_tables>");
@@ -226,10 +231,12 @@ export function buildCorpus(hub, data, prefix){
       t = sec.title || t;
       const rows = reviewRows(sec); if (!rows.length) return;
       const l = byId.get(g.lec);
+      at = "review:" + (g.lec || "");
       const id = unit(`R${gi + 1}.${si + 1}`, { kind: "review", lec: g.lec || "", text: rows.map(safe).join("\n"), go: { v: "review", lec: g.lec || "", t }, label: `${l ? l.label + " " : ""}review table` });
       lines.push(`<table id="${id}" lecture="${safe(l ? prefix + "L" + l.n : "")}" title="${safe(clean([sec.part, sec.title || t].filter(Boolean).join(": ")))}">`, ...rows.map(safe), "</table>");
     });
   });
+  at = "";
   lines.push("</review_tables>");
 
   // the cram sheet
@@ -256,7 +263,21 @@ export function buildCorpus(hub, data, prefix){
   });
   lines.push("</high_likelihood_topics>");
   lines.push("</hub>");
-  return { hub, title: core.title || hub, prefix, lectures, units, text: lines.join("\n") };
+  const text = parts.map(x => x[1]).join("\n");
+  /* a part of the content (Sam, 2026-11-19: the first question after an idle hour, "Limits and money" in
+     vault/reference/ask-timmy.md): everything but the notes and review tables of the lectures not in `lecs`, each of those
+     lectures left as one line with its title, so he knows what the hub has. Unit ids are the full content's. */
+  const part = lecs => {
+    const keep = new Set(lecs || []), out = [];
+    for (const [k, t] of parts) {
+      if (!k) { out.push(t); continue; }
+      const id = k.slice(k.indexOf(":") + 1);
+      if (keep.has(id)) { out.push(t); continue; }
+      if (k.startsWith("notes:") && t.startsWith("<lecture ")) out.push(t.replace(/>$/, ` notes="not sent"/>`));
+    }
+    return out.join("\n");
+  };
+  return { hub, title: core.title || hub, prefix, lectures, units, text, part };
 }
 
 /* the site's features, from tools/timmy/build.mjs (supabase/functions/timmy/site.json: { sections: [{ id, title, items }] }) */
@@ -307,7 +328,7 @@ export const RULES = `You are Timmy Tooth, the study buddy in a UAB dental schoo
 - If a student is stressed or overwhelmed, be kind and brief, then help them with one concrete next step from the hub. If they sound like they are in real distress or crisis, say you're a study buddy and can't help with that, and point them to UAB's student counseling services, or to call or text 988 (the Suicide & Crisis Lifeline) right away in a crisis, and 911 if they are in immediate danger. Use kind "support".
 
 ## "What should I study tonight?"
-- When the student asks what to study, use <progress> (their own answers on this device) and the exam facts: the nearest exam, the weakest lectures (lowest share right), questions missed, lectures not started. Pick one or two concrete things for tonight and say why, and set "go" to the best first step.
+- When the student asks what to study, use <progress> (their own answers) and the exam facts: the nearest exam, the weakest lectures (lowest share right), questions missed, lectures not started. Pick one or two concrete things for tonight and say why, and set "go" to the best first step.
 
 ## "go": one next step the page can open (optional)
 - type "notes" with target a notes unit id (opens the notes at that paragraph); "practice" with target a lecture id (practice questions on that lecture); "drill" with target "" (the Daily drill); "none" with target "". On the dashboard, ids carry their hub.
@@ -690,6 +711,10 @@ function corpusOf(hub, data, prefix){
   if (!byPrefix.has(prefix)) byPrefix.set(prefix, buildCorpus(hub, data, prefix));
   return byPrefix.get(prefix);
 }
+/* the full content's cache entry, by what it is cached on (the model, the rules and the content): "<hub>:<hash>" */
+const fnv = s => { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); } return (h >>> 0).toString(36); };
+const hashOf = c => c.hash || (c.hash = fnv(c.text));
+export function cacheKey(hub, corpora, model){ return `${hub}:${fnv([model || MODEL, fnv(RULES), ...corpora.map(c => c.hub + "=" + hashOf(c))].join("|"))}`; }
 let siteCache = null;
 function siteOf(site){ if (!siteCache || siteCache.src !== site) siteCache = { src: site, built: buildSite(site) }; return siteCache.built; }
 
@@ -697,8 +722,15 @@ function siteOf(site){ if (!siteCache || siteCache.src !== site) siteCache = { s
    live hub's), then the site help. The site help changes with the About page, several times a day, and comes last, so a
    change to it rewrites only its own ~40k tokens: the hub's content (130-160k tokens, where the cost is) stays cached.
    With the site help first, as before 2026-11-18, every About page change sent every hub's content to the cache again. */
-export function buildRequest(corpora, site, history, sent){
-  const content = corpora.map(c => c.text).join("\n\n");
+/* The first question on a hub after an idle hour gets a part of the content (`part`: { lecs }; Sam, 2026-11-19): the
+   rules, the site help (cached for an hour, and the same for every hub, so it stays warm whenever anyone asks anything),
+   then the part, cached for 5 minutes (a follow-up reads it; a write costs 1.25x, not 2x). If the part doesn't have the
+   answer he says "not_covered" and handle() asks again with the whole content, as every question did before. */
+export const PART_NOTE = `<partial_content>Only part of this hub's content is below, to save time: the exam facts, the cram sheet, the Exam Hints, the High likelihood topics, and the notes and review tables of the lectures listed with their units. A lecture marked notes="not sent" has notes that aren't below. If the answer needs anything that isn't below (another lecture's notes or review tables, a detail the cram sheet only touches on), or you can't tell whether the full notes say more, reply with kind "not_covered" and nothing else: you'll be asked again with the whole content. Never tell the student the content is partial.</partial_content>`;
+export const WARM_MS = 55 * 60 * 1000;    // the content's 1-hour cache, read within this long, is taken as still there
+export const MARK_MS = 5 * 60 * 1000;     // and its time is marked again only this often
+export function buildRequest(corpora, site, history, sent, part){
+  const content = part ? [PART_NOTE, ...corpora.map(c => c.part(part.lecs || []))].join("\n\n") : corpora.map(c => c.text).join("\n\n");
   const messages = [];
   /* earlier turns, as they were sent and answered; a turn with no stored answer (it failed) is left out */
   for (let i = 0; i < history.length; i++) {
@@ -711,8 +743,11 @@ export function buildRequest(corpora, site, history, sent){
   messages.push({ role: "user", content: sent });
   return withModel({
     model: MODEL, max_tokens: MAX_TOKENS, betas: BETAS, fallbacks: "default",
-    system: [{ type: "text", text: RULES }, { type: "text", text: content, cache_control: { type: "ephemeral", ttl: "1h" } },
-      { type: "text", text: siteOf(site).text, cache_control: { type: "ephemeral", ttl: "1h" } }],
+    system: part
+      ? [{ type: "text", text: RULES }, { type: "text", text: siteOf(site).text, cache_control: { type: "ephemeral", ttl: "1h" } },
+        { type: "text", text: content, cache_control: { type: "ephemeral", ttl: "5m" } }]
+      : [{ type: "text", text: RULES }, { type: "text", text: content, cache_control: { type: "ephemeral", ttl: "1h" } },
+        { type: "text", text: siteOf(site).text, cache_control: { type: "ephemeral", ttl: "1h" } }],
     messages,
     cache_control: { type: "ephemeral" },
     output_config: { effort: EFFORT, format: { type: "json_schema", schema: SCHEMA } }
@@ -753,7 +788,25 @@ export async function handle(body, deps){
     if (question) qUnits = { id: "Q", hub: input.hub, kind: "question", lec: "", text: question, go: { v: "bank", q: input.ask.qid }, label: "This question" };
   }
   const sent = renderTurn(input, corpora, question, deps.now());
-  const params = buildRequest(corpora, deps.site, Array.isArray(b.history) ? b.history : [], sent);
+  const history = Array.isArray(b.history) ? b.history : [];
+  /* the first question after an idle hour (nobody's question read this hub's whole content for 55 minutes: timmy_cache,
+     migration_v85) gets a part of it: the lecture the student is on, or the answered question's lecture, with everything
+     but the other lectures' notes and review tables. Without deps.db.cache, or when it fails, the whole content, as before. */
+  const key = cacheKey(input.hub, corpora, MODEL);
+  let warmAt = null, part = null;
+  if (deps.db.cache) {
+    try { const at = await deps.db.cache({ p_key: key, p_mark: false }); warmAt = at ? Date.parse(at) : 0; }
+    catch (e) { log("cache", { error: String(e && e.message || e).slice(0, 200) }); warmAt = null; }
+    if (warmAt != null && !(warmAt && deps.now() - warmAt < WARM_MS)) {
+      const lecs = [];
+      if (corpora.length === 1) {
+        if (input.context.lec) lecs.push(input.context.lec);
+        if (question && input.ask) { try { const q = ((await deps.loadQuestions(input.hub)) || []).find(x => x && x.id === input.ask.qid); if (q && q.lec) lecs.push(String(q.lec)); } catch (e) {} }
+      }
+      part = { lecs: [...new Set(lecs)].filter(l => corpora[0].lectures.some(x => x.id === l)) };
+    }
+  }
+  const params = buildRequest(corpora, deps.site, history, sent, part);
   const units = new Map(siteOf(deps.site).units);
   for (const c of corpora) for (const [k, v] of c.units) units.set(k, v);
   if (qUnits) units.set("Q", qUnits);
@@ -762,8 +815,26 @@ export async function handle(body, deps){
   let msg, reply, kind, raw = null, check = { ok: 0, bad: 0, moved: 0, unchecked: [] };
   try { msg = await deps.model(params); }
   catch (e) { log("model", { error: String(e && e.status || ""), message: String(e && e.message || e).slice(0, 300) }); msg = null; }
+  /* the part didn't have it ("not_covered", or an answer that didn't parse): ask again with the whole content. A failed
+     call or a refusal isn't asked again. */
+  let partMsg = null, mode = part ? "part" : "full";
+  if (part && msg && msg.stop_reason !== "refusal") {
+    let pk = null; try { pk = msg.stop_reason === "max_tokens" ? null : JSON.parse((msg.content || []).filter(x => x.type === "text").map(x => x.text).join("")).kind; } catch (e) {}
+    if (pk === "not_covered" || !KINDS.includes(pk)) {
+      partMsg = msg; mode = "part+full";
+      try { msg = await deps.model(buildRequest(corpora, deps.site, history, sent, null)); }
+      catch (e) { log("model", { error: String(e && e.status || ""), message: String(e && e.message || e).slice(0, 300) }); msg = null; }
+    }
+  }
+  /* the whole content was read (or written) just now: mark it, so the next question within the hour reads it whole too */
+  if (deps.db.cache && warmAt != null && msg && mode !== "part" && !(warmAt && deps.now() - warmAt < MARK_MS)) {
+    try { await deps.db.cache({ p_key: key, p_mark: true }); } catch (e) { log("cache", { error: String(e && e.message || e).slice(0, 200) }); }
+  }
   const ms = deps.now() - t0;
-  const served = msg && msg.model || MODEL, usage = msg && msg.usage || {};
+  const pu = partMsg && partMsg.usage || {}, both = (a, b) => a == null && b == null ? undefined : (a || 0) + (b || 0);
+  const served = msg && msg.model || MODEL, usage0 = msg && msg.usage || {};
+  const usage = partMsg ? { input_tokens: both(usage0.input_tokens, pu.input_tokens), output_tokens: both(usage0.output_tokens, pu.output_tokens),
+    cache_read_input_tokens: both(usage0.cache_read_input_tokens, pu.cache_read_input_tokens), cache_creation_input_tokens: both(usage0.cache_creation_input_tokens, pu.cache_creation_input_tokens) } : usage0;
   if (!msg) { reply = napReply("error", input.voice); kind = "error"; }
   else if (msg.stop_reason === "refusal") { reply = napReply("refusal", input.voice); kind = "refusal"; }
   else {
@@ -786,7 +857,7 @@ export async function handle(body, deps){
     if (g.gap) reply.gap = g.gap;
   }
   const gu = gapMsg && gapMsg.usage || {}, sum = (a, b) => a == null && b == null ? null : (a || 0) + (b || 0);
-  const cost = (msg ? estimateCost(usage, served) : 0) + (gapMsg ? estimateCost(gu, gapMsg.model || MODEL) : 0);
+  const cost = (msg ? estimateCost(usage0, served) : 0) + (partMsg ? estimateCost(pu, partMsg.model || MODEL) : 0) + (gapMsg ? estimateCost(gu, gapMsg.model || MODEL) : 0);
   let mid = null;
   try {
     mid = await deps.db.finish({ p_student: b.message, p_sent: sent, p_kind: kind, p_text: replyText(reply), p_reply: reply, p_raw: raw,
@@ -795,7 +866,7 @@ export async function handle(body, deps){
       p_cache_read: sum(usage.cache_read_input_tokens, gu.cache_read_input_tokens),
       p_cache_write: sum(usage.cache_creation_input_tokens, gu.cache_creation_input_tokens), p_cost: Math.round(cost * 1e6) / 1e6, p_ms: ms + gapMs });
   } catch (e) { log("finish", { error: String(e && e.message || e) }); }
-  log("turn", { hub: input.hub, kind, ms, cost: Math.round(cost * 1e4) / 1e4, cites: check.ok, bad: check.bad, moved: check.moved, model: served,
+  log("turn", { hub: input.hub, kind, ms, content: mode, cost: Math.round(cost * 1e4) / 1e4, cites: check.ok, bad: check.bad, moved: check.moved, model: served,
     lookup: gapWhy, lookup_ms: gapMsg ? gapMs : undefined, searches: gu.server_tool_use ? gu.server_tool_use.web_search_requests : undefined,
     in: usage.input_tokens, out: usage.output_tokens, read: usage.cache_read_input_tokens, write: usage.cache_creation_input_tokens });
   return { status: 200, body: Object.assign({ ok: true, chat: b.chat, message: mid }, reply) };

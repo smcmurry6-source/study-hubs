@@ -103,10 +103,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   across runs (350-385 in the final run; budget 500, fails past 750). The same scripts run, in fewer and longer tasks.
   Not looked into: a trace of the first seconds to see which tasks are long (the engine's start, or `widget/v3.js`'s,
   which is shared with the live hubs). Worth a look at the release, when v3.js no longer has to stay as it is for the old pages.
-- [ ] Ask Timmy's "What should I study tonight?" on the new dashboard reads each hub's progress from this device's saved state
+- [x] Ask Timmy's "What should I study tonight?" on the new dashboard reads each hub's progress from this device's saved state
   (`progressFrom` in `widget/ask.js`), so on a new or linked device it sees nothing until a hub page has synced the answers. Read the
   student's own answers from the server there instead (their own rows, like the v2 bootstrap), or say "open a hub first" when every
-  hub's state is empty (2026-11-12, [Ask Timmy](done/2026-11-12-redesign-ask-timmy.md) part 2).
+  hub's state is empty (2026-11-12, [Ask Timmy](done/2026-11-12-redesign-ask-timmy.md) part 2). Done: the dashboard merges `get_my_answers` with the device's (#469).
 - [ ] Anima figures on phones: at 390 px their in-drawing labels scale down to about 6-7 px. A plain bigger font for narrow screens clipped labels at the edges in about half the PCD Implants figures (tried 2026-11-04, reverted); it needs a per-figure phone layout (labels moved inside the drawing) or tap-to-zoom. Heme & Endo Exam 3's 22 (2026-11-17) mostly draw them at 10-15 px; its four L17 figures after the oocyte are the smallest (labels about 8 px on the timeline, implantation, estriol and breastfeeding figures). 
 - [ ] Retention, the part not built yet (approved 2026-11-04, [analytics-retention](../reference/analytics-retention.md)): before the school year ends (spring 2027), collapse `activity_hourly` / `activity_visits` older than the school year to hub × section × day with people counts and no ids, as one more step in `sh_retention_run`. **Since migration_v68 the wallet pays 100 crowns per hour of hub time from `activity_hourly`** (`sh_time_crowns`): before the collapse deletes a visitor's hours, keep what they paid (each visitor's capped ping total in a small table `sh_time_crowns` reads, or the crowns as a row), or balances drop. Also ask Sam about the two rows the question-health work proposed (`question_events`, `question_feedback`).
 - [ ] **The workflows' actions off Node.js 20** (2026-11-18, seen in #407's After merge run): every run warns "Node.js 20 is
@@ -114,12 +114,25 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   on Node 24 for now; `actions/upload-artifact@v4` (3) and `actions/github-script@v7` (2) are likely the same. Before GitHub
   drops Node 20 entirely: move each to the major version that runs on Node 24, and let CI run every job once ("Check hubs" and
   "Release tests" both run when a workflow changes).
-- [ ] **Sam's call: Ask Timmy's first question after an idle hour** (2026-11-18, found while answering why Heme & Endo Exam 3 had 21
+- [x] **Sam's call: Ask Timmy's first question after an idle hour** (2026-11-18, found while answering why Heme & Endo Exam 3 had 21
   identical questions): writing a hub's content to the API's cache is most of what students' questions cost (about $14 of their
   $20 from 11-14 to 11-18), and most of it is the first question on a hub after nobody asked for an hour (about $0.60 each; the
   cache lasts an hour). The deploys that broke the cache are fixed ([ask-timmy](../reference/ask-timmy.md), "Limits and money").
   What's left would mean sending less: for example only the exam facts, Exam Hints and the lecture the student is on, with the
-  rest of the notes only when the question needs them. That changes what Timmy can answer, so it needs the eval ($6) and Sam's OK.
+  rest of the notes only when the question needs them. That changes what Timmy can answer, so it needs the eval ($6) and Sam's OK. Done: Sam said yes; built with the eval in `--part` mode (#469).
+- [ ] **Apply `migration_v85.sql` (Ask Timmy's `timmy_cache`) once its PR merges** (2026-11-19): one small table and one
+  service-role function, no backfill, safe at any hour. Until it's applied the function gets an error from the call and sends
+  the whole content as before, so the cheaper first question starts only then. Through the connector, md5-checked; then append
+  it to `supabase/schema.sql` and take its line out of `supabase/pending-migrations.txt`
+  ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)).
+- [ ] **A week after `migration_v85` is applied, check what the part saved** (2026-11-19): the admin page's Ask Timmy tab (cost by
+  day against 11-14 to 11-18's) and the edge logs' `turn` lines (`content`: `part`, `part+full`, `full`). In the eval, 16 of 50
+  first questions were asked again with the whole content; if real students' share is much higher, the part costs more than it
+  saves: send more with it (another lecture, the review tables) or turn it off (`WARM_MS` in `supabase/functions/timmy/core.js`).
+- [ ] **Ask Timmy's quote check fails a table cell under three words** (2026-11-19, the eval's pe-02 on the whole content):
+  he cited R1.3 with "≥10 cigarettes/day", which is in the table, but `quoteIn` wants at least three words or the whole unit, so
+  the link was dropped and the eval failed. Either accept a whole table cell (the text between two ` · `) as a quote, or say in
+  `RULES` that a table quote takes the row's label with it.
 - [ ] **a11y.js checks the About page in light mode on a laptop only** (2026-11-19, found fixing BUG-002, BUG-006 and BUG-007):
   `check('about', 'about/')` in `tools/release/a11y.js` runs at 1280 px in light mode, so a phone-only problem (four of the five
   tables that scroll sideways were only too wide at 390 px) or a dark-mode one would never be counted. Add the About page in dark

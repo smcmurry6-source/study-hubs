@@ -3,7 +3,8 @@
 //   - the model: Anthropic's API, with ANTHROPIC_API_KEY from the function's secrets (Sam saves it in the Supabase
 //     dashboard, Edge Functions > Secrets; never in the repo or a chat). When no secret has that name it reads
 //     TIMMY_EVAL_KEY: at the release (2026-11-14) the key Sam had saved there was under that name;
-//   - the database: timmy_begin and timmy_finish (migration_v55), called with the service-role key the runtime provides;
+//   - the database: timmy_begin and timmy_finish (migration_v55) and timmy_cache (migration_v85), called with the
+//     service-role key the runtime provides;
 //   - the content: each hub's published content JSON, fetched from the site and kept in memory for 10 minutes;
 //   - the site help: site.json beside this file (tools/timmy/build.mjs builds it from the About page).
 // Deploy with JWT verification off (the site's publishable key isn't a JWT); the function checks its own input, answers
@@ -71,7 +72,9 @@ async function loadVariants(hub: string) {
 }
 
 const deps = {
-  db: { begin: (a: Record<string, unknown>) => rpc("timmy_begin", a), finish: (a: Record<string, unknown>) => rpc("timmy_finish", a) },
+  db: { begin: (a: Record<string, unknown>) => rpc("timmy_begin", a), finish: (a: Record<string, unknown>) => rpc("timmy_finish", a),
+    // when a hub's whole content was last read (migration_v85); an error (not applied yet) sends the whole content, as before
+    cache: (a: Record<string, unknown>) => rpc("timmy_cache", a) },
   // deno-lint-ignore no-explicit-any
   model: (params: any, options?: any) => client.beta.messages.create(params, options),
   lookup: (Deno.env.get("TIMMY_LOOKUP") ?? "") !== "off",
