@@ -42,11 +42,11 @@
     ".sh-tour-spot{position:fixed; z-index:20001; border-radius:14px; pointer-events:none; box-shadow:0 0 0 2px var(--focus, var(--accent,#2F6FD6));",
     "  transition:left .3s ease, top .3s ease, width .3s ease, height .3s ease, opacity .2s;}",
     ".sh-tour-spot[hidden]{display:block; opacity:0;}",
-    ".sh-tour{position:fixed; z-index:20002; box-sizing:border-box; width:min(380px, calc(100vw - 32px)); background:var(--sht-bg); color:var(--sht-ink); font-family:var(--sht-font);",
+    ".sh-tour{position:fixed; z-index:20002; box-sizing:border-box; width:min(380px, calc(100% - 32px)); background:var(--sht-bg); color:var(--sht-ink); font-family:var(--sht-font);",
     "  border:1px solid var(--sht-line); border-radius:16px; box-shadow:0 2px 4px rgba(0,0,0,.08), 0 24px 48px -16px rgba(0,0,0,.5); padding:20px 20px 16px; text-align:left;",
-    "  max-height:calc(100vh - 32px); max-height:calc(100dvh - 32px); overflow:auto; transition:left .3s ease, top .3s ease, opacity .2s;}",
+    "  max-height:calc(100% - 32px); overflow:auto; transition:left .3s ease, top .3s ease, opacity .2s;}",
     ".sh-tour *{box-sizing:border-box;}",
-    ".sh-tour.is-center{left:50% !important; top:50% !important; transform:translate(-50%,-50%); width:min(440px, calc(100vw - 32px));}",
+    ".sh-tour.is-center{left:50% !important; top:50% !important; transform:translate(-50%,-50%); width:min(440px, calc(100% - 32px));}",
     ".sh-tour-x{position:absolute; top:10px; right:10px; width:32px; height:32px; border:0; border-radius:50%; background:transparent; color:var(--sht-ink3); font-size:22px; line-height:1; cursor:pointer; padding:0;}",
     ".sh-tour-x:hover{background:var(--sht-bg2); color:var(--sht-ink);}",
     ".sh-tour-eyebrow{font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--sht-ink3);}",
@@ -63,14 +63,14 @@
     ".sh-tour-btn:hover{background:var(--sht-bg2);}",
     ".sh-tour-btn.is-primary{background:var(--sht-ink); border-color:var(--sht-ink); color:var(--sht-bg);}",
     ".sh-tour-btn.is-primary:hover{opacity:.9;}",
-    ".sh-tour-toast{position:absolute; z-index:10003; width:min(280px, calc(100vw - 32px)); background:var(--sht-ink); color:var(--sht-bg); font-family:var(--sht-font); border-radius:12px;",
+    ".sh-tour-toast{position:absolute; z-index:10003; width:min(280px, calc(100% - 32px)); background:var(--sht-ink); color:var(--sht-bg); font-family:var(--sht-font); border-radius:12px;",
     "  padding:10px 14px; font-size:14px; line-height:1.4; box-shadow:0 12px 30px -12px rgba(0,0,0,.5); opacity:0; transform:translateY(-4px); transition:opacity .25s, transform .25s;}",
     ".sh-tour-toast.is-shown{opacity:1; transform:none;}",
     ".sh-tour-toast::before{content:''; position:absolute; top:-6px; right:var(--arrow,20px); width:12px; height:12px; background:inherit; transform:rotate(45deg); border-radius:2px;}",
     ".sh-tour-toast.is-below::before{top:auto; bottom:-6px;}",
     "@media (max-width:640px){",
-    "  .sh-tour:not(.is-center){left:8px !important; right:8px; top:auto !important; bottom:calc(8px + env(safe-area-inset-bottom, 0px)); width:auto; max-height:52vh; padding:16px 16px 14px;}",
-    "  .sh-tour.is-top:not(.is-center){top:calc(8px + env(safe-area-inset-top, 0px)) !important; bottom:auto; max-height:46vh;}",    /* the part is low on the screen (the phone bar) */
+    "  .sh-tour:not(.is-center){left:8px !important; right:8px; top:auto !important; bottom:calc(8px + env(safe-area-inset-bottom, 0px)); width:auto; max-height:52%; padding:16px 16px 14px;}",
+    "  .sh-tour.is-top:not(.is-center){top:calc(8px + env(safe-area-inset-top, 0px)) !important; bottom:auto; max-height:46%;}",    /* the part is low on the screen (the phone bar) */
     "  .sh-tour h3{font-size:22px;} .sh-tour-body{font-size:14px;}",
     "  .sh-tour:not(.is-center) .sh-tour-foot{margin:10px -16px -14px; padding:8px 16px 14px; bottom:-14px;}",
     "}",
@@ -93,6 +93,9 @@
   function $$(sel){ return [].slice.call(document.querySelectorAll(sel)); }
   function txt(el){ return (el && el.textContent || "").replace(/\s+/g, " ").trim(); }
   function phone(){ return window.innerWidth <= 640; }
+  /* the text-size setting zooms <html>: getBoundingClientRect and the window are in screen px, a style's px and offsetWidth
+     in the page's zoomed px, so positions are worked out on the screen and divided by this when set (BUG-190) */
+  function zoom(){ try { return parseFloat(getComputedStyle(document.documentElement).zoom) || 1; } catch (e) { return 1; } }
   /* fixed or sticky parts (the hub's top bar, the launcher) don't need the page scrolled to them */
   function pinned(el){
     for (var e = el; e && e !== document.body; e = e.parentElement) {
@@ -338,7 +341,7 @@
   }
   function place(){
     var s = T.list[T.i], card = T.card, spot = T.spot;
-    var vw = window.innerWidth, vh = window.innerHeight;
+    var vw = window.innerWidth, vh = window.innerHeight, z = zoom(), px = function(n){ return n / z + "px"; };
     if (!s || !s.node || !document.contains(s.node)) {
       spot.hidden = true; T.block.classList.add("is-dim"); T.dim.hidden = true;
       card.classList.add("is-center"); card.classList.remove("is-top"); card.style.left = card.style.top = card.style.maxHeight = "";
@@ -349,21 +352,21 @@
     var top = Math.max(r.top - pad, 6), bottom = Math.min(r.bottom + pad, vh - 6);
     var left = Math.max(r.left - pad, 6), right = Math.min(r.right + pad, vw - 6);
     spot.hidden = false;
-    spot.style.left = left + "px"; spot.style.top = top + "px";
-    spot.style.width = Math.max(0, right - left) + "px"; spot.style.height = Math.max(0, bottom - top) + "px";
-    T.dim.hidden = false; hole(T.dim, vw, vh, left, top, right, bottom);
+    spot.style.left = px(left); spot.style.top = px(top);
+    spot.style.width = px(Math.max(0, right - left)); spot.style.height = px(Math.max(0, bottom - top));
+    T.dim.hidden = false; hole(T.dim, vw / z, vh / z, left / z, top / z, right / z, bottom / z);
     if (vw <= 640) {      /* phones: docked by CSS, away from the part; a short screen lets it use more of the height */
       var low = (top + bottom) / 2 > vh * .5;
       card.classList.toggle("is-top", low);
-      card.style.maxHeight = vh < 560 ? Math.round(Math.max(low ? top : vh - bottom, vh * .6) - 16) + "px" : "";
+      card.style.maxHeight = vh < 560 ? px(Math.round(Math.max(low ? top : vh - bottom, vh * .6) - 16)) : "";
       return;
     }
     card.style.maxHeight = "";
-    var cw = card.offsetWidth, ch = card.offsetHeight, gap = 14, y, x = Math.min(Math.max(16, r.left), vw - cw - 16);
+    var cw = card.offsetWidth * z, ch = card.offsetHeight * z, gap = 14, y, x = Math.min(Math.max(16, r.left), vw - cw - 16);
     if (vh - bottom >= ch + gap + 16) y = bottom + gap;
     else if (top >= ch + gap + 16) y = top - gap - ch;
     else { y = vh - ch - 16; x = r.left > vw / 2 ? 16 : vw - cw - 16; }     /* no room either side: a bottom corner, over the part */
-    card.style.left = x + "px"; card.style.top = Math.max(16, y) + "px";
+    card.style.left = px(x); card.style.top = px(Math.max(16, y));
   }
   /* the whole screen minus a rounded rectangle the shape of the spotlight ring (evenodd: the inner path is the hole) */
   function hole(el, vw, vh, l, t, r, b){
@@ -434,10 +437,10 @@
       : b.id === "shstat-launch" ? "No problem. The tour is in this menu whenever you want it."
       : "No problem. The tour is right here whenever you want it.";
     document.body.appendChild(t);
-    var w = t.offsetWidth, h = t.offsetHeight, x = Math.min(Math.max(16, r.left + r.width / 2 - w + 26), window.innerWidth - w - 16);
-    t.style.left = x + "px";
-    t.style.top = (below ? r.bottom + window.pageYOffset + 10 : r.top + window.pageYOffset - h - 10) + "px";
-    t.style.setProperty("--arrow", Math.max(10, Math.min(w - 22, r.left + r.width / 2 - x - 6)) + "px");
+    var z = zoom(), w = t.offsetWidth * z, h = t.offsetHeight * z, x = Math.min(Math.max(16, r.left + r.width / 2 - w + 26), window.innerWidth - w - 16);
+    t.style.left = x / z + "px";
+    t.style.top = (below ? r.bottom + window.pageYOffset + 10 : r.top + window.pageYOffset - h - 10) / z + "px";
+    t.style.setProperty("--arrow", Math.max(10, Math.min(w - 22, r.left + r.width / 2 - x - 6)) / z + "px");
     requestAnimationFrame(function(){ t.classList.add("is-shown"); });
     setTimeout(function(){ t.classList.remove("is-shown"); setTimeout(function(){ t.remove(); }, 300); }, 4500);
   }
