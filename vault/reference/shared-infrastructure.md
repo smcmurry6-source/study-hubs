@@ -94,7 +94,9 @@ tags: [widget, supabase]
   connect), Sam restarts it from the dashboard (Settings, General, Restart project); that clears the jam, not the CPU.
   A page backs off by itself: a call the server fails starts a **quiet spell** (`window.shDb` in `widget/v3.js`: 30 s,
   doubling to 5 minutes), in which answers go one at a time and the analytics wait; a new caller of the database that
-  isn't something the student did on purpose should check `shDb.busy()` too.
+  isn't something the student did on purpose should check `shDb.busy()` too. An answer still waiting when the page is hidden
+  or closed is kept on the device (`sh_answers_kept:<hub>`, up to 3 days) and sent by the hub's next page with the same
+  request id, so it records and pays once (2026-11-19).
   **The database is small** (1 GB of memory, two shared cores, 60 connections), and every student's answer is saved
   through it (`record_answer_v2`, about 150 ms). Visitors' calls stop after 3 s (anon's `statement_timeout`; `lock_timeout`
   8 s). **A heavy query takes the cores from the class:** on 2026-11-18, the day before the Perio final, answer saves

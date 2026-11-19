@@ -32,6 +32,20 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-19 (pages that ride out a busy database: answers kept on the device, and the rank pill, Claude Code)** — (1) An
+  answer still unsaved when its tab closed was lost (the line's retries lived in the page). Now `widget/v3.js` writes the
+  answers still in the line to the device when the page is hidden (`sh_answers_kept:<hub>`), takes them back when it shows
+  again, and the hub's next page sends them first, oldest first, with the same request ids (an answer that did reach the
+  server pays nothing new); a page that finds its answers taken by another drops them. An answer out of its 8 tries is kept
+  too. At most 3 days and 24 tries; the server stamps each when it arrives. A backlog (after a quiet spell, or kept) now goes
+  out spaced as it was answered, up to 2.1 s apart, so its misses pay and count toward a run as they would have (the speed
+  limit); live answers go at once as before. Mocks' and games' answers aren't kept (inbox). (2) With the bootstrap timed
+  out, `widget/ranks.js` read the old rank profile until the first answer: no double-XP chip, and from 50,000 XP the wrong
+  rank or journey (nobody is there yet). It asks `get_rank_profile_v2` when `shGame.live()` (a new `live` hook in
+  `shEggHooks`). The dashboard already asked v2 first. About page ("What the hubs record") and Ask Timmy's site help
+  updated; bundles rebuilt; `tools/ci/quiet.js` checks the kept answers. It also closes every WebSocket now: since #429 its
+  pages (not marked automated, so they act as visitors) opened the real realtime connection and showed in Perio's
+  "studying now" count for about a minute each CI run (nothing saved; the smoke test always closed them).
 - **2026-11-18 (Heme & Endo Exam 3: L21 and L22 in, Claude Code)** — Sam: "i just added the last endo lectures. update the hub.
   no to all diagrams". Dr. Dal Zotto's **L21** Male reproductive and lower urinary tract pathology (`mpath`, 64 questions,
   `mr-`) and **L22** Female reproductive pathology (`fpath`, 60, `fr-`), both taught 11/18, written from their recordings (the
