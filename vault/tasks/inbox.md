@@ -10,6 +10,13 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **The arcade games themselves at 320 px with the largest text** (2026-11-19, left from BUG-168's fix): the lobby and
+  every view of a hub now fit a 320 px phone at XX-Large (220 px of layout), and the smoke test checks them, but a game once
+  it's started (each hub's own `content/arcade.css` and `widget/games.css`) wasn't swept. Open each in a scripted browser at
+  that size, the way `tools/ci/smoke.js`'s 320 px check does, and fix any that scroll sideways or cut off a control.
+- [ ] **The dashboard's toast on a phone** (2026-11-19, left from BUG-126's fix): a hub's toasts now drop in at the top on a
+  phone, clear of Timmy, the streak flame and the Listen player; the dashboard's own (`toast()` in `widget/dash.js`) still
+  comes up at the bottom and wasn't checked against what sits there. Check it on a phone and move it if anything covers it.
 - [ ] **Read Perio's data quality and question-health lists with its retrospective** (2026-11-18, the evening lessons refresh):
   `select sh_data_quality();` stopped at the 5 s limit with 80 people in Perio on its final's eve, so neither it nor
   `qh_report('perio')` was read after S6 went taught. Read both, early in the day or in the quiet hours, when the retrospective runs.

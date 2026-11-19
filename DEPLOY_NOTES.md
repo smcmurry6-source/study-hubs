@@ -32,7 +32,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
-- **2026-11-19 (Phone and large-text fixes on the hubs: BUG-168, BUG-126, BUG-009, Claude Code, #PRNUM)** — Sam's package of
+- **2026-11-19 (Phone and large-text fixes on the hubs: BUG-168, BUG-126, BUG-009, Claude Code, [#458](https://github.com/smcmurry6-source/study-hubs/pull/458))** — Sam's package of
   three bugs. **Nothing on a hub scrolls sideways on a phone at the largest text** (BUG-168): the text sizes zoom the page,
   so XX-Large on a 320 px phone lays out in 220 px, and the arcade lobby, the Question Bank, Notes, Exam Hints, the cram
   sheet, Stats and Settings all ran past the screen there (Exam Hints and the cram sheet at 320 px at every size). In
