@@ -7,8 +7,14 @@ status: archived
 
 # MSK Exam 3 (GI & MSK Exam 3)
 
+**Its page came down 2026-11-19**, with the other five old single-file hub pages (Sam: "lets go ahead and take down all
+old pages", [decisions](../decisions.md)). Its `hubs.js` entry (the check-ins, the recap),
+`tools/question-ids/msk-exam3.txt`, its art and the class's data in Supabase stay. The page is still in git:
+`git show a897c0c:hubs/msk-exam3/index.html` (the last `main` commit with it); its questions and lectures as JSON:
+`tools/dump-banks.js` on a copy of that commit ([repo map](../reference/repo-map.md)).
+
 Nutrition, joints, cartilage, bone, autoimmune disease, hereditary bone disorders, bone drugs and tumors (L19-L27); exam
-Fri Oct 2. Archived; the page is still up. Retrospective: `LESSONS.md` → Hub retrospectives.
+Fri Oct 2. Archived. Retrospective: `LESSONS.md` → Hub retrospectives.
 
 - The first hub with full data (clicks, per-section time, the idle rule, Daily Drill, mock scores).
 - Its PollEv exam-review items were removed after the exam; they're in git history (`git show 1e6b580:hubs/msk-exam3/index.html`).

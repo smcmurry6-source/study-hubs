@@ -17,48 +17,6 @@
    "lcp": 2500,
    "tbt": 500
   },
-  "hubs/heme-endo-exam1/": {
-   "kb": 1050,
-   "requests": 33,
-   "fcp": 2000,
-   "lcp": 2500,
-   "tbt": 1000
-  },
-  "hubs/heme-endo-exam2/": {
-   "kb": 1330,
-   "requests": 33,
-   "fcp": 2000,
-   "lcp": 5500,
-   "tbt": 1000
-  },
-  "hubs/msk-exam3/": {
-   "kb": 850,
-   "requests": 30,
-   "fcp": 1500,
-   "lcp": 2500,
-   "tbt": 500
-  },
-  "hubs/msk-exam4/": {
-   "kb": 900,
-   "requests": 31,
-   "fcp": 2000,
-   "lcp": 2500,
-   "tbt": 500
-  },
-  "hubs/pcd-exam3/": {
-   "kb": 850,
-   "requests": 30,
-   "fcp": 1500,
-   "lcp": 2500,
-   "tbt": 500
-  },
-  "hubs/pcd-implants-exam1/": {
-   "kb": 1000,
-   "requests": 33,
-   "fcp": 2000,
-   "lcp": 2500,
-   "tbt": 500
-  },
   "hubs/heme-endo-exam3/": {
    "kb": 830,
    "requests": 12,

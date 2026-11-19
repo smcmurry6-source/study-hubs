@@ -64,7 +64,8 @@ tags: [map]
   entry).
 - `hubs/<hub-id>/index.html` alone — **an old single-file hub** (the ones archived before the release, listed under
   `legacy` in `hubs.js`): the page holds everything and is its own source. They load `widget/v3.js` and the rest by
-  name. No new hub is built this way.
+  name. No new hub is built this way. **None is on the site since 2026-11-19** (Sam took the last six down);
+  `legacy` still lists them, so the dashboard never looks for engine content they never had.
 - `tools/bundle/` and `widget/*.bundle.*` — what the dashboard and a hub on the engine load instead of one request per widget file
   ([bundles](bundles.md)): `bundles.json` lists each bundle's sources, `build.mjs` writes `widget/hub.bundle.js`,
   `dash.bundle.js`, `rest.bundle.js`, `hub-rest.bundle.js` and `site.bundle.css` (**generated and committed**: edit the
@@ -100,7 +101,9 @@ tags: [map]
   [ask-timmy](ask-timmy.md)). Its **Recap** tab makes the shareable end-of-hub image (drawn by
   `widget/recap.js`) and **publishes** it to the dashboard's "Hub recaps" slideshow. When a hub is archived, publish its
   recap (`tools/publish-recap.js --bank <file>`; Sam's standing OK since 2026-10-01, `/lessons-audit` does it) **before**
-  the hub page comes down, while `tools/dump-banks.js` can still read its bank.
+  the hub page comes down, while `tools/dump-banks.js` can still read its bank. A page that has come down is still in
+  git, with its bank: `git worktree add <dir> <a commit that has it>` and run that copy's `node tools/dump-banks.js <out>`
+  (it reads the hubs beside it; the commit is in the hub's note).
   **Archived hubs' question banks are not kept in this public repo** (`question-banks/` is gitignored, removed
   2026-10-02): the syllabus keeps quiz and exam content from later classes. Keep a dump locally if you need one.
 - `tools/question-ids/<hub>.txt` — every question id each hub has ever shipped (`<id> retired` for deleted ones), checked by

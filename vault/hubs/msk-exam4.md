@@ -7,8 +7,15 @@ status: archived
 
 # MSK Exam 4 (GI & MSK Exam 4)
 
-Skin histology, derm pharm, dermpath, skeletal muscle and NMJ pharm (L28-L32); exam Fri Oct 16. Archived; the page is
-still up. Retrospective: `LESSONS.md` → Hub retrospectives.
+**Its page came down 2026-11-19**, with the other five old single-file hub pages (Sam: "lets go ahead and take down all
+old pages", [decisions](../decisions.md)). Its `hubs.js` entry (the check-ins, the recap),
+`tools/question-ids/msk-exam4.txt`, its art, its figure kit (`tools/figures/msk-exam4/`), its Timmy Time script
+(`tools/podcast/msk-exam4/`) and the class's data in Supabase stay. The page is still in git:
+`git show a897c0c:hubs/msk-exam4/index.html` (the last `main` commit with it); its questions and lectures as JSON:
+`tools/dump-banks.js` on a copy of that commit ([repo map](../reference/repo-map.md)).
+
+Skin histology, derm pharm, dermpath, skeletal muscle and NMJ pharm (L28-L32); exam Fri Oct 16. Archived.
+Retrospective: `LESSONS.md` → Hub retrospectives.
 
 - **The first anima figures** (the neuromuscular junction, the sliding sarcomere): `tools/figures/msk-exam4/` is the
   reference build new hubs copy (`shared.mjs` maps the kit onto a hub palette, `uniq()` gives every copy its own SVG ids).
