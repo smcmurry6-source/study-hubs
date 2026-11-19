@@ -82,6 +82,8 @@ Hub building
 - [Package the to-do list into sessions](how-to/package-the-to-dos.md): every open item in numbered packages, one PR each
   (a really big item alone), and the prompt that starts the one Sam picks (Claude Code: `/backlog`).
 - [Read usage data and run surveys](how-to/read-usage-data.md)
+- [Run SQL on the live database without slowing the class](how-to/run-sql-on-the-live-database.md): the quiet
+  hours (1 to 5 am Central), one short query at a time under a time limit, and a migration's backfill at night or in batches.
 - [Student reports, suggestions and notices](how-to/reply-to-reports.md)
 - Lessons audit and refresh: `tools/lessons-refresh.md` (Claude Code: `/lessons-audit`). A Timmy Time episode:
   `tools/podcast/README.md` (Claude Code: `/podcast`). Ideas from the Claude subreddits, checked against the repo:

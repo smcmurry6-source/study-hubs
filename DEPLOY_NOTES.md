@@ -54,6 +54,26 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   Event `news:more` (the arrows) replaces `news:open` ([event-taxonomy](vault/reference/event-taxonomy.md)). The About
   page, the tour's steps and the preview's fixture changelog (five entries now) follow.
 
+- **2026-11-18 (rules for heavy queries, Claude Code)** — From the database-load task's second and third boxes: on
+  2026-11-18 the lessons audit's economy queries (11 and 13 s) and a migration's 43 s transaction failed students' answer
+  saves. Timed on a throwaway copy at 1.5 times the class's size: `tools/economy.sql`'s E3 worked every wallet out about ten
+  times (an inlined CTE), 4.7 s, now 0.5 s with `as materialized` and the same numbers; `tools/retro.sql`'s click list
+  counted people once a row, now in one pass (0.3 s to 0.03 s); every other audit query under 0.1 s. The connector runs as
+  `postgres` with a 2-minute limit, so every audit query is now its own call under `set local statement_timeout = '5s'`,
+  one at a time (`tools/lessons-refresh.md`, the `lessons-audit` skill, the SQL files' headers). New how-to:
+  [run-sql-on-the-live-database](vault/how-to/run-sql-on-the-live-database.md) (the class's quiet hours, 1 to 5 am Central;
+  a backfill at night or in batches; `create index concurrently`; `lock_timeout`; small data fixes). Nothing on the site
+  changes.
+- **2026-11-18 (Heme & Endo Exam 3: L21 and L22 in, Claude Code)** — Sam: "i just added the last endo lectures. update the hub.
+  no to all diagrams". Dr. Dal Zotto's **L21** Male reproductive and lower urinary tract pathology (`mpath`, 64 questions,
+  `mr-`) and **L22** Female reproductive pathology (`fpath`, 60, `fr-`), both taught 11/18, written from their recordings (the
+  slides were in Drive but too big for the connector to read: checking them is an inbox line). Notes at both levels, every
+  question format with every why (13 Patient Box cases), the study guide's focus hints and topics first, the "you don't need"
+  remarks as hints with no question keyed on them, tables, cram, processes, sort sets, all three narration levels. **No
+  figures** (Sam's call, replacing the 11-16 yes for these two). The mock is the exam's 35 in 90 minutes; the "join later"
+  wording is gone (`index.html`, `examInfo`, `hubs.js`). 437 questions, 86 topics. Shared: 29 words in
+  `tools/podcast/lexicon.json` and "WHO" read as W H O in `tools/narrate.py` (only new recordings change). Content flags
+  in `vault/hubs/heme-endo-exam3.md`; the task is done.
 - **2026-11-18 (the backlog board, Claude Code)** — Sam: "would it be effective to make the backlog into a trello board
   artifact that i can initiate sessions from?", then "yes build it". `/backlog` now also redraws a private claude.ai
   artifact, "Study Hubs Backlog": the packages in four columns (This week, Next, Later, Set aside; tabs on a phone), each
@@ -568,7 +588,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   **Not done, merged early because Sam was running out of usage** ("merge before i run out of usage, we can finish the rest
   when it resets"): the 22 figures Sam approved (drafts in `tools/figures/heme-endo-exam3/drafts/`) and High yield
   narration for L17-L20 (`vault/tasks/2026-11-16-heme-endo-exam3-figures.md`); L19 and L20 to taught and L21 and L22, whose
-  slides weren't posted (`vault/tasks/2026-11-16-heme-endo-exam3-l19-l22.md`). Not used (graded-coursework): the Exam 3 Anki
+  slides weren't posted (`vault/tasks/done/2026-11-16-heme-endo-exam3-l19-l22.md`). Not used (graded-coursework): the Exam 3 Anki
   deck in Drive, "Resources from D3s", Quiz 4 (open until 11/19). Hub note: `vault/hubs/heme-endo-exam3.md`.
 - **2026-11-16 (Time in Learn and in Flashcards, told apart from the Question Bank, Claude Code, [#381](https://github.com/smcmurry6-source/study-hubs/pull/381))** — Sam asked
   "do we have tracking for how people do questions between the bank, learn, and flashcards", then "i want to see where people

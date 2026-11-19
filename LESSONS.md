@@ -129,7 +129,7 @@ late to read before the final.
   the notes say rare), `q6-L38` (79% picked walls over depth in Nibali 2021), `q9-L09`, `q9-L26`, `q5-S04`, `q8-03`, `q9-S07`, `q9-L41`,
   `q7-L27`, `q7-L43`, `q8-P02`, `q9-L38`. Read them again after the final.
 - **Heme & Endo Exam 3** (exam Fri 11-20, 8 am): 11-17 20 people, 98 minutes (13 under 5 minutes): the class arrives 3-4 days out, so
-  11-17 to 11-19 decide it. 121 answers, 83%. Nothing to fix yet; L21-L22 wait in [their task](vault/tasks/2026-11-16-heme-endo-exam3-l19-l22.md).
+  11-17 to 11-19 decide it. 121 answers, 83%. Nothing to fix yet; L21-L22 wait in [their task](vault/tasks/done/2026-11-16-heme-endo-exam3-l19-l22.md).
 
 **The game economy** (Sam's standing rule since 2026-11-18, [earn-rates-stay-enjoyable](vault/rules/earn-rates-stay-enjoyable.md);
 `tools/economy.sql`, read over 11-15 to 11-18 with today's rules). Skews: the rate rose on 11-17/18 and was **back-paid from all past XP

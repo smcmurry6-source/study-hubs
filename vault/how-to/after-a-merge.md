@@ -48,7 +48,9 @@ The one thing that repeats is a changelog line, so leave `changelog` out (`--onl
 ## What it doesn't do
 
 - **Migrations** (`migration_v*.sql`) are still applied by hand, through the Supabase connector or the SQL editor, and
-  `supabase/schema.sql` is refreshed in the same PR ([repo map](../reference/repo-map.md)).
+  `supabase/schema.sql` is refreshed in the same PR ([repo map](../reference/repo-map.md)); one with a backfill goes in
+  late at night or in small batches ([run-sql-on-the-live-database](run-sql-on-the-live-database.md)). A data fix runs
+  at the merge, whatever the hour, so it stays small.
 - It doesn't decide whether a data fix is right: that's the PR's review, like any change. A fix that writes to the
   class's data is reviewed in its PR and runs once, after the merge.
 

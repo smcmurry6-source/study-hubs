@@ -11,7 +11,8 @@ with the decision each number drives: [insights-dashboard](../reference/insights
 means: [event-taxonomy](../reference/event-taxonomy.md); what to correct for: [analytics-data-quality](../reference/analytics-data-quality.md);
 what may be written down: [learner-data-privacy](../rules/learner-data-privacy.md) (totals over 5+ people, no visitor ids).
 
-To decide what to improve or cut, read the data before guessing (Supabase connector, read-only SQL):
+To decide what to improve or cut, read the data before guessing (Supabase connector, read-only SQL, one short query a call
+under a time limit: [run-sql-on-the-live-database](run-sql-on-the-live-database.md)):
 `activity_hourly` (time per `<mode>/<sub-view>`: n pings of 25 s per hour and person; the raw `activity_pings` are kept
 3 days since 2026-11-18, [analytics-retention](../reference/analytics-retention.md)), `ui_clicks` + `ui_click_reach` (clicks per
 button/tab and distinct people, per day; who tapped what is kept 90 days), `question_stats` / `question_choices` (accuracy, popular wrong answers),
