@@ -59,6 +59,10 @@ closed); **final Thu Nov 19, cumulative**. Dates: its entry in `hubs.js` (and `e
   `S06`, `q6-N01`-`N04`, `q6-W01`-`W04` (which / which-false), `q6-F02`-`F07`; 79 questions, every one with its version B.
   Not in the hub on purpose: his asides (peak bone mass and diet soda, the witch scale, Gouda, fluoride and the
   congressional visit). His five diagrams were approved and built the same day (S6 · Figs 1-5, "Diagram decisions" below).
+  **`q6-T02` is retired** (Sam, 2026-11-18: "it can go"): a true/false on his aside that he sometimes skips initial therapy
+  before regeneration (root planing tightens the tissue), while S4, S5 and his decision tree put initial therapy first. Report
+  #62 said it contradicted the other lectures, and half the class answered False. The aside stays in the S6 notes. Don't write
+  an item on an exception without the rule beside it ([LESSONS.md](../../LESSONS.md), reports section).
 - **Dr. Kaur's focus for her part of the final** (Sam passed it on 2026-11-11): "really know" peri-implant health,
   peri-implant mucositis and peri-implantitis; her clinical questions are based on them. In the hub: an S7 Exam Hint
   (`src:'relay'`, labeled "Paraphrased": not her exact words), the S7 `note` at the top of its notes, S7's

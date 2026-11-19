@@ -32,6 +32,17 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 
 ## Recent major changes (newest first — add a line when you ship something)
 
+- **2026-11-18 (lessons refresh, the Perio final's eve, Claude Code)** — `/lessons-audit` again at 7:30 pm Central (the morning's
+  was #414). Perio report #62 ("Contradicts other lectures", `q6-T02`): the true/false on Dr. Geurs sometimes skipping initial
+  therapy before regeneration (9 of 18 answers had said False) is **retired** (Sam: "it can go"; `q6-T02 retired` in
+  `tools/question-ids/perio.txt`, out of `questions.json`, `variants.json` and its High Likelihood topic), so S6's High yield
+  changed and was recorded again (`periodontal-regeneration-hy.mp3` and its words file). `q6-L35`'s explanation and why separate the root's sides from a defect's bony walls (15 of
+  30 first tries took "3 or more sides" for contained). Report #63 (`q7-P01`, "not enough info in the question"): the case box
+  (and `q7-P02`'s, the same #31 case) says the loss is at #31's margin with the apex not involved, which its explanation relied on.
+  `LESSONS.md`: Live signals rewritten (Perio's biggest day, 80 people and 205 h by 7:30 pm; the economy over 11-18,
+  the first day of #403's rates: 630 crowns an hour, 13% of crowns spent), the later check-ins in the Occlusion and Heme & Endo
+  Exam 2 retrospectives, a reports lesson on exception items. Every query under the 5 s limit; `sh_data_quality()` stopped there,
+  so it and `qh_report` weren't read (`tools/lessons-refresh.md` step 1, the database-load task, the inbox).
 - **2026-11-19 (Heme & Endo Exam 3: Dr. Herr's study guide in Notes, Claude Code)** — Sam: "under notes, make a section for dr
   herrs study guide. have each item as a heading and have [high] yield explainer of everything we need to know about that topic.
   since it skips dr taylors lecture, dont include it". A **study guide page** at `#notes/guide`, first in the notes' lecture list,
@@ -90,7 +101,6 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   cases now ask about Heme & Endo Exam 3). `tools/release/xp.js` grades Perio's real bank and `tools/release/admin-ui.js`
   archives Perio by hand instead. Its `hubs.js` entry stays for its check-ins, and its id list, art and podcast scripts stay
   ([hub note](vault/hubs/occlusion.md)).
-
 - **2026-11-19 (Collections, Claude Code)** — Sam: "in the timmy card i want there to be a button where you can view your
   collections of items bought in the shop. holiday collections and other things. you can see your progress and all and
   completing a collection gives 1000 xp and 1000 crowns as a bonus". A **Collections** button in Timmy's place (under
