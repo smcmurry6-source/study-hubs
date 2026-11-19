@@ -109,15 +109,16 @@ Live first, from the catalog (cheap, any hour; 9:40 am Central): `xp_awards` 62,
 and 22,006 updates since the restart of 2026-11-18; `activity_visits` 8,788 visits, a 1.4 MB table with 6.1 MB of indexes
 (4.7 MB of it `activity_visits_last_idx`), 39,443 updates, 6.6% in place; `xp_seen` 180,099 rows, a 29.9 MB table and a
 24.8 MB primary key, 18 dead rows.
-Then on two throwaway copies, **`node tools/release/bench-answers.js --statements`**: the same made-up class (37,630 calls:
-a heavy student with 8,300 awards, a middling one, a light one and 40 more, with mocks, arcade games, cards, replays and
+Then on two throwaway copies, **`node tools/release/bench-answers.js`**: the same made-up class (37,630 calls:
+a heavy student with 7,950 awards, a middling one, a light one and 40 more, with mocks, arcade games, cards, replays and
 double taps) on `supabase/schema.sql` (A) and with the pending migrations (B). Identical replies to all 37,630 calls,
 identical wallets, identical rows in all 75 tables, every running total equal to its awards; then 200 more answers by each
-of the three, A and B in turn, three rounds (ms an answer, its own transaction, psql included):
+of the three, A and B in turn, three rounds (ms an answer, its own transaction, psql included; the statements inside
+them from a `--statements` run before v78 was in):
 
 | Idea | Before (A) | After (B) | What was done |
 |---|---|---|---|
-| **The awards summed once** | heavy 3.96, middling 3.06, light 2.33; the wallet's sum 0.86 ms of every answer | 2.37, 2.11, 2.21; the sum 0.03 ms | **`migration_v79.sql`**: `xp_award_totals`, kept by statement-level triggers on `xp_awards` (an award insert 0.035 → 0.061 ms, about 60 bytes more log); the fill and the triggers in one transaction under a lock on `xp_awards`, so no award falls between them. The light student's answer is the same within the rounds' spread (2.25-2.40 against 1.95-2.39). Link my devices' rebuild of the heavy student: 280-350 ms either way, the totals exact after |
+| **The awards summed once** (with the next row) | heavy 3.81, middling 2.86, light 2.53; the wallet's sum 0.86 ms of every answer | 2.19, 2.12, 2.01; the sum 0.03 ms | **`migration_v79.sql`**: `xp_award_totals`, kept by statement-level triggers on `xp_awards` (an award insert 0.035 → 0.061 ms, about 60 bytes more log); the fill and the triggers in one transaction under a lock on `xp_awards`, so no award falls between them. A light student gains least (their sum was short) and loses nothing: 1.82-2.13 against 2.37-2.71 in the rounds. Link my devices' rebuild of the heavy student: 280-350 ms either way, the totals exact after |
 | **`answer_xp` once an answer** | an insert and an update: 0.085 ms, 1,219 kB of log for 1,800 answers | one insert: 0.048 ms, 964 kB | **`migration_v80.sql`**: the row is inserted at the end with the reply. One row version an answer instead of two (no dead row left for vacuum) |
 | **`activity_visits_last_idx`** | 300 visits pinged 60 times, a ping a transaction: 0% of the updates in place; the table 512 kB, its indexes 576 kB; 21 MB of log | 99.9% in place; 24 kB and 48 kB; 16 MB of log | **`migration_v81.sql`** drops it. The admin page's visitor summary without it, at the live size (9,000 visits): 30 days 3.4 ms either way (it reads by the visitor index), 1 day 0.4 → 2.1 ms (a scan of 1.4 MB), the same numbers |
 | **`xp_seen`'s 52 MB** | live: 29.9 MB table + 24.8 MB index for 180,099 rows | the same rows fresh at the live widths: about 16 + 15 MB; `cluster` 0.35 s for 197,000 on the copy | **Rewrite it once, at night**: about 24 MB back. The table is twice what its rows need, most likely from the rebuilds of everyone that migrations ran (`sh_xp_rebuild` over every visitor, in v54 and v68: each deletes and copies every row). Link my devices' rebuilds bring some back, mostly to the index (60 rebuilds of a student on the copy: the table 17 → 19 MB, the index 16 → 23 MB; live, 65,125 rows deleted and added again in the 18 hours after the restart) |
