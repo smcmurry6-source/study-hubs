@@ -91,14 +91,21 @@ tags: [widget, supabase]
   **The project is on Supabase's Free plan** (checked 2026-11-18): a shared CPU that slows to a crawl once a busy day has
   used up its burst, and a database that goes **read-only at 500 MB** (318 MB on 2026-11-19, after the ping table's rewrite; 465 MB just before it; then every save fails). Keep
   each answer's work small ([migration_v72](../../migration_v72.sql) cut it to a quarter for the most active students) and
-  watch the size ([the task](../tasks/2026-11-18-database-load.md)). If the database jams (even the connector can't
+  watch the size ([the task](../tasks/2026-11-18-database-load.md)). **Reading the dashboard** (2026-11-19): its database size
+  is refreshed once a day, so it can show yesterday's figure for hours after a cleanup (the true one:
+  `select pg_size_pretty(sum(pg_database_size(datname))) from pg_database`, the sum Supabase counts against the 500 MB); the
+  "Disk size" on Database Settings adds the write-ahead log, which the limit doesn't count. Its **Memory commitment**
+  chart is memory *promised* to Postgres and to Supabase's own services on the same small server, not memory used, so on
+  Nano it reads high even with the class asleep. The sign that memory really ran out is an out-of-memory kill or a crash
+  in the Postgres logs (none through 2026-11-19); fewer, shorter queries keep the busy-hour spikes down. If the database jams (even the connector can't
   connect), Sam restarts it from the dashboard (Settings, General, Restart project); that clears the jam, not the CPU.
   A page backs off by itself: a call the server fails starts a **quiet spell** (`window.shDb` in `widget/v3.js`: 30 s,
   doubling to 5 minutes), in which answers go one at a time and the analytics wait; a new caller of the database that
   isn't something the student did on purpose should check `shDb.busy()` too. An answer still waiting when the page is hidden
   or closed is kept on the device (`sh_answers_kept:<hub>`, up to 3 days) and sent by the hub's next page with the same
   request id, so it records and pays once (2026-11-19).
-  **The database is small** (1 GB of memory, two shared cores, 60 connections), and every student's answer is saved
+  **The database is small** (the Free plan's Nano size: a shared CPU and up to 0.5 GB of memory, of which Postgres's own
+  cache, `shared_buffers`, takes 224 MB; 60 connections; earlier notes said 1 GB, which is the paid Micro), and every student's answer is saved
   through it (`record_answer_v2`, about 150 ms). Visitors' calls stop after 3 s (anon's `statement_timeout`; `lock_timeout`
   8 s). **A heavy query takes the cores from the class:** on 2026-11-18, the day before the Perio final, answer saves
   failed in bursts of 1 to 5 minutes, up to 1 in 2 of them, each time something heavy ran: a migration with a 43 s
