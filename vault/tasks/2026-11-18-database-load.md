@@ -242,5 +242,8 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   all live since this morning) and, past that, the analytics move or a larger compute size (Sam: stay free).
 - 2026-11-19 (the housekeeping package): the compute-size box ticked: Sam's call was made on 11-18 ("Stay free, keep
   fixing", [decisions](../decisions.md)); it opens again only if the saves fail in bursts after v72.
+- 2026-11-19, noon Central (Claude Code): the optimization pass's phase 2 applied live at Sam's word, with the rewrites of
+  `xp_seen` and `activity_visits`: **the database 349 → 323 MB** (it had grown 31 MB since the morning's 318 MB, Perio's final
+  day). No request failed ([the optimization pass](2026-11-18-database-optimization-pass.md), its Log).
 
 ## Outcome

@@ -11516,3 +11516,600 @@ $$;
 revoke all on function public.sh_answer(timestamptz, text, text, text, integer, integer[], boolean, text, text, text, uuid, boolean) from public, anon, authenticated;
 revoke all on function public.sh_xp_replay(text[]) from public, anon, authenticated;
 revoke all on function public.sh_xp_rebuild(text[]) from public, anon, authenticated;
+
+-- ====================================================================== migration_v79.sql
+-- v79 (2026-11-19, to apply after Heme & Endo Exam 3, at night): a student's awards are summed once, as they're paid,
+-- instead of again on every answer. The optimization pass, phase 2 (vault/tasks/2026-11-18-database-optimization-pass.md).
+--
+-- Every answer's reply carries the crown balance (sh_crowns -> sh_wallet), and the page bootstrap and the shop read it too.
+-- After migration_v76 the largest part of a heavy student's answer save is sh_wallet summing every award they were ever
+-- paid (xp_awards): on a throwaway copy 1.7 of 4.4 ms at 9,000 awards, 0.6 ms at 3,000. The most active student live has
+-- 2,753 awards (2026-11-19; 91 students have any, 63,000 in all), and the sum grows with every answer they give.
+--
+-- xp_award_totals keeps, for each student and kind of award (xp_awards.src), how many awards there are and the sums of
+-- their base and paid XP: what sh_wallet summed. Statement-level triggers on xp_awards keep it: each insert, delete or
+-- update adds what it changed, per student and kind, in one statement (Link my devices' rebuild deletes and re-adds
+-- thousands of awards in one statement each; a row trigger would update the same total thousands of times). A kind
+-- that isn't there yet starts at what the statement added.
+-- sh_wallet then reads about ten rows for a student instead of thousands; everything else in it is v72's, and every
+-- balance is the same (the copy: every made-up student's wallet compared before and after, and the totals compared with
+-- the sums after every suite in tools/release/xp.js, Link my devices and the rebuilds included).
+--
+-- Applying it (one transaction, as apply_migration runs it): xp_awards is locked against writes (share row exclusive,
+-- which reads still pass) for the moment it takes to fill the totals from the awards already there and add the triggers,
+-- so no award can be paid between the two. On the copy with 63,000 awards the whole file takes about a second
+-- (tools/release/pg.js); answers wait behind it meanwhile, so it goes in at night (1 to 5 am Central,
+-- vault/how-to/run-sql-on-the-live-database.md), and the lock gives up after 3 s instead of holding answers up longer.
+-- Check after: the totals equal the sums, for every student (the query at the end of this file, which returns no rows).
+
+set local lock_timeout = '3s';
+lock table public.xp_awards in share row exclusive mode;
+
+create table if not exists public.xp_award_totals (
+  visitor_id text not null,
+  src text not null,
+  n integer not null,
+  base integer not null,
+  xp integer not null,
+  primary key (visitor_id, src)
+);
+alter table public.xp_award_totals enable row level security;   -- no policies: only the functions below touch it
+revoke all on public.xp_award_totals from anon, authenticated;
+
+-- each statement's change, per student and kind, added in one go; in key order, so two statements never wait on each
+-- other's rows in opposite orders
+create or replace function public.sh_award_totals_step()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'INSERT' then
+    insert into xp_award_totals as t (visitor_id, src, n, base, xp)
+      select r.visitor_id, r.src, count(*), sum(r.base), sum(r.xp) from new_rows r group by 1, 2 order by 1, 2
+      on conflict (visitor_id, src) do update set n = t.n + excluded.n, base = t.base + excluded.base, xp = t.xp + excluded.xp;
+  elsif tg_op = 'DELETE' then
+    insert into xp_award_totals as t (visitor_id, src, n, base, xp)
+      select r.visitor_id, r.src, -count(*), -sum(r.base), -sum(r.xp) from old_rows r group by 1, 2 order by 1, 2
+      on conflict (visitor_id, src) do update set n = t.n + excluded.n, base = t.base + excluded.base, xp = t.xp + excluded.xp;
+  elsif tg_op = 'UPDATE' then
+    insert into xp_award_totals as t (visitor_id, src, n, base, xp)
+      select d.visitor_id, d.src, sum(d.n), sum(d.b), sum(d.x)
+        from (select r.visitor_id, r.src, 1 as n, r.base as b, r.xp as x from new_rows r
+              union all select r.visitor_id, r.src, -1, -r.base, -r.xp from old_rows r) d
+        group by 1, 2 having sum(d.n) <> 0 or sum(d.b) <> 0 or sum(d.x) <> 0 order by 1, 2
+      on conflict (visitor_id, src) do update set n = t.n + excluded.n, base = t.base + excluded.base, xp = t.xp + excluded.xp;
+  elsif tg_op = 'TRUNCATE' then
+    delete from xp_award_totals;
+  end if;
+  return null;
+end;
+$$;
+revoke all on function public.sh_award_totals_step() from public, anon, authenticated;
+
+-- the awards already there (the backfill: 63,000 live on 2026-11-19, about 700 totals)
+insert into public.xp_award_totals (visitor_id, src, n, base, xp)
+  select a.visitor_id, a.src, count(*), sum(a.base), sum(a.xp) from public.xp_awards a group by 1, 2
+  on conflict (visitor_id, src) do update set n = excluded.n, base = excluded.base, xp = excluded.xp;
+
+drop trigger if exists xp_awards_totals_ins on public.xp_awards;
+drop trigger if exists xp_awards_totals_del on public.xp_awards;
+drop trigger if exists xp_awards_totals_upd on public.xp_awards;
+drop trigger if exists xp_awards_totals_trunc on public.xp_awards;
+create trigger xp_awards_totals_ins after insert on public.xp_awards
+  referencing new table as new_rows for each statement execute function public.sh_award_totals_step();
+create trigger xp_awards_totals_del after delete on public.xp_awards
+  referencing old table as old_rows for each statement execute function public.sh_award_totals_step();
+create trigger xp_awards_totals_upd after update on public.xp_awards
+  referencing old table as old_rows new table as new_rows for each statement execute function public.sh_award_totals_step();
+create trigger xp_awards_totals_trunc after truncate on public.xp_awards
+  for each statement execute function public.sh_award_totals_step();
+
+-- sh_wallet is v72's (md5-checked against the live body on 2026-11-19), with the one change marked "v79"
+create or replace function public.sh_wallet(p_visitor text)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+declare v_xp int; extra int; prize_xp int; prize_c int; n_f int; base_xp int; bl public.game_baseline; badges text[]; t_now text[]; t_was text[];
+  m_now text[]; m_was text[]; n_t int; n_m int; n_r int; earned int; spent int; dd date := (now() at time zone 'America/Chicago')::date;
+  t_c int := sh_time_crowns(p_visitor);
+begin
+  select coalesce(max(x.xp), 0) into v_xp from xp_visitors x where x.visitor_id = p_visitor;
+  -- v72: summed by kind first, so sh_is_prize runs once a kind (about 20), not once an award (thousands); the same totals
+  -- v79: the sums by kind are kept as the awards are paid (xp_award_totals), so this reads a row a kind
+  select coalesce(sum(g.e), 0), coalesce(sum(g.b) filter (where sh_is_prize(g.src)), 0),
+         coalesce(sum(g.n) filter (where g.src in ('survey', 'checkin')), 0),
+         coalesce(sum(g.b) filter (where sh_is_prize(g.src) and g.src not in ('survey', 'checkin')), 0)
+    into extra, prize_xp, n_f, prize_c
+    from (select t.src, t.xp - t.base as e, t.base as b, t.n from xp_award_totals t where t.visitor_id = p_visitor) g;
+  base_xp := greatest(0, v_xp - extra - prize_xp);
+  select * into bl from game_baseline where visitor_id = p_visitor;
+  badges := array(select jsonb_array_elements_text(coalesce(get_rank_profile_v2(p_visitor)->'badges', '[]'::jsonb)));
+  t_now := array(select distinct split_part(b, ':', 1) from unnest(badges) b
+                 where b not like 'mastery-%' and b not like 'dark-seen-%' and split_part(b, ':', 1) <> 'pet-adopt');
+  t_was := array(select distinct split_part(b, ':', 1) from unnest(coalesce(bl.badges, '{}')) b
+                 where b not like 'mastery-%' and b not like 'dark-seen-%' and split_part(b, ':', 1) <> 'pet-adopt');
+  m_now := array(select b from unnest(badges) b where b like 'mastery-%:%');
+  m_was := array(select b from unnest(coalesce(bl.badges, '{}')) b where b like 'mastery-%:%');
+  n_t := (select count(*) from unnest(t_now) z where not (z = any(t_was)));
+  n_m := (select count(*) from unnest(m_now) z where not (z = any(m_was)));
+  n_r := greatest(0, (select gtier from sh_rank(v_xp)) - (select gtier from sh_rank(coalesce(bl.xp, 0))));
+  earned := base_xp / 2 + t_c + prize_c + 1000 * n_f + 25 * n_t + 50 * n_m + 20 * n_r;
+  select coalesce(sum(price), 0) into spent from pet_purchases where visitor_id = p_visitor;
+  return jsonb_build_object('earned', earned, 'spent', spent, 'balance', earned - spent, 'from_xp', base_xp / 2, 'from_time', t_c,
+    'prizes', prize_c + 1000 * n_f, 'trophies', n_t, 'medals', n_m, 'rankups', n_r, 'rewards', n_f, 'pays', sh_prizes(),
+    'got', jsonb_build_object(
+      'name', exists (select 1 from xp_awards w where w.visitor_id = p_visitor and w.key = 'name'),
+      'visit', exists (select 1 from xp_awards w where w.visitor_id = p_visitor and w.key = 'visit:' || dd),
+      'game', exists (select 1 from xp_awards w where w.visitor_id = p_visitor and w.key = 'game:' || dd)));
+end;
+$$;
+revoke all on function public.sh_wallet(text) from public, anon, authenticated;
+
+-- The check, after applying (and any time): no rows means every total equals the sum of its awards.
+--   select coalesce(a.visitor_id, t.visitor_id), coalesce(a.src, t.src), a.n, t.n, a.base, t.base, a.xp, t.xp
+--   from (select visitor_id, src, count(*)::int n, sum(base)::int base, sum(xp)::int xp from public.xp_awards group by 1, 2) a
+--   full join (select * from public.xp_award_totals where n <> 0 or base <> 0 or xp <> 0) t using (visitor_id, src)
+--   where a.n is distinct from t.n or a.base is distinct from t.base or a.xp is distinct from t.xp;
+
+-- ====================================================================== migration_v80.sql
+-- v80 (2026-11-19, to apply after Heme & Endo Exam 3): an answer writes its answer_xp row once, not twice.
+-- The optimization pass, phase 2 (vault/tasks/2026-11-18-database-optimization-pass.md).
+--
+-- sh_answer inserted the answer's answer_xp row (its request id, session, context and kind) right after the answer, then
+-- updated it at the end with the reply (resp, about 230 bytes), so every answer wrote that table twice: two row versions,
+-- the second left for vacuum to clear, and twice the write-ahead log (live, since the restart of 2026-11-18: 22,227 inserts
+-- and 22,006 updates). Now the row is inserted once, at the end, with the reply.
+-- Nothing between the two places reads the answer's own row. The speed limit's count of the last minute's answers
+-- (n60) joins answer_xp only to leave out mock answers, and it runs only for an answer outside a mock, which it counts
+-- either way: before, through its row (no session, or an arcade game's); now, with no row yet. The double-tap check, the
+-- runs, the streak and the medal check read personal_answers. A replayed request still finds the first one's reply
+-- (another call waits for this one's lock, then sees its row), and a request id used by someone else still fails, at
+-- the end instead of the middle, which undoes the answer the same way.
+-- Checked on a throwaway copy (tools/release/pg.js): the same workload of answers (mocks, arcade games, double taps,
+-- replays, boosts, medals) on two copies, one with this file: identical replies, identical rows in every table an answer
+-- writes; and tools/release/xp.js.
+-- sh_answer is migration_v78's (no "A miss fixed" bonus, applied 2026-11-19; supabase/schema.sql's newest copy), with the
+-- two changes marked "v80"; md5-checked against the live body before it is applied.
+-- One function replaced, no table or data changes: safe to apply at any hour (after the exam).
+
+create or replace function public.sh_answer(p_at timestamptz, p_visitor text, p_hub text, p_qid text, p_choice integer,
+  p_picks integer[], p_self boolean, p_v text, p_ctx text, p_request text, p_session uuid, p_claim boolean)
+returns jsonb language plpgsql security definer set search_path = public as $$
+declare
+  k public.question_keys; v_kind text; v_ctx text; v_ok boolean; v_correct boolean; v_at timestamptz;
+  s public.xp_sessions; s_ok boolean := false; s_n int := 0; s_dup boolean := false;
+  aid bigint; dd date; prev_t timestamptz; n60 int; rn_same int; rn_all int; rn_ever int := 0; pos_day int;
+  speed_ok boolean := false; right_ok boolean := false; v_base int := 0; v_mult int := 1; paid int := 0; v_n int; why text; bonus jsonb := '[]'::jsonb;
+  medal jsonb; v_resp jsonb; prev record; day_n int; tap boolean := false; was_right boolean;
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 or p_hub is null or p_hub !~ '^[a-z0-9][a-z0-9-]{0,39}$'
+     or p_qid is null or length(p_qid) not between 1 and 80
+     or (p_request is not null and p_request !~ '^[A-Za-z0-9_-]{8,64}$')
+     or (p_picks is not null and (cardinality(p_picks) > 20 or exists (select 1 from unnest(p_picks) z where z is null or z not between 0 and 19)))
+     or (p_choice is not null and p_choice not between 0 and 19) then
+    return jsonb_build_object('ok', false, 'error', 'bad');
+  end if;
+  v_ctx := case when p_ctx in ('bank', 'drill', 'weak', 'misses', 'mock', 'arcade', 'check', 'review', 'case', 'learn') then p_ctx else 'other' end;
+  perform pg_advisory_xact_lock(hashtext('xp|' || p_visitor));
+  v_at := coalesce(p_at, clock_timestamp());
+
+  -- the same answer again (a retry, a reload, a replayed call): what it got the first time, nothing new
+  if p_request is not null then
+    select x.resp, a.visitor_id into prev from answer_xp x join personal_answers a on a.id = x.answer_id where x.request_id = p_request;
+    if found then
+      if prev.visitor_id = p_visitor then return coalesce(prev.resp, '{}'::jsonb) || jsonb_build_object('repeat', true); end if;
+      return jsonb_build_object('ok', false, 'error', 'dup');
+    end if;
+  end if;
+
+  -- right or wrong, from the key
+  select * into k from sh_key(p_hub, p_qid, p_v);
+  -- v66: a retired question that still has its key is graded from it (Sam: "Every right answer should give xp")
+  v_kind := case when k.qid is null then 'unknown'
+                 when k.retired and k.kind <> 'self' and coalesce(cardinality(k.answer), 0) = 0 then 'retired' else k.kind end;
+  if v_kind = 'one' then
+    if p_choice is null and coalesce(cardinality(p_picks), 0) <> 1 then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
+    v_correct := coalesce(p_choice, p_picks[1]) = k.answer[1];
+  elsif v_kind = 'all' then
+    if p_picks is null then return jsonb_build_object('ok', false, 'error', 'bad'); end if;
+    v_correct := (select coalesce(array_agg(distinct z order by z), '{}') from unnest(p_picks) z)
+               = (select array_agg(distinct z::int order by z::int) from unnest(k.answer) z);
+  elsif v_kind = 'order' and p_picks is null then
+    -- (v64, matching items) no order sent: a page cached before matching items were graded as an order. The student's word,
+    -- paid as self. (v67: put back; migration_v66 had left it out.)
+    v_kind := 'self';
+    v_correct := coalesce(p_self, p_claim, false);
+  elsif v_kind = 'order' then
+    v_correct := p_picks = k.answer::integer[];
+  elsif v_kind = 'self' then
+    v_correct := coalesce(p_self, p_claim, false);
+  else
+    v_correct := coalesce(p_claim, false);
+  end if;
+
+  -- the mock or arcade game it belongs to: this visitor's, this hub's, started within 6 hours, not finished long ago
+  if p_session is not null then
+    select * into s from xp_sessions where id = p_session and visitor_id = p_visitor and hub = p_hub
+      and started_at <= v_at and started_at > v_at - interval '6 hours'
+      and (finished_at is null or finished_at > v_at - interval '10 minutes');
+    if found then
+      s_ok := true;
+      select count(*), coalesce(bool_or(a.qid = p_qid), false) into s_n, s_dup
+        from answer_xp x join personal_answers a on a.id = x.answer_id where x.session_id = p_session;
+    end if;
+  end if;
+
+  -- record it as the four calls a page makes today do: class stats, the class's picks, the right-in-a-row streak, your answers
+  perform record_answer(p_hub, p_qid, v_correct);
+  if p_choice is not null then perform record_choice(p_hub, p_qid, p_choice);
+  elsif p_picks is not null and v_kind <> 'order' then
+    if cardinality(p_picks) = 1 and v_kind <> 'all' then perform record_choice(p_hub, p_qid, p_picks[1]);
+    else perform record_choices(p_hub, p_qid, p_picks); end if;
+  end if;
+  perform record_correct_streak(p_visitor, v_correct);
+  perform set_config('sh.xp_v2', 'on', true);
+  insert into personal_answers (visitor_id, hub, qid, correct, answered_at) values (p_visitor, p_hub, p_qid, v_correct, v_at)
+    returning id into aid;
+  perform set_config('sh.xp_v2', 'off', true);
+  -- v80: answer_xp's row is written once, at the end, with the reply (it was inserted here and updated at the end)
+  dd := (v_at at time zone 'America/Chicago')::date;
+
+  -- the guardrails: no key, no XP; then the speed limit
+  if v_kind in ('one', 'all', 'order', 'self') then
+    if s_ok and s.kind = 'mock' then
+      speed_ok := not s_dup and s_n + 1 <= 300 and v_at - s.started_at >= (s_n + 1) * interval '2 seconds';
+    else
+      select max(a.answered_at) into prev_t from personal_answers a where a.visitor_id = p_visitor and a.id <> aid and a.answered_at <= v_at;
+      select count(*) into n60 from personal_answers a
+        left join answer_xp x on x.answer_id = a.id left join xp_sessions ss on ss.id = x.session_id
+        where a.visitor_id = p_visitor and a.answered_at >= v_at - interval '60 seconds' and a.answered_at <= v_at
+          and coalesce(ss.kind, '') <> 'mock';
+      speed_ok := (prev_t is null or v_at - prev_t >= interval '2 seconds') and n60 <= 30;
+    end if;
+    -- v66 (Sam, 2026-11-17: "Every right answer should give xp"): a right answer always pays, however fast and however
+    -- often that day; only the same question twice in one mock (one answer sent twice) doesn't. The speed limit and the
+    -- three a day still hold for misses, and for the runs of right answers in a row (the nuke's 100 among them).
+    -- a double tap: the same question again within 2 seconds of answering it is one answer sent twice
+    select a.hub = p_hub and a.qid = p_qid and v_at - a.answered_at < interval '2 seconds' into tap
+      from personal_answers a where a.visitor_id = p_visitor and a.id <> aid and a.answered_at <= v_at
+      order by a.answered_at desc, a.id desc limit 1;
+    right_ok := v_correct and not coalesce(tap, false) and not (s_ok and s.kind = 'mock' and s_dup);
+    if not speed_ok and not right_ok then why := 'fast'; end if;
+  else
+    why := v_kind;
+  end if;
+
+  select count(*) filter (where a.correct = v_correct), count(*), count(*) filter (where a.correct)
+    into rn_same, rn_all, v_n
+    from personal_answers a where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid
+      and (a.answered_at at time zone 'America/Chicago')::date = dd;
+  if speed_ok or right_ok then
+    if v_correct then select count(*) into rn_ever from personal_answers a where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid and a.correct; end if;
+    v_base := case when right_ok then case when v_kind = 'self' or rn_ever > 1 then 2 else 10 end
+                   when v_kind = 'self' then case when rn_all <= 3 then 2 else 0 end
+                   else case when rn_same <= 3 then 1 else 0 end end;
+    if v_base = 0 then why := 'repeat'; end if;
+    v_mult := sh_xp_mult(p_visitor, v_at);
+    paid := sh_award(p_visitor, 'a:' || aid, 'answer', p_hub, v_base, v_mult, v_at);
+    -- the day's 20th answer
+    select n into pos_day from xp_days where visitor_id = p_visitor and d = dd;
+    if coalesce(pos_day, 0) >= 20 then
+      v_n := sh_award(p_visitor, 'g20:' || dd, 'goal20', p_hub, 30, v_mult, v_at);
+      if v_n > 0 then bonus := bonus || jsonb_build_object('src', 'goal20', 'xp', v_n); end if;
+    end if;
+    -- v78: no "A miss fixed" bonus any more (Sam, 2026-11-19)
+    -- v66: the run of right answers in a row (graded from a key), with its prizes. Only within the speed limit and a
+    -- question's first three right answers of the day: a 4th, or one under 2 seconds, pays but neither adds nor breaks it
+    if speed_ok and v_kind in ('one', 'all', 'order') and (rn_same <= 3 or not v_correct) then
+      bonus := bonus || sh_run_step(p_visitor, p_hub, aid, v_correct, v_at);
+    end if;
+  end if;
+  -- v66: the day's first answer moves the streak of days studied
+  select n into day_n from xp_days where visitor_id = p_visitor and d = dd;
+  if coalesce(day_n, 0) = 1 then bonus := bonus || sh_streak_step(p_visitor, p_hub, dd, v_at); end if;
+  -- v72: a new medal needs one more question whose latest answer is right, so only a right answer to a question whose
+  -- answer before it wasn't right (or that had none) can reach one; every other answer skips the count of the whole hub
+  if v_kind in ('one', 'all', 'order', 'self') and v_correct then
+    select a.correct into was_right from personal_answers a
+      where a.visitor_id = p_visitor and a.hub = p_hub and a.qid = p_qid and a.id <> aid
+      order by a.answered_at desc, a.id desc limit 1;
+    if not coalesce(was_right, false) then medal := sh_medal_check(p_visitor, p_hub, v_at); end if;
+  end if;
+
+  v_resp := jsonb_build_object('ok', true, 'correct', v_correct, 'kind', v_kind, 'xp', paid, 'base', v_base, 'mult', v_mult,
+    'first', v_correct and rn_ever = 1 and paid > 0, 'why', why, 'bonus', bonus, 'medal', medal,
+    'boost', sh_boost_json(p_visitor, v_at), 'total', (select xv.xp from xp_visitors xv where xv.visitor_id = p_visitor),
+    'crowns', sh_crowns(p_visitor));
+  insert into answer_xp (answer_id, request_id, session_id, ctx, kind, resp)
+    values (aid, p_request, case when s_ok then p_session end, v_ctx, v_kind, v_resp);
+  return v_resp;
+end;
+$$;
+
+revoke all on function public.sh_answer(timestamptz, text, text, text, integer, integer[], boolean, text, text, text, uuid, boolean) from public, anon, authenticated;
+
+-- ====================================================================== migration_v81.sql
+-- v81 (2026-11-19, to apply after Heme & Endo Exam 3): activity_visits without its index on last_at, so a ping's update
+-- of its visit stays on the visit's page. The optimization pass, phase 2 (vault/tasks/2026-11-18-database-optimization-pass.md).
+--
+-- Every study-time ping moves its visit's last_at (sh_activity_on_insert), and a column with an index of its own can't be
+-- updated in place (a "HOT" update): each ping wrote a new copy of the visit's row and a new entry in all three of the
+-- table's indexes. Live, since the restart of 2026-11-18: 39,443 updates, 6.6% of them in place; the index was 4.7 MB of
+-- the table's 7.6 MB for 8,800 visits. On the throwaway copy of the optimization pass, without it: every update in place,
+-- 24% less write-ahead log and 17% less time for the pings.
+-- Its one reader was the admin page's visitor summary (get_visitor_summary: `where v.last_at >= since`), which now reads
+-- the whole table instead: on a copy with 9,000 visits, a sequential scan of 1.4 MB, the same rows and the same numbers
+-- (the time in the PR). Nothing else filters or sorts on last_at.
+--
+-- Live, this is `drop index concurrently if exists public.activity_visits_last_idx;` sent alone in its own call (it can't
+-- run in a transaction, and it doesn't stop the pings while it waits). Then, at night, the table is rewritten once to give
+-- back the room the copies took: `cluster public.activity_visits using activity_visits_pkey;` under `set local
+-- lock_timeout = '3s'`, then `analyze public.activity_visits;` (vault/how-to/run-sql-on-the-live-database.md).
+-- The line below is the same drop in the form a transaction takes (supabase/schema.sql and the tests' throwaway copy).
+
+drop index if exists public.activity_visits_last_idx;
+
+-- ====================================================================== migration_v82.sql
+-- v82 (2026-11-19, written as v79; renumbered at the merge: v79-v81 went to the answer save, #457): the database optimization pass, phase 2: fewer calls from the page, and a lighter page bootstrap.
+-- Sam's package of the to-do list (vault/tasks/2026-11-18-database-optimization-pass.md, Phase 2's boxes "The class's
+-- numbers on each card", "The page's three analytics batches as one call" and "The bootstrap"; the fourth box, the rank and
+-- mastery after every tenth answer, is page work in widget/ranks.js with no server part). Sam: "dont cut anything for now",
+-- "i dont want to upgrade the plan. stay free". Nothing students see or earn changes; the pages fall back to the old calls
+-- while this isn't applied.
+--   1. get_class_numbers(hub, qids, choice qids): the class's numbers on a card (question_stats: how many answered, how
+--      many right; question_choices: how often each choice was picked) in one call. The page read them as two REST reads a
+--      card, each with its own preflight: a fifth of every request the class made (2026-11-19's edge logs).
+--   2. record_analytics(hub, visitor, visit, question health, clicks, events): the page's three analytics batches
+--      (record_qh, record_clicks, record_events: 14.8% of the requests) in one call. It calls the three functions as they
+--      are, each with its own checks and its own "never surface an error" block, so every row is what it was.
+--   3. The shop's picks of the day, worked out once for everyone (shop_days), not again for every visitor's bootstrap,
+--      shop read and purchase. sh_shop_day reads the stored day when it's there and works it out as before when it isn't,
+--      so the shop is the same either way; any change to shop_items clears what's stored (a trigger), and pg_cron fills
+--      today and tomorrow once an hour.
+--   4. get_widget_bootstrap_v2 builds its answer once: it called today's bootstrap and then replaced three of its parts
+--      (the rank, Timmy's days and the Inbox) with their v2 versions, so the old rank, Timmy's days and Inbox were worked
+--      out on every page load and thrown away. The same keys and the same values, without them.
+--   5. get_my_answers: the same rows, a little cheaper to build (the time as a float's seconds, not numeric's; the JSON
+--      built as text and read once).
+--   6. anon_name (the class name of a visitor without a chosen one, e.g. "Gleaming Molar 42"): it compared the visitor's
+--      name with everyone's, working out every visitor's name on every call (3.6-6 ms; in every bootstrap and on every row
+--      of the boards). An index on the name's base (correct_streaks_anon_base) makes that a lookup; the same names.
+-- Measured on a throwaway copy of supabase/schema.sql with a made-up class (the task's Log has the numbers). Tested with
+-- tools/release/xp.js and rls.js. Functions are created or replaced, with one small new table and one index on
+-- correct_streaks (about 2,000 rows on 2026-11-19: a moment's lock); apply it at night (1 to 5 am Central), after
+-- Heme & Endo Exam 3 (Fri 2026-11-20, 9:30 am) (vault/how-to/run-sql-on-the-live-database.md).
+-- Copied from main's newest copies: sh_shop_day (v54), get_widget_bootstrap_v2 (v54) and the parts of get_widget_bootstrap
+-- it repeats (v53's, as in supabase/schema.sql), get_my_answers (v34), anon_name (v12).
+
+-- ---------- 1. the class's numbers on a card, in one call ----------
+-- {stats: [{qid, attempts, correct}], choices: [{qid, choice, picks}]}: the rows the two REST reads returned
+-- (question_stats for p_qids, question_choices for p_choices), up to 1,000 questions each.
+create or replace function public.get_class_numbers(p_hub text, p_qids text[], p_choices text[] default null)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+begin
+  if p_hub is null or p_hub !~ '^[a-z0-9][a-z0-9-]{0,39}$' or coalesce(cardinality(p_qids), 0) > 1000
+     or coalesce(cardinality(p_choices), 0) > 1000 then
+    return jsonb_build_object('stats', '[]'::jsonb, 'choices', '[]'::jsonb);
+  end if;
+  return jsonb_build_object(
+    'stats', coalesce((select jsonb_agg(jsonb_build_object('qid', s.qid, 'attempts', s.attempts, 'correct', s.correct))
+      from question_stats s where s.hub = p_hub and s.qid = any(p_qids)), '[]'::jsonb),
+    'choices', coalesce((select jsonb_agg(jsonb_build_object('qid', c.qid, 'choice', c.choice, 'picks', c.picks))
+      from question_choices c where c.hub = p_hub and c.qid = any(p_choices)), '[]'::jsonb));
+end;
+$$;
+
+-- ---------- 2. the page's three analytics batches, in one call ----------
+-- Each part is optional; each goes to its own function as it is (record_qh, record_clicks, record_events), which checks
+-- it and swallows its own errors, so one bad batch never loses the other two.
+create or replace function public.record_analytics(p_hub text, p_visitor text, p_visit text default null,
+  p_qh jsonb default null, p_clicks jsonb default null, p_events jsonb default null)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if jsonb_typeof(p_qh) = 'array' and jsonb_array_length(p_qh) > 0 then perform record_qh(p_hub, p_visitor, p_visit, p_qh); end if;
+  if jsonb_typeof(p_clicks) = 'array' and jsonb_array_length(p_clicks) > 0 then perform record_clicks(p_hub, p_visitor, p_clicks); end if;
+  if jsonb_typeof(p_events) = 'array' and jsonb_array_length(p_events) > 0 then perform record_events(p_hub, p_visitor, p_events); end if;
+end;
+$$;
+
+-- ---------- 3. the shop's picks of the day, once for everyone ----------
+-- One row per item on sale that day, exactly as sh_shop_day_make(day) gives them. Read only by sh_shop_day.
+create table if not exists public.shop_days (
+  day date not null,
+  shelf text not null,
+  pos integer not null,
+  item_id text not null,
+  primary key (day, shelf, pos)
+);
+alter table public.shop_days enable row level security;
+revoke all on public.shop_days from anon, authenticated;
+
+-- the day's shop worked out from the catalog: v54's sh_shop_day, unchanged (the rotation, the seasons, a throwback day's
+-- three and the shelf; the same for everyone, from the Central date and shop_items alone)
+create or replace function public.sh_shop_day_make(p_day date)
+returns table(item_id text, shelf text, pos integer) language plpgsql stable security definer set search_path = public as $$
+declare wk text[]; ssn text[] := sh_shop_seasons(p_day);
+begin
+  wk := array(select w.item_id from sh_shop_pick('week:' || date_trunc('week', p_day)::date, 3, null) w order by w.pos);
+  return query
+    select w.item_id, 'weekly'::text, w.pos::integer from unnest(wk) with ordinality w(item_id, pos)
+    union all select d.item_id, 'daily', d.pos from sh_shop_pick('day:' || p_day, 4, wk) d
+    union all select i.id, 'season', (row_number() over (order by array_position(ssn, i.season), i.sort, i.id))::integer from shop_items i
+      where i.active and i.season = any(ssn)
+    union all select t.item_id, 'throwback', t.pos from sh_throwback_items(p_day) t
+    union all select i.id, 'always', (row_number() over (order by i.sort, i.id))::integer from shop_items i where i.active and i.shelf;
+end;
+$$;
+
+-- the day's shop: the stored one when it's there (in the order sh_shop_day_make gives), otherwise worked out
+create or replace function public.sh_shop_day(p_day date)
+returns table(item_id text, shelf text, pos integer) language plpgsql stable security definer set search_path = public as $$
+begin
+  if exists (select 1 from shop_days c where c.day = p_day) then
+    return query select c.item_id, c.shelf, c.pos from shop_days c where c.day = p_day
+      order by array_position(array['weekly', 'daily', 'season', 'throwback', 'always'], c.shelf), c.pos;
+  else
+    return query select m.item_id, m.shelf, m.pos from sh_shop_day_make(p_day) m;
+  end if;
+end;
+$$;
+
+-- store today's and tomorrow's (Central) shop if they aren't stored yet, and drop the days before yesterday; pg_cron runs
+-- it hourly. Returns how many days it stored.
+create or replace function public.sh_shop_days_fill()
+returns integer language plpgsql security definer set search_path = public as $$
+declare d date := (now() at time zone 'America/Chicago')::date; x date; n int := 0;
+begin
+  perform pg_advisory_xact_lock(hashtext('sh_shop_days'));
+  delete from shop_days where day < d - 1;
+  foreach x in array array[d, d + 1] loop
+    if not exists (select 1 from shop_days where day = x) then
+      insert into shop_days (day, shelf, pos, item_id) select x, m.shelf, m.pos, m.item_id from sh_shop_day_make(x) m;
+      n := n + 1;
+    end if;
+  end loop;
+  return n;
+end;
+$$;
+
+-- any change to the catalog (a new item, a price, an item taken off sale) clears what's stored, so the shop is worked out
+-- from the new catalog until the next fill
+create or replace function public.sh_shop_days_clear()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  delete from shop_days;
+  return null;
+end;
+$$;
+drop trigger if exists shop_items_clear_days on public.shop_items;
+create trigger shop_items_clear_days after insert or update or delete or truncate on public.shop_items
+  for each statement execute function public.sh_shop_days_clear();
+
+revoke all on function public.sh_shop_day_make(date) from public, anon, authenticated;
+revoke all on function public.sh_shop_day(date) from public, anon, authenticated;
+revoke all on function public.sh_shop_days_fill() from public, anon, authenticated;
+revoke all on function public.sh_shop_days_clear() from public, anon, authenticated;
+
+select public.sh_shop_days_fill();
+
+do $do$
+begin
+  if exists (select 1 from pg_available_extensions where name = 'pg_cron') then
+    begin
+      create extension if not exists pg_cron;
+      perform cron.unschedule(jobid) from cron.job where jobname = 'sh-shop-days';
+      perform cron.schedule('sh-shop-days', '7 * * * *', 'select public.sh_shop_days_fill()');
+    exception when others then
+      raise notice 'pg_cron not set up (%): the shop is worked out on every read, as before', sqlerrm;
+    end;
+  end if;
+end
+$do$;
+
+-- ---------- 5. get_my_answers: the same rows, cheaper to build ----------
+-- [qid, seconds, 1 or 0] for each of the visitor's latest 5,000 answers in the hub, oldest first. date_part's float
+-- seconds floor to the same whole second as extract's numeric ones (checked on every answer of the throwaway copy and on
+-- two million made-up times), and the JSON is built as text and read once instead of an element at a time. PL/pgSQL, so
+-- its plan is kept for the connection (v76).
+create or replace function public.get_my_answers(p_visitor text, p_hub text)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+begin
+  if p_visitor is null or length(p_visitor) not between 1 and 80 or length(coalesce(p_hub, '')) not between 1 and 40 then
+    return '[]'::jsonb;
+  end if;
+  return coalesce((
+    select ('[' || string_agg('[' || to_json(x.qid)::text || ',' || x.t || ',' || x.c || ']', ',' order by x.t, x.id) || ']')::jsonb
+    from (
+      select a.id, a.qid, floor(date_part('epoch', a.answered_at))::bigint as t, case when a.correct then 1 else 0 end as c
+      from personal_answers a
+      where a.visitor_id = p_visitor and a.hub = p_hub
+      order by a.answered_at desc, a.id desc
+      limit 5000
+    ) x), '[]'::jsonb);
+end;
+$$;
+
+-- ---------- 4. the v2 bootstrap, built once ----------
+-- Every key of get_widget_bootstrap (today's), worked out the same way, except the three the v2 replaces (rank, pet_days,
+-- inbox), which come from their v2 functions only; then the shop. Without a visitor: today's, with the shop, as before.
+create or replace function public.get_widget_bootstrap_v2(
+  p_visitor text, p_hub text default null, p_cavity_week text default null, p_episode text default null,
+  p_include_pins boolean default false, p_dashboard boolean default false, p_luck_hub text default null,
+  p_luck_date date default null, p_link_name text default null)
+returns jsonb language plpgsql stable security definer set search_path = public as $$
+declare
+  valid_visitor boolean := p_visitor is not null and length(p_visitor) between 1 and 80;
+  valid_hub boolean := p_hub is not null and p_hub ~ '^[a-z0-9][a-z0-9-]{0,39}$';
+begin
+  if not valid_visitor then
+    return get_widget_bootstrap(p_visitor, p_hub, p_cavity_week, p_episode, p_include_pins, p_dashboard, p_luck_hub, p_luck_date, p_link_name)
+      || jsonb_build_object('shop', get_my_shop(null));
+  end if;
+
+  return jsonb_build_object(
+    'display_name', get_display_name(p_visitor),
+    'answers', case when valid_hub then get_my_answers(p_visitor, p_hub) else '[]'::jsonb end,
+    'pins', case when valid_hub and p_include_pins then get_my_pins(p_visitor, p_hub) else '[]'::jsonb end,
+    'survey', coalesce((select jsonb_agg(to_jsonb(s) order by s.starts_at desc) from get_my_survey(p_visitor) s), '[]'::jsonb),
+    'overrides', coalesce((select jsonb_agg(to_jsonb(o) order by o.hub) from get_hub_overrides() o), '[]'::jsonb),
+    'cavity', case when valid_hub and p_cavity_week ~ '^\d{4}-W\d{2}$' then
+      coalesce((select jsonb_agg(to_jsonb(c) order by c.claimed_at) from get_cavity_week(p_hub, p_cavity_week) c), '[]'::jsonb)
+      else '[]'::jsonb end,
+    'podcast', case when valid_hub and length(coalesce(p_episode, '')) between 1 and 80
+      then pod_feed(p_hub, p_episode, p_visitor) else null end,
+    'dashboard_week', case when p_dashboard then coalesce((
+      select jsonb_agg(jsonb_build_object('answer_date', x.answer_date, 'attempts', x.attempts, 'correct', x.correct) order by x.answer_date)
+      from (
+        select (a.answered_at at time zone 'America/Chicago')::date as answer_date,
+          count(*)::integer as attempts, count(*) filter (where a.correct)::integer as correct
+        from personal_answers a
+        where a.visitor_id = p_visitor
+          and (a.answered_at at time zone 'America/Chicago')::date >= (now() at time zone 'America/Chicago')::date - 13
+        group by 1
+      ) x
+    ), '[]'::jsonb) else '[]'::jsonb end,
+    'survey_popup', case when p_dashboard then coalesce((
+      select jsonb_agg(to_jsonb(s) order by s.id) from get_active_survey(p_visitor) s
+    ), '[]'::jsonb) else '[]'::jsonb end,
+    'exam_luck', case when p_dashboard and length(coalesce(p_luck_hub, '')) between 1 and 40 and p_luck_date is not null
+      then get_exam_luck(p_luck_hub, p_luck_date, p_visitor) else null end,
+    'recaps', case when p_dashboard then coalesce((
+      select jsonb_agg(to_jsonb(r) order by r.published_at desc) from get_published_recaps() r
+    ), '[]'::jsonb) else '[]'::jsonb end,
+    'golden', case when p_dashboard then coalesce((
+      select jsonb_agg(to_jsonb(g) order by g.claimed_at) from get_golden_today() g
+    ), '[]'::jsonb) else '[]'::jsonb end,
+    'name_shared', case when length(btrim(coalesce(p_link_name, ''))) between 1 and 24
+      then name_shared(p_visitor, p_link_name) else false end,
+    'mastery', case when valid_hub then
+      coalesce((select jsonb_agg(to_jsonb(m) order by m.hub) from get_hub_mastery(p_visitor) m), '[]'::jsonb)
+      else '[]'::jsonb end,
+    'rank', get_rank_profile_v2(p_visitor),
+    'pet_days', coalesce((select jsonb_agg(to_jsonb(pd) order by pd.d) from get_pet_days_v2(p_visitor) pd), '[]'::jsonb),
+    'inbox', coalesce((select jsonb_agg(to_jsonb(i) order by i.at desc) from get_my_inbox_v2(p_visitor) i), '[]'::jsonb),
+    'shop', get_my_shop(p_visitor));
+end;
+$$;
+
+-- ---------- 6. the class name, by lookup ----------
+-- The visitor's word pair, with a two-digit number when someone who answered earlier has the same pair (v12's rule,
+-- unchanged). The index finds the others with the same pair; before it, every visitor's pair was worked out each call.
+create index if not exists correct_streaks_anon_base on public.correct_streaks (public.anon_name_base(visitor_id));
+analyze public.correct_streaks;
+create or replace function public.anon_name(p_visitor_id text)
+returns text language plpgsql stable set search_path = public as $$
+declare b text := anon_name_base(p_visitor_id); since timestamptz := first_seen(p_visitor_id);
+begin
+  if exists (
+      select 1 from correct_streaks c
+      where anon_name_base(c.visitor_id) = b
+        and c.visitor_id <> p_visitor_id
+        and first_seen(c.visitor_id) is not null
+        and (since is null or first_seen(c.visitor_id) < since
+             or (first_seen(c.visitor_id) = since and c.visitor_id < p_visitor_id))) then
+    return b || ' ' || (10 + abs(hashtext(p_visitor_id || ':n')) % 90)::text;
+  end if;
+  return b;
+end;
+$$;
+
+revoke all on function public.get_class_numbers(text, text[], text[]) from public;
+grant execute on function public.get_class_numbers(text, text[], text[]) to anon, authenticated;
+revoke all on function public.record_analytics(text, text, text, jsonb, jsonb, jsonb) from public;
+grant execute on function public.record_analytics(text, text, text, jsonb, jsonb, jsonb) to anon, authenticated;

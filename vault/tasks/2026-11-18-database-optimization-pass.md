@@ -136,7 +136,8 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
 - [ ] A readout from a busy evening after: the share of database time per call again, and whether any saves failed.
   The first evening after the merge with a class studying (Heme & Endo Exam 3's eve, Thu 2026-11-19, if it is merged by
   then): the edge logs any time, `pg_stat_statements` at a quiet hour. The "before" to compare with is in the Log
-  (2026-11-19, 4:10 am).
+  (2026-11-19, 4:10 am). Phase 2's `migration_v79.sql` to `v82` went live at 12:10-12:13 pm Central that day (the Log), so
+  that evening's numbers have them in too.
 
 **Phase 2: found by the measuring, each needs more than a `create or replace` (apply after Fri 2026-11-20, 9:30 am, at night):**
 
@@ -177,7 +178,7 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   Inbox only to replace them, the class name is a lookup on an index of its base (5-6.5 → 0.03-0.14 ms; 50 names on a
   board 15.9 → 11.1 ms) and `get_my_answers` is PL/pgSQL with its JSON built once (11.7 → 8.8 ms for 8,000 answers).
   Every value is what it was (below). Left: the answers themselves, the next box.
-- [ ] **Apply `migration_v82.sql`** (phase 2: the class's numbers, the analytics, the bootstrap): at night (1 to 5 am
+- [x] **Apply `migration_v82.sql`** (phase 2: the class's numbers, the analytics, the bootstrap): at night (1 to 5 am
   Central), not before Heme & Endo Exam 3 is over (Fri 2026-11-20, 9:30 am; Sam), after #457's v79 to v81 (the box
   "Phase 2 applied live" below; the same night is fine, one call at a time, or a later one). Fetch `main` first and check that
   nothing since has replaced `sh_shop_day`, `get_widget_bootstrap_v2`, `get_my_answers` or `anon_name`; md5-check their
@@ -185,6 +186,8 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   `sh-shop-days` job and `shop_days` holds today and tomorrow; then `get_class_numbers` and `record_analytics` through the
   API as a visitor. Append it to `supabase/schema.sql`, take its line out of `supabase/pending-migrations.txt`. Until it
   is applied, the pages ask for the two new calls once a page load and use the old ones (a 404 each).
+  **Done** 2026-11-19, 12:13 pm Central, ahead of the exam at Sam's word ("the hubs are quiet right now. go ahead and run the
+  migrations you were waiting on"): the Log.
 - [ ] **The bootstrap's answers** (left by phase 2): `get_my_answers` is still most of a heavy student's bootstrap (8.8 of
   22.5 ms at 8,000 answers; 0.6 ms at 500) and is read again every 3 minutes a hub is open. The device could send the time
   of the newest answer it holds and get only those after it. `get_pet_days_v2` is the next (about 3 ms for the heaviest).
@@ -209,7 +212,7 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   every 50 answers; with Stats open, on the old pages and without the bootstrap, as before. Timmy's three trophies and
   the arcade's 25 games send no signal: they show at the next read (at most 50 answers, Stats, or the next page).
   `tools/ci/quiet.js` checks both ways.
-- [ ] **Phase 2 applied live, at night after Heme & Endo Exam 3** (set for Sat 2026-11-21, 1:30 am Central, by the session of
+- [x] **Phase 2 applied live, at night after Heme & Endo Exam 3** (set for Sat 2026-11-21, 1:30 am Central, by the session of
   [#457](https://github.com/smcmurry6-source/study-hubs/pull/457)). First fetch `main`: if another migration took 79-81,
   renumber; a newer `sh_answer` than `migration_v78.sql`'s (applied 2026-11-19, which v80 is built on) means v80 is rebuilt on
   it (the same two changes, marked "v80") and tested again. Then one call at a time, nothing in parallel: `migration_v79.sql` (apply_migration) and the check at its end (no rows); v80;
@@ -217,6 +220,7 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   activity_visits_pkey;` and `cluster public.xp_seen using xp_seen_pkey;`, each under `set local lock_timeout = '3s'`, then
   `analyze` of both; the live bodies md5-checked against the files; the sizes after. Then v79-v81 appended to
   `supabase/schema.sql` and out of `supabase/pending-migrations.txt`, in the same PR.
+  **Done** 2026-11-19, 12:10-12:13 pm Central, with v82, at Sam's word (the Log); the Saturday run was turned off.
 - [ ] **Room in the dashboard's page budget** (found by phase 2): the dashboard was at 345.4 of its 345 KB on `main`
   (2026-11-19, `tools/release/perf.js`), so a few hundred bytes more in `widget/rest.bundle.js` fail "Release tests".
   `widget/ranks.js`'s hub widget (`mount()`, about 360 lines: the rank card, the trophy case in Stats, Link my devices)
@@ -274,11 +278,38 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   pass with it pending (and again with #457's v79 to v81 ahead of it after the merge); `tools/ci/quiet.js` checks the page side. Not applied live: the box above
   ([#459](https://github.com/smcmurry6-source/study-hubs/pull/459); phase 1 was #444).
 
+- 2026-11-19, 12:07-12:20 pm Central (Claude Code): Sam: "the hubs are quiet right now. go ahead and run the migrations you
+  were waiting on" (the morning's call was nothing live before the exam; this one moved it up). The class was quiet: 4 people
+  in the last 10 minutes, 2 answers. One call at a time through the connector:
+  - **Before:** the live bodies of `sh_wallet`, `sh_answer`, `sh_shop_day`, `get_widget_bootstrap_v2`, `get_my_answers`,
+    `anon_name` and `anon_name_base` matched `supabase/schema.sql`'s newest copies (md5); none of the new functions existed.
+    The three most active students' crown balances read; the database 349 MB.
+  - **`migration_v79.sql`** (apply_migration, 12:10): the check at its end found no mismatch (703 totals, the four triggers
+    on `xp_awards`); the three balances read again, every field the same; `sh_wallet` and `sh_award_totals_step` match the
+    file (md5).
+  - **`migration_v80.sql`** (12:11): `sh_answer` matches the file, still `security definer` with its `search_path`, not
+    callable by visitors.
+  - **`migration_v81.sql`**: `drop index concurrently if exists public.activity_visits_last_idx;` alone; then `cluster
+    public.activity_visits using activity_visits_pkey;` and `cluster public.xp_seen using xp_seen_pkey;`, each under
+    `lock_timeout 3s`, and `analyze` of both. **`xp_seen` 29.2 + 24.2 MB → 15.9 + 14.8 MB** (180,369 rows),
+    `activity_visits` 1.4 + 6.0 MB → 1.1 + 1.0 MB, **the database 349 → 323 MB**.
+  - **`migration_v82.sql`** (12:13, with `lock_timeout 3s` added at the top): all nine bodies match the file (md5); pg_cron
+    has `sh-shop-days` (`7 * * * *`) beside the retention job; `shop_days` holds today and tomorrow (29 rows each), and the
+    stored shop equals the worked-out one for both days; `correct_streaks_anon_base` and the `shop_items` trigger are there.
+    Through the API as a visitor: `get_class_numbers` 200, the same rows as the two old reads for two questions;
+    `record_analytics` with empty batches 204 (nothing written); `sh_wallet` still 401.
+  - **The edge logs, 12:00-12:15:** no request failed (no 5xx). Two answers were slow but saved (2.9 s in the minute
+    `sh_answer` was replaced, 2.2 s for the first bootstrap after v82, each the first call planning a new body); answers
+    after it a median of 146 ms; the pages switched to `get_class_numbers` and `record_analytics` within a minute.
+  - The scheduled run for Saturday 1:30 am (phase 2's live steps) was turned off; tonight's 1:30 am readout still runs.
+  - `supabase/schema.sql` has v79-v82 appended; `supabase/pending-migrations.txt` lists none.
+
 ## Outcome
 
-So far (the task stays open for the boxes still unticked): phase 1's `migration_v76.sql` and `migration_v77.sql` are live;
-phase 2's fewer calls from the page (the four boxes ticked 2026-11-19) are `migration_v82.sql`, waiting to be applied at
-night after Fri 2026-11-20, 9:30 am, and page changes that work with or without it.
+So far (the task stays open for the boxes still unticked): phase 1's `migration_v76.sql` and `migration_v77.sql` are live,
+and so is phase 2: `migration_v79.sql` to `v82` (the awards summed once, `answer_xp` written once, the visits' index gone,
+fewer calls from the page and a lighter bootstrap), applied 2026-11-19 at noon, with `xp_seen` and `activity_visits`
+rewritten. Left: the evening readout, the bootstrap's answers and room in the dashboard's budget.
 
 Related: [database-load](2026-11-18-database-load.md) · [shared-infrastructure](../reference/shared-infrastructure.md) ·
 [game-server](../reference/game-server.md) · [decisions](../decisions.md) ·

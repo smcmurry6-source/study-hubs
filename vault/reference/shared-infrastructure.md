@@ -89,7 +89,7 @@ tags: [widget, supabase]
   Sam's machine (`deploy_rollout.ps1`, `check_leaderboard.ps1`) — **never**
   commit them here or hardcode them into a hub's client-side JS.
   **The project is on Supabase's Free plan** (checked 2026-11-18): a shared CPU that slows to a crawl once a busy day has
-  used up its burst, and a database that goes **read-only at 500 MB** (318 MB on 2026-11-19, after the ping table's rewrite; 465 MB just before it; then every save fails). Keep
+  used up its burst, and a database that goes **read-only at 500 MB** (323 MB at noon on 2026-11-19, after the optimization pass's rewrites of `xp_seen` and `activity_visits`; 318 MB that morning, after the ping table's rewrite; 465 MB just before it; then every save fails). Keep
   each answer's work small ([migration_v72](../../migration_v72.sql) cut it to a quarter for the most active students) and
   watch the size ([the task](../tasks/2026-11-18-database-load.md)). **Reading the dashboard** (2026-11-19): its database size
   is refreshed once a day, so it can show yesterday's figure for hours after a cleanup (the true one:
