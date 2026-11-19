@@ -107,7 +107,12 @@ tags: [widget, supabase]
   backfill, and run long analysis SQL, when the class is quiet (1 to 5 am Central) or in small batches; send every query
   alone, one at a time, under `set local statement_timeout = '5s'`; benchmark a function on a throwaway copy
   (`tools/release/pg.js`), never in a loop on the live database
-  ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)). The admin page reads one query at a time
+  ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)). **A function that a page calls often, or
+  that such a function calls, is written in PL/pgSQL, not SQL** (2026-11-19, `migration_v76.sql`): a SQL-language function
+  with `security definer` or its own `search_path` (all of ours) can't be inlined, so it is parsed and planned again on
+  every call, while a PL/pgSQL one keeps its plans for the life of the connection; that planning was about a third of every
+  answer save. `pg_stat_statements` with `track = all` on a throwaway copy shows it
+  ([the optimization pass](../tasks/2026-11-18-database-optimization-pass.md)). The admin page reads one query at a time
   ([admin-operations](admin-operations.md)), and `widget/v3.js` holds a failed answer and sends it again with the same
   request id (the quiet spell above). What's still to do: [the task](../tasks/2026-11-18-database-load.md).
 - **GitHub Pages deploy** — `github.com/smcmurry6-source/study-hubs`, branch

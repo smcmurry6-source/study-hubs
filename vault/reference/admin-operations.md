@@ -45,9 +45,11 @@ its ink and blue-grey, each hub's class color as a dot).
 ## Live: who's studying now
 
 - **"Live" means at least one study ping in the last 3 minutes** (`admin_live_presence(p_secret, p_minutes)`, default 3,
-  clamped to 1-15). A hub sends a ping (`record_activity_ping`) for every 25 s it is on screen and in use; it stops when
-  the tab is hidden and after 15 minutes with no input, so a forgotten tab drops off within 3 minutes. Three minutes
-  leaves room for someone moving between sections and for a lost ping. The dashboard and the About page send no pings,
+  clamped to 1-15). A hub counts a ping for every 25 s it is on screen and in use and, since 2026-11-19, sends what it
+  has counted once a minute in one call (`record_activity_pings`, each ping saved at the time it was counted; a visit's
+  first ping goes at once); it stops when the tab is hidden and after 15 minutes with no input, so a forgotten tab drops
+  off within 3 minutes. Three minutes leaves room for someone moving between sections, for the minute between calls and
+  for a lost one; a 1-minute window would miss people between calls. The dashboard and the About page send no pings,
   so this counts people in a hub.
 - **Names are the leaderboard name** (Sam, 2026-11-04): the name a student picked, otherwise their random class name
   (`get_display_name`/`anon_name`). The function returns only `{minutes, as_of, total, hubs: [{hub, people, names}]}`:

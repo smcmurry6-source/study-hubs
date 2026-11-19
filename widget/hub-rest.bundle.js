@@ -3649,6 +3649,7 @@ return { play: play, stop: stop, preload: function(name){ try { elFor(name).load
 })();
 (function(){
 var POLL_MS = 4 * 60 * 1000;
+var KEEP_MS = 30 * 60 * 1000, KEEP_KEY = "sh_changelog_seen";
 var baseline = null, toastEl = null;
 function ensureToast(){
 if (toastEl) return toastEl;
@@ -3660,7 +3661,19 @@ toastEl.querySelector(".sh-update-reload").addEventListener("click", function(){
 toastEl.querySelector(".sh-update-dismiss").addEventListener("click", function(){ toastEl.classList.remove("is-shown"); });
 return toastEl;
 }
+function kept(){
+try {
+var k = JSON.parse(localStorage.getItem(KEEP_KEY) || "null"), now = Date.now();
+return k && typeof k.at === "string" && typeof k.t === "number" && k.t <= now && now - k.t < KEEP_MS ? k.at : null;
+} catch (e) { return null; }
+}
+function take(latest){
+if (baseline === null) { baseline = latest; return; }
+if (new Date(latest) > new Date(baseline)) { ensureToast().classList.add("is-shown"); }
+}
 function check(){
+var have = kept();
+if (have) { take(have); return; }
 fetch(SB_URL + "/rest/v1/changelog?select=created_at&order=created_at.desc&limit=1", {
 headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }
 })
@@ -3668,8 +3681,8 @@ headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY }
 .then(function(rows){
 if (!rows || !rows.length) return;
 var latest = rows[0].created_at;
-if (baseline === null) { baseline = latest; return; }
-if (new Date(latest) > new Date(baseline)) { ensureToast().classList.add("is-shown"); }
+try { localStorage.setItem(KEEP_KEY, JSON.stringify({ t: Date.now(), at: latest })); } catch (e) {}
+take(latest);
 })
 .catch(function(){   });
 }
@@ -3911,8 +3924,37 @@ return true;
 var sectionBank = {};
 var tickTimer = null;
 var lastTick = 0;
-function pingActivity(section){
+var PING_SEND_MS = 60000, pingHeld = [], pingTimer = null, pingsTogether = true;
+function pingOne(section){
 safeRpc("record_activity_ping", { p_visitor: VISITOR_ID, p_visit: VISIT_ID, p_hub: HUB, p_section: section });
+}
+function sendPings(leaving){
+if (pingTimer) { clearTimeout(pingTimer); pingTimer = null; }
+if (!pingHeld.length) return;
+var now = Date.now(), held = pingHeld.splice(0, pingHeld.length);
+if (!supabase || AUTOMATED) return;
+if (!pingsTogether) { held.forEach(function(p){ pingOne(p.s); }); return; }
+for (var i = 0; i < held.length; i += 12) (function(part){
+var args = { p_visitor: VISITOR_ID, p_visit: VISIT_ID, p_hub: HUB,
+p_items: part.map(function(p){ return { s: p.s, a: Math.max(0, Math.min(300, Math.round((now - p.t) / 1000))) }; }) };
+try {
+if (leaving && window.fetch) {
+fetch(SB_URL + "/rest/v1/rpc/record_activity_pings", { method: "POST", keepalive: true, body: JSON.stringify(args),
+headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY, "Content-Type": "application/json" } }).catch(function(){});
+return;
+}
+supabase.rpc("record_activity_pings", args).then(function(res){
+if (rpcMissing(res)) { pingsTogether = false; part.forEach(function(p){ pingOne(p.s); }); }
+else if (dbFailed(res)) dbFail();
+}, function(){ dbFail(); });
+} catch (e) {}
+})(held.slice(i, i + 12));
+}
+function pingActivity(section, now){
+if (!pingsTogether) { pingOne(section); return; }
+pingHeld.push({ s: section, t: Date.now() });
+if (now) sendPings();
+else if (!pingTimer) pingTimer = setTimeout(sendPings, PING_SEND_MS);
 }
 var bg = false, bgEl = null, bgT = 0;
 function playingAudio(){
@@ -3960,6 +4002,7 @@ Object.keys(sectionBank).forEach(function(sec){
 if (sectionBank[sec] >= PING_INTERVAL_MS / 2) pingActivity(sec);
 sectionBank[sec] = 0;
 });
+sendPings(true);
 }
 var firstPingSent = false;
 function startActivityPing(){
@@ -3967,7 +4010,7 @@ if (tickTimer) return;
 if (!firstPingSent) {
 firstPingSent = true;
 var startSec = currentSection();
-pingActivity(startSec);
+pingActivity(startSec, true);
 sectionBank[startSec] = -PING_INTERVAL_MS;
 }
 lastTick = Date.now();

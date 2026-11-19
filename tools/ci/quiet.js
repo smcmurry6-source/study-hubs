@@ -159,9 +159,75 @@ async function kept(browser){
   await context.close();
 }
 
+// The study-time pings go out together (2026-11-19, migration_v77): a visit's first ping at once, then what the page counted
+// (one a 25 s) in one record_activity_pings call a minute, each with its age; what is held when the page is hidden goes at
+// once; a database without the call gets one record_activity_ping a ping. And the changelog is read once, then kept on
+// the device (half an hour), not every four minutes. The page's clock is run by hand, so four minutes take a moment.
+async function pings(browser, missing){
+  const what = missing ? 'pings, a database without record_activity_pings' : 'pings';
+  const context = await browser.newContext();
+  if (context.routeWebSocket) await context.routeWebSocket(/.*/, ws => ws.close());
+  const log = [];
+  await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, async route => {
+    const u = route.request().url(), fn = (/\/rpc\/([a-z0-9_]+)/.exec(u) || [])[1] || (/\/rest\/v1\/([a-z_]+)/.exec(u) || [])[1] || '';
+    if (!/supabase\.co/.test(u)) return route.fulfill({ status: 204, body: '' });
+    let a = {}; try { a = JSON.parse(route.request().postData() || '{}'); } catch (e) {}
+    log.push({ fn, items: a.p_items, section: a.p_section, visit: a.p_visit });
+    const json = (b, s) => route.fulfill({ status: s || 200, contentType: 'application/json', body: JSON.stringify(b) });
+    if (fn === 'get_widget_bootstrap_v2') return json({ rank, mastery: [] });
+    if (fn === 'get_rank_profile_v2') return json(rank);
+    if (fn === 'changelog') return json([{ created_at: '2026-11-19T01:00:00+00:00' }]);
+    if (fn === 'record_activity_pings' && missing) return json({ code: 'PGRST202', message: 'Could not find the function public.record_activity_pings' }, 404);
+    return json(fn ? null : []);
+  });
+  await context.addInitScript(() => { try { Object.defineProperty(Navigator.prototype, 'webdriver', { get: () => false, configurable: true }); } catch (e) {} });
+  const page = await context.newPage(), errs = [];
+  page.on('pageerror', e => errs.push(e.message));
+  await page.clock.install();
+  await page.goto(BASE() + 'hubs/perio/index.html#questions');
+  if (!(await page.waitForFunction(() => window.shGame && window.shGame.v2() && window.shDb, null, { timeout: 20000 }).catch(() => null))) {
+    problems.push(`${what}: the page didn't come up on the game layer`); await context.close(); return;
+  }
+  const settle = () => page.waitForTimeout(400);   // real time, for the answers to the calls
+  const of = name => log.filter(c => c.fn === name);
+  await page.clock.runFor(3000); await settle();
+  // the visit's first ping, at once
+  const first = of('record_activity_pings');
+  if (first.length !== 1 || !Array.isArray(first[0].items) || first[0].items.length !== 1 || first[0].items[0].a !== 0)
+    problems.push(`${what}: the visit's first ping should go at once, alone, with age 0 (${JSON.stringify(first.map(c => c.items))})`);
+  if (missing) {
+    if (of('record_activity_ping').length !== 1) problems.push(`${what}: the first ping should be sent again the old way (${of('record_activity_ping').length} record_activity_ping calls)`);
+  } else if (of('record_activity_ping').length) problems.push(`${what}: ${of('record_activity_ping').length} old one-ping calls with the new call working`);
+  // two minutes on the page: a ping at 50, 75 and 100 s (the first was credited ahead), sent together a minute after the first of them
+  await page.clock.runFor(112000); await settle();
+  if (missing) {
+    if (of('record_activity_pings').length !== 1) problems.push(`${what}: asked for the missing call again (${of('record_activity_pings').length} calls)`);
+    if (of('record_activity_ping').length !== 4) problems.push(`${what}: 3 held pings should go as 3 old calls (${of('record_activity_ping').length - 1})`);
+  } else {
+    const calls = of('record_activity_pings');
+    const ages = calls[1] && Array.isArray(calls[1].items) ? calls[1].items.map(i => i.a) : null;
+    if (calls.length !== 2 || !ages || ages.length !== 3 || Math.abs(ages[0] - 60) > 3 || Math.abs(ages[1] - 35) > 3 || Math.abs(ages[2] - 10) > 3)
+      problems.push(`${what}: after two minutes, one call with three pings counted about 60, 35 and 10 s before (${calls.length - 1} calls, ages ${JSON.stringify(ages)})`);
+    else if (calls[1].items.some(i => typeof i.s !== 'string' || !i.s) || calls[1].visit !== calls[0].visit) problems.push(`${what}: every ping carries its section, and the call the same visit`);
+    // 40 s more (a ping at 125 and 150 s), then the page is hidden: what it holds goes at once, with half a ping's worth rounded up
+    await page.clock.runFor(40000);
+    const before = of('record_activity_pings').length;
+    await page.evaluate(() => { Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' }); document.dispatchEvent(new Event('visibilitychange')); });
+    await settle();
+    const last = of('record_activity_pings').slice(before);
+    if (last.length !== 1 || !Array.isArray(last[0].items) || last[0].items.length < 2) problems.push(`${what}: hiding the page should send what it holds in one call (${JSON.stringify(last.map(c => c.items))})`);
+    if (of('record_activity_ping').length) problems.push(`${what}: ${of('record_activity_ping').length} old one-ping calls with the new call working`);
+  }
+  // the changelog: read once on load, then from the device (the watcher looks again at four minutes)
+  await page.clock.runFor(120000); await settle();
+  if (of('changelog').length !== 1) problems.push(`${what}: the changelog should be read once in five minutes, then kept on the device (${of('changelog').length} reads)`);
+  if (errs.length) problems.push(`${what}, page errors: ${errs.join(' | ')}`);
+  await context.close();
+}
+
 (async () => {
   const browser = await chromium.launch();
-  try { await run(browser, false); await Promise.all([run(browser, true), kept(browser)]); } finally { await browser.close(); server.close(); }
+  try { await run(browser, false); await Promise.all([run(browser, true), kept(browser), pings(browser, false), pings(browser, true)]); } finally { await browser.close(); server.close(); }
   if (problems.length) { console.log('✗', problems.join('\n✗ ')); process.exit(1); }
-  console.log('✓ the quiet spell: one line, nothing sent in the spell, the same ids, in order; a working database saves at once; answers kept on the device go from the next page');
+  console.log('✓ the quiet spell: one line, nothing sent in the spell, the same ids, in order; a working database saves at once; answers kept on the device go from the next page; pings go together once a minute, and the changelog is read once');
 })();

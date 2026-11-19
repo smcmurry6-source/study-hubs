@@ -23,3 +23,5 @@
 # migration_v73 (the answer catch-up after the evening outage: restore_outage_v2, the 'restore' award) was applied on 2026-11-18 (through the connector, md5-checked; the constraint validated in its own step).
 # migration_v74 (raw pings kept 3 days, the retention job nightly) was applied on 2026-11-18 (through the connector, md5-checked).
 # migration_v75 (collections: shop_items.collection, get_my_collections, claim_collections_v2, the 'collection' award) was applied on 2026-11-19 (through the connector, md5-checked, after PR #437).
+migration_v76.sql
+migration_v77.sql
