@@ -120,12 +120,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   cache lasts an hour). The deploys that broke the cache are fixed ([ask-timmy](../reference/ask-timmy.md), "Limits and money").
   What's left would mean sending less: for example only the exam facts, Exam Hints and the lecture the student is on, with the
   rest of the notes only when the question needs them. That changes what Timmy can answer, so it needs the eval ($6) and Sam's OK. Done: Sam said yes; built with the eval in `--part` mode (#469).
-- [ ] **Apply `migration_v85.sql` (Ask Timmy's `timmy_cache`) once its PR merges** (2026-11-19): one small table and one
+- [x] **Apply `migration_v85.sql` (Ask Timmy's `timmy_cache`) once its PR merges** (2026-11-19): one small table and one
   service-role function, no backfill, safe at any hour. Until it's applied the function gets an error from the call and sends
   the whole content as before, so the cheaper first question starts only then. Through the connector, md5-checked; then append
   it to `supabase/schema.sql` and take its line out of `supabase/pending-migrations.txt`
-  ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)).
-- [ ] **A week after `migration_v85` is applied, check what the part saved** (2026-11-19): the admin page's Ask Timmy tab (cost by
+  ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)). Done 2026-11-19 at about 2:10 pm Central, md5-checked.
+- [ ] **A week after `migration_v85` is applied (2026-11-19), so on 2026-11-26, check what the part saved** (2026-11-19): the admin page's Ask Timmy tab (cost by
   day against 11-14 to 11-18's) and the edge logs' `turn` lines (`content`: `part`, `part+full`, `full`). In the eval, 16 of 50
   first questions were asked again with the whole content; if real students' share is much higher, the part costs more than it
   saves: send more with it (another lecture, the review tables) or turn it off (`WARM_MS` in `supabase/functions/timmy/core.js`).

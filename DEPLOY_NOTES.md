@@ -41,8 +41,8 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   likelihood topics and the lecture on screen or the answered question's; every other lecture as one line with its title),
   with the site help moved ahead of it so its cache is shared by every hub; when the part doesn't have the answer
   ("not_covered"), he's asked again with the whole content, which is then marked as cached (`timmy_cache`,
-  `migration_v85.sql`: one small table, the service role only; until it's applied the function sends the whole content,
-  as before). The eval in that mode (`node tools/timmy/eval.mjs --part`, $5.28 for all 50 cases): 49 passed, 34 answered
+  `migration_v85.sql`: one small table, the service role only; applied through the connector right after the merge,
+  md5-checked; without it the function sends the whole content, as before). The eval in that mode (`node tools/timmy/eval.mjs --part`, $5.28 for all 50 cases): 49 passed, 34 answered
   from the part, 16 asked again; the one failure was a two-word quote from a table cell on a whole-content answer.
   Also: `tools/timmy/test.mjs` defines the `C` that `exportSections` reads since the study guide (it failed on `main`).
   [Ask Timmy](vault/reference/ask-timmy.md), "Limits and money".
