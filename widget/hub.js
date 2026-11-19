@@ -1003,8 +1003,35 @@
     else if (sec.type === "list") inner = '<ul class="rv-list">' + sec.items.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>";
     else if (sec.type === "figs") inner = '<div class="figs-slot" data-figs="' + esc(sec.figs.join(",")) + '"></div>';
     else if (sec.type === "flows") inner = '<div class="flows">' + (STUDY.sequences || []).filter(function(s){ return !sec.lec || s.lec === sec.lec; }).map(function(s){ return '<div class="flow"><h4>' + esc(s.title) + "</h4><ol>" + s.steps.map(function(st){ return "<li>" + esc(st) + "</li>"; }).join("") + "</ol></div>"; }).join("") + "</div>";
-    return '<section class="rv-section">' + (sec.title ? "<h3>" + esc(sec.title) + "</h3>" : "") + inner + "</section>";
+    /* a table or a set of cards can cover its answers, to test yourself (Sam, 2026-11-19, from a survey answer): coverSection() */
+    var cov = sec.type === "table" || sec.type === "cards", title = sec.title ? "<h3>" + esc(sec.title) + "</h3>" : "";
+    return '<section class="rv-section">' + (cov ? '<div class="rv-head">' + title + '<button class="btn btn-text rv-cover" type="button" data-rvcover="on" aria-pressed="false">' + icon("cards", 18) + "<span>Cover the answers</span></button></div>" : title) + inner + "</section>";
   }
+  /* Cover the answers: every cell but a row's first (a table's td, a card's dd) keeps its size with its words hidden, from
+     screen readers too (visibility), under a Show button; Show reveals that one, Show all the rest. The buttons carry fixed
+     data-* values, so a click count never records what a cell says. */
+  function coverSection(sec, on){
+    var b = sec.querySelector("[data-rvcover]"); if (!b) return;
+    b.setAttribute("aria-pressed", on ? "true" : "false"); b.setAttribute("data-rvcover", on ? "off" : "on");
+    b.querySelector("span").textContent = on ? "Show all" : "Cover the answers";
+    $$("td, dd", sec).forEach(function(c){
+      var peek = c.querySelector(".rv-peek");
+      if (on && !peek) {
+        if (!c.querySelector(".rv-a")) c.innerHTML = '<span class="rv-a">' + c.innerHTML + "</span>";
+        c.classList.add("rv-hid");
+        c.insertAdjacentHTML("beforeend", '<button class="rv-peek" type="button" data-rvpeek="cell" aria-label="Show this answer">Show</button>');
+      } else if (!on) { c.classList.remove("rv-hid"); if (peek) c.removeChild(peek); }
+    });
+  }
+  document.addEventListener("click", function(e){
+    var t = e.target && e.target.closest ? e.target.closest("[data-rvcover], [data-rvpeek]") : null, sec = t && t.closest(".rv-section");
+    if (!sec) return;
+    if (t.hasAttribute("data-rvcover")) { coverSection(sec, t.getAttribute("aria-pressed") !== "true"); return; }
+    var cell = t.parentNode; cell.classList.remove("rv-hid"); cell.removeChild(t);
+    var next = sec.querySelector(".rv-peek");
+    if (!next) coverSection(sec, false);   /* every one shown: back to Cover the answers */
+    else if (e.detail === 0) next.focus();   /* from the keyboard: on to the next one */
+  });
   function checkYourself(host, lec){
     /* three per lecture: the likely ones first, then ones you haven't tried or missed */
     var pool = (QBL[lec.id] || []).map(function(r){ return QBY[r.id]; }).filter(function(q){ return q && (q.type === "mcq" || q.type === "multi"); });

@@ -17,7 +17,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   the connector with Sam's OK; it is safe to run twice), first counting what it would select (its first statement as a `select
   count(*)`), and tick BUG-192's retest. Until then, a Heme & Endo Exam 3 retrospective reads that hub's arcade and Timmy Time
   clicks of 11-19 as test runs.
-- [ ] **Hide the answers in a review table to test yourself** (2026-11-19, a "How's the new look?" survey answer: "being able
+- [x] **Hide the answers in a review table to test yourself** (Sam said yes; built as Cover the answers, the PR after #476) (2026-11-19, a "How's the new look?" survey answer: "being able
   to hide the answers in the charts"): a hub's review tables and Side by side charts (`study.json`'s `review`) show every cell. A "Cover" button on a table that
   blanks every column but the first until a cell is tapped (and a "Show all") would make each table a self-test, like
   Flashcards. A feature: Sam's call, then a task note (drawn in `widget/hub.js`, the Review groups' tables; the About page).
@@ -89,12 +89,15 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   only blur (a hook that moves the whole piece while its egg plays, within [motion-cost](../reference/motion-cost.md)); a coral
   or kelp `treeKind` for the reef and a plain one for the moon (both use the crystal tree); no snow on an underwater scene. Done: a piece's `move` and `T.spinner`, a scene's own `tree`, `noSnow` ([#467](https://github.com/smcmurry6-source/study-hubs/pull/467)).
 - [ ] **After the redesign's release: what the old pages still hold up** (2026-11-13, [the release](done/2026-11-06-redesign-release.md)).
-  When the last single-file hub's page comes down (the archived ones and Heme & Endo Exam 2): take out the `NEW` (`html.shx`)
+  **The last single-file hub pages came down 2026-11-19** (Sam: "lets go ahead and take down all old pages"), so this can
+  start: take out the `NEW` (`html.shx`)
   branches in `widget/ranks.js` and `widget/rankup.js` (the old cards, the 23-trophy list), the old house picture and
   `sh_rank_tier`'s use in `widget/pet.js` (`houseSvg`: today only the fallback under the place on the dashboard), the
   `rpc2` fallbacks in `widget/dash.js` for a database without the game layer, `legacy` and the unused `modes` in `hubs.js`,
   and any separate widget file or the full client (`widget/vendor/supabase-2.117.2.js`) that `grep` finds no page loading
-  by name (`review/` keeps the full client). The sources of a bundle are never deleted.
+  by name (`review/` keeps the full client). The sources of a bundle are never deleted. `legacy` goes only with the
+  `dash.js` code that reads it (it tells the dashboard a hub has no `content/`). Also the old pages' leftovers in
+  `tools/ci/smoke.js` (`WHY_EXEMPT` and the other exemption sets, the `OLD` hub's checks, the old cards' markup check).
 - [ ] **The hubs' own arcade lobby, never shown on the engine** (2026-11-19, found retesting BUG-012): More's Arcade on a hub on
   the engine draws its own lobby (`moreArcade()` in `widget/hub.js`) and opens a game on its stage, so the lobby inside a hub's
   `content/arcade.js` (`lobby()` in Perio's, with the `.ar-board-tabs` boards; Heme & Endo Exam 3's has `.ar-board-grid`) looks

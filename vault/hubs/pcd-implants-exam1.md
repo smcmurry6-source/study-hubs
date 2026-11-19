@@ -7,12 +7,18 @@ status: archived
 
 # PCD Implants Exam 1
 
+**Its page came down 2026-11-19**, with the other five old single-file hub pages (Sam: "lets go ahead and take down all
+old pages", [decisions](../decisions.md)). Its `hubs.js` entry (the check-ins, the recap),
+`tools/question-ids/pcd-implants-exam1.txt`, its art, its figure kit (`tools/figures/pcd-implants-exam1/`), its Timmy
+Time script (`tools/podcast/pcd-implants-exam1/`) and the class's data in Supabase stay. The page is still in git:
+`git show a897c0c:hubs/pcd-implants-exam1/index.html` (the last `main` commit with it); its questions and lectures as
+JSON: `tools/dump-banks.js` on a copy of that commit ([repo map](../reference/repo-map.md)).
+
 Nine lectures (Dr. Mueninghoff, Dr. Chavali, Dr. Chen, Dr. Givan, Dr. Geisinger). The exam is on Canvas, Fri Nov 6,
 7:00 am-8:00 pm: 40 questions in one hour (3 multiple-answer, 3 matching, the rest MCQ). Dates and check-in hours (the
 window closes at 8 pm, so `checkinHour:20`): `HUBS` in `index.html`. Archived 2026-11-06 at 10 pm; its card leaves the dashboard
 11-16. Retrospective: `LESSONS.md` → Hub retrospectives (written 2026-11-10, with the first 5 check-ins; later ones go into the next
-audit). Its recap is on the dashboard since 2026-11-10 (`review/` → Recap → "Remove from dashboard" takes it down). Still to do by
-hand: remove `hubs/pcd-implants-exam1/` and optionally move its entry into `ARCHIVED_HUBS`.
+audit). Its recap is on the dashboard since 2026-11-10 (`review/` → Recap → "Remove from dashboard" takes it down).
 
 ## Before you work on it
 
