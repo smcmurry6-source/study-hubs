@@ -266,5 +266,9 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   (live only: catalog reads, `pg_stats`, settings, the cron table). `migration_v83.sql` written and tested
   (`tools/release/admin-ops.js`: 116 checks, the cache's among them; `rls.js`, `retention.js`, `xp.js`, `timmy.js` pass with
   it pending); the admin page reads its time from `get_admin_cache_status`. Applied live at night (the box below).
+- 2026-11-19, evening (Claude Code): #456 brought up to date. `main` had taken `migration_v79.sql` to `v82` at noon (the
+  database pass's phase 2, applied live), so #456's migration, written as v79, is now `migration_v83.sql`, with its pending
+  line and every mention; it replaces none of the functions v79 to v82 wrote. Run again on `main` with v83 pending:
+  `admin-ops.js` (116 checks), `rls.js` and `xp.js` (629 checks) pass. Still to do: the box above, applying it live at night.
 
 ## Outcome
