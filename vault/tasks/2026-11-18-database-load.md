@@ -97,17 +97,18 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   20.5 ms an answer, 19 ms of it those two; after v72, 5.1 ms (a wrong answer) to 6.8 ms (a right one that can reach a
   medal), the same balances and medals. Applied live on 2026-11-18 at about 21:00 UTC, once the restart had finished
   (Sam: "Apply it now"); the three live bodies' md5 match the file.
-- [ ] **The ping table rewritten after the first 3-day cleanup** (no data deleted by the rewrite): `activity_pings` was 166 MB of
+- [x] **The ping table rewritten after the first 3-day cleanup** (no data deleted by the rewrite): `activity_pings` was 166 MB of
   the 414 MB database, 117 MB of it three bloated indexes. Since `migration_v74.sql` the nightly job keeps 3 days of raw pings
   (below), and deleted rows' space is only reused, so once its first run (3:23 am Central, 2026-11-19, about 27 days of pings)
   is done, `vacuum full public.activity_pings` (or `cluster ... using activity_pings_time_idx`) at night gives it back and
   rebuilds the indexes, in place of the index rebuild planned first (Sam asked "could we do it now"; in the afternoon it would
-  have taken the CPU from the class). Scheduled for about 3:45 am Central on 2026-11-19 from this session.
+  have taken the CPU from the class). **Done** 2026-11-19, 3:46-3:48 am Central (Log): **the database 465 MB → 318 MB**, the
+  ping table 179 MB → 31 MB, all 86,372 rows kept, every index valid, no request failed.
 - [x] **Sam's call: the Free plan's 500 MB limit.** The project is on the **Free plan** (not a paid Micro: `get_organization`,
   2026-11-18), whose database goes **read-only at 500 MB** of database size, and every save then fails. 414 MB on
   2026-11-18; a busy exam day adds about 15 MB of pings alone. Sam: "i dont want to upgrade the plan. stay free", and to
   "do we need to even save pings for 14 days? ... could we do 1 day?": **"do 3 days"** (`migration_v74.sql`, applied live:
-  raw pings kept 3 days, the retention job nightly; every reader of study time uses `activity_hourly`). About 280 MB once
+  raw pings kept 3 days, the retention job nightly; every reader of study time uses `activity_hourly`). 318 MB once
   the table is rewritten (the box above).
 - [x] **The outage's study time restored** (Sam: "we can do fixes for 1 and 2"): `tools/data-fixes/2026-11-18-outage-time.sql`
   fills the window's 40 s to 10 minute gaps between saved pings, 2,691 pings (18.7 hours) for 52 people, under the ~2,900
@@ -200,5 +201,16 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   hidden again, and a second page on a working database sends its two answers with the same ids, 2.5 s apart; the first
   page, shown again, sends nothing more. Nobody was past 50,000 XP (165 on the ladder), so the wrong rank had shown no one
   yet; the missing double-XP chip had.
+- 2026-11-19, 3:23-3:48 am Central (the night task scheduled from #430's session; the class quiet, 10-13 requests a minute,
+  no 5xx). The first nightly 3-day run (`sh-retention-nightly`) succeeded in 11 s and deleted 253,666 pings older than 3 days.
+  **The database had reached 465 MB** (419 MB the afternoon before: the busy evening before the Perio final, with deleted
+  pings' space not given back), 35 MB from the Free plan's read-only limit, and a full rewrite of the ping table needs room
+  for its new copy first, so it went in two steps: `reindex index concurrently` on the three bloated indexes, one call each
+  (writes went on; `activity_pings_time_idx` 45 → 8 MB, `_visitor_idx` 41 → 6 MB, `_hub_idx` 27 → 3 MB; the database
+  465 → 370 MB), then `cluster public.activity_pings using activity_pings_time_idx` under `lock_timeout 5s` (heap 53 → 12 MB,
+  the primary key 9 → 2 MB) and `analyze`. After: **318 MB**, the ping table 31 MB (86,372 rows, newest a few seconds old),
+  every index valid, no failed request or database error in those minutes. The biggest tables now: `personal_answers` 76 MB,
+  `xp_seen` 52 MB, `question_events` 34 MB, `ui_click_reach` 23 MB, `xp_awards` 22 MB, `answer_xp` 21 MB (for the
+  [optimization pass](2026-11-18-database-optimization-pass.md); `xp_seen` is worth a look).
 
 ## Outcome
