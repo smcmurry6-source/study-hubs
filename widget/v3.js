@@ -3550,8 +3550,11 @@
     document.head.appendChild(s);
   }
   if (!EXPORT_ONLY) widgetFile("eggs.js");
-  /* handpiece ranks, trophies, accent unlocks, link my devices (widget/ranks.js) */
-  if (!EXPORT_ONLY) widgetFile("ranks.js", function(){ if (window.shRanks) window.shRanks.mount(window.shEggHooks); });
+  /* handpiece ranks, trophies, accent unlocks, link my devices: widget/ranks.js (the art and lists, shared with the
+     dashboard) and widget/ranks-hub.js (the hub widget, shRanks.mount: a hub's only, 2026-11-19) */
+  if (!EXPORT_ONLY) widgetFile("ranks.js", function(){
+    if (window.shRanks) widgetFile("ranks-hub.js", function(){ if (window.shRanks.mount) window.shRanks.mount(window.shEggHooks); });
+  });
   /* tooth buddy (widget/pet.js): Timmy Tooth, in the bottom-left corner. Everyone has Timmy (the redesign's release):
      he loads for everyone, with no adoption, and wears what's on at his place (the v2 bootstrap's shop; on an old
      single-file hub, which has no shop, the outfit kept on the device). */
