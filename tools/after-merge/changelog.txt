@@ -59,3 +59,4 @@ perio | Session 7: the #31 implant case now says where the tissue was lost (at t
 heme-endo-exam3 | New in Notes: Dr. Herr's study guide, at the top of the lecture list. Every item on the Exam 3 study guide (L17 to L22) is a heading with what you need to know about it, then its key terms, with buttons to each lecture's notes and High likelihood questions.
 heme-endo-exam3 | Dr. Herr's study guide now has a recording: Listen plays it in the notes' narrator's voice, with Follow along. Tap any word to jump there.
 perio | Session 7: the four implant cases now say what today's radiograph shows in words (where the bone sits below the implant), so you don't have to read it off the drawing.
+heme-endo-exam3 | L21 and L22 now match Dr. Dal Zotto's slides too: the notes add what only the slides say, with 23 new questions from them and a fresh recording of both lectures, the study guide and Timmy Time.

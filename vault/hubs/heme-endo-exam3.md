@@ -38,10 +38,14 @@ entry in `hubs.js`.
   from their slides, then taken to taught on 2026-11-18 from their recordings (Drive, Exam 3 folder: `GMT20261117-190158`, Dr.
   Herr, 1 pm, and `GMT20261117-194905`, Dr. Borak, the 2 pm lecture; the captions name no speaker). **L21 and L22** (Dr. Dal Zotto, 11/18) went in the same evening, written from
   their recordings (Drive, Exam 3 folder: `GMT20261118-190020`, 1 pm, male, and `GMT20261118-200153`, 2 pm, female; the
-  captions say "Michael Herr" throughout). Their slides are in that folder too, but the connector couldn't read them (over its
-  10 MB limit, and no text came back), so **the notes haven't been checked against the slides**: a detail only on a slide
-  isn't in them, and each lecture says so in a reading-note and in its `note`. When the decks can be read (Sam opens them as
-  Google Slides, or a smaller copy), check them: [the inbox](../tasks/inbox.md).
+  captions say "Michael Herr" throughout). Their slides were too big for the connector at first (over its 10 MB limit); on
+  2026-11-19 Sam put smaller copies in the same folder (the course numbers the decks 20 and 21: `20-Pathology of Lowe Urinary
+  Tract and Male reproductive System-Dal Zotto-STU`, a Google Slides copy, and `21-Pathology of Female Reproductive
+  System-Dal Zotto-STU.pdf`), and **both lectures were checked against them slide by slide** the same morning: what only a
+  slide says is in the notes at both levels and says so ("the slide"), the review tables, cram lines, hints' takes, topics and
+  the study guide page carry it too, 23 questions were written from the slides (`src: "slides"`), two were fixed
+  (`mr-tf-pein30`, `fr-tf-ls-only`), and both lectures' `source` says "+ slides". Slides 16-20 of the male deck are images
+  only (no text came back).
 - **Dr. Herr's Exam 3 study guide** (Sam, 2026-11-17: no in-class review; the guide is "very indicative" and "everything on the study
   guide should be high likelihood questions"; Drive, Exam 3 folder, `Exam 3 Study Guide (1).docx`): a focus list and key terms for
   each of L17-L22, nothing for Lecture A. Each lecture's Exam Hints open with its list (a `focus` hint, the guide's words, then the
@@ -86,7 +90,7 @@ entry in `hubs.js`.
   review. A figure added later numbers on from Fig 25.
 - **Narration:** `hubs/heme-endo-exam3/audio/<lecture>-full|plain|hy.mp3` with their words files
   (`python3 tools/narrate.py heme-endo-exam3 --lec <id> --level <level> --force`). Every lecture has all three levels (High
-  yield for L17-L20 recorded 2026-11-17, after the study guide's rebuild; L19 and L20's three levels again 2026-11-18, taught; L21 and L22's the same day). High yield again after any change to a lecture's
+  yield for L17-L20 recorded 2026-11-17, after the study guide's rebuild; L19 and L20's three levels again 2026-11-18, taught; L21 and L22's the same day, and again 2026-11-19 after the slides). High yield again after any change to a lecture's
   notes, topics, hints or questions, then the content build. L21 and L22 added 29 words to `tools/podcast/lexicon.json`
   (cryptorchidism, leiomyoma, urothelial, botryoides, Trichomonas, PeIN...) and `tools/narrate.py` reads "WHO" as W H O.
   **Timmy Time:** "Exam 3: the last-minute review" (`exam3-review`, 52 minutes, 2026-11-19), all seven lectures, each of
@@ -136,12 +140,17 @@ No question's key depends on any of these, except L22's LCIS (below).
   key depends on it) and put Hodgkin's start in the chest's central nodes (22:08; the slide says the neck). He grouped
   mantle cell with the indolent lymphomas once (46:16; textbooks: aggressive; no key on its grade). Its 10 Patient Box cases
   are written for the hub.
-- **L21 (Dr. Dal Zotto, from the recording):** bladder cancer "the fourth cause of death in men" right after "it doesn't cause
-  many deaths" (the questions use the incidence rank: fourth most common cancer in men); Leydig cells "secrete testosterone and
-  dihydrotestosterone" (most DHT is made in target tissues, L18) and the vas deferens "ends up in the ureter" (the urethra),
-  both in reading-notes; cryptorchidism in "1 in 10" newborns, corrected at about 2 years (texts: about 3 percent, by 18
-  months; no key on either number); the periurethral zone called the "central zone" and the "transitional zone" in one breath
-  (questions say "around the urethra" or "transition zone"). Said not needed (hints, no key on them): retroperitoneal
+- **L21 (Dr. Dal Zotto; recording and slides):** bladder cancer "the fourth cause of death in men" right after "it doesn't cause
+  many deaths": the slide settles it, fourth in incidence and eighth as a cause of death in men (the questions use the incidence
+  rank); Leydig cells "secrete testosterone and dihydrotestosterone" (most DHT is made in target tissues, L18) and the vas
+  deferens "ends up in the ureter" (the urethra), both in reading-notes; cryptorchidism in "1 in 10" newborns aloud, but the
+  slide's "3% term infants, 30% premature" matches the texts (`mr-crypto-rate` keys the slide's), corrected at about 2 years
+  (guidelines: by 18 months; no key on the age); the periurethral zone called the "central zone" and the "transitional zone"
+  in one breath, and the slides do both (the zonal slide: transitional; the BPH slide: "central zone"; questions say "around
+  the urethra" or "transition zone"). PeIN's "30 percent" is, on the slide, the HPV-associated kind's (the HPV-independent
+  kind, 2-8 percent): `mr-tf-pein30` says "HPV-associated" since 2026-11-19. The slides' non-seminoma details (yolk sac
+  tumor's AFP, embryonal carcinoma's numbers, the 2016 WHO classification) are in a reading-note only, as "general
+  information". Said not needed (hints, no key on them): retroperitoneal
   fibrosis, the WHO classifications, FGFR3 and TP53, the testicular tumor classification, the seminoma's histology and the
   nonseminomas' details ("general information").
 - **L22 (Dr. Dal Zotto, from the recording):** the paramesonephric ducts "about the first week of gestation" and the
@@ -150,7 +159,12 @@ No question's key depends on any of these, except L22's LCIS (below).
   here (`fr-dcis` and the breast numbered and except items key it), since the lecture's points are what the exam tests; texts
   also call LCIS a marker of higher breast cancer risk, followed with surveillance (a reading-note says so). Said not needed:
   the new cervical screening's details (know it's risk-based), the ovarian tumor classification, DCIS vs LCIS under the
-  microscope.
+  microscope. From the slides (2026-11-19): the lecture called lichen sclerosus "the single non-infectious inflammatory
+  disorder that can lead to carcinomas", but the vulvar squamous cell carcinoma slide puts the HPV-independent kind on
+  "lichen sclerosus or lichen planus" (long-standing inflammation). No key depends on whether lichen planus can lead to
+  carcinoma: `fr-tf-ls-only` now asks about lichen simplex chronicus (keyed False), the hints, guide and tables say "the one she
+  said" with the slide beside it, and Timmy Time's lightning question was reworded. The aggressive endometrial type is "over
+  65" aloud and 70-80 on the slide, which names it (serous and clear cell carcinoma); both are in the notes.
 
 ## Pending
 
@@ -161,7 +175,8 @@ Open tasks for this hub: `vault/tasks/` notes with `hub: heme-endo-exam3` (none 
 went taught (2026-11-18), 313 questions (L19 72, L20 65), 64 topics, 285 High Likelihood, 83 hints, 24 figures; three L20
 questions retired (`ll-hl-case`, `ll-2s-scatter`, `ll-specimen`: Hodgkin subtypes and flow cytometry, said not needed).
 With L21 and L22 (2026-11-18): 437 questions (L21 64, L22 60, 13 of them Patient Box cases), 86 topics, 387 High
-Likelihood, 122 hints, 24 figures. Left open: checking L21 and L22 against their slides ([inbox](../tasks/inbox.md)).
+Likelihood, 122 hints, 24 figures. After the slides (2026-11-19): 460 questions (L21 75, L22 72), 86 topics, 410 High
+Likelihood. Nothing left open from the slides.
 
 ## History
 
