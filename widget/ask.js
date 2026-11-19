@@ -328,13 +328,40 @@
       return { hub: hub, lec: l.id, questions: ids.length, answered: n, right: right, missed: missed, notes_done: !!RD[l.id] };
     });
   }
+  /* the student's own answers on a hub from the server (get_my_answers: [[qid, seconds, 1 | 0], ...], oldest first, every
+     linked device's), folded into a saved state's shape and merged with this device's: each question keeps whichever copy
+     has more tries, as the hub page's own sync does (SH_SYNC.merge). So a new or linked device sees what was answered
+     elsewhere without opening a hub first. Nothing (busy, offline, 4 s) leaves the device's copy as it is. */
+  function serverSeen(hubId){
+    if (!visitor() || (window.shDb && window.shDb.busy && window.shDb.busy())) return Promise.resolve(null);
+    return Promise.race([rpc("get_my_answers", { p_visitor: visitor(), p_hub: hubId }),
+      new Promise(function(ok){ setTimeout(function(){ ok({ fail: true }); }, 4000); })]).then(function(r){
+      if (!r || r.fail || !Array.isArray(r.data)) return null;
+      var seen = {};
+      r.data.forEach(function(x){
+        if (!Array.isArray(x) || x.length < 3) return;
+        var s = seen[String(x[0])] || (seen[String(x[0])] = { n: 0, last: null });
+        s.n++; s.last = x[2] === 1 || x[2] === true;
+      });
+      return seen;
+    });
+  }
+  function withServer(st, seen){
+    if (!seen) return st;
+    st = st && typeof st === "object" ? st : {};
+    var A = st.answered && typeof st.answered === "object" && !st.seen ? st.answered : null, own = {};
+    if (A) Object.keys(A).forEach(function(id){ var a = A[id]; if (a) own[id] = { n: a.seen || 0, last: typeof a.lastCorrect === "boolean" ? a.lastCorrect : !!a.correct }; });
+    else Object.keys(st.seen || {}).forEach(function(id){ var s = st.seen[id]; if (s) own[id] = { n: s.n || 0, last: s.last }; });
+    Object.keys(seen).forEach(function(id){ if (!own[id] || (own[id].n || 0) < seen[id].n) own[id] = seen[id]; });
+    return { seen: own, read: st.read || {} };
+  }
   var coreMemo = {};
   function progress(){
     if (!isDash()) return Promise.resolve({ lectures: progressFrom(O.hub, opt("core"), opt("state"), O.exam).slice(0, 40) });
     var hubs = (opt("hubs") || []).filter(function(h){ return h && h.content; }).slice(0, 4);
     return Promise.all(hubs.map(function(h){
       var p = coreMemo[h.id] || (coreMemo[h.id] = fetch(h.content + "core.json").then(function(r){ if (!r.ok) throw new Error(); return r.json(); }).then(function(c){ p.done = c; return c; }).catch(function(){ delete coreMemo[h.id]; return null; }));
-      return p.then(function(core){ var st = null; try { st = JSON.parse(ls(h.stateKey) || "null"); } catch (e) {} return progressFrom(h.id, core, st, null); });
+      return Promise.all([p, serverSeen(h.id)]).then(function(x){ var st = null; try { st = JSON.parse(ls(h.stateKey) || "null"); } catch (e) {} return progressFrom(h.id, x[0], withServer(st, x[1]), null); });
     })).then(function(all){ return { lectures: [].concat.apply([], all).slice(0, 40) }; });
   }
   /* the question "Ask Timmy" was tapped on is read by the server only once the database has this answer: wait for it */
@@ -780,7 +807,7 @@
 
   window.shAsk = {
     mount: mount, open: open, close: close, isOpen: isOpen, voice: voice, available: available,
-    /* for the tests: the progress summary from a hub's content and saved state */
-    progressFrom: progressFrom
+    /* for the tests: the progress summary from a hub's content and saved state, and the server's answers merged in */
+    progressFrom: progressFrom, withServer: withServer
   };
 })();
