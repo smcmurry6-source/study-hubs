@@ -477,6 +477,10 @@ html.hx-still .dx-wn *, html.hx-still .dx-wn *::after { animation: none !importa
 .dx-coinnum svg { flex: none; width: 44px; height: 44px; padding: 6px; border-radius: 50%; background: var(--ar-row); }
 .dx-cointx { display: grid; min-width: 0; font-size: var(--fs-meta); color: var(--ar-soft); }
 .dx-cointx b { font-size: 26px; line-height: 1.1; font-weight: var(--w-title); color: var(--ar-gold); }
+.dx-walletbtns { display: flex; flex-wrap: wrap; gap: 8px; }
+.dx .dx-collbtn { border-color: rgba(255, 224, 138, .55); background: transparent; color: var(--ar-gold); }
+.dx .dx-collbtn:hover { background: rgba(255, 224, 138, .12); }
+.dx .dx-collbtn:focus-visible { outline-color: var(--ar-gold); }
 .dx .dx-shopbtn { gap: 8px; border-color: transparent; background: var(--ar-gold); color: #2a2233; }
 .dx .dx-shopbtn:hover { background: #ffe9a8; }
 .dx .dx-shopbtn:focus-visible { outline-color: var(--ar-gold); }

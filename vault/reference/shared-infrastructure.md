@@ -68,7 +68,8 @@ tags: [widget, supabase]
 - **`widget/place.js` + `widget/place.css`** (`window.shPlace`): Timmy's place, part of the redesign.
   `shPlace.setup({ sb, visitor, shop, profile, tints })` hands it the page's client, the bootstrap's
   `shop` and the v2 rank profile; `shPlace.card(host, options)` draws the place as a picture that opens the full view
-  (`shPlace.open()`; `open({ customize: true })` starts in the customizer, `open({ place })` draws someone else's from
+  (`shPlace.open()`; `open({ customize: true })` starts in the customizer, `open({ collections: true })` on the Collections view alone
+  (every shop set with what you own of it and its 1,000 XP and crowns bonus, [game-server](game-server.md); the place's own Collections button opens it over the place), `open({ place })` draws someone else's from
   `get_place`, for visiting: the dashboard's boards open it from a row, with an
   `onClose` that gives focus back to the row, and `nav` for its arrows and "Back to mine": the tour; a `nav` with `more()` is a random trip, whose Next past the last place asks for someone else; a place's `top`, 1 to 10, draws the top ten's number badge after the name). The full view is the leaderboard's theater, dark in both themes, for your own place and a visit
   (Sam, 2026-11-14; `place.css` sets the design tokens on the dialog). It loads its own stylesheet, the kit (`widget/hub-art/place.js`, `window.SH_PLACE`) and

@@ -14,7 +14,10 @@
      - the full view (shPlace.open): Timmy hops between spots on the ground, waves, talks from a bubble over his head,
        and looks, moves and behaves as his HP says (the kit's HEALTH table); tapping things plays their eggs; the medal
        board opens the big view of every hub's medal;
-     - the customizer: what stands where, from what you own, saved at once through equip_item.
+     - the customizer: what stands where, from what you own, saved at once through equip_item;
+     - Collections (open({ collections: true }), or its button by Customize and Shop): every season's set, every
+       year-round collection and the rare costumes, with what you own of each, and the bonus a finished one pays
+       (migration_v75: get_my_collections, claim_collections_v2).
 
    The server is migration_v54 (vault/reference/game-server.md): get_my_shop's inventory, locked and equipped, and
    equip_item(visitor, slot, item) with its thirteen slots (outfit, home, scene, the five yard spots yard-left,
@@ -41,6 +44,7 @@
   function track(k){ try { if (W.shTrack) W.shTrack(k); } catch (e) {} }
   function lowerFirst(t){ t = String(t || ""); return /^[A-Z]([a-z]| )/.test(t) && !/^Timmy/.test(t) ? t.charAt(0).toLowerCase() + t.slice(1) : t; }
   function cardName(n){ n = String(n || "").replace(/^(The|A|An) /, ""); return n.charAt(0).toUpperCase() + n.slice(1); }
+  function num(n){ return String(Math.round(+n || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
   function keyed(el, fn){ el.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); e.stopPropagation(); fn(); } }); }
 
   /* ---------- loading: the kit, the stylesheet and a set's file, each once and only when first needed ---------- */
@@ -72,12 +76,13 @@
   function byK(list, k){ for (var i = 0; i < list.length; i++) if (list[i].k === k) return list[i]; return null; }
 
   /* ---------- what the place knows: whose it is, what's owned, what stands where, the rank and the medals ---------- */
-  var S = { sb: null, visitor: null, game: false, eq: {}, own: {}, locked: [], profile: null, flair: null, tints: null, asked: false };
+  var S = { sb: null, visitor: null, game: false, eq: {}, own: {}, locked: [], seasons: [], coll: null, collPays: 0, profile: null, flair: null, tints: null, asked: false };
   var YARD_SLOTS = ["left", "front", "corner", "side", "right"], UPS = ["windows", "porch", "chimney", "flag"];
   function takeShop(sh){
     if (!sh || typeof sh !== "object" || !sh.inventory) return false;
     S.game = true; S.eq = copy(sh.equipped); S.own = {}; (sh.inventory || []).forEach(function(x){ if (x && x.id) S.own[x.id] = x.how || "bought"; });
     S.locked = (sh.locked || []).filter(function(x){ return x && x.id; });
+    S.seasons = Array.isArray(sh.seasons) ? sh.seasons.slice() : [];
     return true;
   }
   function setup(o){
@@ -260,7 +265,8 @@
     bag: IC('<path d="M4 7h12l-.9 9.2c-.1.5-.5.8-1 .8H5.9c-.5 0-.9-.3-1-.8z"/><path d="M7.2 9V6.2a2.8 2.8 0 0 1 5.6 0V9"/>'),
     check: IC('<path d="M4.5 10.5l3.6 3.6 7.4-8"/>'),
     zoom: IC('<circle cx="9" cy="9" r="5.2"/><path d="M13 13l4 4M9 6.8v4.4M6.8 9h4.4"/>'),
-    medal: IC('<circle cx="10" cy="12" r="4.6"/><path d="M7.2 8.2L5 3h3.2L10 6.6 11.8 3H15l-2.2 5.2"/>')
+    medal: IC('<circle cx="10" cy="12" r="4.6"/><path d="M7.2 8.2L5 3h3.2L10 6.6 11.8 3H15l-2.2 5.2"/>'),
+    album: IC('<rect x="2.6" y="5.2" width="10.4" height="12.2" rx="2"/><path d="M6.4 5.2V4.4c0-1 .8-1.8 1.8-1.8h7.4c1 0 1.8.8 1.8 1.8v9.2c0 1-.8 1.8-1.8 1.8H13"/><path d="M5.4 13.6l1.8-2.4 1.6 1.6 1.4-1.6 1.2 2.4"/>')
   };
   function isStill(){ return reduced; }
   function HL(){ return TP.healthFor(hpOf(V.m)); }
@@ -423,8 +429,9 @@
     first.then(function(){ if (V && !V.m.visiting) V.m = mine(); return ready(V && V.m); }).then(function(){
       if (!V) return;
       $(".tpv-wait", dlg).hidden = true;
-      build({ hello: true });
+      build({ hello: !o.collections });
       if (o.customize && canChange()) setMode("customize");
+      else if (o.collections && !V.m.visiting && S.game) openCollections({ only: true });
       tripOut(dlg);
     }, function(){ if (V) { tripGone(dlg); var w = $(".tpv-wait", dlg); w.hidden = false; w.textContent = "Timmy’s place couldn’t be opened just now. Try again in a moment."; } });
     return api;
@@ -749,17 +756,184 @@
       (list.length ? '<ul class="tpv-mgrid">' + list.map(function(x, i){ return '<li class="tpv-mcard lvl-' + x.lvl + '" style="--i:' + i + '">' + medal(x, 72) + "<b>" + esc(name(x.hub)) + '</b><span>' + TP.MEDALS[x.lvl] + "</span></li>"; }).join("") + "</ul>" : "") +
       '<p class="tpv-note">These are the medals each hub gives, the same ones that pop up when one is earned. The board by the house hangs the best twenty.</p>');
   }
-  function overOpen(html){
+  function overOpen(html, cls, xLabel){
     var ov = $(".tpv-over", V.dlg);
-    ov.innerHTML = '<div class="tpv-overin" role="dialog" aria-modal="true" aria-labelledby="tpvO"><button type="button" class="tpv-x tpv-ox" data-tp="over-close" aria-label="Back to the place">' + X_SVG + "</button>" + html + "</div>";
+    ov.innerHTML = '<div class="tpv-overin' + (cls ? " " + cls : "") + '" role="dialog" aria-modal="true" aria-labelledby="tpvO"><button type="button" class="tpv-x tpv-ox" data-tp="over-close" aria-label="' + esc(xLabel || "Back to the place") + '">' + X_SVG + "</button>" + html + "</div>";
     ov.hidden = false; V.overBack = D.activeElement && V.dlg.contains(D.activeElement) ? D.activeElement : null;
     var x = $(".tpv-ox", ov); x.addEventListener("click", overClose); x.focus();
     ov.onclick = function(e){ if (e.target === ov) overClose(); };
   }
   function overClose(){
     if (!V) return;
+    if (V.collIO) { V.collIO.disconnect(); V.collIO = null; }
+    if (V.overOnly) { V.overOnly = false; close(); return; }   /* opened for Collections alone (the dashboard's button): closing it closes the place */
     var ov = $(".tpv-over", V.dlg); ov.hidden = true; ov.innerHTML = "";
     var b = V.overBack || $('[data-tp="close"]', V.dlg); try { b.focus(); } catch (e) {}
+  }
+
+  /* ---------- Collections (Sam, 2026-11-19: "a button where you can view your collections of items bought in the shop.
+     holiday collections and other things. you can see your progress and all and completing a collection gives 1000 xp
+     and 1000 crowns as a bonus"). Every season's set, every year-round collection and the rare costumes, each with what
+     you own of it, over the place like the medal board. The pieces and their names come from the kit (sets.mjs's lists,
+     TP.SETS, and its costumes); what you own is get_my_shop's; the server (migration_v75) says which bonuses are paid
+     (get_my_collections) and pays a finished collection's (claim_collections_v2: 1,000 XP and 1,000 crowns, once). A
+     collection's drawings are fetched only when its card comes near the screen (its set's file, as the customizer
+     does). A collection whose every piece is a gift (Halloween 2026's) is finished for everyone and pays nothing. ---------- */
+  var COLL_KINDS = [["season", "Holidays and seasons", "Each set is in the shop in its own season, and now and then on a throwback day."],
+    ["collection", "Year-round collections", "In the shop’s daily and weekly picks all year."], ["costumes", "Rare costumes", ""]];
+  function collPays(){ var G = W.shGame, n = G && G.prizes && G.prizes.collection; return S.collPays || n || 1000; }
+  function collList(){
+    var SETS = TP.SETS || {}, out = [], piece = function(it){ return { id: it.id, n: it.n, kind: it.kind, rarity: rarOf(it.rarity), price: it.price }; };
+    (SETS.seasons || []).forEach(function(se){ out.push({ k: se.k, kind: "season", n: se.n, about: se.when, gift: !!se.gift, items: (se.items || []).map(piece) }); });
+    (SETS.collections || []).forEach(function(co){ out.push({ k: co.k, kind: "collection", n: co.n, about: co.note, items: (co.items || []).map(piece) }); });
+    var cos = TP.OUTFITS.filter(function(x){ return x.costume && x.id; });
+    if (cos.length) out.push({ k: "costumes", kind: "costumes", n: "Rare costumes", about: "Timmy wears one now and then. Spot him in it and it comes into your shop.",
+      items: cos.map(function(x){ return { id: x.id, n: cardName(x.n), kind: "outfit", rarity: rarOf(x.rarity), price: x.price }; }) });
+    out.forEach(function(c){ c.have = c.items.filter(function(it){ return !!S.own[it.id]; }).length; c.done = c.items.length > 0 && c.have >= c.items.length; });
+    return out;
+  }
+  function collName(k){ var c = TP ? collList().filter(function(x){ return x.k === k; })[0] : null; return c ? c.n : ""; }
+  function takeColl(d){
+    if (!d || d.ok === false || !Array.isArray(d.collections)) return false;
+    S.coll = {}; d.collections.forEach(function(c){ if (c && c.k) S.coll[c.k] = c; });
+    if (d.pays > 0) S.collPays = d.pays;
+    return true;
+  }
+  /* which bonuses are paid, as the server says (nothing when it can't say: the view then shows progress only) */
+  function readColl(){
+    if (!S.sb || !S.visitor || !S.game) return Promise.resolve(null);
+    return S.sb.rpc("get_my_collections", { p_visitor: S.visitor }).then(function(r){ if (r && !r.error) takeColl(r.data); return S.coll; }, function(){ return S.coll; });
+  }
+  /* pay every finished collection not paid yet. What it paid goes out as sh:prize (the hub's reward card and the day's
+     XP, the dashboard's toast), the balance as sh:crowns, as for every prize. The shop asks after a collection's piece is
+     bought (shShop: o.sb, o.visitor). Test browsers ask nothing (as widget/v3.js's prizes). */
+  function claimColl(o){
+    o = o || {};
+    var sb = o.sb || S.sb, v = o.visitor || S.visitor, bot = false; try { bot = !!navigator.webdriver; } catch (e) {}
+    if (!sb || !v || bot) return Promise.resolve(null);
+    return sb.rpc("claim_collections_v2", { p_visitor: v }).then(function(r){
+      var d = r && !r.error ? r.data : null;
+      if (!d || typeof d !== "object" || d.ok === false) return null;
+      takeColl(d);
+      var G = W.shGame, xp = d.xp | 0;
+      if (typeof d.crowns === "number") { if (G && G.setCrowns) G.setCrowns(d.crowns); else try { D.dispatchEvent(new CustomEvent("sh:crowns", { detail: { balance: d.crowns } })); } catch (e) {} }
+      if (xp > 0) { var n = (d.won || []).length, text = G && G.prizeText ? G.prizeText("collection", xp, d) : (n > 1 ? n + " collections finished" : "Collection finished") + ": +" + num(xp) + " XP and " + num(xp) + " crowns";
+        try { D.dispatchEvent(new CustomEvent("sh:prize", { detail: { src: "collection", xp: xp, text: text, res: d } })); } catch (e) {} }
+      return d;
+    }, function(){ return null; });
+  }
+  function collStatus(c){
+    var sv = S.coll && S.coll[c.k], pay = num(collPays()), left = c.items.length - c.have;
+    if (c.gift && c.done) return '<p class="tco-st is-gift">' + ICON.check + "<span>A gift from Timmy: everyone’s from the start, so it pays no bonus.</span></p>";
+    if (c.done && sv && sv.paid) return '<p class="tco-st is-paid">' + ICON.check + "<span>Finished. Bonus earned: +" + pay + " XP and " + pay + " crowns</span></p>";
+    if (c.done && sv && sv.done && sv.pays) return '<button type="button" class="tpv-btn tpv-gold tco-claim" data-tp="coll-claim" data-k="' + esc(c.k) + '">' + ICON.check + "<span>Claim +" + pay + " XP and " + pay + " crowns</span></button>";
+    if (c.done) return '<p class="tco-st is-paid">' + ICON.check + "<span>Finished</span></p>";
+    /* a season's dates as sets.mjs words them ("October", "The week of Easter"): only "The"/"After" go lowercase mid-sentence */
+    var when = String(c.about || "").replace(/^(The|After) /, function(w){ return w.toLowerCase(); });
+    var where = c.kind === "season" ? (S.seasons.indexOf(c.k) >= 0 ? "On sale now: " : "Back in the shop: ") + when + "." : c.kind === "collection" ? "Turns up in the daily and weekly picks." : "Spot Timmy in one, then it’s in your shop.";
+    /* a piece added to a collection after its bonus was paid: it's unfinished again, and the bonus stays paid */
+    return '<p class="tco-st"><b>' + left + " to go</b>" + (sv && sv.paid ? " (bonus already earned)" : S.coll ? " for +" + pay + " XP and " + pay + " crowns" : "") + '<span class="tco-where">' + esc(where) + "</span></p>";
+  }
+  function collCard(c, i){
+    var sale = c.kind === "season" && S.seasons.indexOf(c.k) >= 0, pct = Math.round(c.have / c.items.length * 100), id = "tco-" + c.k;
+    return '<section class="tco' + (c.done ? " is-done" : "") + '" data-k="' + esc(c.k) + '" aria-labelledby="' + esc(id) + '" style="--i:' + i + '">' +
+      '<div class="tco-top"><span class="tco-cover" aria-hidden="true"></span><div class="tco-txt"><h5 id="' + esc(id) + '">' + esc(c.n) + (sale ? ' <span class="tco-chip">In the shop now</span>' : "") + "</h5>" +
+        (c.kind === "season" ? "" : '<p class="tco-about">' + esc(c.about) + "</p>") +
+        '<p class="tco-prog"><span class="tco-bar" aria-hidden="true"><i style="width:' + pct + '%"></i></span><span class="num">' + c.have + " of " + c.items.length + "</span></p></div></div>" +
+      '<ul class="tco-pieces" aria-label="' + esc(c.n) + '">' + c.items.map(function(it){ var own = !!S.own[it.id];
+        return '<li class="tco-p r-' + it.rarity.toLowerCase() + (own ? " is-own" : "") + '" data-id="' + esc(it.id) + '" title="' + esc(cardName(it.n) + " · " + it.rarity + (own ? " · yours" : " · " + num(it.price) + " crowns")) + '">' +
+          '<span class="tco-pic" aria-hidden="true"></span><span class="tco-pn">' + esc(cardName(it.n)) + "</span>" +
+          '<span class="tpv-sr">' + (own ? ", yours" : ", not yet: " + esc(it.rarity) + ", " + num(it.price) + " crowns") + "</span></li>"; }).join("") + "</ul>" +
+      '<div class="tco-foot" aria-live="polite">' + collStatus(c) + "</div></section>";
+  }
+  function collHead(list){
+    var fin = list.filter(function(c){ return c.done; }).length, got = 0, all = 0, pay = num(collPays()), paid = S.coll ? list.filter(function(c){ var sv = S.coll[c.k]; return sv && sv.paid; }).length : 0;
+    list.forEach(function(c){ got += c.have; all += c.items.length; });
+    return '<p class="tco-sum"><span><b class="num">' + fin + "</b> of " + list.length + " finished</span><span><b class=\"num\">" + got + "</b> of " + all + " pieces</span>" +
+      (paid ? '<span><b class="num">+' + num(paid * collPays()) + "</b> XP and crowns earned</span>" : "") + "</p>" +
+      '<p class="tco-lede">Finish one for a bonus of <b>+' + pay + " XP and " + pay + " crowns</b>.</p>";
+  }
+  /* the seasons in the shop now first, then the calendar's order; the rest as the lists have them */
+  function collHTML(){
+    var list = collList(), sale = function(c){ return c.kind === "season" && S.seasons.indexOf(c.k) >= 0 ? 0 : 1; }, i = 0;
+    V.collList = list;
+    return '<div class="tpv-mhead"><h3 id="tpvO">Your collections</h3><p>Every holiday set, year-round collection and rare costume, and what you have of each</p></div>' +
+      '<div class="tco-headin">' + collHead(list) + "</div>" +
+      COLL_KINDS.map(function(g){
+        var cs = list.filter(function(c){ return c.kind === g[0]; }).map(function(c, j){ return [c, j]; }).sort(function(a, b){ return sale(a[0]) - sale(b[0]) || a[1] - b[1]; }).map(function(x){ return x[0]; });
+        if (!cs.length) return "";
+        var fin = cs.filter(function(c){ return c.done; }).length;
+        return '<h4 class="tco-gh">' + esc(g[1]) + ' <span class="num">' + fin + " of " + cs.length + "</span></h4>" + (g[2] ? '<p class="tco-gn">' + esc(g[2]) + "</p>" : "") +
+          '<div class="tco-list">' + cs.map(function(c){ return collCard(c, i++); }).join("") + "</div>";
+      }).join("");
+  }
+  /* a card's drawings: its set's file first (a costume is in the kit), then each piece on the set's own scene */
+  function collArt(sec){
+    if (!V || !sec || sec.__art) return; sec.__art = 1;
+    var c = (V.collList || []).filter(function(x){ return x.k === sec.dataset.k; })[0]; if (!c) return;
+    needPacks(c.items.map(function(it){ return it.id; })).then(function(){
+      if (!V || !sec.isConnected) return;
+      var first = function(kind){ return c.items.filter(function(it){ return it.kind === kind; })[0]; };
+      var sc = first("scene"), scK = sc ? key("scene", sc.id) : "", home = first("home"), pic = function(it){
+        var k = key(it.kind, it.id); if (!k) return "";
+        return it.kind === "outfit" ? thumb("outfit", k) : it.kind === "scene" ? thumb("scene", k) : thumb(it.kind, k, { scene: scK || "hill" }); };
+      $$(".tco-p", sec).forEach(function(li){ var it = c.items.filter(function(x){ return x.id === li.dataset.id; })[0], p = $(".tco-pic", li); if (it && p) p.innerHTML = pic(it); });
+      var cv = $(".tco-cover", sec), mine = c.items.filter(function(it){ return S.own[it.id]; })[0];
+      if (cv) cv.innerHTML = home ? pic(home) : pic(mine || c.items[0]);
+      sec.classList.add("has-art");
+    }, function(){});
+  }
+  function collWire(ov){
+    var box = $(".tpv-overin", ov), secs = $$(".tco", ov);
+    if (W.IntersectionObserver) {
+      V.collIO = new IntersectionObserver(function(es){ es.forEach(function(e){ if (e.isIntersecting) { collArt(e.target); V && V.collIO && V.collIO.unobserve(e.target); } }); }, { root: box, rootMargin: "320px 0px" });
+      secs.forEach(function(s){ V.collIO.observe(s); });
+    } else secs.forEach(collArt);
+    ov.addEventListener("click", function(e){ var b = e.target.closest && e.target.closest('[data-tp="coll-claim"]'); if (b) collClaim(b); });
+  }
+  /* the server's word on the bonuses: each card's foot and the summary are drawn again, nothing else moves */
+  function collRefresh(){
+    var ov = V && $(".tpv-over", V.dlg); if (!ov || ov.hidden || !V.collList) return;
+    V.collList = collList();
+    V.collList.forEach(function(c){ var f = $('.tco[data-k="' + c.k + '"] .tco-foot', ov); if (f && !f.contains(D.activeElement)) f.innerHTML = collStatus(c); });
+    var h = $(".tco-headin", ov); if (h) h.innerHTML = collHead(V.collList);
+  }
+  function collClaim(btn){
+    if (!V || V.claiming) return;
+    var k = btn.dataset.k, sec = btn.closest(".tco"), lab = $("span", btn);
+    V.claiming = true; btn.disabled = true; if (lab) lab.textContent = "Claiming…";
+    claimColl().then(function(d){
+      if (!V) return;
+      V.claiming = false;
+      var foot = sec && $(".tco-foot", sec);
+      if (!d) { btn.disabled = false; if (lab) lab.textContent = "That didn’t go through. Try again"; return; }
+      var c = collList().filter(function(x){ return x.k === k; })[0], won = (d.won || []).indexOf(k) >= 0, pay = num(collPays());
+      if (foot && c) foot.innerHTML = won ? '<p class="tco-st is-paid is-new">' + ICON.check + "<span><b>" + esc(c.n) + " finished!</b> +" + pay + " XP and " + pay + " crowns</span></p>" : collStatus(c);
+      if (won && sec && !isStill()) {
+        sec.classList.remove("is-claimed"); void sec.offsetWidth; sec.classList.add("is-claimed");
+        /* the Legendary burst a new piece lands with, its moves from the kit's stylesheet (in its own shadow root) */
+        var bu = D.createElement("span"); bu.className = "tco-burst"; bu.setAttribute("aria-hidden", "true");
+        if (TP.burst) { if (bu.attachShadow) bu.attachShadow({ mode: "open" }).innerHTML = "<style>" + TP.CSS + "</style>" + TP.burst("Legendary"); else bu.innerHTML = TP.burst("Legendary"); }
+        sec.appendChild(bu); setTimeout(function(){ if (bu.parentNode) bu.parentNode.removeChild(bu); }, 1800);
+      }
+      var keep = foot && $(".tco-st", foot); try { if (keep) { keep.setAttribute("tabindex", "-1"); keep.focus({ preventScroll: true }); } } catch (e) {}
+      collRefresh();   /* another collection finished at the same time is paid in the same call: its card says so */
+    });
+  }
+  function openCollections(o){
+    if (!V || V.m.visiting || !S.game || !TP) return;
+    o = o || {};
+    track("place:collections");
+    overOpen(collHTML(), "is-coll", o.only ? "Close collections" : "Back to the place");
+    V.overOnly = !!o.only;
+    var ov = $(".tpv-over", V.dlg);
+    collWire(ov);
+    readColl().then(function(){ collRefresh(); });
+  }
+  function collCount(){ if (!TP || !S.game) return null; var l = collList(); return { done: l.filter(function(c){ return c.done; }).length, of: l.length }; }
+  function collBtn(){
+    var n = collCount(); if (!n) return "";
+    return '<button type="button" class="tpv-btn tpv-big tpv-collb" data-tp="collections">' + ICON.album + '<span>Collections</span><span class="tpv-collc num" aria-hidden="true">' + n.done + "/" + n.of + '</span><span class="tpv-sr">, ' + n.done + " of " + n.of + " finished</span></button>";
   }
 
   /* ---------- saving: each change shows at once and goes to equip_item; the calls go one after another, in order ---------- */
@@ -852,7 +1026,7 @@
         '<div class="tpv-mebody"><p class="tpv-gk">Timmy today</p><p class="tpv-hp"><b>' + esc(H.n) + '</b><span class="num">' + hp + " HP</span></p>" +
         '<div class="tpv-meter" aria-hidden="true"><i style="width:' + hp + '%"></i></div><p class="tpv-medoes">' + esc(H.does) + ".</p></div></div>" +
       (can ? '<div class="tpv-cta"><button type="button" class="tpv-btn tpv-gold tpv-big" data-tp="customize2">' + ICON.brush + '<span>Customize</span></button>' +
-        '<button type="button" class="tpv-btn tpv-big" data-tp="shop" aria-label="Timmy’s shop">' + ICON.bag + "<span>Shop</span></button></div>" : "") +
+        '<button type="button" class="tpv-btn tpv-big" data-tp="shop" aria-label="Timmy’s shop">' + ICON.bag + "<span>Shop</span></button>" + collBtn() + "</div>" : "") +
       '<div class="tpv-gplate">' + (big ? '<div class="tpv-grank" aria-hidden="true">' + big + "</div>" : "") + '<p class="tpv-gk">Your rank</p><p class="tpv-gr">' + esc(rankName(m)) + "</p></div>" +
       '<div class="tpv-gmedals"><p class="tpv-gk">Hub mastery</p>' + (fl.length
         ? '<ul class="tpv-gml">' + fl.slice(0, 8).map(function(x){ var n = hub(x.hub); return '<li title="' + esc(n) + '"><span aria-hidden="true">' + medal(x) + '</span><span class="tpv-gmn">' + esc(n) + "</span></li>"; }).join("") + "</ul>" +
@@ -862,6 +1036,7 @@
     var mb = $('[data-tp="mastery"]', el); if (mb) mb.addEventListener("click", openMastery);
     var cb = $('[data-tp="customize2"]', el); if (cb) cb.addEventListener("click", function(){ setMode("customize"); });
     var sb = $('[data-tp="shop"]', el); if (sb) sb.addEventListener("click", toShop);
+    var lb = $('[data-tp="collections"]', el); if (lb) lb.addEventListener("click", function(){ openCollections(); });
   }
   /* the customizer's cards sit in their rarity's frame, the shop's own card art (widget/hub-art/shop.js, SH_SHOP_ART.frame;
      Sam, 2026-11-14: "the things you have should reuse the rarity art instead of just having 'legendary' in yellow").
@@ -994,6 +1169,10 @@
   }
 
   var api = W.shPlace = { setup: setup, card: card, open: open, close: close, ready: ready, repaint: repaint, seasonOn: seasonOn, STILL: STILL,
+    /* the shop asks after a collection's piece is bought (claimCollections({ sb, visitor }): the reply, or null), and
+       names what was finished (collName(k)) */
+    claimCollections: claimColl, collName: collName,
     /* for the tests: what stands where, and whether the customizer can be used */
-    state: function(){ return { game: S.game, equipped: copy(S.eq), owned: Object.keys(S.own).length, locked: S.locked.length, open: !!V, mode: V ? V.mode : "", at: V ? V.at : "" }; } };
+    state: function(){ var oc = V && $(".tpv-over", V.dlg); return { game: S.game, equipped: copy(S.eq), owned: Object.keys(S.own).length, locked: S.locked.length, open: !!V, mode: V ? V.mode : "", at: V ? V.at : "",
+      collections: oc && !oc.hidden ? $$(".tco", oc).length : 0, collPaid: S.coll ? Object.keys(S.coll).filter(function(k){ return S.coll[k].paid; }).length : null }; } };
 })();
