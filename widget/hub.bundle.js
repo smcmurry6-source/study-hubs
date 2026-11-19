@@ -2556,8 +2556,31 @@ else if (sec.type === "html") inner = '<div class="rv-html">' + sec.html + "</di
 else if (sec.type === "list") inner = '<ul class="rv-list">' + sec.items.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>";
 else if (sec.type === "figs") inner = '<div class="figs-slot" data-figs="' + esc(sec.figs.join(",")) + '"></div>';
 else if (sec.type === "flows") inner = '<div class="flows">' + (STUDY.sequences || []).filter(function(s){ return !sec.lec || s.lec === sec.lec; }).map(function(s){ return '<div class="flow"><h4>' + esc(s.title) + "</h4><ol>" + s.steps.map(function(st){ return "<li>" + esc(st) + "</li>"; }).join("") + "</ol></div>"; }).join("") + "</div>";
-return '<section class="rv-section">' + (sec.title ? "<h3>" + esc(sec.title) + "</h3>" : "") + inner + "</section>";
+var cov = sec.type === "table" || sec.type === "cards", title = sec.title ? "<h3>" + esc(sec.title) + "</h3>" : "";
+return '<section class="rv-section">' + (cov ? '<div class="rv-head">' + title + '<button class="btn btn-text rv-cover" type="button" data-rvcover="on" aria-pressed="false">' + icon("cards", 18) + "<span>Cover the answers</span></button></div>" : title) + inner + "</section>";
 }
+function coverSection(sec, on){
+var b = sec.querySelector("[data-rvcover]"); if (!b) return;
+b.setAttribute("aria-pressed", on ? "true" : "false"); b.setAttribute("data-rvcover", on ? "off" : "on");
+b.querySelector("span").textContent = on ? "Show all" : "Cover the answers";
+$$("td, dd", sec).forEach(function(c){
+var peek = c.querySelector(".rv-peek");
+if (on && !peek) {
+if (!c.querySelector(".rv-a")) c.innerHTML = '<span class="rv-a">' + c.innerHTML + "</span>";
+c.classList.add("rv-hid");
+c.insertAdjacentHTML("beforeend", '<button class="rv-peek" type="button" data-rvpeek="cell" aria-label="Show this answer">Show</button>');
+} else if (!on) { c.classList.remove("rv-hid"); if (peek) c.removeChild(peek); }
+});
+}
+document.addEventListener("click", function(e){
+var t = e.target && e.target.closest ? e.target.closest("[data-rvcover], [data-rvpeek]") : null, sec = t && t.closest(".rv-section");
+if (!sec) return;
+if (t.hasAttribute("data-rvcover")) { coverSection(sec, t.getAttribute("aria-pressed") !== "true"); return; }
+var cell = t.parentNode; cell.classList.remove("rv-hid"); cell.removeChild(t);
+var next = sec.querySelector(".rv-peek");
+if (!next) coverSection(sec, false);
+else if (e.detail === 0) next.focus();
+});
 function checkYourself(host, lec){
 var pool = (QBL[lec.id] || []).map(function(r){ return QBY[r.id]; }).filter(function(q){ return q && (q.type === "mcq" || q.type === "multi"); });
 var score = function(q){ var s = ansOf(q.id); return (q.likely ? 0 : 2) + (s ? (s.last ? 3 : 1) : 0) + Math.random(); };
