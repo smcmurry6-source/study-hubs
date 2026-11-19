@@ -79,8 +79,13 @@ entry in `hubs.js`.
   yield for L17-L20 recorded 2026-11-17, after the study guide's rebuild; L19 and L20's three levels again 2026-11-18, taught; L21 and L22's the same day). High yield again after any change to a lecture's
   notes, topics, hints or questions, then the content build. L21 and L22 added 29 words to `tools/podcast/lexicon.json`
   (cryptorchidism, leiomyoma, urothelial, botryoides, Trichomonas, PeIN...) and `tools/narrate.py` reads "WHO" as W H O.
-  **Timmy Time:** none yet. Sam, 2026-11-17: "wait for timmy time until we have all the lectures for exam 3"; with L21 and L22
-  in, Sam, 2026-11-18: "after you finish, start a new session for timmy time" ([inbox](../tasks/inbox.md)).
+  **Timmy Time:** "Exam 3: the last-minute review" (`exam3-review`, 52 minutes, 2026-11-19), all seven lectures, each of
+  L17-L22 opening on Dr. Herr's study guide list; script `tools/podcast/heme-endo-exam3/script.md`, audio
+  `audio/timmy-time.mp3`, wired in `content/core.json`'s `podcast` and `hubs.js`. It says nothing as fact that the content
+  flags below keep out of the keys (the script's header lists what it steers around). **A change to the notes means fixing
+  the script and rebuilding the episode in the same PR** (`tools/podcast/README.md`;
+  [text-and-audio-never-drift](../rules/text-and-audio-never-drift.md)). When the hub is archived, the episode comes off with
+  the narration ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)).
 - **Quirks:** `SH_HUB` has no `exam` key on purpose: with one, the engine counts only lectures whose `exam` matches, so
   nothing would count. Lecture A's id is `dental` and its label "A".
 

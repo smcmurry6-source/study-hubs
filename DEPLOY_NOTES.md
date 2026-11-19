@@ -41,6 +41,16 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   the first day of #403's rates: 630 crowns an hour, 13% of crowns spent), the later check-ins in the Occlusion and Heme & Endo
   Exam 2 retrospectives, a reports lesson on exception items. Every query under the 5 s limit; `sh_data_quality()` stopped there,
   so it and `qh_report` weren't read (`tools/lessons-refresh.md` step 1, the database-load task, the inbox).
+- **2026-11-19 (Heme & Endo Exam 3: Timmy Time, Claude Code)** — Sam (11-18): "after you finish, start a new session for
+  timmy time". A 52-minute episode (`exam3-review`, 14 chapters): Dr. Taylor's Lecture A, then L17-L22 in order, each of
+  L17-L22 opening on Dr. Herr's study guide list word for word, the professors' hints quoted, the "you don't need" remarks,
+  then a 29-question lightning round. Written from the hub's own notes, hints, cram and High Likelihood topics only; it steers
+  around every content flag in the hub note (the script's header lists them). Lore (Sam's picks): number thirty-one's letter
+  about a bump ("That's your cusp"), "a tooth for every baby" is a saying, not physiology, and Timmy has blood too; one lore
+  comment (thirty-one's four cusps). 31 words added to `tools/podcast/lexicon.json` (finasteride, dutasteride, tamoxifen,
+  raloxifene, ulipristal, levonorgestrel, Sézary, Sjögren, the trophoblasts...). Wired in `content/core.json` `podcast`
+  (Home's quick link and More's tile), `hubs.js` (the dashboard) and the About page's episode list. Script
+  `tools/podcast/heme-endo-exam3/script.md`; the After merge workflow registers the episode for XP.
 - **2026-11-19 (the dashboard's hub card and What's new, Claude Code)** — Sam: "Make the timmy time card a part of the hub
   blast on home dashboard. Make the whats new box take up that space between the hub card and the you and leaderboard
   cards and look super cool, reformat and rework send luck to make space". `widget/dash.js` + `widget/dash.css` (bundles
