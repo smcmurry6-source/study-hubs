@@ -44,7 +44,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
   (a gold banner on its "Got it" sheet), and a collection finished before shows a Claim button. Halloween 2026's gift set
   pays nothing; rank sets aren't collections ([decisions](vault/decisions.md)). Tests: `tools/release/xp.js` 14d (596
   checks), the smoke test's place section. `migration_v75.sql` was applied right after the merge, through the connector
-  (md5-checked), and is in `supabase/schema.sql` ([the task](vault/tasks/2026-11-19-shop-collections.md)).
+  (md5-checked), and is in `supabase/schema.sql` ([the task](vault/tasks/done/2026-11-19-shop-collections.md)).
 - **2026-11-19 (pages that ride out a busy database: answers kept on the device, and the rank pill, Claude Code)** — (1) An
   answer still unsaved when its tab closed was lost (the line's retries lived in the page). Now `widget/v3.js` writes the
   answers still in the line to the device when the page is hidden (`sh_answers_kept:<hub>`), takes them back when it shows
