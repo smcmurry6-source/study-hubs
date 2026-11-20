@@ -102,7 +102,7 @@ last evening's audit (6 pm). Live hubs: **Review of Systems** (two mock boards, 
 far) and **Heme & Endo Exam 3** until it archives at 10 pm tonight; its retrospective is below. **The database is 358 MB** of the Free
 plan's 500 MB (`personal_answers` 84 MB, `activity_pings` 46, `question_events` 38, `xp_seen` 33, `answer_xp` 27), 29 MB more than last
 evening (the Exam 3 eve). **Data quality** (the admin page's kept copy, 1:41 am): no test rows in clicks, events, time or answers, every
-table writing, 25 visitor-hours counted twice (164 minutes, nothing to correct), 323 visitor ids with 38 linked. The smoke test's rows
+table writing, 25 visitor-hours counted twice (164 minutes in all, small), 323 visitor ids with 38 linked. The smoke test's rows
 of 11-19 are gone (this hub's arcade is down to a single player). **One more leak, found by reading question health:** 13 made-up
 visitors since 11-19 2:59 pm, two answers each on two questions no hub has (`pq-1`, `pq-2`, ctx "mock"), plus 6 in Perio: the mock
 checks of `tools/ci/quiet.js` run from branches older than `tools/ci/no-leaks.js` (#476). Today's `quiet.js`, run behind a proxy that
