@@ -138,9 +138,11 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
   window. `sh_easter(year)` is the Easter date both use.
 - **Halloween 2026's set is everyone's** (`gift`): owned by every visitor with no row written, never sold (`buy_item` says
   `owned`), never on the daily, weekly or throwback shelves; in October it is listed on the season shelf as owned.
-- **Rank sets** (Sam: an outfit and a decoration for each full rank-up, earned by rank, never sold): twelve rows for the
-  Handpiece's six ranks (`rank_tier` 1-6 is `sh_rank`'s `gtier`: Antique to Dark Matter; the ModuPro's and the Loupes'
-  sets, tiers 7-20, come before anyone reaches them). Owned by anyone whose rank has reached the tier, so the sets of ranks
+- **Rank sets** (Sam: an outfit and a decoration for each full rank-up, earned by rank, never sold): forty rows, twelve for
+  the Handpiece's six ranks (`rank_tier` 1-6 is `sh_rank`'s `gtier`: Antique to Dark Matter) and, since migration_v91, 28
+  for the ModuPro's and the Loupes' seven each (7-13 and 14-20: Stone to Dark Matter, so ModuPro Stone, gtier 7, is reached
+  at 125,000 XP). Their drawings are `tools/figures/site/packs/ranks.mjs`; the later journeys' outfits are in
+  `widget/hub-art/outfits/journeys.js`, fetched only when someone wears one. Owned by anyone whose rank has reached the tier, so the sets of ranks
   already passed are theirs with no rows written. Never on a shelf; `buy_item` says `rank`.
 - **Who owns what** is decided in one place, `sh_owned(visitor)` (and `sh_owns(visitor, item)`): what was bought, every
   gift, and every rank item reached. `equip_item`, `buy_item` and `get_my_shop` all use it.

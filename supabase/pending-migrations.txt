@@ -38,3 +38,4 @@
 # migration_v88 (a survey asks each person once: get_active_survey and get_my_survey across linked ids) was applied on 2026-11-20 (through the connector as v88a-d, one statement each, md5-checked, PR #489).
 # migration_v90 (an admin read with no kept copy is left to the sh-admin-cache job and answers "being worked out": sh_admin_cached, the four admin functions, get_admin_cache_status's "pending") was applied on 2026-11-20 (through the connector in one call, md5-checked before and after, PR #495).
 # migration_v89 (crowns for reaching a journey: 5,000 for each Dark Matter, 20,000 for the ModuPro, 30,000 for the Loupes, with back pay; sh_wallet, sh_prizes) was applied on 2026-11-20 (through the connector in one call, md5-checked before and after, PR #492).
+migration_v91.sql
