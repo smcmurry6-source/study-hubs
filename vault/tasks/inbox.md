@@ -65,7 +65,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `cluster` at night. Measure on a copy first (`tools/release/bench-answers.js`).
   **Read 2026-11-20, 2:30 am: 17 + 16 MB** (187,763 rows; 30.7 MB after the noon rewrite), under 40 MB with the last live
   hub's exam that morning, so nothing to do now. Every lessons audit reads the table sizes (`tools/lessons-refresh.md` step 1):
-  past about 40 MB, write a new line for the partial rebuild (#PR).
+  past about 40 MB, write a new line for the partial rebuild (#488).
 - [ ] **Read the data-quality report** (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
   `select sh_data_quality();` stopped at the audit's 5 s limit both times (80 people in Perio on its final's eve; then at 12:40 pm
   the next day, between the Perio final and the Heme & Endo Exam 3 eve). `qh_report('perio')` was read with the retrospective
