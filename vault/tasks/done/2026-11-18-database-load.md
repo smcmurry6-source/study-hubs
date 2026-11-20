@@ -294,7 +294,8 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   `ui_click_reach` rows, 100,000 live, and a faster CPU). 15 rows kept (the reads above, each day range the page offers),
   then set as read 3 hours ago, so they're refreshed nightly and not every 15 minutes overnight. The ticks after: 0.01 s with
   nothing due. Found, for later (inbox): a read the table doesn't have yet that takes over 3 s still times out for the page,
-  and leaves no row for the job.
+  and leaves no row for the job. Fixed by `migration_v90.sql` (#495): a first read leaves the row for the job and the page
+  says "Being worked out".
 
 ## Outcome
 
@@ -309,6 +310,8 @@ indexes (`migration_v71.sql`), the outage's study time and answers were restored
 (`migration_v74.sql`): the database went 465 → 318 MB on 2026-11-19 (323 MB that afternoon), under the Free plan's 500 MB.
 Sam stayed on the Free plan ([decisions](../../decisions.md)).
 
+An admin read with no kept copy yet no longer times out (`migration_v90.sql`, #495).
+
 Left, on the to-do list: the second free project for the analytics, parked in [the inbox](../inbox.md) until the database
-nears about 420 MB; an admin read with no kept copy still times out (the inbox); `sh_data_quality` to read from the kept copy
+nears about 420 MB; `sh_data_quality` to read from the kept copy
 (the inbox).

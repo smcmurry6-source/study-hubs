@@ -51,6 +51,9 @@ The **Preview** button, bottom left, opens the controls:
   (`localStorage.sh_preview_ui`, e.g. `{"missing": ["admin_timmy_"]}`) makes every function whose name starts with one of
   those answer "Could not find the function", as the live database does before its migration. `tools/release/admin-ui.js`
   uses it to see the admin page's Ask Timmy tab as it is until the redesign's release.
+- **An admin read not worked out yet** (`migration_v90.sql`; no button either): `pending` in the same settings, e.g.
+  `{"pending": ["insights", "qh:perio", "visitors:30"]}`, makes those reads answer "being worked out" for 45 s after their
+  first read, then normally, so the admin page's "Being worked out" and its redraw can be seen.
 
 If the button turns red, something tried to reach production: that's an S1 bug, report it (the write log says what).
 
