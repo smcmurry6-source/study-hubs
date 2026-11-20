@@ -76,12 +76,21 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   **Read 2026-11-20, 2:30 am: 17 + 16 MB** (187,763 rows; 30.7 MB after the noon rewrite), under 40 MB with the last live
   hub's exam that morning, so nothing to do now. Every lessons audit reads the table sizes (`tools/lessons-refresh.md` step 1):
   past about 40 MB, write a new line for the partial rebuild (#488).
+- [ ] **An admin read the kept copies don't have yet still times out, and leaves nothing for the job** (2026-11-20, found
+  applying `migration_v83.sql`, [the database-load note](2026-11-18-database-load.md)'s Log). Live, insights takes 4.1 s to
+  work out, Perio's question health 3.6 s and clicks up to 3.2 s, over a visitor's 3 s limit. A key with a row is fine (the page
+  gets the kept copy and `sh-admin-cache`, with 10 s, works out the new one), and the night of the apply filled the usual ones.
+  But a key with no row (a hub's first Question health, a read unused for 30 days) is worked out inline by `sh_admin_cached`;
+  when that stops at 3 s, the error rolls back with it, so no row is left and the job never picks it up: the page shows the
+  error until a quiet moment. A fix: on a first read, insert the row with no body and return a "being worked out" marker the
+  admin page shows (with its "newer numbers on the way" and the 30 s look) instead of working it out inline. Small; needs
+  `review/index.html` and a migration, tested in `tools/release/admin-ops.js`.
 - [ ] **Read the data-quality report** (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
   `select sh_data_quality();` stopped at the audit's 5 s limit both times (80 people in Perio on its final's eve; then at 12:40 pm
   the next day, between the Perio final and the Heme & Endo Exam 3 eve). `qh_report('perio')` was read with the retrospective
-  (2026-11-19: no miskeys). Once `migration_v83.sql` is live, read the admin page's kept copy instead, at any hour (`admin_cache`'s
-  `quality`; the query in `tools/lessons-refresh.md` step 1; the night v83 is applied fills it, and it's refreshed nightly for a
-  week); until then, once between 1 and 5 am Central. Tick this when it's read. (Not run again on 2026-11-19 at 5 pm either, the
+  (2026-11-19: no miskeys). `migration_v83.sql` is live since 2026-11-20 (1:45 am Central): read the admin page's kept copy
+  instead, at any hour (`admin_cache`'s `quality`, first worked out at 1:41 am that night; the query in `tools/lessons-refresh.md`
+  step 1; refreshed nightly for a week, and every 15 minutes while the admin page is in use). Tick this when it's read. (Not run again on 2026-11-19 at 5 pm either, the
   Heme & Endo Exam 3 eve; that audit found test runs in the data by reading the clicks, BUG-192.)
 - [x] **The other `shGame.v2()` checks while the bootstrap times out** (#468) (2026-11-19, found with the rank pill's fix). Three more
   places wait for `v2()` (true only once the bootstrap or an answer's reply came back) where `shGame.live()` would do: Timmy
