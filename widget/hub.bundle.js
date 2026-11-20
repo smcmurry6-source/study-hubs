@@ -1169,7 +1169,7 @@ var BASIS_IDS = {};
 function lkBasis(b){
 b = String(b || "").toLowerCase();
 if (!HX.CORE) return {};
-if (!BASIS_IDS[b]) { var s = BASIS_IDS[b] = {}; (HX.CORE.likelyTopics || []).forEach(function(t){ if (String(t.basis || "").toLowerCase().indexOf(b) > -1) (t.ids || []).forEach(function(id){ s[id] = 1; }); }); }
+if (!BASIS_IDS[b]) { var s = BASIS_IDS[b] = {}; (HX.CORE.likelyTopics || []).forEach(function(t){ if (String(t.basis || "").toLowerCase().indexOf(b) > -1) (t.picks || t.ids || []).forEach(function(id){ s[id] = 1; }); }); }
 return BASIS_IDS[b];
 }
 HX.lkBasis = lkBasis;

@@ -23,7 +23,8 @@ it, and adds only its own toggles (`SH_HUB.bank.only`). The single-file hubs arc
   toggle for its own case, one on at a time (Heme & Endo Exam 2: **Exam 1 High likelihood**, `likely1`, the Exam 1 Refresher's
   predicted-topic questions; Sam, 2026-11-06; Heme & Endo Exam 3: **On the study guide**, `{ basis: "study guide" }`, the questions of
   the topics that rest on Dr. Herr's study guide; Sam, 2026-11-20). A toggle's spec is `{ prop, lec }` (a question property, in one
-  lecture) or `{ basis }` (the topics whose `basis` names those words, worked out on the page from `likelyTopics`). Exam Hints' "Practice these" opens the bank with the toggle on and Show on All; Home's
+  lecture) or `{ basis }` (the topics whose `basis` names those words, worked out on the page from `likelyTopics`: a topic's `picks` when it has
+  them, else its `ids`; Exam 3's guide topics pick 115 of their 209, each point asked once, Sam, 2026-11-20). Exam Hints' "Practice these" opens the bank with the toggle on and Show on All; Home's
   buttons into the bank start with it off.
 - **Sets**: a row under Show: Daily drill, Yesterday's misses, Weak spots, Mock exam (`#questions/<set>`). A set replaces the list
   until it's closed; the filters stay as they were. Above the panel, **Study as** picks how the chosen questions are asked:

@@ -298,13 +298,15 @@
      isn't ticked, then unticks it again when the toggle goes off (STATE.ui.qE1auto, as on the live hub). */
   /* Or [key, label, { basis }]: the questions a predicted topic lists whose basis names those words (core.json's
      likelyTopics), in whatever lecture (Heme & Endo Exam 3's On the study guide, basis "study guide"; Sam, 2026-11-20: "make
-     a filter ... that is only the high likelihood questions from the study guide"). HX.lkBasis is also the study guide page's. */
+     a filter ... that is only the high likelihood questions from the study guide"). A topic with picks gives only those (the same
+     day: "can we make it higher yield with less redundant questions"; tools/hub-next/build.mjs checks them), one with none all
+     its ids. HX.lkBasis is also the study guide page's. */
   var LIKELY = [["likely", "High likelihood"]].concat((C.bank && C.bank.only) || []);
   var BASIS_IDS = {};
   function lkBasis(b){
     b = String(b || "").toLowerCase();
     if (!HX.CORE) return {};
-    if (!BASIS_IDS[b]) { var s = BASIS_IDS[b] = {}; (HX.CORE.likelyTopics || []).forEach(function(t){ if (String(t.basis || "").toLowerCase().indexOf(b) > -1) (t.ids || []).forEach(function(id){ s[id] = 1; }); }); }
+    if (!BASIS_IDS[b]) { var s = BASIS_IDS[b] = {}; (HX.CORE.likelyTopics || []).forEach(function(t){ if (String(t.basis || "").toLowerCase().indexOf(b) > -1) (t.picks || t.ids || []).forEach(function(id){ s[id] = 1; }); }); }
     return BASIS_IDS[b];
   }
   HX.lkBasis = lkBasis;
