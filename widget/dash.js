@@ -1266,6 +1266,9 @@
         h += '</div>';
       });
       h += '<div class="survey-foot"><button type="button" class="survey-skip">Later</button><button type="button" class="btn btn-primary survey-send" disabled>Send</button></div>';
+      /* once per person (Sam, 2026-11-20): the server counts linked devices as one (migration_v88), but two devices never
+         linked are two people to it, so this one offers Link my devices. Either way round, the link brings the answer along. */
+      h += '<p class="survey-why survey-linknote">Already answered it on another device? <button type="button" class="survey-link">Link this device</button> and it won’t ask again.</p>';
       W.set(h);
       W.say(re ? "Me again! There are still " + num(FORM_CROWNS) + " crowns in it for you." : "Got a minute? I pay in crowns.");
       var send = box.querySelector(".survey-send");
@@ -1321,6 +1324,8 @@
           refresh(); return;
         }
         if (sent) return;
+        /* nothing is recorded: if the devices don't get linked, the pop-up is back next visit */
+        if (e.target.closest(".survey-link")) { sent = true; W.close(true); openLink($("greetLink") || $("greetEdit"), "survey"); return; }
         if (e.target.closest(".survey-skip")) done(null, false);
         else if (e.target.closest(".survey-send") && !send.disabled) done(answers, true);
       });
