@@ -64,6 +64,7 @@
         '<div class="toolbar" role="toolbar" aria-label="Study guide tools">' +
           '<button type="button" class="btn sh-tts-btn" id="sh-tts-btn"' + (mp3 ? ' data-sh-tts-audio="1"' : ' title="Read aloud in your device\'s voice"') + ' aria-label="Listen to the study guide">' + icon("listen", 18) + '<span class="sh-tts-label-play">Listen</span><span class="sh-tts-label-pause">Pause</span></button>' +
           (HX.followBtn ? HX.followBtn() : "") +   // an engine from before it had one: no toggle
+          (HX.foldBtn ? HX.foldBtn() : "") +
           '<button type="button" class="btn btn-text" data-report-notes>' + icon("report", 18) + "Report a mistake</button>" +
           '<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
         "</div>" +
@@ -74,6 +75,9 @@
         "</article>";
       el.innerHTML = '<div class="hx-page notes"><div class="notes-grid">' + HX.lecListHTML(LBY[STATE.ui.lec] || HX.LECS[0], true) + art + "</div></div>";
       var prose = $(".reading-prose", el);
+      /* each item folds like a topic in the notes (Sam, 2026-11-20: "yes make the study guide fold too"), its key terms too;
+         the lecture headings and Practice buttons stay, and Collapse all leaves a list of the items under each lecture */
+      if (HX.foldParts) HX.foldParts(S.map(function(g){ var sec = $("#gd-" + g.lec, el); return { root: sec, key: "guide/" + g.lec, heads: $$(":scope > h3", sec) }; }), el, ".gd-acts");
       HX.wireLecPick(el);
       $$("[data-gdjump]", el).forEach(function(b){ b.addEventListener("click", function(){ var s = document.getElementById("gd-" + b.getAttribute("data-gdjump")); if (s) s.scrollIntoView({ block: "start", behavior: HX.reduced ? "auto" : "smooth" }); track("notes:guide-jump"); }); });
       var tts = $("#sh-tts-btn", el);
