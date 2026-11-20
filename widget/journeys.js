@@ -3,16 +3,18 @@
    (a v2 rank profile, migration_v54). Nothing here runs on a live hub.
 
      shJourneys.handoff(d, done)   a journey's Dark Matter III is done and the next object is handed over, once:
-                                   d = { from, to } (journeys 0-2). "The ModuPro is yours."
+                                   d = { from, to } (journeys 0-2). "The ModuPro is yours." The ModuPro has its own scene
+                                   (the drill, the shattered screen, the typodont), the Loupes the one before it.
      shJourneys.dark(d, done)      a journey's Dark Matter is reached, once per journey ever: d = { journey, position, of }
                                    (where the student stands in the class, if known). It shows the 5,000 crowns it pays.
      shJourneys.road(p)            the road ahead for the "you" panels, as markup: p is a v2 rank profile
      shJourneys.css()              adds the stylesheet (the scenes and the road share it)
 
-   Both scenes are a dialog over the page: Esc closes them, Skip closes the hand-off and takes the Dark Matter unlock to
-   its last frame (its reward stays on screen), the last button closes them, focus goes back where it was. Reduced motion
-   gets the last frame, faded in, with nothing moving. They move transform and opacity only, but for the Dark Matter
-   title's one sheen; the Dark Matter unlock's dust, burst, ring of light and coins are drawn on one canvas.
+   Both scenes are a dialog over the page: Esc closes them, Skip closes the Loupes' hand-off and takes the Dark Matter
+   unlock and the ModuPro's hand-off to their last frame (what they give stays on screen), the last button closes them,
+   focus goes back where it was. Reduced motion gets the last frame, faded in, with nothing moving. They move transform
+   and opacity only, but for the Dark Matter title's one sheen; the Dark Matter unlock's dust, burst, ring of light and
+   coins, and the ModuPro's sparks, cracked glass and typodont, are each drawn on one canvas.
    No sound yet: the site has no sound setting, and these stay silent until it has one (a to-do in the journeys note).
    The medallions are shRanks.artOf (the handpiece by ranks.js, the ModuPro and the loupes by widget/hub-art/journeys.js,
    which is fetched first). When a scene reaches its peak it sends "sh:journey-scene", and "sh:journey-scene-end" when it
@@ -240,6 +242,46 @@
     "@container shj (max-width:420px){.shj-hand .shj-in{padding-top:46px}}",
     "@container shj (max-width:300px){.shj-track{justify-self:stretch}.shj-track li{flex:1 1 0;width:auto;min-width:0;font-size:11px}.shj-ahead{flex-wrap:wrap;row-gap:6px}}",
 
+    /* ----- the hand-off to the ModuPro: the Handpiece spins up to 400,000 RPM throwing sparks and drills into the screen,
+       the screen cracks and falls away in shards, and behind it is the sim lab under its light, where the typodont's teeth
+       fly in and snap into their arches, the jaws bite down, and the typodont becomes the ModuPro medallion. The times
+       are --imp (the drill hits the glass), --brk (it shatters), --chomp (the bite), --slam and --rise. ----- */
+    ".shj-mp{background:#05020C;--mpk:#9BE7EE}",
+    ".shj-lab{position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 55% at 50% 0%,rgba(255,246,222,.26),rgba(255,246,222,0) 70%),linear-gradient(180deg,#17485C 0%,#0C2A38 50%,#061118 100%)}",
+    ".shj-cone{position:absolute;left:-30%;right:-30%;top:0;bottom:0;background:linear-gradient(180deg,rgba(255,244,214,.3),rgba(255,244,214,.07) 70%,rgba(255,244,214,0));clip-path:polygon(44% 0,56% 0,82% 100%,18% 100%);opacity:0;pointer-events:none}",
+    ".shj-lamp{position:absolute;left:50%;top:-70px;width:380px;height:140px;margin-left:-190px;border-radius:50%;background:radial-gradient(closest-side,#FFFDF4,rgba(255,246,222,.65) 45%,rgba(255,246,222,0));opacity:0;pointer-events:none}",
+    ".shj-mp.is-on .shj-cone,.shj-mp.is-on .shj-lamp{animation:shj-rayin 1.2s ease-out both;animation-delay:calc(var(--brk) + .15s)}",
+    ".shj-space{position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 8%,#2A1456 0%,#130A2B 52%,#05020C 100%)}",
+    ".shj-mp.is-broken .shj-space{visibility:hidden}",
+    ".shj-mp.is-on .shj-in{animation:shj-quake .7s linear var(--imp),shj-quake .5s linear var(--chomp)}",
+    ".shj-mp.is-on .shj-stage{animation:shj-up .9s cubic-bezier(.65,0,.35,1) both;animation-delay:var(--rise)}",
+    ".shj-mp .shj-eyebrow,.shj-mp .shj-aheadcap{color:var(--mpk)}",
+    ".shj-mp .shj-pre{top:-46px;bottom:auto}",
+    ".shj-hp{position:relative;opacity:0}.shj-hp .shj-med{width:100%}",
+    ".shj-mp.is-on .shj-hp{animation:shj-oldin .6s ease-out .2s both,shj-tremble 2.2s linear .5s,shj-lunge .38s cubic-bezier(.55,0,1,.45) 2.55s forwards}",
+    "@keyframes shj-lunge{0%{opacity:1;transform:scale(1.08)}100%{opacity:0;transform:scale(3.4)}}",
+    ".shj-whirl{position:absolute;left:-14%;top:-14%;width:128%;height:128%;border-radius:50%;opacity:0;pointer-events:none;",
+    "background:repeating-conic-gradient(from 0deg,rgba(255,236,170,0) 0deg 8deg,rgba(255,236,170,.6) 8deg 11deg,rgba(255,236,170,0) 11deg 24deg);",
+    "-webkit-mask:radial-gradient(circle,transparent 52%,#000 57%,#000 67%,transparent 71%);mask:radial-gradient(circle,transparent 52%,#000 57%,#000 67%,transparent 71%)}",
+    ".shj-mp.is-on .shj-whirl{animation:shj-whirl 2.2s cubic-bezier(.6,0,1,.6) .4s both,shj-whirlout .3s ease-in 2.55s forwards}",
+    "@keyframes shj-whirl{0%{opacity:0;transform:rotate(0)}15%{opacity:1}100%{opacity:1;transform:rotate(2520deg)}}",
+    "@keyframes shj-whirlout{to{opacity:0;transform:rotate(2700deg) scale(1.6)}}",
+    ".shj-rpm{position:absolute;left:-60%;right:-60%;bottom:-58px;margin:0;font-weight:800;color:#FFE7A0;white-space:nowrap;font-variant-numeric:tabular-nums;opacity:0}",
+    ".shj-rpm b{font-size:32px;letter-spacing:-.01em}.shj-rpm span{margin-left:6px;font-size:14px;letter-spacing:.14em;color:#F5DFA0}",
+    ".shj-rpm.is-max b{color:#fff}",
+    ".shj-mp.is-on .shj-rpm{animation:shj-rayin .4s ease-out .5s both,shj-rpmout .3s ease-in 2.6s forwards}",
+    "@keyframes shj-rpmout{to{opacity:0;transform:scale(1.5)}}",
+    ".shj-mp.is-on .shj-flash{animation:shj-flash2 .8s ease-out both;animation-delay:var(--at)}",
+    ".shj-flash.is-soft{background:#E6FBFF}.shj-mp.is-on .shj-flash.is-soft{animation:shj-flash3 .6s ease-out both;animation-delay:var(--at)}",
+    "@keyframes shj-flash3{0%{opacity:0}8%{opacity:.55}100%{opacity:0}}",
+    ".shj-mp .shj-new .shj-med{width:86%}",
+    ".shj-mpt .shj-wd{display:inline-block;opacity:0}",
+    ".shj-mp.is-on .shj-mpt .shj-wd{animation:shj-word .75s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--at) + var(--i) * .13s)}",
+    "@keyframes shj-word{0%{opacity:0;transform:scale(2.6) translateY(-.2em)}60%{opacity:1}100%{opacity:1;transform:none}}",
+    ".shj-mpn{background:linear-gradient(180deg,#FFFFFF 15%,#9BE7EE 90%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}",
+    ".shj.is-still .shj-wd{opacity:1;transform:none}.shj.is-still .shj-cone,.shj.is-still .shj-lamp{opacity:1}",
+    ".shj.is-still .shj-hp,.shj.is-still .shj-whirl,.shj.is-still .shj-rpm,.shj.is-still .shj-space{display:none}",
+
     /* ----- the road ahead (the 'you' panels) ----- */
     ".shj-road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 0;padding:0;list-style:none}",
     ".shj-road li{display:grid;justify-items:center;align-content:start;gap:3px;padding:14px 8px 12px;border-radius:var(--r-row,14px);background:var(--row,#fff);text-align:center;min-width:0}",
@@ -350,10 +392,315 @@
     el.style.setProperty("--ox", Math.round(rb.left + rb.width / 2 - ra.left - ra.width / 2) + "px");
     el.style.setProperty("--oy", Math.round(rb.top + rb.height / 2 - ra.top - ra.height / 2) + "px");
   }
+  /* ---------- the hand-off to the ModuPro (Sam, 2026-11-20: "something absolutely bananas when you rank up to modupro.
+     completely unique and epic"). About 9 seconds to the button:
+       0.5-2.5 s  the Dark Matter Handpiece spins up, 0 to 400,000 RPM, its whirl faster and faster, sparks spraying off it;
+       2.6-2.9 s  it drills into the screen (--imp): a flash, the glass cracks from where it hit, the screen shakes;
+       3.3 s      the glass shatters and falls away (--brk): behind it is the sim lab, its light coming on;
+       3.55-5 s   the typodont: its base and gums slide in, then 28 teeth fly in from everywhere and snap into their arches;
+       5.1 s      the jaws bite down (--chomp): a flash along the bite, sparks, the screen shakes;
+       5.6 s      the typodont folds into the ModuPro medallion (--slam), which rises to its place (--rise);
+       6.9-9 s    what the hand-off has always said: the road, the title word by word, the seven new ranks, the trophy.
+     Skip jumps to the last frame, Esc closes. The Loupes keep the hand-off above. ---------- */
+  var MP = { imp: 2.93, brk: 3.3, jaw: 3.55, teeth: 3.85, chomp: 5.1, morph: 5.6, slam: 5.75, rise: 6.3 };
+  function mpHTML(d){
+    var T0 = MP.slam, R0 = MP.rise + .6;
+    function s(x){ return x.toFixed(2) + "s"; }
+    var track = [0, 1, 2].map(function(j){
+      var st = j < 1 ? "is-done" : j === 1 ? "is-now" : "is-lock";
+      return '<li class="' + st + '"><span class="shj-sock' + (j === 0 ? " shj-sockdone" : j === 1 ? " shj-socknow" : "") + '"' + (j === 1 ? ' style="--at:' + s(R0 + .5) + '"' : "") + ">" +
+        (j > 1 ? LOCK : R.artOf(j, j < 1 ? 6 : 0, 36) + (j < 1 ? CHECK : "")) + "</span>" + esc(JN[j]) + "</li>";
+    }).join("");
+    var sparks = "";
+    for (var i = 0, x = 23; i < 34; i++){
+      x = (x * 9301 + 49297) % 233280; var a = x / 233280 * Math.PI * 2; x = (x * 9301 + 49297) % 233280; var r = 120 + x / 233280 * 190;
+      sparks += '<i class="shj-spark" style="--sx:' + Math.round(Math.cos(a) * r) + "px;--sy:" + Math.round(Math.sin(a) * r) + "px;--d:" + (i % 6 * .04).toFixed(2) + 's"></i>';
+    }
+    var ahead = T.map(function(t, i){ return '<li style="--i:' + i + '"' + (i ? "" : ' class="is-now"') + ">" + R.artOf(1, i, 36) + esc(t.name) + "</li>"; }).join("");
+    var tro = trophySvg("journey-0");
+    var words = ["The", "ModuPro", "is", "yours."].map(function(w, i){ return '<span class="shj-wd' + (i === 1 ? " shj-mpn" : "") + '" style="--i:' + i + '">' + w + "</span>"; }).join(" ");
+    return '<span class="shj-lab"></span><span class="shj-cone"></span><span class="shj-lamp"></span>' +
+      '<span class="shj-space"><svg class="shj-sky" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + stars(5, 120, 800, 600) + "</svg></span>" +
+      '<canvas class="shj-cv" aria-hidden="true"></canvas>' +
+      '<span class="shj-flash" style="--at:' + s(MP.imp) + '"></span><span class="shj-flash is-soft" style="--at:' + s(MP.chomp + .14) + '"></span>' +
+      '<div class="shj-in">' +
+      '<ol class="shj-track" aria-label="The three journeys" data-at style="--at:' + s(R0) + ";--land:" + s(R0 + .4) + '">' + track + "</ol>" +
+      '<div class="shj-stage" style="--at:' + s(T0) + '">' +
+        '<span class="shj-rays" style="--at:' + s(T0 + .2) + '"></span><span class="shj-halo"></span>' +
+        '<span class="shj-ring"></span><span class="shj-ring" style="--at:' + s(T0 + .25) + '"></span>' +
+        '<span class="shj-whirl"></span>' +
+        '<span class="shj-hp" aria-hidden="true">' + med(0, 6, 200, { animate: true, level: 3 }) + "</span>" +
+        '<p class="shj-pre" aria-hidden="true">Dark Matter III. The Handpiece is finished.</p>' +
+        '<p class="shj-rpm" aria-hidden="true"><b>0</b><span>RPM</span></p>' +
+        '<span class="shj-new">' + med(1, 0, 240, { animate: true, level: 1 }) + "</span>" + sparks +
+      "</div>" +
+      '<p class="shj-eyebrow" data-at style="--at:' + s(R0 + .1) + '"><span class="shj-nw">Journey 2 of 3</span> · <span class="shj-nw">' + fmt(125000) + " XP</span></p>" +
+      '<h2 class="shj-title shj-mpt" aria-label="The ModuPro is yours." style="--at:' + s(R0 + .25) + '"><span aria-hidden="true">' + words + "</span></h2>" +
+      '<p class="shj-line" data-at style="--at:' + s(R0 + .75) + '">You finished the Handpiece. Your XP, your trophies and everything you earned come with you.</p>' +
+      '<ol class="shj-ahead" aria-label="Seven new ranks" style="--at:' + s(R0 + 1.05) + '">' + ahead + "</ol>" +
+      '<p class="shj-aheadcap" data-at style="--at:' + s(R0 + 1.65) + '">Seven new ranks, Stone to Dark Matter</p>' +
+      (tro ? '<p class="shj-chip" data-at style="--at:' + s(R0 + 1.85) + '">' + tro + "Trophy won: Handpiece finished</p>" : "") +
+      '<button type="button" class="shj-go" data-shj="go" data-at style="--at:' + s(R0 + 2.15) + '">Begin the ModuPro</button></div>';
+  }
+  /* the teeth, seen from the front, in a box: x 0-1 across, y 0 at the gum and 1 at the biting edge (an upper tooth;
+     a lower one is drawn flipped) */
+  var TOOTH = {
+    i: "M.1 0 C.4 -.03 .6 -.03 .9 0 C.98 .25 .97 .6 .93 .9 C.9 .99 .82 1 .5 1 C.18 1 .1 .99 .07 .9 C.03 .6 .02 .25 .1 0 Z",
+    c: "M.12 0 C.4 -.03 .6 -.03 .88 0 C.98 .25 .98 .55 .9 .72 C.8 .86 .64 .95 .5 1 C.36 .95 .2 .86 .1 .72 C.02 .55 .02 .25 .12 0 Z",
+    p: "M.1 0 C.4 -.03 .6 -.03 .9 0 C.99 .3 .98 .62 .88 .8 C.78 .9 .62 .9 .5 1 C.38 .9 .22 .9 .12 .8 C.02 .62 .01 .3 .1 0 Z",
+    m: "M.06 0 C.4 -.03 .6 -.03 .94 0 C1 .3 1 .62 .94 .82 C.88 .95 .78 .95 .72 .88 C.65 .96 .58 .98 .5 .9 C.42 .98 .35 .96 .28 .88 C.22 .95 .12 .95 .06 .82 C0 .62 0 .3 .06 0 Z"
+  };
+  /* each side's seven, from the midline back: kind, width, height (a central incisor is 1 by 1) */
+  var ARCH = {
+    u: [["i", 1, 1], ["i", .78, .86], ["c", .82, 1.02], ["p", .68, .84], ["p", .62, .8], ["m", .66, .74], ["m", .54, .66]],
+    l: [["i", .66, .86], ["i", .7, .86], ["c", .78, .98], ["p", .66, .82], ["p", .62, .8], ["m", .7, .74], ["m", .58, .66]]
+  };
+  function labFx(el){
+    var cv = el.querySelector(".shj-cv"), g = cv && cv.getContext ? cv.getContext("2d") : null;
+    if (!g || !window.Path2D) return null;
+    var dpr = Math.min(2, window.devicePixelRatio || 1), W = 0, H = 0, ps = [], ems = [], raf = 0, last = 0, dead = false;
+    var stage = el.querySelector(".shj-stage"), C = { x: 0, y: 0, r: 90 }, crack = null, jaw = null, TP = {}, k;
+    for (k in TOOTH) TP[k] = new Path2D(TOOTH[k]);
+    function at(){ var st = stage.getBoundingClientRect(), c = cv.getBoundingClientRect(); C.x = st.left + st.width / 2 - c.left; C.y = st.top + st.height / 2 - c.top; C.r = st.width * .39; }
+    function fit(){ W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); at(); if (jaw) layout(jaw); }
+    fit(); window.addEventListener("resize", fit);
+    function rnd(a, b){ return a + Math.random() * (b - a); }
+    function pick(a){ return a[Math.random() * a.length | 0]; }
+    function go(){ if (!raf && !dead) raf = requestAnimationFrame(tick); }
+    function tick(now){
+      raf = 0; if (dead) return;
+      var dt = last ? Math.min(.05, (now - last) / 1000) : 1 / 60; last = now;
+      at();
+      ems = ems.filter(function(e){ return e(dt) !== false; });
+      g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+      if (crack) drawCrack(dt);
+      if (jaw) drawJaw(dt);
+      for (var i = ps.length - 1; i >= 0; i--) {
+        var p = ps[i]; p.age += dt;
+        var u = p.age / p.life;
+        if (u >= 1) { ps.splice(i, 1); continue; }
+        var d = Math.pow(p.drag || 1, dt * 60);
+        p.vx *= d; p.vy = p.vy * d + (p.g || 0) * dt; p.x += p.vx * dt; p.y += p.vy * dt; if (p.vr) p.rot += p.vr * dt;
+        draw(p, u);
+      }
+      g.globalAlpha = 1; g.globalCompositeOperation = "source-over";
+      if (ps.length || ems.length || crack || jaw) go(); else last = 0;
+    }
+    function draw(p, u){
+      if (p.t === "shard") {
+        g.globalCompositeOperation = "source-over"; g.globalAlpha = u > .7 ? (1 - u) / .3 : 1;
+        var sc = 1 + p.grow * u;
+        g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.scale(sc, sc);
+        g.beginPath(); g.moveTo(p.pts[0][0], p.pts[0][1]); for (var i = 1; i < p.pts.length; i++) g.lineTo(p.pts[i][0], p.pts[i][1]); g.closePath();
+        g.fillStyle = p.c; g.fill(); g.strokeStyle = "rgba(214,200,255,.65)"; g.lineWidth = 1.2; g.stroke();
+        g.restore(); return;
+      }
+      if (p.t === "ring") {
+        g.globalCompositeOperation = "lighter"; g.globalAlpha = (1 - u) * .9; g.strokeStyle = p.c; g.lineWidth = 2 * (1 - u) + .5;
+        g.beginPath(); g.arc(p.x, p.y, p.s * (.2 + u), 0, 6.2832); g.stroke(); return;
+      }
+      g.globalCompositeOperation = "lighter"; g.globalAlpha = (1 - u * u) * (p.al || 1);
+      if (p.t === "streak") {
+        g.strokeStyle = p.c; g.lineWidth = p.s; g.lineCap = "round";
+        g.beginPath(); g.moveTo(p.x - p.vx * .035, p.y - p.vy * .035); g.lineTo(p.x, p.y); g.stroke();
+      } else {
+        g.fillStyle = p.c; g.beginPath(); g.arc(p.x, p.y, Math.max(.4, p.s * (1 - u * .5)), 0, 6.2832); g.fill();
+        g.globalAlpha *= .25; g.beginPath(); g.arc(p.x, p.y, p.s * 3, 0, 6.2832); g.fill();
+      }
+    }
+    /* ----- the glass: rays from where the drill hit, and two rings; its pieces are the cells between them */
+    function makeCrack(){
+      var n = 13, D = Math.hypot(W, H), th = [], rr = [];
+      for (var i = 0; i < n; i++) th.push((i + rnd(-.3, .3)) / n * 6.2832);
+      for (i = 0; i < n; i++) rr.push([0, D * rnd(.12, .18), D * rnd(.34, .46), D * 1.1]);
+      return { x: C.x, y: C.y, th: th, rr: rr, n: n, t: 0 };
+    }
+    function P(c, i, j){ var a = c.th[i % c.n], r = c.rr[i % c.n][j]; return [c.x + Math.cos(a) * r, c.y + Math.sin(a) * r]; }
+    function drawCrack(dt){
+      var c = crack; c.t += dt;
+      var grow = Math.min(1, c.t / .22), ring = Math.min(1, Math.max(0, (c.t - .1) / .15));
+      g.globalCompositeOperation = "lighter"; g.lineCap = "round"; g.lineJoin = "round";
+      [[5, .18], [1.4, .95]].forEach(function(w){
+        g.lineWidth = w[0]; g.strokeStyle = "rgba(235,228,255," + w[1] + ")"; g.globalAlpha = 1; g.beginPath();
+        for (var i = 0; i < c.n; i++) {
+          var e = P(c, i, 3); g.moveTo(c.x, c.y); g.lineTo(c.x + (e[0] - c.x) * grow, c.y + (e[1] - c.y) * grow);
+          if (ring > 0) for (var j = 1; j < 3; j++) { var a = P(c, i, j), b = P(c, i + 1, j); g.moveTo(a[0], a[1]); g.lineTo(a[0] + (b[0] - a[0]) * ring, a[1] + (b[1] - a[1]) * ring); }
+        }
+        g.stroke();
+      });
+      g.globalAlpha = .6; g.fillStyle = "#fff"; g.beginPath(); g.arc(c.x, c.y, 7 + 10 * (1 - grow), 0, 6.2832); g.fill();
+    }
+    function shatter(){
+      var c = crack || makeCrack(); crack = null;
+      for (var i = 0; i < c.n; i++) for (var j = 0; j < 3; j++) {
+        var pts = j ? [P(c, i, j), P(c, i, j + 1), P(c, i + 1, j + 1), P(c, i + 1, j)] : [[c.x, c.y], P(c, i, 1), P(c, i + 1, 1)];
+        var cx = 0, cy = 0; pts.forEach(function(q){ cx += q[0]; cy += q[1]; }); cx /= pts.length; cy /= pts.length;
+        var a = Math.atan2(cy - c.y, cx - c.x), v = (3 - j) * rnd(90, 180);
+        ps.push({ t: "shard", x: cx, y: cy, pts: pts.map(function(q){ return [q[0] - cx, q[1] - cy]; }), vx: Math.cos(a) * v, vy: Math.sin(a) * v - rnd(60, 220), g: 2100, drag: .995,
+          rot: 0, vr: rnd(-2.4, 2.4) * (j ? 1 : 2), grow: j ? rnd(0, .15) : rnd(.3, .7), life: rnd(1.2, 1.7), age: 0, c: pick(["#0E0720", "#130A2B", "#1A0E38", "#0A0518"]) });
+      }
+      for (i = 0; i < 60; i++) { var b = rnd(0, 6.2832), w = rnd(200, 900); ps.push({ t: "dot", x: c.x, y: c.y, vx: Math.cos(b) * w, vy: Math.sin(b) * w, drag: .94, life: rnd(.5, 1.1), age: 0, s: rnd(.8, 2.4), c: pick(["#FFFFFF", "#E6DDFF", "#BFEFF4"]) }); }
+      go();
+    }
+    /* ----- the typodont: two arches on their base, the teeth flying in, the bite, and the fold into the medallion */
+    function layout(J){
+      var TW = Math.min(W * .8, 560), u = TW / 10.2, H0 = u * 1.3, teeth = [];
+      J.u = u; J.H0 = H0; J.gap0 = H0 * .85;
+      ["u", "l"].forEach(function(arch){
+        var off = 0, half = 0; ARCH[arch].forEach(function(t){ half += t[1]; });
+        ARCH[arch].forEach(function(t, k){
+          var w = t[1] * u, h = t[2] * H0, cx = (off + t[1] / 2) * u, e = Math.pow((off + t[1] / 2) / half, 2) * H0 * .38;
+          off += t[1];
+          [-1, 1].forEach(function(sd){
+            var old = J.teeth && J.teeth.filter(function(q){ return q.arch === arch && q.k === k && q.sd === sd; })[0];
+            var edge = arch === "u" ? -e : -e - H0 * .12;
+            teeth.push({ arch: arch, k: k, sd: sd, kind: t[0], w: w, h: h, x: sd * cx, edge: edge, ty: arch === "u" ? edge - h / 2 : edge + h / 2,
+              st: old ? old.st : null, land: old ? old.land : false, delay: k * .1 + rnd(0, .05), a: old ? old.a : rnd(0, 6.2832), rot0: old ? old.rot0 : rnd(-4, 4) });
+          });
+        });
+      });
+      J.teeth = teeth;
+      function band(arch){
+        var row = teeth.filter(function(q){ return q.arch === arch; }).sort(function(a, b){ return a.x - b.x; }), sg = arch === "u" ? -1 : 1;
+        var L = row[0].x - row[0].w / 2 - u * .3, Rr = row[row.length - 1].x + row[row.length - 1].w / 2 + u * .3, cerv = function(q){ return arch === "u" ? q.edge - q.h : q.edge + q.h; };
+        var top = Math.min.apply(null, row.map(function(q){ return arch === "u" ? cerv(q) : -cerv(q); })) * (arch === "u" ? 1 : -1) + sg * H0 * .55;
+        var gum = new Path2D(); gum.moveTo(L, top);
+        gum.quadraticCurveTo((L + Rr) / 2, top + sg * H0 * .25, Rr, top);
+        gum.quadraticCurveTo(Rr + u * .2, cerv(row[row.length - 1]), row[row.length - 1].x + row[row.length - 1].w / 2, cerv(row[row.length - 1]) - sg * .2 * row[row.length - 1].h);
+        for (var i = row.length - 1; i >= 0; i--) {
+          var q = row[i], xl = q.x - q.w / 2, cy = cerv(q);
+          gum.quadraticCurveTo(q.x, cy + sg * H0 * .2, xl, cy - sg * .25 * q.h);
+        }
+        gum.quadraticCurveTo(L - u * .2, cerv(row[0]), L, top); gum.closePath();
+        var base = new Path2D(), bh = H0 * .7, y0 = arch === "u" ? top - bh : top - H0 * .15, r = u * .6;
+        base.moveTo(L - u * .5 + r, y0); base.lineTo(Rr + u * .5 - r, y0); base.quadraticCurveTo(Rr + u * .5, y0, Rr + u * .5, y0 + r);
+        base.lineTo(Rr + u * .5, y0 + bh + H0 * .15 - r); base.quadraticCurveTo(Rr + u * .5, y0 + bh + H0 * .15, Rr + u * .5 - r, y0 + bh + H0 * .15);
+        base.lineTo(L - u * .5 + r, y0 + bh + H0 * .15); base.quadraticCurveTo(L - u * .5, y0 + bh + H0 * .15, L - u * .5, y0 + bh + H0 * .15 - r);
+        base.lineTo(L - u * .5, y0 + r); base.quadraticCurveTo(L - u * .5, y0, L - u * .5 + r, y0); base.closePath();
+        return { gum: gum, base: base, L: L, R: Rr };
+      }
+      J.bu = band("u"); J.bl = band("l");
+    }
+    function easeBack(t){ var c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
+    function tooth(q, x, y, rot, sc){
+      g.save(); g.translate(x, y); g.rotate(rot); g.scale(sc, sc);
+      if (q.arch === "u") { g.translate(-q.w / 2, -q.h / 2); g.scale(q.w, q.h); } else { g.translate(-q.w / 2, q.h / 2); g.scale(q.w, -q.h); }
+      g.fillStyle = "#FBF7EE"; g.fill(TP[q.kind]); g.lineWidth = 1.5 / Math.sqrt(q.w * q.h * sc * sc); g.strokeStyle = "#3B2E3A"; g.stroke(TP[q.kind]);
+      g.globalAlpha *= .55; g.fillStyle = "#FFFFFF"; g.beginPath(); g.ellipse(.3, .38, .08, .2, 0, 0, 6.2832); g.fill();
+      g.restore();
+    }
+    function drawJaw(dt){
+      var J = jaw; J.t += dt;
+      var slide = Math.min(1, J.t / .45), se = 1 - Math.pow(1 - slide, 3), gap = J.gap0;
+      if (J.chomp != null) { J.chomp += dt; var cu = Math.min(1, J.chomp / .14); gap = J.gap0 * (1 - cu * cu); if (cu >= 1 && !J.bit) { J.bit = true; bite(J); } if (J.bit) gap = -Math.sin(Math.min(1, (J.chomp - .14) / .2) * Math.PI) * J.H0 * .04; }
+      var S = 1, A = 1;
+      if (J.morph != null) { J.morph += dt; var mu = Math.min(1, J.morph / .4); S = 1 - .8 * mu * mu; A = 1 - mu; if (mu >= 1) { jaw = null; return; } }
+      g.save(); g.globalCompositeOperation = "source-over"; g.globalAlpha = A;
+      g.translate(C.x, C.y + J.H0 * .1); g.scale(S, S);
+      var yu = -gap - (1 - se) * H, yl = (1 - se) * H;
+      [["l", yl], ["u", yu]].forEach(function(z){
+        var b = z[0] === "u" ? J.bu : J.bl;
+        g.save(); g.translate(0, z[1]);
+        g.fillStyle = "#6C7A8B"; g.fill(b.base); g.lineWidth = 1.6; g.strokeStyle = "#2B2F3A"; g.stroke(b.base);
+        g.fillStyle = "#E58EA2"; g.fill(b.gum); g.lineWidth = 1.4; g.strokeStyle = "#A9506A"; g.stroke(b.gum);
+        g.restore();
+        J.teeth.forEach(function(q){
+          if (q.arch !== z[0]) return;
+          var tt = J.t - (J.tteeth || 1e9) - q.delay;
+          if (tt < 0) return;
+          var ty = q.ty + z[1], u = Math.min(1, tt / .5);
+          if (u >= 1) { if (!q.land) { q.land = true; snap(J, q, C.x + q.x * S, C.y + (J.H0 * .1 + ty) * S); } tooth(q, q.x, ty, 0, 1); return; }
+          var dist = Math.max(W, H) * .85, sx = q.x + Math.cos(q.a) * dist, sy = ty + Math.sin(q.a) * dist, e = easeBack(u), r = 1 - Math.pow(1 - u, 3);
+          tooth(q, sx + (q.x - sx) * e, sy + (ty - sy) * e, q.rot0 * (1 - r), 1.8 - .8 * r);
+        });
+      });
+      if (J.flare != null) {
+        J.flare += dt; var fu = Math.min(1, J.flare / .6);
+        if (fu < 1) { var gr = g.createLinearGradient(-W / 2, 0, W / 2, 0); gr.addColorStop(0, "rgba(230,251,255,0)"); gr.addColorStop(.5, "rgba(230,251,255,.95)"); gr.addColorStop(1, "rgba(230,251,255,0)");
+          g.globalCompositeOperation = "lighter"; g.globalAlpha = A * (1 - fu); g.fillStyle = gr; g.fillRect(-W / 2, -J.H0 * .16 - 6 * (1 - fu), W, 12 * (1 - fu) + 4); }
+      }
+      if (J.morph != null) { g.globalCompositeOperation = "lighter"; g.globalAlpha = Math.min(1, J.morph / .2) * .8; var rg = g.createRadialGradient(0, 0, 0, 0, 0, J.H0 * 4); rg.addColorStop(0, "rgba(255,255,255,1)"); rg.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = rg; g.fillRect(-J.H0 * 4, -J.H0 * 4, J.H0 * 8, J.H0 * 8); }
+      g.restore();
+    }
+    function snap(J, q, x, y){
+      ps.push({ t: "ring", x: x, y: y, s: q.w * .9, life: .32, age: 0, c: "#E6FBFF" });
+      for (var i = 0; i < 6; i++) { var a = rnd(0, 6.2832), v = rnd(120, 380); ps.push({ t: "dot", x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, drag: .9, life: rnd(.25, .5), age: 0, s: rnd(.8, 1.8), c: pick(["#FFFFFF", "#9BE7EE", "#FFE7A0"]) }); }
+    }
+    function bite(J){
+      J.flare = 0;
+      var y = C.y + J.H0 * .1 - J.H0 * .16;
+      for (var i = 0; i < 70; i++) { var x = C.x + rnd(-1, 1) * W * .32, up = Math.random() < .5 ? -1 : 1; ps.push({ t: i % 3 ? "dot" : "streak", x: x, y: y, vx: rnd(-1, 1) * 260 + (x - C.x) * 1.6, vy: up * rnd(80, 520), g: 600, drag: .95, life: rnd(.5, 1.1), age: 0, s: rnd(1, 2.6), c: pick(["#FFFFFF", "#9BE7EE", "#FFE7A0", "#BFEFF4"]) }); }
+    }
+    return {
+      /* sparks thrown off the spinning handpiece, more and faster as it spins up */
+      grind: function(sec){
+        var t = 0;
+        ems.push(function(dt){
+          t += dt; if (t > sec) return false;
+          var lv = t / sec, n = (12 + 460 * lv * lv) * dt;
+          while (n > 0) {
+            if (n < 1 && Math.random() > n) break; n--;
+            var a = rnd(-1.05, -.35), x = C.x + Math.cos(a) * C.r, y = C.y + Math.sin(a) * C.r, d = a + Math.PI / 2 + rnd(-.35, .25), v = rnd(380, 1000) * (.45 + lv);
+            ps.push({ t: "streak", x: x, y: y, vx: Math.cos(d) * v, vy: Math.sin(d) * v, g: 1400, drag: .985, life: rnd(.35, .8), age: 0, s: rnd(1, 2.4), c: pick(["#FFF4C2", "#FFD36B", "#FF9A3C", "#FFFFFF"]) });
+          }
+        });
+        go();
+      },
+      crack: function(){ crack = makeCrack(); go(); },
+      shatter: shatter,
+      jaw: function(){ jaw = { t: 0 }; layout(jaw); go(); },
+      teeth: function(){ if (jaw) jaw.tteeth = jaw.t; },
+      chomp: function(){ if (jaw) jaw.chomp = 0; },
+      morph: function(){ if (jaw) jaw.morph = 0; },
+      stop: function(){ dead = true; if (raf) cancelAnimationFrame(raf); raf = 0; window.removeEventListener("resize", fit); }
+    };
+  }
+  function modupro(d, done, opt){
+    var el = shell("shj-hand shj-mp", "A new journey: the ModuPro", mpHTML(d)), timers = [], fx = null, settled = false, ticket = 0;
+    ["imp", "brk", "chomp", "slam", "rise"].forEach(function(k){ el.style.setProperty("--" + k, MP[k] + "s"); });
+    var rpm = el.querySelector(".shj-rpm"), rpmN = rpm.querySelector("b");
+    function at(sec, f){ timers.push(setTimeout(f, sec * 1000)); }
+    function stopAll(){ timers.forEach(clearTimeout); timers = []; ticket++; if (fx) { fx.stop(); fx = null; } }
+    open(el, { still: opt.still, focusAt: 9100, peakAt: MP.slam * 1000, detail: { kind: "handoff", journey: 1 },
+      skip: function(){
+        if (settled) return false;
+        settled = true; stopAll(); el.classList.add("is-still", "is-broken");
+        var sk = el.querySelector(".shj-skip"); if (sk) sk.remove();
+        try { el.querySelector(".shj-go").focus({ preventScroll: true }); } catch (e) {}
+        return true;
+      },
+      end: stopAll }, done);
+    if (el.classList.contains("is-still")) { el.classList.add("is-broken"); return; }
+    var st = el.querySelector(".shj-stage").getBoundingClientRect();
+    el.style.setProperty("--dy", Math.round(innerHeight / 2 - (st.top + st.height / 2)) + "px");
+    fx = labFx(el);
+    /* the RPM, 0 to 400,000, faster and faster */
+    at(.5, function(){
+      var mine = ++ticket, t0 = 0;
+      (function f(now){
+        if (mine !== ticket) return;
+        if (!t0) t0 = now;
+        var u = Math.min(1, (now - t0) / 1850);
+        rpmN.textContent = fmt(Math.round(400000 * Math.pow(u, 2.2) / 1000) * 1000);
+        if (u < 1) requestAnimationFrame(f); else rpm.classList.add("is-max");
+      })(performance.now());
+    });
+    if (fx) {
+      at(.5, function(){ fx.grind(2.05); });
+      at(MP.imp, function(){ fx.crack(); });
+      at(MP.jaw, function(){ fx.jaw(); });
+      at(MP.teeth, function(){ fx.teeth(); });
+      at(MP.chomp, function(){ fx.chomp(); });
+      at(MP.morph, function(){ fx.morph(); });
+    }
+    at(MP.brk, function(){ el.classList.add("is-broken"); if (fx) fx.shatter(); });
+    at(MP.rise + .6 + 2.15, function(){ settled = true; });
+  }
   function handoff(d, done, opt){
     d = d || {}; opt = opt || {};
     R.needJourneyArt(function(){
       var to = Math.max(1, Math.min(2, d.to | 0));
+      if (to === 1) { modupro(d, done, opt); return; }
       var el = shell("shj-hand", "A new journey: the " + JN[to], handoffHTML(d));
       open(el, { still: opt.still, focusAt: 6400, peakAt: 3600, detail: { kind: "handoff", journey: to } }, done);
       placeFly(el);
@@ -623,8 +970,9 @@
   function still(kind, d){
     css();
     var el = document.createElement("div");
-    el.className = "shj shj-inline is-still is-on " + (kind === "dark" ? "shj-dark shj-d" + Math.max(0, Math.min(2, (d && d.journey) | 0)) : "shj-hand");
-    el.innerHTML = kind === "dark" ? darkHTML(d || {}) : handoffHTML(d || {});
+    var mp = kind !== "dark" && (d && d.to | 0) === 1;
+    el.className = "shj shj-inline is-still is-on " + (kind === "dark" ? "shj-dark shj-d" + Math.max(0, Math.min(2, (d && d.journey) | 0)) : mp ? "shj-hand shj-mp is-broken" : "shj-hand");
+    el.innerHTML = kind === "dark" ? darkHTML(d || {}) : mp ? mpHTML(d) : handoffHTML(d || {});
     return el;
   }
 
