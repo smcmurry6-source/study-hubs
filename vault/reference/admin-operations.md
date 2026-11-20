@@ -35,8 +35,13 @@ its ink and blue-grey, each hub's class color as a dot).
 - **The heavy reads are worked out ahead** (2026-11-19, `migration_v83.sql`): Insights' three reads, Question health, the
   visitor totals (Overview, Time by section), the check-ins and Clicks and features (without a hub) come from
   `admin_cache`, one row a read (`insights`, `retries`, `quality`, `qh:<hub>`, `visitors:<days>`, `debriefs`,
-  `clicks:<days>`, `features:<days>`), closed to anon. The admin functions keep their arguments, results and shape; a read
-  the table doesn't have yet is worked out at once and kept. pg_cron's `sh-admin-cache` runs `sh_admin_cache_tick()` every
+  `clicks:<days>`, `features:<days>`), closed to anon. The admin functions keep their arguments, results and shape. A read
+  the table doesn't have yet (a hub's first Question health, a read nobody used for 30 days) is **not** worked out while
+  the page waits (since `migration_v90.sql`, 2026-11-20: insights takes 4.1 s live, over a visitor's 3 s, and the error
+  rolled the new row back with it): `sh_admin_cached` inserts the row with no body and returns null, `get_insights`,
+  `get_insight_retries`, `get_data_quality` and `get_question_health` then answer `{"pending": true}` (the row-returning
+  ones answer no rows), `get_admin_cache_status` says `pending`, and the page says "Being worked out" under the view's title
+  until the job's next tick has it (within a minute or two; it looks again every 30 s). pg_cron's `sh-admin-cache` runs `sh_admin_cache_tick()` every
   minute (10 s limit): a read asked with new arguments (an edited question's fingerprint, new exam dates) or by Refresh
   at once; a read the page used in the last 2 hours every 15 minutes, **every hour while 20 or more people are studying**
   (a ping in the last 5 minutes); any read used in the last week once a night (1 to 5 am Central) if over 12 hours old.

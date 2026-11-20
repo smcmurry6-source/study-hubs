@@ -293,6 +293,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   `ui_click_reach` rows, 100,000 live, and a faster CPU). 15 rows kept (the reads above, each day range the page offers),
   then set as read 3 hours ago, so they're refreshed nightly and not every 15 minutes overnight. The ticks after: 0.01 s with
   nothing due. Found, for later (inbox): a read the table doesn't have yet that takes over 3 s still times out for the page,
-  and leaves no row for the job.
+  and leaves no row for the job. Fixed by `migration_v90.sql` (#495): a first read leaves the row for the job and the page
+  says "Being worked out".
 
 ## Outcome

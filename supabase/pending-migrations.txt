@@ -37,3 +37,4 @@
 # migration_v84 (the bootstrap's answers after the device's newest: sh_answers_since, get_my_answers_since, get_widget_bootstrap_v2's two new arguments; get_pet_days by the boundary day) was applied on 2026-11-20 (through the connector, md5-checked, PR #470).
 # migration_v88 (a survey asks each person once: get_active_survey and get_my_survey across linked ids) was applied on 2026-11-20 (through the connector as v88a-d, one statement each, md5-checked, PR #489).
 migration_v89.sql
+migration_v90.sql
