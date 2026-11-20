@@ -3187,6 +3187,7 @@ wordCursor++;
 clearHighlight();
 var w = words[wordCursor];
 if (w) w.el.classList.add("sh-tts-active");
+if (w && w.el.closest && w.el.closest("[hidden]")) { try { w.el.dispatchEvent(new CustomEvent("sh:reveal", { bubbles: true })); } catch (e) {} }
 dockProgress(words.length ? (wordCursor + 1) / words.length : 0, "");
 };
 u.onend = function(){

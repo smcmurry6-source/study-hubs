@@ -622,6 +622,7 @@
         (hasPlain || hasHy ? '<span class="seg" role="group" aria-label="Reading level"><button type="button" data-level="full" aria-pressed="' + (level === "full") + '">As taught</button>' +
           (hasPlain ? '<button type="button" data-level="plain" aria-pressed="' + (level === "plain") + '">Plain English</button>' : "") +
           (hasHy ? '<button type="button" data-level="hy" aria-pressed="' + hy + '">High yield</button>' : "") + "</span>" : "") +
+        '<button type="button" class="btn" data-ntall="fold" hidden>' + icon("menu", 18) + "<span>Collapse all</span></button>" +   // shown by foldTopics() when the notes have topics
         '<button type="button" class="btn" data-mmap aria-expanded="false">' + icon("mindmap", 18) + "Mind map</button>" +
         '<button type="button" class="btn btn-text" data-report-notes>' + icon("report", 18) + "Report a mistake</button>" +
         '<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
@@ -641,6 +642,7 @@
     el.innerHTML = '<div class="hx-page notes"><div class="notes-grid">' + list + art + "</div></div>";
     /* figures: in the notes next to the paragraph they explain, the rest under them (the live hub's FIG_PLACE) */
     var prose = $(".reading-prose", el), needF = (CORE.figByLec || {})[lec.id] && CORE.figByLec[lec.id].length;
+    foldTopics(prose, lec, el);   // before the figures: placeFigs() looks inside the topics
     /* in High yield, only the figures that go with a paragraph it shows (placed by As taught's anchors), none left over */
     if (needF || (group && !hy)) needFigures().then(function(){ if (!prose.isConnected) return; placeFigs(prose, lec.id, hy ? "full" : level, hy ? null : $(".lec-figs", el)); $$(".charts [data-figs]", el).forEach(function(b){ b.innerHTML = b.getAttribute("data-figs").split(",").map(figCardHTML).join(""); }); try { FIG.wireCuspMaps(el); FIG.ANIMA.mount(el); } catch (e) {} }).catch(function(){});
     checkYourself($("[data-check]", el), lec);
@@ -664,6 +666,76 @@
     /* the first visit's tip sits under the toolbar; while it shows, the toolbar's short "Select text to highlight it" hides (hub.css) */
     tip(el, "notes", "Select any words in the notes to highlight them; they stay on this device.", $(".reading > .toolbar", el));
   }
+  /* ======================= Topics that fold ======================= */
+  /* Each topic in a lecture's notes folds (Sam, 2026-11-20: "make the individual topics collapsible in the notes"). Every
+     heading at the top level of the notes (As taught's and Plain English's h4s, High yield's numbered h3s) gets a button laid
+     over it that hides or shows its topic, down to the next heading, and the toolbar's Collapse all folds the whole lecture
+     into a list of its topics (Expand all opens them again). A lecture with fewer than two topics doesn't fold.
+     The heading's words stay where they were and the button has none of its own (data-sh-noread), so highlights (kept by the
+     notes' text), Follow along and the device's voice see the same words as before. A folded topic's body is
+     hidden="until-found", so the browser's find-in-page opens it; so does a search result or Ask Timmy link that lands in it
+     (SH_GOTO), and Listen reaching it (revealTopic): Follow along opens it when the reader is following, the device's voice
+     always (widget/v3.js sends sh:reveal). Which topics are folded is kept on this device (sh_fold:<hub>), by lecture and
+     heading, so a topic stays folded at every reading level that has it; only the buttons save, an opening by Listen,
+     search or find doesn't. */
+  var FOLD = "sh_fold:" + HUB, FOLDS = null;
+  function foldGet(){ try { var v = JSON.parse(ls(FOLD) || "{}"); return v && typeof v === "object" && !Array.isArray(v) ? v : {}; } catch (e) { return {}; } }
+  function topicKey(h){ var c = h.cloneNode(true); $$(".hy-n, [data-sh-noread]", c).forEach(function(x){ x.remove(); }); return c.textContent.replace(/\s+/g, " ").trim().toLowerCase().slice(0, 80); }
+  function setTopic(t, open){
+    t.box.classList.toggle("is-shut", !open);
+    t.btn.setAttribute("aria-expanded", String(open));
+    if (open) t.body.removeAttribute("hidden"); else t.body.setAttribute("hidden", "until-found");
+  }
+  function foldTopics(prose, lec, el){
+    FOLDS = null;
+    var kids = Array.prototype.slice.call(prose.children), lv = 9;
+    kids.forEach(function(k){ var m = /^H([2-4])$/.exec(k.tagName); if (m && +m[1] < lv) lv = +m[1]; });
+    var heads = kids.filter(function(k){ return k.tagName === "H" + lv; }), all = $("[data-ntall]", el);
+    if (heads.length < 2) return;
+    if ("onbeforematch" in document.body) prose.classList.add("nt-find");   // hub.css: find-in-page can open a folded topic
+    var shut = {}; (foldGet()[lec.id] || []).forEach(function(k){ shut[k] = 1; });
+    var T = heads.map(function(h, n){
+      var box = document.createElement("div"), body = document.createElement("div"), id = "nt" + n;
+      box.className = "nt"; body.className = "nt-b"; body.id = id + "-b";
+      if (!h.id) h.id = id;
+      h.classList.add("nt-h");
+      prose.insertBefore(box, h); box.appendChild(h);
+      var x = box.nextSibling; while (x && x.nodeType === 3 && !/\S/.test(x.data)) x = x.nextSibling;
+      if (x && x.nodeType === 1 && x.classList.contains("hy-why")) box.appendChild(x);   // High yield's "why it's on the list" stays with its heading
+      box.appendChild(body);
+      while (box.nextSibling && heads.indexOf(box.nextSibling) < 0) body.appendChild(box.nextSibling);
+      h.insertAdjacentHTML("beforeend", '<button type="button" class="nt-tog" data-nt="topic" data-sh-noread aria-expanded="true" aria-controls="' + body.id + '" aria-labelledby="' + esc(h.id) + '"><span class="nt-ch">' + icon("chevron", 18) + "</span></button>");
+      var t = { box: box, body: body, btn: h.lastElementChild, key: topicKey(h) };
+      t.btn.addEventListener("click", function(){ var open = t.btn.getAttribute("aria-expanded") !== "true"; setTopic(t, open); save(); sync(); track("notes:" + (open ? "unfold" : "fold")); });
+      body.addEventListener("beforematch", function(){ setTopic(t, true); sync(); });
+      if (shut[t.key]) setTopic(t, false);
+      box.__nt = t;
+      return t;
+    });
+    /* this level's folded topics; the lecture's other levels' (other headings) are kept as they were */
+    function save(){
+      var mine = {}, A = foldGet();
+      T.forEach(function(t){ mine[t.key] = 1; });
+      var list = (A[lec.id] || []).filter(function(k){ return !mine[k]; }).concat(T.filter(function(t){ return t.box.classList.contains("is-shut"); }).map(function(t){ return t.key; }));
+      if (list.length) A[lec.id] = list.slice(-300); else delete A[lec.id];
+      ls(FOLD, Object.keys(A).length ? JSON.stringify(A) : null);
+    }
+    function sync(){
+      if (!all) return;
+      var open = T.some(function(t){ return !t.box.classList.contains("is-shut"); });
+      all.setAttribute("data-ntall", open ? "fold" : "unfold"); $("span", all).textContent = open ? "Collapse all" : "Expand all";
+    }
+    if (all) { all.hidden = false; all.addEventListener("click", function(){ var fold = all.getAttribute("data-ntall") === "fold"; T.forEach(function(t){ setTopic(t, !fold); }); save(); sync(); track("notes:" + (fold ? "fold-all" : "unfold-all")); }); }
+    sync();
+    FOLDS = { sync: sync };
+  }
+  /* open the folded topic a node is in, without saving it (Listen, a search result) */
+  function revealTopic(node){
+    var b = node && node.closest ? node.closest(".nt-b[hidden]") : null, t = b && b.parentNode.__nt;
+    if (!t) return;
+    setTopic(t, true); if (FOLDS) FOLDS.sync();
+  }
+  document.addEventListener("sh:reveal", function(e){ revealTopic(e.target); });
   /* ======================= Follow along: the word being read ======================= */
   /* While Listen plays a lecture's narration, the word being read is highlighted in the notes, and the sentence around it
      more softly (a survey idea, approved by Sam 2026-11-11: "highlight the words being read when listening to the lecture
@@ -759,6 +831,9 @@
       while (i >= 0 && dwi < 0 && i > 0) { i--; dwi = F.map[i]; }   // a word the page doesn't show: stay on the one before
       if (dwi < 0) { clear(); return; }
       var w = F.dw[dwi], r = rangeOf(w, w); if (!r) { F.dirty = true; return; }
+      /* a folded topic opens when the narration reaches it while the reader is following (the last word was on screen), or a
+         seek lands in it (foldTopics) */
+      if (jump || (F.seen && Date.now() - userAt >= 6000)) revealTopic(w.a.parentNode);
       var s0 = i, s1 = i, sid = F.sent[i];
       while (s0 > 0 && F.sent[s0 - 1] === sid) s0--;
       while (s1 < F.w.length - 1 && F.sent[s1 + 1] === sid) s1++;
@@ -994,7 +1069,12 @@
     var f = FIG.FIGS[key]; return f ? '<figure class="fig-card"><h4>' + esc(f.title) + "</h4>" + f.svg + "<p>" + esc(f.caption) + "</p>" + HX.figKeyHTML(f) + "</figure>" : "";
   }
   function placeFigs(prose, lecId, level, rest){
-    var placed = {}, kids = Array.prototype.slice.call(prose.children);
+    /* the notes' paragraphs in order: a folded topic's (foldTopics) are its heading, then its body's */
+    var placed = {}, kids = [];
+    Array.prototype.forEach.call(prose.children, function(k){
+      if (!k.classList.contains("nt")) { kids.push(k); return; }
+      Array.prototype.forEach.call(k.children, function(x){ if (x.classList.contains("nt-b")) kids.push.apply(kids, Array.prototype.slice.call(x.children)); else kids.push(x); });
+    });
     function norm(t){ return String(t || "").replace(/\s+/g, " ").trim(); }
     (FIG.FIG_PLACE[lecId] || []).forEach(function(p){
       var at = p[level] || p.full, el = null, i;
@@ -1519,7 +1599,7 @@
   window.SH_GOTO = function(g){
     if (!g) return;
     if (g.v === "notes") { STATE.ui.level = "full"; go("notes/" + g.lec);
-      var t0 = Date.now(); (function wait(){ var p = $(".reading-prose"); if (p && p.closest("#lec-" + g.lec)) flashIn(function(){ return Array.prototype.filter.call(p.querySelectorAll("p, li, h3, h4"), function(el){ return !el.closest("[data-sh-noread]"); })[g.k]; }); else if (Date.now() - t0 < 5000) setTimeout(wait, 100); })(); }
+      var t0 = Date.now(); (function wait(){ var p = $(".reading-prose"); if (p && p.closest("#lec-" + g.lec)) flashIn(function(){ var x = Array.prototype.filter.call(p.querySelectorAll("p, li, h3, h4"), function(el){ return !el.closest("[data-sh-noread]"); })[g.k]; revealTopic(x); return x; }); else if (Date.now() - t0 < 5000) setTimeout(wait, 100); })(); }
     else if (g.v === "guide") { go("notes/guide");
       var t2 = Date.now(); (function wait(){ var hd = $$("#gd-" + g.lec + " h3")[g.k || 0]; if (hd) { hd.scrollIntoView({ block: "start" }); flashIn(function(){ return hd; }); } else if (Date.now() - t2 < 5000) setTimeout(wait, 100); })(); }
     else if (g.v === "cram") { go("more/cram"); setTimeout(function(){ var c = document.getElementById("cram-" + g.lec); if (c && window.shFlash) window.shFlash(c); }, 600); }
