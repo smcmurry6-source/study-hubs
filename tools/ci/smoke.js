@@ -501,14 +501,20 @@ function lint(hub, A){
   }
   if (longItems.length) notes.push(`${hub}: heads-up, long ordering/select-all items score very low (LESSONS.md): ${longItems.join(', ')}`);
   if (!FORMAT_EXEMPT.has(hub)) {
-    L.forEach(l => {
-      const lq = Q.filter(q => q.lec === l.id);
+    /* A hub of many courses (its lectures have a group: Review of Systems) counts the formats per course, not per lecture
+       (Sam, 2026-11-19: "Mostly board-style": the special formats per course, the rest single-best-answer and patient boxes) */
+    const units = L.some(l => l.group)
+      ? [...new Set(L.map(l => l.group))].map(g => ({ id: g, what: 'course', lecs: L.filter(l => l.group === g && (!l.status || l.status === 'taught')).map(l => l.id) }))
+      : L.map(l => ({ id: l.id, what: 'lecture', lecs: [l.id], l }));
+    units.forEach(u => {
+      const l = u.l || { id: u.id };
+      const lq = Q.filter(q => u.lecs.includes(q.lec));
       if (!lq.length || (l.status && l.status !== 'taught') || FORMAT_GRANDFATHERED.has(`${hub}:${l.id}`)) return;
       Object.keys(FORMAT_MIN).forEach(f => { const n = lq.filter(q => q.fmt === f).length;
-        if (n < FORMAT_MIN[f]) problems.push(`${hub}: lecture ${l.id} has ${n} ${FORMAT_NAME[f]} questions (needs at least ${FORMAT_MIN[f]}; see vault/rules/${f === 'numbered' ? 'numbered-statements' : 'two-statement-and-true-false'}.md)`); });
+        if (n < FORMAT_MIN[f]) problems.push(`${hub}: ${u.what} ${l.id} has ${n} ${FORMAT_NAME[f]} questions (needs at least ${FORMAT_MIN[f]}; see vault/rules/${f === 'numbered' ? 'numbered-statements' : 'two-statement-and-true-false'}.md)`); });
       if (WHICH_EXEMPT.has(hub) || WHICH_GRANDFATHERED.has(`${hub}:${l.id}`)) return;
       Object.keys(WHICH_MIN).forEach(f => { const n = lq.filter(q => q.fmt === f).length;
-        if (n < WHICH_MIN[f]) problems.push(`${hub}: lecture ${l.id} has ${n} ${FORMAT_NAME[f]} questions (needs at least ${WHICH_MIN[f]}; see vault/rules/which-statement-questions.md)`); });
+        if (n < WHICH_MIN[f]) problems.push(`${hub}: ${u.what} ${l.id} has ${n} ${FORMAT_NAME[f]} questions (needs at least ${WHICH_MIN[f]}; see vault/rules/which-statement-questions.md)`); });
     });
     const tfq = Q.filter(q => q.fmt === 'tf');
     if (tfq.length >= 10) { const t = Math.round(100 * tfq.filter(q => q.answer === 0).length / tfq.length);

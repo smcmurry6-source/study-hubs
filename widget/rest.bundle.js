@@ -1083,7 +1083,7 @@ var MASTERY = [
 ];
 var HUB_NAMES = { "perio": "Perio", "msk-exam3": "MSK Exam 3", "gi-exam1": "GI Exam 1", "gi-exam2": "GI Exam 2",
 "hepatobiliary": "Hepatobiliary", "genetics": "Genetics", "fixed-pros": "Fixed Pros",
-"msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo 1", "heme-endo-exam2": "Heme & Endo 2", "heme-endo-exam3": "Heme & Endo 3", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants 1" };
+"msk-exam4": "MSK Exam 4", "occlusion": "Occlusion", "pcd-exam3": "PCD Exam 3", "heme-endo-exam1": "Heme & Endo 1", "heme-endo-exam2": "Heme & Endo 2", "heme-endo-exam3": "Heme & Endo 3", "review-of-systems": "Review of Systems", "special-patient-care": "Special Patient Care", "pcd-implants-exam1": "PCD Implants 1" };
 function hubName(h){ return (window.SH_HUB_NAMES && window.SH_HUB_NAMES[h]) || HUB_NAMES[h] || String(h).replace(/-/g, " ").replace(/\b\w/g, function(c){ return c.toUpperCase(); }); }
 var MEDAL = {
 1: ["#5A2A0E", "#B0672B", "#F2B884", "#FFE6CC"],
@@ -1107,6 +1107,7 @@ var HUB_MEDAL = {
 "gi-exam1":     { rib: ["#C46A1E", "#E8B04B"], g: [["f", "M9 2.5h3.4v4.6c0 2 1.4 2.8 3 2.4 2.4-.6 5.1.4 5.1 3.4 0 4.6-4.4 8.6-9.6 8.6-4.2 0-7.4-2.8-7.4-6.6 0-4.2 4.5-4.6 5.5-7.4z"]] },
 "gi-exam2":     { rib: ["#7A3B1F", "#6E9A3A"], g: [["f", "M2.6 9.4c0-2.6 2.4-3.6 5.4-3.6h11c2.4 0 3.1 2.2 1.8 4.2-2.6 4.2-7.8 8.8-12.6 9.2-3.6.3-5.6-5-5.6-9.8z"]] },
 "hepatobiliary":{ rib: ["#7A3B1F", "#6E9A3A"], g: [["f", "M2.6 9.4c0-2.6 2.4-3.6 5.4-3.6h11c2.4 0 3.1 2.2 1.8 4.2-2.6 4.2-7.8 8.8-12.6 9.2-3.6.3-5.6-5-5.6-9.8z"]] },
+"review-of-systems": { rib: ["#6B46A8", "#4FB3A9"], g: [["f", "M6.4 4.8h11.2q1.6 0 1.6 1.6v14q0 1.6-1.6 1.6H6.4q-1.6 0-1.6-1.6v-14q0-1.6 1.6-1.6z"], ["f", "M9 2.4h6q1 0 1 1V7H8V3.4q0-1 1-1z"], ["l", "M7.6 11.4l1.4 1.4 2.4-2.6M13.4 11.6h3.4M7.6 17l1.4 1.4 2.4-2.6M13.4 17.2h3.4"]] },
 "genetics":     { rib: ["#3A6FD8", "#E05A9C"], g: [["s", "M7 3c0 6 10 6 10 12v6"], ["s", "M17 3c0 6-10 6-10 12v6"], ["l", "M8.4 5.8h7.2M8.4 18h7.2"]] }
 };
 function hubMedal(h){ return HUB_MEDAL[h] || { rib: ["#C2414B", "#2F5FA8"], g: TOOTH }; }

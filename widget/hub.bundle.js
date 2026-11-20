@@ -1211,6 +1211,10 @@ var R = C.review || {}, n = function(t){ return String(t).replace("{n}", bankAll
 if (isDefaultLecs(picked)) return n(R.all || "All lectures");
 if (picked.length === HX.LECS.length) return n(R.allPlus || "All lectures");
 if (!picked.length) return "No lectures";
+if (HX.GROUPS) {
+var whole = HX.lecGroups(HX.LECS).filter(function(x){ return x.lecs.every(function(l){ return picked.indexOf(l.id) > -1; }); });
+if (whole.length && whole.reduce(function(n, x){ return n + x.lecs.length; }, 0) === picked.length) return whole.map(function(x){ return x.g.title; }).join(", ");
+}
 return picked.length === 1 ? lecName(picked[0]) : picked.map(function(id){ return lecLabel(LBY[id]); }).join(", ");
 }
 function filtered(o){
@@ -1328,7 +1332,10 @@ return '<div class="qbar panel' + (preset ? " is-set" : "") + '" role="search" a
 '<div class="qbar-row">' +
 '<div class="lp"><span class="lab" id="lpL">Lectures</span><button class="btn lp-btn" type="button" aria-expanded="false" aria-labelledby="lpL lpS" data-lp><span id="lpS">' + esc(sum) + "</span>" + icon("chevron", 16, "rot") + "</button>" +
 '<div class="lp-pop" hidden><div class="lp-acts"><button class="btn btn-text" type="button" data-lpall>' + esc((C.review || {}).allBtn || "All lectures") + '</button><button class="btn btn-text" type="button" data-lpnone>Untick all</button></div>' + ((C.review || {}).help ? '<p class="note lp-help">' + esc(C.review.help) + "</p>" : "") + "<ul>" +
-HX.LECS.map(function(l){ var on = picked.indexOf(l.id) > -1; return '<li><label><input type="checkbox" value="' + esc(l.id) + '"' + (on ? " checked" : "") + ">" + lecDot(l.id) + "<span>" + esc(lecName(l.id)) + '</span></label><button class="btn btn-text" type="button" data-only="' + esc(l.id) + '" aria-label="Only ' + esc(lecLabel(l)) + '">Only</button></li>'; }).join("") +
+(HX.GROUPS ? HX.lecGroups(HX.LECS) : [{ lecs: HX.LECS }]).map(function(x){
+return (x.g ? '<li class="lp-grp"><b>' + esc(x.g.title) + '</b><button class="btn btn-text" type="button" data-onlyg="' + esc(x.g.id) + '" aria-label="Only ' + esc(x.g.title) + '">Only</button></li>' : "") +
+x.lecs.map(function(l){ var on = picked.indexOf(l.id) > -1; return '<li><label><input type="checkbox" value="' + esc(l.id) + '"' + (on ? " checked" : "") + ">" + lecDot(l.id) + "<span>" + esc(lecName(l.id)) + '</span></label><button class="btn btn-text" type="button" data-only="' + esc(l.id) + '" aria-label="Only ' + esc(lecLabel(l)) + '">Only</button></li>'; }).join("");
+}).join("") +
 "</ul></div></div>" +
 '<label class="search"><span class="sr">Search the questions</span>' + icon("search", 18) + '<input type="search" placeholder="Search the questions" value="' + esc(bankSearch) + '" data-search></label>' +
 "</div>" +
@@ -1349,6 +1356,7 @@ btn.addEventListener("click", function(){ var on = pop.hidden; pop.hidden = !on;
 document.addEventListener("click", function away(e){ if (!el.isConnected) { document.removeEventListener("click", away); return; } if (!pop.hidden && !e.target.closest(".lp")) { pop.hidden = true; btn.setAttribute("aria-expanded", "false"); } });
 pop.addEventListener("change", function(){ var ids = $$("input:checked", pop).map(function(c){ return c.value; }); STATE.ui.qlec = lecValue(ids); STATE.ui.qE1auto = false; saveState(); $("#lpS", el).textContent = lecSummary(ids); clearTimeout(pop.__t); pop.__t = setTimeout(function(){ if (!pop.hidden) { pop.hidden = true; } redraw("lec-pick"); }, 900); });
 $$("[data-only]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qlec = b.getAttribute("data-only"); STATE.ui.qE1auto = false; redraw("lec-only"); }); });
+$$("[data-onlyg]", el).forEach(function(b){ b.addEventListener("click", function(){ var g = b.getAttribute("data-onlyg"); STATE.ui.qlec = HX.LECS.filter(function(l){ return l.group === g; }).map(function(l){ return l.id; }); STATE.ui.qE1auto = false; redraw("lec-only-course"); }); });
 $("[data-lpall]", el).addEventListener("click", function(){ STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; redraw("lec-all"); });
 $("[data-lpnone]", el).addEventListener("click", function(){ $$("input", pop).forEach(function(c){ c.checked = false; }); STATE.ui.qlec = []; STATE.ui.qE1auto = false; saveState(); $("#lpS", el).textContent = "No lectures"; });
 $$("[data-show]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qstatus = b.getAttribute("data-show"); redraw("show=" + STATE.ui.qstatus); }); });
@@ -1864,7 +1872,7 @@ function saveState(){ clearTimeout(saveT); saveT = setTimeout(saveNow, 250); }
 addEventListener("pagehide", saveNow);
 document.addEventListener("visibilitychange", function(){ if (document.visibilityState === "hidden") saveNow(); });
 var AUDIO_OFF = false;
-var CORE = null, QS = null, QBY = {}, QBL = {}, LECS = [], LBY = {}, IDX = [], NOTES = null, STUDY = null, FIG = null, ARC = null;
+var CORE = null, QS = null, QBY = {}, QBL = {}, LECS = [], LBY = {}, GROUPS = null, IDX = [], NOTES = null, STUDY = null, FIG = null, ARC = null;
 var EXAM = null, EXAM_LECS = {}, REVIEW = {};
 var memo = {};
 function getJSON(name){
@@ -1882,6 +1890,7 @@ function loadCss(href){ if (memo[href]) return; memo[href] = 1; var l = document
 function lecLabel(l){ return l ? (l.label || ("L" + l.num)) : ""; }
 function shortTitle(l){ return l ? String(l.title).split(":")[0] : ""; }
 function lecName(id){ var l = LBY[id]; return l ? lecLabel(l) + " · " + shortTitle(l) : id; }
+function lecGroups(list){ return (GROUPS || []).map(function(g){ return { g: g, lecs: list.filter(function(l){ return l.group === g.id; }) }; }).filter(function(x){ return x.lecs.length; }); }
 var LCOL = {};
 function lc(id){ return " lc lc-" + (LCOL[id] || "x"); }
 function lecDot(id){ return '<i class="ld' + lc(id) + '" aria-hidden="true"></i>'; }
@@ -1891,16 +1900,21 @@ function isRead(id){ return !!(STATE.read || {})[id]; }
 function isExamLec(id){ return !!EXAM_LECS[id]; }
 function isReview(id){ return !!REVIEW[id]; }
 function hasReview(){ return Object.keys(REVIEW).length > 0; }
+function examOver(x){ var p = String(x.date).split("-").map(Number), t = String(x.closes || "23:59").split(":").map(Number); return Date.now() > new Date(p[0], p[1] - 1, p[2], t[0] || 0, t[1] || 0).getTime(); }
 function setCore(c){
 AUDIO_OFF = c.audio === "off";
 if (AUDIO_OFF && c.podcast) { c = Object.assign({}, c); delete c.podcast; }
 CORE = c; LECS = c.lectures || []; LECS.forEach(function(l){ LBY[l.id] = l; QBL[l.id] = []; });
 IDX = (c.index || []).map(function(r){ return { id: r[0], lec: r[1], likely: !!r[2], src: r[3] || "" }; });
 IDX.forEach(function(r){ (QBL[r.lec] = QBL[r.lec] || []).push(r); });
-EXAM = (c.exams || []).filter(function(x){ return x.id === C.exam; })[0] || (c.exams || [])[c.exams.length - 1] || null;
+var open = (c.exams || []).filter(function(x){ return !examOver(x); });
+EXAM = (c.exams || []).filter(function(x){ return x.id === C.exam; })[0] || (!C.exam && open[0]) || (c.exams || [])[c.exams.length - 1] || null;
 (c.reviewOnly || []).forEach(function(id){ REVIEW[id] = 1; });
 LECS.forEach(function(l){ if ((!C.exam || l.exam === C.exam) && !REVIEW[l.id]) EXAM_LECS[l.id] = 1; });
-var nc = 0; LECS.forEach(function(l){ LCOL[l.id] = REVIEW[l.id] ? "x" : String(nc++ % 10); });
+GROUPS = (c.groups || []).filter(function(g){ return LECS.some(function(l){ return l.group === g.id; }); });
+if (!GROUPS.length) GROUPS = null;
+var nc = 0, gi = {}; if (GROUPS) GROUPS.forEach(function(g, i){ gi[g.id] = String(i % 10); });
+LECS.forEach(function(l){ LCOL[l.id] = REVIEW[l.id] ? "x" : GROUPS ? (gi[l.group] || "x") : String(nc++ % 10); });
 if (!LBY[STATE.ui.lec]) STATE.ui.lec = (LECS.filter(function(l){ return isExamLec(l.id); })[0] || LECS[0] || {}).id;
 }
 function needQuestions(){
@@ -2077,7 +2091,7 @@ var y = day(-1); return Object.keys(all).filter(function(id){ var r = all[id]; r
 var homeTimer = 0;
 function renderHome(el){
 clearInterval(homeTimer);
-var X = C.home || {}, rows = LECS.map(lecProgress), fin = rows.filter(function(r){ return isExamLec(r.l.id); });
+var X = Object.assign({}, C.home || {}, ((C.home || {}).byExam || {})[EXAM && EXAM.id] || {}), rows = LECS.map(lecProgress), fin = rows.filter(function(r){ return isExamLec(r.l.id); });
 var total = fin.reduce(function(n, r){ return n + r.total; }, 0), right = fin.reduce(function(n, r){ return n + r.right; }, 0);
 var left = IDX.filter(function(q){ return !ansOf(q.id) && isExamLec(q.lec); }).length;
 var cont = LBY[STATE.ui.lec] || LECS[0], d = EXAM ? calDays(EXAM.date) : null, M = AH.masthead || { body: "", label: "" };
@@ -2145,8 +2159,11 @@ return '<ul class="rows">' + out.slice(0, 3).join("") + "</ul>";
 function lecsHTML(rows){
 var last = null, X = C.home || {};
 return '<ul class="lec-rows">' + rows.map(function(r){
-var tw = r.total ? Math.round(r.tried / r.total * 100) : 0, rw = r.total ? Math.round(r.right / r.total * 100) : 0, grp = isExamLec(r.l.id) ? "on" : "off", head = "";
-if (grp !== last) { head = '<li class="grp">' + esc(grp === "on" ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures")) + "</li>"; last = grp; }
+var tw = r.total ? Math.round(r.tried / r.total * 100) : 0, rw = r.total ? Math.round(r.right / r.total * 100) : 0, grp = GROUPS ? r.l.group : isExamLec(r.l.id) ? "on" : "off", head = "";
+if (grp !== last) {
+var gt = GROUPS ? (GROUPS.filter(function(g){ return g.id === grp; })[0] || {}).title || "" : grp === "on" ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures");
+head = '<li class="grp' + (GROUPS ? " grp-c" : "") + '">' + esc(gt) + "</li>"; last = grp;
+}
 return head + '<li class="' + lc(r.l.id).trim() + '">' + lecBadge(r.l, "lb-s") + '<div class="lr-main"><p><b><span class="sr">' + esc(lecLabel(r.l)) + " · </span>" + esc(shortTitle(r.l)) + "</b>" + (isRead(r.l.id) ? ' <span class="read-tag">' + icon("check", 14) + "Notes done</span>" : "") + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
 '<p class="note num">' + r.tried + " of " + r.total + " tried" + (r.pct !== null ? " · " + r.pct + "% of answers right" : "") + "</p></div>" +
 '<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + (isRead(r.l.id) ? ", done" : "") + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>';
@@ -2183,11 +2200,13 @@ var groups = [["on", LECS.filter(function(l){ return isExamLec(l.id); })], ["off
 var pick = onGuide ? GD.pick() : lecBadge(lec) + '<span class="lp-t"><b>' + esc(shortTitle(lec)) + "</b><small>" + esc(lecLabel(lec)) + " · change lecture</small></span>";
 return '<nav class="lec-list" aria-label="Lectures"><button class="lec-pick btn" type="button" aria-expanded="false" data-lecpick>' + pick + icon("chevron", 18, "rot") + "</button><ul>" +
 (GD ? GD.entry(onGuide) : "") +
-groups.map(function(g){
+(GROUPS ? lecGroups(LECS).map(function(x){
+return '<li class="grp grp-on grp-c"><b>' + esc(x.g.title) + "</b><span>" + esc(x.g.sub || pl(x.lecs.length, "part")) + "</span></li>" + x.lecs.map(function(l){ return lecItemHTML(l, !onGuide && l.id === lec.id); }).join("");
+}) : groups.map(function(g){
 var on = g[0] === "on";
 return '<li class="grp grp-' + g[0] + '"><b>' + esc(on ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures")) + "</b><span>" +
 esc(on ? (EXAM ? (EXAM.label || "The exam") + ", " + dateLabel(EXAM.date, { weekday: "long", month: "long", day: "numeric" }) : "") : (X.offNote || "For review")) + "</span></li>" + g[1].map(function(l){ return lecItemHTML(l, !onGuide && l.id === lec.id); }).join("");
-}).join("") + "</ul></nav>";
+})).join("") + "</ul></nav>";
 }
 function drawNotes(el, lec){
 if (view !== "notes") return;
@@ -2645,7 +2664,7 @@ return '<li class="mt f-' + f + (big ? " is-big" : "") + '"><a href="#more/' + m
 '<span class="mt-meta num">' + esc(moreMeta(m[0])) + "</span></span>" + icon("chevron", 20) + "</a></li>";
 };
 el.innerHTML = '<div class="hx-page more"><h1>More</h1><p class="more-lede">Everything past the notes and the questions: the review, the games, your stats and your settings.</p>' +
-'<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "shop" || HX.hasShop()); }).map(tile).join("") + "</ul></nav>" +
+'<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "shop" || HX.hasShop()) && (m[0] !== "arcade" || ((C.arcade || {}).games || []).length); }).map(tile).join("") + "</ul></nav>" +
 '<section class="panel menu talk" aria-labelledby="mwH"><h2 id="mwH">Talk to us</h2><ul class="rows">' +
 MORE_ROWS.map(function(m){ return '<li><a href="#more/' + m[0] + '">' + icon(m[1], 22) + "<span><b>" + esc(m[2]) + "</b><small>" + esc(m[3]) + "</small></span>" + icon("chevron", 18) + "</a></li>"; }).join("") +
 '<li><button type="button" data-sh-inbox>' + icon("inbox", 22) + "<span><b>Inbox</b><small>Replies to what you report or suggest, and notices to the class</small></span>" + icon("chevron", 18) + "</button></li>" +
@@ -3117,7 +3136,7 @@ visible: visible, toast: toast, icon: icon, artSvg: artSvg, spot: spot, img: img
 flameLevel: flameLevel, flame: flame, ring: ring, mark: mark, ANSWERED: ANSWERED, STATE: STATE, ansOf: ansOf,
 studyDayList: studyDayList, achMap: achMap, putAnswer: putAnswer, saveNow: saveNow, saveState: saveState,
 QBY: QBY, QBL: QBL, LBY: LBY, EXAM_LECS: EXAM_LECS, REVIEW: REVIEW, loadScript: loadScript, loadCss: loadCss,
-lecLabel: lecLabel, shortTitle: shortTitle, lecName: lecName, LCOL: LCOL, lc: lc, lecDot: lecDot,
+lecLabel: lecLabel, shortTitle: shortTitle, lecName: lecName, lecGroups: lecGroups, LCOL: LCOL, lc: lc, lecDot: lecDot,
 lecChip: lecChip, lecHead: lecHead, isRead: isRead, isExamLec: isExamLec, isReview: isReview,
 hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, hasVersions: hasVersions, needNotes: needNotes, needStudy: needStudy,
 needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
@@ -3125,7 +3144,7 @@ go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses:
 offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget, lecBadge: lecBadge, lecListHTML: lecListHTML, wireLecPick: wireLecPick, wireLecLinks: wireLecLinks,
 followBtn: followBtn, wireFollow: wireFollow
 };
-[["CORE", function(){ return CORE; }], ["QS", function(){ return QS; }], ["LECS", function(){ return LECS; }],
+[["CORE", function(){ return CORE; }], ["QS", function(){ return QS; }], ["LECS", function(){ return LECS; }], ["GROUPS", function(){ return GROUPS; }],
 ["IDX", function(){ return IDX; }], ["NOTES", function(){ return NOTES; }], ["AUDIO_OFF", function(){ return AUDIO_OFF; }],
 ["STUDY", function(){ return STUDY; }], ["FIG", function(){ return FIG; }], ["ARC", function(){ return ARC; }],
 ["EXAM", function(){ return EXAM; }], ["shell", function(){ return shell; }],

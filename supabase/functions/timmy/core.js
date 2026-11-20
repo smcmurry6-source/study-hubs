@@ -15,9 +15,12 @@
 // facts, and the site's features (from the About page, spoilers left out). Never the question bank, except the one
 // question "Ask Timmy" was tapped on after the student answered it.
 
-// Sonnet 5.5 (Sam, 2026-11-14: "Lets do sonnet"), from the eval's comparison that day: as good as Opus 5.5 on the test
-// set, at half the cost and twice the speed. Built and first tested on claude-opus-5-5.
-export const MODEL = "claude-sonnet-5-5";
+// Haiku 5.5 (Sam, 2026-11-20: "we can switch timmy to run on haiku"), when the Review of Systems hub's content (about
+// 180k tokens by length, over the test's earlier 110k) would have made every cache write on it cost about 1.6 times a
+// usual hub's. Sonnet 5.5 before (Sam, 2026-11-14: "Lets do sonnet": as good as Opus 5.5 on the test set at half the
+// cost); that day's eval had Haiku answering fewer of the cases (83 against 98) at a third of the cost. Built and first
+// tested on claude-opus-5-5. withModel() leaves the fallback out: Haiku has none, so a declined question just ends.
+export const MODEL = "claude-haiku-5-5";
 export const BETAS = ["server-side-fallback-2026-07-01"];
 export const EFFORT = "medium";
 export const MAX_TOKENS = 16000;

@@ -41,6 +41,8 @@ export const TINTS = {
   /* Heme & Endo Exam 3 reuses Exam 2's art and tint (Sam, 2026-11-15: "you can reuse the art that was made for endo exam 2") */
   "heme-endo-exam3":      { name: "Heme & Endo 3",        ink: "#a83232", mid: "#D86F6F", light: "#F5DADA", dark: "#EE8A8A" },
   "special-patient-care": { name: "Special Patient Care", ink: "#2e7d4f", mid: "#6DB58A", light: "#D7EEDF", dark: "#76CB98" },
+  /* Review of Systems (2026-11-19): violet, a hue no other hub has */
+  "review-of-systems":    { name: "Review of Systems",    ink: "#6b46a8", mid: "#A58AD6", light: "#E8E0F5", dark: "#B9A2EC" },
   "generic":              { name: "A new hub",            ink: "#6B5A68", mid: "#A897A4", light: "#ECE6EA", dark: "#C4B3C0" }
 };
 export const HUBS = Object.keys(TINTS);

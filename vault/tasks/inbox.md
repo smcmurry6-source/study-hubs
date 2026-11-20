@@ -10,6 +10,25 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [ ] **Review of Systems: weigh the mock by what Mock 1 asked** (2026-11-19, the hub's build): the hub's 200-question mock
+  spreads its questions by the size of each course (`core.json` `mock.blueprint`), a guess: the course announced no counts.
+  After Mock 1 (Thu Dec 3, noon), read its exam check-ins (which courses felt heavy, what surprised people) and, before Mock 2
+  (Dec 10), move the blueprint toward that, and add High likelihood topics for what the check-ins say came up
+  ([hub note](../hubs/review-of-systems.md)).
+- [ ] **Review of Systems: an arcade with its own skin** (2026-11-19, the hub's build): it shipped without one (More hides
+  the tile). Sam's call whether it wants one; if so, its games, names and lobby art are its own
+  ([arcade-skins](../rules/arcade-skins.md)), and the hub comes out of `TEXT_ONLY` in `sw.js`.
+- [x] **Review of Systems: Sam's calls from the build** (2026-11-20): Sam answered them all the same day: keep everything but the order of the teeth most often missing after third molars, leave the Emergencies names, and leave out anything the professors de-emphasized ([decisions](../decisions.md)); done in [#480](https://github.com/smcmurry6-source/study-hubs/pull/480).
+- [ ] **The engine's background work after Home in small pieces** (2026-11-20, [#480](https://github.com/smcmurry6-source/study-hubs/pull/480)):
+  on the performance suite's slowed phone, Review of Systems blocks the page for about 850 ms after Home has drawn (Heme & Endo
+  Exam 3: about 330). A CPU profile put the JavaScript in `exportSections()` in `widget/hub.js` (every part's notes parsed into
+  the page in one task for the search index), `fit()`/`fitFigs()` in `widget/v3.js`'s layer and `fmt()`'s `toLocaleString`;
+  the rest is the browser parsing the content JSON. Building the index a few parts at a time, yielding between them, would
+  cut it on every hub; then lower the hub's `tbt` in `tools/release/budgets.json` (set to 900 from that day's run).
+- [x] ~~**Ask Timmy on Haiku: run the eval, with Review of Systems cases**~~ (2026-11-20): dropped, Sam: "dont worry about testing haiku, just switch timmy to it" ([decisions](../decisions.md)). If his answers fall short, going back is `MODEL` in `supabase/functions/timmy/core.js` ([ask-timmy](../reference/ask-timmy.md)).
+- [ ] **Review of Systems: Cardio & Respiratory and Renal from their slides** (2026-11-19, the hub's build): their Drive
+  folders had the thinnest sources (classmates' guides, no professor slides), so those sections rest most on standard
+  references. If Sam can share their slides or transcripts, check those parts against them.
 - [ ] **Run the test-runs data fix once more on 2026-11-21** (2026-11-19, the evening lessons audit): the PR that adds
   `tools/ci/no-leaks.js` runs `tools/data-fixes/2026-11-19-test-runs.sql` after its merge, but a smoke test run locally from a
   branch older than the fix (another session's) still writes its game-layer check into the live hub until that branch takes

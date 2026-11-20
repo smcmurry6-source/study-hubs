@@ -187,7 +187,7 @@
 
   /* ---------- the content ---------- */
   var AUDIO_OFF = false;   // core.json's "audio": "off" (setCore)
-  var CORE = null, QS = null, QBY = {}, QBL = {}, LECS = [], LBY = {}, IDX = [], NOTES = null, STUDY = null, FIG = null, ARC = null;
+  var CORE = null, QS = null, QBY = {}, QBL = {}, LECS = [], LBY = {}, GROUPS = null, IDX = [], NOTES = null, STUDY = null, FIG = null, ARC = null;
   var EXAM = null, EXAM_LECS = {}, REVIEW = {};
   var memo = {};
   function getJSON(name){
@@ -207,6 +207,8 @@
   function lecLabel(l){ return l ? (l.label || ("L" + l.num)) : ""; }
   function shortTitle(l){ return l ? String(l.title).split(":")[0] : ""; }
   function lecName(id){ var l = LBY[id]; return l ? lecLabel(l) + " · " + shortTitle(l) : id; }
+  /* a list's lectures by course, in the order of core.json's groups: [{ g, lecs }] (only on a hub with groups) */
+  function lecGroups(list){ return (GROUPS || []).map(function(g){ return { g: g, lecs: list.filter(function(l){ return l.group === g.id; }) }; }).filter(function(x){ return x.lecs.length; }); }
   /* each lecture's own color (Sam, 2026-11-11: "more color ... to distinguish each lecture from one another so its easier
      to tell where questions come from and also which lectures youve done in the lecture notes"): set in setCore from the
      lecture's place in the hub, so it is the same everywhere (question cards, the notes, Home, the bank's picker, hints,
@@ -226,6 +228,8 @@
      (Sam, 2026-11-10). Their answers still count for XP and streaks, and the drill, mock and search still use them. */
   function isReview(id){ return !!REVIEW[id]; }
   function hasReview(){ return Object.keys(REVIEW).length > 0; }
+  /* an exam is over once its closing time (or the end of its day) has passed on the device's clock */
+  function examOver(x){ var p = String(x.date).split("-").map(Number), t = String(x.closes || "23:59").split(":").map(Number); return Date.now() > new Date(p[0], p[1] - 1, p[2], t[0] || 0, t[1] || 0).getTime(); }
   function setCore(c){
     /* an archived hub whose narration and Timmy Time came off the site (core.json's "audio": "off";
        vault/rules/archived-hubs-drop-their-audio.md): no Timmy Time on Home or in More, Listen reads in the device's
@@ -235,10 +239,18 @@
     CORE = c; LECS = c.lectures || []; LECS.forEach(function(l){ LBY[l.id] = l; QBL[l.id] = []; });
     IDX = (c.index || []).map(function(r){ return { id: r[0], lec: r[1], likely: !!r[2], src: r[3] || "" }; });
     IDX.forEach(function(r){ (QBL[r.lec] = QBL[r.lec] || []).push(r); });
-    EXAM = (c.exams || []).filter(function(x){ return x.id === C.exam; })[0] || (c.exams || [])[c.exams.length - 1] || null;
+    /* the exam the hub counts down to: the page's own (SH_HUB.exam), or else the first one not over yet, then the last
+       (a hub with two sittings, such as Review of Systems' two mocks, moves on to the second once the first has closed) */
+    var open = (c.exams || []).filter(function(x){ return !examOver(x); });
+    EXAM = (c.exams || []).filter(function(x){ return x.id === C.exam; })[0] || (!C.exam && open[0]) || (c.exams || [])[c.exams.length - 1] || null;
     (c.reviewOnly || []).forEach(function(id){ REVIEW[id] = 1; });
     LECS.forEach(function(l){ if ((!C.exam || l.exam === C.exam) && !REVIEW[l.id]) EXAM_LECS[l.id] = 1; });
-    var nc = 0; LECS.forEach(function(l){ LCOL[l.id] = REVIEW[l.id] ? "x" : String(nc++ % 10); });
+    /* a hub of many courses (core.json's groups, and each lecture's group: Review of Systems, 2026-11-19) lists its
+       lectures under their course in the notes' list, Home's progress and the bank's picker, and each course has one color */
+    GROUPS = (c.groups || []).filter(function(g){ return LECS.some(function(l){ return l.group === g.id; }); });
+    if (!GROUPS.length) GROUPS = null;
+    var nc = 0, gi = {}; if (GROUPS) GROUPS.forEach(function(g, i){ gi[g.id] = String(i % 10); });
+    LECS.forEach(function(l){ LCOL[l.id] = REVIEW[l.id] ? "x" : GROUPS ? (gi[l.group] || "x") : String(nc++ % 10); });
     if (!LBY[STATE.ui.lec]) STATE.ui.lec = (LECS.filter(function(l){ return isExamLec(l.id); })[0] || LECS[0] || {}).id;
   }
   function needQuestions(){
@@ -446,7 +458,8 @@
   var homeTimer = 0;
   function renderHome(el){
     clearInterval(homeTimer);
-    var X = C.home || {}, rows = LECS.map(lecProgress), fin = rows.filter(function(r){ return isExamLec(r.l.id); });
+    /* the words for the exam it counts down to (home.byExam[<exam id>]: a hub with two sittings) over the hub's own */
+    var X = Object.assign({}, C.home || {}, ((C.home || {}).byExam || {})[EXAM && EXAM.id] || {}), rows = LECS.map(lecProgress), fin = rows.filter(function(r){ return isExamLec(r.l.id); });
     var total = fin.reduce(function(n, r){ return n + r.total; }, 0), right = fin.reduce(function(n, r){ return n + r.right; }, 0);
     var left = IDX.filter(function(q){ return !ansOf(q.id) && isExamLec(q.lec); }).length;
     var cont = LBY[STATE.ui.lec] || LECS[0], d = EXAM ? calDays(EXAM.date) : null, M = AH.masthead || { body: "", label: "" };
@@ -520,8 +533,11 @@
   function lecsHTML(rows){
     var last = null, X = C.home || {};
     return '<ul class="lec-rows">' + rows.map(function(r){
-      var tw = r.total ? Math.round(r.tried / r.total * 100) : 0, rw = r.total ? Math.round(r.right / r.total * 100) : 0, grp = isExamLec(r.l.id) ? "on" : "off", head = "";
-      if (grp !== last) { head = '<li class="grp">' + esc(grp === "on" ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures")) + "</li>"; last = grp; }
+      var tw = r.total ? Math.round(r.tried / r.total * 100) : 0, rw = r.total ? Math.round(r.right / r.total * 100) : 0, grp = GROUPS ? r.l.group : isExamLec(r.l.id) ? "on" : "off", head = "";
+      if (grp !== last) {
+        var gt = GROUPS ? (GROUPS.filter(function(g){ return g.id === grp; })[0] || {}).title || "" : grp === "on" ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures");
+        head = '<li class="grp' + (GROUPS ? " grp-c" : "") + '">' + esc(gt) + "</li>"; last = grp;
+      }
       return head + '<li class="' + lc(r.l.id).trim() + '">' + lecBadge(r.l, "lb-s") + '<div class="lr-main"><p><b><span class="sr">' + esc(lecLabel(r.l)) + " · </span>" + esc(shortTitle(r.l)) + "</b>" + (isRead(r.l.id) ? ' <span class="read-tag">' + icon("check", 14) + "Notes done</span>" : "") + '</p><span class="bar" role="img" aria-label="' + r.tried + " of " + r.total + " tried, " + r.right + ' right"><i class="tried" style="width:' + tw + '%"></i><i class="right" style="width:' + rw + '%"></i></span>' +
         '<p class="note num">' + r.tried + " of " + r.total + " tried" + (r.pct !== null ? " · " + r.pct + "% of answers right" : "") + "</p></div>" +
         '<span class="lr-acts"><a class="btn btn-text" href="#notes/' + esc(r.l.id) + '" aria-label="Notes for ' + esc(lecLabel(r.l)) + (isRead(r.l.id) ? ", done" : "") + '">Notes</a><a class="btn btn-text" href="#questions" data-lecq="' + esc(r.l.id) + '" aria-label="Questions for ' + esc(lecLabel(r.l)) + '">Questions</a></span></li>';
@@ -570,11 +586,13 @@
     var pick = onGuide ? GD.pick() : lecBadge(lec) + '<span class="lp-t"><b>' + esc(shortTitle(lec)) + "</b><small>" + esc(lecLabel(lec)) + " · change lecture</small></span>";
     return '<nav class="lec-list" aria-label="Lectures"><button class="lec-pick btn" type="button" aria-expanded="false" data-lecpick>' + pick + icon("chevron", 18, "rot") + "</button><ul>" +
       (GD ? GD.entry(onGuide) : "") +
-      groups.map(function(g){
+      (GROUPS ? lecGroups(LECS).map(function(x){
+        return '<li class="grp grp-on grp-c"><b>' + esc(x.g.title) + "</b><span>" + esc(x.g.sub || pl(x.lecs.length, "part")) + "</span></li>" + x.lecs.map(function(l){ return lecItemHTML(l, !onGuide && l.id === lec.id); }).join("");
+      }) : groups.map(function(g){
         var on = g[0] === "on";
         return '<li class="grp grp-' + g[0] + '"><b>' + esc(on ? (X.onExam || "On the exam") : (X.offExam || "Earlier lectures")) + "</b><span>" +
           esc(on ? (EXAM ? (EXAM.label || "The exam") + ", " + dateLabel(EXAM.date, { weekday: "long", month: "long", day: "numeric" }) : "") : (X.offNote || "For review")) + "</span></li>" + g[1].map(function(l){ return lecItemHTML(l, !onGuide && l.id === lec.id); }).join("");
-      }).join("") + "</ul></nav>";
+      })).join("") + "</ul></nav>";
   }
   function drawNotes(el, lec){
     if (view !== "notes") return;
@@ -1097,7 +1115,7 @@
         '<span class="mt-meta num">' + esc(moreMeta(m[0])) + "</span></span>" + icon("chevron", 20) + "</a></li>";
     };
     el.innerHTML = '<div class="hx-page more"><h1>More</h1><p class="more-lede">Everything past the notes and the questions: the review, the games, your stats and your settings.</p>' +
-      '<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "shop" || HX.hasShop()); }).map(tile).join("") + "</ul></nav>" +
+      '<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "shop" || HX.hasShop()) && (m[0] !== "arcade" || ((C.arcade || {}).games || []).length); }).map(tile).join("") + "</ul></nav>" +
       '<section class="panel menu talk" aria-labelledby="mwH"><h2 id="mwH">Talk to us</h2><ul class="rows">' +
         MORE_ROWS.map(function(m){ return '<li><a href="#more/' + m[0] + '">' + icon(m[1], 22) + "<span><b>" + esc(m[2]) + "</b><small>" + esc(m[3]) + "</small></span>" + icon("chevron", 18) + "</a></li>"; }).join("") +
         '<li><button type="button" data-sh-inbox>' + icon("inbox", 22) + "<span><b>Inbox</b><small>Replies to what you report or suggest, and notices to the class</small></span>" + icon("chevron", 18) + "</button></li>" +
@@ -1646,7 +1664,7 @@
     flameLevel: flameLevel, flame: flame, ring: ring, mark: mark, ANSWERED: ANSWERED, STATE: STATE, ansOf: ansOf,
     studyDayList: studyDayList, achMap: achMap, putAnswer: putAnswer, saveNow: saveNow, saveState: saveState,
     QBY: QBY, QBL: QBL, LBY: LBY, EXAM_LECS: EXAM_LECS, REVIEW: REVIEW, loadScript: loadScript, loadCss: loadCss,
-    lecLabel: lecLabel, shortTitle: shortTitle, lecName: lecName, LCOL: LCOL, lc: lc, lecDot: lecDot,
+    lecLabel: lecLabel, shortTitle: shortTitle, lecName: lecName, lecGroups: lecGroups, LCOL: LCOL, lc: lc, lecDot: lecDot,
     lecChip: lecChip, lecHead: lecHead, isRead: isRead, isExamLec: isExamLec, isReview: isReview,
     hasReview: hasReview, needQuestions: needQuestions, needVariants: needVariants, worded: worded, hasVersions: hasVersions, needNotes: needNotes, needStudy: needStudy,
     needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
@@ -1654,7 +1672,7 @@
     offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget, lecBadge: lecBadge, lecListHTML: lecListHTML, wireLecPick: wireLecPick, wireLecLinks: wireLecLinks,
     followBtn: followBtn, wireFollow: wireFollow
   };
-  [["CORE", function(){ return CORE; }], ["QS", function(){ return QS; }], ["LECS", function(){ return LECS; }],
+  [["CORE", function(){ return CORE; }], ["QS", function(){ return QS; }], ["LECS", function(){ return LECS; }], ["GROUPS", function(){ return GROUPS; }],
     ["IDX", function(){ return IDX; }], ["NOTES", function(){ return NOTES; }], ["AUDIO_OFF", function(){ return AUDIO_OFF; }],
     ["STUDY", function(){ return STUDY; }], ["FIG", function(){ return FIG; }], ["ARC", function(){ return ARC; }],
     ["EXAM", function(){ return EXAM; }], ["shell", function(){ return shell; }],

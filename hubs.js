@@ -15,6 +15,10 @@
    Read by widget/dash.js (the dashboard), review/ (the admin page) and the tools (tools/release/lib.js hubData()). */
 window.SH_DASH_DATA = {
  "classes": {
+  "ros": {
+   "name": "Review of Systems",
+   "egg": "Every system reviewed. Vitals within normal limits."
+  },
   "implants": {
    "name": "PCD Implants",
    "egg": "Osseointegrated. Primary stability: excellent."
@@ -45,6 +49,41 @@ window.SH_DASH_DATA = {
   }
  },
  "hubs": [
+  {
+   "id": "review-of-systems",
+   "cls": "ros",
+   "title": "Review of Systems Hub",
+   "code": "Review of Systems · Mock boards",
+   "exams": [
+    {
+     "name": "Review of Systems Mock Board 1",
+     "label": "Mock 1",
+     "date": "2026-12-03",
+     "code": "Review of Systems · Mock 1",
+     "checkinHour": 12,
+     "promptHour": 12
+    },
+    {
+     "name": "Review of Systems Mock Board 2",
+     "label": "Mock 2",
+     "date": "2026-12-10",
+     "code": "Review of Systems · Mock 2",
+     "checkinHour": 12,
+     "promptHour": 12
+    }
+   ],
+   "updated": "2026-11-20",
+   "desc": "Every course on the two mock board exams (Thu Dec 3 and Thu Dec 10, 8:00 am to noon, 200 questions each): Head & Neck Anatomy, Dental Anatomy & Occlusion, Fundamentals I and II, Oral Microbiology, Neuroscience, Cardio & Respiratory, Renal, Heme & Endo, MSK & GI, Ethics & Professionalism, Evidence-Based Dentistry, Radiology and Emergencies in the Dental Clinic. Each course is a section cut into short parts: high-yield notes with a Plain English version, a cram list, board-style questions with patient boxes and every choice explained, High Likelihood Exam Questions, review tables and a 200-question timed mock.",
+   "modes": [
+    "Home",
+    "Compendium",
+    "Plain-English notes",
+    "Review tables",
+    "Mock exam",
+    "Listen"
+   ],
+   "stateKey": "ros-state-v1"
+  },
   {
    "id": "heme-endo-exam3",
    "cls": "hemeendo",
@@ -490,6 +529,7 @@ window.SH_DASH_DATA = {
   "heme-endo-exam1": "Heme & Endo 1",
   "heme-endo-exam2": "Heme & Endo 2",
   "heme-endo-exam3": "Heme & Endo 3",
+  "review-of-systems": "Review of Systems",
   "special-patient-care": "Special Patient Care",
   "pcd-implants-exam1": "PCD Implants 1"
  },

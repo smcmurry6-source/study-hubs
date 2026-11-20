@@ -377,12 +377,13 @@ max-height: calc(var(--sh-vh, 100vh) - var(--bar-h) - var(--boss-h, 0px) - 48px)
 .lec-list .grp span { font-size: var(--fs-meta); color: var(--muted); }
 .lec-list .grp-on b { color: var(--hub-text); }
 .lec-list .grp-off { margin-top: 10px; padding-top: 16px; border-top: 1px solid var(--border); }
+.lec-list .grp-c ~ .grp-c, .lec-rows .grp-c ~ .grp-c { margin-top: 10px; padding-top: 14px; border-top: 1px solid var(--border); }
 .lec-item { position: relative; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px 12px 10px 10px; border-radius: var(--r-row);
 text-decoration: none; transition: background var(--t-hover) var(--ease-out); }
 .lec-item:hover { background: var(--active); }
 .lec-item[aria-current="page"] { background: var(--row); }
 .lec-item[aria-current="page"]::before { content: ""; position: absolute; left: -10px; top: 12px; bottom: 12px; width: 4px; border-radius: 0 4px 4px 0; background: var(--lc, var(--hub-text)); }
-.lb { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 12px; flex: none;
+.lb { display: inline-flex; align-items: center; justify-content: center; min-width: 40px; padding: 0 5px; white-space: nowrap; height: 40px; border-radius: 12px; flex: none;
 font-size: var(--fs-label); font-weight: var(--w-title); background: var(--row); color: var(--muted); border: 1px solid var(--border); }
 .lb.is-on { background: var(--hub-soft); color: var(--hub-text); border-color: transparent; }
 .lec-item[aria-current="page"] .lb:not(.lc) { background: var(--hub); color: #ffffff; border-color: transparent; }
@@ -392,7 +393,7 @@ font-size: var(--fs-label); font-weight: var(--w-title); background: var(--row);
 .lb-ck { position: absolute; right: -6px; bottom: -6px; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center;
 background: var(--right); color: var(--on-mark); box-shadow: 0 0 0 2px var(--panel); }
 .lb-ck svg { width: 12px; height: 12px; }
-.lb-s { width: 30px; height: 30px; border-radius: 9px; font-size: var(--fs-meta); }
+.lb-s { min-width: 30px; padding: 0 4px; height: 30px; border-radius: 9px; font-size: var(--fs-meta); }
 .lb-s .lb-ck { width: 15px; height: 15px; right: -5px; bottom: -5px; }
 .lb-s .lb-ck svg { width: 10px; height: 10px; }
 .lc .bar .right, .bar.lc .right { background: var(--lc); }
@@ -407,7 +408,7 @@ background: var(--lc-soft); color: var(--lc-ink); font-weight: var(--w-strong); 
 .lec-item[aria-current="page"] .lt b { font-weight: var(--w-head); }
 .lt small { display: block; margin-top: 1px; font-size: var(--fs-meta); color: var(--muted); line-height: 1.3; }
 .lt .bar { height: 5px; margin: 7px 0 0; }
-.lec-pick .lb { width: 34px; height: 34px; border-radius: 10px; }
+.lec-pick .lb { min-width: 34px; padding: 0 4px; height: 34px; border-radius: 10px; }
 .lp-t { flex: 1; min-width: 0; text-align: left; }
 .lp-t b { display: block; font-weight: var(--w-head); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .lp-t small { display: block; font-size: var(--fs-meta); color: var(--muted); font-weight: var(--w-body); }
@@ -557,6 +558,9 @@ background: var(--row); border: 1px solid var(--control); box-shadow: var(--floa
 .lp-pop label:hover { background: var(--panel); }
 .lp-pop input { width: 18px; height: 18px; accent-color: var(--hub); }
 .lp-pop label .ld { margin: 0; }
+.lp-pop .lp-grp { justify-content: space-between; padding: 8px 8px 2px; font-size: var(--fs-meta); color: var(--muted); }
+.lp-pop .lp-grp ~ .lp-grp { margin-top: 6px; border-top: 1px solid var(--border); }
+.lp-pop .lp-grp b { font-weight: var(--w-head); color: var(--ink); }
 .search { flex: 1; min-width: min(220px, 100%); display: flex; align-items: center; gap: 8px; height: var(--control-h); padding: 0 14px; border-radius: var(--r-pill); background: var(--row);
 border: 1px solid var(--control); color: var(--muted); }
 .search input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; color: var(--text); font-size: var(--fs-label); }

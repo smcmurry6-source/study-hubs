@@ -95,9 +95,13 @@ for (const c of corpora) {
   const inText = stems.filter(s => c.text.includes(s));
   ok(inText.length === 0, `${c.hub}: ${inText.length} question stems appear word for word in Timmy's content (${inText.slice(0, 2).join(" | ").slice(0, 120)})`);
   const kinds = {}; for (const u of c.units.values()) kinds[u.kind] = (kinds[u.kind] || 0) + 1;
-  ok(kinds.notes > 100 && kinds.review > 10 && kinds.cram > 50 && kinds.hint > 20 && kinds.likely > 10 && kinds.exam >= 1, `${c.hub}: every kind of content is there (${JSON.stringify(kinds)})`);
+  /* hints come from a professor's recordings; a hub built from few (Review of Systems: only Medical Emergencies had them, 18) has fewer than 21 to send */
+  const nHints = ((DATA[c.hub].study || {}).hints || []).length;
+  ok(kinds.notes > 100 && kinds.review > 10 && kinds.cram > 50 && (kinds.hint || 0) >= Math.min(21, nHints) && kinds.likely > 10 && kinds.exam >= 1, `${c.hub}: every kind of content is there (${JSON.stringify(kinds)})`);
   ok([...c.units.keys()].every(id => /^(N\d+\.\d+|N\d+t\d+|R\d+\.\d+|C\d+\.\d+|H\d+|K\d+|X\d+)$/.test(id)), `${c.hub}: every unit id has the documented shape`);
-  ok(c.text.length / 4 < 110000, `${c.hub}: about ${Math.round(c.text.length / 4)} tokens of content (budget 110,000)`);
+  /* a guard against content that runs away, not the model's limit (1M tokens). 110,000 until 2026-11-20, when the Review of
+     Systems hub (14 courses, about 180k) came in and Timmy moved to Haiku 5.5, where a cache write costs a quarter of Sonnet's */
+  ok(c.text.length / 4 < 200000, `${c.hub}: about ${Math.round(c.text.length / 4)} tokens of content (budget 200,000)`);
   ok(!/<(?!\/?(hub|exam_facts|lecture|review_tables|table|cram_sheet|exam_hints|high_likelihood_topics)[ >])[A-Za-z\/!?]/.test(c.text), `${c.hub}: nothing in the content looks like a tag but the section tags`);
   notes.push(`${c.hub}: ${c.units.size} units, about ${Math.round(c.text.length / 4).toLocaleString("en-US")} tokens`);
 }
@@ -148,7 +152,10 @@ const base = { visitor: "visitor-1", hub: HUB, text: "What does this paragraph m
   const db = fakeDb(), m = fakeModel(answer([{ text: "It means the thing.", cites: [{ id: realUnit.id, quote: realQuote }] }]));
   const out = await T.handle(base, deps(m, db));
   const p = m.calls[0];
-  eq([p.model, p.output_config.effort, p.output_config.format.type, p.fallbacks, p.betas], [T.MODEL, "medium", "json_schema", "default", ["server-side-fallback-2026-07-01"]], "the request: model, effort, structured output, the refusal fallback");
+  /* Haiku has no server-side fallback, so its request goes without one (withModel) */
+  eq([p.model, p.output_config.effort, p.output_config.format.type, p.fallbacks, p.betas], [T.MODEL, "medium", "json_schema"].concat(/^claude-haiku/.test(T.MODEL) ? [undefined, undefined] : ["default", ["server-side-fallback-2026-07-01"]]), "the request: model, effort, structured output, the refusal fallback where the model has one");
+  { const s = T.withModel({ model: "x", betas: T.BETAS, fallbacks: "default" }, "claude-sonnet-5-5"), h = T.withModel({ model: "x", betas: T.BETAS, fallbacks: "default" }, "claude-haiku-5-5");
+    ok(s.fallbacks === "default" && s.betas === T.BETAS && !("fallbacks" in h) && !("betas" in h), "withModel: the fallback for Sonnet, none for Haiku"); }
   ok(!("temperature" in p) && !("top_p" in p) && !("top_k" in p) && !("thinking" in p) && !("tool_choice" in p), "nothing this model rejects (sampling, a thinking setting, forced tools)");
   ok(p.messages[p.messages.length - 1].role === "user", "no prefill: the last message is the student's");
   eq(p.system.map(s => s.cache_control || null), [null, { type: "ephemeral", ttl: "1h" }, { type: "ephemeral", ttl: "1h" }], "the rules, then the content and the site help, each with a 1-hour cache mark");
@@ -386,7 +393,7 @@ ok(!T.quoteIn("Final: 2026", "Final: 2026-11-19") && !T.quoteIn("Final", "Final:
   eq([out.body.kind, out.body.gap && out.body.gap.text, out.body.gap && out.body.gap.sources], ["not_covered", "An exostosis is a benign bony outgrowth. It ties to L2.",
     [{ url: "https://pmc.ncbi.nlm.nih.gov/articles/PMC1/", title: "Oral exostoses: a review", site: "NIH" }]], "the looked-up answer: its text (no markdown) and each source once, with its site");
   const f = db.calls.finish[0], c1 = T.estimateCost(first.usage, T.MODEL);
-  ok(Math.abs(f.p_cost - (c1 + (14000 * 2 + 240 * 10) / 1e6 + T.SEARCH_USD)) < 1e-6 && f.p_input === 15200 && f.p_output === 540 && /Not in your notes \(looked up\): An exostosis/.test(f.p_text) && f.p_kind === "not_covered",
+  ok(Math.abs(f.p_cost - (c1 + T.estimateCost({ input_tokens: 14000, output_tokens: 240, server_tool_use: { web_search_requests: 1 } }, T.MODEL))) < 1e-6 && f.p_input === 15200 && f.p_output === 540 && /Not in your notes \(looked up\): An exostosis/.test(f.p_text) && f.p_kind === "not_covered",
     "both calls are logged: the summed tokens, the search's cost, the looked-up text with the answer");
 
   out = await T.handle(base, deps(two(looked(onList, { pre: true })), fakeDb()));

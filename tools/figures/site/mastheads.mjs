@@ -434,6 +434,84 @@ function generic(){
   return s;
 }
 
+/* ======================= Review of Systems: the board-review desk ======================= */
+function ros(){
+  const t = T["review-of-systems"];
+  let s = ground(t);
+
+  /* a wall chart of the heart, its great vessels and an ECG strip under it (the systems courses) */
+  let h = box(66, 18, 100, 78, 3, C.paper, C.paperShade, 7);
+  h += ROD("M108 44 C106 34 110 28 118 28 C124 28 128 32 128 38", 5, C.red) + ROD("M112 31 V24 M118 28 V22 M124 30 V24", 2.4, C.red);
+  h += ROD("M122 46 C126 40 132 38 138 40", 4.4, C.blue);
+  h += S("M114 82 C101 74 90 66 90 55 C90 47 96 42 103 44 C108 45.5 111.6 48.6 114 52 C117 47.6 121.6 43.6 128 43.6 C135.6 43.6 140 49.6 139.2 56.6 C138 67 127 75.6 114 82 Z", C.red,
+    "M134.4 48.4 C138.6 52.6 139.6 58.6 137.6 64.4 C134.4 72 125.6 77.4 116.4 81.4 C125.6 73.2 132.6 63.4 134.4 48.4 Z", "#B8323A", 2.6);
+  h += L("M114 52 C113 60 112.6 68 114 76", 1.6, "#8E1F2B", .55);
+  h += H("M95 55 C95 50 98 47 102 47", 2.2);
+  h += L("M74 88 H92 L95 84 L98 88 H101 L104 76 L107.6 94 L110.6 86 L113.6 88 H158", 2, t.ink);
+  s += G("rotate(-3 116 57)", h + pin(116, 18));
+
+  /* a wall chart of the lungs: the trachea with its rings, the two main bronchi and the lungs (three lobes and two) */
+  let g = box(434, 18, 100, 78, 3, C.paper, C.paperShade, 7);
+  g += S("M478 48 C468 42 457 48 453 60 C449 72 449 84 456 88 C464 91 474 88 478 82 Z", C.pink, "M470 86 C474 84 477 81 478 77 V82 C474 88 466 90.4 460 89 C464 88.6 468 87.6 470 86 Z", C.gumShade, 2.6);
+  g += S("M490 48 C500 42 511 48 515 60 C519 72 519 84 512 88 C504 91 494 88 490 82 Z", C.pink, "M513.6 64 C517.4 72 517.6 82 512.6 87 C508.6 89.6 503.6 89.6 499 88.4 C509 85 513.6 76 513.6 64 Z", C.gumShade, 2.6);
+  g += L("M455 66 C462 64 470 62 478 63 M490 60 C497 58 505 60 514 66 M492 72 C499 72 506 74 516 78", 1.4, "#C9607E", .7);
+  g += P("M480 24 H488 V48 C488 50 486.6 51 484 51 C481.4 51 480 50 480 48 Z", C.paper, 2.4) + L("M480.4 29 H487.6 M480.4 34 H487.6 M480.4 39 H487.6 M480.4 44 H487.6", 1.4, INK, .45);
+  g += ROD("M484 50 C481 53 478 56 472 60 M484 50 C487 53 490 56 496 60", 3.2, C.paper);
+  g += H("M456 72 C456 64 459 57 464 53", 2.2);
+  s += G("rotate(3 484 57)", g + pin(484, 18));
+
+  /* the lightbox, the scene's middle: a periapical film of two premolars in their bone, pulp canals and a lamina dura */
+  s += box(226, 14, 148, 112, 7, C.metalLight, C.metalShade, 8);
+  s += P(rr(236, 24, 128, 92, 4), "#FBFDFF", 2.4);
+  s += P(rr(250, 34, 100, 72, 5), "#2F3440", 2.6);
+  s += F("M252 70 C268 66 276 70 300 69 C324 68 334 66 348 70 V104 H252 Z", "#5E6878");
+  const pm = (cx) => F(`M${cx - 15} 52 C${cx - 15} 42 ${cx - 9} 38 ${cx} 38 C${cx + 9} 38 ${cx + 15} 42 ${cx + 15} 52 C${cx + 15} 58 ${cx + 12} 63 ${cx + 9} 66 C${cx + 8} 80 ${cx + 5} 94 ${cx + 1} 100 C${cx - 1} 102 ${cx - 3} 100 ${cx - 4} 98 C${cx - 7} 90 ${cx - 9} 78 ${cx - 9} 66 C${cx - 12} 63 ${cx - 15} 58 ${cx - 15} 52 Z`, "#C9D2DB") +
+    F(`M${cx - 13} 50 C${cx - 13} 43 ${cx - 8} 40 ${cx} 40 C${cx + 8} 40 ${cx + 13} 43 ${cx + 13} 50 C${cx + 9} 47 ${cx - 9} 47 ${cx - 13} 50 Z`, "#F2F5F8") +
+    L(`M${cx - 1} 52 C${cx - 1} 70 ${cx} 86 ${cx} 96`, 2.4, "#2F3440") + L(`M${cx - 11} 70 C${cx - 10} 84 ${cx - 6} 96 ${cx - 2} 102 M${cx + 10} 70 C${cx + 8} 84 ${cx + 5} 96 ${cx + 2} 102`, 1.4, "#E8EDF2", .7);
+  s += pm(282) + pm(318);
+  s += H("M256 40 L256 52", 2.2);
+  s += CIRC(362, 120, 3.2, C.green, 1.8);
+
+  s += bench(156, t);
+
+  /* a stack of the course books on the left: spines with bands, page edges at the right */
+  [[36, 142, 112, t.mid, t.ink], [44, 128, 100, C.gold, C.goldShade], [38, 114, 106, C.green, "#26A060"]].forEach(([x, y, w, c, d]) => {
+    s += box(x, y, w, 14, 3, c, d, 4);
+    s += F(`M${x + w - 10} ${y + 2.6} H${x + w - 3} V${y + 11.4} H${x + w - 10} Z`, C.paper) + L(`M${x + w - 10} ${y + 5.6} H${x + w - 3.6} M${x + w - 10} ${y + 8.4} H${x + w - 3.6}`, 1.2, INK, .4);
+    s += L(`M${x + 12} ${y + 3} V${y + 11} M${x + 17} ${y + 3} V${y + 11}`, 2, C.paper, .85);
+  });
+  s += H("M50 118 H90", 2);
+
+  /* a molar model on its stand */
+  s += box(190, 148, 54, 8, 3, C.wood, C.woodShade, 4);
+  s += molar(.3, 217, 92);
+
+  /* a stethoscope lying on the bench: the chest piece, its tubing in a loose loop, the binaurals and their ear tips */
+  s += ROD("M352 146 C334 154 304 155 290 146 C280 139 286 128 300 131", 4.6, t.ink);
+  s += ROD("M300 131 C306 121 318 118 326 124 M300 131 C310 126 322 128 328 136", 2.6, C.metalShade);
+  s += CIRC(328, 124, 3, C.metal, 1.8) + CIRC(330, 137, 3, C.metal, 1.8);
+  s += CIRC(362, 145, 10, C.metal, 2.8) + `<circle cx="362" cy="145" r="5.4" fill="${t.mid}" stroke="${INK}" stroke-width="1.8"/>` + H("M355 141 C356 138.6 358 137.4 360 137", 2);
+
+  /* a pill bottle */
+  s += P(rr(392, 104, 34, 12, 3), C.paper, 2.4) + L("M398 106 V114 M404 106 V114 M410 106 V114 M416 106 V114 M422 106 V114", 1.2, INK, .35);
+  s += box(395, 116, 28, 40, 5, C.orange, "#C56F08", 6);
+  s += F("M395 126 H423 V144 H395 Z", C.paper) + L("M395 126 H423 M395 144 H423", 2) + L("M400 132 H418 M400 138 H412", 1.4, INK, .4) + O(rr(395, 116, 28, 40, 5), 3);
+  s += H("M400 120 V123", 2);
+
+  /* an hourglass: the mocks are timed */
+  s += box(452, 98, 44, 7, 3, C.wood, C.woodShade, 4) + box(452, 149, 44, 7, 3, C.wood, C.woodShade, 4);
+  s += L("M457 105 V149 M491 105 V149", 3, C.woodShade);
+  s += P("M462 105 C462 120 472 124 474 127 C472 130 462 134 462 149 H486 C486 134 476 130 474 127 C476 124 486 120 486 105 Z", "#F7FBFF", 2.4);
+  s += F("M466 112 C470 118 472 120 474 122 C476 120 478 118 482 112 Z", C.gold) + F("M465 148 C468 140 472 137 474 135 C476 137 480 140 483 148 Z", C.gold);
+  s += L("M474 124 V135", 1.4, C.goldShade);
+  s += H("M466 108 C466 113 467 116 469 118", 2);
+
+  /* a pencil */
+  s += S("M520 146 H576 L590 150 L576 154 H520 Z", C.yellow, "M520 151.5 H578 L588 150.4 L576 154 H520 Z", C.goldShade, 2.4);
+  s += F("M584 148.6 L590 150 L584 151.4 Z", INK) + P(rr(512, 146, 9, 8, 2), C.pink, 2.2);
+  return s;
+}
+
 export const MASTHEADS = {
   "occlusion":            { label: "A lab bench: a semi-adjustable articulator holding mounted casts, articulating paper, a facebow on its hook, a bowl of mounting stone and a TMJ sketch pinned to the wall", body: occlusion() },
   "perio":                { label: "A row of teeth in their gums with a probe walked into a pocket and a bleeding point beside it, a perio chart on a clipboard, a mouth mirror and a curette", body: perio() },
@@ -441,5 +519,6 @@ export const MASTHEADS = {
   "heme-endo-exam2":      { label: "A chart of the thyroid on the trachea, an insulin pen and vial, a glucose meter with a drop on its strip, a rack of blood tubes and red cells drifting by", body: hemeEndo() },
   "heme-endo-exam3":      { label: "A chart of the thyroid on the trachea, an insulin pen and vial, a glucose meter with a drop on its strip, a rack of blood tubes and red cells drifting by", body: hemeEndo() },   // Exam 2's, reused (Sam, 2026-11-15)
   "special-patient-care": { label: "A calm operatory corner: the chair under a soft blanket, a picture schedule on the wall, the light turned low, tinted sunglasses and a foam-grip toothbrush on the tray", body: spc() },
+  "review-of-systems":    { label: "A board-review desk: a lightbox with a periapical film of two premolars, wall charts of the heart with an ECG strip and of the lungs, a stack of course books, a molar model, a stethoscope, a pill bottle and an hourglass", body: ros() },
   "generic":              { label: "A study desk: a lamp, a stack of books in the hubs' colors, a molar model, a mug, an open notebook and an exam calendar with a day circled", body: generic() }
 };
