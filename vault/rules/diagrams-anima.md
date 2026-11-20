@@ -46,5 +46,12 @@ figures of anatomy, cells, receptors and drug mechanisms. Use it for hub diagram
   Outside sources are encouraged, for accuracy and for how the figure works, and cited
   ([outside-sources-for-figures](outside-sources-for-figures.md)); what it shows and names stays with what the lecture
   teaches ([figures-teach-the-lecture](figures-teach-the-lecture.md)).
+- **On a phone, the engine zooms it** (2026-11-20, `figZoomWrap()` in `widget/hub.js`): under every anima figure drawn at less
+  than 85% of its viewBox width, a Zoom button opens it full-screen at its drawn size (its `.anima` element moved into the view
+  and back, so the figure keeps working), with + / - / Fit; the drawing scrolls sideways in its plate. It needs nothing from
+  the figure except the kit's markup (`.anima` > `.am-svg` > `svg` with a `viewBox`, and the `data-corner="title"` corner for
+  its name), so **draw labels for the figure's own width (10-15 px there) and let Zoom carry them on a phone**: don't shrink a
+  layout to fit 390 px, and don't bump the label font for narrow screens (it clipped labels at the edges in PCD Implants,
+  2026-11-04). Moving labels inside the drawing for a phone layout is still welcome where a figure has room.
 - Run anima's own checks, look at it at 390 px wide and in both themes, and give Sam the screenshots in the PR:
   drawn figures get Sam's look before merge, as the suture diagrams did. A new kind of figure goes on the About page.
