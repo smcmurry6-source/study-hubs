@@ -48,6 +48,13 @@ tags: [widget, supabase]
   doesn't exist. A hub's content JSON is served from the cache at once and refreshed behind it, so **a content edit
   shows on the page load after the one that fetched it**; old hub pages and the separate widget files are cached as
   they're used.
+- **The toast** (`widget/toast.js`, `window.shToast(msg, kind | { kind, title, icon, ms, sticky, action })`; 2026-11-20):
+  every short message on the dashboard and a hub (a tip, "still loading", "couldn't open", a sync, a streak cheer, an
+  achievement, Focus mode, "a newer version is live") is a sticker in the reward card's family, its styles `.hx-toast` in
+  `widget/hub.css`. It runs first in `hub.bundle.js` and `dash.bundle.js`; `hub.js`'s and `dash.js`'s `toast()` call it,
+  and `widget/v3.js` (the streak cheer, Welcome back, the update notice) and `widget/pet.js` use it when it's there (an
+  old page without it keeps the dark pill). **A new message calls it with a kind** (the list is at the top of the file);
+  what pays XP or crowns goes on the gold reward card (`widget/prize.js`) instead ([decisions](../decisions.md)).
 - **`widget/cases.js` + `widget/cases.css`** (`window.shCases`): the dental case kit. A Patient Box question in any
   hub names a case (`pcase`) in that hub's `PCASES`, and the kit draws its periodontal chart, periapical radiograph
   and buccal view from the case's numbers, works out the diagnosis from them and validates that every number is

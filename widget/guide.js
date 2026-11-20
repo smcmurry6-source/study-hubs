@@ -84,7 +84,7 @@
       if (tts) tts.addEventListener("click", function(){ if (window.shTTS) window.shTTS.speak(prose, tts, mp3); });
       if (HX.wireFollow) HX.wireFollow(el, prose, mp3);
       $$("[data-report-notes]", el).forEach(function(b){ b.addEventListener("click", function(){
-        track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: "guide", label: I.title }); else toast("The report form is still loading. Try again in a moment.");
+        track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: "guide", label: I.title }); else toast("The report form is still loading. Try again in a moment.", "wait");
       }); });
       HX.wireLecLinks(el);
       $$("[data-gdall]", el).forEach(function(a){ a.addEventListener("click", function(){ var U = STATE.ui; U.qset = ""; U.qlec = "all"; U.qstatus = "all"; U.qlikely = GT[0]; U.qfmt = "all"; U.qsrc = "all"; HX.saveState(); track("notes:practice-guide-all"); }); });

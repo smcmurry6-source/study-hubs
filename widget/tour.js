@@ -63,11 +63,20 @@
     ".sh-tour-btn:hover{background:var(--sht-bg2);}",
     ".sh-tour-btn.is-primary{background:var(--sht-ink); border-color:var(--sht-ink); color:var(--sht-bg);}",
     ".sh-tour-btn.is-primary:hover{opacity:.9;}",
-    ".sh-tour-toast{position:absolute; z-index:10003; width:min(280px, calc(100% - 32px)); background:var(--sht-ink); color:var(--sht-bg); font-family:var(--sht-font); border-radius:12px;",
-    "  padding:10px 14px; font-size:14px; line-height:1.4; box-shadow:0 12px 30px -12px rgba(0,0,0,.5); opacity:0; transform:translateY(-4px); transition:opacity .25s, transform .25s;}",
+    /* the note after "No thanks": the site's sticker toast (widget/hub.css .hx-toast), pointing at the button (2026-11-20) */
+    ".sh-tour-toast{position:absolute; z-index:10003; display:flex; align-items:center; gap:10px; width:min(290px, calc(100% - 32px)); background:var(--sht-bg); color:var(--sht-ink);",
+    "  font-family:var(--sht-font); font-weight:700; border:2px solid #3B2E3A; border-radius:16px; padding:9px 14px 9px 9px; font-size:14px; line-height:1.35;",
+    "  box-shadow:0 4px 0 #3B2E3A, 0 14px 30px -12px rgba(0,0,0,.45); opacity:0; transform:translateY(-6px) scale(.94); transition:opacity .25s, transform .4s cubic-bezier(.34,1.56,.64,1);}",
+    ".sh-tour-toast.is-below{transform:translateY(6px) scale(.94);}",
     ".sh-tour-toast.is-shown{opacity:1; transform:none;}",
-    ".sh-tour-toast::before{content:''; position:absolute; top:-6px; right:var(--arrow,20px); width:12px; height:12px; background:inherit; transform:rotate(45deg); border-radius:2px;}",
-    ".sh-tour-toast.is-below::before{top:auto; bottom:-6px;}",
+    ".sh-tour-tic{flex:none; display:grid; place-items:center; width:34px; height:34px; border-radius:50%; border:2px solid #3B2E3A; background:var(--hub-soft, #ECE6F8); color:var(--hub-text, #58408A);}",
+    ".sh-tour-tic svg{width:19px; height:19px;}",
+    ".sh-tour-toast::before{content:''; position:absolute; top:-8px; right:var(--arrow,20px); width:12px; height:12px; background:var(--sht-bg); border:2px solid #3B2E3A; border-right:0; border-bottom:0; transform:rotate(45deg); border-radius:3px 0 0 0;}",
+    ".sh-tour-toast.is-below::before{top:auto; bottom:-8px; border:2px solid #3B2E3A; border-left:0; border-top:0; border-radius:0 0 3px 0;}",
+    "html.shx[data-theme=dark] .sh-tour-toast, html.shx[data-theme=dark] .sh-tour-tic, html.shx[data-theme=dark] .sh-tour-toast::before{border-color:#0c090c;}",
+    "html.shx[data-theme=dark] .sh-tour-toast{box-shadow:0 4px 0 #0c090c, 0 0 0 1px rgba(255,255,255,.14), 0 14px 30px -12px rgba(0,0,0,.6);}",
+    "@media (prefers-color-scheme:dark){ html.shx:not([data-theme=light]) .sh-tour-toast, html.shx:not([data-theme=light]) .sh-tour-tic, html.shx:not([data-theme=light]) .sh-tour-toast::before{border-color:#0c090c;}",
+    "  html.shx:not([data-theme=light]) .sh-tour-toast{box-shadow:0 4px 0 #0c090c, 0 0 0 1px rgba(255,255,255,.14), 0 14px 30px -12px rgba(0,0,0,.6);} }",
     "@media (max-width:640px){",
     "  .sh-tour:not(.is-center){left:8px !important; right:8px; top:auto !important; bottom:calc(8px + env(safe-area-inset-bottom, 0px)); width:auto; max-height:52%; padding:16px 16px 14px;}",
     "  .sh-tour.is-top:not(.is-center){top:calc(8px + env(safe-area-inset-top, 0px)) !important; bottom:auto; max-height:46%;}",    /* the part is low on the screen (the phone bar) */
@@ -433,9 +442,15 @@
     if (!b) return;
     var r = b.getBoundingClientRect(), t = document.createElement("div"), below = r.top < window.innerHeight / 2;
     t.className = "sh-tour-toast" + (below ? "" : " is-below"); t.setAttribute("role", "status");
-    t.textContent = b.id === "shstat-more-pill" ? "No problem. The tour is under More whenever you want it."
+    var say = b.id === "shstat-more-pill" ? "No problem. The tour is under More whenever you want it."
       : b.id === "shstat-launch" ? "No problem. The tour is in this menu whenever you want it."
       : "No problem. The tour is right here whenever you want it.";
+    var art = window.SH_HUB_ART && window.SH_HUB_ART.icons && window.SH_HUB_ART.icons.tour;
+    if (art) {
+      t.innerHTML = '<span class="sh-tour-tic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">' +
+        art.body + "</svg></span>";
+      var words = document.createElement("span"); words.textContent = say; t.appendChild(words);
+    } else t.textContent = say;
     document.body.appendChild(t);
     var z = zoom(), w = t.offsetWidth * z, h = t.offsetHeight * z, x = Math.min(Math.max(16, r.left + r.width / 2 - w + 26), window.innerWidth - w - 16);
     t.style.left = x / z + "px";

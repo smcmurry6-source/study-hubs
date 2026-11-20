@@ -959,8 +959,6 @@ html.hx-still .dx .survey, html.hx-still .dx .survey-win { transition: none; }
 html.hx-still .dx .survey-win { transform: none; }
 html.hx-still .dx .survey *, html.hx-still .dx .survey *::after { animation: none !important; }
 html.hx-still .dx .dx-rank.is-gain { animation: none; }
-.dx-update { position: fixed; z-index: 55; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 10px; width: max-content; max-width: calc(100% - 24px);
-  padding: 8px 8px 8px 18px; border-radius: var(--r-pill); background: var(--ground); box-shadow: var(--float-shadow); font-size: var(--fs-label); font-weight: var(--w-strong); }
 
 /* ---------- a tablet ---------- */
 @media (max-width: 1000px) {

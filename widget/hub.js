@@ -56,10 +56,12 @@
   function track(k){ try { if (window.shTrack) window.shTrack(k); } catch (e) {} }
   function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} return null; }
   function visible(el){ if (!el || !el.isConnected) return false; var r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.bottom > 0 && r.top < innerHeight && getComputedStyle(el).visibility !== "hidden"; }
-  function toast(msg){
+  /* the sticker toast (widget/toast.js, ahead of this file in hub.bundle.js): toast(msg, kind) or toast(msg, { kind, title, icon }) */
+  function toast(msg, o){
+    if (window.shToast) return window.shToast(msg, o);
     var host = $("#hxToast"); if (!host) return;
     var t = h('<div class="hx-toast" role="status">' + esc(msg) + "</div>"); host.appendChild(t);
-    setTimeout(function(){ t.classList.add("out"); setTimeout(function(){ t.remove(); }, 300); }, 2600);
+    setTimeout(function(){ t.classList.add("out"); setTimeout(function(){ t.remove(); }, 300); }, 3200);
   }
 
   /* ---------- the drawings (widget/hub-art.js and widget/hub-art/<hub>.js) ---------- */
@@ -345,7 +347,7 @@
     shell.addEventListener("click", function(e){
       if (!e.target.closest("[data-search-open]")) return;
       var p = document.getElementById("shstat-search-pill");
-      if (p) { p.click(); track("bar:search"); } else toast("Search is still loading. Try again in a moment.");
+      if (p) { p.click(); track("bar:search"); } else toast("Search is still loading. Try again in a moment.", "wait");
     });
     HX.paintMeters();
   }
@@ -658,7 +660,7 @@
     wireFollow(el, prose, mp3);
     /* a mistake in the notes goes to Sam's Inbox with the lecture attached (the shared widget's report form) */
     $$("[data-report-notes]", el).forEach(function(b){ b.addEventListener("click", function(){
-      track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: lec.id, label: lecLabel(lec) + " " + shortTitle(lec) }); else toast("The report form is still loading. Try again in a moment.");
+      track("notes:report"); if (window.shOpenFlag) window.shOpenFlag({ lec: lec.id, label: lecLabel(lec) + " " + shortTitle(lec) }); else toast("The report form is still loading. Try again in a moment.", "wait");
     }); });
     $$("[data-lecnav]", el).forEach(function(a){ a.addEventListener("click", function(){ track("notes:" + a.getAttribute("data-lecnav")); }); });
     wireLecLinks(el);
@@ -957,7 +959,7 @@
           me.w = w; me.t = d.t; show(true); kick();
           root.addEventListener("click", tapped); root.addEventListener("touchstart", touched, { passive: true });
           root.classList.toggle("is-following", me.on);
-          if (me.on && !ls("sh_tip_wordseek")) { ls("sh_tip_wordseek", "1"); toast("Tip: tap any word in the notes to jump the narration there."); }
+          if (me.on && !ls("sh_tip_wordseek")) { ls("sh_tip_wordseek", "1"); toast("Tap any word in the notes to jump the narration there.", { kind: "tip", icon: "listen" }); }
         }
         if (audio.readyState >= 1) ready(); else audio.addEventListener("loadedmetadata", ready, { once: true });
         function on(x, f){ audio.addEventListener(x, f); me.off.push([x, f]); }
@@ -1018,7 +1020,7 @@
   function readClaim(lec){
     var r = READ, G = window.shGame;
     if (!r || r.lec !== lec.id || !r.id || !G || !G.claim) return;
-    if (r.active < r.need) { if (!r.wait) toast("Notes done. Keep reading: the +" + G.prizes.notes + " XP and crowns come once you've had time to read it through."); r.wait = true; return; }
+    if (r.active < r.need) { if (!r.wait) toast("Keep reading: the +" + G.prizes.notes + " XP and crowns come once you've had time to read it through.", { kind: "notes", title: "Notes done" }); r.wait = true; return; }
     READ = null;
     G.claim("notes_done_v2", { p_visitor: ls("sh_visitor_id"), p_read: r.id }, "notes");
   }
@@ -1546,7 +1548,7 @@
     body.addEventListener("click", function(e){
       if (e.target.closest("[data-focus]")) {
         var on = !focusOn(); setFocus(on); paintFocus(); $("[data-extras]", body).innerHTML = extrasHTML();
-        track("settings:focus=" + (on ? "on" : "off")); toast(on ? "Focus mode is on. Every extra is off." : "Focus mode is off. Your extras are back.");
+        track("settings:focus=" + (on ? "on" : "off")); toast(on ? "Every extra is off." : "Your extras are back.", { kind: "focus", title: on ? "Focus mode is on" : "Focus mode is off" });
         $("[data-focus]", body).focus(); return;
       }
       var b = e.target.closest(".seg [data-val]"); if (b) {
@@ -1563,10 +1565,10 @@
         track("settings:" + k + "=" + v);
         return;
       }
-      if (e.target.closest("[data-name]")) whenWidget("shEditName", function(f){ if (f) f(); else toast("Couldn’t open your name. Are you online?"); });
+      if (e.target.closest("[data-name]")) whenWidget("shEditName", function(f){ if (f) f(); else toast("Couldn’t open your name. Are you online?", "err"); });
       /* Link my devices (widget/linkask.js, which widget/v3.js loads): beside the name, as everywhere a name is changed */
       var lk = e.target.closest("[data-link]");
-      if (lk) whenWidget("shLinkAsk", function(L){ if (L && L.link) L.link({ back: lk, from: "settings" }); else toast("Couldn’t open Link my devices. Are you online?"); });
+      if (lk) whenWidget("shLinkAsk", function(L){ if (L && L.link) L.link({ back: lk, from: "settings" }); else toast("Couldn’t open Link my devices. Are you online?", "err"); });
     });
   }
   function applyTheme(t){ if (t === "light" || t === "dark") docEl.setAttribute("data-theme", t); else docEl.removeAttribute("data-theme"); }
@@ -1671,7 +1673,7 @@
       });
       if (!changed) return;
       if (!ANSWERED) STATE.days.sort(); HX.achievements(true); saveNow(); HX.paintMeters();
-      if (added) toast("Synced " + pl(added, "question") + " from your other devices");
+      if (added) toast(pl(added, "question") + " from your other devices", "sync");
       /* Home, or a bank not yet answered in, redraws with the merged answers (its counts and Missed last time) */
       if (Date.now() - LOADED < 8000 && (view === "home" || (view === "questions" && !HX.SESSION.n && !parse()[1] && !(document.activeElement && document.activeElement.matches("input, textarea"))))) route();
     }
@@ -1687,7 +1689,7 @@
   function startTour(){
     if (window.shTour) return window.shTour.start();
     if (window.shLoadTour) window.shLoadTour(function(){ if (window.shTour) window.shTour.start(); });
-    else toast("The tour is still loading. Try again in a moment.");
+    else toast("The tour is still loading. Try again in a moment.", "wait");
   }
   function tourSteps(o){
     var press = function(hash){ return function(){ if (location.hash !== "#" + hash) location.hash = hash; }; };

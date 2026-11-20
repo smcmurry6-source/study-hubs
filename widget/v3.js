@@ -1203,7 +1203,7 @@
     var t0 = Date.now();
     (function go(){
       if (window.shLinkAsk && window.shLinkAsk.link) { window.shLinkAsk.link({ back: back, from: from }); return; }
-      if (Date.now() - t0 > 8000) { showStreakToast("Couldn’t open Link my devices. Are you online?"); return; }
+      if (Date.now() - t0 > 8000) { showStreakToast("Couldn’t open Link my devices. Are you online?", null, { kind: "err" }); return; }
       setTimeout(go, 200);
     })();
   });
@@ -1217,7 +1217,7 @@
     prefSet(SH_VISITS_KEY, String(visits));
     var n = currentName();
     if (visits > 1 && n) {
-      setTimeout(function(){ showStreakToast("Welcome back, " + n); }, 900);
+      setTimeout(function(){ if (window.shToast) showStreakToast("Good to see you, " + n + ".", null, { kind: "hi", ms: 3400 }); else showStreakToast("Welcome back, " + n); }, 900);
     }
   })();
 
@@ -1337,7 +1337,10 @@
     }
     function take(latest){
       if (baseline === null) { baseline = latest; return; }
-      if (new Date(latest) > new Date(baseline)) { ensureToast().classList.add("is-shown"); }
+      if (!(new Date(latest) > new Date(baseline))) return;
+      /* the redesign's pages: a sticker toast that stays until it's closed (widget/toast.js); an old page: the bar */
+      if (window.shToast) { if (!toastEl) toastEl = window.shToast("This hub has been updated.", { kind: "update", sticky: true, action: { label: "Reload", run: function(){ location.reload(); } } }); }
+      else ensureToast().classList.add("is-shown");
     }
     function check(){
       var have = kept();
@@ -2288,13 +2291,13 @@
       sessionCorrectStreak++;
       if (sessionCorrectStreak > 0 && sessionCorrectStreak % 5 === 0 && extraOn("sh_pref_cheers")) {
         fireConfetti();
-        showStreakToast(shGreet(sessionCorrectStreak + " in a row") + "!", ICON_FLAME);
+        showStreakToast(shGreet(sessionCorrectStreak + " in a row") + "!", ICON_FLAME, { kind: "streak", ms: 3200 });
       }
       if (sessionCorrectStreak >= NUKE_STREAK_THRESHOLD && !nukeReady && nukePref() !== "off") {
         nukeReady = true;
         safeRpc("record_nuke_unlock", { p_hub: HUB, p_visitor: VISITOR_ID });
         showNukeBadge();
-        showStreakToast(shGreet("Tactical nuke ready"), '<span class="sh-nuke-icon sh-nuke-icon-sm"></span>');
+        showStreakToast(shGreet("Tactical nuke ready"), '<span class="sh-nuke-icon sh-nuke-icon-sm"></span>', { kind: "nuke", title: "100 right in a row" });
       }
     } else {
       sessionCorrectStreak = 0;
@@ -2411,7 +2414,14 @@
   safeRpc("record_mode_open", { p_hub: HUB, p_mode: DEFAULT_MODE });
 
   /* ---------- confetti + streak toast ---------- */
-  function showStreakToast(text, iconHTML){
+  /* on the redesign's pages it's the sticker toast (widget/toast.js, window.shToast; 2026-11-20): showStreakToast(text, icon,
+     { kind, title }); an old single-file page keeps the dark pill below */
+  function showStreakToast(text, iconHTML, o){
+    if (window.shToast) {
+      o = o || {};
+      window.shToast(text, { kind: o.kind, title: o.title, icon: iconHTML || undefined, ms: o.ms });
+      return;
+    }
     var t = document.createElement("div");
     t.className = "shstat-streaktoast";
     t.textContent = text;
