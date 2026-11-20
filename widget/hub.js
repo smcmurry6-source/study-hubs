@@ -44,7 +44,9 @@
   function $$(s, el){ return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function h(html){ var t = document.createElement("template"); t.innerHTML = String(html).trim(); return t.content.firstElementChild; }
-  function fmt(n){ return Number(n || 0).toLocaleString("en-US"); }
+  /* one formatter for the page: toLocaleString makes a new one on every call, which a slow phone felt (2026-11-20) */
+  var NUMF = window.Intl && Intl.NumberFormat ? new Intl.NumberFormat("en-US") : null;
+  function fmt(n){ n = Number(n || 0); return NUMF ? NUMF.format(n) : n.toLocaleString("en-US"); }
   function pl(n, one, many){ return fmt(n) + " " + (n === 1 ? one : (many || one + "s")); }
   function ymd(d){ return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
   function day(off){ var d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + (off || 0)); return ymd(d); }
@@ -1598,28 +1600,41 @@
       return o;
     });
   }
-  function exportSections(){
+  /* The search index: every notes paragraph, cram line, guide item, chart row and hint, for widget/v3.js's search.
+     Parsing every part's notes in one task blocked a slow phone for a quarter of a second after Home (Review of Systems'
+     70 parts, 2026-11-20), so with a pace (a function that runs its argument later) it works in steps of about 25 ms,
+     a lecture or a chart group at a time, and returns a promise; without one (tools/timmy/test.mjs) it runs at once.
+     The sections are published only when every step is done, in the same order either way. */
+  function exportSections(pace){
     var out = [], frag = function(html){ var d = document.createElement("div"); d.innerHTML = html || ""; return d; }, clean = function(t){ return String(t || "").replace(/\s+/g, " ").trim(); };
-    LECS.forEach(function(l){
+    var steps = LECS.map(function(l){ return function(){
       var where = lecLabel(l) + " " + l.title;
       Array.prototype.forEach.call(frag(NOTES.full[l.id]).querySelectorAll("p, li, h3, h4"), function(el, k){ var t = clean(el.textContent); if (t.length > 2) out.push({ kind: "Notes", where: where, text: t, lec: l.id, go: { v: "notes", lec: l.id, k: k } }); });
       if (STUDY) ((STUDY.cram || {})[l.id] || []).forEach(function(b){ out.push({ kind: "Cram sheet", where: where, text: b, lec: l.id, go: { v: "cram", lec: l.id } }); });
-    });
+    }; });
     /* the study guide's items and key terms, their own group in search (each jumps to its heading on the guide's page) */
-    if (STUDY) (STUDY.guide || []).forEach(function(g){
+    if (STUDY) steps.push(function(){ (STUDY.guide || []).forEach(function(g){
       var l = LBY[g.lec]; if (!l) return; var where = (((C.notes || {}).guide || {}).title || "Study guide") + " · " + lecLabel(l);
       (g.items || []).forEach(function(it, k){ out.push({ kind: "Study guide", where: where, title: it.h, text: clean(frag(it.body).textContent), lec: l.id, go: { v: "guide", lec: l.id, k: k } }); });
       (g.terms || []).forEach(function(t){ out.push({ kind: "Study guide", where: where + " · Key terms", text: clean(t.t + ": " + frag(t.d).textContent), lec: l.id, go: { v: "guide", lec: l.id, k: (g.items || []).length + (g.more || []).length } }); });   // Key terms' heading comes after the items' and the .gd-more ones
-    });
+    }); });
     /* every Review table row (each lecture's charts sit under its notes; Perio's live search found them too) */
-    if (STUDY) (STUDY.review || []).forEach(function(g){ var t = ""; (g.sections || []).forEach(function(sec){
+    if (STUDY) (STUDY.review || []).forEach(function(g){ steps.push(function(){ var t = ""; (g.sections || []).forEach(function(sec){
       t = sec.title || t;
       var rows = sec.type === "table" ? sec.rows.map(function(r){ return r.join(" · "); }) : sec.type === "html" ? Array.prototype.map.call(frag(sec.html).querySelectorAll("tr, li"), function(el){ return Array.prototype.map.call(el.tagName === "TR" ? el.children : [el], function(c){ return c.textContent; }).join(" · "); }) : [];
       rows.forEach(function(r){ r = clean(r); if (r.length > 2) out.push({ kind: "Review tables", where: (LBY[g.lec] ? lecLabel(LBY[g.lec]) + " · " : "") + t, text: r, lec: g.lec || "", go: { v: "review", lec: g.lec || "", t: t } }); });
-    }); });
-    if (STUDY) (STUDY.hints || []).forEach(function(x){ var l = LBY[x.lec]; out.push({ kind: "Exam hints", where: l ? lecLabel(l) + " " + l.title : "", text: clean(x.quote + " " + x.take), lec: x.lec, go: { v: "hints", lec: x.lec } }); });
-    window.SH_EXPORT.sections = out;
-    if (STUDY) window.SH_EXPORT.hints = (STUDY.hints || []).map(function(x){ return { lec: x.lec, quote: x.quote }; });
+    }); }); });
+    if (STUDY) steps.push(function(){ (STUDY.hints || []).forEach(function(x){ var l = LBY[x.lec]; out.push({ kind: "Exam hints", where: l ? lecLabel(l) + " " + l.title : "", text: clean(x.quote + " " + x.take), lec: x.lec, go: { v: "hints", lec: x.lec } }); }); });
+    function publish(){
+      window.SH_EXPORT.sections = out;
+      if (STUDY) window.SH_EXPORT.hints = (STUDY.hints || []).map(function(x){ return { lec: x.lec, quote: x.quote }; });
+    }
+    if (!pace) { steps.forEach(function(f){ f(); }); publish(); return; }
+    var i = 0;
+    return new Promise(function(done){ (function next(){
+      for (var t0 = Date.now(); i < steps.length && Date.now() - t0 < 25;) steps[i++]();
+      if (i < steps.length) pace(next); else { publish(); done(); }
+    })(); });
   }
   function flashIn(fn){ setTimeout(function(){ var el = fn(); if (el && window.shFlash) window.shFlash(el); }, 120); }
   window.SH_GOTO = function(g){
@@ -1749,7 +1764,7 @@
       /* the rest of the content in the background, then the shared widget (it needs the notes for its search and eggs) */
       var idle = window.requestIdleCallback || function(f){ setTimeout(f, 300); };
       idle(function(){
-        needNotes().then(function(){ return needStudy().catch(function(){}); }).then(function(){ exportSections(); if (courses()) SH_EXPORT.sections.forEach(function(x){ if (x.kind === "Exam hints") x.kind = hintsName(); }); }).catch(function(){}).then(startWidget);   // exportSections() stays self-contained: tools/timmy/test.mjs runs it alone
+        needNotes().then(function(){ return needStudy().catch(function(){}); }).then(function(){ return exportSections(function(f){ setTimeout(f, 0); }); }).then(function(){ if (courses()) SH_EXPORT.sections.forEach(function(x){ if (x.kind === "Exam hints") x.kind = hintsName(); }); }).catch(function(){}).then(startWidget);   // exportSections() stays self-contained: tools/timmy/test.mjs runs it alone
         needQuestions().catch(function(){});
       });
     }).catch(function(e){ main.innerHTML = offlineHTML("this hub"); if (window.console) console.error(e); });
