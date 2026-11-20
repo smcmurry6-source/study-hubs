@@ -51,7 +51,21 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `main`. Two days later, run it again (`node tools/after-merge/run.js ... --fix tools/data-fixes/2026-11-19-test-runs.sql`, or
   the connector with Sam's OK; it is safe to run twice), first counting what it would select (its first statement as a `select
   count(*)`), and tick BUG-192's retest. Until then, a Heme & Endo Exam 3 retrospective reads that hub's arcade and Timmy Time
-  clicks of 11-19 as test runs.
+  clicks of 11-19 as test runs. **Run `tools/data-fixes/2026-11-20-quiet-test-rows.sql` again with it** (2026-11-20, the Exam 3
+  retrospective): `tools/ci/quiet.js`'s mock checks, run from those same older branches, wrote two `pq-` rows each into question
+  health (13 made-up visitors to 6:37 am on 11-20); today's `quiet.js` sends nothing past its routes (checked behind a refusing proxy).
+- [ ] **After 10 pm on 2026-11-20: Heme & Endo Exam 3 out of `HUBS` in `sw.js`** (2026-11-20, its retrospective): it archives
+  itself then (`hubs.js`), and an archived hub leaves the service worker's precache, with `VERSION` bumped
+  ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md) step 2). Not before: `tools/ci/syntax.js` fails a live
+  engine hub missing from `HUBS`. A small PR any time after 10 pm Central; Review of Systems is the one hub left in it.
+- [ ] **Sam's call: take Heme & Endo Exam 3's page down?** (2026-11-20, its retrospective; Perio's came down the afternoon of its
+  final). Its retrospective and recap are done and its audio is off, so nothing else needs the page. If yes, in the same PR: what
+  names it moves to Review of Systems or goes (`grep -rln heme-endo-exam3 tools .github widget review sw.js`: `tools/ci/quiet.js`,
+  `tools/release/admin-ui.js`, `perf.js`, `budgets.json` and `baselines/a11y.json`, Ask Timmy's `tools/timmy/test-set.json`,
+  `tools/after-merge/test.js`, the preview's `serve.js` and `design/`, its figure build in `.github/workflows/check.yml`; the smoke
+  test's game-layer check needs a hub with Million-Dollar Smile, which Review of Systems hasn't), its About entries (the Cycle
+  Arcade column, "Heme & Endo Exam 3: Lab Sort"), and `archiveOn` in `hubs.js` so the dashboard never links to a missing page
+  ([the hub note](../hubs/heme-endo-exam3.md)).
 - [ ] **The arcade games themselves at 320 px with the largest text** (2026-11-19, left from BUG-168's fix): the lobby and
   every view of a hub now fit a 320 px phone at XX-Large (220 px of layout), and the smoke test checks them, but a game once
   it's started (each hub's own `content/arcade.css` and `widget/games.css`) wasn't swept. Open each in a scripted browser at
@@ -60,7 +74,9 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `widget/prize.js`): on an emulated iPhone 13 (Perio, the preview's made-up data) a reply pop-up open at the top of the
   screen sits over the gold card (`.hx-prizes`, z-index 45) so only its first line shows. On `main` too. Perhaps lift the
   card above the pop-up for its few seconds, or drop it in under the pop-up.
-- [ ] **Read the data-quality report** (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
+- [x] **Read the data-quality report** (done 2026-11-20 at 8:30 am Central, the admin page's kept copy of 1:41 am, in `LESSONS.md`'s
+  Live signals: no test rows, every table writing; the one problem it can't see, `quiet.js`'s `pq-` rows, found by reading question
+  health) (the Heme & Endo Exam 3 retrospective's PR) (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
   `select sh_data_quality();` stopped at the audit's 5 s limit both times (80 people in Perio on its final's eve; then at 12:40 pm
   the next day, between the Perio final and the Heme & Endo Exam 3 eve). `qh_report('perio')` was read with the retrospective
   (2026-11-19: no miskeys). `migration_v83.sql` is live since 2026-11-20 (1:45 am Central): read the admin page's kept copy

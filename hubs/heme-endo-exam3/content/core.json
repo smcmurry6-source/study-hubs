@@ -2,6 +2,7 @@
  "hub": "heme-endo-exam3",
  "title": "Heme & Endo Exam 3 Hub",
  "stateKey": "hee3-state-v1",
+ "audio": "off",
  "exams": [
   {"id":"exam3","label":"Exam 3","date":"2026-11-20","time":"08:00","closes":"09:30"}
  ],

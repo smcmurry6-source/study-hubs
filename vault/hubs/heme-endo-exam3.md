@@ -1,8 +1,8 @@
 ---
 type: hub
-tags: [hub, live]
+tags: [hub, archived]
 hub: heme-endo-exam3
-status: live
+status: archived
 ---
 
 # Heme & Endo Exam 3
@@ -14,6 +14,19 @@ and lactation (Dr. Madison, 11/10), **L18** Estrogens and androgens (Dr. Fasinu,
 (Dr. Herr, 11/17), **L20** Lymphomas and leukemias (Dr. Borak, 11/17), **L21** and **L22** Pathology of the male and female
 reproductive systems (Dr. Dal Zotto, 11/18). Exam date and check-in hours: its
 entry in `hubs.js`.
+
+**The exam is over** (Sam, the morning of 11-20: "Hematology is over. You can do what you need to do"); the hub **archives
+itself at 10 pm on 2026-11-20** (its date in `hubs.js`). Its **retrospective** is in `LESSONS.md` ("Hub retrospectives", written
+that morning, before any check-in: they open at 10 am and go into the next audit) and its **recap** is on the dashboard (published
+with it; featured: `ll-num-bsx`). **Its narration, the study guide's recording and Timmy Time came off the site the same morning**
+([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md): the 23 mp3s and 22 words files, 283 MB;
+`"audio": "off"` in `content/core.json`, so the build emptied `hyAudio` and set `guideAudio` false; Listen, Timmy Time and the
+`podcast` came out of its `hubs.js` entry). `content/core.json`'s `podcast` and `tools/podcast/heme-endo-exam3/` stay. To bring the
+audio back: `git checkout b0057d1 -- hubs/heme-endo-exam3/audio`, take `"audio": "off"` out and rebuild. **The page is still up**
+(Sam's call whether it comes down, as Perio's did): it is the page several tests run on (`tools/ci/quiet.js`, `tools/release/admin-ui.js`,
+the smoke test's game-layer check with its Million-Dollar Smile, the preview's design pages), so taking it down means moving them to
+Review of Systems (which has no arcade) in the same PR. **After 10 pm** it leaves `HUBS` in `sw.js` (with `VERSION` bumped): until then
+`tools/ci/syntax.js` fails a live engine hub missing from it ([inbox](../tasks/inbox.md)).
 
 ## Before you work on it
 
@@ -201,6 +214,7 @@ students; `tools/data-fixes/2026-11-19-test-runs.sql` takes them out after its P
 
 ## History
 
-Grep "Recent major changes" in `DEPLOY_NOTES.md` for `heme-endo-exam3`. Retrospective (once archived): `LESSONS.md`.
+Grep "Recent major changes" in `DEPLOY_NOTES.md` for `heme-endo-exam3`. Retrospective: `LESSONS.md`, "Hub retrospectives",
+Heme & Endo Exam 3 (2026-11-20).
 
 Related: [home](../home.md) · [heme-endo-exam2](heme-endo-exam2.md) · [heme-endo-exam1](heme-endo-exam1.md)
