@@ -3,9 +3,10 @@
    (a v2 rank profile, migration_v54). Nothing here runs on a live hub.
 
      shJourneys.handoff(d, done)   a journey's Dark Matter III is done and the next object is handed over, once:
-                                   d = { from, to } (journeys 0-2). "The ModuPro is yours." The ModuPro has its own scene
-                                   (the spin-up, the rush of light, the typodont), the Loupes the one before it. Each
-                                   shows the crowns it pays: 20,000 for the ModuPro, 30,000 for the Loupes.
+                                   d = { from, to } (journeys 0-2). "The ModuPro is yours." Each has its own scene: the
+                                   ModuPro the spin-up, the rush of light and the typodont; the Loupes the headlight's
+                                   sunbeam that burns the ModuPro away. Each shows the crowns it pays: 20,000 for the
+                                   ModuPro, 30,000 for the Loupes.
      shJourneys.dark(d, done)      a journey's Dark Matter is reached, once per journey ever: d = { journey, position, of }
                                    (where the student stands in the class, if known). It shows the 5,000 crowns it pays.
      shJourneys.road(p)            the road ahead for the "you" panels, as markup: p is a v2 rank profile
@@ -15,7 +16,8 @@
    screen), the last button closes them,
    focus goes back where it was. Reduced motion gets the last frame, faded in, with nothing moving. They move transform
    and opacity only, but for the Dark Matter title's one sheen; the Dark Matter unlock's dust, burst, ring of light and
-   coins, and the hand-offs' sparks, rush of light, typodont and coins, are each drawn on one canvas.
+   coins, and the hand-offs' sparks, rush of light, typodont, the beam's dust, embers, ash and coins, are each drawn on
+   one canvas.
    No sound yet: the site has no sound setting, and these stay silent until it has one (a to-do in the journeys note).
    The medallions are shRanks.artOf (the handpiece by ranks.js, the ModuPro and the loupes by widget/hub-art/journeys.js,
    which is fetched first). When a scene reaches its peak it sends "sh:journey-scene", and "sh:journey-scene-end" when it
@@ -98,8 +100,6 @@
     ".shj-hand .shj-stage{width:min(320px,100%,74cqw,31cqh)}",
     ".shj-hand.is-on .shj-sky{animation:shj-warp 8s cubic-bezier(.16,1,.3,1) both}",
     "@keyframes shj-warp{from{transform:scale(1)}to{transform:scale(1.18)}}",
-    ".shj-hand.is-on .shj-in{animation:shj-shake .55s linear;animation-delay:var(--slam)}",
-    "@keyframes shj-shake{0%,100%{transform:none}15%{transform:translate(-7px,5px)}30%{transform:translate(6px,-5px)}45%{transform:translate(-5px,-3px)}60%{transform:translate(4px,3px)}80%{transform:translate(-2px,1px)}}",
     ".shj-rays{position:absolute;left:-65%;top:-65%;width:230%;height:230%;border-radius:50%;opacity:0;pointer-events:none;",
     "background:repeating-conic-gradient(from 0deg,rgba(255,236,170,.34) 0deg 7deg,rgba(255,236,170,0) 7deg 20deg);",
     "-webkit-mask:radial-gradient(circle,#000 0%,rgba(0,0,0,.55) 30%,transparent 62%);mask:radial-gradient(circle,#000 0%,rgba(0,0,0,.55) 30%,transparent 62%)}",
@@ -107,14 +107,7 @@
     "@keyframes shj-rayin{from{opacity:0}to{opacity:1}}@keyframes shj-spin{to{transform:rotate(360deg)}}",
     ".shj-halo{position:absolute;left:-10%;top:-10%;width:120%;height:120%;border-radius:50%;background:radial-gradient(circle,rgba(255,244,200,.6),rgba(255,214,120,.18) 42%,rgba(255,214,120,0) 68%);opacity:0;pointer-events:none}",
     ".shj.is-on .shj-halo{animation:shj-rayin 1s ease-out both;animation-delay:var(--at)}",
-    ".shj-beam{position:absolute;left:33%;bottom:50%;width:34%;height:300%;transform-origin:50% 100%;background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,246,214,.9) 50%,rgba(255,255,255,0));opacity:0;pointer-events:none}",
-    ".shj.is-on .shj-beam{animation:shj-beam 1.5s ease-out both;animation-delay:var(--at)}",
-    "@keyframes shj-beam{0%{opacity:0;transform:scaleX(.1)}22%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(1.5)}}",
-    ".shj-old{opacity:0}.shj-old .shj-med{width:100%}",
-    ".shj.is-on .shj-old{animation:shj-oldin .7s ease-out both,shj-charge 1.5s ease-in-out .7s forwards,shj-fly 1s cubic-bezier(.76,0,.24,1) var(--fly) forwards}",
     "@keyframes shj-oldin{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}",
-    "@keyframes shj-charge{0%,100%{transform:scale(1)}30%{transform:scale(1.06) rotate(-2deg)}60%{transform:scale(1.1) rotate(2deg)}85%{transform:scale(1.04)}}",
-    "@keyframes shj-fly{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:translate(var(--ox),var(--oy)) scale(.16)}}",
     ".shj-pre{position:absolute;left:-60%;right:-60%;bottom:-30px;margin:0;font-size:17px;font-weight:700;color:#D9D0E6;opacity:0;white-space:nowrap}",
     ".shj.is-on .shj-pre{animation:shj-pre 2.4s ease both .5s}",
     "@keyframes shj-pre{0%{opacity:0}18%,80%{opacity:1}100%{opacity:0}}",
@@ -234,7 +227,7 @@
     ".shj.is-still [data-at],.shj.is-still .shj-new,.shj.is-still .shj-is,.shj.is-still .shj-ahead li,.shj.is-still .shj-socknow svg,.shj.is-still .shj-sockdone>*,.shj.is-still .shj-lt,.shj.is-still .shj-coin{opacity:1;transform:none}",
     ".shj.is-still .shj-rays,.shj.is-still .shj-halo,.shj.is-still .shj-glow,.shj.is-still .shj-tglow{opacity:1}",
     ".shj.is-still .shj-sky,.shj.is-still .shj-neb{opacity:.8;transform:none}.shj.is-still .shj-const{opacity:1}",
-    ".shj.is-still .shj-old,.shj.is-still .shj-was,.shj.is-still .shj-pull,.shj.is-still .shj-lens,.shj.is-still .shj-core,.shj.is-still .shj-wave,.shj.is-still .shj-cv,.shj.is-still .shj-sheen,.shj.is-still .shj-pre,.shj.is-still .shj-beam,.shj.is-still .shj-ring,.shj.is-still .shj-spark,.shj.is-still .shj-flash{display:none}",
+    ".shj.is-still .shj-was,.shj.is-still .shj-pull,.shj.is-still .shj-lens,.shj.is-still .shj-core,.shj.is-still .shj-wave,.shj.is-still .shj-cv,.shj.is-still .shj-sheen,.shj.is-still .shj-pre,.shj.is-still .shj-ring,.shj.is-still .shj-spark,.shj.is-still .shj-flash{display:none}",
     ".shj.shj-inline{position:relative;inset:auto;z-index:0;opacity:1;border-radius:16px;overflow:hidden;padding:26px 16px}",
     ".shj.shj-inline .shj-skip{display:none}.shj.shj-inline .shj-go{pointer-events:none}",
     "@media (max-width:520px){.shj-track li{width:86px;font-size:12px}.shj-ahead{gap:4px}.shj-ahead svg{width:32px;height:32px}.shj-ahead li{font-size:10px}.shj-line{font-size:15px}}",
@@ -286,11 +279,87 @@
     "@keyframes shj-flash3{0%{opacity:0}8%{opacity:.42}100%{opacity:0}}",
     ".shj-mp .shj-new .shj-med{width:86%}",
     ".shj-mpt .shj-wd{display:inline-block;opacity:0}",
-    ".shj-mp.is-on .shj-mpt .shj-wd{animation:shj-word .75s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--at) + var(--i) * .13s)}",
+    ".shj-mp.is-on .shj-mpt .shj-wd,.shj-lp.is-on .shj-mpt .shj-wd{animation:shj-word .75s cubic-bezier(.16,1,.3,1) both;animation-delay:calc(var(--at) + var(--i) * .13s)}",
     "@keyframes shj-word{0%{opacity:0;transform:scale(2.6) translateY(-.2em)}60%{opacity:1}100%{opacity:1;transform:none}}",
     ".shj-mpn{background:linear-gradient(180deg,#FFFFFF 15%,#9BE7EE 90%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}",
     ".shj.is-still .shj-wd{opacity:1;transform:none}.shj.is-still .shj-cone,.shj.is-still .shj-lamp,.shj.is-still .shj-lab{opacity:1}",
     ".shj.is-still .shj-hp,.shj.is-still .shj-whirl,.shj.is-still .shj-rpm,.shj.is-still .shj-space{display:none}",
+
+    /* ----- the hand-off to the Loupes: the Dark Matter ModuPro under the ModuPro's nebula; the loupes come down over it,
+       their headlight clicks on, and its beam grows into a sunbeam that heats the ModuPro white-hot, cracks it and burns
+       it away into embers; then the loupes come down through the light into its place and become the Loupes medallion.
+       The times are --lin (the loupes come in), --click (the headlight), --beam, --sun (the beam grows; --heat long),
+       --crk (the cracks), --burn, --drop (the loupes come down), --set (the medallion) and --rise. ----- */
+    ".shj-lp{background:#05020C;--lpk:#9FF3E0}",
+    ".shj-lp .shj-cv{z-index:1}.shj-lp.is-told .shj-cv{z-index:auto}",   // the embers in front of the scene; the coins behind the words, as elsewhere
+    /* the sky's slow zoom stays inside the screen, and nothing scrolls while the waves and the beam reach past it */
+    ".shj-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}",
+    ".shj-lp:not(.is-told):not(.is-still){overflow:hidden}",
+    ".shj-nmp{background:radial-gradient(70% 60% at 18% 30%,rgba(214,60,170,.5) 0%,rgba(214,60,170,0) 62%),radial-gradient(80% 70% at 86% 72%,rgba(50,110,255,.5) 0%,rgba(50,110,255,0) 64%)}",
+    ".shj-nlp{opacity:0;background:linear-gradient(200deg,rgba(40,200,170,.36) 0%,rgba(40,200,170,0) 46%),radial-gradient(100% 80% at 50% 110%,rgba(60,90,220,.5) 0%,rgba(60,90,220,0) 60%)}",
+    ".shj-lp.is-on .shj-nmp{animation:shj-gone .9s ease-in forwards;animation-delay:var(--burn)}",
+    ".shj-lp.is-on .shj-nlp{animation:shj-rayin 2.2s ease-out both;animation-delay:var(--drop)}",
+    "@keyframes shj-gone{to{opacity:0}}",
+    ".shj-dim{position:absolute;inset:0;pointer-events:none;background:radial-gradient(55% 60% at 50% var(--my,50%),rgba(3,1,8,0) 30%,rgba(3,1,8,.82) 100%);opacity:0}",
+    ".shj-lp.is-on .shj-dim{animation:shj-rayin .8s ease-out both,shj-gone .8s ease-out forwards;animation-delay:var(--beam),var(--drop)}",
+    ".shj-bloom{position:absolute;inset:0;pointer-events:none;background:radial-gradient(42% 38% at 50% var(--my,50%),rgba(255,248,222,.7),rgba(255,226,150,.22) 45%,rgba(255,226,150,0) 75%);opacity:0}",
+    ".shj-lp.is-on .shj-bloom{animation:shj-bloom 2.4s ease-in both;animation-delay:var(--sun)}",
+    "@keyframes shj-bloom{0%{opacity:0}66%,80%{opacity:1}100%{opacity:0}}",
+    /* until --rise the stage holds the middle of the screen, scaled up (--zoom) so the loupes over the ModuPro fill it */
+    ".shj-lp.is-on .shj-stage{animation:shj-lpup .9s cubic-bezier(.65,0,.35,1) both;animation-delay:var(--rise)}",
+    "@keyframes shj-lpup{from{transform:translateY(var(--dy,0px)) scale(var(--zoom,1))}to{transform:none}}",
+    ".shj-lp.is-on .shj-in{animation:shj-quake .8s linear var(--burn)}",
+    ".shj-lp .shj-eyebrow{color:var(--lpk)}",
+    ".shj-lp .shj-pre{top:calc(100% + 10px);bottom:auto;white-space:normal;text-wrap:balance;transform-origin:50% 0;transform:scale(calc(1 / var(--zoom,1)))}",   // its own size while the stage is scaled up
+    ".shj-lp .shj-mpn{background-image:linear-gradient(180deg,#FFF6D6 12%,#9FF3E0 92%)}",
+    ".shj-flash.is-sun{background:radial-gradient(60% 55% at 50% var(--my,50%),#FFFBEA 0%,rgba(255,240,200,.75) 40%,rgba(255,226,150,0) 100%)}.shj-lp.is-on .shj-flash{animation:shj-flash2 .9s ease-out both;animation-delay:var(--at)}",
+    ".shj-lp.is-on .shj-wave{animation:shj-wave 1.6s cubic-bezier(.16,1,.3,1) forwards;animation-delay:var(--at)}",
+    /* the ModuPro: lit, trembling harder and harder, white-hot, cracking, gone */
+    ".shj-mpo{position:relative;width:86%;opacity:0}.shj-mpo .shj-med{width:100%}",
+    ".shj-lp.is-on .shj-mpo{animation:shj-oldin .6s ease-out .2s both,shj-tremble var(--heat) linear var(--sun),shj-vapor .38s ease-in var(--burn) forwards}",
+    "@keyframes shj-vapor{0%{opacity:1;transform:scale(1.08)}100%{opacity:0;transform:scale(1.22)}}",
+    ".shj-heat{position:absolute;inset:3%;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFFFF 0%,#FFF6D6 38%,rgba(255,214,120,.85) 66%,rgba(255,160,60,0) 100%);opacity:0}",
+    ".shj-lp.is-on .shj-heat{animation:shj-heat var(--heat) cubic-bezier(.55,0,.9,.5) var(--sun) forwards}",
+    "@keyframes shj-heat{from{opacity:0}to{opacity:.97}}",
+    ".shj-crk{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 3px #FFD36B) drop-shadow(0 0 9px rgba(255,190,80,.85))}",
+    ".shj-crk path{opacity:0}.shj-lp.is-on .shj-crk path{animation:shj-rayin .16s ease-out both;animation-delay:calc(var(--crk) + var(--i) * .11s)}",
+    ".shj-spot{position:absolute;left:-12%;top:-12%;width:124%;height:124%;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,rgba(255,250,230,.55),rgba(255,236,170,.22) 55%,rgba(255,236,170,0));opacity:0}",
+    ".shj-lp.is-on .shj-spot{animation:shj-rayin .5s ease-out both,shj-gone .5s ease-in forwards;animation-delay:var(--beam),var(--burn)}",
+    /* the loupes: drawn big, they come down over the ModuPro and hang there; at --drop they come down into its place,
+       turned and sized as the medallion draws them, and the medallion takes over */
+    ".shj-lpo{position:absolute;left:-10%;top:50%;width:120%;margin-top:-33.6%;opacity:0;pointer-events:none}",
+    ".shj-lpo svg{position:relative;display:block;width:100%;height:auto;overflow:visible}",
+    ".shj-lp.is-on .shj-lpo{animation:shj-lpin 1.1s cubic-bezier(.16,1,.3,1) both,shj-lpbob 2.6s ease-in-out infinite,shj-lpland .8s cubic-bezier(.65,0,.35,1) forwards;animation-delay:var(--lin),calc(var(--lin) + 1.1s),var(--drop)}",
+    "@keyframes shj-lpin{0%{opacity:0;transform:translateY(-330%) rotate(-9deg) scale(1.2)}55%{opacity:1}100%{opacity:1;transform:translateY(-150%)}}",
+    "@keyframes shj-lpbob{0%,100%{transform:translateY(-150%)}50%{transform:translateY(-155%) rotate(.8deg)}}",
+    "@keyframes shj-lpland{0%{opacity:1;transform:translateY(-150%)}70%{opacity:1}100%{opacity:0;transform:translateY(-2%) rotate(-8deg) scale(.59)}}",
+    ".shj-lmp,.shj-lgl{opacity:0}",
+    ".shj-lp.is-on .shj-lmp{animation:shj-click .55s linear both;animation-delay:var(--click)}",
+    ".shj-lp.is-on .shj-lgl{animation:shj-rayin .5s ease-out both;animation-delay:calc(var(--click) + .3s)}",
+    "@keyframes shj-click{0%{opacity:0}12%{opacity:1}24%{opacity:.1}38%{opacity:.9}50%{opacity:.25}64%,100%{opacity:1}}",
+    /* the headlight's flare, and its beam: thin at first, then a sunbeam with rays in it */
+    ".shj-flare{position:absolute;left:50%;top:17.6%;width:170%;margin:-11% 0 0 -85%;aspect-ratio:7.7/1;pointer-events:none;opacity:0;",
+    "background:radial-gradient(closest-side,#FFFFFF,rgba(255,250,228,.75) 14%,rgba(255,236,170,0) 46%),linear-gradient(90deg,rgba(160,255,230,0) 8%,rgba(210,255,244,.75) 50%,rgba(160,255,230,0) 92%) center/100% 7% no-repeat}",
+    ".shj-lp.is-on .shj-flare{animation:shj-click .55s linear both,shj-flareup var(--heat) ease-in forwards,shj-gone .4s ease-in forwards;animation-delay:var(--click),var(--sun),var(--drop)}",
+    "@keyframes shj-flareup{from{transform:none}to{transform:scale(1.7,1.4)}}",
+    ".shj-sun{position:absolute;left:50%;top:17.6%;width:84%;margin-left:-42%;height:250%;transform-origin:50% 0;pointer-events:none;opacity:0;",
+    "clip-path:polygon(46.5% 0,53.5% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(255,253,240,.95) 0%,rgba(255,240,190,.7) 45%,rgba(255,226,150,.38) 78%,rgba(255,226,150,0) 100%)}",
+    ".shj-sun::before{content:'';position:absolute;inset:0;clip-path:polygon(48.5% 0,51.5% 0,70% 100%,30% 100%);background:linear-gradient(180deg,#fff 0%,rgba(255,255,255,.75) 55%,rgba(255,255,255,0) 100%)}",
+    ".shj-sun::after{content:'';position:absolute;inset:0;opacity:.55;background:repeating-conic-gradient(from 150deg at 50% 0,rgba(255,255,255,0) 0deg 2.2deg,rgba(255,255,255,.5) 3deg,rgba(255,255,255,0) 3.8deg 6.5deg)}",
+    ".shj-lp.is-on .shj-sun{animation:shj-sunon .45s ease-out both,shj-sunup var(--heat) cubic-bezier(.5,0,.8,.6) forwards,shj-sunout .5s ease-in forwards;animation-delay:var(--beam),var(--sun),var(--drop)}",
+    "@keyframes shj-sunon{from{opacity:0;transform:scaleX(.05)}to{opacity:.6;transform:scaleX(.3)}}",
+    "@keyframes shj-sunup{from{opacity:.6;transform:scaleX(.3)}to{opacity:1;transform:scaleX(1.12)}}",
+    "@keyframes shj-sunout{to{opacity:0;transform:scaleX(1.5)}}",
+    /* a glint across a lens */
+    ".shj-glint{position:absolute;width:24%;aspect-ratio:1;margin:-12% 0 0 -12%;pointer-events:none;opacity:0;",
+    "background:radial-gradient(closest-side,#fff,rgba(255,255,255,.6) 12%,rgba(255,255,255,0) 34%),linear-gradient(90deg,rgba(255,255,255,0),#fff 50%,rgba(255,255,255,0)) center/100% 5% no-repeat,linear-gradient(0deg,rgba(255,255,255,0),#fff 50%,rgba(255,255,255,0)) center/5% 100% no-repeat}",
+    ".shj-lpo .shj-glint{width:16%;margin:-8% 0 0 -8%}",
+    ".shj-lp.is-on .shj-glint{animation:shj-glint .8s ease-out both;animation-delay:var(--g)}",
+    "@keyframes shj-glint{0%{opacity:0;transform:scale(.2) rotate(-30deg)}35%{opacity:1;transform:scale(1.1) rotate(10deg)}100%{opacity:0;transform:scale(.5) rotate(45deg)}}",
+    /* the Loupes medallion appears around the loupes as they settle */
+    ".shj-lp.is-on .shj-new{animation:shj-settle .8s cubic-bezier(.16,1,.3,1) both,shj-float 5s ease-in-out infinite;animation-delay:var(--at),calc(var(--at) + .8s)}",
+    "@keyframes shj-settle{0%{opacity:0;transform:scale(1.25)}100%{opacity:1;transform:none}}",
+    ".shj.is-still .shj-lpo,.shj.is-still .shj-mpo,.shj.is-still .shj-spot,.shj.is-still .shj-dim,.shj.is-still .shj-bloom,.shj.is-still .shj-nmp,.shj.is-still .shj-glint{display:none}",
 
     /* ----- the road ahead (the 'you' panels) ----- */
     ".shj-road{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0 0;padding:0;list-style:none}",
@@ -359,49 +428,6 @@
     return el;
   }
 
-  /* ---------- the hand-off: the finished journey's Dark Matter medallion charges, flies up to its place on the road,
-     a beam comes down and the next object lands in it; then its name, its seven ranks lighting in turn, the trophy ---------- */
-  function handoffHTML(d){
-    var from = Math.max(0, Math.min(1, d.from | 0)), to = Math.max(1, Math.min(2, d.to | 0)), name = JN[to], AT = 3.5;
-    var track = [0, 1, 2].map(function(j){
-      var st = j < to ? "is-done" : j === to ? "is-now" : "is-lock";
-      return '<li class="' + st + '"><span class="shj-sock' + (j === from ? " shj-sockdone" : j === to ? " shj-socknow" : "") + '"' + (j === to ? ' style="--at:' + (AT + .5) + 's"' : "") + ">" +
-        (j > to ? LOCK : R.artOf(j, j < to ? 6 : 0, 36) + (j < to ? CHECK : "")) + "</span>" + esc(JN[j]) + "</li>";
-    }).join("");
-    var sparks = "";
-    for (var i = 0, x = 17; i < 34; i++){
-      x = (x * 9301 + 49297) % 233280; var a = x / 233280 * Math.PI * 2; x = (x * 9301 + 49297) % 233280; var r = 120 + x / 233280 * 190;
-      sparks += '<i class="shj-spark" style="--sx:' + Math.round(Math.cos(a) * r) + "px;--sy:" + Math.round(Math.sin(a) * r) + "px;--d:" + (i % 6 * .04).toFixed(2) + 's"></i>';
-    }
-    var ahead = T.map(function(t, i){ return '<li style="--i:' + i + '"' + (i ? "" : ' class="is-now"') + ">" + R.artOf(to, i, 36) + esc(t.name) + "</li>"; }).join("");
-    var pays = journeyCrowns(to);
-    return '<svg class="shj-sky" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + stars(5, 120, 800, 600) + "</svg>" +
-      '<canvas class="shj-cv" aria-hidden="true"></canvas>' +
-      '<span class="shj-flash" style="--at:' + AT + 's"></span>' +
-      '<div class="shj-in" style="--slam:' + AT + 's">' +
-      '<ol class="shj-track" aria-label="The three journeys" data-at style="--at:.2s;--land:3.1s">' + track + "</ol>" +
-      '<div class="shj-stage" style="--at:' + AT + 's;--fly:2.3s">' +
-        '<span class="shj-rays" style="--at:' + (AT + .2) + 's"></span><span class="shj-halo"></span><span class="shj-beam" style="--at:' + (AT - .5) + 's"></span>' +
-        '<span class="shj-ring"></span><span class="shj-ring" style="--at:' + (AT + .25) + 's"></span>' +
-        '<span class="shj-old" aria-hidden="true">' + med(from, 6, 200, { animate: true, level: 3 }) + "</span>" +
-        '<p class="shj-pre" aria-hidden="true">Dark Matter III. The ' + esc(JN[from]) + " is finished.</p>" +
-        '<span class="shj-new">' + med(to, 0, 240, { animate: true, level: 1 }) + "</span>" + sparks +
-      "</div>" +
-      '<p class="shj-eyebrow" data-at style="--at:' + (AT + .7) + 's"><span class="shj-nw">Journey ' + (to + 1) + ' of 3</span> · <span class="shj-nw">' + fmt(125000 * to) + " XP</span></p>" +
-      '<h2 class="shj-title" data-at style="--at:' + (AT + .85) + 's">The ' + esc(name) + (to === 2 ? " are yours." : " is yours.") + "</h2>" +
-      '<p class="shj-line" data-at style="--at:' + (AT + 1.05) + 's">You finished the ' + esc(JN[from]) + ". Your XP, your trophies and everything you earned come with you.</p>" +
-      '<ol class="shj-ahead" aria-label="Seven new ranks" style="--at:' + (AT + 1.5) + 's">' + ahead + "</ol>" +
-      lootHTML(pays, from, AT + 2.1) +
-      '<button type="button" class="shj-go shj-gold" data-shj="go" data-at style="--at:' + sec(AT + 3) + '">' + COIN + "Collect " + fmt(pays) + " crowns</button></div>";
-  }
-  function placeFly(el){
-    /* where the old medallion flies: from the middle of the stage to its place on the road */
-    var a = el.querySelector(".shj-old"), b = el.querySelector(".shj-sockdone");
-    if (!a || !b) return;
-    var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
-    el.style.setProperty("--ox", Math.round(rb.left + rb.width / 2 - ra.left - ra.width / 2) + "px");
-    el.style.setProperty("--oy", Math.round(rb.top + rb.height / 2 - ra.top - ra.height / 2) + "px");
-  }
   /* ---------- the hand-off to the ModuPro (Sam, 2026-11-20: "something absolutely bananas when you rank up to modupro.
      completely unique and epic"; then, of the first cut, "the model is inaccurate ... i also dont like the screen
      shatter"). About 9.5 seconds to the button:
@@ -413,7 +439,7 @@
        5.65 s     the typodont folds into the ModuPro medallion (--slam), which rises to its place (--rise);
        7-9.4 s    the road, the title word by word, the seven new ranks, then the reward: 20,000 Shiny Gold Crowns counted up
                   with a fountain and a rain of coins (migration_v89 pays them), and the Handpiece's trophy.
-     Skip jumps to the last frame (the reward stays), Esc closes. The Loupes keep the hand-off above, with their 30,000. ---------- */
+     Skip jumps to the last frame (the reward stays), Esc closes. The Loupes have their own scene, below. ---------- */
   var MP = { imp: 2.6, arr: 3.3, jaw: 3.55, teeth: 3.85, chomp: 5.15, morph: 5.65, slam: 5.8, rise: 6.35 };
   var MP_R = MP.rise + .6;   // the words and the reward start here
   function sec(x){ return (+x).toFixed(2) + "s"; }
@@ -446,11 +472,7 @@
       return '<li class="' + st + '"><span class="shj-sock' + (j === 0 ? " shj-sockdone" : j === 1 ? " shj-socknow" : "") + '"' + (j === 1 ? ' style="--at:' + s(R0 + .5) + '"' : "") + ">" +
         (j > 1 ? LOCK : R.artOf(j, j < 1 ? 6 : 0, 36) + (j < 1 ? CHECK : "")) + "</span>" + esc(JN[j]) + "</li>";
     }).join("");
-    var sparks = "";
-    for (var i = 0, x = 23; i < 34; i++){
-      x = (x * 9301 + 49297) % 233280; var a = x / 233280 * Math.PI * 2; x = (x * 9301 + 49297) % 233280; var r = 120 + x / 233280 * 190;
-      sparks += '<i class="shj-spark" style="--sx:' + Math.round(Math.cos(a) * r) + "px;--sy:" + Math.round(Math.sin(a) * r) + "px;--d:" + (i % 6 * .04).toFixed(2) + 's"></i>';
-    }
+    var sparks = sparksHTML(23);
     var ahead = T.map(function(t, i){ return '<li style="--i:' + i + '"' + (i ? "" : ' class="is-now"') + ">" + R.artOf(1, i, 36) + esc(t.name) + "</li>"; }).join("");
     var words = ["The", "ModuPro", "is", "yours."].map(function(w, i){ return '<span class="shj-wd' + (i === 1 ? " shj-mpn" : "") + '" style="--i:' + i + '">' + w + "</span>"; }).join(" ");
     return '<span class="shj-lab"></span><span class="shj-cone"></span><span class="shj-lamp"></span>' +
@@ -473,6 +495,98 @@
       '<p class="shj-line" data-at style="--at:' + s(R0 + .7) + '">You finished the Handpiece. Your XP, your trophies and everything you earned come with you.</p>' +
       '<ol class="shj-ahead" aria-label="Seven new ranks, Stone to Dark Matter" style="--at:' + s(R0 + .95) + '">' + ahead + "</ol>" +
       lootHTML(pays, 0, R0 + 1.45) +
+      '<button type="button" class="shj-go shj-gold" data-shj="go" data-at style="--at:' + s(R0 + 2.4) + '">' + COIN + "Collect " + fmt(pays) + " crowns</button></div>";
+  }
+  /* the burst of sparks a medallion lands with */
+  function sparksHTML(seed){
+    var out = "";
+    for (var i = 0, x = seed; i < 34; i++){
+      x = (x * 9301 + 49297) % 233280; var a = x / 233280 * Math.PI * 2; x = (x * 9301 + 49297) % 233280; var r = 120 + x / 233280 * 190;
+      out += '<i class="shj-spark" style="--sx:' + Math.round(Math.cos(a) * r) + "px;--sy:" + Math.round(Math.sin(a) * r) + "px;--d:" + (i % 6 * .04).toFixed(2) + 's"></i>';
+    }
+    return out;
+  }
+
+  /* ---------- the hand-off to the Loupes (Sam, 2026-11-20: "turning on the light of the loupes acts like some kind of
+     sunbeam and like destroys the ModuPro, and then the loupes take its place"). About 9 seconds to the button:
+       0.2-0.9 s  the Dark Matter III ModuPro under the ModuPro's nebula ("The ModuPro is finished.");
+       0.9-2 s    the loupes come down out of the dark and hang over it (--lin);
+       2.05 s     their headlight clicks on, flickers, and their lenses catch it (--click);
+       2.3-3 s    a thin beam onto the ModuPro, the screen dims around it, dust turning in the light (--beam);
+       3-4.6 s    the beam grows into a sunbeam (--sun): the ModuPro trembles, goes white-hot, cracks (--crk), throws embers;
+       4.6 s      it burns away (--burn): a flash, embers and ash pulled up into the light, shock waves, the screen shakes,
+                  and the ModuPro's nebula gives way to the Loupes' sky;
+       5-5.8 s    the loupes come down through the light into its place (--drop) and the Loupes medallion forms around
+                  them (--set), a glint across each lens; it rises to its place (--rise);
+       6.6-9 s    the road, the title word by word, the seven new ranks, then the reward: 30,000 Shiny Gold Crowns counted
+                  up with coins (migration_v89 pays them), and the ModuPro's trophy.
+     Skip jumps to the last frame (the reward stays), Esc closes. ---------- */
+  var LP = { lin: .9, click: 2.05, beam: 2.3, sun: 3, crk: 3.7, burn: 4.6, drop: 5, set: 5.45, rise: 6 };
+  var LP_R = LP.rise + .6;   // the words and the reward start here
+  var lpUid = 0;
+  /* the loupes alone, big: the kit's drawing (widget/hub-art/journeys.js) in polished metal, with the headlight's glow
+     and the lenses' (both hidden until it clicks on) */
+  function lpSvg(){
+    var K = window.SH_JOURNEY_ART, S = K && K.shape(2);
+    if (!S) return "";
+    var p = "shjlp" + (++lpUid) + "-";
+    function cyl(id, cs){ return '<linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1">' + cs.map(function(c, i){ return '<stop offset="' + (i / (cs.length - 1)).toFixed(3) + '" stop-color="' + c + '"/>'; }).join("") + "</linearGradient>"; }
+    var defs = cyl(p + "g", ["#2A2F37", "#5E6673", "#B9C1CC", "#F1F4F8", "#939CA9", "#4D545F", "#23272E", "#717A88"]) +
+      cyl(p + "gd", ["#1C2026", "#41474F", "#878F9A", "#B8BFC8", "#6B737E", "#363B43", "#16191E", "#535A64"]) +
+      '<radialGradient id="' + p + 'lamp"><stop offset="0" stop-color="#fff"/><stop offset=".25" stop-color="#FFF6D6" stop-opacity=".9"/><stop offset="1" stop-color="#FFE7A0" stop-opacity="0"/></radialGradient>' +
+      '<radialGradient id="' + p + 'lens"><stop offset="0" stop-color="#D5FFF6" stop-opacity=".85"/><stop offset=".6" stop-color="#46DCBE" stop-opacity=".35"/><stop offset="1" stop-color="#46DCBE" stop-opacity="0"/></radialGradient>';
+    return '<svg viewBox="-6 -12 132 74" aria-hidden="true"><defs>' + defs + "</defs>" + S.modern(p, true) + (S.top ? S.top(p, true, false) : "") +
+      '<g class="shj-lgl"><circle cx="37" cy="38.5" r="9.8" fill="url(#' + p + 'lens)"/><circle cx="83" cy="38.5" r="9.8" fill="url(#' + p + 'lens)"/></g>' +
+      '<g class="shj-lmp"><circle cx="60" cy="1" r="15" fill="url(#' + p + 'lamp)"/><circle cx="60" cy="1" r="3.6" fill="#fff"/></g></svg>';
+  }
+  /* the cracks that open across the ModuPro as it heats, from the middle out (on the medallion's 128 grid) */
+  function crackSvg(){
+    var x = 31, out = "", order = [0, 4, 2, 6, 1, 5, 3, 7];
+    function r(){ x = (x * 9301 + 49297) % 233280; return x / 233280; }
+    function pt(a, rr){ return (64 + Math.cos(a) * rr).toFixed(1) + " " + (64 + Math.sin(a) * rr).toFixed(1); }
+    for (var i = 0; i < 8; i++){
+      var a = i / 8 * 6.2832 + r() * .5, d = "M" + pt(a, 6);
+      for (var k = 1; k <= 5; k++){
+        var rr = 6 + k * 10.4, aa = a + (r() - .5) * .5, here = pt(aa, rr);
+        d += " L" + here;
+        if (k === 3 && r() > .4) d += " L" + pt(aa + (r() > .5 ? .6 : -.6), rr + 14) + " M" + here;
+      }
+      out += '<path d="' + d + '" style="--i:' + order[i] + '"/>';
+    }
+    return '<svg class="shj-crk" viewBox="0 0 128 128" aria-hidden="true"><g fill="none" stroke="#FFF8E2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + out + "</g></svg>";
+  }
+  function lpHTML(d){
+    var R0 = LP_R, s = sec, pays = journeyCrowns(2);
+    var track = [0, 1, 2].map(function(j){
+      return '<li class="' + (j < 2 ? "is-done" : "is-now") + '"><span class="shj-sock' + (j === 1 ? " shj-sockdone" : j === 2 ? " shj-socknow" : "") + '"' + (j === 2 ? ' style="--at:' + s(R0 + .5) + '"' : "") + ">" +
+        R.artOf(j, j < 2 ? 6 : 0, 36) + (j < 2 ? CHECK : "") + "</span>" + esc(JN[j]) + "</li>";
+    }).join("");
+    var ahead = T.map(function(t, i){ return '<li style="--i:' + i + '"' + (i ? "" : ' class="is-now"') + ">" + R.artOf(2, i, 36) + esc(t.name) + "</li>"; }).join("");
+    var words = ["The", "Loupes", "are", "yours."].map(function(w, i){ return '<span class="shj-wd' + (i === 1 ? " shj-mpn" : "") + '" style="--i:' + i + '">' + w + "</span>"; }).join(" ");
+    function glint(x, y, t){ return '<i class="shj-glint" style="left:' + x + "%;top:" + y + "%;--g:" + s(t) + '"></i>'; }
+    return '<span class="shj-bg"><svg class="shj-sky" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + stars(9, 120, 800, 600) + "</svg>" +
+      '<span class="shj-neb shj-nmp"></span><span class="shj-neb shj-nlp"></span></span><span class="shj-dim"></span><span class="shj-bloom"></span>' +
+      '<canvas class="shj-cv" aria-hidden="true"></canvas>' +
+      '<span class="shj-flash is-sun" style="--at:' + s(LP.burn) + '"></span>' +
+      '<div class="shj-in">' +
+      '<ol class="shj-track" aria-label="The three journeys" data-at style="--at:' + s(R0) + ";--land:" + s(R0 + .4) + '">' + track + "</ol>" +
+      '<div class="shj-stage" style="--at:' + s(LP.set) + '">' +
+        '<span class="shj-rays" style="--at:' + s(LP.set + .1) + '"></span><span class="shj-halo"></span>' +
+        '<span class="shj-wave" style="--at:' + s(LP.burn) + '"></span><span class="shj-wave is-t" style="--at:' + s(LP.burn + .12) + '"></span>' +
+        '<span class="shj-ring"></span><span class="shj-ring" style="--at:' + s(LP.set + .25) + '"></span>' +
+        '<span class="shj-mpo" aria-hidden="true">' + med(1, 6, 200, { animate: true, level: 3 }) + '<span class="shj-heat"></span>' + crackSvg() + "</span>" +
+        '<span class="shj-spot"></span>' +
+        '<p class="shj-pre" aria-hidden="true">Dark Matter III. The ModuPro is finished.</p>' +
+        '<span class="shj-new">' + med(2, 0, 240, { animate: true, level: 1 }) + "</span>" +
+        glint(38.8, 57.6, LP.set + .55) + glint(63.2, 54.1, LP.set + .8) + sparksHTML(41) +
+        '<span class="shj-lpo" aria-hidden="true"><span class="shj-sun"></span>' + lpSvg() + '<span class="shj-flare"></span>' +
+          glint(32.6, 68.2, LP.click + .3) + glint(67.4, 68.2, LP.click + .45) + "</span>" +
+      "</div>" +
+      '<p class="shj-eyebrow" data-at style="--at:' + s(R0 + .1) + '"><span class="shj-nw">Journey 3 of 3</span> · <span class="shj-nw">' + fmt(250000) + " XP</span></p>" +
+      '<h2 class="shj-title shj-mpt" aria-label="The Loupes are yours." style="--at:' + s(R0 + .25) + '"><span aria-hidden="true">' + words + "</span></h2>" +
+      '<p class="shj-line" data-at style="--at:' + s(R0 + .7) + '">You finished the ModuPro. Your XP, your trophies and everything you earned come with you.</p>' +
+      '<ol class="shj-ahead" aria-label="Seven new ranks, Stone to Dark Matter" style="--at:' + s(R0 + .95) + '">' + ahead + "</ol>" +
+      lootHTML(pays, 1, R0 + 1.45) +
       '<button type="button" class="shj-go shj-gold" data-shj="go" data-at style="--at:' + s(R0 + 2.4) + '">' + COIN + "Collect " + fmt(pays) + " crowns</button></div>";
   }
 
@@ -644,14 +758,25 @@
         g.globalCompositeOperation = "lighter"; g.globalAlpha = (1 - u) * .9; g.strokeStyle = p.c; g.lineWidth = 2 * (1 - u) + .5;
         g.beginPath(); g.arc(p.x, p.y, p.s * (.2 + u), 0, 6.2832); g.stroke(); return;
       }
-      g.globalCompositeOperation = "lighter"; g.globalAlpha = (p.t === "rush" ? Math.min(1, u * 6) * (1 - u) : 1 - u * u) * (p.al || 1);
+      if (p.t === "ash") {   // a flake of the burnt ModuPro, dark, its edge still glowing
+        g.globalCompositeOperation = "source-over"; g.globalAlpha = (1 - u) * Math.min(1, u * 10) * .9;
+        g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.fillStyle = p.c; g.fillRect(-p.s / 2, -p.s * .3, p.s, p.s * .6);
+        g.globalCompositeOperation = "lighter"; g.strokeStyle = "rgba(255,170,80," + (.9 * (1 - u)).toFixed(2) + ")"; g.lineWidth = .9; g.strokeRect(-p.s / 2, -p.s * .3, p.s, p.s * .6); g.restore(); return;
+      }
+      if (p.t === "ember" && p.vx * p.vx + p.vy * p.vy > 3600) {   // a fast ember is a spark, drawn along its path
+        g.globalCompositeOperation = "lighter"; g.globalAlpha = (1 - u) * (.6 + .4 * Math.sin(p.fl + p.age * 26));
+        g.strokeStyle = p.c; g.lineWidth = p.s * .8; g.lineCap = "round";
+        g.beginPath(); g.moveTo(p.x - p.vx * .03, p.y - p.vy * .03); g.lineTo(p.x, p.y); g.stroke(); return;
+      }
+      g.globalCompositeOperation = "lighter";
+      g.globalAlpha = (p.t === "rush" ? Math.min(1, u * 6) * (1 - u) : p.t === "mote" ? Math.sin(3.1416 * u) : p.t === "ember" ? (1 - u) * (.6 + .4 * Math.sin(p.fl + p.age * 26)) : 1 - u * u) * (p.al || 1);
       if (p.t === "streak" || p.t === "rush") {
         var tl = p.t === "rush" ? .07 : .035;
         g.strokeStyle = p.c; g.lineWidth = p.s; g.lineCap = "round";
         g.beginPath(); g.moveTo(p.x - p.vx * tl, p.y - p.vy * tl); g.lineTo(p.x, p.y); g.stroke();
       } else {
         g.fillStyle = p.c; g.beginPath(); g.arc(p.x, p.y, Math.max(.4, p.s * (1 - u * .5)), 0, 6.2832); g.fill();
-        g.globalAlpha *= .25; g.beginPath(); g.arc(p.x, p.y, p.s * 3, 0, 6.2832); g.fill();
+        g.globalAlpha *= .25; g.beginPath(); g.arc(p.x, p.y, p.s * (p.t === "ember" ? 2 : 3), 0, 6.2832); g.fill();
       }
     }
     /* ----- the typodont: px a mm, so it fills about 82% of the width, or 68% of the height when that is less */
@@ -797,6 +922,56 @@
         });
         go();
       },
+      /* the Loupes' scene: dust turning in the headlight's beam, from the lamp down past the ModuPro */
+      motes: function(sec, lamp){
+        var t = 0;
+        ems.push(function(dt){
+          t += dt; if (t > sec) return false;
+          var a = centerOf(lamp), bx = C.x, by = C.y + C.r * 1.1, n = 80 * dt;
+          while (n > 0) {
+            if (n < 1 && Math.random() > n) break; n--;
+            var u = Math.sqrt(Math.random()), hw = 3 + (by - a.y) * u * .26;
+            ps.push({ t: "mote", x: a.x + (bx - a.x) * u + rnd(-1, 1) * hw, y: a.y + (by - a.y) * u, vx: rnd(-10, 10), vy: rnd(-22, 6), life: rnd(1.1, 2.2), age: 0,
+              s: rnd(.7, 2), al: rnd(.4, 1), c: pick(["#FFFFFF", "#FFF4C2", "#FFE7A0"]) });
+          }
+        });
+        go();
+      },
+      /* embers lifting off the ModuPro as it heats, more and more */
+      embers: function(sec){
+        var t = 0;
+        ems.push(function(dt){
+          t += dt; if (t > sec) return false;
+          var n = (25 + 320 * Math.pow(t / sec, 1.6)) * dt;
+          while (n > 0) {
+            if (n < 1 && Math.random() > n) break; n--;
+            var a = rnd(0, 6.2832), r = C.r * Math.sqrt(Math.random()) * .95;
+            ps.push({ t: "ember", x: C.x + Math.cos(a) * r, y: C.y + Math.sin(a) * r, vx: rnd(-30, 30), vy: rnd(-150, -30), g: -320, drag: .985, life: rnd(.6, 1.3), age: 0,
+              s: rnd(.9, 2.6), fl: rnd(0, 6.28), c: pick(["#FFF4C2", "#FFD36B", "#FF9A3C", "#FFFFFF", "#FFB86B"]) });
+          }
+        });
+        go();
+      },
+      /* it burns away: embers and the ModuPro's ash thrown out, then drawn up into the light, and rings */
+      burn: function(){
+        var i, a, v, r;
+        for (i = 0; i < 240; i++) { a = rnd(0, 6.2832); v = rnd(120, 720); r = C.r * Math.sqrt(Math.random()) * .8;
+          ps.push({ t: "ember", x: C.x + Math.cos(a) * r, y: C.y + Math.sin(a) * r, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 120, g: -420, drag: .93, life: rnd(.9, 2.1), age: 0,
+            s: rnd(1, 3.2), fl: rnd(0, 6.28), c: pick(["#FFFFFF", "#FFF4C2", "#FFD36B", "#FF9A3C"]) }); }
+        for (i = 0; i < 150; i++) { a = rnd(0, 6.2832); v = rnd(80, 520); r = C.r * Math.sqrt(Math.random());
+          ps.push({ t: "ash", x: C.x + Math.cos(a) * r, y: C.y + Math.sin(a) * r, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 80, g: -260, drag: .94, life: rnd(1.1, 2.4), age: 0,
+            s: rnd(2, 6.5), rot: rnd(0, 6.28), vr: rnd(-8, 8), c: pick(["#2A1456", "#3B1E6E", "#1E2A5E", "#5A2A86", "#14102A"]) }); }
+        [1, 1.6, 2.3].forEach(function(k, i){ ps.push({ t: "ring", x: C.x, y: C.y, vx: 0, vy: 0, life: .9 + i * .25, age: 0, s: C.r * k * 1.8, c: i ? "#FFE7A0" : "#FFFFFF" }); });
+        go();
+      },
+      /* the Loupes medallion forms: a ring and glitter off its rim */
+      glitter: function(){
+        for (var i = 0; i < 70; i++) { var a = rnd(0, 6.2832), v = rnd(60, 340);
+          ps.push({ t: "streak", x: C.x + Math.cos(a) * C.r * .9, y: C.y + Math.sin(a) * C.r * .9, vx: Math.cos(a) * v, vy: Math.sin(a) * v, drag: .94, life: rnd(.6, 1.2), age: 0,
+            s: rnd(1, 2.2), c: pick(["#FFFFFF", "#9FF3E0", "#D5FFF6", "#FFE7A0"]) }); }
+        ps.push({ t: "ring", x: C.x, y: C.y, vx: 0, vy: 0, life: 1, age: 0, s: C.r * 2.2, c: "#9FF3E0" });
+        go();
+      },
       jaw: function(){ if (!M) prepare(); jaw = { t: 0, gap0: 14, cy: 2 }; jaw.k = scaleOf(); M.teeth.forEach(function(q){ q.land = false; }); go(); },
       teeth: function(){ if (jaw) jaw.tteeth = jaw.t; },
       chomp: function(){ if (jaw) jaw.chomp = 0; },
@@ -874,13 +1049,31 @@
     run.at(MP.chomp, fx(function(x){ x.chomp(); }));
     run.at(MP.morph, fx(function(x){ x.morph(); }));
   }
+  function loupes(d, done, opt){
+    var pays = journeyCrowns(2), el = shell("shj-hand shj-lp", "A new journey: the Loupes", lpHTML(d));
+    Object.keys(LP).forEach(function(k){ el.style.setProperty("--" + k, LP[k] + "s"); });
+    el.style.setProperty("--heat", (LP.burn - LP.sun) + "s");
+    var run = paying(el, pays, opt, done, { focusAt: (LP_R + 2.4) * 1000 + 100, peakAt: LP.burn * 1000, detail: { kind: "handoff", journey: 2 },
+      reward: LP_R + 1.75, end: LP_R + 2.4 });
+    if (!run) return;
+    /* the loupes hang 1.35 stages above the ModuPro's middle, and it and its caption reach .43 stages and 58px below: that,
+       scaled up as far as the screen allows (at most 1.6 times), in the middle of the screen */
+    var st = el.querySelector(".shj-stage").getBoundingClientRect(), lamp = el.querySelector(".shj-flare"), w = st.width || 1;
+    var a = 1.345 * w, b = .43 * w + 58;   // above the ModuPro's middle, and below it with the caption
+    var z = Math.max(1, Math.min(1.6, (innerHeight - 70) / (a + b), (innerWidth - 24) / (1.25 * w))), yc = innerHeight / 2 + (a - b) * z / 2;
+    el.style.setProperty("--dy", Math.round(yc - (st.top + st.height / 2)) + "px");
+    el.style.setProperty("--zoom", z.toFixed(3)); el.style.setProperty("--my", Math.round(yc) + "px");
+    function fx(f){ return function(){ var x = run.fx(); if (x) f(x); }; }
+    run.at(LP.beam, fx(function(x){ x.motes(LP.drop - LP.beam + .3, lamp); }));
+    run.at(LP.sun, fx(function(x){ x.embers(LP.burn - LP.sun); }));
+    run.at(LP.burn, fx(function(x){ x.burn(); }));
+    run.at(LP.set + .05, fx(function(x){ x.glitter(); }));
+    run.at(LP_R, function(){ el.classList.add("is-told"); });
+  }
   function handoff(d, done, opt){
     d = d || {}; opt = opt || {};
     R.needJourneyArt(function(){
-      var to = Math.max(1, Math.min(2, d.to | 0));
-      if (to === 1) { modupro(d, done, opt); return; }
-      var el = shell("shj-hand", "A new journey: the " + JN[to], handoffHTML(d));
-      if (paying(el, journeyCrowns(to), opt, done, { focusAt: 6600, peakAt: 3600, detail: { kind: "handoff", journey: to }, reward: 3.5 + 2.4, end: 3.5 + 3 })) placeFly(el);
+      if ((d.to | 0) >= 2) loupes(d, done, opt); else modupro(d, done, opt);
     });
   }
 
@@ -1148,9 +1341,9 @@
   function still(kind, d){
     css();
     var el = document.createElement("div");
-    var mp = kind !== "dark" && (d && d.to | 0) === 1;
-    el.className = "shj shj-inline is-still is-on " + (kind === "dark" ? "shj-dark shj-d" + Math.max(0, Math.min(2, (d && d.journey) | 0)) : mp ? "shj-hand shj-mp is-lab" : "shj-hand");
-    el.innerHTML = kind === "dark" ? darkHTML(d || {}) : mp ? mpHTML(d) : handoffHTML(d || {});
+    var lp = kind !== "dark" && (d && d.to | 0) >= 2;
+    el.className = "shj shj-inline is-still is-on " + (kind === "dark" ? "shj-dark shj-d" + Math.max(0, Math.min(2, (d && d.journey) | 0)) : lp ? "shj-hand shj-lp" : "shj-hand shj-mp is-lab");
+    el.innerHTML = kind === "dark" ? darkHTML(d || {}) : lp ? lpHTML(d) : mpHTML(d);
     return el;
   }
 
