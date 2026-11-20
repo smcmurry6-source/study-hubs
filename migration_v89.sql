@@ -1,23 +1,27 @@
--- v89 (2026-11-20): reaching Dark Matter pays 5,000 Shiny Gold Crowns, once for each journey's Dark Matter.
--- Sam, 2026-11-20: "reaching dark matter gets you 5000 crowns. be sure to put that on the rank up screen".
+-- v89 (2026-11-20): reaching Dark Matter pays 5,000 Shiny Gold Crowns, once for each journey's Dark Matter; reaching the
+-- ModuPro pays 20,000 and reaching the Loupes 30,000.
+-- Sam, 2026-11-20: "reaching dark matter gets you 5000 crowns. be sure to put that on the rank up screen", then
+-- "10,000 crowns for reaching modupro", then "we can upp modupro to 20,000 and then loupes to 30,000".
 --
 -- The wallet is worked out from what a student has earned, never stored (sh_wallet), so the award is a term of it, like
 -- the +20 a rank-up: 5,000 for every journey whose Dark Matter the student's XP has reached (the Handpiece's at 50,000 XP,
 -- the ModuPro's at 232,142, the Loupes' at 357,142; sh_rank's gtier 6, 13 and 20). It counts from the first XP, not from
 -- the switch, so a student who reached Dark Matter before today is paid now: the back pay. Crowns only: no XP, so it moves
--- no rank, and a boost doesn't double it.
+-- no rank, and a boost doesn't double it. Reaching a new journey pays the same way, once, crowns only, back pay included:
+-- the ModuPro (125,000 XP, gtier 7, where the Handpiece's journey ends) 20,000, the Loupes (250,000 XP, gtier 14) 30,000.
 --
--- sh_prizes() says what it pays ('dark'), so widget/v3.js's PRIZES (the same table; tools/release/xp.js fails if they
--- differ) and the Dark Matter scene (widget/journeys.js, "+5,000 Shiny Gold Crowns") read one number. The wallet also
--- returns 'dark', how many Dark Matters are paid. Everything else in both functions is v79's and v75's.
+-- sh_prizes() says what they pay ('dark', 'modupro', 'loupes'), so widget/v3.js's PRIZES (the same table; tools/release/xp.js fails
+-- if they differ) and the scenes (widget/journeys.js: "+5,000 Shiny Gold Crowns" on the Dark Matter unlock, "+10,000" on
+-- the hand-offs: "+20,000" to the ModuPro, "+30,000" to the Loupes) read one number. The wallet also returns 'dark', how
+-- many Dark Matters are paid, and 'modupro' and 'loupes', 1 once each is reached. Everything else in both functions is v79's and v75's.
 --
 -- Applying it: two function replacements, no table touched, nothing locked; safe at any hour.
 
--- what every prize pays, for the page (migration_v75's table, and `dark`; widget/v3.js's PRIZES says the same)
+-- what every prize pays, for the page (migration_v75's table, with `dark`, `modupro` and `loupes`; widget/v3.js's PRIZES says the same)
 create or replace function public.sh_prizes()
 returns jsonb language sql immutable set search_path = public as $$
   select jsonb_build_object('name', 500, 'ring', 5, 'boss', 500, 'nuke', 10000, 'alltime', 20000, 'notes', 50, 'trophy', 200,
-    'visit', 50, 'game', 100, 'pb', 50, 'top', 250, 'report', 100, 'collection', 1000, 'dark', 5000,
+    'visit', 50, 'game', 100, 'pb', 50, 'top', 250, 'report', 100, 'collection', 1000, 'dark', 5000, 'modupro', 20000, 'loupes', 30000,
     'streak', jsonb_build_array(jsonb_build_array(3, 100), jsonb_build_array(7, 300), jsonb_build_array(14, 700),
       jsonb_build_array(30, 1500), jsonb_build_array(60, 3000), jsonb_build_array(100, 5000)),
     'row', jsonb_build_array(jsonb_build_array(10, 25), jsonb_build_array(25, 100), jsonb_build_array(50, 250)),
@@ -29,7 +33,7 @@ grant execute on function public.sh_prizes() to anon, authenticated;
 create or replace function public.sh_wallet(p_visitor text)
 returns jsonb language plpgsql stable security definer set search_path = public as $$
 declare v_xp int; extra int; prize_xp int; prize_c int; n_f int; base_xp int; bl public.game_baseline; badges text[]; t_now text[]; t_was text[];
-  m_now text[]; m_was text[]; n_t int; n_m int; n_r int; n_d int; gt int; earned int; spent int; dd date := (now() at time zone 'America/Chicago')::date;
+  m_now text[]; m_was text[]; n_t int; n_m int; n_r int; n_d int; n_p int; n_l int; gt int; earned int; spent int; dd date := (now() at time zone 'America/Chicago')::date;
   t_c int := sh_time_crowns(p_visitor);
 begin
   select coalesce(max(x.xp), 0) into v_xp from xp_visitors x where x.visitor_id = p_visitor;
@@ -55,10 +59,14 @@ begin
   n_r := greatest(0, gt - (select r.gtier from sh_rank(coalesce(bl.xp, 0)) r));
   -- v89: each journey's Dark Matter reached (gtier 6, 13, 20), from the first XP, so it is back pay too
   n_d := (gt + 1) / 7;
-  earned := base_xp / 2 + t_c + prize_c + 1000 * n_f + 25 * n_t + 50 * n_m + 20 * n_r + (sh_prizes()->>'dark')::int * n_d;
+  -- v89: the ModuPro reached (gtier 7, 125,000 XP) and the Loupes (gtier 14, 250,000 XP), each once, from the first XP too
+  n_p := case when gt >= 7 then 1 else 0 end;
+  n_l := case when gt >= 14 then 1 else 0 end;
+  earned := base_xp / 2 + t_c + prize_c + 1000 * n_f + 25 * n_t + 50 * n_m + 20 * n_r + (sh_prizes()->>'dark')::int * n_d
+    + (sh_prizes()->>'modupro')::int * n_p + (sh_prizes()->>'loupes')::int * n_l;
   select coalesce(sum(price), 0) into spent from pet_purchases where visitor_id = p_visitor;
   return jsonb_build_object('earned', earned, 'spent', spent, 'balance', earned - spent, 'from_xp', base_xp / 2, 'from_time', t_c,
-    'prizes', prize_c + 1000 * n_f, 'trophies', n_t, 'medals', n_m, 'rankups', n_r, 'dark', n_d, 'rewards', n_f, 'pays', sh_prizes(),
+    'prizes', prize_c + 1000 * n_f, 'trophies', n_t, 'medals', n_m, 'rankups', n_r, 'dark', n_d, 'modupro', n_p, 'loupes', n_l, 'rewards', n_f, 'pays', sh_prizes(),
     'got', jsonb_build_object(
       'name', exists (select 1 from xp_awards w where w.visitor_id = p_visitor and w.key = 'name'),
       'visit', exists (select 1 from xp_awards w where w.visitor_id = p_visitor and w.key = 'visit:' || dd),

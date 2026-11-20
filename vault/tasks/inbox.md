@@ -10,10 +10,17 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
-- [ ] **Sam: confirm the Dark Matter crowns' three readings** (2026-11-20, [decisions](../decisions.md)): 5,000 for each journey's
-  Dark Matter (three in all), crowns only (no XP), and back pay for anyone already there. Each is one line of `sh_wallet` in
-  `migration_v89.sql` to change, and the scene reads the amount from `sh_prizes()`'s `dark`. Never take crowns back once paid
+- [ ] **Sam: confirm the readings of the journey crowns** (2026-11-20, [decisions](../decisions.md)): 5,000 for each journey's
+  Dark Matter (three in all), 20,000 for reaching the ModuPro and 30,000 for the Loupes (Sam's numbers, once each), all crowns
+  only (no XP), with back pay for anyone already there. Each is one line of `sh_wallet` in `migration_v89.sql` to change, and
+  the scenes read the amounts from `sh_prizes()`'s `dark`, `modupro` and `loupes`. Never take crowns back once paid
   ([earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md)): dropping the back pay after v89 is live would lower balances.
+  The next lessons audit reads the economy with the back pay in it (a one-off jump in balances, not a rate).
+- [ ] **After #492 merges: replay the new Dark Matter unlock for the one student Sam asked for** (2026-11-20, "replay the dark
+  matter animation for ... since they didnt get to see it"; the name is in that session's chat, not here: per-person rows stay in
+  the database, [learner-data-privacy](../rules/learner-data-privacy.md)). It plays when the profile's `dark_seen` lacks 0:
+  delete that visitor's `achievements` row of kind `dark-seen-0` through the connector (one row, Sam's OK), after v89 is applied
+  and the merge has published; the page marks it seen again once it has played.
 - [x] **Apply `migration_v88.sql` after its PR merges** (done 2026-11-20 at about 5 am Central, right after #489 merged: md5-checked, recorded in the PR after it) (2026-11-20, a survey asks each person once): two functions replaced (`get_active_survey`, `get_my_survey`), no table touched, so any time of day, one statement a call through the connector, md5-checked. Fetch `main` first: if v88 was taken meanwhile, renumber. Then append it to `supabase/schema.sql`, take its line out of `supabase/pending-migrations.txt` and note it there, in a small PR. Until then linked devices work as before (the pop-up's Link this device works without it).
 
 - [ ] **The mastery read is slower a call than before the optimization pass** (2026-11-20, its readout): `get_hub_mastery`
