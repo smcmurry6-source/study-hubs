@@ -499,6 +499,22 @@ try {
   anon(`select record_achievement('xp-U', 'owl', '')`);
   const uw = json(`sh_wallet('xp-U')`);
   ok(uw.rankups === 2 && uw.trophies === 1 && uw.earned === Math.floor((xpOf('xp-U') - 1300) / 2) + uw.from_time + 1300 + 2 * 20 + 25, `rank-ups and trophies since the switch: +20 and +25 each, a fixed report's XP in crowns (${JSON.stringify(uw)})`);
+  // reaching Dark Matter (migration_v88, Sam: "reaching dark matter gets you 5000 crowns"): 5,000 for each journey's Dark
+  // Matter, crowns only, and back pay for one reached before the award existed
+  award('xp-DM', 'rep:flag:9101', 49000);
+  const dm0 = json(`sh_wallet('xp-DM')`), dmX0 = xpOf('xp-DM');
+  award('xp-DM', 'rep:flag:9102', 1500);
+  const dm1 = json(`sh_wallet('xp-DM')`);
+  eq([dm0.dark, dm1.dark, json(`sh_prizes()`).dark], [0, 1, 5000], 'the Handpiece\'s Dark Matter at 50,000 XP: one paid, and sh_prizes() says 5,000');
+  eq([xpOf('xp-DM') - dmX0, dm1.earned - dm0.earned - 20 * (dm1.rankups - dm0.rankups)], [1500, 1500 + 5000], 'reaching it pays 5,000 crowns and no XP (the 1,500 XP a fixed report paid, as many crowns, and a rank-up\'s 20)');
+  award('xp-DM', 'rep:flag:9103', 10);
+  eq(json(`sh_wallet('xp-DM')`).dark, 1, 'once: more XP inside Dark Matter doesn\'t pay it again');
+  award('xp-DM', 'rep:flag:9104', 232142 - xpOf('xp-DM'));
+  award('xp-DM', 'rep:flag:9105', 357142 - xpOf('xp-DM'));
+  const dm3 = json(`sh_wallet('xp-DM')`);
+  ok(dm3.dark === 3 && dm3.earned === dm3.from_xp + dm3.from_time + dm3.prizes + 20 * dm3.rankups + 25 * dm3.trophies + 3 * 5000, `the ModuPro's at 232,142 and the Loupes' at 357,142: 15,000 in all (${JSON.stringify(dm3)})`);
+  sql(`delete from xp_awards where visitor_id = 'xp-DM'; delete from xp_visitors where visitor_id = 'xp-DM'`);   // off the boards the later checks read
+  notes.push('Dark Matter pays 5,000 crowns once per journey, crowns only, back pay included (migration_v88)');
   // hub time (migration_v68, Sam: "also 100 crowns per hour of hub time"): 25 seconds a ping, at most 100 crowns in a clock
   // hour (two tabs, or a script, can't pay more), the dashboard's and test rows never
   sql(`insert into activity_hourly (h, hub, section, visitor_id, n) values

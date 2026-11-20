@@ -100,7 +100,10 @@ leaderboards, the streak stats and the arcade board have `_v2` versions with the
 
 - **The balance** (`sh_wallet`, never stored; its sums of the awards are `xp_award_totals`, above): 5 per 10 XP of base XP (1 until migration_v68; Sam, 2026-11-17: "lets increase it to 5 crowns per 10xp") (a boost's extra earns none; nor does a survey's or
   check-in's 1,000 XP), +1,000 a survey or check-in reward (migration_v60: counted from its award row's `src`), +25 a trophy, +50 a medal,
-  +20 a rank-up (a tier) since the switch, **+ every prize's XP again as crowns** (migration_v68, next to last section), minus what was spent. Spending never lowers XP or rank. The XP from before the
+  +20 a rank-up (a tier) since the switch, **+5,000 for each journey's Dark Matter reached** (migration_v88, Sam, 2026-11-20:
+  "reaching dark matter gets you 5000 crowns"; the Handpiece's at 50,000 XP, the ModuPro's at 232,142, the Loupes' at 357,142;
+  counted from the first XP, so it was back pay for those already there; crowns only, `sh_prizes()`'s `dark`, the wallet's
+  `dark` says how many; the Dark Matter scene shows it), **+ every prize's XP again as crowns** (migration_v68, next to last section), minus what was spent. Spending never lowers XP or rank. The XP from before the
   switch counts, so the shop opens with what XP already earned; the one-time grants count from the switch on.
 - **The catalog** (`shop_items`): each item's kind, rarity, price (checked against its rarity's band), season, slot, HP or
   boost, `wide` for a yard item that takes two spots (the bowling lane), `gift` (everyone owns it) and `rank_tier` (owned
