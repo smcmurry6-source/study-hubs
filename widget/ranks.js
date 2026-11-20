@@ -29,9 +29,6 @@
      this runs. The Handpiece keeps today's names ("Gold II"); a later journey's name leads ("ModuPro Gold II"). */
   var JOURNEYS = ["Handpiece", "ModuPro", "Loupes"];
   function isV2(p){ return !!p && p.journey != null; }
-  /* the redesign's pages: a new hub's engine and the new dashboard set html.shx before this file runs. The trophy case's
-     list of 27 and the cards' new look are theirs; a live page never has the class, so its lists and cards are today's. */
-  var NEW = (function(){ try { return document.documentElement.classList.contains("shx"); } catch (e) { return false; } })();
   /* what the handpiece-only parts of this file read from a v2 profile: from the ModuPro on, the rank the Handpiece
      ended at (Dark Matter III), so accents, Timmy's house and the old cards never go back to Stone */
   function legacy(p){
@@ -364,23 +361,21 @@
   ];
   /* Full Arch is retired (Sam, 2026-11-12: the 32-tooth chart came out at the redesign's release): it is in neither
      list, and RETIRED keeps its row for those who earned it (shown as "Full Arch (retired)").
-     The redesign's trophy case (phase 4, session 6), on its pages only: the three journey trophies and the bowling
+     The redesign's trophy case (phase 4, session 6): the three journey trophies and the bowling
      egg's join, so the case holds 27, 16 of them secret. A journey has its own scene (the hand-off), so trackTrophies
      doesn't announce it again (scene); Bowling is earned on the device (sh_bowl_trophy, widget/bowling.js), which counts it
-     at once, and widget/v3.js sends it to the server (migration_v63), which gives it its class share. An old single-file hub's page keeps the 23 it can still win. */
+     at once, and widget/v3.js sends it to the server (migration_v63), which gives it its class share. (The old single-file hub pages, which kept 23, came down 2026-11-19.) */
   var RETIRED = [
     { k: "fullarch",     n: "Full Arch",            d: "Fill all 32 teeth of the arch",        ic: "M4 16c0-7 3.6-11 8-11s8 4 8 11M7 15.5v-2M10 14v-2.5M14 14v-2.5M17 15.5v-2", secret: true, clue: "Every right answer grows a tooth; every miss knocks one out. Adults have how many?" }
   ];
-  if (NEW) {
-    TROPHIES = TROPHIES.filter(function(t){ return !t.secret; }).concat([
-      { k: "journey-0", n: "Handpiece finished", d: "Reach 125,000 XP: Dark Matter III on the Handpiece", ic: "M3 21l6-6M9 15l8.5-8.5 2.5 2.5L11.5 17.5zM15 5l1.5-1.5 4 4L19 9", scene: true },
-      { k: "journey-1", n: "ModuPro finished", d: "Reach 250,000 XP: Dark Matter III on the ModuPro", ic: "M4 5h16v15H4zM4 10h16M4 15h16M10 7.5h4M10 12.5h4M10 17.5h4", scene: true },
-      { k: "journey-2", n: "Loupes finished", d: "Reach 375,000 XP: Dark Matter III on the Loupes", ic: "M3 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM14 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM10 15h4M4.5 12L7 5h10l2.5 7", scene: true }
-    ], TROPHIES.filter(function(t){ return t.secret; }), [
-      { k: "bowling", n: "Lane Legend", d: "Saw all eight bowling clips", ic: "M12 3c-1.7 0-2.5 1.6-2 3.5.4 1.4-1.5 3-1.5 6.5 0 3.5 1.6 6 3.5 8 1.9-2 3.5-4.5 3.5-8 0-3.5-1.9-5.1-1.5-6.5C14.5 4.6 13.7 3 12 3zM10.2 8.5h3.6", secret: true, device: "sh_bowl_trophy",
-        clue: "The alley\u2019s screen plays something odd after a strike. There are eight." }
-    ]);
-  }
+  TROPHIES = TROPHIES.filter(function(t){ return !t.secret; }).concat([
+    { k: "journey-0", n: "Handpiece finished", d: "Reach 125,000 XP: Dark Matter III on the Handpiece", ic: "M3 21l6-6M9 15l8.5-8.5 2.5 2.5L11.5 17.5zM15 5l1.5-1.5 4 4L19 9", scene: true },
+    { k: "journey-1", n: "ModuPro finished", d: "Reach 250,000 XP: Dark Matter III on the ModuPro", ic: "M4 5h16v15H4zM4 10h16M4 15h16M10 7.5h4M10 12.5h4M10 17.5h4", scene: true },
+    { k: "journey-2", n: "Loupes finished", d: "Reach 375,000 XP: Dark Matter III on the Loupes", ic: "M3 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM14 15a3.5 3.5 0 1 0 7 0 3.5 3.5 0 1 0-7 0zM10 15h4M4.5 12L7 5h10l2.5 7", scene: true }
+  ], TROPHIES.filter(function(t){ return t.secret; }), [
+    { k: "bowling", n: "Lane Legend", d: "Saw all eight bowling clips", ic: "M12 3c-1.7 0-2.5 1.6-2 3.5.4 1.4-1.5 3-1.5 6.5 0 3.5 1.6 6 3.5 8 1.9-2 3.5-4.5 3.5-8 0-3.5-1.9-5.1-1.5-6.5C14.5 4.6 13.7 3 12 3zM10.2 8.5h3.6", secret: true, device: "sh_bowl_trophy",
+      clue: "The alley\u2019s screen plays something odd after a strike. There are eight." }
+  ]);
   /* how many of the case's trophies a profile's badges (and this device, for Bowling) have won */
   function caseCount(badges){
     var got = {}; (badges || []).forEach(function(b){ got[String(b).split(":")[0]] = 1; });
@@ -731,14 +726,10 @@
      the trophy case; track() now announces each new one with a card (widget/rankup.js). Secret ones keep their own
      moment (an egg's toast, Timmy Tooth), and hub mastery medals are announced by the hub widget (widget/ranks-hub.js). The
      device remembers which it has seen in sh_trophy_seen; the first look only records them. */
-  var rarityOf = null;   // set by the hub widget (widget/ranks-hub.js) once trophy stats load: kind -> { n, total, label }
+  /* the card: the drawn trophy (k, SH_TROPHY_ART), its share from the shared stats and what's next */
   function trophyCard(tr, badges){
-    var c = { name: tr.n, desc: tr.d, eyebrow: "Trophy unlocked", ic: tr.ic, pal: "gold", rarity: function(){ return rarityOf ? rarityOf(tr.k) : null; } };
-    /* the redesign's card: the drawn trophy (k, SH_TROPHY_ART), its share from the shared stats and what's next */
-    if (NEW) {
-      c.k = tr.k; c.eyebrow = "New trophy"; c.rarity = function(){ return shareOf(tr.k); };
-      if (badges) { var n = caseCount(badges); c.next = n.won + " of " + n.of + " in your case"; }
-    }
+    var c = { k: tr.k, name: tr.n, desc: tr.d, eyebrow: "New trophy", ic: tr.ic, pal: "gold", rarity: function(){ return shareOf(tr.k); } };
+    if (badges) { var n = caseCount(badges); c.next = n.won + " of " + n.of + " in your case"; }
     return c;
   }
   function trackTrophies(p, busy){
@@ -749,7 +740,7 @@
     if (seen === null || (ls("sh_pref_celebrate") || "on") === "off") return;
     var old = {}; seen.split(",").forEach(function(k){ old[k] = 1; });
     var fresh = TROPHIES.filter(function(tr){ return !tr.secret && !tr.scene && kinds[tr.k] && !old[tr.k]; });
-    if (NEW && fresh.length) trophyStats();
+    if (fresh.length) trophyStats();
     fresh.forEach(function(tr){ playRankUp("trophy", trophyCard(tr, p.badges), busy); });
   }
   /* a trophy won from now on pays 200 XP and crowns (migration_v68): when a v2 profile shows a trophy this device hasn't
@@ -841,12 +832,8 @@
   function masteryCard(i, hub){
     var c = { name: MASTERY[i].n + " mastery", eyebrow: "Hub mastery" + (hub ? " · " + hubName(hub) : ""), art: medalSvg(i + 1, 84, hub), pal: MASTERY_PAL[i],
       desc: i === 3 ? "Every question right. The crown now sits next to your name on every leaderboard." : "A " + MASTERY[i].n.toLowerCase() + " medal with this hub's emblem now shows next to your name on every leaderboard.",
-      rarity: function(){ return rarityOf ? rarityOf(MASTERY[i].k) : null; } };
-    /* the redesign's card: the same medal, its share and the next medal */
-    if (NEW) {
-      c.rarity = function(){ return shareOf(MASTERY[i].k); };
-      if (i < 3) c.next = MASTERY[i + 1].n + " at " + Math.round(MASTERY[i + 1].pct * 100) + "% right";
-    }
+      rarity: function(){ return shareOf(MASTERY[i].k); } };
+    if (i < 3) c.next = MASTERY[i + 1].n + " at " + Math.round(MASTERY[i + 1].pct * 100) + "% right";
     return c;
   }
 
@@ -877,8 +864,8 @@
     flair: flair, flairFromBadges: flairFromBadges, medal: medalSvg, hubName: hubName,
     track: track, preview: preview,
     /* the hub widget's kit: widget/ranks-hub.js (shRanks.mount, loaded by widget/v3.js on a hub only) draws with these */
-    _hub: { NEW: NEW, TS: TS, ls: ls, ROMAN: ROMAN, RETIRED: RETIRED, HUB_NAMES: HUB_NAMES, playRankUp: playRankUp, trophyCard: trophyCard,
-      masteryCard: masteryCard, setRarity: function(f){ rarityOf = f; } },
+    _hub: { TS: TS, ls: ls, ROMAN: ROMAN, RETIRED: RETIRED, HUB_NAMES: HUB_NAMES, playRankUp: playRankUp, trophyCard: trophyCard,
+      masteryCard: masteryCard },
     /* widget/fx.js: the mock exam results card (and anything else that should take turns with the rank-ups) */
     celebrate: function(kind, d){ withRankUp(function(U){ if (U[kind]) U[kind](d); }); }, applyAccent: applyAccent, accentTex: accentTex, accentSvg: accentSvg, svgDataUri: svgDataUri, rankName: rankName, ACCENTS: ACCENTS,
     tierFor: function(xp){ var t = 0; TIERS.forEach(function(x, i){ if (xp >= x.at) t = i; }); return t; },

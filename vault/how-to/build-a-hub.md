@@ -69,7 +69,7 @@ Since the redesign's release (2026-11) every hub runs on the shared engine (`wid
 
 - `hubs.js` (the dashboard's hubs, edited by hand): the hub's entry under `hubs` (its class, title, exams and dates,
   what it covers; `checkinHour` / `archiveHour` when an exam closes late), its class under `classes` if it's new, and
-  its short name under `labels`. Never under `legacy`.
+  its short name under `labels`.
 - `sw.js`: the hub in `HUBS`, and bump `VERSION` (`node tools/ci/syntax.js` fails a live engine hub that isn't there).
 - `review/index.html`: `HUB_LABEL`, `HUB_COLOR`, `HUB_TITLE`. `tools/publish-recap.js`: `HUB_COLOR`, `HUB_TITLE`.
 - `widget/ranks.js`: its name in `HUB_NAMES` and its medal (emblem and ribbon colors) in `HUB_MEDAL`.

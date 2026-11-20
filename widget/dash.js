@@ -36,8 +36,6 @@
   /* ---------- the data (hubs.js) ---------- */
   var CLASSES = D.classes, HUBS = D.hubs.slice(), ARCHIVED_HUBS = D.archived.slice(), HUB_LABEL = D.labels || {};
   var CHECKIN_HOUR = D.checkinHour, ARCHIVE_HOUR = D.archiveHour, CARD_DAYS = D.cardDays, DEBRIEF_DAYS = D.debriefDays;
-  /* hubs still on their old single-file page; every other hub is on the engine (widget/hub.js) */
-  var LEGACY = {}; (D.legacy || []).forEach(function(id){ LEGACY[id] = 1; });
 
   /* ---------- helpers ---------- */
   function $(id){ return document.getElementById(id); }
@@ -173,11 +171,11 @@
   }
   var hubSig = partitionHubs();
 
-  /* ---------- where a hub opens: the engine's routes, or an old single-file hub's own ---------- */
+  /* ---------- where a hub opens: the engine's routes ---------- */
   function hubHref(hub, part){
-    var isNew = !LEGACY[hub.id], base = ROOT + "hubs/" + hub.id + "/";
-    if (part === "drill") return base + (isNew ? "#questions/drill" : "#drill");
-    if (part === "timmy") return base + (isNew ? "#more/timmy" : "#timmy");
+    var base = ROOT + "hubs/" + hub.id + "/";
+    if (part === "drill") return base + "#questions/drill";
+    if (part === "timmy") return base + "#more/timmy";
     return base;
   }
   function hubName(hub){ return HUB_LABEL[hub.id] || tintOf(hub.id).name || hub.title; }
@@ -1139,9 +1137,10 @@
       else h += '<button type="button" class="btn btn-primary survey-send" data-act="send">Send</button>';
       W.set(h + '</div>');
       W.say(line(q));
-      /* an old single-file hub has no answer keys on the server, so an idea from its check-in is for all hubs */
+      /* an idea from a check-in is for its hub; one the server holds no answer keys for (an old single-file hub's)
+         goes in as an idea for all hubs (widget/ideas.js sends it again without the hub) */
       var th = box.querySelector("[data-idea-tick]");
-      ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: LEGACY[hub.id] ? null : hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
+      ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
       refresh();
       var t = box.querySelector("textarea"); if (t && step && window.matchMedia && matchMedia("(hover:hover)").matches) setTimeout(function(){ try{ t.focus({ preventScroll:true }); }catch(e){} }, 60);
     }
@@ -1852,16 +1851,11 @@
   function rest(path){
     return fetch(SB_URL + "/rest/v1/" + path, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY } }).then(function(r){ return r.ok ? r.json() : null; });
   }
-  /* the game layer's function when the database has it (<name>_v2, migration_v54), today's otherwise */
-  var V2 = C.v2 === false ? false : null;
-  function missing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
   /* a survey or a check-in (migration_v60): the _v2 call answers { ok, xp, crowns } with the reward it paid (1,000 XP since migration_v61, and 1,000
-     crowns, once per survey and per hub's exam check-in); without it, the old call's true or false. Kept apart from rpc2 so
-     a missing _v2 here never turns the rest of the game layer's calls off. Resolves { ok, xp, crowns }. */
+     crowns, once per survey and per hub's exam check-in). Resolves { ok, xp, crowns }. (The fallbacks to the calls from
+     before the game layer, migration_v54, came out with the old single-file hub pages, 2026-11-19.) */
   function sendForm(sb, name, args){
-    function old(){ return sb.rpc(name, args).then(function(r){ return { ok: !r.error && r.data === true, xp: 0, crowns: 0 }; }); }
     return sb.rpc(name + "_v2", args).then(function(r){
-      if (missing(r)) return old();
       var d = !r.error && r.data && typeof r.data === "object" ? r.data : null;
       return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0, closed: !!(d && d.closed) };
     });
@@ -1876,13 +1870,8 @@
   }
   /* a survey answered in the Inbox (widget/replies.js) paid a reward: read the card's XP and crowns again */
   document.addEventListener("sh:reward", function(e){ rewardPaid(debriefSb || boardSb, e.detail); });
-  function rpc2(sb, name, args){
-    if (V2 === false) return sb.rpc(name, args);
-    return sb.rpc(name + "_v2", args).then(function(r){
-      if (missing(r)) { V2 = false; return sb.rpc(name, args); }
-      V2 = true; return r;
-    }, function(){ return sb.rpc(name, args); });
-  }
+  /* the game layer's call (<name>_v2, migration_v54) */
+  function rpc2(sb, name, args){ return sb.rpc(name + "_v2", args); }
   function dashboardBootstrap(sb){
     var boot = { data: null, ready: Promise.resolve(null), linkName: localName || "" };
     if (!sb || !VISITOR) { window.shBootstrap = boot; return boot; }
@@ -1976,10 +1965,10 @@
     $("visitRand").hidden = !visitList().length; visitEarn();
   }
   /* what the top three's Timmys wear: each one's place says (get_place, migration_v54), through the visit key on their
-     row. A place that can't be read, or a database without the game layer yet, gives a plain Timmy. The answer is kept
+     row. A place that can't be read gives a plain Timmy. The answer is kept
      for a visit (getPlace), so a tap on one of the top three doesn't ask again. */
   function loadFits(sb, d){
-    if (V2 !== true || !sb) return;
+    if (!sb) return;
     d.rows.slice(0, 3).forEach(function(r, i){
       var k = visitKey(r); if (!k) return;
       getPlace(sb, k).then(function(p){
@@ -2430,7 +2419,7 @@
        hub (Sam, 2026-11-12: "timmy doesnt ask what hub when on the dashboard"); a link opens that hub's page at it */
     if (window.shAsk) window.shAsk.mount({ where: "dashboard", sb: sb, name: "Study Hubs", about: C.about || ROOT + "about/",
       section: function(){ return "dashboard"; },
-      hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: LEGACY[h.id] ? null : ROOT + "hubs/" + h.id + "/content/" }; }); },
+      hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: ROOT + "hubs/" + h.id + "/content/" }; }); },
       href: function(id){ var h = HUBS.concat(ARCHIVED_HUBS).filter(function(x){ return x.id === id; })[0]; return h ? hubHref(h) : ""; },
       spot: function(){ return $("askSpot"); } });
     /* Timmy (widget/pet.js) lives in the "you" card. Everyone has Timmy (Ask Timmy, part 4): no adoption and no
@@ -2438,7 +2427,7 @@
     if (window.shPet) {
       window.shPet.mount({ where: "dashboard", sb: sb, visitor: VISITOR,
         name: function(){ return localName || randomName; },
-        home: function(){ return $("petHome"); }, bootstrap: bootstrap.ready, live: function(){ return V2 !== false; } });
+        home: function(){ return $("petHome"); }, bootstrap: bootstrap.ready, live: function(){ return true; } });
     }
     placeStart(sb, bootstrap.ready);
     shopStart(sb, bootstrap.ready);
@@ -2447,9 +2436,8 @@
     /* the idea board (widget/ideas.js): its section stays hidden until its first load says the board is up (its
        server is migration_v54). An idea can be for a live hub or all hubs; an archived hub's ideas keep its name. */
     if (window.shIdeas) window.shIdeas.mount($("ideas"), { sb: sb,
-      /* only a hub on the engine can be named: the server takes an idea's hub from the hubs whose answer keys it holds,
-         and an old single-file hub has none ("All hubs" is always there) */
-      hubs: function(){ return HUBS.filter(function(h){ return !LEGACY[h.id]; }).map(function(h){ return { id: h.id, name: hubName(h) }; }); },
+      /* the live hubs (the server takes an idea's hub from the hubs whose answer keys it holds; "All hubs" is always there) */
+      hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h) }; }); },
       name: function(id){ var h = debriefHub(id); return h ? hubName(h) : HUB_LABEL[id] || ""; },
       tint: tintVars, editName: openNameEditor, nameHint: function(){ return randomName; },
       onReady: function(ok){ $("ideas").hidden = !ok; } });
@@ -2510,7 +2498,7 @@
       return Promise.resolve({ data: null, error: null });
     } };
     if (window.shClicks) window.shClicks.start({ sb: anSb, hub: "dashboard", visitor: VISITOR, section: function(){ return "dashboard"; } });
-    if (window.shReplies) window.shReplies.start({ sb: sb, visitor: VISITOR || null, hub: "dashboard", bootstrap: bootstrap.ready, v2: function(){ return V2 !== false; } });
+    if (window.shReplies) window.shReplies.start({ sb: sb, visitor: VISITOR || null, hub: "dashboard", bootstrap: bootstrap.ready, v2: function(){ return true; } });
     if (window.shLinkAsk) window.shLinkAsk.start({ sb: sb, hub: "dashboard", bootstrap: bootstrap.ready, bootstrapName: bootstrap.linkName });
 
     /* after an exam, its check-in takes the survey's place for that visit; both wait while the tour is on screen */

@@ -24,12 +24,12 @@
   "use strict";
   if (window.shRankUp || !window.shRanks) return;
   var R = window.shRanks, T = R.TIERS, ROMAN = ["I", "II", "III"];
-  /* The redesign's pages (html.shx; phase 4, session 6): the cards on the design system. Their look is in
+  /* The cards on the design system (phase 4, session 6). Their look is in
      widget/trophies.css and the trophies are drawn from widget/hub-art/trophies.js (SH_TROPHY_ART); widget/ranks.js
      fetches both with the first card, which waits for them (at most 2.5 s). In the markup only what the look needs
      changes: data-metal and data-band, the title, Timmy's place in place of the cut accents, the next line. Timing, the
-     queue, skip and the reduced-motion stills are the same. A live page never has the class: its cards are today's. */
-  var NEW = (function(){ try { return document.documentElement.classList.contains("shx"); } catch (e) { return false; } })();
+     queue, skip and the reduced-motion stills are the same. (The old single-file hub pages, which kept the old cards, came
+     down 2026-11-19.) */
 
   /* sparks (c), the glow behind the medal, and the metallic name gradient (n) per rank, made for a dark backdrop */
   var PAL = {
@@ -41,8 +41,6 @@
     diamond: { c: ["#9EE6FF", "#FFFFFF", "#5AB6E6", "#CBEFFF"], glow: "#4FD0FF", n: ["#4DB5E8", "#EAFBFF", "#8FDCFA"] },
     dark:    { c: ["#B57BFF", "#FF7AE0", "#44C8FF", "#FFFFFF"], glow: "#8A4DFF", n: ["#A77BFF", "#FFB0EE", "#6FD8FF"] }
   };
-  /* what each rank adds to Timmy Tooth's house (UPGRADES in widget/pet.js) */
-  var HOUSE = ["", "a picket fence", "a bronze mailbox", "a garden lamppost", "gold trim and a gold door", "diamond windows", "a night sky of its own"];
 
   function ls(k){ try { return localStorage.getItem(k); } catch (e) { return null; } }
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -419,28 +417,7 @@
   /* ---------- the full rank-up cutscene ---------- */
   var IC_HOUSE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>';
   var IC_CROWN = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 8l4.5 4L12 5l4.5 7L21 8l-2 11H5z"/></svg>';
-  function unlocks(d){
-    var to = T[d.to], out = [];
-    if (d.jn) {   // a later journey: its accents and house pieces were earned on the Handpiece; only what's next
-      if (d.to < 6) out.push('<span class="sh-ru-ic">' + A(d, d.to + 1, 30) + '</span><span><b>Next rank</b>' + esc(d.jn + " " + T[d.to + 1].name) + (d.tier_next ? ' at ' + fmt(d.tier_next) + ' XP' : '') + '.</span>');
-      return out.map(function(h, i){ return '<li style="--i:' + i + '">' + h + '</li>'; }).join("");
-    }
-    if (R.ACCENTS && R.ACCENTS[to.key] && R.accentTex) {
-      out.push('<span class="sh-ru-ic" style="background-image:url(\'' + R.accentTex(to.key) + '\')"></span><span><b>New accent</b>' + esc(to.name) +
-        ' metal for your buttons, switches and progress bars. Pick it in Settings.</span>');
-    }
-    if (HOUSE[d.to] && ls("sh_pet_born") && ls("sh_pref_pet") !== "off") {
-      out.push('<span class="sh-ru-ic" style="color:var(--ru-n2)">' + IC_HOUSE + '</span><span><b>Timmy\'s house</b>Timmy Tooth\'s house gets ' + HOUSE[d.to] + '.</span>');
-    }
-    if (d.to < 6) {
-      var nx = T[d.to + 1];
-      out.push('<span class="sh-ru-ic">' + R.art(d.to + 1, 30) + '</span><span><b>Next rank</b>' + esc(nx.name) + ' at ' + fmt(nx.at) + ' XP' +
-        (d.xp != null && nx.at > d.xp ? ' (' + fmt(nx.at - d.xp) + ' to go)' : '') + '.</span>');
-    } else {
-      out.push('<span class="sh-ru-ic" style="color:var(--ru-n2)">' + IC_CROWN + '</span><span><b>The top</b>Dark Matter is the highest rank there is.</span>');
-    }
-    return out.map(function(h, i){ return '<li style="--i:' + i + '">' + h + '</li>'; }).join("");
-  }
+
 
   /* one celebration at a time: a mock result, a trophy, a level and a rank that land together play in turn */
   var queue = [], playing = false;
@@ -455,10 +432,10 @@
       catch (e) { playing = false; nextUp(); }
     });
   }
-  /* the redesign's look arrives before its first card (on a live page this calls straight through) */
+  /* the cards' look arrives before the first card */
   var xq = null;
   function xready(cb){
-    if (!NEW || xq === true) { cb(); return; }
+    if (xq === true) { cb(); return; }
     if (xq) { xq.push(cb); return; }
     xq = [cb];
     var left = 2, fin = function(){ if (xq === true) return; var q = xq; xq = true; q.forEach(function(f){ f(); }); }, one = function(){ if (--left === 0) fin(); };
@@ -492,10 +469,10 @@
     css();
     if (open) open(true);
     var to = T[d.to], key = to.key, P = PAL[key], lvl = d.level || 1, fromLvl = d.fromLevel || 3, still = reduced();
-    var name = N(d, d.to, lvl), title = NEW ? (d.to >= 6 && !d.jn && !d.v2 ? "Top rank" : "New rank") : d.to >= 6 && !d.jn ? "MAX RANK" : "RANK UP";
+    var name = N(d, d.to, lvl), title = d.to >= 6 && !d.jn && !d.v2 ? "Top rank" : "New rank";
     var el = document.createElement("div");
     el.className = "sh-ru"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-label", "New rank: " + name); el.tabIndex = -1;
-    vars(el, key); if (NEW) el.setAttribute("data-metal", key);
+    vars(el, key); el.setAttribute("data-metal", key);
     el.innerHTML = '<div class="sh-ru-bg"></div><canvas class="sh-ru-cv" aria-hidden="true"></canvas>' +
       '<div class="sh-ru-fx" aria-hidden="true"><div class="sh-ru-fxc"><div class="sh-ru-rays"><i></i><i></i></div><div class="sh-ru-halo"></div></div></div>' +
       '<div class="sh-ru-stage"><div class="sh-ru-in">' +
@@ -507,7 +484,7 @@
           '<div class="sh-ru-namewrap"><span class="sh-ru-name sh-ru-mt">' + esc(name) + '</span></div>' +
           '<div class="sh-ru-from"><span>' + A(d, d.from, 26) + esc(N(d, d.from, fromLvl)) + '</span><span class="sh-ru-arw" aria-label="to">&rarr;</span><span>' + A(d, d.to, 26) + esc(name) + '</span></div>' +
           (d.xp != null ? '<div class="sh-ru-stat"><b>' + fmt(d.xp) + '</b> XP' + (d.position ? ' · #' + fmt(d.position) + ' of ' + fmt(d.of) + ' in the class' : '') + '</div>' : '') +
-          '<ul class="sh-ru-unl">' + (NEW ? unlocksNew(d) : unlocks(d)) + '</ul>' +
+          '<ul class="sh-ru-unl">' + unlocksNew(d) + '</ul>' +
           '<button type="button" class="sh-ru-go">Let\'s go</button>' +
         '</div>' +
       '</div></div>' +
@@ -626,7 +603,7 @@
     var o = ROMAN[old - 1], n = ROMAN[lv - 1];
     var el = document.createElement("div");
     el.className = "sh-ru-lv"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite"); el.setAttribute("aria-label", "Level up: " + N(d, d.to, lv));
-    vars(el, key); if (NEW) el.setAttribute("data-metal", key);
+    vars(el, key); el.setAttribute("data-metal", key);
     el.innerHTML = '<div class="sh-ru-lv-medal" aria-hidden="true"><i class="sh-ru-lv-ring"></i><i class="sh-ru-lv-ring"></i><div class="sh-ru-lv-coin">' + A(d, d.to, 80, { level: old }) + '</div></div>' +
       '<div class="sh-ru-lv-body" aria-hidden="true"><div class="sh-ru-lv-eye">' + (d.jn ? esc(d.jn) + " · level up" : "Level up") + '</div>' +
       '<div class="sh-ru-lv-name"><span class="sh-ru-mt">' + esc(t.name) + '</span><span class="sh-ru-roll"><i>' + (o.length > n.length ? o : n) + '</i>' +
@@ -693,7 +670,7 @@
   var tuid = 0;
   function trophyArt(ic, px, key, k){
     /* the redesign: the trophy's own drawing, when its key is given and the drawings are here */
-    var D = NEW && k && window.SH_TROPHY_ART && window.SH_TROPHY_ART[k];
+    var D = k && window.SH_TROPHY_ART && window.SH_TROPHY_ART[k];
     if (D) return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 64 64" aria-hidden="true" focusable="false">' + D.body + '</svg>';
     var P = PAL[key] || PAL.gold, id = "shtr" + (++tuid), ink = R.shade ? R.shade(P.n[0], -.55) : "#4A3405";
     return '<svg width="' + px + '" height="' + px + '" viewBox="0 0 80 80" aria-hidden="true"><defs>' +
@@ -705,11 +682,7 @@
       '<g transform="translate(26 20) scale(1.1667)" fill="none" stroke="' + ink + '" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="' + ic + '"/></g>' +
       '<path d="M23.5 27a17.5 17.5 0 0 1 12-11" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="2.4" stroke-linecap="round"/></svg>';
   }
-  function rarityLine(r){
-    if (!r || !r.total) return "";
-    if (!r.n) return "You're the first in the class to earn it.";
-    return "Earned by <b>" + fmt(r.n) + " of " + fmt(r.total) + "</b> classmates so far (" + esc(r.label) + ").";
-  }
+
   /* the redesign's line under a trophy or medal: the class's share, then what's next */
   function rarityNew(r, next){
     var p = r && r.total ? r.n / r.total * 100 : 0;
@@ -724,8 +697,8 @@
     var el = document.createElement("div");
     el.className = "sh-ru-lv sh-ru-tr"; el.setAttribute("role", "status"); el.setAttribute("aria-live", "polite");
     el.setAttribute("aria-label", eye + ": " + (t.name || "") + (t.desc ? ". " + t.desc : ""));
-    vars(el, key); if (NEW) el.setAttribute("data-metal", key);
-    var line = NEW ? rarityNew(rare, t.next) : rare && rare.total ? rarityLine(rare) : "";
+    vars(el, key); el.setAttribute("data-metal", key);
+    var line = rarityNew(rare, t.next);
     el.innerHTML = '<div class="sh-ru-lv-medal" aria-hidden="true"><i class="sh-ru-lv-ring"></i><i class="sh-ru-lv-ring"></i><div class="sh-ru-lv-coin">' +
         (t.art || trophyArt(t.ic || "M5 12l4 4 10-10", 84, key, t.k)) + '</div></div>' +
       '<div class="sh-ru-lv-body" aria-hidden="true"><div class="sh-ru-lv-eye">' + esc(eye) + '</div>' +
@@ -797,7 +770,7 @@
     var el = document.createElement("div");
     el.className = "sh-mk"; el.setAttribute("role", "dialog"); el.setAttribute("aria-modal", "true"); el.setAttribute("aria-labelledby", "sh-mk-t"); el.tabIndex = -1;
     el.style.setProperty("--mk-c", B[1]); el.style.setProperty("--mk-g", B[2]);
-    if (NEW) el.setAttribute("data-band", String(BAND.indexOf(B)));
+    el.setAttribute("data-band", String(BAND.indexOf(B)));
     el.innerHTML = '<div class="sh-mk-bg"></div><canvas class="sh-ru-cv" aria-hidden="true"></canvas>' +
       '<div class="sh-mk-stage"><div class="sh-mk-card">' +
         '<div class="sh-mk-eye">Mock exam' + (m.hub ? ' · ' + esc(m.hub) : '') + '</div>' +
@@ -809,7 +782,7 @@
         '<div class="sh-mk-best' + (isBest ? ' is-new' : '') + '">' + esc(bestLine) + '</div>' +
         (lecs.length > 1 ? '<ul class="sh-mk-lecs" aria-label="By lecture">' + lecs.map(function(x, i){
           var q = x.correct / x.total;
-          return '<li style="--i:' + i + '"' + (NEW ? ' data-band="' + BAND.indexOf(band(q)) + '"' : '') + '><span class="l">' + esc(x.label) + '</span><span class="b"><i style="--w:' + Math.max(2, Math.round(q * 100)) + '%; --c:' + band(q)[1] + '"></i></span><span class="n">' + x.correct + '/' + x.total + '</span></li>';
+          return '<li style="--i:' + i + '"' + ' data-band="' + BAND.indexOf(band(q)) + '"' + '><span class="l">' + esc(x.label) + '</span><span class="b"><i style="--w:' + Math.max(2, Math.round(q * 100)) + '%; --c:' + band(q)[1] + '"></i></span><span class="n">' + x.correct + '/' + x.total + '</span></li>';
         }).join("") + '</ul>' : '') +
         '<div class="sh-mk-actions"><button type="button" class="sh-mk-go">Review answers</button>' +
           (right < total && typeof m.missed === "function" ? '<button type="button" class="sh-mk-miss">See what I missed</button>' : '') + '</div>' +

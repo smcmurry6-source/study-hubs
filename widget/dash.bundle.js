@@ -198,7 +198,6 @@ var docEl = document.documentElement;
 docEl.classList.add("shx", "sh-dash");
 var CLASSES = D.classes, HUBS = D.hubs.slice(), ARCHIVED_HUBS = D.archived.slice(), HUB_LABEL = D.labels || {};
 var CHECKIN_HOUR = D.checkinHour, ARCHIVE_HOUR = D.archiveHour, CARD_DAYS = D.cardDays, DEBRIEF_DAYS = D.debriefDays;
-var LEGACY = {}; (D.legacy || []).forEach(function(id){ LEGACY[id] = 1; });
 function $(id){ return document.getElementById(id); }
 function q(sel, el){ return (el || document).querySelector(sel); }
 function qa(sel, el){ return [].slice.call((el || document).querySelectorAll(sel)); }
@@ -318,9 +317,9 @@ return sig.join(",");
 }
 var hubSig = partitionHubs();
 function hubHref(hub, part){
-var isNew = !LEGACY[hub.id], base = ROOT + "hubs/" + hub.id + "/";
-if (part === "drill") return base + (isNew ? "#questions/drill" : "#drill");
-if (part === "timmy") return base + (isNew ? "#more/timmy" : "#timmy");
+var base = ROOT + "hubs/" + hub.id + "/";
+if (part === "drill") return base + "#questions/drill";
+if (part === "timmy") return base + "#more/timmy";
 return base;
 }
 function hubName(hub){ return HUB_LABEL[hub.id] || tintOf(hub.id).name || hub.title; }
@@ -1127,7 +1126,7 @@ else h += '<button type="button" class="btn btn-primary survey-send" data-act="s
 W.set(h + '</div>');
 W.say(line(q));
 var th = box.querySelector("[data-idea-tick]");
-ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: LEGACY[hub.id] ? null : hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
+ideaTick = th && window.shIdeas && debriefSb ? window.shIdeas.tick(th, { sb: debriefSb, hub: hub.id, hubName: hubName(hub), source: "checkin", checked: true, category: "content", state: ideaPost, nameHint: function(){ return randomName; } }) : null;
 refresh();
 var t = box.querySelector("textarea"); if (t && step && window.matchMedia && matchMedia("(hover:hover)").matches) setTimeout(function(){ try{ t.focus({ preventScroll:true }); }catch(e){} }, 60);
 }
@@ -1745,12 +1744,8 @@ m.hidden = false;
 function rest(path){
 return fetch(SB_URL + "/rest/v1/" + path, { headers: { apikey: SB_KEY, Authorization: "Bearer " + SB_KEY } }).then(function(r){ return r.ok ? r.json() : null; });
 }
-var V2 = C.v2 === false ? false : null;
-function missing(r){ var e = r && r.error; return !!e && (e.code === "PGRST202" || e.code === "42883" || r.status === 404 || /could not find the function|does not exist/i.test(e.message || "")); }
 function sendForm(sb, name, args){
-function old(){ return sb.rpc(name, args).then(function(r){ return { ok: !r.error && r.data === true, xp: 0, crowns: 0 }; }); }
 return sb.rpc(name + "_v2", args).then(function(r){
-if (missing(r)) return old();
 var d = !r.error && r.data && typeof r.data === "object" ? r.data : null;
 return { ok: !!(d && d.ok), xp: d && d.xp | 0, crowns: d && d.crowns | 0, closed: !!(d && d.closed) };
 });
@@ -1763,13 +1758,7 @@ if (x && !x.error && x.data && x.data.wallet) try { document.dispatchEvent(new C
 }, function(){});
 }
 document.addEventListener("sh:reward", function(e){ rewardPaid(debriefSb || boardSb, e.detail); });
-function rpc2(sb, name, args){
-if (V2 === false) return sb.rpc(name, args);
-return sb.rpc(name + "_v2", args).then(function(r){
-if (missing(r)) { V2 = false; return sb.rpc(name, args); }
-V2 = true; return r;
-}, function(){ return sb.rpc(name, args); });
-}
+function rpc2(sb, name, args){ return sb.rpc(name + "_v2", args); }
 function dashboardBootstrap(sb){
 var boot = { data: null, ready: Promise.resolve(null), linkName: localName || "" };
 if (!sb || !VISITOR) { window.shBootstrap = boot; return boot; }
@@ -1851,7 +1840,7 @@ if (d.say) visitSay(d.say.key, d.say.msg, true);
 $("visitRand").hidden = !visitList().length; visitEarn();
 }
 function loadFits(sb, d){
-if (V2 !== true || !sb) return;
+if (!sb) return;
 d.rows.slice(0, 3).forEach(function(r, i){
 var k = visitKey(r); if (!k) return;
 getPlace(sb, k).then(function(p){
@@ -2232,20 +2221,20 @@ VISITOR = surveyVisitor();
 var bootstrap = dashboardBootstrap(sb);
 if (window.shAsk) window.shAsk.mount({ where: "dashboard", sb: sb, name: "Study Hubs", about: C.about || ROOT + "about/",
 section: function(){ return "dashboard"; },
-hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: LEGACY[h.id] ? null : ROOT + "hubs/" + h.id + "/content/" }; }); },
+hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h), stateKey: h.stateKey, content: ROOT + "hubs/" + h.id + "/content/" }; }); },
 href: function(id){ var h = HUBS.concat(ARCHIVED_HUBS).filter(function(x){ return x.id === id; })[0]; return h ? hubHref(h) : ""; },
 spot: function(){ return $("askSpot"); } });
 if (window.shPet) {
 window.shPet.mount({ where: "dashboard", sb: sb, visitor: VISITOR,
 name: function(){ return localName || randomName; },
-home: function(){ return $("petHome"); }, bootstrap: bootstrap.ready, live: function(){ return V2 !== false; } });
+home: function(){ return $("petHome"); }, bootstrap: bootstrap.ready, live: function(){ return true; } });
 }
 placeStart(sb, bootstrap.ready);
 shopStart(sb, bootstrap.ready);
 if (!sb){ renderMyRank(null); whenPanelOpens($("class"), function(){ boardOpen = true; drawBoard(); }); return; }
 nameSb = sb; luckSb = sb; debriefSb = sb; boardSb = sb;
 if (window.shIdeas) window.shIdeas.mount($("ideas"), { sb: sb,
-hubs: function(){ return HUBS.filter(function(h){ return !LEGACY[h.id]; }).map(function(h){ return { id: h.id, name: hubName(h) }; }); },
+hubs: function(){ return HUBS.map(function(h){ return { id: h.id, name: hubName(h) }; }); },
 name: function(id){ var h = debriefHub(id); return h ? hubName(h) : HUB_LABEL[id] || ""; },
 tint: tintVars, editName: openNameEditor, nameHint: function(){ return randomName; },
 onReady: function(ok){ $("ideas").hidden = !ok; } });
@@ -2298,7 +2287,7 @@ anOut[k] = a.p_items;
 return Promise.resolve({ data: null, error: null });
 } };
 if (window.shClicks) window.shClicks.start({ sb: anSb, hub: "dashboard", visitor: VISITOR, section: function(){ return "dashboard"; } });
-if (window.shReplies) window.shReplies.start({ sb: sb, visitor: VISITOR || null, hub: "dashboard", bootstrap: bootstrap.ready, v2: function(){ return V2 !== false; } });
+if (window.shReplies) window.shReplies.start({ sb: sb, visitor: VISITOR || null, hub: "dashboard", bootstrap: bootstrap.ready, v2: function(){ return true; } });
 if (window.shLinkAsk) window.shLinkAsk.start({ sb: sb, hub: "dashboard", bootstrap: bootstrap.ready, bootstrapName: bootstrap.linkName });
 var held = 0;
 function askNext(){

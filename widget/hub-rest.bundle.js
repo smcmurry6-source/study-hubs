@@ -33,7 +33,7 @@ SH_BUNDLE.hold("ranks-hub.js", (function(__sh_script){
 "use strict";
 var R = window.shRanks, K = R && R._hub;
 if (!K || R.mount) return;
-var NEW = K.NEW, TS = K.TS, ls = K.ls, ROMAN = K.ROMAN, RETIRED = K.RETIRED, HUB_NAMES = K.HUB_NAMES,
+var TS = K.TS, ls = K.ls, ROMAN = K.ROMAN, RETIRED = K.RETIRED, HUB_NAMES = K.HUB_NAMES,
 playRankUp = K.playRankUp, trophyCard = K.trophyCard, masteryCard = K.masteryCard,
 TIERS = R.TIERS, TROPHIES = R.TROPHIES, HUB_TROPHIES = R.HUB_TROPHIES, MASTERY = R.MASTERY, ACCENTS = R.ACCENTS,
 art = R.art, artOf = R.artOf, nameOf = R.nameOf, rankName = R.rankName, isV2 = R.isV2, legacy = R.legacy,
@@ -45,7 +45,7 @@ function mount(H){
 if (!H || window.__shRanksMounted) return;
 window.__shRanksMounted = true;
 var SB = H.supabase, esc = H.esc;
-if (NEW && SB) TS.sb = SB;
+if (SB) TS.sb = SB;
 applyAccent(ls("sh_pref_accent"));
 if (!SB) return;
 function rpc(name, args){ return SB.rpc(name, args).then(function(r){ return r && !r.error ? r.data : null; }, function(){ return null; }); }
@@ -94,12 +94,7 @@ var tstats = null, tstatsAt = 0;
 function loadTrophyStats(){
 if (Date.now() - tstatsAt < 600000) return;
 tstatsAt = Date.now();
-if (NEW) { TS.sb = SB; trophyStats(function(d){ if (!d) { tstatsAt = 0; return; } tstats = d; render(); }); return; }
-rpc("get_trophy_stats", {}).then(function(rows){
-if (!rows || !rows.length) { tstatsAt = 0; return; }
-tstats = {}; rows.forEach(function(r){ tstats[r.kind] = { n: r.n | 0, total: r.total | 0 }; });
-render();
-});
+TS.sb = SB; trophyStats(function(d){ if (!d) { tstatsAt = 0; return; } tstats = d; render(); });
 }
 function mockBusy(){
 try {
@@ -107,7 +102,6 @@ if (!/(^|\/)mock/.test(String(H.section ? H.section() : ""))) return false;
 return !!document.querySelector("[data-mock-pick]:not([disabled]), [data-exam-choice], [data-exam-multi], [data-exam-match]");
 } catch (e) { return false; }
 }
-K.setRarity(function(k){ return rarity(k); });
 function rarity(k){
 if (!tstats) return null;
 var any = null; for (var key in tstats) { any = tstats[key]; break; }
@@ -154,7 +148,7 @@ var myFlair = flairFromBadges(badges.concat(m.lvl >= 0 ? [MASTERY[m.lvl].k + ":"
 if ((ls("sh_rank_flair") || "") !== myFlair) { ls("sh_rank_flair", myFlair || null); try { document.dispatchEvent(new CustomEvent("sh:rank")); } catch (e) {} }
 if (myFlair) h += '<div class="sh-flair-row"><span>Your mastery medals</span>' + flair(myFlair, { list: true, big: true }) + '</div>';
 var earned = {}; badges.forEach(function(b){ earned[b.split(":")[0]] = true; });
-if (NEW) TROPHIES.forEach(function(x){ if (x.device && ls(x.device)) earned[x.k] = true; });
+TROPHIES.forEach(function(x){ if (x.device && ls(x.device)) earned[x.k] = true; });
 h += '<div class="sh-trophies-h"><span>Trophy case</span><b>' + TROPHIES.filter(function(x){ return earned[x.k]; }).length + ' / ' + TROPHIES.length + '</b></div>' +
 '<div class="sh-trophies">' + TROPHIES.map(function(x){ return trophyHTML(x, earned[x.k]); }).join("") +
 RETIRED.filter(function(x){ return earned[x.k]; }).map(function(x){ return trophyHTML({ k: x.k, n: x.n + " (retired)", d: x.d, ic: x.ic }, true); }).join("") + '</div>' +
@@ -183,12 +177,12 @@ hubTrophyCard("seen-all");
 function hubTrophyCard(k){
 if (H.prefGet("sh_pref_celebrate", "on") === "off") return;
 var t = HUB_TROPHIES.filter(function(x){ return x.k === k; })[0]; if (!t) return;
-if (NEW) trophyStats();
+trophyStats();
 playRankUp("trophy", trophyCard({ k: t.k, n: t.n, d: t.d + " (" + hubName(H.hub) + ")", ic: t.ic }), mockBusy);
 }
 function masteryToast(i){
 if (H.prefGet("sh_pref_celebrate", "on") === "off") return;
-if (NEW) trophyStats();
+trophyStats();
 playRankUp("trophy", masteryCard(i, H.hub), mockBusy);
 }
 function hubCases(badges, m){

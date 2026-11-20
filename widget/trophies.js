@@ -42,12 +42,16 @@
   function hubName(h){ var D = window.SH_DASH_DATA; return (D && D.labels && D.labels[h]) || (R.hubName ? R.hubName(h) : h); }
   function meta(k){ return hubMeta(k) || R.TROPHIES.concat(R.RETIRED || []).filter(function(t){ return t.k === k; })[0] || null; }
   function isRetired(k){ return (R.RETIRED || []).some(function(t){ return t.k === k; }); }
-  /* the hubs that get a shelf: the one you're in, the hubs on the new design, and any hub you've won one in */
+  /* the hubs that get a shelf: the one you're in, the live hubs (on the dashboard) and any hub you've won one in */
   function hubShelves(st){
     var seen = {}, out = [], D = window.SH_DASH_DATA, here = (window.SH_HUB && window.SH_HUB.hub) || "";
     function add(h){ if (h && /^[a-z0-9-]+$/.test(h) && !seen[h]) { seen[h] = 1; out.push(h); } }
     add(here);
-    if (D && D.hubs) { var old = {}; (D.legacy || []).forEach(function(h){ old[h] = 1; }); D.hubs.forEach(function(h){ if (!old[h.id]) add(h.id); }); }
+    if (D && D.hubs) {
+      var A = window.shArchive, ov = {}, o = { archiveHour: D.archiveHour, cardDays: D.cardDays };
+      try { if (A) ov = A.index(A.readCache()); } catch (e) {}
+      D.hubs.forEach(function(h){ var st = null; try { st = A ? A.resolve(h, ov[h.id], new Date(), o).state : null; } catch (e) {} if (!A || st === "live") add(h.id); });
+    }
     Object.keys(st.earned).map(hubOf).filter(Boolean).sort(function(a, b){ return hubName(a) < hubName(b) ? -1 : 1; }).forEach(add);
     return out;
   }

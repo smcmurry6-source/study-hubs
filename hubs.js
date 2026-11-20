@@ -10,8 +10,6 @@
    surveyAgain { "<survey id>": "yyyy-mm-dd" }: a round that shows that survey's pop-up once more to everyone who said
                "Later" to it (it waits in their Inbox until answered)
    labels      short names
-   legacy      hubs still on their old single-file page (hubs/<id>/index.html holds everything); every other hub is on
-               the engine (widget/hub.js, its content in hubs/<id>/content/). A new hub is never added here.
    Read by widget/dash.js (the dashboard), review/ (the admin page) and the tools (tools/release/lib.js hubData()). */
 window.SH_DASH_DATA = {
  "classes": {
@@ -74,14 +72,6 @@ window.SH_DASH_DATA = {
    ],
    "updated": "2026-11-20",
    "desc": "Every course on the two mock board exams (Thu Dec 3 and Thu Dec 10, 8:00 am to noon, 200 questions each): Head & Neck Anatomy, Dental Anatomy & Occlusion, Fundamentals I and II, Oral Microbiology, Neuroscience, Cardio & Respiratory, Renal, Heme & Endo, MSK & GI, Ethics & Professionalism, Evidence-Based Dentistry, Radiology and Emergencies in the Dental Clinic. Each course is a section cut into short parts: high-yield notes with a Plain English version, a cram list, board-style questions with patient boxes and every choice explained, High Likelihood Exam Questions, review tables and a 200-question timed mock.",
-   "modes": [
-    "Home",
-    "Compendium",
-    "Plain-English notes",
-    "Review tables",
-    "Mock exam",
-    "Listen"
-   ],
    "stateKey": "ros-state-v1"
   },
   {
@@ -101,17 +91,6 @@ window.SH_DASH_DATA = {
    ],
    "updated": "2026-11-18",
    "desc": "Dr. Taylor's Lecture A (dental endocrinology, moved here from Exam 2), L17 Pregnancy and lactation, L18 Estrogens and androgens, L19 Introduction to hematology, L20 Lymphomas and leukemias, and Dr. Dal Zotto's L21 and L22, the pathology of the male and female reproductive systems. The exam is Fri Nov 20, 8:00-9:30 am (35 questions, new material only). Its own home page with your countdown and progress, notes in three reading levels with narration, 24 interactive diagrams, Patient Box cases, two-statement, true/false, numbered and which-statement questions with every choice explained, High Likelihood Exam Questions, exam hints from the recordings, review tables with side-by-side look-alikes, a mock exam and the Cycle Arcade.",
-   "modes": [
-    "Home",
-    "Compendium",
-    "Plain-English notes",
-    "Diagrams",
-    "Review tables",
-    "Mock exam",
-    "Arcade",
-    "Listen",
-    "Timmy Time"
-   ],
    "stateKey": "hee3-state-v1",
    "podcast": {
     "name": "Timmy Time",
@@ -184,17 +163,6 @@ window.SH_DASH_DATA = {
    ],
    "updated": "2026-11-03",
    "desc": "All nine lectures: the evolution of implants, the implant-tissue interface, biomechanics, implant terminology, prefabricated abutments, Dr. Givan's imaging and CBCT study guide, implant surgery, and guided vs freehand surgery. The exam is on Canvas Fri Nov 6, 7 am-8 pm (40 questions, one hour). Its own home page with your countdown and progress, notes in two reading levels with narration, 11 interactive diagrams, multiple-choice, multiple-answer, matching, true/false, two-statement and numbered-statement questions, exam hints, a mock exam and the Osseo Arcade.",
-   "modes": [
-    "Home",
-    "Compendium",
-    "Plain-English notes",
-    "Diagrams",
-    "Review tables",
-    "Mock exam",
-    "Arcade",
-    "Listen",
-    "Timmy Time"
-   ],
    "stateKey": "pcdimpl-state-v1",
    "podcast": {
     "name": "Timmy Time",
@@ -223,17 +191,6 @@ window.SH_DASH_DATA = {
    },
    "updated": "2026-11-10",
    "desc": "Lectures 11-16: diabetes pharmacology, endocrine pathology (both hours), male and female reproductive histology and physiology, plus an Exam 1 refresher for the 5 old questions (L16 is the last lecture on Exam 2: Dr. Taylor's Lecture A, L17 and L18 aren't on it). The exam is Fri Nov 13, 10:00-11:30 am (50 questions: 8 on L11, 9 on L12, 7 each on L13-L16, 5 on Exam 1). Its own home page with your countdown and progress, notes in two reading levels with narration, animated diagrams, Patient Box lab-value cases, two-statement, true/false and numbered-statement questions with every choice explained, High Likelihood Exam Questions, exam hints from the recordings, review tables with side-by-side look-alikes, a 50-question mock and the Cycle Arcade.",
-   "modes": [
-    "Home",
-    "Compendium",
-    "Plain-English notes",
-    "Diagrams",
-    "Review tables",
-    "Mock exam",
-    "Arcade",
-    "Listen",
-    "Timmy Time"
-   ],
    "stateKey": "hee2-state-v1",
    "podcast": {
     "name": "Timmy Time",
@@ -262,16 +219,6 @@ window.SH_DASH_DATA = {
    ],
    "updated": "2026-10-27",
    "desc": "Lectures 1-10: endocrine histology, the hypothalamus and pituitary, growth, thyroid, the endocrine pancreas, the adrenal gland, corticosteroid and thyroid drugs, and calcium and phosphate. Its own home page with your countdown and progress by lecture, notes in two reading levels with narration, two-statement, true/false and numbered-statement questions, exam hints from the recordings, a 55-question mock and the Feedback Loop Arcade.",
-   "modes": [
-    "Home",
-    "Compendium",
-    "Plain-English notes",
-    "Review tables",
-    "Mock exam",
-    "Arcade",
-    "Listen",
-    "Timmy Time"
-   ],
    "stateKey": "endo1-state-v1",
    "archiveOn": {
     "date": "2026-11-03",
@@ -302,14 +249,6 @@ window.SH_DASH_DATA = {
    "updated": "2026-10-08",
    "hideCardOn": "2026-10-21",
    "desc": "Skin histology, dermatological pharmacology, dermatopathology, skeletal muscle, and neuromuscular junction drugs. Notes in two reading levels, Patient Box and two-statement questions, exam hints from the recordings, a timed mock exam, review tables and the Skin Deep Arcade.",
-   "modes": [
-    "Compendium",
-    "Plain-English notes",
-    "Review tables",
-    "Mock exam",
-    "Arcade",
-    "Timmy Time"
-   ],
    "stateKey": "msk4-state-v1",
    "podcast": {
     "name": "Timmy Time",
@@ -333,14 +272,6 @@ window.SH_DASH_DATA = {
    "updated": "2026-10-08",
    "hideCardOn": "2026-10-21",
    "desc": "Cement and cementation, bonding dental ceramics, removing a crown, onlays, laminate veneers, color in fixed prosthodontics and James Bradley's glaze-and-contacts video. Notes in two reading levels, drawn diagrams, matching and Patient Box questions built on the Exam 3 hint list, exam hints from the recordings, a timed mock and the Bond Street Arcade.",
-   "modes": [
-    "Compendium",
-    "Plain-English notes",
-    "Diagrams",
-    "Mock exam",
-    "Arcade",
-    "Listen"
-   ],
    "stateKey": "pcd3-state-v1"
   },
   {
@@ -390,15 +321,6 @@ window.SH_DASH_DATA = {
    ],
    "updated": "2026-11-12",
    "desc": "Now for the final (Mon Nov 16, 6:30-7:45 pm, not comprehensive): L6 Occlusal Instrumentation (articulators, the facebow and the CR, MIP and eccentric records), L7 Malocclusion and Dysfunction (TMD, splints, mobility, wear and bruxism), L8 Denture Occlusion (balanced, non-balanced and lingualized dentures; support, stability and retention), L9 Noncarious Cervical Lesions (Dr. Lawson: abrasion, abfraction and erosion; pH vs buffering capacity) and L10 Occlusion and the Periodontium (Dr. Abou-Arraj: occlusal trauma, mobility and when to adjust the occlusion). The midterm lectures stay for review: basic occlusion and the fence post, TMJ anatomy and the muscles, chewing, swallowing and speech, occlusal concepts, and applying occlusion. Notes in two reading levels, drawn diagrams, Patient Box questions, exam hints from the recordings, a timed mock and the Freeway Space Arcade.",
-   "modes": [
-    "Compendium",
-    "Plain-English notes",
-    "Diagrams",
-    "Mock exam",
-    "Arcade",
-    "Listen",
-    "Timmy Time"
-   ],
    "stateKey": "occl-state-v1",
    "podcast": {
     "name": "Timmy Time",
@@ -420,12 +342,6 @@ window.SH_DASH_DATA = {
    ],
    "updated": "2026-09-23",
    "desc": "Nutrition, joints, cartilage and bone, bone development, autoimmune disease, hereditary bone disorders, bone drugs, and tumors. Grouped review tables for every drug, hormone, cell type and disease, a timed mock exam, and the Bone Zone Arcade of quick mini games.",
-   "modes": [
-    "Compendium",
-    "Review tables",
-    "Mock exam",
-    "Arcade"
-   ],
    "stateKey": "msk3-state-v1"
   },
   {
@@ -457,13 +373,6 @@ window.SH_DASH_DATA = {
    },
    "updated": "2026-09-25",
    "desc": "Diagnosis and classification, incisions, flaps and sutures, risk assessment and prognosis, Phase I therapy and instrumentation, resective surgery and furcations, regeneration, implants, host modulation, and plastic surgery. Review tables, a timed mock exam and the Pocket Arcade.",
-   "modes": [
-    "Compendium",
-    "Plain-English notes",
-    "Review tables",
-    "Mock exam",
-    "Arcade"
-   ],
    "stateKey": "perio-d2-compendium-state-v1"
   }
  ],
@@ -532,15 +441,5 @@ window.SH_DASH_DATA = {
   "review-of-systems": "Review of Systems",
   "special-patient-care": "Special Patient Care",
   "pcd-implants-exam1": "PCD Implants 1"
- },
- "legacy": [
-  "pcd-implants-exam1",
-  "special-patient-care",
-  "heme-endo-exam2",
-  "heme-endo-exam1",
-  "msk-exam4",
-  "pcd-exam3",
-  "msk-exam3",
-  "hepatobiliary"
- ]
+ }
 };

@@ -144,17 +144,20 @@
   }
   /* one post: { ok, id, name } or { ok: false, msg } */
   function send(sb, p){
-    var go = function(){
-      return call(sb, "post_idea", { p_visitor: visitor(), p_title: p.title, p_body: p.body || "", p_hub: p.hub || null, p_category: p.category, p_source: p.source || "board", p_request: p.request || requestId() }).then(function(r){
+    var req = p.request || requestId();
+    var go = function(hub){
+      return call(sb, "post_idea", { p_visitor: visitor(), p_title: p.title, p_body: p.body || "", p_hub: hub || null, p_category: p.category, p_source: p.source || "board", p_request: req }).then(function(r){
         var d = r.data;
         if (r.fail || !d || typeof d !== "object") return { ok: false, msg: OFFLINE };
+        /* a hub the server holds no answer keys for (an archived old single-file hub's check-in): the idea is for all hubs */
+        if (!d.ok && d.error === "hub" && hub) return go(null);
         if (!d.ok) return { ok: false, error: d.error, msg: ERR[d.error] || ERR.bad };
         track("ideas:post=" + (p.source || "board"));
         return { ok: true, id: d.id, name: d.name };
       });
     };
-    if (p.newName) return saveName(sb, p.newName).then(function(ok){ return ok ? go() : { ok: false, msg: OFFLINE }; });
-    return go();
+    if (p.newName) return saveName(sb, p.newName).then(function(ok){ return ok ? go(p.hub) : { ok: false, msg: OFFLINE }; });
+    return go(p.hub);
   }
   function kindOptions(cur){ return (cur ? "" : '<option value="" selected>Pick a kind</option>') + CATS.map(function(c){ return '<option value="' + c[0] + '"' + (c[0] === cur ? " selected" : "") + ">" + esc(c[1]) + "</option>"; }).join(""); }
 
