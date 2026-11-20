@@ -3,11 +3,11 @@
  "scripts": {
   "hub.bundle.js": {
    "what": "a hub's engine: with the page",
-   "run": ["hub-art.js", "statements.js", "prize.js", "hub-rewards.js", "hub-timmy.js", "hub-bank.js", "hub.js"]
+   "run": ["hub-art.js", "toast.js", "statements.js", "prize.js", "hub-rewards.js", "hub-timmy.js", "hub-bank.js", "hub.js"]
   },
   "dash.bundle.js": {
    "what": "the dashboard's engine: with the page",
-   "run": ["hub-art.js", "hub-art/dash.js", "archive.js", "dash.js"]
+   "run": ["hub-art.js", "hub-art/dash.js", "toast.js", "archive.js", "dash.js"]
   },
   "rest.bundle.js": {
    "what": "the widgets a hub and the dashboard share, and the database client: once the page is drawn",

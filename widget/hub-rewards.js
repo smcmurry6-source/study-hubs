@@ -67,7 +67,7 @@
       else if (c.type === "allSeen") ok = HX.IDX.every(function(q){ return ansOf(q.id); });
       /* every question of a lecture right at least once (Perio's "Session n Mastered") */
       else if (c.type === "lecRight") { var lq = QBL[c.lec] || []; ok = lq.length > 0 && lq.filter(function(q){ var r = ansOf(q.id); return r && r.c > 0; }).length * 100 >= (c.pct || 100) * lq.length; }
-      if (ok) { got[a.id] = ANSWERED ? true : day(0); if (!quiet) toast("Achievement: " + a.name); }
+      if (ok) { got[a.id] = ANSWERED ? true : day(0); if (!quiet) toast(a.name, "achv"); }
     });
   }
   /* XP as the server counts it. On the live rules (widget/ranks.js, "How XP works"): 10 the first time you get a

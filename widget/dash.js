@@ -62,10 +62,12 @@
   function num(n){ return Number(n || 0).toLocaleString(); }
   function reduced(){ return !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches); }
   function track(t){ try{ if (window.shTrack) window.shTrack(t); }catch(e){} }
-  function toast(msg){
+  /* the sticker toast (widget/toast.js, ahead of this file in dash.bundle.js): toast(msg, kind) or toast(msg, { kind, title, icon }) */
+  function toast(msg, o){
+    if (window.shToast) return window.shToast(msg, o);
     var host = q(".hx-toasts") || document.body.appendChild(Object.assign(document.createElement("div"), { className: "hx-toasts" }));
     var t = document.createElement("div"); t.className = "hx-toast"; t.setAttribute("role", "status"); t.textContent = msg; host.appendChild(t);
-    setTimeout(function(){ t.classList.add("out"); setTimeout(function(){ t.remove(); }, 300); }, 2600);
+    setTimeout(function(){ t.classList.add("out"); setTimeout(function(){ t.remove(); }, 300); }, 3200);
   }
 
   /* ---------- the drawings (widget/hub-art.js: the icon set, the flame, Home's spot art; widget/hub-art/dash.js: every
@@ -814,7 +816,7 @@
     var btn = e.target.closest(".dx-scene[data-egg]"); if (!btn) return;
     var c = CLASSES[btn.getAttribute("data-egg")]; if (!c || !c.egg) return;
     btn.classList.remove("is-active"); void btn.offsetWidth; btn.classList.add("is-active");
-    toast(c.egg);
+    toast(c.egg, "egg");
   });
   /* remember what was opened last */
   document.addEventListener("click", function(e){
@@ -1373,7 +1375,7 @@
     var t0 = Date.now();
     (function go(){
       if (window.shLinkAsk && window.shLinkAsk.link) { window.shLinkAsk.link({ back: back, from: from }); return; }
-      if (Date.now() - t0 > 8000) { toast("Couldn’t open Link my devices. Are you online?"); return; }
+      if (Date.now() - t0 > 8000) { toast("Couldn’t open Link my devices. Are you online?", "err"); return; }
       setTimeout(go, 200);
     })();
   }
@@ -1473,7 +1475,7 @@
     body.addEventListener("click", function(e){
       if (e.target.closest("[data-focus]")) {
         var on = !focusOn(); setFocus(on); paintFocus(); q("[data-extras]", body).innerHTML = extrasHTML();
-        track("settings:focus=" + (on ? "on" : "off")); toast(on ? "Focus mode is on. Every extra is off." : "Focus mode is off. Your extras are back.");
+        track("settings:focus=" + (on ? "on" : "off")); toast(on ? "Every extra is off." : "Your extras are back.", { kind: "focus", title: on ? "Focus mode is on" : "Focus mode is off" });
         if (window.shPet) window.shPet.refresh();
         q("[data-focus]", body).focus(); return;
       }
@@ -1700,7 +1702,7 @@
   function openCollections(){
     var back = function(){ var b = q(".dx-collbtn"); if (b) b.focus({ preventScroll: true }); };
     placeLoad().then(function(){ if (!window.shPlace) throw new Error("no place"); window.shPlace.open({ collections: true, onClose: back }); })
-      .then(null, function(){ toast("Your collections didn't open. Try again in a moment."); });
+      .then(null, function(){ toast("Your collections didn't open. Try again in a moment.", "err"); });
   }
   function openShop(){
     loadScriptOnce(WIDGET + "shop.js").then(function(){
@@ -1708,7 +1710,7 @@
       window.shShop.setup({ sb: SHOP.sb, visitor: VISITOR || null, shop: SHOP.shop, profile: myRank });
       SHOP.open = true;
       window.shShop.open({ onClose: function(){ SHOP.open = false; var b = q(".dx-shopbtn"); if (b) b.focus({ preventScroll: true }); } });
-    }).then(null, function(){ toast("The shop didn't open. Try again in a moment."); });
+    }).then(null, function(){ toast("The shop didn't open. Try again in a moment.", "err"); });
   }
   document.addEventListener("sh:shop", function(e){ var sh = e.detail && e.detail.shop; if (sh && sh.wallet) { SHOP.shop = sh; drawWallet(); visitEarn(); } });
   /* ---------- prizes (migration_v68): a reply that pays carries the balance after it, and the prize says what it paid
@@ -1722,11 +1724,11 @@
   function prizeLine(src, xp){ return (PRIZE_SAYS[src] || "Bonus") + ": +" + num(xp) + " XP and " + num(xp) + " crowns"; }
   document.addEventListener("sh:crowns", function(e){ var d = e.detail || {}; setCrowns(d.balance); });
   /* a prize comes up on the hubs' gold reward card (widget/prize.js, fetched the first time one pays: the page's budget
-     has no room for it; 2026-11-19), over an open dialog when one is (a visit pays inside Timmy's place), the dark toast
-     only if the card can't be fetched */
+     has no room for it; 2026-11-19), over an open dialog when one is (a visit pays inside Timmy's place), a toast only
+     if the card can't be fetched */
   function prizeShow(d){
     var text = d.text || prizeLine(d.src, d.xp), P = window.shPrize;
-    if (!P) { loadScriptOnce(WIDGET + "prize.js").then(function(){ if (window.shPrize) prizeShow(d); else toast(text); }, function(){ toast(text); }); return; }
+    if (!P) { loadScriptOnce(WIDGET + "prize.js").then(function(){ if (window.shPrize) prizeShow(d); else toast(text, { kind: "achv", title: "You earned" }); }, function(){ toast(text, { kind: "achv", title: "You earned" }); }); return; }
     var open = document.querySelectorAll("dialog[open]"), dlg = open.length ? open[open.length - 1] : null;
     P.show([{ t: String(text).split(": +")[0], xp: d.xp, c: d.xp, src: d.src }], {}, { star: function(){ return starSvg(26); }, coin: function(){ return coinSvg(26); },
       calm: reduced, within: dlg, top: dlg ? 0 : 56, target: function(){ var w = q(".dx-coinnum svg"), r = w && w.getBoundingClientRect(); return !dlg && r && r.width && r.bottom > 0 && r.top < innerHeight ? w : null; } });
@@ -2199,7 +2201,7 @@
       var a = document.createElement("a"); a.href = c.toDataURL("image/png");
       a.download = row.title.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() + "-recap.png";
       document.body.appendChild(a); a.click(); a.remove(); track("recap:save");
-    }).then(function(){ btn.disabled = false; }, function(){ btn.disabled = false; toast("The image didn't load. Try again in a moment."); });
+    }).then(function(){ btn.disabled = false; }, function(){ btn.disabled = false; toast("The image didn't load. Try again in a moment.", "err"); });
   }
   /* the recap's drawings (widget/hub-art/class.js: tools/figures/site/recap.mjs and six trophy drawings): hours per day
      as drawn columns with the exam day's flag and Timmy climbing them, and the classmates as a crowd of teeth. Drawn at
@@ -2370,11 +2372,7 @@
     var baseline = null, shown = false;
     function show(){
       if (shown) return; shown = true;
-      var t = document.createElement("div"); t.className = "dx-update"; t.setAttribute("role", "status");
-      t.innerHTML = '<span>A newer version of the hubs is live.</span><button type="button" class="btn btn-primary" data-reload>Reload</button><button type="button" class="dx-ib" aria-label="Dismiss" data-dismiss>' + icon("close", 18) + "</button>";
-      root.appendChild(t);
-      q("[data-reload]", t).addEventListener("click", function(){ location.reload(); });
-      q("[data-dismiss]", t).addEventListener("click", function(){ t.remove(); });
+      toast("A newer version of the hubs is live.", { kind: "update", sticky: true, action: { label: "Reload", run: function(){ location.reload(); } } });
     }
     function take(latest){
       if (baseline === null){ baseline = latest; return; }
@@ -2413,7 +2411,7 @@
   function tourIdle(fn){ if (window.shTour) window.shTour.whenIdle(fn); else fn(); }
   $("tourBtn").addEventListener("click", function(){
     menu(false);
-    loadScriptOnce(WIDGET + "tour.js").then(function(){ if (window.shTour) window.shTour.start(); }, function(){ toast("The tour didn't load. Try again in a moment."); });
+    loadScriptOnce(WIDGET + "tour.js").then(function(){ if (window.shTour) window.shTour.start(); }, function(){ toast("The tour didn't load. Try again in a moment.", "err"); });
   });
 
   /* ---------- first paint: everything that needs no network ---------- */
