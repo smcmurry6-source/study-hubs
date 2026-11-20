@@ -27,6 +27,11 @@ whose exam is already over).
 
 Perio: add topics for each session as it is taught.
 
+**A hub that reviews earlier courses** (Review of Systems, Sam, 2026-11-20: "exam hints for old exams are not exam hints for review of
+systems. they do indicate higher yield content, however"): its topics and hints rest on those courses' own exams, so they are ranked
+the same way but never called a prediction of this hub's exam. Set `"hintsFrom": "courses"` in its `core.json`: the engine and Ask
+Timmy then say High yield and High-yield points instead of High likelihood and Exam hints.
+
 **They also write the High yield notes** (Sam, 2026-11-12): on the engine (every hub since the redesign's release), each lecture's
 notes have a third reading level, **High yield**, built from its topics in this order, each with the notes' paragraphs its
 questions point to and the Exam Hints' takeaways (`tools/hub-next/high-yield.mjs`, run by `tools/hub-next/build.mjs`). So a
