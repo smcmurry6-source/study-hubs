@@ -66,7 +66,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   few seconds (`.hx-prizes` z-index 10004 in `widget/prize.js`: over `.sh-reply`'s 10001, under a phone's toasts' 10005,
   which drop in under it). The same overlap was on a laptop from about 870 to 1,250 px wide, where the pop-up (bottom right)
   covered the card's right end; fixed by the same line. Checked on the preview's made-up data on Review of Systems and Heme
-  & Endo Exam 3, iPhone 13 and 1100 px: the card is on top. (#PRNUM)
+  & Endo Exam 3, iPhone 13 and 1100 px: the card is on top. (#497)
 - [x] **The dashboard's toast on a phone** (2026-11-19, left from BUG-126's fix): a hub's toasts now drop in at the top on a
   phone, clear of Timmy, the streak flame and the Listen player; the dashboard's own (`toast()` in `widget/dash.js`) still
   comes up at the bottom and wasn't checked against what sits there. Check it on a phone and move it if anything covers it. Checked 2026-11-19 on an emulated iPhone 13 with the preview's made-up data: since #458 the rule in `widget/hub.css` drops the dashboard's toasts in at the top too (64 px, under its 56 px bar), clear of the report-reply pop-up and the bottom corners; nothing covers a long one, so nothing to move. And its prizes are on the gold card now (the next line). (#466)
