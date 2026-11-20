@@ -51,7 +51,18 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `main`. Two days later, run it again (`node tools/after-merge/run.js ... --fix tools/data-fixes/2026-11-19-test-runs.sql`, or
   the connector with Sam's OK; it is safe to run twice), first counting what it would select (its first statement as a `select
   count(*)`), and tick BUG-192's retest. Until then, a Heme & Endo Exam 3 retrospective reads that hub's arcade and Timmy Time
-  clicks of 11-19 as test runs.
+  clicks of 11-19 as test runs. **Run `tools/data-fixes/2026-11-20-quiet-test-rows.sql` again with it** (2026-11-20, the Exam 3
+  retrospective): `tools/ci/quiet.js`'s mock checks, run from those same older branches, wrote two `pq-` rows each into question
+  health (13 made-up visitors to 6:37 am on 11-20); today's `quiet.js` sends nothing past its routes (checked behind a refusing proxy).
+- [x] **Heme & Endo Exam 3 out of `HUBS` in `sw.js`** (2026-11-20, its retrospective): done with its page coming down, `sh-v68`
+  with Review of Systems alone (#503).
+- [x] **Sam's call: take Heme & Endo Exam 3's page down?** Sam, the morning of the exam: "Yes come down. Merge". `hubs/heme-endo-exam3/`
+  is gone, `archiveOn` 9 am on 2026-11-20, and what named it moved to Review of Systems or went (#503,
+  [the hub note](../hubs/heme-endo-exam3.md)).
+- [ ] **The smoke test's game-layer wiring check runs again on the next hub with an arcade** (2026-11-20, Exam 3's page down):
+  `tools/ci/smoke.js`'s `wiringCheck` (Million-Dollar Smile's sessions and answers, Timmy Time's minutes) needs a live engine hub
+  with Smile in its `content/arcade.js`, and Review of Systems has no arcade, so it is skipped until one is built. When the next
+  hub with an arcade ships, check its smoke run prints "the game layer's wiring" for it (nothing to change: it picks the hub itself).
 - [ ] **The arcade games themselves at 320 px with the largest text** (2026-11-19, left from BUG-168's fix): the lobby and
   every view of a hub now fit a 320 px phone at XX-Large (220 px of layout), and the smoke test checks them, but a game once
   it's started (each hub's own `content/arcade.css` and `widget/games.css`) wasn't swept. Open each in a scripted browser at
@@ -64,7 +75,9 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   which drop in under it). The same overlap was on a laptop from about 870 to 1,250 px wide, where the pop-up (bottom right)
   covered the card's right end; fixed by the same line. Checked on the preview's made-up data on Review of Systems and Heme
   & Endo Exam 3, iPhone 13 and 1100 px: the card is on top. (#497)
-- [ ] **Read the data-quality report** (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
+- [x] **Read the data-quality report** (done 2026-11-20 at 8:30 am Central, the admin page's kept copy of 1:41 am, in `LESSONS.md`'s
+  Live signals: no test rows, every table writing; the one problem it can't see, `quiet.js`'s `pq-` rows, found by reading question
+  health) (#503) (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
   `select sh_data_quality();` stopped at the audit's 5 s limit both times (80 people in Perio on its final's eve; then at 12:40 pm
   the next day, between the Perio final and the Heme & Endo Exam 3 eve). `qh_report('perio')` was read with the retrospective
   (2026-11-19: no miskeys). `migration_v83.sql` is live since 2026-11-20 (1:45 am Central): read the admin page's kept copy
@@ -87,7 +100,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `dash.js` code that reads it (it tells the dashboard a hub has no `content/`). Also the old pages' leftovers in
   `tools/ci/smoke.js` (`WHY_EXEMPT` and the other exemption sets, the `OLD` hub's checks, the old cards' markup check). (#496)
 - [ ] **What the old pages' cleanup left** (2026-11-20, from #496; none of it changes what students see):
-  (1) `widget/hub-art/<hub>.js` for the hubs whose pages came down (`generic`, `heme-endo-exam2`, `occlusion`,
+  (1) `widget/hub-art/<hub>.js` for the hubs whose pages came down (`generic`, `heme-endo-exam2`, `heme-endo-exam3`, `occlusion`,
   `pcd-implants-exam1`, `perio`, `special-patient-care`): `tools/figures/site/build.mjs` writes one for every hub in its list
   and no page loads them; trim its list, keeping what the dashboard's art (`hub-art/dash.js`) and the recaps still need.
   (2) Every CSS rule that starts `html.shx` (`widget/hub.css`, `trophies.css`, `study-modes.css`, `dash.css` and others;

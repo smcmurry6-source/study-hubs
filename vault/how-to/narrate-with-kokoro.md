@@ -56,15 +56,15 @@ longer matches. One lecture on a 4-core machine speaks about 50 characters a sec
 minutes); `--jobs 4` manages about 40 a second in all, and the 21 lectures of 2026-11-12 (270,000 characters, 148 MB) took
 106 minutes.
 
-**A professor's study guide** (since 2026-11-19, Heme & Endo Exam 3's) is one recording, `audio/guide.mp3`, spoken from the
+**A professor's study guide** (since 2026-11-19; the first was Heme & Endo Exam 3's, whose page came down 2026-11-20) is one recording, `audio/guide.mp3`, spoken from the
 page's readable part: `node tools/hub-next/guide.mjs <hub>` prints it (each lecture's heading, its items and its key terms;
 not the badges, the question counts or the buttons, so a new question doesn't change it). "L17" is said "Lecture 17"
 (`data-say` in that HTML: the attribute is spoken, the text inside is what the page shows). Record it, then build:
 
 ```bash
-python3 tools/narrate.py heme-endo-exam3 --level guide --text   # what it will say
-python3 tools/narrate.py heme-endo-exam3 --level guide --force
-node tools/hub-next/build.mjs --hub heme-endo-exam3        # then always this (notes.json's guideAudio)
+python3 tools/narrate.py <hub> --level guide --text   # what it will say
+python3 tools/narrate.py <hub> --level guide --force
+node tools/hub-next/build.mjs --hub <hub>        # then always this (notes.json's guideAudio)
 ```
 
 Its words file says which text it was spoken from (`h`), as High yield's does. Exam 3's first guide (90,000 characters) took 26 minutes on 4 cores and

@@ -125,13 +125,12 @@ Hub building
 
 Live
 - [Review of Systems](hubs/review-of-systems.md): the two mock board exams, every course on them
-- [Heme & Endo Exam 3](hubs/heme-endo-exam3.md)
 
-Archived (page still up)
-- [Heme & Endo Exam 2](hubs/heme-endo-exam2.md) · [PCD Implants Exam 1](hubs/pcd-implants-exam1.md) ·
-  [Heme & Endo Exam 1](hubs/heme-endo-exam1.md) · [MSK Exam 4](hubs/msk-exam4.md) ·
-  [PCD Fixed Pros Exam 3](hubs/pcd-exam3.md) · [MSK Exam 3](hubs/msk-exam3.md)
-- Removed (no folder, labels only): [Periodontology](hubs/perio.md) (2026-11-19, the day of its final), [Occlusion](hubs/occlusion.md) (2026-11-19), [Special Patient Care](hubs/special-patient-care.md) (2026-11-14), GI Exam 1 (`gi-exam1`),
+Archived
+- Removed (no folder, labels only): [Heme & Endo Exam 3](hubs/heme-endo-exam3.md) (2026-11-20, the morning of its exam), [Periodontology](hubs/perio.md) (2026-11-19, the day of its final), [Occlusion](hubs/occlusion.md) (2026-11-19),
+  the six old single-file pages (2026-11-19: [Heme & Endo Exam 2](hubs/heme-endo-exam2.md) · [PCD Implants Exam 1](hubs/pcd-implants-exam1.md) ·
+  [Heme & Endo Exam 1](hubs/heme-endo-exam1.md) · [MSK Exam 4](hubs/msk-exam4.md) · [PCD Fixed Pros Exam 3](hubs/pcd-exam3.md) ·
+  [MSK Exam 3](hubs/msk-exam3.md)), [Special Patient Care](hubs/special-patient-care.md) (2026-11-14), GI Exam 1 (`gi-exam1`),
   GI Exam 2 (`hepatobiliary`), Genetics, Fixed Pros.
 
 Being built on its own branch

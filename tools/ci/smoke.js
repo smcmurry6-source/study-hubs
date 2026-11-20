@@ -470,7 +470,7 @@ function lint(hub, A){
   });
   {
     const T = A.LIKELY_TOPICS;
-    if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from heme-endo-exam3)`);
+    if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from review-of-systems)`);
     else {
       const byId = new Map(Q.map(q => [q.id, q]));
       T.forEach(t => (t.ids || []).forEach(id => { const q = byId.get(id);
