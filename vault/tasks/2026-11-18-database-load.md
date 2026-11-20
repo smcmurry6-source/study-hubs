@@ -150,9 +150,8 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   hubs a busy week can add 150 MB or more: from about 420 MB, the analytics move (the box above) or a trim is due.
   Done 2026-11-19 by the lessons audit: the query is in `tools/lessons-refresh.md` step 1 and the skill; that afternoon it read
   323 MB (`personal_answers` 79 MB, `activity_pings` 36, `question_events` 35, `xp_seen` 31, `ui_click_reach` 24).
-- [ ] [The optimization pass](2026-11-18-database-optimization-pass.md): the answer save is still 55% of the database's time.
-  (Its readout, 2026-11-20: 31.7% since phases 1 and 2, 45 ms a save on the server; the bootstrap and the mastery read
-  are now a third, its open boxes.)
+- [x] [The optimization pass](done/2026-11-18-database-optimization-pass.md): the answer save is still 55% of the database's time.
+  **Done** 2026-11-20 (phases 1-3, #444 to #470): the answer save 31% of the database's time at 45 ms a call, the evening after.
 - [x] `personal_answers`' two indexes (`migration_v71.sql`: the person's answers newest first, and one question's answers)
   built on the live database with `create index concurrently`, then the file appended to `supabase/schema.sql` and its line
   taken out of `supabase/pending-migrations.txt`. Each answer's speed limit, double-tap check and per-question counts read
@@ -240,10 +239,10 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   the primary key 9 → 2 MB) and `analyze`. After: **318 MB**, the ping table 31 MB (86,372 rows, newest a few seconds old),
   every index valid, no failed request or database error in those minutes. The biggest tables now: `personal_answers` 76 MB,
   `xp_seen` 52 MB, `question_events` 34 MB, `ui_click_reach` 23 MB, `xp_awards` 22 MB, `answer_xp` 21 MB (for the
-  [optimization pass](2026-11-18-database-optimization-pass.md); `xp_seen` is worth a look).
+  [optimization pass](done/2026-11-18-database-optimization-pass.md); `xp_seen` is worth a look).
 - 2026-11-19, 4:10 am Central ([#444](https://github.com/smcmurry6-source/study-hubs/pull/444)): the rewrite read back from the catalog before
   the optimization pass's phase 1 went in: the ping table 31 MB (the table 12 MB, its five indexes 19 MB), the database
-  318 MB. `migration_v76.sql` and `migration_v77.sql` applied the same hour: [its note](2026-11-18-database-optimization-pass.md).
+  318 MB. `migration_v76.sql` and `migration_v77.sql` applied the same hour: [its note](done/2026-11-18-database-optimization-pass.md).
 - 2026-11-19, 5 am Central (Claude Code, read-only through the connector): Sam: "supabase is still saying its at like 400 mb
   and the memory commitment is at severe". The database read **318 MB** (332 MB with the two template databases, the sum
   the 500 MB limit counts). Supabase refreshes the dashboard's size once a day, so it still showed the figure from before
@@ -266,7 +265,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   fixing", [decisions](../decisions.md)); it opens again only if the saves fail in bursts after v72.
 - 2026-11-19, noon Central (Claude Code): the optimization pass's phase 2 applied live at Sam's word, with the rewrites of
   `xp_seen` and `activity_visits`: **the database 349 → 323 MB** (it had grown 31 MB since the morning's 318 MB, Perio's final
-  day). No request failed ([the optimization pass](2026-11-18-database-optimization-pass.md), its Log).
+  day). No request failed ([the optimization pass](done/2026-11-18-database-optimization-pass.md), its Log).
 
 - 2026-11-19 (Claude Code, [#456](https://github.com/smcmurry6-source/study-hubs/pull/456)): the first box. Everything measured on a throwaway copy
   (live only: catalog reads, `pg_stats`, settings, the cron table). `migration_v83.sql` written and tested

@@ -622,7 +622,7 @@
         (hasPlain || hasHy ? '<span class="seg" role="group" aria-label="Reading level"><button type="button" data-level="full" aria-pressed="' + (level === "full") + '">As taught</button>' +
           (hasPlain ? '<button type="button" data-level="plain" aria-pressed="' + (level === "plain") + '">Plain English</button>' : "") +
           (hasHy ? '<button type="button" data-level="hy" aria-pressed="' + hy + '">High yield</button>' : "") + "</span>" : "") +
-        '<button type="button" class="btn" data-ntall="fold" hidden>' + icon("menu", 18) + "<span>Collapse all</span></button>" +   // shown by foldTopics() when the notes have topics
+        foldBtn() +   // shown by foldTopics() when the notes have topics
         '<button type="button" class="btn" data-mmap aria-expanded="false">' + icon("mindmap", 18) + "Mind map</button>" +
         '<button type="button" class="btn btn-text" data-report-notes>' + icon("report", 18) + "Report a mistake</button>" +
         '<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
@@ -690,34 +690,47 @@
     FOLDS = null;
     var kids = Array.prototype.slice.call(prose.children), lv = 9;
     kids.forEach(function(k){ var m = /^H([2-4])$/.exec(k.tagName); if (m && +m[1] < lv) lv = +m[1]; });
-    var heads = kids.filter(function(k){ return k.tagName === "H" + lv; }), all = $("[data-ntall]", el);
+    var heads = kids.filter(function(k){ return k.tagName === "H" + lv; });
     if (heads.length < 2) return;
-    if ("onbeforematch" in document.body) prose.classList.add("nt-find");   // hub.css: find-in-page can open a folded topic
-    var shut = {}; (foldGet()[lec.id] || []).forEach(function(k){ shut[k] = 1; });
-    var T = heads.map(function(h, n){
-      var box = document.createElement("div"), body = document.createElement("div"), id = "nt" + n;
-      box.className = "nt"; body.className = "nt-b"; body.id = id + "-b";
-      if (!h.id) h.id = id;
-      h.classList.add("nt-h");
-      prose.insertBefore(box, h); box.appendChild(h);
-      var x = box.nextSibling; while (x && x.nodeType === 3 && !/\S/.test(x.data)) x = x.nextSibling;
-      if (x && x.nodeType === 1 && x.classList.contains("hy-why")) box.appendChild(x);   // High yield's "why it's on the list" stays with its heading
-      box.appendChild(body);
-      while (box.nextSibling && heads.indexOf(box.nextSibling) < 0) body.appendChild(box.nextSibling);
-      h.insertAdjacentHTML("beforeend", '<button type="button" class="nt-tog" data-nt="topic" data-sh-noread aria-expanded="true" aria-controls="' + body.id + '" aria-labelledby="' + esc(h.id) + '"><span class="nt-ch">' + icon("chevron", 18) + "</span></button>");
-      var t = { box: box, body: body, btn: h.lastElementChild, key: topicKey(h) };
-      t.btn.addEventListener("click", function(){ var open = t.btn.getAttribute("aria-expanded") !== "true"; setTopic(t, open); save(); sync(); track("notes:" + (open ? "unfold" : "fold")); });
-      body.addEventListener("beforematch", function(){ setTopic(t, true); sync(); });
-      if (shut[t.key]) setTopic(t, false);
-      box.__nt = t;
-      return t;
+    foldParts([{ root: prose, key: lec.id, heads: heads }], el);
+  }
+  /* the fold itself, for one lecture's notes or for several sections under one Collapse all (the study guide's lectures,
+     widget/guide.js: each section's items, kept as "guide/<lecture>"). A topic's body stops at the next heading, or at an
+     element matching stop (the guide's Practice buttons). */
+  function foldParts(parts, el, stop){
+    FOLDS = null;
+    var all = $("[data-ntall]", el), A0 = foldGet(), T = [];
+    if (parts.reduce(function(n, p){ return n + p.heads.length; }, 0) < 2) return;
+    var prose = $(".reading-prose", el); if (prose && "onbeforematch" in document.body) prose.classList.add("nt-find");   // hub.css: find-in-page can open a folded topic
+    parts.forEach(function(p){
+      var shut = {}; (A0[p.key] || []).forEach(function(k){ shut[k] = 1; });
+      p.T = p.heads.map(function(h){
+        var box = document.createElement("div"), body = document.createElement("div"), id = "nt" + T.length;
+        box.className = "nt"; body.className = "nt-b"; body.id = id + "-b";
+        if (!h.id) h.id = id;
+        h.classList.add("nt-h");
+        p.root.insertBefore(box, h); box.appendChild(h);
+        var x = box.nextSibling; while (x && x.nodeType === 3 && !/\S/.test(x.data)) x = x.nextSibling;
+        if (x && x.nodeType === 1 && x.classList.contains("hy-why")) box.appendChild(x);   // High yield's "why it's on the list" stays with its heading
+        box.appendChild(body);
+        for (x = box.nextSibling; x && p.heads.indexOf(x) < 0 && !(stop && x.nodeType === 1 && x.matches(stop)); x = box.nextSibling) body.appendChild(x);
+        h.insertAdjacentHTML("beforeend", '<button type="button" class="nt-tog" data-nt="topic" data-sh-noread aria-expanded="true" aria-controls="' + body.id + '" aria-labelledby="' + esc(h.id) + '"><span class="nt-ch">' + icon("chevron", 18) + "</span></button>");
+        var t = { box: box, body: body, btn: h.lastElementChild, key: topicKey(h) };
+        t.btn.addEventListener("click", function(){ var open = t.btn.getAttribute("aria-expanded") !== "true"; setTopic(t, open); save(); sync(); track("notes:" + (open ? "unfold" : "fold")); });
+        body.addEventListener("beforematch", function(){ setTopic(t, true); sync(); });
+        if (shut[t.key]) setTopic(t, false);
+        box.__nt = t; T.push(t);
+        return t;
+      });
     });
-    /* this level's folded topics; the lecture's other levels' (other headings) are kept as they were */
+    /* these topics' state; the same key's other topics (a lecture's other reading levels' headings) are kept as they were */
     function save(){
-      var mine = {}, A = foldGet();
-      T.forEach(function(t){ mine[t.key] = 1; });
-      var list = (A[lec.id] || []).filter(function(k){ return !mine[k]; }).concat(T.filter(function(t){ return t.box.classList.contains("is-shut"); }).map(function(t){ return t.key; }));
-      if (list.length) A[lec.id] = list.slice(-300); else delete A[lec.id];
+      var A = foldGet();
+      parts.forEach(function(p){
+        var mine = {}; p.T.forEach(function(t){ mine[t.key] = 1; });
+        var list = (A[p.key] || []).filter(function(k){ return !mine[k]; }).concat(p.T.filter(function(t){ return t.box.classList.contains("is-shut"); }).map(function(t){ return t.key; }));
+        if (list.length) A[p.key] = list.slice(-300); else delete A[p.key];
+      });
       ls(FOLD, Object.keys(A).length ? JSON.stringify(A) : null);
     }
     function sync(){
@@ -729,6 +742,8 @@
     sync();
     FOLDS = { sync: sync };
   }
+  /* the toolbar's Collapse all, hidden until foldParts() finds topics (a lecture's notes; the study guide's toolbar) */
+  function foldBtn(){ return '<button type="button" class="btn" data-ntall="fold" hidden>' + icon("menu", 18) + "<span>Collapse all</span></button>"; }
   /* open the folded topic a node is in, without saving it (Listen, a search result) */
   function revealTopic(node){
     var b = node && node.closest ? node.closest(".nt-b[hidden]") : null, t = b && b.parentNode.__nt;
@@ -1583,7 +1598,7 @@
     if (STUDY) (STUDY.guide || []).forEach(function(g){
       var l = LBY[g.lec]; if (!l) return; var where = (((C.notes || {}).guide || {}).title || "Study guide") + " · " + lecLabel(l);
       (g.items || []).forEach(function(it, k){ out.push({ kind: "Study guide", where: where, title: it.h, text: clean(frag(it.body).textContent), lec: l.id, go: { v: "guide", lec: l.id, k: k } }); });
-      (g.terms || []).forEach(function(t){ out.push({ kind: "Study guide", where: where + " · Key terms", text: clean(t.t + ": " + frag(t.d).textContent), lec: l.id, go: { v: "guide", lec: l.id, k: (g.items || []).length } }); });
+      (g.terms || []).forEach(function(t){ out.push({ kind: "Study guide", where: where + " · Key terms", text: clean(t.t + ": " + frag(t.d).textContent), lec: l.id, go: { v: "guide", lec: l.id, k: (g.items || []).length + (g.more || []).length } }); });   // Key terms' heading comes after the items' and the .gd-more ones
     });
     /* every Review table row (each lecture's charts sit under its notes; Perio's live search found them too) */
     if (STUDY) (STUDY.review || []).forEach(function(g){ var t = ""; (g.sections || []).forEach(function(sec){
@@ -1601,7 +1616,7 @@
     if (g.v === "notes") { STATE.ui.level = "full"; go("notes/" + g.lec);
       var t0 = Date.now(); (function wait(){ var p = $(".reading-prose"); if (p && p.closest("#lec-" + g.lec)) flashIn(function(){ var x = Array.prototype.filter.call(p.querySelectorAll("p, li, h3, h4"), function(el){ return !el.closest("[data-sh-noread]"); })[g.k]; revealTopic(x); return x; }); else if (Date.now() - t0 < 5000) setTimeout(wait, 100); })(); }
     else if (g.v === "guide") { go("notes/guide");
-      var t2 = Date.now(); (function wait(){ var hd = $$("#gd-" + g.lec + " h3")[g.k || 0]; if (hd) { hd.scrollIntoView({ block: "start" }); flashIn(function(){ return hd; }); } else if (Date.now() - t2 < 5000) setTimeout(wait, 100); })(); }
+      var t2 = Date.now(); (function wait(){ var hd = $$("#gd-" + g.lec + " h3")[g.k || 0]; if (hd) { revealTopic(hd.parentNode.querySelector(".nt-b")); hd.scrollIntoView({ block: "start" }); flashIn(function(){ return hd; }); } else if (Date.now() - t2 < 5000) setTimeout(wait, 100); })(); }
     else if (g.v === "cram") { go("more/cram"); setTimeout(function(){ var c = document.getElementById("cram-" + g.lec); if (c && window.shFlash) window.shFlash(c); }, 600); }
     else if (g.v === "hints") go("more/hints");
     else if (g.v === "review") {
@@ -1750,7 +1765,7 @@
     needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
     go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
     offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget, lecBadge: lecBadge, lecListHTML: lecListHTML, wireLecPick: wireLecPick, wireLecLinks: wireLecLinks,
-    followBtn: followBtn, wireFollow: wireFollow
+    followBtn: followBtn, wireFollow: wireFollow, foldBtn: foldBtn, foldParts: foldParts
   };
   [["CORE", function(){ return CORE; }], ["QS", function(){ return QS; }], ["LECS", function(){ return LECS; }], ["GROUPS", function(){ return GROUPS; }],
     ["IDX", function(){ return IDX; }], ["NOTES", function(){ return NOTES; }], ["AUDIO_OFF", function(){ return AUDIO_OFF; }],
