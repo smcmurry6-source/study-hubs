@@ -12,6 +12,26 @@
    },
    "motion": 0
   },
+  "about (dark, spoilers shown)": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
+  "about (phone, spoilers shown)": {
+   "axe": {},
+   "focus": {
+    "invisible": 0,
+    "stuck": 0,
+    "where": [],
+    "why": []
+   },
+   "motion": 0
+  },
   "review (sign-in)": {
    "axe": {},
    "focus": {
