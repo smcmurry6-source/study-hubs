@@ -26,12 +26,12 @@ jobs:
     outputs:
       reuse: ${{ steps.reuse.outputs.reuse }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0          # every commit and tree, no file contents: enough for git diff --name-only
           filter: blob:none
           sparse-checkout: tools/ci
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Only notes changed since an earlier green run?
@@ -47,10 +47,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 2   # the PR's merge commit and its base (HEAD^1)
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Syntax and merge markers
@@ -112,10 +112,10 @@ jobs:
       matrix:
         part: [desktop, phone]   # the desktop half has the question-bank lint and preview safety; the phone half the top bars
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 2   # the PR's merge commit and its base (HEAD^1), so the smoke test sees which hubs changed
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Install headless Chromium

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Accessibility regression test (RELEASE_TEST_PLAN.md, "Accessibility"), on a preview with the returning learner:
 //   - axe-core (WCAG 2.0/2.1/2.2 A and AA rules) on the dashboard, About, the admin page's sign-in and every mode of
-//     every live hub, in light mode, plus each live hub's first screen in dark mode;
+//     every live hub, in light mode, plus each live hub's first screen in dark mode, and About in dark mode and at a
+//     phone's width with the spoilers shown;
 //   - keyboard: 30 presses of Tab from the top of each page; every stop must be visible (an outline or a ring) and
 //     focus must keep moving (no trap);
 //   - reduced motion: with "reduce motion" on, endless animations still running are counted.
@@ -269,7 +270,27 @@ async function openVisit(page, check){
       results[`${next[0]} · shop (dark)`] = { axe: Object.fromEntries(v.map(x => [x.id, { n: x.n, impact: x.impact, help: x.help, sample: x.sample }])), focus: null, motion: 0 };
     } else problems.push(`${next[0]} · shop (dark): the shop didn't draw`);
   }
-  await dark.close(); await browser.close(); srv.server.close();
+  await dark.close();
+  /* the About page beyond the laptop in light mode (2026-11-19: four of its five sideways-scrolling tables were too wide
+     only at 390 px): in dark mode, and at a phone's width, each with the spoilers shown (the hidden hints are styled
+     apart), axe, the keyboard and motion, each with its baseline at 0 */
+  if (!ONLY) for (const [key, scheme, viewport] of [['about (dark, spoilers shown)', 'dark', { width: 1280, height: 860 }], ['about (phone, spoilers shown)', 'light', { width: 390, height: 844 }]]) {
+    const ac = await browser.newContext({ viewport, colorScheme: scheme, reducedMotion: 'reduce', serviceWorkers: 'block', ...(viewport.width < 500 ? { isMobile: true, hasTouch: true, deviceScaleFactor: 1 } : {}) });
+    await L.guard(ac);
+    const ap = await ac.newPage();
+    await ap.goto(srv.url + 'about/'); await L.settle(ap);
+    /* the preview starts a new device on its first page (storage cleared), so the theme and the box are set on the page */
+    await ap.evaluate(theme => document.documentElement.setAttribute('data-theme', theme), scheme);
+    await ap.check('#spoilers').catch(() => {}); await ap.waitForTimeout(300);
+    await ap.evaluate(() => window.scrollTo(0, 0));
+    if (await ap.evaluate(() => document.documentElement.classList.contains('hide-spoilers'))) problems.push(`${key}: the spoilers didn't show`);
+    const r = { axe: {}, focus: null, motion: 0 };
+    for (const v of await audit(ap)) r.axe[v.id] = { n: v.n, impact: v.impact, help: v.help, sample: v.sample };
+    r.focus = await keyboard(ap); r.motion = await motion(ap);
+    results[key] = r;
+    await ac.close();
+  }
+  await browser.close(); srv.server.close();
 
   /* compare with the baseline */
   let total = 0;

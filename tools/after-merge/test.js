@@ -2,7 +2,7 @@
 // Checks tools/after-merge/run.js's plan (what a push needs after it merges) on made-up pushes, with nothing sent
 // anywhere. Run by "Check hubs" (the fast job).   node tools/after-merge/test.js
 'use strict';
-const { plan, checkHub, closedCheckins, closedCheckinsSql } = require('./run.js');
+const { plan, checkHub, closedCheckins, closedCheckinsSql, coverFrom } = require('./run.js');
 const fails = [];
 const eq = (name, got, want) => { const g = JSON.stringify(got), w = JSON.stringify(want); if (g !== w) fails.push(`${name}: got ${g}, want ${w}`); };
 const ch = (...a) => a.map(s => ({ status: s[0], path: s.slice(2) }));
@@ -68,5 +68,30 @@ eq('no hubs.js data: nothing is reopened', threw, true);
 eq('the SQL', /values \('hepatobiliary', '2026-09-18'::date\), \('occlusion', '2026-10-21'::date\)/.test(closedCheckinsSql(closedCheckins(hd))), true);
 eq('none closed', closedCheckinsSql([]), 'delete from exam_checkins_closed');
 
+// a canceled run's push is covered by the next push run: it starts where the last run that wasn't canceled ended
+// (#467's, 2026-11-19: waiting behind #469's, canceled when #472 merged). Commits a < b < c < d on main.
+const line = ['a', 'b', 'c', 'd'], anc = (x, y) => line.indexOf(x) >= 0 && line.indexOf(x) <= line.indexOf(y);
+const run = (n, sha, conclusion, event = 'push') => ({ run_number: n, head_sha: sha, event, status: 'completed', conclusion });
+let c = coverFrom({ runs: [run(10, 'a', 'success'), run(11, 'b', 'cancelled')], runNumber: 12, before: 'b', isAncestor: anc });
+eq('a canceled run: from where the last good one ended', c.from, 'a');
+eq('it says so', /11 \(b\)/.test(c.note), true);
+c = coverFrom({ runs: [run(11, 'b', 'cancelled'), run(10, 'a', 'success'), run(9, 'a', 'cancelled')], runNumber: 12, before: 'b', isAncestor: anc });
+eq('only the canceled runs since the last good one', c.skipped.map(r => r.run_number), [11]);
+c = coverFrom({ runs: [run(10, 'a', 'success'), run(11, 'b', 'cancelled'), run(12, 'c', 'cancelled')], runNumber: 13, before: 'c', isAncestor: anc });
+eq('two canceled in a row', [c.from, c.skipped.length], ['a', 2]);
+c = coverFrom({ runs: [run(10, 'a', 'success'), run(11, 'b', 'success')], runNumber: 12, before: 'b', isAncestor: anc });
+eq('nothing canceled: the push\'s own range', [c.from, c.note], ['b', null]);
+c = coverFrom({ runs: [run(10, 'a', 'failure'), run(11, 'b', 'cancelled')], runNumber: 12, before: 'b', isAncestor: anc });
+eq('a failed run counts as covered (it went red; it is redone by hand)', c.from, 'a');
+c = coverFrom({ runs: [run(10, 'a', 'success'), run(11, 'b', 'success', 'workflow_dispatch'), run(12, 'c', 'cancelled')], runNumber: 13, before: 'c', isAncestor: anc });
+eq('a manual run is not where coverage ends', c.from, 'a');
+c = coverFrom({ runs: [run(10, 'a', 'success'), run(11, 'c', 'cancelled'), run(13, 'd', 'success')], runNumber: 12, before: 'c', isAncestor: anc });
+eq('newer runs (queued behind this one) are not looked at', c.from, 'a');
+c = coverFrom({ runs: [run(10, 'x', 'success'), run(11, 'b', 'cancelled')], runNumber: 12, before: 'b', isAncestor: anc });
+eq('a run off this line of history: the push\'s own range, with a warning', [c.from, /by hand/.test(c.note)], ['b', true]);
+c = coverFrom({ runs: [run(11, 'b', 'cancelled')], runNumber: 12, before: 'b', isAncestor: anc });
+eq('no good run in the page: the push\'s own range, with a warning', [c.from, /by hand/.test(c.note)], ['b', true]);
+eq('no runs at all', coverFrom({ runs: [], runNumber: 1, before: 'b', isAncestor: anc }), { from: 'b', skipped: [], note: null });
+
 if (fails.length) { console.log('✗ after-merge plan:\n  ' + fails.join('\n  ')); process.exit(1); }
-console.log('✓ after-merge plan: keys, Ask Timmy, episodes, closed check-ins, data fixes and changelog lines on made-up pushes');
+console.log('✓ after-merge plan: keys, Ask Timmy, episodes, closed check-ins, data fixes, changelog lines and canceled runs on made-up pushes');

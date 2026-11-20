@@ -152,11 +152,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **A smoke check for visiting from a hub's arcade board** (2026-11-19, from #467): `tools/ci/smoke.js` checks the
   dashboard's visit but not a hub's. Stub `get_arcade_leaderboard_v2` and `get_place`, finish a game, tap a name on the
   game-over board: the place opens as a visit, Escape gives focus back, a key that opens nothing says so on the row.
-- [ ] **After merge drops a queued push's steps** (2026-11-19): GitHub's `concurrency` keeps one run going and one
+- [x] **After merge drops a queued push's steps** (2026-11-19): GitHub's `concurrency` keeps one run going and one
   waiting, so when three merges land close together the waiting one is canceled by the next (#467's run was, behind
   #469's, when #472 merged), and each run only covers its own push (`github.event.before`), so the canceled push's steps
   never run. #467's were run by hand (`run.js --from 894c21a --to 35671c1 --only timmy,changelog`). Fix: have a run
-  cover everything since the last After merge run that succeeded on `main`, or flag a canceled run so its range is redone.
+  cover everything since the last After merge run that succeeded on `main`, or flag a canceled run so its range is redone. Done: a push run starts where the last push run that wasn't canceled ended (`--since-last-run`, `coverFrom()`) ([#494](https://github.com/smcmurry6-source/study-hubs/pull/494)).
 - [x] **Visiting from a hub's boards** (2026-11-13, [visiting](done/2026-11-12-redesign-visiting.md)): the leaderboards in a
   hub's own panel (`widget/v3.js`) don't open anyone's place yet (Sam, 2026-11-12: the dashboard's boards first). Done: the hubs' boards are their arcades' (`v3.js`'s panel has none now); `window.shVisitPlace` in `widget/hub-timmy.js`, Perio's and Heme & Endo Exam 3's arcades ([#467](https://github.com/smcmurry6-source/study-hubs/pull/467)).
 - [ ] **Sound for the hand-off and the Dark Matter unlock**, only if the redesign ever gets a sound setting (it has none; the
@@ -181,11 +181,11 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   hub's state is empty (2026-11-12, [Ask Timmy](done/2026-11-12-redesign-ask-timmy.md) part 2). Done: the dashboard merges `get_my_answers` with the device's (#469).
 - [ ] Anima figures on phones: at 390 px their in-drawing labels scale down to about 6-7 px. A plain bigger font for narrow screens clipped labels at the edges in about half the PCD Implants figures (tried 2026-11-04, reverted); it needs a per-figure phone layout (labels moved inside the drawing) or tap-to-zoom. Heme & Endo Exam 3's 22 (2026-11-17) mostly draw them at 10-15 px; its four L17 figures after the oocyte are the smallest (labels about 8 px on the timeline, implantation, estriol and breastfeeding figures). 
 - [ ] Retention, the part not built yet (approved 2026-11-04, [analytics-retention](../reference/analytics-retention.md)): before the school year ends (spring 2027), collapse `activity_hourly` / `activity_visits` older than the school year to hub × section × day with people counts and no ids, as one more step in `sh_retention_run`. **Since migration_v68 the wallet pays 100 crowns per hour of hub time from `activity_hourly`** (`sh_time_crowns`): before the collapse deletes a visitor's hours, keep what they paid (each visitor's capped ping total in a small table `sh_time_crowns` reads, or the crowns as a row), or balances drop. Also ask Sam about the two rows the question-health work proposed (`question_events`, `question_feedback`).
-- [ ] **The workflows' actions off Node.js 20** (2026-11-18, seen in #407's After merge run): every run warns "Node.js 20 is
+- [x] **The workflows' actions off Node.js 20** (2026-11-18, seen in #407's After merge run): every run warns "Node.js 20 is
   deprecated" for `actions/checkout@v4` and `actions/setup-node@v4` (8 uses each in `.github/workflows/*.yml`) and runs them
   on Node 24 for now; `actions/upload-artifact@v4` (3) and `actions/github-script@v7` (2) are likely the same. Before GitHub
   drops Node 20 entirely: move each to the major version that runs on Node 24, and let CI run every job once ("Check hubs" and
-  "Release tests" both run when a workflow changes).
+  "Release tests" both run when a workflow changes). Done: `checkout@v7`, `setup-node@v7`, `upload-artifact@v7`, `github-script@v9` ([#494](https://github.com/smcmurry6-source/study-hubs/pull/494)).
 - [x] **Sam's call: Ask Timmy's first question after an idle hour** (2026-11-18, found while answering why Heme & Endo Exam 3 had 21
   identical questions): writing a hub's content to the API's cache is most of what students' questions cost (about $14 of their
   $20 from 11-14 to 11-18), and most of it is the first question on a hub after nobody asked for an hour (about $0.60 each; the
@@ -205,7 +205,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   he cited R1.3 with "≥10 cigarettes/day", which is in the table, but `quoteIn` wants at least three words or the whole unit, so
   the link was dropped and the eval failed. Either accept a whole table cell (the text between two ` · `) as a quote, or say in
   `RULES` that a table quote takes the row's label with it.
-- [ ] **a11y.js checks the About page in light mode on a laptop only** (2026-11-19, found fixing BUG-002, BUG-006 and BUG-007):
+- [x] **a11y.js checks the About page in light mode on a laptop only** (2026-11-19, found fixing BUG-002, BUG-006 and BUG-007):
   `check('about', 'about/')` in `tools/release/a11y.js` runs at 1280 px in light mode, so a phone-only problem (four of the five
   tables that scroll sideways were only too wide at 390 px) or a dark-mode one would never be counted. Add the About page in dark
-  mode and at a phone width (with spoilers shown, since the hidden hints are styled apart), each with its baseline entry at 0.
+  mode and at a phone width (with spoilers shown, since the hidden hints are styled apart), each with its baseline entry at 0. Done: `about (dark, spoilers shown)` and `about (phone, spoilers shown)`, both 0 ([#494](https://github.com/smcmurry6-source/study-hubs/pull/494)).
+- [ ] **Review of Systems' a11y screens have no baseline entries** (2026-11-20, seen running a11y.js for #494): `tools/release/a11y.js` lists its five screens (home, notes, questions, more, dark) as "not in the baseline yet", so only a serious or critical issue there fails. All five were at 0 axe nodes: add them to `tools/release/baselines/a11y.json` at 0 (by hand, or `--update --hub review-of-systems`).
