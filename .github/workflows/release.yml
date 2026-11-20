@@ -34,12 +34,12 @@ jobs:
       run: ${{ steps.final.outputs.run }}
       reuse: ${{ steps.reuse.outputs.reuse }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0          # every commit and tree, no file contents: enough for git diff --name-only
           filter: blob:none
           sparse-checkout: tools/ci
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Shared code changed, or the full-tests label?
@@ -104,8 +104,8 @@ jobs:
       # The runner context isn't available in a job's env, so the results folder is set here for every later step.
       - name: Results folder outside the checkout
         run: echo "SH_RELEASE_OUT=$RUNNER_TEMP/release" >> "$GITHUB_ENV"
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Install Playwright's ${{ matrix.browsers }} and axe-core
@@ -126,7 +126,7 @@ jobs:
         run: cat "$SH_RELEASE_OUT/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
       - name: Upload the test results
         if: ${{ !cancelled() && env.SKIP_ENGINE != 'true' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-test-results-${{ matrix.key }}
           path: ${{ runner.temp }}/release
@@ -155,7 +155,7 @@ jobs:
     steps:
       - name: Results folder outside the checkout
         run: echo "SH_RELEASE_OUT=$RUNNER_TEMP/release" >> "$GITHUB_ENV"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Playwright (its browsers are in the image)
         if: env.SKIP_ENGINE != 'true'
         run: npm i --no-save playwright@1.63.0 axe-core@4.14.0
@@ -167,7 +167,7 @@ jobs:
         run: cat "$SH_RELEASE_OUT/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
       - name: Upload the test results
         if: ${{ !cancelled() && env.SKIP_ENGINE != 'true' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-test-results-matrix-firefox
           path: ${{ env.SH_RELEASE_OUT }}   # not runner.temp: in a container job that is the runner's own path
@@ -196,7 +196,7 @@ jobs:
     steps:
       - name: Results folder outside the checkout
         run: echo "SH_RELEASE_OUT=$RUNNER_TEMP/release" >> "$GITHUB_ENV"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Playwright (its browsers are in the image)
         if: env.SKIP_ENGINE != 'true'
         run: npm i --no-save playwright@1.63.0 axe-core@4.14.0
@@ -208,7 +208,7 @@ jobs:
         run: cat "$SH_RELEASE_OUT/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
       - name: Upload the test results
         if: ${{ !cancelled() && env.SKIP_ENGINE != 'true' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-test-results-matrix-webkit
           path: ${{ env.SH_RELEASE_OUT }}
@@ -223,10 +223,10 @@ jobs:
     steps:
       - name: Results folder outside the checkout
         run: echo "SH_RELEASE_OUT=$RUNNER_TEMP/release" >> "$GITHUB_ENV"
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Install Playwright's Chromium and PostgreSQL
@@ -241,7 +241,7 @@ jobs:
         run: cat "$SH_RELEASE_OUT/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
       - name: Upload the test results
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: release-test-results-others
           path: ${{ runner.temp }}/release

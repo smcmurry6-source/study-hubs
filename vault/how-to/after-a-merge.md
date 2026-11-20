@@ -46,6 +46,16 @@ this workflow existed). A cloud session can do the same by hand: `node tools/aft
 Running it again is safe: keys and episodes are upserts, the deploy sends the same files, and a data fix is a recount.
 The one thing that repeats is a changelog line, so leave `changelog` out (`--only`) when you run a push again.
 
+## Merges close together
+
+GitHub keeps one After merge run going and one waiting; when a third push comes, the waiting run is **canceled**
+(2026-11-19: #467's, behind #469's, when #472 merged). Nothing is lost since 2026-11-20: a run for a push starts where the
+last push run that wasn't canceled ended (`--since-last-run`, `coverFrom()` in `run.js`, read from GitHub's API), so it
+does the canceled push's steps with its own, and its summary says which runs it covered. A failed run doesn't count as
+canceled (it went red, and is run again by hand as above). **Don't redo a canceled run by hand**: the next push's run
+already does, and redoing it repeats its changelog lines. A manual run (Run workflow) covers only the range it's given,
+so one that canceled a waiting push run leaves it to the next push's run.
+
 ## What it doesn't do
 
 - **Migrations** (`migration_v*.sql`) are still applied by hand, through the Supabase connector or the SQL editor, and
