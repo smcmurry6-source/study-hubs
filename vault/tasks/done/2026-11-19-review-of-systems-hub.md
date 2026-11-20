@@ -47,4 +47,46 @@ sections to make it more manageable."
 
 ## Outcome
 
-To be filled in when the drafts are merged.
+Shipped in [#480](https://github.com/smcmurry6-source/study-hubs/pull/480): 14 courses (Cardio & Respiratory still being merged: this line gets the final counts). Every part has notes As
+taught and in Plain English, a cram list, High likelihood topics (about 40% of its questions) and board-style questions with
+every choice explained; the special formats meet their minimums per course. Narration off, no figures, no arcade.
+
+**How it was built.** One drafting session per course (or pair), each reading only that course's Drive folders and this
+site's earlier hubs for it, writing into a scratch folder (never the repo), with a report of what it read, where its sources
+disagreed and what Sam should decide. A merge script checked every draft (answer ranges, a why for every choice, the fixed
+two-statement and true/false choices, ids, likely topics pointing at real questions), capped High likelihood at about 40% a
+part and ran the hub build. None of the drafts or reports is in the repo (course material, classmates' docs).
+
+**Where sources disagreed, the standard fact was used**, and the hub never says a classmate's guide was wrong. Most courses'
+sources were classmates' guides and answered objectives, not professor slides, so the notes lean on standard references
+(`src: "ref"` on those questions). By course:
+- Head & Neck: the stylomandibular ligament limits protrusion (a practice set said it "prevents excessive opening").
+- Dental Anatomy & Occlusion: primary teeth start calcifying in utero; the maxillary first molar usually has 4 canals; the
+  most often missing tooth after third molars and two angle facts where sources differ are not keyed.
+- Fundamentals I: about 16 study-guide errors (proton counts per complex, PEP carboxykinase, β2-microglobulin, what Tfh and NK
+  cells secrete, RLRs and MAVS, among others); enzyme inhibition sits in both halves.
+- Fundamentals II: high-risk HPV 16 and 18; M. tuberculosis acid-fast; mirabegron a β3 agonist; fluoroquinolones on DNA
+  gyrase; AHA 2021 prophylaxis without clindamycin; several outdated drugs left out.
+- Oral Microbiology: Kaposi sarcoma as HHV-8; localized aggressive periodontitis with its current name.
+- Neuroscience: Wernicke area in the temporal lobe; the rule of 4; amides metabolized in the liver.
+- Cardio & Respiratory: being merged.
+- Renal: GFR 125 mL/min and 180 L/day; NKCC2 in the thick ascending limb; contraction alkalosis; the ion and segment
+  percentages; CKD not High likelihood (above).
+- Heme & Endo: Hashimoto as anti-TPO destruction; pramlintide apart from the alpha-glucosidase inhibitors; hypoglycemia below
+  70 here (Heme & Endo Exam 3 keeps Dr. Taylor's "under 60" from his recording); LCIS as a risk marker.
+- MSK & GI: duodenal papilla as foregut to midgut; the inguinal hernia routes; metoclopramide a D2 antagonist and 5-HT4
+  agonist; Hashimoto as above.
+- Ethics & Professionalism: HCV needlestick risk about 2%; HIV survives poorly outside the body.
+- Evidence-Based Dentistry: false positives from low specificity; what a p-value is; CONSORT.
+- Radiology: the fetal threshold about 0.3 Gy (a guide copy said mGy); contrast and grayscale kept brief, with no question
+  turning on them (the guide says the professor won't ask).
+- Medical Emergencies: the four recordings settled most points; what the professors said they won't test has no questions;
+  normal heart rate 60-100, aspirin held 7-10 days, hemophilia B is factor IX, chest thrusts for a choking infant.
+
+**Graded work:** the earlier courses' quizzes, crosswords and exams that turned up were used as a topic check only; nothing
+was copied or reworded, and this course's own quizzes were never opened. **Not read:** Anki decks (`.apkg`), HEIC photos,
+Quizlet sets behind a login, videos where a transcript existed.
+
+**Also in the PR:** the engine's course groups and two-exam countdown, lecture badges that widen for a label like HN-1, the
+About page, and **Ask Timmy on Haiku 5.5** (Sam: "we can switch timmy to run on haiku"), whose eval is still to run
+([inbox](../inbox.md)). **Left for Sam:** the calls listed in [the inbox](../inbox.md) ("Sam's calls from the build").
