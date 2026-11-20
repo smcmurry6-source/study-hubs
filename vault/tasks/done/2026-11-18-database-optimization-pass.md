@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/444, https://github.com/smcmurry6-source/study-hubs/pull/457, https://github.com/smcmurry6-source/study-hubs/pull/459, https://github.com/smcmurry6-source/study-hubs/pull/470
+pr: https://github.com/smcmurry6-source/study-hubs/pull/444, https://github.com/smcmurry6-source/study-hubs/pull/457, https://github.com/smcmurry6-source/study-hubs/pull/459, https://github.com/smcmurry6-source/study-hubs/pull/470, https://github.com/smcmurry6-source/study-hubs/pull/486
 ---
 
 # The database optimization pass: the same site for less of the Free plan's CPU
@@ -357,13 +357,17 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
     **Failed: 7 of 21,648.** 3 answer saves of 4,706 (0.06%), all at 8:34-8:35 pm Central, statement timeouts at 3 s with
     no heavy query near them: every call was slow that minute (an answer 5.1 s, a card's numbers 2.9 s), so the shared CPU
     stalled. The other 4: a ping (502), and the admin page's `get_exam_debriefs` and `get_data_quality` twice at 7:23-7:25 pm.
+    Against the same hours the evening before the Perio final, read again for its failures (#486): 17 answer saves failed
+    of 7,780 (0.22%) then, 3 of 4,706 (0.06%) now; every server error 29 → 7; **9.0 → 4.6 requests an answer** (69,796
+    over 7,780, 21,648 over 4,706).
   - **`pg_stat_statements`** (no reset since 2026-11-18 20:57 UTC; less the 4:10 am snapshot: **2,102 s in the 27 hours
     since**, phase 2 live from noon): `record_answer_v2` 14,590 calls, 655 s, **31%, 45 ms a call** (106 ms before);
     `get_widget_bootstrap_v2` 884 calls, 443 s, **21%, 500 ms** (the one v84 is for); `get_hub_mastery` 673 calls, 235 s,
     11%, 349 ms; `record_activity_pings` 91 s (4.3%), `record_analytics` 74 s (3.5%), `get_pet_days` 404 calls at 174 ms,
     70 s (3.3%: the old pages' and `pet.js`'s own read, v84's), `get_my_answers` 56 s (2.7%), `record_qh` 52 s (2.5%,
     16 ms a call, from 24), `record_clicks` about 38 s, `record_events` about 23 s, `record_card_v2` 18 s (16 ms, from 56),
-    `record_activity_ping` 16 s, `get_rank_profile_v2` about 13 s.
+    `record_activity_ping` 16 s, `get_rank_profile_v2` about 13 s. **Database time an answer: 224 → 141 ms** (3,795 s over
+    16,964 answers before, about 2,060 s over 14,580 since; #486). The mastery read slower a call (236 → 349 ms): the inbox.
   - **Sizes:** the database **353 MB** (323 MB at noon the day before; Heme & Endo Exam 3's eve and the pings kept 3 days);
     the biggest `personal_answers` 83 MB, `activity_pings` 44, `question_events` 37, `xp_seen` 33, `answer_xp` 27.
     **`xp_seen` 17 + 16 MB** (187,763 rows; 15.9 + 14.8 MB for 180,369 after the noon rewrite): under the inbox's 40 MB.
