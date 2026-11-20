@@ -30,14 +30,13 @@ tags: [widget, supabase]
   is what the old hub pages get. `widget/ranks.js` and `widget/rankup.js` draw a rank past the Handpiece only for a v2 profile (`journey`
   set); `shRanks.art()` without a shape is byte for byte what it was. How it fits together:
   [game-server](game-server.md) and [the journeys](../tasks/done/2026-11-06-redesign-progression-journeys.md).
-- **The trophy case and the cards on the redesign** (phase 4 session 6): `widget/ranks.js` and `widget/rankup.js` are
-  shared with the old single-file hub pages, so what's new there is gated on the `shx` class the redesign's pages put on
-  `<html>` (`NEW`): 27 trophies (the journeys and Bowling in), the cards' new look, and `shRanks.trophyCase()`, which
-  fetches `widget/trophies.js` + `.css` and `widget/hub-art/trophies.js` on first use. An old page keeps the old cards
-  (the smoke test compares their markup) and lists 23 trophies. **Full Arch is retired on every page** (the release):
-  the chart and its switch are gone from `widget/eggs.js`, and someone who won it keeps it as a retired trophy. The
-  `NEW` gates can go now that the last old page has come down (2026-11-19, [inbox](../tasks/inbox.md)).
-  ([the task](../tasks/done/2026-11-12-redesign-trophy-case-and-cards.md))
+- **The trophy case and the cards on the redesign** (phase 4 session 6): `widget/ranks.js` and `widget/rankup.js` hold
+  27 trophies (the journeys and Bowling in), the cards' look and `shRanks.trophyCase()`, which fetches
+  `widget/trophies.js` + `.css` and `widget/hub-art/trophies.js` on first use. Until 2026-11-20 this was gated on the `shx`
+  class (`NEW`) so the old single-file hub pages kept the old cards and 23 trophies; with those pages down, the gates
+  came out (CSS selectors that start `html.shx` still match, since every page sets it). **Full Arch is retired on every
+  page** (the release): the chart and its switch are gone from `widget/eggs.js`, and someone who won it keeps it as a
+  retired trophy. ([the task](../tasks/done/2026-11-12-redesign-trophy-case-and-cards.md))
 - **Everyone has Timmy** (the release): `widget/pet.js` has no adoption, introduction or holiday outfits any more. He is
   on every page from the first visit and wears only what is on at his place (`fit()`; on an old hub's page, the outfit
   kept on the device, or nothing). `FULL_FROM` in `pet.js` is the release day: a Timmy first met from then on starts at

@@ -89,7 +89,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   misses all right, an idea of yours marked done on the idea board, the first day back after a week away. Each would be one
   `xp_awards` row with a key that pays once and an amount in `sh_prizes()` ([game-server](../reference/game-server.md)).
   (Studying's rate was raised to 5 crowns per 10 XP the same day, Sam: "lets increase it to 5 crowns per 10xp".)
-- [ ] **After the redesign's release: what the old pages still hold up** (2026-11-13, [the release](done/2026-11-06-redesign-release.md)).
+- [x] **After the redesign's release: what the old pages still hold up** (2026-11-13, [the release](done/2026-11-06-redesign-release.md)).
   **The last single-file hub pages came down 2026-11-19** (Sam: "lets go ahead and take down all old pages"), so this can
   start: take out the `NEW` (`html.shx`)
   branches in `widget/ranks.js` and `widget/rankup.js` (the old cards, the 23-trophy list), the old house picture and
@@ -98,7 +98,19 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   and any separate widget file or the full client (`widget/vendor/supabase-2.117.2.js`) that `grep` finds no page loading
   by name (`review/` keeps the full client). The sources of a bundle are never deleted. `legacy` goes only with the
   `dash.js` code that reads it (it tells the dashboard a hub has no `content/`). Also the old pages' leftovers in
-  `tools/ci/smoke.js` (`WHY_EXEMPT` and the other exemption sets, the `OLD` hub's checks, the old cards' markup check).
+  `tools/ci/smoke.js` (`WHY_EXEMPT` and the other exemption sets, the `OLD` hub's checks, the old cards' markup check). (#496)
+- [ ] **What the old pages' cleanup left** (2026-11-20, from #496; none of it changes what students see):
+  (1) `widget/hub-art/<hub>.js` for the hubs whose pages came down (`generic`, `heme-endo-exam2`, `heme-endo-exam3`, `occlusion`,
+  `pcd-implants-exam1`, `perio`, `special-patient-care`): `tools/figures/site/build.mjs` writes one for every hub in its list
+  and no page loads them; trim its list, keeping what the dashboard's art (`hub-art/dash.js`) and the recaps still need.
+  (2) Every CSS rule that starts `html.shx` (`widget/hub.css`, `trophies.css`, `study-modes.css`, `dash.css` and others;
+  every page sets the class now) could lose the prefix, with a screenshot check of the dashboard and a hub.
+  (3) Options that are now always on: `widget/pet.js`'s `live` and `widget/replies.js`'s `v2` (the dashboard passes true),
+  with their branches for a database without the game layer, and the preview's answers to the non-`_v2` calls nothing sends
+  any more (`tools/preview/runtime/preview.js`). (4) The tools' old-page branches: `tools/release/a11y.js` (an old hub's
+  modes), `tools/release/lib.js`, `tools/ci/cases.js` and `tools/ci/preview.js` (the single-file case), and the line in
+  `AGENTS.md` and [verify-before-pushing](../how-to/verify-before-pushing.md) about keeping `window.SH_EXPORT = {` last in an
+  old hub's script.
 - [ ] **The hubs' own arcade lobby, never shown on the engine** (2026-11-19, found retesting BUG-012): More's Arcade on a hub on
   the engine draws its own lobby (`moreArcade()` in `widget/hub.js`) and opens a game on its stage, so the lobby inside a hub's
   `content/arcade.js` (`lobby()` in Perio's, with the `.ar-board-tabs` boards; Heme & Endo Exam 3's has `.ar-board-grid`) looks

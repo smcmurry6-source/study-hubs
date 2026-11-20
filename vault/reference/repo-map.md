@@ -30,8 +30,8 @@ tags: [map]
   `widget/site.bundle.css`: [bundles](bundles.md)) on the hub engine's design system (`widget/hub.css`), with
   `widget/hub-art/dash.js` (every hub's emblem and tint, from `tools/figures/site/build.mjs`).
 - `hubs.js` — the dashboard's hubs (`window.SH_DASH_DATA`), **edited by hand**: every hub with a card (its class, title,
-  exams and dates, what it covers), the archived ones kept for their recaps, the archive hours, short names, and
-  `legacy`, the hubs still on an old single-file page. **Add, date or archive a hub here.** Read by the dashboard, the
+  exams and dates, what it covers), the archived ones kept for their recaps, the archive hours and short names
+  (`legacy` and `modes` came out 2026-11-20). **Add, date or archive a hub here.** Read by the dashboard, the
   admin page and the tools (`tools/release/lib.js` `hubData()`).
   The dashboard's drawn parts are kits the page draws at its own size: `widget/hub-art/class.js`
   (the studying-now classroom, the leaderboard's stage and the recap's bar graph and crowd, from `classroom.mjs`,
@@ -62,10 +62,12 @@ tags: [map]
   later try; `tools/ci/statements.js` checks it on every item, and Ask Timmy's `inOrder()` matches it). The
   page loads them as one built file, `widget/hub.bundle.js`, and the stylesheet as `widget/site.bundle.css` (the next
   entry).
-- `hubs/<hub-id>/index.html` alone — **an old single-file hub** (the ones archived before the release, listed under
-  `legacy` in `hubs.js`): the page holds everything and is its own source. They load `widget/v3.js` and the rest by
-  name. No new hub is built this way. **None is on the site since 2026-11-19** (Sam took the last six down);
-  `legacy` still lists them, so the dashboard never looks for engine content they never had.
+- `hubs/<hub-id>/index.html` alone — **an old single-file hub** (the ones archived before the release): the page held
+  everything and was its own source, loading `widget/v3.js` and the rest by name. No new hub is built this way. **None is
+  on the site since 2026-11-19** (Sam took the last six down), and what the shared code kept for them came out
+  2026-11-20 (the old cards and 23-trophy list, the house picture, the fallbacks to the calls from before the game layer,
+  `legacy` in `hubs.js`, the smoke test's old-hub walk). An idea from such a hub's exam check-in, which the server
+  can't file under a hub it holds no answer keys for, goes in as an idea for all hubs (`widget/ideas.js`).
 - `tools/bundle/` and `widget/*.bundle.*` — what the dashboard and a hub on the engine load instead of one request per widget file
   ([bundles](bundles.md)): `bundles.json` lists each bundle's sources, `build.mjs` writes `widget/hub.bundle.js`,
   `dash.bundle.js`, `rest.bundle.js`, `hub-rest.bundle.js` and `site.bundle.css` (**generated and committed**: edit the

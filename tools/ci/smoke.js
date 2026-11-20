@@ -48,18 +48,13 @@ const { hubs, why: hubsWhy } = pickHubs();
 const PART = process.env.SMOKE_PART || '';
 if (PART && !['desktop', 'phone'].includes(PART)) { console.error(`SMOKE_PART must be desktop or phone, not "${PART}"`); process.exit(1); }
 console.log(`Smoke test: ${hubsWhy}${PART ? `, the ${PART} half` : ''}`);
-/* Two kinds of hub. A hub on the engine (widget/hub.js: its page is settings, its content is in hubs/<id>/content/)
-   and an old single-file hub (everything in hubs/<id>/index.html, with widget/v3.js): each has its own walk below. */
-const isEngine = h => fs.existsSync(path.join(root, 'hubs', h, 'content', 'core.json'));
-const engineHubs = hubs.filter(isEngine), oldHubs = hubs.filter(h => !isEngine(h));
-/* an old hub for the checks that an old page gets nothing of the engine's: Heme & Endo Exam 2 when it is picked (the
-   last one built), else the first */
-const OLD = oldHubs.includes('heme-endo-exam2') ? 'heme-endo-exam2' : oldHubs[0] || null;
+/* Every hub is on the engine (widget/hub.js: its page is settings, its content is in hubs/<id>/content/). The old
+   single-file hub pages came down 2026-11-19, and their walk and checks with them. */
+const engineHubs = hubs;
 const content = (h, f) => path.join(root, 'hubs', h, 'content', f);
 /* The dashboard and the engine's hubs load bundles (tools/bundle/build.mjs, tools/bundle/bundles.json): the engine as
    one deferred script with the page, the shared widgets and a hub's own widget layer once it is drawn, and one
-   stylesheet. A page that asks for a file one of its bundles carries has lost the bundle; an old single-file hub
-   never asks for a bundle. */
+   stylesheet. A page that asks for a file one of its bundles carries has lost the bundle. */
 const BUNDLES = JSON.parse(fs.readFileSync(path.join(root, 'tools/bundle/bundles.json'), 'utf8'));
 const inBundle = out => { const b = BUNDLES.scripts[out] || {}; return [...(b.css || []), ...(b.run || []), ...(b.hold || [])]; };
 const SHEET = Object.keys(BUNDLES.styles)[0];
@@ -359,33 +354,19 @@ async function stub(context){
     .observe(document, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] }); } catch (e) {} });
 }
 
-/* matching items allowed to repeat an answer because that hub grades matches by answer text (perio, since 2026-09-29) */
-const SAME_ANSWER_OK = new Set(['perio:q4-L27']);
 /* every multiple-choice and select-all question explains each of its choices (q.why, one line per choice, same order;
-   Sam's standing rule, 2026-10-20). Hubs archived before the rule are exempt: their exams are over. */
-const WHY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
+   Sam's standing rule, 2026-10-20). (The hubs exempted from this and the rules below came down with their pages, 2026-11-19.) */
 /* every taught lecture's questions include two-statement and true/false items (Sam's standing rule, 2026-10-22;
    vault/rules/two-statement-and-true-false.md) and numbered-statement items (2026-10-28;
-   vault/rules/numbered-statements.md). Archived hubs are exempt, and so are the perio sessions taught before the rules (its engine has neither
-   true/false nor numbered items yet): a lecture taught after them, in any live or new hub, needs all three formats. */
-const FORMAT_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
-const FORMAT_GRANDFATHERED = new Set(['perio:diagnosis-tx-planning', 'perio:incisions-flaps-sutures', 'perio:risk-assessment', 'perio:phase1-therapy', 'perio:resective-furcation']);
+   vault/rules/numbered-statements.md): every taught lecture needs all three formats. */
 const FORMAT_MIN = { '2stmt': 3, tf: 5, numbered: 2 };
 /* "Which statement is true?" (fmt 'which': one true, three false) and "Which statement is false?" (fmt 'whichf': one false,
    three true): Sam's standing rule, 2026-11-10 (vault/rules/which-statement-questions.md). Every lecture taught after it
-   needs at least one of each. Hubs archived before the rule are exempt, and so are the lectures already taught then
-   (Occlusion's midterm lectures, Heme & Endo Exam 2's Exam 1 Refresher, Perio's sessions through Session 9). */
+   needs at least one of each. */
 const WHICH_MIN = { which: 1, whichf: 1 };
-const WHICH_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3', 'heme-endo-exam1', 'pcd-implants-exam1']);
-const WHICH_GRANDFATHERED = new Set(['occlusion:review', 'occlusion:anatomy', 'occlusion:function', 'occlusion:concepts', 'occlusion:applying',
-  'heme-endo-exam2:refresh', 'perio:diagnosis-tx-planning', 'perio:incisions-flaps-sutures', 'perio:risk-assessment', 'perio:phase1-therapy',
-  'perio:resective-furcation', 'perio:implants-perio', 'perio:antibiotics-host-mod', 'perio:perio-plastic-esthetics']);
 /* High Likelihood Exam Questions (Sam's standing rule, 2026-10-30; vault/rules/high-likelihood-topics.md):
    every lecture with questions has at least one LIKELY_TOPICS entry, so a lecture added to a hub is ranked too, and every
-   topic's ids exist in that lecture. Archived hubs from before the rule are exempt, and so are lectures whose exam is over
-   while the hub stays up for a later one (Occlusion's midterm lectures; the final isn't cumulative). */
-const LIKELY_EXEMPT = new Set(['msk-exam3', 'msk-exam4', 'pcd-exam3']);
-const LIKELY_SKIP = new Set(['occlusion:review', 'occlusion:anatomy', 'occlusion:function', 'occlusion:concepts', 'occlusion:applying']);
+   topic's ids exist in that lecture. */
 const FORMAT_NAME = { '2stmt': 'two-statement', tf: 'true/false', numbered: 'numbered-statement', which: '"which statement is true"', whichf: '"which statement is false"' };
 const TWO_CHOICES = ['Both statements are true', 'Both statements are false', 'Statement 1 is true; statement 2 is false', 'Statement 1 is false; statement 2 is true'];
 /* Question ids are permanent (vault/rules/question-ids-are-permanent.md): class data, reports, pins and question health
@@ -449,7 +430,7 @@ function lint(hub, A){
       const low = ch.map(c => String(c).trim().toLowerCase()); if (new Set(low).size !== low.length) problems.push(`${hub}: ${q.id} has duplicate choices`);
     }
     if (q.type !== 'recall' && !String(q.ex || '').trim()) problems.push(`${hub}: ${q.id} has no explanation`);
-    if ((q.type === 'mcq' || q.type === 'multi') && !WHY_EXEMPT.has(hub)) {
+    if (q.type === 'mcq' || q.type === 'multi') {
       const w = q.why || [];
       if (w.length !== (q.choices || []).length || w.some(x => !String(x || '').trim())) problems.push(`${hub}: ${q.id} needs a why for every choice (q.why: ${w.length} of ${(q.choices || []).length}; add its row to QUESTION_WHY)`);
     }
@@ -457,7 +438,7 @@ function lint(hub, A){
       /* two items with the same answer: grading by index marks the other copy wrong (perio q4-L27, LESSONS.md) */
       ['left', 'right'].forEach((side, k) => {
         const vals = (q.pairs || []).map(p => String(p[k]).trim().toLowerCase());
-        if (new Set(vals).size !== vals.length && !SAME_ANSWER_OK.has(`${hub}:${q.id}`)) problems.push(`${hub}: ${q.id} matching has the same ${side}-hand item twice (give each pair a distinct answer)`);
+        if (new Set(vals).size !== vals.length) problems.push(`${hub}: ${q.id} matching has the same ${side}-hand item twice (give each pair a distinct answer)`);
       });
     }
     if (q.fmt === '2stmt') {
@@ -487,7 +468,7 @@ function lint(hub, A){
     if (q.type === 'sequence' && (q.steps || []).length > 5) longItems.push(`${q.id} (${q.steps.length} steps)`);
     if (q.type === 'multi' && (q.choices || []).length > 6) longItems.push(`${q.id} (${q.choices.length} options)`);
   });
-  if (!LIKELY_EXEMPT.has(hub)) {
+  {
     const T = A.LIKELY_TOPICS;
     if (!Array.isArray(T)) problems.push(`${hub}: no LIKELY_TOPICS (High Likelihood Exam Questions; copy it from review-of-systems)`);
     else {
@@ -495,12 +476,12 @@ function lint(hub, A){
       T.forEach(t => (t.ids || []).forEach(id => { const q = byId.get(id);
         if (!q) problems.push(`${hub}: LIKELY_TOPICS "${t.t}" lists unknown question ${id}`);
         else if (q.lec !== t.lec) problems.push(`${hub}: LIKELY_TOPICS "${t.t}" (${t.lec}) lists ${id}, which is in ${q.lec}`); }));
-      L.forEach(l => { if (LIKELY_SKIP.has(`${hub}:${l.id}`) || !Q.some(q => q.lec === l.id)) return;
+      L.forEach(l => { if (!Q.some(q => q.lec === l.id)) return;
         if (!T.some(t => t.lec === l.id && (t.ids || []).length)) problems.push(`${hub}: lecture ${l.id} has no High Likelihood topics (add its LIKELY_TOPICS entries, ranked by hints and reviews)`); });
     }
   }
   if (longItems.length) notes.push(`${hub}: heads-up, long ordering/select-all items score very low (LESSONS.md): ${longItems.join(', ')}`);
-  if (!FORMAT_EXEMPT.has(hub)) {
+  {
     /* A hub of many courses (its lectures have a group: Review of Systems) counts the formats per course, not per lecture
        (Sam, 2026-11-19: "Mostly board-style": the special formats per course, the rest single-best-answer and patient boxes) */
     const units = L.some(l => l.group)
@@ -509,10 +490,9 @@ function lint(hub, A){
     units.forEach(u => {
       const l = u.l || { id: u.id };
       const lq = Q.filter(q => u.lecs.includes(q.lec));
-      if (!lq.length || (l.status && l.status !== 'taught') || FORMAT_GRANDFATHERED.has(`${hub}:${l.id}`)) return;
+      if (!lq.length || (l.status && l.status !== 'taught')) return;
       Object.keys(FORMAT_MIN).forEach(f => { const n = lq.filter(q => q.fmt === f).length;
         if (n < FORMAT_MIN[f]) problems.push(`${hub}: ${u.what} ${l.id} has ${n} ${FORMAT_NAME[f]} questions (needs at least ${FORMAT_MIN[f]}; see vault/rules/${f === 'numbered' ? 'numbered-statements' : 'two-statement-and-true-false'}.md)`); });
-      if (WHICH_EXEMPT.has(hub) || WHICH_GRANDFATHERED.has(`${hub}:${l.id}`)) return;
       Object.keys(WHICH_MIN).forEach(f => { const n = lq.filter(q => q.fmt === f).length;
         if (n < WHICH_MIN[f]) problems.push(`${hub}: ${u.what} ${l.id} has ${n} ${FORMAT_NAME[f]} questions (needs at least ${WHICH_MIN[f]}; see vault/rules/which-statement-questions.md)`); });
     });
@@ -724,54 +704,6 @@ function lint(hub, A){
       if (outside.length) problems.push(`${name}: the page asked Google Fonts for ${[...new Set(outside)].join(', ')}; the redesign's one typeface is self-hosted`);
       ownFiles('dashboard', label, 'dash', askedFiles);
       notes.push(`${name}: ${tabs.length} hub tabs, the class board, Settings, the name dialog and the menu`);
-      await page.close();
-    }
-    // the old single-file hubs: every mode tab and its sub-tabs, and the arcade's games
-    for (const hub of oldHubs) {
-      const page = await context.newPage(); const errs = [];
-      page.on('pageerror', e => errs.push(e.message));
-      /* an old hub loads its widget files by themselves, as it always has: never a bundle */
-      const liveBundles = []; page.on('request', r => { if (/\.bundle\.(js|css)/.test(r.url())) liveBundles.push(widgetFile(r.url())); });
-      if (!vp.isMobile) await page.route(`**/hubs/${hub}/index.html`, async route => {
-        const r = await route.fetch(); let h = await r.text(); const i = h.lastIndexOf('window.SH_EXPORT = {');
-        if (i > 0) h = h.slice(0, i) + 'window.__CI = { QUESTIONS: typeof QUESTIONS!=="undefined"?QUESTIONS:[], LECTURES: typeof LECTURES!=="undefined"?LECTURES:[], READINGS: typeof READINGS!=="undefined"?READINGS:{}, READINGS_PLAIN: typeof READINGS_PLAIN!=="undefined"?READINGS_PLAIN:{}, LIKELY_TOPICS: typeof LIKELY_TOPICS!=="undefined"?LIKELY_TOPICS:undefined };\n' + h.slice(i);
-        route.fulfill({ response: r, body: h });
-      });
-      await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(800);
-      // a hub whose last exam has passed opens "This hub is archived" over the page; close it like a student would. It waits
-      // for the database's bootstrap (up to 3 s, widget/v3.js), so on an archived hub wait for it rather than try once. A hub on
-      // the engine sets SH_EXPORT (its exams) only once its content JSON has loaded, so wait for that first (Occlusion, 2026-11-17)
-      await page.waitForFunction(() => window.SH_EXPORT && window.SH_EXPORT.exams, null, { timeout: 5000 }).catch(() => {});
-      const archivedNow = await page.evaluate(() => { const E = window.SH_EXPORT || {}; let last = null;
-        [...(E.exams || []), ...(E.archiveOn && E.archiveOn.date ? [Object.assign({}, E.archiveOn, { archiveHour: E.archiveOn.hour })] : [])].forEach(x => {
-          const p = String((x && x.date) || '').split('-').map(Number); if (p.length !== 3 || !p[0]) return;
-          const d = new Date(p[0], p[1] - 1, p[2], x.archiveHour != null ? x.archiveHour : 22); if (!last || d > last) last = d; });
-        return !!(last && new Date() >= last); }).catch(() => false);
-      await page.click(".sh-archived-stay", { timeout: archivedNow ? 5000 : 1000 }).catch(() => {});
-      if (!vp.isMobile) { const A = await page.evaluate(() => window.__CI); if (A) lint(hub, A); else problems.push(`${hub}: could not read its question data (is window.SH_EXPORT still set at the end of the script?)`); }
-      const modes = await page.$$eval('#modeSwitch [data-mode]', bs => bs.map(b => b.getAttribute('data-mode')));
-      if (liveBundles.length || await page.evaluate(() => !!window.SH_BUNDLE)) problems.push(`${hub} (${label}): an old single-file hub loaded a bundle (${liveBundles.join(', ') || 'window.SH_BUNDLE'}); only the dashboard and the engine's hubs do`);
-      /* and its 8-bit code still asks Google Fonts for the pixel face, as it always has */
-      if (!vp.isMobile && hub === oldHubs[0]) {
-        await page.waitForFunction(() => !!window.shEggHooks && !!document.querySelector('script[src*="eggs.js"]'), null, { timeout: 8000 }).catch(() => {}); await page.waitForTimeout(600);
-        const e8 = await eightBit(page);
-        if (!e8.on || e8.tag !== 'LINK' || !/fonts\.googleapis\.com\/css2\?family=VT323/.test(e8.href)) problems.push(`${hub} (${label}): an old hub's 8-bit code changed (8-bit mode ${e8.on ? 'on' : 'did not start'}, <${e8.tag.toLowerCase() || 'nothing'}> ${e8.href})`);
-      }
-      let screens = 0;
-      for (const m of modes) {
-        await page.click(`#modeSwitch [data-mode="${m}"]`); await page.waitForTimeout(250); screens++;
-        const subs = await page.$$eval(`[data-mode-panel="${m}"] .subtabs button, [data-mode-panel="${m}"] #compendium-subnav button`, bs => bs.map((b, i) => i));
-        for (const i of subs) { await page.click(`:is([data-mode-panel="${m}"] .subtabs button, [data-mode-panel="${m}"] #compendium-subnav button) >> nth=${i}`).catch(() => {}); await page.waitForTimeout(200); screens++;
-          const w = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth); if (w > 1) problems.push(`${hub} (${label}): ${m} tab ${i + 1} scrolls sideways by ${w}px`); }
-        if (m === 'arcade') {
-          const games = await page.$$eval('#panel-arcade .ar-grid [data-game]', bs => [...new Set(bs.map(b => b.getAttribute('data-game')))]);
-          for (const g of games) { await page.click(`#panel-arcade .ar-grid [data-game="${g}"]`).catch(() => {}); await page.waitForTimeout(250);
-            const s = await page.$('#panel-arcade [data-start]'); if (s) await s.click().catch(() => {}); await page.waitForTimeout(400);
-            const back = await page.$('#panel-arcade [data-back]'); if (back) await back.click().catch(() => {}); await page.waitForTimeout(150); screens++; }
-        }
-      }
-      errs.forEach(e => problems.push(`${hub} (${label}): JavaScript error: ${e}`));
-      notes.push(`${hub} (${label}): clicked through ${screens} screens`);
       await page.close();
     }
     // the hubs on the engine: the four views, then every page in More and every set of questions
@@ -1242,21 +1174,7 @@ function lint(hub, A){
         errs.forEach(e => problems.push(`${name} (${label}, the lane): JavaScript error: ${e}`));
         await page.close();
       }
-      if (!vp.isMobile && OLD) { /* an old single-file hub: no counter, no file */
-        const { page, errs, asked } = await fresh();
-        await page.goto(BASE() + `hubs/${OLD}/index.html`); await page.waitForTimeout(1500);
-        await page.click('.sh-archived-stay', { timeout: 1000 }).catch(() => {});
-        await page.evaluate(h => { localStorage.setItem('sh_bowl_run', '49'); localStorage.removeItem('sh_bowl_today');
-          const t = document.querySelector('script[data-answered-event]');
-          document.dispatchEvent(new CustomEvent(t ? t.getAttribute('data-answered-event') : h + ':answered', { detail: { qid: 'smoke-bowl', correct: true } })); }, OLD);
-        await page.waitForTimeout(1800);
-        const live = await page.evaluate(() => ({ run: localStorage.getItem('sh_bowl_run'), api: !!window.shBowl, today: localStorage.getItem('sh_bowl_today') }));
-        if (asked.length || live.api || live.run !== '49' || live.today) problems.push(`${OLD} (${label}): an old single-file hub should have no bowling counter and fetch neither file (${JSON.stringify(live)}, ${asked.join(', ')})`);
-        await clean(page);
-        errs.forEach(e => problems.push(`${OLD} (${label}, the bowling egg): JavaScript error: ${e}`));
-        await page.close();
-      }
-      notes.push(`${name} (${label}): the run, a strike, a retry, a miss, the turkey, the mock, eggs off, Focus mode${vp.isMobile ? '' : ', reduced motion, the lane and an old hub'}`);
+      notes.push(`${name} (${label}): the run, a strike, a retry, a miss, the turkey, the mock, eggs off, Focus mode${vp.isMobile ? '' : ', reduced motion and the lane'}`);
     }
     /* Timmy's shop (phase 4, part B: widget/shop.js, its art widget/hub-art/shop.js and the place's kit). On the game
        layer, with a made-up shop in the bootstrap and buy_item stubbed here (nothing is recorded): More has the Shop
@@ -1458,7 +1376,7 @@ function lint(hub, A){
       notes.push(`${name} (${label}): the "Study as" toggle, a Learn question and a flashcard turned over and rated`);
       await page.close();
     }
-    /* the new dashboard's "you" card: the place takes the house picture's spot once Timmy is adopted. The page is at its
+    /* the dashboard's "you" card: the place is drawn over a blank frame (the old house picture's spot). The page is at its
        request budget, so nothing of the place loads with it; the place draws on first use and keeps a still, and the
        next visit shows that still at once, still without a request. */
     {
@@ -1468,15 +1386,15 @@ function lint(hub, A){
       await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); localStorage.setItem('sh_tour_done', '1'); } catch (e) {} });
       await page.goto(BASE() + 'index.html'); await page.waitForTimeout(2500);
       const before = await page.evaluate(() => { const s = document.querySelector('#petHome .shpet-scene'); return { scene: !!s, place: !!(s && s.classList.contains('has-place')), house: !!(s && s.querySelector('.shpet-housesvg')) }; });
-      if (!before.scene || !before.house) problems.push(`${name} (${label}): the "you" card should show Timmy's house for an adopted Timmy (${JSON.stringify(before)})`);
+      if (!before.scene || !before.house) problems.push(`${name} (${label}): the "you" card should hold the blank frame the place is drawn over (${JSON.stringify(before)})`);
       if (asked.length) problems.push(`${name} (${label}): the place's files loaded with the dashboard (${asked.join(', ')}): the page is at its request budget, they load on first use`);
       await page.evaluate(() => window.dispatchEvent(new Event('scroll')));
       const live = await page.waitForSelector('#petHome .shpet-scene.has-place .tpc.is-live', { timeout: 20000 }).catch(() => null);
-      if (!live) problems.push(`${name} (${label}): the place didn't take the house picture's spot after the first scroll`);
+      if (!live) problems.push(`${name} (${label}): the place didn't take the frame's spot after the first scroll`);
       else {
         const d = await page.evaluate(() => { const s = document.querySelector('#petHome .shpet-scene'), h = s.querySelector('.shpet-housesvg'), b = s.querySelector('.shpet-btn');
           return { house: h ? getComputedStyle(h).display : '', timmy: b ? getComputedStyle(b).display : '', info: !!document.querySelector('#petHome .shpet-info [data-joke]'), w: document.documentElement.scrollWidth - innerWidth }; });
-        if (d.house !== 'none' || d.timmy !== 'none' || !d.info) problems.push(`${name} (${label}): with the place drawn, the old house picture and its Timmy step aside and his name, HP and buttons stay (${JSON.stringify(d)})`);
+        if (d.house !== 'none' || d.timmy !== 'none' || !d.info) problems.push(`${name} (${label}): with the place drawn, the frame and its Timmy step aside and his name, HP and buttons stay (${JSON.stringify(d)})`);
         if (d.w > 1) problems.push(`${name} (${label}): the dashboard with the place scrolls sideways by ${d.w}px`);
         asked = [];
         await page.reload(); await page.waitForTimeout(2500);
@@ -1705,27 +1623,6 @@ function lint(hub, A){
       errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
       notes.push(`${name} (${label}): rows as buttons, a visit, the plain line, focus back, the tour, a random visit from the whole class (and the board's rows before the release), both boards`);
       await page.close();
-      /* without the game layer: today's boards, no keys, no buttons */
-      const p2 = await context.newPage(); const e2 = [];
-      p2.on('pageerror', e => e2.push(e.message));
-      await p2.addInitScript(() => { try { localStorage.setItem('sh_tour_done', '1'); } catch (e) {} });
-      await p2.route(/supabase\.co\/rest\/v1\/rpc\/[a-z_]+_v2/, route => json(route, { code: 'PGRST202', message: 'Could not find the function' }, 404));
-      await p2.route(/supabase\.co\/rest\/v1\/rpc\/get_rank_board(\?|$)/, route => json(route, board.map(r => { const o = Object.assign({}, r); delete o.visit; delete o.journey; delete o.step; return o; })));
-      await p2.goto(BASE() + 'index.html'); await p2.waitForTimeout(2000);
-      await p2.evaluate(() => document.getElementById('class').scrollIntoView());
-      await p2.waitForSelector('#board li', { timeout: 15000 }).catch(() => null); await p2.waitForTimeout(600);
-      const old = await p2.evaluate(() => ({ rows: document.querySelectorAll('#board li').length, buttons: document.querySelectorAll('#board .dx-visit, #board [data-visit]').length, rand: !document.getElementById('visitRand').hidden }));
-      if (!old.rows || old.buttons || old.rand) problems.push(`${name} (${label}): without the game layer no row should be a button, and there's no random visit (${JSON.stringify(old)})`);
-      e2.forEach(e => problems.push(`${name}, without the game layer (${label}): JavaScript error: ${e}`));
-      await p2.close();
-    }
-    for (const hub of OLD ? [OLD] : []) {
-      const page = await context.newPage(); const asked = [];
-      page.on('request', r => { const u = r.url(); if (/\/widget\/(shop\.(js|css)|hub-art\/shop\.js)|rpc\/(get_pet_days_v2|buy_item|get_my_shop|record_costume_sighting)/.test(u)) asked.push(u.replace(/^.*\/(widget|rpc)\//, '')); });
-      await page.addInitScript(() => { try { localStorage.setItem('sh_pet_born', '2026-10-01'); } catch (e) {} });
-      await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(2500);
-      if (asked.length) problems.push(`${hub} (${label}): an old single-file hub asked for the shop (${asked.join(', ')}): it is on the dashboard and the engine's hubs only`);
-      await page.close();
     }
     /* Everyone has Timmy (Ask Timmy, part 4; the only behavior since the redesign's release). widget/pet.js
        is served with its FULL_FROM at today, as a preview serves it (tools/preview/transform.js), so a Timmy met today starts
@@ -1734,7 +1631,7 @@ function lint(hub, A){
        first key (outfits.js never loads with a page), then the outfit, kept on the device; on the next visit he wears it at
        once with no request; with nothing on he wears nothing, on Halloween too; shPet.fit() is the outfit's id; changing
        it in the customizer changes the bar without a reload; More has Timmy's place and the shop. The same first visit on
-       the dashboard has him in the "you" card. An old single-file hub has him the same way, with nothing on. */
+       the dashboard has him in the "you" card. */
     {
       const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago' }).format(new Date());
       /* widget/pet.js by itself (a live page) or inside the bundle the redesign's pages load it from */
@@ -1849,27 +1746,6 @@ function lint(hub, A){
         notes.push(`${name} (${label}): a first visit, in his outfit`);
         await page.close();
       }
-      /* an old single-file hub (they keep their pages until they come down): everyone has Timmy there too. A
-         first-time visitor finds him on the bar with no introduction, born today; he never dresses himself for a
-         holiday, fit() is "" with nothing on, and outfits.js isn't fetched */
-      for (const hub of OLD ? [OLD] : []) {
-        const page = await context.newPage(), errs = [], asked = [], name = `${hub}, everyone has Timmy`;
-        page.on('pageerror', e => errs.push(e.message));
-        page.on('request', r => { if (/\/widget\/hub-art\/outfits\.js/.test(r.url())) asked.push('outfits.js'); });
-        await fresh(page);
-        await page.addInitScript(() => { try { localStorage.setItem('sh_egg_holiday_test', 'halloween'); } catch (e) {} });
-        await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(2500);
-        await page.click('.sh-archived-stay', { timeout: 1000 }).catch(() => {});
-        await page.waitForSelector('.shpet-home .shpet-btn', { timeout: 15000 }).catch(() => {});
-        const t = await bar(page, '.shpet-home .shpet-btn');
-        if (!t.here || !t.on || t.intro || t.perch || t.born !== today) problems.push(`${name} (${label}): a first-time visitor on an old hub should find Timmy on the bar, met today, with no introduction (${JSON.stringify({ here: t.here, on: t.on, intro: t.intro, perch: t.perch, born: t.born })})`);
-        if (t.dressed || t.fit !== '') problems.push(`${name} (${label}): Timmy doesn't dress himself for a holiday any more: nothing on, fit() "" (${JSON.stringify({ dressed: t.dressed, fit: t.fit })})`);
-        if (asked.length) problems.push(`${name} (${label}): an old hub fetched an outfit with nothing on (${asked.join(', ')})`);
-        errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
-        notes.push(`${hub} (${label}): Timmy for a first-time visitor on an old hub, no introduction, no holiday outfit`);
-        await page.evaluate(() => { ['sh_pet_born', 'sh_egg_holiday_test', 'sh_pet_adopt_sent'].forEach(k => localStorage.removeItem(k)); });
-        await page.close();
-      }
     }
     /* The trophy case and the cards on the design system (phase 4, session 6; vault/tasks/2026-11-12-redesign-trophy-case-and-cards.md).
        A new hub on the game layer whose profile won First Hundred, a run of 25, the Tooth Fairy, the Golden Probe and Full
@@ -1880,18 +1756,8 @@ function lint(hub, A){
        drawing; every button has a fixed data-sht; the scoreboard, a card per lecture and the achievements are under it.
        Without Full Arch won there is no Retired shelf. A trophy the device hasn't seen plays the new card (drawn, "New
        trophy", in the rank's metal, "... of 27 in your case") and a tap skips it. On the new dashboard the "you" card opens
-       the case. On an old single-file hub (they keep their pages until they come down): 23 trophies, Full Arch in neither
-       list and no chart after a right answer (it is retired on every page since the release), nothing of the case is
-       fetched, and the trophy, mastery, rank-up and mock cards have the same structure as before that session
-       (LIVE_CARDS: tags, classes but not is-* states, attribute names; captured from main's widget/rankup.js and
-       ranks.js, 2026-11-13). */
+       the case. A card after a level-up card still plays (BUG-116). */
     {
-      const LIVE_CARDS = {
-        "t": "div.sh-ru-lv.sh-ru-tr[aria-label,aria-live,role,style](div.sh-ru-lv-medal[aria-hidden](i.sh-ru-lv-ring[]()i.sh-ru-lv-ring[]()div.sh-ru-lv-coin[](svg[aria-hidden,height,viewBox,width]))div.sh-ru-lv-body[aria-hidden](div.sh-ru-lv-eye[]()span.sh-ru-tr-name.sh-ru-mt[]()div.sh-ru-tr-desc[]())i.sh-ru-lv-shine[aria-hidden]())",
-        "m": "div.sh-ru-lv.sh-ru-tr[aria-label,aria-live,role,style](div.sh-ru-lv-medal[aria-hidden](i.sh-ru-lv-ring[]()i.sh-ru-lv-ring[]()div.sh-ru-lv-coin[](svg[aria-hidden,height,viewBox,width]))div.sh-ru-lv-body[aria-hidden](div.sh-ru-lv-eye[]()span.sh-ru-tr-name.sh-ru-mt[]()div.sh-ru-tr-desc[]())i.sh-ru-lv-shine[aria-hidden]())",
-        "r": "div.sh-ru[aria-label,aria-modal,role,style,tabindex](div.sh-ru-bg[]()canvas.sh-ru-cv[aria-hidden,height,width]()div.sh-ru-fx[aria-hidden](div.sh-ru-fxc[](div.sh-ru-rays[](i[]()i[]())div.sh-ru-halo[style]()))div.sh-ru-stage[](div.sh-ru-in[](div.sh-ru-medal[](div.sh-ru-face.sh-ru-new[style](svg[aria-label,height,role,viewBox,width])div.sh-ru-glare[style]())div.sh-ru-hint[](span[]())div.sh-ru-text[](h2.sh-ru-title[aria-label](span[aria-hidden,style]()span[aria-hidden,style]()span[aria-hidden,style]()span[aria-hidden,style]()span[aria-hidden,style]()span[aria-hidden,style]()span[aria-hidden,style]())div.sh-ru-namewrap[](span.sh-ru-name.sh-ru-mt[]())div.sh-ru-from[](span[](svg[aria-label,height,role,viewBox,width])span.sh-ru-arw[aria-label]()span[](svg[aria-label,height,role,viewBox,width]))ul.sh-ru-unl[](li[style](span.sh-ru-ic[style]()span[](b[]()))li[style](span.sh-ru-ic[style](svg[fill,stroke,stroke-linecap,stroke-linejoin,stroke-width,viewBox])span[](b[]()))li[style](span.sh-ru-ic[](svg[aria-label,height,role,viewBox,width])span[](b[]())))button.sh-ru-go[type]())))div.sh-ru-bars[aria-hidden](i[]()i[]())div.sh-ru-flash[aria-hidden]())",
-        "k": "div.sh-mk[aria-labelledby,aria-modal,role,style,tabindex](div.sh-mk-bg[]()canvas.sh-ru-cv[aria-hidden,height,width]()div.sh-mk-stage[](div.sh-mk-card[](div.sh-mk-eye[]()h2.sh-ru-sr[id]()div.sh-mk-ring[aria-hidden](svg[viewBox]div.sh-mk-num[](b[]()span[]()))div.sh-mk-frac[aria-hidden]()div.sh-mk-verdict[aria-hidden]()div.sh-mk-best[]()ul.sh-mk-lecs[aria-label](li[style](span.l[]()span.b[](i[style]())span.n[]())li[style](span.l[]()span.b[](i[style]())span.n[]())li[style](span.l[]()span.b[](i[style]())span.n[]()))div.sh-mk-actions[](button.sh-mk-go[type]()button.sh-mk-miss[type]()))))"
-      };
       const json = (route, body) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
       const caseFiles = /\/widget\/(trophies\.(js|css)|hub-art\/trophies\.js)(\?|$)/;
       const rank = badges => ({ xp: 2400, journey: 0, tier: 1, level: 2, step: 4, gtier: 1, step_at: 2000, next_at: 3000, tier_at: 1500, steps: 63, answers: 300, correct: 220, days: 12, badges, dark_seen: [], boost: null });
@@ -1962,6 +1828,16 @@ function lint(hub, A){
         await page.goto(BASE() + `hubs/${hub}/index.html#more/stats`); await page.waitForTimeout(1500);
         await page.waitForSelector('.sht .sht-cab', { timeout: 20000 }).catch(() => null);
         if (await page.$('.sht-shelf.is-retired')) problems.push(`${name} (${label}): a Retired shelf showed for someone who never won Full Arch`);
+        /* BUG-116: a card after a level-up card still plays (a local `done` in levelNow's close() once stopped the queue) */
+        await page.evaluate(() => window.shRanks.preview('level', 4, 2));
+        const lv = await page.waitForSelector('.sh-ru-lv:not(.sh-ru-tr)', { timeout: 15000 }).catch(() => null);
+        if (!lv) problems.push(`${name} (${label}): shRanks.preview(level) showed no level-up card`);
+        else {
+          await page.waitForTimeout(1500); await lv.click().catch(() => {});
+          await page.evaluate(() => window.shRanks.preview('tier', 5, 6));
+          if (!(await page.waitForSelector('.sh-ru', { timeout: 8000 }).catch(() => null))) problems.push(`${name} (${label}): after a level-up card no later card played (BUG-116)`);
+          else { await page.waitForTimeout(800); await page.keyboard.press('Escape'); await page.waitForTimeout(900); }
+        }
         await page.close();
         /* a trophy this device hasn't seen yet: the new card, skipped with a tap */
         ({ page, got, errs } = await tpage(['answers-100', 'fairy', 'golden'], 'fairy,golden'));
@@ -2001,52 +1877,6 @@ function lint(hub, A){
         errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
         await page.close();
         notes.push(`${name} (${label}): the "you" card's Trophy case button opens the case`);
-      }
-      /* an old single-file hub: the shared files it still loads behave there as they did, less Full Arch */
-      for (const hub of OLD ? [OLD] : []) {
-        const page = await context.newPage(), errs = [], got = [], name = `${hub}, trophies as before`;
-        page.on('pageerror', e => errs.push(e.message));
-        page.on('request', r => { if (caseFiles.test(r.url())) got.push(r.url().replace(/^.*\/widget\//, '')); });
-        await page.addInitScript(h => { try { ['sh_egg_arch_' + h, 'sh_egg_arch_done_' + h, 'sh_pref_arch', 'sh_pref_eggs', 'sh_pref_pet', 'sh_pref_celebrate', 'sh_pref_focus'].forEach(k => localStorage.removeItem(k));
-          localStorage.setItem('sh_pet_born', '2026-10-01');
-          window.__sig = function sig(el){
-            const cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/).filter(c => c && !/^is-/.test(c)).map(c => '.' + c).join('') : '';
-            const at = [...el.attributes].map(a => a.name).filter(n => n !== 'class').sort().join(',');
-            return el.tagName.toLowerCase() + cls + '[' + at + ']' + (el.tagName.toLowerCase() === 'svg' ? '' : '(' + [...el.children].filter(c => !c.classList.contains('sh-ru-ring')).map(sig).join('') + ')');
-          }; } catch (e) {} }, hub);
-        await page.goto(BASE() + `hubs/${hub}/index.html`); await page.waitForTimeout(2500);
-        await page.click('.sh-archived-stay', { timeout: 1000 }).catch(() => {});
-        await page.waitForFunction(() => window.shRanks && [...document.scripts].some(s => /\/eggs\.js/.test(s.src)), null, { timeout: 15000 }).catch(() => {});
-        for (let i = 0; i < 3; i++) { await page.keyboard.press('Escape'); await page.waitForTimeout(150); }
-        const l = await page.evaluate(() => { const R = window.shRanks; return R ? { n: R.TROPHIES.length, arch: R.TROPHIES.some(t => t.k === 'fullarch'), hub: R.HUB_TROPHIES.some(t => t.k === 'fullarch'), retired: (R.RETIRED || []).length } : null; });
-        if (!l || l.n !== 23 || l.arch || l.hub || l.retired !== 1) problems.push(`${name} (${label}): an old hub's case should hold 23 trophies, Full Arch only in RETIRED (${JSON.stringify(l)})`);
-        await answer(page, 2); await page.waitForTimeout(700);
-        if (await page.$('.sh-egg-arch')) problems.push(`${name} (${label}): the Full Arch chart showed after a right answer (it is retired)`);
-        for (const [k, a, sel] of [['t', ['trophy', 1], '.sh-ru-tr'], ['m', ['mastery', 1], '.sh-ru-tr'], ['r', ['tier', 3], '.sh-ru'], ['k', ['mock', 34, 40], '.sh-mk']]) {
-          await page.evaluate(a => window.shRanks.preview(...a), a);
-          const el = await page.waitForSelector(sel, { timeout: 15000 }).catch(() => null);
-          if (!el) { problems.push(`${name} (${label}): shRanks.preview(${a.join(', ')}) showed no card`); continue; }
-          await page.waitForTimeout(k === 'r' ? 4500 : 1200);
-          const sig = await page.evaluate(sel => window.__sig(document.querySelector(sel)), sel);
-          if (sig !== LIVE_CARDS[k]) problems.push(`${name} (${label}): the ${a[0]} card's markup changed on an old hub:\n      was ${LIVE_CARDS[k]}\n      now ${sig}`);
-          if (k === 'r' || k === 'k') await page.keyboard.press('Escape'); else await el.click().catch(() => {});
-          await page.waitForTimeout(900);
-        }
-        /* BUG-116: a card after a level-up card still plays (a local `done` in levelNow's close() once stopped the queue) */
-        await page.evaluate(() => window.shRanks.preview('level', 4, 2));
-        const lv = await page.waitForSelector('.sh-ru-lv:not(.sh-ru-tr)', { timeout: 15000 }).catch(() => null);
-        if (!lv) problems.push(`${name} (${label}): shRanks.preview(level) showed no level-up card`);
-        else {
-          await page.waitForTimeout(1500); await lv.click().catch(() => {});
-          await page.evaluate(() => window.shRanks.preview('tier', 5, 6));
-          if (!(await page.waitForSelector('.sh-ru', { timeout: 8000 }).catch(() => null))) problems.push(`${name} (${label}): after a level-up card no later card played (BUG-116)`);
-          else { await page.waitForTimeout(800); await page.keyboard.press('Escape'); await page.waitForTimeout(900); }
-        }
-        if (got.length || (await page.$('#sh-trophies-css'))) problems.push(`${name} (${label}): an old hub fetched the trophy case's files (${got.join(', ')})`);
-        errs.forEach(e => problems.push(`${name} (${label}): JavaScript error: ${e}`));
-        await page.evaluate(h => { ['sh_egg_arch_' + h, 'sh_pet_born'].forEach(k => localStorage.removeItem(k)); }, hub);
-        notes.push(`${hub} (${label}): 23 trophies, no Full Arch, the trophy, mastery, rank-up and mock cards as before, and a card after a level-up plays`);
-        await page.close();
       }
     }
     await context.close();
