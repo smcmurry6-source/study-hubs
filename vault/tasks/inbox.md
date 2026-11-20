@@ -33,9 +33,10 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   After Mock 1 (Thu Dec 3, noon), read its exam check-ins (which courses felt heavy, what surprised people) and, before Mock 2
   (Dec 10), move the blueprint toward that, and add High likelihood topics for what the check-ins say came up
   ([hub note](../hubs/review-of-systems.md)).
-- [ ] **Review of Systems: an arcade with its own skin** (2026-11-19, the hub's build): it shipped without one (More hides
+- [ ] ~~**Review of Systems: an arcade with its own skin** (2026-11-19, the hub's build): it shipped without one (More hides
   the tile). Sam's call whether it wants one; if so, its games, names and lobby art are its own
-  ([arcade-skins](../rules/arcade-skins.md)), and the hub comes out of `TEXT_ONLY` in `sw.js`.
+  ([arcade-skins](../rules/arcade-skins.md)), and the hub comes out of `TEXT_ONLY` in `sw.js`.~~ dropped: Sam, 2026-11-20, "No
+  arcade" ([decisions](../decisions.md)).
 - [x] **The engine's background work after Home in small pieces** (2026-11-20, [#480](https://github.com/smcmurry6-source/study-hubs/pull/480)):
   on the performance suite's slowed phone, Review of Systems blocks the page for about 850 ms after Home has drawn (Heme & Endo
   Exam 3: about 330). A CPU profile put the JavaScript in `exportSections()` in `widget/hub.js` (every part's notes parsed into
@@ -44,7 +45,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   cut it on every hub; then lower the hub's `tbt` in `tools/release/budgets.json` (set to 900 from that day's run). Done (#498): the index is built a lecture at a time, `widget/fx.js` measures every bar before animating any (the biggest share, about 370 ms: not in the first profile), `fit()` reads before it writes, the rank pill is fitted once a frame, `fmt()` keeps one formatter. Review of Systems about 920 to 490 ms, `tbt` 900 to 700; Heme & Endo Exam 3 about 430 to 230.
 - [ ] **Review of Systems: Cardio & Respiratory and Renal from their slides** (2026-11-19, the hub's build): their Drive
   folders had the thinnest sources (classmates' guides, no professor slides), so those sections rest most on standard
-  references. If Sam can share their slides or transcripts, check those parts against them.
+  references. If Sam can share their slides or transcripts, check those parts against them. Sam, 2026-11-20: "ill get you the other
+  slides soon": waiting on Sam.
 - [ ] **Run the test-runs data fix once more on 2026-11-21** (2026-11-19, the evening lessons audit): the PR that adds
   `tools/ci/no-leaks.js` runs `tools/data-fixes/2026-11-19-test-runs.sql` after its merge, but a smoke test run locally from a
   branch older than the fix (another session's) still writes its game-layer check into the live hub until that branch takes

@@ -34,9 +34,9 @@ check-in hours: its entry in `hubs.js`.
   and `mock.groups` lists each course's parts. **The spread is this hub's guess** (by the size of each course): the course
   announced no per-course counts. `likelyShare` 0.5.
 - **No narration** (`"audio": "off"`; Sam: "if we need to we can cut the lecture reading for this hub"): Listen reads in the
-  device's voice. **No figures** (Sam: "i dont think we do any figures"), so no diagram review. **No arcade yet:** More hides
-  its tile while `SH_HUB.arcade` has no games ([inbox](../tasks/inbox.md)). No Timmy Time. In `sw.js` it is in `HUBS` and in
-  `TEXT_ONLY` (no figures or arcade files to keep for offline): give it an arcade and take it out of `TEXT_ONLY`.
+  device's voice. **No figures** (Sam: "i dont think we do any figures"), so no diagram review. **No arcade** (Sam, 2026-11-20:
+  "No arcade", [decisions](../decisions.md)): More hides its tile while `SH_HUB.arcade` has no games. No Timmy Time. In `sw.js`
+  it is in `HUBS` and in `TEXT_ONLY` (no figures or arcade files to keep for offline).
 - **Art, its own** ([every-hub-gets-its-own-art](../rules/every-hub-gets-its-own-art.md)), in `tools/figures/site/`: violet
   (`#6b46a8`, a hue no other hub has); the emblem is a checklist on a clipboard with a molar in front; the masthead is a desk
   with a heart chart and a lungs chart on the wall, a lightbox holding a periapical film, books, a molar model, a stethoscope,
