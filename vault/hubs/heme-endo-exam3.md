@@ -112,6 +112,12 @@ entry in `hubs.js`.
   the narration ([archived-hubs-drop-their-audio](../rules/archived-hubs-drop-their-audio.md)).
 - **Quirks:** `SH_HUB` has no `exam` key on purpose: with one, the engine counts only lectures whose `exam` matches, so
   nothing would count. Lecture A's id is `dental` and its label "A".
+- **Skipped points still in the As taught notes, on purpose:** since 2026-11-20 no hub's notes teach what a professor said
+  you don't need ([dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md)). This hub was written under the
+  older rule, so its As taught notes still describe some of them, marked with the professor's words (AML's M0 to M7, the CD
+  markers, the Hodgkin subtypes, the rarely used SERMs, the testicular and ovarian classifications, and the like in seven
+  lectures). Sam, 2026-11-20, the night before its exam: the rule from then on, so they stay until it archives (no
+  re-recording the night before). Its 27 `deemphasize` Exam Hints stay under the rule.
 
 ## Content flags (kept as taught; check when a recording or review lands)
 

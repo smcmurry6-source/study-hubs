@@ -47,7 +47,8 @@ Copy the header comment from the last script and update it (sources, the exam, t
 2. **One segment per lecture or per gland/topic** (`## N. Title`, these become the chapters), 3-6 minutes each, with
    time roughly in proportion to the exam counts. Each one: what the professor said to know (quote `hints.txt` word for
    word and say it's a quote), the facts behind every `likely.txt` topic, the review items' answers explained, the
-   look-alikes the class mixes up, and what was de-emphasized ("you don't need..."). Hooks and mnemonics from the notes.
+   look-alikes the class mixes up, and what was de-emphasized, said only as the professor's "skip this, know that" (never
+   teaching the skipped point: `vault/rules/dont-ask-what-professors-skip.md`). Hooks and mnemonics from the notes.
 3. **Lightning round**: 25-35 one-line questions, `Question? [pause 2.5] Answer.` on one paragraph each (the inline pause
    cues the bell). Cover every lecture.
 4. **Sign-off**: the plan for the night before and the morning of, a lore callback, the exam day (not the time), and
