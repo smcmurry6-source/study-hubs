@@ -100,6 +100,6 @@ note on what it costs), a look at the data, a check after a migration.
 - Numbering a migration, `supabase/schema.sql` and the pending list: the [repo map](../reference/repo-map.md).
 
 Related: [shared-infrastructure](../reference/shared-infrastructure.md) · [the database-load task](../tasks/2026-11-18-database-load.md) ·
-[the optimization pass](../tasks/2026-11-18-database-optimization-pass.md) · [after-a-merge](after-a-merge.md) ·
+[the optimization pass](../tasks/done/2026-11-18-database-optimization-pass.md) · [after-a-merge](after-a-merge.md) ·
 [read-usage-data](read-usage-data.md) · [analytics-governance](../reference/analytics-governance.md) ·
 [learner-data-privacy](../rules/learner-data-privacy.md)

@@ -1,13 +1,13 @@
 ---
 type: task
-status: in-progress
+status: done
 hub: site
 created: 2026-11-18
 requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/444, https://github.com/smcmurry6-source/study-hubs/pull/457, https://github.com/smcmurry6-source/study-hubs/pull/459
+pr: https://github.com/smcmurry6-source/study-hubs/pull/444, https://github.com/smcmurry6-source/study-hubs/pull/457, https://github.com/smcmurry6-source/study-hubs/pull/459, https://github.com/smcmurry6-source/study-hubs/pull/470
 ---
 
 # The database optimization pass: the same site for less of the Free plan's CPU
@@ -19,13 +19,13 @@ plan. Rework only: nothing students see changes, and nothing is cut.
 
 ## Context
 
-- Sam, 2026-11-18, after the evening outage ([database-load](2026-11-18-database-load.md)): "are there any other settings we
+- Sam, 2026-11-18, after the evening outage ([database-load](../2026-11-18-database-load.md)): "are there any other settings we
   can use that would help, or would it be worth doing a pass over with fable to see if the existing database could be
   optimized further. what things are necessary/could be reworked vs cut to optimize". Then: **"dont cut anything for now"**
-  and "i dont want to upgrade the plan. stay free" ([decisions](../decisions.md)). Any model can do this pass; what matters
+  and "i dont want to upgrade the plan. stay free" ([decisions](../../decisions.md)). Any model can do this pass; what matters
   is starting from the numbers below and measuring on a throwaway copy.
 - The project is on Supabase's **Free plan**: shared CPU, 500 MB before read-only
-  ([shared-infrastructure](../reference/shared-infrastructure.md)). Already done: `migration_v71` (two answer indexes),
+  ([shared-infrastructure](../../reference/shared-infrastructure.md)). Already done: `migration_v71` (two answer indexes),
   `migration_v72` (the answer save a quarter as costly), the pages' quiet spell (`widget/v3.js`, `window.shDb`), raw pings
   kept 3 days (`migration_v74`).
 - **Where the database's time went**, `pg_stat_statements` from the restart (about 20:57 UTC) to about 21:30, 2026-11-18,
@@ -133,11 +133,13 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   **Done for phase 1:** `migration_v76.sql` (ideas 1 and 2), `migration_v77.sql` with `widget/v3.js` (idea 3),
   `widget/v3.js` and `widget/dash.js` (idea 4); idea 5 isn't worth doing. What the measuring found and this PR doesn't
   do is the next boxes.
-- [ ] A readout from a busy evening after: the share of database time per call again, and whether any saves failed.
+- [x] A readout from a busy evening after: the share of database time per call again, and whether any saves failed.
   The first evening after the merge with a class studying (Heme & Endo Exam 3's eve, Thu 2026-11-19, if it is merged by
   then): the edge logs any time, `pg_stat_statements` at a quiet hour. The "before" to compare with is in the Log
   (2026-11-19, 4:10 am). Phase 2's `migration_v79.sql` to `v82` went live at 12:10-12:13 pm Central that day (the Log), so
   that evening's numbers have them in too.
+  **Done** 2026-11-20, 2:30 am Central (the Log): 21,648 requests that evening, not 70,000; the answer save 31% of the
+  database's time at 45 ms a call (55% at 106 ms before); 3 saves of 4,706 failed, all in one minute of a CPU stall.
 
 **Phase 2: found by the measuring, each needs more than a `create or replace` (apply after Fri 2026-11-20, 9:30 am, at night):**
 
@@ -155,7 +157,7 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   The rewrite is `cluster ... using activity_visits_pkey` (unlike `vacuum full`, it runs inside the connector's call). Applied
   live and rewritten: the box below. Since `migration_v83.sql` that summary is worked out ahead
   (`sh_visitor_summary`, at most every 15 minutes while the admin page is in use), so a slower scan without the index costs
-  little ([database-load](2026-11-18-database-load.md)).
+  little ([database-load](../2026-11-18-database-load.md)).
 - [x] **The class's numbers on each card** (`question_stats` and `question_choices`, `widget/v3.js`): 20.6% of every
   request and another 14.6% of preflights, two reads a card. (Only 0.5% of the database's time, live: the gain is in
   requests, so it matters when the request limit or the connection count is what's tight.) The answer's reply could carry them (the save has just
@@ -199,7 +201,7 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   added, except by Link my devices, which moves older ones in: then the count doesn't add up and the whole history comes
   back. `get_pet_days` read every answer of the last 70 days to find the one boundary day's; it is bounded by that day's
   end now. Measured: phase 3's Log. Applied live: the next box.
-- [ ] **Apply `migration_v84.sql`** (phase 3) at night (1 to 5 am Central), after #456's `migration_v83.sql` if that goes in
+- [x] **Apply `migration_v84.sql`** (phase 3) at night (1 to 5 am Central), after #456's `migration_v83.sql` if that goes in
   the same night (not at the same time). Fetch `main` first: if v84 was taken, renumber; if `get_widget_bootstrap_v2`,
   `get_my_answers`, `get_pet_days` or `get_pet_days_v2` changed since v82, rebuild on the newer copy. md5-check the four
   live bodies against `supabase/schema.sql` first; then the file through `apply_migration` (one transaction: the
@@ -207,12 +209,13 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   in `pg_proc`, `get_my_answers_since` and the bootstrap through the API as a visitor (200), the edge logs for a minute
   after. Then append it to `supabase/schema.sql` and take its line out of `supabase/pending-migrations.txt`. Until it is
   applied the pages ask as before (they keep no copy: the reply has no `answers_id`).
+  **Done** 2026-11-20, about 2:40 am Central, after #456's v83 (the Log).
 - [x] **`answer_xp` is written twice an answer** (the row, then its reply onto it): one insert at the end would halve
   that table's writes and dead rows. It moves the insert past the speed limit's count, which reads the row, so it needs
   care. **Done: `migration_v80.sql`.** The count joins the row only to leave out mock answers and runs only outside a mock,
   so it counts the answer either way (the file's header); the same replies and rows on the copy. Applied live: the box below.
 - [x] **`xp_seen`'s size**: 52 MB for about 177,000 rows (2026-11-19; the second biggest table after
-  `personal_answers`, 76 MB), found by the ping table's rewrite ([database-load](2026-11-18-database-load.md), its Log). Its
+  `personal_answers`, 76 MB), found by the ping table's rewrite ([database-load](../2026-11-18-database-load.md), its Log). Its
   rows are four short columns, so most of it is likely the primary key's index and space left by Link my devices'
   rebuilds: look at the table's and the index's sizes apart before deciding on a rewrite.
   **Looked at:** the table 29.9 MB and the index 24.8 MB, both about twice what the rows need. **Decided: rewrite it once at
@@ -342,13 +345,53 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   `timmy.js` pass with it pending; `tools/ci/quiet.js`'s `history()` checks the page both ways (with v84: the copy kept,
   the cursor sent, the two new answers in place; without: asked again without the cursor, no copy kept).
 
+- 2026-11-20, 2:30-2:45 am Central (Claude Code, phase 3's night steps, scheduled by the session of #470; read-only
+  first, one query a call under a 5 s limit). Nothing else was running (`pg_stat_activity`); #456's v83 was already in.
+  - **The edge logs, 2026-11-20 00:00-04:00 UTC** (6-10 pm Central, Heme & Endo Exam 3's eve): **21,648 requests** (70,000
+    the evening before Perio's final, a much bigger class night), 1,562 of them preflights (7%, from about 30%).
+    `record_answer_v2` 4,706 (21.7%; median 105 ms, 95th percentile 313 ms, from 125 and 870), `get_class_numbers` 4,603
+    (21.3%: the card's one read, where `question_stats` and `question_choices` were 20.6% as two), `record_analytics` 3,640
+    (16.8%: the three batches, 14.8% as three calls before), `record_activity_pings` 3,159 (14.6%; `record_activity_ping`
+    was 18.3%), `record_card_v2` 601, the changelog 449 (2.1%, from 5.1%), `get_my_answers` 349,
+    `get_widget_bootstrap_v2` 228 (median 574 ms, 95th percentile 1.7 s), `get_hub_mastery` 77 (median 709 ms).
+    **Failed: 7 of 21,648.** 3 answer saves of 4,706 (0.06%), all at 8:34-8:35 pm Central, statement timeouts at 3 s with
+    no heavy query near them: every call was slow that minute (an answer 5.1 s, a card's numbers 2.9 s), so the shared CPU
+    stalled. The other 4: a ping (502), and the admin page's `get_exam_debriefs` and `get_data_quality` twice at 7:23-7:25 pm.
+  - **`pg_stat_statements`** (no reset since 2026-11-18 20:57 UTC; less the 4:10 am snapshot: **2,102 s in the 27 hours
+    since**, phase 2 live from noon): `record_answer_v2` 14,590 calls, 655 s, **31%, 45 ms a call** (106 ms before);
+    `get_widget_bootstrap_v2` 884 calls, 443 s, **21%, 500 ms** (the one v84 is for); `get_hub_mastery` 673 calls, 235 s,
+    11%, 349 ms; `record_activity_pings` 91 s (4.3%), `record_analytics` 74 s (3.5%), `get_pet_days` 404 calls at 174 ms,
+    70 s (3.3%: the old pages' and `pet.js`'s own read, v84's), `get_my_answers` 56 s (2.7%), `record_qh` 52 s (2.5%,
+    16 ms a call, from 24), `record_clicks` about 38 s, `record_events` about 23 s, `record_card_v2` 18 s (16 ms, from 56),
+    `record_activity_ping` 16 s, `get_rank_profile_v2` about 13 s.
+  - **Sizes:** the database **353 MB** (323 MB at noon the day before; Heme & Endo Exam 3's eve and the pings kept 3 days);
+    the biggest `personal_answers` 83 MB, `activity_pings` 44, `question_events` 37, `xp_seen` 33, `answer_xp` 27.
+    **`xp_seen` 17 + 16 MB** (187,763 rows; 15.9 + 14.8 MB for 180,369 after the noon rewrite): under the inbox's 40 MB.
+  - **`migration_v84.sql` applied** (about 2:40 am, `apply_migration` as `v84_bootstrap_answers_since`, one transaction).
+    Before: the live `get_widget_bootstrap_v2`, `get_my_answers`, `get_pet_days`, `get_pet_days_v2` and `name_shared`
+    (v87's, which the bootstrap calls) matched `supabase/schema.sql` (md5; v85-v87 changed none of the four). After: all
+    seven bodies match a throwaway copy with v84 (md5), one `get_widget_bootstrap_v2` (the 11-argument one), `security
+    definer`, `sh_answers_since` not callable by visitors (401 through the API). Through the API as a made-up visitor:
+    `get_my_answers_since` 200, the bootstrap 200 with the cursor (`answers_part` true) and with the old arguments. No
+    request failed after it. `supabase/schema.sql` has v84 appended; `supabase/pending-migrations.txt` lists only v83 (#456's
+    own write-back).
+
 ## Outcome
 
-So far (the task stays open for the boxes still unticked): phase 1's `migration_v76.sql` and `migration_v77.sql` are live,
-and so is phase 2: `migration_v79.sql` to `v82` (the awards summed once, `answer_xp` written once, the visits' index gone,
-fewer calls from the page and a lighter bootstrap), applied 2026-11-19 at noon, with `xp_seen` and `activity_visits`
-rewritten. Left: the evening readout and the bootstrap's answers (room in the dashboard's budget: done, PR #466).
+**Done.** Three phases, every one measured on a throwaway copy before it went live and nothing cut (Sam: "dont cut
+anything for now", "stay free"):
+- Phase 1 (#444, live 2026-11-19 4 am): the answer's helpers as PL/pgSQL, the medal check's early exit, the mastery by
+  lookup (`migration_v76.sql`); pings once a minute in one call (`v77`); the changelog read once every 30 minutes a device.
+- Phase 2 (#457, #459, #466, live 2026-11-19 noon): the awards summed once (`v79`), `answer_xp` written once (`v80`), the
+  visits' index dropped and two tables rewritten (`v81`), the card's numbers and the analytics as one call each and a
+  lighter bootstrap (`v82`), the rank and mastery worked out on the page, room in the dashboard's budget.
+- Phase 3 (#470, live 2026-11-20 2:40 am): the bootstrap and the sync send only the answers the device doesn't have, and
+  Timmy's days read one day (`v84`).
+The evening after phases 1 and 2: the answer save 45 ms a call on the live database, from 106, and 31% of its time, from
+55%; a third fewer requests a student (fewer preflights, one read a card, one analytics call); 3 failed saves of 4,706, in
+one minute of a CPU stall. What's left for the database is on [database-load](../2026-11-18-database-load.md) (the analytics
+move to a second project, when it's needed) and in the inbox (`xp_seen`'s growth, watched by every lessons audit's size read).
 
-Related: [database-load](2026-11-18-database-load.md) · [shared-infrastructure](../reference/shared-infrastructure.md) ·
-[game-server](../reference/game-server.md) · [decisions](../decisions.md) ·
-[run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md)
+Related: [database-load](../2026-11-18-database-load.md) · [shared-infrastructure](../../reference/shared-infrastructure.md) ·
+[game-server](../../reference/game-server.md) · [decisions](../../decisions.md) ·
+[run-sql-on-the-live-database](../../how-to/run-sql-on-the-live-database.md)
