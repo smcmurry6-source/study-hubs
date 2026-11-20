@@ -31,7 +31,8 @@ Perio: add topics for each session as it is taught.
 notes have a third reading level, **High yield**, built from its topics in this order, each with the notes' paragraphs its
 questions point to and the Exam Hints' takeaways (`tools/hub-next/high-yield.mjs`, run by `tools/hub-next/build.mjs`). So a
 topic's words and its question list decide what that level shows: after changing topics, rebuild and check the picks with
-`node tools/hub-next/high-yield.mjs <hub> <lecture>`. Never write High yield text by hand.
+`node tools/hub-next/high-yield.mjs <hub> <lecture>`. Never write High yield text by hand. A topic may also carry `picks` (Heme & Endo Exam 3, 2026-11-20), some of its `ids` with each point it
+names asked once, for a bank toggle with a basis ([question-bank-filter-panel](question-bank-filter-panel.md)); `ids` alone decide High likelihood and High yield.
 
 Related: [question-bank-filter-panel](question-bank-filter-panel.md) (the High likelihood toggle) ·
 [the redesign release](../tasks/done/2026-11-06-redesign-release.md) (High yield's drafts)
