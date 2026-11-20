@@ -33,7 +33,7 @@ Hub-specific knowledge (sources, build steps, quirks, what's pending) is in `vau
 ## Recent major changes (newest first — add a line when you ship something)
 
 - **2026-11-20 (The admin page's first read of a new key no longer times out, Claude Code)** — the inbox's "An admin read
-  the kept copies don't have yet still times out" ([#495](https://github.com/smcmurry6-source/study-hubs/pull/495)). `migration_v90.sql` (pending: applied after the merge; v89 is #492's):
+  the kept copies don't have yet still times out" ([#495](https://github.com/smcmurry6-source/study-hubs/pull/495)). `migration_v90.sql` (**applied live 2026-11-20 at about 6:35 am Central** through the connector, md5-checked before and after; `supabase/schema.sql` has it; v89 is #492's):
   `sh_admin_cached` no longer works a read out inline when `admin_cache` has no row for it (live, insights 4.1 s, Perio's
   question health 3.6 s, over a visitor's 3 s, and the error rolled the new row back so the job never saw it): it inserts
   the row empty for `sh-admin-cache`, the admin functions answer `{"pending": true}` (or no rows) and
