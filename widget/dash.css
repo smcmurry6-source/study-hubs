@@ -839,6 +839,11 @@ html.shx[data-theme="dark"] .dx .rc-chart h4 { color: #3b2e3a; }
 .dx .survey-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px; }
 .dx .survey-skip { min-height: 40px; padding: 0 10px; border: 0; border-radius: var(--r-pill); background: transparent; font-size: var(--fs-label); font-weight: var(--w-strong); color: var(--muted); }
 .dx .survey-skip:hover { background: var(--panel); }
+/* Link my devices for an unlinked second device (once per person, migration_v88): a link in the sentence */
+.dx .survey-linknote { text-align: center; }
+.dx .survey-link { display: inline; padding: 0; border: 0; background: transparent; color: var(--text); font: inherit; font-weight: var(--w-strong);
+  text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+.dx .survey-link:hover { text-decoration-thickness: 2px; }
 .dx .survey-done { display: grid; gap: 10px; }
 .dx .survey-thanks { font-size: var(--fs-label); }
 

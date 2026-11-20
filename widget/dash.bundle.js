@@ -1127,6 +1127,7 @@ if (q.other) h += '<textarea class="survey-other" maxlength="300" hidden aria-la
 h += '</div>';
 });
 h += '<div class="survey-foot"><button type="button" class="survey-skip">Later</button><button type="button" class="btn btn-primary survey-send" disabled>Send</button></div>';
+h += '<p class="survey-why survey-linknote">Already answered it on another device? <button type="button" class="survey-link">Link this device</button> and it won’t ask again.</p>';
 W.set(h);
 W.say(re ? "Me again! There are still " + num(FORM_CROWNS) + " crowns in it for you." : "Got a minute? I pay in crowns.");
 var send = box.querySelector(".survey-send");
@@ -1179,6 +1180,7 @@ else answers[id] = multi ? picked : (q.getAttribute("data-kind") === "scale" ? +
 refresh(); return;
 }
 if (sent) return;
+if (e.target.closest(".survey-link")) { sent = true; W.close(true); openLink($("greetLink") || $("greetEdit"), "survey"); return; }
 if (e.target.closest(".survey-skip")) done(null, false);
 else if (e.target.closest(".survey-send") && !send.disabled) done(answers, true);
 });

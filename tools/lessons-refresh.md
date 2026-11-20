@@ -24,9 +24,10 @@ its narration and Timmy Time off the site ([archived-hubs-drop-their-audio](../v
   parallel ([run-sql-on-the-live-database](../vault/how-to/run-sql-on-the-live-database.md)). On a throwaway copy at 1.5
   times the class's size, every query in `tools/lessons-daily.sql`, `tools/economy.sql` and `tools/retro.sql` takes 0.5 s
   or less, so the audit runs at any hour, the morning before an exam included. The slowest calls are the admin page's
-  functions below (`qh_report` about 0.5 s for a big hub on a copy with the live settings, `sh_data_quality()` 0.4 s and
-  `sh_insights` 0.4 s since migration_v83; the 3 s measured on 2026-11-18 was mostly the copy's JIT compiler, which the
-  live database has off), and since v83 the admin page keeps a copy of each, read at any hour for nothing. A query that stops
+  functions below: on the live database at 1:40 am, with the class quiet (2026-11-20, migration_v83 applied), `qh_report`
+  took 3.6 s for Perio and 1.8 s for Heme & Endo Exam 3, `sh_data_quality()` 2.8 s and `sh_insights` 4.1 s (on a copy they
+  take 0.4 to 0.5 s: the Free plan's shared CPU is several times slower), so read the admin page's kept copy of each
+  instead (since v83, read at any hour for nothing). A query that stops
   at the limit means the database is busy: never send it again at once or raise the limit; split it (one hub, a shorter
   `:since`), keep it for the quiet hours (1 to 5 am Central), or go on without it and say so in the PR. A query of your
   own beyond these files is timed on a copy first.
