@@ -10,6 +10,17 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
+- [x] **Sam: confirm the readings of the journey crowns** (done 2026-11-20: "merge, do backpay if someone is already past"; `migration_v89.sql` applied live before the merge) (#492) (2026-11-20, [decisions](../decisions.md)): 5,000 for each journey's
+  Dark Matter (three in all), 20,000 for reaching the ModuPro and 30,000 for the Loupes (Sam's numbers, once each), all crowns
+  only (no XP), with back pay for anyone already there. Each is one line of `sh_wallet` in `migration_v89.sql` to change, and
+  the scenes read the amounts from `sh_prizes()`'s `dark`, `modupro` and `loupes`. Never take crowns back once paid
+  ([earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md)): dropping the back pay after v89 is live would lower balances.
+  The next lessons audit reads the economy with the back pay in it (a one-off jump in balances, not a rate).
+- [ ] **After #492 merges: replay the new Dark Matter unlock for the one student Sam asked for** (2026-11-20, "replay the dark
+  matter animation for ... since they didnt get to see it"; the name is in that session's chat, not here: per-person rows stay in
+  the database, [learner-data-privacy](../rules/learner-data-privacy.md)). It plays when the profile's `dark_seen` lacks 0:
+  delete that visitor's `achievements` row of kind `dark-seen-0` through the connector (one row, Sam's OK), after v89 is applied
+  and the merge has published; the page marks it seen again once it has played.
 - [ ] **The mastery read is slower a call than before the optimization pass** (2026-11-20, its readout): `get_hub_mastery`
   236 → 349 ms on the server on average (673 calls since phase 1), the evening's median 242 → 709 ms on 77 calls, 11% of the
   database's time. Since #459 the page works out the rank between answers, so the reads left are the ones when a hub's page
