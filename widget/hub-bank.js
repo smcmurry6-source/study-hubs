@@ -340,6 +340,10 @@
     if (isDefaultLecs(picked)) return n(R.all || "All lectures");
     if (picked.length === HX.LECS.length) return n(R.allPlus || "All lectures");
     if (!picked.length) return "No lectures";
+    if (HX.GROUPS) {
+      var whole = HX.lecGroups(HX.LECS).filter(function(x){ return x.lecs.every(function(l){ return picked.indexOf(l.id) > -1; }); });
+      if (whole.length && whole.reduce(function(n, x){ return n + x.lecs.length; }, 0) === picked.length) return whole.map(function(x){ return x.g.title; }).join(", ");
+    }
     return picked.length === 1 ? lecName(picked[0]) : picked.map(function(id){ return lecLabel(LBY[id]); }).join(", ");
   }
   function filtered(o){
@@ -464,7 +468,11 @@
       '<div class="qbar-row">' +
         '<div class="lp"><span class="lab" id="lpL">Lectures</span><button class="btn lp-btn" type="button" aria-expanded="false" aria-labelledby="lpL lpS" data-lp><span id="lpS">' + esc(sum) + "</span>" + icon("chevron", 16, "rot") + "</button>" +
           '<div class="lp-pop" hidden><div class="lp-acts"><button class="btn btn-text" type="button" data-lpall>' + esc((C.review || {}).allBtn || "All lectures") + '</button><button class="btn btn-text" type="button" data-lpnone>Untick all</button></div>' + ((C.review || {}).help ? '<p class="note lp-help">' + esc(C.review.help) + "</p>" : "") + "<ul>" +
-          HX.LECS.map(function(l){ var on = picked.indexOf(l.id) > -1; return '<li><label><input type="checkbox" value="' + esc(l.id) + '"' + (on ? " checked" : "") + ">" + lecDot(l.id) + "<span>" + esc(lecName(l.id)) + '</span></label><button class="btn btn-text" type="button" data-only="' + esc(l.id) + '" aria-label="Only ' + esc(lecLabel(l)) + '">Only</button></li>'; }).join("") +
+          (HX.GROUPS ? HX.lecGroups(HX.LECS) : [{ lecs: HX.LECS }]).map(function(x){
+            /* a hub of many courses: each course's lectures under its name, with an Only for the whole course */
+            return (x.g ? '<li class="lp-grp"><b>' + esc(x.g.title) + '</b><button class="btn btn-text" type="button" data-onlyg="' + esc(x.g.id) + '" aria-label="Only ' + esc(x.g.title) + '">Only</button></li>' : "") +
+              x.lecs.map(function(l){ var on = picked.indexOf(l.id) > -1; return '<li><label><input type="checkbox" value="' + esc(l.id) + '"' + (on ? " checked" : "") + ">" + lecDot(l.id) + "<span>" + esc(lecName(l.id)) + '</span></label><button class="btn btn-text" type="button" data-only="' + esc(l.id) + '" aria-label="Only ' + esc(lecLabel(l)) + '">Only</button></li>'; }).join("");
+          }).join("") +
           "</ul></div></div>" +
         '<label class="search"><span class="sr">Search the questions</span>' + icon("search", 18) + '<input type="search" placeholder="Search the questions" value="' + esc(bankSearch) + '" data-search></label>' +
       "</div>" +
@@ -485,6 +493,7 @@
     document.addEventListener("click", function away(e){ if (!el.isConnected) { document.removeEventListener("click", away); return; } if (!pop.hidden && !e.target.closest(".lp")) { pop.hidden = true; btn.setAttribute("aria-expanded", "false"); } });
     pop.addEventListener("change", function(){ var ids = $$("input:checked", pop).map(function(c){ return c.value; }); STATE.ui.qlec = lecValue(ids); STATE.ui.qE1auto = false; saveState(); $("#lpS", el).textContent = lecSummary(ids); clearTimeout(pop.__t); pop.__t = setTimeout(function(){ if (!pop.hidden) { pop.hidden = true; } redraw("lec-pick"); }, 900); });
     $$("[data-only]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qlec = b.getAttribute("data-only"); STATE.ui.qE1auto = false; redraw("lec-only"); }); });
+    $$("[data-onlyg]", el).forEach(function(b){ b.addEventListener("click", function(){ var g = b.getAttribute("data-onlyg"); STATE.ui.qlec = HX.LECS.filter(function(l){ return l.group === g; }).map(function(l){ return l.id; }); STATE.ui.qE1auto = false; redraw("lec-only-course"); }); });
     $("[data-lpall]", el).addEventListener("click", function(){ STATE.ui.qlec = "all"; STATE.ui.qE1auto = false; redraw("lec-all"); });
     $("[data-lpnone]", el).addEventListener("click", function(){ $$("input", pop).forEach(function(c){ c.checked = false; }); STATE.ui.qlec = []; STATE.ui.qE1auto = false; saveState(); $("#lpS", el).textContent = "No lectures"; });
     $$("[data-show]", el).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qstatus = b.getAttribute("data-show"); redraw("show=" + STATE.ui.qstatus); }); });

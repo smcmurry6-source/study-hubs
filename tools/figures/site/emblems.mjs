@@ -171,6 +171,26 @@ function generic(){
   ].join("");
 }
 
+/* ---------------- Review of Systems: a checklist on a clipboard, a molar standing in front ---------------- */
+function ros(){
+  const t = T["review-of-systems"];
+  const box = (x, y, w, h, r) => `M${x + r} ${y} H${x + w - r} Q${x + w} ${y} ${x + w} ${y + r} V${y + h - r} Q${x + w} ${y + h} ${x + w - r} ${y + h} H${x + r} Q${x} ${y + h} ${x} ${y + h - r} V${y + r} Q${x} ${y} ${x + r} ${y} Z`;
+  const rows = [21, 30.5, 40].map((y) =>
+    P(box(16.5, y - 3, 6, 6, 1.4), C.paper, 1.5) + L(`M17.6 ${y - .2} L19.4 ${y + 1.8} L22.6 ${y - 2.8}`, 2, t.ink) + L(`M26 ${y} H${y === 40 ? 33 : 38}`, 1.6, INK, .45)).join("");
+  return [
+    /* the board, then the paper on it */
+    S(box(9, 7.5, 37, 52, 4.5), C.wood, "M41 7.6 Q46 7.5 46 12 V55 Q46 59.5 41.5 59.5 L39.8 59.5 Q43 57 43 52 V12 Q43 9 41 7.6 Z", C.woodShade),
+    S(box(13.5, 13.5, 28, 41, 1.8), C.paper, "M38.4 13.6 H39.6 Q41.4 13.6 41.4 15.4 V52.6 Q41.4 54.4 39.6 54.4 H38.4 Z", C.paperShade, 2),
+    rows,
+    /* the clip */
+    S(box(19.5, 4, 16, 9.5, 3), C.metal, "M31.5 4.2 H32.5 Q35.4 4.2 35.4 7 V10.5 Q35.4 13.3 32.5 13.3 H31.5 Q33.2 11 33.2 8.7 Q33.2 6.2 31.5 4.2 Z", C.metalShade, 2.2),
+    P("M25.6 7.6 H29.4", C.metalShade, 1.8),
+    H("M21.6 7.2 L21.6 10"),
+    /* the molar in front, at the board's lower right */
+    molar(.152, 47.5, 31.4)
+  ].join("");
+}
+
 export const EMBLEMS = {
   "occlusion":            { label: "An articulator with two casts meeting in front", body: occlusion() },
   "perio":                { label: "A periodontal probe in the pocket at a molar's gumline", body: perio() },
@@ -178,5 +198,6 @@ export const EMBLEMS = {
   "heme-endo-exam2":      { label: "The thyroid gland on the trachea, with a drop of blood", body: hemeEndo() },
   "heme-endo-exam3":      { label: "The thyroid gland on the trachea, with a drop of blood", body: hemeEndo() },   // Exam 2's, reused (Sam, 2026-11-15)
   "special-patient-care": { label: "A molar cradled in a gloved hand", body: spc() },
+  "review-of-systems":    { label: "A checklist on a clipboard with a molar standing in front", body: ros() },
   "generic":              { label: "A molar standing on an open book", body: generic() }
 };

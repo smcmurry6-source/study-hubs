@@ -1,0 +1,1782 @@
+{
+ "hub": "review-of-systems",
+ "title": "Review of Systems Hub",
+ "stateKey": "ros-state-v1",
+ "audio": "off",
+ "exams": [
+  {
+   "id": "mock1",
+   "label": "Mock Board 1",
+   "date": "2026-12-03",
+   "time": "08:00",
+   "closes": "12:00"
+  },
+  {
+   "id": "mock2",
+   "label": "Mock Board 2",
+   "date": "2026-12-10",
+   "time": "08:00",
+   "closes": "12:00"
+  }
+ ],
+ "examInfo": [
+  [
+   "What",
+   "Two Canvas mock board exams of 200 questions each, INBDE style, with images and patient boxes. You get 200 minutes once you start."
+  ],
+  [
+   "When",
+   "Mock 1: Thursday, December 3. Mock 2: Thursday, December 10. Both 8:00 am to noon CST: start at 8:00 am, finish once you start; Canvas closes the exam at noon."
+  ],
+  [
+   "Where",
+   "Remote, on Canvas with Respondus LockDown Browser and Monitor. Use a stable internet connection: the exams have images and patient boxes."
+  ],
+  [
+   "To pass",
+   "Pass/fail: complete the course's 8 quizzes and score 55% or better over the two mocks together (220 of 400)."
+  ],
+  [
+   "Courses",
+   "Head & Neck Anatomy, Dental Anatomy & Occlusion, Fundamentals I and II, Oral Microbiology, Neuroscience, the systems courses (Cardio & Respiratory, Renal, Heme & Endo, MSK & GI), Ethics & Professionalism, Evidence-Based Dentistry, Radiology and Emergencies in the Dental Clinic."
+  ],
+  [
+   "Per course",
+   "The course hasn't said how many questions come from each course. This hub's mock spreads its 200 by the size of each course: a guess, not the exam's blueprint."
+  ],
+  [
+   "The course",
+   "Self-study, November 16 to December 11, with no review sessions. Your earlier lecturers will answer questions if you ask them."
+  ],
+  [
+   "This hub",
+   "Each course is a section, cut into parts you can do in a sitting: high-yield notes, a Plain English version, a cram list and board-style questions. Built from the class's study guides, answered objectives and notes, the class above's, and this site's earlier hubs. Nothing from this course's quizzes."
+  ]
+ ],
+ "courseDates": [
+  {
+   "date": "2026-11-16",
+   "label": "Review of Systems starts (self-study)",
+   "kind": "lecture"
+  },
+  {
+   "date": "2026-12-03",
+   "label": "Mock Board 1, 8:00 am to noon",
+   "kind": "exam"
+  },
+  {
+   "date": "2026-12-10",
+   "label": "Mock Board 2, 8:00 am to noon",
+   "kind": "exam"
+  },
+  {
+   "date": "2026-12-11",
+   "label": "The course ends",
+   "kind": "due"
+  }
+ ],
+ "groups": [
+  {
+   "id": "hn",
+   "title": "Head & Neck Anatomy",
+   "code": "HN"
+  },
+  {
+   "id": "da",
+   "title": "Dental Anatomy & Occlusion",
+   "code": "DA"
+  },
+  {
+   "id": "f1",
+   "title": "Fundamentals I",
+   "code": "F1"
+  },
+  {
+   "id": "f2",
+   "title": "Fundamentals II",
+   "code": "F2"
+  },
+  {
+   "id": "om",
+   "title": "Oral Microbiology",
+   "code": "OM"
+  },
+  {
+   "id": "ns",
+   "title": "Neuroscience",
+   "code": "NS"
+  },
+  {
+   "id": "cr",
+   "title": "Cardio & Respiratory",
+   "code": "CR"
+  },
+  {
+   "id": "rn",
+   "title": "Renal",
+   "code": "RN"
+  },
+  {
+   "id": "he",
+   "title": "Heme & Endo",
+   "code": "HE"
+  },
+  {
+   "id": "mg",
+   "title": "MSK & GI",
+   "code": "MG"
+  },
+  {
+   "id": "et",
+   "title": "Ethics & Professionalism",
+   "code": "ET"
+  },
+  {
+   "id": "eb",
+   "title": "Evidence-Based Dentistry",
+   "code": "EB"
+  },
+  {
+   "id": "rd",
+   "title": "Radiology",
+   "code": "RD"
+  },
+  {
+   "id": "em",
+   "title": "Emergencies in the Dental Clinic",
+   "code": "EM"
+  }
+ ],
+ "lectures": [
+  {
+   "id": "hn-neck",
+   "num": 1,
+   "label": "HN-1",
+   "group": "hn",
+   "title": "The neck: triangles, root, viscera and autonomics",
+   "who": "Spring 2026 · Gross Anatomy · Exam 1",
+   "status": "taught",
+   "from": "class study guides, answered objectives, class-above lecture notes and student practice tests"
+  },
+  {
+   "id": "hn-skull",
+   "num": 2,
+   "label": "HN-2",
+   "group": "hn",
+   "title": "Skull, cranial cavity and cranial nerves",
+   "who": "Spring 2026 · Gross Anatomy · Exam 1",
+   "status": "taught",
+   "from": "class study guides, answered objectives, class-above lecture notes and student practice tests"
+  },
+  {
+   "id": "hn-face",
+   "num": 3,
+   "label": "HN-3",
+   "group": "hn",
+   "title": "Orbit, face, scalp and parotid",
+   "who": "Spring 2026 · Gross Anatomy · Exam 1",
+   "status": "taught",
+   "from": "class study guides, answered objectives, class-above lecture notes and student practice tests"
+  },
+  {
+   "id": "hn-itf",
+   "num": 4,
+   "label": "HN-4",
+   "group": "hn",
+   "title": "Temporal and infratemporal fossae and TMJ",
+   "who": "Spring 2026 · Gross Anatomy · Exam 2",
+   "status": "taught",
+   "from": "class study guides, class-above lecture notes and student practice tests"
+  },
+  {
+   "id": "da-numbering",
+   "num": 5,
+   "label": "DA-1",
+   "group": "da",
+   "title": "Numbering, Eruption and the Primary Dentition",
+   "who": "D1 Fall 2025 · PCD (Dental Anatomy) · Exam 1",
+   "status": "taught",
+   "from": "class and D2 study guides, the SG worksheets and Exam 1 notes"
+  },
+  {
+   "id": "da-anterior",
+   "num": 6,
+   "label": "DA-2",
+   "group": "da",
+   "title": "Contours, Contacts and the Anterior Teeth",
+   "who": "D1 Fall 2025 · PCD (Dental Anatomy) · Exam 1",
+   "status": "taught",
+   "from": "class and D2 study guides, the SG worksheets, notes outlines and Exam 1 notes"
+  },
+  {
+   "id": "da-posterior",
+   "num": 7,
+   "label": "DA-3",
+   "group": "da",
+   "title": "Premolars, Molars and Their Roots",
+   "who": "D1 Fall 2025 · PCD (Dental Anatomy) · Exam 1",
+   "status": "taught",
+   "from": "class and D2 study guides, the SG worksheets (with Root Morphology), notes outlines and Exam 1 notes"
+  },
+  {
+   "id": "da-anomalies",
+   "num": 8,
+   "label": "DA-4",
+   "group": "da",
+   "title": "Dental Anomalies and Tooth Identification",
+   "who": "D1 Fall 2025 · PCD (Dental Anatomy) · Exam 1",
+   "status": "taught",
+   "from": "class and D2 study guides, the Dental Anomalies SG, the anomalies outline and the tooth ID cheat sheet"
+  },
+  {
+   "id": "f1-biomol",
+   "num": 9,
+   "label": "F1-1",
+   "group": "f1",
+   "title": "Biomolecules: proteins, collagen, hemoglobin, carbohydrates, lipids and nucleic acids",
+   "who": "Fall 2025 · Fundamentals I · Exam I",
+   "status": "taught",
+   "from": "class study guides (this class's and the D2s'), checked against standard biochemistry"
+  },
+  {
+   "id": "f1-cells",
+   "num": 10,
+   "label": "F1-2",
+   "group": "f1",
+   "title": "Cells, membranes, transport and nerve signaling",
+   "who": "Fall 2025 · Fundamentals I · Exam I",
+   "status": "taught",
+   "from": "class study guides (this class's and the D2s'), checked against standard physiology"
+  },
+  {
+   "id": "f1-molbio",
+   "num": 11,
+   "label": "F1-3",
+   "group": "f1",
+   "title": "Molecular biology and genetics: replication, transcription, translation, inheritance and cancer genes",
+   "who": "Fall 2025 · Fundamentals I · Exam II",
+   "status": "taught",
+   "from": "class study guides, Q&A worksheets and a classmate's practice quiz, checked against standard molecular biology"
+  },
+  {
+   "id": "f2-genpath",
+   "num": 12,
+   "label": "F2-1",
+   "group": "f2",
+   "title": "General pathology: injury, inflammation and neoplasia",
+   "who": "Fall 2025 · Fundamentals II · Exam I",
+   "status": "taught",
+   "from": "class Exam I study guides and a student practice test"
+  },
+  {
+   "id": "f2-virology",
+   "num": 13,
+   "label": "F2-2",
+   "group": "f2",
+   "title": "Virology: herpesviruses, HIV and hepatitis",
+   "who": "Fall 2025 · Fundamentals II · Exam I",
+   "status": "taught",
+   "from": "class Exam I study guides and \"The Viruses\" summary"
+  },
+  {
+   "id": "f2-bacteria",
+   "num": 14,
+   "label": "F2-3",
+   "group": "f2",
+   "title": "Bacteria: structure, toxins and the key pathogens",
+   "who": "Fall 2025 · Fundamentals II · Exam II",
+   "status": "taught",
+   "from": "class Exam II study guides and a student practice test"
+  },
+  {
+   "id": "ns-anat",
+   "num": 15,
+   "label": "NS-1",
+   "group": "ns",
+   "title": "Neuroanatomy, development and cranial nerves",
+   "who": "D1 Spring 2026 · Neuroscience · Exam 1",
+   "status": "taught",
+   "from": "class learning objectives, notecards and study guides; D2 lecture notes"
+  },
+  {
+   "id": "ns-path",
+   "num": 16,
+   "label": "NS-2",
+   "group": "ns",
+   "title": "Pathways, motor control and stroke",
+   "who": "D1 Spring 2026 · Neuroscience · Exam 2",
+   "status": "taught",
+   "from": "class learning objectives, notecards and study guides"
+  },
+  {
+   "id": "ns-phys",
+   "num": 17,
+   "label": "NS-3",
+   "group": "ns",
+   "title": "Neurophysiology and anesthetics",
+   "who": "D1 Spring 2026 · Neuroscience · Exam 2",
+   "status": "taught",
+   "from": "class learning objectives, notecards and study guides"
+  },
+  {
+   "id": "ns-sens",
+   "num": 18,
+   "label": "NS-4",
+   "group": "ns",
+   "title": "Special senses, autonomic system and pain",
+   "who": "D1 Spring 2026 · Neuroscience · Exams 2 and 3",
+   "status": "taught",
+   "from": "class learning objectives, notecards and study guides"
+  },
+  {
+   "id": "rn-filtration",
+   "num": 19,
+   "label": "RN-1",
+   "group": "rn",
+   "title": "Structure, Filtration and Clearance",
+   "who": "D2 Fall 2026 · Renal · Exam 1",
+   "status": "taught",
+   "from": "class learning objectives and notes, the class above’s Exam 1 notes"
+  },
+  {
+   "id": "rn-tubule",
+   "num": 20,
+   "label": "RN-2",
+   "group": "rn",
+   "title": "Tubule Segments and Transporters",
+   "who": "D2 Fall 2026 · Renal · Exam 1",
+   "status": "taught",
+   "from": "class learning objectives, the class above’s notes and solute and transporter tables"
+  },
+  {
+   "id": "rn-balance",
+   "num": 21,
+   "label": "RN-3",
+   "group": "rn",
+   "title": "Water, Electrolyte and Acid-Base Balance",
+   "who": "D2 Fall 2026 · Renal · Exam 2",
+   "status": "taught",
+   "from": "class learning objectives, the class above’s Exam 2 study guide, acid-base notes and self-check"
+  },
+  {
+   "id": "rn-disease",
+   "num": 22,
+   "label": "RN-4",
+   "group": "rn",
+   "title": "Chronic Kidney Disease and Renal Pathology",
+   "who": "D2 Fall 2026 · Renal · Exams 1 and 2",
+   "status": "taught",
+   "from": "class learning objectives and notes, the class above’s Exam 2 study guide"
+  },
+  {
+   "id": "rn-dental",
+   "num": 23,
+   "label": "RN-5",
+   "group": "rn",
+   "title": "Diuretics and the Dental Patient",
+   "who": "D2 Fall 2026 · Renal · Exam 2",
+   "status": "taught",
+   "from": "class learning objectives (pharmacology and dental application), standard dental references"
+  },
+  {
+   "id": "he-axes",
+   "num": 24,
+   "label": "HE-1",
+   "group": "he",
+   "title": "Hypothalamus, Pituitary, Growth and the Adrenal",
+   "who": "D2 Fall 2026 · Hematology & Endocrinology · Exams 1–3",
+   "status": "taught",
+   "from": "the course hubs (slides and recordings), class study guides and objectives"
+  },
+  {
+   "id": "he-thyroid",
+   "num": 25,
+   "label": "HE-2",
+   "group": "he",
+   "title": "Thyroid, Parathyroid and Calcium",
+   "who": "D2 Fall 2026 · Hematology & Endocrinology · Exams 1–3",
+   "status": "taught",
+   "from": "the course hubs (slides and recordings), class study guides and objectives"
+  },
+  {
+   "id": "he-diabetes",
+   "num": 26,
+   "label": "HE-3",
+   "group": "he",
+   "title": "The Pancreas and Diabetes",
+   "who": "D2 Fall 2026 · Hematology & Endocrinology · Exams 1–3",
+   "status": "taught",
+   "from": "the course hubs (slides and recordings), class study guides and objectives"
+  },
+  {
+   "id": "mg-giphys",
+   "num": 27,
+   "label": "MG-1",
+   "group": "mg",
+   "title": "GI Physiology: Hormones, Secretion, Motility and Absorption",
+   "who": "D2 Fall 2026 · Musculoskeletal & GI · Exams 1 and 2",
+   "status": "taught",
+   "from": "class learning objectives, study guides and GI notes, checked against standard physiology"
+  },
+  {
+   "id": "mg-gianat",
+   "num": 28,
+   "label": "MG-2",
+   "group": "mg",
+   "title": "GI Anatomy and Histology",
+   "who": "D2 Fall 2026 · Musculoskeletal & GI · Exams 1 and 2",
+   "status": "taught",
+   "from": "class learning objectives and study guides, checked against standard anatomy and histology"
+  },
+  {
+   "id": "mg-gipath",
+   "num": 29,
+   "label": "MG-3",
+   "group": "mg",
+   "title": "Liver and GI Pathology and GI Drugs",
+   "who": "D2 Fall 2026 · Musculoskeletal & GI · Exam 2",
+   "status": "taught",
+   "from": "class GI pharmacology notes and study guides, checked against standard pathology and pharmacology"
+  },
+  {
+   "id": "eb-ask",
+   "num": 30,
+   "label": "EB-1",
+   "group": "eb",
+   "title": "Asking and finding: the 5 A's, PICO and study designs",
+   "who": "D1 Fall 2025 · Evidence-Based Dentistry · Midterm",
+   "status": "taught",
+   "from": "the class above's midterm study guide, study-type and appraisal summaries, and practice tests"
+  },
+  {
+   "id": "eb-appraise",
+   "num": 31,
+   "label": "EB-2",
+   "group": "eb",
+   "title": "Appraising: validity, bias and the numbers",
+   "who": "D1 Fall 2025 · Evidence-Based Dentistry · Midterm",
+   "status": "taught",
+   "from": "the class above's midterm study guide and practice tests, with standard biostatistics added"
+  }
+ ],
+ "likelyTopics": [
+  {
+   "lec": "hn-neck",
+   "t": "Horner syndrome: ptosis, miosis, anhidrosis and flushing from a cervical sympathetic lesion",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-neck-02",
+    "hn-neck-11"
+   ]
+  },
+  {
+   "lec": "hn-neck",
+   "t": "Nerves at risk in thyroid surgery and the carotid sheath and its neighbors",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-neck-01"
+   ]
+  },
+  {
+   "lec": "hn-neck",
+   "t": "Root of the neck: subclavian branches, phrenic nerve, thoracic duct and the superior thoracic aperture",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-neck-05"
+   ]
+  },
+  {
+   "lec": "hn-neck",
+   "t": "Posterior triangle: CN XI and the cervical plexus at the nerve point",
+   "basis": "study guide",
+   "ids": [
+    "hn-neck-09"
+   ]
+  },
+  {
+   "lec": "hn-neck",
+   "t": "Suprahyoid and infrahyoid nerves, landmarks, carotid sinus and fascial spaces",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-neck-04"
+   ]
+  },
+  {
+   "lec": "hn-skull",
+   "t": "Foramina of the skull and what passes through each (rotundum, ovale, spinosum, jugular foramen)",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-skull-01",
+    "hn-skull-05"
+   ]
+  },
+  {
+   "lec": "hn-skull",
+   "t": "Cavernous sinus: contents, drainage and thrombosis with CN VI as the first sign",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-skull-02"
+   ]
+  },
+  {
+   "lec": "hn-skull",
+   "t": "Cranial nerve lesions: III palsy, tongue and uvula deviation, UMN vs LMN facial weakness, corneal reflex",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-skull-07"
+   ]
+  },
+  {
+   "lec": "hn-skull",
+   "t": "Epidural vs subdural vs subarachnoid bleeds",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-skull-12"
+   ]
+  },
+  {
+   "lec": "hn-skull",
+   "t": "Visual pathway lesions and skull bones",
+   "basis": "study guide",
+   "ids": [
+    "hn-skull-10"
+   ]
+  },
+  {
+   "lec": "hn-face",
+   "t": "Parotid: what runs through it, the duct opposite the maxillary second molar, IX–otic–auriculotemporal secretion, Frey syndrome",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-face-02",
+    "hn-face-03"
+   ]
+  },
+  {
+   "lec": "hn-face",
+   "t": "Facial nerve branches, Bell palsy and facial paralysis from a misplaced inferior alveolar block",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-face-06",
+    "hn-face-11"
+   ]
+  },
+  {
+   "lec": "hn-face",
+   "t": "Orbit: blow-out fracture, extraocular muscle actions and nerves, accommodation and glaucoma",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-face-01"
+   ]
+  },
+  {
+   "lec": "hn-face",
+   "t": "Sensory supply of the face, scalp layers and lacrimal secretion",
+   "basis": "objectives + study guide",
+   "ids": [
+    "hn-face-10"
+   ]
+  },
+  {
+   "lec": "hn-itf",
+   "t": "Muscles of mastication: actions, the lateral pterygoid as the opener, jaw deviation toward a V3 lesion",
+   "basis": "study guide + review guide",
+   "ids": [
+    "hn-itf-01",
+    "hn-itf-02"
+   ]
+  },
+  {
+   "lec": "hn-itf",
+   "t": "V3 branches, the chorda tympani on the lingual nerve, and the anatomy and complications of dental blocks",
+   "basis": "study guide + review guide",
+   "ids": [
+    "hn-itf-04",
+    "hn-itf-05"
+   ]
+  },
+  {
+   "lec": "hn-itf",
+   "t": "TMJ structure, compartments, dislocation and nerve supply",
+   "basis": "study guide + review guide",
+   "ids": [
+    "hn-itf-11"
+   ]
+  },
+  {
+   "lec": "hn-itf",
+   "t": "Maxillary artery parts and fossa boundaries",
+   "basis": "study guide",
+   "ids": [
+    "hn-itf-06"
+   ]
+  },
+  {
+   "lec": "da-numbering",
+   "t": "Converting between Universal, Palmer and FDI, permanent and primary",
+   "basis": "study guide",
+   "ids": [
+    "da-numbering-01",
+    "da-numbering-02"
+   ]
+  },
+  {
+   "lec": "da-numbering",
+   "t": "Eruption ages and sequences: primary central-lateral-first molar-canine-second molar; maxillary 6-1-2-4-5-3-7-8, mandibular 6-1-2-3-4-5-7-8",
+   "basis": "study guide",
+   "ids": [
+    "da-numbering-04",
+    "da-numbering-05"
+   ]
+  },
+  {
+   "lec": "da-numbering",
+   "t": "Primary versus permanent teeth, and the one-of-a-kind primary teeth",
+   "basis": "study guide",
+   "ids": [
+    "da-numbering-12",
+    "da-numbering-13"
+   ]
+  },
+  {
+   "lec": "da-numbering",
+   "t": "Calcification and root completion timelines; succedaneous teeth",
+   "basis": "study guide",
+   "ids": [
+    "da-numbering-08"
+   ]
+  },
+  {
+   "lec": "da-anterior",
+   "t": "Heights of contour on each surface, and what over- and undercontouring do",
+   "basis": "study guide",
+   "ids": [
+    "da-anterior-01",
+    "da-anterior-02"
+   ]
+  },
+  {
+   "lec": "da-anterior",
+   "t": "Canines: longest tooth, root and crown; maxillary versus mandibular canine features",
+   "basis": "study guide",
+   "ids": [
+    "da-anterior-06",
+    "da-anterior-07"
+   ]
+  },
+  {
+   "lec": "da-anterior",
+   "t": "Contact, embrasure and CEJ trends and their exceptions",
+   "basis": "study guide",
+   "ids": [
+    "da-anterior-04"
+   ]
+  },
+  {
+   "lec": "da-anterior",
+   "t": "Telling the incisors apart: maxillary lateral traits, mandibular central versus lateral, the cingulum",
+   "basis": "study guide",
+   "ids": [
+    "da-anterior-09"
+   ]
+  },
+  {
+   "lec": "da-posterior",
+   "t": "Molar roots and canals: palatal > MB > DB, MB2, the mesial root of mandibular molars, and the furcation levels",
+   "basis": "study guide",
+   "ids": [
+    "da-posterior-01",
+    "da-posterior-02"
+   ]
+  },
+  {
+   "lec": "da-posterior",
+   "t": "Premolar identification: maxillary first (two roots, mesial concavity), mandibular first (canine-like, marginal ridge), mandibular second (Y, H, U)",
+   "basis": "study guide",
+   "ids": [
+    "da-posterior-04",
+    "da-posterior-05"
+   ]
+  },
+  {
+   "lec": "da-posterior",
+   "t": "Maxillary molar crowns: cusp sizes, oblique ridge, Carabelli, lingual width; first versus second molar",
+   "basis": "study guide",
+   "ids": [
+    "da-posterior-08"
+   ]
+  },
+  {
+   "lec": "da-posterior",
+   "t": "Mandibular molars: five versus four cusps, grooves, smallest and tallest cusps",
+   "basis": "study guide",
+   "ids": [
+    "da-posterior-10"
+   ]
+  },
+  {
+   "lec": "da-anomalies",
+   "t": "Fusion, gemination and concrescence (the tooth count), supernumerary and missing teeth",
+   "basis": "study guide",
+   "ids": [
+    "da-anomalies-01",
+    "da-anomalies-02"
+   ]
+  },
+  {
+   "lec": "da-anomalies",
+   "t": "Hereditary versus acquired enamel and dentin defects: amelogenesis and dentinogenesis imperfecta, fluorosis, tetracycline, Turner tooth",
+   "basis": "study guide",
+   "ids": [
+    "da-anomalies-04"
+   ]
+  },
+  {
+   "lec": "da-anomalies",
+   "t": "Tooth identification, right or left included",
+   "basis": "study guide",
+   "ids": [
+    "da-anomalies-14"
+   ]
+  },
+  {
+   "lec": "da-anomalies",
+   "t": "Shape and root anomalies: taurodontism, enamel pearl, dilaceration, talon cusp, dens in dente, Hutchinson incisors",
+   "basis": "study guide",
+   "ids": [
+    "da-anomalies-07"
+   ]
+  },
+  {
+   "lec": "da-anomalies",
+   "t": "Attrition, abrasion, erosion and abfraction",
+   "basis": "study guide",
+   "ids": [
+    "da-anomalies-11"
+   ]
+  },
+  {
+   "lec": "f1-biomol",
+   "t": "Collagen: Gly-X-Y, the triple helix, vitamin C–dependent hydroxylation and the collagen diseases (scurvy, osteogenesis imperfecta)",
+   "basis": "study guide",
+   "ids": [
+    "f1-biomol-01",
+    "f1-biomol-02"
+   ]
+  },
+  {
+   "lec": "f1-biomol",
+   "t": "Hemoglobin: cooperativity, T and R states, the Bohr effect, 2,3-BPG and fetal hemoglobin",
+   "basis": "study guide",
+   "ids": [
+    "f1-biomol-05"
+   ]
+  },
+  {
+   "lec": "f1-biomol",
+   "t": "Amino acid side chains (histidine's pKa) and the levels of protein structure",
+   "basis": "study guide",
+   "ids": [
+    "f1-biomol-08"
+   ]
+  },
+  {
+   "lec": "f1-biomol",
+   "t": "Carbohydrate isomers, sucrose and S. mutans, GAGs and glycation",
+   "basis": "study guide",
+   "ids": [
+    "f1-biomol-10"
+   ]
+  },
+  {
+   "lec": "f1-biomol",
+   "t": "Lipid structure, base pairing and buffers",
+   "basis": "study guide",
+   "ids": [
+    "f1-biomol-12"
+   ]
+  },
+  {
+   "lec": "f1-cells",
+   "t": "Phases of the nerve action potential, refractory periods, and how hyperkalemia, tetrodotoxin and local anesthetics change it",
+   "basis": "study guide",
+   "ids": [
+    "f1-cells-01",
+    "f1-cells-02"
+   ]
+  },
+  {
+   "lec": "f1-cells",
+   "t": "Transport mechanisms and osmosis: passive, primary and secondary active transport, tonicity, the reflection coefficient",
+   "basis": "study guide",
+   "ids": [
+    "f1-cells-07",
+    "f1-cells-08"
+   ]
+  },
+  {
+   "lec": "f1-cells",
+   "t": "Nernst equilibrium potentials (a tenfold gradient gives about 60 mV) and the resting potential",
+   "basis": "study guide",
+   "ids": [
+    "f1-cells-04"
+   ]
+  },
+  {
+   "lec": "f1-cells",
+   "t": "Synapses, the main neurotransmitters, and the neuromuscular junction (botulinum, myasthenia gravis)",
+   "basis": "study guide",
+   "ids": [
+    "f1-cells-10"
+   ]
+  },
+  {
+   "lec": "f1-cells",
+   "t": "Organelle functions and address tags, the cytoskeleton, and apoptosis",
+   "basis": "study guide",
+   "ids": [
+    "f1-cells-13"
+   ]
+  },
+  {
+   "lec": "f1-molbio",
+   "t": "Modes of inheritance, pedigree clues and carrier risk (the 2/3 rule)",
+   "basis": "study guide",
+   "ids": [
+    "f1-molbio-14",
+    "f1-molbio-15"
+   ]
+  },
+  {
+   "lec": "f1-molbio",
+   "t": "Oncogenes versus tumor suppressors (two hits), p53, RB, BRCA and HPV, and benign versus malignant",
+   "basis": "study guide",
+   "ids": [
+    "f1-molbio-18",
+    "f1-molbio-19"
+   ]
+  },
+  {
+   "lec": "f1-molbio",
+   "t": "Replication enzymes, leading and lagging strands, and telomerase",
+   "basis": "study guide",
+   "ids": [
+    "f1-molbio-01",
+    "f1-molbio-02"
+   ]
+  },
+  {
+   "lec": "f1-molbio",
+   "t": "Transcription: σ and promoters, the lac operon, the three eukaryotic polymerases and epigenetic switches",
+   "basis": "study guide",
+   "ids": [
+    "f1-molbio-05"
+   ]
+  },
+  {
+   "lec": "f1-molbio",
+   "t": "RNA processing, translation and the types of mutation",
+   "basis": "study guide",
+   "ids": [
+    "f1-molbio-04"
+   ]
+  },
+  {
+   "lec": "f2-genpath",
+   "t": "Necrosis patterns and the organ or disease each belongs to (coagulative infarct, liquefactive brain and abscess, caseous TB, fat necrosis pancreas, fibrinoid vessels)",
+   "basis": "study guide",
+   "ids": [
+    "f2-genpath-01",
+    "f2-genpath-02"
+   ]
+  },
+  {
+   "lec": "f2-genpath",
+   "t": "Apoptosis versus necrosis, and the intrinsic and extrinsic pathways",
+   "basis": "study guide",
+   "ids": [
+    "f2-genpath-03",
+    "f2-genpath-04"
+   ]
+  },
+  {
+   "lec": "f2-genpath",
+   "t": "Acute inflammation: exudate, leukocyte recruitment steps; chronic inflammation: M1 and M2 macrophages",
+   "basis": "study guide",
+   "ids": [
+    "f2-genpath-07"
+   ]
+  },
+  {
+   "lec": "f2-genpath",
+   "t": "Repair and scar problems (granulation tissue, keloid versus hypertrophic scar) and acute-phase proteins",
+   "basis": "study guide",
+   "ids": [
+    "f2-genpath-10"
+   ]
+  },
+  {
+   "lec": "f2-genpath",
+   "t": "Tumor naming, benign versus malignant, grade versus stage",
+   "basis": "study guide",
+   "ids": [
+    "f2-genpath-13"
+   ]
+  },
+  {
+   "lec": "f2-virology",
+   "t": "Human herpesviruses HHV-1 to HHV-8: diseases and latency sites, with their oral lesions",
+   "basis": "study guide",
+   "ids": [
+    "f2-virology-01",
+    "f2-virology-02"
+   ]
+  },
+  {
+   "lec": "f2-virology",
+   "t": "Hepatitis A to E (spread, chronicity, prevention) and hepatitis B serology",
+   "basis": "study guide",
+   "ids": [
+    "f2-virology-04",
+    "f2-virology-05"
+   ]
+  },
+  {
+   "lec": "f2-virology",
+   "t": "HIV: entry through CD4 and CCR5 or CXCR4, the life cycle, stages by CD4 count and tests",
+   "basis": "study guide",
+   "ids": [
+    "f2-virology-09"
+   ]
+  },
+  {
+   "lec": "f2-virology",
+   "t": "Oncogenic viruses: HPV E6 and E7, EBV, HBV and HCV, HTLV-1, HHV-8",
+   "basis": "study guide",
+   "ids": [
+    "f2-virology-14"
+   ]
+  },
+  {
+   "lec": "f2-virology",
+   "t": "RNA viruses: measles and Koplik spots, influenza drift and shift, rabies, enveloped versus naked",
+   "basis": "study guide",
+   "ids": [
+    "f2-virology-07"
+   ]
+  },
+  {
+   "lec": "f2-bacteria",
+   "t": "Gram-positive versus gram-negative envelope and the gram stain",
+   "basis": "study guide",
+   "ids": [
+    "f2-bacteria-01",
+    "f2-bacteria-02"
+   ]
+  },
+  {
+   "lec": "f2-bacteria",
+   "t": "Exotoxins versus endotoxin and the classic toxins (cholera, Shiga, tetanus, botulinum, staph)",
+   "basis": "study guide",
+   "ids": [
+    "f2-bacteria-03",
+    "f2-bacteria-04"
+   ]
+  },
+  {
+   "lec": "f2-bacteria",
+   "t": "S. aureus virulence, abscess and MRSA; S. epidermidis biofilm; S. pneumoniae capsule",
+   "basis": "study guide",
+   "ids": [
+    "f2-bacteria-05"
+   ]
+  },
+  {
+   "lec": "f2-bacteria",
+   "t": "Gene transfer, growth curve and the three ways to make ATP",
+   "basis": "study guide",
+   "ids": [
+    "f2-bacteria-09"
+   ]
+  },
+  {
+   "lec": "f2-bacteria",
+   "t": "Gram-negative rods, MacConkey agar and the periodontal red complex",
+   "basis": "study guide",
+   "ids": [
+    "f2-bacteria-10"
+   ]
+  },
+  {
+   "lec": "ns-anat",
+   "t": "The cranial nerves: jobs, parasympathetic ganglia and lesion signs (tongue, jaw, uvula, eye)",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-anat-08",
+    "ns-anat-11"
+   ]
+  },
+  {
+   "lec": "ns-anat",
+   "t": "Spinal cord tracts, blood supply and cord syndromes (Brown-Séquard, anterior cord)",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-anat-05"
+   ]
+  },
+  {
+   "lec": "ns-anat",
+   "t": "The intracranial bleeds and the cavernous sinus",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-anat-01"
+   ]
+  },
+  {
+   "lec": "ns-anat",
+   "t": "Brainstem rule of 4 and the medullary syndromes",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-anat-07"
+   ]
+  },
+  {
+   "lec": "ns-anat",
+   "t": "Neural tube and neural crest derivatives and their defects",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-anat-03"
+   ]
+  },
+  {
+   "lec": "ns-path",
+   "t": "Stroke territories: ACA, MCA, PCA, lacunar and brainstem syndromes",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-path-01",
+    "ns-path-02"
+   ]
+  },
+  {
+   "lec": "ns-path",
+   "t": "Upper versus lower motor neuron signs and the neuromuscular diseases",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-path-05"
+   ]
+  },
+  {
+   "lec": "ns-path",
+   "t": "The trigeminal sensory nuclei and VPM",
+   "basis": "study guide",
+   "ids": [
+    "ns-path-03"
+   ]
+  },
+  {
+   "lec": "ns-path",
+   "t": "DCML versus spinothalamic pathway and where each crosses",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-path-08"
+   ]
+  },
+  {
+   "lec": "ns-path",
+   "t": "Basal ganglia pathways, Parkinson and Huntington disease; cerebellar signs",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-path-09"
+   ]
+  },
+  {
+   "lec": "ns-phys",
+   "t": "Local anesthetic mechanism and the properties that set onset, potency and duration",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-phys-01",
+    "ns-phys-02"
+   ]
+  },
+  {
+   "lec": "ns-phys",
+   "t": "Ester versus amide metabolism and allergy; prilocaine and articaine",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-phys-04"
+   ]
+  },
+  {
+   "lec": "ns-phys",
+   "t": "Local anesthetic systemic toxicity",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-phys-06"
+   ]
+  },
+  {
+   "lec": "ns-phys",
+   "t": "Resting potential, the action potential and myelin",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-phys-07"
+   ]
+  },
+  {
+   "lec": "ns-phys",
+   "t": "Synaptic transmission, receptors, NMDA; general anesthetic action, MAC and sedation levels",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-phys-09"
+   ]
+  },
+  {
+   "lec": "ns-sens",
+   "t": "Trigeminal neuralgia and the upper- versus lower-half causes of head and facial pain",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-sens-01",
+    "ns-sens-02"
+   ]
+  },
+  {
+   "lec": "ns-sens",
+   "t": "Pain fibers, gate control, sensitization; nociceptive versus neuropathic pain and their drugs",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-sens-03"
+   ]
+  },
+  {
+   "lec": "ns-sens",
+   "t": "Taste and smell pathways and tongue innervation",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-sens-06"
+   ]
+  },
+  {
+   "lec": "ns-sens",
+   "t": "Visual field defects, eye-movement nerves and INO",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-sens-08"
+   ]
+  },
+  {
+   "lec": "ns-sens",
+   "t": "Autonomic layout and transmitters; hearing; facial trauma",
+   "basis": "objectives + study guide",
+   "ids": [
+    "ns-sens-11"
+   ]
+  },
+  {
+   "lec": "rn-filtration",
+   "t": "Clearance: the formula, inulin = GFR, PAH = RPF, creatinine and GFR, and clearance ratios",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-filtration-02",
+    "rn-filtration-14"
+   ]
+  },
+  {
+   "lec": "rn-filtration",
+   "t": "Afferent versus efferent arteriole resistance, angiotensin II, prostaglandins and autoregulation",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-filtration-01",
+    "rn-filtration-08"
+   ]
+  },
+  {
+   "lec": "rn-filtration",
+   "t": "Body fluid compartments (60–40–20), plasma osmolarity, fluid shifts and IV fluids",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-filtration-13"
+   ]
+  },
+  {
+   "lec": "rn-filtration",
+   "t": "Filtration barrier and juxtaglomerular apparatus",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-filtration-07"
+   ]
+  },
+  {
+   "lec": "rn-tubule",
+   "t": "What each segment reabsorbs and which transporter and diuretic belong to it",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-tubule-01",
+    "rn-tubule-06"
+   ]
+  },
+  {
+   "lec": "rn-tubule",
+   "t": "Glucose transport maximum, glycosuria and SGLT2 inhibitors",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-tubule-02",
+    "rn-tubule-03"
+   ]
+  },
+  {
+   "lec": "rn-tubule",
+   "t": "Countercurrent multiplication, urea recycling and ADH's actions",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-tubule-09"
+   ]
+  },
+  {
+   "lec": "rn-balance",
+   "t": "SIADH, central and nephrogenic diabetes insipidus, and ADH control",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-balance-01",
+    "rn-balance-02"
+   ]
+  },
+  {
+   "lec": "rn-balance",
+   "t": "Reading a blood gas: the four simple disorders and their compensation",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-balance-11",
+    "rn-balance-12"
+   ]
+  },
+  {
+   "lec": "rn-balance",
+   "t": "Potassium shifts and the drugs that raise or lower K+",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-balance-06"
+   ]
+  },
+  {
+   "lec": "rn-balance",
+   "t": "PTH, calcitriol and FGF23, and ANP versus RAAS",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-balance-10"
+   ]
+  },
+  {
+   "lec": "rn-disease",
+   "t": "CKD stages, causes, azotemia versus uremia, and CKD mineral and bone disorder",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-disease-01",
+    "rn-disease-03"
+   ]
+  },
+  {
+   "lec": "rn-disease",
+   "t": "Nephritic versus nephrotic syndrome and the classic glomerular diseases",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-disease-07"
+   ]
+  },
+  {
+   "lec": "rn-disease",
+   "t": "Pyelonephritis, casts, stones and renal tumors",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-disease-12"
+   ]
+  },
+  {
+   "lec": "rn-dental",
+   "t": "Dialysis patient: timing after dialysis, the fistula arm, bleeding and hepatitis",
+   "basis": "objectives",
+   "ids": [
+    "rn-dental-01",
+    "rn-dental-05"
+   ]
+  },
+  {
+   "lec": "rn-dental",
+   "t": "Drug choice and dosing in kidney failure (analgesics, antibiotics, local anesthetics)",
+   "basis": "objectives",
+   "ids": [
+    "rn-dental-02"
+   ]
+  },
+  {
+   "lec": "rn-dental",
+   "t": "Diuretic classes, sites and side effects",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-dental-11"
+   ]
+  },
+  {
+   "lec": "rn-dental",
+   "t": "Oral and radiographic signs of kidney failure",
+   "basis": "objectives + study guide",
+   "ids": [
+    "rn-dental-06"
+   ]
+  },
+  {
+   "lec": "he-axes",
+   "t": "The patient on long-term steroids in the chair: a suppressed axis, the adrenal crisis and 100 mg hydrocortisone, and why steroids are tapered",
+   "basis": "recording + slides + study guide",
+   "ids": [
+    "he-axes-01",
+    "he-axes-09"
+   ]
+  },
+  {
+   "lec": "he-axes",
+   "t": "Cushing vs Addison by the labs: cortisol read with ACTH, and the oral pigmentation of Addison disease",
+   "basis": "recording + slides",
+   "ids": [
+    "he-axes-02"
+   ]
+  },
+  {
+   "lec": "he-axes",
+   "t": "Growth hormone regulation, IGF-1, and acromegaly's growing jaw (Class III, diastemas, macroglossia)",
+   "basis": "recording + slides + objectives",
+   "ids": [
+    "he-axes-04"
+   ]
+  },
+  {
+   "lec": "he-axes",
+   "t": "Corticosteroid choice and side effects: fludrocortisone vs dexamethasone, candidiasis, hyperglycemia, osteoporosis",
+   "basis": "recording + slides",
+   "ids": [
+    "he-axes-07"
+   ]
+  },
+  {
+   "lec": "he-axes",
+   "t": "Pituitary adenomas and the posterior pituitary: prolactinoma, bitemporal hemianopsia, diabetes insipidus vs SIADH; the adrenal zones and Conn syndrome",
+   "basis": "recording + slides + review guide",
+   "ids": [
+    "he-axes-05"
+   ]
+  },
+  {
+   "lec": "he-thyroid",
+   "t": "Reading TSH and free T4: Graves (TSH low, T4 high) vs Hashimoto (TSH high, T4 low), and titrating levothyroxine by TSH",
+   "basis": "recording + slides + review guide",
+   "ids": [
+    "he-thyroid-01",
+    "he-thyroid-02"
+   ]
+  },
+  {
+   "lec": "he-thyroid",
+   "t": "Thyroid drugs: levothyroxine's rules, methimazole vs propylthiouracil in pregnancy, agranulocytosis, what methimazole blocks",
+   "basis": "recording + slides",
+   "ids": [
+    "he-thyroid-03"
+   ]
+  },
+  {
+   "lec": "he-thyroid",
+   "t": "Hyperthyroid vs hypothyroid in the chair: epinephrine caution and thyroid storm; macroglossia and delayed healing",
+   "basis": "recording + slides",
+   "ids": [
+    "he-thyroid-05"
+   ]
+  },
+  {
+   "lec": "he-thyroid",
+   "t": "Primary vs secondary hyperparathyroidism and hypoparathyroidism by their labs; lamina dura and brown tumors on the radiograph",
+   "basis": "recording + slides + review guide",
+   "ids": [
+    "he-thyroid-07"
+   ]
+  },
+  {
+   "lec": "he-thyroid",
+   "t": "Thyroid carcinomas: papillary (lymphatics), follicular (invasion, blood), medullary (C cells, RET, MEN 2)",
+   "basis": "recording + slides",
+   "ids": [
+    "he-thyroid-10"
+   ]
+  },
+  {
+   "lec": "he-diabetes",
+   "t": "Hypoglycemia in the chair: the signs, the sulfonylurea or insulin with a skipped meal, oral glucose if awake, glucagon if not",
+   "basis": "recording + slides + review guide",
+   "ids": [
+    "he-diabetes-01",
+    "he-diabetes-02"
+   ]
+  },
+  {
+   "lec": "he-diabetes",
+   "t": "Which drugs cause hypoglycemia and weight gain (insulin and the secretagogues) and which don't; metformin's rules",
+   "basis": "recording + slides",
+   "ids": [
+    "he-diabetes-06"
+   ]
+  },
+  {
+   "lec": "he-diabetes",
+   "t": "Drug classes by mechanism and adverse effect: SGLT2 (yeast infections), GLP-1 (weight loss, C-cell warning), DPP-4, TZD (heart failure), the insulins",
+   "basis": "recording + slides + review guide",
+   "ids": [
+    "he-diabetes-04"
+   ]
+  },
+  {
+   "lec": "he-diabetes",
+   "t": "Type 1 vs type 2, C-peptide, HbA1c cutoffs and control before implants",
+   "basis": "recording + slides + study guide",
+   "ids": [
+    "he-diabetes-03"
+   ]
+  },
+  {
+   "lec": "he-diabetes",
+   "t": "Insulin release through the K-ATP channel, and diabetes in the mouth with its two-way periodontal link",
+   "basis": "recording + slides",
+   "ids": [
+    "he-diabetes-11"
+   ]
+  },
+  {
+   "lec": "mg-giphys",
+   "t": "The GI hormones: cell, trigger and actions of gastrin, CCK, secretin, GIP/GLP-1 and motilin",
+   "basis": "objectives + study guide",
+   "ids": [
+    "mg-giphys-01",
+    "mg-giphys-02"
+   ]
+  },
+  {
+   "lec": "mg-giphys",
+   "t": "Digestion and absorption: monosaccharide carriers, micelles and chylomicrons, bile salt recycling and where B12 is absorbed",
+   "basis": "objectives + study guide",
+   "ids": [
+    "mg-giphys-08",
+    "mg-giphys-09"
+   ]
+  },
+  {
+   "lec": "mg-giphys",
+   "t": "Parietal cell acid secretion: the H+/K+ pump, its three stimulants, its brakes and the vagal cephalic phase",
+   "basis": "objectives + study guide",
+   "ids": [
+    "mg-giphys-06"
+   ]
+  },
+  {
+   "lec": "mg-giphys",
+   "t": "Motility: slow waves, the migrating motor complex and motilin, and achalasia",
+   "basis": "objectives + study guide",
+   "ids": [
+    "mg-giphys-04"
+   ]
+  },
+  {
+   "lec": "mg-giphys",
+   "t": "Saliva: isotonic primary saliva made hypotonic by the ducts, and dual autonomic control",
+   "basis": "objectives + study guide",
+   "ids": [
+    "mg-giphys-05"
+   ]
+  },
+  {
+   "lec": "mg-gianat",
+   "t": "Foregut, midgut and hindgut: arteries, boundaries, the stomach's arteries, referred pain and retroperitoneal organs",
+   "basis": "objectives + study guide",
+   "ids": [
+    "mg-gianat-01",
+    "mg-gianat-02"
+   ]
+  },
+  {
+   "lec": "mg-gianat",
+   "t": "Portal-caval anastomoses in portal hypertension: esophageal varices, caput medusae, rectal varices",
+   "basis": "objectives + study guide",
+   "ids": [
+    "mg-gianat-03"
+   ]
+  },
+  {
+   "lec": "mg-gianat",
+   "t": "Abdominal wall layers and the arcuate line, inguinal hernias (MDs don't LIe), dermatomes and diaphragm openings",
+   "basis": "objectives + study guide",
+   "ids": [
+    "mg-gianat-06",
+    "mg-gianat-07"
+   ]
+  },
+  {
+   "lec": "mg-gianat",
+   "t": "GI histology by region: esophagus, stomach cells, duodenum vs jejunum vs ileum vs colon, oral mucosa and salivary glands",
+   "basis": "objectives + study guide",
+   "ids": [
+    "mg-gianat-10"
+   ]
+  },
+  {
+   "lec": "mg-gianat",
+   "t": "Liver histology: the acinus zones, Kupffer and stellate cells, and the gallbladder wall",
+   "basis": "study guide",
+   "ids": [
+    "mg-gianat-13"
+   ]
+  },
+  {
+   "lec": "mg-gipath",
+   "t": "Peptic ulcer disease: H. pylori and NSAIDs, and the acid drugs (PPIs vs H2 blockers, antacid chelation, misoprostol)",
+   "basis": "study guide",
+   "ids": [
+    "mg-gipath-01",
+    "mg-gipath-02"
+   ]
+  },
+  {
+   "lec": "mg-gipath",
+   "t": "Liver disease: hepatitis viruses, hemochromatosis and Wilson disease, acetaminophen, and the cirrhotic dental patient (INR, platelets, analgesics)",
+   "basis": "study guide",
+   "ids": [
+    "mg-gipath-09",
+    "mg-gipath-10"
+   ]
+  },
+  {
+   "lec": "mg-gipath",
+   "t": "Crohn disease vs ulcerative colitis and celiac disease, with their oral findings",
+   "basis": "study guide",
+   "ids": [
+    "mg-gipath-08"
+   ]
+  },
+  {
+   "lec": "mg-gipath",
+   "t": "Antiemetics (5-HT3, D2, H1, muscarinic), antidiarrheals and laxatives",
+   "basis": "study guide",
+   "ids": [
+    "mg-gipath-06"
+   ]
+  },
+  {
+   "lec": "mg-gipath",
+   "t": "GERD and Barrett esophagus, colorectal syndromes with oral signs, and C. difficile colitis",
+   "basis": "study guide",
+   "ids": [
+    "mg-gipath-15"
+   ]
+  },
+  {
+   "lec": "eb-ask",
+   "t": "Efficacy versus effectiveness, the study-context continuum and the three evidence-to-practice gaps",
+   "basis": "study guide",
+   "ids": [
+    "eb-ask-13",
+    "eb-ask-14"
+   ]
+  },
+  {
+   "lec": "eb-ask",
+   "t": "Pre-appraised evidence: literature review, systematic review, meta-analysis and guideline; the pyramid; GRADE and AGREE",
+   "basis": "study guide",
+   "ids": [
+    "eb-ask-10",
+    "eb-ask-11"
+   ]
+  },
+  {
+   "lec": "eb-ask",
+   "t": "Naming the design from a study description, and what case-control and cohort studies are each good for",
+   "basis": "study guide",
+   "ids": [
+    "eb-ask-05",
+    "eb-ask-06"
+   ]
+  },
+  {
+   "lec": "eb-ask",
+   "t": "The 5 A's in order and building a PICO(T) question; question types and their best designs",
+   "basis": "study guide",
+   "ids": [
+    "eb-ask-01"
+   ]
+  },
+  {
+   "lec": "eb-appraise",
+   "t": "Sensitivity, specificity and predictive values: calculating them and choosing a test for screening or confirming",
+   "basis": "study guide",
+   "ids": [
+    "eb-appraise-08",
+    "eb-appraise-09"
+   ]
+  },
+  {
+   "lec": "eb-appraise",
+   "t": "Reading relative risk, odds ratio, hazard ratio and NNT with their confidence intervals and p-values; type I and II errors and power",
+   "basis": "study guide",
+   "ids": [
+    "eb-appraise-10",
+    "eb-appraise-11"
+   ]
+  },
+  {
+   "lec": "eb-appraise",
+   "t": "Internal and external validity; bias, confounding and chance; randomization, blinding and intention-to-treat",
+   "basis": "study guide",
+   "ids": [
+    "eb-appraise-01",
+    "eb-appraise-02"
+   ]
+  },
+  {
+   "lec": "eb-appraise",
+   "t": "Standardization, calibration and reliability; precision versus accuracy",
+   "basis": "study guide",
+   "ids": [
+    "eb-appraise-06"
+   ]
+  }
+ ],
+ "mock": {
+  "blueprint": {
+   "hn": 18,
+   "da": 16,
+   "f1": 18,
+   "f2": 18,
+   "ns": 14,
+   "rn": 12,
+   "he": 16,
+   "mg": 14,
+   "eb": 10
+  },
+  "groups": {
+   "hn": [
+    "hn-neck",
+    "hn-skull",
+    "hn-face",
+    "hn-itf"
+   ],
+   "da": [
+    "da-numbering",
+    "da-anterior",
+    "da-posterior",
+    "da-anomalies"
+   ],
+   "f1": [
+    "f1-biomol",
+    "f1-cells",
+    "f1-molbio"
+   ],
+   "f2": [
+    "f2-genpath",
+    "f2-virology",
+    "f2-bacteria"
+   ],
+   "ns": [
+    "ns-anat",
+    "ns-path",
+    "ns-phys",
+    "ns-sens"
+   ],
+   "rn": [
+    "rn-filtration",
+    "rn-tubule",
+    "rn-balance",
+    "rn-disease",
+    "rn-dental"
+   ],
+   "he": [
+    "he-axes",
+    "he-thyroid",
+    "he-diabetes"
+   ],
+   "mg": [
+    "mg-giphys",
+    "mg-gianat",
+    "mg-gipath"
+   ],
+   "eb": [
+    "eb-ask",
+    "eb-appraise"
+   ]
+  },
+  "limit": 12000,
+  "likelyShare": 0.5
+ },
+ "srcLabel": {
+  "guide": "From the study guides",
+  "rec": "From the recording",
+  "slides": "From the slides",
+  "hub": "From an earlier hub",
+  "ref": "Board fact"
+ },
+ "drillHy": {},
+ "achievements": [
+  {
+   "id": "first",
+   "name": "Chief Complaint",
+   "icon": "tooth",
+   "desc": "Answer your first question",
+   "cond": {
+    "type": "totalCorrect",
+    "n": 1
+   }
+  },
+  {
+   "id": "fifty",
+   "name": "History Taken",
+   "icon": "check",
+   "desc": "50 correct answers",
+   "cond": {
+    "type": "totalCorrect",
+    "n": 50
+   }
+  },
+  {
+   "id": "twohundred",
+   "name": "One Full Mock",
+   "icon": "mock",
+   "desc": "200 correct answers",
+   "cond": {
+    "type": "totalCorrect",
+    "n": 200
+   }
+  },
+  {
+   "id": "streak10",
+   "name": "Vitals Stable",
+   "icon": "goal",
+   "desc": "10 correct in a row",
+   "cond": {
+    "type": "streak",
+    "n": 10
+   }
+  },
+  {
+   "id": "streak25",
+   "name": "Clean Bill of Health",
+   "icon": "flame",
+   "desc": "25 correct in a row",
+   "cond": {
+    "type": "streak",
+    "n": 25
+   }
+  },
+  {
+   "id": "all",
+   "name": "Every System Reviewed",
+   "icon": "trophy",
+   "desc": "Answer every question in the bank at least once",
+   "cond": {
+    "type": "allSeen"
+   }
+  }
+ ],
+ "pcases": [],
+ "index": []
+}
