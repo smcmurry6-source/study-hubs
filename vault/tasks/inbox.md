@@ -59,10 +59,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   every view of a hub now fit a 320 px phone at XX-Large (220 px of layout), and the smoke test checks them, but a game once
   it's started (each hub's own `content/arcade.css` and `widget/games.css`) wasn't swept. Open each in a scripted browser at
   that size, the way `tools/ci/smoke.js`'s 320 px check does, and fix any that scroll sideways or cut off a control.
-- [ ] **A hub's report-reply pop-up covers the reward card on a phone** (2026-11-19, seen while moving the card to
+- [x] **A hub's report-reply pop-up covers the reward card on a phone** (2026-11-19, seen while moving the card to
   `widget/prize.js`): on an emulated iPhone 13 (Perio, the preview's made-up data) a reply pop-up open at the top of the
   screen sits over the gold card (`.hx-prizes`, z-index 45) so only its first line shows. On `main` too. Perhaps lift the
-  card above the pop-up for its few seconds, or drop it in under the pop-up.
+  card above the pop-up for its few seconds, or drop it in under the pop-up. Done 2026-11-20: the card is lifted above the pop-up for its
+  few seconds (`.hx-prizes` z-index 10004 in `widget/prize.js`: over `.sh-reply`'s 10001, under a phone's toasts' 10005,
+  which drop in under it). The same overlap was on a laptop from about 870 to 1,250 px wide, where the pop-up (bottom right)
+  covered the card's right end; fixed by the same line. Checked on the preview's made-up data on Review of Systems and Heme
+  & Endo Exam 3, iPhone 13 and 1100 px: the card is on top. (#PRNUM)
 - [x] **The dashboard's toast on a phone** (2026-11-19, left from BUG-126's fix): a hub's toasts now drop in at the top on a
   phone, clear of Timmy, the streak flame and the Listen player; the dashboard's own (`toast()` in `widget/dash.js`) still
   comes up at the bottom and wasn't checked against what sits there. Check it on a phone and move it if anything covers it. Checked 2026-11-19 on an emulated iPhone 13 with the preview's made-up data: since #458 the rule in `widget/hub.css` drops the dashboard's toasts in at the top too (64 px, under its 56 px bar), clear of the report-reply pop-up and the bottom corners; nothing covers a long one, so nothing to move. And its prizes are on the gold card now (the next line). (#466)
