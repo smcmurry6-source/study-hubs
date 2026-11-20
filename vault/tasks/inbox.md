@@ -16,7 +16,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   the scenes read the amounts from `sh_prizes()`'s `dark`, `modupro` and `loupes`. Never take crowns back once paid
   ([earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md)): dropping the back pay after v89 is live would lower balances.
   The next lessons audit reads the economy with the back pay in it (a one-off jump in balances, not a rate).
-- [ ] **After #492 merges: replay the new Dark Matter unlock for the one student Sam asked for** (2026-11-20, "replay the dark
+- [x] **After #492 merges: replay the new Dark Matter unlock for the one student Sam asked for** (done 2026-11-20 at about 7:20 am Central, once the merge had published: the one `dark-seen-0` row deleted through the connector, their profile's `dark_seen` empty again, so it plays on their next visit; their crowns already include its 5,000) (2026-11-20, "replay the dark
   matter animation for ... since they didnt get to see it"; the name is in that session's chat, not here: per-person rows stay in
   the database, [learner-data-privacy](../rules/learner-data-privacy.md)). It plays when the profile's `dark_seen` lacks 0:
   delete that visitor's `achievements` row of kind `dark-seen-0` through the connector (one row, Sam's OK), after v89 is applied
