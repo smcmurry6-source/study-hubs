@@ -35,4 +35,4 @@
 # migration_v87 ("Is this your other device?" only about a device used in the last 21 days: name_shared) was applied on 2026-11-19 (through the connector, md5-checked, PR #479; v83 and v84 still wait).
 # migration_v84 (the bootstrap's answers after the device's newest: sh_answers_since, get_my_answers_since, get_widget_bootstrap_v2's two new arguments; get_pet_days by the boundary day) was applied on 2026-11-20 (through the connector, md5-checked, PR #470).
 migration_v83.sql
-migration_v88.sql
+migration_v89.sql

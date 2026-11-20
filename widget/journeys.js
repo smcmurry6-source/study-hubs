@@ -369,7 +369,7 @@
                   medallion slams in with rays and a slow ring of light around it;
        4.6-5.6 s  the medallion rises from the middle of the screen to its place;
        5.5-7.6 s  "Dark Matter" letter by letter and a sheen across it, the line, then the reward: 5,000 Shiny Gold Crowns
-                  counted up with a fountain of coins and a rain of them (migration_v88 pays them), and on the Handpiece the
+                  counted up with a fountain of coins and a rain of them (migration_v89 pays them), and on the Handpiece the
                   rank's two Legendary pieces for Timmy's place;
        8.5 s      "Collect 5,000 crowns" (the coin flies up as it closes).
      Skip jumps to the last frame (the reward stays), Esc closes. Each journey has its own sky and colors. ---------- */

@@ -12,8 +12,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 
 - [ ] **Sam: confirm the Dark Matter crowns' three readings** (2026-11-20, [decisions](../decisions.md)): 5,000 for each journey's
   Dark Matter (three in all), crowns only (no XP), and back pay for anyone already there. Each is one line of `sh_wallet` in
-  `migration_v88.sql` to change, and the scene reads the amount from `sh_prizes()`'s `dark`. Never take crowns back once paid
-  ([earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md)): dropping the back pay after v88 is live would lower balances.
+  `migration_v89.sql` to change, and the scene reads the amount from `sh_prizes()`'s `dark`. Never take crowns back once paid
+  ([earn-rates-stay-enjoyable](../rules/earn-rates-stay-enjoyable.md)): dropping the back pay after v89 is live would lower balances.
 - [ ] **The mastery read is slower a call than before the optimization pass** (2026-11-20, its readout): `get_hub_mastery`
   236 → 349 ms on the server on average (673 calls since phase 1), the evening's median 242 → 709 ms on 77 calls, 11% of the
   database's time. Since #459 the page works out the rank between answers, so the reads left are the ones when a hub's page

@@ -1,4 +1,4 @@
--- v88 (2026-11-20): reaching Dark Matter pays 5,000 Shiny Gold Crowns, once for each journey's Dark Matter.
+-- v89 (2026-11-20): reaching Dark Matter pays 5,000 Shiny Gold Crowns, once for each journey's Dark Matter.
 -- Sam, 2026-11-20: "reaching dark matter gets you 5000 crowns. be sure to put that on the rank up screen".
 --
 -- The wallet is worked out from what a student has earned, never stored (sh_wallet), so the award is a term of it, like
@@ -53,7 +53,7 @@ begin
   n_m := (select count(*) from unnest(m_now) z where not (z = any(m_was)));
   gt := (select r.gtier from sh_rank(v_xp) r);
   n_r := greatest(0, gt - (select r.gtier from sh_rank(coalesce(bl.xp, 0)) r));
-  -- v88: each journey's Dark Matter reached (gtier 6, 13, 20), from the first XP, so it is back pay too
+  -- v89: each journey's Dark Matter reached (gtier 6, 13, 20), from the first XP, so it is back pay too
   n_d := (gt + 1) / 7;
   earned := base_xp / 2 + t_c + prize_c + 1000 * n_f + 25 * n_t + 50 * n_m + 20 * n_r + (sh_prizes()->>'dark')::int * n_d;
   select coalesce(sum(price), 0) into spent from pet_purchases where visitor_id = p_visitor;
