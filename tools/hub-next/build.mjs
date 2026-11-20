@@ -122,8 +122,18 @@ function build(hub){
      the mock's share and the drill read) is worked out from core.json's likelyTopics, so it can't fall behind them
      (BUG-164: re-ranking Exam 3's topics left 77 questions in a topic unflagged). Set in place, so its key keeps its spot. */
   const firstTopic = {};
+  /* a topic's picks (Sam, 2026-11-20, Heme & Endo Exam 3: "can we make it higher yield with less redundant questions"): the
+     questions a bank toggle with a basis shows from it (SH_HUB.bank.only's { basis }), each point the topic names asked
+     once; its ids stay High likelihood and keep writing High yield. Picks are some of the topic's own ids, and a question's
+     likely flag carries the topic without them, so picking changes nothing in questions.json. */
+  for (const t of core.likelyTopics || []) {
+    if (!t.picks) continue;
+    const bad = t.picks.filter((id) => !(t.ids || []).includes(id));
+    if (bad.length || new Set(t.picks).size !== t.picks.length) throw new Error(`hubs/${hub}/content/core.json: the topic "${t.t.slice(0, 60)}" picks ${bad.length ? bad.join(", ") + ", not among its ids" : "a question twice"}`);
+  }
   (core.likelyTopics || []).forEach((t) => (t.ids || []).forEach((id) => { if (!firstTopic[id]) firstTopic[id] = t; }));
-  questions.forEach((q) => { if (firstTopic[q.id]) q.likely = firstTopic[q.id]; else delete q.likely; });
+  const flag = (t) => { if (!t.picks) return t; const { picks, ...rest } = t; return rest; };
+  questions.forEach((q) => { if (firstTopic[q.id]) q.likely = flag(firstTopic[q.id]); else delete q.likely; });
   /* the other wordings: checked, laid out a question to a line, and counted in core.json (the engine fetches the file only
      when the count is there) */
   const vPath = join(dir, "variants.json");

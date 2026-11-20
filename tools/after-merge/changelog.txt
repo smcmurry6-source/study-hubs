@@ -77,3 +77,4 @@ heme-endo-exam3 | Four explanations now say more about the wrong answer most of 
 heme-endo-exam3 | Every chart can now cover its answers so you can test yourself: press Cover the answers beside a chart's title, then Show on a cell to check it, or Show all.
 all | The "Is this your other device?" card now only asks about a device used in the last 3 weeks, says to type the code on your other device right away, and takes a code from your other device on its first screen.
 heme-endo-exam3 | New filter in the Question Bank: under Only, tick On the study guide to practice just the questions on Dr. Herr's study guide (209 of them). The study guide page has a button for all of them and one per lecture.
+heme-endo-exam3 | The On the study guide filter now has one or two questions on each point of Dr. Herr's study guide, without the repeats: 115 questions instead of 209. Every one of them is still under High likelihood.
