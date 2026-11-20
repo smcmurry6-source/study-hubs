@@ -55,6 +55,16 @@ check-in hours: its entry in `hubs.js`.
   items, with the special formats. Ids are `<part id>-NN` and permanent (`tools/question-ids/review-of-systems.txt`).
   High likelihood is about 40% of each part's questions: each topic keeps its most direct questions.
 - **Scope:** only the intro deck's list (Sam: "None: stick to the list"): no oral histology, dental anesthesia or operative.
+- **Exam Hints:** only Medical Emergencies has any (18, from its four lecture recordings, with each professor's name as the
+  transcript spells it). What those professors said they won't test (ECG patterns, airway adjunct sizing, the steroid chart
+  and the like) has no questions. The other courses had no recordings in their folders.
+- **Not High likelihood on purpose:** CKD (`rn-disease-01` to `-05`): a classmate's Renal Exam 1 objectives head it "NO EXAM
+  Qs on this". The questions stay, since that was about the Renal course's own exam and CKD's dental care is board material;
+  Sam's call ([inbox](../tasks/inbox.md)). The merge script that built the content kept it out.
+- **Size:** the biggest bank on the site, about 1 MB over the wire on a first visit (after the page has drawn: the content
+  JSON loads behind it), against Heme & Endo Exam 3's 780 KB; its line in `tools/release/budgets.json`. Ask Timmy's content
+  for it is about 170-200k tokens by length, which is why Timmy moved to Haiku 5.5 ([decisions](../decisions.md),
+  [ask-timmy](../reference/ask-timmy.md)) and `tools/timmy/test.mjs`'s guard is 200k.
 
 ## Pending
 
