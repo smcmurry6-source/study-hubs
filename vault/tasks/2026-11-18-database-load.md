@@ -56,9 +56,11 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   against 0.5 s. Same results as the old functions on all 22 reads compared (exact JSON); the page shows when each was
   worked out and "newer numbers on the way" after Refresh. The lessons audit reads the kept copies too
   (`tools/lessons-refresh.md`), so its two heaviest calls no longer touch the class's CPU.
-- [ ] `migration_v83.sql` applied live at night (1 to 5 am Central, one statement a call, after fetching `main` for the
+- [x] `migration_v83.sql` applied live at night (1 to 5 am Central, one statement a call, after fetching `main` for the
   number), the tables filled one read a call, `supabase/schema.sql` appended and the pending line taken out; the first
   ticks read back (`select key, computed_at, took_ms, fails, error from admin_cache order by key;`).
+  **Done** 2026-11-20, 1:35 to 1:47 am Central: md5-checked (all 24 functions match a throwaway copy built with it), 15
+  reads kept, no failed request; the times are in the Log ([#456](https://github.com/smcmurry6-source/study-hubs/pull/456)'s write-back).
 - [x] The lessons audit's queries (`tools/economy.sql`, `tools/lessons-daily.sql`, `tools/retro.sql`) stay short, or the
   runbook says to run them when the class is quiet; the connector's queries have no time limit.
   **Done, both** ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md), [#434](https://github.com/smcmurry6-source/study-hubs/pull/434)). Timed on a throwaway copy at
@@ -274,5 +276,22 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   database pass's phase 2, applied live), so #456's migration, written as v79, is now `migration_v83.sql`, with its pending
   line and every mention; it replaces none of the functions v79 to v82 wrote. Run again on `main` with v83 pending:
   `admin-ops.js` (116 checks), `rls.js` and `xp.js` (629 checks) pass. Still to do: the box above, applying it live at night.
+- 2026-11-20, 1:30 to 1:50 am Central (Claude Code, the night apply): `main` fetched (#456 had merged as v83; v84 pending, its
+  own session's apply set for 2:30 am, after this one). The edge logs quiet (about 15 requests a minute; four failed requests at
+  1:23 am, after a forced checkpoint, none from 1:25 on). Before: the 12 functions v83 replaces matched `main`'s copy, except that
+  `sh_data_quality` was the same body without its comments and **`sh_insights` already had v83's body** (the same md5; no
+  migration history row, so applied by hand earlier). Applied one statement a call, in file order except that `sh_insights`
+  (already there) was skipped and the helpers' revokes went in before the tick (a new function is open to visitors until its
+  revoke; the edge logs show no call to any of them). After: all 24 functions match a throwaway copy of `main` with v83
+  (body md5, volatility, security definer); `sh-admin-cache` runs every minute (10 s), the retention and shop jobs unchanged;
+  through the API a visitor gets "unauthorized" (28000) from the admin functions and "permission denied" from the helpers,
+  the tick and the table. **Live times** to work each read out (`took_ms`), the class quiet: insights 4,135 ms (by the first
+  tick; the connector's 5 s limit stopped it the first time), Perio's question health 3,583, clicks 30 days 3,165 (7 days
+  2,062, 90 days 1,613), data quality 2,754, retries 1,848, Heme & Endo Exam 3's question health 1,790, features 30 days 995
+  (7 days 228, 90 days 250), check-ins 385, visitors 100 to 116. That is 2 to 20 times the copy (the copy had no
+  `ui_click_reach` rows, 100,000 live, and a faster CPU). 15 rows kept (the reads above, each day range the page offers),
+  then set as read 3 hours ago, so they're refreshed nightly and not every 15 minutes overnight. The ticks after: 0.01 s with
+  nothing due. Found, for later (inbox): a read the table doesn't have yet that takes over 3 s still times out for the page,
+  and leaves no row for the job.
 
 ## Outcome
