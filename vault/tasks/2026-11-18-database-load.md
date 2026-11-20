@@ -151,6 +151,8 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   Done 2026-11-19 by the lessons audit: the query is in `tools/lessons-refresh.md` step 1 and the skill; that afternoon it read
   323 MB (`personal_answers` 79 MB, `activity_pings` 36, `question_events` 35, `xp_seen` 31, `ui_click_reach` 24).
 - [ ] [The optimization pass](2026-11-18-database-optimization-pass.md): the answer save is still 55% of the database's time.
+  (Its readout, 2026-11-20: 31.7% since phases 1 and 2, 45 ms a save on the server; the bootstrap and the mastery read
+  are now a third, its open boxes.)
 - [x] `personal_answers`' two indexes (`migration_v71.sql`: the person's answers newest first, and one question's answers)
   built on the live database with `create index concurrently`, then the file appended to `supabase/schema.sql` and its line
   taken out of `supabase/pending-migrations.txt`. Each answer's speed limit, double-tap check and per-question counts read

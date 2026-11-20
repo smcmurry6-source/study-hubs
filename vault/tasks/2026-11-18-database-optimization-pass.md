@@ -133,11 +133,16 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   **Done for phase 1:** `migration_v76.sql` (ideas 1 and 2), `migration_v77.sql` with `widget/v3.js` (idea 3),
   `widget/v3.js` and `widget/dash.js` (idea 4); idea 5 isn't worth doing. What the measuring found and this PR doesn't
   do is the next boxes.
-- [ ] A readout from a busy evening after: the share of database time per call again, and whether any saves failed.
+- [x] A readout from a busy evening after: the share of database time per call again, and whether any saves failed.
   The first evening after the merge with a class studying (Heme & Endo Exam 3's eve, Thu 2026-11-19, if it is merged by
   then): the edge logs any time, `pg_stat_statements` at a quiet hour. The "before" to compare with is in the Log
   (2026-11-19, 4:10 am). Phase 2's `migration_v79.sql` to `v82` went live at 12:10-12:13 pm Central that day (the Log), so
   that evening's numbers have them in too.
+  **Done** 2026-11-20, 1:30-1:45 am Central (the Log): 6 to 10 pm, **9.0 → 4.6 requests an answer** (69,796 → 21,648
+  requests, 7,780 → 4,706 answers), **failed saves 17 → 3** (0.22% → 0.06%, the three in one 90-second stall), an answer
+  125 → 105 ms at the median and **870 → 313 ms at the 95th percentile**; since the 4:10 am snapshot, the answer save
+  **106 → 45 ms** on the server and **224 → 141 ms of database time an answer**. Slower a call: the bootstrap and the
+  mastery read (the box after "Apply `migration_v84.sql`").
 
 **Phase 2: found by the measuring, each needs more than a `create or replace` (apply after Fri 2026-11-20, 9:30 am, at night):**
 
@@ -207,6 +212,15 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   in `pg_proc`, `get_my_answers_since` and the bootstrap through the API as a visitor (200), the edge logs for a minute
   after. Then append it to `supabase/schema.sql` and take its line out of `supabase/pending-migrations.txt`. Until it is
   applied the pages ask as before (they keep no copy: the reply has no `answers_id`).
+- [ ] **The bootstrap and the mastery read are slower a call than before phase 1** (found by the readout, 2026-11-20):
+  since the 4:10 am snapshot, `get_widget_bootstrap_v2` 425 → 500 ms on the server on average (878 calls; the evening's
+  median end to end 445 → 574 ms, 95th percentile 1.7 s) and `get_hub_mastery` 236 → 349 ms (673 calls; the evening's
+  median 242 → 709 ms, on 77 calls). Together they are now a third of the database's time (21.3% and 11.4%; the answer
+  save 31.7%). Since #459 the page works out the rank between answers, so the mastery reads left are the ones when a hub's
+  page opens (`loadOwn()` in `widget/ranks-hub.js`), beside the bootstrap: likely the cold ones (a student's rows not in
+  memory), not a slower body, but not checked. After `migration_v84.sql` is live (the box above; it takes most of the
+  bootstrap's answers out), read both again; then, on a throwaway copy, time the mastery read first-of-page against
+  warmed, and against the body before `migration_v76.sql`, before changing anything.
 - [x] **`answer_xp` is written twice an answer** (the row, then its reply onto it): one insert at the end would halve
   that table's writes and dead rows. It moves the insert past the speed limit's count, which reads the row, so it needs
   care. **Done: `migration_v80.sql`.** The count joins the row only to leave out mock answers and runs only outside a mock,
@@ -341,13 +355,47 @@ much (29 ms a check, not 1), which made the first timings meaningless. Live tabl
   past the newest, no visitor, the grants. `tools/release/xp.js` (+5 checks), `rls.js`, `admin-ops.js`, `retention.js`,
   `timmy.js` pass with it pending; `tools/ci/quiet.js`'s `history()` checks the page both ways (with v84: the copy kept,
   the cursor sent, the two new answers in place; without: asked again without the cursor, no copy kept).
+- 2026-11-20, 1:30-1:45 am Central (Claude Code, the readout, the session of #457): the evening of Heme & Endo Exam 3's eve,
+  with phase 1 and phase 2 live (`migration_v76.sql`, `v77` and `v79` to `v82`; also `v85` to `v87`; `v83` and `v84` still
+  waiting). Read only, one call at a time.
+  - **Edge logs, 2026-11-20 00:00-04:00 UTC (6 to 10 pm Central)**, against the same hours the evening before the Perio
+    final (read again for the failures, which the "before" didn't count): 69,796 → **21,648 requests** (1,562 preflights),
+    7,780 → **4,706 answers**, so 9.0 → **4.6 requests an answer**. Shares: `record_answer_v2` 21.7%, `get_class_numbers`
+    21.3% (one a card: 0.98 an answer, where `question_stats` and `question_choices` were 1.85), `record_analytics` 16.8%
+    (0.77 an answer, where `record_qh`, `record_clicks` and `record_events` were 1.33), `record_activity_pings` 14.6% (0.67
+    an answer, where `record_activity_ping` was 1.64), preflights 7.2%, `record_card_v2` 2.8%, the changelog 2.1% (5.1%).
+    An answer 125 → **105 ms** at the median, 870 → **313 ms** at the 95th percentile; the class's numbers 91 ms, the
+    analytics 99, the pings 97. The bootstrap 445 → 574 ms at the median (228 calls, 95th percentile 1,731 ms) and the
+    mastery read 242 → 709 ms (77 calls): the new box.
+  - **Failed saves 17 → 3** (0.22% → 0.06%; every server error 29 → 7). The three were at 8:34-8:35 pm, in a stall of
+    about 90 seconds when every call slowed to 2 to 5 s; Postgres logged only their three statement timeouts (3 s, at
+    02:35:02-05 UTC) and no heavy statement, a checkpoint had finished at 02:33:51 (82 s of spread writes, as usual), and no
+    merge, migration or data fix of ours ran then (#484 merged at 8:04). Cause not found; the page holds a failed answer
+    and sends it again with the same request id (the quiet spell). The other errors: one ping batch's 502 (6:32 pm, 142 ms)
+    and three admin-page reads at the visitors' 3 s limit (7:23-7:25 pm: `get_exam_debriefs`, `get_data_quality` twice),
+    which `migration_v83.sql` works out ahead ([database-load](2026-11-18-database-load.md), its box).
+  - **`pg_stat_statements`** (the same restart, 2026-11-18 20:57 UTC, no reset, nothing evicted): 5,856 s in all, so
+    **2,061 s since the 4:10 am snapshot** (21 hours: Exam 3's last day and its eve). `record_answer_v2` **31.7%** (47.4%
+    before; 14,573 calls, **45 ms** each on average, 106 before), `get_widget_bootstrap_v2` 21.3% (878 calls, 500 ms; 425
+    before), `get_hub_mastery` 11.4% (673, 349 ms; 236 before), `record_activity_pings` 4.4% (10,333, 8.8 ms),
+    `record_analytics` 3.5% (7,326, 9.9 ms), `get_my_answers` 2.7%, `record_qh` 2.5% (until the pages moved to
+    `record_analytics` at noon), `record_clicks` 1.8%, `record_events` 1.1%, `get_class_numbers` 1.0% (8,802, 2.3 ms),
+    `record_card_v2` 0.9% (1,133, 16 ms; 56 before), `record_activity_ping` 0.8%; the rest about 16% (`get_pet_days`, which
+    `migration_v84.sql` bounds, the place, the shop, the boards, the admin page). **Database time an answer: 3,795 s over
+    16,964 answers = 224 ms → 2,061 s over 14,573 = 141 ms.**
+  - **Size:** the study database **338 MB** (323 MB after the rewrites at noon), 352 MB with the two template databases
+    (the sum the 500 MB limit counts). The biggest: `personal_answers` 29 + 54 MB (indexes), `activity_pings` 16 + 28 (kept
+    3 days), `question_events` 24 + 13, `xp_seen` 17 + 16 (15.9 + 14.8 after its rewrite: the inbox line on its growth),
+    `answer_xp` 21 + 5, `xp_awards` 9 + 18.
 
 ## Outcome
 
 So far (the task stays open for the boxes still unticked): phase 1's `migration_v76.sql` and `migration_v77.sql` are live,
 and so is phase 2: `migration_v79.sql` to `v82` (the awards summed once, `answer_xp` written once, the visits' index gone,
 fewer calls from the page and a lighter bootstrap), applied 2026-11-19 at noon, with `xp_seen` and `activity_visits`
-rewritten. Left: the evening readout and the bootstrap's answers (room in the dashboard's budget: done, PR #466).
+rewritten. The evening after (Exam 3's eve, the readout of 2026-11-20): half the requests an answer, failed saves 17 → 3,
+an answer save 106 → 45 ms on the server and 224 → 141 ms of database time an answer. Left: phase 3's `migration_v84.sql`
+live (the bootstrap's answers), then the bootstrap's and the mastery read's slower calls (the readout's box).
 
 Related: [database-load](2026-11-18-database-load.md) · [shared-infrastructure](../reference/shared-infrastructure.md) ·
 [game-server](../reference/game-server.md) · [decisions](../decisions.md) ·
