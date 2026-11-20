@@ -33,5 +33,5 @@
 # migration_v86 (closed check-ins closed on the server: exam_checkins_closed, sh_submit_exam_debrief) was applied on 2026-11-19 at about 2 pm Central (through the connector as v85_closed_checkins, ahead of v83, v84 and #469's v85, which it touches nothing of), and is in supabase/schema.sql.
 # migration_v85 (Ask Timmy's timmy_cache and timmy_cache_marks) was applied on 2026-11-19 (through the connector, md5-checked, after PR #469; v83 and v84 still wait, and v85 doesn't need them).
 # migration_v87 ("Is this your other device?" only about a device used in the last 21 days: name_shared) was applied on 2026-11-19 (through the connector, md5-checked, PR #479; v83 and v84 still wait).
+# migration_v83 (the admin page's heavy reads worked out ahead: admin_cache, sh_admin_cached, the sh-admin-cache pg_cron job) was applied on 2026-11-20 (through the connector, one statement a call, md5-checked, PR #456; v84 went in after it the same night).
 # migration_v84 (the bootstrap's answers after the device's newest: sh_answers_since, get_my_answers_since, get_widget_bootstrap_v2's two new arguments; get_pet_days by the boundary day) was applied on 2026-11-20 (through the connector, md5-checked, PR #470).
-migration_v83.sql

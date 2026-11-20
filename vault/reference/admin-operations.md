@@ -48,7 +48,13 @@ its ink and blue-grey, each hub's class color as a dot).
   copies (not one under 2 minutes old), the header says "newer numbers on the way", and the page looks again every 30 s
   and redraws when they've come. Two lookups also got cheaper (`sh_surface` once a section, not once an hourly row).
   On a throwaway copy at the live size: insights 1.05 → 0.43 s to work out, data quality 0.98 → 0.37 s; read from the
-  table, each read under 3 ms, question health 42 ms (the overlay) against 0.5 s.
+  table, each read under 3 ms, question health 42 ms (the overlay) against 0.5 s. **On the live database** (applied
+  2026-11-20 at 1:35 to 1:45 am Central, the class quiet) working each out takes several times as long as on the copy:
+  insights 4.1 s, Perio's question health 3.6 s, clicks 1.6 to 3.2 s, data quality 2.8 s, retries 1.8 s, Heme & Endo
+  Exam 3's question health 1.8 s, features 0.2 to 1.0 s, check-ins 0.4 s, visitors 0.1 s. Insights, clicks and
+  Perio's question health are over a visitor's 3 s limit, so a read the table doesn't have yet times out the way it did
+  before v83; the job's 10 s covers them. That night the usual reads were filled (each day range the page offers: 7, 30
+  and 90), and rows stay 30 days after their last read.
   **To read a kept copy through the connector** (cheap at any hour): `select computed_at, body from admin_cache where key =
   'quality';`; Question health with today's reviews: `select r->>'qid' qid, r->>'state' state, (r->>'score')::int score,
   r->'flags' flags from admin_cache c, jsonb_array_elements(sh_qh_overlay('<hub>', c.body)) r where c.key = 'qh:<hub>' and
