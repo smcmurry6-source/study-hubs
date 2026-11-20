@@ -7,7 +7,7 @@ requested-by: Sam
 due:
 waiting-on:
 agent:
-pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430, https://github.com/smcmurry6-source/study-hubs/pull/434, https://github.com/smcmurry6-source/study-hubs/pull/435, https://github.com/smcmurry6-source/study-hubs/pull/456
+pr: https://github.com/smcmurry6-source/study-hubs/pull/421, https://github.com/smcmurry6-source/study-hubs/pull/429, https://github.com/smcmurry6-source/study-hubs/pull/430, https://github.com/smcmurry6-source/study-hubs/pull/434, https://github.com/smcmurry6-source/study-hubs/pull/435, https://github.com/smcmurry6-source/study-hubs/pull/456, https://github.com/smcmurry6-source/study-hubs/pull/487
 ---
 
 # Keep heavy queries from failing students' answer saves
@@ -60,7 +60,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   number), the tables filled one read a call, `supabase/schema.sql` appended and the pending line taken out; the first
   ticks read back (`select key, computed_at, took_ms, fails, error from admin_cache order by key;`).
   **Done** 2026-11-20, 1:35 to 1:47 am Central: md5-checked (all 24 functions match a throwaway copy built with it), 15
-  reads kept, no failed request; the times are in the Log ([#456](https://github.com/smcmurry6-source/study-hubs/pull/456)'s write-back).
+  reads kept, no failed request; the times are in the Log ([#487](https://github.com/smcmurry6-source/study-hubs/pull/487)).
 - [x] The lessons audit's queries (`tools/economy.sql`, `tools/lessons-daily.sql`, `tools/retro.sql`) stay short, or the
   runbook says to run them when the class is quiet; the connector's queries have no time limit.
   **Done, both** ([run-sql-on-the-live-database](../how-to/run-sql-on-the-live-database.md), [#434](https://github.com/smcmurry6-source/study-hubs/pull/434)). Timed on a throwaway copy at
@@ -276,7 +276,7 @@ saves failed in bursts of 1 to 5 minutes, about eight times in the day, up to 1 
   database pass's phase 2, applied live), so #456's migration, written as v79, is now `migration_v83.sql`, with its pending
   line and every mention; it replaces none of the functions v79 to v82 wrote. Run again on `main` with v83 pending:
   `admin-ops.js` (116 checks), `rls.js` and `xp.js` (629 checks) pass. Still to do: the box above, applying it live at night.
-- 2026-11-20, 1:30 to 1:50 am Central (Claude Code, the night apply): `main` fetched (#456 had merged as v83; v84 pending, its
+- 2026-11-20, 1:30 to 1:50 am Central (Claude Code, the night apply, [#487](https://github.com/smcmurry6-source/study-hubs/pull/487)): `main` fetched (#456 had merged as v83; v84 pending, its
   own session's apply set for 2:30 am, after this one). The edge logs quiet (about 15 requests a minute; four failed requests at
   1:23 am, after a forced checkpoint, none from 1:25 on). Before: the 12 functions v83 replaces matched `main`'s copy, except that
   `sh_data_quality` was the same body without its comments and **`sh_insights` already had v83's body** (the same md5; no
