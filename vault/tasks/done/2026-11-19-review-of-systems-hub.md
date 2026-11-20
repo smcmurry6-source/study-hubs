@@ -37,7 +37,7 @@ sections to make it more manageable."
 - [x] Notes (As taught and Plain English), a cram list, review tables and board-style questions for every course
 - [x] High likelihood topics for every part; every choice with its why; the format minimums per course
 - [x] Wired into the site: `hubs.js`, `sw.js`, the admin page, the recap tool, the budgets
-- [ ] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
+- [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)
 - [x] Vault written back (hub note, decisions, this note's Outcome)
 
 ## Log
