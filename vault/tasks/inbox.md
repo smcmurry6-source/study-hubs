@@ -36,12 +36,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [ ] **Review of Systems: an arcade with its own skin** (2026-11-19, the hub's build): it shipped without one (More hides
   the tile). Sam's call whether it wants one; if so, its games, names and lobby art are its own
   ([arcade-skins](../rules/arcade-skins.md)), and the hub comes out of `TEXT_ONLY` in `sw.js`.
-- [ ] **The engine's background work after Home in small pieces** (2026-11-20, [#480](https://github.com/smcmurry6-source/study-hubs/pull/480)):
+- [x] **The engine's background work after Home in small pieces** (2026-11-20, [#480](https://github.com/smcmurry6-source/study-hubs/pull/480)):
   on the performance suite's slowed phone, Review of Systems blocks the page for about 850 ms after Home has drawn (Heme & Endo
   Exam 3: about 330). A CPU profile put the JavaScript in `exportSections()` in `widget/hub.js` (every part's notes parsed into
   the page in one task for the search index), `fit()`/`fitFigs()` in `widget/v3.js`'s layer and `fmt()`'s `toLocaleString`;
   the rest is the browser parsing the content JSON. Building the index a few parts at a time, yielding between them, would
-  cut it on every hub; then lower the hub's `tbt` in `tools/release/budgets.json` (set to 900 from that day's run).
+  cut it on every hub; then lower the hub's `tbt` in `tools/release/budgets.json` (set to 900 from that day's run). Done (#498): the index is built a lecture at a time, `widget/fx.js` measures every bar before animating any (the biggest share, about 370 ms: not in the first profile), `fit()` reads before it writes, the rank pill is fitted once a frame, `fmt()` keeps one formatter. Review of Systems about 920 to 490 ms, `tbt` 900 to 700; Heme & Endo Exam 3 about 430 to 230.
 - [ ] **Review of Systems: Cardio & Respiratory and Renal from their slides** (2026-11-19, the hub's build): their Drive
   folders had the thinnest sources (classmates' guides, no professor slides), so those sections rest most on standard
   references. If Sam can share their slides or transcripts, check those parts against them.
@@ -97,11 +97,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   game-over board: the place opens as a visit, Escape gives focus back, a key that opens nothing says so on the row.
 - [ ] **Sound for the hand-off and the Dark Matter unlock**, only if the redesign ever gets a sound setting (it has none; the
   scenes are silent on purpose: [the journeys](done/2026-11-06-redesign-progression-journeys.md)).
-- [ ] **A new hub's blocking time after the bundles** (2026-11-13, [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md), [#358](https://github.com/smcmurry6-source/study-hubs/pull/358)):
+- [x] **A new hub's blocking time after the bundles** (2026-11-13, [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md), [#358](https://github.com/smcmurry6-source/study-hubs/pull/358)):
   on `perf.js`'s slow phone a new hub's total blocking time was 230-365 ms on `main` and is 310-540 ms with the bundles
   across runs (350-385 in the final run; budget 500, fails past 750). The same scripts run, in fewer and longer tasks.
   Not looked into: a trace of the first seconds to see which tasks are long (the engine's start, or `widget/v3.js`'s,
-  which is shared with the live hubs). Worth a look at the release, when v3.js no longer has to stay as it is for the old pages.
+  which is shared with the live hubs). Worth a look at the release, when v3.js no longer has to stay as it is for the old pages. Done (#498): traced with the Long Animation Frames API on the slow phone; the fixes are in the line above, and what is left is the next line.
+- [ ] **A hub's three remaining long tasks after Home** (2026-11-20, #498's trace of Review of Systems on `perf.js`'s slow phone): `widget/v3.js`'s start runs in one script task (about 180 ms, 60 of it a forced layout); the synced answers redraw the whole of Home (`applySync` to `SH_SYNC.merge` to `renderHome`, about 130 ms, then about 110 ms laying the new Home out for its bars); and parsing `notes.json` and `questions.json` (about 70 ms each). Ideas: split v3.js's start into a few tasks, have the merge redraw only the parts whose numbers changed, and fetch the notes as each part opens.
 - [ ] Anima figures on phones: at 390 px their in-drawing labels scale down to about 6-7 px. A plain bigger font for narrow screens clipped labels at the edges in about half the PCD Implants figures (tried 2026-11-04, reverted); it needs a per-figure phone layout (labels moved inside the drawing) or tap-to-zoom. Heme & Endo Exam 3's 22 (2026-11-17) mostly draw them at 10-15 px; its four L17 figures after the oocyte are the smallest (labels about 8 px on the timeline, implantation, estriol and breastfeeding figures). 
 - [ ] Retention, the part not built yet (approved 2026-11-04, [analytics-retention](../reference/analytics-retention.md)): before the school year ends (spring 2027), collapse `activity_hourly` / `activity_visits` older than the school year to hub × section × day with people counts and no ids, as one more step in `sh_retention_run`. **Since migration_v68 the wallet pays 100 crowns per hour of hub time from `activity_hourly`** (`sh_time_crowns`): before the collapse deletes a visitor's hours, keep what they paid (each visitor's capped ping total in a small table `sh_time_crowns` reads, or the crowns as a row), or balances drop. Also ask Sam about the two rows the question-health work proposed (`question_events`, `question_feedback`).
 - [ ] **A week after `migration_v85` is applied (2026-11-19), so on 2026-11-26, check what the part saved** (2026-11-19): the admin page's Ask Timmy tab (cost by
