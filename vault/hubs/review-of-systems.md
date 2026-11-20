@@ -57,8 +57,8 @@ check-in hours: its entry in `hubs.js`.
 - **Scope:** only the intro deck's list (Sam: "None: stick to the list"): no oral histology, dental anesthesia or operative.
 - **Exam Hints:** only Medical Emergencies has any (18, from its four lecture recordings, with each professor's name as the
   transcript spells it). What those professors said they won't test (ECG patterns, airway adjunct sizing, the steroid chart
-  and the like) is left out of the notes as well as the questions (Sam, 2026-11-20: "dont include anything that was
-  deemphasized or we were told not to worry about"; Radiology's contrast and grayscale too). The other courses had no recordings in their folders.
+  and the like) is left out of the notes as well as the questions ([dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md),
+  every hub's rule since 2026-11-20; Radiology's contrast and grayscale too). The other courses had no recordings in their folders.
 - **Not High likelihood on purpose:** CKD (`rn-disease-01` to `-05`): a classmate's Renal Exam 1 objectives head it "NO EXAM
   Qs on this". The questions stay, since that was about the Renal course's own exam and CKD's dental care is board material;
   Sam kept it so (2026-11-20, [decisions](../decisions.md)). The merge script that built the content keeps it out.

@@ -47,7 +47,7 @@ Questions
 - [High Likelihood Exam Questions](rules/high-likelihood-topics.md): `LIKELY_TOPICS` for every lecture *(on demand)*.
 - [Question Bank: the filter panel](rules/question-bank-filter-panel.md), lecture picker, order and pins *(on demand)*.
 - [Question ids are permanent](rules/question-ids-are-permanent.md): never renamed or reused (`tools/question-ids/`, checked by CI).
-- [No questions on what a professor says you don't need](rules/dont-ask-what-professors-skip.md): check every recording; retire what tests it *(on demand)*.
+- [Nothing on what a professor says you don't need](rules/dont-ask-what-professors-skip.md): check every recording; retire what tests it and leave it out of the notes, keeping the skip hint *(on demand)*.
 - [Question-health flags are leads](rules/question-health-flags-are-leads.md): nothing changes a question automatically; Sam decides *(on demand)*.
 
 Hub building

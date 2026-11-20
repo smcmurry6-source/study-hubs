@@ -3,7 +3,7 @@
 Claude Code reads this file when a session opens anything in `hubs/`, so the question-writing rules, which the root
 `CLAUDE.md` doesn't load into every session ("Feature rules" there; Sam, 2026-11-11, to make sessions cheaper), are in
 context whenever a hub's questions, notes or bank change. Other agents: read the notes below before writing or editing a
-question.
+question or a lecture's notes.
 
 @../vault/rules/every-choice-gets-a-why.md
 

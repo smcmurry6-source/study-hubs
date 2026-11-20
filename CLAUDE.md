@@ -88,7 +88,7 @@ slow to start). They bind just as much: **read the ones for a feature before you
 them by itself when it opens a file in `hubs/`, `tools/figures/` or `tools/podcast/` (each has a `CLAUDE.md` that imports them),
 and the `/podcast` and `anima` skills point at them.
 
-- **Writing or editing questions** (any hub's bank, a lecture added or taught, `QUESTION_WHY`, `LIKELY_TOPICS`, Exam Hints,
+- **Writing or editing questions or notes** (any hub's bank or notes, a lecture added or taught, `QUESTION_WHY`, `LIKELY_TOPICS`, Exam Hints,
   the Question Bank's panel, a question-health flag, the lessons refresh's fixes): [every-choice-gets-a-why](vault/rules/every-choice-gets-a-why.md),
   [two-statement-and-true-false](vault/rules/two-statement-and-true-false.md), [numbered-statements](vault/rules/numbered-statements.md),
   [which-statement-questions](vault/rules/which-statement-questions.md), [high-likelihood-topics](vault/rules/high-likelihood-topics.md),
