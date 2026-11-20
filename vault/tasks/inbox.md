@@ -67,7 +67,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   every view of a hub now fit a 320 px phone at XX-Large (220 px of layout), and the smoke test checks them, but a game once
   it's started (each hub's own `content/arcade.css` and `widget/games.css`) wasn't swept. Open each in a scripted browser at
   that size, the way `tools/ci/smoke.js`'s 320 px check does, and fix any that scroll sideways or cut off a control.
-  Done (#PR): Heme & Endo Exam 3's six games, from `b0057d1` on today's widget, fixed in `widget/games.css` (and Showdown's
+  Done (#508): Heme & Endo Exam 3's six games, from `b0057d1` on today's widget, fixed in `widget/games.css` (and Showdown's
   column headers in `widget/games.js`); the smoke test's 320 px check now starts every game of a hub with an arcade.
 - [x] **A hub's report-reply pop-up covers the reward card on a phone** (2026-11-19, seen while moving the card to
   `widget/prize.js`): on an emulated iPhone 13 (Perio, the preview's made-up data) a reply pop-up open at the top of the
@@ -118,7 +118,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   `content/arcade.js` (`lobby()` in Perio's, with the `.ar-board-tabs` boards; Heme & Endo Exam 3's has `.ar-board-grid`) looks
   unreachable. Check whether anything still calls it (its mute button redraws it) and whether its per-game boards are shown
   anywhere else; if not, take it out of the next hub built from these files ([build-a-hub](../how-to/build-a-hub.md)).
-  Done (#PR): unreachable (every game's Back went to the engine's lobby in a scripted run), and its top-ten boards
+  Done (#508): unreachable (every game's Back went to the engine's lobby in a scripted run), and its top-ten boards
   aren't shown anywhere else (only the game-over card's top five); [build-a-hub](../how-to/build-a-hub.md) says what to leave out.
 - [ ] **Learn: a typed answer** (2026-11-13, idea from making Learn "more like quizlet"): Quizlet's Learn ends on written
   questions. Ours ends on recall before the choices show (Sam's call 5, 2026-11-06), because a typed answer can't be
@@ -128,7 +128,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [x] **A smoke check for visiting from a hub's arcade board** (2026-11-19, from #467): `tools/ci/smoke.js` checks the
   dashboard's visit but not a hub's. Stub `get_arcade_leaderboard_v2` and `get_place`, finish a game, tap a name on the
   game-over board: the place opens as a visit, Escape gives focus back, a key that opens nothing says so on the row.
-  Done (#PR): `visitCheck` in `tools/ci/smoke.js`, passed on Exam 3 from `b0057d1`; skipped (a note says so) until a live
+  Done (#508): `visitCheck` in `tools/ci/smoke.js`, passed on Exam 3 from `b0057d1`; skipped (a note says so) until a live
   hub has an arcade with Smile, like the wiring check.
 - [ ] **A sound switch for the arcade on the engine** (2026-11-20, found checking the hubs' own lobby): the games' beeps
   (`beep()` in a hub's `content/arcade.js`) obey `STATE.arcade.muted`, but the only switch for it was the hub's own lobby,
