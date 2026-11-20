@@ -10,7 +10,7 @@ this folder (deleting the line: the note carries it) or just does it, if it's sm
 (`- [x] ... (#123)`); ticked lines are cleared the next time someone goes through the inbox. Anything left to do from a chat
 lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the-vault.md)). See [README](README.md).
 
-- [ ] **Sam: confirm the readings of the journey crowns** (2026-11-20, [decisions](../decisions.md)): 5,000 for each journey's
+- [x] **Sam: confirm the readings of the journey crowns** (done 2026-11-20: "merge, do backpay if someone is already past"; `migration_v89.sql` applied live before the merge) (#492) (2026-11-20, [decisions](../decisions.md)): 5,000 for each journey's
   Dark Matter (three in all), 20,000 for reaching the ModuPro and 30,000 for the Loupes (Sam's numbers, once each), all crowns
   only (no XP), with back pay for anyone already there. Each is one line of `sh_wallet` in `migration_v89.sql` to change, and
   the scenes read the amounts from `sh_prizes()`'s `dark`, `modupro` and `loupes`. Never take crowns back once paid
