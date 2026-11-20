@@ -9,6 +9,9 @@
 (window.SH_HUB_PARTS = window.SH_HUB_PARTS || {}).bank = function(HX){
   "use strict";
   /* from the core (widget/hub.js), under the names they have there */
+  /* a hub whose hints and topics come from the courses it reviews (core.json's hintsFrom "courses", Review of Systems): High yield, not High likelihood */
+  function courses(){ return !!(HX.courses && HX.courses()); }
+  function likelyName(){ return HX.likelyName ? HX.likelyName() : "High likelihood"; }
   var C = HX.C, HUB = HX.HUB, docEl = HX.docEl, $ = HX.$, $$ = HX.$$, esc = HX.esc, h = HX.h, pl = HX.pl,
     shuffled = HX.shuffled, seeded = HX.seeded, track = HX.track, ls = HX.ls, icon = HX.icon, mark = HX.mark,
     STATE = HX.STATE, ansOf = HX.ansOf, saveNow = HX.saveNow, saveState = HX.saveState, QBY = HX.QBY, QBL = HX.QBL,
@@ -38,7 +41,7 @@
     var L = "ABCDEF".charAt(q._w || 0) || "A";
     return '<span class="qc-ver num" title="Version ' + L + ' of this question"><span class="sr">Version </span>' + L + "</span>";
   }
-  function likelyTag(q){ return q.likely ? '<button class="likely" type="button" data-lkwhy aria-expanded="false">' + icon("hints", 14) + 'High likelihood<span class="sr">: why?</span><span class="chev" aria-hidden="true">' + icon("chevron", 14) + "</span></button>" : ""; }
+  function likelyTag(q){ return q.likely ? '<button class="likely" type="button" data-lkwhy aria-expanded="false">' + icon("hints", 14) + likelyName() + '<span class="sr">: why?</span><span class="chev" aria-hidden="true">' + icon("chevron", 14) + "</span></button>" : ""; }
   var BASIS = [[/^hints?$/i, "a hint from the professor"], [/^final review$/i, "the final's review"], [/^final focus$/i, "the final's focus list"],
     [/^(class )?review guide$/i, "the class's review guide"], [/^exam[- ]review$/i, "the class's exam review"], [/^live class$/i, "what was said in class"],
     [/^(\w+) check-?ins?$/i, "the $1's exam check-ins"], [/^check-?ins?$/i, "exam check-ins"], [/^study guide$/i, "the study guide"],
@@ -55,10 +58,10 @@
   function likelyWhyHTML(q, id){
     var L = q.likely, lec = L.lec || q.lec, T = (HX.CORE.likelyTopics || []).filter(function(t){ return t.lec === lec; });
     var k = T.map(function(t){ return t.t; }).indexOf(L.t) + 1, rests = basisWords(L.basis);
-    return '<div class="qc-lkwhy" id="' + id + '" data-lkbox><p><b>Why it\u2019s High likelihood:</b> it tests a predicted exam topic' + (L.t ? ", <i>" + esc(L.t) + "</i>" : "") +
+    return '<div class="qc-lkwhy" id="' + id + '" data-lkbox><p><b>Why it\u2019s ' + likelyName() + ":</b> " + (courses() ? "it tests a topic its course stressed" : "it tests a predicted exam topic") + (L.t ? ", <i>" + esc(L.t) + "</i>" : "") +
       (k ? " (number " + k + " of " + T.length + " for " + esc(lecName(lec)) + ", strongest evidence first)" : " for " + esc(lecName(lec))) + ".</p>" +
-      (rests ? '<p class="note">What it rests on: ' + esc(rests) + ".</p>" : "") +
-      '<p><a class="lk" href="#more/hints" data-lkall>Every predicted topic, in Exam hints</a></p></div>';
+      (rests ? '<p class="note">What it rests on' + (courses() ? ", in its course" : "") + ": " + esc(rests) + ".</p>" : "") +
+      '<p><a class="lk" href="#more/hints" data-lkall>' + (courses() ? "Every high-yield topic, in High-yield points" : "Every predicted topic, in Exam hints") + "</a></p></div>";
   }
   function likelyWire(el, q){
     var b = $("[data-lkwhy]", el); if (!b || !q.likely) return;
@@ -310,6 +313,7 @@
     return BASIS_IDS[b];
   }
   HX.lkBasis = lkBasis;
+  function lkName(k){ return k === "likely" ? likelyName() : labelOf(LIKELY, k); }
   function isLk(k){ return LIKELY.some(function(x){ return x[0] === k; }); }
   function lkSpec(k){ for (var i = 0; i < LIKELY.length; i++) if (LIKELY[i][0] === k) return LIKELY[i][2] || null; return null; }
   function lkHas(q, k){ var sp = lkSpec(k); return sp ? (sp.basis ? !!lkBasis(sp.basis)[q.id] : !!q[sp.prop || "likely"]) && (!sp.lec || q.lec === sp.lec) : !!q[k]; }
@@ -490,7 +494,7 @@
         '<label class="search"><span class="sr">Search the questions</span>' + icon("search", 18) + '<input type="search" placeholder="Search the questions" value="' + esc(bankSearch) + '" data-search></label>' +
       "</div>" +
       '<div class="qbar-row chips"><span class="lab">Show</span><span class="chipset">' + SHOW.map(function(x){ return showChip(x[0], x[1]); }).join("") + "</span></div>" +
-      '<div class="qbar-row chips only"><span class="lab">Only</span><span class="chipset" role="group" aria-label="Only">' + LIKELY.map(function(x){ return lkChip(x[0], x[1]); }).join("") + "</span></div>" +
+      '<div class="qbar-row chips only"><span class="lab">Only</span><span class="chipset" role="group" aria-label="Only">' + LIKELY.map(function(x){ return lkChip(x[0], x[0] === "likely" ? likelyName() : x[1]); }).join("") + "</span></div>" +
       '<div class="qbar-row chips"><span class="lab">Sets</span><span class="chipset">' + SETS.map(function(x){ return setChip(x[0], x[1]); }).join("") + "</span></div>" +
       '<div class="qbar-row">' + (qview() === "questions" ? '<span class="lab">Order</span><span class="seg" role="group" aria-label="Order"><button type="button" data-order="in" aria-pressed="' + (STATE.ui.qorder !== "random") + '">In order</button><button type="button" data-order="random" aria-pressed="' + (STATE.ui.qorder === "random") + '">' + icon("shuffle", 16) + "Random</button></span>" +
           '<span class="lab" id="qzL">At a time</span><span class="seg seg-size" role="group" aria-labelledby="qzL">' + SIZES.map(function(x){ return '<button type="button" data-qsize="' + x[0] + '" aria-pressed="' + (qsize() === x[0]) + '"' + (x[0] === "all" ? ' aria-label="All at once"' : ' aria-label="' + x[1] + ' at a time"') + ">" + x[1] + "</button>"; }).join("") + "</span>" : "") +
@@ -580,7 +584,7 @@
     var nRev = list.filter(function(q){ return isReview(q.lec); }).length, n = list.length - nRev;
     if (!isDefaultLecs(picked)) tags.push(["lec", picked.length === 1 ? lecName(picked[0]) : picked.length === HX.LECS.length && R.tag ? R.tag : picked.length + " lectures"]);
     if (STATE.ui.qstatus && STATE.ui.qstatus !== "all") tags.push(["show", labelOf(SHOW, STATE.ui.qstatus)]);
-    if (STATE.ui.qlikely) tags.push(["lk", labelOf(LIKELY, STATE.ui.qlikely)]);
+    if (STATE.ui.qlikely) tags.push(["lk", lkName(STATE.ui.qlikely)]);
     if (STATE.ui.qfmt && STATE.ui.qfmt !== "all") tags.push(["fmt", labelOf(FMTS, STATE.ui.qfmt)]);
     if (STATE.ui.qsrc && STATE.ui.qsrc !== "all") tags.push(["src", (HX.CORE.srcLabel || {})[STATE.ui.qsrc] || STATE.ui.qsrc]);
     if (bankSearch.trim()) tags.push(["search", "“" + bankSearch.trim() + "”"]);
@@ -591,10 +595,10 @@
   }
   /* what's in the way when the bank shows nothing, in the live hubs' words */
   function emptyWhy(){
-    var st = STATE.ui.qstatus || "all", lk = STATE.ui.qlikely ? labelOf(LIKELY, STATE.ui.qlikely) + " " : "";
+    var st = STATE.ui.qstatus || "all", lk = STATE.ui.qlikely ? lkName(STATE.ui.qlikely) + " " : "";
     var only = !(STATE.ui.qfmt && STATE.ui.qfmt !== "all") && !(STATE.ui.qsrc && STATE.ui.qsrc !== "all") && !bankSearch.trim();
     if (!lecIds().length) return "No lectures are ticked, so there is nothing to show.";
-    var sp = lkSpec(STATE.ui.qlikely); if (sp && sp.lec && LBY[sp.lec] && lecIds().indexOf(sp.lec) === -1) return labelOf(LIKELY, STATE.ui.qlikely) + " questions are in " + lecName(sp.lec) + ", which isn't ticked under Lectures.";
+    var sp = lkSpec(STATE.ui.qlikely); if (sp && sp.lec && LBY[sp.lec] && lecIds().indexOf(sp.lec) === -1) return lkName(STATE.ui.qlikely) + " questions are in " + lecName(sp.lec) + ", which isn't ticked under Lectures.";
     if (st === "pinned" && !pins().length) return "No pinned questions yet. Tap Pin on any question to save it here.";
     if (st === "missed" && only) return lk ? "You haven't missed any " + lk + "questions in these lectures. Questions you get wrong come back here." : "Nothing missed in these lectures. Questions you get wrong come back here.";
     if (st === "unseen" && only) return "You have answered every " + lk + "question here. Try Missed last time, or another lecture.";

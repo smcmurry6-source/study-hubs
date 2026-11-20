@@ -481,7 +481,7 @@
           q("#questions/drill", "drill", "Daily drill", "Misses and high-yield, a few minutes") +
           q("#notes/" + esc(cont.id), "notes", "Notes", lecLabel(cont) + " " + shortTitle(cont)) +
           q("#questions/mock", "mock", "Mock exam", pl(HX.mockTotal(), "question") + ", timed") +
-          q("#more/hints", "hints", "Exam hints", "What " + (X.prof || "the professor") + " said to know") +
+          q("#more/hints", "hints", hintsName(), courses() ? "What each course stressed most" : "What " + (X.prof || "the professor") + " said to know") +
           q("#more/cram", "cram", "Cram sheet", "Every lecture on one page") +
           (pod ? podMiniHTML(pod) : "") +
         "</nav>" +
@@ -628,12 +628,12 @@
         '<span class="note tool-tip">' + icon("highlight", 18) + "Select text to highlight it</span>" +
       "</div>" +
       '<div class="mmap" hidden></div>' +
-      (hy ? '<p class="note hy-intro">' + icon("hints", 18) + "<span>Only what's most likely on the exam: " + pl(nTopics, "predicted topic") + ", strongest evidence first, each with the part of the notes that teaches it. <b>As taught</b> has everything.</span></p>" : "") +
+      (hy ? '<p class="note hy-intro">' + icon("hints", 18) + "<span>" + (courses() ? "Only what the courses stressed most: " + pl(nTopics, "high-yield topic") : "Only what's most likely on the exam: " + pl(nTopics, "predicted topic")) + ", strongest evidence first, each with the part of the notes that teaches it. <b>As taught</b> has everything.</span></p>" : "") +
       '<div class="reading-prose' + (hy ? " hy" : "") + '">' + (text || "<p>Notes coming soon.</p>") + "</div>" +
       '<section class="lec-figs" hidden aria-labelledby="lfH"><h2 id="lfH">Diagrams</h2><div class="fig-grid"></div></section>' +
       (group && !hy ? '<section class="charts" aria-labelledby="lcH"><h2 id="lcH">Charts for this lecture</h2><p class="note">' + esc(group.blurb || "") + "</p>" + group.sections.map(function(sec, i){ return (sec.part ? '<h3 class="part">' + esc(sec.part) + "</h3>" : "") + sectionHTML(sec); }).join("") + "</section>" : "") +
       '<section class="check" aria-labelledby="ckH"><h2 id="ckH">Check yourself</h2><p class="note">Three questions from this lecture. Answers count like anywhere else.</p><div class="qlist" data-check></div></section>' +
-      '<nav class="foot-acts" aria-label="Next">' + readBtnHTML(lec) + (hy && nLikely ? '<a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '" data-lqlk>' + icon("questions", 18) + "Practice the " + fmt(nLikely) + " High likelihood questions</a>" :
+      '<nav class="foot-acts" aria-label="Next">' + readBtnHTML(lec) + (hy && nLikely ? '<a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '" data-lqlk>' + icon("questions", 18) + "Practice the " + fmt(nLikely) + " " + likelyName() + " questions</a>" :
         '<a class="btn btn-primary" href="#questions" data-lecq="' + esc(lec.id) + '">' + icon("questions", 18) + "Practice " + esc(lecLabel(lec)) + " questions</a>") +
         '<a class="btn" href="#more/cram" data-cram="' + esc(lec.id) + '">' + icon("cram", 18) + "Cram bullets</a></nav>" +
       footNavHTML(lec) +
@@ -1161,6 +1161,15 @@
   }
 
   /* ======================= More ======================= */
+  /* A hub whose hints and predicted topics come from the courses it reviews, said about each course's own exams and not about
+     this hub's exam (Review of Systems; Sam, 2026-11-20: "exam hints for old exams are not exam hints for review of
+     systems. they do indicate higher yield content, however"), has core.json's hintsFrom "courses": they are its High-yield
+     points and High yield, never "Exam hints", "High likelihood" or a predicted exam topic. widget/hub-bank.js, widget/ask.js
+     and Ask Timmy's server (supabase/functions/timmy/core.js) read the same flag. */
+  function courses(){ return !!(CORE && CORE.hintsFrom === "courses"); }
+  function hintsName(){ return courses() ? "High-yield points" : "Exam hints"; }
+  function likelyName(){ return courses() ? "High yield" : "High likelihood"; }
+  function moreList(){ return courses() ? MORE.map(function(m){ return m[0] === "hints" ? ["hints", "hints", hintsName(), "What each course stressed, and its highest-yield topics"] : m; }) : MORE; }
   var MORE = [
     ["timmy", "podcast", "Timmy Time", "The audio review, with likes and comments"],
     ["hints", "hints", "Exam hints", "What the professor said would be tested, and the most likely questions"],
@@ -1177,7 +1186,7 @@
   function renderMore(el, s){
     /* #more/<page>/<what>: the arcade opens a game straight away (#more/arcade/stage: Perio's Home link) */
     var bits = String(s || "").split("/"), what = bits.slice(1).join("/"); s = bits[0];
-    var page = MORE.concat(MORE_ROWS).filter(function(m){ return m[0] === s; })[0];
+    var page = moreList().concat(MORE_ROWS).filter(function(m){ return m[0] === s; })[0];
     if (!page) { drawMoreMenu(el); return; }
     var back = '<a class="btn btn-text back" href="#more">' + icon("chevron", 18, "flip") + "More</a>";
     el.innerHTML = '<div class="hx-page more-page">' + back + "<h1>" + esc(page[2]) + '</h1><div class="more-body"><p class="note loading">Loading…</p></div></div>';
@@ -1191,7 +1200,7 @@
     var pod = CORE.podcast, X = C.arcade || {}, x = HX.rankXp();
     return ({
       timmy: pod ? Math.round((pod.duration || 0) / 60) + " min" + (pod.chapters ? " · " + pl(pod.chapters.length, "chapter") : "") : "",
-      hints: pl((CORE.likelyTopics || []).length, "likely topic"),
+      hints: pl((CORE.likelyTopics || []).length, courses() ? "high-yield topic" : "likely topic"),
       cram: pl(LECS.length, "lecture"),
       side: "Across every lecture",
       arcade: pl((X.games || []).length, "game"),
@@ -1210,7 +1219,7 @@
         '<span class="mt-meta num">' + esc(moreMeta(m[0])) + "</span></span>" + icon("chevron", 20) + "</a></li>";
     };
     el.innerHTML = '<div class="hx-page more"><h1>More</h1><p class="more-lede">Everything past the notes and the questions: the review, the games, your stats and your settings.</p>' +
-      '<nav aria-label="Study and play"><ul class="more-tiles">' + MORE.filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "shop" || HX.hasShop()) && (m[0] !== "arcade" || ((C.arcade || {}).games || []).length); }).map(tile).join("") + "</ul></nav>" +
+      '<nav aria-label="Study and play"><ul class="more-tiles">' + moreList().filter(function(m){ return (m[0] !== "timmy" || pod) && (m[0] !== "side" || !CORE.noSide) && (m[0] !== "shop" || HX.hasShop()) && (m[0] !== "arcade" || ((C.arcade || {}).games || []).length); }).map(tile).join("") + "</ul></nav>" +
       '<section class="panel menu talk" aria-labelledby="mwH"><h2 id="mwH">Talk to us</h2><ul class="rows">' +
         MORE_ROWS.map(function(m){ return '<li><a href="#more/' + m[0] + '">' + icon(m[1], 22) + "<span><b>" + esc(m[2]) + "</b><small>" + esc(m[3]) + "</small></span>" + icon("chevron", 18) + "</a></li>"; }).join("") +
         '<li><button type="button" data-sh-inbox>' + icon("inbox", 22) + "<span><b>Inbox</b><small>Replies to what you report or suggest, and notices to the class</small></span>" + icon("chevron", 18) + "</button></li>" +
@@ -1301,17 +1310,17 @@
           return '<div class="hint-group' + lc(l.id) + '"><h3>' + lecHead(l) + ' <a class="btn btn-text" href="#notes/' + esc(l.id) + '">Notes</a></h3>' + items.map(function(x){
             /* a focus list came from the class, not a recording, so it has no quotation marks (as on the live hub) */
             var said = x.kind !== "focus";
-            return '<figure class="hint' + (said ? "" : " is-focus") + '"><blockquote>' + (said ? "“" : "") + esc(x.quote) + (said ? "”" : "") + '</blockquote><figcaption><span class="kind ' + esc(x.kind) + '">' + (x.kind === "deemphasize" ? "Less likely" : x.kind === "focus" ? "Focus list" : "Know this") + "</span>" + esc(x.take) + "</figcaption></figure>"; }).join("") + "</div>"; }).join("") + "</section>";
+            return '<figure class="hint' + (said ? "" : " is-focus") + '"><blockquote>' + (said ? "“" : "") + esc(x.quote) + (said ? "”" : "") + '</blockquote><figcaption><span class="kind ' + esc(x.kind) + '">' + (x.kind === "deemphasize" ? (courses() ? "Said not needed" : "Less likely") : x.kind === "focus" ? "Focus list" : "Know this") + "</span>" + esc(x.take) + "</figcaption></figure>"; }).join("") + "</div>"; }).join("") + "</section>";
       body.innerHTML = html;
       $$("[data-likely]", body).forEach(function(b){ b.addEventListener("click", function(){ STATE.ui.qset = ""; STATE.ui.qlec = b.getAttribute("data-likely"); STATE.ui.qstatus = "all"; STATE.ui.qlikely = "likely"; STATE.ui.qfmt = "all"; STATE.ui.qsrc = "all"; saveState(); track("hints:likely-practice"); go("questions"); }); });
     }); }).catch(function(){ body.innerHTML = "<p>Couldn't load the hints. Check your connection.</p>"; });
   }
   function likelyHTML(X){
     var T = CORE.likelyTopics || [], counts = CORE.examCounts || {};
-    return '<section class="panel likely-box" aria-labelledby="lkH"><h2 id="lkH">Most likely questions</h2><p class="note">' + esc(X.likely || "Each lecture's predicted topics, strongest evidence first.") + '</p><div class="likely-grid">' + LECS.map(function(l){
+    return '<section class="panel likely-box" aria-labelledby="lkH"><h2 id="lkH">' + (courses() ? "Highest-yield topics" : "Most likely questions") + '</h2><p class="note">' + esc(X.likely || (courses() ? "Each part's high-yield topics, strongest evidence first: what its course stressed most." : "Each lecture's predicted topics, strongest evidence first.")) + '</p><div class="likely-grid">' + LECS.map(function(l){
       var ts = T.filter(function(t){ return t.lec === l.id; }); if (!ts.length) return "";
       var grp = CORE.mock && CORE.mock.groups ? Object.keys(CORE.mock.groups).filter(function(k){ return CORE.mock.groups[k].indexOf(l.id) > -1; })[0] : null;
-      var cnt = grp && counts[grp] ? counts[grp] + " on the exam for " + CORE.mock.groups[grp].map(function(id){ return lecLabel(LBY[id]); }).join(" and ") + " together" : counts[l.id] ? counts[l.id] + " on the exam" : pl(ts.length, "predicted topic");
+      var cnt = grp && counts[grp] ? counts[grp] + " on the exam for " + CORE.mock.groups[grp].map(function(id){ return lecLabel(LBY[id]); }).join(" and ") + " together" : counts[l.id] ? counts[l.id] + " on the exam" : pl(ts.length, courses() ? "high-yield topic" : "predicted topic");
       return '<div class="likely-lec' + lc(l.id) + '"><h3>' + lecHead(l) + ' <span class="note">' + esc(cnt) + "</span></h3><ol>" +
         ts.map(function(t){ return "<li>" + esc(t.t) + ' <span class="note">' + esc(t.basis) + "</span></li>"; }).join("") +
         '</ol><button class="btn" type="button" data-likely="' + esc(l.id) + '">Practice these (' + ts.reduce(function(k, t){ return k + t.ids.length; }, 0) + ")</button></div>";
@@ -1738,7 +1747,7 @@
       /* the rest of the content in the background, then the shared widget (it needs the notes for its search and eggs) */
       var idle = window.requestIdleCallback || function(f){ setTimeout(f, 300); };
       idle(function(){
-        needNotes().then(function(){ return needStudy().catch(function(){}); }).then(function(){ exportSections(); }).catch(function(){}).then(startWidget);
+        needNotes().then(function(){ return needStudy().catch(function(){}); }).then(function(){ exportSections(); if (courses()) SH_EXPORT.sections.forEach(function(x){ if (x.kind === "Exam hints") x.kind = hintsName(); }); }).catch(function(){}).then(startWidget);   // exportSections() stays self-contained: tools/timmy/test.mjs runs it alone
         needQuestions().catch(function(){});
       });
     }).catch(function(e){ main.innerHTML = offlineHTML("this hub"); if (window.console) console.error(e); });
@@ -1765,7 +1774,7 @@
     needFigures: needFigures, needsFig: needsFig, liveNow: liveNow, paintLive: paintLive, parse: parse, route: route,
     go: go, section: section, lecStat: lecStat, lecProgress: lecProgress, srsMisses: srsMisses,
     offlineHTML: offlineHTML, tip: tip, whenWidget: whenWidget, lecBadge: lecBadge, lecListHTML: lecListHTML, wireLecPick: wireLecPick, wireLecLinks: wireLecLinks,
-    followBtn: followBtn, wireFollow: wireFollow, foldBtn: foldBtn, foldParts: foldParts
+    followBtn: followBtn, wireFollow: wireFollow, foldBtn: foldBtn, foldParts: foldParts, courses: courses, hintsName: hintsName, likelyName: likelyName
   };
   [["CORE", function(){ return CORE; }], ["QS", function(){ return QS; }], ["LECS", function(){ return LECS; }], ["GROUPS", function(){ return GROUPS; }],
     ["IDX", function(){ return IDX; }], ["NOTES", function(){ return NOTES; }], ["AUDIO_OFF", function(){ return AUDIO_OFF; }],

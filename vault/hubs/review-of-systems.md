@@ -55,7 +55,11 @@ check-in hours: its entry in `hubs.js`.
   items, with the special formats. Ids are `<part id>-NN` and permanent (`tools/question-ids/review-of-systems.txt`).
   High likelihood is about 40% of each part's questions: each topic keeps its most direct questions.
 - **Scope:** only the intro deck's list (Sam: "None: stick to the list"): no oral histology, dental anesthesia or operative.
-- **Exam Hints:** only Medical Emergencies has any (18, from its four lecture recordings, with each professor's name as the
+- **Not exam hints, High yield** (Sam, 2026-11-20, [decisions](../decisions.md)): the quotes and the topics come from the courses this hub reviews, said
+  about those courses' own exams, so they mark high-yield content and never predict the mocks. `core.json`'s `hintsFrom: "courses"` makes the engine
+  say **High-yield points** for Exam hints (Home, More, search) and **High yield** for High likelihood (the bank's toggle, the card's tag and its why,
+  High yield's intro), and Ask Timmy say the same (`supabase/functions/timmy/core.js`). Words that predict the mocks stay out of this hub's text.
+- **The quotes:** only Medical Emergencies has any (18, from its four lecture recordings, with each professor's name as the
   transcript spells it). What those professors said they won't test (ECG patterns, airway adjunct sizing, the steroid chart
   and the like) is left out of the notes as well as the questions ([dont-ask-what-professors-skip](../rules/dont-ask-what-professors-skip.md),
   every hub's rule since 2026-11-20; Radiology's contrast and grayscale too). The other courses had no recordings in their folders.

@@ -3,6 +3,7 @@
  "title": "Review of Systems Hub",
  "stateKey": "ros-state-v1",
  "audio": "off",
+ "hintsFrom": "courses",
  "exams": [
   {"id":"mock1","label":"Mock Board 1","date":"2026-12-03","time":"08:00","closes":"12:00"},
   {"id":"mock2","label":"Mock Board 2","date":"2026-12-10","time":"08:00","closes":"12:00"}
