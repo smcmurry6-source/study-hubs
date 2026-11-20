@@ -4,7 +4,7 @@
 
      shJourneys.handoff(d, done)   a journey's Dark Matter III is done and the next object is handed over, once:
                                    d = { from, to } (journeys 0-2). "The ModuPro is yours." Each has its own scene: the
-                                   ModuPro the spin-up, the rush of light and the typodont; the Loupes the headlight's
+                                   ModuPro the typodont that eats the Handpiece; the Loupes the headlight's
                                    sunbeam that burns the ModuPro away. Each shows the crowns it pays: 20,000 for the
                                    ModuPro, 30,000 for the Loupes.
      shJourneys.dark(d, done)      a journey's Dark Matter is reached, once per journey ever: d = { journey, position, of }
@@ -16,7 +16,7 @@
    screen), the last button closes them,
    focus goes back where it was. Reduced motion gets the last frame, faded in, with nothing moving. They move transform
    and opacity only, but for the Dark Matter title's one sheen; the Dark Matter unlock's dust, burst, ring of light and
-   coins, and the hand-offs' sparks, rush of light, typodont, the beam's dust, embers, ash and coins, are each drawn on
+   coins, and the hand-offs' typodont, the dust it pulls in, the Handpiece's shards, the beam's dust, embers, ash and coins, are each drawn on
    one canvas.
    No sound yet: the site has no sound setting, and these stay silent until it has one (a to-do in the journeys note).
    The medallions are shRanks.artOf (the handpiece by ranks.js, the ModuPro and the loupes by widget/hub-art/journeys.js,
@@ -240,42 +240,34 @@
     "@container shj (max-width:420px){.shj-hand .shj-in{padding-top:46px}}",
     "@container shj (max-width:300px){.shj-track{justify-self:stretch}.shj-track li{flex:1 1 0;width:auto;min-width:0;font-size:11px}.shj-ahead{flex-wrap:wrap;row-gap:6px}}",
 
-    /* ----- the hand-off to the ModuPro: the Handpiece spins up to 400,000 RPM throwing sparks and lunges at the screen,
-       the picture rushes forward through streaks of light into the sim lab, its light coming on, where the typodont's 32
-       teeth fly in and snap into their arches, the jaws bite down, and the typodont becomes the ModuPro medallion; then
-       the reward. The times are --imp (the rush), --arr (the lab), --chomp (the bite), --slam and --rise. ----- */
+    /* ----- the hand-off to the ModuPro: the ModuPro eats the Handpiece. The Dark Matter Handpiece floats in its purple
+       space; the screen darkens and rumbles (--rum), the typodont comes in from above and below with its jaws wide open
+       around it, dark and glowing inside, and the Handpiece shivers (--shiv) and is pulled in (--suck); the jaws snap shut
+       on it (--chomp), chew twice and swallow, and the typodont folds into the ModuPro medallion (--slam) as the sim lab's
+       light comes on; it rises (--rise), then the reward. The typodont and the Handpiece inside it are on the canvas. ----- */
     ".shj-mp{background:#05020C;--mpk:#9BE7EE}",
     ".shj-lab{position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 55% at 50% 0%,rgba(255,246,222,.26),rgba(255,246,222,0) 70%),linear-gradient(180deg,#17485C 0%,#0C2A38 50%,#061118 100%);opacity:0}",
-    ".shj-mp.is-on .shj-lab{animation:shj-arrive .8s cubic-bezier(.16,1,.3,1) both;animation-delay:var(--arr)}",
-    "@keyframes shj-arrive{from{opacity:0;transform:scale(1.35)}to{opacity:1;transform:none}}",
     ".shj-cone{position:absolute;left:-30%;right:-30%;top:0;bottom:0;background:linear-gradient(180deg,rgba(255,244,214,.3),rgba(255,244,214,.07) 70%,rgba(255,244,214,0));clip-path:polygon(44% 0,56% 0,82% 100%,18% 100%);opacity:0;pointer-events:none}",
     ".shj-lamp{position:absolute;left:50%;top:-70px;width:380px;height:140px;margin-left:-190px;border-radius:50%;background:radial-gradient(closest-side,#FFFDF4,rgba(255,246,222,.65) 45%,rgba(255,246,222,0));opacity:0;pointer-events:none}",
-    ".shj-mp.is-on .shj-cone,.shj-mp.is-on .shj-lamp{animation:shj-rayin 1.2s ease-out both;animation-delay:calc(var(--arr) + .2s)}",
-    ".shj-space{position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 8%,#2A1456 0%,#130A2B 52%,#05020C 100%)}",
-    ".shj-mp.is-on .shj-space{animation:shj-jump .75s cubic-bezier(.55,0,1,.45) forwards;animation-delay:var(--imp)}",
-    "@keyframes shj-jump{to{opacity:0;transform:scale(2.8)}}",
-    ".shj-mp.is-lab .shj-space{display:none}.shj-mp.is-lab .shj-lab{opacity:1}",
-    ".shj-mp.is-on .shj-in{animation:shj-quake .5s linear var(--chomp)}",
+    ".shj-mp.is-on .shj-lab{animation:shj-rayin .9s ease-out both;animation-delay:var(--slam)}",
+    ".shj-mp.is-on .shj-cone,.shj-mp.is-on .shj-lamp{animation:shj-rayin 1.2s ease-out both;animation-delay:calc(var(--slam) + .2s)}",
+    ".shj-space{position:absolute;inset:0;overflow:hidden;pointer-events:none;background:radial-gradient(120% 90% at 50% 8%,#2A1456 0%,#130A2B 52%,#05020C 100%)}",
+    ".shj-mp.is-on .shj-space{animation:shj-gone .9s ease-in forwards;animation-delay:var(--slam)}",
+    ".shj-mp.is-on .shj-dim{animation:shj-rayin .9s ease-out both,shj-gone .6s ease-out forwards;animation-delay:var(--rum),var(--slam)}",
+    ".shj-mp.is-on .shj-in{animation:shj-rumble .7s linear var(--rum)}",
+    "@keyframes shj-rumble{0%,100%{transform:none}20%{transform:translate(-3px,2px)}40%{transform:translate(3px,-2px)}60%{transform:translate(-2px,-1px)}80%{transform:translate(2px,1px)}}",
+    ".shj-mp.is-on .shj-cv{animation:shj-quake .6s linear var(--chomp)}",   // the bite shakes the typodont, which is on the canvas
+    ".shj-mp:not(.is-told):not(.is-still){overflow:hidden}",
     ".shj-mp.is-on .shj-stage{animation:shj-up .9s cubic-bezier(.65,0,.35,1) both;animation-delay:var(--rise)}",
     ".shj-mp .shj-eyebrow{color:var(--mpk)}",
-    ".shj-mp .shj-pre{top:-46px;bottom:auto}",
+    ".shj-mp .shj-pre{top:-46px;bottom:auto}.shj-mp.is-on .shj-pre{animation:shj-pre 1.5s ease both .4s}",
     ".shj-hp{position:relative;opacity:0}.shj-hp .shj-med{width:100%}",
-    ".shj-mp.is-on .shj-hp{animation:shj-oldin .6s ease-out .2s both,shj-tremble 2.2s linear .5s,shj-lunge .4s cubic-bezier(.55,0,1,.45) var(--imp) forwards}",
-    "@keyframes shj-lunge{0%{opacity:1;transform:scale(1.08)}100%{opacity:0;transform:scale(4)}}",
-    ".shj-whirl{position:absolute;left:-14%;top:-14%;width:128%;height:128%;border-radius:50%;opacity:0;pointer-events:none;",
-    "background:repeating-conic-gradient(from 0deg,rgba(255,236,170,0) 0deg 8deg,rgba(255,236,170,.6) 8deg 11deg,rgba(255,236,170,0) 11deg 24deg);",
-    "-webkit-mask:radial-gradient(circle,transparent 52%,#000 57%,#000 67%,transparent 71%);mask:radial-gradient(circle,transparent 52%,#000 57%,#000 67%,transparent 71%)}",
-    ".shj-mp.is-on .shj-whirl{animation:shj-whirl 2.2s cubic-bezier(.6,0,1,.6) .4s both,shj-whirlout .3s ease-in var(--imp) forwards}",
-    "@keyframes shj-whirl{0%{opacity:0;transform:rotate(0)}15%{opacity:1}100%{opacity:1;transform:rotate(2520deg)}}",
-    "@keyframes shj-whirlout{to{opacity:0;transform:rotate(2700deg) scale(1.6)}}",
-    ".shj-rpm{position:absolute;left:-60%;right:-60%;bottom:-58px;margin:0;font-weight:800;color:#FFE7A0;white-space:nowrap;font-variant-numeric:tabular-nums;opacity:0}",
-    ".shj-rpm b{font-size:32px;letter-spacing:-.01em}.shj-rpm span{margin-left:6px;font-size:14px;letter-spacing:.14em;color:#F5DFA0}",
-    ".shj-rpm.is-max b{color:#fff}",
-    ".shj-mp.is-on .shj-rpm{animation:shj-rayin .4s ease-out .5s both,shj-rpmout .3s ease-in var(--imp) forwards}",
-    "@keyframes shj-rpmout{to{opacity:0;transform:scale(1.5)}}",
-    ".shj-mp.is-on .shj-flash{animation:shj-flash2 .8s ease-out both;animation-delay:var(--at)}",
-    ".shj-flash.is-jump{background:#E9FCFF}.shj-mp.is-on .shj-flash.is-jump{animation:shj-flash3 .45s ease-out both;animation-delay:var(--at)}",
-    ".shj-flash.is-soft{background:#E6FBFF}.shj-mp.is-on .shj-flash.is-soft{animation:shj-flash3 .6s ease-out both;animation-delay:var(--at)}",
+    ".shj-mp.is-on .shj-hp{animation:shj-oldin .6s ease-out .2s both,shj-dread .3s linear var(--shiv) 4,shj-suck .5s cubic-bezier(.55,0,.8,.4) var(--suck) forwards}",
+    "@keyframes shj-dread{0%,100%{transform:none}25%{transform:translate(-3px,1px) rotate(-3deg)}75%{transform:translate(3px,-1px) rotate(3deg)}}",
+    "@keyframes shj-suck{to{transform:scale(.55) rotate(-25deg)}}",
+    ".shj-mp.is-gulp .shj-hp{visibility:hidden}",   // the canvas draws it from here, inside the mouth
+    ".shj-flash.is-jump{background:#E9FCFF}.shj-flash.is-soft{background:radial-gradient(55% 40% at 50% 50%,rgba(241,232,255,.95),rgba(201,182,245,.4) 45%,rgba(201,182,245,0) 100%)}",
+    ".shj-mp.is-on .shj-flash{animation:shj-flash3 .55s ease-out both;animation-delay:var(--at)}",
     "@keyframes shj-flash3{0%{opacity:0}8%{opacity:.42}100%{opacity:0}}",
     ".shj-mp .shj-new .shj-med{width:86%}",
     ".shj-mpt .shj-wd{display:inline-block;opacity:0}",
@@ -283,7 +275,7 @@
     "@keyframes shj-word{0%{opacity:0;transform:scale(2.6) translateY(-.2em)}60%{opacity:1}100%{opacity:1;transform:none}}",
     ".shj-mpn{background:linear-gradient(180deg,#FFFFFF 15%,#9BE7EE 90%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}",
     ".shj.is-still .shj-wd{opacity:1;transform:none}.shj.is-still .shj-cone,.shj.is-still .shj-lamp,.shj.is-still .shj-lab{opacity:1}",
-    ".shj.is-still .shj-hp,.shj.is-still .shj-whirl,.shj.is-still .shj-rpm,.shj.is-still .shj-space{display:none}",
+    ".shj.is-still .shj-hp,.shj.is-still .shj-space{display:none}",
 
     /* ----- the hand-off to the Loupes: the Dark Matter ModuPro under the ModuPro's nebula; the loupes come down over it,
        their headlight clicks on, and its beam grows into a sunbeam that heats the ModuPro white-hot, cracks it and burns
@@ -429,18 +421,21 @@
   }
 
   /* ---------- the hand-off to the ModuPro (Sam, 2026-11-20: "something absolutely bananas when you rank up to modupro.
-     completely unique and epic"; then, of the first cut, "the model is inaccurate ... i also dont like the screen
-     shatter"). About 9.5 seconds to the button:
-       0.5-2.5 s  the Dark Matter Handpiece spins up, 0 to 400,000 RPM, its whirl faster and faster, sparks spraying off it;
-       2.6-3.3 s  it lunges at the screen and the picture rushes forward through streaks of light (--imp);
-       3.3 s      the sim lab, its light coming on (--arr);
-       3.55-5 s   the typodont: its two bases slide in, then its 32 teeth fly in from everywhere and snap into their arches;
-       5.15 s     the jaws close into occlusion (--chomp): a flash along the bite, sparks, the screen shakes;
-       5.65 s     the typodont folds into the ModuPro medallion (--slam), which rises to its place (--rise);
-       7-9.4 s    the road, the title word by word, the seven new ranks, then the reward: 20,000 Shiny Gold Crowns counted up
+     completely unique and epic"; then "I think instead I want the modupro to basically eat the handpiece and then replace
+     it"). About 9.5 seconds to the button:
+       0.2-1.9 s  the Dark Matter III Handpiece in its purple space ("The Handpiece is finished.");
+       1.1 s      the screen darkens and rumbles (--rum);
+       1.5-2 s    the typodont comes in from above and below, its jaws wide open around the Handpiece (--jaw), the mouth
+                  dark and glowing inside; the Handpiece shivers (--shiv) and dust and stars stream into the mouth (--pull);
+       2.7-3.4 s  the Handpiece is pulled in (--suck), and from inside the mouth the canvas draws it, behind the teeth (--swap);
+       3.41 s     the jaws snap shut on it (--chomp): a flash along the bite, the typodont shakes, shards of the Handpiece and
+                  Dark Matter sparks spray from the corners of the mouth;
+       3.8-4.7 s  it chews twice, crumbs falling, and swallows (--gulp);
+       5.2 s      the typodont folds into the ModuPro medallion (--slam) as the sim lab's light comes on; it rises (--rise);
+       6.6-9 s    the road, the title word by word, the seven new ranks, then the reward: 20,000 Shiny Gold Crowns counted up
                   with a fountain and a rain of coins (migration_v89 pays them), and the Handpiece's trophy.
      Skip jumps to the last frame (the reward stays), Esc closes. The Loupes have their own scene, below. ---------- */
-  var MP = { imp: 2.6, arr: 3.3, jaw: 3.55, teeth: 3.85, chomp: 5.15, morph: 5.65, slam: 5.8, rise: 6.35 };
+  var MP = { rum: 1.1, jaw: 1.5, shiv: 1.5, pull: 2, suck: 2.7, swap: 3.22, close: 3.25, chomp: 3.41, chew: 3.8, chew2: 4.3, gulp: 4.85, morph: 5.2, slam: 5.35, rise: 5.95 };
   var MP_R = MP.rise + .6;   // the words and the reward start here
   function sec(x){ return (+x).toFixed(2) + "s"; }
   /* what reaching a journey pays (sh_prizes()'s modupro and loupes, which widget/v3.js's PRIZES copies) */
@@ -477,17 +472,15 @@
     var words = ["The", "ModuPro", "is", "yours."].map(function(w, i){ return '<span class="shj-wd' + (i === 1 ? " shj-mpn" : "") + '" style="--i:' + i + '">' + w + "</span>"; }).join(" ");
     return '<span class="shj-lab"></span><span class="shj-cone"></span><span class="shj-lamp"></span>' +
       '<span class="shj-space"><svg class="shj-sky" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice" aria-hidden="true">' + stars(5, 120, 800, 600) + "</svg></span>" +
-      '<canvas class="shj-cv" aria-hidden="true"></canvas>' +
-      '<span class="shj-flash is-jump" style="--at:' + s(MP.arr - .12) + '"></span><span class="shj-flash is-soft" style="--at:' + s(MP.chomp + .14) + '"></span>' +
+      '<span class="shj-dim"></span><canvas class="shj-cv" aria-hidden="true"></canvas>' +
+      '<span class="shj-flash is-soft" style="--at:' + s(MP.chomp) + '"></span><span class="shj-flash is-jump" style="--at:' + s(MP.slam) + '"></span>' +
       '<div class="shj-in">' +
       '<ol class="shj-track" aria-label="The three journeys" data-at style="--at:' + s(R0) + ";--land:" + s(R0 + .4) + '">' + track + "</ol>" +
       '<div class="shj-stage" style="--at:' + s(T0) + '">' +
         '<span class="shj-rays" style="--at:' + s(T0 + .2) + '"></span><span class="shj-halo"></span>' +
         '<span class="shj-ring"></span><span class="shj-ring" style="--at:' + s(T0 + .25) + '"></span>' +
-        '<span class="shj-whirl"></span>' +
         '<span class="shj-hp" aria-hidden="true">' + med(0, 6, 200, { animate: true, level: 3 }) + "</span>" +
         '<p class="shj-pre" aria-hidden="true">Dark Matter III. The Handpiece is finished.</p>' +
-        '<p class="shj-rpm" aria-hidden="true"><b>0</b><span>RPM</span></p>' +
         '<span class="shj-new">' + med(1, 0, 240, { animate: true, level: 1 }) + "</span>" + sparks +
       "</div>" +
       '<p class="shj-eyebrow" data-at style="--at:' + s(R0 + .1) + '"><span class="shj-nw">Journey 2 of 3</span> · <span class="shj-nw">' + fmt(125000) + " XP</span></p>" +
@@ -718,8 +711,8 @@
     return { build: build, gum: gumPath };
   })();
 
-  /* the moving light of the ModuPro's hand-off: the sparks off the spinning handpiece, the rush of light, the typodont
-     (its teeth flying in, the bite, the fold into the medallion) and the coins; the Loupes' hand-off uses it for its
+  /* the moving light of the ModuPro's hand-off: the typodont (its open jaws, the mouth and the Handpiece in it, the bite,
+     the chews, the fold into the medallion), the dust it pulls in, the Handpiece's shards and the coins; the Loupes' hand-off uses it for its
      coins. null without a canvas. */
   function labFx(el){
     var cv = el.querySelector(".shj-cv"), g = cv && cv.getContext ? cv.getContext("2d") : null;
@@ -727,8 +720,9 @@
     var dpr = Math.min(2, window.devicePixelRatio || 1), W = 0, H = 0, ps = [], ems = [], raf = 0, last = 0, dead = false;
     var stage = el.querySelector(".shj-stage"), C = { x: 0, y: 0, r: 90 }, jaw = null, M = null, crownP = null;
     try { crownP = new Path2D(CROWN_D); } catch (e) {}
-    function at(){ var st = stage.getBoundingClientRect(), c = cv.getBoundingClientRect(); C.x = st.left + st.width / 2 - c.left; C.y = st.top + st.height / 2 - c.top; C.r = st.width * .39; }
-    function fit(){ W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); at(); if (jaw) jaw.k = scaleOf(); }
+    /* positions are taken against the scene, not the canvas, so a shake on the canvas (the bite) shakes what it draws */
+    function at(){ var st = stage.getBoundingClientRect(), c = el.getBoundingClientRect(); C.x = st.left + st.width / 2 - c.left; C.y = st.top + st.height / 2 - c.top; C.r = st.width * .39; }
+    function fit(){ W = cv.clientWidth; H = cv.clientHeight; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); at(); if (jaw) jaw.k = jawK(jaw.m); }
     fit(); window.addEventListener("resize", fit);
     function rnd(a, b){ return a + Math.random() * (b - a); }
     function pick(a){ return a[Math.random() * a.length | 0]; }
@@ -743,7 +737,7 @@
       for (var i = ps.length - 1; i >= 0; i--) {
         var p = ps[i]; p.age += dt;
         var u = p.age / p.life;
-        if (u >= 1) { ps.splice(i, 1); continue; }
+        if (u >= 1 || (p.to && (p.to.x - p.x) * (p.to.x - p.x) + (p.to.y - p.y) * (p.to.y - p.y) < 150)) { ps.splice(i, 1); continue; }
         var d = Math.pow(p.drag || 1, dt * 60);
         if (p.acc) d *= 1 + p.acc * dt;
         p.vx *= d; p.vy = p.vy * d + (p.g || 0) * dt; p.x += p.vx * dt; p.y += p.vy * dt; if (p.vr) p.rot += p.vr * dt;
@@ -757,6 +751,11 @@
       if (p.t === "ring") {
         g.globalCompositeOperation = "lighter"; g.globalAlpha = (1 - u) * .9; g.strokeStyle = p.c; g.lineWidth = 2 * (1 - u) + .5;
         g.beginPath(); g.arc(p.x, p.y, p.s * (.2 + u), 0, 6.2832); g.stroke(); return;
+      }
+      if (p.t === "shard") {   // a bit of the chewed Handpiece: metal, its edge catching the light
+        g.globalCompositeOperation = "source-over"; g.globalAlpha = u > .7 ? (1 - u) / .3 : 1;
+        g.save(); g.translate(p.x, p.y); g.rotate(p.rot); g.beginPath(); g.moveTo(-p.s * .6, -p.s * .3); g.lineTo(p.s * .5, -p.s * .45); g.lineTo(p.s * .2, p.s * .4); g.closePath();
+        g.fillStyle = p.c; g.fill(); g.lineWidth = .8; g.strokeStyle = "rgba(255,255,255,.7)"; g.stroke(); g.restore(); return;
       }
       if (p.t === "ash") {   // a flake of the burnt ModuPro, dark, its edge still glowing
         g.globalCompositeOperation = "source-over"; g.globalAlpha = (1 - u) * Math.min(1, u * 10) * .9;
@@ -779,8 +778,11 @@
         g.globalAlpha *= .25; g.beginPath(); g.arc(p.x, p.y, p.s * (p.t === "ember" ? 2 : 3), 0, 6.2832); g.fill();
       }
     }
-    /* ----- the typodont: px a mm, so it fills about 82% of the width, or 68% of the height when that is less */
-    function scaleOf(){ return Math.min(W * .82 / 64, H * .68 / 66); }
+    /* ----- the typodont ----- */
+    /* px a mm for the typodont that eats the Handpiece: big, so its open mouth is wider than a medallion m px across (on a
+       phone its back teeth go off the sides), and with its jaws that far open (48 mm of arches and plates plus the gap)
+       it still fits 92% of the height */
+    function jawK(m){ return Math.max(1, Math.min(W * 1.08 / 64, (H * .92 - (m || 0) * 1.15) / 48)); }
     function mix(a, b, t){ var A = parseInt(a.slice(1), 16), B = parseInt(b.slice(1), 16); function c(s){ return Math.round(((A >> s) & 255) * (1 - t) + ((B >> s) & 255) * t); } return "rgb(" + c(16) + "," + c(8) + "," + c(0) + ")"; }
     /* each tooth's path and paints, once: the enamel lighter toward the edge, darker on a tooth turned away (out of the
        lamp), the incisors' translucent edge, a highlight on a tooth that faces you, the molars' buccal grooves */
@@ -796,7 +798,6 @@
         if (q.k < 2) { var e = q.edge, t = g.createLinearGradient(0, e - (up ? 2.2 : -2.2), 0, e); t.addColorStop(0, "rgba(214,226,236,0)"); t.addColorStop(1, "rgba(200,216,230,.55)"); q.edgeFill = t; q.ey = [Math.min(e, e - (up ? 2.2 : -2.2)), 2.2]; }
         if (q.face > .5) { var hx = -q.sd * q.w2 * .12, hy = (up ? 1 : -1) * 1.2, hg = g.createRadialGradient(hx, hy, 0, hx, hy, q.w2 * .45); hg.addColorStop(0, "rgba(255,255,255," + (.45 * q.face).toFixed(2) + ")"); hg.addColorStop(1, "rgba(255,255,255,0)"); q.hl = hg; }
         if (q.gr.length) { var gp = new Path2D(); q.gr.forEach(function(l){ gp.moveTo(l[0][0], l[0][1]); gp.lineTo(l[1][0], l[1][1]); }); q.gp = gp; }
-        q.a = rnd(0, 6.2832); q.rot0 = rnd(-4, 4); q.delay = q.k * .09 + rnd(0, .06);
       });
       ["u", "l"].forEach(function(a){
         var G = M.gum[a], up = a === "u", o = TYPO.gum(G, up), lo = Infinity;
@@ -839,85 +840,103 @@
       g.restore();
       g.lineWidth = 1.1 * px; g.strokeStyle = "#8E4452"; g.stroke(o.p);
     }
-    /* where a tooth goes, until it lands: its outline, glowing faintly, like a blueprint */
-    function slot(q, y, px, a){
-      g.save(); g.translate(q.cx, q.cy + y); g.globalAlpha *= a;
-      g.fillStyle = "rgba(155,231,238,.1)"; g.fill(q.p); g.lineWidth = 1.2 * px; g.strokeStyle = "rgba(155,231,238,.75)"; g.stroke(q.p);
-      g.restore();
-    }
     function plate(G, px){ g.fillStyle = G.pf; g.fill(G.plate); g.lineWidth = 1.2 * px; g.strokeStyle = "#252A33"; g.stroke(G.plate); }
-    function easeBack(t){ var c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2); }
+    /* the typodont eats the Handpiece. jaw.gap0 is how wide its jaws open (mm), breathing a little; close() snaps them
+       shut (the bite), chew() opens and closes them once more, gulp() swallows, morph() folds it into the medallion. */
     function drawJaw(dt){
       var J = jaw; J.t += dt;
-      var k = J.k, slide = Math.min(1, J.t / .45), se = 1 - Math.pow(1 - slide, 3), gap = J.gap0;
-      if (J.chomp != null) { J.chomp += dt; var cu = Math.min(1, J.chomp / .14); gap = J.gap0 * (1 - cu * cu); if (cu >= 1 && !J.bit) { J.bit = true; bite(); } if (J.bit) gap = -Math.sin(Math.min(1, (J.chomp - .14) / .2) * Math.PI) * .6; }
+      var k = J.k, slide = Math.min(1, J.t / .5), se = 1 - Math.pow(1 - slide, 3), gap = J.gap0 + Math.sin(J.t * 3.4) * .9 * se, bob = 0, sq = 1;
+      if (J.close != null) {
+        J.close += dt; var cu = Math.min(1, J.close / .16);
+        gap = J.gap0 * (1 - cu * cu * cu);
+        if (cu >= 1) { if (!J.bit) { J.bit = true; bite(); } gap = -Math.sin(Math.min(1, (J.close - .16) / .2) * Math.PI) * .7; }
+      }
+      J.chews.forEach(function(c){
+        var u = (J.t - c.t0) / .42;
+        if (u > 0 && u < 1) { gap = Math.max(0, gap) + 5.5 * Math.sin(u * Math.PI); bob = -Math.sin(u * Math.PI) * 1.4; }
+        else if (u >= 1 && !c.done) { c.done = true; crumbs(); }
+      });
+      if (J.gulp != null) { J.gulp += dt; var gu = Math.min(1, J.gulp / .5); sq = 1 - .07 * Math.sin(gu * Math.PI * 2) * (1 - gu); }
       var S = 1, A = 1;
       if (J.morph != null) { J.morph += dt; var mu = Math.min(1, J.morph / .4); S = 1 - .8 * mu * mu; A = 1 - mu; if (mu >= 1) { jaw = null; return; } }
-      var off = (1 - se) * H / k, dy = { u: -gap / 2 - off, l: gap / 2 + off }, px = 1 / (k * S), fly = [];
+      if (J.glow != null) J.glow = Math.min(1, J.glow + dt * .9);
+      if (J.hp) J.hp.t += dt;
+      var off = (1 - se) * H / k, dy = { u: -gap / 2 - off, l: gap / 2 + off }, px = 1 / (k * S);
       g.save(); g.globalCompositeOperation = "source-over"; g.globalAlpha = A;
-      g.translate(C.x, C.y + J.cy * k); g.scale(k * S, k * S);
+      g.translate(C.x, C.y + (J.cy + bob) * k); g.scale(k * S, k * S * sq);
+      if (gap > .3) mouth(J, dy, se);
       ["l", "u"].forEach(function(a){
-        var G = M.gum[a], y = dy[a];
-        g.save(); g.translate(0, y); plate(G, px); g.restore();
-        M.teeth.forEach(function(q){
-          if (q.arch !== a) return;
-          var tt = J.tteeth == null ? -1 : J.t - J.tteeth - q.delay, u = Math.min(1, tt / .5);
-          if (!q.land) slot(q, y, px, se * (tt < 0 ? 1 : Math.max(0, 1 - u * 1.4)));
-          if (tt < 0) return;
-          if (u >= 1) { if (!q.land) { q.land = true; snap(q, y, S); } tooth(q, q.cx, q.cy + y, 0, 1, px); }
-          else fly.push([q, u, y]);
-        });
-        g.save(); g.translate(0, y); gum(G, a === "u", px); g.restore();
-      });
-      fly.forEach(function(f){
-        var q = f[0], u = f[1], ty = q.cy + f[2], dist = Math.max(W, H) / k * .85, sx = q.cx + Math.cos(q.a) * dist, sy = ty + Math.sin(q.a) * dist, e = easeBack(u), r = 1 - Math.pow(1 - u, 3);
-        tooth(q, sx + (q.cx - sx) * e, sy + (ty - sy) * e, q.rot0 * (1 - r), 1.8 - .8 * r, px);
+        var G = M.gum[a];
+        g.save(); g.translate(0, dy[a]); plate(G, px);
+        M.teeth.forEach(function(q){ if (q.arch === a) tooth(q, q.cx, q.cy, 0, 1, px); });
+        gum(G, a === "u", px); g.restore();
       });
       if (J.flare != null) {
         J.flare += dt; var fu = Math.min(1, J.flare / .6);
-        if (fu < 1) { var gr = g.createLinearGradient(-34, 0, 34, 0); gr.addColorStop(0, "rgba(230,251,255,0)"); gr.addColorStop(.5, "rgba(230,251,255,.95)"); gr.addColorStop(1, "rgba(230,251,255,0)");
+        if (fu < 1) { var gr = g.createLinearGradient(-34, 0, 34, 0); gr.addColorStop(0, "rgba(241,232,255,0)"); gr.addColorStop(.5, "rgba(241,232,255,.95)"); gr.addColorStop(1, "rgba(241,232,255,0)");
           g.globalCompositeOperation = "lighter"; g.globalAlpha = A * (1 - fu); g.fillStyle = gr; g.fillRect(-34, -1.2 - .8 * (1 - fu), 68, 1.6 * (1 - fu) + .6); }
       }
       if (J.morph != null) { g.globalCompositeOperation = "lighter"; g.globalAlpha = Math.min(1, J.morph / .2) * .8; var rg = g.createRadialGradient(0, 0, 0, 0, 0, 40); rg.addColorStop(0, "rgba(255,255,255,1)"); rg.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = rg; g.fillRect(-40, -40, 80, 80); }
       g.restore();
     }
-    function snap(q, y, S){
-      var k = jaw.k * S, x = C.x + q.cx * k, yy = C.y + (jaw.cy + q.cy + y) * k;
-      ps.push({ t: "ring", x: x, y: yy, s: Math.max(8, q.w2 * k * .9), life: .32, age: 0, c: "#E6FBFF" });
-      for (var i = 0; i < 5; i++) { var a = rnd(0, 6.2832), v = rnd(120, 380); ps.push({ t: "dot", x: x, y: yy, vx: Math.cos(a) * v, vy: Math.sin(a) * v, drag: .9, life: rnd(.25, .5), age: 0, s: rnd(.8, 1.8), c: pick(["#FFFFFF", "#9BE7EE", "#FFE7A0"]) }); }
+    /* the inside of the open mouth, dark, glowing purple as it pulls, and the Handpiece in it once it has been pulled in
+       (drawn here, before the teeth, so they close over it) */
+    function mouth(J, dy, se){
+      var ry = (dy.l - dy.u) / 2 + 5, cy = (dy.u + dy.l) / 2;
+      g.save(); g.globalAlpha *= se * se; g.translate(0, cy); g.scale(23 / 26, ry / 26);   // inside the arches, its edge soft
+      var rg = g.createRadialGradient(0, 0, 0, 0, 0, 26); rg.addColorStop(0, "#2A0B24"); rg.addColorStop(.62, "#12040F"); rg.addColorStop(.9, "rgba(6,1,6,.85)"); rg.addColorStop(1, "rgba(6,1,6,0)");
+      g.fillStyle = rg; g.beginPath(); g.arc(0, 0, 26, 0, 6.2832); g.fill();
+      if (J.glow) {
+        var pg = g.createRadialGradient(0, 0, 0, 0, 0, 22); pg.addColorStop(0, "rgba(155,107,255," + (.6 * J.glow).toFixed(2) + ")"); pg.addColorStop(1, "rgba(122,60,255,0)");
+        g.globalCompositeOperation = "lighter"; g.fillStyle = pg; g.fill();
+      }
+      g.restore();
+      var hp = J.hp;
+      if (hp && !J.bit) {
+        var u = Math.min(1, hp.t / .3), mx = C.x, my = C.y + J.cy * J.k, sz = hp.s * (1 - .55 * u);
+        g.save(); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.globalAlpha = 1 - .35 * u;
+        g.translate(hp.x + (mx - hp.x) * u, hp.y + (my - hp.y) * u); g.rotate(-.44 - 2.2 * u);
+        g.drawImage(hp.img, -sz / 2, -sz / 2, sz, sz); g.restore();
+      }
     }
+    /* the bite: a flash along it, and the Handpiece in pieces: shards of metal and Dark Matter sparks out of the corners of
+       the mouth and the front, falling */
     function bite(){
       jaw.flare = 0;
-      var y = C.y + jaw.cy * jaw.k, half = 30 * jaw.k;
-      for (var i = 0; i < 70; i++) { var x = C.x + rnd(-1, 1) * half, up = Math.random() < .5 ? -1 : 1; ps.push({ t: i % 3 ? "dot" : "streak", x: x, y: y, vx: rnd(-1, 1) * 260 + (x - C.x) * 1.6, vy: up * rnd(80, 520), g: 600, drag: .95, life: rnd(.5, 1.1), age: 0, s: rnd(1, 2.6), c: pick(["#FFFFFF", "#9BE7EE", "#FFE7A0", "#BFEFF4"]) }); }
+      var y = C.y + jaw.cy * jaw.k, k = jaw.k, i, side, x;
+      for (i = 0; i < 90; i++) {
+        side = i % 3 === 0 ? 0 : i % 3 === 1 ? -1 : 1; x = C.x + (side ? side * rnd(18, 27) : rnd(-12, 12)) * k;
+        ps.push({ t: "shard", x: x, y: y + rnd(-2, 2) * k, vx: side ? side * rnd(220, 640) : rnd(-160, 160), vy: rnd(-520, side ? 80 : -120), g: 1300, drag: .985, life: rnd(.8, 1.5), age: 0,
+          s: rnd(4, 10), rot: rnd(0, 6.28), vr: rnd(-12, 12), c: pick(["#8E98A3", "#C9D1DA", "#5E6673", "#3B2E3A", "#7A3CFF", "#C9B6F5"]) });
+      }
+      for (i = 0; i < 70; i++) {
+        side = Math.random() < .5 ? -1 : 1; x = C.x + side * rnd(10, 27) * k;
+        ps.push({ t: i % 2 ? "dot" : "streak", x: x, y: y, vx: side * rnd(120, 700), vy: rnd(-600, 200), g: 900, drag: .96, life: rnd(.5, 1.2), age: 0, s: rnd(1, 2.6), c: pick(["#FFFFFF", "#C9B6F5", "#9B6BFF", "#E9DDFF", "#7FA0FF"]) });
+      }
+      ps.push({ t: "ring", x: C.x, y: y, vx: 0, vy: 0, life: .8, age: 0, s: 34 * k, c: "#E9DDFF" });
     }
-    function centerOf(n){ var b = n.getBoundingClientRect(), c = cv.getBoundingClientRect(); return { x: b.left + b.width / 2 - c.left, y: b.top + b.height / 2 - c.top }; }
+    /* what falls out of the corners of the mouth at each chew */
+    function crumbs(){
+      var y = C.y + jaw.cy * jaw.k, k = jaw.k;
+      for (var i = 0; i < 22; i++) {
+        var side = Math.random() < .5 ? -1 : 1;
+        ps.push({ t: i % 3 ? "shard" : "dot", x: C.x + side * rnd(16, 26) * k, y: y, vx: side * rnd(40, 240), vy: rnd(-260, -40), g: 1200, drag: .99, life: rnd(.7, 1.2), age: 0,
+          s: i % 3 ? rnd(3, 6) : rnd(1, 2), rot: rnd(0, 6.28), vr: rnd(-10, 10), c: pick(["#8E98A3", "#C9D1DA", "#5E6673", "#9B6BFF", "#C9B6F5"]) });
+      }
+    }
+    function centerOf(n){ var b = n.getBoundingClientRect(), c = el.getBoundingClientRect(); return { x: b.left + b.width / 2 - c.left, y: b.top + b.height / 2 - c.top }; }
     return {
-      /* sparks thrown off the spinning handpiece, more and faster as it spins up */
-      grind: function(sec){
+      /* the ModuPro's scene: dust and stars streaming into the open mouth, faster and faster */
+      suck: function(sec){
         var t = 0;
         ems.push(function(dt){
-          t += dt; if (t > sec) return false;
-          var lv = t / sec, n = (12 + 460 * lv * lv) * dt;
+          t += dt; if (t > sec || !jaw) return false;
+          var to = { x: C.x, y: C.y + jaw.cy * jaw.k }, n = (60 + 380 * Math.min(1, t / sec)) * dt;
           while (n > 0) {
             if (n < 1 && Math.random() > n) break; n--;
-            var a = rnd(-1.05, -.35), x = C.x + Math.cos(a) * C.r, y = C.y + Math.sin(a) * C.r, d = a + Math.PI / 2 + rnd(-.35, .25), v = rnd(380, 1000) * (.45 + lv);
-            ps.push({ t: "streak", x: x, y: y, vx: Math.cos(d) * v, vy: Math.sin(d) * v, g: 1400, drag: .985, life: rnd(.35, .8), age: 0, s: rnd(1, 2.4), c: pick(["#FFF4C2", "#FFD36B", "#FF9A3C", "#FFFFFF"]) });
-          }
-        });
-        go();
-      },
-      /* the rush: streaks of light from the middle out, faster and faster, as if flying forward */
-      rush: function(sec){
-        var t = 0;
-        ems.push(function(dt){
-          t += dt; if (t > sec) return false;
-          var n = (260 + 900 * Math.min(1, t / (sec * .6))) * dt;
-          while (n > 0) {
-            if (n < 1 && Math.random() > n) break; n--;
-            var a = rnd(0, 6.2832), r0 = rnd(6, 70), v = rnd(70, 200);
-            ps.push({ t: "rush", x: C.x + Math.cos(a) * r0, y: C.y + Math.sin(a) * r0, vx: Math.cos(a) * v, vy: Math.sin(a) * v, acc: 4.5, life: rnd(.45, .8), age: 0,
-              s: rnd(.8, 2.6), al: rnd(.5, 1), c: pick(["#FFFFFF", "#E9FCFF", "#BFEFF4", "#9BE7EE", "#FFE7A0", "#C9B6F5"]) });
+            var a = rnd(0, 6.2832), r = rnd(C.r * 1.3, C.r * 3.4), v = rnd(40, 110);
+            ps.push({ t: "rush", x: to.x + Math.cos(a) * r, y: to.y + Math.sin(a) * r, vx: -Math.cos(a) * v, vy: -Math.sin(a) * v, acc: 2.4, life: 1.6, age: 0, to: to,
+              s: rnd(.8, 2.2), al: rnd(.5, 1), c: pick(["#FFFFFF", "#E9DDFF", "#C9B6F5", "#9B6BFF", "#7FA0FF"]) });
           }
         });
         go();
@@ -972,9 +991,15 @@
         ps.push({ t: "ring", x: C.x, y: C.y, vx: 0, vy: 0, life: 1, age: 0, s: C.r * 2.2, c: "#9FF3E0" });
         go();
       },
-      jaw: function(){ if (!M) prepare(); jaw = { t: 0, gap0: 14, cy: 2 }; jaw.k = scaleOf(); M.teeth.forEach(function(q){ q.land = false; }); go(); },
-      teeth: function(){ if (jaw) jaw.tteeth = jaw.t; },
-      chomp: function(){ if (jaw) jaw.chomp = 0; },
+      /* the typodont comes in with its jaws open wide enough to swallow a medallion m px across */
+      jaw: function(m){ if (!M) prepare(); jaw = { t: 0, cy: 2, m: m, chews: [], glow: null }; jaw.k = jawK(m); jaw.gap0 = Math.max(14, m * 1.15 / jaw.k); go(); },
+      /* the mouth starts to glow and pull */
+      pull: function(){ if (jaw) jaw.glow = 0; },
+      /* the Handpiece, from here drawn in the mouth: img at x, y (page px), size px across */
+      swallow: function(img, x, y, size){ if (jaw) { var c = el.getBoundingClientRect(); jaw.hp = { img: img, x: x - c.left, y: y - c.top, s: size, t: 0 }; } },
+      close: function(){ if (jaw) jaw.close = 0; },
+      chew: function(){ if (jaw) jaw.chews.push({ t0: jaw.t }); },
+      gulp: function(){ if (jaw) jaw.gulp = 0; },
       morph: function(){ if (jaw) jaw.morph = 0; },
       coins: function(from, n, up){
         var o = centerOf(from);
@@ -1021,33 +1046,31 @@
     return { fx: function(){ return fx; }, at: at };
   }
   function modupro(d, done, opt){
-    var pays = journeyCrowns(1), el = shell("shj-hand shj-mp", "A new journey: the ModuPro", mpHTML(d)), ticket = 0;
-    ["imp", "arr", "chomp", "slam", "rise"].forEach(function(k){ el.style.setProperty("--" + k, MP[k] + "s"); });
-    var rpm = el.querySelector(".shj-rpm"), rpmN = rpm.querySelector("b");
-    var run = paying(el, pays, opt, done, { focusAt: (MP_R + 2.4) * 1000 + 100, peakAt: MP.slam * 1000, detail: { kind: "handoff", journey: 1 },
-      reward: MP_R + 1.75, end: MP_R + 2.4, stop: function(){ ticket++; }, still: function(){ el.classList.add("is-lab"); } });
+    var pays = journeyCrowns(1), el = shell("shj-hand shj-mp", "A new journey: the ModuPro", mpHTML(d));
+    ["rum", "shiv", "suck", "chomp", "slam", "rise"].forEach(function(k){ el.style.setProperty("--" + k, MP[k] + "s"); });
+    var run = paying(el, pays, opt, done, { focusAt: (MP_R + 2.4) * 1000 + 100, peakAt: MP.chomp * 1000, detail: { kind: "handoff", journey: 1 },
+      reward: MP_R + 1.75, end: MP_R + 2.4 });
     if (!run) return;
-    var st = el.querySelector(".shj-stage").getBoundingClientRect();
+    var st = el.querySelector(".shj-stage").getBoundingClientRect(), hp = el.querySelector(".shj-hp .shj-med");
     el.style.setProperty("--dy", Math.round(innerHeight / 2 - (st.top + st.height / 2)) + "px");
-    /* the RPM, 0 to 400,000, faster and faster */
-    run.at(.5, function(){
-      var mine = ++ticket, t0 = 0;
-      (function f(now){
-        if (mine !== ticket) return;
-        if (!t0) t0 = now;
-        var u = Math.min(1, (now - t0) / 1850);
-        rpmN.textContent = fmt(Math.round(400000 * Math.pow(u, 2.2) / 1000) * 1000);
-        if (u < 1) requestAnimationFrame(f); else rpm.classList.add("is-max");
-      })(performance.now());
-    });
+    /* the Handpiece as a picture the canvas can draw inside the mouth, behind the teeth (without it, it just goes at the bite) */
+    var img = null;
+    try { var im = new Image(); im.onload = function(){ img = im; }; im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(R.artOf(0, 6, 400, { animate: true, level: 3 }).replace("<svg ", '<svg xmlns="http://www.w3.org/2000/svg" ')); } catch (e) {}
     function fx(f){ return function(){ var x = run.fx(); if (x) f(x); }; }
-    run.at(.5, fx(function(x){ x.grind(2.05); }));
-    run.at(MP.imp, fx(function(x){ x.rush(.75); }));
-    run.at(MP.arr, function(){ el.classList.add("is-lab"); });
-    run.at(MP.jaw, fx(function(x){ x.jaw(); }));
-    run.at(MP.teeth, fx(function(x){ x.teeth(); }));
-    run.at(MP.chomp, fx(function(x){ x.chomp(); }));
+    run.at(MP.jaw, fx(function(x){ x.jaw(hp ? hp.offsetWidth || 200 : 200); }));
+    run.at(MP.pull, fx(function(x){ x.pull(); x.suck(MP.chomp - MP.pull); }));
+    run.at(MP.swap, function(){
+      var x = run.fx(); if (!x || !img || !hp) return;
+      var b = hp.getBoundingClientRect();
+      x.swallow(img, b.left + b.width / 2, b.top + b.height / 2, hp.offsetWidth * .55); el.classList.add("is-gulp");
+    });
+    run.at(MP.close, fx(function(x){ x.close(); }));
+    run.at(MP.chomp, function(){ el.classList.add("is-gulp"); });
+    run.at(MP.chew, fx(function(x){ x.chew(); }));
+    run.at(MP.chew2, fx(function(x){ x.chew(); }));
+    run.at(MP.gulp, fx(function(x){ x.gulp(); }));
     run.at(MP.morph, fx(function(x){ x.morph(); }));
+    run.at(MP_R, function(){ el.classList.add("is-told"); });
   }
   function loupes(d, done, opt){
     var pays = journeyCrowns(2), el = shell("shj-hand shj-lp", "A new journey: the Loupes", lpHTML(d));
@@ -1342,7 +1365,7 @@
     css();
     var el = document.createElement("div");
     var lp = kind !== "dark" && (d && d.to | 0) >= 2;
-    el.className = "shj shj-inline is-still is-on " + (kind === "dark" ? "shj-dark shj-d" + Math.max(0, Math.min(2, (d && d.journey) | 0)) : lp ? "shj-hand shj-lp" : "shj-hand shj-mp is-lab");
+    el.className = "shj shj-inline is-still is-on " + (kind === "dark" ? "shj-dark shj-d" + Math.max(0, Math.min(2, (d && d.journey) | 0)) : lp ? "shj-hand shj-lp" : "shj-hand shj-mp");
     el.innerHTML = kind === "dark" ? darkHTML(d || {}) : lp ? lpHTML(d) : mpHTML(d);
     return el;
   }
