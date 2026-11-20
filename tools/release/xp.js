@@ -147,20 +147,24 @@ try {
   eq(ans('xp-V', 'v1', { hub: 'xv', choice: 3, v: 'unknown-v', at: 20 }).correct, true, 'an unknown version falls back to the current key');
   const ret = ans('xp-V', 'v2', { hub: 'xv', choice: 0, at: 30, claim: false });
   ok(ret.kind === 'one' && ret.correct === true && ret.xp > 0, `a retired id that still has its key is graded from it and pays (migration_v68; ${JSON.stringify(ret)})`);
-  // a real bank through tools/xp/keys.js: the first hub on the engine that has one (Heme & Endo Exam 3's in 2026-11; Occlusion's,
-  // then Perio's, until their pages came down, 2026-11-19), so the suite outlives any one hub's page. Its multiple choice and
-  // select-all come from the bank; an ordering and a matching item are made up here (Heme & Endo Exam 3 has neither), through
-  // the same keyFor()
+  // a real bank through tools/xp/keys.js: the last hub on the engine by name that has one (Review of Systems' since 2026-11-19;
+  // Heme & Endo Exam 3's before it; Occlusion's, then Perio's, until their pages came down), so the suite outlives any one hub's
+  // page. Its multiple choice comes from the bank, and its select-all too when it has one; an ordering and a matching item (and a
+  // select-all, for a bank without one) are made up here, through the same keyFor()
   const BANK_HUB = fs.readdirSync(path.join(ROOT, 'hubs')).sort().reverse().find(h => fs.existsSync(path.join(ROOT, 'hubs', h, 'content/questions.json')));
   if (!BANK_HUB) throw new Error('no hub on the engine has a content/questions.json for the keys test');
+  const bankQs = JSON.parse(fs.readFileSync(path.join(ROOT, 'hubs', BANK_HUB, 'content/questions.json'), 'utf8'));
   const madeUp = [
     { id: 'xp-seq', lec: 'x', type: 'sequence', stem: 'Put these in order.', steps: ['First', 'Second', 'Third', 'Fourth'], ex: 'E' },
     { id: 'xp-match', lec: 'x', type: 'match', stem: 'Match each.', pairs: [['a', '1'], ['b', '2'], ['c', '3'], ['d', '4']], ex: 'E' },
-  ];
+  ].concat(bankQs.some(x => x.type === 'multi') ? [] : [
+    /* a bank with no select-all item (Review of Systems, 2026-11-19) gets a made-up one, so the suite never depends on a hub having one */
+    { id: 'xp-multi', lec: 'x', type: 'multi', stem: 'Select all that apply.', choices: ['A', 'B', 'C', 'D'], correct: [0, 2], ex: 'E' },
+  ]);
   const occ = KEYS.keys(BANK_HUB).concat(madeUp.map(KEYS.keyFor));
   const loaded = anonJson(`admin_load_question_keys(${S}, ${q(BANK_HUB)}, ${q(JSON.stringify(occ))}::jsonb, true)`);
   ok(loaded.loaded === occ.filter(k => !k.retired).length && loaded.keys === loaded.loaded, `${BANK_HUB}'s ${loaded.loaded} keys load from its content JSON (${JSON.stringify(loaded)})`);
-  const oq = JSON.parse(fs.readFileSync(path.join(ROOT, 'hubs', BANK_HUB, 'content/questions.json'), 'utf8')).concat(madeUp);
+  const oq = bankQs.concat(madeUp);
   const om = oq.find(x => x.type === 'mcq'), omu = oq.find(x => x.type === 'multi'), os = oq.find(x => x.type === 'sequence');
   eq(ans('xp-O', om.id, { hub: BANK_HUB, choice: om.answer, v: KEYS.fp(KEYS.exported(om)), at: 0 }).xp, 10, 'a real bank\'s question answered right with its version: 10 XP');
   eq(ans('xp-O', omu.id, { hub: BANK_HUB, picks: omu.correct.slice().reverse(), at: 10 }).correct, true, 'a real bank\'s select-all answered right in any order');

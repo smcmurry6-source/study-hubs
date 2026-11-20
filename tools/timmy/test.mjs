@@ -95,7 +95,9 @@ for (const c of corpora) {
   const inText = stems.filter(s => c.text.includes(s));
   ok(inText.length === 0, `${c.hub}: ${inText.length} question stems appear word for word in Timmy's content (${inText.slice(0, 2).join(" | ").slice(0, 120)})`);
   const kinds = {}; for (const u of c.units.values()) kinds[u.kind] = (kinds[u.kind] || 0) + 1;
-  ok(kinds.notes > 100 && kinds.review > 10 && kinds.cram > 50 && kinds.hint > 20 && kinds.likely > 10 && kinds.exam >= 1, `${c.hub}: every kind of content is there (${JSON.stringify(kinds)})`);
+  /* hints come from a professor's recordings; a hub built without any (Review of Systems, 2026-11-19) has none to send */
+  const nHints = ((DATA[c.hub].study || {}).hints || []).length;
+  ok(kinds.notes > 100 && kinds.review > 10 && kinds.cram > 50 && (kinds.hint || 0) >= Math.min(21, nHints) && kinds.likely > 10 && kinds.exam >= 1, `${c.hub}: every kind of content is there (${JSON.stringify(kinds)})`);
   ok([...c.units.keys()].every(id => /^(N\d+\.\d+|N\d+t\d+|R\d+\.\d+|C\d+\.\d+|H\d+|K\d+|X\d+)$/.test(id)), `${c.hub}: every unit id has the documented shape`);
   ok(c.text.length / 4 < 110000, `${c.hub}: about ${Math.round(c.text.length / 4)} tokens of content (budget 110,000)`);
   ok(!/<(?!\/?(hub|exam_facts|lecture|review_tables|table|cram_sheet|exam_hints|high_likelihood_topics)[ >])[A-Za-z\/!?]/.test(c.text), `${c.hub}: nothing in the content looks like a tag but the section tags`);
