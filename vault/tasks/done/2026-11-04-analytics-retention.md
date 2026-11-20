@@ -35,8 +35,9 @@ stop keeping per-person rows longer than a feature needs them.
       `activity_hourly` / `activity_visits` rows instead of rebuilding them from raw pings.
 - [x] A retention function (admin-only) runs exactly the approved deletes; how it runs (by hand in each lessons audit, or a
       scheduled job) is Sam's call. (A weekly pg_cron job; Sam can switch it to by hand.)
-- [ ] Optional, if Sam wants it: a "Delete my data" button in Settings (all rows for this browser's id) and the student's
-      id shown in Stats so a deletion request can be honored. (Not asked for; left out.)
+- [x] ~~Optional, if Sam wants it: a "Delete my data" button in Settings (all rows for this browser's id) and the student's
+      id shown in Stats so a deletion request can be honored.~~ (Not asked for; left out. Moved to [the inbox](../inbox.md)
+      as an "only if Sam asks" line, 2026-11-20.)
 - [x] [analytics-retention](../../reference/analytics-retention.md) says "In force" with the dates; `supabase/schema.sql`
       refreshed.
 - [x] CI passes (`node tools/ci/syntax.js`, `node tools/ci/vault.js`, `node tools/ci/smoke.js`)

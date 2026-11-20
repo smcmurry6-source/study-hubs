@@ -809,7 +809,7 @@
     }
     if ((raw.tier | 0) >= 6 && (raw.dark_seen || []).indexOf(j) < 0 && !darkPlayed[j]) {
       darkPlayed[j] = 1; if (j === 0) took = true;
-      scene("dark", { journey: j, xp: base.xp, level: raw.level || 1 }, function(){ if (opt.seen) opt.seen(j); });
+      scene("dark", { journey: j, xp: base.xp, level: raw.level || 1, position: raw.position, of: raw.of }, function(){ if (opt.seen) opt.seen(j); });
     }
     return took;
   }

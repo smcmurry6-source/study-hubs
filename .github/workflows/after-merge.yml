@@ -20,7 +20,10 @@ on:
         required: false
 permissions:
   contents: read
-# one at a time and never cancelled: a data fix or a key load must not be cut off halfway
+  actions: read   # the earlier runs: a push run also covers the ones canceled while waiting (run.js coverFrom)
+# one at a time and never cancelled: a data fix or a key load must not be cut off halfway. GitHub still cancels a run
+# that is waiting when a newer one queues behind it, so a push run starts where the last push run that wasn't canceled
+# ended (--since-last-run), not at its own github.event.before
 concurrency:
   group: after-merge
   cancel-in-progress: false
@@ -30,10 +33,10 @@ jobs:
     timeout-minutes: 40
     environment: after-merge
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0   # the whole history: the push's range, the podcast before and after, the changelog lines added
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Install headless Chromium (for the post-release check)
@@ -50,8 +53,11 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           FROM: ${{ inputs.from || github.event.before }}
           FIX: ${{ inputs.fix }}
+          GITHUB_TOKEN: ${{ github.token }}
+          EVENT: ${{ github.event_name }}
         run: |
           args=(--to "$GITHUB_SHA")
           [ -n "$FROM" ] && args+=(--from "$FROM")
+          [ "$EVENT" = push ] && args+=(--since-last-run)
           [ -n "$FIX" ] && args+=(--fix "$FIX")
           node tools/after-merge/run.js "${args[@]}"

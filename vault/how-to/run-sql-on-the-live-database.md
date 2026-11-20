@@ -9,7 +9,7 @@ Every student's answer is saved through one small database on Supabase's Free pl
 [shared-infrastructure](../reference/shared-infrastructure.md)). Whatever else runs there takes that CPU from the saves. On
 2026-11-18, the day before the Perio final, saves failed in bursts of 1 to 5 minutes each time something heavy ran: a
 migration's 43 s transaction and 17 s backfill, the lessons audit's 11 and 13 s economy queries, the admin page's reads sent
-all at once, a function timed in a loop ([the task](../tasks/2026-11-18-database-load.md)). This note says when and how to
+all at once, a function timed in a loop ([the task](../tasks/done/2026-11-18-database-load.md)). This note says when and how to
 run anything on the live database: a query through the Supabase connector or the SQL editor, a migration, a backfill.
 
 ## When the class is quiet: 1 to 5 am Central
@@ -99,7 +99,7 @@ note on what it costs), a look at the data, a check after a migration.
   batches, or the quiet hours.
 - Numbering a migration, `supabase/schema.sql` and the pending list: the [repo map](../reference/repo-map.md).
 
-Related: [shared-infrastructure](../reference/shared-infrastructure.md) · [the database-load task](../tasks/2026-11-18-database-load.md) ·
+Related: [shared-infrastructure](../reference/shared-infrastructure.md) · [the database-load task](../tasks/done/2026-11-18-database-load.md) ·
 [the optimization pass](../tasks/done/2026-11-18-database-optimization-pass.md) · [after-a-merge](after-a-merge.md) ·
 [read-usage-data](read-usage-data.md) · [analytics-governance](../reference/analytics-governance.md) ·
 [learner-data-privacy](../rules/learner-data-privacy.md)

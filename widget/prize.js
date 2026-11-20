@@ -21,7 +21,9 @@
   function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function fmt(n){ return Number(n || 0).toLocaleString("en-US"); }
   var PRIZE_CSS =
-    ".hx-prizes{--hxp-y:46px;position:fixed;z-index:45;left:50%;bottom:24px;transform:translateX(-50%);display:grid;gap:10px;width:min(420px,calc(100% - 32px));pointer-events:none}" +
+    /* above the report-reply pop-up (.sh-reply, 10001) for its few seconds, which sits where the card drops in on a phone and
+       beside it on a laptop; under the phone's toasts (10005), which drop in under the card */
+    ".hx-prizes{--hxp-y:46px;position:fixed;z-index:10004;left:50%;bottom:24px;transform:translateX(-50%);display:grid;gap:10px;width:min(420px,calc(100% - 32px));pointer-events:none}" +
     ".hx-prize .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}" +
     ".hx-prize{position:relative;pointer-events:auto;cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent}" +
     ".hxp-card{position:relative;overflow:hidden;display:grid;grid-template-columns:58px minmax(0,1fr);column-gap:12px;align-items:center;padding:12px 14px 15px 12px;" +

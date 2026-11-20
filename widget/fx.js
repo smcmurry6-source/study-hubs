@@ -156,15 +156,23 @@
     var label = row ? (row.textContent || "").replace(/[\d%.,/·:()+\-]+/g, " ").replace(/\s+/g, " ").trim() : "";
     return (scope ? scope.id : "") + "|" + (host ? host.className : "") + "|" + (label.length <= 80 ? label : "");
   }
-  function fillBars(node){
-    var bars = node.matches(BAR_SEL) ? [node] : node.querySelectorAll(BAR_SEL);
-    for (var i = 0; i < bars.length; i++) {
-      var bar = bars[i], to = bar.style.width;
-      if (!to || to.indexOf("%") < 0 || !bar.getClientRects().length) continue;   // hidden: fill it when it shows
-      var key = barKey(bar), from = Object.prototype.hasOwnProperty.call(barMem, key) ? barMem[key] : "0%";
-      barMem[key] = to;
-      if (from !== to) anim(bar, [{ width: from }, { width: to }], { duration: 900, delay: Math.min(i, 8) * 45, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" });
+  /* every bar is measured first and animated after: an animation started between two measurements made the browser lay
+     the page out again for the next bar, which on Home's progress (two bars a lecture, 140 on Review of Systems) blocked
+     a slow phone for a third of a second (2026-11-20) */
+  var barQ = [];
+  function fillBars(nodes){
+    var todo = [];
+    for (var n = 0; n < nodes.length; n++) {
+      var node = nodes[n], bars = node.matches(BAR_SEL) ? [node] : node.querySelectorAll(BAR_SEL);
+      for (var i = 0; i < bars.length; i++) {
+        var bar = bars[i], to = bar.style.width;
+        if (!to || to.indexOf("%") < 0 || !bar.getClientRects().length) continue;   // hidden: fill it when it shows
+        var key = barKey(bar), from = Object.prototype.hasOwnProperty.call(barMem, key) ? barMem[key] : "0%";
+        barMem[key] = to;
+        if (from !== to) todo.push([bar, from, to, i]);
+      }
     }
+    todo.forEach(function(b){ anim(b[0], [{ width: b[1] }, { width: b[2] }], { duration: 900, delay: Math.min(b[3], 8) * 45, easing: "cubic-bezier(.2,.8,.2,1)", fill: "backwards" }); });
   }
 
   /* ---------- view fades: modes, tabs, lectures ---------- */
@@ -199,18 +207,21 @@
   /* ---------- one observer for all three ---------- */
   function watch(){
     new MutationObserver(function(recs){
-      var live = tap && performance.now() <= tap.until;
+      var live = tap && performance.now() <= tap.until, fill = [];
       for (var i = 0; i < recs.length; i++) {
         var r = recs[i];
         if (r.type === "childList") {
           var any = false;
-          for (var j = 0; j < r.addedNodes.length; j++) { var n = r.addedNodes[j]; if (n.nodeType === 1) { any = true; fillBars(n); } }
+          for (var j = 0; j < r.addedNodes.length; j++) { var n = r.addedNodes[j]; if (n.nodeType === 1) { any = true; fill.push(n); } }
           if (any && nav && r.target.nodeType === 1) nav.added.push(r.target);
         } else if (r.attributeName === "hidden") {
           if (nav && !r.target.hidden) nav.shown.push(r.target);
-          if (!r.target.hidden) fillBars(r.target);
+          if (!r.target.hidden) fill.push(r.target);
         } else if (live) answerRec(r);
       }
+      /* measured just before the next frame, once for everything added since: a page redrawn twice in a row (Home, then
+         the synced answers) is laid out once, outside the script that drew it */
+      if (fill.length) { if (!barQ.length) requestAnimationFrame(function(){ var q = barQ; barQ = []; fillBars(q); }); barQ.push.apply(barQ, fill); }
     }).observe(document.body, { subtree: true, childList: true, attributes: true, attributeOldValue: true, attributeFilter: ["class", "data-state", "hidden"] });
     document.addEventListener("click", function(e){
       var c = e.target && e.target.closest ? e.target.closest(".qcard") : null;
@@ -218,7 +229,7 @@
       navClick(e);
     }, true);
     /* bars already on the page when this loads */
-    fillBars(document.body);
+    fillBars([document.body]);
   }
 
   /* ---------- streak flame ---------- */

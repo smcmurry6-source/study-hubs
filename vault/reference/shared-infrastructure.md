@@ -97,7 +97,7 @@ tags: [widget, supabase]
   **The project is on Supabase's Free plan** (checked 2026-11-18): a shared CPU that slows to a crawl once a busy day has
   used up its burst, and a database that goes **read-only at 500 MB** (323 MB at noon on 2026-11-19, after the optimization pass's rewrites of `xp_seen` and `activity_visits`; 318 MB that morning, after the ping table's rewrite; 465 MB just before it; then every save fails). Keep
   each answer's work small ([migration_v72](../../migration_v72.sql) cut it to a quarter for the most active students) and
-  watch the size ([the task](../tasks/2026-11-18-database-load.md)). **Reading the dashboard** (2026-11-19): its database size
+  watch the size ([the task](../tasks/done/2026-11-18-database-load.md)). **Reading the dashboard** (2026-11-19): its database size
   is refreshed once a day, so it can show yesterday's figure for hours after a cleanup (the true one:
   `select pg_size_pretty(sum(pg_database_size(datname))) from pg_database`, the sum Supabase counts against the 500 MB); the
   "Disk size" on Database Settings adds the write-ahead log, which the limit doesn't count. Its **Memory commitment**
@@ -130,7 +130,7 @@ tags: [widget, supabase]
   and its heavy reads come worked out ahead from `admin_cache`, refreshed by pg_cron's `sh-admin-cache` job (every 15
   minutes while the page is in use, hourly while the class is busy, one read a minute; `migration_v83.sql`)
   ([admin-operations](admin-operations.md)), and `widget/v3.js` holds a failed answer and sends it again with the same
-  request id (the quiet spell above). What's still to do: [the task](../tasks/2026-11-18-database-load.md).
+  request id (the quiet spell above). What's still to do: [the task](../tasks/done/2026-11-18-database-load.md).
 - **GitHub Pages deploy** — `github.com/smcmurry6-source/study-hubs`, branch
   `main`, served at `smcmurry6-source.github.io/study-hubs/`. Deploy via the
   GitHub Git Data API (blob → tree → commit → ref update); a GitHub PAT is

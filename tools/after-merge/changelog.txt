@@ -83,4 +83,9 @@ all | Topics in the notes now fold: tap a topic's heading to fold it away or ope
 heme-endo-exam3 | Dr. Herr's study guide folds too: tap an item's heading to fold it, or press Collapse all to see each lecture's items as a list. Search results for a lecture's Key terms now land on Key terms.
 review-of-systems | No more "exam hints" here: what each course stressed for its own exams marks high-yield content, not the mocks, so Exam hints is now High-yield points and High likelihood is now High yield, in the bank, the notes and Ask Timmy.
 all | A survey now asks you once, not once on each of your devices: answering it, or tapping Later, on one of your linked devices counts for all of them. On a device that isn't linked, the survey has a Link this device button.
+all | Reaching Dark Matter is now the biggest moment on the ladder: a new full-screen scene, and it pays 5,000 Shiny Gold Crowns on each journey. Already there? The 5,000 is in your balance.
+all | Finishing the Handpiece now hands you the ModuPro in a scene of its own: a typodont opens wide around your handpiece, pulls it into its mouth, chews it to pieces and swallows it, then becomes your ModuPro.
+all | Finishing the ModuPro hands you the Loupes in a scene of its own: their headlight clicks on, its beam grows into a sunbeam that burns your ModuPro away, and the loupes come down to take its place.
+all | Reaching a new journey pays Shiny Gold Crowns: 20,000 for the ModuPro and 30,000 for the Loupes, shown on the screen that hands it to you. Already there? They're in your balance.
 all | Pop-up messages got a makeover: tips, "one moment" notes, connection hiccups, syncs, streak cheers, achievements and update notices now come up as colorful cards with their own icon and a countdown bar, not plain dark boxes. Tap one to close it.
+all | On a phone, a reply to your report no longer hides the gold card when you earn XP: the card now shows on top of it for its few seconds.
