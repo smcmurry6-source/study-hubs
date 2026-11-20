@@ -29,12 +29,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   the tile). Sam's call whether it wants one; if so, its games, names and lobby art are its own
   ([arcade-skins](../rules/arcade-skins.md)), and the hub comes out of `TEXT_ONLY` in `sw.js`.
 - [x] **Review of Systems: Sam's calls from the build** (2026-11-20): Sam answered them all the same day: keep everything but the order of the teeth most often missing after third molars, leave the Emergencies names, and leave out anything the professors de-emphasized ([decisions](../decisions.md)); done in [#480](https://github.com/smcmurry6-source/study-hubs/pull/480).
-- [ ] **The engine's background work after Home in small pieces** (2026-11-20, [#480](https://github.com/smcmurry6-source/study-hubs/pull/480)):
+- [x] **The engine's background work after Home in small pieces** (2026-11-20, [#480](https://github.com/smcmurry6-source/study-hubs/pull/480)):
   on the performance suite's slowed phone, Review of Systems blocks the page for about 850 ms after Home has drawn (Heme & Endo
   Exam 3: about 330). A CPU profile put the JavaScript in `exportSections()` in `widget/hub.js` (every part's notes parsed into
   the page in one task for the search index), `fit()`/`fitFigs()` in `widget/v3.js`'s layer and `fmt()`'s `toLocaleString`;
   the rest is the browser parsing the content JSON. Building the index a few parts at a time, yielding between them, would
-  cut it on every hub; then lower the hub's `tbt` in `tools/release/budgets.json` (set to 900 from that day's run).
+  cut it on every hub; then lower the hub's `tbt` in `tools/release/budgets.json` (set to 900 from that day's run). Done (#498): the index is built a lecture at a time, `widget/fx.js` measures every bar before animating any (the biggest share, about 370 ms: not in the first profile), `fit()` reads before it writes, the rank pill is fitted once a frame, `fmt()` keeps one formatter. Review of Systems about 920 to 490 ms, `tbt` 900 to 700; Heme & Endo Exam 3 about 430 to 230.
 - [x] ~~**Ask Timmy on Haiku: run the eval, with Review of Systems cases**~~ (2026-11-20): dropped, Sam: "dont worry about testing haiku, just switch timmy to it" ([decisions](../decisions.md)). If his answers fall short, going back is `MODEL` in `supabase/functions/timmy/core.js` ([ask-timmy](../reference/ask-timmy.md)).
 - [ ] **Review of Systems: Cardio & Respiratory and Renal from their slides** (2026-11-19, the hub's build): their Drive
   folders had the thinnest sources (classmates' guides, no professor slides), so those sections rest most on standard
@@ -170,11 +170,12 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   **2026-11-18:** 834 of 850 after the final's bank audit (BUG-176), then 864 of 885 with S6 taught (BUG-180, [#419](https://github.com/smcmurry6-source/study-hubs/pull/419));
   the [S6 diagrams](done/2026-11-18-perio-s6-diagrams.md) took none of it (still 864 of 885: `figures.js` loads with Notes, not on a Home
   visit; it is 157 KB gzipped with S6's five, was 121), so the next change to the notes, questions or hints needs room: trim first or ask Sam.
-- [ ] **A new hub's blocking time after the bundles** (2026-11-13, [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md), [#358](https://github.com/smcmurry6-source/study-hubs/pull/358)):
+- [x] **A new hub's blocking time after the bundles** (2026-11-13, [phase 5, part 2](done/2026-11-05-redesign-phase-5-backend.md), [#358](https://github.com/smcmurry6-source/study-hubs/pull/358)):
   on `perf.js`'s slow phone a new hub's total blocking time was 230-365 ms on `main` and is 310-540 ms with the bundles
   across runs (350-385 in the final run; budget 500, fails past 750). The same scripts run, in fewer and longer tasks.
   Not looked into: a trace of the first seconds to see which tasks are long (the engine's start, or `widget/v3.js`'s,
-  which is shared with the live hubs). Worth a look at the release, when v3.js no longer has to stay as it is for the old pages.
+  which is shared with the live hubs). Worth a look at the release, when v3.js no longer has to stay as it is for the old pages. Done (#498): traced with the Long Animation Frames API on the slow phone; the fixes are in the line above, and what is left is the next line.
+- [ ] **A hub's three remaining long tasks after Home** (2026-11-20, #498's trace of Review of Systems on `perf.js`'s slow phone): `widget/v3.js`'s start runs in one script task (about 180 ms, 60 of it a forced layout); the synced answers redraw the whole of Home (`applySync` to `SH_SYNC.merge` to `renderHome`, about 130 ms, then about 110 ms laying the new Home out for its bars); and parsing `notes.json` and `questions.json` (about 70 ms each). Ideas: split v3.js's start into a few tasks, have the merge redraw only the parts whose numbers changed, and fetch the notes as each part opens.
 - [x] Ask Timmy's "What should I study tonight?" on the new dashboard reads each hub's progress from this device's saved state
   (`progressFrom` in `widget/ask.js`), so on a new or linked device it sees nothing until a hub page has synced the answers. Read the
   student's own answers from the server there instead (their own rows, like the v2 bootstrap), or say "open a hub first" when every
