@@ -57,10 +57,11 @@ check-in hours: its entry in `hubs.js`.
 - **Scope:** only the intro deck's list (Sam: "None: stick to the list"): no oral histology, dental anesthesia or operative.
 - **Exam Hints:** only Medical Emergencies has any (18, from its four lecture recordings, with each professor's name as the
   transcript spells it). What those professors said they won't test (ECG patterns, airway adjunct sizing, the steroid chart
-  and the like) has no questions. The other courses had no recordings in their folders.
+  and the like) is left out of the notes as well as the questions (Sam, 2026-11-20: "dont include anything that was
+  deemphasized or we were told not to worry about"; Radiology's contrast and grayscale too). The other courses had no recordings in their folders.
 - **Not High likelihood on purpose:** CKD (`rn-disease-01` to `-05`): a classmate's Renal Exam 1 objectives head it "NO EXAM
   Qs on this". The questions stay, since that was about the Renal course's own exam and CKD's dental care is board material;
-  Sam's call ([inbox](../tasks/inbox.md)). The merge script that built the content kept it out.
+  Sam kept it so (2026-11-20, [decisions](../decisions.md)). The merge script that built the content keeps it out.
 - **Size:** the biggest bank on the site, about 1.2 MB over the wire on a first visit (200 KB before the page has drawn: the
   content JSON loads behind it), against Heme & Endo Exam 3's 780 KB, and about 850 ms of blocking time on the performance
   suite's slowed phone (Heme & Endo Exam 3: 300-370 ms), nearly all of it the background work after Home has drawn (parsing the

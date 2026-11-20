@@ -62,7 +62,8 @@ sources were classmates' guides and answered objectives, not professor slides, s
 (`src: "ref"` on those questions). By course:
 - Head & Neck: the stylomandibular ligament limits protrusion (a practice set said it "prevents excessive opening").
 - Dental Anatomy & Occlusion: primary teeth start calcifying in utero; the maxillary first molar usually has 4 canals; the
-  most often missing tooth after third molars and two angle facts where sources differ are not keyed.
+  order of the teeth most often missing after third molars is left out (sources differ; Sam, 2026-11-20) and two angle facts
+  where sources differ are not keyed.
 - Fundamentals I: about 16 study-guide errors (proton counts per complex, PEP carboxykinase, β2-microglobulin, what Tfh and NK
   cells secrete, RLRs and MAVS, among others); enzyme inhibition sits in both halves.
 - Fundamentals II: high-risk HPV 16 and 18; M. tuberculosis acid-fast; mirabegron a β3 agonist; fluoroquinolones on DNA
@@ -81,9 +82,9 @@ sources were classmates' guides and answered objectives, not professor slides, s
   agonist; Hashimoto as above.
 - Ethics & Professionalism: HCV needlestick risk about 2%; HIV survives poorly outside the body.
 - Evidence-Based Dentistry: false positives from low specificity; what a p-value is; CONSORT.
-- Radiology: the fetal threshold about 0.3 Gy (a guide copy said mGy); contrast and grayscale kept brief, with no question
-  turning on them (the guide says the professor won't ask).
-- Medical Emergencies: the four recordings settled most points; what the professors said they won't test has no questions;
+- Radiology: the fetal threshold about 0.3 Gy (a guide copy said mGy); contrast and grayscale left out, since
+  the guide says the professor won't ask (Sam, 2026-11-20).
+- Medical Emergencies: the four recordings settled most points; what the professors said they won't test is left out of the notes and questions;
   normal heart rate 60-100, aspirin held 7-10 days, hemophilia B is factor IX, chest thrusts for a choking infant.
 
 **Graded work:** the earlier courses' quizzes, crosswords and exams that turned up were used as a topic check only; nothing
@@ -92,4 +93,4 @@ Quizlet sets behind a login, videos where a transcript existed.
 
 **Also in the PR:** the engine's course groups and two-exam countdown, lecture badges that widen for a label like HN-1, the
 About page, and **Ask Timmy on Haiku 5.5** (Sam: "we can switch timmy to run on haiku"), whose eval is still to run
-([inbox](../inbox.md)). **Left for Sam:** the calls listed in [the inbox](../inbox.md) ("Sam's calls from the build").
+([inbox](../inbox.md)). **Sam's calls** from the build, answered 2026-11-20: [decisions](../../decisions.md).
