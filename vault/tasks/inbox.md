@@ -76,7 +76,7 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   card above the pop-up for its few seconds, or drop it in under the pop-up.
 - [x] **Read the data-quality report** (done 2026-11-20 at 8:30 am Central, the admin page's kept copy of 1:41 am, in `LESSONS.md`'s
   Live signals: no test rows, every table writing; the one problem it can't see, `quiet.js`'s `pq-` rows, found by reading question
-  health) (the Heme & Endo Exam 3 retrospective's PR) (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
+  health) (#503) (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
   `select sh_data_quality();` stopped at the audit's 5 s limit both times (80 people in Perio on its final's eve; then at 12:40 pm
   the next day, between the Perio final and the Heme & Endo Exam 3 eve). `qh_report('perio')` was read with the retrospective
   (2026-11-19: no miskeys). `migration_v83.sql` is live since 2026-11-20 (1:45 am Central): read the admin page's kept copy
