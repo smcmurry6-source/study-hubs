@@ -56,13 +56,16 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 - [x] **The dashboard's toast on a phone** (2026-11-19, left from BUG-126's fix): a hub's toasts now drop in at the top on a
   phone, clear of Timmy, the streak flame and the Listen player; the dashboard's own (`toast()` in `widget/dash.js`) still
   comes up at the bottom and wasn't checked against what sits there. Check it on a phone and move it if anything covers it. Checked 2026-11-19 on an emulated iPhone 13 with the preview's made-up data: since #458 the rule in `widget/hub.css` drops the dashboard's toasts in at the top too (64 px, under its 56 px bar), clear of the report-reply pop-up and the bottom corners; nothing covers a long one, so nothing to move. And its prizes are on the gold card now (the next line). (#466)
-- [ ] **`xp_seen` grows back with every full rebuild** (2026-11-19, the optimization pass's phase 2,
-  [its note](2026-11-18-database-optimization-pass.md)). `sh_xp_rebuild` (Link my devices, an edited or deleted answer) deletes
+- [x] **`xp_seen` grows back with every full rebuild** (2026-11-19, the optimization pass's phase 2,
+  [its note](done/2026-11-18-database-optimization-pass.md)). `sh_xp_rebuild` (Link my devices, an edited or deleted answer) deletes
   and copies all of a student's `xp_seen` rows, `xp_days` and answer awards, whatever changed: 65,125 `xp_seen` rows went and
   came back in the 18 hours after the 2026-11-18 restart, and on a copy 60 such rebuilds grew its index 16 → 23 MB. Phase 2
   rewrites the table once at night (about 24 MB back). If it passes about 40 MB again, look at rebuilding only what changed
   (an `xp_seen` row is one per question and right-or-wrong: inserting the missing ones would do for a link), or another
   `cluster` at night. Measure on a copy first (`tools/release/bench-answers.js`).
+  **Read 2026-11-20, 2:30 am: 17 + 16 MB** (187,763 rows; 30.7 MB after the noon rewrite), under 40 MB with the last live
+  hub's exam that morning, so nothing to do now. Every lessons audit reads the table sizes (`tools/lessons-refresh.md` step 1):
+  past about 40 MB, write a new line for the partial rebuild (#PR).
 - [ ] **Read the data-quality report** (2026-11-18, the evening lessons refresh; 2026-11-19, the Perio retrospective):
   `select sh_data_quality();` stopped at the audit's 5 s limit both times (80 people in Perio on its final's eve; then at 12:40 pm
   the next day, between the Perio final and the Heme & Endo Exam 3 eve). `qh_report('perio')` was read with the retrospective
