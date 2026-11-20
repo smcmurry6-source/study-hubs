@@ -250,11 +250,17 @@ export function buildCorpus(hub, data, prefix){
   });
   lines.push("</cram_sheet>");
 
-  // Exam Hints: what the professors said about the exam, word for word, and the hub's take on it
+  // Exam Hints: what the professors said about the exam, word for word, and the hub's take on it. A hub that reviews earlier
+  // courses (core.json's hintsFrom "courses", Review of Systems; Sam, 2026-11-20: "exam hints for old exams are not exam hints
+  // for review of systems. they do indicate higher yield content, however") has them from those courses, said about each
+  // course's own exams: Timmy calls them high-yield points and High yield, never hints or predictions about this hub's exam.
+  const fromCourses = core.hintsFrom === "courses";
+  const hintLabel = fromCourses ? "High-yield points" : "Exam Hints", likelyLabel = fromCourses ? "High yield" : "High likelihood";
   lines.push("<exam_hints>");
+  if (fromCourses) lines.push("(This hub reviews earlier courses for a board-style exam. These quotes and the topics below come from those courses: what each course's professors stressed about their own course exams. They mark high-yield content. They are not hints about this hub's exam and don't predict it: call them high-yield points and High yield topics, never exam hints, likely exam questions or predicted exam topics.)");
   (study.hints || []).forEach((h, i) => {
     const l = byId.get(h.lec), t = clean(`${h.quote} ${h.take || ""}`);
-    lines.push(`[${unit("H" + (i + 1), { kind: "hint", lec: h.lec || "", text: safe(t), go: { v: "hints", lec: h.lec || "" }, label: `${l ? l.label + " " : ""}Exam Hints` })}] (${l ? prefix + "L" + l.n : ""}, ${safe(h.kind || "")}) The professor said: "${safe(clean(h.quote))}" ${safe(clean(h.take || ""))}`);
+    lines.push(`[${unit("H" + (i + 1), { kind: "hint", lec: h.lec || "", text: safe(t), go: { v: "hints", lec: h.lec || "" }, label: `${l ? l.label + " " : ""}${hintLabel}` })}] (${l ? prefix + "L" + l.n : ""}, ${safe(h.kind || "")}) ${fromCourses ? "The course's professor said, in that course" : "The professor said"}: "${safe(clean(h.quote))}" ${safe(clean(h.take || ""))}`);
   });
   lines.push("</exam_hints>");
 
@@ -262,7 +268,7 @@ export function buildCorpus(hub, data, prefix){
   lines.push("<high_likelihood_topics>");
   (core.likelyTopics || []).forEach((k, i) => {
     const l = byId.get(k.lec), t = clean(k.t);
-    lines.push(`[${unit("K" + (i + 1), { kind: "likely", lec: k.lec || "", text: safe(t), go: { v: "hints", lec: k.lec || "" }, label: `${l ? l.label + " " : ""}High likelihood` })}] (${l ? prefix + "L" + l.n : ""}; why: ${safe(clean(k.basis || ""))}) ${safe(t)}`);
+    lines.push(`[${unit("K" + (i + 1), { kind: "likely", lec: k.lec || "", text: safe(t), go: { v: "hints", lec: k.lec || "" }, label: `${l ? l.label + " " : ""}${likelyLabel}` })}] (${l ? prefix + "L" + l.n : ""}; why: ${safe(clean(k.basis || ""))}) ${safe(t)}`);
   });
   lines.push("</high_likelihood_topics>");
   lines.push("</hub>");
