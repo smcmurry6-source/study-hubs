@@ -873,6 +873,27 @@
   function unauthorized(){ return { error: { status: 401, code: "28000", message: "unauthorized" } }; }
   /* the admin page's reads worked out ahead (migration_v83): each worked out 7 minutes ago; one asked for again (Refresh)
      is on its way for 45 seconds, then worked out, as the database's job does within a minute or two */
+  /* a read not worked out yet (migration_v90): the preview's settings (sh_preview_ui) can list keys, e.g.
+     { "pending": ["insights", "qh:perio"] }, that answer "being worked out" for 45 s after their first read */
+  function aheadKeyOf(fn, a){
+    var d = Number(a.p_days) || 30;
+    if (fn === "get_insights") return "insights";
+    if (fn === "get_insight_retries") return "retries";
+    if (fn === "get_data_quality") return "quality";
+    if (fn === "get_exam_debriefs") return "debriefs";
+    if (fn === "get_question_health") return "qh:" + a.p_hub;
+    if (/^get_visitor_(summary|by_hub|by_section)$/.test(fn)) return "visitors:" + d;
+    if (fn === "get_click_summary" && !a.p_hub) return "clicks:" + (Number(a.p_days) || 14);
+    if (fn === "get_feature_events" && !a.p_hub) return "features:" + d;
+    return null;
+  }
+  function aheadIsPending(k){
+    var p = jget(K.ui, {}).pending;
+    if (!Array.isArray(p) || p.indexOf(k) < 0) return false;
+    var at = db.pendingAt || (db.pendingAt = {});
+    if (!at[k]) { at[k] = now(); save(); }
+    return now() - at[k] < 45000;
+  }
   function aheadStatus(a){
     var t = now(), asked = db.ahead || (db.ahead = {}), ask = Array.isArray(a.p_ask) ? a.p_ask : [];
     ask.forEach(function(k){ if (typeof k === "string" && (!asked[k] || t - asked[k] > 45000)) asked[k] = t; });
@@ -880,10 +901,12 @@
     var keys = ["insights", "retries", "quality", "debriefs", "qh:perio", "qh:heme-endo-exam3", "qh:occlusion"];
     [7, 30, 90].forEach(function(d){ keys.push("visitors:" + d, "clicks:" + d, "features:" + d); });
     Object.keys(asked).forEach(function(k){ if (keys.indexOf(k) < 0) keys.push(k); });
+    (jget(K.ui, {}).pending || []).forEach(function(k){ if (typeof k === "string" && keys.indexOf(k) < 0) keys.push(k); });
     var out = {};
     keys.forEach(function(k){
       var on = !!asked[k] && t - asked[k] < 45000;
-      out[k] = { at: iso(asked[k] && !on ? asked[k] + 45000 : t - 7 * 60000), ms: 420, failed_at: null, waiting: on };
+      var pend = aheadIsPending(k);
+      out[k] = { at: pend ? null : iso(asked[k] && !on ? asked[k] + 45000 : t - 7 * 60000), ms: 420, failed_at: null, waiting: on || pend, pending: pend };
     });
     return out;
   }
@@ -1461,6 +1484,8 @@
     if (ADMIN_FNS.test(fn)) {
       if (a.p_secret !== C.adminSecret) return unauthorized();
       if (fn === "get_admin_cache_status") return { data: aheadStatus(a), write: Array.isArray(a.p_ask) && a.p_ask.length > 0 };
+      var pk = aheadKeyOf(fn, a);
+      if (pk && aheadIsPending(pk)) return { data: /^get_(insights|insight_retries|data_quality|question_health)$/.test(fn) ? { pending: true } : [] };
       var ideaOp = ideaAdmin(fn, a, now());
       if (ideaOp) return ideaOp;
       var ops = adminOps(fn, a);

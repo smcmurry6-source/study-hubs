@@ -455,6 +455,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       <div>
         <h1 id="viewTitle">Overview</h1>
         <p class="sub" id="viewSub"></p>
+        <p class="sub" id="viewPending" role="status" hidden></p>
       </div>
       <div class="view-tools">
         <div class="segmented" id="rangeSeg" role="group" aria-label="Time range">
@@ -719,7 +720,10 @@ table.data.tm-table td.lbl{white-space:nowrap;}
      once a night. get_admin_cache_status says when each was worked out (the view's "Updated" time) and whether a newer one
      is on its way: new arguments (a question edited since, new exam dates) or Refresh, which asks for new ones. The page
      then looks again every 30 seconds, for up to 10 minutes, and redraws the view when they've come. Until the database
-     has v83 there is no status, and every read is worked out when it's asked, as before. */
+     has v83 there is no status, and every read is worked out when it's asked, as before.
+     A read the table doesn't have yet (a hub's first Question health, a read unused for 30 days) isn't worked out while the
+     page waits (v90: it could take longer than a visitor's 3 s and fail): the database keeps an empty row for the job and
+     says "pending", the read returns {pending: true} (or no rows), and the view says "Being worked out" until it has come. */
   var ahead = { st: null, watch: null, missing: false };
   function aheadRead(ask){
     if (ahead.missing) return Promise.resolve(null);
@@ -731,7 +735,10 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       });
   }
   function aheadAt(key){ var x = ahead.st && ahead.st[key], t = x && x.at ? Date.parse(x.at) : NaN; return isNaN(t) ? 0 : t; }
-  function aheadWaiting(keys){ return (keys || []).filter(function(c){ var x = ahead.st && ahead.st[c]; return !!(x && x.waiting); }); }
+  function aheadWaiting(keys){ return (keys || []).filter(function(c){ var x = ahead.st && ahead.st[c]; return !!(x && (x.waiting || x.pending)); }); }
+  function aheadPending(keys){ return (keys || []).filter(function(c){ var x = ahead.st && ahead.st[c]; return !!(x && x.pending); }); }
+  var PENDING_NOTE = "Being worked out: this is the first time it’s been asked for (or in a month), so the database works it out in the next minute or two. This view looks again every 30 seconds and shows it when it’s here.";
+  function pendingCard(title){ return '<div class="stack">' + card(title, "", empty("Being worked out. It shows here when it’s ready.")) + '</div>'; }
   /* the keys a view reads that are worked out ahead */
   function tabAhead(t){
     if (t === "insights") return ["insights", "retries", "quality"];
@@ -822,6 +829,10 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var day = stamp && new Date(stamp).toDateString() !== new Date().toDateString()
       ? new Date(stamp).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" }) + ", " : "";
     var on = stamp && aheadWaiting(tabAhead(state.tab)).length ? " · newer numbers on the way" : "";
+    /* a read not worked out yet (v90): said under the title, for every view that has one */
+    var pend = !!stamp && aheadPending(tabAhead(state.tab)).length > 0, vp = $("#viewPending");
+    vp.hidden = !pend; vp.textContent = pend ? PENDING_NOTE : "";
+    if (pend) { $("#viewStamp").textContent = "Being worked out · here in a minute or two"; return; }
     $("#viewStamp").textContent = stamp && isFinite(stamp) ? "Updated " + day + clockShort(stamp) + on : "";
   }
   function loadingView(el){
@@ -2144,6 +2155,12 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   function renderInsights(){
     var el = $('[data-panel="insights"]');
     if (!insights || insights.pending) return;
+    /* one of the three not worked out yet (v90): say so, and aheadWatch draws them when they've come */
+    if ([insights.main, insights.retries, insights.quality].some(function(r){ return r && r.data && r.data.pending === true; })) {
+      setHead("Being worked out", insights.at);
+      el.innerHTML = pendingCard("Insights");
+      return;
+    }
     var html = insightScorecard() + insightSurfaces() + insightSpacing() + insightFeatures() + insightVoice() + insightQuality();
     var flags = (html.match(/<ul class="decisions">[\s\S]*?<\/ul>/g) || []).reduce(function(n, ul){ return n + (ul.match(/<li>/g) || []).length; }, 0);
     setHead(flags ? plural(flags, "number") + " past " + (flags === 1 ? "its" : "their") + " threshold, each with the decision it drives" : "Nothing past its threshold", insights.at);
@@ -2479,7 +2496,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
      version} worked out here from the hub's own SH_EXPORT (shQH.fp, widget/qhealth.js), so the numbers are for the question
      as it reads now and ids with data that the hub no longer has show up. Flags are leads, not verdicts: Sam marks each
      Looks fine / Needs a fix / Fixed (admin_review_question), which only stores the call. Nothing here changes a question. */
-  var QH = { hub: null, rows: null, ex: {}, vx: {}, filter: "review", loading: false, err: null, shown: 40, saving: {}, at: 0 };
+  var QH = { hub: null, rows: null, ex: {}, vx: {}, filter: "review", loading: false, err: null, pending: false, shown: 40, saving: {}, at: 0 };
   var QH_FILTERS = [["review", "To review"], ["todo", "Needs a fix"], ["reviewed", "Reviewed"], ["all", "All with data"]];
   var QH_STATE = { "new": "To review", changed: "Changed since “Needs a fix”: check it", todo: "Needs a fix", reviewed: "Reviewed", clear: "No flags" };
   var QH_SRC = { version: "this version", all: "all answers ever", feedback: "students", ids: "ids" };
@@ -2528,7 +2545,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
   }
   function qhLoad(hub, quiet){
     /* quiet: a newer copy that has come (aheadWatch); the list stays as it is until it's here */
-    if (!quiet) { QH.hub = hub; QH.rows = null; QH.err = null; QH.loading = true; QH.shown = 40; renderHealth(); }
+    if (!quiet) { QH.hub = hub; QH.rows = null; QH.err = null; QH.pending = false; QH.loading = true; QH.shown = 40; renderHealth(); }
     Promise.all([qhExport(hub), qhVariants(hub)]).then(function(all){ return all[0]; }).then(function(ex){
       var cur = null;
       /* the live version's fingerprint, key, choice count and kind: the miskey and chance checks work before any version row exists */
@@ -2539,6 +2556,8 @@ table.data.tm-table td.lbl{white-space:nowrap;}
       if (QH.hub !== hub) return;
       QH.loading = false;
       if (res.error) { if (!quiet) { QH.err = res.error; renderHealth(); } return; }
+      /* not worked out yet (v90): "Being worked out" until the job has it (aheadWatch looks again) */
+      QH.pending = !!(res.data && !Array.isArray(res.data) && res.data.pending === true);
       QH.rows = Array.isArray(res.data) ? res.data : [];
       /* worked out ahead: "Updated" is when; a newer copy after an edit or Refresh is fetched when it's ready */
       return aheadRead().then(function(){
@@ -2643,6 +2662,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var body = '<div class="chips" role="group" aria-label="Hub">' + hubs.map(function(h){ return '<button type="button" data-qh-hub="' + esc(h) + '" aria-pressed="' + (QH.hub === h) + '">' + dot(h) + esc(hubLabel(h)) + '</button>'; }).join("") + '</div>';
     if (QH.loading) { qhHead("Loading…", 0); body += empty("Reading " + esc(hubLabel(QH.hub)) + "’s questions and class data…"); }
     else if (QH.err) { qhHead("", 0); body += errBox("Couldn’t load question health", QH.err, "migration_v51"); }
+    else if (QH.pending) { qhHead("Being worked out", QH.at); body += empty(esc(hubLabel(QH.hub)) + "’s question health is being worked out. It shows here when it’s ready."); }
     else {
       var ex = QH.ex[QH.hub], rows = QH.rows || [], n = {};
       QH_FILTERS.forEach(function(f){ n[f[0]] = rows.filter(function(r){ return qhIn(r, f[0]); }).length; });
@@ -2844,6 +2864,7 @@ table.data.tm-table td.lbl{white-space:nowrap;}
     var v = VIEWS[t], el = $('[data-panel="' + t + '"]');
     $("#viewTitle").textContent = v.t;
     $("#rangeSeg").hidden = !v.range; $("#archivedToggle").hidden = !v.past;
+    $("#viewPending").hidden = true;
     if (t === "live") { renderLive(); return; }
     if (t === "hubs") { renderHubAdmin(); if (!hubAdm.loading && (!dash.src || !hubAdm.rows)) loadHubAdmin(); return; }
     if (t === "recap") { renderRecapPanel(); return; }
