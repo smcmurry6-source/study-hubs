@@ -12,6 +12,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
 
 - [ ] **Apply `migration_v88.sql` after its PR merges** (2026-11-20, a survey asks each person once): two functions replaced (`get_active_survey`, `get_my_survey`), no table touched, so any time of day, one statement a call through the connector, md5-checked. Fetch `main` first: if v88 was taken meanwhile, renumber. Then append it to `supabase/schema.sql`, take its line out of `supabase/pending-migrations.txt` and note it there, in a small PR. Until then linked devices work as before (the pop-up's Link this device works without it).
 
+- [ ] **The mastery read is slower a call than before the optimization pass** (2026-11-20, its readout): `get_hub_mastery`
+  236 → 349 ms on the server on average (673 calls since phase 1), the evening's median 242 → 709 ms on 77 calls, 11% of the
+  database's time. Since #459 the page works out the rank between answers, so the reads left are the ones when a hub's page
+  opens (`loadOwn()` in `widget/ranks-hub.js`), beside the bootstrap: likely the cold ones, not a slower body, but not checked.
+  Read it again a busy evening after `migration_v84.sql` (live 2026-11-20) with the bootstrap; if it's still slow, time it on
+  a throwaway copy first-of-page against warmed, and against the body before `migration_v76.sql`, before changing anything
+  ([the pass](done/2026-11-18-database-optimization-pass.md), its Log).
+
 - [ ] **Review of Systems: weigh the mock by what Mock 1 asked** (2026-11-19, the hub's build): the hub's 200-question mock
   spreads its questions by the size of each course (`core.json` `mock.blueprint`), a guess: the course announced no counts.
   After Mock 1 (Thu Dec 3, noon), read its exam check-ins (which courses felt heavy, what surprised people) and, before Mock 2
