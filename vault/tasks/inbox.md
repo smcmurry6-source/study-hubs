@@ -138,8 +138,8 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   and any separate widget file or the full client (`widget/vendor/supabase-2.117.2.js`) that `grep` finds no page loading
   by name (`review/` keeps the full client). The sources of a bundle are never deleted. `legacy` goes only with the
   `dash.js` code that reads it (it tells the dashboard a hub has no `content/`). Also the old pages' leftovers in
-  `tools/ci/smoke.js` (`WHY_EXEMPT` and the other exemption sets, the `OLD` hub's checks, the old cards' markup check). (#PRNUM)
-- [ ] **What the old pages' cleanup left** (2026-11-20, from #PRNUM; none of it changes what students see):
+  `tools/ci/smoke.js` (`WHY_EXEMPT` and the other exemption sets, the `OLD` hub's checks, the old cards' markup check). (#496)
+- [ ] **What the old pages' cleanup left** (2026-11-20, from #496; none of it changes what students see):
   (1) `widget/hub-art/<hub>.js` for the hubs whose pages came down (`generic`, `heme-endo-exam2`, `occlusion`,
   `pcd-implants-exam1`, `perio`, `special-patient-care`): `tools/figures/site/build.mjs` writes one for every hub in its list
   and no page loads them; trim its list, keeping what the dashboard's art (`hub-art/dash.js`) and the recaps still need.
