@@ -10,7 +10,7 @@ branch `claude/clever-wright-ftcdnm`, with `main` at `0b80306` (PR #237 merged i
 written to the class's data: every page ran on the preview's fixtures, the database tests ran on throwaway PostgreSQL
 copies of `supabase/schema.sql`, and the live project was only read through its system catalogs (names and function
 signatures, no student rows). [How it works](../../reference/admin-operations.md) ·
-[task](../../tasks/2026-11-04-admin-operations.md)
+[task](../../tasks/done/2026-11-04-admin-operations.md)
 
 - **Change:** the admin page is redesigned (a sidebar of views, a header per view, data loaded per view, an Overview of
   what's waiting, check-ins and searches in their own views, a Menu on phones; #237's Insights tab is a view in it) and

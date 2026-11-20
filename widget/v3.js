@@ -2157,7 +2157,7 @@
      What each prize pays in XP, with as many Shiny Gold Crowns (study XP pays 5 crowns per 10). The server's sh_prizes()
      says the same and tools/release/xp.js checks the two match. ring is per question of the daily goal; streak and row
      are [reached, pays]; medal is Bronze to Crown. The cards that offer a prize read it from here (window.shGame.prizes). */
-  var PRIZES = { name: 500, ring: 5, boss: 500, nuke: 10000, alltime: 20000, notes: 50, trophy: 200, visit: 50, game: 100, pb: 50, top: 250, report: 100, collection: 1000, streak: [[3, 100], [7, 300], [14, 700], [30, 1500], [60, 3000], [100, 5000]], row: [[10, 25], [25, 100], [50, 250]], medal: [250, 500, 750, 1000] };
+  var PRIZES = { name: 500, ring: 5, boss: 500, nuke: 10000, alltime: 20000, notes: 50, trophy: 200, visit: 50, game: 100, pb: 50, top: 250, report: 100, collection: 1000, dark: 5000, modupro: 20000, loupes: 30000, streak: [[3, 100], [7, 300], [14, 700], [30, 1500], [60, 3000], [100, 5000]], row: [[10, 25], [25, 100], [50, 250]], medal: [250, 500, 750, 1000] };
   function fmtN(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
   /* what a prize is called ("Daily goal done"), for the engine's reward card (widget/hub-rewards.js), and what it says
      when it's paid: "Daily goal done: +100 XP and 100 crowns" */
@@ -3804,9 +3804,13 @@
     var root = document.documentElement;
     function zoom(){ try { return parseFloat(getComputedStyle(root).zoom) || parseFloat(root.style.zoom) || 1; } catch (e) { return 1; } }
     function headH(){ var h = document.querySelector("header.hub-header, .hub-header"); return h ? h.offsetHeight : 0; }
+    /* measure first, then write, and only what changed: writing --sh-vh before measuring the bar made the browser lay the
+       whole page out twice on every call (a slow phone felt it after Home, 2026-11-20) */
+    function setVar(k, v){ if (root.style.getPropertyValue(k) !== v) root.style.setProperty(k, v); }
     function fit(){
-      root.style.setProperty("--sh-vh", (window.innerHeight / zoom()) + "px");
-      root.style.setProperty("--sh-head-h", headH() + "px");
+      var vh = (window.innerHeight / zoom()) + "px", hh = headH() + "px";
+      setVar("--sh-vh", vh);
+      setVar("--sh-head-h", hh);
       fitFigs();
     }
     function esc(t){ return String(t == null ? "" : t).replace(/[&<>"]/g, function(c){ return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -3870,9 +3874,10 @@
        while its controls and explanation scroll up beside it, so the picture and what you change are on screen together.
        Only on wide screens, only when the picture fits in about 70% of the screen (v3.css caps the drawing's height). */
     function fitFigs(){
+      var all = document.querySelectorAll(".anima"); if (!all.length) return;
       var wide = window.matchMedia("(min-width: 861px)").matches;
       var room = window.innerHeight / zoom() - headH();
-      document.querySelectorAll(".anima").forEach(function(a){
+      all.forEach(function(a){
         var figs = a.querySelectorAll(":scope > figure.iso-figure"), ctl = a.querySelector(":scope > .am-controls");
         var f = figs.length === 1 && ctl ? figs[0] : null;
         a.querySelectorAll(":scope > figure.sh-fig-pin").forEach(function(x){ if (x !== f) x.classList.remove("sh-fig-pin"); });

@@ -1,11 +1,11 @@
 ---
 type: task
-status: review
+status: done
 hub: site
 created: 2026-11-04
 requested-by: Sam
 due: 
-waiting-on: Sam's first look at the signed-in admin views on real data; Sam closes PR #205
+waiting-on:
 agent: Claude Code
 pr: https://github.com/smcmurry6-source/study-hubs/pull/236
 ---
@@ -20,11 +20,11 @@ surveys newest first.
 
 ## Context
 
-- How it works: [admin-operations](../reference/admin-operations.md)
-- Sam's calls: [decisions](../decisions.md) (2026-11-04: leaderboard names; manual state until cleared or an end time)
-- Process: [preview-and-release-test](../rules/preview-and-release-test.md), tier 3 (a migration and the dashboard)
-- Bug fixed on the way: BUG-019 in the [bug log](../release/bug-log.md)
-- Test report: [2026-11-04-admin-operations](../release/reports/2026-11-04-admin-operations.md)
+- How it works: [admin-operations](../../reference/admin-operations.md)
+- Sam's calls: [decisions](../../decisions.md) (2026-11-04: leaderboard names; manual state until cleared or an end time)
+- Process: [preview-and-release-test](../../rules/preview-and-release-test.md), tier 3 (a migration and the dashboard)
+- Bug fixed on the way: BUG-019 in the [bug log](../../release/bug-log.md)
+- Test report: [2026-11-04-admin-operations](../../release/reports/2026-11-04-admin-operations.md)
 
 ## Done when
 
@@ -41,13 +41,14 @@ surveys newest first.
 - [x] `migration_v50.sql` applied to the live project (connector `apply_migration`), then the PR merged
 - [x] After the release: `node tools/release/postcheck.js`, the Live and Hubs views load on the live admin page, BUG-019
   retested (2026-11-05)
-- [ ] PR #205 closed (its function is in v50)
+- [x] PR #205 closed (its function is in v50): closed by Sam (2026-11-20)
+- [x] Sam's first look at the signed-in admin views on real data (done, Sam, 2026-11-20)
 
 ## Log
 
 - 2026-11-04: written; built on PR #233's preview process, then moved onto `main` when #233 merged. Waiting for Sam.
 - 2026-11-04: Sam: keep admin information off the About page (reverted) and "a full optimization of the admin page"
-  (done: [admin-operations](../reference/admin-operations.md), "The page").
+  (done: [admin-operations](../../reference/admin-operations.md), "The page").
 - 2026-11-05: merged `main` (#237: Insights tab and its own `migration_v49.sql`); this PR's migration is now
   `migration_v50.sql`. Insights moved into the new layout. The "Release tests" check is red for reasons outside this
   PR (the same failures on #237): explained on the PR.
@@ -58,11 +59,13 @@ surveys newest first.
   #235 and #239 were in. Merged as `e6a8f02`; postcheck passed; the live functions checked read-only (the test report).
 - 2026-11-05: Sam dropped post-release monitoring for this release and every future one; the 1-hour check was cancelled
   before it ran.
+- 2026-11-20: Sam: "yes the admin look is done and #205 is closed". Closed and moved to `done/` (the vault housekeeping
+  package, after #499).
 
 ## Outcome
 
 Shipped in PR #236 (2026-11-05): the redesigned admin page, Live and Hubs views, newest-first check-ins, and
 `migration_v50.sql` on the live project. Verified on fixtures and throwaway databases before release (the test
 report), and on the live database with read-only checks after the migration (grants, RLS, a wrong passphrase refused,
-the permission audit), and after the merge by `postcheck.js` and read-only calls to the live functions. Left:
-Sam's first look at the signed-in views on real data, PR #205 closed by Sam.
+the permission audit), and after the merge by `postcheck.js` and read-only calls to the live functions. Sam has since
+looked at the signed-in views on real data and closed PR #205 (2026-11-20). Nothing left.

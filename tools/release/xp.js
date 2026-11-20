@@ -499,6 +499,35 @@ try {
   anon(`select record_achievement('xp-U', 'owl', '')`);
   const uw = json(`sh_wallet('xp-U')`);
   ok(uw.rankups === 2 && uw.trophies === 1 && uw.earned === Math.floor((xpOf('xp-U') - 1300) / 2) + uw.from_time + 1300 + 2 * 20 + 25, `rank-ups and trophies since the switch: +20 and +25 each, a fixed report's XP in crowns (${JSON.stringify(uw)})`);
+  // reaching Dark Matter (migration_v89, Sam: "reaching dark matter gets you 5000 crowns"): 5,000 for each journey's Dark
+  // Matter, crowns only, and back pay for one reached before the award existed
+  award('xp-DM', 'rep:flag:9101', 49000);
+  const dm0 = json(`sh_wallet('xp-DM')`), dmX0 = xpOf('xp-DM');
+  award('xp-DM', 'rep:flag:9102', 1500);
+  const dm1 = json(`sh_wallet('xp-DM')`);
+  eq([dm0.dark, dm1.dark, json(`sh_prizes()`).dark], [0, 1, 5000], 'the Handpiece\'s Dark Matter at 50,000 XP: one paid, and sh_prizes() says 5,000');
+  eq([xpOf('xp-DM') - dmX0, dm1.earned - dm0.earned - 20 * (dm1.rankups - dm0.rankups)], [1500, 1500 + 5000], 'reaching it pays 5,000 crowns and no XP (the 1,500 XP a fixed report paid, as many crowns, and a rank-up\'s 20)');
+  award('xp-DM', 'rep:flag:9103', 10);
+  eq(json(`sh_wallet('xp-DM')`).dark, 1, 'once: more XP inside Dark Matter doesn\'t pay it again');
+  // reaching a new journey (migration_v89, Sam: "we can upp modupro to 20,000 and then loupes to 30,000"): once each, crowns only
+  award('xp-DM', 'rep:flag:9106', 124990 - xpOf('xp-DM'));
+  const mp0 = json(`sh_wallet('xp-DM')`), mpX0 = xpOf('xp-DM');
+  award('xp-DM', 'rep:flag:9107', 10);
+  const mp1 = json(`sh_wallet('xp-DM')`);
+  eq([mp0.modupro, mp1.modupro, json(`sh_prizes()`).modupro], [0, 1, 20000], 'the ModuPro at 125,000 XP: paid, and sh_prizes() says 20,000');
+  eq([xpOf('xp-DM') - mpX0, mp1.earned - mp0.earned - 20 * (mp1.rankups - mp0.rankups) - 25 * (mp1.trophies - mp0.trophies)], [10, 10 + 20000], 'reaching it pays 20,000 crowns and no XP (beside the 10 XP, a rank-up\'s 20 and the journey trophy\'s 25)');
+  award('xp-DM', 'rep:flag:9104', 232142 - xpOf('xp-DM'));
+  award('xp-DM', 'rep:flag:9108', 249990 - xpOf('xp-DM'));
+  const lp0 = json(`sh_wallet('xp-DM')`);
+  award('xp-DM', 'rep:flag:9109', 10);
+  const lp1 = json(`sh_wallet('xp-DM')`);
+  eq([lp0.loupes, lp1.loupes, lp1.modupro, json(`sh_prizes()`).loupes], [0, 1, 1, 30000], 'the Loupes at 250,000 XP: paid, the ModuPro\'s not paid again, and sh_prizes() says 30,000');
+  eq(lp1.earned - lp0.earned - 20 * (lp1.rankups - lp0.rankups) - 25 * (lp1.trophies - lp0.trophies), 10 + 30000, 'reaching them pays 30,000 crowns');
+  award('xp-DM', 'rep:flag:9105', 357142 - xpOf('xp-DM'));
+  const dm3 = json(`sh_wallet('xp-DM')`);
+  ok(dm3.dark === 3 && dm3.modupro === 1 && dm3.loupes === 1 && dm3.earned === dm3.from_xp + dm3.from_time + dm3.prizes + 20 * dm3.rankups + 25 * dm3.trophies + 3 * 5000 + 20000 + 30000, `the ModuPro's Dark Matter at 232,142 and the Loupes' at 357,142: 15,000 in all, with 20,000 and 30,000 for the two journeys, once each (${JSON.stringify(dm3)})`);
+  sql(`delete from xp_awards where visitor_id = 'xp-DM'; delete from xp_visitors where visitor_id = 'xp-DM'`);   // off the boards the later checks read
+  notes.push('Dark Matter pays 5,000 crowns once per journey, the ModuPro 20,000 and the Loupes 30,000, crowns only, back pay included (migration_v89)');
   // hub time (migration_v68, Sam: "also 100 crowns per hour of hub time"): 25 seconds a ping, at most 100 crowns in a clock
   // hour (two tabs, or a script, can't pay more), the dashboard's and test rows never
   sql(`insert into activity_hourly (h, hub, section, visitor_id, n) values
