@@ -15,115 +15,128 @@
   var I = {};
   function f1(v){ return +(+v).toFixed(1); }
   function esc(s){ return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
-  function rnd(seed){ var s = seed % 2147483647; if(s <= 0) s += 2147483646; return function(){ s = s * 16807 % 2147483647; return (s - 1) / 2147483646; }; }
-  /* Catmull-Rom smoothing; a point listed twice keeps a sharp corner (an incisal angle, a cusp tip, a groove) */
-  function dense(pts, closed, per){
-    per = per || 8; var n = pts.length, out = [], last = closed ? n : n - 1;
-    for(var i = 0; i < last; i++){
-      var p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
-      if(!closed){ if(i === 0) p0 = p1; if(i + 2 >= n) p3 = p2; }
-      var c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6], c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-      for(var j = 0; j < per; j++){ var t = j / per, u = 1 - t;
-        out.push([u * u * u * p1[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * p2[0], u * u * u * p1[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * p2[1]]); }
-    }
-    if(!closed) out.push(pts[n - 1]);
-    return out;
-  }
+  var TL = window.SH_TEETH;
+  if(!TL) throw new Error('widget/cases.js needs widget/teeth.js (window.SH_TEETH) loaded first');
+  var dense = TL.dense, rnd = TL.rnd;
   function poly(pts, open){ return 'M' + pts.map(function(p){ return f1(p[0]) + ' ' + f1(p[1]); }).join('L') + (open ? '' : 'Z'); }
   function path(cls, pts, open, style){ return '<path class="' + cls + '"' + (style ? ' style="' + style + '"' : '') + ' d="' + poly(pts, open) + '"/>'; }
   function txt(x, y, t, cls, anchor){ return '<text class="' + (cls || 'dc-t') + '" x="' + f1(x) + '" y="' + f1(y) + '"' + (anchor ? ' text-anchor="' + anchor + '"' : '') + '>' + esc(t) + '</text>'; }
   function dot(cls, x, y, r){ return '<circle class="' + cls + '" cx="' + f1(x) + '" cy="' + f1(y) + '" r="' + r + '"/>'; }
 
-  /* ---------- the tooth catalog (Wheeler averages, mm) ----------
-     cw: mesiodistal width at the contacts; cv: at the cervix; ch: crown length; rl: root length (the longest root);
-     tr: root trunk, CEJ to the facial furcation; cej: how far the facial cervical line dips toward the apex at the
-     middle of the tooth (anteriors curve most, molars least); roots: see rootsMM. */
-  var XT = {
-    maxI1:{ cw:8.5, cv:7,   ch:10.5, rl:13,   s:'maxI1', cej:.7 },
-    maxI2:{ cw:6.5, cv:5,   ch:9,    rl:13,   s:'maxI2', cej:.6 },
-    maxC: { cw:7.5, cv:5.5, ch:10,   rl:17,   s:'maxC',  cej:.6 },
-    maxP1:{ cw:7,   cv:5,   ch:8.5,  rl:14,   s:'maxP1', cej:.4, bif:true },
-    maxP2:{ cw:6.5, cv:5,   ch:8.5,  rl:14,   s:'maxP2', cej:.4 },
-    maxM1:{ cw:10,  cv:8,   ch:7.5,  rl:12.5, s:'maxM',  cej:.3, tr:4,   pal:true },
-    maxM2:{ cw:9,   cv:7,   ch:7,    rl:11.5, s:'maxM',  cej:.3, tr:4.5, pal:true, close:true },
-    maxM3:{ cw:8.5, cv:6.5, ch:6.5,  rl:11,   s:'maxM',  cej:.3, tr:5,   pal:true, close:true },
-    manI1:{ cw:5,   cv:3.5, ch:9,    rl:12.5, s:'manI1', cej:.5 },
-    manI2:{ cw:5.5, cv:4,   ch:9.5,  rl:14,   s:'manI2', cej:.5 },
-    manC: { cw:7,   cv:5.5, ch:11,   rl:16,   s:'manC',  cej:.6 },
-    manP1:{ cw:7,   cv:5,   ch:8.5,  rl:14,   s:'manP1', cej:.4 },
-    manP2:{ cw:7,   cv:5,   ch:8,    rl:14.5, s:'manP2', cej:.4 },
-    manM1:{ cw:11,  cv:9,   ch:7.5,  rl:14,   s:'manM1', cej:.3, tr:3 },
-    manM2:{ cw:10.5,cv:8,   ch:7,    rl:13,   s:'manM2', cej:.3, tr:3.5, close:true },
-    manM3:{ cw:10,  cv:7.5, ch:7,    rl:11,   s:'manM2', cej:.3, tr:4,   close:true }
-  };
-  var POS = ['I1', 'I2', 'C', 'P1', 'P2', 'M1', 'M2', 'M3'];
-  function isUpper(n){ return +n <= 16; }
-  /* 1 = central incisor, 8 = third molar, counted from the midline */
-  function posOf(n){ n = +n; return n <= 8 ? 9 - n : n <= 16 ? n - 8 : n <= 24 ? 25 - n : n - 24; }
-  function typeOf(n){ return (isUpper(n) ? 'max' : 'man') + POS[posOf(n) - 1]; }
-  function dims(n){ return XT[typeOf(n)]; }
-  /* on the patient's right (#1-8, #25-32) mesial faces the viewer's right, because the midline is at the center */
-  function mesialRight(n){ n = +n; return n <= 8 || n >= 25; }
-  function isMolar(n){ return posOf(n) >= 6; }
-  /* viewer order, left to right: upper numbers ascend, lower numbers descend (the patient's right on your left) */
-  function viewOrder(teeth){ var a = teeth.map(String); return a.sort(function(x, y){ return isUpper(x) ? +x - +y : +y - +x; }); }
-  /* a tooth's three sites, in tooth terms [mesial, middle, distal], put in viewer order left to right */
-  function siteOrder(n){ return mesialRight(n) ? [2, 1, 0] : [0, 1, 2]; }
-  var SITE_NAME = ['mesial', 'middle', 'distal'];
-
-  /* ---------- crown outlines (facial view, mm): mesial at -x, the cervix at y = 0, the incisal edge at y = ch ----------
-     Each list runs from the mesial cervical corner up the mesial side, across the incisal edge or cusps and down the
-     distal side to the distal cervical corner. Contact heights, cusp positions and angle shapes follow Wheeler:
-     maxillary central: mesioincisal angle sharp, distoincisal rounded, mesial contact in the incisal third, distal at
-     the junction of incisal and middle thirds; lateral: more rounded; canine: cusp tip a little mesial of center with a
-     shorter mesial cusp ridge; first premolar: buccal cusp tip a little distal of center (its mesial ridge is the long
-     one); maxillary molars: two buccal cusps, mesiobuccal the larger, with a buccal groove between; mandibular first
-     molar: three buccal cusps (mesiobuccal, distobuccal, distal, each smaller) and two buccal grooves; mandibular
-     second molar: two buccal cusps; mandibular incisors: narrow, symmetric, sharp incisal angles; mandibular canine:
-     long and narrow, the mesial outline nearly straight with the root. */
-  function crownMM(d){
-    var w = d.cw / 2, v = d.cv / 2, h = d.ch, s = d.s, p;
-    if(s === 'maxI1') p = [[-v, 0], [-v - .15, h * .12], [-w + .35, h * .45], [-w, h * .78], [-w + .1, h * .96], [-w + .1, h * .96], [-w + .6, h], [w - 1.4, h * .985], [w - .35, h * .9], [w, h * .68], [w - .3, h * .42], [v + .1, h * .1], [v, 0]];
-    else if(s === 'maxI2') p = [[-v, 0], [-v - .1, h * .12], [-w + .3, h * .5], [-w, h * .78], [-w + .25, h * .95], [-w + .9, h], [w - 1.7, h * .97], [w - .5, h * .86], [w, h * .62], [w - .3, h * .4], [v + .1, h * .1], [v, 0]];
-    else if(s === 'maxC') p = [[-v, 0], [-v - .2, h * .15], [-w + .3, h * .45], [-w, h * .67], [-w + .3, h * .84], [-.35, h], [w - .45, h * .74], [w, h * .55], [w - .3, h * .35], [v + .1, h * .1], [v, 0]];
-    else if(s === 'maxP1') p = [[-v, 0], [-v - .25, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .4, h * .82], [.3, h], [w - .4, h * .8], [w, h * .62], [w - .2, h * .45], [v + .25, h * .2], [v, 0]];
-    else if(s === 'maxP2') p = [[-v, 0], [-v - .25, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .5, h * .86], [0, h * .97], [w - .5, h * .86], [w, h * .62], [w - .2, h * .45], [v + .25, h * .2], [v, 0]];
-    else if(s === 'maxM') p = [[-v, 0], [-v - .4, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .3, h * .84], [-w * .5, h], [-.05, h * .87], [-.05, h * .87], [w * .45, h * .96], [w - .3, h * .82], [w, h * .6], [w - .2, h * .42], [v + .4, h * .2], [v, 0]];
-    else if(s === 'manM1') p = [[-v, 0], [-v - .4, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .3, h * .84], [-w * .58, h], [-w * .27, h * .87], [-w * .27, h * .87], [w * .05, h * .97], [w * .33, h * .85], [w * .33, h * .85], [w * .6, h * .9], [w - .25, h * .78], [w, h * .58], [w - .2, h * .42], [v + .4, h * .2], [v, 0]];
-    else if(s === 'manM2') p = [[-v, 0], [-v - .4, h * .2], [-w + .2, h * .45], [-w, h * .62], [-w + .3, h * .84], [-w * .48, h], [0, h * .87], [0, h * .87], [w * .46, h * .98], [w - .3, h * .82], [w, h * .6], [w - .2, h * .42], [v + .4, h * .2], [v, 0]];
-    else if(s === 'manI1') p = [[-v, 0], [-v - .1, h * .15], [-w + .2, h * .55], [-w, h * .88], [-w + .1, h], [-w + .1, h], [w - .1, h], [w - .1, h], [w, h * .88], [w - .2, h * .55], [v + .1, h * .15], [v, 0]];
-    else if(s === 'manI2') p = [[-v, 0], [-v - .1, h * .15], [-w + .2, h * .55], [-w, h * .88], [-w + .1, h], [-w + .1, h], [w - .25, h * .97], [w, h * .84], [w - .2, h * .55], [v + .1, h * .15], [v, 0]];
-    else if(s === 'manC') p = [[-v, 0], [-v - .15, h * .3], [-w + .1, h * .62], [-w, h * .75], [-w + .3, h * .9], [-.3, h], [w - .5, h * .8], [w, h * .55], [w - .3, h * .3], [v + .1, h * .1], [v, 0]];
-    else if(s === 'manP1') p = [[-v, 0], [-v - .3, h * .2], [-w + .2, h * .45], [-w, h * .6], [-w + .4, h * .8], [-.2, h], [w - .4, h * .8], [w, h * .6], [w - .2, h * .45], [v + .3, h * .2], [v, 0]];
-    else p = [[-v, 0], [-v - .3, h * .2], [-w + .2, h * .45], [-w, h * .6], [-w + .6, h * .86], [0, h * .95], [w - .6, h * .86], [w, h * .6], [w - .2, h * .45], [v + .3, h * .2], [v, 0]];
-    /* the cervical line dips toward the apex at the middle of the facial surface */
-    var c = d.cej || 0;
-    return p.concat([[v * .55, -c * .8], [0, -c], [-v * .55, -c * .8]]);
+  /* ---------- the teeth: the tooth library (widget/teeth.js, window.SH_TEETH), shared with the figure builds ----------
+     Wheeler's sizes and outlines for the 16 types (XT, crownMM, rootsMM, backRootMM), the numbering helpers and one
+     catalogue entry per tooth (surfaces, roots, furcation entrances, root trunk, sites, landmarks, films). */
+  var XT = TL.XT, POS = TL.POS, isUpper = TL.isUpper, posOf = TL.posOf, typeOf = TL.typeOf, dims = TL.dims, mesialRight = TL.mesialRight,
+    isMolar = TL.isMolar, viewOrder = TL.viewOrder, siteOrder = TL.siteOrder, SITE_NAME = TL.SITE_NAME,
+    crownMM = TL.crownMM, rootsMM = TL.rootsMM, backRootMM = TL.backRootMM, CAT = TL.tooth;
+  function hasFurc(n){ var c = CAT(n); return !!(c && c.furcations.length); }
+  /* ---------- modules (Patient Box v2): a case assembled from a few choices, the per-tooth numbers written from them ----------
+     spec.modules is a list applied in order, then spec.t (the per-tooth numbers, as in v1) is laid over the result
+     field by field, so an author can still set one number by hand. Each module:
+       { m:'missing', teeth:[...] }                                  the teeth are gone (the odontogram's X)
+       { m:'restoration', tooth, surfaces:'MOD', material }          amalgam | composite | gold | crown (crown: all surfaces)
+       { m:'caries', tooth, surface:'D', depth }                     enamel | dentin | pulp
+       { m:'endo', tooth, fill:true, lesion:mm }                     a root canal filling and/or a periapical radiolucency
+       { m:'bone', teeth:[...], percent, pattern, defect, side, rec, swell, furc, mob }
+           percent: bone loss as a share of the root (a number, or { tooth:percent }); pattern 'horizontal' (default) or
+           'vertical' with defect (mm) on side 'm' or 'd'. It writes the bone, the vertical defect and, at all six sites,
+           the CAL that agrees with the crest (the pocket base about 1 mm coronal to it, Newman and Carranza), the
+           recession (rec, facial mm at the middle site, default 0; the lingual one less) and the probing depth (CAL minus
+           recession, at least 2 mm; swell mm of pseudopocket adds to it). Furcations follow the bone past the root trunk
+           (Class I within 1.5 mm of it, II from 1.5 mm past, III from 4 mm past, both entrances of a mandibular molar;
+           the film shows II and III on a molar), and mobility follows the bone (1 from 55%, 2 from 70%), unless furc:false
+           or mob is given.
+       { m:'bop', rate:.3, teeth }, { m:'pus', ... }, { m:'plaque', ... }   that share of the sites, the deepest first
+       { m:'recession', teeth:[...], mm }                           facial recession at the middle site, the pocket 1 mm
+     The record keeps everything else (age, smoke, hba1c, cc, mouth, gingiva), and the box rows, every view and the key
+     are drawn from it. */
+  var MAT = ['amalgam', 'composite', 'gold', 'crown'], DEPTH = ['enamel', 'dentin', 'pulp'];
+  function toothKeys(t){ return Object.keys(t || {}).filter(function(k){ return /^\d+$/.test(k) && +k >= 1 && +k <= 32; }); }
+  function ensure(t, n){ n = String(n); if(!t[n]) t[n] = {}; return t[n]; }
+  function list(v){ return Array.isArray(v) ? v.map(String) : v == null ? [] : [String(v)]; }
+  function normSurf(n, s){ var c = CAT(n); return String(s || '').toUpperCase().split('').map(function(x){ if(!c) return x; if(x === 'B' || x === 'F') return c.surfaces[3]; if(x === 'O' || x === 'I') return c.surfaces[1]; return x; }).join(''); }
+  function boneModule(t, md, probs){
+    list(md.teeth).forEach(function(n){
+      var c = CAT(n); if(!c){ probs.push('bone: tooth ' + n + ' is not a universal number'); return; }
+      var pct = typeof md.percent === 'object' && md.percent ? (md.percent[n] || 0) : (md.percent || 0), d = c.dims, r = ensure(t, n);
+      var vert = md.pattern === 'vertical', side = md.side === 'd' ? 'd' : 'm', vd = vert ? (md.defect || 0) : 0;
+      r.bone = { m:pct, d:pct }; r.vdef = vert ? (side === 'm' ? { m:vd } : { d:vd }) : {};
+      function crest(sd){ return Math.max(1.5, pct / 100 * d.rl) + (r.vdef[sd] || 0); }
+      var cm = crest('m'), cd = crest('d'), base = Math.max(1.5, pct / 100 * d.rl);
+      var calI = function(cr){ return pct || vd ? Math.max(0, Math.round(cr - 1)) : 0; };
+      var calMid = pct ? Math.max(0, Math.round(base - 1.5)) : 0;
+      var recF = md.rec || 0, recL = Math.max(0, recF - 1), sw = md.swell || 0;
+      r.pd = {}; r.rec = {};
+      ['f', 'l'].forEach(function(s){
+        var R = s === 'f' ? recF : recL, cals = [calI(cm), calMid, calI(cd)], recs = [Math.max(0, R - 1), R, Math.max(0, R - 1)];
+        r.pd[s] = []; r.rec[s] = [];
+        cals.forEach(function(cal, i){
+          var rec = cal === 0 && recs[i] === 0 ? -2 : recs[i], pd = cal - rec;
+          if(pd < 2){ pd = 2; rec = cal - 2; }
+          pd += sw; rec -= sw;
+          r.pd[s].push(pd); r.rec[s].push(rec);
+        });
+      });
+      if(md.furc !== false && c.furcations.length && c.trunk){
+        var past = base - c.trunk;
+        var cls = past < -1.5 ? 0 : past < 1.5 ? 1 : past < 4 ? 2 : 3;
+        if(cls){ r.furc = { f:cls, l:cls }; var onFilm = c.furcations.some(function(e){ return e.film; }); r.furcX = onFilm && cls >= 2 ? cls : 0; }
+      }
+      if(md.mob != null) r.mob = md.mob; else r.mob = pct >= 70 ? 2 : pct >= 55 ? 1 : 0;
+    });
   }
-  /* roots (facial view, mm): [x at the cervix, x at the apex, half width at the cervix, length], mesial at -x. Single
-     roots taper to a rounded apex that tilts distally (anteriors most, the canine's the longest root in the mouth).
-     Maxillary molars: mesiobuccal (broad, bends distally at the apex) and distobuccal (narrower) roots that diverge
-     on the first molar and run closer on the second and third, with the palatal root behind them; maxillary first
-     premolar: buccal and palatal roots, seen one behind the other on a film; mandibular molars: a broad mesial root
-     and a narrower distal root, both curving distally, well apart on the first molar and closer on the second. */
-  function rootsMM(d){
-    var v = d.cv / 2, s = d.s;
-    if(s === 'maxM' || s === 'manM1' || s === 'manM2'){
-      if(d.pal) return d.close ? [[-v + 1.8, -v + 1.4, 1.8, d.rl], [v - 1.5, v - .8, 1.5, d.rl - 1]] : [[-v + 1.9, -v + .9, 1.9, d.rl], [v - 1.5, v - .4, 1.5, d.rl - 1]];
-      return d.close ? [[-v + 2.1, -v + 2.9, 2.1, d.rl], [v - 1.8, v - 1, 1.8, d.rl - .8]] : [[-v + 2.3, -v + 2.6, 2.3, d.rl], [v - 1.9, v - .9, 1.9, d.rl - 1]];
-    }
-    if(s === 'maxC' || s === 'manC') return [[0, 1.2, v, d.rl]];
-    if(s === 'maxI1' || s === 'manI1') return [[0, .5, v, d.rl]];
-    if(s === 'maxI2' || s === 'manI2') return [[0, 1, v, d.rl]];
-    return [[0, .6, v, d.rl]];
+  /* bleeding, suppuration or plaque at a share of the sites (of md.teeth, or of every tooth in the case), the deepest first */
+  function siteModule(t, md, spec, field){
+    var teeth = md.teeth ? list(md.teeth) : allNums(spec, t), sites = [];
+    teeth.forEach(function(n){ var r = t[n] || {}; if(r.missing || r.implant) return; var pd = r.pd || {};
+      ['f', 'l'].forEach(function(s){ [0, 1, 2].forEach(function(i){ sites.push({ n:n, s:s, i:i, pd:(pd[s] || [2, 2, 2])[i] }); }); }); });
+    sites.sort(function(a, b){ return b.pd - a.pd || (+a.n - +b.n) || (a.s < b.s ? -1 : a.s > b.s ? 1 : 0) || a.i - b.i; });
+    var k = Math.round((md.rate || 0) * sites.length);
+    if(field === 'pus') sites = sites.filter(function(x){ return x.pd >= 4; });
+    sites.slice(0, k).forEach(function(x){ var r = ensure(t, x.n); r[field] = r[field] || {}; r[field][x.s] = r[field][x.s] || [0, 0, 0]; r[field][x.s][x.i] = 1;
+      if(field === 'pus'){ r.bop = r.bop || {}; r.bop[x.s] = r.bop[x.s] || [0, 0, 0]; r.bop[x.s][x.i] = 1; } });
   }
-  /* a root behind the others: the palatal root of a maxillary molar (long, centered, flaring palatally so it shows
-     between the buccal roots) or of a first premolar (a second apex beside the buccal one) */
-  function backRootMM(d){
-    if(d.pal) return [.2, .8, 2.1, d.rl + .5];
-    if(d.bif) return [.6, 1.5, 1.9, d.rl - .5];
-    return null;
+  function allNums(spec, t){
+    var seen = {}, out = [];
+    (spec.teeth || []).concat(toothKeys(t || spec.t)).forEach(function(n){ n = String(n); if(!seen[n]){ seen[n] = 1; out.push(n); } });
+    return out.sort(function(a, b){ return +a - +b; });
   }
+  function expand(spec){
+    if(!spec || !spec.modules) return spec;
+    var t = {}, probs = [];
+    spec.modules.forEach(function(md, i){
+      var w = 'module ' + (i + 1) + ' (' + md.m + '): ';
+      if(md.m === 'missing') list(md.teeth).forEach(function(n){ ensure(t, n).missing = true; });
+      else if(md.m === 'restoration'){
+        var r = ensure(t, md.tooth), mat = md.material || 'amalgam';
+        if(MAT.indexOf(mat) < 0) probs.push(w + 'material must be ' + MAT.join(', '));
+        if(mat === 'crown') r.crown = true;
+        else { (r.resto = r.resto || []).push({ s:normSurf(md.tooth, md.surfaces), mat:mat }); if(mat === 'amalgam' || mat === 'gold') r.amalgam = true; }
+      }
+      else if(md.m === 'caries'){ var rc = ensure(t, md.tooth); (rc.caries = rc.caries || []).push({ s:normSurf(md.tooth, md.surface), depth:md.depth || 'dentin' }); }
+      else if(md.m === 'endo'){ var re = ensure(t, md.tooth); if(md.fill !== false) re.endo = true; if(md.lesion) re.lesion = md.lesion; }
+      else if(md.m === 'bone') boneModule(t, md, probs);
+      else if(md.m === 'bop' || md.m === 'pus' || md.m === 'plaque') siteModule(t, md, spec, md.m);
+      else if(md.m === 'recession') list(md.teeth).forEach(function(n){ var r = ensure(t, n), mm = md.mm || 0; r.rec = r.rec || {}; r.pd = r.pd || {};
+        r.rec.f = (r.rec.f || [-2, -2, -2]).slice(); r.pd.f = (r.pd.f || [2, 2, 2]).slice(); var cal = r.pd.f[1] + r.rec.f[1]; r.rec.f[1] = Math.max(mm, 0); r.pd.f[1] = Math.max(1, cal - mm); });
+      else probs.push(w + 'unknown module');
+    });
+    /* the author's own numbers win, field by field */
+    Object.keys(spec.t || {}).forEach(function(n){
+      var own = spec.t[n]; if(!own) return; var r = ensure(t, n);
+      Object.keys(own).forEach(function(k){ r[k] = own[k]; });
+    });
+    var out = {}; Object.keys(spec).forEach(function(k){ out[k] = spec[k]; });
+    out.t = t; out._moduleProblems = probs; delete out.modules;
+    return out;
+  }
+  var CACHE = typeof WeakMap === 'function' ? new WeakMap() : null;
+  function prep(spec){
+    if(!spec || !spec.modules) return spec;
+    if(CACHE && CACHE.has(spec)) return CACHE.get(spec);
+    var e = expand(spec); if(CACHE) CACHE.set(spec, e); return e;
+  }
+  I.expand = function(spec){ return prep(spec); };
 
   /* ---------- the model's tooth record, with defaults ---------- */
   function tooth(spec, n){
@@ -134,18 +147,23 @@
     var r = { n:String(n), d:d, missing:!!t.missing, implant:t.implant || null, mob:t.mob || 0, furc:t.furc || {},
       pd:{ f:arr(pd, 'f', [2, 2, 2]), l:arr(pd, 'l', [2, 2, 2]) }, rec:{ f:arr(rec, 'f', [-2, -2, -2]), l:arr(rec, 'l', [-2, -2, -2]) },
       bop:{ f:arr(bop, 'f', z), l:arr(bop, 'l', z) }, pus:{ f:arr(pus, 'f', z), l:arr(pus, 'l', z) }, plaque:{ f:arr(pl, 'f', z), l:arr(pl, 'l', z) },
-      bone:t.bone || { m:0, d:0 }, vdef:t.vdef || {}, furcX:t.furcX || 0, calc:!!t.calc, crown:!!t.crown, endo:!!t.endo, amalgam:!!t.amalgam, halo:!!t.halo, raw:t };
+      bone:t.bone || { m:0, d:0 }, vdef:t.vdef || {}, furcX:t.furcX || 0, calc:!!t.calc, crown:!!t.crown, endo:!!t.endo, amalgam:!!t.amalgam, halo:!!t.halo,
+      resto:t.resto || [], caries:t.caries || [], lesion:t.lesion || 0, raw:t };
     r.cal = { f:r.pd.f.map(function(p, i){ return p + r.rec.f[i]; }), l:r.pd.l.map(function(p, i){ return p + r.rec.l[i]; }) };
     return r;
   }
-  function teethOf(spec){ return viewOrder(spec.teeth).map(function(n){ return tooth(spec, n); }); }
+  /* the teeth a view shows (its own list, or the case's), in viewer order; allOf: every tooth the case says anything about */
+  function teethOf(spec, teeth){ return viewOrder(teeth || spec.teeth).map(function(n){ return tooth(spec, n); }); }
+  function allOf(spec){ var a = allNums(spec), up = a.filter(isUpper), lo = a.filter(function(n){ return !isUpper(n); });
+    return viewOrder(up).concat(viewOrder(lo)).map(function(n){ return tooth(spec, n); }); }
   /* radiographic bone level on one side, in mm from the CEJ (the crest sits 1.5 mm from the CEJ in health, so a
      percentage of root length below that; an implant's bone is given in mm below its platform) */
   function boneMM(t, side){ return t.implant ? (t.bone[side] || 0) : Math.max(1.5, (t.bone[side] || 0) / 100 * t.d.rl); }
 
   /* ---------- derived values: what the numbers add up to under the 2018 staging and grading tables ---------- */
   I.derive = function(spec){
-    var ts = teethOf(spec), out = { maxCAL:{ v:-99 }, maxInterdental:{ v:-99 }, maxPD:{ v:-99 }, maxRBL:{ pct:0 }, vertical:0, furc:0, bop:0, sites:0, pus:0, impl:{} };
+    spec = prep(spec);
+    var ts = allOf(spec), out = { maxCAL:{ v:-99 }, maxInterdental:{ v:-99 }, maxPD:{ v:-99 }, maxRBL:{ pct:0 }, vertical:0, furc:0, bop:0, sites:0, pus:0, impl:{} };
     ts.forEach(function(t){
       if(t.missing) return;
       if(t.implant){
@@ -172,15 +190,15 @@
         });
       });
       ['m', 'd'].forEach(function(side){ var b = t.bone[side] || 0; if(b > out.maxRBL.pct) out.maxRBL = { pct:b, tooth:t.n, side:side === 'm' ? 'mesial' : 'distal' };
-        if((t.vdef[side] || 0) > out.vertical) out.vertical = t.vdef[side]; });
-      var fc = Math.max(t.furc.f || 0, t.furc.l || 0, t.furcX || 0); if(fc > out.furc) out.furc = fc;
+        if((t.vdef[side] || 0) > out.vertical){ out.vertical = t.vdef[side]; out.verticalTooth = t.n; } });
+      var fc = Math.max(t.furc.f || 0, t.furc.l || 0, t.furcX || 0); if(fc > out.furc){ out.furc = fc; out.furcTooth = t.n; }
     });
     var m = spec.mouth || {};
     out.bopPct = out.sites ? Math.round(100 * out.bop / out.sites) : 0;
     /* severity: interdental CAL first (the gold standard), radiographic bone loss second; the worse one sets the stage */
     var cal = out.maxInterdental.v, rbl = out.maxRBL.pct;
     var sCAL = cal >= 5 ? 3 : cal >= 3 ? 2 : cal >= 1 ? 1 : 0, sRBL = rbl > 33 ? 3 : rbl >= 15 ? 2 : rbl > 0 ? 1 : 0;
-    out.severity = Math.max(sCAL, sRBL);
+    out.severity = Math.max(sCAL, sRBL); out.sCAL = sCAL; out.sRBL = sRBL;
     out.attachmentLoss = cal >= 1 || rbl > 0;
     out.triggers = [];
     if(out.maxPD.v >= 6) out.triggers.push('probing depth of 6 mm or more');
@@ -217,28 +235,52 @@
      the bone crest must agree: in a suprabony pocket the crest sits 0-3 mm apical to the pocket base, and a pocket
      base more than 1.5 mm apical to the crest needs a declared vertical defect that reaches it. */
   I.validate = function(spec){
-    var P = [], ts;
+    spec = prep(spec);
+    var P = (spec && spec._moduleProblems || []).slice(), ts;
     function bad(m){ P.push(m); }
     function num(v, lo, hi, what){ if(typeof v !== 'number' || isNaN(v)) bad(what + ' is not a number'); else if(v < lo || v > hi) bad(what + ' = ' + v + ' is outside ' + lo + '-' + hi); }
     if(!spec || !spec.teeth || !spec.teeth.length) return ['no teeth'];
     spec.teeth.forEach(function(n){ if(!(+n >= 1 && +n <= 32 && +n === Math.floor(+n))) bad('tooth ' + n + ' is not a universal number'); });
     var arch = spec.teeth.map(function(n){ return isUpper(n); });
     if(arch.some(Boolean) && !arch.every(Boolean)) bad('the teeth are not all in one arch');
-    try { ts = teethOf(spec); } catch(e){ return ['teeth: ' + e.message]; }
+    toothKeys(spec.t).forEach(function(n){ if(spec.teeth.map(String).indexOf(n) < 0 && !spec.full) bad('#' + n + ' has numbers but is not in teeth (list it, or set full:true for a full-mouth case)'); });
+    try { ts = allOf(spec); } catch(e){ return ['teeth: ' + e.message]; }
     if(spec.age != null) num(spec.age, 12, 105, 'age');
     if(spec.smoke != null) num(spec.smoke, 0, 80, 'cigarettes a day');
     if(spec.hba1c != null) num(spec.hba1c, 4, 16, 'HbA1c');
     var m = spec.mouth;
     if(m){ if(m.teeth != null) num(m.teeth, 1, 32, 'teeth in the mouth'); if(m.involved != null){ num(m.involved, 0, 32, 'teeth involved'); if(m.teeth != null && m.involved > m.teeth) bad('more teeth involved than teeth in the mouth'); }
       if(m.lost != null){ num(m.lost, 0, 32, 'teeth lost'); if(m.teeth != null && m.lost + m.teeth > 32) bad('teeth lost + teeth present exceed 32'); } }
+    if(spec.full){
+      /* a full-mouth case: the box's counts must be the record's */
+      var gone = 0, inv = 0;
+      for(var j = 1; j <= 32; j++){ var tj = tooth(spec, String(j)); if(tj.missing){ gone++; continue; } if(tj.implant) continue;
+        if(Math.max(tj.cal.f[0], tj.cal.f[2], tj.cal.l[0], tj.cal.l[2]) >= 1 || (tj.bone.m || 0) > 0 || (tj.bone.d || 0) > 0) inv++; }
+      if(!m || m.teeth == null) bad('a full-mouth case gives mouth.teeth');
+      else if(m.teeth !== 32 - gone) bad('mouth.teeth = ' + m.teeth + ', but the record has ' + (32 - gone) + ' teeth present');
+      if(m && m.involved != null && m.involved !== inv) bad('mouth.involved = ' + m.involved + ', but ' + inv + ' teeth in the record have attachment or bone loss');
+      if(m && m.lost != null && m.lost > gone) bad('mouth.lost = ' + m.lost + ', but only ' + gone + ' teeth are missing');
+    }
     var g = spec.gingiva || {};
     if(g.kt != null) num(g.kt, 0, 9, 'keratinized tissue width');
     if(g.edema != null) num(g.edema, 0, 1, 'edema');
     if(g.look && ['healthy', 'inflamed', 'fibrotic'].indexOf(g.look) < 0) bad('gingiva.look must be healthy, inflamed or fibrotic');
     ts.forEach(function(t){
       var w = '#' + t.n + ' ', raw = t.raw;
-      Object.keys(raw).forEach(function(k){ if(['pd', 'rec', 'bop', 'pus', 'plaque', 'mob', 'furc', 'bone', 'vdef', 'furcX', 'calc', 'crown', 'endo', 'amalgam', 'implant', 'missing', 'halo', 'lift'].indexOf(k) < 0) bad(w + 'unknown field ' + k); });
-      if(t.missing) return;
+      Object.keys(raw).forEach(function(k){ if(['pd', 'rec', 'bop', 'pus', 'plaque', 'mob', 'furc', 'bone', 'vdef', 'furcX', 'calc', 'crown', 'endo', 'amalgam', 'implant', 'missing', 'halo', 'lift', 'resto', 'caries', 'lesion'].indexOf(k) < 0) bad(w + 'unknown field ' + k); });
+      /* impossible combinations: nothing on a missing tooth; nothing of a tooth's own on an implant */
+      if(t.missing){
+        [['resto', t.resto.length], ['crown', t.crown], ['amalgam', t.amalgam], ['caries', t.caries.length], ['endo', t.endo], ['periapical lesion', t.lesion], ['furcation', t.furc.f || t.furc.l || t.furcX], ['implant', t.implant], ['calculus', t.calc]].forEach(function(e){ if(e[1]) bad(w + 'a missing tooth has ' + (e[0] === 'resto' ? 'a restoration' : e[0] === 'caries' ? 'caries' : 'a ' + e[0])); });
+        return;
+      }
+      var cat = CAT(t.n);
+      t.resto.forEach(function(r){ if(!r || MAT.indexOf(r.mat) < 0 || r.mat === 'crown') bad(w + 'a restoration\'s material must be amalgam, composite or gold (a crown is crown:true)');
+        String(r && r.s || '').split('').forEach(function(x){ if(cat.surfaces.indexOf(x) < 0) bad(w + 'restoration surface ' + x + ' is not one of this tooth\'s (' + cat.surfaces.join('') + ')'); });
+        if(!r || !r.s) bad(w + 'a restoration with no surfaces'); });
+      t.caries.forEach(function(c){ if(!c || cat.surfaces.indexOf(c.s) < 0) bad(w + 'caries surface ' + (c && c.s) + ' is not one of this tooth\'s (' + cat.surfaces.join('') + ')');
+        if(c && DEPTH.indexOf(c.depth) < 0) bad(w + 'caries depth must be ' + DEPTH.join(', '));
+        if(c && t.crown) bad(w + 'caries under a full crown can\'t be charted by surface'); });
+      if(t.lesion) num(t.lesion, 1, 15, w + 'periapical lesion (mm across)');
       if(t.mob != null) num(t.mob, 0, 3, w + 'mobility');
       ['f', 'l'].forEach(function(s){
         if(t.pd[s].length !== 3 || t.rec[s].length !== 3) bad(w + s + ': three sites per surface');
@@ -261,7 +303,7 @@
         ['m', 'd'].forEach(function(sd){ var b = t.bone[sd] || 0; num(b, 0, im.len - 1, w + 'implant bone loss ' + sd);
           if(im.baseline){ num(im.baseline[sd] || 0, 0, im.len - 1, w + 'baseline bone ' + sd); if(b < (im.baseline[sd] || 0)) bad(w + 'bone at ' + sd + ' is higher than at the baseline'); } });
         if(t.furc.f || t.furc.l || t.furcX) bad(w + 'an implant has no furcation');
-        if(t.endo || t.amalgam || t.calc) bad(w + 'an implant has no root filling, amalgam or root calculus');
+        if(t.endo || t.amalgam || t.calc || t.resto.length || t.caries.length || t.lesion) bad(w + 'an implant and a root in one site: an implant has no root filling, restoration, caries, periapical lesion or root calculus');
         if(t.mob && !t.halo) bad(w + 'a mobile implant has lost osseointegration: set halo:true so the film shows it');
         return;
       }
@@ -281,11 +323,15 @@
       if(maxBone >= 70 && !t.mob) bad(w + maxBone + '% bone loss with no mobility');
       var fcs = [t.furc.f || 0, t.furc.l || 0];
       fcs.forEach(function(f){ num(f, 0, 3, w + 'furcation class'); });
-      if((fcs[0] || fcs[1] || t.furcX) && !t.d.tr) bad(w + 'a furcation on a single-rooted tooth');
-      if(t.d.tr){
-        var fmax = Math.max(fcs[0], fcs[1]);
-        if(fmax >= 1 && Math.max(boneMM(t, 'm'), boneMM(t, 'd')) < t.d.tr - 1.5 && !t.furcX) bad(w + 'a furcation involvement before bone loss has reached the root trunk (' + t.d.tr + ' mm)');
-        if(fmax >= 2 && !t.furcX) bad(w + 'a Class II or III furcation should show on the film: set furcX');
+      Object.keys(t.furc).forEach(function(s){ if(s !== 'f' && s !== 'l') bad(w + 'furcation surface ' + s + ' must be f or l'); });
+      var fe = cat.furcations, filmF = fe.some(function(e){ return e.film; });
+      if((fcs[0] || fcs[1] || t.furcX) && !fe.length) bad(w + 'a furcation on a tooth with no furcation (' + cat.roots.join(', ') + ' root' + (cat.roots.length > 1 ? 's' : '') + ')');
+      [['f', fcs[0]], ['l', fcs[1]]].forEach(function(e){ if(e[1] && fe.length && !fe.some(function(x){ return x.from === e[0]; })) bad(w + 'no furcation entrance is probed from the ' + (e[0] === 'f' ? 'facial' : 'lingual')); });
+      if(t.furcX && fe.length && !filmF) bad(w + 'furcX: a film doesn\'t show this tooth\'s furcation (its roots overlap)');
+      if(fe.length){
+        var fmax = Math.max(fcs[0], fcs[1]), trk = cat.trunk;
+        if(fmax >= 1 && Math.max(boneMM(t, 'm'), boneMM(t, 'd')) < trk - 1.5 && !t.furcX) bad(w + 'a furcation involvement before bone loss has reached the root trunk (' + trk + ' mm)');
+        if(fmax >= 2 && !t.furcX && filmF) bad(w + 'a Class II or III furcation should show on the film: set furcX');
         if(t.furcX > fmax) bad(w + 'the film shows more furcation loss (furcX ' + t.furcX + ') than the probe found (' + fmax + ')');
         if((fcs[0] === 3) !== (fcs[1] === 3) && !t.d.pal) bad(w + 'a Class III furcation is through and through: both surfaces');
       }
@@ -294,38 +340,8 @@
     return P;
   };
 
-  /* ---------- root geometry shared by the chart, the film and the view (px) ----------
-     r: { a0, a1 (x at the cervix and the apex), w0 (half width at the cervix), wa (at the apex), y0, len } */
-  function rAx(r, t){ return r.a0 + (r.a1 - r.a0) * Math.pow(t, 1.7); }
-  function rHw(r, t){ return r.w0 + (r.wa - r.w0) * Math.pow(t, .92); }
-  function rootOutline(r, dd, yL, yR, fun){
-    var L = [], R = [], N = 16;
-    function ax(t){ return rAx(r, t); }
-    function hw(t){ return rHw(r, t); }
-    function ex(t){ return fun ? fun * Math.pow(Math.max(0, 1 - t / .4), 1.5) : 0; }
-    var tL = Math.min(.9, Math.max(0, (yL - r.y0) / r.len)), tR = Math.min(.9, Math.max(0, (yR - r.y0) / r.len)), i, t;
-    for(i = 0; i <= N; i++){ t = tL + (1 - tL) * i / N; L.push([ax(t) - hw(t) - dd - ex(t), r.y0 + t * r.len]); }
-    var cx = ax(1), cy = r.y0 + r.len, rr = r.wa + dd;
-    for(i = 1; i < 8; i++){ var th = Math.PI - i * Math.PI / 8; L.push([cx + Math.cos(th) * rr, cy + Math.sin(th) * rr]); }
-    for(i = N; i >= 0; i--){ t = tR + (1 - tR) * i / N; R.push([ax(t) + hw(t) + dd + ex(t), r.y0 + t * r.len]); }
-    return L.concat(R);
-  }
-  function mkRoots(d, X, k, cej){
-    return rootsMM(d).map(function(r){ return { a0:X(r[0]), a1:X(r[1]), w0:r[2] * k, wa:.75 * k, y0:cej, len:r[3] * k }; });
-  }
-  function mkBack(d, X, k, cej){ var b = backRootMM(d); return b ? { a0:X(b[0]), a1:X(b[1]), w0:b[2] * k, wa:.8 * k, y0:cej, len:b[3] * k } : null; }
-  /* the root trunk between two roots, from y0 down to the furcation (the arch between the roots) */
-  function trunkPts(roots, sg, dd, y0, yf, k){
-    var l = roots[0], r = roots[1], L = sg > 0 ? l : r, R = sg > 0 ? r : l, pts = [], i;
-    if(y0 >= yf) return null;
-    function tOf(rt, y){ return Math.max(0, (y - rt.y0) / rt.len); }
-    for(i = 0; i <= 4; i++){ var y = y0 + (yf - y0) * i / 4, t = tOf(L, y); pts.push([rAx(L, t) - rHw(L, t) - dd, y]); }
-    var tl = tOf(L, yf), tr = tOf(R, yf), xa = rAx(L, tl) + rHw(L, tl) * .2, xb = rAx(R, tr) - rHw(R, tr) * .2;
-    pts.push([xa, yf + dd], [(xa + xb) / 2, yf + dd - .5 * k], [xb, yf + dd]);
-    for(i = 4; i >= 0; i--){ var y2 = y0 + (yf - y0) * i / 4, t2 = tOf(R, y2); pts.push([rAx(R, t2) + rHw(R, t2) + dd, y2]); }
-    return pts;
-  }
-
+  /* ---------- root geometry shared by the chart, the film and the view: the tooth library's (widget/teeth.js) ---------- */
+  var rAx = TL.rAx, rHw = TL.rHw, rootOutline = TL.rootOutline, mkRoots = TL.mkRoots, mkBack = TL.mkBack, trunkPts = TL.trunkPts;
   /* ---------- the periodontal chart: an SVG strip per surface plus the numbers as a table ---------- */
   var CK = 5.2, CW = 46, CPAD_L = 34;
   /* one tooth drawn crown-up in a column, in chart px: the CEJ at y0, the crown above it, the root (or roots) below */
@@ -369,7 +385,7 @@
       var cx = CPAD_L + i * CW + CW / 2, mr = mesialRight(t.n), so = siteOrder(t.n), sx = [cx - 14, cx, cx + 14];
       if(t.missing){ inner += '<path class="dc-x" d="M' + f1(cx - 10) + ' ' + f1(y0 - 24) + 'l20 20m0 -20l-20 20"/>'; return; }
       inner += chartTooth(t, cx, y0, k, mr);
-      if(isMolar(t.n) && !hide.furc && (t.furc[sf] || 0) > 0) inner += furcMark(t.furc[sf], cx, y0 + t.d.tr * k + 2, 5);
+      if(hasFurc(t.n) && !hide.furc && (t.furc[sf] || 0) > 0) inner += furcMark(t.furc[sf], cx, y0 + CAT(t.n).trunk * k + 2, 5);
       /* the gingival margin and the pocket base through the three sites (tooth terms m, c, d in viewer order); the
          middle site's CEJ sits where the cervical line dips */
       var gm = [], pb = [], dip = t.implant ? 0 : (t.d.cej || 0) * k;
@@ -400,7 +416,7 @@
     if(ts.some(function(t){ return t.plaque[sf].some(Boolean); })) h += '<tr><th scope="row">Plaque</th>' + cells(function(t){ return siteOrder(t.n).map(function(si){ return t.plaque[sf][si] ? '<span class="pc-flag">+</span>' : '<span>–</span>'; }).join(''); }) + '</tr>';
     if(sf === 'f'){
       if(!hide.mob) h += '<tr><th scope="row">Mobility</th>' + cells(function(t){ return t.mob ? '<span class="pc-flag">' + t.mob + '</span>' : '0'; }) + '</tr>';
-      if(!hide.furc && ts.some(function(t){ return isMolar(t.n) && !t.missing; })) h += '<tr><th scope="row">Furcation (Glickman)</th>' + cells(function(t){ if(!isMolar(t.n)) return '–'; var f = t.furc.f || 0, l = t.furc.l || 0; return (f ? '<span class="pc-flag">' + ['', 'I', 'II', 'III', 'IV'][f] + '</span> facial' : '') + (f && l ? ', ' : '') + (l ? '<span class="pc-flag">' + ['', 'I', 'II', 'III', 'IV'][l] + '</span> lingual' : '') || 'none'; }) + '</tr>';
+      if(!hide.furc && ts.some(function(t){ return !t.missing && (isMolar(t.n) || (hasFurc(t.n) && (t.furc.f || t.furc.l))); })) h += '<tr><th scope="row">Furcation (Glickman)</th>' + cells(function(t){ if(!hasFurc(t.n)) return '–'; var f = t.furc.f || 0, l = t.furc.l || 0; return (f ? '<span class="pc-flag">' + ['', 'I', 'II', 'III', 'IV'][f] + '</span> facial' : '') + (f && l ? ', ' : '') + (l ? '<span class="pc-flag">' + ['', 'I', 'II', 'III', 'IV'][l] + '</span> lingual' : '') || 'none'; }) + '</tr>';
     }
     return '<div class="pchart-wrap">' + h + '</tbody></table></div>';
   }
@@ -411,7 +427,7 @@
       (sf === 'f' ? 'cheek and lip' : up ? 'palate' : 'tongue') + ' side</p>';
   }
   I.chart = function(spec, o){
-    o = o || {}; var ts = teethOf(spec), hide = o.hide || {}, s = '';
+    spec = prep(spec); o = o || {}; var ts = teethOf(spec, o.teeth), hide = o.hide || {}, s = '';
     var surfaces = o.lingual === false ? ['f'] : (spec.lingual === false ? ['f'] : ['f', 'l']), two = surfaces.length > 1, up = isUpper(ts[0].n);
     if(two) s += '<p class="dc-sides">One chart from one visit: the facial side of these teeth, then the lingual side of the same teeth.</p>';
     surfaces.forEach(function(sf){ s += (two ? '<div class="dc-surf">' + sideHead(sf, up) : '') + chartStrip(spec, ts, sf, o) + chartTable(spec, ts, sf, o) + (two ? '</div>' : ''); });
@@ -458,6 +474,8 @@
     s += pulpSVG(g);
     if(o.endo) s += endoSVG(g);
     if(o.amalgam) s += amalgamSVG(g);
+    else if(o.resto && o.resto.some(function(r){ return r.mat === 'composite'; })) s += amalgamSVG(g).replace('xr-metal', 'xr-comp');
+    if(o.caries) s += cariesSVG(g);
     if(o.crown) s += crownSVG(g);
     if(o.calc) s += calcSVG(g);
     return s;
@@ -498,6 +516,24 @@
     var a = occ[0], b = occ[occ.length - 1];
     function at(p, f, y){ return [g.x + (p[0] - g.x) * f, y]; }
     return path('xr-metal', occ.concat([[b[0], box], at(b, .74, box + .2 * k), at(b, .62, floor), at(a, .62, floor), at(a, .74, box + .2 * k), [a[0], box]]));
+  }
+  /* caries on a film (White and Pharoah): a proximal lesion is a dark notch at the contact, a triangle with its base on the
+     surface, through the enamel (enamel), into the dentin (dentin) or reaching the pulp (pulp); an occlusal lesion is seen
+     only once it is in the dentin, a dark band under the enamel; a facial or lingual one as a round shadow at the cervical
+     third. The contact heights are the tooth library's. */
+  function cariesSVG(g){
+    var k = g.k, d = g.d, s = '', cat = CAT(g.o.n), up = cat && cat.arch === 'upper';
+    g.o.caries.forEach(function(c){
+      var deep = c.depth === 'enamel' ? 1.1 : c.depth === 'dentin' ? 2.6 : d.cw * .38;
+      if(c.s === 'M' || c.s === 'D'){
+        var sideSg = (c.s === 'M' ? -1 : 1) * g.sg, fr = cat ? cat.landmarks.contacts[c.s === 'M' ? 'm' : 'd'] : .6;
+        var y = g.cej - fr * d.ch * k, x = g.x + sideSg * d.cw / 2 * k - sideSg * .15 * k;
+        s += path('xr-car', [[x, y - .9 * k], [x - sideSg * deep * k, y + .1 * k], [x, y + .9 * k]]);
+      } else if(c.s === 'O' || c.s === 'I'){
+        if(c.depth !== 'enamel') s += '<ellipse class="xr-car" cx="' + f1(g.x) + '" cy="' + f1(g.top + (1.6 + (c.depth === 'pulp' ? 1.4 : .6)) * k) + '" rx="' + f1(d.cw * .2 * k) + '" ry="' + f1((c.depth === 'pulp' ? 1.5 : .9) * k) + '"/>';
+      } else s += dot('xr-car', g.x, g.cej - d.ch * .25 * k, (c.depth === 'enamel' ? .7 : 1.2) * k);
+    });
+    return s;
   }
   /* a full-coverage crown: a metal (or metal-ceramic) cap that follows the crown outline down to a margin at the CEJ */
   function crownSVG(g){
@@ -543,7 +579,7 @@
   /* bone up to the crest on each root surface, the septum between neighbors; an angular defect drops the crest beside
      its root to the defect's base while the septum keeps its height; a furcation lesion darkens the space between the
      roots below the trunk; trabeculae inside */
-  function boneSVG(gs, w, yBottom, seed){
+  function boneSVG(gs, w, yBottom, seed, tb){
     var top = [], k = gs[0].k, extra = '';
     function side(g, right, y){
       if(g.o.implant) return g.x + (right ? 1 : -1) * (g.o.implant.w / 2 + .1) * k;
@@ -570,7 +606,7 @@
     var s = path('xr-bone', top.concat([[w + 5, yBottom], [-5, yBottom]]));
     function yTop(x){ for(var i = 1; i < top.length; i++) if(x <= top[i][0]){ var a = top[i - 1], b = top[i], t = (x - a[0]) / ((b[0] - a[0]) || 1); return a[1] + (b[1] - a[1]) * t; } return top[top.length - 1][1]; }
     var r = rnd(seed), yMin = Math.min.apply(null, top.map(function(p){ return p[1]; }));
-    for(var i = 0; i < 230; i++){ var cx = r() * w, cy = yMin + r() * (yBottom - yMin), rx = 1.5 + r() * 5, ry = 1 + r() * 2.6, a = Math.round(r() * 180), cl = r() < .55 ? 'xr-tb' : 'xr-tb2';
+    for(var i = 0; i < (tb || 230); i++){ var cx = r() * w, cy = yMin + r() * (yBottom - yMin), rx = 1.5 + r() * 5, ry = 1 + r() * 2.6, a = Math.round(r() * 180), cl = r() < .55 ? 'xr-tb' : 'xr-tb2';
       if(cy < yTop(cx) + 3 || cy > yBottom - 2) continue;
       s += '<ellipse class="' + cl + '" cx="' + f1(cx) + '" cy="' + f1(cy) + '" rx="' + f1(rx) + '" ry="' + f1(ry) + '" transform="rotate(' + a + ' ' + f1(cx) + ' ' + f1(cy) + ')"/>'; }
     s += path('xr-cortex', top.slice(1, -1), true);
@@ -581,43 +617,161 @@
     list.forEach(function(o){ var d = XT[o.t]; o.k = k; o.occ = occ; x += (o.gap || 0) * k; o.x = x + d.cw * k / 2; gs.push(xrTooth(o)); x += d.cw * k - .15 * k; });
     return gs;
   }
-  function filmBG(gs, w, h, seed){
+  function filmBG(gs, w, h, seed, tb){
     var s = '<rect class="xr-soft" x="0" y="' + f1(gs[0].top - 1.2 * gs[0].k) + '" width="' + w + '" height="' + f1(h) + '"/>';
-    s += boneSVG(gs, w, h + 60, seed);
+    s += boneSVG(gs, w, h + 60, seed, tb);
     gs.forEach(function(g){ s += socketSVG(g, (g.o.pdl || .2) + (g.o.lam || .22), 'xr-lam'); });
     gs.forEach(function(g){ s += socketSVG(g, g.o.pdl || .2, 'xr-pdl'); });
+    /* a periapical lesion: a round radiolucency at the apex, the lamina dura gone there (Cohen's Pathways of the Pulp;
+       White and Pharoah) */
+    gs.forEach(function(g){ if(!g.o.lesion || g.o.implant) return; var rr = g.o.lesion / 2 * g.k;
+      g.roots.forEach(function(r){ s += '<ellipse class="xr-pdl xr-lesion" cx="' + f1(rAx(r, 1)) + '" cy="' + f1(r.y0 + r.len + rr * .35) + '" rx="' + f1(rr) + '" ry="' + f1(rr * .9) + '"/>'; }); });
     return s;
   }
   /* a periapical film of the case's teeth: bone levels, defects, furcations, restorations and implants from the model */
-  I.film = function(spec, o){
-    o = o || {}; var ts = teethOf(spec), up = isUpper(ts[0].n), k = o.k || 9;
+  /* one row of a film: the teeth in viewer order, crowns up, the occlusal edges at occ; { inner, w, h, up, ts }. A film of an
+     upper row is flipped crowns down by its caller. o.tb: how many trabeculae (fewer on the small films of a series) */
+  function filmRow(spec, teeth, k, occ, h, o){
+    o = o || {}; var ts = teethOf(spec, teeth), up = isUpper(ts[0].n);
     var list = [], seed = 0, width = 0, gapFirst = 0;
     ts.forEach(function(t, i){
-      var d = t.d, mr = mesialRight(t.n), x = { t:typeOf(t.n), m:mr };
+      var d = t.d, mr = mesialRight(t.n), x = { t:typeOf(t.n), m:mr, n:t.n };
       seed += +t.n * (i + 3);
       width += d.cw;
-      if(t.missing){ if(list.length) list[list.length - 1].gapAfter = d.cw; else gapFirst += d.cw; return; }
+      if(t.missing){ if(list.length) list[list.length - 1].gapAfter = (list[list.length - 1].gapAfter || 0) + d.cw; else gapFirst += d.cw; return; }
       /* bone loss % of root length -> mm below the normal crest (1.5 mm below the CEJ); an implant's bone is in mm
          below its platform, which sits at that crest line */
       var bm = t.implant ? (t.bone.m || 0) : Math.max(0, boneMM(t, 'm') - 1.5), bd = t.implant ? (t.bone.d || 0) : Math.max(0, boneMM(t, 'd') - 1.5);
       x.bone = [bm, bd]; x.vdef = [t.vdef.m || 0, t.vdef.d || 0]; x.furcX = t.furcX;
       x.crown = t.crown; x.endo = t.endo; x.amalgam = t.amalgam; x.calc = t.calc; x.lift = t.raw.lift || 0; x.halo = t.halo;
+      if(t.resto.length) x.resto = t.resto; if(t.caries.length) x.caries = t.caries; if(t.lesion) x.lesion = t.lesion;
       if(t.mob >= 2) x.pdl = .34;
       if(t.implant){ x.implant = t.implant; x.cover = !!t.implant.cover; }
       list.push(x);
     });
     list.forEach(function(x, i){ if(i && list[i - 1].gapAfter) x.gap = list[i - 1].gapAfter; else if(!i && gapFirst) x.gap = gapFirst; });
-    var w = Math.round(width * k + 48), h = o.h || Math.round(30 * k), gs = rowXR(list, 20, 2.6 * k, k);
-    var inner = filmBG(gs, w, h, seed) + gs.map(toothSVG).join('');
-    if(up) inner = '<g transform="translate(0 ' + h + ') scale(1 -1)">' + inner + '</g>';
-    var label = o.aria || ('Periapical radiograph of ' + (up ? 'upper' : 'lower') + ' teeth ' + ts.map(function(t){ return '#' + t.n; }).join(', ') + (up ? ', shown crowns down' : ''));
-    var dotP = up ? [w - 16, h - 9] : [w - 16, 9];
-    return '<svg class="xr dc-film" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + esc(label) + '"><rect class="xr-film" x="0" y="0" width="' + w + '" height="' + h + '" rx="14"/>' + inner + '<circle class="xr-dot" cx="' + dotP[0] + '" cy="' + dotP[1] + '" r="3"/></svg>';
+    var w = Math.round(width * k + 48);
+    if(!list.length) return { inner:'<rect class="xr-soft" x="0" y="0" width="' + w + '" height="' + h + '"/><rect class="xr-bone" x="0" y="' + f1(occ + 9 * k) + '" width="' + w + '" height="' + h + '"/>', w:w, h:h, up:up, ts:ts };
+    var gs = rowXR(list, 20, occ, k);
+    return { inner:filmBG(gs, w, h, seed, o.tb) + gs.map(toothSVG).join(''), w:w, h:h, up:up, ts:ts };
+  }
+  function filmSVG(cls, w, h, label, inner, dotTop){
+    var dotP = dotTop ? [w - 16, 9] : [w - 16, h - 9];
+    return '<svg class="xr dc-film' + (cls ? ' ' + cls : '') + '" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + esc(label) + '"><rect class="xr-film" x="0" y="0" width="' + w + '" height="' + h + '" rx="14"/>' + inner + '<circle class="xr-dot" cx="' + dotP[0] + '" cy="' + dotP[1] + '" r="3"/></svg>';
+  }
+  function names(ts){ return ts.map(function(t){ return '#' + t.n; }).join(', '); }
+  /* a periapical film of the case's teeth (or the figure's): bone levels, defects, furcations, restorations, caries,
+     periapical lesions and implants from the model */
+  I.film = function(spec, o){
+    spec = prep(spec); o = o || {}; var k = o.k || 9, h = o.h || Math.round(30 * k);
+    var R = filmRow(spec, o.teeth, k, 2.6 * k, h, o), inner = R.inner;
+    if(R.up) inner = '<g transform="translate(0 ' + h + ') scale(1 -1)">' + inner + '</g>';
+    var label = o.aria || ('Periapical radiograph of ' + (R.up ? 'upper' : 'lower') + ' teeth ' + names(R.ts) + (R.up ? ', shown crowns down' : ''));
+    return filmSVG('', R.w, h, label, inner, !R.up);
   };
+  /* a bitewing: the crowns of both arches on one film, the bite tab between them, and the crest of the bone on each side
+     (White and Pharoah: the posterior teeth only; it shows proximal caries and the crest, not the apices). o.teeth: upper
+     and lower premolars and molars of one side, e.g. ['2','3','4','5','28','29','30','31'] */
+  function bitewingInner(spec, teeth, k, tb){
+    var up = teeth.filter(isUpper), lo = teeth.filter(function(n){ return !isUpper(n); }), hb = Math.round(15 * k), occ = .9 * k;
+    var U = filmRow(spec, up, k, occ, hb, { tb:tb }), L = filmRow(spec, lo, k, occ, hb, { tb:tb }), w = Math.max(U.w, L.w);
+    var inner = '<g transform="translate(' + f1((w - U.w) / 2) + ' ' + hb + ') scale(1 -1)">' + U.inner + '</g>' +
+      '<g transform="translate(' + f1((w - L.w) / 2) + ' ' + hb + ')">' + L.inner + '</g>';
+    return { inner:inner, w:w, h:2 * hb, ts:U.ts.concat(L.ts) };
+  }
+  I.bitewing = function(spec, o){
+    spec = prep(spec); o = o || {}; var k = o.k || 9, teeth = (o.teeth || spec.teeth).map(String);
+    var B = bitewingInner(spec, teeth, k, o.tb);
+    var label = o.aria || ('Bitewing radiograph of ' + names(B.ts) + ': the upper crowns above, the lower below, the bone crest on both');
+    return filmSVG('dc-bw', B.w, B.h, label, B.inner, true);
+  };
+  /* a full-mouth series: 14 periapicals and 4 bitewings laid out as they are mounted, the patient's right on your left
+     (upper periapicals on top, the bitewings between, lower periapicals below), every tooth in the record; a tooth the case
+     says nothing about is drawn healthy */
+  var FMX_U = [['1', '2', '3'], ['4', '5'], ['6', '7'], ['8', '9'], ['10', '11'], ['12', '13'], ['14', '15', '16']];
+  var FMX_L = [['32', '31', '30'], ['29', '28'], ['27', '26'], ['25', '24'], ['23', '22'], ['21', '20'], ['19', '18', '17']];
+  var FMX_B = [['2', '3', '31', '30'], ['4', '5', '29', '28'], ['12', '13', '20', '21'], ['14', '15', '19', '18']];
+  I.fmx = function(spec, o){
+    spec = prep(spec); o = o || {}; var k = 6, cw = 150, ch = 196, gap = 8, s = '', W = 7 * cw + 8 * gap, y = gap;
+    function cell(x, yy, svgW, svgH, inner, cls){
+      var sc = Math.min((cw - 4) / svgW, (ch - 4) / svgH), ww = svgW * sc, hh = svgH * sc;
+      return '<svg class="' + cls + '" x="' + f1(x + (cw - ww) / 2) + '" y="' + f1(yy + (ch - hh) / 2) + '" width="' + f1(ww) + '" height="' + f1(hh) + '" viewBox="0 0 ' + svgW + ' ' + svgH + '"><rect class="xr-film" x="0" y="0" width="' + svgW + '" height="' + svgH + '" rx="12"/>' + inner + '</svg>';
+    }
+    FMX_U.forEach(function(g, i){ var R = filmRow(spec, g, k, 2.6 * k, Math.round(30 * k), { tb:60 });
+      s += cell(gap + i * (cw + gap), y, R.w, R.h, '<g transform="translate(0 ' + R.h + ') scale(1 -1)">' + R.inner + '</g>', 'dc-pa'); });
+    y += ch + gap;
+    var bwW = (W - 5 * gap) / 4;
+    FMX_B.forEach(function(g, i){ var B = bitewingInner(spec, g, k, 60), sc = Math.min((bwW - 4) / B.w, (ch * .8 - 4) / B.h), ww = B.w * sc, hh = B.h * sc, x = gap + i * (bwW + gap) + (i >= 2 ? gap : 0);
+      s += '<svg class="dc-bwc" x="' + f1(x + (bwW - ww) / 2) + '" y="' + f1(y + (ch * .8 - hh) / 2) + '" width="' + f1(ww) + '" height="' + f1(hh) + '" viewBox="0 0 ' + B.w + ' ' + B.h + '"><rect class="xr-film" x="0" y="0" width="' + B.w + '" height="' + B.h + '" rx="12"/>' + B.inner + '</svg>'; });
+    y += ch * .8 + gap;
+    FMX_L.forEach(function(g, i){ var R = filmRow(spec, g, k, 2.6 * k, Math.round(30 * k), { tb:60 });
+      s += cell(gap + i * (cw + gap), y, R.w, R.h, R.inner, 'dc-pa'); });
+    y += ch + gap;
+    var label = o.aria || 'Full-mouth series: 14 periapical films and 4 bitewings, mounted with the patient\'s right on your left; upper films on top, the bitewings between, lower films below';
+    return '<svg class="xr dc-film dc-fmx" viewBox="0 0 ' + f1(W) + ' ' + f1(y) + '" role="img" aria-label="' + esc(label) + '"><rect class="dc-mount" x="0" y="0" width="' + f1(W) + '" height="' + f1(y) + '" rx="10"/>' + s + '</svg>';
+  };
+
+  /* ---------- the odontogram: the whole mouth, each tooth as five surfaces ----------
+     Upper teeth #1-16 across the top, lower #32-17 across the bottom, the patient's right on your left, the facial surface
+     toward the outside of the chart (up for the upper row, down for the lower) and the mesial toward the midline. Marked
+     from the record: missing (X), an implant, a crown, restorations by surface and material, caries by surface (red), a
+     root canal filling and a periapical lesion (under the tooth), furcations and mobility left to the chart. */
+  I.odontogram = function(spec, o){
+    spec = prep(spec); o = o || {}; var cw = 26, pad = 10, W = 16 * cw + 2 * pad, rowH = 58, H = 2 * rowH + 18, s = '';
+    s += '<rect class="dc-paper" x="0" y="0" width="' + W + '" height="' + H + '" rx="10"/>';
+    s += '<path class="dc-mid" d="M' + (W / 2) + ' 6V' + (H - 6) + 'M' + pad + ' ' + (H / 2) + 'H' + (W - pad) + '"/>';
+    function one(n, col, up){
+      var t = tooth(spec, n), c = CAT(n), cx = pad + col * cw + cw / 2, cy = up ? 31 : H - 31, r = 9.5, q = 4.2, out = '';
+      var fy = up ? -1 : 1;   /* facial toward the outside */
+      var mx = mesialRight(n) ? 1 : -1;   /* mesial toward the midline: patient's right teeth have mesial on the viewer's right */
+      out += txt(cx, up ? 11 : H - 4, n, 'dc-onum', 'middle');
+      var P = { O:[[cx - q, cy - q], [cx + q, cy - q], [cx + q, cy + q], [cx - q, cy + q]],
+        F:[[cx - r, cy + fy * r], [cx + r, cy + fy * r], [cx + q, cy + fy * q], [cx - q, cy + fy * q]],
+        L:[[cx - r, cy - fy * r], [cx + r, cy - fy * r], [cx + q, cy - fy * q], [cx - q, cy - fy * q]],
+        M:[[cx + mx * r, cy - r], [cx + mx * r, cy + r], [cx + mx * q, cy + q], [cx + mx * q, cy - q]],
+        D:[[cx - mx * r, cy - r], [cx - mx * r, cy + r], [cx - mx * q, cy + q], [cx - mx * q, cy - q]] };
+      function key(x){ return x === 'B' ? 'F' : x === 'I' ? 'O' : x; }
+      var fill = {};
+      t.resto.forEach(function(rs){ rs.s.split('').forEach(function(x){ fill[key(x)] = 'dc-o-' + rs.mat; }); });
+      var car = {}; t.caries.forEach(function(cr){ car[key(cr.s)] = cr.depth; });
+      if(t.missing){
+        ['O', 'F', 'L', 'M', 'D'].forEach(function(x){ out += path('dc-osurf dc-o-gone', P[x]); });
+        out += '<path class="dc-ox" d="M' + f1(cx - 11) + ' ' + f1(cy - 11) + 'l22 22m0 -22l-22 22"/>';
+        return out;
+      }
+      ['O', 'F', 'L', 'M', 'D'].forEach(function(x){ out += path('dc-osurf' + (fill[x] ? ' ' + fill[x] : '') + (car[x] ? ' dc-o-caries' : ''), P[x]); });
+      if(t.crown || t.implant) out += '<rect class="dc-o-crown" x="' + f1(cx - r - 1.6) + '" y="' + f1(cy - r - 1.6) + '" width="' + f1(2 * r + 3.2) + '" height="' + f1(2 * r + 3.2) + '" rx="3"/>';
+      var ry = cy + (up ? 1 : -1) * (r + 4);   /* under the tooth, toward the middle of the chart: the root marks */
+      if(t.implant) out += '<path class="dc-o-impl" d="M' + f1(cx - 3) + ' ' + f1(ry) + 'h6M' + f1(cx - 3.6) + ' ' + f1(ry + (up ? 2.6 : -2.6)) + 'h7.2M' + f1(cx - 3) + ' ' + f1(ry + (up ? 5.2 : -5.2)) + 'h6"/>';
+      if(t.endo) out += '<path class="dc-o-endo" d="M' + f1(cx) + ' ' + f1(ry) + 'v' + (up ? 6 : -6) + '"/>';
+      if(t.lesion) out += dot('dc-o-lesion', cx, ry + (up ? 8 : -8), 2.6);
+      return out;
+    }
+    for(var i = 0; i < 16; i++){ s += one(String(i + 1), i, true); s += one(String(32 - i), i, false); }
+    var label = o.aria || 'Odontogram of the whole mouth: each tooth drawn as five surfaces; missing teeth crossed out; restorations, caries, crowns, implants and root canal fillings marked';
+    var svg = '<svg class="dc-odo" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(label) + '">' + s + '</svg>';
+    var key = '<div class="pchart-key dc-okey"><span class="dc-ok dc-o-amalgam"></span>amalgam <span class="dc-ok dc-o-composite"></span>composite <span class="dc-ok dc-o-gold"></span>gold <span class="dc-ok dc-o-caries"></span>caries · square around: crown (an implant has bars under it) · line under: root canal filling · dot: periapical lesion · X: missing. Upper teeth on top, facial side out, mesial toward the middle.</div>';
+    return svg + key + odoText(spec);
+  };
+  /* the same record as text, for a screen reader and for anyone who can't read the small squares */
+  function odoText(spec){
+    var miss = [], notes = [];
+    for(var n = 1; n <= 32; n++){ var t = tooth(spec, String(n)), c = CAT(n), bits = [];
+      if(t.missing){ miss.push('#' + n); continue; }
+      if(t.implant) bits.push('implant');
+      if(t.crown) bits.push('crown');
+      t.resto.forEach(function(r){ bits.push(r.s + ' ' + r.mat); });
+      t.caries.forEach(function(r){ bits.push('caries ' + r.s + ' (' + r.depth + ')'); });
+      if(t.endo) bits.push('root canal filling');
+      if(t.lesion) bits.push('periapical lesion');
+      if(bits.length) notes.push('#' + n + ': ' + bits.join(', '));
+    }
+    return '<details class="dc-otext"><summary>The chart as text</summary><p>' + (miss.length ? 'Missing: ' + miss.join(', ') + '. ' : 'No teeth missing. ') + esc(notes.join('; ')) + (notes.length ? '.' : '') + '</p></details>';
+  }
 
   /* ---------- the drawn buccal view ---------- */
   I.view = function(spec, o){
-    o = o || {}; var ts = teethOf(spec), up = isUpper(ts[0].n), k = o.k || 8.2, g = spec.gingiva || {};
+    spec = prep(spec); o = o || {}; var ts = teethOf(spec, o.teeth), up = isUpper(ts[0].n), k = o.k || 8.2, g = spec.gingiva || {};
     var look = g.look || 'healthy', edema = g.edema != null ? g.edema : (look === 'inflamed' ? 1 : 0);
     var n = ts.length, w = 0; ts.forEach(function(t){ w += t.d.cw * k - .2 * k; });
     var W = Math.round(w + 60), H = 230, occ = up ? H - 62 : 62, dir = up ? -1 : 1;   /* occ: the incisal edges; dir +1 = roots go down (lower) */
@@ -677,21 +831,147 @@
     return '<svg class="io dc-view" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(label) + '">' + s + '</svg>';
   };
 
-  /* ---------- the figures a question shows: list = [{kind:'chart'|'film'|'view', title, note, hide, lingual}] ---------- */
+  /* ---------- the figures a question shows: list = [{kind, title, note, hide, lingual, teeth}] ----------
+     kind: chart | film | view (one arch: the case's teeth, or the figure's own teeth), bitewing (the premolars and molars
+     of one side, both arches), fmx (the full-mouth series) or odontogram (the whole mouth) */
+  var KINDS = { chart:'Periodontal chart', film:'Periapical radiograph', view:'Clinical view (drawn)', bitewing:'Bitewing radiograph', fmx:'Full-mouth series', odontogram:'Odontogram' };
+  var WIDE = { chart:1, fmx:1, odontogram:1 };
+  I.KINDS = Object.keys(KINDS);
   I.figures = function(spec, list){
-    var out = '', kinds = { chart:'Periodontal chart', film:'Periapical radiograph', view:'Clinical view (drawn)' };
+    spec = prep(spec);
+    var out = '';
     (list || []).forEach(function(f){
-      var body = f.kind === 'chart' ? I.chart(spec, f) : f.kind === 'film' ? I.film(spec, f) : f.kind === 'view' ? I.view(spec, f) : '';
+      var body = f.kind === 'chart' ? I.chart(spec, f) : f.kind === 'film' ? I.film(spec, f) : f.kind === 'view' ? I.view(spec, f) :
+        f.kind === 'bitewing' ? I.bitewing(spec, f) : f.kind === 'fmx' ? I.fmx(spec, f) : f.kind === 'odontogram' ? I.odontogram(spec, f) : '';
       if(!body) return;
-      out += '<figure class="pimg dc-fig' + (f.kind === 'chart' ? ' wide' : '') + '"><figcaption><b>' + esc(kinds[f.kind]) + '</b>' + (f.title ? ' · ' + esc(f.title) : '') + '</figcaption>' + body + (f.note ? '<div class="pimg-cap">' + esc(f.note) + '</div>' : '') + '</figure>';
+      out += '<figure class="pimg dc-fig' + (WIDE[f.kind] ? ' wide' : '') + '"><figcaption><b>' + esc(KINDS[f.kind]) + '</b>' + (f.title ? ' · ' + esc(f.title) : '') + '</figcaption>' + body + (f.note ? '<div class="pimg-cap">' + esc(f.note) + '</div>' : '') + '</figure>';
     });
     if(!out) return '';
     return '<div class="pimg-grid dc-figs">' + out + '</div><div class="pimg-note dc-note">Drawn for this hub from the case\'s numbers to show the findings; not a patient image or a real radiograph. Tooth sizes and shapes are averages (Wheeler).</div>';
   };
+
+  /* ---------- the Patient Box rows, from the same record ----------
+     A case with no box of its own gets these, so the age, smoking, HbA1c and teeth a question shows are the numbers the
+     key was worked out from. spec: age, sex ('woman' | 'man'), smoke (cigarettes a day; 0 = doesn't smoke), hba1c,
+     medical, cc (the chief complaint, in the patient's words), mouth.teeth / lost / involved. */
+  I.rows = function(spec){
+    spec = prep(spec); var r = [], m = spec.mouth || {};
+    if(spec.age != null) r.push(['Patient', spec.age + '-year-old ' + (spec.sex || 'patient')]);
+    if(spec.cc) r.push(['Chief complaint', '"' + spec.cc + '"']);
+    if(spec.medical) r.push(['Medical history', spec.medical]);
+    if(spec.hba1c != null) r.push(['HbA1c', spec.hba1c + '%']);
+    if(spec.smoke != null) r.push(['Tobacco', spec.smoke ? spec.smoke + ' cigarettes a day' : 'Does not smoke']);
+    if(m.teeth != null) r.push(['Teeth', m.teeth + ' present' + (m.lost ? '; ' + m.lost + ' lost to periodontitis' : m.lost === 0 ? '; none lost to periodontitis' : '')]);
+    if(m.involved != null && m.teeth != null) r.push(['Teeth involved', m.involved + ' of ' + m.teeth + ' have attachment loss']);
+    if(m.stage4 && m.stage4.length) r.push(['Also', m.stage4.join('; ')]);
+    return r;
+  };
+  I.caseRows = function(c){ return c ? (c.box || I.rows(c.spec)) : []; };
+
+  /* ---------- checks on what a question shows ---------- */
+  function present(spec, teeth){ return (teeth || []).map(String).filter(function(n){ return !tooth(spec, n).missing; }); }
+  function figTeeth(spec, f){
+    if(f.kind === 'fmx' || f.kind === 'odontogram'){ var a = []; for(var i = 1; i <= 32; i++) a.push(String(i)); return a; }
+    return (f.teeth || spec.teeth || []).map(String);
+  }
+  /* the pictures themselves: known kinds, one arch where a view needs one, a bitewing only of premolars and molars and of
+     both arches, and a full-mouth view that agrees with the counts the box gives */
+  I.checkFigs = function(spec, figs){
+    spec = prep(spec); var P = [], m = spec.mouth || {};
+    (figs || []).forEach(function(f, i){
+      var w = 'figure ' + (i + 1) + ' (' + f.kind + '): ';
+      if(!KINDS[f.kind]){ P.push(w + 'unknown picture kind'); return; }
+      Object.keys(f.hide || {}).forEach(function(h){ if(['cal', 'furc', 'mob'].indexOf(h) < 0) P.push(w + 'hide.' + h + ' is not something a chart can hide'); });
+      var ts = figTeeth(spec, f);
+      ts.forEach(function(n){ if(!CAT(n)) P.push(w + 'tooth ' + n + ' is not a universal number'); });
+      if(f.kind === 'chart' || f.kind === 'film' || f.kind === 'view'){
+        var a = ts.map(isUpper); if(a.some(Boolean) && !a.every(Boolean)) P.push(w + 'the teeth are not all in one arch');
+        if(!present(spec, ts).length) P.push(w + 'every tooth in it is missing');
+      }
+      if(f.kind === 'bitewing'){
+        ts.forEach(function(n){ var c = CAT(n); if(c && c.films.indexOf('bitewing') < 0) P.push(w + 'a bitewing of #' + n + ' (the ' + c.name + '): bitewings show premolars and molars'); });
+        if(!ts.some(isUpper) || ts.every(isUpper)) P.push(w + 'a bitewing shows both arches: list upper and lower teeth');
+        var sides = ts.map(function(n){ return CAT(n) && CAT(n).side; }); if(sides.some(function(x){ return x !== sides[0]; })) P.push(w + 'a bitewing shows one side');
+      }
+      if(f.kind === 'fmx' || f.kind === 'odontogram'){
+        var gone = 0; for(var j = 1; j <= 32; j++) if(tooth(spec, String(j)).missing) gone++;
+        if(!spec.full) P.push(w + 'a full-mouth view needs full:true and every tooth in the record (missing ones by the missing module)');
+        if(m.teeth != null && m.teeth !== 32 - gone) P.push(w + 'the box says ' + m.teeth + ' teeth present; the record has ' + (32 - gone));
+        if(m.lost != null && m.lost > gone) P.push(w + m.lost + ' teeth lost to periodontitis, but only ' + gone + ' are missing');
+      }
+    });
+    return P;
+  };
+  /* answerable from what's shown: each question says what its key rests on (q.rests: stage, grade, extent, rt, furc, impl,
+     kind), and this fails when the figures and rows it shows don't include it. The twin of hide, which stops a picture
+     from giving the answer away. */
+  var RESTS = ['stage', 'grade', 'extent', 'rt', 'furc', 'impl', 'kind'];
+  I.RESTS = RESTS;
+  I.answerable = function(spec, figs, rows, rests){
+    spec = prep(spec); figs = figs || []; rows = rows || []; var P = [], D = I.derive(spec), m = spec.mouth || {};
+    var rowText = rows.map(function(r){ return r.join(': '); }).join(' | ');
+    function row(re){ return re.test(rowText); }
+    function inFig(kinds, n, test){ return figs.some(function(f){ return kinds.indexOf(f.kind) >= 0 && figTeeth(spec, f).indexOf(String(n)) >= 0 && (!test || test(f)); }); }
+    function chart(n, test){ return inFig(['chart'], n, test); }
+    function film(n){ return inFig(['film', 'bitewing', 'fmx'], n); }
+    var anyChart = figs.some(function(f){ return f.kind === 'chart'; });
+    (rests || []).forEach(function(k){
+      if(RESTS.indexOf(k) < 0){ P.push('rests: "' + k + '" is not one of ' + RESTS.join(', ')); return; }
+      if(k === 'kind' && !anyChart) P.push('kind: health, gingivitis or periodontitis needs the chart (CAL and bleeding)');
+      if(k === 'stage'){
+        if(D.kind !== 'periodontitis'){ if(!anyChart) P.push('stage: no attachment loss is only seen on the chart, and none is shown'); return; }
+        var sev = (D.sCAL === D.severity && chart(D.maxInterdental.tooth)) || (D.sRBL === D.severity && D.maxRBL.tooth && film(D.maxRBL.tooth));
+        if(!sev) P.push('stage: the severity rests on interdental CAL at #' + D.maxInterdental.tooth + ' (' + D.maxInterdental.v + ' mm) or bone loss at #' + (D.maxRBL.tooth || '?') + ' (' + D.maxRBL.pct + '%), and neither is shown');
+        if(D.stage === 4 && (m.lost >= 5 || (m.stage4 && m.stage4.length))){
+          if(!row(/lost|stage 4|bite|chewing|ridge|mobil|drift|flar/i)) P.push('stage: Stage 4 rests on teeth lost or the complexity it adds, and no row gives it');
+        } else if(D.stage > D.severity){
+          var shown = (D.maxPD.v >= 6 && chart(D.maxPD.tooth)) || (D.vertical >= 3 && film(D.verticalTooth)) ||
+            (D.furc >= 2 && (chart(D.furcTooth, function(f){ return !(f.hide && f.hide.furc); }) || (film(D.furcTooth) && tooth(spec, D.furcTooth).furcX >= 2))) ||
+            (m.lost && row(/lost/i));
+          if(!shown) P.push('stage: Stage ' + D.stage + ' rests on ' + D.triggers.join(' or ') + ', and none of it is shown');
+        }
+      }
+      if(k === 'grade'){
+        var smokeRow = row(/tobacco|smok|cigar/i), a1cRow = row(/hba1c|a1c|glyc|diabet/i);
+        if(D.modifiers.length){
+          if(!(((spec.smoke || 0) >= 10 && smokeRow) || ((spec.hba1c || 0) >= 7 && a1cRow))) P.push('grade: Grade C rests on ' + D.modifiers.join(' or ') + ', and no row gives it');
+        } else {
+          if(D.maxRBL.pct > 0 && !film(D.maxRBL.tooth)) P.push('grade: the grade rests on bone loss for age, and the film of #' + D.maxRBL.tooth + ' is not shown');
+          if(!row(/patient|age|year-old/i)) P.push('grade: the grade rests on bone loss for age, and no row gives the age');
+          if(spec.smoke != null && !smokeRow) P.push('grade: no row says whether the patient smokes, so Grade C can\'t be ruled out');
+          if(spec.hba1c != null && !a1cRow) P.push('grade: no row gives the HbA1c, so Grade C can\'t be ruled out');
+        }
+      }
+      if(k === 'extent' && !row(/involv|extent|of \d+ teeth/i)) P.push('extent: localized or generalized rests on how many teeth are involved, and no row gives it');
+      if(k === 'rt') Object.keys(D.rt).forEach(function(n){ if(!chart(n)) P.push('rt: the recession type of #' + n + ' needs its chart (facial recession and interdental CAL)'); });
+      if(k === 'furc' && D.furc && !(chart(D.furcTooth, function(f){ return !(f.hide && f.hide.furc); }) || (film(D.furcTooth) && tooth(spec, D.furcTooth).furcX))) P.push('furc: the furcation of #' + D.furcTooth + ' is not shown');
+      if(k === 'impl') Object.keys(D.impl).forEach(function(n){ if(!film(n)) P.push('impl: the implant at #' + n + ' needs its film'); });
+    });
+    return P;
+  };
+  /* the numbers an explanation quotes: q.says = { maxInterdental:7, stage:3, ... }; each must be what the record gives and
+     must appear in the question's text, so the explanation can't drift from the picture */
+  I.got = function(spec){
+    var d = I.derive(spec);
+    return { kind:d.kind, stage:d.stage, grade:d.grade, extent:d.extent, dx:d.dx, rt:d.rt, impl:d.impl, triggers:d.triggers, ratio:d.ratio,
+      maxInterdental:d.maxInterdental.v, maxRBL:d.maxRBL.pct, maxPD:d.maxPD.v, bopPct:d.bopPct, extentPct:d.extentPct };
+  };
+  I.checkSays = function(spec, q){
+    var P = [], g = I.got(spec), text = [q.stem, q.ex, q.why, q.choices, q.exp].map(function(x){ return x == null ? '' : typeof x === 'string' ? x : JSON.stringify(x); }).join(' ');
+    Object.keys(q.says || {}).forEach(function(k){
+      var v = q.says[k];
+      if(!(k in g)){ P.push('says.' + k + ': not something the record works out'); return; }
+      if(JSON.stringify(g[k]) !== JSON.stringify(v)) P.push('says.' + k + ': the text quotes ' + JSON.stringify(v) + ', the record gives ' + JSON.stringify(g[k]));
+      var sv = String(v), re = typeof v === 'number' ? new RegExp('(^|[^0-9.])' + sv.replace('.', '\\.') + '($|[^0-9])') : null;
+      if(re ? !re.test(text) : text.toLowerCase().indexOf(sv.toLowerCase()) < 0) P.push('says.' + k + ': ' + sv + ' is not in the question\'s text');
+    });
+    return P;
+  };
   /* the hooks a hub calls: q.pcase names a case in its PCASES; q.pfig picks this question's pictures (and hides a row
-     that would give its answer away); the case's box rows go in front of the question's own */
+     that would give its answer away); the case's box rows (its own, or the record's) go in front of the question's own */
   I.pboxFigures = function(q, cases){ var c = q && q.pcase && cases && cases[q.pcase]; return c ? I.figures(c.spec, q.pfig || c.figs) : ''; };
-  I.foldBox = function(questions, cases){ (questions || []).forEach(function(q){ var c = q.pcase && cases && cases[q.pcase]; if(c && !q._boxFolded){ q.pbox = (c.box || []).concat(q.pbox || []); q._boxFolded = true; } }); };
+  I.boxRows = function(q, cases){ var c = q && q.pcase && cases && cases[q.pcase]; return (c && !q._boxFolded ? I.caseRows(c) : []).concat(q && q.pbox || []); };
+  I.foldBox = function(questions, cases){ (questions || []).forEach(function(q){ var c = q.pcase && cases && cases[q.pcase]; if(c && !q._boxFolded){ q.pbox = I.caseRows(c).concat(q.pbox || []); q._boxFolded = true; } }); };
   /* "In the notes" buttons under an explanation: q.ref = [{ label, go }], go as window.SH_GOTO takes it */
   I.refHTML = function(q){
     if(!q || !q.ref || !q.ref.length) return '';
@@ -705,6 +985,7 @@
   });
   I.derivedText = function(spec){ return I.derive(spec).dx; };
   I.XT = XT;
-  I._ = { teethOf:teethOf, viewOrder:viewOrder, typeOf:typeOf, siteOrder:siteOrder, crownMM:crownMM, rootsMM:rootsMM, boneMM:boneMM };
+  I.teeth = TL;
+  I._ = { teethOf:teethOf, expand:expand, viewOrder:viewOrder, typeOf:typeOf, siteOrder:siteOrder, crownMM:crownMM, rootsMM:rootsMM, boneMM:boneMM };
   window.shCases = I; window.DCASE = I;
 })();

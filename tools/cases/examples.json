@@ -1,0 +1,57 @@
+{
+  "about": "Patient Box v2's example cases: made-up patients assembled from modules, checked by node tools/ci/cases.js like a hub's (every module, view and check runs on them) and drawn for the screenshots in its PR. Not on any page. A new hub copies one into its content/core.json's pcases (vault/how-to/draw-a-patient-box-case.md).",
+  "pcases": {
+    "v2-full-mouth": {
+      "title": "Full mouth, first visit",
+      "spec": {
+        "full": true, "teeth": ["28", "29", "30", "31"], "age": 52, "sex": "man", "smoke": 12, "hba1c": 5.6,
+        "cc": "My gums bleed when I brush and the back tooth feels loose.",
+        "mouth": { "teeth": 27, "involved": 13, "lost": 1 },
+        "gingiva": { "look": "inflamed", "edema": 0.6, "kt": 3 },
+        "modules": [
+          { "m": "missing", "teeth": ["1", "16", "17", "32", "19"] },
+          { "m": "bone", "teeth": ["2", "3", "14", "15", "18", "20", "21", "28", "29", "31"], "percent": 22, "rec": 1 },
+          { "m": "bone", "teeth": ["30"], "percent": 30, "pattern": "vertical", "side": "m", "defect": 3, "rec": 1 },
+          { "m": "bone", "teeth": ["4", "13"], "percent": 15 },
+          { "m": "restoration", "tooth": "30", "surfaces": "MOD", "material": "amalgam" },
+          { "m": "restoration", "tooth": "14", "surfaces": "O", "material": "composite" },
+          { "m": "restoration", "tooth": "3", "material": "crown" },
+          { "m": "endo", "tooth": "3" },
+          { "m": "caries", "tooth": "29", "surface": "D", "depth": "dentin" },
+          { "m": "caries", "tooth": "4", "surface": "M", "depth": "enamel" },
+          { "m": "caries", "tooth": "20", "surface": "M", "depth": "dentin" },
+          { "m": "endo", "tooth": "20", "fill": false, "lesion": 4 },
+          { "m": "bop", "rate": 0.35 },
+          { "m": "plaque", "rate": 0.4 }
+        ],
+        "t": { "30": { "calc": true } }
+      },
+      "figs": [{ "kind": "chart", "title": "#28-#31" }, { "kind": "film", "title": "#28-#31" }, { "kind": "odontogram" }],
+      "expect": { "kind": "periodontitis", "stage": 3, "grade": "C", "extent": "generalized", "maxRBL": 30 }
+    },
+    "v2-molar-furcation": {
+      "title": "Upper left molars",
+      "spec": {
+        "teeth": ["12", "13", "14", "15"], "age": 61, "sex": "woman", "smoke": 0, "hba1c": 6.1,
+        "mouth": { "teeth": 26, "involved": 6, "lost": 0 },
+        "modules": [
+          { "m": "bone", "teeth": ["12", "13"], "percent": 18 },
+          { "m": "bone", "teeth": ["14"], "percent": 45, "rec": 2 },
+          { "m": "bone", "teeth": ["15"], "percent": 35, "rec": 1 },
+          { "m": "restoration", "tooth": "15", "surfaces": "DO", "material": "gold" },
+          { "m": "bop", "rate": 0.25 }
+        ]
+      },
+      "figs": [{ "kind": "chart" }, { "kind": "film" }, { "kind": "bitewing", "teeth": ["12", "13", "14", "15", "21", "20", "19", "18"] }],
+      "expect": { "kind": "periodontitis", "stage": 3, "grade": "B", "extent": "localized" }
+    }
+  },
+  "questions": [
+    { "id": "v2-ex-1", "pcase": "v2-full-mouth", "rests": ["stage", "grade", "extent"], "says": { "stage": 3, "grade": "C" },
+      "stem": "From his chart, film and odontogram, how is this patient's periodontitis staged and graded?",
+      "choices": ["Generalized Stage 3 Grade C", "Localized Stage 2 Grade B", "Generalized Stage 2 Grade C", "Localized Stage 3 Grade A"], "answer": 0,
+      "why": ["Stage 3: the 3 mm vertical defect on #30's mesial raises it; Grade C: he smokes 12 cigarettes a day; generalized: 13 of 27 teeth.", "", "", ""] },
+    { "id": "v2-ex-2", "pcase": "v2-molar-furcation", "rests": ["furc", "stage"], "pfig": [{ "kind": "chart", "hide": { "furc": true } }, { "kind": "film" }],
+      "stem": "What does #14's film show between its roots?", "choices": ["Furcation involvement", "Nothing unusual"], "answer": 0, "why": ["", ""] }
+  ]
+}

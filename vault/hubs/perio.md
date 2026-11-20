@@ -73,6 +73,9 @@ sh-v66). Its later check-ins go into the next audit.
   unrealistic or its `expect` disagrees with them. A question names its case in `pcase`, picks its pictures with
   `pfig` (and hides a row that would give its answer away: `hide.cal`, `hide.furc`, `hide.mob`) and lists its `ref`
   links ("In the notes"). Write every new Patient Box item this way: [draw-a-patient-box-case](../how-to/draw-a-patient-box-case.md).
+  Since Patient Box v2 (2026-11-20) the kit reads `widget/teeth.js` and cases can be built from modules; the eleven old
+  cases (in git before 6b32460) still draw byte for byte as before, and move onto modules if the page ever returns
+  ([next steps](../tasks/2026-11-20-patient-box-v2-next-steps.md)).
 - **Session 6, Dr. Geurs** (taught since 2026-11-18, [task](../tasks/done/2026-11-03-perio-s6-regeneration-taught.md)): the
   notes follow the class recording (Drive: `en-FA2026_DENT2145-VT_Lecturecapture_AVLC (1).txt`, uploaded 2026-10-25, found
   2026-11-18; it opens "Good morning, so you've had a day of occlusion") with his deck

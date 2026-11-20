@@ -54,6 +54,9 @@ tags: [widget, supabase]
   and `widget/v3.js` (the streak cheer, Welcome back, the update notice) and `widget/pet.js` use it when it's there (an
   old page without it keeps the dark pill). **A new message calls it with a kind** (the list is at the top of the file);
   what pays XP or crowns goes on the gold reward card (`widget/prize.js`) instead ([decisions](../decisions.md)).
+- **`widget/teeth.js`** (`window.SH_TEETH`; `require()` in Node): the tooth library (Patient Box v2, 2026-11-20): Wheeler's
+  sizes and outlines and one catalogue entry for each of the 32 teeth. The case kit reads it and the figure builds import it
+  (the arcade's Stage & Grade tile), so a drawn tooth and a case's agree. A hub loads it before `cases.js`.
 - **`widget/cases.js` + `widget/cases.css`** (`window.shCases`): the dental case kit. A Patient Box question in any
   hub names a case (`pcase`) in that hub's `PCASES`, and the kit draws its periodontal chart, periapical radiograph
   and buccal view from the case's numbers, works out the diagnosis from them and validates that every number is

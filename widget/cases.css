@@ -1,5 +1,5 @@
 /* study-hubs: styles for the dental case kit (widget/cases.js): the chart strip, the numbers table, the periapical
-   film and the drawn buccal view. Scoped to .dc-figs so a hub's own .pimg rules are left alone. Loaded by every hub
+   film, the bitewing, the full-mouth series, the odontogram and the drawn buccal view. Scoped to .dc-figs so a hub's own .pimg rules are left alone. Loaded by every hub
    that draws Patient Box cases, after widget/v3.css. */
 .dc-figs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:10px;margin:10px 0 4px}
 .dc-figs .pimg{margin:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px}
@@ -52,6 +52,23 @@
 .dc-film .xr-lam{fill:#cfcfcf}.dc-film .xr-pdl{fill:#2a2a2a}.dc-film .xr-dentin{fill:#b2b2b2}.dc-film .xr-enamel{fill:#ececec}.dc-film .xr-pulp{fill:#4f4f4f}
 .dc-film .xr-metal{fill:#fbfbfb}.dc-film .xr-crown{fill:#e4e4e4;stroke:#fff;stroke-width:1.2}.dc-film .xr-bore{fill:#3c3c3c}
 .dc-film .xr-dot{fill:#f3f3f3}
+/* Patient Box v2: composite and caries on a film, the full-mouth series' mount */
+.dc-film .xr-comp{fill:#c4c4c4}.dc-film .xr-car{fill:#262626;opacity:.92}.dc-film .xr-lesion{opacity:.9}
+.dc-fmx .dc-mount{fill:#1c1c1c}
+.dc-figs svg.dc-fmx,.dc-figs svg.dc-odo{max-width:760px}
+/* the odontogram: five surfaces a tooth, the record's marks on them */
+.dc-odo .dc-osurf{fill:var(--surface);stroke:var(--ink-soft);stroke-width:.7;stroke-linejoin:round}
+.dc-odo .dc-o-gone{fill:var(--surface-3,var(--surface-2));stroke:var(--line)}
+.dc-odo .dc-osurf.dc-o-amalgam{fill:#6c717c}.dc-odo .dc-osurf.dc-o-composite{fill:#ecd98f}.dc-odo .dc-osurf.dc-o-gold{fill:#d6a22a}.dc-odo .dc-osurf.dc-o-caries{fill:#d7303a}
+.dc-odo .dc-ox{stroke:var(--ink-faint);stroke-width:2;stroke-linecap:round;fill:none}
+.dc-odo .dc-o-crown{fill:none;stroke:var(--ink);stroke-width:1.5}
+.dc-odo .dc-o-impl,.dc-odo .dc-o-endo{fill:none;stroke:var(--ink);stroke-width:1.6;stroke-linecap:round}
+.dc-odo .dc-o-lesion{fill:none;stroke:#d7303a;stroke-width:1.4}
+.dc-odo .dc-onum{fill:var(--ink-soft);font:700 8.5px var(--font-mono)}
+.dc-odo .dc-mid{stroke:var(--line-strong,var(--line));stroke-width:.8;stroke-dasharray:3 2;fill:none}
+.dc-okey .dc-ok{display:inline-block;width:.8em;height:.8em;border:1px solid var(--ink-soft);border-radius:2px;vertical-align:-.1em;margin:0 2px 0 6px}
+.dc-okey .dc-ok:first-child{margin-left:0}.dc-okey .dc-ok.dc-o-caries{background:#d7303a}.dc-okey .dc-o-amalgam{background:#6c717c}.dc-okey .dc-o-composite{background:#ecd98f}.dc-okey .dc-o-gold{background:#d6a22a}
+.dc-otext{font-size:.74rem;color:var(--ink-soft);margin-top:4px}.dc-otext summary{cursor:pointer;font-weight:600}.dc-otext p{margin:4px 0 0;line-height:1.4}
 /* the drawn view */
 .dc-view .io-bg{fill:#3a1f24}.dc-view .io-gum{fill:#e3959b}.dc-view .io-mucosa{fill:#c9636d}
 .dc-attached{fill:#eba3a8}.dc-attached.dc-inflamed{fill:#d9646c}.dc-attached.dc-fibrotic{fill:#e8b4b4}
