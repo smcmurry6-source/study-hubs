@@ -47,7 +47,7 @@ sections to make it more manageable."
 
 ## Outcome
 
-Shipped in [#480](https://github.com/smcmurry6-source/study-hubs/pull/480): 14 courses (Cardio & Respiratory still being merged: this line gets the final counts). Every part has notes As
+Shipped in [#480](https://github.com/smcmurry6-source/study-hubs/pull/480): 14 courses in 70 parts, 1,126 questions, 316 High likelihood topics. Every part has notes As
 taught and in Plain English, a cram list, High likelihood topics (about 40% of its questions) and board-style questions with
 every choice explained; the special formats meet their minimums per course. Narration off, no figures, no arcade.
 
@@ -69,7 +69,10 @@ sources were classmates' guides and answered objectives, not professor slides, s
   gyrase; AHA 2021 prophylaxis without clindamycin; several outdated drugs left out.
 - Oral Microbiology: Kaposi sarcoma as HHV-8; localized aggressive periodontitis with its current name.
 - Neuroscience: Wernicke area in the temporal lobe; the rule of 4; amides metabolized in the liver.
-- Cardio & Respiratory: being merged.
+- Cardio & Respiratory: written from the class's objectives and the class above's reviews (no slides); its dental points
+  (epinephrine limits, blood pressure cutoffs, INR for an extraction, the wait after an MI) from standard references; Mobitz II,
+  normal aPTT 25-35 s, protamine fully reverses heparin and only partly LMWH, clopidogrel and CYP2C19, CO2 about 70% as
+  bicarbonate, tetracyclines (not fluoroquinolones) stain teeth. It holds the coagulation and anticoagulants Heme & Endo left to it.
 - Renal: GFR 125 mL/min and 180 L/day; NKCC2 in the thick ascending limb; contraction alkalosis; the ion and segment
   percentages; CKD not High likelihood (above).
 - Heme & Endo: Hashimoto as anti-TPO destruction; pramlintide apart from the alpha-glucosidase inhibitors; hypoglycemia below

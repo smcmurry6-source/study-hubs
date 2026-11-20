@@ -30,6 +30,14 @@ lands here or in a task note ([to-dos-go-in-the-vault](../rules/to-dos-go-in-the
   - The stylomandibular ligament: the notes say it limits protrusion (standard texts), not "prevents excessive opening".
   - Medical Emergencies' professors as the transcripts spell them: Dr. Kinard, Dr. Squire, Dr. Ying, Dr. Castro.
   - Fundamentals II has four review tables and four sort sets (the brief said up to two a course): trim or keep.
+  - Cardio & Respiratory: NYHA class, prazosin and artificial valves (the class above was told they weren't on its test) are
+    mentioned in passing, with no question on them: keep or drop.
+- [ ] **The engine's background work after Home in small pieces** (2026-11-20, [#480](https://github.com/smcmurry6-source/study-hubs/pull/480)):
+  on the performance suite's slowed phone, Review of Systems blocks the page for about 850 ms after Home has drawn (Heme & Endo
+  Exam 3: about 330). A CPU profile put the JavaScript in `exportSections()` in `widget/hub.js` (every part's notes parsed into
+  the page in one task for the search index), `fit()`/`fitFigs()` in `widget/v3.js`'s layer and `fmt()`'s `toLocaleString`;
+  the rest is the browser parsing the content JSON. Building the index a few parts at a time, yielding between them, would
+  cut it on every hub; then lower the hub's `tbt` in `tools/release/budgets.json` (set to 900 from that day's run).
 - [ ] **Ask Timmy on Haiku: run the eval, with Review of Systems cases** (2026-11-20, [#480](https://github.com/smcmurry6-source/study-hubs/pull/480)):
   Timmy moved to Haiku 5.5 (Sam: "we can switch timmy to run on haiku"; [decisions](../decisions.md)) without a new eval run,
   because the session that switched him had no eval key (`TIMMY_EVAL_KEY`). The last Haiku run (2026-11-14) answered 83 of the

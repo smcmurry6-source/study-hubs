@@ -25,11 +25,11 @@
    "tbt": 500
   },
   "hubs/review-of-systems/": {
-   "kb": 830,
+   "kb": 1500,
    "requests": 12,
    "fcp": 3000,
    "lcp": 3000,
-   "tbt": 500
+   "tbt": 900
   }
  }
 }

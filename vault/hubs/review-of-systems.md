@@ -61,8 +61,11 @@ check-in hours: its entry in `hubs.js`.
 - **Not High likelihood on purpose:** CKD (`rn-disease-01` to `-05`): a classmate's Renal Exam 1 objectives head it "NO EXAM
   Qs on this". The questions stay, since that was about the Renal course's own exam and CKD's dental care is board material;
   Sam's call ([inbox](../tasks/inbox.md)). The merge script that built the content kept it out.
-- **Size:** the biggest bank on the site, about 1 MB over the wire on a first visit (after the page has drawn: the content
-  JSON loads behind it), against Heme & Endo Exam 3's 780 KB; its line in `tools/release/budgets.json`. Ask Timmy's content
+- **Size:** the biggest bank on the site, about 1.2 MB over the wire on a first visit (200 KB before the page has drawn: the
+  content JSON loads behind it), against Heme & Endo Exam 3's 780 KB, and about 850 ms of blocking time on the performance
+  suite's slowed phone (Heme & Endo Exam 3: 300-370 ms), nearly all of it the background work after Home has drawn (parsing the
+  JSON, the search index of every part's notes). Its budget in `tools/release/budgets.json` is set from that (2026-11-20);
+  chunking the search index is on the [inbox](../tasks/inbox.md). Ask Timmy's content
   for it is about 170-200k tokens by length, which is why Timmy moved to Haiku 5.5 ([decisions](../decisions.md),
   [ask-timmy](../reference/ask-timmy.md)) and `tools/timmy/test.mjs`'s guard is 200k.
 
